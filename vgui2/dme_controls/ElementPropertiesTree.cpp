@@ -2883,7 +2883,7 @@ void CElementPropertiesTreeInternal::UpdateTree()
 		vgui::Panel *widget = CreateAttributeDataWidget( pElement, "element", pElement, NULL );
 
 		CUtlVector< Panel * >	columns;
-		columns.AddToTail( NULL );
+		columns.AddToTail( nullptr );
 		columns.AddToTail( widget );
 		int rootIndex = m_pTree->AddItem( kv, editableLabel, -1, columns );
 
@@ -4160,7 +4160,7 @@ void CElementPropertiesTreeInternal::CreateTreeEntry( int parentNodeIndex, CDmEl
 	}
 
 	CUtlVector< vgui::Panel * >	columns;
-	columns.AddToTail( NULL );
+	columns.AddToTail( nullptr );
 	columns.AddToTail( widgets.m_pValueWidget );
 	int itemIndex = m_pTree->AddItem( kv, bEditableLabel, parentNodeIndex, columns );
 	SetTreeItemColor( itemIndex, pEntryElement, bIsElementArrayItem, bEditableLabel );
