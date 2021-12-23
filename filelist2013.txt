@@ -3,39 +3,7 @@ Volume serial number is 7A71-36E5
 D:.
 ³   createallprojects.bat
 ³   filelist2013.txt
-³   
-ÃÄÄÄapp
-³   ÀÄÄÄlegion
-³           basemenu.cpp
-³           basemenu.h
-³           gamemanager.cpp
-³           gamemanager.h
-³           heightfield.cpp
-³           heightfield.h
-³           hostgamemenu.cpp
-³           inetworkmessagelistener.h
-³           inputmanager.cpp
-³           inputmanager.h
-³           joingamemenu.cpp
-³           legion.cpp
-³           legion.h
-³           legion.vcproj
-³           mainmenu.cpp
-³           menumanager.cpp
-³           menumanager.h
-³           networkmanager.cpp
-³           networkmanager.h
-³           networkmessages.cpp
-³           networkmessages.h
-³           physicsmanager.cpp
-³           physicsmanager.h
-³           rendermanager.cpp
-³           rendermanager.h
-³           uimanager.cpp
-³           uimanager.h
-³           worldmanager.cpp
-³           worldmanager.h
-³           
+³      
 ÃÄÄÄappframework
 ³       appframework.vpc
 ³       AppSystemGroup.cpp
