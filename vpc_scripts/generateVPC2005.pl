@@ -276,6 +276,7 @@ my(%configOptionsMultiValue) = (
 		"FloatingPointExceptions"		=>	"EnableFloatingPointExceptions",
 
 		# Language
+		"LanguageStandard"			=>	"LanguageStandard",
 		"DisableLanguageExtensions"		=>	"DisableLanguageExtensions",
 		"DefaultCharIsUnsigned"			=>	"DefaultCharUnsigned",
 		"TreatWChar_tAsBuiltInType"		=>	"TreatWchar_tAsBuiltinType",
@@ -579,6 +580,12 @@ my(%configOptionValues) = (
 		},
 
 		# Language
+		"LanguageStandard"			=>
+		{
+			"0"	=>	"ISO C++14 Standard (std:c++14)",
+			"1"	=>	"ISO C++17 Standard (std:c++17)",
+			"2"	=>	"Preview - Features from the Latest C++ Working Draft (std:c++latest)",
+		},
 		"DisableLanguageExtensions"		=>
 		{
 			"false"	=>	"No",

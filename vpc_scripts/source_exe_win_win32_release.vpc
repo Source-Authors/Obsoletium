@@ -103,6 +103,7 @@ $Configuration "Release"
 		$EnableFloatingPointExceptions
 
 		// Language
+		$LanguageStandard					"ISO C++17 Standard (std:c++17)"
 		$DisableLanguageExtensions
 		$DefaultCharUnsigned					"No"
 		$TreatWCHAR_TAsBuiltInType				"Yes (/Zc:wchar_t)"
