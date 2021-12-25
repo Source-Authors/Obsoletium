@@ -679,7 +679,7 @@ public:
 			eSize = BREAKPOINT_SIZE_2;
 			break;
 		case 4:
-			eSize = BREAKPOINT_SIZE_4;
+			eSize = BREAKPOINT_SIZE_4; //-V1048
 			break;
 		case 8:
 			eSize = BREAKPOINT_SIZE_8;

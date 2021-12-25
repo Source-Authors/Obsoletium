@@ -5,11 +5,11 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vstdlib/ikeyvaluessystem.h>
-#include <keyvalues.h>
+#include "vstdlib/ikeyvaluessystem.h"
+#include "tier1/keyvalues.h"
 #include "tier1/mempool.h"
-#include "utlsymbol.h"
-#include "utlmap.h"
+#include "tier1/utlsymbol.h"
+#include "tier1/utlmap.h"
 #include "tier0/threadtools.h"
 #include "tier1/memstack.h"
 #include "tier1/convar.h"
@@ -19,7 +19,7 @@
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 #ifdef NO_SBH // no need to pool if using tier0 small block heap
 #define KEYVALUES_USE_POOL 1
@@ -312,7 +312,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 
 			// build up the new item
 			item->next = NULL;
-			int numStringBytes = strlen(name);
+			size_t numStringBytes = strlen(name);
 			char *pString = (char *)m_Strings.Alloc( numStringBytes + 1 + 3 );
 			if ( !pString )
 			{
@@ -372,8 +372,8 @@ HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive( HKeySymbol &hCaseI
 			while ( int nAlternativeStringIndex = MEM_4BYTES_FROM_0_AND_3BYTES( *pnCaseResolveIndex ) )
 			{
 				pCompareString = (char *)m_Strings.GetBase() + nAlternativeStringIndex;
-				int iResult = strcmp( name, pCompareString );
-				if ( !iResult )
+				int res = strcmp( name, pCompareString );
+				if ( !res )
 				{
 					// found an exact match
 					return (HKeySymbol)nAlternativeStringIndex;
@@ -427,7 +427,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive( HKeySymbol &hCaseI
 
 			// build up the new item
 			item->next = NULL;
-			int numStringBytes = strlen(name);
+			size_t numStringBytes = strlen(name);
 			char *pString = (char *)m_Strings.Alloc( numStringBytes + 1 + 3 );
 			if ( !pString )
 			{

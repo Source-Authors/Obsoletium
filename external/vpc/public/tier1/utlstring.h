@@ -269,7 +269,7 @@ public:
 	static char		  *Duplicate( const char *pValue ) { return strdup( pValue ); }
 	static void		   Copy( char *out_pOut, const char *pIn, int iLength ) { strncpy( out_pOut, pIn, iLength ); }
 	static int		   Compare( const char *pLhs, const char *pRhs ) { return strcmp( pLhs, pRhs ); }
-	static int		   Length( const char *pValue ) { return strlen( pValue ); }
+	static ptrdiff_t		   Length( const char *pValue ) { return strlen( pValue ); }
 	static const char *FindChar( const char *pStr, const char cSearch ) { return strchr( pStr, cSearch ); }
 	static const char *EmptyString() { return ""; }
 };
@@ -281,7 +281,7 @@ public:
 	static wchar_t		 *Duplicate( const wchar_t *pValue ) { return wcsdup( pValue ); }
 	static void			  Copy( wchar_t *out_pOut, const wchar_t  *pIn, int iLength ) { wcsncpy( out_pOut, pIn, iLength ); }
 	static int			  Compare( const wchar_t *pLhs, const wchar_t *pRhs ) { return wcscmp( pLhs, pRhs ); }
-	static int			  Length( const wchar_t *pValue ) { return wcslen( pValue ); }
+	static ptrdiff_t			  Length( const wchar_t *pValue ) { return wcslen( pValue ); }
 	static const wchar_t *FindChar( const wchar_t *pStr, const wchar_t cSearch ) { return wcschr( pStr, cSearch ); }
 	static const wchar_t *EmptyString() { return L""; }
 };

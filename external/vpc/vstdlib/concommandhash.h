@@ -164,22 +164,26 @@ CConCommandHash::CCommandHashIterator_t CConCommandHash::First() const
 CConCommandHash::CCommandHashIterator_t 
 CConCommandHash::Next( const CConCommandHash::CCommandHashIterator_t &iter ) const
 {
-	// look for the next entry in the current bucket
-	CCommandHashHandle_t next = m_aDataPool.Next(iter.handle);
 	const CCommandHashHandle_t invalidIndex = m_aDataPool.InvalidIndex();
-	if ( next != invalidIndex )
 	{
-		// this bucket still has more elements in it
-		return CCommandHashIterator_t(iter.bucket, next);
+		// look for the next entry in the current bucket
+		CCommandHashHandle_t next = m_aDataPool.Next(iter.handle);
+		if (next != invalidIndex)
+		{
+			// this bucket still has more elements in it
+			return CCommandHashIterator_t(iter.bucket, next);
+		}
 	}
 
-	// otherwise look for the next bucket with data
-	int bucketCount = m_aBuckets.Count();
-	for ( int bucket = iter.bucket+1 ; bucket < bucketCount ; ++bucket )
 	{
-		CCommandHashHandle_t next = m_aBuckets[bucket]; // get the head of the bucket
-		if (next != invalidIndex)
-			return CCommandHashIterator_t( bucket, next );
+		// otherwise look for the next bucket with data
+		int bucketCount = m_aBuckets.Count();
+		for (int bucket = iter.bucket + 1; bucket < bucketCount; ++bucket)
+		{
+			CCommandHashHandle_t next = m_aBuckets[bucket]; // get the head of the bucket
+			if (next != invalidIndex)
+				return CCommandHashIterator_t(bucket, next);
+		}
 	}
 
 	// if we're here, there's no more data to be had

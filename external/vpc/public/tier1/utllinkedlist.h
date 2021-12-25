@@ -236,8 +236,8 @@ template <class T, class S, bool ML, class I, class M>
 CUtlLinkedList<T,S,ML,I,M>::CUtlLinkedList( int growSize, int initSize ) :
 	m_Memory( growSize, initSize ), m_LastAlloc( m_Memory.InvalidIterator() )
 {
-	// Prevent signed non-int datatypes
-	COMPILE_TIME_ASSERT( sizeof(S) == 4 || ( ( (S)-1 ) > 0 ) );
+	// Prevent signed non-intp datatypes
+	static_assert( sizeof(S) == sizeof(intp) || ( ( (S)-1 ) > 0 ) );
 	ConstructList();
 	ResetDbgInfo();
 }

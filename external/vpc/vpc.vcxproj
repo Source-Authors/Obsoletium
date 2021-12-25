@@ -239,7 +239,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NO_PERFORCE;STANDALONE_VPC;STATIC_TIER0;STATIC_VSTDLIB;COMPILER_MSVC;COMPILER_MSVC64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NO_PERFORCE;STANDALONE_VPC;STATIC_TIER0;STATIC_VSTDLIB;COMPILER_MSVC;COMPILER_MSVC64;PLATFORM_64BITS;X64BITS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>public;public\tier0;public\tier1;public\tier2;public\vstdlib</AdditionalIncludeDirectories>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
@@ -261,7 +261,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NO_PERFORCE;STANDALONE_VPC;STATIC_TIER0;STATIC_VSTDLIB;COMPILER_MSVC;COMPILER_MSVC64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NO_PERFORCE;STANDALONE_VPC;STATIC_TIER0;STATIC_VSTDLIB;COMPILER_MSVC;COMPILER_MSVC64;PLATFORM_64BITS;X64BITS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>public;public\tier0;public\tier1;public\tier2;public\vstdlib</AdditionalIncludeDirectories>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>

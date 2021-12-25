@@ -322,7 +322,7 @@ void LMDReportInvalidBlock( DbgMemHeader_t *pHeader, const char *pszMessage )
 	char szMsg[256];
 	if ( pHeader )
 	{
-		sprintf( szMsg, "HEAP IS CORRUPT: %s (block 0x%x, %d bytes)\n", pszMessage, (size_t)( ((byte*) pHeader) + sizeof( DbgMemHeader_t ) ), pHeader->nLogicalSize );
+		sprintf( szMsg, "HEAP IS CORRUPT: %s (block 0x%zx, %zu bytes)\n", pszMessage, (size_t)( ((byte*) pHeader) + sizeof( DbgMemHeader_t ) ), pHeader->nLogicalSize );
 	}
 	else
 	{
@@ -2371,7 +2371,7 @@ void CDbgMemAlloc::SetCRTAllocFailed( size_t nSize )
 	m_sMemoryAllocFailed = nSize;
 	DebuggerBreakIfDebugging();
 	char buffer[256];
-	_snprintf( buffer, sizeof( buffer ), "***** OUT OF MEMORY! attempted allocation size: %u ****\n", nSize );
+	_snprintf( buffer, sizeof( buffer ), "***** OUT OF MEMORY! attempted allocation size: %zu ****\n", nSize );
 	buffer[sizeof(buffer) - 1] = '\0';
 #if defined( _PS3 ) && defined( _DEBUG )
 	DebuggerBreak();

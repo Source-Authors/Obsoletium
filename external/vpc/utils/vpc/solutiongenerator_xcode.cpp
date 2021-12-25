@@ -12,7 +12,7 @@
 
 #include "tier0/memdbgon.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <direct.h>
 #define mkdir(dir, mode) _mkdir(dir)
 #define getcwd _getcwd

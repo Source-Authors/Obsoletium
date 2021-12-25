@@ -123,7 +123,7 @@ const int MAX_LOGGING_LISTENER_COUNT = 16;
 // An invalid color set on a channel to imply that it should use
 // a device-dependent default color where applicable.
 //-----------------------------------------------------------------------------
-const Color UNSPECIFIED_LOGGING_COLOR( 0, 0, 0, 0 );
+const inline Color UNSPECIFIED_LOGGING_COLOR( 0, 0, 0, 0 );
 
 //-----------------------------------------------------------------------------
 // An ID returned by the logging system to refer to a logging channel.

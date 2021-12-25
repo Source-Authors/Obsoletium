@@ -285,7 +285,7 @@ VSTRTOOLS_INTERFACE void * V_UTF8_strncpy( char *pDest, const char *pSrc, size_t
   strncpy( pDest, pSrc, nMaxBytes );
 
   // http://en.wikipedia.org/wiki/UTF-8
-  int end = nMaxBytes-1;
+  ptrdiff_t end = nMaxBytes-1;
   pDest[end] = 0;
 
   int nBytesSeen = 0, nBytesExpected = 0;

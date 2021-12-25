@@ -7,7 +7,9 @@
 //===========================================================================//
 
 #include "vstdlib/cvar.h"
-#include <ctype.h>
+
+#include <cctype>
+
 #include "tier0/icommandline.h"
 #include "tier1/utlrbtree.h"
 #include "tier1/strtools.h"

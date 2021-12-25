@@ -3,9 +3,11 @@
 #include "crccheck_shared.h"
 #include "tier1/checksum_crc.h"
 #include "tier1/strtools.h"
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
+
+#include <cstring>
+#include <cstdio>
+#include <cstdarg>
+
 #ifdef _WIN32
 #include <process.h>
 #else

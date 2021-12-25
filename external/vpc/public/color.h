@@ -22,9 +22,8 @@ class Color
 {
 public:
 	// constructors
-	Color()
+	constexpr Color() : _color{0, 0, 0, 0}
 	{
-		*((int *)this) = 0;
 	}
 	Color(int _r,int _g,int _b)
 	{
@@ -33,6 +32,9 @@ public:
 	Color(int _r,int _g,int _b,int _a)
 	{
 		SetColor(_r, _g, _b, _a);
+	}
+	constexpr Color(const Color& rhs) : _color{ rhs._color[0], rhs._color[1], rhs._color[2], rhs._color[3] }
+	{
 	}
 	
 	// set the color
@@ -66,10 +68,10 @@ public:
 		return *((int *)this);
 	}
 
-	inline int r() const	{ return _color[0]; }
-	inline int g() const	{ return _color[1]; }
-	inline int b() const	{ return _color[2]; }
-	inline int a() const	{ return _color[3]; }
+	constexpr int r() const	{ return _color[0]; }
+	constexpr int g() const	{ return _color[1]; }
+	constexpr int b() const	{ return _color[2]; }
+	constexpr int a() const	{ return _color[3]; }
 	
 	unsigned char &operator[](int index)
 	{
@@ -91,9 +93,12 @@ public:
 		return !(operator==(rhs));
 	}
 
-	Color &operator=( const Color &rhs )
+	constexpr Color &operator=( const Color &rhs )
 	{
-		SetRawColor( rhs.GetRawColor() );
+		_color[0] = rhs.r();
+		_color[1] = rhs.g();
+		_color[2] = rhs.b();
+		_color[3] = rhs.a();
 		return *this;
 	}
 
@@ -108,12 +113,7 @@ public:
 
 	color32 ToColor32() const
 	{
-		color32 newColor;
-		newColor.r = _color[0];
-		newColor.g = _color[1];
-		newColor.b = _color[2];
-		newColor.a = _color[3];
-		return newColor;
+		return { _color[0], _color[1], _color[2], _color[3] };
 	}
 
 private:

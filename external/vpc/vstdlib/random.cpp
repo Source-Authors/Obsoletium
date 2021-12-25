@@ -8,8 +8,10 @@
 
 
 #include "vstdlib/random.h"
-#include <math.h>
-#include "dbg.h"
+
+#include <cmath>
+
+#include "tier0/dbg.h"
 
 #include "tier0/memdbgon.h"
 

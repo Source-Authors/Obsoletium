@@ -155,7 +155,7 @@ int GetCallStack_Fast( void **pReturnAddressesOut, int iArrayCount, int iSkipCou
 {
 	//Only tested in windows. This function won't work with frame pointer omission enabled. "vpc /nofpo" all projects
 #if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ))
+	(defined( WIN32 ) && !defined( _X360 ) && !defined( _WIN64 ))
 	void *pStackCrawlEBP;
 	__asm
 	{
@@ -837,8 +837,15 @@ int CrawlStack_StackWalk64( CONTEXT *pExceptionContext, void **pReturnAddressesO
 
 	STACKFRAME64 sfFrame = { 0 }; //memset(&sfFrame, 0x0, sizeof(sfFrame));
 	sfFrame.AddrPC.Mode = sfFrame.AddrFrame.Mode = AddrModeFlat;
-	sfFrame.AddrPC.Offset = currentContext.Eip;	
+#ifdef _WIN64
+	sfFrame.AddrPC.Offset = currentContext.Rip;	
+	sfFrame.AddrFrame.Offset = currentContext.Rbp;
+#elif defined(_WIN32)
+	sfFrame.AddrPC.Offset = currentContext.Eip;
 	sfFrame.AddrFrame.Offset = currentContext.Ebp;
+#else
+#error Unknown CPU arch.
+#endif
 
 	HANDLE hThread = GetCurrentThread();
 
@@ -1443,7 +1450,7 @@ CStackTop_CopyParentStack::CStackTop_CopyParentStack( void * const *pParentStack
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	//miniature version of GetCallStack_Fast()
 #if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ))
+	(defined( WIN32 ) && !defined( _X360 ) && !defined( _WIN64 ))
 	void *pStackCrawlEBP;
 	__asm
 	{
@@ -1501,7 +1508,7 @@ CStackTop_ReferenceParentStack::CStackTop_ReferenceParentStack( void * const *pP
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	//miniature version of GetCallStack_Fast()
 #if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ))
+	(defined( WIN32 ) && !defined( _X360 ) && !defined( _WIN64 ) )
 	void *pStackCrawlEBP;
 	__asm
 	{

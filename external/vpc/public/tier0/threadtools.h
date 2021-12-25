@@ -42,13 +42,6 @@
 #define PS3_SYS_PPU_THREAD_COMMON_STACK_SIZE ( 256 * 1024 )
 #endif
 
-
-#if defined( _WIN32 )
-#pragma once
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
-
 #ifdef COMPILER_MSVC64
 #include <intrin.h>
 #endif
@@ -143,7 +136,7 @@ typedef uint64 ThreadHandle_t;
 #else // COMPILER_SNC
 FORWARD_DECLARE_HANDLE( ThreadHandle_t );
 #endif // !COMPILER_SNC
-typedef uintp (*ThreadFunc_t)( void *pParam );
+typedef uint (*ThreadFunc_t)( void *pParam );
 
 #if defined( _PS3 )
 PLATFORM_OVERLOAD ThreadHandle_t CreateSimpleThread( ThreadFunc_t, void *pParam, ThreadId_t *pID, unsigned stackSize = 0x10000 /*64*/ );
@@ -433,7 +426,7 @@ DLL_IMPORT __thread int g_nThreadID;
 #endif
 #endif
 
-#if defined(WIN32) || defined(OSX)
+#if defined(_WIN32) || defined(OSX)
 #ifndef __AFXTLS_H__ // not compatible with some Windows headers
 
 #define CTHREADLOCALINT GenericThreadLocals::CThreadLocalInt<int>
@@ -488,13 +481,7 @@ private:
 			void *pData = CThreadLocalBase::Get();
 			return *reinterpret_cast<T*>( &pData );
 #else
-	#ifdef COMPILER_MSVC
-		#pragma warning ( disable : 4311 )
-	#endif
 			return reinterpret_cast<T>( CThreadLocalBase::Get() );
-	#ifdef COMPILER_MSVC
-		#pragma warning ( default : 4311 )
-	#endif
 #endif
 		}
 
@@ -505,13 +492,7 @@ private:
 			*reinterpret_cast<T*>( &pData ) = val;
 			CThreadLocalBase::Set( pData );
 #else
-	#ifdef COMPILER_MSVC
-		#pragma warning ( disable : 4312 )
-	#endif
 			CThreadLocalBase::Set( reinterpret_cast<void *>(val) );
-	#ifdef COMPILER_MSVC
-		#pragma warning ( default : 4312 )
-	#endif
 #endif
 		}
 	};
@@ -904,7 +885,7 @@ public:
 	}
 
 private:
-	uint8 pad[128-sizeof(CThreadFastMutex)];
+	uint8 pad[128-sizeof(CThreadFastMutex)];  //-V730_NOINIT
 };
 
 #else
@@ -2389,10 +2370,6 @@ template<class T> FORCEINLINE T ReadVolatileMemory( T const *pPtr )
 
 
 //-----------------------------------------------------------------------------
-
-#if defined( _WIN32 )
-#pragma warning(pop)
-#endif
 
 #if defined( _PS3 )
 BOOL SetEvent( CThreadEvent *pEvent );

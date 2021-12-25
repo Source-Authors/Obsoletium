@@ -382,7 +382,9 @@ inline bool IsFinite( const vec_t &f )
 #endif
 }
 
-#if defined( WIN32 )
+#if defined( _WIN32 )
+
+#include <sal.h>
 
 //#include <math.h>
 // Just use prototype from math.h
@@ -390,9 +392,9 @@ inline bool IsFinite( const vec_t &f )
 extern "C" 
 {
 #endif
-	double __cdecl fabs(double);
+	_Check_return_ double __cdecl fabs( _In_ double );
 	//_CRT_JIT_INTRINSIC  _CRTIMP float  __cdecl fabsf( __in float  _X);
-	float __cdecl fabsf( _In_ float );
+	_Check_return_ float __cdecl fabsf( _In_ float );
 #ifdef __cplusplus
 }
 #endif

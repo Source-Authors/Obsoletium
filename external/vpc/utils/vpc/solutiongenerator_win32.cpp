@@ -10,6 +10,7 @@
 
 #if defined( _WIN32 ) && !defined( _X360 )
 #include <windows.h>
+#include <io.h>
 #endif
 
 #include "tier0/memdbgon.h"

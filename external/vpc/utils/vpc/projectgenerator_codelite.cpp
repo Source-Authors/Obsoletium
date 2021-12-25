@@ -7,7 +7,7 @@
 #include "vpc.h"
 #include "projectgenerator_codelite.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <direct.h>
 #define mkdir(dir, mode) _mkdir(dir)
 #define getcwd _getcwd

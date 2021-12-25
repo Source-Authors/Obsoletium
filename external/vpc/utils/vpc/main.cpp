@@ -1692,7 +1692,7 @@ void CVPC::FindProjectFromVCPROJ( const char *pScriptNameVCProj )
 	// resolve to correct project, best will be longest match, due to project names like foo_? and foo_bar_?
 	char szProject[MAX_PATH];
 	szProject[0] = '\0';
-	unsigned int bestLen = 0;
+	size_t bestLen = 0;
 	for ( int i = 0; i < m_Projects.Count(); i++ )
 	{
 		if ( V_stristr( pScriptNameVCProj, m_Projects[i].name.String() ) )
