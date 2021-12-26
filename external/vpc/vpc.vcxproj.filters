@@ -31,9 +31,6 @@
     <Filter Include="Source Files\dlmalloc">
       <UniqueIdentifier>{470b9814-bd83-48c5-be3e-d8007cedbc7d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\p4lib">
-      <UniqueIdentifier>{535ab282-be70-4722-9ea3-6cc15b6f4ad3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\vpccrccheck">
       <UniqueIdentifier>{eb462a40-67b6-48f3-bb7d-d820974c656a}</UniqueIdentifier>
     </Filter>
@@ -305,9 +302,6 @@
     </ClCompile>
     <ClCompile Include="tier0\win32consoleio.cpp">
       <Filter>Source Files\tier0</Filter>
-    </ClCompile>
-    <ClCompile Include="p4lib\p4.cpp">
-      <Filter>Source Files\p4lib</Filter>
     </ClCompile>
     <ClCompile Include="utils\vpccrccheck\crccheck_shared.cpp">
       <Filter>Source Files\vpccrccheck</Filter>

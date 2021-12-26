@@ -20,12 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="interfaces\interfaces.cpp" />
-    <ClCompile Include="p4lib\p4.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="tier0\assert_dialog.cpp" />
     <ClCompile Include="tier0\commandline.cpp" />
     <ClCompile Include="tier0\cpu.cpp" />

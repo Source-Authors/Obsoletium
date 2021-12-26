@@ -1455,11 +1455,6 @@ $Project "vp4"
 	"utils\vp4\vp4.vpc" [$WIN32]
 }
 
-$Project "vp4mutex"
-{
-	"utils\vp4mutex\vp4mutex.vpc" [$WIN32]
-}
-
 $Project "vpccrccheck"
 {
 	"utils/vpccrccheck/vpccrccheck.vpc"   [$WIN32]

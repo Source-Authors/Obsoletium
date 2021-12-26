@@ -2903,13 +2903,11 @@ D:.
 ³       ³       
 ³       ÃÄÄÄlib
 ³       ³   ÀÄÄÄcommon
-³       ³       ³   libclient.lib
 ³       ³       ³   libp4sslstub.lib
 ³       ³       ³   librpc.lib
 ³       ³       ³   libsupp.lib
 ³       ³       ³   
 ³       ³       ÀÄÄÄdebug
-³       ³               libclient.lib
 ³       ³               libp4sslstub.lib
 ³       ³               librpc.lib
 ³       ³               libsupp.lib
@@ -9296,7 +9294,6 @@ D:.
 ³   ³   ³   ÀÄÄÄ2015
 ³   ³   ³       ÃÄÄÄdebug
 ³   ³   ³       ³       cryptlib.lib
-³   ³   ³       ³       libclient.lib
 ³   ³   ³       ³       libp4sslstub.lib
 ³   ³   ³       ³       librpc.lib
 ³   ³   ³       ³       libsupp.lib
@@ -9312,7 +9309,6 @@ D:.
 ³   ³   ³               ivp_compactbuilder.lib
 ³   ³   ³               ivp_physics.lib
 ³   ³   ³               jpeglib.lib
-³   ³   ³               libclient.lib
 ³   ³   ³               libjpeg.lib
 ³   ³   ³               libp4sslstub.lib
 ³   ³   ³               libpng.lib
@@ -15999,11 +15995,7 @@ D:.
 ³   ³       vp4.vpc
 ³   ³       vp4dialog.cpp
 ³   ³       vp4dialog.h
-³   ³       
-³   ÃÄÄÄvp4mutex
-³   ³       vp4mutex.cpp
-³   ³       vp4mutex.vpc
-³   ³       
+³   ³
 ³   ÃÄÄÄvpc
 ³   ³       readme.txt
 ³   ³       
