@@ -16,22 +16,22 @@ char *GetCommandLine();
 #endif
 
 #include "resource.h"
+
 #include "tier0/valve_on.h"
+
 #include "tier0/threadtools.h"
 #include "tier0/icommandline.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
-class CDialogInitInfo {
- public:
+struct CDialogInitInfo {
   const tchar *m_pFilename;
   int m_iLine;
   const tchar *m_pExpression;
 };
 
-class CAssertDisable {
- public:
+struct CAssertDisable {
   tchar m_Filename[512];
 
   // If these are not -1, then this CAssertDisable only disables asserts on
@@ -48,12 +48,12 @@ class CAssertDisable {
 };
 
 #ifdef _WIN32
-static HINSTANCE g_hTier0Instance = 0;
+static HINSTANCE g_hTier0Instance{nullptr};
 #endif
 
 static bool g_bAssertsEnabled = true;
 
-static CAssertDisable *g_pAssertDisables = NULL;
+static CAssertDisable *g_pAssertDisables = nullptr;
 
 #if (defined(_WIN32) && !defined(_X360))
 static int g_iLastLineRange = 5;
@@ -70,48 +70,46 @@ static CDialogInitInfo g_Info;
 
 static bool g_bDisableAsserts = false;
 
-// --------------------------------------------------------------------------------
-// // Internal functions.
-// --------------------------------------------------------------------------------
-// //
+// Internal functions.
 
 #if defined(_WIN32) && !defined(STATIC_TIER0)
-BOOL WINAPI DllMain(HINSTANCE hinstDLL,  // handle to the DLL module
-                    DWORD fdwReason,     // reason for calling function
-                    LPVOID lpvReserved   // reserved
+BOOL WINAPI DllMain(HINSTANCE dll,  // handle to the DLL module
+                    DWORD,          // reason for calling function
+                    LPVOID          // reserved
 ) {
-  g_hTier0Instance = hinstDLL;
+  g_hTier0Instance = dll;
   return true;
 }
 #endif
 
 static bool IsDebugBreakEnabled() {
   static bool bResult =
-      (_tcsstr(Plat_GetCommandLine(), _T("-debugbreak")) != NULL);
+      (_tcsstr(Plat_GetCommandLine(), _T("-debugbreak")) != nullptr);
   return bResult;
 }
 
 static bool AssertStack() {
   static bool bResult =
-      (_tcsstr(Plat_GetCommandLine(), _T("-assertstack")) != NULL);
+      (_tcsstr(Plat_GetCommandLine(), _T("-assertstack")) != nullptr);
   return bResult;
 }
 
 static bool AreAssertsDisabled() {
   static bool bResult =
-      (_tcsstr(Plat_GetCommandLine(), _T("-noassert")) != NULL);
+      (_tcsstr(Plat_GetCommandLine(), _T("-noassert")) != nullptr);
   return bResult || g_bDisableAsserts;
 }
 
 static bool AllAssertOnce() {
   static bool bResult =
-      (_tcsstr(Plat_GetCommandLine(), _T("-assertonce")) != NULL);
+      (_tcsstr(Plat_GetCommandLine(), _T("-assertonce")) != nullptr);
   return bResult;
 }
 
 static bool AreAssertsEnabledInFileLine(const tchar *pFilename, int iLine) {
   CAssertDisable **pPrev = &g_pAssertDisables;
   CAssertDisable *pNext;
+
   for (CAssertDisable *pCur = g_pAssertDisables; pCur; pCur = pNext) {
     pNext = pCur->m_pNext;
 
@@ -156,9 +154,8 @@ CAssertDisable *CreateNewAssertDisable(const tchar *pFilename) {
   pDisable->m_LineMin = pDisable->m_LineMax = -1;
   pDisable->m_nIgnoreTimes = -1;
 
-  _tcsncpy(pDisable->m_Filename, g_Info.m_pFilename,
-           sizeof(pDisable->m_Filename) - 1);
-  pDisable->m_Filename[sizeof(pDisable->m_Filename) - 1] = 0;
+  _tcsncpy(pDisable->m_Filename, pFilename, sizeof(pDisable->m_Filename) - 1);
+  pDisable->m_Filename[sizeof(pDisable->m_Filename) - 1] = '\0';
 
   return pDisable;
 }
@@ -174,11 +171,12 @@ CAssertDisable *IgnoreAssertsNearby(int nRange) {
   return pDisable;
 }
 
-#if (defined(_WIN32) && !defined(_X360))
-INT_PTR CALLBACK AssertDialogProc(HWND hDlg,      // handle to dialog box
-                                  UINT uMsg,      // message
-                                  WPARAM wParam,  // first message parameter
-                                  LPARAM lParam   // second message parameter
+#if defined(_WIN32) && !defined(_X360)
+INT_PTR CALLBACK AssertDialogProc(
+    HWND hDlg,                      // handle to dialog box
+    UINT uMsg,                      // message
+    WPARAM wParam,                  // first message parameter
+    [[maybe_unused]] LPARAM lParam  // second message parameter
 ) {
   switch (uMsg) {
     case WM_INITDIALOG: {
@@ -283,6 +281,7 @@ static BOOL CALLBACK ParentWindowEnumProc(
   if (IsWindowVisible(hWnd)) {
     DWORD procID;
     GetWindowThreadProcessId(hWnd, &procID);
+
     if (procID == (DWORD)lParam) {
       g_hBestParentWindow = hWnd;
       return FALSE;  // don't iterate any more.
@@ -294,16 +293,13 @@ static BOOL CALLBACK ParentWindowEnumProc(
 static HWND FindLikelyParentWindow() {
   // Enumerate top-level windows and take the first visible one with our
   // processID.
-  g_hBestParentWindow = NULL;
+  g_hBestParentWindow = nullptr;
   EnumWindows(ParentWindowEnumProc, GetCurrentProcessId());
   return g_hBestParentWindow;
 }
 #endif
 
-// --------------------------------------------------------------------------------
-// // Interface functions.
-// --------------------------------------------------------------------------------
-// //
+// Interface functions.
 
 // provides access to the global that turns asserts on and off
 PLATFORM_INTERFACE bool AreAllAssertsDisabled() { return !g_bAssertsEnabled; }
@@ -322,8 +318,8 @@ PLATFORM_INTERFACE bool ShouldUseNewAssertDialog() {
 #ifdef DBGFLAG_ASSERTDLG
   return true;  // always show an assert dialog
 #else
-  return Plat_IsInDebugSession();  // only show an assert dialog if the process
-                                   // is being debugged
+  // only show an assert dialog if the process is being debugged
+  return Plat_IsInDebugSession();
 #endif  // DBGFLAG_ASSERTDLG
 }
 
