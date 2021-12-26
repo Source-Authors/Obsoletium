@@ -218,8 +218,8 @@ CUtlSymbol CUtlSymbolTable::Find(const char *pString) const {
 
   // Store a special context used to help with insertion
   m_pUserSearchString = pString;
-  m_nUserSearchStringHash =
-      m_bInsensitive ? HashStringCaseless(pString) : HashString(pString);
+  m_nUserSearchStringHash = static_cast<unsigned short>(
+      m_bInsensitive ? HashStringCaseless(pString) : HashString(pString));
 
   // Passing this special invalid symbol makes the comparison function
   // use the string passed in the context
@@ -279,8 +279,8 @@ CUtlSymbol CUtlSymbolTable::AddString(const char *pString) {
   }
 
   // Compute a hash
-  hashDecoration_t hash =
-      m_bInsensitive ? HashStringCaseless(pString) : HashString(pString);
+  hashDecoration_t hash = static_cast<hashDecoration_t>(
+      m_bInsensitive ? HashStringCaseless(pString) : HashString(pString));
 
   // Copy the string in.
   StringPool_t *pPool = m_StringPools[iPool];
@@ -288,7 +288,8 @@ CUtlSymbol CUtlSymbolTable::AddString(const char *pString) {
          0xFFFF);  // This should never happen, because if we had a string >
                    // 64k, it would have been given its entire own pool.
 
-  unsigned short iStringOffset = pPool->m_SpaceUsed;
+  unsigned short iStringOffset =
+      static_cast<unsigned short>(pPool->m_SpaceUsed);
   const char *startingAddr = &pPool->m_Data[pPool->m_SpaceUsed];
 
   // store the hash at the head of the string
@@ -299,7 +300,7 @@ CUtlSymbol CUtlSymbolTable::AddString(const char *pString) {
 
   // insert the string into the vector.
   CStringPoolIndex index;
-  index.m_iPool = iPool;
+  index.m_iPool = static_cast<unsigned short>(iPool);
   index.m_iOffset = iStringOffset;
 
   MEM_ALLOC_CREDIT();

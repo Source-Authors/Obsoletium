@@ -2204,7 +2204,8 @@ bool KeyValues::WriteAsBinary(CUtlBuffer &buffer) const {
         break;
       }
       case TYPE_WSTRING: {
-        int nLength = dat->m_wsValue ? V_wcslen(dat->m_wsValue) : 0;
+        unsigned short nLength =
+            dat->m_wsValue ? (unsigned short)V_wcslen(dat->m_wsValue) : 0;
         buffer.PutShort(nLength);
         for (int k = 0; k < nLength; ++k) {
           buffer.PutShort((unsigned short)dat->m_wsValue[k]);
@@ -2585,9 +2586,9 @@ void KeyValues::UnpackIntoStructure(
         Vector *dest_v = (Vector *)dest_field;
         if (find_it) {
           Color c = GetColor(pUnpackTable->m_pKeyName);
-          dest_v->x = c.r();
-          dest_v->y = c.g();
-          dest_v->z = c.b();
+          dest_v->x = static_cast<float>(c.r());
+          dest_v->y = static_cast<float>(c.g());
+          dest_v->z = static_cast<float>(c.b());
         } else {
           if (pUnpackTable->m_pKeyDefault)
             sscanf(pUnpackTable->m_pKeyDefault, "%f %f %f", &(dest_v->x),
@@ -2839,8 +2840,7 @@ bool KeyValues::Dump(IKeyValuesDumpContext *pDump, int nIndentLevel /* = 0 */) {
   if (!pDump->KvBeginKey(this, nIndentLevel)) return false;
 
   // Dump values
-  for (KeyValues *val = GetFirstValue(); val;
-       val = val->GetNextValue()) {
+  for (KeyValues *val = GetFirstValue(); val; val = val->GetNextValue()) {
     if (!pDump->KvWriteValue(val, nIndentLevel + 1)) return false;
   }
 

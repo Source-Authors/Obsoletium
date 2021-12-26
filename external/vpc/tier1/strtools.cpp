@@ -536,7 +536,7 @@ float V_atof(const char *str) {
   // check for character
   //
   if (str[0] == '\'') {
-    return sign * str[1];
+    return static_cast<float>(sign * str[1]);
   }
 
   //
@@ -562,7 +562,7 @@ float V_atof(const char *str) {
   }
 
   if (exponent != 0) {
-    val *= powf(10.0F, exponent);
+    val *= powf(10.0F, static_cast<float>(exponent));
   }
   if (decimal == -1) return val * sign;
   while (total > decimal) {

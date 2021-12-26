@@ -300,7 +300,7 @@ class KeyValues {
   void Clear(void);
 
   // Data type
-  enum types_t {
+  enum types_t : char {
     TYPE_NONE = 0,
     TYPE_STRING,
     TYPE_INT,

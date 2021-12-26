@@ -185,7 +185,7 @@ unsigned short CCountedStringPool::ReferenceStringHandle(
     nCurrentBucket = m_FreeListStart;
     m_FreeListStart = m_Elements[nCurrentBucket].nNextElement;
   } else {
-    nCurrentBucket = m_Elements.AddToTail();
+    nCurrentBucket = (unsigned short)m_Elements.AddToTail();
   }
 
   m_Elements[nCurrentBucket].nReferenceCount = 1;
@@ -210,7 +210,8 @@ void CCountedStringPool::DereferenceString(const char *pIntrinsic) {
   // If we get a NULL pointer, just return
   if (!pIntrinsic) return;
 
-  unsigned short nHashBucketIndex = (Hash(pIntrinsic) % m_HashTable.Count());
+  unsigned short nHashBucketIndex =
+      static_cast<unsigned short>(Hash(pIntrinsic) % m_HashTable.Count());
   unsigned short nCurrentBucket = m_HashTable[nHashBucketIndex];
 
   // If there isn't anything in the bucket, just return.

@@ -805,15 +805,14 @@ class CProjectGenerator_Makefile : public CBaseProjectDataCollector {
       if (of && pCustomBuildCommandLine &&
           V_strlen(pCustomBuildCommandLine) > 0) {
         // This file uses a custom build step.
-        char sFormattedOutputFile[8192];
+        char fof[8192];
         char sFormattedCommandLine[8192];
         char sFormattedDependencies[8192];
         DoStandardVisualStudioReplacements(
             pCustomBuildCommandLine, UsePOSIXSlashes(pFilename),
             sFormattedCommandLine, sizeof(sFormattedCommandLine));
-        DoStandardVisualStudioReplacements(of, UsePOSIXSlashes(pFilename),
-                                           sFormattedOutputFile,
-                                           sizeof(sFormattedOutputFile));
+        DoStandardVisualStudioReplacements(of, UsePOSIXSlashes(pFilename), fof,
+                                           sizeof(fof));
 
         // AdditionalDependencies only applies to custom build steps, not normal
         // compilation steps
@@ -830,21 +829,17 @@ class CProjectGenerator_Makefile : public CBaseProjectDataCollector {
                                     sDependenciesSeparators,
                                     sizeof(sDependenciesSeparators) /
                                         sizeof(sDependenciesSeparators[0]));
-        FOR_EACH_VEC_BACK(additionalDeps, i) {
-          const char *pchOneFile = additionalDeps[i];
-          if (*pchOneFile == '\0') {
-            additionalDeps.Remove(i);
-          }
+        FOR_EACH_VEC_BACK(additionalDeps, j) {
+          const char *pchOneFile = additionalDeps[j];
+          if (*pchOneFile == '\0') additionalDeps.Remove(i);
         }
 
-        CSplitString outFiles(sFormattedOutputFile, sDependenciesSeparators,
+        CSplitString outFiles(fof, sDependenciesSeparators,
                               sizeof(sDependenciesSeparators) /
                                   sizeof(sDependenciesSeparators[0]));
-        FOR_EACH_VEC_BACK(outFiles, i) {
-          const char *pchOneFile = outFiles[i];
-          if (*pchOneFile == '\0') {
-            outFiles.Remove(i);
-          }
+        FOR_EACH_VEC_BACK(outFiles, j) {
+          const char *pchOneFile = outFiles[j];
+          if (*pchOneFile == '\0') outFiles.Remove(i);
         }
 
         char rgchIntermediateFile[MAX_PATH];
@@ -878,8 +873,8 @@ class CProjectGenerator_Makefile : public CBaseProjectDataCollector {
         // Outputs dependent on input file and .mak file
         fprintf(fp, ": $(abspath %s) %s", UsePOSIXSlashes(pFilename),
                 g_pVPC->GetOutputFilename());
-        FOR_EACH_VEC(additionalDeps, i) {
-          fprintf(fp, " %s", additionalDeps[i]);
+        FOR_EACH_VEC(additionalDeps, j) {
+          fprintf(fp, " %s", additionalDeps[j]);
         }
         /// XXX(JohnS): Was this double-added as an accident, or is there some
         /// arcane make reason to have it be the
@@ -888,20 +883,17 @@ class CProjectGenerator_Makefile : public CBaseProjectDataCollector {
         const char *pDescription =
             pFileSpecificData->GetOption(g_pOption_Description);
         DoStandardVisualStudioReplacements(
-            pDescription, UsePOSIXSlashes(pFilename), sFormattedOutputFile,
-            sizeof(sFormattedOutputFile));
+            pDescription, UsePOSIXSlashes(pFilename), fof, sizeof(fof));
 
-        fprintf(fp, "\t @echo \"%s\";mkdir -p $(OBJ_DIR) 2> /dev/null;\n",
-                sFormattedOutputFile);
+        fprintf(fp, "\t @echo \"%s\";mkdir -p $(OBJ_DIR) 2> /dev/null;\n", fof);
 
         static const char *sSeparators[] = {"\r", "\n"};
         CSplitString outLines(sFormattedCommandLine, sSeparators,
                               sizeof(sSeparators) / sizeof(sSeparators[0]));
-        for (int i = 0; i < outLines.Count(); ++i) {
-          const char *pchOneLine = outLines[i];
-          if (*pchOneLine == '\0') {
-            continue;
-          }
+        for (int j = 0; j < outLines.Count(); ++j) {
+          const char *pchOneLine = outLines[j];
+          if (*pchOneLine == '\0') continue;
+
           fprintf(fp, "\t %s\n", pchOneLine);
         }
         fprintf(fp, "\n");
@@ -909,11 +901,11 @@ class CProjectGenerator_Makefile : public CBaseProjectDataCollector {
         // for multiple output files, create a dependency between output files
         // and intermediate file + makefile
         if (outFiles.Count() > 1) {
-          FOR_EACH_VEC(outFiles, i) {
+          FOR_EACH_VEC(outFiles, j) {
             // See ABSPATH NOTE above
-            fprintf(fp, "$(abspath %s) : %s %s\n\t @touch %s\n\n", outFiles[i],
+            fprintf(fp, "$(abspath %s) : %s %s\n\t @touch %s\n\n", outFiles[j],
                     rgchIntermediateFile, g_pVPC->GetOutputFilename(),
-                    outFiles[i]);
+                    outFiles[j]);
           }
         }
       } else if (CheckExtensions(pFilename,

@@ -253,7 +253,7 @@ uint64_t makeoid_raw(const char *pData, int nDataLen, EOIDType type,
     // have a function to return a full-range int and uses the below code to
     // seed itself. Except in tools where it is un-seeded without a warning that
     // that is the case.
-    float flAppTime = Plat_FloatTime();
+    float flAppTime = static_cast<float>(Plat_FloatTime());
     ThreadId_t threadId = ThreadGetCurrentId();
     static_assert(sizeof(flAppTime) <= sizeof(unOIDSalt));
     memcpy(&unOIDSalt, &flAppTime, sizeof(float));
@@ -975,24 +975,29 @@ void CSolutionGenerator_Xcode::EmitBuildSettings(
     ++m_nIndent;
     {
       Write("\"$(inherited)\",\n");
-      FOR_EACH_MAP_FAST(librarySearchPaths, i) {
-        char sExpandedOutString[MAX_PATH];
-        V_strncpy(sExpandedOutString, librarySearchPaths.Key(i),
-                  sizeof(sExpandedOutString));
-        V_StrSubstInPlace(sExpandedOutString, "\"", "\\\"", false);
-
-        if (V_IsAbsolutePath(sExpandedOutString) ||
-            V_strncmp(sExpandedOutString, "$", 1) == 0)
-          V_snprintf(sIncludeDir, sizeof(sExpandedOutString), "%s",
-                     sExpandedOutString);
+      for (unsigned short i = 0; (librarySearchPaths).IsUtlMap &&
+                                 i < (librarySearchPaths).MaxElement();
+           ++i)
+        if (!(librarySearchPaths).IsValidIndex(i))
+          continue;
         else {
-          V_snprintf(sIncludeDir, sizeof(sExpandedOutString), "%s/%s",
-                     pszProjectDir, sExpandedOutString);
-          V_RemoveDotSlashes(sIncludeDir);
-        }
+          char sExpandedOutString[MAX_PATH];
+          V_strncpy(sExpandedOutString, librarySearchPaths.Key(i),
+                    sizeof(sExpandedOutString));
+          V_StrSubstInPlace(sExpandedOutString, "\"", "\\\"", false);
 
-        Write("\"%s\",\n", sIncludeDir);
-      }
+          if (V_IsAbsolutePath(sExpandedOutString) ||
+              V_strncmp(sExpandedOutString, "$", 1) == 0)
+            V_snprintf(sIncludeDir, sizeof(sExpandedOutString), "%s",
+                       sExpandedOutString);
+          else {
+            V_snprintf(sIncludeDir, sizeof(sExpandedOutString), "%s/%s",
+                       pszProjectDir, sExpandedOutString);
+            V_RemoveDotSlashes(sIncludeDir);
+          }
+
+          Write("\"%s\",\n", sIncludeDir);
+        }
     }
     --m_nIndent;
     Write(");\n");
@@ -1195,11 +1200,11 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
               CUtlString sCompilerFlags = NULL;
               // on mac we can only globally specify common (debug and release)
               // per-file compiler flags
-              for (int i = pFileConfig->m_Configurations.First();
-                   i != pFileConfig->m_Configurations.InvalidIndex();
-                   i = pFileConfig->m_Configurations.Next(i)) {
+              for (int k = pFileConfig->m_Configurations.First();
+                   k != pFileConfig->m_Configurations.InvalidIndex();
+                   k = pFileConfig->m_Configurations.Next(k)) {
                 sCompilerFlags +=
-                    pFileConfig->m_Configurations[i]->m_pKV->GetString(
+                    pFileConfig->m_Configurations[k]->m_pKV->GetString(
                         g_pOption_ExtraCompilerFlags);
               }
               // File reference OIDs are unique per project per file
@@ -1465,12 +1470,12 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
                 ++m_nIndent;
                 {
                   CSplitString outFiles(sOutputFiles, ";");
-                  for (int i = 0; i < outFiles.Count(); i++) {
+                  for (int k = 0; k < outFiles.Count(); k++) {
                     CUtlString sOutputFile;
                     sOutputFile.SetLength(MAX_PATH);
                     CBaseProjectDataCollector::
                         DoStandardVisualStudioReplacements(
-                            outFiles[i], sInputFile, sOutputFile.Get(),
+                            outFiles[k], sInputFile, sOutputFile.Get(),
                             MAX_PATH);
                     V_StrSubstInPlace(sOutputFile.Get(), MAX_PATH, "$(OBJ_DIR)",
                                       "${OBJECT_FILE_DIR_normal}", false);
@@ -1479,7 +1484,7 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
                     sOutputPath.SetLength(MAX_PATH);
 
                     if (V_IsAbsolutePath(sOutputFile) ||
-                        V_strncmp(outFiles[i], "$", 1) == 0)
+                        V_strncmp(outFiles[k], "$", 1) == 0)
                       V_snprintf(sOutputPath.Get(), MAX_PATH, "%s",
                                  sOutputFile.String());
                     else {
@@ -2301,8 +2306,8 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
                   Write("\"%s\",\n", sInputFile.String());
 
                   CSplitString additionalDeps(sAdditionalDeps, ";");
-                  FOR_EACH_VEC(additionalDeps, i) {
-                    const char *pchOneFile = additionalDeps[i];
+                  FOR_EACH_VEC(additionalDeps, k) {
+                    const char *pchOneFile = additionalDeps[k];
                     if (*pchOneFile != '\0') {
                       char szDependency[MAX_PATH];
                       // DoStandardVisualStudioReplacements needs to know where
@@ -2351,12 +2356,12 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
                 ++m_nIndent;
                 {
                   CSplitString outFiles(sOutputFiles, ";");
-                  for (int i = 0; i < outFiles.Count(); i++) {
+                  for (int k = 0; k < outFiles.Count(); k++) {
                     CUtlString sOutputFile;
                     sOutputFile.SetLength(MAX_PATH);
                     CBaseProjectDataCollector::
                         DoStandardVisualStudioReplacements(
-                            outFiles[i], sInputFile, sOutputFile.Get(),
+                            outFiles[k], sInputFile, sOutputFile.Get(),
                             MAX_PATH);
                     V_StrSubstInPlace(sOutputFile.Get(), MAX_PATH, "$(OBJ_DIR)",
                                       "${OBJECT_FILE_DIR_normal}", false);
@@ -2365,7 +2370,7 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
                     sOutputPath.SetLength(MAX_PATH);
 
                     if (V_IsAbsolutePath(sOutputFile) ||
-                        V_strncmp(outFiles[i], "$", 1) == 0)
+                        V_strncmp(outFiles[k], "$", 1) == 0)
                       V_snprintf(sOutputPath.Get(), MAX_PATH, "%s",
                                  sOutputFile.String());
                     else {

@@ -1310,7 +1310,7 @@ void Internal_LoadAddressMacroAuto(bool bPad) {
         // assume float format
         float fLength = 0;
         sscanf(szLength, "%f", &fLength);
-        dllLength = fLength * 1024.0f * 1024.0f;
+        dllLength = static_cast<unsigned>(fLength * 1024.0f * 1024.0f);
       } else {
         sscanf(szLength, "%u", &dllLength);
       }

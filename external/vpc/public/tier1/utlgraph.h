@@ -213,10 +213,14 @@ inline T const &CUtlGraph<T, C>::operator[](I i) const {
 
 template <class T, class C>
 void CUtlGraph<T, C>::RemoveAll() {
-  FOR_EACH_MAP_FAST(m_Nodes, iNode) {
-    delete m_Nodes[iNode].m_pvecEdges;
-    delete m_Nodes[iNode].m_pvecPaths;
-  }
+  for (unsigned short iNode = 0;
+       (m_Nodes).IsUtlMap && iNode < (m_Nodes).MaxElement(); ++iNode)
+    if (!(m_Nodes).IsValidIndex(iNode))
+      continue;
+    else {
+      delete m_Nodes[iNode].m_pvecEdges;
+      delete m_Nodes[iNode].m_pvecPaths;
+    }
 
   m_Nodes.RemoveAll();
 }
@@ -234,7 +238,7 @@ void CUtlGraph<T, C>::EnsureCapacity(int num) {
 //-----------------------------------------------------------------------------
 template <class T, class C>
 bool CUtlGraph<T, C>::AddEdge(T SourceNode, T DestNode, C nCost) {
-  I iSrcNode = m_Nodes.Find(SourceNode);
+  auto iSrcNode = m_Nodes.Find(SourceNode);
   if (!m_Nodes.IsValidIndex(iSrcNode)) {
     Node_t Node;
     Node.m_pvecEdges = new vecEdges_t();
@@ -242,7 +246,7 @@ bool CUtlGraph<T, C>::AddEdge(T SourceNode, T DestNode, C nCost) {
     iSrcNode = m_Nodes.Insert(SourceNode, Node);
   }
 
-  I iDstNode = m_Nodes.Find(DestNode);
+  auto iDstNode = m_Nodes.Find(DestNode);
   if (!m_Nodes.IsValidIndex(iDstNode)) {
     Node_t Node;
     Node.m_pvecEdges = new vecEdges_t();
