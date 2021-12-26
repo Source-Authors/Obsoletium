@@ -172,7 +172,7 @@ void CAppSystemGroup::ReportStartupFailure( int nErrorStage, int nSysIndex )
 	}
 
 	char const *pszSystemName = "(Unknown)";
-	for ( int i = m_SystemDict.First(); i != m_SystemDict.InvalidIndex(); i = m_SystemDict.Next( i ) )
+	for ( auto i = m_SystemDict.First(); i != m_SystemDict.InvalidIndex(); i = m_SystemDict.Next( i ) )
 	{
 		if ( m_SystemDict[ i ] != nSysIndex )
 			continue;
@@ -504,6 +504,7 @@ destroy:
 // Constructor
 //-----------------------------------------------------------------------------
 CSteamAppSystemGroup::CSteamAppSystemGroup( IFileSystem *pFileSystem, CAppSystemGroup *pAppSystemParent )
+	: CAppSystemGroup( pAppSystemParent )
 {
 	m_pFileSystem = pFileSystem;
 	m_pGameInfoPath[0] = 0;

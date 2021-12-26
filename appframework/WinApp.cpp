@@ -72,7 +72,7 @@ bool SetupEnvironment360()
 //-----------------------------------------------------------------------------
 // Version of AppMain used by windows applications
 //-----------------------------------------------------------------------------
-int AppMain( void* hInstance, void* hPrevInstance, const char* lpCmdLine, int nCmdShow, CAppSystemGroup *pAppSystemGroup )
+int AppMain( void* hInstance, void*, const char*, int, CAppSystemGroup *pAppSystemGroup )
 {
 	Assert( pAppSystemGroup );
 
@@ -108,7 +108,7 @@ int AppMain( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 //-----------------------------------------------------------------------------
 // Used to startup/shutdown the application
 //-----------------------------------------------------------------------------
-int AppStartup( void* hInstance, void* hPrevInstance, const char* lpCmdLine, int nCmdShow, CAppSystemGroup *pAppSystemGroup )
+int AppStartup( void* hInstance, void*, const char*, int, CAppSystemGroup *pAppSystemGroup )
 {
 	Assert( pAppSystemGroup );
 
@@ -182,7 +182,6 @@ bool CSteamApplication::Create()
 	if ( !m_pFileSystem )
 	{
 		Error( "Unable to load %s", pFileSystemDLL );
-		return false;
 	}
 
 	return true;

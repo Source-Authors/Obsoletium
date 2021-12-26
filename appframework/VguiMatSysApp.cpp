@@ -297,7 +297,6 @@ bool CVguiMatSysApp::SetVideoMode( )
 	if (!modeSet)
 	{
 		Error( "Unable to set mode\n" );
-		return false;
 	}
 
 	g_pMaterialSystem->OverrideConfig( config, false );
