@@ -1,15 +1,9 @@
-//========== Copyright 2005, Valve Corporation, All rights reserved. ========
-//
-// Purpose:
-//
-//=============================================================================
+// Copyright Valve Corporation, All rights reserved.
 
 #include "tier0/platform.h"
 
 #if defined( PLATFORM_WINDOWS_PC )
-#define WIN32_LEAN_AND_MEAN
-#define _WIN32_WINNT 0x0403
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 #ifdef PLATFORM_WINDOWS

@@ -1,17 +1,10 @@
-//========= Copyright 1996-2005, Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef WINLITE_H
-#define WINLITE_H
-#pragma once
+#ifndef VPC_WINLITE_H_
+#define VPC_WINLITE_H_
 
 #ifdef _WIN32
-// 
+//
 // Prevent tons of unused windows definitions
 //
 #define WIN32_LEAN_AND_MEAN
@@ -19,13 +12,14 @@
 #define NOSERVICE
 #define NOMCX
 #define NOIME
-#if !defined( _X360 )
-#pragma warning(push, 1)
-#pragma warning(disable: 4005)
-#include <windows.h>
-#pragma warning(pop)
+
+#ifndef _X360
+#include <Windows.h>
+#include <VersionHelpers.h>
 #endif
+
 #undef PostMessage
 
-#endif // WIN32
-#endif // WINLITE_H
+#endif  // WIN32
+
+#endif  // VPC_WINLITE_H_

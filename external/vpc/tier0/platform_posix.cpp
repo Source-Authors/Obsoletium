@@ -1,9 +1,4 @@
-//========= Copyright 1996-2005, Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #include "pch_tier0.h"
 #include "tier0/platform.h"

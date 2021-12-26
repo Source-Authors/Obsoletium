@@ -1,26 +1,21 @@
-//========= Copyright (c) 1996-2005, Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose:	All of our code is completely Unicode.  Instead of char, you should
-//			use wchar, uint8, or char8, as explained below.
-//
-// $NoKeywords: $
-//=============================================================================//
+// Purpose:	All of our code is completely Unicode.  Instead of char, you
+// should use wchar, uint8, or char8, as explained below.
 
+#ifndef VPC_TIER0_WCHARTYPES_H_
+#define VPC_TIER0_WCHARTYPES_H_
 
-#ifndef WCHARTYPES_H
-#define WCHARTYPES_H
-#ifdef _WIN32
-#pragma once
-#endif
-#include "stddef.h"
+#include <cstddef>
+
 #ifdef _INC_TCHAR
-#error ("Must include tier0 type headers before tchar.h")
+#error "Must include tier0 type headers before tchar.h"
 #endif
 
 // Temporarily turn off Valve defines
 #include "tier0/valve_off.h"
 
-#if !defined(_WCHAR_T_DEFINED)  && !defined( __WCHAR_TYPE__ ) && !defined(GNUC)
+#if !defined(_WCHAR_T_DEFINED) && !defined(__WCHAR_TYPE__) && !defined(GNUC)
 typedef unsigned short wchar_t;
 #define _WCHAR_T_DEFINED
 #endif
@@ -32,21 +27,22 @@ typedef unsigned short wchar_t;
 typedef char char8;
 
 // uint8
-// uint8 is equivalent to byte (but is preferred over byte for clarity).  Use this
-// whenever you mean a byte (for example, one byte of a network packet).
+// uint8 is equivalent to byte (but is preferred over byte for clarity).  Use
+// this whenever you mean a byte (for example, one byte of a network packet).
 // uint8 itself is defined in platform.h
 typedef unsigned char BYTE;
 typedef unsigned char byte;
 
 // wchar
 // wchar is a single character of text (currently 16 bits, as all of our text is
-// Unicode).  Use this whenever you mean a piece of text (for example, in a string).
+// Unicode).  Use this whenever you mean a piece of text (for example, in a
+// string).
 typedef wchar_t wchar;
-//typedef char wchar;
+// typedef char wchar;
 
 // __WFILE__
 // This is a Unicode version of __FILE__
-#define WIDEN2(x) L ## x
+#define WIDEN2(x) L##x
 #define WIDEN(x) WIDEN2(x)
 #define __WFILE__ WIDEN(__FILE__)
 
@@ -57,7 +53,7 @@ typedef wchar_t wchar;
 #define _UNICODE
 #endif
 
-#if defined( POSIX ) || defined( _PS3 )
+#if defined(POSIX) || defined(_PS3)
 #define _tcsstr strstr
 #define _tcsicmp stricmp
 #define _tcscmp strcmp
@@ -66,7 +62,7 @@ typedef wchar_t wchar;
 #define _tcsrchr strrchr
 #define _tcslen strlen
 #define _tfopen fopen
-#define _stprintf sprintf 
+#define _stprintf sprintf
 #define _ftprintf fprintf
 #define _vsntprintf _vsnprintf
 #define _tprintf printf
@@ -95,7 +91,4 @@ typedef char tchar;
 // Turn valve defines back on
 #include "tier0/valve_on.h"
 
-
-#endif // WCHARTYPES
-
-
+#endif  // VPC_TIER0_WCHARTYPES_H_

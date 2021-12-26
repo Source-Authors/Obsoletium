@@ -1,17 +1,10 @@
-//====== Copyright © 1996-2005, Valve Corporation, All rights reserved. =======
-//
-// Purpose: 
-//
-//=============================================================================
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef P4SLN_H
-#define P4SLN_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef VPC_P4SLN_H_
+#define VPC_P4SLN_H_
 
+void GenerateSolutionForPerforceChangelist(
+    CProjectDependencyGraph &dependencyGraph, CUtlVector<int> &changelists,
+    IBaseSolutionGenerator *pGenerator, const char *pSolutionFilename);
 
-void GenerateSolutionForPerforceChangelist( CProjectDependencyGraph &dependencyGraph, CUtlVector<int> &changelists, IBaseSolutionGenerator *pGenerator, const char *pSolutionFilename );
-
-
-#endif // P4SLN_H
+#endif  // VPC_P4SLN_H_

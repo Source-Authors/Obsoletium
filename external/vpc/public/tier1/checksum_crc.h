@@ -1,31 +1,27 @@
-//========= Copyright � 1996-2005, Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
 // Purpose: Generic CRC functions
-//
-// $NoKeywords: $
-//=============================================================================//
-#ifndef CHECKSUM_CRC_H
-#define CHECKSUM_CRC_H
-#ifdef _WIN32
-#pragma once
-#endif
 
-typedef uint32 CRC32_t;
+#ifndef VPC_TIER1_CHECKSUM_CRC_H_
+#define VPC_TIER1_CHECKSUM_CRC_H_
 
-void CRC32_Init( CRC32_t *pulCRC );
-void CRC32_ProcessBuffer( CRC32_t *pulCRC, const void *p, int len );
-void CRC32_Final( CRC32_t *pulCRC );
-CRC32_t	CRC32_GetTableEntry( unsigned int slot );
+#include <cstdint>
 
-inline CRC32_t CRC32_ProcessSingleBuffer( const void *p, int len )
-{
-	CRC32_t crc;
+using CRC32_t = uint32_t;
 
-	CRC32_Init( &crc );
-	CRC32_ProcessBuffer( &crc, p, len );
-	CRC32_Final( &crc );
+void CRC32_Init(CRC32_t *pulCRC);
+void CRC32_ProcessBuffer(CRC32_t *pulCRC, const void *p, int len);
+void CRC32_Final(CRC32_t *pulCRC);
+CRC32_t CRC32_GetTableEntry(unsigned int slot);
 
-	return crc;
+inline CRC32_t CRC32_ProcessSingleBuffer(const void *p, int len) {
+  CRC32_t crc;
+
+  CRC32_Init(&crc);
+  CRC32_ProcessBuffer(&crc, p, len);
+  CRC32_Final(&crc);
+
+  return crc;
 }
 
-#endif // CHECKSUM_CRC_H
+#endif  // VPC_TIER1_CHECKSUM_CRC_H_

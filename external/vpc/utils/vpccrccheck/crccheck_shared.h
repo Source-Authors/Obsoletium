@@ -1,34 +1,29 @@
-//===================== Copyright (c) Valve Corporation. All Rights Reserved. ======================
-//
-//
-//
-//==================================================================================================
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef CRCCHECK_SHARED_H
-#define CRCCHECK_SHARED_H
-#ifdef _WIN32
-#pragma once
-#endif
-
+#ifndef VPCCRCHECK_CRCCHECK_SHARED_H_
+#define VPCCRCHECK_CRCCHECK_SHARED_H_
 
 #ifdef STANDALONE_VPC
-#define VPCCRCCHECK_EXE_FILENAME	"vpc.exe"
+#define VPCCRCCHECK_EXE_FILENAME "vpc.exe"
 #else
-#define VPCCRCCHECK_EXE_FILENAME	"vpccrccheck.exe"
+#define VPCCRCCHECK_EXE_FILENAME "vpccrccheck.exe"
 #endif
 
-// The file extension for the file that contains the CRCs that a vcproj depends on.
-#define VPCCRCCHECK_FILE_EXTENSION		"vpc_crc"
-#define VPCCRCCHECK_FILE_VERSION_STRING	"[vpc crc file version 2]"
+// The file extension for the file that contains the CRCs that a vcproj depends
+// on.
+#define VPCCRCCHECK_FILE_EXTENSION "vpc_crc"
+#define VPCCRCCHECK_FILE_VERSION_STRING "[vpc crc file version 2]"
 
+void Sys_Error(const char *format, ...);
+int Sys_LoadTextFileWithIncludes(const char *filename, char **bufferptr,
+                                 bool bInsertFileMacroExpansion);
 
-void Sys_Error( const char *format, ... );
-int Sys_LoadTextFileWithIncludes( const char* filename, char** bufferptr, bool bInsertFileMacroExpansion );
+bool VPC_CheckProjectDependencyCRCs(const char *pProjectFilename,
+                                    const char *pReferenceSupplementalString,
+                                    char *pErrorString, int nErrorStringLength);
 
-bool VPC_CheckProjectDependencyCRCs( const char *pProjectFilename, const char *pReferenceSupplementalString, char *pErrorString, int nErrorStringLength );
+// Used by vpccrccheck.exe or by vpc.exe to do the CRC check that's initiated in
+// the pre-build steps.
+int VPC_CommandLineCRCChecks(int argc, const char **argv);
 
-// Used by vpccrccheck.exe or by vpc.exe to do the CRC check that's initiated in the pre-build steps.
-int VPC_CommandLineCRCChecks( int argc, const char **argv );
-
-
-#endif // CRCCHECK_SHARED_H
+#endif  // VPCCRCHECK_CRCCHECK_SHARED_H_

@@ -1,26 +1,12 @@
-//======== (C) Copyright 1999, 2000 Valve, L.L.C. All rights reserved. ========
-//
-// The copyright to the contents herein is the property of Valve, L.L.C.
-// The contents may be used and/or copied only with the written permission of
-// Valve, L.L.C., or in accordance with the terms and conditions stipulated in
-// the agreement/contract under which the contents have been supplied.
-//
-// Purpose: 
-//
-// $Workfile:     $
-// $NoKeywords: $
-//=============================================================================
-
-
-#pragma warning(disable: 4514)
+// Copyright Valve Corporation, All rights reserved.
 
 // First include standard libraries
-#include <stdio.h>
-#include <ctype.h>
-#include <math.h>
 #include <malloc.h>
-#include <memory.h>
-#include <ctype.h>
+
+#include <cstdio>
+#include <cctype>
+#include <cmath>
+#include <memory>
 
 // Next, include public
 #include "tier0/basetypes.h"
@@ -46,6 +32,3 @@
 #include "tier1/utlmap.h"
 
 #include "tier0/memdbgon.h"
-
-
-

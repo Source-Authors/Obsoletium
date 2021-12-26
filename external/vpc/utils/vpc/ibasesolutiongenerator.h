@@ -1,24 +1,15 @@
-//====== Copyright © 1996-2005, Valve Corporation, All rights reserved. =======
-//
-// Purpose: 
-//
-//=============================================================================
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef IBASESOLUTIONGENERATOR_H
-#define IBASESOLUTIONGENERATOR_H
-#ifdef _WIN32
-#pragma once
-#endif
-
+#ifndef VPC_IBASESOLUTIONGENERATOR_H_
+#define VPC_IBASESOLUTIONGENERATOR_H_
 
 #include "dependencies.h"
 
-
-class IBaseSolutionGenerator
-{
-public:
-	virtual void GenerateSolutionFile( const char *pSolutionFilename, CUtlVector<CDependency_Project*> &projects ) = 0;	
+class IBaseSolutionGenerator {
+ public:
+  virtual void GenerateSolutionFile(
+      const char *pSolutionFilename,
+      CUtlVector<CDependency_Project *> &projects) = 0;
 };
 
-
-#endif // IBASESOLUTIONGENERATOR_H
+#endif  // VPC_IBASESOLUTIONGENERATOR_H_

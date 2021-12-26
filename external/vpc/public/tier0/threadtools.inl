@@ -1,5 +1,7 @@
-#ifndef THREADTOOLS_INL
-#define THREADTOOLS_INL
+// Copyright Valve Corporation, All rights reserved.
+
+#ifndef VPC_TIER0_THREADTOOLS_INL_
+#define VPC_TIER0_THREADTOOLS_INL_
 
 // This file is included in threadtools.h for PS3 and threadtools.cpp for all other platforms
 //
@@ -627,4 +629,4 @@ INLINE_ON_PS3 void* CThread::ThreadProc(LPVOID pv)
 #endif
 }
 
-#endif // THREADTOOLS_INL
+#endif // VPC_TIER0_THREADTOOLS_INL_
