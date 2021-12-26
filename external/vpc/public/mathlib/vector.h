@@ -367,7 +367,7 @@ class TableVector {
 
 class ALIGN16 VectorAligned : public Vector {
  public:
-  inline VectorAligned(void){};
+  inline VectorAligned() = default;
   inline VectorAligned(vec_t X, vec_t Y, vec_t Z) { Init(X, Y, Z); }
 
 #ifdef VECTOR_NO_SLOW_OPERATIONS
@@ -553,7 +553,7 @@ float RandomVectorInUnitCircle(Vector2D* pVector);
 //-----------------------------------------------------------------------------
 // constructors
 //-----------------------------------------------------------------------------
-inline Vector::Vector(void) {
+inline Vector::Vector() {
 #ifdef _DEBUG
 #ifdef VECTOR_PARANOIA
   // Initialize to NAN to catch errors
@@ -1481,7 +1481,7 @@ class RadianEuler;
 class Quaternion  // same data-layout as engine's vec4_t,
 {                 //		which is a vec_t[4]
  public:
-  inline Quaternion(void) {
+  inline Quaternion() {
     // Initialize to NAN to catch errors
 #ifdef _DEBUG
 #ifdef VECTOR_PARANOIA
@@ -1571,7 +1571,7 @@ inline bool QuaternionsAreEqual(const Quaternion& src1, const Quaternion& src2,
 //-----------------------------------------------------------------------------
 class ALIGN16 QuaternionAligned : public Quaternion {
  public:
-  inline QuaternionAligned(void){};
+  inline QuaternionAligned() = default;
   inline QuaternionAligned(vec_t X, vec_t Y, vec_t Z, vec_t W) {
     Init(X, Y, Z, W);
   }
@@ -1665,7 +1665,7 @@ class ALIGN16 QuaternionAligned : public Quaternion {
 class QAngle;
 class RadianEuler {
  public:
-  inline RadianEuler(void) {}
+  inline RadianEuler() = default;
   inline RadianEuler(vec_t X, vec_t Y, vec_t Z) {
     x = X;
     y = Y;
@@ -1867,7 +1867,7 @@ inline void VectorMA(const QAngle& start, float scale, const QAngle& direction,
 //-----------------------------------------------------------------------------
 // constructors
 //-----------------------------------------------------------------------------
-inline QAngle::QAngle(void) {
+inline QAngle::QAngle() {
 #ifdef _DEBUG
 #ifdef VECTOR_PARANOIA
   // Initialize to NAN to catch errors

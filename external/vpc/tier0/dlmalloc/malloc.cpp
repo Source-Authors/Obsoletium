@@ -11,7 +11,7 @@
 
   This is a version (aka dlmalloc) of malloc/free/realloc written by
   Doug Lea and released to the public domain, as explained at
-  http://creativecommons.org/licenses/publicdomain.  Send questions,
+  https://creativecommons.org/licenses/publicdomain/.  Send questions,
   comments, complaints, performance data, etc to dl@cs.oswego.edu
 
 * Version pre-2.8.4 Wed Mar 29 19:46:29 2006    (dl at gee)
@@ -122,8 +122,8 @@
        minimal protection in concurrent environments, and to provide a
        basis for extensions.  If you are using malloc in a concurrent
        program, consider instead using nedmalloc
-       (http://www.nedprod.com/programs/portable/nedmalloc/) or
-       ptmalloc (See http://www.malloc.de), which are derived
+       (https://www.nedprod.com/programs/portable/nedmalloc/) or
+       ptmalloc (See http://www.malloc.de/), which are derived
        from versions of this malloc.
 
   System requirements: Any combination of MORECORE and/or MMAP/MUNMAP
@@ -136,7 +136,7 @@
        like memset.
 
   Compliance: I believe it is compliant with the Single Unix Specification
-       (See http://www.unix.org). Also SVID/XPG, ANSI C, and probably
+       (See https://unix.org/). Also SVID/XPG, ANSI C, and probably
        others as well.
 
 * Overview of algorithms
@@ -2820,7 +2820,7 @@ static size_t traverse_and_check(mstate m);
   that the mstate controlling malloc/free is intact.  This is a
   streamlined version of the approach described by William Robertson
   et al in "Run-time Detection of Heap-based Overflows" LISA'03
-  http://www.usenix.org/events/lisa03/tech/robertson.html The footer
+  https://www.usenix.org/legacy/events/lisa03/tech/robertson.html The footer
   of an inuse chunk holds the xor of its mstate and a random seed,
   that is checked upon calls to free() and realloc().  This is
   (probablistically) unguessable from outside the program, but can be
@@ -4824,7 +4824,7 @@ static mstate init_user_mstate(char* tbase, size_t tsize) {
   mchunkptr mn;
   mchunkptr msp = align_as_chunk(tbase);
   mstate m = (mstate)(chunk2mem(msp));
-  memset(m, 0, msize);
+  memset(m, 0, msize); //-V512
   INITIAL_LOCK(&m->mutex);
   msp->head = (msize | PINUSE_BIT | CINUSE_BIT);
   m->seg.base = m->least_addr = tbase;

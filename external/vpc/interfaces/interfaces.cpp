@@ -40,7 +40,7 @@ IMaterialSystemHardwareConfig *g_pMaterialSystemHardwareConfig{nullptr};
 IDebugTextureInfo *g_pMaterialSystemDebugTextureInfo{nullptr};
 IVBAllocTracker *g_VBAllocTracker{nullptr};
 IColorCorrectionSystem *colorcorrection{nullptr};
-IP4 *p4{nullptr};
+IP4 *p4{nullptr}; //-V707
 IMdlLib *mdllib{nullptr};
 IQueuedLoader *g_pQueuedLoader{nullptr};
 IResourceAccessControl *g_pResourceAccessControl{nullptr};
@@ -244,7 +244,7 @@ void DisconnectInterfaces() {
 // Reloads an interface
 void ReconnectInterface(CreateInterfaceFn factory, const char *name) {
   for (const auto &global : interface_globals) {
-    if (strcmp(global.interface_name, name)) continue;
+    if (strcmp(global.interface_name, name) != 0) continue;
 
     ReconnectInterface(factory, global.interface_name, (void **)global.global);
   }

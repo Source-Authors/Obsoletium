@@ -71,6 +71,8 @@ CVPC::CVPC() {
   m_bP4AutoAdd = false;
   m_bP4SlnCheckEverything = false;
   m_bDedicatedBuild = false;
+  m_bAppendSrvToDedicated = false;
+  m_bUseValveBinDir = false;
   m_bInMkSlnPass = false;
   m_bShowCaseIssues = false;
   m_bVerboseMakefile = false;
@@ -272,7 +274,7 @@ bool VPC_Config_IgnoreOption(const char *pPropertyName) {
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVPC::VPCError(PRINTF_FORMAT_STRING const char *format, ...) {
+[[noreturn]] void CVPC::VPCError(PRINTF_FORMAT_STRING const char *format, ...) {
   va_list argptr;
   char msg[MAX_SYSPRINTMSG];
 
@@ -296,7 +298,8 @@ void CVPC::VPCError(PRINTF_FORMAT_STRING const char *format, ...) {
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVPC::VPCSyntaxError(PRINTF_FORMAT_STRING const char *format, ...) {
+[[noreturn]] void CVPC::VPCSyntaxError(PRINTF_FORMAT_STRING const char *format,
+                                       ...) {
   va_list argptr;
   char msg[MAX_SYSPRINTMSG];
 
@@ -731,10 +734,11 @@ void CVPC::SpewUsage(void) {
               "               Only works if the currrent directory is the "
               "project directory.\n");
       //			Log_Msg( LOG_VPC, "[/novpcgame]:  Disable
-      //reserved vpc macro $VPCGAME and $VPCGAMECAPS.\n" ); 			Log_Msg( LOG_VPC, "
-      //By default if a single game is specified on command line, then that
-      //specified\n" ); 			Log_Msg( LOG_VPC, "               game name will be used
-      //as a value for $VPCGAME and $VPCGAMECAPS macros.\n" );
+      // reserved vpc macro $VPCGAME and $VPCGAMECAPS.\n" );
+      // Log_Msg( LOG_VPC, " By default if a single game is specified on command
+      // line, then that specified\n" ); 			Log_Msg(
+      // LOG_VPC, "               game name will be used as a value for $VPCGAME
+      // and $VPCGAMECAPS macros.\n" );
       Log_Msg(LOG_VPC,
               "[/define:xxx]: Enable a custom conditional $XXX to use for "
               "quick testing in VPC files.\n");
@@ -1177,7 +1181,8 @@ void CVPC::ParseBuildOptions(int argc, const char *argv[]) {
 
 //-----------------------------------------------------------------------------
 //	Generate a string supplemental to CRC data, derived from command-line
-//options, 	so varying certain command-line options can cause .VCPROJ rebuilds.
+// options, 	so varying certain command-line options can cause .VCPROJ
+// rebuilds.
 //-----------------------------------------------------------------------------
 void CVPC::GenerateOptionsCRCString() {
   m_SupplementalCRCString = "_";
@@ -1258,7 +1263,7 @@ void CVPC::GenerateOptionsCRCString() {
 
 //-----------------------------------------------------------------------------
 //	Restart self from correct location and re-run. Returns FALSE if not
-//applicable, 	otherwise TRUE if restart occurred.
+// applicable, 	otherwise TRUE if restart occurred.
 //-----------------------------------------------------------------------------
 bool CVPC::RestartFromCorrectLocation(bool *pIsChild) {
 #if defined(POSIX)
@@ -2413,9 +2418,7 @@ int CVPC::ProcessCommandLine() {
   m_StartDirectory = szCurrentDirectory;
 
   // parse and build tables from group script that options will reference
-  if (bScriptIsVGC) {
-    VPC_ParseGroupScript(pScriptName);
-  }
+  VPC_ParseGroupScript(pScriptName);
 
   if (bScriptIsVCProj) {
     // this is commonly used as an extern tool in MSDEV to re-vpc in place
@@ -2608,15 +2611,13 @@ int vpcmain(int argc, char **argv)
     if (bBuildSolution) {
       g_pVPC->SetPhase1Projects(&referencedProjects);
     }
-
-    nRetVal = g_pVPC->ProcessCommandLine();
   } else {
     if (!g_pVPC->Init(argc, const_cast<const char **>(argv))) {
       return 0;
     }
-
-    nRetVal = g_pVPC->ProcessCommandLine();
   }
+
+  nRetVal = g_pVPC->ProcessCommandLine();
 
   g_pVPC->Shutdown();
 

@@ -173,7 +173,8 @@ void CProjectGenerator_CodeLite::WriteFilesFolder(const char *pFolderName,
   Write("</VirtualDirectory>\n");
 }
 
-void CProjectGenerator_CodeLite::Write(const char *pMsg, ...) {
+void CProjectGenerator_CodeLite::Write(PRINTF_FORMAT_STRING const char *pMsg,
+                                       ...) {
   char sOut[8192];
 
   va_list marker;

@@ -12,7 +12,7 @@ class CProjectGenerator_CodeLite {
                                const char *pMakefileFilename);
 
  private:
-  void Write(const char *pMsg, ...);
+  void Write(PRINTF_FORMAT_STRING const char *pMsg, ...);
   void WriteHeader();
   void WriteFileReferences();
   void WriteProject(const char *pchMakefileName);

@@ -175,7 +175,8 @@ int _V_wcscmp(const wchar_t *s1, const wchar_t *s2) {
   return -1;
 }
 
-#define TOLOWERC(x) (((x >= 'A') && (x <= 'Z')) ? (x + 32) : x)
+#define TOLOWERC(x) ((((x) >= 'A') && ((x) <= 'Z')) ? ((x) + 32) : (x))
+
 int _V_stricmp(const char *s1, const char *s2) {
   VPROF_2("V_stricmp", VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false,
           BUDGETFLAG_ALL);
@@ -320,7 +321,6 @@ int V_strncmp(const char *s1, const char *s2, int count) {
 }
 
 char *V_strnlwr(char *s, size_t count) {
-  Assert(count >= 0);
   AssertValidStringPtr(s, count);
 
   char *pRet = s;
@@ -737,7 +737,7 @@ void V_wcsncpy(wchar_t *pDest, wchar_t const *pSrc, int maxLenInBytes) {
 }
 
 int V_snwprintf(wchar_t *pDest, int maxLenInNumWideCharacters,
-                const wchar_t *pFormat, ...) {
+                PRINTF_FORMAT_STRING const wchar_t *pFormat, ...) {
   Assert(maxLenInNumWideCharacters >= 0);
   AssertValidWritePtr(pDest, maxLenInNumWideCharacters);
   AssertValidReadPtr(pFormat);
@@ -764,7 +764,8 @@ int V_snwprintf(wchar_t *pDest, int maxLenInNumWideCharacters,
   return len;
 }
 
-int V_snprintf(char *pDest, int maxLen, char const *pFormat, ...) {
+int V_snprintf(char *pDest, int maxLen,
+               PRINTF_FORMAT_STRING char const *pFormat, ...) {
   Assert(maxLen >= 0);
   AssertValidWritePtr(pDest, maxLen);
   AssertValidStringPtr(pFormat);
@@ -841,7 +842,6 @@ char *V_strncat(char *pDest, const char *pSrc, size_t maxLenInBytes,
   DEBUG_LINK_CHECK;
   size_t charstocopy = (size_t)0;
 
-  Assert(maxLenInBytes >= 0);
   AssertValidStringPtr(pDest);
   AssertValidStringPtr(pSrc);
 
@@ -962,9 +962,9 @@ char *V_pretifymem(float value, int digitsafterdecimal /*= 2*/,
 
   // Search for decimal or if it was integral, find the space after the raw
   // number
-  char *dot = strstr(i, ".");
+  char *dot = strchr(i, '.');
   if (!dot) {
-    dot = strstr(i, " ");
+    dot = strchr(i, ' ');
   }
 
   // Compute position of dot
@@ -1020,9 +1020,9 @@ char *V_pretifynum(int64 value) {
   }
 
   // Render quadrillions
-  if (value >= 1000000000000ll) {
+  if (value >= 1000000000000000ll) {
     char *pchRender = out + V_strlen(out);
-    V_snprintf(pchRender, 32, "%d,", (int)(value / 1000000000000ll));
+    V_snprintf(pchRender, 32, "%d,", (int)(value / 1000000000000000ll));
   }
 
   // Render trillions
@@ -1386,7 +1386,7 @@ bool V_StripLastDir(char *dirName, int maxlen) {
   // Allow it to return an empty string and true. This can happen if something
   // like "tf2/" is passed in. The correct behavior is to strip off the last
   // directory ("tf2") and return true.
-  if (len == 0 && !bHitColon) {
+  if (len == 0) {
     V_snprintf(dirName, maxlen, ".%c", CORRECT_PATH_SEPARATOR);
     return true;
   }

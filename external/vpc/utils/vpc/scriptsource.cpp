@@ -8,6 +8,7 @@
 
 CScript::CScript() {
   m_ScriptName = "(empty)";
+  m_bFreeScriptAtPop = false;
   m_nScriptLine = 0;
   m_pScriptData = NULL;
   m_pScriptLine = &m_nScriptLine;
@@ -16,8 +17,6 @@ CScript::CScript() {
   m_PeekToken[0] = '\0';
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 const char *CScript::SkipWhitespace(const char *data, bool *pHasNewLines,
                                     int *pNumLines) {
   int c;
@@ -429,7 +428,7 @@ bool CScript::ParsePropertyValue(const char *pBaseString, char *pOutBuff,
       // current token is last token
       // last token can be optional conditional, need to identify
       // backup and reparse up to last token
-      if (pToken && pToken[0] == '[') {
+      if (pToken[0] == '[') {
         // last token is an optional conditional
         bResult = g_pVPC->EvaluateConditionalExpression(pToken);
         break;
@@ -447,23 +446,21 @@ bool CScript::ParsePropertyValue(const char *pBaseString, char *pOutBuff,
       pToken = "\n";
     }
 
-    if (pToken[0]) {
-      // handle reserved macro
-      if (!pBaseString) pBaseString = "";
-      strcpy(buffer1, pToken);
-      Sys_ReplaceString(buffer1, "$base", pBaseString, buffer2,
-                        sizeof(buffer2));
+    // handle reserved macro
+    if (!pBaseString) pBaseString = "";
 
-      g_pVPC->ResolveMacrosInString(buffer2, buffer1, sizeof(buffer1));
+    strcpy(buffer1, pToken);
+    Sys_ReplaceString(buffer1, "$base", pBaseString, buffer2, sizeof(buffer2));
 
-      len = strlen(buffer1);
-      if (remaining < len) len = remaining;
+    g_pVPC->ResolveMacrosInString(buffer2, buffer1, sizeof(buffer1));
 
-      if (len > 0) {
-        memcpy(pOut, buffer1, len);
-        pOut += len;
-        remaining -= len;
-      }
+    len = strlen(buffer1);
+    if (remaining < len) len = remaining;
+
+    if (len > 0) {
+      memcpy(pOut, buffer1, len);
+      pOut += len;
+      remaining -= len;
     }
 
     pToken = PeekNextToken(*pScriptData, false);

@@ -23,32 +23,35 @@ DEFINE_LOGGING_CHANNEL_NO_TAGS(LOG_ASSERT, "Assert");
 
 // Corresponds to ConMsg/ConWarning/etc. with a level <= 1.
 // Only errors are spewed by default.
-BEGIN_DEFINE_LOGGING_CHANNEL(LOG_CONSOLE, "Console", LCF_CONSOLE_ONLY,
-                             LS_ERROR);
-ADD_LOGGING_CHANNEL_TAG("Console");
+BEGIN_DEFINE_LOGGING_CHANNEL(LOG_CONSOLE, "Console", LCF_CONSOLE_ONLY, LS_ERROR)
+  ;
+  ADD_LOGGING_CHANNEL_TAG("Console");
 END_DEFINE_LOGGING_CHANNEL();
 
 // Corresponds to DevMsg/DevWarning/etc. with a level <= 1.
 // Only errors are spewed by default.
 BEGIN_DEFINE_LOGGING_CHANNEL(LOG_DEVELOPER, "Developer", LCF_CONSOLE_ONLY,
-                             LS_ERROR);
-ADD_LOGGING_CHANNEL_TAG("Developer");
+                             LS_ERROR)
+  ;
+  ADD_LOGGING_CHANNEL_TAG("Developer");
 END_DEFINE_LOGGING_CHANNEL();
 
 // Corresponds to ConMsg/ConWarning/etc. with a level >= 2.
 // Only errors are spewed by default.
 BEGIN_DEFINE_LOGGING_CHANNEL(LOG_DEVELOPER_CONSOLE, "DeveloperConsole",
-                             LCF_CONSOLE_ONLY, LS_ERROR);
-ADD_LOGGING_CHANNEL_TAG("DeveloperVerbose");
-ADD_LOGGING_CHANNEL_TAG("Console");
+                             LCF_CONSOLE_ONLY, LS_ERROR)
+  ;
+  ADD_LOGGING_CHANNEL_TAG("DeveloperVerbose");
+  ADD_LOGGING_CHANNEL_TAG("Console");
 END_DEFINE_LOGGING_CHANNEL();
 
 // Corresponds to DevMsg/DevWarning/etc, with a level >= 2.
 // Only errors are spewed by default.
 BEGIN_DEFINE_LOGGING_CHANNEL(LOG_DEVELOPER_VERBOSE, "DeveloperVerbose",
                              LCF_CONSOLE_ONLY, LS_ERROR,
-                             Color(192, 128, 192, 255));
-ADD_LOGGING_CHANNEL_TAG("DeveloperVerbose");
+                             Color(192, 128, 192, 255))
+  ;
+  ADD_LOGGING_CHANNEL_TAG("DeveloperVerbose");
 END_DEFINE_LOGGING_CHANNEL();
 
 //////////////////////////////////////////////////////////////////////////
@@ -421,6 +424,9 @@ LoggingResponse_t CLoggingSystem::LogDirect(LoggingChannelID_t channelID,
               "Exiting due to logging LR_ABORT request.\n");
       Plat_ExitProcess(EXIT_FAILURE);
       break;
+
+    case LR_CONTINUE:
+      break;
   }
 
   return response;
@@ -597,9 +603,9 @@ void LoggingSystem_SetChannelFlags(LoggingChannelID_t channelID,
   GetGlobalLoggingSystem()->SetChannelFlags(channelID, flags);
 }
 
-LoggingResponse_t LoggingSystem_Log(LoggingChannelID_t channelID,
-                                    LoggingSeverity_t severity,
-                                    const char *pMessageFormat, ...) {
+LoggingResponse_t LoggingSystem_Log(
+    LoggingChannelID_t channelID, LoggingSeverity_t severity,
+    PRINTF_FORMAT_STRING const char *pMessageFormat, ...) {
   if (!GetGlobalLoggingSystem()->IsChannelEnabled(channelID, severity))
     return LR_CONTINUE;
 
@@ -615,9 +621,9 @@ LoggingResponse_t LoggingSystem_Log(LoggingChannelID_t channelID,
       channelID, severity, UNSPECIFIED_LOGGING_COLOR, formattedMessage);
 }
 
-LoggingResponse_t LoggingSystem_Log(LoggingChannelID_t channelID,
-                                    LoggingSeverity_t severity, Color spewColor,
-                                    const char *pMessageFormat, ...) {
+LoggingResponse_t LoggingSystem_Log(
+    LoggingChannelID_t channelID, LoggingSeverity_t severity, Color spewColor,
+    PRINTF_FORMAT_STRING const char *pMessageFormat, ...) {
   if (!GetGlobalLoggingSystem()->IsChannelEnabled(channelID, severity))
     return LR_CONTINUE;
 
@@ -643,7 +649,8 @@ LoggingResponse_t LoggingSystem_LogDirect(LoggingChannelID_t channelID,
                                              pMessage);
 }
 
-LoggingResponse_t LoggingSystem_LogAssert(const char *pMessageFormat, ...) {
+LoggingResponse_t LoggingSystem_LogAssert(
+    PRINTF_FORMAT_STRING const char *pMessageFormat, ...) {
   if (!GetGlobalLoggingSystem()->IsChannelEnabled(LOG_ASSERT, LS_ASSERT))
     return LR_CONTINUE;
 

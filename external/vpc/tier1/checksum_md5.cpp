@@ -15,14 +15,14 @@
 
 // The four core functions - F1 is optimized somewhat
 // #define F1(x, y, z) (x & y | ~x & z)
-#define F1(x, y, z) (z ^ (x & (y ^ z)))
+#define F1(x, y, z) ((z) ^ ((x) & ((y) ^ (z))))
 #define F2(x, y, z) F1(z, x, y)
-#define F3(x, y, z) (x ^ y ^ z)
-#define F4(x, y, z) (y ^ (x | ~z))
+#define F3(x, y, z) ((x) ^ (y) ^ (z))
+#define F4(x, y, z) ((y) ^ ((x) | ~(z)))
 
 // This is the central step in the MD5 algorithm.
 #define MD5STEP(f, w, x, y, z, data, s) \
-  (w += f(x, y, z) + data, w = w << s | w >> (32 - s), w += x)
+  (w += f(x, y, z) + (data), w = (w) << (s) | (w) >> (32 - s), w += x)
 
 //-----------------------------------------------------------------------------
 // Purpose: The core of the MD5 algorithm, this alters an existing MD5 hash to
@@ -237,7 +237,7 @@ void MD5Final(unsigned char digest[MD5_DIGEST_LENGTH], MD5Context_t *ctx) {
 #else
   memcpy(digest, ctx->buf, MD5_DIGEST_LENGTH);
 #endif
-  memset(ctx, 0, sizeof(ctx)); /* In case it's sensitive */
+  memset(ctx, 0, sizeof(*ctx)); /* In case it's sensitive */
 }
 
 //-----------------------------------------------------------------------------
@@ -263,7 +263,7 @@ char *MD5_Print(unsigned char *hash, int hashlen) {
 unsigned int MD5_PseudoRandom(unsigned int nSeed) {
   nSeed = LittleDWord(nSeed);
   MD5Context_t ctx;
-  unsigned char digest[MD5_DIGEST_LENGTH];  // The MD5 Hash
+  alignas(unsigned int) unsigned char digest[MD5_DIGEST_LENGTH];  // The MD5 Hash
 
   memset(&ctx, 0, sizeof(ctx));
 

@@ -104,8 +104,8 @@ enum {
 };
 typedef uint32 PathTypeQuery_t;
 
-#define IS_PACKFILE(n) (n & (PATH_IS_PACKFILE | PATH_IS_MAPPACKFILE))
-#define IS_DVDDEV(n) (n & PATH_IS_DVDDEV)
+#define IS_PACKFILE(n) ((n) & (PATH_IS_PACKFILE | PATH_IS_MAPPACKFILE))
+#define IS_DVDDEV(n) ((n) & PATH_IS_DVDDEV)
 
 enum DVDMode_t {
   DVDMODE_OFF = 0,        // not using dvd

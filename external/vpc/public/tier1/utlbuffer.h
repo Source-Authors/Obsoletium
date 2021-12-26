@@ -288,7 +288,7 @@ class CUtlBuffer {
                                 bool bActualSize = true);
 
   // Just like scanf, but doesn't work in binary mode
-  int Scanf(const char *pFmt, ...);
+  int Scanf(SCANF_FORMAT_STRING const char *pFmt, ...);
   int VaScanf(const char *pFmt, va_list list);
 
   // Eats white space, advances Get index

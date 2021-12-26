@@ -8,11 +8,7 @@ extern "C" void __cpuid(int *CPUInfo, int InfoType);
 #pragma intrinsic(__cpuid)
 #endif
 
-/*
-    This section from http://iss.cs.cornell.edu/ia32.htm
-
-
- */
+// This section from http://iss.cs.cornell.edu/ia32.htm
 typedef unsigned bit;
 
 enum CPUVendor { INTEL, AMD, UNKNOWN_VENDOR };
@@ -150,7 +146,7 @@ class ia32detect {
   const tstring version_text() const {
     tchar b[128];
 
-    _stprintf(b, _T("%d.%d.%d %s XVersion(%d.%d)"), version.Family,
+    _stprintf(b, _T("%u.%u.%u %s XVersion(%u.%u)"), version.Family,
               version.Model, version.Stepping, type_text(), version.XFamily,
               version.XModel);
 
@@ -269,7 +265,7 @@ class ia32detect {
 
     m = 0;
 
-    for (::byte ci3 = 1; ci3 != 0 && ci3 <= 255; ci3++)
+    for (::byte ci3 = 1; ci3 != 0; ci3++)
       if (c[ci3]) cache[m++] = ci3;
 
     cache[m] = 0;

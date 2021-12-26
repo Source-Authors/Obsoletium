@@ -149,7 +149,7 @@ class CUtlMap : public base_utlmap_t {
   void Swap(CUtlMap<K, T, I> &that) { m_Tree.Swap(that.m_Tree); }
 
   struct Node_t {
-    Node_t() {}
+    Node_t() = default;
 
     Node_t(const Node_t &from) : key(from.key), elem(from.elem) {}
 

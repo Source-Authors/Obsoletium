@@ -350,11 +350,11 @@ static uint LookupThreadIDFromHandle( HANDLE hThread )
 
 ThreadHandle_t * CreateTestThreads( ThreadFunc_t fnThread, int numThreads, int nProcessorsToDistribute )
 {
-	ThreadHandle_t *pHandles = (new ThreadHandle_t[numThreads+1]) + 1;
-	pHandles[-1] = (ThreadHandle_t)INT_TO_POINTER( numThreads );
+  auto *handles = new ThreadHandle_t[numThreads + 1];
+  ThreadHandle_t *pHandles = handles + 1;
+  handles[0] = (ThreadHandle_t)INT_TO_POINTER(numThreads);
 	for( int i = 0; i < numThreads; ++i )
 	{
-		//TestThreads();
 		ThreadHandle_t hThread;
 		const unsigned int nDefaultStackSize = 64 * 1024; // this stack size is used in case stackSize == 0
 		hThread = CreateSimpleThread( fnThread, INT_TO_POINTER( i ), nDefaultStackSize );
@@ -364,37 +364,17 @@ ThreadHandle_t * CreateTestThreads( ThreadFunc_t fnThread, int numThreads, int n
 			int32 mask = 1 << (i % nProcessorsToDistribute);
 			ThreadSetAffinity( hThread, mask );
 		}
-		
-/*		
-		ThreadProcInfoUnion_t info;
-		info.val.pfnThread = fnThread;
-		info.val.pParam = (void*)(i);
-		if ( int nError = sys_ppu_thread_create( &hThread, ThreadProcConvertUnion, info.val64, 1001, nDefaultStackSize, SYS_PPU_THREAD_CREATE_JOINABLE, "SimpleThread" ) != CELL_OK )
-		{
-			printf( "PROBLEM!\n" );
-			Error( "Cannot create thread, error %d\n", nError );
-			return 0;
-		}
-*/
-		//ThreadHandle_t hThread = CreateSimpleThread( fnThread, (void*)i );
+
 		pHandles[i] = hThread;
 	}
-//	printf("Finishinged CreateTestThreads(%p,%d)\n", (void*)fnThread,  numThreads );
 	return pHandles;
 }
 
 void JoinTestThreads( ThreadHandle_t *pHandles )
 {
 	int nCount = POINTER_TO_INT( pHandles[-1] );
-// 	printf("Joining test threads @%p[%d]:\n", pHandles, nCount );
-// 	for( int i = 0; i < nCount; ++i )
-// 	{
-// 		printf("    %p,\n", (void*)pHandles[i] );
-// 	}
 	for( int i = 0; i < nCount; ++i )
 	{
-//		printf( "Joining %p", (void*) pHandles[i] );
-//		if( !i ) sys_timer_usleep(100000);
 		ThreadJoin( pHandles[i] );
 		ReleaseThreadHandle( pHandles[i] );
 	}
@@ -963,9 +943,11 @@ uint32 CThreadSyncObject::WaitForMultiple( int nObjects, CThreadSyncObject *pObj
 	DWORD ret = WaitForMultipleObjects( nObjects, pHandles, bWaitAll, dwTimeout );
 	if ( ret == WAIT_TIMEOUT )
 		return TW_TIMEOUT;
-	else if ( ret >= WAIT_OBJECT_0 && (ret-WAIT_OBJECT_0) < (uint32)nObjects )
+	
+	if ( ret >= WAIT_OBJECT_0 && (ret-WAIT_OBJECT_0) < (uint32)nObjects )
 		return (int)(ret - WAIT_OBJECT_0);
-	else if ( ret >= WAIT_ABANDONED_0 && (ret - WAIT_ABANDONED_0) < (uint32)nObjects )
+	
+	if ( ret >= WAIT_ABANDONED_0 && (ret - WAIT_ABANDONED_0) < (uint32)nObjects )
 		Error( "Unhandled WAIT_ABANDONED in WaitForMultipleObjects" );
 	else if ( ret == WAIT_FAILED )
 		return TW_FAILED;
@@ -1418,7 +1400,7 @@ bool CThreadEvent::Wait( uint32 dwTimeout )
 //
 // CThreadSemaphore
 //
-// To get Posix implementation, try http://www-128.ibm.com/developerworks/eserver/library/es-win32linux-sem.html
+// To get Posix implementation, try https://www.scribd.com/document/341915761/Semaphores-Tutorial-OReilly-Linuxdevcenter
 //
 //-----------------------------------------------------------------------------
 

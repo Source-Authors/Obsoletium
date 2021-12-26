@@ -87,8 +87,10 @@ class CCvar : public CBaseAppSystem<ICvar> {
   virtual void RemoveConsoleDisplayFunc(IConsoleDisplayFunc *pDisplayFunc);
   virtual void ConsoleColorPrintf(const Color &clr, const char *pFormat,
                                   ...) const;
-  virtual void ConsolePrintf(const char *pFormat, ...) const;
-  virtual void ConsoleDPrintf(const char *pFormat, ...) const;
+  virtual void ConsolePrintf(PRINTF_FORMAT_STRING const char *pFormat,
+                             ...) const;
+  virtual void ConsoleDPrintf(PRINTF_FORMAT_STRING const char *pFormat,
+                              ...) const;
   virtual void RevertFlaggedConVars(int nFlag);
   virtual void InstallCVarQuery(ICvarQuery *pQuery);
 
@@ -473,14 +475,14 @@ void CCvar::RemoveSplitScreenConVars(CVarDLLIdentifier_t id)
 
   CUtlVector<ConVar *> deleted;
 
-  FOR_EACH_MAP(m_SplitScreenAddedConVarsMap, i) {
-    ConVar *key = m_SplitScreenAddedConVarsMap.Key(i);
+  FOR_EACH_MAP(m_SplitScreenAddedConVarsMap, j) {
+    ConVar *key = m_SplitScreenAddedConVarsMap.Key(j);
 
     if (key->GetDLLIdentifier() != id) {
       continue;
     }
 
-    SplitScreenAddedConVars_t &info = m_SplitScreenAddedConVarsMap[i];
+    SplitScreenAddedConVars_t &info = m_SplitScreenAddedConVarsMap[j];
 
     for (int i = 1; i < m_nMaxSplitScreenSlots; ++i) {
       if (info.m_Vars[i - 1].m_pVar) {
@@ -815,7 +817,7 @@ void CCvar::ConsoleColorPrintf(const Color &clr, const char *pFormat,
   }
 }
 
-void CCvar::ConsolePrintf(const char *pFormat, ...) const {
+void CCvar::ConsolePrintf(PRINTF_FORMAT_STRING const char *pFormat, ...) const {
   char temp[8192];
   va_list argptr;
   va_start(argptr, pFormat);
@@ -835,7 +837,8 @@ void CCvar::ConsolePrintf(const char *pFormat, ...) const {
   }
 }
 
-void CCvar::ConsoleDPrintf(const char *pFormat, ...) const {
+void CCvar::ConsoleDPrintf(PRINTF_FORMAT_STRING const char *pFormat,
+                           ...) const {
   char temp[8192];
   va_list argptr;
   va_start(argptr, pFormat);
@@ -1000,8 +1003,7 @@ void CConCommandHash::Init(void) {
 
 //-----------------------------------------------------------------------------
 // Purpose: Insert data into the hash table given its key (unsigned int),
-//			WITH a check to see if the element already exists within the
-//hash.
+// WITH a check to see if the element already exists within the hash.
 //-----------------------------------------------------------------------------
 CConCommandHash::CCommandHashHandle_t CConCommandHash::Insert(
     ConCommandBase *cmd) {
@@ -1021,7 +1023,6 @@ CConCommandHash::CCommandHashHandle_t CConCommandHash::FastInsert(
   // Get a new element from the pool.
   int iHashData = m_aDataPool.Alloc(true);
   HashEntry_t *pHashData = &m_aDataPool[iHashData];
-  if (!pHashData) return InvalidHandle();
 
   HashKey_t key = Hash(cmd);
 

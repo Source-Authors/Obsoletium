@@ -241,11 +241,12 @@ inline bool V_isspace(int c) {
 //
 // This means the last parameter can usually be a sizeof() of a string.
 void V_strncpy(char *pDest, const char *pSrc, int maxLen);
-int V_snprintf(char *pDest, int destLen, const char *pFormat, ...)
+int V_snprintf(char *pDest, int destLen,
+               PRINTF_FORMAT_STRING const char *pFormat, ...)
     FMTFUNCTION(3, 4);
 void V_wcsncpy(wchar_t *pDest, wchar_t const *pSrc, int maxLenInBytes);
 int V_snwprintf(wchar_t *pDest, int maxLenInNumWideCharacters,
-                const wchar_t *pFormat, ...);
+                PRINTF_FORMAT_STRING const wchar_t *pFormat, ...);
 
 #define COPY_ALL_CHARACTERS -1
 char *V_strncat(char *, const char *, size_t maxLenInBytes,

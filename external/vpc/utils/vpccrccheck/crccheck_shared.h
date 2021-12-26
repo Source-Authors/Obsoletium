@@ -14,7 +14,7 @@
 #define VPCCRCCHECK_FILE_EXTENSION "vpc_crc"
 #define VPCCRCCHECK_FILE_VERSION_STRING "[vpc crc file version 2]"
 
-void Sys_Error(const char *format, ...);
+[[noreturn]] void Sys_Error(PRINTF_FORMAT_STRING const char *format, ...);
 int Sys_LoadTextFileWithIncludes(const char *filename, char **bufferptr,
                                  bool bInsertFileMacroExpansion);
 

@@ -85,17 +85,20 @@ class CClockSpeedInit {
   static void Init() {
     const CPUInformation &pi = GetCPUInformation();
 
-    if (IsX360()) {
+    g_ClockSpeed = pi.m_Speed;
+
+    if constexpr (IsX360()) {
       // cycle counter runs as doc'd at 1/64 Xbox 3.2GHz clock speed, thus 50
       // Mhz
       g_ClockSpeed = pi.m_Speed / 64L;
-    } else if (IsPS3()) {
+    }
+
+    if constexpr (IsPS3()) {
       // CPU clock rate is totally unrelated to time base register frequency on
       // PS3
       g_ClockSpeed = sys_time_get_timebase_frequency();
-    } else {
-      g_ClockSpeed = pi.m_Speed;
     }
+
     g_dwClockSpeed = (unsigned long)g_ClockSpeed;
 
     g_ClockSpeedMicrosecondsMultiplier = 1000000.0 / (double)g_ClockSpeed;
@@ -110,11 +113,10 @@ class CFastTimer {
   // code.
   void Start();
   void End();
-
-  const CCycleCount &GetDuration()
-      const;  // Get the elapsed time between Start and End calls.
-  CCycleCount GetDurationInProgress()
-      const;  // Call without ending. Not that cheap.
+  // Get the elapsed time between Start and End calls.
+  const CCycleCount &GetDuration() const;
+  // Call without ending. Not that cheap.
+  CCycleCount GetDurationInProgress() const;
 
   // Return number of cycles per second on this processor.
   static inline unsigned long GetClockSpeed();
@@ -433,7 +435,7 @@ inline CCycleCount const &CFastTimer::GetDuration() const {
 // CAverageCycleCounter inlines
 
 inline CAverageCycleCounter::CAverageCycleCounter()
-    : m_nIters(0), m_fReport(false) {}
+    : m_nIters(0), m_fReport(false), m_pszName(nullptr) {}
 
 inline void CAverageCycleCounter::Init() {
   m_Total.Init();

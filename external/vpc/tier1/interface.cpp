@@ -363,11 +363,10 @@ CSysModule *Sys_LoadModule(const char *pModuleName) {
     // add it.
     if (!(strstr(pModuleName, ".sprx") || strstr(pModuleName, ".prx"))) {
       strncpy(alteredFilename, pModuleName, MAX_PATH);
-      strncat(alteredFilename, DLL_EXT_STRING, MAX_PATH);
+      strncat(alteredFilename, DLL_EXT_STRING,
+              MAX_PATH - strlen(alteredFilename) - 1);
       pModuleName = alteredFilename;
     }
-  } else {
-    alteredFilename;  // just to quash the warning
   }
 
   if (!V_IsAbsolutePath(pModuleName)) {
@@ -389,20 +388,21 @@ CSysModule *Sys_LoadModule(const char *pModuleName) {
 #else   // !_PS3
     char szCwd[1024];
     _getcwd(szCwd, sizeof(szCwd));
+
     if (IsX360()) {
       int i = CommandLine()->FindParm("-basedir");
-      if (i) {
-        strcpy(szCwd, CommandLine()->GetParm(i + 1));
-      }
-    }
-    if (szCwd[strlen(szCwd) - 1] == '/' || szCwd[strlen(szCwd) - 1] == '\\') {
-      szCwd[strlen(szCwd) - 1] = 0;
+      if (i) strcpy(szCwd, CommandLine()->GetParm(i + 1));
     }
 
     size_t cCwd = strlen(szCwd);
+    if (cCwd != 0 && (szCwd[cCwd - 1] == '/' || szCwd[cCwd - 1] == '\\')) {
+      szCwd[cCwd - 1] = '\0';
+    }
+
+    cCwd = strlen(szCwd);
     if (strstr(pModuleName, "bin/") == pModuleName ||
-        (szCwd[cCwd - 1] == 'n' && szCwd[cCwd - 2] == 'i' &&
-         szCwd[cCwd - 3] == 'b')) {
+        (cCwd >= 3 && (szCwd[cCwd - 1] == 'n' && szCwd[cCwd - 2] == 'i' &&
+                       szCwd[cCwd - 3] == 'b'))) {
       // don't make bin/bin path
       V_snprintf(szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s/%s",
                  szCwd, pModuleName);

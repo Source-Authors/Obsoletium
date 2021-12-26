@@ -71,9 +71,7 @@ void CUtlBinaryBlock::SetLength(int nLength) {
 void CUtlBinaryBlock::Set(const void *pValue, int nLen) {
   Assert(!m_Memory.IsReadOnly());
 
-  if (!pValue) {
-    nLen = 0;
-  }
+  if (!pValue) nLen = 0;
 
   SetLength(nLen);
 
@@ -333,7 +331,7 @@ bool CUtlString::MatchesPattern(const CUtlString &Pattern, int nFlags) const {
   }
 }
 
-int CUtlString::Format(const char *pFormat, ...) {
+int CUtlString::Format(PRINTF_FORMAT_STRING const char *pFormat, ...) {
   Assert(!m_Storage.IsReadOnly());
 
   char tmpBuf[4096];  //< Nice big 4k buffer, as much memory as my first

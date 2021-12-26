@@ -11,8 +11,7 @@
 
 #include "tier0/memdbgon.h"
 
-class CVCProjInfo {
- public:
+struct CVCProjInfo {
   CUtlString m_ProjectName;
   CUtlString m_ProjectGUID;
 };
@@ -25,54 +24,50 @@ struct RegStartPoint {
 class CSolutionGenerator_Win32 : public IBaseSolutionGenerator {
  public:
   void GetVCPROJSolutionGUID(char (&szSolutionGUID)[256]) {
-    HKEY hKey;
-    int firstVer = 8;
+    int firstVer;
     const int lastVer = 14;  // Handle up to VS 14, AKA VS 2015
+
     if (g_pVPC->Is2010()) {
       firstVer = 10;
     } else if (g_pVPC->BUse2008()) {
       firstVer = 9;
+    } else {
+      firstVer = 8;
     }
+
     for (int vsVer = firstVer; vsVer <= lastVer; ++vsVer) {
       // Handle both VisualStudio and VCExpress (used by some SourceSDK
       // customers)
-      RegStartPoint searchPoints[] = {
+      RegStartPoint searchPoints[]{
           {HKEY_LOCAL_MACHINE,
-           "Software\\Microsoft\\VisualStudio\\%d.0\\Projects"},  // Visual
-                                                                  // Studio
-                                                                  // Professional
+           // Visual Studio Professional
+           "Software\\Microsoft\\VisualStudio\\%d.0\\Projects"},
           {HKEY_LOCAL_MACHINE,
-           "Software\\Microsoft\\VCExpress\\%d.0\\Projects"},  // VC Express
-                                                               // 2010 and 2012
+           // VC Express 2010 and 2012
+           "Software\\Microsoft\\VCExpress\\%d.0\\Projects"},
           {HKEY_CURRENT_USER,
-           "Software\\Microsoft\\WDExpress\\%d.0_Config\\Projects"},  // WinDev
-                                                                      // Express
-                                                                      // -- VS
-                                                                      // Express
-                                                                      // starting
-                                                                      // with VS
-                                                                      // 2013
+           // WinDev Express -- VS Express starting with VS 2013
+           "Software\\Microsoft\\WDExpress\\%d.0_Config\\Projects"},
       };
-      for (int j = 0; j < ARRAYSIZE(searchPoints); ++j) {
-        RegStartPoint &searchPoint = searchPoints[j];
+
+      for (const auto &searchPoint : searchPoints) {
         char pRegKeyName[1000];
         V_snprintf(pRegKeyName, ARRAYSIZE(pRegKeyName), searchPoint.baseDir,
                    vsVer);
+        HKEY hKey;
         LONG ret =
             RegOpenKeyEx(searchPoint.baseKey, pRegKeyName, 0, KEY_READ, &hKey);
-        // if ( ret != ERROR_SUCCESS )
-        //	g_pVPC->VPCError( "Unable to open registry key %s.", pRegKeyName
-        //);
 
         for (int i = 0; i < 200; i++) {
           char szKeyName[MAX_PATH];
           DWORD dwKeyNameSize = sizeof(szKeyName);
           ret = RegEnumKeyEx(hKey, i, szKeyName, &dwKeyNameSize, NULL, NULL,
                              NULL, NULL);
+
           if (ret == ERROR_NO_MORE_ITEMS) break;
 
           HKEY hSubKey;
-          LONG ret = RegOpenKeyEx(hKey, szKeyName, 0, KEY_READ, &hSubKey);
+          ret = RegOpenKeyEx(hKey, szKeyName, 0, KEY_READ, &hSubKey);
           if (ret == ERROR_SUCCESS) {
             DWORD dwType;
             char ext[MAX_PATH];
@@ -96,6 +91,7 @@ class CSolutionGenerator_Win32 : public IBaseSolutionGenerator {
         RegCloseKey(hKey);
       }
     }
+
     g_pVPC->VPCError(
         "Unable to find RegKey for .vcproj or .vcxproj files in solutions.");
   }
@@ -121,7 +117,9 @@ class CSolutionGenerator_Win32 : public IBaseSolutionGenerator {
 
     // Write the file.
     FILE *fp = fopen(pSolutionFilename, "wt");
-    if (!fp) g_pVPC->VPCError("Can't open %s for writing.", pSolutionFilename);
+    if (!fp) {
+      g_pVPC->VPCError("Can't open %s for writing.", pSolutionFilename);
+    }
 
     if (g_pVPC->Is2015()) {
       fprintf(fp,

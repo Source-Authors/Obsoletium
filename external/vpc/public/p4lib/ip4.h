@@ -179,6 +179,6 @@ abstract_class IP4 : public IAppSystem {
                                        CUtlVector<P4File_t> &fileList) = 0;
 };
 
-DECLARE_TIER2_INTERFACE(IP4, p4);
+DECLARE_TIER2_INTERFACE(IP4, p4); //-V707
 
 #endif  // VPC_P4LIB_IP4_H_

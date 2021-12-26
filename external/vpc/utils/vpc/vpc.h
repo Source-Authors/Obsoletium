@@ -168,11 +168,12 @@ class CVPC {
   bool Init(int argc, const char **argv);
   void Shutdown(bool bHasError = false);
 
-  void VPCError(PRINTF_FORMAT_STRING const char *pFormat, ...);
+  [[noreturn]] void VPCError(PRINTF_FORMAT_STRING const char *pFormat, ...);
   void VPCWarning(PRINTF_FORMAT_STRING const char *pFormat, ...);
   void VPCStatus(bool bAlwaysSpew, PRINTF_FORMAT_STRING const char *pFormat,
                  ...);
-  void VPCSyntaxError(PRINTF_FORMAT_STRING const char *pFormat = NULL, ...);
+  [[noreturn]] void VPCSyntaxError(
+      PRINTF_FORMAT_STRING const char *pFormat = NULL, ...);
 
   bool IsProjectCurrent(const char *pVCProjFilename, bool bSpewStatus);
 

@@ -188,7 +188,7 @@ DECLARE_FIELD_SIZE(FIELD_MATERIALINDEX, sizeof(int))
 // Used by byteswap datadescs
 #define DEFINE_BITFIELD(name, fieldtype, bitcount)       \
   DEFINE_ARRAY(name, fieldtype,                          \
-               ((bitcount + FIELD_BITS(fieldtype) - 1) & \
+               (((bitcount) + FIELD_BITS(fieldtype) - 1) & \
                 ~(FIELD_BITS(fieldtype) - 1)) /          \
                    FIELD_BITS(fieldtype))
 #define DEFINE_INDEX(name, fieldtype) \

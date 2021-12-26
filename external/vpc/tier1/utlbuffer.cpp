@@ -169,6 +169,7 @@ CUtlBuffer::CUtlBuffer(int growSize, int initSize, int nFlags) : m_Error(0) {
   m_nTab = 0;
   m_nOffset = 0;
   m_Flags = nFlags;
+  m_Reserved = 0;
   if ((initSize != 0) && !IsReadOnly()) {
     m_nMaxPut = -1;
     AddNullTermination(m_Put);
@@ -187,6 +188,7 @@ CUtlBuffer::CUtlBuffer(const void *pBuffer, int nSize, int nFlags)
   m_nTab = 0;
   m_nOffset = 0;
   m_Flags = nFlags;
+  m_Reserved = 0;
   if (IsReadOnly()) {
     m_nMaxPut = m_Put = nSize;
   } else {
@@ -863,7 +865,7 @@ int CUtlBuffer::VaScanf(const char *pFmt, va_list list) {
   return numScanned;
 }
 
-int CUtlBuffer::Scanf(const char *pFmt, ...) {
+int CUtlBuffer::Scanf(SCANF_FORMAT_STRING const char *pFmt, ...) {
   va_list args;
 
   va_start(args, pFmt);
@@ -1387,7 +1389,6 @@ CUtlInplaceBuffer::CUtlInplaceBuffer(int growSize /* = 0 */,
                                      int initSize /* = 0 */,
                                      int nFlags /* = 0 */)
     : CUtlBuffer(growSize, initSize, nFlags) {
-  NULL;
 }
 
 bool CUtlInplaceBuffer::InplaceGetLinePtr(char **ppszInBufferPtr,

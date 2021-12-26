@@ -170,7 +170,7 @@ inline void CUtlDict<T, I>::SetElementName(I i, char const *pName) {
   // TODO:  This relies on the rb tree putting the most recently
   //  removed element at the head of the insert list
   free((void *)m_Elements.Key(i));
-  m_Elements.Reinsert(strdup(pName), i);
+  m_Elements.Reinsert(_strdup(pName), i);
 }
 
 //-----------------------------------------------------------------------------
@@ -257,13 +257,13 @@ void CUtlDict<T, I>::PurgeAndDeleteElements() {
 template <class T, class I>
 I CUtlDict<T, I>::Insert(const char *pName, const T &element) {
   MEM_ALLOC_CREDIT_CLASS();
-  return m_Elements.Insert(strdup(pName), element);
+  return m_Elements.Insert(_strdup(pName), element);
 }
 
 template <class T, class I>
 I CUtlDict<T, I>::Insert(const char *pName) {
   MEM_ALLOC_CREDIT_CLASS();
-  return m_Elements.Insert(strdup(pName));
+  return m_Elements.Insert(_strdup(pName));
 }
 
 //-----------------------------------------------------------------------------

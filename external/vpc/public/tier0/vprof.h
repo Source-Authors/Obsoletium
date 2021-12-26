@@ -1315,7 +1315,7 @@ class CVProfCounter {
     m_pCounter = g_VProfCurrentProfile.FindOrCreateCounter(pName, group);
     Assert(m_pCounter);
   }
-  ~CVProfCounter() {}
+  ~CVProfCounter() = default;
   void Increment(int val) {
     Assert(m_pCounter);
     *m_pCounter += val;

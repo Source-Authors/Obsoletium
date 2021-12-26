@@ -129,20 +129,19 @@ void CCommandLine::LoadParametersFromFile(const char *&pSrc, char *&pDst,
   // Now read in parameters from file
   FILE *fp = fopen(szFileName, "r");
   if (fp) {
-    char c;
-    c = (char)fgetc(fp);
+    int c = fgetc(fp);
     while (c != EOF) {
       // Turn return characters into spaces
       if (c == '\n') c = ' ';
 
-      *pDst++ = c;
+      *pDst++ = static_cast<char>(c);
 
       // Don't go past the end, and allow for our terminating space character
       // AND a terminating null character.
       if ((pDst - pDestStart) >= (maxDestLen - 2)) break;
 
       // Get the next character, if there are more
-      c = (char)fgetc(fp);
+      c = fgetc(fp);
     }
 
     // Add a terminating space character
@@ -163,10 +162,10 @@ void CCommandLine::CreateCmdLine(int argc, char **argv) {
   const int MAX_CHARS = sizeof(cmdline) - 1;
   cmdline[MAX_CHARS] = 0;
   for (int i = 0; i < argc; ++i) {
-    strncat(cmdline, "\"", MAX_CHARS);
-    strncat(cmdline, argv[i], MAX_CHARS);
-    strncat(cmdline, "\"", MAX_CHARS);
-    strncat(cmdline, " ", MAX_CHARS);
+    strncat(cmdline, "\"", MAX_CHARS - strlen(cmdline) - 1);
+    strncat(cmdline, argv[i], MAX_CHARS - strlen(cmdline) - 1);
+    strncat(cmdline, "\"", MAX_CHARS - strlen(cmdline) - 1);
+    strncat(cmdline, " ", MAX_CHARS - strlen(cmdline) - 1);
   }
 
   CreateCmdLine(cmdline);
@@ -524,7 +523,7 @@ void CCommandLine::SetParm(int nIndex, char const *pParm) {
     Assert((nIndex >= 0) && (nIndex < m_nParmCount));
     if ((nIndex >= 0) && (nIndex < m_nParmCount)) {
       if (m_ppParms[nIndex]) delete[] m_ppParms[nIndex];
-      m_ppParms[nIndex] = strdup(pParm);
+      m_ppParms[nIndex] = _strdup(pParm);
     }
   }
 }

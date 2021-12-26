@@ -61,8 +61,6 @@ const char *CVPC::GetTargetPlatformName() {
   // fatal - should have already been default set
   Assert(0);
   VPCError("Unspecified platform.");
-
-  return NULL;
 }
 
 //-----------------------------------------------------------------------------

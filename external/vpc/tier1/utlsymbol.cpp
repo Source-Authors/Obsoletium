@@ -359,7 +359,7 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindOrAddFileName(
   V_strncpy(filename, fn + V_strlen(basepath), sizeof(filename));
 
   // not found, lock and look again
-  FileNameHandleInternal_t handle;
+  alignas(FileNameHandle_t) FileNameHandleInternal_t handle;
   m_lock.LockForWrite();
   handle.path = m_StringPool.FindStringHandle(basepath);
   handle.file = m_StringPool.FindStringHandle(filename);
@@ -393,7 +393,7 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName(const char *pFileName) {
   char filename[MAX_PATH];
   V_strncpy(filename, fn + V_strlen(basepath), sizeof(filename));
 
-  FileNameHandleInternal_t handle;
+  alignas(FileNameHandle_t) FileNameHandleInternal_t handle;
 
   m_lock.LockForRead();
   handle.path = m_StringPool.FindStringHandle(basepath);
@@ -415,9 +415,6 @@ bool CUtlFilenameSymbolTable::String(const FileNameHandle_t &handle, char *buf,
   buf[0] = 0;
 
   FileNameHandleInternal_t *internal = (FileNameHandleInternal_t *)&handle;
-  if (!internal) {
-    return false;
-  }
 
   m_lock.LockForRead();
   const char *path = m_StringPool.HandleToString(internal->path);

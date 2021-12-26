@@ -294,7 +294,7 @@ class CSolutionGenerator_CodeLite : public IBaseSolutionGenerator {
     return pPos + V_strlen(pSearchFor);
   }
 
-  void Write(const char *pMsg, ...) {
+  void Write(PRINTF_FORMAT_STRING const char *pMsg, ...) {
     char sOut[8192];
 
     va_list marker;

@@ -722,7 +722,7 @@ void ConVar::InternalSetValue(const char *value) {
   float flOldValue = m_Value.m_fValue;
   const char *val = value ? value : "";
 
-  if (!InternalSetColorFromString(value)) {
+  if (!InternalSetColorFromString(val)) {
     // Not a color, do the standard thing
     float fNewValue = (float)atof(value);
     if (!IsFinite(fNewValue)) {
@@ -759,9 +759,7 @@ void ConVar::ChangeStringValue(const char *tempVal, float flOldValue) {
   int len = V_strlen(tempVal) + 1;
 
   if (len > m_Value.m_StringLength) {
-    if (m_Value.m_pszString) {
-      delete[] m_Value.m_pszString;
-    }
+    delete[] m_Value.m_pszString;
 
     m_Value.m_pszString = new char[len];
     m_Value.m_StringLength = len;
@@ -1142,12 +1140,9 @@ SplitScreenConVarRef::SplitScreenConVarRef(IConVar *pConVar) {
 
     info.m_pConVar = g_pCVar ? g_pCVar->FindVar(pchName) : &s_EmptyConVar;
     if (!info.m_pConVar) {
-      info.m_pConVar = &s_EmptyConVar;
-      if (i > 0) {
-        // Point at slot zero instead, in case we got in here with a non
-        // FCVAR_SS var...
-        info.m_pConVar = m_Info[0].m_pConVar;
-      }
+      // Point at slot zero instead, in case we got in here with a non
+      // FCVAR_SS var...
+      info.m_pConVar = m_Info[0].m_pConVar;
     }
     info.m_pConVarState = static_cast<ConVar *>(info.m_pConVar);
   }
@@ -1192,7 +1187,8 @@ void ConVar_AppendFlags(const ConCommandBase *var, char *buf, size_t bufsize) {
   }
 }
 
-static void AppendPrintf(char *buf, size_t bufsize, char const *fmt, ...) {
+static void AppendPrintf(char *buf, size_t bufsize,
+                         PRINTF_FORMAT_STRING char const *fmt, ...) {
   char scratch[1024];
   va_list argptr;
   va_start(argptr, fmt);
@@ -1245,14 +1241,12 @@ void ConVar_PrintDescription(const ConCommandBase *pVar) {
       value = var->GetString();
     }
 
-    if (value) {
-      AppendPrintf(outstr, sizeof(outstr), "\"%s\" = \"%s\"", var->GetName(),
-                   value);
+    AppendPrintf(outstr, sizeof(outstr), "\"%s\" = \"%s\"", var->GetName(),
+                 value);
 
-      if (V_stricmp(value, var->GetDefault())) {
-        AppendPrintf(outstr, sizeof(outstr), " ( def. \"%s\" )",
-                     var->GetDefault());
-      }
+    if (V_stricmp(value, var->GetDefault())) {
+      AppendPrintf(outstr, sizeof(outstr), " ( def. \"%s\" )",
+                   var->GetDefault());
     }
 
     if (bMin) {

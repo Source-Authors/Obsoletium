@@ -212,8 +212,8 @@ CKeyValuesSystem::~CKeyValuesSystem() {
 //-----------------------------------------------------------------------------
 // Purpose: registers the size of the KeyValues in the specified instance
 //			so it can build a properly sized memory pool for the
-// KeyValues objects 			the sizes will usually never differ but this
-// is for versioning safety
+// KeyValues objects 			the sizes will usually never differ but
+// this is for versioning safety
 //-----------------------------------------------------------------------------
 void CKeyValuesSystem::RegisterSizeofKeyValues(int size) {
   if (size > m_iMaxKeyValuesSize) {
@@ -222,7 +222,7 @@ void CKeyValuesSystem::RegisterSizeofKeyValues(int size) {
 }
 
 #ifdef KEYVALUES_USE_POOL
-static void KVLeak(char const *fmt, ...) {
+static void KVLeak(PRINTF_FORMAT_STRING char const *fmt, ...) {
   va_list argptr;
   char data[1024];
 
@@ -269,9 +269,7 @@ void CKeyValuesSystem::FreeKeyValuesMemory(void *pMem) {
 //-----------------------------------------------------------------------------
 HKeySymbol CKeyValuesSystem::GetSymbolForString(const char *name,
                                                 bool bCreate) {
-  if (!name) {
-    return (-1);
-  }
+  if (!name) return -1;
 
   AUTO_LOCK(m_mutex);
   MEM_ALLOC_CREDIT();
@@ -279,7 +277,8 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString(const char *name,
   int hash = CaseInsensitiveHash(name, m_HashTable.Count());
   int i = 0;
   hash_item_t *item = &m_HashTable[hash];
-  while (1) {
+
+  while (true) {
     if (!stricmp(name, (char *)m_Strings.GetBase() + item->stringIndex)) {
       return (HKeySymbol)item->stringIndex;
     }
@@ -308,19 +307,17 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString(const char *name,
         Error("Out of keyvalue string space");
         return -1;
       }
+
       item->stringIndex = pString - (char *)m_Strings.GetBase();
       V_memcpy(pString, name, numStringBytes);
-      *reinterpret_cast<uint32 *>(pString + numStringBytes) =
-          0;  // string null-terminator + 3 alternative spelling bytes
+
+      // string null-terminator + 3 alternative spelling bytes
+      *reinterpret_cast<uint32 *>(pString + numStringBytes) = 0;
       return (HKeySymbol)item->stringIndex;
     }
 
     item = item->next;
   }
-
-  // shouldn't be able to get here
-  Assert(0);
-  return (-1);
 }
 
 extern int _V_stricmp_NegativeForUnequal(const char *s1, const char *s2);
@@ -330,9 +327,7 @@ extern int _V_stricmp_NegativeForUnequal(const char *s1, const char *s2);
 //-----------------------------------------------------------------------------
 HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive(
     HKeySymbol &hCaseInsensitiveSymbol, const char *name, bool bCreate) {
-  if (!name) {
-    return (-1);
-  }
+  if (!name) return -1;
 
   AUTO_LOCK(m_mutex);
   MEM_ALLOC_CREDIT();
@@ -348,13 +343,16 @@ HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive(
       // strings are exactly equal matching every letter's case
       hCaseInsensitiveSymbol = (HKeySymbol)item->stringIndex;
       return (HKeySymbol)item->stringIndex;
-    } else if (iResult > 0) {
+    }
+
+    if (iResult > 0) {
       // strings are equal in a case-insensitive compare, but have different
       // case for some letters Need to walk the case-resolving chain
       numNameStringBytes = V_strlen(pCompareString);
       uint32 *pnCaseResolveIndex =
           reinterpret_cast<uint32 *>(pCompareString + numNameStringBytes);
       hCaseInsensitiveSymbol = (HKeySymbol)item->stringIndex;
+
       while (int nAlternativeStringIndex =
                  MEM_4BYTES_FROM_0_AND_3BYTES(*pnCaseResolveIndex)) {
         pCompareString = (char *)m_Strings.GetBase() + nAlternativeStringIndex;
@@ -367,6 +365,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive(
         pnCaseResolveIndex =
             reinterpret_cast<uint32 *>(pCompareString + numNameStringBytes);
       }
+
       // Reached the end of alternative case-resolving chain, pnCaseResolveIndex
       // is pointing at 0 bytes indicating no further alternative stringIndex
       if (!bCreate) {
@@ -376,7 +375,9 @@ HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive(
         // new value anyway, only for locating a pre-existing value and lookups
         // are case-insensitive
         return (HKeySymbol)item->stringIndex;
-      } else {
+      }
+
+      {
         char *pString = (char *)m_Strings.Alloc(numNameStringBytes + 1 + 3);
         if (!pString) {
           Error("Out of keyvalue string space");
@@ -396,10 +397,8 @@ HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive(
     i++;
 
     if (item->next == NULL) {
-      if (!bCreate) {
-        // not found
-        return -1;
-      }
+      // not found
+      if (!bCreate) return -1;
 
       // we're not in the table
       if (item->stringIndex != 0) {
@@ -417,20 +416,18 @@ HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive(
         Error("Out of keyvalue string space");
         return -1;
       }
+
       item->stringIndex = pString - (char *)m_Strings.GetBase();
       V_memcpy(pString, name, numStringBytes);
-      *reinterpret_cast<uint32 *>(pString + numStringBytes) =
-          0;  // string null-terminator + 3 alternative spelling bytes
+      // string null-terminator + 3 alternative spelling bytes
+      *reinterpret_cast<uint32 *>(pString + numStringBytes) = 0;
+
       hCaseInsensitiveSymbol = (HKeySymbol)item->stringIndex;
       return (HKeySymbol)item->stringIndex;
     }
 
     item = item->next;
   }
-
-  // shouldn't be able to get here
-  Assert(0);
-  return (-1);
 }
 
 //-----------------------------------------------------------------------------
@@ -440,6 +437,7 @@ const char *CKeyValuesSystem::GetStringForSymbol(HKeySymbol symbol) {
   if (symbol == -1) {
     return "";
   }
+
   return ((char *)m_Strings.GetBase() + (size_t)symbol);
 }
 

@@ -78,6 +78,7 @@ class k8BaseEvent {
       eventSelect[i].flat = 0;
     }
     eventSelectNum = 0;
+    unitEncode = UE_Unknown;
 
     m_eventMask = 0;
     event_id = 0;

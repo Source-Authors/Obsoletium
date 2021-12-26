@@ -30,9 +30,7 @@ class DummyInitL10N {
 } s_dummyInitL10N;
 #endif
 
-//-----------------------------------------------------------------------------
 // Purpose: Converts a UTF8 string into a unicode string
-//-----------------------------------------------------------------------------
 int V_UTF8ToUnicode(const char *pUTF8, wchar_t *pwchDest,
                     int cubDestSizeInBytes) {
   if (!pUTF8) return 0;
@@ -40,7 +38,8 @@ int V_UTF8ToUnicode(const char *pUTF8, wchar_t *pwchDest,
   AssertValidStringPtr(pUTF8);
   AssertValidWritePtr(pwchDest);
 
-  pwchDest[0] = 0;
+  pwchDest[0] = L'\0';
+
 #ifdef _WIN32
   int cchResult = MultiByteToWideChar(CP_UTF8, 0, pUTF8, -1, pwchDest,
                                       cubDestSizeInBytes / sizeof(wchar_t));
@@ -68,21 +67,18 @@ int V_UTF8ToUnicode(const char *pUTF8, wchar_t *pwchDest,
       cchResult = nMaxUTF8;
   }
 #endif
-  pwchDest[(cubDestSizeInBytes / sizeof(wchar_t)) - 1] = 0;
+
+  pwchDest[(cubDestSizeInBytes / sizeof(wchar_t)) - 1] = L'\0';
   return cchResult;
 }
 
-//-----------------------------------------------------------------------------
 // Purpose: Converts a unicode string into a UTF8 (standard) string
-//-----------------------------------------------------------------------------
 int V_UnicodeToUTF8(const wchar_t *pUnicode, char *pUTF8,
                     int cubDestSizeInBytes) {
   AssertValidStringPtr(pUTF8, cubDestSizeInBytes);
   AssertValidReadPtr(pUnicode);
 
-  if (cubDestSizeInBytes > 0) {
-    pUTF8[0] = 0;
-  }
+  if (cubDestSizeInBytes > 0) pUTF8[0] = '\0';
 
 #ifdef _WIN32
   int cchResult = WideCharToMultiByte(CP_UTF8, 0, pUnicode, -1, pUTF8,
@@ -115,9 +111,7 @@ int V_UnicodeToUTF8(const wchar_t *pUnicode, char *pUTF8,
   }
 #endif
 
-  if (cubDestSizeInBytes > 0) {
-    pUTF8[cubDestSizeInBytes - 1] = 0;
-  }
+  if (cubDestSizeInBytes > 0) pUTF8[cubDestSizeInBytes - 1] = '\0';
 
   return cchResult;
 }
@@ -130,7 +124,8 @@ int V_UCS2ToUnicode(const ucs2 *pUCS2, wchar_t *pUnicode,
   AssertValidWritePtr(pUnicode);
   AssertValidReadPtr(pUCS2);
 
-  pUnicode[0] = 0;
+  pUnicode[0] = L'\0';
+
 #if defined(_WIN32) || defined(_PS3)
   int lenUCS2 = V_wcslen(pUCS2);
   int cchResult = MIN((lenUCS2 + 1) * (int)sizeof(ucs2), cubDestSizeInBytes);
@@ -152,7 +147,8 @@ int V_UCS2ToUnicode(const ucs2 *pUCS2, wchar_t *pUnicode,
       cchResult = nMaxUTF8;
   }
 #endif
-  pUnicode[(cubDestSizeInBytes / sizeof(wchar_t)) - 1] = 0;
+
+  pUnicode[(cubDestSizeInBytes / sizeof(wchar_t)) - 1] = L'\0';
   return cchResult;
 }
 
@@ -183,13 +179,14 @@ int V_UnicodeToUCS2(const wchar_t *pUnicode, int cubSrcInBytes, char *pUCS2,
       cchResult = cubSrcInBytes / sizeof(wchar_t);
   }
 #endif
+
   return cchResult;
 }
 
 // UTF-8 encodes each character (code point) in 1 to 4 octets (8-bit bytes).
 // The first 128 characters of the Unicode character set (which correspond
 // directly to the ASCII) use a single octet with the same binary value as in
-// ASCII. url:http://en.wikipedia.org/wiki/UTF-8
+// ASCII. url: https://en.wikipedia.org/wiki/UTF-8
 #define MAX_UTF8_CHARACTER_BYTES 4
 
 //-----------------------------------------------------------------------------
@@ -284,7 +281,7 @@ VSTRTOOLS_INTERFACE void *V_UTF8_strncpy(char *pDest, const char *pSrc,
                                          size_t nMaxBytes) {
   strncpy(pDest, pSrc, nMaxBytes);
 
-  // http://en.wikipedia.org/wiki/UTF-8
+  // https://en.wikipedia.org/wiki/UTF-8
   ptrdiff_t end = nMaxBytes - 1;
   pDest[end] = 0;
 

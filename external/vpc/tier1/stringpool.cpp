@@ -59,7 +59,7 @@ const char *CStringPool::Allocate(const char *pszValue) {
 
   if (!bNew) return m_Strings[i];
 
-  pszNew = strdup(pszValue);
+  pszNew = _strdup(pszValue);
   m_Strings.Insert(pszNew);
 
   return pszNew;
@@ -317,10 +317,12 @@ bool CCountedStringPool::SaveToBuffer(CUtlBuffer &buffer) {
     buffer.PutUnsignedChar(m_Elements[i].nReferenceCount);
 
     const char *pString = m_Elements[i].pString;
+    Assert(pString);
+
     if (strlen(pString) >= MAX_STRING_SAVE) {
       return false;
     }
-    buffer.PutString(pString ? pString : "");
+    buffer.PutString(pString);
   }
 
   return buffer.IsValid();
@@ -354,7 +356,7 @@ bool CCountedStringPool::RestoreFromBuffer(CUtlBuffer &buffer) {
     m_Elements[i].nNextElement = buffer.GetUnsignedShort();
     m_Elements[i].nReferenceCount = buffer.GetUnsignedChar();
     buffer.GetString(tempString, sizeof(tempString));
-    m_Elements[i].pString = strdup(tempString);
+    m_Elements[i].pString = _strdup(tempString);
   }
 
   return buffer.IsValid();

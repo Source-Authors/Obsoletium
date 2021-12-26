@@ -490,7 +490,7 @@ class CFileSystemPassThru : public CInternalFileSystemPassThru<IFileSystem> {
   }
   virtual void *AllocOptimalReadBuffer(FileHandle_t hFile, unsigned nSize,
                                        unsigned nOffset) {
-    return m_pFileSystemPassThru->AllocOptimalReadBuffer(hFile, nOffset, nSize);
+    return m_pFileSystemPassThru->AllocOptimalReadBuffer(hFile, nSize, nOffset);
   }
   virtual void FreeOptimalReadBuffer(void *p) {
     m_pFileSystemPassThru->FreeOptimalReadBuffer(p);

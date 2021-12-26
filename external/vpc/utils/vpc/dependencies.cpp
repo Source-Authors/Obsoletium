@@ -83,6 +83,7 @@ CDependency::CDependency( CProjectDependencyGraph *pDependencyGraph ) :
 	m_iDependencyMark = m_pDependencyGraph->m_iDependencyMark - 1;
 	m_bCheckedIncludes = false;
 	m_nCacheModificationTime = m_nCacheFileSize = 0;
+	m_bCacheDirty = false;
 }
 
 CDependency::~CDependency()
@@ -112,7 +113,7 @@ bool CDependency::DependsOn( CDependency *pTest, int flags )
 			int i;
 			for( i = callTreeOutputStack.Count() - 1; i >= 0; i-- )
 			{
-				printf( ( const char * )callTreeOutputStack[i].Base() );
+          printf("%s", (const char *)callTreeOutputStack[i].Base());
 			}
 			printf( "-------------------------------------------------------------------------------\n" );
 		}
@@ -192,6 +193,7 @@ CDependency_Project::CDependency_Project( CProjectDependencyGraph *pDependencyGr
 {
 	m_iProjectIndex = -1;
 	m_szStoredScriptName[0] = '\0';
+	m_szStoredCurrentDirectory[0] = '\0';
 }
 
 
@@ -900,6 +902,7 @@ bool CProjectDependencyGraph::LoadCache( const char *pFilename )
 	fread( &version, sizeof( version ), 1, fp );
 	if ( version != VPC_CRC_CACHE_VERSION )
 	{
+		fclose( fp );
 		g_pVPC->VPCWarning( "Invalid dependency cache file version in %s.", pFilename );
 		return false;
 	}
@@ -1117,7 +1120,6 @@ public:
 		if ( !bAdded )
 		{
 			g_pVPC->VPCError( "CGameFilterProjectIterator::VisitProject( %s ) - no project found by that name.", szProjectName );
-			return false;
 		}
 
 		return true;

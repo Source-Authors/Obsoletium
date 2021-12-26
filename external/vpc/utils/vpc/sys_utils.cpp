@@ -64,7 +64,7 @@ void CXMLWriter::Close() {
 void CXMLWriter::PushNode(const char *pName) {
   Indent();
 
-  char *pNewName = strdup(pName);
+  char *pNewName = _strdup(pName);
   m_Nodes.Push(pNewName);
 
   fprintf(m_fp, "<%s%s\n", pName, m_Nodes.Count() == 2 ? ">" : "");
@@ -73,7 +73,7 @@ void CXMLWriter::PushNode(const char *pName) {
 void CXMLWriter::PushNode(const char *pName, const char *pString) {
   Indent();
 
-  char *pNewName = strdup(pName);
+  char *pNewName = _strdup(pName);
   m_Nodes.Push(pNewName);
 
   fprintf(m_fp, "<%s%s%s>\n", pName, pString ? " " : "",
@@ -108,13 +108,13 @@ void CXMLWriter::Write(const char *p) {
   }
 }
 
-CUtlString CXMLWriter::FixupXMLString(const char *pInput) {
-  struct XMLFixup_t {
-    const char *m_pFrom;
-    const char *m_pTo;
-    bool m_b2010Only;
-  };
+struct XMLFixup_t {
+  const char *m_pFrom;
+  const char *m_pTo;
+  bool m_b2010Only;
+};
 
+CUtlString CXMLWriter::FixupXMLString(const char *pInput) {
   // these tokens are not allowed in xml vcproj and be be escaped per msdev docs
   XMLFixup_t xmlFixups[] = {
       {"&", "&amp;", false},
@@ -177,34 +177,29 @@ void CXMLWriter::Indent() {
   }
 }
 
-//-----------------------------------------------------------------------------
 //	Sys_LoadFile
-//
-//-----------------------------------------------------------------------------
 int Sys_LoadFile(const char *filename, void **bufferptr, bool bText) {
-  int handle;
-  long length;
-  char *buffer;
+  *bufferptr = nullptr;
 
-  *bufferptr = NULL;
-
-  if (!Sys_Exists(filename)) return (-1);
+  if (!Sys_Exists(filename)) return -1;
 
   int flags = _O_RDONLY;
+
 #if !defined(POSIX)
   flags |= (bText ? _O_TEXT : _O_BINARY);
 #endif
-  handle = _open(filename, flags);
+
+  int handle{_open(filename, flags)};
   if (handle == -1)
     Sys_Error("Sys_LoadFile(): Error opening %s: %s", filename,
               strerror(errno));
 
-  length = _lseek(handle, 0, SEEK_END);
+  long length{_lseek(handle, 0, SEEK_END)};
   _lseek(handle, 0, SEEK_SET);
-  buffer = (char *)malloc(length + 1);
+  char *buffer = (char *)malloc(length + 1);
 
   int bytesRead = _read(handle, buffer, length);
-  if (!bText && (bytesRead != length))
+  if (!bText && bytesRead != length)
     Sys_Error("Sys_LoadFile(): read truncated failure");
 
   _close(handle);
@@ -214,68 +209,66 @@ int Sys_LoadFile(const char *filename, void **bufferptr, bool bText) {
 
   *bufferptr = (void *)buffer;
 
-  return (length);
+  return length;
 }
 
-//-----------------------------------------------------------------------------
 //	Sys_LoadFileIntoBuffer
-//
-//-----------------------------------------------------------------------------
 bool Sys_LoadFileIntoBuffer(const char *pchFileIn, CUtlBuffer &buf,
                             bool bText) {
   buf.SetBufferType(bText, bText);
+
   struct stat statBuf;
-  if (stat(pchFileIn, &statBuf) != 0) return false;
+  if (::stat(pchFileIn, &statBuf) != 0) return false;
+
   buf.EnsureCapacity((int)(statBuf.st_size + 1));
   if (!buf.IsValid()) return false;
 
-  FILE *fp = fopen(pchFileIn, "rb");
-  if (!fp) return false;
+  FILE *f{fopen(pchFileIn, "rb")};
+  if (!f) return false;
 
   char *pBuffer = (char *)buf.Base();
-  int nBytesRead = statBuf.st_size * fread(pBuffer, statBuf.st_size, 1, fp);
-  fclose(fp);
+  const decltype(statBuf.st_size) nBytesRead =
+      statBuf.st_size * fread(pBuffer, statBuf.st_size, 1, f);
+
+  fclose(f);
+
   buf.SeekPut(CUtlBuffer::SEEK_HEAD, nBytesRead);
-  pBuffer[statBuf.st_size] = 0;  // terminate buffer without changing put size
+  // terminate buffer without changing put size
+  pBuffer[statBuf.st_size] = '\0';
+
   return nBytesRead == statBuf.st_size;
 }
 
-//-----------------------------------------------------------------------------
 //	Sys_FileLength
-//-----------------------------------------------------------------------------
 long Sys_FileLength(const char *filename, bool bText) {
-  long length;
-
   if (filename) {
     int flags = _O_RDONLY;
+
 #if !defined(POSIX)
     flags |= (bText ? _O_TEXT : _O_BINARY);
 #endif
-    int handle = _open(filename, flags);
-    if (handle == -1) {
-      // file does not exist
-      return (-1);
-    }
 
-    length = _lseek(handle, 0, SEEK_END);
+    int handle{_open(filename, flags)};
+    // file does not exist
+    if (handle == -1) return -1;
+
+    long length{_lseek(handle, 0, SEEK_END)};
+
     _close(handle);
-  } else {
-    return (-1);
+
+    return length;
   }
 
-  return (length);
+  return -1;
 }
 
-//-----------------------------------------------------------------------------
 //	Sys_StripPath
 //
-//	Removes path portion from a fully qualified name, leaving filename and
+// Removes path portion from a fully qualified name, leaving filename and
 // extension.
-//-----------------------------------------------------------------------------
 void Sys_StripPath(const char *inpath, char *outpath) {
-  const char *src;
+  const char *src{inpath + strlen(inpath)};
 
-  src = inpath + strlen(inpath);
   while ((src != inpath) && (*(src - 1) != '\\') && (*(src - 1) != '/') &&
          (*(src - 1) != ':'))
     src--;
@@ -283,72 +276,61 @@ void Sys_StripPath(const char *inpath, char *outpath) {
   strcpy(outpath, src);
 }
 
-//-----------------------------------------------------------------------------
 //	Sys_Exists
 //
 //	Returns TRUE if file exists.
-//-----------------------------------------------------------------------------
 bool Sys_Exists(const char *filename) {
-  FILE *test;
+  if (FILE *test = fopen(filename, "rb")) {
+    fclose(test);
+    return true;
+  }
 
-  if ((test = fopen(filename, "rb")) == NULL) return (false);
-
-  fclose(test);
-
-  return (true);
+  return false;
 }
 
-//-----------------------------------------------------------------------------
 //	Sys_Touch
 //
 //	Returns TRUE if the file could be accessed for write
-//-----------------------------------------------------------------------------
 bool Sys_Touch(const char *filename) {
-  FILE *test;
+  if (FILE *test = fopen(filename, "wb")) {
+    fclose(test);
+    return true;
+  }
 
-  if ((test = fopen(filename, "wb")) == NULL) return (false);
-
-  fclose(test);
-
-  return (true);
+  return false;
 }
 
-//-----------------------------------------------------------------------------
 //	Sys_FileInfo
-//-----------------------------------------------------------------------------
 bool Sys_FileInfo(const char *pFilename, int64 &nFileSize, int64 &nModifyTime) {
   struct _stat statData;
   int rt = _stat(pFilename, &statData);
+
   if (rt != 0) return false;
 
   nFileSize = statData.st_size;
   nModifyTime = statData.st_mtime;
+
   return true;
 }
 
-//-----------------------------------------------------------------------------
-//	Ignores allowable trailing characters.
-//-----------------------------------------------------------------------------
+// Ignores allowable trailing characters.
 bool Sys_StringToBool(const char *pString) {
   if (!V_strnicmp(pString, "no", 2) || !V_strnicmp(pString, "off", 3) ||
       !V_strnicmp(pString, "false", 5) || !V_strnicmp(pString, "not set", 7) ||
       !V_strnicmp(pString, "disabled", 8) || !V_strnicmp(pString, "0", 1)) {
     // false
     return false;
-  } else if (!V_strnicmp(pString, "yes", 3) || !V_strnicmp(pString, "on", 2) ||
-             !V_strnicmp(pString, "true", 4) ||
-             !V_strnicmp(pString, "set", 3) ||
-             !V_strnicmp(pString, "enabled", 7) ||
-             !V_strnicmp(pString, "1", 1)) {
-    // true
-    return true;
-  } else {
-    // unknown boolean expression
-    g_pVPC->VPCSyntaxError("Unknown boolean expression '%s'", pString);
   }
 
-  // assume false
-  return false;
+  if (!V_strnicmp(pString, "yes", 3) || !V_strnicmp(pString, "on", 2) ||
+      !V_strnicmp(pString, "true", 4) || !V_strnicmp(pString, "set", 3) ||
+      !V_strnicmp(pString, "enabled", 7) || !V_strnicmp(pString, "1", 1)) {
+    // true
+    return true;
+  }
+
+  // unknown boolean expression
+  g_pVPC->VPCSyntaxError("Unknown boolean expression '%s'", pString);
 }
 
 bool Sys_ReplaceString(const char *pStream, const char *pSearch,
@@ -359,7 +341,7 @@ bool Sys_ReplaceString(const char *pStream, const char *pSearch,
   int len;
   bool bReplaced = false;
 
-  while (1) {
+  while (true) {
     // find sub string
     pFind = V_stristr(pStart, pSearch);
     if (!pFind) {
@@ -392,14 +374,12 @@ bool Sys_ReplaceString(const char *pStream, const char *pSearch,
   return bReplaced;
 }
 
-//--------------------------------------------------------------------------------
-// string match with wildcards.
-// '?' = match any char
-//--------------------------------------------------------------------------------
+// string match with wildcards.  '?' = match any char
 bool Sys_StringPatternMatch(char const *pSrcPattern, char const *pString) {
   for (;;) {
     char nPat = *(pSrcPattern++);
     char nString = *(pString++);
+
     if (!((nPat == nString) || ((nPat == '?') && nString))) return false;
     if (!nString) return true;  // end of string
   }
@@ -409,10 +389,8 @@ bool Sys_EvaluateEnvironmentExpression(const char *pExpression,
                                        const char *pDefault, char *pOutBuff,
                                        int nOutBuffSize) {
   char *pEnvVarName = (char *)StringAfterPrefix(pExpression, "$env(");
-  if (!pEnvVarName) {
-    // not an environment specification
-    return false;
-  }
+  // not an environment specification
+  if (!pEnvVarName) return false;
 
   char *pLastChar = &pEnvVarName[V_strlen(pEnvVarName) - 1];
   if (!*pEnvVarName || *pLastChar != ')') {
@@ -454,12 +432,14 @@ bool Sys_ExpandFilePattern(const char *pPattern,
     vecResults.AddToTail(
         CFmtStr("%s%s", rgchPathPart, findData.cFileName).Access());
     BOOL bMore = TRUE;
+
     while (bMore) {
       bMore = FindNextFile(hFind, &findData);
       if (bMore)
         vecResults.AddToTail(
             CFmtStr("%s%s", rgchPathPart, findData.cFileName).Access());
     }
+
     FindClose(hFind);
   }
 #elif defined(POSIX)
@@ -498,8 +478,6 @@ bool Sys_GetExecutablePath(char *pBuf, int cbBuf) {
 #endif
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 void Sys_CreatePath(const char *path) {
 #if defined(_WIN32)
   char pFullPath[MAX_PATH];
@@ -518,8 +496,10 @@ void Sys_CreatePath(const char *path) {
   } else {
     ptr = pFullPath;
   }
+
   while (ptr) {
     ptr = strchr(ptr + 1, '\\');
+
     if (ptr) {
       *ptr = '\0';
 
@@ -529,17 +509,16 @@ void Sys_CreatePath(const char *path) {
 #error Sys_CreatePath: this mkdir is probably correct but has not been tested
       mkdir(pFullPath, 0777);
 #endif
+
       *ptr = '\\';
     }
   }
 #endif
 }
 
-//-----------------------------------------------------------------------------
 // Given some arbitrary case filename, provides what the OS thinks it is.
-// Windows specific. Returns false if file cannot be resolved (i.e. does not
+// Windows specific.  Returns false if file cannot be resolved (i.e. does not
 // exist).
-//-----------------------------------------------------------------------------
 bool Sys_GetActualFilenameCase(const char *pFilename, char *pOutputBuffer,
                                int nOutputBufferSize) {
 #if defined(_WINDOWS)
@@ -582,13 +561,12 @@ bool Sys_GetActualFilenameCase(const char *pFilename, char *pOutputBuffer,
     filenameBuffer[i] = 0;
 
     SHFILEINFOA info = {0};
-    HRESULT hr = SHGetFileInfoA(filenameBuffer, 0, &info, sizeof(info),
-                                SHGFI_DISPLAYNAME);
-    if (SUCCEEDED(hr)) {
+    DWORD_PTR hr{SHGetFileInfoA(filenameBuffer, 0, &info, sizeof(info),
+                                SHGFI_DISPLAYNAME)};
+    if (hr != 0) {
       // reassemble based on actual component
-      if (bAddSeparator) {
-        actualFilename += CUtlString("\\");
-      }
+      if (bAddSeparator) actualFilename += CUtlString("\\");
+
       actualFilename += CUtlString(info.szDisplayName);
     } else {
       return false;
@@ -611,9 +589,7 @@ bool Sys_GetActualFilenameCase(const char *pFilename, char *pOutputBuffer,
 #endif
 }
 
-//-----------------------------------------------------------------------------
 // Given some arbitrary case filename, determine if OS version matches.
-//-----------------------------------------------------------------------------
 bool Sys_IsFilenameCaseConsistent(const char *pFilename, char *pOutputBuffer,
                                   int nOutputBufferSize) {
   V_strncpy(pOutputBuffer, pFilename, nOutputBufferSize);
@@ -632,8 +608,6 @@ bool Sys_IsFilenameCaseConsistent(const char *pFilename, char *pOutputBuffer,
   return false;
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 bool Sys_CopyToMirror(const char *pFilename) {
   if (!pFilename || !pFilename[0]) return false;
 
@@ -669,9 +643,8 @@ bool Sys_CopyToMirror(const char *pFilename) {
 
   // supply the mirror path head
   char absolutePathToMirror[MAX_PATH];
-  if (pTargetPath[0] == '\\') {
-    pTargetPath++;
-  }
+  if (pTargetPath[0] == '\\') pTargetPath++;
+
   V_ComposeFileName(pMirrorPath, pTargetPath, absolutePathToMirror,
                     sizeof(absolutePathToMirror));
 

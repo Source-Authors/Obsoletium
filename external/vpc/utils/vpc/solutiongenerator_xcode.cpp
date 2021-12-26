@@ -24,8 +24,36 @@ typedef signed __int16 int16_t;
 static const int k_nShellScriptPhasesPerAggregateTarget = 8;
 
 #ifndef STEAM
-bool V_StrSubstInPlace(char *pchInOut, int cchInOut, const char *pMatch,
-                       const char *pReplaceWith, bool bCaseSensitive);
+template <size_t in_out_size>
+bool V_StrSubstInPlace(char (&in_out)[in_out_size], const char *match,
+                       const char *replace_with, bool case_sensitive) {
+  bool bRet = false;
+  char *pchT = new char[in_out_size];
+
+  if (V_StrSubst(in_out, match, replace_with, pchT, in_out_size,
+                 case_sensitive)) {
+    V_strncpy(in_out, pchT, in_out_size);
+    bRet = true;
+  }
+
+  delete[] pchT;
+  return bRet;
+}
+
+bool V_StrSubstInPlace(char *in_out, int in_out_size, const char *pMatch,
+                       const char *pReplaceWith, bool bCaseSensitive) {
+  bool bRet = false;
+  char *pchT = new char[in_out_size];
+
+  if (V_StrSubst(in_out, pMatch, pReplaceWith, pchT, in_out_size,
+                 bCaseSensitive)) {
+    V_strncpy(in_out, pchT, in_out_size);
+    bRet = true;
+  }
+
+  delete[] pchT;
+  return bRet;
+}
 #endif
 
 static const char *k_pchProjects = "Projects";
@@ -175,7 +203,7 @@ class CSolutionGenerator_Xcode : public IBaseSolutionGenerator {
                         const char *pExtensions,
                         CBaseProjectDataCollector *pProject);
 
-  void Write(const char *pMsg, ...);
+  void Write(PRINTF_FORMAT_STRING const char *pMsg, ...);
   FILE *m_fp;
   int m_nIndent;
 };
@@ -227,7 +255,7 @@ uint64_t makeoid_raw(const char *pData, int nDataLen, EOIDType type,
     // that is the case.
     float flAppTime = Plat_FloatTime();
     ThreadId_t threadId = ThreadGetCurrentId();
-    COMPILE_TIME_ASSERT(sizeof(flAppTime) <= sizeof(unOIDSalt));
+    static_assert(sizeof(flAppTime) <= sizeof(unOIDSalt));
     memcpy(&unOIDSalt, &flAppTime, sizeof(float));
     unOIDSalt ^= threadId;
 #endif  // defined( VPC_DETERMINISTIC_XCODE_OIDS )
@@ -253,7 +281,7 @@ uint64_t makeoid_raw(const char *pData, int nDataLen, EOIDType type,
   memcpy(&lowerHash, hash, sizeof(lowerHash));
 
   uint64_t oid = (uint64_t)lowerHash + ((uint64_t)type << 32) +
-                 ((uint64_t)(ordinal + 1) << 52);
+                 (((uint64_t)ordinal + 1) << 52);
 #ifdef VPC_DEBUG_XCODE_OIDS
   Msg("XCode Solution: Produced OID 0x%llx for \"%s\" with salt %u\n", oid,
       pszIdentifier, unOIDSalt);
@@ -262,26 +290,24 @@ uint64_t makeoid_raw(const char *pData, int nDataLen, EOIDType type,
 }
 
 // Make an oid for a unique string identifier, per type, per ordinal
-uint64_t makeoid(const char *pszIdentifier, EOIDType type,
-                 int16_t ordinal = 0) {
+uint64_t makeoid(const char *pszIdentifier, EOIDType type, int ordinal = 0) {
   CFmtStr oidStr("oid1.%s", pszIdentifier);
-  return makeoid_raw(oidStr.Access(), oidStr.Length(), type, ordinal);
+  return makeoid_raw(oidStr.Access(), oidStr.Length(), type, (int16_t)ordinal);
 }
 
 // Make an oid for a unique string tuple, per type, per ordinal
 uint64_t makeoid2(const char *pszIdentifierA, const char *pszIdentifierB,
-                  EOIDType type, int16_t ordinal = 0) {
+                  EOIDType type, int ordinal = 0) {
   CFmtStr oidStr("oid2.%s.%s", pszIdentifierA, pszIdentifierB);
-  return makeoid_raw(oidStr.Access(), oidStr.Length(), type, ordinal);
+  return makeoid_raw(oidStr.Access(), oidStr.Length(), type, (int16_t)ordinal);
 }
 
 // Make an oid for a unique string tuple, per type, per ordinal
 uint64_t makeoid3(const char *pszIdentifierA, const char *pszIdentifierB,
-                  const char *pszIdentifierC, EOIDType type,
-                  int16_t ordinal = 0) {
+                  const char *pszIdentifierC, EOIDType type, int ordinal = 0) {
   CFmtStr oidStr("oid3.%s.%s.%s", pszIdentifierA, pszIdentifierB,
                  pszIdentifierC);
-  return makeoid_raw(oidStr.Access(), oidStr.Length(), type, ordinal);
+  return makeoid_raw(oidStr.Access(), oidStr.Length(), type, (int16_t)ordinal);
 }
 
 static bool IsStaticLibrary(const char *pszFileName) {
@@ -360,8 +386,8 @@ static CUtlString OutputFileWithDirectoryFromConfig(KeyValues *pConfigKV) {
   // workaround for VPC files expecting Makefile semantics -- you shouldn't be
   // using $() in VPC strings.
   const char szObjDir[] = "$(OBJ_DIR)";
-  V_StrSubstInPlace(szOutputDir, sizeof(szOutputDir), szObjDir, ".", true);
-  V_StrSubstInPlace(szOutputFile, sizeof(szOutputFile), szObjDir, ".", true);
+  V_StrSubstInPlace(szOutputDir, szObjDir, ".", true);
+  V_StrSubstInPlace(szOutputFile, szObjDir, ".", true);
 
   // VPC files have snuck in hard-coding of random variables expecting the
   // Makefile backend to expand them.
@@ -447,10 +473,9 @@ static bool IsSourceFile(const char *pszFileName) {
       V_GetFileExtension(V_UnqualifiedFileName(pszFileName));
   if (!pchExtension)
     return false;
-  else if (!V_stricmp(pchExtension, "cpp") || !V_stricmp(pchExtension, "cc") ||
-           !V_stricmp(pchExtension, "cxx") || !V_stricmp(pchExtension, "c") ||
-           !V_stricmp(pchExtension, "m") || !V_stricmp(pchExtension, "mm") ||
-           !V_stricmp(pchExtension, "cc"))
+  else if (!V_stricmp(pchExtension, "cpp") || !V_stricmp(pchExtension, "cxx") ||
+           !V_stricmp(pchExtension, "c") || !V_stricmp(pchExtension, "m") ||
+           !V_stricmp(pchExtension, "mm") || !V_stricmp(pchExtension, "cc"))
     return true;
   return false;
 }
@@ -612,7 +637,7 @@ void CSolutionGenerator_Xcode::XcodeFileTypeFromFileName(
     snprintf(pchOutBuf, cchOutBuf, "compiled.mach-o.executable");
   else if (!V_stricmp(pchExtension, "cpp") || !V_stricmp(pchExtension, "cxx") ||
            !V_stricmp(pchExtension, "cc") || !V_stricmp(pchExtension, "h") ||
-           !V_stricmp(pchExtension, "hxx") || !V_stricmp(pchExtension, "cc"))
+           !V_stricmp(pchExtension, "hxx"))
     snprintf(pchOutBuf, cchOutBuf, "sourcecode.cpp.%s", pchExtension);
   else if (!V_stricmp(pchExtension, "c"))
     snprintf(pchOutBuf, cchOutBuf, "sourcecode.cpp.cpp");
@@ -711,7 +736,7 @@ void CSolutionGenerator_Xcode::EmitBuildSettings(
           "  XCode does not support having differing product names per "
           "config,\n"
           "  the first configuration's names will be used for all configs.",
-          k_rgchConfigNames[iConfig], pszProjectName,
+          k_rgchXCConfigFiles[iConfig], pszProjectName,
           sConfigOutputFile.String(), sConfigGameOutputFile.String(),
           sBuildOutputFile.String(), sGameOutputFile.String());
     }
@@ -832,10 +857,9 @@ void CSolutionGenerator_Xcode::EmitBuildSettings(
       CBaseProjectDataCollector::DoStandardVisualStudioReplacements(
           outStrings[i], CFmtStr("%s/dummy.txt", pszProjectDir).Access(),
           sExpandedOutString, sizeof(sExpandedOutString));
-      V_StrSubstInPlace(sExpandedOutString, sizeof(sExpandedOutString),
-                        "$(OBJ_DIR)", "\"${OBJECT_FILE_DIR_normal}\"", false);
-      V_StrSubstInPlace(sExpandedOutString, sizeof(sExpandedOutString), "\"",
-                        "\\\"", false);
+      V_StrSubstInPlace(sExpandedOutString, "$(OBJ_DIR)",
+                        "\"${OBJECT_FILE_DIR_normal}\"", false);
+      V_StrSubstInPlace(sExpandedOutString, "\"", "\\\"", false);
 
       if (V_IsAbsolutePath(sExpandedOutString) ||
           V_strncmp(sExpandedOutString, "$", 1) == 0)
@@ -955,8 +979,7 @@ void CSolutionGenerator_Xcode::EmitBuildSettings(
         char sExpandedOutString[MAX_PATH];
         V_strncpy(sExpandedOutString, librarySearchPaths.Key(i),
                   sizeof(sExpandedOutString));
-        V_StrSubstInPlace(sExpandedOutString, sizeof(sExpandedOutString), "\"",
-                          "\\\"", false);
+        V_StrSubstInPlace(sExpandedOutString, "\"", "\\\"", false);
 
         if (V_IsAbsolutePath(sExpandedOutString) ||
             V_strncmp(sExpandedOutString, "$", 1) == 0)
@@ -1014,11 +1037,11 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
                           g_vecPGenerators[iProject]->GetProjectName()));
     // the solution is up-to-date only if all the projects in it were up to date
     // and the solution was built after the mod time on all the project outputs
-    CProjectGenerator_Xcode *pProjGen =
-        dynamic_cast<CProjectGenerator_Xcode *>(g_vecPGenerators[iProject]);
-    bUpToDate &= pProjGen->m_bIsCurrent;
+    CProjectGenerator_Xcode &pProjGen =
+        dynamic_cast<CProjectGenerator_Xcode &>(*g_vecPGenerators[iProject]);
+    bUpToDate &= pProjGen.m_bIsCurrent;
     if (bUpToDate &&
-        Sys_FileInfo(pProjGen->m_OutputFilename, llSize, llModTime) &&
+        Sys_FileInfo(pProjGen.m_OutputFilename, llSize, llModTime) &&
         llModTime > llLastModTime) {
       llLastModTime = llModTime;
     }
@@ -1080,7 +1103,7 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
       // regenerating...\n",  cProjectsPreviously, g_vecPGenerators.Count() );
       bUpToDate = false;
     }
-    fclose(fp);
+    if (fp) fclose(fp);
   }
 
   if (bUpToDate) {
@@ -1808,14 +1831,14 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
                   FOR_EACH_VEC(g_vecPGenerators, iGenerator2) {
                     // don't include static libs generated by other projects -
                     // we'll pull them out of the built products tree
-                    KeyValues *pKV = g_vecPGenerators[iGenerator2]
-                                         ->m_BaseConfigData.m_Configurations[0]
-                                         ->m_pKV;
+                    KeyValues *kv = g_vecPGenerators[iGenerator2]
+                                        ->m_BaseConfigData.m_Configurations[0]
+                                        ->m_pKV;
                     char szAbsoluteGameOutputFile[MAX_PATH] = {0};
                     V_MakeAbsolutePath(
                         szAbsoluteGameOutputFile,
                         sizeof(szAbsoluteGameOutputFile),
-                        GameOutputFileFromConfig(pKV).String(),
+                        GameOutputFileFromConfig(kv).String(),
                         projects[iGenerator2]->m_szStoredCurrentDirectory);
                     if (!V_stricmp(szAbsoluteFileName,
                                    szAbsoluteGameOutputFile)) {
@@ -2465,15 +2488,12 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
               Write("outputPaths = (\n");
               ++m_nIndent;
               {
-                V_StrSubstInPlace(rgchDebugFilePath, sizeof(rgchDebugFilePath),
-                                  "/lib/osx32/debug/",
+                V_StrSubstInPlace(rgchDebugFilePath, "/lib/osx32/debug/",
                                   "/lib/osx32/${CONFIGURATION}/", false);
                 CBaseProjectDataCollector::DoStandardVisualStudioReplacements(
                     rgchDebugFilePath, rgchDebugFilePath, rgchDebugFilePath,
                     sizeof(rgchDebugFilePath));
-                V_StrSubstInPlace(rgchReleaseFilePath,
-                                  sizeof(rgchReleaseFilePath),
-                                  "/lib/osx32/release/",
+                V_StrSubstInPlace(rgchReleaseFilePath, "/lib/osx32/release/",
                                   "/lib/osx32/${CONFIGURATION}/", false);
                 CBaseProjectDataCollector::DoStandardVisualStudioReplacements(
                     rgchReleaseFilePath, rgchReleaseFilePath,
@@ -3389,7 +3409,8 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
   fclose(fp);
 }
 
-void CSolutionGenerator_Xcode::Write(const char *pMsg, ...) {
+void CSolutionGenerator_Xcode::Write(PRINTF_FORMAT_STRING const char *pMsg,
+                                     ...) {
   for (int i = 0; i < m_nIndent; i++) fprintf(m_fp, "\t");
 
   va_list marker;

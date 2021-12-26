@@ -302,8 +302,10 @@ PLATFORM_INTERFACE float CrackSmokingCompiler(float a) {
 
 void *Plat_SimpleLog(const tchar *file, int line) {
   FILE *f = _tfopen(_T("simple.log"), _T("at+"));
-  _ftprintf(f, _T("%s:%i\n"), file, line);
-  fclose(f);
+  if (f) {
+    _ftprintf(f, _T("%s:%i\n"), file, line);
+    fclose(f);  
+  }
 
   return NULL;
 }
@@ -364,9 +366,11 @@ void COM_TimestampedLog(char const *fmt, ...) {
       }
 
       FILE *fp = fopen("timestamped.log", "at+");
-      fprintf(fp, "%8.4f / %8.4f:  %s\n", curStamp, curStamp - s_LastStamp,
-              string);
-      fclose(fp);
+      if (fp) {
+        fprintf(fp, "%8.4f / %8.4f:  %s\n", curStamp, curStamp - s_LastStamp,
+                string);
+        fclose(fp);
+      }
     }
 
     if (s_bShouldLogToConsole) {
@@ -418,7 +422,7 @@ void CHardwareBreakPoint::SetBits(DWORD_PTR &dw, int lowBit, int bits,
 
 DWORD WINAPI CHardwareBreakPoint::ThreadProc(LPVOID lpParameter) {
   CHardwareBreakPoint *h = reinterpret_cast<CHardwareBreakPoint *>(lpParameter);
-  SuspendThread(h->m_hThread);
+  SuspendThread(h->m_hThread); //-V720
 
   // Get current context
   CONTEXT ct = {0};

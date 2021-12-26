@@ -733,8 +733,8 @@ class CProjectGenerator_Makefile : public CBaseProjectDataCollector {
 
       const char *pCustomBuildCommandLine =
           pFileSpecificData->GetOption(g_pOption_CustomBuildStepCommandLine);
-      const char *pOutputFile = pFileSpecificData->GetOption(g_pOption_Outputs);
-      if (pOutputFile && pCustomBuildCommandLine &&
+      const char *of = pFileSpecificData->GetOption(g_pOption_Outputs);
+      if (of && pCustomBuildCommandLine &&
           V_strlen(pCustomBuildCommandLine) > 0) {
         char szTempFilename[MAX_PATH];
         V_strncpy(szTempFilename,
@@ -743,19 +743,17 @@ class CProjectGenerator_Makefile : public CBaseProjectDataCollector {
         const char *pFilename = szTempFilename;
 
         // This file uses a custom build step.
-        char sFormattedOutputFile[8192];
-        char szAbsPath[MAX_PATH];
-        V_MakeAbsolutePath(szAbsPath, sizeof(szAbsPath), pFilename);
-        DoStandardVisualStudioReplacements(pOutputFile, szAbsPath,
-                                           sFormattedOutputFile,
-                                           sizeof(sFormattedOutputFile));
+        char fof[8192];
+        char absPath[MAX_PATH];
+        V_MakeAbsolutePath(absPath, sizeof(absPath), pFilename);
+        DoStandardVisualStudioReplacements(of, absPath, fof, sizeof(fof));
 
-        CSplitString outFiles(sFormattedOutputFile, sDependenciesSeparators,
+        CSplitString outFiles(fof, sDependenciesSeparators,
                               sizeof(sDependenciesSeparators) /
                                   sizeof(sDependenciesSeparators[0]));
 
-        for (int i = 0; i < outFiles.Count(); i++) {
-          const char *pchOneFile = outFiles[i];
+        for (int j = 0; j < outFiles.Count(); j++) {
+          const char *pchOneFile = outFiles[j];
           if (*pchOneFile == '\0') {
             continue;
           }
@@ -803,8 +801,8 @@ class CProjectGenerator_Makefile : public CBaseProjectDataCollector {
       // Custom build steps??
       const char *pCustomBuildCommandLine =
           pFileSpecificData->GetOption(g_pOption_CustomBuildStepCommandLine);
-      const char *pOutputFile = pFileSpecificData->GetOption(g_pOption_Outputs);
-      if (pOutputFile && pCustomBuildCommandLine &&
+      const char *of = pFileSpecificData->GetOption(g_pOption_Outputs);
+      if (of && pCustomBuildCommandLine &&
           V_strlen(pCustomBuildCommandLine) > 0) {
         // This file uses a custom build step.
         char sFormattedOutputFile[8192];
@@ -813,9 +811,9 @@ class CProjectGenerator_Makefile : public CBaseProjectDataCollector {
         DoStandardVisualStudioReplacements(
             pCustomBuildCommandLine, UsePOSIXSlashes(pFilename),
             sFormattedCommandLine, sizeof(sFormattedCommandLine));
-        DoStandardVisualStudioReplacements(
-            pOutputFile, UsePOSIXSlashes(pFilename), sFormattedOutputFile,
-            sizeof(sFormattedOutputFile));
+        DoStandardVisualStudioReplacements(of, UsePOSIXSlashes(pFilename),
+                                           sFormattedOutputFile,
+                                           sizeof(sFormattedOutputFile));
 
         // AdditionalDependencies only applies to custom build steps, not normal
         // compilation steps

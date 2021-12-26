@@ -161,7 +161,7 @@ int64 ETWMark(const char *pMessage) {
   return nTime;
 }
 
-int64 ETWMarkPrintf(const char *pMessage, ...) {
+int64 ETWMarkPrintf(PRINTF_FORMAT_STRING const char *pMessage, ...) {
   // If we are running on Windows XP or if our providers have not been enabled
   // (by xperf or other) then this will be false and we can early out.
   // Be sure to check the appropriate context for the event. This is only

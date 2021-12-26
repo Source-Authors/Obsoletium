@@ -105,7 +105,7 @@ class CConCommandHash {
     HashEntry_t(unsigned int _hash, ConCommandBase *_cmd)
         : m_uiKey(_hash), m_Data(_cmd){};
 
-    HashEntry_t() : m_uiKey(0){};
+    HashEntry_t() : m_uiKey(0), m_Data(nullptr) {};
   };
 
   typedef CUtlFixedLinkedList<HashEntry_t> datapool_t;

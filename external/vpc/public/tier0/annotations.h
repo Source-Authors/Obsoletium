@@ -10,7 +10,6 @@
 #pragma warning(error : 4789)
 
 // Suppress some code analysis warnings
-#ifdef _PREFAST_
 // Include the annotation header file.
 #include <sal.h>
 
@@ -59,7 +58,6 @@
 // *pDest, int maxLenInCharacters, PRINTF_FORMAT_STRING const wchar_t *pFormat,
 // ... );
 
-#endif  // _PREFAST_
 #endif  // _MSC_VER >= 1600 // VS 2010 and above.
 
 #ifndef ANALYZE_SUPPRESS

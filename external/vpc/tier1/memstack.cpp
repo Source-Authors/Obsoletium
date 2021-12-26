@@ -50,7 +50,7 @@ CMemoryStack::CMemoryStack()
       m_maxSize(0),
       m_bRegisteredAllocation(false),
       m_bPhysical(false) {
-  m_pszAllocOwner = strdup("CMemoryStack unattributed");
+  m_pszAllocOwner = _strdup("CMemoryStack unattributed");
 }
 
 //-------------------------------------
@@ -318,7 +318,7 @@ bool CMemoryStack::CommitTo(byte *pNextAlloc) RESTRICT {
 void CMemoryStack::SetAllocOwner(const char *pszAllocOwner) {
   if (!pszAllocOwner || !V_strcmp(m_pszAllocOwner, pszAllocOwner)) return;
   free(m_pszAllocOwner);
-  m_pszAllocOwner = strdup(pszAllocOwner);
+  m_pszAllocOwner = _strdup(pszAllocOwner);
 }
 
 void CMemoryStack::RegisterAllocation() {

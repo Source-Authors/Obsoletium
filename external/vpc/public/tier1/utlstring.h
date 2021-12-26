@@ -159,7 +159,7 @@ class CUtlString {
   bool MatchesPattern(const CUtlString &Pattern, int nFlags = 0)
       const;  // case SENSITIVE, use * for wildcard in pattern string
 
-  int Format(const char *pFormat, ...);
+  int Format(PRINTF_FORMAT_STRING const char *pFormat, ...);
   void SetDirect(const char *pValue, int nChars);
 
   // Defining AltArgumentType_t hints that associative container classes should
@@ -236,7 +236,7 @@ class StringFuncs {
 template <>
 class StringFuncs<char> {
  public:
-  static char *Duplicate(const char *pValue) { return strdup(pValue); }
+  static char *Duplicate(const char *pValue) { return _strdup(pValue); }
   static void Copy(char *out_pOut, const char *pIn, int iLength) {
     strncpy(out_pOut, pIn, iLength);
   }
@@ -253,7 +253,7 @@ class StringFuncs<char> {
 template <>
 class StringFuncs<wchar_t> {
  public:
-  static wchar_t *Duplicate(const wchar_t *pValue) { return wcsdup(pValue); }
+  static wchar_t *Duplicate(const wchar_t *pValue) { return _wcsdup(pValue); }
   static void Copy(wchar_t *out_pOut, const wchar_t *pIn, int iLength) {
     wcsncpy(out_pOut, pIn, iLength);
   }

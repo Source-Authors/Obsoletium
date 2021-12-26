@@ -10,16 +10,19 @@
 #include "tier0/memdbgon.h"
 
 #ifndef STEAM
-bool V_StrSubstInPlace(char *pchInOut, int cchInOut, const char *pMatch,
+template <size_t in_out_size>
+bool V_StrSubstInPlace(char (&in_out)[in_out_size], const char *pMatch,
                        const char *pReplaceWith, bool bCaseSensitive) {
   bool bRet = false;
-  char *pchT = (char *)malloc(cchInOut);
-  if (V_StrSubst(pchInOut, pMatch, pReplaceWith, pchT, cchInOut,
+  char *pchT = new char[in_out_size];
+
+  if (V_StrSubst(in_out, pMatch, pReplaceWith, pchT, in_out_size,
                  bCaseSensitive)) {
-    V_strncpy(pchInOut, pchT, cchInOut);
+    V_strncpy(in_out, pchT, in_out_size);
     bRet = true;
   }
-  free(pchT);
+
+  delete[] pchT;
   return bRet;
 }
 #endif
@@ -380,15 +383,15 @@ void VPC_Keyword_AddFile(const char *pFileFlag = NULL,
     return;
   }
 
-  for (int i = 0; i < unbuiltFiles.Count(); i++) {
-    const char *pExcludedFilename = unbuiltFiles[i].String();
+  for (int k = 0; k < unbuiltFiles.Count(); k++) {
+    const char *pExcludedFilename = unbuiltFiles[k].String();
 
     g_pVPC->GetProjectGenerator()->StartFile(pExcludedFilename, true);
     CUtlVector<CUtlString> configurationNames;
     g_pVPC->GetProjectGenerator()->GetAllConfigurationNames(configurationNames);
-    for (int i = 0; i < configurationNames.Count(); i++) {
+    for (int j = 0; j < configurationNames.Count(); j++) {
       g_pVPC->GetProjectGenerator()->StartConfigurationBlock(
-          configurationNames[i].String(), true);
+          configurationNames[j].String(), true);
       g_pVPC->GetProjectGenerator()->FileExcludedFromBuild(true);
       g_pVPC->GetProjectGenerator()->EndConfigurationBlock();
     }
@@ -406,22 +409,25 @@ void VPC_Keyword_AddFile(const char *pFileFlag = NULL,
   // save parser state
   CScriptSource startingScriptSource = g_pVPC->GetScript().GetCurrentScript();
 
-  for (int i = 0; i < files.Count(); i++) {
-    const char *pFilename = files[i].String();
+  for (int k = 0; k < files.Count(); k++) {
+    const char *pFilename = files[k].String();
 
     CUtlString filename;
     if (!g_pVPC->m_bInMkSlnPass && V_stristr(pFilename, "$os")) {
       CUtlVector<CUtlString> vecExcludedFiles;
       filename = ResolveFilename(pFilename, vecExcludedFiles);
+
       char rgchRejectList[4096];
       rgchRejectList[0] = '\0';
+
       if (vecExcludedFiles.Count()) {
-        for (int i = 0; i < files.Count(); i++) {
-          V_strncat(rgchRejectList, files[i].String(),
+        for (int j = 0; j < files.Count(); j++) {
+          V_strncat(rgchRejectList, files[j].String(),
                     V_ARRAYSIZE(rgchRejectList));
           V_strncat(rgchRejectList, ",", V_ARRAYSIZE(rgchRejectList));
         }
       }
+
       g_pVPC->VPCStatus(false, "$OS: Resolved %s -> %s, rejected %s", pFilename,
                         filename.String(), rgchRejectList);
 
@@ -432,25 +438,28 @@ void VPC_Keyword_AddFile(const char *pFileFlag = NULL,
         continue;
       }
 
-      for (i = 0; i < vecExcludedFiles.Count(); i++) {
-        const char *pExcludedFilename = vecExcludedFiles[i].String();
+      for (k = 0; k < vecExcludedFiles.Count(); k++) {
+        const char *pExcludedFilename = vecExcludedFiles[k].String();
         const char *pExcludedExtension = V_GetFileExtension(pExcludedFilename);
-        if (!pExcludedExtension) {
-          pExcludedExtension = "";
-        }
-        if (pExcludedExtension && !V_stricmp(pExcludedExtension, "cpp")) {
+
+        if (!pExcludedExtension) pExcludedExtension = "";
+
+        if (!V_stricmp(pExcludedExtension, "cpp")) {
           g_pVPC->VPCStatus(false, "excluding '%s' from build",
                             pExcludedFilename);
           g_pVPC->GetProjectGenerator()->StartFile(pExcludedFilename, true);
+
           CUtlVector<CUtlString> configurationNames;
           g_pVPC->GetProjectGenerator()->GetAllConfigurationNames(
               configurationNames);
-          for (int i = 0; i < configurationNames.Count(); i++) {
+
+          for (int j = 0; j < configurationNames.Count(); j++) {
             g_pVPC->GetProjectGenerator()->StartConfigurationBlock(
-                configurationNames[i].String(), true);
+                configurationNames[j].String(), true);
             g_pVPC->GetProjectGenerator()->FileExcludedFromBuild(true);
             g_pVPC->GetProjectGenerator()->EndConfigurationBlock();
           }
+
           g_pVPC->GetProjectGenerator()->EndFile();
         }
       }
@@ -464,9 +473,10 @@ void VPC_Keyword_AddFile(const char *pFileFlag = NULL,
       CUtlVector<CUtlString> configurationNames;
       g_pVPC->GetProjectGenerator()->GetAllConfigurationNames(
           configurationNames);
-      for (int i = 0; i < configurationNames.Count(); i++) {
+
+      for (int j = 0; j < configurationNames.Count(); j++) {
         g_pVPC->GetProjectGenerator()->StartConfigurationBlock(
-            configurationNames[i].String(), true);
+            configurationNames[j].String(), true);
         g_pVPC->GetProjectGenerator()->FileIsDynamic(true);
         g_pVPC->GetProjectGenerator()->EndConfigurationBlock();
       }
@@ -474,9 +484,7 @@ void VPC_Keyword_AddFile(const char *pFileFlag = NULL,
 
     // Lookup extension for a custom build script
     const char *pExtension = V_GetFileExtension(pFilename);
-    if (!pExtension) {
-      pExtension = "";
-    }
+    if (!pExtension) pExtension = "";
 
     if (!g_pVPC->m_sUnityCurrent.IsEmpty() && !V_stricmp(pExtension, "cpp") &&
         !bHasSection && !bHasConditional) {
@@ -484,11 +492,13 @@ void VPC_Keyword_AddFile(const char *pFileFlag = NULL,
           (!g_pVPC->m_bInMkSlnPass &&
            (g_pVPC->IsForceGenerate() ||
             !g_pVPC->IsProjectCurrent(g_pVPC->GetOutputFilename(), false)));
+
       if (bEmitUnityFiles) {
         // append to the unity file
         g_pVPC->VPCStatus(false, "Unity: adding '%s' to unity file '%s'",
                           pFilename, g_pVPC->m_sUnityCurrent.String());
         FILE *fp = fopen(g_pVPC->m_sUnityCurrent.String(), "at");
+
         if (!fp) {
           g_pVPC->VPCError("Cannot open %s for appending",
                            g_pVPC->m_sUnityCurrent.String());
@@ -505,9 +515,9 @@ void VPC_Keyword_AddFile(const char *pFileFlag = NULL,
       CUtlVector<CUtlString> configurationNames;
       g_pVPC->GetProjectGenerator()->GetAllConfigurationNames(
           configurationNames);
-      for (int i = 0; i < configurationNames.Count(); i++) {
+      for (int j = 0; j < configurationNames.Count(); j++) {
         g_pVPC->GetProjectGenerator()->StartConfigurationBlock(
-            configurationNames[i].String(), true);
+            configurationNames[j].String(), true);
         g_pVPC->GetProjectGenerator()->FileExcludedFromBuild(true);
         g_pVPC->GetProjectGenerator()->EndConfigurationBlock();
       }
@@ -568,7 +578,7 @@ static void VPC_ParseFileList(CUtlStringList &files) {
       // current token is last token
       // last token can be optional conditional, need to identify
       // backup and reparse up to last token
-      if (pToken && pToken[0] == '[') {
+      if (pToken[0] == '[') {
         if (files.Count() == 0) {
           g_pVPC->VPCSyntaxError(
               "Conditional specified on a file list without any file preceding "
@@ -618,7 +628,7 @@ static void VPC_HandleLibraryExpansion(char const *pDefaultPath,
   CUtlStringList impFiles;
   VPC_ParseFileList(impFiles);
   for (int i = 0; i < impFiles.Count(); i++) {
-    char szFilename[MAX_PATH];
+    char szFilename[MAX_PATH * 2];
     char const *pPathPrefixToUse = pDefaultPath;
 
     // do not add the path prefix if the filename contains path information
@@ -754,7 +764,7 @@ void VPC_Keyword_Folder(
     char unityName[MAX_PATH];
     V_snprintf(unityName, sizeof(unityName), "%s_%s_unity.cpp", folderName,
                g_pVPC->GetProjectName());
-    V_StrSubstInPlace(unityName, sizeof(unityName), " ", "_", false);
+    V_StrSubstInPlace(unityName, " ", "_", false);
 
     // make sure we have a unique file name, we don't want to tread on another
     // projects unity
@@ -764,7 +774,7 @@ void VPC_Keyword_Folder(
            g_pVPC->m_UnityFilesSeen.InvalidIndex()) {
       V_snprintf(unityName, sizeof(unityName), "%s_%s_unity_%d.cpp", folderName,
                  g_pVPC->GetProjectName(), ++cAttempt);
-      V_StrSubstInPlace(unityName, sizeof(unityName), " ", "_", false);
+      V_StrSubstInPlace(unityName, " ", "_", false);
       g_pVPC->m_sUnityCurrent = unityName;
     }
 
@@ -1296,13 +1306,13 @@ void Internal_LoadAddressMacroAuto(bool bPad) {
                                                   sizeof(szLength))) {
         continue;
       }
-      if (strstr(szLength, ".")) {
+      if (strchr(szLength, '.')) {
         // assume float format
         float fLength = 0;
         sscanf(szLength, "%f", &fLength);
         dllLength = fLength * 1024.0f * 1024.0f;
       } else {
-        sscanf(szLength, "%d", &dllLength);
+        sscanf(szLength, "%u", &dllLength);
       }
 
       if (!bPad) {

@@ -103,7 +103,7 @@ void GenerateOrthoFrustum(const Vector &origin, const Vector &forward,
 class matrix3x4a_t;
 
 struct matrix3x4_t {
-  matrix3x4_t() {}
+  matrix3x4_t() = default;
   matrix3x4_t(float m00, float m01, float m02, float m03, float m10, float m11,
               float m12, float m13, float m20, float m21, float m22,
               float m23) {
@@ -1619,7 +1619,7 @@ void Hermite_SplineBasis(float t, float basis[]);
 void Hermite_Spline(const Quaternion &q0, const Quaternion &q1,
                     const Quaternion &q2, float t, Quaternion &output);
 
-// See http://en.wikipedia.org/wiki/Kochanek-Bartels_curves
+// See https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline
 //
 // Tension:  -1 = Round -> 1 = Tight
 // Bias:     -1 = Pre-shoot (bias left) -> 1 = Post-shoot (bias right)

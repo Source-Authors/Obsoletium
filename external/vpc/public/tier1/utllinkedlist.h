@@ -910,8 +910,8 @@ class CUtlPtrLinkedList {
 
  private:
   struct Node_t {
-    Node_t() {}
-    Node_t(const T &_elem) : elem(_elem) {}
+    Node_t() : pPrev(nullptr), pNext(nullptr) {}
+    Node_t(const T &_elem) : elem(_elem), pPrev(nullptr), pNext(nullptr) {}
 
     T elem;
     Node_t *pPrev, *pNext;

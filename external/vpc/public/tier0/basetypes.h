@@ -393,7 +393,7 @@ struct color24 {
   ::byte r, g, b;
 };
 
-typedef struct alignas(unsigned) color32_s {
+typedef struct alignas(const unsigned) color32_s {
   bool operator!=(const struct color32_s &other) const;
   ::byte r, g, b, a;
 
@@ -401,7 +401,7 @@ typedef struct alignas(unsigned) color32_s {
   // than byte-by-byte copy. (No, the compiler is not
   // smart enough to do this for you. /FAcs if you
   // don't believe me.)
-  inline unsigned *asInt(void) { return reinterpret_cast<unsigned *>(this); }
+  inline unsigned *asInt() { return reinterpret_cast<unsigned *>(this); }
   inline const unsigned *asInt(void) const {
     return reinterpret_cast<const unsigned *>(this);
   }
@@ -453,7 +453,7 @@ struct Rect3D_t {
     depth = nDepth;
   }
 
-  FORCEINLINE Rect3D_t(void) {}
+  FORCEINLINE Rect3D_t() = default;
 };
 
 //-----------------------------------------------------------------------------

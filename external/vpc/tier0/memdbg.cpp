@@ -121,13 +121,11 @@ bool GetCallerModule(char *pDest, int iLength) {
 
 //
 // Note: StackDescribe function is non-reentrant:
-//		Reason:   Stack description is stored in a static buffer.
-//		Solution: Passing caller-allocated buffers would allow the
-//		function to become reentrant, however the current only client
-//(FindOrCreateFilename) 		is synchronized with a heap mutex, after
-//retrieving
-// stack description the 		heap memory will be allocated to copy the
-// text.
+// Reason:   Stack description is stored in a static buffer.
+// Solution: Passing caller-allocated buffers would allow the
+// function to become reentrant, however the current only client
+// (FindOrCreateFilename) is synchronized with a heap mutex, after retrieving
+// stack description the heap memory will be allocated to copy the text.
 //
 
 char *StackDescribe(void *const *ppAddresses, int nMaxAddresses) {
@@ -945,7 +943,8 @@ class CDbgMemAlloc : public IMemAlloc {
       Filenames_t;
 
   // Heap reporting method
-  typedef void (*HeapReportFunc_t)(char const *pFormat, ...);
+  typedef void (*HeapReportFunc_t)(PRINTF_FORMAT_STRING char const *pFormat,
+                                   ...);
 
  private:
   // Returns the actual debug info
@@ -1178,7 +1177,8 @@ size_t g_TargetCountRangeMin = 0, g_TargetCountRangeMax = 0;
 //-----------------------------------------------------------------------------
 static FILE *s_DbgFile;
 
-static void DefaultHeapReportFunc(char const *pFormat, ...) {
+static void DefaultHeapReportFunc(PRINTF_FORMAT_STRING char const *pFormat,
+                                  ...) {
   va_list args;
   va_start(args, pFormat);
   vfprintf(s_DbgFile, pFormat, args);
@@ -1358,7 +1358,6 @@ void CDbgMemAlloc::RestoreDebugInfo(const void *pvDebugInfo) {
     if (g_DbgInfoStack == NULL) {
       g_DbgInfoStack = (DbgInfoStack_t *)DebugAlloc(sizeof(DbgInfoStack_t) *
                                                     DBG_INFO_STACK_DEPTH);
-      g_nDbgInfoStackDepth = -1;
     }
 
     const int32 *pnStackDepth = (const int32 *)pvDebugInfo;
@@ -1584,7 +1583,6 @@ void CDbgMemAlloc::RegisterDeallocation(MemInfo_t &info, size_t nLogicalSize,
   Assert(info.m_nPeakCount >= info.m_nCurrentCount);
   Assert(info.m_nPeakSize >= info.m_nCurrentSize);
   Assert(info.m_nCurrentCount >= 0);
-  Assert(info.m_nCurrentSize >= 0);
 
   info.m_nOverheadSize -= (nActualSize - nLogicalSize);
 
@@ -2381,7 +2379,7 @@ size_t CDbgMemAlloc::MemoryAllocFailed() { return m_sMemoryAllocFailed; }
 //
 // Under linux we can ask GLIBC to override malloc for us
 //   Base on code from Ryan,
-//   http://hg.icculus.org/icculus/mallocmonitor/file/29c4b0d049f7/monitor_client/malloc_hook_glibc.c
+//   https://github.com/icculus/mallocmonitor/blob/fc7c207fb18f61977ba4e46a995f1b9f349246b1/monitor_client/malloc_hook_glibc.c
 //
 //
 static void *glibc_malloc_hook = NULL;

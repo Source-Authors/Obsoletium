@@ -521,7 +521,7 @@ class CUtlHashFast {
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
 template <class Data, class HashFuncs>
-CUtlHashFast<Data, HashFuncs>::CUtlHashFast() {
+CUtlHashFast<Data, HashFuncs>::CUtlHashFast() : m_uiBucketMask(0) {
   Purge();
 }
 
@@ -604,7 +604,6 @@ inline UtlHashFastHandle_t CUtlHashFast<Data, HashFuncs>::FastInsert(
   // Get a new element from the pool.
   int iHashData = m_aDataPool.Alloc(true);
   HashFastData_t *pHashData = &m_aDataPool[iHashData];
-  if (!pHashData) return InvalidHandle();
 
   // Add data to new element.
   pHashData->m_uiKey = uiKey;

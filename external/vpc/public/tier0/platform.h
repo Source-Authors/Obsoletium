@@ -807,7 +807,7 @@ typedef void *HINSTANCE;
 // }
 //
 // MSDN __declspec(novtable) documentation:
-// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vclang/html/_langref_novtable.asp
+// https://docs.microsoft.com/en-us/cpp/cpp/novtable
 //
 // Note: NJS: This is not enabled for regular PC, due to not knowing the
 // implications of exporting a class with no no vtable.

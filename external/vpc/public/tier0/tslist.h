@@ -1,8 +1,13 @@
 // Copyright Valve Corporation, All rights reserved.
 //
+// Based on "Lock-Free Techniques for Concurrent Access to Shared Objects" by
+// Dominique Fober, Yann Orlarey, Stéphane Letz
+//
 // LIFO from disassembly of Windows API and
-// http://perso.wanadoo.fr/gmem/evenements/jim2002/articles/L17_Fober.pdf FIFO
-// from http://perso.wanadoo.fr/gmem/evenements/jim2002/articles/L17_Fober.pdf
+// https://hal.archives-ouvertes.fr/hal-02158796/file/fober-JIM2002.pdf
+//
+// FIFO from
+// https://hal.archives-ouvertes.fr/hal-02158796/file/fober-JIM2002.pdf
 
 #ifndef VPC_TIER0_TSLIST_H_
 #define VPC_TIER0_TSLIST_H_
@@ -296,7 +301,7 @@ template <typename T>
 class TSLIST_HEAD_ALIGN CTSList : public CTSListBase {
  public:
   struct TSLIST_NODE_ALIGN Node_t : public TSLNodeBase_t {
-    Node_t() {}
+    Node_t() = default;
     Node_t(const T &init) : elem(init) {}
 
     T elem;
@@ -341,7 +346,7 @@ template <typename T>
 class TSLIST_HEAD_ALIGN CTSListWithFreeList : public CTSListBase {
  public:
   struct TSLIST_NODE_ALIGN Node_t : public TSLNodeBase_t {
-    Node_t() {}
+    Node_t() = default;
     Node_t(const T &init) : elem(init) {}
 
     T elem;
@@ -422,8 +427,8 @@ template <typename T, bool bTestOptimizer = false, bool bFreeList = true>
 class TSLIST_HEAD_ALIGN CTSQueue {
  public:
   struct TSLIST_NODE_ALIGN Node_t {
-    Node_t() {}
-    Node_t(const T &init) : elem(init) {}
+    Node_t() : pNext(nullptr) {}
+    Node_t(const T &init) : elem(init), pNext(nullptr) {}
 
     Node_t *pNext;
     T elem;

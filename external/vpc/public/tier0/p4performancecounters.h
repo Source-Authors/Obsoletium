@@ -7,7 +7,7 @@
 // Pentium 4 support
 
 /*
-    http://developer.intel.com/design/Pentium4/documentation.htm
+    https://www.intel.com/content/www/us/en/documentation-resources/developer.html
 
     IA-32 Intel Architecture Software Developer's Manual Volume 1: Basic
  Architecture
@@ -163,6 +163,8 @@ class P4BaseEvent {
     escr.flat = 0;
     cccr.flat = 0;
     cccr.Reserved16_17 = 3;  // must be set
+    counterPort = 0;
+    cccrPort = 0;
     escrPort = 0;
     m_counter = -1;
   }

@@ -90,7 +90,7 @@ HRESULT PME::Close(void) {
 
   if (hFile)  // if we have no driver handle, return FALSE
   {
-    HRESULT hr = CloseHandle(hFile);
+    HRESULT hr = CloseHandle(hFile) ? S_OK : E_FAIL;
 
     hFile = NULL;
     return hr;
@@ -196,7 +196,7 @@ HRESULT PME::ReadMSR(uint32 dw_reg, int64* pi64_value) {
                        sizeof(int64),  // Length of output buffer in bytes.
                        &dw_ret_len,    // Bytes placed in output buffer.
                        NULL            // NULL means wait till op. completes
-  );
+  ) ? S_OK : E_FAIL;
 
   if (hr == S_OK && dw_ret_len != sizeof(int64)) hr = E_BAD_DATA;
 
@@ -218,7 +218,7 @@ HRESULT PME::ReadMSR(uint32 dw_reg, uint64* pi64_value) {
                        sizeof(uint64),  // Length of output buffer in bytes.
                        &dw_ret_len,     // Bytes placed in output buffer.
                        NULL             // NULL means wait till op. completes
-  );
+  ) ? S_OK : E_FAIL;
 
   if (hr == S_OK && dw_ret_len != sizeof(uint64)) hr = E_BAD_DATA;
 
@@ -230,7 +230,7 @@ HRESULT PME::ReadMSR(uint32 dw_reg, uint64* pi64_value) {
 //---------------------------------------------------------------------------
 HRESULT PME::WriteMSR(uint32 dw_reg, const int64& i64_value) {
   HRESULT hr;
-  DWORD dw_buffer[3];
+  alignas(int64) DWORD dw_buffer[3];
   DWORD dw_ret_len;
 
   if (bDriverOpen == false)  // driver is not going
@@ -247,7 +247,7 @@ HRESULT PME::WriteMSR(uint32 dw_reg, const int64& i64_value) {
                        0,            // Length of output buffer in bytes.
                        &dw_ret_len,  // Bytes placed in DataBuffer.
                        NULL          // NULL means wait till op. completes.
-  );
+  ) ? S_OK : E_FAIL;
 
   if (hr == S_OK && dw_ret_len != 0) hr = E_BAD_DATA;
 
@@ -256,7 +256,7 @@ HRESULT PME::WriteMSR(uint32 dw_reg, const int64& i64_value) {
 
 HRESULT PME::WriteMSR(uint32 dw_reg, const uint64& i64_value) {
   HRESULT hr;
-  DWORD dw_buffer[3];
+  alignas(uint64) DWORD dw_buffer[3];
   DWORD dw_ret_len;
 
   if (bDriverOpen == false)  // driver is not going
@@ -273,7 +273,7 @@ HRESULT PME::WriteMSR(uint32 dw_reg, const uint64& i64_value) {
                        0,            // Length of output buffer in bytes.
                        &dw_ret_len,  // Bytes placed in DataBuffer.
                        NULL          // NULL means wait till op. completes.
-  );
+  ) ? S_OK : E_FAIL;
 
   // E_POINTER
   if (hr == S_OK && dw_ret_len != 0) hr = E_BAD_DATA;

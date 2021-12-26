@@ -171,7 +171,7 @@ static void PerformFileSubstitions(char *line, int linelen) {
 //	Sys_Error
 //
 //-----------------------------------------------------------------------------
-void Sys_Error(const char *format, ...) {
+[[noreturn]] void Sys_Error(PRINTF_FORMAT_STRING const char *format, ...) {
   va_list argptr;
 
   va_start(argptr, format);
@@ -181,7 +181,8 @@ void Sys_Error(const char *format, ...) {
   exit(1);
 }
 
-void SafeSnprintf(char *pOut, int nOutLen, const char *pFormat, ...) {
+void SafeSnprintf(char *pOut, int nOutLen,
+                  PRINTF_FORMAT_STRING const char *pFormat, ...) {
   va_list marker;
   va_start(marker, pFormat);
   V_vsnprintf(pOut, nOutLen, pFormat, marker);
@@ -323,7 +324,7 @@ bool CheckSupplementalString(const char *pSupplementalString,
   // running vpccrccheck.exe), then we ignore it and continue.
   if (!pReferenceSupplementalString) return true;
 
-  return (pSupplementalString && pReferenceSupplementalString &&
+  return (pSupplementalString &&
           stricmp(pSupplementalString, pReferenceSupplementalString) == 0);
 }
 

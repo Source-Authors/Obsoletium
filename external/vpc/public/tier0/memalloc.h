@@ -249,9 +249,8 @@ inline void *MemAlloc_Alloc(size_t nSize, const char *pFileName, int nLine) {
 #else
 #endif
 
-inline bool ValueIsPowerOfTwo(
-    size_t value)  // don't clash with mathlib definition
-{
+// don't clash with mathlib definition
+inline bool ValueIsPowerOfTwo(size_t value) {
   return (value & (value - 1)) == 0;
 }
 
@@ -342,10 +341,8 @@ inline void *MemAlloc_ReallocAligned(void *ptr, size_t size, size_t align) {
 
   if (!ptr) return MemAlloc_AllocAligned(size, align);
 
-  void *pAlloc, *pResult;
-
   // Figure out the actual allocation point
-  pAlloc = ptr;
+  void *pAlloc = ptr;
   pAlloc = (void *)(((size_t)pAlloc & ~(sizeof(void *) - 1)) - sizeof(void *));
   pAlloc = *((void **)pAlloc);
 
@@ -354,8 +351,9 @@ inline void *MemAlloc_ReallocAligned(void *ptr, size_t size, size_t align) {
   size_t nOldSize = g_pMemAlloc->GetSize(pAlloc);
   if (nOldSize >= size + nOffset) return ptr;
 
-  pResult = MemAlloc_AllocAligned(size, align);
-  memcpy(pResult, ptr, nOldSize - nOffset);
+  void *pResult = MemAlloc_AllocAligned(size, align);
+  if (pResult) memcpy(pResult, ptr, nOldSize - nOffset);
+
   g_pMemAlloc->Free(pAlloc);
   return pResult;
 

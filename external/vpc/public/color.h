@@ -6,7 +6,7 @@
 #include "tier0/basetypes.h"
 
 // Purpose: Basic handler for an rgb set of colors
-class Color {
+class alignas(int) Color {
  public:
   // constructors
   constexpr Color() : _color{0, 0, 0, 0} {}
@@ -47,11 +47,14 @@ class Color {
 
   const unsigned char &operator[](int index) const { return _color[index]; }
 
-  bool operator==(const Color &rhs) const {
-    return (*((int *)this) == *((int *)&rhs));
+  constexpr bool operator==(const Color &rhs) const {
+    return _color[0] == rhs._color[0] && _color[1] == rhs._color[1] &&
+           _color[2] == rhs._color[2] && _color[3] == rhs._color[3];
   }
 
-  bool operator!=(const Color &rhs) const { return !(operator==(rhs)); }
+  constexpr bool operator!=(const Color &rhs) const {
+    return !(operator==(rhs));
+  }
 
   constexpr Color &operator=(const Color &rhs) {
     _color[0] = rhs._color[0];

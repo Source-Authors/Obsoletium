@@ -99,7 +99,7 @@ void *g_AllocRegions[] = {
 //       DEFAULT_MMAP_THRESHOLD in malloc.cpp), to avoid ANY fragmentation or
 //       waste in an internal arena
 #define REGION_SPLIT (256 * 1024)
-#define SelectRegion(region, bytes) g_AllocRegions[bytes < REGION_SPLIT]
+#define SelectRegion(region, bytes) g_AllocRegions[(bytes) < REGION_SPLIT]
 #endif
 #else  // MEMALLOC_REGIONS
 #define SelectRegion(region, bytes) g_AllocRegions[region]
