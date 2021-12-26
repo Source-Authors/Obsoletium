@@ -1486,28 +1486,28 @@ inline Vector RandomVector( float minVal, float maxVal )
 // Helper debugging stuff....
 //-----------------------------------------------------------------------------
 
-inline bool operator==( float const* f, const Vector& v )
+inline bool operator==( float const*, const Vector& )
 {
 	// AIIIEEEE!!!!
 	Assert(0);
 	return false;
 }
 
-inline bool operator==( const Vector& v, float const* f )
+inline bool operator==( const Vector&, float const* )
 {
 	// AIIIEEEE!!!!
 	Assert(0);
 	return false;
 }
 
-inline bool operator!=( float const* f, const Vector& v )
+inline bool operator!=( float const*, const Vector& )
 {
 	// AIIIEEEE!!!!
 	Assert(0);
 	return false;
 }
 
-inline bool operator!=( const Vector& v, float const* f )
+inline bool operator!=( const Vector&, float const* )
 {
 	// AIIIEEEE!!!!
 	Assert(0);

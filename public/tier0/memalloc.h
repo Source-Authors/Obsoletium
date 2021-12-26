@@ -566,23 +566,23 @@ PLATFORM_INTERFACE void SetMemoryMark( void );
 PLATFORM_INTERFACE void DumpChangedMemory( int nThresh );
 
 #else
-FORCEINLINE void MemoryLogMessage( char const *s )
+FORCEINLINE void MemoryLogMessage( char const * )
 {
 }
 
-FORCEINLINE void EnableMemoryLogging( bool bOnOff )
+FORCEINLINE void EnableMemoryLogging( bool )
 {
 }
-FORCEINLINE void DumpMemoryLog( int nThresh )
+FORCEINLINE void DumpMemoryLog( int )
 {
 }
-FORCEINLINE void DumpMemorySummary( void )
+FORCEINLINE void DumpMemorySummary()
 {
 }
-FORCEINLINE void SetMemoryMark( void )
+FORCEINLINE void SetMemoryMark()
 {
 }
-FORCEINLINE void DumpChangedMemory( int nThresh )
+FORCEINLINE void DumpChangedMemory( int )
 {
 }
 
@@ -590,9 +590,9 @@ FORCEINLINE void DumpChangedMemory( int nThresh )
 
 #ifdef POSIX
 // ApproximateProcessMemoryUsage returns the approximate memory footprint of this process.
-PLATFORM_INTERFACE size_t ApproximateProcessMemoryUsage( void );
+PLATFORM_INTERFACE size_t ApproximateProcessMemoryUsage();
 #else
-FORCEINLINE size_t ApproximateProcessMemoryUsage( void )
+FORCEINLINE size_t ApproximateProcessMemoryUsage()
 {
 	return 0;
 }

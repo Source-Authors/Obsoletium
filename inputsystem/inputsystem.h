@@ -14,11 +14,11 @@
 
 #ifdef WIN32
 #if !defined( _X360 )
-#define _WIN32_WINNT 0x502
-#include <windows.h>
+#include "winlite.h"
+
 #include <zmouse.h>
 #include "xbox/xboxstubs.h"
-#include "../../dx9sdk/include/XInput.h"
+#include <Xinput.h>
 #endif
 #endif
 

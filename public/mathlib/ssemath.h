@@ -2000,10 +2000,10 @@ FORCEINLINE fltx4 Dot4SIMD( const fltx4 &a, const fltx4 &b )
 FORCEINLINE fltx4 SinSIMD( const fltx4 &radians )
 {
 	fltx4 result;
-	SubFloat( result, 0 ) = sin( SubFloat( radians, 0 ) );
-	SubFloat( result, 1 ) = sin( SubFloat( radians, 1 ) );
-	SubFloat( result, 2 ) = sin( SubFloat( radians, 2 ) );
-	SubFloat( result, 3 ) = sin( SubFloat( radians, 3 ) );
+	SubFloat( result, 0 ) = sinf( SubFloat( radians, 0 ) );
+	SubFloat( result, 1 ) = sinf( SubFloat( radians, 1 ) );
+	SubFloat( result, 2 ) = sinf( SubFloat( radians, 2 ) );
+	SubFloat( result, 3 ) = sinf( SubFloat( radians, 3 ) );
 	return result;
 }
 
@@ -2029,20 +2029,20 @@ FORCEINLINE fltx4 ArcSinSIMD( const fltx4 &sine )
 {
 	// FIXME: Make a fast SSE version
 	fltx4 result;
-	SubFloat( result, 0 ) = asin( SubFloat( sine, 0 ) );
-	SubFloat( result, 1 ) = asin( SubFloat( sine, 1 ) );
-	SubFloat( result, 2 ) = asin( SubFloat( sine, 2 ) );
-	SubFloat( result, 3 ) = asin( SubFloat( sine, 3 ) );
+	SubFloat( result, 0 ) = asinf( SubFloat( sine, 0 ) );
+	SubFloat( result, 1 ) = asinf( SubFloat( sine, 1 ) );
+	SubFloat( result, 2 ) = asinf( SubFloat( sine, 2 ) );
+	SubFloat( result, 3 ) = asinf( SubFloat( sine, 3 ) );
 	return result;
 }
 
 FORCEINLINE fltx4 ArcCosSIMD( const fltx4 &cs )
 {
 	fltx4 result;
-	SubFloat( result, 0 ) = acos( SubFloat( cs, 0 ) );
-	SubFloat( result, 1 ) = acos( SubFloat( cs, 1 ) );
-	SubFloat( result, 2 ) = acos( SubFloat( cs, 2 ) );
-	SubFloat( result, 3 ) = acos( SubFloat( cs, 3 ) );
+	SubFloat( result, 0 ) = acosf( SubFloat( cs, 0 ) );
+	SubFloat( result, 1 ) = acosf( SubFloat( cs, 1 ) );
+	SubFloat( result, 2 ) = acosf( SubFloat( cs, 2 ) );
+	SubFloat( result, 3 ) = acosf( SubFloat( cs, 3 ) );
 	return result;
 }
 
@@ -2050,10 +2050,10 @@ FORCEINLINE fltx4 ArcCosSIMD( const fltx4 &cs )
 FORCEINLINE fltx4 ArcTan2SIMD( const fltx4 &a, const fltx4 &b )
 {
 	fltx4 result;
-	SubFloat( result, 0 ) = atan2( SubFloat( a, 0 ), SubFloat( b, 0 ) );
-	SubFloat( result, 1 ) = atan2( SubFloat( a, 1 ), SubFloat( b, 1 ) );
-	SubFloat( result, 2 ) = atan2( SubFloat( a, 2 ), SubFloat( b, 2 ) );
-	SubFloat( result, 3 ) = atan2( SubFloat( a, 3 ), SubFloat( b, 3 ) );
+	SubFloat( result, 0 ) = atan2f( SubFloat( a, 0 ), SubFloat( b, 0 ) );
+	SubFloat( result, 1 ) = atan2f( SubFloat( a, 1 ), SubFloat( b, 1 ) );
+	SubFloat( result, 2 ) = atan2f( SubFloat( a, 2 ), SubFloat( b, 2 ) );
+	SubFloat( result, 3 ) = atan2f( SubFloat( a, 3 ), SubFloat( b, 3 ) );
 	return result;
 }
 
@@ -2143,10 +2143,10 @@ FORCEINLINE fltx4 MaxSIMD( const fltx4 & a, const fltx4 & b )				// max(a,b)
 FORCEINLINE fltx4 CeilSIMD( const fltx4 &a )
 {
 	fltx4 retVal;
-	SubFloat( retVal, 0 ) = ceil( SubFloat( a, 0 ) );
-	SubFloat( retVal, 1 ) = ceil( SubFloat( a, 1 ) );
-	SubFloat( retVal, 2 ) = ceil( SubFloat( a, 2 ) );
-	SubFloat( retVal, 3 ) = ceil( SubFloat( a, 3 ) );
+	SubFloat( retVal, 0 ) = ceilf( SubFloat( a, 0 ) );
+	SubFloat( retVal, 1 ) = ceilf( SubFloat( a, 1 ) );
+	SubFloat( retVal, 2 ) = ceilf( SubFloat( a, 2 ) );
+	SubFloat( retVal, 3 ) = ceilf( SubFloat( a, 3 ) );
 	return retVal;
 
 }

@@ -203,12 +203,12 @@ ALLOC_CALL void *_realloc_base( void *pMem, size_t nSize )
 	return ReallocUnattributed( pMem, nSize );
 }
 
-ALLOC_CALL void *_recalloc_base( void *pMem, size_t nSize )
+ALLOC_CALL void *_recalloc_base( void *pMem, size_t nCount, size_t nSize )
 {
-	void *pMemOut = ReallocUnattributed( pMem, nSize );
+	void *pMemOut = ReallocUnattributed( pMem, nCount * nSize );
 	if ( !pMem )
 	{
-		memset( pMemOut, 0, nSize );
+		memset( pMemOut, 0, nCount * nSize );
 	}
 	return pMemOut;
 }
@@ -242,7 +242,7 @@ void * __cdecl _realloc_crt(void *ptr, size_t size)
 
 void * __cdecl _recalloc_crt(void *ptr, size_t count, size_t size)
 {
-	return _recalloc_base( ptr, size * count );
+	return _recalloc_base( ptr, count, size );
 }
 
 ALLOC_CALL void * __cdecl _recalloc ( void * memblock, size_t count, size_t size )
@@ -255,7 +255,7 @@ ALLOC_CALL void * __cdecl _recalloc ( void * memblock, size_t count, size_t size
 	return pMem;
 }
 
-size_t _msize_base( void *pMem )
+size_t _msize_base( void *pMem ) noexcept
 {
 	return g_pMemAlloc->GetSize(pMem);
 }
@@ -1079,23 +1079,6 @@ void * __cdecl _heap_alloc_dbg( size_t nSize, int nBlockUse, const char * szFile
 		return _heap_alloc(nSize);
 }
 
-// 64-bit
-#ifdef _WIN64
-static void * __cdecl realloc_help( void * pUserData, size_t * pnNewSize, int nBlockUse,const char * szFileName,
-				int nLine, int fRealloc )
-{
-		assert(0); // Shouldn't be needed
-		return NULL;
-}
-#else
-static void * __cdecl realloc_help( void * pUserData, size_t nNewSize, int nBlockUse, const char * szFileName,
-                  int nLine, int fRealloc)
-{
-		assert(0); // Shouldn't be needed
-		return NULL;
-}
-#endif
-
 void __cdecl _free_nolock( void * pUserData)
 {
 		// I don't think the second param is used in memoverride
@@ -1113,28 +1096,12 @@ _CRT_ALLOC_HOOK __cdecl _CrtGetAllocHook ( void)
         return NULL;
 }
 
-static int __cdecl CheckBytes( unsigned char * pb, unsigned char bCheck, size_t nSize)
-{
-        int bOkay = TRUE;
-        return bOkay;
-}
-
-
 _CRT_DUMP_CLIENT __cdecl _CrtGetDumpClient ( void)
 {
 		assert(0); 
         return NULL;
 }
 
-#if _MSC_VER >= 1400
-static void __cdecl _printMemBlockData( _locale_t plocinfo, _CrtMemBlockHeader * pHead)
-{
-}
-
-static void __cdecl _CrtMemDumpAllObjectsSince_stat( const _CrtMemState * state, _locale_t plocinfo)
-{
-}
-#endif
 void * __cdecl _aligned_malloc_dbg( size_t size, size_t align, const char * f_name, int line_n)
 {
     return _aligned_malloc(size, align);
@@ -1395,62 +1362,6 @@ SIZE_T WINAPI XMemSize( PVOID pAddress, DWORD dwAllocAttributes )
 	return XMemSizeDefault( pAddress, dwAllocAttributes );
 }
 #endif 
-
-#if _MSC_FULL_VER >= 140050415
-#define _NATIVE_STARTUP_NAMESPACE  __identifier("<CrtImplementationDetails>")
-#else  /* _MSC_FULL_VER >= 140050415 */
-#define _NATIVE_STARTUP_NAMESPACE __CrtImplementationDetails
-#endif  /* _MSC_FULL_VER >= 140050415 */
-
-namespace _NATIVE_STARTUP_NAMESPACE
-{
-    class NativeDll
-    {
-    private:
-        static const unsigned int ProcessDetach   = 0;
-        static const unsigned int ProcessAttach   = 1;
-        static const unsigned int ThreadAttach    = 2;
-        static const unsigned int ThreadDetach    = 3;
-        static const unsigned int ProcessVerifier = 4;
-
-    public:
-
-        inline static bool IsInDllMain()
-        {
-            return false;
-        }
-
-        inline static bool IsInProcessAttach()
-        {
-            return false;
-        }
-
-        inline static bool IsInProcessDetach()
-        {
-            return false;
-        }
-
-        inline static bool IsInVcclrit()
-        {
-            return false;
-        }
-
-        inline static bool IsSafeForManagedCode()
-        {
-            if (!IsInDllMain())
-            {
-                return true;
-            }
-
-            if (IsInVcclrit())
-            {
-                return true;
-            }
-
-            return !IsInProcessAttach() && !IsInProcessDetach();
-        }
-    };
-}
 
 #endif // _MSC_VER >= 1400
 

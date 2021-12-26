@@ -58,8 +58,8 @@ inline Vector32& Vector32::operator=(const Vector &vOther)
 
 	static float expScale[4] = { 4.0f, 16.0f, 32.f, 64.f };
 
-	float fmax = Max( fabs( vOther.x ), fabs( vOther.y ) );
-	fmax = Max( fmax, (float)fabs( vOther.z ) );
+	float fmax = Max( fabsf( vOther.x ), fabsf( vOther.y ) );
+	fmax = Max( fmax, fabsf( vOther.z ) );
 
 	for (exp = 0; exp < 3; exp++)
 	{
@@ -132,9 +132,9 @@ inline Normal32::operator Vector ()
 {
 	Vector tmp;
 
-	tmp.x = ((int)x - 16384) * (1 / 16384.0);
-	tmp.y = ((int)y - 16384) * (1 / 16384.0);
-	tmp.z = sqrt( 1 - tmp.x * tmp.x - tmp.y * tmp.y );
+	tmp.x = ((int)x - 16384) * (1 / 16384.0F);
+	tmp.y = ((int)y - 16384) * (1 / 16384.0F);
+	tmp.z = sqrtf( 1 - tmp.x * tmp.x - tmp.y * tmp.y );
 	if (zneg)
 		tmp.z = -tmp.z;
 	return tmp; 
@@ -172,7 +172,7 @@ inline Quaternion64::operator Quaternion ()
 	tmp.x = ((int)x - 1048576) * (1 / 1048576.5f);
 	tmp.y = ((int)y - 1048576) * (1 / 1048576.5f);
 	tmp.z = ((int)z - 1048576) * (1 / 1048576.5f);
-	tmp.w = sqrt( 1 - tmp.x * tmp.x - tmp.y * tmp.y - tmp.z * tmp.z );
+	tmp.w = sqrtf( 1 - tmp.x * tmp.x - tmp.y * tmp.y - tmp.z * tmp.z );
 	if (wneg)
 		tmp.w = -tmp.w;
 	return tmp; 
@@ -216,10 +216,10 @@ inline Quaternion48::operator Quaternion ()
 {
 	Quaternion tmp;
 
-	tmp.x = ((int)x - 32768) * (1 / 32768.0);
-	tmp.y = ((int)y - 32768) * (1 / 32768.0);
-	tmp.z = ((int)z - 16384) * (1 / 16384.0);
-	tmp.w = sqrt( 1 - tmp.x * tmp.x - tmp.y * tmp.y - tmp.z * tmp.z );
+	tmp.x = ((int)x - 32768) * (1 / 32768.0f);
+	tmp.y = ((int)y - 32768) * (1 / 32768.0f);
+	tmp.z = ((int)z - 16384) * (1 / 16384.0f);
+	tmp.w = sqrtf( 1 - tmp.x * tmp.x - tmp.y * tmp.y - tmp.z * tmp.z );
 	if (wneg)
 		tmp.w = -tmp.w;
 	return tmp; 
@@ -263,10 +263,10 @@ inline Quaternion32::operator Quaternion ()
 {
 	Quaternion tmp;
 
-	tmp.x = ((int)x - 1024) * (1 / 1024.0);
-	tmp.y = ((int)y - 512) * (1 / 512.0);
-	tmp.z = ((int)z - 512) * (1 / 512.0);
-	tmp.w = sqrt( 1 - tmp.x * tmp.x - tmp.y * tmp.y - tmp.z * tmp.z );
+	tmp.x = ((int)x - 1024) * (1 / 1024.0f);
+	tmp.y = ((int)y - 512) * (1 / 512.0f);
+	tmp.z = ((int)z - 512) * (1 / 512.0f);
+	tmp.w = sqrtf( 1 - tmp.x * tmp.x - tmp.y * tmp.y - tmp.z * tmp.z );
 	if (wneg)
 		tmp.w = -tmp.w;
 	return tmp; 

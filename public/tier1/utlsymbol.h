@@ -137,7 +137,7 @@ protected:
 	class CLess
 	{
 	public:
-		CLess( int ignored = 0 ) {} // permits default initialization to NULL in CUtlRBTree
+		CLess( [[maybe_unused]] int ignored = 0 ) {} // permits default initialization to NULL in CUtlRBTree
 		bool operator!() const { return false; }
 		bool operator()( const CStringPoolIndex &left, const CStringPoolIndex &right ) const;
 	};

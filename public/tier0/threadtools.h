@@ -827,7 +827,7 @@ public:
 
 	static bool TryLock()			{ return true; }
 	static bool AssertOwnedByCurrentThread() { return true; }
-	static void SetTrace( bool b )	{}
+	static void SetTrace( bool )	{}
 
 	static uint32 GetOwnerId() 		{ return 0;	}
 	static int	GetDepth() 			{ return 0; }
