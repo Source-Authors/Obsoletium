@@ -787,8 +787,8 @@ bool CProjectDependencyGraph::VisitProject( projectIndex_t iProject, const char 
 		V_StrSubst( pFilename, "$(TargetName)", sTargetNameReplacement, sReplaced, sizeof( sReplaced ) );
 		V_MakeAbsolutePath( sAbsImportLibrary, sizeof( sAbsImportLibrary ), sReplaced );
 
-		CDependency *pImportLibrary = FindOrCreateDependency( sAbsImportLibrary );
-		pImportLibrary->m_Dependencies.AddToTail( pProject );
+		CDependency *il = FindOrCreateDependency( sAbsImportLibrary );
+		il->m_Dependencies.AddToTail( pProject );
 	}
 
 	return true;

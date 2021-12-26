@@ -243,10 +243,10 @@ void VPC_Keyword_FileConfiguration() {
         pToken = g_pVPC->GetScript().GetToken(true);
         if (!pToken || !pToken[0]) g_pVPC->VPCSyntaxError();
 
-        char buff[MAX_SYSTOKENCHARS];
-        if (g_pVPC->GetScript().ParsePropertyValue(NULL, buff, sizeof(buff))) {
+        char buf[MAX_SYSTOKENCHARS];
+        if (g_pVPC->GetScript().ParsePropertyValue(NULL, buf, sizeof(buf))) {
           g_pVPC->GetProjectGenerator()->FileExcludedFromBuild(
-              Sys_StringToBool(buff));
+              Sys_StringToBool(buf));
         }
 
         continue;

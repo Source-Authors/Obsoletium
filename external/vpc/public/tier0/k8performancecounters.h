@@ -149,16 +149,12 @@ class k8BaseEvent {
   }
 
   void ClearCounter() {
-    PerfEvtSel &select = eventSelect[eventSelectNum];
-
     int counterPort = MSR_K8_PERFCTR0 + eventSelectNum;
 
     pme->WriteMSR(counterPort, 0ui64);  // clear
   }
 
   void WriteCounter(int64 value) {
-    PerfEvtSel &select = eventSelect[eventSelectNum];
-
     int counterPort = MSR_K8_PERFCTR0 + eventSelectNum;
     pme->WriteMSR(counterPort, value);  // clear
   }

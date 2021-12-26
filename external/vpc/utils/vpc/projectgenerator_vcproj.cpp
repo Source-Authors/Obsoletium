@@ -106,7 +106,7 @@ bool CProjectFolder::GetFolder(const char *pFolderName,
     g_pVPC->VPCError("Empty or bad folder name.");
   }
 
-  for (int iIndex = m_Folders.Head(); iIndex != m_Folders.InvalidIndex();
+  for (auto iIndex = m_Folders.Head(); iIndex != m_Folders.InvalidIndex();
        iIndex = m_Folders.Next(iIndex)) {
     if (!V_stricmp(m_Folders[iIndex]->m_Name.Get(), pFolderName)) {
       // found
@@ -136,7 +136,7 @@ bool CProjectFolder::AddFolder(const char *pFolderName,
   CProjectFolder *pNewFolder = new CProjectFolder(m_pGenerator, pFolderName);
 
   // maintain sorted ascending alphabetic order
-  int iIndex;
+  unsigned short iIndex;
   for (iIndex = m_Folders.Head(); iIndex != m_Folders.InvalidIndex();
        iIndex = m_Folders.Next(iIndex)) {
     if (V_stricmp(pFolderName, m_Folders[iIndex]->m_Name.Get()) < 0) {
@@ -162,7 +162,7 @@ void CProjectFolder::AddFile(const char *pFilename, CProjectFile **ppFile) {
   CProjectFile *pNewFile = new CProjectFile(m_pGenerator, pFilename);
 
   // maintain sorted ascending alphabetic order
-  int iIndex;
+  unsigned short iIndex;
   for (iIndex = m_Files.Head(); iIndex != m_Files.InvalidIndex();
        iIndex = m_Files.Next(iIndex)) {
     if (g_pVPC->IsPlatformDefined("PS3")) {
@@ -193,7 +193,7 @@ bool CProjectFolder::FindFile(const char *pFilename) {
     g_pVPC->VPCError("Empty or bad filename.");
   }
 
-  for (int iIndex = m_Files.Head(); iIndex != m_Files.InvalidIndex();
+  for (auto iIndex = m_Files.Head(); iIndex != m_Files.InvalidIndex();
        iIndex = m_Files.Next(iIndex)) {
     if (!V_stricmp(m_Files[iIndex]->m_Name.Get(), pFilename)) {
       // found
@@ -209,7 +209,7 @@ bool CProjectFolder::RemoveFile(const char *pFilename) {
     g_pVPC->VPCError("Empty or bad filename.");
   }
 
-  for (int iIndex = m_Files.Head(); iIndex != m_Files.InvalidIndex();
+  for (auto iIndex = m_Files.Head(); iIndex != m_Files.InvalidIndex();
        iIndex = m_Files.Next(iIndex)) {
     if (!V_stricmp(m_Files[iIndex]->m_Name.Get(), pFilename)) {
       // found, remove

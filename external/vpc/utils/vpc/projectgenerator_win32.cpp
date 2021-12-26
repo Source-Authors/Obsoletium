@@ -50,13 +50,13 @@ bool CProjectGenerator_Win32::WriteFolder(CProjectFolder *pFolder) {
   m_XMLWriter.Write(CFmtStrMax("Name=\"%s\"", name.String()));
   m_XMLWriter.Write(">");
 
-  for (int iIndex = pFolder->m_Files.Head();
+  for (auto iIndex = pFolder->m_Files.Head();
        iIndex != pFolder->m_Files.InvalidIndex();
        iIndex = pFolder->m_Files.Next(iIndex)) {
     if (!WriteFile(pFolder->m_Files[iIndex])) return false;
   }
 
-  for (int iIndex = pFolder->m_Folders.Head();
+  for (auto iIndex = pFolder->m_Folders.Head();
        iIndex != pFolder->m_Folders.InvalidIndex();
        iIndex = pFolder->m_Folders.Next(iIndex)) {
     if (!WriteFolder(pFolder->m_Folders[iIndex])) return false;
@@ -202,13 +202,13 @@ bool CProjectGenerator_Win32::WriteToXML() {
 
   CProjectFolder *pRootFolder = m_pVCProjGenerator->GetRootFolder();
 
-  for (int iIndex = pRootFolder->m_Folders.Head();
+  for (auto iIndex = pRootFolder->m_Folders.Head();
        iIndex != pRootFolder->m_Folders.InvalidIndex();
        iIndex = pRootFolder->m_Folders.Next(iIndex)) {
     if (!WriteFolder(pRootFolder->m_Folders[iIndex])) return false;
   }
 
-  for (int iIndex = pRootFolder->m_Files.Head();
+  for (auto iIndex = pRootFolder->m_Files.Head();
        iIndex != pRootFolder->m_Files.InvalidIndex();
        iIndex = pRootFolder->m_Files.Next(iIndex)) {
     if (!WriteFile(pRootFolder->m_Files[iIndex])) return false;

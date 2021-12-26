@@ -2537,8 +2537,8 @@ void KeyValues::UnpackIntoStructure(
     switch (pUnpackTable->m_eDataType) {
       case UNPACK_TYPE_FLOAT: {
         float default_value = (pUnpackTable->m_pKeyDefault)
-                                  ? atof(pUnpackTable->m_pKeyDefault)
-                                  : 0.0;
+                                  ? strtof(pUnpackTable->m_pKeyDefault, nullptr)
+                                  : 0.0F;
         *((float *)dest_field) =
             GetFloat(pUnpackTable->m_pKeyName, default_value);
         break;
@@ -2603,7 +2603,7 @@ void KeyValues::UnpackIntoStructure(
           else
             dest_v->Init(0, 0, 0);
         }
-        *(dest_v) *= (1.0 / 255);
+        *(dest_v) *= (1.0F / 255);
       }
     }
     pUnpackTable++;

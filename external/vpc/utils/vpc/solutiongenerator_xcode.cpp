@@ -304,27 +304,6 @@ static bool IsDynamicLibrary(const char *pszFileName) {
   return false;
 }
 
-static const char *EscapeQuotes(const char *pStr) {
-  int len = V_strlen(pStr);
-  static char str[4096];
-  int j = 0;
-  // Be careful, do not overflow buffer here via i or j.
-  for (int i = 0; i < len && j < V_ARRAYSIZE(str);) {
-    if (pStr[i] == '"') {
-      str[j++] = '\\';
-      if (j < V_ARRAYSIZE(str)) {
-        str[j++] = '\\';
-      }
-    }
-    if (j < V_ARRAYSIZE(str)) {
-      str[j++] = pStr[i++];
-    }
-  }
-  str[j] = '\0';
-
-  return str;
-}
-
 static void UsePOSIXSlashes(const char *pStr, char *pOut, int nOutSize) {
   int len = V_strlen(pStr) + 2;
   char *str = pOut;
@@ -461,21 +440,6 @@ static bool ProjectProducesBinary(
           g_pOption_OutputFile) ||
       pProjectDataCollector->m_BaseConfigData.m_Configurations[0]->GetOption(
           g_pOption_GameOutputFile));
-}
-
-static bool NeedsBuildFileEntry(const char *pszFileName) {
-  const char *pchExtension =
-      V_GetFileExtension(V_UnqualifiedFileName(pszFileName));
-  if (!pchExtension)
-    return false;
-  else if (!V_stricmp(pchExtension, "cpp") || !V_stricmp(pchExtension, "cxx") ||
-           !V_stricmp(pchExtension, "cc") || !V_stricmp(pchExtension, "c") ||
-           !V_stricmp(pchExtension, "m") || !V_stricmp(pchExtension, "mm") ||
-           !V_stricmp(pchExtension, "cc"))
-    return true;
-  else if (!V_stricmp(pchExtension, "a") || !V_stricmp(pchExtension, "dylib"))
-    return true;
-  return false;
 }
 
 static bool IsSourceFile(const char *pszFileName) {
@@ -1685,7 +1649,6 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
           KeyValues *pConfigKV = g_vecPGenerators[iGenerator]
                                      ->m_BaseConfigData.m_Configurations[0]
                                      ->m_pKV;
-          const char *pszConfigName = k_rgchConfigNames[0];
           CUtlString sOutputFile = OutputFileWithDirectoryFromConfig(pConfigKV);
           if (sOutputFile.Length()) {
             char rgchFileType[MAX_PATH];

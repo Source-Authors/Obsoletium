@@ -221,6 +221,7 @@ void CKeyValuesSystem::RegisterSizeofKeyValues(int size) {
   }
 }
 
+#ifdef KEYVALUES_USE_POOL
 static void KVLeak(char const *fmt, ...) {
   va_list argptr;
   char data[1024];
@@ -231,6 +232,7 @@ static void KVLeak(char const *fmt, ...) {
 
   Msg(data);
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: allocates a KeyValues object from the shared mempool

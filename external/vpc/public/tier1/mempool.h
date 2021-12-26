@@ -25,7 +25,8 @@ class CUtlMemoryPool {
   };
 
   CUtlMemoryPool(int blockSize, int numElements, int growMode = GROW_FAST,
-                 const char *pszAllocOwner = NULL, int nAlignment = 0);
+                 const char *pszAllocOwner = NULL,
+                 unsigned short nAlignment = 0);
   ~CUtlMemoryPool();
 
   void *Alloc();  // Allocate the element size you specified in the constructor.
@@ -86,7 +87,7 @@ class CUtlMemoryPool {
 class CMemoryPoolMT : public CUtlMemoryPool {
  public:
   CMemoryPoolMT(int blockSize, int numElements, int growMode = GROW_FAST,
-                const char *pszAllocOwner = NULL, int nAlignment = 0)
+                const char *pszAllocOwner = NULL, unsigned short nAlignment = 0)
       : CUtlMemoryPool(blockSize, numElements, growMode, pszAllocOwner,
                        nAlignment) {}
 

@@ -314,7 +314,7 @@ void *Plat_SimpleLog(const tchar *file, int line) {
 //			... -
 //-----------------------------------------------------------------------------
 void COM_TimestampedLog(char const *fmt, ...) {
-  static float s_LastStamp = 0.0;
+  static double s_LastStamp = 0.0;
   static bool s_bShouldLog = false;
   static bool s_bShouldLogToConsole = false;
   static bool s_bShouldLogToETW = false;
@@ -344,7 +344,7 @@ void COM_TimestampedLog(char const *fmt, ...) {
   Tier0Internal_vsnprintf(string, sizeof(string), fmt, argptr);
   va_end(argptr);
 
-  float curStamp = Plat_FloatTime();
+  double curStamp = Plat_FloatTime();
 
 #if defined(_X360)
   XBX_rTimeStampLog(curStamp, string);

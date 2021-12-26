@@ -438,7 +438,7 @@ void CCvar::AddSplitScreenConVars() {
     if (!pConVar->IsFlagSet(FCVAR_SS)) continue;
 
     // See if it's already mapped in
-    int idx = m_SplitScreenAddedConVarsMap.Find(pConVar);
+    unsigned short idx = m_SplitScreenAddedConVarsMap.Find(pConVar);
     if (idx == m_SplitScreenAddedConVarsMap.InvalidIndex()) {
       idx = m_SplitScreenAddedConVarsMap.Insert(pConVar);
     }
@@ -660,14 +660,14 @@ void CCvar::RevertFlaggedConVars(int nFlag) {
     ConCommandBase *var = m_CommandHash[i];
     if (var->IsCommand()) continue;
 
-    ConVar *cvar = (ConVar *)var;
+    ConVar *cv = (ConVar *)var;
 
-    if (!cvar->IsFlagSet(nFlag)) continue;
+    if (!cv->IsFlagSet(nFlag)) continue;
 
     // It's == to the default value, don't count
-    if (!V_stricmp(cvar->GetDefault(), cvar->GetString())) continue;
+    if (!V_stricmp(cv->GetDefault(), cv->GetString())) continue;
 
-    cvar->Revert();
+    cv->Revert();
     // DevMsg( "%s = \"%s\" (reverted)\n", cvar->GetName(), cvar->GetString() );
   }
 }

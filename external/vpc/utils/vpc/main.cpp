@@ -774,7 +774,7 @@ void CVPC::SpewUsage(void) {
     for (int i = 0; i < m_Projects.Count(); i++) {
       sorted.Insert(m_Projects[i].name.String());
     }
-    for (int i = sorted.FirstInorder(); i != sorted.InvalidIndex();
+    for (auto i = sorted.FirstInorder(); i != sorted.InvalidIndex();
          i = sorted.NextInorder(i)) {
       Log_Msg(LOG_VPC, "[+/-] %s\n", sorted[i]);
     }
@@ -789,7 +789,7 @@ void CVPC::SpewUsage(void) {
         sorted.Insert(g_pVPC->m_GroupTags[i].name.String());
       }
     }
-    for (int i = sorted.FirstInorder(); i != sorted.InvalidIndex();
+    for (auto i = sorted.FirstInorder(); i != sorted.InvalidIndex();
          i = sorted.NextInorder(i)) {
       Log_Msg(LOG_VPC, "[+/-] %s\n", sorted[i]);
     }
@@ -2296,11 +2296,11 @@ const char *CVPC::BuildTempGroupScript(const char *pVPCScriptName) {
   // Generate a really crappy temp filename
   uint32 tmpHash = rand();
   for (const char *c = pVPCScriptName; *c; ++c) tmpHash = tmpHash * 257 + *c;
-  uint32 tmpTime = time(NULL);
+  time_t tmpTime = time(nullptr);
 
   char tempGroupScriptFilename[MAX_PATH];
   V_ComposeFileName(szCurrentDirectory,
-                    CFmtStr("%08x%08xvgc.tmp", tmpHash, tmpTime),
+                    CFmtStr("%08x%08llxvgc.tmp", tmpHash, (long long)tmpTime),
                     tempGroupScriptFilename, sizeof(tempGroupScriptFilename));
   m_TempGroupScriptFilename = tempGroupScriptFilename;
 

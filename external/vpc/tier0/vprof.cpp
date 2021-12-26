@@ -723,7 +723,7 @@ void CVProfile::DumpNodes(CVProfNode *pNode, int indent,
       dNodeTime = iterTimeLessChildren->second;
 
     if (bAverageAndCountOnly) {
-      Msg(_T("  %10.3f %9.2f      %8d"),
+      Msg(_T("  %10.3f %9.2f      %8u"),
           (pNode->GetTotalCalls() > 0)
               ? pNode->GetTotalTime() / (double)NumFramesSampled()
               : 0,
@@ -731,7 +731,7 @@ void CVProfile::DumpNodes(CVProfNode *pNode, int indent,
                                        : 0,
           pNode->GetTotalCalls());
     } else {
-      Msg(_T("  %10.3f %9.2f      %10.3f %6.2f      %10.3f %6.2f   %8d %6.2f"),
+      Msg(_T("  %10.3f %9.2f      %10.3f %6.2f      %10.3f %6.2f   %8u %6.2f"),
           pNode->GetTotalTime(), dNodeTime,
           (pNode->GetTotalCalls() > 0)
               ? pNode->GetTotalTime() / (double)NumFramesSampled()

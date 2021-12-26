@@ -13,8 +13,6 @@
 #include "tier0_strtools.h"
 #endif
 
-//#include "tier1/strtools.h" // this is included for the definition of
-// V_isspace()
 #ifdef PLATFORM_WINDOWS_PC
 #include <intrin.h>
 #endif
@@ -78,7 +76,7 @@ static bool cpuid(uint32 function, uint32& out_eax, uint32& out_ebx,
 #endif
 }
 
-static bool CheckMMXTechnology(void) {
+static bool CheckMMXTechnology() {
 #if defined(_X360) || defined(_PS3)
   return true;
 #else
@@ -89,7 +87,7 @@ static bool CheckMMXTechnology(void) {
 #endif
 }
 
-static bool CheckSSETechnology(void) {
+static bool CheckSSETechnology() {
 #if defined(_X360) || defined(_PS3)
   return true;
 #else
@@ -103,7 +101,7 @@ static bool CheckSSETechnology(void) {
 #endif
 }
 
-static bool CheckSSE2Technology(void) {
+static bool CheckSSE2Technology() {
 #if defined(_X360) || defined(_PS3)
   return false;
 #else
@@ -114,7 +112,7 @@ static bool CheckSSE2Technology(void) {
 #endif
 }
 
-bool CheckSSE3Technology(void) {
+bool CheckSSE3Technology() {
 #if defined(_X360) || defined(_PS3)
   return false;
 #else
@@ -125,7 +123,7 @@ bool CheckSSE3Technology(void) {
 #endif
 }
 
-bool CheckSSSE3Technology(void) {
+bool CheckSSSE3Technology() {
 #if defined(_X360) || defined(_PS3)
   return false;
 #else
@@ -138,13 +136,12 @@ bool CheckSSSE3Technology(void) {
 #endif
 }
 
-bool CheckSSE41Technology(void) {
+bool CheckSSE41Technology() {
 #if defined(_X360) || defined(_PS3)
   return false;
 #else
   // SSE 4.1 is implemented by both Intel and AMD
   // detection is done the same way for both vendors
-
   uint32 eax, ebx, edx, ecx;
   if (!cpuid(1, eax, ebx, ecx, edx)) return false;
 
@@ -152,15 +149,12 @@ bool CheckSSE41Technology(void) {
 #endif
 }
 
-bool CheckSSE42Technology(void) {
+bool CheckSSE42Technology() {
 #if defined(_X360) || defined(_PS3)
   return false;
 #else
-  // SSE4.2 is an Intel-only feature
-
-  const char* pchVendor = GetProcessorVendorId();
-  if (0 != V_tier0_stricmp(pchVendor, "GenuineIntel")) return false;
-
+  // SSE 4.2 is implemented by both Intel and AMD
+  // detection is done the same way for both vendors
   uint32 eax, ebx, edx, ecx;
   if (!cpuid(1, eax, ebx, ecx, edx)) return false;
 
@@ -168,12 +162,11 @@ bool CheckSSE42Technology(void) {
 #endif
 }
 
-bool CheckSSE4aTechnology(void) {
+bool CheckSSE4aTechnology() {
 #if defined(_X360) || defined(_PS3)
   return false;
 #else
   // SSE 4a is an AMD-only feature
-
   const char* pchVendor = GetProcessorVendorId();
   if (0 != V_tier0_stricmp(pchVendor, "AuthenticAMD")) return false;
 
@@ -184,7 +177,7 @@ bool CheckSSE4aTechnology(void) {
 #endif
 }
 
-static bool Check3DNowTechnology(void) {
+static bool Check3DNowTechnology() {
 #if defined(_X360) || defined(_PS3)
   return false;
 #else
@@ -211,7 +204,7 @@ static bool CheckCMOVTechnology() {
 #endif
 }
 
-static bool CheckFCMOVTechnology(void) {
+static bool CheckFCMOVTechnology() {
 #if defined(_X360) || defined(_PS3)
   return false;
 #else
@@ -222,7 +215,7 @@ static bool CheckFCMOVTechnology(void) {
 #endif
 }
 
-static bool CheckRDTSCTechnology(void) {
+static bool CheckRDTSCTechnology() {
 #if defined(_X360) || defined(_PS3)
   return false;
 #else
@@ -261,65 +254,8 @@ const tchar* GetProcessorVendorId() {
 #endif
 }
 
-// Returns non-zero if Hyper-Threading Technology is supported on the processors
-// and zero if not. If it's supported, it does not mean that it's been enabled.
-// So we test another flag to see if it's enabled See Intel Processor
-// Identification and the CPUID instruction Application Note 485
-// http://www.intel.com/Assets/PDF/appnote/241618.pdf
-static bool HTSupported(void) {
-#if (defined(_X360) || defined(_PS3))
-  // not entirtely sure about the semantic of HT support, it being an intel name
-  // are we asking about HW threads or HT?
-  return true;
-#else
-  enum {
-    HT_BIT = 0x10000000,  // EDX[28] - Bit 28 set indicates Hyper-Threading
-                          // Technology is supported in hardware.
-    FAMILY_ID =
-        0x0f00,  // EAX[11:8] - Bit 11 thru 8 contains family processor id
-    EXT_FAMILY_ID = 0x0f00000,  // EAX[23:20] - Bit 23 thru 20 contains extended
-                                // family  processor id
-    FAMILY_ID_386 = 0x0300,
-    FAMILY_ID_486 = 0x0400,  // EAX[8:12]  -  486, 487 and overdrive
-    FAMILY_ID_PENTIUM =
-        0x0500,  //               Pentium, Pentium OverDrive  60 - 200
-    FAMILY_ID_PENTIUM_PRO =
-        0x0600,  //            P Pro, P II, P III, P M, Celeron M, Core Duo,
-                 //            Core Solo, Core2 Duo, Core2 Extreme, P D, Xeon
-                 //            model F, also 45-nm : Intel Atom, Core i7, Xeon
-                 //            MP ; see Intel Processor Identification and the
-                 //            CPUID instruction pg 20,21
-
-    FAMILY_ID_EXTENDED = 0x0F00  //               P IV, Xeon, Celeron D, P D,
-  };
-
-  uint32 unused, reg_eax = 0, reg_ebx = 0, reg_edx = 0,
-                 vendor_id[3] = {0, 0, 0};
-
-  // verify cpuid instruction is supported
-  if (!cpuid(0, unused, vendor_id[0], vendor_id[2], vendor_id[1]) ||
-      !cpuid(1, reg_eax, reg_ebx, unused, reg_edx))
-    return false;
-
-  // <Sergiy> Previously, we detected P4 specifically; now, we detect
-  // GenuineIntel with HT enabled in general if (((reg_eax & FAMILY_ID) ==
-  // FAMILY_ID_EXTENDED) || (reg_eax & EXT_FAMILY_ID))
-
-  //  Check to see if this is an Intel Processor with HT or CMT capability , and
-  //  if HT/CMT is enabled
-  if (vendor_id[0] == 'uneG' && vendor_id[1] == 'Ieni' &&
-      vendor_id[2] == 'letn')
-    return (reg_edx & HT_BIT) != 0 &&  // Genuine Intel Processor with
-                                       // Hyper-Threading Technology implemented
-           ((reg_ebx >> 16) & 0xFF) >
-               1;  // Hyper-Threading OR Core Multi-Processing has been enabled
-
-  return false;  // This is not a genuine Intel processor.
-#endif
-}
-
-// See Intel Processor Identification and the CPUID instruction Application Note
-// 485 http://www.intel.com/Assets/PDF/appnote/241618.pdf
+// See Intel® 64 and IA-32 Architectures Developer's Manual: Vol. 2A
+// https://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-software-developer-vol-2a-manual.html
 int LogicalProcessorsPerCore() {
 #if defined(_X360) || defined(_PS3) || defined(LINUX)
   return 2;  //
@@ -469,10 +405,8 @@ const CPUInformation& GetCPUInformation() {
 
   // Redundant, but just in case the user somehow messes with the size.
   memset(&pi, 0x0, sizeof(pi));
-
   // Fill out the structure, and return it:
   pi.m_Size = sizeof(pi);
-
   // Grab the processor frequency:
   pi.m_Speed = CalculateClockSpeed();
 
@@ -485,25 +419,15 @@ const CPUInformation& GetCPUInformation() {
   pi.m_nPhysicalProcessors = 1;
   pi.m_nLogicalProcessors = 2;
 #elif defined(_WIN32) && !defined(_X360)
-  SYSTEM_INFO si;
-  ZeroMemory(&si, sizeof(si));
+  SYSTEM_INFO si = {0};
+  GetNativeSystemInfo(&si);
 
-  GetSystemInfo(&si);
+  pi.m_nLogicalProcessors =
+      static_cast<uint8>(clamp(si.dwNumberOfProcessors, 1U, 255U));
 
-  // Sergiy: fixing: si.dwNumberOfProcessors is the number of logical processors
-  // according to experiments on i7, P4 and a DirectX sample (Aug'09)
-  //         this is contrary to MSDN documentation on GetSystemInfo()
-  //
-  pi.m_nLogicalProcessors = si.dwNumberOfProcessors;
-  if (0 == V_tier0_stricmp(GetProcessorVendorId(), "AuthenticAMD")) {
-    // quick fix for AMD Phenom: it reports 3 logical cores and 4 physical
-    // cores; no AMD CPUs by the end of 2009 have HT, so we'll override HT
-    // detection here
-    pi.m_nPhysicalProcessors = pi.m_nLogicalProcessors;
-  } else {
-    CpuTopology topo;
-    pi.m_nPhysicalProcessors = topo.NumberOfSystemCores();
-  }
+  CpuTopology topo;
+  pi.m_nPhysicalProcessors =
+      static_cast<uint8>(clamp(topo.NumberOfSystemCores(), 1U, 255U));
 
   // Make sure I always report at least one, when running WinXP with the /ONECPU
   // switch, it likes to report 0 processors for some reason.
@@ -539,16 +463,6 @@ const CPUInformation& GetCPUInformation() {
         int cPhysicalId = atoi(pchValue + 1);
         if (cPhysicalId < k_cMaxProcessors) rgbProcessors[cPhysicalId] = true;
       }
-      /* this code will tell us how many physical chips are in the machine, but
-      we want core count, so for the moment, each processor counts as both
-      logical and physical. if ( !strncasecmp( rgchLine, "physical id ", strlen(
-      "physical id " ) ) )
-      {
-              char *pchValue = strchr( rgchLine, ':' );
-              pi.m_nPhysicalProcessors = MAX( pi.m_nPhysicalProcessors, atol(
-      pchValue ) );
-      }
-      */
     }
     fclose(fpCpuInfo);
     for (int i = 0; i < k_cMaxProcessors; i++)
@@ -569,7 +483,6 @@ const CPUInformation& GetCPUInformation() {
   sysctl(mib, 2, &num_cpu, &len, NULL, 0);
   pi.m_nPhysicalProcessors = num_cpu;
   pi.m_nLogicalProcessors = num_cpu;
-
 #endif
 
   // Determine Processor Features:
@@ -586,8 +499,7 @@ const CPUInformation& GetCPUInformation() {
   pi.m_bSSE42 = CheckSSE42Technology();
   pi.m_b3DNow = Check3DNowTechnology();
   pi.m_szProcessorID = (tchar*)GetProcessorVendorId();
-  pi.m_bHT =
-      pi.m_nPhysicalProcessors < pi.m_nLogicalProcessors;  // HTSupported();
+  pi.m_bHT = pi.m_nPhysicalProcessors < pi.m_nLogicalProcessors;
 
   return pi;
 }

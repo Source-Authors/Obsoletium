@@ -77,37 +77,6 @@ static void GetChangelistFilenames( CUtlVector<int> &changelists, CUtlVector<CUt
 	}
 }
 
-static void AddAdditionalDependencies( CUtlVector<CDependency_Project*> &projects, CUtlVector<CDependency_Project*> &allProjects )
-{
-	for ( int nProject=0; nProject < projects.Count(); nProject++ )
-	{
-		CDependency_Project *pCurProject = projects[nProject];
-
-		// Look at all the $AdditionalProjectDependencies projects for this one.
-		for ( int nDependency=0; nDependency < pCurProject->m_AdditionalProjectDependencies.Count(); nDependency++ )
-		{
-			const char *pLookingFor = pCurProject->m_AdditionalProjectDependencies[nDependency].String();
-			
-			// Search for a match in allProjects.
-			int nFound = CDependency_Project::FindByProjectName( allProjects, pLookingFor );
-			if ( nFound == -1 )
-			{
-				g_pVPC->VPCError( "P4SLN: Project %s lists '%s' in its $AdditionalProjectDependencies, but there is no project by that name.", pCurProject->GetName(), pLookingFor );
-			}
-			else
-			{
-				// Got a match.
-				CDependency_Project *pFound = allProjects[nFound];
-				int nTest = projects.Find( pFound );
-				if ( nTest == projects.InvalidIndex() )
-				{
-					projects.AddToTail( pFound );
-				}
-			}
-		}
-	}
-}
-
 static void GetProjectsDependingOnFiles( CProjectDependencyGraph &dependencyGraph, CUtlVector<CUtlString> &filenames, CUtlVector<CDependency_Project*> &projects )
 {
 	// Now figure out the projects that depend on each of these files.

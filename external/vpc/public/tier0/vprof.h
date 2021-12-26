@@ -384,7 +384,7 @@ class PLATFORM_CLASS CVProfNode {
   double GetCurTime();
   int GetPrevCalls();
   double GetPrevTime();
-  int GetTotalCalls();
+  unsigned GetTotalCalls();
   double GetTotalTime();
   double GetPeakTime();
 
@@ -793,7 +793,7 @@ PLATFORM_INTERFACE bool g_VProfSignalSpike;
 
 class CVProfSpikeDetector {
  public:
-  CVProfSpikeDetector(float spike) : m_timeLast(GetTimeLast()) {
+  CVProfSpikeDetector(double spike) : m_timeLast(GetTimeLast()) {
     m_spike = spike;
     m_Timer.Start();
   }
@@ -809,13 +809,13 @@ class CVProfSpikeDetector {
   }
 
  private:
-  static float &GetTimeLast() {
-    static float timeLast = 0;
+  static double &GetTimeLast() {
+    static double timeLast = 0;
     return timeLast;
   }
   CFastTimer m_Timer;
-  float m_spike;
-  float &m_timeLast;
+  double m_spike;
+  double &m_timeLast;
 };
 
 // Macro to signal a local spike. Meant as temporary instrumentation, do not
@@ -943,7 +943,7 @@ inline const tchar *CVProfNode::GetName() { return m_pszName; }
 
 //-------------------------------------
 
-inline int CVProfNode::GetTotalCalls() { return m_nTotalCalls; }
+inline unsigned CVProfNode::GetTotalCalls() { return m_nTotalCalls; }
 
 //-------------------------------------
 

@@ -160,11 +160,10 @@ int GetCallStack_Fast(void **pReturnAddressesOut, int iArrayCount,
                                        // traverse before this address
   int i;
 
-  CStackTop_FriendFuncs *pTop =
-      (CStackTop_FriendFuncs *)(CStackTop_Base *)g_StackTop;
-  if (pTop != NULL)  // we can do fewer error checks if we have a valid
-                     // reference point for the top of the stack
-  {
+  auto *pTop = (CStackTop_FriendFuncs *)(CStackTop_Base *)g_StackTop;
+  // we can do fewer error checks if we have a valid reference point for the top
+  // of the stack
+  if (pTop != NULL) {
     void *pNoGreaterThan = pTop->m_pStackBase;
 
     // skips
@@ -190,39 +189,37 @@ int GetCallStack_Fast(void **pReturnAddressesOut, int iArrayCount,
     }
 
     return AppendParentStackTrace(pReturnAddressesOut, iArrayCount, i);
-  } else {
-    void *pNoGreaterThan =
-        ((unsigned char *)pNoLessThan) +
-        (1024 * 1024);  // standard stack is 1MB. TODO: Get actual stack end
-                        // address if available since this check isn't foolproof
-
-    // skips
-    for (i = 0; i != iSkipCount; ++i) {
-      if (!ValidStackAddress(pStackCrawlEBP, pNoLessThan, pNoGreaterThan))
-        return AppendParentStackTrace(pReturnAddressesOut, iArrayCount, 0);
-
-      pNoLessThan = pStackCrawlEBP;
-      pStackCrawlEBP =
-          *(void **)pStackCrawlEBP;  // should be pointing at old ebp value
-    }
-
-    // store
-    for (i = 0; i != iArrayCount; ++i) {
-      if (!ValidStackAddress(pStackCrawlEBP, pNoLessThan, pNoGreaterThan))
-        break;
-
-      pReturnAddressesOut[i] = *((void **)pStackCrawlEBP + 1);
-
-      pNoLessThan = pStackCrawlEBP;
-      pStackCrawlEBP =
-          *(void **)pStackCrawlEBP;  // should be pointing at old ebp value
-    }
-
-    return AppendParentStackTrace(pReturnAddressesOut, iArrayCount, i);
   }
-#endif
 
+  // standard stack is 1MB. TODO: Get actual stack end address if available
+  // since this check isn't foolproof
+  void *pNoGreaterThan = ((unsigned char *)pNoLessThan) + (1024 * 1024);
+
+  // skips
+  for (i = 0; i != iSkipCount; ++i) {
+    if (!ValidStackAddress(pStackCrawlEBP, pNoLessThan, pNoGreaterThan))
+      return AppendParentStackTrace(pReturnAddressesOut, iArrayCount, 0);
+
+    pNoLessThan = pStackCrawlEBP;
+    // should be pointing at old ebp value
+    pStackCrawlEBP = *(void **)pStackCrawlEBP;
+  }
+
+  // store
+  for (i = 0; i != iArrayCount; ++i) {
+    if (!ValidStackAddress(pStackCrawlEBP, pNoLessThan, pNoGreaterThan)) break;
+
+    pReturnAddressesOut[i] = *((void **)pStackCrawlEBP + 1);
+
+    pNoLessThan = pStackCrawlEBP;
+    // should be pointing at old ebp value
+    pStackCrawlEBP = *(void **)pStackCrawlEBP;
+  }
+
+  return AppendParentStackTrace(pReturnAddressesOut, iArrayCount, i);
+#else
   return 0;
+#endif
 }
 #pragma auto_inline(on)
 
@@ -233,8 +230,8 @@ int GetCallStack_Fast(void **pReturnAddressesOut, int iArrayCount,
 
 #if defined(TIER0_FPO_DISABLED)
 //#	define USE_CAPTURESTACKBACKTRACE //faster than StackWalk64, but only
-//works on XP or newer and only with Frame Pointer Omission optimization
-//disabled(/Oy-) for every function it traces through
+// works on XP or newer and only with Frame Pointer Omission optimization
+// disabled(/Oy-) for every function it traces through
 #endif
 
 #if defined(_M_IX86) || defined(_M_X64)
@@ -545,7 +542,8 @@ class CHelperFunctionsLoader {
     if (iTranslationBufferLength <= 0) return false;
 
     // sample desired output
-    // valid translation -		"tier0.dll!CHelperFunctionsLoader::TranslatePointer
+    // valid translation -
+    // "tier0.dll!CHelperFunctionsLoader::TranslatePointer
     // - u:\Dev\L4D\src\tier0\stacktools.cpp(162) + 4 bytes" fallback
     // translation -	"tier0.dll!0x01234567"
 
@@ -912,8 +910,8 @@ int GetCallStack(void **pReturnAddressesOut, int iArrayCount, int iSkipCount) {
 #endif
 #if defined(USE_STACKWALK64)
   if (s_HelperFunctions.m_pStackWalk64 != StackWalk64_DummyFn) {
-    int iInOutArrayCount = iArrayCount;  // array count becomes both input and
-                                         // output with exception handler version
+    // array count becomes both input and output with exception handler version
+    int iInOutArrayCount = iArrayCount;
     __try {
       ::RaiseException(0, EXCEPTION_NONCONTINUABLE, 0, NULL);
     } __except (GetCallStackReturnAddresses_Exception(
@@ -1128,8 +1126,8 @@ class C360StackTranslationHelper {
                                int iAddressCount) {
     int ReturnedTranslatedCount = -1;
     // construct the message
-    //				Header	Finished Count(out)		Input Count					Input Array
-    //Returned data write address
+    //				Header	Finished Count(out)		Input
+    // Count Input Array Returned data write address
     int iMessageSize = 2 + sizeof(int *) + sizeof(uint32) +
                        (sizeof(void *) * iAddressCount) +
                        sizeof(FullStackInfo_t *);
@@ -1218,16 +1216,16 @@ class C360StackTranslationHelper {
         pReturnedStructs[i].pAddress = 0;
         pReturnedStructs[i].szFileName[0] =
             '\0';  // strncpy( pReturnedStructs[i].szFileName,
-                   // "FileUninitialized", sizeof( pReturnedStructs[i].szFileName
-                   // ) );
+                   // "FileUninitialized", sizeof(
+                   // pReturnedStructs[i].szFileName ) );
         pReturnedStructs[i].szModuleName[0] =
             '\0';  // strncpy( pReturnedStructs[i].szModuleName,
                    // "ModuleUninitialized", sizeof(
                    // pReturnedStructs[i].szModuleName ) );
         pReturnedStructs[i].szSymbol[0] =
             '\0';  // strncpy( pReturnedStructs[i].szSymbol,
-                   // "SymbolUninitialized", sizeof( pReturnedStructs[i].szSymbol
-                   // ) );
+                   // "SymbolUninitialized", sizeof(
+                   // pReturnedStructs[i].szSymbol ) );
         pReturnedStructs[i].iLine = 0;
         pReturnedStructs[i].iSymbolOffset = 0;
       }
@@ -1377,7 +1375,7 @@ void StackToolsNotify_LoadedLibrary(const char *szLibName) {
   uint8 message[2];
   message[0] = XBX_DBG_BNH_STACKTRANSLATOR;  // have this message handled by
                                              // stack translator handler
-  message[1] = ST_BHC_LOADEDLIBARY;  // loaded a library notification
+  message[1] = ST_BHC_LOADEDLIBARY;          // loaded a library notification
   XBX_SendBinaryData(message, 2);
 }
 
@@ -1578,9 +1576,9 @@ void CStackTop_ReferenceParentStack::ReleaseParentStackReferences(void) {
 // Encodes data so that every byte's most significant bit is a 1. Ensuring no
 // null terminators. This puts the encoded data in the 128-255 value range.
 // Leaving all standard ascii characters for control. Returns string length (not
-// including the written null terminator as is standard). Or if the buffer is too
-// small. Returns negative of necessary buffer size (including room needed for
-// null terminator)
+// including the written null terminator as is standard). Or if the buffer is
+// too small. Returns negative of necessary buffer size (including room needed
+// for null terminator)
 int EncodeBinaryToString(const void *pToEncode, int iDataLength,
                          char *pEncodeOut, int iEncodeBufferSize) {
   int iEncodedSize = iDataLength;
@@ -1637,8 +1635,8 @@ int EncodeBinaryToString(const void *pToEncode, int iDataLength,
 // string byte count. Returns:
 //	>= 0 is the decoded data size
 //	INT_MIN (most negative value possible) indicates an improperly formatted
-//string (not our data) 	all other negative values are the negative of how much
-//dest buffer size is necessary.
+// string (not our data) 	all other negative values are the negative of
+// how much dest buffer size is necessary.
 int DecodeBinaryFromString(const char *pString, void *pDestBuffer,
                            int iDestBufferSize, char **ppParseFinishOut) {
   const uint8 *pDecodeRead = (const uint8 *)pString;

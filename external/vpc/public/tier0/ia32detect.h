@@ -269,7 +269,7 @@ class ia32detect {
 
     m = 0;
 
-    for (int ci3 = 1; ci3 < 256; ci3++)
+    for (::byte ci3 = 1; ci3 != 0 && ci3 <= 255; ci3++)
       if (c[ci3]) cache[m++] = ci3;
 
     cache[m] = 0;

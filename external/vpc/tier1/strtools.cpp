@@ -329,7 +329,7 @@ char *V_strnlwr(char *s, size_t count) {
   while (--count > 0) {
     if (!*s) return pRet;  // reached end of string
 
-    *s = tolower(*s);
+    *s = static_cast<char>(tolower(*s));
     ++s;
   }
 
@@ -501,7 +501,7 @@ int V_atoi(const char *str) { return (int)V_atoi64(str); }
 float V_atof(const char *str) {
   DEBUG_LINK_CHECK;
   AssertValidStringPtr(str);
-  double val;
+  float val;
   int sign;
   int c;
   int decimal, total;
@@ -562,7 +562,7 @@ float V_atof(const char *str) {
   }
 
   if (exponent != 0) {
-    val *= pow(10.0, exponent);
+    val *= powf(10.0F, exponent);
   }
   if (decimal == -1) return val * sign;
   while (total > decimal) {
@@ -831,10 +831,9 @@ int V_vsnprintfRet(char *pDest, int maxLen, const char *pFormat, va_list params,
 //  we copy only as many characters as are specified in max_chars_to_copy (or
 //  the # of characters in pSrc if thats's less).
 // Input  : *pDest - destination buffer
-//			*pSrc - string to append
-//			destBufferSize - sizeof the buffer pointed to by pDest
-//			max_chars_to_copy - COPY_ALL_CHARACTERS in pSrc or max # to
-//copy
+// *pSrc - string to append
+// destBufferSize - sizeof the buffer pointed to by pDest
+// max_chars_to_copy - COPY_ALL_CHARACTERS in pSrc or max # to copy
 // Output : char * the copied buffer
 //-----------------------------------------------------------------------------
 char *V_strncat(char *pDest, const char *pSrc, size_t maxLenInBytes,
@@ -873,9 +872,10 @@ char *V_strncat(char *pDest, const char *pSrc, size_t maxLenInBytes,
 //  we copy only as many characters as are specified in max_chars_to_copy (or
 //  the # of characters in pSrc if thats's less).
 // Input  : *pDest - destination buffer
-//			*pSrc - string to append
-//			maxLenInCharacters - sizeof the buffer in characters pointed
-//to by pDest 			max_chars_to_copy - COPY_ALL_CHARACTERS in pSrc or max # to copy
+// *pSrc - string to append
+// maxLenInCharacters - sizeof the buffer in characters
+// pointed to by pDest
+// max_chars_to_copy - COPY_ALL_CHARACTERS in pSrc or max # to copy
 // Output : char * the copied buffer
 //-----------------------------------------------------------------------------
 wchar_t *V_wcsncat(wchar_t *pDest, const wchar_t *pSrc, int maxLenInBytes,
@@ -2017,10 +2017,10 @@ void V_StringToIntArray(int *pVector, int count, const char *pString) {
 void V_StringToColor32(color32 *color, const char *pString) {
   int tmp[4];
   V_StringToIntArray(tmp, 4, pString);
-  color->r = tmp[0];
-  color->g = tmp[1];
-  color->b = tmp[2];
-  color->a = tmp[3];
+  color->r = static_cast<::byte>(tmp[0]);
+  color->g = static_cast<::byte>(tmp[1]);
+  color->b = static_cast<::byte>(tmp[2]);
+  color->a = static_cast<::byte>(tmp[3]);
 }
 
 // 3d memory copy

@@ -42,12 +42,9 @@ inline bool IsPowerOfTwo(int value) { return (value & (value - 1)) == 0; }
 #undef ARRAYSIZE
 #endif
 
-// Return the number of elements in a statically sized array.
-//   DWORD Buffer[100];
-//   RTL_NUMBER_OF(Buffer) == 100
-// This is also popularly known as: NUMBER_OF, ARRSIZE, _countof, NELEM, etc.
-//
-#define RTL_NUMBER_OF_V1(A) (sizeof(A) / sizeof((A)[0]))
+#ifdef _ARRAYSIZE
+#undef _ARRAYSIZE
+#endif
 
 #if defined(__cplusplus) && !defined(MIDL_PASS) && !defined(RC_INVOKED) && \
     !defined(_PREFAST_) && (_MSC_FULL_VER >= 13009466) &&                  \
@@ -87,50 +84,11 @@ inline bool IsPowerOfTwo(int value) { return (value & (value - 1)) == 0; }
 extern "C++" template <typename T, size_t N>
 char (*RtlpNumberOf(UNALIGNED T (&)[N]))[N];
 
-#define RTL_NUMBER_OF_V2(A) (sizeof(*RtlpNumberOf(A)))
-
-// This does not work with:
-//
-// void Foo()
-// {
-//    struct { int x; } y[2];
-//    RTL_NUMBER_OF_V2(y); // illegal use of anonymous local type in template
-//    instantiation
-// }
-//
-// You must instead do:
-//
-// struct Foo1 { int x; };
-//
-// void Foo()
-// {
-//    Foo1 y[2];
-//    RTL_NUMBER_OF_V2(y); // ok
-// }
-//
-// OR
-//
-// void Foo()
-// {
-//    struct { int x; } y[2];
-//    RTL_NUMBER_OF_V1(y); // ok
-// }
-//
-// OR
-//
-// void Foo()
-// {
-//    struct { int x; } y[2];
-//    _ARRAYSIZE(y); // ok
-// }
-
-#else
-#define RTL_NUMBER_OF_V2(A) RTL_NUMBER_OF_V1(A)
-#endif
-
-// ARRAYSIZE is more readable version of RTL_NUMBER_OF_V2
+// ARRAYSIZE is more readable version
 // _ARRAYSIZE is a version useful for anonymous types
-#define ARRAYSIZE(A) RTL_NUMBER_OF_V2(A)
-#define _ARRAYSIZE(A) RTL_NUMBER_OF_V1(A)
+#define ARRAYSIZE(A) (sizeof(*RtlpNumberOf(A)))
+#define _ARRAYSIZE(A) (sizeof(A) / sizeof((A)[0]))
+
+#endif
 
 #endif  // VPC_TIER0_COMMONMACROS_H_

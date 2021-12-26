@@ -20,9 +20,9 @@
 
 // fran1 -- return a random floating-point number on the interval [0,1)
 //
-#define AM (1.0 / IM)
-#define EPS 1.2e-7
-#define RNMX (1.0 - EPS)
+#define AM (1.0F / IM)
+#define EPS 1.2e-7F
+#define RNMX (1.0F - EPS)
 
 //-----------------------------------------------------------------------------
 // globals

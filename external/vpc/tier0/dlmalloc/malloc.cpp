@@ -481,6 +481,7 @@ MAX_RELEASE_CHECK_RATE   default: 255 unless not HAVE_MMAP
   improvement at the expense of carrying around more memory.
 */
 
+//-----------------------------------------------------------------------------
 // Valve specific defines [5/22/2009 tom]
 #define USE_DL_PREFIX
 #define USE_LOCKS 2
@@ -489,7 +490,6 @@ MAX_RELEASE_CHECK_RATE   default: 255 unless not HAVE_MMAP
 #define FOOTERS 1  // for mspace retrieval support
 
 #include "tier0/threadtools.h"
-
 #define ABORT                   \
   do {                          \
     DebuggerBreakIfDebugging(); \
@@ -504,7 +504,8 @@ MAX_RELEASE_CHECK_RATE   default: 255 unless not HAVE_MMAP
 #endif /* WIN32 */
 #ifdef WIN32
 #if !defined(_X360)
-#include "winlite.h"
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #else
 #undef Verify
 #define _XBOX
@@ -1263,17 +1264,21 @@ void* determine_mspace(void* mem);
 
 /*------------------------------ internal #includes ---------------------- */
 
+#ifdef WIN32
+#pragma warning(disable : 4146) /* no "unsigned" warnings */
+#endif                          /* WIN32 */
+
 #include <cstdio> /* for printing in malloc_stats */
 
 #ifndef LACKS_ERRNO_H
 #include <cerrno> /* for malloc_failure_action */
-#endif            /* LACKS_ERRNO_H */
+#endif             /* LACKS_ERRNO_H */
 #if FOOTERS
 #include <ctime> /* for magic initialization */
-#endif           /* FOOTERS */
+#endif            /* FOOTERS */
 #ifndef LACKS_STDLIB_H
 #include <cstdlib> /* for abort() */
-#endif             /* LACKS_STDLIB_H */
+#endif              /* LACKS_STDLIB_H */
 //#ifdef DEBUG
 // #if ABORT_ON_ASSERT_FAILURE
 // #define assert(x) if(!(x)) ABORT
@@ -2793,7 +2798,7 @@ static size_t traverse_and_check(mstate m);
 #define least_bit(x) ((x) & -(x))
 
 /* mask with all bits to left of least bit of x on */
-#define left_bits(x) (((x) << 1) | -((x) << 1))
+#define left_bits(x) ((x << 1) | -(x << 1))
 
 /* mask with all bits to left of or equal to least bit of x on */
 #define same_or_left_bits(x) ((x) | -(x))

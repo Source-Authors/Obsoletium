@@ -144,7 +144,7 @@ uint16 SetWin32ConsoleColor(Win32ConsoleColorContext_t *pContext, int nRed,
 
   // Just use the initial color if there's a match...
   if (pContext->m_LastColor == pContext->m_BadColor)
-    pContext->m_LastColor = pContext->m_InitialColor;
+    pContext->m_LastColor = static_cast<uint16>(pContext->m_InitialColor);
 
   SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
                           pContext->m_LastColor | pContext->m_BackgroundFlags);

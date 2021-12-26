@@ -73,8 +73,8 @@ bool gbCheckNotMultithreaded = true;
 #endif
 
 #ifdef _WIN32
-ASSERT_INVARIANT(TT_SIZEOF_CRITICALSECTION == sizeof(CRITICAL_SECTION));
-ASSERT_INVARIANT(TT_INFINITE == INFINITE);
+static_assert(TT_SIZEOF_CRITICALSECTION == sizeof(CRITICAL_SECTION));
+static_assert(TT_INFINITE == INFINITE);
 #endif
 
 // thread creation counter.
@@ -322,7 +322,7 @@ static uint LookupThreadIDFromHandle( HANDLE hThread )
 	if ( hThread == NULL || hThread == GetCurrentThread() )
 		return GetCurrentThreadId();
 
-	float flStartTime = Plat_FloatTime();
+	double flStartTime = Plat_FloatTime();
 	while ( Plat_FloatTime() - flStartTime < 2 )
 	{
 		CThreadHandleToIDMap *pMap, **ppPrev;

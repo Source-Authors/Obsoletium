@@ -120,13 +120,13 @@ bool CProjectGenerator_Xbox360_2010::WriteFolder(CProjectFolder *pFolder,
     m_XMLWriter.PushNode("ItemGroup");
   }
 
-  for (int iIndex = pFolder->m_Files.Head();
+  for (auto iIndex = pFolder->m_Files.Head();
        iIndex != pFolder->m_Files.InvalidIndex();
        iIndex = pFolder->m_Files.Next(iIndex)) {
     if (!WriteFile(pFolder->m_Files[iIndex], pFileTypeName)) return false;
   }
 
-  for (int iIndex = pFolder->m_Folders.Head();
+  for (auto iIndex = pFolder->m_Folders.Head();
        iIndex != pFolder->m_Folders.InvalidIndex();
        iIndex = pFolder->m_Folders.Next(iIndex)) {
     if (!WriteFolder(pFolder->m_Folders[iIndex], pFileTypeName, nDepth + 1))
@@ -389,7 +389,7 @@ bool CProjectGenerator_Xbox360_2010::WriteFolderToSecondaryXML(
   m_XMLFilterWriter.WriteLineNode("UniqueIdentifier", "", szGUID);
   m_XMLFilterWriter.PopNode(true);
 
-  for (int iIndex = pFolder->m_Folders.Head();
+  for (auto iIndex = pFolder->m_Folders.Head();
        iIndex != pFolder->m_Folders.InvalidIndex();
        iIndex = pFolder->m_Folders.Next(iIndex)) {
     if (!WriteFolderToSecondaryXML(pFolder->m_Folders[iIndex],
@@ -434,7 +434,7 @@ bool CProjectGenerator_Xbox360_2010::WriteFolderContentsToSecondaryXML(
     m_XMLFilterWriter.PushNode("ItemGroup", NULL);
   }
 
-  for (int iIndex = pFolder->m_Files.Head();
+  for (auto iIndex = pFolder->m_Files.Head();
        iIndex != pFolder->m_Files.InvalidIndex();
        iIndex = pFolder->m_Files.Next(iIndex)) {
     if (!WriteFileToSecondaryXML(pFolder->m_Files[iIndex], parentPath.Get(),
@@ -442,7 +442,7 @@ bool CProjectGenerator_Xbox360_2010::WriteFolderContentsToSecondaryXML(
       return false;
   }
 
-  for (int iIndex = pFolder->m_Folders.Head();
+  for (auto iIndex = pFolder->m_Folders.Head();
        iIndex != pFolder->m_Folders.InvalidIndex();
        iIndex = pFolder->m_Folders.Next(iIndex)) {
     if (!WriteFolderContentsToSecondaryXML(pFolder->m_Folders[iIndex],
@@ -470,7 +470,7 @@ bool CProjectGenerator_Xbox360_2010::WriteSecondaryXML(
   // write the root folders
   m_XMLFilterWriter.PushNode("ItemGroup", NULL);
   CProjectFolder *pRootFolder = m_pVCProjGenerator->GetRootFolder();
-  for (int iIndex = pRootFolder->m_Folders.Head();
+  for (auto iIndex = pRootFolder->m_Folders.Head();
        iIndex != pRootFolder->m_Folders.InvalidIndex();
        iIndex = pRootFolder->m_Folders.Next(iIndex)) {
     if (!WriteFolderToSecondaryXML(pRootFolder->m_Folders[iIndex], ""))

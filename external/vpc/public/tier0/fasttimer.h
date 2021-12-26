@@ -90,10 +90,9 @@ class CClockSpeedInit {
       // Mhz
       g_ClockSpeed = pi.m_Speed / 64L;
     } else if (IsPS3()) {
-      g_ClockSpeed =
-          sys_time_get_timebase_frequency();  // CPU clock rate is totally
-                                              // unrelated to time base register
-                                              // frequency on PS3
+      // CPU clock rate is totally unrelated to time base register frequency on
+      // PS3
+      g_ClockSpeed = sys_time_get_timebase_frequency();
     } else {
       g_ClockSpeed = pi.m_Speed;
     }

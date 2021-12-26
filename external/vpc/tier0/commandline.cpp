@@ -23,8 +23,8 @@ static const int MAX_PARAMETER_LEN = 128;
 class CCommandLine : public ICommandLine {
  public:
   // Construction
-  CCommandLine(void);
-  virtual ~CCommandLine(void);
+  CCommandLine();
+  virtual ~CCommandLine();
 
   // Implements ICommandLine
   virtual void CreateCmdLine(const char *commandline);
@@ -41,7 +41,7 @@ class CCommandLine : public ICommandLine {
   virtual const char *GetParm(int nIndex) const;
 
   virtual const char *ParmValue(const char *psz,
-                                const char *pDefaultVal = NULL) const;
+                                const char *pDefaultVal = nullptr) const;
   virtual int ParmValue(const char *psz, int nDefaultVal) const;
   virtual float ParmValue(const char *psz, float flDefaultVal) const;
   virtual void SetParm(int nIndex, char const *pParm);
@@ -83,9 +83,9 @@ ICommandLine *CommandLine() { return &g_CmdLine; }
 // Purpose:
 //-----------------------------------------------------------------------------
 CCommandLine::CCommandLine(void) {
-  m_pszCmdLine = NULL;
+  m_pszCmdLine = nullptr;
   m_nParmCount = 0;
-  m_ppParms[0] = NULL;
+  m_ppParms[0] = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -407,14 +407,14 @@ const char *CCommandLine::GetCmdLine(void) const { return m_pszCmdLine; }
 //-----------------------------------------------------------------------------
 const char *CCommandLine::CheckParm(const char *psz,
                                     const char **ppszValue) const {
-  if (ppszValue) *ppszValue = NULL;
+  if (ppszValue) *ppszValue = nullptr;
 
   int i = FindParm(psz);
-  if (i == 0) return NULL;
+  if (i == 0) return nullptr;
 
   if (ppszValue) {
     if ((i + 1) >= m_nParmCount) {
-      *ppszValue = NULL;
+      *ppszValue = nullptr;
     } else {
       *ppszValue = m_ppParms[i + 1];
     }
@@ -453,13 +453,13 @@ void CCommandLine::ParseCommandLine() {
   }
 
   bool bInQuotes = false;
-  const char *pFirstLetter = NULL;
+  const char *pFirstLetter = nullptr;
   for (; *pChar; ++pChar) {
     if (bInQuotes) {
       if (*pChar != '\"') continue;
 
       AddArgument(pFirstLetter, pChar);
-      pFirstLetter = NULL;
+      pFirstLetter = nullptr;
       bInQuotes = false;
       continue;
     }
@@ -481,7 +481,7 @@ void CCommandLine::ParseCommandLine() {
     // Here, we're in the middle of a word. Look for the end of it.
     if (V_isspace(*pChar)) {
       AddArgument(pFirstLetter, pChar);
-      pFirstLetter = NULL;
+      pFirstLetter = nullptr;
     }
   }
 
@@ -496,7 +496,7 @@ void CCommandLine::ParseCommandLine() {
 void CCommandLine::CleanUpParms() {
   for (int i = 0; i < m_nParmCount; ++i) {
     delete[] m_ppParms[i];
-    m_ppParms[i] = NULL;
+    m_ppParms[i] = nullptr;
   }
   m_nParmCount = 0;
 }

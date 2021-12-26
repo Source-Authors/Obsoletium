@@ -120,7 +120,7 @@ ConCommandBase::~ConCommandBase(void) {}
 //-----------------------------------------------------------------------------
 bool ConCommandBase::IsCommand(void) const {
   //	Assert( 0 ); This can't assert. . causes a recursive assert in
-  //Sys_Printf, etc.
+  // Sys_Printf, etc.
   return true;
 }
 
@@ -690,10 +690,10 @@ bool ConVar::InternalSetColorFromString(const char *value) {
 
       // Stuff all the values into each byte of our int
       unsigned char *pColorElement = ((unsigned char *)&m_Value.m_nValue);
-      pColorElement[0] = nRGBA[0];
-      pColorElement[1] = nRGBA[1];
-      pColorElement[2] = nRGBA[2];
-      pColorElement[3] = nRGBA[3];
+      pColorElement[0] = static_cast<unsigned char>(nRGBA[0]);
+      pColorElement[1] = static_cast<unsigned char>(nRGBA[1]);
+      pColorElement[2] = static_cast<unsigned char>(nRGBA[2]);
+      pColorElement[3] = static_cast<unsigned char>(nRGBA[3]);
 
       // Copy that value into a float (even though this has little meaning)
       m_Value.m_fValue = (float)(m_Value.m_nValue);

@@ -7,11 +7,10 @@
 #include "pch_tier0.h"
 
 #if defined(_WIN32) && !defined(_X360) && !defined(_PS3)
-#include <crtdbg.h>
-
-#include <cstdlib>
-
 #include "cputopology.h"
+
+#include <crtdbg.h>
+#include <cstdlib>
 
 #undef malloc
 #undef free

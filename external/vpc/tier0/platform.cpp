@@ -363,18 +363,6 @@ void Plat_MessageBox(const char *pTitle, const char *pMessage) {
 }
 #endif
 
-PlatOSVersion_t Plat_GetOSVersion() {
-#ifdef PLATFORM_WINDOWS_PC
-  OSVERSIONINFO info = {sizeof(OSVERSIONINFO)};
-  if (GetVersionEx(&info)) return (PlatOSVersion_t)info.dwMajorVersion;
-  return PLAT_OS_VERSION_UNKNOWN;
-#elif defined(PLATFORM_X360)
-  return PLAT_OS_VERSION_XBOX360;
-#else
-  return PLAT_OS_VERSION_UNKNOWN;
-#endif
-}
-
 #if defined(PLATFORM_PS3)
 // copied from platform_posix.cpp
 static char g_CmdLine[2048] = "";

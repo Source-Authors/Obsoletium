@@ -5,7 +5,7 @@
 
 #include "tier0/basetypes.h"
 
-// Purpose: Basic handler for an rgb set of colors This class is fully inline
+// Purpose: Basic handler for an rgb set of colors
 class Color {
  public:
   // constructors

@@ -1306,9 +1306,8 @@ void Internal_LoadAddressMacroAuto(bool bPad) {
       }
 
       if (!bPad) {
-        dllLength = AlignValue(
-            dllLength,
-            64 * 1024);  // will align later when we actually set the darn thing
+        // will align later when we actually set the darn thing
+        dllLength = AlignValue(dllLength, 64 * 1024);
       }
 
       if (dllLength == 0) {

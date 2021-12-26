@@ -177,7 +177,8 @@ void CUtlString::Purge() { m_Storage.Purge(); }
 
 void CUtlString::ToLower() {
   for (int nLength = Length() - 1; nLength >= 0; nLength--) {
-    m_Storage[nLength] = tolower(m_Storage[nLength]);
+    m_Storage[nLength] =
+        static_cast<unsigned char>(tolower(m_Storage[nLength]));
   }
 }
 
@@ -336,7 +337,7 @@ int CUtlString::Format(const char *pFormat, ...) {
   Assert(!m_Storage.IsReadOnly());
 
   char tmpBuf[4096];  //< Nice big 4k buffer, as much memory as my first
-                      //computer had, a Radio Shack Color Computer
+                      // computer had, a Radio Shack Color Computer
 
   va_list marker;
 
