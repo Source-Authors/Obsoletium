@@ -32,8 +32,6 @@ PME* PME::Instance() {
 // Open the device driver and detect the processor
 //---------------------------------------------------------------------------
 HRESULT PME::Init(void) {
-  OSVERSIONINFO OS;
-
   if (bDriverOpen) return E_DRIVER_ALREADY_OPEN;
 
   switch (vendor) {
@@ -48,15 +46,13 @@ HRESULT PME::Init(void) {
   //-----------------------------------------------------------------------
   // Get the operating system version
   //-----------------------------------------------------------------------
-  OS.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-  GetVersionEx(&OS);
 
-  if (OS.dwPlatformId == VER_PLATFORM_WIN32_NT) {
-    hFile = CreateFile(  // WINDOWS NT
+  if (IsWindowsXPOrGreater()) {
+    hFile = CreateFile(  // WINDOWS NT+
         "\\\\.\\GDPERF", GENERIC_READ, 0, NULL, OPEN_EXISTING,
         FILE_ATTRIBUTE_NORMAL, NULL);
   } else {
-    hFile = CreateFile(  // WINDOWS 95
+    hFile = CreateFile(  // WINDOWS NT-
         "\\\\.\\GDPERF.VXD", GENERIC_READ, 0, NULL, OPEN_EXISTING,
         FILE_ATTRIBUTE_NORMAL, NULL);
   }
@@ -549,10 +545,9 @@ const unsigned short cccr_escr_map[NCOUNTERS][8] = {
 #ifdef DBGFLAG_VALIDATE
 //-----------------------------------------------------------------------------
 // Purpose: Ensure that all of our internal structures are consistent, and
-//			account for all memory that we've allocated.
+// account for all memory that we've allocated.
 // Input:	validator -		Our global validator object
-//			pchName -		Our name (typically a member var in our
-//container)
+// pchName -		Our name (typically a member var in our container)
 //-----------------------------------------------------------------------------
 void PME::Validate(CValidator& validator, tchar* pchName) {
   validator.Push(_T("PME"), this, pchName);
