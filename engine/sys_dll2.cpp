@@ -380,11 +380,6 @@ public:
 		}
 
 #ifdef IS_WINDOWS_PC
-		// This warning only applies if you want to catch structured exceptions (crashes)
-		// using C++ exceptions. We do not want to do that so we can build with C++ exceptions
-		// completely disabled, and just suppress this warning.
-		// warning C4535: calling _set_se_translator() requires /EHa
-		#pragma warning( suppress : 4535 )
 		_se_translator_function curfilter = _set_se_translator( &FailSafe );
 #elif defined( POSIX )
 		// Only need to worry about this function crashing when we're dealing with a real crash.

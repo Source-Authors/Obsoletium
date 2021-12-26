@@ -11,8 +11,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#pragma warning( disable : 4800  )  // disable forcing int to bool performance warning
-
 #include "cbase.h"
 #include <cdll_client_int.h>
 #include <cdll_util.h>

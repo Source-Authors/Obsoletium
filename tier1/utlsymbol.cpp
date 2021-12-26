@@ -6,8 +6,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#pragma warning (disable:4514)
-
 #include "utlsymbol.h"
 #include "KeyValues.h"
 #include "tier0/threadtools.h"

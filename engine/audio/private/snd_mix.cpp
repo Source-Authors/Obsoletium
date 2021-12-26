@@ -30,11 +30,6 @@
 extern IReplayMovieManager *g_pReplayMovieManager;
 #endif
 
-#if defined(_WIN32) && id386
-// warning C4731: frame pointer register 'ebp' modified by inline assembly code
-#pragma warning(disable : 4731)
-#endif
-
 // NOTE: !!!!!! YOU MUST UPDATE SND_MIXA.S IF THIS VALUE IS CHANGED !!!!!
 #define SND_SCALE_BITS		7
 #define SND_SCALE_SHIFT		(8-SND_SCALE_BITS)

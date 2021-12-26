@@ -6,11 +6,6 @@
 //
 //=============================================================================//
 
-#ifdef _WIN32
-#pragma warning (disable:4127)
-#pragma warning (disable:4244)
-#endif
-
 #include "cbase.h"
 #include "ivp_controller.hxx"
 

@@ -71,12 +71,10 @@ LINK_ENTITY_TO_CLASS( prop_vehicle, CPropVehicle );
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#pragma warning (disable:4355)
 CPropVehicle::CPropVehicle() : m_VehiclePhysics( this )
 {
 	SetVehicleType( VEHICLE_TYPE_CAR_WHEELS );
 }
-#pragma warning (default:4355)
 
 //-----------------------------------------------------------------------------
 // Purpose: 

@@ -5155,8 +5155,6 @@ float Studio_GetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, flo
 }
 
 
-#pragma warning (disable : 4701)
-
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -5264,7 +5262,6 @@ static int ClipRayToHitbox( const Ray_t &ray, mstudiobbox_t *pbox, matrix3x4_t& 
 	return hitside;
 }
 
-#pragma warning (default : 4701)
 
 
 //-----------------------------------------------------------------------------

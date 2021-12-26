@@ -4,8 +4,6 @@
 //
 //=============================================================================//
 
-// conversion from 'double' to 'float', possible loss of data
-#pragma warning( disable : 4244 ) 
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>

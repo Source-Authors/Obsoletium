@@ -36,11 +36,6 @@
 #endif
 #endif
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
-
 // enable this to get detailed nodes beneath budget
 // #define VPROF_LEVEL 1
 
@@ -1431,9 +1426,6 @@ private:
 #include <pix.h>
 #endif
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif
 

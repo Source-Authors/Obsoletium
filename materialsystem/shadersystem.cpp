@@ -1161,10 +1161,6 @@ void CShaderSystem::ComputeRenderStateFlagsFromSnapshot( ShaderRenderState_t* pR
 //-----------------------------------------------------------------------------
 // Initializes state snapshots
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
-#pragma warning (disable:4189)
-#endif
-
 int CShaderSystem::GetModulationSnapshotCount( IMaterialVar **params )
 {
 	int nSnapshotCount = SnapshotTypeCount();
@@ -1305,10 +1301,6 @@ void CShaderSystem::InitStateSnapshots( IShader *pShader, IMaterialVar **params,
 		CLEAR_FLAGS2( MATERIAL_VAR2_USE_FLASHLIGHT );
 	}
 }
-
-#ifdef _DEBUG
-#pragma warning (default:4189)
-#endif
 
 //-----------------------------------------------------------------------------
 // Helper to count texture coordinates

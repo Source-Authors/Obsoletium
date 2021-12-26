@@ -24,7 +24,6 @@ typedef int socklen_t;
 #include "netapi.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
-#pragma warning(disable: 4706) // warning C4706: assignment within conditional expression
 
 //-----------------------------------------------------------------------------
 // Purpose: Implements INetAPI

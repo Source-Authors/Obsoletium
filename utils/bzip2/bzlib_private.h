@@ -542,17 +542,6 @@ BZ2_hbCreateDecodeTables ( Int32*, Int32*, Int32*, UChar*,
 #endif
 #endif
 
-
-// turn off some compiler warnings - imported from tier0/platform.h
-
-#ifdef _MSC_VER
-#pragma warning(disable : 4127) // warning C4127: conditional expression is constant
-#pragma warning(disable : 4702) // warning C4702: unreachable code
-#pragma warning(disable : 4244) // type conversion warning.
-#pragma warning(disable : 4100) // warning C4100: 'hwnd' : unreferenced formal parameter
-#pragma warning( disable : 4267 )	// conversion from 'size_t' to 'int', possible loss of data
-#endif
-
 /*-------------------------------------------------------------*/
 /*--- end                                   bzlib_private.h ---*/
 /*-------------------------------------------------------------*/

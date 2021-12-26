@@ -7,11 +7,6 @@
 #ifndef NETMESSAGES_H
 #define NETMESSAGES_H
 
-#ifdef _WIN32
-#pragma once
-#pragma warning(disable : 4100)	// unreferenced formal parameter
-#endif
-
 #include <inetmessage.h>
 #include <checksum_crc.h>
 #include <checksum_md5.h>

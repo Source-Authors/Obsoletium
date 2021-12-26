@@ -101,8 +101,6 @@ ConVar sv_rcon_maxpacketbans( "sv_rcon_maxpacketbans", "1", 0, "Ban IPs for send
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-#pragma warning ( disable : 4355 )
-
 CRConServer::CRConServer() : m_Socket( this )
 {
 }
@@ -111,8 +109,6 @@ CRConServer::CRConServer( const char *pNetAddress ) : m_Socket( this )
 {
 	SetAddress( pNetAddress );
 }
-
-#pragma warning ( default : 4355 )
 
 
 //-----------------------------------------------------------------------------

@@ -17,11 +17,6 @@
 #undef max
 #undef min
 
-// There's some constructor problems in the hk stuff...
-// The classes inherit from other classes with private constructor
-#pragma warning (disable : 4510 )
-#pragma warning (disable : 4610 )
-
 // new havana constraint class
 #include "hk_physics/physics.h"
 #include "hk_physics/constraint/constraint.h"

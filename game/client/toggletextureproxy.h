@@ -13,8 +13,6 @@
 class IMaterial;
 class IMaterialVar;
 
-#pragma warning (disable : 4100)
-
 class CBaseToggleTextureProxy : public IMaterialProxy
 {
 public:

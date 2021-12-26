@@ -114,10 +114,6 @@ mat_fullbright 1 doesn't work properly on alpha materials in testroom_standards
 	typedef DWORD* LPDWORD;
 #endif
 
-#ifdef _WIN32
-#pragma warning (disable:4189)
-#endif
-
 ConVar mat_texture_limit( "mat_texture_limit", "-1", FCVAR_NEVER_AS_STRING, 
 	"If this value is not -1, the material system will limit the amount of texture memory it uses in a frame."
 	" Useful for identifying performance cliffs. The value is in kilobytes." );

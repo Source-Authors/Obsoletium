@@ -31,12 +31,6 @@
 #define THREAD_PRIORITY_HIGHEST 2
 #endif
 
-#if defined( _WIN32 )
-#pragma once
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
-
 // #define THREAD_PROFILER 1
 
 #ifndef _RETAIL
@@ -1817,9 +1811,5 @@ template<class T> FORCEINLINE T ReadVolatileMemory( T const *pPtr )
 }
 
 //-----------------------------------------------------------------------------
-
-#if defined( _WIN32 )
-#pragma warning(pop)
-#endif
 
 #endif // THREADTOOLS_H

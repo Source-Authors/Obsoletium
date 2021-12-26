@@ -101,9 +101,6 @@ ConVar r_flashlightdepthres( "r_flashlightdepthres", "1024" );
 
 ConVar r_threaded_client_shadow_manager( "r_threaded_client_shadow_manager", "0" );
 
-#ifdef _WIN32
-#pragma warning( disable: 4701 )
-#endif
 
 // forward declarations
 void ToolFramework_RecordMaterialParams( IMaterial *pMaterial );

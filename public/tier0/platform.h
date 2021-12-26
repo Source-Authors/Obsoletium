@@ -648,42 +648,6 @@ typedef void * HINSTANCE;
 // as little code as possible, and throw an assertion in debug.
 #define NO_DEFAULT default: UNREACHABLE();
 
-
-#ifdef _WIN32
-
-// Remove warnings from warning level 4.
-#pragma warning(disable : 4514) // warning C4514: 'acosl' : unreferenced inline function has been removed
-#pragma warning(disable : 4100) // warning C4100: 'hwnd' : unreferenced formal parameter
-#pragma warning(disable : 4127) // warning C4127: conditional expression is constant
-#pragma warning(disable : 4512) // warning C4512: 'InFileRIFF' : assignment operator could not be generated
-#pragma warning(disable : 4611) // warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
-#pragma warning(disable : 4710) // warning C4710: function 'x' not inlined
-#pragma warning(disable : 4702) // warning C4702: unreachable code
-#pragma warning(disable : 4505) // unreferenced local function has been removed
-#pragma warning(disable : 4239) // nonstandard extension used : 'argument' ( conversion from class Vector to class Vector& )
-#pragma warning(disable : 4097) // typedef-name 'BaseClass' used as synonym for class-name 'CFlexCycler::CBaseFlex'
-#pragma warning(disable : 4324) // Padding was added at the end of a structure
-#pragma warning(disable : 4244) // type conversion warning.
-#pragma warning(disable : 4305)	// truncation from 'const double ' to 'float '
-#pragma warning(disable : 4786)	// Disable warnings about long symbol names
-#pragma warning(disable : 4250) // 'X' : inherits 'Y::Z' via dominance
-#pragma warning(disable : 4201) // nonstandard extension used : nameless struct/union
-#pragma warning(disable : 4481) // warning C4481: nonstandard extension used: override specifier 'override'
-#pragma warning(disable : 4748) // warning C4748: /GS can not protect parameters and local variables from local buffer overrun because optimizations are disabled in function
-
-#if _MSC_VER >= 1300
-#pragma warning(disable : 4511)	// Disable warnings about private copy constructors
-#pragma warning(disable : 4121)	// warning C4121: 'symbol' : alignment of a member was sensitive to packing
-#pragma warning(disable : 4530)	// warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc (disabled due to std headers having exception syntax)
-#endif
-
-#if _MSC_VER >= 1400
-#pragma warning(disable : 4996)	// functions declared deprecated
-#endif
-
-
-#endif // _WIN32
-
 #if defined( LINUX ) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
   // based on some Jonathan Wakely macros on the net...
   #define GCC_DIAG_STR(s) #s
@@ -711,13 +675,6 @@ typedef void * HINSTANCE;
 #pragma GCC diagnostic ignored "-Wswitch"					// enumeration values not handled in switch
 #endif
 
-
-// When we port to 64 bit, we'll have to resolve the int, ptr vs size_t 32/64 bit problems...
-#if !defined( _WIN64 )
-#pragma warning( disable : 4267 )	// conversion from 'size_t' to 'int', possible loss of data
-#pragma warning( disable : 4311 )	// pointer truncation from 'char *' to 'int'
-#pragma warning( disable : 4312 )	// conversion from 'unsigned int' to 'memhandle_t' of greater size
-#endif
 
 
 #ifdef POSIX
@@ -957,9 +914,6 @@ inline T QWordSwapC( T dw )
 	#define WordSwap  WordSwapAsm
 	#define DWordSwap DWordSwapAsm
 
-	#pragma warning(push)
-	#pragma warning (disable:4035) // no return value
-
 	template <typename T>
 	inline T WordSwapAsm( T w )
 	{
@@ -979,8 +933,6 @@ inline T QWordSwapC( T dw )
 		  bswap eax
 	   }
 	}
-
-	#pragma warning(pop)
 
 #else
 

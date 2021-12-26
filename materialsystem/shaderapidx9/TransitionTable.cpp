@@ -316,10 +316,6 @@ void CTransitionTable::Reset()
 //-----------------------------------------------------------------------------
 // Sets the texture stage state
 //-----------------------------------------------------------------------------
-#ifdef _WIN32
-#pragma warning( disable : 4189 )
-#endif
-
 static inline void SetTextureStageState( int stage, D3DTEXTURESTAGESTATETYPE state, DWORD val )
 {
 #if !defined( _X360 )
@@ -352,10 +348,6 @@ static inline void SetTextureStageState( int stage, D3DTEXTURESTAGESTATETYPE sta
 	#define SetRenderStateConstMacro( state, val ) { if ( state != D3DRS_NOTSUPPORTED ) Dx9Device()->SetRenderStateConstInline( state, val ); }
 #else
 	#define SetRenderStateConstMacro( state, val ) SetRenderState( state, val )
-#endif
-
-#ifdef _WIN32
-#pragma warning( default : 4189 )
 #endif
 
 //-----------------------------------------------------------------------------
@@ -1426,10 +1418,6 @@ void CTransitionTable::ApplyTransitionList( int snapshot, int nFirstOp, int nOpC
 //-----------------------------------------------------------------------------
 // Apply startup snapshot
 //-----------------------------------------------------------------------------
-#ifdef _WIN32
-#pragma warning( disable : 4189 )
-#endif
-
 void CTransitionTable::ApplyTransition( TransitionList_t& list, int snapshot )
 {
 	VPROF("CTransitionTable::ApplyTransition");
@@ -1517,10 +1505,6 @@ void CTransitionTable::ApplyTransition( TransitionList_t& list, int snapshot )
 #endif
 #endif
 }
-
-#ifdef _WIN32
-#pragma warning( default : 4189 )
-#endif
 
 //-----------------------------------------------------------------------------
 // Takes a snapshot, hooks it into the material

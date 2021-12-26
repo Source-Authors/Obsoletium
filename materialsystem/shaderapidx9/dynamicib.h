@@ -25,10 +25,6 @@
 // sim.dietrich@nvidia.com
 /////////////////////////////
 
-#ifdef _WIN32
-#pragma warning (disable:4189)
-#endif
-
 #include "locald3dtypes.h"
 #include "tier1/strtools.h"
 #include "tier1/utlqueue.h"
@@ -1045,10 +1041,6 @@ inline int CIndexBuffer::AllocationCount() const
 	return m_IndexCount;
 #endif
 }
-
-#ifdef _WIN32
-#pragma warning (default:4189)
-#endif
 
 #include "tier0/memdbgoff.h"
 

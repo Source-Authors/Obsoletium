@@ -6,8 +6,6 @@
 // Serialization buffer
 //===========================================================================//
 
-#pragma warning (disable : 4514)
-
 #include "tier1/utlbufferutil.h"
 #include "tier1/utlbuffer.h"
 #include "mathlib/vector.h"

@@ -709,14 +709,6 @@ private:
 //-----------------------------------------------------------------------------
 // Work splitting: array split, best when cost per item is roughly equal
 //-----------------------------------------------------------------------------
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4389)
-#pragma warning(disable:4018)
-#pragma warning(disable:4701)
-#endif
-
 #define DEFINE_NON_MEMBER_ITER_RANGE_PARALLEL(N) \
 	template <typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N, typename ITERTYPE1, typename ITERTYPE2> \
 	void IterRangeParallel(FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( ITERTYPE1, ITERTYPE2 FUNC_ADDL_TEMPLATE_FUNC_PARAMS_##N ), ITERTYPE1 from, ITERTYPE2 to FUNC_ARG_FORMAL_PARAMS_##N ) \

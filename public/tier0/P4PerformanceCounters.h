@@ -143,8 +143,6 @@ enum P4OverflowInterrupt
     OverflowInterruptEnable,
 };
 
-// Turn off the no return value warning in ReadCounter.
-#pragma warning( disable : 4035 )
 class P4BaseEvent
 {
     int m_counter;
@@ -314,7 +312,6 @@ public:
         pme->WriteMSR( cccrPort, cccr.flat );
     }
 };
-#pragma warning( default : 4035 )
 
 #include "EventMasks.h" 
 #include "EventModes.h" 

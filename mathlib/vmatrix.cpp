@@ -18,8 +18,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#pragma warning (disable : 4700) // local variable 'x' used without having been initialized
-
 // ------------------------------------------------------------------------------------------- //
 // Helper functions.
 // ------------------------------------------------------------------------------------------- //

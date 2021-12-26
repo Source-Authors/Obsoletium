@@ -664,8 +664,6 @@ inline void CUtlRBTree<T, I, L, M>::SetColor( I i, typename CUtlRBTree<T, I, L, 
 //-----------------------------------------------------------------------------
 // Allocates/ deallocates nodes
 //-----------------------------------------------------------------------------
-#pragma warning(push)
-#pragma warning(disable:4389) // '==' : signed/unsigned mismatch
 template < class T, class I, typename L, class M >
 I  CUtlRBTree<T, I, L, M>::NewNode()
 {
@@ -710,7 +708,6 @@ I  CUtlRBTree<T, I, L, M>::NewNode()
 
 	return elem;
 }
-#pragma warning(pop)
 
 template < class T, class I, typename L, class M >
 void  CUtlRBTree<T, I, L, M>::FreeNode( I i )

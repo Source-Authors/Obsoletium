@@ -12,12 +12,8 @@ $Configuration
 	{
 		// Request a specific compiler toolset.
 		$PlatformToolset "v100" [$VS2010]
-		$PlatformToolset "v110_xp" [$VS2012 && !$ANALYZE] // VS 2012 targeting Windows XP - http://msdn.microsoft.com/en-us/library/vstudio/jj851139.aspx
-		$PlatformToolset "v110" [$VS2012 && $ANALYZE] // VS 2012 for /analyze
-		$PlatformToolset "v120_xp" [$VS2013 && !$ANALYZE] // VS 2013 targeting Windows XP - http://msdn.microsoft.com/en-us/library/vstudio/jj851139.aspx
-		$PlatformToolset "v120" [$VS2013 && $ANALYZE] // VS 2013 for /analyze
-		$PlatformToolset "v140_xp" [$VS2015 && !$ANALYZE] // VS 2015 for /analyze
-		$PlatformToolset "v140" [$VS2015 && $ANALYZE] // VS 2015 for /analyze
+		// HACK(proper): Use newer toolset as XP is out of support.
+		$PlatformToolset "v142" [$VS2015] // VS 2015 for /analyze
 	}
 
 	$General
@@ -35,20 +31,15 @@ $Configuration
 	{
 		$MultiProcessorCompilation "True"
 
-		// warning C4316: object allocated on the heap may not be aligned 16
-		$DisableSpecificWarnings	"$BASE;4316" [$AT_LEAST_VS2013]
-
-		// following are needed for VS2015 using old Windows SDK. Would like to move to each include location
-		$DisableSpecificWarnings			"$BASE;4577;4091"	[$WINDOWS && $AT_LEAST_VS2015]
-
-
 		// Having lots of warnings makes it harder to notice new, and possibly
 		// important warnings, both on buildbot and in the output window. Lots
 		// of warnings also makes it harder to skip through errors in the output
 		// window since F8 stops on both warnings and errors. The only way to
 		// keep the warning count down is to have warnings-as-errors.
 		// We will not be warning free on 64-bit for a while...
-		$TreatWarningsAsErrors				"Yes (/WX)" [!$ANALYZE && !$WIN64]
+		// HACK(proper): Do not treat warnings as errors, there is too much warnings to fix at once.
+		// $TreatWarningsAsErrors				"Yes (/WX)" [!$ANALYZE && !$WIN64]
+		$TreatWarningsAsErrors				"No (/WX-)"
 
 		// Defines to differentiate 32 from 64 bit builds
 		$PreprocessorDefinitions			"$BASE;PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64" [$WIN64]

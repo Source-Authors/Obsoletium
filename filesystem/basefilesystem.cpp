@@ -46,9 +46,6 @@
 #include "tier0/memdbgon.h"
 
 
-#pragma warning( disable : 4355 )  // warning C4355: 'this' : used in base member initializer list
-
-
 ConVar fs_report_sync_opens( "fs_report_sync_opens", "0", 0, "0:Off, 1:Blocking only, 2:All" );
 ConVar fs_warning_mode( "fs_warning_mode", "0", 0, "0:Off, 1:Warn main thread, 2:Warn other threads"  );
 

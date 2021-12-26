@@ -760,16 +760,6 @@ void V_strncpy( char *pDest, char const *pSrc, int maxLen )
 	}
 }
 
-// warning C6053: Call to 'wcsncpy' might not zero-terminate string 'pDest'
-// warning C6059: Incorrect length parameter in call to 'strncat'. Pass the number of remaining characters, not the buffer size of 'argument 1'
-// warning C6386: Buffer overrun: accessing 'argument 1', the writable size is 'destBufferSize' bytes, but '1000' bytes might be written
-// These warnings were investigated through code inspection and writing of tests and they are
-// believed to all be spurious.
-#ifdef _PREFAST_
-#pragma warning( push )
-#pragma warning( disable : 6053 6059 6386 )
-#endif
-
 void V_wcsncpy( wchar_t *pDest, wchar_t const *pSrc, int maxLenInBytes )
 {
 	Assert( maxLenInBytes >= sizeof( *pDest ) );
@@ -1435,11 +1425,6 @@ int _V_UCS2ToUnicode( const ucs2 *pUCS2, wchar_t *pUnicode, int cubDestSizeInByt
 	return cchResult;	
 
 }
-
-#ifdef _PREFAST_
-#pragma warning( pop ) // Restore the /analyze warnings
-#endif
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Converts a wchar_t string into a UCS2 string -noop on windows
@@ -3226,8 +3211,6 @@ struct Tier1FullHTMLEntity_t
 };
 
 
-#pragma warning( push )
-#pragma warning( disable : 4428 ) // universal-character-name encountered in source
 const Tier1FullHTMLEntity_t g_Tier1_FullHTMLEntities[] =
 {
 	{ L'"', "&quot;", 6 },
@@ -3337,7 +3320,6 @@ const Tier1FullHTMLEntity_t g_Tier1_FullHTMLEntities[] =
 	{ L'\u00FF', "&yuml;", 6 },
 	{ 0, NULL, 0 } // sentinel for end of array
 };
-#pragma warning( pop )
 
 
 

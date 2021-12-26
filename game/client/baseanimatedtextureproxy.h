@@ -13,7 +13,6 @@
 class IMaterial;
 class IMaterialVar;
 
-#pragma warning (disable : 4100)
 
 class CBaseAnimatedTextureProxy : public IMaterialProxy
 {

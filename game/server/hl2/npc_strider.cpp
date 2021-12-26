@@ -2140,8 +2140,6 @@ void CNPC_Strider::InputFlickRagdoll( inputdata_t &inputdata )
 		}
 */
 /*
-#pragma warning(push)
-#pragma warning(disable : 4706) // I know what I'm doing
 //---------------------------------------------------------
 //---------------------------------------------------------
 void CNPC_Strider::InputDisableCollisionWith( inputdata_t &inputdata )
@@ -2160,7 +2158,6 @@ void CNPC_Strider::InputDisableCollisionWith( inputdata_t &inputdata )
 		PhysDisableEntityCollisions( pIgnorePhys, pFollowPhys );
 	}
 }
-#pragma warning(pop)
 */
 
 

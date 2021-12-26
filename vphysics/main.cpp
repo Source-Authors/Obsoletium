@@ -32,7 +32,6 @@ static void ivu_string_print_function( const char *str )
 #if defined(_WIN32) && !defined(_XBOX)
 //HMODULE	gPhysicsDLLHandle;
 
-#pragma warning (disable:4100)
 
 BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 {

@@ -11,11 +11,8 @@
 
 #if !defined( _X360 ) && defined( WIN32 )
 #define WIN32_LEAN_AND_MEAN
-#pragma warning(push, 1)
-#pragma warning(disable: 4005)
 #include <windows.h>
 #include <mmsystem.h>
-#pragma warning(pop)
 #include <mmreg.h>
 #endif
 

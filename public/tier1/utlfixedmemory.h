@@ -20,8 +20,6 @@
 #include "tier0/memalloc.h"
 #include "tier0/memdbgon.h"
 
-#pragma warning (disable:4100)
-#pragma warning (disable:4514)
 
 //-----------------------------------------------------------------------------
 

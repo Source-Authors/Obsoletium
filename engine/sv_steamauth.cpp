@@ -51,8 +51,6 @@ ConVar  sv_steamblockingcheck( "sv_steamblockingcheck", "0", 0,
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#pragma warning( disable: 4355 ) // disables ' 'this' : used in base member initializer list'
-
 ConVar sv_master_share_game_socket( "sv_master_share_game_socket", "1", 0, 
 	"Use the game's socket to communicate to the master server. "
 	"If this is 0, then it will create a socket on -steamport + 1 "

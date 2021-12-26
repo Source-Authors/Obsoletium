@@ -25,8 +25,6 @@
 #include "vgui_baseui_interface.h"
 #endif
 
-#pragma warning( disable: 4355 ) // disables ' 'this' : used in base member initializer list'
-
 //-----------------------------------------------------------------------------
 // Purpose: singleton accessor
 //-----------------------------------------------------------------------------

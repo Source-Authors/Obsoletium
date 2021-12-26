@@ -17,8 +17,6 @@
 	#include "PortalRender.h"
 #endif
 
-#pragma warning( disable: 4355 )  // warning C4355: 'this' : used in base member initializer list
-
 class CClientTools;
 
 void DrawSpriteModel( IClientEntity *baseentity, CEngineSprite *psprite,

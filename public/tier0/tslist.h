@@ -10,14 +10,6 @@
 #ifndef TSLIST_H
 #define TSLIST_H
 
-#if defined( _WIN32 )
-#pragma once
-// Suppress this spurious warning:
-// warning C4700: uninitialized local variable 'oldHead' used
-#pragma warning( push )
-#pragma warning( disable : 4700 )
-#endif
-
 #if defined( USE_NATIVE_SLIST ) && !defined( _X360 )
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -994,11 +986,5 @@ private:
 	
 	CTSListBase m_FreeNodes;
 } TSLIST_NODE_ALIGN_POST;
-
-#if defined( _WIN32 )
-// Suppress this spurious warning:
-// warning C4700: uninitialized local variable 'oldHead' used
-#pragma warning( pop )
-#endif
 
 #endif // TSLIST_H

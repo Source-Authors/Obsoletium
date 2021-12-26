@@ -902,7 +902,6 @@ $Project "engine"
 		$File	"$SRCDIR\public\vgui\Dar.h"
 		$File	"$SRCDIR\public\datamap.h"
 		$File	"$SRCDIR\public\tier0\dbg.h"
-		$File	"$SRCDIR\dx9sdk\include\dinput.h"
 		$File	"$SRCDIR\public\disp_vertindex.h"
 		$File	"$SRCDIR\public\dlight.h"
 		$File	"$SRCDIR\public\dt_utlvector_recv.h"
@@ -1124,7 +1123,7 @@ $Project "engine"
 		$Lib	"$LIBCOMMON/binkw32"					[$WIN32&&!$QUICKTIME_WIN32]
 		$File   "$LIBCOMMON\quicktime\QTMLClient"       [$WIN32&&$QUICKTIME_WIN32]
 		$ImpLib	"SDL2" [$SDL]
-		$File	"$SRCDIR\DX9SDK\lib\dsound.lib" [$WIN32]
-		$File	"$SRCDIR\DX9SDK\lib\dxguid.lib" [$WIN32]
+		$ImpLibexternal	"dsound" [$WIN32]
+		$ImpLibexternal	"dxguid" [$WIN32]
 	}	
 }

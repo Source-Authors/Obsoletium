@@ -3614,10 +3614,6 @@ SOURCE=..\dx8sdk\include\dinput.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\dx9sdk\include\dinput.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\public\disp_vertindex.h
 # End Source File
 # Begin Source File
@@ -4962,7 +4958,7 @@ SOURCE=..\lib\public\vstdlib.lib
 # End Source File
 # Begin Source File
 
-SOURCE=..\DX9SDK\lib\dsound.lib
+SOURCE=dsound.lib
 
 !IF  "$(CFG)" == "engine - Win32 Debug"
 

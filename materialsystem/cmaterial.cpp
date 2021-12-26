@@ -3046,10 +3046,6 @@ bool CMaterial::HasProxy( )	const
 // Main draw method
 //-----------------------------------------------------------------------------
 
-#ifdef _WIN32
-#pragma warning (disable: 4189)
-#endif
-
 void CMaterial::DrawMesh( VertexCompressionType_t vertexCompression )
 {
 	if ( m_pShader )
@@ -3073,10 +3069,6 @@ void CMaterial::DrawMesh( VertexCompressionType_t vertexCompression )
 		Warning( "CMaterial::DrawElements: No bound shader\n" );
 	}
 }
-
-#ifdef _WIN32
-#pragma warning (default: 4189)
-#endif
 
 IShader *CMaterial::GetShader( ) const
 {

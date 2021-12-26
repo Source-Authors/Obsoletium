@@ -5,10 +5,6 @@
 //=============================================================================
 
 
-// Because we use STL
-#pragma warning( disable: 4530 )
-
-
 // Standard includes
 #include <io.h>
 #include <algorithm>

@@ -57,13 +57,11 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #include "xbox/xboxstubs.h"
 #include "../vgui2/src/Memorybitmap.h"
 
-#pragma warning( disable : 4706 )
 
 #include <vgui/IVguiMatInfo.h>
 #include <vgui/IVguiMatInfoVar.h>
 #include "materialsystem/imaterialvar.h"
 
-#pragma warning( default : 4706 )
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -2227,7 +2225,6 @@ void CMatSystemSurface::DrawGetTextPos(int& x,int& y)
 	y = m_pDrawTextPos[1];
 }
 
-#pragma warning( disable : 4706 )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -2249,7 +2246,6 @@ void CMatSystemSurface::DrawUnicodeString( const wchar_t *pString, FontDrawType_
 	}
 #endif
 }
-#pragma warning( default : 4706 )
 
 //-----------------------------------------------------------------------------
 // Purpose: 

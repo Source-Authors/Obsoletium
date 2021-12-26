@@ -6,7 +6,6 @@
 
 #include "audio_pch.h"
 #include <dsound.h>
-#pragma warning(disable : 4201)		// nameless struct/union
 #include <ks.h>
 // Fix for VS 2010 build errors copied from Dota
 #if !defined( NEW_DXSDK ) && ( _MSC_VER >= 1600 )

@@ -16,9 +16,6 @@
 
 #define NTAB 32
 
-#pragma warning(push)
-#pragma warning( disable:4251 )
-
 //-----------------------------------------------------------------------------
 // A generator of uniformly distributed random numbers
 //-----------------------------------------------------------------------------
@@ -114,8 +111,6 @@ public:
 //-----------------------------------------------------------------------------
 VSTDLIB_INTERFACE void	InstallUniformRandomStream( IUniformRandomStream *pStream );
 
-
-#pragma warning(pop)
 
 #endif // VSTDLIB_RANDOM_H
 

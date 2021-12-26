@@ -13,9 +13,6 @@
 #pragma once
 #endif
 
-// identifier was truncated to '255' characters in the debug information
-#pragma warning(disable: 4786)
-
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imaterial.h"
 #include "shaderapi/ishaderapi.h"

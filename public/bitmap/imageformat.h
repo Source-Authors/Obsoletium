@@ -27,9 +27,6 @@ typedef enum _D3DFORMAT D3DFORMAT;
 // The various image format types
 //-----------------------------------------------------------------------------
 
-// don't bitch that inline functions aren't used!!!!
-#pragma warning(disable : 4514)
-
 enum ImageFormat 
 {
 	IMAGE_FORMAT_UNKNOWN  = -1,

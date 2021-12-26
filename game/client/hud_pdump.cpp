@@ -21,9 +21,7 @@ static CPDumpPanel *g_pPDumpPanel = NULL;
 //  we pragma'd away in platform.h, so this little compiler specific hack will eliminate those warnings while
 //  retaining our own warning setup...ywb
 #ifdef WIN32
-#pragma warning( push )
-#include <typeinfo.h>
-#pragma warning( pop )
+#include <typeinfo>
 #endif
 
 using namespace vgui;

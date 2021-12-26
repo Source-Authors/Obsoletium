@@ -44,9 +44,6 @@
 #undef max
 
 #include <stddef.h>
-#ifdef _WIN32
-#pragma warning(disable:4530) // warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
-#endif //_WIN32
 #include <string>
 
 #include "snappy-stubs-public.h"

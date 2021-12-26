@@ -218,11 +218,6 @@ $Project "stdshader_dx9"
 		$File	"water_ps2x_helper.h"
 	}
 
-	$Folder	"Link Libraries" [$WIN32]
-	{
-		$File	"$SRCDIR\dx9sdk\lib\d3dx9.lib"
-	}
-
 	$Folder "Link Libraries" 
 	{
         $Lib	mathlib
@@ -234,8 +229,6 @@ $Project "stdshader_dx9"
 	$File	"$SRCDIR\devtools\bin\fxc_prep.pl"
 	$File	"$SRCDIR\devtools\bin\updateshaders.pl"
 	$File	"$SRCDIR\devtools\bin\copyshaders.pl"
-	$File	"$SRCDIR\devtools\bin\p4autocheckout.pl"
-	$File	"$SRCDIR\devtools\bin\p4revertshadertargets.pl"
 	$File	"$SRCDIR\devtools\bin\valve_perl_helpers.pl"
 	$File	"$SRCDIR\devtools\bin\checkshaderchecksums.pl"
 	$File	"buildallshaders.bat"

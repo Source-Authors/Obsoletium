@@ -38,9 +38,6 @@
 
 #ifdef _WIN32
 
-#pragma warning(disable:4018) // warning C4018: '<' : signed/unsigned mismatch
-#pragma warning(disable:4389) // warning C4389: '==' : signed/unsigned mismatch
-
 /* Define like size_t, omitting the "unsigned" */
 #ifdef _WIN64
 typedef __int64 ssize_t;

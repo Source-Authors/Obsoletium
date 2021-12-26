@@ -9,8 +9,6 @@
 #include "tier1/ilocalize.h"
 #include "utlstring.h"
 
-#pragma warning( disable: 4018 ) // '<' : signed/unsigned mismatch
-
 //-----------------------------------------------------------------------------
 // Purpose: converts an english string to unicode
 //-----------------------------------------------------------------------------

@@ -242,8 +242,6 @@ CON_COMMAND_F( rpt_download_log, "", FCVAR_HIDDEN | FCVAR_DONTRECORD )
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-#pragma warning ( disable : 4355 )
-
 CRConClient::CRConClient() : m_Socket( this )
 {
 	m_bAuthenticated = false;
@@ -252,8 +250,6 @@ CRConClient::CRConClient() : m_Socket( this )
 	m_nScreenShotIndex = 0;
 	m_nConsoleLogIndex = 0;
 }
-
-#pragma warning ( default : 4355 )
 
 //-----------------------------------------------------------------------------
 // Purpose: Destructor

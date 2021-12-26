@@ -752,8 +752,6 @@ bool CDmxSerializerKeyValues2::Serialize( CUtlBuffer &outBuf, CDmxElement *pRoot
 //-----------------------------------------------------------------------------
 // Eats whitespaces and c++ style comments
 //-----------------------------------------------------------------------------
-#pragma warning (disable:4706)
-
 void CDmxSerializerKeyValues2::EatWhitespacesAndComments( CUtlBuffer &buf )
 {
 	// eating white spaces and remarks loop
@@ -798,8 +796,6 @@ void CDmxSerializerKeyValues2::EatWhitespacesAndComments( CUtlBuffer &buf )
 
 	buf.SeekGet( CUtlBuffer::SEEK_CURRENT, nOffset );
 }
-
-#pragma warning (default:4706)
 
 //-----------------------------------------------------------------------------
 // Reads a single token, points the token utlbuffer at it

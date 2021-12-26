@@ -18,9 +18,7 @@
 #ifndef _XBOX
 #undef min
 #undef max
-#pragma warning(push)
 #include <set>
-#pragma warning(pop)
 #endif
 
 #ifdef _WIN32

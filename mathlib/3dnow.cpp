@@ -22,9 +22,6 @@
 // to compile the inline assembly below. 3DNow support is highly unlikely to
 // be useful/used, so it's not worth spending time on fixing.
 
-#pragma warning(disable:4244)   // "conversion from 'const int' to 'float', possible loss of data"
-#pragma warning(disable:4730)	// "mixing _m64 and floating point expressions may result in incorrect code"
-
 //-----------------------------------------------------------------------------
 // 3D Now Implementations of optimized routines:
 //-----------------------------------------------------------------------------
@@ -141,10 +138,6 @@ void FASTCALL _3DNow_VectorNormalizeFast (Vector& vec)
 {
 	_3DNow_VectorNormalize( vec );
 }
-
-
-// JAY: This complains with the latest processor pack
-#pragma warning(disable: 4730)
 
 float _3DNow_InvRSquared(const float* v)
 {

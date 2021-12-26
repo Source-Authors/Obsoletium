@@ -247,13 +247,11 @@ protected:
 
 	static CUtlMap<CDetailModel *, LightStyleInfo_t> gm_LightStylesMap;
 
-#pragma warning( disable : 4201 ) //warning C4201: nonstandard extension used : nameless struct/union
 	union
 	{
 		model_t* m_pModel;
 		SptrintInfo_t m_SpriteInfo;
 	};
-#pragma warning( default : 4201 )
 
 #ifdef USE_DETAIL_SHAPES
 	// pointer to advanced properties

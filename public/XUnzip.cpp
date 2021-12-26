@@ -214,39 +214,6 @@ typedef unsigned char BYTE;
 
 #define zfree(p) free(p)
 
-/*
-void *zmalloc(unsigned int len)
-{ char *buf = new char[len+32];
-  for (int i=0; i<16; i++)
-  { buf[i]=i;
-    buf[len+31-i]=i;
-  }
-  *((unsigned int*)buf) = len;
-  char c[1000]; wsprintf(c,"malloc 0x%lx  - %lu",buf+16,len);
-  OutputDebugString(c);
-  return buf+16;
-}
-
-void zfree(void *buf)
-{ char c[1000]; wsprintf(c,"free   0x%lx",buf);
-  OutputDebugString(c);
-  char *p = ((char*)buf)-16;
-  unsigned int len = *((unsigned int*)p);
-  bool blown=false;
-  for (int i=0; i<16; i++)
-  { char lo = p[i];
-    char hi = p[len+31-i];
-    if (hi!=i || (lo!=i && i>4)) blown=true;
-  }
-  if (blown)
-  { OutputDebugString("BLOWN!!!");
-  }
-  delete[] p;
-}
-*/
-
-#pragma warning(disable : 4702)   // unreachable code
-
 typedef struct tm_unz_s
 { unsigned int tm_sec;            // seconds after the minute - [0,59]
   unsigned int tm_min;            // minutes after the hour - [0,59]

@@ -6,7 +6,6 @@
 //===========================================================================//
 
 
-#pragma warning( disable: 4018 ) // '==' : signed/unsigned mismatch in rbtree
 #if defined( WIN32 ) && !defined( _X360 )
 #include <windows.h>
 #elif defined( POSIX )

@@ -13,7 +13,6 @@
 #include <string.h>
 
 typedef unsigned char byte;
-#pragma warning(disable:4244)
 
 #include "tier0/dbg.h"
 #include "mathlib/vector.h"

@@ -13,19 +13,10 @@
 
 #include "tier0/basetypes.h"
 
-#ifdef _WIN32
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
-#endif
-
 #undef min
 #undef max
 #include <fstream>
 #include "valve_minmax_on.h"
-
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
 
 #include <assert.h>
 

@@ -16,9 +16,6 @@
 #include "tier0/vprof.h"
 //#define _VPROF_MATHLIB
 
-#pragma warning(disable:4244)   // "conversion from 'const int' to 'float', possible loss of data"
-#pragma warning(disable:4730)	// "mixing _m64 and floating point expressions may result in incorrect code"
-
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 #if !defined( _X360 )

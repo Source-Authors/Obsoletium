@@ -115,7 +115,6 @@ class BuildModeLocalizedStringEditDialog : public Frame
 
 public:
 
-#pragma warning( disable : 4355 )
 	BuildModeLocalizedStringEditDialog() : Frame(this, NULL)
 	{
 		m_pTokenEntry = new TextEntry(this, NULL);
@@ -133,8 +132,7 @@ public:
 			m_pFileCombo->AddItem(g_pVGuiLocalize->GetLocalizationFileName(i), NULL);
 		}
 	}
-#pragma warning( default : 4355 )
-
+	
 	virtual void DoModal(const char *token)
 	{
 		input()->SetAppModalSurface(GetVPanel());

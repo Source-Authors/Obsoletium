@@ -384,11 +384,6 @@ extern "C" __declspec(dllexport) int DedicatedMain( HINSTANCE hInstance, HINSTAN
 
 	if ( !Plat_IsInDebugSession() && !CommandLine()->FindParm( "-nominidumps") )
 	{
-		// This warning only applies if you want to catch structured exceptions (crashes)
-		// using C++ exceptions. We do not want to do that so we can build with C++ exceptions
-		// completely disabled, and just suppress this warning.
-		// warning C4535: calling _set_se_translator() requires /EHa
-		#pragma warning( suppress : 4535 )
 		_set_se_translator( MiniDumpFunction );
 
 		try  // this try block allows the SE translator to work

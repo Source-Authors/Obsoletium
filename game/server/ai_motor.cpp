@@ -34,8 +34,6 @@ void DebugNoteMovementFailure()
 }
 
 // a place to put breakpoints
-#pragma warning(push)
-#pragma warning(disable:4189)
 AIMoveResult_t DbgResult( AIMoveResult_t result )
 {
 	if ( result < AIMR_OK )

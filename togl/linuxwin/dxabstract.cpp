@@ -48,8 +48,8 @@
 
 #ifdef USE_ACTUAL_DX
 
-#pragma comment( lib, "../../dx9sdk/lib/d3d9.lib" )
-#pragma comment( lib, "../../dx9sdk/lib/d3dx9.lib" )
+#pragma comment( lib, "d3d9.lib" )
+#pragma comment( lib, "d3dx9.lib" )
 
 #else
 

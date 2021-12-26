@@ -16,7 +16,6 @@ bool Check3DNowTechnology(void) { return false; }
 #elif defined( _WIN32 ) && !defined( _X360 )
 
 #pragma optimize( "", off )
-#pragma warning( disable: 4800 ) //'int' : forcing value to bool 'true' or 'false' (performance warning)
 
 // stuff from windows.h
 #ifndef EXCEPTION_EXECUTE_HANDLER

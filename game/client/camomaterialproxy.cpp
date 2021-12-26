@@ -7,8 +7,6 @@
 
 
 #include "cbase.h"
-// identifier was truncated to '255' characters in the debug information
-#pragma warning(disable: 4786)
 
 #include "proxyentity.h"
 #include "materialsystem/imaterialvar.h"
@@ -114,8 +112,6 @@ void CCamoTextureRegen::RegenerateTextureBits( ITexture *pTexture, IVTFTexture *
 }
 
 
-#pragma warning (disable:4355)
-
 CCamoMaterialProxy::CCamoMaterialProxy() : m_TextureRegen(this)
 {
 #if 0
@@ -136,7 +132,6 @@ CCamoMaterialProxy::CCamoMaterialProxy() : m_TextureRegen(this)
 	m_pEnt = NULL;
 }
 
-#pragma warning (default:4355)
 
 CCamoMaterialProxy::~CCamoMaterialProxy()
 {

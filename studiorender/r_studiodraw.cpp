@@ -1015,8 +1015,6 @@ inline void CStudioRender::R_ComputeLightAtPoints3( const FourVectors &pos, cons
 //-----------------------------------------------------------------------------
 // Optimized for low-end hardware
 //-----------------------------------------------------------------------------
-#pragma warning (disable:4701)
-
 // NOTE: I'm using this crazy wrapper because using straight template functions
 // doesn't appear to work with function tables 
 template< int nHasTangentSpace, int nDoFlex, int nHasSIMD, int nLighting, int nDX8VertexFormat > 
@@ -1847,8 +1845,6 @@ void CStudioRender::R_StudioSoftwareProcessMesh_Normals( mstudiomesh_t* pmesh, C
 		} // end tacking on tangentS and tangetT line segments
 	}
 }
-
-#pragma warning (default:4701)
 
 
 
@@ -2896,7 +2892,6 @@ int CStudioRender::SortMeshes( int* pIndices, IMaterial **ppMaterials,
 //
 // Returns the number of triangles rendered.
 //-----------------------------------------------------------------------------
-#pragma warning (disable:4189)
 int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int skin, void /*IClientEntity*/ *pClientEntity, 
 	IMaterial **ppMaterials, int *pMaterialFlags, int boneMask, int lod, ColorMeshInfo_t *pColorMeshes )
 {
@@ -2983,4 +2978,3 @@ int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int sk
 
 	return numTrianglesRendered;
 }
-#pragma warning (default:4189)

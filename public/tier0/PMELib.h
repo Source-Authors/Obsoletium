@@ -11,10 +11,6 @@
 #include "Windows.h"
 #include "tier0/platform.h"
 
-// Get rid of a bunch of STL warnings!
-#pragma warning( push, 3 )
-#pragma warning( disable : 4018 )
-
 #define VERSION "1.0.2"
 
 // uncomment this list to add some runtime checks
@@ -187,6 +183,5 @@ enum PerfErrors
     E_ILLEGAL_OPERATION		= -10,
 };
 
-#pragma warning( pop )
 
 #endif // PMELIB_H

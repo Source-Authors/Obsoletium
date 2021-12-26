@@ -393,12 +393,6 @@ public:
 	CCallback< thisclass, param > var; void func( param *pParam )
 
 
-#ifdef _WIN32
-// disable this warning; this pattern need for steam callback registration
-#pragma warning( disable: 4355 )	// 'this' : used in base member initializer list
-#endif
-
-
 //----------------------------------------------------------------------------------------------------------------------------------------------------------//
 //	steamclient.dll private wrapper functions
 //

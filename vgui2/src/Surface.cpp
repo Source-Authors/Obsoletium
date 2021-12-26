@@ -15,9 +15,7 @@
 #include <imm.h>
 #include <zmouse.h>
 #include <shellapi.h>
-#pragma warning( disable : 4201 )
 #include <mmsystem.h>
-#pragma warning( default : 4201 )
 #include <oleidl.h>
 #include <stdio.h>
 #include <basetypes.h>

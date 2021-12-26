@@ -286,9 +286,6 @@ int GetNumMipMapLevels( int width, int height, int depth )
 	return numMipLevels;
 }
 
-// Turn off warning about FOURCC formats below...
-#pragma warning (disable:4063)
-
 #ifdef DX_TO_GL_ABSTRACTION
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
@@ -519,8 +516,6 @@ D3DFORMAT ImageFormatToD3DFormat( ImageFormat format )
 
 	return D3DFMT_UNKNOWN;
 }
-
-#pragma warning (default:4063)
 
 } // ImageLoader namespace ends
 

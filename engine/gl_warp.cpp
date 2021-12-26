@@ -206,7 +206,6 @@ void R_LoadSkys( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#pragma warning (disable : 4701)
 void MakeSkyVec( float s, float t, int axis, float zFar, Vector& position, Vector2D &texCoord )
 {
 	Vector		v, b;
@@ -256,7 +255,6 @@ void MakeSkyVec( float s, float t, int axis, float zFar, Vector& position, Vecto
 	texCoord[0] = s;
 	texCoord[1] = t;
 }
-#pragma warning (default : 4701)
 
 //-----------------------------------------------------------------------------
 // Purpose: 

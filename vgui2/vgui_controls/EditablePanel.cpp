@@ -49,8 +49,6 @@ DECLARE_BUILD_FACTORY( EditablePanel );
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-#pragma warning( disable : 4355 )
-
 EditablePanel::EditablePanel(Panel *parent, const char *panelName) : Panel(parent, panelName), m_NavGroup(this)
 {
 	_buildGroup = new BuildGroup(this, this);
@@ -77,8 +75,6 @@ EditablePanel::EditablePanel(Panel *parent, const char *panelName, HScheme hSche
 	// add ourselves to the build group
 	SetBuildGroup(GetBuildGroup());
 }
-
-#pragma warning( default : 4355 )
 
 //-----------------------------------------------------------------------------
 // Purpose: Destructor

@@ -592,9 +592,6 @@
 #elif defined (_MSC_VER) && !defined (__MWERKS__)
 // The Microsoft Visual C++ version of the 3DNow! macros.
 
-// Stop the "no EMMS" warning, since it doesn't detect FEMMS properly
-#pragma warning(disable:4799)
-
 // Defines for operands.
 #define _K3D_MM0 0xc0
 #define _K3D_MM1 0xc1

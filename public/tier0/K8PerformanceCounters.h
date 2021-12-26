@@ -68,7 +68,6 @@ enum UnitEncode
 #	pragma pack(pop)
 
 // Turn off the no return value warning in ReadCounter.
-#pragma warning( disable : 4035 )		
 #define k8NUM_COUNTERS 4
 class k8BaseEvent
 {
@@ -250,7 +249,6 @@ public:
 
 
 };
-#pragma warning( default : 4035 )
 
 
 
