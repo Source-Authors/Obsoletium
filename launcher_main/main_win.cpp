@@ -91,12 +91,13 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   _snprintf_s(launcher_dll_path, _TRUNCATE, "%s\\bin\\launcher.dll",
               GetBaseDirectory(module_name, base_directory_path));
 
+  char user_error[1024];
+
   // STEAM OK ... filesystem not mounted yet.
   HMODULE launcher_dll{::LoadLibraryExA(launcher_dll_path, nullptr,
                                         LOAD_WITH_ALTERED_SEARCH_PATH)};
   if (!launcher_dll) [[unlikely]] {
     const auto rc = ::GetLastError();
-    char user_error[1024];
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed in the folder with less "
                 "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
@@ -116,7 +117,6 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 
     if (!::FreeLibrary(launcher_dll)) [[unlikely]] {
       const auto free_error_code = ::GetLastError();
-      char user_error[1024];
       _snprintf_s(user_error, _TRUNCATE,
                   "Please contact publisher, very likely bug is detected.\n\n"
                   "Unable to unload the launcher DLL from %s",
@@ -130,7 +130,6 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 
   {
     const auto rc = ::GetLastError();
-    char user_error[1024];
     _snprintf_s(
         user_error, _TRUNCATE,
         "Please check game installed correctly.\n\nUnable to find LauncherMain "
