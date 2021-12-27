@@ -16,17 +16,19 @@ $Macro OUTBINNAME       "hl2_osx" [$OSXALL]
 $Macro OUTBINNAME       "hl2_linux" [$LINUXALL]
 
 $Include "$SRCDIR\vpc_scripts\source_exe_base.vpc"
+$Include "$SRCDIR\tier0\tier0_exclude.vpc"
+$Include "$SRCDIR\tier1\tier1_exclude.vpc" [$WINDOWS]
+$Include "$SRCDIR\vstdlib\vstdlib_exclude.vpc" [$WINDOWS]
 
 $Configuration
 {
     $General
     {
-        $AdditionalProjectDependencies "$BASE;newdat" [$WIN32 && !$ANALYZE]
+        $AdditionalProjectDependencies "$BASE;newdat" [$WINDOWS && !$ANALYZE]
     }
 
 	$Compiler
 	{
-		$PreprocessorDefinitions	"$BASE;fopen=dont_use_fopen"
 		$ForceIncludes				" "
 	}
 
@@ -36,13 +38,19 @@ $Configuration
 		$FixedBaseAddress			"Generate a relocation section (/FIXED:NO)" [$WIN32]
 	}
 
+	$ManifestTool
+	{
+		// Input And Output
+		$AdditionalManifestFiles			"$BASE;$SRCDIR\public\dpi-aware.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\utf-8-code-page.manifest;enable-visual-styles.manifest" [!$SOURCESDK]
+	}
+
 	$Xbox360ImageConversion	[$X360]
 	{
 		// General
 		$AdditionalSections			"4541080F=$SRCDIR\common\hl2orange.spa"
 	}
 
-	$PreBuildEvent [$WIN32]
+	$PreBuildEvent [$WINDOWS]
 	{
 		$CommandLine		"if EXIST $OUTBINDIR\hl2.exe for /f $QUOTEdelims=$QUOTE %%A in ('attrib $QUOTE$OUTBINDIR\hl2.exe$QUOTE') do set valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
 							"set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
@@ -57,38 +65,31 @@ $Configuration
 									"call $SRCDIR\vpc_scripts\valve_xbcp_wrapper.cmd $(TargetDir)$(TargetName).xex xE:\Valve\default.xex" "\n"
 	}
 
-	$PostBuildEvent	[$WIN32 && !$ANALYZE]
+	$PostBuildEvent	[$WINDOWS && !$ANALYZE]
 	{
 		// Note that the PDB must be checked in with the name it is linked as or else the debugger
 		// will not be able to find it. That's why it is checked in as default.pdb.
 		// override with specific behavior
-		$CommandLine				"copy $(TargetPath) $OUTBINDIR\hl2.exe" "\n"					\
-									"if ERRORLEVEL 1 goto BuildEventFailed" "\n" \
-									"copy $(TargetDir)\default.pdb $OUTBINDIR\default.pdb" "\n"					\
-									"if ERRORLEVEL 1 goto BuildEventFailed" "\n" \
-									"if exist $(TargetDir)$(TargetName).map copy $(TargetDir)$(TargetName).map $OUTBINDIR\hl2.map" "\n" \
+		$CommandLine				"COPY $(TargetPath) $OUTBINDIR\hl2.exe" "\n"					\
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"COPY $(TargetDir)\default.pdb $OUTBINDIR\default.pdb" "\n"					\
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"IF EXIST $(TargetDir)$(TargetName).map COPY $(TargetDir)$(TargetName).map $OUTBINDIR\hl2.map" "\n" \
 									"$OUTBINDIR\bin\newdat $OUTBINDIR\hl2.exe" "\n"					\
-									"goto BuildEventOK" "\n" \
+									"GOTO BuildEventOK" "\n" \
 									":BuildEventFailed" "\n" \
-									"echo *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
-									"del /q $(TargetPath)" "\n" \
-									"exit 1" "\n" \
+									"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
+									"DEL /Q $(TargetPath)" "\n" \
+									"EXIT 1" "\n" \
 									":BuildEventOK" "\n"
 	}
 }
 
 $Project
 {
-	$Folder	"Source Files"
-	{
-		-$File	"$SRCDIR\public\tier0\memoverride.cpp"
-	}
-
-	$Folder	"Link Libraries" 
+	$Folder	"Link Libraries"
 	{
 		-$Lib tier0 [$WINDOWS]
-		-$Lib tier1 [$WINDOWS]
-		-$ImpLib vstdlib [$WINDOWS]
 	}
 }
 
@@ -96,11 +97,14 @@ $Project "launcher_main"
 {
 	$Folder	"Source Files"
 	{
-		$File	"main.cpp"
+		$File	"main_win.cpp" [$WINDOWS]
+		$File	"main_posix.cpp" [$OSXALL || $LINUXALL]
+		$File	"main_xbox.cpp" [$X360]
 	}
 
-	$Folder "Resources" [$WIN32]
+	$Folder "Resources" [$WINDOWS]
 	{
+		$File "enable-visual-styles.manifest"
 		$File	"launcher_main.rc"
 		$File	"$SRCDIR\launcher\res\launcher.ico"
 	}

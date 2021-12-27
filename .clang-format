@@ -1,0 +1,37 @@
+# Copyright Valve Corporation, All rights reserved.
+
+# Defines the Chromium style for automatic reformatting.
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+BasedOnStyle: Google
+# This defaults to 'Auto'. Explicitly set it for a while, so that
+# 'vector<vector<int> >' in existing files gets formatted to
+# 'vector<vector<int>>'. ('Auto' means that clang-format will only use
+# 'int>>' if the file already contains at least one such instance.)
+Standard: Cpp11
+
+# Includes order matters
+SortIncludes: false
+
+# Make sure code like:
+# IPC_BEGIN_MESSAGE_MAP()
+#   IPC_MESSAGE_HANDLER(WidgetHostViewHost_Update, OnUpdate)
+# IPC_END_MESSAGE_MAP()
+# gets correctly indented.
+MacroBlockBegin: "^\
+BEGIN_BITFIELD|\
+BEGIN_BYTESWAP_DATADESC|\
+BEGIN_DATADESC_GUTS|\
+BEGIN_DATADESC_GUTS_NAMESPACE
+BEGIN_DATADESC_NO_BASE|\
+BEGIN_DEFINE_LOGGING_CHANNEL|\
+BEGIN_SIMPLE_DATADESC|\
+BEGIN_SIMPLE_DATADESC_$"
+MacroBlockEnd: "^\
+END_BITFIELD|\
+END_BYTESWAP_DATADESC|\
+END_DATADESC|\
+END_DATADESC|\
+END_DATADESC|\
+END_DEFINE_LOGGING_CHANNEL|\
+END_DATADESC|\
+END_DATADESC$"

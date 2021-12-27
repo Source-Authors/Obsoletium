@@ -23,19 +23,27 @@ $Configuration
 		$EnableLargeAddresses		"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)"
 		$FixedBaseAddress			"Generate a relocation section (/FIXED:NO)"
 	}
+
+	$ManifestTool
+	{
+		// Input And Output
+		$AdditionalManifestFiles			"$BASE;$SRCDIR\public\dpi-aware.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\utf-8-code-page.manifest;enable-visual-styles.manifest" [!$SOURCESDK]
+	}
 }
 
 $Project "Dedicated_main"
 {
 	$Folder	"Source Files"
 	{
-		$File	"main.cpp"
+		$File	"main_win.cpp" [$WINDOWS]
+		$File	"main_posix.cpp" [$OSXALL || $LINUXALL]
 		$File	"$SRCDIR\common\SteamAppStartup.cpp"
 		$File	"$SRCDIR\common\SteamAppStartup.h"
 	}
 
 	$Folder	"Resources"
 	{
+		$File "enable-visual-styles.manifest"
 		$File	"$SRCDIR\launcher\res\launcher.ico"
 		$File	"dedicated_main.rc"
 	}

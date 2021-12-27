@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
+  <asmv3:application>
+    <!-- As of Windows Version 1903 (May 2019 Update) force a process to use UTF-8 as the process code page.
+         See https://docs.microsoft.com/en-us/windows/uwp/design/globalizing/use-utf8-code-page -->
+    <asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings">
+      <activeCodePage>UTF-8</activeCodePage> 
+    </asmv3:windowsSettings>
+  </asmv3:application>
+</assembly>

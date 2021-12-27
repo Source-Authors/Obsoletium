@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <!-- Use ultra-high precision scroll wheel messages (delta = 1).
+           See https://docs.microsoft.com/en-us/windows/win32/w8cookbook/windows-precision-touchpad-devices -->
+      <ultraHighResolutionScrollingAware xmlns="http://schemas.microsoft.com/SMI/2013/WindowsSettings">true</ultraHighResolutionScrollingAware >
+    </windowsSettings>
+  </application>
+</assembly>
