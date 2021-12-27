@@ -942,8 +942,7 @@ struct ExtendedParticleRenderData_t : ParticleRenderData_t
 };
 
 
-typedef struct ALIGN16 _FourInts
-{
+typedef struct ALIGN16 _FourInts : CAlignedNewDelete<16> {
 	int32 m_nValue[4];
 } ALIGN16_POST FourInts;
 

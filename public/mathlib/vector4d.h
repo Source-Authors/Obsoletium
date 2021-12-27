@@ -132,7 +132,7 @@ const Vector4D vec4_invalid( FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX );
 // SSE optimized routines
 //-----------------------------------------------------------------------------
 
-class ALIGN16 Vector4DAligned : public Vector4D
+class ALIGN16 Vector4DAligned : public CAlignedNewDelete<16, Vector4D>
 {
 public:
 	Vector4DAligned(void) {}

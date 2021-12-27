@@ -11,9 +11,10 @@
 
 #include "tier0/type_traits.h"
 
-#include <limits.h>
+#include <climits>
 
 #include "tier0/platform.h"
+#include "tier0/memalloc.h"
 #include "tier0/dbg.h"
 #include "tier0/vcrmode.h"
 #include "tier0/vprof_telemetry.h"
@@ -795,7 +796,7 @@ private:
 #  pragma clang diagnostic ignored "-Wunused-private-field"
 #endif // Q_CC_CLANG
 
-class ALIGN128 CAlignedThreadFastMutex : public CThreadFastMutex
+class ALIGN128 CAlignedThreadFastMutex : public CAlignedNewDelete<128, CThreadFastMutex>
 {
 public:
 	CAlignedThreadFastMutex()
@@ -1170,7 +1171,7 @@ private:
 //
 //-----------------------------------------------------------------------------
 
-class ALIGN8 PLATFORM_CLASS CThreadSpinRWLock
+class ALIGN8 PLATFORM_CLASS CThreadSpinRWLock : CAlignedNewDelete<8>
 {
 public:
 	CThreadSpinRWLock()	{ COMPILE_TIME_ASSERT( sizeof( LockInfo_t ) == sizeof( int64 ) ); Assert( (intp)this % 8 == 0 ); memset( this, 0, sizeof( *this ) ); }

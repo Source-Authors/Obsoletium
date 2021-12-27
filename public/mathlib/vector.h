@@ -217,7 +217,7 @@ FORCEINLINE void NetworkVarConstruct( Vector &v ) { v.Zero(); }
 //=========================================================
 // 4D Short Vector (aligned on 8-byte boundary)
 //=========================================================
-class ALIGN8 ShortVector
+class ALIGN8 ShortVector : CAlignedNewDelete<8>
 {
 public:
 
@@ -370,7 +370,7 @@ public:
 // Here's where we add all those lovely SSE optimized routines
 //-----------------------------------------------------------------------------
 
-class ALIGN16 VectorAligned : public Vector
+class ALIGN16 VectorAligned : public CAlignedNewDelete<16, Vector>
 {
 public:
 	inline VectorAligned(void) {};
@@ -1621,7 +1621,7 @@ inline bool QuaternionsAreEqual( const Quaternion& src1, const Quaternion& src2,
 //-----------------------------------------------------------------------------
 // Here's where we add all those lovely SSE optimized routines
 //-----------------------------------------------------------------------------
-class ALIGN16 QuaternionAligned : public Quaternion
+class ALIGN16 QuaternionAligned : public CAlignedNewDelete<16, Quaternion>
 {
 public:
 	inline QuaternionAligned(void) {};

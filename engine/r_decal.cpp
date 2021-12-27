@@ -77,7 +77,7 @@ CUtlVector<decal_t*>		s_aDecalPool;
 const int DECALCACHE_ENTRY_COUNT = 1024;
 const int INVALID_CACHE_ENTRY = 0xFFFF;
 
-class ALIGN16 CDecalVertCache
+class ALIGN16 CDecalVertCache : public CAlignedNewDelete<16>
 {
 	enum decalindex_ordinal
 	{
