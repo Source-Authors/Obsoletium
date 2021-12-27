@@ -5,11 +5,14 @@
 //=====================================================================================//
 
 #if defined( _WIN32 ) && !defined( _X360 )
-#include <windows.h>
-#include <stdio.h>
-#include <assert.h>
 #include <direct.h>
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+
+#include "winlite.h"
 #endif
+
 #if defined( _X360 )
 #define _XBOX
 #include <xtl.h>
@@ -19,33 +22,50 @@
 #include "xbox\xbox_core.h"
 #include "xbox\xbox_launch.h"
 #endif
+
 #ifdef POSIX
-#include <stdio.h>
-#include <stdlib.h>
 #include <dlfcn.h>
-#include <limits.h>
-#include <string.h>
+
+#include <cstdio>
+#include <cstdlib>
+#include <climits>
+#include <cstring>
 #define MAX_PATH PATH_MAX
 #endif
 
 #include "tier0/basetypes.h"
 
 #ifdef WIN32
-typedef int (*LauncherMain_t)( HINSTANCE hInstance, HINSTANCE hPrevInstance, 
+using LauncherMain_t = int (*)( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 							  LPSTR lpCmdLine, int nCmdShow );
 #elif POSIX
-typedef int (*LauncherMain_t)( int argc, char **argv );
+using LauncherMain_t = int (*)( int argc, char **argv );
 #else
-#error
+#error "Unknown OS platform."
 #endif
 
 #ifdef WIN32
-// hinting the nvidia driver to use the dedicated graphics card in an optimus configuration
-// for more info, see: http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
-extern "C" { _declspec( dllexport ) DWORD NvOptimusEnablement = 0x00000001; }
 
-// same thing for AMD GPUs using v13.35 or newer drivers
-extern "C" { __declspec( dllexport ) int AmdPowerXpressRequestHighPerformance = 1; }
+extern "C" {
+
+	// Starting with the Release 302 drivers, application developers can direct the
+	// Nvidia Optimus driver at runtime to use the High Performance Graphics to
+	// render any application–even those applications for which there is no existing
+	// application profile.
+	//
+	// See
+	// https://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
+	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+
+	// This will select the high performance AMD GPU as long as no profile exists
+	// that assigns the application to another GPU.  Please make sure to use a 13.35
+	// or newer driver.  Older drivers do not support this.
+	//
+	// See
+	// https://community.amd.com/t5/firepro-development/can-an-opengl-app-default-to-the-discrete-gpu-on-an-enduro/td-p/279440
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 0x00000001;
+
+}
 
 #endif
 
@@ -88,14 +108,10 @@ static char *GetBaseDir( const char *pszBuffer )
 
 #ifdef WIN32
 
-int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow )
 {
-	// Must add 'bin' to the path....
-	char* pPath = getenv("PATH");
-
 	// Use the .EXE name to determine the root directory
 	char moduleName[ MAX_PATH ];
-	char szBuffer[4096];
 	if ( !GetModuleFileName( hInstance, moduleName, MAX_PATH ) )
 	{
 		MessageBox( 0, "Failed calling GetModuleFileName", "Launcher Error", MB_OK );
@@ -103,19 +119,16 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	}
 
 	// Get the root directory the .exe is in
-	char* pRootDir = GetBaseDir( moduleName );
+	const char* pRootDir = GetBaseDir( moduleName );
+	// Must add 'bin' to the path....
+	const char* pPath = getenv("PATH");
 
-#ifdef _DEBUG
-	int len = 
-#endif
-	_snprintf( szBuffer, sizeof( szBuffer ), "PATH=%s\\bin\\;%s", pRootDir, pPath );
-	szBuffer[sizeof( szBuffer ) - 1] = '\0';
-	assert( len < sizeof( szBuffer ) );
+	char szBuffer[4096];
+	sprintf_s( szBuffer, "PATH=%s\\bin\\;%s", pRootDir, pPath );
 	_putenv( szBuffer );
 
 	// Assemble the full path to our "launcher.dll"
-	_snprintf( szBuffer, sizeof( szBuffer ), "%s\\bin\\launcher.dll", pRootDir );
-	szBuffer[sizeof( szBuffer ) - 1] = '\0';
+	sprintf_s( szBuffer, "%s\\bin\\launcher.dll", pRootDir );
 
 	// STEAM OK ... filesystem not mounted yet
 #if defined(_X360)
@@ -126,18 +139,20 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	if ( !launcher )
 	{
 		char *pszError;
-		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&pszError, 0, NULL);
+		FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&pszError, 0, NULL);
 
 		char szBuf[1024];
-		_snprintf(szBuf, sizeof( szBuf ), "Failed to load the launcher DLL:\n\n%s", pszError);
-		szBuf[sizeof( szBuf ) - 1] = '\0';
+		sprintf_s(szBuf, "Failed to load the launcher DLL:\n\n%s", pszError);
+
 		MessageBox( 0, szBuf, "Launcher Error", MB_OK );
 
 		LocalFree(pszError);
 		return 0;
 	}
 
-	LauncherMain_t main = (LauncherMain_t)GetProcAddress( launcher, "LauncherMain" );
+	auto main = reinterpret_cast<LauncherMain_t>( GetProcAddress( launcher, "LauncherMain" ) );
 	return main( hInstance, hPrevInstance, lpCmdLine, nCmdShow );
 }
 
