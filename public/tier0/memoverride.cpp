@@ -868,7 +868,7 @@ void __cdecl WriteMiniDumpOrBreak( int , const char *pchName )
 	{
 		WriteMiniDump( pchName );
 		// Call Plat_ExitProcess so we don't continue in a bad state. 
-		TerminateProcess(GetCurrentProcess(), 0);
+		TerminateProcess(GetCurrentProcess(), 1);
 	}
 }
 
@@ -890,17 +890,21 @@ void VInvalidParameterHandler(const wchar_t* expression,
 #pragma optimize("", on)
 
 // Helper class for registering error callbacks. See above for details.
-class ErrorHandlerRegistrar
-{
-public:
-	ErrorHandlerRegistrar();
-} s_ErrorHandlerRegistration;
+class ErrorHandlerRegistrar {
+ public:
+  ErrorHandlerRegistrar() noexcept
+		: old_pure_{_set_purecall_handler(VPureCall)},
+      old_invalid_{_set_invalid_parameter_handler(VInvalidParameterHandler)} {
+	}
+  ~ErrorHandlerRegistrar() noexcept {
+    _set_invalid_parameter_handler(old_invalid_);
+    _set_purecall_handler(old_pure_);
+	}
 
-ErrorHandlerRegistrar::ErrorHandlerRegistrar()
-{
-	_set_purecall_handler( VPureCall );
-	_set_invalid_parameter_handler( VInvalidParameterHandler );
-}
+ private:
+  _purecall_handler old_pure_;
+  _invalid_parameter_handler old_invalid_;
+} s_ErrorHandlerRegistration;
 
 #if defined( _DEBUG )
  
