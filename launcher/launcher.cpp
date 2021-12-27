@@ -9,6 +9,8 @@
 #if defined( _WIN32 ) && !defined( _X360 )
 #include "winlite.h"
 
+#include <winsock.h>
+#include <shellapi.h>
 #include <shlwapi.h> // registry stuff
 #include <direct.h>
 #elif defined ( LINUX ) || defined( OSX )
@@ -1129,7 +1131,7 @@ static const char *BuildCommand()
 // Output : int APIENTRY
 //-----------------------------------------------------------------------------
 #ifdef WIN32
-extern "C" __declspec(dllexport) int LauncherMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+extern "C" __declspec(dllexport) int LauncherMain( HINSTANCE hInstance, HINSTANCE , LPSTR lpCmdLine, int nCmdShow )
 #else
 DLL_EXPORT int LauncherMain( int argc, char **argv )
 #endif
