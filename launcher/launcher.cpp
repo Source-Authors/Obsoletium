@@ -164,7 +164,7 @@ SpewRetval_t LauncherDefaultSpewFunc( SpewType_t spewType, char const *pMsg )
 		if ( !stricmp( GetSpewOutputGroup(), "init" ) )
 		{
 #if defined( WIN32 ) || defined( USE_SDL )
-			::MessageBox( NULL, pMsg, "Warning!", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
+			::MessageBox( NULL, pMsg, "OrangeBox Launcher - Warning", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
 #endif
 		}
 		return SPEW_CONTINUE;
@@ -173,7 +173,7 @@ SpewRetval_t LauncherDefaultSpewFunc( SpewType_t spewType, char const *pMsg )
 		if ( !ShouldUseNewAssertDialog() )
 		{
 #if defined( WIN32 ) || defined( USE_SDL )
-			::MessageBox( NULL, pMsg, "Assert!", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
+			::MessageBox( NULL, pMsg, "OrangeBox Launcher - Assert", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
 #endif
 		}
 		return SPEW_DEBUGGER;
@@ -181,7 +181,7 @@ SpewRetval_t LauncherDefaultSpewFunc( SpewType_t spewType, char const *pMsg )
 	case SPEW_ERROR:
 	default:
 #if defined( WIN32 ) || defined( USE_SDL )
-		::MessageBox( NULL, pMsg, "Error!", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
+		::MessageBox( NULL, pMsg, "OrangeBox Launcher - Error", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
 #endif
 		_exit( 1 );
 	}
@@ -1176,7 +1176,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 
 	if ( !IsWindows7OrGreater() )
 	{
-		Error( "Sorry, Windows &+ required to run the game." );
+		Error( "Sorry, Windows 7+ required to run the game." );
 		return ERROR_OLD_WIN_VERSION;
 	}
 
