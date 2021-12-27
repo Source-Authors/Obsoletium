@@ -4,7 +4,7 @@
 //
 //===========================================================================//
 #if defined( _WIN32 ) && !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 #if !defined( DONT_PROTECT_FILEIO_FUNCTIONS )
@@ -15,16 +15,19 @@
 #undef PROTECTED_THINGS_ENABLE // from protected_things.h
 #endif
 
-#include <stdio.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <system_error>
+
 #include "interface.h"
 #include "basetypes.h"
 #include "tier0/dbg.h"
-#include <string.h>
-#include <stdlib.h>
 #include "tier1/strtools.h"
 #include "tier0/icommandline.h"
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
+
 #ifdef _WIN32
 #include <direct.h> // getcwd
 #elif POSIX
@@ -135,9 +138,9 @@ void *GetModuleHandle(const char *name)
 //-----------------------------------------------------------------------------
 static void *Sys_GetProcAddress( const char *pModuleName, const char *pName )
 {
-	HMODULE hModule = (HMODULE)GetModuleHandle( pModuleName );
+  HMODULE hModule = (HMODULE)GetModuleHandle(pModuleName);
 #ifdef WIN32
-	return (void *)GetProcAddress( hModule, pName );
+	return hModule ? (void *)GetProcAddress( hModule, pName ) : nullptr;
 #else
 	return (void *)dlsym( (void *)hModule, pName );
 #endif
@@ -176,7 +179,7 @@ static HMODULE InternalLoadLibrary( const char *pName, Sys_Flags flags )
 	if ( flags & SYS_NOLOAD )
 		return GetModuleHandle( pName );
 	else
-		return LoadLibraryEx( pName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
+		return LoadLibraryExA( pName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
 #endif
 }
 unsigned ThreadedLoadLibraryFunc( void *pParam )
@@ -279,6 +282,7 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 	{
 		// full path wasn't passed in, using the current working dir
 		_getcwd( szCwd, sizeof( szCwd ) );
+
 		if ( IsX360() )
 		{
 			int i = CommandLine()->FindParm( "-basedir" );
@@ -287,13 +291,15 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 				V_strcpy_safe( szCwd, CommandLine()->GetParm( i + 1 ) );
 			}
 		}
-		if (szCwd[strlen(szCwd) - 1] == '/' || szCwd[strlen(szCwd) - 1] == '\\' )
+
+		size_t cCwd = strlen( szCwd );
+		if (szCwd[cCwd - 1] == '/' || szCwd[cCwd - 1] == '\\')
 		{
-			szCwd[strlen(szCwd) - 1] = 0;
+			szCwd[cCwd - 1] = '\0';
 		}
 
 		char szAbsoluteModuleName[1024];
-		size_t cCwd = strlen( szCwd );
+		cCwd = strlen( szCwd );
 		if ( strstr( pModuleName, "bin/") == pModuleName || ( szCwd[ cCwd - 1 ] == 'n'  && szCwd[ cCwd - 2 ] == 'i' && szCwd[ cCwd - 3 ] == 'b' )  )
 		{
 			// don't make bin/bin path
@@ -315,21 +321,8 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 		{
 // So you can see what the error is in the debugger...
 #if defined( _WIN32 ) && !defined( _X360 )
-			char *lpMsgBuf;
-			
-			FormatMessage( 
-				FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-				FORMAT_MESSAGE_FROM_SYSTEM | 
-				FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL,
-				GetLastError(),
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-				(LPTSTR) &lpMsgBuf,
-				0,
-				NULL 
-			);
-
-			LocalFree( (HLOCAL)lpMsgBuf );
+      const auto error = std::system_category().message(::GetLastError());
+      Msg( "Failed to load %s: %s\n", pModuleName, error.c_str() );
 #elif defined( _X360 )
 			DWORD error = GetLastError();
 			Msg( "Error(%d) - Failed to load %s:\n", error, pModuleName );
@@ -356,15 +349,6 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 		if ( !s_bRunningWithDebugModules )
 		{
 			s_bRunningWithDebugModules = true;
-			
-#if 0 //def IS_WINDOWS_PC
-			char chMemoryName[ MAX_PATH ];
-			DebugKernelMemoryObjectName( chMemoryName );
-			
-			(void) CreateFileMapping( INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, 1024, chMemoryName );
-			// Created a shared memory kernel object specific to process id
-			// Existence of this object indicates that we have debug modules loaded
-#endif
 		}
 	}
 #endif

@@ -137,7 +137,7 @@ void ConstructStringVArgsInternal_Impl(T *unicodeOutput, int unicodeBufferSizeIn
 	}
 
 	// ensure null termination
-	Assert( outputPos - unicodeOutput < unicodeBufferSizeInBytes/sizeof(T) );
+	Assert( outputPos - unicodeOutput < (ptrdiff_t)(unicodeBufferSizeInBytes/sizeof(T)) );
 	*outputPos = L'\0';
 }
 
