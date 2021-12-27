@@ -218,7 +218,7 @@ void _free_base( void *pMem )
 	g_pMemAlloc->Free(pMem);
 }
 
-void *__cdecl _expand_base( void *pMem, size_t nNewSize, int nBlockUse )
+void *__cdecl _expand_base( void *, size_t , int  )
 {
 	Assert( 0 );
 	return NULL;
@@ -280,7 +280,7 @@ void *__cdecl _nh_malloc( size_t nSize, int )
 	return AllocUnattributed( nSize );
 }
 
-void *__cdecl _expand( void *pMem, size_t nSize )
+void *__cdecl _expand( void *, size_t  )
 {
 	Assert( 0 );
 	return NULL;
@@ -399,7 +399,7 @@ void *__cdecl operator new( size_t nSize )
 	return AllocUnattributed( nSize );
 }
 
-void *__cdecl operator new( size_t nSize, int nBlockUse, const char *pFileName, int nLine )
+void *__cdecl operator new( size_t nSize, int , const char *pFileName, int nLine )
 {
 	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
 }
@@ -431,7 +431,7 @@ void *__cdecl operator new[]( size_t nSize )
 	return AllocUnattributed( nSize );
 }
 
-void *__cdecl operator new[] ( size_t nSize, int nBlockUse, const char *pFileName, int nLine )
+void *__cdecl operator new[] ( size_t nSize, int , const char *pFileName, int nLine )
 {
 	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
 }
@@ -492,7 +492,7 @@ private:
 extern "C"
 {
 	
-void *__cdecl _nh_malloc_dbg( size_t nSize, int nFlag, int nBlockUse,
+void *__cdecl _nh_malloc_dbg( size_t nSize, int , int nBlockUse,
 								const char *pFileName, int nLine )
 {
 	AttribIfCrt();
@@ -524,7 +524,7 @@ void *__cdecl _calloc_dbg( size_t nNum, size_t nSize, int nBlockUse,
 }
 
 void *__cdecl _calloc_dbg_impl( size_t nNum, size_t nSize, int nBlockUse, 
-	const char * szFileName, int nLine, int * errno_tmp )
+	const char * szFileName, int nLine, int *  )
 {
 	return _calloc_dbg( nNum, nSize, nBlockUse, szFileName, nLine );
 }
@@ -536,8 +536,7 @@ void *__cdecl _realloc_dbg( void *pMem, size_t nNewSize, int nBlockUse,
 	return g_pMemAlloc->Realloc(pMem, nNewSize, pFileName, nLine);
 }
 
-void *__cdecl _expand_dbg( void *pMem, size_t nNewSize, int nBlockUse,
-							const char *pFileName, int nLine )
+void *__cdecl _expand_dbg( void *, size_t , int , const char *, int  )
 {
 	Assert( 0 );
 	return NULL;
@@ -549,7 +548,7 @@ void __cdecl _free_dbg( void *pMem, int nBlockUse )
 	g_pMemAlloc->Free(pMem);
 }
 
-size_t __cdecl _msize_dbg( void *pMem, int nBlockUse )
+size_t __cdecl _msize_dbg( void *pMem, int  )
 {
 #ifdef _WIN32
 	return _msize(pMem);
@@ -603,7 +602,7 @@ ALLOC_CALL void *__cdecl _aligned_realloc_base( void *ptr, size_t size, size_t a
 	return pNew;
 }
 
-ALLOC_CALL void *__cdecl _aligned_recalloc_base( void *ptr, size_t size, size_t align )
+ALLOC_CALL void *__cdecl _aligned_recalloc_base( void *, size_t , size_t  )
 {
 	Error( "Unsupported function\n" );
 	return NULL;
@@ -625,30 +624,31 @@ ALLOC_CALL void *__cdecl _aligned_realloc(void *memblock, size_t size, size_t al
     return _aligned_realloc_base(memblock, size, align);
 }
 
-ALLOC_CALL void * __cdecl _aligned_recalloc( void * memblock, size_t count, size_t size, size_t align )
-{
+ALLOC_CALL void *__cdecl _aligned_recalloc(
+    _Pre_maybenull_ _Post_invalid_ void *memblock, _In_ size_t count,
+    _In_ size_t size, _In_ size_t align) {
     return _aligned_recalloc_base(memblock, count * size, align);
 }
 
-FREE_CALL void __cdecl _aligned_free( void *memblock )
-{
+FREE_CALL void __cdecl _aligned_free(
+    _Pre_maybenull_ _Post_invalid_ void *memblock) {
     _aligned_free_base(memblock);
 }
 
 // aligned offset base
-ALLOC_CALL void * __cdecl _aligned_offset_malloc_base( size_t size, size_t align, size_t offset )
+ALLOC_CALL void * __cdecl _aligned_offset_malloc_base( size_t , size_t , size_t  )
 {
 	Assert( IsPC() || 0 );
 	return NULL;
 }
 
-ALLOC_CALL void * __cdecl _aligned_offset_realloc_base( void * memblock, size_t size, size_t align, size_t offset)
+ALLOC_CALL void * __cdecl _aligned_offset_realloc_base( void * , size_t , size_t , size_t )
 {
 	Assert( IsPC() || 0 );
 	return NULL;
 }
 
-ALLOC_CALL void * __cdecl _aligned_offset_recalloc_base( void * memblock, size_t size, size_t align, size_t offset)
+ALLOC_CALL void * __cdecl _aligned_offset_recalloc_base( void * , size_t , size_t , size_t )
 {
 	Assert( IsPC() || 0 );
 	return NULL;
@@ -685,12 +685,12 @@ ALLOC_CALL void * __cdecl _aligned_offset_recalloc( void * memblock, size_t coun
 extern "C"
 {
 	
-int _CrtDumpMemoryLeaks(void)
+int _CrtDumpMemoryLeaks()
 {
 	return 0;
 }
 
-_CRT_DUMP_CLIENT _CrtSetDumpClient( _CRT_DUMP_CLIENT dumpClient )
+_CRT_DUMP_CLIENT _CrtSetDumpClient( _CRT_DUMP_CLIENT )
 {
 	return NULL;
 }
@@ -722,12 +722,12 @@ long* AFNAME(_crtBreakAlloc) (void)
 	return AFRET(_crtBreakAlloc);
 }
 
-void __cdecl _CrtSetDbgBlockType( void *pMem, int nBlockUse )
+void __cdecl _CrtSetDbgBlockType( void *, int  )
 {
 	DebuggerBreak();
 }
 
-_CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook( _CRT_ALLOC_HOOK pfnNewHook )
+_CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook( _CRT_ALLOC_HOOK  )
 {
 	DebuggerBreak();
 	return NULL;
@@ -748,26 +748,26 @@ int __cdecl _CrtIsValidPointer( const void *pMem, unsigned int size, int access 
 	return g_pMemAlloc->CrtIsValidPointer( pMem, size, access );
 }
 
-int __cdecl _CrtCheckMemory( void )
+int __cdecl _CrtCheckMemory(  )
 {
 	// FIXME: Remove this when we re-implement the heap
 	return g_pMemAlloc->CrtCheckMemory( );
 }
 
-int __cdecl _CrtIsMemoryBlock( const void *pMem, unsigned int nSize,
-    long *plRequestNumber, char **ppFileName, int *pnLine )
+int __cdecl _CrtIsMemoryBlock( const void *, unsigned int ,
+    long *, char **, int * )
 {
 	DebuggerBreak();
 	return 1;
 }
 
-int __cdecl _CrtMemDifference( _CrtMemState *pState, const _CrtMemState * oldState, const _CrtMemState * newState )
+int __cdecl _CrtMemDifference( _CrtMemState *, const _CrtMemState * , const _CrtMemState *  )
 {
 	DebuggerBreak();
 	return FALSE;
 }
 
-void __cdecl _CrtMemDumpStatistics( const _CrtMemState *pState )
+void __cdecl _CrtMemDumpStatistics( const _CrtMemState * )
 {
 	DebuggerBreak();	
 }
@@ -778,12 +778,12 @@ void __cdecl _CrtMemCheckpoint( _CrtMemState *pState )
 	g_pMemAlloc->CrtMemCheckpoint( pState );
 }
 
-void __cdecl _CrtMemDumpAllObjectsSince( const _CrtMemState *pState )
+void __cdecl _CrtMemDumpAllObjectsSince( const _CrtMemState * )
 {
 	DebuggerBreak();
 }
 
-void __cdecl _CrtDoForAllClientObjects( void (*pfn)(void *, void *), void * pContext )
+void __cdecl _CrtDoForAllClientObjects( void (*)(void *, void *), void *  )
 {
 	DebuggerBreak();
 }
@@ -844,45 +844,7 @@ int __cdecl _CrtDbgReport( int nRptType, const char * szFile,
 // gets its own copy of the C run-time and these overrides are set on a per-CRT
 // basis.
 
-/*
-// This sample code will cause pure-call and invalid_parameter violations and
-// was used for testing:
-class Base
-{
-public:
-	virtual void PureFunction() = 0;
-
-	Base()
-	{
-		NonPureFunction();
-	}
-
-	void NonPureFunction()
-	{
-		PureFunction();
-	}
-};
-
-class Derived : public Base
-{
-public:
-	void PureFunction() OVERRIDE
-	{
-	}
-};
-
-void PureCallViolation()
-{
-	Derived derived;
-}
-
-void InvalidParameterViolation()
-{
-	printf( NULL );
-}
-*/
-
-#include <stdlib.h>
+#include <cstdlib>
 #include "minidump.h"
 
 // Disable compiler optimizations. If we don't do this then VC++ generates code
@@ -895,7 +857,7 @@ void InvalidParameterViolation()
 // The "int dummy" parameter is so that the callers can be unique so that the
 // linker won't use its /opt:icf optimization to collapse them together. This
 // makes reading the call stack easier.
-void __cdecl WriteMiniDumpOrBreak( int dummy, const char *pchName )
+void __cdecl WriteMiniDumpOrBreak( int , const char *pchName )
 {
 	if ( Plat_IsInDebugSession() )
 	{
@@ -944,7 +906,7 @@ ErrorHandlerRegistrar::ErrorHandlerRegistrar()
  
 // wrapper which passes no debug info; not available in debug
 #ifndef	SUPPRESS_INVALID_PARAMETER_NO_INFO
-void __cdecl _invalid_parameter_noinfo(void)
+void __cdecl _invalid_parameter_noinfo()
 {
     Assert(0);
 }
@@ -954,30 +916,30 @@ void __cdecl _invalid_parameter_noinfo(void)
 
 #if defined( _DEBUG ) || defined( USE_MEM_DEBUG )
 
-int __cdecl __crtMessageWindowW( int nRptType, const wchar_t * szFile, const wchar_t * szLine,
-								 const wchar_t * szModule, const wchar_t * szUserMessage )
+int __cdecl __crtMessageWindowW( int , const wchar_t * , const wchar_t * ,
+								 const wchar_t * , const wchar_t *  )
 {
 	Assert(0);
 	return 0;
 }
 
-int __cdecl _CrtDbgReportV( int nRptType, const wchar_t *szFile, int nLine, 
-						    const wchar_t *szModule, const wchar_t *szFormat, va_list arglist )
+int __cdecl _CrtDbgReportV( int , const wchar_t *, int , 
+						    const wchar_t *, const wchar_t *, va_list  )
 {
 	Assert(0);
 	return 0;
 }
 
-int __cdecl _CrtDbgReportW( int nRptType, const wchar_t *szFile, int nLine, 
-						    const wchar_t *szModule, const wchar_t *szFormat, ...)
+int __cdecl _CrtDbgReportW( int , const wchar_t *, int , 
+						    const wchar_t *, const wchar_t *, ...)
 {
 	Assert(0);
 	return 0;
 }
 
 #if _MSC_VER >= 1900
-int __cdecl _VCrtDbgReportA( int nRptType, void* ReturnAddress, const char * szFile, int nLine,
-							 const char * szModule, const char * szFormat, va_list arglist )
+int __cdecl _VCrtDbgReportA( int , void* , const char * , int ,
+							 const char * , const char * , va_list  )
 {
 	Assert(0);
 	return 0;
@@ -991,7 +953,7 @@ int __cdecl _VCrtDbgReportA( int nRptType, const wchar_t * szFile, int nLine,
 }
 #endif
 
-int __cdecl _CrtSetReportHook2( int mode, _CRT_REPORT_HOOK pfnNewHook )
+int __cdecl _CrtSetReportHook2( int , _CRT_REPORT_HOOK pfnNewHook )
 {
 	_CrtSetReportHook( pfnNewHook );
 	return 0;
@@ -1002,7 +964,7 @@ int __cdecl _CrtSetReportHook2( int mode, _CRT_REPORT_HOOK pfnNewHook )
 
 extern "C" int __crtDebugCheckCount = FALSE;
 
-extern "C" int __cdecl _CrtSetCheckCount( int fCheckCount )
+extern "C" int __cdecl _CrtSetCheckCount( int  )
 {
     int oldCheckCount = __crtDebugCheckCount;
     return oldCheckCount;
@@ -1014,7 +976,7 @@ extern "C" int __cdecl _CrtGetCheckCount( void )
 }
 
 // aligned offset debug
-extern "C" void * __cdecl _aligned_offset_recalloc_dbg( void * memblock, size_t count, size_t size, size_t align, size_t offset, const char * f_name, int line_n )
+extern "C" void * __cdecl _aligned_offset_recalloc_dbg( void * memblock, size_t count, size_t size, size_t , size_t , const char * , int  )
 {
 	Assert( IsPC() || 0 );
 	void *pMem = ReallocUnattributed( memblock, size * count );
@@ -1030,7 +992,7 @@ extern "C" void * __cdecl _aligned_recalloc_dbg( void *memblock, size_t count, s
     return _aligned_offset_recalloc_dbg(memblock, count, size, align, 0, f_name, line_n);
 }
 
-extern "C" void * __cdecl _recalloc_dbg ( void * memblock, size_t count, size_t size, int nBlockUse, const char * szFileName, int nLine )
+extern "C" void * __cdecl _recalloc_dbg ( void * memblock, size_t count, size_t size, int , const char * szFileName, int nLine )
 {
 	return _aligned_offset_recalloc_dbg(memblock, count, size, 0, 0, szFileName, nLine);
 }
@@ -1041,7 +1003,7 @@ _CRT_REPORT_HOOK __cdecl _CrtGetReportHook( void )
 }
 
 #endif
-int __cdecl _CrtReportBlockType(const void * pUserData)
+int __cdecl _CrtReportBlockType(const void * )
 {
 	return 0;
 }
@@ -1068,13 +1030,13 @@ extern "C"
 {
 size_t __crtDebugFillThreshold = 0;
 
-extern "C" void * __cdecl _heap_alloc_base (size_t size) {
+extern "C" void * __cdecl _heap_alloc_base (size_t ) {
     assert(0);
 	return NULL;
 }
 
 
-void * __cdecl _heap_alloc_dbg( size_t nSize, int nBlockUse, const char * szFileName, int nLine)
+void * __cdecl _heap_alloc_dbg( size_t nSize, int , const char * , int )
 {
 		return _heap_alloc(nSize);
 }
@@ -1085,7 +1047,7 @@ void __cdecl _free_nolock( void * pUserData)
         _free_dbg(pUserData, 0);
 }
 
-void __cdecl _free_dbg_nolock( void * pUserData, int nBlockUse)
+void __cdecl _free_dbg_nolock( void * pUserData, int )
 {
         _free_dbg(pUserData, 0);
 }
@@ -1102,25 +1064,25 @@ _CRT_DUMP_CLIENT __cdecl _CrtGetDumpClient ( void)
         return NULL;
 }
 
-void * __cdecl _aligned_malloc_dbg( size_t size, size_t align, const char * f_name, int line_n)
+void * __cdecl _aligned_malloc_dbg( size_t size, size_t align, const char * , int )
 {
     return _aligned_malloc(size, align);
 }
 
 void * __cdecl _aligned_realloc_dbg( void *memblock, size_t size, size_t align,
-               const char * f_name, int line_n)
+               const char * , int )
 {
     return _aligned_realloc(memblock, size, align);
 }
 
 void * __cdecl _aligned_offset_malloc_dbg( size_t size, size_t align, size_t offset,
-              const char * f_name, int line_n)
+              const char * , int )
 {
     return _aligned_offset_malloc(size, align, offset);
 }
 
 void * __cdecl _aligned_offset_realloc_dbg( void * memblock, size_t size, size_t align, 
-                 size_t offset, const char * f_name, int line_n)
+                 size_t offset, const char * , int )
 {
     return _aligned_offset_realloc(memblock, size, align, offset);
 }
