@@ -401,3 +401,9 @@ FodyWeavers.xsd
 devtools/bin/vpc.exe
 devtools/bin/vpc.pdb
 
+# Ignore VS solution files.
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.vpc_crc
+*.vpc.sentinel
+
