@@ -130,7 +130,10 @@ $Configuration "Release"
 		// Advanced
 		$CallingConvention
 		$CompileAs							"Compile as C++ Code (/TP)"
-		$DisableSpecificWarnings
+		// HACK(proper): Disable low signal/noise ratio warnings
+		// 4100 'XXX': unreferenced formal parameter
+		// 4127 conditional expression is constant
+		$DisableSpecificWarnings	"4100;4127"
 		$ForceIncludes
 		$Force#Using
 		$ShowIncludes
