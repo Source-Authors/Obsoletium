@@ -7,8 +7,9 @@
 //===========================================================================//
 
 #if defined( _WIN32 ) && !defined( _X360 )
-#include <windows.h>
-#include "shlwapi.h" // registry stuff
+#include "winlite.h"
+
+#include <shlwapi.h> // registry stuff
 #include <direct.h>
 #elif defined ( LINUX ) || defined( OSX )
 	#define O_EXLOCK 0
@@ -50,7 +51,6 @@
 #include "tier1/tier1.h"
 #include "tier2/tier2.h"
 #include "tier3/tier3.h"
-#include "p4lib/ip4.h"
 #include "inputsystem/iinputsystem.h"
 #include "filesystem/IQueuedLoader.h"
 #include "reslistgenerator.h"
@@ -514,52 +514,6 @@ void CLogAllFiles::LogAllFilesFunc(const char *fullPathFileName, const char *opt
 {
 	g_LogFiles.LogFile( fullPathFileName, options );
 }
-
-//-----------------------------------------------------------------------------
-// Purpose: This is a bit of a hack because it appears 
-// Output : Returns true on success, false on failure.
-//-----------------------------------------------------------------------------
-static bool IsWin98OrOlder()
-{
-	bool retval = false;
-
-#if defined( WIN32 ) && !defined( _X360 )
-	OSVERSIONINFOEX osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	
-	BOOL bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi);
-	if( !bOsVersionInfoEx )
-	{
-		// If OSVERSIONINFOEX doesn't work, try OSVERSIONINFO.
-		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-		if ( !GetVersionEx ( (OSVERSIONINFO *) &osvi) )
-		{
-			Error( "IsWin98OrOlder:  Unable to get OS version information" );
-		}
-	}
-
-	switch (osvi.dwPlatformId)
-	{
-	case VER_PLATFORM_WIN32_NT:
-		// NT, XP, Win2K, etc. all OK for SSE
-		break;
-	case VER_PLATFORM_WIN32_WINDOWS:
-		// Win95, 98, Me can't do SSE
-		retval = true;
-		break;
-	case VER_PLATFORM_WIN32s:
-		// Can't really run this way I don't think...
-		retval = true;
-		break;
-	default:
-		break;
-	}
-#endif
-
-	return retval;
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Figure out if Steam is running, then load the GameOverlayRenderer.dll
@@ -1218,10 +1172,10 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	// Hook the debug output stuff.
 	SpewOutputFunc( LauncherDefaultSpewFunc );
 
-	if ( 0 && IsWin98OrOlder() )
+	if ( !IsWindows7OrGreater() )
 	{
-		Error( "This build does not currently run under Windows 98/Me." );
-		return -1;
+		Error( "Sorry, Windows &+ required to run the game." );
+		return ERROR_OLD_WIN_VERSION;
 	}
 
 	// Quickly check the hardware key, essentially a warning shot.  
