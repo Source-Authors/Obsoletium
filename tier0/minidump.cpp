@@ -66,7 +66,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 
 	// get the function pointer directly so that we don't have to include the .lib, and that
 	// we can easily change it to using our own dll when this code is used on win98/ME/2K machines
-	HMODULE hDbgHelpDll = ::LoadLibrary( "DbgHelp.dll" );
+	HMODULE hDbgHelpDll = ::LoadLibraryExA( "DbgHelp.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
 	if ( !hDbgHelpDll )
 		return false;
 
@@ -575,7 +575,7 @@ void EnableCrashingOnCrashes()
 	typedef BOOL (WINAPI *tSetProcessUserModeExceptionPolicy)(DWORD dwFlags);
 	#define PROCESS_CALLBACK_FILTER_ENABLED     0x1
 
-	HMODULE kernel32 = LoadLibraryA("kernel32.dll");
+	HMODULE kernel32 = LoadLibraryExA("kernel32.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	tGetProcessUserModeExceptionPolicy pGetProcessUserModeExceptionPolicy = (tGetProcessUserModeExceptionPolicy)GetProcAddress(kernel32, "GetProcessUserModeExceptionPolicy");
 	tSetProcessUserModeExceptionPolicy pSetProcessUserModeExceptionPolicy = (tSetProcessUserModeExceptionPolicy)GetProcAddress(kernel32, "SetProcessUserModeExceptionPolicy");
 	if (pGetProcessUserModeExceptionPolicy && pSetProcessUserModeExceptionPolicy)

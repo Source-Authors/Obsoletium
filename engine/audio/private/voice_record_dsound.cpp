@@ -10,9 +10,9 @@
 
 #include "audio_pch.h"
 #if !defined( _X360 )
-#include "dsound.h"
+#include <dsound.h>
+#include <VersionHelpers.h>
 #endif
-#include <assert.h>
 #include "voice.h"
 #include "tier0/vcrmode.h"
 #include "ivoicerecord.h"
@@ -29,7 +29,7 @@
 // Globals.
 // ------------------------------------------------------------------------------
 
-typedef HRESULT (WINAPI *DirectSoundCaptureCreateFn)(const GUID FAR *lpGUID, LPDIRECTSOUNDCAPTURE *pCapture, LPUNKNOWN pUnkOuter);
+using DirectSoundCaptureCreateFn = decltype(&DirectSoundCaptureCreate);
 
 
 
@@ -146,23 +146,6 @@ void VoiceRecord_DSound::RecordStop()
 {
 }
 
-static bool IsRunningWindows7()
-{
-	if ( IsPC() )
-	{
-		OSVERSIONINFOEX osvi;
-		ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-
-		if ( GetVersionEx ((OSVERSIONINFO *)&osvi) )
-		{
-			if ( osvi.dwMajorVersion > 6 || (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion >= 1) )
-				return true;
-		}
-	}
-	return false;
-}
-
 bool VoiceRecord_DSound::Init(int sampleRate)
 {
 	HRESULT hr;
@@ -184,10 +167,8 @@ bool VoiceRecord_DSound::Init(int sampleRate)
 		sizeof(WAVEFORMATEX)	// cbSize
 	};
 
-
-	
 	// Load the DSound DLL.
-	m_hInstDS = LoadLibrary("dsound.dll");
+	m_hInstDS = LoadLibraryExA( "dsound.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
 	if(!m_hInstDS)
 		goto HandleError;
 
@@ -196,10 +177,12 @@ bool VoiceRecord_DSound::Init(int sampleRate)
 		goto HandleError;
 
 	const GUID FAR *pGuid = &DSDEVID_DefaultVoiceCapture;
-	if ( IsRunningWindows7() )
+#ifndef _X360
+	if ( IsWindows7OrGreater() )
 	{
 		pGuid = NULL;
 	}
+#endif
 	hr = createFn(pGuid, &m_pCapture, NULL);
 	if(FAILED(hr))
 		goto HandleError;

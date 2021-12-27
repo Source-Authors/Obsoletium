@@ -178,8 +178,7 @@ InitReturnVal_t CInputSystem::Init()
 
 #if defined( PLATFORM_WINDOWS_PC )
 		// NVNT try and load and initialize through the haptic dll, but only if the drivers are installed
-		HMODULE hdl = LoadLibraryEx( "hdl.dll", NULL, LOAD_LIBRARY_AS_DATAFILE );
-
+		HMODULE hdl = LoadLibraryExA( "hdl.dll", NULL, LOAD_LIBRARY_AS_DATAFILE );
 		if ( hdl )
 		{
 			m_pNovintDLL = Sys_LoadModule( "haptics.dll" );

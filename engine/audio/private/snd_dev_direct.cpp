@@ -5,15 +5,11 @@
 //=====================================================================================//
 
 #include "audio_pch.h"
+
 #include <dsound.h>
 #include <ks.h>
-// Fix for VS 2010 build errors copied from Dota
-#if !defined( NEW_DXSDK ) && ( _MSC_VER >= 1600 )
-#undef KSDATAFORMAT_SUBTYPE_WAVEFORMATEX
-#undef KSDATAFORMAT_SUBTYPE_PCM
-#undef KSDATAFORMAT_SUBTYPE_IEEE_FLOAT
-#endif
 #include <ksmedia.h>
+
 #include "iprediction.h"
 #include "eax.h"
 #include "tier0/icommandline.h"
@@ -41,17 +37,9 @@ typedef enum {SIS_SUCCESS, SIS_FAILURE, SIS_NOTAVAIL} sndinitstat;
 #define SECONDARY_BUFFER_SIZE			0x10000		// output buffer size in bytes
 #define SECONDARY_BUFFER_SIZE_SURROUND	0x04000		// output buffer size in bytes, one per channel
 
-#if !defined( NEW_DXSDK )
-// hack - need to include latest dsound.h
-#undef DSSPEAKER_5POINT1
-#undef DSSPEAKER_7POINT1
-#define DSSPEAKER_5POINT1		6
-#define DSSPEAKER_7POINT1		7
-#define DSSPEAKER_7POINT1_SURROUND 8
-#define DSSPEAKER_5POINT1_SURROUND 9
-#endif
 
-HRESULT (WINAPI *pDirectSoundCreate)(GUID FAR *lpGUID, LPDIRECTSOUND FAR *lplpDS, IUnknown FAR *pUnkOuter);
+using DirectSoundCreateFn = decltype(&DirectSoundCreate);
+DirectSoundCreateFn pDirectSoundCreate;
 
 extern void ReleaseSurround(void);
 extern bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int volume[CCHANVOLUMES], int mixchans );
@@ -734,14 +722,14 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 	
 	if (!m_hInstDS)
 	{
-		m_hInstDS = LoadLibrary("dsound.dll");
+		m_hInstDS = LoadLibraryExA( "dsound.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
 		if (m_hInstDS == NULL)
 		{
 			Warning( "Couldn't load dsound.dll\n");
 			return SIS_FAILURE;
 		}
 
-		pDirectSoundCreate = (long (__stdcall *)(struct _GUID *,struct IDirectSound ** ,struct IUnknown *))GetProcAddress(m_hInstDS,"DirectSoundCreate");
+		pDirectSoundCreate = (DirectSoundCreateFn)GetProcAddress(m_hInstDS,"DirectSoundCreate");
 		if (!pDirectSoundCreate)
 		{
 			Warning( "Couldn't get DS proc addr\n");

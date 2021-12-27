@@ -118,18 +118,6 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 	//  Query all of the handles in the system.  We have to do this in a loop, since we do
 	//  not know how large of a buffer we need.
 	nBufferSize = 0;
-	
-	// Load ntdll.dll so we can Query the system
-	/* load the ntdll.dll */
-	NtQuerySystemInformation1 NtQuerySystemInformation;
-
-	//PVOID Info;
-	HMODULE hModule = LoadLibrary( "ntdll.dll" );
-	if (!hModule)   
-	{
-		iProcessCount = CHECK_PROCESS_UNSUPPORTED;
-		goto Cleanup;
-	}
 
 	while ( TRUE )
 	{
@@ -149,14 +137,6 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 			goto Cleanup;
 		}
 
-		//  Query the handles in the system.
-		NtQuerySystemInformation = (NtQuerySystemInformation1)GetProcAddress(hModule, "NtQuerySystemInformation");
-		if ( NtQuerySystemInformation == NULL ) 
-		{
-			iProcessCount = CHECK_PROCESS_UNSUPPORTED;
-			goto Cleanup;
-		}
-	
 		status = NtQuerySystemInformation( SystemHandleInformation,	pHandleInfo, nBufferSize, NULL );
 	
 		//  If our buffer was too small, try again.
@@ -183,7 +163,7 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 	//
 
 	// Check for the presence of GetModuleFileNameEx
-	hInst = LoadLibrary( "Psapi.dll" );
+	hInst = LoadLibraryExA( "Psapi.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
 	if ( !hInst )
 		return CHECK_PROCESS_UNSUPPORTED;
 
@@ -256,11 +236,6 @@ Cleanup:
 		FreeLibrary( hInst );
 	}
 
-	if ( hModule != NULL )
-	{
-		FreeLibrary( hModule );
-	}
-
 	return iProcessCount;
 }
 #endif // IS_WINDOWS_PC
@@ -275,11 +250,11 @@ int CheckOtherInstancesRunning( void )
 	char thisProcessNameShort[ MAX_PATH ];
 
 	// Load the pspapi to get our current process' name
-	HINSTANCE hInst = LoadLibrary( "Psapi.dll" );
+	HINSTANCE hInst = LoadLibraryExA( "Psapi.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
 	if ( hInst )
 	{
-		typedef DWORD (WINAPI *GetProcessImageFileNameFn)(HANDLE, LPTSTR, DWORD);
-		GetProcessImageFileNameFn fn = (GetProcessImageFileNameFn)GetProcAddress( hInst,
+		using GetProcessImageFileNameFn = decltype(&GetProcessImageFileName);
+		auto fn = (GetProcessImageFileNameFn)GetProcAddress( hInst,
 #ifdef  UNICODE
 			"GetProcessImageFileNameW");
 #else

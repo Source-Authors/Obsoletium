@@ -506,11 +506,11 @@ public:
 				(double)memStat.ullAvailExtendedVirtual / MbDiv);
 		}
 
-		HINSTANCE hInst = LoadLibrary( "Psapi.dll" );
+		HINSTANCE hInst = LoadLibraryExA( "Psapi.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
 		if ( hInst )
 		{
-			typedef BOOL (WINAPI *GetProcessMemoryInfoFn)(HANDLE, PPROCESS_MEMORY_COUNTERS, DWORD);
-			GetProcessMemoryInfoFn fn = (GetProcessMemoryInfoFn)GetProcAddress( hInst, "GetProcessMemoryInfo" );
+			using GetProcessMemoryInfoFn = decltype(&GetProcessMemoryInfo);
+			auto fn = (GetProcessMemoryInfoFn)GetProcAddress( hInst, "GetProcessMemoryInfo" );
 			if ( fn )
 			{
 				PROCESS_MEMORY_COUNTERS counters;
@@ -1288,21 +1288,10 @@ void CEngineAPI::ActivateSimulation( bool bActive )
 static void MoveConsoleWindowToFront()
 {
 #ifdef _WIN32
-	// Move the window to the front.
-	HINSTANCE hInst = LoadLibrary( "kernel32.dll" );
-	if ( hInst )
-	{
-		typedef HWND (*GetConsoleWindowFn)();
-		GetConsoleWindowFn fn = (GetConsoleWindowFn)GetProcAddress( hInst, "GetConsoleWindow" );
-		if ( fn )
-		{
-			HWND hwnd = fn();
-			ShowWindow( hwnd, SW_SHOW );
-			UpdateWindow( hwnd );
-			SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
-		}
-		FreeLibrary( hInst );
-	}
+	HWND hwnd = GetConsoleWindow();
+	ShowWindow( hwnd, SW_SHOW );
+	UpdateWindow( hwnd );
+	SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
 #endif
 }
 

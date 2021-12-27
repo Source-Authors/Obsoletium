@@ -54,10 +54,6 @@
 #include "sys_dll.h"
 #include "inputsystem/iinputsystem.h"
 #include "inputsystem/ButtonCode.h"
-#ifdef WIN32
-#undef WIN32_LEAN_AND_MEAN
-  #include "unicode/unicode.h"
-#endif
 #include "GameUI/IGameUI.h"
 #include "matchmaking.h"
 #include "sv_main.h"
@@ -107,12 +103,6 @@ enum GameInputEventType_t
 	IE_WindowMove,
 	IE_AppActivated,
 };
-
-
-
-#ifdef WIN32
-static 	IUnicodeWindows *unicode = NULL;
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Main game interface, including message pump and window creation
@@ -167,9 +157,6 @@ public:
 #endif
 	void			SetActiveApp( bool active );
 
-	bool			LoadUnicode();
-	void			UnloadUnicode();
-
 // Message handlers.
 public:
 	void	HandleMsg_WindowMove( const InputEvent_t &event );
@@ -218,7 +205,6 @@ private:
 	int				m_width;
 	int				m_height;
 	bool			m_bActiveApp;
-	CSysModule		*m_hUnicodeModule;
 
 	bool			m_bCanPostActivateEvents;
 	int				m_iDesktopWidth, m_iDesktopHeight, m_iDesktopRefreshRate;
@@ -422,27 +408,16 @@ void VCR_EnterPausedState()
 	g_bVCRSingleStep = false;
 
 #ifdef WIN32
-	// This is cheesy, but GetAsyncKeyState is blocked (in protected_things.h) 
-	// from being accidentally used, so we get it through it by getting its pointer directly.
-	static HINSTANCE hInst = LoadLibrary( "user32.dll" );
-	if ( !hInst )
-		return;
-
-	typedef SHORT (WINAPI *GetAsyncKeyStateFn)( int vKey );
-	static GetAsyncKeyStateFn pfn = (GetAsyncKeyStateFn)GetProcAddress( hInst, "GetAsyncKeyState" );
-	if ( !pfn )
-		return;
-
 	// In this mode, we enter a wait state where we only pay attention to R and Q.
 	while ( 1 )
 	{
-		if ( pfn( 'R' ) & 0x8000 )
+		if ( GetAsyncKeyState( 'R' ) & 0x8000 )
 			break;
 
-		if ( pfn( 'Q' ) & 0x8000 )
+		if ( GetAsyncKeyState( 'Q' ) & 0x8000 )
 			TerminateProcess( GetCurrentProcess(), 1 );
 
-		if ( pfn( 'S' ) & 0x8000 )
+		if ( GetAsyncKeyState( 'S' ) & 0x8000 )
 		{
 			if ( !g_bWaitingForStepKeyUp )
 			{
@@ -507,14 +482,14 @@ void VCR_HandlePlaybackMessages(
 
 //-----------------------------------------------------------------------------
 // Calls the default window procedure
-// FIXME: It would be nice to remove the need for this, which we can do
-// if we can make unicode work when running inside hammer.
 //-----------------------------------------------------------------------------
 static LONG WINAPI CallDefaultWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-	if ( unicode )
-		return unicode->DefWindowProcW( hWnd, uMsg, wParam, lParam );
-	return DefWindowProc( hWnd, uMsg, wParam, lParam );
+#ifdef _X360
+  return DefWindowProc( hWnd, uMsg, wParam, lParam );
+#else
+	return DefWindowProcW( hWnd, uMsg, wParam, lParam );
+#endif
 }
 #endif
 
@@ -928,14 +903,6 @@ bool CGame::CreateGameWindow( void )
 
 #if defined( WIN32 ) && !defined( USE_SDL )
 #ifndef SWDS
-	if ( IsPC() )
-	{
-		if ( !LoadUnicode() )
-		{
-			return false;
-		}
-	}
-
 #if !defined( _X360 )
 	WNDCLASSW wc;
 #else
@@ -981,9 +948,9 @@ bool CGame::CreateGameWindow( void )
 	// Oops, we didn't clean up the class registration from last cycle which
 	// might mean that the wndproc pointer is bogus
 #ifndef _X360
-	unicode->UnregisterClassW( CLASSNAME, m_hInstance );
+	UnregisterClassW( CLASSNAME, m_hInstance );
 	// Register it again
-    unicode->RegisterClassW( &wc );
+  RegisterClassW( &wc );
 #else
 	RegisterClass( &wc );
 #endif
@@ -1019,7 +986,7 @@ bool CGame::CreateGameWindow( void )
 	}
 
 #if !defined( _X360 )
-	HWND hwnd = unicode->CreateWindowExW( exFlags, CLASSNAME, uc, style, 
+	HWND hwnd = CreateWindowExW( exFlags, CLASSNAME, uc, style, 
 		0, 0, w, h, NULL, NULL, m_hInstance, NULL );
 	// NOTE: On some cards, CreateWindowExW slams the FPU control word
 	SetupFPUControlWord();
@@ -1091,8 +1058,7 @@ void CGame::DestroyGameWindow()
 		}
 
 #if !defined( _X360 )
-		unicode->UnregisterClassW( CLASSNAME, m_hInstance );
-		UnloadUnicode();
+		UnregisterClassW( CLASSNAME, m_hInstance );
 #else
 		UnregisterClass( CLASSNAME, m_hInstance );
 #endif
@@ -1423,8 +1389,6 @@ CGame::CGame()
 
 #if defined( WIN32 )
 #if !defined( USE_SDL )
-	unicode = NULL;
-	m_hUnicodeModule = NULL;
 	m_hInstance = 0;
 	m_ChainedWindowProc = NULL;
 #endif
@@ -1456,19 +1420,6 @@ bool CGame::Init( void *pvInstance )
 	m_bExternallySuppliedWindow = false;
 
 #if defined( WIN32 ) && !defined( USE_SDL )
-	OSVERSIONINFO	vinfo;
-	vinfo.dwOSVersionInfoSize = sizeof(vinfo);
-
-	if ( !GetVersionEx( &vinfo ) )
-	{
-		return false;
-	}
-
-	if ( vinfo.dwPlatformId == VER_PLATFORM_WIN32s )
-	{
-		return false;
-	}
-
 	m_hInstance = (HINSTANCE)pvInstance;
 #endif
 	return true;
@@ -1481,47 +1432,6 @@ bool CGame::Shutdown( void )
 	m_hInstance = 0;
 #endif
 	return true;
-}
-
-bool CGame::LoadUnicode( void )
-{
-#ifdef WIN32
-	m_hUnicodeModule = Sys_LoadModule( "unicode" );
-	if ( !m_hUnicodeModule )
-	{
-		Error( "Unable to load unicode.dll" );
-		return false;
-	}
-
-	CreateInterfaceFn factory = Sys_GetFactory( m_hUnicodeModule );
-	if ( !factory )
-	{
-		Error( "Unable to get factory from unicode.dll" );
-		return false;
-	}
-
-	unicode = ( IUnicodeWindows * )factory( VENGINE_UNICODEINTERFACE_VERSION, NULL );
-	if ( !unicode )
-	{
-		Error( "Unable to load interface '%s' from unicode.dll", VENGINE_UNICODEINTERFACE_VERSION );
-		return false;
-	}
-#endif
-
-	return true;
-}
-
-void CGame::UnloadUnicode()
-{
-#ifdef WIN32
-	unicode = NULL;
-
-	if ( m_hUnicodeModule )
-	{
-		Sys_UnloadModule( m_hUnicodeModule );
-		m_hUnicodeModule = NULL;
-	}
-#endif
 }
 
 void *CGame::GetMainWindow( void )
