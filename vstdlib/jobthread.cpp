@@ -1032,32 +1032,22 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 			if ( !pAffinityTable )
 			{
 #if defined( IS_WINDOWS_PC )
-				// no affinity table, distribution is cycled across all available
-				HINSTANCE hInst = LoadLibrary( "kernel32.dll" );
-				if ( hInst )
+				ThreadHandle_t hMainThread = ThreadGetCurrentHandle();
+				SetThreadIdealProcessor( hMainThread, 0 );
+
+				int iProc = 0;
+				for ( int i = 0; i < m_Threads.Count(); i++ )
 				{
-					typedef DWORD (WINAPI *SetThreadIdealProcessorFn)(ThreadHandle_t hThread, DWORD dwIdealProcessor);
-					SetThreadIdealProcessorFn Thread_SetIdealProcessor = (SetThreadIdealProcessorFn)GetProcAddress( hInst, "SetThreadIdealProcessor" );
-					if ( Thread_SetIdealProcessor )
+					iProc += nHwThreadsPer;
+					if ( iProc >= ci.m_nLogicalProcessors )
 					{
-						ThreadHandle_t hMainThread = ThreadGetCurrentHandle();
-						Thread_SetIdealProcessor( hMainThread, 0 );
-						int iProc = 0;
-						for ( int i = 0; i < m_Threads.Count(); i++ )
+						iProc %= ci.m_nLogicalProcessors;
+						if ( nHwThreadsPer > 1 )
 						{
-							iProc += nHwThreadsPer;
-							if ( iProc >= ci.m_nLogicalProcessors )
-							{
-								iProc %= ci.m_nLogicalProcessors;
-								if ( nHwThreadsPer > 1 )
-								{
-									iProc = ( iProc + 1 ) % nHwThreadsPer;
-								}
-							}
-							Thread_SetIdealProcessor((ThreadHandle_t)m_Threads[i]->GetThreadHandle(), iProc);
+							iProc = ( iProc + 1 ) % nHwThreadsPer;
 						}
 					}
-					FreeLibrary( hInst );
+					SetThreadIdealProcessor( (ThreadHandle_t)m_Threads[i]->GetThreadHandle(), iProc );
 				}
 #else
 				// no affinity table, distribution is cycled across all available
