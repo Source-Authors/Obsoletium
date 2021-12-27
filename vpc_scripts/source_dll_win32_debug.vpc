@@ -127,7 +127,9 @@ $Configuration "Debug"
 		// HACK(proper): Disable low signal/noise ratio warnings
 		// 4100 'XXX': unreferenced formal parameter
 		// 4127 conditional expression is constant
-		$DisableSpecificWarnings	"4100;4127"
+		// 4201 nonstandard extension used: XXX
+		// 4324 'XXX': structure was padded due to alignment specifier
+		$DisableSpecificWarnings	"4100;4127;4201;4324"
 		$ForceIncludes
 		$Force#Using
 		$ShowIncludes
