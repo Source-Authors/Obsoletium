@@ -405,10 +405,8 @@ const CPUInformation* GetCPUInformation()
 	pi.m_nLogicalProcessors = LogicalProcessorsPerPackage();
 
 #if defined(_WIN32) && !defined( _X360 )
-	SYSTEM_INFO si;
-	ZeroMemory( &si, sizeof(si) );
-
-	GetSystemInfo( &si );
+	SYSTEM_INFO si = {0};
+	GetNativeSystemInfo( &si );
 
 	pi.m_nPhysicalProcessors = (unsigned char)(si.dwNumberOfProcessors / pi.m_nLogicalProcessors);
 	pi.m_nLogicalProcessors = (unsigned char)(pi.m_nLogicalProcessors * pi.m_nPhysicalProcessors);
