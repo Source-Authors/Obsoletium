@@ -1096,21 +1096,20 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 	Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_stdio" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
 
 	#if !defined( _X360 )
+		// Use filesystem_steam if it exists?
+		struct stat statBuf;
+		if ( stat( pFileSystemDLL, &statBuf ) == 0 )
+			return FS_OK;
 
-		// Use filsystem_steam if it exists?
-		#if defined( OSX ) || defined( LINUX )
-			struct stat statBuf;
-		#endif
-		if (
-			#if defined( OSX ) || defined( LINUX )
-				stat( pFileSystemDLL, &statBuf ) != 0
-			#else
-				_access( pFileSystemDLL, 0 ) != 0
-			#endif
-		) {
-			Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_steam" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
+		Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_steam" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
+		if ( stat( pFileSystemDLL, &statBuf ) == 0 )
+		{
 			bSteam = true;
+			return FS_OK;
 		}
+
+		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Please ensure game installed correctly.\n\n"
+			"Unable to load filesystem *" DLL_EXT_STRING ": both stdio / steam are absent." );
 	#endif
 
 	return FS_OK;
