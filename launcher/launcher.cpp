@@ -635,7 +635,12 @@ bool CSourceAppSystemGroup::Create()
 #endif
 
 	if ( !AddSystems( appSystems ) ) 
+	{
+		Error("Please check game installed correctly.\n\n"
+			"Unable to add launcher systems from *" DLL_EXT_STRING
+			"s. Looks like required components are missed or broken." );
 		return false;
+	}
 
 
 	// This will be NULL for games that don't support VR. That's ok. Just don't load the DLL
