@@ -24,7 +24,7 @@ $Configuration
 	$Linker
 	{
 		$IgnoreImportLibrary				"Yes" [$WIN32]
-		$AdditionalDependencies				"$BASE vfw32.lib" [$WIN32]
+		$AdditionalDependencies				"$BASE vfw32.lib dsound.lib dxguid.lib" [$WIN32]
 		$SystemLibraries                    "iconv" [$OSXALL]
 		$SystemFrameworks					"Quicktime;Carbon" [$OSXALL]
 		$AdditionalLibraryDirectories		"$BASE;$SRCDIR\dx9sdk\lib"	[$WIN32]
@@ -76,8 +76,6 @@ $Project "video_quicktime"
 	{
 		$Lib tier2
 		$File   "$SRCDIR\lib\common\quicktime\QTMLClient.lib"		[$WIN32]
-		$File	"$SRCDIR\DX9SDK\lib\dsound.lib"						[$WIN32]
-		$File	"$SRCDIR\DX9SDK\lib\dxguid.lib"						[$WIN32]
 		
 	}
 }

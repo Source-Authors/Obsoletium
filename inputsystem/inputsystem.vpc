@@ -42,7 +42,6 @@ $Project "inputsystem"
 		$File	"$SRCDIR\public\inputsystem\ButtonCode.h"
 		$File	"$SRCDIR\public\inputsystem\iinputsystem.h"
 		$File	"$SRCDIR\public\inputsystem\InputEnums.h"
-		$File	"$SRCDIR\dx9sdk\include\xinput.h" [$WIN32]
 	}
 
 	$Folder	"Link Libraries"
