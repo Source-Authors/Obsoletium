@@ -1016,6 +1016,6 @@ $Project
 		$Lib	particles
 		$Lib	tier2
 		$Lib	tier3
-		$ImpLibexternal steam_api
+		$ImpLibexternal steam_api  [!$NO_STEAM]
 	}
 }

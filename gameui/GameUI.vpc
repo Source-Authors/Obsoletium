@@ -249,7 +249,7 @@ $Project "GameUI"
 		$Lib	vgui_controls
 		$Lib	vtf
 		$Lib  	"$LIBCOMMON/libjpeg"		[!$DEDICATED]
-		$ImpLib	steam_api
+		$ImpLib	steam_api  [!$NO_STEAM]
 		$Lib libpng [!$VS2015&&!$DEDICATED]
 		$Lib $LIBCOMMON/libpng [$VS2015&&!$DEDICATED]
 		$Lib libz [!$DEDICATED]

@@ -67,6 +67,6 @@ $Project "SourceVR"
 		$Lib tier2
 		$Lib tier3
 		$Lib appframework
-		$ImpLibexternal steam_api
+		$ImpLibexternal steam_api  [!$NO_STEAM]
 	}
 }

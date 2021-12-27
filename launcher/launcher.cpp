@@ -522,7 +522,7 @@ void CLogAllFiles::LogAllFilesFunc(const char *fullPathFileName, const char *opt
 //-----------------------------------------------------------------------------
 void TryToLoadSteamOverlayDLL()
 {
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 ) && !defined( _X360 ) && !defined( NO_STEAM )
 	// First, check if the module is already loaded, perhaps because we were run from Steam directly
 	HMODULE hMod = GetModuleHandle( "GameOverlayRenderer" DLL_EXT_STRING );
 	if ( hMod )

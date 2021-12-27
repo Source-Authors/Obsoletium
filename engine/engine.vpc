@@ -1104,7 +1104,7 @@ $Project "engine"
 		$Lib	vtf
 		$Lib	vgui_controls						[!$DEDICATED]
 
-		$ImpLibexternal steam_api
+		$ImpLibexternal steam_api   [!$NO_STEAM]
 
 		$ImpLib	"$LIBCOMMON\curl"	  [$OSXALL]
 

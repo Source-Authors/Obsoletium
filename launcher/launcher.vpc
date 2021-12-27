@@ -22,7 +22,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies		"$BASE shlwapi.lib winmm.lib wsock32.lib odbc32.lib odbccp32.lib $SRCDIR\dx9sdk\lib\dinput8.lib $SRCDIR\dx9sdk\lib\ddraw.lib" [$WIN32]
+		$AdditionalDependencies		"$BASE shlwapi.lib winmm.lib wsock32.lib" [$WINDOWS]
 		$SystemLibraries            "iconv" [$OSXALL]
 		$SystemFrameworks			"Carbon;AppKit;OpenGL;IOKit" [$OSXALL]
 		// We run from the ./game dir, but want to look in the ./game/bin directory when loading libraries.
@@ -91,7 +91,7 @@ $Project "launcher"
 		$Lib	appframework
 		$Lib	tier2
 		$Lib	tier3
-		$Implib steam_api
+		$Implib steam_api  [!$NO_STEAM]
 		$ImpLib togl [!$IS_LIB_PROJECT && $GL]
 		$ImpLib SDL2 [$SDL]
 	}
