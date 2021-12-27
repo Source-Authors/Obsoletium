@@ -194,9 +194,7 @@ public:
 
 
     void ClearCounter()
-    {
-        PerfEvtSel & select = eventSelect[eventSelectNum]; 
-        
+    {        
         int counterPort = MSR_K8_PERFCTR0 + eventSelectNum;
 
         pme->WriteMSR(counterPort, 0ui64 ); // clear
@@ -204,9 +202,6 @@ public:
 
     void WriteCounter(int64 value)
     {
-
-        PerfEvtSel & select = eventSelect[eventSelectNum]; 
-
         int counterPort = MSR_K8_PERFCTR0 + eventSelectNum;
         pme->WriteMSR(counterPort, value); // clear
     }

@@ -45,135 +45,68 @@ static bool cpuid(unsigned long function, unsigned long& out_eax, unsigned long&
 	return true;
 #else
 	bool retval = true;
-	unsigned long local_eax, local_ebx, local_ecx, local_edx;
-	_asm pushad;
 
 	__try
 	{
-        _asm
-		{
-			xor edx, edx		// Clue the compiler that EDX is about to be used.
-            mov eax, function   // set up CPUID to return processor version and features
-								//      0 = vendor string, 1 = version info, 2 = cache info
-            cpuid				// code bytes = 0fh,  0a2h
-            mov local_eax, eax	// features returned in eax
-            mov local_ebx, ebx	// features returned in ebx
-            mov local_ecx, ecx	// features returned in ecx
-            mov local_edx, edx	// features returned in edx
-		}
-    } 
-	__except(EXCEPTION_EXECUTE_HANDLER) 
+			int pCPUInfo[4];
+			__cpuid(pCPUInfo, (int)function);
+			out_eax = pCPUInfo[0];
+			out_ebx = pCPUInfo[1];
+			out_ecx = pCPUInfo[2];
+			out_edx = pCPUInfo[3];
+	} 
+	__except(EXCEPTION_EXECUTE_HANDLER)
 	{ 
-		retval = false; 
+		retval = false;
 	}
-
-	out_eax = local_eax;
-	out_ebx = local_ebx;
-	out_ecx = local_ecx;
-	out_edx = local_edx;
-
-	_asm popad
 
 	return retval;
 #endif
 }
 
-static bool CheckMMXTechnology(void)
+static bool CheckMMXTechnology()
 {
 #if defined( _X360 ) || defined( _PS3 ) 
 	return true;
 #else
-    unsigned long eax,ebx,edx,unused;
-    if ( !cpuid(1,eax,ebx,unused,edx) )
+	unsigned long eax,ebx,edx,unused;
+	if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
-    return ( edx & 0x800000 ) != 0;
-#endif
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: This is a bit of a hack because it appears 
-// Output : Returns true on success, false on failure.
-//-----------------------------------------------------------------------------
-static bool IsWin98OrOlder()
-{
-#if defined( _X360 ) || defined( _PS3 ) || defined( POSIX )
-	return false;
-#else
-	bool retval = false;
-
-	OSVERSIONINFOEX osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	
-	BOOL bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi);
-	if( !bOsVersionInfoEx )
-	{
-		// If OSVERSIONINFOEX doesn't work, try OSVERSIONINFO.
-		
-		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-		if ( !GetVersionEx ( (OSVERSIONINFO *) &osvi) )
-		{
-			Error( _T("IsWin98OrOlder:  Unable to get OS version information") );
-		}
-	}
-
-	switch (osvi.dwPlatformId)
-	{
-	case VER_PLATFORM_WIN32_NT:
-		// NT, XP, Win2K, etc. all OK for SSE
-		break;
-	case VER_PLATFORM_WIN32_WINDOWS:
-		// Win95, 98, Me can't do SSE
-		retval = true;
-		break;
-	case VER_PLATFORM_WIN32s:
-		// Can't really run this way I don't think...
-		retval = true;
-		break;
-	default:
-		break;
-	}
-
-	return retval;
+	return ( edx & 0x800000 ) != 0;
 #endif
 }
 
 
-static bool CheckSSETechnology(void)
+static bool CheckSSETechnology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return true;
 #else
-	if ( IsWin98OrOlder() )
+	unsigned long eax,ebx,edx,unused;
+	if ( !cpuid(1,eax,ebx,unused,edx) )
 	{
 		return false;
 	}
 
-    unsigned long eax,ebx,edx,unused;
-    if ( !cpuid(1,eax,ebx,unused,edx) )
-	{
-		return false;
-	}
-
-    return ( edx & 0x2000000L ) != 0;
+	return ( edx & 0x2000000L ) != 0;
 #endif
 }
 
-static bool CheckSSE2Technology(void)
+static bool CheckSSE2Technology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
 	unsigned long eax,ebx,edx,unused;
-    if ( !cpuid(1,eax,ebx,unused,edx) )
+	if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
-    return ( edx & 0x04000000 ) != 0;
+	return ( edx & 0x04000000 ) != 0;
 #endif
 }
 
-bool CheckSSE3Technology(void)
+bool CheckSSE3Technology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
@@ -186,7 +119,7 @@ bool CheckSSE3Technology(void)
 #endif
 }
 
-bool CheckSSSE3Technology(void)
+bool CheckSSSE3Technology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
@@ -201,14 +134,13 @@ bool CheckSSSE3Technology(void)
 #endif
 }
 
-bool CheckSSE41Technology(void)
+bool CheckSSE41Technology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
 	// SSE 4.1 is implemented by both Intel and AMD
 	// detection is done the same way for both vendors
-
 	unsigned long eax,ebx,edx,ecx;
 	if( !cpuid(1,eax,ebx,ecx,edx) )
 		return false;
@@ -217,17 +149,13 @@ bool CheckSSE41Technology(void)
 #endif
 }
 
-bool CheckSSE42Technology(void)
+bool CheckSSE42Technology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
-	// SSE4.2 is an Intel-only feature
-
-	const char *pchVendor = GetProcessorVendorId();
-	if ( 0 != V_tier0_stricmp( pchVendor, "GenuineIntel" ) )
-		return false;
-
+  // SSE 4.1 is implemented by both Intel and AMD
+  // detection is done the same way for both vendors
 	unsigned long eax,ebx,edx,ecx;
 	if( !cpuid(1,eax,ebx,ecx,edx) )
 		return false;
@@ -237,13 +165,12 @@ bool CheckSSE42Technology(void)
 }
 
 
-bool CheckSSE4aTechnology( void )
+bool CheckSSE4aTechnology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
 	// SSE 4a is an AMD-only feature
-
 	const char *pchVendor = GetProcessorVendorId();
 	if ( 0 != V_tier0_stricmp( pchVendor, "AuthenticAMD" ) )
 		return false;
@@ -256,24 +183,24 @@ bool CheckSSE4aTechnology( void )
 #endif
 }
 
-
-static bool Check3DNowTechnology(void)
+static bool Check3DNowTechnology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
 	unsigned long eax, unused;
-    if ( !cpuid(0x80000000,eax,unused,unused,unused) )
+	if ( !cpuid(0x80000000,eax,unused,unused,unused) )
 		return false;
 
-    if ( eax > 0x80000000L )
-    {
-     	if ( !cpuid(0x80000001,unused,unused,unused,eax) )
+	if ( eax > 0x80000000L )
+	{
+		if ( !cpuid(0x80000001,unused,unused,unused,eax) )
 			return false;
 
 		return ( eax & 1<<31 ) != 0;
-    }
-    return false;
+	}
+
+	return false;
 #endif
 }
 
@@ -283,36 +210,36 @@ static bool CheckCMOVTechnology()
 	return false;
 #else
 	unsigned long eax,ebx,edx,unused;
-    if ( !cpuid(1,eax,ebx,unused,edx) )
+	if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
-    return ( edx & (1<<15) ) != 0;
+	return ( edx & (1<<15) ) != 0;
 #endif
 }
 
-static bool CheckFCMOVTechnology(void)
-{
-#if defined( _X360 ) || defined( _PS3 )
-	return false;
-#else
-    unsigned long eax,ebx,edx,unused;
-    if ( !cpuid(1,eax,ebx,unused,edx) )
-		return false;
-
-    return ( edx & (1<<16) ) != 0;
-#endif
-}
-
-static bool CheckRDTSCTechnology(void)
+static bool CheckFCMOVTechnology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
 	unsigned long eax,ebx,edx,unused;
-    if ( !cpuid(1,eax,ebx,unused,edx) )
+	if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
-    return ( edx & 0x10 ) != 0;
+	return ( edx & (1<<16) ) != 0;
+#endif
+}
+
+static bool CheckRDTSCTechnology()
+{
+#if defined( _X360 ) || defined( _PS3 )
+	return false;
+#else
+	unsigned long eax,ebx,edx,unused;
+	if ( !cpuid(1,eax,ebx,unused,edx) )
+		return false;
+
+	return ( edx & 0x10 ) != 0;
 #endif
 }
 
@@ -351,7 +278,7 @@ const tchar* GetProcessorVendorId()
 
 // Returns non-zero if Hyper-Threading Technology is supported on the processors and zero if not.  This does not mean that 
 // Hyper-Threading Technology is necessarily enabled.
-static bool HTSupported(void)
+static bool HTSupported()
 {
 #if defined( _X360 )
 	// not entirtely sure about the semantic of HT support, it being an intel name
@@ -364,9 +291,9 @@ static bool HTSupported(void)
 	const unsigned int PENTIUM4_ID   = 0x0f00;		// Pentium 4 family processor id
 
 	unsigned long unused,
-				  reg_eax = 0, 
-				  reg_edx = 0,
-				  vendor_id[3] = {0, 0, 0};
+					reg_eax = 0, 
+					reg_edx = 0,
+					vendor_id[3] = {0, 0, 0};
 
 	// verify cpuid instruction is supported
 	if( !cpuid(0,unused, vendor_id[0],vendor_id[2],vendor_id[1]) 
@@ -383,7 +310,7 @@ static bool HTSupported(void)
 }
 
 // Returns the number of logical processors per physical processors.
-static uint8 LogicalProcessorsPerPackage(void)
+static uint8 LogicalProcessorsPerPackage()
 {
 #if defined( _X360 )
 	return 2;
@@ -391,7 +318,7 @@ static uint8 LogicalProcessorsPerPackage(void)
 	// EBX[23:16] indicate number of logical processors per package
 	const unsigned NUM_LOGICAL_BITS = 0x00FF0000;
 
-    unsigned long unused, reg_ebx = 0;
+	unsigned long unused, reg_ebx = 0;
 
 	if ( !HTSupported() ) 
 		return 1; 
@@ -588,8 +515,6 @@ const CPUInformation* GetCPUInformation()
 		pi.m_nFeatures[1] = ecx; // sse3+ features
 		pi.m_nFeatures[2] = ebx; // some additional features
 	}
-
-
 
 	return &pi;
 }

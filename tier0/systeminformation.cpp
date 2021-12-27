@@ -228,59 +228,7 @@ SYSTEM_CALL_RESULT_t Plat_GetPagedPoolInfo( PAGED_POOL_INFO_t *pPPI )
 {
 	memset( pPPI, 0, sizeof( *pPPI ) );
 
-	static CSysCallCacheEntry_FindModule qsi( _T( "ntdll.dll" ), "NtQuerySystemInformation" );
-	
-	if ( qsi.CallResult() != SYSCALL_SUCCESS )
-		return qsi.CallResult();
-
-	static bool s_bOsVersionValid = false;
-	if ( !s_bOsVersionValid )
-	{
-		s_bOsVersionValid = true;
-		OSVERSIONINFO osver;
-		memset( &osver, 0, sizeof( osver ) );
-		osver.dwOSVersionInfoSize = sizeof( osver );
-		GetVersionEx( &osver );
-
-		// We should run it only on Windows XP or Windows 2003
-#define MAKEVER( high, low ) DWORD( MAKELONG( low, high ) )
-		DWORD dwOsVer = MAKEVER( osver.dwMajorVersion, osver.dwMinorVersion );
-		if ( dwOsVer < MAKEVER( 5, 1 ) ||	// Earlier than WinXP
-			 dwOsVer > MAKEVER( 5, 2 ) )	// Later than Win2003 (or 64-bit)
-		{
-			qsi.SetFailed( SYSCALL_UNSUPPORTED );
-		}
-
-		// Don't care for 64-bit Windows
-		CSysCallCacheEntry_FindModule wow64( _T( "kernel32.dll" ), "IsWow64Process" );
-		if ( wow64.CallResult() == SYSCALL_SUCCESS )
-		{
-			typedef BOOL ( WINAPI * PFNWOW64 )( HANDLE, PBOOL );
-			BOOL b64 = FALSE;
-			if ( ( wow64.GetFunction< PFNWOW64 >() )( GetCurrentProcess(), &b64 ) &&
-				 b64 )
-			{
-				qsi.SetFailed( SYSCALL_UNSUPPORTED );
-			}
-		}
-		
-		if ( qsi.CallResult() != SYSCALL_SUCCESS )
-			return qsi.CallResult();
-	}
-
-	// Invoke proc
-	PrivateType( SYSTEM_PERFORMANCE_INFORMATION ) spi = {};
-	ULONG ulLength = sizeof( spi );
-	PrivateType( NTSTATUS ) lResult =
-		( qsi.GetFunction< PrivateType( NtQuerySystemInformation ) >() )
-		( SystemPerformanceInformation, &spi, ulLength, &ulLength );
-	if ( lResult )
-		return SYSCALL_FAILED;
-
-	// Return the result
-	pPPI->numPagesUsed = spi.PagedPoolPages;
-	pPPI->numPagesFree = spi.FreePagedPoolPages;
-	return SYSCALL_SUCCESS;
+	return SYSCALL_UNSUPPORTED;
 }
 
 

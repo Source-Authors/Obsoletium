@@ -26,6 +26,7 @@ $Configuration
 		$Create/UsePrecompiledHeader	"Use Precompiled Header (/Yu)"
 		$Create/UsePCHThroughFile		"pch_tier0.h"
 		$PrecompiledHeaderFile			"$(IntDir)/tier0.pch"
+		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
 
 	$Compiler [$WINDOWS]
