@@ -411,6 +411,7 @@ devtools/bin/vpc.pdb
 # Build artifacts
 *.exp
 *.lib
+*.idb
 
 # Solution-specific
 ValveETWProviderEvents*
