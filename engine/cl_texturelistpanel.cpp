@@ -45,7 +45,7 @@
 #include "client.h"
 
 #include "tier2/p4helpers.h"
-#include "p4lib/ip4.h"
+// #include "p4lib/ip4.h"
 #include "ivtex.h"
 #include "tier2/fileutils.h"
 
@@ -1003,6 +1003,7 @@ CP4Requirement::CP4Requirement() :
 
 CP4Requirement::~CP4Requirement()
 {
+#ifdef STAGING_ONLY
 	if ( m_bLoadedModule && m_pP4Module )
 	{
 		if ( p4 )
@@ -1015,6 +1016,7 @@ CP4Requirement::~CP4Requirement()
 		m_pP4Module = NULL;
 		p4 = NULL;
 	}
+#endif
 }
 #endif // #ifdef IS_WINDOWS_PC
 
