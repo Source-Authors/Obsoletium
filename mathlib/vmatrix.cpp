@@ -8,11 +8,12 @@
 
 #if !defined(_STATIC_LINKED) || defined(_SHARED_LIB)
 
-#include "basetypes.h"
+#include <cstring>
+
 #include "mathlib/vmatrix.h"
 #include "mathlib/mathlib.h"
-#include <string.h>
 #include "mathlib/vector4d.h"
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -125,7 +126,7 @@ VMatrix SetupMatrixAxisRot(const Vector &vAxis, vec_t fDegrees)
 	vec_t fRadians;
 
 
-	fRadians = fDegrees * (M_PI / 180.0f);
+	fRadians = fDegrees * (M_PI_F / 180.0f);
 	
 	s = (vec_t)sin(fRadians);
 	c = (vec_t)cos(fRadians);
@@ -1001,7 +1002,7 @@ void MatrixBuildRotation( VMatrix &dst, const Vector& initialDirection, const Ve
 	{
 		CrossProduct( initialDirection, finalDirection, axis );
 		VectorNormalize( axis );
-		angle = acos(angle) * 180 / M_PI;
+		angle = acosf(angle) * 180 / M_PI_F;
 	}
 
 	MatrixBuildRotationAboutAxis( dst, axis, angle );
@@ -1018,10 +1019,10 @@ void MatrixBuildRotation( VMatrix &dst, const Vector& initialDirection, const Ve
 //-----------------------------------------------------------------------------
 void MatrixBuildRotateZ( VMatrix &dst, float angleDegrees )
 {
-	float radians = angleDegrees * ( M_PI / 180.0f );
+	float radians = angleDegrees * ( M_PI_F / 180.0f );
 
-	float fSin = ( float )sin( radians );
-	float fCos = ( float )cos( radians );
+	float fSin = sinf( radians );
+	float fCos = cosf( radians );
 
 	dst[0][0] = fCos; dst[0][1] = -fSin; dst[0][2] = 0.0f; dst[0][3] = 0.0f;
 	dst[1][0] = fSin; dst[1][1] =  fCos; dst[1][2] = 0.0f; dst[1][3] = 0.0f;
@@ -1046,8 +1047,8 @@ void MatrixBuildScale( VMatrix &dst, const Vector& scale )
 void MatrixBuildPerspective( VMatrix &dst, float fovX, float fovY, float zNear, float zFar )
 {
 	// FIXME: collapse all of this into one matrix after we figure out what all should be in here.
-	float width = 2 * zNear * tan( fovX * ( M_PI/180.0f ) * 0.5f );
-	float height = 2 * zNear * tan( fovY * ( M_PI/180.0f ) * 0.5f );
+	float width = 2 * zNear * tanf( fovX * ( M_PI_F/180.0f ) * 0.5f );
+	float height = 2 * zNear * tanf( fovY * ( M_PI_F/180.0f ) * 0.5f );
 
 	memset( dst.Base(), 0, sizeof( dst ) );
 	dst[0][0]  = 2.0F * zNear / width;
@@ -1154,7 +1155,7 @@ void CalculateSphereFromProjectionMatrixInverse( const VMatrix &volumeToWorld, V
 	float h2Sqr = vecCenterFar.DistToSqr( vecFarEdge );
 	float x = (l*l + h2Sqr - h1Sqr) / (2.0f * l);
 	VectorMA( vecCenterNear, (x / l), vecDelta, *pCenter );
-	*pflRadius = sqrt( h1Sqr + x*x );
+	*pflRadius = sqrtf( h1Sqr + x*x );
 }
 
 //-----------------------------------------------------------------------------
@@ -1259,8 +1260,8 @@ void MatrixBuildPerspectiveZRange( VMatrix& dst, double flZNear, double flZFar )
 
 void MatrixBuildPerspectiveX( VMatrix& dst, double flFovX, double flAspect, double flZNear, double flZFar )
 {
-	float flWidthScale = 1.0f / tanf( flFovX * M_PI / 360.0f );
-	float flHeightScale = flAspect * flWidthScale;
+	float flWidthScale = 1.0f / tanf( flFovX * M_PI_F / 360.0f );
+	double flHeightScale = flAspect * flWidthScale;
 	dst.Init(   flWidthScale,				0.0f,							0.0f,										0.0f,
 				0.0f,						flHeightScale,					0.0f,										0.0f,
 				0.0f,						0.0f,							0.0f,										0.0f,
@@ -1271,7 +1272,7 @@ void MatrixBuildPerspectiveX( VMatrix& dst, double flFovX, double flAspect, doub
 
 void MatrixBuildPerspectiveOffCenterX( VMatrix& dst, double flFovX, double flAspect, double flZNear, double flZFar, double bottom, double top, double left, double right )
 {
-	float flWidth = tanf( flFovX * M_PI / 360.0f );
+	float flWidth = tanf( flFovX * M_PI_F / 360.0f );
 	float flHeight = flWidth / flAspect;
 
 	// bottom, top, left, right are 0..1 so convert to -<val>/2..<val>/2

@@ -53,13 +53,13 @@ public:
 	Vector NextValue(void)
 	{
 		float zvalue=zdot.NextValue();
-		zvalue=2*zvalue-1.0;								// map from 0..1 to -1..1
-		float phi=acos(zvalue);
+		zvalue=2*zvalue-1.0f;								// map from 0..1 to -1..1
+		float phi=acosf(zvalue);
 		// now, generate a random rotation angle for x/y
-		float theta=2.0*M_PI*vrot.NextValue();
-		float sin_p=sin(phi);
-		return Vector(cos(theta)*sin_p,
-					  sin(theta)*sin_p,
+		float theta=2.0f*M_PI*vrot.NextValue();
+		float sin_p=sinf(phi);
+		return Vector(cosf(theta)*sin_p,
+					  sinf(theta)*sin_p,
 					  zvalue);
 
 	}

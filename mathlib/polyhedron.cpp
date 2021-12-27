@@ -8,8 +8,8 @@
 
 #include "mathlib/polyhedron.h"
 #include "mathlib/vmatrix.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include "tier1/utlvector.h"
 
 

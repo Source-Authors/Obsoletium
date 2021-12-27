@@ -3,17 +3,18 @@
 // Purpose: Fast ways to compare equality of two floats.  Assumes 
 // sizeof(float) == sizeof(int) and we are using IEEE format.
 //
-// Source:  http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
+// Source:  https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
 //=====================================================================================//
 
 #include <float.h>
-#include <math.h>
+
+#include <cmath>
 
 #include "mathlib/mathlib.h"
 
 static inline bool AE_IsInfinite(float a)
 {
-    const int kInfAsInt = 0x7F800000;
+    constexpr int kInfAsInt = 0x7F800000;
 
     // An infinity has an exponent of 255 (shift left 23 positions) and
     // a zero mantissa. There are two infinities - positive and negative.

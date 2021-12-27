@@ -4,11 +4,13 @@
 //
 //=====================================================================================//
 
-#include <math.h>
 #include <float.h>	// Needed for FLT_EPSILON
-#include "basetypes.h"
 #include <memory.h>
+#include <cmath>
+
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
+
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 #include "mathlib/ssemath.h"
@@ -59,9 +61,9 @@ fltx4 NoiseSIMD( const fltx4 & x, const fltx4 & y, const fltx4 & z )
     {	unsigned int xi = SubInt( x_idx, i );								\
 		unsigned int yi = SubInt( y_idx, i );								\
 		unsigned int zi = SubInt( z_idx, i );								\
-		SubFloat( xfrac, i ) = (xi & 0xff)*(1.0/256.0);						\
-		SubFloat( yfrac, i ) = (yi & 0xff)*(1.0/256.0);						\
-		SubFloat( zfrac, i ) = (zi & 0xff)*(1.0/256.0);						\
+		SubFloat( xfrac, i ) = (xi & 0xff)*(1.0f/256.0f);						\
+		SubFloat( yfrac, i ) = (yi & 0xff)*(1.0f/256.0f);						\
+		SubFloat( zfrac, i ) = (zi & 0xff)*(1.0f/256.0f);						\
 		xi>>=8;																\
 		yi>>=8;																\
 		zi>>=8;																\

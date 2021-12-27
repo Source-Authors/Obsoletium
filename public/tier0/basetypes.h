@@ -78,6 +78,10 @@ inline T AlignValue( T val, uintptr_t alignment )
 #define M_PI			3.14159265358979323846
 #endif
 
+#if !defined(M_PI_F) && !defined(HAVE_M_PI_F)
+#define M_PI_F			3.14159265358979323846f
+#endif
+
 #include "valve_minmax_on.h"
 
 // #define COMPILETIME_MAX and COMPILETIME_MIN for max/min in constant expressions

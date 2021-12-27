@@ -4,11 +4,14 @@
 //
 //=====================================================================================//
 
-#include <math.h>
 #include <float.h>	// Needed for FLT_EPSILON
-#include "basetypes.h"
 #include <memory.h>
+
+#include <cmath>
+
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
+
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 #include "mathlib/ssemath.h"
@@ -33,7 +36,7 @@ public:
 		{
 			for(int j=0;j<4;j++)
 			{
-				SubFloat( m_RandY[i], j) = (seed>>16)/65536.0;
+				SubFloat( m_RandY[i], j) = (seed>>16)/65536.0f;
 				seed=(seed+1)*3141592621u;
 			}
 		}

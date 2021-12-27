@@ -292,7 +292,9 @@ struct matrix3x4_t
 	#define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
 
-#define M_PI_F		((float)(M_PI))	// Shouldn't collide with anything.
+#ifndef M_PI_F
+	#define M_PI_F		((float)(M_PI))	// Shouldn't collide with anything.
+#endif
 
 // NJS: Inlined to prevent floats from being autopromoted to doubles, as with the old system.
 #ifndef RAD2DEG

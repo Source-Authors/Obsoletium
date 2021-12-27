@@ -4,11 +4,13 @@
 //
 //=====================================================================================//
 
-#include <math.h>
 #include <float.h>	// Needed for FLT_EPSILON
-#include "basetypes.h"
 #include <memory.h>
+#include <cmath>
+
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
+
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 #include "mathlib/spherical_geometry.h"
@@ -69,13 +71,13 @@ float AssociatedLegendrePolynomial( int nL, int nM, float flX )
 	}
 	if ( nL == nM )
 		return flPmm;
-	float flPmmp1 = flX * ( 2.0 * nM + 1.0 ) * flPmm;
+	float flPmmp1 = flX * ( 2.0f * nM + 1.0f ) * flPmm;
 	if ( nL == nM + 1 ) 
 		return flPmmp1;
 	float flPll = 0.;
 	for( int nLL = nM + 2 ; nLL <= nL; nLL++ )
 	{
-		flPll = ( ( 2.0 * nLL - 1.0 ) * flX * flPmmp1 - ( nLL + nM - 1.0 ) * flPmm ) * ( 1.0 / ( nLL - nM ) );
+		flPll = ( ( 2.0f * nLL - 1.0f ) * flX * flPmmp1 - ( nLL + nM - 1.0f ) * flPmm ) * ( 1.0f / ( nLL - nM ) );
 		flPmm = flPmmp1;
 		flPmmp1 = flPll;
 	}
@@ -84,11 +86,11 @@ float AssociatedLegendrePolynomial( int nL, int nM, float flX )
 
 static float SHNormalizationFactor( int nL, int nM )
 {
-	double flTemp = ( ( 2. * nL + 1.0 ) * s_flFactorials[ nL - nM ] )/ ( 4. * M_PI * s_flFactorials[ nL + nM ] );
+	float flTemp = ( ( 2.f * nL + 1.0f ) * s_flFactorials[ nL - nM ] )/ ( 4.f * M_PI_F * s_flFactorials[ nL + nM ] );
 	return sqrt( flTemp );
 }
 
-#define SQRT_2 1.414213562373095 
+#define SQRT_2_F 1.414213562373095F
 
 FORCEINLINE float SphericalHarmonic( int nL, int nM, float flTheta, float flPhi, float flCosTheta )
 {
@@ -96,11 +98,11 @@ FORCEINLINE float SphericalHarmonic( int nL, int nM, float flTheta, float flPhi,
 		return SHNormalizationFactor( nL, 0 ) * AssociatedLegendrePolynomial( nL, nM, flCosTheta );
 
 	if ( nM > 0 )
-		return SQRT_2 * SHNormalizationFactor( nL, nM ) * cos ( nM * flPhi ) *
+		return SQRT_2_F * SHNormalizationFactor( nL, nM ) * cos ( nM * flPhi ) *
 			AssociatedLegendrePolynomial( nL, nM, flCosTheta );
 
 	return 
-		SQRT_2 * SHNormalizationFactor( nL, -nM ) * sin( -nM * flPhi ) * AssociatedLegendrePolynomial( nL, -nM, flCosTheta );
+		SQRT_2_F * SHNormalizationFactor( nL, -nM ) * sin( -nM * flPhi ) * AssociatedLegendrePolynomial( nL, -nM, flCosTheta );
 
 }
 

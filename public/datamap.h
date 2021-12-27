@@ -413,7 +413,7 @@ struct datamap_t
 //-----------------------------------------------------------------------------
 
 template <typename T> 
-inline void DataMapAccess(T *ignored, datamap_t **p)
+inline void DataMapAccess([[maybe_unused]] T *ignored, datamap_t **p)
 {
 	*p = &T::m_DataMap;
 }

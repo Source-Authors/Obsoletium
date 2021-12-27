@@ -40,7 +40,7 @@ FORCEINLINE float UnitSphereTriangleArea( Vector const &a, Vector const &b , Vec
 		return 0.;											// zero area triangle
 			
 	// now, find the 3 incribed angles for the triangle
-	float flHalfSumLens = 0.5 * ( flLengthA + flLengthB + flLengthC );
+	float flHalfSumLens = 0.5f * ( flLengthA + flLengthB + flLengthC );
 	float flSinSums = sin( flHalfSumLens );
 	float flSinSMinusA= sin( flHalfSumLens - flLengthA );
 	float flSinSMinusB= sin( flHalfSumLens - flLengthB );
@@ -51,7 +51,7 @@ FORCEINLINE float UnitSphereTriangleArea( Vector const &a, Vector const &b , Vec
 	float flTanCOver2 = sqrt ( ( flSinSMinusA * flSinSMinusB ) / ( flSinSums * flSinSMinusC ) );
 
 	// Girards formula : area = sum of angles - pi.
-	return 2.0 * ( atan( flTanAOver2 ) + atan( flTanBOver2 ) + atan( flTanCOver2 ) ) - M_PI;
+	return 2.0f * ( atan( flTanAOver2 ) + atan( flTanBOver2 ) + atan( flTanCOver2 ) ) - M_PI_F;
 }
 
 // spherical harmonics-related functions. Best explanation at http://www.research.scea.com/gdc2003/spherical-harmonic-lighting.pdf

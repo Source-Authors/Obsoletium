@@ -4,10 +4,12 @@
 //
 //=====================================================================================//
 
-#include <math.h>
-#include "basetypes.h"
 #include <memory.h>
+#include <cmath>
+
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
+
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 #include "mathlib/noise.h"
@@ -81,7 +83,7 @@ float FractalNoise( Vector const &pnt, int n_octaves)
 		scale *= 2.0;
 		iscale *= 0.5;
 	}
-	return ret * ( 1.0/sumscale );
+	return ret * ( 1.0f/sumscale );
 }
 
 float Turbulence( Vector const &pnt, int n_octaves)
@@ -94,12 +96,12 @@ float Turbulence( Vector const &pnt, int n_octaves)
 	{
 		Vector p1=pnt;
 		p1 *= scale;
-		ret+=iscale * fabs ( 2.0*( SparseConvolutionNoise( p1 )-.5 ) );
+		ret+=iscale * fabsf ( 2.0f*( SparseConvolutionNoise( p1 )-.5f ) );
 		sumscale += iscale;
 		scale *= 2.0;
 		iscale *= 0.5;
 	}
-	return ret * ( 1.0/sumscale );
+	return ret * ( 1.0f/sumscale );
 }
 
 #ifdef MEASURE_RANGE

@@ -18,7 +18,7 @@ float HaltonSequenceGenerator_t::GetElement(int elem)
 {
 	int tmpseed=seed;
 	float ret=0.0;
-	float base_inv=1.0/fbase;
+	float base_inv=1.0f/fbase;
 	while(tmpseed)
 	{
 		int dig=tmpseed % base;

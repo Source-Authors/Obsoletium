@@ -6,11 +6,11 @@
 
 /// FIXME: As soon as all references to mathlib.c are gone, include it in here
 
-#include <math.h>
+#include <memory.h>
 #include <float.h>	// Needed for FLT_EPSILON
+#include <cmath>
 
 #include "tier0/basetypes.h"
-#include <memory.h>
 #include "tier0/dbg.h"
 
 #include "tier0/vprof.h"
@@ -18,8 +18,8 @@
 
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
+
 #if !defined( _X360 )
-#include "mathlib/amd3dx.h"
 #ifndef OSX
 #include "3dnow.h"
 #endif
@@ -117,7 +117,7 @@ void InitSinCosTable()
 {
 	for( int i = 0; i < SIN_TABLE_SIZE; i++ )
 	{
-		SinCosTable[i] = sin(i * 2.0 * M_PI / SIN_TABLE_SIZE);
+		SinCosTable[i] = sinf(i * 2.0F * M_PI_F / SIN_TABLE_SIZE);
 	}
 }
 
@@ -544,12 +544,12 @@ void VectorAngles( const float *forward, float *angles )
 	}
 	else
 	{
-		yaw = (atan2(forward[1], forward[0]) * 180 / M_PI);
+		yaw = (atan2f(forward[1], forward[0]) * 180 / M_PI_F);
 		if (yaw < 0)
 			yaw += 360;
 
-		tmp = sqrt (forward[0]*forward[0] + forward[1]*forward[1]);
-		pitch = (atan2(-forward[2], tmp) * 180 / M_PI);
+		tmp = sqrtf (forward[0]*forward[0] + forward[1]*forward[1]);
+		pitch = (atan2f(-forward[2], tmp) * 180 / M_PI_F);
 		if (pitch < 0)
 			pitch += 360;
 	}
@@ -1009,12 +1009,12 @@ void VectorAngles( const Vector& forward, QAngle &angles )
 	}
 	else
 	{
-		yaw = (atan2(forward[1], forward[0]) * 180 / M_PI);
+		yaw = (atan2f(forward[1], forward[0]) * 180 / M_PI_F);
 		if (yaw < 0)
 			yaw += 360;
 
 		tmp = FastSqrt (forward[0]*forward[0] + forward[1]*forward[1]);
-		pitch = (atan2(-forward[2], tmp) * 180 / M_PI);
+		pitch = (atan2f(-forward[2], tmp) * 180 / M_PI_F);
 		if (pitch < 0)
 			pitch += 360;
 	}
@@ -1110,7 +1110,7 @@ void MatrixBuildRotationAboutAxis( const Vector &vAxisOfRot, float angleDegrees,
 	float fSin;
 	float fCos;
 
-	radians = angleDegrees * ( M_PI / 180.0 );
+	radians = angleDegrees * ( M_PI_F / 180.0f );
 	fSin = sin( radians );
 	fCos = cos( radians );
 
@@ -1386,7 +1386,7 @@ bool SolveInverseQuadraticMonotonic( float x1, float y1, float x2, float y2, flo
 		float tempy2=(1-blend_to_linear_factor)*y2+blend_to_linear_factor*FLerp(y1,y3,x1,x3,x2);
 		if (!SolveInverseQuadratic(x1,y1,x2,tempy2,x3,y3,a,b,c))
 			return false;
-		float derivative=2.0*a+b;
+		float derivative=2.0f*a+b;
 		if ( (y1<y2) && (y2<y3))							// monotonically increasing
 		{
 			if (derivative>=0.0)
@@ -1477,8 +1477,8 @@ float Gain( float x, float biasAmt )
 float SmoothCurve( float x )
 {
 	// Actual smooth curve. Visualization:
-	// http://www.wolframalpha.com/input/?i=plot%5B+0.5+*+%281+-+cos%5B2+*+pi+*+x%5D%29+for+x+%3D+%280%2C+1%29+%5D
-	return 0.5f * (1 - cos( 2.0f * M_PI * x ) );
+	// https://www.wolframalpha.com/input/?i=plot%5B+0.5+*+%281+-+cos%5B2+*+pi+*+x%5D%29+for+x+%3D+%280%2C+1%29+%5D
+	return 0.5f * (1 - cosf( 2.0f * M_PI_F * x ) );
 }
 
 
@@ -1488,7 +1488,7 @@ inline float MovePeak( float x, float flPeakPos )
 	if( x < flPeakPos )
 		return x * 0.5f / flPeakPos;
 	else
-		return 0.5 + 0.5 * (x - flPeakPos) / (1 - flPeakPos);
+		return 0.5f + 0.5f * (x - flPeakPos) / (1 - flPeakPos);
 }
 
 
@@ -1644,8 +1644,8 @@ void QuaternionSlerpNoAlign( const Quaternion &p, const Quaternion &q, float t, 
 		qt[1] = q[0];
 		qt[2] = -q[3];
 		qt[3] = q[2];
-		sclp = sin( (1.0f - t) * (0.5f * M_PI));
-		sclq = sin( t * (0.5f * M_PI));
+		sclp = sinf( (1.0f - t) * (0.5f * M_PI_F));
+		sclq = sinf( t * (0.5f * M_PI_F));
 		for (i = 0; i < 3; i++) {
 			qt[i] = sclp * p[i] + sclq * qt[i];
 		}
@@ -1885,9 +1885,9 @@ void QuaternionMatrix( const Quaternion &q, matrix3x4_t& matrix )
 // This should produce the same code as below with optimization, but looking at the assmebly,
 // it doesn't.  There are 7 extra multiplies in the release build of this, go figure.
 #if 1
-	matrix[0][0] = 1.0 - 2.0 * q.y * q.y - 2.0 * q.z * q.z;
-	matrix[1][0] = 2.0 * q.x * q.y + 2.0 * q.w * q.z;
-	matrix[2][0] = 2.0 * q.x * q.z - 2.0 * q.w * q.y;
+	matrix[0][0] = 1.0f - 2.0f * q.y * q.y - 2.0f * q.z * q.z;
+	matrix[1][0] = 2.0f * q.x * q.y + 2.0f * q.w * q.z;
+	matrix[2][0] = 2.0f * q.x * q.z - 2.0f * q.w * q.y;
 
 	matrix[0][1] = 2.0f * q.x * q.y - 2.0f * q.w * q.z;
 	matrix[1][1] = 1.0f - 2.0f * q.x * q.x - 2.0f * q.z * q.z;
@@ -2870,9 +2870,9 @@ float RangeCompressor( float flValue, float flMin, float flMax, float flBase )
 	// convert to -1 to 1 value
 	float flTarget = flMid * 2 - 1;
 
-	if (fabs(flTarget) > 0.75)
+	if (fabs(flTarget) > 0.75f)
 	{
-		float t = (fabs(flTarget) - 0.75) / (1.25);
+		float t = (fabsf(flTarget) - 0.75f) / (1.25f);
 		if (t < 1.0)
 		{
 			if (flTarget > 0)
@@ -2890,7 +2890,7 @@ float RangeCompressor( float flValue, float flMin, float flMax, float flBase )
 		}
 	}
 
-	flMid = (flTarget + 1 ) / 2.0;
+	flMid = (flTarget + 1 ) / 2.0f;
 	flValue = flMin * (1 - flMid) + flMax * flMid;
 
 	flValue -= flBase;
@@ -4206,7 +4206,7 @@ float RandomVectorInUnitSphere( Vector *pVector )
 	float w = ((float)rand() / VALVE_RAND_MAX);
 
 	float flPhi = acos( 1 - 2 * u );
-	float flTheta = 2 * M_PI * v;
+	float flTheta = 2 * M_PI_F * v;
 	float flRadius = powf( w, 1.0f / 3.0f );
 
 	float flSinPhi, flCosPhi;
@@ -4227,7 +4227,7 @@ float RandomVectorInUnitCircle( Vector2D *pVector )
 	float u = ((float)rand() / VALVE_RAND_MAX);
 	float v = ((float)rand() / VALVE_RAND_MAX);
 
-	float flTheta = 2 * M_PI * v;
+	float flTheta = 2 * M_PI_F * v;
 	float flRadius = powf( u, 1.0f / 2.0f );
 
 	float flSinTheta, flCosTheta;

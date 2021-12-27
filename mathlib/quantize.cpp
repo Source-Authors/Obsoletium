@@ -5,22 +5,15 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#ifndef STDIO_H
-#include <stdio.h>
-#endif
+#include <cstdio>
+#include <cstring>
 
-#ifndef STRING_H
-#include <string.h>
-#endif
+#include "quantize.h"
 
-#ifndef QUANTIZE_H
-#include <quantize.h>
-#endif
+#include <cstdlib>
+#include "minmax.h"
 
-#include <stdlib.h>
-#include <minmax.h>
-
-#include <math.h>
+#include <cmath>
 
 static int current_ndims;
 static struct QuantizedValue *current_root;

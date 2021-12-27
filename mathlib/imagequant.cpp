@@ -5,8 +5,8 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <quantize.h>
-#include <minmax.h>
+#include "quantize.h"
+#include "minmax.h"
 
 #define N_EXTRAVALUES 1
 #define N_DIMENSIONS (3+N_EXTRAVALUES)

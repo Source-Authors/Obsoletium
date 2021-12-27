@@ -4,11 +4,14 @@
 //
 //=====================================================================================//
 
-#include <math.h>
 #include <float.h>	// Needed for FLT_EPSILON
-#include "basetypes.h"
 #include <memory.h>
+
+#include <cmath>
+
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
+
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 
@@ -110,7 +113,7 @@ static void CheckExponentTable()
 {
 	for( int i = 0; i < 256; i++ )
 	{
-		float testAgainst = pow( 2.0f, i - 128 ) / 255.0f;
+		float testAgainst = powf( 2.0f, i - 128 ) / 255.0f;
 		float diff = testAgainst - power2_n[i] ;
 		float relativeDiff = diff / testAgainst;
 		Assert( testAgainst == 0 ? 
@@ -133,20 +136,20 @@ void BuildGammaTable( float gamma, float texGamma, float brightness, int overbri
 		g = 3.0;
 	}
 
-	g = 1.0 / g;
+	g = 1.0f / g;
 	g1 = texGamma * g; 
 
 	if (brightness <= 0.0) 
 	{
-		g3 = 0.125;
+		g3 = 0.125f;
 	}
-	else if (brightness > 1.0) 
+	else if (brightness > 1.0f) 
 	{
-		g3 = 0.05;
+		g3 = 0.05f;
 	}
 	else 
 	{
-		g3 = 0.125 - (brightness * brightness) * 0.075;
+		g3 = 0.125f - (brightness * brightness) * 0.075f;
 	}
 
 	for (i=0 ; i<256 ; i++)
@@ -163,17 +166,17 @@ void BuildGammaTable( float gamma, float texGamma, float brightness, int overbri
 	{
 		float f;
 
-		f = i / 1023.0;
+		f = i / 1023.0f;
 
 		// scale up
-		if (brightness > 1.0)
+		if (brightness > 1.0f)
 			f = f * brightness;
 
 		// shift up
 		if (f <= g3)
-			f = (f / g3) * 0.125;
+			f = (f / g3) * 0.125f;
 		else 
-			f = 0.125 + ((f - g3) / (1.0 - g3)) * 0.875;
+			f = 0.125f + ((f - g3) / (1.0f - g3)) * 0.875f;
 
 		// convert linear space to desired gamma space
 		inf = 255 * pow ( f, g ); 
@@ -210,7 +213,7 @@ void BuildGammaTable( float gamma, float texGamma, float brightness, int overbri
 	for (i=0 ; i<1024 ; i++)
 	{
 		// convert from linear space (0..1) to nonlinear texture space (0..255)
-		lineartotexture[i] =  pow( i / 1023.0, 1.0 / texGamma ) * 255;
+		lineartotexture[i] =  pow( i / 1023.0f, 1.0f / texGamma ) * 255;
 	}
 
 #if 0
@@ -245,7 +248,7 @@ void BuildGammaTable( float gamma, float texGamma, float brightness, int overbri
 		for (i=0 ; i<4096 ; i++)
 		{
 			// convert from linear 0..4 (x1024) to screen corrected vertex space (0..1?)
-			f = pow ( i/1024.0, 1.0 / gamma );
+			f = pow ( i/1024.0f, 1.0f / gamma );
 
 			lineartovertex[i] = f * overbrightFactor;
 			if (lineartovertex[i] > 1)

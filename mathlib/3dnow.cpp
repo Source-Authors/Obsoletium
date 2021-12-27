@@ -4,13 +4,15 @@
 //
 //=====================================================================================//
 
-#include <math.h>
-#include <float.h>	// Needed for FLT_EPSILON
-#include "basetypes.h"
 #include <memory.h>
+#include <float.h>	// Needed for FLT_EPSILON
+
+#include <cmath>
+
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
+
 #include "mathlib/mathlib.h"
-#include "mathlib/amd3dx.h"
 #include "mathlib/vector.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -34,9 +36,9 @@ float _3DNow_Sqrt(float x)
 	{
 		femms
 		movd		mm0, x
-		PFRSQRT		(mm1,mm0)
+		pfrsqrt		mm1, mm0
 		punpckldq	mm0, mm0
-		PFMUL		(mm0, mm1)
+		pfmul		mm0, mm1
 		movd		root, mm0
 		femms
 	}
@@ -85,15 +87,15 @@ float FASTCALL _3DNow_VectorNormalize (Vector& vec)
 			movd		mm1, DWORD PTR [eax+8]
 			movq		mm2, mm0
 			movq		mm3, mm1
-			PFMUL		(mm0, mm0)
-			PFMUL		(mm1, mm1)
-			PFACC		(mm0, mm0)
-			PFADD		(mm1, mm0)
-			PFRSQRT		(mm0, mm1)
+			pfmul		mm0, mm0
+			pfmul		mm1, mm1
+			pfacc		mm0, mm0
+			pfadd		mm1, mm0
+			pfrsqrt		mm0, mm1
 			punpckldq	mm1, mm1
-			PFMUL		(mm1, mm0)
-			PFMUL		(mm2, mm0)
-			PFMUL		(mm3, mm0)
+			pfmul		mm1, mm0
+			pfmul		mm2, mm0
+			pfmul		mm3, mm0
 			movq		QWORD PTR [eax], mm2
 			movd		DWORD PTR [eax+8], mm3
 			movd		radius, mm1
@@ -150,12 +152,12 @@ float _3DNow_InvRSquared(const float* v)
 		movq		mm0, QWORD PTR [eax]
 		movd		mm1, DWORD PTR [eax+8]
 		movd		mm2, [r2]
-		PFMUL		(mm0, mm0)
-		PFMUL		(mm1, mm1)
-		PFACC		(mm0, mm0)
-		PFADD		(mm1, mm0)
-		PFMAX		(mm1, mm2)
-		PFRCP		(mm0, mm1)
+		pfmul		mm0, mm0
+		pfmul		mm1, mm1
+		pfacc		mm0, mm0
+		pfadd		mm1, mm0
+		pfmax		mm1, mm2
+		pfrcp		mm0, mm1
 		movd		[r2], mm0
 		femms
 	}

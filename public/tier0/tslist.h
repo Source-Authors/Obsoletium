@@ -130,7 +130,7 @@ public:
 		return pNode;
 	}
 
-	static void * operator new( size_t size, int nBlockUse, const char *pFileName, int nLine )
+	static void * operator new( size_t size, int , const char *pFileName, int nLine )
 	{
 		CTSListBase *pNode = (CTSListBase *)MemAlloc_AllocAligned( size, TSLIST_HEAD_ALIGNMENT, pFileName, nLine );
 		return pNode;
@@ -141,7 +141,7 @@ public:
 		MemAlloc_FreeAligned( p );
 	}
 
-	static void operator delete( void *p, int nBlockUse, const char *pFileName, int nLine )
+	static void operator delete( void *p, int , const char *, int  )
 	{
 		MemAlloc_FreeAligned( p );
 	}
