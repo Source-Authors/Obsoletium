@@ -96,7 +96,7 @@ $Configuration "Release"
 		$BufferSecurityCheck                "No"	[$RETAIL]
 		$BufferSecurityCheck 				"Yes"	[!$RETAIL]
 		$EnableFunctionLevelLinking			"Yes (/Gy)"
-		$EnableEnhancedInstructionSet
+		$EnableEnhancedInstructionSet "Streaming SIMD Extensions 2 (/arch:SSE2)" [$WIN32]
 		$FloatingPointModel					"Fast (/fp:fast)"
 		$EnableFloatingPointExceptions
 
