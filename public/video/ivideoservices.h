@@ -363,7 +363,7 @@ class VideoFrameRate_t
 		inline void					SetFPS( int FPS, bool NTSC )	{ m_TimeUnitsPerSecond = FPS * 1000; m_TimeUnitsPerFrame = 1000 + (uint) NTSC; }
 		inline void					SetFPS( float FPS )				{ m_TimeUnitsPerSecond = (uint) ( FPS * 1000.0f ); m_TimeUnitsPerFrame = 1000; }
 		
-		static inline bool			IsNTSC( float FPS )				{ float diff = ceil(FPS) - FPS; return ( diff > 0.02f && diff < 0.05f); }
+		static inline bool			IsNTSC( float FPS )				{ float diff = ceilf(FPS) - FPS; return ( diff > 0.02f && diff < 0.05f); }
 
 		inline void					Clear()							{ m_TimeUnitsPerSecond = 0; m_TimeUnitsPerFrame = 1000; }
 		inline bool					IsValid()						{ return ( m_TimeUnitsPerSecond != 0); }

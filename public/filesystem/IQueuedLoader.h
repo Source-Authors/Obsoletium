@@ -89,7 +89,7 @@ public:
 class CResourcePreload : public IResourcePreload
 {
 	void PurgeUnreferencedResources()	{}
-	void OnEndMapLoading( bool bAbort )	{}
+	void OnEndMapLoading( bool )	{}
 	void PurgeAll() {}
 };
 

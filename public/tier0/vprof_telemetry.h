@@ -28,13 +28,13 @@
 #include "tmapi_dummy.h"
 
 inline void TelemetryTick() {}
-inline void TelemetrySetLevel( unsigned int Level ) {}
+inline void TelemetrySetLevel( unsigned int ) {}
 #define TelemetrySetLockName( _ctx, _location, _description ) 
 
 class CTelemetryLock
 {
 public:
-	CTelemetryLock(void *plocation, const char *description) {}
+	CTelemetryLock(void *, const char *) {}
 	~CTelemetryLock() {}
 	void Locked() {}
 	void Unlocked() {}
@@ -43,7 +43,7 @@ public:
 class CTelemetrySpikeDetector
 {
 public:
-	CTelemetrySpikeDetector( const char *msg, uint32 threshold = 50 ) {}
+	CTelemetrySpikeDetector( const char *, [[maybe_unused]] uint32 threshold = 50 ) {}
 	~CTelemetrySpikeDetector() { }
 };
 

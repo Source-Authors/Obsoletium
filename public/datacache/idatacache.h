@@ -352,7 +352,7 @@ public:
 		return false;
 	}
 
-	virtual bool GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen  )
+	virtual bool GetItemName( DataCacheClientID_t , const void *, char *, unsigned )
 	{
 		return false;
 	}
