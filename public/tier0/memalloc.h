@@ -272,7 +272,10 @@ inline void *MemAlloc_ReallocAligned( void *ptr, size_t size, size_t align )
 		return ptr;
 
 	pResult = MemAlloc_AllocAligned( size, align );
-	memcpy( pResult, ptr, nOldSize - nOffset );
+	if ( pResult )
+	{
+		memcpy( pResult, ptr, nOldSize - nOffset );
+	}
 	g_pMemAlloc->Free( pAlloc );
 	return pResult;
 }
