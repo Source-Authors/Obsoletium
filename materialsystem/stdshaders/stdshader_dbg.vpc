@@ -7,10 +7,6 @@
 $macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
 
-// shader_dll_verify.cpp defines a function called _ftol3. This means that we can't
-// link with the bug-fixed ftol3.obj. It also means we can't convert float-to-unsigned.
-$Macro DISABLE_FTOL3_OVERRIDE "1"
-
 $include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
 $Configuration	"Debug"
