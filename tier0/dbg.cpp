@@ -218,7 +218,7 @@ DBG_INTERFACE void _AssertValidReadWritePtr( void* ptr, int count/* = 1*/ )
 }
 
 #undef AssertValidStringPtr
-DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, int maxchar/* = 0xFFFFFF */ )
+DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, int /* = 0xFFFFFF */ )
 {
 	Assert( ptr );
 }
@@ -870,7 +870,7 @@ void ValidateSpew( CValidator &validator )
 //-----------------------------------------------------------------------------
 void COM_TimestampedLog( char const *fmt, ... )
 {
-	static float s_LastStamp = 0.0;
+	static double s_LastStamp = 0.0;
 	static bool s_bShouldLog = false;
 	static bool s_bShouldLogToETW = false;
 	static bool s_bChecked = false;
@@ -897,7 +897,7 @@ void COM_TimestampedLog( char const *fmt, ... )
 	_vsnprintf( string, sizeof( string ), fmt, argptr );
 	va_end( argptr );
 
-	float curStamp = Plat_FloatTime();
+	double curStamp = Plat_FloatTime();
 
 #if defined( _X360 )
 	XBX_rTimeStampLog( curStamp, string );

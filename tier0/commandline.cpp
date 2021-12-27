@@ -680,7 +680,7 @@ float CCommandLine::ParmValue( const char *psz, float flDefaultVal ) const
 	if ( m_ppParms[nIndex + 1][0] == '-' || m_ppParms[nIndex + 1][0] == '+' )
 		return flDefaultVal;
 
-	return atof( m_ppParms[nIndex + 1] );
+	return strtof( m_ppParms[nIndex + 1], nullptr );
 }
 const char *CCommandLine::ParmValueByIndex( int nIndex, const char *pDefaultVal ) const
 {

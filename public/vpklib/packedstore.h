@@ -42,7 +42,7 @@ struct ChunkHashFraction_t
 class ChunkHashFractionLess_t
 {
 public:
-	bool Less( const ChunkHashFraction_t& lhs, const ChunkHashFraction_t& rhs, void *pContext )
+	bool Less( const ChunkHashFraction_t& lhs, const ChunkHashFraction_t& rhs, void * )
 	{
 		if ( lhs.m_nPackFileNumber < rhs.m_nPackFileNumber )
 			return true;

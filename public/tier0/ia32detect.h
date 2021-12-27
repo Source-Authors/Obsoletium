@@ -8,6 +8,8 @@
 #ifndef IA32DETECT_H
 #define IA32DETECT_H
 
+#include "wchartypes.h"
+
 #ifdef PLATFORM_WINDOWS_PC
 #include <intrin.h>
 #endif

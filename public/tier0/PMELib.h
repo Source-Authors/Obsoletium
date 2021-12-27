@@ -20,8 +20,6 @@
 #include <string>
 #include "tier0/valve_on.h"
 
-using namespace std;
-
 // RDTSC Instruction macro
 #define RDTSC(var) var = __rdtsc()
 

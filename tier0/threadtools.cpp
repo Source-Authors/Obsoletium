@@ -2110,7 +2110,7 @@ CThread::ThreadProc_t CThread::GetThreadProc()
 
 unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 {
-  std::auto_ptr<ThreadInit_t> pInit((ThreadInit_t *)pv);
+  std::unique_ptr<ThreadInit_t> pInit((ThreadInit_t *)pv);
   
 #ifdef _X360
         // Make sure all threads are consistent w.r.t floating-point math
@@ -2132,7 +2132,6 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 	{
 		bInitSuccess = pInit->pThread->Init();
 	}
-	
 	catch (...)
 	{
 		pInit->pInitCompleteEvent->Set();
@@ -2151,7 +2150,6 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 		{
 			pInit->pThread->m_result = pInit->pThread->Run();
 		}
-		
 		catch (...)
 		{
 		}

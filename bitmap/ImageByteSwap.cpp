@@ -15,6 +15,8 @@
 // Should be last include
 #include "tier0/memdbgon.h"
 
+#define NO_X360_XDK
+
 #if defined( _WIN32 ) && !defined( _X360 ) && !defined( NO_X360_XDK ) && !defined( DX_TO_GL_ABSTRACTION )
 // the x86 version of the 360 (used by win32 tools)
 // It would have been nice to use the 360 D3DFORMAT bit encodings, but the codes

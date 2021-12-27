@@ -1462,6 +1462,7 @@ FileHandleTracker_t & CPackedStore::GetFileHandle( int nFileNumber )
 		return m_FileHandles[nFileHandleIdx];
 	}
 	Error( "Exceeded limit of number of vpk files supported (%d)!\n", MAX_ARCHIVE_FILES_TO_KEEP_OPEN_AT_ONCE );
+
 	static FileHandleTracker_t invalid;
 #ifdef IS_WINDOWS_PC
 	invalid.m_hFileHandle = INVALID_HANDLE_VALUE;
@@ -1808,7 +1809,7 @@ int CPackedStore::GetFileList( const char *pWildCard, CUtlStringList &outFilenam
 	return outFilenames.Count();
 }
 
-void CPackedStore::GetFileList( const char *pWildcard, CUtlVector<VPKContentFileInfo_t> &outVecResults )
+void CPackedStore::GetFileList( const char *, CUtlVector<VPKContentFileInfo_t> &outVecResults )
 {
 
 	// !KLUDGE! Get the filenames first, and then "find" them again.

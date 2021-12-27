@@ -9,9 +9,11 @@
 //========================================================================//
 
 #ifdef POSIX
-#include <stdlib.h>
+#include <cstdlib>
 #endif
+
 #include "tier0/memdbgon.h"
+
 #include "../../public/tier1/lzmaDecoder.h"
 #include "C/7zTypes.h"
 #include "C/LzmaEnc.h"
@@ -19,8 +21,8 @@
 #include "tier0/dbg.h"
 
 // Allocator to pass to LZMA functions
-static void *SzAlloc(void *p, size_t size) { return malloc(size); }
-static void SzFree(void *p, void *address) { free(address); }
+static void *SzAlloc(void *, size_t size) { return malloc(size); }
+static void SzFree(void *, void *address) { free(address); }
 static ISzAlloc g_Alloc = { SzAlloc, SzFree };
 
 // lzma buffers will have a 13 byte trivial header

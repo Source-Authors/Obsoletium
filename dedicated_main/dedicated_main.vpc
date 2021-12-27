@@ -40,4 +40,8 @@ $Project "Dedicated_main"
 		$File	"dedicated_main.rc"
 	}
 
+	$Folder	"Link Libraries" 
+	{
+		-$Lib tier0 [$WINDOWS]
+	}
 }

@@ -99,7 +99,7 @@ static char *GetBaseDir( const char *pszBuffer )
 		if ( ( basedir[ j-1 ] == '\\' ) || 
 			 ( basedir[ j-1 ] == '/' ) )
 		{
-			basedir[ j-1 ] = 0;
+			basedir[ j-1 ] = '\0';
 		}
 	}
 

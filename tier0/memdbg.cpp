@@ -242,7 +242,7 @@ char * StackDescribe( void **ppAddresses, int nMaxAddresses )
 
 #else
 
-inline int WalkStack( void **ppAddresses, int nMaxAddresses, int nSkip = 0 )
+inline int WalkStack( void **ppAddresses, int nMaxAddresses, [[maybe_unused]] int nSkip = 0 )
 {
 	memset( ppAddresses, 0, nMaxAddresses * sizeof(*ppAddresses) );
 	return 0;

@@ -53,12 +53,6 @@ $Configuration
         $ImportLibrary				"$LIBPUBLIC\$_IMPLIB_PREFIX$OUTBINNAME$_IMPLIB_EXT"	[$POSIX]
 		$OutputFile					"$(OBJ_DIR)/$_IMPLIB_PREFIX$OUTBINNAME$_IMPLIB_EXT" [$POSIX]
 	}
-
-	$PreLinkEvent [$WINDOWS]
-	{	
-		$CommandLine	"call $SRCDIR\vpc_scripts\valve_p4_edit.cmd $LIBPUBLIC\$(TargetName).lib $SRCDIR" "\n" \
-						"$BASE"
-	}
 	
 	$PreLinkEvent [$X360]
 	{

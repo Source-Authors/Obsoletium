@@ -61,7 +61,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 {
 	if ( ptchMinidumpFileNameBuffer )
 	{
-		*ptchMinidumpFileNameBuffer = tchar( 0 );
+		*ptchMinidumpFileNameBuffer = tchar(0);
 	}
 
 	// get the function pointer directly so that we don't have to include the .lib, and that

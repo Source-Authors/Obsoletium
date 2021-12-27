@@ -56,11 +56,6 @@ $Configuration
 							"$CRCCHECK" "\n" 			
 	}
 
-	$PreLinkEvent [!$ANALYZE && !$SOURCESDK]
-	{
-		$CommandLine		"call $SRCDIR\vpc_scripts\valve_p4_edit.cmd $OUTLIBDIR\$(TargetName).lib $SRCDIR" 
-	}
-
 	$Librarian
 	{
 		// Suppress this warning using the undocumented /ignore linker switch

@@ -7,7 +7,7 @@
 //===========================================================================//
 
 #ifdef _WIN32
-#include <windows.h>
+#include "winlite.h"
 
 #include "tier0/valve_off.h"
 #include "tier0/pmelib.h"
@@ -40,8 +40,6 @@ PME* PME::Instance()
 //---------------------------------------------------------------------------
 HRESULT PME::Init( void )
 {
-    OSVERSIONINFO	OS;
-
     if ( bDriverOpen )
         return E_DRIVER_ALREADY_OPEN;
 
@@ -55,15 +53,7 @@ HRESULT PME::Init( void )
         return E_UNKNOWN_CPU_VENDOR;
     }
 
-    //-----------------------------------------------------------------------
-    // Get the operating system version
-    //-----------------------------------------------------------------------
-    OS.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
-    GetVersionEx( &OS );
-
-    if ( OS.dwPlatformId == VER_PLATFORM_WIN32_NT )
-    {
-        hFile = CreateFile(						// WINDOWS NT
+    hFile = CreateFile(						// WINDOWS NT
             "\\\\.\\GDPERF",
             GENERIC_READ,
             0,
@@ -71,18 +61,6 @@ HRESULT PME::Init( void )
             OPEN_EXISTING,
             FILE_ATTRIBUTE_NORMAL,
             NULL);
-    }
-    else
-    {
-        hFile = CreateFile(						// WINDOWS 95
-            "\\\\.\\GDPERF.VXD",
-            GENERIC_READ,
-            0,
-            NULL,
-            OPEN_EXISTING,
-            FILE_ATTRIBUTE_NORMAL,
-            NULL);
-    }
 
     if (hFile == INVALID_HANDLE_VALUE )
         return E_CANT_OPEN_DRIVER;

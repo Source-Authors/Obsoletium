@@ -24,7 +24,7 @@ typedef void *LibraryHandle;
 #endif
 
 #if 1
-static inline void dbgdynfn(const char *fmt, ...) {}
+static inline void dbgdynfn(const char *, ...) {}
 #else
 #define dbgdynfn printf
 #endif

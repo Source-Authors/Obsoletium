@@ -2133,7 +2133,7 @@ static void CalcColor( SphereCalc_t *pCalc, int iFace, const Vector &normal, uns
 	float x, y, w;
 
 	int size = pCalc->m_iSize;
-	float hw = 0.5 * size;
+	float hw = 0.5F * size;
 	
 	if ( (iFace == CUBEMAP_FACE_LEFT) || (iFace == CUBEMAP_FACE_RIGHT) )
 	{
@@ -2160,11 +2160,11 @@ static void CalcColor( SphereCalc_t *pCalc, int iFace, const Vector &normal, uns
 			x = -x;
 	}
 
-	x = (x * w) + hw - 0.5;
-	y = (y * w) + hw - 0.5;
+	x = (x * w) + hw - 0.5F;
+	y = (y * w) + hw - 0.5F;
 
-	int u = (int)(x+0.5);
-	int v = (int)(y+0.5);
+	int u = (int)(x+0.5F);
+	int v = (int)(y+0.5F);
 
 	if ( u < 0 ) u = 0;
 	else if ( u > (size-1) ) u = (size-1);
@@ -2196,7 +2196,7 @@ static void CalcSphereColor( SphereCalc_t *pCalc, float x, float y )
 	else
 	{
 		// Compute the z distance based on x*x + y*y + z*z = r*r 
-		float z = sqrt( pCalc->m_flRadiusSq - flRadiusSq );
+		float z = sqrtf( pCalc->m_flRadiusSq - flRadiusSq );
 
 		// Here's the untransformed surface normal
 		normal.Init( x, y, z );
@@ -2233,7 +2233,7 @@ static void CalcHemisphereColor( SphereCalc_t *pCalc, float x, float y )
 	}
 
 	// Compute the z distance based on x*x + y*y + z*z = r*r 
-	float z = sqrt( pCalc->m_flRadiusSq - flRadiusSq );
+	float z = sqrtf( pCalc->m_flRadiusSq - flRadiusSq );
 
 	// Here's the untransformed surface normal
 	normal.Init( x, y, z );
@@ -2284,14 +2284,14 @@ void CVTFTexture::ComputeSpheremapFrame( unsigned char **ppCubeFaces, unsigned c
 			b += sphere.m_pColor[2];
 			a += sphere.m_pColor[3];
 
-			CalcSphereColor( &sphere, u + 0.25, v );
+			CalcSphereColor( &sphere, u + 0.25f, v );
 			r += sphere.m_pColor[0];
 			g += sphere.m_pColor[1];
 			b += sphere.m_pColor[2];
 			a += sphere.m_pColor[3];
 
 			v += 0.25;
-			CalcSphereColor( &sphere, u + 0.25, v );
+			CalcSphereColor( &sphere, u + 0.25f, v );
 			r += sphere.m_pColor[0];
 			g += sphere.m_pColor[1];
 			b += sphere.m_pColor[2];
@@ -2331,14 +2331,14 @@ void CVTFTexture::ComputeHemispheremapFrame( unsigned char **ppCubeFaces, unsign
 			b += sphere.m_pColor[2];
 			a += sphere.m_pColor[3];
 
-			CalcHemisphereColor( &sphere, u + 0.25, v );
+			CalcHemisphereColor( &sphere, u + 0.25f, v );
 			r += sphere.m_pColor[0];
 			g += sphere.m_pColor[1];
 			b += sphere.m_pColor[2];
 			a += sphere.m_pColor[3];
 
 			v += 0.25;
-			CalcHemisphereColor( &sphere, u + 0.25, v );
+			CalcHemisphereColor( &sphere, u + 0.25f, v );
 			r += sphere.m_pColor[0];
 			g += sphere.m_pColor[1];
 			b += sphere.m_pColor[2];
@@ -2405,8 +2405,8 @@ void CVTFTexture::GenerateSpheremap( LookDir_t lookDir )
 	delete [] pSphereMapBits;
 }
 
-void CVTFTexture::GenerateHemisphereMap( unsigned char *pSphereMapBitsRGBA, int targetWidth, 
-		int targetHeight, LookDir_t lookDir, int iFrame )
+void CVTFTexture::GenerateHemisphereMap( unsigned char *pSphereMapBitsRGBA, int , 
+		int , LookDir_t lookDir, int iFrame )
 {
 	Assert( m_Format == IMAGE_FORMAT_RGBA8888 );
 
@@ -2631,7 +2631,7 @@ void CVTFTexture::GenerateMipmaps()
 			}
 			else if ( m_Options.flags0 & ( VtfProcessingOptions::OPT_DECAY_EXP_R << ch ) )
 			{
-				info.m_flColorScale[ch] = pow( m_Options.fDecayExponentBase[ch], iMipLevel - iLastNonDecayMip );
+				info.m_flColorScale[ch] = powf( m_Options.fDecayExponentBase[ch], iMipLevel - iLastNonDecayMip );
 			}
 			else
 			{

@@ -56,7 +56,7 @@ int UpdateOrCreate( const char *pSourceName, char *pTargetName, int targetLen, c
 
 char *CreateX360Filename( const char *pSourceName, char *pTargetName, int targetLen );
 
-FORCEINLINE const char *AdjustFileExtensionForPlatform( const char *pSourceName, char *pTargetName, int targetLen )
+FORCEINLINE const char *AdjustFileExtensionForPlatform( const char *pSourceName, [[maybe_unused]] char *pTargetName, [[maybe_unused]] int targetLen )
 {
 #ifdef PLATFORM_X360
 	return CreateX360Filename( pSourceName, pTargetName, targetLen );

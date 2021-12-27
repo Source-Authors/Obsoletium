@@ -397,13 +397,21 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-# Ignore locally build vpc.
+# Ignore locally build vpc
 devtools/bin/vpc.exe
 devtools/bin/vpc.pdb
 
-# Ignore VS solution files.
+# Ignore VS solution files
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.vpc_crc
 *.vpc.sentinel
+*.sln
+
+# Build artifacts
+*.exp
+*.lib
+
+# Solution-specific
+ValveETWProviderEvents*
 

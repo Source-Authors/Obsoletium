@@ -686,7 +686,7 @@ DBG_INTERFACE bool g_VProfSignalSpike;
 class CVProfSpikeDetector
 {
 public:
-	CVProfSpikeDetector( float spike ) :
+	CVProfSpikeDetector( double spike ) :
 		m_timeLast( GetTimeLast() )
 	{
 		m_spike = spike;
@@ -707,10 +707,10 @@ public:
 	}
 
 private:
-	static float &GetTimeLast() { static float timeLast = 0; return timeLast; }
+	static double &GetTimeLast() { static double timeLast = 0; return timeLast; }
 	CFastTimer	m_Timer;
-	float m_spike;
-	float &m_timeLast;
+	double m_spike;
+	double&m_timeLast;
 };
 
 

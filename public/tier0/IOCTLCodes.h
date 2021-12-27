@@ -7,7 +7,10 @@
 //=============================================================================//
 #ifndef IOCTLCODES_H
 #define IOCTLCODES_H
-#pragma once
+
+#ifdef _WIN32
+#include <winioctl.h>
+#endif
 
 // Define the IOCTL codes we will use.  The IOCTL code contains a command
 // identifier, plus other information about the device, the type of access
