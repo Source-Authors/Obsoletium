@@ -247,7 +247,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 #else
 	#define  _AssertMsg( _exp, _msg, _executeExp, _bFatal )	\
 		do {																\
-			if (!(_exp)) 													\
+			if (!(_exp))  [[unlikely]] 													\
 			{ 																\
 				_SpewInfo( SPEW_ASSERT, __TFILE__, __LINE__ );				\
 				SpewRetval_t retAssert = _SpewMessage("%s", static_cast<const char*>( _msg ));	\
@@ -270,7 +270,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 	#define  _AssertMsgOnce( _exp, _msg, _bFatal ) \
 		do {																\
 			static bool fAsserted;											\
-			if (!fAsserted )												\
+			if (!fAsserted) [[unlikely]]												\
 			{ 																\
 				_AssertMsg( _exp, _msg, (fAsserted = true), _bFatal );		\
 			}																\
