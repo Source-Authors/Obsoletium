@@ -85,7 +85,7 @@ $Configuration "Debug"
 		$EnableMinimalRebuild				
 		$EnableC++Exceptions				"No"
 		$SmallerTypeCheck
-		$BasicRuntimeChecks					"Default"
+		$BasicRuntimeChecks					"Both (/RTC1, equiv. to /RTCsu) (/RTC1)"
 		$RuntimeLibrary						"Multi-threaded Debug (/MTd)"
 		$StructMemberAlignment
 		$BufferSecurityCheck				"Yes"
@@ -99,7 +99,7 @@ $Configuration "Debug"
 		$DisableLanguageExtensions
 		$DefaultCharUnsigned
 		$TreatWCHAR_TAsBuiltInType
-		$ForceConformanceInForLoopScope		"Yes (/Zc:forScope)"
+		$ForceConformanceInForLoopScope
 		$EnableRunTimeTypeInfo				"Yes (/GR)"
 		$OpenMPSupport
 
@@ -111,15 +111,15 @@ $Configuration "Debug"
 		// Output Files
 		$ExpandAttributedSource
 		$AssemblerOutput
-		$ASMListLocation					"$(IntDir)/"
-		$ObjectFileName						"$(IntDir)/"
-		$ProgramDatabaseFileName			"$(IntDir)/"
-		$GenerateXMLDocumentationFiles		"No"
+		$ASMListLocation
+		$ObjectFileName
+		$ProgramDatabaseFileName
+		$GenerateXMLDocumentationFiles
 		$XMLDocumentationFileName
 
 		// Browse Information
-		$EnableBrowseInformation			"None"
-		$BrowseFile							"$(IntDir)/"
+		$EnableBrowseInformation
+		$BrowseFile
 
 		// Advanced
 		$CallingConvention
@@ -130,9 +130,9 @@ $Configuration "Debug"
 		$ShowIncludes
 		$UndefinePreprocessorDefinitions
 		$UndefineAllPreprocessorDefinitions
-		$UseFullPaths						"Yes (/FC)"
+		$UseFullPaths
 		$OmitDefaultLibraryNames
-		$ErrorReporting						"Prompt Immediately (/errorReport:prompt)"
+		$ErrorReporting
 
 		$AdditionalOptions					"/Zm200"
 	}
@@ -144,7 +144,7 @@ $Configuration "Debug"
 		$ShowProgress						"Not Set"
 		$Version
 		$EnableIncrementalLinking			"Yes (/INCREMENTAL)"
-		$SuppressStartupBanner				"Yes (/NOLOGO)"
+		$SuppressStartupBanner
 		$IgnoreImportLibrary
 		$RegisterOutput
 		$AdditionalLibraryDirectories		"$LIBCOMMON;$LIBPUBLIC"
@@ -223,7 +223,7 @@ $Configuration "Debug"
 		$KeyFile
 		$KeyContainer
 		$DelaySign
-		$ErrorReporting						"Prompt Immediately (/ERRORREPORT:PROMPT)"
+		$ErrorReporting
 		$CLRUnmanagedCodeCheck
 		// SAFE_SEH should always be disabled on debug builds.
 		$ImageHasSafeExceptionHandlers		"false"
@@ -235,7 +235,7 @@ $Configuration "Debug"
 	$ManifestTool
 	{
 		// General
-		$SuppressStartupBanner				"Yes (/nologo)"
+		$SuppressStartupBanner
 		$VerboseOutput
 		$AssemblyIdentity
 		$UseUNICODEResponseFiles
@@ -267,7 +267,7 @@ $Configuration "Debug"
 	$XMLDocumentGenerator
 	{
 		// General
-		$SuppressStartupBanner				"Yes (/nologo)"
+		$SuppressStartupBanner
 		$ValidateIntelliSense
 		$AdditionalDocumentFiles
 		$OutputDocumentFile
@@ -277,7 +277,7 @@ $Configuration "Debug"
 
 	$BrowseInformation
 	{
-		$SuppressStartupBanner				"Yes (/nologo)"	
+		$SuppressStartupBanner
 		$OutputFile							"$(OutDir)/$OUTBINNAME.bsc"
 		$AdditionalOptions
 	}

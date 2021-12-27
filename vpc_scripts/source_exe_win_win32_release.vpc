@@ -106,8 +106,8 @@ $Configuration "Release"
 		$LanguageStandard					"ISO C++17 Standard (std:c++17)"
 		$DisableLanguageExtensions
 		$DefaultCharUnsigned					"No"
-		$TreatWCHAR_TAsBuiltInType				"Yes (/Zc:wchar_t)"
-		$ForceConformanceInForLoopScope			"Yes (/Zc:forScope)"
+		$TreatWCHAR_TAsBuiltInType
+		$ForceConformanceInForLoopScope
 		$EnableRunTimeTypeInfo					"Yes (/GR)"
 		$OpenMPSupport							"No"
 
@@ -117,17 +117,17 @@ $Configuration "Release"
 		$PrecompiledHeaderFile
 
 		// Output Files
-		$ExpandAttributedSource					"No"
-		$AssemblerOutput						"No Listing"
-		$ASMListLocation						"$(IntDir)/"
-		$ObjectFileName							"$(IntDir)/"
-		$ProgramDatabaseFileName				"$(IntDir)/"
+		$ExpandAttributedSource
+		$AssemblerOutput
+		$ASMListLocation
+		$ObjectFileName
+		$ProgramDatabaseFileName
 		$GenerateXMLDocumentationFiles
 		$XMLDocumentationFileName
 
 		// Browse Information
-		$EnableBrowseInformation				"None"
-		$BrowseFile								"$(IntDir)/"
+		$EnableBrowseInformation
+		$BrowseFile
 
 		// Advanced
 		$CallingConvention
@@ -138,9 +138,9 @@ $Configuration "Release"
 		$ShowIncludes
 		$UndefinePreprocessorDefinitions
 		$UndefineAllPreprocessorDefinitions
-		$UseFullPaths							"Yes (/FC)"
+		$UseFullPaths
 		$OmitDefaultLibraryNames
-		$ErrorReporting							"Prompt Immediately (/errorReport:prompt)"
+		$ErrorReporting
 
 		// Enable extra debugging information. This switch requires VS 2013 Update 3.
 		// With VS 2013 make sure that Edit-And-Continue is disabled in the debugger settings so that
@@ -158,7 +158,7 @@ $Configuration "Release"
 		$ShowProgress							"Not Set"
 		$Version
 		$EnableIncrementalLinking				"No (/INCREMENTAL:NO)"
-		$SuppressStartupBanner					"Yes (/NOLOGO)"
+		$SuppressStartupBanner
 		$IgnoreImportLibrary
 		$RegisterOutput
 		$AdditionalLibraryDirectories
@@ -249,7 +249,7 @@ $Configuration "Release"
 		$KeyFile
 		$KeyContainer
 		$DelaySign
-		$ErrorReporting							"Prompt Immediately (/ERRORREPORT:PROMPT)"
+		$ErrorReporting
 		$CLRUnmanagedCodeCheck
 		// Most DLLs cannot yet handle SafeSEH
 		$ImageHasSafeExceptionHandlers		"false"
@@ -261,7 +261,7 @@ $Configuration "Release"
 	$ManifestTool
 	{
 		// General
-		$SuppressStartupBanner				"Yes (/nologo)"
+		$SuppressStartupBanner
 		$VerboseOutput
 		$AssemblyIdentity
 		$UseUNICODEResponseFiles
@@ -293,7 +293,7 @@ $Configuration "Release"
 	$XMLDocumentGenerator
 	{
 		// General
-		$SuppressStartupBanner				"Yes (/nologo)"
+		$SuppressStartupBanner
 		$ValidateIntelliSense
 		$AdditionalDocumentFiles
 		$OutputDocumentFile
@@ -303,7 +303,7 @@ $Configuration "Release"
 
 	$BrowseInformation
 	{
-		$SuppressStartupBanner				"Yes (/nologo)"	
+		$SuppressStartupBanner
 		$OutputFile							"$(OutDir)/$OUTBINNAME.bsc"
 		$AdditionalOptions
 	}

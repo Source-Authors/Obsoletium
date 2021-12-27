@@ -89,7 +89,7 @@ $Configuration "Debug"
 		//$EnableMinimalRebuild				"Yes (/Gm)" [!$ANALYZE]
 		$EnableC++Exceptions				"No"
 		$SmallerTypeCheck
-		$BasicRuntimeChecks					"Default"
+		$BasicRuntimeChecks					"Both (/RTC1, equiv. to /RTCsu) (/RTC1)"
 		$RuntimeLibrary						"Multi-threaded Debug (/MTd)"
 		$StructMemberAlignment
 		$BufferSecurityCheck				"Yes"
@@ -102,8 +102,8 @@ $Configuration "Debug"
 		$LanguageStandard					"ISO C++17 Standard (std:c++17)"
 		$DisableLanguageExtensions
 		$DefaultCharUnsigned
-		$TreatWCHAR_TAsBuiltInType			"Yes (/Zc:wchar_t)"
-		$ForceConformanceInForLoopScope		"Yes (/Zc:forScope)"
+		$TreatWCHAR_TAsBuiltInType
+		$ForceConformanceInForLoopScope
 		$EnableRunTimeTypeInfo				"Yes (/GR)"
 		$OpenMPSupport						"No"
 
@@ -113,17 +113,17 @@ $Configuration "Debug"
 		$PrecompiledHeaderFile
 
 		// Output Files
-		$ExpandAttributedSource				"No"
-		$AssemblerOutput					"No Listing"
-		$ASMListLocation					"$(IntDir)/"
-		$ObjectFileName						"$(IntDir)/"
-		$ProgramDatabaseFileName			"$(IntDir)/"
-		$GenerateXMLDocumentationFiles		"No"
+		$ExpandAttributedSource
+		$AssemblerOutput
+		$ASMListLocation
+		$ObjectFileName
+		$ProgramDatabaseFileName
+		$GenerateXMLDocumentationFiles
 		$XMLDocumentationFileName
 
 		// Browse Information
-		$EnableBrowseInformation			"None"
-		$BrowseFile							"$(IntDir)/"
+		$EnableBrowseInformation
+		$BrowseFile
 
 		// Advanced
 		$CallingConvention
@@ -134,9 +134,9 @@ $Configuration "Debug"
 		$ShowIncludes
 		$UndefinePreprocessorDefinitions
 		$UndefineAllPreprocessorDefinitions
-		$UseFullPaths						"Yes (/FC)"
+		$UseFullPaths
 		$OmitDefaultLibraryNames
-		$ErrorReporting						"Prompt Immediately (/errorReport:prompt)"
+		$ErrorReporting
 	}
 
 	$Librarian
@@ -145,7 +145,7 @@ $Configuration "Debug"
 		$OutputFile							"$OUTLIBDIR\$OUTLIBNAME.lib"
 		$AdditionalDependencies
 		$AdditionalLibraryDirectories
-		$SuppressStartupBanner				"Yes (/NOLOGO)"
+		$SuppressStartupBanner
 		$ModuleDefinitionFileName
 		$IgnoreAllDefaultLibraries
 		$IgnoreSpecificLibrary
@@ -161,7 +161,7 @@ $Configuration "Debug"
 	$XMLDocumentGenerator
 	{
 		// General
-		$SuppressStartupBanner				"Yes (/nologo)"
+		$SuppressStartupBanner
 		$ValidateIntelliSense
 		$AdditionalDocumentFiles
 		$OutputDocumentFile
@@ -171,8 +171,8 @@ $Configuration "Debug"
 
 	$BrowseInformation
 	{
-		$SuppressStartupBanner				"Yes (/nologo)"	
-		$OutputFile							"$(OutDir)/$OUTLIBNAME.bsc"
+		$SuppressStartupBanner
+		$OutputFile
 		$AdditionalOptions
 	}
 
