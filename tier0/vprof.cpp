@@ -2087,4 +2087,9 @@ PLATFORM_INTERFACE void TelemetryTick()
 	}
 }
 
+#else
+
+// HACK(proper): Export telemetry as vphysics depends on it.
+TelemetryData g_Telemetry;
+
 #endif // RAD_TELEMETRY_ENABLED
