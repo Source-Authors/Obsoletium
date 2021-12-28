@@ -1093,6 +1093,8 @@ public:
 
 	// Performs final verification of all compositor templates (after they've all been initially loaded).
 	virtual bool				VerifyTextureCompositorTemplates( ) = 0;
+
+	virtual bool				HasShaderAPI() const = 0;
 };
 
 

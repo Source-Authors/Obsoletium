@@ -2362,6 +2362,10 @@ public:
 		return false;	
 	}
 
+	virtual bool HasShaderAPI() const OVERRIDE
+	{
+		return true;
+	}
 };
 
 

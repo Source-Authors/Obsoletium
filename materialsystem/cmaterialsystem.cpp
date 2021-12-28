@@ -637,6 +637,14 @@ void CMaterialSystem::SetShaderAPI( char const *pShaderAPIDLL )
 		DestroyShaderAPI();
 	}
 }
+
+//-----------------------------------------------------------------------------
+// Checks we using shader.
+//-----------------------------------------------------------------------------
+bool CMaterialSystem::HasShaderAPI() const
+{
+	return m_ShaderAPIFactory != nullptr;
+}
 	
 
 //-----------------------------------------------------------------------------
@@ -656,6 +664,13 @@ bool CMaterialSystem::Connect( CreateInterfaceFn factory )
 	if ( !g_pFullFileSystem )
 	{
 		Warning( "The material system requires the filesystem to run!\n" );
+		return false;
+	}
+
+	if ( !m_ShaderAPIFactory ) 
+	{
+		Warning( "The material system requires shader API to be set! Shader API is %s and not loaded.\n",
+              m_pShaderDLL != nullptr ? m_pShaderDLL : "N/A" );
 		return false;
 	}
 

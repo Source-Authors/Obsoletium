@@ -709,6 +709,12 @@ bool CSourceAppSystemGroup::Create()
 	}
 
 	pMaterialSystem->SetShaderAPI( pDLLName );
+	if ( !pMaterialSystem->HasShaderAPI() )
+	{
+		Error("Please check game installed correctly.\n\n"
+			"Unable to set shader API %s. Looks like required components are missed or broken.", pDLLName );
+		return false;
+	}
 
 	double elapsed = Plat_FloatTime() - st;
 	COM_TimestampedLog( "LoadAppSystems:  Took %.4f secs to load libraries and get factories.", (float)elapsed );

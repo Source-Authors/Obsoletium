@@ -106,6 +106,8 @@ private:
 	void									ThreadRelease( );
 	void									ThreadAcquire( bool bForce = false );
 
+	bool									HasShaderAPI() const;
+
 public:
 	virtual void							SetThreadMode( MaterialThreadMode_t nextThreadMode, int nServiceThread );
 	virtual MaterialThreadMode_t			GetThreadMode( ); // current thread mode
