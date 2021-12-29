@@ -12,7 +12,6 @@
 
 #define _WIN32_DCOM
 #include <comdef.h>
-#include <atlcomtime.h>
 #include <wbemidl.h>
 
 // NOTE: This has to be the last file included!

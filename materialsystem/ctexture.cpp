@@ -51,7 +51,8 @@
 #include "filesystem.h"
 #include "tier2/p4helpers.h"
 #include "tier2/tier2.h"
-#include "p4lib/ip4.h"
+// HACK(proper): Exclude ip4.
+//#include "p4lib/ip4.h"
 #include "ctype.h"
 #include "ifilelist.h"
 #include "tier0/icommandline.h"
@@ -4747,6 +4748,8 @@ CP4Requirement::CP4Requirement() :
 
 CP4Requirement::~CP4Requirement()
 {
+// HACK(proper): Exclude ip4.
+#ifdef STAGING_ONLY
 	if ( m_bLoadedModule && m_pP4Module )
 	{
 		if ( p4 )
@@ -4759,6 +4762,7 @@ CP4Requirement::~CP4Requirement()
 		m_pP4Module = NULL;
 		p4 = NULL;
 	}
+#endif
 }
 
 static ConVar mat_texture_list_content_path( "mat_texture_list_content_path", "", FCVAR_ARCHIVE, "The content path to the materialsrc directory. If left unset, it'll assume your content directory is next to the currently running game dir." );

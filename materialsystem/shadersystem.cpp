@@ -1182,7 +1182,7 @@ void CShaderSystem::InitStateSnapshots( IShader *pShader, IMaterialVar **params,
 	{
 		// Putcher breakpoint here to catch the rendering of a material
 		// marked for debugging ($debug = 1 in a .vmt file) shadow state version
-		int x = 0;
+		[[maybe_unused]] int x = 0;
 	}
 #endif
 

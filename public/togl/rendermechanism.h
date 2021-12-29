@@ -60,6 +60,8 @@
 		#else
 			#include <windows.h>
 			#include <d3d9.h>
+      // HACK(proper): Exclude d3d9 extensions, as they are too broad.
+			// #include <d3dx9.h>
 		#endif
 		typedef HWND VD3DHWND;
 	#endif

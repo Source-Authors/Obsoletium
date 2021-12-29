@@ -127,6 +127,10 @@ typedef int PixelShader_t;
 
 #include "togl/rendermechanism.h"
 
+#if !defined(DX_TO_GL_ABSTRACTION)
+#include <d3dx9.h>
+#endif
+
 #if defined( _X360 )
 
 // not supported, keeping for port ease
