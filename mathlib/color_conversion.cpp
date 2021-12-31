@@ -115,7 +115,7 @@ static void CheckExponentTable()
 	{
 		float testAgainst = powf( 2.0f, i - 128 ) / 255.0f;
 		float diff = testAgainst - power2_n[i] ;
-		float relativeDiff = diff / testAgainst;
+		[[maybe_unused]] float relativeDiff = diff / testAgainst;
 		Assert( testAgainst == 0 ? 
 				power2_n[i] < 1.16E-041 :
 				power2_n[i] == testAgainst );
