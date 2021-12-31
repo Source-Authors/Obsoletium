@@ -800,15 +800,14 @@ bool IsDenormal( const float &val )
 	return  ( biased_exponent == 0 && abs_mantissa != 0 );
 }
 
-int SignbitsForPlane (cplane_t *out)
+// dimhotepus: use byte as expected type is byte.
+byte SignbitsForPlane (cplane_t *out)
 {
 	Assert( s_bMathlibInitialized );
-	int	bits, j;
 
 	// for fast box on planeside test
-
-	bits = 0;
-	for (j=0 ; j<3 ; j++)
+	byte bits = 0;
+	for (byte j=0 ; j<3 ; j++)
 	{
 		if (out->normal[j] < 0)
 			bits |= 1<<j;

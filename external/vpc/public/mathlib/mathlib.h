@@ -74,7 +74,7 @@ enum {
   FRUSTUM_NUMPLANES = 6
 };
 
-extern int SignbitsForPlane(cplane_t *out);
+extern byte SignbitsForPlane(cplane_t *out);
 class Frustum_t;
 
 // Computes Y fov from an X fov and a screen aspect ratio + X from Y

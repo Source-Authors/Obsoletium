@@ -200,12 +200,12 @@ enum
 	FRUSTUM_NUMPLANES	= 6
 };
 
-extern int SignbitsForPlane( cplane_t *out );
+extern byte SignbitsForPlane( cplane_t *out );
 
 class Frustum_t
 {
 public:
-	void SetPlane( int i, int nType, const Vector &vecNormal, float dist )
+	void SetPlane( int i, byte nType, const Vector &vecNormal, float dist )
 	{
 		m_Plane[i].normal = vecNormal;
 		m_Plane[i].dist = dist;
