@@ -333,7 +333,11 @@ private:
 
 private:
 	const tchar *m_pszName;
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// DLL export looks safe.
+	MSVC_DISABLE_WARNING(4251)
 	CFastTimer	m_Timer;
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
 
 	// L2 Cache data.
 	int			m_iPrevL2CacheMiss;
@@ -341,8 +345,12 @@ private:
 	int			m_iTotalL2CacheMiss;
 
 #ifndef _X360	
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// DLL export looks safe.
+	MSVC_DISABLE_WARNING(4251)
 	// L2 Cache data.
 	CL2Cache	m_L2Cache;
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
 #else // 360:
 	
 	unsigned int m_iBitFlags; // see enum below for settings
@@ -380,15 +388,28 @@ private:
 	int			m_nRecursions;
 	
 	unsigned	m_nCurFrameCalls;
+	
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// DLL export looks safe.
+	MSVC_DISABLE_WARNING(4251)
 	CCycleCount	m_CurFrameTime;
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
 	
 	unsigned	m_nPrevFrameCalls;
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// DLL export looks safe.
+	MSVC_DISABLE_WARNING(4251)
 	CCycleCount	m_PrevFrameTime;
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
 
-	unsigned	m_nTotalCalls;
+	unsigned	m_nTotalCalls;	
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// DLL export looks safe.
+	MSVC_DISABLE_WARNING(4251)
 	CCycleCount	m_TotalTime;
 
 	CCycleCount	m_PeakTime;
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
 
 	CVProfNode *m_pParent;
 	CVProfNode *m_pChild;

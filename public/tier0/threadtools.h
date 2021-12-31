@@ -1146,11 +1146,16 @@ public:
 private:
 	void WaitForRead();
 
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+  // DLL export looks safe. 
+	MSVC_DISABLE_WARNING(4251)
 #ifdef WIN32
 	CThreadFastMutex m_mutex;
 #else
 	CThreadMutex m_mutex;	
 #endif
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
+
 	CThreadEvent m_CanWrite;
 	CThreadEvent m_CanRead;
 
@@ -1197,7 +1202,12 @@ private:
 	void SpinLockForWrite( const uint32 threadId );
 
 	volatile LockInfo_t m_lockInfo;
+
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+  // DLL export looks safe. 
+	MSVC_DISABLE_WARNING(4251)
 	CInterlockedInt m_nWriters;
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
 } ALIGN8_POST;
 
 //-----------------------------------------------------------------------------
@@ -1359,7 +1369,11 @@ private:
 #elif defined(POSIX)
 	pthread_t m_threadId;
 #endif
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+  // DLL export looks safe.
+	MSVC_DISABLE_WARNING(4251)
 	CInterlockedInt m_nSuspendCount;
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
 	CThreadEvent m_SuspendEvent;
 	CThreadEvent m_SuspendEventSignal;
 	int		m_result;

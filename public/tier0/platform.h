@@ -651,7 +651,24 @@ typedef void * HINSTANCE;
 #pragma GCC diagnostic ignored "-Wswitch"					// enumeration values not handled in switch
 #endif
 
+// MSVC specific.
+#ifdef COMPILER_MSVC
+// Begins MSVC warning override scope.
+#define MSVC_BEGIN_WARNING_OVERRIDE_SCOPE() __pragma(warning(push))
 
+// Disables MSVC warning |warning_level|.
+#define MSVC_DISABLE_WARNING(warning_level) \
+  __pragma(warning(disable : warning_level))
+
+// Ends MSVC warning override scope.
+#define MSVC_END_WARNING_OVERRIDE_SCOPE() __pragma(warning(pop))
+
+// Disable MSVC warning |warning_level| for code |code|.
+#define MSVC_SCOPED_DISABLE_WARNING(warning_level, code) \
+  MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()                    \
+  MSVC_DISABLE_WARNING(warning_level)                    \
+  code MSVC_END_WARNING_OVERRIDE_SCOPE()
+#endif
 
 #ifdef POSIX
 #define _stricmp stricmp
