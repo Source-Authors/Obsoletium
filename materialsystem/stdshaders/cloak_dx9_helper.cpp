@@ -7,7 +7,6 @@
 
 #include "BaseVSShader.h"
 #include "cloak_dx9_helper.h"
-#include "../shaderapidx9/locald3dtypes.h"												   
 #include "convar.h"
 #include "cpp_shader_constant_register_map.h"
 #include "cloak_vs20.inc"

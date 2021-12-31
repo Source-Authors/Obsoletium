@@ -166,7 +166,7 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 		{
 			g_ShaderDeviceUsingD3D9Ex = true;
 
-			// HACK(proper): The following is more "correct" but incompatible with the Steam overlay:
+			// dimhotepus: The following is more "correct" but incompatible with the Steam overlay:
 			//pD3D9Ex->QueryInterface( IID_IDirect3D9, (void**) &m_pD3D );
 			//pD3D9Ex->Release();
 			m_pD3D = static_cast< IDirect3D9* >( pD3D9Ex );
