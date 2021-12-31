@@ -2894,7 +2894,7 @@ void CDmaArrayBase<T,B>::Purge()
 // Attribute initialization
 //-----------------------------------------------------------------------------
 template< class T, class B >
-void CDmaDecorator<T,B>::Init( CDmElement *pOwner, const char *pAttributeName, int nFlags = 0 )
+void CDmaDecorator<T,B>::Init( CDmElement *pOwner, const char *pAttributeName, int nFlags )
 {
 	Assert( pOwner );
 	this->m_pAttribute = pOwner->AddExternalAttribute( pAttributeName, CDmAttributeInfo<CUtlVector<T> >::AttributeType(), &Value() );

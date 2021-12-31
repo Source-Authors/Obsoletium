@@ -65,7 +65,7 @@
 #define MAX_ROUTABLE_PAYLOAD		1260	// Matches x360 size
 
 static_assert((MAX_ROUTABLE_PAYLOAD & 3) == 0,
-	"Bit buffers must be a multiple of 4 bytes")
+              "Bit buffers must be a multiple of 4 bytes");
 
 #define MIN_ROUTABLE_PAYLOAD		16		// minimum playload size
 
