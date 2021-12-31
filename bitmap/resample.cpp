@@ -4,7 +4,10 @@
 //
 //=============================================================================//
 
+// dimhotepus: Exclude nvtc as proprietary.
+#ifndef NO_NVTC
 #include "nvtc.h"
+#endif
 #include "bitmap/imageformat.h"
 #include "basetypes.h"
 #include "tier0/dbg.h"

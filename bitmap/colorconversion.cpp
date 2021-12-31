@@ -17,13 +17,22 @@
 #include "tier1/utlmemory.h"
 #include "tier1/strtools.h"
 #include "mathlib/compressed_vector.h"
+// dimhotepus: Exclude nvtc as proprietary.
+#ifndef NO_NVTC
 #include "nvtc.h"
+#else
+using DWORD = unsigned int;
+using WORD = unsigned short;
+#endif
 
 #ifdef POSIX
 typedef int32 *DWORD_PTR;
 #endif
 
+// dimhotepus: Exclude ATI compress as proprietary.
+#ifndef NO_ATI_COMPRESS
 #include "ATI_Compress.h"
+#endif
 #include "bitmap/float_bm.h"
 
 #define STB_DXT_IMPLEMENTATION
@@ -247,8 +256,8 @@ static RGBA8888ToUserFormatFunc_t GetRGBA8888ToUserFormatFunc_t( ImageFormat dst
 
 struct DXTColBlock
 {
-	WORD col0;
-	WORD col1;
+  WORD col0;
+  WORD col1;
 
 	// no bit fields - use bytes
 	BYTE row[4];
@@ -270,7 +279,7 @@ static inline void GetColorBlockColorsBGRA8888( DXTColBlock *pBlock, BGRA8888_t 
 {
 	// input data is assumed to be x86 order
 	// swap to target platform for proper dxt decoding
-	WORD color0 = LittleShort( pBlock->col0 );
+  WORD color0 = LittleShort( pBlock->col0 );
 	WORD color1 = LittleShort( pBlock->col1 );
 
 	// convert to full precision correctly.
@@ -806,6 +815,8 @@ static void ConvertFromATIxN( const uint8 *src, CDestPixel *dst, int width, int 
 	}
 }
 
+// dimhotepus: Exclude nvtc as proprietary.
+#if !defined(NO_NVTC)
 static DWORD GetDXTCEncodeType( ImageFormat imageFormat )
 {
 	switch ( imageFormat )
@@ -822,13 +833,15 @@ static DWORD GetDXTCEncodeType( ImageFormat imageFormat )
 		return 0;
 	}
 }
+#endif
 
 // Convert RGBA input to ATI1N or ATI2N format
 bool ConvertToATIxN(  const uint8 *src, ImageFormat srcImageFormat,
 					  uint8 *dst, ImageFormat dstImageFormat,
 					  int width, int height, int srcStride, int dstStride )
 {
-#if !defined( _X360 ) && !defined( POSIX )
+// dimhotepus: Exclude ATI compress as proprietary.
+#if !defined(NO_ATI_COMPRESS) && !defined(_X360) && !defined(POSIX)
 
 	// from rgb(a) to ATIxN
 	if( srcStride != 0 || dstStride != 0 )
@@ -877,7 +890,8 @@ bool ConvertToDXTLegacy(  const uint8 *src, ImageFormat srcImageFormat,
  						  uint8 *dst, ImageFormat dstImageFormat, 
 					      int width, int height, int srcStride, int dstStride )
 {
-#if !defined( _X360 ) && !defined( POSIX )
+// dimhotepus: Exclude nvtc as proprietary.
+#if !defined(NO_NVTC) && !defined( _X360 ) && !defined( POSIX )
 	// from rgb(a) to dxtN
 	if( srcStride != 0 || dstStride != 0 )
 		return false;

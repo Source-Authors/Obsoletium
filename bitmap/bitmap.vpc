@@ -15,6 +15,10 @@ $Configuration
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\dx9sdk\include"					[$WINDOWS]
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\x360xdk\include\win32\vs2005"	[$WINDOWS]
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\thirdparty\stb"
+
+		// dimhotepus: Exclude nvtc & ATI compress, as proprietary.
+		$PreprocessorDefinitions			"$BASE;NO_NVTC"						[$NO_NVTC]
+		$PreprocessorDefinitions			"$BASE;NO_ATI_COMPRESS"		[$NO_ATI_COMPRESS]
 	}
 }
 
@@ -51,7 +55,8 @@ $Project "bitmap"
 
 	$Folder "Link Libraries" [$WIN32]
 	{
-		$Lib nvtc
-		$Lib ATI_Compress_MT_VC10
+	  // dimhotepus: Exclude nvtc & ATI compress, as proprietary.
+		$Lib nvtc [!$NO_NVTC]
+		$Lib ATI_Compress_MT_VC10 [!$NO_ATI_COMPRESS]
 	}
 }

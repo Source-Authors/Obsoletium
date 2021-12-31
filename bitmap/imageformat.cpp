@@ -13,7 +13,10 @@
 #include "tier0/dbg.h"
 #include <malloc.h>
 #include <memory.h>
+// dimhotepus: Exclude nvtc as proprietary.
+#ifndef NO_NVTC
 #include "nvtc.h"
+#endif
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 #include "tier1/utlmemory.h"
