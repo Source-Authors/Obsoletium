@@ -30,7 +30,7 @@ $Configuration
 		$SystemLibraries                    "iconv" [$OSXALL]
 		$GCC_ExtraLinkerFlags                   		"-L/usr/lib32" [$LINUXALL]
 		$SystemFrameworks					"Carbon;OpenGL;Quartz;Cocoa;IOKit" [$OSXALL]
-		$AdditionalDependencies				"$BASE d3d9.lib ws2_32.lib" [$WINDOWS]
+		$AdditionalDependencies				"$BASE d3d9.lib" [$WINDOWS]
 	}
 }
 
@@ -135,9 +135,9 @@ $Project "shaderapidx9"
 	
 	$Folder "Link Libraries"
 	{
-    $Lib	bitmap
-    $Lib	mathlib
-    $Lib	tier2
+		$Lib	bitmap
+		$Lib	mathlib
+		$Lib	tier2
 		$Lib	"$LIBCOMMON/bzip2"
 		$ImpLib togl [!$IS_LIB_PROJECT && $GL]
   }
