@@ -14,7 +14,7 @@
 #endif
 
 #ifdef _INC_TCHAR
-#error ("Must include tier0 type headers before tchar.h")
+#error "Must include tier0 type headers before tchar.h"
 #endif
 
 // Temporarily turn off Valve defines
@@ -88,7 +88,7 @@ typedef char tchar;
 #define TCHAR_IS_CHAR
 #endif
 
-#if defined( _MSC_VER ) || defined( WIN32 )
+#if defined( WIN32 )
 typedef wchar_t uchar16;
 typedef unsigned int uchar32;
 #else

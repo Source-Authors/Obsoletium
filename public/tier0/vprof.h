@@ -686,6 +686,7 @@ DBG_INTERFACE bool g_VProfSignalSpike;
 class CVProfSpikeDetector
 {
 public:
+	// dimhotepus: use double to store time instead of float
 	CVProfSpikeDetector( double spike ) :
 		m_timeLast( GetTimeLast() )
 	{
@@ -1090,7 +1091,7 @@ inline void CVProfile::ExitScope()
 {
 #if defined(_X360) && defined(VPROF_PIX)
 #ifdef PIXBeginNamedEvent
-#error
+#error "Please define your platform"
 #endif
 	if ( m_pCurNode->GetBudgetGroupID() != VPROF_BUDGET_GROUP_ID_UNACCOUNTED )
 		PIXEndNamedEvent();

@@ -25,7 +25,8 @@
 
 #ifdef POSIX
 #include <pthread.h>
-#include <errno.h>
+#include <cerrno>
+
 #define WAIT_OBJECT_0 0
 #define WAIT_TIMEOUT 0x00000102
 #define WAIT_FAILED -1
@@ -53,7 +54,7 @@ enum ThreadPriorityEnum_t
 	TP_PRIORITY_HIGH = 100,
 	TP_PRIORITY_LOW = 2001,
 	TP_PRIORITY_DEFAULT = 1001
-#error "Need PRIORITY_LOWEST/HIGHEST"
+#error "Plase define PRIORITY_LOWEST/HIGHEST"
 #elif defined( PLATFORM_LINUX )
     // We can use nice on Linux threads to change scheduling.
     // pthreads on Linux only allows priority setting on
@@ -140,7 +141,7 @@ inline void ThreadPause()
 	__asm __volatile( "pause" );
 #elif defined( _X360 )
 #else
-#error "implement me"
+#error "Please define your platform"
 #endif
 }
 
@@ -205,7 +206,8 @@ inline int ThreadWaitForObject( HANDLE handle, bool bWaitAll = true, unsigned ti
 	// http://preshing.com/20120625/memory-ordering-at-compile-time
 	#define ThreadMemoryBarrier() asm volatile("" ::: "memory")
 #else
-	#error Every platform needs to define ThreadMemoryBarrier to at least prevent compiler reordering
+#error \
+    "Every platform needs to define ThreadMemoryBarrier to at least prevent compiler reordering"
 #endif
 
 #if defined(_WIN32) && !defined(_X360)
@@ -667,7 +669,7 @@ private:
 	pthread_mutex_t m_Mutex;
 	pthread_mutexattr_t m_Attr;
 #else
-#error
+#error "Please define your platform"
 #endif
 
 #ifdef THREAD_MUTEX_TRACING_SUPPORTED
@@ -791,11 +793,7 @@ private:
 	int				m_depth;
 };
 
-#ifdef COMPILER_CLANG
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wunused-private-field"
-#endif // Q_CC_CLANG
-
+// dimhotepus: Fix aligned alloc.
 class ALIGN128 CAlignedThreadFastMutex : public CAlignedNewDelete<128, CThreadFastMutex>
 {
 public:
@@ -805,12 +803,8 @@ public:
 	}
 
 private:
-	uint8 pad[128-sizeof(CThreadFastMutex)];
+	[[maybe_unused]] uint8 pad[128-sizeof(CThreadFastMutex)];
 } ALIGN128_POST;
-
-#ifdef COMPILER_CLANG
-#  pragma clang diagnostic pop
-#endif
 
 #else
 typedef CThreadMutex CThreadFastMutex;
