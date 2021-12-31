@@ -18,7 +18,7 @@
 #elif POSIX
 #define FORCEINLINE_PIXEL inline
 #else
-#error "implement me"
+#error "Please define your platform"
 #endif
 
 #include "bitmap/imageformat.h"

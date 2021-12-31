@@ -873,7 +873,7 @@ static matrix3x4_t *ComputeSkinMatrixSSE( mstudioboneweight_t &boneweights, matr
 #elif defined( _X360 )
 	return ComputeSkinMatrix( boneweights, pPoseToWorld, result );
 #else
-	#error
+#error "Please define your platform"
 #endif
 
 	Assert( 0 );

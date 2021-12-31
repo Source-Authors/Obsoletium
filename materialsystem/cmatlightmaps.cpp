@@ -914,6 +914,7 @@ FORCEINLINE fltx4 PackPixel_BGRA8888( FLTX4 rgba )
 // one noncontiguous float at a time. (If there weren't a huge
 // compiler bug with __stvewx in the Apr07 XDK, that might not
 // be the case.)
+// dimhotepus: Fix aligned alloc.
 struct ALIGN128 CPixelWriterStoreGather : public CAlignedNewDelete<128>
 {
 	enum {

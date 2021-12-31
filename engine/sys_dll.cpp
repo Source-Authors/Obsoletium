@@ -729,7 +729,7 @@ void Sys_InitMemory( void )
 	}
 
 #else
-#error Write me.
+#error "Please define your platform"
 #endif
 
 	if ( memsize > 0xFFFFFFFFUL )
@@ -777,7 +777,7 @@ void Sys_InitMemory( void )
 	}
 
 #else
-#error Write me.
+#error "Please define your platform"
 
 #endif
 }

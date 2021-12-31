@@ -130,7 +130,7 @@ IAudioDevice *IAudioDevice::AutoDetectInit( bool waveOnly )
 #endif // NEVER
 
 #else
-#error
+#error "Please define your platform"
 #endif
 	}
 #if defined( _X360 )

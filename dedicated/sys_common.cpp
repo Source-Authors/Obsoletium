@@ -9,7 +9,7 @@
 #elif POSIX
 #include <unistd.h>
 #else
-#error
+#error "Please define your platform"
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -201,7 +201,7 @@ SpewRetval_t DedicatedSpewOutputFunc( SpewType_t spewType, char const *pMsg )
 		fflush(stdout);
 		_exit(1);
 #else
-#error "Implement me"
+#error "Please define your platform"
 #endif
 		
 		return SPEW_ABORT;

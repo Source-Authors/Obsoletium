@@ -1108,6 +1108,7 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 			return FS_OK;
 		}
 
+		// dimhotepus: Report missed filesystem DLL.
 		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Please ensure game installed correctly.\n\n"
 			"Unable to load filesystem *" DLL_EXT_STRING ": both stdio / steam are absent." );
 	#endif

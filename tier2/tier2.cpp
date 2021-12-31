@@ -14,6 +14,8 @@
 #include "materialsystem/ivballoctracker.h"
 #include "inputsystem/iinputsystem.h"
 #include "networksystem/inetworksystem.h"
+// dimhotepus: No perforce
+// #include "p4lib/ip4.h"
 #include "mdllib/mdllib.h"
 #include "filesystem/IQueuedLoader.h"
 
@@ -79,6 +81,11 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		{
 			g_VBAllocTracker = (IVBAllocTracker*)pFactoryList[i]( VB_ALLOC_TRACKER_INTERFACE_VERSION, 0 );
 		}
+		// dimhotepus: No perforce
+		/*if ( !p4 )
+		{
+			p4 = ( IP4 * )pFactoryList[i]( P4_INTERFACE_VERSION, NULL );
+		}*/
 		if ( !colorcorrection )
 		{
 			colorcorrection = ( IColorCorrectionSystem * )pFactoryList[i]( COLORCORRECTION_INTERFACE_VERSION, NULL );

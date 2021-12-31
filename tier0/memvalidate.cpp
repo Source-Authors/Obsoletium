@@ -449,7 +449,7 @@ int CValidateAlloc::heapchk()
 #elif POSIX
 	return bOk;
 #else
-#error
+#error "Please define your platform"
 #endif
 }
 

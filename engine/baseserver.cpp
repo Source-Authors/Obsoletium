@@ -1173,7 +1173,7 @@ void CBaseServer::CalculateCPUUsage( void )
 		if( m_fCPUPercent < 0 )
 			m_fCPUPercent = 0;
 #else
-#error
+#error "Please define your platform"
 #endif
 		m_fLastCPUCheckTime = curtime; 
 	}

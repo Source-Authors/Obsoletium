@@ -27,7 +27,7 @@
 #elif POSIX
 #define FORCEINLINE_CVAR inline
 #else
-#error "implement me"
+#error "Please define your platform"
 #endif
 
 

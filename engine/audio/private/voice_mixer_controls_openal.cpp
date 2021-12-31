@@ -281,6 +281,6 @@ void ShutdownMixerControls()
 
 
 #else
-#error
+#error "Please define your platform"
 #endif
 

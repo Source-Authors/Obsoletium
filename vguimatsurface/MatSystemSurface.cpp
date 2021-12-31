@@ -1870,7 +1870,7 @@ bool CMatSystemSurface::AddCustomFontFile( const char *fontName, const char *fon
 #elif defined( _X360 )
 #include "xbox/xbox_win32stubs.h"
 #else
-#error	
+#error "Please define your platform"
 #endif
 }
 
@@ -2849,7 +2849,7 @@ void CMatSystemSurface::EnableMouseCapture( VPANEL panel, bool state )
 	//  and he says nobody has ever reported any regressions.
 	// So I've removed the Assert. 8/32/2012 - mikesart.
 #else
-#error
+#error "Please define your platform"
 #endif
 }
 

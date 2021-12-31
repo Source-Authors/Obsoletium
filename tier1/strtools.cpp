@@ -791,7 +791,7 @@ int V_snwprintf( wchar_t *pDest, int maxLen, const wchar_t *pFormat, ... )
 #elif POSIX
 	int len = vswprintf( pDest, maxLen, pFormat, marker );
 #else
-#error "define vsnwprintf type."
+#error "Please define vsnwprintf type."
 #endif
 	va_end( marker );
 
@@ -815,7 +815,7 @@ int V_vsnwprintf( wchar_t *pDest, int maxLen, const wchar_t *pFormat, va_list pa
 #elif POSIX
 	int len = vswprintf( pDest, maxLen, pFormat, params );
 #else
-#error "define vsnwprintf type."
+#error "Please define vsnwprintf type."
 #endif
 
 	// Len < 0 represents an overflow
@@ -845,7 +845,7 @@ int V_snprintf( char *pDest, int maxLen, char const *pFormat, ... )
 #elif POSIX
 	int len = vsnprintf( pDest, maxLen, pFormat, marker );
 #else
-	#error "define vsnprintf type."
+	#error "Please define vsnprintf type."
 #endif
 	va_end( marker );
 
@@ -1456,7 +1456,7 @@ int _V_UnicodeToUCS2( const wchar_t *pUnicode, int cubSrcInBytes, char *pUCS2, i
 			cchResult = cubSrcInBytes / sizeof( wchar_t );
 	}
 #else
-	#error Must be implemented for this platform
+	#error "Please define your platform"
 #endif
 	return cchResult;	
 }

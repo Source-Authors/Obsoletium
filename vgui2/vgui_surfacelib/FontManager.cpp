@@ -600,7 +600,7 @@ FallbackFont_t g_FallbackFonts[] =
 	{ NULL, "Tahoma" },		// every other font falls back to this
 };
 #else
-#error
+#error "Please define your platform"
 #endif
 
 //-----------------------------------------------------------------------------
@@ -654,7 +654,7 @@ const char *CFontManager::GetForeignFallbackFontName()
 #elif defined(_PS3)
 	return "Tahoma";
 #else
-#error
+#error "Please define your platform"
 #endif
 }
 

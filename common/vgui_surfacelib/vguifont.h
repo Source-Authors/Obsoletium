@@ -30,7 +30,7 @@ typedef COSXFont font_t;
 #include "linuxfont.h"
 typedef CLinuxFont font_t;
 #else
-#error
+#error "Please define your platform"
 #endif
 
 

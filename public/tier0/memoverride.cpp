@@ -399,6 +399,7 @@ void *__cdecl operator new( size_t nSize )
 	return AllocUnattributed( nSize );
 }
 
+// dimhotepus: Aligned alloc
 void* __cdecl operator new ( std::size_t nSize, std::align_val_t align )
 {
 	return MemAlloc_AllocAligned(nSize, static_cast<size_t>(align));
@@ -418,6 +419,7 @@ void __cdecl operator delete( void *pMem )
 	g_pMemAlloc->Free( pMem );
 }
 
+// dimhotepus: Aligned alloc
 void __cdecl operator delete ( void* pMem, std::align_val_t align ) noexcept
 {
 	MemAlloc_FreeAligned( pMem );
@@ -441,6 +443,7 @@ void *__cdecl operator new[]( size_t nSize )
 	return AllocUnattributed( nSize );
 }
 
+// dimhotepus: Aligned alloc
 void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align )
 {
 	return MemAlloc_AllocAligned(nSize, static_cast<size_t>(align));
@@ -460,6 +463,7 @@ void __cdecl operator delete[]( void *pMem )
 	g_pMemAlloc->Free( pMem );
 }
 
+// dimhotepus: Aligned alloc
 void operator delete[]( void* ptr, std::align_val_t align ) noexcept 
 {
 	MemAlloc_FreeAligned(ptr);
@@ -914,11 +918,12 @@ class ErrorHandlerRegistrar {
  public:
   ErrorHandlerRegistrar() noexcept
 		: old_pure_{_set_purecall_handler(VPureCall)},
-      old_invalid_{_set_invalid_parameter_handler(VInvalidParameterHandler)} {
+			old_invalid_{_set_invalid_parameter_handler(VInvalidParameterHandler)} {
 	}
+	// dimhotepus: Restore old handlers on exit.
   ~ErrorHandlerRegistrar() noexcept {
-    _set_invalid_parameter_handler(old_invalid_);
-    _set_purecall_handler(old_pure_);
+		_set_invalid_parameter_handler(old_invalid_);
+		_set_purecall_handler(old_pure_);
 	}
 
  private:

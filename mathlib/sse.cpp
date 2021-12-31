@@ -187,7 +187,7 @@ float _SSE_RSqrtFast(float x)
 #elif POSIX
 	__asm__ __volatile__( "rsqrtss %0, %1" : "=x" (rroot) : "x" (x) );
 #else
-#error
+#error "Please define your platform"
 #endif
 
 	return rroot;

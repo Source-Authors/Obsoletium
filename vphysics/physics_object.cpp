@@ -86,7 +86,7 @@ CPhysicsObject::CPhysicsObject( void )
 
 	memset( pData, 0, dataSize );	
 #else
-#error
+#error "Please define your platform"
 #endif
 
 	// HACKHACK: init this as a sphere until someone attaches a surfacemanager

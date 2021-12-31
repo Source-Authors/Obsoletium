@@ -30,7 +30,7 @@
 #elif defined(_WIN32)
 	#include "tier0/dynfunction.h"
 #else
-	#error
+	#error "Please define your platform"
 #endif
 #include "appframework/ilaunchermgr.h"
 
@@ -811,7 +811,7 @@ int CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 #elif defined(_WIN32)
 
 #else
-#error
+#error "Please define your platform"
 #endif
 
 
@@ -1032,7 +1032,7 @@ bool CGame::CreateGameWindow( void )
 	AttachToWindow( );
 	return true;
 #else
-#error
+#error "Please define your platform"
 #endif
 }
 
@@ -1181,7 +1181,7 @@ bool CGame::InputAttachToGameWindow()
 	Assert( !"Impl me" );
 	return false;
 #else
-#error
+#error "Please define your platform"
 #endif
 	return true;
 }

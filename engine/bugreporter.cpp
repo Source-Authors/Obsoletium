@@ -28,7 +28,7 @@
 #define GetLastError() errno
 #elif defined( _X360 )
 #else
-#error
+#error "Please define your platform"
 #endif
 
 #include <time.h>
@@ -108,7 +108,7 @@
 #elif defined(LINUX)
 #define BUG_REPOSITORY_URL "\\\\fileserver\\bugs"
 #else
-//#error
+//#error "Please define your platform"
 #endif
 #define REPOSITORY_VALIDATION_FILE "info.txt"
 
@@ -2298,7 +2298,7 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 #elif POSIX
 		bResult = (0 == copyfile( local, remote, NULL, COPYFILE_ALL )); 
 #else
-#error
+#error "Please define your platform"
 #endif
 	}
 	else

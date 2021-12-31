@@ -104,7 +104,7 @@ static unsigned __stdcall ThreadProcConvert( void *pParam )
 #elif defined(POSIX)
 static void *ThreadProcConvert( void *pParam )
 #else
-#error
+#error "Please define your platform"
 #endif
 {
 	ThreadProcInfo_t info = *((ThreadProcInfo_t *)pParam);
@@ -114,7 +114,7 @@ static void *ThreadProcConvert( void *pParam )
 #elif defined(POSIX)
 	return (void *)(*info.pfnThread)(info.pParam);
 #else
-#error
+#error "Please define your platform"
 #endif
 }
 
@@ -1966,7 +1966,7 @@ unsigned int CThread::Suspend()
 	};
 	return ( susCount) != 0;
 #else
-#error
+#error "Please define your platform"
 #endif
 }
 
@@ -1983,7 +1983,7 @@ unsigned int CThread::Resume()
 	};	
 	return ( susCount - 1) != 0;
 #else
-#error
+#error "Please define your platform"
 #endif
 }
 #endif
@@ -2110,6 +2110,7 @@ CThread::ThreadProc_t CThread::GetThreadProc()
 
 unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 {
+	// dimhotepus: std::auto_ptr -> std::unique_ptr
   std::unique_ptr<ThreadInit_t> pInit((ThreadInit_t *)pv);
   
 #ifdef _X360

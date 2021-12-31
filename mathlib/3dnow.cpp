@@ -54,7 +54,7 @@ float _3DNow_Sqrt(float x)
  	);
  	__asm __volatile__( "femms" );
 #else
-#error
+#error "Please define your platform"
 #endif
 
 	return root;
@@ -129,7 +129,7 @@ float FASTCALL _3DNow_VectorNormalize (Vector& vec)
         	__asm __volatile__( "femms" );
 
 #else
-#error
+#error "Please define your platform"
 #endif
 	}
     return radius;
@@ -183,7 +183,7 @@ float _3DNow_InvRSquared(const float* v)
         	);
         	__asm __volatile__( "femms" );
 #else
-#error
+#error "Please define your platform"
 #endif
 
 	return r2;

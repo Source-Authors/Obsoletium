@@ -504,6 +504,7 @@ destroy:
 // Constructor
 //-----------------------------------------------------------------------------
 CSteamAppSystemGroup::CSteamAppSystemGroup( IFileSystem *pFileSystem, CAppSystemGroup *pAppSystemParent )
+// dimhotepus: Pass app system parent to base class.
 	: CAppSystemGroup( pAppSystemParent )
 {
 	m_pFileSystem = pFileSystem;

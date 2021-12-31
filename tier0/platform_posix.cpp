@@ -796,7 +796,7 @@ static void InstallHooks( void )
 
 
 #else
-#error
+#error "Please define your platform"
 #endif
 
 

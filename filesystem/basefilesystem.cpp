@@ -5018,6 +5018,12 @@ CSysModule *CBaseFileSystem::LoadModule( const char *pFileName, const char *pPat
 {
 	CHECK_DOUBLE_SLASHES( pFileName );
 
+	// dimhotepus: Load directly by system if absolute path.
+	if ( V_IsAbsolutePath( pFileName ) )
+	{
+		return Sys_LoadModule( pFileName );
+	}
+
 	LogFileAccess( pFileName );
 	if ( !pPathID )
 	{
@@ -5050,7 +5056,9 @@ CSysModule *CBaseFileSystem::LoadModule( const char *pFileName, const char *pPat
 	}
 
 	// couldn't load it from any of the search paths, let LoadLibrary try
-	return Sys_LoadModule( pFileName );
+	// dimhotepus: Prevent loading something placed into current directory!
+	// return Sys_LoadModule( pFileName );
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------

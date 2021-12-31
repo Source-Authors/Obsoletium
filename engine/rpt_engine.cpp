@@ -216,7 +216,7 @@ CON_COMMAND_F( rpt_start, "", FCVAR_DONTRECORD | FCVAR_HIDDEN )
 	struct tm *tm = localtime( &now );
 	Q_snprintf( pDir, sizeof(pDir), "rpt/%d_%d_%d", tm->tm_mon, tm->tm_wday, tm->tm_year + 1900 );
 #else
-#error
+#error "Please define your platform"
 #endif
 	RPTClient().SetRemoteFileDirectory( pDir );
 

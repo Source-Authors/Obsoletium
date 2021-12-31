@@ -78,6 +78,7 @@ typedef const fltx4 & FLTX4;
 // A 16-byte aligned int32 datastructure
 // (for use when writing out fltx4's as SIGNED
 // ints).
+// dimhotepus: Fix aligned alloc.
 struct ALIGN16 intx4 : public CAlignedNewDelete<16> 
 {
 	int32 m_i32[4];
@@ -2433,6 +2434,7 @@ FORCEINLINE void ConvertStoreAsIntsSIMD(intx4 * RESTRICT pDest, const fltx4 &vSr
 
 /// class FourVectors stores 4 independent vectors for use in SIMD processing. These vectors are
 /// stored in the format x x x x y y y y z z z z so that they can be efficiently SIMD-accelerated.
+// dimhotepus: Fix aligned alloc.
 class ALIGN16 FourVectors : public CAlignedNewDelete<16>
 {
 public:

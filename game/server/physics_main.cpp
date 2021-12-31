@@ -7,13 +7,7 @@
 
 
 #include "cbase.h"
-#ifdef _WIN32
 #include <typeinfo>
-#elif POSIX
-#include <typeinfo>
-#else
-#error "need typeinfo defined"
-#endif
 
 #include "player.h"
 #include "ai_basenpc.h"
@@ -965,7 +959,7 @@ void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 #elif POSIX
 				Msg( "%s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(this).name(), time );
 #else
-#error "typeinfo"
+#error "Please define your platform"
 #endif
 			}
 		}

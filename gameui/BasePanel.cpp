@@ -2200,7 +2200,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 			fclose( fp );
 #elif defined( _X360 )
 #else
-#error
+#error "Please define your platform"
 #endif
 		}
 	}

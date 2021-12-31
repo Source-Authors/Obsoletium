@@ -175,6 +175,6 @@ void Sys_EnumWindows(void *callbackFunction, int lparam)
 
 
 #else
-#error
+#error "Please define your platform"
 #endif
 

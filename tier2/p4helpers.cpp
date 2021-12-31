@@ -8,6 +8,8 @@
 
 #include "p4helpers.h"
 #include "tier2/tier2.h"
+// dimhotepus: No perforce
+// #include "p4lib/ip4.h"
 
 #ifdef PLATFORM_WINDOWS_PC
 #include <Windows.h>
@@ -54,28 +56,52 @@ CP4File::~CP4File()
 
 bool CP4File::Edit( void )
 {
+  // dimhotepus: No perforce
+  /*if (!p4)
 	return true;
+
+  return p4->OpenFileForEdit( m_sFilename.String() );*/
+  return true;
 }
 
 bool CP4File::Add( void )
 {
+  // dimhotepus: No perforce
+  /*if (!p4)
 	return true;
+
+  return p4->OpenFileForAdd( m_sFilename.String() );*/
+  return true;
 }
 
 bool CP4File::Revert( void )
 {
-	return true;
+  // dimhotepus: No perforce
+  /*if (!p4) return true;
+
+  return p4->RevertFile( m_sFilename.String() );*/
+  return true;
 }
 
 // Is the file in perforce?
 bool CP4File::IsFileInPerforce()
 {
+  // dimhotepus: No perforce
+  /*if (!p4)
 	return false;
+
+  return p4->IsFileInPerforce( m_sFilename.String() );*/
+  return false;
 }
 
 bool CP4File::SetFileType(const CUtlString& desiredFileType)
 {
+	// dimhotepus: No perforce
+  /*if (!p4)
 	return false;
+
+  return p4->SetFileType( m_sFilename.String(), desiredFileType.String() );*/
+	return true;
 }
 
 
@@ -103,6 +129,9 @@ bool CP4Factory::SetDummyMode( bool bDummyMode )
 
 void CP4Factory::SetOpenFileChangeList( const char *szChangeListName )
 {
+  // dimhotepus: No perforce
+	/*if ( !m_bDummyMode && p4 )
+		p4->SetOpenFileChangeList( szChangeListName );*/
 }
 
 CP4File *CP4Factory::AccessFile( char const *szFilename ) const

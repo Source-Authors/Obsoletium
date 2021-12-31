@@ -1383,7 +1383,7 @@ void CEngineAPI::PumpMessagesEditMode( bool &bIdle, long &lIdleCount )
 #elif defined( USE_SDL )
 	Error( "Not supported" );
 #else
-#error
+#error "Please define your platform"
 #endif
 
 

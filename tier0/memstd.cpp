@@ -242,7 +242,7 @@ public:
 
 #ifdef MEMALLOC_SUPPORTS_ALIGNED_ALLOCATIONS
 	// Not currently implemented
-	#error
+#error "Please define your platform"
 #endif
 
 	virtual void *RegionAlloc( int region, size_t nSize ) { __debugbreak(); return 0; }
@@ -325,7 +325,7 @@ public:
 
 #if defined( _MEMTEST )
 	// Not currently implemented
-	#error
+#error "Please define your platform"
 #endif
 
 	virtual size_t MemoryAllocFailed() { return 0; }

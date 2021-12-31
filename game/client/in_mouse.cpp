@@ -606,7 +606,7 @@ void CInput::AccumulateMouse( void )
 		m_flAccumulatedMouseXMovement += dx;
 		m_flAccumulatedMouseYMovement += dy;
 #else
-#error
+#error "Please define your platform"
 #endif
 		// force the mouse to the center, so there's room to move
 		ResetMouse();

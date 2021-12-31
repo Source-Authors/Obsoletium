@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #ifdef POSIX
-#error
+#error "Please exclude from compilation if POSIX"
 #else
 #if defined( _WIN32 ) && !defined( _X360 )
 #include <windows.h>

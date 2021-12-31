@@ -14,7 +14,7 @@
 //#error
 #elif defined( _X360 )
 #else
-#error
+#error "Please define your platform"
 #endif
 #include "FontTextureCache.h"
 #include "MatSystemSurface.h"

@@ -181,7 +181,7 @@ private:
 // CThreadPool
 //
 //-----------------------------------------------------------------------------
-
+// dimhotepus: Fix aligned alloc.
 class CThreadPool : public CAlignedNewDelete<16, CRefCounted1<IThreadPool, CRefCountServiceMT>>
 {
 public:
@@ -327,7 +327,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
+// dimhotepus: Fix aligned alloc.
 class CJobThread : public CAlignedNewDelete<16, CWorkerThread>
 {
 public:

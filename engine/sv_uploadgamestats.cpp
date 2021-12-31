@@ -399,7 +399,7 @@ public:
 			uuid_generate( newId );
 #endif
 #else
-#error
+#error "Please define your platform"
 #endif
 			char hex[ 17 ];
 			Q_memset( hex, 0, sizeof( hex ) );

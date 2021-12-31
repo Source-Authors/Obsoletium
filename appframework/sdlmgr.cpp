@@ -182,7 +182,7 @@ void *VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, vo
 		retval = fallback;
 	}
 #else
-	#error Unimplemented
+#error "Please define non-SDL path"
 #endif
 
 	// Note that a non-NULL response doesn't mean it's safe to call the function!

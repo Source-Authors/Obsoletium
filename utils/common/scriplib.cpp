@@ -1264,7 +1264,7 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 	FindClose( h );
 
 #else
-#error
+#error "Please define your platform"
 #endif
 	
 

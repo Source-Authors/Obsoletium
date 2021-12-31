@@ -14,7 +14,7 @@
 #elif defined( POSIX )
 #include <sys/time.h>
 #else
-#error
+#error "Please define your platform"
 #endif
 #include <sys/types.h>
 #include <sys/stat.h>

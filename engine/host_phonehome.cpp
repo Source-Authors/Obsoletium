@@ -14,7 +14,7 @@
 #include <pwd.h>
 #include <sys/types.h>
 #else
-#error
+#error "Please define your platform"
 #endif
 
 #include "host.h"

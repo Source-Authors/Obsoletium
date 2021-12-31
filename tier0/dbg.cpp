@@ -870,6 +870,7 @@ void ValidateSpew( CValidator &validator )
 //-----------------------------------------------------------------------------
 void COM_TimestampedLog( char const *fmt, ... )
 {
+	// dimhotepus: Store time as double
 	static double s_LastStamp = 0.0;
 	static bool s_bShouldLog = false;
 	static bool s_bShouldLogToETW = false;

@@ -395,7 +395,7 @@ void CursorSelect(HCursor hCursor)
 	ActivateCurrentCursor();
 
 #else
-#error
+#error "Please define your platform"
 #endif
 
 }
@@ -416,7 +416,7 @@ void HideHardwareCursor()
 		g_pLauncherMgr->SetMouseVisible( false );
 	}
 #else
-#error
+#error "Please define your platform"
 #endif
 }
 
@@ -444,7 +444,7 @@ void ActivateCurrentCursor()
 			g_pLauncherMgr->SetMouseVisible( true );
 		}
 #else
-#error
+#error "Please define your platform"
 #endif
 	}
 	else

@@ -17,7 +17,7 @@
 #define _wcsnicmp wcsncmp
 #elif defined( _X360 )
 #else
-#error
+#error "Please define your platform"
 #endif
 
 #undef GetCurrentDirectory

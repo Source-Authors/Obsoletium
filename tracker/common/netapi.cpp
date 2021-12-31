@@ -19,7 +19,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #else
-#error
+#error "Please define your platform"
 #endif
 #include "inetapi.h"
 

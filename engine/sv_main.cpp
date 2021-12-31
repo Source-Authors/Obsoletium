@@ -2711,7 +2711,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 #elif defined ( OSX )
 		event->SetString( "os", "OSX" );
 #else
-#error
+#error "Please define your platform"
 #endif
 		event->SetInt( "dedicated", IsDedicated() ? 1 : 0 );
 

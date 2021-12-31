@@ -31,7 +31,7 @@
 #if PROFILE_THIS_FILE
 
 #if !ENABLE_HARDWARE_PROFILER
-#error "can't profile without profiler enabled"
+#error "Can't profile without profiler enabled"
 #endif
 
 CLinkedMiniProfiler g_mp_morph_Vx("morph_Vx", &g_pOtherMiniProfilers);

@@ -133,7 +133,7 @@ const char *UTIL_FunctionToName( datamap_t *pMap, inputfunc_t *function )
 #elif defined(POSIX)
 				Assert( sizeof(pMap->dataDesc[i].inputFunc) == 8 );
 #else
-#error
+#error "Please define your platform"
 #endif
 				inputfunc_t *pTest = EXTRACT_INPUTFUNC_FUNCTIONPTR(pMap->dataDesc[i].inputFunc);
 
@@ -163,7 +163,7 @@ inputfunc_t *UTIL_FunctionFromName( datamap_t *pMap, const char *pName )
 #elif defined(POSIX)
 			Assert( sizeof(pMap->dataDesc[i].inputFunc) == 8 );
 #else
-#error
+#error "Please define your platform"
 #endif
 
 			if ( pMap->dataDesc[i].flags & FTYPEDESC_FUNCTIONTABLE )

@@ -61,7 +61,7 @@ DEFINE_ENUM_BITWISE_OPERATORS( EPlatform_t );
 #elif defined ( _LINUX ) 
 	const EPlatform_t	thisPlatform = PLATFORM_LINUX;
 #else
-  #error "UNABLE TO DETERMINE PLATFORM"
+#error "Please define your platform"
 #endif
 
 

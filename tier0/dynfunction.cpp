@@ -20,7 +20,7 @@ typedef void *LibraryHandle;
 #define CloseLibraryHandle(handle) dlclose(handle)
 #define LookupInLibraryHandle(handle, fn) dlsym(handle, fn)
 #else
-#error Please define your platform.
+#error "Please define your platform."
 #endif
 
 #if 1

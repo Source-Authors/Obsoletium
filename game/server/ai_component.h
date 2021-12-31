@@ -118,7 +118,7 @@ protected:
 
 public:
 #if defined(new)
-#error
+#error "New should not be overridden here"
 #endif
 
 	void *operator new( size_t nBytes )

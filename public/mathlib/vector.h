@@ -369,7 +369,7 @@ public:
 //-----------------------------------------------------------------------------
 // Here's where we add all those lovely SSE optimized routines
 //-----------------------------------------------------------------------------
-
+// dimhotepus: Fix aligned alloc.
 class ALIGN16 VectorAligned : public CAlignedNewDelete<16, Vector>
 {
 public:
@@ -1621,6 +1621,7 @@ inline bool QuaternionsAreEqual( const Quaternion& src1, const Quaternion& src2,
 //-----------------------------------------------------------------------------
 // Here's where we add all those lovely SSE optimized routines
 //-----------------------------------------------------------------------------
+// dimhotepus: Fix aligned alloc.
 class ALIGN16 QuaternionAligned : public CAlignedNewDelete<16, Quaternion>
 {
 public:

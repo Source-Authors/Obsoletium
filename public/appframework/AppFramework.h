@@ -69,7 +69,7 @@ void AppShutdown( CAppSystemGroup *pAppSystemGroup );
 		return ValveLinuxWindowedMain( argc, argv, &_globalVarName ); \
 	}
 #else
-#error
+#error "Please define your platform"
 #endif
 	
 #else

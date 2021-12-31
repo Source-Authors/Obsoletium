@@ -272,6 +272,7 @@ inline void *MemAlloc_ReallocAligned( void *ptr, size_t size, size_t align )
 		return ptr;
 
 	pResult = MemAlloc_AllocAligned( size, align );
+	// dimhotepus: Do not crash of reallocation fails.
 	if ( pResult )
 	{
 		memcpy( pResult, ptr, nOldSize - nOffset );

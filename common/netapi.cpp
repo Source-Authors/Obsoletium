@@ -18,7 +18,7 @@ typedef int socklen_t;
 #include <unistd.h>
 
 #else
-#error "implement me"
+#error "Please define your platform"
 #endif
 
 #include "netapi.h"

@@ -59,7 +59,7 @@ inline bool ThreadInterlockedAssignIf64x128( volatile int64 *pDest, const int64 
 #define TSLIST_NODE_ALIGN_POST ALIGN8_POST
 
 #else
-#error
+#error "Please define your platform"
 #endif
 
 //-----------------------------------------------------------------------------
