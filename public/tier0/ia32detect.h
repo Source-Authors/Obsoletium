@@ -319,7 +319,7 @@ private:
 
 		m = 0;
 
-		for (int ci3 = 1; ci3 < 256; ci3++)
+		for (byte ci3 = 1U; ci3 > 0 && ci3 <= 255U; ci3++)
 			if (c[ci3])
 				cache[m++] = ci3;
 
