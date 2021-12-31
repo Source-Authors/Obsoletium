@@ -114,12 +114,12 @@ void RenderWireframeSphere( const Vector &vCenter, float flRadius, int nTheta, i
 		{
 			float u = j / ( float )( nTheta - 1 );
 			float v = i / ( float )( nPhi - 1 );
-			float theta = 2.0f * M_PI * u;
-			float phi = M_PI * v;
+			float theta = 2.0f * M_PI_F * u;
+			float phi = M_PI_F * v;
 
-			meshBuilder.Position3f( vCenter.x + ( flRadius * sin(phi) * cos(theta) ),
-				vCenter.y + ( flRadius * sin(phi) * sin(theta) ), 
-				vCenter.z + ( flRadius * cos(phi) ) );
+			meshBuilder.Position3f( vCenter.x + ( flRadius * sinf(phi) * cosf(theta) ),
+				vCenter.y + ( flRadius * sinf(phi) * sinf(theta) ), 
+				vCenter.z + ( flRadius * cosf(phi) ) );
 			meshBuilder.Color4ub( chRed, chGreen, chBlue, chAlpha );
 			meshBuilder.AdvanceVertex();
 		}
@@ -187,13 +187,13 @@ void RenderSphere( const Vector &vCenter, float flRadius, int nTheta, int nPhi, 
 		{
 			float u = j / ( float )( nTheta - 1 );
 			float v = i / ( float )( nPhi - 1 );
-			float theta = 2.0f * M_PI * u;
-			float phi = M_PI * v;
+			float theta = 2.0f * M_PI_F * u;
+			float phi = M_PI_F * v;
 
 			Vector vecPos;
-			vecPos.x = flRadius * sin(phi) * cos(theta);
-			vecPos.y = flRadius * sin(phi) * sin(theta); 
-			vecPos.z = flRadius * cos(phi);
+			vecPos.x = flRadius * sinf(phi) * cosf(theta);
+			vecPos.y = flRadius * sinf(phi) * sinf(theta); 
+			vecPos.z = flRadius * cosf(phi);
 
 			Vector vecNormal = vecPos;
 			VectorNormalize(vecNormal);

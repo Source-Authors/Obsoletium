@@ -63,10 +63,10 @@ void ComputeProjectionMatrix( VMatrix *pCameraToProjection, const Camera_t &came
 //	MatrixBuildPerspective( proj, flFOV, flFOV * flApsectRatio, flZNear, flZFar );
 
 #if 1
-	float halfWidth = tan( flFOV * M_PI / 360.0 );
+	float halfWidth = tanf( flFOV * M_PI_F / 360.0f );
 	float halfHeight = halfWidth / flApsectRatio;
 #else
-	float halfHeight = tan( flFOV * M_PI / 360.0 );
+	float halfHeight = tan( flFOV * M_PI_F / 360.0f );
 	float halfWidth = flApsectRatio * halfHeight;
 #endif
 	memset( pCameraToProjection, 0, sizeof( VMatrix ) );
