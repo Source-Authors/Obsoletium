@@ -954,7 +954,7 @@ float bf_read::ReadBitAngle( int numbits )
 	shift = (float)( BitForBitnum(numbits) );
 
 	i = ReadUBitLong( numbits );
-	fReturn = (float)i * (360.0 / shift);
+	fReturn = (float)i * (360.0f / shift);
 
 	return fReturn;
 }
@@ -1326,7 +1326,7 @@ void bf_read::ReadBitVec3Normal( Vector& fa )
 
 	float fafafbfb = fa[0] * fa[0] + fa[1] * fa[1];
 	if (fafafbfb < 1.0f)
-		fa[2] = sqrt( 1.0f - fafafbfb );
+		fa[2] = sqrtf( 1.0f - fafafbfb );
 	else
 		fa[2] = 0.0f;
 

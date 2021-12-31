@@ -2828,8 +2828,8 @@ void KeyValues::UnpackIntoStructure( KeyValuesUnpackStructure const *pUnpackTabl
 			case UNPACK_TYPE_FLOAT:
 			{
 				Assert( dest_field + sizeof( float ) < pDestEnd );
-
-				float default_value=(pUnpackTable->m_pKeyDefault)?atof(pUnpackTable->m_pKeyDefault):0.0;
+				// dimhotepus: atof -> strtof
+				float default_value=(pUnpackTable->m_pKeyDefault)?strtof(pUnpackTable->m_pKeyDefault,nullptr):0.0f;
 				*( ( float *) dest_field)=GetFloat( pUnpackTable->m_pKeyName, default_value );
 				break;
 			}
