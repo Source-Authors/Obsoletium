@@ -1220,7 +1220,7 @@ FORCEINLINE int RoundFloatToInt(float f)
 	flResult = __fctiw( f );
 	return pResult[1];
 #else
-#error Unknown architecture
+#error "Please define your platform"
 #endif
 }
 
@@ -2020,13 +2020,13 @@ FORCEINLINE float * UnpackNormal_UBYTE4( const unsigned int *pPackedNormal, floa
 	unsigned char cX, cY;
 	if ( bIsTangent )
 	{
-		cX = *pPackedNormal >> 16;					// Unpack Z
-		cY = *pPackedNormal >> 24;					// Unpack W
+		cX = static_cast<unsigned char>(*pPackedNormal >> 16);					// Unpack Z
+		cY = static_cast<unsigned char>(*pPackedNormal >> 24);					// Unpack W
 	}
 	else
 	{
-		cX = *pPackedNormal >>  0;					// Unpack X
-		cY = *pPackedNormal >>  8;					// Unpack Y
+		cX = static_cast<unsigned char>(*pPackedNormal >>  0);					// Unpack X
+		cY = static_cast<unsigned char>(*pPackedNormal >>  8);					// Unpack Y
 	}
 
 	float x = cX - 128.0f;
