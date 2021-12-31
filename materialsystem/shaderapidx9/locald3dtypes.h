@@ -128,6 +128,7 @@ typedef int PixelShader_t;
 #include "togl/rendermechanism.h"
 
 #if !defined(DX_TO_GL_ABSTRACTION)
+// dimhotepus: Put under dx to reduce bloat
 #include <d3dx9.h>
 #endif
 

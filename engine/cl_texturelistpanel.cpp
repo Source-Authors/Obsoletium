@@ -45,6 +45,7 @@
 #include "client.h"
 
 #include "tier2/p4helpers.h"
+// dimhotepus: Exclude perforce
 // #include "p4lib/ip4.h"
 #include "ivtex.h"
 #include "tier2/fileutils.h"
@@ -1003,6 +1004,7 @@ CP4Requirement::CP4Requirement() :
 
 CP4Requirement::~CP4Requirement()
 {
+  // dimhotepus: Exclude perforce
 #ifdef STAGING_ONLY
 	if ( m_bLoadedModule && m_pP4Module )
 	{

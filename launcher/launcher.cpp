@@ -710,6 +710,7 @@ bool CSourceAppSystemGroup::Create()
 	}
 
 	pMaterialSystem->SetShaderAPI( pDLLName );
+	// dimhotepus: Detect missed shader API.
 	if ( !pMaterialSystem->HasShaderAPI() )
 	{
 		Error("Please check game installed correctly.\n\n"

@@ -21,6 +21,7 @@
 #endif
 #include "basetypes.h"	// For vec_t, put this somewhere else?
 #include "tier0/dbg.h"
+// dimhotepus: For CAlignedNewDelete<X>
 #include "tier0/memalloc.h"
 #include "mathlib/math_pfns.h"
 
