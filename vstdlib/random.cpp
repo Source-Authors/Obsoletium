@@ -22,9 +22,9 @@
 
 // fran1 -- return a random floating-point number on the interval [0,1)
 //
-#define AM (1.0/IM)
-#define EPS 1.2e-7
-#define RNMX (1.0-EPS)
+#define AM (1.0f/IM)
+#define EPS 1.2e-7f
+#define RNMX (1.0f-EPS)
 
 //-----------------------------------------------------------------------------
 // globals
@@ -244,7 +244,7 @@ float CGaussianRandomStream::RandomFloat( float flMean, float flStdDev )
 		} while ((rsq > 1.0f) || (rsq == 0.0f));
 
 		// The box-muller transformation to get the two gaussian numbers
-		fac = sqrtf( -2.0f * log(rsq) / rsq );
+		fac = sqrtf( -2.0f * logf(rsq) / rsq );
 
 		// Store off one value for later use
 		m_flRandomValue = v1 * fac;
