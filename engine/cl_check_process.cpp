@@ -118,6 +118,17 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 	//  Query all of the handles in the system.  We have to do this in a loop, since we do
 	//  not know how large of a buffer we need.
 	nBufferSize = 0;
+	
+	// Load ntdll.dll so we can Query the system
+	/* load the ntdll.dll */
+	NtQuerySystemInformation1 NtQuerySystemInformation;
+
+	HMODULE hModule = LoadLibraryExA( "ntdll.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
+	if (!hModule)   
+	{
+		iProcessCount = CHECK_PROCESS_UNSUPPORTED;
+		goto Cleanup;
+	}
 
 	while ( TRUE )
 	{
@@ -137,6 +148,14 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 			goto Cleanup;
 		}
 
+		//  Query the handles in the system.
+		NtQuerySystemInformation = (NtQuerySystemInformation1)GetProcAddress(hModule, "NtQuerySystemInformation");
+		if ( NtQuerySystemInformation == NULL ) 
+		{
+			iProcessCount = CHECK_PROCESS_UNSUPPORTED;
+			goto Cleanup;
+		}
+	
 		status = NtQuerySystemInformation( SystemHandleInformation,	pHandleInfo, nBufferSize, NULL );
 	
 		//  If our buffer was too small, try again.
@@ -234,6 +253,11 @@ Cleanup:
 	if ( hInst != NULL )
 	{
 		FreeLibrary( hInst );
+	}
+
+	if ( hModule != NULL )
+	{
+		FreeLibrary( hModule );
 	}
 
 	return iProcessCount;

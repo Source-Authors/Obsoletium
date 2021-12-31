@@ -1760,7 +1760,7 @@ bool ClientDLL_Load()
 			Steam3Client().SteamApps()->MarkContentCorrupt( true );
 
 		// library failed to load
-		Sys_Error( "Could not load library client. Try restarting. If that doesn't work, verify the cache." );
+		Sys_Error( "Could not load client" DLL_EXT_STRING " library. Try restarting. If that doesn't work, verify the cache." );
 	}
 
 	// Load the client render targets interface from the client .dll
