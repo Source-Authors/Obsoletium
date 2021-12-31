@@ -292,7 +292,7 @@ typedef BOOL (WINAPI *PFN_SymFromAddr)( IN HANDLE hProcess, IN DWORD64 Address, 
 typedef BOOL (WINAPI *PFN_SymGetLineFromAddr64)( IN HANDLE hProcess, IN DWORD64 qwAddr, OUT PDWORD pdwDisplacement, OUT PIMAGEHLP_LINE64 Line64 );
 typedef BOOL (WINAPI *PFN_SymGetModuleInfo64)( IN HANDLE hProcess, IN DWORD64 dwAddr, OUT PIMAGEHLP_MODULE64 ModuleInfo );
 typedef BOOL (WINAPI *PFN_StackWalk64)( DWORD MachineType, HANDLE hProcess, HANDLE hThread, LPSTACKFRAME64 StackFrame, PVOID ContextRecord, PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine, PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine, PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine, PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress );
-typedef USHORT (WINAPI *PFN_CaptureStackBackTrace)( IN ULONG FramesToSkip, IN ULONG FramesToCapture, OUT PVOID *BackTrace, OUT OPTIONAL PULONG BackTraceHash );
+using PFN_CaptureStackBackTrace = decltype(&RtlCaptureStackBackTrace);
 
 
 DWORD WINAPI SymGetOptions_DummyFn( VOID )
@@ -395,6 +395,7 @@ public:
 
 #if defined( USE_CAPTURESTACKBACKTRACE )
 		m_pCaptureStackBackTrace = CaptureStackBackTrace_DummyFn;
+		m_hNTDllDll = NULL;
 #endif
 	}
 
@@ -404,6 +405,11 @@ public:
 
 		if( m_hDbgHelpDll != NULL )
 			::FreeLibrary( m_hDbgHelpDll );
+
+#if defined( USE_CAPTURESTACKBACKTRACE )
+		if( m_hNTDllDll != NULL )
+			::FreeLibrary( m_hNTDllDll );
+#endif
 
 		if( m_szPDBSearchPath != NULL )
 			delete []m_szPDBSearchPath;
@@ -786,7 +792,10 @@ public:
 
 
 #if defined( USE_CAPTURESTACKBACKTRACE )
-		m_pCaptureStackBackTrace = &RtlCaptureStackBackTrace;
+		m_hNTDllDll = ::LoadLibrary( "ntdll.dll" );
+
+		m_pCaptureStackBackTrace = (PFN_CaptureStackBackTrace) ::GetProcAddress( m_hNTDllDll, "RtlCaptureStackBackTrace" );
+		if( m_pCaptureStackBackTrace == NULL )		m_pCaptureStackBackTrace = CaptureStackBackTrace_DummyFn;
 #endif
 
 
@@ -826,6 +835,7 @@ public:
 #endif
 
 #if defined( USE_CAPTURESTACKBACKTRACE )
+	HMODULE m_hNTDllDll;
 	PFN_CaptureStackBackTrace m_pCaptureStackBackTrace;
 #endif
 };
