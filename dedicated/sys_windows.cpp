@@ -5,17 +5,22 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <windows.h> 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstdlib>
+
 #include <eh.h>
+
+#include "winlite.h"
+#include <winsock.h>
+#include <shellapi.h>
+
 #include "isys.h"
 #include "console/conproc.h"
 #include "dedicated.h"
 #include "engine_hlds_api.h"
 #include "checksum_md5.h"
 #include "tier0/vcrmode.h"
+#include "tier0/minidump.h"
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"
 #include "tier0/icommandline.h"
@@ -329,39 +334,15 @@ void NET_Shutdown( void )
 // Output : int PASCAL
 //-----------------------------------------------------------------------------
 int main(int argc, char **argv); // in sys_ded.cpp
-static char *GetBaseDir( const char *pszBuffer )
-{
-	static char	basedir[ MAX_PATH ];
-	char szBuffer[ MAX_PATH ];
-	int j;
-	char *pBuffer = NULL;
-
-	V_strcpy_safe( szBuffer, pszBuffer );
-
-	pBuffer = strrchr( szBuffer,'\\' );
-	if ( pBuffer )
-	{
-		*(pBuffer+1) = '\0';
-	}
-
-	strcpy( basedir, szBuffer );
-
-	j = strlen( basedir );
-	if (j > 0)
-	{
-		if ( ( basedir[ j-1 ] == '\\' ) || 
-			 ( basedir[ j-1 ] == '/' ) )
-		{
-			basedir[ j-1 ] = 0;
-		}
-	}
-
-	return basedir;
-}
 
 void MiniDumpFunction( unsigned int nExceptionCode, EXCEPTION_POINTERS *pException )
 {
+	// dimhotepus: Write minidump when not under Steam.
+#ifndef NO_STEAM
 	SteamAPI_WriteMiniDump( nExceptionCode, pException, 0 );
+#else
+  WriteMiniDumpUsingExceptionInfo( nExceptionCode, pException, 0x00000002 /* MiniDumpWithFullMemory */, "sys_error" );
+#endif
 }
 
 extern "C" __declspec(dllexport) int DedicatedMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
@@ -369,14 +350,11 @@ extern "C" __declspec(dllexport) int DedicatedMain( HINSTANCE hInstance, HINSTAN
 	SetAppInstance( hInstance );
 
 	// Check that we are running on Win32
-	OSVERSIONINFO	vinfo;
-	vinfo.dwOSVersionInfoSize = sizeof(vinfo);
-
-	if ( !GetVersionEx ( &vinfo ) )
-		return -1;
-
-	if ( vinfo.dwPlatformId == VER_PLATFORM_WIN32s )
-		return -1;
+	if ( !IsWindows7OrGreater() )
+	{
+		Error( "Sorry, Windows 7+ required to run the game." );
+		return ERROR_OLD_WIN_VERSION;
+	}
 
 	int argc, iret = -1;
 	LPWSTR * argv= CommandLineToArgvW(GetCommandLineW(),&argc);
@@ -384,7 +362,7 @@ extern "C" __declspec(dllexport) int DedicatedMain( HINSTANCE hInstance, HINSTAN
 
 	if ( !Plat_IsInDebugSession() && !CommandLine()->FindParm( "-nominidumps") )
 	{
-		_set_se_translator( MiniDumpFunction );
+		const auto old_translator = _set_se_translator( MiniDumpFunction );
 
 		try  // this try block allows the SE translator to work
 		{
@@ -392,8 +370,11 @@ extern "C" __declspec(dllexport) int DedicatedMain( HINSTANCE hInstance, HINSTAN
 		}
 		catch( ... )
 		{
+			_set_se_translator( old_translator );
 			return -1;
 		}
+
+		_set_se_translator( old_translator );
 	}
 	else
 	{
