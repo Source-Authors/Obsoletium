@@ -14,23 +14,6 @@
 #include "utlhashtable.h"
 #include "utlstring.h"
 
-// Ensure that everybody has the right compiler version installed. The version
-// number can be obtained by looking at the compiler output when you type 'cl'
-// and removing the last two digits and the periods: 16.00.40219.01 becomes 160040219
-#ifdef _MSC_FULL_VER
-	#if _MSC_FULL_VER > 160000000
-		// VS 2010
-		#if _MSC_FULL_VER < 160040219
-			#error You must install VS 2010 SP1
-		#endif
-	#else
-		// VS 2005
-		#if _MSC_FULL_VER < 140050727
-			#error You must install VS 2005 SP1
-		#endif
-	#endif
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
