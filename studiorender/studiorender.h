@@ -805,7 +805,7 @@ public:
  				}
  				else
  				{
- 					ratio *= pow((dot2 - wl->m_PhiDot) / (wl->m_ThetaDot - wl->m_PhiDot), wl->m_Falloff );
+ 					ratio *= powf((dot2 - wl->m_PhiDot) / (wl->m_ThetaDot - wl->m_PhiDot), wl->m_Falloff );
  				}
 				return ratio;
 
@@ -863,7 +863,7 @@ public:
 			}
 			else
 			{
-				ratio *= pow((dot2 - wl->m_PhiDot) / (wl->m_ThetaDot - wl->m_PhiDot), wl->m_Falloff );
+				ratio *= powf((dot2 - wl->m_PhiDot) / (wl->m_ThetaDot - wl->m_PhiDot), wl->m_Falloff );
 			}
 			return ratio;
 
