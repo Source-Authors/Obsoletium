@@ -54,7 +54,7 @@ bool MD5_Hash_File(byte (&digest)[MD5_DIGEST_LENGTH], const char *fileName,
   memset(&ctx, 0, sizeof(ctx));
   MD5Init(&ctx);
 
-  byte chunk[1024];
+  byte chunk[4096];
   // Now read in 1K chunks.
   while (nSize > 0) {
     const size_t nBytesRead{fread(chunk, 1, min(std::size(chunk), nSize), fp)};
