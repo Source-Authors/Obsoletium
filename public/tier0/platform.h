@@ -39,20 +39,14 @@
 #endif
 
 #define __STDC_LIMIT_MACROS
-#include <stdint.h>
+#include <cstdint>
 
-#include "wchartypes.h"
-#include "basetypes.h"
+#include "tier0/wchartypes.h"
+#include "tier0/basetypes.h"
 #include "tier0/valve_off.h"
 
-#ifdef _DEBUG
-#if !defined( PLAT_COMPILE_TIME_ASSERT )
-#define PLAT_COMPILE_TIME_ASSERT( pred )	switch(0){case 0:case pred:;}
-#endif
-#else
-#if !defined( PLAT_COMPILE_TIME_ASSERT )
-#define PLAT_COMPILE_TIME_ASSERT( pred )
-#endif
+#ifndef PLAT_COMPILE_TIME_ASSERT
+#define PLAT_COMPILE_TIME_ASSERT( pred )	static_assert(pred);
 #endif
 
 #ifdef _WIN32
@@ -74,7 +68,7 @@
 #include <new>
 
 // need this for memset
-#include <string.h>
+#include <cstring>
 
 #include "tier0/valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
 
@@ -156,7 +150,7 @@
 	#define IsPosix() true
 	#define IsPlatformOpenGL() true
 #else
-	#error
+	#error "Please define your platform"
 #endif
 
 typedef unsigned char uint8;
@@ -212,16 +206,7 @@ typedef signed char int8;
 
 	// Avoid redefinition warnings if a previous header defines this.
 	#undef OVERRIDE
-	#if __cplusplus >= 201103L
-		#define OVERRIDE override
-		#if defined(__clang__)
-			// warning: 'override' keyword is a C++11 extension [-Wc++11-extensions]
-			// Disabling this warning is less intrusive than enabling C++11 extensions
-			#pragma GCC diagnostic ignored "-Wc++11-extensions"
-		#endif
-	#else
-		#define OVERRIDE
-	#endif
+	#define OVERRIDE override
 
 #endif // else _WIN32
 
@@ -261,19 +246,10 @@ typedef unsigned int		uint;
 #pragma once
 // Ensure that everybody has the right compiler version installed. The version
 // number can be obtained by looking at the compiler output when you type 'cl'
-// and removing the last two digits and the periods: 16.00.40219.01 becomes 160040219
-#if _MSC_FULL_VER > 180000000
-	#if _MSC_FULL_VER < 180030723
-		#error You must install VS 2013 Update 3
-	#endif
-#elif _MSC_FULL_VER > 160000000
-	#if _MSC_FULL_VER < 160040219
-		#error You must install VS 2010 SP1
-	#endif
-#else
-	#if _MSC_FULL_VER < 140050727
-		#error You must install VS 2005 SP1
-	#endif
+// dimhotepus: Require MSVC 2019 16.10/11 for C++17 support.
+// See https://docs.microsoft.com/en-us/cpp/preprocessor/predefined-macros
+#if _MSC_VER < 1929
+#error "Please install VS 2019 version 16.10, 16.11+"
 #endif
 #endif
 
@@ -496,7 +472,7 @@ typedef void * HINSTANCE;
 #define ALIGN32_POST DECL_ALIGN(32)
 #define ALIGN128_POST DECL_ALIGN(128)
 #else
-#error
+#error "Please define your platform"
 #endif
 
 // Pull in the /analyze code annotations.
@@ -519,7 +495,7 @@ typedef void * HINSTANCE;
 #elif defined(OSX)
 	#define mallocsize( _p )	( malloc_size( _p ) )
 #else
-#error
+#error "Please define your platform"
 #endif
 #elif defined ( _WIN32 )
 	#define stackalloc( _size )		_alloca( ALIGN_VALUE( _size, 16 ) )
@@ -591,7 +567,7 @@ typedef void * HINSTANCE;
 #define  DLL_LOCAL __attribute__ ((visibility("hidden")))
 
 #else
-#error "Unsupported Platform."
+#error "Please define your platform"
 #endif
 
 // Used for standard calling conventions
@@ -1105,7 +1081,7 @@ PLATFORM_INTERFACE struct tm *		Plat_gmtime( const time_t *timep, struct tm *res
 PLATFORM_INTERFACE time_t			Plat_timegm( struct tm *timeptr );
 PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *result );
 
-#if defined( _WIN32 ) && defined( _MSC_VER ) && ( _MSC_VER >= 1400 )
+#if defined( _WIN32 )
 	extern "C" unsigned __int64 __rdtsc();
 	#pragma intrinsic(__rdtsc)
 #endif
@@ -1114,15 +1090,8 @@ inline uint64 Plat_Rdtsc()
 {
 #if defined( _X360 )
 	return ( uint64 )__mftb32();
-#elif defined( _WIN64 )
+#elif defined( _WIN64 ) || defined ( _WIN32 )
 	return ( uint64 )__rdtsc();
-#elif defined( _WIN32 )
-  #if defined( _MSC_VER ) && ( _MSC_VER >= 1400 )
-	return ( uint64 )__rdtsc();
-  #else
-    __asm rdtsc;
-	__asm ret;
-  #endif
 #elif defined( __i386__ )
 	uint64 val;
 	__asm__ __volatile__ ( "rdtsc" : "=A" (val) );
@@ -1132,7 +1101,7 @@ inline uint64 Plat_Rdtsc()
 	__asm__ __volatile__ ( "rdtsc" : "=a" (lo), "=d" (hi));
 	return ( ( ( uint64 )hi ) << 32 ) | lo;
 #else
-	#error
+#error "Please define your platform"
 #endif
 }
 
