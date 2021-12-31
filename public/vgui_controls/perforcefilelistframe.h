@@ -14,7 +14,8 @@
 #include "vgui_controls/Frame.h"
 #include "tier1/utlvector.h"
 #include "tier1/utlstring.h"
-#include "p4lib/ip4.h"
+// dimhotepus: No perforce.
+// #include "p4lib/ip4.h"
 
 
 //-----------------------------------------------------------------------------
@@ -125,13 +126,15 @@ private:
 
 	// Adds files for open, submit
 	void AddFileForOpen( const char *pFullPath );
-	void AddFileForSubmit( const char *pFullPath, P4FileState_t state );
+  // dimhotepus: No perforce.
+	// void AddFileForSubmit( const char *pFullPath, P4FileState_t state );
 
 	// Does the perforce operation
 	void PerformPerforceAction( );
 
 	PerforceAction_t m_Action;
-	CUtlVector< P4File_t > m_OpenedFiles;
+	// dimhotepus: No perforce.
+	// CUtlVector< P4File_t > m_OpenedFiles;
 	CUtlString m_LastOpenedFilePathId;
 };
 

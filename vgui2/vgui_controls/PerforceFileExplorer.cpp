@@ -14,7 +14,8 @@
 #include "vgui/ISystem.h"
 #include "filesystem.h"
 #include <ctype.h>
-#include "p4lib/ip4.h"
+// dimhotepus: No perforce
+//#include "p4lib/ip4.h"
 #include "tier2/tier2.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -198,26 +199,27 @@ void PerforceFileExplorer::PopulateFileList()
 	}
 	g_pFullFileSystem->FindClose( h );
 
+	// dimhotepus: No perforce
 	// Now find all files in perforce
-	CUtlVector<P4File_t> &fileList = p4->GetFileList( m_CurrentDirectory );
-	int nCount = fileList.Count();
-	for ( int i = 0; i < nCount; ++i )
-	{
-		pFileName = p4->String( fileList[i].m_sLocalFile );
-		if ( !pFileName[0] )
-			continue;
+	//CUtlVector<P4File_t> &fileList = p4->GetFileList( m_CurrentDirectory );
+	//int nCount = fileList.Count();
+	//for ( int i = 0; i < nCount; ++i )
+	//{
+	//	pFileName = p4->String( fileList[i].m_sLocalFile );
+	//	if ( !pFileName[0] )
+	//		continue;
 
-		int nItemID = m_pFileList->FindFile( pFileName );
-		bool bFileExists = true;
-		if ( nItemID == m_pFileList->InvalidItemID() )
-		{
-			// If it didn't find it, the file must not exist 
-			// since it already would have added it above
-			bFileExists = false;
-			nItemID = m_pFileList->AddFile( pFileName, false, fileList[i].m_bDir );
-		}
-		m_pFileList->RefreshPerforceState( nItemID, bFileExists, &fileList[i] );
-	}
+	//	int nItemID = m_pFileList->FindFile( pFileName );
+	//	bool bFileExists = true;
+	//	if ( nItemID == m_pFileList->InvalidItemID() )
+	//	{
+	//		// If it didn't find it, the file must not exist 
+	//		// since it already would have added it above
+	//		bFileExists = false;
+	//		nItemID = m_pFileList->AddFile( pFileName, false, fileList[i].m_bDir );
+	//	}
+	//	m_pFileList->RefreshPerforceState( nItemID, bFileExists, &fileList[i] );
+	//}
 
 	m_pFileList->SortList();
 }

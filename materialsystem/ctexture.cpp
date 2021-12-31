@@ -51,7 +51,7 @@
 #include "filesystem.h"
 #include "tier2/p4helpers.h"
 #include "tier2/tier2.h"
-// HACK(proper): Exclude ip4.
+// dimhotepus: Exclude ip4.
 //#include "p4lib/ip4.h"
 #include "ctype.h"
 #include "ifilelist.h"
@@ -4748,7 +4748,7 @@ CP4Requirement::CP4Requirement() :
 
 CP4Requirement::~CP4Requirement()
 {
-// HACK(proper): Exclude ip4.
+// dimhotepus: Exclude ip4.
 #ifdef STAGING_ONLY
 	if ( m_bLoadedModule && m_pP4Module )
 	{
