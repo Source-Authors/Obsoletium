@@ -63,7 +63,7 @@ template <size_t buffer_size>
   _snprintf_s(entire_error_message, _TRUNCATE, "%s\n\n%s", error_message,
               system_error.c_str());
 
-  MessageBoxA(nullptr, entire_error_message, "OrangeBox Launcher - Error",
+  MessageBoxA(nullptr, entire_error_message, "Launcher - Error",
               MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
   return exit_code;
 }

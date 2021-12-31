@@ -21,7 +21,7 @@
 	#include <locale.h>
 #elif defined ( _X360 )
 #else
-#error
+#error "Please define your platform"
 #endif
 #include "appframework/ilaunchermgr.h"
 #include <stdio.h>
@@ -164,7 +164,7 @@ SpewRetval_t LauncherDefaultSpewFunc( SpewType_t spewType, char const *pMsg )
 		if ( !stricmp( GetSpewOutputGroup(), "init" ) )
 		{
 #if defined( WIN32 ) || defined( USE_SDL )
-			::MessageBox( NULL, pMsg, "OrangeBox Launcher - Warning", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
+			::MessageBox( NULL, pMsg, "Launcher - Warning", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
 #endif
 		}
 		return SPEW_CONTINUE;
@@ -173,7 +173,7 @@ SpewRetval_t LauncherDefaultSpewFunc( SpewType_t spewType, char const *pMsg )
 		if ( !ShouldUseNewAssertDialog() )
 		{
 #if defined( WIN32 ) || defined( USE_SDL )
-			::MessageBox( NULL, pMsg, "OrangeBox Launcher - Assert", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
+			::MessageBox( NULL, pMsg, "Launcher - Assert", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
 #endif
 		}
 		return SPEW_DEBUGGER;
@@ -181,7 +181,7 @@ SpewRetval_t LauncherDefaultSpewFunc( SpewType_t spewType, char const *pMsg )
 	case SPEW_ERROR:
 	default:
 #if defined( WIN32 ) || defined( USE_SDL )
-		::MessageBox( NULL, pMsg, "OrangeBox Launcher - Error", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
+		::MessageBox( NULL, pMsg, "Launcher - Error", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
 #endif
 		_exit( 1 );
 	}
@@ -522,6 +522,7 @@ void CLogAllFiles::LogAllFilesFunc(const char *fullPathFileName, const char *opt
 //-----------------------------------------------------------------------------
 void TryToLoadSteamOverlayDLL()
 {
+// dimhotepus: NO_STEAM
 #if defined( WIN32 ) && !defined( _X360 ) && !defined( NO_STEAM )
 	// First, check if the module is already loaded, perhaps because we were run from Steam directly
 	HMODULE hMod = GetModuleHandle( "GameOverlayRenderer" DLL_EXT_STRING );
@@ -1191,6 +1192,13 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		return ERROR_OLD_WIN_VERSION;
 	}
 
+	// dimhotepus: Remove empty call.
+	// Quickly check the hardware key, essentially a warning shot.  
+	// if ( !Plat_VerifyHardwareKeyPrompt() )
+	// {
+	//	return -1;
+	// }
+
 	const char *filename;
 #ifdef WIN32
 	CommandLine()->CreateCmdLine( IsPC() ? VCRHook_GetCommandLine() : lpCmdLine );
@@ -1520,7 +1528,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	}
 #elif defined( _X360 )
 #else
-#error
+#error "Please define your platform"
 #endif
 
 	return 0;
