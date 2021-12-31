@@ -405,13 +405,17 @@ devtools/bin/vpc.pdb
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.vpc_crc
+*.vcxproj.FileListAbsolute.txt
 *.vpc.sentinel
 *.sln
 
 # Build artifacts
+*.dll
+*.dll.recipe
+*.exe.recipe
 *.exp
-*.lib
 *.idb
+*.lib
 
 # Solution-specific
 ValveETWProviderEvents*
