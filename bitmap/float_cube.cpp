@@ -62,8 +62,8 @@ void FloatCubeMap_t::WritePFMs(char const *basename)
 Vector FloatCubeMap_t::PixelDirection(int face, int x, int y)
 {
 	FloatBitMap_t const &bm=face_maps[face];
-	float xc=x*1.0/(bm.Width-1);
-	float yc=y*1.0/(bm.Height-1);
+	float xc=x*1.0f/(bm.Width-1);
+	float yc=y*1.0f/(bm.Height-1);
 	Vector dir=2*xc*face_xvector[face]+
 			2*yc*face_yvector[face]+face_zvector[face];
 	VectorNormalize(dir);
@@ -100,9 +100,9 @@ void FloatCubeMap_t::Resample( FloatCubeMap_t &out, float flPhongExponent )
 							for(int sx=0;sx<face_maps[sface].Width;sx++)
 							{
 								float dp=DotProduct(ddir,PixelDirection(sface,sx,sy));
-								if (dp>0.0)
+								if (dp>0.0f)
 								{
-									dp=pow( dp, flPhongExponent );
+									dp=powf( dp, flPhongExponent );
 									sum_weights += dp;
 									for(int c=0;c<3;c++)
 										sum_rgb[c] += dp*face_maps[sface].Pixel( sx, sy, c );
@@ -111,7 +111,7 @@ void FloatCubeMap_t::Resample( FloatCubeMap_t &out, float flPhongExponent )
 					}
 				}
 				for(int c=0;c<3;c++)
-					out.face_maps[dface].Pixel( dx, dy, c )=sum_rgb[c]*(1.0/sum_weights);
+					out.face_maps[dface].Pixel( dx, dy, c )=sum_rgb[c]*(1.0f/sum_weights);
 			}
 	}
 }

@@ -9,7 +9,7 @@
 #include <d3d9types.h>
 #endif
 #include "bitmap/imageformat.h"
-#include "basetypes.h"
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
 #include <malloc.h>
 #include <memory.h>

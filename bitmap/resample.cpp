@@ -33,7 +33,7 @@ static void ConstructFloatGammaTable( float* pTable, float srcGamma, float dstGa
 {
 	for( int i = 0; i < 256; i++ )
 	{
-		pTable[i] = 255.0 * pow( (float)i / 255.0f, srcGamma / dstGamma );
+		pTable[i] = 255.0f * powf( (float)i / 255.0f, srcGamma / dstGamma );
 	}
 }
 
@@ -42,8 +42,7 @@ void ConstructGammaTable( unsigned char* pTable, float srcGamma, float dstGamma 
 	int v;
 	for( int i = 0; i < 256; i++ )
 	{
-		double f;
-		f = 255.0 * pow( (float)i / 255.0f, srcGamma / dstGamma );
+		float f = 255.0f * powf( (float)i / 255.0f, srcGamma / dstGamma );
 		v = ( int )(f + 0.5f);
 		if( v < 0 )
 		{
@@ -146,18 +145,18 @@ static void GenerateNiceFilter( float wratio, float hratio, float dratio, int ke
 			{
 				int nKernelIndex = kernelWidth * ( i + h * kernelHeight ) + j;
 
-				float d = sqrt( x * x + y * y + z * z );
+				float d = sqrtf( x * x + y * y + z * z );
 				if (d > kernelDiameter * 0.5f)
 				{
 					pKernel[nKernelIndex] = 0.0f;
 				}
 				else
 				{
-					float t = M_PI * d;
+					float t = M_PI_F * d;
 					if ( t != 0 )
 					{
-						float sinc = sin( t ) / t;
-						float sinc3 = 3.0f * sin( t / 3.0f ) / t;
+						float sinc = sinf( t ) / t;
+						float sinc3 = 3.0f * sinf( t / 3.0f ) / t;
 						pKernel[nKernelIndex] = sinc * sinc3;
 					}
 					else
@@ -391,7 +390,7 @@ public:
 				int dstPixel = i * info.m_nSrcWidth + k * info.m_nSrcWidth * info.m_nSrcHeight;
 				for ( int j = 0; j < info.m_nSrcWidth; ++j, ++dstPixel )
 				{
-					pAlphaResult[dstPixel] = fabs( pAlphaResult[dstPixel] - info.m_pSrc[dstPixel * 4 + 3] );
+					pAlphaResult[dstPixel] = fabsf( pAlphaResult[dstPixel] - info.m_pSrc[dstPixel * 4 + 3] );
 				}
 			}
 		}
@@ -490,7 +489,7 @@ public:
 						float flAlpha = ( total[3] >= flAlphaThreshhold ) ? 255 : 0; 
 
 						for ( int ch = 0; ch < 3; ++ ch )
-							info.m_pDest[ dstPixel + ch ] = Clamp( 255.0f * pow( ( info.m_flColorGoal[ch] + ( info.m_flColorScale[ch] * ( ( total[ch] > 0 ? total[ch] : 0 ) - info.m_flColorGoal[ch] ) ) ) / 255.0f, invDstGamma ) );
+							info.m_pDest[ dstPixel + ch ] = Clamp( 255.0f * powf( ( info.m_flColorGoal[ch] + ( info.m_flColorScale[ch] * ( ( total[ch] > 0 ? total[ch] : 0 ) - info.m_flColorGoal[ch] ) ) ) / 255.0f, invDstGamma ) );
 						info.m_pDest[ dstPixel + 3 ] = Clamp( flAlpha );
 
 						AddAlphaToAlphaResult( kernel, info, startX, startY, startZ, flAlpha, pAlphaResult );
@@ -498,7 +497,7 @@ public:
 					else
 					{
 						for ( int ch = 0; ch < 3; ++ ch )
-							info.m_pDest[ dstPixel + ch ] = Clamp( 255.0f * pow( ( info.m_flColorGoal[ch] + ( info.m_flColorScale[ch] * ( ( total[ch] > 0 ? total[ch] : 0 ) - info.m_flColorGoal[ch] ) ) ) / 255.0f, invDstGamma ) );
+							info.m_pDest[ dstPixel + ch ] = Clamp( 255.0f * powf( ( info.m_flColorGoal[ch] + ( info.m_flColorScale[ch] * ( ( total[ch] > 0 ? total[ch] : 0 ) - info.m_flColorGoal[ch] ) ) ) / 255.0f, invDstGamma ) );
 						info.m_pDest[ dstPixel + 3 ] = Clamp( info.m_flColorGoal[3] + ( info.m_flColorScale[3] * ( total[3] - info.m_flColorGoal[3] ) ) );
 					}
 				}

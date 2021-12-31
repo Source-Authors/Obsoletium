@@ -272,7 +272,7 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 	{
 		Vector trace_dir=my_sphere_sampler.NextValue();
 //		trace_dir=Vector(1,0,0);
-		trace_dir.z=fabs(trace_dir.z);						// upwards facing only
+		trace_dir.z=fabsf(trace_dir.z);						// upwards facing only
 		trace_directions[ r ]= trace_dir;
 	}
 
@@ -316,7 +316,7 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 		for( int nY = 0; nY < Height; nY++ )
 			for( int nX = 0; nX < Width; nX++ )
 			{
-				float flScale = flOutputScale * (2.0/3.0) * ( Pixel( nX, nY, 0 ) + Pixel( nX, nY, 1 ) + Pixel( nX, nY, 2 ) );
+				float flScale = flOutputScale * (2.0f/3.0f) * ( Pixel( nX, nY, 0 ) + Pixel( nX, nY, 1 ) + Pixel( nX, nY, 2 ) );
 				ret->Pixel( nX, nY, 0 ) *= flScale;
 				ret->Pixel( nX, nY, 1 ) *= flScale;
 				ret->Pixel( nX, nY, 2 ) *= flScale;
@@ -340,9 +340,9 @@ FloatBitMap_t *FloatBitMap_t::ComputeBumpmapFromHeightInAlphaChannel( float bump
 		for( int x = 0; x < Width; x++ )
 		{
 			Vector const & N = normals[ x + y * Width ];
-			ret->Pixel( x, y, 0 ) = 0.5+ 0.5 * N.x;
-			ret->Pixel( x, y, 1 ) = 0.5+ 0.5 * N.y;
-			ret->Pixel( x, y, 2 ) = 0.5+ 0.5 * N.z;
+			ret->Pixel( x, y, 0 ) = 0.5f+ 0.5f * N.x;
+			ret->Pixel( x, y, 1 ) = 0.5f+ 0.5f * N.y;
+			ret->Pixel( x, y, 2 ) = 0.5f+ 0.5f * N.z;
 			ret->Pixel( x, y, 3 ) = Pixel( x, y, 3 );
 		}
 	return ret;

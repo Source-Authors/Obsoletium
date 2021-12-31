@@ -284,7 +284,7 @@ public:
 				ret+=face_maps[f].AverageColor();
 			}
 			if (nfaces)
-				ret*=(1.0/nfaces);
+				ret*=(1.0f/nfaces);
 			return ret;
 	}
 

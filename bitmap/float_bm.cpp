@@ -141,10 +141,10 @@ bool FloatBitMap_t::WritePFM(char const *fname)
 
 float FloatBitMap_t::InterpolatedPixel(float x, float y, int comp) const
 {
-	int Top= floor(y);
+	int Top= floorf(y);
 	float Yfrac= y - Top;
 	int Bot= min(Height-1,Top+1);
-	int Left= floor(x);
+	int Left= floorf(x);
 	float Xfrac= x - Left;
 	int Right= min(Width-1,Left+1);
 	return
@@ -171,14 +171,14 @@ void FloatBitMap_t::ReSize(int NewWidth, int NewHeight)
 	SourceY= 0;
 	for(int y=0;y<NewHeight;y++)
 	{
-		Yfrac= SourceY - floor(SourceY);
+		Yfrac= SourceY - floorf(SourceY);
 		Top= SourceY;
 		Bot= SourceY+1;
 		if (Bot>=Height) Bot= Height-1;
 		SourceX= 0;
 		for(int x=0;x<NewWidth;x++)
 		{
-			Xfrac= SourceX - floor(SourceX);
+			Xfrac= SourceX - floorf(SourceX);
 			Left= SourceX;
 			Right= SourceX+1;
 			if (Right>=Width) Right= Width-1;
@@ -289,7 +289,7 @@ FloatBitMap_t::FloatBitMap_t(char const *tgafilename)
 		{
 			for(int c=0;c<4;c++)
 			{
-				Pixel(x,y,3-c)=pImage1[c+4*(x+(y*width1))]/255.0;
+				Pixel(x,y,3-c)=pImage1[c+4*(x+(y*width1))]/255.0f;
 			}
 		}
 	}
@@ -341,7 +341,7 @@ Vector FloatBitMap_t::AverageColor(void)
 		for(int x=0;x<Width;x++)
 			for(int c=0;c<3;c++)
 				ret[c]+=Pixel(x,y,c);
-	ret*=1.0/(Width*Height);
+	ret*=1.0f/(Width*Height);
 	return ret;
 }
 
@@ -369,7 +369,7 @@ void FloatBitMap_t::RaiseToPower(float power)
 	for(int y=0;y<Height;y++)
 		for(int x=0;x<Width;x++)
 			for(int c=0;c<3;c++)
-				Pixel(x,y,c)=pow((float)MAX(0.0,Pixel(x,y,c)),(float)power);
+				Pixel(x,y,c)=powf(MAX(0.0f,Pixel(x,y,c)),power);
 
 }
 
@@ -378,7 +378,7 @@ void FloatBitMap_t::Logize(void)
 	for(int y=0;y<Height;y++)
 		for(int x=0;x<Width;x++)
 			for(int c=0;c<3;c++)
-				Pixel(x,y,c)=log(1.0+Pixel(x,y,c));
+				Pixel(x,y,c)=logf(1.0f+Pixel(x,y,c));
 
 }
 
@@ -387,7 +387,7 @@ void FloatBitMap_t::UnLogize(void)
 	for(int y=0;y<Height;y++)
 		for(int x=0;x<Width;x++)
 			for(int c=0;c<3;c++)
-				Pixel(x,y,c)=exp(Pixel(x,y,c))-1;
+				Pixel(x,y,c)=expf(Pixel(x,y,c))-1;
 }
 
 
@@ -516,7 +516,7 @@ void FloatBitMap_t::ScaleGradients(void)
 					{
 						for(int i=0;i<NDELTAS;i++)
 						{
-							float norml=1.1*deltas[i]->Pixel(x,y,c);
+							float norml=1.1f*deltas[i]->Pixel(x,y,c);
 							//           if (norml<0.0)
 							//             norml=-pow(-norml,1.2);
 							//           else
@@ -564,7 +564,7 @@ void FloatBitMap_t::MakeTileable(void)
 			{
 				for(int c=0;c<3;c++)
 				{
-					float a=0.5*(Pixel(x,Height-1,c)+=Pixel(x,0,c));
+					float a=0.5f*(Pixel(x,Height-1,c)+=Pixel(x,0,c));
 					rslta.Pixel(x,Height-1,c)=a;
 					rslta.Pixel(x,0,c)=a;
 				}
@@ -573,7 +573,7 @@ void FloatBitMap_t::MakeTileable(void)
 			{
 				for(int c=0;c<3;c++)
 				{
-					float a=0.5*(Pixel(Width-1,y,c)+Pixel(0,y,c));
+					float a=0.5f*(Pixel(Width-1,y,c)+Pixel(0,y,c));
 					rslta.Pixel(Width-1,y,c)=a;
 					rslta.Pixel(0,y,c)=a;
 				}
@@ -591,7 +591,7 @@ void FloatBitMap_t::MakeTileable(void)
 						{
 							float desiredx=DiffMapX.Pixel(x,y,c)+cursrc->Pixel(x+1,y,c);
 							float desiredy=DiffMapY.Pixel(x,y,c)+cursrc->Pixel(x,y+1,c);
-							float desired=0.5*(desiredy+desiredx);
+							float desired=0.5f*(desiredy+desiredx);
 							curdst->Pixel(x,y,c)=FLerp(cursrc->Pixel(x,y,c),desired,0.5);
 							error+=SQ(desired-cursrc->Pixel(x,y,c));
 						}

@@ -16,13 +16,13 @@ static float ScaleValue(float f, float overbright)
 {
 	// map a value between 0..255 to the scale factor
 	int ival=f;
-	return ival*(overbright/255.0);
+	return ival*(overbright/255.0f);
 }
 
 static float IScaleValue(float f, float overbright)
 {
-	f*=(1.0/overbright);
-	int ival=min(255,(int)ceil(f*255.0));
+	f*=(1.0f/overbright);
+	int ival=min(255,(int)ceil(f*255.0f));
 	return ival;
 }
 
@@ -58,12 +58,12 @@ void FloatBitMap_t::Uncompress(float overbright)
 	for(int y=0;y<Height;y++)
 		for(int x=0;x<Width;x++)
 		{
-			int iactual_alpha_value=255.0*Pixel(x,y,3);
-			float actual_alpha_value=iactual_alpha_value*(1.0/255.0);
+			int iactual_alpha_value=255.0f*Pixel(x,y,3);
+			float actual_alpha_value=iactual_alpha_value*(1.0f/255.0f);
 			for(int c=0;c<3;c++)
 			{
-				int iactual_color_value=255.0*Pixel(x,y,c);
-				float actual_color_value=iactual_color_value*(1.0/255.0);
+				int iactual_color_value=255.0f*Pixel(x,y,c);
+				float actual_color_value=iactual_color_value*(1.0f/255.0f);
 				Pixel(x,y,c)=actual_alpha_value*actual_color_value*overbright;
 			}
 		}
