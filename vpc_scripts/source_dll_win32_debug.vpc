@@ -124,7 +124,7 @@ $Configuration "Debug"
 		// Advanced
 		$CallingConvention
 		$CompileAs							"Compile as C++ Code (/TP)"
-		// HACK(proper): Disable low signal/noise ratio warnings
+		// dimhotepus: Disable low signal/noise ratio warnings
 		// 4100 'XXX': unreferenced formal parameter
 		// 4127 conditional expression is constant
 		// 4201 nonstandard extension used: XXX

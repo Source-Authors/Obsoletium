@@ -12,7 +12,7 @@ $Configuration
 	{
 		// Request a specific compiler toolset.
 		$PlatformToolset "v100" [$VS2010]
-		// HACK(proper): Use newer toolset as XP is out of support.
+		// dimhotepus: Use newer toolset as XP is out of support.
 		$PlatformToolset "v142" [$VS2015]
 	}
 
@@ -37,7 +37,7 @@ $Configuration
 		// window since F8 stops on both warnings and errors. The only way to
 		// keep the warning count down is to have warnings-as-errors.
 		// We will not be warning free on 64-bit for a while...
-		// HACK(proper): Do not treat warnings as errors, there are too much warnings to fix at once.
+		// dimhotepus: Do not treat warnings as errors, there are too much warnings to fix at once.
 		// $TreatWarningsAsErrors				"Yes (/WX)" [!$ANALYZE && !$WIN64]
 		$TreatWarningsAsErrors				"No (/WX-)"
 
