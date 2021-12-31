@@ -147,9 +147,12 @@ void CPlayerResource::UpdateConnectedPlayer( int iIndex, CBasePlayer *pPlayer )
 		// m_iPacketloss.Set( iSlot, packetloss );
 	}
 
+  // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	CSteamID steamID;
 	pPlayer->GetSteamID( &steamID );
 	m_iAccountID.Set( iIndex, steamID.GetAccountID() );
+#endif
 }
 
 

@@ -152,7 +152,10 @@ public:
 		return m_pQuickListCheckButton ? m_pQuickListCheckButton->IsSelected() : false;
 	}
 
+  // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	STEAM_CALLBACK( CBaseGamesPage, OnFavoritesMsg, FavoritesListChanged_t, m_CallbackFavoritesMsg );
+#endif
 
 	// applies games filters to current list
 	void ApplyGameFilters();

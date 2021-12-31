@@ -731,6 +731,8 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 	m_pGameLogo = NULL;
 	m_hMainMenuOverridePanel = NULL;
 
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	if ( SteamClient() )
 	{
 		HSteamPipe steamPipe = SteamClient()->CreateSteamPipe();
@@ -742,6 +744,7 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 
 		SteamClient()->BReleaseSteamPipe( steamPipe );
 	}
+#endif
 
 	CreateGameMenu();
 	CreateGameLogo();

@@ -168,7 +168,10 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	enginesound = (IEngineSound *)factory(IENGINESOUND_CLIENT_INTERFACE_VERSION, NULL);
 	engine = (IVEngineClient *)factory( VENGINE_CLIENT_INTERFACE_VERSION, NULL );
 
+	// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	steamapicontext->Init();
+#endif
 
 	ConVarRef var( "gameui_xbox" );
 	m_bIsConsoleUI = var.IsValid() && var.GetBool();

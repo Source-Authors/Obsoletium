@@ -820,7 +820,7 @@ bool ServerDLL_Load( bool bIsServerOnly )
 {
 	// Load in the game .dll
 	LoadEntityDLLs( GetBaseDirectory(), bIsServerOnly );
-	return true;
+	return serverGameDLL != nullptr;
 }
 
 void ServerDLL_Unload()

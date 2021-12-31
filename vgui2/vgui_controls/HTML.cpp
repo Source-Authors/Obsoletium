@@ -110,8 +110,10 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-HTML::HTML(Panel *parent, const char *name, bool allowJavaScript, bool bPopupWindow) : Panel(parent, name), 
-m_NeedsPaint( this, &HTML::BrowserNeedsPaint ),
+HTML::HTML(Panel *parent, const char *name, bool allowJavaScript, bool bPopupWindow) : Panel(parent, name)
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
+, m_NeedsPaint( this, &HTML::BrowserNeedsPaint ),
 m_StartRequest( this, &HTML::BrowserStartRequest ),
 m_URLChanged( this, &HTML::BrowserURLChanged ),
 m_FinishedRequest( this, &HTML::BrowserFinishedRequest ),
@@ -132,6 +134,7 @@ m_StatusText( this, &HTML::BrowserStatusText ),
 m_ShowTooltip( this, &HTML::BrowserShowToolTip ),
 m_UpdateTooltip( this, &HTML::BrowserUpdateToolTip ),
 m_HideTooltip( this, &HTML::BrowserHideToolTip )
+#endif
 {
 	m_iHTMLTextureID = 0;
 	m_bCanGoBack = false;
@@ -146,6 +149,9 @@ m_HideTooltip( this, &HTML::BrowserHideToolTip )
 	SetPostChildPaintEnabled( true );
 
 	m_unBrowserHandle = INVALID_HTMLBROWSER;
+
+  // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	m_SteamAPIContext.Init();
 	if ( m_SteamAPIContext.SteamHTMLSurface() )
 	{
@@ -157,6 +163,7 @@ m_HideTooltip( this, &HTML::BrowserHideToolTip )
 	{
 		Warning("Unable to access SteamHTMLSurface");
 	}
+#endif
 	m_iScrollBorderX=m_iScrollBorderY=0;
 	m_bScrollBarEnabled = true;
 	m_bContextMenuEnabled = true; 
@@ -383,7 +390,7 @@ void HTML::PostURL(const char *URL, const char *pchPostData, bool force)
 
 			g_pFullFileSystem->GetLocalPath( baseDir, fileLocation, sizeof(fileLocation) );
 			Q_snprintf(htmlLocation, sizeof(htmlLocation), "file://%s", fileLocation);
-	
+
 			if (m_SteamAPIContext.SteamHTMLSurface())
 				m_SteamAPIContext.SteamHTMLSurface()->LoadURL( m_unBrowserHandle, htmlLocation, NULL );
 		}
@@ -397,14 +404,20 @@ void HTML::PostURL(const char *URL, const char *pchPostData, bool force)
 	{
 		if ( pchPostData && Q_strlen(pchPostData) > 0 )
 		{
+			// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 			if (m_SteamAPIContext.SteamHTMLSurface())
 				m_SteamAPIContext.SteamHTMLSurface()->LoadURL( m_unBrowserHandle, URL, pchPostData );
+#endif
 
 		}
 		else
 		{			
+			// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 			if (m_SteamAPIContext.SteamHTMLSurface())
 				m_SteamAPIContext.SteamHTMLSurface()->LoadURL( m_unBrowserHandle, URL, NULL );
+#endif
 		}
 	}
 }
@@ -415,8 +428,11 @@ void HTML::PostURL(const char *URL, const char *pchPostData, bool force)
 //-----------------------------------------------------------------------------
 bool HTML::StopLoading()
 {
+  // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	if (m_SteamAPIContext.SteamHTMLSurface())
 		m_SteamAPIContext.SteamHTMLSurface()->StopLoad( m_unBrowserHandle );
+#endif
 	return true;
 }
 
@@ -426,8 +442,11 @@ bool HTML::StopLoading()
 //-----------------------------------------------------------------------------
 bool HTML::Refresh()
 {
+  // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	if (m_SteamAPIContext.SteamHTMLSurface())
 		m_SteamAPIContext.SteamHTMLSurface()->Reload( m_unBrowserHandle );
+#endif
 	return true;
 }
 
@@ -1222,7 +1241,8 @@ void HTML::CHTMLFindBar::OnCommand( const char *pchCmd )
 
 }
 
-
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 //-----------------------------------------------------------------------------
 // Purpose: we have a new texture to update
 //-----------------------------------------------------------------------------
@@ -1268,6 +1288,7 @@ void HTML::BrowserNeedsPaint( HTML_NeedsPaint_t *pCallback )
 	// need a paint next time
 	Repaint();
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: browser wants to start loading this url, do we let it?
@@ -1324,6 +1345,8 @@ bool HTML::OnStartRequest( const char *url, const char *target, const char *pchP
 	return true;
 }
 
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 //-----------------------------------------------------------------------------
 // Purpose: callback from cef thread, load a url please
 //-----------------------------------------------------------------------------
@@ -1401,7 +1424,8 @@ void HTML::BrowserPopupHTMLWindow( HTML_NewWindow_t *pCmd )
 
 }
 
-
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 //-----------------------------------------------------------------------------
 // Purpose: browser telling us the page title
 //-----------------------------------------------------------------------------
@@ -1410,6 +1434,7 @@ void HTML::BrowserSetHTMLTitle( HTML_ChangedTitle_t *pCmd )
 	PostMessage( GetParent(), new KeyValues( "OnSetHTMLTitle", "title", pCmd->pchTitle ) );
 	OnSetHTMLTitle( pCmd->pchTitle );
 }
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -1639,7 +1664,6 @@ void HTML::BrowserSearchResults( HTML_SearchResults_t *pCmd )
 	m_pFindBar->InvalidateLayout();
 }
 
-
 //-----------------------------------------------------------------------------
 // Purpose: browser telling us it had a close requested
 //-----------------------------------------------------------------------------
@@ -1750,7 +1774,7 @@ void HTML::BrowserJSConfirm( HTML_JSConfirm_t *pCmd )
 	pDlg->SetCancelCommand( new KeyValues( "DismissJSDialog", "result", false ) );
 	pDlg->DoModal();
 }
-
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: got an answer from the dialog, tell cef
@@ -1761,7 +1785,8 @@ void HTML::DismissJSDialog( int bResult )
 		m_SteamAPIContext.SteamHTMLSurface()->JSDialogResponse( m_unBrowserHandle, bResult );
 };
 
-
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 //-----------------------------------------------------------------------------
 // Purpose: browser telling us the state of back and forward buttons
 //-----------------------------------------------------------------------------
@@ -1770,7 +1795,7 @@ void HTML::BrowserCanGoBackandForward( HTML_CanGoBackAndForward_t *pCmd )
 	m_bCanGoBack = pCmd->bCanGoBack;
 	m_bCanGoForward = pCmd->bCanGoForward;
 }
-
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: ask the browser for what is at this x,y
@@ -1780,7 +1805,6 @@ void HTML::GetLinkAtPosition( int x, int y )
 	if (m_SteamAPIContext.SteamHTMLSurface())
 		m_SteamAPIContext.SteamHTMLSurface()->GetLinkAtPosition( m_unBrowserHandle, x, y );
 }
-
 
 //-----------------------------------------------------------------------------
 // Purpose: update the size of the browser itself and scrollbars it shows

@@ -954,6 +954,9 @@ void CVoteController::TrackVoteCaller( CBasePlayer *pPlayer )
 		return;
 
 	CSteamID steamID;
+  
+	// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	pPlayer->GetSteamID( &steamID );
 
 	int iIdx = m_VoteCallers.Find( steamID.ConvertToUint64() );
@@ -965,6 +968,7 @@ void CVoteController::TrackVoteCaller( CBasePlayer *pPlayer )
 	}
 
 	m_VoteCallers.Insert( steamID.ConvertToUint64(), gpGlobals->curtime + sv_vote_creation_timer.GetInt() );
+#endif
 };
 
 //-----------------------------------------------------------------------------

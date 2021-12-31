@@ -83,10 +83,13 @@ bool CServerBrowser::Initialize(CreateInterfaceFn *factorylist, int factoryCount
 			g_pEngineReplay = ( IEngineReplay * )factorylist[ i ]( ENGINE_REPLAY_INTERFACE_VERSION, NULL );
 		}
 	}
-	
+
+	// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	SteamAPI_InitSafe();
 	SteamAPI_SetTryCatchCallbacks( false ); // We don't use exceptions, so tell steam not to use try/catch in callback handlers
 	steamapicontext->Init();
+#endif
 
 	for (int i = 0; i < factoryCount; i++)
 	{

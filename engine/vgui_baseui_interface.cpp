@@ -565,12 +565,12 @@ void CEngineVGui::Init()
 	COM_TimestampedLog( "Loading gameui.dll" );
 
 	// load the GameUI dll
-	const char *szDllName = "GameUI";
+	constexpr char szDllName[]{"GameUI"};
 	m_hStaticGameUIModule = g_pFileSystem->LoadModule(szDllName, "EXECUTABLE_PATH", true); // LoadModule() does a GetLocalCopy() call
 	m_GameUIFactory = Sys_GetFactory(m_hStaticGameUIModule);
 	if ( !m_GameUIFactory )
 	{
-		Error( "Could not load: %s\n", szDllName );
+		Error( "Could not load %s. Try restarting. If that doesn't work, verify the cache.\n", szDllName );
 	}
 	
 	// get the initialization func

@@ -24,13 +24,19 @@
 #include "xauddefs.h"
 #endif
 
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 #include "steam/steam_api.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 static CSteamAPIContext g_SteamAPIContext;
 static CSteamAPIContext *steamapicontext = NULL;
+#endif
 
 void Voice_EndChannel( int iChannel );
 void VoiceTweak_EndVoiceTweakMode();
@@ -202,11 +208,14 @@ static bool VoiceRecord_Start()
 {
 	if ( g_bUsingSteamVoice )
 	{
+    // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		if ( steamapicontext && steamapicontext->SteamUser() )
 		{
 			steamapicontext->SteamUser()->StartVoiceRecording();
 			return true;
 		}
+#endif
 	}
 	else if ( g_pVoiceRecord )
 	{
@@ -219,10 +228,13 @@ static void VoiceRecord_Stop()
 {
 	if ( g_bUsingSteamVoice )
 	{
+    // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		if ( steamapicontext && steamapicontext->SteamUser() )
 		{
 			steamapicontext->SteamUser()->StopVoiceRecording();
 		}
+#endif
 	}
 	else if ( g_pVoiceRecord )
 	{
@@ -602,26 +614,36 @@ bool Voice_Init( const char *pCodecName, int nSampleRate )
 
 	g_bUsingSteamVoice = bSteam;
 
+  // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	if ( !steamapicontext )
 	{
 		steamapicontext = &g_SteamAPIContext;
 		steamapicontext->Init();
 	}
+#endif
 
 	if ( g_bUsingSteamVoice )
 	{
+    // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		if ( !steamapicontext->SteamFriends() || !steamapicontext->SteamUser() )
 		{
 			Msg( "Voice_Init: Requested Steam voice, but cannot access API.  Voice will not function\n" );
 			return false;
 		}
+#endif
 	}
 
 	// For steam, nSampleRate 0 means "use optimal steam sample rate".
 	if ( bSteam && nSampleRate == 0 )
 	{
+    // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		Msg( "Voice_Init: Using Steam voice optimal sample rate %d\n",
 		     steamapicontext->SteamUser()->GetVoiceOptimalSampleRate() );
+#endif
+
 		// Steam's sample rate may change and not be supported by our rather unflexible sound engine. However, steam
 		// will resample as necessary in DecompressVoice, so we can pretend we're outputting at native rates.
 		//
@@ -994,11 +1016,14 @@ bool Voice_RecordStart(
 		g_bVoiceRecording = VoiceRecord_Start();
 		if ( g_bVoiceRecording )
 		{
+      // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 			if ( steamapicontext && steamapicontext->SteamFriends() && steamapicontext->SteamUser() )
 			{
 				// Tell Friends' Voice chat that the local user has started speaking
 				steamapicontext->SteamFriends()->SetInGameVoiceSpeaking( steamapicontext->SteamUser()->GetSteamID(), true );
 			}
+#endif
 
 			g_pSoundServices->OnChangeVoiceStatus( -1, true );		// Tell the client DLL.
 		}
@@ -1020,7 +1045,10 @@ void Voice_UserDesiresStop()
 	// received all the data.
 	if ( g_bUsingSteamVoice )
 	{
+    // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		steamapicontext->SteamUser()->StopVoiceRecording();
+#endif
 	}
 	else
 	{
@@ -1058,11 +1086,14 @@ bool Voice_RecordStop()
 
 	if ( g_bVoiceRecording )
 	{
+    // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		if ( steamapicontext->SteamFriends() && steamapicontext->SteamUser() )
 		{
 			// Tell Friends' Voice chat that the local user has stopped speaking
 			steamapicontext->SteamFriends()->SetInGameVoiceSpeaking( steamapicontext->SteamUser()->GetSteamID(), false );
 		}
+#endif
 	}
 
 	g_bVoiceRecording = false;
@@ -1081,6 +1112,9 @@ int Voice_GetCompressedData(char *pchDest, int nCount, bool bFinal)
 		uint32 cbUncompressedWritten = 0;
 		uint32 cbCompressed = 0;
 		uint32 cbUncompressed = 0;
+
+		// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		// We're going to always request steam give us the encoded stream at the optimal rate, unless our final output
 		// rate is lower than it.  We'll pass our output rate when we actually extract the data, which Steam will
 		// happily upsample from its optimal rate for us.
@@ -1108,6 +1142,8 @@ int Voice_GetCompressedData(char *pchDest, int nCount, bool bFinal)
 
 			g_pSoundServices->OnChangeVoiceStatus( -3, false );
 		}
+#endif
+
 		return cbCompressedWritten;
 	}
 
@@ -1333,6 +1369,9 @@ int Voice_AddIncomingData(int nChannel, const char *pchData, int nCount, int iSe
 	if ( g_bUsingSteamVoice )
 	{
 		uint32 nBytesWritten = 0;
+
+		// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		EVoiceResult result = steamapicontext->SteamUser()->DecompressVoice( pchData, nCount,
 		                                                                     decompressed, sizeof( decompressed ),
 		                                                                     &nBytesWritten, Voice_SamplesPerSec() );
@@ -1340,6 +1379,7 @@ int Voice_AddIncomingData(int nChannel, const char *pchData, int nCount, int iSe
 		{
 			nDecompressed = nBytesWritten / BYTES_PER_SAMPLE;
 		}
+#endif
 	}
 	else
 	{

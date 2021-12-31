@@ -1602,6 +1602,8 @@ void Host_ReadConfiguration()
 
 	bool saveconfig = false;
 
+  // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
 		SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
 	
@@ -1622,6 +1624,7 @@ void Host_ReadConfiguration()
 			GetFileFromRemoteStorage( pRemoteStorage, "cfg/config.cfg", "cfg/config.cfg" );
 		}
 	}
+#endif
 
 	if ( g_pFileSystem->FileExists( "//mod/cfg/config.cfg" ) )
 	{
@@ -1635,6 +1638,8 @@ void Host_ReadConfiguration()
 
 	Cbuf_Execute();
 
+  // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	if ( pRemoteStorage )
 	{
 		if ( cl_cloud_settings.GetInt() == STEAMREMOTESTORAGE_CLOUD_ON )
@@ -1650,6 +1655,7 @@ void Host_ReadConfiguration()
 			GetFileFromRemoteStorage( pRemoteStorage, g_szDefaultLogoFileName, g_szDefaultLogoFileName );
 		}
 	}
+#endif
 
 	// check to see if we actually set any keys, if not, load defaults from kb_def.lst
 	// so we at least have basics setup.
@@ -2998,7 +3004,10 @@ void Host_ShowIPCCallCount()
 	double flCurTime = Plat_FloatTime();
 	if ( flCurTime - s_flLastTime >= flInterval )
 	{
-		uint32 callCount;
+		uint32 callCount = 0;
+
+	  // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		ISteamClient *pSteamClient = SteamClient();
 		if ( pSteamClient )
 		{
@@ -3009,6 +3018,7 @@ void Host_ShowIPCCallCount()
 			// Ok, we're a dedicated server and we need to use this to get it.
 			callCount = (uint32)SteamGameServer_GetIPCCallCount();
 		}
+#endif
 
 		// Avoid a divide by zero.
 		int frameCount = host_framecount - s_nLastFrame;
@@ -3955,6 +3965,8 @@ bool DLL_LOCAL Host_IsValidSignature( const char *pFilename, bool bAllowUnknown 
 	}
 	else
 	{
+    // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		if ( Steam3Client().SteamUtils() )
 		{
 			SteamAPICall_t hAPICall = Steam3Client().SteamUtils()->CheckFileSignature( pFilename );
@@ -3987,6 +3999,7 @@ bool DLL_LOCAL Host_IsValidSignature( const char *pFilename, bool bAllowUnknown 
 				}
 			}
 		}
+#endif
 	}
 
 	return false;

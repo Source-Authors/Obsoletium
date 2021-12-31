@@ -1047,8 +1047,11 @@ CBasePlayer *UTIL_PlayerBySteamID( const CSteamID &steamID )
 		if ( !pPlayer )
 			continue;
 
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		if ( !pPlayer->GetSteamID( &steamIDPlayer ) )
 			continue;
+#endif
 
 		if ( steamIDPlayer == steamID )
 			return pPlayer;
@@ -1387,10 +1390,20 @@ ISteamUtils* GetSteamUtils()
 	// Use steamgameserver context if this isn't a client/listenserver.
 	if ( engine->IsDedicatedServer() )
 	{
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		return steamgameserverapicontext ? steamgameserverapicontext->SteamGameServerUtils() : NULL;
+#else
+  return nullptr;
+#endif
 	}
 #endif
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	return steamapicontext ? steamapicontext->SteamUtils() : NULL;
+#else
+  return nullptr;
+#endif
 }
 
 //-----------------------------------------------------------------------------

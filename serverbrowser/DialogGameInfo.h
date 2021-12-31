@@ -80,7 +80,10 @@ protected:
 	virtual void OnKeyCodePressed( vgui::KeyCode code );
 
 private:
+  // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	STEAM_CALLBACK( CDialogGameInfo, OnPersonaStateChange, PersonaStateChange_t, m_CallbackPersonaStateChange );
+#endif
 
 	long m_iRequestRetry;	// time at which to retry the request
 	static int PlayerTimeColumnSortFunc(vgui::ListPanel *pPanel, const vgui::ListPanelItem &p1, const vgui::ListPanelItem &p2);

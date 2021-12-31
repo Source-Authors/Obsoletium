@@ -122,7 +122,10 @@ void CGameListPanel::OnKeyCodePressed(vgui::KeyCode code)
 //-----------------------------------------------------------------------------
 CBaseGamesPage::CBaseGamesPage( vgui::Panel *parent, const char *name, EPageType eType, const char *pCustomResFilename)
 	: PropertyPage(parent, name),
+	// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	  m_CallbackFavoritesMsg( this, &CBaseGamesPage::OnFavoritesMsg ),
+#endif
 	  m_hRequest( NULL ),
 	  m_pCustomResFilename( pCustomResFilename )
 {
@@ -2239,7 +2242,8 @@ const char *CBaseGamesPage::GetConnectCode()
 	return pszConnectCode;
 }
 
-
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 //-----------------------------------------------------------------------------
 // Purpose: Refresh if our favorites list changed
 //-----------------------------------------------------------------------------
@@ -2311,6 +2315,7 @@ void CBaseGamesPage::OnFavoritesMsg( FavoritesListChanged_t *pFavListChanged )
 		Assert( !"unknown matchmaking type" );
 	};
 }
+#endif
 
 void CCheckBoxWithStatus::OnCursorEntered()
 {

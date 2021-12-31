@@ -43,7 +43,10 @@ bool QueryLessFunc( const struct challenge_s &item1, const struct challenge_s &i
 //-----------------------------------------------------------------------------
 CDialogGameInfo::CDialogGameInfo( vgui::Panel *parent, int serverIP, int queryPort, unsigned short connectionPort, const char *pszConnectCode ) : 
 	Frame(parent, "DialogGameInfo"),
+	// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	m_CallbackPersonaStateChange( this, &CDialogGameInfo::OnPersonaStateChange ),
+#endif
 	m_sConnectCode( pszConnectCode )
 {
 	SetBounds(0, 0, 512, 512);
@@ -191,8 +194,8 @@ void CDialogGameInfo::ChangeGame( int serverIP, int queryPort, unsigned short co
 	RequestInfo();
 	InvalidateLayout();
 }
-
-
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 //-----------------------------------------------------------------------------
 // Purpose: updates the dialog if it's watching a friend who changes servers
 //-----------------------------------------------------------------------------
@@ -221,7 +224,7 @@ void CDialogGameInfo::OnPersonaStateChange( PersonaStateChange_t *pPersonaStateC
 	}
 #endif
 }
-
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Associates a user with this dialog

@@ -57,6 +57,11 @@
 #include "cl_steamauth.h"
 #include "tier0/etwprof.h"
 
+// dimhotepus: NO_STEAM
+#ifdef NO_STEAM
+#include "tier0/minidump.h"
+#endif
+
 #include "vgui_baseui_interface.h"
 #include "tier0/systeminformation.h"
 #ifdef _WIN32
@@ -412,7 +417,7 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 		!CommandLine()->FindParm( "-nocrashdialog" ) )
 	{
 #ifdef _WIN32
-		::MessageBox( NULL, text, "Engine Error", MB_OK | MB_TOPMOST );
+		::MessageBox( NULL, text, "Engine - Error", MB_OK | MB_TOPMOST | MB_ICONERROR );
 #elif defined( USE_SDL )
 		Sys_MessageBox( "Engine Error", text, false );
 #endif
@@ -451,7 +456,14 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 		}
 		// Write the minidump from inside the filter (GetExceptionInformation() is only 
 		// valid in the filter)
-		__except ( SteamAPI_WriteMiniDump( 0, GetExceptionInformation(), build_number() ), EXCEPTION_EXECUTE_HANDLER )
+		__except ( 
+#ifndef NO_STEAM
+			SteamAPI_WriteMiniDump( 0, GetExceptionInformation(), build_number() )
+#else
+			// dimhotepus: Write dump via tier0 if no Steam.
+      WriteMiniDumpUsingExceptionInfo( GetExceptionCode(), GetExceptionInformation(), 0x00000002 /* MiniDumpWithFullMemory */, "sys_error" )
+#endif
+			, EXCEPTION_EXECUTE_HANDLER )
 		{
 
 			// We always get here because the above filter evaluates to EXCEPTION_EXECUTE_HANDLER
@@ -460,8 +472,9 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 		// Doing this doesn't quite work the way we want because there is no "crashing" thread
 		// and we see "No thread was identified as the cause of the crash; No signature could be created because we do not know which thread crashed" on the back end
 		//SteamAPI_WriteMiniDump( 0, NULL, build_number() );
-		printf("\n ##### Sys_Error: %s", text );
-		fflush(stdout );
+		// dimhotepus: Write to stderr instead ouf stdout
+		fprintf( stderr, "\n ##### Sys_Error: %s", text );
+		fflush( stdout );
 
 		int *p = 0;
 		*p = 0xdeadbeef;
@@ -1259,6 +1272,11 @@ void LoadEntityDLLs( const char *szBaseDir, bool bIsServerOnly )
 	if ( serverGameDLL )
 	{
 		Msg("server%s loaded for \"%s\"\n", DLL_EXT_STRING, (char *)serverGameDLL->GetGameDescription());
+	}
+	else
+	{
+		// dimhotepus: Show explicit error if no server DLL. Same as for client.dll
+		Error("Could not load server" DLL_EXT_STRING " library. Try restarting. If that doesn't work, verify the cache.");
 	}
 }
 

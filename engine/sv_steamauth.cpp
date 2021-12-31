@@ -26,7 +26,10 @@
 #include "filesystem_engine.h"
 #include "filesystem_init.h"
 #include "tier0/icommandline.h"
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 #include "steam/steam_gameserver.h"
+#endif
 #include "hltvserver.h"
 #include "sys_dll.h"
 #if defined( REPLAY_ENABLED )
@@ -212,7 +215,8 @@ void CSteam3Server::Activate( EServerType serverType )
 		usMasterServerUpdaterPort = m_usPort;
 		m_QueryPort = m_usPort;
 	}
-#ifndef _X360
+// dimhotepus: NO_STEAM
+#if !defined(_X360) && !defined(NO_STEAM)
 
 	switch ( m_eServerMode )
 	{
@@ -301,8 +305,11 @@ void CSteam3Server::Shutdown()
 {
 	if ( !BIsActive() )
 		return;
-
+  // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	SteamGameServer_Shutdown();
+#endif
+
 	m_bHasActivePlayers = false;
 	m_bLogOnResult = false;
 	m_SteamIDGS = k_steamIDNotInitYetGS;
@@ -862,7 +869,10 @@ void CSteam3Server::RunFrame()
 	if ( fCurtime - s_fLastRunCallback > 0.1f )
 	{
 		s_fLastRunCallback = fCurtime;
+    // dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		SteamGameServer_RunCallbacks();
+#endif
 	}
 }
 

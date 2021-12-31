@@ -12,7 +12,10 @@
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"
 #endif
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 #include "steam/steam_api.h"
+#endif
 
 DECLARE_BUILD_FACTORY( CAvatarImagePanel );
 
@@ -24,7 +27,10 @@ bool CAvatarImage::m_sbInitializedAvatarCache = false;
 // Purpose:
 //-----------------------------------------------------------------------------
 CAvatarImage::CAvatarImage( void )
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 : m_sPersonaStateChangedCallback( this, &CAvatarImage::OnPersonaStateChanged )
+#endif
 {
 	ClearAvatarSteamID();
 	m_pFriendIcon = NULL;
@@ -73,7 +79,11 @@ void CAvatarImage::ClearAvatarSteamID( void )
 	m_bFriend = false;
 	m_bLoadPending = false;
 	m_SteamID.Set( 0, k_EUniverseInvalid, k_EAccountTypeInvalid );
+
+	// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	m_sPersonaStateChangedCallback.Unregister();
+#endif
 }
 
 
@@ -88,7 +98,10 @@ bool CAvatarImage::SetAvatarSteamID( CSteamID steamIDUser, EAvatarSize avatarSiz
 	m_AvatarSize = avatarSize;
 	m_bLoadPending = true;
 
+	// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	m_sPersonaStateChangedCallback.Register( this, &CAvatarImage::OnPersonaStateChanged );
+#endif
 
 	LoadAvatarImage();
 	UpdateFriendStatus();
@@ -120,6 +133,12 @@ void CAvatarImage::LoadAvatarImage()
 #ifdef CSS_PERF_TEST
 	return;
 #endif
+
+  // dimhotepus: NO_STEAM
+#ifdef NO_STEAM
+	return;
+#endif
+
 	// attempt to retrieve the avatar image from Steam
 	if ( m_bLoadPending && steamapicontext->SteamFriends() && steamapicontext->SteamUtils() && gpGlobals->curtime >= m_fNextLoadTime )
 	{
@@ -178,8 +197,11 @@ void CAvatarImage::UpdateFriendStatus( void )
 	if ( !m_SteamID.IsValid() )
 		return;
 
+	// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 	if ( steamapicontext->SteamFriends() && steamapicontext->SteamUtils() )
 		m_bFriend = steamapicontext->SteamFriends()->HasFriend( m_SteamID, k_EFriendFlagImmediate );
+#endif
 }
 
 //-----------------------------------------------------------------------------
