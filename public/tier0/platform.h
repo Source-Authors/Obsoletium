@@ -153,25 +153,26 @@
 	#error "Please define your platform"
 #endif
 
-typedef unsigned char uint8;
-typedef signed char int8;
+using int8 = int8_t;
+using uint8 = uint8_t;
+
+using int16 = int16_t;
+using uint16 = uint16_t;
+
+using int32 = int32_t;
+using uint32 = uint32_t;
+
+using int64 = int64_t;
+using uint64 = uint64_t;
+
+// intp is an integer that can accomodate a pointer
+// (ie, sizeof(intp) >= sizeof(int) && sizeof(intp) >= sizeof(void *)
+using intp = ptrdiff_t;
+// uintp is an unsigned integer that can accomodate a pointer
+// (ie, sizeof(uintp) >= sizeof(unsigned int) && sizeof(uintp) >= sizeof(void *)
+using uintp = size_t;
 
 #if defined( _WIN32 )
-
-	typedef __int16					int16;
-	typedef unsigned __int16		uint16;
-	typedef __int32					int32;
-	typedef unsigned __int32		uint32;
-	typedef __int64					int64;
-	typedef unsigned __int64		uint64;
-
-	#ifdef PLATFORM_64BITS
-		typedef __int64 intp;				// intp is an integer that can accomodate a pointer
-		typedef unsigned __int64 uintp;		// (ie, sizeof(intp) >= sizeof(int) && sizeof(intp) >= sizeof(void *)
-	#else
-		typedef __int32 intp;
-		typedef unsigned __int32 uintp;
-	#endif
 
 	#if defined( _X360 )
 		#ifdef __m128
@@ -180,35 +181,22 @@ typedef signed char int8;
 		#define __m128				__vector4
 	#endif
 
-	// Use this to specify that a function is an override of a virtual function.
-	// This lets the compiler catch cases where you meant to override a virtual
-	// function but you accidentally changed the function signature and created
-	// an overloaded function. Usage in function declarations is like this:
-	// int GetData() const OVERRIDE;
-	#define OVERRIDE override
-
 #else // _WIN32
 
-	typedef short					int16;
-	typedef unsigned short			uint16;
-	typedef int						int32;
-	typedef unsigned int			uint32;
-	typedef long long				int64;
-	typedef unsigned long long		uint64;
-	#ifdef PLATFORM_64BITS
-		typedef long long			intp;
-		typedef unsigned long long	uintp;
-	#else
-		typedef int					intp;
-		typedef unsigned int		uintp;
-	#endif
 	typedef void *HWND;
 
-	// Avoid redefinition warnings if a previous header defines this.
-	#undef OVERRIDE
-	#define OVERRIDE override
-
 #endif // else _WIN32
+
+// Avoid redefinition warnings if a previous header defines
+// this.
+#undef OVERRIDE
+// Use this to specify that a function is an override of a
+// virtual function. This lets the compiler catch cases where
+// you meant to override a virtual function but you accidentally
+// changed the function signature and created an overloaded
+// function. Usage in function declarations is like this: int
+// GetData() const OVERRIDE;
+#define OVERRIDE override
 
 //-----------------------------------------------------------------------------
 // Set up platform type defines.
@@ -303,45 +291,6 @@ typedef unsigned int		uint;
 // As a result, we pick the least common denominator here.  This should be used anywhere
 // you might typically want to use RAND_MAX
 #define VALVE_RAND_MAX 0x7fff
-
-/*
-FIXME: Enable this when we no longer fear change =)
-
-// need these for the limits
-#include <limits.h>
-#include <float.h>
-
-// Maximum and minimum representable values
-#define  INT8_MAX			SCHAR_MAX
-#define  INT16_MAX			SHRT_MAX
-#define  INT32_MAX			LONG_MAX
-#define  INT64_MAX			(((int64)~0) >> 1)
-
-#define  INT8_MIN			SCHAR_MIN
-#define  INT16_MIN			SHRT_MIN
-#define  INT32_MIN			LONG_MIN
-#define  INT64_MIN			(((int64)1) << 63)
-
-#define  UINT8_MAX			((uint8)~0)
-#define  UINT16_MAX			((uint16)~0)
-#define  UINT32_MAX			((uint32)~0)
-#define  UINT64_MAX			((uint64)~0)
-
-#define  UINT8_MIN			0
-#define  UINT16_MIN			0
-#define  UINT32_MIN			0
-#define  UINT64_MIN			0
-
-#ifndef  UINT_MIN
-#define  UINT_MIN			UINT32_MIN
-#endif
-
-#define  FLOAT32_MAX		FLT_MAX
-#define  FLOAT64_MAX		DBL_MAX
-
-#define  FLOAT32_MIN FLT_MIN
-#define  FLOAT64_MIN DBL_MIN
-*/
 
 // portability / compiler settings
 #if defined(_WIN32) && !defined(WINDED)
