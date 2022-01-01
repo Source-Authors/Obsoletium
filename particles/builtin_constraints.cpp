@@ -192,7 +192,7 @@ bool C_OP_ConstrainDistanceToPath::EnforceConstraint( int nStartBlock,
 									 &StartPnt, &MidP, &EndPnt );
 
 	fltx4 CurTime = ReplicateX4( pParticles->m_flCurTime );
-	fltx4 TimeScale= ReplicateX4( 1.0/(max(0.001f,  m_flTravelTime ) ) );
+	fltx4 TimeScale= ReplicateX4( 1.0f/(max(0.001f,  m_flTravelTime ) ) );
 
 	// calculate radius spline
 	bool bConstantRadius = true;
@@ -755,7 +755,7 @@ static void WorldIntersectTNew( FourVectors const *pStartPnt, FourVectors const 
 						
 						float ln = delta.Length();
 
-						float traceScale = max( 5.0, 300.0 / ( ln + .01 ) );
+						float traceScale = max( 5.0f, 300.0f / ( ln + .01f ) );
 
 						Vector end = start + delta * traceScale;
 
@@ -879,7 +879,7 @@ static void WorldIntersectT( FourVectors const *pStartPnt, FourVectors const *pE
 			}
 			else
 			{
-				SubFloat( pISectData->m_LeftOverT, i ) = 1.0 - tr.fraction;
+				SubFloat( pISectData->m_LeftOverT, i ) = 1.0f - tr.fraction;
 			}
 			SubFloat( pISectData->m_ISectNormal.x, i ) = tr.plane.normal.x;
 			SubFloat( pISectData->m_ISectNormal.y, i ) = tr.plane.normal.y;

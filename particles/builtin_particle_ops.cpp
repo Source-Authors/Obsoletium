@@ -1070,8 +1070,8 @@ void C_OP_Noise::Operate( CParticleCollection *pParticles, float flStrength, voi
 		fMax *= ( M_PI / 180.0f );
 	}
 	// calculate coefficients. noise retuns -1..1
-	fltx4 ValueScale=ReplicateX4( 0.5*(fMax-fMin ) );
-	fltx4 ValueBase=ReplicateX4( fMin + 0.5*( fMax - fMin ) );
+	fltx4 ValueScale=ReplicateX4( 0.5f*(fMax-fMin ) );
+	fltx4 ValueBase=ReplicateX4( fMin + 0.5f*( fMax - fMin ) );
 	int nActive = pParticles->m_nPaddedActiveParticles;
 	do
 	{
@@ -1126,19 +1126,19 @@ void C_OP_VectorNoise::Operate( CParticleCollection *pParticles, float flStrengt
 	fltx4 CoordScale = m_fl4NoiseScale;
 	
 	// calculate coefficients. noise retuns -1..1
-	fltx4 ValueScaleX = ReplicateX4( 0.5*(m_vecOutputMax.x-m_vecOutputMin.x ) );
-	fltx4 ValueBaseX = ReplicateX4(m_vecOutputMin.x+0.5*( m_vecOutputMax.x-m_vecOutputMin.x ) );
+	fltx4 ValueScaleX = ReplicateX4( 0.5f*(m_vecOutputMax.x-m_vecOutputMin.x ) );
+	fltx4 ValueBaseX = ReplicateX4(m_vecOutputMin.x+0.5f*( m_vecOutputMax.x-m_vecOutputMin.x ) );
 
-	fltx4 ValueScaleY = ReplicateX4( 0.5*(m_vecOutputMax.y-m_vecOutputMin.y ) );
-	fltx4 ValueBaseY = ReplicateX4(m_vecOutputMin.y+0.5*( m_vecOutputMax.y-m_vecOutputMin.y ) );
+	fltx4 ValueScaleY = ReplicateX4( 0.5f*(m_vecOutputMax.y-m_vecOutputMin.y ) );
+	fltx4 ValueBaseY = ReplicateX4(m_vecOutputMin.y+0.5f*( m_vecOutputMax.y-m_vecOutputMin.y ) );
 
-	fltx4 ValueScaleZ = ReplicateX4( 0.5*(m_vecOutputMax.z-m_vecOutputMin.z ) );
-	fltx4 ValueBaseZ = ReplicateX4(m_vecOutputMin.z+0.5*( m_vecOutputMax.z-m_vecOutputMin.z ) );
+	fltx4 ValueScaleZ = ReplicateX4( 0.5f*(m_vecOutputMax.z-m_vecOutputMin.z ) );
+	fltx4 ValueBaseZ = ReplicateX4(m_vecOutputMin.z+0.5f*( m_vecOutputMax.z-m_vecOutputMin.z ) );
 
 	FourVectors ofs_y;
-	ofs_y.DuplicateVector( Vector( 100000.5, 300000.25, 9000000.75 ) );
+	ofs_y.DuplicateVector( Vector( 100000.5f, 300000.25f, 9000000.75f ) );
 	FourVectors ofs_z;
-	ofs_z.DuplicateVector( Vector( 110000.25, 310000.75, 9100000.5 ) );
+	ofs_z.DuplicateVector( Vector( 110000.25f, 310000.75f, 9100000.5f ) );
 
 	int nActive = pParticles->m_nActiveParticles;
 	for( int i=0; i < nActive; i+=4 )
@@ -1372,8 +1372,8 @@ protected:
 
 	virtual void InitParams( CParticleSystemDefinition *pDef, CDmxElement *pElement )
 	{
-		m_fSpinRateRadians = (float) m_nSpinRateDegrees * ( M_PI / 180.0f );
-		m_fSpinRateMinRadians = (float) m_nSpinRateMinDegrees * ( M_PI / 180.0f );
+		m_fSpinRateRadians = (float) m_nSpinRateDegrees * ( M_PI_F / 180.0f );
+		m_fSpinRateMinRadians = (float) m_nSpinRateMinDegrees * ( M_PI_F / 180.0f );
 	}
 
 	virtual void Operate( CParticleCollection *pParticles, float flStrength,  void *pContext ) const;
@@ -1393,21 +1393,21 @@ void CGeneralSpin::Operate( CParticleCollection *pParticles, float flStrength,  
 		return;
 
 	float dt = pParticles->m_flDt;
-	float drot = dt * fabs( fCurSpinRate * 2.0f * M_PI );
+	float drot = dt * fabsf( fCurSpinRate * 2.0f * M_PI_F );
 	if ( m_fSpinRateStopTime == 0.0f )
 	{
-		drot = fmod( drot, (float)(2.0f * M_PI) );
+		drot = fmodf( drot, 2.0f * M_PI_F );
 	}
 	if ( fCurSpinRate < 0.0f )
 	{
 		drot = -drot;
 	}
 	fltx4 Rot_Add = ReplicateX4( drot );
-	fltx4 Pi_2 = ReplicateX4( 2.0*M_PI );
-	fltx4 nPi_2 = ReplicateX4( -2.0*M_PI );
+	fltx4 Pi_2 = ReplicateX4( 2.0f*M_PI_F );
+	fltx4 nPi_2 = ReplicateX4( -2.0f*M_PI_F );
 
 	// FIXME: This is wrong
-	fltx4 minSpeedRadians = ReplicateX4( dt * fabs( m_fSpinRateMinRadians * 2.0f * M_PI ) );
+	fltx4 minSpeedRadians = ReplicateX4( dt * fabs( m_fSpinRateMinRadians * 2.0f * M_PI_F ) );
 
 	fltx4 now = pParticles->m_fl4CurTime;
 	fltx4 SpinRateStopTime = ReplicateX4( m_fSpinRateStopTime ); 
@@ -1765,7 +1765,7 @@ void C_OP_ColorInterpolate::Operate( CParticleCollection *pParticles, float flSt
 	if ( m_flFadeEndTime == m_flFadeStartTime )
 		return;
 
-	fltx4 ooInRange = ReplicateX4( 1.0 / ( m_flFadeEndTime - m_flFadeStartTime ) );
+	fltx4 ooInRange = ReplicateX4( 1.0f / ( m_flFadeEndTime - m_flFadeStartTime ) );
 
 	fltx4 curTime = pParticles->m_fl4CurTime;
 	fltx4 lowRange = ReplicateX4( m_flFadeStartTime );
@@ -2033,13 +2033,13 @@ void C_OP_PositionLock::Operate( CParticleCollection *pParticles, float flStreng
 	fltx4 fl4_Dt = ReplicateX4( pParticles->m_flDt );
 
 	int nCtr = pParticles->m_nPaddedActiveParticles;
-	bool bUseRange = ( m_flRange != 0.0 );
+	bool bUseRange = ( m_flRange != 0.0f );
 	fltx4 fl4OORange;
 	if ( bUseRange )
-		fl4OORange = ReplicateX4( 1.0 / m_flRange );
+		fl4OORange = ReplicateX4( 1.0f / m_flRange );
 
-	fltx4 fl4BiasParm = PreCalcBiasParameter( ReplicateX4( 0.2 ) );
-	if ( m_flStartTime_min >= 1.0 )							// always locked on
+	fltx4 fl4BiasParm = PreCalcBiasParameter( ReplicateX4( 0.2F ) );
+	if ( m_flStartTime_min >= 1.0f )							// always locked on
 	{
 		CM128AttributeIterator pCreationTime( PARTICLE_ATTRIBUTE_CREATION_TIME, pParticles );
 		do 
@@ -3440,10 +3440,10 @@ void C_OP_LockToBone::Operate( CParticleCollection *pParticles, float flStrength
 	{
 		float flAgeThreshold = m_flLifeTimeFadeEnd;
 		if ( flAgeThreshold <= 0.0 )
-			flAgeThreshold = 1.0e20;
+			flAgeThreshold = 1.0e20f;
 		float flIScale = 0.0;
 		if ( m_flLifeTimeFadeEnd > m_flLifeTimeFadeStart )
-			flIScale = 1.0/( m_flLifeTimeFadeEnd - m_flLifeTimeFadeStart );
+			flIScale = 1.0f/( m_flLifeTimeFadeEnd - m_flLifeTimeFadeStart );
 
 		for ( int i = 0; i < pParticles->m_nActiveParticles; ++i )
 		{
@@ -3482,7 +3482,7 @@ void C_OP_LockToBone::Operate( CParticleCollection *pParticles, float flStrength
 					Vector Delta = vecWorldPosition-vecPrevWorldPosition;
 				
 					if ( flAge > m_flLifeTimeFadeStart )
-						Delta *= flStrength * ( 1.0- ( ( flAge - m_flLifeTimeFadeStart ) * flIScale ) );
+						Delta *= flStrength * ( 1.0F - ( ( flAge - m_flLifeTimeFadeStart ) * flIScale ) );
 				
 					Vector xyz;
 					SetVectorFromAttribute( xyz, pXYZ );
@@ -3828,7 +3828,7 @@ END_PARTICLE_OPERATOR_UNPACK( C_OP_OrientTo2dDirection )
 void C_OP_OrientTo2dDirection::Operate( CParticleCollection *pParticles, float flStrength, void *pContext ) const
 {
 
-	float flRotOffset = m_flRotOffset * ( M_PI / 180.0f );
+	float flRotOffset = m_flRotOffset * ( M_PI_F / 180.0f );
 	// FIXME: SSE-ize
 	for ( int i = 0; i < pParticles->m_nActiveParticles; ++i )
 	{
@@ -3852,7 +3852,7 @@ void C_OP_OrientTo2dDirection::Operate( CParticleCollection *pParticles, float f
 
 		float flCurRot = *roll;
 
-		float flVelRot = atan2(vecVelocityCur.y, vecVelocityCur.x ) + M_PI;
+		float flVelRot = atan2f(vecVelocityCur.y, vecVelocityCur.x ) + M_PI_F;
 
 		flVelRot += flRotOffset;
 
@@ -3905,7 +3905,7 @@ END_PARTICLE_OPERATOR_UNPACK( C_OP_Orient2DRelToCP )
 void C_OP_Orient2DRelToCP::Operate( CParticleCollection *pParticles, float flStrength, void *pContext ) const
 {
 
-	float flRotOffset = m_flRotOffset * ( M_PI / 180.0f );
+	float flRotOffset = m_flRotOffset * ( M_PI_F / 180.0f );
 	// FIXME: SSE-ize
 	for ( int i = 0; i < pParticles->m_nActiveParticles; ++i )
 	{
@@ -3927,7 +3927,7 @@ void C_OP_Orient2DRelToCP::Operate( CParticleCollection *pParticles, float flStr
 
 		float flCurRot = *roll;
 
-		float flVelRot = atan2(vecVelocityCur.y, vecVelocityCur.x ) + M_PI;
+		float flVelRot = atan2f(vecVelocityCur.y, vecVelocityCur.x ) + M_PI_F;
 
 		flVelRot += flRotOffset;
 

@@ -392,7 +392,7 @@ private:
 	{
 	public:
 		virtual inline float operator()( float x ) {
-			return ( cosf( x * M_PI ) + 1.0f ) / 2.0f;
+			return ( cosf( x * M_PI_F ) + 1.0f ) / 2.0f;
 		}
 	};
 
@@ -401,7 +401,7 @@ private:
 	{
 	public:
 		virtual inline float operator()( float x ) {
-			return ( cosf( x * M_PI / 2.0 ) );
+			return ( cosf( x * M_PI_F / 2.0f ) );
 		}
 	};
 
@@ -410,7 +410,7 @@ private:
 	{
 	public:
 		virtual inline float operator()( float x ) {
-			return ( 1.0f - cosf( ( 1.0f - x ) * M_PI / 2.0 ) );
+			return ( 1.0f - cosf( ( 1.0f - x ) * M_PI_F / 2.0f ) );
 		}
 	};
 

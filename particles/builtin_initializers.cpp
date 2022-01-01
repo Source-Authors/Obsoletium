@@ -373,15 +373,15 @@ void C_INIT_CreateWithinSphere::InitNewParticlesScalar(
 			{
 				if ( m_vecDistanceBiasAbs.x	!= 0.0f )
 				{
-					randpos.x = fabs(randpos.x);
+					randpos.x = fabsf(randpos.x);
 				}
 				if ( m_vecDistanceBiasAbs.y	!= 0.0f )
 				{
-					randpos.y = fabs(randpos.y);
+					randpos.y = fabsf(randpos.y);
 				}
 				if ( m_vecDistanceBiasAbs.z	!= 0.0f )
 				{
-					randpos.z = fabs(randpos.z);
+					randpos.z = fabsf(randpos.z);
 				}
 			}
 			randpos *= m_vecDistanceBias;
@@ -475,7 +475,7 @@ void C_INIT_CreateWithinSphere::InitNewParticlesBlock( CParticleCollection *pPar
 		v4ControlPointDelta.DuplicateVector( pParticles->m_ControlPoints[m_nControlPointNumber].m_Position );
 		v4ControlPointDelta -= v4PrevControlPointPosition;
 
-		float flOODT = ( pParticles->m_flDt > 0.0 ) ? ( 1.0 / pParticles->m_flDt ) : 0.0;
+		float flOODT = ( pParticles->m_flDt > 0.0f ) ? ( 1.0f / pParticles->m_flDt ) : 0.0f;
 		fltx4 fl4OODt = ReplicateX4( flOODT );
 		fltx4 fl4PrevTime = ReplicateX4( pParticles->m_flCurTime - pParticles->m_flDt );
 		int nContext = GetSIMDRandContext();
@@ -491,7 +491,7 @@ void C_INIT_CreateWithinSphere::InitNewParticlesBlock( CParticleCollection *pPar
 		}
 		fltx4 fl4RadiusMin = ReplicateX4( m_fRadiusMin );
 		fltx4 fl4RadiusSpread = ReplicateX4( m_fRadiusMax - m_fRadiusMin );
-		int nPowSSEMask = 4.0 * m_fSpeedRandExp;
+		int nPowSSEMask = 4.0f * m_fSpeedRandExp;
 
 		bool bDoRandSpeed =
 			( m_fSpeedMax > 0. ) || 
@@ -1011,13 +1011,13 @@ void C_INIT_InitialVelocityNoise::InitNewParticlesBlock( CParticleCollection *pP
 	float ValueScaleX, ValueScaleY, ValueScaleZ, ValueBaseX, ValueBaseY, ValueBaseZ;
 
 	ValueScaleX = ( flAbsScaleX *(m_vecOutputMax.x-m_vecOutputMin.x ) );
-	ValueBaseX = (m_vecOutputMin.x+ ( ( 1.0 - flAbsScaleX ) *( m_vecOutputMax.x-m_vecOutputMin.x ) ) );
+	ValueBaseX = (m_vecOutputMin.x+ ( ( 1.0f - flAbsScaleX ) *( m_vecOutputMax.x-m_vecOutputMin.x ) ) );
 
 	ValueScaleY = ( flAbsScaleY *(m_vecOutputMax.y-m_vecOutputMin.y ) );
-	ValueBaseY = (m_vecOutputMin.y+ ( ( 1.0 - flAbsScaleY ) *( m_vecOutputMax.y-m_vecOutputMin.y ) ) );
+	ValueBaseY = (m_vecOutputMin.y+ ( ( 1.0f - flAbsScaleY ) *( m_vecOutputMax.y-m_vecOutputMin.y ) ) );
 
 	ValueScaleZ = ( flAbsScaleZ *(m_vecOutputMax.z-m_vecOutputMin.z ) );
-	ValueBaseZ = (m_vecOutputMin.z+ ( ( 1.0 - flAbsScaleZ ) *( m_vecOutputMax.z-m_vecOutputMin.z ) ) );
+	ValueBaseZ = (m_vecOutputMin.z+ ( ( 1.0f - flAbsScaleZ ) *( m_vecOutputMax.z-m_vecOutputMin.z ) ) );
 
 	fltx4 fl4ValueBaseX = ReplicateX4( ValueBaseX );
 	fltx4 fl4ValueBaseY = ReplicateX4( ValueBaseY );
@@ -1030,8 +1030,8 @@ void C_INIT_InitialVelocityNoise::InitNewParticlesBlock( CParticleCollection *pP
 	float CoordScale = m_flNoiseScale;
 	float CoordScaleLoc = m_flNoiseScaleLoc;
 
-	Vector ofs_y = Vector( 100000.5, 300000.25, 9000000.75 );
-	Vector ofs_z = Vector( 110000.25, 310000.75, 9100000.5 );
+	Vector ofs_y = Vector( 100000.5f, 300000.25f, 9000000.75f );
+	Vector ofs_z = Vector( 110000.25f, 310000.75f, 9100000.5f );
 
 	size_t attr_stride;
 
@@ -1159,13 +1159,13 @@ void C_INIT_InitialVelocityNoise::InitNewParticlesScalar(
 	float ValueScaleX, ValueScaleY, ValueScaleZ, ValueBaseX, ValueBaseY, ValueBaseZ;
 
 	ValueScaleX = ( flAbsScaleX *(m_vecOutputMax.x-m_vecOutputMin.x ) );
-	ValueBaseX = (m_vecOutputMin.x+ ( ( 1.0 - flAbsScaleX ) *( m_vecOutputMax.x-m_vecOutputMin.x ) ) );
+	ValueBaseX = (m_vecOutputMin.x+ ( ( 1.0f - flAbsScaleX ) *( m_vecOutputMax.x-m_vecOutputMin.x ) ) );
 
 	ValueScaleY = ( flAbsScaleY *(m_vecOutputMax.y-m_vecOutputMin.y ) );
-	ValueBaseY = (m_vecOutputMin.y+ ( ( 1.0 - flAbsScaleY ) *( m_vecOutputMax.y-m_vecOutputMin.y ) ) );
+	ValueBaseY = (m_vecOutputMin.y+ ( ( 1.0f - flAbsScaleY ) *( m_vecOutputMax.y-m_vecOutputMin.y ) ) );
 
 	ValueScaleZ = ( flAbsScaleZ *(m_vecOutputMax.z-m_vecOutputMin.z ) );
-	ValueBaseZ = (m_vecOutputMin.z+ ( ( 1.0 - flAbsScaleZ ) *( m_vecOutputMax.z-m_vecOutputMin.z ) ) );
+	ValueBaseZ = (m_vecOutputMin.z+ ( ( 1.0f - flAbsScaleZ ) *( m_vecOutputMax.z-m_vecOutputMin.z ) ) );
 
 
 	float CoordScale = m_flNoiseScale;
@@ -1217,16 +1217,16 @@ void C_INIT_InitialVelocityNoise::InitNewParticlesScalar(
 		{
 			if ( m_vecAbsValInv.x	!= 0.0f )
 			{
-				flNoiseX = 1.0 - flNoiseX;
+				flNoiseX = 1.0f - flNoiseX;
 			}
 
 			if ( m_vecAbsValInv.y	!= 0.0f )
 			{											   
-				flNoiseY = 1.0 - flNoiseY;
+				flNoiseY = 1.0f - flNoiseY;
 			}
 			if ( m_vecAbsValInv.z	!= 0.0f )
 			{
-				flNoiseZ = 1.0 - flNoiseZ;
+				flNoiseZ = 1.0f - flNoiseZ;
 			}
 		}
 
@@ -1468,9 +1468,9 @@ protected:
 
 	virtual void InitParams( CParticleSystemDefinition *pDef, CDmxElement *pElement )
 	{
-		m_flRadians = m_flDegrees * ( M_PI / 180.0f );
-		m_flRadiansMin = m_flDegreesMin * ( M_PI / 180.0f );
-		m_flRadiansMax = m_flDegreesMax * ( M_PI / 180.0f );
+		m_flRadians = m_flDegrees * ( M_PI_F / 180.0f );
+		m_flRadiansMin = m_flDegreesMin * ( M_PI_F / 180.0f );
+		m_flRadiansMax = m_flDegreesMax * ( M_PI_F / 180.0f );
 	}
 
 	virtual void InitNewParticlesBlock( CParticleCollection *pParticles, 
@@ -1532,9 +1532,9 @@ protected:
 
 	virtual void InitParams( CParticleSystemDefinition *pDef, CDmxElement *pElement )
 	{
-		m_flRadians = m_flDegrees * ( M_PI / 180.0f );
-		m_flRadiansMin = m_flDegreesMin * ( M_PI / 180.0f );
-		m_flRadiansMax = m_flDegreesMax * ( M_PI / 180.0f );
+		m_flRadians = m_flDegrees * ( M_PI_F / 180.0f );
+		m_flRadiansMin = m_flDegreesMin * ( M_PI_F / 180.0f );
+		m_flRadiansMax = m_flDegreesMax * ( M_PI_F / 180.0f );
 	}
 
 	virtual void InitNewParticlesBlock( CParticleCollection *pParticles, 
@@ -2180,7 +2180,7 @@ void C_INIT_CreationNoise::InitNewParticlesBlock( CParticleCollection *pParticle
 
 	float ValueScale, ValueBase;
 	ValueScale = ( flAbsScale *( fMax - fMin ) );
-	ValueBase = ( fMin+ ( ( 1.0 - flAbsScale ) *( fMax - fMin ) ) );
+	ValueBase = ( fMin+ ( ( 1.0f - flAbsScale ) *( fMax - fMin ) ) );
 
 	fltx4 fl4ValueBase = ReplicateX4( ValueBase );
 	fltx4 fl4ValueScale = ReplicateX4( ValueScale );
@@ -2262,8 +2262,8 @@ void C_INIT_CreationNoise::InitNewParticlesScalar(
 
 	if ( ATTRIBUTES_WHICH_ARE_ANGLES & (1 << m_nFieldOutput ) )
 	{
-		fMin *= ( M_PI / 180.0f );
-		fMax *= ( M_PI / 180.0f );
+		fMin *= ( M_PI_F / 180.0f );
+		fMax *= ( M_PI_F / 180.0f );
 	}
 
 	float CoordScale = m_flNoiseScale;
@@ -2271,7 +2271,7 @@ void C_INIT_CreationNoise::InitNewParticlesScalar(
 
     float ValueScale, ValueBase;
 	ValueScale = ( flAbsScale *( fMax - fMin ) );
-	ValueBase = ( fMin+ ( ( 1.0 - flAbsScale ) *( fMax - fMin ) ) );
+	ValueBase = ( fMin+ ( ( 1.0f - flAbsScale ) *( fMax - fMin ) ) );
 	
 	Vector CoordLoc, CoordWorldTime, CoordBase;
 	const float *pCreationTime = pParticles->GetFloatAttributePtr( PARTICLE_ATTRIBUTE_CREATION_TIME, start_p );
@@ -2307,7 +2307,7 @@ void C_INIT_CreationNoise::InitNewParticlesScalar(
 
 		if ( m_bAbsValInv )
 		{
-			flNoise = 1.0 - flNoise;
+			flNoise = 1.0f - flNoise;
 		}
 		    
 		float flInitialNoise = ( ValueBase + ( ValueScale * flNoise ) );
@@ -2803,11 +2803,11 @@ void C_INIT_AgeNoise::InitNewParticlesScalar(
 		*( (int *) &flNoise)  &= nAbsVal;
 
 		ValueScale = ( flAbsScale *( fMax - fMin ) );
-		ValueBase = ( fMin+ ( ( 1.0 - flAbsScale ) *( fMax - fMin ) ) );
+		ValueBase = ( fMin+ ( ( 1.0f - flAbsScale ) *( fMax - fMin ) ) );
 
 		if ( m_bAbsValInv )
 		{
-			flNoise = 1.0 - flNoise;
+			flNoise = 1.0f - flNoise;
 		}
 
 		float flInitialNoise = ( ValueBase + ( ValueScale * flNoise ) );
@@ -3000,7 +3000,7 @@ void C_INIT_CreateInHierarchy::InitNewParticlesScalar(
 		pParticles->CalculatePathValues( PathParams, *ct, &StartPnt, &MidP, &EndPnt);
 		EndPnt *= flGrowth;
 
-		float t=pParticles->RandomFloat( 0.0, 1.0 );
+		float t=pParticles->RandomFloat( 0.0F, 1.0F );
 		
 		Vector randpos;
 		pParticles->RandomVector( -m_fMaxDistance, m_fMaxDistance, &randpos );
@@ -3009,15 +3009,15 @@ void C_INIT_CreateInHierarchy::InitNewParticlesScalar(
 		{
 			if ( m_vecDistanceBiasAbs.x	!= 0.0f )
 			{
-				randpos.x = fabs(randpos.x);
+				randpos.x = fabsf(randpos.x);
 			}
 			if ( m_vecDistanceBiasAbs.y	!= 0.0f )
 			{
-				randpos.y = fabs(randpos.y);
+				randpos.y = fabsf(randpos.y);
 			}
 			if ( m_vecDistanceBiasAbs.z	!= 0.0f )
 			{
-				randpos.z = fabs(randpos.z);
+				randpos.z = fabsf(randpos.z);
 			}
 		}
 		randpos *= m_vecDistanceBias;

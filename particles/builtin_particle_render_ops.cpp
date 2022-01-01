@@ -1472,7 +1472,7 @@ void C_OP_RenderSpritesTrail::RenderSpriteTrail( CMeshBuilder &meshBuilder,
 	int nCreationTimeIndex = nGroup * info.m_nCreationTimeStride;
 	float flAge = info.m_pParticles->m_flCurTime - SubFloat( info.m_pCreationTimeStamp[ nCreationTimeIndex ], nOffset );
 
-	float flLengthScale = ( flAge >= m_flLengthFadeInTime ) ? 1.0 : ( flAge / m_flLengthFadeInTime );
+	float flLengthScale = ( flAge >= m_flLengthFadeInTime ) ? 1.0f : ( flAge / m_flLengthFadeInTime );
 
 	int nXYZIndex = nGroup * info.m_nXYZStride;
 	Vector vecWorldPos( SubFloat( info.m_pXYZ[ nXYZIndex ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+1 ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+2 ], nOffset ) );
@@ -1713,7 +1713,7 @@ class C_OP_RenderRope : public CParticleOperatorInstance
 		{
 			m_flTexelSizeInUnits = 1.0f;
 		}
-		m_flTStep = 1.0 / m_nSubdivCount;
+		m_flTStep = 1.0f / m_nSubdivCount;
 	}
 
 	virtual int GetParticlesToRender( CParticleCollection *pParticles, void *pContext, int nFirstParticle, int nRemainingVertices, int nRemainingIndices, int *pVertsUsed, int *pIndicesUsed ) const;
@@ -2364,8 +2364,8 @@ void C_OP_RenderScreenVelocityRotate::Render( IMatRenderContext *pRenderContext,
 	// const fltx4 *pRot = pParticles->GetM128AttributePtr( PARTICLE_ATTRIBUTE_ROTATION, &rot_stride );
 	fltx4 *pRot = pParticles->GetM128AttributePtrForWrite( PARTICLE_ATTRIBUTE_ROTATION, &rot_stride );
 
-	float flForwardRadians = m_flForwardDegrees * ( M_PI / 180.0f );
-	//float flRotateRateRadians = m_flRotateRateDegrees * ( M_PI / 180.0f );
+	float flForwardRadians = m_flForwardDegrees * ( M_PI_F / 180.0f );
+	//float flRotateRateRadians = m_flRotateRateDegrees * ( M_PI_F / 180.0f );
 
 	for( int i = 0; i < nParticles; i++ )
 	{
@@ -2386,7 +2386,7 @@ void C_OP_RenderScreenVelocityRotate::Render( IMatRenderContext *pRenderContext,
 		Vector vecPrevViewPos;
 		Vector3DMultiplyPosition( tempView, vecPrevWorldPos, vecPrevViewPos );
 
-		float rot = atan2( vecViewPos.y - vecPrevViewPos.y, vecViewPos.x - vecPrevViewPos.x ) + flForwardRadians;
+		float rot = atan2f( vecViewPos.y - vecPrevViewPos.y, vecViewPos.x - vecPrevViewPos.x ) + flForwardRadians;
 		SubFloat( pRot[ nGroup * rot_stride ], nOffset ) = rot;
 	}
 }

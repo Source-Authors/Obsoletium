@@ -1632,7 +1632,7 @@ bool CParticleCollection::CheckIfOperatorShouldRun(
 	float flTime=m_flCurTime;
 	if ( pOp->m_flOpFadeOscillatePeriod > 0.0 )
 	{
-		flTime=fmod( m_flCurTime*( 1.0/pOp->m_flOpFadeOscillatePeriod ), 1.0 );
+		flTime=fmodf( m_flCurTime*( 1.0F/pOp->m_flOpFadeOscillatePeriod ), 1.0F );
 	}
 
 	float flStrength = FadeInOut( pOp->m_flOpStartFadeInTime, pOp->m_flOpEndFadeInTime,
@@ -2200,8 +2200,8 @@ float CParticleCollection::RandomVectorInUnitSphere( int nRandomSampleId, Vector
 	float v = RandomFloat( nRandomSampleId+1, 0.0001f, 1.0f );
 	float w = RandomFloat( nRandomSampleId+2, 0.0001f, 1.0f );
 
-	float flPhi = acos( 1 - 2 * u );
-	float flTheta = 2 * M_PI * v;
+	float flPhi = acosf( 1 - 2 * u );
+	float flTheta = 2 * M_PI_F * v;
 	float flRadius = powf( w, 1.0f / 3.0f );
 
 	float flSinPhi, flCosPhi;
@@ -2465,7 +2465,7 @@ void CParticleCollection::RecomputeBounds( void )
 	VectorAdd( m_MaxBounds, m_pDef->m_BoundingBoxMax, m_MaxBounds );
 
 	// calculate center
-	float flOONumParticles = 1.0 / m_nActiveParticles;
+	float flOONumParticles = 1.0F / m_nActiveParticles;
 	m_Center.x = flOONumParticles * fsum_x;
 	m_Center.y = flOONumParticles * fsum_y;
 	m_Center.z = flOONumParticles * fsum_z;
@@ -2829,14 +2829,14 @@ void CParticleCollection::CalculatePathValues( CPathParameters const &PathIn,
 			nCP = PathIn.m_nEndControlPointNumber;
 		Vector Fwd = m_ControlPoints[nCP].m_ForwardVector;
 		float len=VectorLength( vTarget);
-		if ( len > 1.0e-6 )
+		if ( len > 1.0e-6F )
 		{
-			vTarget *= (1.0/len);						// normalize
-			flBulgeScale = 1.0-fabs( DotProduct( vTarget, Fwd )); // bulge inversely scaled
+			vTarget *= (1.0F/len);						// normalize
+			flBulgeScale = 1.0F-fabsf( DotProduct( vTarget, Fwd )); // bulge inversely scaled
 		}
 		Vector Potential_MidP=Fwd;
 		float flOffsetDist = VectorLength( Potential_MidP );
-		if ( flOffsetDist > 1.0e-6 )
+		if ( flOffsetDist > 1.0e-6F )
 		{
 			Potential_MidP *= (PathIn.m_flBulge*len*flBulgeScale)/flOffsetDist;
 			MidP += Potential_MidP;
