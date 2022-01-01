@@ -444,7 +444,8 @@ void CMaterialSystem::CreateCompositorMaterials()
 
 		IMaterialInternal *pMatqf = assert_cast< IMaterialInternal* >( FindMaterial( pszMaterial, TEXTURE_GROUP_RUNTIME_COMPOSITE ) );
 		Assert( pMatqf );
-		Assert( !pMatqf->IsErrorMaterial() );
+		// dimhotepus: Show missed material name.
+		AssertMsg( !pMatqf->IsErrorMaterial(), "Material %s is missed", pszMaterial );
 		IMaterialInternal *pMatrt = pMatqf->GetRealTimeVersion();
 		Assert( pMatrt );
 		pMatrt->IncrementReferenceCount(); // Hold a ref.
