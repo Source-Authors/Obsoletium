@@ -1276,7 +1276,10 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 	}
 
 #if defined(NO_STEAM)
+	// dimhotepus: Show assert only for X360
+#if defined(_X360)
 		AssertMsg( false, "SteamCloud not available on Xbox 360. Badger Martin to fix this." );
+#endif
 #else
 		ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
 			SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
