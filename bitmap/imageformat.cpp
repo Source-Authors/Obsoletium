@@ -354,7 +354,10 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 		return IMAGE_FORMAT_R32F;
 	case D3DFMT_A32B32G32R32F:
 		return IMAGE_FORMAT_RGBA32323232F;
-
+		
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
+	MSVC_DISABLE_WARNING(4063)
 	// DST and FOURCC formats mapped back to ImageFormat (for vendor-dependent shadow depth textures)
 	case (D3DFORMAT)(MAKEFOURCC('R','A','W','Z')):
 		return IMAGE_FORMAT_NV_RAWZ;
@@ -362,6 +365,7 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 		return IMAGE_FORMAT_NV_INTZ;
 	case (D3DFORMAT)(MAKEFOURCC('N','U','L','L')):
 		return IMAGE_FORMAT_NV_NULL;
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
 	case D3DFMT_D16:
 #if !defined( _X360 )
 		return IMAGE_FORMAT_NV_DST16;
@@ -374,6 +378,9 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 #else
 		return IMAGE_FORMAT_X360_DST24;
 #endif
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
+	MSVC_DISABLE_WARNING(4063)
 	case (D3DFORMAT)(MAKEFOURCC('D','F','1','6')):
 		return IMAGE_FORMAT_ATI_DST16;
 	case (D3DFORMAT)(MAKEFOURCC('D','F','2','4')):
@@ -384,6 +391,7 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 		return IMAGE_FORMAT_ATI1N;
 	case (D3DFORMAT)(MAKEFOURCC('A','T','I','2')):
 		return IMAGE_FORMAT_ATI2N;
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
 
 #if defined( _X360 )
 	case D3DFMT_LIN_A8R8G8B8:
