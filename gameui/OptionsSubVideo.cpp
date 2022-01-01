@@ -662,7 +662,8 @@ public:
 
 	void ApplyChangesToConVar( const char *pConVarName, int value )
 	{
-		Assert( cvar->FindVar( pConVarName ) );
+		// dimhotepus: Dump missed convar.
+		AssertMsg( cvar->FindVar( pConVarName ), "Missed con var %s", pConVarName);
 		char szCmd[256];
 		Q_snprintf( szCmd, sizeof(szCmd), "%s %d\n", pConVarName, value );
 		engine->ClientCmd_Unrestricted( szCmd );
