@@ -122,15 +122,15 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
 	case WM_MBUTTONDOWN:
-	case MS_WM_XBUTTONDOWN:
+	case WM_XBUTTONDOWN:
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
 	case WM_MBUTTONUP:
-	case MS_WM_XBUTTONUP:
+	case WM_XBUTTONUP:
 	case WM_LBUTTONDBLCLK:
 	case WM_RBUTTONDBLCLK:
 	case WM_MBUTTONDBLCLK:
-	case MS_WM_XBUTTONDBLCLK:
+	case WM_XBUTTONDBLCLK:
 		event.m_nType = IE_LocateMouseClick;
 		event.m_nData = (short)LOWORD(lParam);
 		event.m_nData2 = (short)HIWORD(lParam);

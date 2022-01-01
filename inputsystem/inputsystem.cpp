@@ -1336,9 +1336,9 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		}
 		break;
 
-	case MS_WM_XBUTTONDOWN:
+	case WM_XBUTTONDOWN:
 		{
-			ButtonCode_t code = ( HIWORD( wParam ) == 1 ) ? MOUSE_4 : MOUSE_5;
+			ButtonCode_t code = ( GET_XBUTTON_WPARAM( wParam ) == XBUTTON1 ) ? MOUSE_4 : MOUSE_5;
 			int nButtonMask = ButtonMaskFromMouseWParam( wParam, code, true );
 			UpdateMouseButtonState( nButtonMask );
 
@@ -1347,9 +1347,9 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		}
 		break;
 
-	case MS_WM_XBUTTONUP:
+	case WM_XBUTTONUP:
 		{
-			ButtonCode_t code = ( HIWORD( wParam ) == 1 ) ? MOUSE_4 : MOUSE_5;
+			ButtonCode_t code = ( GET_XBUTTON_WPARAM( wParam ) == XBUTTON1 ) ? MOUSE_4 : MOUSE_5;
 			int nButtonMask = ButtonMaskFromMouseWParam( wParam, code, false );
 			UpdateMouseButtonState( nButtonMask );
 
@@ -1382,9 +1382,9 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		}
 		break;
 
-	case MS_WM_XBUTTONDBLCLK:
+	case WM_XBUTTONDBLCLK:
 		{
-			ButtonCode_t code = ( HIWORD( wParam ) == 1 ) ? MOUSE_4 : MOUSE_5;
+			ButtonCode_t code = ( GET_XBUTTON_WPARAM( wParam ) == XBUTTON1 ) ? MOUSE_4 : MOUSE_5;
 			int nButtonMask = ButtonMaskFromMouseWParam( wParam, code, true );
 			UpdateMouseButtonState( nButtonMask, code );
 

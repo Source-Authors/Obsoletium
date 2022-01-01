@@ -3762,27 +3762,27 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 	
 	switch (msg)
 	{
-		case MS_WM_XBUTTONDOWN:
+		case WM_XBUTTONDOWN:
 		{
 			PostCursorMoved( hwnd, lparam );
-			MouseCode code = ( HIWORD( wparam ) == 1 ) ? MOUSE_4 : MOUSE_5;
+			MouseCode code = ( GET_XBUTTON_WPARAM( wparam ) == XBUTTON1 ) ? MOUSE_4 : MOUSE_5;
 			g_pInput->SetMouseCodeState( code, BUTTON_PRESSED );
 			g_pInput->InternalMousePressed( code );
 			break;
 		}
-		case MS_WM_XBUTTONUP:
+		case WM_XBUTTONUP:
 		{
 			PostCursorMoved( hwnd, lparam );
-			MouseCode code = ( HIWORD( wparam ) == 1 ) ? MOUSE_4 : MOUSE_5;
+			MouseCode code = ( GET_XBUTTON_WPARAM( wparam ) == XBUTTON1 ) ? MOUSE_4 : MOUSE_5;
 			g_pInput->SetMouseCodeState( code, BUTTON_RELEASED );
 			g_pInput->InternalMouseReleased( code );
 			break;
 		}
 
-		case MS_WM_XBUTTONDBLCLK:
+		case WM_XBUTTONDBLCLK:
 		{
 			PostCursorMoved( hwnd, lparam );
-			MouseCode code = ( HIWORD( wparam ) == 1 ) ? MOUSE_4 : MOUSE_5;
+			MouseCode code = ( GET_XBUTTON_WPARAM( wparam ) == XBUTTON1 ) ? MOUSE_4 : MOUSE_5;
 			g_pInput->SetMouseCodeState( code, BUTTON_DOUBLECLICKED );
 			g_pInput->InternalMouseDoublePressed( code );
 			break;
@@ -3790,9 +3790,9 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 
 		case WM_CREATE:
 		{
-	        s_uTaskbarRestart = RegisterWindowMessage(TEXT("TaskbarCreated"));
+			s_uTaskbarRestart = RegisterWindowMessage(TEXT("TaskbarCreated"));
 			break;
-        }
+		}
 		case WM_CLOSE:
 		{
 			// tell the panel to close
