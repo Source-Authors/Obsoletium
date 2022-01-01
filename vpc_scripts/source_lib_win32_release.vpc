@@ -62,7 +62,8 @@ $Configuration "Release"
 		// General
 		$AdditionalIncludeDirectories		"$SRCDIR\common;$SRCDIR\public;$SRCDIR\public\tier0;$SRCDIR\public\tier1"
 		$Resolve#UsingReferences
-		$DebugInformationFormat				"C7 Compatible (/Z7)"
+		// dimhotepus: Use compatible with SAFE_SEH debug info format.
+		$DebugInformationFormat				"Program Database (/Zi)"
 		$SuppressStartupBanner
 		$WarningLevel						"Level 4 (/W4)"
 		$Detect64bitPortabilityIssues		"Yes (/Wp64)"

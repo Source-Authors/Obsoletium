@@ -65,6 +65,7 @@ $Configuration "Release"
 		// General
 		$AdditionalIncludeDirectories		"$SRCDIR\common;$SRCDIR\public;$SRCDIR\public\tier0;$SRCDIR\public\tier1"
 		$Resolve#UsingReferences
+		// dimhotepus: Use compatible with SAFE_SEH debug info format.
 		$DebugInformationFormat				"Program Database (/Zi)"
 		$SuppressStartupBanner
 		$WarningLevel						"Level 4 (/W4)"
@@ -256,8 +257,8 @@ $Configuration "Release"
 		$DelaySign
 		$ErrorReporting
 		$CLRUnmanagedCodeCheck
-		// Most DLLs cannot yet handle SafeSEH
-		$ImageHasSafeExceptionHandlers		"false"
+		// dimhotepus: Enable SAFE_SEH.
+		$ImageHasSafeExceptionHandlers		"true"
 
 		// Command Line
 		$AdditionalOptions						

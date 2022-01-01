@@ -56,8 +56,8 @@ $Configuration "Debug"
 		// General
 		$AdditionalIncludeDirectories		"$SRCDIR\common;$SRCDIR\public;$SRCDIR\public\tier0;$SRCDIR\public\tier1"
 		$Resolve#UsingReferences
-		$DebugInformationFormat				"Program Database for Edit & Continue (/ZI)" [$WIN32]
-		$DebugInformationFormat				"Program Database (/Zi)" [$WIN64]		
+		// dimhotepus: Use compatible with SAFE_SEH debug info format.
+		$DebugInformationFormat				"Program Database (/Zi)"
 		$SuppressStartupBanner		
 		$WarningLevel						"Level 4 (/W4)"
 		$Detect64bitPortabilityIssues		"Yes (/Wp64)"

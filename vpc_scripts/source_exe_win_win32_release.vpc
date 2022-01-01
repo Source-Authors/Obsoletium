@@ -256,8 +256,8 @@ $Configuration "Release"
 		$DelaySign
 		$ErrorReporting
 		$CLRUnmanagedCodeCheck
-		// Most DLLs cannot yet handle SafeSEH
-		$ImageHasSafeExceptionHandlers		"false"
+		// dimhotepus: Enable SAFE_SEH.
+		$ImageHasSafeExceptionHandlers		"true"
 
 		// Command Line
 		$AdditionalOptions						
