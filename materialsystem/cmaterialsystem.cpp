@@ -466,7 +466,12 @@ void CMaterialSystem::CleanUpCompositorMaterials()
 			continue;
 
 		m_pCompositorMaterials[ i ]->DecrementReferenceCount();
-		RemoveMaterial( m_pCompositorMaterials[ i ] );
+
+		// dimhotepus: Remove only loaded material, as nothing to remove + warning for not loaded one.
+		if ( !m_pCompositorMaterials[i]->IsErrorMaterial() )
+		{
+			RemoveMaterial( m_pCompositorMaterials[ i ] );
+		}
 	}
 
 	m_pCompositorMaterials.RemoveAll();
