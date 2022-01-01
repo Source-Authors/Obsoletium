@@ -647,11 +647,17 @@ void CMatSystemSurface::StartDrawing( void )
 		
 		const char *pX = CommandLine()->ParmValue( "-pixel_offset_x", (const char*)NULL );
 		if ( pX )
-			g_flPixelOffsetX = atof( pX );
+		{
+			// dimhotepus: atof -> strtof
+			g_flPixelOffsetX = strtof( pX, nullptr );
+		}
 
 		const char *pY = CommandLine()->ParmValue( "-pixel_offset_y", (const char*)NULL );
 		if ( pY )
-			g_flPixelOffsetY = atof( pY );
+		{
+			// dimhotepus: atof -> strtof
+			g_flPixelOffsetY = strtof( pY, nullptr );
+		}
 	}
 
 	g_bInDrawing = true;
@@ -1380,12 +1386,12 @@ void CMatSystemSurface::DrawOutlinedCircle(int x, int y, int radius, int segment
 	vertex[0].m_Position.Init( m_nTranslateX + x + radius, m_nTranslateY + y );
 	vertex[0].m_TexCoord.Init( 1.0f, 0.5f );
 
-	float invDelta = 2.0f * M_PI / segments;
+	float invDelta = 2.0f * M_PI_F / segments;
 	for ( int i = 1; i <= segments; ++i )
 	{
 		float flRadians = i * invDelta;
-		float ca = cos( flRadians );
-		float sa = sin( flRadians );
+		float ca = cosf( flRadians );
+		float sa = sinf( flRadians );
 					 
 		// Rotate it around the circle
 		vertex[1].m_Position.x = m_nTranslateX + x + (radius * ca);
@@ -2431,7 +2437,7 @@ void CMatSystemSurface::DrawPrintText(const wchar_t *text, int iTextLen, FontDra
  			vgui::Vertex_t &lr = pQuads[2*iCount + 1];
 			++iCount;
 
-			ul.m_Position.x = x + iTotalWidth + floor(flabcA + 0.6);
+			ul.m_Position.x = x + iTotalWidth + floorf(flabcA + 0.6f);
 			ul.m_Position.y = y;
 			lr.m_Position.x = ul.m_Position.x +  textureWide;
 			lr.m_Position.y = ul.m_Position.y + iTall;
@@ -2455,7 +2461,7 @@ void CMatSystemSurface::DrawPrintText(const wchar_t *text, int iTextLen, FontDra
 			lr.m_TexCoord[1] = texCoords[3];
 		}
 
-		iTotalWidth += floor(flWide+0.6);
+		iTotalWidth += floorf(flWide+0.6f);
 	}
 
 	// Draw any left-over characters
@@ -3492,8 +3498,8 @@ void CMatSystemSurface::DrawColoredCircle( int centerx, int centery, float radiu
 		float flRadians = DEG2RAD( iDegrees );
 		iDegrees += (360 / CIRCLE_POINTS);
 
-		float ca = cos( flRadians );
-		float sa = sin( flRadians );
+		float ca = cosf( flRadians );
+		float sa = sinf( flRadians );
 					 
 		// Rotate it around the circle
 		vecPoint.x = centerx + (radius * sa);
