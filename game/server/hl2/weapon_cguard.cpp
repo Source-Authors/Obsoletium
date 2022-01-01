@@ -475,7 +475,7 @@ void CWeaponCGuard::AddViewKick( void )
 
 	pPlayer->SnapEyeAngles( angles );
 	
-	pPlayer->ViewPunch( QAngle( random->RandomInt( -8, -12 ), random->RandomInt( -2, 2 ), random->RandomInt( -8, 8 ) ) );
+	pPlayer->ViewPunch( QAngle( random->RandomInt( -12, -8 ), random->RandomInt( -2, 2 ), random->RandomInt( -8, 8 ) ) );
 }
 
 #endif
