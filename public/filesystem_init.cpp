@@ -1095,25 +1095,25 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 	// Assume we'll use local files
 	Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_stdio" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
 
-	#if !defined( _X360 )
-		// Use filesystem_steam if it exists?
-		struct stat statBuf;
-		if ( stat( pFileSystemDLL, &statBuf ) == 0 )
-			return FS_OK;
+#if !defined( _X360 )
+	// Use filesystem_steam if it exists?
+	struct stat statBuf;
+	if ( stat( pFileSystemDLL, &statBuf ) == 0 )
+		return FS_OK;
 
-		Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_steam" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
-		if ( stat( pFileSystemDLL, &statBuf ) == 0 )
-		{
-			bSteam = true;
-			return FS_OK;
-		}
+	Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_steam" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
+	if ( stat( pFileSystemDLL, &statBuf ) == 0 )
+	{
+		bSteam = true;
+		return FS_OK;
+	}
 
-		// dimhotepus: Report missed filesystem DLL.
-		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Please ensure game installed correctly.\n\n"
-			"Unable to load filesystem *" DLL_EXT_STRING ": both stdio / steam are absent." );
-	#endif
-
+	// dimhotepus: Report missed filesystem DLL.
+	return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Please ensure game installed correctly.\n\n"
+		"Unable to load filesystem *" DLL_EXT_STRING ": both stdio / steam are absent." );
+#else
 	return FS_OK;
+#endif
 }
 
 
