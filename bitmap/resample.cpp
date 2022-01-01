@@ -196,16 +196,8 @@ static void GenerateNiceFilter( float wratio, float hratio, float dratio, int ke
 static inline unsigned char Clamp( float x )
 {
 	int idx = (int)(x + 0.5f);
-	if (idx < 0) idx = 0;
-	else if (idx > 255) idx = 255;
-	return idx;
+  return static_cast<unsigned char>(std::clamp(idx, 0, 255));
 }
-
-inline bool IsPowerOfTwo( int x )
-{
-	return (x & ( x - 1 )) == 0;
-}
-
 
 struct KernelInfo_t
 {
@@ -444,7 +436,7 @@ public:
 					flAlphaDelta *= flInvFactor;
 					if ( flAlphaDelta > flAlphaThreshhold )
 					{
-						info.m_pDest[ dstPixel + 3 ] = 255.0f;
+						info.m_pDest[ dstPixel + 3 ] = 255U;
 					}
 				}
 			}
@@ -486,7 +478,7 @@ public:
 					else if ( type == KERNEL_ALPHATEST )
 					{
 						// If there's more than 40% coverage, then keep the pixel (renormalize the color based on coverage)
-						float flAlpha = ( total[3] >= flAlphaThreshhold ) ? 255 : 0; 
+						float flAlpha = ( total[3] >= flAlphaThreshhold ) ? 255.0f : 0; 
 
 						for ( int ch = 0; ch < 3; ++ ch )
 							info.m_pDest[ dstPixel + ch ] = Clamp( 255.0f * powf( ( info.m_flColorGoal[ch] + ( info.m_flColorScale[ch] * ( ( total[ch] > 0 ? total[ch] : 0 ) - info.m_flColorGoal[ch] ) ) ) / 255.0f, invDstGamma ) );

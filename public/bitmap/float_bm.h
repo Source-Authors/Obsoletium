@@ -46,10 +46,10 @@ inline PixRGBAF PixRGBA8_to_F( PixRGBA8 const &x )
 inline PixRGBA8 PixRGBAF_to_8( PixRGBAF const &f )
 {
 	PixRGBA8 x;
-	x.Red = max( 0.f, min( 255.f,255.f*f.Red ) );
-	x.Green = max( 0.f, min( 255.f,255.f*f.Green ) );
-	x.Blue = max( 0.f, min( 255.f,255.f*f.Blue ) );
-	x.Alpha = max( 0.f, min( 255.f,255.f*f.Alpha ) );
+	x.Red = static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Red ) ));
+	x.Green = static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Green ) ));
+	x.Blue = static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Blue ) ));
+	x.Alpha = static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Alpha ) ));
 	return x;
 }
 

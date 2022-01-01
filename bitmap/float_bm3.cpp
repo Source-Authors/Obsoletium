@@ -19,8 +19,8 @@ void FloatBitMap_t::InitializeWithRandomPixelsFromAnotherFloatBM(FloatBitMap_t c
 	for(int y=0;y<Height;y++)
 		for(int x=0;x<Width;x++)
 		{
-			float x1=RandomInt(0,other.Width-1);
-			float y1=RandomInt(0,other.Height-1);
+			int x1=RandomInt(0,other.Width-1);
+			int y1=RandomInt(0,other.Height-1);
 			for(int c=0;c<4;c++)
 			{
 				Pixel(x,y,c)=other.Pixel(x1,y1,c);

@@ -409,74 +409,6 @@ void OutputRowBGRX5551( CUtlBuffer& buf, TGAHeader_t const& header, unsigned cha
 	}
 }
 
-static OutputRowFunc_t GetOutputRowFunc( ImageFormat imageFormat )
-{
-	switch( imageFormat )
-	{
-	case IMAGE_FORMAT_RGBA8888:
-		return &OutputRowRGBA8888;
-	case IMAGE_FORMAT_ABGR8888:
-		return &OutputRowABGR8888;
-	case IMAGE_FORMAT_RGB888:
-		return &OutputRowRGB888;
-	case IMAGE_FORMAT_BGR888:
-		return &OutputRowBGR888;
-	case IMAGE_FORMAT_RGB565:
-		return &OutputRowRGB565;
-	case IMAGE_FORMAT_I8:
-		return &OutputRowI8;
-	case IMAGE_FORMAT_IA88:
-		return &OutputRowIA88;
-	case IMAGE_FORMAT_A8:
-		return &OutputRowA8;
-	case IMAGE_FORMAT_RGB888_BLUESCREEN:
-		return &OutputRowRGB888BlueScreen;
-	case IMAGE_FORMAT_BGR888_BLUESCREEN:
-		return &OutputRowBGR888BlueScreen;
-	case IMAGE_FORMAT_ARGB8888:
-		return &OutputRowARGB8888;
-	case IMAGE_FORMAT_BGRA8888:
-		return &OutputRowBGRA8888;
-	case IMAGE_FORMAT_BGRX8888:
-		return &OutputRowBGRX8888;
-	case IMAGE_FORMAT_BGR565:
-		return &OutputRowBGR565;
-	case IMAGE_FORMAT_BGRX5551:
-		return &OutputRowBGRX5551;
-#ifdef _X360
-	case IMAGE_FORMAT_LINEAR_RGB888:
-		return &OutputRowRGB888;
-	case IMAGE_FORMAT_LINEAR_BGR888:
-		return &OutputRowBGR888;
-#endif
-	default:
-		return NULL;
-		break;
-	}
-}
-
-#if 0
-static void InitSourceGammaConversionTable( float srcGamma )
-{
-	static float lastSrcGamma = -1;
-	if (lastSrcGamma == srcGamma)
-		return;
-
-	lastSrcGamma = srcGamma;
-	ImageLoader::ConstructGammaTable( g_SrcGammaTable, srcGamma, 1.0f );
-}
-
-static void InitDestGammaConversionTable( float dstGamma )
-{
-	static float lastDstGamma = -1;
-	if (lastDstGamma == dstGamma)
-		return;
-
-	lastDstGamma = dstGamma;
-	ImageLoader::ConstructGammaTable( g_DstGammaTable, 1.0f, dstGamma );
-}
-#endif
-
 //-----------------------------------------------------------------------------
 // Reads an 8-bit palettized TGA image
 //-----------------------------------------------------------------------------
@@ -845,31 +777,6 @@ static bool ReadSourceImage( CUtlBuffer& buf, TGAHeader_t& header, CTempImage& i
 
 	return true;
 }
-
-#if 0
-//-----------------------------------------------------------------------------
-// Outputs the final image
-//-----------------------------------------------------------------------------
-static bool OutputImage( CTempImage& image, TGAHeader_t& header, 
-						 ImageFormat imageFormat, unsigned char* pDst )
-{
-	// How do we write?
-	OutputRowFunc_t OutputRowFunc = GetOutputRowFunc( imageFormat );
-	if( !OutputRowFunc )
-		return false;
-
-	CUtlBuffer buf( image.Base(), image.NumAllocated(), CUtlBuffer::READ_ONLY );
-	unsigned char* pDstBits;
-	for( int row = 0; row < header.height; ++row )
-	{
-		pDstBits = pDst + 
-			row * header.width * ImageLoader::SizeInBytes(imageFormat);
-		OutputRowFunc( buf, header, pDstBits );
-	}
-
-	return true;
-}
-#endif
 
 //-----------------------------------------------------------------------------
 // Parses the lovely bits previously read from disk

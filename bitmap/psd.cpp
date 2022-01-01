@@ -183,18 +183,18 @@ PSDImageResources PSDGetImageResources( CUtlBuffer &buf )
 //-----------------------------------------------------------------------------
 static inline void CMYKToRGB( RGBA8888_t &color )
 {
-	unsigned char nCyan = 255 - color.r;
-	unsigned char nMagenta = 255 - color.g;
-	unsigned char nYellow = 255 - color.b;
-	unsigned char nBlack = 255 - color.a;
+	unsigned char nCyan = 255U - color.r;
+	unsigned char nMagenta = 255U - color.g;
+	unsigned char nYellow = 255U - color.b;
+	unsigned char nBlack = 255U - color.a;
 
-	int nCyanBlack		= (int)nCyan + (int)nBlack;
-	int nMagentaBlack	= (int)nMagenta + (int)nBlack;
-	int nYellowBlack	= (int)nYellow + (int)nBlack;
-	color.r = ( nCyanBlack < 255 ) ? 255 - nCyanBlack : 0;
-	color.g = ( nMagentaBlack < 255 ) ? 255 - nMagentaBlack : 0;
-	color.b = ( nYellowBlack < 255 ) ? 255 - nYellowBlack : 0;
-	color.a = 255;
+	unsigned short nCyanBlack = (unsigned short)nCyan + (unsigned short)nBlack;
+	unsigned short nMagentaBlack	= (unsigned short)nMagenta + (unsigned short)nBlack;
+	unsigned short nYellowBlack	= (unsigned short)nYellow + (unsigned short)nBlack;
+	color.r = static_cast<unsigned char>(( nCyanBlack < 255U ) ? 255U - nCyanBlack : 0);
+	color.g = static_cast<unsigned char>(( nMagentaBlack < 255U ) ? 255U - nMagentaBlack : 0);
+	color.b = static_cast<unsigned char>(( nYellowBlack < 255U ) ? 255U - nYellowBlack : 0);
+	color.a = 255U;
 }
 
 

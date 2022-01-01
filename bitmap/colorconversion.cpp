@@ -57,10 +57,8 @@ static void RGBA8888ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToABGR8888( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToRGB888( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToBGR888( const uint8 *src, uint8 *dst, int numPixels );
-static void RGBA8888ToRGB565( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToI8( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToIA88( const uint8 *src, uint8 *dst, int numPixels );
-static void RGBA8888ToP8( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToA8( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToRGB888_BLUESCREEN( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToBGR888_BLUESCREEN( const uint8 *src, uint8 *dst, int numPixels );
@@ -79,10 +77,8 @@ static void RGBA8888ToUVLX8888( const uint8 *src, uint8 *dst, int numPixels );
 static void ABGR8888ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 static void RGB888ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 static void BGR888ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
-static void RGB565ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 static void I8ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 static void IA88ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
-static void P8ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 static void A8ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 static void RGB888_BLUESCREENToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 static void BGR888_BLUESCREENToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
@@ -1908,15 +1904,6 @@ void RGBA8888ToBGR888( const uint8 *src, uint8 *dst, int numPixels )
 	}
 }
 
-void RGBA8888ToRGB565( const uint8 *src, uint8 *dst, int numPixels )
-{
-	Assert( 0 );
-	const uint8 *endSrc = src + numPixels * 4;
-	for ( ; src < endSrc; src += 4, dst += 2 )
-	{
-	}
-}
-
 void RGBA8888ToI8( const uint8 *src, uint8 *dst, int numPixels )
 {
 	const uint8 *endSrc = src + numPixels * 4;
@@ -1935,11 +1922,6 @@ void RGBA8888ToIA88( const uint8 *src, uint8 *dst, int numPixels )
 		dst[0] = ( uint8 )( 0.299f * src[0] + 0.587f * src[1] + 0.114f * src[2] );
 		dst[1] = src[3];
 	}
-}
-
-void RGBA8888ToP8( const uint8 *src, uint8 *dst, int numPixels )
-{
-	Assert( 0 );
 }
 
 void RGBA8888ToA8( const uint8 *src, uint8 *dst, int numPixels )
@@ -2132,15 +2114,6 @@ void BGR888ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 	}
 }
 
-void RGB565ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
-{
-	Assert( 0 );
-	const uint8 *endSrc = src + numPixels * 2;
-	for ( ; src < endSrc; src += 2, dst += 4 )
-	{
-	}
-}
-
 void I8ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 {
 	const uint8 *endSrc = src + numPixels;
@@ -2163,11 +2136,6 @@ void IA88ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 		dst[2] = src[0];
 		dst[3] = src[1];
 	}
-}
-
-void P8ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
-{
-	Assert( 0 );
 }
 
 void A8ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
@@ -2268,15 +2236,15 @@ void BGR565ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 	unsigned short* pEndSrc = pSrcShort + numPixels;
 	for ( ; pSrcShort < pEndSrc; pSrcShort++, dst += 4 )
 	{
-		int blue = (*pSrcShort & 0x1F);
-		int green = (*pSrcShort >> 5) & 0x3F;
-		int red = (*pSrcShort >> 11) & 0x1F;
+		unsigned blue = (*pSrcShort & 0x1FU);
+		unsigned green = (*pSrcShort >> 5) & 0x3FU;
+		unsigned red = (*pSrcShort >> 11) & 0x1FU;
 
 		// Expand to 8 bits
-		dst[0] = (red << 3) | (red >> 2);
-		dst[1] = (green << 2) | (green >> 4);
-		dst[2] = (blue << 3) | (blue >> 2);
-		dst[3] = 255;
+		dst[0] = static_cast<uint8>((red << 3) | (red >> 2));
+		dst[1] = static_cast<uint8>((green << 2) | (green >> 4));
+		dst[2] = static_cast<uint8>((blue << 3) | (blue >> 2));
+		dst[3] = 255U;
 	}
 }
 
@@ -2286,15 +2254,15 @@ void BGRX5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 	unsigned short* pEndSrc = pSrcShort + numPixels;
 	for ( ; pSrcShort < pEndSrc; pSrcShort++, dst += 4 )
 	{
-		int blue = (*pSrcShort & 0x1F);
-		int green = (*pSrcShort >> 5) & 0x1F;
-		int red = (*pSrcShort >> 10) & 0x1F;
+		unsigned blue = (*pSrcShort & 0x1FU);
+		unsigned green = (*pSrcShort >> 5) & 0x1FU;
+		unsigned red = (*pSrcShort >> 10) & 0x1FU;
 
 		// Expand to 8 bits
-		dst[0] = (red << 3) | (red >> 2);
-		dst[1] = (green << 3) | (green >> 2);
-		dst[2] = (blue << 3) | (blue >> 2);
-		dst[3] = 255;
+		dst[0] = static_cast<uint8>((red << 3) | (red >> 2));
+		dst[1] = static_cast<uint8>((green << 3) | (green >> 2));
+		dst[2] = static_cast<uint8>((blue << 3) | (blue >> 2));
+		dst[3] = 255U;
 	}
 }
 
@@ -2304,19 +2272,19 @@ void BGRA5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 	unsigned short* pEndSrc = pSrcShort + numPixels;
 	for ( ; pSrcShort < pEndSrc; pSrcShort++, dst += 4 )
 	{
-		int blue = (*pSrcShort & 0x1F);
-		int green = (*pSrcShort >> 5) & 0x1F;
-		int red = (*pSrcShort >> 10) & 0x1F;
-		int alpha = *pSrcShort & ( 1 << 15 );
+		unsigned blue = (*pSrcShort & 0x1FU);
+		unsigned green = (*pSrcShort >> 5) & 0x1FU;
+		unsigned red = (*pSrcShort >> 10) & 0x1FU;
+		unsigned alpha = *pSrcShort & ( 1 << 15 );
 
 		// Expand to 8 bits
-		dst[0] = (red << 3) | (red >> 2);
-		dst[1] = (green << 3) | (green >> 2);
-		dst[2] = (blue << 3) | (blue >> 2);
+		dst[0] = static_cast<uint8>((red << 3) | (red >> 2));
+		dst[1] = static_cast<uint8>((green << 3) | (green >> 2));
+		dst[2] = static_cast<uint8>((blue << 3) | (blue >> 2));
 		// garymcthack
 		if( alpha )
 		{
-			dst[3] = 255;
+			dst[3] = 255U;
 		}
 		else
 		{
@@ -2331,17 +2299,17 @@ void BGRA4444ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 	unsigned short* pEndSrc = pSrcShort + numPixels;
 	for ( ; pSrcShort < pEndSrc; pSrcShort++, dst += 4 )
 	{
-		int blue = (*pSrcShort & 0xF);
-		int green = (*pSrcShort >> 4) & 0xF;
-		int red = (*pSrcShort >> 8) & 0xF;
-		int alpha = (*pSrcShort >> 12) & 0xF;
+		unsigned blue = (*pSrcShort & 0xFU);
+		unsigned green = (*pSrcShort >> 4) & 0xFU;
+		unsigned red = (*pSrcShort >> 8) & 0xFU;
+		unsigned alpha = (*pSrcShort >> 12) & 0xFU;
 
 		// Expand to 8 bits
 		// FIXME: shouldn't this be (red << 4) | red?
-		dst[0] = (red << 4) | (red >> 4);
-		dst[1] = (green << 4) | (green >> 4);
-		dst[2] = (blue << 4) | (blue >> 4);
-		dst[3] = (alpha << 4) | (alpha >> 4);
+		dst[0] = static_cast<uint8>((red << 4) | (red >> 4));
+		dst[1] = static_cast<uint8>((green << 4) | (green >> 4));
+		dst[2] = static_cast<uint8>((blue << 4) | (blue >> 4));
+		dst[3] = static_cast<uint8>((alpha << 4) | (alpha >> 4));
 	}
 }
 
@@ -2374,10 +2342,10 @@ void RGBA16161616ToRGBA8888( const uint8 *src_, uint8 *dst, int numPixels )
 	unsigned short *pEndSrc = src + numPixels * 4;
 	for ( ; src < pEndSrc; src += 4, dst += 4 )
 	{
-		dst[0] = min( 255, src[0] >> 4 );
-		dst[1] = min( 255, src[1] >> 4 );
-		dst[2] = min( 255, src[2] >> 4 );
-		dst[3] = min( 255, src[3] >> 8 );
+		dst[0] = static_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[0] >> 4) ));
+		dst[1] = static_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[1] >> 4) ));
+		dst[2] = static_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[2] >> 4) ));
+		dst[3] = static_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[3] >> 8) ));
 	}
 }
 
