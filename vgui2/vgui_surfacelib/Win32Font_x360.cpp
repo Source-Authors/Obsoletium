@@ -23,8 +23,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-bool s_bSupportsUnicode = true;
-
 //-----------------------------------------------------------------------------
 // Determine possible style from parameters.
 //-----------------------------------------------------------------------------

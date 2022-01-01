@@ -15,10 +15,6 @@
 
 static CFontManager s_FontManager;
 
-#ifdef WIN32
-extern bool s_bSupportsUnicode;
-#endif
-
 #if !defined( _X360 )
 #define MAX_INITIAL_FONTS	100
 #else
