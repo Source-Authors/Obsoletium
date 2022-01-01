@@ -256,8 +256,8 @@ $Configuration "Release"
 		$DelaySign
 		$ErrorReporting
 		$CLRUnmanagedCodeCheck
-		// dimhotepus: Enable SAFE_SEH.
-		$ImageHasSafeExceptionHandlers		"true"
+		// dimhotepus: Enable SAFE_SEH (Default).
+		$ImageHasSafeExceptionHandlers
 
 		// Command Line
 		$AdditionalOptions						
