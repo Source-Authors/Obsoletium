@@ -18,6 +18,10 @@
 static void initKeymap(void);
 #endif
 
+#ifdef WIN32
+#include <hidusage.h>
+#endif
+
 #ifdef _X360
 #include "xbox/xbox_win32stubs.h"
 #endif
@@ -29,31 +33,6 @@ ConVar joy_xcontroller_found( "joy_xcontroller_found", "1", FCVAR_HIDDEN, "Autom
 static CInputSystem g_InputSystem;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CInputSystem, IInputSystem, 
 						INPUTSYSTEM_INTERFACE_VERSION, g_InputSystem );
-
-
-
-#if defined( WIN32 ) && !defined( _X360 )
-typedef BOOL (WINAPI *RegisterRawInputDevices_t)
-(
-	PCRAWINPUTDEVICE pRawInputDevices,
-	UINT uiNumDevices,
-	UINT cbSize
-);
-
-typedef UINT (WINAPI *GetRawInputData_t)
-(
-	HRAWINPUT hRawInput,
-	UINT uiCommand,
-	LPVOID pData,
-	PUINT pcbSize,
-	UINT cbSizeHeader
-);
-
-RegisterRawInputDevices_t pfnRegisterRawInputDevices;
-GetRawInputData_t pfnGetRawInputData;
-#endif
-
-
 
 //-----------------------------------------------------------------------------
 // Constructor, destructor
@@ -82,7 +61,6 @@ CInputSystem::CInputSystem()
 	Assert( (MAX_JOYSTICKS + 7) >> 3 << sizeof(unsigned short) ); 
 
 	m_pXInputDLL = NULL;
-	m_pRawInputDLL = NULL;
 
 #if defined ( _WIN32 ) && !defined ( _X360 )
 	// NVNT DLL
@@ -104,12 +82,6 @@ CInputSystem::~CInputSystem()
 	{
 		Sys_UnloadModule( m_pXInputDLL );
 		m_pXInputDLL = NULL;
-	}
-
-	if ( m_pRawInputDLL )
-	{
-		Sys_UnloadModule( m_pRawInputDLL );
-		m_pRawInputDLL = NULL;
 	}
 
 #if defined ( _WIN32 ) && !defined ( _X360 )
@@ -204,17 +176,7 @@ InitReturnVal_t CInputSystem::Init()
 
 #elif defined( WIN32 ) && !defined( _X360 )
 
-	// Check if this version of windows supports raw mouse input (later than win2k)
-	m_bRawInputSupported = false;
-
-	CSysModule *m_pRawInputDLL = Sys_LoadModule( "USER32.dll" );
-	if ( m_pRawInputDLL )
-	{
-		pfnRegisterRawInputDevices = (RegisterRawInputDevices_t)GetProcAddress( (HMODULE)m_pRawInputDLL, "RegisterRawInputDevices" );
-		pfnGetRawInputData = (GetRawInputData_t)GetProcAddress( (HMODULE)m_pRawInputDLL, "GetRawInputData" );
-		if ( pfnRegisterRawInputDevices && pfnGetRawInputData )
-			m_bRawInputSupported = true;
-	}
+	m_bRawInputSupported = true;
 
 #endif
 
@@ -312,23 +274,12 @@ void CInputSystem::AttachToWindow( void* hWnd )
 	AttachWindowToNovintDevices( hWnd );
 
 	// register to read raw mouse input
-
-#if !defined(HID_USAGE_PAGE_GENERIC)
-#define HID_USAGE_PAGE_GENERIC         ((USHORT) 0x01)
-#endif
-#if !defined(HID_USAGE_GENERIC_MOUSE)
-#define HID_USAGE_GENERIC_MOUSE        ((USHORT) 0x02)
-#endif
-
-	if ( m_bRawInputSupported )
-	{
-		RAWINPUTDEVICE Rid[1];
-		Rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC; 
-		Rid[0].usUsage = HID_USAGE_GENERIC_MOUSE; 
-		Rid[0].dwFlags = RIDEV_INPUTSINK;   
-		Rid[0].hwndTarget = g_InputSystem.m_hAttachedHWnd; // GetHhWnd;
-		pfnRegisterRawInputDevices(Rid, ARRAYSIZE(Rid), sizeof(Rid[0]));
-	}
+	RAWINPUTDEVICE Rid[1];
+	Rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
+	Rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+	Rid[0].dwFlags = RIDEV_INPUTSINK;
+	Rid[0].hwndTarget = g_InputSystem.m_hAttachedHWnd; // GetHhWnd;
+	m_bRawInputSupported = !!RegisterRawInputDevices(Rid, ARRAYSIZE(Rid), sizeof(Rid[0]));
 #endif
 
 	// New window, clear input state
@@ -1443,12 +1394,12 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_MOUSEWHEEL:
 		{
-			ButtonCode_t code = (short)HIWORD( wParam ) > 0 ? MOUSE_WHEEL_UP : MOUSE_WHEEL_DOWN;
+			ButtonCode_t code = GET_WHEEL_DELTA_WPARAM( wParam ) > 0 ? MOUSE_WHEEL_UP : MOUSE_WHEEL_DOWN;
 			state.m_ButtonPressedTick[ code ] = state.m_ButtonReleasedTick[ code ] = m_nLastSampleTick;
 			PostEvent( IE_ButtonPressed, m_nLastSampleTick, code, code );
 			PostEvent( IE_ButtonReleased, m_nLastSampleTick, code, code );
 
-			state.m_pAnalogDelta[ MOUSE_WHEEL ] = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+			state.m_pAnalogDelta[ MOUSE_WHEEL ] = GET_WHEEL_DELTA_WPARAM( wParam ) / WHEEL_DELTA;
 			state.m_pAnalogValue[ MOUSE_WHEEL ] += state.m_pAnalogDelta[ MOUSE_WHEEL ];
 			PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_WHEEL, state.m_pAnalogValue[ MOUSE_WHEEL ], state.m_pAnalogDelta[ MOUSE_WHEEL ] );
 		}
@@ -1459,17 +1410,27 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		{
 			if ( m_bRawInputSupported )
 			{
-				UINT dwSize = 40;
-				static BYTE lpb[40];
+				UINT bufferSize{ sizeof(RAWINPUT) };
+				alignas(RAWINPUT) BYTE buffer[sizeof(RAWINPUT)];
 
-				pfnGetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb, &dwSize, sizeof(RAWINPUTHEADER));
-
-				RAWINPUT* raw = (RAWINPUT*)lpb;
-				if (raw->header.dwType == RIM_TYPEMOUSE) 
+				HRAWINPUT hInput = reinterpret_cast<HRAWINPUT>( lParam );
+				if ( UINT_MAX != GetRawInputData(hInput, RID_INPUT, buffer, &bufferSize, sizeof(RAWINPUTHEADER)) )
 				{
-					m_mouseRawAccumX += raw->data.mouse.lLastX;
-					m_mouseRawAccumY += raw->data.mouse.lLastY;
-				} 
+					RAWINPUT* raw = reinterpret_cast<RAWINPUT*>( buffer );
+					if (raw->header.dwType == RIM_TYPEMOUSE) 
+					{
+						m_mouseRawAccumX += raw->data.mouse.lLastX;
+						m_mouseRawAccumY += raw->data.mouse.lLastY;
+					}
+				}
+			}
+
+			if ( wParam == RIM_INPUT && !m_ChainedWndProc )
+			{
+				// dimhotepus: Input occurred while the application was in the foreground.
+				// The application must call DefWindowProc so the system can perform cleanup.
+				// If no chained proc which should handle this, than do.
+				return DefWindowProc( hwnd, uMsg, wParam, lParam );
 			}
 		}
 		break;

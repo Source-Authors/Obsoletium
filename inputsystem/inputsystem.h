@@ -448,7 +448,6 @@ public:
 	HANDLE m_hEvent;
 
 	CSysModule   *m_pXInputDLL;
-	CSysModule   *m_pRawInputDLL;
 	
 #if defined( WIN32 ) && !defined ( _X360 )
 	// NVNT falcon module
