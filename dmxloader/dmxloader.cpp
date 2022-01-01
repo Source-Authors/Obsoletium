@@ -545,7 +545,7 @@ bool SerializeDMX( const char *pFileName, const char *pPathID, bool bTextMode, C
 	if ( !buf.IsValid() )
 	{
 		Warning( "SerializeDMX: Unable to open file \"%s\"\n", pFullPath );
-		return DMFILEID_INVALID;
+		return false;
 	}
 
 	return SerializeDMX( buf, pRoot, pFullPath );
