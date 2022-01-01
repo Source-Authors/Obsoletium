@@ -583,10 +583,6 @@ void CInput::AccumulateMouse( void )
 	int w, h;
 	engine->GetScreenSize( w, h );
 
-	// x,y = screen center
-	int x = w >> 1;	x;
-	int y = h >> 1;	y;
-
 	//only accumulate mouse if we are not moving the camera with the mouse
 	if ( !m_fCameraInterceptingMouse && vgui::surface()->IsCursorLocked() )
 	{
@@ -594,8 +590,11 @@ void CInput::AccumulateMouse( void )
 		// By design, we follow the old mouse path even when using SDL for Windows, to retain old mouse behavior.
 #if defined( PLATFORM_WINDOWS )
 		int current_posx, current_posy;
-
 		GetMousePos(current_posx, current_posy);
+
+		// x,y = screen center
+		int x = w >> 1;
+		int y = h >> 1;
 
 		m_flAccumulatedMouseXMovement += current_posx - x;
 		m_flAccumulatedMouseYMovement += current_posy - y;
@@ -616,12 +615,13 @@ void CInput::AccumulateMouse( void )
 		// Clamp
 		int ox, oy;
 		GetMousePos( ox, oy );
-		ox = clamp( ox, 0, w - 1 );
-		oy = clamp( oy, 0, h - 1 );
-		SetMousePos( ox, oy );
+
+		// dimhotepus: Call costly set mouse pos only when pos is changed.
+		if ( ox != clamp( ox, 0, w - 1 ) || oy != clamp( oy, 0, h - 1 ) )
+		{
+			SetMousePos( ox, oy );
+		}
 	}
-
-
 }
 
 //-----------------------------------------------------------------------------
