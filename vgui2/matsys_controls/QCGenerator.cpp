@@ -124,11 +124,13 @@ void QCInfo::SyncFromControls()
 
 	pTargetField = pQCGenerator->FindChildByName( "massField" );
 	((TextEntry *)pTargetField)->GetText(tempText, MAX_PATH);
-	fMass = atof(tempText);
+	// dimhotepus: atof -> strtof
+	fMass = strtof(tempText, nullptr);
 
 	pTargetField = pQCGenerator->FindChildByName( "scaleField" );
 	((TextEntry *)pTargetField)->GetText(tempText, MAX_PATH);
-	fScale = atof(tempText);
+	// dimhotepus: atof -> strtof
+	fScale = strtof(tempText, nullptr);
 
     pTargetField = pQCGenerator->FindChildByName( "collisionSMDField" );
 	((TextEntry *)pTargetField)->GetText( tempText, MAX_PATH );	

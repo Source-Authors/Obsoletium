@@ -120,13 +120,13 @@ void CVTFPreviewPanel::RenderSphere( const Vector &vCenter, float flRadius, int 
 		{
 			float u = j / ( float )(nTheta - 1);
 			float v = i / ( float )(nPhi - 1);
-			float theta = ( j != nTheta-1 ) ? 2.0f * M_PI * u : 0.0f;
-			float phi = M_PI * v;
+			float theta = ( j != nTheta-1 ) ? 2.0f * M_PI_F * u : 0.0f;
+			float phi = M_PI_F * v;
 
 			Vector vecPos;
-			vecPos.x = flRadius * sin(phi) * cos(theta);
-			vecPos.y = flRadius * cos(phi);
-			vecPos.z = -flRadius * sin(phi) * sin(theta); 
+			vecPos.x = flRadius * sinf(phi) * cosf(theta);
+			vecPos.y = flRadius * cosf(phi);
+			vecPos.z = -flRadius * sinf(phi) * sinf(theta); 
 			    
 			Vector vecNormal = vecPos;
 			VectorNormalize( vecNormal );
@@ -300,10 +300,10 @@ void CVTFPreviewPanel::LookAt( const Vector &vecLookAt, float flRadius )
 	GetSize( w, h );
 	if ( h < w )
 	{
-		flFOVx = atan( h * tan( flFOVx ) / w );
+		flFOVx = atanf( h * tanf( flFOVx ) / w );
 	}
 
-	float flDistance = flRadius / sin( flFOVx );
+	float flDistance = flRadius / sinf( flFOVx );
 
 	Vector vecMDLOrigin = vecLookAt;
 	Vector vecCameraOrigin;
@@ -342,10 +342,10 @@ void CVTFPreviewPanel::SetupProjectionMatrix( int nWidth, int nHeight )
 	float flApsectRatio = (nHeight != 0.0f) ? (float)nWidth / (float)nHeight : 100.0f;
 
 #if 1
-	float halfWidth = tan( flFOV * M_PI / 360.0 );
+	float halfWidth = tanf( flFOV * M_PI_F / 360.0F );
 	float halfHeight = halfWidth / flApsectRatio;
 #else
-	float halfHeight = tan( flFOV * M_PI / 360.0 );
+	float halfHeight = tanf( flFOV * M_PI_F / 360.0F );
 	float halfWidth = flApsectRatio * halfHeight;
 #endif
 	memset( proj.Base(), 0, sizeof( proj ) );

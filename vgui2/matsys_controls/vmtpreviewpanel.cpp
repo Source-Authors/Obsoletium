@@ -144,13 +144,13 @@ void CVMTPreviewPanel::RenderSphere( const Vector &vCenter, float flRadius, int 
 		{
 			float u = j / ( float )(nTheta - 1);
 			float v = i / ( float )(nPhi - 1);
-			float theta = ( j != nTheta-1 ) ? 2.0f * M_PI * u : 0.0f;
-			float phi = M_PI * v;
+			float theta = ( j != nTheta-1 ) ? 2.0f * M_PI_F * u : 0.0f;
+			float phi = M_PI_F * v;
 
 			Vector vecPos;
-			vecPos.x = flRadius * sin(phi) * cos(theta);
-			vecPos.y = flRadius * sin(phi) * sin(theta); 
-			vecPos.z = flRadius * cos(phi);
+			vecPos.x = flRadius * sinf(phi) * cosf(theta);
+			vecPos.y = flRadius * sinf(phi) * sinf(theta); 
+			vecPos.z = flRadius * cosf(phi);
 			    
 			Vector vecNormal = vecPos;
 			VectorNormalize( vecNormal );
@@ -178,7 +178,7 @@ void CVMTPreviewPanel::RenderSphere( const Vector &vCenter, float flRadius, int 
 
 			if ( bIsUsingLightmap )
 			{
-				u1 = RemapVal( u1, 0.0f, 1.0f, flHalfLuxel, 0.25 - flHalfLuxel );
+				u1 = RemapVal( u1, 0.0f, 1.0f, flHalfLuxel, 0.25f - flHalfLuxel );
 
 				if ( bIsUsingBumpedLightmap )
 				{
@@ -371,7 +371,7 @@ void CVMTPreviewPanel::DrawRectangle( void )
 	if ( bIsUsingLightmap )
 	{
 		u1_l = v1_t = flHalfLuxel;
-		u1_r = v1_b = 0.25 - flHalfLuxel;
+		u1_r = v1_b = 0.25f - flHalfLuxel;
 		if ( bIsUsingBumpedLightmap )
 		{
 			u2_l = u2_r = 0.25f;
@@ -498,10 +498,10 @@ void CVMTPreviewPanel::LookAt( const Vector &vecLookAt, float flRadius )
 	GetSize( w, h );
 	if ( h < w )
 	{
-		flFOVx = atan( h * tan( flFOVx ) / w );
+		flFOVx = atanf( h * tanf( flFOVx ) / w );
 	}
 
-	float flDistance = flRadius / sin( flFOVx );
+	float flDistance = flRadius / sinf( flFOVx );
 
 	Vector vecMDLOrigin = vecLookAt;
 	Vector vecCameraOrigin;
@@ -538,7 +538,7 @@ void CVMTPreviewPanel::SetupProjectionMatrix( int nWidth, int nHeight )
 	float flZFar = ZFAR;
 	float flApsectRatio = (nHeight != 0.0f) ? (float)nWidth / (float)nHeight : 100.0f;
 
-	float halfWidth = tan( flFOV * M_PI / 360.0 );
+	float halfWidth = tanf( flFOV * M_PI_F / 360.0F );
 	float halfHeight = halfWidth / flApsectRatio;
 
 	memset( proj.Base(), 0, sizeof( proj ) );

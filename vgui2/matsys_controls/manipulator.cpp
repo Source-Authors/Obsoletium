@@ -185,10 +185,10 @@ void CPotteryWheelManip::UpdateTransform()
 	if ( !m_pTransform )
 		return;
 
-	float y = m_zoom * sin( m_altitude );
-	float xz = m_zoom * cos( m_altitude );
-	float x = xz * sin( m_azimuth );
-	float z = xz * cos( m_azimuth );
+	float y = m_zoom * sinf( m_altitude );
+	float xz = m_zoom * cosf( m_altitude );
+	float x = xz * sinf( m_azimuth );
+	float z = xz * cosf( m_azimuth );
 
 	Vector position(x, y, z);
 	AngleMatrix( RadianEuler( -m_altitude, m_azimuth, 0 ), position, *m_pTransform );

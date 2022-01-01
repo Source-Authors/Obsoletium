@@ -302,13 +302,13 @@ void CVMTPanel::RenderSphere( const Vector &vCenter, float flRadius, int nTheta,
 		{
 			float u = j / ( float )(nTheta - 1);
 			float v = i / ( float )(nPhi - 1);
-			float theta = ( j != nTheta-1 ) ? 2.0f * M_PI * u : 0.0f;
-			float phi = M_PI * v;
+			float theta = ( j != nTheta-1 ) ? 2.0f * M_PI_F * u : 0.0f;
+			float phi = M_PI_F * v;
 
 			Vector vecPos;
-			vecPos.x = flRadius * sin(phi) * cos(theta);
-			vecPos.y = flRadius * sin(phi) * sin(theta); 
-			vecPos.z = flRadius * cos(phi);
+			vecPos.x = flRadius * sinf(phi) * cosf(theta);
+			vecPos.y = flRadius * sinf(phi) * sinf(theta); 
+			vecPos.z = flRadius * cosf(phi);
 			    
 			Vector vecNormal = vecPos;
 			VectorNormalize( vecNormal );
@@ -336,7 +336,7 @@ void CVMTPanel::RenderSphere( const Vector &vCenter, float flRadius, int nTheta,
 
 			if ( bIsUsingLightmap )
 			{
-				u1 = RemapVal( u1, 0.0f, 1.0f, flHalfLuxel, 0.25 - flHalfLuxel );
+				u1 = RemapVal( u1, 0.0f, 1.0f, flHalfLuxel, 0.25f - flHalfLuxel );
 
 				if ( bIsUsingBumpedLightmap )
 				{

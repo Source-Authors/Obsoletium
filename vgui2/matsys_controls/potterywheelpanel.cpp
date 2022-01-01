@@ -122,7 +122,7 @@ void CZoomManipulator::OnCursorMoved( int x, int y )
 {
 	float delta  = 0.2f * ( y - m_lasty );
 	m_lasty = y;
-	*m_pDistance *= pow( 1.01f, delta );
+	*m_pDistance *= powf( 1.01f, delta );
 }
 
 
@@ -358,7 +358,8 @@ void StringToFloatArray( float *pVector, int count, const char *pString )
 
 	for ( j = 0; j < count; j++ )			// lifted from pr_edict.c
 	{
-		pVector[j] = atof( pfront );
+		// dimhotepus: atof -> strtof
+		pVector[j] = strtof( pfront, nullptr );
 
 		// skip any leading whitespace
 		while ( *pstr && *pstr <= ' ' )
@@ -685,10 +686,10 @@ void CPotteryWheelPanel::LookAt( float flRadius )
 	GetSize( w, h );
 	if ( h < w )
 	{
-		flFOVx = atan( h * tan( flFOVx ) / w );
+		flFOVx = atanf( h * tanf( flFOVx ) / w );
 	}
 
-	m_vecCameraOffset.x = -( flRadius / sin( flFOVx ) );
+	m_vecCameraOffset.x = -( flRadius / sinf( flFOVx ) );
 	UpdateCameraTransform();
 }
 
