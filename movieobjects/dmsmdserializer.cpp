@@ -414,7 +414,8 @@ bool CQcData::ParseQc(
 				}
 				else if ( !V_stricmp( tokens[0], "$scale" ) )
 				{
-					m_scale = strtod( tokens[1].Get(), NULL );
+					// dimhotepus: strtod -> strtof
+					m_scale = strtof( tokens[1].Get(), NULL );
 				}
 				else if ( !V_stricmp( tokens[0], "$cdmaterials" ) )
 				{
@@ -1321,29 +1322,6 @@ static void CreatePolygon(
 	pDmeFaceSet->SetIndices( nFaceSetIndex, 1, const_cast< int * >( &nFaceDelimiter ) );
 
 	triangle.Reset();
-}
-
-
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-static CDmeFaceSet *FindOrAddFaceSet(
-	CDmeMesh *pDmeMesh,
-	CUtlMap< CUtlString, CDmeFaceSet * > &faceListMap,
-	const char *pszMaterialPath )
-{
-	CUtlMap< CUtlString, CDmeFaceSet * >::IndexType_t nIndex = faceListMap.Find( CUtlString( pszMaterialPath ) );
-
-	if ( faceListMap.IsValidIndex( nIndex ) )
-		return faceListMap.Element( nIndex );
-
-	CDmeFaceSet *pDmeFaceSet = CreateElement< CDmeFaceSet >( pszMaterialPath, pDmeMesh->GetFileId() );
-	CDmeMaterial *pDmeMaterial = CreateElement< CDmeMaterial >( pszMaterialPath, pDmeMesh->GetFileId() );
-	Assert( pDmeFaceSet && pDmeMaterial );
-	pDmeMaterial->SetMaterial( pszMaterialPath );
-	pDmeMesh->AddFaceSet( pDmeFaceSet );
-
-	return faceListMap.Element( faceListMap.Insert( CUtlString( pszMaterialPath ), pDmeFaceSet ) );
 }
 
 
