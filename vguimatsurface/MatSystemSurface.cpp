@@ -447,8 +447,9 @@ void CMatSystemSurface::Shutdown( void )
 		while ( RemoveFontResourceExA( m_CustomFontFileNames[i].String(), FR_PRIVATE, NULL ) && ( nRetries < 10 ) )
 		{
 			nRetries++;
-			Msg( "Removed font resource %s on attempt %d.\n", m_CustomFontFileNames[i].String(), nRetries );
 		}
+		// dimhotepus: Less noisy font removal traces
+		Msg( "Removed font resource %s on attempt %d.\n", m_CustomFontFileNames[i].String(), nRetries );
  	}
 #endif
 
