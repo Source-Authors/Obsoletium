@@ -48,7 +48,7 @@ HWND GetConsoleHwnd(void)
 	GetConsoleTitle( pszOldWindowTitle, 1024 );
 
 	// Format a "unique" NewWindowTitle.
-	wsprintf( pszNewWindowTitle,"%d/%d", GetTickCount(), GetCurrentProcessId() );
+	sprintf_s( pszNewWindowTitle,"%d/%d", GetTickCount(), GetCurrentProcessId() );
 
 	// Change current window title.
 	SetConsoleTitle(pszNewWindowTitle);

@@ -278,7 +278,7 @@ bool CRegistry::DirectInit( const char *subDirectoryUnderValve )
 	ULONG dwDisposition;    // Type of key opening event
 
 	char szModelKey[ 1024 ];
-	wsprintf( szModelKey, "Software\\Valve\\%s", subDirectoryUnderValve );
+	sprintf_s( szModelKey, "Software\\Valve\\%s", subDirectoryUnderValve );
 
 	lResult = VCRHook_RegCreateKeyEx(
 		HKEY_CURRENT_USER,	// handle of open key 
@@ -308,7 +308,7 @@ bool CRegistry::DirectInit( const char *subDirectoryUnderValve )
 bool CRegistry::Init( const char *platformName )
 {
 	char subDir[ 512 ];
-	wsprintf( subDir, "%s\\Settings", platformName );
+	sprintf_s( subDir, "%s\\Settings", platformName );
 	return DirectInit( subDir );
 }
 
