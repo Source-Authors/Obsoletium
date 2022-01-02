@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <memory.h>
 #if defined( WIN32 ) && !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 #include "ContentControlDialog.h"

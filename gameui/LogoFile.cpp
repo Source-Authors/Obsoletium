@@ -7,7 +7,7 @@
 //=============================================================================//
 
 #if !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #endif
 #include <stdio.h>
 #include "tier1/utlbuffer.h"

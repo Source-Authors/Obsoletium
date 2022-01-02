@@ -7,7 +7,7 @@
 
 #ifdef WIN32
 #if !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #endif
 #include <io.h>
 #include <direct.h>

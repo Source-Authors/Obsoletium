@@ -6,13 +6,8 @@
 //=============================================================================//
 
 
-#if defined( WIN32 ) && !defined( _X360 )
-#include <windows.h> // SRC only!!
-#endif
-
 #include "OptionsSubMultiplayer.h"
 #include "MultiplayerAdvancedDialog.h"
-#include <stdio.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/QueryBox.h>
@@ -1653,90 +1648,6 @@ void COptionsSubMultiplayer::OnControlModified()
 #define SUIT_HUE_END 223
 #define PLATE_HUE_START 160
 #define PLATE_HUE_END 191
-
-#ifdef POSIX 
-typedef struct tagRGBQUAD { 
-  uint8 rgbBlue;
-  uint8 rgbGreen;
-  uint8 rgbRed;
-  uint8 rgbReserved;
-} RGBQUAD;
-#endif
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-static void PaletteHueReplace( RGBQUAD *palSrc, int newHue, int Start, int end )
-{
-	int i;
-	float r, b, g;
-	float maxcol, mincol;
-	float hue, val, sat;
-
-	hue = (float)(newHue * (360.0 / 255));
-
-	for (i = Start; i <= end; i++)
-	{
-		b = palSrc[ i ].rgbBlue;
-		g = palSrc[ i ].rgbGreen;
-		r = palSrc[ i ].rgbRed;
-		
-		maxcol = max( max( r, g ), b ) / 255.0f;
-		mincol = min( min( r, g ), b ) / 255.0f;
-		
-		val = maxcol;
-		sat = (maxcol - mincol) / maxcol;
-
-		mincol = val * (1.0f - sat);
-
-		if (hue <= 120)
-		{
-			b = mincol;
-			if (hue < 60)
-			{
-				r = val;
-				g = mincol + hue * (val - mincol)/(120 - hue);
-			}
-			else
-			{
-				g = val;
-				r = mincol + (120 - hue)*(val-mincol)/hue;
-			}
-		}
-		else if (hue <= 240)
-		{
-			r = mincol;
-			if (hue < 180)
-			{
-				g = val;
-				b = mincol + (hue - 120)*(val-mincol)/(240 - hue);
-			}
-			else
-			{
-				b = val;
-				g = mincol + (240 - hue)*(val-mincol)/(hue - 120);
-			}
-		}
-		else
-		{
-			g = mincol;
-			if (hue < 300)
-			{
-				b = val;
-				r = mincol + (hue - 240)*(val-mincol)/(360 - hue);
-			}
-			else
-			{
-				r = val;
-				b = mincol + (360 - hue)*(val-mincol)/(hue - 240);
-			}
-		}
-
-		palSrc[ i ].rgbBlue = (unsigned char)(b * 255);
-		palSrc[ i ].rgbGreen = (unsigned char)(g * 255);
-		palSrc[ i ].rgbRed = (unsigned char)(r * 255);
-	}
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
