@@ -12,7 +12,7 @@
 
 // HACK: Need ShellExecute for PSD updates
 #ifdef IS_WINDOWS_PC
-#include <windows.h>
+#include "winlite.h"
 #include <shellapi.h>
 #pragma comment ( lib, "shell32"  )
 #endif

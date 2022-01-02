@@ -4,11 +4,6 @@
 //
 //==============================================================================
 
-#if defined (WIN32) && !defined( _X360 )
-#include <windows.h>
-#elif POSIX
-#define _cdecl
-#endif
 #include "materialsystem/IColorCorrection.h"
 #include "materialsystem_global.h"
 #include "shaderapi/ishaderapi.h"
@@ -317,7 +312,7 @@ void CColorCorrectionSystem::ResetLookup( )
 //  ColorCorrectionLookup_t sorting function
 //-----------------------------------------------------------------------------
 typedef ColorCorrectionLookup_t * CCLPtr;
-int _cdecl CompareLookups( const CCLPtr *lookup_a, const CCLPtr *lookup_b )
+int CompareLookups( const CCLPtr *lookup_a, const CCLPtr *lookup_b )
 {
 	if ( (*lookup_a)->m_flWeight < (*lookup_b)->m_flWeight )
 		return 1;

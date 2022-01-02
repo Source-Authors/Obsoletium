@@ -4,7 +4,7 @@
 //
 //=============================================================================
 
-#include <windows.h>
+#include "winlite.h"
 #include "shader_dll_verify.h"
 
 
