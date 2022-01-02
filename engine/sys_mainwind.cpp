@@ -18,6 +18,10 @@
 #if defined( WIN32 ) && !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
 #include "winlite.h"
 #include "xbox/xboxstubs.h"
+// dimhotepus: Disable accessibility keys (ex. five times Shift).
+#include "accessibility_shortcut_keys_toggler.h"
+// dimhotepus: Disable Win key.
+#include "windows_shortcut_keys_toggler.h"
 #endif
 
 #if defined( IS_WINDOWS_PC ) && !defined( USE_SDL )
@@ -208,6 +212,14 @@ private:
 
 	bool			m_bCanPostActivateEvents;
 	int				m_iDesktopWidth, m_iDesktopHeight, m_iDesktopRefreshRate;
+
+#if defined( IS_WINDOWS_PC )
+	// dimhotepus: Disable Win key.
+	source::engine::windows::WindowsShortcutKeysToggler m_windowsShortcutKeysToggler;
+	// dimhotepus: Disable accessibility keys (ex. five times Shift).
+	source::engine::windows::AccessibilityShortcutKeysToggler m_accessibilityShortcutKeysToggler;
+#endif
+
 	void			UpdateDesktopInformation();
 #ifdef WIN32
 	void			UpdateDesktopInformation( WPARAM wParam, LPARAM lParam );
@@ -872,7 +884,7 @@ bool CGame::CreateGameWindow( void )
 {
 	// get the window name
 	char windowName[256];
-	windowName[0] = 0;
+	windowName[0] = '\0';
 	KeyValues *modinfo = new KeyValues("ModInfo");
 	if (modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt"))
 	{
@@ -904,16 +916,15 @@ bool CGame::CreateGameWindow( void )
 #if defined( WIN32 ) && !defined( USE_SDL )
 #ifndef SWDS
 #if !defined( _X360 )
-	WNDCLASSW wc;
+	WNDCLASSW wc = {0};
 #else
-	WNDCLASS wc;
+	WNDCLASS wc = {0};
 #endif
-	memset( &wc, 0, sizeof( wc ) );
 
-    wc.style         = CS_OWNDC | CS_DBLCLKS;
-    wc.lpfnWndProc   = CallDefaultWindowProc;
-    wc.hInstance     = m_hInstance;
-    wc.lpszClassName = CLASSNAME;
+	wc.style         = CS_OWNDC | CS_DBLCLKS;
+	wc.lpfnWndProc   = CallDefaultWindowProc;
+	wc.hInstance     = m_hInstance;
+	wc.lpszClassName = CLASSNAME;
 
 	// find the icon file in the filesystem
 	if ( IsPC() )
@@ -926,7 +937,7 @@ bool CGame::CreateGameWindow( void )
 		}
 		else
 		{
-			wc.hIcon = (HICON)LoadIcon( GetModuleHandle( 0 ), MAKEINTRESOURCE( DEFAULT_EXE_ICON ) );
+			wc.hIcon = (HICON)::LoadIcon( GetModuleHandle( 0 ), MAKEINTRESOURCE( DEFAULT_EXE_ICON ) );
 		}
 	}
 	
@@ -971,11 +982,9 @@ bool CGame::CreateGameWindow( void )
 	// Never a max box
 	style &= ~WS_MAXIMIZEBOX;
 
-	int w, h;
-
 	// Create a full screen size window by default, it'll get resized later anyway
-	w = GetSystemMetrics( SM_CXSCREEN );
-	h = GetSystemMetrics( SM_CYSCREEN );
+	int w = GetSystemMetrics( SM_CXSCREEN );
+	int h = GetSystemMetrics( SM_CYSCREEN );
 
 	// Create the window
 	DWORD exFlags = 0;
@@ -1054,7 +1063,7 @@ void CGame::DestroyGameWindow()
 		if ( m_hWindow )
 		{
 			DestroyWindow( m_hWindow );
-			m_hWindow = (HWND)0;
+			m_hWindow = nullptr;
 		}
 
 #if !defined( _X360 )
@@ -1065,7 +1074,7 @@ void CGame::DestroyGameWindow()
 	}
 	else
 	{
-		m_hWindow = (HWND)0;
+		m_hWindow = nullptr;
 		m_bExternallySuppliedWindow = false;
 	}
 #endif // !defined( SWDS )
@@ -1375,25 +1384,43 @@ void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 
 }
 
-
+// dimhotepus: Disable Win key.
+//-----------------------------------------------------------------------------
+// Purpose: Enable Windows shortcut keys when app is inactive.
+//-----------------------------------------------------------------------------
+bool ShouldEnableWindowsShortcutKeys() noexcept
+{
+  return !game->IsActiveApp();
+}
 
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
 CGame::CGame()
+	// dimhotepus: Disable Win key.
+#if defined( IS_WINDOWS_PC )
+	: m_windowsShortcutKeysToggler{ ::GetModuleHandleW( L"engine.dll" ), ShouldEnableWindowsShortcutKeys }
+#endif
 {
+	// dimhotepus: Disable Win key.
+	if ( m_windowsShortcutKeysToggler.errno_code() )
+	{
+		const auto lastErrorText = m_windowsShortcutKeysToggler.errno_code().message();
+		Warning("Can't disable Windows keys for full screen mode: %s\n", lastErrorText.c_str() );
+	}
+
 #if defined( USE_SDL )
 	m_pSDLWindow = 0;
 #endif
 
 #if defined( WIN32 )
 #if !defined( USE_SDL )
-	m_hInstance = 0;
-	m_ChainedWindowProc = NULL;
+	m_hInstance = nullptr;
+	m_ChainedWindowProc = nullptr;
 #endif
 
-	m_hWindow = 0;
+	m_hWindow = nullptr;
 #endif
 
 	m_x = m_y = 0;
@@ -1429,7 +1456,7 @@ bool CGame::Init( void *pvInstance )
 bool CGame::Shutdown( void )
 {
 #if defined( WIN32 ) && !defined( USE_SDL )
-	m_hInstance = 0;
+	m_hInstance = nullptr;
 #endif
 	return true;
 }
@@ -1648,5 +1675,11 @@ bool CGame::CanPostActivateEvents()
 void CGame::SetActiveApp( bool active )
 {
 	m_bActiveApp = active;
+
+#if defined(IS_WINDOWS_PC)
+  // Disable accessibility shortcut keys when app is active.
+  // If app is inactive - restore accessibility shortcut keys to original state.
+  m_accessibilityShortcutKeysToggler.Toggle( !IsActiveApp() );
+#endif
 }
 

@@ -579,6 +579,8 @@ $Project "engine"
 
 	$Folder	"Header Files"
 	{
+		// dimhotepus: Disable accessibility shortcut keys.
+		$File	"accessibility_shortcut_keys_toggler.h"	[$WINDOWS]
 		$File	"baseclient.h"
 		$File	"baseclientstate.h"
 		$File	"baseserver.h"
@@ -774,6 +776,8 @@ $Project "engine"
 		$File	"sbar.h"
 		$File	"$SRCDIR\public\scratchpad3d.h"
 		$File	"screen.h"
+		// dimhotepus: Keyabord hook to disable Win key.
+		$File	"scoped_windows_hook.h"	[$WINDOWS]
 		$File	"server.h"
 		$File	"Session.h"
 		$File	"shadowmgr.h"
@@ -822,6 +826,8 @@ $Project "engine"
 		$File	"view.h"
 		$File	"vprof_engine.h"
 		$File	"vprof_record.h"
+		// dimhotepus: Disable Win key.
+		$File	"windows_shortcut_keys_toggler.h"	[$WINDOWS]
 		$File	"world.h"
 		$File	"zone.h"
 		$File	"baseautocompletefilelist.h"
