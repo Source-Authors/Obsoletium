@@ -360,18 +360,21 @@ void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFunction_t function )
 
 bool Is64BitOS()
 {
-	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
-	static LPFN_ISWOW64PROCESS pfnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress( GetModuleHandle("kernel32"), "IsWow64Process" );
-
+	// dimhotepus: Cleanup x86-64 process detection.
+#ifdef _WIN64
+  return true;
+#else
 	static BOOL bIs64bit = FALSE;
 	static bool bInitialized = false;
-	if ( bInitialized ) 
-		return bIs64bit == (BOOL)TRUE;
+	if ( bInitialized )
+		return bIs64bit != FALSE;
 	else
 	{
 		bInitialized = true;
-		return pfnIsWow64Process && pfnIsWow64Process(GetCurrentProcess(), &bIs64bit) && bIs64bit;
+		// NOTE: If the process is a 32-bit application running under 64-bit Windows 10 on ARM, the value is set to FALSE
+		return ::IsWow64Process(::GetCurrentProcess(), &bIs64bit) && bIs64bit;
 	}
+#endif
 }
 
 
