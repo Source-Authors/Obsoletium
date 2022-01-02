@@ -129,6 +129,8 @@
 #include <locale.h>
 #include "SDL.h"
 #endif
+// dimhotepus: Fix warnings about unpaired voice controls shutdown.
+#include "audio/private/voice_mixer_controls.h"
 
 #include "ixboxsystem.h"
 extern IXboxSystem *g_pXboxSystem;
@@ -4177,6 +4179,10 @@ void Host_Init( bool bDedicated )
 	TRACEINIT( Filter_Init(), Filter_Shutdown() );
 
 #ifndef SWDS
+#ifndef _X360
+	TRACEINIT( InitMixerControls(), ShutdownMixerControls() );
+#endif
+
 	TRACEINIT( Key_Init(), Key_Shutdown() );
 #endif
 
@@ -4888,8 +4894,6 @@ void Host_FreeToLowMark( bool server )
 //-----------------------------------------------------------------------------
 void Host_Shutdown(void)
 {
-	extern void ShutdownMixerControls();
-
 	if ( host_checkheap )
 	{
 #ifdef _WIN32
