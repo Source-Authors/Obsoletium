@@ -11,7 +11,7 @@
 #endif
 
 #if defined( _WIN32 ) && !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #include <direct.h>
 #include <io.h>
 #include <process.h>

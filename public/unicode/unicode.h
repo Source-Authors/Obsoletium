@@ -12,12 +12,8 @@
 
 #include "interface.h"
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-
 #if !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #endif
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"

@@ -9,7 +9,7 @@
 #undef PROTECTED_THINGS_ENABLE
 #include <tier0/platform.h>
 #ifdef IS_WINDOWS_PC
-#include <windows.h>
+#include "winlite.h"
 #else
 #define INVALID_HANDLE_VALUE (void *)0
 #define FILE_BEGIN SEEK_SET

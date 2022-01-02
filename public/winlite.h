@@ -21,7 +21,7 @@
 #define STRICT
 #endif
 
-// 0x0601 gives us access to Windows 7 features.
+// Access to Windows 7 features.
 #define _WIN32_WINNT 0x0601
 
 #define NOWINRES

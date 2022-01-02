@@ -12,8 +12,7 @@
 #undef PROTECTED_THINGS_ENABLE   // allow use of _vsnprintf
 
 #if defined( _WIN32 ) && !defined( _X360 )
-#define WIN_32_LEAN_AND_MEAN
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 #ifdef _WIN32

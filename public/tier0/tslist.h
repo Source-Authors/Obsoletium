@@ -11,8 +11,7 @@
 #define TSLIST_H
 
 #if defined( USE_NATIVE_SLIST ) && !defined( _X360 )
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 #include "tier0/dbg.h"
