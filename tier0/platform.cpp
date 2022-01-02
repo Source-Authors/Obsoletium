@@ -49,15 +49,12 @@ static double g_FakeBenchmarkTimeInc = 1.0 / 66.0;
 
 static void InitTime()
 {
-	if( !s_bTimeInitted )
-	{
-		s_bTimeInitted = true;
-		QueryPerformanceFrequency(&g_PerformanceFrequency);
-		g_PerformanceCounterToS = 1.0 / g_PerformanceFrequency.QuadPart;
-		g_PerformanceCounterToMS = 1e3 / g_PerformanceFrequency.QuadPart;
-		g_PerformanceCounterToUS = 1e6 / g_PerformanceFrequency.QuadPart;
-		QueryPerformanceCounter(&g_ClockStart);
-	}
+	s_bTimeInitted = true;
+	QueryPerformanceFrequency(&g_PerformanceFrequency);
+	g_PerformanceCounterToS = 1.0 / g_PerformanceFrequency.QuadPart;
+	g_PerformanceCounterToMS = 1e3 / g_PerformanceFrequency.QuadPart;
+	g_PerformanceCounterToUS = 1e6 / g_PerformanceFrequency.QuadPart;
+	QueryPerformanceCounter(&g_ClockStart);
 }
 
 bool Plat_IsInBenchmarkMode()
@@ -72,7 +69,7 @@ void Plat_SetBenchmarkMode( bool bBenchmark )
 
 double Plat_FloatTime()
 {
-	if (! s_bTimeInitted )
+  if ( !s_bTimeInitted ) [[unlikely]]
 		InitTime();
 	if ( g_bBenchmarkMode )
 	{
@@ -91,7 +88,7 @@ double Plat_FloatTime()
 
 uint32 Plat_MSTime()
 {
-	if (! s_bTimeInitted )
+	if ( !s_bTimeInitted ) [[unlikely]]
 		InitTime();
 	if ( g_bBenchmarkMode )
 	{
@@ -108,7 +105,7 @@ uint32 Plat_MSTime()
 
 uint64 Plat_USTime()
 {
-	if (! s_bTimeInitted )
+	if ( !s_bTimeInitted ) [[unlikely]]
 		InitTime();
 	if ( g_bBenchmarkMode )
 	{
