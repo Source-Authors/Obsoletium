@@ -28,7 +28,6 @@
 #define NOMINMAX
 #undef min
 #undef max
-#include <windows.h>
 #include "PowrProf.h"
 #include <algorithm>
 #pragma comment(lib, "PowrProf.lib")

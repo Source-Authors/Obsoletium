@@ -19,8 +19,6 @@
 //    wevtutil um %vgame%\..\src\tier0\ValveETWProvider.man
 //    wevtutil im %vgame%\..\src\tier0\ValveETWProvider.man
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 // These are defined in evntrace.h but you need a Vista+ Windows
 // SDK to have them available, so I define them here.
 #define EVENT_CONTROL_CODE_DISABLE_PROVIDER 0

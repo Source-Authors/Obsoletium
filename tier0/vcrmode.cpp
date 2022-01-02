@@ -9,8 +9,6 @@
 #include "pch_tier0.h"
 
 #ifdef _WIN32
-#define WIN_32_LEAN_AND_MEAN
-#include <windows.h>
 #include <winsock.h>
 #endif
 

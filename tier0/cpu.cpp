@@ -6,10 +6,7 @@
 //=============================================================================//
 #include "pch_tier0.h"
 
-#if defined(_WIN32) && !defined(_X360)
-#define WINDOWS_LEAN_AND_MEAN
-#include <windows.h>
-#elif defined(_LINUX)
+#if defined(_LINUX)
 #include <stdlib.h>
 #elif defined(OSX)
 #include <sys/sysctl.h>

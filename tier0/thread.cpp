@@ -8,10 +8,8 @@
 #include "pch_tier0.h"
 
 #include "tier0/valve_off.h"
+
 #ifdef _WIN32
-#define WIN_32_LEAN_AND_MEAN
-#include <windows.h>
-#include <assert.h>
 #include <tlhelp32.h>
 #endif
 

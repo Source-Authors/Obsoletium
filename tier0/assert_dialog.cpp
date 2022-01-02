@@ -11,8 +11,6 @@
 #include "xbox/xbox_console.h"
 #include "xbox/xbox_vxconsole.h"
 #elif defined( _WIN32 )
-#include <windows.h>
-
 // dimhotepus: Launcher icon id.
 #include "../launcher_main/resource.h"
 #elif defined( POSIX )

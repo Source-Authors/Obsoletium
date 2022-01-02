@@ -10,11 +10,6 @@
 #include "tier0/memalloc.h"
 #include "tier0/valve_off.h"
 
-#if defined(_WIN32) && !defined(_X360)
-#define WIN_32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-
 #include <assert.h>
 
 #ifdef _WIN32

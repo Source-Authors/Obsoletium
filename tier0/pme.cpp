@@ -5,8 +5,6 @@
 //=============================================================================//
 
 #include "pch_tier0.h"
-#define WINDOWS_LEAN_AND_MEAN
-#include <windows.h>
 
 #include "tier0/platform.h"
 #include "tier0/vprof.h"

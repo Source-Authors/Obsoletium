@@ -14,8 +14,6 @@
 
 #ifdef WIN32
 
-#include <windows.h>
-
 #define SystemBasicInformation 0
 #define SystemPerformanceInformation 2
 #define SystemTimeInformation 3

@@ -13,24 +13,12 @@
 
 #if _MSC_VER >= 1300
 #include "tier0/valve_off.h"
-#define WIN_32_LEAN_AND_MEAN
-#include <windows.h>
 
 #include <dbghelp.h>
-
 #include <time.h>
 
 // MiniDumpWriteDump() function declaration (so we can just get the function directly from windows)
-typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)
-	(
-	HANDLE hProcess, 
-	DWORD dwPid, 
-	HANDLE hFile, 
-	MINIDUMP_TYPE DumpType,
-	CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
-	CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
-	CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam
-	);
+using MINIDUMPWRITEDUMP = decltype(&::MiniDumpWriteDump);
 
 
 // counter used to make sure minidump names are unique
