@@ -108,7 +108,7 @@ public:
 
 	unsigned short GetShadowIndex( int i )
 	{
-		Assert( i >= 0 && i < (int)m_NumIndices );
+		Assert( (unsigned)i < m_NumIndices );
 		return m_pShadowIndices[i];
 	}
 #endif
