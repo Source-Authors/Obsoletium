@@ -468,6 +468,15 @@ public:
 	}
 };
 
+class CStringLessCaseSensitive
+{
+public:
+	bool operator()(const char* pszLeft, const char* pszRight) const
+	{
+		return ( strcmp(pszLeft, pszRight) < 0 );
+	}
+};
+
 //-----------------------------------------------------------------------------
 
 #pragma warning( disable:4074 ) // warning C4074: initializers put in compiler reserved initialization area
@@ -618,7 +627,7 @@ private:
 	typedef StatMap_t::iterator StatMapIter_t;
 	typedef StatMap_t::value_type StatMapEntry_t;
 
-	typedef std::set<const char *, CStringLess, CNoRecurseAllocator<const char *> > Filenames_t;
+	typedef std::set<const char *, CStringLessCaseSensitive, CNoRecurseAllocator<const char *> > Filenames_t;
 
 	// Heap reporting method
 	typedef void (*HeapReportFunc_t)( char const *pFormat, ... );
