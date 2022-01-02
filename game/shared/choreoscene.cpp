@@ -7,10 +7,6 @@
 //=============================================================================//
 
 
-#if defined(_WIN32) && !defined(_X360)
-#include <windows.h>
-#endif
-
 #include "basetypes.h"
 #include <stdio.h>
 #include "choreoscene.h"
