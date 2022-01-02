@@ -515,7 +515,9 @@ void CMaterialSystem::CleanUpErrorMaterial()
 	IMaterialInternal *pErrorMaterial = g_pErrorMaterial;
 	g_pErrorMaterial = NULL;
 	pErrorMaterial->DecrementReferenceCount();
-	RemoveMaterial( pErrorMaterial );
+	// dimhotepus: error material already removed from dictionary as
+	// dictionary.removeall always called before.
+	// RemoveMaterial( pErrorMaterial );
 }
 
 //-----------------------------------------------------------------------------
