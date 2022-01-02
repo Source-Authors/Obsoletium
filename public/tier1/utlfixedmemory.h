@@ -88,9 +88,11 @@ public:
 	}
 	bool IsIdxAfter( intp i, const Iterator_t &it ) const
 	{
-		Assert( IsValidIterator( it ) );
 		if ( !IsValidIterator( it ) )
+		{
+			Assert( false );
 			return false;
+		}
 
 		if ( IsInBlock( i, it.m_pBlockHeader ) )
 			return i > GetIndex( it );
