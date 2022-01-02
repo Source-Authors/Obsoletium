@@ -4,7 +4,7 @@
 //
 //===========================================================================//
 #ifdef _WIN32
-#include <windows.h> 
+#include "winlite.h"
 #include <direct.h>
 
 // includes for the VGUI version

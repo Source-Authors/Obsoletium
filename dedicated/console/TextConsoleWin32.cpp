@@ -10,8 +10,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "TextConsoleWin32.h"
+#include "winlite.h"
 #include "tier0/dbg.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
 // Could possibly switch all this code over to using readline. This:
 //   http://mingweditline.sourceforge.net/?Description

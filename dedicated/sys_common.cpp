@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //===========================================================================//
 #ifdef _WIN32
-#include <windows.h> 
+#include "winlite.h" 
 #elif POSIX
 #include <unistd.h>
 #else

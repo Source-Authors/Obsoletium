@@ -5,12 +5,13 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#ifdef _WIN32
-// conproc.c -- support for qhost
-#include <stdio.h>
-#include <process.h>
-#include <windows.h>
 #include "conproc.h"
+
+#ifdef _WIN32
+#include <process.h>
+#include <cstdio>
+
+#include "winlite.h"
 #include "isys.h"
 #include "tier0/icommandline.h"
 #include "tier1/strtools.h"

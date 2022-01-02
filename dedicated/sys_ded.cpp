@@ -27,7 +27,7 @@
 #include "inputsystem/iinputsystem.h"
 
 #ifdef _WIN32
-#include <windows.h> 
+#include "winlite.h"
 #include <direct.h>
 #include "KeyValues.h"
 #else

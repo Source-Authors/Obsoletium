@@ -15,11 +15,13 @@
 
 #ifdef _WIN32
 
-#include <windows.h>
 #include "TextConsole.h"
 
 #define MAX_CONSOLE_TEXTLEN 256
 #define MAX_BUFFER_LINES	30
+
+using HANDLE = void*;
+using WORD = unsigned short;
 
 class CTextConsoleWin32 : public CTextConsole
 {

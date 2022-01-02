@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include <windows.h>
+#include "winlite.h"
 // base vgui interfaces
 #include <vgui/vgui.h>
 #include <vgui_controls/Panel.h>
