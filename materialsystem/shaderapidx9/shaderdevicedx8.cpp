@@ -3525,14 +3525,14 @@ void CShaderDeviceDx8::SetHardwareGammaRamp( float fGamma, float fGammaTVRangeMi
 		}
 
 		// Apply the user controlled exponent curve
-		float flCorrection = pow( flSrgbGammaValue, ( fGamma / 2.2f ) );
+		float flCorrection = powf( flSrgbGammaValue, ( fGamma / 2.2f ) );
 		flCorrection = clamp( flCorrection, 0.0f, 1.0f );
 
 		// TV adjustment - Apply an exp and a scale and bias
 		if ( bTVEnabled )
 		{
 			// Adjust for TV gamma of 2.5 by applying an exponent of 2.2 / 2.5 = 0.88
-			flCorrection = pow( flCorrection, 2.2f / fGammaTVExponent );
+			flCorrection = powf( flCorrection, 2.2f / fGammaTVExponent );
 			flCorrection = clamp( flCorrection, 0.0f, 1.0f );
 
 			// Scale and bias to fit into the 16-235 range for TV's

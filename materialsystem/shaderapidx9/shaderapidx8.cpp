@@ -4886,38 +4886,6 @@ void CShaderAPIDx8::ClearSnapshots()
 }
 
 
-static void KillTranslation( D3DXMATRIX& mat )
-{
-	mat[3] = 0.0f;
-	mat[7] = 0.0f;
-	mat[11] = 0.0f;
-	mat[12] = 0.0f;
-	mat[13] = 0.0f;
-	mat[14] = 0.0f;
-	mat[15] = 1.0f;
-}
-
-static void PrintMatrix( const char *name, const D3DXMATRIX& mat )
-{
-	int row, col;
-	char buf[128];
-
-	Plat_DebugString( name );
-	Plat_DebugString( "\n" );
-	for( row = 0; row < 4; row++ )
-	{
-		Plat_DebugString( "    " );
-		for( col = 0; col < 4; col++ )
-		{
-			sprintf( buf, "%f ", ( float )mat( row, col ) );
-			Plat_DebugString( buf );
-		}
-		Plat_DebugString( "\n" );
-	}
-	Plat_DebugString( "\n" );
-}
-
-
 //-----------------------------------------------------------------------------
 // Gets the vertex format for a particular snapshot id
 //-----------------------------------------------------------------------------
@@ -5650,54 +5618,6 @@ void CShaderAPIDx8::EnableFastClip( bool bEnable )
 	}
 }
 
-/*
-// -----------------------------------------------------------------------------
-// SetInvariantClipVolume - This routine takes six planes as input and sets the
-// appropriate Direct3D user clip plane state
-// What we mean by "invariant clipping" here is that certain devices implement
-// user clip planes at the raster level, which means that multi-pass rendering
-// where one pass is unclipped (such as base geometry) and another pass *IS*
-// clipped (such as flashlight geometry), there is no z-fighting since the
-// clipping is implemented at the raster level in an "invariant" way
-// -----------------------------------------------------------------------------
-void CShaderAPIDx8::SetInvariantClipVolume( Frustum_t *pFrustumPlanes )
-{
-	// Only do this on modern nVidia hardware, which does invariant clipping
-	if ( m_VendorID == VENDORID_NVIDIA )
-	{
-		if ( pFrustumPlanes )
-		{
-//			if ()
-//			{
-//
-//			}
-
-			for (int i=0; i<6; i++)
-			{
-				const cplane_t *pPlane = pFrustumPlanes->GetPlane(i);
-
-				SetClipPlane( i, (float *) &pPlane->normal );
-				EnableClipPlane( i, true );
-
-//	FRUSTUM_RIGHT		= 0,
-//	FRUSTUM_LEFT		= 1,
-//	FRUSTUM_TOP			= 2,
-//	FRUSTUM_BOTTOM		= 3,
-//	FRUSTUM_NEARZ		= 4,
-//	FRUSTUM_FARZ		= 5,
-
-			}
-		}
-		else // NULL disables the invariant clip volume...
-		{
-			for (int i=0; i<6; i++)
-			{
-				EnableClipPlane( i, false );
-			}
-		}
-	}
-}
-*/
 
 //-----------------------------------------------------------------------------
 // Vertex blending
@@ -5875,7 +5795,7 @@ void CShaderAPIDx8::UpdatePixelFogColorConstant( void )
 			{
 				//srgb in ps2b uses the 2.2 curve
 				for( int i = 0; i != 3; ++i )
-					fogColor[i] = pow( m_DynamicState.m_PixelFogColor[i], 2.2f );
+					fogColor[i] = powf( m_DynamicState.m_PixelFogColor[i], 2.2f );
 			}
 			else
 			{
@@ -7003,25 +6923,6 @@ void CShaderAPIDx8::ComputeStatsInfo( ShaderAPITextureHandle_t hTexture, bool is
 	// 360 uses gpu storage size (which accounts for page alignment bloat), not format size
 	textureData.m_SizeBytes = g_TextureHeap.GetSize( pD3DTex );
 #endif
-}
-
-static D3DFORMAT ComputeFormat( IDirect3DBaseTexture* pTexture, bool isCubeMap )
-{
-	Assert( pTexture );
-	D3DSURFACE_DESC desc;
-	if (isCubeMap)
-	{
-		IDirect3DCubeTexture* pTex = static_cast<IDirect3DCubeTexture*>(pTexture);
-		HRESULT hr = pTex->GetLevelDesc( 0, &desc );
-		Assert( !FAILED(hr) );
-	}
-	else
-	{
-		IDirect3DTexture* pTex = static_cast<IDirect3DTexture*>(pTexture);
-		HRESULT hr = pTex->GetLevelDesc( 0, &desc );
-		Assert( !FAILED(hr) );
-	}
-	return desc.Format;
 }
 
 ShaderAPITextureHandle_t CShaderAPIDx8::CreateDepthTexture( 
@@ -8740,13 +8641,13 @@ void CShaderAPIDx8::SetLight( int lightNum, const LightDesc_t& desc_ )
 	// normalize light color...
 	light.Theta = desc.m_Theta;
 	light.Phi = desc.m_Phi;
-	if (light.Phi > M_PI)
-		light.Phi = M_PI;
+	if (light.Phi > M_PI_F)
+		light.Phi = M_PI_F;
 
 	// This piece of crap line of code is because if theta gets too close to phi,
 	// we get no light at all.
-	if (light.Theta - light.Phi > -1e-3)
-		light.Theta = light.Phi - 1e-3;
+	if (light.Theta - light.Phi > -1e-3f)
+		light.Theta = light.Phi - 1e-3f;
 
 	m_DynamicState.m_LightChanged[lightNum] = STATE_CHANGED;
 	memcpy( &m_DynamicState.m_Lights[lightNum], &light, sizeof(light) );
@@ -10344,7 +10245,7 @@ void CShaderAPIDx8::Rotate( float angle, float x, float y, float z )
 	if (MatrixIsChanging())
 	{
 		D3DXVECTOR3 axis( x, y, z );
-		m_pMatrixStack[m_CurrStack]->RotateAxisLocal( &axis, M_PI * angle / 180.0f );
+		m_pMatrixStack[m_CurrStack]->RotateAxisLocal( &axis, M_PI_F * angle / 180.0f );
 		UpdateMatrixTransform();
 	}
 }
@@ -10418,7 +10319,7 @@ void CShaderAPIDx8::PerspectiveX( double fovx, double aspect, double zNear, doub
 {
 	if (MatrixIsChanging())
 	{
-		float width = 2 * zNear * tan( fovx * M_PI / 360.0 );
+		float width = 2 * zNear * tanf( fovx * M_PI_F / 360.0F );
 		float height = width / aspect;
 		Assert( m_CurrStack == MATERIAL_PROJECTION );
 		D3DXMATRIX rh;
@@ -10432,7 +10333,7 @@ void CShaderAPIDx8::PerspectiveOffCenterX( double fovx, double aspect, double zN
 {
 	if (MatrixIsChanging())
 	{
-		float width = 2 * zNear * tan( fovx * M_PI / 360.0 );
+		float width = 2 * zNear * tanf( fovx * M_PI_F / 360.0F );
 		float height = width / aspect;
 
 		// bottom, top, left, right are 0..1 so convert to -1..1
@@ -10467,19 +10368,19 @@ void CShaderAPIDx8::PickMatrix( int x, int y, int width, int height )
 		int vheight = viewport.m_nHeight;
 
 		// Compute the location of the pick region in projection space...
-		float px = 2.0 * (float)(x - vx) / (float)vwidth - 1;
-		float py = 2.0 * (float)(y - vy)/ (float)vheight - 1;
-		float pw = 2.0 * (float)width / (float)vwidth;
-		float ph = 2.0 * (float)height / (float)vheight;
+		float px = 2.0f * (float)(x - vx) / (float)vwidth - 1;
+		float py = 2.0f * (float)(y - vy)/ (float)vheight - 1;
+		float pw = 2.0f * (float)width / (float)vwidth;
+		float ph = 2.0f * (float)height / (float)vheight;
 
 		// we need to translate (px, py) to the origin
 		// and scale so (pw,ph) -> (2, 2)
 		D3DXMATRIX matrix;
 		D3DXMatrixIdentity( &matrix );
-		matrix.m[0][0] = 2.0 / pw;
-		matrix.m[1][1] = 2.0 / ph;
-		matrix.m[3][0] = -2.0 * px / pw;
-		matrix.m[3][1] = -2.0 * py / ph;
+		matrix.m[0][0] = 2.0f / pw;
+		matrix.m[1][1] = 2.0f / ph;
+		matrix.m[3][0] = -2.0f * px / pw;
+		matrix.m[3][1] = -2.0f * py / ph;
 
 		m_pMatrixStack[m_CurrStack]->MultMatrixLocal(&matrix);
 		UpdateMatrixTransform();
@@ -10557,33 +10458,33 @@ void CShaderAPIDx8::SetupSelectionModeVisualizationState()
 // Set view transforms
 //-----------------------------------------------------------------------------
 
-static void printmat4x4( char *label, float *m00 )
-{
-	// print label..
-	// fetch 4 from row, print as a row
-	// fetch 4 from column, print as a row
-	
-#ifdef DX_TO_GL_ABSTRACTION
-	float	row[4];
-	float	col[4];
-	
-	GLMPRINTF(("-M-    -- %s --", label ));
-	for( int n=0; n<4; n++ )
-	{
-		// extract row and column floats
-		for( int i=0; i<4;i++)
-		{
-			row[i] = m00[(n*4)+i];			
-			col[i] = m00[(i*4)+n];
-		}
-		GLMPRINTF((		"-M-    [ %7.4f %7.4f %7.4f %7.4f ] T=> [ %7.4f %7.4f %7.4f %7.4f ]",
-						row[0],row[1],row[2],row[3],
-						col[0],col[1],col[2],col[3]						
-						));
-	}
-	GLMPRINTF(("-M-"));
-#endif
-}
+//static void printmat4x4( char *label, float *m00 )
+//{
+//	// print label..
+//	// fetch 4 from row, print as a row
+//	// fetch 4 from column, print as a row
+//	
+//#ifdef DX_TO_GL_ABSTRACTION
+//	float	row[4];
+//	float	col[4];
+//	
+//	GLMPRINTF(("-M-    -- %s --", label ));
+//	for( int n=0; n<4; n++ )
+//	{
+//		// extract row and column floats
+//		for( int i=0; i<4;i++)
+//		{
+//			row[i] = m00[(n*4)+i];			
+//			col[i] = m00[(i*4)+n];
+//		}
+//		GLMPRINTF((		"-M-    [ %7.4f %7.4f %7.4f %7.4f ] T=> [ %7.4f %7.4f %7.4f %7.4f ]",
+//						row[0],row[1],row[2],row[3],
+//						col[0],col[1],col[2],col[3]						
+//						));
+//	}
+//	GLMPRINTF(("-M-"));
+//#endif
+//}
 
 void CShaderAPIDx8::SetVertexShaderViewProj()
 {
@@ -11079,8 +10980,8 @@ void CShaderAPIDx8::CommitVertexShaderLighting()
 		// The next constant holds exponent, stopdot, stopdot2, 1 / (stopdot - stopdot2)
 		if (light.Type == D3DLIGHT_SPOT)
 		{
-			float stopdot = cos( light.Theta * 0.5f );
-			float stopdot2 = cos( light.Phi * 0.5f );
+			float stopdot = cosf( light.Theta * 0.5f );
+			float stopdot2 = cosf( light.Phi * 0.5f );
 			float oodot = (stopdot > stopdot2) ? 1.0f / (stopdot - stopdot2) : 0.0f;
 			lightState[3].Init( light.Falloff, stopdot, stopdot2, oodot );
 		}
@@ -14091,7 +13992,7 @@ float CShaderAPIDx8::GammaToLinear_HardwareSpecific( float fGamma ) const
 	else
 	{
 		// Unknown console
-		return pow( fGamma, 2.2f ); // Use a gamma 2.2 curve
+		return powf( fGamma, 2.2f ); // Use a gamma 2.2 curve
 	}
 }
 
@@ -14108,7 +14009,7 @@ float CShaderAPIDx8::LinearToGamma_HardwareSpecific( float fLinear ) const
 	else
 	{
 		// Unknown console
-		return pow( fLinear, ( 1.0f / 2.2f ) ); // Use a gamma 2.2 curve
+		return powf( fLinear, ( 1.0f / 2.2f ) ); // Use a gamma 2.2 curve
 	}
 }
 

@@ -130,20 +130,6 @@ static void MatFlushShaders( void );
 //static D3DToGL_ASM sg_D3DToOpenGLTranslator;	// Remove the _ASM to switch to the new translator
 //static D3DToGL sg_NewD3DToOpenGLTranslator;		// Remove the _ASM to switch to the new translator
 
-static const char *GetLightTypeName( VertexShaderLightTypes_t type )
-{
-	static const char *s_VertexShaderLightTypeNames[] = 
-	{
-		"LIGHT_NONE",
-		"LIGHT_SPOT",
-		"LIGHT_POINT",
-		"LIGHT_DIRECTIONAL",
-		"LIGHT_STATIC",
-		"LIGHT_AMBIENTCUBE",
-	};
-	return s_VertexShaderLightTypeNames[type+1];
-}
-
 #ifdef PROFILE_SHADER_CREATE
 static FILE *GetDebugFileHandle( void )
 {
