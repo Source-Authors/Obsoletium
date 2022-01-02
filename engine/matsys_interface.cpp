@@ -1290,7 +1290,9 @@ void ShutdownWellKnownRenderTargets( void )
 	}
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	pRenderContext->SetNonInteractiveTempFullscreenBuffer( NULL, MATERIAL_NON_INTERACTIVE_MODE_LEVEL_LOAD );
-
+	
+	// dimhotepus: Do not leak materials for fb depth
+	g_ResolvedFullFrameDepth.Shutdown();
 	g_FullFrameDepth.Shutdown();
 	if( IsPC() )
 	{
