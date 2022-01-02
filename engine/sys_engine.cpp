@@ -5,7 +5,7 @@
 //===========================================================================//
 
 #include "quakedef.h"
-#include <assert.h>
+#include <thread>
 #include "engine_launcher_api.h"
 #include "iengine.h"
 #include "ivideomode.h"
@@ -365,11 +365,8 @@ void CEngine::Frame( void )
 				// the other logical hyperthread core if the CPU supports it)
 				for (int i = 2000; i >= 0; --i)
 				{
-#if defined(POSIX)
-					__asm( "pause" ); __asm( "pause" ); __asm( "pause" ); __asm( "pause" );
-#elif defined(IS_WINDOWS_PC)
-					_asm { pause }; _asm { pause }; _asm { pause }; _asm { pause };
-#endif
+					// dimhotepus: Reschedule the execution of the threads.
+					std::this_thread::yield();
 				}
 			}
 
