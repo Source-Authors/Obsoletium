@@ -4,11 +4,6 @@
 //
 //=============================================================================
 
-#if defined(WIN32) && !defined( _X360 )
-#include <windows.h>
-#endif
-#undef PropertySheet
-
 #include "matsys_controls/gamefiletreeview.h"
 #include "filesystem.h"
 #include "tier1/KeyValues.h"

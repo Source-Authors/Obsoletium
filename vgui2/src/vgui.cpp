@@ -5,12 +5,6 @@
 // $NoKeywords: $
 //===========================================================================//
 
-
-#if defined( WIN32 ) && !defined( _X360 )
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include <vgui/VGUI.h>
 #include <vgui/Dar.h>
@@ -1072,6 +1066,10 @@ void operator delete [] (void *pMem)
 }
 */
 
+#ifdef WIN32
+extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(_In_opt_ const char *lpOutputString);
+#endif
+
 void CVGui::DPrintf(const char* format,...)
 {
 	char    buf[2048];
@@ -1082,7 +1080,7 @@ void CVGui::DPrintf(const char* format,...)
 	va_end(argList);
 
 #ifdef WIN32
-	::OutputDebugString(buf);
+	::OutputDebugStringA(buf);
 #else
 	Msg( "%s", buf );
 #endif
@@ -1101,7 +1099,7 @@ void CVGui::DPrintf2(const char* format,...)
 	va_end(argList);
 
 #ifdef WIN32
-	::OutputDebugString(buf);
+	::OutputDebugStringA(buf);
 #else
 	Msg( "%s", buf );
 #endif

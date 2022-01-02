@@ -6,7 +6,7 @@
 //===========================================================================//
 
 #if defined( WIN32 ) && !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #include <imm.h>
 #define DO_IME
 #endif

@@ -11,9 +11,8 @@
 // SRC only
 #define PROTECTED_THINGS_DISABLE
 
-#include <windows.h>
+#include "winlite.h"
 #include <imm.h>
-#include <zmouse.h>
 #include <shellapi.h>
 #include <mmsystem.h>
 #include <oleidl.h>

@@ -7,9 +7,8 @@
 
 
 #if !defined( _X360 )
-#define WIN32_LEAN_AND_MEAN
 #define OEMRESOURCE
-#include <windows.h>
+#include "winlite.h"
 #include <shellapi.h>
 #include <shlwapi.h>
 #include <shlobj.h>

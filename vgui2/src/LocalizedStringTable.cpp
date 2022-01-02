@@ -6,12 +6,10 @@
 //===========================================================================//
 
 
-#if defined( WIN32 ) && !defined( _X360 )
-#include <windows.h>
-#elif defined( POSIX )
+#if defined( POSIX )
 #include <iconv.h>
-
 #endif
+
 #include <wchar.h>
 
 #include "filesystem.h"
