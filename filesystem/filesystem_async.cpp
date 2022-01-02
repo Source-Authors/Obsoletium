@@ -16,8 +16,7 @@
 
 #include <limits.h>
 #if defined( _WIN32 ) && !defined( _X360 )
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "winlite.h"
 #endif
 #include "tier0/vcrmode.h"
 #include "tier1/convar.h"
