@@ -110,9 +110,11 @@ bool CUtlSymbol::operator==( const char* pStr ) const
 inline const char* CUtlSymbolTable::StringFromIndex( const CStringPoolIndex &index ) const
 {
 	Assert( index.m_iPool < m_StringPools.Count() );
-	Assert( index.m_iOffset < m_StringPools[index.m_iPool]->m_TotalLen );
 
-	return &m_StringPools[index.m_iPool]->m_Data[index.m_iOffset];
+  const auto &pool = m_StringPools[index.m_iPool];
+  Assert( index.m_iOffset < pool->m_TotalLen );
+
+	return &pool->m_Data[index.m_iOffset];
 }
 
 
