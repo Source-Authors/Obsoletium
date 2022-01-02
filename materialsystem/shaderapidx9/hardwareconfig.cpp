@@ -1092,9 +1092,11 @@ int CHardwareConfig::MaxTextureDepth() const
 
 int CHardwareConfig::GetDXSupportLevel() const
 {
-	if ( ShaderUtil()->GetConfig().dxSupportLevel != 0 )
+  const int shaderDxLevel = ShaderUtil()->GetConfig().dxSupportLevel;
+
+	if ( shaderDxLevel != 0 )
 	{
-		return min( ShaderUtil()->GetConfig().dxSupportLevel, m_Caps.m_nDXSupportLevel );
+		return min( shaderDxLevel, m_Caps.m_nDXSupportLevel );
 	}
 
 	return m_Caps.m_nDXSupportLevel;
