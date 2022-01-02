@@ -198,7 +198,7 @@ static DWORD WINAPI MeasureThread( LPVOID vThreadNum )
 	}
 
 	// This will never be hit.
-	return 0;
+	UNREACHABLE();
 }
 
 /*
@@ -298,7 +298,7 @@ static DWORD WINAPI HeartbeatThread( LPVOID )
 	}
 
 	// This will never be hit.
-	return 0;
+	UNREACHABLE();
 }
 
 PLATFORM_INTERFACE CPUFrequencyResults GetCPUFrequencyResults( bool fGetDisabledResults )
