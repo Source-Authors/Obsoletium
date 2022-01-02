@@ -5,9 +5,6 @@
 //
 //=============================================================================//
 
-#if defined( _WIN32 ) && !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
-#include <windows.h>
-#endif
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "bitmap/imageformat.h"

@@ -4,9 +4,6 @@
 //
 //=============================================================================//
 
-#ifdef IS_WINDOWS_PC
-#include <windows.h>
-#endif
 #include "bitmap/imageformat.h"
 #include "basetypes.h"
 #include "tier0/dbg.h"
