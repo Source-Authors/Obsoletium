@@ -6,7 +6,7 @@
 //
 //===========================================================================//
 #if defined( _WIN32 ) && !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 #include "tier0/dbg.h"
@@ -14,7 +14,6 @@
 #include "tier1/strtools.h"
 
 #if defined( _WIN32 ) && !defined( _X360 )
-#define WIN32_LEAN_AND_MEAN
 #include <winsock.h>
 typedef int socklen_t;
 #elif !defined( _X360 )

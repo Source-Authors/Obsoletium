@@ -10,7 +10,8 @@
 #include "tier0/platform.h"
 
 #ifdef IS_WINDOWS_PC
-#include <windows.h> // UUIDCreate
+#include "winlite.h" // UUIDCreate
+#include <rpc.h>
 #else
 #include "checksum_crc.h"
 #endif

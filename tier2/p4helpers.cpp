@@ -12,7 +12,7 @@
 // #include "p4lib/ip4.h"
 
 #ifdef PLATFORM_WINDOWS_PC
-#include <Windows.h>
+#include "winlite.h"
 #endif // PLATFORM_WINDOWS_PC
 
 //////////////////////////////////////////////////////////////////////////

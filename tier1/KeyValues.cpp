@@ -7,7 +7,7 @@
 //=============================================================================//
 
 #if defined( _WIN32 ) && !defined( _X360 )
-#include <windows.h>		// for WideCharToMultiByte and MultiByteToWideChar
+#include "winlite.h"		// for WideCharToMultiByte and MultiByteToWideChar
 #elif defined(POSIX)
 #include <wchar.h> // wcslen()
 #define _alloca alloca

@@ -6,7 +6,7 @@
 
 #ifdef _WIN32
 #if !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #endif
 #include <direct.h>
 #include <io.h> // _chmod

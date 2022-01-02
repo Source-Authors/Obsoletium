@@ -11,7 +11,7 @@
 
 #ifdef IS_WINDOWS_PC
 
-#include <windows.h> // WAVEFORMATEX, WAVEFORMAT and ADPCM WAVEFORMAT!!!
+#include "winlite.h" // WAVEFORMATEX, WAVEFORMAT and ADPCM WAVEFORMAT!!!
 #include <mmreg.h>
 
 #else
