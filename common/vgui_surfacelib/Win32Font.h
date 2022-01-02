@@ -12,18 +12,17 @@
 #endif
 
 #if !defined( _X360 )
-#define WIN32_LEAN_AND_MEAN
-#define OEMRESOURCE
-#include <windows.h>
-#endif
-#ifdef GetCharABCWidths
-#undef GetCharABCWidths
+using HFONT = struct HFONT__*;
+using HDC = struct HDC__*;
+using HBITMAP = struct HBITMAP__*;
 #endif
 
 #include "utlrbtree.h"
 #include "tier1/utlsymbol.h"
 
 struct newChar_t;
+
+
 
 //-----------------------------------------------------------------------------
 // Purpose: encapsulates a windows font
