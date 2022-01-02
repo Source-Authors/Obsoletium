@@ -3787,12 +3787,12 @@ void Host_InitProcessor( void )
 
 	// Compute Frequency in Mhz: 
 	char* szFrequencyDenomination = "Mhz";
-	double fFrequency = pi.m_Speed / 1000000.0;
+	float fFrequency = pi.m_Speed / 1000000.0f;
 
 	// Adjust to Ghz if nessecary:
-	if( fFrequency > 1000.0 )
+	if( fFrequency > 1000.0f )
 	{
-		fFrequency /= 1000.0;
+		fFrequency /= 1000.0f;
 		szFrequencyDenomination = "Ghz";
 	}
 
@@ -3810,6 +3810,31 @@ void Host_InitProcessor( void )
 	{
 		if( MathLib_SSE2Enabled() ) Q_strncat(szFeatureString, "SSE2 ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
 		else					   Q_strncat(szFeatureString, "(SSE2) ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
+	}
+
+	if (pi.m_bSSE3)
+	{
+		Q_strncat( szFeatureString, "(SSE3) ", sizeof(szFeatureString), COPY_ALL_CHARACTERS );
+	}
+
+	if (pi.m_bSSSE3)
+	{
+		Q_strncat( szFeatureString, "(SSSE3) ", sizeof(szFeatureString), COPY_ALL_CHARACTERS );
+	}
+
+	if (pi.m_bSSE4a)
+	{
+		Q_strncat( szFeatureString, "(SSE4a) ", sizeof(szFeatureString), COPY_ALL_CHARACTERS );
+	}
+
+	if (pi.m_bSSE41)
+	{
+		Q_strncat( szFeatureString, "(SSE4.1) ", sizeof(szFeatureString), COPY_ALL_CHARACTERS );
+	}
+
+	if (pi.m_bSSE42)
+	{
+		Q_strncat( szFeatureString, "(SSE4.2) ", sizeof(szFeatureString), COPY_ALL_CHARACTERS );
 	}
 
 	if( pi.m_bMMX )
