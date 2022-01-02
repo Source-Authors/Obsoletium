@@ -13,7 +13,7 @@
 #endif
 
 #if defined( USE_WINDOWS_CLIPBOARD )
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 CClipboardManager::CClipboardManager( ) :

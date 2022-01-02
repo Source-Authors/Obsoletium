@@ -13,7 +13,7 @@
 #endif
 
 #if defined( WIN32 ) && !defined( _X360 )
-#include <windows.h> // SRC only!!
+#include "winlite.h"// SRC only!!
 #elif defined( POSIX )
 #include <stdio.h>
 #include <sys/stat.h>

@@ -7,13 +7,13 @@
 #ifdef _WIN32
 #include "SteamAppStartup.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <assert.h>
-#include <windows.h>
 #include <process.h>
 #include <direct.h>
-#include <stdio.h>
 #include <sys/stat.h>
+#include <cassert>
+#include <cstdio>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
 #define STEAM_PARM "-steam"
 
