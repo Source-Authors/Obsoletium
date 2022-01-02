@@ -5,7 +5,6 @@
 //===========================================================================//
 
 #if defined( _WIN32 ) && !defined( _X360 )
-#include <windows.h>
 #include <direct.h>
 #include <io.h> // _chmod
 #elif _LINUX

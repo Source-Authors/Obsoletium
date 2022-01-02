@@ -10,7 +10,7 @@
 // -----------------------
 #include "tier0/platform.h"
 #ifdef IS_WINDOWS_PC
-#include <windows.h>
+#include "winlite.h"
 #endif
 #include "cmdlib.h"
 #include <sys/types.h>

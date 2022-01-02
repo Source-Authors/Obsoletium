@@ -5,7 +5,7 @@
 //===========================================================================//
 
 #if !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #endif
 #include "vstdlib/iprocessutils.h"
 #include "tier1/utllinkedlist.h"

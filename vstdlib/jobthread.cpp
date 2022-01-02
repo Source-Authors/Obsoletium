@@ -5,8 +5,7 @@
 //=============================================================================
 
 #if defined( _WIN32 ) && !defined( _X360 )
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "winlite.h"
 #endif
 #include "tier0/dbg.h"
 #include "tier0/tslist.h"
