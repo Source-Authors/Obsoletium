@@ -87,7 +87,6 @@ void  __cdecl _SSE_VectorMA( const float *start, float scale, const float *direc
 //-----------------------------------------------------------------------------
 float _SSE_Sqrt(float x)
 {
-	Assert( s_bMathlibInitialized );
 	float	root = 0.f;
 #ifdef _WIN32
 	__asm
@@ -107,8 +106,6 @@ float _SSE_Sqrt(float x)
 #if 0
 float _SSE_RSqrtAccurate(float x)
 {
-	Assert( s_bMathlibInitialized );
-
 	float rroot;
 	__asm
 	{
@@ -175,8 +172,6 @@ float _SSE_RSqrtAccurate(float a)
 // or so, so ok for closed transforms.  (ie, computing lighting normals)
 float _SSE_RSqrtFast(float x)
 {
-	Assert( s_bMathlibInitialized );
-
 	float rroot;
 #ifdef _WIN32
 	__asm
@@ -195,12 +190,10 @@ float _SSE_RSqrtFast(float x)
 
 float FASTCALL _SSE_VectorNormalize (Vector& vec)
 {
-	Assert( s_bMathlibInitialized );
-
 	// NOTE: This is necessary to prevent an memory overwrite...
 	// sice vec only has 3 floats, we can't "movaps" directly into it.
 #ifdef _WIN32
-	__declspec(align(16)) float result[4];
+	alignas(16) float result[4];
 #elif POSIX
 	 float result[4] __attribute__((aligned(16)));
 #endif
@@ -896,7 +889,6 @@ float _SSE2_cos(float x)
 // SSE Version of VectorTransform
 void VectorTransformSSE(const float *in1, const matrix3x4_t& in2, float *out1)
 {
-	Assert( s_bMathlibInitialized );
 	Assert( in1 != out1 );
 
 #ifdef _WIN32
@@ -955,7 +947,6 @@ void VectorTransformSSE(const float *in1, const matrix3x4_t& in2, float *out1)
 #if 0
 void VectorRotateSSE( const float *in1, const matrix3x4_t& in2, float *out1 )
 {
-	Assert( s_bMathlibInitialized );
 	Assert( in1 != out1 );
 
 #ifdef _WIN32
@@ -1014,7 +1005,6 @@ void _declspec(naked) _SSE_VectorMA( const float *start, float scale, const floa
 	// FIXME: This don't work!! It will overwrite memory in the write to dest
 	Assert(0);
 
-	Assert( s_bMathlibInitialized );
 	__asm {  // Intel SSE only routine
 		mov	eax, DWORD PTR [esp+0x04]	; *start, s0..s2
 		mov ecx, DWORD PTR [esp+0x0c]	; *direction, d0..d2
@@ -1046,7 +1036,6 @@ void _declspec(naked) __cdecl _SSE_VectorMA( const Vector &start, float scale, c
 	// FIXME: This don't work!! It will overwrite memory in the write to dest
 	Assert(0);
 
-	Assert( s_bMathlibInitialized );
 	__asm 
 	{  
 		// Intel SSE only routine

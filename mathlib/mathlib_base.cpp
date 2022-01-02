@@ -49,14 +49,11 @@ const int nanmask = 255<<23;
 //-----------------------------------------------------------------------------
 float _sqrtf(float _X)
 {
-	Assert( s_bMathlibInitialized );
 	return sqrtf(_X); 
 }
 
 float _rsqrtf(float x)
 {
-	Assert( s_bMathlibInitialized );
-
 	return 1.f / _sqrtf( x );
 }
 
@@ -65,7 +62,6 @@ float FASTCALL _VectorNormalize (Vector& vec)
 #ifdef _VPROF_MATHLIB
 	VPROF_BUDGET( "_VectorNormalize", "Mathlib" );
 #endif
-	Assert( s_bMathlibInitialized );
 	float radius = sqrtf(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
 
 	// FLT_EPSILON is added to the radius to eliminate the possibility of divide by zero.
@@ -82,8 +78,6 @@ float FASTCALL _VectorNormalize (Vector& vec)
 // Perhaps use approximate rsqrt trick, if the accuracy isn't too bad.
 void FASTCALL _VectorNormalizeFast (Vector& vec)
 {
-	Assert( s_bMathlibInitialized );
-
 	// FLT_EPSILON is added to the radius to eliminate the possibility of divide by zero.
 	float iradius = 1.f / ( sqrtf(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z) + FLT_EPSILON );
 	
@@ -95,7 +89,6 @@ void FASTCALL _VectorNormalizeFast (Vector& vec)
 
 float _InvRSquared(const float* v)
 {
-	Assert( s_bMathlibInitialized );
 	float	r2 = DotProduct(v, v);
 	return r2 < 1.f ? 1.f : 1/r2;
 }
@@ -123,7 +116,6 @@ void InitSinCosTable()
 
 qboolean VectorsEqual( const float *v1, const float *v2 )
 {
-	Assert( s_bMathlibInitialized );
 	return ( ( v1[0] == v2[0] ) &&
 		     ( v1[1] == v2[1] ) &&
 			 ( v1[2] == v2[2] ) );
@@ -207,7 +199,6 @@ void MatrixAngles( const matrix3x4_t& matrix, float *angles )
 #ifdef _VPROF_MATHLIB
 	VPROF_BUDGET( "MatrixAngles", "Mathlib" );
 #endif
-	Assert( s_bMathlibInitialized );
 	float forward[3];
 	float left[3];
 	float up[3];
@@ -255,7 +246,6 @@ void MatrixAngles( const matrix3x4_t& matrix, float *angles )
 // transform in1 by the matrix in2
 void VectorTransform (const float *in1, const matrix3x4_t& in2, float *out)
 {
-	Assert( s_bMathlibInitialized );
 	Assert( in1 != out );
 	out[0] = DotProduct(in1, in2[0]) + in2[0][3];
 	out[1] = DotProduct(in1, in2[1]) + in2[1][3];
@@ -266,7 +256,6 @@ void VectorTransform (const float *in1, const matrix3x4_t& in2, float *out)
 // assuming the matrix is orthonormal, transform in1 by the transpose (also the inverse in this case) of in2.
 void VectorITransform (const float *in1, const matrix3x4_t& in2, float *out)
 {
-	Assert( s_bMathlibInitialized );
 	float in1t[3];
 
 	in1t[0] = in1[0] - in2[0][3];
@@ -282,7 +271,6 @@ void VectorITransform (const float *in1, const matrix3x4_t& in2, float *out)
 // assume in2 is a rotation and rotate the input vector
 void VectorRotate( const float *in1, const matrix3x4_t& in2, float *out )
 {
-	Assert( s_bMathlibInitialized );
 	Assert( in1 != out );
 	out[0] = DotProduct( in1, in2[0] );
 	out[1] = DotProduct( in1, in2[1] );
@@ -309,7 +297,6 @@ void VectorRotate( const Vector &in1, const Quaternion &in2, Vector &out )
 // rotate by the inverse of the matrix
 void VectorIRotate( const float *in1, const matrix3x4_t& in2, float *out )
 {
-	Assert( s_bMathlibInitialized );
 	Assert( in1 != out );
 	out[0] = in1[0]*in2[0][0] + in1[1]*in2[1][0] + in1[2]*in2[2][0];
 	out[1] = in1[0]*in2[0][1] + in1[1]*in2[1][1] + in1[2]*in2[2][1];
@@ -353,7 +340,6 @@ void MatrixInitialize( matrix3x4_t &mat, const Vector &vecOrigin, const Vector &
 
 void MatrixCopy( const matrix3x4_t& in, matrix3x4_t& out )
 {
-	Assert( s_bMathlibInitialized );
 	memcpy( out.Base(), in.Base(), sizeof( float ) * 3 * 4 );
 }
 
@@ -376,12 +362,11 @@ bool MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float f
 // NOTE: This is just the transpose not a general inverse
 void MatrixInvert( const matrix3x4_t& in, matrix3x4_t& out )
 {
-	Assert( s_bMathlibInitialized );
 	if ( &in == &out )
 	{
-		V_swap(out[0][1],out[1][0]);
-		V_swap(out[0][2],out[2][0]);
-		V_swap(out[1][2],out[2][1]);
+		std::swap(out[0][1],out[1][0]);
+		std::swap(out[0][2],out[2][0]);
+		std::swap(out[1][2],out[2][1]);
 	}
 	else
 	{
@@ -454,10 +439,7 @@ void MatrixScaleByZero ( matrix3x4_t &out )
 
 int VectorCompare (const float *v1, const float *v2)
 {
-	Assert( s_bMathlibInitialized );
-	int		i;
-	
-	for (i=0 ; i<3 ; i++)
+	for (int i=0 ; i<3 ; i++)
 		if (v1[i] != v2[i])
 			return 0;
 			
@@ -466,7 +448,6 @@ int VectorCompare (const float *v1, const float *v2)
 
 void CrossProduct (const float* v1, const float* v2, float* cross)
 {
-	Assert( s_bMathlibInitialized );
 	Assert( v1 != cross );
 	Assert( v2 != cross );
 	cross[0] = v1[1]*v2[2] - v1[2]*v2[1];
@@ -531,7 +512,6 @@ void VectorMatrix( const Vector &forward, matrix3x4_t& matrix)
 
 void VectorAngles( const float *forward, float *angles )
 {
-	Assert( s_bMathlibInitialized );
 	float	tmp, yaw, pitch;
 	
 	if (forward[1] == 0 && forward[0] == 0)
@@ -567,7 +547,6 @@ R_ConcatRotations
 */
 void ConcatRotations (const float in1[3][3], const float in2[3][3], float out[3][3])
 {
-	Assert( s_bMathlibInitialized );
 	Assert( in1 != out );
 	Assert( in2 != out );
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] +
@@ -775,7 +754,6 @@ GreatestCommonDivisor
 */
 int GreatestCommonDivisor (int i1, int i2)
 {
-	Assert( s_bMathlibInitialized );
 	if (i1 > i2)
 	{
 		if (i2 == 0)
@@ -803,8 +781,6 @@ bool IsDenormal( const float &val )
 // dimhotepus: use byte as expected type is byte.
 byte SignbitsForPlane (cplane_t *out)
 {
-	Assert( s_bMathlibInitialized );
-
 	// for fast box on planeside test
 	byte bits = 0;
 	for (byte j=0 ; j<3 ; j++)
@@ -824,7 +800,6 @@ Returns 1, 2, or 1 + 2
 */
 int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane_t *p)
 {
-	Assert( s_bMathlibInitialized );
 	float	dist1, dist2;
 	int		sides;
 
@@ -995,7 +970,6 @@ void AngleVectorsTranspose (const QAngle &angles, Vector *forward, Vector *right
 
 void VectorAngles( const Vector& forward, QAngle &angles )
 {
-	Assert( s_bMathlibInitialized );
 	float	tmp, yaw, pitch;
 	
 	if (forward[1] == 0 && forward[0] == 0)
@@ -1281,20 +1255,15 @@ void AngleIMatrix (const QAngle &angles, const Vector &position, matrix3x4_t &ma
 
 void ClearBounds (Vector& mins, Vector& maxs)
 {
-	Assert( s_bMathlibInitialized );
 	mins[0] = mins[1] = mins[2] = 99999;
 	maxs[0] = maxs[1] = maxs[2] = -99999;
 }
 
 void AddPointToBounds (const Vector& v, Vector& mins, Vector& maxs)
 {
-	Assert( s_bMathlibInitialized );
-	int		i;
-	vec_t	val;
-
-	for (i=0 ; i<3 ; i++)
+	for (int i=0 ; i<3 ; i++)
 	{
-		val = v[i];
+		vec_t val = v[i];
 		if (val < mins[i])
 			mins[i] = val;
 		if (val > maxs[i])
@@ -1305,7 +1274,6 @@ void AddPointToBounds (const Vector& v, Vector& mins, Vector& maxs)
 // solve a x^2 + b x + c = 0
 bool SolveQuadratic( float a, float b, float c, float &root1, float &root2 )
 {
-	Assert( s_bMathlibInitialized );
 	if (a == 0)
 	{
 		if (b != 0)
@@ -1343,7 +1311,7 @@ bool SolveInverseQuadratic( float x1, float y1, float x2, float y2, float x3, fl
 	float det = (x1 - x2)*(x1 - x3)*(x2 - x3);
 
 	// FIXME: check with some sort of epsilon
-	if (det == 0.0)
+	if (det == 0.0F)
 		return false;
 
 	a = (x3*(-y1 + y2) + x2*(y1 - y3) + x1*(-y2 + y3)) / det;
@@ -1504,8 +1472,6 @@ float SmoothCurve_Tweak( float x, float flPeakPos, float flPeakSharpness )
 
 void QuaternionAlign( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 {
-	Assert( s_bMathlibInitialized );
-
 	// FIXME: can this be done with a quat dot product?
 
 	int i;
@@ -1612,7 +1578,6 @@ void QuaternionSlerp( const Quaternion &p, const Quaternion &q, float t, Quatern
 
 void QuaternionSlerpNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
-	Assert( s_bMathlibInitialized );
 	float omega, cosom, sinom, sclp, sclq;
 	int i;
 
@@ -1678,7 +1643,6 @@ float QuaternionAngleDiff( const Quaternion &p, const Quaternion &q )
 	Quaternion q2;
 	QuaternionAlign( p, q, q2 );
 
-	Assert( s_bMathlibInitialized );
 	float cosom = p.x * q2.x + p.y * q2.y + p.z * q2.z + p.w * q2.w;
 
 	if ( cosom > -1.0f )
@@ -1697,7 +1661,6 @@ float QuaternionAngleDiff( const Quaternion &p, const Quaternion &q )
 
 void QuaternionConjugate( const Quaternion &p, Quaternion &q )
 {
-	Assert( s_bMathlibInitialized );
 	Assert( q.IsValid() );
 
 	q.x = -p.x;
@@ -1730,7 +1693,6 @@ void QuaternionInvert( const Quaternion &p, Quaternion &q )
 //-----------------------------------------------------------------------------
 float QuaternionNormalize( Quaternion &q )
 {
-	Assert( s_bMathlibInitialized );
 	float radius, iradius;
 
 	Assert( q.IsValid() );
@@ -1821,7 +1783,6 @@ void QuaternionAdd( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 
 float QuaternionDotProduct( const Quaternion &p, const Quaternion &q )
 {
-	Assert( s_bMathlibInitialized );
 	Assert( p.IsValid() );
 	Assert( q.IsValid() );
 
@@ -2477,7 +2438,6 @@ float Hermite_Spline(
 	float d2,
 	float t )
 {
-	Assert( s_bMathlibInitialized );
 	float output;
 	float tSqr = t*t;
 	float tCube = t*tSqr;

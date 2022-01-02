@@ -71,7 +71,6 @@ float _3DNow_RSqrt(float x)
 
 float FASTCALL _3DNow_VectorNormalize (Vector& vec)
 {
-	Assert( s_bMathlibInitialized );
 	float *v = &vec[0];
 	float	radius = 0.f;
 
@@ -142,7 +141,6 @@ void FASTCALL _3DNow_VectorNormalizeFast (Vector& vec)
 
 float _3DNow_InvRSquared(const float* v)
 {
-	Assert( s_bMathlibInitialized );
 	float	r2 = 1.f;
 #ifdef _WIN32
 	__asm { // AMD 3DNow only routine
