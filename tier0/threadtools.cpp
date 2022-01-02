@@ -6,11 +6,10 @@
 
 #include "pch_tier0.h"
 
+#include <thread>
+
 #include "tier1/strtools.h"
 #include "tier0/dynfunction.h"
-#if defined( _WIN32 ) && !defined( _X360 )
-#include "winlite.h"
-#endif
 #ifdef _WIN32
 	#include <process.h>
 
@@ -185,11 +184,15 @@ bool ReleaseThreadHandle( ThreadHandle_t hThread )
 
 void ThreadSleep(unsigned nMilliseconds)
 {
-#ifdef _WIN32
-	Sleep( nMilliseconds );
-#elif defined(POSIX)
-   usleep( nMilliseconds * 1000 ); 
-#endif
+	// dimhotepus: Use std thread APIs.
+	if ( nMilliseconds == 0 )
+	{
+    std::this_thread::yield();
+	}
+	else
+	{
+		std::this_thread::sleep_for( std::chrono::milliseconds{nMilliseconds} );
+	}
 }
 
 //-----------------------------------------------------------------------------
