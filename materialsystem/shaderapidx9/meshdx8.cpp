@@ -3360,58 +3360,55 @@ void CMeshDX8::DrawInternal( CPrimList *pLists, int nLists )
 #ifdef CHECK_INDICES
 void CMeshDX8::CheckIndices( CPrimList *pPrim, int numPrimitives )
 {
+	// dimhotepus: Simplified indices checking
 	// g_pLastVertex - this is the current vertex buffer
 	// g_pLastColorMesh - this is the current color mesh, if there is one.
 	// g_pLastIndex - this is the current index buffer.
 	// vertoffset : m_FirstIndex
-	if( m_Mode == D3DPT_TRIANGLELIST || m_Mode == D3DPT_TRIANGLESTRIP )
+	int nIndexCount = 0;
+	if ( m_Mode == D3DPT_TRIANGLELIST )
+	{
+		nIndexCount = numPrimitives * 3;
+	}
+	else if (m_Mode == D3DPT_TRIANGLESTRIP)
+	{
+		nIndexCount = numPrimitives + 2;
+	}
+
+	if ( nIndexCount != 0 )
 	{
 		Assert( pPrim->m_FirstIndex >= 0 && pPrim->m_FirstIndex < g_pLastIndex->IndexCount() );
-		int i;
-		for( i = 0; i < 2; i++ )
+		Assert( s_FirstVertex >= 0 );
+
+		const int maxVertexIdx = (int)( s_FirstVertex + m_FirstIndex );
+
 		{
-			CVertexBuffer *pMesh;
-			if( i == 0 )
+			CVertexBuffer* pMesh = g_pLastVertex;
+
+			Assert( pMesh && maxVertexIdx < pMesh->VertexCount() );
+		}
+
+		{
+			CVertexBuffer* pMesh = g_pLastColorMesh ? g_pLastColorMesh->m_pVertexBuffer : NULL;
+
+			if ( pMesh )
 			{
-				pMesh = g_pLastVertex;
-				Assert( pMesh );
+				Assert( maxVertexIdx < pMesh->VertexCount() );
 			}
-			else
+		}
+
+		for (int j = 0; j < nIndexCount; j++)
+		{
+			const unsigned int index = g_pLastIndex->GetShadowIndex( j + pPrim->m_FirstIndex );
+
+			if (index >= s_FirstVertex && index < s_FirstVertex + s_NumVertices)
 			{
-				if( !g_pLastColorMesh )
-				{
-					continue;
-				}
-				pMesh = g_pLastColorMesh->m_pVertexBuffer;
-				if( !pMesh )
-				{
-					continue;
-				}
+				continue;
 			}
-			Assert( s_FirstVertex >= 0 && 
-				(int)( s_FirstVertex + m_FirstIndex ) < pMesh->VertexCount() );
-			int nIndexCount = 0;
-			if( m_Mode == D3DPT_TRIANGLELIST )
-			{
-				nIndexCount = numPrimitives * 3;
-			}
-			else if( m_Mode == D3DPT_TRIANGLESTRIP )
-			{
-				nIndexCount = numPrimitives + 2;
-			}
-			else
-			{
-				Assert( 0 );
-			}
-			int j;
-			for( j = 0; j < nIndexCount; j++ )
-			{
-				int index = g_pLastIndex->GetShadowIndex( j + pPrim->m_FirstIndex );
-				if ( ( index < (int)s_FirstVertex ) || ( index >= (int)( s_FirstVertex + s_NumVertices ) ) )
-					Warning("%s invalid index: %d [%u..%u]\n", __FUNCTION__, index, s_FirstVertex, s_FirstVertex + s_NumVertices - 1 );
-				Assert( index >= (int)s_FirstVertex );
-				Assert( index < (int)(s_FirstVertex + s_NumVertices) );
-			}
+
+			Warning("%s invalid index: %d [%u..%u]\n", __FUNCTION__, index, s_FirstVertex, s_FirstVertex + s_NumVertices - 1);
+
+			Assert( false );
 		}
 	}
 }
