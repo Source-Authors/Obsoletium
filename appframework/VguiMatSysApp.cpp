@@ -9,7 +9,7 @@
 #ifdef _WIN32
 
 #if defined( _WIN32 ) && !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #endif
 #include "appframework/vguimatsysapp.h"
 #include "filesystem.h"
