@@ -29,10 +29,9 @@
 //-----------------------------------------------------------------------------
 float _3DNow_Sqrt(float x)
 {
-	Assert( s_bMathlibInitialized );
 	float	root = 0.f;
 #ifdef _WIN32
-	_asm
+	__asm
 	{
 		femms
 		movd		mm0, x
@@ -79,7 +78,7 @@ float FASTCALL _3DNow_VectorNormalize (Vector& vec)
 	if ( v[0] || v[1] || v[2] )
 	{
 #ifdef _WIN32
-	_asm
+	__asm
 		{
 			mov			eax, v
 			femms
@@ -146,7 +145,7 @@ float _3DNow_InvRSquared(const float* v)
 	Assert( s_bMathlibInitialized );
 	float	r2 = 1.f;
 #ifdef _WIN32
-	_asm { // AMD 3DNow only routine
+	__asm { // AMD 3DNow only routine
 		mov			eax, v
 		femms
 		movq		mm0, QWORD PTR [eax]

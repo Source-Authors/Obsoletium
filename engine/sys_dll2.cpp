@@ -1171,7 +1171,7 @@ InitReturnVal_t CEngineAPI::Init()
 
 	// Initialize the FPU control word
 #if defined(WIN32) && !defined( SWDS ) && !defined( _X360 )
-	_asm
+	__asm
 	{
 		fninit
 	}

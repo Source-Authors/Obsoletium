@@ -2480,7 +2480,7 @@ void CWin32Surface::CreatePopup(VPANEL panel, bool minimised, bool showTaskbarIc
 	else
 	{
 		// somehow getting added twice, fundamental problem
-		_asm int 3;
+		DebuggerBreak();
 	}
 
 	// hack, force a windows sound to be played

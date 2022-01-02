@@ -471,7 +471,7 @@ bool CDedicatedSteamApplication::Create( )
 int main(int argc, char **argv)
 {
 #ifndef POSIX
-	_asm
+	__asm
 	{
 		fninit
 	}

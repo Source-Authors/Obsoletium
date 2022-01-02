@@ -90,7 +90,7 @@ float _SSE_Sqrt(float x)
 	Assert( s_bMathlibInitialized );
 	float	root = 0.f;
 #ifdef _WIN32
-	_asm
+	__asm
 	{
 		sqrtss		xmm0, x
 		movss		root, xmm0
@@ -110,7 +110,7 @@ float _SSE_RSqrtAccurate(float x)
 	Assert( s_bMathlibInitialized );
 
 	float rroot;
-	_asm
+	__asm
 	{
 		rsqrtss	xmm0, x
 		movss	rroot, xmm0
@@ -179,7 +179,7 @@ float _SSE_RSqrtFast(float x)
 
 	float rroot;
 #ifdef _WIN32
-	_asm
+	__asm
 	{
 		rsqrtss	xmm0, x
 		movss	rroot, xmm0
@@ -216,7 +216,7 @@ float FASTCALL _SSE_VectorNormalize (Vector& vec)
 	if ( v[0] || v[1] || v[2] )
 	{
 #ifdef _WIN32
-	_asm
+	__asm
 		{
 			mov			eax, v
 			mov			edx, r
@@ -290,7 +290,7 @@ float _SSE_InvRSquared(const float* v)
 {
 	float	inv_r2 = 1.f;
 #ifdef _WIN32
-	_asm { // Intel SSE only routine
+	__asm { // Intel SSE only routine
 		mov			eax, v
 		movss		xmm5, inv_r2		// x5 = 1.0, 0, 0, 0
 #ifdef ALIGNED_VECTOR
@@ -1015,7 +1015,7 @@ void _declspec(naked) _SSE_VectorMA( const float *start, float scale, const floa
 	Assert(0);
 
 	Assert( s_bMathlibInitialized );
-	_asm {  // Intel SSE only routine
+	__asm {  // Intel SSE only routine
 		mov	eax, DWORD PTR [esp+0x04]	; *start, s0..s2
 		mov ecx, DWORD PTR [esp+0x0c]	; *direction, d0..d2
 		mov edx, DWORD PTR [esp+0x10]	; *dest
@@ -1047,7 +1047,7 @@ void _declspec(naked) __cdecl _SSE_VectorMA( const Vector &start, float scale, c
 	Assert(0);
 
 	Assert( s_bMathlibInitialized );
-	_asm 
+	__asm 
 	{  
 		// Intel SSE only routine
 		mov	eax, DWORD PTR [esp+0x04]	; *start, s0..s2
