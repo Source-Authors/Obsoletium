@@ -6,8 +6,9 @@
 //===========================================================================//
 
 #if defined( WIN32 ) && !defined( _X360 )
-#include <windows.h>
-#include <zmouse.h>
+#include "winlite.h"
+
+#include <imm.h>
 #endif
 #include "inputsystem/iinputsystem.h"
 #include "tier2/tier2.h"

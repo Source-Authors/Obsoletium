@@ -6,8 +6,7 @@
 //=============================================================================//
 
 #if defined ( WIN32 ) && !defined( _X360 )
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "winlite.h"
 #elif defined( OSX )
 #include <Carbon/Carbon.h>
 #elif defined( LINUX )

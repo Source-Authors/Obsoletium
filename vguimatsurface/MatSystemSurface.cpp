@@ -6,7 +6,9 @@
 //=============================================================================//
 
 #if defined( WIN32) && !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
+
+#include <shellapi.h>
 #endif
 #ifdef OSX
 #include <Carbon/Carbon.h>
