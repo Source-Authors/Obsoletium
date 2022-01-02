@@ -5,9 +5,6 @@
 //=============================================================================//
 
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
 #include "bitmap/imageformat.h"
 #include "basetypes.h"
 #include "tier0/dbg.h"

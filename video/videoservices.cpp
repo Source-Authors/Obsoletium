@@ -24,7 +24,7 @@
 #include "tier0/memdbgon.h"
 
 #if defined( WIN32 )
-	#include <windows.h>
+	#include "winlite.h"
 #elif defined( OSX )
 	#include <Carbon/Carbon.h>
 #endif
