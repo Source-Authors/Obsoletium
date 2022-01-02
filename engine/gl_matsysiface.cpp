@@ -759,13 +759,23 @@ void CMSurfaceSortList::Init( int maxSortIDs, int minMaterialLists )
 	m_groupUsed.EnsureCount(groupBytes);
 	Q_memset(m_groupUsed.Base(), 0, groupBytes);
 
-	for ( int i = 0; i < MAX_MAT_SORT_GROUPS; i++ )
+	auto it = std::begin(m_sortGroupLists);
 	{
-		m_sortGroupLists[i].RemoveAll();
-		int cap = (i==0) ? 128 : 16;
-		m_sortGroupLists[i].EnsureCapacity(cap);
-		groupOffset[i] = m_maxSortIDs * i;
+		it->RemoveAll();
+		it->EnsureCapacity(128);
+		groupOffset[0] = 0;
+		++it;
 	}
+
+	int i = 1;
+	for ( const auto end = std::end(m_sortGroupLists); it != end; ++it )
+	{
+		it->RemoveAll();
+		it->EnsureCapacity(16);
+
+		groupOffset[i] = m_maxSortIDs * i;
+		++i;
+ 	}
 	InitGroup(&m_emptyGroup);
 }
 
