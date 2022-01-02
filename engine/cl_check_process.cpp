@@ -11,12 +11,12 @@
 #include "dbg.h"
 
 #ifdef IS_WINDOWS_PC
-#include <Windows.h>
+#include "winlite.h"
 #include <winternl.h>
-#include <stdio.h>
 #include <TlHelp32.h>
-#include "strtools.h"
 #include <Psapi.h>
+#include <cstdio>
+#include "tier1/strtools.h"
 #endif // IS_WINDOWS_PC
 
 // memdbgon must be the last include file in a .cpp file!!!

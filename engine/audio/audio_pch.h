@@ -10,8 +10,7 @@
 #include "platform.h"
 
 #if !defined( _X360 ) && defined( WIN32 )
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "winlite.h"
 #include <mmsystem.h>
 #include <mmreg.h>
 #endif

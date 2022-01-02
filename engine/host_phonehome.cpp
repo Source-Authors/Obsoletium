@@ -6,7 +6,9 @@
 
 #ifdef _WIN32
 #if !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
+
+#include <winsock.h>
 #endif
 #elif defined(POSIX)
 #include <sys/socket.h>
