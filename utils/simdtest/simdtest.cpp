@@ -9,13 +9,15 @@
 #include "bitmap/float_bm.h"
 #include "mathlib/mathlib.h"
 #include "tier2/tier2.h"
-#include "tier0/memdbgon.h"
 #include "mathlib/ssemath.h"
+
+#include <iostream>
 
 #ifdef _X360
 #include "xbox/xbox_console.h"
 #endif
 
+#include "tier0/memdbgon.h"
 
 
 #define PROBLEM_SIZE 1000
@@ -192,7 +194,8 @@ bool SIMDTest()
 	Warning(outputBuffer);
 #endif // RECORD_OUTPUT
 
-	printf("elapsed time=%f p/s=%f\n",ETime, (4.0*PROBLEM_SIZE*N_ITERS)/ETime );
+	std::cout << "elapsed time=" << ETime
+                  << " p/s=" << (4.0 * PROBLEM_SIZE * N_ITERS) / ETime << "\n";
 	return bChangedSomething;
 }
 
@@ -298,7 +301,10 @@ int main(int argc,char **argv)
 	// This function is useful for inspecting compiler output
 	fltx4 result;
 	SSEClassTest( Four_PointFives, result );
-	printf("(%f,%f,%f,%f)\n", SubFloat( result, 0 ), SubFloat( result, 1 ), SubFloat( result, 2 ), SubFloat( result, 3 ) );
+	std::cout << "(" << SubFloat( result, 0 ) << "," 
+		<< SubFloat( result, 1 ) << "," 
+		<< SubFloat( result, 2 ) << "," 
+		<< SubFloat( result, 3) << ")\n";
 
 #else // _X360
 
