@@ -6,9 +6,7 @@
 //
 //=============================================================================//
 
-#if defined( _WIN32 ) && !defined( _X360 )
-#include "winlite.h"		// for WideCharToMultiByte and MultiByteToWideChar
-#elif defined(POSIX)
+#if defined(POSIX)
 #include <wchar.h> // wcslen()
 #define _alloca alloca
 #define _wtoi(arg) wcstol(arg, NULL, 10)

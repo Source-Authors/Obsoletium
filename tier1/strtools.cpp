@@ -1469,7 +1469,7 @@ int _V_UCS2ToUTF8( const ucs2 *pUCS2, char *pUTF8, int cubDestSizeInBytes )
 	AssertValidStringPtr(pUTF8, cubDestSizeInBytes);
 	AssertValidReadPtr(pUCS2);
 	
-	pUTF8[0] = 0;
+	pUTF8[0] = '\0';
 #ifdef _WIN32
 	// under win32 wchar_t == ucs2, sigh
 	int cchResult = WideCharToMultiByte( CP_UTF8, 0, pUCS2, -1, pUTF8, cubDestSizeInBytes, NULL, NULL );
@@ -1510,7 +1510,7 @@ int _V_UCS2ToUTF8( const ucs2 *pUCS2, char *pUTF8, int cubDestSizeInBytes )
 			cchResult = nMaxUTF8;
 	}
 #endif
-	pUTF8[cubDestSizeInBytes - 1] = 0;
+	pUTF8[cubDestSizeInBytes - 1] = '\0';
 	return cchResult;	
 }
 
@@ -3383,17 +3383,17 @@ bool V_BasicHtmlEntityEncode( char *pDest, const int nDestSize, char const *pIn,
 bool V_HtmlEntityDecodeToUTF8( char *pDest, const int nDestSize, char const *pIn, const int nInSize )
 {
 	Assert( nDestSize == 0 || pDest != NULL );
-	int iOutput = 0;
+  int iOutput = 0;
+  char rgchReplacement[8];
 	for ( int iInput = 0; iInput < nInSize && iOutput < nDestSize; ++iInput )
 	{
 		bool bReplacementDone = false;
 		if ( pIn[ iInput ] == '&' )
 		{
+			rgchReplacement[ 0 ] = '\0';
 			bReplacementDone = true;
 
 			uchar32 wrgchReplacement[ 2 ] = { 0, 0 };
-			char rgchReplacement[ 8 ];
-			rgchReplacement[ 0 ] = 0;
 
 			const char *pchEnd = Q_strstr( pIn + iInput + 1, ";" );
 			if ( pchEnd )

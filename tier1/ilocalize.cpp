@@ -1,8 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 
-#if defined( WIN32 ) && !defined( _X360 )
-	#include "winlite.h"
-#elif defined( POSIX )
+#if defined( POSIX )
 	#include <iconv.h>
 #endif
 
@@ -18,9 +16,7 @@ int ILocalize::ConvertANSIToUnicode(const char *ansi, wchar_t *unicode, int unic
 	// Q_UTF8ToUnicode returns the number of bytes. This function is expected to return the number of chars.
 	return Q_UTF8ToUnicode(ansi, unicode, unicodeBufferSizeInBytes) / sizeof( wchar_t );
 #else
-	int chars = MultiByteToWideChar(CP_UTF8, 0, ansi, -1, unicode, unicodeBufferSizeInBytes / sizeof(wchar_t));
-	unicode[(unicodeBufferSizeInBytes / sizeof(wchar_t)) - 1] = 0;
-	return chars;
+  return V_UTF8ToUCS2(ansi, -1, unicode, unicodeBufferSizeInBytes);
 #endif
 }
 
@@ -32,9 +28,7 @@ int ILocalize::ConvertUnicodeToANSI(const wchar_t *unicode, char *ansi, int ansi
 #ifdef POSIX
 	return Q_UnicodeToUTF8(unicode, ansi, ansiBufferSize);
 #else
-	int result = WideCharToMultiByte(CP_UTF8, 0, unicode, -1, ansi, ansiBufferSize, NULL, NULL);
-	ansi[ansiBufferSize - 1] = 0;
-	return result;
+  return V_UCS2ToUTF8(unicode, ansi, ansiBufferSize);
 #endif
 }
 
