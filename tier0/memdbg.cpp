@@ -777,7 +777,7 @@ CDbgMemAlloc::~CDbgMemAlloc()
 
 void CDbgMemAlloc::Initialize()
 {
-	if ( !m_bInitialized )
+  if (!m_bInitialized) [[unlikely]]
 	{
 		m_pFilenames = new Filenames_t;
 		m_pStatMap= new StatMap_t;
@@ -1086,14 +1086,16 @@ void CDbgMemAlloc::RegisterAllocation( const char *pFileName, int nLine, int nLo
 {
 	HEAP_LOCK();
 	RegisterAllocation( m_GlobalInfo, nLogicalSize, nActualSize, nTime );
-	RegisterAllocation( FindOrCreateEntry( pFileName, nLine ), nLogicalSize, nActualSize, nTime );
+	MemInfo_t &info{FindOrCreateEntry( pFileName, nLine )};
+	RegisterAllocation( info, nLogicalSize, nActualSize, nTime );
 }
 
 void CDbgMemAlloc::RegisterDeallocation( const char *pFileName, int nLine, int nLogicalSize, int nActualSize, unsigned nTime )
 {
 	HEAP_LOCK();
 	RegisterDeallocation( m_GlobalInfo, nLogicalSize, nActualSize, nTime );
-	RegisterDeallocation( FindOrCreateEntry( pFileName, nLine ), nLogicalSize, nActualSize, nTime );
+	MemInfo_t &info{FindOrCreateEntry( pFileName, nLine )};
+	RegisterDeallocation( info, nLogicalSize, nActualSize, nTime );
 }
 
 void CDbgMemAlloc::RegisterAllocation( MemInfo_t &info, int nLogicalSize, int nActualSize, unsigned nTime )
@@ -1219,10 +1221,9 @@ void *CDbgMemAlloc::Alloc( size_t nSize, const char *pFileName, int nLine )
 	void *pMem = InternalMalloc( nSize, pFileName, nLine );
 	m_Timer.End();
 
-	ApplyMemoryInitializations( pMem, nSize );
-
 	if ( pMem )
 	{
+		ApplyMemoryInitializations( pMem, nSize );
 		RegisterAllocation( pFileName, nLine, nSize, InternalMSize( pMem ), m_Timer.GetDuration().GetMicroseconds() );
 	}
 	else
