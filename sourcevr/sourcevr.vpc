@@ -8,6 +8,14 @@ $Macro SRCDIR ".."
 $Macro OUTBINDIR "..\..\game\bin"
 $Macro BINNAME "sourcevr"
 
+$Macro OPENVRSRCDIR $SRCDIR\thirdparty\openvr
+$Macro OPENVRLIBDIR win32   [$WIN32]
+$Macro OPENVRLIBDIR win64   [$WIN64]
+$Macro OPENVRLIBDIR linux32 [$LINUX32]
+$Macro OPENVRLIBDIR linux64 [$LINUX64]
+$Macro OPENVRLIBDIR osx32   [$OSX32]
+$Macro OPENVRLIBDIR osx64   [$OSX64]
+
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
 $Configuration
@@ -19,6 +27,8 @@ $Configuration
 
 	$Compiler
 	{
+		// General
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\thirdparty"
 		$PreprocessorDefinitions		"$BASE;SOURCEVR_DLL;VERSION_SAFE_STEAM_API_INTERFACES" 
 		$Create/UsePrecompiledHeader	"Use Precompiled Header (/Yu)"
 		$Create/UsePCHThroughFile		"cbase.h"
@@ -28,6 +38,16 @@ $Configuration
 	$Linker
 	{
 		$IgnoreImportLibrary			"TRUE"
+	}
+
+	$PostBuildEvent [!$ANALYZE]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
+									"COPY $OPENVRSRCDIR\bin\$OPENVRLIBDIR\openvr_api.dll $OUTBINDIR\openvr_api.dll" "\n"					\
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"COPY $OPENVRSRCDIR\bin\$OPENVRLIBDIR\openvr_api.pdb $OUTBINDIR\openvr_api.pdb" "\n"					\
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"$BASE"
 	}
 }
 
@@ -53,7 +73,7 @@ $Project "SourceVR"
 		$Folder "Public Headers"
 		{
 			$File "$SRCDIR\public\sourcevr\isourcevirtualreality.h"
-			$File "$SRCDIR\public\openvr\openvr.h"
+			$File "$SRCDIR\thirdparty\openvr\headers\openvr.h"
 		}
 
 		$File	"$SRCDIR\sourcevr\sourcevirtualreality.h"
@@ -62,7 +82,7 @@ $Project "SourceVR"
 
 	$Folder	"Link Libraries"
 	{
-		$ImpLibexternal openvr_api
+		$File	"$OPENVRSRCDIR\lib\$OPENVRLIBDIR\openvr_api.lib" [$WINDOWS]
 		$Lib mathlib
 		$Lib tier2
 		$Lib tier3

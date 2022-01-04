@@ -13,7 +13,7 @@
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterialvar.h"
 #include "renderparm.h"
-#include "openvr/openvr.h"
+#include "openvr/headers/openvr.h"
 
 using namespace vr;
 
@@ -148,7 +148,7 @@ InitReturnVal_t	CSourceVirtualReality::Init()
 		TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD | TEXTUREFLAGS_NODEBUGOVERRIDE |
 		TEXTUREFLAGS_SINGLECOPY | TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT );
 	// dimhotepus: InitProceduralTexture to correctly count materials.
-	m_pDistortionTextureLeft.InitProceduralTexture( "vr_distort_map_right", TEXTURE_GROUP_PIXEL_SHADERS,
+	m_pDistortionTextureRight.InitProceduralTexture( "vr_distort_map_right", TEXTURE_GROUP_PIXEL_SHADERS,
 		distortionTextureSize, distortionTextureSize, IMAGE_FORMAT_RGBA16161616,
 		TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD | TEXTUREFLAGS_NODEBUGOVERRIDE |
 		TEXTUREFLAGS_SINGLECOPY | TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT );

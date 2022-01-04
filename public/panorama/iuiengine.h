@@ -38,7 +38,7 @@
 
 #if !defined( SOURCE2_PANORAMA )
 #include "audio/iaudiointerface.h"
-#include <openvr.h>
+#include "openvr/headers/openvr.h"
 #endif
 
 #if _GNUC

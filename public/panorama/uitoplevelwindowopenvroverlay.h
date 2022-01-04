@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include <openvr.h>
+#include "openvr/headers/openvr.h"
 
 namespace panorama
 {

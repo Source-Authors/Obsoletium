@@ -16,7 +16,7 @@
 #include "sourcevr/isourcevirtualreality.h"
 #include "materialsystem/itexture.h"
 #include "materialsystem/MaterialSystemUtil.h"
-#include "openvr/openvr.h"
+#include "openvr/headers/openvr.h"
 
 
 // this is a callback so we can regenerate the distortion texture whenever we need to
