@@ -221,6 +221,9 @@ CreateInterfaceFn VStdLib_GetICVarFactory()
 //-----------------------------------------------------------------------------
 CCvar::CCvar() : m_TempConsoleBuffer( 0, 1024 )
 {
+	// dimhotepus: Preallocate diplay funcs.
+  m_DisplayFuncs.EnsureCapacity( 2 );
+
 	m_nNextDLLIdentifier = 0;
 	m_pConCommandList = NULL;
 
