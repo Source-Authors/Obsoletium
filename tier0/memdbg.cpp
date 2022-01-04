@@ -898,30 +898,36 @@ void *CDbgMemAlloc::Expand_NoLongerSupported( void *pMem, size_t nSize )
 	return NULL;
 }
 
+void SetupDebugInfoStack()
+{
+	g_DbgInfoStack = (DbgInfoStack_t *)DebugAlloc( sizeof(DbgInfoStack_t) * DBG_INFO_STACK_DEPTH );
+	g_nDbgInfoStackDepth = -1;
+}
 
 //-----------------------------------------------------------------------------
 // Force file + line information for an allocation
 //-----------------------------------------------------------------------------
 void CDbgMemAlloc::PushAllocDbgInfo( const char *pFileName, int nLine )
 {
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == NULL ) [[unlikely]]
 	{
-		g_DbgInfoStack = (DbgInfoStack_t *)DebugAlloc( sizeof(DbgInfoStack_t) * DBG_INFO_STACK_DEPTH );
-		g_nDbgInfoStackDepth = -1;
+		SetupDebugInfoStack();
 	}
 
 	const int newStackDepth{++g_nDbgInfoStackDepth};
 	Assert( newStackDepth < DBG_INFO_STACK_DEPTH );
-	g_DbgInfoStack[newStackDepth].m_pFileName = FindOrCreateFilename( pFileName );
-	g_DbgInfoStack[newStackDepth].m_nLine = nLine;
+
+	DbgInfoStack_t &info{g_DbgInfoStack[newStackDepth]};
+
+	info.m_pFileName = FindOrCreateFilename( pFileName );
+	info.m_nLine = nLine;
 }
 
 void CDbgMemAlloc::PopAllocDbgInfo()
 {
-	if ( g_DbgInfoStack == NULL )
+  if ( g_DbgInfoStack == NULL ) [[unlikely]]
 	{
-		g_DbgInfoStack = (DbgInfoStack_t *)DebugAlloc( sizeof(DbgInfoStack_t) * DBG_INFO_STACK_DEPTH );
-		g_nDbgInfoStackDepth = -1;
+		SetupDebugInfoStack();
 	}
 
 	[[maybe_unused]] const int newStackDepth{--g_nDbgInfoStackDepth};
@@ -939,10 +945,9 @@ uint32 CDbgMemAlloc::GetDebugInfoSize()
 
 void CDbgMemAlloc::SaveDebugInfo( void *pvDebugInfo )
 {
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == NULL ) [[unlikely]]
 	{
-		g_DbgInfoStack = (DbgInfoStack_t *)DebugAlloc( sizeof(DbgInfoStack_t) * DBG_INFO_STACK_DEPTH );
-		g_nDbgInfoStackDepth = -1;
+		SetupDebugInfoStack();
 	}
 
 	int32 *pnStackDepth = (int32*) pvDebugInfo;
@@ -952,10 +957,9 @@ void CDbgMemAlloc::SaveDebugInfo( void *pvDebugInfo )
 
 void CDbgMemAlloc::RestoreDebugInfo( const void *pvDebugInfo )
 {
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == NULL ) [[unlikely]]
 	{
-		g_DbgInfoStack = (DbgInfoStack_t *)DebugAlloc( sizeof(DbgInfoStack_t) * DBG_INFO_STACK_DEPTH );
-		g_nDbgInfoStackDepth = -1;
+    SetupDebugInfoStack();
 	}
 
 	const int32 *pnStackDepth = (const int32*) pvDebugInfo;
@@ -993,18 +997,17 @@ void CDbgMemAlloc::GetActualDbgInfo( const char *&pFileName, int &nLine )
 	return;
 #endif
 
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == NULL ) [[unlikely]]
 	{
-		g_DbgInfoStack = (DbgInfoStack_t *)DebugAlloc( sizeof(DbgInfoStack_t) * DBG_INFO_STACK_DEPTH );
-		g_nDbgInfoStackDepth = -1;
+		SetupDebugInfoStack();
 	}
 
-	const DbgInfoStack_t *top{g_DbgInfoStack};
+	const DbgInfoStack_t &top{g_DbgInfoStack[0]};
 
-	if (g_nDbgInfoStackDepth >= 0 && top->m_pFileName)
+	if (g_nDbgInfoStackDepth >= 0 && top.m_pFileName)
 	{
-		pFileName = top->m_pFileName;
-		nLine = top->m_nLine;
+		pFileName = top.m_pFileName;
+		nLine = top.m_nLine;
 	}
 }
 
