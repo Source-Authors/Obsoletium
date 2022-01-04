@@ -824,12 +824,14 @@ void CSentence::CacheRestoreFromBuffer( CUtlBuffer& buf )
 		pcount = (unsigned short)buf.GetShort();
 	}
 
+	// dimhotepus: Preallocate known size for speed.
+	m_RunTimePhonemes.EnsureCapacity( pcount );
+
 	// phonemes
 	CPhonemeTag pt;
-	int i;
 	if ( version == CACHED_SENTENCE_VERSION_ALIGNED )
 	{
-		for ( i = 0; i < pcount; ++i )
+		for ( int i = 0; i < pcount; ++i )
 		{
 			int code = buf.GetInt();
 			float st = buf.GetFloat();
@@ -843,7 +845,7 @@ void CSentence::CacheRestoreFromBuffer( CUtlBuffer& buf )
 	}
 	else
 	{
-		for ( i = 0; i < pcount; ++i )
+		for ( int i = 0; i < pcount; ++i )
 		{
 			unsigned short code = buf.GetShort();
 			float st = buf.GetFloat();
@@ -857,11 +859,12 @@ void CSentence::CacheRestoreFromBuffer( CUtlBuffer& buf )
 	}
 
 	// emphasis samples and voice duck
-	int c;
 	if ( version == CACHED_SENTENCE_VERSION_ALIGNED )
 	{
-		c = buf.GetInt();
-		for ( i = 0; i < c; i++ )
+		int c = buf.GetInt();
+		// dimhotepus: Preallocate known size for speed.
+		m_EmphasisSamples.EnsureCapacity( c );
+		for ( int i = 0; i < c; i++ )
 		{
 			CEmphasisSample sample;
 			sample.SetSelected( false );
@@ -873,8 +876,10 @@ void CSentence::CacheRestoreFromBuffer( CUtlBuffer& buf )
 	}
 	else
 	{
-		c = buf.GetShort();
-		for ( i = 0; i < c; i++ )
+		int c = buf.GetShort();
+		// dimhotepus: Preallocate known size for speed.
+		m_EmphasisSamples.EnsureCapacity( c );
+		for ( int i = 0; i < c; i++ )
 		{
 			CEmphasisSample sample;
 			sample.SetSelected( false );
