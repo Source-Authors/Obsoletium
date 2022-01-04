@@ -90,6 +90,7 @@ $Project "Dedicated"
 
 	$Folder	"Header Files"
 	{
+		$File	"args_win.h" [$WINDOWS]
 		$File	"$SRCDIR\filesystem\filetracker.h"
 		$File	"$SRCDIR\filesystem\threadsaferefcountedobject.h"
 		$File	"$SRCDIR\public\ifilelist.h"

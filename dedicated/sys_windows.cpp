@@ -10,9 +10,9 @@
 
 #include <eh.h>
 
+#include "args_win.h"
 #include "winlite.h"
 #include <winsock.h>
-#include <shellapi.h>
 
 #include "isys.h"
 #include "console/conproc.h"
@@ -356,17 +356,24 @@ extern "C" __declspec(dllexport) int DedicatedMain( HINSTANCE hInstance, HINSTAN
 		return ERROR_OLD_WIN_VERSION;
 	}
 
-	int argc, iret = -1;
-	LPWSTR * argv= CommandLineToArgvW(GetCommandLineW(),&argc);
+	const auto args_result = Args::FromCommandLine( GetCommandLineW() );
+	if ( const auto *rc = std::get_if<std::error_code>( &args_result )) [[unlikely]]
+	{
+		Error( "Sorry, unable to parse command line arguments: %s", rc->message().c_str() );
+		return rc->value();
+	}
+
+	const auto *args = std::get_if<Args>( &args_result );
 	CommandLine()->CreateCmdLine( VCRHook_GetCommandLine() );
 
 	if ( !Plat_IsInDebugSession() && !CommandLine()->FindParm( "-nominidumps") )
 	{
 		const auto old_translator = _set_se_translator( MiniDumpFunction );
 
+		int rc = -1;
 		try  // this try block allows the SE translator to work
 		{
-			iret = main(argc,(char **)argv);
+			rc = main( args->count(), args->values() );
 		}
 		catch( ... )
 		{
@@ -375,13 +382,9 @@ extern "C" __declspec(dllexport) int DedicatedMain( HINSTANCE hInstance, HINSTAN
 		}
 
 		_set_se_translator( old_translator );
-	}
-	else
-	{
-		iret = main(argc,(char **)argv);
+
+		return rc;
 	}
 
-	GlobalFree( argv );
-	return iret;
+	return main( args->count(), args->values() );
 }
-
