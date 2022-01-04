@@ -67,13 +67,13 @@ bool SIMDTest()
 	bool bChangedSomething = false;
 	for(int i=0;i<N_ITERS;i++)
 	{
-		float t=i*(1.0/N_ITERS);
+		float t=i*(1.0F/N_ITERS);
 		FourVectors * __restrict pXYZ = g_XYZ;
 
 		fltx4 * __restrict pCreationTime = g_CreationTime;
 
 		fltx4 CurTime   = ReplicateX4( t );
-		fltx4 TimeScale = ReplicateX4( 1.0/(max(0.001,  1.0 ) ) );
+		fltx4 TimeScale = ReplicateX4( 1.0F/(max(0.001F,  1.0F ) ) );
 
 		// calculate radius spline
 		bool bConstantRadius = true;
