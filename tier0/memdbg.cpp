@@ -999,10 +999,12 @@ void CDbgMemAlloc::GetActualDbgInfo( const char *&pFileName, int &nLine )
 		g_nDbgInfoStackDepth = -1;
 	}
 
-	if ( g_nDbgInfoStackDepth >= 0 && g_DbgInfoStack[0].m_pFileName)
+	const DbgInfoStack_t *top{g_DbgInfoStack};
+
+	if (g_nDbgInfoStackDepth >= 0 && top->m_pFileName)
 	{
-		pFileName = g_DbgInfoStack[0].m_pFileName;
-		nLine = g_DbgInfoStack[0].m_nLine;
+		pFileName = top->m_pFileName;
+		nLine = top->m_nLine;
 	}
 }
 
@@ -1044,7 +1046,7 @@ const char *CDbgMemAlloc::FindOrCreateFilename( const char *pFileName )
 	Filenames_t::const_iterator iter = m_pFilenames->find( pFileName );
 	if ( iter == m_pFilenames->end() )
 	{
-		int nLen = strlen(pFileName) + 1;
+		size_t nLen = strlen(pFileName) + 1;
 		pszFilenameCopy = (char *)DebugAlloc( nLen );
 		memcpy( pszFilenameCopy, pFileName, nLen );
 		m_pFilenames->insert( pszFilenameCopy );
@@ -1068,7 +1070,7 @@ CDbgMemAlloc::MemInfo_t &CDbgMemAlloc::FindOrCreateEntry( const char *pFileName,
 	std::pair<StatMapIter_t, bool> retval;
 	if ( m_pStatMap )
 	{
-		retval = m_pStatMap->insert( StatMapEntry_t( MemInfoKey_t( pFileName, line ), MemInfo_t() ) );
+		retval = m_pStatMap->emplace( MemInfoKey_t( pFileName, line ), MemInfo_t() );
 	}
 	return retval.first->second;
 }
@@ -1218,7 +1220,7 @@ void *CDbgMemAlloc::Alloc( size_t nSize, const char *pFileName, int nLine )
 
 	if ( pMem )
 	{
-		RegisterAllocation( GetAllocatonFileName( pMem ), GetAllocatonLineNumber( pMem ), InternalLogicalSize( pMem ), InternalMSize( pMem ), m_Timer.GetDuration().GetMicroseconds() );
+		RegisterAllocation( pFileName, nLine, nSize, InternalMSize( pMem ), m_Timer.GetDuration().GetMicroseconds() );
 	}
 	else
 	{
@@ -1238,7 +1240,7 @@ void *CDbgMemAlloc::Realloc( void *pMem, size_t nSize, const char *pFileName, in
 
 	if ( pMem != 0 )
 	{
-		RegisterDeallocation( GetAllocatonFileName( pMem ), GetAllocatonLineNumber( pMem ), InternalLogicalSize( pMem), InternalMSize( pMem ), 0 );
+		RegisterDeallocation( GetAllocatonFileName( pMem ), GetAllocatonLineNumber( pMem ), InternalLogicalSize( pMem ), InternalMSize( pMem ), 0 );
 	}
 
 	GetActualDbgInfo( pFileName, nLine );
@@ -1249,7 +1251,7 @@ void *CDbgMemAlloc::Realloc( void *pMem, size_t nSize, const char *pFileName, in
 
 	if ( pMem )
 	{
-		RegisterAllocation( GetAllocatonFileName( pMem ), GetAllocatonLineNumber( pMem ), InternalLogicalSize( pMem), InternalMSize( pMem ), m_Timer.GetDuration().GetMicroseconds() );
+		RegisterAllocation( pFileName, nLine, nSize, InternalMSize( pMem ), m_Timer.GetDuration().GetMicroseconds() );
 	}
 	else
 	{
