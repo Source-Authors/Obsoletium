@@ -799,7 +799,7 @@ void CShaderManager::InitRemoteShaderCompile()
 	int nResult = 0;
 	#ifdef _WIN32	
 		WSADATA wsaData;
-		nResult = WSAStartup( 0x101, &wsaData );
+		nResult = WSAStartup( MAKEWORD(2,0), &wsaData );
 		if ( nResult != 0 )
 		{
 			Warning( "CShaderManager::Init - Could not init socket for remote dynamic shader compilation\n" );

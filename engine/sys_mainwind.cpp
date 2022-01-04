@@ -842,7 +842,7 @@ static void DoSomeSocketStuffInOrderToGetZoneAlarmToNoticeUs( void )
 {
 #ifdef IS_WINDOWS_PC
 	WSAData wsaData;
-	if ( ! WSAStartup( 0x0101, &wsaData ) )
+	if ( ! WSAStartup( MAKEWORD(2,0), &wsaData ) )
 	{
 		SOCKET tmpSocket = socket( AF_INET, SOCK_DGRAM, 0 );
 		if ( tmpSocket != INVALID_SOCKET )
