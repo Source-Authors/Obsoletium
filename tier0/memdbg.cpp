@@ -24,9 +24,10 @@
 #include <stdlib.h>
 #endif
 
+#include <atomic>
 #include <map>
 #include <set>
-#include <limits.h>
+#include <climits>
 #include "tier0/threadtools.h"
 #ifdef _X360
 #include "xbox/xbox_console.h"
@@ -322,8 +323,13 @@ inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLine )
 	pInternalMem = (DbgMemHeader_t *)_malloc_dbg( nSize + sizeof(DbgMemHeader_t), _NORMAL_BLOCK, pFileName, nLine );
 #endif // defined( POSIX ) || !defined( _DEBUG )
 
-	pInternalMem->nLogicalSize = nSize;
-	return pInternalMem + 1;
+	if ( pInternalMem ) [[likely]]
+	{
+		pInternalMem->nLogicalSize = nSize;
+		return pInternalMem + 1;
+	}
+
+	return nullptr;
 #endif // LINUX || WIN32
 }
 
@@ -354,8 +360,13 @@ inline void *InternalRealloc( void *pMem, size_t nNewSize, const char *pFileName
 	pInternalMem = (DbgMemHeader_t *)_realloc_dbg( pInternalMem, nNewSize + sizeof(DbgMemHeader_t), _NORMAL_BLOCK, pFileName, nLine );
 #endif
 
-	pInternalMem->nLogicalSize = nNewSize;
-	return pInternalMem + 1;
+	if ( pInternalMem ) [[likely]]
+	{
+		pInternalMem->nLogicalSize = nNewSize;
+		return pInternalMem + 1;
+	}
+
+	return nullptr;
 #endif // LINUX || WIN32
 }
 
@@ -682,7 +693,7 @@ static char const *g_pszUnknown = "unknown";
 
 //-----------------------------------------------------------------------------
 
-const int DBG_INFO_STACK_DEPTH = 32;
+constexpr int DBG_INFO_STACK_DEPTH = 32;
 
 struct DbgInfoStack_t
 {
@@ -690,8 +701,8 @@ struct DbgInfoStack_t
 	int m_nLine;
 };
 
-CThreadLocalPtr<DbgInfoStack_t> g_DbgInfoStack CONSTRUCT_EARLY;
-CThreadLocalInt<>				g_nDbgInfoStackDepth CONSTRUCT_EARLY;
+thread_local DbgInfoStack_t* g_DbgInfoStack CONSTRUCT_EARLY;
+thread_local int				g_nDbgInfoStackDepth CONSTRUCT_EARLY;
 
 //-----------------------------------------------------------------------------
 // Singleton...
@@ -899,10 +910,10 @@ void CDbgMemAlloc::PushAllocDbgInfo( const char *pFileName, int nLine )
 		g_nDbgInfoStackDepth = -1;
 	}
 
-	++g_nDbgInfoStackDepth;
-	Assert( g_nDbgInfoStackDepth < DBG_INFO_STACK_DEPTH );
-	g_DbgInfoStack[g_nDbgInfoStackDepth].m_pFileName = FindOrCreateFilename( pFileName );
-	g_DbgInfoStack[g_nDbgInfoStackDepth].m_nLine = nLine;
+	const int newStackDepth{++g_nDbgInfoStackDepth};
+	Assert( newStackDepth < DBG_INFO_STACK_DEPTH );
+	g_DbgInfoStack[newStackDepth].m_pFileName = FindOrCreateFilename( pFileName );
+	g_DbgInfoStack[newStackDepth].m_nLine = nLine;
 }
 
 void CDbgMemAlloc::PopAllocDbgInfo()
@@ -913,8 +924,8 @@ void CDbgMemAlloc::PopAllocDbgInfo()
 		g_nDbgInfoStackDepth = -1;
 	}
 
-	--g_nDbgInfoStackDepth;
-	Assert( g_nDbgInfoStackDepth >= -1 );
+	[[maybe_unused]] const int newStackDepth{--g_nDbgInfoStackDepth};
+	Assert( newStackDepth >= -1 );
 }
 
 
