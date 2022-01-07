@@ -881,7 +881,6 @@ $Project
 
 	$Folder	"Public Header Files"
 	{
-		$File	"$SRCDIR\public\mathlib\amd3dx.h"
 		$File	"$SRCDIR\public\vgui_controls\AnimationController.h"
 		$File	"$SRCDIR\public\basehandle.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"

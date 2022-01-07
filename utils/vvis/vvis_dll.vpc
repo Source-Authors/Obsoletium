@@ -54,7 +54,6 @@ $Project "Vvis_dll"
 
 	$Folder	"Header Files"
 	{
-		$File	"$SRCDIR\public\mathlib\amd3dx.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"$SRCDIR\public\BSPFILE.H"
 		$File	"$SRCDIR\public\bspflags.h"

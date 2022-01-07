@@ -90,7 +90,6 @@ $Project "MaterialSystem"
 
 	$Folder	"Public Header Files"
 	{
-		$File	"$SRCDIR\public\mathlib\amd3dx.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"$SRCDIR\public\mathlib\bumpvects.h"
 		$File	"$SRCDIR\public\const.h"

@@ -37,7 +37,6 @@ $Project "Motionmapper"
 
 	$Folder	"Header Files"
 	{
-		$File	"$SRCDIR\public\mathlib\amd3dx.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"$SRCDIR\public\tier1\characterset.h"
 		$File	"..\common\cmdlib.h"

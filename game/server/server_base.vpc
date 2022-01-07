@@ -789,7 +789,6 @@ $Project
 
 	$Folder	"Header Files"
 	{
-		$File	"$SRCDIR\public\mathlib\amd3dx.h"
 		$File	"$SRCDIR\game\shared\ammodef.h"
 		$File	"$SRCDIR\game\shared\base_playeranimstate.h"
 		$File	"base_transmit_proxy.h"

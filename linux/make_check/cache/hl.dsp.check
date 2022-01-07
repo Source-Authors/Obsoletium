@@ -68563,10 +68563,6 @@ SOURCE=.\world.h
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
 # Begin Source File
 
-SOURCE=..\Public\amd3dx.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\game_shared\ammodef.h
 # End Source File
 # Begin Source File

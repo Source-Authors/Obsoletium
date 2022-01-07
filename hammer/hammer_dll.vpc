@@ -633,7 +633,6 @@ $Project "hammer_dll"
 
 	$Folder	"Common Header Files"
 	{
-		$File	"$SRCDIR\public\mathlib\amd3dx.h"
 		$File	"$SRCDIR\public\arraystack.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"$SRCDIR\public\bone_setup.h"

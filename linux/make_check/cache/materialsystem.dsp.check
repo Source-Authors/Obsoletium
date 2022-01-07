@@ -255,10 +255,6 @@ SOURCE=..\Public\vmatrix.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\Public\amd3dx.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\Public\basetypes.h
 # End Source File
 # Begin Source File

@@ -126,7 +126,6 @@ rFileExtensionsToSkip = [
 	'eax.h',
 	'IceKey.cpp',
 	'nvtc.h',
-	'amd3dx.h',
 	'halton.h',
 	'snappy',
 	'extendedtrace',

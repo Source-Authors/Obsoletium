@@ -47,8 +47,7 @@ $Project "mathlib"
 
 
 	$Folder	"Public Header Files"
-	{
-		$File	"$SRCDIR\public\mathlib\amd3dx.h"			[$WINDOWS||$LINUX]		
+	{		
 		$File	"$SRCDIR\public\mathlib\anorms.h"
 		$File	"$SRCDIR\public\mathlib\bumpvects.h"		
 		$File	"$SRCDIR\public\mathlib\compressed_3d_unitvec.h"

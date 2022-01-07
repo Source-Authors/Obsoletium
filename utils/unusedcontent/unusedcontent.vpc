@@ -58,7 +58,6 @@ $Project "Unusedcontent"
 	{
 		$File	"$SRCDIR\public\filesystem_helpers.h"
 		$File	"..\common\scriplib.h"
-		$File	"$SRCDIR\public\mathlib\amd3dx.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"cbase.h"
 		$File	"$SRCDIR\game\shared\choreoactor.h"

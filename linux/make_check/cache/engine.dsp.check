@@ -3446,10 +3446,6 @@ SOURCE=.\valve.ico
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\Public\amd3dx.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\public\vgui_controls\AnimationController.h
 # End Source File
 # Begin Source File

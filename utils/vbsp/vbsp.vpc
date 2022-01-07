@@ -129,7 +129,6 @@ $Project "Vbsp"
 
 	$Folder	"Public Headers"
 	{
-		$File	"$SRCDIR\public\mathlib\amd3dx.h"
 		$File	"$SRCDIR\public\arraystack.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"$SRCDIR\public\BSPFILE.H"
