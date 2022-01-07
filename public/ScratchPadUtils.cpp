@@ -230,8 +230,8 @@ void ScratchPad_DrawLitCone(
 	
 	for ( int i=0; i < nSegments; i++ )
 	{
-		float flAngle = (float)(i+1) * M_PI * 2.0 / nSegments;
-		Vector vOffset = vRight * cos( flAngle ) + vUp * sin( flAngle );
+		float flAngle = (float)(i+1) * M_PI_F * 2.0F / nSegments;
+		Vector vOffset = vRight * cosf( flAngle ) + vUp * sinf( flAngle );
 		Vector vCurBottom = vBaseCenter + vOffset;
 
 		const Vector &v1 = vTip;
@@ -297,8 +297,8 @@ void ScratchPad_DrawLitCylinder(
 	
 	for ( int i=0; i < nSegments; i++ )
 	{
-		float flAngle = (float)(i+1) * M_PI * 2.0 / nSegments;
-		Vector vOffset = vRight * cos( flAngle ) + vUp * sin( flAngle );
+		float flAngle = (float)(i+1) * M_PI_F * 2.0F / nSegments;
+		Vector vOffset = vRight * cosf( flAngle ) + vUp * sinf( flAngle );
 		Vector vCurTop = v1 + vOffset;
 		Vector vCurBottom = v2 + vOffset;
 
@@ -387,7 +387,7 @@ void ScratchPad_DrawSphere(
 	// For each vertical slice.. (the top and bottom ones are just a single point).
 	for ( int iSlice=0; iSlice < nSubDivs; iSlice++ )
 	{
-		float flHalfSliceAngle = M_PI * (float)iSlice / (nSubDivs - 1);
+		float flHalfSliceAngle = M_PI_F * (float)iSlice / (nSubDivs - 1);
 
 		if ( iSlice == 0 )
 		{
@@ -399,7 +399,7 @@ void ScratchPad_DrawSphere(
 		{
 			for ( int iSubPt=0; iSubPt < nSubDivs; iSubPt++ )
 			{
-				float flHalfAngle = M_PI * (float)iSubPt / (nSubDivs - 1);
+				float flHalfAngle = M_PI_F * (float)iSubPt / (nSubDivs - 1);
 				float flAngle = flHalfAngle * 2;
 				
 				Vector pt;
@@ -409,9 +409,9 @@ void ScratchPad_DrawSphere(
 				}
 				else
 				{
-					pt.x = cos( flAngle ) * sin( flHalfSliceAngle );
-					pt.y = sin( flAngle ) * sin( flHalfSliceAngle );
-					pt.z = cos( flHalfSliceAngle );
+					pt.x = cosf( flAngle ) * sinf( flHalfSliceAngle );
+					pt.y = sinf( flAngle ) * sinf( flHalfSliceAngle );
+					pt.z = cosf( flHalfSliceAngle );
 					
 					pt *= flRadius;
 					pt += vCenter;

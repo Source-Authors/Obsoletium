@@ -1590,7 +1590,7 @@ void BlendBones(
 	}
 
 	float s2 = s;
-	float s1 = 1.0 - s2;
+	float s1 = 1.0F - s2;
 
 	for (i = 0; i < pStudioHdr->numbones(); i++)
 	{
@@ -1710,10 +1710,10 @@ void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float posePa
 
 	if (Pose.loop)
 	{
-		float wrap = (Pose.start + Pose.end) / 2.0 + Pose.loop / 2.0;
+		float wrap = (Pose.start + Pose.end) / 2.0F + Pose.loop / 2.0F;
 		float shift = Pose.loop - wrap;
 
-		flValue = flValue - Pose.loop * floor((flValue + shift) / Pose.loop);
+		flValue = flValue - Pose.loop * floorf((flValue + shift) / Pose.loop);
 	}
 
 	if (seqdesc.posekeyindex == 0)
@@ -2595,7 +2595,7 @@ public:
    static float findD(float a, float b, float c) {
       return (c + (a*a-b*b)/c) / 2;
    }
-   static float findE(float a, float d) { return sqrt(a*a-d*d); } 
+   static float findE(float a, float d) { return sqrtf(a*a-d*d); } 
 
 // This leads to a solution to the more general problem:
 //
@@ -2656,7 +2656,7 @@ public:
 
    static float dot(float const a[], float const b[]) { return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]; }
 
-   static float length(float const v[]) { return sqrt( dot(v,v) ); }
+   static float length(float const v[]) { return sqrtf( dot(v,v) ); }
 
    static void normalize(float v[]) {
       float norm = length(v);
@@ -3919,7 +3919,7 @@ void CIKContext::UpdateTargets( Vector pos[], Quaternion q[], matrix3x4_t boneTo
 				float d4 = (p3 + pTarget->latched.deltaPos - p1).Length();
 
 				// unstick feet when distance is too great
-				if ((d4 < fabs( d1 - d2 ) || d4 * 0.95 > d1 + d2) && pTarget->est.latched > 0.2)
+				if ((d4 < fabsf( d1 - d2 ) || d4 * 0.95F > d1 + d2) && pTarget->est.latched > 0.2F)
 				{
 					pTarget->error.flTime = m_flTime;
 				}
@@ -3927,10 +3927,10 @@ void CIKContext::UpdateTargets( Vector pos[], Quaternion q[], matrix3x4_t boneTo
 				// unstick feet when angle is too great
 				if (pTarget->est.latched > 0.2)
 				{
-					float d = fabs( pTarget->latched.deltaQ.w ) * 2.0f - 1.0f; // QuaternionDotProduct( pTarget->latched.q, pTarget->est.q );
+					float d = fabsf( pTarget->latched.deltaQ.w ) * 2.0f - 1.0f; // QuaternionDotProduct( pTarget->latched.q, pTarget->est.q );
 
 					// FIXME: cos(45), make property of chain
-					if (d < 0.707)
+					if (d < 0.707F)
 					{
 						pTarget->error.flTime = m_flTime;
 					}
@@ -4682,7 +4682,7 @@ void DoAxisInterpBone(
 	Quaternion v, tmp;
 	if (a1 + a2 > 0)
 	{
-		float t = 1.0 / (a1 + a2 + a3);
+		float t = 1.0F / (a1 + a2 + a3);
 		// FIXME: do a proper 3-way Quat blend!
 		QuaternionSlerp( *q2, *q1, a1 / (a1 + a2), tmp );
 		QuaternionSlerp( tmp, *q3, a3 * t, v );
@@ -4735,10 +4735,10 @@ void DoQuatInterpBone(
 		int i;
 		for (i = 0; i < pProc->numtriggers; i++)
 		{
-			float dot = fabs( QuaternionDotProduct( pProc->pTrigger( i )->trigger, src ) );
+			float dot = fabsf( QuaternionDotProduct( pProc->pTrigger( i )->trigger, src ) );
 			// FIXME: a fast acos should be acceptable
 			dot = clamp( dot, -1.f, 1.f );
-			weight[i] = 1 - (2 * acos( dot ) * pProc->pTrigger( i )->inv_tolerance );
+			weight[i] = 1 - (2 * acosf( dot ) * pProc->pTrigger( i )->inv_tolerance );
 			weight[i] = max( 0.f, weight[i] );
 			scale += weight[i];
 		}
@@ -5042,7 +5042,7 @@ float Studio_SetController( const CStudioHdr *pStudioHdr, int iController, float
 	if (ctlValue < 0) ctlValue = 0;
 	if (ctlValue > 1) ctlValue = 1;
 
-	float flReturnVal = ((1.0 - ctlValue)*pbonecontroller->start + ctlValue *pbonecontroller->end);
+	float flReturnVal = ((1.0F - ctlValue)*pbonecontroller->start + ctlValue *pbonecontroller->end);
 
 	// ugly hack, invert value if a rotational controller and end < start
 	if (pbonecontroller->type & (STUDIO_XR | STUDIO_YR | STUDIO_ZR) &&
@@ -5120,10 +5120,10 @@ float Studio_SetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, flo
 
 	if (PoseParam.loop)
 	{
-		float wrap = (PoseParam.start + PoseParam.end) / 2.0 + PoseParam.loop / 2.0;
+		float wrap = (PoseParam.start + PoseParam.end) / 2.0F + PoseParam.loop / 2.0F;
 		float shift = PoseParam.loop - wrap;
 
-		flValue = flValue - PoseParam.loop * floor((flValue + shift) / PoseParam.loop);
+		flValue = flValue - PoseParam.loop * floorf((flValue + shift) / PoseParam.loop);
 	}
 
 	ctlValue = (flValue - PoseParam.start) / (PoseParam.end - PoseParam.start);
@@ -5504,7 +5504,7 @@ int Studio_MaxFrame( const CStudioHdr *pStudioHdr, int iSequence, const float po
 	
 
 	// FIXME: why does the weights sometimes not exactly add it 1.0 and this sometimes rounds down?
-	return (maxFrame + 0.01);
+	return (maxFrame + 0.01F);
 }
 
 
@@ -5608,7 +5608,7 @@ bool Studio_AnimPosition( mstudioanimdesc_t *panim, float flCycle, Vector &vecPo
 		{
 			float f = (flFrame - prevframe) / (pmove->endframe - prevframe);
 
-			float d = pmove->v0 * f + 0.5 * (pmove->v1 - pmove->v0) * f * f;
+			float d = pmove->v0 * f + 0.5F * (pmove->v1 - pmove->v0) * f * f;
 
 			vecPos = vecPos + d * pmove->vector;
 			vecAngle.y = vecAngle.y * (1 - f) + pmove->angle * f;
@@ -5712,16 +5712,16 @@ float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist )
 	{
 		mstudiomovement_t *pmove = panim->pMovement( i );
 
-		float flMove = (pmove->v0 + pmove->v1) * 0.5;
+		float flMove = (pmove->v0 + pmove->v1) * 0.5F;
 
 		if (flMove >= flDist)
 		{
 			float root1, root2;
 
 			// d = V0 * t + 1/2 (V1-V0) * t^2
-			if (SolveQuadratic( 0.5 * (pmove->v1 - pmove->v0), pmove->v0, -flDist, root1, root2 ))
+			if (SolveQuadratic( 0.5F * (pmove->v1 - pmove->v0), pmove->v0, -flDist, root1, root2 ))
 			{
-				float cpf = 1.0 / (panim->numframes - 1);  // cycles per frame
+				float cpf = 1.0F / (panim->numframes - 1);  // cycles per frame
 
 				return (prevframe + root1 * (pmove->endframe - prevframe)) * cpf;
 			}

@@ -217,7 +217,7 @@ void CJiggleBones::BuildJiggleTransformations( int boneIndex, float currenttime,
 			if ( jiggleInfo->flags & JIGGLE_HAS_YAW_CONSTRAINT )
 			{
 				// enforce yaw constraints in local XZ plane
-				float yawError = atan2( localAlong.x, localAlong.z );
+				float yawError = atan2f( localAlong.x, localAlong.z );
 
 				bool isAtLimit = false;
 				float yaw = 0.0f;
@@ -315,7 +315,7 @@ void CJiggleBones::BuildJiggleTransformations( int boneIndex, float currenttime,
 			if ( jiggleInfo->flags & JIGGLE_HAS_PITCH_CONSTRAINT )
 			{
 				// enforce pitch constraints in local YZ plane
-				float pitchError = atan2( localAlong.y, localAlong.z );
+				float pitchError = atan2f( localAlong.y, localAlong.z );
 
 				bool isAtLimit = false;
 				float pitch = 0.0f;
@@ -409,16 +409,16 @@ void CJiggleBones::BuildJiggleTransformations( int boneIndex, float currenttime,
 			// enforce max angular error
 			Vector error = goalTip - data->tipPos;
 			float dot = DotProduct( forward, goalForward );
-			float angleBetween = acos( dot );
+			float angleBetween = acosf( dot );
 			if ( dot < 0.0f )
 			{
-				angleBetween = 2.0f * M_PI - angleBetween;
+				angleBetween = 2.0f * M_PI_F - angleBetween;
 			}
 
 			if ( angleBetween > jiggleInfo->angleLimit )
 			{
 				// at angular limit
-				float maxBetween = jiggleInfo->length * sin( jiggleInfo->angleLimit );
+				float maxBetween = jiggleInfo->length * sinf( jiggleInfo->angleLimit );
 
 				Vector delta = goalTip - data->tipPos;
 				delta.NormalizeInPlace();
@@ -644,7 +644,7 @@ void CJiggleBones::BuildJiggleTransformations( int boneIndex, float currenttime,
 			damping *= damping;
 			damping *= damping;
 
-			float flex = jiggleInfo->boingAmplitude * cos( jiggleInfo->boingFrequency * data->boingTime ) * damping;
+			float flex = jiggleInfo->boingAmplitude * cosf( jiggleInfo->boingFrequency * data->boingTime ) * damping;
 
  			float squash = 1.0f + flex;
  			float stretch = 1.0f - flex;

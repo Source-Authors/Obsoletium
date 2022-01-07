@@ -43,7 +43,7 @@ static void Collision_ClearTrace( const Vector &vecRayStart, const Vector &vecRa
 static float ComputeBoxOffset( const Ray_t& ray )
 {
 	if (ray.m_IsRay)
-		return 1e-3f;
+		return 1e-3F;
 
 	// Find the projection of the box diagonal along the ray...
 	float offset = FloatMakePositive(ray.m_Extents[0] * ray.m_Delta[0]) +
@@ -56,7 +56,7 @@ static float ComputeBoxOffset( const Ray_t& ray )
 	offset *= InvRSquared( ray.m_Delta );
 
 	// 1e-3 is an epsilon
-	return offset + 1e-3;
+	return offset + 1e-3F;
 }
 
 
