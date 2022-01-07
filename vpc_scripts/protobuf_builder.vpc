@@ -9,7 +9,7 @@ $CustomBuildStep "proto"
 {
 	$Description	"Running Protocol Buffer Compiler on $(InputFileName)..."
 	$CommandLine	"if not exist $GENERATED_PROTO_DIR mkdir $GENERATED_PROTO_DIR" "\n" \
-					"$SRCDIR\thirdparty\protobuf-2.6.1\bin\win32\2013\staticcrt\release\protoc.exe --proto_path=$SRCDIR\thirdparty\protobuf-2.6.1\src" \
+					"$SRCDIR\thirdparty\protobuf-2.6.1\vsprojects\Release\protoc.exe --proto_path=$SRCDIR\thirdparty\protobuf-2.6.1\src" \
 					" --proto_path=$(InputDir) --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
 					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $(InputPath)" [$WINDOWS]
 
