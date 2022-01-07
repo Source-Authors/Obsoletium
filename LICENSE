@@ -56,6 +56,13 @@ marked with other licenses or externally maintained libraries.
 
 Externally maintained by Source 1 libraries are:
 
+- Miles Sound System 7.1a located at thirdparty\mss is licensed as:
+"""
+  Author: John Miles
+
+  Contact RAD Game Tools at 425-893-4300 for technical support.
+"""
+
 - openvr 0.9.11 located at thirdparty\openvr is licensed as:
 """
   Copyright (c) 2015, Valve Corporation
