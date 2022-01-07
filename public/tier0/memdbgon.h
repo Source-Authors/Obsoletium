@@ -136,13 +136,11 @@ inline void *MemAlloc_InlineCallocMemset( void *pMem, size_t nCount, size_t nEle
 
 inline char *MemAlloc_StrDup(const char *pString, const char *pFileName, unsigned nLine)
 {
-	char *pMemory;
-	
 	if (!pString)
 		return NULL;
-	
-	size_t len = strlen(pString) + 1;
-	if ((pMemory = (char *)g_pMemAlloc->Alloc(len, pFileName, nLine)) != NULL)
+
+	const size_t len = strlen(pString) + 1;
+	if (char* pMemory = (char *)g_pMemAlloc->Alloc(len, pFileName, nLine); pMemory != NULL)
 	{
 		return strcpy( pMemory, pString );
 	}
@@ -152,13 +150,11 @@ inline char *MemAlloc_StrDup(const char *pString, const char *pFileName, unsigne
 
 inline wchar_t *MemAlloc_WcStrDup(const wchar_t *pString, const char *pFileName, unsigned nLine)
 {
-	wchar_t *pMemory;
-	
 	if (!pString)
 		return NULL;
-	
-	size_t len = (wcslen(pString) + 1);
-	if ((pMemory = (wchar_t *)g_pMemAlloc->Alloc(len * sizeof(wchar_t), pFileName, nLine)) != NULL)
+
+	const size_t len = wcslen(pString) + 1;
+	if (wchar_t *pMemory = (wchar_t *)g_pMemAlloc->Alloc(len * sizeof(wchar_t), pFileName, nLine); pMemory != NULL)
 	{
 		return wcscpy( pMemory, pString );
 	}
@@ -198,13 +194,11 @@ inline wchar_t *MemAlloc_WcStrDup(const wchar_t *pString, const char *pFileName,
 
 inline char *MemAlloc_StrDup(const char *pString)
 {
-	char *pMemory;
-
 	if (!pString)
 		return NULL;
 
-	size_t len = strlen(pString) + 1;
-	if ((pMemory = (char *)g_pMemAlloc->Alloc(len)) != NULL)
+	const size_t len = strlen(pString) + 1;
+	if (char* pMemory = (char *)g_pMemAlloc->Alloc(len); pMemory != NULL)
 	{
 		return strcpy( pMemory, pString );
 	}
@@ -214,13 +208,11 @@ inline char *MemAlloc_StrDup(const char *pString)
 
 inline wchar_t *MemAlloc_WcStrDup(const wchar_t *pString)
 {
-	wchar_t *pMemory;
-
 	if (!pString)
 		return NULL;
 
-	size_t len = (wcslen(pString) + 1);
-	if ((pMemory = (wchar_t *)g_pMemAlloc->Alloc(len * sizeof(wchar_t))) != NULL)
+	const size_t len = wcslen(pString) + 1;
+	if (wchar_t *pMemory = (wchar_t *)g_pMemAlloc->Alloc(len * sizeof(wchar_t)); pMemory != NULL)
 	{
 		return wcscpy( pMemory, pString );
 	}

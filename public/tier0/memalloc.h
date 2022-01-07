@@ -176,74 +176,70 @@ inline bool ValueIsPowerOfTwo( size_t value )			// don't clash with mathlib defi
 
 inline void *MemAlloc_AllocAligned( size_t size, size_t align )
 {
-	unsigned char *pAlloc, *pResult;
-
 	if (!IsPowerOfTwo(align))
 		return NULL;
 
 	align = (align > sizeof(void *) ? align : sizeof(void *)) - 1;
-
-	if ( (pAlloc = (unsigned char*)g_pMemAlloc->Alloc( sizeof(void *) + align + size ) ) == (unsigned char*)NULL)
+	
+	unsigned char *pAlloc;
+	if ( (pAlloc = (unsigned char*)g_pMemAlloc->Alloc( sizeof(void *) + align + size ) ) == NULL)
 		return NULL;
 
-	pResult = (unsigned char*)( (size_t)(pAlloc + sizeof(void *) + align ) & ~align );
+	unsigned char *pResult = (unsigned char*)( (size_t)(pAlloc + sizeof(void *) + align ) & ~align );
 	((unsigned char**)(pResult))[-1] = pAlloc;
 
-	return (void *)pResult;
+	return pResult;
 }
 
 inline void *MemAlloc_AllocAligned( size_t size, size_t align, const char *pszFile, int nLine )
 {
-	unsigned char *pAlloc, *pResult;
-
 	if (!IsPowerOfTwo(align))
 		return NULL;
 
 	align = (align > sizeof(void *) ? align : sizeof(void *)) - 1;
 
-	if ( (pAlloc = (unsigned char*)g_pMemAlloc->Alloc( sizeof(void *) + align + size, pszFile, nLine ) ) == (unsigned char*)NULL)
+  unsigned char *pAlloc;
+	if ( (pAlloc = (unsigned char*)g_pMemAlloc->Alloc( sizeof(void *) + align + size, pszFile, nLine ) ) == NULL)
 		return NULL;
 
-	pResult = (unsigned char*)( (size_t)(pAlloc + sizeof(void *) + align ) & ~align );
+	unsigned char *pResult = (unsigned char*)( (size_t)(pAlloc + sizeof(void *) + align ) & ~align );
 	((unsigned char**)(pResult))[-1] = pAlloc;
 
-	return (void *)pResult;
+	return pResult;
 }
 
 inline void *MemAlloc_AllocAlignedUnattributed( size_t size, size_t align )
 {
-	unsigned char *pAlloc, *pResult;
-
 	if (!ValueIsPowerOfTwo(align))
 		return NULL;
 
 	align = (align > sizeof(void *) ? align : sizeof(void *)) - 1;
-
+	
+	unsigned char *pAlloc;
 	if ( (pAlloc = (unsigned char*)MemAlloc_Alloc( sizeof(void *) + align + size ) ) == (unsigned char*)NULL)
 		return NULL;
 
-	pResult = (unsigned char*)( (size_t)(pAlloc + sizeof(void *) + align ) & ~align );
+	unsigned char *pResult = (unsigned char*)( (size_t)(pAlloc + sizeof(void *) + align ) & ~align );
 	((unsigned char**)(pResult))[-1] = pAlloc;
 
-	return (void *)pResult;
+	return pResult;
 }
 
 inline void *MemAlloc_AllocAlignedFileLine( size_t size, size_t align, const char *pszFile, int nLine )
 {
-	unsigned char *pAlloc, *pResult;
-
 	if (!ValueIsPowerOfTwo(align))
 		return NULL;
 
 	align = (align > sizeof(void *) ? align : sizeof(void *)) - 1;
 
-	if ( (pAlloc = (unsigned char*)MemAlloc_Alloc( sizeof(void *) + align + size, pszFile, nLine ) ) == (unsigned char*)NULL)
+	unsigned char *pAlloc;
+	if ( (pAlloc = (unsigned char*)MemAlloc_Alloc( sizeof(void *) + align + size, pszFile, nLine ) ) == NULL)
 		return NULL;
 
-	pResult = (unsigned char*)( (size_t)(pAlloc + sizeof(void *) + align ) & ~align );
+	unsigned char *pResult = (unsigned char*)( (size_t)(pAlloc + sizeof(void *) + align ) & ~align );
 	((unsigned char**)(pResult))[-1] = pAlloc;
 
-	return (void *)pResult;
+	return pResult;
 }
 
 inline void *MemAlloc_ReallocAligned( void *ptr, size_t size, size_t align )
@@ -258,10 +254,8 @@ inline void *MemAlloc_ReallocAligned( void *ptr, size_t size, size_t align )
 	if ( !ptr )
 		return MemAlloc_AllocAligned( size, align );
 
-	void *pAlloc, *pResult;
-
 	// Figure out the actual allocation point
-	pAlloc = ptr;
+	void *pAlloc = ptr;
 	pAlloc = (void *)(((size_t)pAlloc & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
 	pAlloc = *( (void **)pAlloc );
 
@@ -271,7 +265,7 @@ inline void *MemAlloc_ReallocAligned( void *ptr, size_t size, size_t align )
 	if ( nOldSize >= size + nOffset )
 		return ptr;
 
-	pResult = MemAlloc_AllocAligned( size, align );
+	void *pResult = MemAlloc_AllocAligned( size, align );
 	// dimhotepus: Do not crash of reallocation fails.
 	if ( pResult )
 	{
@@ -283,12 +277,10 @@ inline void *MemAlloc_ReallocAligned( void *ptr, size_t size, size_t align )
 
 inline void MemAlloc_FreeAligned( void *pMemBlock )
 {
-	void *pAlloc;
-
 	if ( pMemBlock == NULL )
 		return;
 
-	pAlloc = pMemBlock;
+	void *pAlloc = pMemBlock;
 
 	// pAlloc points to the pointer to starting of the memory block
 	pAlloc = (void *)(((size_t)pAlloc & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
@@ -300,12 +292,10 @@ inline void MemAlloc_FreeAligned( void *pMemBlock )
 
 inline void MemAlloc_FreeAligned( void *pMemBlock, const char *pFileName, int nLine )
 {
-	void *pAlloc;
-
 	if ( pMemBlock == NULL )
 		return;
 
-	pAlloc = pMemBlock;
+	void *pAlloc = pMemBlock;
 
 	// pAlloc points to the pointer to starting of the memory block
 	pAlloc = (void *)(((size_t)pAlloc & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
@@ -317,12 +307,10 @@ inline void MemAlloc_FreeAligned( void *pMemBlock, const char *pFileName, int nL
 
 inline size_t MemAlloc_GetSizeAligned( void *pMemBlock )
 {
-	void *pAlloc;
-
 	if ( pMemBlock == NULL )
 		return 0;
 
-	pAlloc = pMemBlock;
+	void *pAlloc = pMemBlock;
 
 	// pAlloc points to the pointer to starting of the memory block
 	pAlloc = (void *)(((size_t)pAlloc & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
