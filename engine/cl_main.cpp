@@ -123,7 +123,7 @@ static bool cl_takejpeg = false;
 static bool cl_takesnapshot_internal = false;
 
 static int cl_jpegquality = DEFAULT_JPEG_QUALITY;
-static ConVar jpeg_quality( "jpeg_quality", "90", 0, "jpeg screenshot quality." );
+static ConVar jpeg_quality( "jpeg_quality", "98", 0, "jpeg screenshot quality." );
 
 static int	cl_snapshotnum = 0;
 static char cl_snapshotname[MAX_OSPATH];

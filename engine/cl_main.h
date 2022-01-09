@@ -44,7 +44,7 @@ class CEntityReadInfo;
 class CPureServerWhitelist;
 struct SoundInfo_t;
 
-#define DEFAULT_JPEG_QUALITY 50
+#define DEFAULT_JPEG_QUALITY 98
 
 void CL_TakeJpeg( const char *name = NULL, int quality = DEFAULT_JPEG_QUALITY );
 
