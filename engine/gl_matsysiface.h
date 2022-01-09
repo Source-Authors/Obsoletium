@@ -165,13 +165,13 @@ private:
 		}									\
 	}
 
+// dimhotepus: Optimize list traversing via range for.
 #define MSL_FOREACH_GROUP_BEGIN( _sortList, _sortGroup, _group )							\
 	{																						\
 		const CUtlVector<surfacesortgroup_t *> &_groupList = (_sortList).GetSortList(_sortGroup);	\
-		int _count = _groupList.Count();													\
-		for ( int _listIndex = 0; _listIndex < _count; ++_listIndex )						\
+		for ( auto *_gp : _groupList )						\
 		{																					\
-			const surfacesortgroup_t &_group = *_groupList[_listIndex];
+			const surfacesortgroup_t &_group = *_gp;
 
 #define MSL_FOREACH_GROUP_END( )		\
 		}								\

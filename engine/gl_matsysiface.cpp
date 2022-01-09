@@ -753,11 +753,19 @@ void CMSurfaceSortList::Init( int maxSortIDs, int minMaterialLists )
 	m_list.EnsureCapacity(minMaterialLists);
 	m_maxSortIDs = maxSortIDs;
 	int groupMax = maxSortIDs*MAX_MAT_SORT_GROUPS;
-	m_groups.RemoveAll();
+	// dimhotepus: Allocate less.
+	// m_groups.RemoveAll();
 	m_groups.EnsureCount(groupMax);
+	// dimhotepus: Just zero memory instead of reallocation.
+	static_assert(std::is_trivially_copyable_v<decltype(m_groups)::ElemType_t>,
+		"Unable to memset not TriviallyCopyable type");
+	Q_memset(m_groups.Base(), 0, groupMax * sizeof(decltype(m_groups)::ElemType_t));
 	int groupBytes = (groupMax+7)>>3;
 	m_groupUsed.EnsureCount(groupBytes);
-	Q_memset(m_groupUsed.Base(), 0, groupBytes);
+	// dimhotepus: Just zero memory instead of reallocation.
+	static_assert(std::is_trivially_copyable_v<decltype(m_groupUsed)::ElemType_t>,
+		"Unable to memset not TriviallyCopyable type");
+	Q_memset(m_groupUsed.Base(), 0, groupBytes * sizeof(decltype(m_groupUsed)::ElemType_t));
 
 	auto it = std::begin(m_sortGroupLists);
 	{
