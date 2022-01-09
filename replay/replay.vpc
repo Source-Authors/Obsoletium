@@ -21,6 +21,7 @@ $Configuration
 {
 	$Compiler
 	{
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\thirdparty;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out"
 		// REPLAY_ENABLED is set here for netmessages.h
 		$PreprocessorDefinitions		"$BASE;REPLAY_DLL;REPLAY_ENABLED"
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
@@ -193,11 +194,11 @@ $Project "replay"
 		$Lib	tier2
 		$Lib	mathlib
 		$Lib	bitmap
-		$Lib	$LIBCOMMON\replay_common
-		$Lib	$LIBCOMMON\lzma
+		$Lib	"$LIBCOMMON/replay_common"
+		$Lib	"$LIBCOMMON/lzma"
 		$Lib	vtf
 		$Lib	"$LIBCOMMON/bzip2"
-		$Lib  	"$LIBCOMMON/libjpeg"		[!$DEDICATED]
+		$Lib	"$LIBCOMMON/jpeg-static" [!$DEDICATED]
 
 		$Libexternal	$LIBCOMMON/libcrypto [$OSXALL]
 		$Libexternal 	"$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL]

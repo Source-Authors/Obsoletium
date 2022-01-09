@@ -4,3 +4,6 @@
 [submodule "thirdparty/protobuf-2.6.1"]
 	path = thirdparty/protobuf-2.6.1
 	url = git@github.com:protocolbuffers/protobuf.git
+[submodule "thirdparty/libjpeg-turbo"]
+	path = thirdparty/libjpeg-turbo
+	url = git@github.com:libjpeg-turbo/libjpeg-turbo.git

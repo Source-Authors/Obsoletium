@@ -41,7 +41,7 @@ typedef void *HDC;
 #include "materialsystem/materialsystem_config.h"
 #include "materialsystem/itexture.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
-#include "jpeglib/jpeglib.h"
+#include "libjpeg-turbo/jpeglib.h"
 #include "vgui/ISurface.h"
 #include "vgui_controls/Controls.h"
 #include "gl_shader.h"

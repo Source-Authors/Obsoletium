@@ -15,7 +15,7 @@ $Configuration
 	{
 		// Deprecated MBCS MFC libraries for VS 2013 (nafxcw.lib and nafxcwd.lib) can be downloaded from http://go.microsoft.com/?linkid=9832071
 		$PreprocessorDefinitions			"$BASE;NO_WARN_MBCS_MFC_DEPRECATION"
-		$AdditionalIncludeDirectories		"$BASE,..\common"
+		$AdditionalIncludeDirectories		"$BASE,..\common;$SRCDIR\thirdparty;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out"
 		$PreprocessorDefinitions			"$BASE;;WINVER=0x502"
 		$Create/UsePrecompiledHeader		"Use Precompiled Header (/Yu)"
 		$PrecompiledHeaderFile				"Debug/FileSystemOpenDialog.pch"
@@ -71,6 +71,6 @@ $Project "FileSystemOpenDialog"
 
 	$Folder "Link Libraries"
 	{
-		$Lib $LIBCOMMON/libjpeg
+		$Lib	"$LIBCOMMON/jpeg-static"
 	}
 }

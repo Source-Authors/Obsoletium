@@ -8,7 +8,7 @@
 #include "tier0/dbg.h"
 #include "tier1/utlvector.h"
 #include "tier0/vprof.h"
-#include "jpeglib/jpeglib.h"
+#include "libjpeg-turbo/jpeglib.h"
 #include <setjmp.h>
 //#include "fileio.h"
 

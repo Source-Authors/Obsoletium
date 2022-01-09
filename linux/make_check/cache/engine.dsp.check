@@ -1751,8 +1751,6 @@ SOURCE=.\host_listmaps.cpp
 # Begin Source File
 
 SOURCE=.\host_phonehome.cpp
-# ADD CPP /I "..\public\jpeglib"
-# SUBTRACT CPP /YX /Yc /Yu
 # End Source File
 # Begin Source File
 
@@ -3954,18 +3952,6 @@ SOURCE=..\Public\ivtex.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\public\jpeglib\jconfig.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\public\jpeglib\jmorecfg.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\public\jpeglib\jpeglib.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\public\vgui\KeyCode.h
 # End Source File
 # Begin Source File
@@ -5000,7 +4986,7 @@ SOURCE=..\lib\public\vtf.lib
 # End Source File
 # Begin Source File
 
-SOURCE=..\lib\common\jpeglib.lib
+SOURCE=..\lib\common\win32\jpeglib-static.lib
 # End Source File
 # Begin Source File
 

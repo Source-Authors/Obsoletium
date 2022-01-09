@@ -10,7 +10,7 @@
 
 #include "stdafx.h"
 #include "FileSystemOpenDlg.h"
-#include "jpeglib/jpeglib.h"
+#include "libjpeg-turbo/jpeglib.h"
 #include "utldict.h"
 #include "resource.h"
 #include "ifilesystemopendialog.h"

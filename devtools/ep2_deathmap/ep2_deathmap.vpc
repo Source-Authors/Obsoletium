@@ -13,7 +13,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\utils\vmpi;$SRCDIR\game\shared;$SRCDIR\game\server"
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\utils\vmpi;$SRCDIR\game\shared;$SRCDIR\game\server;$SRCDIR\thirdparty;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out"
 		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
 }
@@ -49,6 +49,6 @@ $Project "ep2_deathmap"
 	$Folder	"Link Libraries"
 	{
 		$Lib tier2
-		$Lib $LIBCOMMON/jpeglib
+		$Lib	"$LIBCOMMON/jpeg-static"
 	}
 }

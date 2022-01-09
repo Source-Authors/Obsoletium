@@ -29,7 +29,7 @@
 #include "sys_utils.h"
 #include "sys_scriptlib.h"
 #include "bugreporter/bugreporter.h"
-#include "jpeglib/jpeglib.h"
+#include "libjpeg-turbo/jpeglib.h"
 #include "UtlBuffer.h"
 #include "strtools.h"
 #include "xbox/xbox_vxconsole.h"

@@ -61,7 +61,7 @@ extern void longjmp( jmp_buf, int ) __attribute__((noreturn));
 
 // use the JPEGLIB_USE_STDIO define so that we can read in jpeg's from outside the game directory tree.
 #define JPEGLIB_USE_STDIO
-#include "jpeglib/jpeglib.h"
+#include "libjpeg-turbo/jpeglib.h"
 #undef JPEGLIB_USE_STDIO
 
 #include "libpng/png.h"

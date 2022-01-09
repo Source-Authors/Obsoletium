@@ -16,7 +16,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;.\;audio;audio\private;audio\public;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls"
+		$AdditionalIncludeDirectories	"$BASE;.\;audio;audio\private;audio\public;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls;$SRCDIR\thirdparty;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out"
 		$PreprocessorDefinitions		"$BASE;USE_CONVARS;VOICE_OVER_IP;BUMPMAP;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER"
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY" [$LINUXALL]
@@ -993,9 +993,6 @@ $Project "engine"
 		$File	"$SRCDIR\public\ivrenderview.h"
 		$File	"$SRCDIR\public\ivtex.h"
 		$File	"$SRCDIR\public\ixboxsystem.h"			[$X360]
-		$File	"$SRCDIR\public\jpeglib\jconfig.h"
-		$File	"$SRCDIR\public\jpeglib\jmorecfg.h"
-		$File	"$SRCDIR\public\jpeglib\jpeglib.h"
 		$File	"$SRCDIR\public\vgui\KeyCode.h"
 		$File	"$SRCDIR\public\tier1\KeyValues.h"
 		$File	"$SRCDIR\public\vgui_controls\Label.h"
@@ -1100,7 +1097,7 @@ $Project "engine"
 		$Lib	appframework
 		$Lib	bitmap
 		$Lib	"$LIBCOMMON/bzip2"
-		$Lib  	"$LIBCOMMON/libjpeg"			[!$DEDICATED]
+		$Lib	"$LIBCOMMON/jpeg-static" [!$DEDICATED]
 
 		$Lib	dmxloader
 		$Lib	mathlib

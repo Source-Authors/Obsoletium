@@ -25,7 +25,7 @@
 #include "filesystem.h"
 #include "interface.h"
 #include "vstdlib/random.h"
-#include "jpeglib/jpeglib.h"
+#include "libjpeg-turbo/jpeglib.h"
 
 
 static char gamename[ 32 ] = "ep2";
