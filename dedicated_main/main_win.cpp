@@ -103,8 +103,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
     char user_error[1024];
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed correctly.\n\nUnable to find "
-                "DedicatedMain "
-                "entry point in the dedicated DLL %s",
+                "DedicatedMain entry point in the dedicated DLL %s",
                 dedicated_dll_path);
 
     return ShowErrorBoxAndExitWithCode(user_error, rc);

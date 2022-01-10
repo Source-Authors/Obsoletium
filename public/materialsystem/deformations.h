@@ -30,14 +30,14 @@ struct BoxDeformation_t : DeformationBase_t
 {
 	// don't change the layout without changing code in shaderapidx8!!!!
 	Vector m_SourceMins;									// cube to clamp within
-	float m_flPad0;
+	float m_flPad0; //-V730_NOINIT
 	Vector m_SourceMaxes;
-	float m_flPad1;
+	float m_flPad1; //-V730_NOINIT
 
 	Vector m_ClampMins;
-	float m_flPad2;
+	float m_flPad2; //-V730_NOINIT
 	Vector m_ClampMaxes;
-	float m_flPad3;
+	float m_flPad3; //-V730_NOINIT
 
 	FORCEINLINE BoxDeformation_t( void )
 	{

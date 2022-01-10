@@ -223,6 +223,7 @@ CFSSearchPathsInit::CFSSearchPathsInit()
 {
 	m_pDirectoryName = NULL;
 	m_pLanguage = NULL;
+	m_pFileSystem = NULL;
 	m_ModPath[0] = 0;
 	m_bMountHDContent = m_bLowViolence = false;
 }
@@ -232,15 +233,18 @@ CFSSteamSetupInfo::CFSSteamSetupInfo()
 {
 	m_pDirectoryName = NULL;
 	m_bOnlyUseDirectoryName = false;
+	m_bSetSteamDLLPath = false;
 	m_bSteam = false;
 	m_bToolsMode = true;
 	m_bNoGameInfo = false;
+	m_GameInfoPath[0] = '\0';
 }
 
 
 CFSLoadModuleInfo::CFSLoadModuleInfo()
 {
 	m_pFileSystemDLLName = NULL;
+  m_ConnectFactory = NULL;
 	m_pFileSystem = NULL;
 	m_pModule = NULL;
 }
