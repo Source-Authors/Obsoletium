@@ -14,7 +14,7 @@
 
 #if defined( USE_SDL )
 #undef M_PI
-#include "SDL.h"
+#include "SDL2/include/SDL.h"
 #endif
 
 #include "tier0/dbg.h"

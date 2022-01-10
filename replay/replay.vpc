@@ -21,7 +21,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\thirdparty;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out;$SRCDIR\thirdparty\zlib;$SRCDIR\thirdparty\zlib\out"
 		// REPLAY_ENABLED is set here for netmessages.h
 		$PreprocessorDefinitions		"$BASE;REPLAY_DLL;REPLAY_ENABLED"
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
@@ -194,23 +194,20 @@ $Project "replay"
 		$Lib	tier2
 		$Lib	mathlib
 		$Lib	bitmap
-		$Lib	"$LIBCOMMON/replay_common"
-		$Lib	"$LIBCOMMON/lzma"
 		$Lib	vtf
 		$Lib	"$LIBCOMMON/bzip2"
-		$Lib	"$LIBCOMMON/jpeg-static" [!$DEDICATED]
+		$Lib	"$LIBCOMMON/lzma"
+		$Lib	"$LIBCOMMON/replay_common"
+		$Lib	"$LIBCOMMON/libcurl" [$WIN32&&!$VS2015]
 
-		$Libexternal	$LIBCOMMON/libcrypto [$OSXALL]
-		$Libexternal 	"$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL]
-		$Libexternal libpng [!$VS2015]
-		$Libexternal $LIBCOMMON/libpng [$VS2015]
+		$Libexternal	"$LIBCOMMON/jpeg-static" [!$DEDICATED]
+		$Libexternal	"$LIBCOMMON/libpng16" [!$DEDICATED]
+		$Libexternal	"$LIBCOMMON/zlibstatic" [!$DEDICATED]
 
-		$ImpLib	"$LIBCOMMON\curl"	  [$OSXALL]
+		$Libexternal	"$LIBCOMMON/libcrypto" [$OSXALL]
+		$Libexternal 	"$SRCDIR/lib/common/$(CRYPTOPPDIR)/libcrypto" [$LINUXALL]
 
-		$Lib	"$LIBCOMMON\libcurl" [$WIN32&&!$VS2015]
-		$Lib   "libz" [$WIN32]
-
-		$Libexternal	libz [$LINUXALL]
+		$ImpLib	"$LIBCOMMON/curl"	  [$OSXALL]
 	}
 	
 }

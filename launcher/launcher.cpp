@@ -72,7 +72,7 @@
 #endif
 
 #if defined( USE_SDL )
-#include "SDL.h"
+#include "SDL2/include/SDL.h"
 
 #if !defined( _WIN32 )
 #define MB_OK 			0x00000001

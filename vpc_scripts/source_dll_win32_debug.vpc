@@ -55,7 +55,7 @@ $Configuration "Debug"
 	$Compiler
 	{
 		// General
-		$AdditionalIncludeDirectories		"$SRCDIR\common;$SRCDIR\public;$SRCDIR\public\tier0;$SRCDIR\public\tier1"
+		$AdditionalIncludeDirectories		"$SRCDIR\common;$SRCDIR\public;$SRCDIR\public\tier0;$SRCDIR\public\tier1;$SRCDIR\thirdparty"
 		$Resolve#UsingReferences
 		// dimhotepus: Use compatible with SAFE_SEH debug info format.
 		$DebugInformationFormat				"Program Database (/Zi)"

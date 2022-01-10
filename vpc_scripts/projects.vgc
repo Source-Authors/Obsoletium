@@ -1777,7 +1777,8 @@ $Project "socketlib"
 	"socketlib/socketlib.vpc" [$WINDOWS]
 }
 
-$Project "zlib"
-{
-    "thirdparty\zlib-1.2.5\zlib.vpc" [$WINDOWS]
-}
+// dimhotepus: thirdparty.
+//$Project "zlib"
+//{
+//    "thirdparty\zlib-1.2.5\zlib.vpc" [$WINDOWS]
+//}

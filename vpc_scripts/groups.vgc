@@ -201,7 +201,8 @@ $Group "game"
 	"vstdlib"
 	"vtf"
 	"coroutine_osx"
-	"zlib"
+// dimhotepus: thirdparty.
+//	"zlib"
 }
 
 $Group "everything"
@@ -464,7 +465,8 @@ $Group "everything"
 	"vtfscrew"
 	"vvis_dll"
 	"vvis_launcher"
-	"zlib"
+// dimhotepus: thirdparty.
+//	"zlib"
 	"coroutine_osx"
 
 //	"vs_python2.5"

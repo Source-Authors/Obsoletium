@@ -5,8 +5,8 @@
 //===========================================================================//
 #if defined( USE_SDL )
 #undef PROTECTED_THINGS_ENABLE
-#include "SDL.h"
-#include "SDL_syswm.h"
+#include "SDL2/include/SDL.h"
+#include "SDL2/include/SDL_syswm.h"
 
 #if defined( OSX )
 #define DONT_DEFINE_BOOL

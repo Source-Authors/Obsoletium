@@ -13,7 +13,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\econ;$SRCDIR\gcsdk\steamextra;.\econ"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\econ;$SRCDIR\gcsdk\steamextra;.\econ;$SRCDIR\thirdparty\zlib;$SRCDIR\thirdparty\zlib\out"
 		$PreprocessorDefinitions		"$BASE;USES_ECON_ITEMS"
 	}
 
@@ -178,9 +178,8 @@ $Project
 	
 	$Folder	"Link Libraries" 
 	{
-		$Lib "$LIBCOMMON/libjpeg"
-		$Lib libpng [!$VS2015]
-		$Lib $LIBCOMMON/libpng [$VS2015]
-		$Lib libz
+		$Libexternal	"$LIBCOMMON/jpeg-static"
+		$Libexternal	"$LIBCOMMON/libpng16"
+		$Libexternal	"$LIBCOMMON/zlibstatic"
 	}
 }

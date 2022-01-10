@@ -21,6 +21,15 @@ $Configuration
 		$SystemLibraries                                                        "iconv" [$OSXALL]
 		$SystemFrameworks			"IOKit;Carbon;ForceFeedback"
 	}
+	$PostBuildEvent [!$ANALYZE]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
+									"COPY $LIBCOMMON\SDL2.dll $OUTBINDIR\SDL2.dll" "\n"					\
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"COPY $LIBCOMMON\SDL2.pdb $OUTBINDIR\SDL2.pdb" "\n"					\
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"$BASE"
+	}
 }
 
 $Project "inputsystem"
@@ -48,7 +57,7 @@ $Project "inputsystem"
 	{
 		$Lib	tier1
 		$Lib	tier2
-		$ImpLib SDL2
 		$Implib	"steam_api"						[($WIN32||$WIN64||$POSIX||$PS3)&&!$NO_STEAM]
+		$Libexternal	"$LIBCOMMON/SDL2"
 	}
 }

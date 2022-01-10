@@ -93,7 +93,7 @@ $Project "launcher"
 		$Lib	tier3
 		$Implib steam_api  [!$NO_STEAM]
 		$ImpLib togl [!$IS_LIB_PROJECT && $GL]
-		$ImpLib SDL2 [$SDL]
+		$Libexternal	"$LIBCOMMON/SDL2" [$SDL]
 	}
 
 }

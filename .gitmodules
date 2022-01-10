@@ -7,3 +7,12 @@
 [submodule "thirdparty/libjpeg-turbo"]
 	path = thirdparty/libjpeg-turbo
 	url = git@github.com:libjpeg-turbo/libjpeg-turbo.git
+[submodule "thirdparty/libpng"]
+	path = thirdparty/libpng
+	url = git@github.com:glennrp/libpng.git
+[submodule "thirdparty/zlib"]
+	path = thirdparty/zlib
+	url = git@github.com:madler/zlib.git
+[submodule "thirdparty/sdl2"]
+	path = thirdparty/sdl2
+	url = git@github.com:libsdl-org/SDL.git

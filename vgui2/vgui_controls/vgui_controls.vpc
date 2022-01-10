@@ -15,7 +15,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\thirdparty;$SRCDIR\thirdparty\cef;$GENERATED_PROTO_DIR"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\thirdparty\cef;$GENERATED_PROTO_DIR"
 	}
 }
 

@@ -63,7 +63,7 @@ $Configuration "Release"
 	$Compiler
 	{
 		// General
-		$AdditionalIncludeDirectories			"$SRCDIR\common;$SRCDIR\public;$SRCDIR\public\tier0;$SRCDIR\public\tier1"
+		$AdditionalIncludeDirectories			"$SRCDIR\common;$SRCDIR\public;$SRCDIR\public\tier0;$SRCDIR\public\tier1;$SRCDIR\thirdparty"
 		$Resolve#UsingReferences
 		$DebugInformationFormat					"Program Database (/Zi)"
 		$SuppressStartupBanner

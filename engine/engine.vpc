@@ -16,7 +16,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;.\;audio;audio\private;audio\public;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls;$SRCDIR\thirdparty;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out"
+		$AdditionalIncludeDirectories	"$BASE;.\;audio;audio\private;audio\public;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out;$SRCDIR\thirdparty\zlib;$SRCDIR\thirdparty\zlib\out"
 		$PreprocessorDefinitions		"$BASE;USE_CONVARS;VOICE_OVER_IP;BUMPMAP;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER"
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY" [$LINUXALL]
@@ -1096,8 +1096,6 @@ $Project "engine"
 
 		$Lib	appframework
 		$Lib	bitmap
-		$Lib	"$LIBCOMMON/bzip2"
-		$Lib	"$LIBCOMMON/jpeg-static" [!$DEDICATED]
 
 		$Lib	dmxloader
 		$Lib	mathlib
@@ -1110,16 +1108,15 @@ $Project "engine"
 		$ImpLibexternal steam_api   [!$NO_STEAM]
 
 		$ImpLib	"$LIBCOMMON\curl"	  [$OSXALL]
-
-		$Libexternal	"libz"
+		
+		$Libexternal	"$LIBCOMMON/bzip2"
+		$Libexternal	"$LIBCOMMON/jpeg-static" [!$DEDICATED]
+		$Libexternal	"$LIBCOMMON/SDL2" [$SDL]
+		$Libexternal	"$LIBCOMMON/zlibstatic"
 		$Libexternal 	"$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL&&!$DEDICATED]
 
 		// Link with the google profiler.
 		// https://github.com/gperftools/gperftools
 		$File	"$SRCDIR/thirdparty/gperftools-2.0/.libs/libprofiler.so" [$GPROFILER]
-
-		$Lib	"$LIBCOMMON/binkw32"					[$WIN32&&!$QUICKTIME_WIN32]
-		$File   "$LIBCOMMON\quicktime\QTMLClient"       [$WIN32&&$QUICKTIME_WIN32]
-		$ImpLib	"SDL2" [$SDL]
 	}	
 }

@@ -15,7 +15,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;.\;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls;$SRCDIR\common\GameUI;$SRCDIR\thirdparty;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out"
+		$AdditionalIncludeDirectories	"$BASE;.\;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls;$SRCDIR\common\GameUI;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out;$SRCDIR\thirdparty\zlib;$SRCDIR\thirdparty\zlib\out"
 		$PreprocessorDefinitions		"$BASE;GAMEUI_EXPORTS;VERSION_SAFE_STEAM_API_INTERFACES"
 	}
 
@@ -248,11 +248,12 @@ $Project "GameUI"
 		$Lib	tier3
 		$Lib	vgui_controls
 		$Lib	vtf
+
 		$ImpLib	steam_api  [!$NO_STEAM]
-		$Lib	"$LIBCOMMON/jpeg-static" [!$DEDICATED]
-		$Lib libpng [!$VS2015&&!$DEDICATED]
-		$Lib $LIBCOMMON/libpng [$VS2015&&!$DEDICATED]
-		$Lib libz [!$DEDICATED]
-		$ImpLib SDL2 [$SDL]
+
+		$Libexternal	"$LIBCOMMON/jpeg-static" [!$DEDICATED]
+		$Libexternal	"$LIBCOMMON/libpng16" [!$DEDICATED]
+		$Libexternal	"$LIBCOMMON/zlibstatic" [!$DEDICATED]
+		$Libexternal	"$LIBCOMMON/SDL2" [$SDL]
 	}
 }

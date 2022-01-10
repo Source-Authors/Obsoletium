@@ -19,7 +19,7 @@
 #define _STDINT_H_ 1
 #endif
 
-#include "SDL.h"
+#include "SDL2/include/SDL.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

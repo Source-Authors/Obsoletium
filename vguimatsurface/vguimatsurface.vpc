@@ -101,6 +101,6 @@ $Project "vguimatsurface"
 		$Lib		tier3
 		$Lib		vgui_controls
 		$Lib		vgui_surfacelib
-		$ImpLib		SDL2 [$SDL]
+		$Libexternal	"$LIBCOMMON/SDL2" [$SDL]
 	}
 }
