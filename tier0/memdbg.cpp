@@ -438,10 +438,10 @@ public:
 	typedef std::size_t    size_type;
 	typedef std::ptrdiff_t difference_type;
 
-	CNoRecurseAllocator() {}
+	CNoRecurseAllocator() = default;
 	CNoRecurseAllocator(const CNoRecurseAllocator&) {}
 	template <class U> CNoRecurseAllocator(const CNoRecurseAllocator<U>&) {}
-	~CNoRecurseAllocator(){}
+	~CNoRecurseAllocator() = default;
 
 	// rebind allocator to type U
 	template <class U > struct rebind { typedef CNoRecurseAllocator<U> other; };

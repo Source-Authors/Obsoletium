@@ -68,7 +68,7 @@ static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
 	HANDLE hThread = OpenThread( THREAD_SUSPEND_RESUME | THREAD_SET_CONTEXT, FALSE, dwThreadId );
 	if ( hThread != INVALID_HANDLE_VALUE )
 	{
-		if ( SuspendThread( hThread ) != -1 )
+		if ( SuspendThread( hThread ) != -1 ) //-V720
 		{
 			SetThreadContext( hThread, &ctx );
 			ResumeThread( hThread );

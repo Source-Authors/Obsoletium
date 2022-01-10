@@ -89,6 +89,11 @@ public:
 		return !(operator==(rhs));
 	}
 
+	Color( const Color &rhs )
+	{
+		SetRawColor( rhs.GetRawColor() );
+	}
+
 	Color &operator=( const Color &rhs )
 	{
 		SetRawColor( rhs.GetRawColor() );

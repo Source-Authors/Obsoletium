@@ -1597,7 +1597,7 @@ void CThreadSpinRWLock::UnlockRead()
 void CThreadSpinRWLock::UnlockWrite()
 {
 	Assert( m_lockInfo.m_writerId == ThreadGetCurrentId()  && m_lockInfo.m_nReaders == 0 );
-	static const LockInfo_t newValue = { 0, 0 };
+	static const alignas(int64) LockInfo_t newValue = { 0, 0 };
 #if defined(_X360)
 	// X360TBD: Serious Perf implications, not yet. __sync();
 #endif
@@ -1942,7 +1942,7 @@ void CThread::BWaitForThreadSuspendCooperative()
 unsigned int CThread::Suspend()
 {
 #ifdef _WIN32
-	return ( SuspendThread(m_hThread) != 0 );
+	return ( SuspendThread(m_hThread) != 0 ); //-V720
 #elif defined(OSX)
 	int susCount = m_nSuspendCount++;
 	while ( thread_suspend( pthread_mach_thread_np(m_threadId) ) != KERN_SUCCESS )
