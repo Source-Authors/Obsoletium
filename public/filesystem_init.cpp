@@ -580,7 +580,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 
 		if ( Q_stristr( pLocation, GAMEINFOPATH_TOKEN ) == pLocation )
 		{
-			pLocation += strlen( GAMEINFOPATH_TOKEN );
+			pLocation += std::size( GAMEINFOPATH_TOKEN ) - 1;
 			pszBaseDir = initInfo.m_pDirectoryName;
 		}
 		else if ( Q_stristr( pLocation, BASESOURCEPATHS_TOKEN ) == pLocation )
@@ -593,7 +593,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 			// We need a special identifier in the gameinfo.txt here because the base hl2 folder exists in different places.
 			// In the case of a game or a Steam-launched dedicated server, all the necessary prior engine content is mapped in with the Steam depots,
 			// so we can just use the path as-is.
-			pLocation += strlen( BASESOURCEPATHS_TOKEN );
+			pLocation += std::size( BASESOURCEPATHS_TOKEN ) - 1;
 		}
 
 		CUtlStringList vecFullLocationPaths;
@@ -970,6 +970,7 @@ bool DoesPathExistAlready( const char *pPathEnvVar, const char *pTestPath )
 
 	pTestPath = correctedTestPath;
 
+	size_t nTestPathLen = strlen( pTestPath );
 	const char *pCurPos = pPathEnvVar;
 	while ( 1 )
 	{
@@ -978,7 +979,7 @@ bool DoesPathExistAlready( const char *pPathEnvVar, const char *pTestPath )
 			return false;
 
 		// Ok, we found pTestPath in the path, but it's only valid if it's followed by an optional slash and a semicolon.
-		pTestPos += strlen( pTestPath );
+		pTestPos += nTestPathLen;
 		if ( pTestPos[0] == 0 || pTestPos[0] == ';' || (PATHSEPARATOR( pTestPos[0] ) && pTestPos[1] == ';') )
 			return true;
 	

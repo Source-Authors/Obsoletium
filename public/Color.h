@@ -16,7 +16,7 @@
 // Purpose: Basic handler for an rgb set of colors
 //			This class is fully inline
 //-----------------------------------------------------------------------------
-class Color
+class alignas(int) Color
 {
 public:
 	// constructors

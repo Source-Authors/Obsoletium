@@ -373,7 +373,7 @@ public:
 class ALIGN16 VectorAligned : public CAlignedNewDelete<16, Vector>
 {
 public:
-	inline VectorAligned(void) {};
+  inline VectorAligned() = default;
 	inline VectorAligned(vec_t X, vec_t Y, vec_t Z) 
 	{
 		Init(X,Y,Z);
@@ -1662,7 +1662,7 @@ class QAngle;
 class RadianEuler
 {
 public:
-	inline RadianEuler(void)							{ }
+  inline RadianEuler() = default;
 	inline RadianEuler(vec_t X, vec_t Y, vec_t Z)		{ x = X; y = Y; z = Z; }
 	inline RadianEuler(Quaternion const &q);	// evil auto type promotion!!!
 	inline RadianEuler(QAngle const &angles);	// evil auto type promotion!!!

@@ -29,7 +29,7 @@ typedef int SideType;
 class VPlane
 {
 public:
-				VPlane();
+				VPlane() = default;
 				VPlane(const Vector &vNormal, vec_t dist);
 
 	void		Init(const Vector &vNormal, vec_t dist);
@@ -77,14 +77,9 @@ private:
 //-----------------------------------------------------------------------------
 // Inlines.
 //-----------------------------------------------------------------------------
-inline VPlane::VPlane()
-{
-}
-
 inline VPlane::VPlane(const Vector &vNormal, vec_t dist)
+    : m_Normal{vNormal}, m_Dist{dist}
 {
-	m_Normal = vNormal;
-	m_Dist = dist;
 }
 
 inline void	VPlane::Init(const Vector &vNormal, vec_t dist)

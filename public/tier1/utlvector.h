@@ -212,7 +212,7 @@ public:
 
 protected:
 	// Can't copy this unless we explicitly do it!
-	CUtlVector( CUtlVector const& vec ) { Assert(0); }
+	CUtlVector( CUtlVector const& vec ) : m_Size{0} { Assert(0); }
 
 	// Grows the vector
 	void GrowVector( int num = 1 );
@@ -586,7 +586,7 @@ class CCopyableUtlVector : public CUtlVector< T, CUtlMemory<T> >
 public:
 	explicit CCopyableUtlVector( int growSize = 0, int initSize = 0 ) : BaseClass( growSize, initSize ) {}
 	CCopyableUtlVector( T* pMemory, int numElements ) : BaseClass( pMemory, numElements ) {}
-	virtual ~CCopyableUtlVector() {}
+	virtual ~CCopyableUtlVector()  = default;
 	CCopyableUtlVector( CCopyableUtlVector const& vec ) { this->CopyArray( vec.Base(), vec.Count() ); }
 };
 
@@ -603,7 +603,7 @@ class CCopyableUtlVectorFixed : public CUtlVectorFixed< T, MAX_SIZE >
 public:
 	explicit CCopyableUtlVectorFixed( int growSize = 0, int initSize = 0 ) : BaseClass( growSize, initSize ) {}
 	CCopyableUtlVectorFixed( T* pMemory, int numElements ) : BaseClass( pMemory, numElements ) {}
-	virtual ~CCopyableUtlVectorFixed() {}
+	virtual ~CCopyableUtlVectorFixed() = default;
 	CCopyableUtlVectorFixed( CCopyableUtlVectorFixed const& vec ) { this->CopyArray( vec.Base(), vec.Count() ); }
 };
 
@@ -1459,7 +1459,7 @@ public:
 		return strcmp( *sz1, *sz2 );
 	}
 
-	CUtlStringList(){}
+	CUtlStringList() = default;
 
 	CUtlStringList( char const *pString, char const *pSeparator )
 	{

@@ -191,7 +191,6 @@ struct MaterialSystem_Config_t
 
 		// misc defaults
 		bAllowCheats = false;
-		bCompressedTextures = true;
 		bEditMode = false;
 
 		// debug modes
@@ -199,13 +198,9 @@ struct MaterialSystem_Config_t
 		bShowDiffuse = true;
 		nFullbright = 0;
 		bShowNormalMap = false;
-		bFilterLightmaps = true;
-		bFilterTextures = true;
-		bMipMapTextures = true;
 		nShowMipLevels = 0;
 		bShowLowResImage = false;
 		bReverseDepth = false;
-		bBufferPrimitives = true;
 		bDrawFlat = false;
 		bMeasureFillRate = false;
 		bVisualizeFillRate = false;

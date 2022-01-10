@@ -169,7 +169,7 @@ struct BGRA5551_t;
 struct BGRA4444_t;
 struct RGBX5551_t;
 
-struct BGRA8888_t
+struct alignas(unsigned int) BGRA8888_t
 {
 	unsigned char b;		// change the order of names to change the 
 	unsigned char g;		//  order of the output ARGB or BGRA, etc...
@@ -182,7 +182,7 @@ struct BGRA8888_t
 	}
 };
 
-struct BGRX8888_t
+struct alignas(unsigned int) BGRX8888_t
 {
 	unsigned char b;		// change the order of names to change the 
 	unsigned char g;		//  order of the output ARGB or BGRA, etc...

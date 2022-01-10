@@ -56,11 +56,9 @@ protected:
 	float m_RangeSquared;
 public:
 
-	void RecalculateDerivedValues(void);			 // calculate m_xxDot, m_Type for changed parms
+	void RecalculateDerivedValues();			 // calculate m_xxDot, m_Type for changed parms
 
-	LightDesc_t(void)
-	{
-	}
+	LightDesc_t() = default;
 
 	// constructors for various useful subtypes
 
