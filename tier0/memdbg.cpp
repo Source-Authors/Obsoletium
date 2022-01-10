@@ -755,7 +755,7 @@ static void DefaultHeapReportFunc( char const *pFormat, ... )
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CDbgMemAlloc::CDbgMemAlloc() : m_sMemoryAllocFailed( (size_t)0 )
+CDbgMemAlloc::CDbgMemAlloc() : m_pStatMap{nullptr}, m_pFilenames{nullptr}, m_sMemoryAllocFailed{0}
 {
 	// Make sure that we return 64-bit addresses in 64-bit builds.
 	ReserveBottomMemory();
@@ -798,11 +798,9 @@ void CDbgMemAlloc::Shutdown()
 		{
 			char *pFileName = (char*)(*iter);
 			free( pFileName );
-			iter++;
+			++iter;
 		}
 		m_pFilenames->clear();
-
-		m_bInitialized = false;
 
 		delete m_pFilenames;
 		m_pFilenames = nullptr;
@@ -1473,7 +1471,7 @@ void CDbgMemAlloc::DumpFileStats()
 	while ( iter != m_pStatMap->end() )
 	{
 		DumpMemInfo( iter->first.m_pFileName, iter->first.m_nLine, iter->second );
-		iter++;
+		++iter;
 	}
 }
 

@@ -1236,7 +1236,7 @@ private:
 
 	struct Node_t
 	{
-		Node_t() {}
+		Node_t() = default;
 		Node_t( const T &_elem ) : elem( _elem ) {}
 
 		T elem;

@@ -401,7 +401,7 @@ class TSLIST_HEAD_ALIGN CTSList : public CTSListBase
 public:
 	struct TSLIST_NODE_ALIGN Node_t : public TSLNodeBase_t
 	{
-		Node_t() {}
+		Node_t() = default;
 		Node_t( const T &init ) : elem( init ) {}
 		T elem;
 
@@ -492,7 +492,7 @@ class TSLIST_HEAD_ALIGN CTSListWithFreeList : public CTSListBase
 public:
 	struct TSLIST_NODE_ALIGN Node_t : public TSLNodeBase_t
 	{
-		Node_t() {}
+		Node_t() = default;
 		Node_t( const T &init ) : elem( init ) {}
 
 		T elem;
@@ -660,8 +660,8 @@ public:
 			MemAlloc_FreeAligned( p );
 		}
 
-		Node_t() {}
-		Node_t( const T &init ) : elem( init ) {}
+		Node_t() = default;
+		Node_t( const T &init ) : pNext{nullptr}, elem{init} {}
 
 		Node_t *pNext;
 		T elem;
@@ -854,7 +854,7 @@ public:
 
 		FinishPush( pNode, oldTail ); // This can fail if another thread pushed between the sequence and node grabs above. Later pushes or pops corrects
 
-		m_Count++;
+		++m_Count;
 
 		return oldTail.value.pNode;
 	}
@@ -925,7 +925,7 @@ public:
 			}
 		}
 
-		m_Count--;
+		--m_Count;
 		head.value.pNode->elem = elem;
 		return head.value.pNode;
 	}

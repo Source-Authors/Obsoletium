@@ -269,7 +269,7 @@ HRESULT PME::ReadMSR(uint32 dw_reg, uint64 * pi64_value)
 //---------------------------------------------------------------------------
 HRESULT PME::WriteMSR(uint32 dw_reg, const int64 & i64_value)
 {
-	DWORD	dw_buffer[3];
+  alignas(int64) DWORD dw_buffer[3];
 	DWORD	dw_ret_len;
 
 	if (bDriverOpen == false)				// driver is not going
@@ -301,7 +301,7 @@ HRESULT PME::WriteMSR(uint32 dw_reg, const int64 & i64_value)
 
 HRESULT PME::WriteMSR(uint32 dw_reg, const uint64 & i64_value)
 {
-	DWORD	dw_buffer[3];
+  alignas(uint64) DWORD dw_buffer[3];
 	DWORD	dw_ret_len;
 
 	if (bDriverOpen == false)				// driver is not going

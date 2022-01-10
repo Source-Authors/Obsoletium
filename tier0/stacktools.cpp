@@ -372,6 +372,7 @@ public:
 	{
 		m_bIsInitialized = false;
 		m_bShouldReloadSymbols = false;
+		m_hProcess = INVALID_HANDLE_VALUE;
 		m_hDbgHelpDll = NULL;
 		m_szPDBSearchPath = NULL;
 		m_pSymInitialize = SymInitialize_DummyFn;

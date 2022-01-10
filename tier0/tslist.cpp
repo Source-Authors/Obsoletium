@@ -52,13 +52,13 @@ class CQueueOps : public CTestOps
 	void Push( int item )
 	{
 		g_TestQueue.PushItem( item );
-		g_nPushes++;
+		++g_nPushes;
 	}
 	bool Pop( int *pResult )
 	{
 		if ( g_TestQueue.PopItem( pResult ) )
 		{
-			g_nPops++;
+			++g_nPops;
 			return true;
 		}
 		return false;

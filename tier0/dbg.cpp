@@ -180,7 +180,7 @@ SpewOutputFunc_t GetSpewOutputFunc( void )
 
 void _ExitOnFatalAssert( const tchar* pFile, int line )
 {
-	_SpewMessage( _T("Fatal assert failed: %s, line %d.  Application exiting.\n"), pFile, line );
+	(void)_SpewMessage( _T("Fatal assert failed: %s, line %d.  Application exiting.\n"), pFile, line );
 
 	// only write out minidumps if we're not in the debugger
 	if ( !Plat_IsInDebugSession() )

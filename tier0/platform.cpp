@@ -167,7 +167,7 @@ void Plat_ExitProcess( int nCode )
 	const char *pchCmdLineA = Plat_GetCommandLineA();
 	if ( nCode || ( strstr( pchCmdLineA, "gc.exe" ) && strstr( pchCmdLineA, "gc.dll" ) && strstr( pchCmdLineA, "-gc" ) ) )
 	{
-		int *x = NULL; *x = 1; // cause a hard crash, GC is not allowed to exit voluntarily from gc.dll
+		int *x = NULL; *x = 1; // cause a hard crash, GC is not allowed to exit voluntarily from gc.dll //-V522
 	}
 	TerminateProcess( GetCurrentProcess(), nCode );
 #elif defined(_PS3)

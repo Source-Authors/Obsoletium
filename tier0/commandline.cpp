@@ -156,22 +156,21 @@ void CCommandLine::LoadParametersFromFile( const char *&pSrc, char *&pDst, int m
 	FILE *fp = fopen( szFileName, "r" );
 	if ( fp )
 	{
-		char c;
-		c = (char)fgetc( fp );
+		int c = fgetc( fp );
 		while ( c != EOF )
 		{
 			// Turn return characters into spaces
 			if ( c == '\n' )
 				c = ' ';
 
-			*pDst++ = c;
+			*pDst++ = static_cast<char>( c );
 			
 			// Don't go past the end, and allow for our terminating space character AND a terminating null character.
 			if ( (pDst - pDestStart) >= (maxDestLen-2) )
 				break;
 
 			// Get the next character, if there are more
-			c = (char)fgetc( fp );
+			c = fgetc( fp );
 		}
 	
 		// Add a terminating space character
@@ -338,6 +337,7 @@ void CCommandLine::RemoveParm( const char *pszParm )
 	char *pnextparam;
 	int n;
 	int curlen;
+	size_t nParmLen = strlen( pszParm );
 
 	p = m_pszCmdLine;
 	while ( *p )
@@ -356,7 +356,7 @@ void CCommandLine::RemoveParm( const char *pszParm )
 		while ( pnextparam && *pnextparam && (*pnextparam != ' ') && (*pnextparam != '\"') )
 			pnextparam++;
 
-		if ( pnextparam && ( static_cast<size_t>( pnextparam - found ) > strlen( pszParm ) ) )
+		if ( pnextparam && ( static_cast<size_t>( pnextparam - found ) > nParmLen ) )
 		{
 			p = pnextparam;
 			continue;
