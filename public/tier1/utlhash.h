@@ -619,8 +619,6 @@ template<class Data, class HashFuncs> inline UtlHashFastHandle_t CUtlHashFast<Da
 	// Get a new element from the pool.
 	int iHashData = m_aDataPool.Alloc( true );
 	HashFastData_t *pHashData = &m_aDataPool[iHashData];
-	if ( !pHashData )
-		return InvalidHandle();
 
 	// Add data to new element.
 	pHashData->m_uiKey = uiKey;
