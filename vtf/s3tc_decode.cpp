@@ -292,7 +292,7 @@ void S3TC_MergeBlocks(
 	)
 {
 	// Figure out a good palette to represent all of these blocks.
-	char mergedBlocks[16*MAX_S3TC_BLOCK_BYTES]; 
+	alignas(S3TCBlock_DXT1*) char mergedBlocks[16 * MAX_S3TC_BLOCK_BYTES]; 
 	GenerateRepresentativePalette( format, pOriginals, nBlocks, lPitch, mergedBlocks );
 
 	// Build a remap table to remap block 2's colors to block 1's colors.
@@ -334,7 +334,7 @@ void S3TC_MergeBlocks(
 		const char *pAlphaBits = mergedBlocks + 2;
 		
 		// Skip past the alpha pixel bits and past the color palette.
-		const char *pColorPalette = pAlphaBits + 6*nBlocks;
+		alignas(unsigned short*) const char *pColorPalette = pAlphaBits + 6*nBlocks;
 		const char *pColorBits = pColorPalette + 4;
 
 		for ( int iBlock=0; iBlock < nBlocks; iBlock++ )

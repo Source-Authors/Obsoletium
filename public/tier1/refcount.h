@@ -167,7 +167,7 @@ class CRefPtr : public CBaseAutoPtr<T>
 {
 	typedef CBaseAutoPtr<T> BaseClass;
 public:
-	CRefPtr()												{}
+	CRefPtr()	= default;
 	CRefPtr( T *pInit )										: BaseClass( pInit ) {}
 	CRefPtr( const CRefPtr<T> &from )						: BaseClass( from ) {}
 	~CRefPtr()												{ if ( BaseClass::m_pObject ) BaseClass::m_pObject->Release(); }
@@ -218,9 +218,7 @@ protected:
 	{
 	}
 
-	virtual ~CRefCountServiceBase()
-	{
-	}
+	virtual ~CRefCountServiceBase() = default;
 
 	virtual bool OnFinalRelease()
 	{
@@ -267,9 +265,7 @@ protected:
 	{
 	}
 
-	virtual ~CRefCountServiceDestruct()
-	{
-	}
+	virtual ~CRefCountServiceDestruct() = default;
 
 	int GetRefCount() const
 	{
@@ -313,7 +309,7 @@ template < class REFCOUNT_SERVICE = CRefCountService >
 class NO_VTABLE CRefCounted : public REFCOUNT_SERVICE
 {
 public:
-	virtual ~CRefCounted()	{}
+  virtual ~CRefCounted() = default;
 	int AddRef() 			{ return REFCOUNT_SERVICE::DoAddRef(); }
 	int Release()			{ return REFCOUNT_SERVICE::DoRelease(); }
 };
@@ -325,7 +321,7 @@ class NO_VTABLE CRefCounted1 : public BASE1,
 							   public REFCOUNT_SERVICE
 {
 public:
-	virtual ~CRefCounted1()	{}
+  virtual ~CRefCounted1() = default;
 	int AddRef() 			{ return REFCOUNT_SERVICE::DoAddRef(); }
 	int Release()			{ return REFCOUNT_SERVICE::DoRelease(); }
 };
@@ -337,7 +333,7 @@ class NO_VTABLE CRefCounted2 : public BASE1, public BASE2,
 							   public REFCOUNT_SERVICE
 {
 public:
-	virtual ~CRefCounted2()	{}
+  virtual ~CRefCounted2() = default;
 	int AddRef() 			{ return REFCOUNT_SERVICE::DoAddRef(); }
 	int Release()			{ return REFCOUNT_SERVICE::DoRelease(); }
 };
@@ -348,7 +344,7 @@ template < class BASE1, class BASE2, class BASE3, class REFCOUNT_SERVICE = CRefC
 class NO_VTABLE CRefCounted3 : public BASE1, public BASE2, public BASE3,
 							   public REFCOUNT_SERVICE
 {
-	virtual ~CRefCounted3()	{}
+  virtual ~CRefCounted3() = default;
 	int AddRef() 			{ return REFCOUNT_SERVICE::DoAddRef(); }
 	int Release()			{ return REFCOUNT_SERVICE::DoRelease(); }
 };
@@ -360,7 +356,7 @@ class NO_VTABLE CRefCounted4 : public BASE1, public BASE2, public BASE3, public 
 							   public REFCOUNT_SERVICE
 {
 public:
-	virtual ~CRefCounted4()	{}
+  virtual ~CRefCounted4() = default;
 	int AddRef() 			{ return REFCOUNT_SERVICE::DoAddRef(); }
 	int Release()			{ return REFCOUNT_SERVICE::DoRelease(); }
 };
@@ -372,7 +368,7 @@ class NO_VTABLE CRefCounted5 : public BASE1, public BASE2, public BASE3, public 
 							   public REFCOUNT_SERVICE
 {
 public:
-	virtual ~CRefCounted5()	{}
+  virtual ~CRefCounted5() = default;
 	int AddRef() 			{ return REFCOUNT_SERVICE::DoAddRef(); }
 	int Release()			{ return REFCOUNT_SERVICE::DoRelease(); }
 };

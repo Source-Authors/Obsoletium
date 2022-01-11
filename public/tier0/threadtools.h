@@ -803,7 +803,7 @@ public:
 	}
 
 private:
-	[[maybe_unused]] uint8 pad[128-sizeof(CThreadFastMutex)];
+	[[maybe_unused]] uint8 pad[128-sizeof(CThreadFastMutex)];  //-V730_NOINIT
 } ALIGN128_POST;
 
 #else
