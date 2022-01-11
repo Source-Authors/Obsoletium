@@ -371,7 +371,7 @@ private:
 #ifdef _DEBUG
 		while ( ( waitResult = WaitForMultipleObjects( ARRAYSIZE(waitHandles), waitHandles, FALSE, 10 ) ) == WAIT_TIMEOUT )
 		{
-			waitResult = waitResult; // break here
+			waitResult = waitResult; // break here //-V570
 		}
 #else
 		waitResult = WaitForMultipleObjects( ARRAYSIZE(waitHandles), waitHandles, FALSE, INFINITE );
@@ -506,8 +506,9 @@ IThreadPool *g_pThreadPool = &g_ThreadPool;
 
 CThreadPool::CThreadPool() :
 	m_nIdleThreads( 0 ),
+	m_nSuspend( 0 ),
 	m_nJobs( 0 ),
-	m_nSuspend( 0 )
+	m_bExecOnThreadPoolThreadsOnly( 0 )
 {
 }
 
@@ -1166,16 +1167,14 @@ public:
 		if ( bDoWork )
 		{
 			byte pMemory[1024];
-			int i;
-			for ( i = 0; i < 1024; i++ )
+			for ( auto &b : pMemory ) b = rand();
+
+			double acc{0.0};
+			for ( size_t i = 0; i < 50; i++ )
 			{
-				pMemory[i] = rand();
+				acc += sqrt( HashBlock( pMemory, 1024 ) + HashBlock( pMemory, 1024 ) + 10.0 );
 			}
-			for ( i = 0; i < 50; i++ )
-			{
-				sqrt( (float)HashBlock( pMemory, 1024 ) + HashBlock( pMemory, 1024 ) + 10.0 );
-			}
-			bDoWork = false;
+			bDoWork = acc != 0.0F;
 		}
 		if ( m_nCount == g_nTotalToComplete )
 			g_done.Set();
@@ -1273,14 +1272,12 @@ public:
 	virtual JobStatus_t DoExecute()
 	{
 		byte pMemory[1024];
-		int i;
-		for ( i = 0; i < 1024; i++ )
+		for ( auto &b : pMemory ) b = rand();
+
+		double acc{0.0};
+		for ( int i = 0; i < 50; i++ )
 		{
-			pMemory[i] = rand();
-		}
-		for ( i = 0; i < 50; i++ )
-		{
-			sqrt( (float)HashBlock( pMemory, 1024 ) + HashBlock( pMemory, 1024 ) + 10.0 );
+			acc += sqrt( HashBlock( pMemory, 1024 ) + HashBlock( pMemory, 1024 ) + 10.0 );
 		}
 		if ( AccessEvent()->Check() || IsFinished() )
 		{
@@ -1290,7 +1287,7 @@ public:
 				DebuggerBreakIfDebugging();
 			}
 		}
-		return 0;
+		return acc != 0.0F ? 0 : -1;
 	}
 };
 

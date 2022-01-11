@@ -1226,7 +1226,7 @@ public:
 		return ( p && p->pNext && p->pPrev );
 	}
 
-	inline static IndexType_t  InvalidIndex()			
+	inline static IndexType_t  InvalidIndex()
 	{ 
 		return NULL; 
 	}
@@ -1235,7 +1235,7 @@ private:
 	struct Node_t
 	{
 		Node_t() = default;
-		Node_t( const T &_elem ) : elem( _elem ) {}
+		Node_t( const T &_elem ) : elem( _elem ), pPrev{nullptr}, pNext{nullptr} {}
 
 		T elem;
 		Node_t *pPrev, *pNext;

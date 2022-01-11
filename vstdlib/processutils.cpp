@@ -21,7 +21,7 @@ class CProcessUtils : public CTier1AppSystem< IProcessUtils >
 	typedef CTier1AppSystem< IProcessUtils > BaseClass;
 
 public:
-	CProcessUtils() : BaseClass( false ) {}
+	CProcessUtils() : BaseClass( false ), m_hCurrentProcess{PROCESS_HANDLE_INVALID}, m_bInitialized{false} {}
 
 	// Inherited from IAppSystem
 	virtual InitReturnVal_t Init();
