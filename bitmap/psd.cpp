@@ -355,7 +355,6 @@ static void PSDReadCompressedChannels( CUtlBuffer &buf, int nChannelsCount, PSDM
 				pSrc += nCount;
 				nPixelsRemaining -= nCount;
 			}
-			Assert( nPixelsRemaining == 0 );
 
 			// Collate the channels together
 			for ( int k = 0; k < bitmap.Width(); ++k, pDest += 4 )

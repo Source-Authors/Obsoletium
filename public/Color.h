@@ -18,19 +18,18 @@
 //-----------------------------------------------------------------------------
 class alignas(int) Color
 {
+	using component = unsigned char;
 public:
 	// constructors
-	Color()
+	Color() : Color{0,0,0}
 	{
-		*((int *)this) = 0;
 	}
-	Color(int _r,int _g,int _b)
+	Color(component r,component g,component b) : Color{r,g,b,0}
 	{
-		SetColor(_r, _g, _b, 0);
 	}
-	Color(int _r,int _g,int _b,int _a)
+	Color(component r,component g,component b,component a)
 	{
-		SetColor(_r, _g, _b, _a);
+		SetColor(r, g, b, a);
 	}
 	
 	// set the color
@@ -38,12 +37,12 @@ public:
 	// g - green component (0-255)
 	// b - blue component (0-255)
 	// a - alpha component, controls transparency (0 - transparent, 255 - opaque);
-	void SetColor(int _r, int _g, int _b, int _a = 0)
+	void SetColor(component _r, component _g, component _b, component _a = 0)
 	{
-		_color[0] = (unsigned char)_r;
-		_color[1] = (unsigned char)_g;
-		_color[2] = (unsigned char)_b;
-		_color[3] = (unsigned char)_a;
+		_color[0] = _r;
+		_color[1] = _g;
+		_color[2] = _b;
+		_color[3] = _a;
 	}
 
 	void GetColor(int &_r, int &_g, int &_b, int &_a) const
@@ -69,22 +68,22 @@ public:
 	inline int b() const	{ return _color[2]; }
 	inline int a() const	{ return _color[3]; }
 	
-	unsigned char &operator[](int index)
+	component &operator[](int index)
 	{
 		return _color[index];
 	}
 
-	const unsigned char &operator[](int index) const
+	const component &operator[](int index) const
 	{
 		return _color[index];
 	}
 
-	bool operator == (const Color &rhs) const
+	bool operator ==(const Color &rhs) const
 	{
 		return ( *((int *)this) == *((int *)&rhs) );
 	}
 
-	bool operator != (const Color &rhs) const
+	bool operator !=(const Color &rhs) const
 	{
 		return !(operator==(rhs));
 	}
@@ -101,7 +100,7 @@ public:
 	}
 
 private:
-	unsigned char _color[4];
+	component _color[4];
 };
 
 

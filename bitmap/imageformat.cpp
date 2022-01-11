@@ -260,7 +260,7 @@ int GetNumMipMapLevels( int width, int height, int depth )
 		depth = 1;
 	}
 
-	if( width < 1 || height < 1 || depth < 1 )
+	if( width < 1 || height < 1 )
 		return 0;
 
 	int numMipLevels = 1;
@@ -456,7 +456,7 @@ D3DFORMAT ImageFormatToD3DFormat( ImageFormat format )
 	case IMAGE_FORMAT_DXT3:
 		return D3DFMT_DXT3;
 	case IMAGE_FORMAT_DXT5:
-		return D3DFMT_DXT5;
+		return D3DFMT_DXT5; //-V1037
 	case IMAGE_FORMAT_UV88:
 		return D3DFMT_V8U8;
 	case IMAGE_FORMAT_UVWQ8888:

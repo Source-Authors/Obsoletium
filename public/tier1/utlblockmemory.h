@@ -321,7 +321,7 @@ void CUtlBlockMemory<T,I>::Purge( int numElements )
 	if ( numElements > nAllocated )
 	{
 		// Ensure this isn't a grow request in disguise.
-		Assert( numElements <= nAllocated );
+		Assert( numElements <= nAllocated ); //-V547
 		return;
 	}
 

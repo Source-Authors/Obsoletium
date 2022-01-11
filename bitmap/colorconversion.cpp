@@ -106,7 +106,7 @@ static UserFormatToRGBA8888Func_t GetUserFormatToRGBA8888Func_t( ImageFormat src
 	case IMAGE_FORMAT_BGR888:
 		return BGR888ToRGBA8888;
 	case IMAGE_FORMAT_RGB565:
-		return NULL;
+		return NULL; //-V1037
 	case IMAGE_FORMAT_I8:
 		return I8ToRGBA8888;
 	case IMAGE_FORMAT_IA88:
@@ -183,7 +183,7 @@ static RGBA8888ToUserFormatFunc_t GetRGBA8888ToUserFormatFunc_t( ImageFormat dst
 	case IMAGE_FORMAT_BGR888:
 		return RGBA8888ToBGR888;
 	case IMAGE_FORMAT_RGB565:
-		return NULL;
+		return NULL; //-V1037
 	case IMAGE_FORMAT_I8:
 		return RGBA8888ToI8;
 	case IMAGE_FORMAT_IA88:

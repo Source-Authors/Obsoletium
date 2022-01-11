@@ -237,8 +237,9 @@ class RayStream
 	FourRays PendingRays[8];
 
 public:
-	RayStream(void)
+	RayStream()
 	{
+		memset(PendingStreamOutputs,0,sizeof(PendingStreamOutputs));
 		memset(n_in_stream,0,sizeof(n_in_stream));
 	}
 };

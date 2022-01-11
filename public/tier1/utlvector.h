@@ -212,7 +212,7 @@ public:
 
 protected:
 	// Can't copy this unless we explicitly do it!
-	CUtlVector( CUtlVector const& vec ) : m_Size{0} { Assert(0); }
+	CUtlVector( CUtlVector const& ) = delete;
 
 	// Grows the vector
 	void GrowVector( int num = 1 );

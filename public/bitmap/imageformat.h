@@ -169,20 +169,23 @@ struct BGRA5551_t;
 struct BGRA4444_t;
 struct RGBX5551_t;
 
-struct alignas(unsigned int) BGRA8888_t
+struct BGRA8888_t
 {
 	unsigned char b;		// change the order of names to change the 
 	unsigned char g;		//  order of the output ARGB or BGRA, etc...
 	unsigned char r;		//  Last one is MSB, 1st is LSB.
 	unsigned char a;
-	inline BGRA8888_t& operator=( const BGRA8888_t& in )
+	BGRA8888_t& operator=( const BGRA8888_t& in )
 	{
-		*( unsigned int * )this = *( unsigned int * )&in;
+		b = in.b;
+		g = in.g;
+		r = in.r;
+		a = in.a;
 		return *this;
 	}
 };
 
-struct alignas(unsigned int) BGRX8888_t
+struct BGRX8888_t
 {
 	unsigned char b;		// change the order of names to change the 
 	unsigned char g;		//  order of the output ARGB or BGRA, etc...
@@ -190,7 +193,10 @@ struct alignas(unsigned int) BGRX8888_t
 	unsigned char x;
 	inline BGRX8888_t& operator=( const BGRX8888_t& in )
 	{
-		*( unsigned int * )this = *( unsigned int * ) &in;
+		b = in.b;
+		g = in.g;
+		r = in.r;
+		x = in.x;
 		return *this;
 	}
 };

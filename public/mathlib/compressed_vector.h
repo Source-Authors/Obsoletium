@@ -501,7 +501,7 @@ protected:
 class float16_with_assign : public float16
 {
 public:
-	float16_with_assign() {}
+  float16_with_assign() = default;
 	float16_with_assign( float f ) { m_storage.rawWord = ConvertFloatTo16bits(f); }
 
 	float16& operator=(const float16 &other) { m_storage.rawWord = ((float16_with_assign &)other).m_storage.rawWord; return *this; }
@@ -518,7 +518,7 @@ class Vector48
 {
 public:
 	// Construction/destruction:
-	Vector48(void) {}
+	Vector48() = default;
 	Vector48(vec_t X, vec_t Y, vec_t Z) { x.SetFloat( X ); y.SetFloat( Y ); z.SetFloat( Z ); }
 
 	// assignment

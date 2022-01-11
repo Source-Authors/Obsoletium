@@ -809,7 +809,7 @@ void CUtlMemory<T,I>::Purge( int numElements )
 	if( numElements > m_nAllocationCount )
 	{
 		// Ensure this isn't a grow request in disguise.
-		Assert( numElements <= m_nAllocationCount );
+		Assert( numElements <= m_nAllocationCount ); //-V547
 		return;
 	}
 

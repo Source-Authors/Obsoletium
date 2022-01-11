@@ -72,6 +72,8 @@ public:
 	/// direciton is derived from that.
 	LightDesc_t( const Vector &pos, const Vector &color, const Vector &point_at,
 				float inner_cone_boundary, float outer_cone_boundary )
+			: m_ThetaDot{0.0F}, m_PhiDot{0.0F}, m_Flags{0},
+			OneOver_ThetaDot_Minus_PhiDot{0.0F}, m_RangeSquared{0.0F}
 	{
 		InitSpot( pos, color, point_at, inner_cone_boundary, outer_cone_boundary );
 	}
