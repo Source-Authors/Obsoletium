@@ -475,7 +475,7 @@ bool IntersectInfiniteRayWithSphere( const Vector &vecRayOrigin, const Vector &v
 	if ( flDiscrim < 0.0f )
 		return false;
 
-	flDiscrim = sqrt( flDiscrim );
+	flDiscrim = sqrtf( flDiscrim );
 	float oo2a = 0.5f / a;
 	*pT1 = ( - b - flDiscrim ) * oo2a;
 	*pT2 = ( - b + flDiscrim ) * oo2a;

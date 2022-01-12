@@ -121,9 +121,9 @@ void CStudioRender::R_StudioEyelidFACS( const mstudioeyeball_t *peyeball, const 
 	vecNormTarget.z = clamp( vecNormTarget.z, -1.0f, 1.0f );
 
 	// get weighted position of eyeball angles based on the "raiser", "neutral", and "lowerer" controls
-	upperlid = m_pFlexWeights[peyeball->upperflexdesc[0]] * asin( vecNormTarget.x );
-	upperlid += m_pFlexWeights[peyeball->upperflexdesc[1]] * asin( vecNormTarget.y );
-	upperlid += m_pFlexWeights[peyeball->upperflexdesc[2]] * asin( vecNormTarget.z );
+	upperlid = m_pFlexWeights[peyeball->upperflexdesc[0]] * asinf( vecNormTarget.x );
+	upperlid += m_pFlexWeights[peyeball->upperflexdesc[1]] * asinf( vecNormTarget.y );
+	upperlid += m_pFlexWeights[peyeball->upperflexdesc[2]] * asinf( vecNormTarget.z );
 
 	vecNormTarget.Init( peyeball->lowertarget[0], peyeball->lowertarget[1], peyeball->lowertarget[2] );
 	vecNormTarget /= peyeball->radius;
@@ -131,9 +131,9 @@ void CStudioRender::R_StudioEyelidFACS( const mstudioeyeball_t *peyeball, const 
 	vecNormTarget.y = clamp( vecNormTarget.y, -1.0f, 1.0f );
 	vecNormTarget.z = clamp( vecNormTarget.z, -1.0f, 1.0f );
 
-	lowerlid = m_pFlexWeights[peyeball->lowerflexdesc[0]] * asin( vecNormTarget.x );
-	lowerlid += m_pFlexWeights[peyeball->lowerflexdesc[1]] * asin( vecNormTarget.y );
-	lowerlid += m_pFlexWeights[peyeball->lowerflexdesc[2]] * asin( vecNormTarget.z );
+	lowerlid = m_pFlexWeights[peyeball->lowerflexdesc[0]] * asinf( vecNormTarget.x );
+	lowerlid += m_pFlexWeights[peyeball->lowerflexdesc[1]] * asinf( vecNormTarget.y );
+	lowerlid += m_pFlexWeights[peyeball->lowerflexdesc[2]] * asinf( vecNormTarget.z );
 
 	// ConDMsg("%.1f %.1f\n", RAD2DEG( upperlid ), RAD2DEG( lowerlid ) );		
 

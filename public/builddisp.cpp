@@ -414,13 +414,13 @@ bool CCoreDispSurface::LongestInU( const Vector &vecU, const Vector &vecV )
 	float flVLength = 0.0f;
 	for ( int iPoint = 0; iPoint < 4; ++iPoint )
 	{
-		float flTestDist = fabs( flDistU[(iPoint+1)%4] - flDistU[iPoint] );
+		float flTestDist = fabsf( flDistU[(iPoint+1)%4] - flDistU[iPoint] );
 		if ( flTestDist > flULength )
 		{
 			flULength = flTestDist;
 		}
 
-		flTestDist = fabs( flDistV[(iPoint+1)%4] - flDistV[iPoint] );
+		flTestDist = fabsf( flDistV[(iPoint+1)%4] - flDistV[iPoint] );
 		if ( flTestDist > flVLength )
 		{
 			flVLength = flTestDist;
