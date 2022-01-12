@@ -810,10 +810,7 @@ void ConVar::ChangeStringValue( const char *tempVal, float flOldValue )
 
 		if ( len > m_StringLength)
 		{
-			if (m_pszString)
-			{
-				delete[] m_pszString;
-			}
+			delete[] m_pszString;
 
 			m_pszString	= new char[len];
 			m_StringLength = len;
@@ -1338,7 +1335,7 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 		{
 			ConColorMsg( clr, "\"%s\" = \"%s\"", var->GetName(), value );
 
-			if ( stricmp( value, var->GetDefault() ) )
+			if ( stricmp( value, var->GetDefault() ) != 0 )
 			{
 				ConMsg( " ( def. \"%s\" )", var->GetDefault() );
 			}

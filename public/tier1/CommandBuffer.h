@@ -44,7 +44,7 @@ class CCommandBuffer
 public:
 	// Constructor, destructor
 	CCommandBuffer( );
-	~CCommandBuffer();
+	~CCommandBuffer() = default;
 
     // Inserts text into the command buffer
 	bool AddText( const char *pText, int nTickDelay = 0 );

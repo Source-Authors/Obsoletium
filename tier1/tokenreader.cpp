@@ -18,10 +18,12 @@
 //-----------------------------------------------------------------------------
 TokenReader::TokenReader(void)
 {
-	m_szFilename[0] = '\0';
 	m_nLine = 1;
 	m_nErrorCount = 0;
+	m_szFilename[0] = '\0';
+	m_szStuffed[0] = '\0';
 	m_bStuffed = false;
+	m_eStuffed = TOKENNONE;
 }
 
 

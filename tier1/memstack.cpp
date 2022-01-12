@@ -77,7 +77,7 @@ bool CMemoryStack::Init( unsigned maxSize, unsigned commitSize, unsigned initial
 
 #ifndef _X360
 	SYSTEM_INFO sysInfo;
-	GetSystemInfo( &sysInfo );
+	GetNativeSystemInfo( &sysInfo );
 	Assert( !( sysInfo.dwPageSize & (sysInfo.dwPageSize-1)) );
 	pageSize = sysInfo.dwPageSize;
 #else

@@ -63,6 +63,8 @@ private:
 
 FORCEINLINE CLZSS::CLZSS( int nWindowSize )
 {
+	m_pHashTable = nullptr;
+	m_pHashTarget = nullptr;
 	m_nWindowSize = nWindowSize;
 }
 #endif

@@ -51,7 +51,9 @@ const int MAX_ERROR_STACK = 64;
 class CKeyValuesErrorStack
 {
 public:
-	CKeyValuesErrorStack() : m_pFilename("NULL"), m_errorIndex(0), m_maxErrorIndex(0) {}
+	CKeyValuesErrorStack() : m_pFilename("NULL"), m_errorIndex(0), m_maxErrorIndex(0) {
+		memset( m_errorStack, 0, sizeof(m_errorStack) );
+	}
 
 	void SetFilename( const char *pFilename )
 	{
@@ -1482,7 +1484,7 @@ const wchar_t *KeyValues::GetWString( const char *keyName, const wchar_t *defaul
 			break;
 		case TYPE_UINT64:
 			{
-				swprintf( wbuf, Q_ARRAYSIZE(wbuf), L"%lld", *((uint64 *)(dat->m_sValue)) );
+				swprintf( wbuf, Q_ARRAYSIZE(wbuf), L"%llu", *((uint64 *)(dat->m_sValue)) );
 				SetWString( keyName, wbuf );
 			}
 			break;
@@ -2996,7 +2998,7 @@ bool KeyValues::Dump( IKeyValuesDumpContext *pDump, int nIndentLevel /* = 0 */, 
 		CUtlSortVector< KeyValues*, CUtlSortVectorKeyValuesByName > vecSortedKeys;
 	
 		// Dump values
-		for ( KeyValues *val = this ? GetFirstValue() : NULL; val; val = val->GetNextValue() )
+		for ( KeyValues *val = GetFirstValue(); val; val = val->GetNextValue() )
 		{
 			vecSortedKeys.InsertNoSort( val );
 		}
@@ -3011,7 +3013,7 @@ bool KeyValues::Dump( IKeyValuesDumpContext *pDump, int nIndentLevel /* = 0 */, 
 		vecSortedKeys.Purge();
 
 		// Dump subkeys
-		for ( KeyValues *sub = this ? GetFirstTrueSubKey() : NULL; sub; sub = sub->GetNextTrueSubKey() )
+		for ( KeyValues *sub = GetFirstTrueSubKey(); sub; sub = sub->GetNextTrueSubKey() )
 		{
 			vecSortedKeys.InsertNoSort( sub );
 		}
@@ -3026,14 +3028,14 @@ bool KeyValues::Dump( IKeyValuesDumpContext *pDump, int nIndentLevel /* = 0 */, 
 	else
 	{
 		// Dump values
-		for ( KeyValues *val = this ? GetFirstValue() : NULL; val; val = val->GetNextValue() )
+		for ( KeyValues *val = GetFirstValue(); val; val = val->GetNextValue() )
 		{
 			if ( !pDump->KvWriteValue( val, nIndentLevel + 1 ) )
 				return false;
 		}
 
 		// Dump subkeys
-		for ( KeyValues *sub = this ? GetFirstTrueSubKey() : NULL; sub; sub = sub->GetNextTrueSubKey() )
+		for ( KeyValues *sub = GetFirstTrueSubKey(); sub; sub = sub->GetNextTrueSubKey() )
 		{
 			if ( !sub->Dump( pDump, nIndentLevel + 1 ) )
 				return false;
@@ -3048,7 +3050,7 @@ bool IKeyValuesDumpContextAsText::KvBeginKey( KeyValues *pKey, int nIndentLevel 
 	if ( pKey )
 	{
 		return
-			KvWriteIndent( nIndentLevel ) &&
+			KvWriteIndent( nIndentLevel ) && //-V501
 			KvWriteText( pKey->GetName() ) &&
 			KvWriteText( "\n" ) &&
 			KvWriteIndent( nIndentLevel ) &&

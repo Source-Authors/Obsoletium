@@ -146,8 +146,9 @@ bool CUtlSymbolTable::CLess::operator()( const CStringPoolIndex &i1, const CStri
 //-----------------------------------------------------------------------------
 // constructor, destructor
 //-----------------------------------------------------------------------------
-CUtlSymbolTable::CUtlSymbolTable( int growSize, int initSize, bool caseInsensitive ) : 
-	m_Lookup( growSize, initSize ), m_bInsensitive( caseInsensitive ), m_StringPools( 8 )
+CUtlSymbolTable::CUtlSymbolTable( int growSize, int initSize, bool caseInsensitive )
+	: m_Lookup( growSize, initSize ), m_bInsensitive( caseInsensitive ),
+	m_pUserSearchString{nullptr}, m_StringPools( 8 )
 {
 }
 
@@ -321,22 +322,10 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindOrAddFileName( const char *pFileNa
 	Q_strncpy( filename, fn + Q_strlen( basepath ), sizeof( filename ) );
 
 	// not found, lock and look again
-	FileNameHandleInternal_t handle;
+	alignas(FileNameHandle_t) FileNameHandleInternal_t handle;
 	m_lock.LockForWrite();
 	handle.path = m_Strings->Insert( basepath ) + 1;
 	handle.file = m_Strings->Insert( filename ) + 1;
-	//handle.path = m_StringPool.FindStringHandle( basepath );
-	//handle.file = m_StringPool.FindStringHandle( filename );
-	//if ( handle.path != m_Strings.InvalidHandle() && handle.file )
-	//{
-		// found
-	//	m_lock.UnlockWrite();
-	//	return *( FileNameHandle_t * )( &handle );
-	//}
-
-	// safely add it
-	//handle.path = m_StringPool.ReferenceStringHandle( basepath );
-	//handle.file = m_StringPool.ReferenceStringHandle( filename );
 	m_lock.UnlockWrite();
 
 	return *( FileNameHandle_t * )( &handle );
@@ -363,15 +352,13 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 	char filename[ MAX_PATH ];
 	Q_strncpy( filename, fn + Q_strlen( basepath ), sizeof( filename ) );
 
-	FileNameHandleInternal_t handle;
+	alignas(FileNameHandle_t) FileNameHandleInternal_t handle;
 
 	Assert( (uint16)(m_Strings->InvalidHandle() + 1) == 0 );
 
 	m_lock.LockForRead();
 	handle.path = m_Strings->Find(basepath) + 1;
 	handle.file = m_Strings->Find(filename) + 1;
-	//handle.path = m_StringPool.FindStringHandle(basepath);
-	//handle.file = m_StringPool.FindStringHandle(filename);
 	m_lock.UnlockRead();
 
 	if ( handle.path == 0 || handle.file == 0 )
@@ -387,10 +374,10 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 //-----------------------------------------------------------------------------
 bool CUtlFilenameSymbolTable::String( const FileNameHandle_t& handle, char *buf, int buflen )
 {
-	buf[ 0 ] = 0;
+	buf[ 0 ] = '\0';
 
 	FileNameHandleInternal_t *internal = ( FileNameHandleInternal_t * )&handle;
-	if ( !internal || !internal->file || !internal->path )
+	if ( !internal->file || !internal->path )
 	{
 		return false;
 	}

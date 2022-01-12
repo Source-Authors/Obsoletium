@@ -183,6 +183,8 @@ public:
 		{
 		}
 
+		Node_t &operator=( const Node_t & ) = delete;
+
 		KeyType_t	key;
 		ElemType_t	elem;
 	};

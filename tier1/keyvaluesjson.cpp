@@ -7,7 +7,7 @@
 #include "tier1/keyvaluesjson.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/strtools.h"
-#include <stdint.h> // INT32_MIN defn
+#include <cstdint> // INT32_MIN defn
 
 KeyValuesJSONParser::KeyValuesJSONParser( const CUtlBuffer &buf )
 {
@@ -18,8 +18,6 @@ KeyValuesJSONParser::KeyValuesJSONParser( const char *pszText, int cbSize )
 {
 	Init( pszText, cbSize >= 0 ? cbSize : V_strlen(pszText) );
 }
-
-KeyValuesJSONParser::~KeyValuesJSONParser() {}
 
 void KeyValuesJSONParser::Init( const char *pszText, int cbSize )
 {
@@ -667,7 +665,7 @@ static void JSONTest_ParseValid( const char *pszData )
 	KeyValuesJSONParser parser( pszData );
 	KeyValues *pFile = parser.ParseFile();
 	Assert( pFile );
-	pFile->deleteThis();
+	if (pFile) pFile->deleteThis();
 }
 
 static void JSONTest_ParseInvalid( const char *pszData, const char *pszExpectedErrMsgSnippet, int nExpectedFailureLine )

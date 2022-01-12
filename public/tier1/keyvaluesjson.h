@@ -21,7 +21,7 @@ class KeyValuesJSONParser
 public:
 	KeyValuesJSONParser( const CUtlBuffer &buf );
 	KeyValuesJSONParser( const char *pszText, int cbSize = -1 );
-	~KeyValuesJSONParser();
+	~KeyValuesJSONParser() = default;
 
 	/// Parse the whole string.  If there's a problem, returns NULL and sets m_nLine,m_szErrMsg with more info. 
 	KeyValues *ParseFile();

@@ -146,7 +146,7 @@ unsigned FASTCALL HashInt( const int n )
 	even  = g_nRandomValues[n & 0xff];
 	odd   = g_nRandomValues[((n >> 8) & 0xff)];
 
-	even  = g_nRandomValues[odd ^ (n >> 24)];
+	even  = g_nRandomValues[odd ^ (n >> 24)]; //-V519
 	odd   = g_nRandomValues[even ^ ((n >> 16) & 0xff)];
 	even  = g_nRandomValues[odd ^ ((n >> 8) &  0xff)];
 	odd   = g_nRandomValues[even  ^ (n & 0xff)];
@@ -167,7 +167,7 @@ unsigned FASTCALL Hash4( const void *pKey )
 	even  = g_nRandomValues[n & 0xff];
 	odd   = g_nRandomValues[((n >> 8) & 0xff)];
 
-	even  = g_nRandomValues[odd ^ (n >> 24)];
+	even  = g_nRandomValues[odd ^ (n >> 24)]; //-V519
 	odd   = g_nRandomValues[even ^ ((n >> 16) & 0xff)];
 	even  = g_nRandomValues[odd ^ ((n >> 8) &  0xff)];
 	odd   = g_nRandomValues[even  ^ (n & 0xff)];
@@ -189,7 +189,7 @@ unsigned FASTCALL Hash8( const void *pKey )
 	even  = g_nRandomValues[n & 0xff];
 	odd   = g_nRandomValues[((n >> 8) & 0xff)];
 
-	even  = g_nRandomValues[odd ^ (n >> 24)];
+	even  = g_nRandomValues[odd ^ (n >> 24)]; //-V519
 	odd   = g_nRandomValues[even ^ ((n >> 16) & 0xff)];
 	even  = g_nRandomValues[odd ^ ((n >> 8) &  0xff)];
 	odd   = g_nRandomValues[even  ^ (n & 0xff)];
@@ -217,7 +217,7 @@ unsigned FASTCALL Hash12( const void *pKey )
 	even  = g_nRandomValues[n & 0xff];
 	odd   = g_nRandomValues[((n >> 8) & 0xff)];
 
-	even  = g_nRandomValues[odd ^ (n >> 24)];
+	even  = g_nRandomValues[odd ^ (n >> 24)]; //-V519
 	odd   = g_nRandomValues[even ^ ((n >> 16) & 0xff)];
 	even  = g_nRandomValues[odd ^ ((n >> 8) &  0xff)];
 	odd   = g_nRandomValues[even  ^ (n & 0xff)];
@@ -251,7 +251,7 @@ unsigned FASTCALL Hash16( const void *pKey )
 	even  = g_nRandomValues[n & 0xff];
 	odd   = g_nRandomValues[((n >> 8) & 0xff)];
 
-	even  = g_nRandomValues[odd ^ (n >> 24)];
+	even  = g_nRandomValues[odd ^ (n >> 24)]; //-V519
 	odd   = g_nRandomValues[even ^ ((n >> 16) & 0xff)];
 	even  = g_nRandomValues[odd ^ ((n >> 8) &  0xff)];
 	odd   = g_nRandomValues[even  ^ (n & 0xff)];
@@ -361,7 +361,7 @@ uint32 MurmurHash2( const void * key, int len, uint32 seed )
 	return h;
 }
 
-#define TOLOWERU( c ) ( ( uint32 ) ( ( ( c >= 'A' ) && ( c <= 'Z' ) )? c + 32 : c ) )
+#define TOLOWERU( c ) ( ( uint32 ) ( ( ( (c) >= 'A' ) && ( (c) <= 'Z' ) )? (c) + 32 : (c) ) )
 uint32 MurmurHash2LowerCase( char const *pString, uint32 nSeed )
 {
 	int nLen = ( int )strlen( pString );

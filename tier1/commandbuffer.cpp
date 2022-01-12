@@ -30,17 +30,16 @@ struct cmdalias_t
 //-----------------------------------------------------------------------------
 CCommandBuffer::CCommandBuffer( ) : m_Commands( 32, 32 )
 {
-	m_hNextCommand = m_Commands.InvalidIndex();
-	m_nWaitDelayTicks = 1;
+	memset(m_pArgSBuffer, 0, sizeof(m_pArgSBuffer));
+	m_nLastUsedArgSSize = 0;
+	m_nArgSBufferSize = 0;
 	m_nCurrentTick = 0;
 	m_nLastTickToProcess = -1;
-	m_nArgSBufferSize = 0;
-	m_bIsProcessingCommands = false;
+	m_nWaitDelayTicks = 1;
+	m_hNextCommand = m_Commands.InvalidIndex();
 	m_nMaxArgSBufferLength = ARGS_BUFFER_LENGTH;
-}
-
-CCommandBuffer::~CCommandBuffer()
-{
+	m_bIsProcessingCommands = false;
+	m_bWaitEnabled = false;
 }
 
 

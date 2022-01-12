@@ -300,8 +300,7 @@ int FindDiffsForLargeFiles(uint8 const *NewBlock, uint8 const *OldBlock,
     pending_raw_len=0;
   }
   delete[] HashedMatches;
-  if (Blocks)
-    delete[] Blocks;
+  delete[] Blocks;
   DiffListSize=outbuf-Output;
   return ret;
 }
@@ -430,8 +429,7 @@ int FindDiffs(uint8 const *NewBlock, uint8 const *OldBlock,
     CopyPending(pending_raw_len,walk-pending_raw_len,outbuf,Output+OutSize);
     pending_raw_len=0;
   }
-  if (Blocks)
-    delete[] Blocks;
+  delete[] Blocks;
   DiffListSize=outbuf-Output;
   return ret;
 }

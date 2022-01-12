@@ -1040,10 +1040,10 @@ char *V_pretifymem( float value, int digitsafterdecimal /*= 2*/, bool usebinaryo
 	char *o = out;
 
 	// Search for decimal or if it was integral, find the space after the raw number
-	char *dot = strstr( i, "." );
+	char *dot = strchr( i, '.' );
 	if ( !dot )
 	{
-		dot = strstr( i, " " );
+		dot = strchr( i, ' ' );
 	}
 
 	// Compute position of dot
@@ -3541,7 +3541,7 @@ bool V_BBCodeToHTML( OUT_Z_CAP( nDestSize ) char *pDest, const int nDestSize, ch
 				pDest[ iOutput++ ] = '\"';
 
 				// copy all characters up to the closing square bracket
-				while ( pIn[ iInput ] != ']' && iInput < nInSize && iOutput < nDestSize )
+				while ( iInput < nInSize && pIn[ iInput ] != ']' && iOutput < nDestSize )
 				{
 					pDest[ iOutput++ ] = pIn[ iInput++ ];
 				}
@@ -3555,7 +3555,7 @@ bool V_BBCodeToHTML( OUT_Z_CAP( nDestSize ) char *pDest, const int nDestSize, ch
 			// otherwise, skip over everything up to the closing square bracket
 			if ( !bFoundReplacement )
 			{
-				while ( pIn[ iInput ] != ']' && iInput < nInSize )
+				while ( iInput < nInSize && pIn[ iInput ] != ']' )
 				{
 					iInput++;
 				}

@@ -39,6 +39,7 @@ public:
 
 	// Copy.
 	VPlane&		operator=(const VPlane &thePlane);
+	VPlane(const VPlane &thePlane);
 
 	// Returns SIDE_ON, SIDE_FRONT, or SIDE_BACK.
 	// The epsilon for SIDE_ON can be passed in.
@@ -98,6 +99,11 @@ inline VPlane& VPlane::operator=(const VPlane &thePlane)
 	m_Normal = thePlane.m_Normal;
 	m_Dist = thePlane.m_Dist;
 	return *this;
+}
+
+inline VPlane::VPlane(const VPlane &thePlane)
+	: m_Normal{thePlane.m_Normal}, m_Dist{thePlane.m_Dist}
+{
 }
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS

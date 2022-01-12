@@ -340,7 +340,7 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 			return;
 
 		SYSTEM_INFO systemInfo;
-		GetSystemInfo( &systemInfo );
+		GetNativeSystemInfo( &systemInfo );
 
 		g_numCPUs = systemInfo.dwNumberOfProcessors;
 		if ( g_numCPUs > nMaxCPUs )

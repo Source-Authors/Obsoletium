@@ -23,6 +23,7 @@
 
 #if !defined(_MINIMUM_BUILD_)
 #include "checksum_sha1.h"
+#include <cstring>
 #else
 //
 //	This path is build in the CEG/DRM projects where we require that no CRT references are made !
@@ -209,6 +210,10 @@ bool CSHA1::HashFile(char *szFileName)
 }
 #endif
 
+// dimhotepus: Prevent compiler from inlining memset and further
+// removal if SecureMemset buffer is not accessed later.
+static volatile auto SecureMemset = memset;
+
 #ifdef	_MINIMUM_BUILD_
 void Minimum_CSHA1::Final()
 #else
@@ -238,8 +243,9 @@ void CSHA1::Final()
 	i = 0;
 	memset(m_buffer, 0, sizeof(m_buffer) );
 	memset(m_state, 0, sizeof(m_state) );
-	memset(m_count, 0, sizeof(m_count) );
-	memset(finalcount, 0, sizeof( finalcount) );
+	// dimhotepus: Ensure compiler do not remove trailing memset.
+	SecureMemset(m_count, 0, sizeof(m_count) );
+	SecureMemset(finalcount, 0, sizeof(finalcount));
 
 	Transform(m_state, m_buffer);
 }

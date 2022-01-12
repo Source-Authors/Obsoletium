@@ -409,7 +409,7 @@ protected:
 
 	unsigned char m_Error;
 	unsigned char m_Flags;
-	unsigned char m_Reserved;
+	unsigned char m_Reserved;  //-V730_NOINIT
 #if defined( _X360 )
 	unsigned char pad;
 #endif

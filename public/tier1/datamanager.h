@@ -116,7 +116,7 @@ protected:
 
 	unsigned int m_targetMemorySize;
 	unsigned int m_memUsed;
-	
+
 	CUtlMultiList< resource_lru_element_t, unsigned short >  m_memoryLists;
 	
 	unsigned short m_lruList;
