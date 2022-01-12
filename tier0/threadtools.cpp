@@ -2135,8 +2135,9 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 		{
 			pInit->pThread->m_result = pInit->pThread->Run();
 		}
-		catch (...)
+		catch ( const std::exception &e )
 		{
+			Warning( "Thread exception occured: %s", e.what() );
 		}
 	}
 	else
@@ -2290,7 +2291,7 @@ int CWorkerThread::WaitForReply( unsigned timeout, WaitFunc_t pfnWait )
 			break;
 		}
 #endif
-		result = (*pfnWait)((sizeof(waits) / sizeof(waits[0])), waits, false,
+		result = (*pfnWait)((sizeof(waits) / sizeof(waits[0])), waits, 0,
 			(timeout != TT_INFINITE) ? timeout : 30000);
 
 		AssertMsg(timeout != TT_INFINITE || result != WAIT_TIMEOUT, "Possible hung thread, call to thread timed out");

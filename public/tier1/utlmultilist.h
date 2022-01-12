@@ -136,7 +136,7 @@ protected:
 	bool IsElementInList( ListHandle_t list, I elem ) const;
 
 	// copy constructors not allowed
-	CUtlMultiList( CUtlMultiList<T, I> const& list ) { Assert(0); }
+	CUtlMultiList( CUtlMultiList<T, I> const& list ) = delete;
 	   
 	M							m_Memory;
 	CUtlLinkedList<List_t, I>	m_List;

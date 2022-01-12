@@ -705,13 +705,15 @@ I CUtlLinkedList<T,S,ML,I,M>::AllocInternal( bool multilist )
 
 	if ( !multilist )
 	{
-		InternalElement( elem ).m_Next = elem;
-		InternalElement( elem ).m_Previous = elem;
+		auto &e = InternalElement( elem );
+		e.m_Next = elem;
+		e.m_Previous = elem;
 	}
 	else
 	{
-		InternalElement( elem ).m_Next = InvalidIndex();
-		InternalElement( elem ).m_Previous = InvalidIndex();
+		auto &e = InternalElement( elem );
+		e.m_Next = InvalidIndex();
+		e.m_Previous = InvalidIndex();
 	}
 
 	return elem;

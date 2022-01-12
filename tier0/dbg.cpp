@@ -88,15 +88,15 @@ DBG_INTERFACE SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 #ifndef WIN32
 		// Non-win32
 		bool bRaiseOnAssert = getenv( "RAISE_ON_ASSERT" ) || !!CommandLine()->FindParm( "-raiseonassert" );
+		return bRaiseOnAssert ? SPEW_DEBUGGER : SPEW_CONTINUE;
 #elif defined( _DEBUG )
 		// Win32 debug
-		bool bRaiseOnAssert = true;
+		return SPEW_DEBUGGER;
 #else
 		// Win32 release
 		bool bRaiseOnAssert = !!CommandLine()->FindParm( "-raiseonassert" );
-#endif
-
 		return bRaiseOnAssert ? SPEW_DEBUGGER : SPEW_CONTINUE;
+#endif
 	}
 	else if ( type == SPEW_ERROR )
 		return SPEW_ABORT;
@@ -844,8 +844,11 @@ DBG_INTERFACE float CrackSmokingCompiler( float a )
 void* Plat_SimpleLog( const tchar* file, int line )
 {
 	FILE* f = _tfopen( _T("simple.log"), _T("at+") );
-	_ftprintf( f, _T("%s:%i\n"), file, line );
-	fclose( f );
+  if ( f )
+	{
+		_ftprintf( f, _T("%s:%i\n"), file, line );
+		fclose( f );
+	}
 
 	return NULL;
 }
@@ -918,8 +921,11 @@ void COM_TimestampedLog( char const *fmt, ... )
 			}
 
 			FILE* fp = fopen( "timestamped.log", "at+" );
-			fprintf( fp, "%8.4f / %8.4f:  %s\n", curStamp, curStamp - s_LastStamp, string );
-			fclose( fp );
+			if ( fp )
+			{
+				fprintf( fp, "%8.4f / %8.4f:  %s\n", curStamp, curStamp - s_LastStamp, string );
+				fclose( fp );
+			}
 		}
 	}
 

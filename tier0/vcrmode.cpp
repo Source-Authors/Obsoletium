@@ -101,7 +101,7 @@ void VCR_Debug( const char *pMsg, ... )
 	EnterCriticalSection( &g_DebugFileCS );
 
 	if ( !g_pDebugFile )
-		g_pDebugFile = fopen( "c:\\vcrdebug.txt", "wt" );
+		g_pDebugFile = fopen( "vcrdebug.txt", "wt" );
 
 	if ( g_pDebugFile )
 	{
@@ -1309,15 +1309,11 @@ void VCR_GenericRecord( const char *pEventName, const void *pData, int len )
 		Error( "VCR_GenericRecord( %s ): not recording a VCR file", pEventName );
 
 	// Write the event name (or 255 if none).
-	int nameLen = 255;
-	if ( pEventName )
+	int nameLen = strlen( pEventName ) + 1;
+	if ( nameLen >= 255 )
 	{
-		nameLen = strlen( pEventName ) + 1;
-		if ( nameLen >= 255 )
-		{
-			VCR_Error( "VCR_GenericRecord( %s ): nameLen too long (%d)", pEventName, nameLen );
-			return;
-		}
+		VCR_Error( "VCR_GenericRecord( %s ): nameLen too long (%d)", pEventName, nameLen );
+		return;
 	}
 	unsigned char ucNameLen = (unsigned char)nameLen;
 	VCR_WriteVal( ucNameLen );

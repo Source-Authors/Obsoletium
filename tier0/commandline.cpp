@@ -105,7 +105,7 @@ CCommandLine::CCommandLine( void )
 {
 	m_pszCmdLine = NULL;
 	m_nParmCount = 0;
-	m_ppParms[0] = '\0';
+	memset(m_ppParms, 0, sizeof(m_ppParms));
 }
 
 //-----------------------------------------------------------------------------
