@@ -80,6 +80,14 @@ public:
 	CPackedStoreFileHandle( void )
 	{
 		m_nFileNumber = -1;
+		m_nFileOffset = -1;
+		m_nFileSize = -1;
+		m_nCurrentFileOffset = -1;
+		m_pMetaData = nullptr;
+		m_nMetaDataSize = 0;
+		m_pOwner = nullptr;
+		m_pHeaderData = nullptr;
+		m_pDirFileNamePtr = nullptr;
 	}
 
 	int Seek( int nOffset, int nWhence )
@@ -134,6 +142,8 @@ struct FileHandleTracker_t
 	FileHandleTracker_t( void )
 	{
 		m_nFileNumber = -1;
+		m_hFileHandle = nullptr;
+		m_nCurOfs = 0;
 	}
 };
 

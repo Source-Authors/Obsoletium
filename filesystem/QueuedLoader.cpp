@@ -526,14 +526,14 @@ void IOComputationJob( FileJob_t *pFileJob, void *pData, int nSize, LoaderError_
 
 	if ( pFileJob->m_Priority == LOADERPRIORITY_DURINGPRELOAD )
 	{
-		g_nHighPriorityJobs--;
+		--g_nHighPriorityJobs;
 	}
 	else if ( pFileJob->m_Priority == LOADERPRIORITY_BEFOREPLAY )
 	{
-		g_nJobsToFinishBeforePlay--;
+		--g_nJobsToFinishBeforePlay;
 	}
 
-	g_nQueuedJobs--;
+	--g_nQueuedJobs;
 
 	if ( g_nQueuedJobs == 0 && ( spewDetail & LOADER_DETAIL_TIMING ) )
 	{
@@ -828,13 +828,13 @@ void CQueuedLoader::SubmitPendingJobs()
 		{
 			// must finish during preload
 			asyncRequest.priority = PRIORITY_HIGH;
-			g_nHighPriorityJobs++;
+			++g_nHighPriorityJobs;
 		}
 		else if ( pFileJob->m_Priority == LOADERPRIORITY_BEFOREPLAY )
 		{
 			// must finish before gameplay
 			asyncRequest.priority = PRIORITY_NORMAL;
-			g_nJobsToFinishBeforePlay++;
+			++g_nJobsToFinishBeforePlay;
 		}
 		else 
 		{
@@ -854,7 +854,7 @@ void CQueuedLoader::SubmitPendingJobs()
 		if ( pFileJob->m_bFileExists )
 		{
 			// start the valid async request
-			g_nActiveJobs++;
+			++g_nActiveJobs;
 			g_pFullFileSystem->AsyncRead( asyncRequest, &pFileJob->m_hAsyncControl );
 		}
 		else
@@ -972,7 +972,7 @@ bool CQueuedLoader::AddJob( const LoaderJob_t *pLoaderJob )
 		m_AnonymousJobs.Insert( szFixedName, pFileJob );
 	}
 
-	g_nQueuedJobs++;
+	++g_nQueuedJobs;
 
 	if ( m_bBatching )
 	{

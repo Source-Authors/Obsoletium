@@ -531,7 +531,7 @@ private:
 	CThreadMutex		m_mutex;
 	unsigned char		m_flags;
 	char				m_iServicingThread;
-	short				m_reserved;
+	short				m_reserved;  //-V730_NOINIT
 	ThreadPoolData_t	m_ThreadPoolData;
 	IThreadPool *		m_pThreadPool;
 	CThreadEvent		m_CompleteEvent;

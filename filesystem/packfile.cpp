@@ -22,13 +22,14 @@ ConVar fs_monitor_read_from_pack( "fs_monitor_read_from_pack", "0", 0, "0:Off, 1
 CPackFile::CPackFile()
 {
 	m_FileLength = 0;
-	m_hPackFileHandleFS = NULL;
 	m_fs = NULL;
 	m_nBaseOffset = 0;
 	m_bIsMapPath = false;
 	m_lPackFileTime = 0L;
 	m_refCount = 0;
 	m_nOpenFiles = 0;
+	m_hPackFileHandleFS = NULL;
+	m_bIsExcluded = false;
 	m_PackFileID = 0;
 }
 
@@ -149,7 +150,7 @@ CFileHandle *CZipPackFile::OpenFile( const char *pFileName, const char *pOptions
 		fh->m_nLength = nOriginalSize;
 
 		// The default mode for fopen is text, so require 'b' for binary
-		if ( strstr( pOptions, "b" ) == NULL )
+		if ( strchr( pOptions, 'b' ) == NULL )
 		{
 			fh->m_type = FT_PACK_TEXT;
 		}
@@ -382,9 +383,6 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 	size_t nLenWildcardPath = 0;
 	size_t nLenWildcardBase = 0;
 
-	bool bBaseWildcard = true;
-	bool bExtWildcard = true;
-
 	//
 	// Parse the wildcard string into a base and extension used for string comparisons
 	//
@@ -414,8 +412,8 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 	// there's no one point where we implement it, so rather than trying to match one of our broken implementations
 	// (windows stdio is the only one I could find that was actually right), I'm going with "you shouldn't use this API
 	// for that".
-	bBaseWildcard = ( V_strcmp( szWildCardBase, "*" ) == 0 );
-	bExtWildcard = ( V_strcmp( szWildCardExt, "*" ) == 0 );
+	bool bBaseWildcard = ( V_strcmp( szWildCardBase, "*" ) == 0 );
+	bool bExtWildcard = ( V_strcmp( szWildCardExt, "*" ) == 0 );
 
 	if ( !bWildcardHasExt && bBaseWildcard )
 	{

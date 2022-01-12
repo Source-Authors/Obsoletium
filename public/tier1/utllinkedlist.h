@@ -46,7 +46,7 @@ struct UtlLinkedListElem_t
 
 private:
 	// No copy constructor for these...
-	UtlLinkedListElem_t( const UtlLinkedListElem_t& );
+	UtlLinkedListElem_t( const UtlLinkedListElem_t& ) = delete;
 };
 
 
@@ -354,7 +354,7 @@ protected:
 	ListElem_t const& InternalElement( I i ) const { return m_Memory[i]; }
 
 	// copy constructors not allowed
-	CUtlLinkedList( CUtlLinkedList<T, S, ML, I, M> const& list ) { Assert(0); }
+	CUtlLinkedList( CUtlLinkedList<T, S, ML, I, M> const& list ) = delete;
 
 	M	m_Memory;
 	I	m_Head;

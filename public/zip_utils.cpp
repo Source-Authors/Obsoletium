@@ -408,6 +408,7 @@ private:
 					~CZipEntry( void );
 
 					CZipEntry( const CZipEntry& src );
+					CZipEntry& operator=( const CZipEntry& src ) = delete;
 
 		// RB tree compare function
 		static bool ZipFileLessFunc( CZipEntry const& src1, CZipEntry const& src2 );
@@ -506,14 +507,13 @@ CZipFile::CZipEntry::~CZipEntry( void )
 // Purpose: Construction
 //-----------------------------------------------------------------------------
 CZipFile::CZipFile( const char *pDiskCacheWritePath, bool bSortByName )
-: m_Files( 0, 32 )
+: m_Files( 0, 32 ), m_DiskCacheWritePath{ pDiskCacheWritePath }
 {
 	m_AlignmentSize = 0;
 	m_bForceAlignment = false;
 	m_bCompatibleFormat = true;
 
 	m_bUseDiskCacheForWrites = ( pDiskCacheWritePath != NULL );
-	m_DiskCacheWritePath = pDiskCacheWritePath;
 	m_hDiskCacheWriteFile = INVALID_HANDLE_VALUE;
 
 	if ( bSortByName )
@@ -1334,7 +1334,7 @@ void CZipFile::ParseXZipCommentString( const char *pCommentString )
 		if ( !m_bForceAlignment )
 		{
 			m_AlignmentSize = 0;
-			sscanf( pCommentString + 4, "%d", &m_AlignmentSize );
+			sscanf( pCommentString + 4, "%u", &m_AlignmentSize );
 			if ( !IsPowerOfTwo( m_AlignmentSize ) )
 			{
 				m_AlignmentSize = 0;
@@ -1553,7 +1553,9 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 			const char *pFilename = e->m_Name.String();
 			hdr.compressedSize = e->m_nCompressedSize;
 			hdr.uncompressedSize = e->m_nUncompressedSize;
-			hdr.fileNameLength = strlen( pFilename );
+			size_t nFilenameLen = strlen( pFilename );
+			Assert( nFilenameLen <= std::numeric_limits<decltype(hdr.fileNameLength)>::max() );
+			hdr.fileNameLength = static_cast<unsigned short>( nFilenameLen );
 			hdr.extraFieldLength = CalculatePadding( hdr.fileNameLength, e->m_ZipOffset );
 			int extraFieldLength = hdr.extraFieldLength;
 
@@ -1619,7 +1621,9 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 
 			hdr.compressedSize = e->m_nCompressedSize;
 			hdr.uncompressedSize = e->m_nUncompressedSize;
-			hdr.fileNameLength = strlen( e->m_Name.String() );
+			size_t nFilenameLen = strlen( e->m_Name.String() );
+			Assert( nFilenameLen <= std::numeric_limits<decltype(hdr.fileNameLength)>::max() );
+			hdr.fileNameLength = static_cast<unsigned short>( nFilenameLen );
 			hdr.extraFieldLength = CalculatePadding( hdr.fileNameLength, e->m_ZipOffset );
 			hdr.fileCommentLength = 0;
 			hdr.diskNumberStart = 0;

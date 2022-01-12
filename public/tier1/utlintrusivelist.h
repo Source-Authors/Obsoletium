@@ -489,7 +489,7 @@ namespace IntrusiveList
 	// the head and tail pointer can be modified by this routine.
 	template<class T,class V> void AddToEndWithTail(T * & head, T * & tail,V * node)
 	{
-		Assert((head && tail) || ((!head) && (!tail)));
+		Assert(!!head == !!tail);
 		node->m_pNext=0;
 		if (! head)
 		{
@@ -506,7 +506,7 @@ namespace IntrusiveList
 	template<class T> void AddSortedByName(T * & head, T * node)
 	{
 		if ( (! head) ||                                          // empty list?
-			 (stricmp(node->m_Name,head->m_Name)==-1))                // or we should be first?
+			 (stricmp(node->m_Name,head->m_Name)<0))                // or we should be first?
 		{
 			node->m_pNext=head;                                        // make us head
 			head=node;
@@ -561,7 +561,7 @@ namespace IntrusiveList
 	// find a named node in any list which has both a Next field and a Name field.
 	template <class T> static inline T * FindNamedNode(T * head, char const *name)
 	{
-		for(;head && stricmp(head->m_Name,name); head=head->m_pNext)
+		for(;head && stricmp(head->m_Name,name) != 0; head=head->m_pNext)
 		{
 		}
 		return head;
@@ -569,7 +569,7 @@ namespace IntrusiveList
 
 	template <class T> static inline T * FindNamedNodeCaseSensitive(T * head, char const *name)
 	{
-		for(;head && strcmp(head->m_Name,name); head=head->m_pNext)
+		for(;head && strcmp(head->m_Name,name) != 0; head=head->m_pNext)
 		{
 		}
 		return head;

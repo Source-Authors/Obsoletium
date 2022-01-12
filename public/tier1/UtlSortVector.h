@@ -90,7 +90,7 @@ public:
 
 protected:
 	// No copy constructor
-	CUtlSortVector( const CUtlSortVector<T, LessFunc> & );
+	CUtlSortVector( const CUtlSortVector<T, LessFunc> & ) = delete;
 
 	// never call these; illegal for this class
 	int AddToHead();

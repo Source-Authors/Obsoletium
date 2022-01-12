@@ -222,11 +222,10 @@ CUtlVector< FileNameHandle_t > CBaseFileSystem::m_ExcludePaths;
 class CStoreIDEntry
 {
 public:
-	CStoreIDEntry() {}
+	CStoreIDEntry() = default;
 	CStoreIDEntry( const char *pPathIDStr, int storeID )
+		:  m_PathIDString{pPathIDStr}, m_StoreID{storeID}
 	{
-		m_PathIDString = pPathIDStr;
-		m_StoreID = storeID;
 	}
 
 public:
@@ -234,31 +233,6 @@ public:
 	int			m_StoreID;
 };
 
-#if 0
-static CStoreIDEntry* FindPrevFileByStoreID( CUtlDict< CUtlVector<CStoreIDEntry>* ,int> &filesByStoreID, const char *pFilename, const char *pPathIDStr, int foundStoreID )
-{
-	int iEntry = filesByStoreID.Find( pFilename );
-	if ( iEntry == filesByStoreID.InvalidIndex() )
-	{
-		CUtlVector<CStoreIDEntry> *pList = new CUtlVector<CStoreIDEntry>; 
-		pList->AddToTail( CStoreIDEntry(pPathIDStr, foundStoreID) );
-		filesByStoreID.Insert( pFilename, pList );
-		return NULL;
-	}
-	else
-	{
-		// Now is there a previous entry with a different path ID string and the same store ID?
-		CUtlVector<CStoreIDEntry> *pList = filesByStoreID[iEntry]; 
-		for ( int i=0; i < pList->Count(); i++ )
-		{
-			CStoreIDEntry &entry = pList->Element( i );
-			if ( entry.m_StoreID == foundStoreID && V_stricmp( entry.m_PathIDString.String(), pPathIDStr ) != 0 )
-				return &entry;
-		}
-		return NULL;
-	}
-}
-#endif
 
 //-----------------------------------------------------------------------------
 
@@ -288,8 +262,8 @@ public:
 private:
 	void ProcessNewEntries( int start );
 
-	CFileCacheObject( const CFileCacheObject& ); // not implemented
-	CFileCacheObject & operator=(const CFileCacheObject& ); // not implemented
+	CFileCacheObject(const CFileCacheObject &) = delete;
+	CFileCacheObject & operator=(const CFileCacheObject& ) = delete;
 };
 
 //-----------------------------------------------------------------------------
@@ -762,8 +736,7 @@ void CBaseFileSystem::Trace_DumpUnclosedFiles( void )
 //-----------------------------------------------------------------------------
 void CBaseFileSystem::PrintOpenedFiles( void )
 {
-	FileWarningLevel_t saveLevel = m_fwLevel;
-	m_fwLevel = FILESYSTEM_WARNING_REPORTUNCLOSED;
+  FileWarningLevel_t saveLevel = std::exchange(m_fwLevel, FILESYSTEM_WARNING_REPORTUNCLOSED);
 	Trace_DumpUnclosedFiles();
 	m_fwLevel = saveLevel;
 }
@@ -1193,7 +1166,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 		dheader_t header;
 		memset( &header, 0, sizeof(dheader_t) );
 		m_Stats.nBytesRead += FS_fread( &header, sizeof( header ), fp );
-		m_Stats.nReads++;
+		++m_Stats.nReads;
 	
 		if ( header.ident != IDBSPHEADER || header.version < MINBSPVERSION || header.version > BSPVERSION )
 		{
@@ -2400,7 +2373,7 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 			if ( pBacking->m_nLength != -1 )
 			{
 				CFileHandle* pFile = new CMemoryFileHandle( this, pBacking );
-				pFile->m_type = strstr( pOptions, "b" ) ? FT_MEMORY_BINARY : FT_MEMORY_TEXT;
+				pFile->m_type = strchr( pOptions, 'b' ) ? FT_MEMORY_BINARY : FT_MEMORY_TEXT;
 				return ( FileHandle_t )pFile;
 			}
 			else
@@ -2679,7 +2652,7 @@ FileHandle_t CBaseFileSystem::OpenEx( const char *pFileName, const char *pOption
 
 	// Try each of the search paths in succession
 	// FIXME: call createdirhierarchy upon opening for write.
-	if ( strstr( pOptions, "r" ) && !strstr( pOptions, "+" ) )
+	if ( strchr( pOptions, 'r' ) && !strchr( pOptions, '+' ) )
 	{
 		return OpenForRead( pFileName, pOptions, flags, pathID, ppszResolvedFilename );
 	}
@@ -3271,7 +3244,7 @@ char *CBaseFileSystem::ReadLine( char *pOutput, int maxChars, FileHandle_t file 
 		Warning( FILESYSTEM_WARNING, "FS:  Tried to ReadLine NULL file handle!\n" );
 		return NULL;
 	}
-	m_Stats.nReads++;
+	++m_Stats.nReads;
 
 	int nRead = 0;
 
@@ -5780,7 +5753,7 @@ void CBaseFileSystem::CFileCacheObject::IOCallback( const FileAsyncRequest_t &re
 	//DevWarning("preload %s  %d\n", request.pszFilename, pBacking->m_nLength);
 
 	info.pBacking = pBacking;
-	info.pOwner->m_nPending--;
+	--info.pOwner->m_nPending;
 }
 
 CBaseFileSystem::CFileCacheObject::~CFileCacheObject()

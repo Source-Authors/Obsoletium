@@ -44,8 +44,7 @@ public:
 
 	~CCryptoOutBuffer()
 	{
-		if ( m_pubData )
-			delete[] m_pubData;
+		delete[] m_pubData;
 		m_pubData = NULL;
 		m_cubData = 0;
 	}
@@ -55,8 +54,7 @@ public:
 		if ( !pubData || !cubData )
 			return;
 
-		if ( m_pubData )
-			delete[] m_pubData;
+		delete[] m_pubData;
 
 		m_pubData = new uint8[ cubData ];
 		memcpy( m_pubData, pubData, cubData );
@@ -65,8 +63,7 @@ public:
 
 	void Allocate( uint32 cubData )
 	{
-		if ( m_pubData )
-			delete[] m_pubData;
+		delete[] m_pubData;
 
 		m_pubData = new uint8[ cubData ];
 		m_cubData = cubData;
@@ -243,7 +240,7 @@ class CCustomHexEncoder
 {
 public:
 	CCustomHexEncoder( const char *pchEncodingTable );
-	~CCustomHexEncoder();
+	~CCustomHexEncoder() = default;
 
 	bool Encode( const uint8 *pubData, const uint32 cubData, char *pchEncodedData, uint32 cchEncodedData );
 	bool Decode( const char *pchData, uint8 *pubDecodedData, uint32 *pcubDecodedData );
@@ -264,7 +261,7 @@ class CCustomBase32Encoder
 {
 public:
 	CCustomBase32Encoder( const char *pchEncodingTable );
-	~CCustomBase32Encoder();
+	~CCustomBase32Encoder() = default;
 
 	bool Encode( const uint8 *pubData, const uint32 cubData, char *pchEncodedData, uint32 cchEncodedData );
 	bool Decode( const char *pchData, uint8 *pubDecodedData, uint32 *pcubDecodedData );

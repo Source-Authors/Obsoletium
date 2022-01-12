@@ -36,6 +36,8 @@ struct TrackedFile_t
 {
 	TrackedFile_t()
 	{
+		m_filename = nullptr;
+		m_path = nullptr;
 		m_nFileFraction = 0;
 		m_PackFileID = 0;
 		m_nPackFileNumber = 0;
@@ -87,6 +89,7 @@ struct TrackedVPKFile_t
 		m_PackFileID = 0;
 		m_nPackFileNumber = 0;
 		m_nFileFraction = 0;
+		m_idxAllOpenedFiles = 0;
 	}
 	int m_PackFileID;
 	int m_nPackFileNumber;

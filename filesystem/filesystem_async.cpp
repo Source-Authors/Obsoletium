@@ -633,10 +633,10 @@ void CBaseFileSystem::InitAsync()
 			{
 				for (;;)
 				{
-					Sleep(1000);
+					ThreadSleep(1000);
 					static int wakeCount;
 					wakeCount++;
-					volatile static int bForceResume = false;
+					volatile static bool bForceResume = false;
 					if ( bForceResume )
 					{
 						bForceResume = false;
@@ -1526,12 +1526,7 @@ void CBaseFileSystem::DoAsyncCallback( const FileAsyncRequest_t &request, void *
 	if ( pDataToFree  )
 	{
 		Assert( !request.pfnAlloc );
-#if defined( OSX ) || defined( LINUX )
-		// The ugly delete[] (void*) method generates a compile warning on osx, as it should.
 		free( pDataToFree );
-#else
-		delete [] pDataToFree;
-#endif
 	}
 }
 

@@ -10,6 +10,7 @@
 #pragma once
 #endif
 
+#include <atomic>
 
 // This class can be used for fast access to an object from multiple threads,
 // and the main thread can wait until the threads are done using the object before it frees the object.
@@ -17,11 +18,9 @@ template< class T >
 class CThreadSafeRefCountedObject
 {
 public:
-	CThreadSafeRefCountedObject( T initVal )
+  CThreadSafeRefCountedObject(T initVal) : m_RefCount{ 0 }
 	{
-		m_RefCount = 0;
 		m_pObject = initVal;
-		m_RefCount = 0;
 	}
 	
 	void Init( T pObj )
@@ -77,7 +76,7 @@ public:
 	}
 
 private:	
-	CInterlockedIntT<long>	m_RefCount;
+	std::atomic_int32_t	m_RefCount;
 	T						m_pObject;
 };
 

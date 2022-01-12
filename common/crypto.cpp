@@ -244,7 +244,7 @@ bool CCrypto::SymmetricEncryptWithIV( const uint8 *pubPlaintextData, const uint3
 			bRet = true;
 		}
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 2, "CCrypto::SymmetricEncrypt: crypto++ threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -436,7 +436,7 @@ static bool SymmetricDecryptWorker( const uint8 *pubEncryptedData, uint32 cubEnc
 			bRet = true;
 		}
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 4, "CCrypto::SymmetricDecrypt: crypto++ threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -661,7 +661,7 @@ bool CCrypto::EncryptWithPasswordAndHMACWithIV( const uint8 *pubPlaintextData, u
 	{
 		CryptoPP::SHA256().CalculateDigest( rgubKey, (const uint8 *)pchPassword, Q_strlen( pchPassword ) );
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 4, "CCrypto::EncryptWithPassword: crypto++ threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -713,7 +713,7 @@ bool CCrypto::DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData
 	{
 		CryptoPP::SHA256().CalculateDigest( rgubKey, (const uint8 *)pchPassword, Q_strlen( pchPassword ) );
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 4, "CCrypto::EncryptWithPassword: crypto++ threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -772,7 +772,7 @@ bool CCrypto::RSAGenerateKeys( uint8 *pubPublicKey, uint32 *pcubPublicKey, uint8
 		*pcubPublicKey = arraySinkPublicKey.TotalPutLength();
 		bRet = true;
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 2, "CCrypto::RSAGenerateKeys: crypto++ threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -843,7 +843,7 @@ bool CCrypto::RSAEncrypt( const uint8 *pubPlaintextData, uint32 cubPlaintextData
 
 		bRet = true;
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 2, "CCrypto::RSAEncrypt: Encrypt() threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -929,7 +929,7 @@ bool CCrypto::RSADecrypt( const uint8 *pubEncryptedData, uint32 cubEncryptedData
 
 		bRet = true;
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 2, "CCrypto::RSADecrypt: Decrypt() threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -995,7 +995,7 @@ bool CCrypto::RSAPublicDecrypt_NoPadding( const uint8 *pubEncryptedData, uint32 
 
 		bRet = true;
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 2, "CCrypto::RSAPublicDecrypt_NoPadding: Decrypt() threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -1040,7 +1040,7 @@ bool CCrypto::RSASign( const uint8 *pubData, const uint32 cubData,
 		*pcubSignature = (uint32)len;
 		bRet = true;
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 2, "CCrypto::RSASign: SignMessage threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -1077,7 +1077,7 @@ bool CCrypto::RSAVerifySignature( const uint8 *pubData, const uint32 cubData,
 		RSASSA_PKCS1v15_SHA_Verifier pub( stringSourcePublicKey );
 		bRet = pub.VerifyMessage( pubData, cubData, pubSignature, cubSignature );
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 2, "CCrypto::RSASign: VerifyMessage threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -1121,7 +1121,7 @@ bool CCrypto::RSASignSHA256( const uint8 *pubData, const uint32 cubData,
 		*pcubSignature = (uint32)len;
 		bRet = true;
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 2, "CCrypto::RSASign: SignMessage threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -1158,7 +1158,7 @@ bool CCrypto::RSAVerifySignatureSHA256( const uint8 *pubData, const uint32 cubDa
 		RSASS<PKCS1v15, SHA256>::Verifier pub( stringSourcePublicKey );
 		bRet = pub.VerifyMessage( pubData, cubData, pubSignature, cubSignature );
 	}
-	catch ( Exception e ) 
+	catch ( const Exception &e ) 
 	{
 		DMsg( SPEW_CRYPTO, 2, "CCrypto::RSASign: VerifyMessage threw exception %s (%d)\n",
 			e.what(), e.GetErrorType() );
@@ -1769,14 +1769,6 @@ CCustomHexEncoder::CCustomHexEncoder( const char *pchEncodingTable )
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Destructor
-//-----------------------------------------------------------------------------
-CCustomHexEncoder::~CCustomHexEncoder()
-{
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: Hex-encodes a block of data.  (Binary -> text representation.)  The output
 //			is null-terminated and can be treated as a string.
 //			Uses the supplied custom encoding characters
@@ -1875,14 +1867,6 @@ CCustomBase32Encoder::CCustomBase32Encoder( const char *pchEncodingTable )
 	{
 		AssertMsg( false, "CCrypto::CustomBase32Encoder: Improper encoding table\n" );
 	}
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Destructor
-//-----------------------------------------------------------------------------
-CCustomBase32Encoder::~CCustomBase32Encoder()
-{
 }
 
 
