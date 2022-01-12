@@ -490,7 +490,7 @@ void CShaderSystem::VerifyBaseShaderDLL( CSysModule *pModule )
 //-----------------------------------------------------------------------------
 bool CShaderSystem::LoadShaderDLL( const char *pFullPath, const char *pPathID, bool bModShaderDLL )
 {
-	if ( !pFullPath && !pFullPath[0] )
+	if ( !pFullPath || !pFullPath[0] )
 		return true;
 
 	// Load the new shader

@@ -418,7 +418,7 @@ ITexture *CMatRenderContextBase::GetRenderTargetEx( int nRenderTargetID  )
 
 void CMatRenderContextBase::SetFrameBufferCopyTexture( ITexture *pTexture, int textureIndex )
 {
-	if( textureIndex < 0 || textureIndex > MAX_FB_TEXTURES )
+	if( textureIndex < 0 || textureIndex >= MAX_FB_TEXTURES )
 	{
 		Assert( 0 );
 		return;
@@ -430,7 +430,7 @@ void CMatRenderContextBase::SetFrameBufferCopyTexture( ITexture *pTexture, int t
 
 ITexture *CMatRenderContextBase::GetFrameBufferCopyTexture( int textureIndex )
 {
-	if( textureIndex < 0 || textureIndex > MAX_FB_TEXTURES )
+	if( textureIndex < 0 || textureIndex >= MAX_FB_TEXTURES )
 	{
 		Assert( 0 );
 		return NULL; // FIXME!  This should return the error texture.
@@ -1063,6 +1063,9 @@ CMatRenderContext::CMatRenderContext()
 	m_pCurrentIndexBuffer = NULL;
 	m_pMorphRenderContext = NULL;
 	m_NonInteractiveMode = MATERIAL_NON_INTERACTIVE_MODE_NONE;
+	m_flNormalizedX = 0.0F;
+	m_flNormalizedY = 0.0F;
+	m_flNormalizedSize = 0.0F;
 }
 
 InitReturnVal_t CMatRenderContext::Init( CMaterialSystem *pMaterialSystem )
@@ -1864,7 +1867,7 @@ void CMatRenderContext::CommitRenderTargetAndViewport( void )
 
 void CMatRenderContext::SetFrameBufferCopyTexture( ITexture *pTexture, int textureIndex )
 {
-	if( textureIndex < 0 || textureIndex > MAX_FB_TEXTURES )
+	if( textureIndex < 0 || textureIndex >= MAX_FB_TEXTURES )
 	{
 		Assert( 0 );
 		return;

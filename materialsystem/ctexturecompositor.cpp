@@ -441,6 +441,9 @@ public:
 	, m_pTex( NULL )
 	, m_pTexRed( NULL )
 	, m_pTexBlue( NULL )
+	, m_fAdjustBlack( 0.0F )
+	, m_fAdjustWhite( 0.0F )
+	, m_fAdjustGamma( 0.0F )
 	{ 
 	}
 
@@ -1062,6 +1065,9 @@ public:
 	, m_pTex( NULL )
 	, m_pTexSpecular( NULL )
 	, m_nChoice( 0 )
+	, m_fAdjustBlack( 0.0F )
+	, m_fAdjustWhite( 0.0F )
+	, m_fAdjustGamma( 0.0F )
 	{ 
 		SafeAssign( &m_pMaterial, materials->FindMaterial( cCombineMaterialName[ ECO_Blend ], TEXTURE_GROUP_RUNTIME_COMPOSITE ) );
 	} 
@@ -1351,7 +1357,6 @@ private:
 
 	ITexture* m_pTex;
 	CUtlString m_FinalTextureName;
-	uint32 m_nTexCompositeCreateFlags;
 };
 
 // ------------------------------------------------------------------------------------------------

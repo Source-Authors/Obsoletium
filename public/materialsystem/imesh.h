@@ -645,6 +645,12 @@ inline CVertexBuilder::CVertexBuilder()
 	memset( m_pCurrTexCoord, 0, sizeof( m_pCurrTexCoord ) );
 	m_bModify = false;
 #endif
+
+#if defined( _DEBUG ) && (COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4)
+	// Debug checks to make sure we write userdata4/tangents AFTER normals
+	m_bWrittenNormal = false;
+	m_bWrittenUserData = false;
+#endif
 }
 
 inline CVertexBuilder::CVertexBuilder( IVertexBuffer *pVertexBuffer, VertexFormat_t fmt )
@@ -673,6 +679,12 @@ inline CVertexBuilder::CVertexBuilder( IVertexBuffer *pVertexBuffer, VertexForma
 	m_pCurrColor = NULL;
 	memset( m_pCurrTexCoord, 0, sizeof( m_pCurrTexCoord ) );
 	m_bModify = false;
+#endif
+
+#if defined( _DEBUG ) && (COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4)
+	// Debug checks to make sure we write userdata4/tangents AFTER normals
+	m_bWrittenNormal = false;
+	m_bWrittenUserData = false;
 #endif
 }
 
@@ -2493,7 +2505,7 @@ private:
 // Constructor
 //-----------------------------------------------------------------------------
 inline CIndexBuilder::CIndexBuilder() : m_pIndexBuffer(0), m_nIndexCount(0), 
-	m_nCurrentIndex(0),	m_nMaxIndexCount(0)
+	m_nIndexOffset{0}, m_nCurrentIndex(0),	m_nMaxIndexCount(0)
 {
 	m_nTotalIndexCount = 0;
 	m_nBufferOffset = INVALID_BUFFER_OFFSET;
@@ -2509,6 +2521,7 @@ inline CIndexBuilder::CIndexBuilder( IIndexBuffer *pIndexBuffer, MaterialIndexFo
 	m_nBufferOffset = INVALID_BUFFER_OFFSET;
 	m_nBufferFirstIndex = 0;
 	m_nIndexCount = 0;
+	m_nIndexOffset = 0;
 	m_nCurrentIndex = 0;
 	m_nMaxIndexCount = 0;
 	m_nTotalIndexCount = 0;
@@ -3274,7 +3287,8 @@ inline void CMeshBuilder::Begin( IVertexBuffer* pVertexBuffer, IIndexBuffer *pIn
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-inline CMeshBuilder::CMeshBuilder()	: m_pMesh(0), m_bGenerateIndices(false)
+inline CMeshBuilder::CMeshBuilder()
+	: m_pMesh(0), m_Type{MATERIAL_TRIANGLES}, m_bGenerateIndices(false)
 {
 }
 

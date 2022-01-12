@@ -293,7 +293,7 @@ public:
 	virtual void SwapContents( ITexture *pOther ) {}
 
 	virtual unsigned int GetFlags( void ) const { return 0; }
-	virtual void ForceLODOverride( int iNumLodsOverrideUpOrDown ) { NULL; }
+	virtual void ForceLODOverride( int iNumLodsOverrideUpOrDown ) {}
 
 #if defined( _X360 )
 	virtual bool ClearTexture( int r, int g, int b, int a ) { return true; }

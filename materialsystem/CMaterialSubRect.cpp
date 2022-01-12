@@ -954,8 +954,8 @@ static IMaterialVar* CreateVectorMaterialVarFromKeyValue( IMaterial* pMaterial, 
 		}
 
 		char* pEnd;
-
-		vecVal[i] = strtod( pScan, &pEnd );
+		// dimhotepus: atof -> strtof
+		vecVal[i] = strtof( pScan, &pEnd );
 		if (pScan == pEnd)
 		{
 			Warning( "Error in .VMT file: error parsing vector element \"%s\" in \"%s\"\n", pKeyValue->GetName(), pMaterial->GetName() );

@@ -1534,8 +1534,8 @@ static int ParseVectorFromKeyValueString( const char *pString, float vecVal[4] )
 		}
 
 		char* pEnd;
-
-		vecVal[i] = strtod( pScan, &pEnd );
+		// dimhotepus: atof -> strtof
+		vecVal[i] = strtof( pScan, &pEnd );
 		if (pScan == pEnd)
 		{
 			Warning( "error parsing vector element in ParseVectorFromKeyValueString\n" );

@@ -538,7 +538,7 @@ namespace IntrusiveList
 	// remove themselves from the list when delete is called
 	template<class T> void KillList(T * & head)
 	{
-		while(head)
+		while(head) //-V1044
 		{
 			delete head;
 		}

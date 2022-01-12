@@ -1276,7 +1276,9 @@ void CMorph::RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture
 	zeroDelta.m_flSpeed = 1.0f;
 	zeroDelta.m_flSide = 0.5f;
 
-	int nWidth = pVTFTexture->Width() / Get4TupleCount( m_Format );
+	int nTupleCount = Get4TupleCount( m_Format );
+	Assert(nTupleCount);
+	int nWidth = nTupleCount != 0 ? pVTFTexture->Width() / nTupleCount : 0;
 	int nHeight = pVTFTexture->Height();
 	for ( int i = 0; i < nHeight; ++i )
 	{

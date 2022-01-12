@@ -527,7 +527,8 @@ CMaterialSystem::CMaterialSystem()
 {
 	m_nRenderThreadID = 0xFFFFFFFF;
 	m_hAsyncLoadFileCache = NULL;
-	m_ShaderHInst = 0;
+	m_ShaderHInst = NULL;
+	m_ShaderAPIFactory = NULL;
 	m_pMaterialProxyFactory = NULL;
 	m_nAdapter = 0;
 	m_nAdapterFlags = 0;
@@ -550,6 +551,8 @@ CMaterialSystem::CMaterialSystem()
 	m_MaxDepthTextureHandle = INVALID_SHADERAPI_TEXTURE_HANDLE;
 
 	m_bInStubMode = false;
+	m_pDrawFlatMaterial = NULL;
+	m_pRenderTargetBlitMaterial = NULL;
 	m_pForcedTextureLoadPathID = NULL;
 	m_bAllocatingRenderTargets = false;
 	m_pRenderContext.Set( &m_HardwareRenderContext );
@@ -575,10 +578,7 @@ CMaterialSystem::CMaterialSystem()
 
 CMaterialSystem::~CMaterialSystem()
 {
-	if (m_pShaderDLL)
-	{
-		delete[] m_pShaderDLL;
-	}
+	delete[] m_pShaderDLL;
 }
 
 
@@ -1136,7 +1136,7 @@ IMatRenderContext *CMaterialSystem::CreateRenderContext( MaterialContextType_t t
 IMatRenderContext *CMaterialSystem::SetRenderContext( IMatRenderContext *pNewContext )
 {
 	IMatRenderContext *pOldContext = m_pRenderContext.Get();
-	if ( pNewContext )
+	if ( pNewContext ) //-V1051
 	{
 		pNewContext->AddRef();
 		m_pRenderContext.Set( assert_cast<IMatRenderContextInternal *>(pNewContext) );
@@ -4890,7 +4890,7 @@ void CMaterialSystem::ThreadRelease( )
 		return;
 	}
 
-	double flStartTime, flEndThreadRelease, flEndTime;
+	double flStartTime = 0.0, flEndThreadRelease = 0.0, flEndTime = 0.0;
 	int do_report = mat_queue_report.GetInt();
 
 	if ( do_report )
@@ -4936,7 +4936,7 @@ void CMaterialSystem::ThreadAcquire( bool bForce )
 		return;
 	}
 
-	double flStartTime, flEndTime;
+	double flStartTime = 0.0, flEndTime = 0.0;
 	int do_report = mat_queue_report.GetInt();
 
 	if ( do_report )
@@ -4976,7 +4976,7 @@ void CMaterialSystem::ThreadAcquire( bool bForce )
 //-----------------------------------------------------------------------------------------------------
 MaterialLock_t CMaterialSystem::Lock()
 {
-	double flStartTime;
+  double flStartTime = 0.0;
 	int do_report = mat_queue_report.GetInt();
 
 	if ( do_report )
@@ -5037,7 +5037,7 @@ MaterialLock_t CMaterialSystem::Lock()
 //-----------------------------------------------------------------------------------------------------
 void CMaterialSystem::Unlock( MaterialLock_t hMaterialLock )
 {
-	double flStartTime;
+	double flStartTime = 0.0;
 	int do_report = mat_queue_report.GetInt();
 
 	if ( do_report )

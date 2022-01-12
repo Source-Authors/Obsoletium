@@ -96,11 +96,12 @@ class CMatQueuedRenderContext : public CMatRenderContextBase
 	typedef CMatRenderContextBase BaseClass;
 public:
 	CMatQueuedRenderContext()
-	 :	m_pHardwareContext( NULL ), 
-		m_iRenderDepth( 0 ), 
-		m_pQueuedMesh( NULL ),
-		m_WidthBackBuffer( 0 ), 
+	 :	m_pQueuedMesh( NULL ),
+		m_pHardwareContext( NULL ),
+		m_iRenderDepth( 0 ),
+		m_WidthBackBuffer( 0 ),
 		m_HeightBackBuffer( 0 ),
+		m_nBoneCount( 0 ), 
 		m_FogMode( MATERIAL_FOG_NONE ),
 		m_flFogStart( 0 ),
 		m_flFogEnd( 0 ),

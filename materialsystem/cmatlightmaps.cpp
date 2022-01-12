@@ -74,7 +74,9 @@ CMatLightmaps::CMatLightmaps()
 	m_NumLightmapPages = 0;
 	m_numSortIDs = 0;
 	m_nUpdatingLightmapsStackDepth = 0;
+	m_firstDynamicLightmap = 0;
 	m_nLockedLightmap = -1;
+	m_dynamic.Init();
 	m_pLightmapDataPtrArray = NULL;
 	m_eLightmapsState = STATE_DEFAULT;
 }
@@ -1928,7 +1930,7 @@ int CMatLightmaps::AllocateDynamicLightmap( int lightmapSize[2], int *pOutOffset
 	// check frameID, fail if current
 	for ( int i = 0; i < COUNT_DYNAMIC_LIGHTMAP_PAGES; i++ )
 	{
-		int dynamicIndex = (m_dynamic.currentDynamicIndex + i) % COUNT_DYNAMIC_LIGHTMAP_PAGES;
+		int dynamicIndex = (m_dynamic.currentDynamicIndex + i) % COUNT_DYNAMIC_LIGHTMAP_PAGES; //-V1063
 		int lightmapPageIndex = m_firstDynamicLightmap + dynamicIndex;
 		if ( m_dynamic.lightmapLockFrame[dynamicIndex] != frameID )
 		{
@@ -1975,7 +1977,7 @@ void CMatLightmaps::UpdateLightmap( int lightmapPageID, int lightmapSize[2],
 	{
 		int dynamicIndex = lightmapPageID-m_firstDynamicLightmap;
 		Assert(dynamicIndex < COUNT_DYNAMIC_LIGHTMAP_PAGES);
-		m_dynamic.currentDynamicIndex = (dynamicIndex + 1) % COUNT_DYNAMIC_LIGHTMAP_PAGES;
+		m_dynamic.currentDynamicIndex = (dynamicIndex + 1) % COUNT_DYNAMIC_LIGHTMAP_PAGES; //-V1063
 	}
 
 	if ( mat_lightmap_pfms.GetBool())

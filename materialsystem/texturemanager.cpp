@@ -1003,8 +1003,7 @@ public:
 		while ( m_asyncScratchVTFs.Count() > 0 )
 		{
 			IVTFTexture* pScratchVTF = NULL;
-			m_asyncScratchVTFs.PopItem( &pScratchVTF );
-			delete pScratchVTF;
+			if ( m_asyncScratchVTFs.PopItem( &pScratchVTF ) )	delete pScratchVTF;
 		}
 	}
 
@@ -1432,6 +1431,8 @@ CTextureManager::CTextureManager( void )
 , m_nAsyncLoadThread( 0xFFFFFFFF )
 , m_nAsyncReadThread( 0xFFFFFFFF )
 {
+	m_iNextTexID = 0;
+  m_nFlags = 0;
 	m_pErrorTexture = NULL;
 	m_pBlackTexture = NULL;
 	m_pWhiteTexture = NULL;
@@ -1443,6 +1444,7 @@ CTextureManager::CTextureManager( void )
 	m_pSignedNormalizationCubemap = NULL;
 	m_pShadowNoise2D = NULL;
 	m_pIdentityLightWarp = NULL;
+	memset(&m_pColorCorrectionTextures, 0, sizeof(m_pColorCorrectionTextures));
 	m_pFullScreenDepthTexture = NULL;
 	m_pDebugLuxels2D = NULL;
 	m_pAsyncLoader = new AsyncLoader;

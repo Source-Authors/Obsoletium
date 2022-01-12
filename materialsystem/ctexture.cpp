@@ -686,7 +686,7 @@ public:
 	virtual int GetReferenceCount( ) { return m_nRefCount; }
 
 	// Used to modify the texture bits (procedural textures only)
-	virtual void SetTextureRegenerator( ITextureRegenerator *pTextureRegen ) { NULL; }
+	virtual void SetTextureRegenerator( ITextureRegenerator *pTextureRegen ) {}
 
 	// Little helper polling methods
 	virtual bool IsNormalMap( ) const { return false; }
@@ -703,19 +703,19 @@ public:
 	virtual int GetActualDepth() const { return 1; }
 
 	// Releases the texture's hw memory
-	void ReleaseMemory() { NULL; }
+	void ReleaseMemory() {}
 
-	virtual void OnRestore() { NULL; }
+	virtual void OnRestore() {}
 
 	// Sets the filtering modes on the texture we're modifying
-	void SetFilteringAndClampingMode( bool bOnlyLodValues = false ) { NULL; }
-	void Download( Rect_t *pRect = NULL, int nAdditionalCreationFlags = 0 ) { NULL; }
+	void SetFilteringAndClampingMode( bool bOnlyLodValues = false ) {}
+	void Download( Rect_t *pRect = NULL, int nAdditionalCreationFlags = 0 ) {}
 
 	// Loads up information about the texture 
-	virtual void Precache() { NULL; }
+	virtual void Precache() {}
 
 	// FIXME: Bogus methods... can we please delete these?
-	virtual void GetLowResColorSample( float s, float t, float *color ) const { NULL; }
+	virtual void GetLowResColorSample( float s, float t, float *color ) const {}
 
 	// Gets texture resource data of the specified type.
 	// Params:
@@ -748,16 +748,16 @@ public:
 	// Set this texture as a render target (optionally set depth texture as depth buffer as well)
 	bool SetRenderTarget( int nRenderTargetID, ITexture *pDepthTexture) { return false; }
 
-	virtual void MarkAsPreloaded( bool bSet ) { NULL; }
+	virtual void MarkAsPreloaded( bool bSet ) {}
 	virtual bool IsPreloaded() const { return true; }
 
-	virtual void MarkAsExcluded( bool bSet, int nDimensionsLimit ) { NULL; }
+	virtual void MarkAsExcluded( bool bSet, int nDimensionsLimit ) {}
 	virtual bool UpdateExcludedState( void ) { return true; }
 
 	// Retrieve the vtf flags mask
 	virtual unsigned int GetFlags( void ) const { return 0; }
 
-	virtual void ForceLODOverride( int iNumLodsOverrideUpOrDown ) { NULL; }
+	virtual void ForceLODOverride( int iNumLodsOverrideUpOrDown ) {}
 
 	virtual void ReloadFilesInList( IFileList *pFilesToReload ) {}
 
@@ -800,9 +800,9 @@ protected:
 public:
 	virtual void DeleteIfUnreferenced();
 
-	void FixupTexture( const void *pData, int nSize, LoaderError_t loaderError ) { NULL; }
+	void FixupTexture( const void *pData, int nSize, LoaderError_t loaderError ) {}
 
-	void SwapContents( ITexture *pOther ) { NULL; }
+	void SwapContents( ITexture *pOther ) {}
 
 public:
 	void SetName( char const *szName );
@@ -819,7 +819,6 @@ CReferenceToHandleTexture::CReferenceToHandleTexture() :
 #endif
 	m_nRefCount( 0 )
 {
-	NULL;
 }
 
 CReferenceToHandleTexture::~CReferenceToHandleTexture()
@@ -1045,9 +1044,12 @@ CTexture::CTexture() : m_ImageFormat( IMAGE_FORMAT_UNKNOWN )
 	m_pStreamingJob = NULL;
 	m_residenceTarget = RESIDENT_NONE;
 	m_residenceCurrent = RESIDENT_NONE;
+
 	m_lodClamp = 0;	
+	m_lastLodBiasAdjustFrame = 0;	
 	m_lodBiasInitial = 0;
 	m_lodBiasCurrent = 0;
+	m_lodBiasStartTime = 0.0;
 
 	m_nDesiredDimensionLimit = 0;
 	m_nActualDimensionLimit = 0;
@@ -1531,7 +1533,7 @@ void CTexture::MakePartiallyResident()
 
 	if ( oldCurrentResidence == RESIDENT_PARTIAL )
 	{
-		Assert( oldTargetResidence == RESIDENT_FULL ); oldTargetResidence;
+		Assert( oldTargetResidence == RESIDENT_FULL );
 		// If we are already partially resident, then just cancel our job to stream in, 
 		// cause we don't need that data anymore.
 		CancelStreamingJob();
@@ -1579,7 +1581,7 @@ bool CTexture::MakeFullyResident()
 	{
 		// This isn't a requirement, but right now it would be a mistake 
 		Assert( !HardwareConfig()->CanStretchRectFromTextures() );
-		Assert( oldTargetResidence == RESIDENT_PARTIAL ); oldTargetResidence;
+		Assert( oldTargetResidence == RESIDENT_PARTIAL );
 		
 		m_residenceCurrent = m_residenceTarget = RESIDENT_FULL;
 		m_lodClamp = 0;
@@ -3378,7 +3380,10 @@ IVTFTexture *CTexture::LoadTextureBitsFromFile( char *pCacheFileName, char **ppR
 		SetupDebuggingTextures( pVTFTexture );
 
 	if ( ConvertToActualFormat( pVTFTexture ) )
-		pVTFTexture; // STAGING_ONLY_EXEC ( Warning( "\"%s\" not in final format, this is causing stutters or load time bloat!\n", pCacheFileName ) );
+	{
+		// dimhotepus: Notify artists about bad texture format.
+		Warning( "\"%s\" not in final format, this is causing stutters or load time bloat!\n", pCacheFileName );
+	}
 
 	return pVTFTexture;
 }

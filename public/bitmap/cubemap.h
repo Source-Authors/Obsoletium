@@ -48,7 +48,7 @@ public:
 			nLargest += 3;
 		}
 		nFace = nLargest;
-		flZ = 1.0 / flZ;
+		flZ = 1.0F / flZ;
 		nX = RemapValClamped( vecNormalizedDirection[nAxis0] * flZ, -1, 1, 0, RES - 1 );
 		nY = RemapValClamped( vecNormalizedDirection[nAxis1] * flZ, -1, 1, 0, RES - 1 );
 	}

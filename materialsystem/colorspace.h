@@ -202,11 +202,9 @@ namespace ColorSpace
 
 	inline unsigned short LinearToUnsignedShort( float in, int nFractionalBits )
 	{
-		unsigned short out;
 		in = in * ( 1 << nFractionalBits );
 		in = min( in, 65535.f );
-		out = max( in, 0.0f );
-		return out;
+		return max( in, 0.0f );
 	}
 
 	inline void ClampToHDR( const Vector &in, unsigned short out[3] )

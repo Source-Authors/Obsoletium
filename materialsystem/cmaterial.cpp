@@ -919,7 +919,8 @@ int ParseVectorFromKeyValueString( KeyValues *pKeyValue, const char *pMaterialNa
 
 		char* pEnd;
 
-		vecVal[i] = strtod( pScan, &pEnd );
+		// dimhotepus: atof -> strtof
+		vecVal[i] = strtof( pScan, &pEnd );
 		if (pScan == pEnd)
 		{
 			Warning( "Error in .VMT file: error parsing vector element \"%s\" in \"%s\"\n", pKeyValue->GetName(), pMaterialName );

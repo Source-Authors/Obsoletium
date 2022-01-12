@@ -37,6 +37,11 @@ public:
 #endif
 		m_FunctorFactory.SetAllocator( &m_Allocator );
 		m_pHead = m_pTail = NULL;
+
+#ifdef _DEBUG
+		m_nCurSerialNumber = 0;
+		m_nBreakSerialNumber = 0;
+#endif
 	}
 
 	size_t GetMemoryUsed()
@@ -173,8 +178,11 @@ private:
 
 	CMemoryStack m_Allocator;
 	CCustomizedFunctorFactory<CMemoryStack, CRefCounted1<CFunctor, CRefCountServiceDestruct< CRefST > > > m_FunctorFactory;
+
+#ifdef _DEBUG
 	unsigned m_nCurSerialNumber;
 	unsigned m_nBreakSerialNumber;
+#endif
 };
 
 
