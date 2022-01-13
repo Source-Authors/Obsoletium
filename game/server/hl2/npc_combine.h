@@ -125,8 +125,10 @@ public:
 	// -------------
 	// Sounds
 	// -------------
-	void			DeathSound( void );
-	void			PainSound( void );
+	// dimhotepus: Combine has special one.
+	void			DeathSound( const CTakeDamageInfo & ) override;
+	// dimhotepus: Combine can scream from pain.
+	void			PainSound( const CTakeDamageInfo & ) override;
 	void			IdleSound( void );
 	void			AlertSound( void );
 	void			LostEnemySound( void );

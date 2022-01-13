@@ -2565,7 +2565,8 @@ void CNPC_Combine::SpeakSentence( int sentenceType )
 //=========================================================
 // PainSound
 //=========================================================
-void CNPC_Combine::PainSound ( void )
+// dimhotepus: Combine can scream from pain.
+void CNPC_Combine::PainSound ( const CTakeDamageInfo & )
 {
 	// NOTE: The response system deals with this at the moment
 	if ( GetFlags() & FL_DISSOLVING )
@@ -2668,7 +2669,8 @@ void CNPC_Combine::NotifyDeadFriend ( CBaseEntity* pFriend )
 //=========================================================
 // DeathSound 
 //=========================================================
-void CNPC_Combine::DeathSound ( void )
+// dimhotepus: Combine has special one.
+void CNPC_Combine::DeathSound( const CTakeDamageInfo & )
 {
 	// NOTE: The response system deals with this at the moment
 	if ( GetFlags() & FL_DISSOLVING )
