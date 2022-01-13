@@ -13,6 +13,14 @@
  *
  */
 
+#ifdef COMPILER_MSVC64
+extern "C"
+{
+   unsigned __int64 __readpmc(unsigned long);
+}
+
+#pragma intrinsic(__readpmc)
+#endif
 
 
 typedef union EVENT_MASK(NULL_MASK)

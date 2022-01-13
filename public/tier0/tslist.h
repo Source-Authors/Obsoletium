@@ -27,8 +27,27 @@
 
 #if defined( PLATFORM_64BITS )
 
+#if defined (PLATFORM_WINDOWS) 
+//typedef __m128i int128;
+//inline int128 int128_zero()	{ return _mm_setzero_si128(); }
+#else  // PLATFORM_WINDOWS
+typedef __int128_t int128;
+#define int128_zero() 0
+#endif// PLATFORM_WINDOWS
+
 #define TSLIST_HEAD_ALIGNMENT 16
 #define TSLIST_NODE_ALIGNMENT 16
+
+#ifdef POSIX
+inline bool ThreadInterlockedAssignIf128( int128 volatile * pDest, const int128 &value, const int128 &comparand ) 
+{
+	// We do not want the original comparand modified by the swap
+	// so operate on a local copy.
+	int128 local_comparand = comparand;
+	return __sync_bool_compare_and_swap( pDest, local_comparand, value );
+}
+#endif
+
 inline bool ThreadInterlockedAssignIf64x128( volatile int128 *pDest, const int128 &value, const int128 &comperand )
 	{ return ThreadInterlockedAssignIf128( pDest, value, comperand ); }
 #else
