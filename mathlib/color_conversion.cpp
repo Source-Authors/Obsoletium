@@ -108,36 +108,30 @@ ALIGN128 float	power2_n[256] = 			// 2**(index - 128) / 255
 
 // You can use this to double check the exponent table and assert that 
 // the precomputation is correct.
-#ifdef DBGFLAG_ASSERT
-static void CheckExponentTable()
-{
-	for( int i = 0; i < 256; i++ )
-	{
-		float testAgainst = powf( 2.0f, i - 128 ) / 255.0f;
-		float diff = testAgainst - power2_n[i] ;
-		[[maybe_unused]] float relativeDiff = diff / testAgainst;
-		Assert( testAgainst == 0 ? 
-				power2_n[i] < 1.16E-041 :
-				power2_n[i] == testAgainst );
-	}
-}
-#endif
+//#ifdef DBGFLAG_ASSERT
+//static void CheckExponentTable()
+//{
+//	for( int i = 0; i < 256; i++ )
+//	{
+//		float testAgainst = powf( 2.0f, static_cast<float>( i - 128 ) ) / 255.0f;
+//		float diff = testAgainst - power2_n[i] ;
+//		[[maybe_unused]] float relativeDiff = diff / testAgainst;
+//		Assert( testAgainst == 0 ? 
+//				power2_n[i] < 1.16E-041 :
+//				power2_n[i] == testAgainst );
+//	}
+//}
+//#endif
 
 void BuildGammaTable( float gamma, float texGamma, float brightness, int overbright )
 {
-	int		i, inf;
-	float	g1, g3;
+	int		i;
 
 	// Con_Printf("BuildGammaTable %.1f %.1f %.1f\n", g, v_lightgamma.GetFloat(), v_texgamma.GetFloat() );
 
-	float g = gamma;
-	if (g > 3.0) 
-	{
-		g = 3.0;
-	}
-
-	g = 1.0f / g;
-	g1 = texGamma * g; 
+	float g = 1.0f / min( gamma, 3.0F );
+	float g1 = texGamma * g;
+	float	g3;
 
 	if (brightness <= 0.0) 
 	{
@@ -154,19 +148,13 @@ void BuildGammaTable( float gamma, float texGamma, float brightness, int overbri
 
 	for (i=0 ; i<256 ; i++)
 	{
-		inf = 255 * pow ( i/255.f, g1 ); 
-		if (inf < 0)
-			inf = 0;
-		if (inf > 255)
-			inf = 255;
-		texgammatable[i] = inf;
+		int inf = static_cast<int>( 255 * pow ( i/255.f, g1 ) ); 
+		texgammatable[i] = static_cast<byte>( max( min( inf, 255 ), 0 ) );
 	}
 
 	for (i=0 ; i<1024 ; i++)
 	{
-		float f;
-
-		f = i / 1023.0f;
+		float f = i / 1023.0f;
 
 		// scale up
 		if (brightness > 1.0f)
@@ -179,24 +167,9 @@ void BuildGammaTable( float gamma, float texGamma, float brightness, int overbri
 			f = 0.125f + ((f - g3) / (1.0f - g3)) * 0.875f;
 
 		// convert linear space to desired gamma space
-		inf = 255 * pow ( f, g ); 
-
-		if (inf < 0)
-			inf = 0;
-		if (inf > 255)
-			inf = 255;
-		lineartoscreen[i] = inf;
+		int inf = static_cast<int>( 255 * pow ( f, g ) );
+		lineartoscreen[i] = max( min( inf, 255 ), 0 );
 	}
-
-	/*
-	for (i=0 ; i<1024 ; i++)
-	{
-		// convert from screen gamma space to linear space
-		lineargammatable[i] = 1023 * pow ( i/1023.0, v_gamma.GetFloat() );
-		// convert from linear gamma space to screen space
-		screengammatable[i] = 1023 * pow ( i/1023.0, 1.0 / v_gamma.GetFloat() );
-	}
-	*/
 
 	for (i=0 ; i<256 ; i++)
 	{
@@ -213,22 +186,8 @@ void BuildGammaTable( float gamma, float texGamma, float brightness, int overbri
 	for (i=0 ; i<1024 ; i++)
 	{
 		// convert from linear space (0..1) to nonlinear texture space (0..255)
-		lineartotexture[i] =  pow( i / 1023.0f, 1.0f / texGamma ) * 255;
+		lineartotexture[i] = static_cast<int>( pow( i / 1023.0f, 1.0f / texGamma ) * 255 );
 	}
-
-#if 0
-	for (i=0 ; i<256 ; i++)
-	{
-		float f;
-
-		// convert from nonlinear lightmap space (0..255) to linear space (0..4)
-		// f =  (i / 255.0) * sqrt( 4 );
-		f =  i * (2.0 / 255.0);
-		f = f * f;
-
-		texlighttolinear[i] = f;
-	}
-#endif
 
 	{
 		float f;
@@ -422,13 +381,7 @@ float TextureToLinear( int c )
 int LinearToTexture( float f )
 {
 	Assert( s_bMathlibInitialized );
-	int i;
-	i = f * 1023;	// assume 0..1 range
-	if (i < 0)
-		i = 0;
-	if (i > 1023)
-		i = 1023;
-
+	int i = max( min( static_cast<int>( f * 1023 ), 1023 ), 0 );	// assume 0..1 range
 	return lineartotexture[i];
 }
 
@@ -437,13 +390,7 @@ int LinearToTexture( float f )
 int LinearToScreenGamma( float f )
 {
 	Assert( s_bMathlibInitialized );
-	int i;
-	i = f * 1023;	// assume 0..1 range
-	if (i < 0)
-		i = 0;
-	if (i > 1023)
-		i = 1023;
-
+	int i = max( min( static_cast<int>( f * 1023 ), 1023 ), 0 );	// assume 0..1 range
 	return lineartoscreen[i];
 }
 
@@ -455,79 +402,6 @@ void ColorRGBExp32ToVector( const ColorRGBExp32& in, Vector& out )
 	out.y = 255.0f * TexLightToLinear( in.g, in.exponent );
 	out.z = 255.0f * TexLightToLinear( in.b, in.exponent );
 }
-
-#if 0
-// assumes that the desired mantissa range is 128..255
-static int VectorToColorRGBExp32_CalcExponent( float in )
-{
-	int power = 0;
-	
-	if( in != 0.0f )
-	{
-		while( in > 255.0f )
-		{
-			power += 1;
-			in *= 0.5f;
-		}
-		
-		while( in < 128.0f )
-		{
-			power -= 1;
-			in *= 2.0f;
-		}
-	}
-
-	return power;
-}
-
-void VectorToColorRGBExp32( const Vector& vin, ColorRGBExp32 &c )
-{
-	Vector v = vin;
-	Assert( s_bMathlibInitialized );
-	Assert( v.x >= 0.0f && v.y >= 0.0f && v.z >= 0.0f );
-	int i;		
-	float max = v[0];				
-	for( i = 1; i < 3; i++ )
-	{
-		// Get the maximum value.
-		if( v[i] > max )
-		{
-			max = v[i];
-		}
-	}
-				
-	// figure out the exponent for this luxel.
-	int exponent = VectorToColorRGBExp32_CalcExponent( max );
-				
-	// make the exponent fits into a signed byte.
-	if( exponent < -128 )
-	{
-		exponent = -128;
-	}
-	else if( exponent > 127 )
-	{
-		exponent = 127;
-	}
-				
-	// undone: optimize with a table
-	float scalar = pow( 2.0f, -exponent );
-	// convert to mantissa x 2^exponent format
-	for( i = 0; i < 3; i++ )
-	{
-		v[i] *= scalar;
-		// clamp
-		if( v[i] > 255.0f )
-		{
-			v[i] = 255.0f;
-		}
-	}
-	c.r = ( unsigned char )v[0];
-	c.g = ( unsigned char )v[1];
-	c.b = ( unsigned char )v[2];
-	c.exponent = ( signed char )exponent;
-}
-
-#else
 
 // given a floating point number  f, return an exponent e such that
 // for f' = f * 2^e,  f is on [128..255].
@@ -609,29 +483,14 @@ void VectorToColorRGBExp32( const Vector& vin, ColorRGBExp32 &c )
 		scalar = *reinterpret_cast<float *>(&fbits);
 	}
 
-	// We can totally wind up above 255 and that's okay--but above 256 would be right out.
-	Assert(vin.x * scalar < 256.0f && 
-		   vin.y * scalar < 256.0f && 
-		   vin.z * scalar < 256.0f);
+	// Above 255 would be right out.
+	Assert(vin.x * scalar <= 255.0f && 
+		   vin.y * scalar <= 255.0f && 
+		   vin.z * scalar <= 255.0f);
 
-	// This awful construction is necessary to prevent VC2005 from using the 
-	// fldcw/fnstcw control words around every float-to-unsigned-char operation.
-	{
-		int red = (vin.x * scalar);
-		int green = (vin.y * scalar);
-		int blue = (vin.z * scalar);
-
-		c.r = red;
-		c.g = green;
-		c.b = blue;
-	}
-	/*
-	c.r = ( unsigned char )(vin.x * scalar);
-	c.g = ( unsigned char )(vin.y * scalar);
-	c.b = ( unsigned char )(vin.z * scalar);
-	*/
+	c.r = static_cast<byte>( vin.x * scalar );
+	c.g = static_cast<byte>( vin.y * scalar );
+	c.b = static_cast<byte>( vin.z * scalar );
 
 	c.exponent = ( signed char )exponent;
 }
-
-#endif
