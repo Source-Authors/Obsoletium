@@ -1279,7 +1279,7 @@ void C_BaseAnimating::DelayedInitModelEffects( void )
 	m_bDelayInitModelEffects = false;
 
 	// Parse the keyvalues and see if they want to make ropes on this model.
-	KeyValues * modelKeyValues = new KeyValues("");
+	KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
 	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
 		// Do we have a cables section?
@@ -1360,8 +1360,6 @@ void C_BaseAnimating::DelayedInitModelEffects( void )
 			}
 		}
 	}
-
-	modelKeyValues->deleteThis();
 }
 
 

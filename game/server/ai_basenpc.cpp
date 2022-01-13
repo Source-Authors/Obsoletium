@@ -317,7 +317,7 @@ CJob *g_pQueuedNavigationQueryJob = NULL;
 static void ProcessNavigationQueries( CFunctor **pData, unsigned int nCount )
 {
 	// Run all queued navigation on a separate thread
-	for ( int i = 0; i < nCount; i++ )
+	for ( unsigned i = 0; i < nCount; i++ )
 	{
 		(*pData[i])();
 	}
@@ -12944,7 +12944,7 @@ void CAI_BaseNPC::ParseScriptedNPCInteractions( void )
 		return;
 
 	// Parse the model's key values and find any dynamic interactions
-	KeyValues *modelKeyValues = new KeyValues("");
+	KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
 	CUtlBuffer buf( 1024, 0, CUtlBuffer::TEXT_BUFFER );
 
 	if (! modelinfo->GetModelKeyValue( GetModel(), buf ))
@@ -13120,8 +13120,6 @@ void CAI_BaseNPC::ParseScriptedNPCInteractions( void )
 			}
 		}
 	}
-
-	modelKeyValues->deleteThis();
 }
 
 //-----------------------------------------------------------------------------

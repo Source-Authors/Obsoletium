@@ -326,10 +326,9 @@ void CBaseProp::CalculateBlockLOS( void )
 //-----------------------------------------------------------------------------
 int CBaseProp::ParsePropData( void )
 {
-	KeyValues *modelKeyValues = new KeyValues("");
+  KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
 	if ( !modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
-		modelKeyValues->deleteThis();
 		return PARSE_FAILED_NO_DATA;
 	}
 
@@ -337,12 +336,10 @@ int CBaseProp::ParsePropData( void )
 	KeyValues *pkvPropData = modelKeyValues->FindKey("prop_data");
 	if ( !pkvPropData )
 	{
-		modelKeyValues->deleteThis();
 		return PARSE_FAILED_NO_DATA;
 	}
 
 	int iResult = g_PropDataSystem.ParsePropFromKV( this, pkvPropData, modelKeyValues );
-	modelKeyValues->deleteThis();
 	return iResult;
 }
 
@@ -2036,7 +2033,7 @@ void CDynamicProp::CreateBoneFollowers()
 	if ( m_BoneFollowerManager.GetNumBoneFollowers() )
 		return;
 
-	KeyValues *modelKeyValues = new KeyValues("");
+	KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
 	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
 		// Do we have a bone follower section?
@@ -2054,8 +2051,6 @@ void CDynamicProp::CreateBoneFollowers()
 				pBone = pBone->GetNextKey();
 			}
 		}
-
-		modelKeyValues->deleteThis();
 	}
 
 	// if we got here, we don't have a bone follower section, but if we have a ragdoll
@@ -2819,7 +2814,7 @@ void CPhysicsProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 //-----------------------------------------------------------------------------
 bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
 {
-	KeyValues *modelKeyValues = new KeyValues("");
+  KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
 	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
 		KeyValues *pkvPropData = modelKeyValues->FindKey( "physgun_interactions" );
@@ -2835,7 +2830,6 @@ bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
 		}
 	}
 
-	modelKeyValues->deleteThis();
 	return false;
 }
 
@@ -2844,19 +2838,17 @@ bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
 //-----------------------------------------------------------------------------
 float CPhysicsProp::GetCarryDistanceOffset( void )
 {
-	KeyValues *modelKeyValues = new KeyValues("");
+	KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
 	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
 		KeyValues *pkvPropData = modelKeyValues->FindKey( "physgun_interactions" );
 		if ( pkvPropData )
 		{
 			float flDistance = pkvPropData->GetFloat( "carry_distance_offset", 0 );
-			modelKeyValues->deleteThis();
 			return flDistance;
 		}
 	}
 
-	modelKeyValues->deleteThis();
 	return 0;
 }
 
@@ -3748,61 +3740,61 @@ void CBasePropDoor::CalcDoorSounds()
 	string_t strSoundUnlocked = NULL_STRING;
 
 	bool bFoundSkin = false;
-	// Otherwise, use the sounds specified by the model keyvalues. These are looked up
-	// based on skin and hardware.
-	KeyValues *modelKeyValues = new KeyValues("");
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
-		KeyValues *pkvDoorSounds = modelKeyValues->FindKey("door_options");
-		if ( pkvDoorSounds )
+		// Otherwise, use the sounds specified by the model keyvalues. These are looked up
+		// based on skin and hardware.
+		KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
+		if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 		{
-			// Open / close / move sounds are looked up by skin index.
-			char szSkin[80];
-			int skin = m_nSkin;
-			Q_snprintf( szSkin, sizeof( szSkin ), "skin%d", skin );
-			KeyValues *pkvSkinData = pkvDoorSounds->FindKey( szSkin );
-			if ( pkvSkinData )
+			KeyValues *pkvDoorSounds = modelKeyValues->FindKey("door_options");
+			if ( pkvDoorSounds )
 			{
-				strSoundOpen = AllocPooledString( pkvSkinData->GetString( "open" ) );
-				strSoundClose = AllocPooledString( pkvSkinData->GetString( "close" ) );
-				strSoundMoving = AllocPooledString( pkvSkinData->GetString( "move" ) );
-				const char *pSurfaceprop = pkvSkinData->GetString( "surfaceprop" );
-				if ( pSurfaceprop && VPhysicsGetObject() )
+				// Open / close / move sounds are looked up by skin index.
+				char szSkin[80];
+				int skin = m_nSkin;
+				Q_snprintf( szSkin, sizeof( szSkin ), "skin%d", skin );
+				KeyValues *pkvSkinData = pkvDoorSounds->FindKey( szSkin );
+				if ( pkvSkinData )
 				{
-					bFoundSkin = true;
-					VPhysicsGetObject()->SetMaterialIndex( physprops->GetSurfaceIndex( pSurfaceprop ) );
+					strSoundOpen = AllocPooledString( pkvSkinData->GetString( "open" ) );
+					strSoundClose = AllocPooledString( pkvSkinData->GetString( "close" ) );
+					strSoundMoving = AllocPooledString( pkvSkinData->GetString( "move" ) );
+					const char *pSurfaceprop = pkvSkinData->GetString( "surfaceprop" );
+					if ( pSurfaceprop && VPhysicsGetObject() )
+					{
+						bFoundSkin = true;
+						VPhysicsGetObject()->SetMaterialIndex( physprops->GetSurfaceIndex( pSurfaceprop ) );
+					}
 				}
-			}
 
-			// Locked / unlocked sounds are looked up by hardware index.
-			char szHardware[80];
-			Q_snprintf( szHardware, sizeof( szHardware ), "hardware%d", m_nHardwareType );
-			KeyValues *pkvHardwareData = pkvDoorSounds->FindKey( szHardware );
-			if ( pkvHardwareData )
-			{
-				strSoundLocked = AllocPooledString( pkvHardwareData->GetString( "locked" ) );
-				strSoundUnlocked = AllocPooledString( pkvHardwareData->GetString( "unlocked" ) );
-			}
-
-			// If any sounds were missing, try the "defaults" block.
-			if ( ( strSoundOpen == NULL_STRING ) || ( strSoundClose == NULL_STRING ) || ( strSoundMoving == NULL_STRING ) ||
-				 ( strSoundLocked == NULL_STRING ) || ( strSoundUnlocked == NULL_STRING ) )
-			{
-				KeyValues *pkvDefaults = pkvDoorSounds->FindKey( "defaults" );
-				if ( pkvDefaults )
+				// Locked / unlocked sounds are looked up by hardware index.
+				char szHardware[80];
+				Q_snprintf( szHardware, sizeof( szHardware ), "hardware%d", m_nHardwareType );
+				KeyValues *pkvHardwareData = pkvDoorSounds->FindKey( szHardware );
+				if ( pkvHardwareData )
 				{
-					ASSIGN_STRING_IF_NULL( strSoundOpen, AllocPooledString( pkvDefaults->GetString( "open" ) ) );
-					ASSIGN_STRING_IF_NULL( strSoundClose, AllocPooledString( pkvDefaults->GetString( "close" ) ) );
-					ASSIGN_STRING_IF_NULL( strSoundMoving, AllocPooledString( pkvDefaults->GetString( "move" ) ) );
-					ASSIGN_STRING_IF_NULL( strSoundLocked, AllocPooledString( pkvDefaults->GetString( "locked" ) ) );
-					ASSIGN_STRING_IF_NULL( strSoundUnlocked, AllocPooledString( pkvDefaults->GetString( "unlocked" ) ) );
-					// NOTE: No default needed for surfaceprop, it's set by the model
+					strSoundLocked = AllocPooledString( pkvHardwareData->GetString( "locked" ) );
+					strSoundUnlocked = AllocPooledString( pkvHardwareData->GetString( "unlocked" ) );
+				}
+
+				// If any sounds were missing, try the "defaults" block.
+				if ( ( strSoundOpen == NULL_STRING ) || ( strSoundClose == NULL_STRING ) || ( strSoundMoving == NULL_STRING ) ||
+					 ( strSoundLocked == NULL_STRING ) || ( strSoundUnlocked == NULL_STRING ) )
+				{
+					KeyValues *pkvDefaults = pkvDoorSounds->FindKey( "defaults" );
+					if ( pkvDefaults )
+					{
+						ASSIGN_STRING_IF_NULL( strSoundOpen, AllocPooledString( pkvDefaults->GetString( "open" ) ) );
+						ASSIGN_STRING_IF_NULL( strSoundClose, AllocPooledString( pkvDefaults->GetString( "close" ) ) );
+						ASSIGN_STRING_IF_NULL( strSoundMoving, AllocPooledString( pkvDefaults->GetString( "move" ) ) );
+						ASSIGN_STRING_IF_NULL( strSoundLocked, AllocPooledString( pkvDefaults->GetString( "locked" ) ) );
+						ASSIGN_STRING_IF_NULL( strSoundUnlocked, AllocPooledString( pkvDefaults->GetString( "unlocked" ) ) );
+						// NOTE: No default needed for surfaceprop, it's set by the model
+					}
 				}
 			}
 		}
 	}
-	modelKeyValues->deleteThis();
-	modelKeyValues = NULL;
 	if ( !bFoundSkin && VPhysicsGetObject() )
 	{
 		Warning( "%s has Door model (%s) with no door_options! Verify that SKIN is valid, and has a corresponding options block in the model QC file\n", GetDebugName(), modelinfo->GetModelName( GetModel() ) );

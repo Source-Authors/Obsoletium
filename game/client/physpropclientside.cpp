@@ -210,10 +210,9 @@ void C_PhysPropClientside::SetRespawnZone( C_FuncPhysicsRespawnZone *pZone )
 //-----------------------------------------------------------------------------
 int C_PhysPropClientside::ParsePropData( void )
 {
-	KeyValues *modelKeyValues = new KeyValues("");
+	KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
 	if ( !modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
-		modelKeyValues->deleteThis();
 		return PARSE_FAILED_NO_DATA;
 	}
 
@@ -221,12 +220,10 @@ int C_PhysPropClientside::ParsePropData( void )
 	KeyValues *pkvPropData = modelKeyValues->FindKey("prop_data");
 	if ( !pkvPropData )
 	{
-		modelKeyValues->deleteThis();
 		return PARSE_FAILED_NO_DATA;
 	}
 
 	int iResult = g_PropDataSystem.ParsePropFromKV( this, pkvPropData, modelKeyValues );
-	modelKeyValues->deleteThis();
 	return iResult;
 }
 

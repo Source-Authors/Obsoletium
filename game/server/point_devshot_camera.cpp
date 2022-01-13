@@ -218,7 +218,7 @@ public:
 			// See if we've got a camera file to import cameras from
 			char szFullName[512];
 			Q_snprintf(szFullName,sizeof(szFullName), "maps/%s.txt", STRING( gpGlobals->mapname ));
-			KeyValues *pkvMapCameras = new KeyValues( "MapCameras" );
+			KeyValues::AutoDelete pkvMapCameras = KeyValues::AutoDelete( "MapCameras" );
 			if ( pkvMapCameras->LoadFromFile( filesystem, szFullName, "MOD" ) )
 			{
 				Warning( "Devshots: Loading point_devshot_camera positions from %s. \n", szFullName );

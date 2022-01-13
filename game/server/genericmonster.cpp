@@ -340,7 +340,7 @@ bool CNPC_Furniture::CreateVPhysics( void )
 
 	if ( !m_BoneFollowerManager.GetNumBoneFollowers() )
 	{
-		KeyValues *modelKeyValues = new KeyValues("");
+		KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
 		if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 		{
 			// Do we have a bone follower section?
@@ -359,7 +359,6 @@ bool CNPC_Furniture::CreateVPhysics( void )
 				}
 			}
 		}
-		modelKeyValues->deleteThis();
 	}
 
 	return true;
