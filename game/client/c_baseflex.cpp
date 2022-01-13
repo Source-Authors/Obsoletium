@@ -259,7 +259,7 @@ void C_BaseFlex::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quaternio
 		CrossProduct( p0, leanPos, p1 );
 		float sinAngle = VectorNormalize( p1 );
 		float cosAngle = DotProduct( p0, leanPos );
-		float angle = atan2( sinAngle, cosAngle ) * 180 / M_PI;
+		float angle = atan2f( sinAngle, cosAngle ) * 180 / M_PI_F;
 		Quaternion q1;
 		angle = clamp( angle, -45, 45 );
 		AxisAngleQuaternion( p1, angle, q1 );
@@ -1034,16 +1034,16 @@ void C_BaseFlex::GetToolRecordingState( KeyValues *msg )
 
 	// FIXME: this needs a better algorithm
 	// blink the eyes
-	float t = (m_blinktime - gpGlobals->curtime) * M_PI * 0.5 * (1.0/g_CV_BlinkDuration.GetFloat());
+	float t = (m_blinktime - gpGlobals->curtime) * M_PI_F * 0.5F * (1.0F/g_CV_BlinkDuration.GetFloat());
 	if (t > 0)
 	{
 		// do eyeblink falloff curve
-		t = cos(t);
+		t = cosf(t);
 		if (t > 0)
 		{
 			g_flexweight[m_iBlink] = sqrtf( t ) * 2;
 			if (g_flexweight[m_iBlink] > 1)
-				g_flexweight[m_iBlink] = 2.0 - g_flexweight[m_iBlink];
+				g_flexweight[m_iBlink] = 2.0F - g_flexweight[m_iBlink];
 		}
 	}
 
@@ -1148,7 +1148,9 @@ void C_BaseFlex::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightC
 {
 	// hack in an initialization
 	LinkToGlobalFlexControllers( GetModelPtr() );
-	m_iBlink = AddGlobalFlexController( "UH" );
+
+	// dimhotepus: Allow NPCs to blink
+	// m_iBlink = AddGlobalFlexController( "UH" );
 
 	if ( SetupGlobalWeights( pBoneToWorld, nFlexWeightCount, pFlexWeights, pFlexDelayedWeights ) )
 	{
@@ -1241,11 +1243,11 @@ bool C_BaseFlex::SetupGlobalWeights( const matrix3x4_t *pBoneToWorld, int nFlexW
 	// blink the eyes
 	float flBlinkDuration = g_CV_BlinkDuration.GetFloat();
 	float flOOBlinkDuration = ( flBlinkDuration > 0 ) ? 1.0f / flBlinkDuration : 0.0f;
-	float t = ( m_blinktime - gpGlobals->curtime ) * M_PI * 0.5 * flOOBlinkDuration;
+	float t = ( m_blinktime - gpGlobals->curtime ) * M_PI_F * 0.5f * flOOBlinkDuration;
 	if (t > 0)
 	{
 		// do eyeblink falloff curve
-		t = cos(t);
+		t = cosf(t);
 		if (t > 0.0f && t < 1.0f)
 		{
 			t = sqrtf( t ) * 2.0f;
@@ -1701,7 +1703,7 @@ void C_BaseFlex::ProcessSceneEvents( bool bFlexEvents )
 	{
 		for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
 		{
-			SetFlexWeight( i, GetFlexWeight( i ) * 0.95 );
+			SetFlexWeight( i, GetFlexWeight( i ) * 0.95F );
 		}
 	}
 
@@ -2060,7 +2062,7 @@ void CSceneEventInfo::InitWeight( C_BaseFlex *pActor )
 
 float CSceneEventInfo::UpdateWeight( C_BaseFlex *pActor )
 {
-	m_flWeight = MIN( m_flWeight + 0.1, 1.0 );
+	m_flWeight = MIN( m_flWeight + 0.1F, 1.0F );
 	return m_flWeight;
 }
 
