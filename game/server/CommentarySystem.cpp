@@ -485,7 +485,7 @@ public:
 				if ( m_iTeleportStage == TELEPORT_FADEOUT )
 				{
 					m_iTeleportStage = TELEPORT_TELEPORT;
-					m_flNextTeleportTime = gpGlobals->curtime + 0.35;
+					m_flNextTeleportTime = gpGlobals->curtime + 0.35F;
 
 					color32_s clr = { 0,0,0,255 };
 					UTIL_ScreenFade( pPlayer, clr, 0.3, 0, FFADE_OUT | FFADE_PURGE | FFADE_STAYOUT );
@@ -498,12 +498,12 @@ public:
 					}
 
 					m_iTeleportStage = TELEPORT_FADEIN;
-					m_flNextTeleportTime = gpGlobals->curtime + 0.6;
+					m_flNextTeleportTime = gpGlobals->curtime + 0.6F;
 				}
 				else if ( m_iTeleportStage == TELEPORT_FADEIN )
 				{
 					m_iTeleportStage = TELEPORT_NONE;
-					m_flNextTeleportTime = gpGlobals->curtime + 0.25;
+					m_flNextTeleportTime = gpGlobals->curtime + 0.25F;
 
 					color32_s clr = { 0,0,0,255 };
 					UTIL_ScreenFade( pPlayer, clr, 0.3, 0, FFADE_IN | FFADE_PURGE );
@@ -599,7 +599,8 @@ public:
 		// Find the commentary file
 		char szFullName[512];
 		Q_snprintf(szFullName,sizeof(szFullName), "maps/%s_commentary.txt", STRING( gpGlobals->mapname ));
-		KeyValues *pkvFile = new KeyValues( "Commentary" );
+		// dimhotepus: Fix pkvFile memory leak.
+		KeyValues::AutoDelete pkvFile = KeyValues::AutoDelete( "Commentary" );
 		if ( pkvFile->LoadFromFile( filesystem, szFullName, "MOD" ) )
 		{
 			Msg( "Commentary: Loading commentary data from %s. \n", szFullName );
@@ -1202,7 +1203,7 @@ void CPointCommentaryNode::UpdateViewThink( void )
 		// Accelerate towards the target goal angles
   		float dx = AngleDiff( angGoal.x, angCurrent.x );
   		float dy = AngleDiff( angGoal.y, angCurrent.y );
-		float mod = 1.0 - ExponentialDecay( 0.5, 0.3, gpGlobals->frametime );
+		float mod = 1.0F - ExponentialDecay( 0.5F, 0.3F, gpGlobals->frametime );
    		float dxmod = dx * mod;
 		float dymod = dy * mod;
 
@@ -1268,7 +1269,7 @@ void CPointCommentaryNode::UpdateViewPostThink( void )
 	{
  		// Blend back to the player's position over time.
    		float flCurTime = (gpGlobals->curtime - m_flFinishedTime);
-		float flTimeToBlend = MIN( 2.0, m_flFinishedTime - m_flStartTime ); 
+		float flTimeToBlend = MIN( 2.0F, m_flFinishedTime - m_flStartTime ); 
  		float flBlendPerc = 1.0f - clamp( flCurTime / flTimeToBlend, 0.f, 1.f );
 
 		//Msg("OUT: CurTime %.2f, BlendTime: %.2f, Blend: %.3f\n", flCurTime, flTimeToBlend, flBlendPerc );
@@ -1289,7 +1290,7 @@ void CPointCommentaryNode::UpdateViewPostThink( void )
 				Quaternion quatCurrent;
 				AngleQuaternion( m_vecOriginalAngles, quatOriginal );
 				AngleQuaternion( m_vecFinishAngles, quatFinish );
-				QuaternionSlerp( quatFinish, quatOriginal, 1.0 - flBlendPerc, quatCurrent );
+				QuaternionSlerp( quatFinish, quatOriginal, 1.0F - flBlendPerc, quatCurrent );
 				QAngle angCurrent;
 				QuaternionAngles( quatCurrent, angCurrent );
 				m_hViewPositionMover->SetAbsAngles( angCurrent );
@@ -1615,7 +1616,7 @@ END_DATADESC()
 void CCommentaryAuto::Spawn(void)
 {
 	BaseClass::Spawn();
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1F );
 }
 
 //-----------------------------------------------------------------------------
