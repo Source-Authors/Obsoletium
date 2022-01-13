@@ -953,7 +953,7 @@ void FileOpenDialog::SetStartDirectory( const char *dir )
 //-----------------------------------------------------------------------------
 void FileOpenDialog::AddFilter( const char *filter, const char *filterName, bool bActive, const char *pFilterInfo  )
 {
-	KeyValues *kv = new KeyValues("item");
+	KeyValues::AutoDelete kv = KeyValues::AutoDelete("item");
 	kv->SetString( "filter", filter );
 	kv->SetString( "filterinfo", pFilterInfo );
 	int itemID = m_pFileTypeCombo->AddItem(filterName, kv);

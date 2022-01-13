@@ -392,7 +392,7 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, int parentNodeIndex
 		if ( !Q_stricmp( pFileName, ".." ) || !Q_stricmp( pFileName, "." ) )
 			continue;
 
-		KeyValues *kv = new KeyValues("item");
+		KeyValues::AutoDelete kv = KeyValues::AutoDelete("item");
 		kv->SetString("Text", pFileName);
 		// set the folder image
 		kv->SetInt("Image", 1);
