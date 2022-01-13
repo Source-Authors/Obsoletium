@@ -663,7 +663,7 @@ int CCombineDropshipContainer::OnTakeDamage( const CTakeDamageInfo &info )
 
 		if ( ShouldTriggerDamageEffect( nPrevHealth, MAX_EXPLOSIONS ) )
 		{
-			ExplosionCreate( dmgInfo.GetDamagePosition(), vec3_angle, this, 1000, 500.0f, 
+			ExplosionCreate( dmgInfo.GetDamagePosition(), vec3_angle, this, 1000, 500, 
 			SF_ENVEXPLOSION_NODAMAGE | SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 0 );
 			UTIL_ScreenShake( dmgInfo.GetDamagePosition(), 25.0, 150.0, 1.0, 750.0f, SHAKE_START );
 
@@ -681,7 +681,7 @@ int CCombineDropshipContainer::OnTakeDamage( const CTakeDamageInfo &info )
 void CCombineDropshipContainer::AddSmokeTrail( const Vector &vecPos )
 {
 	// Start this trail out with a bang!
-	ExplosionCreate( vecPos, vec3_angle, this, 1000, 500.0f, SF_ENVEXPLOSION_NODAMAGE | 
+	ExplosionCreate( vecPos, vec3_angle, this, 1000, 500, SF_ENVEXPLOSION_NODAMAGE | 
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 0 );
 	UTIL_ScreenShake( vecPos, 25.0, 150.0, 1.0, 750.0f, SHAKE_START );
 
@@ -1211,9 +1211,9 @@ void CNPC_CombineDropship::Flight( void )
 		//NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + deltaPos, 0, 255, 0, true, 0.1f );
 
 		// calc goal linear accel to hit deltaPos in dt time.
-		accel.x = 2.0 * (deltaPos.x - GetAbsVelocity().x * dt) / (dt * dt);
-		accel.y = 2.0 * (deltaPos.y - GetAbsVelocity().y * dt) / (dt * dt);
-		accel.z = 2.0 * (deltaPos.z - GetAbsVelocity().z * dt + 0.5 * 384 * dt * dt) / (dt * dt);
+		accel.x = 2.0F * (deltaPos.x - GetAbsVelocity().x * dt) / (dt * dt);
+		accel.y = 2.0F * (deltaPos.y - GetAbsVelocity().y * dt) / (dt * dt);
+		accel.z = 2.0F * (deltaPos.z - GetAbsVelocity().z * dt + 0.5F * 384 * dt * dt) / (dt * dt);
 		
 		float flDistFromPath = 0.0f;
 		Vector vecPoint, vecDelta;
@@ -1240,9 +1240,9 @@ void CNPC_CombineDropship::Flight( void )
 		VectorNormalize( goalUp );
 
 		// calc goal orientation to hit linear accel forces
-		float goalPitch = RAD2DEG( asin( DotProduct( forward, goalUp ) ) );
+		float goalPitch = RAD2DEG( asinf( DotProduct( forward, goalUp ) ) );
 		float goalYaw = UTIL_VecToYaw( m_vecDesiredFaceDir );
-		float goalRoll = RAD2DEG( asin( DotProduct( right, goalUp ) ) );
+		float goalRoll = RAD2DEG( asinf( DotProduct( right, goalUp ) ) );
 
 		// clamp goal orientations
 		goalPitch = clamp( goalPitch, -45, 60 );
@@ -1251,9 +1251,9 @@ void CNPC_CombineDropship::Flight( void )
 		// calc angular accel needed to hit goal pitch in dt time.
 		dt = 0.6;
 		QAngle goalAngAccel;
-		goalAngAccel.x = 2.0 * (AngleDiff( goalPitch, AngleNormalize( GetLocalAngles().x ) ) - GetLocalAngularVelocity().x * dt) / (dt * dt);
-		goalAngAccel.y = 2.0 * (AngleDiff( goalYaw, AngleNormalize( GetLocalAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
-		goalAngAccel.z = 2.0 * (AngleDiff( goalRoll, AngleNormalize( GetLocalAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
+		goalAngAccel.x = 2.0F * (AngleDiff( goalPitch, AngleNormalize( GetLocalAngles().x ) ) - GetLocalAngularVelocity().x * dt) / (dt * dt);
+		goalAngAccel.y = 2.0F * (AngleDiff( goalYaw, AngleNormalize( GetLocalAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
+		goalAngAccel.z = 2.0F * (AngleDiff( goalRoll, AngleNormalize( GetLocalAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
 
 		goalAngAccel.x = clamp( goalAngAccel.x, -300, 300 );
 		//goalAngAccel.y = clamp( goalAngAccel.y, -60, 60 );
@@ -1271,7 +1271,7 @@ void CNPC_CombineDropship::Flight( void )
 		angAccelAccel.y = clamp( angAccelAccel.y, -1000, 1000 );
 		angAccelAccel.z = clamp( angAccelAccel.z, -1000, 1000 );
 
-		m_vecAngAcceleration += angAccelAccel * 0.1;
+		m_vecAngAcceleration += angAccelAccel * 0.1F;
 
 		// DevMsg( "pitch %6.1f (%6.1f:%6.1f)  ", goalPitch, GetLocalAngles().x, m_vecAngVelocity.x );
 		// DevMsg( "roll %6.1f (%6.1f:%6.1f) : ", goalRoll, GetLocalAngles().z, m_vecAngVelocity.z );
@@ -1282,7 +1282,7 @@ void CNPC_CombineDropship::Flight( void )
 		ApplyGeneralDrag();
 		
 		QAngle angVel = GetLocalAngularVelocity();
-		angVel += m_vecAngAcceleration * 0.1;
+		angVel += m_vecAngAcceleration * 0.1F;
 
 		//angVel.y = clamp( angVel.y, -60, 60 );
 		//angVel.y = clamp( angVel.y, -120, 120 );
@@ -1290,17 +1290,17 @@ void CNPC_CombineDropship::Flight( void )
 
 		SetLocalAngularVelocity( angVel );
 
-		m_flForce = m_flForce * 0.8 + (accel.z + fabs( accel.x ) * 0.1 + fabs( accel.y ) * 0.1) * 0.1 * 0.2;
+		m_flForce = m_flForce * 0.8F + (accel.z + fabsf( accel.x ) * 0.1F + fabsf( accel.y ) * 0.1F) * 0.1F * 0.2F;
 
 		vecImpulse = m_flForce * up;
 		
 		if ( m_lifeState == LIFE_DYING )
 		{
-			vecImpulse.z = -38.4;  // 64ft/sec
+			vecImpulse.z = -38.4F;  // 64ft/sec
 		}
 		else
 		{
-			vecImpulse.z -= 38.4;  // 32ft/sec
+			vecImpulse.z -= 38.4F;  // 32ft/sec
 		}
 
 		// Find our current velocity
@@ -1534,7 +1534,7 @@ void CNPC_CombineDropship::UpdateRotorWashVolume( CSoundPatch *pRotorSound, floa
 	{
 		// We can change from 0 to 1 in 3 seconds. 
 		// Figure out how many seconds flVolDelta will take.
-		float flRampTime = fabs( flVolDelta ) * flDeltaTime; 
+		float flRampTime = fabsf( flVolDelta ) * flDeltaTime; 
 		controller.SoundChangeVolume( pRotorSound, flVolume, flRampTime );
 	}
 }
@@ -1575,20 +1575,20 @@ void CNPC_CombineDropship::UpdateRotorSoundPitch( int iPitch )
 {
 	CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
 
-	float rotorPitch = 0.2 + m_engineThrust * 0.8;
+	float rotorPitch = 0.2F + m_engineThrust * 0.8F;
 	if ( m_pRotorSound )
 	{
-		controller.SoundChangePitch( m_pRotorSound, iPitch + rotorPitch, 0.1 );
+		controller.SoundChangePitch( m_pRotorSound, iPitch + rotorPitch, 0.1F );
 	}
 
 	if ( m_pNearRotorSound )
 	{
-		controller.SoundChangePitch( m_pNearRotorSound, iPitch + rotorPitch, 0.1 );
+		controller.SoundChangePitch( m_pNearRotorSound, iPitch + rotorPitch, 0.1F );
 	}
 
 	if (m_pRotorOnGroundSound)
 	{
-		controller.SoundChangePitch( m_pRotorOnGroundSound, iPitch + rotorPitch, 0.1 );
+		controller.SoundChangePitch( m_pRotorOnGroundSound, iPitch + rotorPitch, 0.1F );
 	}
 
 	UpdateRotorWashVolume();
@@ -2047,7 +2047,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 #define MIN_LAND_VEL	-75.0f
 #define ALTITUDE_CAP	512.0f
 
-			float flFactor = MIN( 1.0,  flAltitude / ALTITUDE_CAP );
+			float flFactor = MIN( 1.0f,  flAltitude / ALTITUDE_CAP );
 			float flDescendVelocity = MIN( -75, MAX_LAND_VEL * flFactor );
 
 			vecVelocity.z = flDescendVelocity;
@@ -2072,8 +2072,8 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 				m_existRoll = UTIL_Approach( 0.0, m_existRoll, 1 );
 
 				QAngle angles = GetLocalAngles();
-				angles.x = m_existPitch + ( sin( gpGlobals->curtime * 3.5f ) * DROPSHIP_MAX_LAND_TILT );
-				angles.z = m_existRoll + ( sin( gpGlobals->curtime * 3.75f ) * DROPSHIP_MAX_LAND_TILT );
+				angles.x = m_existPitch + ( sinf( gpGlobals->curtime * 3.5f ) * DROPSHIP_MAX_LAND_TILT );
+				angles.z = m_existRoll + ( sinf( gpGlobals->curtime * 3.75f ) * DROPSHIP_MAX_LAND_TILT );
 				SetLocalAngles( angles );
 			}
 
@@ -2197,7 +2197,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 					else
 					{
 						// We're out of troops, time to leave
-						m_flTimeTakeOff = gpGlobals->curtime + 0.5;
+						m_flTimeTakeOff = gpGlobals->curtime + 0.5F;
 					}
 				}
 			}
@@ -2364,7 +2364,7 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	if ( !m_hContainer )
 	{
 		// We're done, take off.
-		m_flTimeTakeOff = gpGlobals->curtime + 0.5;
+		m_flTimeTakeOff = gpGlobals->curtime + 0.5F;
 		return;
 	}
 
@@ -2372,7 +2372,7 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	if ( m_iCurrentTroopExiting >= m_soldiersToDrop || m_sNPCTemplateData[m_iCurrentTroopExiting] == NULL_STRING )
 	{
 		// We're done, take off.
-		m_flTimeTakeOff = gpGlobals->curtime + 0.5;
+		m_flTimeTakeOff = gpGlobals->curtime + 0.5F;
 		return;
 	}
 
@@ -2395,7 +2395,7 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	QAngle vecDeployEndAngles;
 	m_hContainer->GetAttachment( m_iAttachmentTroopDeploy, vecDeployEndPoint, vecDeployEndAngles );
 	vecDeployEndPoint = GetDropoffFinishPosition( vecDeployEndPoint, NULL, vecNPCMins, vecNPCMaxs );
-	CSoundEnt::InsertSound( SOUND_DANGER, vecDeployEndPoint, 120.0f, 2.0f, this );
+	CSoundEnt::InsertSound( SOUND_DANGER, vecDeployEndPoint, 120, 2.0f, this );
 
 	// Make sure there are no NPCs on the spot
 	trace_t tr;
@@ -2643,7 +2643,7 @@ void CNPC_CombineDropship::UpdatePickupNavigation( void )
 {
 	// Try and touch the top of the object
 	Vector vecPickup = m_hPickupTarget->WorldSpaceCenter();
-	vecPickup.z += (m_hPickupTarget->CollisionProp()->OBBSize().z * 0.5);
+	vecPickup.z += (m_hPickupTarget->CollisionProp()->OBBSize().z * 0.5F);
 	SetDesiredPosition( vecPickup );
 
 	//NDebugOverlay::Cross3D( GetDesiredPosition(), -Vector(32,32,32), Vector(32,32,32), 0, 255, 255, true, 0.1f );
@@ -2827,11 +2827,11 @@ void CNPC_CombineDropship::UpdateContainerGunFacing( Vector &vecMuzzle, Vector &
 		// and use atan2() to get angles
 
 		// angles from target pos to center
-		float targetToCenterYaw = atan2( target.y, target.x );
-		float centerToGunYaw = atan2( vecBarrelPos.y, sqrt( quadTarget - (vecBarrelPos.y*vecBarrelPos.y) ) );
+		float targetToCenterYaw = atan2f( target.y, target.x );
+		float centerToGunYaw = atan2f( vecBarrelPos.y, sqrtf( quadTarget - (vecBarrelPos.y*vecBarrelPos.y) ) );
 
-		float targetToCenterPitch = atan2( target.z, sqrt( quadTargetXY ) );
-		float centerToGunPitch = atan2( -vecBarrelPos.z, sqrt( quadTarget - (vecBarrelPos.z*vecBarrelPos.z) ) );
+		float targetToCenterPitch = atan2f( target.z, sqrtf( quadTargetXY ) );
+		float centerToGunPitch = atan2f( -vecBarrelPos.z, sqrtf( quadTarget - (vecBarrelPos.z*vecBarrelPos.z) ) );
 
 		QAngle angles;
 		angles.Init( RAD2DEG(targetToCenterPitch+centerToGunPitch), RAD2DEG( targetToCenterYaw + centerToGunYaw ), 0 );
@@ -2874,7 +2874,7 @@ bool CNPC_CombineDropship::FireCannonRound( void )
 	float flCosAngle = DotProduct( vecToEnemy, vecAimDir );
 	if ( flCosAngle < DOT_15DEGREE )
 	{
-		m_flTimeNextAttack = gpGlobals->curtime + 0.1;
+		m_flTimeNextAttack = gpGlobals->curtime + 0.1F;
 		return false;
 	}
 
@@ -2882,7 +2882,7 @@ bool CNPC_CombineDropship::FireCannonRound( void )
 	if ( m_iBurstRounds <= 0 )
 	{
 		m_iBurstRounds = RandomInt( 10, 20 );
-		m_flTimeNextAttack = gpGlobals->curtime + (m_iBurstRounds * 0.1);
+		m_flTimeNextAttack = gpGlobals->curtime + (m_iBurstRounds * 0.1F);
 		return false;
 	}
 
@@ -2902,7 +2902,7 @@ bool CNPC_CombineDropship::FireCannonRound( void )
 	QAngle vecAimAngles;
 	VectorAngles( vecAimDir, vecAimAngles );
 	g_pEffects->MuzzleFlash( vecMuzzle, vecAimAngles, random->RandomFloat( 5.0f, 7.0f ), MUZZLEFLASH_TYPE_GUNSHIP );
-	m_flTimeNextAttack = gpGlobals->curtime + 0.05;
+	m_flTimeNextAttack = gpGlobals->curtime + 0.05F;
 
 	// Clamp to account for inaccuracy in aiming w/ pose parameters
 	vecAimDir = vecToEnemy;
@@ -2919,7 +2919,7 @@ bool CNPC_CombineDropship::FireCannonRound( void )
 //------------------------------------------------------------------------------
 void CNPC_CombineDropship::DoImpactEffect( trace_t &tr, int nDamageType )
 {
-	CSoundEnt::InsertSound( SOUND_DANGER | SOUND_CONTEXT_REACT_TO_SOURCE, tr.endpos, 120.0f, 0.3f, this );
+	CSoundEnt::InsertSound( SOUND_DANGER | SOUND_CONTEXT_REACT_TO_SOURCE, tr.endpos, 120, 0.3f, this );
 
 	BaseClass::DoImpactEffect( tr, nDamageType );
 }
