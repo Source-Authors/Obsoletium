@@ -143,8 +143,10 @@ private:
 
 //-----------------------------------------------------------------------------
 
-const Vector2D vec2_origin(0,0);
-const Vector2D vec2_invalid( FLT_MAX, FLT_MAX );
+// dimhotepus: inline
+const inline Vector2D vec2_origin( 0, 0 );
+// dimhotepus: inline
+const inline Vector2D vec2_invalid( FLT_MAX, FLT_MAX );
 
 //-----------------------------------------------------------------------------
 // Vector2D related operations

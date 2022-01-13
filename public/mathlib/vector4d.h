@@ -127,8 +127,10 @@ public:
 	Vector4D& operator=( Vector4D const& src );
 };
 
-const Vector4D vec4_origin( 0.0f, 0.0f, 0.0f, 0.0f );
-const Vector4D vec4_invalid( FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX );
+// dimhotepus: inline
+const inline Vector4D vec4_origin( 0.0f, 0.0f, 0.0f, 0.0f );
+// dimhotepus: inline
+const inline Vector4D vec4_invalid( FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX );
 
 //-----------------------------------------------------------------------------
 // SSE optimized routines
