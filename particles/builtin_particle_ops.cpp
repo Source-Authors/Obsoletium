@@ -2162,7 +2162,11 @@ void C_OP_PositionLock::Operate( CParticleCollection *pParticles, float flStreng
 	}
 	// Store off the control point position for the next delta computation
 	pCtx->m_vPrevPosition = vecControlPoint;
-	pCtx->m_matPrevTransform = matCurrentTransform;
+	// dimhotepus: Use current transform only when it is initialized.
+	if ( m_bLockRot )
+	{
+		pCtx->m_matPrevTransform = matCurrentTransform;
+	}
 	ReleaseSIMDRandContext( nContext );
 };
 #endif
