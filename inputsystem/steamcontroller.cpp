@@ -339,51 +339,40 @@ bool CInputSystem::InitializeSteamControllers()
 {
 	m_flLastSteamControllerInput = -FLT_MAX;
 	auto steamcontroller = SteamControllerInterface();
-	if ( steamcontroller )
-	{
-		if ( !steamcontroller->Init() )
-		{
-			return false;
-		}
-	}
-	else
+	if ( !steamcontroller || !steamcontroller->Init() )
 	{
 		return false;
 	}
 
-	for( int i=0; i<STEAM_CONTROLLER_MAX_COUNT; i++ )
+	for ( auto &sv : m_pRadialMenuStickVal )
 	{
-		m_pRadialMenuStickVal[i][0] = 0.0f;
-		m_pRadialMenuStickVal[i][1] = 0.0f;
+		sv[0] = 0.0f;
+		sv[1] = 0.0f;
 	}
 	
 	// We have to account for other joysticks prior to adding steam controllers
 	// So we get the baseline number here when first initializing
 	m_nJoystickBaseline = m_nJoystickCount;
-	if ( steamcontroller )
+
+	uint64 nControllerHandles[STEAM_CONTROLLER_MAX_COUNT];
+	m_unNumConnected = steamcontroller->GetConnectedControllers( nControllerHandles );
+	steamcontroller->RunFrame();
+
+	if ( m_unNumConnected > 0 )
 	{
-		uint64 nControllerHandles[STEAM_CONTROLLER_MAX_COUNT];
-		m_unNumConnected = steamcontroller->GetConnectedControllers( nControllerHandles );
-		steamcontroller->RunFrame();
-
-		if ( m_unNumConnected > 0 )
+		for ( uint32 i = 0; i < m_unNumConnected; i++ )
 		{
-			for ( uint32 i = 0; i < m_unNumConnected; i++ )
+			if ( m_Device[i].m_nJoystickIndex == INVALID_USER_ID )
 			{
-				if ( m_Device[i].m_nJoystickIndex == INVALID_USER_ID )
-				{
-					int nJoystickIndex = i;
-					m_Device[i].m_nJoystickIndex = nJoystickIndex;
-					m_Device[i].m_nHardwareIndex = i;
-				}
-				m_nControllerType[m_Device[i].m_nJoystickIndex] = INPUT_TYPE_STEAMCONTROLLER;
+				int nJoystickIndex = i;
+				m_Device[i].m_nJoystickIndex = nJoystickIndex;
+				m_Device[i].m_nHardwareIndex = i;
 			}
+			m_nControllerType[m_Device[i].m_nJoystickIndex] = INPUT_TYPE_STEAMCONTROLLER;
 		}
-
-		return true;
 	}
 
-	return false;	
+	return true;
 }
 
 ControllerActionSetHandle_t CInputSystem::GetActionSetHandle( GameActionSet_t eActionSet )
@@ -393,11 +382,11 @@ ControllerActionSetHandle_t CInputSystem::GetActionSetHandle( GameActionSet_t eA
 
 ControllerActionSetHandle_t CInputSystem::GetActionSetHandle( const char* szActionSet )
 {
-	for ( int i = 0; i != ARRAYSIZE( g_GameActionSets ); ++i )
+	for ( const auto &set : g_GameActionSets )
 	{
-		if ( !Q_strcmp( szActionSet, g_GameActionSets[i].strName ) )
+		if ( !Q_strcmp( szActionSet, set.strName ) )
 		{
-			return g_GameActionSets[i].handle;
+			return set.handle;
 		}
 	}
 

@@ -398,11 +398,12 @@ public:
 	{
 		steampad_t()
 		{
+			active = false;
+			memset( lastAnalogKeys, 0, sizeof( lastAnalogKeys ) );
+			memset( m_appSKeys, 0, sizeof( m_appSKeys ) );
 			m_nHardwareIndex = 0;
 			m_nJoystickIndex = INVALID_USER_ID;
 			m_nLastPacketIndex = 0;
-			active = false;
-			memset( lastAnalogKeys, 0, sizeof( lastAnalogKeys ) );
 		}
 		bool				active;
 

@@ -197,7 +197,7 @@ ALLOC_CALL void *_calloc_base( size_t nCount, size_t nSize )
 	return pMem;
 }
 
-ALLOC_CALL void *_realloc_base( void *pMem, size_t nSize )
+ALLOC_CALL void *_realloc_base( void *pMem, size_t nSize ) //-V524
 {
 	return ReallocUnattributed( pMem, nSize );
 }
@@ -264,7 +264,7 @@ size_t _msize( void *pMem )
 	return _msize_base(pMem);
 }
 
-size_t msize( void *pMem )
+size_t msize( void *pMem ) //-V524
 {
 	return g_pMemAlloc->GetSize(pMem);
 }
@@ -346,7 +346,7 @@ int __cdecl _heapwalk( _HEAPINFO * )
 extern "C"
 {
 	
-void *malloc_db( size_t nSize, const char *pFileName, int nLine )
+void *malloc_db( size_t nSize, const char *pFileName, int nLine ) //-V524
 {
 	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
 }

@@ -39,41 +39,64 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CInputSystem, IInputSystem,
 //-----------------------------------------------------------------------------
 CInputSystem::CInputSystem()
 {
-	m_nLastPollTick = m_nLastSampleTick = m_StartupTimeTick = 0;
-	m_ChainedWndProc = 0;
-	m_hAttachedHWnd = 0;
-	m_hEvent = NULL;
+#if defined(USE_SDL)
+  m_pLauncherMgr = nullptr;
+#endif
+	m_ChainedWndProc = nullptr;
+	m_hAttachedHWnd = nullptr;
 	m_bEnabled = true;
 	m_bPumpEnabled = true;
 	m_bIsPolling = false;
+	memset( m_currentActionSet, 0, sizeof(m_currentActionSet) );
+	m_StartupTimeTick = 0;
+	m_nLastPollTick = 0;
+	m_nLastSampleTick = 0;
+	m_nPollCount = 0;
+	m_uiMouseWheel = 0;
+
 	m_JoysticksEnabled.ClearAllFlags();
 	m_nJoystickCount = 0;
 	m_bJoystickInitialized = false;
-	m_nPollCount = 0;
-	m_PrimaryUserId = INVALID_USER_ID;
-	m_uiMouseWheel = 0;
 	m_bXController = false;
-	m_bRawInputSupported = false;
+	memset( m_pJoystickInfo, 0, sizeof(m_pJoystickInfo) );
+
+	memset( m_pRadialMenuStickVal, 0, sizeof(m_pRadialMenuStickVal) );
+	memset( m_Device, 0, sizeof(m_Device) );
+	m_unNumConnected = 0;
+	m_flLastSteamControllerInput = 0.0F;
+	m_nJoystickBaseline = 0;
+	memset( m_nControllerType, 0, sizeof(m_nControllerType) );
+
 	m_bSteamController = false;
 	m_bSteamControllerActionsInitialized = false;
 	m_bSteamControllerActive = false;
 
-	Assert( (MAX_JOYSTICKS + 7) >> 3 << sizeof(unsigned short) ); 
+#if defined( WIN32 ) && !defined ( _X360 )
+	// NVNT Novint device info
+	m_nNovintDeviceCount = 0;
+	m_bNovintDevices = false;
+#endif
 
-	m_pXInputDLL = NULL;
+	memset( m_appXKeys, 0, sizeof(m_appXKeys) );
+	memset( m_XDevices, 0, sizeof(m_XDevices) );
+	m_PrimaryUserId = INVALID_USER_ID;
+
+	m_bRawInputSupported = false;
+	m_mouseRawAccumX = m_mouseRawAccumY = 0;
+
+	m_hEvent = nullptr;
+
+	m_pXInputDLL = nullptr;
 
 #if defined ( _WIN32 ) && !defined ( _X360 )
 	// NVNT DLL
-	m_pNovintDLL = NULL;
+	m_pNovintDLL = nullptr;
 #endif
 
 	m_bConsoleTextMode = false;
-	m_bSkipControllerInitialization = false;
+	m_bSkipControllerInitialization = CommandLine()->CheckParm( "-nosteamcontroller" );
 
-	if ( CommandLine()->CheckParm( "-nosteamcontroller" ) )
-	{
-		m_bSkipControllerInitialization = true;
-	}
+	static_assert( (MAX_JOYSTICKS + 7) >> 3 << sizeof(unsigned short) );
 }
 
 CInputSystem::~CInputSystem()
@@ -1483,7 +1506,8 @@ bool CInputSystem::GetRawMouseAccumulators( int& accumX, int& accumY )
 
 	accumX = m_mouseRawAccumX;
 	accumY = m_mouseRawAccumY;
-	m_mouseRawAccumX = m_mouseRawAccumY = 0;
+	m_mouseRawAccumX = 0;
+	m_mouseRawAccumY = 0;
 	return m_bRawInputSupported;
 
 #endif

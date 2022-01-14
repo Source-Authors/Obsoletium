@@ -540,11 +540,14 @@ void ButtonCode_InitKeyTranslationTable()
 	s_pVirtualKeyToButtonCode[VK_PRIOR]		=KEY_PAGEUP;
 	s_pVirtualKeyToButtonCode[VK_NEXT]		=KEY_PAGEDOWN;
 	s_pVirtualKeyToButtonCode[VK_PAUSE]		=KEY_BREAK;
-	s_pVirtualKeyToButtonCode[VK_SHIFT]		=KEY_RSHIFT;
+	// dimhotepus: Comment double assignment.
+	// s_pVirtualKeyToButtonCode[VK_SHIFT]		=KEY_RSHIFT;
 	s_pVirtualKeyToButtonCode[VK_SHIFT]		=KEY_LSHIFT;	// SHIFT -> left SHIFT
-	s_pVirtualKeyToButtonCode[VK_MENU]		=KEY_RALT;
+	// dimhotepus: Comment double assignment.
+	// s_pVirtualKeyToButtonCode[VK_MENU]		=KEY_RALT;
 	s_pVirtualKeyToButtonCode[VK_MENU]		=KEY_LALT;		// ALT -> left ALT
-	s_pVirtualKeyToButtonCode[VK_CONTROL]	=KEY_RCONTROL;
+	// dimhotepus: Comment double assignment.
+	// s_pVirtualKeyToButtonCode[VK_CONTROL]	=KEY_RCONTROL;
 	s_pVirtualKeyToButtonCode[VK_CONTROL]	=KEY_LCONTROL;	// CTRL -> left CTRL
 	s_pVirtualKeyToButtonCode[VK_LWIN]		=KEY_LWIN;
 	s_pVirtualKeyToButtonCode[VK_RWIN]		=KEY_RWIN;
@@ -728,7 +731,7 @@ ButtonCode_t ButtonCode_StringToButtonCode( const char *pString, bool bXControll
 		int nIndex = atoi( &pString[3] );
 		if ( nIndex < 29 )
 			return JOYSTICK_BUTTON( 0, nIndex );
-		if ( ( nIndex >= 29 ) && ( nIndex <= 32 ) )
+		if ( nIndex <= 32 )
 			return JOYSTICK_POV_BUTTON( 0, nIndex - 29 );
 		return BUTTON_CODE_INVALID;
 	}
