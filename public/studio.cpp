@@ -150,7 +150,7 @@ mstudioanim_t *mstudioanimdesc_t::pAnim( int *piFrame, float &flStall ) const
 	else if (panim != NULL && zeroframestalltime != 0.0f)
 	{
 		float dt = Plat_FloatTime() - zeroframestalltime;
-		if (dt >= 0.0)
+		if (dt >= 0.0f)
 		{
 			flStall = SimpleSpline( clamp( (0.200f - dt) * 5.0f, 0.0f, 1.0f ) );
 		}
