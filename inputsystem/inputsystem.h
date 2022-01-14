@@ -383,9 +383,6 @@ public:
 	int m_nLastSampleTick;
 	int m_nPollCount;
 
-	// Mouse wheel hack
-	UINT m_uiMouseWheel;
-
 	// Joystick info
 	CUtlFlags<unsigned short> m_JoysticksEnabled;
 	int m_nJoystickCount;

@@ -52,7 +52,6 @@ CInputSystem::CInputSystem()
 	m_nLastPollTick = 0;
 	m_nLastSampleTick = 0;
 	m_nPollCount = 0;
-	m_uiMouseWheel = 0;
 
 	m_JoysticksEnabled.ClearAllFlags();
 	m_nJoystickCount = 0;
@@ -123,11 +122,6 @@ InitReturnVal_t CInputSystem::Init()
 
 
 #if !defined( POSIX )
-	if ( IsPC() )
-	{
-		m_uiMouseWheel = RegisterWindowMessage( "MSWHEEL_ROLLMSG" );
-	}
-
 	m_hEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
 	if ( !m_hEvent )
 		return INIT_FAILED;
@@ -1470,21 +1464,6 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
  		break;
 
 	}
-	
-#if defined( PLATFORM_WINDOWS_PC ) && !defined( USE_SDL )
-	// Can't put this in the case statement, it's not constant
-	if ( uMsg == m_uiMouseWheel )
-	{
-		ButtonCode_t code = ( ( int )wParam ) > 0 ? MOUSE_WHEEL_UP : MOUSE_WHEEL_DOWN;
-		state.m_ButtonPressedTick[ code ] = state.m_ButtonReleasedTick[ code ] = m_nLastSampleTick;
-		PostEvent( IE_ButtonPressed, m_nLastSampleTick, code, code );
-		PostEvent( IE_ButtonReleased, m_nLastSampleTick, code, code );
-
-		state.m_pAnalogDelta[ MOUSE_WHEEL ] = ( ( int )wParam ) / WHEEL_DELTA;
-		state.m_pAnalogValue[ MOUSE_WHEEL ] += state.m_pAnalogDelta[ MOUSE_WHEEL ];
-		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_WHEEL, state.m_pAnalogValue[ MOUSE_WHEEL ], state.m_pAnalogDelta[ MOUSE_WHEEL ] );
-	}
-#endif
 
 #endif // PLATFORM_WINDOWS
 	return ChainWindowMessage( hwnd, uMsg, wParam, lParam );
