@@ -278,7 +278,7 @@ static LRESULT CALLBACK InputSystemWindowProc( HWND hwnd, UINT uMsg, WPARAM wPar
 //-----------------------------------------------------------------------------
 void CInputSystem::AttachToWindow( void* hWnd )
 {
-	Assert( m_hAttachedHWnd == 0 );
+	Assert( m_hAttachedHWnd == nullptr );
 	if ( m_hAttachedHWnd )
 	{
 		Warning( "CInputSystem::AttachToWindow: Cannot attach to two windows at once!\n" );
@@ -301,7 +301,7 @@ void CInputSystem::AttachToWindow( void* hWnd )
 	Rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
 	Rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
 	Rid[0].dwFlags = RIDEV_INPUTSINK;
-	Rid[0].hwndTarget = g_InputSystem.m_hAttachedHWnd; // GetHhWnd;
+	Rid[0].hwndTarget = g_InputSystem.m_hAttachedHWnd;
 	m_bRawInputSupported = !!RegisterRawInputDevices(Rid, ARRAYSIZE(Rid), sizeof(Rid[0]));
 #endif
 
@@ -320,19 +320,30 @@ void CInputSystem::DetachFromWindow( )
 
 	ResetInputState();
 
+#if defined( PLATFORM_WINDOWS_PC ) && !defined( USE_SDL )
+	// unregister raw mouse input
+	RAWINPUTDEVICE Rid[1];
+	Rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
+	Rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+	Rid[0].dwFlags = RIDEV_REMOVE;
+	// RegisterRawInputDevices requires nullptr window when RIDEV_REMOVE.
+	Rid[0].hwndTarget = nullptr;
+	[[maybe_unused]] const bool is_succeeded{!!RegisterRawInputDevices(Rid, ARRAYSIZE(Rid), sizeof(Rid[0]))};
+	Assert(is_succeeded);
+
+	// NVNT inform novint devices loss of window
+	DetachWindowFromNovintDevices( );
+#endif
+
 #if defined( PLATFORM_WINDOWS )
 	if ( m_ChainedWndProc )
 	{
 		SetWindowLongPtrW( m_hAttachedHWnd, GWLP_WNDPROC, (LONG_PTR)m_ChainedWndProc );
-		m_ChainedWndProc = 0;
+		m_ChainedWndProc = nullptr;
 	}
 #endif
 
-#if defined( PLATFORM_WINDOWS_PC )
-	// NVNT inform novint devices loss of window
-	DetachWindowFromNovintDevices( );
-#endif
-	m_hAttachedHWnd = 0;
+	m_hAttachedHWnd = nullptr;
 }
 
 
@@ -1436,7 +1447,7 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 				if ( UINT_MAX != GetRawInputData(hInput, RID_INPUT, buffer, &bufferSize, sizeof(RAWINPUTHEADER)) )
 				{
 					RAWINPUT* raw = reinterpret_cast<RAWINPUT*>( buffer );
-					if (raw->header.dwType == RIM_TYPEMOUSE) 
+					if (raw->header.dwType == RIM_TYPEMOUSE)
 					{
 						m_mouseRawAccumX += raw->data.mouse.lLastX;
 						m_mouseRawAccumY += raw->data.mouse.lLastY;
