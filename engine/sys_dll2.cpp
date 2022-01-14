@@ -1323,13 +1323,6 @@ void CEngineAPI::PumpMessages()
 		XBX_ProcessEvents();
 	}
 
-	// NOTE: Under some implementations of Win9x, 
-	// dispatching messages can cause the FPU control word to change
-	if ( IsPC() )
-	{
-		SetupFPUControlWord();
-	}
-
 	game->DispatchAllStoredGameMessages();
 
 	if ( IsPC() )
@@ -1385,11 +1378,6 @@ void CEngineAPI::PumpMessagesEditMode( bool &bIdle, long &lIdleCount )
 #else
 #error "Please define your platform"
 #endif
-
-
-	// NOTE: Under some implementations of Win9x, 
-	// dispatching messages can cause the FPU control word to change
-	SetupFPUControlWord();
 
 	game->DispatchAllStoredGameMessages();
 }

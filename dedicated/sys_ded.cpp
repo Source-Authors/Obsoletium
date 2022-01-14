@@ -120,13 +120,6 @@ static bool HandleVCRHook()
 		DispatchMessage( &msg );
 	}
 
-	if ( IsPC() )
-	{
-		// NOTE: Under some implementations of Win9x, 
-		// dispatching messages can cause the FPU control word to change
-		SetupFPUControlWord();
-	}
-
 	if ( bDone /*|| gbAppHasBeenTerminated*/ )
 		return true;
 #endif // _WIN32
