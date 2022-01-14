@@ -1368,12 +1368,12 @@ Vector CBaseCombatCharacter::CalcDamageForceVector( const CTakeDamageInfo &info 
 			// This simulates features that usually vary from
 			// person-to-person variables such as bodyweight,
 			// which are all indentical for characters using the same model.
-			float scale = random->RandomFloat( 0.85, 1.15 );
+			float scale = random->RandomFloat( 0.85F, 1.15F );
 			Vector force = info.GetDamageForce();
 			force.x *= scale;
 			force.y *= scale;
 			// Try to always exaggerate the upward force because we've got pretty harsh gravity
-			force.z *= (force.z > 0) ? 1.15 : scale;
+			force.z *= (force.z > 0) ? 1.15F : scale;
 			return force;
 		}
 

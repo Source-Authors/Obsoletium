@@ -1047,7 +1047,7 @@ void CHLTVDirector::AnalyzeCameras()
 			VectorNormalize( v2 );
 
 			// player/camera cost function:
-			flRank += ( 1.0f/sqrt(dist) ) * WeightedAngle( v1, v2 );
+			flRank += ( 1.0f/sqrtf(dist) ) * WeightedAngle( v1, v2 );
 
 			vDistribution += v2;
 		}

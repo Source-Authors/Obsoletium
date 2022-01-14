@@ -3890,7 +3890,7 @@ bool CAI_Navigator::GetStoppingPath( CAI_WaypointList *	pClippedWaypoints )
 			{
 				if ( pCurWaypoint->GetNext() && pCurWaypoint->GetNext()->NavType() == NAV_CLIMB )
 					distToCurrent += ComputePathDistance( NAV_CLIMB, pCurWaypoint->GetPos(), pCurWaypoint->GetNext()->GetPos() );
-				distToCurrent += GetHullWidth() * 2.0;
+				distToCurrent += GetHullWidth() * 2.0F;
 			}
 
 			if ( distToCurrent > distRemaining )

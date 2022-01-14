@@ -1317,8 +1317,8 @@ void CSceneEntity::DispatchProcessLoop( CChoreoScene *scene, CChoreoEvent *event
 
 	Assert( scene );
 	Assert( event->GetType() == CChoreoEvent::LOOP );
-
-	float backtime = (float)atof( event->GetParameters() );
+	// dimhotepus: atof -> strtof
+	float backtime = strtof( event->GetParameters(), nullptr );
 
 	bool process = true;
 	int counter = event->GetLoopCount();
@@ -1335,7 +1335,8 @@ void CSceneEntity::DispatchProcessLoop( CChoreoScene *scene, CChoreoEvent *event
 		}
 	}
 
-	if ( !process )
+	// dimhotepus: Some loops has zero length in data, no sense in such loops.
+	if ( !process || backtime == 0.0F )
 		return;
 
 	scene->LoopToTime( backtime );

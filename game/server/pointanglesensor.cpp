@@ -553,7 +553,7 @@ void CPointProximitySensor::Think( void )
 			GetVectors( &vecDir, NULL, NULL );
 
 			float flDot = DotProduct( vecTestDir, vecDir );
-			flDist *= fabs( flDot );
+			flDist *= fabsf( flDot );
 		}
 
 		m_Distance.Set( flDist, this, this );

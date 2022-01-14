@@ -224,11 +224,13 @@ bool CBaseDoor::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "locked_sentence"))
 	{
-		m_bLockedSentence = atof(szValue);
+		// dimhotepus: atof -> strtof
+		m_bLockedSentence = strtof(szValue, nullptr);
 	}
 	else if (FStrEq(szKeyName, "unlocked_sentence"))
 	{
-		m_bUnlockedSentence = atof(szValue);
+		// dimhotepus: atof -> strtof
+		m_bUnlockedSentence = strtof(szValue, nullptr);
 	}
 	else
 		return BaseClass::KeyValue( szKeyName, szValue );

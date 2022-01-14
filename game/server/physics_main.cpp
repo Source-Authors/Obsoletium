@@ -1182,12 +1182,12 @@ void CBaseEntity::PhysicsAddHalfGravity( float timestep )
 	}
 	else
 	{
-		ent_gravity = 1.0;
+		ent_gravity = 1.0F;
 	}
 
 	// Add 1/2 of the total gravitational effects over this timestep
 	Vector vecAbsVelocity = GetAbsVelocity();
-	vecAbsVelocity[2] -= ( 0.5 * ent_gravity * GetCurrentGravity() * timestep );
+	vecAbsVelocity[2] -= ( 0.5F * ent_gravity * GetCurrentGravity() * timestep );
 	vecAbsVelocity[2] += GetBaseVelocity()[2] * gpGlobals->frametime;
 	SetAbsVelocity( vecAbsVelocity );
 

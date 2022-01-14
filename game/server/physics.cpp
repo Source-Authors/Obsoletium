@@ -1756,8 +1756,8 @@ void PhysFrame( float deltaTime )
 
 		if ( simRealTime < 0 )
 			simRealTime = 0;
-		g_PhysAverageSimTime *= 0.8;
-		g_PhysAverageSimTime += (simRealTime * 0.2);
+		g_PhysAverageSimTime *= 0.8F;
+		g_PhysAverageSimTime += (simRealTime * 0.2F);
 		if ( lastObjectCount != 0 || activeCount != 0 )
 		{
 			Msg( "Physics: %3d objects, %4.1fms / AVG: %4.1fms\n", activeCount, simRealTime * 1000, g_PhysAverageSimTime * 1000 );

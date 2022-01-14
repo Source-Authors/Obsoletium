@@ -437,7 +437,7 @@ void CAI_FreePass::Update( )
 		}
 		else
 		{
-			m_FreePassTimeRemaining += 0.1 * m_Params.refillRate;
+			m_FreePassTimeRemaining += 0.1F * m_Params.refillRate;
 			if ( m_FreePassTimeRemaining > m_Params.duration )
 				m_FreePassTimeRemaining = m_Params.duration;
 			m_FreePassMoveMonitor.SetMark( pTarget, m_Params.moveTolerance );

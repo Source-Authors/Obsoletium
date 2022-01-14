@@ -12,7 +12,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define CAM_THINK_INTERVAL 0.05
+#define CAM_THINK_INTERVAL 0.05F
 
 // Spawnflags
 #define SF_CAMERA_START_OFF				0x01

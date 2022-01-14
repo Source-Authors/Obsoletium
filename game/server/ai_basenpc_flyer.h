@@ -65,21 +65,21 @@ protected:
 		m_vCurrentVelocity.z = (decay * m_vCurrentVelocity.z);
 	}
 
-	void AddNoiseToVelocity( float noiseScale = 1.0 )
+	void AddNoiseToVelocity( float noiseScale = 1.0F )
 	{
 		if( m_vNoiseMod.x )
 		{
-			m_vCurrentVelocity.x += noiseScale*sin(m_vNoiseMod.x * gpGlobals->curtime + m_vNoiseMod.x);
+			m_vCurrentVelocity.x += noiseScale*sinf(m_vNoiseMod.x * gpGlobals->curtime + m_vNoiseMod.x);
 		}
 
 		if( m_vNoiseMod.y )
 		{
-			m_vCurrentVelocity.y += noiseScale*cos(m_vNoiseMod.y * gpGlobals->curtime + m_vNoiseMod.y);
+			m_vCurrentVelocity.y += noiseScale*cosf(m_vNoiseMod.y * gpGlobals->curtime + m_vNoiseMod.y);
 		}
 
 		if( m_vNoiseMod.z )
 		{
-			m_vCurrentVelocity.z -= noiseScale*cos(m_vNoiseMod.z * gpGlobals->curtime + m_vNoiseMod.z);
+			m_vCurrentVelocity.z -= noiseScale*cosf(m_vNoiseMod.z * gpGlobals->curtime + m_vNoiseMod.z);
 		}
 	}
 

@@ -845,14 +845,14 @@ float CBreakableSurface::GetSupport(int nWidth, int nHeight)
 float CBreakableSurface::RecalcSupport(int nWidth, int nHeight)
 {
 	// Always has some support. Zero signifies that it has been broken
-	float flSupport = 0.01;
+	float flSupport = 0.01F;
 
 	// ------------
 	// Top support
 	// ------------
 	if (nHeight == m_nNumHigh-1)
 	{
-		flSupport += 1.0;
+		flSupport += 1.0F;
 	}
 	else
 	{
@@ -864,11 +864,11 @@ float CBreakableSurface::RecalcSupport(int nWidth, int nHeight)
 	// ------------
 	if (nHeight == 0)
 	{
-		flSupport += 1.25;
+		flSupport += 1.25F;
 	}
 	else
 	{
- 		flSupport += 1.25 * GetSupport(nWidth,nHeight-1);
+ 		flSupport += 1.25F * GetSupport(nWidth,nHeight-1);
 	}
 
 	// ------------
@@ -876,7 +876,7 @@ float CBreakableSurface::RecalcSupport(int nWidth, int nHeight)
 	// ------------
 	if (nWidth == 0)
 	{
-		flSupport += 1.0;
+		flSupport += 1.0F;
 	}
 	else
 	{
@@ -888,7 +888,7 @@ float CBreakableSurface::RecalcSupport(int nWidth, int nHeight)
 	// --------------
 	if (nWidth == m_nNumWide-1)
 	{
-		flSupport += 1.0;
+		flSupport += 1.0F;
 	}
 	else
 	{
@@ -900,7 +900,7 @@ float CBreakableSurface::RecalcSupport(int nWidth, int nHeight)
 	// --------------------
 	if (nHeight == 0 || nWidth == 0)
 	{
-		flSupport += 1.0;
+		flSupport += 1.0F;
 	}
 	else
 	{
@@ -912,7 +912,7 @@ float CBreakableSurface::RecalcSupport(int nWidth, int nHeight)
 	// ---------------------
 	if (nHeight == 0 || nWidth == m_nNumWide-1)
 	{
-		flSupport += 1.0;
+		flSupport += 1.0F;
 	}
 	else
 	{
@@ -924,11 +924,11 @@ float CBreakableSurface::RecalcSupport(int nWidth, int nHeight)
 	// -----------------
 	if (nHeight == m_nNumHigh-1 || nWidth == m_nNumWide-1)
 	{
-		flSupport += 0.25;
+		flSupport += 0.25F;
 	}
 	else
 	{
-		flSupport += 0.25 * GetSupport(nWidth+1,nHeight+1);
+		flSupport += 0.25F * GetSupport(nWidth+1,nHeight+1);
 	}
 
 	// -----------------
@@ -936,11 +936,11 @@ float CBreakableSurface::RecalcSupport(int nWidth, int nHeight)
 	// -----------------
 	if (nHeight == m_nNumHigh-1 || nWidth == 0)
 	{
-		flSupport += 0.25;
+		flSupport += 0.25F;
 	}
 	else
 	{
-		flSupport += 0.25 * GetSupport(nWidth-1,nHeight+1);
+		flSupport += 0.25F * GetSupport(nWidth-1,nHeight+1);
 	}
 	
 	return flSupport;

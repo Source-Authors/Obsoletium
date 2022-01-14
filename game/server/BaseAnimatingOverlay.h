@@ -105,8 +105,8 @@ inline float CAnimationLayer::GetFadeout( float flCurTime )
 	else
 	{
 		// blend in over 0.2 seconds
-		s = 1.0 - (flCurTime - m_flLayerAnimtime) / m_flLayerFadeOuttime;
-		if (s > 0 && s <= 1.0)
+		s = 1.0F - (flCurTime - m_flLayerAnimtime) / m_flLayerFadeOuttime;
+		if (s > 0 && s <= 1.0F)
 		{
 			// do a nice spline curve
 			s = 3 * s * s - 2 * s * s * s;

@@ -1510,8 +1510,8 @@ AI_Waypoint_t *CAI_Pathfinder::BuildRadialRoute( const Vector &vStartPos, const 
 		
 		// Get our next position along the arc
 		vNextPos	= vCenterPos;
-		vNextPos.x	+= flRadius * cos( flCurAngle );
-		vNextPos.y	+= flRadius * sin( flCurAngle );
+		vNextPos.x	+= flRadius * cosf( flCurAngle );
+		vNextPos.y	+= flRadius * sinf( flCurAngle );
 
 		// Build a route from the last position to the current one
 		pNextRoute = BuildLocalRoute( vLastPos, vNextPos, NULL, NULL, NO_NODE, fRouteBits, goalTolerance);
@@ -2092,9 +2092,9 @@ void CAI_Pathfinder::CTriDebugOverlay::FadeTriOverlayLines(void)
 	{
 		for (int i=0;i<NUM_NPC_DEBUG_OVERLAYS;i++)
 		{
-			m_debugTriOverlayLine[i]->r *= 0.5;
-			m_debugTriOverlayLine[i]->g *= 0.5;				
-			m_debugTriOverlayLine[i]->b *= 0.5;				
+			m_debugTriOverlayLine[i]->r /= 2;
+			m_debugTriOverlayLine[i]->g /= 2;
+			m_debugTriOverlayLine[i]->b /= 2;
 		}
 	}
 }

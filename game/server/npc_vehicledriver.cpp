@@ -957,8 +957,8 @@ void CNPC_VehicleDriver::CheckForTeleport( void )
 		Vector vecMins, vecMaxs;
 		vecMins = m_hVehicleEntity->CollisionProp()->OBBMins();
 		vecMaxs = m_hVehicleEntity->CollisionProp()->OBBMaxs();
-		Vector vecTarget = pTrack->GetAbsOrigin() - (vecMins + vecMaxs) * 0.5;
-		vecTarget.z += ((vecMaxs.z - vecMins.z) * 0.5) + 8;	// Safety buffer
+		Vector vecTarget = pTrack->GetAbsOrigin() - (vecMins + vecMaxs) * 0.5F;
+		vecTarget.z += ((vecMaxs.z - vecMins.z) * 0.5F) + 8;	// Safety buffer
 
 		// Orient it to face the next point
 		QAngle vecAngles = pTrack->GetAbsAngles();

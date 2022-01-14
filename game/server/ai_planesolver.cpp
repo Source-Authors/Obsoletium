@@ -243,12 +243,12 @@ void CAI_PlaneSolver::GenerateSuggestionFromTrace( const AILocalMoveGoal_t &goal
 	
 	float weight = CalculateRegulationWeight( moveTrace, pctBlocked );
 
-	if ( weight < 0.001 )
+	if ( weight < 0.001F )
 		return;
 	
-	if ( pctBlocked < 0.5 )
+	if ( pctBlocked < 0.5F )
 	{
-		arcSpan *= pctBlocked * 2.0;
+		arcSpan *= pctBlocked * 2.0F;
 	}
 
 	Vector vecToEnd = moveTrace.vEndPosition - GetLocalOrigin();
@@ -807,12 +807,12 @@ bool CAI_PlaneSolver::GenerateCircleObstacleSuggestions( const AILocalMoveGoal_t
 				vecTangent.z = 0;
 
 				float cosHalfArc = vecToObstacle.Dot( vecTangent );
-				arc = RAD2DEG(acosf( cosHalfArc )) * 2.0;
-				weight = 1.0 - (distToObstacle - radius) / probeDist;
-				if ( weight > 0.75 )
-					arc += (arc * 0.5) * (weight - 0.75) / 0.25;
+				arc = RAD2DEG(acosf( cosHalfArc )) * 2.0F;
+				weight = 1.0F - (distToObstacle - radius) / probeDist;
+				if ( weight > 0.75F )
+					arc += (arc * 0.5F) * (weight - 0.75F) / 0.25F;
 				
-				Assert( weight >= 0.0 && weight <= 1.0 );
+				Assert( weight >= 0.0F && weight <= 1.0F );
 
 #if DEBUG_OBSTACLES
 				// -------------------------

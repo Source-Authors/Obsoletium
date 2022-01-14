@@ -450,8 +450,8 @@ bool CAI_FollowBehavior::UpdateFollowPosition()
 	{
 		if ( pFollowTarget->GetParent()->GetServerVehicle() )
 		{
-			m_FollowNavGoal.targetMoveTolerance *= 1.5;
-			m_FollowNavGoal.range += pFollowTarget->GetParent()->BoundingRadius() * 0.333;
+			m_FollowNavGoal.targetMoveTolerance *= 1.5F;
+			m_FollowNavGoal.range += pFollowTarget->GetParent()->BoundingRadius() * 0.333F;
 		}
 	}
 

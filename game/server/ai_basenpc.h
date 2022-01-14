@@ -1718,7 +1718,7 @@ public:
 	// This is where your origin should go when you are chasing pEnemy when his origin is at chasePosition
 	// by default, leave this alone to make your origin coincide with his.
 	virtual void		TranslateNavGoal( CBaseEntity *pEnemy, Vector &chasePosition);
-	virtual float		GetDefaultNavGoalTolerance() { return (GetHullWidth() * 2.0); }
+	virtual float		GetDefaultNavGoalTolerance() { return (GetHullWidth() * 2.0F); }
 
 	virtual bool		FCanCheckAttacks ( void );
 	virtual void		CheckAmmo( void ) {}

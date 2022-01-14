@@ -219,18 +219,18 @@ Vector VecCheckThrow ( CBaseEntity *pEdict, const Vector &vecSpot1, Vector vecSp
 
 	// throw at a constant time
 	float time = vecGrenadeVel.Length( ) / flSpeed;
-	vecGrenadeVel = vecGrenadeVel * (1.0 / time);
+	vecGrenadeVel = vecGrenadeVel * (1.0F / time);
 
 	// adjust upward toss to compensate for gravity loss
-	vecGrenadeVel.z += flGravity * time * 0.5;
+	vecGrenadeVel.z += flGravity * time * 0.5F;
 
-	Vector vecApex = vecSpot1 + (vecSpot2 - vecSpot1) * 0.5;
-	vecApex.z += 0.5 * flGravity * (time * 0.5) * (time * 0.5);
+	Vector vecApex = vecSpot1 + (vecSpot2 - vecSpot1) * 0.5F;
+	vecApex.z += 0.5F * flGravity * (time * 0.5F) * (time * 0.5F);
 
 	
 	trace_t tr;
 	UTIL_TraceLine(vecSpot1, vecApex, MASK_SOLID, pEdict, COLLISION_GROUP_NONE, &tr);
-	if (tr.fraction != 1.0)
+	if (tr.fraction != 1.0F)
 	{
 		// fail!
 		//NDebugOverlay::Line( vecSpot1, vecApex, 255, 0, 0, true, 5.0 );
@@ -240,7 +240,7 @@ Vector VecCheckThrow ( CBaseEntity *pEdict, const Vector &vecSpot1, Vector vecSp
 	//NDebugOverlay::Line( vecSpot1, vecApex, 0, 255, 0, true, 5.0 );
 
 	UTIL_TraceLine(vecSpot2, vecApex, MASK_SOLID_BRUSHONLY, pEdict, COLLISION_GROUP_NONE, &tr);
-	if (tr.fraction != 1.0)
+	if (tr.fraction != 1.0F)
 	{
 		// fail!
 		//NDebugOverlay::Line( vecApex, vecSpot2, 255, 0, 0, true, 5.0 );
@@ -253,7 +253,7 @@ Vector VecCheckThrow ( CBaseEntity *pEdict, const Vector &vecSpot1, Vector vecSp
 	{
 		// Check to ensure the entity's hull can travel the first half of the grenade throw
 		UTIL_TraceHull( vecSpot1, vecApex, *vecMins, *vecMaxs, MASK_SOLID, pEdict, COLLISION_GROUP_NONE, &tr);		
-		if ( tr.fraction < 1.0 )
+		if ( tr.fraction < 1.0F )
 		{
 			//NDebugOverlay::SweptBox( vecSpot1, tr.endpos, *vecMins, *vecMaxs, vec3_angle, 255, 0, 0, 64, 5.0 );
 			return vec3_origin;

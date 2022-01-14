@@ -214,7 +214,7 @@ float CAI_BlendedMotor::GetMoveScriptDist( float &flNewSpeed )
 			flNewSpeed = m_scriptMove[i].flMaxVelocity * (1 - a) + m_scriptMove[i+1].flMaxVelocity * a;
 			
 			// get distance traveled over this entry
-			flTotalDist += (m_scriptMove[i].flMaxVelocity + flNewSpeed) * 0.5 * t; 
+			flTotalDist += (m_scriptMove[i].flMaxVelocity + flNewSpeed) * 0.5F * t; 
 			break;
 		}
 		else
