@@ -580,28 +580,21 @@ inline float UTIL_DistApprox2D( const Vector &vec1, const Vector &vec2 );
 //---------------------------------------------------------
 inline float UTIL_DistApprox( const Vector &vec1, const Vector &vec2 )
 {
-	float dx;
-	float dy;
-	float dz;
+	float dx = vec1.x - vec2.x;
+	float dy = vec1.y - vec2.y;
+	float dz = vec1.z - vec2.z;
 
-	dx = vec1.x - vec2.x;
-	dy = vec1.y - vec2.y;
-	dz = vec1.z - vec2.z;
-
-	return fabs(dx) + fabs(dy) + fabs(dz);
+	return fabsf(dx) + fabsf(dy) + fabsf(dz);
 }
 
 //---------------------------------------------------------
 //---------------------------------------------------------
 inline float UTIL_DistApprox2D( const Vector &vec1, const Vector &vec2 )
 {
-	float dx;
-	float dy;
+	float dx = vec1.x - vec2.x;
+	float dy = vec1.y - vec2.y;
 
-	dx = vec1.x - vec2.x;
-	dy = vec1.y - vec2.y;
-
-	return fabs(dx) + fabs(dy);
+	return fabsf(dx) + fabsf(dy);
 }
 
 // Find out if an entity is facing another entity or position within a given tolerance range

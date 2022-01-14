@@ -78,7 +78,7 @@ protected:
 class CSimTimer : public CSimpleSimTimer
 {
 public:
-	CSimTimer( float interval = 0.0, bool startExpired = true )	
+	CSimTimer( float interval = 0.0F, bool startExpired = true )	
 	{ 
 		Set( interval, startExpired );
 	}
@@ -86,12 +86,12 @@ public:
 	void Set( float interval, bool startExpired = true )
 	{ 
 		m_interval = interval;
-		m_next = (startExpired) ? -1.0 : gpGlobals->curtime + m_interval;
+		m_next = (startExpired) ? -1.0F : gpGlobals->curtime + m_interval;
 	}
 
-	void Reset( float interval = -1.0 )
+	void Reset( float interval = -1.0F )
 	{
-		if ( interval == -1.0 )
+		if ( interval == -1.0F )
 		{
 			m_next = gpGlobals->curtime + m_interval;
 		}
