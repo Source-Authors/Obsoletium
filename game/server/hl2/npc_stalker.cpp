@@ -849,9 +849,9 @@ void CNPC_Stalker::CalcBeamPosition(void)
 		float m_fNoiseModY		= 5;
 		float m_fNoiseModZ		= 5;
 
-		m_vLaserDir.x += 5*noiseScale*sin(m_fNoiseModX * gpGlobals->curtime + m_fNoiseModX);
-		m_vLaserDir.y += 5*noiseScale*sin(m_fNoiseModY * gpGlobals->curtime + m_fNoiseModY);
-		m_vLaserDir.z += 5*noiseScale*sin(m_fNoiseModZ * gpGlobals->curtime + m_fNoiseModZ);
+		m_vLaserDir.x += 5*noiseScale*sinf(m_fNoiseModX * gpGlobals->curtime + m_fNoiseModX);
+		m_vLaserDir.y += 5*noiseScale*sinf(m_fNoiseModY * gpGlobals->curtime + m_fNoiseModY);
+		m_vLaserDir.z += 5*noiseScale*sinf(m_fNoiseModZ * gpGlobals->curtime + m_fNoiseModZ);
 	}
 }
 

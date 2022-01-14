@@ -639,10 +639,10 @@ void CNPC_GroundTurret::Scan()
 
 	// Draw a sweeping beam
 	scanAngle = GetAbsAngles();
-	scanAngle.y += (GROUNDTURRET_VIEWCONE / 2.0f) * sin( gpGlobals->curtime * 3.0f );
+	scanAngle.y += (GROUNDTURRET_VIEWCONE / 2.0f) * sinf( gpGlobals->curtime * 3.0f );
 	
 	AngleVectors( scanAngle, &forward, NULL, NULL );
-	ProjectBeam( vecEye, forward, 1, 30, 0.3 );
+	ProjectBeam( vecEye, forward, 1, 30, 0.3F );
 }
 
 //-----------------------------------------------------------------------------

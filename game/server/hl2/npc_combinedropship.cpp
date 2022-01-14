@@ -497,7 +497,7 @@ void CCombineDropshipContainer::CreateCorpse()
 	CPASFilter filter( GetAbsOrigin() );
 	CollisionProp()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint);
 	te->Explosion( filter, 0.0f, &vecAbsPoint, g_sModelIndexFireball, 
-		random->RandomInt( 4, 10 ), random->RandomInt( 8, 15 ), TE_EXPLFLAG_NOPARTICLES, 100, 0 );
+		random->RandomFloat( 4, 10 ), random->RandomInt( 8, 15 ), TE_EXPLFLAG_NOPARTICLES, 100, 0 );
 
 	// Break into chunks
 	Vector angVelocity;

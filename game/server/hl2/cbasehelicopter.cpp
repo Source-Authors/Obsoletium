@@ -1481,9 +1481,9 @@ void CBaseHelicopter::InputSetAngles( inputdata_t &inputdata )
 void CBaseHelicopter::ApplySidewaysDrag( const Vector &vecRight )
 {
 	Vector vecNewVelocity = GetAbsVelocity();
-	vecNewVelocity.x *= 1.0 - fabs( vecRight.x ) * 0.05;
-	vecNewVelocity.y *= 1.0 - fabs( vecRight.y ) * 0.05;
-	vecNewVelocity.z *= 1.0 - fabs( vecRight.z ) * 0.05;
+	vecNewVelocity.x *= 1.0F - fabsf( vecRight.x ) * 0.05F;
+	vecNewVelocity.y *= 1.0F - fabsf( vecRight.y ) * 0.05F;
+	vecNewVelocity.z *= 1.0F - fabsf( vecRight.z ) * 0.05F;
 	SetAbsVelocity( vecNewVelocity );
 }
 

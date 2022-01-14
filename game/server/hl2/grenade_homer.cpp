@@ -622,9 +622,9 @@ void CGrenadeHomer::AimThink( void )
 	Vector vecImpulse( 0, 0, 0 );
 	if (m_flSpinMagnitude > 0)
 	{
-		vecImpulse.x += m_flSpinMagnitude*sin(m_flSpinSpeed * gpGlobals->curtime + m_flSpinOffset);
-		vecImpulse.y += m_flSpinMagnitude*cos(m_flSpinSpeed * gpGlobals->curtime + m_flSpinOffset);
-		vecImpulse.z -= m_flSpinMagnitude*cos(m_flSpinSpeed * gpGlobals->curtime + m_flSpinOffset);
+		vecImpulse.x += m_flSpinMagnitude*sinf(m_flSpinSpeed * gpGlobals->curtime + m_flSpinOffset);
+		vecImpulse.y += m_flSpinMagnitude*cosf(m_flSpinSpeed * gpGlobals->curtime + m_flSpinOffset);
+		vecImpulse.z -= m_flSpinMagnitude*cosf(m_flSpinSpeed * gpGlobals->curtime + m_flSpinOffset);
 	}
 
 	// Add in gravity

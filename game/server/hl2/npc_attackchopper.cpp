@@ -3838,12 +3838,12 @@ float CNPC_AttackHelicopter::UpdatePerpPathDistance( float flMaxPathOffset )
 		{
 			float flLeadTime = GetLeadingDistance() / flSpeedAlongPath;
 			flLeadTime = clamp( flLeadTime, 0.0f, 2.0f );
-			flNewPathOffset += 0.25 * flLeadTime * TargetSpeedAcrossPath();
+			flNewPathOffset += 0.25F * flLeadTime * TargetSpeedAcrossPath();
 		}
 
 		flSpeedAlongPath = clamp( flSpeedAlongPath, 100.0f, 500.0f );
 		float flSinHeight = SimpleSplineRemapVal( flSpeedAlongPath, 100.0f, 500.0f, 0.0f, 200.0f );
-		flNewPathOffset += flSinHeight * sin( 2.0f * M_PI * (gpGlobals->curtime / 6.0f) );
+		flNewPathOffset += flSinHeight * sinf( 2.0f * M_PI_F * (gpGlobals->curtime / 6.0f) );
 	}
 
 	if ( (flMaxPathOffset != 0.0f) && (flNewPathOffset > flMaxPathOffset) )

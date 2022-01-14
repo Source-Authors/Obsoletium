@@ -2404,15 +2404,15 @@ void CNPC_CombineGunship::ApplySidewaysDrag( const Vector &vecRight )
 	Vector vecVelocity = GetAbsVelocity();
 	if( m_lifeState == LIFE_ALIVE )
 	{
-		vecVelocity.x *= (1.0 - fabs( vecRight.x ) * 0.04);
-		vecVelocity.y *= (1.0 - fabs( vecRight.y ) * 0.04);
-		vecVelocity.z *= (1.0 - fabs( vecRight.z ) * 0.04);
+		vecVelocity.x *= (1.0F - fabsf( vecRight.x ) * 0.04F);
+		vecVelocity.y *= (1.0F - fabsf( vecRight.y ) * 0.04F);
+		vecVelocity.z *= (1.0F - fabsf( vecRight.z ) * 0.04F);
 	}
 	else
 	{
-		vecVelocity.x *= (1.0 - fabs( vecRight.x ) * 0.03);
-		vecVelocity.y *= (1.0 - fabs( vecRight.y ) * 0.03);
-		vecVelocity.z *= (1.0 - fabs( vecRight.z ) * 0.09);
+		vecVelocity.x *= (1.0F - fabsf( vecRight.x ) * 0.03F);
+		vecVelocity.y *= (1.0F - fabsf( vecRight.y ) * 0.03F);
+		vecVelocity.z *= (1.0F - fabsf( vecRight.z ) * 0.09F);
 	}
 	SetAbsVelocity( vecVelocity );
 }

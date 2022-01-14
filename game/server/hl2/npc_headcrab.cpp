@@ -555,12 +555,12 @@ void CBaseHeadcrab::JumpAttack( bool bRandomJump, const Vector &vecPos, bool bTh
 		height += additionalHeight;
 
 		// NOTE: This equation here is from vf^2 = vi^2 + 2*a*d
-		float speed = sqrt( 2 * gravity * height );
+		float speed = sqrtf( 2 * gravity * height );
 		float time = speed / gravity;
 
 		// add in the time it takes to fall the additional height
 		// So the impact takes place on the downward slope at the original height
-		time += sqrt( (2 * additionalHeight) / gravity );
+		time += sqrtf( (2 * additionalHeight) / gravity );
 
 		// Scale the sideways velocity to get there at the right time
 		VectorSubtract( vecPos, GetAbsOrigin(), vecJumpVel );

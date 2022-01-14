@@ -1715,7 +1715,7 @@ void CNPC_Strider::RunTask( const Task_t *pTask )
 			// This doesn't work right now. (sjb)
 			Vector vecVelocity = GetAbsVelocity();
 
-			vecVelocity.z -= (GetCurrentGravity() * 0.1);
+			vecVelocity.z -= (GetCurrentGravity() * 0.1F);
 
 			SetAbsVelocity( vecVelocity );
 
@@ -4905,8 +4905,8 @@ void CStriderMinigun::AimAtPoint( IStriderMinigunHost *pHost, const Vector &vecP
 	pdiff = UTIL_AngleDiff( localPointAngles.x, 0 );
 	ydiff = UTIL_AngleDiff( localPointAngles.y, 0 );
 
-	m_pitch.target += 0.5 * pdiff;
-	m_yaw.target -= 0.5 * ydiff;
+	m_pitch.target += 0.5F * pdiff;
+	m_yaw.target -= 0.5F * ydiff;
 
 	m_pitch.target = MAX( MINIGUN_MIN_PITCH, m_pitch.target );
 	m_pitch.target = MIN( MINIGUN_MAX_PITCH, m_pitch.target );

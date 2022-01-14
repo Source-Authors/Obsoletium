@@ -1670,11 +1670,11 @@ Vector CNPC_CScanner::SpotlightTargetPos(void)
 		VectorNormalize( m_vSpotlightTargetPos );
 		m_vSpotlightTargetPos   *= 5;
 
-		float noiseScale = 2.5;
+		float noiseScale = 2.5F;
 		const Vector &noiseMod = GetNoiseMod();
-		m_vSpotlightTargetPos.x += noiseScale*sin(noiseMod.x * gpGlobals->curtime + noiseMod.x);
-		m_vSpotlightTargetPos.y += noiseScale*cos(noiseMod.y* gpGlobals->curtime + noiseMod.y);
-		m_vSpotlightTargetPos.z -= fabs(noiseScale*cos(noiseMod.z* gpGlobals->curtime + noiseMod.z) );
+		m_vSpotlightTargetPos.x += noiseScale*sinf(noiseMod.x * gpGlobals->curtime + noiseMod.x);
+		m_vSpotlightTargetPos.y += noiseScale*cosf(noiseMod.y* gpGlobals->curtime + noiseMod.y);
+		m_vSpotlightTargetPos.z -= fabsf(noiseScale*cosf(noiseMod.z* gpGlobals->curtime + noiseMod.z) );
 		m_vSpotlightTargetPos   = GetLocalOrigin()+m_vSpotlightTargetPos * 2024;
 	}
 

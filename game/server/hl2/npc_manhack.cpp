@@ -300,9 +300,9 @@ void CNPC_Manhack::PrescheduleThink( void )
 		if( IsAlive() )
 		{
 			// If I've been out of water for 2 seconds or more, I'm eligible to be stuck in water again.
-			if( gpGlobals->curtime - m_flWaterSuspendTime > 2.0 )
+			if( gpGlobals->curtime - m_flWaterSuspendTime > 2.0F )
 			{
-				m_flWaterSuspendTime = gpGlobals->curtime + 1.0;
+				m_flWaterSuspendTime = gpGlobals->curtime + 1.0F;
 			}
 		}
 	}
@@ -435,7 +435,7 @@ void CNPC_Manhack::HitPhysicsObject( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 // Take damage from being thrown by a physcannon 
 //-----------------------------------------------------------------------------
-#define MANHACK_SMASH_SPEED 500.0	// How fast a manhack must slam into something to take full damage
+#define MANHACK_SMASH_SPEED 500.0F	// How fast a manhack must slam into something to take full damage
 void CNPC_Manhack::TakeDamageFromPhyscannon( CBasePlayer *pPlayer )
 {
 	CTakeDamageInfo info;
@@ -530,7 +530,7 @@ void CNPC_Manhack::TakeDamageFromPhysicsImpact( int index, gamevcollisionevent_t
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#define MANHACK_SMASH_TIME	0.35		// How long after being thrown from a physcannon that a manhack is eligible to die from impact
+#define MANHACK_SMASH_TIME	0.35F		// How long after being thrown from a physcannon that a manhack is eligible to die from impact
 void CNPC_Manhack::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
 	BaseClass::VPhysicsCollision( index, pEvent );
@@ -903,7 +903,7 @@ void CNPC_Manhack::HandleAnimEvent( animevent_t *pEvent )
 		break;
 
 	case MANHACK_AE_DONE_UNPACKING:
-		m_flNextBurstTime = gpGlobals->curtime + 2.0;
+		m_flNextBurstTime = gpGlobals->curtime + 2.0F;
 		break;
 
 	case MANHACK_AE_OPEN_BLADE:
@@ -1253,7 +1253,7 @@ void CNPC_Manhack::MoveToTarget(float flInterval, const Vector &vMoveTarget)
 		if ( GetEnemy() != NULL )
 		{
 			Vector steerDir = ( GetEnemy()->EyePosition() - GetAbsOrigin() );
-			zDist = fabs( steerDir.z );
+			zDist = fabsf( steerDir.z );
 			VectorNormalize( steerDir );
 
 			float useTime = flInterval;
@@ -1576,7 +1576,7 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 	// norm of what we've hit
 	if (flInterval > 0)
 	{
-		float moveLen = ( (GetCurrentVelocity() * flInterval) * (1.0 - tr.fraction) ).Length();
+		float moveLen = ( (GetCurrentVelocity() * flInterval) * (1.0F - tr.fraction) ).Length();
 
 		Vector moveVec	= moveLen*tr.plane.normal/flInterval;
 
@@ -1811,11 +1811,11 @@ void CNPC_Manhack::PlayFlySound(void)
 			int iPitch1, iPitch2;
 			float flDistFactor;
 
-			flDistFactor = MIN( 1.0, 1 - flEnemyDist / MANHACK_PITCH_DIST1 ); 
+			flDistFactor = MIN( 1.0F, 1 - flEnemyDist / MANHACK_PITCH_DIST1 ); 
 			iPitch1 = MANHACK_MIN_PITCH1 + ( ( MANHACK_MAX_PITCH1 - MANHACK_MIN_PITCH1 ) * flDistFactor); 
 
 			// NOTE: MANHACK_PITCH_DIST2 must be < MANHACK_PITCH_DIST1
-			flDistFactor = MIN( 1.0, 1 - flEnemyDist / MANHACK_PITCH_DIST2 ); 
+			flDistFactor = MIN( 1.0F, 1 - flEnemyDist / MANHACK_PITCH_DIST2 ); 
 			iPitch2 = MANHACK_MIN_PITCH2 + ( ( MANHACK_MAX_PITCH2 - MANHACK_MIN_PITCH2 ) * flDistFactor); 
 
 			m_nEnginePitch1 = iPitch1;
@@ -2113,23 +2113,23 @@ void CNPC_Manhack::MoveExecute_Dead(float flInterval)
 	if (gpGlobals->curtime > m_fSmokeTime && GetWaterLevel() == 0)
 	{
 //		UTIL_Smoke(GetAbsOrigin(), random->RandomInt(10, 15), 10);
-		m_fSmokeTime = gpGlobals->curtime + random->RandomFloat( 0.1, 0.3);
+		m_fSmokeTime = gpGlobals->curtime + random->RandomFloat( 0.1F, 0.3F);
 	}
 
 	// Periodically emit sparks.
 	if (gpGlobals->curtime > m_fSparkTime)
 	{
 		g_pEffects->Sparks( GetAbsOrigin() );
-		m_fSparkTime = gpGlobals->curtime + random->RandomFloat(0.1, 0.3);
+		m_fSparkTime = gpGlobals->curtime + random->RandomFloat(0.1F, 0.3F);
 	}
 
 	Vector newVelocity = GetCurrentVelocity();
 
 	// accelerate faster and faster when dying
-	newVelocity = newVelocity + (newVelocity * 1.5 * flInterval );
+	newVelocity = newVelocity + (newVelocity * 1.5F * flInterval );
 
 	// Lose lift
-	newVelocity.z -= 0.02*flInterval*(GetCurrentGravity());
+	newVelocity.z -= 0.02F*flInterval*(GetCurrentGravity());
 
 	// ----------------------------------------------------------------------------------------
 	// Add in any forced velocity
@@ -2712,7 +2712,7 @@ void CNPC_Manhack::StartTask( const Task_t *pTask )
 			}
 
 			Assert( count != 0 );
-			m_vSavePosition = m_vSavePosition * (1.0 / count);
+			m_vSavePosition = m_vSavePosition * (1.0F / count);
 
 			TaskComplete();
 		}
@@ -2762,7 +2762,7 @@ void CNPC_Manhack::StartTask( const Task_t *pTask )
 			}
 			else
 			{
-				m_fSwarmMoveTime = gpGlobals->curtime + RandomFloat( pTask->flTaskData * 0.8, pTask->flTaskData * 1.2 );
+				m_fSwarmMoveTime = gpGlobals->curtime + RandomFloat( pTask->flTaskData * 0.8F, pTask->flTaskData * 1.2F );
 			}
 		}
 		break;
@@ -2802,7 +2802,7 @@ bool CNPC_Manhack::HandleInteraction(int interactionType, void* data, CBaseComba
 		m_vForceMoveTarget.x = ((Vector *)data)->x;
 		m_vForceMoveTarget.y = ((Vector *)data)->y;
 		m_vForceMoveTarget.z = ((Vector *)data)->z;
-		m_fForceMoveTime   = gpGlobals->curtime + 2.0;
+		m_fForceMoveTime   = gpGlobals->curtime + 2.0F;
 		return false;
 	}
 
@@ -2837,7 +2837,7 @@ float CNPC_Manhack::ManhackMaxSpeed( void )
 //-----------------------------------------------------------------------------
 void CNPC_Manhack::ClampMotorForces( Vector &linear, AngularImpulse &angular )
 {
-	float scale = m_flBladeSpeed / 100.0;
+	float scale = m_flBladeSpeed / 100.0F;
 
 	// Msg("%.0f %.0f %.0f\n", linear.x, linear.y, linear.z );
 
@@ -3148,8 +3148,8 @@ void CNPC_Manhack::StartBurst( const Vector &vecDirection )
 	ShowHostile();
 
 	// Don't burst attack again for a couple seconds
-	m_flNextBurstTime = gpGlobals->curtime + 2.0;
-	m_flBurstDuration = gpGlobals->curtime + 1.0;
+	m_flNextBurstTime = gpGlobals->curtime + 2.0F;
+	m_flBurstDuration = gpGlobals->curtime + 1.0F;
 	
 	// Save off where we were going towards and for how long
 	m_vecBurstDirection = vecDirection;

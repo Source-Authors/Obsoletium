@@ -818,9 +818,9 @@ void CProtoSniper::PaintTarget( const Vector &vecTarget, float flPaintTime )
 	}
 
 	// mult by P
-	vecCurrentDir.x += flNoiseScale * ( sin( 3 * M_PI * gpGlobals->curtime ) * 0.0006 );
-	vecCurrentDir.y += flNoiseScale * ( sin( 2 * M_PI * gpGlobals->curtime + 0.5 * M_PI ) * 0.0006 );
-	vecCurrentDir.z += flNoiseScale * ( sin( 1.5 * M_PI * gpGlobals->curtime + M_PI ) * 0.0006 );
+	vecCurrentDir.x += flNoiseScale * ( sinf( 3 * M_PI_F * gpGlobals->curtime ) * 0.0006F );
+	vecCurrentDir.y += flNoiseScale * ( sinf( 2 * M_PI_F * gpGlobals->curtime + 0.5F * M_PI_F ) * 0.0006F );
+	vecCurrentDir.z += flNoiseScale * ( sinf( 1.5F * M_PI_F * gpGlobals->curtime + M_PI_F ) * 0.0006F );
 #endif
 
 	trace_t tr;

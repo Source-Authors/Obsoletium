@@ -933,23 +933,23 @@ Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vect
 
 	// throw at a constant time
 	float time = vecGrenadeVel.Length( ) / flSpeed;
-	vecGrenadeVel = vecGrenadeVel * (1.0 / time);
+	vecGrenadeVel = vecGrenadeVel * (1.0F / time);
 
 	// adjust upward toss to compensate for gravity loss
-	vecGrenadeVel.z += flGravity * time * 0.5;
+	vecGrenadeVel.z += flGravity * time * 0.5F;
 
-	Vector vecApex = vecSpot1 + (vecSpot2 - vecSpot1) * 0.5;
-	vecApex.z += 0.5 * flGravity * (time * 0.5) * (time * 0.5);
+	Vector vecApex = vecSpot1 + (vecSpot2 - vecSpot1) * 0.5F;
+	vecApex.z += 0.5F * flGravity * (time * 0.5F) * (time * 0.5F);
 
 
 	trace_t tr;
 	UTIL_TraceLine( vecSpot1, vecApex, MASK_SOLID, pEdict, COLLISION_GROUP_NONE, &tr );
-	if (tr.fraction != 1.0)
+	if (tr.fraction != 1.0F)
 	{
 		// fail!
 		if ( g_debug_antlion_worker.GetBool() )
 		{
-			NDebugOverlay::Line( vecSpot1, vecApex, 255, 0, 0, true, 5.0 );
+			NDebugOverlay::Line( vecSpot1, vecApex, 255, 0, 0, true, 5.0F );
 		}
 
 		return vec3_origin;
@@ -957,11 +957,11 @@ Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vect
 
 	if ( g_debug_antlion_worker.GetBool() )
 	{
-		NDebugOverlay::Line( vecSpot1, vecApex, 0, 255, 0, true, 5.0 );
+		NDebugOverlay::Line( vecSpot1, vecApex, 0, 255, 0, true, 5.0F );
 	}
 
 	UTIL_TraceLine( vecApex, vecSpot2, MASK_SOLID_BRUSHONLY, pEdict, COLLISION_GROUP_NONE, &tr );
-	if ( tr.fraction != 1.0 )
+	if ( tr.fraction != 1.0F )
 	{
 		bool bFail = true;
 
@@ -973,7 +973,7 @@ Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vect
 			{
 				if ( g_debug_antlion_worker.GetBool() )
 				{
-					NDebugOverlay::Sphere( tr.endpos, vec3_angle, flTolerance, 0, 255, 0, 0, true, 5.0 );
+					NDebugOverlay::Sphere( tr.endpos, vec3_angle, flTolerance, 0, 255, 0, 0, true, 5.0F );
 				}
 
 				bFail = false;
@@ -984,8 +984,8 @@ Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vect
 		{
 			if ( g_debug_antlion_worker.GetBool() )
 			{
-				NDebugOverlay::Line( vecApex, vecSpot2, 255, 0, 0, true, 5.0 );
-				NDebugOverlay::Sphere( tr.endpos, vec3_angle, flTolerance, 255, 0, 0, 0, true, 5.0 );
+				NDebugOverlay::Line( vecApex, vecSpot2, 255, 0, 0, true, 5.0F );
+				NDebugOverlay::Sphere( tr.endpos, vec3_angle, flTolerance, 255, 0, 0, 0, true, 5.0F );
 			}
 			return vec3_origin;
 		}
@@ -993,7 +993,7 @@ Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vect
 
 	if ( g_debug_antlion_worker.GetBool() )
 	{
-		NDebugOverlay::Line( vecApex, vecSpot2, 0, 255, 0, true, 5.0 );
+		NDebugOverlay::Line( vecApex, vecSpot2, 0, 255, 0, true, 5.0F );
 	}
 
 	return vecGrenadeVel;
@@ -3322,7 +3322,7 @@ bool CNPC_Antlion::CheckLanding( void )
 
 	//Roughly looks one second into the future
 	testPos = GetAbsOrigin() + ( GetAbsVelocity() * timeStep );
-	testPos[2] -= ( 0.5 * GetCurrentGravity() * GetGravity() * timeStep * timeStep);
+	testPos[2] -= ( 0.5F * GetCurrentGravity() * GetGravity() * timeStep * timeStep);
 
 	if ( g_debug_antlion.GetInt() == 2 )
 	{
