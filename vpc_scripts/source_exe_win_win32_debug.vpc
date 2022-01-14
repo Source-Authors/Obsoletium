@@ -17,14 +17,15 @@ $MacroRequiredAllowEmpty	"INTERMEDIATESUBDIR"
 $MacroRequiredAllowEmpty	"_UNITYSUBDIR"
 $MacroRequiredAllowEmpty	"_STATICSUBDIR"
 $Macro						"_SUBDIRSUFFIX"		"$INTERMEDIATESUBDIR$_STATICSUBDIR$GAMENAME$PLATSUBDIR$_UNITYSUBDIR"
+$Macro OUTBUILDDIR	"$SRCDIR\..\out"
 
 $Configuration "Debug"
 {
 	$General	
 	{
 		// General
-		$OutputDirectory					".\Debug$_SUBDIRSUFFIX"
-		$IntermediateDirectory				".\Debug$_SUBDIRSUFFIX"
+		$OutputDirectory					"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME"
+		$IntermediateDirectory				"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\\$PROJECTNAME\i"
 		$ExtensionsToDeleteOnClean
 		$BuildLogFile
 		$InheritedProjectPropertySheets

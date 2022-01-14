@@ -68,7 +68,7 @@ $Configuration
 		$CommandLine		"copy $QUOTE$(TargetDir)$QUOTE$(TargetFileName) $OUTBINDIR\$(TargetFileName) >nul" "\n" \
 							"if ERRORLEVEL 1 goto BuildEventFailed" "\n" \
 							"if exist $QUOTE$(TargetDir)$QUOTE$(TargetName).map copy $QUOTE$(TargetDir)$QUOTE$(TargetName).map $OUTBINDIR\$(TargetName).map >nul" "\n"
-		$CommandLine		"$BASE"	"copy $QUOTE$(TargetDir)$QUOTE$(TargetName).pdb $OUTBINDIR\$(TargetName).pdb >nul" "\n" \
+		$CommandLine		"$BASE"	"copy $QUOTE$(IntDir)$QUOTE$(TargetName).pdb $OUTBINDIR\$(TargetName).pdb >nul" "\n" \
 							"if ERRORLEVEL 1 goto BuildEventFailed" "\n" \
 							"goto BuildEventOK" "\n" \
 							":BuildEventFailed" "\n" \

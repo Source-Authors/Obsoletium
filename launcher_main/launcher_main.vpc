@@ -72,7 +72,7 @@ $Configuration
 		// override with specific behavior
 		$CommandLine				"COPY $(TargetPath) $OUTBINDIR\hl2.exe" "\n"					\
 									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"COPY $(TargetDir)\default.pdb $OUTBINDIR\default.pdb" "\n"					\
+									"COPY $(IntDir)\default.pdb $OUTBINDIR\default.pdb" "\n"					\
 									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
 									"IF EXIST $(TargetDir)$(TargetName).map COPY $(TargetDir)$(TargetName).map $OUTBINDIR\hl2.map" "\n" \
 									"$OUTBINDIR\bin\newdat $OUTBINDIR\hl2.exe" "\n"					\

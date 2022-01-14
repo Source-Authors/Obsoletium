@@ -6,6 +6,13 @@
 
 $macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro OUTBUILDDIR	"$SRCDIR\..\out"
+
+$MacroRequired				"PLATSUBDIR"
+$MacroRequiredAllowEmpty	"GAMENAME"
+$MacroRequiredAllowEmpty	"INTERMEDIATESUBDIR"
+$MacroRequiredAllowEmpty	"_UNITYSUBDIR"
+$Macro						"_SUBDIRSUFFIX"		"$INTERMEDIATESUBDIR$GAMENAME$PLATSUBDIR$_UNITYSUBDIR"
 
 $include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -13,8 +20,8 @@ $Configuration	"Debug"
 {
 	$General
 	{
-		$OutputDirectory		"Debug_dbg" [$WINDOWS]
-		$IntermediateDirectory	"Debug_dbg" [$WINDOWS]
+		$OutputDirectory		"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
+		$IntermediateDirectory	"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
 
 		$OutputDirectory		"Debug_dbg_360"		[$X360]
 		$IntermediateDirectory	"Debug_dbg_360"		[$X360]
@@ -25,8 +32,8 @@ $Configuration	"Release"
 {
 	$General
 	{
-		$OutputDirectory		"Release_dbg" [$WINDOWS]
-		$IntermediateDirectory	"Release_dbg" [$WINDOWS]
+		$OutputDirectory		"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
+		$IntermediateDirectory	"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
 
 		$OutputDirectory		"Release_dbg_360"	[$X360]
 		$IntermediateDirectory	"Release_dbg_360"	[$X360]

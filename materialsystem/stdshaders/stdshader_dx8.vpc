@@ -6,6 +6,13 @@
 
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro OUTBUILDDIR	"$SRCDIR\..\out"
+
+$MacroRequired				"PLATSUBDIR"
+$MacroRequiredAllowEmpty	"GAMENAME"
+$MacroRequiredAllowEmpty	"INTERMEDIATESUBDIR"
+$MacroRequiredAllowEmpty	"_UNITYSUBDIR"
+$Macro						"_SUBDIRSUFFIX"		"$INTERMEDIATESUBDIR$GAMENAME$PLATSUBDIR$_UNITYSUBDIR"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -13,8 +20,8 @@ $Configuration	"Debug"
 {
 	$General
 	{
-		$OutputDirectory		"Debug_dx8"	
-		$IntermediateDirectory	"Debug_dx8"
+		$OutputDirectory		"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME"	
+		$IntermediateDirectory	"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i"
 	}
 }
 
@@ -22,8 +29,8 @@ $Configuration	"Release"
 {
 	$General
 	{
-		$OutputDirectory		"Release_dx8"
-		$IntermediateDirectory	"Release_dx8"
+		$OutputDirectory		"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME"
+		$IntermediateDirectory	"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME\i"
 	}
 }
 

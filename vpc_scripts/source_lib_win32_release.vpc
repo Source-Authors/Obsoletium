@@ -21,6 +21,7 @@ $MacroRequiredAllowEmpty	"INTERMEDIATESUBDIR"
 $MacroRequiredAllowEmpty	"_UNITYSUBDIR"
 $MacroRequiredAllowEmpty	"_STATICSUBDIR"
 $Macro						"_SUBDIRSUFFIX"		"$INTERMEDIATESUBDIR$_STATICSUBDIR$GAMENAME$PLATSUBDIR$_UNITYSUBDIR"
+$Macro OUTBUILDDIR	"$SRCDIR\..\out"
 
 $Configuration "Release"
 {
@@ -28,9 +29,9 @@ $Configuration "Release"
 	{
 		// General
 		$OutputDirectory					"$OUTLIBDIR"
-		$IntermediateDirectory				".\Release$_SUBDIRSUFFIX"		[!$RETAIL && !$PROFILE]
-		$IntermediateDirectory				".\Retail$_SUBDIRSUFFIX"		[$RETAIL]
-		$IntermediateDirectory				".\Profile$_SUBDIRSUFFIX"		[!$RETAIL && $PROFILE]
+		$IntermediateDirectory				"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME\i"		[!$RETAIL && !$PROFILE]
+		$IntermediateDirectory				"$OUTBUILDDIR\retail\$_SUBDIRSUFFIX\$PROJECTNAME\i"		[$RETAIL]
+		$IntermediateDirectory				"$OUTBUILDDIR\profile\$_SUBDIRSUFFIX\$PROJECTNAME\i"		[!$RETAIL && $PROFILE]
 		$ExtensionsToDeleteOnClean
 		$BuildLogFile
 		$InheritedProjectPropertySheets

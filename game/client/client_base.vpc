@@ -13,6 +13,13 @@ $Macro GENERATED_PROTO_DIR	"$SRCDIR\game\client\generated_proto_$GAMENAME"
 
 $MacroRequired "GAMENAME"
 
+$Macro OUTBUILDDIR	"$SRCDIR\..\out"
+$MacroRequired				"PLATSUBDIR"
+$MacroRequiredAllowEmpty	"GAMENAME"
+$MacroRequiredAllowEmpty	"INTERMEDIATESUBDIR"
+$MacroRequiredAllowEmpty	"_UNITYSUBDIR"
+$Macro						"_SUBDIRSUFFIX"		"$INTERMEDIATESUBDIR$GAMENAME$PLATSUBDIR$_UNITYSUBDIR"
+
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 $include "$SRCDIR\vpc_scripts\protobuf_builder.vpc"
 $Include "$SRCDIR\vpc_scripts\source_replay.vpc"	[$TF]
@@ -22,8 +29,8 @@ $Configuration	"Debug"
 {
 	$General
 	{
-		$OutputDirectory			".\Debug_$GAMENAME" [$WINDOWS]
-		$IntermediateDirectory		".\Debug_$GAMENAME" [$WINDOWS]
+		$OutputDirectory			"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
+		$IntermediateDirectory		"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
 
 		$OutputDirectory			".\Debug_$GAMENAME_360"		[$X360]
 		$IntermediateDirectory		".\Debug_$GAMENAME_360"		[$X360]
@@ -35,8 +42,8 @@ $Configuration	"Release"
 	$General
 	{
 		// Windows generator doesn't sandbox these directories per configuration but others do :-/
-		$OutputDirectory			".\Release_$GAMENAME" [$WINDOWS]
-		$IntermediateDirectory		".\Release_$GAMENAME" [$WINDOWS]
+		$OutputDirectory			"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
+		$IntermediateDirectory		"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
 
 		$OutputDirectory			".\Release_$GAMENAME_360"	[$X360]
 		$IntermediateDirectory		".\Release_$GAMENAME_360"	[$X360]
@@ -45,11 +52,12 @@ $Configuration	"Release"
 
 $Configuration
 {
-	$General
-	{
-		$OutputDirectory			".\$GAMENAME"
-		$IntermediateDirectory		".\$GAMENAME"
-	}
+	// dimhotepus: Commented as somehow override above.
+	//$General
+	//{
+	//	$OutputDirectory			".\$GAMENAME"
+	//	$IntermediateDirectory		".\$GAMENAME\i"
+	//}
 
 	$Compiler
 	{
