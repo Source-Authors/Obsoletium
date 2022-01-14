@@ -2824,7 +2824,6 @@ bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
 			if ( pszBase && pszBase[0] )
 			{
 				UTIL_StringToVector( vecAngles.Base(), pszBase );
-				modelKeyValues->deleteThis();
 				return true;
 			}
 		}
