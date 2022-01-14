@@ -1170,8 +1170,7 @@ void CInputSystem::SetCursorPosition( int x, int y )
 		return;
 
 #if defined( PLATFORM_WINDOWS )
-	POINT pt;
-	pt.x = x; pt.y = y;
+	POINT pt{ x, y };
 	ClientToScreen( (HWND)m_hAttachedHWnd, &pt );
 	SetCursorPos( pt.x, pt.y );
 #elif defined( USE_SDL )
@@ -1189,15 +1188,15 @@ void CInputSystem::SetCursorPosition( int x, int y )
 
 	if ( bXChanged )
 	{
-		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_X, state.m_pAnalogValue[ MOUSE_X ], state.m_pAnalogDelta[ MOUSE_X ] );
+		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_X, x, 0 );
 	}
 	if ( bYChanged )
 	{
-		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_Y, state.m_pAnalogValue[ MOUSE_Y ], state.m_pAnalogDelta[ MOUSE_Y ] );
+		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_Y, y, 0 );
 	}
 	if ( bXChanged || bYChanged )
 	{
-		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_XY, state.m_pAnalogValue[ MOUSE_X ], state.m_pAnalogValue[ MOUSE_Y ] );
+		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_XY, x, y );
 	}
 }
 
@@ -1209,20 +1208,24 @@ void CInputSystem::UpdateMousePositionState( InputState_t &state, short x, short
 
 	state.m_pAnalogValue[ MOUSE_X ] = x;
 	state.m_pAnalogValue[ MOUSE_Y ] = y;
-	state.m_pAnalogDelta[ MOUSE_X ] = state.m_pAnalogValue[ MOUSE_X ] - nOldX;
-	state.m_pAnalogDelta[ MOUSE_Y ] = state.m_pAnalogValue[ MOUSE_Y ] - nOldY;
 
-	if ( state.m_pAnalogDelta[ MOUSE_X ] != 0 )
+	int nDeltaX = x - nOldX;
+	int nDeltaY = y - nOldY;
+
+	state.m_pAnalogDelta[ MOUSE_X ] = nDeltaX;
+	state.m_pAnalogDelta[ MOUSE_Y ] = nDeltaY;
+
+	if ( nDeltaX != 0 )
 	{
-		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_X, state.m_pAnalogValue[ MOUSE_X ], state.m_pAnalogDelta[ MOUSE_X ] );
+		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_X, x, nDeltaX );
 	}
-	if ( state.m_pAnalogDelta[ MOUSE_Y ] != 0 )
+	if ( nDeltaY != 0 )
 	{
-		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_Y, state.m_pAnalogValue[ MOUSE_Y ], state.m_pAnalogDelta[ MOUSE_Y ] );
+		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_Y, y, nDeltaY );
 	}
-	if ( state.m_pAnalogDelta[ MOUSE_X ] != 0 || state.m_pAnalogDelta[ MOUSE_Y ] != 0 )
+	if ( nDeltaX != 0 || nDeltaY != 0 )
 	{
-		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_XY, state.m_pAnalogValue[ MOUSE_X ], state.m_pAnalogValue[ MOUSE_Y ] );
+		PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, MOUSE_XY, x, y );
 	}
 }
 
