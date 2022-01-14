@@ -147,7 +147,6 @@ $Project "shaderapidx10"
 		$DynamicFile	"$SRCDIR\lib\public\tier2.lib"
 		$DynamicFile	"$SRCDIR\lib\public\bitmap.lib"
 		$DynamicFile	"$SRCDIR\lib\public\mathlib.lib"
-		$DynamicFile	"$SRCDIR\lib\common\vc7\bzip2.lib"
 		
 		$File	"$SRCDIR\dx10sdk\lib\x86\d3d9.lib" 
 		$File	"$SRCDIR\dx10sdk\lib\x86\d3d10.lib" 

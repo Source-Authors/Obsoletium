@@ -1092,7 +1092,7 @@ $Project "engine"
 
 		$ImpLib	"$LIBCOMMON\curl"	  [$OSXALL]
 		
-		$Libexternal	"$LIBCOMMON/bzip2"
+		$Libexternal	"$LIBCOMMON/libbz2"
 		$Libexternal	"$LIBCOMMON/jpeg-static" [!$DEDICATED]
 		$Libexternal	"$LIBCOMMON/SDL2" [$SDL]
 		$Libexternal	"$LIBCOMMON/zlibstatic"

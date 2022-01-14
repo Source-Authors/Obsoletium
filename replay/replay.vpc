@@ -191,7 +191,7 @@ $Project "replay"
 		$Lib	mathlib
 		$Lib	bitmap
 		$Lib	vtf
-		$Lib	"$LIBCOMMON/bzip2"
+		$Lib	"$LIBCOMMON/libbz2"
 		$Lib	"$LIBCOMMON/lzma"
 		$Lib	"$LIBCOMMON/replay_common"
 		$Lib	"$LIBCOMMON/libcurl" [$WIN32&&!$VS2015]

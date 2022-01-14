@@ -8,7 +8,7 @@
 #include "convar.h"
 #include "filesystem.h"
 #include "fmtstr.h"
-#include "../utils/bzip2/bzlib.h"
+#include "bzip2/bzlib.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

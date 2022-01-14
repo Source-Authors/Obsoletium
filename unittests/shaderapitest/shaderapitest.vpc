@@ -20,6 +20,6 @@ $Project "ShaderAPITest"
 	{
 		$Lib appframework
 		$Lib tier2
-		$Lib $LIBCOMMON\bzip2
+		$Lib $LIBCOMMON\libbz2
 	}
 }

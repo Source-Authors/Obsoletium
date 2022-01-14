@@ -119,7 +119,7 @@ $Project "shaderapidx9"
 		$Lib	bitmap
 		$Lib	mathlib
 		$Lib	tier2
-		$Lib	"$LIBCOMMON/bzip2"
+		$Lib	"$LIBCOMMON/libbz2"
 		$ImpLib togl [!$IS_LIB_PROJECT && $GL]
   }
 }

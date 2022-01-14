@@ -73,10 +73,11 @@ $Project "bugreporter_filequeue"
 	"utils\bugreporter_filequeue\bugreporter_filequeue.vpc" [$WINDOWS||$POSIX]
 }
 
-$Project "bzip2"
-{
-	"utils\bzip2\bzip2.vpc" [$WINDOWS||$POSIX]
-}
+// dimhotepus: Thirdparty.
+//$Project "bzip2"
+//{
+//	"utils\bzip2\bzip2.vpc" [$WINDOWS||$POSIX]
+//}
 
 $Project "captioncompiler"
 {

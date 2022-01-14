@@ -2,7 +2,7 @@
 //
 //=======================================================================================//
 
-#include "../utils/bzip2/bzlib.h"
+#include "bzip2/bzlib.h"
 #include "sv_filepublish.h"
 #include "utlstring.h"
 #include "strtools.h"

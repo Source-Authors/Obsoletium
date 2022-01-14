@@ -84,7 +84,7 @@ typedef int SOCKET;
 // It currently includes windows.h and we don't want that.
 #ifdef USE_ACTUAL_DX
 
-#include "../utils/bzip2/bzlib.h"
+#include "bzip2/bzlib.h"
 
 #else
 

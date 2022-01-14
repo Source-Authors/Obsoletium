@@ -5004,9 +5004,5 @@ SOURCE=..\lib\common\vc6\cryptlib.lib
 
 SOURCE=..\lib\common\vc6\FindSteamServers.lib
 # End Source File
-# Begin Source File
-
-SOURCE=..\lib\common\vc6\bzip2.lib
-# End Source File
 # End Target
 # End Project
