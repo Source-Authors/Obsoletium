@@ -447,8 +447,6 @@ public:
 
 	// For the 'SleepUntilInput' feature
 	HANDLE m_hEvent;
-
-	CSysModule   *m_pXInputDLL;
 	
 #if defined( WIN32 ) && !defined ( _X360 )
 	// NVNT falcon module

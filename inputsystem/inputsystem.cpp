@@ -86,8 +86,6 @@ CInputSystem::CInputSystem()
 
 	m_hEvent = nullptr;
 
-	m_pXInputDLL = nullptr;
-
 #if defined ( _WIN32 ) && !defined ( _X360 )
 	// NVNT DLL
 	m_pNovintDLL = nullptr;
@@ -101,12 +99,6 @@ CInputSystem::CInputSystem()
 
 CInputSystem::~CInputSystem()
 {
-	if ( m_pXInputDLL )
-	{
-		Sys_UnloadModule( m_pXInputDLL );
-		m_pXInputDLL = NULL;
-	}
-
 #if defined ( _WIN32 ) && !defined ( _X360 )
 	// NVNT DLL unload
 	if ( m_pNovintDLL )
