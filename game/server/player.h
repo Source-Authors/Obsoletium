@@ -969,7 +969,7 @@ protected:
 	int						m_nPoisonDmg;			// track recoverable poison damage taken
 	int						m_nPoisonRestored;		// track poison damage restored
 	// NOTE: bits damage type appears to only be used for time-based damage
-	BYTE					m_rgbTimeBasedDamage[CDMG_TIMEBASED];
+	byte					m_rgbTimeBasedDamage[CDMG_TIMEBASED];
 
 	// Player Physics Shadow
 	int						m_vphysicsCollisionState;

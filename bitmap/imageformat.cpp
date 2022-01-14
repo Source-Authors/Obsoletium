@@ -8,11 +8,10 @@
 #include "winlite.h"
 #include <d3d9types.h>
 #endif
+
 #include "bitmap/imageformat.h"
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
-#include <malloc.h>
-#include <memory.h>
 // dimhotepus: Exclude nvtc as proprietary.
 #ifndef NO_NVTC
 #include "nvtc.h"
@@ -292,8 +291,8 @@ int GetNumMipMapLevels( int width, int height, int depth )
 #ifdef DX_TO_GL_ABSTRACTION
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
-	((DWORD)(BYTE)(ch0) | ((DWORD)(BYTE)(ch1) << 8) |   \
-	((DWORD)(BYTE)(ch2) << 16) | ((DWORD)(BYTE)(ch3) << 24 ))
+	((DWORD)(byte)(ch0) | ((DWORD)(byte)(ch1) << 8) |   \
+	((DWORD)(byte)(ch2) << 16) | ((DWORD)(byte)(ch3) << 24 ))
 #endif //defined(MAKEFOURCC)
 #endif	
 //-----------------------------------------------------------------------------

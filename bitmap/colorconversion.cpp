@@ -5,10 +5,8 @@
 //=============================================================================//
 
 #include "bitmap/imageformat.h"
-#include "basetypes.h"
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
-#include <malloc.h>
-#include <memory.h>
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 #include "tier1/utlmemory.h"
@@ -17,9 +15,6 @@
 // dimhotepus: Exclude nvtc as proprietary.
 #ifndef NO_NVTC
 #include "nvtc.h"
-#else
-using DWORD = unsigned int;
-using WORD = unsigned short;
 #endif
 
 #ifdef POSIX
@@ -249,31 +244,31 @@ static RGBA8888ToUserFormatFunc_t GetRGBA8888ToUserFormatFunc_t( ImageFormat dst
 
 struct DXTColBlock
 {
-  WORD col0;
-  WORD col1;
+  word col0;
+  word col1;
 
 	// no bit fields - use bytes
-	BYTE row[4];
+	byte row[4];
 };
 
 struct DXTAlphaBlock3BitLinear
 {
-	BYTE alpha0;
-	BYTE alpha1;
+	byte alpha0;
+	byte alpha1;
 
-	BYTE stuff[6];
+	byte stuff[6];
 };
 
 #pragma pack()
 
 static inline void GetColorBlockColorsBGRA8888( DXTColBlock *pBlock, BGRA8888_t *col_0, 
 											    BGRA8888_t *col_1, BGRA8888_t *col_2, 
-												BGRA8888_t *col_3, WORD & wrd  )
+												BGRA8888_t *col_3, word & wrd  )
 {
 	// input data is assumed to be x86 order
 	// swap to target platform for proper dxt decoding
-  WORD color0 = LittleShort( pBlock->col0 );
-	WORD color1 = LittleShort( pBlock->col1 );
+  word color0 = LittleShort( pBlock->col0 );
+	word color1 = LittleShort( pBlock->col1 );
 
 	// convert to full precision correctly.
 	// If this was a perf problem, we could optimize it. But this isn't used in any hotpaths 
@@ -295,26 +290,26 @@ static inline void GetColorBlockColorsBGRA8888( DXTColBlock *pBlock, BGRA8888_t 
 		// These two bit codes correspond to the 2-bit fields 
 		// stored in the 64-bit block.
 
-		wrd = ((WORD)col_0->r * 2 + (WORD)col_1->r )/3;
+		wrd = ((word)col_0->r * 2 + (word)col_1->r )/3;
 											// no +1 for rounding
 											// as bits have been shifted to 888
-		col_2->r = (BYTE)wrd;
+		col_2->r = (byte)wrd;
 
-		wrd = ((WORD)col_0->g * 2 + (WORD)col_1->g )/3;
-		col_2->g = (BYTE)wrd;
+		wrd = ((word)col_0->g * 2 + (word)col_1->g )/3;
+		col_2->g = (byte)wrd;
 
-		wrd = ((WORD)col_0->b * 2 + (WORD)col_1->b )/3;
-		col_2->b = (BYTE)wrd;
+		wrd = ((word)col_0->b * 2 + (word)col_1->b )/3;
+		col_2->b = (byte)wrd;
 		col_2->a = 0xff;
 
-		wrd = ((WORD)col_0->r + (WORD)col_1->r *2 )/3;
-		col_3->r = (BYTE)wrd;
+		wrd = ((word)col_0->r + (word)col_1->r *2 )/3;
+		col_3->r = (byte)wrd;
 
-		wrd = ((WORD)col_0->g + (WORD)col_1->g *2 )/3;
-		col_3->g = (BYTE)wrd;
+		wrd = ((word)col_0->g + (word)col_1->g *2 )/3;
+		col_3->g = (byte)wrd;
 
-		wrd = ((WORD)col_0->b + (WORD)col_1->b *2 )/3;
-		col_3->b = (BYTE)wrd;
+		wrd = ((word)col_0->b + (word)col_1->b *2 )/3;
+		col_3->b = (byte)wrd;
 		col_3->a = 0xff;
 	}
 	else
@@ -327,12 +322,12 @@ static inline void GetColorBlockColorsBGRA8888( DXTColBlock *pBlock, BGRA8888_t 
 
 		// explicit for each component, unlike some refrasts...????
 		
-		wrd = ((WORD)col_0->r + (WORD)col_1->r )/2;
-		col_2->r = (BYTE)wrd;
-		wrd = ((WORD)col_0->g + (WORD)col_1->g )/2;
-		col_2->g = (BYTE)wrd;
-		wrd = ((WORD)col_0->b + (WORD)col_1->b )/2;
-		col_2->b = (BYTE)wrd;
+		wrd = ((word)col_0->r + (word)col_1->r )/2;
+		col_2->r = (byte)wrd;
+		wrd = ((word)col_0->g + (word)col_1->g )/2;
+		col_2->g = (byte)wrd;
+		wrd = ((word)col_0->b + (word)col_1->b )/2;
+		col_2->b = (byte)wrd;
 		col_2->a = 0xff;
 
 		col_3->r = 0x00;		// random color to indicate alpha
@@ -348,15 +343,15 @@ static inline void DecodeColorBlock( CDestPixel *pOutputImage, DXTColBlock *pCol
 					                 BGRA8888_t *col_2, BGRA8888_t *col_3 )
 {
 	// width is width of image in pixels
-	DWORD bits;
+	dword bits;
 	int r,n;
 
 	// bit masks = 00000011, 00001100, 00110000, 11000000
-	const DWORD masks[] = { 3 << 0, 3 << 2, 3 << 4, 3 << 6 };
+	const dword masks[] = { 3 << 0, 3 << 2, 3 << 4, 3 << 6 };
 	const int   shift[] = { 0, 2, 4, 6 };
 
 	// r steps through lines in y
-	for ( r=0; r < 4; r++, pOutputImage += width-4 )	// no width*4 as DWORD ptr inc will *4
+	for ( r=0; r < 4; r++, pOutputImage += width-4 )	// no width*4 as dword ptr inc will *4
 	{
 		// width * 4 bytes per pixel per line
 		// each j dxtc row is 4 lines of pixels
@@ -397,8 +392,8 @@ static inline void DecodeColorBlock( CDestPixel *pOutputImage, DXTColBlock *pCol
 template <class CDestPixel> 
 static inline void DecodeAlpha3BitLinear( CDestPixel *pImPos, DXTAlphaBlock3BitLinear *pAlphaBlock, int width, int nChannelSelect = 3 )
 {
-	static BYTE		gBits[4][4];
-	static WORD		gAlphas[8];
+	static byte		gBits[4][4];
+	static word		gAlphas[8];
 	static BGRA8888_t	gACol[4][4];
 
 	gAlphas[0] = pAlphaBlock->alpha0;
@@ -435,44 +430,44 @@ static inline void DecodeAlpha3BitLinear( CDestPixel *pImPos, DXTAlphaBlock3BitL
 
 	// first two rows of 4 pixels each:
 	// pRows = (Alpha3BitRows*) & ( pAlphaBlock->stuff[0] );
-	const DWORD mask = 0x00000007;		// bits = 00 00 01 11
+	const dword mask = 0x00000007;		// bits = 00 00 01 11
 
-	DWORD bits = *( (DWORD*) & ( pAlphaBlock->stuff[0] ));
+	dword bits = *( (dword*) & ( pAlphaBlock->stuff[0] ));
 
-	gBits[0][0] = (BYTE)( bits & mask );
+	gBits[0][0] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[0][1] = (BYTE)( bits & mask );
+	gBits[0][1] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[0][2] = (BYTE)( bits & mask );
+	gBits[0][2] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[0][3] = (BYTE)( bits & mask );
+	gBits[0][3] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[1][0] = (BYTE)( bits & mask );
+	gBits[1][0] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[1][1] = (BYTE)( bits & mask );
+	gBits[1][1] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[1][2] = (BYTE)( bits & mask );
+	gBits[1][2] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[1][3] = (BYTE)( bits & mask );
+	gBits[1][3] = (byte)( bits & mask );
 
 	// now for last two rows:
-	bits = *( (DWORD*) & ( pAlphaBlock->stuff[3] ));		// last 3 bytes
+	bits = *( (dword*) & ( pAlphaBlock->stuff[3] ));		// last 3 bytes
 
-	gBits[2][0] = (BYTE)( bits & mask );
+	gBits[2][0] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[2][1] = (BYTE)( bits & mask );
+	gBits[2][1] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[2][2] = (BYTE)( bits & mask );
+	gBits[2][2] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[2][3] = (BYTE)( bits & mask );
+	gBits[2][3] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[3][0] = (BYTE)( bits & mask );
+	gBits[3][0] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[3][1] = (BYTE)( bits & mask );
+	gBits[3][1] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[3][2] = (BYTE)( bits & mask );
+	gBits[3][2] = (byte)( bits & mask );
 	bits >>= 3;
-	gBits[3][3] = (BYTE)( bits & mask );
+	gBits[3][3] = (byte)( bits & mask );
 
 	// decode the codes into alpha values
 	int row, pix;
@@ -480,7 +475,7 @@ static inline void DecodeAlpha3BitLinear( CDestPixel *pImPos, DXTAlphaBlock3BitL
 	{
 		for ( pix=0; pix < 4; pix++ )
 		{
-			gACol[row][pix].a = (BYTE) gAlphas[ gBits[row][pix] ];
+			gACol[row][pix].a = (byte) gAlphas[ gBits[row][pix] ];
 
 			Assert( gACol[row][pix].r == 0 );
 			Assert( gACol[row][pix].g == 0 );
@@ -553,11 +548,11 @@ static void ConvertFromDXT1( const uint8 *src, CDestPixel *dst, int width, int h
 	xblocks = width >> 2;
 	yblocks = height >> 2;
 	CDestPixel *pDstScan = dst;
-	DWORD *pSrcScan = ( DWORD * )src;
+	dword *pSrcScan = ( dword * )src;
 
 	DXTColBlock *pBlock;
 	BGRA8888_t col_0, col_1, col_2, col_3;
-	WORD wrdDummy;
+	word wrdDummy;
 
 	int i, j;
 	for ( j = 0; j < yblocks; j++ )
@@ -616,13 +611,13 @@ static void ConvertFromDXT5( const uint8 *src, CDestPixel *dst, int width, int h
 	yblocks = height >> 2;
 	
 	CDestPixel *pDstScan = dst;
-	DWORD *pSrcScan = ( DWORD * )src;
+	dword *pSrcScan = ( dword * )src;
 
 	DXTColBlock				*pBlock;
 	DXTAlphaBlock3BitLinear *pAlphaBlock;
 
 	BGRA8888_t col_0, col_1, col_2, col_3;
-	WORD wrd;
+	word wrd;
 
 	int i,j;
 	for ( j=0; j < yblocks; j++ )
@@ -696,12 +691,12 @@ static void ConvertFromDXT5IgnoreAlpha( const uint8 *src, CDestPixel *dst, int w
 	yblocks = height >> 2;
 	
 	CDestPixel *pDstScan = dst;
-	DWORD *pSrcScan = ( DWORD * )src;
+	dword *pSrcScan = ( dword * )src;
 
 	DXTColBlock *pBlock;
 
 	BGRA8888_t col_0, col_1, col_2, col_3;
-	WORD wrd;
+	word wrd;
 
 	int i,j;
 	for ( j=0; j < yblocks; j++ )
@@ -768,7 +763,7 @@ static void ConvertFromATIxN( const uint8 *src, CDestPixel *dst, int width, int 
 	yblocks = height >> 2;
 
 	CDestPixel *pDstScan = dst;
-	DWORD *pSrcScan = ( DWORD * )src;
+	dword *pSrcScan = ( dword * )src;
 
 	DXTAlphaBlock3BitLinear	*pBlock;
 
@@ -810,7 +805,7 @@ static void ConvertFromATIxN( const uint8 *src, CDestPixel *dst, int width, int 
 
 // dimhotepus: Exclude nvtc as proprietary.
 #if !defined(NO_NVTC)
-static DWORD GetDXTCEncodeType( ImageFormat imageFormat )
+static dword GetDXTCEncodeType( ImageFormat imageFormat )
 {
 	switch ( imageFormat )
 	{
@@ -894,7 +889,7 @@ bool ConvertToDXTLegacy(  const uint8 *src, ImageFormat srcImageFormat,
 	memset( &descIn, 0, sizeof(descIn) );
 	memset( &descOut, 0, sizeof(descOut) );
 	float weight[3] = {0.3086f, 0.6094f, 0.0820f};
-	DWORD dwEncodeType = GetDXTCEncodeType( dstImageFormat );
+	dword dwEncodeType = GetDXTCEncodeType( dstImageFormat );
 	
 	// Setup descIn
 	descIn.dwSize = sizeof(descIn);

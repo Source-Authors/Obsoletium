@@ -1796,7 +1796,7 @@ HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, int bpp, void **di
 	return hRet;
 }
 
-#define DIB_HEADER_MARKER   ((WORD) ('M' << 8) | 'B')
+#define DIB_HEADER_MARKER   ((word) ('M' << 8) | 'B')
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

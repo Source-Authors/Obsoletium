@@ -83,11 +83,12 @@ typedef enum
 //	XVRB_ALL,
 //} xverbose_e;
 
-typedef unsigned short WORD;
+typedef unsigned char BYTE; //-V677
+typedef unsigned short WORD; //-V677
 #ifndef POSIX
-typedef unsigned long DWORD;
-typedef void* HANDLE;
-typedef unsigned __int64 ULONGLONG;
+typedef unsigned long DWORD; //-V677
+typedef void* HANDLE; //-V677
+typedef unsigned __int64 ULONGLONG; //-V677
 #endif
 
 #ifdef POSIX

@@ -142,9 +142,13 @@ typedef int BOOL;
 
 typedef int qboolean;
 typedef unsigned long ULONG;
-typedef unsigned char BYTE;
 typedef unsigned char byte;
 typedef unsigned short word;
+#ifdef _WIN32
+typedef unsigned long dword;
+#else
+typedef unsigned int dword;
+#endif
 #ifdef _WIN32
 typedef wchar_t ucs2; // under windows wchar_t is ucs2
 #else

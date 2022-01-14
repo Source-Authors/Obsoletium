@@ -82,8 +82,8 @@ void CByteswap::SwapFieldsToTargetEndian( void *pOutputBuffer, void *pBaseData, 
 	for ( int i = 0; i < fieldCount; ++i )
 	{
 		typedescription_t *pField = &pFields[i];
-		SwapFieldToTargetEndian( (BYTE*)pOutputBuffer + pField->fieldOffset[ TD_OFFSET_NORMAL ],  
-								 (BYTE*)pBaseData + pField->fieldOffset[ TD_OFFSET_NORMAL ], 
+		SwapFieldToTargetEndian( (byte*)pOutputBuffer + pField->fieldOffset[ TD_OFFSET_NORMAL ],  
+								 (byte*)pBaseData + pField->fieldOffset[ TD_OFFSET_NORMAL ], 
 								  pField );
 	}
 }

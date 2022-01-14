@@ -1643,7 +1643,7 @@ void COptionsSubMultiplayer::OnControlModified()
 	InvalidateLayout();
 }
 
-#define DIB_HEADER_MARKER   ((WORD) ('M' << 8) | 'B')
+#define DIB_HEADER_MARKER   ((word) ('M' << 8) | 'B')
 #define SUIT_HUE_START 192
 #define SUIT_HUE_END 223
 #define PLATE_HUE_START 160

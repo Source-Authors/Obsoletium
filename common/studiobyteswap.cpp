@@ -377,7 +377,7 @@ void ProcessFields( void *pBaseAddress, void *pData, datamap_t *pDataMap, datade
 	for ( int i = 0; i < fieldCount; ++i )
 	{
 		typedescription_t *pField = &pFields[i];
-		ProcessField( pBaseAddress, (BYTE*)pData + pField->fieldOffset[ TD_OFFSET_NORMAL ], pField, pfnProcessFunc );
+		ProcessField( pBaseAddress, (byte*)pData + pField->fieldOffset[ TD_OFFSET_NORMAL ], pField, pfnProcessFunc );
 	}
 }
 
@@ -407,7 +407,7 @@ void ProcessFieldByName( void *pBaseAddress, void *pData, datamap_t *pDataMap, c
 		typedescription_t *pField = &pFields[i];
 		if ( !Q_stricmp( pField->fieldName, pName ) )
 		{
-			ProcessField( pBaseAddress, (BYTE*)pData + pField->fieldOffset[ TD_OFFSET_NORMAL ], pField, pfnProcessFunc );
+			ProcessField( pBaseAddress, (byte*)pData + pField->fieldOffset[ TD_OFFSET_NORMAL ], pField, pfnProcessFunc );
 			break;
 		}
 	}
