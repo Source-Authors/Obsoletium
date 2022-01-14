@@ -1568,7 +1568,6 @@ for( $lineCt = 0; $lineCt < @lines; ++$lineCt )
 #		push( @fileheader, "_win32_base.vpc\"\t\[\$WIN32\|\|\$LINUX\]\n" );
 #		push( @fileheader, "\$Include \"\$SRCDIR\\vpc_scripts\\source_" );
 #		push( @fileheader, $configtype );
-#		push( @fileheader, "_x360_base.vpc\"\t\t\[\$X360\]\n" );
 		push( @fileheader, "\n" );
 
 

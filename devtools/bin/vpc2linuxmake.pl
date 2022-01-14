@@ -454,7 +454,6 @@ sub nextvpcline
 			return &nextvpcline;
 		}
 		s/\[\$WIN32\]//g;
-		return &nextvpcline if (/\[\$X360\]/);
 		if ( /^\s*\$include\s+\"(.*)\"/i)
 		{
 			# process $include

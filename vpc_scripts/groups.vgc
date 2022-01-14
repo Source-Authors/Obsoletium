@@ -67,13 +67,6 @@ $Group "physics"
 //	"vphysics"
 }
 
-$Group "xbox_utils"
-{
-	"MakeGameData"
-	"VXConsole"
-	"xbspinfo"
-}
-
 // All projects required to build the console version
 $Group "console"
 {
@@ -121,7 +114,6 @@ $Group "console"
 	"vphysics"
 	"vstdlib"
 	"vtf"
-	"vxbdm"
 	"coroutine_osx"
 }
 
@@ -289,8 +281,6 @@ $Group "everything"
 	"lua"
 	"lxVsDmxIO_Modo302"
 	"lzma"
-	"makegamedata"
-	"makescenesimage"
 	"materialsystem"
 	"materialsystemtest"
 	"mathlib"
@@ -668,8 +658,6 @@ $Group "sourcelicensee"
 	"launcher_main"
 	"localization_check"
 	"lzma"
-	"makegamedata"
-	"makescenesimage"
 	"materialsystem"
 	"materialsystemtest"
 	"mathlib"
@@ -828,7 +816,6 @@ $Group "licensee_console"
 	"vguimatsurface"
 	"vstdlib"
 	"vtf"
-	"vxbdm"
 	"coroutine_osx"
 }
 

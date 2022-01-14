@@ -17,10 +17,9 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\dx9sdk\include" [$WINDOWS && !$GL]
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\x360xdk\include\xbox" [$X360]
 		$AdditionalIncludeDirectories	"$BASE;..\"
 		$PreprocessorDefinitions		"$BASE;SHADERAPIDX9;SHADER_DLL_EXPORT;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead"
-		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [($WINDOWS||$X360) && !$GL]
+		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [$WINDOWS && !$GL]
 		$PreprocessorDefinitions		"$BASE;GL_GLEXT_PROTOTYPES;DX_TO_GL_ABSTRACTION" [$GL]
 //		$AdditionalOptions		"/FC"
 	}
@@ -31,22 +30,6 @@ $Configuration
 		$GCC_ExtraLinkerFlags                   		"-L/usr/lib32" [$LINUXALL]
 		$SystemFrameworks					"Carbon;OpenGL;Quartz;Cocoa;IOKit" [$OSXALL]
 		$AdditionalDependencies				"$BASE d3d9.lib" [$WINDOWS]
-	}
-}
-
-$Configuration "Debug"
-{
-	$Linker [$X360]
-	{
-		$AdditionalDependencies		"$BASE d3dx9d.lib xuirund.lib xuirenderd.lib xaudiod2.lib xmcored.lib"
-	}
-}
-
-$Configuration "Release"
-{
-	$Linker [$X360]
-	{
-		$AdditionalDependencies		"$BASE d3dx9.lib xuirun.lib xuirender.lib xaudio2.lib xmcore.lib"
 	}
 }
 
@@ -71,7 +54,6 @@ $Project "shaderapidx9"
 		$File	"vertexdecl.cpp"
 		$File	"vertexshaderdx8.cpp"
 		$File	"wmi.cpp"									[$WINDOWS && !$GL]
-		$File	"textureheap.cpp"							[$X360]
 		$File	"winutils.cpp"							[!$WINDOWS]
 	}
 
@@ -123,7 +105,6 @@ $Project "shaderapidx9"
 		$File	"texturedx8.h"
 		$File	"vertexshaderdx8.h"
 		$File	"wmi.h"							[$WINDOWS && !$GL]
-		$File	"textureheap.h"					[$X360]
 		$File	"winutils.h"				[!$WINDOWS]
 	}
 

@@ -22,9 +22,6 @@ $Configuration	"Debug"
 	{
 		$OutputDirectory		"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
 		$IntermediateDirectory	"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
-
-		$OutputDirectory		"Debug_dx9_360"		[$X360]
-		$IntermediateDirectory	"Debug_dx9_360"		[$X360]
 	}
 }
 
@@ -34,9 +31,6 @@ $Configuration	"Release"
 	{
 		$OutputDirectory		"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
 		$IntermediateDirectory	"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
-
-		$OutputDirectory		"Release_dx9_360"	[$X360]
-		$IntermediateDirectory	"Release_dx9_360"	[$X360]
 	}
 }
 
@@ -46,15 +40,13 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	"$BASE;fxctmp9;vshtmp9;"	[$WIN32||$POSIX]
-		$AdditionalIncludeDirectories	"$BASE;fxctmp9_360;vshtmp9_360"					[$X360]
 		$PreprocessorDefinitions		"$BASE;STDSHADER_DX9_DLL_EXPORT;FAST_MATERIALVAR_ACCESS"
-		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [($WIN32||$X360) && !$GL]
+		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [$WIN32 && !$GL]
 	}
 
 	$Linker
 	{
 		$AdditionalDependencies			"$BASE version.lib winmm.lib"	[$WIN32]
-		$ModuleDefinitionFile			"xbox\xbox_dx9.def"				[$X360]
 		$SystemLibraries                                                        "iconv" [$OSXALL]
 	}
 }
@@ -129,7 +121,6 @@ $Project "stdshader_dx9"
 		$File	"pyro_vision.cpp"
 		$File	"refract.cpp"
 		$File	"refract_dx9_helper.cpp"
-		$File	"rendertargetblit_x360.cpp"					[$X360]	
 		$File	"sample4x4.cpp"
 		$File	"sample4x4_blend.cpp"
 		$File	"screenspace_general.cpp"
@@ -177,26 +168,6 @@ $Project "stdshader_dx9"
 			$File	"..\shader_dll_verify.cpp"
 			$File	"..\shader_dll_verify.h"
 		}
-
-		// 360 collapes stdshader_dbg.dll into stdshader_dx9.dll
-		$Folder	"stdshader_dbg Files" [$X360]
-		{
-			$File	"debugdepth.cpp"
-			$File	"DebugDrawEnvmapMask.cpp"
-			$File	"debugluxel.cpp"
-			$File	"debugnormalmap.cpp"
-			$File	"debugtangentspace.cpp"
-			$File	"fillrate.cpp"
-
-			// dead shader, but hl2 models have it
-			$File	"eyeball.cpp"
-		}
-	}
-
-	$Folder "Xbox"	[$X360]
-	{
-		-$File	"xbox\xbox.def"
-		$File	"xbox\xbox_dx9.def"
 	}
 
 	$Folder	"Header Files"
@@ -222,9 +193,9 @@ $Project "stdshader_dx9"
 
 	$Folder "Link Libraries" 
 	{
-        $Lib	mathlib
-        $Lib	shaderlib
-    }
+		$Lib	mathlib
+		$Lib	shaderlib
+	}
 
 	$File	"$SRCDIR\devtools\bin\vsh_prep.pl"
 	$File	"$SRCDIR\devtools\bin\psh_prep.pl"

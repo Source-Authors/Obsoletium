@@ -22,7 +22,6 @@ $Project "vtf"
 		$File	"convert_x360.cpp"
 		$File	"s3tc_decode.cpp" 	[$WINDOWS]
 		$File	"vtf.cpp"
-		$File	"vtf_x360.cpp"		[$X360]
 	}
 
 	$Folder	"Public Header Files"
@@ -34,12 +33,5 @@ $Project "vtf"
 	$Folder	"Header Files"
 	{	
 		$File	"cvtf.h"
-	}
-
-	$Folder "Link Libraries" [$X360]
-	{
-		$Lib bitmap
-		$Lib mathlib
-		$Lib tier2
 	}
 }

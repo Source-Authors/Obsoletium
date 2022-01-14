@@ -18,7 +18,6 @@
 #include "shaderapi/ishaderapi.h"
 #include "filesystem.h"
 #include "locald3dtypes.h"
-#include "textureheap.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/callqueue.h"
 #include "tier0/vprof.h"

@@ -27,7 +27,7 @@ $Project
 				$Compiler
 				{
 					$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-					$EnableC++Exceptions	"Yes With SEH Exceptions (/EHa)" [!$X360]
+					$EnableC++Exceptions	"Yes With SEH Exceptions (/EHa)"
 				}
 			}
 		}

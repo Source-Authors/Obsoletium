@@ -36,4 +36,4 @@ $Macro BUILD_REPLAY		1
 
 //-----------------------------------------------------------------------------
 
-$Include "$SRCDIR\vpc_scripts\source_replay_private.vpc"	[$BUILD_REPLAY && !$X360]
+$Include "$SRCDIR\vpc_scripts\source_replay_private.vpc"	[$BUILD_REPLAY]

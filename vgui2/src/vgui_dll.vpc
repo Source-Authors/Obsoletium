@@ -46,7 +46,7 @@ $Project "vgui2"
 		$File	"MessageListener.cpp"
 		$File	"Scheme.cpp"
 		$File	"Surface.cpp"					[$WIN32]
-		$File	"System.cpp"					[$WINDOWS||$X360]
+		$File	"System.cpp"					[$WINDOWS]
 		$File	"system_posix.cpp" [$POSIX]
 		$File	"$SRCDIR\public\UnicodeFileHelpers.cpp"
 		$File	"vgui.cpp"

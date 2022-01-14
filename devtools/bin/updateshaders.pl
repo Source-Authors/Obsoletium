@@ -131,27 +131,16 @@ sub DoAsmShader
 	}
 	
 
-	my $x360switch = "";
 	my $moreswitches = "";
 	if( !$bWillCompileVcs && $shadertype eq "fxc" )
 	{
 		$moreswitches .= "-novcs ";
 	}
-	if( $g_x360 )
-	{
-		$x360switch = "-x360";
-		
-		if( $bWillCompileVcs && ( $shaderbase =~ m/_ps20$/i ) )
-		{
-			$moreswitches .= "-novcs ";
-			$bWillCompileVcs = 0;
-		}
-	}
 
 	# if we are psh and we are compiling the vcs, we don't need this rule.
 	if( !( $shadertype eq "psh" && !$bWillCompileVcs ) )
 	{
-		&output_makefile_line( "\tperl $g_SourceDir\\devtools\\bin\\" . $shadertype . "_prep.pl $moreswitches $x360switch -source \"$g_SourceDir\" $argstring\n") ;
+		&output_makefile_line( "\tperl $g_SourceDir\\devtools\\bin\\" . $shadertype . "_prep.pl $moreswitches -source \"$g_SourceDir\" $argstring\n") ;
 	}
 
 	if( $bWillCompileVcs )
@@ -171,7 +160,6 @@ if( scalar( @ARGV ) == 0 )
 	die "Usage updateshaders.pl shaderprojectbasename\n\tie: updateshaders.pl stdshaders_dx6\n";
 }
 
-$g_x360			= 0;
 $g_tmpfolder	= "_tmp";
 $g_vcsext		= ".vcs";
 
@@ -182,12 +170,6 @@ while( 1 )
 	if( $inputbase =~ m/-source/ )
 	{
 		$g_SourceDir = shift;
-	}
-	elsif( $inputbase =~ m/-x360/ )
-	{
-		$g_x360 = 1;
-		$g_tmpfolder = "_360_tmp";
-		$g_vcsext = ".360.vcs";
 	}
 	elsif( $inputbase =~ m/-execute/ )
 	{
@@ -232,7 +214,7 @@ foreach $shader ( @srcfiles )
 	{
 		$compilevcs = 0;
 	}
-	if( $g_x360 && ( $shaderbase =~ m/_ps20$/i ) )
+	if( ( $shaderbase =~ m/_ps20$/i ) )
 	{
 		$compilevcs = 0;
 	}

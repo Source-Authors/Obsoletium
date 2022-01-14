@@ -31,22 +31,6 @@ $Configuration
 	}
 }
 
-$Configuration "Debug"
-{
-	$Linker
-	{
-		$AdditionalDependencies			"$BASE Xonlined.lib" [$X360]
-	}
-}
-
-$Configuration "Release"
-{
-	$Linker
-	{
-		$AdditionalDependencies			"$BASE Xonline.lib" [$X360]
-	}
-}
-
 $Project "launcher"
 {
 	$Folder	"Source Files"

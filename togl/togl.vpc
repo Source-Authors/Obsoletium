@@ -27,7 +27,7 @@ $Configuration
     
 	$Linker
 	{
-		$ImportLibrary			"$LIBPUBLIC\$_IMPLIB_PREFIX$OUTBINNAME$_IMPLIB_EXT"	[!$X360 && !$OSXALL]
+		$ImportLibrary			"$LIBPUBLIC\$_IMPLIB_PREFIX$OUTBINNAME$_IMPLIB_EXT"	[!$OSXALL]
 		$ImportLibrary			"$SRCDIR\lib\$PLATFORM\$_IMPLIB_PREFIX$OUTBINNAME$_IMPLIB_EXT"	[$OSXALL]
 	}
 

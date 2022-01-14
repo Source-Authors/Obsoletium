@@ -39,22 +39,6 @@ $Configuration
 	}
 }
 
-$Configuration "Debug"
-{
-	$Linker [$X360]
-	{
-		$AdditionalDependencies		"$BASE xonlined.lib xaudiod2.lib Xhvd2.lib xmpd.lib xmcored.lib xmahald.lib xpartyd.lib"
-	}
-}
-
-$Configuration "Release"
-{
-	$Linker [$X360]
-	{
-		$AdditionalDependencies		"$BASE xonline.lib xaudio2.lib Xhv2.lib xmp.lib xmcore.lib xmahal.lib xparty.lib"
-	}
-}
-
 
 $Project "engine"
 {
@@ -383,8 +367,8 @@ $Project "engine"
 		$File	"EngineSoundClient.cpp" [!$DEDICATED]
 		$File	"engsoundservice.cpp" [!$DEDICATED]
 		$File   "audio\private\voice_wavefile.cpp"
-		$File	"audio\private\MPAFile.cpp" [!$DEDICATED&&!$X360]
-		$File	"audio\private\MPAHeader.cpp" [!$DEDICATED&&!$X360]
+		$File	"audio\private\MPAFile.cpp" [!$DEDICATED]
+		$File	"audio\private\MPAHeader.cpp" [!$DEDICATED]
 		$File	"audio\private\circularbuffer.cpp" [!$DEDICATED]
 		$File	"audio\private\snd_posix.cpp"		[$POSIX]	
 		
@@ -434,11 +418,11 @@ $Project "engine"
 				"audio\private\snd_dev_wave.cpp"	[$WINDOWS]		\
 				"audio\private\snd_mp3_source.cpp"	[!$DEDICATED]		\
 				"audio\private\snd_wave_mixer_mp3.cpp"	[!$DEDICATED]	\
-				"audio\private\VBRHeader.cpp"		[!$DEDICATED&&!$X360]		\
-				"audio\private\voice.cpp"			[!$DEDICATED&&!$X360]		\
+				"audio\private\VBRHeader.cpp"		[!$DEDICATED]		\
+				"audio\private\voice.cpp"			[!$DEDICATED]		\
 				"audio\private\voice_mixer_controls.cpp" [$WINDOWS]	\
 				"audio\private\voice_record_dsound.cpp"	[$WINDOWS]	\
-				"audio\private\voice_sound_engine_interface.cpp"	[!$DEDICATED&&!$X360]
+				"audio\private\voice_sound_engine_interface.cpp"	[!$DEDICATED]
 		{
 			$Configuration
 			{
@@ -992,7 +976,6 @@ $Project "engine"
 		$File	"$SRCDIR\common\ivprofexport.h"
 		$File	"$SRCDIR\public\ivrenderview.h"
 		$File	"$SRCDIR\public\ivtex.h"
-		$File	"$SRCDIR\public\ixboxsystem.h"			[$X360]
 		$File	"$SRCDIR\public\vgui\KeyCode.h"
 		$File	"$SRCDIR\public\tier1\KeyValues.h"
 		$File	"$SRCDIR\public\vgui_controls\Label.h"

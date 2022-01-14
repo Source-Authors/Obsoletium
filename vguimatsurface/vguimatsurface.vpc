@@ -25,7 +25,6 @@ $Configuration
 		$SystemFrameworks				"Carbon" [$OSXALL]
 		$GCC_ExtraLinkerFlags                   "-L/usr/lib32 -L/usr/lib -L/usr/lib/i386-linux-gnu" [$LINUXALL]
 		$SystemLibraries                        "fontconfig;freetype" [$LINUXALL]
-		$AdditionalDependencies			"$BASE vgui_surfacelib_360.lib"			[$X360]
 		$AdditionalDependencies			"$BASE vgui_surfacelib.lib"	[$WINDOWS]
 		// dimhotepus: Exclude nvtc as proprietary.
 		$AdditionalDependencies			"$BASE nvtc.lib"	[$WIN32 && !$NO_NVTC]

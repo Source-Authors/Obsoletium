@@ -44,25 +44,12 @@ $Configuration
 		$AdditionalManifestFiles			"$BASE;$SRCDIR\public\dpi-aware.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\utf-8-code-page.manifest;enable-visual-styles.manifest" [!$SOURCESDK]
 	}
 
-	$Xbox360ImageConversion	[$X360]
-	{
-		// General
-		$AdditionalSections			"4541080F=$SRCDIR\common\hl2orange.spa"
-	}
-
 	$PreBuildEvent [$WINDOWS]
 	{
 		$CommandLine		"if EXIST $OUTBINDIR\hl2.exe for /f $QUOTEdelims=$QUOTE %%A in ('attrib $QUOTE$OUTBINDIR\hl2.exe$QUOTE') do set valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
 							"set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
 							"if $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE del /q $QUOTE$(TargetDir)$QUOTE$(TargetFileName)" "\n" \
 							"$CRCCHECK"
-	}
-
-	$PostBuildEvent	[$X360]
-	{
-		// inherit and add
-		$CommandLine				"$BASE" \
-									"call $SRCDIR\vpc_scripts\valve_xbcp_wrapper.cmd $(TargetDir)$(TargetName).xex xE:\Valve\default.xex" "\n"
 	}
 
 	$PostBuildEvent	[$WINDOWS && !$ANALYZE]
@@ -99,7 +86,6 @@ $Project "launcher_main"
 	{
 		$File	"main_win.cpp" [$WINDOWS]
 		$File	"main_posix.cpp" [$OSXALL || $LINUXALL]
-		$File	"main_xbox.cpp" [$X360]
 	}
 
 	$Folder "Resources" [$WINDOWS]

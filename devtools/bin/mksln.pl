@@ -9,8 +9,7 @@ use Digest::MD5  qw(md5 md5_hex md5_base64);
 
 
 GetOptions( "verbose"=>\$verbose,
-			"projlist"=>\$projlist,
-			"x360"=>\$x360 );
+			"projlist"=>\$projlist );
 
 $sln_name=shift || &PrintArgumentSummaryAndExit;
 
@@ -21,7 +20,6 @@ $curdir=~ (m@(^.*/[a-z_]*src[0-9]?)@i) || die "Can't determine srcroot from curr
 $srcroot=lc($1);
 
 $linker_tool_name="VCLinkerTool";
-$linker_tool_name="VCX360LinkerTool" if ($x360);
 
 @output_only_projects_dependent_upon = ();
 
@@ -278,7 +276,6 @@ sub AddProject
 			  {
 				$outputtarget=~s/\$\(TargetName\)/$targetname/i;
 				$outputtarget=lc(basename($outputtarget));
-				$outputtarget =~ s/\.lib/_360.lib/ if ( $x360 );
 				$provider{$outputtarget}=basename($pname);
 				print "$pname provides $outputtarget\n" if ($verbose);
 			  }
@@ -369,7 +366,6 @@ sub ReadVPCProjects
 		elsif (/^\s*\"([^\"]+)\.vpc\"/)
 		{
 			my $base = $1;
-			$base="$base"."_x360" if ( $x360 );
 			$projpath{lc($curproj)}.=" $base.vcproj";
 		}
 	}

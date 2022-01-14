@@ -23,8 +23,6 @@ $Configuration	"Debug"
 	{
 		$OutputDirectory		"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME"     [$WINDOWS]
 		$IntermediateDirectory	"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i"     [$WINDOWS]
-		$OutputDirectory		"Debug_Stdio_360" [$X360]
-		$IntermediateDirectory	"Debug_Stdio_360" [$X360]
 	}
 }
 
@@ -34,8 +32,6 @@ $Configuration	"Release"
 	{
 		$OutputDirectory		"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME"     [$WINDOWS]
 		$IntermediateDirectory	"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME\i"     [$WINDOWS]
-		$OutputDirectory		"Release_Stdio_360" [$X360]
-		$IntermediateDirectory	"Release_Stdio_360" [$X360]
 	}
 }
 
