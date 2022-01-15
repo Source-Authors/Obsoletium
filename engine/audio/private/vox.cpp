@@ -2195,7 +2195,8 @@ void VOX_ParseLineCommands( char *pSentenceData, int sentenceIndex )
 				// All commands starting with the letter 'l' here
 				if ( !Q_strnicmp( pSentenceData, "len", 3 ) )
 				{
-					g_Sentences[sentenceIndex].length = atof( pSentenceData + 3 ) ;
+					// dimhotepus: atof -> strtof
+					g_Sentences[sentenceIndex].length = strtof( pSentenceData + 3, nullptr ) ;
 
 					// "len " len + space
 					pSentenceData += 4;

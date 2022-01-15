@@ -66,8 +66,8 @@ extern IVideoServices *g_pVideo;
 //
 //#define DEBUG_CHANNELS
 
-#define SNDLVL_TO_DIST_MULT( sndlvl ) ( sndlvl ? ((pow( 10.0f, snd_refdb.GetFloat() / 20 ) / pow( 10.0f, (float)sndlvl / 20 )) / snd_refdist.GetFloat()) : 0 )
-#define DIST_MULT_TO_SNDLVL( dist_mult ) (soundlevel_t)(int)( dist_mult ? ( 20 * log10( pow( 10.0f, snd_refdb.GetFloat() / 20 ) / (dist_mult * snd_refdist.GetFloat()) ) ) : 0 )
+#define SNDLVL_TO_DIST_MULT( sndlvl ) ( sndlvl ? ((powf( 10.0f, snd_refdb.GetFloat() / 20 ) / powf( 10.0f, (float)sndlvl / 20 )) / snd_refdist.GetFloat()) : 0 )
+#define DIST_MULT_TO_SNDLVL( dist_mult ) (soundlevel_t)(int)( dist_mult ? ( 20 * log10f( powf( 10.0f, snd_refdb.GetFloat() / 20 ) / (dist_mult * snd_refdist.GetFloat()) ) ) : 0 )
 
 extern ConVar dsp_spatial;
 extern IPhysicsSurfaceProps	*physprop;
@@ -1533,7 +1533,7 @@ void S_SpatializeChannel( int pVolume[CCHANVOLUMES/2], int master_vol, const Vec
 	for (int i = 0; i < CCHANVOLUMES/2; i++)
 		pVolume[i] = 0;
 
-	if (mono > 0.0)
+	if (mono > 0.0F)
 	{
 		// sound has radius, within which spatialization becomes mono:
 
@@ -1542,11 +1542,11 @@ void S_SpatializeChannel( int pVolume[CCHANVOLUMES/2], int master_vol, const Vec
 		// at radius * 0.5, dotRight is 0 (ie: sound centered left/right)
 		// at radius * 1.0, dotRight == dotRight
 
-		dotRight   *= (1.0 - mono);
+		dotRight   *= (1.0F - mono);
 	}
 
-	rscale = 1.0 + dotRight;
-	lscale = 1.0 - dotRight;
+	rscale = 1.0F + dotRight;
+	lscale = 1.0F - dotRight;
 
  // add in distance effect
 	scale = gain * rscale / 2;
@@ -1762,10 +1762,10 @@ float SND_GetDspMix( channel_t *pchannel, int idist)
 // calculate crossfade between wav left (close sound) and wav right (far sound) based on
 // distance fron listener
 
-#define DVAR_DIST_MIN	(20.0  * 12.0)		// play full 'near' sound at 20' or less
-#define DVAR_DIST_MAX	(110.0 * 12.0)		// play full 'far' sound at 110' or more
-#define DVAR_MIX_MIN	0.0
-#define DVAR_MIX_MAX	1.0
+#define DVAR_DIST_MIN	(20.0F  * 12.0F)		// play full 'near' sound at 20' or less
+#define DVAR_DIST_MAX	(110.0F * 12.0F)		// play full 'far' sound at 110' or more
+#define DVAR_MIX_MIN	0.0F
+#define DVAR_MIX_MAX	1.0F
 
 // calculate mixing parameter for CHAR_DISTVAR wavs
 // returns 0 - 1.0, 1.0 is 100% far sound (wav right)
@@ -1894,8 +1894,8 @@ bool SND_GetClosestPoint( channel_t *pChannel, QAngle &source_angles, Vector &vn
 
 #define DOPPLER_DIST_MAX			(20*12)		// max distance - causes min pitch
 #define DOPPLER_DIST_MIN			(1*12)		// min distance - causes max pitch
-#define DOPPLER_PITCH_MAX			1.5			// max pitch change due to distance
-#define DOPPLER_PITCH_MIN			0.25		// min pitch change due to distance
+#define DOPPLER_PITCH_MAX			1.5F			// max pitch change due to distance
+#define DOPPLER_PITCH_MIN			0.25F		// min pitch change due to distance
 
 #define DOPPLER_RANGE_MAX			(10*12)		// don't play doppler wav unless within this range
 												// UNDONE: should be set by caller!
@@ -1962,11 +1962,11 @@ ConVar snd_showstart( "snd_showstart", "0", FCVAR_CHEAT );	// showstart always s
 												// 6 - reserved
 												// 7 - show 2 and total gain & dist in ft. to sound source
 
-#define SND_DB_MAX				140.0	// max db of any sound source
-#define SND_DB_MED				90.0	// db at which compression curve changes
-#define SND_DB_MIN				60.0	// min db of any sound source
+#define SND_DB_MAX				140.0F	// max db of any sound source
+#define SND_DB_MED				90.0F	// db at which compression curve changes
+#define SND_DB_MIN				60.0F	// min db of any sound source
 
-#define SND_GAIN_PLAYER_WEAPON_DB 2.0	// increase player weapon gain by N dB
+#define SND_GAIN_PLAYER_WEAPON_DB 2.0F	// increase player weapon gain by N dB
 
 // dB = 20 log (amplitude/32768)		0 to -90.3dB
 // amplitude = 32768 * 10 ^ (dB/20)		0 to +/- 32768
@@ -1974,13 +1974,13 @@ ConVar snd_showstart( "snd_showstart", "0", FCVAR_CHEAT );	// showstart always s
 
 float Gain_To_dB ( float gain )
 {
-	float dB = 20 * log ( gain );
+	float dB = 20 * logf ( gain );
 	return dB;
 }
 
 float dB_To_Gain ( float dB )
 {
-	float gain = powf (10, dB / 20.0);
+	float gain = powf (10, dB / 20.0F);
 	return gain;
 }
 
@@ -2076,7 +2076,7 @@ float SND_GetGain( channel_t *ch, bool fplayersound, bool fmusicsound, bool floo
 // always ramp channel gain changes over time
 // returns ramped gain, given new target gain
 
-#define SND_GAIN_FADE_TIME	0.25		// xfade seconds between obscuring gain changes
+#define SND_GAIN_FADE_TIME	0.25F		// xfade seconds between obscuring gain changes
 
 float SND_FadeToNewGain( channel_t *ch, float gain_new )
 {
@@ -2105,7 +2105,7 @@ float SND_FadeToNewGain( channel_t *ch, float gain_new )
 	float speed;
 	speed = ( frametime / SND_GAIN_FADE_TIME ) * (gain_new - ch->ob_gain);
 
-	ch->ob_gain_inc = fabs(speed);
+	ch->ob_gain_inc = fabsf(speed);
 
 	// ch->ob_gain_inc = fabs(gain_new - ch->ob_gain) / 10.0;
 	
@@ -2113,7 +2113,7 @@ float SND_FadeToNewGain( channel_t *ch, float gain_new )
 
 	// if not hit target, keep approaching
 	
-	if ( fabs( ch->ob_gain - ch->ob_gain_target ) > 0.01 )
+	if ( fabsf( ch->ob_gain - ch->ob_gain_target ) > 0.01F )
 	{
 		ch->ob_gain = Approach( ch->ob_gain_target, ch->ob_gain, ch->ob_gain_inc );
 	}
@@ -2313,8 +2313,8 @@ float SND_GetGainObscured( channel_t *ch, bool fplayersound, bool flooping, bool
 
 		vecl2 = radius * vecl;
 		vecr2 = radius * vecr;
-		vecl = (radius / 2.0) * vecl;
-		vecr = (radius / 2.0) * vecr;
+		vecl = (radius / 2.0F) * vecl;
+		vecr = (radius / 2.0F) * vecr;
 
 		// endpoints from diagonal vectors
 
@@ -2364,8 +2364,8 @@ float SND_GetGainObscured( channel_t *ch, bool fplayersound, bool flooping, bool
 // convert sound db level to approximate sound source radius,
 // used only for determining how much of sound is obscured by world
 
-#define SND_RADIUS_MAX		(20.0 * 12.0)	// max sound source radius
-#define SND_RADIUS_MIN		(2.0 * 12.0)	// min sound source radius
+#define SND_RADIUS_MAX		(20.0F * 12.0F)	// max sound source radius
+#define SND_RADIUS_MIN		(2.0F * 12.0F)	// min sound source radius
 
 inline float dB_To_Radius ( float db )
 {
@@ -2395,23 +2395,23 @@ float PercentDifference( float a, float b )
 	float vp;
 
 	if (!(int)a && !(int)b)
-		return 0.0;
+		return 0.0F;
 
 	if (!(int)a || !(int)b)
-		return 1.0;
+		return 1.0F;
 
 	if (a > b)
 		vp = b / a;
 	else
 		vp = a / b;
 
-	return (1.0 - vp);
+	return (1.0F - vp);
 }
 
 // NOTE: Do not change SND_WALL_TRACE_LEN without also changing PRC_MDY6 delay value in snd_dsp.cpp!
 
-#define SND_WALL_TRACE_LEN (100.0*12.0)		// trace max of 100' = max of 100 milliseconds of linear delay
-#define SND_SPATIAL_WAIT	(0.25)			// seconds to wait between traces
+#define SND_WALL_TRACE_LEN (100.0F*12.0F)		// trace max of 100' = max of 100 milliseconds of linear delay
+#define SND_SPATIAL_WAIT	(0.25F)			// seconds to wait between traces
 
 // change mod delay value on chan 0..3 to v (inches)
 
@@ -2419,10 +2419,10 @@ void DSP_SetSpatialDelay( int chan, float v )
 {
 	// remap delay value 0..1200 to 1.0 to -1.0 for modulation
 
-	float value = ( v / SND_WALL_TRACE_LEN) - 1.0;					// -1.0...0
-	value = value * 2.0;											// -2.0...0
-	value += 1.0;													// -1.0...1.0 (0...1200)
-	value *= -1.0;													// 1.0...-1.0 (0...1200)
+	float value = ( v / SND_WALL_TRACE_LEN) - 1.0F;					// -1.0...0
+	value = value * 2.0F;											// -2.0...0
+	value += 1.0F;													// -1.0...1.0 (0...1200)
+	value *= -1.0F;													// 1.0...-1.0 (0...1200)
 
 	// assume first processor in dsp_spatial is the modulating delay unit for DSP_ChangePresetValue
 
@@ -2593,7 +2593,7 @@ void SND_SetSpatialDelays()
 		{
 			// compute average of 3 traces per channel
 
-			v = (g_ssp.dist[chan][0] + g_ssp.dist[chan][1] + g_ssp.dist[chan][2]) / 3.0;
+			v = (g_ssp.dist[chan][0] + g_ssp.dist[chan][1] + g_ssp.dist[chan][2]) / 3.0F;
 			vp = g_ssp.value_prev[chan];
 
 			// only change if 10% difference from previous
@@ -2668,26 +2668,26 @@ ConVar das_debug( "adsp_debug", "0", FCVAR_ARCHIVE );
 												// 6: draw teal box around room as detected
 
 #define DAS_CWALLS				20				// # of wall traces to save for calculating room dimensions
-#define DAS_ROOM_TRACE_LEN		(400.0*12.0)	// max size of trace to check for room dimensions
+#define DAS_ROOM_TRACE_LEN		(400.0F*12.0F)	// max size of trace to check for room dimensions
 
-#define DAS_AUTO_WAIT	0.25					// wait min of n seconds between dsp_room changes and update checks
+#define DAS_AUTO_WAIT	0.25F					// wait min of n seconds between dsp_room changes and update checks
 
-#define DAS_WIDTH_MIN	0.4						// min % change in avg width of any wall pair to cause new dsp
-#define DAS_REFL_MIN	0.5						// min % change in avg refl of any wall to cause new dsp
-#define DAS_SKYHIT_MIN	0.8						// min % change in # of sky hits per wall
+#define DAS_WIDTH_MIN	0.4F						// min % change in avg width of any wall pair to cause new dsp
+#define DAS_REFL_MIN	0.5F						// min % change in avg refl of any wall to cause new dsp
+#define DAS_SKYHIT_MIN	0.8F						// min % change in # of sky hits per wall
 
-#define DAS_DIST_MIN	(4.0 * 12.0)			// min distance between room dsp changes
-#define DAS_DIST_MAX	(40.0 * 12.0)			// max distance to preserve room dsp changes
+#define DAS_DIST_MIN	(4.0F * 12.0F)			// min distance between room dsp changes
+#define DAS_DIST_MAX	(40.0F * 12.0F)			// max distance to preserve room dsp changes
 
-#define DAS_DIST_MIN_OUTSIDE	(6.0 * 12.0)	// min distance between room dsp changes outside
-#define DAS_DIST_MAX_OUTSIDE	(100.0 * 12.0)	// max distance to preserve room dsp changes outside
+#define DAS_DIST_MIN_OUTSIDE	(6.0F * 12.0F)	// min distance between room dsp changes outside
+#define DAS_DIST_MAX_OUTSIDE	(100.0F * 12.0F)	// max distance to preserve room dsp changes outside
 
 #define IVEC_DIAG_UP	8						// start of diagonal up vectors
 #define IVEC_UP			18						// up vector
 #define IVEC_DOWN		19						// down vector
 
-#define DAS_REFLECTIVITY_NORM	0.5
-#define DAS_REFLECTIVITY_SKY	0.0
+#define DAS_REFLECTIVITY_NORM	0.5F
+#define DAS_REFLECTIVITY_SKY	0.0F
 
 // auto dsp room struct
 
@@ -2800,21 +2800,21 @@ void DAS_InitNodes( void )
 
 	// set up trace vectors for max height - on x=y diagonal
 
-	g_das_vec3[8].Init(vlu, vlu2, vlu/2.0);			// front right up A x,y,z/2		(IVEC_DIAG_UP)
+	g_das_vec3[8].Init(vlu, vlu2, vlu/2.0F);			// front right up A x,y,z/2		(IVEC_DIAG_UP)
 	g_das_vec3[9].Init(vlu, vlu2, vlu);				// front right up B x,y,z
-	g_das_vec3[10].Init(vlu/2.0, vlu2/2.0, vlu);	// front right up C x/2,y/2,z
+	g_das_vec3[10].Init(vlu/2.0F, vlu2/2.0F, vlu);	// front right up C x/2,y/2,z
 
-	g_das_vec3[11].Init(-vlu, -vlu2, vlu/2.0);		// rear left up A -x,-y,z/2
+	g_das_vec3[11].Init(-vlu, -vlu2, vlu/2.0F);		// rear left up A -x,-y,z/2
 	g_das_vec3[12].Init(-vlu, -vlu2, vlu);			// rear left up B -x,-y,z
-	g_das_vec3[13].Init(-vlu/2.0, -vlu2/2.0, vlu);	// rear left up C -x/2,-y/2,z
+	g_das_vec3[13].Init(-vlu/2.0F, -vlu2/2.0F, vlu);	// rear left up C -x/2,-y/2,z
 
 	// set up trace vectors for max height - on x axis & y axis
 
 	g_das_vec3[14].Init(-vlu, 0, vlu);				// left up B -x,0,z
-	g_das_vec3[15].Init(0, vlu/2.0, vlu);			// front up C -x/2,0,z
+	g_das_vec3[15].Init(0, vlu/2.0F, vlu);			// front up C -x/2,0,z
 
 	g_das_vec3[16].Init(0, -vlu, vlu);				// rear up B x,0,z
-	g_das_vec3[17].Init(vlu/2.0, 0, vlu);			// right up C x/2,0,z
+	g_das_vec3[17].Init(vlu/2.0F, 0, vlu);			// right up C x/2,0,z
 
 	g_das_vec3[18].Init(0.0, 0.0, vl);				// up	(IVEC_UP)
 	g_das_vec3[19].Init(0.0, 0.0, -vl);				// down (IVEC_DOWN)
@@ -3172,10 +3172,10 @@ bool DAS_CalcRoomProps( das_room_t *proom )
 	area1 = (float)(dist[0] * dist[1]);
 	area2 = (float)(dist[2] * dist[3]);
 
-	area1 = (int)area1 == 0 ? 1.0 : area1;
-	area2 = (int)area2 == 0 ? 1.0 : area2;
+	area1 = (int)area1 == 0 ? 1.0F : area1;
+	area2 = (int)area2 == 0 ? 1.0F : area2;
 	
-	if ( PercentDifference(area1, area2) > 0.25 )
+	if ( PercentDifference(area1, area2) > 0.25F )
 	{
 		// areas are more than 25% different - select pair with greater area
 
@@ -3296,7 +3296,7 @@ bool DAS_CalcRoomProps( das_room_t *proom )
 	refl += proom->reflect[IVEC_DOWN];
 	proom->refl_walls[5] = proom->reflect[IVEC_DOWN];
 
-	proom->refl_avg = refl / 6.0;
+	proom->refl_avg = refl / 6.0F;
 
 	// calculate sky hit percent for this wall
 
@@ -3738,7 +3738,7 @@ bool DAS_UpdateRoomSize( das_room_t *proom )
 
 	proom->dist[iwall]		= surfdata.dist;
 	proom->reflect[iwall]	= clamp(surfdata.reflectivity, 0.0f, 1.0f);
-	proom->skyhits[iwall]	= bskyhit ? 0.1 : 0.0;
+	proom->skyhits[iwall]	= bskyhit ? 0.1F : 0.0F;
 	proom->hit[iwall]		= surfdata.hit;
 	proom->norm[iwall]		= surfdata.norm;
 
@@ -3806,7 +3806,7 @@ class CDasEntEnum : public IPartitionEnumerator
 		Vector mins = pCollideable->OBBMins();
 		Vector maxs = pCollideable->OBBMaxs();
 		
-		vol = fabs((maxs.x - mins.x) * (maxs.y - mins.y) * (maxs.z - mins.z));
+		vol = fabsf((maxs.x - mins.x) * (maxs.y - mins.y) * (maxs.z - mins.z));
 
 		m_volume += vol;	// add to total vol
 
@@ -3881,14 +3881,14 @@ void DAS_DisplayRoomDEBUG( das_room_t *proom, bool fnew, float preset )
 	if (das_debug.GetInt() == 0)
 		return;
 
-	dx = proom->length_max / 12.0;
-	dy = proom->width_max / 12.0;
-	dz = proom->height_max / 12.0;
+	dx = proom->length_max / 12.0F;
+	dy = proom->width_max / 12.0F;
+	dz = proom->height_max / 12.0F;
 	
 	float refl = proom->refl_avg;
 	
 	count = (float)(proom->ent_count);
-	float fsky = (proom->bskyabove ? 1.0 : 0.0);
+	float fsky = (proom->bskyabove ? 1.0F : 0.0F);
 
 	if (fnew)
 		DevMsg( "NEW DSP NODE: size:(%.0f,%.0f) height:(%.0f) dif %.4f : refl %.4f : cobj: %.0f : sky %.0f \n", dx, dy, dz, proom->diffusion, refl, count, fsky);
@@ -3984,17 +3984,17 @@ bool DAS_CheckNewRoom( das_room_t *proom )
 	if ( proom_prev->refl_avg != 0.0 )
 		dr = proom->refl_avg / proom_prev->refl_avg;					// reflectivity delta
 
-	ds = fabs( proom->sky_pct - proom_prev->sky_pct);					// sky hits delta
+	ds = fabsf( proom->sky_pct - proom_prev->sky_pct);					// sky hits delta
 
-	if (dw > 1.0) dw = 1.0 / dw;
-	if (dw2 > 1.0) dw = 1.0 / dw2;
-	if (dh > 1.0) dh = 1.0 / dh;
-	if (dr > 1.0) dr = 1.0 / dr;
+	if (dw > 1.0F) dw = 1.0F / dw;
+	if (dw2 > 1.0F) dw = 1.0F / dw2;
+	if (dh > 1.0F) dh = 1.0F / dh;
+	if (dr > 1.0F) dr = 1.0F / dr;
 
-	if ( (1.0 - dw) >= DAS_WIDTH_MIN )
+	if ( (1.0F - dw) >= DAS_WIDTH_MIN )
 		cchanged++;
 		
-	if ( (1.0 - dw2) >= DAS_WIDTH_MIN )
+	if ( (1.0F - dw2) >= DAS_WIDTH_MIN )
 		cchanged++;
 
 //	if ( (1.0 - dh) >= DAS_WIDTH_MIN )	// don't change room based on height change
@@ -4528,13 +4528,13 @@ void SND_Spatialize(channel_t *ch)
 
 	if ( ch->radius > 0 && dist < ch->radius && !fdopplerwav )
 	{
-		float interval = ch->radius * 0.5;
+		float interval = ch->radius * 0.5F;
 		mono = dist - interval;
 		if ( mono < 0.0 )
 			mono = 0.0;
 		mono /= interval;
 		
-		mono = 1.0 - mono;
+		mono = 1.0F - mono;
 
 		// mono is 0.0 -> 1.0 from radius 100% to radius 50%
 	}
@@ -4631,7 +4631,7 @@ void SND_Spatialize(channel_t *ch)
 	}
 
 	// calculate total volume for display later
-	ch->last_vol = gain * (ch->master_vol/255.0);
+	ch->last_vol = gain * (ch->master_vol/255.0F);
 
 	return;
 
@@ -4941,9 +4941,9 @@ inline void ChannelStopVolXfade( channel_t *pch, int ivol )
 	pch->fvolume_inc[ivol] = 0.0;
 }
 
-#define	VOL_XFADE_TIME	0.070	// channel volume crossfade time in seconds
+#define	VOL_XFADE_TIME	0.070F	// channel volume crossfade time in seconds
 
-#define VOL_INCR_MAX	20.0	// never change volume by more than +/-N units per frame
+#define VOL_INCR_MAX	20.0F	// never change volume by more than +/-N units per frame
 
 // set volume target and volume increment (for crossfade) for channel & speaker
 
@@ -5719,7 +5719,7 @@ int S_GetCurrentStaticSounds( SoundInfo_t *pResult, int nSizeResult, int entchan
 						  channels[i].sfx->getname(), 
 						  channels[i].origin,
 						  channels[i].direction,
-						  ( (float)channels[i].master_vol / 255.0 ),
+						  ( (float)channels[i].master_vol / 255.0F ),
 						  DIST_MULT_TO_SNDLVL( channels[i].dist_mult ),
 						  IsChannelLooped( i ),
 						  channels[i].basePitch,
@@ -6480,10 +6480,10 @@ void S_ExtraUpdate( void )
 
 	// Only mix if you have used up 90% of the mixahead buffer
 	double tNow = Plat_FloatTime();
-	float delta = (tNow - g_LastMixTime);
+	double delta = (tNow - g_LastMixTime);
 	// we know we were at least snd_mixahead seconds ahead of the output the last time we did mixing
 	// if we're not close to running out just exit to avoid small mix batches
-	if ( delta > 0 && delta < (snd_mixahead.GetFloat() * 0.9f) )
+	if ( delta > 0 && delta < (snd_mixahead.GetFloat() * 0.9) )
 		return;
 	g_LastMixTime = tNow;
 
@@ -6566,15 +6566,15 @@ void S_Update_Thread()
 		// mixing (for 360) needs to be updated at a steady rate
 		// large update times causes the mixer to demand more audio data
 		// the 360 decoder has finite latency and cannot fulfill spike requests
-		float t0 = Plat_FloatTime();
+		double t0 = Plat_FloatTime();
 		S_Update_Guts( frameTime + snd_mixahead.GetFloat() );
-		int updateTime = ( Plat_FloatTime() - t0 ) * 1000.0f;
+		double updateTime = ( Plat_FloatTime() - t0 ) * 1000.0;
 
 		// try to maintain a steadier rate by compensating for fluctuating mix times
-		int sleepTime = THREADED_MIX_TIME - updateTime;
+		double sleepTime = THREADED_MIX_TIME - updateTime;
 		if ( sleepTime > 0 )
 		{
-			ThreadSleep( sleepTime );
+			ThreadSleep( (int)sleepTime );
 		}
 
 		// mimic a frametime needed for sound update
@@ -6666,8 +6666,9 @@ void S_DspParms( const CCommand &args )
 
 	// get preset & proc
 	int idsp, iproc;
-	idsp = Q_atof( args[1] );
-	iproc = Q_atof( args[2] );
+	// dimhotepus: Q_atof -> Q_atoi
+	idsp = Q_atoi( args[1] );
+	iproc = Q_atoi( args[2] );
 
 	// get params
 	for (int i = 0; i < cparam; i++)
@@ -6797,15 +6798,7 @@ static void S_PlayDelay( const CCommand &args )
 }
 static ConCommand sndplaydelay( "sndplaydelay", S_PlayDelay, "Usage:  sndplaydelay delay_in_sec (negative to skip ahead) soundname", FCVAR_SERVER_CAN_EXECUTE );
 
-static bool SortByNameLessFunc( const int &lhs, const int &rhs )
-{
-	CSfxTable *pSfx1 = s_Sounds[lhs].pSfx;
-	CSfxTable *pSfx2 = s_Sounds[rhs].pSfx;
-
-	return CaselessStringLessThan( pSfx1->getname(), pSfx2->getname() );
-}
-
-void S_SoundList(void)
+void S_SoundList()
 {
 	CSfxTable		*sfx;
 	CAudioSource	*pSource;
@@ -7460,12 +7453,12 @@ struct debug_showvols_t
 
 // display routine for MXR_DebugShowMixVolumes
 
-#define MXR_DEBUG_INCY	(1.0/40.0)			// vertical text spacing
-#define MXR_DEBUG_GREENSTART 0.3			// start position on screen of bar
+#define MXR_DEBUG_INCY	(1.0F/40.0F)			// vertical text spacing
+#define MXR_DEBUG_GREENSTART 0.3F			// start position on screen of bar
 
-#define MXR_DEBUG_MAXVOL		1.0			// max volume scale
-#define MXR_DEBUG_REDLIMIT		1.0			// volume limit into yellow
-#define MXR_DEBUG_YELLOWLIMIT	0.7			// volume limit into red
+#define MXR_DEBUG_MAXVOL		1.0F			// max volume scale
+#define MXR_DEBUG_REDLIMIT		1.0F			// volume limit into yellow
+#define MXR_DEBUG_YELLOWLIMIT	0.7F			// volume limit into red
 
 #define MXR_DEBUG_VOLSCALE 48				// length of graph in characters
 #define MXR_DEBUG_CHAR			'-'			// bar character
@@ -7601,7 +7594,7 @@ float MXR_GetDuckVolume( int mixgroupid )
 
 }
 
-#define SND_DUCKER_UPDATETIME	0.1		// seconds to wait between ducker updates
+#define SND_DUCKER_UPDATETIME	0.1F		// seconds to wait between ducker updates
 
 double g_mxr_ducktime = 0.0;			// time of last update to ducker
 
@@ -7735,7 +7728,7 @@ void MXR_UpdateAllDuckerVolumes( void )
 			// delta is volume change per update (we can do this 
 			// since we run at an approximate fixed update rate of 10hz)
 
-			float delta	= (1.0 - g_grouprules[i].duck_target_pct);
+			float delta	= (1.0F - g_grouprules[i].duck_target_pct);
 			
 			delta *= ( SND_DUCKER_UPDATETIME / ramptime );
 			
@@ -7845,7 +7838,8 @@ static void MXR_DebugSetMixGroupVolume( const CCommand &args )
 	}
 
 	const char *szgroupname = args[1];
-	float vol = atof( args[2] );
+	// dimhotepus: atof -> strtof
+	float vol = strtof( args[2], nullptr );
 
 	int imixgroup = MXR_GetMixgroupFromName( szgroupname );
 
@@ -8239,7 +8233,8 @@ bool MXR_LoadAllSoundMixers( void )
 			
 			// get mix value
 			pstart = COM_Parse( pstart );
-			value = atof( com_token );
+			// dimhotepus: atof -> strtof
+			value = strtof( com_token, nullptr );
 
 			// store value for mixgroupid
 			Assert(mixgroupid <= CMXRGROUPMAX);

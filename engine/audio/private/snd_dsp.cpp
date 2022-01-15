@@ -1397,11 +1397,11 @@ void DLY_SetNormalizingGain ( dly_t *pdly, int feedback )
 
 	b = pdly->b ? pdly->b : PMAX;
 
-	fgain = 1.0 / (1.0 - fb);
+	fgain = 1.0F / (1.0F - fb);
 
 	// compensating gain -  multiply rva output by gain then >> PBITS
 
-	gain = (int)((1.0 / fgain) * PMAX);	
+	gain = (int)((1.0F / fgain) * PMAX);	
 
 	gain = gain * 4;	// compensate for fact that gain calculation is for +/- 32767 amplitude wavs
 						// ie: ok to allow a bit more gain because most wavs are not at theoretical peak amplitude at all times
@@ -1595,7 +1595,7 @@ dly_t * DLY_Params ( prc_t *pprc )
 	dly_t *pdly = NULL;
 	int D, a, b;
 	
-	float delay		= fabs(pprc->prm[dly_idelay]);
+	float delay		= fabsf(pprc->prm[dly_idelay]);
 	float feedback	= pprc->prm[dly_ifeedback];
 	float gain		= pprc->prm[dly_igain];
 	int type		= pprc->prm[dly_idtype];
@@ -1605,9 +1605,9 @@ dly_t * DLY_Params ( prc_t *pprc )
 	float qwidth	= pprc->prm[dly_iqwidth];
 	float qual		= pprc->prm[dly_iquality];
 
-	float t1		= fabs(pprc->prm[dly_itap1]);
-	float t2		= fabs(pprc->prm[dly_itap2]);
-	float t3		= fabs(pprc->prm[dly_itap3]);
+	float t1		= fabsf(pprc->prm[dly_itap1]);
+	float t2		= fabsf(pprc->prm[dly_itap2]);
+	float t3		= fabsf(pprc->prm[dly_itap3]);
 
 	D = MSEC_TO_SAMPS(delay);					// delay samples
 	a = feedback * PMAX;						// feedback
@@ -2082,7 +2082,7 @@ inline int MDY_GetNext( mdy_t *pmdy, int x )
 
 		// modulate between 0 and 100% of d0
 
-		D1 = (float)D0 * (1.0 - pmdy->depth);
+		D1 = (float)D0 * (1.0F - pmdy->depth);
 
 		Dnew = RandomInt( (int)D1, D0 );
 
@@ -2212,11 +2212,11 @@ mdy_t * MDY_Params ( prc_t *pprc )
 	mdy_t *pmdy;
 	dly_t *pdly;	
 
-	float ramptime = pprc->prm[mdy_imodglide] / 1000.0;			// get ramp time in seconds
+	float ramptime = pprc->prm[mdy_imodglide] / 1000.0F;			// get ramp time in seconds
 	float modtime = 0.0f;
 	if ( pprc->prm[mdy_imodrate] != 0.0f )
 	{
-		modtime = 1.0 / pprc->prm[mdy_imodrate];				// time between modulations in seconds
+		modtime = 1.0F / pprc->prm[mdy_imodrate];				// time between modulations in seconds
 	}
 	float depth = pprc->prm[mdy_imoddepth];						// depth of modulations 0-1.0
 	float mix	= pprc->prm[mdy_imix];
@@ -2251,9 +2251,9 @@ void MDY_Mod ( mdy_t *pmdy, float v )
 	// if v is < -2.0 then delay is v + 10.0
 	// invert phase of output. hack.
 
-	if ( v < -2.0 )
+	if ( v < -2.0F )
 	{
-		v = v + 10.0;
+		v = v + 10.0F;
 		pmdy->bPhaseInvert = true;
 	}
 	else
@@ -2261,7 +2261,7 @@ void MDY_Mod ( mdy_t *pmdy, float v )
 		pmdy->bPhaseInvert = false;
 	}
 
-	v2 = -(v + 1.0)/2.0;				// v2 varies -1.0-0.0
+	v2 = -(v + 1.0F)/2.0F;				// v2 varies -1.0-0.0
 
 	// D0 varies 0..D0
 
@@ -2424,9 +2424,9 @@ rva_t * RVA_Alloc ( int *D, int *a, int *b, int m, flt_t *pflt, int fparallel, f
 			
 			// value of ftaps is the seed for all tap values 
 
-			float t1 = max((double)MSEC_TO_SAMPS(5), D[i] * (1.0 - ftaps * 3.141592) );	
-			float t2 = max((double)MSEC_TO_SAMPS(7), D[i] * (1.0 - ftaps * 1.697043) );	
-			float t3 = max((double)MSEC_TO_SAMPS(10), D[i] * (1.0 - ftaps * 0.96325) ); 
+			float t1 = max((float)MSEC_TO_SAMPS(5), D[i] * (1.0F - ftaps * 3.141592F) );	
+			float t2 = max((float)MSEC_TO_SAMPS(7), D[i] * (1.0F - ftaps * 1.697043F) );	
+			float t3 = max((float)MSEC_TO_SAMPS(10), D[i] * (1.0F - ftaps * 0.96325F) ); 
 
 			DLY_ChangeTaps( prva->pdlys[i], (int)t1, (int)t2, (int)t3, D[i] );
 		}
@@ -2720,22 +2720,22 @@ void RVA_ConstructDelays( float *rgd, float *rgf, int m, int *D, int *a, int *b,
 		// reverberations due to room width, depth, height
 		// assume sound moves at approx 1ft/ms
 
-		int j = (int)(fmod ((float)i, 3.0f));	// j counts   0,1,2  0,1,2 0,1..
+		int j = (int)(fmodf ((float)i, 3.0f));	// j counts   0,1,2  0,1,2 0,1..
 		
 		d = (int)rgd[j];
-		r = fabs(rgf[j]);
+		r = fabsf(rgf[j]);
 
 		bpredelay = ((rgf[j] < 0) && i < 3);
 
 		// re-use predelay values as reverb values:
 
 		if (rgf[j] < 0 && !bpredelay)
-			d = max((int)(rgd[j] / 4.0), RVA_MIN_SEPARATION);
+			d = max((int)(rgd[j] / 4.0F), RVA_MIN_SEPARATION);
 
 		if (i < 3)
-			dm = 0.0;
+			dm = 0.0F;
 		else
-			dm = max( (double)(RVA_MIN_SEPARATION * (i/3)), ((i/3) * ((float)d * 0.18)) );
+			dm = max( (float)(RVA_MIN_SEPARATION * (i/3)), ((i/3) * ((float)d * 0.18F)) );
 
 		d += (int)dm;
 		D[i] = MSEC_TO_SAMPS(d);		
@@ -2816,9 +2816,9 @@ rva_t * RVA_Params ( prc_t *pprc )
 	float fmoddly	= pprc->prm[rva_imoddly];		// if > 0, milliseconds of delay mod depth
 	float fmodrate	= pprc->prm[rva_imodrate];		// if fmoddly > 0, # of delay repetitions between modulations
 
-	float width		= fabs(pprc->prm[rva_width]);			// 0-1000 controls size of 1/3 of delays - used instead of size if non-zero
-	float depth		= fabs(pprc->prm[rva_depth]);			// 0-1000 controls size of 1/3 of delays - used instead of size if non-zero
-	float height	= fabs(pprc->prm[rva_height]);		// 0-1000 controls size of 1/3 of delays - used instead of size if non-zero
+	float width		= fabsf(pprc->prm[rva_width]);			// 0-1000 controls size of 1/3 of delays - used instead of size if non-zero
+	float depth		= fabsf(pprc->prm[rva_depth]);			// 0-1000 controls size of 1/3 of delays - used instead of size if non-zero
+	float height	= fabsf(pprc->prm[rva_height]);		// 0-1000 controls size of 1/3 of delays - used instead of size if non-zero
 
 	float fbwidth	= pprc->prm[rva_fbwidth];		// feedback parameter for walls	0..2		
 	float fbdepth	= pprc->prm[rva_fbdepth];		// feedback parameter for floor
@@ -3245,7 +3245,7 @@ void LFOWAV_Fill( int *w, int count, int type )
 	case LFO_SIN:			// sine wav, all values 0 <= x <= LFOAMP, initial value = 0
 			for (i = 0; i < count; i++ )
 			{
-				x = ( int )( (float)(LFOAMP) * sinf( (2.0 * M_PI_F * (float)i / (float)count ) + (M_PI_F * 1.5) ) );
+				x = ( int )( (float)(LFOAMP) * sinf( (2.0F * M_PI_F * (float)i / (float)count ) + (M_PI_F * 1.5F) ) );
 				w[i] = (x + LFOAMP)/2;
 			}
 			break;
@@ -3276,7 +3276,7 @@ void LFOWAV_Fill( int *w, int count, int type )
 			break;
 	case LFO_LOG_OUT:		// logarithmic fade out, all values 0 <= x <= LFOAMP, initial value = LFOAMP
 			for (i = 0; i < count; i++)
-				w[i] = ( int ) ( (float)(LFOAMP) * powf( 1.0 - ((float)i / (float)count), 2 ));
+				w[i] = ( int ) ( (float)(LFOAMP) * powf( 1.0F - ((float)i / (float)count), 2 ));
 			break;
 	case LFO_LIN_IN:		// linear fade in, all values 0 <= x <= LFOAMP, initial value = 0
 			for (i = 0; i < count; i++)
@@ -3530,7 +3530,7 @@ inline void LFO_Mod ( lfo_t *plfo, float v )
 	float fhznew;
 
 	fhz = plfo->f;
-	fhznew = fhz * (1.0 + v);
+	fhznew = fhz * (1.0F + v);
 
 	LFO_ChangeVal ( plfo, fhznew );
 
@@ -3662,18 +3662,18 @@ ptc_t * PTC_Alloc( float timeslice, float timexfade, float fstep )
 
 	// get size of region to cut or duplicate
 
-	tcutdup = abs((fstep - 1.0) * timeslice);
+	tcutdup = abs((fstep - 1.0F) * timeslice);
 
 	// to prevent buffer overruns:
 
 	// make sure timeslice is greater than cut/dup time
 	
-	tslice = max ( (double)tslice, 1.1 * tcutdup);
+	tslice = max ( tslice, 1.1F * tcutdup);
 
 	// make sure xfade time smaller than cut/dup time, and smaller than (timeslice-cutdup) time
 
-	txfade = min ( (double)txfade, 0.9 * tcutdup );
-	txfade = min ( (double)txfade, 0.9 * (tslice - tcutdup));
+	txfade = min ( txfade, 0.9F * tcutdup );
+	txfade = min ( txfade, 0.9F * (tslice - tcutdup));
 
 	pptc->cxfade =		MSEC_TO_SAMPS( txfade );
 	pptc->ccut =		MSEC_TO_SAMPS( tcutdup );
@@ -3711,7 +3711,7 @@ ptc_t * PTC_Alloc( float timeslice, float timexfade, float fstep )
 
 	// if fstep > 1.0 we're pitching shifting up, so fdup = true
 
-	pptc->fdup = fstep > 1.0 ? true : false;
+	pptc->fdup = fstep > 1.0F ? true : false;
 	
 	pptc->cin = cin;
 	pptc->cout = cout;
@@ -3999,9 +3999,9 @@ void PTC_Mod ( ptc_t *pptc, float v )
 	float fstepnew;
 
 	fstep = pptc->fstep;
-	fstepnew = fstep * (1.0 + v);
+	fstepnew = fstep * (1.0F + v);
 
-	PTC_ChangeVal( pptc, fstepnew, 0.01 );
+	PTC_ChangeVal( pptc, fstepnew, 0.01F );
 }
 
 
@@ -4194,10 +4194,10 @@ env_t * ENV_Params ( prc_t *pprc )
 	float amp1		= pprc->prm[env_iamp1];
 	float amp2		= pprc->prm[env_iamp2];
 	float amp3		= pprc->prm[env_iamp3];
-	float attack	= pprc->prm[env_iattack]/1000.0;
-	float decay		= pprc->prm[env_idecay]/1000.0;
-	float sustain	= pprc->prm[env_isustain]/1000.0;
-	float release	= pprc->prm[env_irelease]/1000.0;
+	float attack	= pprc->prm[env_iattack]/1000.0F;
+	float decay		= pprc->prm[env_idecay]/1000.0F;
+	float sustain	= pprc->prm[env_isustain]/1000.0F;
+	float release	= pprc->prm[env_irelease]/1000.0F;
 	float fexp		= pprc->prm[env_ifexp];
 	bool bexp;
 
@@ -4529,8 +4529,8 @@ efo_t * EFO_Params ( prc_t *pprc )
 	efo_t *penv;
 
 	float threshold		= Gain_To_Amplitude( dB_To_Gain(pprc->prm[efo_ithreshold]) );
-	float attack		= pprc->prm[efo_iattack]/1000.0;
-	float decay			= pprc->prm[efo_idecay]/1000.0;
+	float attack		= pprc->prm[efo_iattack]/1000.0F;
+	float decay			= pprc->prm[efo_idecay]/1000.0F;
 	float fexp			= pprc->prm[efo_iexp];
 	bool bexp;
 
@@ -5040,14 +5040,14 @@ amp_t * AMP_Params ( prc_t *pprc )
 	float rand = pprc->prm[amp_irand];
 	bool brand;
 
-	if (pprc->prm[amp_imodrate] > 0.0)
+	if (pprc->prm[amp_imodrate] > 0.0F)
 	{
-		ramptime = pprc->prm[amp_imodglide] / 1000.0;			// get ramp time in seconds
-		modtime = 1.0 / max((double)pprc->prm[amp_imodrate], 0.01);		// time between modulations in seconds
+		ramptime = pprc->prm[amp_imodglide] / 1000.0F;			// get ramp time in seconds
+		modtime = 1.0F / max(pprc->prm[amp_imodrate], 0.01F);		// time between modulations in seconds
 		depth = pprc->prm[amp_imoddepth];						// depth of modulations 0-1.0
 	}
 
-	brand = rand > 0.0 ? 1 : 0;
+	brand = rand > 0.0F ? 1 : 0;
 
 	pamp = AMP_Alloc ( pprc->prm[amp_gain], pprc->prm[amp_vthresh], pprc->prm[amp_distmix], pprc->prm[amp_vfeed], 
 		ramptime, modtime, depth, brand );
@@ -6096,7 +6096,7 @@ int DSP_Alloc( int ipset, float xfade, int cchan )
 
 	// set up crossfade time in seconds
 
-	pdsp->xfade = xfade / 1000.0;				
+	pdsp->xfade = xfade / 1000.0F;				
 	pdsp->xfade_default = pdsp->xfade;
 
 	RMP_SetEnd(&pdsp->xramp);
@@ -6329,9 +6329,9 @@ void DSP_SetPreset( int idsp, int ipsetnew)
 	
 	// get new xfade time from previous preset (ie: fade out time). if 0 use default. if < 0, use exponential xfade
 
-	if ( fabs(pdsp->ppsetprev[0]->fade) > 0.0 )
+	if ( fabsf(pdsp->ppsetprev[0]->fade) > 0.0F )
 	{
-		pdsp->xfade = fabs(pdsp->ppsetprev[0]->fade);
+		pdsp->xfade = fabsf(pdsp->ppsetprev[0]->fade);
 		pdsp->bexpfade = pdsp->ppsetprev[0]->fade < 0 ? 1 : 0;
 	}
 	else
@@ -6816,16 +6816,16 @@ void ADSP_SetupAutoDelay( prc_t *pprc_dly, auto_params_t *pa )
 	// feedback: feedback 0-1.0
 	// gain: final gain of output stage, 0-1.0
 
-	int size = pa->length * 2.0;
+	int size = pa->length * 2;
 	
 	if (pa->shape == ADSP_ALLEY || pa->shape == ADSP_STREET || pa->shape == ADSP_OPEN_STREET)
-		size = pa->width * 2.0;
+		size = pa->width * 2;
 
 	pprc_dly->type = PRC_DLY;
 
 	pprc_dly->prm[dly_idtype]		= DLY_LOWPASS;		// delay with feedback
 
-	pprc_dly->prm[dly_idelay]		= clamp((size / 12.0), 5.0, 500.0);
+	pprc_dly->prm[dly_idelay]		= clamp((size / 12.0F), 5.0F, 500.0F);
 	
 	pprc_dly->prm[dly_ifeedback]	= MapSizeToDLYFeedback[pa->len];
 
@@ -6843,8 +6843,8 @@ void ADSP_SetupAutoDelay( prc_t *pprc_dly, auto_params_t *pa )
 
 	pprc_dly->prm[dly_iquality]		= QUA_LO;
 
-	float l = clamp((pa->length * 2.0 / 12.0), 14.0, 500.0);
-	float w = clamp((pa->width * 2.0 / 12.0), 14.0, 500.0);
+	float l = clamp((pa->length * 2.0F / 12.0F), 14.0F, 500.0F);
+	float w = clamp((pa->width * 2.0F / 12.0F), 14.0F, 500.0F);
 
 	// convert to multitap delay
 
@@ -6918,9 +6918,9 @@ void ADSP_SetupAutoReverb( prc_t *pprc_rva, auto_params_t *pa )
 
 	pprc_rva->prm[rva_iftaps]		= 0;	// 0.1 // use extra delay taps to increase density
 
-	pprc_rva->prm[rva_width]		= clamp( ((float)(pa->width) / 12.0), 6.0, 500.0);	// in feet
-	pprc_rva->prm[rva_depth]		= clamp( ((float)(pa->length) / 12.0), 6.0, 500.0);
-	pprc_rva->prm[rva_height]		= clamp( ((float)(pa->height) / 12.0), 6.0, 500.0);
+	pprc_rva->prm[rva_width]		= clamp( ((float)(pa->width) / 12.0F), 6.0F, 500.0F);	// in feet
+	pprc_rva->prm[rva_depth]		= clamp( ((float)(pa->length) / 12.0F), 6.0F, 500.0F);
+	pprc_rva->prm[rva_height]		= clamp( ((float)(pa->height) / 12.0F), 6.0F, 500.0F);
 
 	// room
 	pprc_rva->prm[rva_fbwidth]		= 0.9; // MapSizeToRVAFeedback[pa->size];	// larger size = more feedback
@@ -7144,9 +7144,9 @@ void ADSP_InterpolatePreset( pset_t *pnew, pset_t *pmin, pset_t *pmax, auto_para
 	// interpolate width,depth,height based on ap width length & height - exponential interpolation
 	// if pmin or pmax parameters are < 0, directly set value from w/l/h
 
-	float w	= clamp( ((float)(pa->width) / 12.0), 6.0, 500.0);	// in feet
-	float l = clamp( ((float)(pa->length) / 12.0), 6.0, 500.0);
-	float h	= clamp( ((float)(pa->height) / 12.0), 6.0, 500.0);
+	float w	= clamp( ((float)(pa->width) / 12.0F), 6.0F, 500.0F);	// in feet
+	float l = clamp( ((float)(pa->length) / 12.0F), 6.0F, 500.0F);
+	float h	= clamp( ((float)(pa->height) / 12.0F), 6.0F, 500.0F);
 
 	ADSP_SetParamIfNegative( pnew, pmin, pmax, PRC_RVA, iskip, rva_width, pa->wid, ADSP_WIDTH_MAX, 1, w);
 	ADSP_SetParamIfNegative( pnew, pmin, pmax, PRC_RVA, iskip, rva_depth, pa->len, ADSP_LENGTH_MAX, 1, l);
@@ -7169,8 +7169,8 @@ void ADSP_InterpolatePreset( pset_t *pnew, pset_t *pmin, pset_t *pmax, auto_para
 	
 	// directly set delay value from pa->length if pmin or pmax value is < 0
 	
-	l = clamp((pa->length * 2.0 / 12.0), 14.0, 500.0);
-	w = clamp((pa->width * 2.0 / 12.0), 14.0, 500.0);
+	l = clamp((pa->length * 2.0F / 12.0F), 14.0F, 500.0F);
+	w = clamp((pa->width * 2.0F / 12.0F), 14.0F, 500.0F);
 
 	ADSP_SetParamIfNegative( pnew, pmin, pmax, PRC_DLY, iskip, dly_idelay, pa->len, ADSP_LENGTH_MAX, 1, l);
 
@@ -9048,8 +9048,9 @@ float DSP_LookupStringToken( char *psz, int ipset )
 	int i;	
 	float fipset = (float)ipset;
 
+	// dimhotepus: atof -> strtof
 	if (isnumber(psz[0]))
-		return atof(psz);
+		return strtof(psz, nullptr);
 
 	for (i = 0; i < gcdsp_stringmap; i++)
 	{
@@ -9164,22 +9165,28 @@ bool DSP_LoadPresetFile( void )
 		itype = (int)DSP_LookupStringToken( com_token , ipreset);
 
 		pstart = COM_Parse( pstart );
-		mix_min = atof( com_token );
+		// dimhotepus: atof -> strtof
+		mix_min = strtof( com_token, nullptr );
 
 		pstart = COM_Parse( pstart );
-		mix_max = atof( com_token );
+		// dimhotepus: atof -> strtof
+		mix_max = strtof( com_token, nullptr );
 
 		pstart = COM_Parse( pstart );
-		duration = atof( com_token );
+		// dimhotepus: atof -> strtof
+		duration = strtof( com_token, nullptr );
 
 		pstart = COM_Parse( pstart );
-		fadeout = atof( com_token );
+		// dimhotepus: atof -> strtof
+		fadeout = strtof( com_token, nullptr );
 		
 		pstart = COM_Parse( pstart );
-		db_min = atof( com_token );
+		// dimhotepus: atof -> strtof
+		db_min = strtof( com_token, nullptr );
 
 		pstart = COM_Parse( pstart );
-		db_mixdrop = atof( com_token );
+		// dimhotepus: atof -> strtof
+		db_mixdrop = strtof( com_token, nullptr );
 
 
 		g_psettemplates[ipreset].fused = true;
@@ -9659,7 +9666,7 @@ inline int S_Compress( int xin )
 	//Cn = l * (*pCnPrev) + (1 - l) * fabs((float)xin);
 	//*pCnPrev = Cn;
 	
-	Cn = fabs((float)xin);
+	Cn = fabsf((float)xin);
 
 	if (Cn < C0)
 		Fn = 1;

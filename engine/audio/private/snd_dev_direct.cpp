@@ -1270,8 +1270,8 @@ void DS3D_SetBufferParams( LPDIRECTSOUND3DBUFFER pDSBuf3D, D3DVECTOR *pbpos, D3D
 
 	bparm.vPosition = bpos;
 	bparm.vVelocity = bvel;
-	bparm.dwInsideConeAngle = 5.0;						// narrow cones for each speaker
-	bparm.dwOutsideConeAngle = 10.0;	
+	bparm.dwInsideConeAngle = 5;						// narrow cones for each speaker
+	bparm.dwOutsideConeAngle = 10;	
 	bparm.vConeOrientation = bdir;
 	bparm.lConeOutsideVolume = DSBVOLUME_MIN;
 	bparm.flMinDistance = 100.0;		// no rolloff (until > 2.0 meter distance)

@@ -1664,10 +1664,10 @@ void SDEBUG_GetAvgValue( int ibuf, int count, float *pav )
 	if (snd_showstart.GetInt() != 4 )
 		return;
 
-	float av = 0.0;
+	float av = 0.0F;
 	
 	for (int i = 0; i < count; i++)
-		av += (float)(abs(g_paintBuffers[ibuf].pbuf->left) + abs(g_paintBuffers[ibuf].pbuf->right))/2.0;
+		av += (abs(g_paintBuffers[ibuf].pbuf->left) + abs(g_paintBuffers[ibuf].pbuf->right))/2.0F;
 	
 	*pav = av / count;
 #endif // DEBUG
@@ -2558,7 +2558,7 @@ bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int vol
 	// If global dsp volume is less than 1, reduce dspmix (ie: increase dry volume)
 	// If gloabl dsp volume is greater than 1,  do not reduce dspmix
 	
-	if (g_dsp_volume < 1.0)
+	if (g_dsp_volume < 1.0F)
 		dspmix *= g_dsp_volume;
 
 	// If mixing to facing/facingaway buss, adjust volume based on sound entity's facing direction.
@@ -2568,7 +2568,7 @@ bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int vol
 	
 	// scale 1.0 - facing player, scale 0, facing away
 
-	scale = (pChannel->dspface + 1.0) / 2.0;
+	scale = (pChannel->dspface + 1.0F) / 2.0F;
 
 	// UNDONE: get front cone % from channel to set this.
 

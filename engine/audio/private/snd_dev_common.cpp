@@ -39,7 +39,7 @@ inline bool FVolumeCenterNonZero( int *pvol )
 // fmix2channels causes mono mix for 4 channel mix to mix down to 2 channels
 //    this is used for the 2 speaker outpu case, which uses recombined 4 channel front/rear mixing
 
-static float XfadeSpeakerVolToMono( float scale, float xfade, float ispeaker, float cspeaker, bool fmix2channels )
+static float XfadeSpeakerVolToMono( float scale, float xfade, int ispeaker, int cspeaker, bool fmix2channels )
 {
 	float scale_out;
 	float scale_target;
@@ -47,13 +47,13 @@ static float XfadeSpeakerVolToMono( float scale, float xfade, float ispeaker, fl
 	if (cspeaker == 4 )
 	{
 		// mono sound distribution:
-		float scale_targets[]    = {0.9, 0.9, 0.9, 0.9};	// RF, LF, RR, LR
-		float scale_targets2ch[] = {0.9, 0.9, 0.0, 0.0};	// RF, LF, RR, LR
+		float scale_targets[]    = {0.9F, 0.9F, 0.9F, 0.9F};	// RF, LF, RR, LR
+		float scale_targets2ch[] = {0.9F, 0.9F, 0.0F, 0.0F};	// RF, LF, RR, LR
 
 		if ( fmix2channels )
-			scale_target = scale_targets2ch[clamp(FastFloatToSmallInt(ispeaker), 0, 3)];
+			scale_target = scale_targets2ch[clamp(ispeaker, 0, 3)];
 		else
-			scale_target = scale_targets[clamp(FastFloatToSmallInt(ispeaker), 0, 3)];
+			scale_target = scale_targets[clamp(ispeaker, 0, 3)];
 
 		goto XfadeExit;
 	}
@@ -61,13 +61,13 @@ static float XfadeSpeakerVolToMono( float scale, float xfade, float ispeaker, fl
 	if (cspeaker == 5 )
 	{
 		// mono sound distribution:
-		float scale_targets[] = {0.9, 0.9, 0.5, 0.5, 0.9};	// RF, LF, RR, LR, FC
-		scale_target = scale_targets[(int)clamp(FastFloatToSmallInt(ispeaker), 0, 4)];
+		float scale_targets[] = {0.9F, 0.9F, 0.5F, 0.5F, 0.9F};	// RF, LF, RR, LR, FC
+		scale_target = scale_targets[clamp(ispeaker, 0, 4)];
 		goto XfadeExit;
 	}
 
 	// if (cspeaker == 2 )
-	scale_target = 0.9; // front 2 speakers in stereo each get 50% of total volume in mono case
+	scale_target = 0.9F; // front 2 speakers in stereo each get 50% of total volume in mono case
 	
 XfadeExit:
 	scale_out = scale + (scale_target - scale) * xfade;
@@ -83,9 +83,9 @@ XfadeExit:
 // return: scale from 0-1.0 for speaker volume.
 // NOTE: as pitch angle goes to +/- 90, sound goes to mono, all speakers.
 
-#define PITCH_ANGLE_THRESHOLD	45.0
-#define REAR_VOL_DROP			0.5
-#define VOLCURVEPOWER			1.5		// 1.0 is a linear crossfade of volume between speakers.
+#define PITCH_ANGLE_THRESHOLD	45.0F
+#define REAR_VOL_DROP			0.5F
+#define VOLCURVEPOWER			1.5F		// 1.0 is a linear crossfade of volume between speakers.
 										// 1.5 provides a smoother, nonlinear volume transition - this is done
 										// because a volume of 255 played in a single speaker is
 										// percieved as louder than 128 + 128 in two speakers
@@ -94,10 +94,10 @@ XfadeExit:
 
 static float GetSpeakerVol( float yaw_source, float pitch_source, float mono, float yaw_speaker, int ispeaker, int cspeaker, bool fmix2channels )
 {
-	float adif = fabs(yaw_source - yaw_speaker);
+	float adif = fabsf(yaw_source - yaw_speaker);
 	float pitch_angle = pitch_source;
-	float scale = 0.0; 
-	float xfade = 0.0;
+	float scale = 0.0F; 
+	float xfade = 0.0F;
 
 	if ( adif > 180 )
 		adif = 360 - adif;
@@ -118,7 +118,7 @@ static float GetSpeakerVol( float yaw_source, float pitch_source, float mono, fl
 	// calculate additional mono crossfade due to pitch angle
 	if ( pitch_angle > PITCH_ANGLE_THRESHOLD )	
 	{
-		xfade  = ( pitch_angle - PITCH_ANGLE_THRESHOLD ) / ( 90.0 - PITCH_ANGLE_THRESHOLD );	// 0.0 -> 1.0 as angle 45->90	
+		xfade  = ( pitch_angle - PITCH_ANGLE_THRESHOLD ) / ( 90.0F - PITCH_ANGLE_THRESHOLD );	// 0.0 -> 1.0 as angle 45->90	
 
 		mono += xfade;
 		mono = clamp(mono, 0.0f, 1.0f);
@@ -128,7 +128,7 @@ static float GetSpeakerVol( float yaw_source, float pitch_source, float mono, fl
 	{
 		// 2 speaker (headphone) mix: speakers opposing, at 0 & 180 degrees
 
-		scale = (1.0 - powf(adif/180.0, VOLCURVEPOWER));
+		scale = (1.0F - powf(adif/180.0F, VOLCURVEPOWER));
 
 		goto GetVolExit;
 	}
@@ -142,7 +142,7 @@ static float GetSpeakerVol( float yaw_source, float pitch_source, float mono, fl
 		// scale ranges from 0.0 (at 90 degree difference between source and speaker)
 		// to 1.0 (0 degree difference between source and speaker)
 
-		scale = (1.0 - powf(adif/90.0, VOLCURVEPOWER));
+		scale = (1.0F - powf(adif/90.0F, VOLCURVEPOWER));
 	
 		goto GetVolExit;
 	}
@@ -160,17 +160,17 @@ static float GetSpeakerVol( float yaw_source, float pitch_source, float mono, fl
 	case ISPEAKER_LEFT_REAR:
 		{
 			// rear speakers get +/- 90 degrees of linear scaling...
-			scale = (1.0 - powf(adif/90.0, VOLCURVEPOWER));
+			scale = (1.0F - powf(adif/90.0F, VOLCURVEPOWER));
 			break;
 		}
 
 	case ISPEAKER_CENTER_FRONT:
 		{
 			// center speaker gets +/- 45 degrees of linear scaling...
-			if (adif > 45.0)
+			if (adif > 45.0F)
 				goto GetVolExit;	// 0.0 scale
 
-			scale = (1.0 - powf(adif/45.0, VOLCURVEPOWER));
+			scale = (1.0F - powf(adif/45.0F, VOLCURVEPOWER));
 			break;
 		}
 	case ISPEAKER_RIGHT_FRONT:
@@ -183,7 +183,7 @@ static float GetSpeakerVol( float yaw_source, float pitch_source, float mono, fl
 					if (adif > 75.0)
 						goto GetVolExit;	// 0.0 scale
 
-					scale = (1.0 - powf(adif/75.0, VOLCURVEPOWER));
+					scale = (1.0F - powf(adif/75.0F, VOLCURVEPOWER));
 			}
 /*
 			if (yaw_source > yaw_speaker && yaw_source < (yaw_speaker + 90.0))
@@ -199,7 +199,7 @@ static float GetSpeakerVol( float yaw_source, float pitch_source, float mono, fl
 			else
 			{
 				// sound source is CW from right speaker, apply scaling over 90 degrees...
-				scale = (1.0 - powf(adif/90.0, VOLCURVEPOWER));
+				scale = (1.0F - powf(adif/90.0F, VOLCURVEPOWER));
 			}
 
 			break;
@@ -212,10 +212,10 @@ static float GetSpeakerVol( float yaw_source, float pitch_source, float mono, fl
 				// if sound source is between left front speaker and center speaker, 
 				// apply scaling over 75 degrees...
 
-				if (adif > 75.0)
+				if (adif > 75.0F)
 					goto GetVolExit;	// 0.0 scale
 
-				scale = (1.0 - powf(adif/75.0, VOLCURVEPOWER));
+				scale = (1.0F - powf(adif/75.0F, VOLCURVEPOWER));
 
 			}
 /*
@@ -233,7 +233,7 @@ static float GetSpeakerVol( float yaw_source, float pitch_source, float mono, fl
 			else
 			{
 				// sound source is CW from right speaker, apply scaling over 90 degrees...
-				scale = (1.0 - powf(adif/90.0, VOLCURVEPOWER));
+				scale = (1.0F - powf(adif/90.0F, VOLCURVEPOWER));
 			}
 			break;
 		}
@@ -329,8 +329,8 @@ void CAudioDeviceBase::SpatializeChannel( int volume[CCHANVOLUMES/2], int master
 
 			// add sounds coming from rear (quieter)
 
-			rfscale = clamp((rfscale + rrscale * 0.75), 0.0, 1.0); 
-			lfscale = clamp((lfscale + lrscale * 0.75), 0.0, 1.0);		
+			rfscale = clamp((rfscale + rrscale * 0.75F), 0.0F, 1.0F); 
+			lfscale = clamp((lfscale + lrscale * 0.75F), 0.0F, 1.0F);		
 			
 			rrscale = 0;
 			lrscale = 0;
@@ -403,7 +403,7 @@ SpatialExit:
 		if ( m_bSurroundCenter )
 		{
 			volume[IFRONT_CENTER] = (int) (master_vol * gain * fcscale);
-			volume[IFRONT_CENTER0] = 0.0;
+			volume[IFRONT_CENTER0] = 0;
 
 			volume[IFRONT_CENTER] = clamp( volume[IFRONT_CENTER], 0, 255);
 		}
