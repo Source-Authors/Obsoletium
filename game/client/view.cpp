@@ -1000,10 +1000,10 @@ void CViewRender::WriteSaveGameScreenshot( const char *pFilename )
 
 float ScaleFOVByWidthRatio( float fovDegrees, float ratio )
 {
-	float halfAngleRadians = fovDegrees * ( 0.5f * M_PI / 180.0f );
-	float t = tan( halfAngleRadians );
+	float halfAngleRadians = fovDegrees * ( 0.5f * M_PI_F / 180.0f );
+	float t = tanf( halfAngleRadians );
 	t *= ratio;
-	float retDegrees = ( 180.0f / M_PI ) * atan( t );
+	float retDegrees = ( 180.0f / M_PI_F ) * atanf( t );
 	return retDegrees * 2.0f;
 }
 
