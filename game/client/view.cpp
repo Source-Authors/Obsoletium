@@ -736,7 +736,8 @@ void CViewRender::SetUpViews()
 	float flFOVOffset = fDefaultFov - viewEye.fov;
 
 	//Adjust the viewmodel's FOV to move with any FOV offsets on the viewer's end
-	viewEye.fovViewmodel = g_pClientMode->GetViewModelFOV() - flFOVOffset;
+	// dimhotepus: Do not rotate view model when in zoom mode.
+	viewEye.fovViewmodel = fabsf(g_pClientMode->GetViewModelFOV() - flFOVOffset);
 
 	if ( UseVR() )
 	{
