@@ -184,13 +184,14 @@ bool ReleaseThreadHandle( ThreadHandle_t hThread )
 
 void ThreadSleep(unsigned nMilliseconds)
 {
-	// dimhotepus: Use std thread APIs.
 	if ( nMilliseconds == 0 )
 	{
-    std::this_thread::yield();
+    // dimhotepus: Pause a bit.
+    ThreadPause();
 	}
 	else
 	{
+		// dimhotepus: Use std thread APIs.
 		std::this_thread::sleep_for( std::chrono::milliseconds{nMilliseconds} );
 	}
 }
