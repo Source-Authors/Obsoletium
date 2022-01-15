@@ -19,3 +19,6 @@
 [submodule "thirdparty/bzip2"]
 	path = thirdparty/bzip2
 	url = git://sourceware.org/git/bzip2.git
+[submodule "thirdparty/stb"]
+	path = thirdparty/stb
+	url = git@github.com:nothings/stb.git

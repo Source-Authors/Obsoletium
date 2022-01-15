@@ -20,7 +20,7 @@
 #include "../../thirdparty/miniz/miniz.c"
 #include "../../thirdparty/miniz/simple_bitmap.h"
 #define STBI_NO_STDIO
-#include "../../thirdparty/stb_image/stb_image.c"
+#include "../../thirdparty/stb/stb_image.h"
 #include "ivideomode.h"
 #endif
 
