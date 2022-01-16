@@ -5,10 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <KeyValues.h>
-#include <tier0/mem.h>
+#include "tier1/KeyValues.h"
+#include "tier0/mem.h"
 #include "filesystem.h"
-#include "utldict.h"
+#include "tier1/utldict.h"
 #include "ammodef.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -52,11 +52,11 @@ int GetWeaponSoundFromString( const char *pszString )
 
 
 // Item flags that we parse out of the file.
-typedef struct
+struct itemFlags_t
 {
 	const char *m_pFlagName;
 	int m_iFlagValue;
-} itemFlags_t;
+};
 #if !defined(_STATIC_LINKED) || defined(CLIENT_DLL)
 itemFlags_t g_ItemFlags[8] =
 {
@@ -77,8 +77,14 @@ extern itemFlags_t g_ItemFlags[8];
 static CUtlDict< FileWeaponInfo_t*, unsigned short > m_WeaponInfoDatabase;
 
 #ifdef _DEBUG
+struct UsedWeaponSlot_t
+{
+  char szPrintName[MAX_WEAPON_STRING];
+  bool bUsed;
+};
+
 // used to track whether or not two weapons have been mistakenly assigned the wrong slot
-bool g_bUsedWeaponSlots[MAX_WEAPON_SLOTS][MAX_WEAPON_POSITIONS] = { { false } };
+UsedWeaponSlot_t g_bUsedWeaponSlots[MAX_WEAPON_SLOTS][MAX_WEAPON_POSITIONS] = { { '\0', false } };
 
 #endif
 
@@ -144,28 +150,12 @@ WEAPON_FILE_INFO_HANDLE GetInvalidWeaponInfoHandle( void )
 	return (WEAPON_FILE_INFO_HANDLE)m_WeaponInfoDatabase.InvalidIndex();
 }
 
-#if 0
-void ResetFileWeaponInfoDatabase( void )
-{
-	int c = m_WeaponInfoDatabase.Count(); 
-	for ( int i = 0; i < c; ++i )
-	{
-		delete m_WeaponInfoDatabase[ i ];
-	}
-	m_WeaponInfoDatabase.RemoveAll();
-
-#ifdef _DEBUG
-	memset(g_bUsedWeaponSlots, 0, sizeof(g_bUsedWeaponSlots));
-#endif
-}
-#endif
-
 void PrecacheFileWeaponInfoDatabase( IFileSystem *pFilesystem, const unsigned char *pICEKey )
 {
 	if ( m_WeaponInfoDatabase.Count() )
 		return;
 
-	KeyValues *manifest = new KeyValues( "weaponscripts" );
+	KeyValues::AutoDelete manifest = KeyValues::AutoDelete("weaponscripts");
 	if ( manifest->LoadFromFile( pFilesystem, "scripts/weapon_manifest.txt", "GAME" ) )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL ; sub = sub->GetNextKey() )
@@ -190,7 +180,6 @@ void PrecacheFileWeaponInfoDatabase( IFileSystem *pFilesystem, const unsigned ch
 			}
 		}
 	}
-	manifest->deleteThis();
 }
 
 KeyValues* ReadEncryptedKVFile( IFileSystem *pFilesystem, const char *szFilenameWithoutExtension, const unsigned char *pICEKey, bool bForceReadEncryptedFile /*= false*/ )
@@ -285,20 +274,18 @@ bool ReadWeaponDataFromFileForSlot( IFileSystem* pFilesystem, const char *szWeap
 	char sz[128];
 	Q_snprintf( sz, sizeof( sz ), "scripts/%s", szWeaponName );
 
-	KeyValues *pKV = ReadEncryptedKVFile( pFilesystem, sz, pICEKey,
+	KeyValues::AutoDelete pKV = KeyValues::AutoDelete{ReadEncryptedKVFile( pFilesystem, sz, pICEKey,
 #if defined( DOD_DLL )
 		true			// Only read .ctx files!
 #else
 		false
 #endif
-		);
+		)};
 
 	if ( !pKV )
 		return false;
 
 	pFileInfo->Parse( pKV, szWeaponName );
-
-	pKV->deleteThis();
 
 	return true;
 }
@@ -422,28 +409,25 @@ void FileWeaponInfo_t::Parse( KeyValues *pKeyValuesData, const char *szWeaponNam
 	}
 	else
 	{
-		if (g_bUsedWeaponSlots[iSlot][iPosition])
+		auto &slot = g_bUsedWeaponSlots[iSlot][iPosition];
+		if ( slot.bUsed )
 		{
-			Warning( "Duplicately assigned weapon slots in selection hud:  %s (%d, %d)\n", szPrintName, iSlot, iPosition );
+			Warning( "Duplicately assigned weapon slots in selection hud:  %s -> %s (%d, %d)\n",
+				slot.szPrintName, szPrintName, iSlot, iPosition );
 		}
-		g_bUsedWeaponSlots[iSlot][iPosition] = true;
+		Q_strncpy( slot.szPrintName, szPrintName, std::size( slot.szPrintName ) );
+		slot.bUsed = true;
 	}
 #endif
 
 	// Primary ammo used
 	const char *pAmmo = pKeyValuesData->GetString( "primary_ammo", "None" );
-	if ( strcmp("None", pAmmo) == 0 )
-		Q_strncpy( szAmmo1, "", sizeof( szAmmo1 ) );
-	else
-		Q_strncpy( szAmmo1, pAmmo, sizeof( szAmmo1 )  );
+	Q_strncpy( szAmmo1, strcmp("None", pAmmo) == 0 ? "" : pAmmo, sizeof( szAmmo1 ) );
 	iAmmoType = GetAmmoDef()->Index( szAmmo1 );
 	
 	// Secondary ammo used
 	pAmmo = pKeyValuesData->GetString( "secondary_ammo", "None" );
-	if ( strcmp("None", pAmmo) == 0)
-		Q_strncpy( szAmmo2, "", sizeof( szAmmo2 ) );
-	else
-		Q_strncpy( szAmmo2, pAmmo, sizeof( szAmmo2 )  );
+	Q_strncpy( szAmmo2, strcmp("None", pAmmo) == 0 ? "" : pAmmo, sizeof( szAmmo2 ) );
 	iAmmo2Type = GetAmmoDef()->Index( szAmmo2 );
 
 	// Now read the weapon sounds
