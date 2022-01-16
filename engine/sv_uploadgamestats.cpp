@@ -271,7 +271,7 @@ class CUploadGameStats : public IUploadGameStats
 {
 public:
 
-	#define GAMESTATSUPLOADER_CONNECT_RETRY_TIME	1.0
+	#define GAMESTATSUPLOADER_CONNECT_RETRY_TIME	1.0F
 
 	CUploadGameStats() : m_bConnected(false), m_flNextConnectAttempt(0) {}
 

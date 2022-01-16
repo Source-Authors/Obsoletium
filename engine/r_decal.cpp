@@ -449,7 +449,7 @@ void Shader_DecalDrawPoly( CDecalVert *v, IMaterial *pMaterial, SurfaceHandle_t 
 		}
 		else
 		{
-			fadeval = 1.0 - (cl.GetTime() - pdecal->fadeStartTime) / pdecal->fadeDuration;
+			fadeval = 1.0F - (cl.GetTime() - pdecal->fadeStartTime) / pdecal->fadeDuration;
 		}
 
 		fadeval = clamp( fadeval, 0.0f, 1.0f );
@@ -923,8 +923,8 @@ void R_DecalSurface( SurfaceHandle_t surfID, decalinfo_t *decalinfo, bool bForce
 		fabs( decalinfo->m_decalHeight * DotProduct( textureV.AsVector3D(), decalinfo->m_Basis[1] ) );
 
 	// move s,t to upper left corner
-	s -= ( w * 0.5 );
-	t -= ( h * 0.5 );
+	s -= ( w * 0.5F );
+	t -= ( h * 0.5F );
 
 	// Is this rect within the surface? -- tex width & height are unsigned
 	if( !bForceForDisplacement )
@@ -2087,7 +2087,7 @@ void R_DrawDecalsAllImmediate_Gathered( IMatRenderContext *pRenderContext, decal
 			}
 			else
 			{
-				flFadeValue = 1.0 - ( cl.GetTime() - pDecal->fadeStartTime ) / pDecal->fadeDuration;
+				flFadeValue = 1.0F - ( cl.GetTime() - pDecal->fadeStartTime ) / pDecal->fadeDuration;
 			}
 
 			flFadeValue = clamp( flFadeValue, 0.0f, 1.0f );
@@ -2225,7 +2225,7 @@ void R_DrawDecalsAllImmediate( IMatRenderContext *pRenderContext, int iGroup, in
 					}
 					else
 					{
-						flFadeValue = 1.0 - ( cl.GetTime() - pDecal->fadeStartTime ) / pDecal->fadeDuration;
+						flFadeValue = 1.0F - ( cl.GetTime() - pDecal->fadeStartTime ) / pDecal->fadeDuration;
 					}
 					
 					flFadeValue = clamp( flFadeValue, 0.0f, 1.0f );
@@ -2548,7 +2548,7 @@ void R_DrawDecalsAll_Gathered( IMatRenderContext *pRenderContext, decal_t **ppDe
 			}
 			else
 			{
-				flFadeValue = 1.0 - ( cl.GetTime() - pDecal->fadeStartTime ) / pDecal->fadeDuration;
+				flFadeValue = 1.0F - ( cl.GetTime() - pDecal->fadeStartTime ) / pDecal->fadeDuration;
 			}
 
 			flFadeValue = clamp( flFadeValue, 0.0f, 1.0f );
@@ -2802,7 +2802,7 @@ void R_DrawDecalsAll( IMatRenderContext *pRenderContext, int iGroup, int iTreeTy
 					}
 					else
 					{
-						flFadeValue = 1.0 - ( localClientTime - pDecal->fadeStartTime ) / pDecal->fadeDuration;
+						flFadeValue = 1.0F - ( localClientTime - pDecal->fadeStartTime ) / pDecal->fadeDuration;
 					}
 					
 					flFadeValue = clamp( flFadeValue, 0.0f, 1.0f );

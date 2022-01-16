@@ -212,7 +212,7 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 					for(int x1=0;x1<tgaSize;x1++)
 						for(int y1=0;y1<tgaSize;y1++)
 							for(int c=0;c<3;c++)
-								ldr_map.Pixel(x1,y1,c)=pImage1[c+4*(x1+tgaSize*y1)]*(1/255.0);
+								ldr_map.Pixel(x1,y1,c)=pImage1[c+4*(x1+tgaSize*y1)]*(1/255.0F);
 					delete[] pImage;
 					delete[] pImage1;
 					ldr_map.RaiseToPower(2.2);				// gamma to linear

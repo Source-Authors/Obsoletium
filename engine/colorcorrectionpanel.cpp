@@ -255,7 +255,7 @@ float HueToRGB( float v1, float v2, float vH )
 
 	vH = vH / 360.0f;
 
-	vH = fmod (vH + 1.0f, 1.0f);
+	vH = fmodf (vH + 1.0f, 1.0f);
 
 	if ( ( vH * 6.0f ) < 1.0f )
 	{
@@ -2504,7 +2504,7 @@ void CSelectedHSVOperation::Apply( const Vector &inRGB, Vector &outRGB )
 	if( !m_bColorize )
 	{
 		hsv.x += m_DeltaHSV.x;
-		hsv.x = fmod( hsv.x, 360.0f );
+		hsv.x = fmodf( hsv.x, 360.0f );
 		if( hsv.x < 0.0f ) hsv.x = 360.0f + hsv.x;
 
 		hsv.y += m_DeltaHSV.y*hsv.y;
@@ -3710,12 +3710,12 @@ int HSLValue( float n1, float n2, float hue )
 	else if (hue < 0)
 		hue += 255;
 
-	if (hue < 42.5)
-		value = n1 + (n2 - n1) * (hue / 42.5);
-	else if (hue < 127.5)
+	if (hue < 42.5F)
+		value = n1 + (n2 - n1) * (hue / 42.5F);
+	else if (hue < 127.5F)
 		value = n2;
 	else if (hue < 170)
-		value = n1 + (n2 - n1) * ((170 - hue) / 42.5);
+		value = n1 + (n2 - n1) * ((170 - hue) / 42.5F);
 	else
 		value = n1;
 
@@ -3745,11 +3745,11 @@ void HSLToRGB( int *hue, int *saturation, int *lightness )
 		float m1, m2;
 
 		if (l < 128)
-			m2 = (l * (255 + s)) / 65025.0;
+			m2 = (l * (255 + s)) / 65025.0F;
 		else
-			m2 = (l + s - (l * s) / 255.0) / 255.0;
+			m2 = (l + s - (l * s) / 255.0F) / 255.0F;
 
-		m1 = (l / 127.5) - m2;
+		m1 = (l / 127.5F) - m2;
 
 		/*  chromatic case  */
 		*hue        = HSLValue(m1, m2, h + 85);
@@ -3783,12 +3783,12 @@ void RGBToHSL( int *red, int *green, int *blue )
 		imin = min (r, b);
 	}
 
-	l = (imax + imin) / 2.0;
+	l = (imax + imin) / 2.0F;
 
 	if (imax == imin)
 	{
-		s = 0.0;
-		h = 0.0;
+		s = 0.0F;
+		h = 0.0F;
 	}
 	else
 	{
@@ -3806,7 +3806,7 @@ void RGBToHSL( int *red, int *green, int *blue )
 		else
 			h = 4 + (r - g) / (float) delta;
 
-		h = h * 42.5;
+		h = h * 42.5F;
 
 		if (h < 0)
 			h += 255;

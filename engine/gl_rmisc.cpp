@@ -86,7 +86,7 @@ void R_TimeRefresh_f (void)
 	start = Sys_FloatTime ();
 	for (i=0 ; i<128 ; i++)
 	{
-		view.angles[1] = i/128.0*360.0;
+		view.angles[1] = i/128.0F*360.0F;
 		g_ClientDLL->RenderView( view, VIEW_CLEAR_COLOR, RENDERVIEW_DRAWVIEWMODEL | RENDERVIEW_DRAWHUD );
 		Shader_SwapBuffers();
 	}

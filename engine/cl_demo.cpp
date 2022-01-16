@@ -2294,7 +2294,8 @@ CON_COMMAND( demo_pause, "Pauses demo playback." )
 
 	if ( args.ArgC() == 2 )
 	{
-		seconds = atof( args[1] );
+		// dimhotepus: atof -> strtof
+		seconds = strtof( args[1], nullptr );
 	}
 
 	demoplayer->PausePlayback( seconds );
@@ -2365,7 +2366,8 @@ CON_COMMAND( demo_timescale, "Sets demo replay speed." )
 
 	if ( args.ArgC() == 2 )
 	{
-		fScale = atof( args[1] );
+		// dimhotepus: atof -> strtof
+		fScale = strtof( args[1], nullptr );
 		fScale = clamp( fScale, 0.0f, 100.0f );
 	}
 

@@ -259,9 +259,9 @@ bool CEngine::FilterTime( float dt )
 	{
 		// Limit fps to withing tolerable range
 //		fps = max( MIN_FPS, fps ); // red herring - since we're only checking if dt < 1/fps, clamping against MIN_FPS has no effect
-		fps = min( MAX_FPS, (double)fps );
+		fps = min( MAX_FPS, fps );
 
-		float minframetime = 1.0 / fps;
+		float minframetime = 1.0F / fps;
 
 		m_flMinFrameTime = minframetime;
 
@@ -365,8 +365,12 @@ void CEngine::Frame( void )
 				// the other logical hyperthread core if the CPU supports it)
 				for (int i = 2000; i >= 0; --i)
 				{
-					// dimhotepus: Reschedule the execution of the threads.
-					std::this_thread::yield();
+					// dimhotepus: Use pause abstraction.
+					ThreadPause();
+					ThreadPause();
+					ThreadPause();
+					ThreadPause();
+					ThreadPause();
 				}
 			}
 

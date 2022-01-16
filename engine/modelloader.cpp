@@ -1230,12 +1230,11 @@ void Mod_LoadVertices( void )
 //-----------------------------------------------------------------------------
 static float RadiusFromBounds (Vector& mins, Vector& maxs)
 {
-	int		i;
 	Vector	corner;
 
-	for (i=0 ; i<3 ; i++)
+	for (int i=0 ; i<3 ; i++)
 	{
-		corner[i] = fabs(mins[i]) > fabs(maxs[i]) ? fabs(mins[i]) : fabs(maxs[i]);
+		corner[i] = max( fabsf(mins[i]), fabsf(maxs[i]) );
 	}
 
 	return VectorLength( corner );
@@ -2981,14 +2980,14 @@ void CMDLCacheNotify::SetBoundsFromStudioHdr( model_t *pModel, MDLHandle_t handl
 	pModel->radius = 0.0f;
 	for ( int i = 0; i < 3; i++ )
 	{
-		if ( fabs(pModel->mins[i]) > pModel->radius )
+		if ( fabsf(pModel->mins[i]) > pModel->radius )
 		{
-			pModel->radius = fabs(pModel->mins[i]);
+			pModel->radius = fabsf(pModel->mins[i]);
 		}
 
-		if ( fabs(pModel->maxs[i]) > pModel->radius )
+		if ( fabsf(pModel->maxs[i]) > pModel->radius )
 		{
-			pModel->radius = fabs(pModel->maxs[i]);
+			pModel->radius = fabsf(pModel->maxs[i]);
 		}
 	}
 }

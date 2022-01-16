@@ -72,11 +72,11 @@ float SND_GetGainFromMult( float gain, float dist_mult, vec_t dist )
 
 		// calculate crossover point
 
-		Y = -1.0 / ( pow(SND_GAIN_COMP_THRESH, snd_gain_comp_power) * (SND_GAIN_COMP_THRESH - 1) );
+		Y = -1.0F / ( powf(SND_GAIN_COMP_THRESH, snd_gain_comp_power) * (SND_GAIN_COMP_THRESH - 1) );
 		
 		// calculate compressed gain
 
-		gain = 1.0 - 1.0 / (Y * pow( gain, snd_gain_comp_power ) );
+		gain = 1.0F - 1.0F / (Y * powf( gain, snd_gain_comp_power ) );
 
 		gain = gain * snd_gain_max.GetFloat();
 	}
@@ -85,10 +85,10 @@ float SND_GetGainFromMult( float gain, float dist_mult, vec_t dist )
 	{
 		// sounds less than snd_gain_min fall off to 0 in distance it took them to fall to snd_gain_min
 
-		gain = snd_gain_min.GetFloat() * (2.0 - relative_dist * snd_gain_min.GetFloat());
+		gain = snd_gain_min.GetFloat() * (2.0F - relative_dist * snd_gain_min.GetFloat());
 		
-		if (gain <= 0.0)
-			gain = 0.001;	// don't propagate 0 gain
+		if (gain <= 0.0F)
+			gain = 0.001F;	// don't propagate 0 gain
 	}
 
 	return gain;

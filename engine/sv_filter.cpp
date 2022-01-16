@@ -172,8 +172,8 @@ static void Filter_Add_f( const CCommand& args )
 		// updating in-place, so don't kick people
 		bKick = false;
 	}
-	
-	banTime = atof( args[1] );
+	// dimhotepus: atof -> strtof
+	banTime = strtof( args[1], nullptr );
 	if (banTime < 0.01f)
 	{
 		banTime = 0.0f;
@@ -182,7 +182,7 @@ static void Filter_Add_f( const CCommand& args )
 	g_IPFilters[i].banTime = banTime;
 
 	// Time to unban.
-	g_IPFilters[i].banEndTime = ( banTime != 0.0 ) ? ( realtime + 60.0 * banTime ) : 0.0;
+	g_IPFilters[i].banEndTime = ( banTime != 0.0F ) ? ( realtime + 60.0F * banTime ) : 0.0F;
 
 	if ( !Filter_ConvertString( args[2], &g_IPFilters[i]) )
 	{
@@ -893,7 +893,7 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 	}
 
 	g_UserFilters[i].banTime = banTime;
-	g_UserFilters[i].banEndTime = ( banTime != 0.0 ) ? ( realtime + 60.0 * banTime ) : 0.0;
+	g_UserFilters[i].banEndTime = ( banTime != 0.0F ) ? ( realtime + 60.0F * banTime ) : 0.0F;
 	g_UserFilters[i].userid = *id;
 
 	// Build a duration string for the ban

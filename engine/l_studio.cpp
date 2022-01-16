@@ -187,8 +187,8 @@ bool WorldLightToMaterialLight( dworldlight_t* pWorldLight, LightDesc_t& light )
 		light.m_Attenuation0 = pWorldLight->constant_attn;
 		light.m_Attenuation1 = pWorldLight->linear_attn;
 		light.m_Attenuation2 = pWorldLight->quadratic_attn;
-		light.m_Theta = 2.0 * acos( pWorldLight->stopdot );
-		light.m_Phi = 2.0 * acos( pWorldLight->stopdot2 );
+		light.m_Theta = 2.0F * acosf( pWorldLight->stopdot );
+		light.m_Phi = 2.0F * acosf( pWorldLight->stopdot2 );
 		light.m_ThetaDot = pWorldLight->stopdot;
 		light.m_PhiDot = pWorldLight->stopdot2;
 		light.m_Falloff = pWorldLight->exponent ? pWorldLight->exponent : 1.0f;
@@ -559,7 +559,7 @@ float Engine_WorldLightAngle( const dworldlight_t *wl, const Vector& lnormal, co
 			}
 			else
 			{
-				ratio *= pow((dot2 - wl->stopdot2) / (wl->stopdot - wl->stopdot2), wl->exponent );
+				ratio *= powf((dot2 - wl->stopdot2) / (wl->stopdot - wl->stopdot2), wl->exponent );
 			}
 			return ratio;
 
@@ -4168,7 +4168,7 @@ bool CModelRender::UpdateStaticPropColorData( IHandleEntity *pProp, ModelInstanc
 	if ( pStudioHdr->flags & STUDIOHDR_FLAGS_CONSTANT_DIRECTIONAL_LIGHT_DOT )
 	{
 		bUseConstDirLighting = true;
-		flConstDirLightingAmount =  (float)( pStudioHdr->constdirectionallightdot ) / 255.0;
+		flConstDirLightingAmount =  (float)( pStudioHdr->constdirectionallightdot ) / 255.0F;
 	}
 
 	CUtlMemory< color24 > tmpLightingMem; 

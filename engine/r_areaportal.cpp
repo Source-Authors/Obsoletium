@@ -385,9 +385,9 @@ static void R_SetupGlobalFrustum()
 		float xFOV = g_EngineRenderer->GetFov() * 0.5f;
 		float yFOV = g_EngineRenderer->GetFovY() * 0.5f;
 
-		g_viewWindow.right	= tan( DEG2RAD( xFOV ) );
+		g_viewWindow.right	= tanf( DEG2RAD( xFOV ) );
 		g_viewWindow.left	= -g_viewWindow.right;
-		g_viewWindow.top	= tan( DEG2RAD( yFOV ) );
+		g_viewWindow.top	= tanf( DEG2RAD( yFOV ) );
 		g_viewWindow.bottom	= -g_viewWindow.top;
 
 		if ( g_viewSetup.m_bOffCenter )

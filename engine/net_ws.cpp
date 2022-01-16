@@ -981,11 +981,11 @@ void NET_AdjustLag( void )
 	// Last step, go the whole way
 	if ( converge > fabs( diff ) )
 	{
-		converge = fabs( diff );
+		converge = fabsf( diff );
 	}
 
 	// Converge toward fakelag.GetFloat()
-	if ( diff < 0.0 )
+	if ( diff < 0.0F )
 	{
 		// Converge toward fakelag.GetFloat()
 		s_FakeLag -= converge;

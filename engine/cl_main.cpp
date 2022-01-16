@@ -1855,8 +1855,10 @@ CON_COMMAND_F( box, "Draw a debug box.", FCVAR_CHEAT )
 	Vector mins, maxs;
 	for (int i = 0; i < 3; ++i)
 	{
-		mins[i] = atof(args[i + 1]); 
-		maxs[i] = atof(args[i + 4]); 
+		// dimhotepus: atof -> strtof
+		mins[i] = strtof(args[i + 1], nullptr); 
+		// dimhotepus: atof -> strtof
+		maxs[i] = strtof(args[i + 4], nullptr); 
 	}
 	CDebugOverlay::AddBoxOverlay( vec3_origin, mins, maxs, vec3_angle, 255, 0, 0, 0, 100 );
 }

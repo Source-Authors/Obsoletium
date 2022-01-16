@@ -1020,7 +1020,7 @@ static float LightIntensityAndDirectionAtPointNew( dworldlight_t* pLight, lightz
 		}
 
 		// cache miss
-		flTraceDistance = max( 100.0, 2.0 * dist );		// trace a little further for better caching
+		flTraceDistance = max( 100.0F, 2.0F * dist );		// trace a little further for better caching
 		epnt += ( dist - flTraceDistance ) * ( *pDirection );
 	}
 	
@@ -1033,7 +1033,7 @@ static float LightIntensityAndDirectionAtPointNew( dworldlight_t* pLight, lightz
 	if ( pSample )
 	{
 		pSample->m_flTraceDistance = flTraceDistance;
-		pSample->m_flHitDistance = ( pm.fraction >= 1.0 ) ? 1.0e23 : flHitDistance;
+		pSample->m_flHitDistance = ( pm.fraction >= 1.0F ) ? 1.0e23F : flHitDistance;
 	}
 	if ( dist > flHitDistance + 8)
 	{
@@ -1497,8 +1497,8 @@ static void WorldLightFromDynamicLight( dlight_t const& dynamicLight,
 	{
 		worldLight.type = emit_spotlight;
 		VectorCopy( dynamicLight.m_Direction, worldLight.normal );
-		worldLight.stopdot = cos( dynamicLight.m_InnerAngle * M_PI / 180.0f );
-		worldLight.stopdot2 = cos( dynamicLight.m_OuterAngle * M_PI / 180.0f );
+		worldLight.stopdot = cosf( dynamicLight.m_InnerAngle * M_PI_F / 180.0f );
+		worldLight.stopdot2 = cosf( dynamicLight.m_OuterAngle * M_PI_F / 180.0f );
 	}
 }
 

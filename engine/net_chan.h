@@ -22,9 +22,9 @@
 #include "inetchannel.h"
 
 // How fast to converge flow estimates
-#define FLOW_AVG ( 3.0 / 4.0 )
+#define FLOW_AVG ( 3.0F / 4.0F )
  // Don't compute more often than this
-#define FLOW_INTERVAL 0.25
+#define FLOW_INTERVAL 0.25F
 
 
 #define NET_FRAMES_BACKUP	64		// must be power of 2

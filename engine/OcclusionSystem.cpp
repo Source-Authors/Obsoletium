@@ -2572,7 +2572,7 @@ void COcclusionSystem::SetView( const Vector &vecCameraPos, float flFOV, const V
 	m_bEdgeListDirty = true;
 	m_flNearPlaneDist = -( DotProduct( vecCameraPos, m_NearClipPlane.normal ) - m_NearClipPlane.dist );
 	Assert( m_flNearPlaneDist > 0.0f );
-	m_flFOVFactor = m_flNearPlaneDist * tan( flFOV * 0.5f * M_PI / 180.0f );
+	m_flFOVFactor = m_flNearPlaneDist * tanf( flFOV * 0.5f * M_PI_F / 180.0f );
 	m_flFOVFactor = m_flNearPlaneDist / m_flFOVFactor;
 	m_flFOVFactor *= m_flFOVFactor;
 

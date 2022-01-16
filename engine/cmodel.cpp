@@ -1825,9 +1825,9 @@ void CM_RayLeafnums_r( const Ray_t &ray, CCollisionBSPData *pBSPData, int iNode,
 			{
 				flDist1 = DotProduct( pPlane->normal, vecPoint1 ) - pPlane->dist;
 				flDist2 = DotProduct( pPlane->normal, vecPoint2 ) - pPlane->dist;
-				flOffset = fabs( ray.m_Extents[0] * pPlane->normal[0] ) +
-					fabs( ray.m_Extents[1] * pPlane->normal[1] ) +
-					fabs( ray.m_Extents[2] * pPlane->normal[2] );
+				flOffset = fabsf( ray.m_Extents[0] * pPlane->normal[0] ) +
+					fabsf( ray.m_Extents[1] * pPlane->normal[1] ) +
+					fabsf( ray.m_Extents[2] * pPlane->normal[2] );
 			}
 
 			// See which sides we need to consider
@@ -1866,14 +1866,14 @@ void CM_RayLeafnums_r( const Ray_t &ray, CCollisionBSPData *pBSPData, int iNode,
 	// Put the crosspoint DIST_EPSILON pixels on the near side.
 	if ( flDist1 < flDist2 )
 	{
-		flDist = 1.0 / ( flDist1 - flDist2 );
+		flDist = 1.0F / ( flDist1 - flDist2 );
 		nSide = 1;
 		flFrac2 = ( flDist1 + flOffset + DIST_EPSILON ) * flDist;
 		flFrac1 = ( flDist1 - flOffset - DIST_EPSILON ) * flDist;
 	}
 	else if ( flDist1 > flDist2 )
 	{
-		flDist = 1.0 / ( flDist1-flDist2 );
+		flDist = 1.0F / ( flDist1-flDist2 );
 		nSide = 0;
 		flFrac2 = ( flDist1 - flOffset - DIST_EPSILON ) * flDist;
 		flFrac1 = ( flDist1 + flOffset + DIST_EPSILON ) * flDist;
@@ -1994,14 +1994,14 @@ static void FASTCALL CM_RecursiveHullCheckImpl( TraceInfo_t *pTraceInfo, int num
 	// put the crosspoint DIST_EPSILON pixels on the near side
 	if (t1 < t2)
 	{
-		idist = 1.0/(t1-t2);
+		idist = 1.0F/(t1-t2);
 		side = 1;
 		frac2 = (t1 + offset + DIST_EPSILON)*idist;
 		frac = (t1 - offset - DIST_EPSILON)*idist;
 	}
 	else if (t1 > t2)
 	{
-		idist = 1.0/(t1-t2);
+		idist = 1.0F/(t1-t2);
 		side = 0;
 		frac2 = (t1 - offset - DIST_EPSILON)*idist;
 		frac = (t1 + offset + DIST_EPSILON)*idist;

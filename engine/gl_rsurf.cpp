@@ -5180,9 +5180,9 @@ static bool EnumerateLeavesAlongExtrudedRay_R( mnode_t *node, Ray_t const& ray,
 	{
 		startDotN = DotProduct( ray.m_Start, plane->normal );
 		deltaDotN = DotProduct( ray.m_Delta, plane->normal );
-		offset = fabs(ray.m_Extents[0]*plane->normal[0]) +
-				fabs(ray.m_Extents[1]*plane->normal[1]) +
-				fabs(ray.m_Extents[2]*plane->normal[2]) + DIST_EPSILON;
+		offset = fabsf(ray.m_Extents[0]*plane->normal[0]) +
+				fabsf(ray.m_Extents[1]*plane->normal[1]) +
+				fabsf(ray.m_Extents[2]*plane->normal[2]) + DIST_EPSILON;
 	}
 	t1 = startDotN + start * deltaDotN - plane->dist;
 	t2 = startDotN + end * deltaDotN - plane->dist;
@@ -5228,14 +5228,14 @@ static bool EnumerateLeavesAlongExtrudedRay_R( mnode_t *node, Ray_t const& ray,
 	int side;
 	if (t1 < t2)
 	{
-		idist = 1.0/(t1-t2);
+		idist = 1.0F/(t1-t2);
 		side = 1;
 		frac2 = (t1 + offset) * idist;
 		frac = (t1 - offset) * idist;
 	}
 	else if (t1 > t2)
 	{
-		idist = 1.0/(t1-t2);
+		idist = 1.0F/(t1-t2);
 		side = 0;
 		frac2 = (t1 - offset) * idist;
 		frac = (t1 + offset) * idist;

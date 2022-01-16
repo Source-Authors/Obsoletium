@@ -1423,7 +1423,7 @@ bool XBX_SetProfileDefaultSettings( void )
 		return false;
 
 	// Now we allocate that buffer and supply it to the call
-	BYTE *pData = (BYTE *) stackalloc( dwResultSize );
+	byte *pData = (byte *) stackalloc( dwResultSize );
 	ZeroMemory( pData, dwResultSize );
 
 	pResults = (XUSER_READ_PROFILE_SETTING_RESULT *) pData;
@@ -1927,7 +1927,7 @@ void Host_AccumulateTime( float dt )
 		if ( CommandLine()->CheckParm( "-tools" ) == NULL )
 		{
 #endif
-			host_frametime = min( (double)host_frametime, MAX_FRAMETIME * fullscale);
+			host_frametime = min( host_frametime, MAX_FRAMETIME * fullscale);
 #ifndef NO_TOOLFRAMEWORK
 		}
 #endif
@@ -1942,8 +1942,8 @@ void Host_AccumulateTime( float dt )
 #endif // !NO_TOOLFRAMEWORK
 	{	// don't allow really long or short frames
 		host_frametime_unbounded = host_frametime;
-		host_frametime = min( (double)host_frametime, MAX_FRAMETIME );
-		host_frametime = max( (double)host_frametime, MIN_FRAMETIME );
+		host_frametime = min( host_frametime, MAX_FRAMETIME );
+		host_frametime = max( host_frametime, MIN_FRAMETIME );
 	}
 #endif
 
@@ -2410,8 +2410,8 @@ void CFrameTimer::ComputeFrameVariability()
 		{
 			i = FRAME_HISTORY_COUNT - 1;
 		}
-		flExpCurveArea += exp( flExponent * n );
-		flAverageTime += m_pFrameTimeHistory[i] * exp( flExponent * n );
+		flExpCurveArea += expf( flExponent * n );
+		flAverageTime += m_pFrameTimeHistory[i] * expf( flExponent * n );
 		++n;
 	}
 
@@ -2424,13 +2424,13 @@ void CFrameTimer::ComputeFrameVariability()
 	}
 
 	float flCurrentFPS = 0.0f;
-	if ( frametime != 0.0f )
+	if ( frametime != 0.0 )
 	{
 		flCurrentFPS = 1.0f / frametime;
 	}
 
 	// Now subtract out the current fps to get variability in FPS
-	m_flFPSVariability = fabs( flCurrentFPS - flAveFPS );
+	m_flFPSVariability = fabsf( flCurrentFPS - flAveFPS );
 
 	// Now compute variance/stddeviation
 	double sum = 0.0f;

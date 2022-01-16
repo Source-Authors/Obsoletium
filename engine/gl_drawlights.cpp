@@ -117,9 +117,9 @@ static void DrawLightSprite( dworldlight_t *pLight, float angleAttenFactor )
 	VectorNormalize( color );
 	color *= angleAttenFactor;
 
-	color[0] = pow( color[0], 1.0f / 2.2f );
-	color[1] = pow( color[1], 1.0f / 2.2f );
-	color[2] = pow( color[2], 1.0f / 2.2f );
+	color[0] = powf( color[0], 1.0f / 2.2f );
+	color[1] = powf( color[1], 1.0f / 2.2f );
+	color[2] = powf( color[2], 1.0f / 2.2f );
 	
 	CMatRenderContextPtr pRenderContext( materials );
 
@@ -184,14 +184,14 @@ static void DrawPointLight( const Vector &vecOrigin, float flLightRadius )
 	float flPhi = 0;
 	for ( i = 0; i <= POINT_PHI_GRID; ++i )
 	{
-		float flSinPhi = sin(DEG2RAD(flPhi));
-		float flCosPhi = cos(DEG2RAD(flPhi));
+		float flSinPhi = sinf(DEG2RAD(flPhi));
+		float flCosPhi = cosf(DEG2RAD(flPhi));
 		float flTheta = 0;
 		for ( int j = 0; j < POINT_THETA_GRID; ++j )
 		{
 			pt = vecOrigin;
-			pt.x += flLightRadius * cos(DEG2RAD(flTheta)) * flSinPhi;
-			pt.y += flLightRadius * sin(DEG2RAD(flTheta)) * flSinPhi;
+			pt.x += flLightRadius * cosf(DEG2RAD(flTheta)) * flSinPhi;
+			pt.y += flLightRadius * sinf(DEG2RAD(flTheta)) * flSinPhi;
 			pt.z += flLightRadius * flCosPhi;
 
 			meshBuilder.Position3fv( pt.Base() );

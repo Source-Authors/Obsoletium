@@ -238,19 +238,19 @@ void MakeSkyVec( float s, float t, int axis, float zFar, Vector& position, Vecto
 	}
 
 	// avoid bilerp seam
-	s = (s+1)*0.5;
-	t = (t+1)*0.5;
+	s = (s+1)*0.5F;
+	t = (t+1)*0.5F;
 
-	if (s < 1.0/512)
-		s = 1.0/512;
-	else if (s > 511.0/512)
-		s = 511.0/512;
-	if (t < 1.0/512)
-		t = 1.0/512;
+	if (s < 1.0F/512)
+		s = 1.0F/512;
+	else if (s > 511.0F/512)
+		s = 511.0F/512;
+	if (t < 1.0F/512)
+		t = 1.0F/512;
 	else if (t > 511.0/512)
-		t = 511.0/512;
+		t = 511.0F/512;
 
-	t = 1.0 - t;
+	t = 1.0F - t;
 	VectorCopy( v, position );
 	texCoord[0] = s;
 	texCoord[1] = t;

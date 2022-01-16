@@ -946,7 +946,7 @@ void CShadowMgr::ComputeSurfaceBounds( SurfaceBounds_t* pBounds, SurfaceHandle_t
 			pBounds->m_flRadius = flDistSq;
 		}
 	}
-	pBounds->m_flRadius = sqrt( pBounds->m_flRadius );
+	pBounds->m_flRadius = sqrtf( pBounds->m_flRadius );
 }
 
 
@@ -2946,10 +2946,10 @@ void ConstructNearAndFarPolygons( Vector *pVecNearPlane, Vector *pVecFarPlane, f
 	float fovY = CalcFovY( view.fov, view.m_flAspectRatio );
 
 	// Compute near and far plane half-width and half-height
-	float flTanHalfAngleRadians = tan( view.fov * ( 0.5f * M_PI / 180.0f ) );
+	float flTanHalfAngleRadians = tanf( view.fov * ( 0.5f * M_PI_F / 180.0f ) );
 	float flHalfNearWidth = flTanHalfAngleRadians * ( view.zNear + flPlaneEpsilon );
 	float flHalfFarWidth  = flTanHalfAngleRadians * ( view.zFar  - flPlaneEpsilon );
-	flTanHalfAngleRadians = tan( fovY * ( 0.5f * M_PI / 180.0f ) );
+	flTanHalfAngleRadians = tanf( fovY * ( 0.5f * M_PI_F / 180.0f ) );
 	float flHalfNearHeight = flTanHalfAngleRadians * ( view.zNear + flPlaneEpsilon );
 	float flHalfFarHeight  = flTanHalfAngleRadians * ( view.zFar  - flPlaneEpsilon );
 

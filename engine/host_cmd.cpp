@@ -490,7 +490,7 @@ CON_COMMAND( status, "Display map and connection status." )
 		print = Host_Client_Printf;
 
 		// limit this to once per 5 seconds
-		LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0);
+		LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0F);
 	}
 
 	// ============================================================
@@ -673,7 +673,7 @@ CON_COMMAND( ping, "Display ping to server." )
 		return;
 	}
 	// limit this to once per 5 seconds
-	LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0);
+	LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0F);
 
 	host_client->ClientPrintf( "Client ping times:\n" );
 
@@ -843,14 +843,16 @@ void Host_Map_Helper( const CCommand &args, bool bEditmode, bool bBackground, bo
 			&& Q_stricmp(args[6], "setang") == 0) 
 		{
 			Vector newpos;
-			newpos.x = atof( args[3] );
-			newpos.y = atof( args[4] );
-			newpos.z = atof( args[5] );
+			// dimhotepus: atof -> strtof
+			newpos.x = strtof( args[3], nullptr );
+			newpos.y = strtof( args[4], nullptr );
+			newpos.z = strtof( args[5], nullptr );
 
 			QAngle newangle;
-			newangle.x = atof( args[7] );
-			newangle.y = atof( args[8] );
-			newangle.z = atof( args[9] );
+			// dimhotepus: atof -> strtof
+			newangle.x = strtof( args[7], nullptr );
+			newangle.y = strtof( args[8], nullptr );
+			newangle.z = strtof( args[9], nullptr );
 			
 			HostState_SetSpawnPoint(newpos, newangle);
 		}
@@ -1883,16 +1885,16 @@ CON_COMMAND_F( soundfade, "Fade client volume.", FCVAR_SERVER_CAN_EXECUTE )
 		return;
 	}
 
-	percent = clamp( (float) atof(args[1]), 0.0f, 100.0f );
+	percent = clamp( strtof(args[1],nullptr), 0.0f, 100.0f );
 	
-	holdTime = max( 0., atof(args[2]) );
+	holdTime = max( 0.F, strtof(args[2],nullptr) );
 
 	inTime = 0.0f;
 	outTime = 0.0f;
 	if (args.ArgC() == 5)
 	{
-		outTime = max( 0., atof(args[3]) );
-		inTime = max( 0., atof( args[4]) );
+		outTime = max( 0.F, strtof(args[3],nullptr) );
+		inTime = max( 0.F, strtof( args[4],nullptr) );
 	}
 
 	S_SoundFade( percent, holdTime, outTime, inTime );

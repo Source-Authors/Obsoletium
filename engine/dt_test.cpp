@@ -719,7 +719,7 @@ void RandomlyChangeUtlVectorFloat( DTTestServer *pServer )
 	int nElements = rand() % MAX_FLOATARRAY_ELEMENTS;
 	pServer->m_Sub.m_UtlVectorFloat.SetSize( nElements );
 	for ( int i=0; i < nElements; i++ )
-		pServer->m_Sub.m_UtlVectorFloat[i] = rand() / 0.93;
+		pServer->m_Sub.m_UtlVectorFloat[i] = rand() / 0.93F;
 }
 
 

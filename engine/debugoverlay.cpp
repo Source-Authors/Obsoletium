@@ -318,10 +318,10 @@ int ScreenPosition(const Vector& point, Vector& screen)
 	int x, y, w, h;
 	pRenderContext->GetViewport( x, y, w, h );
 
-	screen[0] =  0.5 * screen[0] * w;
-	screen[1] = -0.5 * screen[1] * h;
-	screen[0] += 0.5 * w;
-	screen[1] += 0.5 * h;
+	screen[0] =  screen[0] * w / 2;
+	screen[1] = -screen[1] * h / 2;
+	screen[0] += w / 2;
+	screen[1] += h / 2;
 	return retval;
 }
 

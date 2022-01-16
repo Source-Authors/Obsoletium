@@ -26,7 +26,7 @@ enum
 // How long to flush item when something important happens
 #define EFFECT_TIME  1.5f
 // How long to latch peak bit count for item
-#define PEAK_LATCH_TIME 2.0f;
+#define PEAK_LATCH_TIME 2.0f
 
 //-----------------------------------------------------------------------------
 // Purpose: Entity report event types
@@ -367,8 +367,8 @@ void CEntityReportPanel::ApplyEffect( ENTITYBITS *entry, int& r, int& g, int& b 
 	frac = min( 1.f, frac );
 	frac = max( 0.f, frac );
 
-	frac *= 2.0 * M_PI;
-	frac = sin( frequency * frac );
+	frac *= 2.0F * M_PI_F;
+	frac = sinf( frequency * frac );
 
 	if ( entry->flags & FENTITYBITS_LEAVEPVS )
 	{
