@@ -91,7 +91,9 @@ public:
 
 inline CBaseMeshReader::CBaseMeshReader()
 {
-	m_pMesh = NULL;
+	m_pMesh = nullptr;
+	m_MaxVertices = -1;
+	m_MaxIndices = -1;
 }
 
 inline CBaseMeshReader::~CBaseMeshReader()

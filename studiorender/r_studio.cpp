@@ -173,7 +173,7 @@ IMaterial* CStudioRender::R_StudioSetupSkinAndLighting( IMatRenderContext *pRend
 
 					if ( pOriginalTextureVar->IsTexture() ) // If $basetexture is defined
 					{
-						if( pTextureVar && pOriginalTextureVar )
+						if( pTextureVar )
 						{
 							pTextureVar->SetTextureValue( pOriginalTextureVar->GetTextureValue() );
 						}
@@ -237,8 +237,7 @@ IMaterial* CStudioRender::R_StudioSetupSkinAndLighting( IMatRenderContext *pRend
 	{
 		bool translucent = pMaterial->IsTranslucent();
 
-		if (( m_bDrawTranslucentSubModels && !translucent ) ||
-			( !m_bDrawTranslucentSubModels && translucent ))
+		if ( m_bDrawTranslucentSubModels != translucent )
 		{
 			m_bSkippedMeshes = true;
 			return NULL;

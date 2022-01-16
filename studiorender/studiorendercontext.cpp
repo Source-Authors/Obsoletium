@@ -1001,7 +1001,7 @@ VertexFormat_t CStudioRenderContext::CalculateVertexFormat( const studiohdr_t *p
 			//        So, in the absence of reliable material vertex formats, use the old 'standard' elements
 			//        (we can still omit skinning data - and COLOR for DX8+, where it should come from the
 			//        second static lighting stream):
-			VertexFormat_t vertexFormat = bIsDX7 ? MATERIAL_VERTEX_FORMAT_MODEL_DX7 : ( MATERIAL_VERTEX_FORMAT_MODEL & ~VERTEX_COLOR );
+			VertexFormat_t vertexFormat = ( MATERIAL_VERTEX_FORMAT_MODEL & ~VERTEX_COLOR );
 
 			// aggregate single bit settings
 			newVertexFormat |= vertexFormat & ( ( 1 << VERTEX_LAST_BIT ) - 1 );

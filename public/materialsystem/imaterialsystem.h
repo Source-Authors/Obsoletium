@@ -425,6 +425,16 @@ struct FlashlightState_t
 {
 	FlashlightState_t()
 	{
+		m_NearZ = 0.0F;
+		m_FarZ = 0.0F;
+		m_fHorizontalFOVDegrees = 0.0F;
+		m_fVerticalFOVDegrees = 0.0F;
+		m_fQuadraticAtten = 0.0F;
+		m_fLinearAtten = 0.0F;
+		m_fConstantAtten = 0.0F;
+		memset( &m_Color, 0, sizeof(m_Color) );
+		m_pSpotlightTexture = nullptr;
+		m_nSpotlightTextureFrame = -1;
 		m_bEnableShadows = false;						// Provide reasonable defaults for shadow depth mapping parameters
 		m_bDrawShadowFrustum = false;
 		m_flShadowMapResolution = 1024.0f;
@@ -433,12 +443,12 @@ struct FlashlightState_t
 		m_flShadowDepthBias = 0.0005f;
 		m_flShadowJitterSeed = 0.0f;
 		m_flShadowAtten = 0.0f;
+		m_nShadowQuality = 0;
 		m_bScissor = false; 
 		m_nLeft = -1;
 		m_nTop = -1;
 		m_nRight = -1;
 		m_nBottom = -1;
-		m_nShadowQuality = 0;
 	}
 
 	Vector m_vecLightOrigin;

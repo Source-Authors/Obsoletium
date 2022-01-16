@@ -114,10 +114,10 @@ struct mstudioaxisinterpbone_t
 	Vector			pos[6];	// X+, X-, Y+, Y-, Z+, Z-
 	Quaternion		quat[6];// X+, X-, Y+, Y-, Z+, Z-
 
-	mstudioaxisinterpbone_t(){}
+	mstudioaxisinterpbone_t() : control{-1}, axis{-1} {}
 private:
 	// No copy constructors allowed
-	mstudioaxisinterpbone_t(const mstudioaxisinterpbone_t& vOther);
+	mstudioaxisinterpbone_t(const mstudioaxisinterpbone_t& vOther) = delete;
 };
 
 
@@ -129,10 +129,10 @@ struct mstudioquatinterpinfo_t
 	Vector			pos;		// new position
 	Quaternion		quat;		// new angle
 
-	mstudioquatinterpinfo_t(){}
+	mstudioquatinterpinfo_t() : inv_tolerance{FLOAT32_NAN} {}
 private:
 	// No copy constructors allowed
-	mstudioquatinterpinfo_t(const mstudioquatinterpinfo_t& vOther);
+	mstudioquatinterpinfo_t(const mstudioquatinterpinfo_t& vOther) = delete;
 };
 
 struct mstudioquatinterpbone_t
@@ -143,10 +143,10 @@ struct mstudioquatinterpbone_t
 	int				triggerindex;
 	inline mstudioquatinterpinfo_t *pTrigger( int i ) const { return  (mstudioquatinterpinfo_t *)(((byte *)this) + triggerindex) + i; };
 
-	mstudioquatinterpbone_t(){}
+	mstudioquatinterpbone_t() : control{-1}, numtriggers{-1}, triggerindex{-1} {}
 private:
 	// No copy constructors allowed
-	mstudioquatinterpbone_t(const mstudioquatinterpbone_t& vOther);
+	mstudioquatinterpbone_t(const mstudioquatinterpbone_t& vOther) = delete;
 };
 
 
@@ -228,10 +228,10 @@ struct mstudioaimatbone_t
 	Vector			upvector;
 	Vector			basepos;
 
-	mstudioaimatbone_t() {}
+	mstudioaimatbone_t() : parent{-1}, aim{-1} {}
 private:
 	// No copy constructors allowed
-	mstudioaimatbone_t(const mstudioaimatbone_t& vOther);
+	mstudioaimatbone_t(const mstudioaimatbone_t& vOther) = delete;
 };
 
 // bones
@@ -264,10 +264,10 @@ struct mstudiobone_t
 
 	int					unused[8];		// remove as appropriate
 
-	mstudiobone_t(){}
+	mstudiobone_t() = default;
 private:
 	// No copy constructors allowed
-	mstudiobone_t(const mstudiobone_t& vOther);
+	mstudiobone_t(const mstudiobone_t& vOther) = delete;
 };
 
 struct mstudiolinearbone_t	
@@ -306,10 +306,10 @@ struct mstudiolinearbone_t
 
 	int unused[6];
 
-	mstudiolinearbone_t(){}
+	mstudiolinearbone_t() = default;
 private:
 	// No copy constructors allowed
-	mstudiolinearbone_t(const mstudiolinearbone_t& vOther);
+	mstudiolinearbone_t(const mstudiolinearbone_t& vOther) = delete;
 };
 
 
@@ -337,7 +337,7 @@ struct mstudioboneflexdrivercontrol_t
 	float m_flMin;				// Min value of bone component mapped to 0 on flex controller
 	float m_flMax;				// Max value of bone component mapped to 1 on flex controller
 
-	mstudioboneflexdrivercontrol_t(){}
+	mstudioboneflexdrivercontrol_t() : m_nBoneComponent{-1}, m_nFlexControllerIndex{-1}, m_flMin{FLOAT32_NAN}, m_flMax{FLOAT32_NAN} {}
 private:
 	// No copy constructors allowed
 	mstudioboneflexdrivercontrol_t( const mstudioboneflexdrivercontrol_t &vOther );
@@ -361,12 +361,12 @@ struct mstudioboneflexdriver_t
 		return (mstudioboneflexdrivercontrol_t *)(((byte *)this) + m_nControlIndex) + i;
 	}
 
-	int unused[3];
+	int unused[3];	//-V730_NOINIT
 
-	mstudioboneflexdriver_t(){}
+	mstudioboneflexdriver_t() : m_nBoneIndex{-1}, m_nControlCount{-1}, m_nControlIndex{-1} {}
 private:
 	// No copy constructors allowed
-	mstudioboneflexdriver_t( const mstudioboneflexdriver_t &vOther );
+	mstudioboneflexdriver_t( const mstudioboneflexdriver_t &vOther ) = delete;
 };
 
 
@@ -425,7 +425,7 @@ struct mstudiobbox_t
 	Vector				bbmin;				// bounding box
 	Vector				bbmax;	
 	int					szhitboxnameindex;	// offset to the name of the hitbox.
-	int					unused[8];
+	int					unused[8];	//-V730_NOINIT
 
 	const char* pszHitboxName()
 	{
@@ -435,11 +435,11 @@ struct mstudiobbox_t
 		return ((const char*)this) + szhitboxnameindex;
 	}
 
-	mstudiobbox_t() {}
+	mstudiobbox_t() : bone{-1}, group{-1}, szhitboxnameindex{-1} {}
 
 private:
 	// No copy constructors allowed
-	mstudiobbox_t(const mstudiobbox_t& vOther);
+	mstudiobbox_t(const mstudiobbox_t& vOther) = delete;
 };
 
 // demand loaded sequence groups
@@ -664,7 +664,7 @@ struct mstudiomovement_t
 	Vector				vector;		// movement vector relative to this blocks initial angle
 	Vector				position;	// relative to start of animation???
 
-	mstudiomovement_t(){}
+	mstudiomovement_t() : endframe{-1}, motionflags{0}, v0{FLOAT32_NAN}, v1{FLOAT32_NAN}, angle{FLOAT32_NAN} {}
 private:
 	// No copy constructors allowed
 	mstudiomovement_t(const mstudiomovement_t& vOther);
@@ -1065,7 +1065,7 @@ public:
 	};
 	friend class CSortByIndex;
 
-	mstudiovertanim_t(){}
+	mstudiovertanim_t() : index{USHRT_MAX}, speed{UCHAR_MAX}, side{UCHAR_MAX} {}
 //private:
 // No copy constructors allowed, but it's needed for std::sort()
 //	mstudiovertanim_t(const mstudiovertanim_t& vOther);
@@ -1176,11 +1176,11 @@ struct mstudiovertex_t
 	Vector				m_vecNormal;
 	Vector2D			m_vecTexCoord;
 
-	mstudiovertex_t() {}
+	mstudiovertex_t() { memset( &m_BoneWeights, 0, sizeof(m_BoneWeights) ); }
 
 private:
 	// No copy constructors allowed
-	mstudiovertex_t(const mstudiovertex_t& vOther);
+	mstudiovertex_t(const mstudiovertex_t& vOther) = delete;
 };
 
 // skin info
@@ -1243,10 +1243,10 @@ struct mstudioiklink_t
 	Vector	kneeDir;	// ideal bending direction (per link, if applicable)
 	Vector	unused0;	// unused
 
-	mstudioiklink_t(){}
+	mstudioiklink_t() : bone{-1} {}
 private:
 	// No copy constructors allowed
-	mstudioiklink_t(const mstudioiklink_t& vOther);
+	mstudioiklink_t(const mstudioiklink_t& vOther) = delete;
 };
 
 struct mstudioikchain_t
@@ -1615,10 +1615,10 @@ struct mstudiomouth_t
 	Vector				forward;
 	int					flexdesc;
 
-	mstudiomouth_t(){}
+	mstudiomouth_t() : bone{-1}, flexdesc{-1} {}
 private:
 	// No copy constructors allowed
-	mstudiomouth_t(const mstudiomouth_t& vOther);
+	mstudiomouth_t(const mstudiomouth_t& vOther) = delete;
 };
 
 struct mstudiohitboxset_t

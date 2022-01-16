@@ -86,11 +86,11 @@ struct lightpos_t
 	float	falloff;	// light distance falloff
 	float	dot;		// light direction * delta;
 
-	lightpos_t() {}
+	lightpos_t() : falloff{FLOAT32_NAN}, dot{FLOAT32_NAN} {}
 
 private:
 	// Copy constructors are not allowed
-	lightpos_t( const lightpos_t& src );
+	lightpos_t( const lightpos_t& src ) = delete;
 };
 
 struct eyeballstate_t
@@ -106,11 +106,11 @@ struct eyeballstate_t
 	
 	Vector	cornea;		// world center of cornea
 
-	eyeballstate_t() {}
+	eyeballstate_t() : peyeball{nullptr} {}
 
 private:
 	// Copy constructors are not allowed
-	eyeballstate_t( const eyeballstate_t& src );
+	eyeballstate_t( const eyeballstate_t& src ) = delete;
 };
 
 
@@ -170,7 +170,7 @@ struct DecalVertex_t
 	unsigned short	m_Group;
 #endif
 
-	DecalVertex_t() {}
+	DecalVertex_t() : m_MeshVertexIndex{USHRT_MAX}, m_Body{USHRT_MAX}, m_Model{USHRT_MAX}, m_Mesh{USHRT_MAX}, m_GroupIndex{USHRT_MAX}, m_Group{USHRT_MAX} {}
 	DecalVertex_t( const DecalVertex_t& src )
 	{
 		m_Position = src.m_Position;

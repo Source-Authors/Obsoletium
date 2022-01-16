@@ -61,11 +61,16 @@ struct DecalClipState_t
 	// Union of the decal triangle clip flags above for each vert
 	int m_ClipFlags[16];
 
-	DecalClipState_t() {}
+	DecalClipState_t() : m_VertCount{-1}, m_Pass{false}, m_ClipVertCount{-1}
+	{
+		memset( m_Indices, 0, sizeof(m_Indices) );
+		memset( m_ClipVerts, 0, sizeof(m_ClipVerts) );
+		memset( m_ClipFlags, 0, sizeof(m_ClipFlags) );
+	}
 
 private:
 	// Copy constructors are not allowed
-	DecalClipState_t( const DecalClipState_t& src );
+	DecalClipState_t( const DecalClipState_t& src ) = delete;
 };
 
 
@@ -920,8 +925,6 @@ void CStudioRender::RetireDecal( DecalModelList_t &list, DecalId_t nRetireID, in
 	for ( int iLod = ( iMaxLOD - 1 ); iLod >= list.m_pHardwareData->m_RootLOD; --iLod )
 	{
 		pHistoryList = &list.m_pLod[iLod].m_DecalHistory;
-		if ( !pHistoryList )
-			continue;
 	
 		unsigned short iList = pHistoryList->Head();
 		unsigned short iNext = pHistoryList->InvalidIndex();
@@ -931,7 +934,7 @@ void CStudioRender::RetireDecal( DecalModelList_t &list, DecalId_t nRetireID, in
 			iNext = pHistoryList->Next( iList );
 
 			pDecalHistory = &pHistoryList->Element( iList );
-			if ( !pDecalHistory || pDecalHistory->m_nId != nRetireID )
+			if ( pDecalHistory->m_nId != nRetireID )
 			{
 				iList = iNext;
 				continue;
@@ -939,7 +942,6 @@ void CStudioRender::RetireDecal( DecalModelList_t &list, DecalId_t nRetireID, in
 
 			// Find the decal material for the decal to remove
 			DecalMaterial_t *pMaterial = &m_DecalMaterial[pDecalHistory->m_Material];			
-			if ( pMaterial )
 			{
 				// @Note!! Decals must be removed in the reverse order they are added. This code
 				// assumes that the decal to remove is the oldest one on the model, and therefore
@@ -1408,9 +1410,6 @@ void CStudioRender::DrawSingleBoneFlexedDecals( IMatRenderContext *pRenderContex
 	for ( DecalVertexList_t::IndexLocalType_t i = verts.Head(); i != verts.InvalidIndex(); i = verts.Next(i) )
 	{
 		DecalVertex_t& vertex = verts[i];
-
-		// Clipped verts shouldn't come through here, only static props should use clipped
-		Assert ( vertex.m_MeshVertexIndex >= 0 );
 
 		m_VertexCache.SetBodyModelMesh( vertex.m_Body, vertex.m_Model, vertex.m_Mesh );
 		if (m_VertexCache.IsVertexFlexed( vertex.m_MeshVertexIndex ))

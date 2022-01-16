@@ -141,7 +141,7 @@ private:
 		unsigned short	m_Tag;
 		unsigned short	m_FlexTag;
 
-		CacheDict_t() : m_Tag(0), m_FlexTag(0) {}
+		CacheDict_t() : m_FirstIndex(0), m_IndexCount(0), m_Tag(0), m_FlexTag(0) {}
 	};
 
 	typedef CUtlVector< CacheDict_t >		CacheMeshDict_t;

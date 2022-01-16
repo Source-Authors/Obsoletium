@@ -958,9 +958,12 @@ inline void CStudioRender::R_ComputeLightAtPoints3( const FourVectors &pos, cons
 				
 			case MATERIAL_LIGHT_DIRECTIONAL:
 				delta.DuplicateVector(wl->m_Direction);
-				delta*=-1.0;
+				delta*=-1.0F;
 				break;
 				
+			// dimhotepus: Just add last type.
+			case MATERIAL_LIGHT_DISABLE:
+				break;
 		}
 		fltx4 falloff = R_WorldLightDistanceFalloff( wl, delta);
 		delta.VectorNormalizeFast();
@@ -985,7 +988,7 @@ inline void CStudioRender::R_ComputeLightAtPoints3( const FourVectors &pos, cons
 				fltx4 cone_falloff_scale=MulSIMD(OneOver_ThetaDot_Minus_PhiDot[i],
 													 SubSIMD(dot2,ReplicateX4(wl->m_PhiDot)));
 				cone_falloff_scale=MinSIMD(cone_falloff_scale,Four_Ones);
-				if ((wl->m_Falloff!=0.0) && (wl->m_Falloff!=1.0))
+				if ((wl->m_Falloff!=0.0F) && (wl->m_Falloff!=1.0F))
 				{
 					// !!speed!! could compute integer exponent needed by powsimd and store in light
 					cone_falloff_scale=PowSIMD(cone_falloff_scale,wl->m_Falloff);
@@ -1001,7 +1004,10 @@ inline void CStudioRender::R_ComputeLightAtPoints3( const FourVectors &pos, cons
 			
 			case MATERIAL_LIGHT_DIRECTIONAL:
 				break;
-
+				
+			// dimhotepus: Just add last type.
+			case MATERIAL_LIGHT_DISABLE:
+				break;
 		}
 		strength=MulSIMD(strength,falloff);
 		color.x=AddSIMD(color.x,MulSIMD(strength,ReplicateX4(wl->m_Color.x)));
@@ -2740,9 +2746,8 @@ int CStudioRender::R_StudioDrawEyeball( IMatRenderContext *pRenderContext, mstud
 			meshBuilder.Begin( pMesh, MATERIAL_LINES, pGroup->m_NumVertices );
 
 			bool doFlex = true;
-			bool r_blend = false;
 			R_StudioSoftwareProcessMesh_Normals( pmesh, meshBuilder, pGroup->m_NumVertices, 
-				pGroup->m_pGroupIndexToMeshIndex, lighting, doFlex, r_blend, m_pRC->m_Config.bDrawNormals, m_pRC->m_Config.bDrawTangentFrame );
+				pGroup->m_pGroupIndexToMeshIndex, lighting, doFlex, 0.0F, m_pRC->m_Config.bDrawNormals, m_pRC->m_Config.bDrawTangentFrame );
 			meshBuilder.End( );
 
 			pMesh->Draw();

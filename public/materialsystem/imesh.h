@@ -229,7 +229,7 @@ public:
 	int			m_NumIndices;
 };
 
-inline CPrimList::CPrimList()
+inline CPrimList::CPrimList() : CPrimList{0, 0}
 {
 }
 
