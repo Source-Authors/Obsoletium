@@ -451,13 +451,13 @@ fltx4 FASTCALL R_WorldLightDistanceFalloff( const LightDesc_t *wl, const FourVec
 int CStudioRender::R_LightGlintPosition( int index, const Vector& org, Vector& delta, Vector& intensity )
 {
 	if (index >= m_pRC->m_NumLocalLights)
-		return false;
+		return 0;
 
 	R_WorldLightDelta( &m_pRC->m_LocalLights[index], org, delta );
 	float falloff = R_WorldLightDistanceFalloff( &m_pRC->m_LocalLights[index], delta );
 
 	VectorMultiply( m_pRC->m_LocalLights[index].m_Color, falloff, intensity );
-	return true;
+	return 1;
 }
 
 

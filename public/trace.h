@@ -59,11 +59,16 @@ public:
 	bool			allsolid;				// if true, plane is not valid
 	bool			startsolid;				// if true, the initial point was in a solid area
 
-	CBaseTrace() {}
+	CBaseTrace() 
+		: fraction{FLOAT32_NAN}, contents{0}, dispFlags{0},
+		allsolid{false}, startsolid{false}
+	{
+		memset( &plane, 0, sizeof(plane) );
+	}
 
 private:
 	// No copy constructors allowed
-	CBaseTrace(const CBaseTrace& vOther);
+	CBaseTrace(const CBaseTrace& vOther) = delete;
 };
 
 #endif // TRACE_H

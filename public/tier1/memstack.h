@@ -139,8 +139,12 @@ class CUtlMemoryStack
 {
 public:
 	// constructor, destructor
-	CUtlMemoryStack( int nGrowSize = 0, int nInitSize = 0 )	{ m_MemoryStack.Init( MAX_SIZE * sizeof(T), COMMIT_SIZE * sizeof(T), INITIAL_COMMIT * sizeof(T), 4 ); COMPILE_TIME_ASSERT( sizeof(T) % 4 == 0 );	}
-	CUtlMemoryStack( T* pMemory, int numElements )			{ Assert( 0 ); 										}
+	CUtlMemoryStack( int nGrowSize = 0, int nInitSize = 0 )	
+	{ 
+		m_MemoryStack.Init( MAX_SIZE * sizeof(T), COMMIT_SIZE * sizeof(T), INITIAL_COMMIT * sizeof(T), 4 );
+		static_assert( sizeof(T) % 4 == 0 );
+	}
+	CUtlMemoryStack( T* pMemory, int numElements ) = delete;
 
 	// Can we use this index?
 	bool IsIdxValid( I i ) const							{ return (i >= 0) && (i < m_nAllocated); }

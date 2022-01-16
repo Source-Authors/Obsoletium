@@ -811,7 +811,7 @@ inline void CVertexBuilder::ValidateCompressionType()
 		{
 			Warning( "ERROR: CVertexBuilder::SetCompressionType() must be called to specify the same vertex compression type (%s) as the vertex buffer being modified."
 					 "Junk vertices will be rendered, or there will be a crash in CVertexBuilder!\n",
-					  vbCompressionType == VERTEX_COMPRESSION_ON ? "VERTEX_COMPRESSION_ON" : "VERTEX_COMPRESSION_NONE" );
+					  vbCompressionType == VERTEX_COMPRESSION_ON ? "VERTEX_COMPRESSION_ON" : "VERTEX_COMPRESSION_NONE" ); //-V547
 		}
 		// Never use vertex compression for dynamic VBs (the conversions can really hurt perf)
 		Assert(	!m_pVertexBuffer->IsDynamic() );

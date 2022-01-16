@@ -49,16 +49,9 @@ static ConVar r_flexstats( "r_flexstats", "0", FCVAR_CHEAT );
 //-----------------------------------------------------------------------------
 CStudioRender::CStudioRender()
 {
+  R_LightEffectsWorld3 = NULL;
 	m_pRC = NULL;
 	m_pBoneToWorld = NULL;
-	m_pFlexWeights = NULL;
-	m_pFlexDelayedWeights = NULL;
-	m_pStudioHdr = NULL;
-	m_pStudioMeshes = NULL;
-	m_pSubModel = NULL;
-	m_pGlintTexture = NULL;
-	m_GlintWidth = 0;
-	m_GlintHeight = 0;
 
 	// Cache-align our important matrices
 	MemAlloc_PushAllocDbgInfo( __FILE__, __LINE__ );
@@ -67,6 +60,39 @@ CStudioRender::CStudioRender()
 	m_PoseToDecal = (matrix3x4_t*)MemAlloc_AllocAligned( MAXSTUDIOBONES * sizeof(matrix3x4_t), 32 );
 
 	MemAlloc_PopAllocDbgInfo();
+
+	m_pFlexWeights = NULL;
+	m_pFlexDelayedWeights = NULL;
+	m_pStudioHdr = NULL;
+	m_pSubModel = NULL;
+	m_pStudioMeshes = NULL;
+
+	memset( m_pEyeballState, 0, sizeof(m_pEyeballState) );
+
+	m_pMaterialMRMWireframe = NULL;
+	m_pMaterialMRMWireframeZBuffer = NULL;
+	m_pMaterialMRMNormals = NULL;
+	m_pMaterialTangentFrame = NULL;
+	m_pMaterialTranslucentModelHulls = NULL;
+	m_pMaterialSolidModelHulls = NULL;
+	m_pMaterialAdditiveVertexColorVertexAlpha = NULL;
+	m_pMaterialModelBones = NULL;
+	m_pMaterialWorldWireframe = NULL;
+	m_pMaterialModelEnvCubemap = NULL;
+
+	memset( m_pDepthWrite, 0, sizeof(m_pDepthWrite) );
+	memset( m_pSSAODepthWrite, 0, sizeof(m_pSSAODepthWrite) );
+
+	m_pGlintTexture = NULL;
+	m_pGlintLODTexture = NULL;
+	m_pGlintBuildMaterial = NULL;
+
+	m_GlintWidth = 0;
+	m_GlintHeight = 0;
+
+	m_bSkippedMeshes = 0;
+	m_bDrawTranslucentSubModels = 0;
+
 	m_nDecalId = 1;
 }
 

@@ -378,16 +378,16 @@ static int IntersectPlane( DecalClipState_t& state, int start, int end,
 	out.m_Body = ( sizeof(out.m_Body) == 1 ) ? 0xFF : 0xFFFF;
 
 	// Interpolate position
-	out.m_Position[0] = startVert.m_Position[0] * (1.0 - t) + endVert.m_Position[0] * t;
-	out.m_Position[1] = startVert.m_Position[1] * (1.0 - t) + endVert.m_Position[1] * t;
-	out.m_Position[2] = startVert.m_Position[2] * (1.0 - t) + endVert.m_Position[2] * t;
+	out.m_Position[0] = startVert.m_Position[0] * (1.0F - t) + endVert.m_Position[0] * t;
+	out.m_Position[1] = startVert.m_Position[1] * (1.0F - t) + endVert.m_Position[1] * t;
+	out.m_Position[2] = startVert.m_Position[2] * (1.0F - t) + endVert.m_Position[2] * t;
 
 	// Interpolate normal
 	Vector vNormal;
 	// FIXME: this is a bug (it's using position data to compute interpolated normals!)... not seeing any obvious artifacts, though
-	vNormal[0] = startVert.m_Position[0] * (1.0 - t) + endVert.m_Position[0] * t;
-	vNormal[1] = startVert.m_Position[1] * (1.0 - t) + endVert.m_Position[1] * t;
-	vNormal[2] = startVert.m_Position[2] * (1.0 - t) + endVert.m_Position[2] * t;
+	vNormal[0] = startVert.m_Position[0] * (1.0F - t) + endVert.m_Position[0] * t;
+	vNormal[1] = startVert.m_Position[1] * (1.0F - t) + endVert.m_Position[1] * t;
+	vNormal[2] = startVert.m_Position[2] * (1.0F - t) + endVert.m_Position[2] * t;
 	VectorNormalize( vNormal );
 	out.m_Normal = vNormal;
 
@@ -1311,11 +1311,12 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 			decal.m_Flags = flags;
 
 			// Add this decal to the history...
-			int h = list.m_pLod[i].m_DecalHistory.AddToTail();
-			list.m_pLod[i].m_DecalHistory[h].m_Material = materialIdx;
-			list.m_pLod[i].m_DecalHistory[h].m_Decal = decalIndex;
-			list.m_pLod[i].m_DecalHistory[h].m_nId = m_nDecalId;
-			list.m_pLod[i].m_DecalHistory[h].m_nPad = 0;
+			auto h = list.m_pLod[i].m_DecalHistory.AddToTail();
+			auto &d = list.m_pLod[i].m_DecalHistory[h];
+			d.m_Material = materialIdx;
+			d.m_Decal = decalIndex;
+			d.m_nId = m_nDecalId;
+			d.m_nPad = 0;
 		}
 	}
 

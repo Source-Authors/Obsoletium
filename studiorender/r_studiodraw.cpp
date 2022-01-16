@@ -154,7 +154,6 @@ void CStudioRender::R_StudioDrawBones (void)
 	Vector		up, right, forward;
 	Vector		a1;
 	mstudiobone_t		*pbones;
-	Vector		positionArray[4];
 
 	pbones		= m_pStudioHdr->pBone( 0 );
 
@@ -1476,10 +1475,10 @@ public:
 			else
 			{
 				meshBuilder.Fast4VerticesSSE( 
-					(ModelVertexDX7_t*)&(dst[0]),
-					(ModelVertexDX7_t*)&(dst[1]),
-					(ModelVertexDX7_t*)&(dst[2]),
-					(ModelVertexDX7_t*)&(dst[3]));
+					&(dst[0]),
+					&(dst[1]),
+					&(dst[2]),
+					&(dst[3]));
 			}
 		}
 		meshBuilder.FastAdvanceNVertices( numVertices );

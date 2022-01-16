@@ -72,11 +72,16 @@ public:
 	// Otherwise, this is the hitbox index.
 	int			hitbox;					// box hit by trace in studio
 
-	CGameTrace() {}
+	CGameTrace()
+		: fractionleftsolid{FLOAT32_NAN}, hitgroup{-1},
+		physicsbone{-1}, m_pEnt{nullptr}, hitbox{-1}
+	{
+		memset( &surface, 0, sizeof(surface) );
+	}
 
 private:
 	// No copy constructors allowed
-	CGameTrace(const CGameTrace& vOther);
+	CGameTrace(const CGameTrace& vOther) = delete;
 };
 
 

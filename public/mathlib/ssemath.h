@@ -2178,7 +2178,7 @@ FORCEINLINE fltx4 SqrtEstSIMD( const fltx4 & a )					// sqrt(a), more or less
 	return _mm_sqrt_ps( a );
 }
 
-FORCEINLINE fltx4 SqrtSIMD( const fltx4 & a )						// sqrt(a)
+FORCEINLINE fltx4 SqrtSIMD( const fltx4 & a )						// sqrt(a) //-V524
 {
 	return _mm_sqrt_ps( a );
 }
@@ -2507,7 +2507,7 @@ public:
 		return dot;
 	}
 
-	FORCEINLINE void VProduct(FourVectors const &b)				//< component by component mul
+	FORCEINLINE void VProduct(FourVectors const &b)				//< component by component mul //-V524
 	{
 		x=MulSIMD(x,b.x);
 		y=MulSIMD(y,b.y);

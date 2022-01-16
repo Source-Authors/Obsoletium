@@ -331,7 +331,7 @@ private:
 
 	private:
 		// No copy constructors
-		DecalBuildVertexInfo_t( const DecalBuildVertexInfo_t &src );
+		DecalBuildVertexInfo_t( const DecalBuildVertexInfo_t &src ) = delete;
 	};
 
 	struct DecalBuildInfo_t
@@ -573,7 +573,7 @@ private:
 	void ComputeEyeballState( mstudiomodel_t *pSubModel );
 
 	// Avoid some warnings...
-	CStudioRender( CStudioRender const& );
+	CStudioRender( CStudioRender const& ) = delete;
 
 public:
 	// Render context (comes from queue)
@@ -897,7 +897,7 @@ inline void CStudioRender::R_StudioEyeballNormal( mstudioeyeball_t const* peyeba
 	// inside of a flattened torus
 	VectorSubtract( pos, org, normal );
 	float flUpAmount =  DotProduct( normal, peyeball->up );
-	VectorMA( normal, -0.5 * flUpAmount, peyeball->up, normal );
+	VectorMA( normal, -0.5F * flUpAmount, peyeball->up, normal );
 	VectorNormalize( normal );
 }
 

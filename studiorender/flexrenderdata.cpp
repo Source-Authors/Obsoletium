@@ -14,13 +14,15 @@
 // Constructor
 //-----------------------------------------------------------------------------
 
-CCachedRenderData::CCachedRenderData() : m_CurrentTag(0), m_pFirstFlexIndex(0),
-	m_pFirstWorldIndex(0)
+CCachedRenderData::CCachedRenderData()
+	: m_FlexVertexCount(0), m_ThinFlexVertexCount(0),
+	m_WorldVertexCount(0), m_IndexCount(0),
+	m_CurrentTag(0), m_Body(-1), m_Model(-1), m_Mesh(-1),
+	m_pFirstFlexIndex(nullptr), m_pFirstThinFlexIndex(nullptr), m_pFirstWorldIndex(nullptr)
 {
 #ifdef _DEBUG
-	int i;
 	float val = VEC_T_NAN;
-	for( i = 0; i < MAXSTUDIOFLEXVERTS; i++ )
+	for( int i = 0; i < MAXSTUDIOFLEXVERTS; i++ )
 	{
 		m_pFlexVerts[i].m_Position[0] = val; 
 		m_pFlexVerts[i].m_Position[1] = val;

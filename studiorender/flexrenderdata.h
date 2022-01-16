@@ -31,7 +31,7 @@ struct CachedPosNormTan_t
 	Vector		m_Normal;
 	Vector4D	m_TangentS;
 
-	CachedPosNormTan_t() {}
+	CachedPosNormTan_t() = default;
 
 	CachedPosNormTan_t( CachedPosNormTan_t const& src )
 	{
@@ -40,6 +40,8 @@ struct CachedPosNormTan_t
 		Vector4DCopy( src.m_TangentS, m_TangentS );
 		Assert( m_TangentS.w == 1.0f || m_TangentS.w == -1.0f );
 	}
+
+	CachedPosNormTan_t& operator=( CachedPosNormTan_t const& src ) = delete;
 };
 
 //-----------------------------------------------------------------------------
@@ -51,13 +53,15 @@ struct CachedPosNorm_t
 	Vector4DAligned	m_Position;
 	Vector4DAligned	m_Normal;
 
-	CachedPosNorm_t() {}
+	CachedPosNorm_t() = default;
 
 	CachedPosNorm_t( CachedPosNorm_t const& src )
 	{
 		Vector4DCopy( src.m_Position, m_Position );
 		Vector4DCopy( src.m_Normal, m_Normal );
 	}
+
+	CachedPosNorm_t& operator=( CachedPosNorm_t const& src ) = delete;
 };
 
 

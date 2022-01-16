@@ -340,7 +340,7 @@ struct mstudioboneflexdrivercontrol_t
 	mstudioboneflexdrivercontrol_t() : m_nBoneComponent{-1}, m_nFlexControllerIndex{-1}, m_flMin{FLOAT32_NAN}, m_flMax{FLOAT32_NAN} {}
 private:
 	// No copy constructors allowed
-	mstudioboneflexdrivercontrol_t( const mstudioboneflexdrivercontrol_t &vOther );
+	mstudioboneflexdrivercontrol_t( const mstudioboneflexdrivercontrol_t &vOther ) = delete;
 };
 
 
@@ -503,7 +503,7 @@ struct mstudioikerror_t
 
 private:
 	// No copy constructors allowed
-	mstudioikerror_t(const mstudioikerror_t& vOther);
+	mstudioikerror_t(const mstudioikerror_t& vOther) = delete;
 };
 
 union mstudioanimvalue_t;
@@ -514,11 +514,11 @@ struct mstudiocompressedikerror_t
 	float	scale[6];
 	short	offset[6];
 	inline mstudioanimvalue_t *pAnimvalue( int i ) const { if (offset[i] > 0) return  (mstudioanimvalue_t *)(((byte *)this) + offset[i]); else return NULL; };
-	mstudiocompressedikerror_t(){}
+	mstudiocompressedikerror_t() { memset( scale, 0, sizeof(scale) ); memset( offset, 0, sizeof(offset) );}
 
 private:
 	// No copy constructors allowed
-	mstudiocompressedikerror_t(const mstudiocompressedikerror_t& vOther);
+	mstudiocompressedikerror_t(const mstudiocompressedikerror_t& vOther) = delete;
 };
 
 struct mstudioikrule_t
@@ -540,7 +540,7 @@ struct mstudioikrule_t
 
 	int			compressedikerrorindex;
 	inline mstudiocompressedikerror_t *pCompressedError() const { return (mstudiocompressedikerror_t *)(((byte *)this) + compressedikerrorindex); };
-	int			unused2;
+	int			unused2; //-V730_NOINIT
 
 	int			iStart;
 	int			ikerrorindex;
@@ -551,25 +551,25 @@ struct mstudioikrule_t
 	float		tail;	// end of full influence
 	float		end;	// end of all influence
 
-	float		unused3;	// 
+	float		unused3; //-V730_NOINIT
 	float		contact;	// frame footstep makes ground concact
 	float		drop;		// how far down the foot should drop when reaching for IK
 	float		top;		// top of the foot box
 
-	int			unused6;
-	int			unused7;
-	int			unused8;
+	int			unused6; //-V730_NOINIT
+	int			unused7; //-V730_NOINIT
+	int			unused8; //-V730_NOINIT
 
 	int			szattachmentindex;		// name of world attachment
 	inline char * const pszAttachment( void ) const { return ((char *)this) + szattachmentindex; }
 
-	int			unused[7];
+	int			unused[7]; //-V730_NOINIT
 
 	mstudioikrule_t() {}
 
 private:
 	// No copy constructors allowed
-	mstudioikrule_t(const mstudioikrule_t& vOther);
+	mstudioikrule_t(const mstudioikrule_t& vOther) = delete;
 };
 
 
@@ -667,7 +667,7 @@ struct mstudiomovement_t
 	mstudiomovement_t() : endframe{-1}, motionflags{0}, v0{FLOAT32_NAN}, v1{FLOAT32_NAN}, angle{FLOAT32_NAN} {}
 private:
 	// No copy constructors allowed
-	mstudiomovement_t(const mstudiomovement_t& vOther);
+	mstudiomovement_t(const mstudiomovement_t& vOther) = delete;
 };
 
 struct studiohdr_t;
@@ -706,7 +706,7 @@ struct mstudioanimdesc_t
 	int					movementindex;
 	inline mstudiomovement_t * const pMovement( int i ) const { return (mstudiomovement_t *)(((byte *)this) + movementindex) + i; };
 
-	int					unused1[6];			// remove as appropriate (and zero if loading older versions)	
+	int					unused1[6];			// remove as appropriate (and zero if loading older versions)	 //-V730_NOINIT
 
 	int					animblock;
 	int					animindex;	 // non-zero when anim data isn't in sections
@@ -733,10 +733,10 @@ struct mstudioanimdesc_t
 	byte				*pZeroFrameData( ) const { if (zeroframeindex) return (((byte *)this) + zeroframeindex); else return NULL; };
 	mutable float		zeroframestalltime;		// saved during read stalls
 
-	mstudioanimdesc_t(){}
+	mstudioanimdesc_t() = default;
 private:
 	// No copy constructors allowed
-	mstudioanimdesc_t(const mstudioanimdesc_t& vOther);
+	mstudioanimdesc_t(const mstudioanimdesc_t& vOther) = delete;
 };
 
 struct mstudioikrule_t;
@@ -863,12 +863,12 @@ struct mstudioseqdesc_t
 	int					numactivitymodifiers;
 	inline mstudioactivitymodifier_t *pActivityModifier( int i ) const { Assert( i >= 0 && i < numactivitymodifiers); return activitymodifierindex != 0 ? (mstudioactivitymodifier_t *)(((byte *)this) + activitymodifierindex) + i : NULL; };
 
-	int					unused[5];		// remove/add as appropriate (grow back to 8 ints on version change!)
+	int					unused[5];		// remove/add as appropriate (grow back to 8 ints on version change!) //-V730_NOINIT
 
 	mstudioseqdesc_t(){}
 private:
 	// No copy constructors allowed
-	mstudioseqdesc_t(const mstudioseqdesc_t& vOther);
+	mstudioseqdesc_t(const mstudioseqdesc_t& vOther) = delete;
 };
 
 
@@ -944,21 +944,21 @@ struct mstudioflexcontrollerui_t
 	{
 		return stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex0 ) : NULL;
 	}
-	inline char * const	pszLeftName( void ) const { return stereo ? pLeftController()->pszName() : NULL; }
+	inline char * const	pszLeftName( void ) const { auto *c = pLeftController(); return c ? c->pszName() : NULL; }
 	inline int			leftIndex( const CStudioHdr &cStudioHdr ) const;
 
 	inline const mstudioflexcontroller_t *pRightController( void ) const
 	{
 		return stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex1 ): NULL;
 	}
-	inline char * const	pszRightName( void ) const { return stereo ? pRightController()->pszName() : NULL; }
+	inline char * const	pszRightName( void ) const { auto *c = pRightController(); return c ? c->pszName() : NULL; }
 	inline int			rightIndex( const CStudioHdr &cStudioHdr ) const;
 
 	inline const mstudioflexcontroller_t *pNWayValueController( void ) const
 	{
 		return remaptype == FLEXCONTROLLER_REMAP_NWAY ? (mstudioflexcontroller_t *)( (char *)this + szindex2 ) : NULL;
 	}
-	inline char * const	pszNWayValueName( void ) const { return remaptype == FLEXCONTROLLER_REMAP_NWAY ? pNWayValueController()->pszName() : NULL; }
+	inline char * const	pszNWayValueName( void ) const { auto *c = pNWayValueController(); return c ? c->pszName() : NULL; }
 	inline int			nWayValueIndex( const CStudioHdr &cStudioHdr ) const;
 
 	// Number of controllers this ui description contains, 1, 2 or 3
@@ -1212,9 +1212,9 @@ struct mstudioeyeball_t
 	Vector	forward;
 	int		texture;
 
-	int		unused1;
+	int		unused1; //-V730_NOINIT
 	float	iris_scale;
-	int		unused2;
+	int		unused2; //-V730_NOINIT
 
 	int		upperflexdesc[3];	// index of raiser, neutral, and lowerer flexdesc that is set by flex controllers
 	int		lowerflexdesc[3];
@@ -1223,15 +1223,15 @@ struct mstudioeyeball_t
 
 	int		upperlidflexdesc;	// index of flex desc that actual lid flexes look to
 	int		lowerlidflexdesc;
-	int		unused[4];			// These were used before, so not guaranteed to be 0
+	int		unused[4];			// These were used before, so not guaranteed to be 0 //-V730_NOINIT
 	bool	m_bNonFACS;			// Never used before version 44
-	char	unused3[3];
-	int		unused4[7];
+	char	unused3[3]; //-V730_NOINIT
+	int		unused4[7]; //-V730_NOINIT
 
 	mstudioeyeball_t(){}
 private:
 	// No copy constructors allowed
-	mstudioeyeball_t(const mstudioeyeball_t& vOther);
+	mstudioeyeball_t(const mstudioeyeball_t& vOther) = delete;
 };
 
 
@@ -1339,12 +1339,12 @@ struct mstudiomesh_t
 
 	mstudio_meshvertexdata_t vertexdata;
 
-	int					unused[8]; // remove as appropriate
+	int					unused[8]; // remove as appropriate //-V730_NOINIT
 
 	mstudiomesh_t(){}
 private:
 	// No copy constructors allowed
-	mstudiomesh_t(const mstudiomesh_t& vOther);
+	mstudiomesh_t(const mstudiomesh_t& vOther) = delete;
 };
 
 // studio models
@@ -2295,9 +2295,9 @@ struct studiohdr_t
 	//	numAllowedRootLODs = N	means that lod0 - lod(N-1) can be set as root lod, but not lodN or lower.
 	byte				numAllowedRootLODs;
 
-	byte				unused[1];
+	byte				unused[1]; //-V730_NOINIT
 
-	int					unused4; // zero out if version < 47
+	int					unused4; // zero out if version < 47 //-V730_NOINIT
 
 	int					numflexcontrollerui;
 	int					flexcontrolleruiindex;
@@ -2306,7 +2306,7 @@ struct studiohdr_t
 	float				flVertAnimFixedPointScale;
 	inline float		VertAnimFixedPointScale() const { return ( flags & STUDIOHDR_FLAGS_VERT_ANIM_FIXED_POINT_SCALE ) ? flVertAnimFixedPointScale : 1.0f / 4096.0f; }
 
-	int					unused3[1];
+	int					unused3[1]; //-V730_NOINIT
 
 	// FIXME: Remove when we up the model version. Move all fields of studiohdr2_t into studiohdr_t.
 	int					studiohdr2index;
@@ -2328,13 +2328,13 @@ struct studiohdr_t
 	// NOTE: No room to add stuff? Up the .mdl file format version 
 	// [and move all fields in studiohdr2_t into studiohdr_t and kill studiohdr2_t],
 	// or add your stuff to studiohdr2_t. See NumSrcBoneTransforms/SrcBoneTransform for the pattern to use.
-	int					unused2[1];
+	int					unused2[1]; //-V730_NOINIT
 
 	studiohdr_t() {}
 
 private:
 	// No copy constructors allowed
-	studiohdr_t(const studiohdr_t& vOther);
+	studiohdr_t(const studiohdr_t& vOther) = delete;
 
 	friend struct virtualmodel_t;
 };
@@ -2878,19 +2878,22 @@ inline int mstudioflexcontrollerui_t::controllerIndex( const CStudioHdr &cStudio
 
 inline int mstudioflexcontrollerui_t::rightIndex( const CStudioHdr &cStudioHdr ) const
 {
-	return stereo ? pRightController() - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
+	auto *c = pRightController();
+	return c ? c - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
 }
 
 
 inline int mstudioflexcontrollerui_t::leftIndex( const CStudioHdr &cStudioHdr ) const
 {
-	return stereo ? pLeftController() - cStudioHdr.pFlexcontroller((LocalFlexController_t) 0 ) : -1;
+	auto *c = pLeftController();
+	return c ? c - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
 }
 
 
 inline int mstudioflexcontrollerui_t::nWayValueIndex( const CStudioHdr &cStudioHdr ) const
 {
-	return remaptype == FLEXCONTROLLER_REMAP_NWAY ? pNWayValueController() - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
+	auto *c = pNWayValueController();
+	return c ? c - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
 }
 
 

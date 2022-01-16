@@ -713,7 +713,7 @@ I CUtlLinkedList<T,S,ML,I,M>::AllocInternal( bool multilist )
 	{
 		auto &e = InternalElement( elem );
 		e.m_Next = InvalidIndex();
-		e.m_Previous = InvalidIndex();
+		e.m_Previous = InvalidIndex(); //-V656
 	}
 
 	return elem;
@@ -940,7 +940,7 @@ void  CUtlLinkedList<T,S,ML,I,M>::RemoveAll()
 
 	// Clear everything else out
 	m_Head = InvalidIndex(); 
-	m_Tail = InvalidIndex();
+	m_Tail = InvalidIndex(); //-V656
 	m_ElementCount = 0;
 }
 

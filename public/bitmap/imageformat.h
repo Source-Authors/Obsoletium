@@ -175,14 +175,6 @@ struct BGRA8888_t
 	unsigned char g;		//  order of the output ARGB or BGRA, etc...
 	unsigned char r;		//  Last one is MSB, 1st is LSB.
 	unsigned char a;
-	BGRA8888_t& operator=( const BGRA8888_t& in )
-	{
-		b = in.b;
-		g = in.g;
-		r = in.r;
-		a = in.a;
-		return *this;
-	}
 };
 
 struct BGRX8888_t
@@ -191,14 +183,6 @@ struct BGRX8888_t
 	unsigned char g;		//  order of the output ARGB or BGRA, etc...
 	unsigned char r;		//  Last one is MSB, 1st is LSB.
 	unsigned char x;
-	inline BGRX8888_t& operator=( const BGRX8888_t& in )
-	{
-		b = in.b;
-		g = in.g;
-		r = in.r;
-		x = in.x;
-		return *this;
-	}
 };
 
 struct RGBA8888_t
@@ -425,8 +409,12 @@ namespace ImageLoader
 
 	struct ResampleInfo_t
 	{
-
-		ResampleInfo_t() : m_nFlags(0), m_flAlphaThreshhold(0.4f), m_flAlphaHiFreqThreshhold(0.4f), m_nSrcDepth(1), m_nDestDepth(1)
+		ResampleInfo_t()
+			: m_pSrc(nullptr), m_pDest(nullptr),
+			m_nSrcWidth(-1), m_nSrcHeight(-1), m_nSrcDepth(1),
+			m_nDestWidth(-1), m_nDestHeight(-1), m_nDestDepth(1),
+			m_flSrcGamma(0.0F), m_flDestGamma(0.0F),
+			m_flAlphaThreshhold(0.4f), m_flAlphaHiFreqThreshhold(0.4f), m_nFlags(0)
 		{
 			m_flColorScale[0] = 1.0f, m_flColorScale[1] = 1.0f, m_flColorScale[2] = 1.0f, m_flColorScale[3] = 1.0f;
 			m_flColorGoal[0] = 0.0f, m_flColorGoal[1] = 0.0f, m_flColorGoal[2] = 0.0f, m_flColorGoal[3] = 0.0f;

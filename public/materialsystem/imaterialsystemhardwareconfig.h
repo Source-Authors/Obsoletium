@@ -207,7 +207,7 @@ public:
 	virtual bool CanStretchRectFromTextures( void ) const = 0;
 
 	inline bool ShouldAlwaysUseShaderModel2bShaders() const { return IsOpenGL(); }
-	inline bool PlatformRequiresNonNullPixelShaders() const { return IsOpenGL(); }
+	inline bool PlatformRequiresNonNullPixelShaders() const { return IsOpenGL(); } //-V524
 };
 
 #endif // IMATERIALSYSTEMHARDWARECONFIG_H
