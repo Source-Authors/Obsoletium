@@ -202,7 +202,7 @@ public:
 	
 	const Type& Set( const Type &val )
 	{
-		if ( memcmp( &m_Value, &val, sizeof(Type) ) )
+		if ( memcmp( &m_Value, &val, sizeof(Type) ) != 0 )
 		{
 			NetworkStateChanged();
 			m_Value = val;

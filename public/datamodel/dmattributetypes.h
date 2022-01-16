@@ -43,7 +43,7 @@ struct DmUnknownAttribute_t
 //-----------------------------------------------------------------------------
 struct DmElementAttribute_t
 {
-	DmElementAttribute_t() : m_ElementType( UTL_INVAL_SYMBOL ) {}
+	DmElementAttribute_t() : m_Handle{DMELEMENT_HANDLE_INVALID}, m_ElementType( UTL_INVAL_SYMBOL ) {}
 
 	operator DmElementHandle_t&() { return m_Handle; }
 	operator const DmElementHandle_t&() const { return m_Handle; }

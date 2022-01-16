@@ -291,14 +291,13 @@ bool CSceneFileCache::GetSceneDataFromImage( const char *pFileName, int iScene, 
 
 	SceneImageEntry_t *pEntries = (SceneImageEntry_t *)( (byte *)pHeader + pHeader->nSceneEntryOffset );
 	unsigned char *pData = (unsigned char *)pHeader + pEntries[iScene].nDataOffset;
-	bool bIsCompressed;
-	bIsCompressed = CLZMA::IsCompressed( pData );
+	bool bIsCompressed = CLZMA::IsCompressed( pData );
 	if ( bIsCompressed )
 	{
-		int originalSize = CLZMA::GetActualSize( pData );
+		size_t originalSize = CLZMA::GetActualSize( pData );
 		if ( pSceneData )
 		{
-			int nMaxLen = *pSceneLength;
+			size_t nMaxLen = *pSceneLength;
 			if ( originalSize <= nMaxLen )
 			{
 				CLZMA::Uncompress( pData, pSceneData );

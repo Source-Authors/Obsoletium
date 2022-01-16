@@ -61,10 +61,9 @@ bool AutoAddGestureKeys( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPosePa
 	if ( iSequence < 0 )
 		return false;
 
-	KeyValues *pSeqKeyValues = new KeyValues( "" );
+	KeyValues::AutoDelete pSeqKeyValues = KeyValues::AutoDelete("");
 	if ( !pSeqKeyValues->LoadFromBuffer( pStudioHdr->pszName(), Studio_GetKeyValueText( pStudioHdr, iSequence ) ) )
 	{
-		pSeqKeyValues->deleteThis();
 		return false;
 	}
 
@@ -72,20 +71,18 @@ bool AutoAddGestureKeys( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPosePa
 	KeyValues *pKVAllFaceposer = pSeqKeyValues->FindKey("faceposer");
 	if ( !pKVAllFaceposer )
 	{
-		pSeqKeyValues->deleteThis();
 		return false;
 	}
 
 	int nMaxFrame = Studio_MaxFrame( pStudioHdr, iSequence, pPoseParameters ) - 1;
 
 	// Start grabbing the sounds and slotting them in
-	KeyValues *pkvFaceposer;
 	char szStartLoop[CEventAbsoluteTag::MAX_EVENTTAG_LENGTH] = { "loop" };
 	char szEndLoop[CEventAbsoluteTag::MAX_EVENTTAG_LENGTH] = { "end" };
 	char szEntry[CEventAbsoluteTag::MAX_EVENTTAG_LENGTH] = { "apex" };
 	char szExit[CEventAbsoluteTag::MAX_EVENTTAG_LENGTH] = { "end" };
 
-	for ( pkvFaceposer = pKVAllFaceposer->GetFirstSubKey(); pkvFaceposer; pkvFaceposer = pkvFaceposer->GetNextKey() )
+	for ( KeyValues *pkvFaceposer = pKVAllFaceposer->GetFirstSubKey(); pkvFaceposer; pkvFaceposer = pkvFaceposer->GetNextKey() )
 	{
 		if ( !Q_stricmp( pkvFaceposer->GetName(), "startloop" ) )
 		{
@@ -116,8 +113,7 @@ bool AutoAddGestureKeys( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPosePa
 			if ( nMaxFrame <= 0 )
 				continue;
 
-			KeyValues *pkvTags;
-			for ( pkvTags = pkvFaceposer->GetFirstSubKey(); pkvTags; pkvTags = pkvTags->GetNextKey() )
+			for ( KeyValues *pkvTags = pkvFaceposer->GetFirstSubKey(); pkvTags; pkvTags = pkvTags->GetNextKey() )
 			{
 				float flPercentage = (float)pkvTags->GetInt() / nMaxFrame;
 
@@ -189,7 +185,6 @@ bool AutoAddGestureKeys( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPosePa
 		}
 	}
 
-	pSeqKeyValues->deleteThis();
 	return true;
 }
 

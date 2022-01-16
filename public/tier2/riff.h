@@ -53,7 +53,7 @@ public:
 	bool	IsValid( void ) { return m_file != 0; }
 
 private:
-	const InFileRIFF & operator=( const InFileRIFF & );
+	const InFileRIFF & operator=( const InFileRIFF & ) = delete;
 
 	IFileReadBinary		&m_io;
 	int					m_file;
@@ -123,7 +123,7 @@ public:
 	void    HasLISETData( int position );
 
 private:
-	const OutFileRIFF & operator=( const OutFileRIFF & );
+	const OutFileRIFF & operator=( const OutFileRIFF & ) = delete;
 
 	IFileWriteBinary	&m_io;
 	int					m_file;

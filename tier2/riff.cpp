@@ -175,6 +175,7 @@ OutFileRIFF::OutFileRIFF( const char *pFileName, IFileWriteBinary &io ) : m_io( 
 	int riff = RIFF_ID;
 	m_io.write( &riff, 4, m_file );
 
+	m_riffName = 0;
 	m_riffSize = 0;
 	m_nNamePos = m_io.tell( m_file );
 
@@ -399,6 +400,9 @@ IterateOutputRIFF::IterateOutputRIFF( OutFileRIFF &riff )
 		return;
 
 	m_start = m_riff.PositionGet();
+	m_size = -1;
+	m_chunkName = UINT_MAX;
+	m_chunkSize = -1;
 	m_chunkPosition = m_start;
 	m_chunkStart = -1;
 }
@@ -407,6 +411,9 @@ IterateOutputRIFF::IterateOutputRIFF( IterateOutputRIFF &parent )
 	: m_riff(parent.m_riff)
 {
 	m_start = parent.ChunkFilePosition();
+  m_size = -1;
+  m_chunkName = UINT_MAX;
+	m_chunkSize = -1;
 	m_chunkPosition = m_start;
 	m_chunkStart = -1;
 }

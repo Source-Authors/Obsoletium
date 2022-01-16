@@ -117,8 +117,10 @@ void RenderWireframeSphere( const Vector &vCenter, float flRadius, int nTheta, i
 			float theta = 2.0f * M_PI_F * u;
 			float phi = M_PI_F * v;
 
-			meshBuilder.Position3f( vCenter.x + ( flRadius * sinf(phi) * cosf(theta) ),
-				vCenter.y + ( flRadius * sinf(phi) * sinf(theta) ), 
+			float sinPhi = sinf(phi);
+
+			meshBuilder.Position3f( vCenter.x + ( flRadius * sinPhi * cosf(theta) ),
+				vCenter.y + ( flRadius * sinPhi * sinf(theta) ), 
 				vCenter.z + ( flRadius * cosf(phi) ) );
 			meshBuilder.Color4ub( chRed, chGreen, chBlue, chAlpha );
 			meshBuilder.AdvanceVertex();
