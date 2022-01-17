@@ -636,6 +636,21 @@ Externally maintained by Source 1 libraries are:
   Contact RAD Game Tools at 425-893-4300 for technical support.
 """
 
+- MPAHeaderInfo 2.2 located at thirdparty\MPAHeaderInfo is licensed as:
+"""
+  GNU LESSER GENERAL PUBLIC LICENSE
+  Version 3, 29 June 2007
+
+  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+
+  Everyone is permitted to copy and distribute verbatim copies of this license
+  document, but changing it is not allowed.
+
+  This version of the GNU Lesser General Public License incorporates the terms and
+  conditions of version 3 of the GNU General Public License, supplemented by the
+  additional permissions listed below.
+"""
+
 - openvr 0.9.11 located at thirdparty\openvr is licensed as:
 """
   Copyright (c) 2015, Valve Corporation

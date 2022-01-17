@@ -366,9 +366,23 @@ $Project "engine"
 		$File	"EngineSoundServer.cpp"
 		$File	"EngineSoundClient.cpp" [!$DEDICATED]
 		$File	"engsoundservice.cpp" [!$DEDICATED]
-		$File   "audio\private\voice_wavefile.cpp"
-		$File	"audio\private\MPAFile.cpp" [!$DEDICATED]
-		$File	"audio\private\MPAHeader.cpp" [!$DEDICATED]
+		$File	"audio\private\mp3duration_helper.cpp"
+		$File	"audio\private\voice_wavefile.cpp"
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ApeTag.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ID3V1Tag.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ID3V2Tag.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\LameTag.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Lyrics3Tag.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAEndOfFileException.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAException.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFile.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFileStream.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFrame.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAHeader.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAStream.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MusicMatchTag.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Tag.cpp" [!$DEDICATED]
+		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Tags.cpp" [!$DEDICATED]
 		$File	"audio\private\circularbuffer.cpp" [!$DEDICATED]
 		$File	"audio\private\snd_posix.cpp"		[$POSIX]	
 		
@@ -418,7 +432,9 @@ $Project "engine"
 				"audio\private\snd_dev_wave.cpp"	[$WINDOWS]		\
 				"audio\private\snd_mp3_source.cpp"	[!$DEDICATED]		\
 				"audio\private\snd_wave_mixer_mp3.cpp"	[!$DEDICATED]	\
-				"audio\private\VBRHeader.cpp"		[!$DEDICATED]		\
+				"$SRCDIR\thirdparty\MPAHeaderInfo\VBRHeader.cpp"		[!$DEDICATED]		\
+				"$SRCDIR\thirdparty\MPAHeaderInfo\VBRIHeader.cpp"		[!$DEDICATED]		\
+				"$SRCDIR\thirdparty\MPAHeaderInfo\XINGHeader.cpp"		[!$DEDICATED]		\
 				"audio\private\voice.cpp"			[!$DEDICATED]		\
 				"audio\private\voice_mixer_controls.cpp" [$WINDOWS]	\
 				"audio\private\voice_record_dsound.cpp"	[$WINDOWS]	\
@@ -473,9 +489,21 @@ $Project "engine"
 			$File	"audio\public\soundservice.h"
 			$File	"audio\public\voice.h"
 			$File	"audio\public\vox.h"
-			$File	"audio\private\MPAFile.h"							[$WIN32]
-			$File	"audio\private\MPAHeader.h"							[$WIN32]
-			$File	"audio\private\VBRHeader.h"							[$WIN32]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ApeTag.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ID3V1Tag.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ID3V2Tag.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\LameTag.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Lyrics3Tag.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAEndOfFileException.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAException.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFile.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFileStream.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFrame.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAHeader.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAStream.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MusicMatchTag.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Tag.h" [$WINDOWS]
+			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Tags.h" [$WINDOWS]
 			$File	"audio\private\circularbuffer.h"
 			$File	"audio\private\eax.h"
 			$File	"audio\private\snd_channels.h"
