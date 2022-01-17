@@ -350,55 +350,6 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 #endif
 }
 
-static int GetNumberForMap()
-{
-	if ( !host_state.worldmodel )
-		return 1;
-
-	char mapname[256];
-	CL_SetupMapName( modelloader->GetName( host_state.worldmodel ), mapname, sizeof( mapname ) );
-
-	KeyValues *resfilekeys = new KeyValues( "mapnumber" );
-	if ( resfilekeys->LoadFromFile( g_pFileSystem, "scripts/bugreport_mapnumber.txt", "GAME" ) )
-	{
-		KeyValues *entry = resfilekeys->GetFirstSubKey();
-
-		while ( entry )
-		{
-			if ( !Q_stricmp( entry->GetName(), mapname ) )
-			{
-				return entry->GetInt() + 1;
-			}
-
-			entry = entry->GetNextKey();
-		}
-	}
-	resfilekeys->deleteThis();
-
-	char szNameCopy[ 128 ];
-
-	const char *pszResult = Q_strrchr( mapname, '_' );
-	if( !pszResult )
-		//I don't know where the number of this map is, if there even is one.
-		return 1; 
-
-	Q_strncpy( szNameCopy, pszResult + 1, sizeof( szNameCopy ) );
-	if ( !szNameCopy[0] )
-		return 1;
-	
-//	in case we can't use tchar.h, this will do the same thing
-	char *pcEndOfName = szNameCopy;
-	while(*pcEndOfName != 0)
-	{
-		if(*pcEndOfName < '0' || *pcEndOfName > '9')
-			*pcEndOfName = 0;
-		pcEndOfName++;
-	}
-	
-	//add 1 because pvcs has 0 as the first map number, not 1 (and it is not 0-based).
-	return atoi(szNameCopy) + 1;		
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: Generic dialog for displaying animating steam progress logo
 //			used when we are doing a possibly length steam op that has no progress measure (login/create user/etc)
