@@ -419,4 +419,5 @@ devtools/bin/vpc.pdb
 
 # Solution-specific
 ValveETWProviderEvents*
+gcsdk/generated_proto/
 
