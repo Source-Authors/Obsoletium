@@ -136,9 +136,9 @@ using namespace vgui;
 unsigned long GetRam()
 {
 #ifdef WIN32
-	MEMORYSTATUS stat;
-	GlobalMemoryStatus( &stat );
-	return (stat.dwTotalPhys / (1024 * 1024));
+  MEMORYSTATUSEX stat = { sizeof(stat) };
+	GlobalMemoryStatusEx( &stat );
+	return stat.ullTotalPhys / (1024 * 1024);
 #elif defined(OSX)
 	int mib[2] = { CTL_HW, HW_MEMSIZE };
 	u_int namelen = sizeof(mib) / sizeof(mib[0]);

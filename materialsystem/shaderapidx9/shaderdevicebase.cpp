@@ -696,14 +696,19 @@ void CShaderDeviceMgrBase::LoadConfig( KeyValues *pKeyValues, KeyValues *pConfig
 //-----------------------------------------------------------------------------
 static unsigned long GetRam()
 {
-	MEMORYSTATUS stat;
-	GlobalMemoryStatus( &stat );
-	
-	char buf[256];
-	V_snprintf( buf, sizeof( buf ), "GlobalMemoryStatus: %llu\n", (uint64)(stat.dwTotalPhys) );
-	Plat_DebugString( buf );
+  MEMORYSTATUSEX stat = { sizeof(stat) };
+	if ( GlobalMemoryStatusEx( &stat ) )
+	{
+		char buf[256];
+		V_snprintf( buf, sizeof( buf ), "GlobalMemoryStatusEx: %llu\n", (uint64)stat.ullTotalPhys );
+		Plat_DebugString( buf );
+	}
+	else
+	{
+		Plat_DebugString( "GetRam failed" );
+	}
 
-	return (stat.dwTotalPhys / (1024 * 1024));
+	return stat.ullTotalPhys / (1024 * 1024);
 }
 
 

@@ -489,10 +489,7 @@ public:
 #ifdef _WIN32
 		const double MbDiv = 1024.0 * 1024.0;
 
-		MEMORYSTATUSEX	memStat;
-		ZeroMemory( &memStat, sizeof( MEMORYSTATUSEX ) );
-		memStat.dwLength = sizeof( MEMORYSTATUSEX );
-
+		MEMORYSTATUSEX memStat = { sizeof(memStat) };
 		if ( GlobalMemoryStatusEx( &memStat ) )
 		{
 			CommentPrintf( "\nMemory\nmemusage( %d %% )\ntotalPhysical Mb(%.2f)\nfreePhysical Mb(%.2f)\ntotalPaging Mb(%.2f)\nfreePaging Mb(%.2f)\ntotalVirtualMem Mb(%.2f)\nfreeVirtualMem Mb(%.2f)\nextendedVirtualFree Mb(%.2f)\n",
