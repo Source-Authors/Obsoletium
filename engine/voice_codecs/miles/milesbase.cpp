@@ -155,9 +155,12 @@ bool ASISTRUCT::Init( void *pCallbackObject, const char *pInputFileType, const c
 	// Get the provider.
 	HPROVIDER hProvider = RIB_find_files_provider( "ASI codec", 
 		"Output file types", pOutputFileType, "Input file types", pInputFileType );
-
 	if ( !hProvider )
+	{
+		DevWarning( "Can't find provider 'ASI codec' for input %s, output %s",
+			pInputFileType, pOutputFileType );
 		return false;
+	}
 
 	m_pProvider = CProvider::FindProvider( hProvider );
 	if ( !m_pProvider )
@@ -166,7 +169,10 @@ bool ASISTRUCT::Init( void *pCallbackObject, const char *pInputFileType, const c
 	}
 
 	if ( !m_pProvider )
+	{
+		DevWarning( "Can't create provider 'ASI codec'" );
 		return false;
+	}
 
 	RIB_INTERFACE_ENTRY ASISTR[] =
 	{
@@ -188,25 +194,25 @@ bool ASISTRUCT::Init( void *pCallbackObject, const char *pInputFileType, const c
 	};
 
 	RIBRESULT result = RIB_request( m_pProvider->GetProviderHandle(), "ASI stream", ASISTR );
-	if(result != RIB_NOERR)
+	if ( result != RIB_NOERR )
+	{
+		DevWarning( "Can't find interface 'ASI stream' for provider 'ASI codec'" );
 		return false;
-
+	}
 	
 	// This function doesn't exist for the voice DLLs, but it's not fatal in that case.
-	RIB_INTERFACE_ENTRY seekFn[] = 
-	{
-		FN( ASI_stream_seek ),
-	};
+	RIB_INTERFACE_ENTRY seekFn[]{ FN( ASI_stream_seek ), };
 	result = RIB_request( m_pProvider->GetProviderHandle(), "ASI stream", seekFn );
-	if(result != RIB_NOERR)
+	if ( result != RIB_NOERR )
 		ASI_stream_seek = NULL;
 
-
-
-
-	m_stream = ASI_stream_open((UINTa)pCallbackObject, cb, 0);
-	if(!m_stream)
+	m_stream = ASI_stream_open( (UINTa)pCallbackObject, cb, 0 );
+	if( !m_stream )
+	{
+		DevWarning("Can't open ASI stream for conversion input %s -> output %s",
+			pInputFileType, pOutputFileType );
 		return false;
+	}
 
 	return true;
 }
@@ -244,11 +250,8 @@ bool ASISTRUCT::IsActive() const
 unsigned int ASISTRUCT::GetProperty( HPROPERTY hProperty )
 {
 	uint32 nValue = 0;
-	if ( ASI_stream_property( m_stream, hProperty, &nValue, NULL, NULL ) )
-	{
-		return nValue;
-	}
-	return 0;
+	return ASI_stream_property( m_stream, hProperty, &nValue, NULL, NULL )
+		? nValue : 0;
 }
 
 void ASISTRUCT::Seek( int position )
@@ -258,5 +261,3 @@ void ASISTRUCT::Seek( int position )
 
 	ASI_stream_seek( m_stream, (S32)position );
 }
-
-

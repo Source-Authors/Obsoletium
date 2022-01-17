@@ -146,8 +146,9 @@ public:
 	void *CreateMilesAudioEngine()
 	{
 		IncrementRefMiles();
-		HDIGDRIVER hDriver = AIL_open_digital_driver( 44100, 16, MSS_MC_51_DISCRETE, 0 );
-		return (void *)hDriver;
+		// dimhotepus: Use system configuration instead of 5:1 as it is now always the case.
+		HDIGDRIVER hDriver = AIL_open_digital_driver( 44100, 16, MSS_MC_USE_SYSTEM_CONFIG, 0 );
+		return hDriver;
 	}
 
 	void DestroyMilesAudioEngine( void *pEngine )
