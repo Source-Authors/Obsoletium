@@ -68,7 +68,7 @@ $Configuration "Debug"
 		// Optimization
 		$Optimization							"Disabled (/Od)"
 		$InlineFunctionExpansion
-		$EnableIntrinsicFunctions
+		$EnableIntrinsicFunctions			"Yes (/Oi)"
 		$FavorSizeOrSpeed
 		$OmitFramePointers
 		$EnableFiberSafeOptimizations
