@@ -36,7 +36,7 @@
 #endif
 
 // FPExceptionDisabler and FPExceptionEnabler taken from my blog post
-// at http://www.altdevblogaday.com/2012/04/20/exceptional-floating-point/
+// at https://randomascii.wordpress.com/2012/04/21/exceptional-floating-point/
 
 // Declare an object of this type in a scope in order to suppress
 // all floating-point exceptions temporarily. The old exception
@@ -1328,7 +1328,8 @@ inline int Floor2Int( float a )
 //-----------------------------------------------------------------------------
 // Fast color conversion from float to unsigned char
 //-----------------------------------------------------------------------------
-FORCEINLINE unsigned int FastFToC( float c )
+// dimhotepus: Use unsigned char as return type.
+FORCEINLINE unsigned char FastFToC( float c )
 {
 #if defined( __i386__ )
 	// IEEE float bit manipulation works for values between [0, 1<<23)
@@ -1633,7 +1634,7 @@ void Hermite_Spline(
 	Quaternion &output );
 
 
-// See http://en.wikipedia.org/wiki/Kochanek-Bartels_curves
+// See https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline
 // 
 // Tension:  -1 = Round -> 1 = Tight
 // Bias:     -1 = Pre-shoot (bias left) -> 1 = Post-shoot (bias right)
