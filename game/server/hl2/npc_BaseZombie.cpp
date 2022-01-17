@@ -82,7 +82,7 @@ envelopePoint_t envDefaultZombieMoanVolume[] =
 
 
 // if the zombie doesn't find anything closer than this, it doesn't swat.
-#define ZOMBIE_FARTHEST_PHYSICS_OBJECT	40.0*12.0
+#define ZOMBIE_FARTHEST_PHYSICS_OBJECT	40.0F*12.0F
 #define ZOMBIE_PHYSICS_SEARCH_DEPTH	100
 
 // Don't swat objects unless player is closer than this.
@@ -290,8 +290,8 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 		return false;
 	}
 
-	float flNearestDist = MIN( dist, ZOMBIE_FARTHEST_PHYSICS_OBJECT * 0.5 );
-	Vector vecDelta( flNearestDist, flNearestDist, GetHullHeight() * 2.0 );
+	float flNearestDist = MIN( dist, ZOMBIE_FARTHEST_PHYSICS_OBJECT * 0.5F );
+	Vector vecDelta( flNearestDist, flNearestDist, GetHullHeight() * 2.0F );
 
 	class CZombieSwatEntitiesEnum : public CFlaggedEntitiesEnum
 	{
@@ -503,7 +503,7 @@ bool CNPC_BaseZombie::OverrideMoveFacing( const AILocalMoveGoal_t &move, float f
 			}
 			else
 			{
-				idealYaw = flMoveYaw + UTIL_AngleDiff( flEYaw, flMoveYaw ) * (2 - flEDist / 128.0);
+				idealYaw = flMoveYaw + UTIL_AngleDiff( flEYaw, flMoveYaw ) * (2 - flEDist / 128.0F);
 			}
 
 			//DevMsg("was %.0f now %.0f\n", flMoveYaw, idealYaw );
@@ -905,7 +905,7 @@ int CNPC_BaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 
 				if ( ( info.GetDamageType() & DMG_BLAST) && random->RandomInt( 0, 1 ) == 0 )
 				{
-					Ignite( 5.0 + random->RandomFloat( 0.0, 5.0 ) );
+					Ignite( 5.0F + random->RandomFloat( 0.0, 5.0F ) );
 				}
 
 				// For Combine cannon impacts
@@ -918,7 +918,7 @@ int CNPC_BaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 					}
 				}
 
-				if (flDamageThreshold >= 1.0)
+				if (flDamageThreshold >= 1.0F)
 				{
 					m_iHealth = 0;
 					BecomeRagdollOnClient( info.GetDamageForce() );
@@ -2028,7 +2028,7 @@ void CNPC_BaseZombie::GatherConditions( void )
 		if( gpGlobals->curtime >= m_flNextSwatScan && (m_hPhysicsEnt == NULL) )
 		{
 			FindNearestPhysicsObject( ZOMBIE_MAX_PHYSOBJ_MASS );
-			m_flNextSwatScan = gpGlobals->curtime + 2.0;
+			m_flNextSwatScan = gpGlobals->curtime + 2.0F;
 		}
 	}
 
@@ -2324,6 +2324,9 @@ void CNPC_BaseZombie::RemoveHead( void )
 
 bool CNPC_BaseZombie::ShouldPlayFootstepMoan( void )
 {
+	// dimhotepus: No reason to play sound when no angry zombies.
+  if ( !s_iAngryZombies ) return false;
+
 	if( random->RandomInt( 1, zombie_stepfreq.GetInt() * s_iAngryZombies ) == 1 )
 	{
 		return true;
