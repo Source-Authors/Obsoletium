@@ -136,7 +136,7 @@ using namespace vgui;
 unsigned long GetRam()
 {
 #ifdef WIN32
-  MEMORYSTATUSEX stat = { sizeof(stat) };
+	MEMORYSTATUSEX stat = { sizeof(stat) };
 	GlobalMemoryStatusEx( &stat );
 	return stat.ullTotalPhys / (1024 * 1024);
 #elif defined(OSX)
@@ -187,32 +187,56 @@ const char *GetInternalBugReporterDLL( void )
 	return BUG_REPORTER_DLLNAME;
 }
 
+// dimhotepus: Additional bug info.
+#if defined(_WIN32) && !defined(_X360)
+// See https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-checktokenmembership
+BOOL IsUserAdmin()
+{
+  SID_IDENTIFIER_AUTHORITY ntAuthority{ SECURITY_NT_AUTHORITY };
+	PSID administratorsGroup;
+	BOOL b = AllocateAndInitializeSid(
+			&ntAuthority,
+			2,
+			SECURITY_BUILTIN_DOMAIN_RID,
+			DOMAIN_ALIAS_RID_ADMINS,
+			0, 0, 0, 0, 0, 0,
+			&administratorsGroup);
+
+	if (b)
+	{
+			if (!CheckTokenMembership( NULL, administratorsGroup, &b)) 
+			{
+					 b = FALSE;
+			}
+
+			FreeSid(administratorsGroup); 
+	}
+
+	return b;
+}
+#endif
+
+// dimhotepus: Additional bug info.
+bool Plat_IsUserAnAdmin()
+{
+#if defined( _WIN32 ) && !defined( _X360 )
+  return ::IsUserAdmin() ? true : false;
+#else
+	return true;
+#endif
+}
+
 void DisplaySystemVersion( char *osversion, int maxlen )
 {
 #ifdef WIN32
-	osversion[ 0 ] = 0;
-	OSVERSIONINFOEX osvi;
-	BOOL bOsVersionInfoEx;
-	
-	// Try calling GetVersionEx using the OSVERSIONINFOEX structure.
-	//
-	// If that fails, try using the OSVERSIONINFO structure.
-	
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	
-	bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi);
+	osversion[ 0 ] = '\0';
 
+	OSVERSIONINFOEX osvi = { sizeof(osvi) };
+	BOOL bOsVersionInfoEx = GetVersionEx( (OSVERSIONINFO *)&osvi );
 	if( !bOsVersionInfoEx )
 	{
-		// If OSVERSIONINFOEX doesn't work, try OSVERSIONINFO.
-		
-		osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-		if (! GetVersionEx ( (OSVERSIONINFO *) &osvi) )
-		{
-			Q_strncpy( osversion, "Unable to get Version", maxlen );
-			return;
-		}
+		Q_strncpy( osversion, "Unable to get OS Version", maxlen );
+		return;
 	}
 	
 	switch (osvi.dwPlatformId)
@@ -220,62 +244,63 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 	case VER_PLATFORM_WIN32_NT:
 		
 		// Test for the product.
-		
-		if ( osvi.dwMajorVersion <= 4 )
+		// dimhotepus: <= Vista - out of support.
+
+		if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 )
 		{
-			Q_strncat ( osversion, "NT ", maxlen, COPY_ALL_CHARACTERS );
+			Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows 7" : "Windows Server 2008 R2", maxlen, COPY_ALL_CHARACTERS );
+			bOsVersionInfoEx = TRUE;
 		}
-		
-		if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 )
+
+		if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2 )
 		{
-			Q_strncat ( osversion, "2000 ", maxlen, COPY_ALL_CHARACTERS );
+			Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows 8" : "Windows Server 2012", maxlen, COPY_ALL_CHARACTERS );
+			bOsVersionInfoEx = TRUE;
 		}
-		
-		if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1 )
+
+		if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 3 )
 		{
-			Q_strncat ( osversion, "XP ", maxlen, COPY_ALL_CHARACTERS );
+			Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows 8.1" : "Windows Server 2012 R2", maxlen, COPY_ALL_CHARACTERS );
+			bOsVersionInfoEx = TRUE;
+		}
+
+		if ( osvi.dwMajorVersion == 10 && osvi.dwMinorVersion == 0 )
+		{
+			// dimhotepus: Windows 11 has dwBuildNumber >= 22000U
+			if ( osvi.dwBuildNumber < 22000U )
+			{
+				Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows 10" : "Windows Server 2016", maxlen, COPY_ALL_CHARACTERS );
+			}
+			else
+			{
+				Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows 11+" : "Windows Server 2022+", maxlen, COPY_ALL_CHARACTERS );
+			}
+
+			bOsVersionInfoEx = TRUE;
+		}
+
+		if ( !bOsVersionInfoEx )
+		{
+			// dimhotepus: Well, some too old or new OS version.
+			Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows N/A" : "Windows Server N/A", maxlen, COPY_ALL_CHARACTERS );
 		}
 		
 		// Display version, service pack (if any), and build number.
 		
 		char build[256];
-		Q_snprintf (build, sizeof( build ), "%s (Build %d) version %d.%d",
+		Q_snprintf (build, sizeof( build ), "%s (Build %lu) version %lu.%lu (LimitedUser: %s)",
 			osvi.szCSDVersion,
 			osvi.dwBuildNumber & 0xFFFF,
 			osvi.dwMajorVersion,
-			osvi.dwMinorVersion );
+			osvi.dwMinorVersion,
+			Plat_IsUserAnAdmin() ? "no" : "yes" );
 		Q_strncat ( osversion, build, maxlen, COPY_ALL_CHARACTERS );
 		break;
-		
+	
+	// dimhotepus: Out of support.
 	case VER_PLATFORM_WIN32_WINDOWS:
-		
-		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0)
-		{
-			Q_strncat ( osversion, "95 ", maxlen, COPY_ALL_CHARACTERS );
-			if ( osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B' )
-			{
-				Q_strncat ( osversion, "OSR2 ", maxlen, COPY_ALL_CHARACTERS );
-			}
-		} 
-		
-		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
-		{
-			Q_strncat ( osversion, "98 ", maxlen, COPY_ALL_CHARACTERS );
-			if ( osvi.szCSDVersion[1] == 'A' )
-			{
-				Q_strncat ( osversion, "SE ", maxlen, COPY_ALL_CHARACTERS );
-			}
-		} 
-		
-		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
-		{
-			Q_strncat ( osversion, "Me ", maxlen, COPY_ALL_CHARACTERS );
-		} 
-		break;
-		
 	case VER_PLATFORM_WIN32s:
-		
-		Q_strncat ( osversion, "Win32s ", maxlen, COPY_ALL_CHARACTERS );
+		Q_strncat ( osversion, "Out of support ", maxlen, COPY_ALL_CHARACTERS );
 		break;
 	}
 #elif defined(OSX)
@@ -285,38 +310,20 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 	char rgchVersionLine[1024];
 		
 	if ( !fpVersionInfo )
-		Q_strncat ( osversion, "OSXU ", maxlen, COPY_ALL_CHARACTERS );
+		Q_strncpy ( osversion, "OSXU ", maxlen );
 	else
 	{
+		Q_strncpy ( osversion, "OSX10", maxlen );
+
 		while ( fgets( rgchVersionLine, sizeof(rgchVersionLine), fpVersionInfo ) )
 		{
 			if ( !Q_strnicmp( rgchVersionLine, pszSearchString, cchSearchString ) )
 			{
+				// dimhotepus: Just get MacOS version.
 				const char *pchVersion = rgchVersionLine + cchSearchString;
-				if ( !Q_strnicmp( pchVersion, "10.", Q_strlen( "10." ) ) )
-				{
-					pchVersion += 3; // move past "10."
-					if( *pchVersion == '4' && *(pchVersion+1) == '.' )
-					{
-						Q_strncat ( osversion, "OSX104 ", maxlen, COPY_ALL_CHARACTERS );
-						break;
-					}
-					else if ( *pchVersion == '5' && *(pchVersion+1) == '.' )
-					{
-						Q_strncat ( osversion, "OSX105 ", maxlen, COPY_ALL_CHARACTERS );
-						break;
-					}
-					else if ( *pchVersion == '6' && *(pchVersion+1) == '.' )
-					{
-						Q_strncat ( osversion, "OSX106 ", maxlen, COPY_ALL_CHARACTERS );
-						break;
-					}
-					else if ( *pchVersion == '7' && *(pchVersion+1) == '.' )
-					{
-						Q_strncat ( osversion, "OSX107 ", maxlen, COPY_ALL_CHARACTERS );
-						break;
-					}
-				}
+				int ccVersion = Q_strlen(pchVersion); // trim the \n
+				Q_strncpy ( osversion, pchVersion, ccVersion );
+				osversion[ ccVersion ] = 0;
 				break;
 			}
 		}
