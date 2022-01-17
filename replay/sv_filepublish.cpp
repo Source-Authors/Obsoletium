@@ -179,7 +179,7 @@ JobStatus_t	CCompressionJob::DoExecute()
 	int nResult = JOB_FAILED;
 
 	// Attempt to compress the file
-	const int nMaxCompressedSize = ceil( m_nSrcSize * 1.1f ) + 600;	// see "destLen" - http://www.bzip.org/1.0.3/html/util-fns.html
+	const int nMaxCompressedSize = ceil( m_nSrcSize * 1.1f ) + 600;	// see "destLen" - http://www.bzip.org/
 	uint8 *pCompressed = new uint8[ nMaxCompressedSize ];
 
 	// Compress

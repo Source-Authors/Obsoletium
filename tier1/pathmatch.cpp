@@ -80,7 +80,7 @@ extern "C" int __real_access(const char *pathname, int mode);
 extern "C" DIR *__real_opendir(const char *name);
 
 
-// UTF-8 work from PhysicsFS: http://icculus.org/physfs/
+// UTF-8 work from PhysicsFS: https://icculus.org/physfs/
 //  Even if it wasn't under the zlib license, Ryan wrote all this code originally.
 
 #define UNICODE_BOGUS_CHAR_VALUE 0xFFFFFFFF

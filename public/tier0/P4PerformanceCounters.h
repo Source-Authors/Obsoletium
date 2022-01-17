@@ -12,7 +12,7 @@
 // Pentium 4 support
 
 /*
-    http://developer.intel.com/design/Pentium4/documentation.htm
+    https://www.intel.com/content/www/us/en/documentation-resources/developer.html#panel-top-resources|most-popular
 
     IA-32 Intel Architecture Software Developer's Manual Volume 1: Basic Architecture 
 

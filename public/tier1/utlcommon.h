@@ -100,7 +100,7 @@ template <typename T> struct DefaultEqualFunctor;
 // into the hash table. If you do roll your own, please read up on
 // bit-mixing and the avalanche property; be sure that your values
 // are reasonably well-distributed across the entire 32-bit range.
-//  http://en.wikipedia.org/wiki/Avalanche_effect
+//  https://en.wikipedia.org/wiki/Avalanche_effect
 //  http://home.comcast.net/~bretm/hash/5.html
 // 
 template <typename T> struct DefaultHashFunctor;

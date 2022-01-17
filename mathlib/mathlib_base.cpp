@@ -2511,7 +2511,7 @@ void Hermite_Spline( const Quaternion &q0, const Quaternion &q1, const Quaternio
 	QuaternionNormalize( output );
 }
 
-// See http://en.wikipedia.org/wiki/Kochanek-Bartels_curves
+// See https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline
 // 
 // Tension:  -1 = Round -> 1 = Tight
 // Bias:     -1 = Pre-shoot (bias left) -> 1 = Post-shoot (bias right)
@@ -4201,7 +4201,7 @@ float RandomVectorInUnitCircle( Vector2D *pVector )
 #endif
 
 // FPExceptionDisable and FPExceptionEnabler taken from my blog post
-// at http://www.altdevblogaday.com/2012/04/20/exceptional-floating-point/
+// at https://randomascii.wordpress.com/2012/04/21/exceptional-floating-point/
 
 #ifdef FP_EXCEPTIONS_ENABLED
 // These functions are all inlined NOPs if FP_EXCEPTIONS_ENABLED is not defined.

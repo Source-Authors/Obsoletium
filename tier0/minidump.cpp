@@ -555,7 +555,7 @@ that we don't want to struggle on after crashing.
 
 For more scary details see this article. It actually suggests using the compatibility
 manifest, but that does not appear to work.
-http://blog.paulbetts.org/index.php/2010/07/20/the-case-of-the-disappearing-onload-exception-user-mode-callback-exceptions-in-x64/
+https://stackoverflow.com/questions/11376795/why-cant-64-bit-windows-unwind-user-kernel-user-exceptions
 */
 void EnableCrashingOnCrashes()
 {

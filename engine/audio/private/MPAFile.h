@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: Uses mp3 code from:  http://www.codeproject.com/audio/MPEGAudioInfo.asp
+// Purpose: Uses mp3 code from:  https://www.codeproject.com/Articles/8295/MPEG-Audio-Frame-Header
 //
 // There don't appear to be any licensing restrictions for using this code:
 //
@@ -18,7 +18,7 @@ This tool was written as an example on how to use the classes:
 CMPAFile, CMPAHeader, CVBRHeader and CMPAException.
 
 The article MPEG Audio Frame Header on Sourceproject
-[http://www.codeproject.com/audio/MPEGAudioInfo.asp] 
+[https://www.codeproject.com/Articles/8295/MPEG-Audio-Frame-Header] 
 provides additional information about these classes and the frame header
 in general.
 

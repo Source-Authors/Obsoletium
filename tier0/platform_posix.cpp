@@ -77,7 +77,7 @@ void Plat_SetBenchmarkMode( bool bBenchmark )
 size_t ApproximateProcessMemoryUsage( void )
 {
 /*
-From http://man7.org/linux/man-pages/man5/proc.5.html:
+From https://man7.org/linux/man-pages/man5/proc.5.html:
        /proc/[pid]/statm
               Provides information about memory usage, measured in pages.
               The columns are:
@@ -435,7 +435,7 @@ PLATFORM_INTERFACE void Plat_SetAllocErrorFn( Plat_AllocErrorFn fn )
 
 #if defined( OSX )
 
-// From the Apple tech note: http://developer.apple.com/library/mac/#qa/qa1361/_index.html
+// From the Apple tech note: https://developer.apple.com/library/archive/qa/qa1361/_index.html
 bool Plat_IsInDebugSession()
 {
 	int                 junk;
@@ -476,7 +476,7 @@ bool Plat_IsInDebugSession()
 
 bool Plat_IsInDebugSession()
 {
-	// For linux: http://stackoverflow.com/questions/3596781/detect-if-gdb-is-running
+	// For linux: https://stackoverflow.com/questions/3596781/how-to-detect-if-the-current-process-is-being-run-by-gdb
 	// Don't use "if (ptrace(PTRACE_TRACEME, 0, NULL, 0) == -1)" as it means debuggers can't attach.
 	// 	Other solutions they mention involve forking. Ugh.
 	//

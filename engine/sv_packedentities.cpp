@@ -91,7 +91,7 @@ void SV_EnsureInstanceBaseline( ServerClass *pServerClass, int iEdict, const voi
 			// be visible before its initialization has finished. This potential problem is caused
 			// by the use of double-checked locking -- the problem is that the code outside of the
 			// lock is looking at the variable that is protected by the lock. See this article for details:
-			// http://en.wikipedia.org/wiki/Double-checked_locking
+			// https://en.wikipedia.org/wiki/Double-checked_locking
 			// Write-release barrier
 			ThreadMemoryBarrier();
 			pClass->m_InstanceBaselineIndex = temp;

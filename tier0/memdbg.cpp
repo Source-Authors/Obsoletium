@@ -1141,7 +1141,7 @@ void CDbgMemAlloc::RegisterDeallocation( MemInfo_t &info, int nLogicalSize, int 
 	Assert( info.m_nCurrentCount != 0 );
 
 	// It is technically legal for code to request allocations of zero bytes, and there are a number of places in our code
-	// that do. So only assert that nLogicalSize >= 0. http://stackoverflow.com/questions/1087042/c-new-int0-will-it-allocate-memory
+	// that do. So only assert that nLogicalSize >= 0. https://stackoverflow.com/questions/1087042/c-new-int0-will-it-allocate-memory
 	Assert( nLogicalSize >= 0 );
 	Assert( info.m_nCurrentSize >= (size_t)nLogicalSize );
 	--info.m_nCurrentCount;
@@ -1600,7 +1600,7 @@ size_t CDbgMemAlloc::MemoryAllocFailed()
 #if defined( LINUX ) && !defined( NO_HOOK_MALLOC )
 //
 // Under linux we can ask GLIBC to override malloc for us
-//   Base on code from Ryan, http://hg.icculus.org/icculus/mallocmonitor/file/29c4b0d049f7/monitor_client/malloc_hook_glibc.c
+//   Base on code from Ryan, https://github.com/icculus/mallocmonitor/blob/fc7c207fb18f61977ba4e46a995f1b9f349246b1/monitor_client/malloc_hook_glibc.c
 //
 //
 static void *glibc_malloc_hook = NULL;

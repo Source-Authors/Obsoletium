@@ -218,7 +218,7 @@ void C_INIT_CreateOnModel::InitNewParticlesScalar(
 static inline void RandomPointOnUnitSphere( int nRandContext, FourVectors &out )
 {
 	// generate 4 random points on the unit sphere. uses Marsaglia (1972) method from
-	// http://mathworld.wolfram.com/SpherePointPicking.html
+	// https://mathworld.wolfram.com/SpherePointPicking.html
 
 	fltx4 f4x1 = SubSIMD( MulSIMD( Four_Twos, RandSIMD( nRandContext ) ), Four_Ones ); // -1..1
 	fltx4 f4x2 = SubSIMD( MulSIMD( Four_Twos, RandSIMD( nRandContext ) ), Four_Ones ); // -1..1

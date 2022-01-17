@@ -361,7 +361,7 @@ void CMPAFile::FillBuffer( uint32 dwOffsetToRead )
     m_dwBufferSize += dwBytesRead;
 }
 
-// Uses mp3 code from:  http://www.codeproject.com/audio/MPEGAudioInfo.asp
+// Uses mp3 code from:  https://www.codeproject.com/Articles/8295/MPEG-Audio-Frame-Header
 
 struct MP3Duration_t
 {

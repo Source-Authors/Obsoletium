@@ -16,7 +16,7 @@
 #include <math.h>
 #include <float.h>
 
-// see http://mathworld.wolfram.com/SphericalTrigonometry.html
+// see https://mathworld.wolfram.com/SphericalTrigonometry.html
 
 // return the spherical distance, in radians, between 2 points on the unit sphere.
 FORCEINLINE float UnitSphereLineSegmentLength( Vector const &a, Vector const &b )
@@ -54,7 +54,7 @@ FORCEINLINE float UnitSphereTriangleArea( Vector const &a, Vector const &b , Vec
 	return 2.0f * ( atan( flTanAOver2 ) + atan( flTanBOver2 ) + atan( flTanCOver2 ) ) - M_PI_F;
 }
 
-// spherical harmonics-related functions. Best explanation at http://www.research.scea.com/gdc2003/spherical-harmonic-lighting.pdf
+// spherical harmonics-related functions. Best explanation at https://theory.cpe.ku.ac.th/~pramook/files/spherical-harmonic-lighting.pdf
 
 // Evaluate associated legendre polynomial P( l, m ) at flX, using recurrence relation
 float AssociatedLegendrePolynomial( int nL, int nM, float flX );

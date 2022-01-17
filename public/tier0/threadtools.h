@@ -194,16 +194,11 @@ inline int ThreadWaitForObject( HANDLE handle, bool bWaitAll = true, unsigned ti
 	// Prevent compiler reordering across this barrier. This is
 	// sufficient for most purposes on x86/x64.
 
-	#if _MSC_VER < 1500
-		// !KLUDGE! For VC 2005
-		// http://connect.microsoft.com/VisualStudio/feedback/details/100051
-		#pragma intrinsic(_ReadWriteBarrier)
-	#endif
 	#define ThreadMemoryBarrier() _ReadWriteBarrier()
 #elif defined(GNUC)
 	// Prevent compiler reordering across this barrier. This is
 	// sufficient for most purposes on x86/x64.
-	// http://preshing.com/20120625/memory-ordering-at-compile-time
+	// https://preshing.com/20120625/memory-ordering-at-compile-time/
 	#define ThreadMemoryBarrier() asm volatile("" ::: "memory")
 #else
 #error \

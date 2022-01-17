@@ -1867,7 +1867,7 @@ int CEngineAPI::Run()
 	// and try/catch will usually not catch exceptions in a WindowProc or other
 	// callback that is called from kernel mode because 64-bit Windows cannot handle
 	// throwing exceptions across that boundary. See this article for details:
-	// http://blog.paulbetts.org/index.php/2010/07/20/the-case-of-the-disappearing-onload-exception-user-mode-callback-exceptions-in-x64/
+	// https://randomascii.wordpress.com/2012/07/05/when-even-crashing-doesnt-work/
 	// Note that the unhandled exception function is not called when running
 	// under a debugger, but that's fine because in that case we don't care about
 	// recording minidumps.

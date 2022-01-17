@@ -142,7 +142,7 @@ float SparseConvolutionNoise(Vector const &pnt, float (*pNoiseShapeFunction)(flo
 // Improved Perlin Noise
 // The following code is the c-ification of Ken Perlin's new noise algorithm
 // "JAVA REFERENCE IMPLEMENTATION OF IMPROVED NOISE - COPYRIGHT 2002 KEN PERLIN"
-// as available here: http://mrl.nyu.edu/~perlin/noise/
+// as available here: https://mrl.cs.nyu.edu/~perlin/noise/
 
 float NoiseGradient(int hash, float x, float y, float z)
 {

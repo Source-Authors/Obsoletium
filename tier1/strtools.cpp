@@ -3705,7 +3705,7 @@ bool V_IsMeanSpaceW( wchar_t wch )
 //-----------------------------------------------------------------------------
 // Purpose: tell us if a Unicode character is deprecated
 //
-// See Unicode Technical Report #20: http://www.unicode.org/reports/tr20/
+// See Unicode Technical Report #20: https://www.unicode.org/reports/tr20/
 //
 // Some characters are difficult or unreliably rendered. These characters eventually
 // fell out of the Unicode standard, but are abusable by users. For example,

@@ -153,7 +153,7 @@ typedef unsigned char BYTE;
 
 // THIS FILE is almost entirely based upon code by Jean-loup Gailly
 // and Mark Adler. It has been modified by Lucian Wischik.
-// The original code may be found at http://www.gzip.org/zlib/
+// The original code may be found at http://www.gzip.org/
 // The original copyright text follows.
 //
 //

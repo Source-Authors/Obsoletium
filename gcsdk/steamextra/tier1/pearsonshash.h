@@ -6,7 +6,7 @@
 //	The generic implementation is a template, plus a couple of specializations
 //	for commonly used types.
 //
-//	Take a look at http://en.wikipedia.org/wiki/Pearson_hashing for more info.
+//	Take a look at https://en.wikipedia.org/wiki/Pearson_hashing for more info.
 //
 //=============================================================================
 

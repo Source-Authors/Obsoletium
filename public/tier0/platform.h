@@ -275,7 +275,7 @@ typedef unsigned int		uint;
 //      ...
 // }
 //
-// MSDN __declspec(novtable) documentation: http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vclang/html/_langref_novtable.asp
+// MSDN __declspec(novtable) documentation: https://docs.microsoft.com/en-us/cpp/cpp/novtable
 //
 // Note: NJS: This is not enabled for regular PC, due to not knowing the implications of exporting a class with no no vtable.
 //       It's probable that this shouldn't be an issue, but an experiment should be done to verify this.

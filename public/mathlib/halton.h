@@ -2,7 +2,7 @@
 // $Id$
 
 // halton.h - classes, etc for generating numbers using the Halton pseudo-random sequence.  See
-// http://halton-sequences.wikiverse.org/.
+// https://en.wikipedia.org/wiki/Halton_sequence.
 //
 // what this function is useful for is any sort of sampling/integration problem where
 // you want to solve it by random sampling. Each call the NextValue() generates

@@ -4,7 +4,7 @@
 //			a number of techniques to provide transparent parameter type
 //			deduction and packaging. Supports both member and non-member functions.
 //
-//			See also: http://en.wikipedia.org/wiki/Function_object
+//			See also: https://en.wikipedia.org/wiki/Function_object
 //
 //			Note that getting into the guts of this file is not for the
 //			feint of heart. The core concept here is that the compiler can

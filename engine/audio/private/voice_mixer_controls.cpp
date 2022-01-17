@@ -19,7 +19,7 @@
 // The interface is not 1:1 so for now we'll just back the state with convars and reapply it
 // on init of the mixer controls.  In the future when XP is no longer the majority of our user base
 // we should revisit this and move to the new API.
-// http://msdn.microsoft.com/en-us/library/aa964574(VS.85).aspx
+// https://docs.microsoft.com/en-us/previous-versions//aa964574(v=vs.85)?redirectedfrom=MSDN
 
 
 class CMixerControls : public IMixerControls

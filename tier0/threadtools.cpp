@@ -988,7 +988,7 @@ bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, 
 	//  and the RCX:RBX value is copied to the memory location.
 	//  Otherwise, the ZF flag is cleared, and the memory value is copied to RDX:RAX.
 
-	// _InterlockedCompareExchange128: http://msdn.microsoft.com/en-us/library/bb514094.aspx
+	// _InterlockedCompareExchange128: https://docs.microsoft.com/en-us/cpp/intrinsics/interlockedcompareexchange128
 	return _InterlockedCompareExchange128( pDest64, pValue64[1], pValue64[0], pComperand64 ) == 1;
 }
 
@@ -1725,7 +1725,7 @@ bool CThread::Start( unsigned nBytesStack )
 #elif defined(POSIX)
 	pthread_attr_t attr;
 	pthread_attr_init( &attr );
-	// From http://www.kernel.org/doc/man-pages/online/pages/man3/pthread_attr_setstacksize.3.html
+	// From https://man7.org/linux/man-pages/man3/pthread_attr_setstacksize.3.html
 	//  A thread's stack size is fixed at the time of thread creation. Only the main thread can dynamically grow its stack.
 	pthread_attr_setstacksize( &attr, MAX( nBytesStack, 1024u*1024 ) );
 	if ( pthread_create( &m_threadId, &attr, (void *(*)(void *))GetThreadProc(), new ThreadInit_t( init ) ) != 0 )

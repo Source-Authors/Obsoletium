@@ -2063,7 +2063,7 @@ void CClientState::RunFrame()
 			Warning( "  Currently using %lu pages (%lu Kb) of total %lu pages (%lu Kb total)\n",
 				ppi.numPagesUsed, ppi.numPagesUsed * Plat_GetMemPageSize(),
 				( ppi.numPagesFree + ppi.numPagesUsed ), ( ppi.numPagesFree + ppi.numPagesUsed ) * Plat_GetMemPageSize() );
-			Warning( "  Please see http://www.steampowered.com for more information.\n" );
+			Warning( "  Please see https://www.steampowered.com for more information.\n" );
 		}
 	}
 	else if ( s_bLowPagedPoolMemoryWarning )
