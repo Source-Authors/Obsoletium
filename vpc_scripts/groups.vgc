@@ -125,6 +125,8 @@ $Group "game"
 	"bsppack"
 // dimhotepus: Thirdparty.
 //	"bzip2"
+// dimhotepus: Required for bug UI.
+	"bugreporter_public"
 	"choreoobjects"
 	"client"
 	"datacache"

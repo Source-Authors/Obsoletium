@@ -24,7 +24,7 @@ $Configuration
 	}
 }
 
-$Project "Bugreporter_public"
+$Project "bugreporter_public"
 {
 	$Folder	"Source Files"
 	{
