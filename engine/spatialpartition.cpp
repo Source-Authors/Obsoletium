@@ -282,7 +282,7 @@ private:
 	CVoxelHash*							m_pVoxelHash;
 	CLeafList							m_aLeafList;								// Pool - Linked list(multilist) of leaves per entity.
 	int									m_TreeId;
-	CThreadLocalPtr<CPartitionVisits>	m_pVisits;
+	CThreadLocalPtr<CPartitionVisits> m_pVisits;
 	CSpatialPartition *					m_pOwner;
 	CUtlVector<unsigned short>			m_AvailableVisitBits;
 	unsigned short						m_nNextVisitBit;

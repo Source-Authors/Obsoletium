@@ -1614,7 +1614,7 @@ void CThreadSpinRWLock::UnlockWrite()
 //
 //-----------------------------------------------------------------------------
 
-CThreadLocalPtr<CThread> g_pCurThread;
+static thread_local CThread *g_pCurThread;
 
 //---------------------------------------------------------
 
@@ -1865,7 +1865,7 @@ void CThread::Stop(int exitCode)
 		if ( !( m_flags & SUPPORT_STOP_PROTOCOL ) )
 		{
 			OnExit();
-			g_pCurThread = (int)NULL;
+			g_pCurThread = NULL;
 
 #ifdef _WIN32
 			CloseHandle( m_hThread );
@@ -2018,7 +2018,7 @@ CThread *CThread::GetCurrentCThread()
 void CThread::Yield()
 {
 #ifdef _WIN32
-	::Sleep(0);
+  ::Sleep(0);
 #elif defined(POSIX)
 	pthread_yield();
 #endif
@@ -2106,9 +2106,9 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 	CThread *pThread = pInit->pThread;
 	g_pCurThread = pThread;
 	
-	g_pCurThread->m_pStackBase = AlignValue( &pThread, 4096 );
+	pThread->m_pStackBase = AlignValue(&pThread, 4096);
 	
-	pInit->pThread->m_result = -1;
+	pThread->m_result = -1;
 	
 	bool bInitSuccess = true;
 	if ( pInit->pfInitSuccess )
@@ -2116,7 +2116,7 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 	
 	try
 	{
-		bInitSuccess = pInit->pThread->Init();
+		bInitSuccess = pThread->Init();
 	}
 	catch (...)
 	{
@@ -2130,11 +2130,11 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 	if (!bInitSuccess)
 		return 0;
 	
-	if ( pInit->pThread->m_flags & SUPPORT_STOP_PROTOCOL )
+	if ( pThread->m_flags & SUPPORT_STOP_PROTOCOL )
 	{
 		try
 		{
-			pInit->pThread->m_result = pInit->pThread->Run();
+			pThread->m_result = pThread->Run();
 		}
 		catch ( const std::exception &e )
 		{
@@ -2143,14 +2143,14 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 	}
 	else
 	{
-		pInit->pThread->m_result = pInit->pThread->Run();
+		pThread->m_result = pThread->Run();
 	}
 	
-	pInit->pThread->OnExit();
-	g_pCurThread = (int)NULL;
-	pInit->pThread->Cleanup();
+	pThread->OnExit();
+	g_pCurThread = NULL;
+	pThread->Cleanup();
 	
-	return pInit->pThread->m_result;
+	return pThread->m_result;
 }
 
 

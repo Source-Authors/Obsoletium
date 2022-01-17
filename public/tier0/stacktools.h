@@ -73,6 +73,7 @@ public:
 		iValidEntries = copyFrom.iValidEntries;
 		memcpy( pStack, copyFrom.pStack, sizeof( void * ) * copyFrom.iValidEntries );
 	}
+	CCallStackStorage& operator=( const CCallStackStorage& ) = delete;
 
 	void *pStack[128]; //probably too big, possibly too small for some applications. Don't want to spend the time figuring out how to generalize this without templatizing pollution or mallocs
 	uint32 iValidEntries;

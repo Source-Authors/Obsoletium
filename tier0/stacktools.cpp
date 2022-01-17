@@ -474,7 +474,7 @@ public:
 
 		AUTO_LOCK( m_Mutex );
 
-		unsigned char genericbuffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME*sizeof(TCHAR)];
+		alignas(SYMBOL_INFO) unsigned char genericbuffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME*sizeof(TCHAR)];
 
 		((PSYMBOL_INFO)genericbuffer)->SizeOfStruct = sizeof(SYMBOL_INFO);
 		((PSYMBOL_INFO)genericbuffer)->MaxNameLen = MAX_SYM_NAME;

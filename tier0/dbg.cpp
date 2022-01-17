@@ -142,7 +142,7 @@ struct SpewInfo_t
 	int				m_nSpewOutputLevel;
 };
 
-CThreadLocalPtr<SpewInfo_t> g_pSpewInfo;
+static thread_local SpewInfo_t *g_pSpewInfo;
 
 
 // Standard groups
@@ -323,10 +323,12 @@ static SpewRetval_t _SpewMessage( SpewType_t spewType, const char *pGroupName, i
 		
 	case SPEW_ABORT:
 	{
-//		MessageBox(NULL,"Error in _SpewMessage","Error",MB_OK);
-//		ConMsg( _T("Exiting on SPEW_ABORT\n") );
 		exit(1);
 	}
+
+	// dimhotepus: Do nothing.
+	case SPEW_CONTINUE:
+		break;
 	}
 
 	return ret;

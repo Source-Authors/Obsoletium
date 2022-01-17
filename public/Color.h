@@ -80,12 +80,12 @@ public:
 
 	bool operator ==(const Color &rhs) const
 	{
-		return ( *((int *)this) == *((int *)&rhs) );
+		return GetRawColor() == rhs.GetRawColor();
 	}
 
 	bool operator !=(const Color &rhs) const
 	{
-		return !(operator==(rhs));
+		return !(*this == rhs);
 	}
 
 	Color( const Color &rhs )

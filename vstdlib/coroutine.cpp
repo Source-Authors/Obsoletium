@@ -586,7 +586,7 @@ private:
 	CUtlVector<HCoroutine> m_VecCoroutineStack;
 };
 
-CThreadLocalPtr< CCoroutineMgr > g_ThreadLocalCoroutineMgr;
+static thread_local CCoroutineMgr* g_ThreadLocalCoroutineMgr;
 
 CUtlVector< CCoroutineMgr * > g_VecPCoroutineMgr;
 CThreadMutex g_ThreadMutexCoroutineMgr;

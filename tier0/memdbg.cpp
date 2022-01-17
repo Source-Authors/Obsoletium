@@ -1017,20 +1017,19 @@ const char *CDbgMemAlloc::FindOrCreateFilename( const char *pFileName )
 {
 	Initialize();
 
+	if ( !pFileName )
+	{
+		pFileName = g_pszUnknown;
+	}
+
 	// If we created it for the first time, actually *allocate* the filename memory
 	HEAP_LOCK();
 	// This is necessary for shutdown conditions: the file name is stored
 	// in some piece of memory in a DLL; if that DLL becomes unloaded,
 	// we'll have a pointer to crap memory
 
-	if ( !pFileName )
-	{
-		pFileName = g_pszUnknown;
-	}
-
 #if defined( USE_STACK_WALK_DETAILED )
 {
-
 	// Walk the stack to determine what's causing the allocation
 	void *arrStackAddresses[ 10 ] = { 0 };
 	int numStackAddrRetrieved = WalkStack( arrStackAddresses, 10, 0 );
@@ -1039,25 +1038,25 @@ const char *CDbgMemAlloc::FindOrCreateFilename( const char *pFileName )
 	{
 		pFileName = szStack;		// Use the stack description for the allocation
 	}
-
 }
 #endif // #if defined( USE_STACK_WALK_DETAILED )
 
-	char *pszFilenameCopy;
-	Filenames_t::const_iterator iter = m_pFilenames->find( pFileName );
+	auto iter = m_pFilenames->find( pFileName );
 	if ( iter == m_pFilenames->end() )
 	{
-		size_t nLen = strlen(pFileName) + 1;
-		pszFilenameCopy = (char *)DebugAlloc( nLen );
-		memcpy( pszFilenameCopy, pFileName, nLen );
-		m_pFilenames->insert( pszFilenameCopy );
-	}
-	else
-	{
-		pszFilenameCopy = (char *)(*iter);
+		size_t nLen = strlen( pFileName ) + 1;
+
+		char *pszFilenameCopy = (char *)DebugAlloc(nLen);
+		if ( pszFilenameCopy )
+		{
+			memcpy( pszFilenameCopy, pFileName, nLen );
+			m_pFilenames->insert( pszFilenameCopy );
+		}
+
+		return pszFilenameCopy;
 	}
 
-	return pszFilenameCopy;
+	return (char *)(*iter);
 }
 
 //-----------------------------------------------------------------------------
@@ -1107,7 +1106,7 @@ void CDbgMemAlloc::RegisterAllocation( MemInfo_t &info, int nLogicalSize, int nA
 
 	info.m_nCurrentSize += nLogicalSize;
 	info.m_nTotalSize += nLogicalSize;
-	if (info.m_nCurrentSize > info.m_nPeakSize)
+	if (info.m_nCurrentSize > info.m_nPeakSize) //-V1051
 	{
 		info.m_nPeakSize = info.m_nCurrentSize;
 	}
