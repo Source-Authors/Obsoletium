@@ -17,6 +17,9 @@ CSheet::CSheet( void )
 {
 	memset( m_pSamples, 0, sizeof( m_pSamples ) );
 	memset( m_bClamp, 0, sizeof( m_bClamp ) );
+	memset( m_bSequenceIsCopyOfAnotherSequence, 0, sizeof( m_bSequenceIsCopyOfAnotherSequence ) );
+	memset( m_nNumFrames, 0, sizeof( m_nNumFrames ) );
+	memset( m_flFrameSpan, 0, sizeof( m_flFrameSpan ) );
 }
 
 CSheet::CSheet( CUtlBuffer &buf )
@@ -52,7 +55,8 @@ CSheet::CSheet( CUtlBuffer &buf )
 		m_pSamples[ nSequenceNumber ] = 
 			new SheetSequenceSample_t[ nTimeSamples ];
 
-		int fTotalSequenceTime = buf.GetFloat();
+		// dimhotepus: int -> float.
+		float fTotalSequenceTime = buf.GetFloat();
 		float InterpKnot[SEQUENCE_SAMPLE_COUNT];
 		float InterpValue[SEQUENCE_SAMPLE_COUNT];
 		SheetSequenceSample_t Samples[SEQUENCE_SAMPLE_COUNT];

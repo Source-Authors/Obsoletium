@@ -879,30 +879,27 @@ void CWorldCollideContextData::operator delete( void* pData, int nBlockUse, cons
 //-----------------------------------------------------------------------------
 CParticleCollection::CParticleCollection( )
 {
-	COMPILE_TIME_ASSERT( ( MAX_RANDOM_FLOATS & ( MAX_RANDOM_FLOATS - 1 ) ) == 0 );
-	COMPILE_TIME_ASSERT( sizeof( s_pRandomFloats ) / sizeof( float ) >= MAX_RANDOM_FLOATS );
+	static_assert( ( MAX_RANDOM_FLOATS & ( MAX_RANDOM_FLOATS - 1 ) ) == 0 );
+	static_assert( sizeof( s_pRandomFloats ) / sizeof( float ) >= MAX_RANDOM_FLOATS );
 
-	m_pNextDef = m_pPrevDef = NULL;
-	m_nUniqueParticleId = 0;
-	m_nRandomQueryCount = 0;
-	m_bIsScrubbable = false;
-	m_bIsRunningInitializers = false;
-	m_bIsRunningOperators = false;
-	m_bIsTranslucent = false;
-	m_bIsTwoPass = false;
-	m_bIsBatchable = false;
-	m_bUsesPowerOfTwoFrameBufferTexture = false;
-	m_bUsesFullFrameBufferTexture = false;
-	m_pRenderOp = NULL;
-	m_nControlPointReadMask = 0;
+	m_fl4CurTime = Four_Zeros;
+	m_nPaddedActiveParticles = 0;
+	m_flCurTime = 0.0f;
 
-	m_flLastMinDistSqr = m_flLastMaxDistSqr = 0.0f;
-	m_flMinDistSqr = m_flMaxDistSqr = 0.0f;
-	m_flOOMaxDistSqr = 1.0f;
-	m_vecLastCameraPos.Init();
-	m_MinBounds.Init();
-	m_MaxBounds.Init();
-	m_bBoundsValid = false;
+	m_nActiveParticles = 0;
+	m_flDt = 0.0f;
+	m_flPreviousDt = 0.05f;
+	m_flNextSleepTime = 0.0f;
+
+	m_pDef = NULL;
+	m_nAllocatedParticles = 0;
+	m_nMaxAllowedParticles = 0;
+	m_bDormant = false;
+	m_bEmissionStopped = false;
+	m_bRequiresOrderInvariance = false;
+
+	m_LocalLightingCP = -1;
+	m_LocalLighting = Color(255, 255, 255, 255);
 
 	memset( m_ControlPoints, 0, sizeof(m_ControlPoints) );
 
@@ -914,39 +911,69 @@ CParticleCollection::CParticleCollection( )
 		m_ControlPoints[i].m_RightVector.Init( 1, 0, 0 );
 	}
 
-	memset( m_pParticleInitialAttributes, 0, sizeof(m_pParticleInitialAttributes) );
+	memset( m_ControlPointHitBoxes, 0, sizeof( m_ControlPointHitBoxes ) );
+	
+	m_pOperatorContextData = NULL;
+	m_pNext = m_pPrev = NULL;
+
+	memset( m_pCollisionCacheData, 0, sizeof( m_pCollisionCacheData ) );
+	m_pParent = NULL;
+
+	m_bBoundsValid = false;
+	m_MinBounds.Init();
+	m_MaxBounds.Init();
+	m_nHighestCP = 0;
+
+	m_pParticleMemory = NULL;
+	m_pParticleInitialMemory = NULL;
+	m_pConstantMemory = NULL;
 
 	m_nPerParticleUpdatedAttributeMask = 0;
 	m_nPerParticleInitializedAttributeMask = 0;
 	m_nPerParticleReadInitialAttributeMask = 0;
-	m_pParticleMemory = NULL;
-	m_pParticleInitialMemory = NULL;
-	m_pConstantMemory = NULL;
-	m_nActiveParticles = 0;
-	m_nPaddedActiveParticles = 0;
-	m_flCurTime = 0.0f;
-	m_fl4CurTime = Four_Zeros;
-	m_flDt = 0.0f;
-	m_flPreviousDt = 0.05f;
+	memset( m_pParticleAttributes, 0, sizeof(m_pParticleAttributes) );
+	memset( m_pParticleInitialAttributes, 0, sizeof(m_pParticleInitialAttributes) );
+	memset( m_nParticleFloatStrides, 0, sizeof(m_nParticleFloatStrides) );
+	memset( m_nParticleInitialFloatStrides, 0, sizeof(m_nParticleInitialFloatStrides) );
+
+	m_pConstantAttributes = NULL;
+
+	m_nControlPointReadMask = 0;
 	m_nParticleFlags = PCFLAGS_FIRST_FRAME;
-	m_pOperatorContextData = NULL;
-	m_pNext = m_pPrev = NULL;
-	m_nRandomSeed = 0;
-	m_pDef = NULL;
-	m_nAllocatedParticles = 0;
-	m_nMaxAllowedParticles = 0;
-	m_bDormant = false;
-	m_bEmissionStopped = false;
-	m_bRequiresOrderInvariance = false;
+	m_bIsScrubbable = false;
+	m_bIsRunningInitializers = false;
+	m_bIsRunningOperators = false;
+	m_bIsTranslucent = false;
+	m_bIsTwoPass = false;
+	m_bAnyUsesPowerOfTwoFrameBufferTexture = false;
+	m_bAnyUsesFullFrameBufferTexture = false;
+	m_bIsBatchable = false;
+
+	m_bUsesPowerOfTwoFrameBufferTexture = false;
+	m_bUsesFullFrameBufferTexture = false;
+
+	m_nDrawnFrames = 0;
 	m_nSimulatedFrames = 0;
 
+	m_Center.Init();
+
+	m_nUniqueParticleId = 0;
+	
+	m_nRandomQueryCount = 0;
+	m_nRandomSeed = 0;
+	m_nOperatorRandomSampleOffset = 0;
+
+	m_flMinDistSqr = m_flMaxDistSqr = 0.0f;
+	m_flOOMaxDistSqr = 1.0f;
+	m_vecLastCameraPos.Init();
+	m_flLastMinDistSqr = m_flLastMaxDistSqr = 0.0f;
+	
 	m_nNumParticlesToKill = 0;
-	m_pParticleKillList = NULL;
-	m_nHighestCP = 0;
-	memset( m_pCollisionCacheData, 0, sizeof( m_pCollisionCacheData ) );
-	m_pParent = NULL;
-	m_LocalLighting = Color(255, 255, 255, 255);
-	m_LocalLightingCP = -1;
+	m_pParticleKillList = nullptr;
+
+	m_pNextDef = m_pPrevDef = nullptr;
+
+	m_pRenderOp = nullptr;
 	
 }
 
@@ -956,18 +983,9 @@ CParticleCollection::~CParticleCollection( void )
 
 	m_Children.Purge();
 
-	if ( m_pParticleMemory )
-	{
-		delete[] m_pParticleMemory;
-	}
-	if ( m_pParticleInitialMemory )
-	{
-		delete[] m_pParticleInitialMemory;
-	}
-	if ( m_pConstantMemory )
-	{
-		delete[] m_pConstantMemory;
-	}
+	delete[] m_pParticleMemory;
+	delete[] m_pParticleInitialMemory;
+	delete[] m_pConstantMemory;
 	if ( m_pOperatorContextData )
 	{
 		MemAlloc_FreeAligned( m_pOperatorContextData );
@@ -975,10 +993,7 @@ CParticleCollection::~CParticleCollection( void )
 
 	for( int i = 0 ; i < ARRAYSIZE( m_pCollisionCacheData ) ; i++ )
 	{
-		if ( m_pCollisionCacheData[i] )
-		{
-			delete m_pCollisionCacheData[i];
-		}
+		delete m_pCollisionCacheData[i];
 	}
 }
 
@@ -1079,13 +1094,14 @@ void CParticleCollection::Init( CParticleSystemDefinition *pDef, float flDelay, 
 		}
 
 		CParticleCollection *pChild;
-		if ( pDef->m_Children[i].m_bUseNameBasedLookup )
+		const auto &child = pDef->m_Children[i];
+		if ( child.m_bUseNameBasedLookup )
 		{
-			pChild = g_pParticleSystemMgr->CreateParticleCollection( pDef->m_Children[i].m_Name, -m_flCurTime + pDef->m_Children[i].m_flDelay, nRandomSeed );
+			pChild = g_pParticleSystemMgr->CreateParticleCollection( child.m_Name, -m_flCurTime + child.m_flDelay, nRandomSeed );
 		}
 		else
 		{
-			pChild = g_pParticleSystemMgr->CreateParticleCollection( pDef->m_Children[i].m_Id, -m_flCurTime + pDef->m_Children[i].m_flDelay, nRandomSeed );
+			pChild = g_pParticleSystemMgr->CreateParticleCollection( child.m_Id, -m_flCurTime + child.m_flDelay, nRandomSeed );
 		}
 		if ( pChild )
 		{
@@ -1113,7 +1129,8 @@ void CParticleCollection::Init( CParticleSystemDefinition *pDef, float flDelay, 
 //-----------------------------------------------------------------------------
 bool CParticleCollection::Init( CParticleSystemDefinition *pDef )
 {
-	if ( !pDef ) // || !pDef->IsPrecached() )
+	// dimhotepus: Warng if particle system is not precached. 
+	if ( !pDef || !pDef->IsPrecached() )
 	{
 		Warning( "Particlelib: Missing precache for particle system type \"%s\"!\n", pDef ? pDef->GetName() : "unknown" );
 		CParticleSystemDefinition *pErrorDef = g_pParticleSystemMgr->FindParticleSystem( "error" );
@@ -2910,21 +2927,28 @@ static CDefaultParticleSystemQuery s_DefaultParticleSystemQuery;
 CParticleSystemMgr::CParticleSystemMgr()
 	// m_SheetList( DefLessFunc( ITexture * ) )
 {
+	m_pParticleSystemDictionary = nullptr;
+
+	m_pVisualizedParticles = nullptr;
+	memset( &m_VisualizedOperatorId, 0, sizeof(m_VisualizedOperatorId) );
 	m_pQuery = &s_DefaultParticleSystemQuery;
+	m_pShadowDepthMaterial = nullptr;
+	m_flLastSimulationTime = 0.0f;
+
 	m_bDidInit = false;
 	m_bUsingDefaultQuery = true;
 	m_bShouldLoadSheets = true;
-	m_pParticleSystemDictionary = NULL;
+
 	m_nNumFramesMeasured = 0;
-	m_flLastSimulationTime = 0.0f;
-	m_nParticleVertexCount = m_nParticleIndexCount = 0;
-	m_bFrameWarningNeeded = false;
 
 	for ( int i = 0; i < c_nNumFramesTracked; i++ )
 	{
 		m_nParticleVertexCountHistory[i] = 0;
 	}
+
 	m_fParticleCountScaling = 1.0f;
+	m_nParticleVertexCount = m_nParticleIndexCount = 0;
+	m_bFrameWarningNeeded = false;
 }
 
 CParticleSystemMgr::~CParticleSystemMgr()
@@ -3108,18 +3132,12 @@ void* CParticleOperatorInstance::operator new( size_t nSize, int nBlockUse, cons
 
 void CParticleOperatorInstance::operator delete(void *pData)
 {
-	if ( pData )
-	{
-		MemAlloc_FreeAligned( pData );
-	}
+	MemAlloc_FreeAligned( pData );
 }
 
 void CParticleOperatorInstance::operator delete( void* pData, int nBlockUse, const char *pFileName, int nLine )
 {
-	if ( pData )
-	{
-		MemAlloc_FreeAligned( pData );
-	}
+	MemAlloc_FreeAligned( pData );
 }
 
 #include "tier0/memdbgon.h"
@@ -3845,7 +3863,7 @@ void IParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 	for(int i=0; i < nNumPtsOut; i++)
 	{
 		pPntsOut[i]=pParticles->m_ControlPoints[nControlPointNumber].m_Position;
-		if ( pHitBoxRelativeCoordOut )
+		if ( pHitBoxRelativeCoordOut ) //-V1051
 			pHitBoxRelativeCoordOut[i].Init();
 		if ( pHitBoxIndexOut )
 			pHitBoxIndexOut[i] = -1;

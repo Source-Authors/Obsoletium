@@ -57,13 +57,12 @@ template<EParticleSortKeyType eSortKeyMode> void s_GenerateData( Vector CameraPo
 
 	do
 	{
-		fltx4 fl4X = pXYZ->x;
-		fltx4 fl4Y = pXYZ->y;
-		fltx4 fl4Z = pXYZ->z;
-		
 		fltx4 fl4SortKey;
 		if ( eSortKeyMode == SORT_KEY_DISTANCE )
 		{
+			fltx4 fl4X = pXYZ->x;
+			fltx4 fl4Y = pXYZ->y;
+			fltx4 fl4Z = pXYZ->z;
 			fltx4 Xdiff = SubSIMD( EyePos.x, fl4X );
 			fltx4 Ydiff = SubSIMD( EyePos.y, fl4Y );
 			fltx4 Zdiff = SubSIMD( EyePos.z, fl4Z );

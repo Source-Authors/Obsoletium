@@ -1333,8 +1333,10 @@ struct SpriteTrailRenderInfo_t : public SpriteRenderInfo_t
 	size_t length_stride;
 	const fltx4 *m_pLength;
 
-	const fltx4 *m_pCreationTime;
-	size_t m_nCreationTimeStride;
+	// dimhotepus: m_pCreationTime is m_pCreationTimeStamp
+	// const fltx4 *m_pCreationTime;
+	// dimhotepus: Already in base class
+	// size_t m_nCreationTimeStride;
 
 
 	void Init( CParticleCollection *pParticles, int nVertexOffset, float flAgeScale, CSheet *pSheet )
@@ -1343,7 +1345,8 @@ struct SpriteTrailRenderInfo_t : public SpriteRenderInfo_t
 		m_pParticles = pParticles;
 		m_pPrevXYZ = pParticles->GetM128AttributePtr( PARTICLE_ATTRIBUTE_PREV_XYZ, &m_nPrevXYZStride );
 		m_pLength = pParticles->GetM128AttributePtr( PARTICLE_ATTRIBUTE_TRAIL_LENGTH, &length_stride );
-		m_pCreationTime = pParticles->GetM128AttributePtr( PARTICLE_ATTRIBUTE_CREATION_TIME, &m_nCreationTimeStride );
+		// dimhotepus: Already read m_pCreationTimeStamp and m_nCreationTimeStride in base class.
+		// m_pCreationTime = pParticles->GetM128AttributePtr( PARTICLE_ATTRIBUTE_CREATION_TIME, &m_nCreationTimeStride );
 	}
 };
 
@@ -1687,7 +1690,7 @@ class C_OP_RenderRope : public CParticleOperatorInstance
 	virtual void InitializeContextData( CParticleCollection *pParticles, void *pContext ) const
 	{
 		RenderRopeContext_t *pCtx = reinterpret_cast<RenderRopeContext_t *>( pContext );
-		pCtx->m_flRenderedRopeLength = false;
+		pCtx->m_flRenderedRopeLength = 0.0f;
 		float *pSubdivList = (float*)( pCtx + 1 );
 		for ( int iSubdiv = 0; iSubdiv < m_nSubdivCount; iSubdiv++ )
 		{

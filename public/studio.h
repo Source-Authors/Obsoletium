@@ -499,7 +499,7 @@ struct mstudioikerror_t
 	Vector		pos;
 	Quaternion	q;
 
-	mstudioikerror_t() {}
+	mstudioikerror_t() = default;
 
 private:
 	// No copy constructors allowed
@@ -2597,10 +2597,7 @@ public:
 		{	
 			if ( m_pSequenceTuples != NULL )
 			{
-				if ( m_pSequenceTuples->pActivityModifiers != NULL )
-				{
-					delete[] m_pSequenceTuples->pActivityModifiers;
-				}
+				delete[] m_pSequenceTuples->pActivityModifiers;
 				delete[] m_pSequenceTuples;
 			}
 		}

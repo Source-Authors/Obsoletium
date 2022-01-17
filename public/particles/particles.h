@@ -192,6 +192,7 @@ public:
 	CModelHitBoxesInfo( void )
 	{
 		m_flLastUpdateTime = -1;
+		m_flPrevLastUpdateTime = -1;
 		m_nNumHitBoxes = 0;
 		m_nNumPrevHitBoxes = 0;
 		m_pHitBoxes = NULL;
@@ -200,10 +201,8 @@ public:
 
 	~CModelHitBoxesInfo( void )
 	{
-		if ( m_pHitBoxes )
-			delete[] m_pHitBoxes;
-		if ( m_pPrevBoxes )
-			delete[] m_pPrevBoxes;
+		delete[] m_pHitBoxes;
+		delete[] m_pPrevBoxes;
 	}
 
 };
@@ -1421,9 +1420,7 @@ public:
 class CM128AttributeWriteIterator : public CStridedPtr<fltx4>
 {
 public:
-	FORCEINLINE CM128AttributeWriteIterator( void )
-	{
-	}
+	FORCEINLINE CM128AttributeWriteIterator(void) = default;
 	FORCEINLINE void Init ( int nAttribute, CParticleCollection *pParticles )
 	{
 		m_pData = pParticles->GetM128AttributePtrForWrite( nAttribute, &m_nStride );
@@ -2128,22 +2125,55 @@ public:
 //-----------------------------------------------------------------------------
 inline CParticleSystemDefinition::CParticleSystemDefinition( void )
 {
-	m_nControlPointReadMask = 0;
-	m_nInitialAttributeReadMask = 0;
-	m_nPerParticleInitializedAttributeMask = 0;
+  m_nInitialParticles = 0;
 	m_nPerParticleUpdatedAttributeMask = 0;
+	m_nPerParticleInitializedAttributeMask = 0;
+	m_nInitialAttributeReadMask = 0;
 	m_nAttributeReadMask = 0;
-	m_flTotalSimTime = 0.0;
-	m_flMaxMeasuredSimTime = 0.0;
-	m_nMaximumActiveParticles = 0;
-	m_bIsPrecached = false;
-	m_bAlwaysPrecache = false;
-	m_bShouldBatch = false;
-	m_bShouldSort = true;
+	m_nControlPointReadMask = 0;
+	m_BoundingBoxMin.Init();
+	m_BoundingBoxMax.Init();
+	m_pszMaterialName[0] = '\0';
+	m_Material = nullptr;
 	m_pFirstCollection = NULL;
+	m_pszCullReplacementName[0] = '\0';
 	m_flCullRadius = 0.0f;
 	m_flCullFillCost = 1.0f;
+	m_nCullControlPoint = 0;
 	m_nRetireCheckFrame = 0;
+
+	m_flConstantRadius = 0.0f;
+	m_flConstantRotation = 0.0f;
+	m_flConstantRotationSpeed = 0.0f;
+	m_nConstantSequenceNumber = 0;
+	m_nConstantSequenceNumber1 = 0;
+	m_nGroupID = 0;
+
+	m_flMaximumTimeStep = 0.0f;
+	m_flMaximumSimTime = 0.0f;
+	m_flMinimumSimTime = 0.0f;
+
+	m_nMinimumFrames = 0;
+
+	m_bViewModelEffect = false;
+
+	m_nContextDataSize = 0;
+	memset( &m_Id, 0, sizeof(m_Id) );
+
+	m_flMaxDrawDistance = 0.0f;
+	m_flNoDrawTimeToGoToSleep = 0.0f;
+
+	m_nMaxParticles = 0;
+	m_nSkipRenderControlPoint = 0;
+	
+	m_flTotalSimTime = 0.0f;
+	m_flUncomittedTotalSimTime = 0.0f;
+	m_flMaxMeasuredSimTime = 0.0f;
+	m_nMaximumActiveParticles = 0;
+	m_bShouldSort = true;
+	m_bShouldBatch = false;
+	m_bIsPrecached = false;
+	m_bAlwaysPrecache = false;
 }
 
 inline CParticleSystemDefinition::~CParticleSystemDefinition( void )

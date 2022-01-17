@@ -362,7 +362,7 @@ class C_OP_ContinuousEmitter : public CParticleOperatorInstance
 		//	pCtx->m_flTotalActualParticlesSoFar = min( pCtx->m_ActualParticlesToEmit, pCtx->m_flTotalActualParticlesSoFar );
 		pCtx->m_nTotalEmittedSoFar = 0;
 		//simulate a bunch
-		int nActualParticlesToEmit = floor (pCtx->m_flTotalActualParticlesSoFar);
+		int nActualParticlesToEmit = floorf (pCtx->m_flTotalActualParticlesSoFar);
 		int nStartParticle = pParticles->m_nActiveParticles;
 
 		if ( pParticles->m_nMaxAllowedParticles < nStartParticle + nActualParticlesToEmit )
@@ -390,7 +390,10 @@ class C_OP_ContinuousEmitter : public CParticleOperatorInstance
 			flPrevDrawTime = max( flPrevDrawTime, flCurrDrawTime - pParticles->m_pDef->m_flNoDrawTimeToGoToSleep );
 			pParticles->m_flCurTime = flPrevDrawTime;
 			pParticles->m_fl4CurTime = ReplicateX4( flPrevDrawTime );
-			for( float i = flPrevDrawTime; i < flCurrDrawTime; i += 0.1 )
+
+			// dimhotepus: Use int as cycle counter.
+			int maxDrawTime = static_cast<int>( flCurrDrawTime * 10 );
+			for( int i = static_cast<int>( flPrevDrawTime * 10 ); i < maxDrawTime; i++ )
 			{
 				pParticles->Simulate( .1, false );
 			}
@@ -503,7 +506,7 @@ uint32 C_OP_ContinuousEmitter::Emit( CParticleCollection *pParticles, float flCu
 	pCtx->m_flTotalActualParticlesSoFar += flActualParticlesToEmit;
 
 	//Floor float accumulated value and subtract whole int emitted so far from the result to determine total whole particles to emit this frame
-	int nParticlesToEmit = 	floor ( pCtx->m_flTotalActualParticlesSoFar ) - pCtx->m_nTotalEmittedSoFar;
+	int nParticlesToEmit = 	floorf ( pCtx->m_flTotalActualParticlesSoFar ) - pCtx->m_nTotalEmittedSoFar;
 
 	//Add emitted particles to running int total.
 	pCtx->m_nTotalEmittedSoFar += nParticlesToEmit;
@@ -772,11 +775,11 @@ uint32 C_OP_NoiseEmitter::Emit( CParticleCollection *pParticles, float flCurStre
 	*( (int *) &flNoise)  &= nAbsVal;
 
 	ValueScale = ( flAbsScale *( fMax - fMin ) );
-	ValueBase = ( fMin+ ( ( 1.0 - flAbsScale ) *( fMax - fMin ) ) );
+	ValueBase = ( fMin+ ( ( 1.0F - flAbsScale ) *( fMax - fMin ) ) );
 
 	if ( m_bAbsValInv )
 	{
-		flNoise = 1.0 - flNoise;
+		flNoise = 1.0F - flNoise;
 	}
 
 	float flInitialNoise = ( ValueBase + ( ValueScale * flNoise ) );
@@ -826,7 +829,7 @@ uint32 C_OP_NoiseEmitter::Emit( CParticleCollection *pParticles, float flCurStre
 	pCtx->m_flTotalActualParticlesSoFar += flActualParticlesToEmit;
 
 	//Floor float accumulated value and subtract whole int emitted so far from the result to determine total whole particles to emit this frame
-	int nParticlesToEmit = 	floor ( pCtx->m_flTotalActualParticlesSoFar ) - pCtx->m_nTotalEmittedSoFar;
+	int nParticlesToEmit = 	floorf ( pCtx->m_flTotalActualParticlesSoFar ) - pCtx->m_nTotalEmittedSoFar;
 
 	//Add emitted particles to running int total.
 	pCtx->m_nTotalEmittedSoFar += nParticlesToEmit;

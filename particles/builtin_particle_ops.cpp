@@ -158,9 +158,9 @@ void C_OP_BasicMovement::Operate( CParticleCollection *pParticles, float flStren
 	}
 	else
 	{
-		pAccOut->x = accFactorX;
-		pAccOut->y = accFactorY;
-		pAccOut->z = accFactorZ;
+		pAccOut->x = accFactorX; //-V619
+		pAccOut->y = accFactorY; //-V619
+		pAccOut->z = accFactorZ; //-V619
 		// we just have gravity
 	}
 	
@@ -454,7 +454,7 @@ void C_OP_FadeIn::Operate( CParticleCollection *pParticles, float flStrength,  v
 	fltx4 CurTime = pParticles->m_fl4CurTime;
 
 	int nCtr = pParticles->m_nPaddedActiveParticles;
-	int nSSEFixedExponent = m_flFadeInTimeExp*4.0;
+	int nSSEFixedExponent = m_flFadeInTimeExp*4.0F;
 
 	fltx4 FadeTimeMin = ReplicateX4( m_flFadeInTimeMin );
 	fltx4 FadeTimeWidth = ReplicateX4( m_flFadeInTimeMax - m_flFadeInTimeMin );
@@ -564,7 +564,7 @@ void C_OP_FadeOut::Operate( CParticleCollection *pParticles, float flStrength,  
 	fltx4 fl4CurTime = pParticles->m_fl4CurTime;
 
 	int nCtr = pParticles->m_nPaddedActiveParticles;
-	int nSSEFixedExponent = m_flFadeOutTimeExp*4.0;
+	int nSSEFixedExponent = m_flFadeOutTimeExp*4.0F;
 
 	fltx4 FadeTimeMin = ReplicateX4( m_flFadeOutTimeMin );
 	fltx4 FadeTimeWidth = ReplicateX4( m_flFadeOutTimeMax - m_flFadeOutTimeMin );
@@ -580,10 +580,10 @@ void C_OP_FadeOut::Operate( CParticleCollection *pParticles, float flStrength,  
 
 		// Find our life percentage
 		fltx4 fl4LifeTime = SubSIMD( fl4CurTime, *pCreationTime );
-		fltx4 fl4LifeDuration = *pLifeDuration;
 
 		if ( m_bProportional )
 		{
+			fltx4 fl4LifeDuration = *pLifeDuration;
 			fl4LifeTime = MulSIMD( fl4LifeTime, ReciprocalEstSIMD( fl4LifeDuration ) );
 			fl4FadeOutTime = SubSIMD( Four_Ones, fl4FadeOutTime );
 			fl4Lifespan = SubSIMD ( Four_Ones, fl4FadeOutTime );
@@ -1407,7 +1407,7 @@ void CGeneralSpin::Operate( CParticleCollection *pParticles, float flStrength,  
 	fltx4 nPi_2 = ReplicateX4( -2.0f*M_PI_F );
 
 	// FIXME: This is wrong
-	fltx4 minSpeedRadians = ReplicateX4( dt * fabs( m_fSpinRateMinRadians * 2.0f * M_PI_F ) );
+	fltx4 minSpeedRadians = ReplicateX4( dt * fabsf( m_fSpinRateMinRadians * 2.0f * M_PI_F ) );
 
 	fltx4 now = pParticles->m_fl4CurTime;
 	fltx4 SpinRateStopTime = ReplicateX4( m_fSpinRateStopTime ); 
@@ -1422,12 +1422,11 @@ void CGeneralSpin::Operate( CParticleCollection *pParticles, float flStrength,  
 	for( int i=0; i < nActive; i+=4 )
 	{
 		// HACK: Rather than redo this, I'm simply remapping the stop time into the percentage of lifetime, rather than seconds
-		fltx4 LifeSpan = *pLifeDuration;
-		fltx4 SpinFadePerc = Four_Zeros;
 		fltx4 OOSpinFadeRate = Four_Zeros;
 		if ( m_fSpinRateStopTime )
 		{
-			SpinFadePerc = MulSIMD( LifeSpan, SpinRateStopTime );
+			fltx4 LifeSpan = *pLifeDuration;
+			fltx4 SpinFadePerc = MulSIMD( LifeSpan, SpinRateStopTime );
 			OOSpinFadeRate = DivSIMD( Four_Ones,  SpinFadePerc );
 		}
 		
@@ -2002,7 +2001,7 @@ void C_OP_PositionLock::Operate( CParticleCollection *pParticles, float flStreng
 	}
 
 	Vector vDelta;
-	matrix3x4_t matCurrentTransform;
+	matrix3x4_t matCurrentTransform = {};
 	matrix3x4_t matTransformLock;
 
 	if ( m_bLockRot )
@@ -2095,8 +2094,8 @@ void C_OP_PositionLock::Operate( CParticleCollection *pParticles, float flStreng
 		fltx4 fl4StartBias = ReplicateX4( m_flStartTime_min );
 		fltx4 fl4EndRange = ReplicateX4( m_flEndTime_max - m_flEndTime_min );
 		fltx4 fl4EndBias = ReplicateX4( m_flEndTime_min );
-		int nSSEStartExponent = m_flStartTime_exp * 4.0;
-		int nSSEEndExponent = m_flEndTime_exp * 4.0;
+		int nSSEStartExponent = m_flStartTime_exp * 4.0F;
+		int nSSEEndExponent = m_flEndTime_exp * 4.0F;
 		do 
 		{
 
@@ -2586,43 +2585,27 @@ void C_OP_ControlpointLight::Render( CParticleCollection *pParticles ) const
 	Vector vecOrigin4 = pParticles->GetControlPointAtCurrentTime( m_nControlPoint4 );
 	vecOrigin4 += m_vecCPOffset4;
 
-	Color LightColor1Outer;
-	LightColor1Outer[0] = m_LightColor1[0] / 2.0f;
-	LightColor1Outer[1] = m_LightColor1[1] / 2.0f;
-	LightColor1Outer[2] = m_LightColor1[2] / 2.0f;
-	LightColor1Outer[3] = 255;
-	Color LightColor2Outer;
-	LightColor2Outer[0] = m_LightColor2[0] / 2.0f;
-	LightColor2Outer[1] = m_LightColor2[1] / 2.0f;
-	LightColor2Outer[2] = m_LightColor2[2] / 2.0f;
-	LightColor2Outer[3] = 255;
-	Color LightColor3Outer;
-	LightColor3Outer[0] = m_LightColor3[0] / 2.0f;
-	LightColor3Outer[1] = m_LightColor3[1] / 2.0f;
-	LightColor3Outer[2] = m_LightColor3[2] / 2.0f;
-	LightColor3Outer[3] = 255;
-	Color LightColor4Outer;
-	LightColor4Outer[0] = m_LightColor4[0] / 2.0f;
-	LightColor4Outer[1] = m_LightColor4[1] / 2.0f;
-	LightColor4Outer[2] = m_LightColor4[2] / 2.0f;
-	LightColor4Outer[3] = 255;
 	if ( m_bLightActive1 )
 	{
+		Color LightColor1Outer( m_LightColor1[0] / 2.0f, m_LightColor1[1] / 2.0f, m_LightColor1[2] / 2.0f, 255 );
 		RenderWireframeSphere( vecOrigin1, m_LightFiftyDist1, 16, 8, m_LightColor1, false );
 		RenderWireframeSphere( vecOrigin1, m_LightZeroDist1, 16, 8, LightColor1Outer, false );
 	}
 	if ( m_bLightActive2 )
 	{	
+		Color LightColor2Outer( m_LightColor2[0] / 2.0f, m_LightColor2[1] / 2.0f, m_LightColor2[2] / 2.0f, 255 );
 		RenderWireframeSphere( vecOrigin2, m_LightFiftyDist2, 16, 8, m_LightColor2, false );
 		RenderWireframeSphere( vecOrigin2, m_LightZeroDist2, 16, 8, LightColor2Outer, false );
 	}
 	if ( m_bLightActive3 )
 	{
+		Color LightColor3Outer( m_LightColor3[0] / 2.0f, m_LightColor3[1] / 2.0f, m_LightColor3[2] / 2.0f, 255 );
 		RenderWireframeSphere( vecOrigin3, m_LightFiftyDist3, 16, 8, m_LightColor3, false );
 		RenderWireframeSphere( vecOrigin3, m_LightZeroDist3, 16, 8, LightColor3Outer, false );
 	}
 	if ( m_bLightActive4 )
 	{
+		Color LightColor4Outer( m_LightColor4[0] / 2.0f, m_LightColor4[1] / 2.0f, m_LightColor4[2] / 2.0f, 255 );
 		RenderWireframeSphere( vecOrigin4, m_LightFiftyDist4, 16, 8, m_LightColor4, false );
 		RenderWireframeSphere( vecOrigin4, m_LightZeroDist4, 16, 8, LightColor4Outer, false );
 	}
@@ -2857,7 +2840,7 @@ void C_OP_DampenToCP::Operate( CParticleCollection *pParticles, float flStrength
 		else
 		{
 			flDampenAmount = flDistance  / m_flRange;
-			flDampenAmount = pow( flDampenAmount, m_flScale);
+			flDampenAmount = powf( flDampenAmount, m_flScale);
 		}
 		
 		vParticleDelta = vecParticlePosition - vecParticlePosition_prev;
@@ -3323,7 +3306,7 @@ void C_OP_PerParticleEmitter::Operate( CParticleCollection *pParticles, float fl
 				pCtx->m_flTotalActualParticlesSoFar += flActualParticlesToEmit;
 
 				//Floor float accumulated value and subtract whole int emitted so far from the result to determine total whole particles to emit this frame
-				int nParticlesToEmit = 	floor ( pCtx->m_flTotalActualParticlesSoFar ) - pCtx->m_nTotalEmittedSoFar;
+				int nParticlesToEmit = 	floorf ( pCtx->m_flTotalActualParticlesSoFar ) - pCtx->m_nTotalEmittedSoFar;
 
 				//Add emitted particles to running int total.
 				pCtx->m_nTotalEmittedSoFar += nParticlesToEmit;
@@ -3630,7 +3613,7 @@ void C_OP_ModelCull::Operate( CParticleCollection *pParticles, float flStrength,
 			SetVectorFromAttribute( vecParticlePosition, pXYZ );
 
 			bool bInside = g_pParticleSystemMgr->Query()->IsPointInControllingObjectHitBox( pParticles, m_nControlPointNumber, vecParticlePosition, m_bBoundBox );
-			if ( ( bInside && m_bCullOutside ) || ( !bInside && !m_bCullOutside ))
+			if ( bInside == m_bCullOutside )
 				continue;
 
 			pParticles->KillParticle(i);
@@ -4262,7 +4245,8 @@ void C_OP_RemapDotProductToScalar::Operate( CParticleCollection *pParticles, flo
 		}
 		if ( ATTRIBUTES_WHICH_ARE_INTS & ( 1 << m_nFieldOutput ) )
 		{
-			*pOutput = int ( flOutput );
+			// dimhotepus: floorf
+			*pOutput = floorf ( flOutput );
 		}
 		else
 		{
@@ -4364,7 +4348,8 @@ void C_OP_RemapCPtoScalar::Operate( CParticleCollection *pParticles, float flStr
 		}
 		if ( ATTRIBUTES_WHICH_ARE_INTS & ( 1 << m_nFieldOutput ) )
 		{
-			*pOutput = int ( flOutput );
+			// dimhotepus: floorf
+			*pOutput = floorf ( flOutput );
 		}
 		else
 		{
@@ -4400,7 +4385,8 @@ class C_OP_MovementRotateParticleAroundAxis : public CParticleOperatorInstance
 		return 1ULL << m_nCP;
 	}
 
-	void InitParams( CParticleSystemDefinition *pDef )
+	// dimhotepus: override
+	virtual void InitParams( CParticleSystemDefinition *pDef, CDmxElement *pElement ) override
 	{
 		VectorNormalize( m_vecRotAxis );
 	}
@@ -4497,7 +4483,9 @@ class C_OP_RemapSpeedtoCP : public CParticleOperatorInstance
 	{
 		return true;
 	}
-	virtual void InitParams(CParticleSystemDefinition *pDef )
+
+	// dimhotepus: override
+	virtual void InitParams( CParticleSystemDefinition *pDef, CDmxElement *pElement ) override
 	{
 		// Safety for bogus input->output feedback loop
 		if ( m_nInControlPointNumber == m_nOutControlPointNumber )

@@ -190,7 +190,7 @@ void C_OP_AttractToControlPoint::AddForces( FourVectors *pAccumulatedForces,
 											float flStrength,
 											void *pContext ) const
 {
-	int power_frac=-4.0f*m_fFalloffPower;					// convert to what pow_fixedpoint_exponent_simd wants
+	int power_frac=static_cast<int>(-4.0f*m_fFalloffPower);					// convert to what pow_fixedpoint_exponent_simd wants
 	fltx4 fForceScale=ReplicateX4( -m_fForceAmount * flStrength );
 
 	Vector vecCenter;

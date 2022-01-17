@@ -38,7 +38,10 @@ struct BeamSeg_t
 class CBeamSegDraw
 {
 public:
-	CBeamSegDraw() : m_pRenderContext( NULL ) {}
+  CBeamSegDraw() : m_pMeshBuilder(nullptr), m_nMeshVertCount(-1), m_nTotalSegs(-1), m_nSegsDrawn(-1), m_pRenderContext(nullptr)
+	{
+		memset( &m_Seg, 0, sizeof(m_Seg) );
+	}
 	// Pass null for pMaterial if you have already set the material you want.
 	void			Start( IMatRenderContext *pRenderContext, int nSegs, IMaterial *pMaterial=0, CMeshBuilder *pMeshBuilder = NULL, int nMeshVertCount = 0 );
 	virtual void	NextSeg( BeamSeg_t *pSeg );

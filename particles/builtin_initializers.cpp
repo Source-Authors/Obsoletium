@@ -360,7 +360,7 @@ void C_INIT_CreateWithinSphere::InitNewParticlesScalar(
 			{
 				flStrength = min ( pParticles->m_flCurTime, m_flEndCPGrowthTime ) / m_flEndCPGrowthTime ;
 			}
-			int nHighestControlPoint = floor ( pParticles->GetHighestControlPoint() * flStrength );
+			int nHighestControlPoint = static_cast<int>(floorf ( pParticles->GetHighestControlPoint() * flStrength ));
 			nCurrentControlPoint = pParticles->RandomInt( m_nControlPointNumber, nHighestControlPoint );
 		}
 		Vector randpos, randDir;
@@ -491,10 +491,10 @@ void C_INIT_CreateWithinSphere::InitNewParticlesBlock( CParticleCollection *pPar
 		}
 		fltx4 fl4RadiusMin = ReplicateX4( m_fRadiusMin );
 		fltx4 fl4RadiusSpread = ReplicateX4( m_fRadiusMax - m_fRadiusMin );
-		int nPowSSEMask = 4.0f * m_fSpeedRandExp;
+		int nPowSSEMask = static_cast<int>(4.0f * m_fSpeedRandExp);
 
 		bool bDoRandSpeed =
-			( m_fSpeedMax > 0. ) || 
+			( m_fSpeedMax > 0.F ) || 
 			( m_LocalCoordinateSystemSpeedMax.x != 0 ) ||
 			( m_LocalCoordinateSystemSpeedMax.y != 0 ) ||
 			( m_LocalCoordinateSystemSpeedMax.z != 0 ) ||
@@ -1761,8 +1761,6 @@ class C_INIT_RandomColor : public CParticleOperatorInstance
 	{
 		C_OP_RandomColorContext_t *pCtx=reinterpret_cast<C_OP_RandomColorContext_t *>( pContext );
 
-		Color	tint( 255, 255, 255, 255 );
-
 		size_t attr_stride;
 
 		FourVectors *pColor = pParticles->Get4VAttributePtrForWrite( PARTICLE_ATTRIBUTE_TINT_RGB, &attr_stride );
@@ -1779,6 +1777,8 @@ class C_INIT_RandomColor : public CParticleOperatorInstance
 		// If we're factoring in luminosity or tint, then get our lighting info for this position
 		if ( m_flTintPerc )
 		{
+			Color	tint( 255, 255, 255, 255 );
+
 			if ( pParticles->m_pParent && pParticles->m_pParent->m_LocalLightingCP == m_nTintCP )
 			{
 				tint = pParticles->m_pParent->m_LocalLighting;
@@ -2619,7 +2619,8 @@ void C_INIT_RemapScalar::InitNewParticlesScalar(
 		}
 		if ( ATTRIBUTES_WHICH_ARE_INTS & ( 1 << m_nFieldOutput ) )
 		{
-			*pOutput = int ( flOutput );
+			// dimhotepus: floorf
+			*pOutput = floorf( flOutput );
 		}
 		else
 		{
@@ -2865,15 +2866,16 @@ void C_INIT_SequenceLifeTime::InitNewParticlesScalar(
 		{
 			const float *flSequence = pParticles->GetFloatAttributePtr( PARTICLE_ATTRIBUTE_SEQUENCE_NUMBER, start_p );
 			float *dtime = pParticles->GetFloatAttributePtrForWrite( PARTICLE_ATTRIBUTE_LIFE_DURATION, start_p );
-			int nSequence = *flSequence;
+			int nSequence = static_cast<int>(*flSequence);
+			const float flFrameSpan = pParticles->m_Sheet()->m_flFrameSpan[nSequence];
 
-			if ( pParticles->m_Sheet()->m_flFrameSpan[nSequence] != 0 )
+			if ( flFrameSpan != 0)
 			{
-				*dtime = pParticles->m_Sheet()->m_flFrameSpan[nSequence] / m_flFramerate;
+				*dtime = flFrameSpan / m_flFramerate;
 			}
 			else
 			{
-				*dtime = 1.0;
+				*dtime = 1.0F;
 			}
 		}
 	}
@@ -2979,7 +2981,7 @@ void C_INIT_CreateInHierarchy::InitNewParticlesScalar(
 		if ( ( pParticles->m_flCurTime <= m_flGrowthTime ) && ( nRealEndPoint > 0 ) )
 		{
 			float flCurrentEndCP = RemapValClamped( *ct, 0.0f, m_flGrowthTime, min( m_nDesiredStartPoint + 1, nRealEndPoint ), nRealEndPoint );
-			nEndCP =  pParticles->RandomInt( min( m_nDesiredStartPoint + 1, (int)flCurrentEndCP ), flCurrentEndCP );
+			nEndCP =  pParticles->RandomInt( min( m_nDesiredStartPoint + 1, (int)flCurrentEndCP ), (int)flCurrentEndCP );
 
 			// clamp growth to the appropriate values...
 			float flEndTime = flCurrentEndCP / float(nRealEndPoint) ;
@@ -3705,7 +3707,8 @@ class C_INIT_RandomSecondSequence : public CParticleOperatorInstance
 		for( ; nParticleCount--; start_p++ )
 		{
 			pSequence = pParticles->GetFloatAttributePtrForWrite( PARTICLE_ATTRIBUTE_SEQUENCE_NUMBER1, start_p );
-			*pSequence = pParticles->RandomInt( m_nSequenceMin, m_nSequenceMax );
+			// dimhotepus: RandomInt -> RandomFloat
+			*pSequence = pParticles->RandomFloat( m_nSequenceMin, m_nSequenceMax );
 		}
 	}
  
@@ -3821,7 +3824,8 @@ void C_INIT_RemapCPtoScalar::InitNewParticlesScalar(
 		}
 		if ( ATTRIBUTES_WHICH_ARE_INTS & ( 1 << m_nFieldOutput ) )
 		{
-			*pOutput = int ( flOutput );
+			// dimhotepus: floorf
+			*pOutput = floorf( flOutput );
 		}
 		else
 		{
@@ -4322,7 +4326,6 @@ void C_INIT_LifespanFromVelocity::InitNewParticlesScalar(
 	{
 		*ppCtx = new CWorldCollideContextData;
 		(*ppCtx)->m_nActivePlanes = 0;
-		(*ppCtx)->m_nActivePlanes = 0;
 		(*ppCtx)->m_nNumFixedPlanes = 0;
 	}
 	pCtx = *ppCtx;
@@ -4369,8 +4372,6 @@ void C_INIT_LifespanFromVelocity::InitNewParticlesScalar(
 		FourVectors fvEndPnt;
 		fvEndPnt.DuplicateVector( vecEndPnt );
 		FourVectors v4PointOnPlane;
-		FourVectors v4PlaneNormal;
-		FourVectors v4Delta;
 		fltx4 fl4ClosestDist = Four_FLT_MAX;
 		for( int i = 0 ; i < pCtx->m_nActivePlanes; i++ )
 		{
@@ -4453,7 +4454,6 @@ void C_INIT_LifespanFromVelocity::InitNewParticlesBlock( CParticleCollection *pP
 		{
 			*ppCtx = new CWorldCollideContextData;
 			(*ppCtx)->m_nActivePlanes = 0;
-			(*ppCtx)->m_nActivePlanes = 0;
 			(*ppCtx)->m_nNumFixedPlanes = 0;
 		}
 		pCtx = *ppCtx;
@@ -4506,7 +4506,6 @@ void C_INIT_LifespanFromVelocity::InitNewParticlesBlock( CParticleCollection *pP
 
 			// Test versus existing Data
 			FourVectors v4PointOnPlane;
-			FourVectors v4PlaneNormal;
 			fltx4 fl4ClosestDist = Four_FLT_MAX;
 			for( int i = 0 ; i < pCtx->m_nActivePlanes; i++ )
 			{
@@ -4637,12 +4636,8 @@ void C_INIT_CreateFromPlaneCache::InitNewParticlesScalar(
 		return;
 	}
 
-
-	CWorldCollideContextData **ppCtx;
-	if ( pParticles->m_pParent )
-		ppCtx = &( pParticles->m_pParent->m_pCollisionCacheData[COLLISION_MODE_INITIAL_TRACE_DOWN] );
-	else
-		ppCtx = &( pParticles->m_pCollisionCacheData[COLLISION_MODE_INITIAL_TRACE_DOWN] );
+	// dimhotepus: pParticles->m_pParent is always present.
+	CWorldCollideContextData **ppCtx = &( pParticles->m_pParent->m_pCollisionCacheData[COLLISION_MODE_INITIAL_TRACE_DOWN] );
 
 	CWorldCollideContextData *pCtx = NULL;
 	if ( ! *ppCtx )
