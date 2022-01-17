@@ -666,7 +666,7 @@ void CSteam3Server::OnValidateAuthTicketResponseHelper( CBaseClient *cl, EAuthSe
 				cl->Disconnect( INVALID_STEAM_TICKET );
 			break;
 		case k_EAuthSessionResponseVACCheckTimedOut:
-			cl->Disconnect( "An issue with your computer is blocking the VAC system. You cannot play on secure servers.\n\nhttps://support.steampowered.com/kb_article.php?ref=2117-ILZV-2837" );
+			cl->Disconnect( "An issue with your computer is blocking the VAC system. You cannot play on secure servers.\n\nhttps://help.steampowered.com/en/faqs/view/22C0-03D0-AE4B-04E8" );
 			break;
 		default:
 			cl->Disconnect( "Client dropped by server" );

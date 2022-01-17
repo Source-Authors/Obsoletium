@@ -2254,12 +2254,12 @@ IDirect3DDevice9* CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, int nAdapter
 	if ( pszMoreInfo )
 	{
 		DWarning( "init", 0, "Failed to create %s device!\nError 0x%lX: %s\n\nPlease see the following for more info.\n"
-			"http://support.steampowered.com/cgi-bin/steampowered.cfg/php/enduser/std_adp.php?p_faqid=772\n", IsOpenGL() ? "OpenGL" : "D3D", hr, pszMoreInfo );
+			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145", IsOpenGL() ? "OpenGL" : "D3D", hr, pszMoreInfo );
 	}
 	else
 	{
 		DWarning( "init", 0, "Failed to create %s device!\nError 0x%lX.\n\nPlease see the following for more info.\n"
-			"http://support.steampowered.com/cgi-bin/steampowered.cfg/php/enduser/std_adp.php?p_faqid=772\n", IsOpenGL() ? "OpenGL" : "D3D", hr );
+			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145", IsOpenGL() ? "OpenGL" : "D3D", hr );
 	}
 
 	return NULL;
@@ -3436,7 +3436,7 @@ void CShaderDeviceDx8::Present()
 
 			Error( "Internal driver error at Present.\n"
 				   "You're likely out of OS Paged Pool Memory! For more info, see\n"
-				   "http://support.steampowered.com/cgi-bin/steampowered.cfg/php/enduser/std_adp.php?p_faqid=150\n" );
+				   "https://help.steampowered.com/\n" );
 		}
 		if ( hr == D3DERR_DEVICELOST )
 		{

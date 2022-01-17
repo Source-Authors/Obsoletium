@@ -908,7 +908,7 @@ bool CPackedStoreReadCache::CheckMd5Result( CachedVPKRead_t &cachedVPKRead )
 			"Corruption detected in %s\n"
 			"\n"
 			"Try verifying the integrity of your game cache.\n"
-			"https://support.steampowered.com/kb_article.php?ref=2037-QEUH-3335"
+			"https://help.steampowered.com/en/faqs/view/0C48-FCBD-DA71-93EB"
 			"\n"
 			"Offset %d, expected %s, got %s\n",
 			szFilename,

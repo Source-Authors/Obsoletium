@@ -1871,7 +1871,7 @@ bool CVertexBufferDx8::Lock( int nMaxVertexCount, bool bAppend, VertexDesc_t &de
 		if ( ( SYSCALL_SUCCESS == Plat_GetPagedPoolInfo( &ppi ) ) &&
 			( ( ppi.numPagesFree * 20 ) < ( ppi.numPagesUsed + ppi.numPagesFree ) ) )
 		{
-			Error( "Out of OS Paged Pool Memory! For more information, please see\nhttp://support.steampowered.com/cgi-bin/steampowered.cfg/php/enduser/std_adp.php?p_faqid=150\n" );
+			Error( "Out of OS Paged Pool Memory! For more information, please see\nhttps://help.steampowered.com/\n" );
 		}
 		else
 		{
@@ -2617,7 +2617,7 @@ bool CMeshDX8::Lock( int nVertexCount, bool bAppend, VertexDesc_t &desc )
 			if ( ( SYSCALL_SUCCESS == Plat_GetPagedPoolInfo( &ppi ) ) &&
 				 ( ( ppi.numPagesFree * 20 ) < ( ppi.numPagesUsed + ppi.numPagesFree ) ) )
 			{
-				Error( "Out of OS Paged Pool Memory! For more information, please see\nhttp://support.steampowered.com/cgi-bin/steampowered.cfg/php/enduser/std_adp.php?p_faqid=150\n" );
+				Error( "Out of OS Paged Pool Memory! For more information, please see\nhttps://help.steampowered.com/\n" );
 			}
 			else
 			{
@@ -2697,7 +2697,7 @@ int CMeshDX8::Lock( bool bReadOnly, int nFirstIndex, int nIndexCount, IndexDesc_
 		if ( ( SYSCALL_SUCCESS == Plat_GetPagedPoolInfo( &ppi ) ) &&
 			( ( ppi.numPagesFree * 20 ) < ( ppi.numPagesUsed + ppi.numPagesFree ) ) )
 		{
-			Error( "Out of OS Paged Pool Memory! For more information, please see\nhttp://support.steampowered.com/cgi-bin/steampowered.cfg/php/enduser/std_adp.php?p_faqid=150\n" );
+			Error( "Out of OS Paged Pool Memory! For more information, please see\nhttps://help.steampowered.com/\n" );
 		}
 		else
 		{
