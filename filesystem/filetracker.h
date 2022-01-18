@@ -188,7 +188,9 @@ private:
 
 	// Stats
 	int m_cThreadBlocks;
-    int m_cDupMD5s;
+	int m_cDupMD5s;
+	// dimhotepus: How many VPK files we track and should compute hash for?
+	size_t m_cComputedMD5ForVPKFiles;
 };
 
 #else

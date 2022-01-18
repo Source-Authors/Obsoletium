@@ -85,6 +85,12 @@ int CFileTracker2::SubmitThreadedMD5Request( uint8 *pubBuffer, int cubBuffer, in
 	{
 		AUTO_LOCK( m_Mutex );
 
+		// dimhotepus: We do not track any VPK file, no sense in hash computation for them.
+		if ( m_cComputedMD5ForVPKFiles == 0 )
+		{
+			return 0;
+		}
+
 		TrackedVPKFile_t trackedVPKFileFind;
 		trackedVPKFileFind.m_nPackFileNumber = nPackFileNumber;
 		trackedVPKFileFind.m_PackFileID = PackFileID;
@@ -196,6 +202,8 @@ CFileTracker2::CFileTracker2( CBaseFileSystem *pFileSystem ):
 
 	m_cThreadBlocks = 0;
 	m_cDupMD5s = 0;
+	// dimhotepus: No tracked files by default.
+	m_cComputedMD5ForVPKFiles = 0;
 
 #ifdef SUPPORT_PACKED_STORE
 	m_bThreadShouldRun = false;
@@ -421,6 +429,8 @@ void CFileTracker2::AddFileHashForVPKFile( int nPackFileNumber, int nFileFractio
 	trackedVPKFile.m_nFileFraction = nFileFraction;
 	trackedVPKFile.m_idxAllOpenedFiles = IdxFileFromName( pszFileName, "GAME", nFileFraction, true );
 
+	// dimhotepus: Count required to check hash VPK files.
+	++m_cComputedMD5ForVPKFiles;
 	m_treeTrackedVPKFiles.Insert( trackedVPKFile );
 
 	TrackedFile_t &trackedfile = m_treeAllOpenedFiles[ trackedVPKFile.m_idxAllOpenedFiles ];
