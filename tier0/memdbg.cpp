@@ -25,8 +25,9 @@
 #endif
 
 #include <atomic>
-#include <map>
-#include <set>
+#include <algorithm>
+#include <unordered_map>
+#include <unordered_set>
 #include <climits>
 #include "tier0/threadtools.h"
 #ifdef _X360
@@ -470,24 +471,6 @@ bool operator!=(const CNoRecurseAllocator<T1>&, const CNoRecurseAllocator<T2>&)
 	return false;
 }
 
-class CStringLess
-{
-public:
-	bool operator()(const char *pszLeft, const char *pszRight ) const 
-	{
-		return ( stricmp( pszLeft, pszRight ) < 0 );
-	}
-};
-
-class CStringLessCaseSensitive
-{
-public:
-	bool operator()(const char* pszLeft, const char* pszRight) const
-	{
-		return ( strcmp(pszLeft, pszRight) < 0 );
-	}
-};
-
 //-----------------------------------------------------------------------------
 
 #pragma warning( disable:4074 ) // warning C4074: initializers put in compiler reserved initialization area
@@ -507,20 +490,20 @@ public:
 	virtual void *Alloc( size_t nSize );
 	virtual void *Realloc( void *pMem, size_t nSize );
 	virtual void  Free( void *pMem );
-    virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize );
+	virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize );
 
 	// Debug versions
-    virtual void *Alloc( size_t nSize, const char *pFileName, int nLine );
-    virtual void *Realloc( void *pMem, size_t nSize, const char *pFileName, int nLine );
-    virtual void  Free( void *pMem, const char *pFileName, int nLine );
-    virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize, const char *pFileName, int nLine );
+	virtual void *Alloc( size_t nSize, const char *pFileName, int nLine );
+	virtual void *Realloc( void *pMem, size_t nSize, const char *pFileName, int nLine );
+	virtual void  Free( void *pMem, const char *pFileName, int nLine );
+	virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize, const char *pFileName, int nLine );
 
 	// Returns size of a particular allocation
 	virtual size_t GetSize( void *pMem );
 
-    // Force file + line information for an allocation
-    virtual void PushAllocDbgInfo( const char *pFileName, int nLine );
-    virtual void PopAllocDbgInfo();
+	// Force file + line information for an allocation
+	virtual void PushAllocDbgInfo( const char *pFileName, int nLine );
+	virtual void PopAllocDbgInfo();
 
 	virtual long CrtSetBreakAlloc( long lNewBreakAlloc );
 	virtual	int CrtSetReportMode( int nReportType, int nReportMode );
@@ -614,32 +597,50 @@ private:
 	struct MemInfoKey_t
 	{
 		MemInfoKey_t( const char *pFileName, int line ) : m_pFileName(pFileName), m_nLine(line) {}
-		bool operator<( const MemInfoKey_t &key ) const
+
+		bool operator==( const MemInfoKey_t &key ) const
+		{
+			// dimhotepus: File names are from __FILE__ or from module name, so unique pointers.
+			return m_nLine == key.m_nLine && m_pFileName == key.m_pFileName;
+		}
+
+		const char *m_pFileName;
+		int					m_nLine;
+	};
+
+	struct MemInfoKeyHasher 
+	{
+		std::size_t operator()( const MemInfoKey_t &key ) const
+		{
+			std::size_t h1 = std::hash<const char*>{}( key.m_pFileName );
+			return h1 ^ (key.m_nLine << 1);
+		}
+	};
+
+	struct MemInfoKeySorter
+	{
+		bool operator()( const std::pair<MemInfoKey_t, MemInfo_t> &lhs,
+			const std::pair<MemInfoKey_t, MemInfo_t> &rhs )
 		{
 			// dimhotepus: stricmp -> strcmp. Alphabetical order is enough, and stricmp is too slow.
-			int iret = strcmp( m_pFileName, key.m_pFileName );
+			int iret = strcmp( lhs.first.m_pFileName, rhs.first.m_pFileName );
 			if ( iret < 0 )
 				return true;
 
 			if ( iret > 0 )
 				return false;
 
-			return m_nLine < key.m_nLine;
+			return lhs.first.m_nLine < rhs.first.m_nLine;
 		}
-
-		const char *m_pFileName;
-		int			m_nLine;
 	};
 
 	// NOTE: Deliberately using STL here because the UTL stuff
 	// is a client of this library; want to avoid circular dependency
 
 	// Maps file name to info
-	typedef std::map< MemInfoKey_t, MemInfo_t, std::less<MemInfoKey_t>, CNoRecurseAllocator<std::pair<const MemInfoKey_t, MemInfo_t> > > StatMap_t;
-	typedef StatMap_t::iterator StatMapIter_t;
-	typedef StatMap_t::value_type StatMapEntry_t;
-
-	typedef std::set<const char *, CStringLessCaseSensitive, CNoRecurseAllocator<const char *> > Filenames_t;
+	// dimhotepus: Speed up debug allocation tracking.
+	typedef std::unordered_map<MemInfoKey_t, MemInfo_t, MemInfoKeyHasher, std::equal_to<MemInfoKey_t>, CNoRecurseAllocator<std::pair<const MemInfoKey_t, MemInfo_t>>> StatMap_t;
+	typedef std::unordered_set<const char*, std::hash<const char*>, std::equal_to<const char*>, CNoRecurseAllocator<const char*>> Filenames_t;
 
 	// Heap reporting method
 	typedef void (*HeapReportFunc_t)( char const *pFormat, ... );
@@ -780,7 +781,11 @@ void CDbgMemAlloc::Initialize()
   if (!m_bInitialized) [[unlikely]]
 	{
 		m_pFilenames = new Filenames_t;
-		m_pStatMap= new StatMap_t;
+		// dimhotepus: Allocate reasonable amount.
+    m_pFilenames->reserve( 2048 + 1024 );
+		m_pStatMap = new StatMap_t;
+		// dimhotepus: Allocate reasonable amount.
+    m_pStatMap->reserve( 2048 + 1024 );
 		m_bInitialized = true;
 	}
 }
@@ -793,15 +798,6 @@ void CDbgMemAlloc::Shutdown()
 {
 	if ( m_bInitialized )
 	{
-		Filenames_t::const_iterator iter = m_pFilenames->begin();
-		while ( iter != m_pFilenames->end() )
-		{
-			char *pFileName = (char*)(*iter);
-			free( pFileName );
-			++iter;
-		}
-		m_pFilenames->clear();
-
 		delete m_pFilenames;
 		m_pFilenames = nullptr;
 
@@ -1041,22 +1037,8 @@ const char *CDbgMemAlloc::FindOrCreateFilename( const char *pFileName )
 }
 #endif // #if defined( USE_STACK_WALK_DETAILED )
 
-	auto iter = m_pFilenames->find( pFileName );
-	if ( iter == m_pFilenames->end() )
-	{
-		size_t nLen = strlen( pFileName ) + 1;
-
-		char *pszFilenameCopy = (char *)DebugAlloc(nLen);
-		if ( pszFilenameCopy )
-		{
-			memcpy( pszFilenameCopy, pFileName, nLen );
-			m_pFilenames->insert( pszFilenameCopy );
-		}
-
-		return pszFilenameCopy;
-	}
-
-	return (char *)(*iter);
+	// dimhotepus: Insert if not found.
+	return *m_pFilenames->emplace(pFileName).first;
 }
 
 //-----------------------------------------------------------------------------
@@ -1067,12 +1049,10 @@ CDbgMemAlloc::MemInfo_t &CDbgMemAlloc::FindOrCreateEntry( const char *pFileName,
 	Initialize();
 	// Oh how I love crazy STL. retval.first == the StatMapIter_t in the std::pair
 	// retval.first->second == the MemInfo_t that's part of the StatMapIter_t 
-	std::pair<StatMapIter_t, bool> retval;
-	if ( m_pStatMap )
-	{
-		retval = m_pStatMap->emplace( MemInfoKey_t( pFileName, line ), MemInfo_t() );
-	}
-	return retval.first->second;
+	// dimhotepus: Insert if not found.
+	return m_pStatMap
+		->emplace( MemInfoKey_t( pFileName, line ), MemInfo_t() )
+		.first->second;
 }
 
 
@@ -1466,11 +1446,13 @@ void CDbgMemAlloc::DumpFileStats()
 	if ( !m_pStatMap )
 		return;
 
-	StatMapIter_t iter = m_pStatMap->begin();
-	while ( iter != m_pStatMap->end() )
+	// dimhotepus: Need to preserve sorted order as it was before.
+	std::vector<std::pair<MemInfoKey_t, MemInfo_t>> elems( m_pStatMap->begin(), m_pStatMap->end() );
+	std::sort( elems.begin(), elems.end(), MemInfoKeySorter{} );
+
+	for ( const auto &e : elems )
 	{
-		DumpMemInfo( iter->first.m_pFileName, iter->first.m_nLine, iter->second );
-		++iter;
+		DumpMemInfo( e.first.m_pFileName, e.first.m_nLine, e.second );
 	}
 }
 
