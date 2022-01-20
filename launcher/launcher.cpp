@@ -111,16 +111,11 @@ static FileAssociationInfo g_FileAssociations[] =
 	{ ".bsp", "map" },
 };
 
-#ifdef _WIN32
-#pragma warning(disable:4073)
-#pragma init_seg(lib)
-#endif
-
 class CLeakDump
 {
 public:
-	CLeakDump()
-	 :	m_bCheckLeaks( false )
+	CLeakDump( bool m_bCheckLeaks )
+	 :	m_bCheckLeaks( m_bCheckLeaks )
 	{
 	}
 
@@ -132,8 +127,9 @@ public:
 		}
 	}
 
+private:
 	bool m_bCheckLeaks;
-} g_LeakDump;
+};
 
 //-----------------------------------------------------------------------------
 // Spew function!
@@ -204,8 +200,6 @@ public:
 		return NULL;
 	}
 };
-
-static CVCRHelpers g_VCRHelpers;
 
 //-----------------------------------------------------------------------------
 // Gets the executable name
@@ -1249,7 +1243,6 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	//	return -1;
 	// }
 
-	const char *filename;
 #ifdef WIN32
 	CommandLine()->CreateCmdLine( IsPC() ? VCRHook_GetCommandLine() : lpCmdLine );
 #else
@@ -1289,11 +1282,13 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	// are running from the command line directly, this allows the same experience the user gets
 	// to be present when running from perforce, the call has no effect on X360
 	TryToLoadSteamOverlayDLL();
-
+	
+	const char *filename;
+	CVCRHelpers VCRHelpers;
 	// Start VCR mode?
 	if ( CommandLine()->CheckParm( "-vcrrecord", &filename ) )
 	{
-		if ( !VCRStart( filename, true, &g_VCRHelpers ) )
+		if ( !VCRStart( filename, true, &VCRHelpers ) )
 		{
 			Error( "-vcrrecord: can't open '%s' for writing.\n", filename );
 			return -1;
@@ -1301,7 +1296,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	}
 	else if ( CommandLine()->CheckParm( "-vcrplayback", &filename ) )
 	{
-		if ( !VCRStart( filename, false, &g_VCRHelpers ) )
+		if ( !VCRStart( filename, false, &VCRHelpers ) )
 		{
 			Error( "-vcrplayback: can't open '%s' for reading.\n", filename );
 			return -1;
@@ -1421,7 +1416,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	// and make that be the current working directory
 	_chdir( baseDirectory );
 
-	g_LeakDump.m_bCheckLeaks = CommandLine()->CheckParm( "-leakcheck" ) ? true : false;
+	CLeakDump leakDump( CommandLine()->CheckParm( "-leakcheck" ) );
 
 	bool bRestart = true;
 	while ( bRestart )
