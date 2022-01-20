@@ -104,9 +104,6 @@ static IHammer *g_pHammer;
 
 bool g_bTextMode = false;
 
-static char g_szBasedir[MAX_PATH];
-static char g_szGamedir[MAX_PATH];
-
 // copied from sys.h
 struct FileAssociationInfo
 {
@@ -218,20 +215,6 @@ public:
 static CVCRHelpers g_VCRHelpers;
 
 //-----------------------------------------------------------------------------
-// Purpose: Return the game directory
-// Output : char
-//-----------------------------------------------------------------------------
-char *GetGameDirectory( void )
-{
-	return g_szGamedir;
-}
-
-void SetGameDirectory( const char *game )
-{
-	Q_strncpy( g_szGamedir, game, sizeof(g_szGamedir) );
-}
-
-//-----------------------------------------------------------------------------
 // Gets the executable name
 //-----------------------------------------------------------------------------
 bool GetExecutableName( char *out, int outSize )
@@ -248,45 +231,35 @@ bool GetExecutableName( char *out, int outSize )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Return the base directory
-// Output : char
-//-----------------------------------------------------------------------------
-char *GetBaseDirectory( void )
-{
-	return g_szBasedir;
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Determine the directory where this .exe is running from
 //-----------------------------------------------------------------------------
-void UTIL_ComputeBaseDir()
+void UTIL_ComputeBaseDir(char (&szBasedir)[MAX_PATH] )
 {
-	g_szBasedir[0] = 0;
+	szBasedir[0] = '\0';
 
 	if ( IsX360() )
 	{
 		char const *pBaseDir = CommandLine()->ParmValue( "-basedir" );
 		if ( pBaseDir )
 		{
-			strcpy( g_szBasedir, pBaseDir );
+			strcpy( szBasedir, pBaseDir );
 		}
 	}
 
-	if ( !g_szBasedir[0] && GetExecutableName( g_szBasedir, sizeof( g_szBasedir ) ) )
+	if ( !szBasedir[0] && GetExecutableName( szBasedir, sizeof( szBasedir ) ) )
 	{
-		char *pBuffer = strrchr( g_szBasedir, '\\' );
+		char *pBuffer = strrchr( szBasedir, '\\' );
 		if ( *pBuffer )
 		{
 			*(pBuffer+1) = '\0';
 		}
 
-		int j = strlen( g_szBasedir );
+		size_t j = strlen( szBasedir );
 		if (j > 0)
 		{
-			if ( ( g_szBasedir[j-1] == '\\' ) || 
-				 ( g_szBasedir[j-1] == '/' ) )
+			if ( szBasedir[j-1] == '\\' || szBasedir[j-1] == '/' )
 			{
-				g_szBasedir[j-1] = 0;
+				szBasedir[j-1] = '\0';
 			}
 		}
 	}
@@ -296,14 +269,14 @@ void UTIL_ComputeBaseDir()
 		char const *pOverrideDir = CommandLine()->CheckParm( "-basedir" );
 		if ( pOverrideDir )
 		{
-			strcpy( g_szBasedir, pOverrideDir );
+			strcpy( szBasedir, pOverrideDir );
 		}
 	}
 
 #ifdef WIN32
-	Q_strlower( g_szBasedir );
+	Q_strlower( szBasedir );
 #endif
-	Q_FixSlashes( g_szBasedir );
+	Q_FixSlashes( szBasedir );
 }
 
 #ifdef WIN32
@@ -343,16 +316,17 @@ class CLogAllFiles
 {
 public:
 	CLogAllFiles();
-	void Init();
+	void Init( char (&baseDirectory)[MAX_PATH] );
 	void Shutdown();
 	void LogFile( const char *fullPathFileName, const char *options );
 
 private:
 	static void LogAllFilesFunc( const char *fullPathFileName, const char *options );
 	void LogToAllReslist( char const *line );
-
-	bool		m_bActive;
+	
 	char		m_szCurrentDir[_MAX_PATH];
+	char		m_szBaseDir[_MAX_PATH];
+	bool		m_bActive;
 
 	// persistent across restarts
 	CUtlRBTree< CUtlString, int > m_Logged;
@@ -360,7 +334,7 @@ private:
 	CUtlString	m_sFullGamePath;
 };
 
-static CLogAllFiles *g_LogFiles = new CLogAllFiles();
+static CLogAllFiles *g_LogFiles = nullptr;
 
 static bool AllLogLessFunc( CUtlString const &pLHS, CUtlString const &pRHS )
 {
@@ -372,10 +346,12 @@ CLogAllFiles::CLogAllFiles() :
 	m_Logged( 0, 0, AllLogLessFunc )
 {
 	MEM_ALLOC_CREDIT();
+  m_szBaseDir[0] = '\0';
+	m_szCurrentDir[0] = '\0';
 	m_sResListDir = "reslists";
 }
 
-void CLogAllFiles::Init()
+void CLogAllFiles::Init( char (&baseDirectory)[MAX_PATH] )
 {
 	if ( IsX360() )
 	{
@@ -392,6 +368,8 @@ void CLogAllFiles::Init()
 	{
 		return;
 	}
+
+	Q_strcpy(m_szBaseDir, baseDirectory);
 
 	m_bActive = true;
 
@@ -413,7 +391,7 @@ void CLogAllFiles::Init()
 
 	// game directory has not been established yet, must derive ourselves
 	char path[MAX_PATH];
-	Q_snprintf( path, sizeof(path), "%s/%s", GetBaseDirectory(), CommandLine()->ParmValue( "-game", "hl2" ) );
+	Q_snprintf( path, sizeof(path), "%s/%s", m_szBaseDir, CommandLine()->ParmValue( "-game", "hl2" ) );
 	Q_FixSlashes( path );
 #ifdef WIN32
 	Q_strlower( path );
@@ -496,10 +474,10 @@ void CLogAllFiles::LogFile(const char *fullPathFileName, const char *options)
 	m_Logged.Insert( fullPathFileName );
 
 	// make it relative to our root directory
-	const char *relative = Q_stristr( fullPathFileName, GetBaseDirectory() );
+	const char *relative = Q_stristr( fullPathFileName, m_szBaseDir );
 	if ( relative )
 	{
-		relative += ( Q_strlen( GetBaseDirectory() ) + 1 );
+		relative += ( Q_strlen( m_szBaseDir ) + 1 );
 
 		char rel[ MAX_PATH ];
 		Q_strncpy( rel, relative, sizeof( rel ) );
@@ -563,7 +541,11 @@ void TryToLoadSteamOverlayDLL()
 class CSourceAppSystemGroup : public CSteamAppSystemGroup
 {
 public:
-	CSourceAppSystemGroup() = default;
+  CSourceAppSystemGroup(  char (&baseDirectory)[MAX_PATH]  )
+     : m_pReslistgenerator(CreateReslistGenerator()), m_bEditMode(false)
+	{
+		Q_strcpy( m_szBaseDir, baseDirectory );
+	}
 	~CSourceAppSystemGroup()
 	{
 		DestroyReslistGenerator( m_pReslistgenerator );
@@ -582,6 +564,7 @@ private:
 	const char *DetermineDefaultMod();
 	const char *DetermineDefaultGame();
 
+	char m_szBaseDir[_MAX_PATH];
 	IResListGenerator *m_pReslistgenerator;
 	bool m_bEditMode;
 };
@@ -781,17 +764,18 @@ bool CSourceAppSystemGroup::PreInit()
 
 	if ( IsPC() )
 	{
-		m_pReslistgenerator = CreateReslistGenerator();
-
 		// This will get called multiple times due to being here, but only the first one will do anything
-		m_pReslistgenerator->Init( GetBaseDirectory(), CommandLine()->ParmValue( "-game", "hl2" ) );
+		m_pReslistgenerator->Init( m_szBaseDir, CommandLine()->ParmValue( "-game", "hl2" ) );
 
 		// This will also get called each time, but will actually fix up the command line as needed
 		m_pReslistgenerator->SetupCommandLine();
 	}
+	
+	Assert( !g_LogFiles );
 
+	g_LogFiles = new CLogAllFiles();
 	// FIXME: Logfiles is mod-specific, needs to move into the engine.
-	g_LogFiles->Init();
+	g_LogFiles->Init( m_szBaseDir );
 
 	// Required to run through the editor
 	if ( m_bEditMode )
@@ -801,7 +785,7 @@ bool CSourceAppSystemGroup::PreInit()
 
 	StartupInfo_t info;
 	info.m_pInstance = GetAppInstance();
-	info.m_pBaseDirectory = GetBaseDirectory();
+	info.m_pBaseDirectory = m_szBaseDir;
 	info.m_pInitialMod = DetermineDefaultMod();
 	info.m_pInitialGame = DetermineDefaultGame();
 	info.m_pParentAppSystemGroup = this;
@@ -1311,8 +1295,9 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		CommandLine()->RemoveParm( "+mat_dxlevel" );
 	}
 	
+	char baseDirectory[MAX_PATH];
 	// Figure out the directory the executable is running from
-	UTIL_ComputeBaseDir();
+	UTIL_ComputeBaseDir( baseDirectory );
 
 #if defined( _X360 )
 	bool bSpewDllInfo = CommandLine()->CheckParm( "-dllinfo" );
@@ -1327,7 +1312,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		COM_TimestampedLog( "LauncherMain: Application Start - %s", CommandLine()->GetCmdLine() );
 	if ( bSpewDllInfo )
 	{	
-		XBX_DumpDllInfo( GetBaseDirectory() );
+		XBX_DumpDllInfo( baseDirectory );
 		Error( "Stopped!\n" );
 	}
 
@@ -1507,7 +1492,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 
 	// Figure out the directory the executable is running from
 	// and make that be the current working directory
-	_chdir( GetBaseDirectory() );
+	_chdir( baseDirectory );
 
 	g_LeakDump.m_bCheckLeaks = CommandLine()->CheckParm( "-leakcheck" ) ? true : false;
 
@@ -1516,7 +1501,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	{
 		bRestart = false;
 
-		CSourceAppSystemGroup sourceSystems;
+		CSourceAppSystemGroup sourceSystems( baseDirectory );
 		CSteamApplication steamApplication( &sourceSystems );
 		int nRetval = steamApplication.Run();
 		if ( steamApplication.GetErrorStage() == CSourceAppSystemGroup::INITIALIZATION )
