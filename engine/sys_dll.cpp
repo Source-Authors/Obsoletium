@@ -1108,7 +1108,6 @@ void Sys_ShutdownGame( void )
 CreateInterfaceFn g_ServerFactory;
 
 
-#pragma optimize( "g", off )
 static bool LoadThisDll( char *szDllFilename, bool bIsServerOnly )
 {
 	CSysModule *pDLL = NULL;
@@ -1210,7 +1209,6 @@ IgnoreThisDLL:
 	}
 	return false;
 }
-#pragma optimize( "", on )
 
 //
 // Scan DLL directory, load all DLLs that conform to spec.

@@ -15,8 +15,6 @@ bool Check3DNowTechnology(void) { return false; }
 
 #elif defined( _WIN32 ) && !defined( _X360 )
 
-#pragma optimize( "", off )
-
 // stuff from windows.h
 #ifndef EXCEPTION_EXECUTE_HANDLER
 #define EXCEPTION_EXECUTE_HANDLER       1
@@ -267,7 +265,5 @@ bool Check3DNowTechnology(void)
 
     return retval;
 }
-
-#pragma optimize( "", on )
 
 #endif // _WIN32

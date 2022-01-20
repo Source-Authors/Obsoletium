@@ -527,13 +527,6 @@ void CDispInfo::SetTag()
 //-----------------------------------------------------------------------------
 // Helpers for global functions.
 //-----------------------------------------------------------------------------
-
-// This function crashes in release without this pragma.
-#if !defined( _X360 )
-#pragma optimize( "g", off )
-#endif
-#pragma optimize( "", on )
-
 void DispInfo_BuildPrimLists( int nSortGroup, SurfaceHandle_t *pList, int listCount, bool bDepthOnly,
 	CDispInfo *visibleDisps[MAX_MAP_DISPINFO], int &nVisibleDisps )
 {

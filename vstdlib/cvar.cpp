@@ -441,22 +441,15 @@ void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
 	}
 }
 
-// Crash here in TF2, so I'm adding some debugging stuff.
-#ifdef WIN32
-#pragma optimize( "", off )
-#endif
 void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 {
-	ConCommandBase	*pNewList;
-	ConCommandBase  *pCommand, *pNext;
+	size_t iCommandsLooped = 0;
 
-	int iCommandsLooped = 0;
-
-	pNewList = NULL;
-	pCommand = m_pConCommandList;
+	ConCommandBase *pNewList = NULL;
+	ConCommandBase  *pCommand = m_pConCommandList;
 	while ( pCommand )
 	{
-		pNext = pCommand->m_pNext;
+		ConCommandBase  *pNext = pCommand->m_pNext;
 		if ( pCommand->GetDLLIdentifier() != id )
 		{
 			pCommand->m_pNext = pNewList;
@@ -475,9 +468,6 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 
 	m_pConCommandList = pNewList;
 }
-#ifdef WIN32
-#pragma optimize( "", on )
-#endif
 
 
 //-----------------------------------------------------------------------------

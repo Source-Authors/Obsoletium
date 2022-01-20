@@ -2474,19 +2474,11 @@ void Hermite_SplineBasis( float t, float basis[4] )
 //			this is reasonable C1 method when there's no "p3" data yet.
 // Input  : 
 //-----------------------------------------------------------------------------
-
-// BUG: the VectorSubtract()'s calls go away if the global optimizer is enabled
-#pragma optimize( "g", off )
-
 void Hermite_Spline( const Vector &p0, const Vector &p1, const Vector &p2, float t, Vector& output )
 {
-	Vector e10, e21;
-	VectorSubtract( p1, p0, e10 );
-	VectorSubtract( p2, p1, e21 );
+  Vector e10 = p1 - p0, e21 = p2 - p1;
 	Hermite_Spline( p1, p2, e10, e21, t, output );
 }
-
-#pragma optimize( "", on )
 
 float Hermite_Spline( float p0, float p1, float p2,	float t )
 {
@@ -2856,9 +2848,6 @@ float RangeCompressor( float flValue, float flMin, float flMax, float flBase )
 
 	return flValue;
 }
-
-
-//#pragma optimize( "", on )
 
 //-----------------------------------------------------------------------------
 // Transforms a AABB into another space; which will inherently grow the box.
@@ -3252,13 +3241,9 @@ bool CalcLineToLineIntersectionSegment(
    return true;
 }
 
-#pragma optimize( "", off )
-
 #ifndef EXCEPTION_EXECUTE_HANDLER
 #define EXCEPTION_EXECUTE_HANDLER       1
 #endif
-
-#pragma optimize( "", on )
 
 static bool s_b3DNowEnabled = false;
 static bool s_bMMXEnabled = false;

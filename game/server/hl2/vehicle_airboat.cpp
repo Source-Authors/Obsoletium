@@ -932,7 +932,6 @@ void CPropAirboat::VPhysicsFriction( IPhysicsObject *pObject, float energy, int 
 //-----------------------------------------------------------------------------
 // This fixes an optimizer bug that was causing targetYaw and targetPitch to
 // always be reported as clamped, thus disabling the gun. Ack!
-#pragma optimize("", off)
 void CPropAirboat::AimGunAt( const Vector &aimPos, float flInterval )
 {
 	matrix3x4_t gunMatrix;
@@ -982,7 +981,6 @@ void CPropAirboat::AimGunAt( const Vector &aimPos, float flInterval )
 	m_aimPitch = GetPoseParameter( AIRBOAT_GUN_PITCH );
 	m_aimYaw = GetPoseParameter( AIRBOAT_GUN_YAW );
 }
-#pragma optimize("", on)
 
 
 //-----------------------------------------------------------------------------
