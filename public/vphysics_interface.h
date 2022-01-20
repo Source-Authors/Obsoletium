@@ -383,8 +383,8 @@ public:
 
 	virtual void PostSimulationFrame() = 0;
 
-	virtual void ObjectEnterTrigger( [[maybe_unused]] IPhysicsObject *pTrigger, [[maybe_unused]] IPhysicsObject *pObject ) {}
-	virtual void ObjectLeaveTrigger( [[maybe_unused]] IPhysicsObject *pTrigger, [[maybe_unused]] IPhysicsObject *pObject ) {}
+	virtual void ObjectEnterTrigger( IPhysicsObject *, IPhysicsObject * ) {}
+	virtual void ObjectLeaveTrigger( IPhysicsObject *, IPhysicsObject * ) {}
 };
 
 
@@ -1021,7 +1021,7 @@ struct fluidparams_t
 	bool		useAerodynamics;// true if this controller should calculate surface pressure
 	int			contents;
 
-	fluidparams_t() {}
+	fluidparams_t() : pGameData{nullptr} {}
 	fluidparams_t( fluidparams_t const& src )
 	{
 		Vector4DCopy( src.surfacePlane, surfacePlane );
