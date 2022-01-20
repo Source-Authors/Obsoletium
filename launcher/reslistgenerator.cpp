@@ -129,6 +129,7 @@ public:
 	};
 
 	CResListGenerator();
+	virtual ~CResListGenerator() = default;
 
 	virtual void Init( char const *pchBaseDir, char const *pchGameDir );
 	virtual bool IsActive();
@@ -163,8 +164,17 @@ private:
 	int			m_nCurrentState;
 };
 
-static CResListGenerator g_ResListGenerator;
-IResListGenerator *reslistgenerator = &g_ResListGenerator;
+
+IResListGenerator *CreateReslistGenerator()
+{
+	return new CResListGenerator();
+}
+
+void DestroyReslistGenerator(IResListGenerator *&gen) 
+{
+	delete gen;
+  gen = nullptr;
+}
 
 CResListGenerator::CResListGenerator() :
 	m_bInitialized( false ),
@@ -416,12 +426,10 @@ bool CResListGenerator::InitCommandFile( char const *pchGameDir, char const *pch
 		return false;
 	}
 
-	KeyValues *kv = new KeyValues( "reslists" );
+	KeyValues::AutoDelete kv = KeyValues::AutoDelete("reslists");
 	if ( !kv->LoadFromBuffer( "reslists", (const char *)buf.Base() ) )
 	{
 		Error( "Unable to parse keyvalues from '%s'\n", fullpath );
-		kv->deleteThis();
-		return false;
 	}
 
 	CUtlString sMapListFile = kv->GetString( "maplist", "maplist.txt" );
@@ -429,8 +437,6 @@ bool CResListGenerator::InitCommandFile( char const *pchGameDir, char const *pch
 	if ( m_MapList.Count() <= 0 )
 	{
 		Error( "Maplist file '%s' empty or missing!!!\n", sMapListFile.String() );
-		kv->deleteThis();
-		return false;
 	}
 
 	char const *pszSolo = NULL;
@@ -508,15 +514,6 @@ bool CResListGenerator::InitCommandFile( char const *pchGameDir, char const *pch
 		exit( -1 );
 	}
 
-	kv->deleteThis();
-
-	/*
-	if ( m_bActive )
-	{
-		// Wipe console log
-		g_pFullFileSystem->RemoveFile( "console.log", "GAME" );
-	}
-	*/
 	return m_bActive;
 }
 

@@ -26,7 +26,8 @@ public:
 	virtual bool ShouldContinue() = 0;
 };
 
-extern IResListGenerator *reslistgenerator;
+IResListGenerator *CreateReslistGenerator();
+void DestroyReslistGenerator(IResListGenerator *&gen);
 
 #endif // RESLISTGENERATOR_H
 

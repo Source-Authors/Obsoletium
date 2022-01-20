@@ -34,6 +34,7 @@
 #ifndef STEAM
 #define PvRealloc realloc
 #define PvAlloc malloc
+#define PvFree free
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -835,6 +836,11 @@ void SpewActivate( const tchar* pGroupName, int level )
 	s_pSpewGroups[ind].m_Level = level;
 }
 
+void SpewDeactivate()
+{
+	PvFree( s_pSpewGroups );
+  s_pSpewGroups = nullptr;
+}
 
 // If we don't have a function from math.h, then it doesn't link certain floating-point
 // functions in and printfs with %f cause runtime errors in the C libraries.

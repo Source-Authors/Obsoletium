@@ -628,7 +628,6 @@ ALLOC_CALL void *__cdecl _aligned_realloc_base( void *ptr, size_t size, size_t a
 ALLOC_CALL void *__cdecl _aligned_recalloc_base( void *, size_t , size_t  )
 {
 	Error( "Unsupported function\n" );
-	return NULL;
 }
 
 FREE_CALL void __cdecl _aligned_free_base( void *ptr )

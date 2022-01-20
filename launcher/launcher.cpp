@@ -360,7 +360,7 @@ private:
 	CUtlString	m_sFullGamePath;
 };
 
-static CLogAllFiles g_LogFiles;
+static CLogAllFiles *g_LogFiles = new CLogAllFiles();
 
 static bool AllLogLessFunc( CUtlString const &pLHS, CUtlString const &pRHS )
 {
@@ -517,7 +517,7 @@ void CLogAllFiles::LogFile(const char *fullPathFileName, const char *options)
 //-----------------------------------------------------------------------------
 void CLogAllFiles::LogAllFilesFunc(const char *fullPathFileName, const char *options)
 {
-	g_LogFiles.LogFile( fullPathFileName, options );
+	g_LogFiles->LogFile( fullPathFileName, options );
 }
 
 //-----------------------------------------------------------------------------
@@ -563,6 +563,12 @@ void TryToLoadSteamOverlayDLL()
 class CSourceAppSystemGroup : public CSteamAppSystemGroup
 {
 public:
+	CSourceAppSystemGroup() = default;
+	~CSourceAppSystemGroup()
+	{
+		DestroyReslistGenerator( m_pReslistgenerator );
+	}
+
 	// Methods of IApplication
 	virtual bool Create();
 	virtual bool PreInit();
@@ -570,10 +576,13 @@ public:
 	virtual void PostShutdown();
 	virtual void Destroy();
 
+	bool ShouldContinueGenerateReslist();
+
 private:
 	const char *DetermineDefaultMod();
 	const char *DetermineDefaultGame();
 
+	IResListGenerator *m_pReslistgenerator;
 	bool m_bEditMode;
 };
 
@@ -643,7 +652,6 @@ bool CSourceAppSystemGroup::Create()
 		Error("Please check game installed correctly.\n\n"
 			"Unable to add launcher systems from *" DLL_EXT_STRING
 			"s. Looks like required components are missed or broken." );
-		return false;
 	}
 
 
@@ -718,7 +726,6 @@ bool CSourceAppSystemGroup::Create()
 	{
 		Error("Please check game installed correctly.\n\n"
 			"Unable to set shader API %s. Looks like required components are missed or broken.", pDLLName );
-		return false;
 	}
 
 	double elapsed = Plat_FloatTime() - st;
@@ -774,15 +781,17 @@ bool CSourceAppSystemGroup::PreInit()
 
 	if ( IsPC() )
 	{
+		m_pReslistgenerator = CreateReslistGenerator();
+
 		// This will get called multiple times due to being here, but only the first one will do anything
-		reslistgenerator->Init( GetBaseDirectory(), CommandLine()->ParmValue( "-game", "hl2" ) );
+		m_pReslistgenerator->Init( GetBaseDirectory(), CommandLine()->ParmValue( "-game", "hl2" ) );
 
 		// This will also get called each time, but will actually fix up the command line as needed
-		reslistgenerator->SetupCommandLine();
+		m_pReslistgenerator->SetupCommandLine();
 	}
 
 	// FIXME: Logfiles is mod-specific, needs to move into the engine.
-	g_LogFiles.Init();
+	g_LogFiles->Init();
 
 	// Required to run through the editor
 	if ( m_bEditMode )
@@ -811,9 +820,15 @@ int CSourceAppSystemGroup::Main()
 void CSourceAppSystemGroup::PostShutdown()
 {
 	// FIXME: Logfiles is mod-specific, needs to move into the engine.
-	g_LogFiles.Shutdown();
+	g_LogFiles->Shutdown();
+	// dimhotepus: Fix log files leak.
+	delete g_LogFiles;
+	g_LogFiles = nullptr;
 
-	reslistgenerator->Shutdown();
+	if ( IsPC() )
+	{
+		m_pReslistgenerator->Shutdown();
+	}
 
 	DisconnectTier3Libraries();
 	DisconnectTier2Libraries();
@@ -830,6 +845,11 @@ void CSourceAppSystemGroup::Destroy()
 #ifdef WIN32
 	CoUninitialize();
 #endif
+}
+
+bool CSourceAppSystemGroup::ShouldContinueGenerateReslist()
+{
+  return m_pReslistgenerator->ShouldContinue();
 }
 
 
@@ -1250,7 +1270,6 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	if ( !IsWindows7OrGreater() )
 	{
 		Error( "Sorry, Windows 7+ required to run the game." );
-		return ERROR_OLD_WIN_VERSION;
 	}
 
 	using namespace std::chrono_literals;
@@ -1512,7 +1531,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		bool bReslistCycle = false;
 		if ( !bRestart )
 		{
-			bReslistCycle = reslistgenerator->ShouldContinue();
+			bReslistCycle = sourceSystems.ShouldContinueGenerateReslist();
 			bRestart = bReslistCycle;
 		}
 		
@@ -1601,6 +1620,9 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 #else
 #error "Please define your platform"
 #endif
+
+	// dimhotepus: Free spew memory, etc.
+	SpewDeactivate();
 
 	return 0;
 }
