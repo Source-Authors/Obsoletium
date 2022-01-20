@@ -57,7 +57,15 @@ bool CVguiMatSysApp::Create()
 		return false;
 	}
 
-	pMaterialSystem->SetShaderAPI( "shaderapidx9.dll" );
+	char const* pDLLName = "shaderapidx9" DLL_EXT_STRING;
+	// dimhotepus: Allow to override shader API DLL.
+	const char *pArg = nullptr;
+	if ( CommandLine()->CheckParm( "-shaderapi", &pArg ))
+	{
+		pDLLName = pArg;
+	}
+
+	pMaterialSystem->SetShaderAPI( pDLLName );
 	return true;
 }
 

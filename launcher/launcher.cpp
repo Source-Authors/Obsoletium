@@ -564,6 +564,8 @@ void ReportDirtyDiskNoMaterialSystem()
 //-----------------------------------------------------------------------------
 bool CSourceAppSystemGroup::Create()
 {
+	double st = Plat_FloatTime();
+
 	IFileSystem *pFileSystem = (IFileSystem*)FindSystem( FILESYSTEM_INTERFACE_VERSION );
 	pFileSystem->InstallDirtyDiskReportFunc( ReportDirtyDiskNoMaterialSystem );
 
@@ -573,8 +575,6 @@ bool CSourceAppSystemGroup::Create()
 
 	// Are we running in edit mode?
 	m_bEditMode = CommandLine()->CheckParm( "-edit" );
-
-	double st = Plat_FloatTime();
 
 	AppSystemInfo_t appSystems[] = 
 	{
@@ -672,7 +672,12 @@ bool CSourceAppSystemGroup::Create()
 	{
 		pDLLName = "shaderapiempty" DLL_EXT_STRING;
 	}
-
+	// dimhotepus: Allow to override shader API DLL.
+	const char *pArg = nullptr;
+	if ( CommandLine()->CheckParm( "-shaderapi", &pArg ))
+	{
+		pDLLName = pArg;
+	}
 	pMaterialSystem->SetShaderAPI( pDLLName );
 	// dimhotepus: Detect missed shader API.
 	if ( !pMaterialSystem->HasShaderAPI() )
@@ -682,7 +687,7 @@ bool CSourceAppSystemGroup::Create()
 	}
 
 	double elapsed = Plat_FloatTime() - st;
-	COM_TimestampedLog( "LoadAppSystems:  Took %.4f secs to load libraries and get factories.", (float)elapsed );
+	COM_TimestampedLog( "CSourceAppSystemGroup::Create:  Took %.4f secs to load libraries and get factories.", (float)elapsed );
 
 	return true;
 }
@@ -902,6 +907,12 @@ bool GrabSourceMutex()
 		return false;
 	}
 
+	// dimhotepus: Looks like CS:GO do this.
+	// In case we have a umask setting creation to something other than 0666,
+	// force it to 0666 so we don't lock other users out of the game if
+	// the game dies etc.
+	fchmod( g_lockfd, 0666 );
+
 	struct flock fl;
 	fl.l_type = F_WRLCK;
 	fl.l_whence = SEEK_SET;
@@ -990,29 +1001,6 @@ void RemoveSpuriousGameParameters()
 	}
 }
 
-/*
-============
-va
-
-does a varargs printf into a temp buffer, so I don't need to have
-varargs versions of all text functions.
-============
-*/
-static char *va( char *format, ... )
-{
-	va_list		argptr;
-	static char	string[8][512];
-	static int	curstring = 0;
-
-	curstring = ( curstring + 1 ) % 8;
-
-	va_start (argptr, format);
-	Q_vsnprintf( string[curstring], sizeof( string[curstring] ), format, argptr );
-	va_end (argptr);
-
-	return string[curstring];  
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *param - 
@@ -1041,7 +1029,7 @@ static char const *Cmd_TranslateFileAssociation(char const *param )
 		FileAssociationInfo& info = g_FileAssociations[ i ];
 
 		if ( ! Q_strcmp( extension, info.extension ) && 
-			! CommandLine()->FindParm(va( "+%s", info.command_to_issue ) ) )
+			! CommandLine()->FindParm(CFmtStr( "+%s", info.command_to_issue ) ) )
 		{
 			// Translate if haven't already got one of these commands			
 			Q_strncpy( sz, temp, sizeof( sz ) );
@@ -1086,7 +1074,7 @@ static const char *BuildCommand()
 			const char *szValue = CommandLine()->ParmValue(szParm);
 			if (szValue)
 			{
-				build.PutString(va("%s %s;", szParm+1, szValue));
+				build.PutString(CFmtStr("%s %s;", szParm+1, szValue));
 				i++;
 			}
 			else
@@ -1178,18 +1166,21 @@ class ScopedTimerResolution {
 // Output : int APIENTRY
 //-----------------------------------------------------------------------------
 #ifdef WIN32
-extern "C" __declspec(dllexport) int LauncherMain( HINSTANCE hInstance, HINSTANCE , LPSTR lpCmdLine, int nCmdShow )
+DLL_EXPORT int LauncherMain( HINSTANCE hInstance, HINSTANCE , LPSTR lpCmdLine, int nCmdShow )
 #else
 DLL_EXPORT int LauncherMain( int argc, char **argv )
 #endif
 {
+#ifdef WIN32
+	SetAppInstance( hInstance );
+#endif
+
 #ifdef LINUX
-	// Temporary fix to stop us from crashing in printf/sscanf functions that don't expect
-	//  localization to mess with your "." and "," float seperators. Mac OSX also sets LANG
-	//  to en_US.UTF-8 before starting up (in info.plist I believe).
-	// We need to double check that localization for libcef is handled correctly
-	//  when we slam things to en_US.UTF-8.
-	// Also check if C.UTF-8 exists and use it? This file: /usr/lib/locale/C.UTF-8.
+	// Fix to stop us from crashing in printf/sscanf functions that don't expect localization to mess with
+	// your "." and "," float seperators.  Mac OSX also sets LANG to en_US.UTF-8 before starting up (in
+	// info.plist I believe).  We need to double check that localization for libcef is handled correctly
+	// when we slam things to en_US.UTF-8.  Also check if C.UTF-8 exists and use it?
+	// This file: /usr/lib/locale/C.UTF-8.
 	// It looks like it's only installed on Debian distros right now though.
 	const char en_US[] = "en_US.UTF-8";
 
@@ -1203,9 +1194,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	}
 #endif // LINUX
 
-#ifdef WIN32
-	SetAppInstance( hInstance );
-#elif defined( POSIX )
+#if defined( POSIX )
 	// Store off command line for argument searching
 	Plat_SetCommandLine( BuildCmdLine( argc, argv, false ) );
 
@@ -1236,12 +1225,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			(long long)newTimerResolution.count() );
 	}
 
-	// dimhotepus: Remove empty call.
-	// Quickly check the hardware key, essentially a warning shot.  
-	// if ( !Plat_VerifyHardwareKeyPrompt() )
-	// {
-	//	return -1;
-	// }
+	// dimhotepus: Remove Plat_VerifyHardwareKeyPrompt call as it is empty.
 
 #ifdef WIN32
 	CommandLine()->CreateCmdLine( IsPC() ? VCRHook_GetCommandLine() : lpCmdLine );

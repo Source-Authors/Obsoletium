@@ -176,6 +176,8 @@ void DestroyReslistGenerator(IResListGenerator *&gen)
   gen = nullptr;
 }
 
+IResListGenerator::~IResListGenerator() = default;
+
 CResListGenerator::CResListGenerator() :
 	m_bInitialized( false ),
 	m_bActive( false ),
