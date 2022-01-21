@@ -28,7 +28,7 @@
 
 // faster iteration, but in an unspecified order
 #define FOR_EACH_MAP_FAST( mapName, iteratorName ) \
-	for ( int iteratorName = 0; (mapName).IsUtlMap && iteratorName < (mapName).MaxElement(); ++iteratorName ) if ( !(mapName).IsValidIndex( iteratorName ) ) continue; else
+	for ( decltype((mapName).FirstInorder()) iteratorName = 0; (mapName).IsUtlMap && iteratorName < (mapName).MaxElement(); ++iteratorName ) if ( !(mapName).IsValidIndex( iteratorName ) ) continue; else
 
 struct base_utlmap_t
 {

@@ -68,7 +68,7 @@ public:
 
 	void Report()
 	{
-		for ( int i = m_locations.FirstInorder(); i != m_locations.InvalidIndex(); i = m_locations.NextInorder( i ) )
+		for ( auto i = m_locations.FirstInorder(); i != m_locations.InvalidIndex(); i = m_locations.NextInorder( i ) )
 		{
 			Msg( "%s(%d) :\n", m_locations[i].pszFile, m_locations[i].line );
 		}
