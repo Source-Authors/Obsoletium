@@ -401,7 +401,6 @@ I CUtlMultiList<T,I>::Alloc( )
 		{
 			// We rarely if ever handle alloc failure. Continuing leads to corruption.
 			Error( "CUtlMultiList overflow! (exhausted index range)\n" );
-			return InvalidIndex();
 		}
 
 		// Nothing in the free list; add.
@@ -416,7 +415,6 @@ I CUtlMultiList<T,I>::Alloc( )
 			{
 				// We rarely if ever handle alloc failure. Continuing leads to corruption.
 				Error( "CUtlMultiList overflow! (exhausted memory allocator)\n" );
-				return InvalidIndex();
 			}
 		}
 		

@@ -681,7 +681,6 @@ I CUtlLinkedList<T,S,ML,I,M>::AllocInternal( bool multilist )
 			{
 				// We rarely if ever handle alloc failure. Continuing leads to corruption.
 				Error( "CUtlLinkedList overflow! (exhausted memory allocator)\n" );
-				return InvalidIndex();
 			}
 		}
 
@@ -690,7 +689,6 @@ I CUtlLinkedList<T,S,ML,I,M>::AllocInternal( bool multilist )
 		{
 			// We rarely if ever handle alloc failure. Continuing leads to corruption.
 			Error( "CUtlLinkedList overflow! (exhausted index range)\n" );
-			return InvalidIndex();
 		}
 
 		m_LastAlloc = it;

@@ -155,7 +155,6 @@ unsigned short GetCurrentVCRThreadIndex()
 			return (unsigned short)i;
 	}
 	Error( "GetCurrentVCRThreadInfo: no matching thread." );
-	return 0;
 }
 
 

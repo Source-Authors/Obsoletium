@@ -290,7 +290,6 @@ int CUtlStreamBuffer::ReadBytesFromFile( int nBytesToRead, int nReadOffset )
 		if ( m_hFileHandle == FILESYSTEM_INVALID_HANDLE )
 		{
 			Error( "Unable to read file %s!\n", m_pFileName );
-			return 0;
 		}
 		if ( m_nOffset != 0 )
 		{

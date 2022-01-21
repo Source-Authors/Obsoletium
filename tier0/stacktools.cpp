@@ -246,9 +246,11 @@ int GetCallStack_Fast( void **pReturnAddressesOut, int iArrayCount, int iSkipCou
 
 		return AppendParentStackTrace( pReturnAddressesOut, iArrayCount, i );
 	}
-#endif
+#else
 
 	return 0;
+
+#endif
 }
 #pragma auto_inline( on )
 
