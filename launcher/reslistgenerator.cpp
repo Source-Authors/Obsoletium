@@ -206,12 +206,6 @@ void CResListGenerator::CollateFiles( char const *pchResListFilename )
 
 void CResListGenerator::Init( char const *pchBaseDir, char const *pchGameDir )
 {
-	if ( IsX360() )
-	{
-		// not used or supported
-		return;
-	}
-
 	// Because we have to call this inside the first Apps "PreInit", we need only Init on the very first call
 	if ( m_bInitialized )
 	{

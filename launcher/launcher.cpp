@@ -204,10 +204,11 @@ public:
 //-----------------------------------------------------------------------------
 // Gets the executable name
 //-----------------------------------------------------------------------------
-bool GetExecutableName( char *out, int outSize )
+template <DWORD outSize>
+bool GetExecutableName( char (&out)[outSize] )
 {
 #ifdef WIN32
-	if ( !::GetModuleFileName( ( HINSTANCE )GetModuleHandle( NULL ), out, outSize ) )
+	if ( !::GetModuleFileName( GetModuleHandle( nullptr ), out, outSize ) )
 	{
 		return false;
 	}
@@ -220,23 +221,14 @@ bool GetExecutableName( char *out, int outSize )
 //-----------------------------------------------------------------------------
 // Purpose: Determine the directory where this .exe is running from
 //-----------------------------------------------------------------------------
-void UTIL_ComputeBaseDir(char (&szBasedir)[MAX_PATH] )
+void UTIL_ComputeBaseDir( char (&szBasedir)[MAX_PATH] )
 {
 	szBasedir[0] = '\0';
 
-	if ( IsX360() )
-	{
-		char const *pBaseDir = CommandLine()->ParmValue( "-basedir" );
-		if ( pBaseDir )
-		{
-			strcpy( szBasedir, pBaseDir );
-		}
-	}
-
-	if ( !szBasedir[0] && GetExecutableName( szBasedir, sizeof( szBasedir ) ) )
+	if ( !szBasedir[0] && GetExecutableName( szBasedir ) )
 	{
 		char *pBuffer = strrchr( szBasedir, '\\' );
-		if ( *pBuffer )
+		if ( pBuffer && *pBuffer )
 		{
 			*(pBuffer+1) = '\0';
 		}
@@ -334,11 +326,6 @@ CLogAllFiles::CLogAllFiles() :
 
 void CLogAllFiles::Init( char (&baseDirectory)[MAX_PATH] )
 {
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	// Can't do this in edit mode
 	if ( CommandLine()->CheckParm( "-edit" ) )
 	{
@@ -727,18 +714,10 @@ bool CSourceAppSystemGroup::PreInit()
 	if ( FileSystem_MountContent( fsInfo ) != FS_OK )
 		return false;
 
-	if ( IsPC() || !IsX360() )
-	{
-		fsInfo.m_pFileSystem->AddSearchPath( "platform", "PLATFORM" );
-	}
-	else
-	{
-		// 360 needs absolute paths
-		FileSystem_AddSearchPath_Platform( g_pFullFileSystem, steamInfo.m_GameInfoPath );
-	}
-
 	if ( IsPC() )
 	{
+		fsInfo.m_pFileSystem->AddSearchPath( "platform", "PLATFORM" );
+
 		// This will get called multiple times due to being here, but only the first one will do anything
 		m_pReslistgenerator->Init( m_szBaseDir, CommandLine()->ParmValue( "-game", "hl2" ) );
 
