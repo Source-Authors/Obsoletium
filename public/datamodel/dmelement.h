@@ -89,10 +89,7 @@ struct DmElementReference_t
 		m_attributes.m_pNext = that.m_attributes.m_pNext;
 		return *this;
 	}
-	~DmElementReference_t()
-	{
-		//		Assert( !IsStronglyReferenced() );
-	}
+	~DmElementReference_t() = default;
 
 	void AddAttribute( CDmAttribute *pAttribute );
 	void RemoveAttribute( CDmAttribute *pAttribute );
