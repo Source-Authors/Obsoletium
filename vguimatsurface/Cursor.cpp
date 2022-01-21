@@ -285,8 +285,7 @@ void CursorSelect(HCursor hCursor)
 		s_nForceCursorVisibleCount += ( hCursor == dc_alwaysvisible_push ? 1 : -1 );
 		Assert( s_nForceCursorVisibleCount >= 0 );
 
-		if( ( s_nForceCursorVisibleCount && !s_bCursorVisible ) ||
-			( !s_nForceCursorVisibleCount && s_bCursorVisible ) )
+		if( (bool)s_nForceCursorVisibleCount != s_bCursorVisible )
 		{
 			ActivateCurrentCursor();
 		}

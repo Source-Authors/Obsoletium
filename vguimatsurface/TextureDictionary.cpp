@@ -314,11 +314,13 @@ private:
 //-----------------------------------------------------------------------------
 CMatSystemTexture::CMatSystemTexture( void )
 {
+	m_crcFile = (CRC32_t)0;
 	m_pMaterial = NULL;
 	m_pTexture = NULL;
 	m_pOverrideTexture = NULL;
-	m_crcFile = (CRC32_t)0;
 	m_iWide = m_iTall = 0;
+	m_iInputWide = m_iInputTall = 0;
+	m_ID = -1;
 	m_s0 = m_t0 = 0;
 	m_s1 = m_t1 = 1;
 
@@ -976,8 +978,6 @@ int	CTextureDictionary::FindTextureIdForTextureFile( char const *pFileName )
 	for ( int i = m_Textures.Head(); i != m_Textures.InvalidIndex(); i = m_Textures.Next( i ) )
 	{
 		CMatSystemTexture *tex = &m_Textures[i];
-		if ( !tex )
-			continue;
 
 		IMaterial *mat = tex->GetMaterial();
 		if ( !mat )
