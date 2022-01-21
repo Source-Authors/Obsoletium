@@ -7,9 +7,10 @@
 #ifdef POSIX
 #error "Please exclude from compilation if POSIX"
 #else
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include "winlite.h"
 #endif
+
 #include "appframework/appframework.h"
 #include "tier0/dbg.h"
 #include "tier0/icommandline.h"
@@ -51,25 +52,6 @@ void SetAppInstance( void* hInstance )
 }
 
 //-----------------------------------------------------------------------------
-// Specific 360 environment setup.
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-bool SetupEnvironment360()
-{
-	CommandLine()->CreateCmdLine( GetCommandLine() );
-
-	if ( !CommandLine()->FindParm( "-game" ) && !CommandLine()->FindParm( "-vproject" ) )
-	{
-		// add the default game name due to lack of vproject environment
-		CommandLine()->AppendParm( "-game", "hl2" );
-	}
-
-	// success
-	return true;
-}
-#endif
-
-//-----------------------------------------------------------------------------
 // Version of AppMain used by windows applications
 //-----------------------------------------------------------------------------
 int AppMain( void* hInstance, void*, const char*, int, CAppSystemGroup *pAppSystemGroup )
@@ -78,11 +60,7 @@ int AppMain( void* hInstance, void*, const char*, int, CAppSystemGroup *pAppSyst
 
 //	g_pDefaultLoggingListener = &s_SimpleWindowsLoggingListener;
 	s_HInstance = (HINSTANCE)hInstance;
-#if !defined( _X360 )
 	CommandLine()->CreateCmdLine( ::GetCommandLine() );
-#else
-	SetupEnvironment360();
-#endif
 
 	return pAppSystemGroup->Run();
 }
@@ -96,11 +74,7 @@ int AppMain( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 
 //	g_pDefaultLoggingListener = &s_SimpleLoggingListener;
 	s_HInstance = NULL;
-#if !defined( _X360 )
 	CommandLine()->CreateCmdLine( argc, argv );
-#else
-	SetupEnvironment360();
-#endif
 
 	return pAppSystemGroup->Run();
 }
@@ -114,11 +88,7 @@ int AppStartup( void* hInstance, void*, const char*, int, CAppSystemGroup *pAppS
 
 //	g_pDefaultLoggingListener = &s_SimpleWindowsLoggingListener;
 	s_HInstance = (HINSTANCE)hInstance;
-#if !defined( _X360 )
 	CommandLine()->CreateCmdLine( ::GetCommandLine() );
-#else
-	SetupEnvironment360();
-#endif
 
 	return pAppSystemGroup->Startup();
 }
@@ -129,11 +99,7 @@ int AppStartup( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 
 //	g_pDefaultLoggingListener = &s_SimpleLoggingListener;
 	s_HInstance = NULL;
-#if !defined( _X360 )
 	CommandLine()->CreateCmdLine( argc, argv );
-#else
-	SetupEnvironment360();
-#endif
 
 	return pAppSystemGroup->Startup();
 }

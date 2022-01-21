@@ -46,8 +46,6 @@ void AppShutdown( CAppSystemGroup *pAppSystemGroup );
 //-----------------------------------------------------------------------------
 // Macros to create singleton application objects for windowed + console apps
 //-----------------------------------------------------------------------------
-#if !defined( _X360 )
-
 #ifdef WIN32
 #define DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( _globalVarName ) \
 	int __stdcall WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )	\
@@ -71,28 +69,12 @@ void AppShutdown( CAppSystemGroup *pAppSystemGroup );
 #else
 #error "Please define your platform"
 #endif
-	
-#else
-#define DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( _globalVarName )	\
-	void __cdecl main()																\
-	{																				\
-		AppMain( (HINSTANCE)1, (HINSTANCE)0, NULL, 0, &_globalVarName );		\
-	}
-#endif
 
-#if !defined( _X360 )
 #define DEFINE_CONSOLE_APPLICATION_OBJECT_GLOBALVAR( _globalVarName ) \
 	int main( int argc, char **argv )			\
 	{											\
 		return AppMain( argc, argv, &_globalVarName );	\
 	}
-#else
-#define DEFINE_CONSOLE_APPLICATION_OBJECT_GLOBALVAR( _globalVarName ) \
-	void __cdecl main()							\
-	{											\
-		AppMain( 0, (char**)NULL, &_globalVarName );	\
-	}
-#endif
 
 #define DEFINE_WINDOWED_APPLICATION_OBJECT( _className )	\
 	static _className __s_ApplicationObject;				\
