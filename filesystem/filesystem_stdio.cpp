@@ -593,89 +593,6 @@ int CFileSystem_Stdio::FS_chmod( const char *pathT, int pmode )
 	return rt;
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: A replacement for _stat() backed by GetFileAttributesEx for XP users
-//
-// Workaround for:
-// https://connect.microsoft.com/VisualStudio/feedback/details/1600505/stat-not-working-on-windows-xp-using-v14-xp-platform-toolset-vs2015
-//
-// This is not well tested or meant to be a proper implementation of stat(), but rather a band-aid for XP users only
-// until microsoft pushes a runtime update to fix above issue :-/
-//-----------------------------------------------------------------------------
-#if defined(_WIN32) && defined(FILESYSTEM_MSVC2015_STAT_BUG_WORKAROUND)
-static int WindowsXPStatShim( const char *pathT, struct _stat *buf )
-{
-	WIN32_FILE_ATTRIBUTE_DATA fileAttributes;
-	if ( !GetFileAttributesEx(pathT, GetFileExInfoStandard, &fileAttributes) )
-	{
-		*_errno() = ENOENT;
-		return -1;
-	}
-
-	memset( buf, 0, sizeof(struct _stat) );
-
-	// Mode
-	unsigned short permBits = _S_IREAD; // If GetFileAttributes let us see it, we can read it. I think.
-	if ( fileAttributes.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-	{
-		buf->st_mode |= _S_IFDIR;
-		permBits |= _S_IEXEC;
-	}
-	else
-	{
-		buf->st_mode |= _S_IFREG;
-
-		const char *pExt = V_GetFileExtension( pathT );
-		if ( V_strcasecmp( pExt, "exe" ) == 0 ||
-		     V_strcasecmp( pExt, "bat" ) == 0 ||
-		     V_strcasecmp( pExt, "com" ) == 0 ||
-		     V_strcasecmp( pExt, "cmd" ) == 0 )
-		{
-			// Windows stat seems to set this flag for these extensions
-			permBits |= _S_IEXEC;
-		}
-	}
-
-	if ( fileAttributes.dwFileAttributes & FILE_ATTRIBUTE_READONLY )
-	{
-		permBits |= S_IWRITE;
-	}
-
-	// Duplicate permission bits to user/group/world (windows stat doesn't care)
-	buf->st_mode |= permBits | permBits >> 3 | permBits >> 6;
-
-	// Device is just drive-letter-index according to msdn
-	char driveLetter = tolower( pathT[ 0 ] );
-	if ( driveLetter >= 'a' && driveLetter <= 'z' && pathT[1] == ':' )
-	{
-		unsigned char driveIdx = driveLetter - 'a';
-		buf->st_dev = driveIdx;
-		buf->st_rdev = driveIdx;
-	}
-	else
-	{
-		buf->st_dev = _getdrive();
-		buf->st_rdev = _getdrive();
-	}
-
-	buf->st_nlink = 1;
-	buf->st_size = (uint64_t)fileAttributes.nFileSizeHigh << 32 | fileAttributes.nFileSizeLow;
-	// The 90s was a hell of a time I guess.
-	uint64_t actualAccessTime = (uint64_t)fileAttributes.ftLastAccessTime.dwHighDateTime << 32 | (uint64_t)fileAttributes.ftLastAccessTime.dwLowDateTime;
-	uint64_t actualModTime = (uint64_t)fileAttributes.ftLastWriteTime.dwHighDateTime << 32 | (uint64_t)fileAttributes.ftLastWriteTime.dwLowDateTime;
-	uint64_t actualCreationTime = (uint64_t)fileAttributes.ftCreationTime.dwHighDateTime << 32 | (uint64_t)fileAttributes.ftCreationTime.dwLowDateTime;
-	uint64_t ullMSUniverseToEveryoneElseUniverse = (369 * 365 + 89) * 86400ull; // okay
-	buf->st_atime = actualAccessTime / 10000000ull - ullMSUniverseToEveryoneElseUniverse;
-	buf->st_mtime = actualModTime / 10000000ull - ullMSUniverseToEveryoneElseUniverse;
-	buf->st_ctime = actualCreationTime / 10000000ull - ullMSUniverseToEveryoneElseUniverse;
-
-	// st_uid/st_gid always 0 on windows
-
-	return 0;
-}
-#endif // defined(_WIN32) && defined(FILESYSTEM_MSVC2015_STAT_BUG_WORKAROUND)
-
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
 //-----------------------------------------------------------------------------
@@ -694,18 +611,6 @@ int CFileSystem_Stdio::FS_stat( const char *pathT, struct _stat *buf, bool *pbLo
 	CBaseFileSystem::FixUpPath ( pathT, path, sizeof( path ) );
 
 	int rt = _stat( path, buf );
-
-	// Workaround bug wherein stat() randomly fails on Windows XP.  See comment on function.
-#if defined(_WIN32) && defined(FILESYSTEM_MSVC2015_STAT_BUG_WORKAROUND)
-	if ( rt == -1 )
-	{
-		EOSType eOSType = GetOSType();
-		if ( eOSType == k_eWin2000 || eOSType == k_eWinXP || eOSType == k_eWin2003 )
-		{
-			rt = WindowsXPStatShim( path, buf );
-		}
-	}
-#endif // defined(_WIN32) && defined(FILESYSTEM_MSVC2015_STAT_BUG_WORKAROUND)
 
 #if defined(LINUX)
 	if ( rt == -1 )
