@@ -74,9 +74,8 @@ template< typename IInterface >
 class CTier0AppSystem : public CBaseAppSystem< IInterface >
 {
 public:
-	CTier0AppSystem( bool bIsPrimaryAppSystem = true )
+	CTier0AppSystem( bool bIsPrimaryAppSystem = true ) : m_bIsPrimaryAppSystem{ bIsPrimaryAppSystem }
 	{
-		m_bIsPrimaryAppSystem = bIsPrimaryAppSystem;
 	}
 
 protected:
