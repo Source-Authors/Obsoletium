@@ -21,7 +21,7 @@ void ApplyRotaryEffectToTexture( int rgbaWide, int rgbaTall, unsigned char *rgba
 	if ( !bRotary )
 		return;
 
-	int y = rgbaTall * 0.5;
+	int y = rgbaTall / 2;
 
 	unsigned char *line = &rgba[(y * rgbaWide) * 4];
 
@@ -43,8 +43,7 @@ void ApplyScanlineEffectToTexture( int rgbaWide, int rgbaTall, unsigned char *rg
 	if ( iScanLines < 2 )
 		return;
 
-	float scale;
-	scale = 0.7f;
+	constexpr float scale = 0.7f;
 
 	// darken all the areas except the scanlines
 	for (int y = 0; y < rgbaTall; y++)
@@ -172,7 +171,7 @@ void ApplyGaussianBlurToTexture( int rgbaWide, int rgbaTall, unsigned char *rgba
 	for (int x = 0; x <= (nBlur * 2); x++)
 	{
 		int val = x - nBlur;
-		pGaussianDistribution[x] = (float)( 1.0f / sqrt(2 * 3.14 * sigma * sigma)) * pow(2.7, -1 * (val * val) / (2 * sigma * sigma));
+		pGaussianDistribution[x] = (float)( 1.0f / sqrt(2 * 3.14 * sigma * sigma)) * powf(2.7F, -1 * (val * val) / (2 * sigma * sigma));
 	}
 
 	// alloc a new buffer

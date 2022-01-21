@@ -192,9 +192,9 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 		m_iFlags |= vgui::ISurface::FONTFLAG_ADDITIVE;
 	}
 
-	m_iMaxCharWidth = (float)pFontTable->m_pBitmapFont->m_MaxCharWidth * m_scalex;
-	m_iHeight       = (float)pFontTable->m_pBitmapFont->m_MaxCharHeight * m_scaley;
-	m_iAscent       = (float)pFontTable->m_pBitmapFont->m_Ascent * m_scaley;
+	m_iMaxCharWidth = pFontTable->m_pBitmapFont->m_MaxCharWidth * m_scalex;
+	m_iHeight       = pFontTable->m_pBitmapFont->m_MaxCharHeight * m_scaley;
+	m_iAscent       = pFontTable->m_pBitmapFont->m_Ascent * m_scaley;
 
 	// mark as valid
 	m_szName = fontName;
@@ -244,9 +244,9 @@ void CBitmapFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
 	BitmapFontTable_t *pFont = &g_BitmapFontTable[m_bitmapFontHandle];
 
 	ch = pFont->m_pBitmapFont->m_TranslateTable[ch];
-	a = (float)pFont->m_pBitmapGlyphs[ch].a * m_scalex;
-	b = (float)pFont->m_pBitmapGlyphs[ch].b * m_scalex;
-	c = (float)pFont->m_pBitmapGlyphs[ch].c * m_scalex;
+	a = pFont->m_pBitmapGlyphs[ch].a * m_scalex;
+	b = pFont->m_pBitmapGlyphs[ch].b * m_scalex;
+	c = pFont->m_pBitmapGlyphs[ch].c * m_scalex;
 }
 
 void CBitmapFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned char *prgba )
