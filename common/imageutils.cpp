@@ -847,6 +847,8 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 		}
 		else
 		{
+			// dimhotepus: Do not leak file resource.
+			fclose( fp );
 			errcode = CE_ERROR_PARSING_SOURCE;
 		}
 		return NULL;
