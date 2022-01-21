@@ -9,10 +9,6 @@
 #ifndef APPFRAMEWORK_H
 #define APPFRAMEWORK_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "appframework/IAppSystemGroup.h"
 
 
@@ -92,22 +88,22 @@ void AppShutdown( CAppSystemGroup *pAppSystemGroup );
 //-----------------------------------------------------------------------------
 class CSteamApplication : public CAppSystemGroup
 {
-	typedef CAppSystemGroup BaseClass;
+	using BaseClass = CAppSystemGroup;
 
 public:
 	CSteamApplication( CSteamAppSystemGroup *pAppSystemGroup );
 
 	// Implementation of IAppSystemGroup
-	virtual bool Create( );
-	virtual bool PreInit( );
-	virtual int Main( );
-	virtual void PostShutdown();
-	virtual void Destroy();
+	bool Create( ) override;
+	bool PreInit( ) override;
+	int Main( ) override;
+	void PostShutdown() override;
+	void Destroy() override;
 
 	// Use this version in cases where you can't control the main loop and
 	// expect to be ticked
-	virtual int Startup();
-	virtual void Shutdown();
+	int Startup() override;
+	void Shutdown() override;
 
 protected:
 	IFileSystem *m_pFileSystem;

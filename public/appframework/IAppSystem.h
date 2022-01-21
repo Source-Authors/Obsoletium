@@ -9,10 +9,6 @@
 #ifndef IAPPSYSTEM_H
 #define IAPPSYSTEM_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier1/interface.h"
 
 
@@ -53,28 +49,28 @@ public:
 //-----------------------------------------------------------------------------
 // Helper empty implementation of an IAppSystem
 //-----------------------------------------------------------------------------
-template< class IInterface > 
+template< typename IInterface > 
 class CBaseAppSystem : public IInterface
 {
 public:
 	// Here's where the app systems get to learn about each other 
-	virtual bool Connect( CreateInterfaceFn factory ) { return true; }
-	virtual void Disconnect() {}
+	bool Connect( CreateInterfaceFn factory ) override { return true; }
+	void Disconnect() override {}
 
 	// Here's where systems can access other interfaces implemented by this object
 	// Returns NULL if it doesn't implement the requested interface
-	virtual void *QueryInterface( const char *pInterfaceName ) { return NULL; }
+	void *QueryInterface( const char *pInterfaceName ) override { return NULL; }
 
 	// Init, shutdown
-	virtual InitReturnVal_t Init() { return INIT_OK; }
-	virtual void Shutdown() {}
+	InitReturnVal_t Init() override { return INIT_OK; }
+	void Shutdown() override {}
 };
 
 
 //-----------------------------------------------------------------------------
 // Helper implementation of an IAppSystem for tier0
 //-----------------------------------------------------------------------------
-template< class IInterface > 
+template< typename IInterface > 
 class CTier0AppSystem : public CBaseAppSystem< IInterface >
 {
 public:
@@ -94,7 +90,7 @@ protected:
 	bool IsPrimaryAppSystem() { return m_bIsPrimaryAppSystem; }
 
 private:
-	bool m_bIsPrimaryAppSystem;
+	const bool m_bIsPrimaryAppSystem;
 };
 
 

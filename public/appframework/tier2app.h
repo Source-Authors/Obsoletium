@@ -14,10 +14,6 @@
 #ifndef TIER2APP_H
 #define TIER2APP_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 
 #include "appframework/AppFramework.h"
 #include "tier2/tier2dm.h"
@@ -29,11 +25,11 @@
 //-----------------------------------------------------------------------------
 class CTier2SteamApp : public CSteamAppSystemGroup
 {
-	typedef CSteamAppSystemGroup BaseClass;
+	using BaseClass = CSteamAppSystemGroup;
 
 public:
 	// Methods of IApplication
-	virtual bool PreInit()
+	bool PreInit() override
 	{
 		CreateInterfaceFn factory = GetFactory();
 		ConnectTier1Libraries( &factory, 1 );
@@ -42,7 +38,7 @@ public:
 		return true;			
 	}
 
-	virtual void PostShutdown()
+	void PostShutdown() override
 	{
 		DisconnectTier2Libraries();
 		ConVar_Unregister();
@@ -56,11 +52,11 @@ public:
 //-----------------------------------------------------------------------------
 class CTier2DmSteamApp : public CTier2SteamApp
 {
-	typedef CTier2SteamApp BaseClass;
+	using BaseClass = CTier2SteamApp;
 
 public:
 	// Methods of IApplication
-	virtual bool PreInit()
+	bool PreInit() override
 	{
 		if ( !BaseClass::PreInit() )
 			return false;
@@ -73,7 +69,7 @@ public:
 		return ( nRetVal == INIT_OK );
 	}
 
-	virtual void PostShutdown()
+	void PostShutdown() override
 	{
 		ShutdownDataModel();
 		DisconnectDataModel();

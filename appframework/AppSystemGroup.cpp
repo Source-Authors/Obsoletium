@@ -20,12 +20,6 @@
 //-----------------------------------------------------------------------------
 // constructor, destructor
 //-----------------------------------------------------------------------------
-//extern ILoggingListener *g_pDefaultLoggingListener;
-
-
-//-----------------------------------------------------------------------------
-// constructor, destructor
-//-----------------------------------------------------------------------------
 CAppSystemGroup::CAppSystemGroup( CAppSystemGroup *pAppSystemParent ) : m_SystemDict(false, 0, 16)
 {
 	m_pParentAppSystem = pAppSystemParent;
@@ -48,7 +42,7 @@ CSysModule *CAppSystemGroup::LoadModuleDLL( const char *pDLLName )
 AppModule_t CAppSystemGroup::LoadModule( const char *pDLLName )
 {
 	// Remove the extension when creating the name.
-	int nLen = Q_strlen( pDLLName ) + 1;
+	size_t nLen = strlen( pDLLName ) + 1;
 	char *pModuleName = (char*)stackalloc( nLen );
 	Q_StripExtension( pDLLName, pModuleName, nLen );
 
@@ -69,7 +63,7 @@ AppModule_t CAppSystemGroup::LoadModule( const char *pDLLName )
 		return APP_MODULE_INVALID;
 	}
 
-	int nIndex = m_Modules.AddToTail();
+	auto nIndex = m_Modules.AddToTail();
 	m_Modules[nIndex].m_pModule = pSysModule;
 	m_Modules[nIndex].m_Factory = 0;
 	m_Modules[nIndex].m_pModuleName = (char*)malloc( nLen );
@@ -96,7 +90,7 @@ AppModule_t CAppSystemGroup::LoadModule( CreateInterfaceFn factory )
 		}
 	}
 
-	int nIndex = m_Modules.AddToTail();
+	auto nIndex = m_Modules.AddToTail();
 	m_Modules[nIndex].m_pModule = NULL;
 	m_Modules[nIndex].m_Factory = factory;
 	m_Modules[nIndex].m_pModuleName = NULL; 
@@ -141,9 +135,8 @@ IAppSystem *CAppSystemGroup::AddSystem( AppModule_t module, const char *pInterfa
 		return NULL;
 	}
 
-	IAppSystem *pAppSystem = static_cast<IAppSystem*>(pSystem);
-	
-	int sysIndex = m_Systems.AddToTail( pAppSystem );
+	auto *pAppSystem = static_cast<IAppSystem*>(pSystem);
+	auto sysIndex = m_Systems.AddToTail( pAppSystem );
 
 	// Inserting into the dict will help us do named lookup later
 	MEM_ALLOC_CREDIT();
@@ -191,7 +184,7 @@ void CAppSystemGroup::AddSystem( IAppSystem *pAppSystem, const char *pInterfaceN
 	if ( !pAppSystem )
 		return;
 
-	int sysIndex = m_Systems.AddToTail( pAppSystem );
+	auto sysIndex = m_Systems.AddToTail( pAppSystem );
 
 	// Inserting into the dict will help us do named lookup later
 	MEM_ALLOC_CREDIT();
@@ -245,9 +238,9 @@ void *CAppSystemGroup::FindSystem( const char *pSystemName )
 
 	// QUESTION: What order should we iterate this in?
 	// It controls who wins if multiple ones implement the same interface
- 	for ( i = 0; i < m_Systems.Count(); ++i )
+ 	for ( auto *s : m_Systems )
 	{
-		void *pInterface = m_Systems[i]->QueryInterface( pSystemName );
+		void *pInterface = s->QueryInterface( pSystemName );
 		if (pInterface)
 			return pInterface;
 	}
@@ -278,15 +271,16 @@ CAppSystemGroup *CAppSystemGroup::GetParent()
 //-----------------------------------------------------------------------------
 bool CAppSystemGroup::ConnectSystems()
 {
-	for (int i = 0; i < m_Systems.Count(); ++i )
+	int i { 0 };
+	for ( auto *sys : m_Systems )
 	{
-		IAppSystem *sys = m_Systems[i];
-
 		if (!sys->Connect( GetFactory() ))
 		{
 			ReportStartupFailure( CONNECTION, i );
 			return false;
 		}
+
+		++i;
 	}
 	return true;
 }
@@ -306,14 +300,17 @@ void CAppSystemGroup::DisconnectSystems()
 //-----------------------------------------------------------------------------
 InitReturnVal_t CAppSystemGroup::InitSystems()
 {
-	for (int i = 0; i < m_Systems.Count(); ++i )
+	int i { 0 };
+	for ( auto *sys : m_Systems )
 	{
-		InitReturnVal_t nRetVal = m_Systems[i]->Init();
+		InitReturnVal_t nRetVal = sys->Init();
 		if ( nRetVal != INIT_OK )
 		{
 			ReportStartupFailure( INITIALIZATION, i );
 			return nRetVal;
 		}
+
+		++i;
 	}
 	return INIT_OK;
 }
@@ -464,6 +461,10 @@ void CAppSystemGroup::OnShutdown()
 	case CREATION:
 	case CONNECTION:
 		goto destroy;
+
+	default:
+		// dimhotepus: Not the errors.
+		break;
 	}
 
 	// Cal Shutdown on all App Systems
@@ -479,12 +480,6 @@ disconnect:
 destroy:
 	// Unload all DLLs loaded in the AppCreate block
 	RemoveAllSystems();
-
-	// Have to do this because the logging listeners & response policies may live in modules which are being unloaded
-	// @TODO: this seems like a bad legacy practice... app systems should unload their spew handlers gracefully.
-//	LoggingSystem_ResetCurrentLoggingState();
-//	Assert( g_pDefaultLoggingListener != NULL );
-//	LoggingSystem_RegisterLoggingListener( g_pDefaultLoggingListener );
 
 	UnloadAllModules();
 
@@ -509,7 +504,7 @@ CSteamAppSystemGroup::CSteamAppSystemGroup( IFileSystem *pFileSystem, CAppSystem
 	: CAppSystemGroup( pAppSystemParent )
 {
 	m_pFileSystem = pFileSystem;
-	m_pGameInfoPath[0] = 0;
+	m_pGameInfoPath[0] = '\0';
 }
 
 

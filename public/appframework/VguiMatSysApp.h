@@ -14,11 +14,6 @@
 #ifndef VGUIMATSYSAPP_H
 #define VGUIMATSYSAPP_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
 #include "appframework/tier3app.h"
 
 
@@ -27,16 +22,16 @@
 //-----------------------------------------------------------------------------
 class CVguiMatSysApp : public CVguiSteamApp
 {
-	typedef CVguiSteamApp BaseClass;
+	using BaseClass = CVguiSteamApp;
 
 public:
 	CVguiMatSysApp() = default;
 
 	// Methods of IApplication
-	virtual bool Create();
-	virtual bool PreInit();
-	virtual void PostShutdown();
-	virtual void Destroy();
+	bool Create() override;
+	bool PreInit() override;
+	void PostShutdown() override;
+	void Destroy() override;
 
 	// Returns the window handle (HWND in Win32)
 	void* GetAppWindow();

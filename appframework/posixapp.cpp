@@ -24,11 +24,6 @@
 //-----------------------------------------------------------------------------
 HINSTANCE s_HInstance;
 
-//#if !defined(LINUX)
-//static CSimpleLoggingListener s_SimpleLoggingListener;
-//ILoggingListener *g_pDefaultLoggingListener = &s_SimpleLoggingListener;
-//#endif
-
 //-----------------------------------------------------------------------------
 // HACK: Since I don't want to refit vgui yet...
 //-----------------------------------------------------------------------------
@@ -57,10 +52,6 @@ int AppMain( void* hInstance, void* hPrevInstance, const char* lpCmdLine, int nC
 	return -1;
 }
 
-//#if !defined(LINUX)
-//static CNonFatalLoggingResponsePolicy s_NonFatalLoggingResponsePolicy;
-//#endif
-
 //-----------------------------------------------------------------------------
 // Version of AppMain used by console applications
 //-----------------------------------------------------------------------------
@@ -68,9 +59,6 @@ int AppMain( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 {
 	Assert( pAppSystemGroup );
 
-	//#if !defined(LINUX)
-	//	LoggingSystem_SetLoggingResponsePolicy( &s_NonFatalLoggingResponsePolicy );
-	//#endif
 	s_HInstance = NULL;
 	CommandLine()->CreateCmdLine( argc, argv );
 

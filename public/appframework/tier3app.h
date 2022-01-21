@@ -14,10 +14,6 @@
 #ifndef TIER3APP_H
 #define TIER3APP_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 
 #include "appframework/tier2app.h"
 #include "tier3/tier3.h"
@@ -29,11 +25,11 @@
 //-----------------------------------------------------------------------------
 class CTier3SteamApp : public CTier2SteamApp
 {
-	typedef CTier2SteamApp BaseClass;
+	using BaseClass = CTier2SteamApp;
 
 public:
 	// Methods of IApplication
-	virtual bool PreInit()
+	bool PreInit() override
 	{
 		if ( !BaseClass::PreInit() )
 			return false;
@@ -43,7 +39,7 @@ public:
 		return true;			
 	}
 
-	virtual void PostShutdown()
+	void PostShutdown() override
 	{
 		DisconnectTier3Libraries();
 		BaseClass::PostShutdown();
@@ -56,11 +52,11 @@ public:
 //-----------------------------------------------------------------------------
 class CTier3DmSteamApp : public CTier2DmSteamApp
 {
-	typedef CTier2DmSteamApp BaseClass;
+	using BaseClass = CTier2DmSteamApp;
 
 public:
 	// Methods of IApplication
-	virtual bool PreInit()
+	bool PreInit() override
 	{
 		if ( !BaseClass::PreInit() )
 			return false;
@@ -70,7 +66,7 @@ public:
 		return true;			
 	}
 
-	virtual void PostShutdown()
+	void PostShutdown() override
 	{
 		DisconnectTier3Libraries();
 		BaseClass::PostShutdown();
@@ -83,11 +79,11 @@ public:
 //-----------------------------------------------------------------------------
 class CVguiSteamApp : public CTier3SteamApp
 {
-	typedef CTier3SteamApp BaseClass;
+	using BaseClass = CTier3SteamApp;
 
 public:
 	// Methods of IApplication
-	virtual bool PreInit()
+	bool PreInit() override
 	{
 		if ( !BaseClass::PreInit() )
 			return false;
@@ -103,11 +99,11 @@ public:
 //-----------------------------------------------------------------------------
 class CVguiDmSteamApp : public CTier3DmSteamApp
 {
-	typedef CTier3DmSteamApp BaseClass;
+	using BaseClass = CTier3DmSteamApp;
 
 public:
 	// Methods of IApplication
-	virtual bool PreInit()
+	bool PreInit() override
 	{
 		if ( !BaseClass::PreInit() )
 			return false;

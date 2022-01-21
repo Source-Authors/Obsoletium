@@ -30,10 +30,6 @@
 //-----------------------------------------------------------------------------
 HINSTANCE s_HInstance;
 
-//static CSimpleWindowsLoggingListener s_SimpleWindowsLoggingListener;
-//static CSimpleLoggingListener s_SimpleLoggingListener;
-//ILoggingListener *g_pDefaultLoggingListener = &s_SimpleLoggingListener;
-
 //-----------------------------------------------------------------------------
 // HACK: Since I don't want to refit vgui yet...
 //-----------------------------------------------------------------------------
@@ -58,7 +54,6 @@ int AppMain( void* hInstance, void*, const char*, int, CAppSystemGroup *pAppSyst
 {
 	Assert( pAppSystemGroup );
 
-//	g_pDefaultLoggingListener = &s_SimpleWindowsLoggingListener;
 	s_HInstance = (HINSTANCE)hInstance;
 	CommandLine()->CreateCmdLine( ::GetCommandLine() );
 
@@ -72,7 +67,6 @@ int AppMain( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 {
 	Assert( pAppSystemGroup );
 
-//	g_pDefaultLoggingListener = &s_SimpleLoggingListener;
 	s_HInstance = NULL;
 	CommandLine()->CreateCmdLine( argc, argv );
 
@@ -86,7 +80,6 @@ int AppStartup( void* hInstance, void*, const char*, int, CAppSystemGroup *pAppS
 {
 	Assert( pAppSystemGroup );
 
-//	g_pDefaultLoggingListener = &s_SimpleWindowsLoggingListener;
 	s_HInstance = (HINSTANCE)hInstance;
 	CommandLine()->CreateCmdLine( ::GetCommandLine() );
 
@@ -97,7 +90,6 @@ int AppStartup( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 {
 	Assert( pAppSystemGroup );
 
-//	g_pDefaultLoggingListener = &s_SimpleLoggingListener;
 	s_HInstance = NULL;
 	CommandLine()->CreateCmdLine( argc, argv );
 

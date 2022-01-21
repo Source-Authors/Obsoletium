@@ -6,10 +6,6 @@
 #ifndef ILAUNCHERMGR_H
 #define ILAUNCHERMGR_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #if defined( USE_SDL )
 
 #include "tier0/threadtools.h"
@@ -29,7 +25,7 @@ class CShowPixelsParams;
 class CCocoaEvent;
 class CStackCrawlParams;
 
-typedef struct SDL_Cursor SDL_Cursor;
+using SDL_Cursor = struct SDL_Cursor;
 
 class ILauncherMgr : public IAppSystem
 {

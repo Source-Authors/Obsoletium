@@ -79,17 +79,15 @@ void CVguiMatSysApp::Destroy()
 //-----------------------------------------------------------------------------
 void*CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w, int h )
 {
-	WNDCLASSEX		wc;
-	memset( &wc, 0, sizeof( wc ) );
-	wc.cbSize		 = sizeof( wc );
-    wc.style         = CS_OWNDC | CS_DBLCLKS;
-    wc.lpfnWndProc   = DefWindowProc;
-    wc.hInstance     = (HINSTANCE)GetAppInstance();
-    wc.lpszClassName = "Valve001";
-	wc.hIcon		 = NULL; //LoadIcon( s_HInstance, MAKEINTRESOURCE( IDI_LAUNCHER ) );
-	wc.hIconSm		 = wc.hIcon;
+	WNDCLASSEX		wc = {sizeof( wc )};
+	wc.style         = CS_OWNDC | CS_DBLCLKS;
+	wc.lpfnWndProc   = DefWindowProc;
+	wc.hInstance     = (HINSTANCE)GetAppInstance();
+	wc.lpszClassName = "Valve001";
+	wc.hIcon				 = NULL;
+	wc.hIconSm			 = wc.hIcon;
 
-    RegisterClassEx( &wc );
+	RegisterClassEx( &wc );
 
 	// Note, it's hidden
 	DWORD style = WS_POPUP | WS_CLIPSIBLINGS;
@@ -114,23 +112,21 @@ void*CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w,
 	AdjustWindowRectEx(&windowRect, style, FALSE, 0);
 
 	// Create the window
-	void *hWnd = CreateWindow( wc.lpszClassName, pTitle, style, 0, 0, 
+	HWND hWnd = CreateWindow( wc.lpszClassName, pTitle, style, 0, 0, 
 		windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, 
 		NULL, NULL, (HINSTANCE)GetAppInstance(), NULL );
 
 	if (!hWnd)
 		return NULL;
 
-    int CenterX, CenterY;
-
-	CenterX = (GetSystemMetrics(SM_CXSCREEN) - w) / 2;
-	CenterY = (GetSystemMetrics(SM_CYSCREEN) - h) / 2;
+	int CenterX = (GetSystemMetrics(SM_CXSCREEN) - w) / 2;
+	int CenterY = (GetSystemMetrics(SM_CYSCREEN) - h) / 2;
 	CenterX = (CenterX < 0) ? 0: CenterX;
 	CenterY = (CenterY < 0) ? 0: CenterY;
 
 	// In VCR modes, keep it in the upper left so mouse coordinates are always relative to the window.
 	SetWindowPos( (HWND)hWnd, NULL, CenterX, CenterY, 0, 0,
-				  SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_DRAWFRAME);
+		SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_DRAWFRAME);
 
 	return hWnd;
 }

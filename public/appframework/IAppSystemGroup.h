@@ -15,10 +15,6 @@
 #ifndef IAPPSYSTEMGROUP_H
 #define IAPPSYSTEMGROUP_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 
 #include "tier1/interface.h"
 #include "tier1/utlvector.h"
@@ -36,7 +32,7 @@ class IFileSystem;
 //-----------------------------------------------------------------------------
 // Handle to a DLL
 //-----------------------------------------------------------------------------
-typedef int AppModule_t;
+using AppModule_t = int;
 
 enum
 {
@@ -214,14 +210,14 @@ private:
 //-----------------------------------------------------------------------------
 // Helper empty decorator implementation of an IAppSystemGroup
 //-----------------------------------------------------------------------------
-template< class CBaseClass > 
+template< typename CBaseClass > 
 class CDefaultAppSystemGroup : public CBaseClass
 {
 public:
-	virtual bool Create( ) { return true; }
-	virtual bool PreInit() { return true; }
-	virtual void PostShutdown() {}
-	virtual void Destroy() {}
+	bool Create( ) override { return true; }
+	bool PreInit() override { return true; }
+	void PostShutdown() override {}
+	void Destroy() override {}
 };
 
 
@@ -246,7 +242,7 @@ class CFSSteamSetupInfo;	// Forward declaration
 //		was successfully copied into the provided buffer.
 //		Returns "false" otherwise, interpreted that no suggestion will be used.
 //
-typedef bool ( * SuggestGameInfoDirFn_t ) ( CFSSteamSetupInfo const *pFsSteamSetupInfo, char *pchPathBuffer, int nBufferLength, bool *pbBubbleDirectories );
+using SuggestGameInfoDirFn_t = bool (*) ( CFSSteamSetupInfo const *pFsSteamSetupInfo, char *pchPathBuffer, int nBufferLength, bool *pbBubbleDirectories );
 
 //
 // SetSuggestGameInfoDirFn
