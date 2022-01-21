@@ -29,23 +29,29 @@
 //-----------------------------------------------------------------------------
 CWin32Font::CWin32Font() : m_ExtendedABCWidthsCache(256, 0, &ExtendedABCWidthsCacheLessFunc)
 {
-	m_szName = UTL_INVAL_SYMBOL;
-	m_iTall = 0;
-	m_iWeight = 0;
-	m_iHeight = 0;
-	m_iAscent = 0;
-	m_iFlags = 0;
-	m_iMaxCharWidth = 0;
 	m_hFont = NULL;
 	m_hDC = NULL;
 	m_hDIB = NULL;
-	m_bAntiAliased = false;
-	m_bUnderlined = false;
-	m_iBlur = 0;
+	m_pBuf = NULL;
+
+	m_szName = UTL_INVAL_SYMBOL;
+
+	m_iTall = 0;
+	m_iWeight = 0;
+	m_iFlags = 0;
 	m_iScanLines = 0;
+	m_iBlur = 0;
+	m_rgiBitmapSize[ 0 ] = m_rgiBitmapSize[ 1 ] = 0;
+	m_bUnderlined = false;	
+
+	m_iHeight = 0;
+	m_iMaxCharWidth = 0;
+	m_iAscent = 0;
+	m_iDropShadowOffset = 0;
+	m_iOutlineSize = 0;
+	m_bAntiAliased = false;
 	m_bRotary = false;
 	m_bAdditive = false;
-	m_rgiBitmapSize[ 0 ] = m_rgiBitmapSize[ 1 ] = 0;
 
 #if defined( _X360 )
 	Q_memset( m_ABCWidthsCache, 0, sizeof( m_ABCWidthsCache ) );
