@@ -86,7 +86,7 @@ private:
 	{
 		DmObjectId_t m_oldId;
 		DmObjectId_t m_newId;
-		DmIdPair_t() {}
+		DmIdPair_t() = default;
 		DmIdPair_t( const DmObjectId_t &id )
 		{
 			CopyUniqueId( id, &m_oldId );
@@ -114,7 +114,7 @@ private:
 
 	struct DeletionInfo_t
 	{
-		DeletionInfo_t() {}
+		DeletionInfo_t() = default;
 		DeletionInfo_t( DmElementHandle_t hElement ) : m_hElementToDelete( hElement ) {}
 		bool operator==( const DeletionInfo_t& src ) const { return m_hElementToDelete == src.m_hElementToDelete; }
 

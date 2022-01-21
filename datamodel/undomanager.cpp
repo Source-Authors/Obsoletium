@@ -24,6 +24,7 @@ CUndoManager::CUndoManager( ) :
 	m_nItemsAddedSinceStartOfStream( 0 ),
 	m_nNotifySource( 0 ),
 	m_nNotifyFlags( 0 ),
+	m_pNotifyReason( 0 ),
 	m_nChainingID( 0 ),
 	m_PreviousChainingID( 0 )
 {

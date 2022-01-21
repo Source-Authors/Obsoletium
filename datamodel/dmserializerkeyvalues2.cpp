@@ -302,10 +302,7 @@ void CDmSerializerKeyValues2::SerializeElementAttribute( CUtlBuffer& buf, CDmEle
 	if ( dict.ShouldInlineElement( pElement ) )
 	{
 		buf.Printf( "\"%s\"\n{\n", pElement->GetTypeString() );
-		if ( pElement )
-		{
-			SaveElement( buf, dict, pElement, false );
-		}
+		SaveElement( buf, dict, pElement, false );
 		buf.Printf( "}\n" );
 	}
 	else
@@ -337,10 +334,7 @@ void CDmSerializerKeyValues2::SerializeElementArrayAttribute( CUtlBuffer& buf, C
 		if ( dict.ShouldInlineElement( pElement ) )
 		{
 			buf.Printf( "\"%s\"\n{\n", pElement->GetTypeString() );
-			if ( pElement )
-			{
-				SaveElement( buf, dict, pElement, false );
-			}
+			SaveElement( buf, dict, pElement, false );
 			buf.PutChar( '}' );
 		}
 		else

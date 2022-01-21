@@ -532,12 +532,12 @@ class CUndoAttributeRenameElement : public CUndoElement
 
 public:
 	CUndoAttributeRenameElement( CDmAttribute *pAttribute, const char *newName )
-		: BaseClass( "CUndoAttributeRenameElement" )
+		: BaseClass( "CUndoAttributeRenameElement" ),
+		m_symAttributeOld( pAttribute->GetName() ),
+		m_symAttributeNew( newName )
 	{
 		Assert( pAttribute->GetOwner() && pAttribute->GetOwner()->GetFileId() != DMFILEID_INVALID );
 		m_hOwner = pAttribute->GetOwner()->GetHandle();
-		m_symAttributeOld = pAttribute->GetName();
-		m_symAttributeNew = newName;
 	}
 
 	virtual void Undo()
