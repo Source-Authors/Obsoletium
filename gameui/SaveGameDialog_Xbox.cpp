@@ -122,7 +122,6 @@ CAsyncCtxSaveGame::CAsyncCtxSaveGame( CSaveGameDialogXbox *pDlg ) :
 	CBasePanel::CAsyncJobContext( 3.0f ),	// Storage device info for at least 3 seconds
 	m_pSaveGameDlg( pDlg )
 {
-	NULL;
 }
 
 void CAsyncCtxSaveGame::ExecuteAsync()

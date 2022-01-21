@@ -2116,7 +2116,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 	else if ( Q_stristr( command, "engine " ) )
 	{
 		const char *engineCMD = strstr( command, "engine " ) + strlen( "engine " );
-		if ( strlen( engineCMD ) > 0 )
+		if ( engineCMD && engineCMD[0] )
 		{
 			engine->ClientCmd_Unrestricted( const_cast<char *>( engineCMD ) );
 		}
@@ -4449,6 +4449,8 @@ void CMessageDialogHandler::ShowMessageDialog( int nType, vgui::Panel *pOwner )
 							 "AcceptVocalsLanguageChange", 
 							 "CancelVocalsLanguageChange",
 							 pOwner );
+		// dimhotepus: Add missed break.
+		break;
 
 	case MD_SAVE_BEFORE_NEW_GAME:
 		CreateMessageDialog( MD_OKCANCEL|MD_WARNING|iSimpleFrame|MD_COMMANDAFTERCLOSE|MD_RESTRICTPAINT, 

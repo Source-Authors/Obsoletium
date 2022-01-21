@@ -291,7 +291,7 @@ void CLoadingDialog::DisplayGenericError(const char *failureReason, const char *
 	
 	SetupControlSettingsForErrorDisplay("Resource/LoadingDialogError.res");
 
-	if ( extendedReason && strlen( extendedReason ) > 0 ) 
+	if ( extendedReason && extendedReason[0] ) 
 	{
 		wchar_t compositeReason[256], finalMsg[512], formatStr[256];
 		if ( extendedReason[0] == '#' )

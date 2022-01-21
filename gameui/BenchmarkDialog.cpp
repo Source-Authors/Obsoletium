@@ -74,7 +74,7 @@ public:
 	{
 		BaseClass::Activate();
 
-		KeyValues *kv = new KeyValues( "Benchmark" );
+		KeyValues::AutoDelete kv = KeyValues::AutoDelete( "Benchmark" );
 		if ( kv->LoadFromFile( g_pFullFileSystem, "results/results.txt", "MOD" ) )
 		{
 			// get the framerate
@@ -86,7 +86,6 @@ public:
 		{
 			Close();
 		}
-		kv->deleteThis();
 	}
 
 	void OnKeyCodePressed( KeyCode code )

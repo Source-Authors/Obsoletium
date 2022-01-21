@@ -579,7 +579,7 @@ void COptionsSubKeyboard::FillInDefaultBindings( void )
 	{
 		char cmd[64];
 		data = UTIL_Parse( data, cmd, sizeof(cmd) );
-		if ( strlen( cmd ) <= 0 )
+		if ( !cmd[0] )
 			break;
 
 		if ( !stricmp(cmd, "bind") )
@@ -587,12 +587,12 @@ void COptionsSubKeyboard::FillInDefaultBindings( void )
 			// Key name
 			char szKeyName[256];
 			data = UTIL_Parse( data, szKeyName, sizeof(szKeyName) );
-			if ( strlen( szKeyName ) <= 0 )
+			if ( !szKeyName[0] )
 				break; // Error
 
 			char szBinding[256];
 			data = UTIL_Parse( data, szBinding, sizeof(szBinding) );
-			if ( strlen( szKeyName ) <= 0 )  
+			if ( !szKeyName[0] )  
 				break; // Error
 
 			// Find item

@@ -625,7 +625,6 @@ bool CGameUI::FindPlatformDirectory(char *platformDir, int bufferSize)
 {
 	platformDir[0] = '\0';
 
-	if ( platformDir[0] == '\0' )
 	{
 		// we're not under steam, so setup using path relative to game
 		if ( IsPC() )

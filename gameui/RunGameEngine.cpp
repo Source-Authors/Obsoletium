@@ -56,7 +56,7 @@ public:
 	// returns true if the player is currently connected to a game server
 	virtual bool IsInGame()
 	{
-		return engine->GetLevelName() && strlen(engine->GetLevelName()) > 0;
+		return engine->GetLevelName() && engine->GetLevelName()[0];
 	}
 
 	// gets information about the server the engine is currently connected to

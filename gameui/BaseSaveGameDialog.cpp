@@ -216,7 +216,7 @@ void CBaseSaveGameDialog::ScanSavedGames()
 	const char *pFileName = g_pFullFileSystem->FindFirst( szDirectory, &handle );
 	while (pFileName)
 	{
-		if ( !Q_strnicmp(pFileName, "HLSave", strlen( "HLSave" ) ) )
+		if ( !Q_strnicmp(pFileName, "HLSave", std::size( "HLSave" ) - 1 ) )
 		{
 			pFileName = g_pFullFileSystem->FindNext( handle );
 			continue;
@@ -367,10 +367,10 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 	long fileTime = g_pFullFileSystem->GetFileTime(pszFileName);
 	char szFileTime[32];
 	g_pFullFileSystem->FileTimeToString(szFileTime, sizeof(szFileTime), fileTime);
-	char *newline = strstr(szFileTime, "\n");
+	char *newline = strchr(szFileTime, '\n');
 	if (newline)
 	{
-		*newline = 0;
+		*newline = '\0';
 	}
 	Q_strncpy( save.szFileTime, szFileTime, sizeof(save.szFileTime) );
 	save.iTimestamp = fileTime;
@@ -628,10 +628,7 @@ int SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) char *name, int 
 	delete[] pTokenList;
 	delete[] pSaveData;
 	
-	if (strlen(name) > 0 && strlen(comment) > 0)
-		return 1;
-	
-	return 0;
+	return name[0] && comment[0] ? 1 : 0;
 }
 
 //-----------------------------------------------------------------------------

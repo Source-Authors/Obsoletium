@@ -164,10 +164,10 @@ public:
 		// the image has the same name as the config file
 		char szMaterial[ MAX_PATH ];
 		Q_snprintf( szMaterial, sizeof(szMaterial), "chapters/%s", chapterConfigFile );
-		char *ext = strstr( szMaterial, "." );
+		char *ext = strchr( szMaterial, '.' );
 		if ( ext )
 		{
-			*ext = 0;
+			*ext = '\0';
 		}
 		m_pLevelPic->SetImage( szMaterial );
 

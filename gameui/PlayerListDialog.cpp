@@ -227,7 +227,7 @@ void CPlayerListDialog::OnItemSelected()
 			isValidPlayer = false;
 		}
 
-		if (data && isValidPlayer && GameClientExports() && GameClientExports()->IsPlayerGameVoiceMuted(data->GetInt("index")))
+		if (isValidPlayer && GameClientExports() && GameClientExports()->IsPlayerGameVoiceMuted(iPlayerIndex))
 		{
 			m_pMuteButton->SetText("#GameUI_UnmuteIngameVoice");
 		}

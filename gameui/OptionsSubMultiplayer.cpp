@@ -815,10 +815,7 @@ void CrosshairImagePanelAdvanced::SetCrosshairTexture( const char *crosshairname
 
 	vgui::surface()->DrawSetTextureFile( m_iCrosshairTextureID, crosshairname, true, false );
 
-	if ( m_pAdvCrosshairMaterial )
-	{
-		delete m_pAdvCrosshairMaterial;
-	}
+	delete m_pAdvCrosshairMaterial;
 
 	m_pAdvCrosshairMaterial = vgui::surface()->DrawGetTextureMatInfoFactory( m_iCrosshairTextureID );
 

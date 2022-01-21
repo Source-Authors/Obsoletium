@@ -82,23 +82,12 @@ CGameSavePanel::CGameSavePanel( CSaveGameBrowserDialog *parent, SaveGameDescript
 //-----------------------------------------------------------------------------
 CGameSavePanel::~CGameSavePanel( void )
 {
-	if ( m_pLevelPicBorder ) 
-		delete m_pLevelPicBorder;
-
-	if ( m_pLevelPic )
-		delete m_pLevelPic;
-
-	if ( m_pChapterTitle )
-		delete m_pChapterTitle;
-
-	if ( m_pTime )
-		delete m_pTime;
-
-	if ( m_pElapsedTime )
-		delete m_pElapsedTime;
-
-	if ( m_pType )
-		delete m_pType;
+	delete m_pLevelPicBorder;
+	delete m_pLevelPic;
+	delete m_pChapterTitle;
+	delete m_pTime;
+	delete m_pElapsedTime;
+	delete m_pType;
 }
 
 //-----------------------------------------------------------------------------
@@ -1276,10 +1265,10 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 	long fileTime = g_pFullFileSystem->GetFileTime(pszFileName);
 	char szFileTime[32];
 	g_pFullFileSystem->FileTimeToString(szFileTime, sizeof(szFileTime), fileTime);
-	char *newline = strstr(szFileTime, "\n");
+	char *newline = strchr(szFileTime, '\n');
 	if (newline)
 	{
-		*newline = 0;
+		*newline = '\0';
 	}
 	Q_strncpy( save->szFileTime, szFileTime, sizeof(save->szFileTime) );
 	save->iTimestamp = fileTime;
@@ -1339,7 +1328,7 @@ void CSaveGameBrowserDialog::ScanSavedGames( bool bIgnoreAutosave )
 	const char *pFileName = g_pFullFileSystem->FindFirst( szDirectory, &handle );
 	while (pFileName)
 	{
-		if ( !Q_strnicmp(pFileName, "HLSave", strlen( "HLSave" ) ) )
+		if ( !Q_strnicmp(pFileName, "HLSave", std::size( "HLSave" ) - 1 ) )
 		{
 			pFileName = g_pFullFileSystem->FindNext( handle );
 			continue;

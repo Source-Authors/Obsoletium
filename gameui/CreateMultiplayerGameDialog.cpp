@@ -176,12 +176,13 @@ void CCreateMultiplayerGameDialog::OnKeyCodePressed( vgui::KeyCode code )
 			  nButtonCode == STEAMCONTROLLER_DPAD_DOWN ||
 			  nButtonCode == KEY_DOWN )
 	{
-		int nItem = m_pServerPage->GetMapList()->GetActiveItem() + 1;
-		if ( nItem >= m_pServerPage->GetMapList()->GetItemCount() )
+		vgui::ComboBox *cb = m_pServerPage->GetMapList();
+		int nItem = cb->GetActiveItem() + 1;
+		if ( nItem >= cb->GetItemCount() )
 		{
 			nItem = 0;
 		}
-		m_pServerPage->GetMapList()->ActivateItem( nItem );
+		cb->ActivateItem( nItem );
 	}
 	else
 	{
