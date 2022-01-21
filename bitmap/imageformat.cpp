@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#if defined( _WIN32 ) && !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
+#if defined( _WIN32 ) && !defined( DX_TO_GL_ABSTRACTION )
 #include "winlite.h"
 #include <d3d9types.h>
 #endif
@@ -74,25 +74,6 @@ static const ImageFormatInfo_t g_ImageFormatInfo[] =
 	// Vendor-dependent compressed formats typically used for normal map compression
 	{ "ATI1N",						0, 0, 0, 0, 0, true },			// IMAGE_FORMAT_ATI1N
 	{ "ATI2N",						0, 0, 0, 0, 0, true },			// IMAGE_FORMAT_ATI2N
-
-#ifdef _X360
-	{ "X360_DST16",					2, 16, 0, 0, 0, false },		// IMAGE_FORMAT_X360_DST16
-	{ "X360_DST24",					4, 24, 0, 0, 0, false },		// IMAGE_FORMAT_X360_DST24
-	{ "X360_DST24F",				4, 24, 0, 0, 0, false },		// IMAGE_FORMAT_X360_DST24F
-	{ "LINEAR_BGRX8888",			4, 8, 8, 8, 8, false },			// IMAGE_FORMAT_LINEAR_BGRX8888
-	{ "LINEAR_RGBA8888",			4, 8, 8, 8, 8, false },			// IMAGE_FORMAT_LINEAR_RGBA8888
-	{ "LINEAR_ABGR8888",			4, 8, 8, 8, 8, false },			// IMAGE_FORMAT_LINEAR_ABGR8888
-	{ "LINEAR_ARGB8888",			4, 8, 8, 8, 8, false },			// IMAGE_FORMAT_LINEAR_ARGB8888
-	{ "LINEAR_BGRA8888",			4, 8, 8, 8, 8, false },			// IMAGE_FORMAT_LINEAR_BGRA8888
-	{ "LINEAR_RGB888",				3, 8, 8, 8, 0, false },			// IMAGE_FORMAT_LINEAR_RGB888
-	{ "LINEAR_BGR888",				3, 8, 8, 8, 0, false },			// IMAGE_FORMAT_LINEAR_BGR888
-	{ "LINEAR_BGRX5551",			2, 5, 5, 5, 0, false },			// IMAGE_FORMAT_LINEAR_BGRX5551
-	{ "LINEAR_I8",					1, 0, 0, 0, 0, false },			// IMAGE_FORMAT_LINEAR_I8
-	{ "LINEAR_RGBA16161616",		8, 16, 16, 16, 16, false },		// IMAGE_FORMAT_LINEAR_RGBA16161616
-
-	{ "LE_BGRX8888",				4, 8, 8, 8, 8, false },			// IMAGE_FORMAT_LE_BGRX8888
-	{ "LE_BGRA8888",				4, 8, 8, 8, 8, false },			// IMAGE_FORMAT_LE_BGRA8888
-#endif
 
 	{ "DXT1_RUNTIME",				0, 0, 0, 0, 0, true, },			// IMAGE_FORMAT_DXT1_RUNTIME
 	{ "DXT5_RUNTIME",				0, 0, 0, 0, 8, true, },			// IMAGE_FORMAT_DXT5_RUNTIME
@@ -301,20 +282,10 @@ int GetNumMipMapLevels( int width, int height, int depth )
 //-----------------------------------------------------------------------------
 ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 {
-#if defined( _X360 )
-	if ( IS_D3DFORMAT_SRGB( format ) )
-	{
-		// sanitize the format from possible sRGB state for comparison purposes
-		format = MAKE_NON_SRGB_FMT( format );
-	}
-#endif
-
 	switch ( format )
 	{
-#if !defined( _X360 )
 	case D3DFMT_R8G8B8:
 		return IMAGE_FORMAT_BGR888;
-#endif
 	case D3DFMT_A8R8G8B8:
 		return IMAGE_FORMAT_BGRA8888;
 	case D3DFMT_X8R8G8B8:
@@ -366,17 +337,9 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 		return IMAGE_FORMAT_NV_NULL;
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
 	case D3DFMT_D16:
-#if !defined( _X360 )
 		return IMAGE_FORMAT_NV_DST16;
-#else
-		return IMAGE_FORMAT_X360_DST16;
-#endif
 	case D3DFMT_D24S8:
-#if !defined( _X360 )
 		return IMAGE_FORMAT_NV_DST24;
-#else
-		return IMAGE_FORMAT_X360_DST24;
-#endif
 	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
 	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
 	MSVC_DISABLE_WARNING(4063)
@@ -391,28 +354,6 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 	case (D3DFORMAT)(MAKEFOURCC('A','T','I','2')):
 		return IMAGE_FORMAT_ATI2N;
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
-
-#if defined( _X360 )
-	case D3DFMT_LIN_A8R8G8B8:
-		return IMAGE_FORMAT_LINEAR_BGRA8888;
-	case D3DFMT_LIN_X8R8G8B8:
-		return IMAGE_FORMAT_LINEAR_BGRX8888;
-	case D3DFMT_LIN_X1R5G5B5:
-		return IMAGE_FORMAT_LINEAR_BGRX5551;
-	case D3DFMT_LIN_L8:
-		return IMAGE_FORMAT_LINEAR_I8;
-	case D3DFMT_LIN_A16B16G16R16:
-		return IMAGE_FORMAT_LINEAR_RGBA16161616;
-
-	case D3DFMT_LE_X8R8G8B8:
-		return IMAGE_FORMAT_LE_BGRX8888;
-
-	case D3DFMT_LE_A8R8G8B8:
-		return IMAGE_FORMAT_LE_BGRA8888;
-
-	case D3DFMT_D24FS8:
-		return IMAGE_FORMAT_X360_DST24F;
-#endif
 	}
 
 	Assert( 0 );
@@ -426,11 +367,7 @@ D3DFORMAT ImageFormatToD3DFormat( ImageFormat format )
 	switch ( format )
 	{
 	case IMAGE_FORMAT_BGR888:
-#if !defined( _X360 )
 		return D3DFMT_R8G8B8;
-#else
-		return D3DFMT_UNKNOWN;
-#endif
 	case IMAGE_FORMAT_BGRA8888:
 		return D3DFMT_A8R8G8B8;
 	case IMAGE_FORMAT_BGRX8888:
@@ -492,29 +429,6 @@ D3DFORMAT ImageFormatToD3DFormat( ImageFormat format )
 		return (D3DFORMAT)(MAKEFOURCC('A','T','I','1'));
 	case IMAGE_FORMAT_ATI2N:
 		return (D3DFORMAT)(MAKEFOURCC('A','T','I','2'));
-
-#if defined( _X360 )
-	case IMAGE_FORMAT_LINEAR_BGRA8888:
-		return D3DFMT_LIN_A8R8G8B8;
-	case IMAGE_FORMAT_LINEAR_BGRX8888:
-		return D3DFMT_LIN_X8R8G8B8;
-	case IMAGE_FORMAT_LINEAR_BGRX5551:
-		return D3DFMT_LIN_X1R5G5B5;
-	case IMAGE_FORMAT_LINEAR_I8:
-		return D3DFMT_LIN_L8;
-	case IMAGE_FORMAT_LINEAR_RGBA16161616:
-		return D3DFMT_LIN_A16B16G16R16;
-	case IMAGE_FORMAT_LE_BGRX8888:
-		return D3DFMT_LE_X8R8G8B8;
-	case IMAGE_FORMAT_LE_BGRA8888:
-		return D3DFMT_LE_A8R8G8B8;
-	case IMAGE_FORMAT_X360_DST16:
-		return D3DFMT_D16;
-	case IMAGE_FORMAT_X360_DST24:
-		return D3DFMT_D24S8;
-	case IMAGE_FORMAT_X360_DST24F:
-		return D3DFMT_D24FS8;
-#endif
 
 	case IMAGE_FORMAT_DXT1_RUNTIME:
 		return D3DFMT_DXT1;

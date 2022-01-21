@@ -14,7 +14,7 @@
 
 #define NO_X360_XDK
 
-#if defined( _WIN32 ) && !defined( _X360 ) && !defined( NO_X360_XDK ) && !defined( DX_TO_GL_ABSTRACTION )
+#if defined( _WIN32 ) && !defined( NO_X360_XDK ) && !defined( DX_TO_GL_ABSTRACTION )
 // the x86 version of the 360 (used by win32 tools)
 // It would have been nice to use the 360 D3DFORMAT bit encodings, but the codes
 // are different for WIN32, and this routine is used by a WIN32 library to
