@@ -1381,7 +1381,8 @@ void MakeElementNameUnique( CDmElement *pElement, const char *prefix, const CUtl
 	else
 	{
 		char *name = new char[ newlen + 1 ];
-		Q_snprintf( name, sizeof( name ), "%s%d", prefix, i );
+		// dimhotepus: Fix name buffer size.
+		Q_snprintf( name, newlen + 1, "%s%d", prefix, i );
 		pElement->SetName( name );
 		delete[] name;
 	}
