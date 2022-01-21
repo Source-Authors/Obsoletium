@@ -231,7 +231,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CFileSystem_Stdio, IBaseFileSystem, BASEFILES
 #ifndef _RETAIL
 bool UseOptimalBufferAllocation()
 {
-	static bool bUseOptimalBufferAllocation = ( IsX360() || ( !IsLinux() && Q_stristr( Plat_GetCommandLine(), "-unbuffered_io" ) != NULL ) );
+	static bool bUseOptimalBufferAllocation = ( !IsLinux() && Q_stristr( Plat_GetCommandLine(), "-unbuffered_io" ) != NULL );
 	return bUseOptimalBufferAllocation;
 }
 ConVar filesystem_unbuffered_io( "filesystem_unbuffered_io", "1", 0, "" );

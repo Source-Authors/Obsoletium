@@ -12,26 +12,26 @@
 
 #if defined( _WIN32 )
 #include "winlite.h"
+
 #include <direct.h>
 #include <io.h>
 #include <process.h>
 #elif defined( POSIX )
 #include <unistd.h>
+#include <sys/stat.h>
 #define _chdir chdir
 #define _access access
 #endif
-#include <stdio.h>
-#include <sys/stat.h>
 #include "tier1/strtools.h"
 #include "tier1/utlbuffer.h"
+#include "tier1/KeyValues.h"
+#include "tier1/smartptr.h"
 #include "filesystem_init.h"
 #include "tier0/icommandline.h"
-#include "KeyValues.h"
 #include "appframework/IAppSystemGroup.h"
-#include "tier1/smartptr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 #define GAMEINFO_FILENAME			"gameinfo.txt"
 #define GAMEINFO_FILENAME_ALTERNATE	"gameinfo.txt"

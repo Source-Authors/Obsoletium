@@ -622,41 +622,6 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	bool bCentralDirRecord = false;
 	int64 offset = fileLen - sizeof( ZIP_EndOfCentralDirRecord );
 
-	// 360 can have an incompatible format
-	bool bCompatibleFormat = true;
-	if ( IsX360() )
-	{
-		// 360 has dependable exact zips, backup to handle possible xzip format
-		if ( offset - XZIP_COMMENT_LENGTH >= 0 )
-		{
-			offset -= XZIP_COMMENT_LENGTH;
-		}
-
-		// single i/o operation, scanning forward
-		char *pTemp = (char *)_alloca( fileLen - offset );
-		ReadFromPack( -1, pTemp, -1, fileLen - offset, offset );
-		while ( offset <= (int64)(fileLen - sizeof( ZIP_EndOfCentralDirRecord )) )
-		{
-			memcpy( &rec, pTemp, sizeof( ZIP_EndOfCentralDirRecord ) );
-			m_swap.SwapFieldsToTargetEndian( &rec );
-			if ( rec.signature == PKID( 5, 6 ) )
-			{
-				bCentralDirRecord = true;
-				if ( rec.commentLength >= 4 )
-				{
-					char *pComment = pTemp + sizeof( ZIP_EndOfCentralDirRecord );
-					if ( !V_strnicmp( pComment, "XZP2", 4 ) )
-					{
-						bCompatibleFormat = false;
-					}
-				}
-				break;
-			}
-			offset++;
-			pTemp++;
-		}
-	}
-	else
 	{
 		// scan entire file from expected location for central dir
 		for ( ; offset >= 0; offset-- )
@@ -711,7 +676,7 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 		SetupPreloadData();
 
 		// Set up to extract the remaining files
-		int nextOffset = bCompatibleFormat ? zipFileHeader.extraFieldLength + zipFileHeader.fileCommentLength : 0;
+		int nextOffset = zipFileHeader.extraFieldLength + zipFileHeader.fileCommentLength;
 		zipDirBuff.SeekGet( CUtlBuffer::SEEK_CURRENT, nextOffset );
 		firstFileIdx = 1;
 	}
@@ -784,7 +749,7 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 		}
 		m_PackFiles.InsertNoSort( lookup );
 
-		int nextOffset = bCompatibleFormat ? zipFileHeader.extraFieldLength + zipFileHeader.fileCommentLength : 0;
+		int nextOffset = zipFileHeader.extraFieldLength + zipFileHeader.fileCommentLength;
 		zipDirBuff.SeekGet( CUtlBuffer::SEEK_CURRENT, nextOffset );
 	}
 
