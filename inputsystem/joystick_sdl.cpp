@@ -169,9 +169,9 @@ void CInputSystem::InitializeJoysticks( void )
 	// assume no joystick
 	m_nJoystickCount = 0;
 	memset( m_pJoystickInfo, 0, sizeof( m_pJoystickInfo ) );
-	for ( int i = 0; i < MAX_JOYSTICKS; ++i )
+	for ( auto &joy : m_pJoystickInfo )
 	{
-		m_pJoystickInfo[ i ].m_nDeviceId = -1;
+		joy.m_nDeviceId = -1;
 	}
 
 	// abort startup if user requests no joystick
