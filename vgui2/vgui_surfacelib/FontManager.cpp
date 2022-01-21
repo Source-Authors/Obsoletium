@@ -513,8 +513,9 @@ void CFontManager::GetTextSize(HFont font, const wchar_t *text, int &wide, int &
 	tall = GetFontTall(font);
 	
 	float xx = 0;
-	char chBefore = 0;
-	char chAfter = 0;
+	// dimhotepus: char -> wchar_t to compute width for Unicode text correctly. 
+	wchar_t chBefore = 0;
+	wchar_t chAfter = 0;
 	for (int i = 0; ; i++)
 	{
 		wchar_t ch = text[i];
@@ -541,7 +542,7 @@ void CFontManager::GetTextSize(HFont font, const wchar_t *text, int &wide, int &
 			xx += flWide;
 			if (xx > wide)
 			{
-				wide = ceil(xx);
+				wide = ceilf(xx);
 			}
 		}
 		chBefore = ch;
