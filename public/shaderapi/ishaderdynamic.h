@@ -127,7 +127,7 @@ struct ShaderViewport_t
 	float m_flMinZ;
 	float m_flMaxZ;
 
-	ShaderViewport_t() : m_nVersion( SHADER_VIEWPORT_VERSION ) {}
+	ShaderViewport_t() { Init(); }
 
 	void Init()
 	{

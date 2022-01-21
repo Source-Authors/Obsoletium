@@ -194,7 +194,7 @@ protected:
 		float fValues[4];
 		bool bHack_IsHeightClipPlane; //used to hack in compatibility between the user clip planes and the existing height clip plane code
 		//I'm doing the hack this way to retain modder's flexibility to mess with clip plane ordering so that they can make special hacks on their side if necessary
-		PlaneStackElement( void ) : bHack_IsHeightClipPlane( false ) { };
+		PlaneStackElement( void ) : bHack_IsHeightClipPlane( false ) { memset( fValues, 0, sizeof(fValues) ); };
 	};
 
 protected:

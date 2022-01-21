@@ -228,8 +228,16 @@ const char *CShaderSystem::s_pDebugShaderName[MATERIAL_DEBUG_COUNT]	=
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CShaderSystem::CShaderSystem() : m_StoredSpew( 0, 512, 0 ), m_bForceUsingGraphicsReturnTrue( false )
+CShaderSystem::CShaderSystem()
+	: m_SaveSpewOutput( nullptr ),
+		m_StoredSpew( 0, 512, 0 ),
+		m_pRenderState( nullptr ),
+		m_hShaderDLL( USHRT_MAX ),
+		m_nModulation( UCHAR_MAX ),
+		m_nRenderPass( UCHAR_MAX ),
+		m_bForceUsingGraphicsReturnTrue( false )
 {
+	memset( m_pDebugMaterials, 0, sizeof(m_pDebugMaterials) );
 }
 
 

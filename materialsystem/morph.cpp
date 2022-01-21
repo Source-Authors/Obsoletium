@@ -80,7 +80,7 @@ private:
 	// A list of all vertices affecting a particular morph target
 	struct MorphVertexList_t
 	{
-		MorphVertexList_t() {}
+		MorphVertexList_t() : m_nMorphTargetId(-1) {}
 		MorphVertexList_t( const MorphVertexList_t& src ) : m_nMorphTargetId( src.m_nMorphTargetId ) {}
 
 		int m_nMorphTargetId;
@@ -1642,6 +1642,8 @@ CMorphMgrRenderContext::CMorphMgrRenderContext()
 {
 	m_nMorphCount = 0;
 
+	memset( m_pMorphsToAccumulate, 0, sizeof(m_pMorphsToAccumulate) );
+
 #ifdef DBGFLAG_ASSERT
 	m_bInMorphAccumulation = false;
 #endif
@@ -2116,8 +2118,8 @@ bool CMorphMgr::GetMorphAccumulatorTexCoord( IMorphMgrRenderContext *pRenderCont
 		return false;
 	}
 
-	float flOOWidth = ( nWidth != 0 ) ? 1.0f / nWidth : 1.0f;
-	float flOOHeight = ( nHeight != 0 ) ? 1.0f / nHeight : 1.0f;
+	float flOOWidth = 1.0f / nWidth;
+	float flOOHeight = 1.0f / nHeight;
 
 	int x, y, w, h;
 	ComputeAccumulatorSubrect( &x, &y, &w, &h, nRenderId );

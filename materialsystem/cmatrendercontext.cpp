@@ -124,48 +124,49 @@ int	CMatRenderContextBase::sm_nInitializeCount = 0;
 CMatRenderContextBase::CMatRenderContextBase() :
 	m_pMaterialSystem( NULL ), m_RenderTargetStack( 16, 32 ), m_MatrixMode( NUM_MATRIX_MODES )
 {
-	int i;
-
-	m_bDirtyViewState = true;
-
 	// Put a special element at the top of the RT stack (indicating back buffer is current top of stack)
 	// NULL indicates back buffer, -1 indicates full-size viewport
-#if !defined( _X360 )
-                RenderTargetStackElement_t initialElement = { {NULL, NULL, NULL, NULL}, NULL, 0, 0, -1, -1 };
-#else
-                RenderTargetStackElement_t initialElement = { {NULL}, NULL, 0, 0, -1, -1 };
-#endif
-
-
+	RenderTargetStackElement_t initialElement = { {NULL, NULL, NULL, NULL}, NULL, 0, 0, -1, -1 };
 	m_RenderTargetStack.Push( initialElement );
-
-	for ( i = 0; i < MAX_FB_TEXTURES; i++ )
-	{
-		m_pCurrentFrameBufferCopyTexture[i] = NULL;
-	}
 
 	m_pCurrentMaterial = NULL;
 	m_pCurrentProxyData = NULL;
-	m_pUserDefinedLightmap = NULL;
-	m_HeightClipMode = MATERIAL_HEIGHTCLIPMODE_DISABLE;
-	m_HeightClipZ = 0.0f;
-	m_bEnableClipping = true;
-	m_bFlashlightEnable = false;
-	m_bFullFrameDepthIsValid = false;
 
-	for ( i = 0; i < NUM_MATRIX_MODES; i++ )
+	m_lightmapPageID = 0;
+	m_pUserDefinedLightmap = NULL;
+
+	m_pLocalCubemapTexture = NULL;
+
+	for ( auto &t : m_pCurrentFrameBufferCopyTexture )
 	{
-		m_MatrixStacks[i].Push();
-		m_MatrixStacks[i].Top().matrix.Identity();
-		m_MatrixStacks[i].Top().flags |= ( MSF_DIRTY| MSF_IDENTITY );
+		t = NULL;
+	}
+
+	m_HeightClipMode = MATERIAL_HEIGHTCLIPMODE_DISABLE;	
+	m_HeightClipZ = 0.0f;
+	m_pBoundMorph = NULL;
+	m_pMorphRenderContext = NULL;
+
+	for ( auto &s : m_MatrixStacks )
+	{
+		s.Push();
+		s.Top().matrix.Identity();
+		s.Top().flags |= ( MSF_DIRTY| MSF_IDENTITY );
 	}
 	m_pCurMatrixItem = &m_MatrixStacks[0].Top();
 
-	m_Viewport.Init( 0, 0, 0, 0 );
+	m_FrameTime = -1;
 
-	m_LastSetToneMapScale=Vector(1,1,1);
-	m_CurToneMapScale=1.0;
+	m_LastSetToneMapScale = Vector( 1, 1, 1 );
+	m_CurToneMapScale = 1.0f;
 	m_GoalToneMapScale = 1.0f;
+	m_Viewport.Init( 0, 0, 0, 0 );
+	
+	m_bFlashlightEnable = false;
+	m_bDirtyViewState = true;
+	m_bDirtyViewProjState = false;
+	m_bEnableClipping = true;
+	m_bFullFrameDepthIsValid = false;
 }
 
 

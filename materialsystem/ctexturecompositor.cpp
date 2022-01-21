@@ -725,7 +725,10 @@ class CTCCombineStage : public CTCStage
 public:
 	CTCCombineStage( const CombineStageParameters& _csp, uint32 nTexCompositeCreateFlags )
 	: m_Parameters( _csp ) 
-	, m_pMaterial( NULL )
+	, m_pMaterial( nullptr )
+	, m_fAdjustBlack( 0 )
+	, m_fAdjustWhite( 0 )
+	, m_fAdjustGamma( 0 )
 	{ 
 		Assert( m_Parameters.m_CombineOp >= 0 && m_Parameters.m_CombineOp < ECO_COUNT );
 

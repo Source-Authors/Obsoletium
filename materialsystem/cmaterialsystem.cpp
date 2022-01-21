@@ -551,6 +551,7 @@ CMaterialSystem::CMaterialSystem()
 	m_MaxDepthTextureHandle = INVALID_SHADERAPI_TEXTURE_HANDLE;
 
 	m_bInStubMode = false;
+	memset( m_pBufferClearObeyStencil, 0, sizeof(m_pBufferClearObeyStencil) );
 	m_pDrawFlatMaterial = NULL;
 	m_pRenderTargetBlitMaterial = NULL;
 	m_pForcedTextureLoadPathID = NULL;
