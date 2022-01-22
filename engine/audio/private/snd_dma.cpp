@@ -637,7 +637,8 @@ void S_Startup( void )
 
 	if ( !g_AudioDevice || g_AudioDevice == Audio_GetNullDevice() )
 	{
-		g_AudioDevice = IAudioDevice::AutoDetectInit( CommandLine()->CheckParm( "-wavonly" ) != 0 );
+		// dimhotepus: Remove wave device support.
+		g_AudioDevice = IAudioDevice::AutoDetectInit( false );
 		if ( !g_AudioDevice )
 		{
 			Error( "Unable to init audio" );

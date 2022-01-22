@@ -62,36 +62,16 @@ Try to find a sound device to mix for.
 Returns a CAudioNULLDevice if nothing is found.
 ==================
 */
-IAudioDevice *IAudioDevice::AutoDetectInit( bool waveOnly )
+IAudioDevice *IAudioDevice::AutoDetectInit( bool )
 {
 	IAudioDevice *pDevice = NULL;
 
 	if ( IsPC() )
 	{
 #if defined( WIN32 ) && !defined( USE_SDL )
-		if ( waveOnly )
+		if ( snd_firsttime )
 		{
-			pDevice = Audio_CreateWaveDevice();
-			if ( !pDevice )
-				goto NULLDEVICE;
-		}
-
-		if ( !pDevice )
-		{
-			if ( snd_firsttime )
-			{
-				pDevice = Audio_CreateDirectSoundDevice();
-			}
-		}
-
-		// if DirectSound didn't succeed in initializing, try to initialize
-		// waveOut sound, unless DirectSound failed because the hardware is
-		// already allocated (in which case the user has already chosen not
-		// to have sound)
-		// UNDONE: JAY: This doesn't test for the hardware being in use anymore, REVISIT
-		if ( !pDevice )
-		{
-			pDevice = Audio_CreateWaveDevice();
+			pDevice = Audio_CreateDirectSoundDevice();
 		}
 #elif defined(OSX)
 		if ( !CommandLine()->CheckParm( "-snd_openal" ) )

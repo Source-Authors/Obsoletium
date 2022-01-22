@@ -42,7 +42,6 @@
 #include "snd_convars.h"
 #include "snd_dev_common.h"
 #include "snd_dev_direct.h"
-#include "snd_dev_wave.h"
 #include "snd_dev_xaudio.h"
 #include "snd_sfx.h"
 #include "snd_audio_source.h"

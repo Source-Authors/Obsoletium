@@ -429,7 +429,6 @@ $Project "engine"
 		
 		// WIN32 only audio files
 		$File	"audio\private\snd_dev_direct.cpp"	[$WINDOWS]		\
-				"audio\private\snd_dev_wave.cpp"	[$WINDOWS]		\
 				"audio\private\snd_mp3_source.cpp"	[!$DEDICATED]		\
 				"audio\private\snd_wave_mixer_mp3.cpp"	[!$DEDICATED]	\
 				"$SRCDIR\thirdparty\MPAHeaderInfo\VBRHeader.cpp"		[!$DEDICATED]		\
@@ -510,7 +509,6 @@ $Project "engine"
 			$File	"audio\private\snd_convars.h"
 			$File	"audio\private\snd_dev_common.h"
 			$File	"audio\private\snd_dev_direct.h"					[$WIN32]
-			$File	"audio\private\snd_dev_wave.h"						[$WIN32]
 			$File	"audio\private\snd_dev_xaudio.h"
 			$File	"audio\private\snd_dma.h"
 			$File	"audio\private\snd_env_fx.h"
