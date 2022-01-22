@@ -212,46 +212,6 @@ static void SurfaceToVerts( model_t *model, SurfaceHandle_t surfID, Vector verts
 }
 
 
-// Calculate the surface area of an arbitrary msurface_t polygon (convex with collinear verts)
-static float SurfaceArea( model_t *model, SurfaceHandle_t surfID )
-{
-	Vector	center, verts[32];
-	int		vertCount = 32;
-	float	area;
-	int		i;
-
-	// Compute a "center" point and fan
-	SurfaceToVerts( model, surfID, verts, &vertCount );
-	CenterVerts( verts, vertCount, center );
-
-	area = 0;
-	// For a triangle of the center and each edge
-	for ( i = 0; i < vertCount; i++ )
-	{
-		Vector edge0, edge1, out;
-		int next;
-
-		next = (i+1)%vertCount;
-		VectorSubtract( verts[i], center, edge0 );			// 0.5 * edge cross edge (0.5 is done once at the end)
-		VectorSubtract( verts[next], center, edge1 );
-		CrossProduct( edge0, edge1, out );
-		area += VectorLength( out );
-	}
-	return area * 0.5;										// 0.5 here
-}
-
-
-// Average the list of vertices to find an approximate "center"
-static void SurfaceCenter( model_t *model, SurfaceHandle_t surfID, Vector& center )
-{
-	Vector	verts[32];		// We limit faces to 32 verts elsewhere in the engine
-	int		vertCount = 32;
-
-	SurfaceToVerts( model, surfID, verts, &vertCount );
-	CenterVerts( verts, vertCount, center );
-}
-
-
 static bool ValidCmd( const char *pCmd )
 {
 	int len;

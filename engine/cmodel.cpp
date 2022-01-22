@@ -698,63 +698,6 @@ int	CM_BoxClusters_headnode ( CCollisionBSPData *pBSPData, const Vector& mins, c
 }
 #endif
 
-static int FASTCALL CM_BrushBoxContents( CCollisionBSPData *pBSPData, const Vector &vMins, const Vector &vMaxs, cbrush_t *pBrush )
-{
-	if ( pBrush->IsBox())
-	{
-		cboxbrush_t *pBox = &pBSPData->map_boxbrushes[pBrush->GetBox()];
-		if ( !IsBoxIntersectingBox( vMins, vMaxs, pBox->mins, pBox->maxs ) )
-			return 0;
-	}
-	else
-	{
-		if (!pBrush->numsides)
-			return 0;
-		Vector vCenter = 0.5f *(vMins + vMaxs);
-		Vector vExt = vMaxs - vCenter;
-		int			i, j;
-
-		cplane_t	*plane;
-		float		dist;
-		Vector		vOffset;
-		float		d1;
-		cbrushside_t	*side;
-
-		for (i=0 ; i<pBrush->numsides ; i++)
-		{
-			side = &pBSPData->map_brushsides[pBrush->firstbrushside+i];
-			plane = side->plane;
-
-			// FIXME: special case for axial
-
-			// general box case
-
-			// push the plane out appropriately for mins/maxs
-
-			// FIXME: use signbits into 8 way lookup for each mins/maxs
-			for (j=0 ; j<3 ; j++)
-			{
-				if (plane->normal[j] < 0)
-					vOffset[j] = vExt[j];
-				else
-					vOffset[j] = -vExt[j];
-			}
-			dist = DotProduct (vOffset, plane->normal);
-			dist = plane->dist - dist;
-
-			d1 = DotProduct (vCenter, plane->normal) - dist;
-
-			// if completely in front of face, no intersection
-			if (d1 > 0)
-				return 0;
-
-		}
-	}
-
-	// inside this brush
-	return pBrush->contents;
-}
-
 static int FASTCALL CM_BrushPointContents( CCollisionBSPData *pBSPData, const Vector &vPos, cbrush_t *pBrush )
 {
 	if ( pBrush->IsBox())

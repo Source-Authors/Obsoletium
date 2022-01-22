@@ -61,6 +61,8 @@ ConVar sv_master_share_game_socket( "sv_master_share_game_socket", "1", 0,
 
 static char s_szTempMsgBuf[16000];
 
+
+#if !defined(_X360) && !defined(NO_STEAM)
 static void MsgAndLog( const char *fmt, ... )
 {
 	va_list ap;
@@ -72,6 +74,7 @@ static void MsgAndLog( const char *fmt, ... )
 	//	Msg("%s", s_szTempMsgBuf );
 	Log("%s", s_szTempMsgBuf );
 }
+#endif
 
 static void WarningAndLog( const char *fmt, ... )
 {

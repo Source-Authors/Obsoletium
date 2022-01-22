@@ -733,24 +733,6 @@ bool CL_PortalDemo_MapCheck( const char *name )
 	return true;
 }
 
-int _Host_Map_f_CompletionFunc( char const *cmdname, char const *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] );
-
-// Note, leaves name alone if no match possible
-static bool Host_Map_Helper_FuzzyName( const CCommand &args, char *name, size_t bufsize )
-{
-	char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ];
-	CUtlString argv0;
-	argv0 = args.Arg( 0 );
-	argv0 += " ";
-
-	if ( _Host_Map_f_CompletionFunc( argv0, args.ArgS(), commands ) > 0 )
-	{
-		Q_strncpy( name, &commands[ 0 ][ argv0.Length() ], bufsize );
-		return true;
-	}
-	return false;
-}
-
 void Host_Map_Helper( const CCommand &args, bool bEditmode, bool bBackground, bool bCommentary )
 {
 	if ( cmd_source != src_command )

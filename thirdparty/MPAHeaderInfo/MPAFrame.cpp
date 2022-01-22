@@ -48,7 +48,7 @@ CMPAFrame::CMPAFrame(CMPAStream* pStream, DWORD& dwOffset, bool bFindSubsequentF
 		{
 			m_bIsLast = true;
 		}
-		catch (CMPAException& e)
+		catch (CMPAException&)
 		{
 			OutputDebugString(_T("Didn't find subsequent frame"));
 			//if (e->GetErrorID() == CMPAException::NoFrameInTolerance

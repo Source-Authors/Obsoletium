@@ -809,7 +809,6 @@ bool CDispCollTree::AABBTree_IntersectAABB( const Vector &absMins, const Vector 
 	mins0.DuplicateVector(absMins);
 	FourVectors maxs0;
 	maxs0.DuplicateVector(absMaxs);
-	FourVectors rayExtents;
 	while ( listIndex <= maxIndex )
 	{
 		int iNode = nodeList[listIndex];

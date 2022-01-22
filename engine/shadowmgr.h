@@ -132,7 +132,7 @@ inline unsigned char IShadowMgrInternal::ComputeDarkness( float z, const ShadowD
 	z = fsel( z, z, 0.0f );
 	z = info.m_flFalloffBias + z * info.m_flFalloffAmount;
 	z = fsel( z - 255.0f, 255.0f, z );
-	return z;
+	return static_cast<unsigned char>( z );
 }
 
 

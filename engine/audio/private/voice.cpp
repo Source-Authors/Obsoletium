@@ -1107,14 +1107,15 @@ int Voice_GetCompressedData(char *pchDest, int nCount, bool bFinal)
 	// Check g_bVoiceRecordStopping in case g_bUsingSteamVoice changes on us
 	// while waiting for the end of voice data.
 	if ( g_bUsingSteamVoice || g_bVoiceRecordStopping )
-	{
+	{		
 		uint32 cbCompressedWritten = 0;
+
+		// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
 		uint32 cbUncompressedWritten = 0;
 		uint32 cbCompressed = 0;
 		uint32 cbUncompressed = 0;
 
-		// dimhotepus: NO_STEAM
-#ifndef NO_STEAM
 		// We're going to always request steam give us the encoded stream at the optimal rate, unless our final output
 		// rate is lower than it.  We'll pass our output rate when we actually extract the data, which Steam will
 		// happily upsample from its optimal rate for us.

@@ -4,7 +4,6 @@
 //
 //=============================================================================//
 
-#include "bzip2/bzlib.h"
 #include "net_chan.h"
 #include "tier1/strtools.h"
 #include "filesystem_engine.h"
@@ -21,6 +20,7 @@
 #include "net_ws_headers.h"
 #include "net_ws_queued_packet_sender.h"
 #include "filesystem_init.h"
+#include "bzip2/bzlib.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

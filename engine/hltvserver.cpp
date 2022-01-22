@@ -1691,9 +1691,9 @@ bool CHLTVServer::ProcessConnectionlessPacket( netpacket_t * packet )
 		return false;
 	}
 
+#ifndef NO_STEAM
 	switch ( c )
 	{
-#ifndef NO_STEAM
 	case A2S_INFO:
 		char rgchInfoPostfix[64];
 		msg.ReadString( rgchInfoPostfix, sizeof( rgchInfoPostfix ) );
@@ -1706,8 +1706,8 @@ bool CHLTVServer::ProcessConnectionlessPacket( netpacket_t * packet )
 		break;
 	//case A2S_PLAYER:
 	//	return true;
-#endif // #ifndef NO_STEAM
 	}
+#endif // #ifndef NO_STEAM
 
 	return CBaseServer::ProcessConnectionlessPacket( packet );
 }
