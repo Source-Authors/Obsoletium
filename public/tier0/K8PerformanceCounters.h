@@ -1,10 +1,5 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
+
 #ifndef K8PERFORMANCECOUNTERS_H
 #define K8PERFORMANCECOUNTERS_H
 

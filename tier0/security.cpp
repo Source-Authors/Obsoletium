@@ -1,8 +1,6 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: Platform level security functions.
-//
-//=============================================================================//
+// Platform level security functions.
 
 // Uncomment the following line to require the prescence of a hardware key.
 //#define REQUIRE_HARDWARE_KEY

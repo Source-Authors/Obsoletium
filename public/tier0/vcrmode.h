@@ -1,14 +1,12 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
 // Purpose: VCR mode records a client's game and allows you to 
-//			play it back and reproduce it exactly. When playing it back, nothing
-//			is simulated on the server, but all server packets are recorded.
+// play it back and reproduce it exactly. When playing it back, nothing
+// is simulated on the server, but all server packets are recorded.
 //
-//			Most of the VCR mode functionality is accomplished through hooks
-//			called at various points in the engine.
-//
-// $NoKeywords: $
-//===========================================================================//
+// Most of the VCR mode functionality is accomplished through hooks
+// called at various points in the engine.
+
 #ifndef VCRMODE_H
 #define VCRMODE_H
 

@@ -1,9 +1,7 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: determine CPU speed under linux
-//
-// $NoKeywords: $
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
+// 
+// Determine CPU speed under linux
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>

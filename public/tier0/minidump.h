@@ -1,8 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #ifndef MINIDUMP_H
 #define MINIDUMP_H

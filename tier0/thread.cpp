@@ -1,9 +1,6 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: Thread management routines
-//
-// $NoKeywords: $
-//=============================================================================//
+// Thread management routines.
 
 #include "pch_tier0.h"
 

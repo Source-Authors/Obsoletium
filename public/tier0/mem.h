@@ -1,9 +1,6 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: Memory allocation!
-//
-// $NoKeywords: $
-//=============================================================================//
+// Memory allocation!
 
 #ifndef TIER0_MEM_H
 #define TIER0_MEM_H

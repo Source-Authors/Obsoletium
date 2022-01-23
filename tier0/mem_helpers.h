@@ -1,8 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #ifndef MEM_HELPERS_H
 #define MEM_HELPERS_H

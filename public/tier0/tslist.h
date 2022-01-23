@@ -1,11 +1,9 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose:
-//
-// LIFO from disassembly of Windows API and https://stackoverflow.com/questions/2979165/fober-et-al-lock-free-fifo-queue-multiple-consumers-and-producers
-// FIFO from https://stackoverflow.com/questions/2979165/fober-et-al-lock-free-fifo-queue-multiple-consumers-and-producers
-//
-//=============================================================================
+// LIFO from disassembly of Windows API and
+// https://stackoverflow.com/questions/2979165/fober-et-al-lock-free-fifo-queue-multiple-consumers-and-producers
+// FIFO from
+// https://stackoverflow.com/questions/2979165/fober-et-al-lock-free-fifo-queue-multiple-consumers-and-producers
 
 #ifndef TSLIST_H
 #define TSLIST_H

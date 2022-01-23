@@ -1,11 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $Workfile:     $
-// $NoKeywords: $
-//=============================================================================//
-
+// Copyright Valve Corporation, All rights reserved.
 
 #if defined(_WIN32)
 #include "winlite.h"

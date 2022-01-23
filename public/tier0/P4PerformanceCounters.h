@@ -1,10 +1,5 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
+
 #ifndef P4PERFORMANCECOUNTERS_H
 #define P4PERFORMANCECOUNTERS_H
 

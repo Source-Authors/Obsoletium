@@ -1,9 +1,6 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
 // Purpose: Real-Time Hierarchical Profiling
-//
-// $NoKeywords: $
-//=============================================================================//
 
 #ifndef VPROF_H
 #define VPROF_H

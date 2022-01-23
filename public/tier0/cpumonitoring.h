@@ -1,3 +1,5 @@
+// Copyright Valve Corporation, All rights reserved.
+
 #ifndef CPU_MONITORING_H
 #define CPU_MONITORING_H
 

@@ -1,23 +1,24 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
 // ETW (Event Tracing for Windows) profiling helpers.
+// 
 // This allows easy insertion of Generic Event markers into ETW/xperf tracing
 // which then aids in analyzing the traces and finding performance problems.
 // The usage patterns are to use ETWBegin and ETWEnd (typically through the
-// convenience class CETWScope) to bracket time-consuming operations. In addition
+// convenience class CETWScope) to bracket time-consuming operations.  In addition
 // ETWFrameMark marks the beginning of each frame, and ETWMark can be used to
 // mark other notable events. More event types and providers can be added as needed.
 // When recording xperf profiles add Valve-Main+Valve-FrameRate to the list of
 // user-mode providers and be sure to register the providers with this sequence
 // of commands:
-//    xcopy /y game\bin\tier0.dll %temp%
-//    wevtutil um src\tier0\ValveETWProvider.man
-//    wevtutil im src\tier0\ValveETWProvider.man
 //
-//===============================================================================
+//  xcopy /y game\bin\tier0.dll %temp%
+//  wevtutil um src\tier0\ValveETWProvider.man
+//  wevtutil im src\tier0\ValveETWProvider.man
 
 #ifndef ETWPROF_H
 #define ETWPROF_H
+
 #if defined( COMPILER_MSVC )
 #pragma once
 #endif

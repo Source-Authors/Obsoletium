@@ -1,10 +1,8 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
 // ETW (Event Tracing for Windows) profiling helpers.
 // This allows easy insertion of Generic Event markers into ETW/xperf tracing
 // which then aids in analyzing the traces and finding performance problems.
-//
-//===============================================================================
 
 #include "pch_tier0.h"
 #include "tier0/etwprof.h"

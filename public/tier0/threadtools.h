@@ -1,10 +1,8 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
 // Purpose: A collection of utility classes to simplify thread handling, and
-//			as much as possible contain portability problems. Here avoiding 
-//			including windows.h.
-//
-//=============================================================================
+// as much as possible contain portability problems.  Here avoiding including
+// windows.h.
 
 #ifndef THREADTOOLS_H
 #define THREADTOOLS_H

@@ -1,9 +1,7 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: Utility to interrogate and modify the data in the OSX IPC Server
+// Utility to interrogate and modify the data in the OSX IPC Server
 //
-// $NoKeywords: $
-//=============================================================================
 // README:README
 //
 // This file implements the --wrap for ld on linux that lets file i/o api's

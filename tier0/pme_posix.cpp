@@ -1,8 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #include "tier0/platform.h"
 #include "tier0/vprof.h"

@@ -1,8 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-//===========================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #ifndef TIER0_ICOMMANDLINE_H
 #define TIER0_ICOMMANDLINE_H

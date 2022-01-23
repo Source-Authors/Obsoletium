@@ -1,9 +1,7 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: Attaches a console for I/O to a Win32 GUI application in a
-//          reasonably smart fashion
-//
-//=============================================================================
+// Attaches a console for I/O to a Win32 GUI application in a
+// reasonably smart fashion.
 
 #include "pch_tier0.h"
 

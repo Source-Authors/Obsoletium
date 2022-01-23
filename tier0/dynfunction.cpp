@@ -1,9 +1,6 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: Shared library loading and symbol lookup.
-//
-// $NoKeywords: $
-//=============================================================================//
+// Shared library loading and symbol lookup.
 
 #include "pch_tier0.h"
 #include "tier0/dynfunction.h"

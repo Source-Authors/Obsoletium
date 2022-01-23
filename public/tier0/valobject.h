@@ -1,11 +1,8 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
 // Purpose:	CValObject is used for tracking individual objects that report
-//			in to CValidator.  Whenever a new object reports in (via CValidator::Push),
-//			we create a new CValObject to aggregate stats for it.
-//
-// $NoKeywords: $
-//=============================================================================//
+// in to CValidator.  Whenever a new object reports in (via CValidator::Push),
+// we create a new CValObject to aggregate stats for it.
 
 #ifndef VALOBJECT_H
 #define VALOBJECT_H

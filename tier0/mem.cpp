@@ -1,9 +1,6 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: Memory allocation!
-//
-// $NoKeywords: $
-//=============================================================================//
+// Memory allocation!
 
 #include "pch_tier0.h"
 #include "tier0/mem.h"

@@ -1,10 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $Workfile:     $
-// $NoKeywords: $
-//===========================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #include "pch_tier0.h"
 #include "tier0/icommandline.h"

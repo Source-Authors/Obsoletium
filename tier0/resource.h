@@ -1,10 +1,5 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
+// 
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
 // Used by assert_dialog.rc

@@ -1,20 +1,10 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//===========================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #ifdef _WIN32
 #include "winlite.h"
 
 #include "tier0/valve_off.h"
 #include "tier0/pmelib.h"
-#if _MSC_VER >=1300
-#else
-#include "winioctl.h"
-#endif
 #include "tier0/valve_on.h"
 
 #include "tier0/ioctlcodes.h"

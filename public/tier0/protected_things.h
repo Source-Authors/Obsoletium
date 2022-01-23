@@ -1,9 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #ifndef PROTECTED_THINGS_H
 #define PROTECTED_THINGS_H

@@ -1,8 +1,5 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
+
 #ifndef CL2CACHE_H
 #define CL2CACHE_H
 #ifdef _WIN32

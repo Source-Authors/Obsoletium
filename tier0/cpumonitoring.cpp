@@ -1,4 +1,4 @@
-//============ Copyright (c) Valve Corporation, All rights reserved. ============
+// Copyright (c) Valve Corporation, All rights reserved.
 //
 // A non-trivial number of Valve customers hit performance problems because their CPUs overheat
 // and are thermally throttled. While thermal throttling is better than melting it is still a
@@ -17,8 +17,6 @@
 // This code doesn't use normal worker threads because of the special purpose nature of this
 // work. The threads are started on demand and are never terminated, in order to simplify
 // the code.
-//
-//===============================================================================
 
 #include "pch_tier0.h"
 #include "tier0/cpumonitoring.h"

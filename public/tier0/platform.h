@@ -1,10 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose:
-//
-// $NoKeywords: $
-//
-//===========================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #ifndef PLATFORM_H
 #define PLATFORM_H
