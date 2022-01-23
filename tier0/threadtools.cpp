@@ -429,7 +429,7 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 		{
 			RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(DWORD), (ULONG_PTR *)&info);
 		}
-		__except (EXCEPTION_CONTINUE_EXECUTION)
+		__except (EXCEPTION_EXECUTE_HANDLER)
 		{
 		}
 	}
@@ -1259,7 +1259,9 @@ CThreadMutex::CThreadMutex()
 #ifdef THREAD_MUTEX_TRACING_ENABLED
 	memset( &m_CriticalSection, 0, sizeof(m_CriticalSection) );
 #endif
-	InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION *)&m_CriticalSection, 4000);
+	// This function always succeeds and returns a nonzero value on XP+.
+	// See https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-initializecriticalsectionandspincount
+	(void)InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION *)&m_CriticalSection, 4000);
 #ifdef THREAD_MUTEX_TRACING_SUPPORTED
 	// These need to be initialized unconditionally in case mixing release & debug object modules
 	// Lock and unlock may be emitted as COMDATs, in which case may get spurious output

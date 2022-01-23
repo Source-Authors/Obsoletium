@@ -186,15 +186,13 @@ bool WriteMiniDumpUsingExceptionInfo(
 			tchar rgchFailedFileName[_MAX_PATH];
 			_sntprintf( rgchFailedFileName, sizeof(rgchFailedFileName) / sizeof(tchar), "(failed)%s", rgchFileName );
 			// Ensure null-termination.
-			rgchFailedFileName[ Q_ARRAYSIZE(rgchFailedFileName) - 1 ] = 0;
-			rename( rgchFileName, rgchFailedFileName );
+			rgchFailedFileName[ Q_ARRAYSIZE(rgchFailedFileName) - 1 ] = '\0';
+			// dimhotepus: If rename failed, well, do notning.
+			(void)rename( rgchFileName, rgchFailedFileName );
 		}
 	}
 
 	::FreeLibrary( hDbgHelpDll );
-
-	// call the log flush function if one is registered to try to flush any logs
-	//CallFlushLogFunc();
 
 	return bReturnValue;
 }
@@ -564,8 +562,10 @@ void EnableCrashingOnCrashes()
 	#define PROCESS_CALLBACK_FILTER_ENABLED     0x1
 
 	HMODULE kernel32 = LoadLibraryExA("kernel32.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
-	tGetProcessUserModeExceptionPolicy pGetProcessUserModeExceptionPolicy = (tGetProcessUserModeExceptionPolicy)GetProcAddress(kernel32, "GetProcessUserModeExceptionPolicy");
-	tSetProcessUserModeExceptionPolicy pSetProcessUserModeExceptionPolicy = (tSetProcessUserModeExceptionPolicy)GetProcAddress(kernel32, "SetProcessUserModeExceptionPolicy");
+	if ( !kernel32 ) return;
+
+	auto pGetProcessUserModeExceptionPolicy = (tGetProcessUserModeExceptionPolicy)GetProcAddress(kernel32, "GetProcessUserModeExceptionPolicy");
+	auto pSetProcessUserModeExceptionPolicy = (tSetProcessUserModeExceptionPolicy)GetProcAddress(kernel32, "SetProcessUserModeExceptionPolicy");
 	if (pGetProcessUserModeExceptionPolicy && pSetProcessUserModeExceptionPolicy)
 	{
 		DWORD dwFlags;

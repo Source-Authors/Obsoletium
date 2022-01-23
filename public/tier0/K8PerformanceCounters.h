@@ -117,7 +117,7 @@ public:
         event_id = 0;
         name = 0;
         revRequired = 'A'; 
-
+        unitEncode = UE_Unknown;
 
     }
 

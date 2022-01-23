@@ -1036,7 +1036,7 @@ static long VCR_Hook_RegSetValueEx(void *hKey, tchar const *lpValueName, unsigne
 {
 	// Preamble.
 	if ( !IsVCRModeEnabledForThisThread() )
-		return RegSetValueEx((HKEY)hKey, lpValueName, Reserved, dwType, lpData, cbData);
+		return RegSetValueEx((HKEY)hKey, lpValueName, 0, dwType, lpData, cbData);
 
 	VCR_THREADSAFE;
 	VCR_Event(VCREvent_RegSetValueEx);
@@ -1048,7 +1048,7 @@ static long VCR_Hook_RegSetValueEx(void *hKey, tchar const *lpValueName, unsigne
 	}
 	else
 	{
-		ret = RegSetValueEx((HKEY)hKey, lpValueName, Reserved, dwType, lpData, cbData);
+		ret = RegSetValueEx((HKEY)hKey, lpValueName, 0, dwType, lpData, cbData);
 
 		if(g_VCRMode == VCR_Record)
 			VCR_WriteVal(ret);
@@ -1101,7 +1101,7 @@ static long VCR_Hook_RegCreateKeyEx(void *hKey, char const *lpSubKey, unsigned l
 {
 	// Preamble.
 	if ( !IsVCRModeEnabledForThisThread() )
-		return RegCreateKeyEx((HKEY)hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, (LPSECURITY_ATTRIBUTES)lpSecurityAttributes, (HKEY*)phkResult, lpdwDisposition);
+		return RegCreateKeyEx((HKEY)hKey, lpSubKey, 0, lpClass, dwOptions, samDesired, (LPSECURITY_ATTRIBUTES)lpSecurityAttributes, (HKEY*)phkResult, lpdwDisposition);
 
 	VCR_THREADSAFE;
 	VCR_Event(VCREvent_RegCreateKeyEx);
@@ -1113,7 +1113,7 @@ static long VCR_Hook_RegCreateKeyEx(void *hKey, char const *lpSubKey, unsigned l
 	}
 	else
 	{
-		ret = RegCreateKeyEx((HKEY)hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, (LPSECURITY_ATTRIBUTES)lpSecurityAttributes, (HKEY*)phkResult, lpdwDisposition);
+		ret = RegCreateKeyEx((HKEY)hKey, lpSubKey, 0, lpClass, dwOptions, samDesired, (LPSECURITY_ATTRIBUTES)lpSecurityAttributes, (HKEY*)phkResult, lpdwDisposition);
 
 		if(g_VCRMode == VCR_Record)
 			VCR_WriteVal(ret);
@@ -1339,6 +1339,7 @@ int VCR_GenericPlaybackInternal( const char *pEventName, void *pOutData, int max
 	{
 		char testName[512];
 		VCR_Read( testName, nameLen );
+		testName[std::size(testName) - 1] = '\0';
 		if ( strcmp( pEventName, testName ) != 0 )
 		{
 			VCR_Error( "VCR_GenericPlayback( %s ) - event name does not match '%s'", pEventName, testName );

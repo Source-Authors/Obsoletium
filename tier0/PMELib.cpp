@@ -399,7 +399,7 @@ double PME::GetCPUClockSpeedSlow(void)
     if (m_CPUClockSpeed != 0)
         return m_CPUClockSpeed;
 
-    unsigned long start_ms, stop_ms;
+    unsigned long long start_ms, stop_ms;
     unsigned long start_tsc,stop_tsc;
 
     // boosting priority helps with noise. its optional and i dont think
@@ -410,8 +410,8 @@ double PME::GetCPUClockSpeedSlow(void)
     pme->SetProcessPriority(ProcessPriorityHigh);
 
     // wait for millisecond boundary
-    start_ms = GetTickCount() + 5;
-    while (start_ms <= GetTickCount());
+    start_ms = GetTickCount64() + 5;
+    while (start_ms <= GetTickCount64());
 
     // read timestamp (you could use QueryPerformanceCounter in hires mode if you want)
 #ifdef COMPILER_MSVC64 
@@ -427,7 +427,7 @@ double PME::GetCPUClockSpeedSlow(void)
 
     // wait for end
     stop_ms = start_ms + 1000; // longer wait gives better resolution
-    while (stop_ms > GetTickCount());
+    while (stop_ms > GetTickCount64());
 
     // read timestamp (you could use QueryPerformanceCounter in hires mode if you want)
 #ifdef COMPILER_MSVC64

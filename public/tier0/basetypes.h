@@ -209,7 +209,7 @@ inline unsigned long FloatAbsBits( vec_t f )
 #ifndef _In_
 #define _In_
 #endif
-extern "C" float fabsf(_In_ float);
+extern "C" _Check_return_ float fabsf(_In_ float);
 #else
 #include <math.h>
 #endif

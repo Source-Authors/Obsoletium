@@ -14,17 +14,15 @@
 #pragma comment(lib,"user32.lib")	// For MessageBox
 #endif
 
-#include <assert.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdio>
+#include <cstring>
+#include <cstdarg>
+#include <cstdlib>
 #include "Color.h"
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
 #include "tier0/icommandline.h"
-#include <math.h>
 #if defined( _X360 )
 #include "xbox/xbox_console.h"
 #endif
@@ -401,13 +399,19 @@ bool IsSpewActive( const tchar* pGroupName, int level )
 
 inline bool IsSpewActive( StandardSpewGroup_t group, int level )
 {
+  if ( static_cast<unsigned>(group) >= std::size(s_pGroupIndices) )
+	{
+    AssertMsg( static_cast<int>(group) >= sizeof(s_pGroupIndices), "Group index is out of range." );
+    return false;
+	}
+
 	// If we don't find the spew group, use the default level.
 	if ( s_pGroupIndices[group] >= 0 )
 		return s_pSpewGroups[ s_pGroupIndices[group] ].m_Level >= level;
 	return s_DefaultLevel >= level;
 }
 
-SpewRetval_t  _SpewMessage( const tchar* pMsgFormat, ... )
+SpewRetval_t  _SpewMessage( PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... ) FMTFUNCTION( 1, 2 )
 {
 	va_list args;
 	va_start( args, pMsgFormat );
@@ -416,7 +420,7 @@ SpewRetval_t  _SpewMessage( const tchar* pMsgFormat, ... )
 	return ret;
 }
 
-SpewRetval_t _DSpewMessage( const tchar *pGroupName, int level, const tchar* pMsgFormat, ... )
+SpewRetval_t _DSpewMessage( const tchar *pGroupName, int level, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	if( !IsSpewActive( pGroupName, level ) )
 		return SPEW_CONTINUE;
@@ -428,7 +432,7 @@ SpewRetval_t _DSpewMessage( const tchar *pGroupName, int level, const tchar* pMs
 	return ret;
 }
 
-DBG_INTERFACE SpewRetval_t ColorSpewMessage( SpewType_t type, const Color *pColor, const tchar* pMsgFormat, ... )
+DBG_INTERFACE SpewRetval_t ColorSpewMessage( SpewType_t type, const Color *pColor, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	va_list args;
 	va_start( args, pMsgFormat );
@@ -437,7 +441,7 @@ DBG_INTERFACE SpewRetval_t ColorSpewMessage( SpewType_t type, const Color *pColo
 	return ret;
 }
 
-void Msg( const tchar* pMsgFormat, ... )
+void Msg( PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	va_list args;
 	va_start( args, pMsgFormat );
@@ -445,7 +449,7 @@ void Msg( const tchar* pMsgFormat, ... )
 	va_end(args);
 }
 
-void DMsg( const tchar *pGroupName, int level, const tchar *pMsgFormat, ... )
+void DMsg( const tchar *pGroupName, int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( pGroupName, level ) )
 		return;
@@ -462,7 +466,7 @@ void MsgV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist )
 }
 
 
-void Warning( const tchar *pMsgFormat, ... )
+void Warning( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	va_list args;
 	va_start( args, pMsgFormat );
@@ -470,7 +474,7 @@ void Warning( const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void DWarning( const tchar *pGroupName, int level, const tchar *pMsgFormat, ... )
+void DWarning( const tchar *pGroupName, int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( pGroupName, level ) )
 		return;
@@ -487,7 +491,7 @@ void WarningV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist )
 }
 
 
-void Log( const tchar *pMsgFormat, ... )
+void Log( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	va_list args;
 	va_start( args, pMsgFormat );
@@ -495,7 +499,7 @@ void Log( const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void DLog( const tchar *pGroupName, int level, const tchar *pMsgFormat, ... )
+void DLog( const tchar *pGroupName, int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( pGroupName, level ) )
 		return;
@@ -512,7 +516,7 @@ void LogV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist )
 }
 
 
-void Error( const tchar *pMsgFormat, ... )
+void Error( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	va_list args;
 	va_start( args, pMsgFormat );
@@ -529,7 +533,7 @@ void ErrorV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist )
 // A couple of super-common dynamic spew messages, here for convenience 
 // These looked at the "developer" group, print if it's level 1 or higher 
 //-----------------------------------------------------------------------------
-void DevMsg( int level, const tchar* pMsgFormat, ... )
+void DevMsg( int level, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_DEVELOPER, level ) )
 		return;
@@ -540,7 +544,7 @@ void DevMsg( int level, const tchar* pMsgFormat, ... )
 	va_end(args);
 }
 
-void DevWarning( int level, const tchar *pMsgFormat, ... )
+void DevWarning( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_DEVELOPER, level ) )
 		return;
@@ -551,7 +555,7 @@ void DevWarning( int level, const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void DevLog( int level, const tchar *pMsgFormat, ... )
+void DevLog( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_DEVELOPER, level ) )
 		return;
@@ -562,7 +566,7 @@ void DevLog( int level, const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void DevMsg( const tchar *pMsgFormat, ... )
+void DevMsg( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_DEVELOPER, 1 ) )
 		return;
@@ -573,7 +577,7 @@ void DevMsg( const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void DevWarning( const tchar *pMsgFormat, ... )
+void DevWarning( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_DEVELOPER, 1 ) )
 		return;
@@ -584,7 +588,7 @@ void DevWarning( const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void DevLog( const tchar *pMsgFormat, ... )
+void DevLog( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_DEVELOPER, 1 ) )
 		return;
@@ -600,7 +604,7 @@ void DevLog( const tchar *pMsgFormat, ... )
 // A couple of super-common dynamic spew messages, here for convenience 
 // These looked at the "console" group, print if it's level 1 or higher 
 //-----------------------------------------------------------------------------
-void ConColorMsg( int level, const Color& clr, const tchar* pMsgFormat, ... )
+void ConColorMsg( int level, const Color& clr, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, level ) )
 		return;
@@ -611,7 +615,7 @@ void ConColorMsg( int level, const Color& clr, const tchar* pMsgFormat, ... )
 	va_end(args);
 }
 
-void ConMsg( int level, const tchar* pMsgFormat, ... )
+void ConMsg( int level, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, level ) )
 		return;
@@ -622,7 +626,7 @@ void ConMsg( int level, const tchar* pMsgFormat, ... )
 	va_end(args);
 }
 
-void ConWarning( int level, const tchar *pMsgFormat, ... )
+void ConWarning( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, level ) )
 		return;
@@ -633,7 +637,7 @@ void ConWarning( int level, const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void ConLog( int level, const tchar *pMsgFormat, ... )
+void ConLog( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, level ) )
 		return;
@@ -644,7 +648,7 @@ void ConLog( int level, const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void ConColorMsg( const Color& clr, const tchar* pMsgFormat, ... )
+void ConColorMsg( const Color& clr, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, 1 ) )
 		return;
@@ -655,7 +659,7 @@ void ConColorMsg( const Color& clr, const tchar* pMsgFormat, ... )
 	va_end(args);
 }
 
-void ConMsg( const tchar *pMsgFormat, ... )
+void ConMsg( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, 1 ) )
 		return;
@@ -666,7 +670,7 @@ void ConMsg( const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void ConWarning( const tchar *pMsgFormat, ... )
+void ConWarning( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, 1 ) )
 		return;
@@ -677,7 +681,7 @@ void ConWarning( const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void ConLog( const tchar *pMsgFormat, ... )
+void ConLog( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, 1 ) )
 		return;
@@ -689,7 +693,7 @@ void ConLog( const tchar *pMsgFormat, ... )
 }
 
 
-void ConDColorMsg( const Color& clr, const tchar* pMsgFormat, ... )
+void ConDColorMsg( const Color& clr, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, 2 ) )
 		return;
@@ -700,7 +704,7 @@ void ConDColorMsg( const Color& clr, const tchar* pMsgFormat, ... )
 	va_end(args);
 }
 
-void ConDMsg( const tchar *pMsgFormat, ... )
+void ConDMsg( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, 2 ) )
 		return;
@@ -711,7 +715,7 @@ void ConDMsg( const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void ConDWarning( const tchar *pMsgFormat, ... )
+void ConDWarning( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, 2 ) )
 		return;
@@ -722,7 +726,7 @@ void ConDWarning( const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void ConDLog( const tchar *pMsgFormat, ... )
+void ConDLog( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_CONSOLE, 2 ) )
 		return;
@@ -738,7 +742,7 @@ void ConDLog( const tchar *pMsgFormat, ... )
 // A couple of super-common dynamic spew messages, here for convenience 
 // These looked at the "network" group, print if it's level 1 or higher 
 //-----------------------------------------------------------------------------
-void NetMsg( int level, const tchar* pMsgFormat, ... )
+void NetMsg( int level, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_NETWORK, level ) )
 		return;
@@ -749,7 +753,7 @@ void NetMsg( int level, const tchar* pMsgFormat, ... )
 	va_end(args);
 }
 
-void NetWarning( int level, const tchar *pMsgFormat, ... )
+void NetWarning( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_NETWORK, level ) )
 		return;
@@ -760,7 +764,7 @@ void NetWarning( int level, const tchar *pMsgFormat, ... )
 	va_end(args);
 }
 
-void NetLog( int level, const tchar *pMsgFormat, ... )
+void NetLog( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	if( !IsSpewActive( GROUP_NETWORK, level ) )
 		return;
@@ -877,7 +881,7 @@ void ValidateSpew( CValidator &validator )
 // Input  : *fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void COM_TimestampedLog( char const *fmt, ... )
+void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ... )
 {
 	// dimhotepus: Store time as double
 	static double s_LastStamp = 0.0;

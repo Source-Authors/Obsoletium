@@ -351,8 +351,11 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 		for ( DWORD i = 0; i < g_numCPUs; ++i )
 		{
 			HANDLE thread = CreateThread( NULL, 0x10000, MeasureThread, (void*)i, 0, NULL );
-			SetThreadAffinityMask( thread, 1u << i );
-			SetThreadPriority( thread, THREAD_PRIORITY_HIGHEST );
+			if (thread)
+			{
+				SetThreadAffinityMask( thread, 1u << i );
+				SetThreadPriority( thread, THREAD_PRIORITY_HIGHEST );
+			}
 		}
 
 		// Create the thread which tells the measurement threads to wake up periodically

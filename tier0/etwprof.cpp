@@ -109,7 +109,7 @@ int64 ETWMark( const char *pMessage )
 	return nTime;
 }
 
-void ETWMarkPrintf( const char *pMessage, ... )
+void ETWMarkPrintf( PRINTF_FORMAT_STRING const char *pMessage, ... ) FMTFUNCTION( 1, 2 )
 {
 	// If we are running on Windows XP or if our providers have not been enabled
 	// (by xperf or other) then this will be false and we can early out.

@@ -66,7 +66,7 @@ static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
 
 	// Freeze this thread, adjust its breakpoint state
 	HANDLE hThread = OpenThread( THREAD_SUSPEND_RESUME | THREAD_SET_CONTEXT, FALSE, dwThreadId );
-	if ( hThread != INVALID_HANDLE_VALUE )
+	if ( hThread )
 	{
 		if ( SuspendThread( hThread ) != -1 ) //-V720
 		{
@@ -173,7 +173,7 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 	
 
 	HANDLE hWorkThread = CreateThread( NULL, NULL, &ThreadProcX86SetDataBreakpoints, NULL, 0, NULL );
-	if ( hWorkThread != INVALID_HANDLE_VALUE )
+	if ( hWorkThread )
 	{
 		WaitForSingleObject( hWorkThread, INFINITE );
 		CloseHandle( hWorkThread );
@@ -192,7 +192,7 @@ void Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID )
 	else
 	{
 		HANDLE hWorkThread = CreateThread( NULL, NULL, &ThreadProcX86SetDataBreakpoints, &dwThreadID, 0, NULL );
-		if ( hWorkThread != INVALID_HANDLE_VALUE )
+		if ( hWorkThread )
 		{
 			WaitForSingleObject( hWorkThread, INFINITE );
 			CloseHandle( hWorkThread );

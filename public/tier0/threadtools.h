@@ -21,6 +21,7 @@
 
 #ifdef PLATFORM_WINDOWS_PC
 #include <intrin.h>
+#include <sal.h>
 #endif
 
 #ifdef POSIX
@@ -1571,10 +1572,10 @@ typedef RTL_CRITICAL_SECTION CRITICAL_SECTION;
 #ifndef _X360
 extern "C"
 {
-	void __declspec(dllimport) __stdcall InitializeCriticalSection(CRITICAL_SECTION *);
-	void __declspec(dllimport) __stdcall EnterCriticalSection(CRITICAL_SECTION *);
-	void __declspec(dllimport) __stdcall LeaveCriticalSection(CRITICAL_SECTION *);
-	void __declspec(dllimport) __stdcall DeleteCriticalSection(CRITICAL_SECTION *);
+	void __declspec(dllimport) __stdcall InitializeCriticalSection(_Out_ CRITICAL_SECTION *);
+	void __declspec(dllimport) __stdcall EnterCriticalSection(_Inout_ CRITICAL_SECTION *);
+	void __declspec(dllimport) __stdcall LeaveCriticalSection(_Inout_ CRITICAL_SECTION *);
+	void __declspec(dllimport) __stdcall DeleteCriticalSection(_Inout_ CRITICAL_SECTION *);
 };
 #endif
 

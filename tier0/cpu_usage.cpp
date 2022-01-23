@@ -69,7 +69,11 @@ float GetCPUUsage()
 
 	if ( !NtQuerySystemInformation)
 	{
-		NtQuerySystemInformation = (PROCNTQSI)GetProcAddress( GetModuleHandle("ntdll"), "NtQuerySystemInformation" );
+		auto ntdll = GetModuleHandle("ntdll");
+		if ( !ntdll )
+			return(0);
+
+		NtQuerySystemInformation = (PROCNTQSI)GetProcAddress( ntdll, "NtQuerySystemInformation" );
 
 		if ( !NtQuerySystemInformation )
 			return(0);
