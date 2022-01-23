@@ -112,7 +112,7 @@ void C_SpotlightEnd::ClientThink(void)
 	if ( !m_pDynamicLight || (m_pDynamicLight->key != index) )
 	{
 		m_pDynamicLight = effects->CL_AllocDlight( index );
-		assert (m_pDynamicLight);
+		Assert (m_pDynamicLight);
 	}
 
 	//m_pDynamicLight->flags = DLIGHT_NO_MODEL_ILLUMINATION;

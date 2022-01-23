@@ -387,7 +387,7 @@ void CMaterialModifyProxy::OnBindSetVar( C_MaterialModifyControl *pControl )
 //-----------------------------------------------------------------------------
 void CMaterialModifyProxy::OnBindAnimatedTexture( C_MaterialModifyControl *pControl )
 {
-	assert ( m_AnimatedTextureVar );
+	Assert ( m_AnimatedTextureVar );
 	if( m_AnimatedTextureVar->GetType() != MATERIAL_VAR_TYPE_TEXTURE )
 		return;
 
@@ -625,7 +625,7 @@ bool CMaterialModifyAnimatedProxy::Init( IMaterial *pMaterial, KeyValues *pKeyVa
 //-----------------------------------------------------------------------------
 void CMaterialModifyAnimatedProxy::OnBind( void *pEntity )
 {
-	assert ( m_AnimatedTextureVar );
+	Assert ( m_AnimatedTextureVar );
 	if( m_AnimatedTextureVar->GetType() != MATERIAL_VAR_TYPE_TEXTURE )
 		return;
 

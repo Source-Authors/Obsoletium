@@ -440,7 +440,7 @@ static void LightcacheUnlink( lightcache_t *pcache )
 			}
 			plist = lightcache[plist].next;
 		}
-		assert(found);
+		Assert(found);
 	}
 }
 

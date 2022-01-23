@@ -560,7 +560,7 @@ CBaseEntity	*C_BasePlayer::GetObserverTarget() const	// returns players target o
 				return (const_cast<C_BasePlayer*>(this))->GetBaseEntity();
 				break;
 			default:
-				assert ( false );
+				Assert ( false );
 				break;
 			}
 		}
@@ -655,7 +655,7 @@ int C_BasePlayer::GetObserverMode() const
 			return OBS_MODE_CHASE;
 			break;
 		default:
-			assert ( false );
+			Assert ( false );
 			break;
 		}
 	}
