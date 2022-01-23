@@ -165,7 +165,7 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 				}
 			}
 			s_BreakpointState.pAddress[i] = pAddress;
-			s_BreakpointState.nWatchBytes[i] = nWatchBytes;
+			s_BreakpointState.nWatchBytes[i] = static_cast<char>(nWatchBytes);
 			s_BreakpointState.bBreakOnRead[i] = bBreakOnRead;
 			break;
 		}

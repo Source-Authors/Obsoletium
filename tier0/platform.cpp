@@ -306,23 +306,19 @@ bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo )
 	if ( !pOutMemoryInfo ) 
 		return false;
 
-	MEMORYSTATUSEX	memStat;
-	ZeroMemory( &memStat, sizeof( MEMORYSTATUSEX ) );
-	memStat.dwLength = sizeof( MEMORYSTATUSEX );
-
+	MEMORYSTATUSEX memStat = { sizeof(memStat) };
 	if ( !GlobalMemoryStatusEx( &memStat ) ) 
 		return false;
 
-	const uint cOneMb = 1024 * 1024;
+	constexpr uint32_t cOneMib{1024 * 1024};
 
 	switch ( pOutMemoryInfo->m_nStructVersion )
 	{
 	case 0:
-		( *pOutMemoryInfo ).m_nPhysicalRamMbTotal     = memStat.ullTotalPhys / cOneMb;
-		( *pOutMemoryInfo ).m_nPhysicalRamMbAvailable = memStat.ullAvailPhys / cOneMb;
-
-		( *pOutMemoryInfo ).m_nVirtualRamMbTotal      = memStat.ullTotalVirtual / cOneMb;
-		( *pOutMemoryInfo ).m_nVirtualRamMbAvailable  = memStat.ullAvailVirtual / cOneMb;
+		( *pOutMemoryInfo ).m_nPhysicalRamMbTotal     = static_cast<uint>(memStat.ullTotalPhys / cOneMib);
+		( *pOutMemoryInfo ).m_nPhysicalRamMbAvailable = static_cast<uint>(memStat.ullAvailPhys / cOneMib);
+		( *pOutMemoryInfo ).m_nVirtualRamMbTotal      = static_cast<uint>(memStat.ullTotalVirtual / cOneMib);
+		( *pOutMemoryInfo ).m_nVirtualRamMbAvailable  = static_cast<uint>(memStat.ullAvailVirtual / cOneMib);
 		break;
 
 	default:
