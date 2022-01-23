@@ -2,8 +2,6 @@
 
 #include "pch_tier0.h"
 #include "mem_helpers.h"
-#include <string.h>
-#include <malloc.h>
 
 bool g_bInitMemory = true;
 

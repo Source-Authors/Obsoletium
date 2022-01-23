@@ -3,16 +3,12 @@
 #include "pch_tier0.h"
 #include "tier0/icommandline.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 #include "tier0/dbg.h"
 
 #include "tier0/memdbgon.h"
 
 #ifdef POSIX
-#include <limits.h>
+#include <climits>
 #define _MAX_PATH PATH_MAX
 #endif
 

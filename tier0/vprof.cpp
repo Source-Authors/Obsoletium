@@ -7,8 +7,6 @@
 #include "tier0/memalloc.h"
 #include "tier0/valve_off.h"
 
-#include <assert.h>
-
 #ifdef _WIN32
 #pragma warning(disable:4073)
 #pragma init_seg( lib )

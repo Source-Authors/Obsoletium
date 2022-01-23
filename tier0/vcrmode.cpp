@@ -6,11 +6,7 @@
 #include <winsock.h>
 #endif
 
-#include <time.h>
-#include <assert.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
+#include <ctime>
 #include "tier0/vcrmode.h"
 #include "tier0/dbg.h"
 
@@ -461,7 +457,7 @@ static int VCR_Start( char const *pFilename, bool bRecord, IVCRHelpers *pHelpers
 			VCR_Read(&version, sizeof(version));
 			if(version != VCRFILE_VERSION)
 			{
-				assert(!"VCR_Start: invalid file version");
+				Assert(!"VCR_Start: invalid file version");
 				VCREnd();
 				return FALSE;
 			}
@@ -545,7 +541,7 @@ static void VCR_SyncToken(char const *pToken)
 	if(g_VCRMode == VCR_Record)
 	{
 		int intLen = strlen( pToken );
-		assert( intLen <= 255 );
+		Assert( intLen <= 255 );
 
 		len = (unsigned char)intLen;
 		
@@ -1062,7 +1058,7 @@ static long VCR_Hook_RegQueryValueEx(void *hKey, tchar const *lpValueName, unsig
 	VCR_Event(VCREvent_RegQueryValueEx);
 
 	// Doesn't support this being null right now (although it would be trivial to add support).
-	assert(lpData);
+	Assert(lpData);
 	
 	long ret;
 	unsigned long dummy = 0;

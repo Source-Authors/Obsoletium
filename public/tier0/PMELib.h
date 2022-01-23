@@ -3,7 +3,7 @@
 #ifndef PMELIB_H
 #define PMELIB_H
 
-#include "Windows.h"
+#include "winlite.h"
 #include "tier0/platform.h"
 
 #define VERSION "1.0.2"

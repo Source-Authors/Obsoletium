@@ -7,11 +7,10 @@
 
 #if defined( _WIN32 ) && !defined( _X360 )
 
-#if _MSC_VER >= 1300
 #include "tier0/valve_off.h"
 
 #include <dbghelp.h>
-#include <time.h>
+#include <ctime>
 
 // MiniDumpWriteDump() function declaration (so we can just get the function directly from windows)
 using MINIDUMPWRITEDUMP = decltype(&::MiniDumpWriteDump);
@@ -571,19 +570,6 @@ void EnableCrashingOnCrashes()
 		}
 	}
 }
-
-#else
-
-PLATFORM_INTERFACE void WriteMiniDump( const char *pszFilenameSuffix )
-{
-}
-
-PLATFORM_INTERFACE void CatchAndWriteMiniDump( FnWMain pfn, int argc, tchar *argv[] )
-{
-	pfn( argc, argv );
-}
-
-#endif
 #elif defined(_X360 )
 PLATFORM_INTERFACE void WriteMiniDump( const char *pszFilenameSuffix )
 {

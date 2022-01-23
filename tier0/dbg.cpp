@@ -9,10 +9,6 @@
 #endif
 
 #include <cassert>
-#include <cstdio>
-#include <cstring>
-#include <cstdarg>
-#include <cstdlib>
 #include "Color.h"
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"

@@ -86,7 +86,7 @@ public:
 		CSharedLibraryItem *item = GetCacheItem(name);
 		if (item)
 		{
-			assert(item == m_pList);
+			Assert(item == m_pList);
 			m_pList = item->m_next;
 			item->m_next = NULL;
 			delete item;

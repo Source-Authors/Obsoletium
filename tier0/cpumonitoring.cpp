@@ -26,7 +26,7 @@
 #define NOMINMAX
 #undef min
 #undef max
-#include "PowrProf.h"
+#include <powrprof.h>
 #include <algorithm>
 #pragma comment(lib, "PowrProf.lib")
 

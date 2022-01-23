@@ -2,7 +2,6 @@
 
 #include "pch_tier0.h"
 
-#include <stdio.h>
 #include "tier0/fasttimer.h"
 
 // g_dwClockSpeed is only exported for backwards compatibility.

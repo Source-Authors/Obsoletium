@@ -19,7 +19,7 @@
 #ifndef ETWPROF_H
 #define ETWPROF_H
 
-#if defined( COMPILER_MSVC )
+#ifdef _WIN32
 #pragma once
 #endif
 

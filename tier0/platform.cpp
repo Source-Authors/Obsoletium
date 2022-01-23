@@ -1,12 +1,12 @@
 // Copyright Valve Corporation, All rights reserved.
 
 #include "pch_tier0.h"
-#include <time.h>
+
+#include <ctime>
 
 #if defined(_WIN32) && !defined(_X360)
-#include <errno.h>
+#include <cerrno>
 #endif
-#include <assert.h>
 #include "tier0/platform.h"
 #include "tier0/minidump.h"
 #ifdef _X360

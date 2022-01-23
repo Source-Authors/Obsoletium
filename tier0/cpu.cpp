@@ -3,7 +3,7 @@
 #include "pch_tier0.h"
 
 #if defined(_LINUX)
-#include <stdlib.h>
+#include <cstdlib>
 #elif defined(OSX)
 #include <sys/sysctl.h>
 #endif

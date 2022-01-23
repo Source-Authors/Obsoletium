@@ -6,8 +6,6 @@
 
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
-#include <malloc.h>
-#include <string.h>
 #include "tier0/dbg.h"
 #include "tier0/memalloc.h"
 #include "mem_helpers.h"

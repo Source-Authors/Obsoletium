@@ -4,7 +4,6 @@
 
 #include "pch_tier0.h"
 #include "tier0/mem.h"
-#include <malloc.h>
 #include "tier0/dbg.h"
 #include "tier0/minidump.h"
 

@@ -1,12 +1,12 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#include <time.h>
-#include <assert.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <errno.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cassert>
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
+#include <cerrno>
+#include <cstdlib>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "tier0/threadtools.h"

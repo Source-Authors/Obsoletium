@@ -169,8 +169,8 @@ public:
 	//-----------------------------------------------------------------------------
 	template<typename T> inline void SwapBufferToTargetEndian( T* outputBuffer, T* inputBuffer = NULL, int count = 1 )
 	{
-		assert( count >= 0 );
-		assert( outputBuffer );
+		Assert( count >= 0 );
+		Assert( outputBuffer );
 
 		// Fail gracefully in release:
 		if( count <=0 || !outputBuffer )

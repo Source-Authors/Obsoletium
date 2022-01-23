@@ -15,8 +15,6 @@
 #define VA_RESERVE_FLAGS (MEM_RESERVE|MEM_LARGE_PAGES)
 #endif
 
-#include <malloc.h>
-
 #include "tier0/valve_minmax_off.h"	// GCC 4.2.2 headers screw up our min/max defs.
 #include <algorithm>
 #include "tier0/valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.

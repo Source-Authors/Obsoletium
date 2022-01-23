@@ -10,7 +10,7 @@
 // dimhotepus: Launcher icon id.
 #include "../launcher_main/resource.h"
 #elif defined( POSIX )
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 #include "resource.h"
 #include "tier0/valve_on.h"
@@ -29,18 +29,16 @@
 typedef int ( SDLCALL FUNC_SDL_ShowMessageBox )( const SDL_MessageBoxData *messageboxdata, int *buttonid );
 #endif
 
-class CDialogInitInfo
+struct CDialogInitInfo
 {
-public:
 	const tchar *m_pFilename;
 	int m_iLine;
 	const tchar *m_pExpression;
 };
 
 
-class CAssertDisable
+struct CAssertDisable
 {
-public:
 	tchar m_Filename[512];
 	
 	// If these are not -1, then this CAssertDisable only disables asserts on lines between
@@ -85,13 +83,10 @@ static CDialogInitInfo g_Info;
 #if defined(_WIN32) && !defined(STATIC_TIER0)
 extern "C" BOOL APIENTRY MemDbgDllMain( HMODULE hDll, DWORD dwReason, PVOID pvReserved );
 
-BOOL WINAPI DllMain(
-  HINSTANCE hinstDLL,  // handle to the DLL module
-  DWORD fdwReason,     // reason for calling function
-  LPVOID lpvReserved   // reserved
-)
+BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 {
 	g_hTier0Instance = hinstDLL;
+
 #ifdef DEBUG
 	MemDbgDllMain( hinstDLL, fdwReason, lpvReserved );
 #endif
