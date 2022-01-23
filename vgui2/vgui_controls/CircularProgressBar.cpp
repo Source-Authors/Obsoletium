@@ -164,8 +164,8 @@ void CircularProgressBar::Paint()
 	float flProgress = GetProgress();
 	float flEndAngle;
 
-	flEndAngle = m_bReverseProgress ? ( 1.0 - flProgress ) : flProgress;
-	flEndAngle = m_iProgressDirection == PROGRESS_CCW ? ( 1.0 - flEndAngle ) : flEndAngle;
+	flEndAngle = m_bReverseProgress ? ( 1.0F - flProgress ) : flProgress;
+	flEndAngle = m_iProgressDirection == PROGRESS_CCW ? ( 1.0F - flEndAngle ) : flEndAngle;
 
 	DrawCircleSegment( GetFgColor(), flEndAngle, ( m_iProgressDirection == PROGRESS_CW ) );
 }
@@ -201,7 +201,7 @@ circular_progress_segment_t Segments[8] =
 
 };
 
-#define SEGMENT_ANGLE	( M_PI / 4 )
+#define SEGMENT_ANGLE	( M_PI_F / 4 )
 
 // function to draw from A to B degrees, with a direction
 // we draw starting from the top ( 0 progress )
@@ -225,7 +225,7 @@ void CircularProgressBar::DrawCircleSegment( Color c, float flEndProgress, bool 
 	// if we want to progress CCW, reverse a few things
 	if ( !bClockwise )
 	{
-		float flEndProgressRadians = flEndProgress * M_PI * 2;
+		float flEndProgressRadians = flEndProgress * M_PI_F * 2;
 
 		int i;
 		for ( i=0;i<8;i++ )
@@ -253,7 +253,7 @@ void CircularProgressBar::DrawCircleSegment( Color c, float flEndProgress, bool 
 						flInternalProgress = SEGMENT_ANGLE - flInternalProgress;
 					}
 
-					float flTan = tan(flInternalProgress);
+					float flTan = tanf(flInternalProgress);
 
 					float flDeltaX, flDeltaY;
 
@@ -269,17 +269,17 @@ void CircularProgressBar::DrawCircleSegment( Color c, float flEndProgress, bool 
 					}
 
 					v[1].m_Position.Init( Segments[i].vert1x * flWide + flDeltaX, Segments[i].vert1y * flTall + flDeltaY );
-					v[1].m_TexCoord.Init( Segments[i].vert1x + ( flDeltaX / flHalfWide ) * 0.5, Segments[i].vert1y + ( flDeltaY / flHalfTall ) * 0.5 );
+					v[1].m_TexCoord.Init( Segments[i].vert1x + ( flDeltaX / flHalfWide ) * 0.5F, Segments[i].vert1y + ( flDeltaY / flHalfTall ) * 0.5F );
 				}
 				else
 				{
 					// full segment, easy calculation
-					v[1].m_Position.Init( flHalfWide + flWide * ( Segments[i].vert1x - 0.5 ), flHalfTall + flTall * ( Segments[i].vert1y - 0.5 ) );
+					v[1].m_Position.Init( flHalfWide + flWide * ( Segments[i].vert1x - 0.5F ), flHalfTall + flTall * ( Segments[i].vert1y - 0.5F ) );
 					v[1].m_TexCoord.Init( Segments[i].vert1x, Segments[i].vert1y );
 				}
 
 				// vert 2 is ( Segments[i].vert1x, Segments[i].vert1y )
-				v[2].m_Position.Init( flHalfWide + flWide * ( Segments[i].vert2x - 0.5 ), flHalfTall + flTall * ( Segments[i].vert2y - 0.5 ) );
+				v[2].m_Position.Init( flHalfWide + flWide * ( Segments[i].vert2x - 0.5F ), flHalfTall + flTall * ( Segments[i].vert2y - 0.5F ) );
 				v[2].m_TexCoord.Init( Segments[i].vert2x, Segments[i].vert2y );
 
 				vgui::surface()->DrawTexturedPolygon( 3, v );
@@ -289,7 +289,7 @@ void CircularProgressBar::DrawCircleSegment( Color c, float flEndProgress, bool 
 	}
 
 
-	float flEndProgressRadians = flEndProgress * M_PI * 2;
+	float flEndProgressRadians = flEndProgress * M_PI_F * 2;
 
 	int cur_wedge = m_iStartSegment;
 	for ( int i=0;i<8;i++ )
@@ -313,7 +313,7 @@ void CircularProgressBar::DrawCircleSegment( Color c, float flEndProgress, bool 
 					flInternalProgress = SEGMENT_ANGLE - flInternalProgress;
 				}
 
-				float flTan = tan(flInternalProgress);
+				float flTan = tanf(flInternalProgress);
 	
 				float flDeltaX, flDeltaY;
 
@@ -329,17 +329,17 @@ void CircularProgressBar::DrawCircleSegment( Color c, float flEndProgress, bool 
 				}
 
 				v[2].m_Position.Init( Segments[i].vert1x * flWide + flDeltaX, Segments[i].vert1y * flTall + flDeltaY );
-				v[2].m_TexCoord.Init( Segments[i].vert1x + ( flDeltaX / flHalfWide ) * 0.5, Segments[i].vert1y + ( flDeltaY / flHalfTall ) * 0.5 );
+				v[2].m_TexCoord.Init( Segments[i].vert1x + ( flDeltaX / flHalfWide ) * 0.5F, Segments[i].vert1y + ( flDeltaY / flHalfTall ) * 0.5F );
 			}
 			else
 			{
 				// full segment, easy calculation
-				v[2].m_Position.Init( flHalfWide + flWide * ( Segments[i].vert2x - 0.5 ), flHalfTall + flTall * ( Segments[i].vert2y - 0.5 ) );
+				v[2].m_Position.Init( flHalfWide + flWide * ( Segments[i].vert2x - 0.5F ), flHalfTall + flTall * ( Segments[i].vert2y - 0.5F ) );
 				v[2].m_TexCoord.Init( Segments[i].vert2x, Segments[i].vert2y );
 			}
 
 			// vert 2 is ( Segments[i].vert1x, Segments[i].vert1y )
-			v[1].m_Position.Init( flHalfWide + flWide * ( Segments[i].vert1x - 0.5 ), flHalfTall + flTall * ( Segments[i].vert1y - 0.5 ) );
+			v[1].m_Position.Init( flHalfWide + flWide * ( Segments[i].vert1x - 0.5F ), flHalfTall + flTall * ( Segments[i].vert1y - 0.5F ) );
 			v[1].m_TexCoord.Init( Segments[i].vert1x, Segments[i].vert1y );
 
 			vgui::surface()->DrawTexturedPolygon( 3, v );
