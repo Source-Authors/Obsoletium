@@ -107,7 +107,6 @@ rDirsToSkip = [
 	'zip',
 	'zlib',
 	'Zlib',
-	'windowssdk',
 	'bzip2',
 	'libjpeg-turbo',
 	'MakeGameData',
