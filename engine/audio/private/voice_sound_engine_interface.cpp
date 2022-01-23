@@ -6,7 +6,6 @@
 //=============================================================================//
 
 #include "audio_pch.h"
-#include <assert.h>
 #include "voice.h"
 #include "ivoicecodec.h"
 

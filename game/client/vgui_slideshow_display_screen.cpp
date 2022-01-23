@@ -63,7 +63,7 @@ CSlideshowDisplayScreen::CSlideshowDisplayScreen( vgui::Panel *parent, const cha
 
 void CSlideshowDisplayScreen::ApplySchemeSettings( IScheme *pScheme )
 {
-	assert( pScheme );
+	Assert( pScheme );
 
 	m_cDefault = pScheme->GetColor( "CSlideshowDisplayScreen_Default", GetFgColor() );
 	m_cInvisible = Color( 0, 0, 0, 0 );	

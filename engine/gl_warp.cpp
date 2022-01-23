@@ -148,7 +148,7 @@ bool R_LoadNamedSkys( const char *skyname )
 		}
 	
 		// Use the new one
-		assert( skies[ i ] );
+		Assert( skies[ i ] );
 		skyboxMaterials[i] = skies[ i ];
 		skyboxMaterials[i]->IncrementReferenceCount();
 	}

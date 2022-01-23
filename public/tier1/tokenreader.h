@@ -18,7 +18,6 @@
 #include <fstream>
 #include "valve_minmax_on.h"
 
-#include <assert.h>
 
 
 typedef enum

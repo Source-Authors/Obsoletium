@@ -49,7 +49,7 @@ CHudElementHelper::CHudElementHelper( CHudElement *( *pfnCreate )( void ), int d
 	m_iDepth		= depth;
 
 	// Set attributes
-	assert( pfnCreate );
+	Assert( pfnCreate );
 	m_pfnCreate		= pfnCreate;
 }
 

@@ -334,7 +334,7 @@ void CHLTVDemoRecorder::WriteFrame( CHLTVFrame *pFrame )
 	ALIGN4 byte		buffer[ NET_MAX_PAYLOAD ] ALIGN4_POST;
 	bf_write	msg( "CHLTVDemo::RecordFrame", buffer, sizeof( buffer ) );
 
-	assert( hltv->IsMasterProxy() ); // this works only on the master since we use sv.
+	Assert( hltv->IsMasterProxy() ); // this works only on the master since we use sv.
 
 	//first write reliable data
 	bf_write *data = &pFrame->m_Messages[HLTV_BUFFER_RELIABLE];

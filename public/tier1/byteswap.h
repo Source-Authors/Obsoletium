@@ -11,6 +11,7 @@
 #endif
 
 #include "datamap.h"	// Needed for typedescription_t.  Note datamap.h is tier1 as well.
+#include "tier0/dbg.h"
 
 class CByteswap
 {
@@ -127,7 +128,7 @@ public:
 		if( output == nativeConstant )
 			return 0;
 
-		assert( 0 );		// if we get here, input is neither a swapped nor unswapped version of nativeConstant.
+		Assert( 0 );		// if we get here, input is neither a swapped nor unswapped version of nativeConstant.
 		return -1;
 	}
 
@@ -140,8 +141,8 @@ public:
 	//-----------------------------------------------------------------------------
 	template<typename T> inline void SwapBuffer( T* outputBuffer, T* inputBuffer = NULL, int count = 1 )
 	{
-		assert( count >= 0 );
-		assert( outputBuffer );
+		Assert( count >= 0 );
+		Assert( outputBuffer );
 
 		// Fail gracefully in release:
 		if( count <=0 || !outputBuffer )

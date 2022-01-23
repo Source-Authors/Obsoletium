@@ -208,7 +208,7 @@ void CMultiplayerAdvancedDialog::GatherCurrentValues()
 				}
 				else  // Couln't find index
 				{
-					//assert(!("Couldn't find string in list, using default value"));
+					//Assert(!("Couldn't find string in list, using default value"));
 					sprintf( szValue, "%s", pObj->defValue );
 				}
 				break;

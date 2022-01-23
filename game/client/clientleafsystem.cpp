@@ -866,7 +866,7 @@ short CClientLeafSystem::GetRenderableArea( ClientRenderHandle_t handle )
 
 void CClientLeafSystem::SetSubSystemDataInLeaf( int leaf, int nSubSystemIdx, CClientLeafSubSystemData *pData )
 {
-	assert( nSubSystemIdx < N_CLSUBSYSTEMS );
+	Assert( nSubSystemIdx < N_CLSUBSYSTEMS );
 	if ( m_Leaf[leaf].m_pSubSystemData[nSubSystemIdx] )
 		delete m_Leaf[leaf].m_pSubSystemData[nSubSystemIdx];
 	m_Leaf[leaf].m_pSubSystemData[nSubSystemIdx] = pData;
@@ -874,7 +874,7 @@ void CClientLeafSystem::SetSubSystemDataInLeaf( int leaf, int nSubSystemIdx, CCl
 
 CClientLeafSubSystemData *CClientLeafSystem::GetSubSystemDataInLeaf( int leaf, int nSubSystemIdx )
 {
-	assert( nSubSystemIdx < N_CLSUBSYSTEMS );
+	Assert( nSubSystemIdx < N_CLSUBSYSTEMS );
 	return m_Leaf[leaf].m_pSubSystemData[nSubSystemIdx];
 }
 

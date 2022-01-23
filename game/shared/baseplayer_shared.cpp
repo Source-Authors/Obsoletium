@@ -1946,7 +1946,7 @@ void CBasePlayer::ClearZoomOwner( void )
 bool CBasePlayer::SetFOV( CBaseEntity *pRequester, int FOV, float zoomRate, int iZoomStart /* = 0 */ )
 {
 	//NOTENOTE: You MUST specify who is requesting the zoom change
-	assert( pRequester != NULL );
+	Assert( pRequester != NULL );
 	if ( pRequester == NULL )
 		return false;
 

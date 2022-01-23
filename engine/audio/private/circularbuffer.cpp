@@ -194,7 +194,7 @@ int CCircularBuffer::Read(void *pchDestIn, int nCount)
 	{
 		nRead = Advance(nPeeked);
 
-		assert( nRead == nPeeked);
+		Assert( nRead == nPeeked);
 	}
 	else
 	{

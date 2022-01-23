@@ -21,7 +21,6 @@
 #include "winlite.h"
 #include <WinInet.h>
 #endif
-#include <assert.h>
 #include <sys/stat.h>
 #include <stdio.h>
 

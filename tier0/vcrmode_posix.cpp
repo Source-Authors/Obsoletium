@@ -1,7 +1,6 @@
 // Copyright Valve Corporation, All rights reserved.
 
 #include <ctime>
-#include <cassert>
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
@@ -253,7 +252,7 @@ static int VCR_Start( char const *pFilename, bool bRecord, IVCRHelpers *pHelpers
 			VCR_Read(&version, sizeof(version));
 			if(version != VCRFILE_VERSION)
 			{
-				assert(!"VCR_Start: invalid file version");
+				Assert(!"VCR_Start: invalid file version");
 				VCREnd();
 				return FALSE;
 			}
@@ -320,7 +319,7 @@ static void VCR_SyncToken(char const *pToken)
 	if(g_VCRMode == VCR_Record)
 	{
 		int intLen = strlen( pToken );
-		assert( intLen <= 255 );
+		Assert( intLen <= 255 );
 
 		len = (unsigned char)intLen;
 		

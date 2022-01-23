@@ -99,7 +99,7 @@ void Shader_Disconnect( void )
 
 void Shader_SwapBuffers( void )
 {
-	assert( materials );
+	Assert( materials );
 	materials->SwapBuffers();
 }
 

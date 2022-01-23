@@ -2272,7 +2272,7 @@ void SurfComputeLightmapCoordinate( SurfaceCtx_t const& ctx, SurfaceHandle_t sur
 		uv *= ctx.m_Scale;
 		uv += ctx.m_Offset;
 
-		assert( uv.IsValid() );
+		Assert( uv.IsValid() );
 	}
 #if _DEBUG
 	// This was here for check against displacements and they actually get calculated later correctly.

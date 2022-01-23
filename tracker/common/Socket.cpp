@@ -8,7 +8,6 @@
 #define FD_SETSIZE 1024
 #endif
 
-#include <assert.h>
 #include "winlite.h"
 #if !defined( _X360 )
 #include "winsock.h"
@@ -101,7 +100,7 @@ static DWORD WINAPI SocketThreadFunc( LPVOID threadobject )
 {
 	// Get pointer to CSocketThread object
 	CSocketThread *socketthread = ( CSocketThread * )threadobject;
-	assert( socketthread );
+	Assert( socketthread );
 	if ( !socketthread )
 	{
 		return 0;
@@ -200,7 +199,7 @@ CSocketThread::CSocketThread( void )
 	InitializeCriticalSection( &cs );
 
 	m_hShutdown	= CreateEvent( NULL, TRUE, FALSE, NULL );
-	assert( m_hShutdown );
+	Assert( m_hShutdown );
 
 	m_hThread = 0;
 	m_nThreadId = 0;
@@ -222,7 +221,7 @@ CSocketThread::~CSocketThread( void )
 
 	// Kill the socket
 //!! need to validate this line
-//	assert( !m_pSocketList );
+//	Assert( !m_pSocketList );
 
 	if ( m_hThread )
 	{
@@ -247,7 +246,7 @@ void CSocketThread::InitTimer( void )
 	m_dCurrentTime			= 0.0;
 
 	success = QueryPerformanceFrequency( &PerformanceFreq );
-	assert( success );
+	Assert( success );
 
 	// get 32 out of the 64 time bits such that we have around
 	// 1 microsecond resolution
@@ -365,7 +364,7 @@ void CSocketThread::AddSocketToThread( CSocket *socket )
 	if (!m_hThread)
 	{
 		m_hThread = VCRHook_CreateThread( NULL, 0, SocketThreadFunc, (void *)this, 0, &m_nThreadId );
-		assert( m_hThread );
+		Assert( m_hThread );
 	}
 
 	socketCount++;
@@ -854,7 +853,7 @@ float CSocket::GetClock( void )
 //-----------------------------------------------------------------------------
 const netadr_t *CSocket::GetAddress( void )
 {
-	assert( m_bValid );
+	Assert( m_bValid );
 
 	if ( !m_bResolved )
 	{

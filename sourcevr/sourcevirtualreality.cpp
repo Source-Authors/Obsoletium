@@ -204,7 +204,7 @@ void CDistortionTextureRegen::RegenerateTextureBits( ITexture *pTexture, IVTFTex
 		for( x = 0; x < width; x++ )
 		{
 			int offset = 4 * ( x + y * width );
-			assert( offset < width * height * 4 );
+			Assert( offset < width * height * 4 );
 
 			float u = ( (float)x + 0.5f) / fWidth;
 			float v = ( (float)y + 0.5f) / fHeight;

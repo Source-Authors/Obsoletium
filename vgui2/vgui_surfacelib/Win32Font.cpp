@@ -545,7 +545,7 @@ int CWin32Font::GetHeight()
 //-----------------------------------------------------------------------------
 int CWin32Font::GetHeightRequested()
 {
-	assert(IsValid());
+	Assert(IsValid());
 	return m_iTall;
 }
 

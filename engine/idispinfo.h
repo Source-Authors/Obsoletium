@@ -17,7 +17,6 @@
 
 //=============================================================================
 
-#include <assert.h>
 #include "bspfile.h"
 #include "mathlib/vmatrix.h"
 #include "dispnode.h"

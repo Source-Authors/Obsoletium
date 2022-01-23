@@ -88,7 +88,7 @@ public:
 	// Determine the color modulation amount
 	void	GetColorModulation( float* color )
 	{
-		assert(color);
+		Assert(color);
 		color[0] = color[1] = color[2] = 1.0f;
 	}
 

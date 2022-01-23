@@ -82,7 +82,7 @@ void FloatImagePyramid_t::ReconstructLowerResolutionLevels(int start_level)
 
 float & FloatImagePyramid_t::Pixel(int x, int y, int component, int level) const
 {
-	assert(level<m_nLevels);
+	Assert(level<m_nLevels);
 	x<<=level;
 	y<<=level;
 	return m_pLevels[level]->Pixel(x,y,component);

@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <assert.h>
 
 #include "VPanel.h"
 #include "vgui_internal.h"
@@ -319,7 +318,7 @@ public:
 		// assert that the specified vpanel is from the same module as requesting the cast
 		if ( !vguiPanel || V_stricmp(GetModuleName(vguiPanel), moduleName) )
 		{
-			// assert(!("GetPanel() used to retrieve a Panel * from a different dll than which which it was created. This is bad, you can't pass Panel * across dll boundaries else you'll break the versioning.  Please only use a VPANEL."));
+			// Assert(!("GetPanel() used to retrieve a Panel * from a different dll than which which it was created. This is bad, you can't pass Panel * across dll boundaries else you'll break the versioning.  Please only use a VPANEL."));
 			// this is valid for now
 			return NULL;
 		}

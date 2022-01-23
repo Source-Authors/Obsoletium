@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <assert.h>
 #include <float.h>
 #include "cmodel_engine.h"
 #include "dispcoll_common.h"

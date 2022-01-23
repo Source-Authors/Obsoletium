@@ -209,7 +209,7 @@ void CAI_BaseNPC::SetSchedule( CAI_Schedule *pNewSchedule )
 			m_ScheduleHistory.Remove( SCHEDULE_HISTORY_SIZE );
 		}
 
-		assert( m_ScheduleHistory.Count() <= SCHEDULE_HISTORY_SIZE );
+		Assert( m_ScheduleHistory.Count() <= SCHEDULE_HISTORY_SIZE );
 
 		// No analysis until the vector is full!
 		if( m_ScheduleHistory.Count() == SCHEDULE_HISTORY_SIZE )

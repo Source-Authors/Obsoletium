@@ -12,8 +12,6 @@
 #include "tier0/platform.h"
 #include "ivoicerecord.h"
 
-#include <assert.h>
-
 #ifndef POSIX
 class VoiceRecord_OpenAL : public IVoiceRecord
 {

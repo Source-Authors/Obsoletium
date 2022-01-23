@@ -13,7 +13,6 @@
 #include <shlwapi.h>
 #include <shlobj.h>
 #endif
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

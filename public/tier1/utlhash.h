@@ -11,7 +11,6 @@
 #define UTLHASH_H
 #pragma once
 
-#include <assert.h>
 #include <limits.h>
 #include "utlmemory.h"
 #include "utlvector.h"
@@ -19,6 +18,7 @@
 #include "utllinkedlist.h"
 #include "commonmacros.h"
 #include "generichash.h"
+#include "tier0/dbg.h"
 
 typedef unsigned int UtlHashHandle_t;
 
@@ -183,8 +183,8 @@ inline int CUtlHash<Data, C, K>::GetKeyDataIndex( UtlHashHandle_t handle ) const
 template<class Data, typename C, typename K>
 inline UtlHashHandle_t CUtlHash<Data, C, K>::BuildHandle( int ndxBucket, int ndxKeyData ) const
 {
-	assert( ( ndxBucket >= 0 ) && ( ndxBucket < 65536 ) );
-	assert( ( ndxKeyData >= 0 ) && ( ndxKeyData < 65536 ) );
+	Assert( ( ndxBucket >= 0 ) && ( ndxBucket < 65536 ) );
+	Assert( ( ndxKeyData >= 0 ) && ( ndxKeyData < 65536 ) );
 
 	UtlHashHandle_t handle = ndxKeyData;
 	handle |= ( ndxBucket << 16 );
@@ -321,7 +321,7 @@ inline UtlHashHandle_t CUtlHash<Data, C, K>::AllocEntryFromKey( Data const &src 
 template<class Data, typename C, typename K>
 inline void CUtlHash<Data, C, K>::Remove( UtlHashHandle_t handle )
 {
-	assert( IsValidHandle( handle ) );
+	Assert( IsValidHandle( handle ) );
 
 	// check to see if the bucket exists
 	int ndxBucket = GetBucketIndex( handle );

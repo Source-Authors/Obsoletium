@@ -286,7 +286,7 @@ int VoiceRecord_DSound::GetRecordedData( short *pOut, int nSamples )
 {
 	if(!m_pCaptureBuffer)
 	{
-		assert(false);
+		Assert(false);
 		return 0;
 	}
 
@@ -333,7 +333,7 @@ int VoiceRecord_DSound::GetRecordedData( short *pOut, int nSamples )
 	// Hopefully we didn't get too much data back!
 	if((dataLen[0]+dataLen[1]) > nBytesWanted )
 	{
-		assert(false);
+		Assert(false);
 		m_pCaptureBuffer->Unlock(pData[0], dataLen[0], pData[1], dataLen[1]);
 		return 0;
 	}

@@ -24,8 +24,6 @@
 #include <WinInet.h>
 #endif
 
-#include <assert.h>
-
 #include "download.h"
 #include "tier0/platform.h"
 #include "download_internal.h"

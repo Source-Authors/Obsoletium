@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include <assert.h>
 #include <math.h> // for ceil()
 #define PROTECTED_THINGS_DISABLE
 

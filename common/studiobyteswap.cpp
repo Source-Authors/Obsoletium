@@ -2008,8 +2008,8 @@ int ByteswapMDL( void *pDestBase, const void *pSrcBase, const int fileSize )
 //----------------------------------------------------------------------
 int ByteswapStudioFile( const char *pFilename, void *pOutBase, const void *pFileBase, int fileSize, studiohdr_t *pHdr, CompressFunc_t pCompressFunc )
 {
-	assert( pFilename );
-	assert( pOutBase != pFileBase );
+	Assert( pFilename );
+	Assert( pOutBase != pFileBase );
 	
 	g_pCompressFunc = pCompressFunc;
 

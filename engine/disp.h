@@ -16,7 +16,6 @@
 
 //=============================================================================
 
-#include <assert.h>
 #include "idispinfo.h"
 #include "bspfile.h"
 #include "mathlib/vmatrix.h"

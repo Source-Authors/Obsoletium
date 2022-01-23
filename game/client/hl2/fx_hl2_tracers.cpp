@@ -213,7 +213,7 @@ void FX_PlayerAR2Tracer( const Vector &start, const Vector &end )
 
 	//Create the line
 	CFXStaticLine *tracerLine = new CFXStaticLine( "Tracer", dStart, dEnd, random->RandomFloat( 6.0f, 12.0f ), 0.01f, "effects/gunshiptracer", 0 );
-	assert( tracerLine );
+	Assert( tracerLine );
 
 	//Throw it into the list
 	clienteffects->AddEffect( tracerLine );

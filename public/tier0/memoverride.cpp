@@ -1058,7 +1058,7 @@ extern "C"
 size_t __crtDebugFillThreshold = 0;
 
 extern "C" void * __cdecl _heap_alloc_base (size_t ) {
-    assert(0);
+    Assert(0);
 	return NULL;
 }
 
@@ -1081,13 +1081,13 @@ void __cdecl _free_dbg_nolock( void * pUserData, int )
 
 _CRT_ALLOC_HOOK __cdecl _CrtGetAllocHook ( void)
 {
-		assert(0); 
+		Assert(0); 
         return NULL;
 }
 
 _CRT_DUMP_CLIENT __cdecl _CrtGetDumpClient ( void)
 {
-		assert(0); 
+		Assert(0); 
         return NULL;
 }
 
@@ -1122,7 +1122,7 @@ void __cdecl _aligned_free_dbg( void * memblock)
 #if _MSC_VER < 1900
 size_t __cdecl _CrtSetDebugFillThreshold( size_t _NewDebugFillThreshold)
 {
-	assert(0);
+	Assert(0);
     return 0;
 }
 

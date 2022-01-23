@@ -7,7 +7,6 @@
 //=============================================================================//
 #include <malloc.h>
 #include <string.h>
-#include <assert.h>
 #include "packed_entity.h"
 #include "basetypes.h"
 #include "changeframelist.h"

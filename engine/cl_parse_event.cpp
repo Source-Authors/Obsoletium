@@ -53,7 +53,7 @@ void CL_DescribeEvent( int slot, CEventInfo *event, const char *eventname )
 void CL_ParseEventDelta( void *RawData, void *pToData, RecvTable *pRecvTable, unsigned int uReadBufferSize )
 {
 	// Make sure we have a decoder
-	assert(pRecvTable->m_pDecoder);
+	Assert(pRecvTable->m_pDecoder);
 
 	// Only so much data allowed
 	bf_read fromBuf( "CL_ParseEventDelta->fromBuf", RawData, uReadBufferSize );
@@ -65,7 +65,7 @@ void CL_ParseEventDelta( void *RawData, void *pToData, RecvTable *pRecvTable, un
 	RecvTable_Decode( pRecvTable, pToData, &fromBuf, -1 );
 
 	// Make sure the server, etc. didn't try to send too much
-	assert(!fromBuf.IsOverflowed());
+	Assert(!fromBuf.IsOverflowed());
 }
 
 //-----------------------------------------------------------------------------

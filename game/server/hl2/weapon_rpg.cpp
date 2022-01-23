@@ -1773,7 +1773,7 @@ Vector CWeaponRPG::GetLaserPosition( void )
 		return m_hLaserDot->GetAbsOrigin();
 
 	//FIXME: The laser dot sprite is not active, this code should not be allowed!
-	assert(0);
+	Assert(0);
 	return vec3_origin;
 }
 

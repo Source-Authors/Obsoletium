@@ -11,6 +11,7 @@
 #endif
 
 #include "tier0/platform.h"
+#include "tier0/dbg.h"
 
 PLATFORM_INTERFACE uint64 g_ClockSpeed;
 #if defined( _X360 ) && defined( _CERT )
@@ -415,7 +416,7 @@ inline int64 CFastTimer::GetClockSpeed()
 inline CCycleCount const& CFastTimer::GetDuration() const
 {
 #ifdef DEBUG_FASTTIMER
-	assert( !m_bRunning );
+	Assert( !m_bRunning );
 #endif
 	return m_Duration;
 }

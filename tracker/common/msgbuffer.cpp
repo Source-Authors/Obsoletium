@@ -4,9 +4,9 @@
 //
 // $NoKeywords: $
 //=============================================================================
-#include <string.h>
-#include <assert.h>
+#include <cstring>
 #include "msgbuffer.h"
+#include "tier0/dbg.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
@@ -43,7 +43,7 @@ CMsgBuffer::~CMsgBuffer( void )
 void CMsgBuffer::Push( void )
 {
 	// ??? Allow multiple pushes without matching pops ???
-	assert( !m_bPushed );
+	Assert( !m_bPushed );
 
 	m_nPushedCount	= m_nReadCount;
 	m_bPushed		= true;
@@ -54,7 +54,7 @@ void CMsgBuffer::Push( void )
 //-----------------------------------------------------------------------------
 void CMsgBuffer::Pop( void )
 {
-	assert( m_bPushed );
+	Assert( m_bPushed );
 
 	m_nReadCount	= m_nPushedCount;
 	m_bPushed		= false;

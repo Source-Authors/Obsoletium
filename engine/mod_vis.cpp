@@ -296,7 +296,7 @@ void Map_VisMark( bool forcenovis, model_t *worldmodel )
 #endif
 
 	// There should always be at least one origin and that's the default render origin in most cases
-	assert( vis.nClusters >= 1 );
+	Assert( vis.nClusters >= 1 );
 
 	CM_Vis( vis.rgCurrentVis, sizeof( vis.rgCurrentVis ), vis.rgVisClusters[ 0 ].viewcluster, DVIS_PVS );
 
@@ -365,7 +365,7 @@ next_cache_check:;
 //-----------------------------------------------------------------------------
 void Map_VisSetup( model_t *worldmodel, int visorigincount, const Vector origins[], bool forcenovis /*=false*/, unsigned int &returnFlags )
 {
-	assert( visorigincount <= MAX_VIS_LEAVES );
+	Assert( visorigincount <= MAX_VIS_LEAVES );
 
 	// Don't crash if the client .dll tries to do something weird/dumb
 	vis.nClusters = min( visorigincount, MAX_VIS_LEAVES );

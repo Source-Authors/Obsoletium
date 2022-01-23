@@ -89,7 +89,7 @@ void SpewToFile( char const* pFmt, ... )
 	va_start( args, pFmt );
 	int len = Q_vsnprintf( temp, sizeof( temp ), pFmt, args );
 	va_end( args );
-	assert( len < 2048 );
+	Assert( len < 2048 );
 
 	int idx = s_RecordingBuffer.AddMultipleToTail( len );
 	memcpy( &s_RecordingBuffer[idx], temp, len );

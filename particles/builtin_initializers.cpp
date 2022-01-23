@@ -3470,7 +3470,7 @@ void C_INIT_InitialRepulsionVelocity::InitNewParticlesScalar(
 				//Push back a proportional amount to the probe
 				d[i] = -d[i] * (1.0f-tr.fraction);
 
-				assert(( 1.0f - tr.fraction ) >= 0.0f );
+				Assert(( 1.0f - tr.fraction ) >= 0.0f );
 
 				resultForce += 1.0f-tr.fraction;
 				resultDirection += d[i];
@@ -3556,7 +3556,7 @@ void C_INIT_InitialRepulsionVelocity::InitNewParticlesScalar(
 				//Push back a proportional amount to the probe
 				d[i] = -d[i] * (1.0f-tr.fraction);
 
-				assert(( 1.0f - tr.fraction ) >= 0.0f );
+				Assert(( 1.0f - tr.fraction ) >= 0.0f );
 
 				resultForce += 1.0f-tr.fraction;
 				resultDirection += d[i];

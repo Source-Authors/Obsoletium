@@ -8,7 +8,6 @@
 
 #include "vgui_surfacelib/linuxfont.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -686,7 +685,7 @@ bool CLinuxFont::IsValid()
 //-----------------------------------------------------------------------------
 int CLinuxFont::GetHeight()
 {
-	assert(IsValid());
+	Assert(IsValid());
 	return m_iHeight;
 }
 
@@ -695,7 +694,7 @@ int CLinuxFont::GetHeight()
 //-----------------------------------------------------------------------------
 int CLinuxFont::GetHeightRequested()
 {
-	assert(IsValid());
+	Assert(IsValid());
 	return m_iHeightRequested;
 }
 
@@ -704,7 +703,7 @@ int CLinuxFont::GetHeightRequested()
 //-----------------------------------------------------------------------------
 int CLinuxFont::GetAscent()
 {
-	assert(IsValid());
+	Assert(IsValid());
 	return m_iAscent;
 }
 
@@ -713,7 +712,7 @@ int CLinuxFont::GetAscent()
 //-----------------------------------------------------------------------------
 int CLinuxFont::GetMaxCharWidth()
 {
-	assert(IsValid());
+	Assert(IsValid());
 	return m_iMaxCharWidth;
 }
 

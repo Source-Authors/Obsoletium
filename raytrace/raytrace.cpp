@@ -163,8 +163,8 @@ static Vector GetEdgeEquation(Vector p1, Vector p2, int c1, int c2, Vector Insid
 	float nx=p1[c2]-p2[c2];
 	float ny=p2[c1]-p1[c1];
 	float d=-(nx*p1[c1]+ny*p1[c2]);
-// 	assert(fabs(nx*p1[c1]+ny*p1[c2]+d)<0.01);
-// 	assert(fabs(nx*p2[c1]+ny*p2[c2]+d)<0.01);
+// 	Assert(fabs(nx*p1[c1]+ny*p1[c2]+d)<0.01);
+// 	Assert(fabs(nx*p2[c1]+ny*p2[c2]+d)<0.01);
 
 	// use the convention that negative is "outside"
 	float trial_dist=InsidePoint[c1]*nx+InsidePoint[c2]*ny+d;
@@ -324,7 +324,7 @@ void RayTracingEnvironment::Trace4Rays(const FourRays &rays, fltx4 TMin, fltx4 T
 				// ok, now trace between 1 and 3 rays, and output the results
 				RayTracingResult tmpresults;
 				msk=tmprays.CalculateDirectionSignMask();
-				assert(msk!=-1);
+				Assert(msk!=-1);
 				Trace4Rays(tmprays,TMin,TMax,msk,&tmpresults,skip_id, pCallback);
 				// now, move results to proper place
 				for(int i=0;i<4;i++)
@@ -452,7 +452,7 @@ void RayTracingEnvironment::Trace4Rays(const FourRays &rays, fltx4 TMin, fltx4 T
 					// must push far, traverse near
  					//printf("visit %d,%d\n",CurNode->LeftChild()+front_idx[split_plane_number],
  					//	   CurNode->LeftChild()+back_idx[split_plane_number]);
-					assert(stack_ptr>NodeQueue);
+					Assert(stack_ptr>NodeQueue);
 					--stack_ptr;
 					stack_ptr->node=FrontChild+back_idx[split_plane_number];
 					stack_ptr->TMin=MaxSIMD(TMin,dist_to_sep_plane);

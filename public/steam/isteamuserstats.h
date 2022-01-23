@@ -208,7 +208,7 @@ public:
 	//				LeaderboardEntry_t leaderboardEntry;
 	//				int32 details[3];		// we know this is how many we've stored previously
 	//				GetDownloadedLeaderboardEntry( pLeaderboardScoresDownloaded->m_hSteamLeaderboardEntries, index, &leaderboardEntry, details, 3 );
-	//				assert( leaderboardEntry.m_cDetails == 3 );
+	//				Assert( leaderboardEntry.m_cDetails == 3 );
 	//				...
 	//			}
 	// once you've accessed all the entries, the data will be free'd, and the SteamLeaderboardEntries_t handle will become invalid

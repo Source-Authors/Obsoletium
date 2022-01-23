@@ -179,7 +179,7 @@ bool CMixerControls::GetValue_Float(Control iControl, float &value)
 			return theError == noErr;
 		}		
 		default:
-			assert( !"Invalid Control type" );	
+			Assert( !"Invalid Control type" );	
 			value = 0.0f;
 			return false;
 	};
@@ -247,7 +247,7 @@ bool CMixerControls::SetValue_Float(Control iControl, float value)
 			return theError == noErr;
 		}		
 		default:
-			assert( !"Invalid Control type" );	
+			Assert( !"Invalid Control type" );	
 			return false;
 	};
 }

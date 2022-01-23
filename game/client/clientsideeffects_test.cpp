@@ -37,7 +37,7 @@ CLIENTEFFECT_REGISTER_END()
 void FX_AddLine( const FXLineData_t &data )
 {
 	CFXLine *t = new CFXLine( "Line", data );
-	assert( t );
+	Assert( t );
 
 	//Throw it into the list
 	clienteffects->AddEffect( t );
@@ -52,7 +52,7 @@ FX_AddStaticLine
 void FX_AddStaticLine( const Vector& start, const Vector& end, float scale, float life, const char *materialName, unsigned char flags )
 {
 	CFXStaticLine	*t = new CFXStaticLine( "StaticLine", start, end, scale, life, materialName, flags );
-	assert( t );
+	Assert( t );
 
 	//Throw it into the list
 	clienteffects->AddEffect( t );
@@ -67,7 +67,7 @@ FX_AddDiscreetLine
 void FX_AddDiscreetLine( const Vector& start, const Vector& direction, float velocity, float length, float clipLength, float scale, float life, const char *shader )
 {
 	CFXDiscreetLine	*t = new CFXDiscreetLine( "Line", start, direction, velocity, length, clipLength, scale, life, shader );
-	assert( t );
+	Assert( t );
 
 	//Throw it into the list
 	clienteffects->AddEffect( t );
@@ -165,7 +165,7 @@ void FX_PlayerTracer( Vector& start, Vector& end )
 	materialName = "effects/spark";
 
 	t = new CFXStaticLine( "Tracer", dStart, dEnd, random->RandomFloat( 0.5f, 0.75f ), 0.01f, materialName, 0 );
-	assert( t );
+	Assert( t );
 
 	//Throw it into the list
 	clienteffects->AddEffect( t );

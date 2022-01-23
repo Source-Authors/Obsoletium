@@ -1115,7 +1115,7 @@ void CNPC_RollerMine::StartTask( const Task_t *pTask )
 
 			if ( pPhysicsObject == NULL )
 			{
-				assert(0);
+				Assert(0);
 				TaskFail("Roller lost internal physics object?");
 				return;
 			}
@@ -1131,7 +1131,7 @@ void CNPC_RollerMine::StartTask( const Task_t *pTask )
 			
 			if ( pPhysicsObject == NULL )
 			{
-				assert(0);
+				Assert(0);
 				TaskFail("Roller lost internal physics object?");
 				return;
 			}
@@ -1330,7 +1330,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			
 			if ( pPhysicsObject == NULL )
 			{
-				assert(0);
+				Assert(0);
 				TaskFail("Roller lost internal physics object?");
 				return;
 			}
