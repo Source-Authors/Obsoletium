@@ -399,7 +399,7 @@ void *__cdecl operator new( size_t nSize )
 }
 
 // dimhotepus: Aligned alloc
-void* __cdecl operator new ( std::size_t nSize, std::align_val_t align )
+void* __cdecl operator new( std::size_t nSize, std::align_val_t align )
 {
 	return MemAlloc_AllocAligned(nSize, static_cast<size_t>(align));
 }
@@ -419,15 +419,24 @@ void __cdecl operator delete( void *pMem )
 }
 
 // dimhotepus: Aligned alloc
-void __cdecl operator delete ( void* pMem, std::align_val_t align ) noexcept
+void __cdecl operator delete( void* pMem, std::align_val_t align ) noexcept
 {
+#ifdef _WIN32
+	// dimhotepus: Windows allocator has 16 bytes alignment by default, so use default free.
+	if ( static_cast<size_t>(align) == 16 )
+	{
+		g_pMemAlloc->Free( pMem );
+		return;
+	}
+#endif
+
 	MemAlloc_FreeAligned( pMem );
 }
 
 #ifdef OSX
-void operator delete(void*pMem, std::size_t)
+void operator delete( void *pMem, std::size_t )
 #else
-void operator delete(void*pMem, std::size_t) throw()
+void operator delete( void *pMem, std::size_t ) throw()
 #endif
 {
 	g_pMemAlloc->Free( pMem );
@@ -465,6 +474,15 @@ void __cdecl operator delete[]( void *pMem )
 // dimhotepus: Aligned alloc
 void operator delete[]( void* ptr, std::align_val_t align ) noexcept 
 {
+#ifdef _WIN32
+	// dimhotepus: Windows allocator has 16 bytes alignment by default, so use default free.
+	if ( static_cast<size_t>(align) == 16 )
+	{
+		g_pMemAlloc->Free( ptr );
+		return;
+	}
+#endif
+
 	MemAlloc_FreeAligned(ptr);
 }
 #endif
