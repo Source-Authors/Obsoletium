@@ -460,6 +460,12 @@ bool CAsyncWaveData::BlockingCopyData( void *destbuffer, int destbufsize, int st
 		return false;
 	}
 
+	if ( count > destbufsize )
+	{
+		AssertMsg( false, "Buffer size (%d) is less than copied bytes count (%d).", destbufsize, count );
+		return false;
+	}
+
 	// Copy data from stream buffer
 	Q_memcpy( destbuffer, (char *)m_pvData + ( startoffset - m_async.nOffset ), count );
 
@@ -2223,7 +2229,7 @@ int CWaveDataStreamAsync::ReadSourceData( void **pData, int sampleIndex, int sam
 					m_dataSize, 
 					m_dataStart,
 					m_buffer, 
-					m_bufferSize,
+					m_bufferSize * m_sampleSize,
 					seekpos, 
 					m_bufferCount * m_sampleSize,
 					&postprocessed ) )
