@@ -27,8 +27,7 @@ CMPAFile::CMPAFile(LPCTSTR szFile)
 // destructor
 CMPAFile::~CMPAFile(void)
 {
-	if (m_pVBRHeader)
-		delete m_pVBRHeader;
+	delete m_pVBRHeader;
 
 	delete m_pFirstFrame;
 	delete m_pTags;

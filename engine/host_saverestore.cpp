@@ -1691,11 +1691,6 @@ void CSaveRestore::ReapplyDecal( bool adjacent, RestoreLookupTable *table, decal
 		int entityToHit = entry->entityIndex != 0 ? LookupRestoreSpotSaveIndex( table, entry->entityIndex ) : entry->entityIndex;
 		if ( entityToHit >= 0 )
 		{
-			// NOTE: I re-initialized the origin and angles as the decals pos/angle are saved in local space (ie. relative to
-			//       the entity they are attached to.
-			Vector vecOrigin( 0.0f, 0.0f, 0.0f );
-			QAngle vecAngle( 0.0f, 0.0f, 0.0f );
-
 			const model_t *pModel = NULL;
 			IClientEntity *clientEntity = entitylist->GetClientEntity( entityToHit );
 			if ( clientEntity )
@@ -1728,7 +1723,12 @@ void CSaveRestore::ReapplyDecal( bool adjacent, RestoreLookupTable *table, decal
 					decalIndex = sv.PrecacheDecal( entry->name, RES_FATALIFMISSING );
 					Draw_DecalSetName( decalIndex, entry->name );
 				}
-				
+
+				// NOTE: I re-initialized the origin and angles as the decals pos/angle are saved in local space (ie. relative to
+				//       the entity they are attached to.
+				Vector vecOrigin( 0.0f, 0.0f, 0.0f );
+				QAngle vecAngle( 0.0f, 0.0f, 0.0f );
+
 				g_pEfx->DecalShoot( decalIndex, entityToHit, pModel, vecOrigin, vecAngle, entry->position, 0, flags );
 			}
 		}
@@ -2183,7 +2183,7 @@ int CSaveRestore::SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) ch
 	delete[] pTokenList;
 	delete[] pSaveData;
 	
-	if ( strlen( name ) > 0 && strlen( comment ) > 0 )
+	if ( name[0] && comment[0] )
 		return 1;
 	
 	return 0;

@@ -39,8 +39,7 @@ CNetworkStringTableItem::~CNetworkStringTableItem( void )
 		{
 			itemchange_s item = m_pChangeList->Element( i );
 
-			if ( item.data )
-				delete[] item.data;
+			delete[] item.data;
 		}
 
 		delete m_pChangeList; // destructor calls Purge()
@@ -49,10 +48,7 @@ CNetworkStringTableItem::~CNetworkStringTableItem( void )
 	}
 #endif
 		
-	if ( m_pUserData )
-	{
-		delete[] m_pUserData;
-	}
+	delete[] m_pUserData;
 }
 
 #ifndef SHARED_NET_STRING_TABLES
@@ -93,10 +89,7 @@ void CNetworkStringTableItem::UpdateChangeList( int tick, int length, const void
 		if ( item.tick == tick )
 		{
 			// two changes within same tick frame, remove last change from list
-			if ( item.data )
-			{
-				delete[] item.data;
-			}
+			delete[] item.data;
 
 			m_pChangeList->Remove( count-1 );
 		}
@@ -192,8 +185,7 @@ bool CNetworkStringTableItem::SetUserData( int tick, int length, const void *use
 		return false; // old & new data are equal
 	}
 
-	if ( m_pUserData )
-		delete[] m_pUserData;
+	delete[] m_pUserData;
 
 	m_nUserDataLength = length;
 

@@ -485,7 +485,7 @@ int VOX_ParseWordParams(char *psz, voxword_t *pvoxword, int fFirst)
 	// parameter block.  Set default voxword to these
 	// values
 
-	if (strlen(pszsave) == 0)
+	if ( !pszsave[0] )
 	{
 		voxwordDefault = *pvoxword;
 		return 0;
@@ -757,7 +757,7 @@ void VOX_LookupRangeHeadingOrGrid( int irhg, char *pGroupName, channel_t *pChann
 		// get range
 		dist = VectorLength(SL);
 
-		dmeters = (int)((dist * 2.54 / 100.0));	// convert inches to meters
+		dmeters = (int)(dist * 2.54F / 100.0F);	// convert inches to meters
 	
 		dmeters = clamp(dmeters, 0, 900);
 	}
@@ -774,12 +774,12 @@ void VOX_LookupRangeHeadingOrGrid( int irhg, char *pGroupName, channel_t *pChann
 	} else if (irhg == 2)
 	{
 		// get gridx
-		dmeters = (int)(((16384 + listener_origin.x) * 2.54 / 100.0) / 10) % 20;
+		dmeters = (int)(((16384 + listener_origin.x) * 2.54F / 100.0) / 10) % 20;
 	}
 	else if (irhg == 3)
 	{
 		// get gridy
-		dmeters = (int)(((16384 + listener_origin.y) * 2.54 / 100.0) / 10) % 20;
+		dmeters = (int)(((16384 + listener_origin.y) * 2.54F / 100.0) / 10) % 20;
 	}
 
 	dmeters = clamp(dmeters, 0, 999);
@@ -1658,7 +1658,7 @@ void VOX_LoadSound( channel_t *pchan, const char *pszin )
 			{
 				if ( snd_vox_captiontrace.GetBool() )
 				{
-					Msg( "Vox:  No caption for '%s'\n", pszin ? pszin : "NULL" );
+					Msg( "Vox:  No caption for '%s'\n", pszin );
 				}
 			}
 		}

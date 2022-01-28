@@ -2743,7 +2743,7 @@ LUFILE *lufopen(void *z,unsigned int len,DWORD flags,ZRESULT *err)
 			HANDLE hf = z;
 			bool res;
 #ifdef _WIN32		
-			res = DuplicateHandle(GetCurrentProcess(),hf,GetCurrentProcess(),&h,0,FALSE,DUPLICATE_SAME_ACCESS) == TRUE;
+			res = DuplicateHandle(GetCurrentProcess(),hf,GetCurrentProcess(),&h,0,FALSE,DUPLICATE_SAME_ACCESS) != FALSE;
 #else
 			h = (void*) dup( (int)hf );
 			res = (int) dup >= 0;
@@ -3060,7 +3060,7 @@ uLong unzlocal_SearchCentralDir(LUFILE *fin)
     }
     if (uPosFound!=0) break;
   }
-  if (buf) zfree(buf);
+  zfree(buf);
   return uPosFound;
 }
 
@@ -3133,7 +3133,7 @@ int unzClose (unzFile file)
         unzCloseCurrentFile(file);
 
 	lufclose(s->file);
-	if (s) zfree(s); // unused s=0;
+	zfree(s); // unused s=0;
 	return UNZ_OK;
 }
 
@@ -3566,7 +3566,7 @@ int unzOpenCurrentFile (unzFile file)
 
 	if (pfile_in_zip_read_info->read_buffer==NULL)
 	{
-		if (pfile_in_zip_read_info!=0) zfree(pfile_in_zip_read_info); //unused pfile_in_zip_read_info=0;
+		zfree(pfile_in_zip_read_info); //unused pfile_in_zip_read_info=0;
 		return UNZ_INTERNALERROR;
 	}
 
@@ -3818,7 +3818,7 @@ int unzCloseCurrentFile (unzFile file)
 		inflateEnd(&pfile_in_zip_read_info->stream);
 
 	pfile_in_zip_read_info->stream_initialised = 0;
-        if (pfile_in_zip_read_info!=0) zfree(pfile_in_zip_read_info); // unused pfile_in_zip_read_info=0;
+        zfree(pfile_in_zip_read_info); // unused pfile_in_zip_read_info=0;
 
     s->pfile_in_zip_read=NULL;
 
@@ -4023,7 +4023,7 @@ ZRESULT TUnzip::Get(int index,ZIPENTRY *ze)
     break;
   }
   //
-  if (extra!=0) delete[] extra;
+  delete[] extra;
   memcpy(&cze,ze,sizeof(ZIPENTRY)); czei=index;
   return ZR_OK;
 }

@@ -306,7 +306,7 @@ void Map_VisMark( bool forcenovis, model_t *worldmodel )
 	// Merge in any extra clusters
 	for ( i = 1; i < vis.nClusters; i++ )
 	{
-		byte	mapVis[ MAX_MAP_CLUSTERS/8 ];
+		alignas(int) byte	mapVis[ MAX_MAP_CLUSTERS/8 ];
 		
 		CM_Vis( mapVis, sizeof( mapVis ), vis.rgVisClusters[ i ].viewcluster, DVIS_PVS );
 				

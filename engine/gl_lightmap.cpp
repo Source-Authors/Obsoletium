@@ -365,7 +365,6 @@ static void R_ComputeSurfaceBasis( SurfaceHandle_t surfID, Vector *pBumpNormals,
 unsigned int R_ComputeDynamicLightMask( dlight_t *pLights, SurfaceHandle_t surfID, msurfacelighting_t *pLighting, const matrix3x4_t& entityToWorld )
 {
 	ASSERT_SURF_VALID( surfID );
-	Vector bumpNormals[3];
 	Vector luxelBasePosition;
 
 	// Displacements do dynamic lights different

@@ -32,8 +32,7 @@ CAudioMixerWaveMP3::CAudioMixerWaveMP3( IWaveData *data ) : CAudioMixerWave( dat
 
 CAudioMixerWaveMP3::~CAudioMixerWaveMP3( void )
 {
-	if ( m_pStream )
-		delete m_pStream;
+	delete m_pStream;
 }
 
 

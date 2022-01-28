@@ -2508,7 +2508,7 @@ int NET_SendPacket ( INetChannel *chan, int sock,  const netadr_t &to, const uns
 void NET_OutOfBandPrintf(int sock, const netadr_t &adr, const char *format, ...)
 {
 	va_list		argptr;
-	char		string[MAX_ROUTABLE_PAYLOAD];
+	alignas(unsigned int) char		string[MAX_ROUTABLE_PAYLOAD];
 	
 	*(unsigned int*)string = CONNECTIONLESS_HEADER;
 

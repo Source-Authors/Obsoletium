@@ -23,12 +23,9 @@ CMPAException::CMPAException(const CMPAException& Source)
 // destructor
 CMPAException::~CMPAException()
 {
-	if (m_szFile)
-		free(m_szFile);
-	if (m_szFunction)
-		free(m_szFunction);
-	if (m_szErrorMsg)
-		delete[] m_szErrorMsg;
+	free(m_szFile);
+	free(m_szFunction);
+	delete[] m_szErrorMsg;
 }
 
 // should be in resource file for multi language applications

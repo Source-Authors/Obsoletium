@@ -2380,7 +2380,7 @@ void COcclusionSystem::AddPolygonToEdgeList( CEdgeList &edgeList, Vector **ppPol
 		// Clamp needed to avoid precision problems.
 //		if ( pVecProjectedVertex[k].z < 0.0f )
 //			pVecProjectedVertex[k].z = 0.0f;
-		pVecProjectedVertex[k].z *= (pVecProjectedVertex[k].z > 0.0f);
+		pVecProjectedVertex[k].z *= (pVecProjectedVertex[k].z > 0.0f) ? 1 : 0;
 		ppClipVertex[k] = &pVecProjectedVertex[k];
 	}
 
@@ -2479,8 +2479,7 @@ void COcclusionSystem::RecomputeOccluderEdgeList()
 			continue;
 
 		// Skip the occluder if it's in a disconnected area
-		if ( cl.m_chAreaBits &&
-			(cl.m_chAreaBits[pOccluders[i].area >> 3] & (1 << ( pOccluders[i].area & 0x7 )) ) == 0 )
+		if ( (cl.m_chAreaBits[pOccluders[i].area >> 3] & (1 << ( pOccluders[i].area & 0x7 )) ) == 0 )
 			continue;
 
 		int nSurfID = pOccluders[i].firstpoly;

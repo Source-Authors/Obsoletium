@@ -48,8 +48,7 @@ bool CVBRHeader::ExtractLAMETag( DWORD dwOffset )
 
 CVBRHeader::~CVBRHeader(void)
 {
-	if (m_pnToc)
-		delete[] m_pnToc;
+	delete[] m_pnToc;
 }
 
 // get byte position for percentage value (fPercent) of file

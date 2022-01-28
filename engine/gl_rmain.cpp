@@ -838,7 +838,7 @@ void CRender::EndUpdateLightmaps( void )
 				threadFrameCount = (threadFrameCount+1) & 1;
 			}
 
-			qsort( g_LightmapUpdateList.Base(), g_LightmapUpdateList.Count(), sizeof(g_LightmapUpdateList.Element(0)), LightmapPageCompareFunc );
+			qsort( g_LightmapUpdateList.Base(), g_LightmapUpdateList.Count(), sizeof(decltype(g_LightmapUpdateList)::ElemType_t), LightmapPageCompareFunc );
 			int i;
 			for ( i = g_LightmapUpdateList.Count()-1; i >= 0; --i )
 			{

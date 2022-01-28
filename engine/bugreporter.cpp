@@ -1482,13 +1482,13 @@ bool CBugUIPanel::IsValidEmailAddress( char const *email )
 	const char *sz = email;
 	if (!V_isalnum(*sz))
 		return false;
-	sz = strstr(sz, "@");
+	sz = strchr(sz, '@');
 	if (!sz)
 		return false;
 	sz++;
 	if (!V_isalnum(*sz))
 		return false;
-	sz = strstr(sz, ".");
+	sz = strchr(sz, '.');
 	if (!sz)
 		return false;
 	sz++;

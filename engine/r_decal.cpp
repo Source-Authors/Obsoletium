@@ -1304,11 +1304,10 @@ struct decalcontext_t
 	SurfaceHandle_t pSurf;
 
 	decalcontext_t( IMatRenderContext *pContext, const Vector &vModelorg )
+		: vModelOrg{ vModelorg }
 	{
 		pRenderContext = pContext;
-		vModelOrg = vModelorg;
 		pSurf = NULL;
-
 	}
 
 	void InitSurface( SurfaceHandle_t surfID )
@@ -2290,17 +2289,19 @@ inline void R_DrawDecalMeshList( DecalMeshList_t &meshList )
 	int nBatchCount = meshList.m_aBatches.Count();
 	for ( int iBatch = 0; iBatch < nBatchCount; ++iBatch )
 	{
+		auto &batch = meshList.m_aBatches[iBatch];
+
 		if ( g_pMaterialSystemConfig->nFullbright == 1 )
 		{
 			pRenderContext->BindLightmapPage( MATERIAL_SYSTEM_LIGHTMAP_PAGE_WHITE );
 		}
 		else
 		{
-			pRenderContext->BindLightmapPage( meshList.m_aBatches[iBatch].m_iLightmapPage );
+			pRenderContext->BindLightmapPage( batch.m_iLightmapPage );
 		}
 		
-		pRenderContext->Bind( meshList.m_aBatches[iBatch].m_pMaterial, meshList.m_aBatches[iBatch].m_pProxy );
-		meshList.m_pMesh->Draw( meshList.m_aBatches[iBatch].m_iStartIndex, meshList.m_aBatches[iBatch].m_nIndexCount );
+		pRenderContext->Bind( batch.m_pMaterial, batch.m_pProxy );
+		meshList.m_pMesh->Draw( batch.m_iStartIndex, batch.m_nIndexCount );
 	}
 }
 

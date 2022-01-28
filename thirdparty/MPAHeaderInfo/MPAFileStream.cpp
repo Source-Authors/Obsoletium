@@ -37,8 +37,7 @@ void CMPAFileStream::Init()
 
 CMPAFileStream::~CMPAFileStream(void)
 {
-	if (m_pBuffer)
-		delete[] m_pBuffer;
+	delete[] m_pBuffer;
 	
 	// close file
 	if (m_bMustReleaseFile)

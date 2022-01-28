@@ -239,7 +239,7 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 							char szMap[ MAX_OSPATH ];
 
 							pFileList = COM_Parse( pFileList );
-							if ( strlen( com_token ) <= 0 )
+							if ( !com_token[0] )
 								break;
 
 							Q_strncpy(szMap, com_token, sizeof(szMap));

@@ -77,7 +77,7 @@ public:
 	int						sndavg;			
 
 public:
-							CMouthInfo( void ) { m_nVoiceSources = 0; m_needsEnvelope = false; }
+							CMouthInfo( void ) { m_nVoiceSources = 0; m_needsEnvelope = 0; }
 	virtual					~CMouthInfo( void ) { ClearVoiceSources(); }
 
 	int						GetNumVoiceSources( void );
@@ -94,7 +94,7 @@ public:
 
 	bool					IsActive( void );
 	bool					NeedsEnvelope() { return m_needsEnvelope != 0; }
-	void					ActivateEnvelope() { m_needsEnvelope = true; }
+	void					ActivateEnvelope() { m_needsEnvelope = 1; }
 
 private:
 	enum

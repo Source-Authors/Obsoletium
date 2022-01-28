@@ -1277,10 +1277,7 @@ bool CBaseClientState::ProcessClassInfo( SVC_ClassInfo *msg )
 		return false;
 	}
 
-	if( m_pServerClasses )
-	{
-		delete [] m_pServerClasses;
-	}
+	delete [] m_pServerClasses;
 
 	m_nServerClasses = msg->m_Classes.Count();
 	m_pServerClasses = new C_ServerClassInfo[m_nServerClasses];

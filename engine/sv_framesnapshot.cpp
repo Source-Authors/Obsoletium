@@ -465,15 +465,9 @@ CFrameSnapshot::~CFrameSnapshot()
 		delete [] m_pTempEntities;
 	}
 
-	if ( m_pHLTVEntityData )
-	{
-		delete [] m_pHLTVEntityData;
-	}
+	delete [] m_pHLTVEntityData;
 
-	if ( m_pReplayEntityData )
-	{
-		delete [] m_pReplayEntityData;
-	}
+	delete [] m_pReplayEntityData;
 	Assert ( m_nReferences == 0 );
 
 #if defined( _DEBUG )

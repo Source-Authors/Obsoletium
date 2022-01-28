@@ -566,35 +566,32 @@ void CAudioDirectSound::ClearBuffer( void )
 	else
 		clear = 0;
 
-	if (pDSBuf)
+	DWORD	dwSize;
+	DWORD	*pData;
+	int		reps;
+	HRESULT	hresult;
+
+	reps = 0;
+	while ((hresult = pDSBuf->Lock(0, m_bufferSizeBytes, (void**)&pData, &dwSize, NULL, NULL, 0)) != DS_OK)
 	{
-		DWORD	dwSize;
-		DWORD	*pData;
-		int		reps;
-		HRESULT	hresult;
-
-		reps = 0;
-		while ((hresult = pDSBuf->Lock(0, m_bufferSizeBytes, (void**)&pData, &dwSize, NULL, NULL, 0)) != DS_OK)
+		if (hresult != DSERR_BUFFERLOST)
 		{
-			if (hresult != DSERR_BUFFERLOST)
-			{
-				Msg("S_ClearBuffer: DS::Lock Sound Buffer Failed\n");
-				S_Shutdown();
-				return;
-			}
-
-			if (++reps > 10000)
-			{
-				Msg("S_ClearBuffer: DS: couldn't restore buffer\n");
-				S_Shutdown();
-				return;
-			}
+			Msg("S_ClearBuffer: DS::Lock Sound Buffer Failed\n");
+			S_Shutdown();
+			return;
 		}
 
-		Q_memset(pData, clear, dwSize);
-
-		pDSBuf->Unlock(pData, dwSize, NULL, 0);
+		if (++reps > 10000)
+		{
+			Msg("S_ClearBuffer: DS: couldn't restore buffer\n");
+			S_Shutdown();
+			return;
+		}
 	}
+
+	Q_memset(pData, clear, dwSize);
+
+	pDSBuf->Unlock(pData, dwSize, NULL, 0);
 }
 
 void CAudioDirectSound::StopAllSounds( void )
@@ -729,7 +726,7 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 			return SIS_FAILURE;
 		}
 
-		pDirectSoundCreate = (DirectSoundCreateFn)GetProcAddress(m_hInstDS,"DirectSoundCreate");
+		pDirectSoundCreate = (DirectSoundCreateFn)GetProcAddress(m_hInstDS, V_STRINGIFY(DirectSoundCreate) );
 		if (!pDirectSoundCreate)
 		{
 			Warning( "Couldn't get DS proc addr\n");
@@ -737,7 +734,7 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 		}
 	}
 
-	while ((hresult = pDirectSoundCreate(NULL, &pDS, NULL)) != DS_OK)
+	if ((hresult = pDirectSoundCreate(NULL, &pDS, NULL)) != DS_OK)
 	{
 		if (hresult != DSERR_ALLOCATED)
 		{

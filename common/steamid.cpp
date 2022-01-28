@@ -101,8 +101,8 @@ void CSteamID::SetFromString( const char *pchSteamID, EUniverse eDefaultUniverse
 		if (*pchSteamID == '-' || *pchSteamID == ':')
 			pchSteamID++; // skip the optional - or :
 
-		if ( strchr( pchSteamID, '(' ) )
-			sscanf( strchr( pchSteamID, '(' ), "(%u)", &nInstance );
+		if ( auto *brace = strchr( pchSteamID, '(' ) )
+			sscanf( brace, "(%u)", &nInstance );
 		const char *pchColon = strchr( pchSteamID, ':' );
 		if ( pchColon && *pchColon != 0 && strchr( pchColon+1, ':' ))
 		{

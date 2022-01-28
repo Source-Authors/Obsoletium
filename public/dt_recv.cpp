@@ -170,10 +170,6 @@ RecvTable::RecvTable(RecvProp *pProps, int nProps, const char *pNetTableName)
 	Construct( pProps, nProps, pNetTableName );
 }
 
-RecvTable::~RecvTable()
-{
-}
-
 void RecvTable::Construct( RecvProp *pProps, int nProps, const char *pNetTableName )
 {
 	m_pProps = pProps;
@@ -470,6 +466,8 @@ void RecvProxy_VectorXYToVectorXY( const CRecvProxyData *pData, void *pStruct, v
 	((float*)pOut)[1] = v[1];
 }
 
+#if 0 // We can't ship this since it changes the size of DTVariant to be 20 bytes instead of 16 and that breaks MODs!!!
+
 void RecvProxy_QuaternionToQuaternion( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
 	const float *v = pData->m_Value.m_Vector;
@@ -480,6 +478,8 @@ void RecvProxy_QuaternionToQuaternion( const CRecvProxyData *pData, void *pStruc
 	((float*)pOut)[2] = v[2];
 	((float*)pOut)[3] = v[3];
 }
+
+#endif
 
 void RecvProxy_Int32ToInt8( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {

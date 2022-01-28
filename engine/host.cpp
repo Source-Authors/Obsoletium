@@ -1989,7 +1989,7 @@ void Host_GetHostInfo(float *fps, int *nActive, int *nMaxPlayers, char *pszMap, 
 
 	if (pszMap)
 	{
-		if (sv.m_szMapname && sv.m_szMapname[0])
+		if (sv.m_szMapname[0])
 			Q_strncpy(pszMap, sv.m_szMapname, maxlen );
 		else
 			pszMap[0] = '\0';

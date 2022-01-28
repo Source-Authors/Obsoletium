@@ -86,8 +86,8 @@ bool Filter_ConvertString( const char *s, ipfilter_t *f )
 {
 	char	num[128];
 	int		i, j;
-	byte	b[4];
-	byte	m[4];
+	alignas(unsigned) byte	b[4];
+	alignas(unsigned) byte	m[4];
 	
 	for (i=0 ; i<4 ; i++)
 	{
@@ -284,7 +284,7 @@ CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 			// array access is zero based
 			slot--;
 
-			*(unsigned *)b = g_IPFilters[slot].compare;
+			memcpy( b, &g_IPFilters[slot].compare, sizeof(b) );
 			Q_snprintf( szIP, sizeof( szIP ), "%3i.%3i.%3i.%3i", b[0], b[1], b[2], b[3] );
 
 			g_IPFilters.Remove( slot );
@@ -368,7 +368,7 @@ CON_COMMAND( listip, "List IP addresses on the ban list." )
 
 	for ( i = 0 ; i < count ; i++ )
 	{
-		*(unsigned *)b = g_IPFilters[i].compare;
+		memcpy( b, &g_IPFilters[i].compare, sizeof(b) );
 
 		if ( g_IPFilters[i].banTime != 0.0f )
 		{
@@ -386,29 +386,26 @@ CON_COMMAND( listip, "List IP addresses on the ban list." )
 //-----------------------------------------------------------------------------
 CON_COMMAND( writeip, "Save the ban list to " BANNED_IP_FILENAME "." )
 {
-	FileHandle_t f;
 	char	name[MAX_OSPATH];
 	byte	b[4];
-	int		i;
-	float banTime;
 
 	Q_strncpy( name, CONFIG_DIR BANNED_IP_FILENAME, sizeof( name ) );
 
 	ConMsg( "Writing %s.\n", name );
 
-	f = g_pFileSystem->Open ( name, "wb" );
+	FileHandle_t f = g_pFileSystem->Open(name, "wb");
 	if ( !f )
 	{
 		ConMsg( "Couldn't open %s\n", name );
 		return;
 	}
 	
-	for ( i = 0 ; i < g_IPFilters.Count() ; i++ )
+	for ( const auto &ipf : g_IPFilters )
 	{
-		*(unsigned *)b = g_IPFilters[i].compare;
+		memcpy( b, &ipf.compare, sizeof(b) );
 
 		// Only store out the permanent bad guys from this server.
-		banTime = g_IPFilters[i].banTime;
+		float banTime = ipf.banTime;
 		
 		if ( banTime != 0.0f )
 		{
@@ -722,6 +719,7 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 	int			iSearchIndex = -1;
 	char		szDuration[256];
 	char		szSearchString[64];
+	szSearchString[0] = '\0';
 	bool		bKick = false;
 	bool		bPlaying = false;
 	const char	*pszArg2 = NULL;

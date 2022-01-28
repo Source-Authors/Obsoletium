@@ -674,12 +674,10 @@ bool CDemoUIPanel2::IsInDriveMode()
 
 void CDemoUIPanel2::GetDriveViewPoint( Vector &origin, QAngle &angle )
 {
-	NULL;
 }
 
 void CDemoUIPanel2::SetDriveViewPoint( Vector &origin, QAngle &angle )
 {
-	NULL;
 }
 
 void CDemoUIPanel2::OnTick()
@@ -841,7 +839,6 @@ void CDemoUIPanel2::OnMessage(const KeyValues *params, VPANEL fromPanel)
 
 		if ( !Q_strcmp( "SliderMoved", params->GetName() ) )
 		{
-			NULL;
 		}
 	}
 }
@@ -894,7 +891,6 @@ void CDemoUIPanel2::OnFileSelected( char const *fullpath )
 
 void CDemoUIPanel2::OnVDMChanged( void )
 {
-	NULL;
 }
 
 bool CDemoUIPanel2::IsHoldingFastForward( void )
@@ -955,7 +951,6 @@ bool CDemoUIPanel2::OverrideView( democmdinfo_t& info, int tick )
 
 void CDemoUIPanel2::DrawDebuggingInfo()
 {
-	NULL;
 }
 
 //-----------------------------------------------------------------------------

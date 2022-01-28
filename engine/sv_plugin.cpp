@@ -243,15 +243,13 @@ void CServerPlugin::LoadPlugins()
 			continue;
 		}
 	
-		KeyValues *pluginsFile = new KeyValues("Plugins");
+		KeyValues::AutoDelete pluginsFile = KeyValues::AutoDelete("Plugins");
 		pluginsFile->LoadFromFile( g_pFileSystem, va("addons/%s", findfn), "MOD" );
 
 		if ( pluginsFile->GetString("file", NULL) ) 
 		{
 			LoadPlugin(pluginsFile->GetString("file"));
 		}
-
-		pluginsFile->deleteThis();
 
 		// move to next item
 		findfn = Sys_FindNext( NULL, 0  );

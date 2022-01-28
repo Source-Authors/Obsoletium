@@ -57,7 +57,7 @@ extern int  NET_ReceiveStream( int nSock, char * buf, int len, int flags );
 // If the network connection hasn't been active in this many seconds, display some warning text.
 #define CONNECTION_PROBLEM_TIME		4.0f	// assume network problem after this time
 
-#define BYTES2FRAGMENTS(i) ((i+FRAGMENT_SIZE-1)/FRAGMENT_SIZE)
+#define BYTES2FRAGMENTS(i) (((i)+FRAGMENT_SIZE-1)/FRAGMENT_SIZE)
 
 #define FLIPBIT(v,b) if (v&b) v &= ~b; else v |= b;
 
@@ -990,8 +990,7 @@ void CNetChan::RemoveHeadInWaitingList( int nList )
 
 	dataFragments_t * data = m_WaitingList[nList][0]; // get head
 
-	if ( data->buffer )
-		delete [] data->buffer;	// free data buffer
+	delete [] data->buffer;	// free data buffer
 
 	if ( data->file	!= FILESYSTEM_INVALID_HANDLE )
 	{

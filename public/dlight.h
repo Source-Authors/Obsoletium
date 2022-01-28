@@ -74,7 +74,7 @@ struct dlight_t
 	}
 
 	// THIS SHOULD ONLY GET CALLED FROM THE ENGINE
-	float IsRadiusGreaterThanZero() const
+	bool IsRadiusGreaterThanZero() const
 	{
 		// don't bother calculating the new radius if you just want to know if it is greater than zero.
 		return radius > 0.0f;

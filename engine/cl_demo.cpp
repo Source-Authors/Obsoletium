@@ -129,7 +129,7 @@ class DemoOverlay
 {
 public:
 	DemoOverlay();
-	~DemoOverlay();
+	~DemoOverlay() = default;
 
 public:
 	void Tick();
@@ -145,10 +145,6 @@ protected:
 
 DemoOverlay::DemoOverlay() :
 	m_fLastTickTime( 0.f ), m_fLastTickOverlay( 0.f ), m_bTick( false ), m_maskDrawnOverlay( OVR_NONE )
-{
-}
-
-DemoOverlay::~DemoOverlay()
 {
 }
 
@@ -448,6 +444,7 @@ void CDemoRecorder::RecordStringTables()
 void CDemoRecorder::RecordUserInput( int cmdnumber )
 {
 	char buffer[256];
+	buffer[0] = '\0';
 	bf_write msg( "CDemo::WriteUserCmd", buffer, sizeof(buffer) );
 
 	g_ClientDLL->EncodeUserCmdToBuffer( msg, cmdnumber );

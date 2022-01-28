@@ -76,10 +76,7 @@ void CSession::ResetSession()
 	Q_memset( &m_nPlayerSlots, 0, sizeof( m_nPlayerSlots ) );
 	Q_memset( &m_SessionInfo, 0, sizeof( m_SessionInfo ) );
 
-	if ( m_pRegistrationResults )
-	{
-		delete m_pRegistrationResults;
-	}
+	delete m_pRegistrationResults;
 
 	m_nSessionFlags	= 0;
 }
@@ -265,7 +262,7 @@ bool CSession::CreateSession()
 		flags |= XSESSION_CREATE_HOST;
 	}
 
-	if ( flags & XSESSION_CREATE_USES_ARBITRATION )
+	if ( flags == XSESSION_CREATE_USES_ARBITRATION )
 	{
 		m_bIsArbitrated = true;
 	}

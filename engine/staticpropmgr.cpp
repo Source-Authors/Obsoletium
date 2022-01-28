@@ -1664,7 +1664,6 @@ void CStaticPropMgr::GetAllStaticPropsInOBB( const Vector &ptOrigin, const Vecto
 	Vector vAABBMins, vAABBMaxs;
 	vAABBMins = ptOrigin;
 	vAABBMaxs = ptOrigin;
-	Vector ptAABBExtents[8];
 
 	Vector ptOBBExtents[8];
 	for( counter = 0; counter != 8; ++counter )

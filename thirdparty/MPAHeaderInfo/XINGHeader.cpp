@@ -76,8 +76,7 @@ CXINGHeader::CXINGHeader(const CMPAFrame* pFrame, DWORD dwOffset) :
 
 CXINGHeader::~CXINGHeader(void)
 {
-	if (m_pLAMETag)
-		delete m_pLAMETag;
+	delete m_pLAMETag;
 }
 
 DWORD CXINGHeader::SeekPosition(float& fPercent) const

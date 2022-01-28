@@ -239,9 +239,7 @@ public:
 		memset( m_pFilename, 0, sizeof( m_pFilename ) );
 	}
 
-	~CDiscardableArray()
-	{
-	}
+	~CDiscardableArray() = default;
 
 	void Init( char* pFilename, int nOffset, int nCount, void *pData = NULL )
 	{

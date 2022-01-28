@@ -821,9 +821,10 @@ void COverlayMgr::Surf_PostClipFragment( moverlay_t *pOverlay, moverlayfragment_
 								  origOverlay.m_aPrimVerts[1].pos,
 								  overlayFrag.m_aPrimVerts[iVert].pos, vecUV );
 
+		overlayvert_t &vert = pFragment->m_aPrimVerts[iVert];
 		Overlay_OverlayPlaneToWorld( pOverlay->m_vecBasis[2], surfID, 
 			                         overlayFrag.m_aPrimVerts[iVert].pos,
-			                         pFragment->m_aPrimVerts[iVert].pos );
+			                         vert.pos );
 
 		// Texture coordinates.
 		Vector2D vecTexCoord;
@@ -833,21 +834,21 @@ void COverlayMgr::Surf_PostClipFragment( moverlay_t *pOverlay, moverlayfragment_
 										origOverlay.m_aPrimVerts[2].texCoord[iTexCoord], origOverlay.m_aPrimVerts[1].texCoord[iTexCoord],
 										vecUV, vecTexCoord );
 
-			pFragment->m_aPrimVerts[iVert].texCoord[iTexCoord][0] = vecTexCoord.x;
-			pFragment->m_aPrimVerts[iVert].texCoord[iTexCoord][1] = vecTexCoord.y;
+			vert.texCoord[iTexCoord][0] = vecTexCoord.x;
+			vert.texCoord[iTexCoord][1] = vecTexCoord.y;
 		}
 
 		// Normals : FIXME this isn't an interpolated normal.
-		pFragment->m_aPrimVerts[iVert].normal = vNormal; 
+		vert.normal = vNormal; 
 		
 		// Lightmap coordinates.
 		Vector2D uv;
-		SurfComputeLightmapCoordinate( ctx, surfID, pFragment->m_aPrimVerts[iVert].pos, uv );
-		pFragment->m_aPrimVerts[iVert].lightCoord[0] = uv.x;
-		pFragment->m_aPrimVerts[iVert].lightCoord[1] = uv.y;
+		SurfComputeLightmapCoordinate( ctx, surfID, vert.pos, uv );
+		vert.lightCoord[0] = uv.x;
+		vert.lightCoord[1] = uv.y;
 
 		// Push -just- off the surface to avoid z-clipping errors.
-		pFragment->m_aPrimVerts[iVert].pos += vNormal * OVERLAY_AVOID_FLICKER_NORMAL_OFFSET;
+		vert.pos += vNormal * OVERLAY_AVOID_FLICKER_NORMAL_OFFSET;
 	}
 
 	// Create the sort ID for this fragment
@@ -1778,10 +1779,7 @@ moverlayfragment_t *COverlayMgr::CopyTempFragment( moverlayfragment_t *pSrc )
 //-----------------------------------------------------------------------------
 void COverlayMgr::DestroyTempFragment( moverlayfragment_t *pFragment )
 {
-	if ( pFragment )
-	{
-		delete pFragment;
-	}
+	delete pFragment;
 }
 
 

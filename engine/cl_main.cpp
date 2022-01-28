@@ -2466,20 +2466,16 @@ void CL_SetSteamCrashComment()
 	MaterialAdapterInfo_t info;
 	materials->GetDisplayAdapterInfo( materials->GetCurrentAdapter(), info );
 
-	const char *dxlevel = "Unk";
 	int nDxLevel = g_pMaterialSystemHardwareConfig->GetDXSupportLevel();
-	if ( g_pMaterialSystemHardwareConfig )
-	{
-		dxlevel = COM_DXLevelToString( nDxLevel ) ;
-	}
+	const char *dxlevel = COM_DXLevelToString( nDxLevel ) ;
 
 	// Make a string out of the high part and low parts of driver version
 	char szDXDriverVersion[ 64 ];
-	Q_snprintf( szDXDriverVersion, sizeof( szDXDriverVersion ), "%ld.%ld.%ld.%ld", 
-		( long )( info.m_nDriverVersionHigh>>16 ), 
-		( long )( info.m_nDriverVersionHigh & 0xffff ), 
-		( long )( info.m_nDriverVersionLow>>16 ), 
-		( long )( info.m_nDriverVersionLow & 0xffff ) );
+	Q_snprintf( szDXDriverVersion, sizeof( szDXDriverVersion ), "%u.%u.%u.%u", 
+		( info.m_nDriverVersionHigh>>16 ), 
+		( info.m_nDriverVersionHigh & 0xffffU ), 
+		( info.m_nDriverVersionLow>>16 ), 
+		( info.m_nDriverVersionLow & 0xffffU ) );
 
 	Q_snprintf( driverinfo, sizeof(driverinfo), "Driver Name:  %s\nDriver Version: %s\nVendorId / DeviceId:  0x%x / 0x%x\nSubSystem / Rev:  0x%x / 0x%x\nDXLevel:  %s [%d]\nVid:  %i x %i",
 		info.m_pDriverName,

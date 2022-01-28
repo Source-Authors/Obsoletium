@@ -307,12 +307,10 @@ void RecvTable_FreeSendTable( SendTable *pTable )
 
 		delete [] pProp->m_pVarName;
 
-		if ( pProp->m_pExcludeDTName )
-			delete [] pProp->m_pExcludeDTName;
+		delete [] pProp->m_pExcludeDTName;
 	}
 
-	if ( pTable->m_pProps )
-		delete [] pTable->m_pProps;
+	delete [] pTable->m_pProps;
 
 	delete pTable;
 }

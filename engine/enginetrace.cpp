@@ -277,11 +277,10 @@ int CEngineTraceServer::SpatialPartitionTriggerMask() const
 class CPointContentsEnum : public IPartitionEnumerator
 {
 public:
-	CPointContentsEnum( CEngineTrace *pEngineTrace, const Vector &pos ) : m_Contents(CONTENTS_EMPTY) 
+	CPointContentsEnum( CEngineTrace *pEngineTrace, const Vector &pos )
+		: m_Contents(CONTENTS_EMPTY), m_pCollide(NULL),
+		m_pEngineTrace(pEngineTrace), m_Pos(pos)
 	{
-		m_pEngineTrace = pEngineTrace;
-		m_Pos = pos; 
-		m_pCollide = NULL;
 	}
 
 	static inline bool TestEntity( 

@@ -1051,8 +1051,7 @@ CColorCurvesUIPanel::CColorCurvesUIPanel( vgui::Panel *pParent, CCurvesColorOper
 
 CColorCurvesUIPanel::~CColorCurvesUIPanel()
 {
-	if( m_pCurveEditor )
-		delete m_pCurveEditor;
+	delete m_pCurveEditor;
 }
 
 
@@ -2007,7 +2006,6 @@ CColorLevelsUIPanel::CColorLevelsUIPanel( vgui::Panel *pParent, CLevelsColorOper
 	m_pOutputLevelSlider->SetRange( 0, 255 );
 	m_pOutputLevelSlider->AddActionSignalTarget( this );
 
-	m_pLevelsOp = new CLevelsColorOperation;
 	m_pHistogramPanel = new CColorHistogramPanel( this, "Histogram", pOp );
 
 	m_pLevelsOp = pOp;
@@ -3576,7 +3574,7 @@ class CColorBalanceOperation : public IColorOperation
 {
 public:
 	CColorBalanceOperation();
-   ~CColorBalanceOperation();
+	~CColorBalanceOperation() = default;
 
 	// Methods of IColorOperation
 	virtual void Apply( const Vector &inRGB, Vector &outRGB );
@@ -3667,14 +3665,6 @@ CColorBalanceOperation::CColorBalanceOperation( )
 	CreateLookupTables( );
 
 	V_strcpy_safe( m_pName, "Balance" );
-}
-
-
-//-----------------------------------------------------------------------------
-// Destructor
-//-----------------------------------------------------------------------------
-CColorBalanceOperation::~CColorBalanceOperation( )
-{
 }
  
 //-----------------------------------------------------------------------------
@@ -4235,8 +4225,7 @@ CLookupViewWindow::CLookupViewWindow( vgui::Panel *parent, ColorCorrectionHandle
 
 CLookupViewWindow::~CLookupViewWindow()
 {
-	if( m_pLookupPanel )
-		delete m_pLookupPanel;
+	delete m_pLookupPanel;
 }
 
 void CLookupViewWindow::Init()

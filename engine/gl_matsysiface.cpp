@@ -500,7 +500,7 @@ void MaterialSystem_CreateSortinfo( void )
 	Assert( !materialSortInfoArray );
 
 	int nSortIDs = materials->GetNumSortIDs();
-	materialSortInfoArray = ( MaterialSystem_SortInfo_t * )new MaterialSystem_SortInfo_t[ nSortIDs ];
+	materialSortInfoArray = new MaterialSystem_SortInfo_t[ nSortIDs ];
 	Assert( materialSortInfoArray );
 	materials->GetSortInfo( materialSortInfoArray );
 

@@ -176,7 +176,7 @@ void CDemoFile::ReadCmdHeader( unsigned char& cmd, int& tick )
 {
 	Assert( m_pBuffer && m_pBuffer->IsValid() );
 	cmd = m_pBuffer->GetUnsignedChar( );
-	if ( !m_pBuffer || !m_pBuffer->IsValid() )
+	if ( !m_pBuffer->IsValid() )
 	{
 		ConDMsg("Missing end tag in demo file.\n");
 		cmd = dem_stop;
@@ -515,7 +515,7 @@ bool CDemoFile::Open(const char *name, bool bReadOnly, bool bMemoryBuffer, int n
 	// Demo files are always little endian
 	m_pBuffer->SetBigEndian( false );
 
-	if ( !m_pBuffer || !m_pBuffer->IsValid() )
+	if ( !m_pBuffer->IsValid() )
 	{
 		ConMsg ("CDemoFile::Open: couldn't open file %s for %s.\n", 
 			name, bReadOnly?"reading":"writing" );

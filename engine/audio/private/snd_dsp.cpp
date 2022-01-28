@@ -1321,10 +1321,7 @@ void DLY_Free ( dly_t *pdly )
 	{
 		FLT_Free ( pdly->pflt );
 
-		if ( pdly->w )
-		{
-			delete[] pdly->w;
-		}
+		delete[] pdly->w;
 		
 		// free dly slot
 
@@ -1986,13 +1983,6 @@ mdy_t *MDY_Alloc ( dly_t *pdly, float ramptime, float modtime, float depth, floa
 			MDY_Init ( pmdy );
 
 			pmdy->pdly = pdly;
-
-			if ( !pmdy->pdly )
-			{
-				DevMsg ("DSP: Warning, failed to allocate delay for mod delay.\n" );
-				return NULL;
-			}
-
 			pmdy->fused = true;
 			pmdy->ramptime = ramptime;
 			pmdy->mtime = SEC_TO_SAMPS(modtime);
@@ -2424,7 +2414,7 @@ rva_t * RVA_Alloc ( int *D, int *a, int *b, int m, flt_t *pflt, int fparallel, f
 			
 			// value of ftaps is the seed for all tap values 
 
-			float t1 = max((float)MSEC_TO_SAMPS(5), D[i] * (1.0F - ftaps * 3.141592F) );	
+			float t1 = max((float)MSEC_TO_SAMPS(5), D[i] * (1.0F - ftaps * M_PI_F) );	
 			float t2 = max((float)MSEC_TO_SAMPS(7), D[i] * (1.0F - ftaps * 1.697043F) );	
 			float t3 = max((float)MSEC_TO_SAMPS(10), D[i] * (1.0F - ftaps * 0.96325F) ); 
 
@@ -5502,7 +5492,7 @@ pset_t * PSET_Alloc ( int ipsettemplate )
 
 	*ppset = g_psettemplates[ipsettemplate];
 
-	ppset->fused = true;
+	ppset->fused = 1;
 
 	// clear state array
 
@@ -7401,7 +7391,6 @@ inline void DSP_ProcessStereoToMono(dsp_t *pdsp, portable_samplepair_t *pbfront,
 
 	// crossfading to current preset from previous preset	
 
-	if ( bcrossfading )
 	{
 		int r;
 		int fl;
@@ -7559,7 +7548,6 @@ inline void DSP_ProcessStereoToStereo(dsp_t *pdsp, portable_samplepair_t *pbfron
 
 	// crossfading to current preset from previous preset	
 
-	if ( bcrossfading )
 	{
 		int r;
 		int flp, frp;
@@ -7672,7 +7660,6 @@ inline void DSP_ProcessQuadToMono(dsp_t *pdsp, portable_samplepair_t *pbfront, p
 			return;
 	}
 
-	if ( bcrossfading )
 	{
 		int r;
 		int fl, fr, rl, rr;
@@ -7872,7 +7859,6 @@ inline void DSP_ProcessQuadToStereo(dsp_t *pdsp, portable_samplepair_t *pbfront,
 
 	// crossfading to current preset from previous preset	
 
-	if ( bcrossfading )
 	{
 		int r;
 		int rl, rr;
@@ -8068,7 +8054,6 @@ inline void DSP_ProcessQuadToQuad(dsp_t *pdsp, portable_samplepair_t *pbfront, p
 
 	// crossfading to current preset from previous preset	
 
-	if ( bcrossfading )
 	{
 		int r;
 		int flp, frp, rlp, rrp;
@@ -8200,7 +8185,6 @@ inline void DSP_Process5To1(dsp_t *pdsp, portable_samplepair_t *pbfront, portabl
 			return;
 	}
 
-	if ( bcrossfading )
 	{
 		int r;
 		int fl, fr, rl, rr, fc;
@@ -8398,7 +8382,6 @@ inline void DSP_Process5To5(dsp_t *pdsp, portable_samplepair_t *pbfront, portabl
 
 	// crossfading to current preset from previous preset	
 
-	if ( bcrossfading )
 	{
 		int r;
 		int flp, frp, rlp, rrp, fcp;
@@ -8917,7 +8900,7 @@ int DSP_CountFilePresets( const char *pstart )
 	{
 		pstart = COM_Parse( pstart );
 		
-		if ( strlen(com_token) <= 0)
+		if ( !com_token[0] )
 			break;
 
 		if ( com_token[0] == '{' )  // left paren
@@ -9210,7 +9193,7 @@ bool DSP_LoadPresetFile( void )
 			{
 				pstart = COM_Parse( pstart );
 
-				if ( strlen(com_token) <= 0)
+				if ( !com_token[0] )
 					break;
 
 				if (com_token[0] == CHAR_LEFT_PAREN)
@@ -9629,58 +9612,3 @@ void DSP_DEBUGReloadPresetFile( void )
 // crabbed
 // barnacle gut
 // bad transmission
-
-////////////////////////
-// Dynamics processing
-////////////////////////
-
-// compressor defines
-#define COMP_MAX_AMP	32767			// abs max amplitude
-#define COMP_THRESH		20000			// start compressing at this threshold
-
-// compress input value - smoothly limit output y to -32767 <= y <= 32767
-// UNDONE: not tested or used
-
-inline int S_Compress( int xin )
-{
-
-	return CLIP( xin >> 2 );	// DEBUG - disabled
-
-
-	float Yn, Xn, Cn, Fn;
-	float C0 = 20000;	// threshold
-	float p = .3;		// compression ratio
-	float g = 1;		// gain after compression
-	
-	Xn = (float)xin;
-
-	// Compressor formula:
-	// Cn = l*Cn-1 + (1-l)*|Xn|				// peak detector with memory
-	// f(Cn) = (Cn/C0)^(p-1)	for Cn > C0	// gain function above threshold
-	// f(Cn) = 1				for C <= C0	// unity gain below threshold
-	// Yn = f(Cn) * Xn						// compressor output
-	
-	// UNDONE: curves discontinuous at threshold, causes distortion, try catmul-rom
-
-	//float l = .5;		// compressor memory
-	//Cn = l * (*pCnPrev) + (1 - l) * fabs((float)xin);
-	//*pCnPrev = Cn;
-	
-	Cn = fabsf((float)xin);
-
-	if (Cn < C0)
-		Fn = 1;
-	else
-		Fn = powf((Cn / C0),(p - 1));
-		
-	Yn = Fn * Xn * g;
-	
-	//if (Cn > 0)
-	//	Msg("%d -> %d\n", xin, (int)Yn);	// DEBUG
-
-	//if (fabs(Yn) > 32767)
-	//	Yn = Yn;			// DEBUG
-
-	return (CLIP((int)Yn));
-}
-

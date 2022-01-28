@@ -780,7 +780,7 @@ CON_COMMAND( alias, "Alias a command." )
 
 	if (!a)
 	{
-		a = (cmdalias_t *)new cmdalias_t;
+		a = new cmdalias_t;
 		a->next = cmd_alias;
 		cmd_alias = a;
 	}

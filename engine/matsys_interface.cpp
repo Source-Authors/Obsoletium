@@ -437,7 +437,7 @@ static void ReadMaterialSystemConfigFromRegistry( MaterialSystem_Config_t &confi
 
 	// Special case...
 	const char *szMonitorGamma = ReadVideoConfigString( "ScreenMonitorGamma", "2.2" );
-	if ( szMonitorGamma && strlen(szMonitorGamma) > 0 )
+	if ( szMonitorGamma && szMonitorGamma[0] )
 	{
 		float flMonitorGamma = atof( szMonitorGamma );
 		// temp, to make sure people with gamma values saved in the old format don't max out

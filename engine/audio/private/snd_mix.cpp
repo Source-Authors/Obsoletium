@@ -2020,7 +2020,7 @@ void CChannelCullList::Initialize( CChannelList &list )
 		// for each sound, determine where it ranks in loudness
 		int howManyLouder = 0;
 		for ( int j = 0 ;
-			 m_channelInfo[j].m_channelNum != i && m_channelInfo[j].m_vol >= 0 && j < MAX_CHANNELS ;
+			 j < MAX_CHANNELS && m_channelInfo[j].m_channelNum != i && m_channelInfo[j].m_vol >= 0;
 			 ++j )
 		{
 			// j steps through the sorted list until we find ourselves:

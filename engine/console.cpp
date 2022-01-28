@@ -976,7 +976,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 	wchar_t const *p = unicode;
 	while ( *p )
 	{
-		const wchar_t *nextreturn = wcsstr( p, L"\n" );
+		const wchar_t *nextreturn = wcschr( p, L'\n' );
 		if ( nextreturn != NULL )
 		{
 			int copysize = nextreturn - p + 1;

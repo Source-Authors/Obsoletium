@@ -545,7 +545,7 @@ class CPowerInfoInitializer
 public:
 	CPowerInfoInitializer()
 	{
-		Assert( MAX_MAP_DISP_POWER+1 == NUM_POWERINFOS );
+		static_assert( MAX_MAP_DISP_POWER+1 == NUM_POWERINFOS );
 
 		for( int i=0; i <= MAX_MAP_DISP_POWER; i++ )
 		{

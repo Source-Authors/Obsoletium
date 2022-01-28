@@ -74,7 +74,7 @@ void SV_EnsureInstanceBaseline( ServerClass *pServerClass, int iEdict, const voi
 		AUTO_LOCK( g_svInstanceBaselineMutex );
 
 		// We need this second check in case multiple instances of the same class have grabbed the lock.
-		if ( pClass->m_InstanceBaselineIndex == INVALID_STRING_INDEX )
+		if ( pClass->m_InstanceBaselineIndex == INVALID_STRING_INDEX ) //-V547
 		{
 			char idString[32];
 			Q_snprintf( idString, sizeof( idString ), "%d", pClass->m_ClassID );

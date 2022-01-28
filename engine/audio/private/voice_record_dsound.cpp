@@ -172,7 +172,7 @@ bool VoiceRecord_DSound::Init(int sampleRate)
 	if(!m_hInstDS)
 		goto HandleError;
 
-	createFn = (DirectSoundCaptureCreateFn)GetProcAddress(m_hInstDS, "DirectSoundCaptureCreate");
+	createFn = (DirectSoundCaptureCreateFn)GetProcAddress(m_hInstDS, V_STRINGIFY(DirectSoundCaptureCreate));
 	if(!createFn)
 		goto HandleError;
 

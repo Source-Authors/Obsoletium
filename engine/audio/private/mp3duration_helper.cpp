@@ -37,12 +37,10 @@ float GetMP3Duration_Helper( char const *filename )
 	char fn[ 512 ];
 	Q_snprintf( fn, sizeof( fn ), "sound/%s", PSkipSoundChars( filename ) );
 
-	FileNameHandle_t h = g_pFullFileSystem->FindOrAddFileName( fn );
-
 	MP3Duration_t search;
-	search.h = h;
+	search.h = g_pFullFileSystem->FindOrAddFileName( fn );
 	
-	int idx = g_MP3Durations.Find( search );
+	auto idx = g_MP3Durations.Find( search );
 	if ( idx != g_MP3Durations.InvalidIndex() )
 	{
 		return g_MP3Durations[ idx ].duration;
@@ -53,8 +51,10 @@ float GetMP3Duration_Helper( char const *filename )
 		CMPAFile MPAFile( fn );
 		duration = (float)MPAFile.GetLengthSec();
 	}
-	catch ( ... )
+	catch ( std::exception &e )
 	{
+		// dimhotepus: Dump exception info.
+		Warning( "Unable to get %s file length: %s.", filename, e.what() );
 	}
 
 	search.duration = duration;

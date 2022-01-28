@@ -65,7 +65,7 @@ CMusicMatchTag::CMusicMatchTag(CMPAStream* pStream, DWORD dwOffset) :
 		dwMetadataSize = 7868;	// fixed size up to version 3
 
 	if (dwMetadataSize == 0)	// could not find correct metadata size
-		throw NULL;
+			throw std::exception( "Incorrect metadata size (0)" );
 
 	// total size = footer + data offsets + metadata + version + img (incl. unused)
 	m_dwSize = 48 + 20 + dwMetadataSize + 256 + (dwVersionOffset - dwImgExtOffset);

@@ -336,7 +336,7 @@ class CErrorText
 {
 public:
 	CErrorText() : m_bIsDedicatedServer( false ) {}
-	~CErrorText() {}
+	~CErrorText() = default;
 
 	void Steam_SetMiniDumpComment()
 	{

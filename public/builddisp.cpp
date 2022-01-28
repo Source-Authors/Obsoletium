@@ -657,14 +657,10 @@ CCoreDispInfo::CCoreDispInfo()
 //-----------------------------------------------------------------------------
 CCoreDispInfo::~CCoreDispInfo()
 {
-	if (m_pVerts)
-		delete [] m_pVerts;
-	if (m_RenderIndices)
-		delete [] m_RenderIndices;
-	if (m_Nodes)
-		delete [] m_Nodes;
-	if (m_pTris)
-		delete [] m_pTris;
+	delete [] m_pVerts;
+	delete [] m_RenderIndices;
+	delete [] m_Nodes;
+	delete [] m_pTris;
 }
 
 

@@ -1878,13 +1878,12 @@ void Mod_LoadFaces( void )
 
 	msurfacelighting_t *pLighting = Hunk_AllocNameAlignedClear< msurfacelighting_t >( count, 32, va( "%s [%s]", lh.GetLoadName(), "surfacelighting" ) );
 
-	lh.GetMap()->surfaces1 = out1;
-	lh.GetMap()->surfaces2 = out2;
-	lh.GetMap()->surfacelighting = pLighting;
-	lh.GetMap()->surfacenormals = Hunk_AllocNameAlignedClear< msurfacenormal_t >( count, 2, va( "%s [%s]", lh.GetLoadName(), "surfacenormal" ) );
-	lh.GetMap()->numsurfaces = count;
-
 	worldbrushdata_t *pBrushData = lh.GetMap();
+	pBrushData->surfaces1 = out1;
+	pBrushData->surfaces2 = out2;
+	pBrushData->surfacelighting = pLighting;
+	pBrushData->surfacenormals = Hunk_AllocNameAlignedClear< msurfacenormal_t >( count, 2, va( "%s [%s]", lh.GetLoadName(), "surfacenormal" ) );
+	pBrushData->numsurfaces = count;
 
 	for ( surfnum=0 ; surfnum<count ; ++surfnum, ++in, ++out1, ++out2, ++pLighting )
 	{

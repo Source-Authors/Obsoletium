@@ -1590,7 +1590,7 @@ CON_COMMAND( star_memory, "Dump memory stats" )
 	}
 	else
 	{
-		Warning( "Unable to dump memory stats: %s ", std::system_category().message( (int) ::GetLastError() ) );
+		Warning( "Unable to dump memory stats: %s ", std::system_category().message( (int) ::GetLastError() ).c_str() );
 	}
 #endif
 }

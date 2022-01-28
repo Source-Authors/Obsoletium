@@ -1064,13 +1064,6 @@ const char *CValveVideoServices::GetFileExtension( const char *pFileName )
 // ===========================================================================	
 
 
-#ifdef WIN32		
-	typedef SHORT (WINAPI *GetAsyncKeyStateFn_t)( int vKey );
-
-	static HINSTANCE s_UserDLLhInst = nullptr;
-	GetAsyncKeyStateFn_t s_pfnGetAsyncKeyState = nullptr;
-#endif
-
 CVideoCommonServices::CVideoCommonServices()
 {
 	ResetInputHandlerState();
@@ -1108,12 +1101,6 @@ void CVideoCommonServices::ResetInputHandlerState()
 	m_forcedMinTime = 0.0f;
 	
 	m_StartTime = 0;
-	
-#ifdef WIN32
-	s_UserDLLhInst = nullptr;
-	s_pfnGetAsyncKeyState = nullptr;
-#endif	
-
 }
 
 // ===========================================================================	
@@ -1287,23 +1274,6 @@ VideoResult_t CVideoCommonServices::InitFullScreenPlaybackInputHandler( VideoPla
 		return VideoResult::OPERATION_ALREADY_PERFORMED;
 	}
 
-#ifdef WIN32
-	// We need to be able to poll the state of the input device, but we're not completely setup yet, so this spoofs the ability
-	HINSTANCE m_UserDLLhInst = LoadLibrary( "user32.dll" );
-	if ( m_UserDLLhInst == NULL )
-	{
-		return VideoResult::SYSTEM_ERROR_OCCURED;
-	}
-
-	s_pfnGetAsyncKeyState = (GetAsyncKeyStateFn_t) GetProcAddress( m_UserDLLhInst, "GetAsyncKeyState" );
-	if ( s_pfnGetAsyncKeyState == NULL )	
-	{
-		FreeLibrary( m_UserDLLhInst );
-		return VideoResult::SYSTEM_ERROR_OCCURED;
-	}
-	
-#endif
-
 	// save off playback options	
 	m_playbackFlags = playbackFlags;
 	m_forcedMinTime = forcedMinTime;
@@ -1373,9 +1343,9 @@ bool CVideoCommonServices::ProcessFullScreenInput( bool &bAbortEvent, bool &bPau
 		DispatchMessage( &msg );
 	}
 	// Escape, return, or space stops or pauses the playback
-	bool bEscPressed	= ( m_bScanEsc )    ? ( s_pfnGetAsyncKeyState( VK_ESCAPE ) & 0x8000 ) != 0 : false;
-	bool bReturnPressed	= ( m_bScanReturn ) ? ( s_pfnGetAsyncKeyState( VK_RETURN ) & 0x8000 ) != 0 : false;
-	bool bSpacePressed	= ( m_bScanSpace )  ? ( s_pfnGetAsyncKeyState( VK_SPACE ) & 0x8000 ) != 0  : false;
+	bool bEscPressed	= ( m_bScanEsc )    ? ( GetAsyncKeyState( VK_ESCAPE ) & 0x8000 ) != 0 : false;
+	bool bReturnPressed	= ( m_bScanReturn ) ? ( GetAsyncKeyState( VK_RETURN ) & 0x8000 ) != 0 : false;
+	bool bSpacePressed	= ( m_bScanSpace )  ? ( GetAsyncKeyState( VK_SPACE ) & 0x8000 ) != 0  : false;
 #elif defined(OSX)
 	g_pLauncherMgr->PumpWindowsMessageLoop();
 	// Escape, return, or space stops or pauses the playback
@@ -1452,10 +1422,6 @@ VideoResult_t CVideoCommonServices::TerminateFullScreenPlaybackInputHandler()
 		WarningAssert( "Not Initialized to call" );
 		return VideoResult::OPERATION_OUT_OF_SEQUENCE;
 	}
-
-#if defined ( WIN32 )
-	FreeLibrary( s_UserDLLhInst );		// and free the dll we needed
-#endif
 
 	ResetInputHandlerState();
 	

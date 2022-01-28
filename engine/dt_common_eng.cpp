@@ -227,10 +227,7 @@ void DataTable_CreateClientClassInfosFromServerClasses( CBaseClientState *pState
 	}
 
 	// Remove old
-	if ( pState->m_pServerClasses )
-	{
-		delete [] pState->m_pServerClasses;
-	}
+	delete [] pState->m_pServerClasses;
 
 	Assert( nClasses > 0 );
 
@@ -364,10 +361,7 @@ void DataTable_WriteClassInfosBuffer(ServerClass *pClasses, bf_write *pBuf )
 
 bool DataTable_ParseClassInfosFromBuffer( CClientState *pState, bf_read *pBuf )
 {
-	if(pState->m_pServerClasses)
-	{
-		delete [] pState->m_pServerClasses;
-	}
+	delete [] pState->m_pServerClasses;
 
 	pState->m_nServerClasses = pBuf->ReadShort();
 

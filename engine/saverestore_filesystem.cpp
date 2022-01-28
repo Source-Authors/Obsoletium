@@ -1466,7 +1466,7 @@ void CSaveRestoreFileSystem::DumpSaveDirectory( void )
 	}
 	float percent = 0.f;
 	if ( totalUncompressedSize )
-		percent = 100.f - (totalCompressedSize / totalUncompressedSize * 100.f);
+		percent = 100.f - ((float)totalCompressedSize / totalUncompressedSize * 100.f);
 	Msg( "Total Size: %.2f Mb (%d bytes)\n", totalCompressedSize / (1024.f*1024.f), totalCompressedSize );
 	Msg( "Compression: %.2f Mb to %.2f Mb (%.0f%%)\n", totalUncompressedSize/(1024.f*1024.f), totalCompressedSize/(1024.f*1024.f), percent );
 }

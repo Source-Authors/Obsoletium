@@ -68,7 +68,7 @@ CLAMETag::CLAMETag(CMPAStream* pStream, bool bAppended, DWORD dwOffset) :
 		m_bRevision = bInfoAndVBR & 0xF0;
 		// invalid value
 		if (m_bRevision == 15)
-			throw NULL;
+			throw std::exception( "Incorrect revision (15)" );
 
 		// VBR info in 4 LSB
 		m_bVBRInfo = bInfoAndVBR & 0x0F;

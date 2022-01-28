@@ -72,7 +72,7 @@ class AccessibilityShortcutKeysToggler {
 };
 
 void AccessibilityShortcutKeysToggler::Toggle( bool toggle ) noexcept {
-  if (is_toggled_.has_value() && is_toggled_.value() == toggle) return;
+  if (is_toggled_.has_value() && *is_toggled_ == toggle) return;
 
   if (toggle) {
     // Restore StickyKeys/etc to original state and enable Windows key.

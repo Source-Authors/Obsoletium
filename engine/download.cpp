@@ -72,7 +72,7 @@ class DownloadCache
 {
 public:
 	DownloadCache();
-	~DownloadCache();
+	~DownloadCache() = default;
 	void Init();
 
 	void GetCachedData( RequestContext_t *rc );			///< Loads cached data, if any
@@ -95,11 +95,6 @@ static DownloadCache *TheDownloadCache = NULL;
 DownloadCache::DownloadCache()
 {
 	m_cache = NULL;
-}
-
-//--------------------------------------------------------------------------------------------------------------
-DownloadCache::~DownloadCache()
-{
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -771,10 +766,7 @@ void CDownloadManager::PruneCompletedRequests()
 	{
 		if ( m_completedRequests[i]->threadDone || !m_completedRequests[i]->bAsHTTP )
 		{
-			if ( m_completedRequests[i]->cacheData )
-			{
-				delete[] m_completedRequests[i]->cacheData;
-			}
+			delete[] m_completedRequests[i]->cacheData;
 			delete m_completedRequests[i];
 			m_completedRequests.Remove( i );
 		}

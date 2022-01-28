@@ -1787,7 +1787,7 @@ void CClientState::FinishSignonState_New()
 	// Verify the map and player .mdl crc's now that we've finished downloading missing resources (maps etc)
 	if ( !CL_CheckCRCs( m_szLevelFileName ) )
 	{
-		Host_Error( "Unable to verify map %s", ( m_szLevelFileName && m_szLevelFileName[0] ) ? m_szLevelFileName : "unknown" );
+		Host_Error( "Unable to verify map %s", m_szLevelFileName[0] ? m_szLevelFileName : "unknown" );
 		return;
 	}
 

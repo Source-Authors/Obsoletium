@@ -271,6 +271,7 @@ int CheckOtherInstancesRunning( void )
 	BOOL bStatus = 0;
 	DWORD nLength = MAX_PATH;
 	char thisProcessName[ MAX_PATH ];
+	thisProcessName[0] = '\0';
 	char thisProcessNameShort[ MAX_PATH ];
 
 	// Load the pspapi to get our current process' name
@@ -278,12 +279,7 @@ int CheckOtherInstancesRunning( void )
 	if ( hInst )
 	{
 		using GetProcessImageFileNameFn = decltype(&GetProcessImageFileName);
-		auto fn = (GetProcessImageFileNameFn)GetProcAddress( hInst,
-#ifdef  UNICODE
-			"GetProcessImageFileNameW");
-#else
-			"GetProcessImageFileNameA");
-#endif
+		auto fn = (GetProcessImageFileNameFn)GetProcAddress( hInst, V_STRINGIFY(GetProcessImageFileName) );
 		if ( fn )
 		{
 			bStatus = fn( GetCurrentProcess(), thisProcessName, nLength );

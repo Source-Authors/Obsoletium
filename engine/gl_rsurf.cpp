@@ -2803,7 +2803,7 @@ void R_SetFogVolumeState( int fogVolume, bool useHeightFog )
 
 	CMatRenderContextPtr pRenderContext( materials );
 
-	if( pMaterial && pFogEnableVar->GetIntValueFast() && fog_enable_water_fog.GetBool() )
+	if( pFogEnableVar->GetIntValueFast() && fog_enable_water_fog.GetBool() )
 	{
 		pRenderContext->SetFogZ( pLeafWaterData->surfaceZ );
 		if( useHeightFog )

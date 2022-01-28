@@ -778,9 +778,7 @@ public:
 		m_iTree = pPartition->GetTreeId();
 	}
 
-	~CPartitionVisitor()
-	{
-	}
+	~CPartitionVisitor() = default;
 
 	bool Visit( SpatialPartitionHandle_t hPartition, EntityInfo_t &hInfo ) const
 	{
@@ -1557,21 +1555,22 @@ int CVoxelHash::EntityCount()
 	int nBucketCount = SPHASH_BUCKET_COUNT;
 	for ( int iBucket = 0; iBucket < nBucketCount; ++iBucket )
 	{
-		if ( m_aVoxelHash.m_aBuckets[iBucket].Count() == 0 )
+		const auto &bucket = m_aVoxelHash.m_aBuckets[iBucket];
+		if ( bucket.Count() == 0 )
 			continue;
 
-		UtlPtrLinkedListIndex_t hHash = m_aVoxelHash.m_aBuckets[iBucket].Head();
+		UtlPtrLinkedListIndex_t hHash = bucket.Head();
 	
-		while ( hHash != m_aVoxelHash.m_aBuckets[iBucket].InvalidIndex() )
+		while ( hHash != bucket.InvalidIndex() )
 		{
-			int iEntity = m_aVoxelHash.m_aBuckets[iBucket][hHash].m_Data;
+			int iEntity = bucket[hHash].m_Data;
 			while ( iEntity!= m_aEntityList.InvalidIndex() )
 			{
 				++nCount;
 				iEntity = m_aEntityList.Next( iEntity );
 			}
 
-			hHash = m_aVoxelHash.m_aBuckets[iBucket].Next( hHash );
+			hHash = bucket.Next( hHash );
 		}
 	}
 	return nCount;
@@ -1638,14 +1637,15 @@ void CVoxelHash::RenderAllObjectsInTree( float flTime )
 
 	for ( int iBucket = 0; iBucket < nBucketCount; ++iBucket )
 	{
-		if ( m_aVoxelHash.m_aBuckets[iBucket].Count() == 0 )
+		const auto &bucket = m_aVoxelHash.m_aBuckets[iBucket];
+		if ( bucket.Count() == 0 )
 			continue;
 
-		UtlPtrLinkedListIndex_t hHash = m_aVoxelHash.m_aBuckets[iBucket].Head();
+		UtlPtrLinkedListIndex_t hHash = bucket.Head();
 
-		while ( hHash != m_aVoxelHash.m_aBuckets[iBucket].InvalidIndex() )
+		while ( hHash != bucket.InvalidIndex() )
 		{
-			int iEntity = m_aVoxelHash.m_aBuckets[iBucket][hHash].m_Data;
+			int iEntity = bucket[hHash].m_Data;
 			while ( iEntity!= m_aEntityList.InvalidIndex() )
 			{
 				SpatialPartitionHandle_t hPartition = m_aEntityList[iEntity];
@@ -1653,7 +1653,7 @@ void CVoxelHash::RenderAllObjectsInTree( float flTime )
 				iEntity = m_aEntityList.Next( iEntity );
 			}
 
-			hHash = m_aVoxelHash.m_aBuckets[iBucket].Next( hHash );
+			hHash = bucket.Next( hHash );
 		}
 	}
 
@@ -2878,7 +2878,7 @@ void CVoxelTree::ReportStats( const char *pFileName )
 
 void CSpatialPartition::ReportStats( const char *pFileName )
 {
-	Msg( "Handle Count %d (%llu bytes)\n", m_aHandles.Count(), (uint64)( m_aHandles.Count() * ( sizeof(EntityInfo_t) + 2 * sizeof(SpatialPartitionHandle_t) ) ) );
+	Msg( "Handle Count %d (%llu bytes)\n", m_aHandles.Count(), ( (uint64)m_aHandles.Count() * ( sizeof(EntityInfo_t) + 2 * sizeof(SpatialPartitionHandle_t) ) ) );
 	for ( int i = 0; i < NUM_TREES; i++ )
 	{
 		m_VoxelTrees[i].ReportStats( pFileName );

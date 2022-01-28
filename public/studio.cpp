@@ -819,11 +819,6 @@ const virtualmodel_t * CStudioHdr::ResetVModel( const virtualmodel_t *pVModel ) 
 
 const studiohdr_t *CStudioHdr::GroupStudioHdr( int i )
 {
-	if ( !this )
-	{
-		ExecuteNTimes( 5, Warning( "Call to NULL CStudioHdr::GroupStudioHdr()\n" ) );
-	}
-
 	if ( m_nFrameUnlockCounter != *m_pFrameUnlockCounter )
 	{
 		m_FrameUnlockCounterMutex.Lock();

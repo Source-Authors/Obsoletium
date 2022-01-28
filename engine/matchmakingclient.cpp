@@ -81,7 +81,7 @@ void CMatchmaking::HandleSystemLinkReply( netpacket_t *pPacket )
 	// Store the session information
 	bf_read &msg = pPacket->message;
 
-	char *pData = new char[MAX_ROUTABLE_PAYLOAD];
+	alignas(systemLinkInfo_s*) char *pData = new char[MAX_ROUTABLE_PAYLOAD];
 
 	systemLinkInfo_s *pResultInfo = (systemLinkInfo_s*)pData;
 	XSESSION_SEARCHRESULT *pResult = &pResultInfo->Result;

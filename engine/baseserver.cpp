@@ -160,9 +160,9 @@ static void SvTagsChangeCallback( IConVar *pConVar, const char *pOldValue, float
 
 	ServerTagsCleanUp();
 
-	ConVarRef var( pConVar );
 	if ( Steam3Server().SteamGameServer() )
 	{
+		ConVarRef var( pConVar );
 		Steam3Server().SteamGameServer()->SetGameTags( var.GetString() );
 	}
 
@@ -205,7 +205,7 @@ static void SetMasterServerKeyValue( ISteamGameServer *pUpdater, IConVar *pConVa
 	if ( var.IsFlagSet( FCVAR_PROTECTED ) )
 	{
 		// If it has a value string and the string is not "none"
-		if ( ( strlen( var.GetString() ) > 0 ) &&
+		if ( var.GetString()[0] &&
 				stricmp( var.GetString(), "none" ) )
 		{
 			pUpdater->SetKeyValue( var.GetName(), "1" );

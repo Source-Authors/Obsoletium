@@ -67,7 +67,7 @@ extern IVideoServices *g_pVideo;
 //#define DEBUG_CHANNELS
 
 #define SNDLVL_TO_DIST_MULT( sndlvl ) ( sndlvl ? ((powf( 10.0f, snd_refdb.GetFloat() / 20 ) / powf( 10.0f, (float)sndlvl / 20 )) / snd_refdist.GetFloat()) : 0 )
-#define DIST_MULT_TO_SNDLVL( dist_mult ) (soundlevel_t)(int)( dist_mult ? ( 20 * log10f( powf( 10.0f, snd_refdb.GetFloat() / 20 ) / (dist_mult * snd_refdist.GetFloat()) ) ) : 0 )
+#define DIST_MULT_TO_SNDLVL( dist_mult ) (soundlevel_t)(int)( (dist_mult) ? ( 20 * log10f( powf( 10.0f, snd_refdb.GetFloat() / 20 ) / ((dist_mult) * snd_refdist.GetFloat()) ) ) : 0 )
 
 extern ConVar dsp_spatial;
 extern IPhysicsSurfaceProps	*physprop;
@@ -788,8 +788,7 @@ void S_Shutdown(void)
 	if ( IsPC() )
 	{
 		// shutdown vaudio
-		if ( vaudio )
-			delete vaudio;
+		delete vaudio;
 		FileSystem_UnloadModule( g_pVAudioModule );
 		g_pVAudioModule = NULL;
 		vaudio = NULL;
@@ -5394,19 +5393,11 @@ int S_StartStaticSound( StartSoundParams_t& params )
 	
 	bool looping = false;
 
-	/*
-	CAudioSource *pSource = pSfx ? pSfx->pSource : NULL;
-	if ( pSource )
-	{
-		looping = pSource->IsLooped();
-	}
-	*/
-
 	SpatializationInfo_t si;
 	si.info.Set( 
 		params.soundsource,
 		params.entchannel,
-		params.pSfx ? sndname : "",
+		sndname,
 		params.origin,
 		params.direction,
 		vol,
@@ -8200,7 +8191,7 @@ bool MXR_LoadAllSoundMixers( void )
 	{
 		pstart = COM_Parse( pstart );
 
-		if ( strlen(com_token) <= 0)
+		if ( !com_token[0] )
 			break;	// eof
 
 		// save name in soundmixer

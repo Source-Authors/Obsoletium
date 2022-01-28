@@ -986,15 +986,13 @@ bool FASTCALL IsBoxIntersectingRay( const fltx4 &inBoxMin, const fltx4 & inBoxMa
 bool FASTCALL IsBoxIntersectingRay( const fltx4& boxMin, const fltx4& boxMax, 
 								   const Ray_t& ray, float flTolerance )
 {
-	fltx4 vTolerance = ReplicateX4(flTolerance);
 	fltx4 rayStart = LoadAlignedSIMD(ray.m_Start);
 	fltx4 rayExtents = LoadAlignedSIMD(ray.m_Extents);
 	if ( !ray.m_IsSwept )
 	{
-
-		fltx4 rayMins, rayMaxs;
-		rayMins = SubSIMD(rayStart, rayExtents);
-		rayMaxs = AddSIMD(rayStart, rayExtents);
+		fltx4 rayMins = SubSIMD(rayStart, rayExtents);
+		fltx4 rayMaxs = AddSIMD(rayStart, rayExtents);
+		fltx4 vTolerance = ReplicateX4(flTolerance);
 		rayMins = AddSIMD(rayMins, vTolerance);
 		rayMaxs = AddSIMD(rayMaxs, vTolerance);
 

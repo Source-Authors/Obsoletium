@@ -86,10 +86,6 @@ void CReplayDeltaEntityCache::SetTick( int nTick, int nMaxEntities )
 	Flush();
 
 	m_nCacheSize = 2 * 1024;
-
-	if ( m_nCacheSize <= 0 )
-		return;
-
 	m_nMaxEntities = MIN(nMaxEntities,MAX_EDICTS);
 	m_nTick = nTick;
 }

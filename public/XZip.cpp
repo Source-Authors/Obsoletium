@@ -2304,7 +2304,7 @@ int timet_to_timestamp( time_t time )
 class TZip
 { public:
   TZip() : hfout(0),hmapout(0),zfis(0),obuf(0),hfin(0),writ(0),oerr(false),hasputcen(false),ooffset(0) {}
-  ~TZip() {}
+  ~TZip() = default;
 
   // These variables say about the file we're writing into
   // We can write to pipe, file-by-handle, file-by-name, memory-to-memmapfile
@@ -2709,7 +2709,7 @@ ZRESULT TZip::Add(const char *odstzn, void *src,unsigned int len, DWORD flags)
 		d++;
 	}
 	bool isdir = (flags==ZIP_FOLDER);
-	bool needs_trailing_slash = (isdir && dstzn[strlen(dstzn)-1]!='/');
+	bool needs_trailing_slash = (isdir && dstzn[0] && dstzn[strlen(dstzn)-1]!='/');
 	int method=DEFLATE; 
 	if (isdir || HasZipSuffix(dstzn)) 
 		method=STORE;
@@ -2886,7 +2886,7 @@ ZRESULT TZip::AddCentral()
     numentries++;
     //
     TZipFileInfo *zfinext = zfi->nxt;
-    if (zfi->cextra!=0) delete[] zfi->cextra;
+    delete[] zfi->cextra;
     delete zfi;
     zfi = zfinext;
   }

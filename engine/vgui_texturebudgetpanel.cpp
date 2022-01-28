@@ -145,17 +145,17 @@ void CTextureBudgetPanel::SendConfigDataToBase()
 		{		
 			// Strip off the TexGroup__ prefix.
 			const char *pGroupName = g_VProfCurrentProfile.GetCounterName( i );
+			char alternateName[256];
 
 			const char *pPrefixes[2] = { "TexGroup_global_", "TexGroup_frame_" };
 			for ( int iPrefix=0; iPrefix < 2; iPrefix++ )
 			{
-				char alternateName[256];
 
 				if ( strstr( pGroupName, pPrefixes[iPrefix] ) == pGroupName )
 				{
 					int len = strlen( pPrefixes[iPrefix] );
 					Q_strncpy( alternateName, &pGroupName[len], len );
-					alternateName[len] = 0;
+					alternateName[len] = '\0';
 
 					pGroupName = alternateName;
 					break;

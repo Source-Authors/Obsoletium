@@ -575,8 +575,6 @@ int SendTable_CalcDelta(
 
 		for ( ; iToProp < MAX_DATATABLE_PROPS; iToProp = toBitsReader.ReadNextPropIndex() )
 		{
-			Assert( (int)iToProp >= 0 );
-
 			// Skip any properties in the from state that aren't in the to state.
 			while ( iFromProp < iToProp )
 			{
@@ -774,7 +772,7 @@ static void SendTable_TermTable( SendTable *pTable )
 		return;
 
 	delete pTable->m_pPrecalc;
-	Assert( !pTable->m_pPrecalc ); // Make sure it unbound itself.
+	pTable->m_pPrecalc = nullptr; // Make sure it unbound itself.
 }
 
 

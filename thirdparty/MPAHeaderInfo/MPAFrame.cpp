@@ -44,7 +44,7 @@ CMPAFrame::CMPAFrame(CMPAStream* pStream, DWORD& dwOffset, bool bFindSubsequentF
 				- subsequent frame is at incorrect position (out of detection range)
 				- frame was incorrectly detected (very improbable)
 		*/
-		catch (CMPAEndOfFileException)
+		catch (CMPAEndOfFileException&)
 		{
 			m_bIsLast = true;
 		}

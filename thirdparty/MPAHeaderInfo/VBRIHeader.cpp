@@ -67,9 +67,7 @@ CVBRIHeader::CVBRIHeader(const CMPAFrame* pFrame, DWORD dwOffset) :
 	m_dwLengthSec = pFrame->m_pHeader->GetLengthSecond(m_dwFrames);
 }
 
-CVBRIHeader::~CVBRIHeader(void)
-{
-}
+CVBRIHeader::~CVBRIHeader(void) { delete[] m_pnToc; }
 
 DWORD CVBRIHeader::SeekPosition(float& fPercent) const
 {

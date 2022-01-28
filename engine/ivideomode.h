@@ -101,8 +101,8 @@ public:
 //-----------------------------------------------------------------------------
 // Utilities for virtual screen coordinates
 //-----------------------------------------------------------------------------
-#define XRES(x)	( x  * ( ( float )videomode->GetModeStereoWidth() / 640.0 ) )
-#define YRES(y)	( y  * ( ( float )videomode->GetModeStereoHeight() / 480.0 ) )
+#define XRES(x)	( (x)  * ( ( float )videomode->GetModeStereoWidth() / 640.0 ) )
+#define YRES(y)	( (y)  * ( ( float )videomode->GetModeStereoHeight() / 480.0 ) )
 
 
 //-----------------------------------------------------------------------------

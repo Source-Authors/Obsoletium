@@ -753,12 +753,12 @@ void CServerRemoteAccess::GetUserBanList(CUtlBuffer &value)
 	{
 		value.Printf("%i %s : %.3f min\n", i + 1, GetUserIDString(g_UserFilters[i].userid), g_UserFilters[i].banTime);
 	}
-
+	
+	unsigned char b[4];
 	// add ip filters
 	for (i = 0; i < g_IPFilters.Count() ; i++)
 	{
-		unsigned char b[4];
-		*(unsigned *)b = g_IPFilters[i].compare;
+		memcpy( b, &g_IPFilters[i].compare, sizeof(b) );
 		value.Printf("%i %i.%i.%i.%i : %.3f min\n", i + 1 + g_UserFilters.Count(), b[0], b[1], b[2], b[3], g_IPFilters[i].banTime);
 	}
 
@@ -816,14 +816,15 @@ void CServerRemoteAccess::GetPlayerList(CUtlBuffer &value)
 		}
 		else
 		{
-			value.Printf("\"%s\" %s %s %d %d %d %d\n", 
+			const auto *channel = client->GetNetChannel();
+			value.Printf("\"%s\" %s %s %d %d %d %d\n",
 				client->GetClientName(),
 				client->GetNetworkIDString(),
-				client->GetNetChannel()->GetAddress(),
-				(int)(client->GetNetChannel()->GetAvgLatency(FLOW_OUTGOING) * 1000.0f),
-				(int)(client->GetNetChannel()->GetAvgLoss(FLOW_INCOMING)),
+				channel->GetAddress(),
+				(int)(channel->GetAvgLatency(FLOW_OUTGOING) * 1000.0f),
+				(int)(channel->GetAvgLoss(FLOW_INCOMING)),
 				pl->frags,
-				(int)(client->GetNetChannel()->GetTimeConnected()));
+				(int)(channel->GetTimeConnected()));
 		}
 	}
 

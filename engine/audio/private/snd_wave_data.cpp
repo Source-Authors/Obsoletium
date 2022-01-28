@@ -676,7 +676,7 @@ class CAsyncWavDataCache : public IAsyncWavDataCache,
 {
 public:
 	CAsyncWavDataCache();
-	~CAsyncWavDataCache() {}
+	~CAsyncWavDataCache() = default;
 
 	virtual bool			Init( unsigned int memSize );
 	virtual void			Shutdown();
@@ -2223,7 +2223,7 @@ int CWaveDataStreamAsync::ReadSourceData( void **pData, int sampleIndex, int sam
 					m_dataSize, 
 					m_dataStart,
 					m_buffer, 
-					sizeof( m_buffer ),
+					m_bufferSize,
 					seekpos, 
 					m_bufferCount * m_sampleSize,
 					&postprocessed ) )

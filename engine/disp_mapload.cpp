@@ -344,8 +344,7 @@ void CDispInfo::CopyMapDispData( const ddispinfo_t *pBuildDisp )
 	m_Indices.SetSize( 6 * (size-1) * (size-1) );
 
 	// Per-node information
-	if (m_pNodeInfo)
-		delete[] m_pNodeInfo;
+	delete[] m_pNodeInfo;
 
 	m_pNodeInfo = new DispNodeInfo_t[m_pPowerInfo->m_NodeCount];
 }
@@ -817,8 +816,7 @@ CDispInfo::CDispInfo()
 
 CDispInfo::~CDispInfo()
 {
-	if (m_pNodeInfo)
-		delete[] m_pNodeInfo;
+	delete[] m_pNodeInfo;
 
 	delete[] m_pWalkIndices;
 	delete[] m_pBuildIndices;

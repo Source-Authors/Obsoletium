@@ -311,7 +311,7 @@ CVoiceChannel g_VoiceChannels[VOICE_NUM_CHANNELS];
 
 
 // These are used for recording the wave data into files for debugging.
-#define MAX_WAVEFILEDATA_LEN	1024*1024
+#define MAX_WAVEFILEDATA_LEN	(1024*1024)
 char *g_pUncompressedFileData = NULL;
 int g_nUncompressedDataBytes = 0;
 const char *g_pUncompressedDataFilename = NULL;
@@ -1356,7 +1356,7 @@ int Voice_AddIncomingData(int nChannel, const char *pchData, int nCount, int iSe
 
 	// Decompress.
 	// @note Tom Bui: suggested destination buffer for Steam voice is 22kb
-	char decompressed[22528];
+	alignas(short) char decompressed[22528];
 
 #ifdef VOICE_SEND_RAW_TEST
 

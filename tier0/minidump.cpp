@@ -54,7 +54,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 		return false;
 
 	bool bReturnValue = false;
-	MINIDUMPWRITEDUMP pfnMiniDumpWrite = (MINIDUMPWRITEDUMP) ::GetProcAddress( hDbgHelpDll, "MiniDumpWriteDump" );
+	MINIDUMPWRITEDUMP pfnMiniDumpWrite = (MINIDUMPWRITEDUMP) ::GetProcAddress( hDbgHelpDll, V_STRINGIFY(MiniDumpWriteDump) );
 
 	if ( pfnMiniDumpWrite )
 	{

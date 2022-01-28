@@ -1947,8 +1947,6 @@ void CRenderTextureEditor::Paint()
 			x + orgTxX + ( extTxWidth - iDrawWidth ) / 2, y + orgTxY + ( extTxWidth - iDrawHeight ) / 2,
 			x + orgTxX + ( extTxWidth + iDrawWidth ) / 2, y + orgTxY + ( extTxWidth + iDrawHeight ) / 2 );
 	}
-
-	y += TILE_SIZE + TILE_BORDER;
 }
 
 
@@ -2019,7 +2017,6 @@ CRenderTexturesListViewPanel::CRenderTexturesListViewPanel( vgui::Panel *parent,
 
 CRenderTexturesListViewPanel::~CRenderTexturesListViewPanel()
 {
-	NULL;
 }
 
 void CRenderTexturesListViewPanel::PerformLayout()
@@ -2360,8 +2357,6 @@ fmtlenreduce:
 			x + orgTxX + ( extTxWidth - iDrawWidth ) / 2, y + orgTxY + ( extTxWidth - iDrawHeight ) / 2,
 			x + orgTxX + ( extTxWidth + iDrawWidth ) / 2, y + orgTxY + ( extTxWidth + iDrawHeight ) / 2 );
 	}
-
- 	y += TILE_SIZE + TILE_BORDER;
 }
 
 void CRenderTexturesListViewPanel::SetDataListPanel( vgui::ListPanel *pPanel )
@@ -2680,7 +2675,7 @@ void CTextureListPanel::PerformLayout()
 	// The cvar reminder goes on the top.
 	m_pCVarListLabel->SetPos( x, yOffset );
 	m_pCVarListLabel->SetWide( w );
-	NULL; // yOffset += m_pCVarListLabel->GetTall();
+	// yOffset += m_pCVarListLabel->GetTall();
 	m_pCVarListLabel->SetVisible( false ); // m_pCVarListLabel->SetVisible( !bCollapsed );
 
 	m_pTotalUsageLabel->SetPos( x, yOffset );

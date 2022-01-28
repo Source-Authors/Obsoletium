@@ -177,7 +177,7 @@ public:
 
 				RecvTable();
 				RecvTable( RecvProp *pProps, int nProps, const char *pNetTableName );
-				~RecvTable();
+				~RecvTable() = default;
 
 	void		Construct( RecvProp *pProps, int nProps, const char *pNetTableName );
 

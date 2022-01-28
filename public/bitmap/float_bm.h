@@ -246,7 +246,7 @@ public:
 
 	void AllocateRGB(int w, int h)
 	{
-		if (RGBAData) delete[] RGBAData;
+		delete[] RGBAData;
 		RGBAData=new float[w*h*4];
 		Width=w;
 		Height=h;

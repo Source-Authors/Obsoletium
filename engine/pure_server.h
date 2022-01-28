@@ -69,8 +69,8 @@ private:
 	class CCommand
 	{
 	public:
-		CCommand();
-		~CCommand();
+		CCommand() = default;
+		~CCommand() = default;
 
 		EPureServerFileClass m_eFileClass;
 		unsigned short	m_LoadOrder;	// What order this thing was specified in the whitelist file?  Used to resolve rule conflicts.

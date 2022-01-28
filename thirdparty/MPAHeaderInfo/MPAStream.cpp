@@ -31,7 +31,7 @@ DWORD CMPAStream::ReadLEValue(DWORD dwNumBytes, DWORD& dwOffset, bool bMoveOffse
 
 	for (DWORD n=0; n < dwNumBytes; n++)
 	{
-		dwResult |= pBuffer[n] << 8 * dwNumByteShifts++;                                                          
+		dwResult |= pBuffer[n] << 8 * dwNumByteShifts++;
 	}
 	
 	return dwResult;
