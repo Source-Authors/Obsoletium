@@ -651,9 +651,6 @@ CON_COMMAND( users, "Show user info for players on server." )
 //-----------------------------------------------------------------------------
 // Purpose: Determine the value of sv.maxclients
 //-----------------------------------------------------------------------------
-bool CL_IsHL2Demo(); // from cl_main.cpp
-bool CL_IsPortalDemo(); // from cl_main.cpp
-
 extern ConVar tv_enable;
 
 void SetupMaxPlayers( int iDesiredMaxPlayers )
@@ -718,12 +715,6 @@ void SetupMaxPlayers( int iDesiredMaxPlayers )
 	}
 
 	newmaxplayers = clamp( newmaxplayers, minmaxplayers, sv.m_nMaxClientsLimit );
-
-	if ( ( CL_IsHL2Demo() || CL_IsPortalDemo() ) && !sv.IsDedicated() )
-	{
-		newmaxplayers = 1;
-		sv.m_nMaxClientsLimit = 1;
-	}
 
 	if ( sv.GetMaxClients() < newmaxplayers || !tv_enable.GetBool() )
 		sv.SetMaxClients( newmaxplayers );
@@ -828,13 +819,6 @@ void ServerDLL_Unload()
 	UnloadEntityDLLs();
 }
 
-#if !defined(DEDICATED)
-#if !defined(_X360)
-// Put this function declaration at global scope to avoid the ambiguity of the most vexing parse.
-bool CL_IsHL2Demo();
-#endif
-#endif
-
 //-----------------------------------------------------------------------------
 // Purpose: Loads the game .dll
 //-----------------------------------------------------------------------------
@@ -851,20 +835,8 @@ void SV_InitGameDLL( void )
 
 #if !defined(SWDS)
 #if !defined(_X360)
-	if ( CL_IsHL2Demo() && !sv.IsDedicated() && Q_stricmp( COM_GetModDirectory(), "hl2" ) )
-	{
-		Error( "The HL2 demo is unable to run Mods.\n" );
-		return;			
-	} 
-
-	if ( CL_IsPortalDemo() && !sv.IsDedicated() && Q_stricmp( COM_GetModDirectory(), "portal" ) )
-	{
-		Error( "The Portal demo is unable to run Mods.\n" );
-		return;			
-	} 
-
 	// check permissions
-	if ( Steam3Client().SteamApps() && !CL_IsHL2Demo() && !CL_IsPortalDemo() )
+	if ( Steam3Client().SteamApps() )
 	{
 		bool bVerifiedMod = false;
 

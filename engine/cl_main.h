@@ -176,8 +176,6 @@ void CL_SetupMapName( const char* pName, char* pFixedName, int maxlen );
 bool CL_CheckCRCs( const char *pszMap );
 bool CL_ShouldLoadBackgroundLevel( const CCommand &args );
 
-bool CL_IsHL2Demo();
-bool CL_IsPortalDemo();
 void CL_SetSteamCrashComment();
 
 void CL_CheckForPureServerWhitelist( /* out */ IFileList *&pFilesToReload );

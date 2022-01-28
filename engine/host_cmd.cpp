@@ -689,49 +689,6 @@ CON_COMMAND( ping, "Display ping to server." )
 	}
 }
 
-bool CL_HL2Demo_MapCheck( const char *name )
-{
-	if ( IsPC() && CL_IsHL2Demo() && !sv.IsDedicated() )
-	{
-		if (    !Q_stricmp( name, "d1_trainstation_01" ) || 
-				!Q_stricmp( name, "d1_trainstation_02" ) || 
-				!Q_stricmp( name, "d1_town_01" ) || 
-				!Q_stricmp( name, "d1_town_01a" ) || 
-				!Q_stricmp( name, "d1_town_02" ) || 
-				!Q_stricmp( name, "d1_town_03" ) ||
-				!Q_stricmp( name, "background01" ) ||
-				!Q_stricmp( name, "background03" ) 
-			)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	return true;
-}
-
-bool CL_PortalDemo_MapCheck( const char *name )
-{
-	if ( IsPC() && CL_IsPortalDemo() && !sv.IsDedicated() )
-	{
-		if (    !Q_stricmp( name, "testchmb_a_00" ) || 
-				!Q_stricmp( name, "testchmb_a_01" ) || 
-				!Q_stricmp( name, "testchmb_a_02" ) || 
-				!Q_stricmp( name, "testchmb_a_03" ) || 
-				!Q_stricmp( name, "testchmb_a_04" ) || 
-				!Q_stricmp( name, "testchmb_a_05" ) ||
-				!Q_stricmp( name, "testchmb_a_06" ) ||
-				!Q_stricmp( name, "background1" ) 
-			)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	return true;
-}
 
 void Host_Map_Helper( const CCommand &args, bool bEditmode, bool bBackground, bool bCommentary )
 {
@@ -791,18 +748,6 @@ void Host_Map_Helper( const CCommand &args, bool bEditmode, bool bBackground, bo
 
 	g_bInCommentaryMode = bCommentary;
 #endif
-
-	if ( !CL_HL2Demo_MapCheck( szMapName ) )
-	{
-		Warning( "map load failed: %s not found or invalid\n", szMapName );
-		return;	
-	}
-
-	if ( !CL_PortalDemo_MapCheck( szMapName ) )
-	{
-		Warning( "map load failed: %s not found or invalid\n", szMapName );
-		return;	
-	}
 
 #if defined( REPLAY_ENABLED )
 	// If we're recording the game, finalize the replay so players can download it.
@@ -909,18 +854,6 @@ CON_COMMAND( restart, "Restart the game on the same level (add setpos to jump to
 
 	Host_Disconnect(false);	// stop old game
 
-	if ( !CL_HL2Demo_MapCheck( sv.GetMapName() ) )
-	{
-		Warning( "map load failed: %s not found or invalid\n", sv.GetMapName() );
-		return;	
-	}
-
-	if ( !CL_PortalDemo_MapCheck( sv.GetMapName() ) )
-	{
-		Warning( "map load failed: %s not found or invalid\n", sv.GetMapName() );
-		return;	
-	}
-
 	HostState_NewGame( sv.GetMapName(), bRememberLocation, false );
 }
 
@@ -973,18 +906,6 @@ CON_COMMAND( reload, "Reload the most recent saved game (add setpos to jump to c
 	else
 #endif
 	{
-		if ( !CL_HL2Demo_MapCheck( host_map.GetString() ) )
-		{
-			Warning( "map load failed: %s not found or invalid\n", host_map.GetString() );
-			return;	
-		}
-
-		if ( !CL_PortalDemo_MapCheck( host_map.GetString() ) )
-		{
-			Warning( "map load failed: %s not found or invalid\n", host_map.GetString() );
-			return;	
-		} 
-
 		HostState_NewGame( host_map.GetString(), remember_location, false );
 	}
 }
@@ -1018,18 +939,6 @@ void Host_Changelevel_f( const CCommand &args )
 		// Warn, but but proceed even if the map is not found, such that we hit the proper server_levelchange_failed
 		// codepath and event later on.
 		Warning( "Failed to find map %s\n", args[ 1 ] );
-	}
-
-	if ( !CL_HL2Demo_MapCheck(szName) )
-	{
-		Warning( "changelevel failed: %s not found\n", szName );
-		return;
-	}
-
-	if ( !CL_PortalDemo_MapCheck(szName) )
-	{
-		Warning( "changelevel failed: %s not found\n", szName );
-		return;
 	}
 
 	const char *pszReason = NULL;
@@ -1067,44 +976,8 @@ void Host_Changelevel2_f( const CCommand &args )
 	IVEngineServer::eFindMapResult eResult = g_pVEngineServer->FindMap( szName, sizeof( szName ) );
 	if ( eResult == IVEngineServer::eFindMap_NotFound )
 	{
-		if ( !CL_IsHL2Demo() || (CL_IsHL2Demo() && !(!Q_stricmp( szName, "d1_trainstation_03" ) || !Q_stricmp( szName, "d1_town_02a" ))) )	
-		{
-			Warning( "changelevel2 failed: %s not found\n", szName );
-			return;
-		}
-	}
-
-#if !defined(SWDS)
-	// needs to be before CL_HL2Demo_MapCheck() check as d1_trainstation_03 isn't a valid map
-	if ( IsPC() && CL_IsHL2Demo() && !sv.IsDedicated() && !Q_stricmp( szName, "d1_trainstation_03" ) ) 
-	{
-		void CL_DemoTransitionFromTrainstation();
-		CL_DemoTransitionFromTrainstation();
-		return; 
-	}
-
-	// needs to be before CL_HL2Demo_MapCheck() check as d1_trainstation_03 isn't a valid map
-	if ( IsPC() && CL_IsHL2Demo() && !sv.IsDedicated() && !Q_stricmp( szName, "d1_town_02a" ) && !Q_stricmp( args[2], "d1_town_02_02a" )) 
-	{
-		void CL_DemoTransitionFromRavenholm();
-		CL_DemoTransitionFromRavenholm();
-		return; 
-	}
-
-	if ( IsPC() && CL_IsPortalDemo() && !sv.IsDedicated() && !Q_stricmp( szName, "testchmb_a_07" ) ) 
-	{
-		void CL_DemoTransitionFromTestChmb();
-		CL_DemoTransitionFromTestChmb();
-		return; 
-	}
-
-#endif
-
-	// allow a level transition to d1_trainstation_03 so the Host_Changelevel() can act on it
-	if ( !CL_HL2Demo_MapCheck( szName ) ) 
-	{
-		Warning( "changelevel failed: %s not found\n", szName );
-		return;	
+		Warning( "changelevel2 failed: %s not found\n", szName );
+		return;
 	}
 
 	HostState_ChangeLevelSP( szName, args[2] );

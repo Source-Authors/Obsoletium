@@ -1967,8 +1967,6 @@ int NET_SendToImpl( SOCKET s, const char FAR * buf, int len, const struct sockad
 //			tolen - 
 // Output : int
 //-----------------------------------------------------------------------------
-bool CL_IsHL2Demo();
-bool CL_IsPortalDemo();
 int NET_SendTo( bool verbose, SOCKET s, const char FAR * buf, int len, const struct sockaddr FAR * to, int tolen, int iGameDataLength )
 {	
 	int nSend = 0;
@@ -2001,13 +1999,6 @@ int NET_SendTo( bool verbose, SOCKET s, const char FAR * buf, int len, const str
 	// Don't send anything out in VCR mode.. it just annoys other people testing in multiplayer.
 	if ( VCRGetMode() != VCR_Playback )
 	{
-#ifndef SWDS
-		if ( ( CL_IsHL2Demo() || CL_IsPortalDemo() ) && !net_dedicated )
-		{
-			Error( " " );
-		}
-#endif // _WIN32
-
 		nSend = NET_SendToImpl
 		( 
 			s, 
