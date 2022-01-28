@@ -36,9 +36,8 @@ public:
 		m_flAlpha = 1;
 	}
 	CSPColor( const Vector &vColor, float flAlpha=1 )
+		: m_vColor( vColor ), m_flAlpha( flAlpha )
 	{
-		m_vColor = vColor;
-		m_flAlpha = flAlpha;
 	}
 	CSPColor( float r, float g, float b, float a=1 )
 	{

@@ -208,10 +208,9 @@ CRecordEffectOwner::CRecordEffectOwner( C_BaseEntity *pEntity, bool bIsViewModel
 	m_bToolsEnabled = ToolsEnabled() && clienttools->IsInRecordingMode();
 	if ( m_bToolsEnabled )
 	{
-		KeyValues *msg = new KeyValues( "EffectsOwner" );
+		KeyValues::AutoDelete msg = KeyValues::AutoDelete( "EffectsOwner" );
 		msg->SetInt( "viewModel", bIsViewModel );
 		ToolFramework_PostToolMessage( pEntity ? pEntity->GetToolHandle() : HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 
@@ -219,9 +218,8 @@ CRecordEffectOwner::~CRecordEffectOwner()
 {
 	if ( m_bToolsEnabled )
 	{
-		KeyValues *msg = new KeyValues( "EffectsOwner" );
+		KeyValues::AutoDelete msg = KeyValues::AutoDelete("EffectsOwner");
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

@@ -17,8 +17,8 @@ class CViewAngleKeyFrame
 {	
 public:
 	CViewAngleKeyFrame( QAngle vecAngles, float flTime, int iFlags )
+		: m_vecAngles( vecAngles )
 	{
-		m_vecAngles = vecAngles;
 		m_flTime = flTime;
 		m_iFlags = iFlags;
 	}

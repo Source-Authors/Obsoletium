@@ -50,8 +50,8 @@ int		ScreenHeight( void );
 // ScreenWidth returns the width of the screen, in pixels
 int		ScreenWidth( void );
 
-#define XRES(x)	( x  * ( ( float )ScreenWidth() / 640.0 ) )
-#define YRES(y)	( y  * ( ( float )ScreenHeight() / 480.0 ) )
+#define XRES(x)	( (x)  * ( ( float )ScreenWidth() / 640.0 ) )
+#define YRES(y)	( (y)  * ( ( float )ScreenHeight() / 480.0 ) )
 
 int		UTIL_ComputeStringWidth( vgui::HFont& font, const char *str );
 int		UTIL_ComputeStringWidth( vgui::HFont& font, const wchar_t *str );

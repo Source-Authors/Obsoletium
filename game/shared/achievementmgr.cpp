@@ -809,7 +809,7 @@ void CAchievementMgr::LoadGlobalState()
     // HPE_END
     //=============================================================================
 
-	KeyValues *pKV = new KeyValues("GameState" );
+	KeyValues::AutoDelete pKV = KeyValues::AutoDelete("GameState");
 	if ( pKV->LoadFromFile( filesystem, szFilename, "MOD" ) )
 	{
 		KeyValues *pNode = pKV->GetFirstSubKey();

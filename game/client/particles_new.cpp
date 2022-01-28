@@ -28,16 +28,14 @@ extern int g_cl_particle_show_bbox_cost;
 //-----------------------------------------------------------------------------
 // Constructor, destructor
 //-----------------------------------------------------------------------------
-CNewParticleEffect::CNewParticleEffect( CBaseEntity *pOwner, CParticleSystemDefinition *pEffect )
+CNewParticleEffect::CNewParticleEffect( CBaseEntity *pOwner, CParticleSystemDefinition *pEffect ) : m_hOwner(pOwner)
 {
-	m_hOwner = pOwner;
 	Init( pEffect );
 	Construct();
 }
 
-CNewParticleEffect::CNewParticleEffect( CBaseEntity *pOwner, const char* pEffectName )
+CNewParticleEffect::CNewParticleEffect( CBaseEntity *pOwner, const char* pEffectName ) : m_hOwner(pOwner)
 {
-	m_hOwner = pOwner;
 	Init( pEffectName );
 	Construct();
 }

@@ -121,16 +121,17 @@ void CBaseModelPanel::ParseModelAnimInfo( KeyValues *inResourceData )
 	if ( iAnim == m_BMPResData.m_aAnimations.InvalidIndex() )
 		return;
 
-	m_BMPResData.m_aAnimations[iAnim].m_pszName = ReadAndAllocStringValue( inResourceData, "name" );
-	m_BMPResData.m_aAnimations[iAnim].m_pszSequence = ReadAndAllocStringValue( inResourceData, "sequence" );
-	m_BMPResData.m_aAnimations[iAnim].m_pszActivity = ReadAndAllocStringValue( inResourceData, "activity" );
-	m_BMPResData.m_aAnimations[iAnim].m_bDefault = inResourceData->GetBool( "default" );
+	auto &anim = m_BMPResData.m_aAnimations[iAnim];
+	anim.m_pszName = ReadAndAllocStringValue( inResourceData, "name" );
+	anim.m_pszSequence = ReadAndAllocStringValue( inResourceData, "sequence" );
+	anim.m_pszActivity = ReadAndAllocStringValue( inResourceData, "activity" );
+	anim.m_bDefault = inResourceData->GetBool( "default" );
 
 	for ( KeyValues *pAnimData = inResourceData->GetFirstSubKey(); pAnimData != NULL; pAnimData = pAnimData->GetNextKey() )
 	{
 		if ( !Q_stricmp( pAnimData->GetName(), "pose_parameters" ) )
 		{
-			m_BMPResData.m_aAnimations[iAnim].m_pPoseParameters = pAnimData->MakeCopy();
+			anim.m_pPoseParameters = pAnimData->MakeCopy();
 		}
 	}
 }

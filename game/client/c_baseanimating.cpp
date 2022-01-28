@@ -4846,7 +4846,6 @@ C_BaseAnimating *C_BaseAnimating::CreateRagdollCopy()
 C_BaseAnimating *C_BaseAnimating::BecomeRagdollOnClient()
 {
 	MoveToLastReceivedPosition( true );
-	GetAbsOrigin();
 
 	C_BaseAnimating *pRagdoll = CreateRagdollCopy();
 	if ( pRagdoll )

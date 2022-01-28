@@ -42,16 +42,16 @@ public:
 		Vector vObsHullMin,
 		Vector vObsHullMax,
 		Vector vDeadViewHeight )
+		: m_vView(vView),
+		m_vHullMin(vHullMin),
+		m_vHullMax(vHullMax),
+		m_vDuckHullMin(vDuckHullMin),
+		m_vDuckHullMax(vDuckHullMax),
+		m_vDuckView(vDuckView),
+		m_vObsHullMin(vObsHullMin),
+		m_vObsHullMax(vObsHullMax),
+		m_vDeadViewHeight(vDeadViewHeight)
 	{
-		m_vView = vView;
-		m_vHullMin = vHullMin;
-		m_vHullMax = vHullMax;
-		m_vDuckHullMin = vDuckHullMin;
-		m_vDuckHullMax = vDuckHullMax;
-		m_vDuckView = vDuckView;
-		m_vObsHullMin = vObsHullMin;
-		m_vObsHullMax = vObsHullMax;
-		m_vDeadViewHeight = vDeadViewHeight;
 	}
 
 	// Height above entity position where the viewer's eye is.
@@ -909,7 +909,7 @@ enum
 #define TEAM_TRAIN_MAX_TEAMS			4
 #define TEAM_TRAIN_MAX_HILLS			5
 #define TEAM_TRAIN_FLOATS_PER_HILL		2
-#define TEAM_TRAIN_HILLS_ARRAY_SIZE		TEAM_TRAIN_MAX_TEAMS * TEAM_TRAIN_MAX_HILLS * TEAM_TRAIN_FLOATS_PER_HILL
+#define TEAM_TRAIN_HILLS_ARRAY_SIZE		(TEAM_TRAIN_MAX_TEAMS * TEAM_TRAIN_MAX_HILLS * TEAM_TRAIN_FLOATS_PER_HILL)
 
 enum
 {

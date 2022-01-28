@@ -1653,8 +1653,7 @@ bool CHalfLife2::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
 {
 #ifdef CLIENT_DLL
 	return false;
-#endif
-
+#else
 	if( !sv_robust_explosions.GetBool() )
 		return false;
 
@@ -1674,6 +1673,7 @@ bool CHalfLife2::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
 #endif//CLIENT_DLL
 
 	return true;
+#endif
 }
 
 #ifndef CLIENT_DLL

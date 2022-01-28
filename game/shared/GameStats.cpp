@@ -192,7 +192,7 @@ void CBaseGameStats::StatsLog( char const *fmt, ... )
 	char timeString[ 128 ];
 	Q_strncpy( timeString, asctime( newtime ), sizeof( timeString ) );
 	// Get rid of the \n.
-	char *pEnd = strstr( timeString, "\n" );
+	char *pEnd = strchr( timeString, '\n' );
 	if ( pEnd )
 	{
 		*pEnd = 0;
@@ -1245,10 +1245,7 @@ void CBaseGameStats_Driver::ResetData()
 	int dest_width,dest_height;
 	pRenderContext->GetRenderTargetDimensions( dest_width, dest_height );
 
-	if ( gpu.m_pDriverName )
-	{
-		OverWriteCharsWeHate( gpu.m_pDriverName );
-	}
+	OverWriteCharsWeHate( gpu.m_pDriverName );
 	pKV->SetString( "GPUDrv", SafeString( gpu.m_pDriverName ) );
 	pKV->SetInt( "GPUVendor", gpu.m_VendorID );
 	pKV->SetInt( "GPUDeviceID", gpu.m_DeviceID );

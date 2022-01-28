@@ -953,8 +953,8 @@ void StriderMuzzleFlashCallback( const CEffectData &data )
 
 DECLARE_CLIENT_EFFECT( "StriderMuzzleFlash", StriderMuzzleFlashCallback );
 
-#define	BLOOD_MIN_SPEED	64.0f*2.0f
-#define BLOOD_MAX_SPEED 256.0f*8.0f
+#define	BLOOD_MIN_SPEED	(64.0f*2.0f)
+#define BLOOD_MAX_SPEED (256.0f*8.0f)
 
 //-----------------------------------------------------------------------------
 // Purpose: 

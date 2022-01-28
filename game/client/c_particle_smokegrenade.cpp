@@ -795,10 +795,11 @@ void C_ParticleSmokeGrenade::GetParticlePosition( Particle *pParticle, Vector& w
 void C_ParticleSmokeGrenade::RecvProxy_CurrentStage(  const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
 	C_ParticleSmokeGrenade *pGrenade = (C_ParticleSmokeGrenade*)pStruct;
-	Assert( pOut == &pGrenade->m_CurrentStage );
 
 	if ( pGrenade && pGrenade->m_CurrentStage == 0 && pData->m_Value.m_Int == 1 )
 	{
+		Assert( pOut == &pGrenade->m_CurrentStage );
+
 		if( pGrenade->m_bStarted )
 			pGrenade->FillVolume();
 		else

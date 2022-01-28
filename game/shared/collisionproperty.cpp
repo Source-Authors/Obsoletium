@@ -58,11 +58,11 @@ public:
 		{
 			m_partitionMutex.LockForRead();
 		}
-		m_readLockCount++;
+		++m_readLockCount;
 	}
 	void UnlockPartitionForRead()
 	{
-		m_readLockCount--;
+		--m_readLockCount;
 		if ( m_readLockCount == 0 )
 		{
 			m_partitionMutex.UnlockRead();

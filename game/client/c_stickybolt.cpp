@@ -41,9 +41,8 @@ class CRagdollBoltEnumerator : public IPartitionEnumerator
 public:
 	//Forced constructor   
 	CRagdollBoltEnumerator( Ray_t& shot, Vector vOrigin )
+		: m_rayShot(shot), m_vWorld(vOrigin)
 	{
-		m_rayShot = shot;
-		m_vWorld = vOrigin;
 	}
 
 	//Actual work code

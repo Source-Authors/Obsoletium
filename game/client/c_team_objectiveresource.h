@@ -15,7 +15,7 @@
 #include "c_baseentity.h"
 #include <igameresources.h>
 
-#define TEAM_ARRAY( index, team )		(index + (team * MAX_CONTROL_POINTS))
+#define TEAM_ARRAY( index, team )		((index) + ((team) * MAX_CONTROL_POINTS))
 
 //-----------------------------------------------------------------------------
 // Purpose: An entity that networks the state of the game's objectives.

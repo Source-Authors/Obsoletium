@@ -1516,7 +1516,7 @@ void CHudCloseCaption::Process( const wchar_t *stream, float duration, const cha
 				// End current phrase
 				*out = L'\0';
 
-				if ( wcslen( phrase ) > 0 )
+				if ( phrase[0] )
 				{
 					CCloseCaptionItem *item = new CCloseCaptionItem( phrase, lifespan, addedlife, delay, valid, fromplayer );
 					m_Items.AddToTail( item );
@@ -1553,7 +1553,7 @@ void CHudCloseCaption::Process( const wchar_t *stream, float duration, const cha
 
 	// End final phrase, if any
 	*out = L'\0';
-	if ( wcslen( phrase ) > 0 )
+	if ( phrase[0] )
 	{
 		CCloseCaptionItem *item = new CCloseCaptionItem( phrase, lifespan, addedlife, delay, valid, fromplayer );
 		m_Items.AddToTail( item );
@@ -1658,7 +1658,7 @@ void CHudCloseCaption::AddWorkUnit( CCloseCaptionItem *item,
 	params.Finalize( vgui::surface()->GetFontTall( params.font ) );
 
 #ifdef WIN32
-	if ( wcslen( params.stream ) > 0 )
+	if ( params.stream[0] )
 #else
 	// params.stream is still in ucs2 format here so just do a basic zero compare for length or just space
 	if ( ((uint16 *)params.stream)[0] != 0 && ((uint16 *)params.stream)[0] != 32  )		
@@ -2430,7 +2430,7 @@ void CHudCloseCaption::ProcessSentenceCaptionStream( const char *tokenstream )
 
 void CHudCloseCaption::_ProcessSentenceCaptionStream( int wordCount, const char *tokenstream, const wchar_t *caption_full )
 {
-	if ( wcslen( caption_full ) > 0 )
+	if ( caption_full[0] )
 	{
 		Process( caption_full, ( wordCount + 1 ) * 0.75f, tokenstream, false /*never from player!*/ );
 	}

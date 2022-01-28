@@ -38,7 +38,7 @@ extern const objectparams_t g_PhysDefaultObjectParams;
 // energy of a 10kg mass moving at speed
 #define MASS10_SPEED2ENERGY(speed)	MASS_SPEED2ENERGY(10,speed)
 
-#define MASS_ENERGY2SPEED(mass,energy)	(FastSqrt((energy)/mass))
+#define MASS_ENERGY2SPEED(mass,energy)	(FastSqrt((energy)/(mass)))
 
 #define ENERGY_VOLUME_SCALE		(1.0f / 15500.0f)
 

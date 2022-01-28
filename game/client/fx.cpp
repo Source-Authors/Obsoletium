@@ -601,12 +601,13 @@ class CSmokeEmitter : public CSimpleEmitter
 {
 	typedef CSimpleEmitter BaseClass;
 public:
-	CSmokeEmitter( ClientEntityHandle_t hEntity, int nAttachment, const char *pDebugName ) : CSimpleEmitter( pDebugName ) 
+	CSmokeEmitter( ClientEntityHandle_t hEntity, int nAttachment, const char *pDebugName )
+		: CSimpleEmitter( pDebugName ), m_hEntity(hEntity)
 	{
-		m_hEntity = hEntity;
-		m_nAttachmentIndex = nAttachment;
 		m_flDeathTime = 0;
 		m_flLastParticleSpawnTime = 0;
+		m_flSpawnRate = 0;
+		m_nAttachmentIndex = nAttachment;
 	}
 	
 	// Create

@@ -16,10 +16,8 @@
 static const char g_EffectName[] = "Quad";
 
 CFXQuad::CFXQuad( const FXQuadData_t &data )
-	: CClientSideEffect( g_EffectName )
+	: CClientSideEffect( g_EffectName ), m_FXData( data )
 {
-	m_FXData = data;
-
 	if ( data.m_pMaterial != NULL )
 	{
 		// If we've got a material, use that as our effectname instead of just "Quad".

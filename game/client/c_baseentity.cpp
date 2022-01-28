@@ -3854,6 +3854,16 @@ void C_BaseEntity::operator delete( void *pMem )
 	MemAlloc_Free( pMem );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *pMem - 
+//-----------------------------------------------------------------------------
+void C_BaseEntity::operator delete[]( void *pMem )
+{
+	// get the engine to free the memory
+	MemAlloc_Free( pMem );
+}
+
 #include "tier0/memdbgon.h"
 
 //========================================================================================
@@ -5203,9 +5213,6 @@ void C_BaseEntity::ShiftIntermediateDataForward( int slots_to_remove, int number
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	Assert( m_pIntermediateData );
-	if ( !m_pIntermediateData )
-		return;
-
 	Assert( number_of_commands_run >= slots_to_remove );
 
 	// Just moving pointers, yeah

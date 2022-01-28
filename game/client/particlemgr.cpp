@@ -965,9 +965,9 @@ void CParticleEffectBinding::RemoveParticle( Particle *pParticle )
 {
 	UnlinkParticle( pParticle );
 	
+	Assert( m_nActiveParticles >= 0 );
 	// Important that this is updated BEFORE NotifyDestroyParticle is called.
 	--m_nActiveParticles;
-	Assert( m_nActiveParticles >= 0 );
 
 	// Let the effect do any necessary cleanup
 	m_pSim->NotifyDestroyParticle(pParticle);

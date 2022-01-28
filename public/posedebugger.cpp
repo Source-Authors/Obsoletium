@@ -261,8 +261,7 @@ void ModelPoseDebugInfo::PrintPendingInfoText( int &rnPosPrint )
 			nxPrn.color[2] = 1.f;
 			if ( prntxt.m_flTimeAlive > flFadeInTime )
 				break;
-			else
-				NULL; // Fall-through to keep showing in green
+			// Fall-through to keep showing in green
 		case F_SEEN_THIS_FRAME :
 			if ( flFadeInTime > 0.f )
 			{

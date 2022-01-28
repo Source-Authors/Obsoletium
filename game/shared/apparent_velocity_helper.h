@@ -46,10 +46,8 @@ template< class T, class Functor=CDefaultCalcDistance<T> >
 class CApparentVelocity
 {
 public:
-	CApparentVelocity(const T& t0)
+  CApparentVelocity(const T &t0) : m_LastValue(t0), m_LastTime(-1)
 	{
-		m_LastTime = -1;
-		m_LastValue = t0;
 	}
 
 	float AddSample( float time, T value )

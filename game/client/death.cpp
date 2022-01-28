@@ -279,7 +279,7 @@ void CHudDeathNotice::FireGameEvent( KeyValues * event)
 		Msg( "%s", rgDeathNoticeList[i].szVictim );
 	}
 
-	if ( killedwith && *killedwith && (*killedwith > 13 ) && strcmp( killedwith, "d_world" ) && !rgDeathNoticeList[i].iTeamKill )
+	if ( (*killedwith > 13 ) && strcmp( killedwith, "d_world" ) && !rgDeathNoticeList[i].iTeamKill )
 	{
 		Msg( " with " );
 

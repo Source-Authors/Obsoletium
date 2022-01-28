@@ -27,11 +27,9 @@ Vector g_FireSpreadDirection(0,0,1);
 class FireRamp
 {
 public:
-			FireRamp(const Vector &s, const Vector &e)
-			{
-				m_Start=s;
-				m_End=e;
-			}
+	FireRamp(const Vector &s, const Vector &e) : m_Start(s), m_End(e)
+	{
+	}
 
 	Vector	m_Start;
 	Vector	m_End;

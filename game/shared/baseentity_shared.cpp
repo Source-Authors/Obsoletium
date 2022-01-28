@@ -1608,10 +1608,11 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 	int			nDamageType	= pAmmoDef->DamageType(info.m_iAmmoType);
 	int			nAmmoFlags	= pAmmoDef->Flags(info.m_iAmmoType);
 	
-	bool bDoServerEffects = true;
-
 #if defined( HL2MP ) && defined( GAME_DLL )
-	bDoServerEffects = false;
+	constexpr bool bDoServerEffects = false;
+#else
+	constexpr bool bDoServerEffects = true;
+
 #endif
 
 #if defined( GAME_DLL )
@@ -1913,7 +1914,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 
 				if ( bStartedInWater || !bHitWater || (info.m_nFlags & FIRE_BULLETS_ALLOW_WATER_SURFACE_IMPACTS) )
 				{
-					if ( bDoServerEffects == true )
+					if constexpr ( bDoServerEffects == true )
 					{
 						DoImpactEffect( tr, nDamageType );
 					}
