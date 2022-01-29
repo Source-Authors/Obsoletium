@@ -57,9 +57,9 @@ void ApplyScanlineEffectToTexture( int rgbaWide, int rgbaTall, unsigned char *rg
 		// darken the other lines
 		for (int x = 0; x < rgbaWide; x++, pBits += 4)
 		{
-			pBits[0] *= scale;
-			pBits[1] *= scale;
-			pBits[2] *= scale;
+			pBits[0] = static_cast<unsigned char>(pBits[0] * scale);
+			pBits[1] = static_cast<unsigned char>(pBits[1] * scale);
+			pBits[2] = static_cast<unsigned char>(pBits[2] * scale);
 		}
 	}
 }
@@ -167,7 +167,7 @@ void ApplyGaussianBlurToTexture( int rgbaWide, int rgbaTall, unsigned char *rgba
 
 	// generate the gaussian field
 	float *pGaussianDistribution = (float*) stackalloc( (nBlur*2+1) * sizeof(float) );
-	double sigma = 0.683 * nBlur;
+	float sigma = 0.683F * nBlur;
 	for (int x = 0; x <= (nBlur * 2); x++)
 	{
 		int val = x - nBlur;

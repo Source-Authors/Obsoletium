@@ -22,7 +22,7 @@ class CFontAmalgam
 {
 public:
 	CFontAmalgam();
-	~CFontAmalgam();
+	~CFontAmalgam() = default;
 
 	const char *Name();
 	void SetName(const char *name);

@@ -243,9 +243,9 @@ void CBitmapFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
 	BitmapFontTable_t *pFont = &g_BitmapFontTable[m_bitmapFontHandle];
 
 	ch = pFont->m_pBitmapFont->m_TranslateTable[ch];
-	a = pFont->m_pBitmapGlyphs[ch].a * m_scalex;
-	b = pFont->m_pBitmapGlyphs[ch].b * m_scalex;
-	c = pFont->m_pBitmapGlyphs[ch].c * m_scalex;
+	a = static_cast<int>(pFont->m_pBitmapGlyphs[ch].a * m_scalex);
+	b = static_cast<int>(pFont->m_pBitmapGlyphs[ch].b * m_scalex);
+	c = static_cast<int>(pFont->m_pBitmapGlyphs[ch].c * m_scalex);
 }
 
 void CBitmapFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned char *prgba )

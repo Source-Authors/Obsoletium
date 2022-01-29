@@ -76,12 +76,6 @@ public:
 	void SetFontDataHelper( FontDataHelper helper ) { m_pFontDataHelper = helper; }
 #endif
 
-#if defined( _X360 )
-	// secondary cache to speed TTF setup
-	bool GetCachedXUIMetrics( const char *pWindowsFontName, int tall, int style, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] );
-	void SetCachedXUIMetrics( const char *pWindowsFontName, int tall, int style, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] );
-#endif
-
 	// used as a hint that intensive TTF operations are finished
 	void ClearTemporaryFontCache();
 	void GetKernedCharWidth( vgui::HFont font, wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &abcA, float &abcC );
@@ -103,23 +97,6 @@ private:
 	char m_szLanguage[64];
 	IFileSystem		*m_pFileSystem;
 	IMaterialSystem *m_pMaterialSystem;
-
-#if defined( _X360 )
-	// These are really bounded by the number of fonts that the game would ever realistically create, so ~100 is expected.
-	// Many of these fonts are redundant and the same underlying metrics can be used. This avoid the very expensive TTF font metric lookup.
-	struct XUIMetricCache_t
-	{
-		// the font signature that can change
-		CUtlSymbol		fontSymbol;
-		int				tall;
-		int				style;
-
-		// the metrics
-		XUIFontMetrics	fontMetrics;
-		XUICharMetrics	charMetrics[256];
-	};
-	CUtlVector< XUIMetricCache_t > m_XUIMetricCache;
-#endif
 };
 
 // singleton accessor

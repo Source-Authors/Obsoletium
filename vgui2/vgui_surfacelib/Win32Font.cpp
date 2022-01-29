@@ -53,10 +53,6 @@ CWin32Font::CWin32Font() : m_ExtendedABCWidthsCache(256, 0, &ExtendedABCWidthsCa
 	m_bRotary = false;
 	m_bAdditive = false;
 
-#if defined( _X360 )
-	Q_memset( m_ABCWidthsCache, 0, sizeof( m_ABCWidthsCache ) );
-#endif
-
 	m_ExtendedABCWidthsCache.EnsureCapacity( 128 );
 }
 
@@ -149,8 +145,6 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	if (!m_hFont)
 	{
 		Error("Couldn't create windows font '%s'\n", windowsFontName);
-		m_szName = UTL_INVAL_SYMBOL;
-		return false;
 	}
 
 	// set as the active font
@@ -186,50 +180,6 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 
 	m_hDIB = ::CreateDIBSection(m_hDC, (BITMAPINFO*)&header, DIB_RGB_COLORS, (void**)(&m_pBuf), NULL, 0);
 	::SelectObject(m_hDC, m_hDIB);
-
-#if defined( _X360 )
-	// get char spacing
-	// a is space before character (can be negative)
-	// b is the width of the character
-	// c is the space after the character
-	memset(m_ABCWidthsCache, 0, sizeof(m_ABCWidthsCache));
-	ABC abc[ABCWIDTHS_CACHE_SIZE];
-	Assert(ABCWIDTHS_CACHE_SIZE <= 256);
-	if (::GetCharABCWidthsW(m_hDC, 0, ABCWIDTHS_CACHE_SIZE - 1, &abc[0]) || ::GetCharABCWidthsA(m_hDC, 0, ABCWIDTHS_CACHE_SIZE - 1, &abc[0]))
-	{	
-		// copy out into our formated structure
-		for (int i = 0; i < ABCWIDTHS_CACHE_SIZE; i++)
-		{
-			m_ABCWidthsCache[i].a = abc[i].abcA - m_iBlur - m_iOutlineSize;
-			m_ABCWidthsCache[i].b = abc[i].abcB + ((m_iBlur + m_iOutlineSize) * 2) + m_iDropShadowOffset;
-			m_ABCWidthsCache[i].c = abc[i].abcC - m_iBlur - m_iDropShadowOffset - m_iOutlineSize;
-		}
-	}
-	else
-	{
-		Warning("GetCharABCWidths() failed for windows font '%s'\n", windowsFontName);
-
-		// since that failed, it must be fixed width, zero everything so a and c will be zeros, then
-		// fill b with the value from TEXTMETRIC
-		for (int i = 0; i < ABCWIDTHS_CACHE_SIZE; i++)
-		{
-			// fallback to old method, no underhangs/overhangs (a/c)
-			SIZE size;
-			char mbcs[6] = { 0 };
-			wchar_t wch = (wchar_t)i;
-			::WideCharToMultiByte(CP_ACP, 0, &wch, 1, mbcs, sizeof(mbcs), NULL, NULL);
-			if (::GetTextExtentPoint32(m_hDC, mbcs, strlen(mbcs), &size))
-			{
-				m_ABCWidthsCache[i].b = size.cx;
-			}
-			else
-			{
-				// failed to get width, just use the average width
-				m_ABCWidthsCache[i].b = (char)tm.tmAveCharWidth;
-			}
-		}
-	}
-#endif
 
 	return true;
 }
@@ -471,27 +421,17 @@ void CWin32Font::SetAsActiveFont(HDC hdc)
 void CWin32Font::GetCharABCWidths(int ch, int &a, int &b, int &c)
 {
 	Assert( IsValid() );
-#if defined( _X360 )
-	if (ch < ABCWIDTHS_CACHE_SIZE)
 	{
-		// use the cache entry
-		a = m_ABCWidthsCache[ch].a;
-		b = m_ABCWidthsCache[ch].b;
-		c = m_ABCWidthsCache[ch].c;
-	}
-	else
-#endif
-	{
-
 		// look for it in the cache
 		abc_cache_t finder = { (wchar_t)ch };
 
 		unsigned short i = m_ExtendedABCWidthsCache.Find(finder);
 		if (m_ExtendedABCWidthsCache.IsValidIndex(i))
 		{
-			a = m_ExtendedABCWidthsCache[i].abc.a;
-			b = m_ExtendedABCWidthsCache[i].abc.b;
-			c = m_ExtendedABCWidthsCache[i].abc.c;
+			const auto& abc = m_ExtendedABCWidthsCache[i].abc;
+			a = abc.a;
+			b = abc.b;
+			c = abc.c;
 			return;
 		}
 
@@ -590,8 +530,8 @@ void CWin32Font::GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAft
 {
 	int a,b,c;
 	GetCharABCWidths(ch, a, b, c );
-	wide = ( a + b + c);
-	abcA = a;
+	wide = static_cast<float>( a + b + c );
+	abcA = static_cast<float>( a );
 }
 
 

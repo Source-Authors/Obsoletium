@@ -15,11 +15,7 @@
 
 static CFontManager s_FontManager;
 
-#if !defined( _X360 )
 #define MAX_INITIAL_FONTS	100
-#else
-#define MAX_INITIAL_FONTS	1
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: singleton accessor
@@ -38,6 +34,7 @@ CFontManager::CFontManager()
 	m_FontAmalgams.EnsureCapacity( MAX_INITIAL_FONTS );
 	m_FontAmalgams.AddToTail();
 	m_Win32Fonts.EnsureCapacity( MAX_INITIAL_FONTS );
+	m_szLanguage[0] = '\0';
 
 #ifdef LINUX
 	FT_Error error = FT_Init_FreeType( &library ); 
@@ -490,7 +487,8 @@ bool CFontManager::IsBitmapFont(HFont font)
 //-----------------------------------------------------------------------------
 int CFontManager::GetCharacterWidth(HFont font, int ch)
 {
-	if ( !iswcntrl( ch ) )
+  Assert( ch <= (int)std::numeric_limits<wint_t>::max() );
+  if (!iswcntrl( static_cast<wint_t>(ch) ))
 	{
 		int a, b, c;
 		GetCharABCwide(font, ch, a, b, c);
@@ -542,7 +540,7 @@ void CFontManager::GetTextSize(HFont font, const wchar_t *text, int &wide, int &
 			xx += flWide;
 			if (xx > wide)
 			{
-				wide = ceilf(xx);
+				wide = (int)ceilf(xx);
 			}
 		}
 		chBefore = ch;
@@ -655,64 +653,8 @@ const char *CFontManager::GetForeignFallbackFontName()
 #endif
 }
 
-#if defined( _X360 )
-bool CFontManager::GetCachedXUIMetrics( const char *pFontName, int tall, int style, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] )
-{
-	// linear lookup is good enough
-	CUtlSymbol fontSymbol = pFontName;
-	bool bFound = false;
-	int i;
-	for ( i = 0; i < m_XUIMetricCache.Count(); i++ )
-	{
-		if ( m_XUIMetricCache[i].fontSymbol == fontSymbol && m_XUIMetricCache[i].tall == tall && m_XUIMetricCache[i].style == style )
-		{
-			bFound = true;
-			break;
-		}
-	}
-	if ( !bFound )
-	{
-		return false;
-	}
-
-	// get from the cache
-	*pFontMetrics = m_XUIMetricCache[i].fontMetrics;
-	V_memcpy( charMetrics, m_XUIMetricCache[i].charMetrics, 256 * sizeof( XUICharMetrics ) );
-	return true;
-}
-#endif
-
-#if defined( _X360 )
-void CFontManager::SetCachedXUIMetrics( const char *pFontName, int tall, int style, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] )
-{
-	MEM_ALLOC_CREDIT();
-
-	int i = m_XUIMetricCache.AddToTail();
-
-	m_XUIMetricCache[i].fontSymbol = pFontName;
-	m_XUIMetricCache[i].tall = tall;
-	m_XUIMetricCache[i].style = style;
-	m_XUIMetricCache[i].fontMetrics = *pFontMetrics;
-	V_memcpy( m_XUIMetricCache[i].charMetrics, charMetrics, 256 * sizeof( XUICharMetrics ) );
-}
-#endif
-
 void CFontManager::ClearTemporaryFontCache()
 {
-#if defined( _X360 )
-	COM_TimestampedLog( "ClearTemporaryFontCache(): Start" );
-
-	m_XUIMetricCache.Purge();
-
-	// many fonts are blindly precached by vgui and never used
-	// font will re-open if glyph is actually requested
-	for ( int i = 0; i < m_Win32Fonts.Count(); i++ )
-	{
-		m_Win32Fonts[i]->CloseResource();
-	}
-
-	COM_TimestampedLog( "ClearTemporaryFontCache(): Finish" );
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -723,7 +665,7 @@ bool CFontManager::GetFontUnderlined( HFont font )
 	return m_FontAmalgams[font].GetUnderlined();
 }
 
-void CFontManager::GetKernedCharWidth( vgui::HFont font, wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &flabcA, float &flabcC )
+void CFontManager::GetKernedCharWidth( vgui::HFont font, wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &flabcA, [[maybe_unused]] float &flabcC )
 {
 	wide = 0.0f;
 	flabcA = 0.0f;

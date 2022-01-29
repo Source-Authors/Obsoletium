@@ -11,11 +11,9 @@
 #pragma once
 #endif
 
-#if !defined( _X360 )
 using HFONT = struct HFONT__*;
 using HDC = struct HDC__*;
 using HBITMAP = struct HBITMAP__*;
-#endif
 
 #include "utlrbtree.h"
 #include "tier1/utlsymbol.h"
@@ -78,23 +76,10 @@ public:
 	// gets the width of ch given its position around before and after chars
 	void GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &abcA );
 
-#if defined( _X360 )
-	// generates texture data for a set of chars
-	virtual void GetCharsRGBA( newChar_t *newChars, int numNewChars, unsigned char *pRGBA );
-
-	virtual void CloseResource();
-#endif
-
 private:
-
-#if !defined( _X360 )
 	HFONT			m_hFont;
 	HDC				m_hDC;
 	HBITMAP			m_hDIB;
-#else
-	HXUIFONT		m_hFont;
-	HDC				m_hDC;
-#endif
 
 	// pointer to buffer for use when generated bitmap versions of a texture
 	unsigned char	*m_pBuf;
@@ -128,7 +113,6 @@ private:
 		char c;
 	};
 
-#if !defined( _X360 )
 	// On PC we cache char widths on demand when actually requested to minimize our use of the kernels 
 	// paged pool (GDI may cache information about glyphs we have requested and take up lots of paged pool)
 	struct abc_cache_t
@@ -138,11 +122,6 @@ private:
 	};
 	CUtlRBTree<abc_cache_t, unsigned short> m_ExtendedABCWidthsCache;
 	static bool ExtendedABCWidthsCacheLessFunc(const abc_cache_t &lhs, const abc_cache_t &rhs);
-#else
-	// 360 requires all possible characters during font init
-	enum { ABCWIDTHS_CACHE_SIZE = 256 };
-	abc_t m_ABCWidthsCache[ABCWIDTHS_CACHE_SIZE];
-#endif
 };
 
 #endif // WIN32FONT_H
