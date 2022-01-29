@@ -135,16 +135,16 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	CDisablePredictionFiltering disabler;
 #endif
 
-	if ( pTrace->fraction != 1.0 )
+	if ( pTrace->fraction != 1.0F )
 	{
 		Vector vecNormal = pTrace->plane.normal;
 		surfacedata_t *pdata = physprops->GetSurfaceData( pTrace->surface.surfaceProps );	
 		CPASFilter filter( vecAbsOrigin );
 
-		te->Explosion( filter, -1.0, // don't apply cl_interp delay
+		te->Explosion( filter, -1.0F, // don't apply cl_interp delay
 			&vecAbsOrigin,
 			!( contents & MASK_WATER ) ? g_sModelIndexFireball : g_sModelIndexWExplosion,
-			m_DmgRadius * .03, 
+			m_DmgRadius * .03F, 
 			25,
 			TE_EXPLFLAG_NONE,
 			m_DmgRadius,
@@ -158,7 +158,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 		te->Explosion( filter, -1.0, // don't apply cl_interp delay
 			&vecAbsOrigin, 
 			!( contents & MASK_WATER ) ? g_sModelIndexFireball : g_sModelIndexWExplosion,
-			m_DmgRadius * .03, 
+			m_DmgRadius * .03F, 
 			25,
 			TE_EXPLFLAG_NONE,
 			m_DmgRadius,
@@ -224,7 +224,7 @@ void CBaseGrenade::Smoke( void )
 
 		te->Smoke( filter, 0.0, 
 			&vecAbsOrigin, g_sModelIndexSmoke,
-			m_DmgRadius * 0.03,
+			m_DmgRadius * 0.03F,
 			24 );
 	}
 #if !defined( CLIENT_DLL )
@@ -276,7 +276,7 @@ void CBaseGrenade::PreDetonate( void )
 #endif
 
 	SetThink( &CBaseGrenade::Detonate );
-	SetNextThink( gpGlobals->curtime + 1.5 );
+	SetNextThink( gpGlobals->curtime + 1.5F );
 }
 
 
@@ -337,14 +337,14 @@ void CBaseGrenade::DangerSoundThink( void )
 	}
 
 #if !defined( CLIENT_DLL )
-	CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin() + GetAbsVelocity() * 0.5, GetAbsVelocity().Length( ), 0.2, this );
+	CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin() + GetAbsVelocity() * 0.5F, GetAbsVelocity().Length(), 0.2F, this );
 #endif
 
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	SetNextThink( gpGlobals->curtime + 0.2F );
 
 	if (GetWaterLevel() != 0)
 	{
-		SetAbsVelocity( GetAbsVelocity() * 0.5 );
+		SetAbsVelocity( GetAbsVelocity() * 0.5F );
 	}
 }
 
@@ -394,7 +394,7 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 		
 		// register a radius louder than the explosion, so we make sure everyone gets out of the way
 #if !defined( CLIENT_DLL )
-		CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), m_flDamage / 0.4, 0.3, this );
+		CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), m_flDamage / 0.4F, 0.3F, this );
 #endif
 		m_bHasWarnedAI = true;
 	}
@@ -411,10 +411,10 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 		// play bounce sound
 		BounceSound();
 	}
-	m_flPlaybackRate = GetAbsVelocity().Length() / 200.0;
-	if (m_flPlaybackRate > 1.0)
+	m_flPlaybackRate = GetAbsVelocity().Length() / 200.0F;
+	if (m_flPlaybackRate > 1.0F)
 		m_flPlaybackRate = 1;
-	else if (m_flPlaybackRate < 0.5)
+	else if (m_flPlaybackRate < 0.5F)
 		m_flPlaybackRate = 0;
 
 }
