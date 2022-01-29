@@ -43,18 +43,20 @@ int CBaseAutoCompleteFileList::AutoCompletionFunc( char const *partial, char com
 
 	CUtlSymbolTable entries( 0, 0, true );
 	CUtlVector< CUtlSymbol > symbols;
+	
+	char sz[ MAX_QPATH ];
+	const size_t substringLength = strlen( substring );
 
 	char const *findfn = Sys_FindFirst( searchpath, NULL, 0 );
 	while ( findfn )
 	{
-		char sz[ MAX_QPATH ];
 		Q_snprintf( sz, sizeof( sz ), "%s", findfn );
 
 		bool add = false;
 		// Insert into lookup
 		if ( substring[0] )
 		{
-			if ( !Q_strncasecmp( findfn, substring, strlen( substring ) ) )
+			if ( !Q_strncasecmp( findfn, substring, substringLength ) )
 			{
 				add = true;
 			}
@@ -84,13 +86,21 @@ int CBaseAutoCompleteFileList::AutoCompletionFunc( char const *partial, char com
 
 	Sys_FindClose();
 
-	for ( int i = 0; i < symbols.Count(); i++ )
+	size_t i{0};
+	for ( auto &s : symbols )
 	{
-		char const *filename = entries.String( symbols[ i ] );
+		char const *filename = entries.String( s );
 
 		Q_snprintf( commands[ i ], sizeof( commands[ i ] ), "%s %s", cmdname, filename );
-		// Remove .dem
-		commands[ i ][ strlen( commands[ i ] ) - 4 ] = 0;
+
+		const size_t commandLen{ strlen( commands[i] ) };
+		if ( commandLen >= 4 )
+		{
+			// Remove .dem
+			commands[ i ][ commandLen - 4 ] = '\0';
+		}
+
+		++i;
 	}
 
 	return symbols.Count();
