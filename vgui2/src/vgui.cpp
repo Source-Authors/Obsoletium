@@ -322,7 +322,7 @@ void CVGui::SpewAllActivePanelNames()
 //-----------------------------------------------------------------------------
 HContext CVGui::CreateContext()
 {
-	HContext i = m_Contexts.AddToTail();
+	auto i = m_Contexts.AddToTail();
 	m_Contexts[i].m_hInputContext = g_pInput->CreateInputContext();
 	return i;
 }
@@ -342,11 +342,10 @@ void CVGui::DestroyContext( HContext context )
 
 void CVGui::DestroyAllContexts( )
 {
-	HContext next;
-	HContext i = m_Contexts.Head();
+	auto i = m_Contexts.Head();
 	while (i != m_Contexts.InvalidIndex())
 	{
-		next = m_Contexts.Next(i);
+		auto next = m_Contexts.Next(i);
 		DestroyContext( i );
 		i = next;
 	}
