@@ -1318,10 +1318,10 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 					//We'll be de-linking from the old point and generating a new one. We do this so other lines can still access the dead point's untouched data.
 					
 					//Generate a new point
-					GeneratePolyhedronFromPlanes_Point *pNewPoint = (GeneratePolyhedronFromPlanes_Point *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_Point ) );
+					GeneratePolyhedronFromPlanes_Point *pNewPoint = (GeneratePolyhedronFromPlanes_Point *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_Point ) ); //-V641
 					{
 						//add this point to the active list
-						pAllPoints->pPrev = (GeneratePolyhedronFromPlanes_UnorderedPointLL *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_UnorderedPointLL ) );
+						pAllPoints->pPrev = (GeneratePolyhedronFromPlanes_UnorderedPointLL *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_UnorderedPointLL ) ); //-V641
 						pAllPoints->pPrev->pNext = pAllPoints;
 						pAllPoints = pAllPoints->pPrev;
 						pAllPoints->pPrev = NULL;
@@ -1454,10 +1454,10 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 			}
 
 			//create the new polygon
-			GeneratePolyhedronFromPlanes_Polygon *pNewPolygon = (GeneratePolyhedronFromPlanes_Polygon *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_Polygon ) );
+			GeneratePolyhedronFromPlanes_Polygon *pNewPolygon = (GeneratePolyhedronFromPlanes_Polygon *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_Polygon ) ); //-V641
 			{
 				//before we forget, add this polygon to the active list
-				pAllPolygons->pPrev = (GeneratePolyhedronFromPlanes_UnorderedPolygonLL *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_UnorderedPolygonLL ) );
+				pAllPolygons->pPrev = (GeneratePolyhedronFromPlanes_UnorderedPolygonLL *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_UnorderedPolygonLL ) ); //-V641
 				pAllPolygons->pPrev->pNext = pAllPolygons;
 				pAllPolygons = pAllPolygons->pPrev;
 				pAllPolygons->pPrev = NULL;
@@ -1503,10 +1503,10 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 					}
 #endif
 
-					GeneratePolyhedronFromPlanes_Line *pJoinLine = (GeneratePolyhedronFromPlanes_Line *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_Line ) );
+					GeneratePolyhedronFromPlanes_Line *pJoinLine = (GeneratePolyhedronFromPlanes_Line *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_Line ) ); //-V641
 					{
 						//before we forget, add this line to the active list
-						pAllLines->pPrev = (GeneratePolyhedronFromPlanes_UnorderedLineLL *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_UnorderedLineLL ) );
+						pAllLines->pPrev = (GeneratePolyhedronFromPlanes_UnorderedLineLL *)stackalloc( sizeof( GeneratePolyhedronFromPlanes_UnorderedLineLL ) ); //-V641
 						pAllLines->pPrev->pNext = pAllLines;
 						pAllLines = pAllLines->pPrev;
 						pAllLines->pPrev = NULL;
