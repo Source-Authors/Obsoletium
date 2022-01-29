@@ -73,14 +73,14 @@ CWin32Font::~CWin32Font()
 // Purpose: Font iteration callback function
 //			used to determine whether or not a font exists on the system
 //-----------------------------------------------------------------------------
-extern bool g_bFontFound = false;
 int CALLBACK FontEnumProc( 
 	const LOGFONT *lpelfe,		// logical-font data
 	const TEXTMETRIC *lpntme,	// physical-font data
 	DWORD FontType,				// type of font
 	LPARAM lParam )				// application-defined data
 {
-	g_bFontFound = true;
+  auto *p = (bool *)lParam;
+	*p = true;
 	return 0;
 }
 
@@ -122,9 +122,10 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	logfont.lfCharSet = DEFAULT_CHARSET;
 	logfont.lfPitchAndFamily = 0;
 	strcpy(logfont.lfFaceName, m_szName.String());
-	g_bFontFound = false;
-	::EnumFontFamiliesEx(m_hDC, &logfont, &FontEnumProc, 0, 0);
-	if (!g_bFontFound)
+	bool bFontFound = false;
+	// dimhotepus: Remove global state when using fonts search.
+	::EnumFontFamiliesEx(m_hDC, &logfont, &FontEnumProc, (LPARAM)&bFontFound, 0);
+	if (!bFontFound)
 	{
 		// needs to go to a fallback
 		m_szName = UTL_INVAL_SYMBOL;
