@@ -101,8 +101,9 @@ protected:
 	unsigned int	m_iDropShadowOffset : 1;
 	unsigned int	m_iOutlineSize : 1;
 	unsigned int	m_bAntiAliased : 1;
+	unsigned int	m_bClearType : 1;
 	unsigned int	m_bRotary : 1;
-	unsigned int	m_bAdditive : 1; //29
+	unsigned int	m_bAdditive : 1; //30
 
 private:
 	// abc widths

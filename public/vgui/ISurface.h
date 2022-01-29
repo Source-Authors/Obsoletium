@@ -208,6 +208,8 @@ public:
 		FRAME_MINIMIZE_MAXIMIZE	 = 5,
 		OUTLINE_FONTS	= 6,
 		DIRECT_HWND_RENDER		= 7,
+		// dimhotepus: Add ClearType fonts support.
+		CLEARTYPE_FONTS		= 8,
 	};
 	virtual bool SupportsFeature(SurfaceFeature_e feature) = 0;
 
@@ -247,6 +249,8 @@ public:
 		FONTFLAG_OUTLINE		= 0x200,
 		FONTFLAG_CUSTOM			= 0x400,		// custom generated font - never fall back to asian compatibility mode
 		FONTFLAG_BITMAP			= 0x800,		// compiled bitmap font - no fallbacks
+		// dimhotepus: Font supports ClearType.
+		FONTFLAG_CLEARTYPE	= 0x1000,
 	};
 
 	virtual bool SetFontGlyphSet(HFont font, const char *windowsFontName, int tall, int weight, int blur, int scanlines, int flags, int nRangeMin = 0, int nRangeMax = 0) = 0;

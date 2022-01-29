@@ -855,6 +855,10 @@ void CScheme::ReloadFontGlyphs()
 			{
 				flags |= ISurface::FONTFLAG_ANTIALIAS;
 			}
+			if (fontdata->GetInt( "cleartype" ) && g_pSurface->SupportsFeature(ISurface::CLEARTYPE_FONTS))
+			{
+				flags |= ISurface::FONTFLAG_CLEARTYPE;
+			}
 			if (fontdata->GetInt( "dropshadow" ) && g_pSurface->SupportsFeature(ISurface::DROPSHADOW_FONTS))
 			{
 				flags |= ISurface::FONTFLAG_DROPSHADOW;

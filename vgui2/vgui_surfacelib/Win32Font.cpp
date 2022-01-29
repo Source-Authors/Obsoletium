@@ -50,6 +50,7 @@ CWin32Font::CWin32Font() : m_ExtendedABCWidthsCache(256, 0, &ExtendedABCWidthsCa
 	m_iDropShadowOffset = 0;
 	m_iOutlineSize = 0;
 	m_bAntiAliased = false;
+	m_bClearType = false;
 	m_bRotary = false;
 	m_bAdditive = false;
 
@@ -94,7 +95,9 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	m_iTall = tall;
 	m_iWeight = weight;
 	m_iFlags = flags;
-	m_bAntiAliased = (flags & vgui::ISurface::FONTFLAG_ANTIALIAS) ? 1 : 0;
+	m_bClearType = (flags & vgui::ISurface::FONTFLAG_CLEARTYPE) ? 1 : 0;
+	// dimhotepus: Use antialised font as fallback when not ClearType font.
+	m_bAntiAliased = !m_bClearType && (flags & vgui::ISurface::FONTFLAG_ANTIALIAS) ? 1 : 0;
 	m_bUnderlined = flags & vgui::ISurface::FONTFLAG_UNDERLINE;
 	m_iDropShadowOffset = (flags & vgui::ISurface::FONTFLAG_DROPSHADOW) ? 1 : 0;
 	m_iOutlineSize = (flags & vgui::ISurface::FONTFLAG_OUTLINE) ? 1 : 0;
@@ -103,7 +106,7 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	m_bRotary = (flags & vgui::ISurface::FONTFLAG_ROTARY) ? 1 : 0;
 	m_bAdditive = (flags & vgui::ISurface::FONTFLAG_ADDITIVE) ? 1 : 0;
 
-	int charset = (flags & vgui::ISurface::FONTFLAG_SYMBOL) ? SYMBOL_CHARSET : ANSI_CHARSET;
+	DWORD charset = (flags & vgui::ISurface::FONTFLAG_SYMBOL) ? SYMBOL_CHARSET : ANSI_CHARSET;
 
 	// hack for japanese win98 support
 	if ( !stricmp( windowsFontName, "win98japanese" ) )
@@ -140,7 +143,7 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 								charset, 
 								OUT_DEFAULT_PRECIS, 
 								CLIP_DEFAULT_PRECIS, 
-								m_bAntiAliased ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY, 
+								m_bClearType ? CLEARTYPE_QUALITY : (m_bAntiAliased ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY), 
 								DEFAULT_PITCH | FF_DONTCARE, 
 								windowsFontName);
 	if (!m_hFont)
@@ -170,9 +173,7 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	m_rgiBitmapSize[0] = tm.tmMaxCharWidth + m_iOutlineSize * 2;
 	m_rgiBitmapSize[1] = tm.tmHeight + m_iDropShadowOffset + m_iOutlineSize * 2;
 
-	::BITMAPINFOHEADER header;
-	memset(&header, 0, sizeof(header));
-	header.biSize = sizeof(header);
+	::BITMAPINFOHEADER header{ sizeof(header) };
 	header.biWidth = m_rgiBitmapSize[0];
 	header.biHeight = -m_rgiBitmapSize[1];
 	header.biPlanes = 1;
@@ -208,7 +209,7 @@ void CWin32Font::GetCharRGBA(wchar_t ch, int rgbaWide, int rgbaTall, unsigned ch
 	MAT2 mat2 = { { 0, 1}, { 0, 0}, { 0, 0}, { 0, 1}};
 	int bytesNeeded = 0;
 
-	bool bShouldAntialias = m_bAntiAliased;
+	bool bShouldAntialias = m_bAntiAliased || m_bClearType;
 	// filter out 
 	if ( ch > 0x00FF && !(m_iFlags & vgui::ISurface::FONTFLAG_CUSTOM) )
 	{

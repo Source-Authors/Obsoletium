@@ -489,6 +489,7 @@ bool CMatSystemSurface::SupportsFeature(SurfaceFeature_e feature)
 	{
 	case ISurface::ANTIALIASED_FONTS:
 	case ISurface::DROPSHADOW_FONTS:
+	case ISurface::CLEARTYPE_FONTS:
 		return true;
 
 	case ISurface::OUTLINE_FONTS:

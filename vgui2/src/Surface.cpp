@@ -3536,6 +3536,7 @@ bool CWin32Surface::SupportsFeature(SurfaceFeature_e feature)
 	{
 	case ISurface::ESCAPE_KEY:
 	case ISurface::ANTIALIASED_FONTS:
+	case ISurface::CLEARTYPE_FONTS:
 	case ISurface::OPENING_NEW_HTML_WINDOWS:
 	case ISurface::FRAME_MINIMIZE_MAXIMIZE:
 	case ISurface::DIRECT_HWND_RENDER:
