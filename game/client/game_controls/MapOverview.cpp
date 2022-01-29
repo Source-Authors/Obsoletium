@@ -466,7 +466,8 @@ void CMapOverview::Update( void )
 	m_bShowNames = overview_names.GetBool() && ( GetMode() != MAP_MODE_RADAR );
 	m_bShowHealth = overview_health.GetBool() && ( GetMode() != MAP_MODE_RADAR );
 	m_bFollowAngle = ( GetMode() != MAP_MODE_RADAR  && !overview_locked.GetBool() ) || ( GetMode() == MAP_MODE_RADAR  &&  !IsRadarLocked() );
-	m_fTrailUpdateInterval = overview_tracks.GetInt() && ( GetMode() != MAP_MODE_RADAR );
+	// dimhotepus: Setup show trails flag.
+	m_bShowTrails = overview_tracks.GetBool() && ( GetMode() != MAP_MODE_RADAR );
 
 	m_fWorldTime = gpGlobals->curtime;
 
