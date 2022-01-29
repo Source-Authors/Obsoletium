@@ -34,26 +34,6 @@ ConVar overview_alpha( "overview_alpha",  "1.0", FCVAR_ARCHIVE | FCVAR_CLIENTCMD
 
 IMapOverviewPanel *g_pMapOverview = NULL; // we assume only one overview is created
 
-static int AdjustValue( int curValue, int targetValue, int amount )
-{
-	if ( curValue > targetValue )
-	{
-		curValue -= amount;
-
-		if ( curValue < targetValue )
-			curValue = targetValue;
-	}
-	else if ( curValue < targetValue )
-	{
-		curValue += amount;
-
-		if ( curValue > targetValue )
-			curValue = targetValue;
-	}
-
-	return curValue;
-}
-
 CON_COMMAND( overview_zoom, "Sets overview map zoom: <zoom> [<time>] [rel]" )
 {
 	if ( !g_pMapOverview || args.ArgC() < 2 )
