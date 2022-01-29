@@ -223,27 +223,17 @@ void BindKey( const char *pchBind, bool bShow, const char *pchCmd )
 
 CON_COMMAND_F( bind, "Bind a key.", FCVAR_DONTRECORD )
 {
-	int i, c;
 	char cmd[1024];
-	
-	c = args.ArgC();
+	int c = args.ArgC();
 
 	if ( c != 2 && c != 3 )
 	{
 		ConMsg( "bind <key> [command] : attach a command to a key\n" );
 		return;
 	}
-	
-	// copy the rest of the command line
-	cmd[0] = 0;		// start out with a null string
-	for ( i=2 ; i< c ; i++ )
-	{
-		if (i > 2)
-		{
-			Q_strncat( cmd, " ", sizeof( cmd ), COPY_ALL_CHARACTERS );
-		}
-		Q_strncat( cmd, args[i], sizeof( cmd ), COPY_ALL_CHARACTERS );
-	}
+
+	// dimhotepus: Single iteration, no space.
+	Q_strncpy( cmd, args[2], sizeof(cmd) );
 
 	BindKey( args[1], c == 2, cmd );
 }
