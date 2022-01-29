@@ -1299,7 +1299,8 @@ public:
 		
 		crossHairMsg.m_Angle.x = pitch;
 		crossHairMsg.m_Angle.y = yaw;
-		crossHairMsg.m_Angle.y = 0;
+		// Correctly set crosshair viewangle z.
+		crossHairMsg.m_Angle.z = 0;
 		
 		client->SendNetMsg( crossHairMsg );
 	}
