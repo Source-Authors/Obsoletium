@@ -1298,7 +1298,8 @@ int CUtlBuffer::ParseToken( characterset_t *pBreaks, char *pTokenBuf, int nMaxLe
 		if ( !IsValid() )
 			break;
 
-		if ( IN_CHARACTERSET( *pBreaks, c ) || c == '\"' || c <= ' ' )
+		// dimhotepus: c > '\0' to support UTF-8.
+		if ( IN_CHARACTERSET( *pBreaks, c ) || c == '\"' || ( c > '\0' && c <= ' ') )
 		{
 			SeekGet( SEEK_CURRENT, -1 );
 			break;
