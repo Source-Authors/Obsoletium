@@ -43,7 +43,7 @@ class CSourceVirtualReality: public CTier3AppSystem< ISourceVirtualReality >
 public:
 
 	CSourceVirtualReality();
-	~CSourceVirtualReality();
+	~CSourceVirtualReality() = default;
 
 	//---------------------------------------------------------
 	// Initialization and shutdown

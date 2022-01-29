@@ -80,12 +80,10 @@ CSourceVirtualReality::CSourceVirtualReality()
 	m_textureGeneratorRight( vr::Eye_Right )
 {
 	m_bActive = false;
+	m_bShouldForceVRMode = false;
 	m_bUsingOffscreenRenderTarget = false;
 	m_pHmd = NULL;
-}
-
-CSourceVirtualReality::~CSourceVirtualReality()
-{
+	m_bHaveValidPose = false;
 }
 
 

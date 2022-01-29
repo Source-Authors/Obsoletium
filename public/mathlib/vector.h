@@ -374,7 +374,7 @@ class ALIGN16 VectorAligned : public CAlignedNewDelete<16, Vector>
 {
 public:
   inline VectorAligned() = default;
-	inline VectorAligned(vec_t X, vec_t Y, vec_t Z) 
+	inline VectorAligned(vec_t X, vec_t Y, vec_t Z)  //-V730
 	{
 		Init(X,Y,Z);
 	}
@@ -388,7 +388,7 @@ private:
 
 #else
 public:
-	explicit VectorAligned(const Vector &vOther) 
+	explicit VectorAligned(const Vector &vOther)  //-V730
 	{
 		Init(vOther.x, vOther.y, vOther.z);
 	}
@@ -500,7 +500,7 @@ float RandomVectorInUnitCircle( Vector2D *pVector );
 //-----------------------------------------------------------------------------
 // constructors
 //-----------------------------------------------------------------------------
-inline Vector::Vector(void)									
+inline Vector::Vector(void)									 //-V730
 { 
 #ifdef _DEBUG
 #ifdef VECTOR_PARANOIA
@@ -1542,7 +1542,7 @@ class RadianEuler;
 class Quaternion				// same data-layout as engine's vec4_t,
 {								//		which is a vec_t[4]
 public:
-	inline Quaternion(void)	{ 
+	inline Quaternion(void)	{  //-V730
 	
 	// Initialize to NAN to catch errors
 #ifdef _DEBUG
@@ -1688,7 +1688,7 @@ extern void QuaternionAngles( Quaternion const &q, RadianEuler &angles );
 
 FORCEINLINE void NetworkVarConstruct( Quaternion &q ) { q.x = q.y = q.z = q.w = 0.0f; }
 
-inline Quaternion::Quaternion(RadianEuler const &angle)
+inline Quaternion::Quaternion(RadianEuler const &angle) //-V730
 {
 	AngleQuaternion( angle, *this );
 }
@@ -1707,7 +1707,7 @@ inline void Quaternion::Invalidate()
 //#endif
 }
 
-inline RadianEuler::RadianEuler(Quaternion const &q)
+inline RadianEuler::RadianEuler(Quaternion const &q) //-V730
 {
 	QuaternionAngles( q, *this );
 }
@@ -1872,7 +1872,7 @@ inline void VectorMA( const QAngle &start, float scale, const QAngle &direction,
 //-----------------------------------------------------------------------------
 // constructors
 //-----------------------------------------------------------------------------
-inline QAngle::QAngle(void)									
+inline QAngle::QAngle(void)									 //-V730
 { 
 #ifdef _DEBUG
 #ifdef VECTOR_PARANOIA
