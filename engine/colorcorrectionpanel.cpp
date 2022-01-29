@@ -5344,7 +5344,7 @@ void CColorCorrectionTools::GrabPreColorCorrectedFrame( int x, int y, int width,
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 
 	Rect_t srcRect;
-	srcRect.x = y; srcRect.y = y;
+	srcRect.x = x; srcRect.y = y;
 	srcRect.width = width; srcRect.height = height;
 
 	Rect_t dstRect;
