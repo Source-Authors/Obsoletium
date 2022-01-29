@@ -335,6 +335,7 @@ int CMatLightmaps::AllocateLightmap( int width, int height,
 
 		// This assertion guarantees we don't see the same material twice in this loop.
 		Assert( pMaterial->GetMinLightmapPageID( ) > pMaterial->GetMaxLightmapPageID() );
+		Assert( GetCurrentMaterialInternal() );
 
 		// NOTE: We may not use this lightmap page, but we might
 		// we won't know for sure until the next material is passed in.
@@ -867,7 +868,7 @@ void CMatLightmaps::BumpedLightmapBitsToPixelWriter_HDRF( float* pFloatImage, fl
 
 			m_LightmapPixelWriter.SkipBytes( nLightmap0WriterSizeBytes );
 			m_LightmapPixelWriter.WritePixelNoAdvanceF( pFloatImageBump1[srcTexelOffset], pFloatImageBump1[srcTexelOffset+1],
-				pFloatImageBump1[srcTexelOffset+2], pFloatImage[srcTexelOffset+3] );
+				pFloatImageBump1[srcTexelOffset+2], pFloatImage[srcTexelOffset+3] ); //-V778
 
 			m_LightmapPixelWriter.SkipBytes( nLightmap0WriterSizeBytes );
 			m_LightmapPixelWriter.WritePixelNoAdvanceF( pFloatImageBump2[srcTexelOffset], pFloatImageBump2[srcTexelOffset+1],
@@ -1928,7 +1929,7 @@ void CMatLightmaps::EndUpdateLightmaps( void )
 int CMatLightmaps::AllocateDynamicLightmap( int lightmapSize[2], int *pOutOffsetIntoPage, int frameID )
 {
 	// check frameID, fail if current
-	for ( int i = 0; i < COUNT_DYNAMIC_LIGHTMAP_PAGES; i++ )
+	for ( int i = 0; i < COUNT_DYNAMIC_LIGHTMAP_PAGES; i++ ) //-V1008
 	{
 		int dynamicIndex = (m_dynamic.currentDynamicIndex + i) % COUNT_DYNAMIC_LIGHTMAP_PAGES; //-V1063
 		int lightmapPageIndex = m_firstDynamicLightmap + dynamicIndex;

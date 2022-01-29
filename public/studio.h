@@ -2902,7 +2902,7 @@ inline const mstudioflexcontroller_t *mstudioflexcontrollerui_t::pController( in
 	if ( remaptype == FLEXCONTROLLER_REMAP_NWAY )
 	{
 		if ( stereo )
-			return (mstudioflexcontroller_t *)( ( char * ) this ) + *( &szindex0 + index );
+			return (mstudioflexcontroller_t *)( ( char * ) this ) + *( &szindex0 + index ); //-V650
 
 		if ( index == 0 )
 			return pController();
@@ -2917,7 +2917,7 @@ inline const mstudioflexcontroller_t *mstudioflexcontrollerui_t::pController( in
 		return NULL;
 
 	if ( stereo )
-		return (mstudioflexcontroller_t *)( ( char * ) this ) + *( &szindex0 + index );
+		return (mstudioflexcontroller_t *)( ( char * ) this ) + *( &szindex0 + index ); //-V650
 
 	if ( index > 0 )
 		return NULL;

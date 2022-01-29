@@ -180,73 +180,6 @@ static int  ComputeMipSkipCount( const char* pName, const TexDimensions_t& mappi
 static int  GetOptimalReadBuffer( CUtlBuffer *pOutOptimalBuffer, FileHandle_t hFile, int nFileSize );
 static void FreeOptimalReadBuffer( int nMaxSize );
 
-//-----------------------------------------------------------------------------
-// Use Warning to show texture flags.
-//-----------------------------------------------------------------------------
-static void PrintFlags( unsigned int flags )
-{
-	if ( flags & TEXTUREFLAGS_NOMIP )
-	{
-		Warning( "TEXTUREFLAGS_NOMIP|" );
-	}
-	if ( flags & TEXTUREFLAGS_NOLOD )
-	{
-		Warning( "TEXTUREFLAGS_NOLOD|" );
-	}
-	if ( flags & TEXTUREFLAGS_SRGB )
-	{
-		Warning( "TEXTUREFLAGS_SRGB|" );
-	}
-	if ( flags & TEXTUREFLAGS_POINTSAMPLE )
-	{
-		Warning( "TEXTUREFLAGS_POINTSAMPLE|" );
-	}
-	if ( flags & TEXTUREFLAGS_TRILINEAR )
-	{
-		Warning( "TEXTUREFLAGS_TRILINEAR|" );
-	}
-	if ( flags & TEXTUREFLAGS_CLAMPS )
-	{
-		Warning( "TEXTUREFLAGS_CLAMPS|" );
-	}
-	if ( flags & TEXTUREFLAGS_CLAMPT )
-	{
-		Warning( "TEXTUREFLAGS_CLAMPT|" );
-	}
-	if ( flags & TEXTUREFLAGS_HINT_DXT5 )
-	{
-		Warning( "TEXTUREFLAGS_HINT_DXT5|" );
-	}
-	if ( flags & TEXTUREFLAGS_ANISOTROPIC )
-	{
-		Warning( "TEXTUREFLAGS_ANISOTROPIC|" );
-	}
-	if ( flags & TEXTUREFLAGS_PROCEDURAL )
-	{
-		Warning( "TEXTUREFLAGS_PROCEDURAL|" );
-	}
-	if ( flags & TEXTUREFLAGS_ALL_MIPS )
-	{
-		Warning( "TEXTUREFLAGS_ALL_MIPS|" );
-	}
-	if ( flags & TEXTUREFLAGS_SINGLECOPY )
-	{
-		Warning( "TEXTUREFLAGS_SINGLECOPY|" );
-	}
-	if ( flags & TEXTUREFLAGS_STAGING_MEMORY )
-	{
-		Warning( "TEXTUREFLAGS_STAGING_MEMORY|" );
-	}
-	if ( flags & TEXTUREFLAGS_IGNORE_PICMIP )
-	{
-		Warning( "TEXTUREFLAGS_IGNORE_PICMIP|" );
-	}
-	if ( flags & TEXTUREFLAGS_IMMEDIATE_CLEANUP )
-	{
-		Warning( "TEXTUREFLAGS_IMMEDIATE_CLEANUP|" );
-	}
-}
-
 
 namespace TextureLodOverride
 {
@@ -1640,7 +1573,7 @@ void CTexture::OnStreamingJobComplete( ResidencyType_t newResidenceCurrent )
 	{
 		if ( mat_lodin_time.GetFloat() > 0 )
 		{
-			m_lodBiasCurrent = m_lodBiasInitial = 1.0 * m_nStreamingMips;
+			m_lodBiasCurrent = m_lodBiasInitial = 1.0F * m_nStreamingMips;
 			m_lodBiasStartTime = Plat_FloatTime();
 		}
 		else
@@ -2141,7 +2074,6 @@ int CTexture::ComputeActualSize( bool bIgnorePicmip, IVTFTexture *pVTFTexture, b
 {
 	unsigned int stripFlags = 0;
 	return ComputeMipSkipCount( GetName(), m_dimsMapping, bIgnorePicmip, pVTFTexture, m_nFlags, m_nDesiredDimensionLimit, &m_nStreamingMips, &m_cachedFileLodSettings, &m_dimsActual, &m_dimsAllocated, &stripFlags );
-	Assert( stripFlags == 0 ); // Not necessarily illegal, just needs investigating. 
 }
 
 
@@ -3203,7 +3135,7 @@ bool CTexture::ConvertToActualFormat( IVTFTexture *pVTFTexture )
 		bConverted = true;
 	}
 	else if ( HardwareConfig()->GetHDRType() == HDR_TYPE_INTEGER &&
-		     fmt == dstFormat && dstFormat == IMAGE_FORMAT_RGBA16161616F )
+				dstFormat == IMAGE_FORMAT_RGBA16161616F )
 	{
 		// This is to force at most the precision of int16 for fp16 texture when running the integer path.
 		pVTFTexture->ConvertImageFormat( IMAGE_FORMAT_RGBA16161616, false );
@@ -3434,8 +3366,8 @@ void CTexture::ComputeMipLevelSubRect( const Rect_t* pSrcRect, int nMipLevel, Re
 	float flInvShrink = 1.0f / (float)(1 << nMipLevel);
 	pSubRect->x = pSrcRect->x * flInvShrink;
 	pSubRect->y = pSrcRect->y * flInvShrink;
-	pSubRect->width = (int)ceil( (pSrcRect->x + pSrcRect->width) * flInvShrink ) - pSubRect->x;
-	pSubRect->height = (int)ceil( (pSrcRect->y + pSrcRect->height) * flInvShrink ) - pSubRect->y;
+	pSubRect->width = (int)ceilf( (pSrcRect->x + pSrcRect->width) * flInvShrink ) - pSubRect->x;
+	pSubRect->height = (int)ceilf( (pSrcRect->y + pSrcRect->height) * flInvShrink ) - pSubRect->y;
 }
 
 
@@ -3476,11 +3408,6 @@ void CTexture::FixupTexture( const void *pData, int nSize, LoaderError_t loaderE
 
 	// Make sure we've actually allocated the texture handles
 	Assert( HasBeenAllocated() );
-} 
-
-static void QueuedLoaderCallback( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError )
-{
-	reinterpret_cast< CTexture * >( pContext )->FixupTexture( pData, nSize, loaderError );
 }
 
 //-----------------------------------------------------------------------------
@@ -4231,8 +4158,7 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 		( *pOptOutDimsMapping ) = dimsMappingCurrent;
 
 
-	int nFullFlags = ( *ppOutVtfTexture )->Flags() 
-		           | nFlags;
+	int nFullFlags = ( *ppOutVtfTexture )->Flags() | nFlags;
 
 	// Seek the reading back to the front of the buffer
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
@@ -4800,7 +4726,8 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 		Msg("mat_texture_list_txlod_sync reset : completed.\n");
 		return;
 	}
-	else if ( !stricmp( szCmd, "save" ) )
+	
+	if ( !stricmp( szCmd, "save" ) )
 	{
 		CP4Requirement p4req;
 		if ( !p4 )
@@ -4953,10 +4880,6 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 		Msg("mat_texture_list_txlod_sync save : completed.\n");
 		return;
 	}
-	else
-		goto usage;
-
-	return;
 
 usage:
 	Warning(

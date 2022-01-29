@@ -75,7 +75,7 @@ inline bool CShader_IsFlagSet( IMaterialVar **params, MaterialVarFlags_t _flag )
 #define IS_FLAG_SET( _flag )	CShader_IsFlagSet( params, _flag )
 #define IS_FLAG_DEFINED( _flag ) ((params[FLAGS_DEFINED]->GetIntValue() & (_flag) ) != 0)
 
-#define IS_PARAM_DEFINED( _param ) ( ( ( _param >= 0 ) && ( params[_param]->IsDefined() ) ) )
+#define IS_PARAM_DEFINED( _param ) ( ( ( (_param) >= 0 ) && ( params[(_param)]->IsDefined() ) ) )
 
 #define SET_PARAM_STRING_IF_NOT_DEFINED( nParamIndex, kDefaultValue )     \
 	if ( ( nParamIndex != -1 ) && ( !params[nParamIndex]->IsDefined() ) ) \

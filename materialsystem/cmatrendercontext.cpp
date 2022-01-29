@@ -57,7 +57,7 @@ void ValidateMatrices( const VMatrix &m1, const VMatrix &m2, float eps = .001 )
 
 	for ( int i = 0; i < 16; i++ )
 	{
-		AssertFloatEquals( m1.Base()[i], m1.Base()[i], eps );
+		AssertFloatEquals( m1.Base()[i], m2.Base()[i], eps );
 	}
 }
 
@@ -137,10 +137,7 @@ CMatRenderContextBase::CMatRenderContextBase() :
 
 	m_pLocalCubemapTexture = NULL;
 
-	for ( auto &t : m_pCurrentFrameBufferCopyTexture )
-	{
-		t = NULL;
-	}
+	memset( m_pCurrentFrameBufferCopyTexture, 0, sizeof(m_pCurrentFrameBufferCopyTexture) );
 
 	m_HeightClipMode = MATERIAL_HEIGHTCLIPMODE_DISABLE;	
 	m_HeightClipZ = 0.0f;
@@ -2006,14 +2003,7 @@ void CMatRenderContext::SetRenderTargetEx( int nRenderTargetID, ITexture *pNewTa
 				}
 			}
 
-			if( pNewTarget && pNewTarget->GetImageFormat() == IMAGE_FORMAT_RGBA16161616F )
-			{
-				g_pShaderAPI->EnableLinearColorSpaceFrameBuffer( true );
-			}
-			else
-			{
-				g_pShaderAPI->EnableLinearColorSpaceFrameBuffer( false );
-			}
+			g_pShaderAPI->EnableLinearColorSpaceFrameBuffer( pNewTarget->GetImageFormat() == IMAGE_FORMAT_RGBA16161616F );
 		}
 	}
 	CommitRenderTargetAndViewport();

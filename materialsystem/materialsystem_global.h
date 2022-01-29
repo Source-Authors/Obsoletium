@@ -45,8 +45,8 @@ class IMaterialVar;
 #define MAX_BLUR_IMAGE_WIDTH  256
 #define MAX_BLUR_IMAGE_HEIGHT 192
 
-#define CLAMP_BLUR_IMAGE_WIDTH( _w ) ( ( _w < MAX_BLUR_IMAGE_WIDTH ) ? _w : MAX_BLUR_IMAGE_WIDTH )
-#define CLAMP_BLUR_IMAGE_HEIGHT( _h ) ( ( _h < MAX_BLUR_IMAGE_HEIGHT ) ? _h : MAX_BLUR_IMAGE_HEIGHT )
+#define CLAMP_BLUR_IMAGE_WIDTH( _w ) ( ( (_w) < MAX_BLUR_IMAGE_WIDTH ) ? (_w) : MAX_BLUR_IMAGE_WIDTH )
+#define CLAMP_BLUR_IMAGE_HEIGHT( _h ) ( ( (_h) < MAX_BLUR_IMAGE_HEIGHT ) ? (_h) : MAX_BLUR_IMAGE_HEIGHT )
 
 //-----------------------------------------------------------------------------
 // Global structures

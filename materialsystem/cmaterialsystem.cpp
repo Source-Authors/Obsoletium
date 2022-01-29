@@ -2415,7 +2415,8 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	if ( config.bAllowCheats != g_config.bAllowCheats ||
 		config.skipMipLevels != g_config.skipMipLevels  ||
 		config.nShowMipLevels != g_config.nShowMipLevels  ||
-		((config.bCompressedTextures != g_config.bCompressedTextures) && HardwareConfig()->SupportsCompressedTextures())||
+		((config.bCompressedTextures != g_config.bCompressedTextures) &&
+			HardwareConfig() && HardwareConfig()->SupportsCompressedTextures())||
 		config.bShowLowResImage != g_config.bShowLowResImage 
 		)
 	{
@@ -5359,7 +5360,7 @@ IMaterialProxy *CMaterialSystem::DetermineProxyReplacements( IMaterial *pMateria
 						const char	*pszTemplateName = pSubKey->GetString( "template", NULL );
 						KeyValues	*pReplacementMaterial = NULL;
 
-						if ( pszTemplateName && pTemplatesKV )
+						if ( pszTemplateName )
 						{
 							KeyValues *pTemplateKV = pTemplatesKV->FindKey( pszTemplateName );
 							if ( pTemplateKV )

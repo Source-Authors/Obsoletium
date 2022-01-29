@@ -1489,13 +1489,13 @@ void CTextureManager::Init( int nFlags )
 	m_pGreyTexture = CreateProceduralTexture( "grey", TEXTURE_GROUP_OTHER,
 		GREY_TEXTURE_SIZE, GREY_TEXTURE_SIZE, 1, IMAGE_FORMAT_BGRA8888, TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_SINGLECOPY );
 	color.r = color.g = color.b = 128;
-	color.a = 255;
+	color.a = 255; //-V1048
 	CreateSolidTexture( m_pGreyTexture, color );
 
 	// Create a grey texture
 	m_pGreyAlphaZeroTexture = CreateProceduralTexture( "greyalphazero", TEXTURE_GROUP_OTHER,
 		GREY_TEXTURE_SIZE, GREY_TEXTURE_SIZE, 1, IMAGE_FORMAT_BGRA8888, TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_SINGLECOPY );
-	color.r = color.g = color.b = 128;
+	color.r = color.g = color.b = 128; //-V1048
 	color.a = 0;
 	CreateSolidTexture( m_pGreyAlphaZeroTexture, color );
 

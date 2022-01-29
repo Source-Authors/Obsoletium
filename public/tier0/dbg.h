@@ -697,6 +697,8 @@ public:
 	{ 
 		return Set( val.m_Value ); 
 	}
+
+	CDataWatcher<Type>( const CDataWatcher<Type> &val ) = delete;
 	
 	const Type& Set( const Type &val )
 	{

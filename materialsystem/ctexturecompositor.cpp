@@ -343,7 +343,6 @@ void ParseInverseRangeFromKV( KeyValues* _kv, void* _pDest )
 	else
 	{
 		Error( "Specified 0.0 for low value, that is illegal in this field. Substituting %.5f\n", kSubstValue );
-		( *realDest ).low = kSubstValue;
 	}
 
 	if ( realDest->high != 0.0f )
@@ -353,7 +352,6 @@ void ParseInverseRangeFromKV( KeyValues* _kv, void* _pDest )
 	else
 	{
 		Error( "Specified 0.0 for high value, that is illegal in this field. Substituting %.5f\n", kSubstValue );
-		( *realDest ).high = kSubstValue;
 	}
 }
 
@@ -504,11 +502,11 @@ protected:
 	virtual void RequestTextures()
 	{
 		if ( !m_Parameters.m_pTexFilename.IsEmpty() )
-			materials->AsyncFindTexture( m_Parameters.m_pTexFilename.Get(), TEXTURE_GROUP_RUNTIME_COMPOSITE, this, ( void* ) Neutral, false, TEXTUREFLAGS_IMMEDIATE_CLEANUP );
+			materials->AsyncFindTexture( m_Parameters.m_pTexFilename.Get(), TEXTURE_GROUP_RUNTIME_COMPOSITE, this, ( void* ) (intptr_t)Neutral, false, TEXTUREFLAGS_IMMEDIATE_CLEANUP );
 		if ( !m_Parameters.m_pTexRedFilename.IsEmpty() )
-			materials->AsyncFindTexture( m_Parameters.m_pTexRedFilename.Get(), TEXTURE_GROUP_RUNTIME_COMPOSITE, this, ( void* ) Red, false, TEXTUREFLAGS_IMMEDIATE_CLEANUP );
+			materials->AsyncFindTexture( m_Parameters.m_pTexRedFilename.Get(), TEXTURE_GROUP_RUNTIME_COMPOSITE, this, ( void* ) (intptr_t)Red, false, TEXTUREFLAGS_IMMEDIATE_CLEANUP );
 		if ( !m_Parameters.m_pTexBlueFilename.IsEmpty() )
-			materials->AsyncFindTexture( m_Parameters.m_pTexBlueFilename.Get(), TEXTURE_GROUP_RUNTIME_COMPOSITE, this, ( void* ) Blue, false, TEXTUREFLAGS_IMMEDIATE_CLEANUP );	
+			materials->AsyncFindTexture( m_Parameters.m_pTexBlueFilename.Get(), TEXTURE_GROUP_RUNTIME_COMPOSITE, this, ( void* ) (intptr_t)Blue, false, TEXTUREFLAGS_IMMEDIATE_CLEANUP );	
 	}
 
 	virtual void ResolveThis( CTextureCompositor* _comp )
@@ -1099,10 +1097,10 @@ protected:
 	virtual void RequestTextures()
 	{
 		if ( !m_Parameters.m_possibleStickers[ m_nChoice ].m_baseFilename.IsEmpty() )
-			materials->AsyncFindTexture( m_Parameters.m_possibleStickers[ m_nChoice ].m_baseFilename.Get(), TEXTURE_GROUP_RUNTIME_COMPOSITE, this, ( void* ) Albedo, false, TEXTUREFLAGS_IMMEDIATE_CLEANUP );
+			materials->AsyncFindTexture( m_Parameters.m_possibleStickers[ m_nChoice ].m_baseFilename.Get(), TEXTURE_GROUP_RUNTIME_COMPOSITE, this, ( void* ) (intptr_t)Albedo, false, TEXTUREFLAGS_IMMEDIATE_CLEANUP );
 
 		if ( !m_Parameters.m_possibleStickers[ m_nChoice ].m_specFilename.IsEmpty() )
-			materials->AsyncFindTexture( m_Parameters.m_possibleStickers[ m_nChoice ].m_specFilename.Get(), TEXTURE_GROUP_RUNTIME_COMPOSITE, this, ( void* ) Specular, false, TEXTUREFLAGS_IMMEDIATE_CLEANUP );	
+			materials->AsyncFindTexture( m_Parameters.m_possibleStickers[ m_nChoice ].m_specFilename.Get(), TEXTURE_GROUP_RUNTIME_COMPOSITE, this, ( void* ) (intptr_t)Specular, false, TEXTUREFLAGS_IMMEDIATE_CLEANUP );	
 	}
 
 	virtual void ResolveThis( CTextureCompositor* _comp )

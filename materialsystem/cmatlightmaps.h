@@ -158,7 +158,7 @@ private:
 			lightmapLocked = -1;
 			frameID = 0;
 			currentDynamicIndex = 0;
-			for ( int i = 0; i < COUNT_DYNAMIC_LIGHTMAP_PAGES; i++ )
+			for ( int i = 0; i < COUNT_DYNAMIC_LIGHTMAP_PAGES; i++ ) //-V1008
 			{
 				lightmapLockFrame[i] = 0;
 			}

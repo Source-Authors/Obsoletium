@@ -2172,7 +2172,7 @@ public:
 	virtual IMatRenderContext *SetRenderContext( IMatRenderContext *pContext )
 	{
 		SafeRelease( pContext );
-		return RetAddRef( this );
+		return RetAddRef( (IMatRenderContext *)this );
 	}
 	virtual IVertexBuffer *		GetDynamicVertexBuffer( /*VertexFormat_t vertexFormat, */bool buffered = true )
 	{
