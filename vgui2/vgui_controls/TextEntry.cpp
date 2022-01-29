@@ -2120,7 +2120,7 @@ void TextEntry::OnCreateDragData( KeyValues *msg )
 	{
 		int len = r1 - r0;
 		// dimhotepus: Prevent out of txt range read.
-		if ( len > 0 && r0 < std::size(txt) )
+		if ( len > 0 && r0 < (int)std::size(txt) )
 		{
 			char selection[ 512 ];
 			Q_strncpy( selection, &txt[ r0 ], len + 1 );
