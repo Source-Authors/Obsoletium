@@ -1752,7 +1752,8 @@ CON_COMMAND_F( soundfade, "Fade client volume.", FCVAR_SERVER_CAN_EXECUTE )
 		inTime = max( 0.F, strtof( args[4],nullptr) );
 	}
 
-	S_SoundFade( percent, holdTime, outTime, inTime );
+	// dimhotepus: Fix sound fade params.
+	S_SoundFade( percent, holdTime, inTime, outTime );
 }
 
 #endif // !SWDS
