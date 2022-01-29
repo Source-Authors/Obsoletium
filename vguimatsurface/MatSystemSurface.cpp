@@ -183,6 +183,21 @@ VPANEL CMatEmbeddedPanel::IsWithinTraverse(int x, int y, bool traversePopups)
 //-----------------------------------------------------------------------------
 CMatSystemSurface::CMatSystemSurface() : m_pEmbeddedPanel(NULL), m_pWhite(NULL)
 {
+	m_nTranslateX = m_nTranslateY = 0;
+	m_flAlphaMultiplier = -1;
+	memset( m_pSurfaceExtents, 0, sizeof(m_pSurfaceExtents) );
+	memset( m_DrawColor, 0, sizeof(m_DrawColor) );
+	memset( m_DrawTextColor, 0, sizeof(m_DrawTextColor) );
+	memset( m_pDrawTextPos, 0, sizeof(m_pDrawTextPos) );
+	m_pMesh = nullptr;
+
+	m_nFullScreenBufferMaterialId = -1;
+	m_bUsingTempFullScreenBufferMaterial = false;
+
+	m_pDefaultEmbeddedPanel = nullptr;
+
+	m_cursorAlwaysVisible = false;
+
 	m_iBoundTexture = -1; 
 	m_HWnd = NULL; 
 	m_bIn3DPaintMode = false;
@@ -199,8 +214,6 @@ CMatSystemSurface::CMatSystemSurface() : m_pEmbeddedPanel(NULL), m_pWhite(NULL)
 
 	m_bNeedsKeyboard = true;
 	m_bNeedsMouse = true;
-	m_bUsingTempFullScreenBufferMaterial = false;
-	m_nFullScreenBufferMaterialId = -1;
 
 	memset( m_WorkSpaceInsets, 0, sizeof( m_WorkSpaceInsets ) );
 	m_nBatchedCharVertCount = 0;
@@ -208,8 +221,6 @@ CMatSystemSurface::CMatSystemSurface() : m_pEmbeddedPanel(NULL), m_pWhite(NULL)
 	m_nFullscreenViewportX = m_nFullscreenViewportY = 0;
 	m_nFullscreenViewportWidth = m_nFullscreenViewportHeight = 0;
 	m_pFullscreenRenderTarget = NULL;
-
-	m_cursorAlwaysVisible = false;
 }
 
 CMatSystemSurface::~CMatSystemSurface()
@@ -2465,7 +2476,7 @@ void CMatSystemSurface::DrawPrintText(const wchar_t *text, int iTextLen, FontDra
 			lr.m_TexCoord[1] = texCoords[3];
 		}
 
-		iTotalWidth += floorf(flWide+0.6f);
+		iTotalWidth += static_cast<int>(floorf(flWide+0.6f));
 	}
 
 	// Draw any left-over characters

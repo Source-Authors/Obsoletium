@@ -42,7 +42,7 @@ const char* ParseFileInternal( const char* pFileBytes, char* pTokenOut, bool* pW
 	static bool com_ignorecolons = false;  
 	characterset_t& breaks = pCharSet ? *pCharSet : (com_ignorecolons ? g_BreakSet : g_BreakSetIncludingColons);
 	
-	int c;
+	char c;
 	unsigned int len = 0;
 	
 // skip whitespace

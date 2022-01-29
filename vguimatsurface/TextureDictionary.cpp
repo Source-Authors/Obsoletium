@@ -470,8 +470,8 @@ void CMatSystemTexture::SetTextureRGBA( const char *rgba, int wide, int tall, Im
 		m_iInputWide = wide;
 		if ( bFixupTextCoords && ( wide != width || tall != height ) )
 		{
-			m_s1 = (double)wide / width;
-			m_t1 = (double)tall / height;
+			m_s1 = (float)wide / width;
+			m_t1 = (float)tall / height;
 		}
 
 		// undo the extra +1 refCount
@@ -644,8 +644,8 @@ void CMatSystemTexture::SetMaterial( IMaterial *pMaterial )
 	m_t0 = flPixelCenterY;
 
 	// FIXME: Old code used +, it should be - yes?!??!
-	m_s1 = 1.0 - flPixelCenterX;
-	m_t1 = 1.0 - flPixelCenterY;
+	m_s1 = 1.0F - flPixelCenterX;
+	m_t1 = 1.0F - flPixelCenterY;
 
 	if ( IsProcedural() )
 	{
@@ -975,7 +975,7 @@ CMatSystemTexture *CTextureDictionary::GetTexture( int id )
 //-----------------------------------------------------------------------------
 int	CTextureDictionary::FindTextureIdForTextureFile( char const *pFileName )
 {
-	for ( int i = m_Textures.Head(); i != m_Textures.InvalidIndex(); i = m_Textures.Next( i ) )
+	for ( auto i = m_Textures.Head(); i != m_Textures.InvalidIndex(); i = m_Textures.Next( i ) )
 	{
 		CMatSystemTexture *tex = &m_Textures[i];
 

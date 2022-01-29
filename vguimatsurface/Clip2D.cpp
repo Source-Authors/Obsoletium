@@ -398,25 +398,25 @@ bool ClipRect( const vgui::Vertex_t &inUL, const vgui::Vertex_t &inLR,
 	{
 		// Pick whichever left side is larger
 		if (g_ScissorRect.left > inUL.m_Position.x)
-			pOutUL->m_Position.x = g_ScissorRect.left;
+			pOutUL->m_Position.x = static_cast<float>(g_ScissorRect.left);
 		else
 			pOutUL->m_Position.x = inUL.m_Position.x;
 
 		// Pick whichever right side is smaller
 		if (g_ScissorRect.right <= inLR.m_Position.x)
-			pOutLR->m_Position.x = g_ScissorRect.right;
+			pOutLR->m_Position.x = static_cast<float>(g_ScissorRect.right);
 		else
 			pOutLR->m_Position.x = inLR.m_Position.x;
 
 		// Pick whichever top side is larger
 		if (g_ScissorRect.top > inUL.m_Position.y)
-			pOutUL->m_Position.y = g_ScissorRect.top;
+			pOutUL->m_Position.y = static_cast<float>(g_ScissorRect.top);
 		else
 			pOutUL->m_Position.y = inUL.m_Position.y;
 
 		// Pick whichever bottom side is smaller
 		if (g_ScissorRect.bottom <= inLR.m_Position.y)
-			pOutLR->m_Position.y = g_ScissorRect.bottom;
+			pOutLR->m_Position.y = static_cast<float>(g_ScissorRect.bottom);
 		else
 			pOutLR->m_Position.y = inLR.m_Position.y;
 

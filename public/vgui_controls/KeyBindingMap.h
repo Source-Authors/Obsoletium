@@ -52,6 +52,7 @@ struct KeyBindingMap_t
 {
 	KeyBindingMap_t();
 	KeyBindingMap_t( const KeyBindingMap_t& src );
+	KeyBindingMap_t& operator=( const KeyBindingMap_t& src ) = delete;
 	~KeyBindingMap_t();
 
 	char const				*bindingname; // for the script file

@@ -29,9 +29,9 @@ public:
 	{
 		SetPoint(0, 0);
 	}
-	Point(int x,int y)
+	Point(int x1,int y1)
 	{
-		SetPoint(x,y);
+		SetPoint(x1,y1);
 	}
 
 	void SetPoint(int x1, int y1)

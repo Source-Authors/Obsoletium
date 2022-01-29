@@ -211,7 +211,7 @@ int InitSoftwareCursorTexture( const char *pchFilename )
 	if( nTextureID == -1 )
 	{
 		nTextureID = g_MatSystemSurface.CreateNewTextureID();
-		g_MatSystemSurface.DrawSetTextureFile( nTextureID, pchFilename, true, false );
+		g_MatSystemSurface.DrawSetTextureFile( nTextureID, pchFilename, 1, false );
 	}
 	return nTextureID;
 }

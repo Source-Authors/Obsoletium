@@ -66,13 +66,6 @@ CFontTextureCache::CFontTextureCache()
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Destructor
-//-----------------------------------------------------------------------------
-CFontTextureCache::~CFontTextureCache()
-{
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Resets the cache
 //-----------------------------------------------------------------------------
 void CFontTextureCache::Clear()
@@ -485,7 +478,7 @@ bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, int &pag
 
 		pTexture->DecrementReferenceCount();
 
-		if ( IsPC() || !IsDebug() )
+		if constexpr ( IsPC() || !IsDebug() )
 		{
 			// clear the texture from the inital checkerboard to black
 			// allocate for 32bpp format
@@ -494,7 +487,7 @@ bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, int &pag
 			Q_memset( pRGBA, 0, nByteCount );
 
 			int typePageNonAdditive = (int)(vgui::FONT_DRAW_NONADDITIVE)-1;
-			g_MatSystemSurface.DrawSetTextureRGBA( newPage.textureID[typePageNonAdditive], pRGBA, newPage.wide, newPage.tall, false, false );
+			g_MatSystemSurface.DrawSetTextureRGBA( newPage.textureID[typePageNonAdditive], pRGBA, newPage.wide, newPage.tall, 0, false );
 		}
 	}
 

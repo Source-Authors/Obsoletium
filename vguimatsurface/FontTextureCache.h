@@ -25,7 +25,7 @@ class CFontTextureCache
 {
 public:
 	CFontTextureCache();
-	~CFontTextureCache();
+	~CFontTextureCache() = default;
 
 	// returns a texture ID and a pointer to an array of 4 texture coords for the given character & font
 	// generates+uploads more texture if necessary

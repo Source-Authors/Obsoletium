@@ -164,7 +164,7 @@ void MemoryBitmap::ForceUpload(unsigned char *texture,int wide, int tall)
 		m_iTextureID = g_MatSystemSurface.CreateNewTextureID( true );
 	}
 
-	g_MatSystemSurface.DrawSetTextureRGBA( m_iTextureID, texture, wide, tall, true, true );
+	g_MatSystemSurface.DrawSetTextureRGBA( m_iTextureID, texture, wide, tall, 1, true );
 
 	_uploaded = true;
 	_valid = g_MatSystemSurface.IsTextureIDValid(m_iTextureID);

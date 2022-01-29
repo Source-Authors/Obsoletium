@@ -264,6 +264,8 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 			case IMN_SETSTATUSWINDOWPOS:   
 				break;
 			}
+			// dimhotepus: Add missed break.
+			break;
 		}
 
 	case WM_IME_SETCONTEXT:

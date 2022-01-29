@@ -274,6 +274,7 @@ private:
 		{
 			m_bVisible = false;
 			m_nMax = m_nScroll = 0;
+			m_flZoom = 0;
 		}
 
 		bool operator==( ScrollData_t const &src ) const
@@ -305,7 +306,7 @@ private:
 	struct CustomCursorCache_t
 	{
 		CustomCursorCache_t() = default;
-		CustomCursorCache_t( const void *pchData ) { m_pchData = pchData; }
+		CustomCursorCache_t( const void *pchData ) : m_CacheTime(-1), m_Cursor(dc_no) { m_pchData = pchData; }
 		float m_CacheTime; // the time we cached the cursor
 		CursorCode m_Cursor; // the vgui handle to it
 		const void *m_pchData; // the pointer to the cursor char data so we can detect the same cursor being used
