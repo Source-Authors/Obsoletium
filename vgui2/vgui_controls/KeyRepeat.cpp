@@ -94,5 +94,6 @@ void CKeyRepeatHandler::SetKeyRepeatTime( vgui::KeyCode code, float flRepeat )
 {
 	int iIndex = GetIndexForCode(code);
 	Assert( iIndex != -1 );
-	m_flRepeatTimes[ iIndex ] = flRepeat;
+	if ( iIndex != -1 )
+		m_flRepeatTimes[ iIndex ] = flRepeat;
 }

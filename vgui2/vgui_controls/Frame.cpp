@@ -54,6 +54,7 @@ namespace
 			_dragging = false;
 			_dragMultX = xdir;
 			_dragMultY = ydir;
+			_marlettFont = INVALID_FONT;
 			SetPaintEnabled(false);
 			SetPaintBackgroundEnabled(false);
 			SetPaintBorderEnabled(false);
@@ -1611,7 +1612,6 @@ void Frame::PaintBackground()
 
 		surface()->DrawFilledRect(inset, inset, wide - inset, captionHeight );
 		
-		if (_title)
 		{
 			int nTitleX = m_iTitleTextInsetXOverride ? m_iTitleTextInsetXOverride : m_iTitleTextInsetX;
 			int nTitleWidth = wide - 72;

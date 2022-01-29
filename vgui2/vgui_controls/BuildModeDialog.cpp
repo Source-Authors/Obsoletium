@@ -766,10 +766,7 @@ void BuildModeDialog::SetActiveControl(Panel *controlToEdit)
 
 		HFont smallFont = scheme()->GetIScheme( GetScheme() )->GetFont( "DefaultVerySmall" );
 
-		if ( label )
-		{
-			label->SetFont( smallFont );
-		}
+		label->SetFont( smallFont );
 		if ( edit )
 		{
 			edit->SetFont( smallFont );
@@ -984,20 +981,20 @@ void BuildModeDialog::ApplyDataToControls()
 	KeyValues *dat = new KeyValues( m_pCurrentPanel->GetName() );
 
 	// loop through the textedit filling in settings
-	for ( int i = 0; i < m_pPanelList->m_PanelList.Size(); i++ )
+	for ( const auto &panel : m_pPanelList->m_PanelList )
 	{
-		const char *name = m_pPanelList->m_PanelList[i].m_szName;
+		const char *name = panel.m_szName;
 		char buf[512];
-		if (m_pPanelList->m_PanelList[i].m_EditPanel)
+		if (panel.m_EditPanel)
 		{
-			m_pPanelList->m_PanelList[i].m_EditPanel->GetText(buf, sizeof(buf));
+			panel.m_EditPanel->GetText(buf, sizeof(buf));
 		}
 		else
 		{
-			m_pPanelList->m_PanelList[i].m_EditButton->GetText(buf, sizeof(buf));
+			panel.m_EditButton->GetText(buf, sizeof(buf));
 		}
 
-		switch (m_pPanelList->m_PanelList[i].m_iType)
+		switch (panel.m_iType)
 		{
 		case TYPE_CORNER:
 		case TYPE_AUTORESIZE:
@@ -1108,20 +1105,20 @@ KeyValues *BuildModeDialog::StoreSettings()
 	storedSettings = new KeyValues( m_pCurrentPanel->GetName() );
 
 	// loop through the textedit filling in settings
-	for ( int i = 0; i < m_pPanelList->m_PanelList.Size(); i++ )
+	for ( const auto &panel : m_pPanelList->m_PanelList )
 	{
-		const char *name = m_pPanelList->m_PanelList[i].m_szName;
+		const char *name = panel.m_szName;
 		char buf[512];
-		if (m_pPanelList->m_PanelList[i].m_EditPanel)
+		if (panel.m_EditPanel)
 		{
-			m_pPanelList->m_PanelList[i].m_EditPanel->GetText(buf, sizeof(buf));
+			panel.m_EditPanel->GetText(buf, sizeof(buf));
 		}
 		else
 		{
-			m_pPanelList->m_PanelList[i].m_EditButton->GetText(buf, sizeof(buf));
+			panel.m_EditButton->GetText(buf, sizeof(buf));
 		}
 
-		switch (m_pPanelList->m_PanelList[i].m_iType)
+		switch (panel.m_iType)
 		{
 		case TYPE_CORNER:
 		case TYPE_AUTORESIZE:

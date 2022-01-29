@@ -37,6 +37,8 @@ static int s_iTooltipWindowCount = 0;
 //-----------------------------------------------------------------------------
 BaseTooltip::BaseTooltip(Panel *parent, const char *text) 
 {
+	// dimhotepus: Tooltip has parent.
+	m_pParent = parent;
 	SetText(text);
 
 	_displayOnOneLine = false;
@@ -151,9 +153,10 @@ void BaseTooltip::SetText(const char *text)
 		m_Text.RemoveAll();
 	}
 
-	for (unsigned int i = 0; i < strlen(text); i++)
+	while (*text)
 	{
-		m_Text.AddToTail(text[i]);
+		m_Text.AddToTail(*text);
+		++text;
 	}
 	m_Text.AddToTail('\0');
 	
@@ -373,8 +376,9 @@ void TextTooltip::SizeTextWindow()
 		s_TooltipWindow->SetToFullWidth();
 		int wide, tall;
 		s_TooltipWindow->GetSize( wide, tall );
-		double newWide = sqrt( (2.0/1) * wide * tall );
-		double newTall = (1/2) * newWide;
+		float newWide = sqrtf( (2.0F/1) * wide * tall );
+		// dimhotepus: Fix newTall computation.
+		float newTall = (1/2.0F) * newWide;
 		s_TooltipWindow->SetMultiline(true);
 		s_TooltipWindow->SetSize((int)newWide, (int)newTall );
 		s_TooltipWindow->SetToFullHeight();

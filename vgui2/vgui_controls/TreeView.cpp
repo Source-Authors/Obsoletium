@@ -1983,14 +1983,15 @@ void TreeView::RemoveItem(int itemIndex, bool bPromoteChildren, bool bFullDelete
 
     // finally get rid of ourselves from the main list
     m_NodeList.Remove(itemIndex);
+
+	// Make sure we don't leave ourselves with an invalid selected item.
+	m_SelectedItems.FindAndRemove( pNode );
 	
+	// dimhotepus: First FindAndRemove node, then delete it.
 	if ( bFullDelete )
 		delete pNode;
 	else
 		pNode->MarkForDeletion();
-    
-	// Make sure we don't leave ourselves with an invalid selected item.
-	m_SelectedItems.FindAndRemove( pNode );
 }
 
 //-----------------------------------------------------------------------------

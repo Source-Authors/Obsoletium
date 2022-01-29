@@ -473,7 +473,7 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 	bool bNormalBuild = true;
 
 	// if there is a space in the text, and the command isn't of the type to know how to autocomplet, then command completion is over
-	const char *space = strstr( text, " " );
+	const char *space = strchr( text, ' ' );
 	if ( space )
 	{
 		ConCommand *pCommand = FindAutoCompleteCommmandFromPartial( text );

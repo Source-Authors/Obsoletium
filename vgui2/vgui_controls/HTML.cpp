@@ -373,12 +373,12 @@ void HTML::PostURL(const char *URL, const char *pchPostData, bool force)
 
 	if ( IsSteamInOfflineMode() && !force )
 	{
+		char otherName[128];
 		const char *baseDir = getenv("HTML_OFFLINE_DIR");
 		if ( baseDir )
 		{
 			// get the app we need to run
 			char htmlLocation[_MAX_PATH];
-			char otherName[128];
 			char fileLocation[_MAX_PATH];
 
 			if ( ! g_pFullFileSystem->FileExists( baseDir ) ) 
@@ -1116,9 +1116,11 @@ void HTML::OnCommand( const char *pchCommand )
 //-----------------------------------------------------------------------------
 void HTML::OnFileSelected( const char *pchSelectedFile )
 {
-	const char *ppchSelectedFiles[] = { pchSelectedFile, NULL };
 	if (m_SteamAPIContext.SteamHTMLSurface())
+	{
+		const char *ppchSelectedFiles[] = { pchSelectedFile, NULL };
 		m_SteamAPIContext.SteamHTMLSurface()->FileLoadDialogResponse( m_unBrowserHandle , ppchSelectedFiles );
+	}
 
 	m_hFileOpenDialog->Close();
 }

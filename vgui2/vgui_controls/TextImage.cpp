@@ -36,20 +36,19 @@ TextImage::TextImage(const char *text) : Image()
 {
 	_utext = NULL;
 	_textBufferLen = 0;
+	_textLen = 0;
 	_font = INVALID_FONT; 
 	_fallbackFont = INVALID_FONT;
 	_unlocalizedTextSymbol = INVALID_LOCALIZE_STRING_INDEX;
 	_drawWidth = 0;
-	_textBufferLen = 0;
-	_textLen = 0;
-	m_bWrap = false;
-	m_bWrapCenter = false;
-	m_LineBreaks.RemoveAll();
-	m_LineXIndent.RemoveAll();
 	m_pwszEllipsesPosition = NULL;
+	m_bWrap = false;
 	m_bUseFallbackFont = false;
 	m_bRenderUsingFallbackFont = false;
 	m_bAllCaps = false;
+	m_bWrapCenter = false;
+	m_LineBreaks.RemoveAll();
+	m_LineXIndent.RemoveAll();
 	
 	SetText(text); // set the text.
 }
@@ -60,13 +59,13 @@ TextImage::TextImage(const char *text) : Image()
 TextImage::TextImage(const wchar_t *wszText) : Image()
 {
 	_utext = NULL;
-	_textBufferLen = 0;
+  _textBufferLen = 0;
+	_textLen = 0;
 	_font = INVALID_FONT;
 	_fallbackFont = INVALID_FONT;
 	_unlocalizedTextSymbol = INVALID_LOCALIZE_STRING_INDEX;
+	m_pwszEllipsesPosition = 0;
 	_drawWidth = 0;
-	_textBufferLen = 0;
-	_textLen = 0;
 	m_bWrap = false;
 	m_bWrapCenter = false;
 	m_LineBreaks.RemoveAll();

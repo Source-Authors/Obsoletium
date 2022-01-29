@@ -550,9 +550,8 @@ int TextEntry::DrawChar(wchar_t ch, HFont font, int index, int x, int y)
 	{
 		// draw selection, if any
 		int selection0 = -1, selection1 = -1;
-		GetSelectedRange(selection0, selection1);
-		
-		if (index >= selection0 && index < selection1)
+		// dimhotepus: Check range is selected.
+		if (GetSelectedRange(selection0, selection1) && index >= selection0 && index < selection1)
 		{
 			// draw background selection color
             VPANEL focus = input()->GetFocus();
@@ -711,7 +710,7 @@ void TextEntry::PaintBackground()
 	int nCompEnd = -1;
 
 	// FIXME: Should insert at cursor pos instead
-	bool composing = m_bAllowNonAsciiCharacters && wcslen( m_szComposition ) > 0;
+	bool composing = m_bAllowNonAsciiCharacters && m_szComposition[0];
 	bool invertcomposition = input()->GetShouldInvertCompositionString();
 
 	if ( composing )
@@ -1277,8 +1276,7 @@ Menu * TextEntry::GetEditMenu()
 void TextEntry::CreateEditMenu()
 {	
 	// create a drop down cut/copy/paste menu appropriate for this object's states
-	if (m_pEditMenu)
-		delete m_pEditMenu;
+	delete m_pEditMenu;
 	m_pEditMenu = new Menu(this, "EditMenu");
 	
 	m_pEditMenu->SetFont( _font );
@@ -1373,8 +1371,9 @@ void TextEntry::CreateEditMenu()
 
 			for ( int i = 0; i < count; ++i )
 			{
-				int id = subMenu->AddCheckableMenuItem( "SentenceMode", UnlocalizeUnicode( sentencemodes[ i ].menuname ), new KeyValues( "DoConversionModeChanged", "handle", modes[ i ].handleValue ), this );
-				if ( modes[ i ].active )
+				// dimhotepus: modes -> sentencemodes.
+				int id = subMenu->AddCheckableMenuItem( "SentenceMode", UnlocalizeUnicode( sentencemodes[ i ].menuname ), new KeyValues( "DoConversionModeChanged", "handle", sentencemodes[ i ].handleValue ), this );
+				if ( sentencemodes[ i ].active )
 				{
 					subMenu->SetMenuItemChecked( id, true );
 				}
@@ -2120,7 +2119,8 @@ void TextEntry::OnCreateDragData( KeyValues *msg )
 	if ( GetSelectedRange( r0, r1 ) && r0 != r1 )
 	{
 		int len = r1 - r0;
-		if ( len > 0 && r0 < 1024 )
+		// dimhotepus: Prevent out of txt range read.
+		if ( len > 0 && r0 < std::size(txt) )
 		{
 			char selection[ 512 ];
 			Q_strncpy( selection, &txt[ r0 ], len + 1 );
@@ -2800,7 +2800,8 @@ int TextEntry::GetCurrentLineEnd()
 		if (!_cursorIsAtEnd)
 		{
 			if (i == m_LineBreaks.Count()-2 )
-				m_TextStream.Count();		
+				// dimhotepus: Add missed return.
+				return m_TextStream.Count();
 			else
 				return m_LineBreaks[i+1];
 		}

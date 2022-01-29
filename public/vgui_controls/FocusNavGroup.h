@@ -27,7 +27,7 @@ class FocusNavGroup
 {
 public:
 	FocusNavGroup(Panel *panel);
-	~FocusNavGroup();
+	~FocusNavGroup() = default;
 	virtual Panel *GetDefaultPanel();	// returns a pointer to the panel with the default focus
 
 	virtual void SetDefaultButton(Panel *panel);	// sets which panel should receive input when ENTER is hit

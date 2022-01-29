@@ -111,10 +111,7 @@ COperationFileListFrame::~COperationFileListFrame()
 {
 	SaveUserConfig();
 	CleanUpMessage();
-	if ( m_pText )
-	{
-		delete[] m_pText;
-	}
+	delete[] m_pText;
 }
 
 

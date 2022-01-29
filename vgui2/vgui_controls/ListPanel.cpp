@@ -739,9 +739,10 @@ void ListPanel::SetColumnHeaderImage(int column, int imageListIndex)
 //-----------------------------------------------------------------------------
 void ListPanel::SetColumnHeaderTooltip(int column, const char *tooltipText)
 {
-	m_ColumnsData[m_CurrentColumns[column]].m_pHeader->GetTooltip()->SetText(tooltipText);
-	m_ColumnsData[m_CurrentColumns[column]].m_pHeader->GetTooltip()->SetTooltipFormatToSingleLine();
-	m_ColumnsData[m_CurrentColumns[column]].m_pHeader->GetTooltip()->SetTooltipDelay(0);
+	auto *tooltip = m_ColumnsData[m_CurrentColumns[column]].m_pHeader->GetTooltip();
+	tooltip->SetText(tooltipText);
+	tooltip->SetTooltipFormatToSingleLine();
+	tooltip->SetTooltipDelay(0);
 }
 
 int ListPanel::GetNumColumnHeaders() const

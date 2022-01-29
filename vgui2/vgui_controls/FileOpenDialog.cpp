@@ -1210,7 +1210,7 @@ void FileOpenDialog::PopulateFileList()
 			{
 				if ( !g_pFullFileSystem->FindIsDirectory( findHandle )
 					|| !IsOSX()
-					|| ( IsOSX() && g_pFullFileSystem->FindIsDirectory( findHandle ) && Q_stristr( pszFileName, ".app" ) ) )
+					|| ( g_pFullFileSystem->FindIsDirectory( findHandle ) && Q_stristr( pszFileName, ".app" ) ) )
 				{
 					char pFullPath[MAX_PATH];
 					Q_snprintf( pFullPath, MAX_PATH, "%s%s", currentDir, pszFileName );
@@ -1261,7 +1261,7 @@ void FileOpenDialog::PopulateFileList()
 	while ( pszFileName )
 	{
 		if ( pszFileName[0] != '.' && g_pFullFileSystem->FindIsDirectory( findHandle )
-			&& ( !IsOSX() || ( IsOSX() && !Q_stristr( pszFileName, ".app" ) ) ) )
+			&& ( !IsOSX() || ( !Q_stristr( pszFileName, ".app" ) ) ) )
 		{
 			char pFullPath[MAX_PATH];
 			Q_snprintf( pFullPath, MAX_PATH, "%s%s", currentDir, pszFileName );
@@ -1499,7 +1499,7 @@ void FileOpenDialog::OnOpen()
 	GetSelectedFileName( pFileName, sizeof( pFileName ) );
 
 	int nLen = Q_strlen( pFileName );
-	bool bSpecifiedDirectory = ( pFileName[nLen-1] == '/' || pFileName[nLen-1] == '\\' ) && (!IsOSX() || ( IsOSX() && !Q_stristr( pFileName, ".app" ) ) );
+	bool bSpecifiedDirectory = ( pFileName[nLen-1] == '/' || pFileName[nLen-1] == '\\' ) && (!IsOSX() || ( !Q_stristr( pFileName, ".app" ) ) );
 	Q_StripTrailingSlash( pFileName );
 
 	if ( !stricmp(pFileName, "..") )
@@ -1550,7 +1550,7 @@ void FileOpenDialog::OnOpen()
 	
 	// If the name specified is a directory, then change directory
 	if ( g_pFullFileSystem->IsDirectory( pFullPath, NULL ) && 
-		( !IsOSX() || ( IsOSX() && !Q_stristr( pFullPath, ".app" ) ) ) )
+		( !IsOSX() || ( !Q_stristr( pFullPath, ".app" ) ) ) )
 	{
 		// it's a directory; change to the specified directory
 		if ( !bSpecifiedDirectory )

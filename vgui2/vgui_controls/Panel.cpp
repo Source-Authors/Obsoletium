@@ -95,6 +95,7 @@ struct vgui::DragDrop_t
 		m_bDragEnabled( false ),
 		m_bShowDragHelper( true ),
 		m_bDropEnabled( false ),
+		m_flHoverContextTime( -1 ),
 		m_bDragStarted( false ),
 		m_nDragStartTolerance( 8 ),
 		m_bDragging( false ),
@@ -216,10 +217,6 @@ KeyBindingMap_t::KeyBindingMap_t( const KeyBindingMap_t& src )
 
 	func				= src.func;
 	passive				= src.passive;
-}
-
-KeyBindingMap_t::~KeyBindingMap_t()
-{
 }
 
 class CKeyBindingsMgr
@@ -753,10 +750,7 @@ Panel::~Panel()
 	// @note Tom Bui: only cleanup if we've created it
 	if ( !m_bToolTipOverridden )
 	{
-		if ( m_pTooltips )
-		{
-			delete m_pTooltips;
-		}
+		delete m_pTooltips;
 	}
 #if defined( VGUI_USEKEYBINDINGMAPS )
 	if ( IsValidKeyBindingsContext() )
@@ -1718,7 +1712,7 @@ HScheme Panel::GetScheme()
 //-----------------------------------------------------------------------------
 void Panel::SetScheme(const char *tag)
 {
-	if (strlen(tag) > 0 && scheme()->GetScheme(tag)) // check the scheme exists
+	if (tag[0] && scheme()->GetScheme(tag)) // check the scheme exists
 	{
 		SetScheme(scheme()->GetScheme(tag));
 	}
@@ -4708,7 +4702,7 @@ void Panel::GetSettings( KeyValues *outResourceData )
 	}
 	if (m_pTooltips)
 	{
-		if (strlen(m_pTooltips->GetText()) > 0)
+		if (m_pTooltips->GetText()[0])
 		{
 			outResourceData->SetString("tooltiptext", m_pTooltips->GetText());
 		}
@@ -7284,7 +7278,8 @@ void CDragDropHelperPanel::PostChildPaint()
 			continue;
 		}
 
-		Panel *dropPanel = panel->GetDragDropInfo()->m_hCurrentDrop.Get();
+		auto *dragDrop = panel->GetDragDropInfo();
+		Panel *dropPanel = dragDrop->m_hCurrentDrop.Get();
 		if ( panel )
 		{
 			if ( !dropPanel )
@@ -7294,13 +7289,11 @@ void CDragDropHelperPanel::PostChildPaint()
 			else
 			{
 				CUtlVector< Panel * > temp;
-				CUtlVector< PHandle >& dragData = panel->GetDragDropInfo()->m_DragPanels;
-				CUtlVector< KeyValues * >& msglist = panel->GetDragDropInfo()->m_DragData;
-				int j, nDragData;
-				nDragData = dragData.Count();
-				for ( j = 0; j < nDragData; ++j )
+				CUtlVector< PHandle >& dragData = dragDrop->m_DragPanels;
+				CUtlVector< KeyValues * >& msglist = dragDrop->m_DragData;
+				for ( auto &data : dragData )
 				{
-					Panel *pPanel = dragData[ j ].Get();
+					Panel *pPanel = data.Get();
 					if ( pPanel )
 					{
 						temp.AddToTail( pPanel );

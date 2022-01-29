@@ -35,13 +35,6 @@ FocusNavGroup::FocusNavGroup(Panel *panel) : _mainPanel(panel)
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Destructor
-//-----------------------------------------------------------------------------
-FocusNavGroup::~FocusNavGroup()
-{
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Sets the focus to the previous panel in the tab order
 // Input  : *panel - panel currently with focus
 //-----------------------------------------------------------------------------

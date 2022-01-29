@@ -35,7 +35,7 @@ URLLabel::URLLabel(Panel *parent, const char *panelName, const char *text, const
     m_pszURL = NULL;
 	m_bUnderline = false;
     m_iURLSize = 0;
-    if (pszURL && strlen(pszURL) > 0)
+    if (pszURL && pszURL[0])
     {
         SetURL(pszURL);
     }
@@ -49,7 +49,7 @@ URLLabel::URLLabel(Panel *parent, const char *panelName, const wchar_t *wszText,
     m_pszURL = NULL;
 	m_bUnderline = false;
     m_iURLSize = 0;
-    if (pszURL && strlen(pszURL) > 0)
+    if (pszURL && pszURL[0])
     {
         SetURL(pszURL);
     }
@@ -60,8 +60,7 @@ URLLabel::URLLabel(Panel *parent, const char *panelName, const wchar_t *wszText,
 //-----------------------------------------------------------------------------
 URLLabel::~URLLabel()
 {
-    if (m_pszURL)
-        delete [] m_pszURL;
+	delete [] m_pszURL;
 }
 
 //-----------------------------------------------------------------------------
