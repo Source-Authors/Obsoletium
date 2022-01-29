@@ -115,7 +115,8 @@ void CDebugOverlay::Paint()
 	OverlayText_t* pCurrText = debugoverlay->GetFirst();
 	while (pCurrText) 
 	{
-		if ( pCurrText->text != NULL ) 
+		// dimhotepus: Check text is present.
+		if ( pCurrText->text[0] ) 
 		{
 			// --------------
 			// Draw the text
