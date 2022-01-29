@@ -26,7 +26,7 @@ protected:
 	virtual			~FrameEncoder_Miles();
 
 public:
-					FrameEncoder_Miles();
+	FrameEncoder_Miles();
 
 	virtual bool	Init(int quality, int &rawFrameSize, int &encodedFrameSize);
 	virtual void	Release();
@@ -104,6 +104,11 @@ void Convert16SignedToUnsigned(short *pDest, int nSamples)
 // ------------------------------------------------------------------------ //
 FrameEncoder_Miles::FrameEncoder_Miles()
 {
+	m_pSrc = nullptr;
+	m_SrcLen = -1;
+	m_CurSrcPos = -1;
+	m_nRawBytes = -1;
+	m_nEncodedBytes = -1;
 }
 
 
@@ -121,7 +126,7 @@ bool FrameEncoder_Miles::Init(int quality, int &rawFrameSize, int &encodedFrameS
 	C8 suffix[128] = ".v12"; // (.v12, .v24, .v29, or .raw)
 
 	// encoder converts from RAW to v12
-	if ( !m_Encoder.Init( (void *)this, ".RAW", suffix, &FrameEncoder_Miles::EncodeStreamCB ) )
+	if ( !m_Encoder.Init( this, ".RAW", suffix, &FrameEncoder_Miles::EncodeStreamCB ) )
 	{
 		Con_Printf("(FrameEncoder_Miles): Can't initialize ASI encoder.\n");
 		Shutdown();
@@ -129,7 +134,7 @@ bool FrameEncoder_Miles::Init(int quality, int &rawFrameSize, int &encodedFrameS
 	}
 	
 	// decoder converts from v12 to RAW
-	if ( !m_Decoder.Init( (void *)this, suffix, ".RAW", &FrameEncoder_Miles::DecodeStreamCB ) )
+	if ( !m_Decoder.Init( this, suffix, ".RAW", &FrameEncoder_Miles::DecodeStreamCB ) )
 	{
 		Con_Printf("(FrameEncoder_Miles): Can't initialize ASI decoder.\n");
 		Shutdown();

@@ -7,21 +7,13 @@
 //=============================================================================//
 
 #include "audio/public/ivoicecodec.h"
-#include <string.h>
+
+#include <cstring>
 #include "tier0/dbg.h"
 #include "iframeencoder.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-
-#ifndef min
-	#define min(a,b) ((a) < (b) ? (a) : (b))
-#endif
-
-
-
-
 
 // VoiceCodec_Frame can be used to wrap a frame encoder for the engine. As it gets sound data, it will queue it
 // until it has enough for a frame, then it will compress it. Same thing for decompression.
@@ -30,12 +22,13 @@ class VoiceCodec_Frame : public IVoiceCodec
 public:
 	enum {MAX_FRAMEBUFFER_SAMPLES=1024};
 
-					VoiceCodec_Frame(IFrameEncoder *pEncoder)
-					{
-						m_nEncodeBufferSamples = 0;
-						m_nRawBytes = m_nRawSamples = m_nEncodedBytes = 0;
-						m_pFrameEncoder = pEncoder;
-					}
+	VoiceCodec_Frame(IFrameEncoder *pEncoder)
+	{
+		memset( m_EncodeBuffer, 0, sizeof(m_EncodeBuffer) );
+		m_nEncodeBufferSamples = 0;
+		m_nRawBytes = m_nRawSamples = m_nEncodedBytes = 0;
+		m_pFrameEncoder = pEncoder;
+	}
 		
 	virtual			~VoiceCodec_Frame()
 	{
