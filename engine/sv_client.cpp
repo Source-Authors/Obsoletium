@@ -1177,11 +1177,12 @@ void CGameClient::SendSnapshot( CClientFrame * pFrame )
 		// copy string updates from server to hltv stringtable
 		networkStringTableContainerServer->DirectUpdate( GetMaxAckTickCount() );
 #endif
+		
+		char *buf = (char *)_alloca( NET_MAX_PAYLOAD );
 
 		// pack sounds to one message
 		if ( m_Sounds.Count() > 0 )
 		{
-			char *buf = (char *)_alloca( NET_MAX_PAYLOAD );
 			SVC_Sounds sounds;
 			sounds.m_DataOut.StartWriting( buf, NET_MAX_PAYLOAD );
 
@@ -1211,11 +1212,11 @@ void CGameClient::SendSnapshot( CClientFrame * pFrame )
 		// copy string updates from server to replay stringtable
 		networkStringTableContainerServer->DirectUpdate( GetMaxAckTickCount() );
 #endif
+		char *buf = (char *)_alloca( NET_MAX_PAYLOAD );
 
 		// pack sounds to one message
 		if ( m_Sounds.Count() > 0 )
 		{
-			char *buf = (char *)_alloca( NET_MAX_PAYLOAD );
 			SVC_Sounds sounds;
 			sounds.m_DataOut.StartWriting( buf, NET_MAX_PAYLOAD );
 
