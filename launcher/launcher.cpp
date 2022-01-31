@@ -557,7 +557,11 @@ bool CSourceAppSystemGroup::Create()
 	pFileSystem->InstallDirtyDiskReportFunc( ReportDirtyDiskNoMaterialSystem );
 
 #ifdef WIN32
-	CoInitialize( NULL );
+	HRESULT hr{CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE )};
+	if ( FAILED(hr) )
+	{
+		Error("Unable to initialize COM: 0x%x.\n\n", hr );
+	}
 #endif
 
 	// Are we running in edit mode?

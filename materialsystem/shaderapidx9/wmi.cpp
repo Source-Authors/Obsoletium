@@ -19,30 +19,24 @@
 #define _WIN32_DCOM
 #include <comdef.h>
 #include <wbemidl.h>
+#include "com_ptr.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
 #pragma comment(lib, "wbemuuid.lib")
 
-#ifndef SAFE_RELEASE
-#define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=nullptr; } }
-#endif
-
 uint64 GetVidMemBytes()
 {
 	static int bBeenHere = false;
 	static uint64 nBytes = 0;
 
-	if( bBeenHere )
-	{
-		return nBytes;
-	}
+	if ( bBeenHere ) return nBytes;
 
 	bBeenHere = true;
-
+	
 	// Initialize COM
-	HRESULT hr = CoInitialize( nullptr );
+	HRESULT hr{CoInitializeEx( nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE )};
 	if ( FAILED(hr) ) [[unlikely]]
 	{
 		Warning( "Unable to get GPU VRAM size: COM initialization failure.\n" );
@@ -50,7 +44,7 @@ uint64 GetVidMemBytes()
 	}
 
 	// Obtain the initial locator to WMI
-	IWbemLocator *pLoc = nullptr;
+	se::win::com::com_ptr<IWbemLocator> pLoc;
 	hr = CoCreateInstance( CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER,
 		IID_IWbemLocator, (LPVOID *) &pLoc);
  
@@ -62,7 +56,7 @@ uint64 GetVidMemBytes()
 	}
 
 	// Connect to WMI through the IWbemLocator::ConnectServer method
-	IWbemServices *pSvc = nullptr;
+	se::win::com::com_ptr<IWbemServices> pSvc;
 	// Connect to the root\cimv2 namespace with the current user and obtain pointer pSvc
 	// to make IWbemServices calls.
 	hr = pLoc->ConnectServer(
@@ -79,7 +73,6 @@ uint64 GetVidMemBytes()
 	if ( FAILED( hr ) )
 	{
 		Warning( "Unable to get GPU VRAM size: WMI server failure.\n" );
-		SAFE_RELEASE( pLoc );
 		CoUninitialize();
 		return 0;
 	}
@@ -99,30 +92,26 @@ uint64 GetVidMemBytes()
 	if ( FAILED( hr ) )
 	{
 		Warning( "Unable to get GPU VRAM size: Proxy security adjustment failure.\n" );
-		SAFE_RELEASE( pSvc );
-		SAFE_RELEASE( pLoc );
 		CoUninitialize();
 		return 0;
 	}
 
 	// Use the IWbemServices pointer to make requests of WMI
 
-	IEnumWbemClassObject *pEnumerator = nullptr;
+	se::win::com::com_ptr<IEnumWbemClassObject> pEnumerator;
 	hr = pSvc->ExecQuery( bstr_t("WQL"), bstr_t("SELECT AdapterRAM FROM Win32_VideoController"),
 		WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator);
 
 	if ( FAILED( hr ) || !pEnumerator )
 	{
 		Warning("Unable to get GPU VRAM size: Win32_VideoController query failure.\n");
-		SAFE_RELEASE(pSvc);
-		SAFE_RELEASE(pLoc);
 		CoUninitialize();
 		return 0;
 	}
 
 
 	// Get the data from the above query
-	IWbemClassObject *pclsObj = nullptr;
+	se::win::com::com_ptr<IWbemClassObject> pclsObj;
 	ULONG uReturn = 0;
 
 	while ( true )
@@ -146,15 +135,9 @@ uint64 GetVidMemBytes()
 			// https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-videocontroller
 			nBytes = static_cast<unsigned int>(adapterRamBytes);
 		}
-
-		SAFE_RELEASE(pclsObj);
 	}
 
 	// Cleanup
-	SAFE_RELEASE(pSvc);
-	SAFE_RELEASE(pLoc);
-	SAFE_RELEASE(pEnumerator);
-	SAFE_RELEASE(pclsObj);
 	CoUninitialize();
 
 	return nBytes;

@@ -762,14 +762,6 @@ CWin32Surface::CWin32Surface() : m_VGuiSurfaceTextures(0, 128, TextureLessFunc)
 	_needKB = true;
 	_needMouse = true;
 
-	HRESULT hr;
-
-	// this step is IMPORTANT , it turns "on" COM
-	if (FAILED(hr = CoInitialize(NULL)))
-	{
-		// failed
-	}
-
 	m_TextPos[0] = m_TextPos[1] = 0;
 
 	m_nFullscreenViewportX = m_nFullscreenViewportY = 0;
@@ -809,8 +801,6 @@ CWin32Surface::~CWin32Surface()
 			::DestroyIcon(texture->_icon);
 		}
 	}
-
-	CoUninitialize(); // turn com off
 }
 
 //-----------------------------------------------------------------------------
