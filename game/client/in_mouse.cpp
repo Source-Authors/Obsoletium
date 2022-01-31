@@ -615,10 +615,13 @@ void CInput::AccumulateMouse( void )
 		int ox, oy;
 		GetMousePos( ox, oy );
 
+		const int new_ox = clamp( ox, 0, w - 1 );
+		const int new_oy = clamp( oy, 0, h - 1 );
+
 		// dimhotepus: Call costly set mouse pos only when pos is changed.
-		if ( ox != clamp( ox, 0, w - 1 ) || oy != clamp( oy, 0, h - 1 ) )
+		if ( ox != new_ox || oy != new_oy )
 		{
-			SetMousePos( ox, oy );
+			SetMousePos( new_ox, new_oy );
 		}
 	}
 }
