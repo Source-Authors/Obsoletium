@@ -1652,10 +1652,9 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 	g_pShaderDeviceMgr->GetAdapterInfo( m_nAdapter, adapterInfo );
 
 	pConfig->dxSupportLevel = MAX( ABSOLUTE_MINIMUM_DXLEVEL, adapterInfo.m_nDXSupportLevel );
-	KeyValues *pKeyValues = new KeyValues( "config" );
+	KeyValues::AutoDelete pKeyValues = KeyValues::AutoDelete ( "config" );
 	if ( !GetRecommendedConfigurationInfo( pConfig->dxSupportLevel, pKeyValues ) )
 	{
-		pKeyValues->deleteThis();
 		return;
 	}
 
@@ -1730,13 +1729,6 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 		pConfig->m_VideoMode.m_Width = nRecommendedWidth;
 		pConfig->m_VideoMode.m_Height = nRecommendedHeight;
 	}
-
-#if defined( _X360 )
-	pConfig->m_VideoMode.m_Width = GetSystemMetrics( SM_CXSCREEN );
-	pConfig->m_VideoMode.m_Height = GetSystemMetrics( SM_CYSCREEN );
-#endif
-
-	pKeyValues->deleteThis();
 
 #endif // LINUX
 
