@@ -82,7 +82,7 @@ struct HardwareCaps_t : public MaterialAdapterInfo_t
 	int  m_MaxTextureHeight;
 	int  m_MaxTextureDepth;
 	int	 m_MaxTextureAspectRatio;
-	int  m_MaxPrimitiveCount;
+	unsigned  m_MaxPrimitiveCount;
 	int  m_NumPixelShaderConstants;
 	int  m_NumBooleanPixelShaderConstants;
 	int  m_NumIntegerPixelShaderConstants;

@@ -22,6 +22,11 @@
 #include "inputlayoutdx10.h"
 #include "shaderapibase.h"
 
+// NOTE: This has to be the last file included!
+#include "tier0/memdbgon.h"
+
+// For testing Fast Clip
+ConVar mat_fastclip("mat_fastclip", "0", FCVAR_CHEAT);
 
 //-----------------------------------------------------------------------------
 // Explicit instantiation of shader buffer implementation
@@ -42,12 +47,14 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CShaderDeviceMgrDx10, IShaderDeviceMgr,
 static CShaderDeviceDx10 g_ShaderDeviceDx10;
 CShaderDeviceDx10* g_pShaderDeviceDx10 = &g_ShaderDeviceDx10;
 
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CShaderDeviceDx10, IShaderDevice, 
+	SHADER_DEVICE_INTERFACE_VERSION, g_ShaderDeviceDx10 )
+
 //-----------------------------------------------------------------------------
 // constructor, destructor
 //-----------------------------------------------------------------------------
 CShaderDeviceMgrDx10::CShaderDeviceMgrDx10()
 {
-	m_pDXGIFactory = NULL;
 	m_bObeyDxCommandlineOverride = true;
 }
 
@@ -66,10 +73,11 @@ bool CShaderDeviceMgrDx10::Connect( CreateInterfaceFn factory )
 	if ( !BaseClass::Connect( factory ) )
 		return false;
 
-	HRESULT hr = CreateDXGIFactory( __uuidof(IDXGIFactory), (void**)(&m_pDXGIFactory) );
+	// Windows 7+.
+	HRESULT hr{CreateDXGIFactory1( IID_PPV_ARGS(&m_pDXGIFactory) )};
 	if ( FAILED( hr ) )
 	{
-		Warning( "Failed to create the DXGI Factory!\n" );
+		Warning( "Failed to create the DXGI Factory #1!\n" );
 		return false;
 	}
 
@@ -81,10 +89,9 @@ void CShaderDeviceMgrDx10::Disconnect()
 {
 	LOCK_SHADERAPI();
 
-	if ( m_pDXGIFactory )
+	if (m_pDXGIFactory)
 	{
-		m_pDXGIFactory->Release();
-		m_pDXGIFactory = NULL;
+		m_pDXGIFactory.Release();
 	}
 
 	BaseClass::Disconnect();
@@ -124,20 +131,18 @@ void CShaderDeviceMgrDx10::InitAdapterInfo()
 {
 	m_Adapters.RemoveAll();
 
-	IDXGIAdapter *pAdapter;
-	for( UINT nCount = 0; m_pDXGIFactory->EnumAdapters( nCount, &pAdapter ) != DXGI_ERROR_NOT_FOUND; ++nCount )
+	se::win::com::com_ptr<IDXGIAdapter1> pAdapter;
+	for( UINT nCount{0}; m_pDXGIFactory->EnumAdapters1( nCount, &pAdapter ) != DXGI_ERROR_NOT_FOUND; ++nCount )
 	{
-		int j = m_Adapters.AddToTail();
-		AdapterInfo_t &info = m_Adapters[j];
+		AdapterInfo_t &info{m_Adapters[m_Adapters.AddToTail()]};
 
 #ifdef _DEBUG
 		memset( &info.m_ActualCaps, 0xDD, sizeof(info.m_ActualCaps) );
 #endif
 
-		IDXGIOutput *pOutput = GetAdapterOutput( nCount );
+		se::win::com::com_ptr<IDXGIOutput> pOutput{GetAdapterOutput( nCount )};
 		info.m_ActualCaps.m_bDeviceOk = ComputeCapsFromD3D( &info.m_ActualCaps, pAdapter, pOutput );
-		if ( !info.m_ActualCaps.m_bDeviceOk )
-			continue;
+		if ( !info.m_ActualCaps.m_bDeviceOk ) continue;
 
 		ReadDXSupportLevels( info.m_ActualCaps );
 
@@ -157,19 +162,22 @@ void CShaderDeviceMgrDx10::InitAdapterInfo()
 //-----------------------------------------------------------------------------
 // Determines hardware caps from D3D
 //-----------------------------------------------------------------------------
-bool CShaderDeviceMgrDx10::ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapter *pAdapter, IDXGIOutput *pOutput )
+bool CShaderDeviceMgrDx10::ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapter1 *pAdapter, IDXGIOutput *pOutput )
 {
-	HRESULT hr = pAdapter->CheckInterfaceSupport( __uuidof(ID3D10Device), NULL );
+  LARGE_INTEGER umdVersion;
+	// If you try to use CheckInterfaceSupport to check whether a Direct3D 11.x and later version interface is supported,
+	// CheckInterfaceSupport returns DXGI_ERROR_UNSUPPORTED.
+	HRESULT hr = pAdapter->CheckInterfaceSupport( __uuidof(ID3D10Device), &umdVersion );
 	if ( hr != S_OK )
 	{
 		// Fall back to Dx9
 		return false;
 	}
 
-	DXGI_ADAPTER_DESC desc;
-	hr = pAdapter->GetDesc( &desc );
+	DXGI_ADAPTER_DESC1 desc;
+	hr = pAdapter->GetDesc1( &desc );
 	Assert( !FAILED( hr ) );
-	if ( FAILED(hr) )
+	if ( FAILED(hr) || (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) )
 		return false;
 
 	bool bForceFloatHDR = ( CommandLine()->CheckParm( "-floathdr" ) != NULL );
@@ -181,6 +189,9 @@ bool CShaderDeviceMgrDx10::ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapt
 	pCaps->m_DeviceID = desc.DeviceId;
 	pCaps->m_SubSysID = desc.SubSysId;
 	pCaps->m_Revision = desc.Revision;
+	pCaps->m_nDXSupportLevel = 100;
+	pCaps->m_nMaxDXSupportLevel = 100;
+
 	pCaps->m_NumSamplers = 16;
 	pCaps->m_NumTextureStages = 0;
 	pCaps->m_HasSetDeviceGammaRamp = true;
@@ -192,17 +203,18 @@ bool CShaderDeviceMgrDx10::ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapt
 	pCaps->m_SupportsPixelShaders_2_0 = false;
 	pCaps->m_SupportsPixelShaders_2_b = false;
 	pCaps->m_SupportsShaderModel_3_0 = false;
+	// pCaps->m_SupportsShaderModel_4_0 = true;
 	pCaps->m_SupportsCompressedTextures = COMPRESSED_TEXTURES_ON;
 	pCaps->m_SupportsCompressedVertices = VERTEX_COMPRESSION_ON;
 	pCaps->m_bSupportsAnisotropicFiltering = true;
 	pCaps->m_bSupportsMagAnisotropicFiltering = true;
 	pCaps->m_bSupportsVertexTextures = true;
-	pCaps->m_nMaxAnisotropy = 16;
+	pCaps->m_nMaxAnisotropy = D3D10_REQ_MAXANISOTROPY;
 	pCaps->m_MaxTextureWidth = D3D10_REQ_TEXTURE2D_U_OR_V_DIMENSION;
 	pCaps->m_MaxTextureHeight = D3D10_REQ_TEXTURE2D_U_OR_V_DIMENSION;
 	pCaps->m_MaxTextureDepth = D3D10_REQ_TEXTURE3D_U_V_OR_W_DIMENSION;
 	pCaps->m_MaxTextureAspectRatio = 1024;	// FIXME
-	pCaps->m_MaxPrimitiveCount = 65536;		// FIXME
+	pCaps->m_MaxPrimitiveCount = (1ULL << D3D10_IA_PRIMITIVE_ID_BIT_COUNT) - 1;		// FIXME
 	pCaps->m_ZBiasAndSlopeScaledDepthBiasSupported = true;
 	pCaps->m_SupportsMipmapping = true;
 	pCaps->m_SupportsOverbright = true;
@@ -217,7 +229,6 @@ bool CShaderDeviceMgrDx10::ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapt
 	pCaps->m_MaxVertexShaderBlendMatrices = 53;	// FIXME
 	pCaps->m_SupportsMipmappedCubemaps = true;
 	pCaps->m_SupportsNonPow2Textures = true;
-	pCaps->m_nDXSupportLevel = 100;
 	pCaps->m_PreferDynamicTextures = false;
 	pCaps->m_HasProjectedBumpEnv = true;
 	pCaps->m_MaxUserClipPlanes = 6;		// FIXME
@@ -231,9 +242,8 @@ bool CShaderDeviceMgrDx10::ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapt
 	pCaps->m_bNeedsATICentroidHack = false;
 	pCaps->m_bColorOnSecondStream = true;
 	pCaps->m_bSupportsStreamOffset = true;
-	pCaps->m_nMaxDXSupportLevel = 100;
 	pCaps->m_bFogColorSpecifiedInLinearSpace = ( desc.VendorId == VENDORID_NVIDIA );
-	pCaps->m_nVertexTextureCount = 16;
+	pCaps->m_nVertexTextureCount = D3D10_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT;
 	pCaps->m_nMaxVertexTextureDimension = D3D10_REQ_TEXTURE2D_U_OR_V_DIMENSION;
 	pCaps->m_bSupportsAlphaToCoverage = false;	// FIXME
 	pCaps->m_bSupportsShadowDepthTextures = true;
@@ -243,10 +253,12 @@ bool CShaderDeviceMgrDx10::ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapt
 	pCaps->m_nMaxViewports = 4;
 
 	DXGI_GAMMA_CONTROL_CAPABILITIES gammaCaps;
-	pOutput->GetGammaControlCapabilities( &gammaCaps );
-	pCaps->m_flMinGammaControlPoint = gammaCaps.MinConvertedValue;
-	pCaps->m_flMaxGammaControlPoint = gammaCaps.MaxConvertedValue;
-	pCaps->m_nGammaControlPointCount = gammaCaps.NumGammaControlPoints;
+	if ( SUCCEEDED(pOutput->GetGammaControlCapabilities( &gammaCaps )) )
+	{
+    pCaps->m_flMinGammaControlPoint = gammaCaps.MinConvertedValue;
+    pCaps->m_flMaxGammaControlPoint = gammaCaps.MaxConvertedValue;
+    pCaps->m_nGammaControlPointCount = gammaCaps.NumGammaControlPoints;
+	}
 	pCaps->m_bCanStretchRectFromTextures = true;
 	return true;
 }
@@ -275,13 +287,13 @@ void CShaderDeviceMgrDx10::GetAdapterInfo( int nAdapter, MaterialAdapterInfo_t& 
 //-----------------------------------------------------------------------------
 // Returns the adapter interface for a particular adapter
 //-----------------------------------------------------------------------------
-IDXGIAdapter* CShaderDeviceMgrDx10::GetAdapter( int nAdapter ) const
+se::win::com::com_ptr<IDXGIAdapter1> CShaderDeviceMgrDx10::GetAdapter( int nAdapter ) const
 {
 	Assert( m_pDXGIFactory && ( nAdapter < GetAdapterCount() ) );
 
-	IDXGIAdapter *pAdapter;
-	HRESULT hr = m_pDXGIFactory->EnumAdapters( nAdapter, &pAdapter );
-	return ( FAILED(hr) ) ? NULL : pAdapter;
+	se::win::com::com_ptr<IDXGIAdapter1> pAdapter;
+	const HRESULT hr{m_pDXGIFactory->EnumAdapters1( nAdapter, &pAdapter )};
+	return SUCCEEDED(hr) ? pAdapter : se::win::com::com_ptr<IDXGIAdapter1>{};
 }
 
 
@@ -291,36 +303,35 @@ IDXGIAdapter* CShaderDeviceMgrDx10::GetAdapter( int nAdapter ) const
 int CShaderDeviceMgrDx10::GetVidMemBytes( int nAdapter ) const
 {
 	LOCK_SHADERAPI();
-	IDXGIAdapter *pAdapter = GetAdapter( nAdapter );
+
+  se::win::com::com_ptr<IDXGIAdapter1> pAdapter{GetAdapter(nAdapter)};
 	if ( !pAdapter )
 		return 0;
 
-	DXGI_ADAPTER_DESC desc;
+	DXGI_ADAPTER_DESC1 desc;
+	const HRESULT hr{pAdapter->GetDesc1(&desc)};
 
-#ifdef DBGFLAG_ASSERT
-	HRESULT hr = 
-#endif
-		pAdapter->GetDesc( &desc );
 	Assert( !FAILED( hr ) );
-	return desc.DedicatedVideoMemory;
+
+	return SUCCEEDED(hr) ? desc.DedicatedVideoMemory : 0;
 }
 
 
 //-----------------------------------------------------------------------------
 // Returns the appropriate adapter output to use
 //-----------------------------------------------------------------------------
-IDXGIOutput* CShaderDeviceMgrDx10::GetAdapterOutput( int nAdapter ) const
+se::win::com::com_ptr<IDXGIOutput> CShaderDeviceMgrDx10::GetAdapterOutput( int nAdapter ) const
 {
 	LOCK_SHADERAPI();
-	IDXGIAdapter *pAdapter = GetAdapter( nAdapter );
-	if ( !pAdapter )
-		return 0;
 
-	IDXGIOutput *pOutput;
-	for( UINT i = 0; pAdapter->EnumOutputs( i, &pOutput ) != DXGI_ERROR_NOT_FOUND; ++i )
+  se::win::com::com_ptr<IDXGIAdapter1> pAdapter{GetAdapter(nAdapter)};
+	if ( !pAdapter ) return {};
+
+	se::win::com::com_ptr<IDXGIOutput> pOutput;
+	DXGI_OUTPUT_DESC desc;
+	for( UINT i{0}; pAdapter->EnumOutputs( i, &pOutput ) != DXGI_ERROR_NOT_FOUND; ++i )
 	{
-		DXGI_OUTPUT_DESC desc;
-		HRESULT hr = pOutput->GetDesc( &desc );
+		const HRESULT hr{pOutput->GetDesc( &desc )};
 		if ( FAILED( hr ) )
 			continue;
 
@@ -332,7 +343,7 @@ IDXGIOutput* CShaderDeviceMgrDx10::GetAdapterOutput( int nAdapter ) const
 		return pOutput;
 	}
 
-	return NULL;
+	return {};
 }
 
 
@@ -344,7 +355,7 @@ int CShaderDeviceMgrDx10::GetModeCount( int nAdapter ) const
 	LOCK_SHADERAPI();
 	Assert( m_pDXGIFactory && ( nAdapter < GetAdapterCount() ) );
 
-	IDXGIOutput *pOutput = GetAdapterOutput( nAdapter );
+	se::win::com::com_ptr<IDXGIOutput> pOutput{GetAdapterOutput( nAdapter )};
 	if ( !pOutput )
 		return 0;
 	
@@ -353,7 +364,7 @@ int CShaderDeviceMgrDx10::GetModeCount( int nAdapter ) const
 	UINT flags         = 0; //desired scanline order and/or scaling
 
 	// get the number of available display mode for the given format and scanline order
-	HRESULT hr = pOutput->GetDisplayModeList( format, flags, &num, 0 );
+	HRESULT hr = pOutput->GetDisplayModeList( format, flags, &num, nullptr );
 	return ( FAILED(hr) ) ? 0 : num;
 }
 
@@ -371,7 +382,7 @@ void CShaderDeviceMgrDx10::GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter
 	LOCK_SHADERAPI();
 	Assert( m_pDXGIFactory && ( nAdapter < GetAdapterCount() ) );
 
-	IDXGIOutput *pOutput = GetAdapterOutput( nAdapter );
+	se::win::com::com_ptr<IDXGIOutput> pOutput{GetAdapterOutput( nAdapter )};
 	if ( !pOutput )
 		return;
 
@@ -383,7 +394,7 @@ void CShaderDeviceMgrDx10::GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter
 	HRESULT hr = pOutput->GetDisplayModeList( format, flags, &num, 0 );
 	Assert( !FAILED( hr ) );
 
-	if ( (UINT)nMode >= num )
+	if ( nMode >= num )
 		return;
 
 	DXGI_MODE_DESC *pDescs = (DXGI_MODE_DESC*)_alloca( num * sizeof( DXGI_MODE_DESC ) );
@@ -405,6 +416,35 @@ void CShaderDeviceMgrDx10::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int n
 {
 	// FIXME: Implement!
 	Assert( 0 );
+
+	Assert( pInfo->m_nVersion == SHADER_DISPLAY_MODE_VERSION );
+	LOCK_SHADERAPI();
+
+	se::win::com::com_ptr<IDXGIOutput> pOutput{g_ShaderDeviceMgrDx10.GetAdapterOutput(nAdapter)};
+	
+	DXGI_OUTPUT_DESC outputDesc;
+  HRESULT hr{pOutput->GetDesc(&outputDesc)};
+	Assert( !FAILED(hr) );
+
+	UINT width = static_cast<unsigned>(outputDesc.DesktopCoordinates.right - outputDesc.DesktopCoordinates.left);
+	UINT height = static_cast<unsigned>(outputDesc.DesktopCoordinates.bottom - outputDesc.DesktopCoordinates.top);
+
+	DXGI_MODE_DESC modeDesc{width, height};
+
+	auto device = D3D10Device();
+	if (!device)
+	{
+		HDC dc = ::GetDC( NULL );
+		modeDesc.RefreshRate.Numerator = ::GetDeviceCaps(dc, VREFRESH);
+		modeDesc.RefreshRate.Denominator = 1;
+		::ReleaseDC( NULL, dc );
+	}
+
+	pInfo->m_nWidth = modeDesc.Width;
+	pInfo->m_nHeight = modeDesc.Height;
+	// pInfo->m_Format = ImageLoader::D3DFormatToImageFormat( closestModeDesc.Format );
+	pInfo->m_nRefreshRateNumerator = modeDesc.RefreshRate.Numerator;
+	pInfo->m_nRefreshRateDenominator = modeDesc.RefreshRate.Denominator;
 }
 
 
@@ -413,6 +453,7 @@ void CShaderDeviceMgrDx10::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int n
 //-----------------------------------------------------------------------------
 bool CShaderDeviceMgrDx10::SetAdapter( int nAdapter, int nFlags )
 {
+  LOCK_SHADERAPI();
 	/*
 	if ( !g_pShaderDeviceDx10->Init() )
 	{
@@ -421,8 +462,41 @@ bool CShaderDeviceMgrDx10::SetAdapter( int nAdapter, int nFlags )
 	}
 
 	g_pMaterialSystemHardwareConfig = g_pShaderDeviceDx10;
-	g_pShaderDevice = g_pShaderDeviceDx10;
 	*/
+
+  g_pShaderDeviceDx10->m_DriverType = (nFlags & MATERIAL_INIT_REFERENCE_RASTERIZER) ? 
+		D3D10_DRIVER_TYPE_REFERENCE : D3D10_DRIVER_TYPE_HARDWARE;
+
+  g_pShaderDeviceDx10->m_DisplayAdapter = nAdapter;
+  if (g_pShaderDeviceDx10->m_DisplayAdapter >= (UINT)GetAdapterCount())
+	{
+    g_pShaderDeviceDx10->m_DisplayAdapter = 0;
+  }
+
+	if (!g_pShaderDeviceDx10->DetermineHardwareCaps())
+	{
+    return false;
+  }
+
+	// Modify the caps based on requested DXlevels
+	int nForcedDXLevel = CommandLine()->ParmValue( "-dxlevel", 0 );
+	
+	if ( nForcedDXLevel > 0 )
+	{
+		nForcedDXLevel = MAX( nForcedDXLevel, ABSOLUTE_MINIMUM_DXLEVEL );
+	}
+
+	// Just use the actual caps if we can't use what was requested or if the default is requested
+	if ( nForcedDXLevel <= 0 ) 
+	{
+		nForcedDXLevel = g_pHardwareConfig->ActualCaps().m_nDXSupportLevel;
+	}
+	nForcedDXLevel = g_pShaderDeviceMgr->GetClosestActualDXLevel( nForcedDXLevel );
+
+	g_pHardwareConfig->SetupHardwareCaps( nForcedDXLevel, g_pHardwareConfig->ActualCaps() );
+
+	g_pShaderDevice = g_pShaderDeviceDx10;
+
 	return true;
 }
 
@@ -435,23 +509,21 @@ CreateInterfaceFn CShaderDeviceMgrDx10::SetMode( void *hWnd, int nAdapter, const
 	LOCK_SHADERAPI();
 
 	Assert( nAdapter < GetAdapterCount() );
-	int nDXLevel = mode.m_nDXLevel != 0 ? mode.m_nDXLevel : m_Adapters[nAdapter].m_ActualCaps.m_nDXSupportLevel;
+
+	const auto &actualCaps = m_Adapters[nAdapter].m_ActualCaps;
+	int nDXLevel = mode.m_nDXLevel != 0 ? mode.m_nDXLevel : actualCaps.m_nDXSupportLevel;
 	if ( m_bObeyDxCommandlineOverride )
 	{
 		nDXLevel = CommandLine()->ParmValue( "-dxlevel", nDXLevel );
 		m_bObeyDxCommandlineOverride = false;
 	}
-	if ( nDXLevel > m_Adapters[nAdapter].m_ActualCaps.m_nMaxDXSupportLevel )
-	{
-		nDXLevel = m_Adapters[nAdapter].m_ActualCaps.m_nMaxDXSupportLevel;
-	}
-	nDXLevel = GetClosestActualDXLevel( nDXLevel );
+	nDXLevel = GetClosestActualDXLevel( min( nDXLevel, actualCaps.m_nMaxDXSupportLevel ) );
 
-	if ( nDXLevel < 100 )
-	{
-		// Fall back to the Dx9 implementations
-		return g_pShaderDeviceMgrDx8->SetMode( hWnd, nAdapter, mode );
-	}
+	//if ( nDXLevel < 100 )
+	//{
+	//	// Fall back to the Dx9 implementations
+	//	return g_pShaderDeviceMgrDx8->SetMode( hWnd, nAdapter, mode );
+	//}
 
 	if ( g_pShaderAPI )
 	{
@@ -474,10 +546,13 @@ CreateInterfaceFn CShaderDeviceMgrDx10::SetMode( void *hWnd, int nAdapter, const
 
 	if ( !g_pShaderAPIDx10->OnDeviceInit() )
 		return NULL;
+	
+	g_pShaderDeviceDx10->DetermineHardwareCaps();
 
 	g_pShaderDevice = g_pShaderDeviceDx10;
 	g_pShaderAPI = g_pShaderAPIDx10;
 	g_pShaderShadow = g_pShaderShadowDx10;
+
 
 	return ShaderInterfaceFactory;
 }
@@ -494,11 +569,9 @@ CreateInterfaceFn CShaderDeviceMgrDx10::SetMode( void *hWnd, int nAdapter, const
 // constructor, destructor
 //-----------------------------------------------------------------------------
 CShaderDeviceDx10::CShaderDeviceDx10()
+	: m_DisplayAdapter(UINT_MAX),
+	m_DriverType(D3D10_DRIVER_TYPE_NULL)
 {
-	m_pDevice = NULL;
-	m_pOutput = NULL;
-	m_pSwapChain = NULL;
-	m_pRenderTargetView = NULL;
 }
 
 CShaderDeviceDx10::~CShaderDeviceDx10()
@@ -519,14 +592,12 @@ bool CShaderDeviceDx10::InitDevice( void *hWnd, int nAdapter, const ShaderDevice
 	}
 
 	LOCK_SHADERAPI();
-	IDXGIAdapter *pAdapter = g_ShaderDeviceMgrDx10.GetAdapter( nAdapter );
-	if ( !pAdapter )
-		return false;
 
-	m_pOutput = g_ShaderDeviceMgrDx10.GetAdapterOutput( nAdapter );
-	if ( !m_pOutput )
-		return false;
-	m_pOutput->AddRef();
+	se::win::com::com_ptr<IDXGIAdapter1> pAdapter{g_ShaderDeviceMgrDx10.GetAdapter( nAdapter )};
+	if ( !pAdapter ) return false;
+
+	m_pOutput = std::move(g_ShaderDeviceMgrDx10.GetAdapterOutput( nAdapter ));
+	if ( !m_pOutput )	return false;
 
 	DXGI_SWAP_CHAIN_DESC sd;
 	ZeroMemory( &sd, sizeof(sd) );
@@ -542,38 +613,37 @@ bool CShaderDeviceDx10::InitDevice( void *hWnd, int nAdapter, const ShaderDevice
 	sd.Flags = mode.m_bWindowed ? 0 : DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	// NOTE: Having more than 1 back buffer disables MSAA!
-	sd.SwapEffect = mode.m_nBackBufferCount > 1 ? DXGI_SWAP_EFFECT_SEQUENTIAL : DXGI_SWAP_EFFECT_DISCARD;
+	sd.SwapEffect = mode.m_nBackBufferCount > 1
+		? DXGI_SWAP_EFFECT_SEQUENTIAL : DXGI_SWAP_EFFECT_DISCARD;
 
 	// FIXME: Chicken + egg problem with SampleDesc.
 	sd.SampleDesc.Count = mode.m_nAASamples ? mode.m_nAASamples : 1;
 	sd.SampleDesc.Quality = mode.m_nAAQuality;
 
-	UINT nDeviceFlags = 0;
+	// Return a NULL pointer instead of triggering an exception on memory exhaustion during invocations to Map.
+	// Without this flag an exception will be raised on memory exhaustion. Only valid on Windows 7.
+	UINT nDeviceFlags = D3D10_CREATE_DEVICE_ALLOW_NULL_FROM_MAP;
 #ifdef _DEBUG
 	nDeviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
 #endif
 
-	HRESULT hr = D3D10CreateDeviceAndSwapChain( pAdapter, D3D10_DRIVER_TYPE_HARDWARE, 
+	HRESULT hr = D3D10CreateDeviceAndSwapChain( pAdapter, m_DriverType, 
 		NULL, nDeviceFlags, D3D10_SDK_VERSION, &sd, &m_pSwapChain, &m_pDevice );
-
-	if ( FAILED( hr ) )
-		return false;
+	if ( FAILED( hr ) )	return false;
 
 	// Create a render target view
-	ID3D10Texture2D *pBackBuffer;
-	hr = m_pSwapChain->GetBuffer( 0, __uuidof( ID3D10Texture2D ), (LPVOID*)&pBackBuffer );
-	if ( FAILED( hr ) )
-		return FALSE;
+	se::win::com::com_ptr<ID3D10Texture2D> pBackBuffer;
+	hr = m_pSwapChain->GetBuffer( 0, IID_PPV_ARGS(&pBackBuffer) );
+	if ( FAILED( hr ) )	return false;
 
 	hr = m_pDevice->CreateRenderTargetView( pBackBuffer, NULL, &m_pRenderTargetView );
-	pBackBuffer->Release();
-	if( FAILED( hr ) )
-		return FALSE;
+	if( FAILED( hr ) ) return false;
 
-	m_pDevice->OMSetRenderTargets( 1, &m_pRenderTargetView, NULL );
+	ID3D10RenderTargetView* views[]{m_pRenderTargetView.GetInterfacePtr()}; 
+	m_pDevice->OMSetRenderTargets( std::size(views), views, NULL );
 
 	m_hWnd = hWnd;
-	m_nAdapter = nAdapter;
+	m_nAdapter = m_DisplayAdapter = nAdapter;
 
 	// This is our current view.
 	m_ViewHWnd = hWnd;
@@ -592,30 +662,27 @@ void CShaderDeviceDx10::ShutdownDevice()
 {
 	if ( m_pRenderTargetView )
 	{
-		m_pRenderTargetView->Release();
-		m_pRenderTargetView = NULL;
+		m_pRenderTargetView.Release();
 	}
 
 	if ( m_pDevice )
 	{
-		m_pDevice->Release();
-		m_pDevice = NULL;
+		m_pDevice.Release();
 	}
 
 	if ( m_pSwapChain )
 	{
-		m_pSwapChain->Release();
-		m_pSwapChain = NULL;
+		m_pSwapChain.Release();
 	}
 
 	if ( m_pOutput )
 	{
-		m_pOutput->Release();
-		m_pOutput = NULL;
+		m_pOutput.Release();
 	}
 
 	m_hWnd = NULL;
 	m_nAdapter = -1;
+	m_DisplayAdapter = UINT_MAX;
 }
 
 
@@ -624,7 +691,7 @@ void CShaderDeviceDx10::ShutdownDevice()
 //-----------------------------------------------------------------------------
 bool CShaderDeviceDx10::IsUsingGraphics() const
 {
-	return ( m_nAdapter >= 0 );
+	return !!m_pDevice;
 }
 
 
@@ -633,7 +700,7 @@ bool CShaderDeviceDx10::IsUsingGraphics() const
 //-----------------------------------------------------------------------------
 int CShaderDeviceDx10::GetCurrentAdapter() const
 {
-	return m_nAdapter;
+	return m_DisplayAdapter;
 }
 
 
@@ -668,7 +735,7 @@ void CShaderDeviceDx10::SpewDriverInfo() const
 void CShaderDeviceDx10::Present()
 {
 	// FIXME: Deal with window occlusion, alt-tab, etc.
-	HRESULT hr = m_pSwapChain->Present( 0, 0 );
+	HRESULT hr{m_pSwapChain->Present( 0, 0 )};
 	if ( FAILED(hr) )
 	{
 		Assert( 0 );
@@ -698,7 +765,7 @@ void CShaderDeviceDx10::SetHardwareGammaRamp( float fGamma, float fGammaTVRangeM
 	for ( int i = 0; i < nGammaPoints; i++ )
 	{
 		float flGamma22 = i * flOOCount;
-		float flCorrection = pow( flGamma22, fGamma / 2.2f );
+		float flCorrection = powf( flGamma22, fGamma / 2.2f );
 		flCorrection = clamp( flCorrection, flMin, flMax );
 
 		gammaControl.GammaCurve[i].Red = flCorrection;
@@ -706,7 +773,7 @@ void CShaderDeviceDx10::SetHardwareGammaRamp( float fGamma, float fGammaTVRangeM
 		gammaControl.GammaCurve[i].Blue = flCorrection;
 	}
 
-	HRESULT hr = m_pOutput->SetGammaControl( &gammaControl );
+	HRESULT hr{m_pOutput->SetGammaControl( &gammaControl )};
 	if ( FAILED(hr) )
 	{
 		Warning( "CShaderDeviceDx10::SetHardwareGammaRamp: Unable to set gamma controls!\n" );
@@ -719,14 +786,16 @@ void CShaderDeviceDx10::SetHardwareGammaRamp( float fGamma, float fGammaTVRangeM
 //-----------------------------------------------------------------------------
 IShaderBuffer* CShaderDeviceDx10::CompileShader( const char *pProgram, size_t nBufLen, const char *pShaderVersion )
 {
-	int nCompileFlags = D3D10_SHADER_AVOID_FLOW_CONTROL;
+	unsigned nCompileFlags = D3D10_SHADER_AVOID_FLOW_CONTROL;
 	nCompileFlags |= D3D10_SHADER_ENABLE_BACKWARDS_COMPATIBILITY;
 
 #ifdef _DEBUG
-	nCompileFlags |= D3D10_SHADER_DEBUG;
+	nCompileFlags |= D3D10_SHADER_DEBUG | D3D10_SHADER_OPTIMIZATION_LEVEL0;
+#else
+	nCompileFlags |= D3D10_SHADER_OPTIMIZATION_LEVEL3;
 #endif
 
-	ID3D10Blob *pCompiledShader, *pErrorMessages;
+	se::win::com::com_ptr<ID3D10Blob> pCompiledShader, pErrorMessages;
 	HRESULT hr = D3DX10CompileFromMemory( pProgram, nBufLen, "",
 		NULL, NULL, "main", pShaderVersion, nCompileFlags, 0, NULL, 
 		&pCompiledShader, &pErrorMessages, NULL );
@@ -737,20 +806,13 @@ IShaderBuffer* CShaderDeviceDx10::CompileShader( const char *pProgram, size_t nB
 		{
 			const char *pErrorMessage = (const char *)pErrorMessages->GetBufferPointer();
 			Warning( "Vertex shader compilation failed! Reported the following errors:\n%s\n", pErrorMessage );
-			pErrorMessages->Release();
 		}
 		return NULL;
 	}
 
 	// NOTE: This uses small block heap allocator; so I'm not going
 	// to bother creating a memory pool.
-	CShaderBuffer< ID3D10Blob > *pShaderBuffer = new CShaderBuffer< ID3D10Blob >( pCompiledShader );
-	if ( pErrorMessages )
-	{
-		pErrorMessages->Release();
-	}
-
-	return pShaderBuffer;
+	return new CShaderBuffer<ID3D10Blob>( pCompiledShader.Detach() );
 }
 
 
@@ -998,5 +1060,50 @@ IIndexBuffer *CShaderDeviceDx10::GetDynamicIndexBuffer( MaterialIndexFormat_t fm
 	return NULL;
 }
 
+char *CShaderDeviceDx10::GetDisplayDeviceName()
+{
+	if( m_sDisplayDeviceName.IsEmpty() )
+	{
+		se::win::com::com_ptr<IDXGIOutput> pOutput{g_ShaderDeviceMgrDx10.GetAdapterOutput(m_DisplayAdapter)};
+		if (pOutput)
+		{
+			DXGI_OUTPUT_DESC desc;
+			HRESULT hr{pOutput->GetDesc(&desc)};
+			if ( FAILED(hr) )
+			{
+				Assert( false );
+				desc.DeviceName[0] = L'\0';
+			}
 
+			char deviceName[std::size(desc.DeviceName)];
+			Q_UnicodeToUTF8(desc.DeviceName, deviceName, sizeof(deviceName));
 
+			m_sDisplayDeviceName = deviceName;
+		}
+	}
+	return m_sDisplayDeviceName.GetForModify();
+}
+
+bool CShaderDeviceDx10::DetermineHardwareCaps() 
+{
+	HardwareCaps_t& actualCaps = g_pHardwareConfig->ActualCapsForEdit();
+  se::win::com::com_ptr<IDXGIAdapter1> pAdapter{g_ShaderDeviceMgrDx10.GetAdapter(m_DisplayAdapter)};
+  se::win::com::com_ptr<IDXGIOutput> pOutput{g_ShaderDeviceMgrDx10.GetAdapterOutput(m_DisplayAdapter)};
+  if (!g_ShaderDeviceMgrDx10.ComputeCapsFromD3D(&actualCaps, pAdapter, pOutput))
+		return false;
+
+	// See if the file tells us otherwise
+	g_ShaderDeviceMgrDx10.ReadDXSupportLevels( actualCaps );
+
+	// Read dxsupport.cfg which has config overrides for particular cards.
+	g_ShaderDeviceMgrDx10.ReadHardwareCaps( actualCaps, actualCaps.m_nMaxDXSupportLevel );
+
+	// What's in "-shader" overrides dxsupport.cfg
+	const char *pShaderParam = CommandLine()->ParmValue( "-shader" );
+	if ( pShaderParam )
+	{
+		Q_strncpy( actualCaps.m_pShaderDLL, pShaderParam, sizeof( actualCaps.m_pShaderDLL ) );
+	}
+
+	return true;
+}

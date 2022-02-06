@@ -190,10 +190,7 @@ private:
 	void ClearSnapshots();
 
 	// Sets the mode...
-	bool SetMode( void* hwnd, int nAdapter, const ShaderDeviceInfo_t &info )
-	{
-		return true;
-	}
+	bool SetMode( void* hwnd, int nAdapter, const ShaderDeviceInfo_t &info );
 
 	void ChangeVideoMode( const ShaderDeviceInfo_t &info )
 	{
@@ -883,6 +880,40 @@ private:
 
 	virtual void SetPSNearAndFarZ( int pshReg )
 	{
+	}
+
+	void CopyRenderTargetToScratchTexture(ShaderAPITextureHandle_t srcRt,
+		ShaderAPITextureHandle_t dstTex, Rect_t* pSrcRect = NULL, Rect_t* pDstRect = NULL) override
+	{
+		Assert(0);
+	}
+
+	void LockRect( void** pOutBits, int* pOutPitch, ShaderAPITextureHandle_t texHandle, int mipmap,
+		int x, int y, int w, int h, bool bWrite, bool bRead ) override
+	{
+		Assert(0);
+	}
+
+	void UnlockRect( ShaderAPITextureHandle_t texHandle, int mipmap )
+	{
+		Assert(0);
+	}
+
+	// Set the finest mipmap that can be used for the texture which is currently being modified. 
+	void TexLodClamp(int finest)
+	{
+		Assert(0);
+	}
+
+	// Set the Lod Bias for the texture which is currently being modified. 
+	void TexLodBias( float bias )
+	{
+		Assert(0);
+	}
+	
+	void CopyTextureToTexture( ShaderAPITextureHandle_t srcTex, ShaderAPITextureHandle_t dstTex )
+	{
+		Assert(0);
 	}
 
 	int GetPackedDeformationInformation( int nMaskOfUnderstoodDeformations,

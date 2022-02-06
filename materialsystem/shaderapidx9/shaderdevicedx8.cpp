@@ -2011,7 +2011,7 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 	Warning( "m_MaxTextureWidth: %d\n", g_pHardwareConfig->Caps().m_MaxTextureWidth );
 	Warning( "m_MaxTextureHeight: %d\n", g_pHardwareConfig->Caps().m_MaxTextureHeight );
 	Warning( "m_MaxTextureAspectRatio: %d\n", g_pHardwareConfig->Caps().m_MaxTextureAspectRatio );
-	Warning( "m_MaxPrimitiveCount: %d\n", g_pHardwareConfig->Caps().m_MaxPrimitiveCount );
+	Warning( "m_MaxPrimitiveCount: %u\n", g_pHardwareConfig->Caps().m_MaxPrimitiveCount );
 	Warning( "m_ZBiasAndSlopeScaledDepthBiasSupported: %s\n", g_pHardwareConfig->Caps().m_ZBiasAndSlopeScaledDepthBiasSupported ? "yes" : "no" );
 	Warning( "m_SupportsMipmapping: %s\n", g_pHardwareConfig->Caps().m_SupportsMipmapping ? "yes" : "no" );
 	Warning( "m_SupportsOverbright: %s\n", g_pHardwareConfig->Caps().m_SupportsOverbright ? "yes" : "no" );

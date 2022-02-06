@@ -18,13 +18,15 @@
 #include "tier1/utlvector.h"
 #include "tier1/utlrbtree.h"
 #include "tier1/utllinkedlist.h"
+#include "tier1/utlstring.h"
+#include "com_ptr.h"
 
 
 //-----------------------------------------------------------------------------
 // Forward declaration
 //-----------------------------------------------------------------------------
-struct IDXGIFactory;
-struct IDXGIAdapter;
+struct IDXGIFactory1;
+struct IDXGIAdapter1;
 struct IDXGIOutput;
 struct IDXGISwapChain;
 struct ID3D10Device;
@@ -68,19 +70,19 @@ private:
 	void InitAdapterInfo();
 
 	// Determines hardware caps from D3D
-	bool ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapter *pAdapter, IDXGIOutput *pOutput );
+	bool ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapter1 *pAdapter, IDXGIOutput *pOutput );
 
 	// Returns the amount of video memory in bytes for a particular adapter
 	virtual int GetVidMemBytes( int nAdapter ) const;
 
 	// Returns the appropriate adapter output to use
-	IDXGIOutput* GetAdapterOutput( int nAdapter ) const;
+	se::win::com::com_ptr<IDXGIOutput> GetAdapterOutput( int nAdapter ) const;
 
 	// Returns the adapter interface for a particular adapter
-	IDXGIAdapter* GetAdapter( int nAdapter ) const;
+	se::win::com::com_ptr<IDXGIAdapter1> GetAdapter( int nAdapter ) const;
 
 	// Used to enumerate adapters, attach to windows
-	IDXGIFactory *m_pDXGIFactory;
+	se::win::com::com_ptr<IDXGIFactory1> m_pDXGIFactory;
 
 	bool m_bObeyDxCommandlineOverride: 1;
 
@@ -130,17 +132,25 @@ public:
 	virtual void RefreshFrontBufferNonInteractive( ) {}
 	virtual void HandleThreadEvent( uint32 threadEvent ) {}
 
+	virtual char *GetDisplayDeviceName() override;
+
 public:
 	// Methods of CShaderDeviceBase
 	virtual bool InitDevice( void *hWnd, int nAdapter, const ShaderDeviceInfo_t& mode );
 	virtual void ShutdownDevice();
 	virtual bool IsDeactivated() const { return false; }
+	virtual bool DetermineHardwareCaps();
 
 	// Other public methods
 	ID3D10VertexShader* GetVertexShader( VertexShaderHandle_t hShader ) const;
 	ID3D10GeometryShader* GetGeometryShader( GeometryShaderHandle_t hShader ) const;
 	ID3D10PixelShader* GetPixelShader( PixelShaderHandle_t hShader ) const;
 	ID3D10InputLayout* GetInputLayout( VertexShaderHandle_t hShader, VertexFormat_t format );
+
+	// FIXME: Make private
+	// Which device are we using?
+	UINT		m_DisplayAdapter;
+	D3D10_DRIVER_TYPE		m_DriverType;
 
 private:
 	struct InputLayout_t
@@ -186,18 +196,19 @@ private:
 	void SetupHardwareCaps();
 	void ReleaseInputLayouts( VertexShaderIndex_t nIndex );
 
-	IDXGIOutput *m_pOutput;
-	ID3D10Device *m_pDevice;	
-	IDXGISwapChain *m_pSwapChain;
-	ID3D10RenderTargetView *m_pRenderTargetView;
+	se::win::com::com_ptr<IDXGIOutput> m_pOutput;
+	se::win::com::com_ptr<ID3D10Device> m_pDevice;
+	se::win::com::com_ptr<IDXGISwapChain> m_pSwapChain;
+	se::win::com::com_ptr<ID3D10RenderTargetView> m_pRenderTargetView;
 
-	CUtlFixedLinkedList< VertexShader_t > m_VertexShaderDict;
-	CUtlFixedLinkedList< GeometryShader_t > m_GeometryShaderDict;
-	CUtlFixedLinkedList< PixelShader_t > m_PixelShaderDict;
+	CUtlFixedLinkedList<VertexShader_t> m_VertexShaderDict;
+	CUtlFixedLinkedList<GeometryShader_t> m_GeometryShaderDict;
+	CUtlFixedLinkedList<PixelShader_t> m_PixelShaderDict;
 
-	friend ID3D10Device *D3D10Device();
-	friend IDXGISwapChain *D3D10SwapChain();
-	friend ID3D10RenderTargetView *D3D10RenderTargetView();
+	CUtlString m_sDisplayDeviceName;
+
+	friend se::win::com::com_ptr<ID3D10Device> D3D10Device();
+	friend se::win::com::com_ptr<ID3D10RenderTargetView> D3D10RenderTargetView();
 };
 
 
@@ -235,17 +246,12 @@ extern CShaderDeviceDx10* g_pShaderDeviceDx10;
 //-----------------------------------------------------------------------------
 // Utility methods
 //-----------------------------------------------------------------------------
-inline ID3D10Device *D3D10Device()
+inline se::win::com::com_ptr<ID3D10Device> D3D10Device()
 {
 	return g_pShaderDeviceDx10->m_pDevice;	
 }
 
-inline IDXGISwapChain *D3D10SwapChain()
-{
-	return g_pShaderDeviceDx10->m_pSwapChain;	
-}
-
-inline ID3D10RenderTargetView *D3D10RenderTargetView()
+inline se::win::com::com_ptr<ID3D10RenderTargetView> D3D10RenderTargetView()
 {
 	return g_pShaderDeviceDx10->m_pRenderTargetView;	
 }

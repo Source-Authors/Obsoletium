@@ -29,11 +29,8 @@ CFunctionCommit::CFunctionCommit()
 
 CFunctionCommit::~CFunctionCommit()
 {
-	if ( m_pCommitFlags )
-	{
-		delete[] m_pCommitFlags;
-		m_pCommitFlags = NULL;
-	}
+	delete[] m_pCommitFlags;
+	m_pCommitFlags = NULL;
 }
 
 void CFunctionCommit::Init( int nFunctionCount )
@@ -81,10 +78,9 @@ inline void CFunctionCommit::ClearAllCommitFuncs( )
 //-----------------------------------------------------------------------------
 void CFunctionCommit::CallCommitFuncs( ID3D10Device *pDevice, const ShaderStateDx10_t &desiredState, ShaderStateDx10_t &currentState, bool bForce )
 {
-	int nCount = m_CommitFuncs.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( auto &cf : m_CommitFuncs )
 	{
-		m_CommitFuncs[i]( pDevice, desiredState, currentState, bForce );
+		cf( pDevice, desiredState, currentState, bForce );
 	}
 
 	ClearAllCommitFuncs( );
@@ -151,10 +147,10 @@ static void CommitSetInputLayout( ID3D10Device *pDevice, const ShaderStateDx10_t
 		// FIXME: Deal with multiple streams
 		ID3D10InputLayout *pInputLayout = g_pShaderDeviceDx10->GetInputLayout( 
 			newState.m_hVertexShader, newState.m_pVertexDecl[0] );
-		pDevice->IASetInputLayout( pInputLayout );						
+		pDevice->IASetInputLayout( pInputLayout );
 
 		currentState.m_InputLayout = newState;
-	}																		
+	}
 }
 
 static void CommitSetViewports( ID3D10Device *pDevice, const ShaderStateDx10_t &desiredState, ShaderStateDx10_t &currentState, bool bForce )
@@ -716,6 +712,11 @@ void CShaderAPIDx10::Draw( MaterialPrimitiveType_t primitiveType, int nFirstInde
 bool CShaderAPIDx10::DoRenderTargetsNeedSeparateDepthBuffer() const
 {
 	return false;
+}
+
+bool CShaderAPIDx10::SetMode( void* hwnd, int nAdapter, const ShaderDeviceInfo_t &info )
+{
+	return g_pShaderDeviceMgr->SetMode( hwnd, nAdapter, info );
 }
 
 // Can we download textures?

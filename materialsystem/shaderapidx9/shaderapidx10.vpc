@@ -9,34 +9,20 @@ $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
-$Configuration	"Debug"
-{
-	$General
-	{
-		$OutputDirectory			".\Debug_dx10"
-		$IntermediateDirectory		".\Debug_dx10"
-	}
-}
-
-$Configuration	"Release"
-{
-	$General
-	{
-		$OutputDirectory			".\Release_dx10"
-		$IntermediateDirectory		".\Release_dx10"
-	}
-}
-
 // Common Configuration
 $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\dx10sdk\include;..\"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\dx9sdk\include"
+		$AdditionalIncludeDirectories	"$BASE;..\"
 		$PreprocessorDefinitions		"$BASE;SHADERAPIDX10;SHADER_DLL_EXPORT;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead"
-		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [$WIN32]
+		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [$WINDOWS]
+	}
 
-//		$AdditionalOptions		"/FC"
+	$Linker
+	{
+		$AdditionalDependencies				"$BASE d3d10.lib dxgi.lib" [$WINDOWS]
 	}
 }
 
@@ -85,13 +71,12 @@ $Project "shaderapidx10"
 
 	$Folder	"DirectX Header Files"
 	{
-		$File	"$SRCDIR\dx10sdk\include\d3d10.h"
-		$File	"$SRCDIR\dx10sdk\include\d3dx10.h"
-		$File	"$SRCDIR\dx10sdk\include\d3dx10core.h"
-		$File	"$SRCDIR\dx10sdk\include\d3dx10math.h"
-		$File	"$SRCDIR\dx10sdk\include\d3dx10math.inl"
-		$File	"$SRCDIR\dx10sdk\include\d3dx10mesh.h"
-		$File	"$SRCDIR\dx10sdk\include\d3dx10tex.h"
+		$File	"$SRCDIR\dx9sdk\include\d3dx10.h"
+		$File	"$SRCDIR\dx9sdk\include\d3dx10core.h"
+		$File	"$SRCDIR\dx9sdk\include\d3dx10math.h"
+		$File	"$SRCDIR\dx9sdk\include\d3dx10math.inl"
+		$File	"$SRCDIR\dx9sdk\include\d3dx10mesh.h"
+		$File	"$SRCDIR\dx9sdk\include\d3dx10tex.h"
 	}
 
 	$Folder	"Public Header Files"
@@ -138,36 +123,20 @@ $Project "shaderapidx10"
 		$File	"ShaderShadowDX8.h"
 		$File	"stubd3ddevice.h"
 		$File	"TextureDX8.h"
-		$File	"VertexShaderDX8.h"					
+		$File	"VertexShaderDX8.h"
 		$File	"wmi.h"
 	}
 
 	$Folder	"Link Libraries"
 	{
-		$DynamicFile	"$SRCDIR\lib\public\tier2.lib"
-		$DynamicFile	"$SRCDIR\lib\public\bitmap.lib"
-		$DynamicFile	"$SRCDIR\lib\public\mathlib.lib"
-		
-		$File	"$SRCDIR\dx10sdk\lib\x86\d3d9.lib" 
-		$File	"$SRCDIR\dx10sdk\lib\x86\d3d10.lib" 
-		$File	"$SRCDIR\dx10sdk\lib\x86\dxgi.lib" 
-		
-		$File	"$SRCDIR\dx10sdk\lib\x86\d3dx10.lib"	\
-				"$SRCDIR\dx10sdk\lib\x86\d3dx9.lib"
+		$Lib	bitmap
+		$Lib	mathlib
+		$Lib	tier2
+
+		$Folder	"Link Libraries" [$WINDOWS]
 		{
-			$Configuration "Debug"
-			{
-				$ExcludedFromBuild	"Yes"
-			}
-		}
-		
-		$File	"$SRCDIR\dx10sdk\lib\x86\d3dx10d.lib"	\
-				"$SRCDIR\dx10sdk\lib\x86\d3dx9d.lib"
-		{
-			$Configuration "Release"
-			{
-				$ExcludedFromBuild	"Yes"
-			}
+			$File	"$SRCDIR\dx9sdk\lib\d3dx10.lib" [$WIN32]
+			$File	"$SRCDIR\dx9sdk\lib\x64\d3dx10.lib" [$WIN64]
 		}
 	}
 }
