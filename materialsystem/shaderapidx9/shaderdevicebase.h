@@ -102,14 +102,14 @@ private:
 	bool GetRecommendedConfigurationInfo( unsigned nAdapter, int nDXLevel, int nVendorID, int nDeviceID, KeyValues *pConfiguration );
 
 	// Returns the amount of video memory in bytes for a particular adapter
-	virtual unsigned GetVidMemBytes( unsigned nAdapter ) const = 0;
+	virtual size_t GetVidMemBytes( unsigned nAdapter ) const = 0;
 
 	// Looks for override keyvalues in the dxsupport cfg keyvalues
 	KeyValues *FindDXLevelSpecificConfig( KeyValues *pKeyValues, int nDxLevel );
 	KeyValues *FindDXLevelAndVendorSpecificConfig( KeyValues *pKeyValues, int nDxLevel, int nVendorID );
 	KeyValues *FindCPUSpecificConfig( KeyValues *pKeyValues, int nCPUMhz, bool bAMD );
 	KeyValues *FindMemorySpecificConfig( KeyValues *pKeyValues, int nSystemRamMB );
-	KeyValues *FindVidMemSpecificConfig( KeyValues *pKeyValues, unsigned nVideoRamMB );
+	KeyValues *FindVidMemSpecificConfig( KeyValues *pKeyValues, size_t nVideoRamMB );
 	KeyValues *FindCardSpecificConfig( KeyValues *pKeyValues, int nVendorID, int nDeviceID );
 
 protected:

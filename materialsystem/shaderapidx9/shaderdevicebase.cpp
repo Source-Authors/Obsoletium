@@ -403,7 +403,7 @@ KeyValues *CShaderDeviceMgrBase::FindMemorySpecificConfig( KeyValues *pKeyValues
 //-----------------------------------------------------------------------------
 // Finds if we have a texture mem size specific config
 //-----------------------------------------------------------------------------
-KeyValues *CShaderDeviceMgrBase::FindVidMemSpecificConfig( KeyValues *pKeyValues, unsigned nVideoRamMB )
+KeyValues *CShaderDeviceMgrBase::FindVidMemSpecificConfig( KeyValues *pKeyValues, size_t nVideoRamMB )
 {	
 	if ( IsX360() )
 	{
@@ -776,8 +776,8 @@ bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( unsigned nAdapter, i
 	LoadConfig( pMemoryKeyValues, pConfiguration );
 
 	// override with texture memory-size based overrides
-	unsigned nTextureMemorySize = GetVidMemBytes( nAdapter );
-	unsigned vidMemMB = nTextureMemorySize / ( 1024 * 1024 );
+	size_t nTextureMemorySize = GetVidMemBytes( nAdapter );
+	size_t vidMemMB = nTextureMemorySize / ( 1024 * 1024 );
 	KeyValues *pVidMemKeyValues = FindVidMemSpecificConfig( pCfg, vidMemMB );
 	if ( pVidMemKeyValues && nTextureMemorySize > 0 )
 	{

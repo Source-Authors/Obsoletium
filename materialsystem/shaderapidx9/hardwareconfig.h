@@ -89,7 +89,7 @@ struct HardwareCaps_t : public MaterialAdapterInfo_t
 	int  m_NumVertexShaderConstants;
 	int  m_NumBooleanVertexShaderConstants;
 	int  m_NumIntegerVertexShaderConstants;
-	unsigned  m_TextureMemorySize;
+	size_t  m_TextureMemorySize;
 	int  m_MaxNumLights;
 	int  m_MaxBlendMatrices;
 	int  m_MaxBlendMatrixIndices;
@@ -196,7 +196,7 @@ public:
 	virtual int  MaximumAnisotropicLevel() const;
 	virtual int  MaxTextureWidth() const;
 	virtual int  MaxTextureHeight() const;
-	virtual unsigned	 TextureMemorySize() const;
+	virtual size_t	 TextureMemorySize() const;
 	virtual bool SupportsOverbright() const;
 	virtual bool SupportsCubeMaps() const;
 	virtual bool SupportsMipmappedCubemaps() const;

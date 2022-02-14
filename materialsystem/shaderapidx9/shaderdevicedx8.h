@@ -83,7 +83,7 @@ public:
 	bool ValidateMode( unsigned nAdapter, const ShaderDeviceInfo_t &info ) const;
 
 	// Returns the amount of video memory in bytes for a particular adapter
-	virtual unsigned GetVidMemBytes( unsigned nAdapter ) const;
+	virtual size_t GetVidMemBytes( unsigned nAdapter ) const;
 
 #if !defined( _X360 )
 	FORCEINLINE IDirect3D9 *D3D() const

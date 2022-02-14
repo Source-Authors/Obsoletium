@@ -73,7 +73,7 @@ private:
 	bool ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapter1 *pAdapter, IDXGIOutput *pOutput );
 
 	// Returns the amount of video memory in bytes for a particular adapter
-	virtual unsigned GetVidMemBytes( unsigned nAdapter ) const;
+	virtual size_t GetVidMemBytes( unsigned nAdapter ) const;
 
 	// Returns the appropriate adapter output to use
 	se::win::com::com_ptr<IDXGIOutput> GetAdapterOutput( unsigned nAdapter ) const;

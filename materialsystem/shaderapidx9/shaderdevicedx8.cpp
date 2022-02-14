@@ -1471,7 +1471,7 @@ bool CShaderDeviceMgrDx8::ValidateMode( unsigned nAdapter, const ShaderDeviceInf
 //-----------------------------------------------------------------------------
 // Returns the amount of video memory in bytes for a particular adapter
 //-----------------------------------------------------------------------------
-unsigned CShaderDeviceMgrDx8::GetVidMemBytes( unsigned nAdapter ) const
+size_t CShaderDeviceMgrDx8::GetVidMemBytes( unsigned nAdapter ) const
 {
 #if defined( _X360 )
 	return 256*1024*1024;
@@ -1480,11 +1480,7 @@ unsigned CShaderDeviceMgrDx8::GetVidMemBytes( unsigned nAdapter ) const
 	D3D()->GetAdapterIdentifier( nAdapter, D3DENUM_WHQL_LEVEL, &devIndentifier );
 	return devIndentifier.VideoMemory;
 #else
-	// FIXME: This currently ignores the adapter
-	uint64 nBytes = ::GetVidMemBytes();
-	if ( nBytes > UINT_MAX )
-		return UINT_MAX;
-	return nBytes;
+  return ::GetVidMemBytes(nAdapter);
 #endif
 }
 
@@ -1960,7 +1956,7 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 		(caps.RasterCaps & D3DPRASTERCAPS_DEPTHBIAS) ? " Y " : " N ",
 		(caps.RasterCaps & D3DPRASTERCAPS_ZTEST) ? " Y " : "*N*" );
 
-	Warning("Size of Texture Memory : %u kb\n", g_pHardwareConfig->Caps().m_TextureMemorySize / 1024 );
+	Warning("Size of Texture Memory : %zu kb\n", g_pHardwareConfig->Caps().m_TextureMemorySize / 1024 );
 	Warning("Max Texture Dimensions : %d x %d\n", 
 		caps.MaxTextureWidth, caps.MaxTextureHeight );
 	if (caps.MaxTextureAspectRatio != 0)
@@ -2020,7 +2016,7 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 	Warning( "m_NumVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumVertexShaderConstants );
 	Warning( "m_NumBooleanVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumBooleanVertexShaderConstants );
 	Warning( "m_NumIntegerVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumIntegerVertexShaderConstants );
-	Warning( "m_TextureMemorySize: %u\n", g_pHardwareConfig->Caps().m_TextureMemorySize );
+	Warning( "m_TextureMemorySize: %zu\n", g_pHardwareConfig->Caps().m_TextureMemorySize );
 	Warning( "m_MaxNumLights: %d\n", g_pHardwareConfig->Caps().m_MaxNumLights );
 	Warning( "m_SupportsHardwareLighting: %s\n", g_pHardwareConfig->Caps().m_SupportsHardwareLighting ? "yes" : "no" );
 	Warning( "m_MaxBlendMatrices: %d\n", g_pHardwareConfig->Caps().m_MaxBlendMatrices );

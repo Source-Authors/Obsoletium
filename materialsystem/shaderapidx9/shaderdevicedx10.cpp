@@ -300,7 +300,7 @@ se::win::com::com_ptr<IDXGIAdapter1> CShaderDeviceMgrDx10::GetAdapter( unsigned 
 //-----------------------------------------------------------------------------
 // Returns the amount of video memory in bytes for a particular adapter
 //-----------------------------------------------------------------------------
-unsigned CShaderDeviceMgrDx10::GetVidMemBytes( unsigned nAdapter ) const
+size_t CShaderDeviceMgrDx10::GetVidMemBytes( unsigned nAdapter ) const
 {
 	LOCK_SHADERAPI();
 

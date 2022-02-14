@@ -441,7 +441,7 @@ public:
 	virtual int  MaxTextureWidth() const			{ return 0; }
 	virtual int  MaxTextureHeight() const			{ return 0; }
 	virtual int  MaxTextureDepth() const			{ return 0; }
-	virtual unsigned	 TextureMemorySize() const			{ return 0; }
+	virtual size_t	 TextureMemorySize() const			{ return 0; }
 	virtual bool SupportsOverbright() const			{ return false; }
 	virtual bool SupportsCubeMaps() const			{ return false; }
 	virtual bool SupportsMipmappedCubemaps() const	{ return false; }

@@ -11,7 +11,7 @@
 #endif
 
 
-uint64 GetVidMemBytes( void );
+size_t GetVidMemBytes( unsigned nAdapter );
 
 
 #endif // WMI_H
