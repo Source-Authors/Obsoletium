@@ -196,7 +196,7 @@ void *CShaderDeviceMgrBase::QueryInterface( const char *pInterfaceName )
 //-----------------------------------------------------------------------------
 // Returns the hardware caps for a particular adapter
 //-----------------------------------------------------------------------------
-const HardwareCaps_t& CShaderDeviceMgrBase::GetHardwareCaps( int nAdapter ) const
+const HardwareCaps_t& CShaderDeviceMgrBase::GetHardwareCaps( unsigned nAdapter ) const
 {
 	Assert( ( nAdapter >= 0 ) && ( nAdapter < GetAdapterCount() ) );
 	return m_Adapters[nAdapter].m_ActualCaps;
@@ -403,7 +403,7 @@ KeyValues *CShaderDeviceMgrBase::FindMemorySpecificConfig( KeyValues *pKeyValues
 //-----------------------------------------------------------------------------
 // Finds if we have a texture mem size specific config
 //-----------------------------------------------------------------------------
-KeyValues *CShaderDeviceMgrBase::FindVidMemSpecificConfig( KeyValues *pKeyValues, int nVideoRamMB )
+KeyValues *CShaderDeviceMgrBase::FindVidMemSpecificConfig( KeyValues *pKeyValues, unsigned nVideoRamMB )
 {	
 	if ( IsX360() )
 	{
@@ -413,9 +413,9 @@ KeyValues *CShaderDeviceMgrBase::FindVidMemSpecificConfig( KeyValues *pKeyValues
 
 	for( KeyValues *pGroup = pKeyValues->GetFirstSubKey(); pGroup; pGroup = pGroup->GetNextKey() )
 	{
-		int nMinMB = pGroup->GetInt( "min megatexels", -1 );
-		int nMaxMB = pGroup->GetInt( "max megatexels", -1 );
-		if ( nMinMB == -1 || nMaxMB == -1 )
+		uint64_t nMinMB = pGroup->GetUint64( "min megatexels", UINT64_MAX );
+		uint64_t nMaxMB = pGroup->GetUint64( "max megatexels", UINT64_MAX );
+		if ( nMinMB == UINT64_MAX || nMaxMB == UINT64_MAX )
 			continue;
 
 		if ( nMinMB <= nVideoRamMB && nVideoRamMB < nMaxMB )
@@ -715,7 +715,7 @@ static unsigned long GetRam()
 //-----------------------------------------------------------------------------
 // Gets the recommended configuration associated with a particular dx level
 //-----------------------------------------------------------------------------
-bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( int nAdapter, int nDXLevel, int nVendorID, int nDeviceID, KeyValues *pConfiguration ) 
+bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( unsigned nAdapter, int nDXLevel, int nVendorID, int nDeviceID, KeyValues *pConfiguration ) 
 {
 	LOCK_SHADERAPI();
 
@@ -776,8 +776,8 @@ bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( int nAdapter, int nD
 	LoadConfig( pMemoryKeyValues, pConfiguration );
 
 	// override with texture memory-size based overrides
-	int nTextureMemorySize = GetVidMemBytes( nAdapter );
-	int vidMemMB = nTextureMemorySize / ( 1024 * 1024 );
+	unsigned nTextureMemorySize = GetVidMemBytes( nAdapter );
+	unsigned vidMemMB = nTextureMemorySize / ( 1024 * 1024 );
 	KeyValues *pVidMemKeyValues = FindVidMemSpecificConfig( pCfg, vidMemMB );
 	if ( pVidMemKeyValues && nTextureMemorySize > 0 )
 	{
@@ -816,7 +816,7 @@ bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( int nAdapter, int nD
 //-----------------------------------------------------------------------------
 // Gets recommended congifuration for a particular adapter at a particular dx level
 //-----------------------------------------------------------------------------
-bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( int nAdapter, int nDXLevel, KeyValues *pCongifuration )
+bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( unsigned nAdapter, int nDXLevel, KeyValues *pCongifuration )
 {
 	Assert( nAdapter >= 0 && nAdapter <= GetAdapterCount() );
 	MaterialAdapterInfo_t info;

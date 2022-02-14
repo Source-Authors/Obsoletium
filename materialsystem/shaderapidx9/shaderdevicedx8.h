@@ -65,25 +65,25 @@ public:
 	virtual void Shutdown();
 
 	// Methods of IShaderDevice
-	virtual int	 GetAdapterCount() const;
-	virtual void GetAdapterInfo( int adapter, MaterialAdapterInfo_t& info ) const;
-	virtual int	 GetModeCount( int nAdapter ) const;
-	virtual void GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter, int mode ) const;
-	virtual void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter ) const;
-	virtual bool SetAdapter( int nAdapter, int nFlags );
-	virtual CreateInterfaceFn SetMode( void *hWnd, int nAdapter, const ShaderDeviceInfo_t& mode );
+	virtual unsigned	 GetAdapterCount() const;
+	virtual void GetAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const;
+	virtual unsigned	 GetModeCount( unsigned nAdapter ) const;
+	virtual void GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter, unsigned mode ) const;
+	virtual void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const;
+	virtual bool SetAdapter( unsigned nAdapter, int nFlags );
+	virtual CreateInterfaceFn SetMode( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode );
 
 	// Determines hardware caps from D3D
-	bool ComputeCapsFromD3D( HardwareCaps_t *pCaps, int nAdapter );
+	bool ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nAdapter );
 
 	// Forces caps to a specific dx level
 	void ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, const HardwareCaps_t &actualCaps );
 
 	// Validates the mode...
-	bool ValidateMode( int nAdapter, const ShaderDeviceInfo_t &info ) const;
+	bool ValidateMode( unsigned nAdapter, const ShaderDeviceInfo_t &info ) const;
 
 	// Returns the amount of video memory in bytes for a particular adapter
-	virtual int GetVidMemBytes( int nAdapter ) const;
+	virtual unsigned GetVidMemBytes( unsigned nAdapter ) const;
 
 #if !defined( _X360 )
 	FORCEINLINE IDirect3D9 *D3D() const
@@ -109,13 +109,13 @@ private:
 	void InitAdapterInfo();
 
 	// Code to detect support for texture border mode (not a simple caps check)
-	void CheckBorderColorSupport( HardwareCaps_t *pCaps, int nAdapter );
+	void CheckBorderColorSupport( HardwareCaps_t *pCaps, unsigned nAdapter );
 
 	// Vendor-dependent code to detect support for various flavors of shadow mapping
-	void CheckVendorDependentShadowMappingSupport( HardwareCaps_t *pCaps, int nAdapter );
+	void CheckVendorDependentShadowMappingSupport( HardwareCaps_t *pCaps, unsigned nAdapter );
 
 	// Vendor-dependent code to detect Alpha To Coverage Backdoors
-	void CheckVendorDependentAlphaToCoverage( HardwareCaps_t *pCaps, int nAdapter );
+	void CheckVendorDependentAlphaToCoverage( HardwareCaps_t *pCaps, unsigned nAdapter );
 
 	// Compute the effective DX support level based on all the other caps
 	void ComputeDXSupportLevel( HardwareCaps_t &caps );
@@ -185,7 +185,7 @@ public:
 	virtual IIndexBuffer *GetDynamicIndexBuffer( MaterialIndexFormat_t fmt, bool bBuffered = true );
 	virtual void SetHardwareGammaRamp( float fGamma, float fGammaTVRangeMin, float fGammaTVRangeMax, float fGammaTVExponent, bool bTVEnabled );
 	virtual void SpewDriverInfo() const;
-	virtual int GetCurrentAdapter() const;
+	virtual unsigned GetCurrentAdapter() const;
 	virtual void EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode, ShaderNonInteractiveInfo_t *pInfo = NULL );
 	virtual void RefreshFrontBufferNonInteractive();
 	virtual char *GetDisplayDeviceName() OVERRIDE; 
@@ -195,7 +195,7 @@ public:
 
 	// Methods of CShaderDeviceBase
 public:
-	virtual bool InitDevice( void* hWnd, int nAdapter, const ShaderDeviceInfo_t &info );
+	virtual bool InitDevice( void* hWnd, unsigned nAdapter, const ShaderDeviceInfo_t &info );
 	virtual void ShutdownDevice();
 	virtual bool IsDeactivated() const;
 
@@ -247,16 +247,16 @@ protected:
 
 protected:
 	// Creates the D3D Device
-	bool CreateD3DDevice( void* pHWnd, int nAdapter, const ShaderDeviceInfo_t &info );
+	bool CreateD3DDevice( void* pHWnd, unsigned nAdapter, const ShaderDeviceInfo_t &info );
 
 	// Actually creates the D3D Device once the present parameters are set up
-	IDirect3DDevice9* InvokeCreateDevice( void* hWnd, int nAdapter, DWORD deviceCreationFlags );
+	IDirect3DDevice9* InvokeCreateDevice( void* hWnd, unsigned nAdapter, DWORD deviceCreationFlags );
 
 	// Checks for CreateQuery support
 	void DetectQuerySupport( IDirect3DDevice9* pD3DDevice );
 
 	// Computes the presentation parameters
-	void SetPresentParameters( void* hWnd, int nAdapter, const ShaderDeviceInfo_t &info );
+	void SetPresentParameters( void* hWnd, unsigned nAdapter, const ShaderDeviceInfo_t &info );
 
 	// Computes the supersample flags
 	D3DMULTISAMPLE_TYPE ComputeMultisampleType( int nSampleCount );

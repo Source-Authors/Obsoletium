@@ -190,7 +190,7 @@ private:
 	void ClearSnapshots();
 
 	// Sets the mode...
-	bool SetMode( void* hwnd, int nAdapter, const ShaderDeviceInfo_t &info );
+	bool SetMode( void* hwnd, unsigned nAdapter, const ShaderDeviceInfo_t &info );
 
 	void ChangeVideoMode( const ShaderDeviceInfo_t &info )
 	{

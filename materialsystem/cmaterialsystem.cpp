@@ -782,7 +782,7 @@ void *CMaterialSystem::QueryInterface( const char *pInterfaceName )
 //-----------------------------------------------------------------------------
 // Must be called before Init(), if you're going to call it at all...
 //-----------------------------------------------------------------------------
-void CMaterialSystem::SetAdapter( int nAdapter, int nAdapterFlags )
+void CMaterialSystem::SetAdapter( unsigned nAdapter, int nAdapterFlags )
 {
 	m_nAdapter = nAdapter;
 	m_nAdapterFlags = nAdapterFlags;
@@ -1006,7 +1006,7 @@ IMaterialSystemHardwareConfig *CMaterialSystem::GetHardwareConfig( const char *p
 //-----------------------------------------------------------------------------
 // Returns the current adapter in use
 //-----------------------------------------------------------------------------
-int CMaterialSystem::GetCurrentAdapter() const
+unsigned CMaterialSystem::GetCurrentAdapter() const
 {
 	return g_pShaderDevice->GetCurrentAdapter();
 }
@@ -1182,19 +1182,19 @@ bool CMaterialSystem::CanUseEditorMaterials() const
 //-----------------------------------------------------------------------------
 
 // Gets the number of adapters...
-int	 CMaterialSystem::GetDisplayAdapterCount() const
+unsigned	 CMaterialSystem::GetDisplayAdapterCount() const
 {
 	return g_pShaderDeviceMgr->GetAdapterCount( );
 }
 
 // Returns info about each adapter
-void CMaterialSystem::GetDisplayAdapterInfo( int adapter, MaterialAdapterInfo_t& info ) const
+void CMaterialSystem::GetDisplayAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const
 {
 	g_pShaderDeviceMgr->GetAdapterInfo( adapter, info );
 }
 
 // Returns the number of modes
-int	 CMaterialSystem::GetModeCount( int adapter ) const
+unsigned	 CMaterialSystem::GetModeCount( unsigned adapter ) const
 {
 	return g_pShaderDeviceMgr->GetModeCount( adapter );
 }
@@ -1238,7 +1238,7 @@ static void ConvertModeStruct( MaterialVideoMode_t *pMode, const ShaderDisplayMo
 //-----------------------------------------------------------------------------
 // Returns mode information..
 //-----------------------------------------------------------------------------
-void CMaterialSystem::GetModeInfo( int nAdapter, int nMode, MaterialVideoMode_t& info ) const
+void CMaterialSystem::GetModeInfo( unsigned nAdapter, unsigned nMode, MaterialVideoMode_t& info ) const
 {
 	ShaderDisplayMode_t shaderInfo;
 	g_pShaderDeviceMgr->GetModeInfo( &shaderInfo, nAdapter, nMode );
@@ -1305,7 +1305,7 @@ bool CMaterialSystem::SetMode( void* hwnd, const MaterialSystem_Config_t &config
 	ConvertModeStruct( &info, config );
 
 	bool bPreviouslyUsingGraphics = g_pShaderDevice->IsUsingGraphics();
-	if( config.m_nVRModeAdapter != -1 && config.m_nVRModeAdapter < GetDisplayAdapterCount() && !bPreviouslyUsingGraphics )
+	if( config.m_nVRModeAdapter != -1 && (unsigned)config.m_nVRModeAdapter < GetDisplayAdapterCount() && !bPreviouslyUsingGraphics )
 	{
 		// if this is init-time, we need to override the adapter with the
 		// VR mode adapter
@@ -1599,7 +1599,7 @@ int GetScreenAspectMode( int width, int height )
 	int nClosestAspectCode = ASPECT_4x3;
 	for ( int i = 0; i < ARRAYSIZE(g_RatioToAspectModes); i++ )
 	{
-		float flDist = fabs( g_RatioToAspectModes[i].flAspectRatio - flAspectRatio );
+		float flDist = fabsf( g_RatioToAspectModes[i].flAspectRatio - flAspectRatio );
 		if ( flDist < flClosestAspectRatioDist )
 		{
 			flClosestAspectRatioDist = flDist;
@@ -1630,8 +1630,8 @@ bool BetterResolution( int nRecommendedNumPixels, int nBestNumPixels, int nNewNu
 		return false;
 
 	// Finally, just check for nearness to desired number of pixels
-	float flDelta = fabs( flRecommendedNumPixels - flNewNumPixels );
-	float flBestDelta = fabs( flRecommendedNumPixels - flBestNumPixels );
+	float flDelta = fabsf( flRecommendedNumPixels - flNewNumPixels );
+	float flBestDelta = fabsf( flRecommendedNumPixels - flBestNumPixels );
 	if ( flDelta >= flBestDelta )
 		return false;
 
@@ -1696,10 +1696,10 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 	nBestMode = nBestWidth = nBestHeight = -1;
 	int nBestPixels = displayMode.m_nHeight * displayMode.m_nWidth;
 
-	int nNumVideoModes = g_pShaderDeviceMgr->GetModeCount( 0 );
+	unsigned nNumVideoModes = g_pShaderDeviceMgr->GetModeCount(0);
 
 	// Pick the resolution with the right aspect ratio which matches the recommended resolution most closely
-	for ( int i=0; i<nNumVideoModes; i++ )
+	for ( unsigned i=0; i<nNumVideoModes; i++ )
 	{
 		g_pShaderDeviceMgr->GetModeInfo( &displayMode, 0, i );
 

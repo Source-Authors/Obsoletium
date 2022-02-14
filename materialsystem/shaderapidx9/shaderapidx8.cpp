@@ -647,7 +647,7 @@ public:
 	//
 
 	// Sets the mode...
-	bool SetMode( void* VD3DHWND, int nAdapter, const ShaderDeviceInfo_t &info );
+	bool SetMode( void* VD3DHWND, unsigned nAdapter, const ShaderDeviceInfo_t &info );
 
 	// Change the video mode after it's already been set.
 	void ChangeVideoMode( const ShaderDeviceInfo_t &info );
@@ -2410,7 +2410,7 @@ void CShaderAPIDx8::OnDeviceShutdown()
 //-----------------------------------------------------------------------------
 // Sets the mode...
 //-----------------------------------------------------------------------------
-bool CShaderAPIDx8::SetMode( void* VD3DHWND, int nAdapter, const ShaderDeviceInfo_t &info )
+bool CShaderAPIDx8::SetMode( void* VD3DHWND, unsigned nAdapter, const ShaderDeviceInfo_t &info )
 {
 	//
 	// FIXME: Note that this entire function is backward compat and will go soon

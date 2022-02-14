@@ -714,7 +714,7 @@ bool CShaderAPIDx10::DoRenderTargetsNeedSeparateDepthBuffer() const
 	return false;
 }
 
-bool CShaderAPIDx10::SetMode( void* hwnd, int nAdapter, const ShaderDeviceInfo_t &info )
+bool CShaderAPIDx10::SetMode( void* hwnd, unsigned nAdapter, const ShaderDeviceInfo_t &info )
 {
 	return g_pShaderDeviceMgr->SetMode( hwnd, nAdapter, info );
 }

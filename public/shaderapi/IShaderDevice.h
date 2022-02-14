@@ -148,31 +148,31 @@ abstract_class IShaderDeviceMgr : public IAppSystem
 {
 public:
 	// Gets the number of adapters...
-	virtual int	 GetAdapterCount() const = 0;
+	virtual unsigned	 GetAdapterCount() const = 0;
 
 	// Returns info about each adapter
-	virtual void GetAdapterInfo( int nAdapter, MaterialAdapterInfo_t& info ) const = 0;
+	virtual void GetAdapterInfo( unsigned nAdapter, MaterialAdapterInfo_t& info ) const = 0;
 
 	// Gets recommended congifuration for a particular adapter at a particular dx level
-	virtual bool GetRecommendedConfigurationInfo( int nAdapter, int nDXLevel, KeyValues *pConfiguration ) = 0;
+	virtual bool GetRecommendedConfigurationInfo( unsigned nAdapter, int nDXLevel, KeyValues *pConfiguration ) = 0;
 
 	// Returns the number of modes
-	virtual int	 GetModeCount( int nAdapter ) const = 0;
+	virtual unsigned	 GetModeCount( unsigned nAdapter ) const = 0;
 
 	// Returns mode information..
-	virtual void GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter, int nMode ) const = 0;
+	virtual void GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter, unsigned nMode ) const = 0;
 
 	// Returns the current mode info for the requested adapter
-	virtual void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter ) const = 0;
+	virtual void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const = 0;
 
 	// Initialization, shutdown
-	virtual bool SetAdapter( int nAdapter, int nFlags ) = 0;
+	virtual bool SetAdapter( unsigned nAdapter, int nFlags ) = 0;
 
 	// Sets the mode
 	// Use the returned factory to get at an IShaderDevice and an IShaderRender
 	// and any other interfaces we decide to create.
 	// A returned factory of NULL indicates the mode was not set properly.
-	virtual CreateInterfaceFn SetMode( void *hWnd, int nAdapter, const ShaderDeviceInfo_t& mode ) = 0;
+	virtual CreateInterfaceFn SetMode( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode ) = 0;
 
 	// Installs a callback to get called 
 	virtual void AddModeChangeCallback( ShaderModeChangeCallbackFunc_t func ) = 0;
@@ -196,7 +196,7 @@ public:
 	virtual void GetBackBufferDimensions( int& width, int& height ) const = 0;
 
 	// Returns the current adapter in use
-	virtual int GetCurrentAdapter() const = 0;
+	virtual unsigned GetCurrentAdapter() const = 0;
 
 	// Are we using graphics?
 	virtual bool IsUsingGraphics() const = 0;

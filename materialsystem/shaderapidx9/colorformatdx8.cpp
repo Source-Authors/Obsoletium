@@ -458,7 +458,7 @@ bool D3DSupportsDepthTexture(D3DFORMAT format)
 //-----------------------------------------------------------------------------
 // Returns true if the depth format is compatible with the display
 //-----------------------------------------------------------------------------
-static inline bool IsDepthFormatCompatible( int nAdapter, ImageFormat displayFormat, ImageFormat renderTargetFormat, D3DFORMAT depthFormat )
+static inline bool IsDepthFormatCompatible( unsigned nAdapter, ImageFormat displayFormat, ImageFormat renderTargetFormat, D3DFORMAT depthFormat )
 {
 	D3DFORMAT d3dDisplayFormat = ImageLoader::ImageFormatToD3DFormat( displayFormat );
 	D3DFORMAT d3dRenderTargetFormat = ImageLoader::ImageFormatToD3DFormat( renderTargetFormat );
@@ -472,7 +472,7 @@ static inline bool IsDepthFormatCompatible( int nAdapter, ImageFormat displayFor
 //-----------------------------------------------------------------------------
 // Finds the nearest supported depth buffer format
 //-----------------------------------------------------------------------------
-D3DFORMAT FindNearestSupportedDepthFormat( int nAdapter, ImageFormat displayFormat, ImageFormat renderTargetFormat, D3DFORMAT depthFormat )
+D3DFORMAT FindNearestSupportedDepthFormat( unsigned nAdapter, ImageFormat displayFormat, ImageFormat renderTargetFormat, D3DFORMAT depthFormat )
 {
 	// This is the default case, used for rendering to the main render target
 	Assert( displayFormat != IMAGE_FORMAT_UNKNOWN && renderTargetFormat != IMAGE_FORMAT_UNKNOWN );

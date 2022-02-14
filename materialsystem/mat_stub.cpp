@@ -441,7 +441,7 @@ public:
 	virtual int  MaxTextureWidth() const			{ return 0; }
 	virtual int  MaxTextureHeight() const			{ return 0; }
 	virtual int  MaxTextureDepth() const			{ return 0; }
-	virtual int	 TextureMemorySize() const			{ return 0; }
+	virtual unsigned	 TextureMemorySize() const			{ return 0; }
 	virtual bool SupportsOverbright() const			{ return false; }
 	virtual bool SupportsCubeMaps() const			{ return false; }
 	virtual bool SupportsMipmappedCubemaps() const	{ return false; }
@@ -874,24 +874,24 @@ public:
 	}
 
 	// Gets the number of adapters...
-	virtual int					GetDisplayAdapterCount() const
+	virtual unsigned					GetDisplayAdapterCount() const
 	{
 		return 0;
 	}
 
 	// Returns info about each adapter
-	virtual void				GetDisplayAdapterInfo( int adapter, MaterialAdapterInfo_t& info ) const
+	virtual void				GetDisplayAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const
 	{
 	}
 
 	// Returns the number of modes
-	virtual int					GetModeCount( int adapter ) const
+	virtual unsigned					GetModeCount( unsigned adapter ) const
 	{
 		return 0;
 	}
 
 	// Returns mode information..
-	virtual void				GetModeInfo( int adapter, int mode, MaterialVideoMode_t& info ) const
+	virtual void				GetModeInfo( unsigned adapter, unsigned mode, MaterialVideoMode_t& info ) const
 	{
 	}
 
@@ -1640,7 +1640,7 @@ public:
 	virtual void *QueryInterface( const char *pInterfaceName ) { return NULL; }
 	virtual InitReturnVal_t Init() { return INIT_OK; }
 	virtual void SetShaderAPI( const char *pShaderAPIDLL ) {}
-	virtual void SetAdapter( int nAdapter, int nFlags ) {}
+	virtual void SetAdapter( unsigned nAdapter, int nFlags ) {}
 
 	// Release temporary HW memory...
 	virtual void ResetTempHWMemory( bool bExitingLevel ) {}
@@ -1789,7 +1789,7 @@ public:
 	}
 
 	// Used to enable editor materials. Must be called before Init.
-	virtual int		GetCurrentAdapter()	const
+	virtual unsigned		GetCurrentAdapter()	const
 	{
 		return 0;
 	}

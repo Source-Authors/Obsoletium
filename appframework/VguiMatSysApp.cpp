@@ -199,10 +199,10 @@ bool CVguiMatSysApp::PreInit( )
 
 	// Get the adapter from the command line....
 	const char *pAdapterString;
-	int adapter = 0;
+	unsigned adapter = 0;
 	if (CommandLine()->CheckParm( "-adapter", &pAdapterString ))
 	{
-		adapter = atoi( pAdapterString );
+		adapter = strtoul( pAdapterString, nullptr, 10 );
 	}
 
 	int adapterFlags = 0;

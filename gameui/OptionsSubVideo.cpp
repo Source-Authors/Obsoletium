@@ -106,7 +106,7 @@ int GetScreenAspectMode( int width, int height )
 	int closestAnamorphic = 0;
 	for (int i = 0; i < ARRAYSIZE(g_RatioToAspectModes); i++)
 	{
-		float dist = fabs( g_RatioToAspectModes[i].aspectRatio - aspectRatio );
+		float dist = fabsf( g_RatioToAspectModes[i].aspectRatio - aspectRatio );
 		if (dist < closestAspectRatioDist)
 		{
 			closestAspectRatioDist = dist;
@@ -1184,7 +1184,7 @@ void COptionsSubVideo::PrepareResolutionList()
 #if defined( DX_TO_GL_ABSTRACTION )
 		int displayIndex = m_pWindowed->GetActiveItem();
 #else
-		int displayIndex = materials->GetCurrentAdapter();
+		unsigned displayIndex = materials->GetCurrentAdapter();
 #endif
 
 		if ( !SDL_GetDisplayBounds( displayIndex, &rect ) )
@@ -1424,7 +1424,7 @@ void COptionsSubVideo::SetCurrentResolutionComboItem()
 #if defined( DX_TO_GL_ABSTRACTION )
 		int displayIndex = getSDLDisplayIndex();
 #else
-		int displayIndex = materials->GetCurrentAdapter();
+		unsigned displayIndex = materials->GetCurrentAdapter();
 #endif
 
 		if ( !SDL_GetDisplayBounds( displayIndex, &rect ) )

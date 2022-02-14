@@ -267,7 +267,7 @@ bool CShaderDeviceMgrDx10::ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapt
 //-----------------------------------------------------------------------------
 // Gets the number of adapters...
 //-----------------------------------------------------------------------------
-int CShaderDeviceMgrDx10::GetAdapterCount() const
+unsigned CShaderDeviceMgrDx10::GetAdapterCount() const
 {
 	return m_Adapters.Count();
 }
@@ -276,9 +276,9 @@ int CShaderDeviceMgrDx10::GetAdapterCount() const
 //-----------------------------------------------------------------------------
 // Returns info about each adapter
 //-----------------------------------------------------------------------------
-void CShaderDeviceMgrDx10::GetAdapterInfo( int nAdapter, MaterialAdapterInfo_t& info ) const
+void CShaderDeviceMgrDx10::GetAdapterInfo( unsigned nAdapter, MaterialAdapterInfo_t& info ) const
 {
-	Assert( ( nAdapter >= 0 ) && ( nAdapter < m_Adapters.Count() ) );
+	Assert( ( nAdapter >= 0 ) && ( nAdapter < (unsigned)m_Adapters.Count() ) );
 	const HardwareCaps_t &caps = m_Adapters[ nAdapter ].m_ActualCaps;
 	memcpy( &info, &caps, sizeof(MaterialAdapterInfo_t) );
 }
@@ -287,7 +287,7 @@ void CShaderDeviceMgrDx10::GetAdapterInfo( int nAdapter, MaterialAdapterInfo_t& 
 //-----------------------------------------------------------------------------
 // Returns the adapter interface for a particular adapter
 //-----------------------------------------------------------------------------
-se::win::com::com_ptr<IDXGIAdapter1> CShaderDeviceMgrDx10::GetAdapter( int nAdapter ) const
+se::win::com::com_ptr<IDXGIAdapter1> CShaderDeviceMgrDx10::GetAdapter( unsigned nAdapter ) const
 {
 	Assert( m_pDXGIFactory && ( nAdapter < GetAdapterCount() ) );
 
@@ -300,7 +300,7 @@ se::win::com::com_ptr<IDXGIAdapter1> CShaderDeviceMgrDx10::GetAdapter( int nAdap
 //-----------------------------------------------------------------------------
 // Returns the amount of video memory in bytes for a particular adapter
 //-----------------------------------------------------------------------------
-int CShaderDeviceMgrDx10::GetVidMemBytes( int nAdapter ) const
+unsigned CShaderDeviceMgrDx10::GetVidMemBytes( unsigned nAdapter ) const
 {
 	LOCK_SHADERAPI();
 
@@ -320,7 +320,7 @@ int CShaderDeviceMgrDx10::GetVidMemBytes( int nAdapter ) const
 //-----------------------------------------------------------------------------
 // Returns the appropriate adapter output to use
 //-----------------------------------------------------------------------------
-se::win::com::com_ptr<IDXGIOutput> CShaderDeviceMgrDx10::GetAdapterOutput( int nAdapter ) const
+se::win::com::com_ptr<IDXGIOutput> CShaderDeviceMgrDx10::GetAdapterOutput( unsigned nAdapter ) const
 {
 	LOCK_SHADERAPI();
 
@@ -350,7 +350,7 @@ se::win::com::com_ptr<IDXGIOutput> CShaderDeviceMgrDx10::GetAdapterOutput( int n
 //-----------------------------------------------------------------------------
 // Returns the number of modes
 //-----------------------------------------------------------------------------
-int CShaderDeviceMgrDx10::GetModeCount( int nAdapter ) const
+unsigned CShaderDeviceMgrDx10::GetModeCount( unsigned nAdapter ) const
 {
 	LOCK_SHADERAPI();
 	Assert( m_pDXGIFactory && ( nAdapter < GetAdapterCount() ) );
@@ -372,7 +372,7 @@ int CShaderDeviceMgrDx10::GetModeCount( int nAdapter ) const
 //-----------------------------------------------------------------------------
 // Returns mode information..
 //-----------------------------------------------------------------------------
-void CShaderDeviceMgrDx10::GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter, int nMode ) const
+void CShaderDeviceMgrDx10::GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter, unsigned nMode ) const
 {
 	// Default error state
 	pInfo->m_nWidth = pInfo->m_nHeight = 0;
@@ -412,7 +412,7 @@ void CShaderDeviceMgrDx10::GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter
 //-----------------------------------------------------------------------------
 // Returns the current mode for an adapter
 //-----------------------------------------------------------------------------
-void CShaderDeviceMgrDx10::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter ) const
+void CShaderDeviceMgrDx10::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const
 {
 	// FIXME: Implement!
 	Assert( 0 );
@@ -451,7 +451,7 @@ void CShaderDeviceMgrDx10::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int n
 //-----------------------------------------------------------------------------
 // Initialization, shutdown
 //-----------------------------------------------------------------------------
-bool CShaderDeviceMgrDx10::SetAdapter( int nAdapter, int nFlags )
+bool CShaderDeviceMgrDx10::SetAdapter( unsigned nAdapter, int nFlags )
 {
   LOCK_SHADERAPI();
 	/*
@@ -468,7 +468,7 @@ bool CShaderDeviceMgrDx10::SetAdapter( int nAdapter, int nFlags )
 		D3D10_DRIVER_TYPE_REFERENCE : D3D10_DRIVER_TYPE_HARDWARE;
 
   g_pShaderDeviceDx10->m_DisplayAdapter = nAdapter;
-  if (g_pShaderDeviceDx10->m_DisplayAdapter >= (UINT)GetAdapterCount())
+  if (g_pShaderDeviceDx10->m_DisplayAdapter >= GetAdapterCount())
 	{
     g_pShaderDeviceDx10->m_DisplayAdapter = 0;
   }
@@ -504,7 +504,7 @@ bool CShaderDeviceMgrDx10::SetAdapter( int nAdapter, int nFlags )
 //-----------------------------------------------------------------------------
 // Sets the mode
 //-----------------------------------------------------------------------------
-CreateInterfaceFn CShaderDeviceMgrDx10::SetMode( void *hWnd, int nAdapter, const ShaderDeviceInfo_t& mode )
+CreateInterfaceFn CShaderDeviceMgrDx10::SetMode( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode )
 {
 	LOCK_SHADERAPI();
 
@@ -582,10 +582,10 @@ CShaderDeviceDx10::~CShaderDeviceDx10()
 //-----------------------------------------------------------------------------
 // Sets the mode
 //-----------------------------------------------------------------------------
-bool CShaderDeviceDx10::InitDevice( void *hWnd, int nAdapter, const ShaderDeviceInfo_t& mode )
+bool CShaderDeviceDx10::InitDevice( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode )
 {
 	// Make sure we've been shutdown previously
-	if ( m_nAdapter != -1 )
+	if ( m_nAdapter != UINT_MAX )
 	{
 		Warning( "CShaderDeviceDx10::SetMode: Previous mode has not been shut down!\n" );
 		return false;
@@ -681,7 +681,7 @@ void CShaderDeviceDx10::ShutdownDevice()
 	}
 
 	m_hWnd = NULL;
-	m_nAdapter = -1;
+	m_nAdapter = UINT_MAX;
 	m_DisplayAdapter = UINT_MAX;
 }
 
@@ -698,7 +698,7 @@ bool CShaderDeviceDx10::IsUsingGraphics() const
 //-----------------------------------------------------------------------------
 // Returns the adapter
 //-----------------------------------------------------------------------------
-int CShaderDeviceDx10::GetCurrentAdapter() const
+unsigned CShaderDeviceDx10::GetCurrentAdapter() const
 {
 	return m_DisplayAdapter;
 }

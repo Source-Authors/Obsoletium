@@ -60,7 +60,7 @@ public:
 	virtual void *QueryInterface( const char *pInterfaceName );
 
 	// Methods of IShaderDeviceMgr
-	virtual bool GetRecommendedConfigurationInfo( int nAdapter, int nDXLevel, KeyValues *pCongifuration );
+	virtual bool GetRecommendedConfigurationInfo( unsigned nAdapter, int nDXLevel, KeyValues *pCongifuration );
 	virtual void AddModeChangeCallback( ShaderModeChangeCallbackFunc_t func );
 	virtual void RemoveModeChangeCallback( ShaderModeChangeCallbackFunc_t func );
 
@@ -71,7 +71,7 @@ public:
 	void ReadDXSupportLevels( HardwareCaps_t &caps );
 
 	// Returns the hardware caps for a particular adapter
-	const HardwareCaps_t& GetHardwareCaps( int nAdapter ) const;
+	const HardwareCaps_t& GetHardwareCaps( unsigned nAdapter ) const;
 
 	// Invokes mode change callbacks
 	void InvokeModeChangeCallbacks();
@@ -99,17 +99,17 @@ private:
 	void LoadHardwareCaps( KeyValues *pGroup, HardwareCaps_t &caps );
 
 	// Gets the recommended configuration associated with a particular dx level
-	bool GetRecommendedConfigurationInfo( int nAdapter, int nDXLevel, int nVendorID, int nDeviceID, KeyValues *pConfiguration );
+	bool GetRecommendedConfigurationInfo( unsigned nAdapter, int nDXLevel, int nVendorID, int nDeviceID, KeyValues *pConfiguration );
 
 	// Returns the amount of video memory in bytes for a particular adapter
-	virtual int GetVidMemBytes( int nAdapter ) const = 0;
+	virtual unsigned GetVidMemBytes( unsigned nAdapter ) const = 0;
 
 	// Looks for override keyvalues in the dxsupport cfg keyvalues
 	KeyValues *FindDXLevelSpecificConfig( KeyValues *pKeyValues, int nDxLevel );
 	KeyValues *FindDXLevelAndVendorSpecificConfig( KeyValues *pKeyValues, int nDxLevel, int nVendorID );
 	KeyValues *FindCPUSpecificConfig( KeyValues *pKeyValues, int nCPUMhz, bool bAMD );
 	KeyValues *FindMemorySpecificConfig( KeyValues *pKeyValues, int nSystemRamMB );
-	KeyValues *FindVidMemSpecificConfig( KeyValues *pKeyValues, int nVideoRamMB );
+	KeyValues *FindVidMemSpecificConfig( KeyValues *pKeyValues, unsigned nVideoRamMB );
 	KeyValues *FindCardSpecificConfig( KeyValues *pKeyValues, int nVendorID, int nDeviceID );
 
 protected:
@@ -147,7 +147,7 @@ public:
 	virtual void GetWindowSize( int& nWidth, int& nHeight ) const;
 
 	// Methods exposed to the rest of shader api
-	virtual bool InitDevice( void *hWnd, int nAdapter, const ShaderDeviceInfo_t& mode ) = 0;
+	virtual bool InitDevice( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode ) = 0;
 	virtual void ShutdownDevice() = 0;
 	virtual bool IsDeactivated() const = 0;
 
@@ -173,7 +173,7 @@ protected:
 	// Finds a child window
 	int  FindView( void* hWnd ) const;
 
-	int m_nAdapter;
+	unsigned m_nAdapter;
 	void *m_hWnd;
 	void* m_hWndCookie;
 	bool m_bInitialized : 1;

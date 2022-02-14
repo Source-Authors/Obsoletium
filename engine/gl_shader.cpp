@@ -70,7 +70,7 @@ bool Shader_Connect( bool bSetProxyFactory )
 	if ( !materials )
 		return false;
 
-	int nAdapter = CommandLine()->ParmValue( "-adapter", 0 );
+	unsigned nAdapter = CommandLine()->ParmValue( "-adapter", 0 );
 	int nModeFlags = MATERIAL_INIT_ALLOCATE_FULLSCREEN_TEXTURE;
 	if ( CommandLine()->FindParm( "-ref" ) )
 	{

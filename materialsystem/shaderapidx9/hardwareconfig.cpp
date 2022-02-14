@@ -956,7 +956,7 @@ int CHardwareConfig::MaxTextureHeight() const
 	return m_Caps.m_MaxTextureHeight;
 }
 
-int	CHardwareConfig::TextureMemorySize() const
+unsigned	CHardwareConfig::TextureMemorySize() const
 {
 	return m_Caps.m_TextureMemorySize;
 }

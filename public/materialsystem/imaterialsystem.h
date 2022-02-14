@@ -608,7 +608,7 @@ public:
 	virtual void				SetShaderAPI( char const *pShaderAPIDLL ) = 0;
 
 	// Must be called before Init(), if you're going to call it at all...
-	virtual void				SetAdapter( int nAdapter, int nFlags ) = 0;
+	virtual void				SetAdapter( unsigned nAdapter, int nFlags ) = 0;
 
 	// Call this when the mod has been set up, which may occur after init
 	// At this point, the game + gamebin paths have been set up
@@ -659,19 +659,19 @@ public:
 	// -----------------------------------------------------------
 
 	// Gets the number of adapters...
-	virtual int					GetDisplayAdapterCount() const = 0;
+	virtual unsigned					GetDisplayAdapterCount() const = 0;
 
 	// Returns the current adapter in use
-	virtual int					GetCurrentAdapter() const = 0;
+	virtual unsigned					GetCurrentAdapter() const = 0;
 
 	// Returns info about each adapter
-	virtual void				GetDisplayAdapterInfo( int adapter, MaterialAdapterInfo_t& info ) const = 0;
+	virtual void				GetDisplayAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const = 0;
 
 	// Returns the number of modes
-	virtual int					GetModeCount( int adapter ) const = 0;
+	virtual unsigned					GetModeCount( unsigned adapter ) const = 0;
 
 	// Returns mode information..
-	virtual void				GetModeInfo( int adapter, int mode, MaterialVideoMode_t& info ) const = 0;
+	virtual void				GetModeInfo( unsigned adapter, unsigned mode, MaterialVideoMode_t& info ) const = 0;
 
 	virtual void				AddModeChangeCallBack( ModeChangeCallbackFunc_t func ) = 0;
 

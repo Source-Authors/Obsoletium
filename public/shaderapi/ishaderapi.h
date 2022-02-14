@@ -164,7 +164,7 @@ public:
 	//
 
 	// Sets the mode...
-	virtual bool SetMode( void* hwnd, int nAdapter, const ShaderDeviceInfo_t &info ) = 0;
+	virtual bool SetMode( void* hwnd, unsigned nAdapter, const ShaderDeviceInfo_t &info ) = 0;
 
 	virtual void ChangeVideoMode( const ShaderDeviceInfo_t &info ) = 0;
 

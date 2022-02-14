@@ -570,7 +570,7 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 #endif
 		}
 	}
-	else if( materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter == materials->GetCurrentAdapter() )
+	else if( (unsigned)materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter == materials->GetCurrentAdapter() )
 	{
 		// if we aren't in VR mode but we do have a VR mode adapter set, we must not be full
 		// screen because that would show up on the HMD
@@ -930,7 +930,7 @@ void CVideoMode_Common::DrawStartupGraphic()
 					// draw a grid too
 				int grid_size = 8;
 				float depthacc = 0.0;
-				float depthinc = 1.0 / (float)((grid_size * grid_size)+1);
+				float depthinc = 1.0F / (float)((grid_size * grid_size)+1);
 				
 				for( int x = 0; x<grid_size; x++)
 				{
@@ -2292,13 +2292,13 @@ bool CVideoMode_MaterialSystem::Init( )
         bAllowSmallModes = true;
     }
 
-    int nAdapter = materials->GetCurrentAdapter();
-    int nModeCount = materials->GetModeCount( nAdapter );
+    unsigned nAdapter = materials->GetCurrentAdapter();
+    unsigned nModeCount = materials->GetModeCount(nAdapter);
 
     int nDesktopWidth, nDesktopHeight, nDesktopRefresh;
     game->GetDesktopInfo( nDesktopWidth, nDesktopHeight, nDesktopRefresh );
 
-    for ( int i = 0; i < nModeCount; i++ )
+    for ( unsigned i = 0; i < nModeCount; i++ )
     {
         MaterialVideoMode_t info;
         materials->GetModeInfo( nAdapter, i, info );

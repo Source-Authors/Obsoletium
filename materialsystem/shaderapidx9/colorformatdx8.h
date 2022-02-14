@@ -53,7 +53,7 @@ ImageFormat FindNearestSupportedFormat( ImageFormat format, bool bIsVertexTextur
 //-----------------------------------------------------------------------------
 // Finds the nearest supported depth buffer format
 //-----------------------------------------------------------------------------
-D3DFORMAT FindNearestSupportedDepthFormat( int nAdapter, ImageFormat displayFormat, ImageFormat renderTargetFormat, D3DFORMAT depthFormat );
+D3DFORMAT FindNearestSupportedDepthFormat( unsigned nAdapter, ImageFormat displayFormat, ImageFormat renderTargetFormat, D3DFORMAT depthFormat );
 
 const char *D3DFormatName( D3DFORMAT d3dFormat );
 

@@ -84,7 +84,7 @@ public:
 	void									SetShaderAPI( const char *pShaderAPIDLL );
 
 	// Must be called before Init(), if you're going to call it at all...
-	void									SetAdapter( int nAdapter, int nFlags );
+	void									SetAdapter( unsigned nAdapter, int nFlags );
 
 	void									ModInit();
 	void									ModShutdown();
@@ -170,12 +170,12 @@ public:
 	// -----------------------------------------------------------
 	// Device methods
 	// -----------------------------------------------------------
-	int										GetDisplayAdapterCount() const;
-	int										GetCurrentAdapter() const;
+	unsigned										GetDisplayAdapterCount() const;
+	unsigned										GetCurrentAdapter() const;
 	char									*GetDisplayDeviceName() const OVERRIDE;
-	void									GetDisplayAdapterInfo( int adapter, MaterialAdapterInfo_t& info ) const;
-	int										GetModeCount( int adapter ) const;
-	void									GetModeInfo( int adapter, int mode, MaterialVideoMode_t& info ) const;
+	void									GetDisplayAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const;
+	unsigned										GetModeCount( unsigned adapter ) const;
+	void									GetModeInfo( unsigned adapter, unsigned mode, MaterialVideoMode_t& info ) const;
 	void									AddModeChangeCallBack( ModeChangeCallbackFunc_t func );
 	void									RemoveModeChangeCallBack( ModeChangeCallbackFunc_t func );
 
@@ -636,7 +636,7 @@ private:
 	CSysModule *							m_ShaderHInst; // Used to dynamically load the shader DLL
 	CreateInterfaceFn						m_ShaderAPIFactory;
 
-	int										m_nAdapter;
+	unsigned										m_nAdapter;
 	int										m_nAdapterFlags;
 
 	//---------------------------------

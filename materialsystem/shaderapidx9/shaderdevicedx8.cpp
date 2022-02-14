@@ -311,8 +311,8 @@ void CShaderDeviceMgrDx8::InitAdapterInfo()
 	m_Adapters.RemoveAll();
 
 	Assert(m_pD3D);
-	int nCount = m_pD3D->GetAdapterCount( );
-	for( int i = 0; i < nCount; ++i )
+	unsigned nCount = m_pD3D->GetAdapterCount( );
+	for( unsigned i = 0; i < nCount; ++i )
 	{
 		int j = m_Adapters.AddToTail();
 		AdapterInfo_t &info = m_Adapters[j];
@@ -344,7 +344,7 @@ void CShaderDeviceMgrDx8::InitAdapterInfo()
 // bit is messed up in drivers due to a stupid WHQL test that requires this to work
 // with float textures which we don't generally care about wrt this address mode)
 //--------------------------------------------------------------------------------
-void CShaderDeviceMgrDx8::CheckBorderColorSupport( HardwareCaps_t *pCaps, int nAdapter )
+void CShaderDeviceMgrDx8::CheckBorderColorSupport( HardwareCaps_t *pCaps, unsigned nAdapter )
 {
 #ifdef DX_TO_GL_ABSTRACTION
 	if( true )
@@ -363,7 +363,7 @@ void CShaderDeviceMgrDx8::CheckBorderColorSupport( HardwareCaps_t *pCaps, int nA
 //--------------------------------------------------------------------------------
 // Vendor-dependent code to detect support for various flavors of shadow mapping
 //--------------------------------------------------------------------------------
-void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps_t *pCaps, int nAdapter )
+void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps_t *pCaps, unsigned nAdapter )
 {
 	// Set a default null texture format...may be overridden below by IHV-specific surface type
 	pCaps->m_NullTextureFormat = IMAGE_FORMAT_ARGB8888;
@@ -477,7 +477,7 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 //-----------------------------------------------------------------------------
 // Vendor-dependent code to detect Alpha To Coverage Backdoors
 //-----------------------------------------------------------------------------
-void CShaderDeviceMgrDx8::CheckVendorDependentAlphaToCoverage( HardwareCaps_t *pCaps, int nAdapter )
+void CShaderDeviceMgrDx8::CheckVendorDependentAlphaToCoverage( HardwareCaps_t *pCaps, unsigned nAdapter )
 {
 	pCaps->m_bSupportsAlphaToCoverage = false;
 
@@ -565,7 +565,7 @@ ConVar mat_fastclip( "mat_fastclip", "0", FCVAR_CHEAT  );
 //-----------------------------------------------------------------------------
 // Determine capabilities
 //-----------------------------------------------------------------------------
-bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, int nAdapter )
+bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nAdapter )
 {
 	D3DCAPS caps;
 	D3DADAPTER_IDENTIFIER9 ident;
@@ -1214,7 +1214,7 @@ void CShaderDeviceMgrDx8::ComputeDXSupportLevel( HardwareCaps_t &caps )
 //-----------------------------------------------------------------------------
 // Gets the number of adapters...
 //-----------------------------------------------------------------------------
-int CShaderDeviceMgrDx8::GetAdapterCount() const
+unsigned CShaderDeviceMgrDx8::GetAdapterCount() const
 {
 	// FIXME: Remove call to InitAdapterInfo once Steam startup issues are resolved.
 	const_cast<CShaderDeviceMgrDx8*>( this )->InitAdapterInfo();
@@ -1226,12 +1226,12 @@ int CShaderDeviceMgrDx8::GetAdapterCount() const
 //-----------------------------------------------------------------------------
 // Returns info about each adapter
 //-----------------------------------------------------------------------------
-void CShaderDeviceMgrDx8::GetAdapterInfo( int nAdapter, MaterialAdapterInfo_t& info ) const
+void CShaderDeviceMgrDx8::GetAdapterInfo( unsigned nAdapter, MaterialAdapterInfo_t& info ) const
 {
 	// FIXME: Remove call to InitAdapterInfo once Steam startup issues are resolved.
 	const_cast<CShaderDeviceMgrDx8*>( this )->InitAdapterInfo();
 
-	Assert( ( nAdapter >= 0 ) && ( nAdapter < m_Adapters.Count() ) );
+	Assert( ( nAdapter >= 0 ) && ( nAdapter < (unsigned)m_Adapters.Count() ) );
 	const HardwareCaps_t &caps = m_Adapters[ nAdapter ].m_ActualCaps;
 	memcpy( &info, &caps, sizeof(MaterialAdapterInfo_t) );
 }
@@ -1240,7 +1240,7 @@ void CShaderDeviceMgrDx8::GetAdapterInfo( int nAdapter, MaterialAdapterInfo_t& i
 //-----------------------------------------------------------------------------
 // Sets the adapter
 //-----------------------------------------------------------------------------
-bool CShaderDeviceMgrDx8::SetAdapter( int nAdapter, int nAdapterFlags )
+bool CShaderDeviceMgrDx8::SetAdapter( unsigned nAdapter, int nAdapterFlags )
 {
 	LOCK_SHADERAPI();
 
@@ -1252,7 +1252,7 @@ bool CShaderDeviceMgrDx8::SetAdapter( int nAdapter, int nAdapterFlags )
 		D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
 	g_pShaderDeviceDx8->m_DisplayAdapter = nAdapter;
-	if ( g_pShaderDeviceDx8->m_DisplayAdapter >= (UINT)GetAdapterCount() )
+	if ( g_pShaderDeviceDx8->m_DisplayAdapter >= GetAdapterCount() )
 	{
 		g_pShaderDeviceDx8->m_DisplayAdapter = 0;
 	}
@@ -1282,7 +1282,7 @@ bool CShaderDeviceMgrDx8::SetAdapter( int nAdapter, int nAdapterFlags )
 //-----------------------------------------------------------------------------
 // Returns the number of modes
 //-----------------------------------------------------------------------------
-int CShaderDeviceMgrDx8::GetModeCount( int nAdapter ) const
+unsigned CShaderDeviceMgrDx8::GetModeCount( unsigned nAdapter ) const
 {
 	LOCK_SHADERAPI();
 	Assert( m_pD3D && (nAdapter < GetAdapterCount() ) );
@@ -1299,7 +1299,7 @@ int CShaderDeviceMgrDx8::GetModeCount( int nAdapter ) const
 //-----------------------------------------------------------------------------
 // Returns mode information..
 //-----------------------------------------------------------------------------
-void CShaderDeviceMgrDx8::GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter, int nMode ) const
+void CShaderDeviceMgrDx8::GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter, unsigned nMode ) const
 {
 	Assert( pInfo->m_nVersion == SHADER_DISPLAY_MODE_VERSION );
 
@@ -1334,7 +1334,7 @@ void CShaderDeviceMgrDx8::GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter,
 //-----------------------------------------------------------------------------
 // Returns the current mode information for an adapter
 //-----------------------------------------------------------------------------
-void CShaderDeviceMgrDx8::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter ) const
+void CShaderDeviceMgrDx8::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const
 {
 	Assert( pInfo->m_nVersion == SHADER_DISPLAY_MODE_VERSION );
 
@@ -1373,7 +1373,7 @@ void CShaderDeviceMgrDx8::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int nA
 //-----------------------------------------------------------------------------
 // Sets the video mode
 //-----------------------------------------------------------------------------
-CreateInterfaceFn CShaderDeviceMgrDx8::SetMode( void *hWnd, int nAdapter, const ShaderDeviceInfo_t& mode )
+CreateInterfaceFn CShaderDeviceMgrDx8::SetMode( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode )
 {
 	LOCK_SHADERAPI();
 
@@ -1438,9 +1438,9 @@ CreateInterfaceFn CShaderDeviceMgrDx8::SetMode( void *hWnd, int nAdapter, const 
 //-----------------------------------------------------------------------------
 // Validates the mode...
 //-----------------------------------------------------------------------------
-bool CShaderDeviceMgrDx8::ValidateMode( int nAdapter, const ShaderDeviceInfo_t &info ) const
+bool CShaderDeviceMgrDx8::ValidateMode( unsigned nAdapter, const ShaderDeviceInfo_t &info ) const
 {
-	if ( nAdapter >= (int)D3D()->GetAdapterCount() )
+	if ( nAdapter >= D3D()->GetAdapterCount() )
 		return false;
 
 	ShaderDisplayMode_t displayMode;
@@ -1471,7 +1471,7 @@ bool CShaderDeviceMgrDx8::ValidateMode( int nAdapter, const ShaderDeviceInfo_t &
 //-----------------------------------------------------------------------------
 // Returns the amount of video memory in bytes for a particular adapter
 //-----------------------------------------------------------------------------
-int CShaderDeviceMgrDx8::GetVidMemBytes( int nAdapter ) const
+unsigned CShaderDeviceMgrDx8::GetVidMemBytes( unsigned nAdapter ) const
 {
 #if defined( _X360 )
 	return 256*1024*1024;
@@ -1482,8 +1482,8 @@ int CShaderDeviceMgrDx8::GetVidMemBytes( int nAdapter ) const
 #else
 	// FIXME: This currently ignores the adapter
 	uint64 nBytes = ::GetVidMemBytes();
-	if ( nBytes > INT_MAX )
-		return INT_MAX;
+	if ( nBytes > UINT_MAX )
+		return UINT_MAX;
 	return nBytes;
 #endif
 }
@@ -1608,7 +1608,7 @@ D3DMULTISAMPLE_TYPE CShaderDeviceDx8::ComputeMultisampleType( int nSampleCount )
 //-----------------------------------------------------------------------------
 // Sets the present parameters
 //-----------------------------------------------------------------------------
-void CShaderDeviceDx8::SetPresentParameters( void* hWnd, int nAdapter, const ShaderDeviceInfo_t &info )
+void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, const ShaderDeviceInfo_t &info )
 {
 	ShaderDisplayMode_t mode;
 	g_pShaderDeviceMgr->GetCurrentModeInfo( &mode, nAdapter );
@@ -1804,7 +1804,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, int nAdapter, const Sha
 //-----------------------------------------------------------------------------
 // Initializes, shuts down the D3D device
 //-----------------------------------------------------------------------------
-bool CShaderDeviceDx8::InitDevice( void* hwnd, int nAdapter, const ShaderDeviceInfo_t &info )
+bool CShaderDeviceDx8::InitDevice( void* hwnd, unsigned nAdapter, const ShaderDeviceInfo_t &info )
 {
 	//Debugger();
 	
@@ -1857,7 +1857,7 @@ bool CShaderDeviceDx8::IsUsingGraphics() const
 //-----------------------------------------------------------------------------
 // Returns the current adapter in use
 //-----------------------------------------------------------------------------
-int CShaderDeviceDx8::GetCurrentAdapter() const
+unsigned CShaderDeviceDx8::GetCurrentAdapter() const
 {
 	LOCK_SHADERAPI();
 	return m_DisplayAdapter;
@@ -1875,7 +1875,7 @@ char *CShaderDeviceDx8::GetDisplayDeviceName()
 		// On Win10, this function is getting called with m_nAdapter still initialized to -1.
 		// It's failing, and m_sDisplayDeviceName has garbage, and tf2 fails to launch.
 		// To repro this, run "hl2.exe -dev -fullscreen -game tf" on Win10.
-		HRESULT hr = D3D()->GetAdapterIdentifier( Max( m_nAdapter, 0 ), 0, &ident );
+		HRESULT hr = D3D()->GetAdapterIdentifier( Max( m_nAdapter, 0U ), 0, &ident );
 		if ( FAILED(hr) )
 		{
 			Assert( false );
@@ -1960,7 +1960,7 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 		(caps.RasterCaps & D3DPRASTERCAPS_DEPTHBIAS) ? " Y " : " N ",
 		(caps.RasterCaps & D3DPRASTERCAPS_ZTEST) ? " Y " : "*N*" );
 
-	Warning("Size of Texture Memory : %d kb\n", g_pHardwareConfig->Caps().m_TextureMemorySize / 1024 );
+	Warning("Size of Texture Memory : %u kb\n", g_pHardwareConfig->Caps().m_TextureMemorySize / 1024 );
 	Warning("Max Texture Dimensions : %d x %d\n", 
 		caps.MaxTextureWidth, caps.MaxTextureHeight );
 	if (caps.MaxTextureAspectRatio != 0)
@@ -2020,7 +2020,7 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 	Warning( "m_NumVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumVertexShaderConstants );
 	Warning( "m_NumBooleanVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumBooleanVertexShaderConstants );
 	Warning( "m_NumIntegerVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumIntegerVertexShaderConstants );
-	Warning( "m_TextureMemorySize: %d\n", g_pHardwareConfig->Caps().m_TextureMemorySize );
+	Warning( "m_TextureMemorySize: %u\n", g_pHardwareConfig->Caps().m_TextureMemorySize );
 	Warning( "m_MaxNumLights: %d\n", g_pHardwareConfig->Caps().m_MaxNumLights );
 	Warning( "m_SupportsHardwareLighting: %s\n", g_pHardwareConfig->Caps().m_SupportsHardwareLighting ? "yes" : "no" );
 	Warning( "m_MaxBlendMatrices: %d\n", g_pHardwareConfig->Caps().m_MaxBlendMatrices );
@@ -2178,7 +2178,7 @@ const char *GetD3DErrorText( HRESULT hr )
 //-----------------------------------------------------------------------------
 // Actually creates the D3D Device once the present parameters are set up
 //-----------------------------------------------------------------------------
-IDirect3DDevice9* CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, int nAdapter, DWORD deviceCreationFlags )
+IDirect3DDevice9* CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, unsigned nAdapter, DWORD deviceCreationFlags )
 {
 	IDirect3DDevice9 *pD3DDevice = NULL;
 	D3DDEVTYPE devType = DX8_DEVTYPE;
@@ -2269,7 +2269,7 @@ IDirect3DDevice9* CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, int nAdapter
 //-----------------------------------------------------------------------------
 // Creates the D3D Device
 //-----------------------------------------------------------------------------
-bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, int nAdapter, const ShaderDeviceInfo_t &info )
+bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const ShaderDeviceInfo_t &info )
 {
 	Assert( info.m_nVersion == SHADER_DEVICE_INFO_VERSION );
 

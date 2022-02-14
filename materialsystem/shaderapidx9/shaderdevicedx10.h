@@ -57,13 +57,13 @@ public:
 	virtual void Shutdown();
 
 	// Methods of IShaderDeviceMgr
-	virtual int	 GetAdapterCount() const;
-	virtual void GetAdapterInfo( int adapter, MaterialAdapterInfo_t& info ) const;
-	virtual int	 GetModeCount( int nAdapter ) const;
-	virtual void GetModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter, int mode ) const;
-	virtual void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter ) const;
-	virtual bool SetAdapter( int nAdapter, int nFlags );
-	virtual CreateInterfaceFn SetMode( void *hWnd, int nAdapter, const ShaderDeviceInfo_t& mode );
+	virtual unsigned	 GetAdapterCount() const;
+	virtual void GetAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const;
+	virtual unsigned	 GetModeCount( unsigned nAdapter ) const;
+	virtual void GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter, unsigned mode ) const;
+	virtual void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const;
+	virtual bool SetAdapter( unsigned nAdapter, int nFlags );
+	virtual CreateInterfaceFn SetMode( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode );
 
 private:
 	// Initialize adapter information
@@ -73,13 +73,13 @@ private:
 	bool ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapter1 *pAdapter, IDXGIOutput *pOutput );
 
 	// Returns the amount of video memory in bytes for a particular adapter
-	virtual int GetVidMemBytes( int nAdapter ) const;
+	virtual unsigned GetVidMemBytes( unsigned nAdapter ) const;
 
 	// Returns the appropriate adapter output to use
-	se::win::com::com_ptr<IDXGIOutput> GetAdapterOutput( int nAdapter ) const;
+	se::win::com::com_ptr<IDXGIOutput> GetAdapterOutput( unsigned nAdapter ) const;
 
 	// Returns the adapter interface for a particular adapter
-	se::win::com::com_ptr<IDXGIAdapter1> GetAdapter( int nAdapter ) const;
+	se::win::com::com_ptr<IDXGIAdapter1> GetAdapter( unsigned nAdapter ) const;
 
 	// Used to enumerate adapters, attach to windows
 	se::win::com::com_ptr<IDXGIFactory1> m_pDXGIFactory;
@@ -103,7 +103,7 @@ public:
 public:
 	// Methods of IShaderDevice
 	virtual bool IsUsingGraphics() const;
-	virtual int GetCurrentAdapter() const;
+	virtual unsigned GetCurrentAdapter() const;
 	virtual ImageFormat GetBackBufferFormat() const;
 	virtual void GetBackBufferDimensions( int& width, int& height ) const;
 	virtual void SpewDriverInfo() const;
@@ -136,7 +136,7 @@ public:
 
 public:
 	// Methods of CShaderDeviceBase
-	virtual bool InitDevice( void *hWnd, int nAdapter, const ShaderDeviceInfo_t& mode );
+	virtual bool InitDevice( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode );
 	virtual void ShutdownDevice();
 	virtual bool IsDeactivated() const { return false; }
 	virtual bool DetermineHardwareCaps();
