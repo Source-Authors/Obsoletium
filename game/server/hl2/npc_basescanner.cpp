@@ -429,7 +429,7 @@ void CNPC_BaseScanner::TraceAttack( const CTakeDamageInfo &info, const Vector &v
 //-----------------------------------------------------------------------------
 // Take damage from being thrown by a physcannon 
 //-----------------------------------------------------------------------------
-#define SCANNER_SMASH_SPEED 250.0	// How fast a scanner must slam into something to take full damage
+#define SCANNER_SMASH_SPEED 250.0F	// How fast a scanner must slam into something to take full damage
 void CNPC_BaseScanner::TakeDamageFromPhyscannon( CBasePlayer *pPlayer )
 {
 	CTakeDamageInfo info;
@@ -502,7 +502,7 @@ bool CNPC_BaseScanner::IsHeldByPhyscannon( )
 //------------------------------------------------------------------------------
 // Physics impact
 //------------------------------------------------------------------------------
-#define SCANNER_SMASH_TIME	0.75		// How long after being thrown from a physcannon that a manhack is eligible to die from impact
+#define SCANNER_SMASH_TIME	0.75F		// How long after being thrown from a physcannon that a manhack is eligible to die from impact
 void CNPC_BaseScanner::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
 	BaseClass::VPhysicsCollision( index, pEvent );
@@ -741,7 +741,7 @@ void CNPC_BaseScanner::AttackDivebombCollide(float flInterval)
 		// norm of what we've hit
 		if (flInterval > 0)
 		{
-			float moveLen	= (1.0 - tr.fraction)*(GetAbsOrigin() - checkPos).Length();
+			float moveLen	= (1.0F - tr.fraction)*(GetAbsOrigin() - checkPos).Length();
 			Vector vBounceVel	= moveLen*tr.plane.normal/flInterval;
 
 			// If I'm right over the ground don't push down
@@ -975,7 +975,7 @@ void CNPC_BaseScanner::MoveExecute_Alive(float flInterval)
 	// Spin the dynamo based upon our speed
 	float flCurrentDynamo = GetPoseParameter( m_nPoseDynamo );
 	float speed	= GetCurrentVelocity().Length();
-	float flDynamoSpeed = (maxSpeed > 0 ? speed / maxSpeed : 1.0) * 60;
+	float flDynamoSpeed = (maxSpeed > 0 ? speed / maxSpeed : 1.0F) * 60;
 	flCurrentDynamo -= flDynamoSpeed;
 	if ( flCurrentDynamo < -180.0 )
 	{
