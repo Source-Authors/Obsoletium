@@ -466,12 +466,7 @@ bool CShaderDeviceMgrDx10::SetAdapter( unsigned nAdapter, int nFlags )
 
   g_pShaderDeviceDx10->m_DriverType = (nFlags & MATERIAL_INIT_REFERENCE_RASTERIZER) ? 
 		D3D10_DRIVER_TYPE_REFERENCE : D3D10_DRIVER_TYPE_HARDWARE;
-
-  g_pShaderDeviceDx10->m_DisplayAdapter = nAdapter;
-  if (g_pShaderDeviceDx10->m_DisplayAdapter >= GetAdapterCount())
-	{
-    g_pShaderDeviceDx10->m_DisplayAdapter = 0;
-  }
+  g_pShaderDeviceDx10->m_DisplayAdapter = Clamp(nAdapter, 0U, GetAdapterCount() - 1);
 
 	if (!g_pShaderDeviceDx10->DetermineHardwareCaps())
 	{

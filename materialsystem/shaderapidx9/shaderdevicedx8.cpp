@@ -215,8 +215,8 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 
 	// FIXME: Want this to be here, but we can't because Steam
 	// hasn't had it's application ID set up yet.
-
-//	InitAdapterInfo();
+	// dimhotepus: Init adapters immediately.
+  InitAdapterInfo();
 	return true;
 }
 
@@ -259,7 +259,8 @@ InitReturnVal_t CShaderDeviceMgrDx8::Init( )
 {
 	// FIXME: Remove call to InitAdapterInfo once Steam startup issues are resolved.
 	// Do it in Connect instead.
-	InitAdapterInfo();
+	// dimhotepus: Init adapters in Connect.
+	// InitAdapterInfo();
 
 	return INIT_OK;
 }
@@ -1217,7 +1218,8 @@ void CShaderDeviceMgrDx8::ComputeDXSupportLevel( HardwareCaps_t &caps )
 unsigned CShaderDeviceMgrDx8::GetAdapterCount() const
 {
 	// FIXME: Remove call to InitAdapterInfo once Steam startup issues are resolved.
-	const_cast<CShaderDeviceMgrDx8*>( this )->InitAdapterInfo();
+	// dimhotepus: Init adapters in Connect.
+	// const_cast<CShaderDeviceMgrDx8*>( this )->InitAdapterInfo();
 
 	return m_Adapters.Count();
 }
@@ -1229,7 +1231,8 @@ unsigned CShaderDeviceMgrDx8::GetAdapterCount() const
 void CShaderDeviceMgrDx8::GetAdapterInfo( unsigned nAdapter, MaterialAdapterInfo_t& info ) const
 {
 	// FIXME: Remove call to InitAdapterInfo once Steam startup issues are resolved.
-	const_cast<CShaderDeviceMgrDx8*>( this )->InitAdapterInfo();
+	// dimhotepus: Init adapters in Connect.
+	// const_cast<CShaderDeviceMgrDx8*>( this )->InitAdapterInfo();
 
 	Assert( ( nAdapter >= 0 ) && ( nAdapter < (unsigned)m_Adapters.Count() ) );
 	const HardwareCaps_t &caps = m_Adapters[ nAdapter ].m_ActualCaps;
@@ -1250,12 +1253,7 @@ bool CShaderDeviceMgrDx8::SetAdapter( unsigned nAdapter, int nAdapterFlags )
 	// Set up hardware information for this adapter...
 	g_pShaderDeviceDx8->m_DeviceType = (nAdapterFlags & MATERIAL_INIT_REFERENCE_RASTERIZER) ? 
 		D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
-
-	g_pShaderDeviceDx8->m_DisplayAdapter = nAdapter;
-	if ( g_pShaderDeviceDx8->m_DisplayAdapter >= GetAdapterCount() )
-	{
-		g_pShaderDeviceDx8->m_DisplayAdapter = 0;
-	}
+	g_pShaderDeviceDx8->m_DisplayAdapter = Clamp(nAdapter, 0U, GetAdapterCount() - 1);
 
 #ifdef NVPERFHUD
 	// hack for nvperfhud
