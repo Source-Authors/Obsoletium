@@ -136,6 +136,18 @@ public:
 		memset( pResult, 0, nBytes );
 		return pResult;
 	}
+	
+	// dimhotepus: Add to call this.
+	void operator delete( void *pMem )
+	{
+		MemAlloc_Free( pMem );
+	}
+
+	// dimhotepus: Add to call this.
+	void operator delete( void *pMem, int nBlockUse, const char *pFileName, int nLine )
+	{ 
+		MemAlloc_Free( pMem, pFileName, nLine );
+	}
 
 private:
 	CAI_BaseNPC *m_pOuter;
