@@ -575,6 +575,8 @@ class CStriderMinigun
 public:
 	DECLARE_DATADESC();
 
+	virtual ~CStriderMinigun() = default;
+
 	void		Init();
 	void		SetTarget( IStriderMinigunHost *pHost, CBaseEntity *pTarget, bool bOverrideEnemy = false );
 	CBaseEntity *GetTarget()		{ return m_hTarget.Get(); }
