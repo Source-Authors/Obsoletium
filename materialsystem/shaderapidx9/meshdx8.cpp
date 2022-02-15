@@ -1110,16 +1110,6 @@ static void ResetMeshRenderState()
 	g_LastVertexFormat = 0;
 }
 
-//-----------------------------------------------------------------------------
-// Makes sure that the render state is always set next time
-//-----------------------------------------------------------------------------
-static void ResetIndexBufferRenderState()
-{
-	SafeRelease( &g_pLastIndex );
-	g_pLastIndexBuffer = 0;
-	g_LastVertexIdx = -1;
-}
-
 
 //-----------------------------------------------------------------------------
 //
