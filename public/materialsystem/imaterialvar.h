@@ -234,7 +234,7 @@ public:
 #endif
 
 private:
-	FORCEINLINE void SetTempIndex( int nIndex )
+	FORCEINLINE void SetTempIndex( uint8 nIndex )
 	{
 		m_nTempIndex = nIndex;
 	}

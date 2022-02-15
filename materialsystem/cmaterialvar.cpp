@@ -187,7 +187,7 @@ void EnableThreadedMaterialVarAccess( bool bEnable, IMaterialVar **ppParams, int
 		}
 		for ( int i = 0; i < nVarCount; ++i )
 		{
-			ppParams[i]->SetTempIndex( 0xFF );
+			ppParams[i]->SetTempIndex( 0xFFU );
 		}
 		s_nTempVarsUsed = 0;
 		if ( s_nOverflowTempVars )
@@ -203,9 +203,9 @@ CMaterialVar *CMaterialVar::AllocThreadVar()
 {
 	if ( s_bEnableThreadedAccess )
 	{
-		if ( m_nTempIndex == 0xFF )
+		if ( m_nTempIndex == 0xFFU )
 		{
-			if ( s_nTempVarsUsed >= Q_ARRAYSIZE(s_pTempMaterialVar) )
+			if ( s_nTempVarsUsed >= (int)std::size(s_pTempMaterialVar) )
 			{
 				s_nOverflowTempVars++;
 				return NULL;
@@ -353,7 +353,8 @@ CMaterialVar::CMaterialVar( IMaterial* pMaterial, const char *pKey, const char *
 	m_pStringVal = new char[ len ];
 	Q_strncpy( m_pStringVal, pVal, len );
 	m_Type = MATERIAL_VAR_TYPE_STRING;
-	m_VecVal[0] = m_VecVal[1] = m_VecVal[2] = m_VecVal[3] = atof( m_pStringVal );
+	// dimhotepus: atof -> strtof.
+	m_VecVal[0] = m_VecVal[1] = m_VecVal[2] = m_VecVal[3] = strtof( m_pStringVal, nullptr );
 	m_intVal = int( atof( m_pStringVal ) );
 }
 
@@ -783,7 +784,8 @@ void CMaterialVar::SetStringValue( const char *val )
 	Q_strncpy( m_pStringVal, val, len );
 	m_Type = MATERIAL_VAR_TYPE_STRING;
 	m_intVal = atoi( val );
-	m_VecVal[0] = m_VecVal[1] = m_VecVal[2] = m_VecVal[3] = atof( m_pStringVal );
+	// dimhotepus: atof -> strtof.
+	m_VecVal[0] = m_VecVal[1] = m_VecVal[2] = m_VecVal[3] = strtof( m_pStringVal, nullptr );
 	VarChanged();
 }
 
@@ -931,7 +933,7 @@ void CMaterialVar::SetTextureValueQueued( ITexture *texture )
 	// Debug
 	if ( mat_texture_tracking.GetBool() )
 	{
-		int iIndex = g_pTextureRefList->Find( texture );
+		auto iIndex = g_pTextureRefList->Find( texture );
 		Assert( iIndex != g_pTextureRefList->InvalidIndex() );
 		g_pTextureRefList->Element( iIndex )--;
 	}
@@ -973,7 +975,7 @@ void CMaterialVar::SetTextureValue( ITexture *texture )
 		// Debug!
 		if ( mat_texture_tracking.GetBool() )
 		{
-			int iIndex = g_pTextureRefList->Find( texture );
+			auto iIndex = g_pTextureRefList->Find( texture );
 			if ( iIndex == g_pTextureRefList->InvalidIndex() )
 			{
 				g_pTextureRefList->Insert( texture, 1 );
