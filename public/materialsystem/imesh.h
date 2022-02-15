@@ -2877,9 +2877,9 @@ inline void CIndexBuilder::FastIndex( unsigned short nIndex )
 inline void CIndexBuilder::FastTriangle( int startVert )
 {
 	startVert += m_nIndexOffset;
-	m_pIndices[m_nCurrentIndex+0] = startVert;
-	m_pIndices[m_nCurrentIndex+1] = startVert + 1;
-	m_pIndices[m_nCurrentIndex+2] = startVert + 2;
+	m_pIndices[m_nCurrentIndex+0] = (unsigned short)startVert;
+	m_pIndices[m_nCurrentIndex+1] = (unsigned short)(startVert + 1);
+	m_pIndices[m_nCurrentIndex+2] = (unsigned short)(startVert + 2);
 
 	AdvanceIndices(3);
 }
@@ -2887,12 +2887,12 @@ inline void CIndexBuilder::FastTriangle( int startVert )
 inline void CIndexBuilder::FastQuad( int startVert )
 {
 	startVert += m_nIndexOffset;
-	m_pIndices[m_nCurrentIndex+0] = startVert;
-	m_pIndices[m_nCurrentIndex+1] = startVert + 1;
-	m_pIndices[m_nCurrentIndex+2] = startVert + 2;
-	m_pIndices[m_nCurrentIndex+3] = startVert;
-	m_pIndices[m_nCurrentIndex+4] = startVert + 2;
-	m_pIndices[m_nCurrentIndex+5] = startVert + 3;
+	m_pIndices[m_nCurrentIndex+0] = (unsigned short)startVert;
+	m_pIndices[m_nCurrentIndex+1] = (unsigned short)(startVert + 1);
+	m_pIndices[m_nCurrentIndex+2] = (unsigned short)(startVert + 2);
+	m_pIndices[m_nCurrentIndex+3] = (unsigned short)startVert;
+	m_pIndices[m_nCurrentIndex+4] = (unsigned short)(startVert + 2);
+	m_pIndices[m_nCurrentIndex+5] = (unsigned short)(startVert + 3);
 	AdvanceIndices(6);
 }
 
@@ -2909,9 +2909,9 @@ inline void CIndexBuilder::FastPolygon( int startVert, int triangleCount )
 	}
 	for ( int v = 0; v < triangleCount; ++v )
 	{
-		*pIndex++ = startVert;
-		*pIndex++ = startVert + v + 1;
-		*pIndex++ = startVert + v + 2;
+		*pIndex++ = (unsigned short)startVert;
+		*pIndex++ = (unsigned short)(startVert + v + 1);
+		*pIndex++ = (unsigned short)(startVert + v + 2);
 	}
 	AdvanceIndices(triangleCount*3);
 }
@@ -2936,9 +2936,9 @@ inline void CIndexBuilder::FastPolygonList( int startVert, int *pVertexCount, in
 		int triangleCount = vertexCount-2;
 		for ( int v = 0; v < triangleCount; ++v )
 		{
-			*pIndex++ = startVert;
-			*pIndex++ = startVert + v + 1;
-			*pIndex++ = startVert + v + 2;
+			*pIndex++ = (unsigned short)startVert;
+			*pIndex++ = (unsigned short)(startVert + v + 1);
+			*pIndex++ = (unsigned short)(startVert + v + 2);
 		}
 		startVert += vertexCount;
 		indexOut += triangleCount * 3;
@@ -2959,7 +2959,7 @@ inline void CIndexBuilder::FastIndexList( const unsigned short *pIndexList, int 
 	}
 	for ( int i = 0; i < indexCount; ++i )
 	{
-		pIndexOut[i] = startVert + pIndexList[i];
+		pIndexOut[i] = (unsigned short)(startVert + pIndexList[i]);
 	}
 	AdvanceIndices(indexCount);
 }
