@@ -996,12 +996,12 @@ protected:
 public:
 	inline void ConvertToFixed( float flVertAnimFixedPointScale )
 	{
-		delta[0] = flDelta[0].GetFloat() / flVertAnimFixedPointScale;
-		delta[1] = flDelta[1].GetFloat() / flVertAnimFixedPointScale;
-		delta[2] = flDelta[2].GetFloat() / flVertAnimFixedPointScale;
-		ndelta[0] = flNDelta[0].GetFloat() / flVertAnimFixedPointScale;
-		ndelta[1] = flNDelta[1].GetFloat() / flVertAnimFixedPointScale;
-		ndelta[2] = flNDelta[2].GetFloat() / flVertAnimFixedPointScale;
+		delta[0] = static_cast<short>(flDelta[0].GetFloat() / flVertAnimFixedPointScale);
+		delta[1] = static_cast<short>(flDelta[1].GetFloat() / flVertAnimFixedPointScale);
+		delta[2] = static_cast<short>(flDelta[2].GetFloat() / flVertAnimFixedPointScale);
+		ndelta[0] = static_cast<short>(flNDelta[0].GetFloat() / flVertAnimFixedPointScale);
+		ndelta[1] = static_cast<short>(flNDelta[1].GetFloat() / flVertAnimFixedPointScale);
+		ndelta[2] = static_cast<short>(flNDelta[2].GetFloat() / flVertAnimFixedPointScale);
 	}
 
 	inline Vector GetDeltaFixed( float flVertAnimFixedPointScale )
@@ -1030,15 +1030,15 @@ public:
 	}
 	inline void SetDeltaFixed( const Vector& vInput, float flVertAnimFixedPointScale )
 	{
-		delta[0] = vInput.x / flVertAnimFixedPointScale;
-		delta[1] = vInput.y / flVertAnimFixedPointScale;
-		delta[2] = vInput.z / flVertAnimFixedPointScale;
+		delta[0] = static_cast<short>(vInput.x / flVertAnimFixedPointScale);
+		delta[1] = static_cast<short>(vInput.y / flVertAnimFixedPointScale);
+		delta[2] = static_cast<short>(vInput.z / flVertAnimFixedPointScale);
 	}
 	inline void SetNDeltaFixed( const Vector& vInputNormal, float flVertAnimFixedPointScale )
 	{
-		ndelta[0] = vInputNormal.x / flVertAnimFixedPointScale;
-		ndelta[1] = vInputNormal.y / flVertAnimFixedPointScale;
-		ndelta[2] = vInputNormal.z / flVertAnimFixedPointScale;
+		ndelta[0] = static_cast<short>(vInputNormal.x / flVertAnimFixedPointScale);
+		ndelta[1] = static_cast<short>(vInputNormal.y / flVertAnimFixedPointScale);
+		ndelta[2] = static_cast<short>(vInputNormal.z / flVertAnimFixedPointScale);
 	}
 
 	// Ick...can also force fp16 data into this structure for writing to file in legacy format...
@@ -1081,8 +1081,8 @@ struct mstudiovertanim_wrinkle_t : public mstudiovertanim_t
 
 	inline void SetWrinkleFixed( float flWrinkle, float flVertAnimFixedPointScale )
 	{
-		int nWrinkleDeltaInt = flWrinkle / flVertAnimFixedPointScale;
-		wrinkledelta = clamp( nWrinkleDeltaInt, -32767, 32767 );
+		int nWrinkleDeltaInt = int(flWrinkle / flVertAnimFixedPointScale);
+		wrinkledelta = (short)clamp( nWrinkleDeltaInt, -32767, 32767 );
 	}
 
 	inline Vector4D GetDeltaFixed( float flVertAnimFixedPointScale )
@@ -1857,7 +1857,7 @@ private:
 		}
 
 		// Treat 'zero weights' as '100% binding to bone zero':
-		pBoneWeights->numbones = m_numBoneInfluences ? m_numBoneInfluences : 1;
+		pBoneWeights->numbones = static_cast<byte>(m_numBoneInfluences ? m_numBoneInfluences : 1);
 	}
 
 	int				m_numBoneInfluences;// Number of bone influences per vertex, N
@@ -3070,7 +3070,7 @@ inline bool Studio_ConvertStudioHdrToNewVersion( studiohdr_t *pStudioHdr )
 }
 
 // must be run to fixup with specified rootLOD
-inline void Studio_SetRootLOD( studiohdr_t *pStudioHdr, int rootLOD )
+inline void Studio_SetRootLOD( studiohdr_t *pStudioHdr, uint8_t rootLOD )
 {
 	// honor studiohdr restriction of root lod in case requested root lod exceeds restriction.
 	if ( pStudioHdr->numAllowedRootLODs > 0 &&
@@ -3080,7 +3080,7 @@ inline void Studio_SetRootLOD( studiohdr_t *pStudioHdr, int rootLOD )
 	}
 
 	Assert( rootLOD >= 0 && rootLOD < MAX_NUM_LODS );
-	rootLOD = Clamp( rootLOD, 0, MAX_NUM_LODS - 1 );
+	rootLOD = Clamp( rootLOD, (uint8_t)0, (uint8_t)(MAX_NUM_LODS - 1) );
 
 	// run the lod fixups that culls higher detail lods
 	// vertexes are external, fixups ensure relative offsets and counts are cognizant of shrinking data
