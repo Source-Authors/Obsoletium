@@ -259,7 +259,7 @@ inline void Detect_VertexElement_t_Changes( VertexElement_t element ) // GREPs f
 //#define COMPRESSED_NORMALS_TYPE						COMPRESSED_NORMALS_SEPARATETANGENTS_SHORT2
 #define COMPRESSED_NORMALS_TYPE						COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4
 
-inline int GetVertexElementSize( VertexElement_t element, VertexCompressionType_t compressionType )
+inline unsigned short GetVertexElementSize( VertexElement_t element, VertexCompressionType_t compressionType )
 {
 	Detect_VertexElement_t_Changes( element );
 

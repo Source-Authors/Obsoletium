@@ -98,9 +98,9 @@ namespace InterceptFxc
 				}
 			}
 			
-			HRESULT hr = s_dxModule.D3DXCompileShaderFromFile( pszFilename, pMacros, NULL /* LPD3DXINCLUDE */,
+			HRESULT hr = s_dxModule.D3DXCompileShaderFromFile( pszFilename, pMacros, NULL,
 				"main",	pszModel, 0, &pShader, &pErrorMessages,
-				NULL /* LPD3DXCONSTANTTABLE *ppConstantTable */ );
+				NULL );
 
 			if ( ppResponse )
 			{

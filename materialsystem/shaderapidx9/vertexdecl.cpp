@@ -240,7 +240,7 @@ void PrintVertexDeclaration( const D3DVERTEXELEMENT9 *pDecl )
 void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStaticLit, bool bUsingFlex, bool bUsingMorph )
 {
 	int i = 0;
-	int offset = 0;
+	WORD offset = 0;
 
 	VertexCompressionType_t compressionType = CompressionType( fmt );
 
@@ -261,7 +261,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Method = D3DDECLMETHOD_DEFAULT;
 		pDecl[i].Usage = D3DDECLUSAGE_POSITION;
 		pDecl[i].UsageIndex = 0;
-		pDecl[i].Type = VertexElementToDeclType( VERTEX_ELEMENT_POSITION, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( VERTEX_ELEMENT_POSITION, compressionType );
 		offset += GetVertexElementSize( VERTEX_ELEMENT_POSITION, compressionType );
 		++i;
 	}
@@ -276,7 +276,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].UsageIndex = 0;
 
 		// Always exactly two weights
-		pDecl[i].Type = VertexElementToDeclType( VERTEX_ELEMENT_BONEWEIGHTS2, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( VERTEX_ELEMENT_BONEWEIGHTS2, compressionType );
 		offset += GetVertexElementSize( VERTEX_ELEMENT_BONEWEIGHTS2, compressionType );
 		++i;
 	}
@@ -289,12 +289,12 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Method = D3DDECLMETHOD_DEFAULT;
 		pDecl[i].Usage = D3DDECLUSAGE_BLENDINDICES;
 		pDecl[i].UsageIndex = 0;
-		pDecl[i].Type = VertexElementToDeclType( VERTEX_ELEMENT_BONEINDEX, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( VERTEX_ELEMENT_BONEINDEX, compressionType );
 		offset += GetVertexElementSize( VERTEX_ELEMENT_BONEINDEX, compressionType );
 		++i;
 	}
 
-	int normalOffset = -1;
+	WORD normalOffset = USHRT_MAX;
 	if ( fmt & VERTEX_NORMAL )
 	{
 		pDecl[i].Stream = 0;
@@ -303,7 +303,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Method = D3DDECLMETHOD_DEFAULT;
 		pDecl[i].Usage = D3DDECLUSAGE_NORMAL;
 		pDecl[i].UsageIndex = 0;
-		pDecl[i].Type = VertexElementToDeclType( VERTEX_ELEMENT_NORMAL, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( VERTEX_ELEMENT_NORMAL, compressionType );
 		offset += GetVertexElementSize( VERTEX_ELEMENT_NORMAL, compressionType );
 		++i;
 	}
@@ -315,7 +315,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Method = D3DDECLMETHOD_DEFAULT;
 		pDecl[i].Usage = D3DDECLUSAGE_COLOR;
 		pDecl[i].UsageIndex = 0;
-		pDecl[i].Type = VertexElementToDeclType( VERTEX_ELEMENT_COLOR, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( VERTEX_ELEMENT_COLOR, compressionType );
 		offset += GetVertexElementSize( VERTEX_ELEMENT_COLOR, compressionType );
 		++i;
 	}
@@ -328,7 +328,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Method = D3DDECLMETHOD_DEFAULT;
 		pDecl[i].Usage = D3DDECLUSAGE_COLOR;
 		pDecl[i].UsageIndex = 1; // SPECULAR goes in the second COLOR slot
-		pDecl[i].Type = VertexElementToDeclType( VERTEX_ELEMENT_SPECULAR, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( VERTEX_ELEMENT_SPECULAR, compressionType );
 		offset += GetVertexElementSize( VERTEX_ELEMENT_SPECULAR, compressionType );
 		++i;
 	}
@@ -337,7 +337,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 												VERTEX_ELEMENT_TEXCOORD2D_0,
 												VERTEX_ELEMENT_TEXCOORD3D_0,
 												VERTEX_ELEMENT_TEXCOORD4D_0 };
-	for ( int j = 0; j < VERTEX_MAX_TEXTURE_COORDINATES; ++j )
+	for ( BYTE j = 0; j < VERTEX_MAX_TEXTURE_COORDINATES; ++j )
 	{
 		int nCoordSize = TexCoordSize( j, fmt );
 		if ( nCoordSize <= 0 )
@@ -350,7 +350,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Usage = D3DDECLUSAGE_TEXCOORD;
 		pDecl[i].UsageIndex = j;
 		VertexElement_t texCoordElement = (VertexElement_t)( texCoordDimensions[ nCoordSize - 1 ] + j );
-		pDecl[i].Type = VertexElementToDeclType( texCoordElement, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( texCoordElement, compressionType );
 		offset += GetVertexElementSize( texCoordElement, compressionType );
 		++i;
 	}
@@ -363,7 +363,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Usage = D3DDECLUSAGE_TANGENT;
 		pDecl[i].UsageIndex = 0;
 		// NOTE: this is currently *not* compressed
-		pDecl[i].Type = VertexElementToDeclType( VERTEX_ELEMENT_TANGENT_S, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( VERTEX_ELEMENT_TANGENT_S, compressionType );
 		offset += GetVertexElementSize( VERTEX_ELEMENT_TANGENT_S, compressionType );
 		++i;
 	}
@@ -376,7 +376,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Usage =   D3DDECLUSAGE_BINORMAL;
 		pDecl[i].UsageIndex = 0;
 		// NOTE: this is currently *not* compressed
-		pDecl[i].Type = VertexElementToDeclType( VERTEX_ELEMENT_TANGENT_T, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( VERTEX_ELEMENT_TANGENT_T, compressionType );
 		offset += GetVertexElementSize( VERTEX_ELEMENT_TANGENT_T, compressionType );
 		++i;
 	}
@@ -401,7 +401,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Usage = D3DDECLUSAGE_TANGENT;
 		pDecl[i].UsageIndex = 0;
 		VertexElement_t userDataElement = (VertexElement_t)( VERTEX_ELEMENT_USERDATA1 + ( userDataSize - 1 ) );
-		pDecl[i].Type = VertexElementToDeclType( userDataElement, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( userDataElement, compressionType );
 		offset += GetVertexElementSize( userDataElement, compressionType );
 		++i;
 	}
@@ -414,7 +414,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Method = D3DDECLMETHOD_DEFAULT;
 		pDecl[i].Usage = D3DDECLUSAGE_COLOR;
 		pDecl[i].UsageIndex = 1; // SPECULAR goes into the second COLOR slot
-		pDecl[i].Type = VertexElementToDeclType( VERTEX_ELEMENT_SPECULAR, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( VERTEX_ELEMENT_SPECULAR, compressionType );
 		++i;
 	}
 
@@ -431,10 +431,10 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Usage = D3DDECLUSAGE_POSITION;
 		pDecl[i].UsageIndex = 1;
 		// FIXME: unify this with VertexElementToDeclType():
-		pDecl[i].Type = bUseWrinkle ? D3DDECLTYPE_FLOAT4 : D3DDECLTYPE_FLOAT3;
+		pDecl[i].Type = (BYTE)(bUseWrinkle ? D3DDECLTYPE_FLOAT4 : D3DDECLTYPE_FLOAT3);
 		++i;
 
-		int normalOffset = GetVertexElementSize( VERTEX_ELEMENT_POSITION, compressionType );
+		WORD normalOffset = GetVertexElementSize( VERTEX_ELEMENT_POSITION, compressionType );
 		if ( bUseWrinkle )
 		{
 			normalOffset += GetVertexElementSize( VERTEX_ELEMENT_WRINKLE, compressionType );
@@ -447,7 +447,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Usage = D3DDECLUSAGE_NORMAL;
 		pDecl[i].UsageIndex = 1;
 		// NOTE: this is currently *not* compressed
-		pDecl[i].Type = VertexElementToDeclType( VERTEX_ELEMENT_NORMAL, VERTEX_COMPRESSION_NONE );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( VERTEX_ELEMENT_NORMAL, VERTEX_COMPRESSION_NONE );
 		++i;
 	}
 
@@ -459,7 +459,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Method = D3DDECLMETHOD_DEFAULT;
 		pDecl[i].Usage = D3DDECLUSAGE_POSITION;
 		pDecl[i].UsageIndex = 2;
-		pDecl[i].Type = VertexElementToDeclType( VERTEX_ELEMENT_USERDATA1, compressionType );
+		pDecl[i].Type = (BYTE)VertexElementToDeclType( VERTEX_ELEMENT_USERDATA1, compressionType );
 		++i;
 	}
 

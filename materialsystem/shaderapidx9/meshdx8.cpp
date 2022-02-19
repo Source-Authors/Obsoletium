@@ -39,6 +39,7 @@
 #include "tier1/strtools.h"
 #include "convar.h"
 #include "shaderdevicedx8.h"
+#include <DirectXMath.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -622,7 +623,7 @@ public:
 private:
 	// Selection mode 
 	void TestSelection( );
-	void ClipTriangle( D3DXVECTOR3 **ppVert, float zNear, D3DXMATRIX &proj );
+	void XM_CALLCONV ClipTriangle( DirectX::XMFLOAT3* (&ppVert)[3], float zNear, DirectX::FXMMATRIX proj );
 
 	CDynamicMeshDX8 *GetDynamicMesh();
 
@@ -1856,17 +1857,7 @@ bool CVertexBufferDx8::Lock( int nMaxVertexCount, bool bAppend, VertexDesc_t &de
 
 	if ( FAILED( hr ) )
 	{
-		// Check if paged pool is in critical state ( < 5% free )
-		PAGED_POOL_INFO_t ppi;
-		if ( ( SYSCALL_SUCCESS == Plat_GetPagedPoolInfo( &ppi ) ) &&
-			( ( ppi.numPagesFree * 20 ) < ( ppi.numPagesUsed + ppi.numPagesFree ) ) )
-		{
-			Error( "Out of OS Paged Pool Memory! For more information, please see\nhttps://help.steampowered.com/\n" );
-		}
-		else
-		{
-			Warning( "Failed to lock vertex buffer in CVertexBufferDx8::Lock\n" );
-		}
+		Warning( "Failed to lock vertex buffer in CVertexBufferDx8::Lock\n" );
 		goto vertexBufferLockFailed;
 	}
 
@@ -1932,9 +1923,9 @@ void CVertexBufferDx8::HandlePerFrameTextureStats( int nFrame )
 // Helpers with meshdescs...
 //-----------------------------------------------------------------------------
 // FIXME: add compression-agnostic read-accessors (which decompress and return by value, checking desc.m_CompressionType)
-inline D3DXVECTOR3 &Position( MeshDesc_t const &desc, int vert )
+inline DirectX::XMFLOAT3 &Position( MeshDesc_t const &desc, int vert )
 {
-	return *(D3DXVECTOR3*)((unsigned char*)desc.m_pPosition + vert * desc.m_VertexSize_Position );
+	return *(DirectX::XMFLOAT3*)((unsigned char*)desc.m_pPosition + vert * desc.m_VertexSize_Position );
 }
 
 inline float Wrinkle( MeshDesc_t const &desc, int vert )
@@ -1942,10 +1933,10 @@ inline float Wrinkle( MeshDesc_t const &desc, int vert )
 	return *(float*)((unsigned char*)desc.m_pWrinkle + vert * desc.m_VertexSize_Wrinkle );
 }
 
-inline D3DXVECTOR3 &BoneWeight( MeshDesc_t const &desc, int vert )
+inline DirectX::XMFLOAT3 &BoneWeight( MeshDesc_t const &desc, int vert )
 {
 	Assert( desc.m_CompressionType == VERTEX_COMPRESSION_NONE );
-	return *(D3DXVECTOR3*)((unsigned char*)desc.m_pBoneWeight + vert * desc.m_VertexSize_BoneWeight );
+	return *(DirectX::XMFLOAT3*)((unsigned char*)desc.m_pBoneWeight + vert * desc.m_VertexSize_BoneWeight );
 }
 
 inline unsigned char *BoneIndex( MeshDesc_t const &desc, int vert )
@@ -1953,10 +1944,10 @@ inline unsigned char *BoneIndex( MeshDesc_t const &desc, int vert )
 	return desc.m_pBoneMatrixIndex + vert * desc.m_VertexSize_BoneMatrixIndex;
 }
 
-inline D3DXVECTOR3 &Normal( MeshDesc_t const &desc, int vert )
+inline DirectX::XMFLOAT3 &Normal( MeshDesc_t const &desc, int vert )
 {
 	Assert( desc.m_CompressionType == VERTEX_COMPRESSION_NONE );
-	return *(D3DXVECTOR3*)((unsigned char*)desc.m_pNormal + vert * desc.m_VertexSize_Normal );
+	return *(DirectX::XMFLOAT3*)((unsigned char*)desc.m_pNormal + vert * desc.m_VertexSize_Normal );
 }
 
 inline unsigned char *Color( MeshDesc_t const &desc, int vert )
@@ -1964,19 +1955,19 @@ inline unsigned char *Color( MeshDesc_t const &desc, int vert )
 	return desc.m_pColor + vert * desc.m_VertexSize_Color;
 }
 
-inline D3DXVECTOR2 &TexCoord( MeshDesc_t const &desc, int vert, int stage )
+inline DirectX::XMFLOAT2 &TexCoord( MeshDesc_t const &desc, int vert, int stage )
 {
-	return *(D3DXVECTOR2*)((unsigned char*)desc.m_pTexCoord[stage] + vert * desc.m_VertexSize_TexCoord[stage] );
+	return *(DirectX::XMFLOAT2*)((unsigned char*)desc.m_pTexCoord[stage] + vert * desc.m_VertexSize_TexCoord[stage] );
 }
 
-inline D3DXVECTOR3 &TangentS( MeshDesc_t const &desc, int vert )
+inline DirectX::XMFLOAT3 &TangentS( MeshDesc_t const &desc, int vert )
 {
-	return *(D3DXVECTOR3*)((unsigned char*)desc.m_pTangentS + vert * desc.m_VertexSize_TangentS );
+	return *(DirectX::XMFLOAT3*)((unsigned char*)desc.m_pTangentS + vert * desc.m_VertexSize_TangentS );
 }
 
-inline D3DXVECTOR3 &TangentT( MeshDesc_t const &desc, int vert )
+inline DirectX::XMFLOAT3 &TangentT( MeshDesc_t const &desc, int vert )
 {
-	return *(D3DXVECTOR3*)((unsigned char*)desc.m_pTangentT + vert * desc.m_VertexSize_TangentT );
+	return *(DirectX::XMFLOAT3*)((unsigned char*)desc.m_pTangentT + vert * desc.m_VertexSize_TangentT );
 }
 
 
@@ -2200,9 +2191,9 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 		temp += sprintf( temp, "[%4d] ", i + desc.m_nFirstVertex );
 		if( fmt & VERTEX_POSITION )
 		{
-			D3DXVECTOR3& pos = Position( desc, i );
+			const auto& pos = Position( desc, i );
 			temp += sprintf(temp, "P %8.2f %8.2f %8.2f ",
-				pos[0], pos[1], pos[2]);
+				pos.x, pos.y, pos.z);
 		}
 
 		if ( fmt & VERTEX_WRINKLE )
@@ -2214,7 +2205,7 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 		if (numBoneWeights > 0)
 		{
 			temp += sprintf(temp, "BW ");
-			float* pWeight = BoneWeight( desc, i );
+			const float* pWeight = &BoneWeight( desc, i ).x;
 			for (int j = 0; j < numBoneWeights; ++j)
 			{
 				temp += sprintf(temp, "%1.2f ", pWeight[j]);
@@ -2232,9 +2223,9 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 
 		if ( fmt & VERTEX_NORMAL )
 		{
-			D3DXVECTOR3& normal = Normal( desc, i );
+			const auto& normal = Normal( desc, i );
 			temp += sprintf(temp, "N %1.2f %1.2f %1.2f ",
-				normal[0],	normal[1],	normal[2]);
+				normal.x,	normal.y,	normal.z);
 		}
 		
 		if (fmt & VERTEX_COLOR)
@@ -2248,23 +2239,23 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 		{
 			if( TexCoordSize( j, fmt ) > 0)
 			{
-				D3DXVECTOR2& texcoord = TexCoord( desc, i, j );
-				temp += sprintf(temp, "T%d %.2f %.2f ", j,texcoord[0], texcoord[1]);
+				const auto& texcoord = TexCoord( desc, i, j );
+				temp += sprintf(temp, "T%d %.2f %.2f ", j, texcoord.x, texcoord.y);
 			}
 		}
 
 		if (fmt & VERTEX_TANGENT_S)
 		{
-			D3DXVECTOR3& tangentS = TangentS( desc, i );
+			const auto& tangentS = TangentS( desc, i );
 			temp += sprintf(temp, "S %1.2f %1.2f %1.2f ",
-				tangentS[0], tangentS[1], tangentS[2]);
+				tangentS.x, tangentS.y, tangentS.z);
 		}
 
 		if (fmt & VERTEX_TANGENT_T)
 		{
-			D3DXVECTOR3& tangentT = TangentT( desc, i );
+			const auto& tangentT = TangentT( desc, i );
 			temp += sprintf(temp, "T %1.2f %1.2f %1.2f ",
-				tangentT[0], tangentT[1], tangentT[2]);
+				tangentT.x, tangentT.y, tangentT.z);
 		}
 
 		sprintf(temp,"\n");
@@ -2310,8 +2301,8 @@ void CBaseMeshDX8::ValidateData( int nVertexCount, int nIndexCount, const MeshDe
 	{
 		if( fmt & VERTEX_POSITION )
 		{
-			D3DXVECTOR3& pos = Position( desc, i );
-			Assert( IsFinite( pos[0] ) && IsFinite( pos[1] ) && IsFinite( pos[2] ) );
+			const auto& pos = Position( desc, i );
+			Assert( IsFinite( pos.x ) && IsFinite( pos.y ) && IsFinite( pos.z ) );
 		}
 		if( fmt & VERTEX_WRINKLE )
 		{
@@ -2320,7 +2311,7 @@ void CBaseMeshDX8::ValidateData( int nVertexCount, int nIndexCount, const MeshDe
 		}
 		if (numBoneWeights > 0)
 		{
-			float* pWeight = BoneWeight( desc, i );
+			const float* pWeight = &BoneWeight( desc, i ).x;
 			for (int j = 0; j < numBoneWeights; ++j)
 			{
 				Assert( pWeight[j] >= 0.0f && pWeight[j] <= 1.0f );
@@ -2336,10 +2327,10 @@ void CBaseMeshDX8::ValidateData( int nVertexCount, int nIndexCount, const MeshDe
 		}
 		if( fmt & VERTEX_NORMAL )
 		{
-			D3DXVECTOR3& normal = Normal( desc, i );
-			Assert( normal[0] >= -1.05f && normal[0] <= 1.05f );
-			Assert( normal[1] >= -1.05f && normal[1] <= 1.05f );
-			Assert( normal[2] >= -1.05f && normal[2] <= 1.05f );
+			const auto& normal = Normal( desc, i );
+			Assert( normal.x >= -1.05f && normal.x <= 1.05f );
+			Assert( normal.y >= -1.05f && normal.y <= 1.05f );
+			Assert( normal.z >= -1.05f && normal.z <= 1.05f );
 		}
 		
 		if (fmt & VERTEX_COLOR)
@@ -2352,21 +2343,21 @@ void CBaseMeshDX8::ValidateData( int nVertexCount, int nIndexCount, const MeshDe
 		{
 			if( TexCoordSize( j, fmt ) > 0)
 			{
-				D3DXVECTOR2& texcoord = TexCoord( desc, i, j );
-				Assert( IsFinite( texcoord[0] ) && IsFinite( texcoord[1] ) );
+				const auto& texcoord = TexCoord( desc, i, j );
+				Assert( IsFinite( texcoord.x ) && IsFinite( texcoord.y ) );
 			}
 		}
 
 		if (fmt & VERTEX_TANGENT_S)
 		{
-			D3DXVECTOR3& tangentS = TangentS( desc, i );
-			Assert( IsFinite( tangentS[0] ) && IsFinite( tangentS[1] ) && IsFinite( tangentS[2] ) );
+			const auto& tangentS = TangentS( desc, i );
+			Assert( IsFinite( tangentS.x ) && IsFinite( tangentS.y ) && IsFinite( tangentS.z ) );
 		}
 
 		if (fmt & VERTEX_TANGENT_T)
 		{
-			D3DXVECTOR3& tangentT = TangentT( desc, i );
-			Assert( IsFinite( tangentT[0] ) && IsFinite( tangentT[1] ) && IsFinite( tangentT[2] ) );
+			const auto& tangentT = TangentT( desc, i );
+			Assert( IsFinite( tangentT.x ) && IsFinite( tangentT.y ) && IsFinite( tangentT.z ) );
 		}
 	}
 #endif // _DEBUG
@@ -2602,18 +2593,8 @@ bool CMeshDX8::Lock( int nVertexCount, bool bAppend, VertexDesc_t &desc )
 		}
 		else
 		{
-			// Check if paged pool is in critical state ( < 5% free )
-			PAGED_POOL_INFO_t ppi;
-			if ( ( SYSCALL_SUCCESS == Plat_GetPagedPoolInfo( &ppi ) ) &&
-				 ( ( ppi.numPagesFree * 20 ) < ( ppi.numPagesUsed + ppi.numPagesFree ) ) )
-			{
-				Error( "Out of OS Paged Pool Memory! For more information, please see\nhttps://help.steampowered.com/\n" );
-			}
-			else
-			{
-				Assert( 0 );
-				Error( "failed to lock vertex buffer in CMeshDX8::LockVertexBuffer: nVertexCount=%d, nFirstVertex=%d\n", nVertexCount, desc.m_nFirstVertex );
-			}
+			Assert( 0 );
+			Error( "failed to lock vertex buffer in CMeshDX8::LockVertexBuffer: nVertexCount=%d, nFirstVertex=%d\n", nVertexCount, desc.m_nFirstVertex );
 		}
 		CVertexBufferBase::ComputeVertexDescription( 0, 0, desc );
 		return false;
@@ -2682,18 +2663,8 @@ int CMeshDX8::Lock( bool bReadOnly, int nFirstIndex, int nIndexCount, IndexDesc_
 		desc.m_pIndices = g_nScratchIndexBuffer;
 		desc.m_nIndexSize = 0;
 
-		// Check if paged pool is in critical state ( < 5% free )
-		PAGED_POOL_INFO_t ppi;
-		if ( ( SYSCALL_SUCCESS == Plat_GetPagedPoolInfo( &ppi ) ) &&
-			( ( ppi.numPagesFree * 20 ) < ( ppi.numPagesUsed + ppi.numPagesFree ) ) )
-		{
-			Error( "Out of OS Paged Pool Memory! For more information, please see\nhttps://help.steampowered.com/\n" );
-		}
-		else
-		{
-			Assert( 0 );
-			Error( "failed to lock index buffer in CMeshDX8::LockIndexBuffer\n" );
-		}
+		Assert( 0 );
+		Error( "failed to lock index buffer in CMeshDX8::LockIndexBuffer\n" );
 
 		return 0;
 	}
@@ -4129,13 +4100,13 @@ void CTempMeshDX8::CopyToMeshBuilder(
 //-----------------------------------------------------------------------------
 // Selection mode helper functions
 //-----------------------------------------------------------------------------
-static void ComputeModelToView( D3DXMATRIX& modelToView )
+static DirectX::XMMATRIX XM_CALLCONV ComputeModelToView()
 {
 	// Get the modelview matrix...
-	D3DXMATRIX world, view;
+	DirectX::XMMATRIX world, view;
 	ShaderAPI()->GetMatrix( MATERIAL_MODEL, (float*)&world );
 	ShaderAPI()->GetMatrix( MATERIAL_VIEW, (float*)&view );
-	D3DXMatrixMultiply( &modelToView, &world, &view );
+	return world * view;
 }
 
 static float ComputeCullFactor( )
@@ -4165,47 +4136,50 @@ static float ComputeCullFactor( )
 // Clip to viewport
 //-----------------------------------------------------------------------------
 static int g_NumClipVerts;
-static D3DXVECTOR3 g_ClipVerts[16];
+static DirectX::XMFLOAT3 g_ClipVerts[16];
 
-static bool PointInsidePlane( D3DXVECTOR3* pVert, int normalInd, float val, bool nearClip )
+static bool XM_CALLCONV PointInsidePlane( DirectX::XMFLOAT3 pVert, int normalInd, float val, bool nearClip )
 {
 	if ((val > 0) || nearClip)
-		return (val - (*pVert)[normalInd] >= 0);
+		return (val - (&pVert.x)[normalInd] >= 0);
 	else
-		return ((*pVert)[normalInd] - val >= 0);
+		return ((&pVert.x)[normalInd] - val >= 0);
 }
 
-static void IntersectPlane( D3DXVECTOR3* pStart, D3DXVECTOR3* pEnd, 
-						    int normalInd, float val, D3DXVECTOR3* pOutVert )
+static DirectX::XMVECTOR XM_CALLCONV IntersectPlane( DirectX::XMFLOAT3 pStart, DirectX::XMFLOAT3 pEnd,
+						    int normalInd, float val )
 {
-	D3DXVECTOR3 dir;
-	D3DXVec3Subtract( &dir, pEnd, pStart );
-	Assert( dir[normalInd] != 0.0f );
-	float t = (val - (*pStart)[normalInd]) / dir[normalInd];
-	pOutVert->x = pStart->x + dir.x * t;
-	pOutVert->y = pStart->y + dir.y * t;
-	pOutVert->z = pStart->z + dir.z * t;
+	DirectX::XMVECTOR start{ DirectX::XMLoadFloat3( &pStart ) };
+	DirectX::XMVECTOR dir{ DirectX::XMVectorSubtract( DirectX::XMLoadFloat3( &pEnd ), start ) };
+	Assert( dir.m128_f32[normalInd] != 0.0f );
+	float t = (val - (&pStart.x)[normalInd]) / dir.m128_f32[normalInd];
 
+	DirectX::XMVECTOR pOutVert{ DirectX::XMVectorMultiplyAdd( dir, DirectX::XMVectorReplicate( t ), start ) };
 	// Avoid any precision problems.
-	(*pOutVert)[normalInd] = val;
+	pOutVert.m128_f32[normalInd] = val;
+
+	return pOutVert;
 }
 
-static int ClipTriangleAgainstPlane( D3DXVECTOR3** ppVert, int nVertexCount, 
-			D3DXVECTOR3** ppOutVert, int normalInd, float val, bool nearClip = false )
+template<size_t vertsSize>
+static int ClipTriangleAgainstPlane( DirectX::XMFLOAT3* (&ppVert)[vertsSize], int nVertexCount,
+			DirectX::XMFLOAT3** ppOutVert, int normalInd, float val, bool nearClip = false )
 {
+	Assert( vertsSize <= (size_t)nVertexCount );
+
 	// Ye Olde Sutherland-Hodgman clipping algorithm
 	int numOutVerts = 0;
-	D3DXVECTOR3* pStart = ppVert[nVertexCount-1];
-	bool startInside = PointInsidePlane( pStart, normalInd, val, nearClip );
+	DirectX::XMFLOAT3* pStart = ppVert[nVertexCount-1];
+	bool startInside = PointInsidePlane( *pStart, normalInd, val, nearClip );
 	for (int i = 0; i < nVertexCount; ++i)
 	{
-		D3DXVECTOR3* pEnd = ppVert[i];
-		bool endInside = PointInsidePlane( pEnd, normalInd, val, nearClip );
+		DirectX::XMFLOAT3* pEnd = ppVert[i];
+		bool endInside = PointInsidePlane( *pEnd, normalInd, val, nearClip );
 		if (endInside)
 		{
 			if (!startInside)
 			{
-				IntersectPlane( pStart, pEnd, normalInd, val, &g_ClipVerts[g_NumClipVerts] );
+				DirectX::XMStoreFloat3( &g_ClipVerts[g_NumClipVerts], IntersectPlane( *pStart, *pEnd, normalInd, val ) );
 				ppOutVert[numOutVerts++] = &g_ClipVerts[g_NumClipVerts++];
 			}
 			ppOutVert[numOutVerts++] = pEnd;
@@ -4214,7 +4188,7 @@ static int ClipTriangleAgainstPlane( D3DXVECTOR3** ppVert, int nVertexCount,
 		{
 			if (startInside)
 			{
-				IntersectPlane( pStart, pEnd, normalInd, val, &g_ClipVerts[g_NumClipVerts] );
+				DirectX::XMStoreFloat3( &g_ClipVerts[g_NumClipVerts], IntersectPlane( *pStart, *pEnd, normalInd, val ) );
 				ppOutVert[numOutVerts++] = &g_ClipVerts[g_NumClipVerts++];
 			}
 		}
@@ -4225,12 +4199,12 @@ static int ClipTriangleAgainstPlane( D3DXVECTOR3** ppVert, int nVertexCount,
 	return numOutVerts;
 }
 
-void CTempMeshDX8::ClipTriangle( D3DXVECTOR3** ppVert, float zNear, D3DXMATRIX& projection )
+void XM_CALLCONV CTempMeshDX8::ClipTriangle( DirectX::XMFLOAT3* (&ppVert)[3], float zNear, DirectX::FXMMATRIX projection )
 {
 	int i;
 	int nVertexCount = 3;
-	D3DXVECTOR3* ppClipVert1[10];
-	D3DXVECTOR3* ppClipVert2[10];
+	DirectX::XMFLOAT3* ppClipVert1[10];
+	DirectX::XMFLOAT3* ppClipVert2[10];
 
 	g_NumClipVerts = 0;
 
@@ -4246,19 +4220,20 @@ void CTempMeshDX8::ClipTriangle( D3DXVECTOR3** ppVert, float zNear, D3DXMATRIX& 
 	Assert( g_NumClipVerts <= 2 );
 	for (i = 0; i < nVertexCount; ++i)
 	{
+		DirectX::XMVECTOR vert1 = DirectX::XMLoadFloat3( ppClipVert1[i] );
 		if (ppClipVert1[i] == &g_ClipVerts[0])
 		{
-			D3DXVec3TransformCoord( &g_ClipVerts[0], ppClipVert1[i], &projection ); 
+			DirectX::XMStoreFloat3( &g_ClipVerts[0], DirectX::XMVector3TransformCoord( vert1, projection ) );
 		}
 		else if (ppClipVert1[i] == &g_ClipVerts[1])
 		{
-			D3DXVec3TransformCoord( &g_ClipVerts[1], ppClipVert1[i], &projection ); 
+			DirectX::XMStoreFloat3( &g_ClipVerts[1], DirectX::XMVector3TransformCoord( vert1, projection ) );
 		}
 		else
 		{
-			D3DXVec3TransformCoord( &g_ClipVerts[g_NumClipVerts], ppClipVert1[i], &projection );
-		    ppClipVert1[i] = &g_ClipVerts[g_NumClipVerts];
-			++g_NumClipVerts;
+			DirectX::XMStoreFloat3( &g_ClipVerts[g_NumClipVerts], DirectX::XMVector3TransformCoord( vert1, projection ) );
+
+			ppClipVert1[i] = &g_ClipVerts[g_NumClipVerts++];
 		}
 	}
 
@@ -4321,14 +4296,14 @@ void CTempMeshDX8::ClipTriangle( D3DXVECTOR3** ppVert, float zNear, D3DXMATRIX& 
 #endif
 
 	// Compute closest and furthest verts
-	float minz = ppClipVert2[0]->z;
-	float maxz = ppClipVert2[0]->z;
+	float minz = ppClipVert2[0]->z, maxz = ppClipVert2[0]->z;
 	for ( i = 1; i < nVertexCount; ++i )
 	{
-		if (ppClipVert2[i]->z < minz)
-			minz = ppClipVert2[i]->z;
-		else if (ppClipVert2[i]->z > maxz)
-			maxz = ppClipVert2[i]->z;
+		float now = ppClipVert2[i]->z;
+		if (now < minz)
+			minz = now;
+		else if (now > maxz)
+			maxz = now;
 	}
 
 	ShaderAPI()->RegisterSelectionHit( minz, maxz );
@@ -4347,14 +4322,14 @@ void CTempMeshDX8::TestSelection()
 	if ((m_Type != MATERIAL_TRIANGLES) && (m_Type != MATERIAL_TRIANGLE_STRIP))
 		return;
 
-	D3DXMATRIX modelToView, projection;
-	ComputeModelToView( modelToView );
+	DirectX::XMMATRIX projection;
+	DirectX::XMMATRIX modelToView = ComputeModelToView();
 	ShaderAPI()->GetMatrix( MATERIAL_PROJECTION, (float*)&projection );
-	float zNear = -projection.m[3][2] / projection.m[2][2];
+	float zNear = -DirectX::XMVectorGetZ( projection.r[3] ) / DirectX::XMVectorGetZ( projection.r[2] );
 
-	D3DXVECTOR3* pPos[3];
-	D3DXVECTOR3 edge[2];
-	D3DXVECTOR3 normal;
+	DirectX::XMFLOAT3* pPos[3];
+	DirectX::XMVECTOR edge[2];
+	DirectX::XMVECTOR normal;
 
 	int numTriangles;
 	if (m_Type == MATERIAL_TRIANGLES)
@@ -4400,11 +4375,12 @@ void CTempMeshDX8::TestSelection()
 		for (int j = 0; j < 3; ++j)
 		{
 			int index = m_IndexData[indexPos];
-			D3DXVECTOR3* pPosition = (D3DXVECTOR3*)&m_VertexData[index * m_VertexSize];
+			DirectX::XMFLOAT3* pPosition = (DirectX::XMFLOAT3*)&m_VertexData[index * m_VertexSize];
 			if ((transformedVert[index >> 3] & (1 << (index & 0x7))) == 0)
 			{
-				D3DXVec3TransformCoord( pPosition, pPosition, &modelToView );
+				DirectX::XMVECTOR position = DirectX::XMVector3TransformCoord( DirectX::XMLoadFloat3(pPosition), modelToView );
 				transformedVert[index >> 3] |= (1 << (index & 0x7));
+				DirectX::XMStoreFloat3( pPosition, position );
 			}
 
 			pPos[j] = pPosition;
@@ -4418,10 +4394,12 @@ void CTempMeshDX8::TestSelection()
 			continue;
 
 		// backface cull....
-		D3DXVec3Subtract( &edge[0], pPos[1], pPos[0] );
-		D3DXVec3Subtract( &edge[1], pPos[2], pPos[0] );
-		D3DXVec3Cross( &normal, &edge[0], &edge[1] );
-		float dot = D3DXVec3Dot( &normal, pPos[inFrontIdx] );
+		edge[0] = DirectX::XMVectorSubtract( DirectX::XMLoadFloat3( pPos[1] ), DirectX::XMLoadFloat3( pPos[0] ) );
+		edge[1] = DirectX::XMVectorSubtract( DirectX::XMLoadFloat3( pPos[2] ), DirectX::XMLoadFloat3( pPos[0] ) );
+		normal = DirectX::XMVector3Cross( edge[0], edge[1] );
+
+		float dot = DirectX::XMVectorGetX( DirectX::XMVector3Dot( normal, DirectX::XMLoadFloat3( pPos[inFrontIdx] ) ) );
+
 		if (dot * cullFactor > 0.0f)
 			continue;
 

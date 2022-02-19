@@ -189,12 +189,6 @@ REM ****************
 if /i "%DIRECTX_SDK_VER%" == "pc09.00" (
 	rem echo "Copy extra files for dx 9 std
 )
-if /i "%DIRECTX_SDK_VER%" == "pc09.30" (
-	echo %SrcDirBase%\devtools\bin\d3dx9_33.dll >> filestocopy.txt
-)
-if /i "%DIRECTX_SDK_VER%" == "pc10.00" (
-	echo %SrcDirBase%\devtools\bin\d3dx10_33.dll >> filestocopy.txt
-)
 if /i "%DIRECTX_SDK_VER%" == "x360.00" (
 	rem echo "Copy extra files for xbox360
 )

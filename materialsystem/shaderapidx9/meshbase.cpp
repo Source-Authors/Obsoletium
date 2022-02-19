@@ -281,8 +281,8 @@ void CVertexBufferBase::ValidateData( int nVertexCount, const VertexDesc_t &spew
 	{
 		if( fmt & VERTEX_POSITION )
 		{
-			D3DXVECTOR3& pos = Position( desc, i );
-			Assert( IsFinite( pos[0] ) && IsFinite( pos[1] ) && IsFinite( pos[2] ) );
+			auto& pos = Position( desc, i );
+			Assert( IsFinite( pos.x ) && IsFinite( pos.y ) && IsFinite( pos.z ) );
 		}
 		if( fmt & VERTEX_WRINKLE )
 		{
@@ -307,10 +307,10 @@ void CVertexBufferBase::ValidateData( int nVertexCount, const VertexDesc_t &spew
 		}
 		if( fmt & VERTEX_NORMAL )
 		{
-			D3DXVECTOR3& normal = Normal( desc, i );
-			Assert( normal[0] >= -1.05f && normal[0] <= 1.05f );
-			Assert( normal[1] >= -1.05f && normal[1] <= 1.05f );
-			Assert( normal[2] >= -1.05f && normal[2] <= 1.05f );
+			auto& normal = Normal( desc, i );
+			Assert( normal.x >= -1.05f && normal.x <= 1.05f );
+			Assert( normal.y >= -1.05f && normal.y <= 1.05f );
+			Assert( normal.z >= -1.05f && normal.z <= 1.05f );
 		}
 
 		if (fmt & VERTEX_COLOR)
@@ -323,21 +323,21 @@ void CVertexBufferBase::ValidateData( int nVertexCount, const VertexDesc_t &spew
 		{
 			if( TexCoordSize( j, fmt ) > 0)
 			{
-				D3DXVECTOR2& texcoord = TexCoord( desc, i, j );
-				Assert( IsFinite( texcoord[0] ) && IsFinite( texcoord[1] ) );
+				auto& texcoord = TexCoord( desc, i, j );
+				Assert( IsFinite( texcoord.x ) && IsFinite( texcoord.y ) );
 			}
 		}
 
 		if (fmt & VERTEX_TANGENT_S)
 		{
-			D3DXVECTOR3& tangentS = TangentS( desc, i );
-			Assert( IsFinite( tangentS[0] ) && IsFinite( tangentS[1] ) && IsFinite( tangentS[2] ) );
+			auto& tangentS = TangentS( desc, i );
+			Assert( IsFinite( tangentS.x ) && IsFinite( tangentS.y ) && IsFinite( tangentS.z ) );
 		}
 
 		if (fmt & VERTEX_TANGENT_T)
 		{
-			D3DXVECTOR3& tangentT = TangentT( desc, i );
-			Assert( IsFinite( tangentT[0] ) && IsFinite( tangentT[1] ) && IsFinite( tangentT[2] ) );
+			auto& tangentT = TangentT( desc, i );
+			Assert( IsFinite( tangentT.x ) && IsFinite( tangentT.y ) && IsFinite( tangentT.z ) );
 		}
 	}
 #endif // _DEBUG

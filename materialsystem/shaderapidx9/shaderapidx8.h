@@ -12,6 +12,7 @@
 #include "shaderapibase.h"
 #include "shaderapi/ishadershadow.h"
 #include "locald3dtypes.h"
+#include <DirectXMath.h>
 
 //-----------------------------------------------------------------------------
 // Vendor-specific defines
@@ -34,7 +35,7 @@ class IMaterialInternal;
 //-----------------------------------------------------------------------------
 struct BufferedState_t
 {
-	D3DXMATRIX m_Transform[3];
+	DirectX::XMMATRIX m_Transform[3];
 	D3DVIEWPORT9 m_Viewport;
 	int m_BoundTexture[16];
 	void *m_VertexShader;

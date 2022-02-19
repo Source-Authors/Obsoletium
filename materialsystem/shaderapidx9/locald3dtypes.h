@@ -15,7 +15,6 @@
 #if defined( DX10 ) && !defined( DX_TO_GL_ABSTRACTION )
 
 #include <d3d10.h>
-#include <d3dx10.h>
 
 struct IDirect3D10BaseTexture
 {
@@ -38,8 +37,6 @@ public:
 	typedef ID3D10VertexShader				IDirect3DVertexShader;
 	typedef ID3D10PixelShader				IDirect3DPixelShader;
 	typedef ID3D10ShaderResourceView		IDirect3DSurface;
-	typedef ID3DX10Font						ID3DXFont;
-	typedef ID3D10Query						ID3DQuery;
 
 	typedef ID3D10Device					*LPDIRECT3DDEVICE;
 	typedef ID3D10Buffer					*LPDIRECT3DINDEXBUFFER;
@@ -126,11 +123,6 @@ typedef int PixelShader_t;
 #define D3DRS_NOTSUPPORTED						D3DRS_FORCE_DWORD
 
 #include "togl/rendermechanism.h"
-
-#if !defined(DX_TO_GL_ABSTRACTION)
-// dimhotepus: Put under dx to reduce bloat
-#include <d3dx9.h>
-#endif
 
 #if defined( _X360 )
 

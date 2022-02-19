@@ -14,7 +14,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\dx9sdk\include"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\dx9sdk\include;$SRCDIR\thirdparty;$SRCDIR\thirdparty\DirectXMath\Inc"
 		$AdditionalIncludeDirectories	"$BASE;..\"
 		$PreprocessorDefinitions		"$BASE;SHADERAPIDX10;SHADER_DLL_EXPORT;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead"
 		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [$WINDOWS]
@@ -22,7 +22,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE d3d10.lib dxgi.lib" [$WINDOWS]
+		$AdditionalDependencies				"$BASE d3d10.lib d3dcompiler.lib dxgi.lib" [$WINDOWS]
 	}
 }
 
@@ -53,30 +53,20 @@ $Project "shaderapidx10"
 		}
 
 		// DX9 related files	
-		$File	"ColorFormatDX8.cpp"
+		// $File	"ColorFormatDX8.cpp"
 		$File	"d3d_async.cpp"
 		$File	"$SRCDIR\public\filesystem_helpers.cpp"
 		$File	"HardwareConfig.cpp"
-		$File	"MeshDX8.cpp"
+		// $File	"MeshDX8.cpp"
 		$File	"Recording.cpp"
-		$File	"ShaderAPIDX8.cpp"
-		$File	"ShaderDeviceDX8.cpp"
-		$File	"ShaderShadowDX8.cpp"
-		$File	"TextureDX8.cpp"
-		$File	"TransitionTable.cpp"
-		$File	"vertexdecl.cpp"
-		$File	"VertexShaderDX8.cpp"
+		// $File	"ShaderAPIDX8.cpp"
+		// $File	"ShaderDeviceDX8.cpp"
+		// $File	"ShaderShadowDX8.cpp"
+		// $File	"TextureDX8.cpp"
+		// $File	"TransitionTable.cpp"
+		// $File	"vertexdecl.cpp"
+		// $File	"VertexShaderDX8.cpp"
 		$File	"wmi.cpp"
-	}
-
-	$Folder	"DirectX Header Files"
-	{
-		$File	"$SRCDIR\dx9sdk\include\d3dx10.h"
-		$File	"$SRCDIR\dx9sdk\include\d3dx10core.h"
-		$File	"$SRCDIR\dx9sdk\include\d3dx10math.h"
-		$File	"$SRCDIR\dx9sdk\include\d3dx10math.inl"
-		$File	"$SRCDIR\dx9sdk\include\d3dx10mesh.h"
-		$File	"$SRCDIR\dx9sdk\include\d3dx10tex.h"
 	}
 
 	$Folder	"Public Header Files"
@@ -111,19 +101,19 @@ $Project "shaderapidx10"
 		// DX9 related files		
 		$File	"TransitionTable.h"
 		$File	"vertexdecl.h"
-		$File	"ColorFormatDX8.h"
+		// $File	"ColorFormatDX8.h"
 		$File	"d3d_async.h"
 		$File	"dynamicib.h"
 		$File	"dynamicvb.h"
-		$File	"IMeshDX8.h"
+		// $File	"IMeshDX8.h"
 		$File	"locald3dtypes.h"
 		$File	"Recording.h"
-		$File	"ShaderAPIDX8.h"
-		$File	"ShaderAPIDX8_Global.h"
-		$File	"ShaderShadowDX8.h"
+		// $File	"ShaderAPIDX8.h"
+		// $File	"ShaderAPIDX8_Global.h"
+		// $File	"ShaderShadowDX8.h"
 		$File	"stubd3ddevice.h"
 		$File	"TextureDX8.h"
-		$File	"VertexShaderDX8.h"
+		// $File	"VertexShaderDX8.h"
 		$File	"wmi.h"
 	}
 
@@ -132,11 +122,5 @@ $Project "shaderapidx10"
 		$Lib	bitmap
 		$Lib	mathlib
 		$Lib	tier2
-
-		$Folder	"Link Libraries" [$WINDOWS]
-		{
-			$File	"$SRCDIR\dx9sdk\lib\d3dx10.lib" [$WIN32]
-			$File	"$SRCDIR\dx9sdk\lib\x64\d3dx10.lib" [$WIN64]
-		}
 	}
 }

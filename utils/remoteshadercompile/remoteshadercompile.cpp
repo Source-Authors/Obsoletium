@@ -142,9 +142,9 @@ void ServerThread( void * )
 
 				// This is the shader compiler we use for pre-ps30 shaders.
 				// This utility needs to change if we want to do ps30 shaders (see logic in vertexshaderdx8.cpp)
-				HRESULT hr = D3DXCompileShaderFromFile( pShaderFilename, macros.Base(), NULL /* LPD3DXINCLUDE */, "main",
+				HRESULT hr = D3DXCompileShaderFromFile( pShaderFilename, macros.Base(), NULL, "main",
 														pShaderModel, 0, &pShader, &pErrorMessages,
-														NULL /* LPD3DXCONSTANTTABLE *ppConstantTable */ );
+														NULL);
 				if ( hr != D3D_OK )
 				{
 					pSendbuf[0] = 0;

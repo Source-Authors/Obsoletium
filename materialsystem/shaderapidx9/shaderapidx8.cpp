@@ -104,6 +104,7 @@ mat_fullbright 1 doesn't work properly on alpha materials in testroom_standards
 #endif
 
 #include "winutils.h"
+#include <DirectXMath/MatrixStack/DirectXMatrixStack.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -229,7 +230,7 @@ struct DynamicState_t
 	D3DVIEWPORT9	m_Viewport;
 
 	// Transform state
-	D3DXMATRIX		m_Transform[NUM_MATRIX_MODES];
+	DirectX::XMMATRIX	m_Transform[NUM_MATRIX_MODES];
 	unsigned char	m_TransformType[NUM_MATRIX_MODES];
 	unsigned char	m_TransformChanged[NUM_MATRIX_MODES];
 
@@ -269,17 +270,17 @@ struct DynamicState_t
 	// user clip planes
 	int				m_UserClipPlaneEnabled;
 	int				m_UserClipPlaneChanged;
-	D3DXPLANE		m_UserClipPlaneWorld[MAXUSERCLIPPLANES];
-	D3DXPLANE		m_UserClipPlaneProj[MAXUSERCLIPPLANES];
+	DirectX::XMVECTOR		m_UserClipPlaneWorld[MAXUSERCLIPPLANES];
+	DirectX::XMVECTOR		m_UserClipPlaneProj[MAXUSERCLIPPLANES];
 	bool			m_UserClipLastUpdatedUsingFixedFunction;
 
 	bool			m_FastClipEnabled;
 	bool			m_bFastClipPlaneChanged;
-	D3DXPLANE		m_FastClipPlane;
+	DirectX::XMVECTOR		m_FastClipPlane;
 
 	// Used when overriding the user clip plane
 	bool			m_bUserClipTransformOverride;
-	D3DXMATRIX		m_UserClipTransform;
+	DirectX::XMMATRIX		m_UserClipTransform;
 
 	// Cull mode
 	D3DCULL			m_DesiredCullMode;
@@ -1073,7 +1074,7 @@ public:
 	virtual void EvictManagedResourcesInternal();
 
 	// Gets at a particular transform
-	inline D3DXMATRIX& GetTransform( int i )
+	inline const DirectX::XMMATRIX& GetTransform( int i )
 	{
 		return *m_pMatrixStack[i]->GetTop();
 	}
@@ -1145,9 +1146,9 @@ public:
 	// Mark all user clip planes as being dirty
 	void MarkAllUserClipPlanesDirty();
 
-	// Converts a D3DXMatrix to a VMatrix and back
-	void D3DXMatrixToVMatrix( const D3DXMATRIX &in, VMatrix &out );
-	void VMatrixToD3DXMatrix( const VMatrix &in, D3DXMATRIX &out );
+	// Converts a DirectX::XMMATRIX to a VMatrix and back
+	void XM_CALLCONV XMMatrixToVMatrix( DirectX::XMMATRIX in, VMatrix& out );
+	DirectX::XMMATRIX XM_CALLCONV VMatrixToXMMatrix( const VMatrix &in );
 
 	ITexture *GetRenderTargetEx( int nRenderTargetID );
 
@@ -1331,7 +1332,7 @@ private:
 
 	// Sets the vertex shader modelView state..
 	// NOTE: GetProjectionMatrix should only be called from the Commit functions!
-	const D3DXMATRIX &GetProjectionMatrix( void );
+	const DirectX::XMMATRIX& GetProjectionMatrix( void );
 	void SetVertexShaderViewProj();
 	void SetVertexShaderModelViewProjAndModelView();
 
@@ -1451,10 +1452,10 @@ private:
 	void CopyBitsFromHostSurface( IDirect3DSurface* pSurfaceBits, 
 		const Rect_t &dstRect, unsigned char *pData, ImageFormat srcFormat, ImageFormat dstFormat, int nDstStride );
 
-	FORCEINLINE void SetTransform( D3DTRANSFORMSTATETYPE State, CONST D3DXMATRIX *pMatrix )
+	FORCEINLINE void SetTransform( D3DTRANSFORMSTATETYPE State, CONST DirectX::XMMATRIX *pMatrix )
 	{
 #if !defined( _X360 )
-		Dx9Device()->SetTransform( State, pMatrix );
+		Dx9Device()->SetTransform( State, reinterpret_cast<CONST D3DMATRIX *>(pMatrix) );
 #endif
 	}
 
@@ -1499,7 +1500,7 @@ private:
 	void CommitUserClipPlanes( bool bUsingFixedFunction );
 
 	// Gets the user clip transform (world->view)
-	D3DXMATRIX & GetUserClipTransform( );
+	DirectX::XMMATRIX XM_CALLCONV GetUserClipTransform( );
 
 	// transform commit
 	bool VertexShaderTransformChanged( int i );
@@ -1519,7 +1520,7 @@ private:
 	void CommitFastClipPlane( );
 
 	// Computes a matrix which includes the poly offset given an initial projection matrix
-	void ComputePolyOffsetMatrix( const D3DXMATRIX& matProjection, D3DXMATRIX &matProjectionOffset );
+	void XM_CALLCONV ComputePolyOffsetMatrix( DirectX::FXMMATRIX matProjection, DirectX::XMMATRIX& matProjectionOffset );
 
 	void SetSkinningMatrices();
 	
@@ -1595,8 +1596,8 @@ private:
 	// State needed at the time of rendering (after snapshots have been applied)
 	//
 
-	// Interface for the D3DXMatrixStack
-	ID3DXMatrixStack*	m_pMatrixStack[NUM_MATRIX_MODES];
+	// Interface for the DirectX::MatrixStack
+	DirectX::MatrixStack*	m_pMatrixStack[NUM_MATRIX_MODES];
 	matrix3x4_t			m_boneMatrix[NUM_MODEL_TRANSFORMS];
 	int					m_maxBoneLoaded;
 
@@ -1608,9 +1609,9 @@ private:
 	Vector4D m_WorldSpaceCameraPositon;
 
 	// The current projection matrix with polyoffset baked into it.
-	D3DXMATRIX		m_CachedPolyOffsetProjectionMatrix;
-	D3DXMATRIX		m_CachedFastClipProjectionMatrix;
-	D3DXMATRIX		m_CachedFastClipPolyOffsetProjectionMatrix;
+	DirectX::XMMATRIX		m_CachedPolyOffsetProjectionMatrix;
+	DirectX::XMMATRIX		m_CachedFastClipProjectionMatrix;
+	DirectX::XMMATRIX		m_CachedFastClipPolyOffsetProjectionMatrix;
 
 	// The texture stage state that changes frequently
 	DynamicState_t	m_DynamicState;
@@ -1911,7 +1912,7 @@ CShaderAPIDx8::CShaderAPIDx8() :
 	m_bBuffer2FramesAhead = false;
 	m_bReadPixelsEnabled = true;
 
-	memset( m_pMatrixStack, 0, sizeof(ID3DXMatrixStack*) * NUM_MATRIX_MODES );
+	memset( m_pMatrixStack, 0, sizeof(m_pMatrixStack) );
 	memset( &m_DynamicState, 0, sizeof(m_DynamicState) );
 	//m_DynamicState.m_HeightClipMode = MATERIAL_HEIGHTCLIPMODE_DISABLE;
 	m_nWindowHeight = m_nWindowWidth = 0;
@@ -2143,159 +2144,7 @@ void CShaderAPIDx8::ReleaseInternalRenderTargets( )
 //-----------------------------------------------------------------------------
 bool CShaderAPIDx8::RestorePersistedDisplay( bool bUseFrontBuffer )
 {
-#if defined( _X360 )
-	if ( !( XboxLaunch()->GetLaunchFlags() & LF_INTERNALLAUNCH ) )
-	{
-		// there is no persisted screen
-		return false;
-	}
-
-	OwnGPUResources( false );
-
-	const char *strVertexShaderProgram = 
-		" float4x4 matWVP : register(c0);"  
-		" struct VS_IN"  
-		" {" 
-		" float4 ObjPos : POSITION;"
-		" float2 TexCoord : TEXCOORD;"
-		" };" 
-		" struct VS_OUT" 
-		" {" 
-		" float4 ProjPos : POSITION;" 
-		" float2 TexCoord : TEXCOORD;"
-		" };"  
-		" VS_OUT main( VS_IN In )"  
-		" {"  
-		" VS_OUT Out; "  
-		" Out.ProjPos = mul( matWVP, In.ObjPos );"
-		" Out.TexCoord = In.TexCoord;"
-		" return Out;"  
-		" }";
-
-	const char *strPixelShaderProgram = 
-		" struct PS_IN"
-		" {"
-		" float2 TexCoord : TEXCOORD;"
-		" };"
-		" sampler detail;"
-		" float4 main( PS_IN In ) : COLOR"  
-		" {"  
-		" return tex2D( detail, In.TexCoord );"
-		" }"; 
-
-	D3DVERTEXELEMENT9 VertexElements[3] =
-	{
-		{ 0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-		{ 0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
-		D3DDECL_END()
-	};
-
-
-	IDirect3DTexture *pTexture;
-	if ( bUseFrontBuffer )
-	{
-		Dx9Device()->GetFrontBuffer( &pTexture );
-	}
-	else
-	{
-		// 360 holds a persistent image across restarts
-		Dx9Device()->GetPersistedTexture( &pTexture );
-	}
-
-	ID3DXBuffer *pErrorMsg = NULL;
-	ID3DXBuffer *pShaderCode = NULL;
-
-	HRESULT hr = D3DXCompileShader( strVertexShaderProgram, (UINT)strlen( strVertexShaderProgram ), NULL, NULL, "main", "vs_2_0", 0, &pShaderCode, &pErrorMsg, NULL );
-	if ( FAILED( hr ) )
-	{
-		return false;
-	}
-	IDirect3DVertexShader9 *pVertexShader;
-	Dx9Device()->CreateVertexShader( (DWORD*)pShaderCode->GetBufferPointer(), &pVertexShader );
-	pShaderCode->Release();
-
-	pErrorMsg = NULL;
-	pShaderCode = NULL;
-	hr = D3DXCompileShader( strPixelShaderProgram, (UINT)strlen( strPixelShaderProgram ), NULL, NULL, "main", "ps_2_0", 0, &pShaderCode, &pErrorMsg, NULL );
-	if ( FAILED(hr) )
-	{
-		return false;
-	}
-	IDirect3DPixelShader9 *pPixelShader;
-	Dx9Device()->CreatePixelShader( (DWORD*)pShaderCode->GetBufferPointer(), &pPixelShader );
-	pShaderCode->Release();
-
-	int w, h;
-	GetBackBufferDimensions( w, h );
-
-	// Create a vertex declaration from the element descriptions.
-	IDirect3DVertexDeclaration9 *pVertexDecl;
-	Dx9Device()->CreateVertexDeclaration( VertexElements, &pVertexDecl );
-	XMMATRIX matWVP = XMMatrixOrthographicOffCenterLH( 0, (FLOAT)w, (FLOAT)h, 0, 0, 1 );
-
-	ConVarRef mat_monitorgamma( "mat_monitorgamma" );
-	ConVarRef mat_monitorgamma_tv_range_min( "mat_monitorgamma_tv_range_min" );
-	ConVarRef mat_monitorgamma_tv_range_max( "mat_monitorgamma_tv_range_max" );
-	ConVarRef mat_monitorgamma_tv_exp( "mat_monitorgamma_tv_exp" );
-	ConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
-	g_pShaderDeviceDx8->SetHardwareGammaRamp( mat_monitorgamma.GetFloat(), mat_monitorgamma_tv_range_min.GetFloat(), mat_monitorgamma_tv_range_max.GetFloat(),
-		mat_monitorgamma_tv_exp.GetFloat(), mat_monitorgamma_tv_enabled.GetBool() );
-
-	// Structure to hold vertex data.
-	struct COLORVERTEX
-	{
-		FLOAT       Position[3];
-		float       TexCoord[2];
-	};
-	COLORVERTEX Vertices[4];
-
-	Vertices[0].Position[0] = 0;
-	Vertices[0].Position[1] = 0;
-	Vertices[0].Position[2] = 0;
-	Vertices[0].TexCoord[0] = 0;
-	Vertices[0].TexCoord[1] = 0;
-
-	Vertices[1].Position[0] = w-1;
-	Vertices[1].Position[1] = 0;
-	Vertices[1].Position[2] = 0;
-	Vertices[1].TexCoord[0] = 1;
-	Vertices[1].TexCoord[1] = 0;
-
-	Vertices[2].Position[0] = w-1;
-	Vertices[2].Position[1] = h-1;
-	Vertices[2].Position[2] = 0;
-	Vertices[2].TexCoord[0] = 1;
-	Vertices[2].TexCoord[1] = 1;
-
-	Vertices[3].Position[0] = 0;
-	Vertices[3].Position[1] = h-1;
-	Vertices[3].Position[2] = 0;
-	Vertices[3].TexCoord[0] = 0;
-	Vertices[3].TexCoord[1] = 1;
-
-	Dx9Device()->SetTexture( 0, pTexture );
-	Dx9Device()->SetVertexShader( pVertexShader );
-	Dx9Device()->SetPixelShader( pPixelShader );
-	Dx9Device()->SetVertexShaderConstantF( 0, (FLOAT*)&matWVP, 4 );
-	Dx9Device()->SetVertexDeclaration( pVertexDecl );
-	Dx9Device()->DrawPrimitiveUP( D3DPT_QUADLIST, 1, Vertices, sizeof( COLORVERTEX ) );
-
-	Dx9Device()->SetVertexShader( NULL );
-	Dx9Device()->SetPixelShader( NULL );
-	Dx9Device()->SetTexture( 0, NULL );
-	Dx9Device()->SetVertexDeclaration( NULL );
-
-	pVertexShader->Release();
-	pPixelShader->Release();
-	pVertexDecl->Release();
-	pTexture->Release();
-
-	OwnGPUResources( true );
-
-	return true;
-#else
 	return false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -2389,11 +2238,7 @@ void CShaderAPIDx8::OnDeviceShutdown()
 
 	for (int i = 0; i < NUM_MATRIX_MODES; ++i)
 	{
-		if (m_pMatrixStack[i])
-		{
-			int ref = m_pMatrixStack[i]->Release();
-			Assert( ref == 0 );
-		}
+		delete m_pMatrixStack[i];
 	}
 
 	// Shutdown the transition table.
@@ -2478,8 +2323,7 @@ void CShaderAPIDx8::CreateMatrixStacks()
 
 	for (int i = 0; i < NUM_MATRIX_MODES; ++i)
 	{
-		HRESULT hr = D3DXCreateMatrixStack( 0, &m_pMatrixStack[i] );
-		Assert( hr == D3D_OK );
+		m_pMatrixStack[i] = new DirectX::MatrixStack();
 	}
 }
 
@@ -3414,9 +3258,9 @@ void CShaderAPIDx8::ResetRenderState( bool bFullReset )
 	// We're not currently rendering anything
 	m_nCurrentSnapshot = -1;
 
-	D3DXMatrixIdentity( &m_CachedPolyOffsetProjectionMatrix );
-	D3DXMatrixIdentity( &m_CachedFastClipProjectionMatrix );
-	D3DXMatrixIdentity( &m_CachedFastClipPolyOffsetProjectionMatrix );
+	m_CachedPolyOffsetProjectionMatrix = DirectX::XMMatrixIdentity();
+	m_CachedFastClipProjectionMatrix = DirectX::XMMatrixIdentity();
+	m_CachedFastClipPolyOffsetProjectionMatrix = DirectX::XMMatrixIdentity();
 	m_UsingTextureRenderTarget = false;
 
 	m_SceneFogColor[0] = 0;
@@ -3675,8 +3519,8 @@ void CShaderAPIDx8::ResetRenderState( bool bFullReset )
 	for( i = 0; i < g_pHardwareConfig->MaxUserClipPlanes(); i++ )
 	{
 		// Make sure that our state is dirty.
-		m_DynamicState.m_UserClipPlaneWorld[i][0] = -1.0f;
-		m_DynamicState.m_UserClipPlaneProj[i][0] = -9999.0f;
+		m_DynamicState.m_UserClipPlaneWorld[i].m128_f32[0] = -1.0f;
+		m_DynamicState.m_UserClipPlaneProj[i].m128_f32[0] = -9999.0f;
 		m_DynamicState.m_UserClipPlaneEnabled |= ( 1 << i );
 		SetClipPlane( i, zero );
 		EnableClipPlane( i, false );
@@ -3689,7 +3533,7 @@ void CShaderAPIDx8::ResetRenderState( bool bFullReset )
 
 	// User clip override
 	m_DynamicState.m_bUserClipTransformOverride = false;
-	D3DXMatrixIdentity( &m_DynamicState.m_UserClipTransform );
+	m_DynamicState.m_UserClipTransform = DirectX::XMMatrixIdentity();
 
 	// Viewport defaults to the window size
 	RECT windowRect;
@@ -4106,7 +3950,6 @@ void CShaderAPIDx8::ForceHardwareSync( void )
 		{
 			m_currentSyncQuery = 0;
 		}
-		double fStart = Plat_FloatTime();
 		int waitIndex = ((m_currentSyncQuery + NUM_FRAME_SYNC_QUERIES) - (NUM_FRAME_SYNC_FRAMES_LATENCY+1)) % NUM_FRAME_SYNC_QUERIES;
 		UpdateFrameSyncQuery( waitIndex, false );
 		UpdateFrameSyncQuery( m_currentSyncQuery, true );
@@ -5049,9 +4892,9 @@ static void CommitVertexShaderConstantRange( IDirect3DDevice9 *pDevice, const Dy
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::GetBufferedState( BufferedState_t& state )
 {
-	memcpy( &state.m_Transform[0], &GetTransform(MATERIAL_MODEL), sizeof(D3DXMATRIX) ); 
-	memcpy( &state.m_Transform[1], &GetTransform(MATERIAL_VIEW), sizeof(D3DXMATRIX) ); 
-	memcpy( &state.m_Transform[2], &GetTransform(MATERIAL_PROJECTION), sizeof(D3DXMATRIX) ); 
+	memcpy( &state.m_Transform[0], &GetTransform(MATERIAL_MODEL), sizeof(state.m_Transform[0]) );
+	memcpy( &state.m_Transform[1], &GetTransform(MATERIAL_VIEW), sizeof(state.m_Transform[1]) );
+	memcpy( &state.m_Transform[2], &GetTransform(MATERIAL_PROJECTION), sizeof(state.m_Transform[2]) );
 	memcpy( &state.m_Viewport, &m_DynamicState.m_Viewport, sizeof(state.m_Viewport) );
 	state.m_PixelShader = ShaderManager()->GetCurrentPixelShader();
 	state.m_VertexShader = ShaderManager()->GetCurrentVertexShader();
@@ -5191,20 +5034,12 @@ void CShaderAPIDx8::SetDepthFeatheringPixelShaderConstant( int iConstant, float 
 
 	if( IsX360() )
 	{
-		const D3DMATRIX &projMatrix = GetProjectionMatrix();
+		const DirectX::XMMATRIX& projMatrix = GetProjectionMatrix();
 
 		fConstantValues[0] = 50.0f / fDepthBlendScale;
-		fConstantValues[1] = 1.0f / projMatrix.m[2][2];
-		fConstantValues[2] = 1.0f / projMatrix.m[3][2];
-		fConstantValues[3] = projMatrix.m[2][2];
-
-		/*
-		D3DXMATRIX invProjMatrix;
-		D3DXMatrixInverse( &invProjMatrix, NULL, (D3DXMATRIX *)&projMatrix );
-		fConstantValues[1] = invProjMatrix.m[3][2];
-		fConstantValues[2] = invProjMatrix.m[3][3];
-		fConstantValues[3] = invProjMatrix.m[2][2];
-		*/
+		fConstantValues[1] = 1.0f / DirectX::XMVectorGetZ( projMatrix.r[2] );
+		fConstantValues[2] = 1.0f / DirectX::XMVectorGetZ( projMatrix.r[3] );
+		fConstantValues[3] = DirectX::XMVectorGetZ( projMatrix.r[2] );
 	}
 	else
 	{
@@ -5396,13 +5231,9 @@ void CShaderAPIDx8::SetClipPlane( int index, const float *pPlane )
 	// NOTE: The plane here is specified in *world space*
 	// NOTE: This is done because they assume Ax+By+Cz+Dw = 0 (where w = 1 in real space)
 	// while we use Ax+By+Cz=D
-	D3DXPLANE plane;
-	plane.a = pPlane[0];
-	plane.b = pPlane[1];
-	plane.c = pPlane[2];
-	plane.d = -pPlane[3];
+	DirectX::XMVECTOR plane{ DirectX::XMVectorSet(pPlane[0], pPlane[1], pPlane[2], -pPlane[3]) };
 
-	if ( plane != m_DynamicState.m_UserClipPlaneWorld[index] )
+	if ( memcmp( &plane, &m_DynamicState.m_UserClipPlaneWorld[index], sizeof(plane) ) != 0 )
 	{
 		FlushBufferedPrimitives();
 
@@ -5413,16 +5244,18 @@ void CShaderAPIDx8::SetClipPlane( int index, const float *pPlane )
 
 
 //-----------------------------------------------------------------------------
-// Converts a D3DXMatrix to a VMatrix and back
+// Converts a DirectX::XMMATRIX to a VMatrix and back
 //-----------------------------------------------------------------------------
-void CShaderAPIDx8::D3DXMatrixToVMatrix( const D3DXMATRIX &in, VMatrix &out )
+void XM_CALLCONV CShaderAPIDx8::XMMatrixToVMatrix( DirectX::XMMATRIX in, VMatrix& out )
 {
 	MatrixTranspose( *(const VMatrix*)&in, out );
 }
 
-void CShaderAPIDx8::VMatrixToD3DXMatrix( const VMatrix &in, D3DXMATRIX &out )
+DirectX::XMMATRIX XM_CALLCONV CShaderAPIDx8::VMatrixToXMMatrix( const VMatrix& in )
 {
-	MatrixTranspose( in, *(VMatrix*)&out );
+	DirectX::XMMATRIX result;
+	MatrixTranspose( in, *(VMatrix*)&result );
+	return result;
 }
 
 	
@@ -5457,10 +5290,9 @@ void CShaderAPIDx8::EnableUserClipTransformOverride( bool bEnable )
 void CShaderAPIDx8::UserClipTransform( const VMatrix &worldToProjection )
 {
 	LOCK_SHADERAPI();
-	D3DXMATRIX dxWorldToProjection;
-	VMatrixToD3DXMatrix( worldToProjection, dxWorldToProjection );
+	DirectX::XMMATRIX dxWorldToProjection{ VMatrixToXMMatrix( worldToProjection ) };
 
-	if ( m_DynamicState.m_UserClipTransform != dxWorldToProjection )
+	if ( memcmp( &m_DynamicState.m_UserClipTransform, &dxWorldToProjection, sizeof(dxWorldToProjection) ) != 0 )
 	{
 		m_DynamicState.m_UserClipTransform = dxWorldToProjection;
 		if ( m_DynamicState.m_bUserClipTransformOverride )
@@ -5505,31 +5337,29 @@ void CShaderAPIDx8::CommitFastClipPlane( )
 
 	m_DynamicState.m_bFastClipPlaneChanged = false;
 
-	D3DXMatrixIdentity( &m_CachedFastClipProjectionMatrix );
+	m_CachedFastClipProjectionMatrix = DirectX::XMMatrixIdentity();
 
 	// Compute worldToProjection - need inv. transpose for transforming plane.
-	D3DXMATRIX viewToProjInvTrans, viewToProjInv, viewToProj = GetTransform(MATERIAL_PROJECTION);
-	viewToProj._43 *= 0.5f;		// pull in zNear because the shear in effect 
+	DirectX::XMMATRIX viewToProjInvTrans, viewToProjInv, viewToProj = GetTransform(MATERIAL_PROJECTION);
+	viewToProj.r[3].m128_f32[2] *= 0.5f;		// pull in zNear because the shear in effect 
 								// moves it out: clipping artifacts when looking down at water 
 								// could occur if this multiply is not done
 
-	D3DXMATRIX worldToViewInvTrans, worldToViewInv, worldToView = GetUserClipTransform();
+	DirectX::XMMATRIX worldToViewInvTrans, worldToViewInv, worldToView = GetUserClipTransform();
 
-	D3DXMatrixInverse( &worldToViewInv, NULL, &worldToView );
-	D3DXMatrixTranspose( &worldToViewInvTrans, &worldToViewInv ); 	
+	worldToViewInv = DirectX::XMMatrixInverse( nullptr, worldToView );
+	worldToViewInvTrans = DirectX::XMMatrixTranspose( worldToViewInv );
 
-	D3DXMatrixInverse( &viewToProjInv, NULL, &viewToProj );
-	D3DXMatrixTranspose( &viewToProjInvTrans, &viewToProjInv ); 
+	viewToProjInv = DirectX::XMMatrixInverse( nullptr, viewToProj );
+	viewToProjInvTrans = DirectX::XMMatrixTranspose( viewToProjInv );
 
-	D3DXPLANE plane;
-	D3DXPlaneNormalize( &plane, &m_DynamicState.m_FastClipPlane );
-	D3DXVECTOR4 clipPlane( plane.a, plane.b, plane.c, plane.d );
+	DirectX::XMVECTOR  plane = DirectX::XMPlaneNormalizeEst( m_DynamicState.m_FastClipPlane );
 
 	// transform clip plane into view space
-	D3DXVec4Transform( &clipPlane, &clipPlane, &worldToViewInvTrans );
+	plane = DirectX::XMVector4Transform( plane, worldToViewInvTrans );
 
 	// transform clip plane into projection space
-	D3DXVec4Transform( &clipPlane, &clipPlane, &viewToProjInvTrans );
+	plane = DirectX::XMVector4Transform( plane, viewToProjInvTrans );
 	
 #define ALLOW_FOR_FASTCLIPDUMPS 0
 
@@ -5539,22 +5369,26 @@ void CShaderAPIDx8::CommitFastClipPlane( )
 		DevMsg( "Fast clip plane projected coordinates: %f %f %f %f", clipPlane.x, clipPlane.y, clipPlane.z, clipPlane.w );
 #endif
 	
-	if( (clipPlane.z * clipPlane.w) <= -0.4f ) // a plane with (z*w) > -0.4 at this point is behind the camera and will cause graphical glitches. Toss it. (0.4 found through experimentation)
+	if( DirectX::XMVectorGetZ( plane ) * DirectX::XMVectorGetW( plane ) <= -0.4f ) // a plane with (z*w) > -0.4 at this point is behind the camera and will cause graphical glitches. Toss it. (0.4 found through experimentation)
 	{
 #if (ALLOW_FOR_FASTCLIPDUMPS == 1)
 		if( shader_dumpfastclipprojectioncoords.GetBool() )
-			DevMsg( "    %f %f %f %f\n", clipPlane.x, clipPlane.y, clipPlane.z, clipPlane.w );
+			DevMsg( "    %f %f %f %f\n",
+				DirectX::XMVectorGetX( plane ),
+				DirectX::XMVectorGetY( plane ),
+				DirectX::XMVectorGetZ( plane ),
+				DirectX::XMVectorGetW( plane ) );
 #endif
 
-		D3DXVec4Normalize( &clipPlane, &clipPlane );
+		plane = DirectX::XMVector4NormalizeEst( plane );
 
 		//if ((fabs(clipPlane.z) > 0.01) && (fabs(clipPlane.w) > 0.01f))  
 		{
 			// put projection space clip plane in Z column
-			m_CachedFastClipProjectionMatrix._13 = clipPlane.x;
-			m_CachedFastClipProjectionMatrix._23 = clipPlane.y;
-			m_CachedFastClipProjectionMatrix._33 = clipPlane.z;
-			m_CachedFastClipProjectionMatrix._43 = clipPlane.w;
+			DirectX::XMVectorSetZ( m_CachedFastClipProjectionMatrix.r[0], DirectX::XMVectorGetX( plane ) );
+			DirectX::XMVectorSetZ( m_CachedFastClipProjectionMatrix.r[1], DirectX::XMVectorGetY( plane ) );
+			DirectX::XMVectorSetZ( m_CachedFastClipProjectionMatrix.r[2], DirectX::XMVectorGetW( plane ) );
+			DirectX::XMVectorSetZ( m_CachedFastClipProjectionMatrix.r[3], DirectX::XMVectorGetZ( plane ) );
 		}
 	}
 #if (ALLOW_FOR_FASTCLIPDUMPS == 1)
@@ -5577,12 +5411,8 @@ void CShaderAPIDx8::CommitFastClipPlane( )
 void CShaderAPIDx8::SetFastClipPlane( const float *pPlane )
 {	
 	LOCK_SHADERAPI();
-	D3DXPLANE plane;
-	plane.a = pPlane[0];
-	plane.b = pPlane[1];
-	plane.c = pPlane[2];
-	plane.d = -pPlane[3];
-	if ( plane != m_DynamicState.m_FastClipPlane )
+	DirectX::XMVECTOR plane{ pPlane[0], pPlane[1], pPlane[2], -pPlane[3] };
+	if ( memcmp( &plane, &m_DynamicState.m_FastClipPlane, sizeof(plane) ) != 0 )
 	{
 		FlushBufferedPrimitives();		
 		UpdateVertexShaderFogParams();
@@ -7137,7 +6967,7 @@ void CShaderAPIDx8::CreateTextures(
 		// Managed textures aren't available under D3D9Ex, but we never lose
 		// texture data, so it's ok to use the default pool. Really. We can't
 		// lock default-pool textures like we normally would to upload, but we
-		// have special logic to blit full updates via D3DX helper functions
+		// have special logic to blit full updates via XM* helper functions
 		// in D3D9Ex mode (see texturedx8.cpp)
 		managed = false;
 		creationFlags &= ~TEXTURE_CREATE_MANAGED;
@@ -9484,134 +9314,6 @@ void CShaderAPIDx8::SpewBoardState()
 	// FIXME: This has regressed
 	return;
 #ifdef DEBUG_BOARD_STATE
-/*
-	{
-		static ID3DXFont* pFont = 0;
-		if (!pFont)
-		{
-			HFONT hFont = CreateFont( 0, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE,
-				ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-				DEFAULT_PITCH | FF_MODERN, 0 );
-			Assert( hFont != 0 );
-
-			HRESULT hr = D3DXCreateFont( Dx9Device(), hFont, &pFont );
-		}
-
-		static char buf[1024];
-		static RECT r = { 0, 0, 640, 480 };
-
-		if (m_DynamicState.m_VertexBlend == 0)
-			return;
-		
-#if 1
-		D3DXMATRIX* m = &GetTransform(MATERIAL_MODEL);
-		D3DXMATRIX* m2 = &GetTransform(MATERIAL_MODEL + 1);
-		sprintf(buf,"FVF %x\n"
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n"
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n\n",
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n",
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n",
-			ShaderManager()->GetCurrentVertexShader(),
-			m->m[0][0],	m->m[0][1],	m->m[0][2],	m->m[0][3],	
-			m->m[1][0],	m->m[1][1],	m->m[1][2],	m->m[1][3],	
-			m->m[2][0],	m->m[2][1],	m->m[2][2],	m->m[2][3],	
-			m->m[3][0], m->m[3][1], m->m[3][2], m->m[3][3],
-			m2->m[0][0], m2->m[0][1], m2->m[0][2], m2->m[0][3],	
-			m2->m[1][0], m2->m[1][1], m2->m[1][2], m2->m[1][3],	
-			m2->m[2][0], m2->m[2][1], m2->m[2][2], m2->m[2][3],	
-			m2->m[3][0], m2->m[3][1], m2->m[3][2], m2->m[3][3]
-			 );
-#else
-		Vector4D *pVec2 = &m_DynamicState.m_pVectorVertexShaderConstant[VERTEX_SHADER_MODELVIEWPROJ];
-		Vector4D *pVec3 = &m_DynamicState.m_pVectorVertexShaderConstant[VERTEX_SHADER_VIEWPROJ];
-		Vector4D *pVec4 = &m_DynamicState.m_pVectorVertexShaderConstant[VERTEX_SHADER_MODEL];
-
-		sprintf(buf,"\n"
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n"
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n\n"
-
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n"
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n\n"
-
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n"
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n\n"
-
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n"
-			"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n",
-
-			pVec1[0][0], pVec1[0][1], pVec1[0][2], pVec1[0][3],	
-			pVec1[1][0], pVec1[1][1], pVec1[1][2], pVec1[1][3],	
-			pVec1[2][0], pVec1[2][1], pVec1[2][2], pVec1[2][3],	
-			pVec1[3][0], pVec1[3][1], pVec1[3][2], pVec1[3][3],
-
-			pVec2[0][0], pVec2[0][1], pVec2[0][2], pVec2[0][3],	
-			pVec2[1][0], pVec2[1][1], pVec2[1][2], pVec2[1][3],	
-			pVec2[2][0], pVec2[2][1], pVec2[2][2], pVec2[2][3],	
-			pVec2[3][0], pVec2[3][1], pVec2[3][2], pVec2[3][3],
-
-			pVec3[0][0], pVec3[0][1], pVec3[0][2], pVec3[0][3],	
-			pVec3[1][0], pVec3[1][1], pVec3[1][2], pVec3[1][3],	
-			pVec3[2][0], pVec3[2][1], pVec3[2][2], pVec3[2][3],	
-			pVec3[3][0], pVec3[3][1], pVec3[3][2], pVec3[3][3],
-
-			pVec4[0][0], pVec4[0][1], pVec4[0][2], pVec4[0][3],	
-			pVec4[1][0], pVec4[1][1], pVec4[1][2], pVec4[1][3],	
-			pVec4[2][0], pVec4[2][1], pVec4[2][2], pVec4[2][3],	
-			0, 0, 0, 1
-			);
-#endif
-		pFont->Begin();
-		pFont->DrawText( buf, -1, &r, DT_LEFT | DT_TOP,
-			D3DCOLOR_RGBA( 255, 255, 255, 255 ) );
-		pFont->End();
-
-		return;
-	}
-
-#if 0
-	Vector4D *pVec2 = &m_DynamicState.m_pVectorVertexShaderConstant[VERTEX_SHADER_MODELVIEWPROJ];
-	Vector4D *pVec3 = &m_DynamicState.m_pVectorVertexShaderConstant[VERTEX_SHADER_VIEWPROJ];
-	Vector4D *pVec4 = &m_DynamicState.m_pVectorVertexShaderConstant[VERTEX_SHADER_MODEL];
-
-	static char buf2[1024];
-	sprintf(buf2,"\n"
-		"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n"
-		"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n\n"
-
-		"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n"
-		"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n\n"
-
-		"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n"
-		"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n\n"
-
-		"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n"
-		"[%6.3f %6.3f %6.3f %6.3f]\n[%6.3f %6.3f %6.3f %6.3f]\n",
-
-		pVec1[0][0], pVec1[0][1], pVec1[0][2], pVec1[0][3],	
-		pVec1[1][0], pVec1[1][1], pVec1[1][2], pVec1[1][3],	
-		pVec1[2][0], pVec1[2][1], pVec1[2][2], pVec1[2][3],	
-		pVec1[3][0], pVec1[3][1], pVec1[3][2], pVec1[3][3],
-
-		pVec2[0][0], pVec2[0][1], pVec2[0][2], pVec2[0][3],	
-		pVec2[1][0], pVec2[1][1], pVec2[1][2], pVec2[1][3],	
-		pVec2[2][0], pVec2[2][1], pVec2[2][2], pVec2[2][3],	
-		pVec2[3][0], pVec2[3][1], pVec2[3][2], pVec2[3][3],
-
-		pVec3[0][0], pVec3[0][1], pVec3[0][2], pVec3[0][3],	
-		pVec3[1][0], pVec3[1][1], pVec3[1][2], pVec3[1][3],	
-		pVec3[2][0], pVec3[2][1], pVec3[2][2], pVec3[2][3],	
-		pVec3[3][0], pVec3[3][1], pVec3[3][2], pVec3[3][3],
-
-		pVec4[0][0], pVec4[0][1], pVec4[0][2], pVec4[0][3],	
-		pVec4[1][0], pVec4[1][1], pVec4[1][2], pVec4[1][3],	
-		pVec4[2][0], pVec4[2][1], pVec4[2][2], pVec4[2][3],	
-		0, 0, 0, 1.0f
-		);
-	Plat_DebugString(buf2);
-	return;
-#endif
-*/
-
 	char buf[256];
 	sprintf(buf, "\nSnapshot id %d : \n", m_TransitionTable.CurrentSnapshot() );
 	Plat_DebugString(buf);
@@ -9653,7 +9355,7 @@ void CShaderAPIDx8::SpewBoardState()
 
 	// REGRESSED!!!!
 	/*
-	D3DXMATRIX* m = &GetTransform(MATERIAL_MODEL);
+	auto* m = &GetTransform(MATERIAL_MODEL);
 	sprintf(buf,"WorldMat [%4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f]\n",
 		m->m[0][0],	m->m[0][1],	m->m[0][2],	m->m[0][3],	
 		m->m[1][0],	m->m[1][1],	m->m[1][2],	m->m[1][3],	
@@ -9845,19 +9547,19 @@ void CShaderAPIDx8::GetWorldSpaceCameraPosition( float* pPos ) const
 
 void CShaderAPIDx8::CacheWorldSpaceCameraPosition()
 {
-	D3DXMATRIX& view = GetTransform(MATERIAL_VIEW);
+	const DirectX::XMMATRIX view = GetTransform(MATERIAL_VIEW);
 	m_WorldSpaceCameraPositon[0] = 
-		-( view( 3, 0 ) * view( 0, 0 ) + 
-		   view( 3, 1 ) * view( 0, 1 ) + 
-		   view( 3, 2 ) * view( 0, 2 ) );
+		-( view.r[3].m128_f32[0] * view.r[0].m128_f32[0] + 
+		   view.r[3].m128_f32[1] * view.r[0].m128_f32[1] + 
+		   view.r[3].m128_f32[2] * view.r[0].m128_f32[2] );
 	m_WorldSpaceCameraPositon[1] = 
-		-( view( 3, 0 ) * view( 1, 0 ) + 
-		   view( 3, 1 ) * view( 1, 1 ) + 
-		   view( 3, 2 ) * view( 1, 2 ) );
+		-( view.r[3].m128_f32[0] * view.r[1].m128_f32[0] + 
+		   view.r[3].m128_f32[1] * view.r[1].m128_f32[1] + 
+		   view.r[3].m128_f32[2] * view.r[1].m128_f32[2] );
 	m_WorldSpaceCameraPositon[2] = 
-		-( view( 3, 0 ) * view( 2, 0 ) + 
-		   view( 3, 1 ) * view( 2, 1 ) + 
-		   view( 3, 2 ) * view( 2, 2 ) );
+		-( view.r[3].m128_f32[0] * view.r[2].m128_f32[0] + 
+		   view.r[3].m128_f32[1] * view.r[2].m128_f32[1] + 
+		   view.r[3].m128_f32[2] * view.r[2].m128_f32[2] );
 	m_WorldSpaceCameraPositon[3] = 1.0f;
 
 	// Protect against zero, as some pixel shaders will divide by this in CalcWaterFogAlpha() in common_ps_fxc.h
@@ -9871,7 +9573,7 @@ void CShaderAPIDx8::CacheWorldSpaceCameraPosition()
 //-----------------------------------------------------------------------------
 // Computes a matrix which includes the poly offset given an initial projection matrix
 //-----------------------------------------------------------------------------
-void CShaderAPIDx8::ComputePolyOffsetMatrix( const D3DXMATRIX& matProjection, D3DXMATRIX &matProjectionOffset )
+void XM_CALLCONV CShaderAPIDx8::ComputePolyOffsetMatrix( DirectX::FXMMATRIX matProjection, DirectX::XMMATRIX& matProjectionOffset )
 {
 	// We never need to do this on hardware that can handle zbias
 	if ( g_pHardwareConfig->Caps().m_ZBiasAndSlopeScaledDepthBiasSupported )
@@ -9881,9 +9583,7 @@ void CShaderAPIDx8::ComputePolyOffsetMatrix( const D3DXMATRIX& matProjection, D3
 		-1.0f * (m_DesiredState.m_Viewport.MaxZ - m_DesiredState.m_Viewport.MinZ) /
 		16384.0f;
 
-	D3DXMATRIX offset;
-	D3DXMatrixTranslation( &offset, 0.0f, 0.0f, offsetVal );
-	D3DXMatrixMultiply( &matProjectionOffset, &matProjection, &offset );
+	matProjectionOffset = matProjection * DirectX::XMMatrixTranslation( 0.0f, 0.0f, offsetVal );
 }
 
 
@@ -9992,10 +9692,10 @@ void CShaderAPIDx8::UpdateMatrixTransform( TransformType_t type )
 
 #ifdef _DEBUG
 	// Store off the board state
-	D3DXMATRIX *pSrc = &GetTransform(m_CurrStack);
-	D3DXMATRIX *pDst = &m_DynamicState.m_Transform[m_CurrStack];
+	const DirectX::XMMATRIX *pSrc = &GetTransform(m_CurrStack);
+	DirectX::XMMATRIX *pDst = &m_DynamicState.m_Transform[m_CurrStack];
 //	Assert( *pSrc != *pDst );
-	memcpy( pDst, pSrc, sizeof(D3DXMATRIX) );
+	memcpy( pDst, pSrc, sizeof(DirectX::XMMATRIX) );
 #endif
 
 	if ( m_CurrStack == MATERIAL_VIEW )
@@ -10126,14 +9826,12 @@ void CShaderAPIDx8::LoadCameraToWorld( )
 	if (MatrixIsChanging(TRANSFORM_IS_CAMERA_TO_WORLD))
 	{
 		// could just use the transpose instead, if we know there's no scale
-		float det;
-		D3DXMATRIX inv;
-		D3DXMatrixInverse( &inv, &det, &GetTransform(MATERIAL_VIEW) );
+		DirectX::XMMATRIX inv{ DirectX::XMMatrixInverse( nullptr, GetTransform(MATERIAL_VIEW) ) };
 
 		// Kill translation
-		inv.m[3][0] = inv.m[3][1] = inv.m[3][2] = 0.0f;
+		inv.r[3].m128_f32[0] = inv.r[3].m128_f32[1] = inv.r[3].m128_f32[2] = 0.0F;
 
-		m_pMatrixStack[m_CurrStack]->LoadMatrix( &inv );
+		m_pMatrixStack[m_CurrStack]->LoadMatrix( inv );
 		UpdateMatrixTransform( TRANSFORM_IS_CAMERA_TO_WORLD );
 	}
 }
@@ -10153,7 +9851,7 @@ void CShaderAPIDx8::LoadMatrix( float *m )
 
 	if (MatrixIsChanging())
 	{
-		m_pMatrixStack[m_CurrStack]->LoadMatrix( (D3DXMATRIX*)m );
+		m_pMatrixStack[m_CurrStack]->LoadMatrix( DirectX::XMMATRIX{ m } );
 		UpdateMatrixTransform();
 	}
 }
@@ -10225,7 +9923,7 @@ void CShaderAPIDx8::MultMatrix( float *m )
 {
 	if (MatrixIsChanging())
 	{
-		m_pMatrixStack[m_CurrStack]->MultMatrix( (D3DXMATRIX*)m );
+		m_pMatrixStack[m_CurrStack]->MultiplyMatrix( DirectX::XMMATRIX{ m } );
 		UpdateMatrixTransform();
 	}
 }
@@ -10234,7 +9932,7 @@ void CShaderAPIDx8::MultMatrixLocal( float *m )
 {
 	if (MatrixIsChanging())
 	{
-		m_pMatrixStack[m_CurrStack]->MultMatrixLocal( (D3DXMATRIX*)m );
+		m_pMatrixStack[m_CurrStack]->MultiplyMatrixLocal( DirectX::XMMATRIX{ m } );
 		UpdateMatrixTransform();
 	}
 }
@@ -10243,8 +9941,8 @@ void CShaderAPIDx8::Rotate( float angle, float x, float y, float z )
 {
 	if (MatrixIsChanging())
 	{
-		D3DXVECTOR3 axis( x, y, z );
-		m_pMatrixStack[m_CurrStack]->RotateAxisLocal( &axis, M_PI_F * angle / 180.0f );
+		DirectX::XMVECTOR axis( DirectX::XMVectorSet( x, y, z, 0.0f ) );
+		m_pMatrixStack[m_CurrStack]->RotateAxisLocal( axis, M_PI_F * angle / 180.0f );
 		UpdateMatrixTransform();
 	}
 }
@@ -10280,10 +9978,8 @@ void CShaderAPIDx8::Ortho( double left, double top, double right, double bottom,
 {
 	if (MatrixIsChanging())
 	{
-		D3DXMATRIX matrix;
-
 		// FIXME: This is being used incorrectly! Should read:
-		// D3DXMatrixOrthoOffCenterRH( &matrix, left, right, bottom, top, zNear, zFar );
+		// matrix = XMMatrixOrthographicOffCenterRH( left, right, bottom, top, zNear, zFar );
 		// Which is certainly why we need these extra -1 scales in y. Bleah
 
 		// NOTE: The camera can be imagined as the following diagram:
@@ -10305,10 +10001,10 @@ void CShaderAPIDx8::Ortho( double left, double top, double right, double bottom,
 		// Where x,y lies between -1 and 1, and z lies from 0 to 1
 		// This is because the viewport transformation from projection space to pixels
 		// introduces a -1 scale in the y coordinates
-//		D3DXMatrixOrthoOffCenterLH( &matrix, left, right, bottom, top, zNear, zFar );
+//		matrix = XMMatrixOrthographicOffCenterLH( left, right, bottom, top, zNear, zFar );
 
-		D3DXMatrixOrthoOffCenterRH( &matrix, left, right, top, bottom, zNear, zFar );
-		m_pMatrixStack[m_CurrStack]->MultMatrixLocal(&matrix);
+		DirectX::XMMATRIX matrix = DirectX::XMMatrixOrthographicOffCenterRH( left, right, top, bottom, zNear, zFar );
+		m_pMatrixStack[m_CurrStack]->MultiplyMatrixLocal( matrix );
 		Assert( m_CurrStack == MATERIAL_PROJECTION );
 		UpdateMatrixTransform();
 	}
@@ -10321,9 +10017,8 @@ void CShaderAPIDx8::PerspectiveX( double fovx, double aspect, double zNear, doub
 		float width = 2 * zNear * tanf( fovx * M_PI_F / 360.0F );
 		float height = width / aspect;
 		Assert( m_CurrStack == MATERIAL_PROJECTION );
-		D3DXMATRIX rh;
-		D3DXMatrixPerspectiveRH( &rh, width, height, zNear, zFar );
-		m_pMatrixStack[m_CurrStack]->MultMatrixLocal(&rh);
+		DirectX::XMMATRIX rh = DirectX::XMMatrixPerspectiveRH( width, height, zNear, zFar );
+		m_pMatrixStack[m_CurrStack]->MultiplyMatrixLocal( rh );
 		UpdateMatrixTransform();
 	}
 }
@@ -10342,9 +10037,8 @@ void CShaderAPIDx8::PerspectiveOffCenterX( double fovx, double aspect, double zN
 		float flFrontPlaneTop    = -(height/2.0f) * (1.0f - top)    + top    * (height/2.0f);
 
 		Assert( m_CurrStack == MATERIAL_PROJECTION );
-		D3DXMATRIX rh;
-		D3DXMatrixPerspectiveOffCenterRH( &rh, flFrontPlaneLeft, flFrontPlaneRight, flFrontPlaneBottom, flFrontPlaneTop, zNear, zFar );
-		m_pMatrixStack[m_CurrStack]->MultMatrixLocal(&rh);
+		DirectX::XMMATRIX rh = DirectX::XMMatrixPerspectiveOffCenterRH( flFrontPlaneLeft, flFrontPlaneRight, flFrontPlaneBottom, flFrontPlaneTop, zNear, zFar );
+		m_pMatrixStack[m_CurrStack]->MultiplyMatrixLocal( rh );
 		UpdateMatrixTransform();
 	}
 }
@@ -10374,21 +10068,20 @@ void CShaderAPIDx8::PickMatrix( int x, int y, int width, int height )
 
 		// we need to translate (px, py) to the origin
 		// and scale so (pw,ph) -> (2, 2)
-		D3DXMATRIX matrix;
-		D3DXMatrixIdentity( &matrix );
-		matrix.m[0][0] = 2.0f / pw;
-		matrix.m[1][1] = 2.0f / ph;
-		matrix.m[3][0] = -2.0f * px / pw;
-		matrix.m[3][1] = -2.0f * py / ph;
+		DirectX::XMMATRIX matrix = DirectX::XMMatrixIdentity();
+		DirectX::XMVectorSetX( matrix.r[0], 2.0f / pw );
+		DirectX::XMVectorSetY( matrix.r[1], 2.0f / ph );
+		DirectX::XMVectorSetX( matrix.r[3], -2.0f * px / pw );
+		DirectX::XMVectorSetY( matrix.r[3], -2.0f * py / ph );
 
-		m_pMatrixStack[m_CurrStack]->MultMatrixLocal(&matrix);
+		m_pMatrixStack[m_CurrStack]->MultiplyMatrixLocal( matrix );
 		UpdateMatrixTransform();
 	}
 }
 
 void CShaderAPIDx8::GetMatrix( MaterialMatrixMode_t matrixMode, float *dst )
 {
-	memcpy( dst, (void*)(FLOAT*)GetTransform(matrixMode), sizeof(D3DXMATRIX) );
+	memcpy( dst, &GetTransform(matrixMode), sizeof(DirectX::XMMATRIX) );
 }
 
 
@@ -10406,7 +10099,7 @@ inline bool CShaderAPIDx8::FixedFunctionTransformChanged( int i )
 }
 
 
-const D3DXMATRIX &CShaderAPIDx8::GetProjectionMatrix( void )
+const DirectX::XMMATRIX& CShaderAPIDx8::GetProjectionMatrix( void )
 {
 	bool bUsingZBiasProjectionMatrix = 
 		!g_pHardwareConfig->Caps().m_ZBiasAndSlopeScaledDepthBiasSupported &&
@@ -10436,19 +10129,17 @@ void CShaderAPIDx8::SetupSelectionModeVisualizationState()
 {
 	Dx9Device()->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
 
-	D3DXMATRIX ident;
-	D3DXMatrixIdentity( &ident );
+	DirectX::XMMATRIX ident{ DirectX::XMMatrixIdentity() };
 	SetTransform( D3DTS_WORLD, &ident );
 	SetTransform( D3DTS_VIEW, &ident );
 	SetTransform( D3DTS_PROJECTION, &ident );
 
 	if ( g_pHardwareConfig->Caps().m_SupportsPixelShaders )
 	{
-		SetVertexShaderConstant( VERTEX_SHADER_VIEWPROJ, ident, 4 );
-		SetVertexShaderConstant( VERTEX_SHADER_MODELVIEWPROJ, ident, 4 );
-		float *pRowTwo = (float *)ident + 8;
-		SetVertexShaderConstant( VERTEX_SHADER_MODELVIEWPROJ_THIRD_ROW, pRowTwo, 1 ); // Row two of an identity matrix
-		SetVertexShaderConstant( VERTEX_SHADER_MODEL, ident, 3 * NUM_MODEL_TRANSFORMS );
+		SetVertexShaderConstant( VERTEX_SHADER_VIEWPROJ, ident.r[0].m128_f32, 4 );
+		SetVertexShaderConstant( VERTEX_SHADER_MODELVIEWPROJ, ident.r[0].m128_f32, 4 );
+		SetVertexShaderConstant( VERTEX_SHADER_MODELVIEWPROJ_THIRD_ROW, ident.r[2].m128_f32, 1 ); // Row two of an identity matrix
+		SetVertexShaderConstant( VERTEX_SHADER_MODEL, ident.r[0].m128_f32, 3 * NUM_MODEL_TRANSFORMS );
 	}
 }
 
@@ -10492,52 +10183,39 @@ void CShaderAPIDx8::SetVertexShaderViewProj()
 	
 	if (g_pHardwareConfig->Caps().m_SupportsPixelShaders)
 	{
-		D3DXMATRIX transpose;
-		if(0)
-		{
-			transpose = GetTransform(MATERIAL_VIEW) * GetProjectionMatrix();
-			D3DXMatrixTranspose( &transpose, &transpose );
-		}
-		else
-		{
-			// show work
-			D3DXMATRIX	matView,matProj;
+		// show work
+		DirectX::XMMATRIX matView		= GetTransform(MATERIAL_VIEW);
+		DirectX::XMMATRIX matProj		= GetProjectionMatrix();
+		DirectX::XMMATRIX transpose	= matView * matProj;
 			
-			matView		= GetTransform(MATERIAL_VIEW);
-			matProj		= GetProjectionMatrix();
-			transpose	= matView * matProj;
+		//printmat4x4( "matView", (float*)&matView );
+		//printmat4x4( "matProj", (float*)&matProj );
+		//printmat4x4( "result (view * proj) pre-transpose", (float*)&transpose );
+
+		transpose = DirectX::XMMatrixTranspose( transpose );
+
+		#if 0	// turned off while we try to do fixup-Y in shader translate
+			if (IsPosix())			// flip all shader projection matrices for Y on GL since you can't have an upside-down viewport specification
+			{
+				// flip Y
+				transpose._21 *= -1.0f;
+				transpose._22 *= -1.0f;
+				transpose._23 *= -1.0f;
+				transpose._24 *= -1.0f;
+			}
+		#endif
 			
-			//printmat4x4( "matView", (float*)&matView );
-			//printmat4x4( "matProj", (float*)&matProj );
-			//printmat4x4( "result (view * proj) pre-transpose", (float*)&transpose );
-
-			D3DXMatrixTranspose( &transpose, &transpose );
-
-			#if 0	// turned off while we try to do fixup-Y in shader translate
-				if (IsPosix())			// flip all shader projection matrices for Y on GL since you can't have an upside-down viewport specification
-				{
-					// flip Y
-					transpose._21 *= -1.0f;
-					transpose._22 *= -1.0f;
-					transpose._23 *= -1.0f;
-					transpose._24 *= -1.0f;
-				}
-			#endif
-			
-			//printmat4x4( "result (view * proj) post-transpose", (float*)&transpose );
-		}
-
+		//printmat4x4( "result (view * proj) post-transpose", (float*)&transpose );
 		
-		SetVertexShaderConstant( VERTEX_SHADER_VIEWPROJ, transpose, 4 );
+		SetVertexShaderConstant( VERTEX_SHADER_VIEWPROJ, transpose.r[0].m128_f32, 4 );
 
 		// If we're doing FastClip, the above viewproj matrix won't work well for
 		// vertex shaders which compute projPos.z, hence we'll compute a more useful
 		// viewproj and put the third row of it in another constant
 		transpose = GetTransform( MATERIAL_VIEW ) * GetTransform( MATERIAL_PROJECTION ); // Get the non-FastClip projection matrix
-		D3DXMatrixTranspose( &transpose, &transpose );
+		transpose = DirectX::XMMatrixTranspose( transpose );
 
-		float *pRowTwo = (float *)transpose + 8;
-		SetVertexShaderConstant( VERTEX_SHADER_VIEWPROJ_THIRD_ROW, pRowTwo, 1 );
+		SetVertexShaderConstant( VERTEX_SHADER_VIEWPROJ_THIRD_ROW, transpose.r[2].m128_f32, 1 );
 	}
 	//GLMPRINTF(( "<-M- SetVertexShaderViewProj" ));
 }
@@ -10549,32 +10227,20 @@ void CShaderAPIDx8::SetVertexShaderModelViewProjAndModelView( void )
 	
 	if (g_pHardwareConfig->Caps().m_SupportsPixelShaders)
 	{
-		D3DXMATRIX modelView, transpose;
-		
-		if (0)
-		{
-			D3DXMatrixMultiply( &modelView, &GetTransform(MATERIAL_MODEL), &GetTransform(MATERIAL_VIEW) );
-			D3DXMatrixMultiply( &transpose, &modelView, &GetProjectionMatrix() );
-		}
-		else
-		{
-			// show work
-			D3DXMATRIX	matView,matProj,matModel;
+		// show work
+		DirectX::XMMATRIX matModel	= GetTransform(MATERIAL_MODEL);
+		DirectX::XMMATRIX matView		= GetTransform(MATERIAL_VIEW);
+		DirectX::XMMATRIX matProj		= GetProjectionMatrix();
 			
-			matModel	= GetTransform(MATERIAL_MODEL);
-			matView		= GetTransform(MATERIAL_VIEW);
-			matProj		= GetProjectionMatrix();
+		DirectX::XMMATRIX modelView = matModel * matView;
+		DirectX::XMMATRIX transpose = modelView * matProj;
 			
-			D3DXMatrixMultiply( &modelView, &matModel, &matView );
-			D3DXMatrixMultiply( &transpose, &modelView, &matProj );
-			
-			//printmat4x4( "matModel", (float*)&matModel );
-			//printmat4x4( "matView", (float*)&matView );
-			//printmat4x4( "matProj", (float*)&matProj );
-			//printmat4x4( "result (model * view * proj) pre-transpose", (float*)&transpose );
-		}
+		//printmat4x4( "matModel", (float*)&matModel );
+		//printmat4x4( "matView", (float*)&matView );
+		//printmat4x4( "matProj", (float*)&matProj );
+		//printmat4x4( "result (model * view * proj) pre-transpose", (float*)&transpose );
 
-		D3DXMatrixTranspose( &transpose, &transpose );
+		transpose = DirectX::XMMatrixTranspose( transpose );
 		
 		#if 0	// turned off while we try to do fixup-Y in shader translate
 			if (IsPosix())			// flip all shader projection matrices for Y on GL since you can't have an upside-down viewport specification
@@ -10587,16 +10253,15 @@ void CShaderAPIDx8::SetVertexShaderModelViewProjAndModelView( void )
 			}
 		#endif
 		
-		SetVertexShaderConstant( VERTEX_SHADER_MODELVIEWPROJ, transpose, 4 );
+		SetVertexShaderConstant( VERTEX_SHADER_MODELVIEWPROJ, transpose.r[0].m128_f32, 4 );
 
 		// If we're doing FastClip, the above modelviewproj matrix won't work well for
 		// vertex shaders which compute projPos.z, hence we'll compute a more useful
 		// modelviewproj and put the third row of it in another constant
-		D3DXMatrixMultiply( &transpose, &modelView, &GetTransform( MATERIAL_PROJECTION ) ); // Get the non-FastClip projection matrix
-		D3DXMatrixTranspose( &transpose, &transpose );
+		transpose = modelView * GetTransform( MATERIAL_PROJECTION ); // Get the non-FastClip projection matrix
+		transpose = DirectX::XMMatrixTranspose( transpose );
 
-		float *pRowTwo = (float *)transpose + 8;
-		SetVertexShaderConstant( VERTEX_SHADER_MODELVIEWPROJ_THIRD_ROW, pRowTwo, 1 );
+		SetVertexShaderConstant( VERTEX_SHADER_MODELVIEWPROJ_THIRD_ROW, transpose.r[2].m128_f32, 1 );
 	}
 	
 	//GLMPRINTF(( "<-M- SetVertexShaderModelViewProjAndModelView" ));
@@ -10613,9 +10278,8 @@ void CShaderAPIDx8::UpdateVertexShaderMatrix( int iMatrix )
 			int vertexShaderConstant = VERTEX_SHADER_MODEL + iMatrix * 3;
 
 			// Put the transform into the vertex shader constants...
-			D3DXMATRIX transpose;
-			D3DXMatrixTranspose( &transpose, &GetTransform(matrix) );
-			SetVertexShaderConstant( vertexShaderConstant, transpose, 3 );
+			DirectX::XMMATRIX transpose = DirectX::XMMatrixTranspose( GetTransform(matrix) );
+			SetVertexShaderConstant( vertexShaderConstant, transpose.r[0].m128_f32, 3 );
 
 			// clear the change flag
 			m_DynamicState.m_TransformChanged[matrix] &= ~STATE_CHANGED_VERTEX_SHADER;
@@ -10631,12 +10295,10 @@ void CShaderAPIDx8::UpdateVertexShaderMatrix( int iMatrix )
 void CShaderAPIDx8::SetVertexShaderStateSkinningMatrices()
 {
 	//GLM_FUNC;
-	// casting from 4x3 matrices to a 4x4 D3DXMATRIX, need 4 floats of overflow
-	float results[12+4];
-
+	// casting from 4x3 matrices to a 4x4 DirectX::XMMATRIX, need 4 floats of overflow
 	// get the first one from the MATERIAL_MODEL matrix stack
-	D3DXMatrixTranspose( (D3DXMATRIX *)&results[0], &GetTransform( MATERIAL_MODEL ) );
-	memcpy( m_boneMatrix[0].Base(), results, 12 * sizeof(float) );
+	DirectX::XMMATRIX result = DirectX::XMMatrixTranspose( GetTransform( MATERIAL_MODEL ) );
+	memcpy( m_boneMatrix[0].Base(), result.r, 12 * sizeof(float) );
 
 	m_maxBoneLoaded++;
 	int matricesLoaded = max( 1, m_maxBoneLoaded );
@@ -11160,7 +10822,7 @@ void CShaderAPIDx8::CommitFixedFunctionLighting()
 //-----------------------------------------------------------------------------
 // Commits user clip planes
 //-----------------------------------------------------------------------------
-D3DXMATRIX& CShaderAPIDx8::GetUserClipTransform( )
+DirectX::XMMATRIX XM_CALLCONV CShaderAPIDx8::GetUserClipTransform( )
 {
 	if ( !m_DynamicState.m_bUserClipTransformOverride )
 		return GetTransform(MATERIAL_VIEW);
@@ -11185,7 +10847,7 @@ void CShaderAPIDx8::CommitUserClipPlanes( bool bUsingFixedFunction )
 		m_DynamicState.m_UserClipLastUpdatedUsingFixedFunction = bUsingFixedFunction;
 	}
 
-	D3DXMATRIX worldToProjectionInvTrans;
+	DirectX::XMMATRIX worldToProjectionInvTrans;
 #ifndef _DEBUG
 	if( m_DynamicState.m_UserClipPlaneChanged & m_DynamicState.m_UserClipPlaneEnabled & ((1 << g_pHardwareConfig->MaxUserClipPlanes()) - 1) )
 #endif
@@ -11195,26 +10857,23 @@ void CShaderAPIDx8::CommitUserClipPlanes( bool bUsingFixedFunction )
 		{
 			if( m_DynamicState.m_bUserClipTransformOverride )
 			{
-				//D3DXMatrixIdentity( &worldToProjectionInvTrans ); //TODO: Test user clip transforms with this
+				//worldToProjectionInvTrans = DirectX::XMMatrixIdentity(); //TODO: Test user clip transforms with this
 				//Since GetUserClipTransform() returns the view matrix if a user supplied transform doesn't exist, the general solution to this should be to transform the user transform by the inverse view matrix
 				//Since we don't know if the user clip is invertable, we'll premultiply by inverse view and cross our fingers that it's right more often than wrong
-				D3DXMATRIX viewInverse = GetTransform( MATERIAL_VIEW );
-				D3DXMatrixInverse(&viewInverse, NULL, &viewInverse);
+				DirectX::XMMATRIX viewInverse = DirectX::XMMatrixInverse( nullptr, GetTransform(MATERIAL_VIEW) );
 				worldToProjectionInvTrans = viewInverse * GetUserClipTransform(); //taking a cue from the multiplication below, multiplication goes left into right
 				
-				D3DXMatrixInverse(&worldToProjectionInvTrans, NULL, &worldToProjectionInvTrans);
-				D3DXMatrixTranspose(&worldToProjectionInvTrans, &worldToProjectionInvTrans);
+				worldToProjectionInvTrans = DirectX::XMMatrixTranspose( DirectX::XMMatrixInverse( nullptr, worldToProjectionInvTrans ) );
 			}
 			else
 			{
-				D3DXMatrixIdentity( &worldToProjectionInvTrans );
+				worldToProjectionInvTrans = DirectX::XMMatrixIdentity();
 			}
 		}
 		else
 		{
 			worldToProjectionInvTrans = GetUserClipTransform( ) * GetTransform( MATERIAL_PROJECTION );
-			D3DXMatrixInverse(&worldToProjectionInvTrans, NULL, &worldToProjectionInvTrans);
-			D3DXMatrixTranspose(&worldToProjectionInvTrans, &worldToProjectionInvTrans);
+			worldToProjectionInvTrans = DirectX::XMMatrixTranspose( DirectX::XMMatrixInverse( nullptr, worldToProjectionInvTrans ) );
 		}
 	}
 
@@ -11229,21 +10888,19 @@ void CShaderAPIDx8::CommitUserClipPlanes( bool bUsingFixedFunction )
 		{
 #ifdef _DEBUG
 			//verify that the plane has not actually changed
-			D3DXPLANE clipPlaneProj;
-			D3DXPlaneTransform( &clipPlaneProj, &m_DynamicState.m_UserClipPlaneWorld[i], &worldToProjectionInvTrans );
-			Assert ( clipPlaneProj == m_DynamicState.m_UserClipPlaneProj[i] );
+			DirectX::XMVECTOR clipPlaneProj{ DirectX::XMPlaneTransform( m_DynamicState.m_UserClipPlaneWorld[i], worldToProjectionInvTrans ) };
+			Assert ( memcmp( &clipPlaneProj, &m_DynamicState.m_UserClipPlaneProj[i], sizeof(clipPlaneProj) ) == 0 );
 #endif
 			continue;
 		}
 
 		m_DynamicState.m_UserClipPlaneChanged &= ~(1 << i);		
 
-		D3DXPLANE clipPlaneProj;
-		D3DXPlaneTransform( &clipPlaneProj, &m_DynamicState.m_UserClipPlaneWorld[i], &worldToProjectionInvTrans );
+		DirectX::XMVECTOR clipPlaneProj{ DirectX::XMPlaneTransform( m_DynamicState.m_UserClipPlaneWorld[i], worldToProjectionInvTrans ) };
 
-		if ( clipPlaneProj != m_DynamicState.m_UserClipPlaneProj[i] )
+		if ( memcmp( &clipPlaneProj, &m_DynamicState.m_UserClipPlaneProj[i], sizeof(clipPlaneProj) ) != 0 )
 		{
-			Dx9Device()->SetClipPlane( i, (float*)clipPlaneProj );
+			Dx9Device()->SetClipPlane( i, clipPlaneProj.m128_f32 );
 			m_DynamicState.m_UserClipPlaneProj[i] = clipPlaneProj;
 		}
 	}
@@ -12075,17 +11732,17 @@ IDirect3DSurface* CShaderAPIDx8::GetBackBufferImage( Rect_t *pSrcRect, Rect_t *p
 		RECT srcRect, destRect;
 		srcRect.left = pSrcRect->x; srcRect.right = pSrcRect->x + pSrcRect->width;
 		srcRect.top = pSrcRect->y; srcRect.bottom = pSrcRect->y + pSrcRect->height;
-		srcRect.left = clamp( srcRect.left, 0, (int)desc.Width );
-		srcRect.right = clamp( srcRect.right, 0, (int)desc.Width );
-		srcRect.top = clamp( srcRect.top, 0, (int)desc.Height );
-		srcRect.bottom = clamp( srcRect.bottom, 0, (int)desc.Height );
+		srcRect.left = std::clamp( srcRect.left, 0L, (long)desc.Width );
+		srcRect.right = std::clamp( srcRect.right, 0L, (long)desc.Width );
+		srcRect.top = std::clamp( srcRect.top, 0L, (long)desc.Height );
+		srcRect.bottom = std::clamp( srcRect.bottom, 0L, (long)desc.Height );
 
 		destRect.left = pDstRect->x ; destRect.right = pDstRect->x + pDstRect->width;
 		destRect.top = pDstRect->y; destRect.bottom = pDstRect->y + pDstRect->height;
-		destRect.left = clamp( destRect.left, 0, (int)desc.Width );
-		destRect.right = clamp( destRect.right, 0, (int)desc.Width );
-		destRect.top = clamp( destRect.top, 0, (int)desc.Height );
-		destRect.bottom = clamp( destRect.bottom, 0, (int)desc.Height );
+		destRect.left = std::clamp( destRect.left, 0L, (long)desc.Width );
+		destRect.right = std::clamp( destRect.right, 0L, (long)desc.Width );
+		destRect.top = std::clamp( destRect.top, 0L, (long)desc.Height );
+		destRect.bottom = std::clamp( destRect.bottom, 0L, (long)desc.Height );
 
 		hr = Dx9Device()->StretchRect( pRenderTarget, &srcRect, pTmpSurface, &destRect, filter );
 		if ( FAILED(hr) )
@@ -13441,175 +13098,6 @@ bool CShaderAPIDx8::GetTrueTypeFontMetrics( HXUIFONT hFont, XUIFontMetrics *pFon
 }
 #endif
 
-//-----------------------------------------------------------------------------
-// Gets the glyph bits in rgba order. This function PURPOSELY hijacks D3D
-// because XUI is involved. It is called at a very specific place in the VGUI
-// render frame where its deleterious affects are going to be harmless.
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-bool CShaderAPIDx8::GetTrueTypeGlyphs( HXUIFONT hFont, int numChars, wchar_t *pWch, int *pOffsetX, int *pOffsetY, int *pWidth, int *pHeight, unsigned char *pRGBA, int *pRGBAOffset )
-{
-	if ( !hFont )
-		return false;
-
-	// Ensure this doesn't talk to D3D at the same time as the loading bar
-	AUTO_LOCK_FM( m_nonInteractiveModeMutex );
-
-
-	LOCK_SHADERAPI();
-	bool bSuccess = false;
-	IDirect3DSurface *pRTSurface = NULL;
-	IDirect3DSurface *pSavedSurface = NULL;
-	IDirect3DSurface *pSavedDepthSurface = NULL;
-	IDirect3DTexture *pTexture = NULL;
-	D3DVIEWPORT9 savedViewport;
-    D3DXMATRIX matView;
-    D3DXMATRIX matXForm;
-	D3DLOCKED_RECT lockedRect;
-
-	// have to reset to default state to rasterize glyph correctly
-	// state will get re-established during next mesh draw
-	ResetRenderState( false );
-	Dx9Device()->SetRenderState( D3DRS_ZENABLE, FALSE );
-
-	Dx9Device()->GetRenderTarget( 0, &pSavedSurface );
-	Dx9Device()->GetDepthStencilSurface( &pSavedDepthSurface );
-	Dx9Device()->GetViewport( &savedViewport );
-
-	// Figure out the size of surface/texture we need to allocate
-	int rtWidth = 0;
-	int rtHeight = 0;
-	for ( int i = 0; i < numChars; i++ )
-	{
-		rtWidth += pWidth[i];
-		rtHeight = max( rtHeight, pHeight[i] );
-	}
-
-	// per resolve() restrictions
-	rtWidth = AlignValue( rtWidth, 32 );
-	rtHeight = AlignValue( rtHeight, 32 );
-
-	// create a render target to capture the glyph render
-	pRTSurface = g_TextureHeap.AllocRenderTargetSurface( rtWidth, rtHeight, D3DFMT_A8R8G8B8 );
-	if ( !pRTSurface )
-		goto cleanUp;
-
-	Dx9Device()->SetRenderTarget( 0, pRTSurface );
-	// Disable depth here otherwise you get a colour/depth multisample mismatch error (in 480p)
-	Dx9Device()->SetDepthStencilSurface( NULL );
-	Dx9Device()->Clear( 0, NULL, D3DCLEAR_TARGET, 0x00000000, ( ReverseDepthOnX360() ? 0.0 : 1.0f ), 0 );
-
-	// create texture to get glyph render from EDRAM
-	HRESULT hr = Dx9Device()->CreateTexture( rtWidth, rtHeight, 1, 0, D3DFMT_A8R8G8B8, 0, &pTexture, NULL );
-	if ( FAILED( hr ) )
-		goto cleanUp;
-
-
-	bool bPreviousOwnState = OwnGPUResources( false );
-	XuiRenderBegin( m_hDC, 0x00000000 );
-
-	D3DXMatrixIdentity( &matView );
-	XuiRenderSetViewTransform( m_hDC, &matView );
-	XuiRenderSetTransform( m_hDC, &matView );
-
-	// rasterize the glyph
-	XuiSelectFont( m_hDC, hFont );
-	XuiSetColorFactor( m_hDC, 0xFFFFFFFF );
-
-	// Draw the characters, stepping across the texture
-	int xCursor = 0;
-	for ( int i = 0; i < numChars; i++)
-	{
-		// FIXME: the drawRect params don't make much sense (should use "(xCursor+pWidth[i]), pHeight[i]", but then some characters disappear!)
-		XUIRect drawRect = XUIRect( xCursor + pOffsetX[i], pOffsetY[i], rtWidth, rtHeight );
-		wchar_t	text[2] = { pWch[i], 0 };
-		XuiDrawText( m_hDC, text, XUI_FONT_STYLE_NORMAL|XUI_FONT_STYLE_SINGLE_LINE|XUI_FONT_STYLE_NO_WORDWRAP, 0, &drawRect ); 
-		xCursor += pWidth[i];
-	}
-
-	XuiRenderEnd( m_hDC );
-	OwnGPUResources( bPreviousOwnState );
-
-
-	// transfer from edram to system
-	hr = Dx9Device()->Resolve( 0, NULL, pTexture, NULL, 0, 0, NULL, 0, 0, NULL );
-	if ( FAILED( hr ) )
-		goto cleanUp;
-
-	hr = pTexture->LockRect( 0, &lockedRect, NULL, 0 );
-	if ( FAILED( hr ) )
-		goto cleanUp;
-
-	// transfer to linear format, one character at a time
-	xCursor = 0;
-	for ( int i = 0;i < numChars; i++ )
-	{
-		int destPitch = pWidth[i]*4;
-		unsigned char *pLinear = pRGBA + pRGBAOffset[i];
-		RECT copyRect = { xCursor, 0, xCursor + pWidth[i], pHeight[i] };
-		xCursor += pWidth[i];
-		XGUntileSurface( pLinear, destPitch, NULL, lockedRect.pBits, rtWidth, rtHeight, &copyRect, 4 );
-
-		// convert argb to rgba
-		float r, g, b, a;
-		for ( int y = 0; y < pHeight[i]; y++ )
-		{
-			unsigned char *pSrc = (unsigned char*)pLinear + y*destPitch;
-			for ( int x = 0; x < pWidth[i]; x++ )
-			{
-				// undo pre-multiplied alpha since glyph bits will be sourced as a rgba texture
-				if ( !pSrc[0] )
-					a = 1;
-				else
-					a = (float)pSrc[0] * 1.0f/255.0f;
-				
-				r = ((float)pSrc[1] * 1.0f/255.0f)/a * 255.0f;
-				if ( r > 255 )
-					r = 255;
-			
-				g = ((float)pSrc[2] * 1.0f/255.0f)/a * 255.0f;
-				if ( g > 255 )
-					g = 255;
-
-				b = ((float)pSrc[3] * 1.0f/255.0f)/a * 255.0f;
-				if ( b > 255 )
-					b = 255;
-
-				pSrc[3] = pSrc[0];
-				pSrc[2] = b;
-				pSrc[1] = g;
-				pSrc[0] = r;
-
-				pSrc += 4;
-			}
-		}
-	}
-
-	pTexture->UnlockRect( 0 );
-
-	bSuccess = true;
-
-cleanUp:
-	if ( pRTSurface )
-	{
-		Dx9Device()->SetRenderTarget( 0, pSavedSurface );
-		Dx9Device()->SetDepthStencilSurface( pSavedDepthSurface );
-		Dx9Device()->SetViewport( &savedViewport );
-		pRTSurface->Release();
-	}
-
-	if ( pTexture )
-		pTexture->Release();
-
-	if ( pSavedSurface )
-		pSavedSurface->Release();
-
-	// XUI changed renderstates behind our back, so we need to reset to defaults again to get back in synch:
-	ResetRenderState( false );
-
-	return bSuccess;
-}
-#endif
 
 //-----------------------------------------------------------------------------
 // Create a 360 Render Target Surface

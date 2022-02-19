@@ -22,3 +22,6 @@
 [submodule "thirdparty/stb"]
 	path = thirdparty/stb
 	url = git@github.com:nothings/stb.git
+[submodule "thirdparty/DirectXMath"]
+	path = thirdparty/DirectXMath
+	url = git@github.com:microsoft/DirectXMath.git

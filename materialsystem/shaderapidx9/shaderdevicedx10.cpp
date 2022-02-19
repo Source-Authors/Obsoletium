@@ -7,7 +7,7 @@
 //===========================================================================//
 
 #include <d3d10.h>
-#include <d3dx10.h>
+#include <d3dcompiler.h>
 
 #include "shaderdevicedx10.h"
 #include "shaderdevicedx8.h"
@@ -171,6 +171,7 @@ bool CShaderDeviceMgrDx10::ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapt
 	if ( hr != S_OK )
 	{
 		// Fall back to Dx9
+		AssertMsg( false, "No Dx10 support!" );
 		return false;
 	}
 
@@ -253,6 +254,7 @@ bool CShaderDeviceMgrDx10::ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapt
 	pCaps->m_nMaxViewports = 4;
 
 	DXGI_GAMMA_CONTROL_CAPABILITIES gammaCaps;
+	// Calling this method is only supported while in full-screen mode.
 	if ( SUCCEEDED(pOutput->GetGammaControlCapabilities( &gammaCaps )) )
 	{
     pCaps->m_flMinGammaControlPoint = gammaCaps.MinConvertedValue;
@@ -327,8 +329,8 @@ se::win::com::com_ptr<IDXGIOutput> CShaderDeviceMgrDx10::GetAdapterOutput( unsig
   se::win::com::com_ptr<IDXGIAdapter1> pAdapter{GetAdapter(nAdapter)};
 	if ( !pAdapter ) return {};
 
-	se::win::com::com_ptr<IDXGIOutput> pOutput;
 	DXGI_OUTPUT_DESC desc;
+	se::win::com::com_ptr<IDXGIOutput> pOutput;
 	for( UINT i{0}; pAdapter->EnumOutputs( i, &pOutput ) != DXGI_ERROR_NOT_FOUND; ++i )
 	{
 		const HRESULT hr{pOutput->GetDesc( &desc )};
@@ -365,7 +367,9 @@ unsigned CShaderDeviceMgrDx10::GetModeCount( unsigned nAdapter ) const
 
 	// get the number of available display mode for the given format and scanline order
 	HRESULT hr = pOutput->GetDisplayModeList( format, flags, &num, nullptr );
-	return ( FAILED(hr) ) ? 0 : num;
+	Assert( !FAILED( hr ) );
+
+	return SUCCEEDED(hr) ? num : 0;
 }
 
 
@@ -383,8 +387,7 @@ void CShaderDeviceMgrDx10::GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAd
 	Assert( m_pDXGIFactory && ( nAdapter < GetAdapterCount() ) );
 
 	se::win::com::com_ptr<IDXGIOutput> pOutput{GetAdapterOutput( nAdapter )};
-	if ( !pOutput )
-		return;
+	if ( !pOutput ) return;
 
 	UINT num = 0;
 	DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; //desired color format
@@ -394,10 +397,9 @@ void CShaderDeviceMgrDx10::GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAd
 	HRESULT hr = pOutput->GetDisplayModeList( format, flags, &num, 0 );
 	Assert( !FAILED( hr ) );
 
-	if ( nMode >= num )
-		return;
+	if ( nMode >= num ) return;
 
-	DXGI_MODE_DESC *pDescs = (DXGI_MODE_DESC*)_alloca( num * sizeof( DXGI_MODE_DESC ) );
+	auto *pDescs = (DXGI_MODE_DESC*)_alloca( num * sizeof( DXGI_MODE_DESC ) );
 	hr = pOutput->GetDisplayModeList( format, flags, &num, pDescs );
 	Assert( !FAILED( hr ) );
 
@@ -414,9 +416,6 @@ void CShaderDeviceMgrDx10::GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAd
 //-----------------------------------------------------------------------------
 void CShaderDeviceMgrDx10::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const
 {
-	// FIXME: Implement!
-	Assert( 0 );
-
 	Assert( pInfo->m_nVersion == SHADER_DISPLAY_MODE_VERSION );
 	LOCK_SHADERAPI();
 
@@ -431,14 +430,12 @@ void CShaderDeviceMgrDx10::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsig
 
 	DXGI_MODE_DESC modeDesc{width, height};
 
-	auto device = D3D10Device();
-	if (!device)
-	{
-		HDC dc = ::GetDC( NULL );
-		modeDesc.RefreshRate.Numerator = ::GetDeviceCaps(dc, VREFRESH);
-		modeDesc.RefreshRate.Denominator = 1;
-		::ReleaseDC( NULL, dc );
-	}
+	// FIXME: Implement!
+	Assert(0);
+	HDC dc = ::GetDC(NULL);
+	modeDesc.RefreshRate.Numerator = ::GetDeviceCaps(dc, VREFRESH);
+	modeDesc.RefreshRate.Denominator = 1;
+	::ReleaseDC(NULL, dc);
 
 	pInfo->m_nWidth = modeDesc.Width;
 	pInfo->m_nHeight = modeDesc.Height;
@@ -514,6 +511,7 @@ CreateInterfaceFn CShaderDeviceMgrDx10::SetMode( void *hWnd, unsigned nAdapter, 
 	}
 	nDXLevel = GetClosestActualDXLevel( min( nDXLevel, actualCaps.m_nMaxDXSupportLevel ) );
 
+	// TODO(dimhotepus): Handle Dx9 fallback.
 	//if ( nDXLevel < 100 )
 	//{
 	//	// Fall back to the Dx9 implementations
@@ -790,10 +788,10 @@ IShaderBuffer* CShaderDeviceDx10::CompileShader( const char *pProgram, size_t nB
 	nCompileFlags |= D3D10_SHADER_OPTIMIZATION_LEVEL3;
 #endif
 
-	se::win::com::com_ptr<ID3D10Blob> pCompiledShader, pErrorMessages;
-	HRESULT hr = D3DX10CompileFromMemory( pProgram, nBufLen, "",
-		NULL, NULL, "main", pShaderVersion, nCompileFlags, 0, NULL, 
-		&pCompiledShader, &pErrorMessages, NULL );
+	se::win::com::com_ptr<ID3DBlob> pCompiledShader, pErrorMessages;
+	HRESULT hr = D3DCompile( pProgram, nBufLen, nullptr,
+		nullptr, nullptr, "main", pShaderVersion, nCompileFlags, 0,
+		&pCompiledShader, &pErrorMessages );
 
 	if ( FAILED( hr ) )
 	{
@@ -807,7 +805,7 @@ IShaderBuffer* CShaderDeviceDx10::CompileShader( const char *pProgram, size_t nB
 
 	// NOTE: This uses small block heap allocator; so I'm not going
 	// to bother creating a memory pool.
-	return new CShaderBuffer<ID3D10Blob>( pCompiledShader.Detach() );
+	return new CShaderBuffer( pCompiledShader.Detach() );
 }
 
 

@@ -1220,7 +1220,7 @@ void FrustumPlanesFromMatrix( const VMatrix &clipToWorld, Frustum_t &frustum )
 void MatrixBuildOrtho( VMatrix& dst, double left, double top, double right, double bottom, double zNear, double zFar )
 {
 	// FIXME: This is being used incorrectly! Should read:
-	// D3DXMatrixOrthoOffCenterRH( &matrix, left, right, bottom, top, zNear, zFar );
+	// matrix = XMMatrixOrthographicOffCenterRH( left, right, bottom, top, zNear, zFar );
 	// Which is certainly why we need these extra -1 scales in y. Bleah
 
 	// NOTE: The camera can be imagined as the following diagram:
@@ -1242,7 +1242,7 @@ void MatrixBuildOrtho( VMatrix& dst, double left, double top, double right, doub
 	// Where x,y lies between -1 and 1, and z lies from 0 to 1
 	// This is because the viewport transformation from projection space to pixels
 	// introduces a -1 scale in the y coordinates
-	//		D3DXMatrixOrthoOffCenterRH( &matrix, left, right, top, bottom, zNear, zFar );
+	// matrix = XMMatrixOrthographicOffCenterRH( left, right, top, bottom, zNear, zFar );
 
 	dst.Init(	 2.0f / ( right - left ),						0.0f,						0.0f, ( left + right ) / ( left - right ),
 				0.0f,	 2.0f / ( bottom - top ),						0.0f, ( bottom + top ) / ( top - bottom ),

@@ -736,7 +736,7 @@ inline unsigned short* CIndexBuffer::Lock( bool bReadOnly, int numIndices, int& 
 	// Ensure there is enough space in the IB for this data
 	if ( numIndices > m_IndexCount ) 
 	{ 
-		Error( "too many indices for index buffer. . tell a programmer (%d>%d)\n", ( int )numIndices, ( int )m_IndexCount );
+		Error( "too many indices for index buffer. . tell a programmer (%d>%d)\n", numIndices, m_IndexCount );
 		Assert( false ); 
 		return 0; 
 	}

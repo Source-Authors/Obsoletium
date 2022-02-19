@@ -84,7 +84,9 @@ typedef int SOCKET;
 // It currently includes windows.h and we don't want that.
 #ifdef USE_ACTUAL_DX
 
+#include <d3dcompiler.h>
 #include "bzip2/bzlib.h"
+#include "com_ptr.h"
 
 #else
 
@@ -158,7 +160,7 @@ ConVar mat_autosave_glshaders( "mat_autosave_glshaders", "1" );
 //-----------------------------------------------------------------------------
 // Explicit instantiation of shader buffer implementation
 //-----------------------------------------------------------------------------
-template class CShaderBuffer< ID3DXBuffer >;
+template class CShaderBuffer<ID3DBlob>;
 
 
 //-----------------------------------------------------------------------------
@@ -295,12 +297,13 @@ static HardwareShader_t CreateD3DVertexShader( DWORD *pByteCode, int numBytes, c
 	#ifdef DX_TO_GL_ABSTRACTION	
 		HRESULT hr = Dx9Device()->CreateVertexShader( pByteCode, (IDirect3DVertexShader9 **)&hShader, pShaderName, debugLabel );
 	#else
-		if ( IsEmulatingGL() )
+		// dimhotepus: Drop D3DX reference.
+		/*if ( IsEmulatingGL() )
 		{
 			DWORD dwVersion = D3DXGetShaderVersion(	pByteCode );
 			REFERENCE( dwVersion );
 			Assert ( D3DSHADER_VERSION_MAJOR( dwVersion ) == 2 );
-		}
+		}*/
 
 	#if defined(_X360) || !defined(DX_TO_GL_ABSTRACTION)
 		HRESULT hr = Dx9Device()->CreateVertexShader( pByteCode, (IDirect3DVertexShader9 **)&hShader );
@@ -417,12 +420,13 @@ static HardwareShader_t CreateD3DPixelShader( DWORD *pByteCode, unsigned int nCe
 			HRESULT hr = Dx9Device()->CreatePixelShader( pByteCode, ( IDirect3DPixelShader ** )&shader, pShaderName, debugLabel, &nCentroidMask );
 		#endif
 	#else
-		if ( IsEmulatingGL() )
+		// dimhotepus: Drop D3DX reference.
+		/*if ( IsEmulatingGL() )
 		{
 			DWORD dwVersion;
 			dwVersion = D3DXGetShaderVersion( pByteCode );
 			Assert ( D3DSHADER_VERSION_MAJOR( dwVersion ) == 2 );
-		}
+		}*/
 #if defined(_X360) || !defined(DX_TO_GL_ABSTRACTION)
 		HRESULT hr = Dx9Device()->CreatePixelShader( pByteCode, ( IDirect3DPixelShader ** )&shader );
 #else
@@ -697,7 +701,7 @@ private:
 	HardwareShader_t		CompileShader( const char *pShaderName, int nStaticIndex, int nDynamicIndex, bool bVertexShader );
 #endif
 
-	void					DisassembleShader( ShaderLookup_t *pLookup, int dynamicCombo, uint8 *pByteCode );
+	void					DisassembleShader( ShaderLookup_t *pLookup, int dynamicCombo, uint8 *pByteCode, size_t size );
 	void					WriteTranslatedFile( ShaderLookup_t *pLookup, int dynamicCombo, char *pFileContents, char *pFileExtension );
 
 	// DX_TO_GL_ABSTRACTION only, no-op otherwise
@@ -714,12 +718,11 @@ private:
 	CUtlSymbolTable m_ShaderSymbolTable;
 
 #ifdef DYNAMIC_SHADER_COMPILE	
-	typedef HRESULT (__stdcall *ShaderCompileFromFileFunc_t)( LPCSTR pSrcFile, CONST D3DXMACRO* pDefines,
-		LPD3DXINCLUDE pInclude,	LPCSTR pFunctionName, LPCSTR pProfile, DWORD Flags,
-		LPD3DXBUFFER* ppShader, LPD3DXBUFFER * ppErrorMsgs,	LPD3DXCONSTANTTABLE * ppConstantTable );
+	using ShaderCompileFromFileFunc_t = decltype(&D3DCompileFromFile);
+
 	CUtlStringMap<ShaderCombos_t>	 m_ShaderNameToCombos;
-	CSysModule						*m_pShaderCompiler30;
-	ShaderCompileFromFileFunc_t		m_ShaderCompileFileFunc30;
+	CSysModule						*m_pShaderCompiler;
+	ShaderCompileFromFileFunc_t		m_ShaderCompileFileFunc;
 #endif
 	
 	// The current vertex and pixel shader
@@ -769,8 +772,8 @@ CShaderManager::CShaderManager() :
 	m_bCreateShadersOnDemand = false;
 
 #ifdef DYNAMIC_SHADER_COMPILE
-	m_pShaderCompiler30 = 0;
-	m_ShaderCompileFileFunc30 = 0;
+	m_pShaderCompiler = 0;
+	m_ShaderCompileFileFunc = 0;
 #ifdef REMOTE_DYNAMIC_SHADER_COMPILE
 	m_RemoteShaderCompileSocket = INVALID_SOCKET;
 #endif
@@ -894,19 +897,11 @@ void CShaderManager::Init()
 	InitRemoteShaderCompile();
 #else // REMOTE_DYNAMIC_SHADER_COMPILE
 
-#ifdef _DEBUG
-	m_pShaderCompiler30 = Sys_LoadModule( "d3dx9d_33.dll" );
-#endif
-	if (!m_pShaderCompiler30)
+	m_pShaderCompiler = Sys_LoadModule( "D3DCompiler_47.dll" );
+	if ( m_pShaderCompiler )
 	{
-		m_pShaderCompiler30 = Sys_LoadModule( "d3dx9_33.dll" );
+		m_ShaderCompileFileFunc = (ShaderCompileFromFileFunc_t)GetProcAddress( (HMODULE)m_pShaderCompiler, "D3DCompileFromFile" );
 	}
-
-	if ( m_pShaderCompiler30 )
-	{
-		m_ShaderCompileFileFunc30 = (ShaderCompileFromFileFunc_t)GetProcAddress( (HMODULE)m_pShaderCompiler30, "D3DXCompileShaderFromFileA" );
-	}
-
 #endif
 
 	}
@@ -918,11 +913,11 @@ void CShaderManager::Init()
 void CShaderManager::Shutdown()
 {
 #ifdef DYNAMIC_SHADER_COMPILE
-	if ( m_pShaderCompiler30 )
+	if ( m_pShaderCompiler )
 	{
-		Sys_UnloadModule( m_pShaderCompiler30 );
-		m_pShaderCompiler30 = 0;
-		m_ShaderCompileFileFunc30 = 0;
+		Sys_UnloadModule( m_pShaderCompiler );
+		m_pShaderCompiler = 0;
+		m_ShaderCompileFileFunc = 0;
 	}
 #endif
 
@@ -943,16 +938,16 @@ void CShaderManager::Shutdown()
 //-----------------------------------------------------------------------------
 IShaderBuffer *CShaderManager::CompileShader( const char *pProgram, size_t nBufLen, const char *pShaderVersion )
 {
-	int nCompileFlags = D3DXSHADER_AVOID_FLOW_CONTROL;
+	UINT nCompileFlags = D3DCOMPILE_AVOID_FLOW_CONTROL;
 
 #ifdef _DEBUG
-	nCompileFlags |= D3DXSHADER_DEBUG;
+	nCompileFlags |= D3DCOMPILE_DEBUG;
 #endif
 
-	LPD3DXBUFFER pCompiledShader, pErrorMessages;
-	HRESULT hr = D3DXCompileShader( pProgram, nBufLen,
-		NULL, NULL, "main", pShaderVersion, nCompileFlags, 
-		&pCompiledShader, &pErrorMessages, NULL );
+	se::win::com::com_ptr<ID3DBlob> pCompiledShader, pErrorMessages;
+	HRESULT hr = D3DCompile( pProgram, nBufLen,
+		nullptr, nullptr, nullptr, "main", pShaderVersion, nCompileFlags, 0,
+		&pCompiledShader, &pErrorMessages );
 
 	if ( FAILED( hr ) )
 	{
@@ -960,20 +955,13 @@ IShaderBuffer *CShaderManager::CompileShader( const char *pProgram, size_t nBufL
 		{
 			const char *pErrorMessage = (const char *)pErrorMessages->GetBufferPointer();
 			Warning( "Shader compilation failed! Reported the following errors:\n%s\n", pErrorMessage );
-			pErrorMessages->Release();
 		}
 		return NULL;
 	}
 
 	// NOTE: This uses small block heap allocator; so I'm not going
 	// to bother creating a memory pool.
-	CShaderBuffer< ID3DXBuffer > *pShaderBuffer = new CShaderBuffer< ID3DXBuffer >( pCompiledShader );
-	if ( pErrorMessages )
-	{
-		pErrorMessages->Release();
-	}
-
-	return pShaderBuffer;
+	return new CShaderBuffer( pCompiledShader.Detach() );
 }
 
 
@@ -1428,7 +1416,7 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 //-----------------------------------------------------------------------------
 // Used to deal with include files
 //-----------------------------------------------------------------------------
-class CDxInclude : public ID3DXInclude
+class CDxInclude : public ID3DInclude
 {
 public:
 	CDxInclude( const char *pMainFileName );
@@ -1436,10 +1424,10 @@ public:
 #if defined( _X360 )
 	virtual HRESULT WINAPI Open( D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID * ppData, UINT * pBytes, LPSTR pFullPath, DWORD cbFullPath );
 #else
-	STDMETHOD(Open)(THIS_ D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes);
+	STDMETHOD(Open)(THIS_ D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) override;
 #endif
 
-	STDMETHOD(Close)(THIS_ LPCVOID pData);
+	STDMETHOD(Close)(THIS_ LPCVOID pData) override;
 
 private:
 	char m_pBasePath[MAX_PATH];
@@ -1458,11 +1446,15 @@ CDxInclude::CDxInclude( const char *pMainFileName )
 #if defined( _X360 )
 HRESULT CDxInclude::Open( D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID * ppData, UINT * pBytes, LPSTR pFullPath, DWORD cbFullPath )
 #else
-HRESULT CDxInclude::Open( D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID * ppData, UINT * pBytes )
+HRESULT CDxInclude::Open( D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID * ppData, UINT * pBytes )
 #endif
 {
 	char pTemp[MAX_PATH];
+#if defined(_X360)
 	if ( !Q_IsAbsolutePath( pFileName ) && ( IncludeType == D3DXINC_LOCAL ) )
+#else
+	if ( !Q_IsAbsolutePath( pFileName ) && ( IncludeType == D3D_INCLUDE_LOCAL ) )
+#endif
 	{
 		Q_ComposeFileName( m_pBasePath, pFileName, pTemp, sizeof(pTemp) );
 		pFileName = pTemp;
@@ -1602,7 +1594,7 @@ HardwareShader_t CShaderManager::CompileShader( const char *pShaderName,
 
 #	endif
 
-	CUtlVector<D3DXMACRO> macros;
+	CUtlVector<D3D_SHADER_MACRO> macros;
 	// plus 1 for null termination, plus 1 for #define SHADER_MODEL_*, and plus 1 for #define _X360 on 360
 	macros.SetCount( combos.m_DynamicCombos.Count() + combos.m_StaticCombos.Count() + 2 + ( IsX360() ? 1 : 0 ) );
 
@@ -1827,27 +1819,27 @@ retry_compile:
 #endif
 
 #if defined( DYNAMIC_SHADER_COMPILE ) && !defined( REMOTE_DYNAMIC_SHADER_COMPILE )
-	LPD3DXBUFFER pShader = NULL;
-	LPD3DXBUFFER pErrorMessages = NULL;
+	se::win::com::com_ptr<ID3DBlob> pShader;
+	se::win::com::com_ptr<ID3DBlob> pErrorMessages;
 	HRESULT hr = S_OK;
 	bool b30Shader = !Q_stricmp( pShaderModel, "vs_3_0" ) || !Q_stricmp( pShaderModel, "ps_3_0" );
 
-	if ( m_ShaderCompileFileFunc30 && b30Shader )
+	wchar_t wfilename[MAX_PATH];
+	V_UTF8ToUnicode( filename, wfilename, sizeof(wfilename) );
+
+	if ( m_ShaderCompileFileFunc && b30Shader )
 	{
 		CDxInclude dxInclude( filename );
-		hr = m_ShaderCompileFileFunc30( filename, macros.Base(), &dxInclude,
-			"main",	pShaderModel, 0 /* DWORD Flags */, 	&pShader, &pErrorMessages, NULL /* LPD3DXCONSTANTTABLE *ppConstantTable */ );
+
+		hr = m_ShaderCompileFileFunc( wfilename, macros.Base(), &dxInclude,
+			"main",	pShaderModel, 0, 0, &pShader, &pErrorMessages );
 	}
 	else
 	{
 #		if ( !defined( _X360 ) )
 		{
-			if ( b30Shader )
-			{
-				Warning( "Compiling with a stale version of d3dx. Should have d3d9x_33.dll installed (Apr 2007)\n" );
-			}
-			hr = D3DXCompileShaderFromFile( filename, macros.Base(), NULL /* LPD3DXINCLUDE */,
-				"main",	pShaderModel, 0 /* DWORD Flags */, 	&pShader, &pErrorMessages, NULL /* LPD3DXCONSTANTTABLE *ppConstantTable */ );
+			hr = D3DCompileFromFile( wfilename, macros.Base(), NULL,
+				"main",	pShaderModel, 0, 0,	&pShader, &pErrorMessages );
 
 
 #ifdef REMOTE_DYNAMIC_SHADER_COMPILE
@@ -1887,8 +1879,8 @@ retry_compile:
 				pUPDBPIXLookup[0] = '\\';
 			}
 
-			hr = D3DXCompileShaderFromFileEx( filename, macros.Base(), NULL /* LPD3DXINCLUDE */,
-				"main",	pShaderModel, 0 /* DWORD Flags */, 	&pShader, &pErrorMessages, NULL /* LPD3DXCONSTANTTABLE *ppConstantTable */, &compileParams );
+			hr = D3DXCompileShaderFromFileEx( filename, macros.Base(), NULL,
+				"main",	pShaderModel, 0, &pShader, &pErrorMessages, NULL, &compileParams );
 		
 			if( (pUPDBOutputFile[0] != '\0') && compileParams.pUPDBBuffer ) //Did we generate a updb?
 			{
@@ -1954,17 +1946,17 @@ retry_compile:
 		Q_strncat( exampleCommandLine, filename, sizeof( exampleCommandLine ) );
 		Q_strncat( exampleCommandLine, "\n", sizeof( exampleCommandLine ) );
 
-		ID3DXBuffer *pd3dxBuffer;
-		HRESULT hr;
-		hr = D3DXDisassembleShader( ( DWORD* )pShader->GetBufferPointer(), false, NULL, &pd3dxBuffer );
+		se::win::com::com_ptr<ID3DBlob> d3dblob;
+		HRESULT hr = D3DDisassemble( pShader->GetBufferPointer(), pShader->GetBufferSize(), 0, NULL, &d3dblob );
 		Assert( hr == D3D_OK );
 		CUtlBuffer tempBuffer;
 		tempBuffer.SetBufferType( true, false );
 		int exampleCommandLineLength = strlen( exampleCommandLine );
-		tempBuffer.EnsureCapacity( pd3dxBuffer->GetBufferSize() + exampleCommandLineLength );
+		tempBuffer.EnsureCapacity( d3dblob->GetBufferSize() + exampleCommandLineLength );
 		memcpy( tempBuffer.Base(), exampleCommandLine, exampleCommandLineLength );
-		memcpy( ( char * )tempBuffer.Base() + exampleCommandLineLength, pd3dxBuffer->GetBufferPointer(), pd3dxBuffer->GetBufferSize() );
-		tempBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, pd3dxBuffer->GetBufferSize() + exampleCommandLineLength );
+		memcpy( ( char * )tempBuffer.Base() + exampleCommandLineLength, d3dblob->GetBufferPointer(), d3dblob->GetBufferSize() );
+		tempBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, d3dblob->GetBufferSize() + exampleCommandLineLength );
+
 		char filename[MAX_PATH];
 		sprintf( filename, "%s_%d_%d.asm", pShaderName, nStaticIndex, nDynamicIndex );
 		g_pFullFileSystem->WriteFile( filename, "DEFAULT_WRITE_PATH", tempBuffer );
@@ -1997,22 +1989,7 @@ retry_compile:
 			MatFlushShaders();
 		}
 #endif
-	}
-
-#ifndef REMOTE_DYNAMIC_SHADER_COMPILE	
-	if ( pShader )
-	{
-		pShader->Release();
-	}
-#endif
-
-#if defined( DYNAMIC_SHADER_COMPILE ) && !defined( REMOTE_DYNAMIC_SHADER_COMPILE )
-	if ( pErrorMessages )
-	{
-		pErrorMessages->Release();
-	}
-#endif
-	
+	}	
 }
 #endif
 
@@ -2101,21 +2078,20 @@ void CShaderManager::WriteTranslatedFile( ShaderLookup_t *pLookup, int dynamicCo
 //-----------------------------------------------------------------------------
 // Disassemble a shader for debugging. Writes .asm files.
 //-----------------------------------------------------------------------------
-void CShaderManager::DisassembleShader( ShaderLookup_t *pLookup, int dynamicCombo, uint8 *pByteCode )
+void CShaderManager::DisassembleShader( ShaderLookup_t *pLookup, int dynamicCombo, uint8 *pByteCode, size_t size )
 {
 #if defined( WRITE_ASSEMBLY )
 	const char *pName = m_ShaderSymbolTable.String( pLookup->m_Name );
 
-	ID3DXBuffer *pd3dxBuffer;
-	HRESULT hr;
-	hr = D3DXDisassembleShader( (DWORD*)pByteCode, false, NULL, &pd3dxBuffer );
+	se::win::com::com_ptr<ID3DBlob> d3dblob;
+	HRESULT hr = D3DDisassemble( pByteCode, size, 0, NULL, &d3dblob );
 	Assert( hr == D3D_OK );
 
 	CUtlBuffer tempBuffer;
 	tempBuffer.SetBufferType( true, false );
-	tempBuffer.EnsureCapacity( pd3dxBuffer->GetBufferSize() );
-	memcpy( ( char * )tempBuffer.Base(), pd3dxBuffer->GetBufferPointer(), pd3dxBuffer->GetBufferSize() );
-	tempBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, pd3dxBuffer->GetBufferSize() );
+	tempBuffer.EnsureCapacity( d3dblob->GetBufferSize() );
+	memcpy( ( char * )tempBuffer.Base(), d3dblob->GetBufferPointer(), d3dblob->GetBufferSize() );
+	tempBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, d3dblob->GetBufferSize() );
 
 	char filename[MAX_PATH];
 	sprintf( filename, "%s_%d_%d.asm", pName, pLookup->m_nStaticIndex, dynamicCombo );
@@ -2194,7 +2170,7 @@ bool CShaderManager::CreateDynamicCombos_Ver4( void *pContext, uint8 *pComboBuff
 		}
 
 #if defined( WRITE_ASSEMBLY )
-		DisassembleShader( pLookup, i, pByteCode );
+		DisassembleShader( pLookup, i, pByteCode, nByteCodeSize );
 #endif
 		HardwareShader_t hardwareShader = INVALID_HARDWARE_SHADER;
 
@@ -2327,7 +2303,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 			uint32 nShaderSize = NextULONG( pReadPtr );
 			
 #if defined( WRITE_ASSEMBLY )
-			DisassembleShader( pLookup, nCombo_ID, pReadPtr );
+			DisassembleShader( pLookup, nCombo_ID, pReadPtr, nBlockSize );
 #endif
 			HardwareShader_t hardwareShader = INVALID_HARDWARE_SHADER;
 
@@ -2367,7 +2343,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 //					bool bDumpGLSL = false;
 //					if ( !stricmp( "vs-file vertexlit_and_unlit_generic_bump_vs20 vs-index 144", debugLabel ) && ( iIndex == 0 ) )
 //					{
-//						DisassembleShader( pLookup, iIndex, pReadPtr );									// Direct3D
+//						DisassembleShader( pLookup, iIndex, pReadPtr, nBlockSize );									// Direct3D
 //						bDumpGLSL = true;
 //					}
 
@@ -2387,7 +2363,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 //						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLCode.Base(), "avp" );		// Old
 //						WriteTranslatedFile( pLookup, iIndex, (char *)bufNewGLCode.Base(), "avp2" );	// New
 						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLSLCode.Base(), "glsl_v" );	// GLSL
-//						DisassembleShader( pLookup, iIndex, pReadPtr );									// Direct3D
+//						DisassembleShader( pLookup, iIndex, pReadPtr, nBlockSize );									// Direct3D
 //					}
 
 					#if defined( WRITE_ASSEMBLY )
@@ -2435,7 +2411,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 //						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLCode.Base(), "afp" );		// Old
 //						WriteTranslatedFile( pLookup, iIndex, (char *)bufNewGLCode.Base(), "afp2" );	// New
 						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLSLCode.Base(), "glsl_p" );	// GLSL
-//						DisassembleShader( pLookup, iIndex, pReadPtr );									// Direct3D
+//						DisassembleShader( pLookup, iIndex, pReadPtr, nBlockSize );									// Direct3D
 //					}
 
 					#if defined( WRITE_ASSEMBLY )
