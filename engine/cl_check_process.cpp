@@ -267,7 +267,6 @@ Cleanup:
 int CheckOtherInstancesRunning( void )
 {
 #ifdef IS_WINDOWS_PC
-
 	BOOL bStatus = 0;
 	DWORD nLength = MAX_PATH;
 	char thisProcessName[ MAX_PATH ];
@@ -305,7 +304,7 @@ int CheckOtherInstancesRunning( void )
 
 	int iEnumCount = CheckOtherInstancesWithEnumProcess( thisProcessNameShort );
 	return iEnumCount > iSnapShotCount ? iEnumCount : iSnapShotCount;
-#endif // IS_WINDOWS_PC
-
+#else
 	return CHECK_PROCESS_UNSUPPORTED;		// -1 UNSUPPORTED
+#endif // IS_WINDOWS_PC
 }
