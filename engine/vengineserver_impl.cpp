@@ -162,55 +162,6 @@ static void PR_CheckEmptyString (const char *s)
 		Host_Error ("Bad string: %s", s);
 }
 
-// Average a list a vertices to find an approximate "center"
-static void CenterVerts( Vector verts[], int vertCount, Vector& center )
-{
-	int i;
-	float scale;
-
-	if ( vertCount )
-	{
-		Vector edge0, edge1, normal;
-
-		VectorCopy( vec3_origin, center );
-		// sum up verts
-		for ( i = 0; i < vertCount; i++ )
-		{
-			VectorAdd( center, verts[i], center );
-		}
-		scale = 1.0f / (float)vertCount;
-		VectorScale( center, scale, center );	// divide by vertCount
-
-		// Compute 2 poly edges
-		VectorSubtract( verts[1], verts[0], edge0 );
-		VectorSubtract( verts[vertCount-1], verts[0], edge1 );
-		// cross for normal
-		CrossProduct( edge0, edge1, normal );
-		// Find the component of center that is outside of the plane
-		scale = DotProduct( center, normal ) - DotProduct( verts[0], normal );
-		// subtract it off
-		VectorMA( center, scale, normal, center );
-		// center is in the plane now
-	}
-}
-
-
-// Copy the list of verts from an msurface_t int a linear array
-static void SurfaceToVerts( model_t *model, SurfaceHandle_t surfID, Vector verts[], int *vertCount )
-{
-	if ( *vertCount > MSurf_VertCount( surfID ) )
-		*vertCount = MSurf_VertCount( surfID );
-
-	// Build the list of verts from 0 to n
-	for ( int i = 0; i < *vertCount; i++ )
-	{
-		int vertIndex = model->brush.pShared->vertindices[ MSurf_FirstVertIndex( surfID ) + i ];
-		Vector& vert = model->brush.pShared->vertexes[ vertIndex ].position;
-		VectorCopy( vert, verts[i] );
-	}
-	// vert[0] is the first and last vert, there is no copy
-}
-
 
 static bool ValidCmd( const char *pCmd )
 {
@@ -308,7 +259,6 @@ public:
 		if ( entnum < 1 || entnum > sv.GetClientCount() )
 		{
 			Error( "Invalid client specified in GetPrevCheckTransmitInfo\n" );
-			return NULL;
 		}
 		
 		CGameClient *client = sv.Client( entnum-1 );

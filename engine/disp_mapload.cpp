@@ -67,17 +67,6 @@ static void BuildDispGetSurfNormals( Vector points[4], Vector normals[4] )
 }
 
 
-static bool FindExtraDependency( unsigned short *pDependencies, int nDependencies, int iDisp )
-{
-	for( int i=0; i < nDependencies; i++ )
-	{
-		if ( pDependencies[i] == iDisp )
-			return true;
-	}
-	return false;
-}
-
-
 static CDispGroup* FindCombo( CUtlVector<CDispGroup*> &combos, int idLMPage, IMaterial *pMaterial )
 {
 	for( int i=0; i < combos.Size(); i++ )

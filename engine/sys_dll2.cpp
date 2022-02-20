@@ -707,7 +707,9 @@ static eSteamInfoInit Sys_TryInitSteamInfo( void *pvAPI, SteamInfVersionInfo_t& 
 {
 	static eSteamInfoInit initState = eSteamInfo_Uninitialized;
 
+#ifndef NO_STEAM
 	eSteamInfoInit previousInitState = initState;
+#endif
 
 	//
 	//

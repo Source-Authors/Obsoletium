@@ -982,46 +982,6 @@ void SaveSurfAtCrossHair()
 		&textureS, &textureT, &lightmapCoords[0], &lightmapCoords[1] );
 }
 
-
-void DebugDrawLightmapAtCrossHair()
-{
-	return;
-	IMaterial *pMaterial;
-	int lightmapPageSize[2];
-
-	if( s_CrossHairSurfID <= 0 )
-	{
-		return;
-	}
-	materials->GetLightmapPageSize( materialSortInfoArray[MSurf_MaterialSortID( s_CrossHairSurfID )].lightmapPageID, 
-		&lightmapPageSize[0], &lightmapPageSize[1] );
-	pMaterial = MSurf_TexInfo( s_CrossHairSurfID )->material;
-//	pMaterial->GetLowResColorSample( textureS, textureT, baseColor );
-	DrawLightmapPage( materialSortInfoArray[MSurf_MaterialSortID( s_CrossHairSurfID )].lightmapPageID );
-
-#if 0
-	int i;
-	for( i = 0; i < 2; i++ )
-	{
-		xy[i] = 
-			( ( float )pCrossHairSurf->offsetIntoLightmapPage[i] / ( float )lightmapPageSize[i] ) +
-			lightmapCoord[i] * ( pCrossHairSurf->lightmapExtents[i] / ( float )lightmapPageSize[i] );
-	}
-
-	materials->Bind( g_materialWireframe );
-	IMesh* pMesh = materials->GetDynamicMesh( g_materialWireframe );
-	
-	CMeshBuilder meshBuilder;
-	meshBuilder.Begin( pMesh, MATERIAL_QUAD, 1 );
-
-	meshBuilder.Position3f( 
-	meshBuilder.AdvanceVertex();
-
-	meshBuilder.End();
-	pMesh->Draw();
-#endif
-}
-
 void ReleaseMaterialSystemObjects();
 void RestoreMaterialSystemObjects( int nChangeFlags );
 

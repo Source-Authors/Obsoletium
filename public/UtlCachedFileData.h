@@ -352,7 +352,6 @@ bool CUtlCachedFileData<T>::IsUpToDate()
 	if ( m_sRepositoryFileName.IsEmpty() )
 	{
 		Error( "CUtlCachedFileData:  Can't IsUpToDate, no repository file specified." );
-		return false;
 	}
 
 	// Always compute meta checksum
@@ -621,7 +620,6 @@ bool CUtlCachedFileData<T>::Init()
 	if ( m_sRepositoryFileName.IsEmpty() )
 	{
 		Error( "CUtlCachedFileData:  Can't Init, no repository file specified." );
-		return false;
 	}
 
 	// Always compute meta checksum

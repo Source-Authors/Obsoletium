@@ -1083,30 +1083,6 @@ static void DeallocateLightingData( worldbrushdata_t *pBrushData )
 	}
 }
 
-static int ComputeLightmapSize( dface_t *pFace, mtexinfo_t *pTexInfo )
-{
-	bool bNeedsBumpmap = false;
-	if( pTexInfo[pFace->texinfo].flags & SURF_BUMPLIGHT )
-	{
-		bNeedsBumpmap = true;
-	}
-
-    int lightstyles;
-    for (lightstyles=0; lightstyles < MAXLIGHTMAPS; lightstyles++ )
-    {
-        if ( pFace->styles[lightstyles] == 255 )
-            break;
-    }
-
-	int nLuxels = (pFace->m_LightmapTextureSizeInLuxels[0]+1) * (pFace->m_LightmapTextureSizeInLuxels[1]+1);
-	if( bNeedsBumpmap )
-	{
-		return nLuxels * 4 * lightstyles * ( NUM_BUMP_VECTS + 1 );
-	}
-
-	return nLuxels * 4 * lightstyles;
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

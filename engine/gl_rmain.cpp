@@ -1179,9 +1179,6 @@ void DrawLightmapPage( int lightmapPageID )
 	pMesh->Draw();
 }
 
-//hack
-extern void DebugDrawLightmapAtCrossHair();
-
 void R_DrawLightmaps( IWorldRenderList *pList, int pageId )
 {
 #ifdef USE_CONVARS

@@ -1369,10 +1369,9 @@ int Voice_AddIncomingData(int nChannel, const char *pchData, int nCount, int iSe
 	int nDecompressed = 0;
 	if ( g_bUsingSteamVoice )
 	{
-		uint32 nBytesWritten = 0;
-
 		// dimhotepus: NO_STEAM
 #ifndef NO_STEAM
+		uint32 nBytesWritten = 0;
 		EVoiceResult result = steamapicontext->SteamUser()->DecompressVoice( pchData, nCount,
 		                                                                     decompressed, sizeof( decompressed ),
 		                                                                     &nBytesWritten, Voice_SamplesPerSec() );
