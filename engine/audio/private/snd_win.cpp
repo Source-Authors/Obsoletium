@@ -125,9 +125,6 @@ IAudioDevice *IAudioDevice::AutoDetectInit( bool )
 	}
 #endif
 
-#if defined( WIN32 ) && !defined( USE_SDL )
-NULLDEVICE:
-#endif
 	snd_firsttime = false;
 
 	if ( !pDevice )
