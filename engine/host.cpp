@@ -5059,6 +5059,7 @@ bool Host_AllowQueuedMaterialSystem( bool bAllow )
 	// g_bAllowThreadedSound = bAllow;
 	// NOTE: Moved this to materialsystem for integrating with other mqm changes
 	return g_pMaterialSystem->AllowThreading( bAllow, g_nMaterialSystemThread );
-#endif
+#else
 	return false;
+#endif
 }

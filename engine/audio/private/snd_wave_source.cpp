@@ -2369,7 +2369,6 @@ bool CAudioSourceCache::Init( unsigned int memSize )
 	if ( !wavedatacache->Init( memSize ) )
 	{
 		Error( "Unable to init wavedatacache system\n" );
-		return false;
 	}
 
 	if ( IsX360() )

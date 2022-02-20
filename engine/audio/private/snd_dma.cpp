@@ -8030,7 +8030,6 @@ bool MXR_LoadAllSoundMixers( void )
 	if ( !pbuffer )
 	{
 		Error( "MXR_LoadAllSoundMixers: unable to open '%s'\n", szFile );
-		return bResult;
 	}
 
 	pstart = pbuffer;

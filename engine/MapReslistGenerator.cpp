@@ -269,14 +269,12 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 			else
 			{
 				Error( "Unable to load %s maplist file: %s\n", pSystemMsg, pMapFile );
-				return false;
 			}
 
 		}
 		else
 		{
 			Error( "Unable to find %s maplist filename\n", pSystemMsg );
-			return false;
 		}
 	}
 

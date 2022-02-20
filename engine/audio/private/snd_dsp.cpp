@@ -9093,7 +9093,6 @@ bool DSP_LoadPresetFile( void )
 	if ( !g_pFullFileSystem->ReadFile( szFile, "GAME", buf ) )
 	{
 		Error( "DSP_LoadPresetFile: unable to open '%s'\n", szFile );
-		return bResult;
 	}
 	pbuffer = (char *)buf.PeekGet(); // Use malloc - free at end of this routine
 

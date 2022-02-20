@@ -679,7 +679,6 @@ IVTFTexture *CVideoMode_Common::LoadVTF( CUtlBuffer &temp, const char *szFileNam
     if ( !texture->Unserialize( temp ) )
     {
         Error( "Invalid or corrupt background texture %s\n", szFileName );
-        return NULL;
     }
     texture->ConvertImageFormat( IMAGE_FORMAT_RGBA8888, false );
     return texture;

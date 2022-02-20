@@ -1757,8 +1757,9 @@ int GetLightingConditions( const Vector &vecLightingOrigin, Vector *pColors, int
 			break;
 	}
 	return nLightCount;
-#endif
+#else
 	return 0;
+#endif
 }
 
 // FIXME: a duplicate of what's in CCDmeMdlRenderable<T>::SetUpLighting and CDmeEmitter::SetUpLighting

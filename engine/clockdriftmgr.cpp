@@ -176,15 +176,15 @@ void CClockDriftMgr::ShowDebugInfo( float flAdjustment )
 
 	if ( IsClockCorrectionEnabled() )
 	{
-		int high=-999, low=999;
+		float high=FLT_MIN, low=FLT_MAX;
 		int exactDiff = cl.GetClientTickCount() - m_nServerTick;
 		for ( int i=0; i < NUM_CLOCKDRIFT_SAMPLES; i++ )
 		{
-			high = max( (float)high, m_ClockOffsets[i] );
-			low = min( (float)low, m_ClockOffsets[i] );
+			high = max( high, m_ClockOffsets[i] );
+			low = min( low, m_ClockOffsets[i] );
 		}
 
-		Msg( "Clock drift: adjustment (per sec): %.2fms, avg: %.3f, lo: %d, hi: %d, ex: %d\n", flAdjustment*1000.0f, GetCurrentClockDifference(), low, high, exactDiff );
+		Msg( "Clock drift: adjustment (per sec): %.2fms, avg: %.3f, lo: %.3f, hi: %.3f, ex: %d\n", flAdjustment*1000.0f, GetCurrentClockDifference(), low, high, exactDiff );
 	}
 	else
 	{

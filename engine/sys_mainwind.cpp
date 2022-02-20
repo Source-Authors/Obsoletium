@@ -1007,7 +1007,6 @@ bool CGame::CreateGameWindow( void )
 	if ( !hwnd )
 	{
 		Error( "Fatal Error:  Unable to create game window!" );
-		return false;
 	}
 
 	SetMainWindow( hwnd );
