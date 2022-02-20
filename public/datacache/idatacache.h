@@ -349,7 +349,6 @@ public:
 			Assert ( 0 );
 			return false;
 		}
-		return false;
 	}
 
 	virtual bool GetItemName( DataCacheClientID_t , const void *, char *, unsigned )
