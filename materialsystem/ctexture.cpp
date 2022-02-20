@@ -3313,8 +3313,8 @@ IVTFTexture *CTexture::LoadTextureBitsFromFile( char *pCacheFileName, char **ppR
 
 	if ( ConvertToActualFormat( pVTFTexture ) )
 	{
-		// dimhotepus: Notify artists about bad texture format.
-		Warning( "\"%s\" not in final format (%d), converting causes stutters or load time bloat!\n", pCacheFileName, m_ImageFormat );
+		// dimhotepus: Notify artists about bad texture format. Silence as too many warnings.
+		// Warning( "\"%s\" not in final format (%d), converting causes stutters or load time bloat!\n", pCacheFileName, m_ImageFormat );
 	}
 
 	return pVTFTexture;
