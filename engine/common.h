@@ -64,7 +64,10 @@ void COM_Shutdown( void );
 bool COM_CheckGameDirectory( const char *gamedir );
 void COM_ParseDirectoryFromCmd( const char *pCmdName, char *pDirName, int maxlen, const char *pDefault );
 
-#define Bits2Bytes(b) ((b+7)>>3)
+template<typename B>
+auto Bits2Bytes(B b) {
+	return (b + 7) >> 3;
+}
 
 // returns a temp buffer of at least 512 bytes 
 char	*tmpstr512();
