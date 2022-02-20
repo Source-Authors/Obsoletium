@@ -275,18 +275,18 @@ int ParseDirective( const char *pText )
 		{
 			if ( ParseFloats( pText, tempFloat, 3 ) )
 			{
-				gMessageParms.r2 = (int)tempFloat[0];
-				gMessageParms.g2 = (int)tempFloat[1];
-				gMessageParms.b2 = (int)tempFloat[2];
+				gMessageParms.r2 = (byte)tempFloat[0];
+				gMessageParms.g2 = (byte)tempFloat[1];
+				gMessageParms.b2 = (byte)tempFloat[2];
 			}
 		}
 		else if ( IsToken( pText, "color" ) )
 		{
 			if ( ParseFloats( pText, tempFloat, 3 ) )
 			{
-				gMessageParms.r1 = (int)tempFloat[0];
-				gMessageParms.g1 = (int)tempFloat[1];
-				gMessageParms.b1 = (int)tempFloat[2];
+				gMessageParms.r1 = (byte)tempFloat[0];
+				gMessageParms.g1 = (byte)tempFloat[1];
+				gMessageParms.b1 = (byte)tempFloat[2];
 			}
 		}
 		else if ( IsToken( pText, "fadein" ) )
