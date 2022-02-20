@@ -2673,83 +2673,16 @@ bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int vol
 //===============================================================================
 void Snd_WriteLinearBlastStereo16( void )
 {
-#if	!id386
-	int		i;
-	int		val;
-
-	for ( i=0; i<snd_linear_count; i+=2 )
+	for ( int i=0; i<snd_linear_count; i+=2 )
 	{
 		// scale and clamp left 16bit signed: [0x8000, 0x7FFF]
-		val = ( snd_p[i] * snd_vol )>>8;
-		if ( val > 32767 )
-			snd_out[i] = 32767;
-		else if ( val < -32768 )
-			snd_out[i] = -32768;
-		else
-			snd_out[i] = val;
+		int val = ( snd_p[i] * snd_vol )>>8;
+		snd_out[i] = std::clamp( val, -32768, 32767 );
 
 		// scale and clamp right 16bit signed: [0x8000, 0x7FFF]
-		val = ( snd_p[i+1] * snd_vol )>>8;
-		if ( val > 32767 )
-			snd_out[i+1] = 32767;
-		else if ( val < -32768 )
-			snd_out[i+1] = -32768;
-		else
-			snd_out[i+1] = val;
+		int val2 = ( snd_p[i+1] * snd_vol )>>8;
+		snd_out[i+1] = std::clamp( val2, -32768, 32767 );
 	}
-#else
-	__asm 
-	{
-		// input data
-		mov	ebx,snd_p
-
-		// output data
-		mov	edi,snd_out
-
-		// iterate from end to beginning
-		mov	ecx,snd_linear_count
-
-		// scale table
-		mov	esi,snd_vol
-
-		// scale and clamp 16bit signed lsw: [0x8000, 0x7FFF]
-WLBS16_LoopTop:
-		mov		eax,[ebx+ecx*4-8]
-		imul	eax,esi
-		sar		eax,0x08
-		cmp		eax,0x7FFF
-		jg		WLBS16_ClampHigh
-		cmp		eax,0xFFFF8000
-		jnl		WLBS16_ClampDone
-		mov		eax,0xFFFF8000
-		jmp		WLBS16_ClampDone
-WLBS16_ClampHigh:
-		mov		eax,0x7FFF
-WLBS16_ClampDone:
-
-		// scale and clamp 16bit signed msw: [0x8000, 0x7FFF]
-		mov		edx,[ebx+ecx*4-4]
-		imul	edx,esi
-		sar		edx,0x08
-		cmp		edx,0x7FFF
-		jg		WLBS16_ClampHigh2
-		cmp		edx,0xFFFF8000
-		jnl		WLBS16_ClampDone2
-		mov		edx,0xFFFF8000
-		jmp		WLBS16_ClampDone2
-WLBS16_ClampHigh2:
-		mov		edx,0x7FFF
-WLBS16_ClampDone2:
-		shl		edx,0x10
-		and		eax,0xFFFF
-		or		edx,eax
-		mov		[edi+ecx*2-4],edx
-
-		// two shorts per iteration
-		sub		ecx,0x02
-		jnz		WLBS16_LoopTop
-	}
-#endif
 }
 
 void SND_InitScaletable (void)
@@ -2763,113 +2696,16 @@ void SND_InitScaletable (void)
 
 void SND_PaintChannelFrom8(portable_samplepair_t *pOutput, int *volume, byte *pData8, int count)
 {
-#if	!id386
-	int 	data;
-	int		*lscale, *rscale;
-	int		i;
+	int		*lscale = snd_scaletable[volume[0] >> SND_SCALE_SHIFT];
+	int		*rscale = snd_scaletable[volume[1] >> SND_SCALE_SHIFT];
 
-	lscale = snd_scaletable[volume[0] >> SND_SCALE_SHIFT];
-	rscale = snd_scaletable[volume[1] >> SND_SCALE_SHIFT];
-
-	for (i=0 ; i<count ; i++)
+	for (int i=0 ; i<count ; i++)
 	{
-		data = pData8[i];
+		int data = pData8[i];
 
 		pOutput[i].left += lscale[data];
 		pOutput[i].right += rscale[data];
 	}
-#else
-	// portable_samplepair_t structure
-#define psp_left		0
-#define psp_right		4
-#define psp_size		8
-	static int			tempStore;
-	
-	__asm
-	{
-		// prologue
-		push	ebp
-
-		// esp = pOutput
-		mov		eax, pOutput
-		mov		tempStore, eax
-		xchg	esp,tempStore
-		// ebx = volume
-		mov		ebx,volume
-		// esi = pData8
-		mov		esi,pData8
-		// ecx = count
-		mov		ecx,count
-
-		// These values depend on the setting of SND_SCALE_BITS
-		// The mask must mask off all the lower bits you aren't using in the multiply
-		// so for 7 bits, the mask is 0xFE, 6 bits 0xFC, etc.
-		// The shift must multiply by the table size.  There are 256 4-byte values in the table at each level.
-		// So each index must be shifted left by 10, but since the bits we use are in the MSB rather than LSB
-		// they must be shifted right by 8 - SND_SCALE_BITS.  e.g., for a 7 bit number the left shift is:
-		// 10 - (8-7) = 9.  For a 5 bit number it's 10 - (8-5) = 7.
-		mov		eax,[ebx]
-		mov		edx,[ebx + 4]
-		and		eax,0xFE
-		and		edx,0xFE
-
-		// shift up by 10 to index table, down by 1 to make the 7 MSB of the bytes an index
-		// eax = lscale
-		// edx = rscale
-		shl		eax,0x09
-		shl		edx,0x09
-		add		eax,OFFSET snd_scaletable
-		add		edx,OFFSET snd_scaletable
-
-		// ebx = data byte
-		sub		ebx,ebx
-		mov		bl,[esi+ecx-1]
-
-		// odd or even number of L/R samples
-		test	ecx,0x01
-		jz		PCF8_Loop
-
-		// process odd L/R sample
-		mov		edi,[eax+ebx*4]
-		mov		ebp,[edx+ebx*4]
-		add		edi,[esp+ecx*psp_size-psp_size+psp_left]
-		add		ebp,[esp+ecx*psp_size-psp_size+psp_right]
-		mov		[esp+ecx*psp_size-psp_size+psp_left],edi
-		mov		[esp+ecx*psp_size-psp_size+psp_right],ebp
-		mov		bl,[esi+ecx-1-1]
-
-		dec		ecx
-		jz		PCF8_Done
-
-PCF8_Loop:
-		// process L/R sample N
-		mov		edi,[eax+ebx*4]
-		mov		ebp,[edx+ebx*4]
-		add		edi,[esp+ecx*psp_size-psp_size+psp_left]
-		add		ebp,[esp+ecx*psp_size-psp_size+psp_right]
-		mov		[esp+ecx*psp_size-psp_size+psp_left],edi
-		mov		[esp+ecx*psp_size-psp_size+psp_right],ebp
-		mov		bl,[esi+ecx-1-1]
-
-		// process L/R sample N-1
-		mov		edi,[eax+ebx*4]
-		mov		ebp,[edx+ebx*4]
-		add		edi,[esp+ecx*psp_size-psp_size*2+psp_left]
-		add		ebp,[esp+ecx*psp_size-psp_size*2+psp_right]
-		mov		[esp+ecx*psp_size-psp_size*2+psp_left],edi
-		mov		[esp+ecx*psp_size-psp_size*2+psp_right],ebp
-		mov		bl,[esi+ecx-1-2]
-
-		// two L/R samples per iteration
-		sub		ecx,0x02
-		jnz		PCF8_Loop
-
-PCF8_Done:
-		// epilogue
-		xchg	esp,tempStore
-		pop		ebp
-	}
-#endif
 }
 
 //===============================================================================
