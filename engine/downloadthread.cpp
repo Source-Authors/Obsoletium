@@ -85,45 +85,45 @@ void Thread_DPrintf (char *fmt, ...)
 /**
  * Convenience function to name status states for debugging
  */
-static const char *StateString( DWORD dwStatus )
-{
-	switch (dwStatus)
-	{
-		case INTERNET_STATUS_RESOLVING_NAME:
-			return "INTERNET_STATUS_RESOLVING_NAME";
-		case INTERNET_STATUS_NAME_RESOLVED:
-			return "INTERNET_STATUS_NAME_RESOLVED";
-		case INTERNET_STATUS_CONNECTING_TO_SERVER:
-			return "INTERNET_STATUS_CONNECTING_TO_SERVER";
-		case INTERNET_STATUS_CONNECTED_TO_SERVER:
-			return "INTERNET_STATUS_CONNECTED_TO_SERVER";
-		case INTERNET_STATUS_SENDING_REQUEST:
-			return "INTERNET_STATUS_SENDING_REQUEST";
-		case INTERNET_STATUS_REQUEST_SENT:
-			return "INTERNET_STATUS_REQUEST_SENT";
-		case INTERNET_STATUS_REQUEST_COMPLETE:
-			return "INTERNET_STATUS_REQUEST_COMPLETE";
-		case INTERNET_STATUS_CLOSING_CONNECTION:
-			return "INTERNET_STATUS_CLOSING_CONNECTION";
-		case INTERNET_STATUS_CONNECTION_CLOSED:
-			return "INTERNET_STATUS_CONNECTION_CLOSED";
-		case INTERNET_STATUS_RECEIVING_RESPONSE:
-			return "INTERNET_STATUS_RECEIVING_RESPONSE";
-		case INTERNET_STATUS_RESPONSE_RECEIVED:
-			return "INTERNET_STATUS_RESPONSE_RECEIVED";
-		case INTERNET_STATUS_HANDLE_CLOSING:
-			return "INTERNET_STATUS_HANDLE_CLOSING";
-		case INTERNET_STATUS_HANDLE_CREATED:
-			return "INTERNET_STATUS_HANDLE_CREATED";
-		case INTERNET_STATUS_INTERMEDIATE_RESPONSE:
-			return "INTERNET_STATUS_INTERMEDIATE_RESPONSE";
-		case INTERNET_STATUS_REDIRECT:
-			return "INTERNET_STATUS_REDIRECT";
-		case INTERNET_STATUS_STATE_CHANGE:
-			return "INTERNET_STATUS_STATE_CHANGE";
-	}
-	return "Unknown";
-}
+//static const char *StateString( DWORD dwStatus )
+//{
+//	switch (dwStatus)
+//	{
+//		case INTERNET_STATUS_RESOLVING_NAME:
+//			return "INTERNET_STATUS_RESOLVING_NAME";
+//		case INTERNET_STATUS_NAME_RESOLVED:
+//			return "INTERNET_STATUS_NAME_RESOLVED";
+//		case INTERNET_STATUS_CONNECTING_TO_SERVER:
+//			return "INTERNET_STATUS_CONNECTING_TO_SERVER";
+//		case INTERNET_STATUS_CONNECTED_TO_SERVER:
+//			return "INTERNET_STATUS_CONNECTED_TO_SERVER";
+//		case INTERNET_STATUS_SENDING_REQUEST:
+//			return "INTERNET_STATUS_SENDING_REQUEST";
+//		case INTERNET_STATUS_REQUEST_SENT:
+//			return "INTERNET_STATUS_REQUEST_SENT";
+//		case INTERNET_STATUS_REQUEST_COMPLETE:
+//			return "INTERNET_STATUS_REQUEST_COMPLETE";
+//		case INTERNET_STATUS_CLOSING_CONNECTION:
+//			return "INTERNET_STATUS_CLOSING_CONNECTION";
+//		case INTERNET_STATUS_CONNECTION_CLOSED:
+//			return "INTERNET_STATUS_CONNECTION_CLOSED";
+//		case INTERNET_STATUS_RECEIVING_RESPONSE:
+//			return "INTERNET_STATUS_RECEIVING_RESPONSE";
+//		case INTERNET_STATUS_RESPONSE_RECEIVED:
+//			return "INTERNET_STATUS_RESPONSE_RECEIVED";
+//		case INTERNET_STATUS_HANDLE_CLOSING:
+//			return "INTERNET_STATUS_HANDLE_CLOSING";
+//		case INTERNET_STATUS_HANDLE_CREATED:
+//			return "INTERNET_STATUS_HANDLE_CREATED";
+//		case INTERNET_STATUS_INTERMEDIATE_RESPONSE:
+//			return "INTERNET_STATUS_INTERMEDIATE_RESPONSE";
+//		case INTERNET_STATUS_REDIRECT:
+//			return "INTERNET_STATUS_REDIRECT";
+//		case INTERNET_STATUS_STATE_CHANGE:
+//			return "INTERNET_STATUS_STATE_CHANGE";
+//	}
+//	return "Unknown";
+//}
 
 //--------------------------------------------------------------------------------------------------------------
 /**
@@ -294,27 +294,27 @@ void CleanUpDownload( RequestContext_t& rc, HTTPStatus_t status, HTTPError_t err
 }
 
 //--------------------------------------------------------------------------------------------------------------
-static void DumpHeaders( RequestContext_t& rc )
-{
-#ifdef _DEBUG
-	DWORD dwSize;
-
-	// First time we will find out the size of the headers.
-	HttpQueryInfo ( rc.hDataResource, HTTP_QUERY_RAW_HEADERS_CRLF, NULL, &dwSize, NULL );
-	char *lpBuffer =  new char [dwSize + 2];
-
-	// Now we call HttpQueryInfo again to get the headers.
-	if (!HttpQueryInfo ( rc.hDataResource, HTTP_QUERY_RAW_HEADERS_CRLF, (LPVOID)lpBuffer, &dwSize, NULL))
-	{
-		return;
-	}
-	*(lpBuffer + dwSize) = '\n';
-	*(lpBuffer + dwSize + 1) = '\0';
-
-	Thread_DPrintf( "------------------------------\n%s%s\n%s------------------------------\n",
-		rc.baseURL, rc.gamePath, lpBuffer );
-#endif
-}
+//static void DumpHeaders( RequestContext_t& rc )
+//{
+//#ifdef _DEBUG
+//	DWORD dwSize;
+//
+//	// First time we will find out the size of the headers.
+//	HttpQueryInfo ( rc.hDataResource, HTTP_QUERY_RAW_HEADERS_CRLF, NULL, &dwSize, NULL );
+//	char *lpBuffer =  new char [dwSize + 2];
+//
+//	// Now we call HttpQueryInfo again to get the headers.
+//	if (!HttpQueryInfo ( rc.hDataResource, HTTP_QUERY_RAW_HEADERS_CRLF, (LPVOID)lpBuffer, &dwSize, NULL))
+//	{
+//		return;
+//	}
+//	*(lpBuffer + dwSize) = '\n';
+//	*(lpBuffer + dwSize + 1) = '\0';
+//
+//	Thread_DPrintf( "------------------------------\n%s%s\n%s------------------------------\n",
+//		rc.baseURL, rc.gamePath, lpBuffer );
+//#endif
+//}
 
 //--------------------------------------------------------------------------------------------------------------
 /**
