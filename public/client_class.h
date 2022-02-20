@@ -51,14 +51,15 @@ class ClientClass
 public:
 	ClientClass( const char *pNetworkName, CreateClientClassFn createFn, CreateEventFn createEventFn, RecvTable *pRecvTable )
 	{
+		m_pCreateFn = createFn;
+		m_pCreateEventFn = createEventFn;
 		m_pNetworkName	= pNetworkName;
-		m_pCreateFn		= createFn;
-		m_pCreateEventFn= createEventFn;
 		m_pRecvTable	= pRecvTable;
 		
 		// Link it in
 		m_pNext				= g_pClientClassHead;
 		g_pClientClassHead	= this;
+		m_ClassID = -1;
 	}
 
 	const char* GetName()

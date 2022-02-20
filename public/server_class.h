@@ -63,6 +63,7 @@ public:
 							p2 = p2->m_pNext;
 						}	
 					}
+					m_ClassID = -1;
 				}
 
 	const char*	GetName()		{ return m_pNetworkName; }
