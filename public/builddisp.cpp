@@ -508,9 +508,9 @@ bool CCoreDispSurface::CalcLuxelCoords( int nLuxels, bool bAdjust, const Vector 
 	for( int iBump = 0; iBump < NUM_BUMP_VECTS+1; ++iBump )
 	{
 		m_LuxelCoords[iBump][(0+iOffset)%4].Init( 0.5f, 0.5f );
-		m_LuxelCoords[iBump][(1+iOffset)%4].Init( 0.5f, flVValue + 0.5 );
-		m_LuxelCoords[iBump][(2+iOffset)%4].Init( flUValue + 0.5, flVValue + 0.5 );
-		m_LuxelCoords[iBump][(3+iOffset)%4].Init( flUValue + 0.5, 0.5f );
+		m_LuxelCoords[iBump][(1+iOffset)%4].Init( 0.5f, flVValue + 0.5f );
+		m_LuxelCoords[iBump][(2+iOffset)%4].Init( flUValue + 0.5f, flVValue + 0.5f );
+		m_LuxelCoords[iBump][(3+iOffset)%4].Init( flUValue + 0.5f, 0.5f );
 	}
 
 	return bSwapped;

@@ -59,7 +59,7 @@ public:
 	void AddEndTime( float startTime )		{ m_flEndTime += startTime; }
 
 	int GetPhonemeCode() const				{ return m_nPhonemeCode; }
-	void SetPhonemeCode( int phonemeCode )	{ m_nPhonemeCode = phonemeCode; }
+	void SetPhonemeCode( unsigned short phonemeCode )	{ m_nPhonemeCode = phonemeCode; }
 
 private:
 	float			m_flStartTime;

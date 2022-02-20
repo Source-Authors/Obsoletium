@@ -1792,12 +1792,12 @@ void ResolveQuadratic( double tPlus, double tMinus,
 	double sDenomMinus = ( axisU0[projU] * ( 1 - tMinus ) ) + ( axisU1[projU] * tMinus );
 
 	double sPlus = UNINIT, sMinus = UNINIT;
-	if( FloatMakePositive( sDenomPlus ) >= 1e-5 )
+	if( fabs( sDenomPlus ) >= 1e-5 )
 	{
 		sPlus = ( pt[projU] - axisOrigin[projU] - ( axisV0[projU] * tPlus ) ) / sDenomPlus; 
 	}
 
-	if( FloatMakePositive( sDenomMinus ) >= 1e-5 )
+	if( fabs( sDenomMinus ) >= 1e-5 )
 	{
 		sMinus = ( pt[projU] - axisOrigin[projU] - ( axisV0[projU] * tMinus ) ) / sDenomMinus; 
 	}
@@ -1828,10 +1828,10 @@ void ResolveQuadratic( double tPlus, double tMinus,
 	if( s1 >= 1.0 ) { s1 -= 1.0; }
 	if( t1 >= 1.0 ) { t1 -= 1.0; }
 
-	s0 = FloatMakePositive( s0 );
-	t0 = FloatMakePositive( t0 );
-	s1 = FloatMakePositive( s1 );
-	t1 = FloatMakePositive( t1 );
+	s0 = fabs( s0 );
+	t0 = fabs( t0 );
+	s1 = fabs( s1 );
+	t1 = fabs( t1 );
 
 	double max0, max1;
 	max0 = s0;
