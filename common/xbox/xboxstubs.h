@@ -95,10 +95,6 @@ typedef unsigned __int64 ULONGLONG; //-V677
 typedef DWORD COLORREF;
 #endif
 
-#ifndef INVALID_HANDLE_VALUE
-#define INVALID_HANDLE_VALUE ((HANDLE)-1)
-#endif
-
 // typedef struct {
 // 	IN_ADDR     ina;                            // IP address (zero if not static/DHCP)
 // 	IN_ADDR     inaOnline;                      // Online IP address (zero if not online)
