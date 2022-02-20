@@ -78,8 +78,8 @@ enum
 #define PACKET_FLAG_CHALLENGE			(1<<5)  // packet contains challenge number, use to prevent packet injection
 
 // NOTE:  Bits 5, 6, and 7 are used to specify the # of padding bits at the end of the packet!!!
-#define ENCODE_PAD_BITS( x ) ( ( x << 5 ) & 0xff )
-#define DECODE_PAD_BITS( x ) ( ( x >> 5 ) & 0xff )
+#define ENCODE_PAD_BITS( x ) ( ( (x) << 5 ) & 0xff )
+#define DECODE_PAD_BITS( x ) ( ( (x) >> 5 ) & 0xff )
 
 // shared commands used by all streams, handled by stream layer, TODO
 
