@@ -3311,11 +3311,11 @@ IVTFTexture *CTexture::LoadTextureBitsFromFile( char *pCacheFileName, char **ppR
 	if ( !IsProcedural() )
 		SetupDebuggingTextures( pVTFTexture );
 
-	//if ( ConvertToActualFormat( pVTFTexture ) )
-	//{
+	if ( ConvertToActualFormat( pVTFTexture ) )
+	{
 		// dimhotepus: Notify artists about bad texture format.
-	//	Warning( "\"%s\" not in final format, this is causing stutters or load time bloat!\n", pCacheFileName );
-	//}
+		Warning( "\"%s\" not in final format (%d), converting causes stutters or load time bloat!\n", pCacheFileName, m_ImageFormat );
+	}
 
 	return pVTFTexture;
 }
