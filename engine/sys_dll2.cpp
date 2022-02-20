@@ -418,15 +418,6 @@ public:
 			// Add Memory Status
 			BuildCommentMemStatus();
 
-			// Spew out paged pool stuff, etc.
-			PAGED_POOL_INFO_t ppi_info;
-			if ( Plat_GetPagedPoolInfo( &ppi_info ) != SYSCALL_UNSUPPORTED )
-			{
-				CommentPrintf( "\nPaged Pool\nprev PP PAGES: used: %lu, free %lu\nfinal PP PAGES: used: %lu, free %lu\n",
-				            g_pagedpoolinfo.numPagesUsed, g_pagedpoolinfo.numPagesFree, 
-				            ppi_info.numPagesUsed, ppi_info.numPagesFree );
-			}
-
 			CommentPrintf( "memallocfail? = %u\nActive: %s\nSpawnCount %d MapLoad Count %d\nError count %d, end demo %d, abort count %d\n",
 			            MemAlloc_MemoryAllocFailed(),
 			            ( game && game->IsActiveApp() ) ? "active" : "inactive", 

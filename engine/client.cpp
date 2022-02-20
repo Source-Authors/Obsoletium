@@ -2036,42 +2036,4 @@ void CClientState::RunFrame()
 		m_NetChannel->SetDataRate( cl_rate->GetFloat() );
 
 	ConsistencyCheck( false );
-
-	// Check if paged pool is low ( < 8% free )
-	static bool s_bLowPagedPoolMemoryWarning = false;
-	PAGED_POOL_INFO_t ppi;
-	if ( ( SYSCALL_SUCCESS == Plat_GetPagedPoolInfo( &ppi ) ) &&
-		( ( ppi.numPagesFree * 12 ) < ( ppi.numPagesUsed + ppi.numPagesFree ) ) )
-	{
-		con_nprint_t np;
-		np.time_to_live = 1.0;
-		np.index = 1;
-		np.fixed_width_font = false;
-		np.color[ 0 ] = 1.0;
-		np.color[ 1 ] = 0.2;
-		np.color[ 2 ] = 0.0;
-		Con_NXPrintf( &np, "WARNING:  OS Paged Pool Memory Low" );
-
-		// Also print a warning to console
-		static float s_flLastWarningTime = 0.0f;
-		if ( !s_bLowPagedPoolMemoryWarning ||
-			 ( Plat_FloatTime() - s_flLastWarningTime > 3.0f ) )	// print a warning no faster than once every 3 sec
-		{
-			s_bLowPagedPoolMemoryWarning = true;
-			s_flLastWarningTime = Plat_FloatTime();
-			Warning( "OS Paged Pool Memory Low!\n" );
-			Warning( "  Currently using %lu pages (%lu Kb) of total %lu pages (%lu Kb total)\n",
-				ppi.numPagesUsed, ppi.numPagesUsed * Plat_GetMemPageSize(),
-				( ppi.numPagesFree + ppi.numPagesUsed ), ( ppi.numPagesFree + ppi.numPagesUsed ) * Plat_GetMemPageSize() );
-			Warning( "  Please see https://www.steampowered.com for more information.\n" );
-		}
-	}
-	else if ( s_bLowPagedPoolMemoryWarning )
-	{
-		s_bLowPagedPoolMemoryWarning = false;
-		Msg( "Info: OS Paged Pool Memory restored - currently %lu pages free (%lu Kb) of total %lu pages (%lu Kb total).\n",
-			ppi.numPagesFree, ppi.numPagesFree * Plat_GetMemPageSize(),
-			( ppi.numPagesFree + ppi.numPagesUsed ), ( ppi.numPagesFree + ppi.numPagesUsed ) * Plat_GetMemPageSize() );
-	}
-
 }
