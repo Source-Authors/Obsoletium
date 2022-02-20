@@ -26,6 +26,9 @@ $Configuration
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR/thirdparty/gperftools-2.0/src/" [$GPROFILER]
 		$PreprocessorDefinitions		"$BASE;GPROFILER" [$GPROFILER]
 		$PreprocessorDefinitions		"$BASE;ENABLE_RPT" [$ENABLE_RPT]
+
+		// dimhotepus: Enable exceptions as we use them in a single place
+		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
 
 	$Linker
