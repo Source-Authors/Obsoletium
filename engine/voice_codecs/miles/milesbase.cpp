@@ -160,7 +160,7 @@ bool ASISTRUCT::Init( void *pCallbackObject, const char *pInputFileType, const c
 		"Output file types", pOutputFileType, "Input file types", pInputFileType );
 	if ( !hProvider )
 	{
-		DevWarning( "Can't find provider 'ASI codec' for input %s, output %s",
+		DevWarning( "Can't find provider 'ASI codec' for input %s, output %s\n",
 			pInputFileType, pOutputFileType );
 		return false;
 	}
@@ -173,7 +173,7 @@ bool ASISTRUCT::Init( void *pCallbackObject, const char *pInputFileType, const c
 
 	if ( !m_pProvider )
 	{
-		DevWarning( "Can't create provider 'ASI codec'" );
+		DevWarning( "Can't create provider 'ASI codec'\n" );
 		return false;
 	}
 
@@ -199,7 +199,7 @@ bool ASISTRUCT::Init( void *pCallbackObject, const char *pInputFileType, const c
 	RIBRESULT result = RIB_request( m_pProvider->GetProviderHandle(), "ASI stream", ASISTR );
 	if ( result != RIB_NOERR )
 	{
-		DevWarning( "Can't find interface 'ASI stream' for provider 'ASI codec'" );
+		DevWarning( "Can't find interface 'ASI stream' for provider 'ASI codec'\n" );
 		return false;
 	}
 	
@@ -212,7 +212,7 @@ bool ASISTRUCT::Init( void *pCallbackObject, const char *pInputFileType, const c
 	m_stream = ASI_stream_open( (UINTa)pCallbackObject, cb, 0 );
 	if( !m_stream )
 	{
-		DevWarning("Can't open ASI stream for conversion input %s -> output %s",
+		DevWarning("Can't open ASI stream for conversion input %s -> output %s\n",
 			pInputFileType, pOutputFileType );
 		return false;
 	}
