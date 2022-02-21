@@ -54,8 +54,7 @@ public:
 
 	~CSIMDVectorMatrix( void )
 	{
-		if ( m_pData )
-			delete[] m_pData;
+		delete[] m_pData;
 	}
 
 	// set up storage and fields for m x n matrix. destroys old data
@@ -63,8 +62,7 @@ public:
 	{
 		if ( ( ! m_pData ) || ( width != m_nWidth ) || ( height != m_nHeight ) )
 		{
-			if ( m_pData )
-				delete[] m_pData;
+			delete[] m_pData;
 			
 			m_nWidth = width;
 			m_nHeight = height;
