@@ -8,7 +8,6 @@
 
 
 #include "basetypes.h"
-#include <stdio.h>
 #include "choreoscene.h"
 #include "choreoevent.h"
 #include "choreochannel.h"
@@ -105,6 +104,7 @@ void CChoreoScene::choreoprintf( int level, const char *fmt, ... )
 //-----------------------------------------------------------------------------
 CChoreoScene::CChoreoScene( IChoreoEventCallback *callback )
 {
+	m_bRestoring = false;
 	Init( callback );
 }
 
@@ -120,34 +120,29 @@ CChoreoScene& CChoreoScene::operator=( const CChoreoScene& src )
 
 	// Delete existing
 	int i;
-	for ( i = 0; i < m_Actors.Size(); i++ )
+	for ( auto *a : m_Actors )
 	{
-		CChoreoActor *a = m_Actors[ i ];
 		Assert( a );
 		delete a;
 	}
 
 	m_Actors.RemoveAll();
 
-	for ( i = 0; i < m_Events.Size(); i++ )
+	for ( auto *e : m_Events )
 	{
-		CChoreoEvent *e = m_Events[ i ];
 		Assert( e );
 		delete e;
 	}
 
 	m_Events.RemoveAll();
 
-	for ( i = 0 ; i < m_Channels.Size(); i++ )
+	for ( auto *c : m_Channels )
 	{
-		CChoreoChannel *c = m_Channels[ i ];
 		Assert( c );
 		delete c;
 	}
 
 	m_Channels.RemoveAll();
-
-	m_pTokenizer = src.m_pTokenizer;
 	
 	m_flCurrentTime = src.m_flCurrentTime;
 	m_flStartLoopTime = src.m_flStartLoopTime;
@@ -165,9 +160,8 @@ CChoreoScene& CChoreoScene::operator=( const CChoreoScene& src )
 	// Now copy the object tree
 	// First copy the global events
 
-	for ( i = 0; i < src.m_Events.Size(); i++ )
+	for ( auto *event : src.m_Events )
 	{
-		CChoreoEvent *event = src.m_Events[ i ];
 		if ( event->GetActor() == NULL )
 		{
 			MEM_ALLOC_CREDIT();
@@ -179,9 +173,8 @@ CChoreoScene& CChoreoScene::operator=( const CChoreoScene& src )
 	}
 
 	// Finally, push actors, channels, events onto global stacks
-	for ( i = 0; i < src.m_Actors.Size(); i++ )
+	for ( auto *actor : src.m_Actors )
 	{
-		CChoreoActor *actor = src.m_Actors[ i ];
 		CChoreoActor *newActor = AllocActor();
 		*newActor = *actor;
 
@@ -641,7 +634,8 @@ void CChoreoScene::ParseEdgeInfo( ISceneTokenProcessor *tokenizer, EdgeInfo_t *e
 	edgeinfo->m_bActive = true;
 	edgeinfo->m_CurveType = Interpolator_CurveTypeForName( tokenizer->CurrentToken() );
 	tokenizer->GetToken( false );
-	edgeinfo->m_flZeroPos = atof( tokenizer->CurrentToken() );
+	// dimhotepus: atof -> strtof.
+	edgeinfo->m_flZeroPos = strtof( tokenizer->CurrentToken(), nullptr );
 	tokenizer->GetToken( true );
 }
 
@@ -756,9 +750,11 @@ void CChoreoScene::ParseFlexAnimations( ISceneTokenProcessor *tokenizer, CChoreo
 		if ( !Q_stricmp( tokenizer->CurrentToken(), "range" ) )
 		{
 			tokenizer->GetToken( false );
-			range_min = atof( tokenizer->CurrentToken() );
+			// dimhotepus: atof -> strtof.
+			range_min = strtof( tokenizer->CurrentToken(), nullptr );
 			tokenizer->GetToken( false );
-			range_max = atof( tokenizer->CurrentToken() );
+			// dimhotepus: atof -> strtof.
+			range_max = strtof( tokenizer->CurrentToken(), nullptr );
 			tokenizer->GetToken( true );
 		}
 		
@@ -998,7 +994,8 @@ CChoreoEvent *CChoreoScene::ParseEvent( CChoreoActor *actor, CChoreoChannel *cha
 		else if ( !Q_stricmp( m_pTokenizer->CurrentToken(), "distancetotarget" ) )
 		{
 			m_pTokenizer->GetToken( false );
-			e->SetDistanceToTarget( atof( m_pTokenizer->CurrentToken() ) );
+			// dimhotepus: atof -> strtof.
+			e->SetDistanceToTarget( strtof( m_pTokenizer->CurrentToken(), nullptr ) );
 		}
 		else if ( !Q_stricmp( m_pTokenizer->CurrentToken(), "forceshortmovement" ) )
 		{
@@ -2211,12 +2208,8 @@ float CChoreoScene::FindAdjustedStartTime( void )
 {
 	float earliest_time = 0.0f;
 
-	CChoreoEvent *e;
-
-	for ( int i = 0; i < m_Events.Size(); i++ )
+	for ( auto *e : m_Events )
 	{
-		e = m_Events[ i ];
-
 		float starttime = e->GetStartTime();
 
 		// If it's a wav file, pre-queue the starting time by the sound system's

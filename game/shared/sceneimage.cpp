@@ -26,7 +26,7 @@
 class CSceneImage : public ISceneImage
 {
 public:
-	virtual bool CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pchModPath, bool bLittleEndian, bool bQuiet, ISceneCompileStatus *Status );
+	bool CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pchModPath, bool bLittleEndian, bool bQuiet, ISceneCompileStatus *Status ) override;
 };
 
 static CSceneImage g_SceneImage;

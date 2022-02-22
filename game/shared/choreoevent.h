@@ -368,7 +368,7 @@ public:
 	const char		*GetParameters3( void );
 
 	void			SetStartTime( float starttime );
-	float			GetStartTime( void );
+	float			GetStartTime( void ) const;
 
 	void			SetEndTime( float endtime );
 	float			GetEndTime( void );

@@ -6,13 +6,11 @@
 //
 //=============================================================================//
 
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
 #include "choreochannel.h"
 #include "choreoevent.h"
 #include "choreoscene.h"
-#include "utlrbtree.h"
+#include "tier0/dbg.h"
+#include "tier1/utlrbtree.h"
 #include "tier1/utlbuffer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -21,8 +19,9 @@
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CChoreoChannel::CChoreoChannel( void )
+CChoreoChannel::CChoreoChannel()
 {
+	m_bMarkedForSave = false;
 	Init();
 }
 
@@ -32,6 +31,7 @@ CChoreoChannel::CChoreoChannel( void )
 //-----------------------------------------------------------------------------
 CChoreoChannel::CChoreoChannel(const char *name )
 {
+	m_bMarkedForSave = false;
 	Init();
 	SetName( name );
 }
@@ -45,10 +45,9 @@ CChoreoChannel&	CChoreoChannel::operator=( const CChoreoChannel& src )
 {
 	m_bActive = src.m_bActive;
 	Q_strncpy( m_szName, src.m_szName, sizeof( m_szName ) );
-	for ( int i = 0; i < src.m_Events.Size(); i++ )
+	for ( auto *e : src.m_Events )
 	{
-		CChoreoEvent *e = src.m_Events[ i ];
-		CChoreoEvent *newEvent = new CChoreoEvent( e->GetScene() );
+		auto *newEvent = new CChoreoEvent( e->GetScene() );
 		*newEvent = *e;
 		AddEvent( newEvent );
 		newEvent->SetChannel( this );
@@ -64,7 +63,7 @@ CChoreoChannel&	CChoreoChannel::operator=( const CChoreoChannel& src )
 //-----------------------------------------------------------------------------
 void CChoreoChannel::SetName( const char *name )
 {
-	assert( Q_strlen( name ) < MAX_CHANNEL_NAME );
+	Assert( strlen( name ) < MAX_CHANNEL_NAME );
 	Q_strncpy( m_szName, name, sizeof( m_szName ) );
 }
 
@@ -153,7 +152,7 @@ int CChoreoChannel::FindEventIndex( CChoreoEvent *event )
 //-----------------------------------------------------------------------------
 void CChoreoChannel::Init( void )
 {
-	m_szName[ 0 ] = 0;
+	m_szName[ 0 ] = '\0';
 	SetActor( NULL );
 	m_bActive = true;
 }
@@ -196,25 +195,17 @@ bool CChoreoChannel::GetActive( void ) const
 
 static bool ChoreEventStartTimeLessFunc( CChoreoEvent * const &p1, CChoreoEvent * const &p2 )
 {
-	CChoreoEvent *e1;
-	CChoreoEvent *e2;
-
-	e1 = const_cast< CChoreoEvent * >( p1 );
-	e2 = const_cast< CChoreoEvent * >( p2 );
-
-	return e1->GetStartTime() < e2->GetStartTime();
+	return p1->GetStartTime() < p2->GetStartTime();
 }
 
 void CChoreoChannel::ReconcileGestureTimes()
 {
-	// Sort gesture events within channel by starting time
-	CUtlRBTree< CChoreoEvent * >  sortedGestures( 0, 0, ChoreEventStartTimeLessFunc );
-	int i;
 	// Sort items
 	int c = GetNumEvents();
-	for ( i = 0; i < c; i++ )
+	// Sort gesture events within channel by starting time
+	CUtlRBTree< CChoreoEvent * >  sortedGestures( 0, c, ChoreEventStartTimeLessFunc );
+	for ( auto *e : m_Events )
 	{
-		CChoreoEvent *e = GetEvent( i );
 		Assert( e );
 		if ( e->GetType() != CChoreoEvent::GESTURE )
 			continue;
@@ -228,7 +219,7 @@ void CChoreoChannel::ReconcileGestureTimes()
 
 	CChoreoEvent *previous = NULL;
 
-	for ( i = sortedGestures.FirstInorder(); i != sortedGestures.InvalidIndex(); i = sortedGestures.NextInorder( i ) )
+	for ( auto i = sortedGestures.FirstInorder(); i != sortedGestures.InvalidIndex(); i = sortedGestures.NextInorder( i ) )
 	{
 		CChoreoEvent *event = sortedGestures[ i ];
 
@@ -249,7 +240,7 @@ void CChoreoChannel::ReconcileGestureTimes()
 
 				// get current decay rate of previous gesture
 				float duration = previous->GetDuration();
-				float decayTime = (1.0 - pExitTag->GetPercentage()) * duration;
+				float decayTime = (1.0F - pExitTag->GetPercentage()) * duration;
 
 				// adjust the previous gestures end time to current apex + existing decay rate
 				previous->RescaleGestureTimes( previous->GetStartTime(), entryTime + decayTime, true );
@@ -322,10 +313,8 @@ void CChoreoChannel::MarkForSaveAll( bool mark )
 {
 	SetMarkedForSave( mark );
 
-	int c = GetNumEvents();
-	for ( int i = 0; i < c; i++ )
+	for ( auto *e : m_Events )
 	{
-		CChoreoEvent *e = GetEvent( i );
 		e->SetMarkedForSave( mark );
 	}
 }
@@ -339,11 +328,10 @@ struct EventGroup
 	}
 
 	EventGroup( const EventGroup& src )
-		:
-		timeSortedEvents( 0, 0, ChoreEventStartTimeLessFunc )
+		: timeSortedEvents( 0, 0, ChoreEventStartTimeLessFunc )
 	{
 		timeSortedEvents.RemoveAll();
-		int i = src.timeSortedEvents.FirstInorder();
+		auto i = src.timeSortedEvents.FirstInorder();
 		while ( i != src.timeSortedEvents.InvalidIndex() )
 		{
 			timeSortedEvents.Insert( src.timeSortedEvents[ i ] );
@@ -358,7 +346,7 @@ struct EventGroup
 			return *this;
 
 		timeSortedEvents.RemoveAll();
-		int i = src.timeSortedEvents.FirstInorder();
+		auto i = src.timeSortedEvents.FirstInorder();
 		while ( i != src.timeSortedEvents.InvalidIndex() )
 		{
 			timeSortedEvents.Insert( src.timeSortedEvents[ i ] );
@@ -458,7 +446,7 @@ void CChoreoChannel::ReconcileCloseCaption()
 		}
 
 		// Okay, read them back in of start time
-		int j = eg.timeSortedEvents.FirstInorder();
+		auto j = eg.timeSortedEvents.FirstInorder();
 		CChoreoEvent *master = NULL;
 		while ( j != eg.timeSortedEvents.InvalidIndex() )
 		{

@@ -4,12 +4,10 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
 #include "choreoactor.h"
 #include "choreochannel.h"
 #include "choreoscene.h"
+#include "tier0/dbg.h"
 #include "tier1/utlbuffer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -18,8 +16,9 @@
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CChoreoActor::CChoreoActor( void )
+CChoreoActor::CChoreoActor()
 {
+	m_bMarkedForSave = false;
 	Init();
 }
 
@@ -29,6 +28,7 @@ CChoreoActor::CChoreoActor( void )
 //-----------------------------------------------------------------------------
 CChoreoActor::CChoreoActor( const char *name )
 {
+	m_bMarkedForSave = false;
 	Init();
 	SetName( name );
 }
@@ -45,10 +45,9 @@ CChoreoActor& CChoreoActor::operator=( const CChoreoActor& src )
 	Q_strncpy( m_szName, src.m_szName, sizeof( m_szName ) );
 	Q_strncpy( m_szFacePoserModelName, src.m_szFacePoserModelName, sizeof( m_szFacePoserModelName ) );
 
-	for ( int i = 0; i < src.m_Channels.Size(); i++ )
+	for ( auto *c : src.m_Channels )
 	{
-		CChoreoChannel *c = src.m_Channels[ i ];
-		CChoreoChannel *newChannel = new CChoreoChannel();
+		auto *newChannel = new CChoreoChannel();
 		newChannel->SetActor( this );
 		*newChannel = *c;
 		AddChannel( newChannel );
@@ -60,10 +59,10 @@ CChoreoActor& CChoreoActor::operator=( const CChoreoActor& src )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CChoreoActor::Init( void )
+void CChoreoActor::Init()
 {
-	m_szName[ 0 ] = 0;
-	m_szFacePoserModelName[ 0 ] = 0;
+	m_szName[ 0 ] = '\0';
+	m_szFacePoserModelName[ 0 ] = '\0';
 	m_bActive = true;
 }
 
@@ -73,7 +72,7 @@ void CChoreoActor::Init( void )
 //-----------------------------------------------------------------------------
 void CChoreoActor::SetName( const char *name )
 {
-	assert( strlen( name ) < MAX_ACTOR_NAME );
+	Assert( strlen( name ) < MAX_ACTOR_NAME );
 	Q_strncpy( m_szName, name, sizeof( m_szName ) );
 }
 
@@ -147,11 +146,7 @@ void CChoreoActor::RemoveAllChannels()
 //-----------------------------------------------------------------------------
 void CChoreoActor::SwapChannels( int c1, int c2 )
 {
-	CChoreoChannel *temp;
-
-	temp = m_Channels[ c1 ];
-	m_Channels[ c1 ] = m_Channels[ c2 ];
-	m_Channels[ c2 ] = temp;
+	std::swap( m_Channels[ c1 ], m_Channels[ c2 ] );
 }
 
 //-----------------------------------------------------------------------------
@@ -161,12 +156,14 @@ void CChoreoActor::SwapChannels( int c1, int c2 )
 //-----------------------------------------------------------------------------
 int CChoreoActor::FindChannelIndex( CChoreoChannel *channel )
 {
-	for ( int i = 0; i < m_Channels.Size(); i++ )
+	ptrdiff_t i{ 0 };
+	for ( auto *channel : m_Channels )
 	{
 		if ( channel == m_Channels[ i ] )
 		{
 			return i;
 		}
+		++i;
 	}
 	return -1;
 }
@@ -214,10 +211,8 @@ void CChoreoActor::MarkForSaveAll( bool mark )
 {
 	SetMarkedForSave( mark );
 
-	int c = GetNumChannels();
-	for ( int i = 0; i < c; i++ )
+	for ( auto *channel : m_Channels )
 	{
-		CChoreoChannel *channel = GetChannel( i );
 		channel->MarkForSaveAll( mark );
 	}
 }
@@ -229,10 +224,8 @@ void CChoreoActor::MarkForSaveAll( bool mark )
 //-----------------------------------------------------------------------------
 CChoreoChannel *CChoreoActor::FindChannel( const char *name )
 {
-	int c = GetNumChannels();
-	for ( int i = 0; i < c; i++ )
+	for ( auto *channel : m_Channels )
 	{
-		CChoreoChannel *channel = GetChannel( i );
 		if ( !Q_stricmp( channel->GetName(), name ) )
 			return channel;
 	}
@@ -271,9 +264,8 @@ bool CChoreoActor::RestoreFromBuffer( CUtlBuffer& buf, CChoreoScene *pScene, ICh
 
 	SetName( sz );
 
-	int i;
 	int c = buf.GetUnsignedChar();
-	for ( i = 0; i < c; i++ )
+	for ( int i = 0; i < c; i++ )
 	{
 		CChoreoChannel *channel = pScene->AllocChannel();
 		Assert( channel );
