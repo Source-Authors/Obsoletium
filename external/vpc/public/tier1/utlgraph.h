@@ -126,7 +126,7 @@ class CUtlGraph {
     }
   };
 
-  CUtlMap<NodeID_t, Node_t> m_Nodes;
+  CUtlMap<NodeID_t, Node_t, int> m_Nodes;
 };
 
 //-----------------------------------------------------------------------------
