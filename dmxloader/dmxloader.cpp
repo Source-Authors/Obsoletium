@@ -193,7 +193,10 @@ bool CDmxSerializer::SaveElement( CUtlBuffer& buf, CDmxSerializationDictionary& 
 			return false;
 
 		buf.PutShort( sym );
-		buf.PutChar( pAttribute->GetType() );
+
+		static_assert(AT_TYPE_COUNT <= CHAR_MAX);
+
+		buf.PutChar( (char)pAttribute->GetType() );
 		switch( pAttribute->GetType() )
 		{
 		default:
@@ -254,11 +257,11 @@ bool CDmxSerializer::Serialize( CUtlBuffer &buf, CDmxElement *pRoot, const char 
 	}
 
 	// write out the string table
-	int nStrings = stringTable.Count();
-	if ( nStrings > 65535 )
+	unsigned nStrings = stringTable.Count();
+	if ( nStrings > 65535U )
 		return false;
-	buf.PutShort( nStrings );
-	for ( int si = 0; si < nStrings; ++si )
+	buf.PutShort( (unsigned short)nStrings );
+	for ( unsigned short si = 0; si < (unsigned short)nStrings; ++si )
 	{
 		buf.PutString( stringTable[ si ] );
 	}
