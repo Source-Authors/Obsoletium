@@ -199,7 +199,7 @@ struct StringNode_t {
 
 static StringNode_t *MakeStrNode(char const *pStr) {
   size_t nLen = strlen(pStr);
-  StringNode_t *nRet =
+  alignas(unsigned char *) StringNode_t *nRet =
       (StringNode_t *)new unsigned char[sizeof(StringNode_t) + nLen];
   strcpy(nRet->m_Text, pStr);
   return nRet;

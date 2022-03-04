@@ -717,9 +717,9 @@ void V_strncpy(char *pDest, char const *pSrc, int maxLen) {
 
   DEBUG_LINK_CHECK;
 
-  strncpy(pDest, pSrc, maxLen);
+  strncpy(pDest, pSrc, maxLen); //-V781
   if (maxLen > 0) {
-    pDest[maxLen - 1] = 0;
+    pDest[maxLen - 1] = '\0';
   }
 }
 
