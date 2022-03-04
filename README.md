@@ -1,6 +1,7 @@
 
 ## How to build
 
+* [windows] Visual Studio 2022 with v143+ platform toolset.
 * Use `git clone --recurse-submodules`
 * Run `creategameprojects_debug.bat` from Developer command prompt.
 * Open `hl2.sln`
