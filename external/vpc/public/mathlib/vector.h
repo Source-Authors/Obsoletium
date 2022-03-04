@@ -139,7 +139,7 @@ class Vector {
   // return true if this vector is exactly (0,0,0) -- only fast if vector is
   // coming from memory, not registers
   inline bool IsZeroFast() const RESTRICT {
-    COMPILE_TIME_ASSERT(sizeof(vec_t) == sizeof(int));
+    static_assert(sizeof(vec_t) == sizeof(int));
     return (*(const int*)(&x) == 0 && *(const int*)(&y) == 0 &&
             *(const int*)(&z) == 0);
   }
@@ -1155,7 +1155,7 @@ inline Vector& AllocTempVector() {
     }
     ThreadPause();
   }
-  return s_vecTemp[nIndex & 0xffff];
+  return s_vecTemp[nIndex & 0x7F];
 }
 
 //-----------------------------------------------------------------------------

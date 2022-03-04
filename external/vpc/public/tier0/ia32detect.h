@@ -291,11 +291,12 @@ class ia32detect {
       uint32 *d = new uint32[(m - 0x80000000) * 4];
 
       for (uint32 i = 0x80000001; i <= m; i++) {
-        uint32 *t = d + (i - 0x80000001) * 4;
 
 #ifdef COMPILER_MSVC64
         __cpuid((int *)(d + (i - 0x80000001) * 4), i);
 #else
+        uint32 *t = d + (i - 0x80000001) * 4;
+
         __asm
         {
 					mov	eax, i;
