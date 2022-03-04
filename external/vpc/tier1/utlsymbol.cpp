@@ -262,7 +262,7 @@ CUtlSymbol CUtlSymbolTable::AddString(const char *pString) {
       lenString + sizeof(hashDecoration_t);  // and with its hash decoration
   // make sure that all strings are aligned on 2-byte boundaries so the hashes
   // will read correctly
-  COMPILE_TIME_ASSERT(sizeof(hashDecoration_t) == 2);
+  static_assert(sizeof(hashDecoration_t) == 2);
   lenDecorated =
       (lenDecorated + 1) & (~0x01);  // round up to nearest multiple of 2
 

@@ -244,7 +244,7 @@ class CFixedBudgetMemoryPool {
  public:
   CFixedBudgetMemoryPool() {
     m_pBase = m_pLimit = 0;
-    COMPILE_TIME_ASSERT(ITEM_SIZE % 4 == 0);
+    static_assert(ITEM_SIZE % 4 == 0);
   }
 
   bool Owns(void *p) { return (p >= m_pBase && p < m_pLimit); }
@@ -465,8 +465,8 @@ template <int ITEM_SIZE, int ALIGNMENT, int CHUNK_SIZE, class CAllocator,
 inline CAlignedMemPool<ITEM_SIZE, ALIGNMENT, CHUNK_SIZE, CAllocator, GROWMODE,
                        COMPACT_THRESHOLD>::CAlignedMemPool()
     : m_pFirstFree(0), m_nFree(0), m_TimeLastCompact(0) {
-  COMPILE_TIME_ASSERT(sizeof(FreeBlock_t) >= BLOCK_SIZE);
-  COMPILE_TIME_ASSERT(ALIGN_VALUE(sizeof(FreeBlock_t), ALIGNMENT) ==
+  static_assert(sizeof(FreeBlock_t) >= BLOCK_SIZE);
+  static_assert(ALIGN_VALUE(sizeof(FreeBlock_t), ALIGNMENT) ==
                       sizeof(FreeBlock_t));
 }
 

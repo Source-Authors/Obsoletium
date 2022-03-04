@@ -276,7 +276,7 @@ uint64_t makeoid_raw(const char *pData, int nDataLen, EOIDType type,
   MD5Final(hash, &md5Context);
 
   // Take lower 32bits of md5
-  COMPILE_TIME_ASSERT(MD5_DIGEST_LENGTH >= sizeof(uint32_t));
+  static_assert(MD5_DIGEST_LENGTH >= sizeof(uint32_t));
   uint32_t lowerHash = 0;
   memcpy(&lowerHash, hash, sizeof(lowerHash));
 

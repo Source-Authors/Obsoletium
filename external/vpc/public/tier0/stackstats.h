@@ -107,7 +107,7 @@ class CCallStackStatsGatherer_StatMutexPool {
  public:
   void LockEntry(uint32 iEntryIndex, bool bLock) {
 #if defined(ENABLE_STACK_STATS_GATHERING)
-    COMPILE_TIME_ASSERT((SHAREDENTRYMUTEXES & (SHAREDENTRYMUTEXES - 1)) ==
+    static_assert((SHAREDENTRYMUTEXES & (SHAREDENTRYMUTEXES - 1)) ==
                         0);  // must be a power of 2
 
     if (bLock) {
@@ -555,7 +555,7 @@ CCallStackStatsGatherer_StructAccessor_Base<STATSTRUCT> CCallStackStatsGatherer<
     STATMUTEXHANDLER,
     TEMPLATIZEDMEMORYALLOCATOR>::GetEntry(const CCallStackStorage &PushStack) {
 #if defined(ENABLE_STACK_STATS_GATHERING)
-  COMPILE_TIME_ASSERT(CAPTUREDCALLSTACKLENGTH <= ARRAYSIZE(PushStack.pStack));
+  static_assert(CAPTUREDCALLSTACKLENGTH <= ARRAYSIZE(PushStack.pStack));
   return GetEntry(GetEntryIndex(PushStack.pStack, PushStack.iValidEntries));
 #else
   return CCallStackStatsGatherer_StructAccessor_Base<STATSTRUCT>(Standardized(),
@@ -571,7 +571,7 @@ uint32 CCallStackStatsGatherer<STATSTRUCT, CAPTUREDCALLSTACKLENGTH,
                                TEMPLATIZEDMEMORYALLOCATOR>::
     GetEntryIndex(const CCallStackStorage &PushStack) {
 #if defined(ENABLE_STACK_STATS_GATHERING)
-  COMPILE_TIME_ASSERT(CAPTUREDCALLSTACKLENGTH <= ARRAYSIZE(PushStack.pStack));
+  static_assert(CAPTUREDCALLSTACKLENGTH <= ARRAYSIZE(PushStack.pStack));
   return GetEntryIndex(PushStack.pStack, PushStack.iValidEntries);
 #else
   return 0;

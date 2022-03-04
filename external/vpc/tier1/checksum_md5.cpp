@@ -229,7 +229,7 @@ void MD5Final(unsigned char digest[MD5_DIGEST_LENGTH], MD5Context_t *ctx) {
   MD5Transform(ctx->buf, (unsigned int *)ctx->in);
   // byteReverse((unsigned char *) ctx->buf, 4);
 #if (PLAT_BIG_ENDIAN == 1)
-  COMPILE_TIME_ASSERT(MD5_DIGEST_LENGTH == (sizeof(unsigned int) * 4));
+  static_assert(MD5_DIGEST_LENGTH == (sizeof(unsigned int) * 4));
   ((unsigned int *)digest)[0] = LittleDWord(ctx->buf[0]);
   ((unsigned int *)digest)[1] = LittleDWord(ctx->buf[1]);
   ((unsigned int *)digest)[2] = LittleDWord(ctx->buf[2]);

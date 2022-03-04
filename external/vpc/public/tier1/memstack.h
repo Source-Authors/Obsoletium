@@ -143,7 +143,7 @@ class CUtlMemoryStack {
   CUtlMemoryStack(int nGrowSize = 0, int nInitSize = 0) {
     m_MemoryStack.Init("CUtlMemoryStack", MAX_SIZE * sizeof(T),
                        COMMIT_SIZE * sizeof(T), INITIAL_COMMIT * sizeof(T), 4);
-    COMPILE_TIME_ASSERT(sizeof(T) % 4 == 0);
+    static_assert(sizeof(T) % 4 == 0);
   }
   CUtlMemoryStack(T *pMemory, int numElements) { Assert(0); }
 
@@ -154,7 +154,7 @@ class CUtlMemoryStack {
   }
 
   // Specify the invalid ('null') index that we'll only return on failure
-  static const I INVALID_INDEX = (I)-1;  // For use with COMPILE_TIME_ASSERT
+  static const I INVALID_INDEX = (I)-1;  // For use with static_assert
   static I InvalidIndex() { return INVALID_INDEX; }
 
   class Iterator_t {

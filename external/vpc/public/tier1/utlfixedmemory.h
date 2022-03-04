@@ -115,7 +115,7 @@ class CUtlFixedMemory {
   bool IsIdxValid(int i) const;
 
   // Specify the invalid ('null') index that we'll only return on failure
-  static const int INVALID_INDEX = 0;  // For use with COMPILE_TIME_ASSERT
+  static const int INVALID_INDEX = 0;  // For use with static_assert
   static int InvalidIndex() { return INVALID_INDEX; }
 
   // Size

@@ -291,8 +291,8 @@ inline bool CUtlMultiList<T, I>::IndexInRange(int index)  // Static method
   // Do a couple of static checks here: the invalid index should be (I)~0 given
   // how we use m_MaxElementIndex, and 'I' should be unsigned (to avoid signed
   // arithmetic errors for plausibly exhaustible ranges).
-  COMPILE_TIME_ASSERT((I)M::INVALID_INDEX == (I)~0);
-  COMPILE_TIME_ASSERT((sizeof(I) > 2) || (((I)-1) > 0));
+  static_assert((I)M::INVALID_INDEX == (I)~0);
+  static_assert((sizeof(I) > 2) || (((I)-1) > 0));
 
   return (((I)index == index) && ((I)index != InvalidIndex()));
 }

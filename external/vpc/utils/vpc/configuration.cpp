@@ -29,7 +29,7 @@ static KeywordName_t s_KeywordNameTable[] = {
 };
 
 const char *CVPC::KeywordToName(configKeyword_e keyword) {
-  COMPILE_TIME_ASSERT(ARRAYSIZE(s_KeywordNameTable) == KEYWORD_MAX);
+  static_assert(ARRAYSIZE(s_KeywordNameTable) == KEYWORD_MAX);
 
   if (keyword == KEYWORD_UNKNOWN) {
     return "???";
@@ -39,11 +39,11 @@ const char *CVPC::KeywordToName(configKeyword_e keyword) {
 }
 
 configKeyword_e CVPC::NameToKeyword(const char *pKeywordName) {
-  COMPILE_TIME_ASSERT(ARRAYSIZE(s_KeywordNameTable) == KEYWORD_MAX);
+  static_assert(ARRAYSIZE(s_KeywordNameTable) == KEYWORD_MAX);
 
-  for (int i = 0; i < ARRAYSIZE(s_KeywordNameTable); i++) {
-    if (!V_stricmp(pKeywordName, s_KeywordNameTable[i].m_pName)) {
-      return s_KeywordNameTable[i].m_Keyword;
+  for (auto &kn : s_KeywordNameTable) {
+    if (!V_stricmp(pKeywordName, kn.m_pName)) {
+      return kn.m_Keyword;
     }
   }
 
@@ -351,8 +351,8 @@ void VPC_Keyword_FolderConfiguration(folderConfig_t *pFolderConfig) {
 
   // just read past all the tokens.  We'll reparse this later, per file.
   //	it would be cool to parse just once, but leaf code in the project
-  //generator expects the parser to be in the right position and parses
-  //directly.
+  // generator expects the parser to be in the right position and parses
+  // directly.
   while (1) {
     g_pVPC->GetScript().SkipToValidToken();
 

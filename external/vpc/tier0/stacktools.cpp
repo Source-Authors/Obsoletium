@@ -1407,7 +1407,7 @@ int TranslateStackInfo(const void *const *pCallStack, int iCallStackCount,
   if (iOutBufferSize >
       (iEncodedSize + (int)cControlLength + 2))  //+2 for ']' and null term
   {
-    COMPILE_TIME_ASSERT(TSISTYLEFLAG_LAST <
+    static_assert(TSISTYLEFLAG_LAST <
                         (1 << 8));  // need to update the encoder/decoder to use
                                     // more than a byte for style flags
 
