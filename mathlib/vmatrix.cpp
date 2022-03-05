@@ -1250,7 +1250,7 @@ void MatrixBuildOrtho( VMatrix& dst, double left, double top, double right, doub
 				0.0f,						0.0f,						0.0f,								1.0f );
 }
 
-void MatrixBuildPerspectiveZRange( VMatrix& dst, double flZNear, double flZFar )
+void MatrixBuildPerspectiveZRange( VMatrix& dst, float flZNear, float flZFar )
 {
 	dst.m[2][0] = 0.0f;
 	dst.m[2][1] = 0.0f;
@@ -1258,10 +1258,10 @@ void MatrixBuildPerspectiveZRange( VMatrix& dst, double flZNear, double flZFar )
 	dst.m[2][3] = flZNear * flZFar / ( flZNear - flZFar );
 }
 
-void MatrixBuildPerspectiveX( VMatrix& dst, double flFovX, double flAspect, double flZNear, double flZFar )
+void MatrixBuildPerspectiveX( VMatrix& dst, float flFovX, float flAspect, float flZNear, float flZFar )
 {
 	float flWidthScale = 1.0f / tanf( flFovX * M_PI_F / 360.0f );
-	double flHeightScale = flAspect * flWidthScale;
+	float flHeightScale = flAspect * flWidthScale;
 	dst.Init(   flWidthScale,				0.0f,							0.0f,										0.0f,
 				0.0f,						flHeightScale,					0.0f,										0.0f,
 				0.0f,						0.0f,							0.0f,										0.0f,
