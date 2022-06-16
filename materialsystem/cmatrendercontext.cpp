@@ -1479,7 +1479,7 @@ void CMatRenderContext::GetMatrix( MaterialMatrixMode_t matrixMode, matrix3x4_t 
 
 void CMatRenderContext::SyncMatrices()
 {
-	if ( !ShouldValidateMatrices() && AllowLazyMatrixSync() )
+	if ( !ShouldValidateMatrices() && AllowLazyMatrixSync() ) //-V560
 	{
 		for( int i = 0; i < NUM_MATRIX_MODES; i++ )
 		{
@@ -1537,7 +1537,7 @@ void CMatRenderContext::ForceSyncMatrix( MaterialMatrixMode_t mode )
 
 void CMatRenderContext::SyncMatrix( MaterialMatrixMode_t mode )
 {
-	if ( !ShouldValidateMatrices() && AllowLazyMatrixSync() )
+	if ( !ShouldValidateMatrices() && AllowLazyMatrixSync() ) //-V560
 	{
 		ForceSyncMatrix( mode );
 	}
