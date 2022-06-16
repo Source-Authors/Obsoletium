@@ -10,15 +10,6 @@ $Macro OUTLIBDIR	"$LIBCOMMON"
 
 $include "$SRCDIR\vpc_scripts\source_lib_base.vpc"
 
-$Configuration
-{
-	$Compiler
-	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\dx9sdk\include"			[$WINDOWS]
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\x360xdk\include\win32\vs2005" [$WINDOWS]
-	}
-}
-
 $Project "replay_common"
 {
 	$Folder	"Source Files"

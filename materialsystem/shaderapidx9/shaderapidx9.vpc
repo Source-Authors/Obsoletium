@@ -16,7 +16,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\dx9sdk\include;$SRCDIR\thirdparty;$SRCDIR\thirdparty\DirectXMath\Inc" [$WINDOWS && !$GL]
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\thirdparty;$SRCDIR\thirdparty\DirectXMath\Inc" [$WINDOWS && !$GL]
 		$AdditionalIncludeDirectories	"$BASE;..\"
 		$PreprocessorDefinitions		"$BASE;SHADERAPIDX9;SHADER_DLL_EXPORT;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead"
 		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [$WINDOWS && !$GL]

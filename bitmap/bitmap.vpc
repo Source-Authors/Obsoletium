@@ -12,8 +12,6 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\dx9sdk\include"					[$WINDOWS]
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\x360xdk\include\win32\vs2005"	[$WINDOWS]
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\thirdparty\stb"
 
 		// dimhotepus: Exclude nvtc & ATI compress, as proprietary.
