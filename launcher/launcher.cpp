@@ -834,31 +834,31 @@ int MessageBox( HWND hWnd, const char *message, const char *header, unsigned uTy
 //-----------------------------------------------------------------------------
 // Allow only one windowed source app to run at a time
 //-----------------------------------------------------------------------------
-#ifdef WIN32
-HANDLE g_hMutex = NULL;
-#elif defined(POSIX)
+#if defined(POSIX)
 int g_lockfd = -1;
 char g_lockFilename[MAX_PATH];
 #endif
-bool GrabSourceMutex()
+bool GrabSourceMutex(
+#ifdef WIN32
+	HANDLE &hMutex
+#endif
+)
 {
 #ifdef WIN32
-	if ( IsPC() )
-	{
-		// don't allow more than one instance to run
-		g_hMutex = ::CreateMutex(NULL, FALSE, TEXT("hl2_singleton_mutex"));
+	// don't allow more than one instance to run
+	hMutex = ::CreateMutex(NULL, FALSE, TEXT("hl2_singleton_mutex"));
+	if (!hMutex) return false;
 
-		unsigned int waitResult = ::WaitForSingleObject(g_hMutex, 0);
+	unsigned int waitResult = ::WaitForSingleObject(hMutex, 0);
 
-		// Here, we have the mutex
-		if (waitResult == WAIT_OBJECT_0 || waitResult == WAIT_ABANDONED)
-			return true;
+	// Here, we have the mutex
+	if (waitResult == WAIT_OBJECT_0 || waitResult == WAIT_ABANDONED)
+		return true;
 
-		// couldn't get the mutex, we must be running another instance
-		::CloseHandle(g_hMutex);
+	// couldn't get the mutex, we must be running another instance
+	::CloseHandle(hMutex);
 
-		return false;
-	}
+	return false;
 #elif defined(POSIX)
 
 	// Under OSX use flock in /tmp/source_engine_<game>.lock, create the file if it doesn't exist
@@ -938,14 +938,18 @@ bool GrabSourceMutex()
 	return true;
 }
 
-void ReleaseSourceMutex()
+void ReleaseSourceMutex(
+#ifdef WIN32
+	HANDLE &hMutex
+#endif
+)
 {
 #ifdef WIN32
-	if ( IsPC() && g_hMutex )
+	if ( IsPC() && hMutex )
 	{
-		::ReleaseMutex( g_hMutex );
-		::CloseHandle( g_hMutex );
-		g_hMutex = NULL;
+		::ReleaseMutex( hMutex );
+		::CloseHandle( hMutex );
+		hMutex = NULL;
 	}
 #elif defined(POSIX)
 	if ( g_lockfd != -1 )
@@ -1284,6 +1288,8 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			Msg( "Warning! Failed to start Winsock via WSAStartup = 0x%x.\n", nError);
 		}
 	}
+
+	HANDLE hMutex = nullptr;
 #endif
 
 	// Run in text mode? (No graphics or sound).
@@ -1297,7 +1303,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	{
 		int retval = -1;
 		// Can only run one windowed source app at a time
-		if ( !GrabSourceMutex() )
+		if ( !GrabSourceMutex(hMutex) )
 		{
 			// Allow the user to explicitly say they want to be able to run multiple instances of the source mutex.
 			// Useful for side-by-side comparisons of different renderers.
@@ -1441,7 +1447,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 #endif
 
 	// Allow other source apps to run
-	ReleaseSourceMutex();
+	ReleaseSourceMutex(hMutex);
 
 #if defined( WIN32 )
 
