@@ -296,8 +296,8 @@ public:
 #endif
 
 	}
-	CUtlMemoryConservative( T* pMemory, int numElements )								{ Assert( 0 ); }
-	~CUtlMemoryConservative()								{ if ( m_pMemory ) free( m_pMemory ); }
+	CUtlMemoryConservative( T* pMemory, int numElements ) = delete;
+	~CUtlMemoryConservative()								{ free( m_pMemory ); }
 
 	// Can we use this index?
 	bool IsIdxValid( int i ) const							{ return ( IsDebug() ) ? ( i >= 0 && i < NumAllocated() ) : ( i >= 0 ); }
