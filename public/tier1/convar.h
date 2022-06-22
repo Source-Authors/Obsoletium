@@ -659,13 +659,13 @@ public:
 
 	virtual void CommandCallback( const CCommand &command )
 	{
-		Assert( m_pOwner && m_Func );
+		Assert( m_pOwner && m_Func != nullptr );
 		(m_pOwner->*m_Func)( command );
 	}
 
 	virtual int  CommandCompletionCallback( const char *pPartial, CUtlVector< CUtlString > &commands )
 	{
-		Assert( m_pOwner && m_CompletionFunc );
+		Assert( m_pOwner && m_CompletionFunc != nullptr );
 		return (m_pOwner->*m_CompletionFunc)( pPartial, commands );
 	}
 
