@@ -345,6 +345,26 @@ void MiniDumpFunction( unsigned int nExceptionCode, EXCEPTION_POINTERS *pExcepti
 #endif
 }
 
+class ScopedSeTranslator
+{
+public:
+	ScopedSeTranslator( _se_translator_function newTranslator ) noexcept
+		: m_oldTranslator{ _set_se_translator( newTranslator ) }
+	{
+	}
+	ScopedSeTranslator(ScopedSeTranslator&) = delete;
+	ScopedSeTranslator(ScopedSeTranslator&&) = delete;
+	ScopedSeTranslator& operator=(ScopedSeTranslator&) = delete;
+	ScopedSeTranslator& operator=(ScopedSeTranslator&&) = delete;
+	~ScopedSeTranslator() noexcept
+	{
+		_set_se_translator( m_oldTranslator );
+	}
+
+private:
+	const _se_translator_function m_oldTranslator;
+};
+
 extern "C" __declspec(dllexport) int DedicatedMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
 	SetAppInstance( hInstance );
@@ -368,22 +388,16 @@ extern "C" __declspec(dllexport) int DedicatedMain( HINSTANCE hInstance, HINSTAN
 
 	if ( !Plat_IsInDebugSession() && !CommandLine()->FindParm( "-nominidumps") )
 	{
-		const auto old_translator = _set_se_translator( MiniDumpFunction );
+		ScopedSeTranslator seTranslator( MiniDumpFunction );
 
-		int rc = -1;
 		try  // this try block allows the SE translator to work
 		{
-			rc = main( args->count(), args->values() );
+			return main( args->count(), args->values() );
 		}
 		catch( ... )
 		{
-			_set_se_translator( old_translator );
 			return -1;
 		}
-
-		_set_se_translator( old_translator );
-
-		return rc;
 	}
 
 	return main( args->count(), args->values() );
