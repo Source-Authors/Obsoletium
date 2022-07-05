@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // Defines the entry point for the application.
 //
@@ -89,14 +89,6 @@ int MessageBox( HWND hWnd, const char *message, const char *header, unsigned uTy
 extern void* CreateSDLMgr();
 #endif
 
-//-----------------------------------------------------------------------------
-// Modules...
-//-----------------------------------------------------------------------------
-static IEngineAPI *g_pEngineAPI;
-static IHammer *g_pHammer;
-
-bool g_bTextMode = false;
-
 // copied from sys.h
 struct FileAssociationInfo
 {
@@ -104,7 +96,7 @@ struct FileAssociationInfo
 	char const  *command_to_issue;
 };
 
-static FileAssociationInfo g_FileAssociations[] =
+static const FileAssociationInfo g_FileAssociations[] =
 {
 	{ ".dem", "playdemo" },
 	{ ".sav", "load" },
@@ -509,8 +501,12 @@ void TryToLoadSteamOverlayDLL()
 class CSourceAppSystemGroup : public CSteamAppSystemGroup
 {
 public:
-  CSourceAppSystemGroup(  char (&baseDirectory)[MAX_PATH]  )
-     : m_pReslistgenerator(CreateReslistGenerator()), m_bEditMode(false)
+  CSourceAppSystemGroup(  char (&baseDirectory)[MAX_PATH], bool bTextMode )
+		: m_pEngineApi(nullptr),
+		m_pHammer(nullptr),
+		m_pReslistgenerator(CreateReslistGenerator()),
+		m_bEditMode(false),
+		m_bTextMode(false)
 	{
 		Q_strcpy( m_szBaseDir, baseDirectory );
 	}
@@ -533,8 +529,11 @@ private:
 	const char *DetermineDefaultGame();
 
 	char m_szBaseDir[_MAX_PATH];
+	IEngineAPI *m_pEngineApi;
+	IHammer *m_pHammer;
 	IResListGenerator *m_pReslistgenerator;
 	bool m_bEditMode;
+	bool m_bTextMode;
 };
 
 
@@ -641,7 +640,7 @@ bool CSourceAppSystemGroup::Create()
 	if ( !pMaterialSystem )
 		return false;
 
-	g_pEngineAPI = (IEngineAPI*)FindSystem( VENGINE_LAUNCHER_API_VERSION );
+	m_pEngineApi = (IEngineAPI*)FindSystem( VENGINE_LAUNCHER_API_VERSION );
 
 	// Load the hammer DLL if we're in editor mode
 #if defined( _WIN32 ) && defined( STAGING_ONLY )
@@ -747,16 +746,16 @@ bool CSourceAppSystemGroup::PreInit()
 	info.m_pInitialMod = DetermineDefaultMod();
 	info.m_pInitialGame = DetermineDefaultGame();
 	info.m_pParentAppSystemGroup = this;
-	info.m_bTextMode = g_bTextMode;
+	info.m_bTextMode = m_bTextMode;
 
-	g_pEngineAPI->SetStartupInfo( info );
+	m_pEngineApi->SetStartupInfo( info );
 
 	return true;
 }
 
 int CSourceAppSystemGroup::Main()
 {
-	return g_pEngineAPI->Run();
+	return m_pEngineApi->Run();
 }
 
 void CSourceAppSystemGroup::PostShutdown()
@@ -780,9 +779,9 @@ void CSourceAppSystemGroup::PostShutdown()
 
 void CSourceAppSystemGroup::Destroy() 
 {
-	g_pEngineAPI = NULL;
+	m_pEngineApi = NULL;
 	g_pMaterialSystem = NULL;
-	g_pHammer = NULL;
+	m_pHammer = NULL;
 
 #ifdef WIN32
 	CoUninitialize();
@@ -806,7 +805,7 @@ const char *CSourceAppSystemGroup::DetermineDefaultMod()
 	{   		 
 		return CommandLine()->ParmValue( "-game", DEFAULT_HL2_GAMEDIR );
 	}
-	return g_pHammer->GetDefaultMod();
+	return m_pHammer->GetDefaultMod();
 }
 
 const char *CSourceAppSystemGroup::DetermineDefaultGame()
@@ -815,7 +814,7 @@ const char *CSourceAppSystemGroup::DetermineDefaultGame()
 	{
 		return CommandLine()->ParmValue( "-defaultgamedir", DEFAULT_HL2_GAMEDIR );
 	}
-	return g_pHammer->GetDefaultGame();
+	return m_pHammer->GetDefaultGame();
 }
 
 //-----------------------------------------------------------------------------
@@ -1013,7 +1012,7 @@ static char const *Cmd_TranslateFileAssociation(char const *param )
 	int c = ARRAYSIZE( g_FileAssociations );
 	for ( int i = 0; i < c; i++ )
 	{
-		FileAssociationInfo& info = g_FileAssociations[ i ];
+		const FileAssociationInfo& info = g_FileAssociations[ i ];
 
 		if ( ! Q_strcmp( extension, info.extension ) && 
 			! CommandLine()->FindParm(CFmtStr( "+%s", info.command_to_issue ) ) )
@@ -1292,10 +1291,12 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	HANDLE hMutex = nullptr;
 #endif
 
+	bool bTextMode = false;
+
 	// Run in text mode? (No graphics or sound).
 	if ( CommandLine()->CheckParm( "-textmode" ) )
 	{
-		g_bTextMode = true;
+		bTextMode = true;
 		InitTextMode();
 	}
 #ifdef WIN32
@@ -1396,7 +1397,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	{
 		bRestart = false;
 
-		CSourceAppSystemGroup sourceSystems( baseDirectory );
+		CSourceAppSystemGroup sourceSystems( baseDirectory, bTextMode );
 		CSteamApplication steamApplication( &sourceSystems );
 		int nRetval = steamApplication.Run();
 		if ( steamApplication.GetErrorStage() == CSourceAppSystemGroup::INITIALIZATION )
