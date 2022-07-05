@@ -1803,7 +1803,7 @@ void Host_RecomputeSpeed_f( void )
 	ConMsg( "Recomputing clock speed...\n" );
 
 	CClockSpeedInit::Init();
-	ConMsg( "Clock speed: %.0f Mhz\n", CFastTimer::GetClockSpeed() / 1000000.0 );
+	ConMsg( "Clock speed: %.0f MHz\n", CFastTimer::GetClockSpeed() / 1000000.0 );
 }
 
 static ConCommand recompute_speed( "recompute_speed", Host_RecomputeSpeed_f, "Recomputes clock speed (for debugging purposes).", FCVAR_CHEAT );
@@ -3782,14 +3782,14 @@ void Host_InitProcessor( void )
 	const CPUInformation& pi = *GetCPUInformation();
 
 	// Compute Frequency in Mhz: 
-	char* szFrequencyDenomination = "Mhz";
+	char* szFrequencyDenomination = "MHz";
 	float fFrequency = pi.m_Speed / 1000000.0f;
 
 	// Adjust to Ghz if nessecary:
 	if( fFrequency > 1000.0f )
 	{
 		fFrequency /= 1000.0f;
-		szFrequencyDenomination = "Ghz";
+		szFrequencyDenomination = "GHz";
 	}
 
 	char szFeatureString[256];

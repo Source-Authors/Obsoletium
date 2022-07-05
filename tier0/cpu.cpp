@@ -313,9 +313,6 @@ static uint8 LogicalProcessorsPerPackage()
 
 	unsigned long unused, reg_ebx = 0;
 
-	if ( !HTSupported() ) 
-		return 1; 
-
 	if ( !cpuid(1,unused,reg_ebx,unused,unused) )
 		return 1;
 
