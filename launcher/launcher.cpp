@@ -14,8 +14,6 @@
 #include <shlwapi.h> // registry stuff
 #include <direct.h>
 
-#include <mmsystem.h>
-#pragma comment(lib, "winmm.lib")
 #elif defined ( LINUX ) || defined( OSX )
 	#define O_EXLOCK 0
 	#include <sys/types.h>
@@ -60,6 +58,7 @@
 #include "reslistgenerator.h"
 #include "tier1/fmtstr.h"
 #include "sourcevr/isourcevirtualreality.h"
+#include "scoped_timer_resolution.h"
 
 #define VERSION_SAFE_STEAM_API_INTERFACES
 #include "steam/steam_api.h"
@@ -1086,73 +1085,12 @@ static const char *BuildCommand()
 	return (const char *)build.Base();
 }
 
-
-// Changes minimum resolution for periodic timers and reverts back when
-// out of scope.
-//
-// "Prior to Windows 10, version 2004, this function affects a global Windows
-// setting.  For all processes Windows uses the lowest value (that is, highest
-// resolution) requested by any process.  Starting with Windows 10, version
-// 2004, this function no longer affects global timer resolution.  For processes
-// which call this function, Windows uses the lowest value (that is, highest
-// resolution) requested by any process.  For processes which have not called
-// this function, Windows does not guarantee a higher resolution than the
-// default system resolution.
-//
-// Starting with Windows 11, if a window-owning process becomes fully occluded,
-// minimized, or otherwise invisible or inaudible to the end user, Windows does
-// not guarantee a higher resolution than the default system resolution.  See
-// SetProcessInformation for more information on this behavior.
-//
-// Setting a higher resolution can improve the accuracy of time-out intervals in
-// wait functions.  However, it can also reduce overall system performance,
-// because the thread scheduler switches tasks more often.  High resolutions can
-// also prevent the CPU power management system from entering power-saving
-// modes.  Setting a higher resolution does not improve the accuracy of the
-// high-resolution performance counter."
-//
-// See
-// https://docs.microsoft.com/en-us/windows/win32/api/timeapi/nf-timeapi-timebeginperiod
-// dimhotepus: Set timer resolution in a single place.
-class ScopedTimerResolution {
- public:
-  // Changes minimum resolution for periodic timers. |resolution_ms| Minimum timers resolution in
-  // milliseconds to request.
-  explicit ScopedTimerResolution(std::chrono::milliseconds resolution_ms) noexcept
-      : m_resolutionMs{resolution_ms},
-        m_errorCode{::timeBeginPeriod(static_cast<unsigned>(resolution_ms.count()))} {
-    AssertMsg(IsSucceeded(), "Unable to set windows timer resolution.");
-  }
-
-  // Restores previous minimum timer resolution.
-  ~ScopedTimerResolution() noexcept {
-    if (IsSucceeded()) {
-      [[maybe_unused]] const bool isSucceeded{
-          ::timeEndPeriod(static_cast<unsigned>(m_resolutionMs.count())) == 0};
-      AssertMsg(isSucceeded, "Unable to restore windows timer resolution.");
-    }
-  }
-
-  // Is set minimum timers resolution succeeded?
-  [[nodiscard]] bool IsSucceeded() const noexcept { return m_errorCode == 0; }
-
- private:
-  // New minimum timer resolution in ms.
-  std::chrono::milliseconds m_resolutionMs;
-  // Minimum timer resolution creation error_code.
-  unsigned m_errorCode;
-};
-
 //-----------------------------------------------------------------------------
 // Purpose: The real entry point for the application
-// Input  : hInstance - 
-//			hPrevInstance - 
-//			lpCmdLine - 
-//			nCmdShow - 
 // Output : int APIENTRY
 //-----------------------------------------------------------------------------
 #ifdef WIN32
-DLL_EXPORT int LauncherMain( HINSTANCE hInstance, HINSTANCE , LPSTR lpCmdLine, int nCmdShow )
+DLL_EXPORT int LauncherMain( HINSTANCE hInstance, HINSTANCE , LPSTR lpCmdLine, int )
 #else
 DLL_EXPORT int LauncherMain( int argc, char **argv )
 #endif
