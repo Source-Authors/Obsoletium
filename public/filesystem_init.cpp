@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 //=============================================================================
 
@@ -156,10 +156,10 @@ public:
 	}
 
 private:
-	bool m_bRestoreOriginalValue;
 	const char *m_pVarName;
-	bool m_bExisted;
 	CUtlVector<char> m_OriginalValue;
+	bool m_bRestoreOriginalValue;
+	bool m_bExisted;
 };
 
 
