@@ -781,7 +781,6 @@ void CSourceAppSystemGroup::Destroy()
 	m_pEngineApi = NULL;
 	g_pMaterialSystem = NULL;
 	m_pHammer = NULL;
-	m_pReslistgenerator = NULL;
 
 #ifdef WIN32
 	CoUninitialize();
