@@ -93,6 +93,17 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 
   char user_error[1024];
 
+  // Disable loading DLLs from current directory to protect against DLL preload
+  // attacks.
+  if (!::SetDllDirectoryA("")) {
+    const auto rc = ::GetLastError();
+    _snprintf_s(user_error, _TRUNCATE,
+                "Please contact publisher, very likely bug is detected.\n\n"
+                "Unable to remove current directory from DLL search order");
+
+    return ShowErrorBoxAndExitWithCode(user_error, rc);
+  }
+
   // STEAM OK ... filesystem not mounted yet.
   HMODULE launcher_dll{::LoadLibraryExA(launcher_dll_path, nullptr,
                                         LOAD_WITH_ALTERED_SEARCH_PATH)};
@@ -109,20 +120,22 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 
   using LauncherMainFunction = int (*)(HINSTANCE, HINSTANCE, LPSTR, int);
 
+  constexpr char launcher_main_function_name[]{"LauncherMain"};
+
   const auto launcher_main = reinterpret_cast<LauncherMainFunction>(
-      ::GetProcAddress(launcher_dll, "LauncherMain"));
+      ::GetProcAddress(launcher_dll, launcher_main_function_name));
   if (launcher_main) [[likely]] {
     const auto rc =
         launcher_main(instance, old_instance, cmd_line, window_flags);
 
     if (!::FreeLibrary(launcher_dll)) [[unlikely]] {
-      const auto free_error_code = ::GetLastError();
+      const auto rc = ::GetLastError();
       _snprintf_s(user_error, _TRUNCATE,
                   "Please contact publisher, very likely bug is detected.\n\n"
                   "Unable to unload the launcher DLL from %s",
                   launcher_dll_path);
 
-      return ShowErrorBoxAndExitWithCode(user_error, free_error_code);
+      return ShowErrorBoxAndExitWithCode(user_error, rc);
     }
 
     return rc;
@@ -130,11 +143,10 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 
   {
     const auto rc = ::GetLastError();
-    _snprintf_s(
-        user_error, _TRUNCATE,
-        "Please check game installed correctly.\n\nUnable to find LauncherMain "
-        "entry point in the launcher DLL %s",
-        launcher_dll_path);
+    _snprintf_s(user_error, _TRUNCATE,
+                "Please check game installed correctly.\n\nUnable to find %s "
+                "entry point in the launcher DLL %s",
+                launcher_main_function_name, launcher_dll_path);
 
     return ShowErrorBoxAndExitWithCode(user_error, rc);
   }
