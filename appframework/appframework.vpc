@@ -5,6 +5,9 @@
 //-----------------------------------------------------------------------------
 
 $macro SRCDIR		".."
+$Macro ZLIBSRCDIR		"$SRCDIR\thirdparty\zlib"
+$Macro ZLIBSRC2DIR		"$ZLIBSRCDIR\out"
+$Macro ZLIBOUTDIR		"$ZLIBSRCDIR\out\Release"
 
 $include "$SRCDIR\vpc_scripts\source_lib_base.vpc"
 
@@ -48,6 +51,6 @@ $Project "appframework"
 	$Folder	"Link Libraries"
 	{
 		$ImpLib togl [!$IS_LIB_PROJECT && $GL]
-		$Libexternal	"$LIBCOMMON/zlibstatic" [!$IS_LIB_PROJECT && $SDL]
+		$Libexternal	"$ZLIBOUTDIR/zlibstatic" [!$IS_LIB_PROJECT && $SDL]
 	}
 }

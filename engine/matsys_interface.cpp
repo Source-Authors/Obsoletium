@@ -44,7 +44,7 @@
 #endif
 
 #if defined( USE_SDL )
-#include "SDL2/include/SDL.h"
+#include "include/SDL3/SDL.h"
 #endif
 
 //X360TEMP

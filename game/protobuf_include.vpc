@@ -5,31 +5,32 @@
 //-----------------------------------------------------------------------------
 
 $MacroRequired "PLATFORM"
+$Macro PROTOBUFDIR "$SRCDIR\thirdparty\protobuf"
 
 $Project
 {
 	$Folder "Link Libraries" [!$VS2015]
 	{
-		$Libexternal $SRCDIR\thirdparty\protobuf-2.6.1\bin\osx32\libc++\libprotobuf [$OSX32]
-		$Libexternal $SRCDIR\thirdparty\protobuf-2.6.1\bin\linux32\libprotobuf [$LINUX32]
+		$Libexternal $PROTOBUFDIR\libprotobuf [$OSX32]
+		$Libexternal $PROTOBUFDIR\libprotobuf [$LINUX32]
 	}
 
 	$Folder "Link Libraries" [$VS2015]
 	{
-		$File "$SRCDIR\lib\common\protobuf-2.6.1\win32\release\libprotobuf.lib" [$WIN32]
+		$File "$PROTOBUFDIR\vsprojects\Release\libprotobuf.lib" [$WIN32]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$SRCDIR\lib\common\protobuf-2.6.1\win32\debug\libprotobuf.lib" [$WIN32]
+		$File "$PROTOBUFDIR\vsprojects\Debug\libprotobuf.lib" [$WIN32]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}
 		
-		$File "$SRCDIR\lib\common\protobuf-2.6.1\x64\release\libprotobuf.lib" [$WIN64]
+		$File "$PROTOBUFDIR\vsprojects\x64\Release\libprotobuf.lib" [$WIN64]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$SRCDIR\lib\common\protobuf-2.6.1\x64\debug\libprotobuf.lib" [$WIN64]
+		$File "$PROTOBUFDIR\vsprojects\x64\Debug\libprotobuf.lib" [$WIN64]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}

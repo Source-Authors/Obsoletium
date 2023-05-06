@@ -10,6 +10,17 @@
 
 $macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro LIBBZSRCDIR		"$SRCDIR\thirdparty\bzip2"
+$Macro LIBBZOUTDIR		"$LIBBZSRCDIR"
+$Macro LIBJPEGSRCDIR	"$SRCDIR\thirdparty\libjpeg-turbo"
+$Macro LIBJPEGSRC2DIR	"$LIBJPEGSRCDIR\out"
+$Macro LIBJPEGOUTDIR	"$LIBJPEGSRCDIR\out\Release"
+$Macro LIBPNGSRCDIR		"$SRCDIR\thirdparty\libpng"
+$Macro LIBPNGSRC2DIR	"$LIBPNGSRCDIR\out"
+$Macro LIBPNGOUTDIR		"$LIBPNGSRCDIR\out\Release"
+$Macro ZLIBSRCDIR		"$SRCDIR\thirdparty\zlib"
+$Macro ZLIBSRC2DIR		"$ZLIBSRCDIR\out"
+$Macro ZLIBOUTDIR		"$ZLIBSRCDIR\out\Release"
 
 // NOTE:  We don't want to include source_replay.vpc here.  The only purpose
 // REPLAY_ENABLED // serves in this project is for includes like netmessages.h
@@ -21,7 +32,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out;$SRCDIR\thirdparty\zlib;$SRCDIR\thirdparty\zlib\out"
+		$AdditionalIncludeDirectories	"$BASE;$LIBJPEGSRCDIR;$LIBJPEGSRC2DIR;$LIBJPEGOUTDIR;$ZLIBSRCDIR;$ZLIBOUTDIR;$LIBPNGSRCDIR;$LIBPNGSRC2DIR;$LIBPNGOUTDIR"
 		// REPLAY_ENABLED is set here for netmessages.h
 		$PreprocessorDefinitions		"$BASE;REPLAY_DLL;REPLAY_ENABLED"
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
@@ -191,14 +202,14 @@ $Project "replay"
 		$Lib	mathlib
 		$Lib	bitmap
 		$Lib	vtf
-		$Lib	"$LIBCOMMON/libbz2"
 		$Lib	"$LIBCOMMON/lzma"
 		$Lib	"$LIBCOMMON/replay_common"
 		$Lib	"$LIBCOMMON/libcurl" [$WIN32&&!$VS2015]
-
-		$Libexternal	"$LIBCOMMON/jpeg-static" [!$DEDICATED]
-		$Libexternal	"$LIBCOMMON/libpng16" [!$DEDICATED]
-		$Libexternal	"$LIBCOMMON/zlibstatic" [!$DEDICATED]
+		
+		$Libexternal	"$LIBBZOUTDIR/libbz2"
+		$Libexternal	"$LIBPNGOUTDIR/libpng16_static" [!$DEDICATED]
+		$Libexternal	"$LIBJPEGOUTDIR/jpeg-static" [!$DEDICATED]
+		$Libexternal	"$ZLIBOUTDIR/zlibstatic" [!$DEDICATED]
 
 		$Libexternal	"$LIBCOMMON/libcrypto" [$OSXALL]
 		$Libexternal 	"$SRCDIR/lib/common/$(CRYPTOPPDIR)/libcrypto" [$LINUXALL]

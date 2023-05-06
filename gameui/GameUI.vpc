@@ -6,6 +6,17 @@
 
 $macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro LIBJPEGSRCDIR	"$SRCDIR\thirdparty\libjpeg-turbo"
+$Macro LIBJPEGSRC2DIR	"$LIBJPEGSRCDIR\out"
+$Macro LIBJPEGOUTDIR	"$LIBJPEGSRCDIR\out\Release"
+$Macro LIBPNGSRCDIR		"$SRCDIR\thirdparty\libpng"
+$Macro LIBPNGSRC2DIR	"$LIBPNGSRCDIR\out"
+$Macro LIBPNGOUTDIR		"$LIBPNGSRCDIR\out\Release"
+$Macro SDL3SRCDIR		"$SRCDIR\thirdparty\SDL"
+$Macro SDL3OUTDIR		"$SDL3SRCDIR\out\Release"
+$Macro ZLIBSRCDIR		"$SRCDIR\thirdparty\zlib"
+$Macro ZLIBSRC2DIR		"$ZLIBSRCDIR\out"
+$Macro ZLIBOUTDIR		"$ZLIBSRCDIR\out\Release"
 
 $include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 $Include "$SRCDIR\vpc_scripts\source_saxxyawards.vpc"
@@ -15,7 +26,11 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;.\;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls;$SRCDIR\common\GameUI;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out;$SRCDIR\thirdparty\zlib;$SRCDIR\thirdparty\zlib\out"
+		$AdditionalIncludeDirectories	"$BASE;.\;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls;$SRCDIR\common\GameUI"
+		$AdditionalIncludeDirectories	"$BASE;$LIBJPEGSRCDIR;$LIBJPEGSRC2DIR;$LIBJPEGOUTDIR"
+		$AdditionalIncludeDirectories	"$BASE;$LIBPNGSRCDIR;$LIBPNGSRC2DIR;$LIBPNGOUTDIR"
+		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include"	[$SDL]
+		$AdditionalIncludeDirectories	"$BASE;$ZLIBSRCDIR;$ZLIBSRC2DIR;$ZLIBOUTDIR"
 		$PreprocessorDefinitions		"$BASE;GAMEUI_EXPORTS;VERSION_SAFE_STEAM_API_INTERFACES"
 	}
 
@@ -25,6 +40,16 @@ $Configuration
 		$SystemLibraries				"iconv;z" [$OSXALL]	
 		$SystemLibraries				"rt" [$LINUXALL && !$DEDICATED]
 		$GCC_ExtraLinkerFlags			"-L/usr/lib32 -L/usr/lib" [$LINUXALL && !$DEDICATED]
+	}
+
+	$PostBuildEvent [!$ANALYZE && $SDL]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
+							"COPY $SDL3OUTDIR\SDL3.dll $OUTBINDIR\SDL3.dll" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $SDL3OUTDIR\SDL3.pdb COPY $SDL3OUTDIR\SDL3.pdb $OUTBINDIR\SDL3.pdb" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"$BASE"
 	}
 }
 
@@ -235,9 +260,9 @@ $Project "GameUI"
 
 		$ImpLib	steam_api  [!$NO_STEAM]
 
-		$Libexternal	"$LIBCOMMON/jpeg-static" [!$DEDICATED]
-		$Libexternal	"$LIBCOMMON/libpng16" [!$DEDICATED]
-		$Libexternal	"$LIBCOMMON/zlibstatic" [!$DEDICATED]
-		$Libexternal	"$LIBCOMMON/SDL2" [$SDL]
+		$Libexternal	"$LIBPNGOUTDIR/libpng16_static" [!$DEDICATED]
+		$Libexternal	"$LIBJPEGOUTDIR/jpeg-static" [!$DEDICATED]
+		$Libexternal	"$SDL3OUTDIR/SDL3" [$SDL]
+		$Libexternal	"$ZLIBOUTDIR/zlibstatic" [!$DEDICATED]
 	}
 }

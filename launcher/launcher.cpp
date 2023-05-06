@@ -64,7 +64,7 @@
 #include "steam/steam_api.h"
 
 #if defined( USE_SDL )
-#include "SDL2/include/SDL.h"
+#include "include/SDL3/SDL.h"
 
 #if !defined( _WIN32 )
 #define MB_OK 			0x00000001

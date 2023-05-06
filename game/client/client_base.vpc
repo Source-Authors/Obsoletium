@@ -6,6 +6,9 @@
 
 $Macro OUTBINNAME	"client"
 $Macro OUTBINDIR	"$SRCDIR\..\game\$GAMENAME\bin"
+$Macro ZLIBSRCDIR		"$SRCDIR\thirdparty\zlib"
+$Macro ZLIBSRC2DIR		"$ZLIBSRCDIR\out"
+$Macro ZLIBOUTDIR		"$ZLIBSRCDIR\out\Release"
 // It's important to include $GAMENAME in the generated_proto directory
 // to avoid race conditions when multiple games are in one solution.
 $Macro GENERATED_PROTO_DIR	"$SRCDIR\game\client\generated_proto_$GAMENAME"
@@ -54,7 +57,7 @@ $Configuration
 
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	".\;$BASE;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls;$SRCDIR\game\shared;.\game_controls;$SRCDIR\thirdparty\sixensesdk\include"
+		$AdditionalIncludeDirectories	".\;$BASE;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls;$SRCDIR\game\shared;.\game_controls"
 		$PreprocessorDefinitions		"$BASE;NO_STRING_T;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead" 
 		$PreprocessorDefinitions		"$BASE;fopen=dont_use_fopen" [$WIN32]
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY;" [$LINUXALL]
@@ -1256,7 +1259,7 @@ $Project
 		
 		$Libexternal $LIBCOMMON/libcrypto [$OSXALL]
 		$Libexternal "$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL]
-		$Libexternal	"$LIBCOMMON/zlibstatic"
+		$Libexternal	"$ZLIBOUTDIR/zlibstatic"
  	}
 
 }

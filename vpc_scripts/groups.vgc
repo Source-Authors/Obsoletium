@@ -44,6 +44,9 @@ $Group "shaders"
 
 $Group "ShaderCompile"
 {
+	"dx_proxy_dx9_v00_pc"
+	"dx_proxy_dx9_v30_pc"
+	"dx_proxy_dx10_v00_pc"
 	"filesystem_stdio"
 	"shadercompile_dll"
 	"shadercompile_launcher"
@@ -169,6 +172,7 @@ $Group "game"
 	"server"
 	"serverbrowser"
 	"shaderapidx9"
+	"shaderapidx10"
 	"shaderlib"
 	"simdtest"
 // dimhotepus: Exclude missed projects.

@@ -30,7 +30,7 @@
 #include "sourcevr/isourcevirtualreality.h"
 
 #if defined( USE_SDL )
-#include "SDL2/include/SDL.h"
+#include "include/SDL3/SDL.h"
 #endif
 
 #include "inetchannelinfo.h"

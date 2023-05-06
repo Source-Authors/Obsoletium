@@ -4,8 +4,10 @@
 //	Project Script
 //-----------------------------------------------------------------------------
 
-$macro SRCDIR		".."
+$Macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro SDL3SRCDIR	"$SRCDIR\thirdparty\SDL"
+$Macro SDL3OUTDIR	"$SDL3SRCDIR\out\Release"
 
 $include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -13,22 +15,22 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\thirdparty\SDL2"	[!$SDL] // If $SDL, then we already have this from source_video_base.vpc.
+		$AdditionalIncludeDirectories		"$BASE;$SDL3SRCDIR;$SDL3SRCDIR/include"	[!$SDL]
 		$PreprocessorDefinitions			"$BASE;VERSION_SAFE_STEAM_API_INTERFACES" 
 	}
 	$Linker
 	{
-		$SystemLibraries                                                        "iconv" [$OSXALL]
+		$SystemLibraries			"iconv" [$OSXALL]
 		$SystemFrameworks			"IOKit;Carbon;ForceFeedback"
 	}
 	$PostBuildEvent [!$ANALYZE]
 	{
 		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
-									"COPY $LIBCOMMON\SDL2.dll $OUTBINDIR\SDL2.dll" "\n"					\
-									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"COPY $LIBCOMMON\SDL2.pdb $OUTBINDIR\SDL2.pdb" "\n"					\
-									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"$BASE"
+							"COPY $SDL3OUTDIR\SDL3.dll $OUTBINDIR\SDL3.dll" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $SDL3OUTDIR\SDL3.pdb COPY $SDL3OUTDIR\SDL3.pdb $OUTBINDIR\SDL3.pdb" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"$BASE"
 	}
 }
 
@@ -58,6 +60,6 @@ $Project "inputsystem"
 		$Lib	tier1
 		$Lib	tier2
 		$Implib	"steam_api"						[($WIN32||$WIN64||$POSIX||$PS3)&&!$NO_STEAM]
-		$Libexternal	"$LIBCOMMON/SDL2"
+		$Libexternal	"$SDL3OUTDIR/SDL3"
 	}
 }

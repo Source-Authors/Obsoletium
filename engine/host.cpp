@@ -127,7 +127,7 @@
 #endif
 #if defined( LINUX )
 #include <locale.h>
-#include "SDL2/include/SDL.h"
+#include "include/SDL3/SDL.h"
 #endif
 // dimhotepus: Fix warnings about unpaired voice controls shutdown.
 #include "audio/private/voice_mixer_controls.h"

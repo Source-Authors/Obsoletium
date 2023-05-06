@@ -6,6 +6,8 @@
 
 $macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro SDL3SRCDIR	"$SRCDIR\thirdparty\SDL"
+$Macro SDL3OUTDIR	"$SDL3SRCDIR\out\Release"
 
 $include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -13,10 +15,10 @@ $Configuration
 {
 	$Compiler
 	{
+		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR/include"	[$SDL]
 		$PreprocessorDefinitions		"$BASE;BENCHMARK;VGUIMATSURFACE_DLL_EXPORT;GAMEUI_EXPORTS;DONT_PROTECT_FILEIO_FUNCTIONS;PROTECTED_THINGS_ENABLE"
 		$PreprocessorDefinitions		"$BASE;fopen=dont_use_fopen" [$WIN32]
 		$EnableC++Exceptions			"Yes (/EHsc)"
-//		$TreatWchar_tAsBuiltinType		"No"
 	}
 
 	$Linker
@@ -28,6 +30,16 @@ $Configuration
 		$AdditionalDependencies			"$BASE vgui_surfacelib.lib"	[$WINDOWS]
 		// dimhotepus: Exclude nvtc as proprietary.
 		$AdditionalDependencies			"$BASE nvtc.lib"	[$WIN32 && !$NO_NVTC]
+	}
+
+	$PostBuildEvent [!$ANALYZE && $SDL]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
+							"COPY $SDL3OUTDIR\SDL3.dll $OUTBINDIR\SDL3.dll" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $SDL3OUTDIR\SDL3.pdb COPY $SDL3OUTDIR\SDL3.pdb $OUTBINDIR\SDL3.pdb" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"$BASE"
 	}
 }
 
@@ -100,6 +112,6 @@ $Project "vguimatsurface"
 		$Lib		tier3
 		$Lib		vgui_controls
 		$Lib		vgui_surfacelib
-		$Libexternal	"$LIBCOMMON/SDL2" [$SDL]
+		$Libexternal	"$SDL3OUTDIR/SDL3" [$SDL]
 	}
 }

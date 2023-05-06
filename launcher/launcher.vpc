@@ -6,6 +6,8 @@
 
 $Macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro SDL3SRCDIR	"$SRCDIR\thirdparty\SDL"
+$Macro SDL3OUTDIR	"$SDL3SRCDIR\out\Release"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -13,11 +15,13 @@ $Configuration
 {
 	$General
 	{
-			$AdditionalProjectDependencies		"$BASE;togl" [$OSXALL]
+		$AdditionalProjectDependencies		"$BASE;togl" [$OSXALL]
 	}
+
 	$Compiler
 	{
-		$PreprocessorDefinitions	"$BASE;LAUNCHERONLY"
+		$AdditionalIncludeDirectories		"$BASE;$SDL3SRCDIR;$SDL3SRCDIR/include"	[$SDL]
+		$PreprocessorDefinitions			"$BASE;LAUNCHERONLY"
 	}
 
 	$Linker
@@ -28,6 +32,16 @@ $Configuration
 		// We run from the ./game dir, but want to look in the ./game/bin directory when loading libraries.
 		//   To dump rpath/runpath of a library, use "chrpath --list blah.so" or "objdump -x blah.so" or "readelf -d bin/launcher.so"
 		$GCC_ExtraLinkerFlags		"-Wl,--enable-new-dtags -Wl,-z,origin -Wl,-rpath,'$$ORIGIN' -L/usr/lib32 -L/usr/lib" [$LINUXALL]
+	}
+
+	$PostBuildEvent [!$ANALYZE && $SDL]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
+							"COPY $SDL3OUTDIR\SDL3.dll $OUTBINDIR\SDL3.dll" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $SDL3OUTDIR\SDL3.pdb COPY $SDL3OUTDIR\SDL3.pdb $OUTBINDIR\SDL3.pdb" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"$BASE"
 	}
 }
 
@@ -78,8 +92,6 @@ $Project "launcher"
 		$Lib	tier3
 		$Implib steam_api  [!$NO_STEAM]
 		$ImpLib togl [!$IS_LIB_PROJECT && $GL]
-		$Libexternal	"$LIBCOMMON/SDL2" [$SDL]
+		$Libexternal	"$SDL3OUTDIR/SDL3" [$SDL]
 	}
-
 }
-

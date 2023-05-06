@@ -44,6 +44,16 @@ $Configuration
 		
 		$PreprocessorDefinitions		"$BASE;GL_GLEXT_PROTOTYPES;DX_TO_GL_ABSTRACTION"			[$GL]
 		$PreprocessorDefinitions		"$BASE;USE_SDL"										[$SDL]
-                $AdditionalIncludeDirectories		"$BASE;$SRCDIR\thirdparty\SDL2"					[$SDL || $DEDICATED]
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\thirdparty\SDL"					[$SDL || $DEDICATED]
+	}
+
+	$PostBuildEvent [!$ANALYZE && $SDL]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
+							"COPY $SDL3OUTDIR\SDL3.dll $OUTBINDIR\SDL3.dll" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $SDL3OUTDIR\SDL3.pdb COPY $SDL3OUTDIR\SDL3.pdb $OUTBINDIR\SDL3.pdb" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"$BASE"
 	}
 }

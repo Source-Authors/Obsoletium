@@ -1,27 +1,29 @@
-[submodule "thirdparty/openvr"]
-	path = thirdparty/openvr
-	url = git@github.com:ValveSoftware/openvr.git
-[submodule "thirdparty/protobuf-2.6.1"]
-	path = thirdparty/protobuf-2.6.1
-	url = git@github.com:protocolbuffers/protobuf.git
-[submodule "thirdparty/libjpeg-turbo"]
-	path = thirdparty/libjpeg-turbo
-	url = git@github.com:libjpeg-turbo/libjpeg-turbo.git
-[submodule "thirdparty/libpng"]
-	path = thirdparty/libpng
-	url = git@github.com:glennrp/libpng.git
-[submodule "thirdparty/zlib"]
-	path = thirdparty/zlib
-	url = git@github.com:madler/zlib.git
-[submodule "thirdparty/sdl2"]
-	path = thirdparty/sdl2
-	url = git@github.com:libsdl-org/SDL.git
-[submodule "thirdparty/bzip2"]
-	path = thirdparty/bzip2
-	url = git://sourceware.org/git/bzip2.git
+[submodule "thirdparty/SDL"]
+	path = thirdparty/SDL
+	url = git@github.com:Source-Authors/SDL.git
 [submodule "thirdparty/stb"]
 	path = thirdparty/stb
-	url = git@github.com:nothings/stb.git
+	url = git@github.com:Source-Authors/stb.git
 [submodule "thirdparty/DirectXMath"]
 	path = thirdparty/DirectXMath
-	url = git@github.com:microsoft/DirectXMath.git
+	url = git@github.com:Source-Authors/DirectXMath.git
+[submodule "thirdparty/zlib"]
+	path = thirdparty/zlib
+	url = git@github.com:Source-Authors/zlib.git
+[submodule "thirdparty/libpng"]
+	path = thirdparty/libpng
+	url = git@github.com:Source-Authors/libpng.git
+[submodule "thirdparty/libjpeg-turbo"]
+	path = thirdparty/libjpeg-turbo
+	url = git@github.com:Source-Authors/libjpeg-turbo.git
+[submodule "thirdparty/openvr"]
+	path = thirdparty/openvr
+	url = git@github.com:Source-Authors/openvr.git
+	branch = 061cf411ee1125fe4b7cdf3837451a1c6a32a3c8
+[submodule "thirdparty/protobuf"]
+	path = thirdparty/protobuf
+	url = git@github.com:Source-Authors/protobuf.git
+	branch = v2.6.2
+[submodule "thirdparty/bzip2"]
+	path = thirdparty/bzip2
+	url = git@github.com:Source-Authors/bzip2.git

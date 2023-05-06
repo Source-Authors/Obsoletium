@@ -1,5 +1,6 @@
 
 $MacroRequired GENERATED_PROTO_DIR
+$Macro PROTOBUFDIR "$SRCDIR\thirdparty\protobuf"
 
 // If set, included on the commandline
 $MacroRequiredAllowEmpty ADDITIONAL_PROTOC_ARGS
@@ -9,17 +10,17 @@ $CustomBuildStep "proto"
 {
 	$Description	"Running Protocol Buffer Compiler on $(InputFileName)..."
 	$CommandLine	"if not exist $GENERATED_PROTO_DIR mkdir $GENERATED_PROTO_DIR" "\n" \
-					"$LIBCOMMON\protoc.exe --proto_path=$SRCDIR\thirdparty\protobuf-2.6.1\src" \
+					"$PROTOBUFDIR\vsprojects\Release\protoc.exe --proto_path=$PROTOBUFDIR\src" \
 					" --proto_path=$(InputDir) --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
 					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $(InputPath)" [$WINDOWS]
 
 	$CommandLine	"mkdir $GENERATED_PROTO_DIR 2> /dev/null;"  \
 					"$LIBCOMMON/protoc" \
-					" --proto_path=$SRCDIR/thirdparty/protobuf-2.6.1/src --proto_path=$(InputDir) --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
+					" --proto_path=$PROTOBUFDIR/src --proto_path=$(InputDir) --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
 					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $(InputPath)" [$OSXALL]
 
 	$CommandLine	"mkdir $GENERATED_PROTO_DIR 2> /dev/null;"  \
-					"$LIBCOMMON/protoc --proto_path=$SRCDIR\thirdparty\protobuf-2.6.1\src" \
+					"$LIBCOMMON/protoc --proto_path=$PROTOBUFDIR\src" \
 					" --proto_path=$(InputDir) --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
 					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $(InputPath)" [$LINUXALL]
 
@@ -32,7 +33,7 @@ $Configuration
 	$Compiler
 	{
 		// General
-		$AdditionalIncludeDirectories		"$BASE;$GENERATED_PROTO_DIR;$SRCDIR\thirdparty\protobuf-2.6.1\src"
+		$AdditionalIncludeDirectories		"$BASE;$GENERATED_PROTO_DIR;$PROTOBUFDIR\src"
 	}
 }
 

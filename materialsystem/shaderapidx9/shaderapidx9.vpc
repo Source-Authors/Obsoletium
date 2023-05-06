@@ -7,6 +7,8 @@
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
 $Macro OUTBINNAME	"shaderapidx9"
+$Macro LIBBZSRCDIR		"$SRCDIR\thirdparty\bzip2"
+$Macro LIBBZOUTDIR		"$LIBBZSRCDIR"
 
 $include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -99,7 +101,7 @@ $Project "shaderapidx9"
 		$Lib	bitmap
 		$Lib	mathlib
 		$Lib	tier2
-		$Lib	"$LIBCOMMON/libbz2"
+		$Libexternal	"$LIBBZOUTDIR/libbz2"
 		$ImpLib togl [!$IS_LIB_PROJECT && $GL]
   }
 }

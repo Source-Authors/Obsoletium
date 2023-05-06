@@ -14,7 +14,7 @@
 
 #if defined( USE_SDL )
 #undef M_PI
-#include "SDL2/include/SDL.h"
+#include "include/SDL3/SDL.h"
 static void initKeymap(void);
 #endif
 
