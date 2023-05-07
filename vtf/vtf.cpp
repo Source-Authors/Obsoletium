@@ -625,7 +625,7 @@ int CVTFTexture::FileSize( int nMipSkipCount ) const
 	if ( pImageDataInfo == NULL )
 	{
 		// Still do the assert so we can catch this in debug--we don't expect this for well formed files.
-		Assert( pImageDataInfo != NULL );
+		Assert( pImageDataInfo != NULL ); //-V547
 		return 0;
 	}
 
@@ -2579,7 +2579,7 @@ void CVTFTexture::GenerateMipmaps()
 	if ( TextureLODControlSettings_t const *pLodSettings = ( TextureLODControlSettings_t const * ) GetResourceData( VTF_RSRC_TEXTURE_LOD_SETTINGS, NULL ) )
 	{
 		int iClampX = 1 << min( pLodSettings->m_ResolutionClampX, pLodSettings->m_ResolutionClampX_360 );
-		int iClampY = 1 << min( pLodSettings->m_ResolutionClampX, pLodSettings->m_ResolutionClampX_360 );
+		int iClampY = 1 << min( pLodSettings->m_ResolutionClampY, pLodSettings->m_ResolutionClampY_360 );
 
 		while ( iClampX < m_nWidth || iClampY < m_nHeight )
 		{
