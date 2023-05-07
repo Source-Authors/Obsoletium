@@ -119,7 +119,6 @@ CChoreoScene& CChoreoScene::operator=( const CChoreoScene& src )
 	Init( src.m_pIChoreoEventCallback );
 
 	// Delete existing
-	int i;
 	for ( auto *a : m_Actors )
 	{
 		Assert( a );
@@ -197,7 +196,7 @@ CChoreoScene& CChoreoScene::operator=( const CChoreoScene& src )
 	m_SceneRamp = src.m_SceneRamp;
 
 	m_TimeZoomLookup.RemoveAll();
-	for ( i = 0; i < (int)src.m_TimeZoomLookup.Count(); i++ )
+	for ( int i = 0; i < (int)src.m_TimeZoomLookup.Count(); i++ )
 	{
 		m_TimeZoomLookup.Insert( src.m_TimeZoomLookup.GetElementName( i ), src.m_TimeZoomLookup[ i ] );
 	}
