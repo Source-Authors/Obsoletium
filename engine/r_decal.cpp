@@ -630,12 +630,6 @@ void R_DecalTermAll()
 }
 
 
-static int R_DecalIndex( decal_t *pdecal )
-{
-	return pdecal->m_iDecalPool;
-}
-
-
 // Release the cache entry for this decal
 static void R_DecalCacheClear( decal_t *pdecal )
 {
@@ -916,11 +910,11 @@ void R_DecalSurface( SurfaceHandle_t surfID, decalinfo_t *decalinfo, bool bForce
 	// (decalWidth * decalBasis[0], decalHeight * decalBasis[1])
 	// in texture coordinates:
 
-	float w = fabs( decalinfo->m_decalWidth  * DotProduct( textureU.AsVector3D(), decalinfo->m_Basis[0] ) ) +
-		fabs( decalinfo->m_decalHeight * DotProduct( textureU.AsVector3D(), decalinfo->m_Basis[1] ) );
+	float w = fabsf( decalinfo->m_decalWidth  * DotProduct( textureU.AsVector3D(), decalinfo->m_Basis[0] ) ) +
+		fabsf( decalinfo->m_decalHeight * DotProduct( textureU.AsVector3D(), decalinfo->m_Basis[1] ) );
 	
-	float h = fabs( decalinfo->m_decalWidth  * DotProduct( textureV.AsVector3D(), decalinfo->m_Basis[0] ) ) +
-		fabs( decalinfo->m_decalHeight * DotProduct( textureV.AsVector3D(), decalinfo->m_Basis[1] ) );
+	float h = fabsf( decalinfo->m_decalWidth  * DotProduct( textureV.AsVector3D(), decalinfo->m_Basis[0] ) ) +
+		fabsf( decalinfo->m_decalHeight * DotProduct( textureV.AsVector3D(), decalinfo->m_Basis[1] ) );
 
 	// move s,t to upper left corner
 	s -= ( w * 0.5F );
@@ -977,7 +971,7 @@ void R_DecalLeaf( mleaf_t *pLeaf, decalinfo_t *decalinfo )
 
 		Assert( !MSurf_DispInfo( surfID ) );
 
-		float dist = fabs( DotProduct(decalinfo->m_Position, MSurf_Plane( surfID ).normal) - MSurf_Plane( surfID ).dist);
+		float dist = fabsf( DotProduct(decalinfo->m_Position, MSurf_Plane( surfID ).normal) - MSurf_Plane( surfID ).dist);
 		if ( dist < DECAL_DISTANCE )
 		{
 			R_DecalSurface( surfID, decalinfo, false );
@@ -1306,6 +1300,10 @@ struct decalcontext_t
 	decalcontext_t( IMatRenderContext *pContext, const Vector &vModelorg )
 		: vModelOrg{ vModelorg }
 	{
+		sOffset = -1;
+		tOffset = -1;
+		sScale = -1;
+		tScale = -1;
 		pRenderContext = pContext;
 		pSurf = NULL;
 	}
@@ -1378,7 +1376,7 @@ static decal_t *R_DecalFindOverlappingDecals( decalinfo_t* decalinfo, SurfaceHan
 	int mapSize[2] = {pMaterial->GetMappingWidth(), pMaterial->GetMappingHeight()};
 	Vector decalExtents[2];
 	// this is half the width in world space of the decal. 
-	float minProjectedWidth = (mapSize[0] / decalinfo->m_scale) * 0.5;
+	float minProjectedWidth = (mapSize[0] / decalinfo->m_scale) * 0.5F;
 	decalExtents[0] = decalinfo->m_Basis[0] * minProjectedWidth;
 	decalExtents[1] = decalinfo->m_Basis[1] * (mapSize[1] / decalinfo->m_scale) * 0.5f;
 
@@ -2286,11 +2284,8 @@ inline void R_DrawDecalMeshList( DecalMeshList_t &meshList )
 {
 	CMatRenderContextPtr pRenderContext( materials );
 
-	int nBatchCount = meshList.m_aBatches.Count();
-	for ( int iBatch = 0; iBatch < nBatchCount; ++iBatch )
+	for ( auto &batch : meshList.m_aBatches )
 	{
-		auto &batch = meshList.m_aBatches[iBatch];
-
 		if ( g_pMaterialSystemConfig->nFullbright == 1 )
 		{
 			pRenderContext->BindLightmapPage( MATERIAL_SYSTEM_LIGHTMAP_PAGE_WHITE );
