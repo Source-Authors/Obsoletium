@@ -1279,9 +1279,12 @@ static void MoveConsoleWindowToFront()
 {
 #ifdef _WIN32
 	HWND hwnd = GetConsoleWindow();
-	ShowWindow( hwnd, SW_SHOW );
-	UpdateWindow( hwnd );
-	SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+	if (hwnd) 
+	{
+		ShowWindow( hwnd, SW_SHOW );
+		UpdateWindow( hwnd );
+		SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+	}
 #endif
 }
 
