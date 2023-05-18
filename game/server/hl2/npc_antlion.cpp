@@ -3594,7 +3594,7 @@ void CNPC_Antlion::BuildScheduleTestBits( void )
 	if( !IsCurSchedule(SCHED_ANTLION_FLEE_THUMPER)			&& 		
 		!IsCurSchedule(SCHED_ANTLION_FLEE_PHYSICS_DANGER)	&& 		
 		!IsCurSchedule(SCHED_ANTLION_BURROW_IN)				&& 		
-		!IsCurSchedule(SCHED_ANTLION_WAIT_UNBORROW)			&& 		
+		!IsCurSchedule(SCHED_ANTLION_BURROW_AWAY) && 		
 		!IsCurSchedule(SCHED_ANTLION_BURROW_OUT)			&&
 		!IsCurSchedule(SCHED_ANTLION_BURROW_WAIT)			&&
 		!IsCurSchedule(SCHED_ANTLION_WAIT_FOR_UNBORROW_TRIGGER)&&
