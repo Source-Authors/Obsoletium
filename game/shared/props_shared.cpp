@@ -466,9 +466,10 @@ const char *CPropData::GetRandomChunkModel( const char *pszBreakableSection, int
 	// Find the right section
 	int iCount = m_BreakableChunks.Count();
 	int i;
+	int iSectionLength = strlen(pszBreakableSection);
 	for ( i = 0; i < iCount; i++ )
 	{
-		if ( !Q_strncmp( STRING(m_BreakableChunks[i].iszChunkType), pszBreakableSection, strlen(pszBreakableSection) ) )
+		if ( !Q_strncmp( STRING(m_BreakableChunks[i].iszChunkType), pszBreakableSection, iSectionLength ) )
 			break;
 	}
 	if ( i == iCount )

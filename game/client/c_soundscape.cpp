@@ -752,7 +752,7 @@ void C_SoundscapeSystem::ProcessPlayLooping( KeyValues *pAmbient, const subsound
 		}
 		else if ( !Q_strcasecmp( pKey->GetName(), "soundlevel" ) )
 		{
-			if ( !Q_strncasecmp( pKey->GetString(), "SNDLVL_", strlen( "SNDLVL_" ) ) )
+			if ( !Q_strncasecmp( pKey->GetString(), "SNDLVL_", std::size( "SNDLVL_" ) - 1 ) )
 			{
 				soundlevel = TextToSoundLevel( pKey->GetString() );
 			}
@@ -928,7 +928,7 @@ void C_SoundscapeSystem::ProcessPlayRandom( KeyValues *pPlayRandom, const subsou
 		}
 		else if ( !Q_strcasecmp( pKey->GetName(), "soundlevel" ) )
 		{
-			if ( !Q_strncasecmp( pKey->GetString(), "SNDLVL_", strlen( "SNDLVL_" ) ) )
+			if ( !Q_strncasecmp( pKey->GetString(), "SNDLVL_", std::size( "SNDLVL_" ) - 1 ) )
 			{
 				sound.soundlevel.start = TextToSoundLevel( pKey->GetString() );
 				sound.soundlevel.range = 0;

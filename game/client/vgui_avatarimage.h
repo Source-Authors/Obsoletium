@@ -37,7 +37,7 @@
 struct AvatarImagePair_t
 {
 	AvatarImagePair_t() { m_iAvatar = 0; }
-	AvatarImagePair_t( CSteamID steamID, int av ) { m_SteamID = steamID; m_iAvatar = av; }
+	AvatarImagePair_t( CSteamID steamID, int av ) : m_SteamID(steamID) { m_iAvatar = av; }
 	bool operator<( const AvatarImagePair_t &rhs ) const
 	{
 		return m_SteamID.ConvertToUint64() < rhs.m_SteamID.ConvertToUint64() || 

@@ -589,6 +589,8 @@ void C_SceneEntity::StartEvent( float currenttime, CChoreoScene *scene, CChoreoE
 			Assert( event != NULL );
 
 			DispatchProcessLoop( scene, event );
+			// dimhotepus: Add break.
+			break;
 		}
 	case CChoreoEvent::SPEAK:
 		{
@@ -1118,7 +1120,7 @@ void C_SceneEntity::PrefetchAnimBlocks( CChoreoScene *pScene )
 	// Build a fast lookup, too
 	CUtlMap<CChoreoActor*,CBaseFlex*> actorMap( 0, 0, DefLessFunc( CChoreoActor* ) );
 
-	int nSpew = 0;
+	constexpr int nSpew = 0;
 	int nResident = 0;
 	int nChecked = 0;
 
@@ -1172,7 +1174,7 @@ void C_SceneEntity::PrefetchAnimBlocks( CChoreoScene *pScene )
 
 										++nChecked;
 
-										if ( nSpew != 0 )
+										if constexpr ( nSpew != 0 )
 										{
 											Msg( "%s checking block %d\n", pStudioHdr->pszName(), animdesc.animblock );
 										}
@@ -1183,14 +1185,14 @@ void C_SceneEntity::PrefetchAnimBlocks( CChoreoScene *pScene )
 										if ( panim )
 										{
 											++nResident;
-											if ( nSpew > 1 )
+											if constexpr ( nSpew > 1 )
 											{
 												Msg( "%s:%s[%i:%i] was resident\n", pStudioHdr->pszName(), animdesc.pszName(), iGroup, j );
 											}
 										}
 										else
 										{
-											if ( nSpew != 0 )
+											if constexpr ( nSpew != 0 )
 											{
 												Msg( "%s:%s[%i:%i] async load\n", pStudioHdr->pszName(), animdesc.pszName(), iGroup, j );
 											}
