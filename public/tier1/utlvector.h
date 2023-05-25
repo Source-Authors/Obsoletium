@@ -416,7 +416,10 @@ public:
 		if ( m_pData == StaticData() )
 		{
 			m_pData = (Data_t *)A::Alloc( sizeof(Data_t) + ( num * sizeof(T) ) );
-			m_pData->m_Size = 0;
+			if (m_pData)
+			{
+				m_pData->m_Size = 0;
+			}
 		}
 		else
 		{
