@@ -30,7 +30,7 @@
 class CViewVectors
 {
 public:
-	CViewVectors() {}
+	CViewVectors() = default;
 
 	CViewVectors( 
 		Vector vView,
@@ -696,11 +696,8 @@ struct FireBulletsInfo_t
 	}
 
 	FireBulletsInfo_t( int nShots, const Vector &vecSrc, const Vector &vecDir, const Vector &vecSpread, float flDistance, int nAmmoType, bool bPrimaryAttack = true )
+		: m_iShots(nShots), m_vecSrc(vecSrc), m_vecDirShooting(vecDir), m_vecSpread(vecSpread)
 	{
-		m_iShots = nShots;
-		m_vecSrc = vecSrc;
-		m_vecDirShooting = vecDir;
-		m_vecSpread = vecSpread;
 		m_flDistance = flDistance;
 		m_iAmmoType = nAmmoType;
 		m_iTracerFreq = 4;

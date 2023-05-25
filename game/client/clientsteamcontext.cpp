@@ -32,9 +32,7 @@ CClientSteamContext::CClientSteamContext()
 
 
 //-----------------------------------------------------------------------------
-CClientSteamContext::~CClientSteamContext()
-{
-}
+CClientSteamContext::~CClientSteamContext() = default;
 
 
 //-----------------------------------------------------------------------------

@@ -35,9 +35,7 @@ CGrid::CGridEntry::CGridEntry()
 	m_bUnderline = false;
 }
 
-CGrid::CGridEntry::~CGridEntry()
-{
-}
+CGrid::CGridEntry::~CGridEntry() = default;
 
 
 // ------------------------------------------------------------------------------ //

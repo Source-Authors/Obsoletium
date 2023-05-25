@@ -298,15 +298,13 @@ C_BaseEntityClassList::C_BaseEntityClassList()
 	m_pNextClassList = s_pClassLists;
 	s_pClassLists = this;
 }
-C_BaseEntityClassList::~C_BaseEntityClassList()
-{
-}
+C_BaseEntityClassList::~C_BaseEntityClassList() = default;
 
 // Any entities that want an OnDataChanged during simulation register for it here.
 class CDataChangedEvent
 {
 public:
-	CDataChangedEvent() {}
+	CDataChangedEvent() = default;
 	CDataChangedEvent( IClientNetworkable *ent, DataUpdateType_t updateType, int *pStoredEvent )
 	{
 		m_pEntity = ent;

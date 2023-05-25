@@ -86,9 +86,7 @@ CParticleSubTextureGroup::CParticleSubTextureGroup()
 }
 
 
-CParticleSubTextureGroup::~CParticleSubTextureGroup()
-{
-}
+CParticleSubTextureGroup::~CParticleSubTextureGroup() = default;
 
 
 //-----------------------------------------------------------------------------

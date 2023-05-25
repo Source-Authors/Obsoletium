@@ -36,9 +36,7 @@ CSplinePatch::CSplinePatch( ) : m_ChannelCount(0),
 {
 }
 
-CSplinePatch::~CSplinePatch()
-{
-}
+CSplinePatch::~CSplinePatch() = default;
 
 //-----------------------------------------------------------------------------
 // Initialize the spline patch

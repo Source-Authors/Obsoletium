@@ -481,9 +481,7 @@ void PhysicsSimulate()
 
 
 
-CCollisionEvent::CCollisionEvent( void ) 
-{ 
-}
+CCollisionEvent::CCollisionEvent( void ) = default;
 
 void CCollisionEvent::ObjectSound( int index, vcollisionevent_t *pEvent )
 {

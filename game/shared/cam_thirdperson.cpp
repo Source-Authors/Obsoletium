@@ -47,9 +47,7 @@ ConVar cl_thirdperson( "cl_thirdperson", "0", FCVAR_NOT_CONNECTED | FCVAR_USERIN
 
 #endif
 
-CThirdPersonManager::CThirdPersonManager( void )
-{
-}
+CThirdPersonManager::CThirdPersonManager( void ) = default;
 
 void CThirdPersonManager::Init( void )
 {

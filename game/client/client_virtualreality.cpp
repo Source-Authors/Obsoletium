@@ -268,9 +268,7 @@ CClientVirtualReality::CClientVirtualReality()
 #endif
 }
 
-CClientVirtualReality::~CClientVirtualReality()
-{
-}
+CClientVirtualReality::~CClientVirtualReality() = default;
 
 
 // --------------------------------------------------------------------

@@ -1607,9 +1607,7 @@ struct WorkUnitParams
 		font = 0;
 	}
 
-	~WorkUnitParams()
-	{
-	}
+	~WorkUnitParams() = default;
 
 	void Finalize( int lineheight )
 	{

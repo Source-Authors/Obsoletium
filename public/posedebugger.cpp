@@ -359,10 +359,7 @@ CPoseDebuggerImpl::CPoseDebuggerImpl() :
 	m_uiMaskShowModels.SetAll();
 }
 
-CPoseDebuggerImpl::~CPoseDebuggerImpl()
-{
-	// g_pPoseDebugger = &s_PoseDebuggerStub;
-}
+CPoseDebuggerImpl::~CPoseDebuggerImpl() = default;
 
 void CPoseDebuggerImpl::ShowAllModels( bool bShow )
 {

@@ -27,7 +27,7 @@ private:
 	static C_BaseExplosionEffect	m_instance;
 
 public:
-			~C_BaseExplosionEffect( void ) {}
+	~C_BaseExplosionEffect( void ) = default;
 
 	static	C_BaseExplosionEffect &Instance( void )	{	return m_instance;	}
 
