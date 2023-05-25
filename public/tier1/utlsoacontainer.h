@@ -148,7 +148,10 @@ protected:
 
 	FORCEINLINE void Init( void )
 	{
-		memset( m_nDataType, 0xff, sizeof( m_nDataType ) );
+		for (auto& t : m_nDataType)
+		{
+			t = ATTRDATATYPE_NONE;
+		}
 		m_pDataMemory = 0;
 		m_nColumns = m_nPaddedColumns = m_nRows = m_nSlices = 0;
 		m_nFieldPresentMask = 0;
