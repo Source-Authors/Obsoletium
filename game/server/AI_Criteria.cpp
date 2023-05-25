@@ -34,9 +34,7 @@ AI_CriteriaSet::AI_CriteriaSet( const AI_CriteriaSet& src ) : m_Lookup( 0, 0, Cr
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-AI_CriteriaSet::~AI_CriteriaSet()
-{
-}
+AI_CriteriaSet::~AI_CriteriaSet() = default;
 
 //-----------------------------------------------------------------------------
 // Purpose: 

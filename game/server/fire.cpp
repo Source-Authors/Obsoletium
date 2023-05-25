@@ -218,13 +218,13 @@ private:
 };
 
 CFireSphere::CFireSphere( CFire **pList, int listMax, bool onlyActiveFires, const Vector &origin, float radius )
+	: m_origin(origin)
 {
+	m_radiusSqr = radius * radius;
 	m_pList = pList;
 	m_listMax = listMax;
 	m_count = 0;
 	m_onlyActiveFires = onlyActiveFires;
-	m_origin = origin;
-	m_radiusSqr = radius * radius;
 }
 
 bool CFireSphere::AddToList( CFire *pFire )

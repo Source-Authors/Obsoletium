@@ -193,9 +193,7 @@ void CAI_Squad::Init(string_t newName)
 
 //-------------------------------------
 
-CAI_Squad::~CAI_Squad(void)
-{
-}
+CAI_Squad::~CAI_Squad(void) = default;
 
 //-------------------------------------
 

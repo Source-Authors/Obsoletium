@@ -250,9 +250,8 @@ Vector CAI_Node::GetPosition(int hull)
 // Output :
 //-----------------------------------------------------------------------------
 CAI_Node::CAI_Node( int id, const Vector &origin, float yaw  ) 
- :	m_Links( 0, 4 )
+ : m_vOrigin(origin), m_Links( 0, 4 )
 {
-	m_vOrigin		= origin;
 	m_iID			= id;
 
 	for (int i = 0; i < NUM_HULLS; i++)

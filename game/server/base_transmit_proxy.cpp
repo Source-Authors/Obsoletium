@@ -10,10 +10,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-CBaseTransmitProxy::CBaseTransmitProxy( CBaseEntity *pEnt )
+CBaseTransmitProxy::CBaseTransmitProxy(CBaseEntity *pEnt)
+	: m_hEnt(pEnt), m_refCount(0)
 {
-	m_hEnt = pEnt;
-	m_refCount = 0;
 }
 
 

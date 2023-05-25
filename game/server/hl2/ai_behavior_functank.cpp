@@ -37,9 +37,7 @@ CAI_FuncTankBehavior::CAI_FuncTankBehavior()
 //-----------------------------------------------------------------------------
 // Purpose: Deconstructor
 //-----------------------------------------------------------------------------
-CAI_FuncTankBehavior::~CAI_FuncTankBehavior()
-{
-}
+CAI_FuncTankBehavior::~CAI_FuncTankBehavior() = default;
 
 //-----------------------------------------------------------------------------
 // Purpose:

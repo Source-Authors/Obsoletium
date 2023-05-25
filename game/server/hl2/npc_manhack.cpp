@@ -231,9 +231,7 @@ CNPC_Manhack::CNPC_Manhack()
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-CNPC_Manhack::~CNPC_Manhack()
-{
-}
+CNPC_Manhack::~CNPC_Manhack() = default;
 
 //-----------------------------------------------------------------------------
 // Purpose: Indicates this NPC's place in the relationship table.
