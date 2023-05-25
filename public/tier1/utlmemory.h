@@ -205,7 +205,7 @@ class CUtlMemoryFixed
 public:
 	// constructor, destructor
 	CUtlMemoryFixed( int nGrowSize = 0, int nInitSize = 0 )	{ Assert( nInitSize == 0 || nInitSize == SIZE ); 	}
-	CUtlMemoryFixed( T* pMemory, int numElements )			{ Assert( 0 ); 										}
+	CUtlMemoryFixed( T* pMemory, int numElements ) = delete;
 
 	// Can we use this index?
 	// Use unsigned math to improve performance
