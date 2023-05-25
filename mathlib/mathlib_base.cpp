@@ -1348,8 +1348,9 @@ bool SolveInverseQuadraticMonotonic( float x1, float y1, float x2, float y2, flo
 	// this code is not fast. what it does is when the curve would be non-monotonic, slowly shifts
 	// the center point closer to the linear line between the endpoints. Should anyone need htis
 	// function to be actually fast, it would be fairly easy to change it to be so.
-	for(float blend_to_linear_factor=0.0;blend_to_linear_factor<=1.0;blend_to_linear_factor+=0.05)
+	for(int factor=0;factor<=100.0;factor+=5)
 	{
+		const float blend_to_linear_factor = factor/100.f;
 		float tempy2=(1-blend_to_linear_factor)*y2+blend_to_linear_factor*FLerp(y1,y3,x1,x3,x2);
 		if (!SolveInverseQuadratic(x1,y1,x2,tempy2,x3,y3,a,b,c))
 			return false;
