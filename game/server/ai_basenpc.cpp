@@ -8263,7 +8263,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			//
 			// Figure out what we're supposed to pick up.
 			//
-			if ( pEvent->options && strlen( pEvent->options ) > 0 )
+			if ( pEvent->options && pEvent->options[0] != '\0' )
 			{
 				// Pick up the weapon or item that was specified in the anim event.
 				pPickup = gEntList.FindEntityGenericNearest( pEvent->options, GetAbsOrigin(), 256, this );

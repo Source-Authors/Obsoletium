@@ -183,7 +183,7 @@ class CPlayerInfo : public IBotController, public IPlayerInfo
 {
 public:
 	CPlayerInfo () { m_pParent = NULL; } 
-	~CPlayerInfo () {}
+	~CPlayerInfo () = default;
 	void SetParent( CBasePlayer *parent ) { m_pParent = parent; } 
 
 	// IPlayerInfo interface

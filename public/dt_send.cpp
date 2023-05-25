@@ -861,10 +861,7 @@ SendTable::SendTable(SendProp *pProps, int nProps, const char *pNetTableName)
 }
 
 
-SendTable::~SendTable()
-{
-//	Assert( !m_pPrecalc );
-}
+SendTable::~SendTable() = default;
 
 
 void SendTable::Construct( SendProp *pProps, int nProps, const char *pNetTableName )

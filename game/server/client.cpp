@@ -214,7 +214,7 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 		pPlayer->CheckChatText( p, 127 );	// though the buffer szTemp that p points to is 256, 
 											// chat text is capped to 127 in CheckChatText above
 
-		Assert( strlen( pPlayer->GetPlayerName() ) > 0 );
+		Assert( pPlayer->GetPlayerName()[0] != '\0' );
 
 		bSenderDead = ( pPlayer->m_lifeState != LIFE_ALIVE );
 	}
@@ -235,9 +235,9 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 
 	const char *pszPlayerName = pPlayer ? pPlayer->GetPlayerName():"Console";
 
-	if ( pszPrefix && strlen( pszPrefix ) > 0 )
+	if (pszPrefix && pszPrefix[0] != '\0' )
 	{
-		if ( pszLocation && strlen( pszLocation ) )
+		if ( pszLocation && pszLocation[0] != '\0' )
 		{
 			Q_snprintf( text, sizeof(text), "%s %s @ %s: ", pszPrefix, pszPlayerName, pszLocation );
 		}

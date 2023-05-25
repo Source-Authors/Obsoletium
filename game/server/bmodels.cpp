@@ -779,7 +779,7 @@ void CFuncRotating::Precache( void )
 	// Set up rotation sound.
 	//
 	char *szSoundFile = ( char * )STRING( m_NoiseRunning );
-	if ( !m_NoiseRunning || strlen( szSoundFile ) == 0 )
+	if ( !m_NoiseRunning || szSoundFile[0] == '\0' )
 	{
 		// No sound set up, use the null sound.
 		m_NoiseRunning = AllocPooledString("DoorSound.Null");

@@ -1078,7 +1078,7 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 	IPhysicsObject	*pPhysObj = NULL;
 	float			flNearestDist = 99999;
 
-	if ( pPickupName != NULL && strlen( pPickupName ) > 0 )
+	if ( pPickupName != NULL && pPickupName[0] != '\0' )
 	{
 		pEnt = gEntList.FindEntityByName( NULL, pPickupName );
 		

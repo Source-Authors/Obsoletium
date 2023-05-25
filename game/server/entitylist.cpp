@@ -286,9 +286,7 @@ CBaseEntityClassList::CBaseEntityClassList()
 	m_pNextClassList = s_pClassLists;
 	s_pClassLists = this;
 }
-CBaseEntityClassList::~CBaseEntityClassList()
-{
-}
+CBaseEntityClassList::~CBaseEntityClassList() = default;
 
 CGlobalEntityList::CGlobalEntityList()
 {

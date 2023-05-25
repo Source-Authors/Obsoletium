@@ -8850,7 +8850,7 @@ void CBasePlayer::SetPlayerName( const char *name )
 
 	if ( name )
 	{
-		Assert( strlen(name) > 0 );
+		Assert( name[0] != '\0' );
 
 		Q_strncpy( m_szNetname, name, sizeof(m_szNetname) );
 	}
