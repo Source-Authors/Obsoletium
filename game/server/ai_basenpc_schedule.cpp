@@ -2110,7 +2110,8 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 
 			case PATH_COVER:	//Get a path to cover FROM our goal
 				{
-					CBaseEntity *pEntity = ( m_hStoredPathTarget == NULL ) ? this : m_hStoredPathTarget;
+					CBaseEntity *pStoredPathTarget = ( m_hStoredPathTarget == NULL ) ? NULL : m_hStoredPathTarget.Get();
+					CBaseEntity *pEntity = pStoredPathTarget ? pStoredPathTarget : this;
 
 					//Find later cover first
 					Vector coverPos;
