@@ -427,7 +427,15 @@ public:
 			int nHave = A::GetSize( m_pData );
 			if ( nNeeded > nHave )
 			{
-				m_pData = (Data_t *)A::Realloc( m_pData, nNeeded );
+				auto *tmp = (Data_t *)A::Realloc( m_pData, nNeeded );
+				if (tmp)
+				{
+					m_pData = tmp;
+				}
+				else
+				{
+					delete m_pData;
+				}
 			}
 		}
 	}
