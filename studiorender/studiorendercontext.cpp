@@ -780,11 +780,12 @@ void CStudioRenderContext::R_StudioBuildMeshGroup( const char *pModelName, bool 
 	for (i = 0; i < pStripGroup->numStrips; ++i )
 	{
 		int numUnique = 0;
-		if (pStripGroup->pStrip(i)->flags & OptimizedModel::STRIP_IS_TRISTRIP) 
+		const OptimizedModel::StripHeader_t *h = pStripGroup->pStrip(i);
+		if (h->flags & OptimizedModel::STRIP_IS_TRISTRIP) 
 		{
 			int last[2] = {-1, -1};
-			int curr = pStripGroup->pStrip(i)->indexOffset;
-			int end = curr + pStripGroup->pStrip(i)->numIndices;
+			int curr = h->indexOffset;
+			int end = curr + h->numIndices;
 			while (curr != end)
 			{
 				int idx = *pStripGroup->pIndex(curr);
@@ -797,7 +798,7 @@ void CStudioRenderContext::R_StudioBuildMeshGroup( const char *pModelName, bool 
 		}
 		else
 		{
-			numUnique = pStripGroup->pStrip(i)->numIndices / 3;
+			numUnique = h->numIndices / 3;
 		}
 		pMeshGroup->m_pUniqueTris[i] = numUnique;
 	}

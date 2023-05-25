@@ -99,12 +99,12 @@ void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_
 					vert.m_TangentS.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
 				}
 #endif				
-				vert.m_NumBones = vertData->BoneWeights( vertID )->numbones;
-				int j;
-				for ( j = 0; j < vert.m_NumBones; j++ )
+				const mstudioboneweight_t *vertexBoneWeight = vertData->BoneWeights( vertID );
+				vert.m_NumBones = vertexBoneWeight->numbones;
+				for ( int j = 0; j < vert.m_NumBones; j++ )
 				{
-					vert.m_BoneWeight[j] = vertData->BoneWeights( vertID )->weight[j];
-					vert.m_BoneIndex[j] = vertData->BoneWeights( vertID )->bone[j];
+					vert.m_BoneWeight[j] = vertexBoneWeight->weight[j];
+					vert.m_BoneIndex[j] = vertexBoneWeight->bone[j];
 				}
 			}
 
