@@ -3711,7 +3711,7 @@ void CChoreoEvent::GetMovementStyle( char *style, int maxlen )
 	const char *in = m_Parameters2.Get();
 	char *out = style;
 
-	while ( *in && *in != '\0' && *in != ' ' )
+	while ( *in != '\0' && *in != ' ' )
 	{
 		if ( out - style >= maxlen - 1 )
 			break;
@@ -3739,7 +3739,7 @@ void CChoreoEvent::GetDistanceStyle( char *style, int maxlen )
 	in++;
 	char *out = style;
 
-	while ( *in && *in != '\0' )
+	while ( *in != '\0' )
 	{
 		if ( out - style >= maxlen - 1 )
 			break;
