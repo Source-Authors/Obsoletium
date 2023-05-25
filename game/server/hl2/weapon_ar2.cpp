@@ -108,6 +108,8 @@ IMPLEMENT_ACTTABLE(CWeaponAR2);
 
 CWeaponAR2::CWeaponAR2( )
 {
+	m_bAltFiresUnderwater = false;
+
 	m_fMinRange1	= 65;
 	m_fMaxRange1	= 2048;
 
@@ -117,7 +119,8 @@ CWeaponAR2::CWeaponAR2( )
 	m_nShotsFired	= 0;
 	m_nVentPose		= -1;
 
-	m_bAltFiresUnderwater = false;
+	m_flDelayedFire = 0.0f;
+	m_bShotDelayed = false;
 }
 
 void CWeaponAR2::Precache( void )
@@ -298,7 +301,7 @@ void CWeaponAR2::SecondaryAttack( void )
 // Purpose: Override if we're waiting to release a shot
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CWeaponAR2::CanHolster( void )
+bool CWeaponAR2::CanHolster( void ) const
 {
 	if ( m_bShotDelayed )
 		return false;
@@ -432,7 +435,7 @@ void CWeaponAR2::Operator_ForceNPCFire( CBaseCombatCharacter *pOperator, bool bS
 	else
 	{
 		// Ensure we have enough rounds in the clip
-		m_iClip1++;
+		++m_iClip1;
 
 		FireNPCPrimaryAttack( pOperator, true );
 	}

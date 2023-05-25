@@ -45,7 +45,7 @@ public:
 	int		GetMaxBurst( void ) { return 5; }
 	float	GetFireRate( void ) { return 0.1f; }
 
-	bool	CanHolster( void );
+	bool	CanHolster( void ) const;
 	bool	Reload( void );
 
 	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
