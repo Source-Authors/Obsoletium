@@ -31,13 +31,13 @@ int CChoreoEvent::s_nGlobalID = 1;
 //			percentage - 
 //-----------------------------------------------------------------------------
 CEventRelativeTag::CEventRelativeTag( CChoreoEvent *owner, const char *name, float percentage )
+	: m_Name(name)
 {
 	Assert( owner );
 	Assert( name );
 	Assert( percentage >= 0.0f );
 	Assert( percentage <= 1.0f );
 
-	m_Name = name;
 	m_flPercentage = percentage;
 	m_pOwner = owner;
 }
@@ -163,12 +163,12 @@ void CFlexTimingTag::SetLocked( bool locked )
 //			percentage - 
 //-----------------------------------------------------------------------------
 CEventAbsoluteTag::CEventAbsoluteTag( CChoreoEvent *owner, const char *name, float t )
+    : m_Name(name)
 {
 	Assert( owner );
 	Assert( name );
 	Assert( t >= 0.0f );
 
-	m_Name = name;
 	m_flPercentage = t;
 	m_pOwner = owner;
 	m_bLocked = false;
