@@ -11,7 +11,7 @@
 #define N_EXTRAVALUES 1
 #define N_DIMENSIONS (3+N_EXTRAVALUES)
 
-#define PIXEL(x,y,c) Image[4*((x)+((Width*(y))))+c]
+#define PIXEL(x,y,c) Image[4*((x)+((Width*(y))))+(c)]
 
 static uint8 Weights[]={5,7,4,8};
 static int ExtraValueXForms[3*N_EXTRAVALUES]={
