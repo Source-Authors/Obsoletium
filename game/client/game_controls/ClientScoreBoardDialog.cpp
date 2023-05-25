@@ -165,8 +165,7 @@ void CClientScoreBoardDialog::ApplySchemeSettings( IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	if ( m_pImageList )
-		delete m_pImageList;
+	delete m_pImageList;
 	m_pImageList = new ImageList( false );
 
 	m_mapAvatarsToImageList.RemoveAll();

@@ -192,10 +192,7 @@ C_PropAirboat::C_PropAirboat()
 //-----------------------------------------------------------------------------
 C_PropAirboat::~C_PropAirboat()
 {
-	if (m_pHeadlight)
-	{
-		delete m_pHeadlight;
-	}
+	delete m_pHeadlight;
 }
 
 

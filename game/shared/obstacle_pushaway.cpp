@@ -186,8 +186,7 @@ int GetPushawayEnts( CBaseCombatCharacter *pPushingEntity, CBaseEntity **ents, i
 
 	int numHit = enumerator->m_nAlreadyHit;
 
-	if ( physPropEnum )
-		delete physPropEnum;
+	delete physPropEnum;
 
 	return numHit;
 }

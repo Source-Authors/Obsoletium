@@ -243,10 +243,7 @@ void IGameSystem::ShutdownAllSystems()
 void IGameSystem::LevelInitPreEntityAllSystems( char const* pMapName )
 {
 	// Store off the map name
-	if ( s_pMapName )
-	{
-		delete[] s_pMapName;
-	}
+	delete[] s_pMapName;
 
 	int len = Q_strlen(pMapName) + 1;
 	s_pMapName = new char [ len ];

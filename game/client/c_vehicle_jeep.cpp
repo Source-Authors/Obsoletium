@@ -48,10 +48,7 @@ C_PropJeep::C_PropJeep()
 //-----------------------------------------------------------------------------
 C_PropJeep::~C_PropJeep()
 {
-	if ( m_pHeadlight )
-	{
-		delete m_pHeadlight;
-	}
+	delete m_pHeadlight;
 }
 
 void C_PropJeep::Simulate( void )
