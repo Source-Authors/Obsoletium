@@ -288,49 +288,6 @@ static void posix_signal_handler( int i )
 
 #endif // POSIX
 
-//-----------------------------------------------------------------------------
-// Purpose: Check whether any mods are loaded.
-//  Currently looks for metamod and sourcemod.
-//-----------------------------------------------------------------------------
-static bool IsSourceModLoaded()
-{
-#if defined( _WIN32 )
-	static const char *s_pFileNames[] = { "metamod.2.tf2.dll", "sourcemod.2.tf2.dll", "sdkhooks.ext.2.ep2v.dll", "sdkhooks.ext.2.tf2.dll" };
-
-	for ( size_t i = 0; i < Q_ARRAYSIZE( s_pFileNames ); i++ )
-	{
-		// GetModuleHandle function returns a handle to a mapped module
-		//  without incrementing its reference count.
-		if ( GetModuleHandleA( s_pFileNames[ i ] ) )
-			return true;
-	}
-#else
-	FILE *fh = fopen( "/proc/self/maps", "r" );
-
-	if ( fh )
-	{
-		char buf[ 1024 ];
-		static const char *s_pFileNames[] = { "metamod.2.tf2.so", "sourcemod.2.tf2.so", "sdkhooks.ext.2.ep2v.so", "sdkhooks.ext.2.tf2.so" };
-
-		while ( fgets( buf, sizeof( buf ), fh ) )
-		{
-			for ( size_t i = 0; i < Q_ARRAYSIZE( s_pFileNames ); i++ )
-			{
-				if ( strstr( buf, s_pFileNames[ i ] ) )
-				{
-					fclose( fh );
-					return true;
-				}
-			}
-		}
-
-		fclose( fh );
-	}
-#endif
-
-	return false;
-}
-
 template< int _SIZE >
 class CErrorText
 {
