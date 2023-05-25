@@ -97,7 +97,7 @@ public:
 	void SetupNewStyleAttenuation( float fFiftyPercentDistance, float fZeroPercentDistance );
 
 
-/// given a direction relative to the light source position, is this ray within the
+	/// given a direction relative to the light source position, is this ray within the
 	/// light cone (for spotlights..non spots consider all rays to be within their cone)
 	bool IsDirectionWithinLightCone(const Vector &rdir) const
 	{
