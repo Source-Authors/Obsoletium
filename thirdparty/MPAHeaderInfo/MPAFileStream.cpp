@@ -17,12 +17,16 @@ CMPAFileStream::CMPAFileStream(LPCTSTR szFilename) :
 		// throw error
 		throw CMPAException(CMPAException::ErrOpenFile, szFilename, _T("CreateFile"), true);
 	}
+
+	m_bMustReleaseFile = true;
+
 	Init();
 }
 
 CMPAFileStream::CMPAFileStream(LPCTSTR szFilename, HANDLE hFile) :
-	CMPAStream(szFilename), m_hFile(hFile)
+	CMPAStream(szFilename), m_hFile(hFile), m_dwOffset(0)
 {
+	m_bMustReleaseFile = false;
 	Init();
 }
 
@@ -43,11 +47,6 @@ CMPAFileStream::~CMPAFileStream(void)
 	if (m_bMustReleaseFile)
 		::CloseHandle(m_hFile);	
 }
-
-// VC++6 doesn't contain this definition
-#ifndef INVALID_SET_FILE_POINTER
-#define INVALID_SET_FILE_POINTER ((DWORD)-1)
-#endif
 
 // set file position
 void CMPAFileStream::SetPosition(DWORD dwOffset) const

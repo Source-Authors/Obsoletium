@@ -4,6 +4,7 @@
 CTag::CTag(CMPAStream* pStream, LPCTSTR szName, bool bAppended, DWORD dwOffset, DWORD dwSize):
 	m_pStream(pStream), m_bAppended(bAppended), m_dwOffset(dwOffset), m_dwSize(dwSize)
 {
+	m_fVersion = 0.0f;
 	m_szName = _tcsdup(szName);
 }
 
