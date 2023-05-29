@@ -24,6 +24,7 @@ public:
 	CMPAException(ErrorIDs ErrorID, LPCTSTR szFile = NULL, LPCTSTR szFunction = NULL, bool bGetLastError=false);
 	// copy constructor (necessary because of LPSTR members)
 	CMPAException(const CMPAException& Source);
+	CMPAException& operator=(CMPAException Source);
 	virtual ~CMPAException(void);
 
 	ErrorIDs GetErrorID() const { return m_ErrorID; };

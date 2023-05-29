@@ -18,6 +18,26 @@ CMPAException::CMPAException(const CMPAException& Source)
 	m_bGetLastError = Source.m_bGetLastError;
 	m_szFile = _tcsdup(Source.m_szFile);
 	m_szFunction = _tcsdup(Source.m_szFunction);
+	if (Source.m_szErrorMsg)
+	{
+		m_szErrorMsg = new char[strlen(Source.m_szErrorMsg) + 1];
+		strcpy(m_szErrorMsg, Source.m_szErrorMsg);
+	}
+	else
+	{
+		m_szErrorMsg = NULL;
+	}
+}
+
+CMPAException& CMPAException::operator=(CMPAException Source)
+{
+	std::swap(m_ErrorID, Source.m_ErrorID);
+	std::swap(m_bGetLastError, Source.m_bGetLastError);
+	std::swap(m_szFunction, Source.m_szFunction);
+	std::swap(m_szFile, Source.m_szFile);
+	std::swap(m_szErrorMsg, Source.m_szErrorMsg);
+
+	return *this;
 }
 
 // destructor
