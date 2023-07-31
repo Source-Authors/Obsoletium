@@ -51,15 +51,7 @@
 
 // crypto ++
 #include "tier0/valve_off.h"
-#include "../external/crypto++-5.6.3/cryptopushdisablewarnings.h"
-#if _MSC_VER < 1400 // doesn't work with vc8, things below need xdebug
-#define _XDEBUG_		// keep crypto++-5.2 from including xdebug
-// these are defined in xdebug and used in some subsequent headers, define them to be our version
-#define _NEW_CRT			new
-#define _DELETE_CRT(_P)		delete (_P)
-#define _DELETE_CRT_VEC(_P)	delete[] (_P)
-#define _STRING_CRT			string
-#endif
+
 #define CRYPTOPP_DLL
 #undef min
 #undef max
@@ -72,24 +64,23 @@ const int k_cMedBuff = 1024;					// medium buffer
 #pragma GCC diagnostic ignored "-Wshadow"
 #endif
 
-#include "../external/crypto++-5.6.3/cryptlib.h"
-#include "../external/crypto++-5.6.3/osrng.h"
-#include "../external/crypto++-5.6.3/crc.h"
-#include "../external/crypto++-5.6.3/modes.h"
-#include "../external/crypto++-5.6.3/files.h"
-#include "../external/crypto++-5.6.3/hex.h"
-#include "../external/crypto++-5.6.3/base64.h"
-#include "../external/crypto++-5.6.3/base32.h"
-#include "../external/crypto++-5.6.3/words.h"
-#include "../external/crypto++-5.6.3/rsa.h"
-#include "../external/crypto++-5.6.3/aes.h"
-#include "../external/crypto++-5.6.3/hmac.h"
-#include "../external/crypto++-5.6.3/zlib.h"
-#include "../external/crypto++-5.6.3/gzip.h"
-#include "../external/crypto++-5.6.3/pwdbased.h"
+#include "../thirdparty/cryptopp/cryptlib.h"
+#include "../thirdparty/cryptopp/osrng.h"
+#include "../thirdparty/cryptopp/crc.h"
+#include "../thirdparty/cryptopp/modes.h"
+#include "../thirdparty/cryptopp/files.h"
+#include "../thirdparty/cryptopp/hex.h"
+#include "../thirdparty/cryptopp/base64.h"
+#include "../thirdparty/cryptopp/base32.h"
+#include "../thirdparty/cryptopp/words.h"
+#include "../thirdparty/cryptopp/rsa.h"
+#include "../thirdparty/cryptopp/aes.h"
+#include "../thirdparty/cryptopp/hmac.h"
+#include "../thirdparty/cryptopp/zlib.h"
+#include "../thirdparty/cryptopp/gzip.h"
+#include "../thirdparty/cryptopp/pwdbased.h"
 using namespace CryptoPP;
 typedef AutoSeededX917RNG<AES> CAutoSeededRNG;
-#include "../external/crypto++-5.6.3/cryptopopdisablewarnings.h"
 
 #if defined(GNUC)
 #pragma GCC diagnostic warning "-Wshadow"
@@ -763,12 +754,14 @@ bool CCrypto::RSAGenerateKeys( uint8 *pubPublicKey, uint32 *pcubPublicKey, uint8
 		ArraySink arraySinkPrivateKey( pubPrivateKey, *pcubPrivateKey );
 		CPoolAllocatedRNG rng;
 		RSAES_OAEP_SHA_Decryptor priv( rng.GetRNG(), k_nRSAKeyBits );
-		priv.DEREncode( arraySinkPrivateKey );
+		const PrivateKey &privKey = priv.GetPrivateKey();
+		privKey.Save(arraySinkPrivateKey);
 		*pcubPrivateKey = arraySinkPrivateKey.TotalPutLength();
 		// generate public key
 		ArraySink arraySinkPublicKey( pubPublicKey, *pcubPublicKey );
 		RSAES_OAEP_SHA_Encryptor pub(priv);
-		pub.DEREncode( arraySinkPublicKey );
+		const PublicKey &pubKey = pub.GetPublicKey();
+		pubKey.Save( arraySinkPublicKey );
 		*pcubPublicKey = arraySinkPublicKey.TotalPutLength();
 		bRet = true;
 	}
@@ -1542,7 +1535,7 @@ bool CCrypto::GenerateSHA1Digest( const uint8 *pubInput, const int cubInput, SHA
 	bool bSuccess = true;
 	try
 	{
-		CryptoPP::SHA().CalculateDigest( *pOutDigest, pubInput, cubInput );
+		CryptoPP::SHA1().CalculateDigest( *pOutDigest, pubInput, cubInput );
 	}
 	catch(...)
 	{
@@ -1605,7 +1598,7 @@ bool CCrypto::GenerateSaltedSHA1Digest( const char *pchInput, const Salt_t *pSal
 	bool bSuccess = true;
 	try
 	{
-		CryptoPP::SHA().CalculateDigest( *pOutDigest, pubSaltedInput, iInputLen + sizeof( Salt_t ) );
+		CryptoPP::SHA1().CalculateDigest( *pOutDigest, pubSaltedInput, iInputLen + sizeof( Salt_t ) );
 	}
 	catch(...)
 	{

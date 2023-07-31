@@ -27,3 +27,6 @@
 [submodule "thirdparty/bzip2"]
 	path = thirdparty/bzip2
 	url = git@github.com:Source-Authors/bzip2.git
+[submodule "thirdparty/cryptopp"]
+	path = thirdparty/cryptopp
+	url = git@github.com:Source-Authors/cryptopp.git

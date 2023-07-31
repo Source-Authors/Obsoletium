@@ -1,3 +1,6 @@
+# Source engine
+
+![CI](https://github.com/Source-Authors/obsolete-source-engine/actions/workflows/build.yml/badge.svg?branch=master)
 
 ## How to build
 

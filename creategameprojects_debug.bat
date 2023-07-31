@@ -1,4 +1,4 @@
-@echo ON
+@echo OFF
 MSBuild.exe /? >NUL
 if ERRORLEVEL 1 (
   echo MsBuild not found in PATH. Please, start from Developer Command Prompt or add MSVC MsBuild directory to the PATH.
@@ -16,8 +16,6 @@ if ERRORLEVEL 1 (
     exit /B 1
   )
 )
-
-start .\download_libs.bat
 
 set ARCH=Win32
 
@@ -116,6 +114,19 @@ if ERRORLEVEL 1 (
 MSBuild.exe /m /p:Platform="x86" /p:Configuration=Release thirdparty\protobuf\vsprojects\protoc.vcxproj
 if ERRORLEVEL 1 (
   echo MSBuild Release for thirdparty\protobuf\protoc failed.
+  exit /B 1
+)
+
+rem Build cryptopp
+MSBuild.exe /m /p:Platform="x86" /p:Configuration=Debug thirdparty\cryptopp\cryptlib.vcxproj
+if ERRORLEVEL 1 (
+  echo MSBuild Debug for thirdparty\cryptopp\cryptlib failed.
+  exit /B 1
+)
+
+MSBuild.exe /m /p:Platform="x86" /p:Configuration=Release thirdparty\cryptopp\cryptlib.vcxproj
+if ERRORLEVEL 1 (
+  echo MSBuild Release for thirdparty\cryptopp\cryptlib failed.
   exit /B 1
 )
 

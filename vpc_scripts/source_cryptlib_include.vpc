@@ -25,30 +25,28 @@ $Project
 	$Folder	"Link Libraries" 
 	{
 		$Lib	vpklib
-		// So we can check the signature of the item schema.
-		$Lib	"$SRCDIR\lib\public\$PLATSUBDIR\2013\release\cryptlib" [$WINDOWS&&!$VS2015]
-		$Libexternal $LIBCOMMON/libcrypto [$OSXALL]
-		$Libexternal $LIBCOMMON/libcryptopp [$OSXALL]
-		$Libexternal "$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL]
-		$Libexternal "$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcryptopp" [$LINUXALL]
+		$Libexternal $SRCDIR\thirdparty\libcrypto [$OSXALL]
+		$Libexternal $SRCDIR\thirdparty\libcryptopp [$OSXALL]
+		$Libexternal "$SRCDIR\thirdparty\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL]
+		$Libexternal "$SRCDIR\thirdparty\$(CRYPTOPPDIR)\libcryptopp" [$LINUXALL]
 	}
 
 	$Folder "Link Libraries" [$VS2015]
 	{
-		$File "$SRCDIR\lib\common\win32\2015\release\cryptlib.lib" [$WIN32]
+		$File "$SRCDIR\thirdparty\cryptopp\Win32\Output\Release\cryptlib.lib" [$WIN32]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$SRCDIR\lib\common\win32\2015\debug\cryptlib.lib" [$WIN32]
+		$File "$SRCDIR\thirdparty\cryptopp\Win32\Output\Debug\cryptlib.lib" [$WIN32]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}
 		
-		$File "$SRCDIR\lib\common\$PLATSUBDIR\2015\release\cryptlib.lib" [$WIN64]
+		$File "$SRCDIR\thirdparty\cryptopp\x64\Output\Release\cryptlib.lib" [$WIN64]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$SRCDIR\lib\common\$PLATSUBDIR\2015\debug\cryptlib.lib" [$WIN64]
+		$File "$SRCDIR\thirdparty\cryptopp\x64\Output\Debug\cryptlib.lib" [$WIN64]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}

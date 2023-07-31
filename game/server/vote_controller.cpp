@@ -979,7 +979,7 @@ bool CVoteController::CanEntityCallVote( CBasePlayer *pPlayer, int &nCooldown, v
 	if ( !pPlayer )
 		return false;
 
-#ifndef _DEBUG
+#if !defined(_DEBUG) && !defined(NO_STEAM)
 	CSteamID steamID;
 	pPlayer->GetSteamID( &steamID );
 
