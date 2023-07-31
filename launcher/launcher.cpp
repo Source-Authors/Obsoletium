@@ -1030,61 +1030,6 @@ static char const *Cmd_TranslateFileAssociation(char const *param )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Converts all the convar args into a convar command
-// Input  : none 
-// Output : const char * series of convars
-//-----------------------------------------------------------------------------
-static const char *BuildCommand()
-{
-	static CUtlBuffer build( 0, 0, CUtlBuffer::TEXT_BUFFER );
-	build.Clear();
-
-	// arg[0] is the executable name
-	for ( int i=1; i < CommandLine()->ParmCount(); i++ )
-	{
-		const char *szParm = CommandLine()->GetParm(i);
-		if (!szParm) continue;
-
-		if (szParm[0] == '-') 
-		{
-			// skip -XXX options and eat their args
-			const char *szValue = CommandLine()->ParmValue(szParm);
-			if ( szValue ) i++;
-			continue;
-		}
-		if (szParm[0] == '+')
-		{
-			// convert +XXX options and stuff them into the build buffer
-			const char *szValue = CommandLine()->ParmValue(szParm);
-			if (szValue)
-			{
-				build.PutString(CFmtStr("%s %s;", szParm+1, szValue));
-				i++;
-			}
-			else
-			{
-				build.PutString(szParm+1);
-				build.PutChar(';');
-			}
-		}
-		else 
-		{
-			// singleton values, convert to command
-			char const *translated = Cmd_TranslateFileAssociation( CommandLine()->GetParm( i ) );
-			if (translated)
-			{
-				build.PutString(translated);
-				build.PutChar(';');
-			}
-		}
-	}
-
-	build.PutChar( '\0' );
-
-	return (const char *)build.Base();
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: The real entry point for the application
 // Output : int APIENTRY
 //-----------------------------------------------------------------------------
@@ -1247,49 +1192,9 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			// Useful for side-by-side comparisons of different renderers.
 			bool multiRun = CommandLine()->CheckParm( "-multirun" ) != NULL;
 
-			// We're going to hijack the existing session and load a new savegame into it. This will mainly occur when users click on links in Bugzilla that will automatically copy saves and load them
-			// directly from the web browser. The -hijack command prevents the launcher from objecting that there is already an instance of the game.
-			if (CommandLine()->CheckParm( "-hijack" ))
-			{
-				HWND hwndEngine = FindWindow( "Valve001", NULL );
-
-				// Can't find the engine
-				if ( hwndEngine == NULL )
-				{
-					::MessageBox( NULL, "The modified entity keyvalues could not be sent to the Source Engine because the engine does not appear to be running.", "Source Engine Not Running", MB_OK | MB_ICONEXCLAMATION );
-				}
-				else
-				{			
-					const char *szCommand = BuildCommand();
-
-					//
-					// Fill out the data structure to send to the engine.
-					//
-					COPYDATASTRUCT copyData;
-					copyData.cbData = strlen( szCommand ) + 1;
-					copyData.dwData = 0;
-					copyData.lpData = ( void * )szCommand;
-
-					if ( !::SendMessage( hwndEngine, WM_COPYDATA, 0, (LPARAM)&copyData ) )
-					{
-						::MessageBox( NULL, "The Source Engine was found running, but did not accept the request to load a savegame. It may be an old version of the engine that does not support this functionality.", "Source Engine Declined Request", MB_OK | MB_ICONEXCLAMATION );
-					}
-					else
-					{
-						retval = 0;
-					}
-
-					free((void *)szCommand);
-				}
-			}
-			else
-			{
-				if (!multiRun) {
-					::MessageBox(NULL, "Only one instance of the game can be running at one time.", "Source - Warning", MB_ICONINFORMATION | MB_OK);
-				}
-			}
-
 			if (!multiRun) {
+				::MessageBox(NULL, "Only one instance of the game can be running at one time.", "Source - Warning", MB_ICONINFORMATION | MB_OK);
+
 				return retval;
 			}
 		}
