@@ -538,6 +538,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	}
 
 	bool bLowViolence = initInfo.m_bLowViolence;
+	bool bFirstGamePath = true;
 	for ( KeyValues *pCur=pSearchPaths->GetFirstValue(); pCur; pCur=pCur->GetNextValue() )
 	{
 		const char *pLocation = pCur->GetString();
@@ -667,7 +668,32 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 		{
 			FOR_EACH_VEC( vecPathIDs, idxPathID )
 			{
-				FileSystem_AddLoadedSearchPath( initInfo, vecPathIDs[ idxPathID ], vecFullLocationPaths[ idxLocation ], bLowViolence );
+				const char *pPathID = vecPathIDs[ idxPathID ], *pFullPath = vecFullLocationPaths[ idxLocation ];
+
+				FileSystem_AddLoadedSearchPath( initInfo, pPathID, pFullPath, bLowViolence );
+				
+				if ( Q_stricmp("game", pPathID) == 0 )
+				{
+					char szGameBinPath[MAX_PATH];		
+					Q_snprintf( szGameBinPath, sizeof(szGameBinPath), "%s\\bin", pFullPath );
+
+					// 1. For each "Game" search path, it adds a "GameBin" path, in <dir>\bin
+					FileSystem_AddLoadedSearchPath( initInfo, "GAMEBIN", szGameBinPath, bLowViolence );
+					
+					// 2. For each "Game" search path, it adds another "Game" path in front of it with _<langage> at the end.
+					//    For example: c:\hl2\cstrike on a french machine would get a c:\hl2\cstrike_french path added to it.
+
+					if ( bFirstGamePath )
+					{
+						// 3. For the first "Game" search path, it adds a search path called "MOD".
+						FileSystem_AddLoadedSearchPath( initInfo, "MOD", pFullPath, bLowViolence );
+
+						// 4. For the first "Game" search path, it adds a search path called "DEFAULT_WRITE_PATH".
+						FileSystem_AddLoadedSearchPath( initInfo, "DEFAULT_WRITE_PATH", pFullPath, bLowViolence );
+
+						bFirstGamePath = false;
+					}
+				}
 			}
 		}
 	}
