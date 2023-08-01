@@ -1869,7 +1869,7 @@ char *CShaderDeviceDx8::GetDisplayDeviceName()
 		// On Win10, this function is getting called with m_nAdapter still initialized to -1.
 		// It's failing, and m_sDisplayDeviceName has garbage, and tf2 fails to launch.
 		// To repro this, run "hl2.exe -dev -fullscreen -game tf" on Win10.
-		HRESULT hr = D3D()->GetAdapterIdentifier( Max( m_nAdapter, 0U ), 0, &ident );
+		HRESULT hr = D3D()->GetAdapterIdentifier( m_nAdapter == UINT_MAX ? 0U : m_nAdapter, 0, &ident );
 		if ( FAILED(hr) )
 		{
 			Assert( false );
