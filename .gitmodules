@@ -30,3 +30,6 @@
 [submodule "thirdparty/cryptopp"]
 	path = thirdparty/cryptopp
 	url = git@github.com:Source-Authors/cryptopp.git
+[submodule "ivp"]
+	path = ivp
+	url = git@github.com:Source-Authors/source-physics.git

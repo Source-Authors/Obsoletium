@@ -65,7 +65,7 @@ static void BuildVertMap( vertmap_t &out, const Vector *pVerts, int vertexCount,
 				int index = -1;
 				Vector tmp;
 				ConvertPositionToHL( &pVertList[ivpIndex], tmp);
-				float minDist = 1e24;
+				float minDist = 1e16;
 				for ( int k = 0; k < vertexCount; k++ )
 				{
 					float dist = (tmp-pVerts[k]).Length();
@@ -230,7 +230,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 	pLedge->has_chilren_flag = isVirtualLedge ? IVP_TRUE : IVP_FALSE;
 
 	// Make the offset -pLedge so the result is a NULL ledgetree node - we haven't needed to create one of these as of yet
-	pLedge->ledgetree_node_offset = -((int)pLedge);
+	//pLedge->ledgetree_node_offset = -((int)pLedge);
 
 	// keep track of which triangle edge referenced this edge (so the next one can swap the order and point to the first one)
 	int forwardEdgeIndex[255];

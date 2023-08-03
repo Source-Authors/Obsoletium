@@ -6,18 +6,15 @@
 //
 //=============================================================================//
 // system
-#include <stdio.h>
-#ifdef _XBOX
-#include <ctype.h>
-#endif
+#include <cstdio>
 
 // Valve
 #include "tier0/dbg.h"
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 #include "convert.h"
-#include "commonmacros.h"
+#include "tier0/commonmacros.h"
 
 // vphysics
 #include "vphysics_interface.h"

@@ -14,6 +14,7 @@
 
 // IsInContact
 #include "ivp_mindist.hxx"
+#include "ivp_mindist_intern.hxx"
 #include "ivp_core.hxx"
 #include "ivp_friction.hxx"
 #include "ivp_listener_object.hxx"
@@ -1051,7 +1052,7 @@ void CShadowController::AttachObject( void )
 
 	if ( !m_allowsRotation )
 	{
-		IVP_U_Float_Point ri( 1e15f, 1e15f, 1e15f );
+		IVP_U_Float_Point ri( 1e14f, 1e14f, 1e14f );
 		pCore->set_rotation_inertia( &ri );
 	}
 	if ( !m_allowsTranslation )

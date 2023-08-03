@@ -28,6 +28,7 @@
 #include "ivp_listener_collision.hxx"
 #include "ivp_listener_object.hxx"
 #include "ivp_mindist.hxx"
+#include "ivp_mindist_intern.hxx"
 #include "ivp_friction.hxx"
 #include "ivp_anomaly_manager.hxx"
 #include "ivp_time.hxx"
@@ -35,7 +36,6 @@
 #include "ivp_phantom.hxx"
 #include "ivp_range_manager.hxx"
 #include "ivp_clustering_visualizer.hxx"
-#include "ivp_mindist_intern.hxx"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -683,7 +683,7 @@ private:
 	
 	struct corepair_t
 	{
-		corepair_t() {}
+		corepair_t() = default;
 		corepair_t( IVP_Friction_Core_Pair *pair )
 		{
 			int index = ( pair->objs[0] < pair->objs[1] ) ? 0 : 1;
@@ -1540,7 +1540,7 @@ void CPhysicsEnvironment::Simulate( float deltaTime )
 	{
 		m_pSleepEvents->ProcessActiveObjects( m_pPhysEnv, m_pCollisionListener->GetHandler() );
 	}
-	VISUALIZE_COLLISIONS();
+	//visualize_collisions();
 	VirtualMeshPSI();
 	GetNextFrameTime();
 }
@@ -2041,7 +2041,7 @@ public:
 		if ( !pHash )
 			return m_objectList.InvalidIndex();
 
-		unsigned int hash = (unsigned int)pHash;
+        uintp hash = (uintp)pHash;
 		// mask off the extra bit we added to avoid zeros
 		hash &= 0xFFFF;
 		return (unsigned short)hash;
@@ -2051,10 +2051,10 @@ public:
 	void *ListIndexToHash( unsigned short listIndex )
 	{
 		unsigned int hash = (unsigned int)listIndex;
-		
+
 		// set the high bit, so zero means "not there"
 		hash |= 0x80000000;
-		return (void *)hash;
+		return (void *)(intp)hash;
 	}
 
 	// Lookup this object and get a multilist entry
