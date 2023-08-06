@@ -34,8 +34,7 @@ CMPAFrame::CMPAFrame(CMPAStream* pStream, DWORD& dwOffset, bool bFindSubsequentF
 		DWORD dwNewOffset = GetSubsequentHeaderOffset();
 		try
 		{
-			CMPAFrame* pSubsequentFrame = new CMPAFrame(pStream, dwNewOffset, false, true, false, m_pHeader);
-			delete pSubsequentFrame;
+			CMPAFrame subsequentFrame(pStream, dwNewOffset, false, true, false, m_pHeader);
 		}
 
 		/* if no subsequent frame found
