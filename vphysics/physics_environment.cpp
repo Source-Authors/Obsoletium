@@ -627,7 +627,7 @@ public:
 
 		if ( pFluid )
 		{
-			if ( pObject && (pObject->CallbackFlags() & CALLBACK_FLUID_TOUCH) )
+			if ( (pObject->CallbackFlags() & CALLBACK_FLUID_TOUCH) )
 			{
 				m_pCallback->FluidStartTouch( pObject, pFluid );
 			}
@@ -655,7 +655,7 @@ public:
 
 		if ( pFluid )
 		{
-			if ( pObject && (pObject->CallbackFlags() & CALLBACK_FLUID_TOUCH) )
+			if ( (pObject->CallbackFlags() & CALLBACK_FLUID_TOUCH) )
 			{
 				m_pCallback->FluidEndTouch( pObject, pFluid );
 			}
@@ -733,7 +733,10 @@ private:
 };
 
 
-CPhysicsListenerCollision::CPhysicsListenerCollision() : IVP_Listener_Collision( ALL_COLLISION_FLAGS ), m_pCallback(&g_EmptyCollisionListener) 
+CPhysicsListenerCollision::CPhysicsListenerCollision()
+	: IVP_Listener_Collision( ALL_COLLISION_FLAGS ),
+	m_pairListOldestTime(0.0f),
+	m_pCallback(&g_EmptyCollisionListener) 
 {
 	m_pairList.SetLessFunc( CorePairLessFunc );
 }

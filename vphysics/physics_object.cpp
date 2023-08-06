@@ -1954,9 +1954,9 @@ bool RestorePhysicsObject( const physrestoreparams_t &params, CPhysicsObject **p
 
 IPhysicsObject *CreateObjectFromBuffer( CPhysicsEnvironment *pEnvironment, void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, bool enableCollisions )
 {
-	CPhysicsObject *pObject = new CPhysicsObject();
 	if ( bufferSize >= sizeof(vphysics_save_cphysicsobject_t))
 	{
+		CPhysicsObject *pObject = new CPhysicsObject();
 		vphysics_save_cphysicsobject_t *pTemplate = reinterpret_cast<vphysics_save_cphysicsobject_t *>(pBuffer);
 		pTemplate->hasShadowController = false; // this hasn't been saved separately so cannot be supported via this path
 		pObject->InitFromTemplate( pEnvironment, pGameData, *pTemplate );

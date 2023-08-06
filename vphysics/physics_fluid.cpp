@@ -34,6 +34,7 @@ CPhysicsFluidController::CPhysicsFluidController( CBuoyancyAttacher *pBuoy, IVP_
 	m_pLiquidSurface = pLiquid;
 	m_pObject = pObject;
 	m_nContents = nContents;
+	m_pGameData = HK_NULL;
 }
 
 CPhysicsFluidController::~CPhysicsFluidController( void )

@@ -590,7 +590,7 @@ void CPhysicsSurfaceProps::SetWorldMaterialIndexTable( int *pMapArray, int mapSi
 	m_ivpManager.SetPropMap( pMapArray, mapSize );
 }
 
-CIVPMaterialManager::CIVPMaterialManager( void ) : IVP_Material_Manager( IVP_FALSE )
+CIVPMaterialManager::CIVPMaterialManager( void ) : IVP_Material_Manager( IVP_FALSE ), m_props()
 {
 	// by default every index maps to itself (NULL translation)
 	for ( int i = 0; i < ARRAYSIZE(m_propMap); i++ )

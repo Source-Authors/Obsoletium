@@ -1110,6 +1110,7 @@ CTraceSolverSweptObject::CTraceSolverSweptObject( trace_t *ptr, ITraceObject *sw
 	m_obstacleIVP = obstacle;
 	m_contentsMask = contentsMask;
 	m_pConvexInfo = (pConvexInfo != NULL) ? pConvexInfo : m_fakeConvexInfo.GetPtr();
+	m_rayLengthOS = 0.0f;
 }
 
 
@@ -2470,5 +2471,6 @@ CPhysicsTrace::~CPhysicsTrace()
 CVisitHash::CVisitHash()
 {
 	m_vertVisitID = 1;
+	m_isInUse = 0;
 	memset( m_vertVisit, 0, sizeof(m_vertVisit) );
 }
