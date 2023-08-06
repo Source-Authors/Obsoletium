@@ -50,7 +50,7 @@ public:
 
 	~CEventInfo()
 	{
-		delete pData;
+		delete[] pData;
 	}
 
 	CEventInfo( const CEventInfo& src )
