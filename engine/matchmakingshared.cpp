@@ -1079,25 +1079,8 @@ void CMatchmaking::ClientDropped( CClientInfo *pClient )
 
 	if ( pClient == &m_Host )
 	{
-		// The host was lost
-		if ( m_Session.IsSystemLink() )
-		{
-			// Can't migrate system link sessions
-			SessionNotification( SESSION_NOTIFY_LOST_HOST );
-		}
-		else
-		{
-			// X360TBD: Migration still doesn't work correctly
-			SessionNotification( SESSION_NOTIFY_LOST_HOST );
-			/* 
-			// Start migrating
-			if ( !IsInMigration() )
-			{
-				m_PreMigrateState = m_CurrentState;
-				StartHostMigration();
-			}
-			*/
-		}
+		// Can't migrate system link sessions
+		SessionNotification( SESSION_NOTIFY_LOST_HOST );
 	}
 	else
 	{
