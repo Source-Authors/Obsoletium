@@ -612,7 +612,7 @@ void CMatchmaking::SendHeartbeat()
 //-----------------------------------------------------------------------------
 static uint64 FindPlayerByName( CClientInfo *pClient, const char *pName )
 {
-	for ( int i = 0; i < XUSER_MAX_COUNT; ++i )
+	for ( int i = 0; i < MAX_PLAYERS_PER_CLIENT; ++i )
 	{
 		if ( pClient->m_xuids[i] && !Q_stricmp( pClient->m_szGamertags[i], pName ) )
 		{
