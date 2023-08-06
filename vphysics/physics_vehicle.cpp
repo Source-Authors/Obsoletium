@@ -547,7 +547,7 @@ IVP_Real_Object *CVehicleController::CreateWheel( int wheelIndex, vehicle_axlepa
 	// the wheels
 	float radius = axle.wheels.radius;
 	float r3 = radius * radius * radius;
-	params.volume = (4 / 3) * M_PI * r3;
+	params.volume = (4.0f / 3) * M_PI * r3;
 
 	CPhysicsObject *pWheel = (CPhysicsObject *)m_pEnv->CreateSphereObject( radius, axle.wheels.materialIndex, wheelPositionHL, bodyAngles, &params, false );
     pWheel->Wake();
@@ -843,7 +843,7 @@ void CVehicleController::Update( float dt, vehicle_controlparams_t &controlsIn )
 
 	if ( IsBoosting() )
 	{
-		controls.boost = true;
+		controls.boost = 1.0f;
 		flThrottle = flThrottle < 0.0f ? -1.0f : 1.0f;
 	}
 
