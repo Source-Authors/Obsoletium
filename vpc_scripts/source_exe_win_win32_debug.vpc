@@ -194,7 +194,7 @@ $Configuration "Debug"
 		$HeapCommitSize
 		$StackReserveSize
 		$StackCommitSize
-		$EnableLargeAddresses
+		$EnableLargeAddresses		"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)"
 		$TerminalServer
 		$SwapRunFromCD
 		$SwapRunFromNetwork
@@ -223,7 +223,7 @@ $Configuration "Debug"
 		$NoEntryPoint
 		$SetChecksum
 		$BaseAddress							"$LOADADDRESS_DEVELOPMENT"
-		$FixedBaseAddress
+		$FixedBaseAddress			"Generate a relocation section (/FIXED:NO)"
 		$TurnOffAssemblyGeneration
 		$DelayLoadedDLL
 		$ImportLibrary

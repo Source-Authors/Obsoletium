@@ -22,26 +22,15 @@ $Include "$SRCDIR\vstdlib\vstdlib_exclude.vpc" [$WINDOWS]
 
 $Configuration
 {
-    $General
-    {
-        $AdditionalProjectDependencies "$BASE;newdat" [$WINDOWS && !$ANALYZE]
-    }
-
-	$Compiler
+	$General
 	{
-		$ForceIncludes				" "
-	}
-
-	$Linker [$WIN32]
-	{
-		$EnableLargeAddresses		"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)" [$WIN32]
-		$FixedBaseAddress			"Generate a relocation section (/FIXED:NO)" [$WIN32]
+		$AdditionalProjectDependencies "$BASE;newdat" [$WINDOWS && !$ANALYZE]
 	}
 
 	$ManifestTool
 	{
 		// Input And Output
-		$AdditionalManifestFiles			"$BASE;$SRCDIR\public\dpi-aware.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\utf-8-code-page.manifest;enable-visual-styles.manifest" [!$SOURCESDK]
+		$AdditionalManifestFiles			"$BASE;$SRCDIR\public\dpi-aware.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\utf-8-code-page.manifest;enable-visual-styles.manifest" [!$SOURCESDK]
 	}
 
 	$PreBuildEvent [$WINDOWS]
@@ -90,7 +79,7 @@ $Project "launcher_main"
 
 	$Folder "Resources" [$WINDOWS]
 	{
-		$File "enable-visual-styles.manifest"
+		$File	"enable-visual-styles.manifest"
 		$File	"launcher_main.rc"
 		$File	"$SRCDIR\launcher\res\launcher.ico"
 	}

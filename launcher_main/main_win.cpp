@@ -26,7 +26,7 @@ __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 //
 // See
 // https://community.amd.com/t5/firepro-development/can-an-opengl-app-default-to-the-discrete-gpu-on-an-enduro/td-p/279440
-__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 0x00000001;
+__declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 0x00000001;
 
 }  // extern "C"
 
@@ -75,6 +75,38 @@ template <size_t buffer_size>
 
 int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
                      _In_ LPSTR cmd_line, _In_ int window_flags) {
+  // Game uses features of Windows 10.
+  if (!IsWindows10OrGreater()) {
+    return ShowErrorBoxAndExitWithCode(
+        "Unfortunately, your environment is not supported."
+        "App requires at least Windows 10 to survive.",
+        ERROR_EXE_MACHINE_TYPE_MISMATCH);
+  }
+
+  // Do not show fault error boxes, etc.
+  (void)::SetErrorMode(
+#ifdef NDEBUG
+      // The system does not display the critical-error-handler message box.
+      // Instead, the system sends the error to the calling process.
+      // Enable only in Release to detect critical errors during debug builds.
+      SEM_FAILCRITICALERRORS |
+#endif
+      // The system automatically fixes memory alignment faults and makes them
+      // invisible to the application.  It does this for the calling process and
+      // any descendant processes.
+      SEM_NOALIGNMENTFAULTEXCEPT |
+      // The system does not display the Windows Error Reporting dialog.
+      SEM_NOGPFAULTERRORBOX);
+
+  // Enable heap corruption detection & app termination.
+  if (!HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr,
+                          0)) {
+    return ShowErrorBoxAndExitWithCode(
+        "Please, contact publisher. Failed to enable termination on heap "
+        "corruption feature for your environment.",
+        ::GetLastError());
+  }
+
   // Use the .exe name to determine the base directory.
   char module_name[MAX_PATH];
   if (!::GetModuleFileNameA(instance, module_name, MAX_PATH)) {

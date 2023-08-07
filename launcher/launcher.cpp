@@ -986,50 +986,6 @@ void RemoveSpuriousGameParameters()
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *param - 
-// Output : static char const
-//-----------------------------------------------------------------------------
-static char const *Cmd_TranslateFileAssociation(char const *param )
-{
-	static char sz[ 512 ];
-	char *retval = NULL;
-
-	char temp[ 512 ];
-	Q_strncpy( temp, param, sizeof( temp ) );
-	Q_FixSlashes( temp );
-#ifdef WIN32
-	Q_strlower( temp );
-#endif
-	const char *extension = V_GetFileExtension(temp);
-	// must have an extension to map
-	if (!extension)
-		return retval;
-	extension--; // back up so we have the . in the extension
-
-	int c = ARRAYSIZE( g_FileAssociations );
-	for ( int i = 0; i < c; i++ )
-	{
-		const FileAssociationInfo& info = g_FileAssociations[ i ];
-
-		if ( ! Q_strcmp( extension, info.extension ) && 
-			! CommandLine()->FindParm(CFmtStr( "+%s", info.command_to_issue ) ) )
-		{
-			// Translate if haven't already got one of these commands			
-			Q_strncpy( sz, temp, sizeof( sz ) );
-			Q_FileBase( sz, temp, sizeof( sz ) );
-
-			Q_snprintf( sz, sizeof( sz ), "%s %s", info.command_to_issue, temp );
-			retval = sz;
-			break;
-		}		
-	}
-
-	// return null if no translation, otherwise return commands
-	return retval;
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: The real entry point for the application
 // Output : int APIENTRY
 //-----------------------------------------------------------------------------
@@ -1078,9 +1034,9 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	// Hook the debug output stuff.
 	SpewOutputFunc( LauncherDefaultSpewFunc );
 
-	if ( !IsWindows7OrGreater() )
+	if ( !IsWindows10OrGreater() )
 	{
-		Error( "Sorry, Windows 7+ required to run the game." );
+		Error( "Sorry, Windows 10+ required to run the game." );
 	}
 
 	using namespace std::chrono_literals;

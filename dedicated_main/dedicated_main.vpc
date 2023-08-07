@@ -20,14 +20,12 @@ $Configuration
 	$Linker [$WINDOWS]
 	{
 		$AdditionalDependencies				"$BASE Advapi32.lib"
-		$EnableLargeAddresses		"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)"
-		$FixedBaseAddress			"Generate a relocation section (/FIXED:NO)"
 	}
 
 	$ManifestTool
 	{
 		// Input And Output
-		$AdditionalManifestFiles			"$BASE;$SRCDIR\public\dpi-aware.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\utf-8-code-page.manifest;enable-visual-styles.manifest" [!$SOURCESDK]
+		$AdditionalManifestFiles			"$BASE;$SRCDIR\public\dpi-aware.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\utf-8-code-page.manifest;enable-visual-styles.manifest" [!$SOURCESDK]
 	}
 }
 

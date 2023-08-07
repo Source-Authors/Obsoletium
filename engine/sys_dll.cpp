@@ -1518,13 +1518,6 @@ void Sys_CreateFileAssociations( int count, FileAssociationInfo *list )
 #endif
 }
 
-void Sys_NoCrashDialog()
-{
-#if defined(_WIN32)
-	::SetErrorMode(SetErrorMode(SEM_NOGPFAULTERRORBOX) | SEM_NOGPFAULTERRORBOX);
-#endif
-}
-
 void Sys_TestSendKey( const char *pKey )
 {
 #if defined(_WIN32) && !defined(USE_SDL) && !defined(_XBOX)

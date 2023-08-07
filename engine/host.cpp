@@ -4193,12 +4193,6 @@ void Host_Init( bool bDedicated )
 	// Should have read info from steam.inf by now.
 	Assert( GetSteamInfIDVersionInfo().AppID != k_uAppIdInvalid );
 
-	if ( CommandLine()->FindParm( "-nocrashdialog" ) )
-	{
-		// stop the various windows error message boxes from showing up (used by the auto-builder so it doesn't block on error) 
-		Sys_NoCrashDialog();
-	}
-
 	TRACEINIT( NET_Init( bDedicated ), NET_Shutdown() );     
 
 	TRACEINIT( g_GameEventManager.Init(), g_GameEventManager.Shutdown() );
