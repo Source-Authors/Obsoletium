@@ -6,60 +6,16 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include "interface.h"
+#include "tier1/interface.h"
 #include "vphysics/object_hash.h"
 #include "vphysics/collision_set.h"
 #include "tier1/tier1.h"
 #include "ivu_vhash.hxx"
 
-
-
-#if defined(_WIN32) && !defined(_X360)
-#include "winlite.h"
-#endif	// _WIN32 && !_X360
-
 #include "vphysics_interfaceV30.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-static void ivu_string_print_function( const char *str )
-{
-	Msg("%s", str);
-}
-
-#if defined(_WIN32) && !defined(_XBOX)
-//HMODULE	gPhysicsDLLHandle;
-
-
-BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
-{
- 	if ( fdwReason == DLL_PROCESS_ATTACH )
-	{
-//		ivp_set_message_print_function( ivu_string_print_function );
-
-		MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false );
-		// store out module handle
-		//gPhysicsDLLHandle = (HMODULE)hinstDLL;
-	}
-	else if ( fdwReason == DLL_PROCESS_DETACH )
-	{
-	}
-	return TRUE;
-}
-
-#endif		// _WIN32
-
-#ifdef POSIX
-void __attribute__ ((constructor)) vphysics_init(void);
-void vphysics_init(void)
-{
-//	ivp_set_message_print_function( ivu_string_print_function );
-
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false );
-}
-#endif
-
 
 // simple 32x32 bit array
 class CPhysicsCollisionSet : public IPhysicsCollisionSet
@@ -215,26 +171,3 @@ void CPhysicsInterface::DestroyAllCollisionSets()
 	delete m_pCollisionSetHash;
 	m_pCollisionSetHash = NULL;
 }
-
-	
-
-// In release build, each of these libraries must contain a symbol that indicates it is also a release build
-// You MUST disable this in order to run a release vphysics.dll with a debug library.
-// This should not usually be necessary
-// #if !defined(_DEBUG) && defined(_WIN32)
-// extern int ivp_physics_lib_is_a_release_build;
-// extern int ivp_compactbuilder_lib_is_a_release_build;
-// extern int hk_base_lib_is_a_release_build;
-// extern int hk_math_lib_is_a_release_build;
-// extern int havana_constraints_lib_is_a_release_build;
-
-// void DebugTestFunction()
-// {
-// 	ivp_physics_lib_is_a_release_build = 0;
-// 	ivp_compactbuilder_lib_is_a_release_build = 0;
-// 	hk_base_lib_is_a_release_build = 0;
-// 	hk_math_lib_is_a_release_build = 0;
-// 	havana_constraints_lib_is_a_release_build = 0;
-// }
-// #endif
-

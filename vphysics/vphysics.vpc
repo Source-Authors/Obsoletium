@@ -28,7 +28,6 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE odbc32.lib odbccp32.lib" [$WIN32]
 		$SystemLibraries                "iconv" [$OSXALL]
 	}
 }
@@ -61,6 +60,7 @@ $Project "vphysics"
 		}
 
 		$File	"ledgewriter.cpp"
+		$File	"dll_main.cpp"
 		$File	"main.cpp"
 		$File	"physics_airboat.cpp"
 		$File	"physics_collide.cpp"
