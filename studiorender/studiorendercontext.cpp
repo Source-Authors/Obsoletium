@@ -1318,7 +1318,7 @@ void CStudioRenderContext::R_StudioDestroyStaticMeshes( int numStudioMeshes, stu
 
 	if ( *ppStudioMeshes )
 	{
-		delete 	*ppStudioMeshes;
+		delete[] 	*ppStudioMeshes;
 		*ppStudioMeshes = 0;
 	}
 }
