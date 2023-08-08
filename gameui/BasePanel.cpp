@@ -1986,12 +1986,14 @@ void CBasePanel::RunMenuCommand(const char *command)
 	{
 		if ( IsPC() )
 		{
+#ifndef NO_STEAM
 			if ( !steamapicontext->SteamUser() || !steamapicontext->SteamUser()->BLoggedOn() )
 			{
 				vgui::MessageBox *pMessageBox = new vgui::MessageBox("#GameUI_Achievements_SteamRequired_Title", "#GameUI_Achievements_SteamRequired_Message");
 				pMessageBox->DoModal();
 				return;
 			}
+#endif
 			OnOpenAchievementsDialog();
 		}
 		else

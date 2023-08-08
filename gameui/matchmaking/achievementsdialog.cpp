@@ -365,6 +365,8 @@ void CAchievementsDialog_XBox::OnClose()
 //-----------------------------------------------------------------------------
 CAchievementsDialog::CAchievementsDialog(vgui::Panel *parent) : BaseClass(parent, "AchievementsDialog")
 {
+	m_iFixedWidth = 512;
+
 	SetDeleteSelfOnClose(true);
 	SetBounds(0, 0, 512, 384);
 	SetMinimumSize( 256, 300 );
@@ -1013,15 +1015,15 @@ void CAchievementDialogItemPanel::SetAchievementInfo( IAchievement* pAchievement
 	m_iSourceAchievementIndex = pAchievement->GetAchievementID();
 }
 
+const char g_controlResourceName[] = "resource/ui/AchievementItem.res";
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CAchievementDialogItemPanel::PreloadResourceFile( void )
 {
-	const char *controlResourceName = "resource/ui/AchievementItem.res";
-
-	g_pPreloadedAchievementItemLayout = new KeyValues(controlResourceName);
-	g_pPreloadedAchievementItemLayout->LoadFromFile(g_pFullFileSystem, controlResourceName);
+	g_pPreloadedAchievementItemLayout = new KeyValues(g_controlResourceName);
+	g_pPreloadedAchievementItemLayout->LoadFromFile(g_pFullFileSystem, g_controlResourceName);
 }
 
 //-----------------------------------------------------------------------------
@@ -1035,7 +1037,7 @@ void CAchievementDialogItemPanel::ApplySchemeSettings( IScheme* pScheme )
 		PreloadResourceFile();
 	}
 
-	LoadControlSettings( "", NULL, g_pPreloadedAchievementItemLayout );
+	LoadControlSettings( g_controlResourceName, NULL, g_pPreloadedAchievementItemLayout );
 
 	m_pSchemeSettings = pScheme;
 	

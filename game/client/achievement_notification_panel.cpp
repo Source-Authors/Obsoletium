@@ -101,6 +101,7 @@ void CAchievementNotificationPanel::FireGameEvent( IGameEvent * event )
 		int iMax = event->GetInt( "max_val" );
 		wchar_t szLocalizedName[256]=L"";
 
+#ifndef NO_STEAM
 		if ( IsPC() )
 		{
 			// shouldn't ever get achievement progress if steam not running and user logged in, but check just in case
@@ -115,6 +116,7 @@ void CAchievementNotificationPanel::FireGameEvent( IGameEvent * event )
 			}
 		}
 		else 
+#endif
 		{
 			// on X360 we need to show our own achievement progress UI
 
@@ -251,9 +253,21 @@ CON_COMMAND_F( achievement_notification_test, "Test the hud notification UI", FC
 
 	CAchievementNotificationPanel *pPanel = GET_HUDELEMENT( CAchievementNotificationPanel );
 	if ( pPanel )
-	{		
+	{	
+#if defined(HL2_DLL)	
 		pPanel->AddNotification( "HL2_KILL_ODESSAGUNSHIP", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
 			L"Test Message B" ) );
+#endif
+
+#if defined(HL2_EPISODIC)
+		pPanel->AddNotification( "EP1_KILL_ANTLIONS_WITHCARS", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
+			L"Test Message B" ) );
+#endif
+
+#if defined(PORTAL)
+		pPanel->AddNotification( "PORTAL_DETACH_ALL_CAMERAS", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
+			L"Test Message B" ) );
+#endif
 	}
 
 #if 0

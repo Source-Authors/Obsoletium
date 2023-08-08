@@ -6,7 +6,7 @@
 
 #include "cbase.h"
 #ifdef _WIN32
-#include "winerror.h"
+#include <winerror.h>
 #endif
 #include "achievementmgr.h"
 #include "icommandline.h"
@@ -963,6 +963,8 @@ void CAchievementMgr::AwardAchievement( int iAchievementID )
 				m_AchievementsAwarded.AddToTail( iAchievementID );
 			}
 		}
+#else
+		m_AchievementsAwarded.AddToTail( iAchievementID );
 #endif
     }
 	else if ( IsX360() )
@@ -1033,12 +1035,14 @@ extern bool IsInCommentaryMode( void );
 //-----------------------------------------------------------------------------
 bool CAchievementMgr::CheckAchievementsEnabled()
 {
+#ifndef NO_STEAM
 	// if PC, Steam must be running and user logged in
 	if ( IsPC() && !LoggedIntoSteam() )
 	{
 		Msg( "Achievements disabled: Steam not running.\n" );
 		return false;
 	}
+#endif
 
 #if defined( _X360 )
 	uint state = XUserGetSigninState( XBX_GetPrimaryUserId() );
@@ -1112,15 +1116,16 @@ bool CAchievementMgr::CheckAchievementsEnabled()
 		// Don't award achievements if cheats are turned on.  
 		if ( WereCheatsEverOn() )
 		{
-#ifndef NO_STEAM
 			// Cheats get turned on automatically if you run with -dev which many people do internally, so allow cheats if developer is turned on and we're not running
 			// on Steam public
-			if ( developer.GetInt() == 0 || ( k_EUniverseInvalid == GetUniverse() ) || ( k_EUniversePublic == GetUniverse() ) )
-			{
+			if ( developer.GetInt() == 0
+#ifndef NO_STEAM				
+				|| ( k_EUniverseInvalid == GetUniverse() ) || ( k_EUniversePublic == GetUniverse() )
+#endif
+			) {
 				Msg( "Achievements disabled: cheats turned on in this app session.\n" );
 				return false;
 			}
-#endif
 		}
 	}
 
@@ -1327,11 +1332,13 @@ void CAchievementMgr::ResetAchievements()
 		return;
 	}
 
+#ifndef NO_STEAM
 	if ( !LoggedIntoSteam() )
 	{
 		Msg( "Steam not running, achievements disabled. Cannot reset achievements.\n" );
 		return;
 	}
+#endif
 
 	FOR_EACH_MAP( m_mapAchievement, i )
 	{
@@ -1359,11 +1366,13 @@ void CAchievementMgr::ResetAchievement( int iAchievementID )
 		return;
 	}
 
+#ifndef NO_STEAM
 	if ( !LoggedIntoSteam() )
 	{
 		Msg( "Steam not running, achievements disabled. Cannot reset achievements.\n" );
 		return;
 	}
+#endif
 
 	CBaseAchievement *pAchievement = GetAchievementByID( iAchievementID );
 	Assert( pAchievement );
@@ -1388,11 +1397,13 @@ void CAchievementMgr::ResetAchievement( int iAchievementID )
 //-----------------------------------------------------------------------------
 void CAchievementMgr::PrintAchievementStatus()
 {
+#ifndef NO_STEAM
 	if ( IsPC() && !LoggedIntoSteam() )
 	{
 		Msg( "Steam not running, achievements disabled. Cannot view or unlock achievements.\n" );
 		return;
 	}
+#endif
 
 	Msg( "%42s %-20s %s\n", "Name:", "Status:", "Point value:" );
 	int iTotalAchievements = 0, iTotalPoints = 0;
