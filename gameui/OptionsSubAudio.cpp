@@ -190,7 +190,7 @@ void COptionsSubAudio::OnResetData()
          m_pSpokenLanguageCombo->AddItem( GetLanguageVGUILocalization( languageCode ), new KeyValues ("Audio Languages", "language", languageCode) );
       }
 
-	  languagesList.PurgeAndDeleteElements();
+	  languagesList.PurgeAndDeleteElementsArray();
    }
    else
    {

@@ -182,6 +182,8 @@ public:
 
 	// Purges the list and calls delete on each element in it.
 	void PurgeAndDeleteElements();
+	// Purges the list and calls delete[] on each element in it.
+	void PurgeAndDeleteElementsArray();
 
 	// Compacts the vector to the number of elements actually in use 
 	void Compact();
@@ -1409,6 +1411,17 @@ inline void CUtlVector<T, A>::PurgeAndDeleteElements()
 	for( int i=0; i < m_Size; i++ )
 	{
 		delete Element(i);
+	}
+	Purge();
+}
+
+
+template< typename T, class A >
+inline void CUtlVector<T, A>::PurgeAndDeleteElementsArray()
+{
+	for( int i=0; i < m_Size; i++ )
+	{
+		delete[] Element(i);
 	}
 	Purge();
 }
