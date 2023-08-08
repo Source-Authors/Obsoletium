@@ -63,6 +63,7 @@ bool IsReplayServer( gameserveritem_t &server )
 					bReplay = true;
 				}
 			}
+			TagList.PurgeAndDeleteElementsArray();
 		}
 	}
 

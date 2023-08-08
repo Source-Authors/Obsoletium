@@ -218,7 +218,7 @@ bool CCustomGames::CheckTagFilter( gameserveritem_t &server )
 			}
 		}
 
-		TagList.PurgeAndDeleteElements();
+		TagList.PurgeAndDeleteElementsArray();
 	}
 
 	return bRetVal;
@@ -413,7 +413,7 @@ void CCustomGames::AddTagToFilterList( const char *pszTag )
 			// Already in the tag list?
 			if ( !Q_stricmp( TagList[i], pszTag ) )
 			{
-				TagList.PurgeAndDeleteElements();
+				TagList.PurgeAndDeleteElementsArray();
 				return;
 			}
 		}
@@ -440,7 +440,7 @@ void CCustomGames::AddTagToFilterList( const char *pszTag )
 	}
 
 	m_pTagFilter->SetText( tmptags );
-	TagList.PurgeAndDeleteElements();
+	TagList.PurgeAndDeleteElementsArray();
 
 	// Update & apply filters now that the tag list has changed
 	UpdateFilterSettings();
