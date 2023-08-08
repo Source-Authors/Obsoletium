@@ -808,7 +808,7 @@ CON_COMMAND_F( connect, "Connect to specified server.", FCVAR_DONTRECORD )
 	{
 		ConMsg( "Usage:  connect <server>\n" );
 	}
-	vecArgs.PurgeAndDeleteElements();
+	vecArgs.PurgeAndDeleteElementsArray();
 }
 
 CON_COMMAND_F( redirect, "Redirect client to specified server.", FCVAR_DONTRECORD | FCVAR_SERVER_CAN_EXECUTE )
@@ -832,7 +832,7 @@ CON_COMMAND_F( redirect, "Redirect client to specified server.", FCVAR_DONTRECOR
 	{
 		ConMsg( "Usage:  redirect <server>\n" );
 	}
-	vecArgs.PurgeAndDeleteElements();
+	vecArgs.PurgeAndDeleteElementsArray();
 }
 
 //-----------------------------------------------------------------------------

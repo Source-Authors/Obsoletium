@@ -222,7 +222,7 @@ bool CPureServerWhitelist::LoadCommandsFromKeyValues( KeyValues *kv )
 			else
 				Warning( "Unknown modifier in whitelist file: %s.\n", mods[i] );
 		}
-		mods.PurgeAndDeleteElements();
+		mods.PurgeAndDeleteElementsArray();
 		if (
 			( bFromTrustedSource && ( bAllowFromDisk || bCheckCRC || bAny ) )
 			|| ( bAny && bCheckCRC ) )

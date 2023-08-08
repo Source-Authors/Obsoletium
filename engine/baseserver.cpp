@@ -127,7 +127,7 @@ static void ServerTagsCleanUp( void )
 		}
 
 		// reset our lists and sort the tags
-		TagList.PurgeAndDeleteElements();
+		TagList.PurgeAndDeleteElementsArray();
 		V_SplitString( tmptags, ",", TagList );
 		TagList.Sort( SortServerTags );
 		tmptags[0] = '\0';
@@ -145,7 +145,7 @@ static void ServerTagsCleanUp( void )
 
 		// set our convar and purge our list
 		sv_tags.SetValue( tmptags );
-		TagList.PurgeAndDeleteElements();
+		TagList.PurgeAndDeleteElementsArray();
 	}
 }
 
@@ -2488,7 +2488,7 @@ void CBaseServer::AddTag( const char *pszTag )
 		if ( !Q_stricmp(TagList[i],pszTag) )
 			return;
 	}
-	TagList.PurgeAndDeleteElements();
+	TagList.PurgeAndDeleteElementsArray();
 
 	// Append it
 	char tmptags[MAX_TAG_STRING_LENGTH];
@@ -2527,7 +2527,7 @@ void CBaseServer::RemoveTag( const char *pszTag )
 			bFoundIt = true;
 		}
 	}
-	TagList.PurgeAndDeleteElements();
+	TagList.PurgeAndDeleteElementsArray();
 
 	// Didn't find it in our list?
 	if ( !bFoundIt )
