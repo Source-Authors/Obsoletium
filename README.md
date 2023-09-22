@@ -9,7 +9,7 @@
 * Add registry keys:
   | Path                        | Name  | Type | Data |
   | ----                        | ----  | ---- | ---- |
-  | `HKLM\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\10.0\Projects\{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}` | `DefaultProjectExtension` | string 
+  | `HKLM\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\10.0\Projects\{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}` | `DefaultProjectExtension` | string | vcproj
 * Run `creategameprojects_debug.bat` from Developer command prompt.
 * Open `hl2.sln`
 * Build
