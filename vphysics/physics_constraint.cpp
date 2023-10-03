@@ -737,7 +737,7 @@ void CPhysicsConstraint::InitHinge( IVP_Environment *pEnvironment, CPhysicsConst
 
 	hk_Hinge_BP_Builder builder;
 
-	IVP_U_Point axisIVP_ws, axisPerpIVP_os, axisStartIVP_ws, axisStartIVP_os;
+	IVP_U_Point axisIVP_ws, axisPerpIVP_os;
 	
 	ConvertDirectionToIVP( hinge.worldAxisDirection, axisIVP_ws );
 	builder.set_axis_ws( (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject(), vec(axisIVP_ws) );

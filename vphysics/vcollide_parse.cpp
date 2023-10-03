@@ -20,7 +20,7 @@
 
 static void ReadVector( const char *pString, Vector& out )
 {
-	float x, y, z;
+	float x = 0, y = 0, z = 0;
 	sscanf( pString, "%f %f %f", &x, &y, &z );
 	out[0] = x;
 	out[1] = y;
@@ -29,7 +29,7 @@ static void ReadVector( const char *pString, Vector& out )
 
 static void ReadAngles( const char *pString, QAngle& out )
 {
-	float x, y, z;
+	float x = 0, y = 0, z = 0;
 	sscanf( pString, "%f %f %f", &x, &y, &z );
 	out[0] = x;
 	out[1] = y;
@@ -38,7 +38,7 @@ static void ReadAngles( const char *pString, QAngle& out )
 
 static void ReadVector4D( const char *pString, Vector4D& out )
 {
-	float x, y, z, w;
+	float x = 0, y = 0, z = 0, w = 0;
 	sscanf( pString, "%f %f %f %f", &x, &y, &z, &w );
 	out[0] = x;
 	out[1] = y;
@@ -916,7 +916,7 @@ void DestroyVPhysicsKeyParser( IVPhysicsKeyParser *pParser )
 // Helper functions for parsing script file
 //-----------------------------------------------------------------------------
 
-const char *ParseKeyvalue( const char *pBuffer, char (&key)[MAX_KEYVALUE], char (&value)[MAX_KEYVALUE] )
+const char *ParseKeyvalue( const char *pBuffer, OUT_Z_ARRAY char (&key)[MAX_KEYVALUE], OUT_Z_ARRAY char (&value)[MAX_KEYVALUE] )
 {
 	// Make sure value is always null-terminated.
 	value[0] = 0;

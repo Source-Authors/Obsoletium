@@ -26,7 +26,7 @@ static void InitializeCharacterSets()
 }
 
 
-const char* ParseFileInternal( const char* pFileBytes, char* pTokenOut, bool* pWasQuoted, characterset_t *pCharSet, size_t nMaxTokenLen )
+const char* ParseFileInternal( const char* pFileBytes, OUT_Z_CAP(nMaxTokenLen) char* pTokenOut, bool* pWasQuoted, characterset_t *pCharSet, size_t nMaxTokenLen )
 {
 	pTokenOut[0] = 0;
 

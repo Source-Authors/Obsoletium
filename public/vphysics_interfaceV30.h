@@ -930,7 +930,7 @@ struct fluidparams_t
 	bool		useAerodynamics;// true if this controller should calculate surface pressure
 	int			contents;
 
-	fluidparams_t() {}
+	fluidparams_t() : pGameData(nullptr) {}
 	fluidparams_t( fluidparams_t const& src )
 	{
 		Vector4DCopy( src.surfacePlane, surfacePlane );
@@ -938,6 +938,8 @@ struct fluidparams_t
 		damping = src.damping;
 		torqueFactor = src.torqueFactor;
 		viscosityFactor = src.viscosityFactor;
+		pGameData = src.pGameData;
+		useAerodynamics = src.useAerodynamics;
 		contents = src.contents;
 	}
 };

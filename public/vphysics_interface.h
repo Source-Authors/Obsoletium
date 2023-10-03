@@ -1029,6 +1029,8 @@ struct fluidparams_t
 		damping = src.damping;
 		torqueFactor = src.torqueFactor;
 		viscosityFactor = src.viscosityFactor;
+		pGameData = src.pGameData;
+		useAerodynamics = src.useAerodynamics;
 		contents = src.contents;
 	}
 };

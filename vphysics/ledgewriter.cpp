@@ -233,7 +233,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 	//pLedge->ledgetree_node_offset = -((int)pLedge);
 
 	// keep track of which triangle edge referenced this edge (so the next one can swap the order and point to the first one)
-	int forwardEdgeIndex[255];
+	int forwardEdgeIndex[255] = {};
 	for ( int i = 0; i < pHull->edgeCount; i++ )
 	{
 		forwardEdgeIndex[i] = -1;

@@ -46,6 +46,7 @@ class CPhysicsCollision : public IPhysicsCollision
 public:
 	CPhysicsCollision()
 	{
+		memset(m_bboxVertMap, 0, sizeof(m_bboxVertMap));
 	}
 	CPhysConvex	*ConvexFromVerts( Vector **pVerts, int vertCount );
 	CPhysConvex	*ConvexFromVertsFast( Vector **pVerts, int vertCount );
