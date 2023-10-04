@@ -64,7 +64,7 @@ CNeurotoxinCountdownScreen::CNeurotoxinCountdownScreen( vgui::Panel *parent, con
 
 void CNeurotoxinCountdownScreen::ApplySchemeSettings( IScheme *pScheme )
 {
-	assert( pScheme );
+	Assert( pScheme );
 
 	m_cDefault = pScheme->GetColor( "CNeurotoxinCountdownScreen_Default", GetFgColor() );
 	m_cInvisible = Color( 0, 0, 0, 0 );	

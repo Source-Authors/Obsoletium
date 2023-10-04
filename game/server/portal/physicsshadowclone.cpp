@@ -684,7 +684,7 @@ void CPhysicsShadowClone::FullSyncClonedPhysicsObjects( bool bTeleport )
 			physenv->SerializeObjectToBuffer( pSource, pBuffer, size ); //this should work across physics environments because the serializer doesn't write anything about itself to the template
 			pSource->SetGameFlags( iOldGameFlags );
 			cloneLink.pClone = m_pOwnerPhysEnvironment->UnserializeObjectFromBuffer( this, pBuffer, size, false ); //unserializer has to be in the target environment
-			assert( cloneLink.pClone ); //there should be absolutely no case where we can't clone a valid existing physics object
+			Assert( cloneLink.pClone ); //there should be absolutely no case where we can't clone a valid existing physics object
 	
 			stackfree(pBuffer);
 		}
