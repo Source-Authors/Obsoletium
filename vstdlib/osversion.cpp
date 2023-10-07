@@ -26,80 +26,30 @@ EOSType GetOSType()
 	if ( eOSVersion == k_eOSUnknown || eOSVersion == k_eWinUnknown )
 	{
 		eOSVersion = k_eWinUnknown;
-		OSVERSIONINFOEX osvi;
-		Q_memset( &osvi, 0x00, sizeof(osvi) );
-		osvi.dwOSVersionInfoSize = sizeof(osvi);
-		
-		if ( GetVersionEx( (OSVERSIONINFO *) &osvi ) )
+
+		if ( IsWindows10OrGreater() )
 		{
-			switch ( osvi.dwPlatformId )
-			{
-			case VER_PLATFORM_WIN32_NT:
-				if ( osvi.dwMajorVersion <= 4 )
-				{
-					eOSVersion = k_eWinNT;
-				}
-				else if ( osvi.dwMajorVersion == 5 )
-				{
-					switch(  osvi.dwMinorVersion ) 
-					{
-					case 0:
-						eOSVersion = k_eWin2000;
-						break;
-					case 1:
-						eOSVersion = k_eWinXP;
-						break;
-					case 2:
-						eOSVersion = k_eWin2003;
-						break;
-					}
-				}
-				else if ( osvi.dwMajorVersion >= 6 )
-				{
-					if ( osvi.wProductType == VER_NT_WORKSTATION )
-					{
-						switch ( osvi.dwMinorVersion )
-						{
-						case 0:
-							eOSVersion = k_eWinVista;
-							break;
-						case 1:
-							eOSVersion = k_eWindows7;
-							break;
-						}
-					}
-					else /* ( osvi.wProductType != VER_NT_WORKSTATION ) */
-					{
-						switch ( osvi.dwMinorVersion )
-						{
-						case 0:
-							eOSVersion = k_eWin2008;	// Windows 2008, not R2
-							break;
-						case 1:
-							eOSVersion = k_eWin2008;	// Windows 2008 R2
-							break;
-						}
-					}
-				}
-				break;
-			case VER_PLATFORM_WIN32_WINDOWS:
-				switch ( osvi.dwMinorVersion )
-				{
-				case 0:
-					eOSVersion = k_eWin95;
-					break;
-				case 10:
-					eOSVersion = k_eWin98;
-					break;
-				case 90:
-					eOSVersion = k_eWinME;
-					break;
-				}
-				break;
-			case VER_PLATFORM_WIN32s:
-				eOSVersion = k_eWin311;
-				break;
-			}
+			eOSVersion = k_eWindows10;
+		}
+		else if ( IsWindows8Point1OrGreater() )
+		{
+			eOSVersion = k_eWindows8_1;
+		}
+		else if ( IsWindows8OrGreater() )
+		{
+			eOSVersion = k_eWindows8;
+		}
+		else if ( IsWindows7OrGreater() )
+		{
+			eOSVersion = k_eWindows7;
+		}
+		else if ( IsWindowsVistaOrGreater() )
+		{
+			eOSVersion = k_eWinVista;
+		}
+		else if ( IsWindowsXPOrGreater() )
+		{
+			eOSVersion = k_eWinXP;
 		}
 	}
 #elif defined(OSX)
@@ -295,6 +245,12 @@ const char *GetNameFromOSType( EOSType eOSType )
 		return "Windows 7";
 	case k_eWin2008:
 		return "Windows 2008";
+	case k_eWindows8:
+		return "Windows 8";
+	case k_eWindows8_1:
+		return "Windows 8.1";
+	case k_eWindows10:
+		return "Windows 10";
 #ifdef POSIX
 	case k_eMacOSUnknown:
 		return "Mac OS";
@@ -360,6 +316,9 @@ const OSTypeNameTuple k_rgOSTypeToName[] =
 	{ k_eWinVista, "winVista" },
 	{ k_eWindows7, "win7" },
 	{ k_eWin2008, "win2008" },
+	{ k_eWindows8, "win8" },
+	{ k_eWindows8_1, "win8.1" },
+	{ k_eWindows10, "win10" },
 };
 
 //-----------------------------------------------------------------------------

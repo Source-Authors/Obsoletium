@@ -47,6 +47,9 @@ enum EOSType
 	k_eWinVista,
 	k_eWindows7,
 	k_eWin2008,
+	k_eWindows8,
+	k_eWindows8_1,
+	k_eWindows10,
 	k_eWinMAX,
 	k_eOSTypeMax = k_eWinMAX + 11 // win types + other ifdef'd types
 };
