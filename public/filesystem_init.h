@@ -212,6 +212,7 @@ FSReturnCode_t GetSteamCfgPath( char *steamCfgPath, int steamCfgPathLen );
 // Returns the last error.
 const char *FileSystem_GetLastErrorString();
 
-void Q_getwd( char *out, int outSize );
+// dimhotepus: Drop internal function.
+// void Q_getwd( char *out, int outSize );
 
 #endif // FILESYSTEM_INIT_H

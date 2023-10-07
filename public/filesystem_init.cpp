@@ -191,8 +191,8 @@ public:
 // ---------------------------------------------------------------------------------------------------- //
 // Helpers.
 // ---------------------------------------------------------------------------------------------------- //
-void Q_getwd( char *out, int outSize )
-{
+template<size_t outSize>
+void Q_getwd( char (&out)[outSize] ) {
 #if defined( _WIN32 ) || defined( WIN32 )
 	_getcwd( out, outSize );
 	Q_strncat( out, "\\", outSize, COPY_ALL_CHARACTERS );
@@ -746,7 +746,8 @@ SuggestGameInfoDirFn_t SetSuggestGameInfoDirFn( SuggestGameInfoDirFn_t pfnNewFn 
 	return pfnOldFn;
 }
 
-static FSReturnCode_t TryLocateGameInfoFile( char *pOutDir, int outDirLen, bool bBubbleDir )
+template<int outDirLen>
+static FSReturnCode_t TryLocateGameInfoFile(char (&pOutDir)[outDirLen], bool bBubbleDir)
 {
 	// Retain a copy of suggested path for further attempts
 	CArrayAutoPtr < char > spchCopyNameBuffer( new char [ outDirLen ] );
@@ -797,7 +798,8 @@ static FSReturnCode_t TryLocateGameInfoFile( char *pOutDir, int outDirLen, bool 
 	return FS_MISSING_GAMEINFO_FILE;
 }
 
-FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char *pOutDir, int outDirLen )
+template<int outDirLen>
+FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char (&pOutDir)[outDirLen] )
 {
 	// Engine and Hammer don't want to search around for it.
 	if ( fsInfo.m_bOnlyUseDirectoryName )
@@ -854,14 +856,14 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char *pOutDi
 		SuggestGameInfoDirFn_t pfnSuggestGameInfoDirFn = GetSuggestGameInfoDirFn();
 		if ( pfnSuggestGameInfoDirFn &&
 			( * pfnSuggestGameInfoDirFn )( &fsInfo, pOutDir, outDirLen, &bBubbleDir ) &&
-			FS_OK == TryLocateGameInfoFile( pOutDir, outDirLen, bBubbleDir ) )
+			FS_OK == TryLocateGameInfoFile( pOutDir, bBubbleDir ) )
 			return FS_OK;
 	}
 
 	// Try to use the environment variable / registry
 	if ( ( pProject = getenv( GAMEDIR_TOKEN ) ) != NULL &&
 		 ( Q_MakeAbsolutePath( pOutDir, outDirLen, pProject ), 1 ) &&
-		 FS_OK == TryLocateGameInfoFile( pOutDir, outDirLen, false ) )
+		 FS_OK == TryLocateGameInfoFile( pOutDir, false ) )
 		return FS_OK;
 
 	if ( IsPC() )
@@ -874,12 +876,12 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char *pOutDi
 		else
 			Q_MakeAbsolutePath( pOutDir, outDirLen, "." );
 
-		if ( FS_OK == TryLocateGameInfoFile( pOutDir, outDirLen, true ) )
+		if ( FS_OK == TryLocateGameInfoFile( pOutDir, true ) )
 			return FS_OK;
 
 		// Use the CWD
-		Q_getwd( pOutDir, outDirLen );
-		if ( FS_OK == TryLocateGameInfoFile( pOutDir, outDirLen, true ) )
+		Q_getwd( pOutDir );
+		if ( FS_OK == TryLocateGameInfoFile( pOutDir, true ) )
 			return FS_OK;
 	}
 
@@ -1063,7 +1065,7 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 FSReturnCode_t FileSystem_SetupSteamEnvironment( CFSSteamSetupInfo &fsInfo )
 {
 	// First, locate the directory with gameinfo.txt.
-	FSReturnCode_t ret = LocateGameInfoFile( fsInfo, fsInfo.m_GameInfoPath, sizeof( fsInfo.m_GameInfoPath ) );
+	FSReturnCode_t ret = LocateGameInfoFile( fsInfo, fsInfo.m_GameInfoPath );
 	if ( ret != FS_OK )
 		return ret;
 
