@@ -377,6 +377,7 @@ public:
 	inline VectorAligned(vec_t X, vec_t Y, vec_t Z)  //-V730
 	{
 		Init(X,Y,Z);
+		w = 0;
 	}
 
 #ifdef VECTOR_NO_SLOW_OPERATIONS
@@ -391,6 +392,7 @@ public:
 	explicit VectorAligned(const Vector &vOther)  //-V730
 	{
 		Init(vOther.x, vOther.y, vOther.z);
+		w = 0;
 	}
 	
 	VectorAligned& operator=(const Vector &vOther)	
