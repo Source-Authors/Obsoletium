@@ -264,9 +264,9 @@ void InitTextMode()
 
 	SetConsoleCtrlHandler( MyHandlerRoutine, TRUE );
 
-	freopen( "CONIN$", "rb", stdin );		// reopen stdin handle as console window input
-	freopen( "CONOUT$", "wb", stdout );		// reopen stout handle as console window output
-	freopen( "CONOUT$", "wb", stderr );		// reopen stderr handle as console window output
+	(void)freopen( "CONIN$", "rb", stdin );		// reopen stdin handle as console window input
+	(void)freopen( "CONOUT$", "wb", stdout );	// reopen stout handle as console window output
+	(void)freopen( "CONOUT$", "wb", stderr );	// reopen stderr handle as console window output
 #endif
 }
 
@@ -1186,7 +1186,10 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 
 	// Figure out the directory the executable is running from
 	// and make that be the current working directory
-	_chdir( baseDirectory );
+	if ( _chdir( baseDirectory ) )
+	{
+		Warning( "Unable to change current directory to %s.", baseDirectory );
+	}
 
 	CLeakDump leakDump( CommandLine()->CheckParm( "-leakcheck" ) );
 
