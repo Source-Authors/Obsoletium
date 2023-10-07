@@ -47,24 +47,26 @@ const char *MakeModuleFileName()
 	if ( g_pMemAlloc && g_pMemAlloc->IsDebugHeap() )
 	{
 		char *pszModuleName = (char *)HeapAlloc( GetProcessHeap(), 0, MAX_PATH ); // small leak, debug only
-
-		MEMORY_BASIC_INFORMATION mbi;
-		static int dummy;
-		VirtualQuery( &dummy, &mbi, sizeof(mbi) );
-
-		GetModuleFileName( reinterpret_cast<HMODULE>(mbi.AllocationBase), pszModuleName, MAX_PATH );
-		char *pDot = strrchr( pszModuleName, '.' );
-		if ( pDot )
+		if (pszModuleName)
 		{
-			char *pSlash = strrchr( pszModuleName, '\\' );
-			if ( pSlash )
-			{
-				pszModuleName = pSlash + 1;
-				*pDot = 0;
-			}
-		}
+			MEMORY_BASIC_INFORMATION mbi;
+			static int dummy;
+			VirtualQuery( &dummy, &mbi, sizeof(mbi) );
 
-		return pszModuleName;
+			GetModuleFileName( static_cast<HMODULE>(mbi.AllocationBase), pszModuleName, MAX_PATH );
+			char *pDot = strrchr( pszModuleName, '.' );
+			if ( pDot )
+			{
+				char *pSlash = strrchr( pszModuleName, '\\' );
+				if ( pSlash )
+				{
+					pszModuleName = pSlash + 1;
+					*pDot = 0;
+				}
+			}
+
+			return pszModuleName;
+		}
 	}
 	return NULL;
 }
