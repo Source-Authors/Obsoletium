@@ -48,6 +48,7 @@ private:
 		HANDLE m_hChildStdoutWr;
 		HANDLE m_hChildStderrWr;
 		HANDLE m_hProcess;
+		HANDLE m_hThread;
 		CUtlString m_CommandLine;
 		CUtlBuffer m_ProcessOutput;
 	};
@@ -137,6 +138,7 @@ ProcessHandle_t CProcessUtils::CreateProcess( ProcessInfo_t &info, bool bConnect
 	if ( ::CreateProcess( NULL, info.m_CommandLine.GetForModify(), NULL, NULL, TRUE, DETACHED_PROCESS, NULL, NULL, &si, &pi ) )
 	{
 		info.m_hProcess = pi.hProcess;
+		info.m_hThread = pi.hThread;
 		m_hCurrentProcess = m_Processes.AddToTail( info );
 		return m_hCurrentProcess;
 	}
@@ -239,6 +241,8 @@ void CProcessUtils::ShutdownProcess( ProcessHandle_t hProcess )
 	CloseHandle( info.m_hChildStdinWr );
 	CloseHandle( info.m_hChildStdoutRd );
 	CloseHandle( info.m_hChildStdoutWr );
+	CloseHandle( info.m_hProcess );
+	CloseHandle( info.m_hThread );
 
 	m_Processes.Remove( hProcess );
 }
@@ -348,7 +352,14 @@ int CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf,
 	}
 
 	dwCount = min( dwCount, (DWORD)nBufLen - 1 );
-	ReadFile( info.m_hChildStdoutRd, pTempBuf, dwCount, &dwRead, NULL);
+	if ( !ReadFile( info.m_hChildStdoutRd, pTempBuf, dwCount, &dwRead, NULL) )
+	{
+		char buf[ 512 ];
+		Warning( "Could not read from pipe associated with command %s\n"
+			"Windows gave the error message:\n   \"%s\"\n",
+			info.m_CommandLine.Get(), GetErrorString( buf, sizeof(buf) ) );
+		return 0;
+	}
 	
 	// Convert /n/r -> /n
 	int nActualCountRead = 0;
