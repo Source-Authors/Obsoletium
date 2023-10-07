@@ -34,8 +34,8 @@ template <size_t buffer_size>
 }
 
 // Purpose: Shows error box and returns error code.
-[[nodiscard]] int ShowErrorBoxAndExitWithCode(const char *error_message,
-                                              int exit_code) {
+[[nodiscard]] int ShowErrorBoxAndExitWithCode(_In_z_ const char *error_message,
+                                              _In_ int exit_code) {
   const auto system_error = std::system_category().message(exit_code);
 
   char entire_error_message[2048];
