@@ -952,35 +952,6 @@ static bool ReadHeaderFromBufferPastBaseHeader( CUtlBuffer &buf, VTFFileHeader_t
 
 bool CVTFTexture::ReadHeader( CUtlBuffer &buf, VTFFileHeader_t &header )
 {
-	if ( IsX360() && SetupByteSwap( buf ) )
-	{
-		VTFFileBaseHeader_t baseHeader;
-		m_Swap.SwapFieldsToTargetEndian( &baseHeader, (VTFFileBaseHeader_t*)buf.PeekGet() );
-
-		// Swap the header inside the UtlBuffer
-		if ( baseHeader.version[0] == VTF_MAJOR_VERSION )
-		{
-			if ( baseHeader.version[1] == 0 || baseHeader.version[1] == 1 )
-			{
-				// version 7.0 or 7.1
-				m_Swap.SwapFieldsToTargetEndian( (VTFFileHeaderV7_1_t*)buf.PeekGet() );
-			}
-			else if ( baseHeader.version[1] == 2 )
-			{
-				// version 7.2
-				m_Swap.SwapFieldsToTargetEndian( (VTFFileHeaderV7_2_t*)buf.PeekGet() );
-			}
-			else if ( baseHeader.version[1] == 3 )
-			{
-				m_Swap.SwapFieldsToTargetEndian( (VTFFileHeaderV7_3_t*)buf.PeekGet() );
-			}
-			else if ( baseHeader.version[1] == VTF_MINOR_VERSION )
-			{
-				m_Swap.SwapFieldsToTargetEndian( (VTFFileHeader_t*)buf.PeekGet() );
-			}
-		}
-	}
-
 	memset( &header, 0, sizeof(VTFFileHeader_t) );
 	buf.Get( &header, sizeof(VTFFileBaseHeader_t) );
 	if ( !buf.IsValid() )
@@ -1014,13 +985,13 @@ bool CVTFTexture::ReadHeader( CUtlBuffer &buf, VTFFileHeader_t &header )
 	case 0:
 	case 1:
 		header.depth = 1;
-		// fall-through
+        [[fallthrough]];
 	case 2:
 		header.numResources = 0;
-		// fall-through
+        [[fallthrough]];
 	case 3:
 		header.flags &= VERSIONED_VTF_FLAGS_MASK_7_3;
-		// fall-through
+        [[fallthrough]];
 	case VTF_MINOR_VERSION:
 		break;
 	}
@@ -1851,8 +1822,8 @@ void CVTFTexture::ComputeMipLevelSubRect( Rect_t *pSrcRect, int nMipLevel, Rect_
 	float flInvShrink = 1.0f / (float)(1 << nMipLevel);
 	pSubRect->x = pSrcRect->x * flInvShrink;
 	pSubRect->y = pSrcRect->y * flInvShrink;
-	pSubRect->width = (int)ceil( (pSrcRect->x + pSrcRect->width) * flInvShrink ) - pSubRect->x;
-	pSubRect->height = (int)ceil( (pSrcRect->y + pSrcRect->height) * flInvShrink ) - pSubRect->y;
+	pSubRect->width = (int)ceilf( (pSrcRect->x + pSrcRect->width) * flInvShrink ) - pSubRect->x;
+	pSubRect->height = (int)ceilf( (pSrcRect->y + pSrcRect->height) * flInvShrink ) - pSubRect->y;
 }
 
 
