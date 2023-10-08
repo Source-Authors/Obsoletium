@@ -356,7 +356,7 @@ bool CUtlString::MatchesPattern( const CUtlString &Pattern, int nFlags ) const
 }
 
 
-int CUtlString::Format( const char *pFormat, ... )
+int CUtlString::Format( PRINTF_FORMAT_STRING const char *pFormat, ... ) FMTFUNCTION( 2, 3 )
 {
 	va_list marker;
 
@@ -371,7 +371,7 @@ int CUtlString::Format( const char *pFormat, ... )
 // This can be called from functions that take varargs.
 //--------------------------------------------------------------------------------------------------
 
-int CUtlString::FormatV( const char *pFormat, va_list marker )
+int CUtlString::FormatV( PRINTF_FORMAT_STRING const char *pFormat, va_list marker )
 {
 	char tmpBuf[ 4096 ];	//< Nice big 4k buffer, as much memory as my first computer had, a Radio Shack Color Computer
 

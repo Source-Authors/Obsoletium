@@ -1077,7 +1077,7 @@ int CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 }
 
 
-int CUtlBuffer::Scanf( const char* pFmt, ... )
+int CUtlBuffer::Scanf( SCANF_FORMAT_STRING const char* pFmt, ... )
 {
 	va_list args;
 
@@ -1455,7 +1455,7 @@ void CUtlBuffer::VaPrintf( const char* pFmt, va_list list )
 	PutString( temp );
 }
 
-void CUtlBuffer::Printf( const char* pFmt, ... )
+void CUtlBuffer::Printf( PRINTF_FORMAT_STRING const char* pFmt, ... ) FMTFUNCTION( 2, 3 )
 {
 	va_list args;
 
