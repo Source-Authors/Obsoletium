@@ -37,6 +37,7 @@ private:
 
 CSceneTokenProcessor::CSceneTokenProcessor() : m_pBuffer()
 {
+	m_szToken[0] = '\0';
 	CharacterSetBuild( &m_BreakSetIncludingColons, "{}()':" );
 }
 
