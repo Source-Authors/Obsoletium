@@ -244,12 +244,13 @@ public:
 
 	~FloatBitMap_t();
 
-	void AllocateRGB(int w, int h)
+	float* AllocateRGB(int w, int h)
 	{
 		delete[] RGBAData;
 		RGBAData=new float[w*h*4];
 		Width=w;
 		Height=h;
+		return RGBAData;
 	}
 };
 

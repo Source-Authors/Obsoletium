@@ -39,14 +39,12 @@ inline float BiLinInterp(float Xfrac, float Yfrac, float UL, float UR, float LL,
 
 FloatBitMap_t::FloatBitMap_t(int width, int height)
 {
-	RGBAData=0;
-	AllocateRGB(width,height);
+	RGBAData=AllocateRGB(width,height);
 }
 
 FloatBitMap_t::FloatBitMap_t(FloatBitMap_t const *orig)
 {
-	RGBAData=0;
-	AllocateRGB(orig->Width,orig->Height);
+	RGBAData=AllocateRGB(orig->Width,orig->Height);
 	memcpy(RGBAData,orig->RGBAData,Width*Height*sizeof(float)*4);
 }
 
