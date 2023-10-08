@@ -38,7 +38,7 @@ struct BeamSeg_t
 class CBeamSegDraw
 {
 public:
-  CBeamSegDraw() : m_pMeshBuilder(nullptr), m_nMeshVertCount(-1), m_nTotalSegs(-1), m_nSegsDrawn(-1), m_pRenderContext(nullptr)
+	CBeamSegDraw() : m_pMeshBuilder(nullptr), m_nMeshVertCount(-1), m_nTotalSegs(-1), m_nSegsDrawn(-1), m_vNormalLast(), m_pRenderContext(nullptr)
 	{
 		memset( &m_Seg, 0, sizeof(m_Seg) );
 	}

@@ -423,7 +423,7 @@ struct MaterialVideoMode_t
 // fixme: should move this into something else.
 struct FlashlightState_t
 {
-	FlashlightState_t()
+	FlashlightState_t() : m_vecLightOrigin(), m_quatOrientation()
 	{
 		m_NearZ = 0.0F;
 		m_FarZ = 0.0F;
