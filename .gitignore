@@ -421,3 +421,5 @@ devtools/bin/vpc.pdb
 ValveETWProviderEvents*
 gcsdk/generated_proto/
 
+# MSVC static analyzer results
+*.lastcodeanalysissucceeded
