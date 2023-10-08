@@ -295,7 +295,7 @@ bool UpdateSequenceLength( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPose
 	if ( e->HasEndTime() )
 	{
 		float dt = e->GetDuration();
-		if ( fabs( dt - flSeqDuration ) > 0.01f )
+		if ( fabsf( dt - flSeqDuration ) > 0.01f )
 		{
 			if ( bCheckOnly )
 				return true;
