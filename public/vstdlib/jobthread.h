@@ -1253,6 +1253,7 @@ inline JobStatus_t CJob::Execute()
 		// fall through...
 
 	case JOB_OK:
+		[[fallthrough]];
 	case JOB_STATUS_ABORTED:
 		result = m_status;
 		break;
