@@ -38,6 +38,9 @@ struct Polyhedron_IndexedPolygon_t
 class CPolyhedron //made into a class because it's going virtual to support distinctions between temp and permanent versions
 {
 public:
+	CPolyhedron() : pVertices(), pLines(), pIndices(), pPolygons(),
+		iVertexCount(), iLineCount(), iIndexCount(), iPolygonCount() {}
+
 	Vector *pVertices;
 	Polyhedron_IndexedLine_t *pLines;
 	Polyhedron_IndexedLineReference_t *pIndices;
