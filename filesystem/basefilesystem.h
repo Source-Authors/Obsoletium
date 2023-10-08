@@ -472,6 +472,7 @@ public:
 	class CPathIDInfo
 	{
 	public:
+		CPathIDInfo() : m_bByRequestOnly(), m_pDebugPathID() {}
 		const CUtlSymbol& GetPathID() const;
 		const char* GetPathIDString() const;
 		void SetPathID( CUtlSymbol id );

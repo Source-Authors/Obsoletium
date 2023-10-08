@@ -917,19 +917,6 @@ bool CQueuedLoader::AddJob( const LoaderJob_t *pLoaderJob )
 		// must resolve now, all submitted paths must be absolute for proper sort which achieves seek linearization
 		// a resolved absolute file ensures its existence
 		PathTypeFilter_t pathFilter = FILTER_NONE;
-		if ( IsX360() && ( g_pFullFileSystem->GetDVDMode() == DVDMODE_STRICT ) )
-		{
-			if ( V_stristr( pLoaderJob->m_pFilename, ".bsp" ) || V_stristr( pLoaderJob->m_pFilename, ".ain" ) )
-			{
-				// only the bsp/ain are allowed to be external
-				pathFilter = FILTER_CULLPACK;
-			}
-			else
-			{
-				// all files are expected to be in zip
-				pathFilter = FILTER_CULLNONPACK;
-			}
-		}
 
 		PathTypeQuery_t pathType;
 		g_pFullFileSystem->RelativePathToFullPath( pLoaderJob->m_pFilename, pLoaderJob->m_pPathID, szFullPath, sizeof( szFullPath ), pathFilter, &pathType );
@@ -1439,7 +1426,7 @@ void CQueuedLoader::GetJobRequests()
 
 			// Can't sleep; that will allow this thread to be used by the thread pool
 			float newt = Plat_FloatTime();
-			if ( newt - flLastUpdateT > .03 )
+			if ( newt - flLastUpdateT > .03f )
 			{
 				m_pProgress->UpdateProgress( flProgress );
 				flProgress = clamp( flProgress + flDelta, PROGRESS_PARSEDRESLIST, PROGRESS_CREATEDRESOURCES );

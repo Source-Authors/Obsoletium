@@ -1144,10 +1144,6 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 			sp->m_storeId = iStoreId;
 			sp->SetPath( pathSymbol );
 			sp->m_pPathIDInfo = FindOrAddPathIDInfo( g_PathIDTable.AddString( pPathID ), -1 );
-			if ( IsX360() && !V_strnicmp( newPath, "net:", 4 ) )
-			{
-				sp->m_bIsRemotePath = true;
-			}
 			SetSearchPathIsTrustedSource( sp );
 			return;
 		}
@@ -1212,11 +1208,6 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 			sp->m_storeId = iStoreId;
 			sp->SetPath( pathSymbol );
 			sp->m_pPathIDInfo = FindOrAddPathIDInfo( g_PathIDTable.AddString( pPathID ), -1 );
-	
-			if ( IsX360() && !V_strnicmp( newPath, "net:", 4 ) )
-			{
-				sp->m_bIsRemotePath = true;
-			}
 	
 			pf->SetPath( pathSymbol );
 			pf->m_lPackFileTime = GetFileTime( newPath );
@@ -1437,13 +1428,6 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 		id = g_iNextSearchPathID++;
 	}
 
-	if ( IsX360() && bAddPackFiles && ( !Q_stricmp( pathID, "DEFAULT_WRITE_PATH" ) || !Q_stricmp( pathID, "LOGDIR" ) ) )
-	{
-		// xbox can be assured that no zips would ever be loaded on its write path
-		// otherwise xbox reloads zips because of mirrored drive mappings
-		bAddPackFiles = false;
-	}
-
 	// Add to list
 	bool bAdded = false;
 	int nIndex = m_SearchPaths.Count();
@@ -1464,21 +1448,6 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 		// Grab last entry and set the path
 		m_SearchPaths.InsertBefore( nIndex );
 	}
-	else if ( IsX360() && bAddPackFiles && bAdded )
-	{
-		// 360 needs to find files (for the preload hit) in the zip first for fast loading
-		// 360 always adds the non-pack search path *after* the pack file but respects the overall list ordering
-		if ( addType == PATH_ADD_TO_HEAD )
-		{
-			m_SearchPaths.InsertBefore( nIndex );
-		}
-		else
-		{
-			nIndex = m_SearchPaths.Count() - 1;
-			m_SearchPaths.InsertAfter( nIndex );
-			nIndex++;
-		}
-	}
 
 	CSearchPath *sp = &m_SearchPaths[ nIndex ];
 	
@@ -1487,10 +1456,6 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 
 	// all matching paths have a reference to the same store
 	sp->m_storeId = id;
-	if ( IsX360() && !V_strnicmp( newPath, "net:", 4 ) )
-	{
-		sp->m_bIsRemotePath = true;
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -3129,7 +3094,7 @@ int CBaseFileSystem::Write( void const* pInput, int size, FileHandle_t file )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CBaseFileSystem::FPrintf( FileHandle_t file, const char *pFormat, ... )
+int CBaseFileSystem::FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	va_list args;
 	va_start( args, pFormat );
@@ -4741,7 +4706,7 @@ const FileSystemStatistics *CBaseFileSystem::GetFilesystemStatistics()
 //			*fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CBaseFileSystem::Warning( FileWarningLevel_t level, const char *fmt, ... )
+void CBaseFileSystem::Warning( FileWarningLevel_t level, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	if ( level > m_fwLevel )
 		return;

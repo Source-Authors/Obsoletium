@@ -1483,7 +1483,7 @@ char *CWin32ReadOnlyFile::FS_fgets( char *dest, int destSize )
 	{
 		return NULL;
 	}
-	int nStartPos = m_ReadPos;
+	int64 nStartPos = m_ReadPos;
 	int nBytesRead = FS_fread( dest, destSize, destSize );
 	if ( !nBytesRead )
 	{
