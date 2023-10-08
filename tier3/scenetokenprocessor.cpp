@@ -35,7 +35,7 @@ private:
 	characterset_t	m_BreakSetIncludingColons;
 };
 
-CSceneTokenProcessor::CSceneTokenProcessor()
+CSceneTokenProcessor::CSceneTokenProcessor() : m_pBuffer()
 {
 	CharacterSetBuild( &m_BreakSetIncludingColons, "{}()':" );
 }
