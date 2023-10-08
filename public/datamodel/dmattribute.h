@@ -456,11 +456,11 @@ inline bool ShouldTraverse( const CDmAttribute *pAttr, TraversalDepth_t depth )
 	case TD_SHALLOW:
 		if ( !pAttr->IsFlagSet( FATTRIB_MUSTCOPY ) )
 			return false;
-		// fall-through intentional
+        [[fallthrough]];
 	case TD_DEEP:
 		if ( pAttr->IsFlagSet( FATTRIB_NEVERCOPY ) )
 			return false;
-		// fall-through intentional
+        [[fallthrough]];
 	case TD_ALL:
 		return true;
 	}
