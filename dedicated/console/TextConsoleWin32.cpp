@@ -33,6 +33,7 @@ BOOL WINAPI ConsoleHandlerRoutine( DWORD CtrlType )
 
 CTextConsoleWin32::CTextConsoleWin32()
 {
+	m_szConsoleText[0] = '\0';
 	hinput	= NULL;
 	houtput = NULL;
 	Attrib = 0;
