@@ -105,6 +105,7 @@ static CVideoCommonServices g_VALVEVIDEOCommon;
 // Valve Video Services implementation
 //-----------------------------------------------------------------------------
 CValveVideoServices::CValveVideoServices() :
+	m_LastResult(VideoResult::VIDEO_SYSTEM_NOT_FOUND),
 	m_nInstalledSystems( 0 ),
 	m_bInitialized( false ),
 	m_nMaterialCount( 0 )
@@ -540,7 +541,7 @@ VideoSystem_t CValveVideoServices::LocateVideoSystemForPlayingFile( const char *
 // ===========================================================================	
 VideoResult_t CValveVideoServices::LocatePlayableVideoFile( const char *pSearchFileName, const char *pPathID, VideoSystem_t *pPlaybackSystem, char *pPlaybackFileName, int fileNameMaxLen, VideoSystemFeature_t playMode )
 {
-	AssertExitV( IS_NOT_EMPTY( pSearchFileName ) || pPlaybackSystem == nullptr || pPlaybackSystem == nullptr || fileNameMaxLen <= 0, SetResult( VideoResult::BAD_INPUT_PARAMETERS ) );
+	AssertExitV( IS_NOT_EMPTY( pSearchFileName ) || pPlaybackSystem == nullptr || pPlaybackFileName == nullptr || fileNameMaxLen <= 0, SetResult( VideoResult::BAD_INPUT_PARAMETERS ) );
 
 	VideoResult_t Status = ResolveToPlayableVideoFile( pSearchFileName, pPathID, VideoSystem::DETERMINE_FROM_FILE_EXTENSION, playMode, 
 									true, pPlaybackFileName, fileNameMaxLen, pPlaybackSystem );

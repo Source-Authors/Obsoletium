@@ -416,7 +416,7 @@ FORCEINLINE_PIXEL void CPixelWriter::WritePixelNoAdvanceF( float r, float g, flo
 
 	if (PIXELWRITER_USING_16BIT_FLOAT_FORMAT & m_nFlags)
 	{
-		float16 fp16[4];
+		float16 fp16[4] = {};
 		fp16[0].SetFloat( r );
 		fp16[1].SetFloat( g );
 		fp16[2].SetFloat( b );
@@ -715,16 +715,16 @@ FORCEINLINE_PIXEL void CPixelWriter::WritePixelNoAdvanceSigned( int r, int g, in
 			{
 			case 4:
 				pSignedBits[3] = (signed char)((val >> 24) & 0xff);
-				// fall through intentionally.
+				[[fallthrough]];
 			case 3:
 				pSignedBits[2] = (signed char)((val >> 16) & 0xff);
-				// fall through intentionally.
+				[[fallthrough]];
 			case 2:
 				pSignedBits[1] = (signed char)((val >> 8) & 0xff);
-				// fall through intentionally.
+				[[fallthrough]];
 			case 1:
 				pSignedBits[0] = (signed char)((val & 0xff));
-				// fall through intentionally.
+				[[fallthrough]];
 				return;
 			}
 		}
@@ -768,20 +768,20 @@ FORCEINLINE_PIXEL void CPixelWriter::WritePixelNoAdvanceSigned( int r, int g, in
 			case 8:
 				pSignedBits[7] = (signed char)((val >> 56) & 0xff);
 				pSignedBits[6] = (signed char)((val >> 48) & 0xff);
-				// fall through intentionally.
+				[[fallthrough]];
 			case 6:
 				pSignedBits[5] = (signed char)((val >> 40) & 0xff);
 				pSignedBits[4] = (signed char)((val >> 32) & 0xff);
-				// fall through intentionally.
+				[[fallthrough]];
 			case 4:
 				pSignedBits[3] = (signed char)((val >> 24) & 0xff);
-				// fall through intentionally.
+				[[fallthrough]];
 			case 3:
 				pSignedBits[2] = (signed char)((val >> 16) & 0xff);
-				// fall through intentionally.
+				[[fallthrough]];
 			case 2:
 				pSignedBits[1] = (signed char)((val >> 8) & 0xff);
-				// fall through intentionally.
+				[[fallthrough]];
 			case 1:
 				pSignedBits[0] = (signed char)((val & 0xff));
 				break;
