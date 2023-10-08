@@ -1113,7 +1113,7 @@ struct CPUInformation
 	uint32 m_nModel;
 	uint32 m_nFeatures[3];
 
-	CPUInformation(): m_Size(0){}
+	CPUInformation() { memset(this, 0, sizeof(*this)); }
 };
 
 // Have to return a pointer, not a reference, because references are not compatible with the
