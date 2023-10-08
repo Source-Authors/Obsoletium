@@ -201,6 +201,7 @@ struct CachedVPKRead_t
 		m_idxLRU = -1;
 		m_hMD5RequestHandle= 0;
 		m_cFailedHashes = 0;
+		memset(&m_md5Value, 0, sizeof(m_md5Value));
 	}
 	int m_nPackFileNumber;	// identifier
 	int m_nFileFraction;	// identifier
