@@ -36,7 +36,7 @@ struct UniqueId_t
 //-----------------------------------------------------------------------------
 // Methods related to unique ids
 //-----------------------------------------------------------------------------
-void CreateUniqueId( UniqueId_t *pDest );
+bool CreateUniqueId( UniqueId_t *pDest );
 void InvalidateUniqueId( UniqueId_t *pDest );
 bool IsUniqueIdValid( const UniqueId_t &id );
 bool IsUniqueIdEqual( const UniqueId_t &id1, const UniqueId_t &id2 );

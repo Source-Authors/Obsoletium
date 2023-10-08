@@ -21,14 +21,15 @@
 //-----------------------------------------------------------------------------
 // Creates a new unique id
 //-----------------------------------------------------------------------------
-void CreateUniqueId( UniqueId_t *pDest )
+bool CreateUniqueId( UniqueId_t *pDest )
 {
 #ifdef IS_WINDOWS_PC
-	Assert( sizeof( UUID ) == sizeof( *pDest ) );
-	UuidCreate( (UUID *)pDest );
+	static_assert( sizeof( UUID ) == sizeof( *pDest ) );
+	return SUCCEEDED( UuidCreate( (UUID *)pDest ) );
 #else
 	// X360/linux TBD: Need a real UUID Implementation
 	Q_memset( pDest, 0, sizeof( UniqueId_t ) );
+	return true;
 #endif
 }
 
@@ -112,9 +113,7 @@ void UniqueIdToString( const UniqueId_t &id, char *pBuf, int nMaxLen )
 	UUID *self = ( UUID * )&id;
 
 	unsigned char *outstring = NULL;
-
-	UuidToString( self, &outstring );
-	if ( outstring && *outstring )
+	if ( UuidToString( self, &outstring ) == RPC_S_OK && outstring && *outstring )
 	{
 		Q_strncpy( pBuf, (const char *)outstring, nMaxLen );
 		RpcStringFree( &outstring );
@@ -136,9 +135,7 @@ bool Serialize( CUtlBuffer &buf, const UniqueId_t &src )
 		UUID *pId = ( UUID * )&src;
 
 		unsigned char *outstring = NULL;
-
-		UuidToString( pId, &outstring );
-		if ( outstring && *outstring )
+		if ( UuidToString( pId, &outstring ) == RPC_S_OK && outstring && *outstring )
 		{
 			buf.PutString( (const char *)outstring );
 			RpcStringFree( &outstring );
