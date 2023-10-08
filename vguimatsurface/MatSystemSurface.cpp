@@ -199,7 +199,8 @@ CMatSystemSurface::CMatSystemSurface() : m_pEmbeddedPanel(NULL), m_pWhite(NULL)
 	m_cursorAlwaysVisible = false;
 
 	m_iBoundTexture = -1; 
-	m_HWnd = NULL; 
+	m_HWnd = NULL;
+	m_n3DLeft = m_n3DRight = m_n3DTop = m_n3DBottom = 0;
 	m_bIn3DPaintMode = false;
 	m_b3DPaintRenderToTexture = false;
 	m_bDrawingIn3DWorld = false;
@@ -3566,7 +3567,7 @@ int CMatSystemSurface::DrawColoredText( vgui::HFont font, int x, int y, int r, i
 	return x + totalLength;
 }
 
-int CMatSystemSurface::DrawColoredText( vgui::HFont font, int x, int y, int r, int g, int b, int a, const char *fmt, ... )
+int CMatSystemSurface::DrawColoredText( vgui::HFont font, int x, int y, int r, int g, int b, int a, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	MAT_FUNC;
 
@@ -3608,7 +3609,7 @@ void CMatSystemSurface::SearchForWordBreak( vgui::HFont font, char *text, int& c
 //-----------------------------------------------------------------------------
 // Purpose: If text width is specified, reterns height of text at that width
 //-----------------------------------------------------------------------------
-void CMatSystemSurface::DrawTextHeight( vgui::HFont font, int w, int& h, const char *fmt, ... )
+void CMatSystemSurface::DrawTextHeight( vgui::HFont font, int w, int& h, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	if ( !font )
 		return;
@@ -3674,7 +3675,7 @@ void CMatSystemSurface::DrawTextHeight( vgui::HFont font, int w, int& h, const c
 //-----------------------------------------------------------------------------
 // Draws text with current font at position and wordwrapped to the rect using color values specified
 //-----------------------------------------------------------------------------
-void CMatSystemSurface::DrawColoredTextRect( vgui::HFont font, int x, int y, int w, int h, int r, int g, int b, int a, const char *fmt, ... )
+void CMatSystemSurface::DrawColoredTextRect( vgui::HFont font, int x, int y, int w, int h, int r, int g, int b, int a, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	MAT_FUNC;
 
@@ -3753,7 +3754,7 @@ void CMatSystemSurface::DrawColoredTextRect( vgui::HFont font, int x, int y, int
 //-----------------------------------------------------------------------------
 // Purpose: Determine length of text string
 //-----------------------------------------------------------------------------
-int	CMatSystemSurface::DrawTextLen( vgui::HFont font, const char *fmt, ... )
+int	CMatSystemSurface::DrawTextLen( vgui::HFont font, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list argptr;
 	char data[1024];
@@ -4347,7 +4348,7 @@ vgui::IImage *CMatSystemSurface::GetIconImageForFullPath( char const *pFullPath 
 			newIcon = m_FileTypeImages[ idx ];
 		}
 
-		DestroyIcon( info.hIcon );
+		if ( info.hIcon ) DestroyIcon(info.hIcon);
 	}
 #endif
 	return newIcon;
