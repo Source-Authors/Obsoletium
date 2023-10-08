@@ -137,6 +137,7 @@ int nummacros;
 void DefineMacro( char *macroname )
 {
 	script_t	*pmacro = (script_t *)malloc( sizeof( script_t ) );
+	if (!pmacro) Error("Out of memory in DefineMacro for %s", macroname);
 
 	strcpy( pmacro->filename, macroname );
 	pmacro->line = script->line;
@@ -193,6 +194,7 @@ void DefineMacro( char *macroname )
 	int size = (cp - script->script_p);
 
 	pmacro->buffer = (char *)malloc( size + 1);
+	if (!pmacro->buffer) Error("Out of memory in macro buffer");
 	memcpy( pmacro->buffer, script->script_p, size );
 	pmacro->buffer[size] = '\0';
 	pmacro->end_p = &pmacro->buffer[size]; 
@@ -272,6 +274,7 @@ bool AddMacroToStack( char *macroname )
 
 	int size = pmacro->end_p - pmacro->buffer;
 	script->buffer = (char *)malloc( size + 1 );
+	if (!script->buffer) return false;
 	memcpy( script->buffer, pmacro->buffer, size );
 	pmacro->buffer[size] = '\0';
 	script->script_p = script->buffer;
@@ -1025,7 +1028,7 @@ bool CScriptLib::WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer,
 		if ( ptr )
 		{
 			*ptr = '\0';
-			_mkdir( dirPath );
+			if ( _mkdir( dirPath ) ) return false;
 			*ptr = '\\';
 		}
 	}

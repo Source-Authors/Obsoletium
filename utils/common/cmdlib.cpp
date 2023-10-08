@@ -63,7 +63,7 @@ void (*g_ExtraSpewHook)(const char*) = NULL;
 
 #if defined( _WIN32 ) || defined( WIN32 )
 
-void CmdLib_FPrintf( FileHandle_t hFile, const char *pFormat, ... )
+void CmdLib_FPrintf( FileHandle_t hFile, PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	static CUtlVector<char> buf;
 	if ( buf.Count() == 0 )
@@ -484,7 +484,7 @@ void ExpandWildcards (int *argc, char ***argv)
 
 // only printf if in verbose mode
 qboolean verbose = false;
-void qprintf (const char *format, ...)
+void qprintf (PRINTF_FORMAT_STRING const char *format, ...)
 {
 	if (!verbose)
 		return;
