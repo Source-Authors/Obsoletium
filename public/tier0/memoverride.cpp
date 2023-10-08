@@ -11,7 +11,7 @@
 
 #undef PROTECTED_THINGS_ENABLE   // allow use of _vsnprintf
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include "winlite.h"
 #endif
 
@@ -41,7 +41,7 @@
 #define __cdecl
 #endif
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 const char *MakeModuleFileName()
 {
 	if ( g_pMemAlloc && g_pMemAlloc->IsDebugHeap() )
@@ -148,26 +148,41 @@ inline void *ReallocUnattributed( void *pMem, size_t nSize )
 
 extern "C"
 {
-	
-ALLOC_CALL void *malloc( _In_ size_t nSize )
+
+_Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(size)
+ALLOC_CALL void *malloc(
+	_In_ size_t size
+)
 {
-	return AllocUnattributed( nSize );
+	return AllocUnattributed( size );
 }
 
-FREE_CALL void free( void *pMem )
+FREE_CALL void free(
+	_Pre_maybenull_ _Post_invalid_ void *pMem
+)
 {
 	g_pMemAlloc->Free(pMem);
 }
 
-ALLOC_CALL void *realloc( void *pMem, size_t nSize )
+_Success_(return != 0) _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(nSize)
+ALLOC_CALL void *realloc(
+	_Pre_maybenull_ _Post_invalid_ void *pMem,
+	_In_ size_t nSize
+)
 {
 	return ReallocUnattributed( pMem, nSize );
 }
 
-ALLOC_CALL void *calloc( size_t nCount, size_t nElementSize )
+_Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(nCount * nElementSize)
+ALLOC_CALL void *calloc(
+	 _In_ size_t nCount,
+	 _In_ size_t nElementSize )
 {
 	void *pMem = AllocUnattributed( nElementSize * nCount );
-	memset(pMem, 0, nElementSize * nCount);
+	if ( pMem )
+	{
+		memset(pMem, 0, nElementSize * nCount);
+	}
 	return pMem;
 }
 
@@ -179,32 +194,42 @@ ALLOC_CALL void *calloc( size_t nCount, size_t nElementSize )
 extern "C"
 {
 
-// 64-bit
-#ifdef _WIN64
-void* __cdecl _malloc_base( size_t nSize )
+_Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(nSize)
+ALLOC_CALL void *_malloc_base(
+	_In_ size_t nSize
+)
 {
 	return AllocUnattributed( nSize );
 }
-#else
-ALLOC_CALL void *_malloc_base( size_t nSize )
-{
-	return AllocUnattributed( nSize );
-}
-#endif
 
-ALLOC_CALL void *_calloc_base( size_t nCount, size_t nSize )
+_Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(nCount * nSize)
+ALLOC_CALL void *_calloc_base(
+	_In_ size_t nCount,
+	_In_ size_t nSize
+)
 {
 	void *pMem = AllocUnattributed( nSize*nCount );
-	memset(pMem, 0, nSize*nCount );
+	if (pMem)
+	{
+		memset(pMem, 0, nSize*nCount );
+	}
 	return pMem;
 }
 
-ALLOC_CALL void *_realloc_base( void *pMem, size_t nSize ) //-V524
+_Success_(return != 0) _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(nSize)
+ALLOC_CALL void *_realloc_base(
+	_Pre_maybenull_ _Post_invalid_ void *pMem,
+	_In_ size_t nSize
+)
 {
 	return ReallocUnattributed( pMem, nSize );
 }
 
-ALLOC_CALL void *_recalloc_base( void *pMem, size_t nCount, size_t nSize )
+_Success_(return != 0) _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(nCount * nSize)
+ALLOC_CALL void *_recalloc_base(
+	_Pre_maybenull_ _Post_invalid_ void *pMem,
+	_In_ size_t nCount,
+	_In_ size_t nSize )
 {
 	void *pMemOut = ReallocUnattributed( pMem, nCount * nSize );
 	if ( !pMem )
@@ -214,15 +239,11 @@ ALLOC_CALL void *_recalloc_base( void *pMem, size_t nCount, size_t nSize )
 	return pMemOut;
 }
 
-void _free_base( void *pMem )
+void _free_base(
+	_Pre_maybenull_ _Post_invalid_ void *pMem
+)
 {
 	g_pMemAlloc->Free(pMem);
-}
-
-void *__cdecl _expand_base( void *, size_t , int  )
-{
-	Assert( 0 );
-	return NULL;
 }
 
 // crt
@@ -246,29 +267,34 @@ void * __cdecl _recalloc_crt(void *ptr, size_t count, size_t size)
 	return _recalloc_base( ptr, count, size );
 }
 
-ALLOC_CALL void * __cdecl _recalloc ( void * memblock, size_t count, size_t size )
+_Success_(return != 0) _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(count * size)
+ALLOC_CALL void * __cdecl _recalloc(
+	_Pre_maybenull_ _Post_invalid_ void * memblock,
+	_In_ size_t count,
+	_In_ size_t size )
 {
-	void *pMem = ReallocUnattributed( memblock, size * count );
-	if ( !memblock )
-	{
-		memset( pMem, 0, size * count );
-	}
-	return pMem;
+	return _recalloc_base( memblock, count, size );
 }
 
-size_t _msize_base( void *pMem ) noexcept
+_Check_return_
+size_t _msize_base(
+	_Pre_notnull_ void *pMem
+) noexcept
 {
 	return g_pMemAlloc->GetSize(pMem);
 }
 
-size_t _msize( void *pMem )
+_Check_return_
+size_t _msize(
+	_Pre_notnull_ void *pMem
+)
 {
 	return _msize_base(pMem);
 }
 
 size_t msize( void *pMem ) //-V524
 {
-	return g_pMemAlloc->GetSize(pMem);
+	return _msize_base(pMem);
 }
 
 void *__cdecl _heap_alloc( size_t nSize )
@@ -281,7 +307,11 @@ void *__cdecl _nh_malloc( size_t nSize, int )
 	return AllocUnattributed( nSize );
 }
 
-void *__cdecl _expand( void *, size_t  )
+_Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(size)
+void *__cdecl _expand(
+	_Pre_notnull_ void *,
+	_In_ size_t size
+)
 {
 	Assert( 0 );
 	return NULL;
@@ -370,8 +400,6 @@ void *realloc_db( void *pMem, size_t nSize, const char *pFileName, int nLine )
 //-----------------------------------------------------------------------------
 extern "C"
 {
-
-#if !defined( _X360 )
 	int __cdecl _heap_init()
 	{
 		return g_pMemAlloc != NULL;
@@ -380,8 +408,6 @@ extern "C"
 	void __cdecl _heap_term()
 	{
 	}
-#endif
-
 }
 #endif
 
@@ -394,33 +420,62 @@ extern "C"
 #ifdef OSX
 void *__cdecl operator new( size_t nSize ) throw (std::bad_alloc)
 #else
+[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
 void *__cdecl operator new( size_t nSize )
 #endif
 {
 	return AllocUnattributed( nSize );
 }
 
-// dimhotepus: Aligned alloc
-void* __cdecl operator new( std::size_t nSize, std::align_val_t align )
+[[nodiscard]] _Ret_maybenull_ _Success_(return != NULL)
+_Post_writable_byte_size_(size) __declspec(allocator)
+void *__cdecl operator new( size_t size, ::std::nothrow_t const & ) noexcept
 {
-	return MemAlloc_AllocAligned(nSize, static_cast<size_t>(align));
-}
-
-void *__cdecl operator new( size_t nSize, int , const char *pFileName, int nLine )
-{
-	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
+	return AllocUnattributed( size );
 }
 
 #ifdef OSX
-void __cdecl operator delete( void *pMem ) throw()
+void *__cdecl operator new[]( size_t nSize ) throw (std::bad_alloc)
 #else
-void __cdecl operator delete( void *pMem )
+[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
+void *__cdecl operator new[]( size_t nSize )
 #endif
 {
-	g_pMemAlloc->Free( pMem );
+	return AllocUnattributed( nSize );
 }
 
-// dimhotepus: Aligned alloc
+[[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
+void *__cdecl operator new[]( size_t nSize, std::nothrow_t const& ) noexcept
+{
+	return AllocUnattributed( nSize );
+}
+
+#ifdef __cpp_aligned_new
+
+[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
+void* __cdecl operator new( std::size_t nSize, std::align_val_t align )
+{
+	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
+}
+
+[[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
+void* __cdecl operator new( std::size_t nSize, std::align_val_t align, std::nothrow_t const& )
+{
+	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
+}
+
+[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
+void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align )
+{
+	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
+}
+
+[[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
+void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align, std::nothrow_t const& )
+{
+	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
+}
+
 void __cdecl operator delete( void* pMem, std::align_val_t align ) noexcept
 {
 #ifdef _WIN32
@@ -435,46 +490,21 @@ void __cdecl operator delete( void* pMem, std::align_val_t align ) noexcept
 	MemAlloc_FreeAligned( pMem );
 }
 
-#ifdef OSX
-void operator delete( void *pMem, std::size_t )
-#else
-void operator delete( void *pMem, std::size_t ) throw()
+void __cdecl operator delete( void* pMem, std::align_val_t align, std::nothrow_t const& ) noexcept
+{
+#ifdef _WIN32
+	// dimhotepus: Windows allocator has 16 bytes alignment by default, so use default free.
+	if ( static_cast<size_t>(align) == 16 )
+	{
+		g_pMemAlloc->Free( pMem );
+		return;
+	}
 #endif
-{
-	g_pMemAlloc->Free( pMem );
+
+	MemAlloc_FreeAligned( pMem );
 }
 
-#ifdef OSX
-void *__cdecl operator new[]( size_t nSize ) throw (std::bad_alloc)
-#else
-void *__cdecl operator new[]( size_t nSize )
-#endif
-{
-	return AllocUnattributed( nSize );
-}
-
-// dimhotepus: Aligned alloc
-void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align )
-{
-	return MemAlloc_AllocAligned(nSize, static_cast<size_t>(align));
-}
-
-void *__cdecl operator new[] ( size_t nSize, int , const char *pFileName, int nLine )
-{
-	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
-}
-
-#ifdef OSX
-void __cdecl operator delete[]( void *pMem ) throw()
-#else
-void __cdecl operator delete[]( void *pMem )
-#endif
-{
-	g_pMemAlloc->Free( pMem );
-}
-
-// dimhotepus: Aligned alloc
-void operator delete[]( void* ptr, std::align_val_t align ) noexcept 
+void __cdecl operator delete( void *ptr, size_t size, std::align_val_t align) noexcept
 {
 #ifdef _WIN32
 	// dimhotepus: Windows allocator has 16 bytes alignment by default, so use default free.
@@ -487,6 +517,105 @@ void operator delete[]( void* ptr, std::align_val_t align ) noexcept
 
 	MemAlloc_FreeAligned(ptr);
 }
+
+void __cdecl operator delete[]( void* ptr, std::align_val_t align ) noexcept
+{
+#ifdef _WIN32
+	// dimhotepus: Windows allocator has 16 bytes alignment by default, so use default free.
+	if ( static_cast<size_t>(align) == 16 )
+	{
+		g_pMemAlloc->Free( ptr );
+		return;
+	}
+#endif
+
+	MemAlloc_FreeAligned(ptr);
+}
+
+void __cdecl operator delete[]( void* ptr, std::align_val_t align, std::nothrow_t const& ) noexcept
+{
+#ifdef _WIN32
+	// dimhotepus: Windows allocator has 16 bytes alignment by default, so use default free.
+	if ( static_cast<size_t>(align) == 16 )
+	{
+		g_pMemAlloc->Free( ptr );
+		return;
+	}
+#endif
+
+	MemAlloc_FreeAligned(ptr);
+}
+
+void __cdecl operator delete[]( void *ptr, size_t size, std::align_val_t align) noexcept
+{
+#ifdef _WIN32
+	// dimhotepus: Windows allocator has 16 bytes alignment by default, so use default free.
+	if ( static_cast<size_t>(align) == 16 )
+	{
+		g_pMemAlloc->Free( ptr );
+		return;
+	}
+#endif
+
+	MemAlloc_FreeAligned(ptr);
+}
+
+#endif
+
+[[nodiscard]] _Check_return_ _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
+void *__cdecl operator new(
+	_In_ size_t nSize,
+	_In_ int ,
+	_In_z_ const char *pFileName,
+	_In_ int nLine
+)
+{
+	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
+}
+
+[[nodiscard]] _Check_return_ _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
+void *__cdecl operator new[](
+	_In_ size_t nSize,
+	_In_ int,
+	_In_z_ const char *pFileName,
+	_In_ int nLine
+)
+{
+	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
+}
+
+#ifdef OSX
+void __cdecl operator delete( void *pMem ) throw()
+#else
+void __cdecl operator delete( void *pMem )
+#endif
+{
+	g_pMemAlloc->Free( pMem );
+}
+
+void __cdecl operator delete( void *block, ::std::nothrow_t const & ) noexcept
+{
+	g_pMemAlloc->Free( block );
+}
+
+#ifdef OSX
+void operator delete( void *pMem, std::size_t )
+#else
+void operator delete( void *pMem, std::size_t ) throw()
+#endif
+{
+	g_pMemAlloc->Free( pMem );
+}
+
+#ifdef OSX
+void __cdecl operator delete[]( void *pMem ) throw()
+#else
+void __cdecl operator delete[]( void *pMem )
+#endif
+{
+	g_pMemAlloc->Free( pMem );
+}
+
 #endif
 
 
@@ -534,13 +663,6 @@ private:
 
 extern "C"
 {
-	
-void *__cdecl _nh_malloc_dbg( size_t nSize, int , int nBlockUse,
-								const char *pFileName, int nLine )
-{
-	AttribIfCrt();
-	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
-}
 
 void *__cdecl _malloc_dbg( size_t nSize, int nBlockUse,
 							const char *pFileName, int nLine )
@@ -585,13 +707,13 @@ void *__cdecl _expand_dbg( void *, size_t , int , const char *, int  )
 	return NULL;
 }
 
-void __cdecl _free_dbg( void *pMem, int nBlockUse )
+void __cdecl _free_dbg( _Pre_maybenull_ _Post_invalid_ void *pMem, _In_ int nBlockUse )
 {
 	AttribIfCrt();
 	g_pMemAlloc->Free(pMem);
 }
 
-size_t __cdecl _msize_dbg( void *pMem, int  )
+size_t __cdecl _msize_dbg( _Pre_notnull_ void *pMem, _In_ int )
 {
 #ifdef _WIN32
 	return _msize(pMem);
@@ -661,6 +783,15 @@ ALLOC_CALL void * __cdecl _aligned_malloc( size_t size, size_t align )
 	return _aligned_malloc_base(size, align);
 }
 
+_Check_return_ size_t __cdecl _aligned_msize(
+  _Pre_notnull_ void *block,
+  _In_ size_t,
+  _In_ size_t
+) 
+{
+	return g_pMemAlloc->GetSize(block);
+}
+
 ALLOC_CALL void *__cdecl _aligned_realloc(void *memblock, size_t size, size_t align)
 {
     return _aligned_realloc_base(memblock, size, align);
@@ -690,10 +821,15 @@ ALLOC_CALL void * __cdecl _aligned_offset_realloc_base( void * , size_t , size_t
 	return NULL;
 }
 
-ALLOC_CALL void * __cdecl _aligned_offset_recalloc_base( void * , size_t , size_t , size_t )
+ALLOC_CALL void * __cdecl _aligned_offset_recalloc_base( void * memblock, size_t size, size_t , size_t )
 {
 	Assert( IsPC() || 0 );
-	return NULL;
+	void *pMem = ReallocUnattributed( memblock, size );
+	if ( !memblock )
+	{
+		memset( pMem, 0, size );
+	}
+	return pMem;
 }
 
 // aligned offset
@@ -1022,23 +1158,6 @@ extern "C" int __cdecl _CrtGetCheckCount( void )
     return __crtDebugCheckCount;
 }
 
-// aligned offset debug
-extern "C" void * __cdecl _aligned_offset_recalloc_dbg( void * memblock, size_t count, size_t size, size_t , size_t , const char * , int  )
-{
-	Assert( IsPC() || 0 );
-	void *pMem = ReallocUnattributed( memblock, size * count );
-	if ( !memblock )
-	{
-		memset( pMem, 0, size * count );
-	}
-	return pMem;
-}
-
-extern "C" void * __cdecl _aligned_recalloc_dbg( void *memblock, size_t count, size_t size, size_t align, const char * f_name, int line_n )
-{
-    return _aligned_offset_recalloc_dbg(memblock, count, size, align, 0, f_name, line_n);
-}
-
 extern "C" void * __cdecl _recalloc_dbg ( void * memblock, size_t count, size_t size, int , const char * szFileName, int nLine )
 {
 	return _aligned_offset_recalloc_dbg(memblock, count, size, 0, 0, szFileName, nLine);
@@ -1111,40 +1230,95 @@ _CRT_DUMP_CLIENT __cdecl _CrtGetDumpClient ( void)
         return NULL;
 }
 
-void * __cdecl _aligned_malloc_dbg( size_t size, size_t align, const char * , int )
+// Heap debug routines.
+
+void __cdecl _aligned_free_dbg(
+  _Pre_maybenull_ _Post_invalid_ void * block
+)
+{
+    _aligned_free(block);
+}
+
+_Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(size)
+__declspec(allocator) void * __cdecl _aligned_malloc_dbg(
+  _In_ size_t size,
+  _In_ size_t align,
+  _In_opt_z_ const char * ,
+  _In_ int )
 {
     return _aligned_malloc(size, align);
 }
 
-void * __cdecl _aligned_realloc_dbg( void *memblock, size_t size, size_t align,
-               const char * , int )
+size_t __cdecl _aligned_msize_dbg(
+  _Pre_notnull_ void* block,
+  _In_ size_t align,
+  _In_ size_t offset
+)
 {
-    return _aligned_realloc(memblock, size, align);
+    return _aligned_msize(block, align, offset);
 }
 
-void * __cdecl _aligned_offset_malloc_dbg( size_t size, size_t align, size_t offset,
-              const char * , int )
+_Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(size)
+__declspec(allocator) void *__cdecl _aligned_offset_malloc_dbg(
+  _In_ size_t size,
+  _In_ size_t align,
+  _In_ size_t offset,
+  _In_opt_z_ const char *,
+  _In_ int)
 {
     return _aligned_offset_malloc(size, align, offset);
 }
 
-void * __cdecl _aligned_offset_realloc_dbg( void * memblock, size_t size, size_t align, 
-                 size_t offset, const char * , int )
+_Success_(return != 0) _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(size)
+__declspec(allocator) void * __cdecl _aligned_offset_realloc_dbg(
+  _Pre_maybenull_ _Post_invalid_ void * memblock,
+  _In_ size_t size,
+  _In_ size_t align,
+  _In_ size_t offset,
+  _In_opt_z_ const char * ,
+  _In_ int )
 {
     return _aligned_offset_realloc(memblock, size, align, offset);
 }
 
-void __cdecl _aligned_free_dbg( void * memblock)
+_Success_(return != 0) _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(count * size)
+__declspec(allocator) void* __cdecl _aligned_offset_recalloc_dbg(
+  _Pre_maybenull_ _Post_invalid_ void* block,
+  _In_ size_t count,
+  _In_ size_t size,
+  _In_ size_t align,
+  _In_ size_t offset,
+  _In_opt_z_ char const*,
+  _In_ int
+)
 {
-    _aligned_free(memblock);
+    return _aligned_offset_recalloc(block, count, size, align, offset);
+}
+
+_Success_(return != 0) _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(size)
+__declspec(allocator) void * __cdecl _aligned_realloc_dbg(
+  _Pre_maybenull_ _Post_invalid_ void *memblock,
+  _In_ size_t size,
+  _In_ size_t align,
+  _In_opt_z_ const char * ,
+  _In_ int )
+{
+    return _aligned_realloc(memblock, size, align);
+}
+
+_Success_(return != 0) _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(count * size)
+void *__cdecl _aligned_recalloc_dbg(
+  _Pre_maybenull_ _Post_invalid_ void *memblock,
+  _In_ size_t count,
+  _In_ size_t size,
+  _In_ size_t align,
+  _In_opt_z_ const char *f_name,
+  _In_ int line_n)
+{
+    return _aligned_recalloc(memblock, count, size, align);
 }
 
 #if _MSC_VER < 1900
-size_t __cdecl _CrtSetDebugFillThreshold( size_t _NewDebugFillThreshold)
-{
-	Assert(0);
-    return 0;
-}
 
 //===========================================
 // NEW!!! 64-bit
@@ -1162,217 +1336,7 @@ char * __cdecl _strdup ( const char * string )
 }
 #endif
 
-#if 0
-_TSCHAR * __cdecl _tfullpath_dbg ( _TSCHAR *UserBuf, const _TSCHAR *path, size_t maxlen, int nBlockUse, const char * szFileName, int nLine )
-{
-	Assert(0);
-	return NULL;
-}
-
-_TSCHAR * __cdecl _tfullpath ( _TSCHAR *UserBuf, const _TSCHAR *path, size_t maxlen )
-{
-	Assert(0);
-	return NULL;
-}
-
-_TSCHAR * __cdecl _tgetdcwd_lk_dbg ( int drive, _TSCHAR *pnbuf, int maxlen, int nBlockUse, const char * szFileName, int nLine )
-{
-	Assert(0);
-	return NULL;
-}
-
-_TSCHAR * __cdecl _tgetdcwd_nolock ( int drive, _TSCHAR *pnbuf, int maxlen )
-{
-	Assert(0);
-	return NULL;
-}
-
-errno_t __cdecl _tdupenv_s_helper ( _TSCHAR **pBuffer, size_t *pBufferSizeInTChars, const _TSCHAR *varname, int nBlockUse, const char * szFileName, int nLine )
-{
-	Assert(0);
-	return 0;
-}
-
-errno_t __cdecl _tdupenv_s_helper ( _TSCHAR **pBuffer, size_t *pBufferSizeInTChars, const _TSCHAR *varname )
-{
-	Assert(0);
-	return 0;
-}
-
-_TSCHAR * __cdecl _ttempnam_dbg ( const _TSCHAR *dir, const _TSCHAR *pfx, int nBlockUse, const char * szFileName, int nLine )
-{
-	Assert(0);
-	return 0;
-}
-
-_TSCHAR * __cdecl _ttempnam ( const _TSCHAR *dir, const _TSCHAR *pfx )
-{
-	Assert(0);
-	return 0;
-}
-
-wchar_t * __cdecl _wcsdup_dbg ( const wchar_t * string, int nBlockUse, const char * szFileName, int nLine )
-{
-	Assert(0);
-	return 0;
-}
-
-wchar_t * __cdecl _wcsdup ( const wchar_t * string )
-{
-	Assert(0);
-	return 0;
-}
-#endif
 } // end extern "C"
-
-#if _MSC_VER >= 1400
-
-//-----------------------------------------------------------------------------
-// 	XBox Memory Allocator Override
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-#if defined( _DEBUG ) || defined( USE_MEM_DEBUG )
-#include "utlmap.h"
-
-MEMALLOC_DEFINE_EXTERNAL_TRACKING( XMem );
-
-CThreadFastMutex g_XMemAllocMutex;
-
-void XMemAlloc_RegisterAllocation( void *p, DWORD dwAllocAttributes )
-{
-	if ( !g_pMemAlloc )
-	{
-		// core xallocs cannot be journaled until system is ready
-		return;
-	}
-
-	AUTO_LOCK_FM( g_XMemAllocMutex );
-	int size = XMemSize( p, dwAllocAttributes );
-	MemAlloc_RegisterExternalAllocation( XMem, p, size );
-}
-
-void XMemAlloc_RegisterDeallocation( void *p, DWORD dwAllocAttributes )
-{
-	if ( !g_pMemAlloc )
-	{
-		// core xallocs cannot be journaled until system is ready
-		return;
-	}
-
-	AUTO_LOCK_FM( g_XMemAllocMutex );
-	int size = XMemSize( p, dwAllocAttributes );
-	MemAlloc_RegisterExternalDeallocation( XMem, p, size );
-}
-
-#else
-
-#define XMemAlloc_RegisterAllocation( p, a )	((void)0)
-#define XMemAlloc_RegisterDeallocation( p, a )	((void)0)
-
-#endif
-
-//-----------------------------------------------------------------------------
-//	XMemAlloc
-//
-//	XBox Memory Allocator Override
-//-----------------------------------------------------------------------------
-LPVOID WINAPI XMemAlloc( SIZE_T dwSize, DWORD dwAllocAttributes )
-{
-	LPVOID	ptr;
-	XALLOC_ATTRIBUTES *pAttribs = (XALLOC_ATTRIBUTES *)&dwAllocAttributes;
-	bool bPhysical = ( pAttribs->dwMemoryType == XALLOC_MEMTYPE_PHYSICAL );
-
-	if ( !bPhysical && !pAttribs->dwHeapTracksAttributes && pAttribs->dwAllocatorId != eXALLOCAllocatorId_XUI )
-	{
-		MEM_ALLOC_CREDIT();
-		switch ( pAttribs->dwAlignment )
-		{
-		case XALLOC_ALIGNMENT_4:
-			ptr = g_pMemAlloc->Alloc( dwSize );
-			break;
-		case XALLOC_ALIGNMENT_8:
-			ptr = MemAlloc_AllocAligned( dwSize, 8 );
-			break;
-		case XALLOC_ALIGNMENT_DEFAULT:
-		case XALLOC_ALIGNMENT_16:
-		default:
-			ptr = MemAlloc_AllocAligned( dwSize, 16 );
-			break;
-		}
-		if ( pAttribs->dwZeroInitialize != 0 )
-		{
-			memset( ptr, 0, XMemSize( ptr, dwAllocAttributes ) );
-		}
-		return ptr;
-	}
-
-	ptr = XMemAllocDefault( dwSize, dwAllocAttributes );
-	if ( ptr )
-	{
-		XMemAlloc_RegisterAllocation( ptr, dwAllocAttributes );
-	}
-
-	return ptr;
-}
-
-//-----------------------------------------------------------------------------
-//	XMemFree
-//
-//	XBox Memory Allocator Override
-//-----------------------------------------------------------------------------
-VOID WINAPI XMemFree( PVOID pAddress, DWORD dwAllocAttributes )
-{
-	if ( !pAddress )
-	{
-		return;
-	}
-
-	XALLOC_ATTRIBUTES *pAttribs = (XALLOC_ATTRIBUTES *)&dwAllocAttributes;
-	bool bPhysical = ( pAttribs->dwMemoryType == XALLOC_MEMTYPE_PHYSICAL );
-
-	if ( !bPhysical && !pAttribs->dwHeapTracksAttributes && pAttribs->dwAllocatorId != eXALLOCAllocatorId_XUI )
-	{
-		switch ( pAttribs->dwAlignment )
-		{
-		case XALLOC_ALIGNMENT_4:
-			return g_pMemAlloc->Free( pAddress );
-		default:
-			return MemAlloc_FreeAligned( pAddress );
-		}
-		return;
-	}
-
-	XMemAlloc_RegisterDeallocation( pAddress, dwAllocAttributes );
-
-	XMemFreeDefault( pAddress, dwAllocAttributes );
-}
-
-//-----------------------------------------------------------------------------
-//	XMemSize
-//
-//	XBox Memory Allocator Override
-//-----------------------------------------------------------------------------
-SIZE_T WINAPI XMemSize( PVOID pAddress, DWORD dwAllocAttributes )
-{
-	XALLOC_ATTRIBUTES *pAttribs = (XALLOC_ATTRIBUTES *)&dwAllocAttributes;
-	bool bPhysical = ( pAttribs->dwMemoryType == XALLOC_MEMTYPE_PHYSICAL );
-
-	if ( !bPhysical && !pAttribs->dwHeapTracksAttributes && pAttribs->dwAllocatorId != eXALLOCAllocatorId_XUI )
-	{
-		switch ( pAttribs->dwAlignment )
-		{
-		case XALLOC_ALIGNMENT_4:
-			return g_pMemAlloc->GetSize( pAddress );
-		default:
-			return MemAlloc_GetSizeAligned( pAddress );
-		}
-	}
-
-	return XMemSizeDefault( pAddress, dwAllocAttributes );
-}
-#endif 
-
-#endif // _MSC_VER >= 1400
 
 #endif // !STEAM && !NO_MALLOC_OVERRIDE
 
