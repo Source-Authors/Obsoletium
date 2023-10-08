@@ -60,7 +60,8 @@ public:
 	bool			startsolid;				// if true, the initial point was in a solid area
 
 	CBaseTrace() 
-		: fraction{FLOAT32_NAN}, contents{0}, dispFlags{0},
+		: startpos(), endpos(),
+		fraction{FLOAT32_NAN}, contents{0}, dispFlags{0},
 		allsolid{false}, startsolid{false}
 	{
 		memset( &plane, 0, sizeof(plane) );

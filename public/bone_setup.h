@@ -249,7 +249,7 @@ struct ikcontextikrule_t
 	Vector		kneeDir;
 	Vector		kneePos;
 
-	ikcontextikrule_t() {}
+	ikcontextikrule_t() : szLabel() {}
 
 private:
 	// No copy constructors allowed
