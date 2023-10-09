@@ -683,11 +683,12 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 					// 2. For each "Game" search path, it adds another "Game" path in front of it with _<langage> at the end.
 					//    For example: c:\hl2\cstrike on a french machine would get a c:\hl2\cstrike_french path added to it.
 
+					// 3. For the first "Game" search path, it adds a search path called "MOD".
+					// dimhotepus: Not only for first, as ex. episode 1 depends on skill.cfg from hl2, so add hl2 as MOD too, but with lower priority.
+					FileSystem_AddLoadedSearchPath( initInfo, "MOD", pFullPath, bLowViolence );
+
 					if ( bFirstGamePath )
 					{
-						// 3. For the first "Game" search path, it adds a search path called "MOD".
-						FileSystem_AddLoadedSearchPath( initInfo, "MOD", pFullPath, bLowViolence );
-
 						// 4. For the first "Game" search path, it adds a search path called "DEFAULT_WRITE_PATH".
 						FileSystem_AddLoadedSearchPath( initInfo, "DEFAULT_WRITE_PATH", pFullPath, bLowViolence );
 
