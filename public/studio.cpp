@@ -1384,7 +1384,7 @@ void CStudioHdr::RunFlexRules( const float *src, float *dest )
 
 	for (int i = 0; i < numflexrules(); i++)
 	{
-		float stack[32] = {};
+		float stack[32] = {0};
 		int k = 0;
 		mstudioflexrule_t *prule = pFlexRule( i );
 
@@ -1403,6 +1403,11 @@ void CStudioHdr::RunFlexRules( const float *src, float *dest )
 
 		for (int j = 0; j < prule->numops; j++)
 		{
+			if (k >= (int)std::size(stack)) 
+			{
+				Error("Out of bounds operations count (%d) >= (%d)", k, (int)std::size(stack));
+			}
+
 			switch (pops->op)
 			{
 			case STUDIO_ADD: stack[k-2] = stack[k-2] + stack[k-1]; k--; break;
