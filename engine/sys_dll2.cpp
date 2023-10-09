@@ -288,6 +288,49 @@ static void posix_signal_handler( int i )
 
 #endif // POSIX
 
+//-----------------------------------------------------------------------------
+// Purpose: Check whether any mods are loaded.
+//  Currently looks for metamod and sourcemod.
+//-----------------------------------------------------------------------------
+static bool IsSourceModLoaded()
+{
+#if defined( _WIN32 )
+	static const char *s_pFileNames[] = { "metamod.2.tf2.dll", "sourcemod.2.tf2.dll", "sdkhooks.ext.2.ep2v.dll", "sdkhooks.ext.2.tf2.dll" };
+
+	for ( size_t i = 0; i < Q_ARRAYSIZE( s_pFileNames ); i++ )
+	{
+		// GetModuleHandle function returns a handle to a mapped module
+		//  without incrementing its reference count.
+		if ( GetModuleHandleA( s_pFileNames[ i ] ) )
+			return true;
+	}
+#else
+	FILE *fh = fopen( "/proc/self/maps", "r" );
+
+	if ( fh )
+	{
+		char buf[ 1024 ];
+		static const char *s_pFileNames[] = { "metamod.2.tf2.so", "sourcemod.2.tf2.so", "sdkhooks.ext.2.ep2v.so", "sdkhooks.ext.2.tf2.so" };
+
+		while ( fgets( buf, sizeof( buf ), fh ) )
+		{
+			for ( size_t i = 0; i < Q_ARRAYSIZE( s_pFileNames ); i++ )
+			{
+				if ( strstr( buf, s_pFileNames[ i ] ) )
+				{
+					fclose( fh );
+					return true;
+				}
+			}
+		}
+
+		fclose( fh );
+	}
+#endif
+
+	return false;
+}
+
 template< int _SIZE >
 class CErrorText
 {
@@ -329,10 +372,13 @@ public:
 			if ( bSourceModLoaded )
 			{
 				AppId_t AppId = GetSteamInfIDVersionInfo().ServerAppID;
+
+#if !defined(NO_STEAM)				
 				// Bump up the number and report the crash. This should be something
 				//  like 232251 (instead of 232250). 232251 is for the TF2 Windows client,
 				//  but we actually report those crashes under ID 440, so this should be ok.
 				SteamAPI_SetBreakpadAppID( AppId + 1 );
+#endif
 			}
 		}
 
@@ -363,7 +409,7 @@ public:
 			{
 				CommentCat( "Crash\n" );
 			}
-			CommentPrintf( "Uptime( %f )\n", Plat_FloatTime() );
+			CommentPrintf( "Uptime: %f s\n", Plat_FloatTime() );
 			CommentPrintf( "SourceMod:%d,DS:%d,Crash:%d\n\n", bSourceModLoaded, m_bIsDedicatedServer, bRealCrash );
 
 			// Add g_minidumpinfo from CL_SetSteamCrashComment().
@@ -440,7 +486,7 @@ public:
 		MEMORYSTATUSEX memStat = { sizeof(memStat) };
 		if ( GlobalMemoryStatusEx( &memStat ) )
 		{
-			CommentPrintf( "\nMemory\nmemusage( %d %% )\ntotalPhysical Mb(%.2f)\nfreePhysical Mb(%.2f)\ntotalPaging Mb(%.2f)\nfreePaging Mb(%.2f)\ntotalVirtualMem Mb(%.2f)\nfreeVirtualMem Mb(%.2f)\nextendedVirtualFree Mb(%.2f)\n",
+			CommentPrintf( "\nMemory\nmemusage( %lu %% )\nTotal Physical: %.2f MiB\nFree Physical: %.2f MiB\nTotal Paging: %.2f MiB\nFree Paging: %.2f MiB\nTotal Virtual: %.2f MiB\nFree Virtual: %.2f MiB\nExtended Virtual Free: %.2f MiB\n",
 				memStat.dwMemoryLoad,
 				(double)memStat.ullTotalPhys / MbDiv,
 				(double)memStat.ullAvailPhys / MbDiv,
@@ -451,21 +497,17 @@ public:
 				(double)memStat.ullAvailExtendedVirtual / MbDiv);
 		}
 
-		HINSTANCE hInst = LoadLibraryExA( "Psapi.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
+		HINSTANCE hInst = LoadLibraryExW( L"Psapi.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
 		if ( hInst )
 		{
 			using GetProcessMemoryInfoFn = decltype(&GetProcessMemoryInfo);
-			auto fn = (GetProcessMemoryInfoFn)GetProcAddress( hInst, "GetProcessMemoryInfo" );
+			auto fn = reinterpret_cast<GetProcessMemoryInfoFn>( GetProcAddress( hInst, "GetProcessMemoryInfo" ) );
 			if ( fn )
 			{
-				PROCESS_MEMORY_COUNTERS counters;
-
-				ZeroMemory( &counters, sizeof( PROCESS_MEMORY_COUNTERS ) );
-				counters.cb = sizeof( PROCESS_MEMORY_COUNTERS );
-
-				if ( fn( GetCurrentProcess(), &counters, sizeof( PROCESS_MEMORY_COUNTERS ) ) )
+				PROCESS_MEMORY_COUNTERS counters = {sizeof( PROCESS_MEMORY_COUNTERS )};
+				if ( fn( GetCurrentProcess(), &counters, counters.cb ) )
 				{
-					CommentPrintf( "\nProcess Memory\nWorkingSetSize Mb(%.2f)\nQuotaPagedPoolUsage Mb(%.2f)\nQuotaNonPagedPoolUsage: Mb(%.2f)\nPagefileUsage: Mb(%.2f)\n",
+					CommentPrintf( "\nProcess Memory\nWorking Set Size: %.2f MiB\nQuota Paged Pool Usage: %.2f MiB\nQuota Non Paged Pool Usage: %.2f MiB\nPagefile Usage: %.2f MiB\n",
 						(double)counters.WorkingSetSize / MbDiv,
 						(double)counters.QuotaPagedPoolUsage / MbDiv,
 						(double)counters.QuotaNonPagedPoolUsage / MbDiv,
@@ -549,7 +591,7 @@ public:
 			CommentCat( "\nConsole History (reversed)\n\n" );
 
 			// Get console
-			int len = V_strlen( m_errorText );
+			size_t len = strlen( m_errorText );
 			if ( len < sizeof( m_errorText ) )
 			{
 				GetSpew( m_errorText + len, sizeof( m_errorText ) - len - 1 );
@@ -627,8 +669,8 @@ void BuildMinidumpComment( char const *pchSysErrorText, bool bRealCrash )
 		return;
 	}
 	*/
-	errorText.BuildComment( pchSysErrorText, bRealCrash );
 #endif
+	errorText.BuildComment( pchSysErrorText, bRealCrash );
 }
 
 #if defined( POSIX )
@@ -1787,6 +1829,16 @@ extern "C" void __cdecl WriteSteamMiniDumpWithComment( unsigned int uStructuredE
 	{
 	}
 #endif
+
+	if ( g_bUpdateMinidumpComment )
+	{
+		BuildMinidumpComment( NULL, true );
+	}
+
+	SetMinidumpComment(errorText.m_errorText);
+
+	// dimhotepus: Write dump via tier0 if no Steam.
+	WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, 0x00000002 /* MiniDumpWithFullMemory */, "crash" );
 } 
 
  

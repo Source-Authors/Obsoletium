@@ -17,13 +17,13 @@ using MINIDUMPWRITEDUMP = decltype(&::MiniDumpWriteDump);
 
 
 // counter used to make sure minidump names are unique
-static int g_nMinidumpsWritten = 0;
+static volatile long g_nMinidumpsWritten = 0;
 
 // process-wide prefix to use for minidumps
 static tchar g_rgchMinidumpFilenamePrefix[MAX_PATH];
 
 // Process-wide comment to put into minidumps
-static char g_rgchMinidumpComment[2048];
+static char g_rgchMinidumpComment[8192];
 
 //-----------------------------------------------------------------------------
 // Purpose: Creates a new file and dumps the exception info into it
@@ -49,28 +49,30 @@ bool WriteMiniDumpUsingExceptionInfo(
 
 	// get the function pointer directly so that we don't have to include the .lib, and that
 	// we can easily change it to using our own dll when this code is used on win98/ME/2K machines
-	HMODULE hDbgHelpDll = ::LoadLibraryExA( "DbgHelp.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
+	HMODULE hDbgHelpDll = ::LoadLibraryExW( L"DbgHelp.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
 	if ( !hDbgHelpDll )
 		return false;
 
 	bool bReturnValue = false;
-	MINIDUMPWRITEDUMP pfnMiniDumpWrite = (MINIDUMPWRITEDUMP) ::GetProcAddress( hDbgHelpDll, V_STRINGIFY(MiniDumpWriteDump) );
 
+	MINIDUMPWRITEDUMP pfnMiniDumpWrite =
+		reinterpret_cast<MINIDUMPWRITEDUMP>( ::GetProcAddress( hDbgHelpDll, V_STRINGIFY(MiniDumpWriteDump) ) );
 	if ( pfnMiniDumpWrite )
 	{
 		// create a unique filename for the minidump based on the current time and module name
 		time_t currTime = ::time( NULL );
 		struct tm * pTime = ::localtime( &currTime );
-		++g_nMinidumpsWritten;
+
+		::InterlockedIncrement( &g_nMinidumpsWritten );
 
 		// If they didn't set a dump prefix, then set one for them using the module name
 		if ( g_rgchMinidumpFilenamePrefix[0] == TCHAR(0) )
 		{
 			tchar rgchModuleName[MAX_PATH];
 			#ifdef TCHAR_IS_WCHAR
-				::GetModuleFileNameW( NULL, rgchModuleName, sizeof(rgchModuleName) / sizeof(tchar) );
+				::GetModuleFileNameW( NULL, rgchModuleName, ARRAYSIZE(rgchModuleName) );
 			#else
-				::GetModuleFileName( NULL, rgchModuleName, sizeof(rgchModuleName) / sizeof(tchar) );
+				::GetModuleFileName( NULL, rgchModuleName, ARRAYSIZE(rgchModuleName) );
 			#endif
 
 			// strip off the rest of the path from the .exe name
@@ -89,14 +91,14 @@ bool WriteMiniDumpUsingExceptionInfo(
 			{
 				pch = _T("unknown");
 			}
-			strcpy( g_rgchMinidumpFilenamePrefix, pch );
+			_tcscpy( g_rgchMinidumpFilenamePrefix, pch );
 		}
 
 		
 		// can't use the normal string functions since we're in tier0
 		tchar rgchFileName[MAX_PATH];
-		_sntprintf( rgchFileName, sizeof(rgchFileName) / sizeof(tchar),
-			_T("%s_%d%02d%02d_%02d%02d%02d_%d%hs%hs.mdmp"),
+		_sntprintf( rgchFileName, ARRAYSIZE(rgchFileName),
+			_T("%s_%d%02d%02d_%02d%02d%02d_%ld%hs%hs.mdmp"),
 			g_rgchMinidumpFilenamePrefix,
 			pTime->tm_year + 1900,	/* Year less 2000 */
 			pTime->tm_mon + 1,		/* month (0 - 11 : 0 = January) */
@@ -105,11 +107,11 @@ bool WriteMiniDumpUsingExceptionInfo(
 			pTime->tm_min,		    /* minutes (0 - 59) */
 			pTime->tm_sec,		    /* seconds (0 - 59) */
 			g_nMinidumpsWritten,	// ensures the filename is unique
-			( pszFilenameSuffix != NULL ) ? "_" : "",
-			( pszFilenameSuffix != NULL ) ? pszFilenameSuffix : ""
+			( pszFilenameSuffix != NULL ) ? _T("_") : _T(""),
+			( pszFilenameSuffix != NULL ) ? pszFilenameSuffix : _T("")
 			);
 		// Ensure null-termination.
-		rgchFileName[ Q_ARRAYSIZE(rgchFileName) - 1 ] = 0;
+		rgchFileName[ ARRAYSIZE(rgchFileName) - 1 ] = 0;
 
 		// Create directory, if our dump filename had a directory in it
 		for ( char *pSlash = rgchFileName ; *pSlash != '\0' ; ++pSlash )
@@ -129,7 +131,6 @@ bool WriteMiniDumpUsingExceptionInfo(
 #else
 		HANDLE hFile = ::CreateFile( rgchFileName, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 #endif
-
 		if ( hFile )
 		{
 			// dump the exception information into the file
@@ -182,7 +183,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 			_sntprintf( rgchFailedFileName, sizeof(rgchFailedFileName) / sizeof(tchar), "(failed)%s", rgchFileName );
 			// Ensure null-termination.
 			rgchFailedFileName[ Q_ARRAYSIZE(rgchFailedFileName) - 1 ] = '\0';
-			// dimhotepus: If rename failed, well, do notning.
+			// dimhotepus: If rename failed, well, do nothing.
 			(void)rename( rgchFileName, rgchFailedFileName );
 		}
 	}
