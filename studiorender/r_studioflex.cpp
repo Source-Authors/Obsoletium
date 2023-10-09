@@ -823,12 +823,12 @@ void CStudioRender::ComputeGlintTextureProjection( eyeballstate_t const* pState,
 							const Vector& vright, const Vector& vup, matrix3x4_t& mat )
 {
 	// project eyeball into screenspace texture
-	float scale = 1.0 / (pState->peyeball->radius * 2);
+	float scale = 1.0f / (pState->peyeball->radius * 2);
 	VectorScale( &vright.x, scale, mat[0] );
 	VectorScale( &vup.x, scale, mat[1] );
 
-	mat[0][3] = -DotProduct( pState->org.Base(), mat[0] ) + 0.5;
-	mat[1][3] = -DotProduct( pState->org.Base(), mat[1] ) + 0.5;
+	mat[0][3] = -DotProduct( pState->org.Base(), mat[0] ) + 0.5f;
+	mat[1][3] = -DotProduct( pState->org.Base(), mat[1] ) + 0.5f;
 }
 
 

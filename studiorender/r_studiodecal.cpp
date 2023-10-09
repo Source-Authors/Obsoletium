@@ -508,8 +508,8 @@ inline unsigned short CStudioRender::AddVertexToDecal( DecalBuildInfo_t& build, 
 		// Make sure clipped vertices are in the right range...
 		if (build.m_UseClipVert)
 		{
-			Assert( (decalVertexList[v].m_TexCoord[0] >= -1e-3) && (decalVertexList[v].m_TexCoord[0] - 1.0f < 1e-3) );
-			Assert( (decalVertexList[v].m_TexCoord[1] >= -1e-3) && (decalVertexList[v].m_TexCoord[1] - 1.0f < 1e-3) );
+			Assert( (decalVertexList[v].m_TexCoord[0] >= -1e-3f) && (decalVertexList[v].m_TexCoord[0] - 1.0f < 1e-3f) );
+			Assert( (decalVertexList[v].m_TexCoord[1] >= -1e-3f) && (decalVertexList[v].m_TexCoord[1] - 1.0f < 1e-3f) );
 		}
 #endif
 
@@ -560,8 +560,8 @@ inline unsigned short CStudioRender::AddVertexToDecal( DecalBuildInfo_t& build, 
 	}
 
 	// This path is the path taken by clipped vertices
-	Assert( (vert.m_TexCoord[0] >= -1e-3) && (vert.m_TexCoord[0] - 1.0f < 1e-3) );
-	Assert( (vert.m_TexCoord[1] >= -1e-3) && (vert.m_TexCoord[1] - 1.0f < 1e-3) );
+	Assert( (vert.m_TexCoord[0] >= -1e-3f) && (vert.m_TexCoord[0] - 1.0f < 1e-3f) );
+	Assert( (vert.m_TexCoord[1] >= -1e-3f) && (vert.m_TexCoord[1] - 1.0f < 1e-3f) );
 
 	// Must create a new vertex...
 	DecalVertexList_t::IndexType_t idx = decalVertexList.AddToTail(vert);

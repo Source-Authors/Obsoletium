@@ -713,6 +713,7 @@ void CStudioRender::DrawModelArray( const DrawModelInfo_t &drawInfo, const Studi
 					{
 					case VERTEX_COMPRESSION_ON:
 						R_StudioRestoreMesh<VERTEX_COMPRESSION_ON>( pmesh, pGroup );
+						[[fallthrough]];
 					case VERTEX_COMPRESSION_NONE:
 					default:
 						R_StudioRestoreMesh<VERTEX_COMPRESSION_NONE>( pmesh, pGroup );

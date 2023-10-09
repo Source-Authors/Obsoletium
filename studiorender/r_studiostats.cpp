@@ -178,7 +178,7 @@ void CStudioRender::R_GatherStats( studiomeshgroup_t *pGroup, CMeshBuilder &Mesh
 				Vector2D	TexV2 = TextureCoords[ nIndex2 ];
 				Vector2D	TexV3 = TextureCoords[ nIndex3 ];
 
-				flTriArea = fabs( TriArea2D( TexV1, TexV2, TexV3 ) );
+				flTriArea = fabsf( TriArea2D( TexV1, TexV2, TexV3 ) );
 				flTextureSurfaceArea += flTriArea;
 				TextureAreas[ ( pStrip->indexOffset + i ) / 3 ] = flTriArea;
 			}

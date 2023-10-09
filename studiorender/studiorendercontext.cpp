@@ -624,7 +624,7 @@ template <VertexCompressionType_t T> bool CStudioRenderContext::R_AddVertexToMes
 
 		// The only way we should not add up to 1 is if there's more than 3 *desired* bones
 		// and more than 1 *actual* bone (we can have 0	vertex bones in the case of static props
-		if ( (pVertex->numBones > 0) && (pBoneWeight->numbones <= 3) && fabs(totalWeight - 1.0f) > 1e-3 )
+		if ( (pVertex->numBones > 0) && (pBoneWeight->numbones <= 3) && fabsf(totalWeight - 1.0f) > 1e-3f )
 		{
 			// force them to re-normalize
 			bOK = false;

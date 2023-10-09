@@ -86,7 +86,7 @@ struct lightpos_t
 	float	falloff;	// light distance falloff
 	float	dot;		// light direction * delta;
 
-	lightpos_t() : falloff{FLOAT32_NAN}, dot{FLOAT32_NAN} {}
+	lightpos_t() : delta(), falloff{FLOAT32_NAN}, dot{FLOAT32_NAN} {}
 
 private:
 	// Copy constructors are not allowed
@@ -170,7 +170,8 @@ struct DecalVertex_t
 	unsigned short	m_Group;
 #endif
 
-	DecalVertex_t() : m_MeshVertexIndex{USHRT_MAX}, m_Body{USHRT_MAX}, m_Model{USHRT_MAX}, m_Mesh{USHRT_MAX}, m_GroupIndex{USHRT_MAX}, m_Group{USHRT_MAX} {}
+	DecalVertex_t() : m_Position(), m_Normal(), m_TexCoord(),
+		m_MeshVertexIndex{USHRT_MAX}, m_Body{USHRT_MAX}, m_Model{USHRT_MAX}, m_Mesh{USHRT_MAX}, m_GroupIndex{USHRT_MAX}, m_Group{USHRT_MAX} {}
 	DecalVertex_t( const DecalVertex_t& src )
 	{
 		m_Position = src.m_Position;

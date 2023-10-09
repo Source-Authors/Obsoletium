@@ -2328,7 +2328,9 @@ int CStudioRender::R_StudioDrawStaticMesh( IMatRenderContext *pRenderContext, ms
 		{
 		case VERTEX_COMPRESSION_ON:
 			R_StudioRestoreMesh<VERTEX_COMPRESSION_ON>( pmesh, pGroup );
+			[[fallthrough]];
 		case VERTEX_COMPRESSION_NONE:
+			[[fallthrough]];
 		default:
 			R_StudioRestoreMesh<VERTEX_COMPRESSION_NONE>( pmesh, pGroup );
 			break;
