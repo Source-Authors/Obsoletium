@@ -40,7 +40,7 @@ CChoreoScene *ChoreoLoadScene(
 	char const *filename,
 	IChoreoEventCallback *callback, 
 	ISceneTokenProcessor *tokenizer,
-	void ( *pfn ) ( const char *fmt, ... ) )
+	void ( *pfn ) ( PRINTF_FORMAT_STRING const char *fmt, ... ) )
 {
 	MEM_ALLOC_CREDIT();
 	CChoreoScene *scene = new CChoreoScene( callback );
@@ -66,8 +66,8 @@ bool IsBufferBinaryVCD( char *pBuffer, int bufferSize )
 //			*fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CChoreoScene::choreoprintf( int level, const char *fmt, ... )
-{
+void CChoreoScene::choreoprintf(int level, PRINTF_FORMAT_STRING const char *fmt,
+                                ...) {
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
@@ -400,7 +400,7 @@ void CChoreoScene::Print( void )
 // Output : 
 //-----------------------------------------------------------------------------
 
-void CChoreoScene::SceneMsg( const char *pFormat, ... )
+void CChoreoScene::SceneMsg( PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	char string[ 2048 ];
 	va_list argptr;
@@ -1577,7 +1577,7 @@ float CChoreoScene::FindStopTime( void )
 //			*fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CChoreoScene::FilePrintf( CUtlBuffer& buf, int level, const char *fmt, ... )
+void CChoreoScene::FilePrintf( CUtlBuffer& buf, int level, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list argptr;
 	va_start( argptr, fmt );
