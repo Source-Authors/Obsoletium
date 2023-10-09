@@ -3180,44 +3180,47 @@ int		IntForKeyWithDefault(entity_t *ent, char *key, int nDefault )
 	return atol(k);
 }
 
-void 	GetVectorForKey (entity_t *ent, char *key, Vector& vec)
-{
+// dimhotepus: Unused.
+//void 	GetVectorForKey (entity_t *ent, char *key, Vector& vec)
+//{
+//
+//	char *k = ValueForKey (ent, key);
+//// scanf into doubles, then assign, so it is vec_t size independent
+//	double	v1, v2, v3;
+//	v1 = v2 = v3 = 0;
+//	sscanf (k, "%lf %lf %lf", &v1, &v2, &v3);
+//	vec[0] = v1;
+//	vec[1] = v2;
+//	vec[2] = v3;
+//}
 
-	char *k = ValueForKey (ent, key);
-// scanf into doubles, then assign, so it is vec_t size independent
-	double	v1, v2, v3;
-	v1 = v2 = v3 = 0;
-	sscanf (k, "%lf %lf %lf", &v1, &v2, &v3);
-	vec[0] = v1;
-	vec[1] = v2;
-	vec[2] = v3;
-}
+// dimhotepus: Unused.
+//void 	GetVector2DForKey (entity_t *ent, char *key, Vector2D& vec)
+//{
+//	double	v1, v2;
+//
+//	char *k = ValueForKey (ent, key);
+//// scanf into doubles, then assign, so it is vec_t size independent
+//	v1 = v2 = 0;
+//	sscanf (k, "%lf %lf", &v1, &v2);
+//	vec[0] = v1;
+//	vec[1] = v2;
+//}
 
-void 	GetVector2DForKey (entity_t *ent, char *key, Vector2D& vec)
-{
-	double	v1, v2;
-
-	char *k = ValueForKey (ent, key);
-// scanf into doubles, then assign, so it is vec_t size independent
-	v1 = v2 = 0;
-	sscanf (k, "%lf %lf", &v1, &v2);
-	vec[0] = v1;
-	vec[1] = v2;
-}
-
-void 	GetAnglesForKey (entity_t *ent, char *key, QAngle& angle)
-{
-	char	*k;
-	double	v1, v2, v3;
-
-	k = ValueForKey (ent, key);
-// scanf into doubles, then assign, so it is vec_t size independent
-	v1 = v2 = v3 = 0;
-	sscanf (k, "%lf %lf %lf", &v1, &v2, &v3);
-	angle[0] = v1;
-	angle[1] = v2;
-	angle[2] = v3;
-}
+// dimhotepus: Unused.
+//void 	GetAnglesForKey (entity_t *ent, char *key, QAngle& angle)
+//{
+//	char	*k;
+//	double	v1, v2, v3;
+//
+//	k = ValueForKey (ent, key);
+//// scanf into doubles, then assign, so it is vec_t size independent
+//	v1 = v2 = v3 = 0;
+//	sscanf (k, "%lf %lf %lf", &v1, &v2, &v3);
+//	angle[0] = v1;
+//	angle[1] = v2;
+//	angle[2] = v3;
+//}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -3390,7 +3393,7 @@ void UpdateAllFaceLightmapExtents()
 //
 //-----------------------------------------------------------------------------
 
-#define TEST_EPSILON	(0.03125)
+#define TEST_EPSILON	(0.03125f)
 
 
 class CToolBSPTree : public ISpatialQuery
