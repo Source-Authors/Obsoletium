@@ -38,8 +38,13 @@ ScalableImageBorder::ScalableImageBorder()
 	m_iSrcCornerWidth = 0;
 	m_iCornerHeight = 0;
 	m_iCornerWidth = 0;
-	m_pszImageName = NULL;
+
 	m_iTextureID = g_pSurface->CreateNewTextureID();
+	m_flCornerWidthPercent = 0;
+	m_flCornerHeightPercent = 0;
+
+	m_pszImageName = NULL;
+	m_bPaintFirst = false;
 }
 
 //-----------------------------------------------------------------------------

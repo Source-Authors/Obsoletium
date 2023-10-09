@@ -27,6 +27,10 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 ImageBorder::ImageBorder()
 {
+	_inset[0] = 0;
+	_inset[1] = 0;
+	_inset[2] = 0;
+	_inset[3] = 0;
 	_name = NULL;
 	m_eBackgroundType = IBorder::BACKGROUND_TEXTURED;
 

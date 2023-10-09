@@ -734,9 +734,7 @@ void CScheme::LoadFonts()
 
 							if ( nRangeMin > nRangeMax )
 							{
-								int nTemp = nRangeMin;
-								nRangeMin = nRangeMax;
-								nRangeMax = nTemp;
+								std::swap(nRangeMin, nRangeMax);
 							}
 						}
 					}

@@ -263,6 +263,7 @@ IVGui *g_pIVgui = &g_VGui;
 //-----------------------------------------------------------------------------
 CVGui::CVGui() : m_DelayedMessageQueue(0, 4, PriorityQueueComp)
 {
+	m_iCurrentMessageID = -1;
 	m_bRunning = false;
 	m_InDispatcher = false;
 	m_bDebugMessages = false;
@@ -807,19 +808,20 @@ bool CVGui::DispatchMessages()
 			if ( m_bDebugMessages )
 			{
 				const char *qname = bUsingSecondaryQueue ? "Secondary" : "Primary";
+				const char *paramsName = messageItem->_params->GetName();
 
-				if (strcmp(messageItem->_params->GetName(), "Tick")
-					&& strcmp(messageItem->_params->GetName(), "MouseFocusTicked") 
-					&& strcmp(messageItem->_params->GetName(), "KeyFocusTicked")
-					&& strcmp(messageItem->_params->GetName(), "CursorMoved"))
+				if (strcmp(paramsName, "Tick")
+					&& strcmp(paramsName, "MouseFocusTicked") 
+					&& strcmp(paramsName, "KeyFocusTicked")
+					&& strcmp(paramsName, "CursorMoved"))
 				{
-					if (!stricmp(messageItem->_params->GetName(), "command"))
+					if (!stricmp(paramsName, "command"))
 					{
-						g_pIVgui->DPrintf2( "%s Queue dispatching command( %s, %s -- %i )\n", qname, messageItem->_params->GetName(), messageItem->_params->GetString("command"), messageItem->_messageID );
+						g_pIVgui->DPrintf2( "%s Queue dispatching command( %s, %s -- %i )\n", qname, paramsName, messageItem->_params->GetString("command"), messageItem->_messageID );
 					}
 					else
 					{
-						g_pIVgui->DPrintf2( "%s Queue dispatching( %s -- %i )\n", qname ,messageItem->_params->GetName(), messageItem->_messageID );
+						g_pIVgui->DPrintf2( "%s Queue dispatching( %s -- %i )\n", qname, paramsName, messageItem->_messageID );
 					}
 				}
 			}

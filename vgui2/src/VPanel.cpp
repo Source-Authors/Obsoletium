@@ -87,6 +87,7 @@ VPanel::VPanel()
 	_pinsibling_my_corner = PIN_TOPLEFT;
 	_pinsibling_their_corner = PIN_TOPLEFT;
 
+	m_nMessageContextId = 0;
 	m_nThinkTraverseLevel = 0;
 	_clientPanelHandle = vgui::INVALID_PANEL;
 }

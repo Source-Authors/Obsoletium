@@ -501,11 +501,17 @@ public:
 	{
 		_refCount = 0;
 		_dragData = NULL;
-		OleInitialize(NULL);
+
+		HRESULT hr = OleInitialize(NULL);
+		if (FAILED(hr)) Warning("OleInitialize failed w/e %ld", hr);
+	}
+	~CSurfaceDragDropTarget()
+	{
+		OleUninitialize();
 	}
 
 private:
-	unsigned int _refCount;
+	volatile unsigned long _refCount;
 	KeyValues *_dragData;
 
     virtual HRESULT STDMETHODCALLTYPE QueryInterface( 
@@ -523,12 +529,12 @@ private:
     
     virtual ULONG STDMETHODCALLTYPE AddRef( void)
 	{
-		return ++_refCount;
+		return ::InterlockedIncrement(&_refCount);
 	}
     
     virtual ULONG STDMETHODCALLTYPE Release( void)
 	{
-		return --_refCount;
+		return ::InterlockedDecrement(&_refCount);
 	}
 
 	virtual HRESULT STDMETHODCALLTYPE DragEnter(IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
@@ -1804,22 +1810,25 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 
 	// Parse bitmap
 	BITMAPFILEHEADER bmfHeader;
-	DWORD dwBitsSize, dwFileSize;
 	LPBITMAPINFO lpbmi;
 
-	dwFileSize = g_pFullFileSystem->Size( file );
+	const DWORD dwFileSize = g_pFullFileSystem->Size( file );
 
 	g_pFullFileSystem->Read( &bmfHeader, sizeof(bmfHeader), file );
 	
 	if (bmfHeader.bfType == DIB_HEADER_MARKER)
 	{
-		dwBitsSize = dwFileSize - sizeof(bmfHeader);
+		const DWORD dwBitsSize = dwFileSize - sizeof(bmfHeader);
 
 		HGLOBAL hDIB = ::GlobalAlloc( GMEM_MOVEABLE | GMEM_ZEROINIT, dwBitsSize );
-		char *pDIB = (LPSTR)::GlobalLock((HGLOBAL)hDIB);
+		if ( !hDIB )
 		{
-			int i, j;
+			g_pFullFileSystem->Close(file);
+			return false;
+		}
 
+		char *pDIB = (LPSTR)::GlobalLock(hDIB);
+		{
 			g_pFullFileSystem->Read(pDIB, dwBitsSize, file );
 
 			lpbmi = (LPBITMAPINFO)pDIB;
@@ -1839,9 +1848,9 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 			unsigned char *rgba = (unsigned char *)( pDIB + sizeof( BITMAPINFOHEADER ) + 256 * sizeof( RGBQUAD ) );
 
 			// Copy raw data
-			for (j = 0; j < texture->_tall; j++)
+			for (int j = 0; j < texture->_tall; j++)
 			{ 
-				for (i = 0; i <texture->_wide; i++)
+				for (int i = 0; i <texture->_wide; i++)
 				{
 					int y = (texture->_tall - j - 1);
 
@@ -3477,7 +3486,7 @@ IImage *CWin32Surface::GetIconImageForFullPath( char const *pFullPath )
 			newIcon = m_FileTypeImages[ idx ];
 		}
 
-		DestroyIcon( info.hIcon );
+		if ( info.hIcon ) DestroyIcon( info.hIcon );
 	}
 
 	return newIcon;

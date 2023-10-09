@@ -235,6 +235,8 @@ CSystem::CSystem()
 	m_iStaticMouseOldX = m_iStaticMouseOldY = -1;
 	m_flFrameTime = 0.0;
 	m_pUserConfigData = NULL;
+	m_szFileName[0] = '\0';
+	m_szPathID[0] = '\0';
 }
 
 //-----------------------------------------------------------------------------
@@ -609,7 +611,7 @@ bool CSystem::SetRegistryString(const char *key, const char *value)
 		return false;
 	}
 
-	if (VCRHook_RegSetValueEx(hKey, key1, NULL, REG_SZ, (uchar*)value, strlen(value) + 1) == ERROR_SUCCESS)
+	if (VCRHook_RegSetValueEx(hKey, key1, NULL, REG_SZ, (uchar*)value, value ? strlen(value) + 1 : 0) == ERROR_SUCCESS)
 	{
 		VCRHook_RegCloseKey(hKey);
 		return true;

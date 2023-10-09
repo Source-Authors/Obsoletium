@@ -183,6 +183,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR_WITH_NAMESPACE(CLocalizedStringTable, vgui::, 
 CLocalizedStringTable::CLocalizedStringTable() : 
 	m_Lookup( 0, 0, SymLess ), m_Names( 1024 ), m_Values( 2048 ), m_FastValueLookup( 0, 0, FastValueLessFunc )
 {
+	m_szLanguage[0] = '\0';
 	m_bUseOnlyLongestLanguageString = false;
 }
 
@@ -321,12 +322,6 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 		// We want to walk them in reverse order so newer files are "overrides" for older ones, so we add them to a list in reverse order
 		for ( char *path = strtok( searchPaths, ";" ); path; path = strtok( NULL, ";" ) )
 		{
-			if ( IsX360() && ( g_pFullFileSystem->GetDVDMode() == DVDMODE_STRICT ) && !V_stristr( path, ".zip" ) )
-			{
-				// only want zip paths
-				continue;
-			}
-
 			char fullpath[MAX_PATH];
 			V_strcpy_safe( fullpath, path );
 			V_AppendSlash( fullpath, sizeof(fullpath) );
