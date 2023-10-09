@@ -486,7 +486,7 @@ private:
 	void FreeAnimBlocks( MDLHandle_t handle );
 
 	// Allocates/frees the virtual model
-	void AllocateVirtualModel( MDLHandle_t handle );
+	[[nodiscard]] virtualmodel_t *AllocateVirtualModel( MDLHandle_t handle );
 	void FreeVirtualModel( MDLHandle_t handle );
 
 	// Purpose: Pulls all submodels/.ani file models into the cache
@@ -1381,7 +1381,7 @@ int CMDLCache::GetAutoplayList( MDLHandle_t handle, unsigned short **pAutoplayLi
 //-----------------------------------------------------------------------------
 // Allocates/frees the virtual model
 //-----------------------------------------------------------------------------
-void CMDLCache::AllocateVirtualModel( MDLHandle_t handle )
+[[nodiscard]] virtualmodel_t * CMDLCache::AllocateVirtualModel( MDLHandle_t handle )
 {
 	studiodata_t *pStudioData = m_MDLDict[handle];
 	Assert( pStudioData->m_pVirtualModel == NULL );
@@ -1390,6 +1390,8 @@ void CMDLCache::AllocateVirtualModel( MDLHandle_t handle )
 	// FIXME: The old code slammed these; could have leaked memory?
 	Assert( pStudioData->m_nAnimBlockCount == 0 );
 	Assert( pStudioData->m_pAnimBlock == NULL );
+
+	return pStudioData->m_pVirtualModel;
 }
 
 void CMDLCache::FreeVirtualModel( MDLHandle_t handle )
@@ -1448,7 +1450,7 @@ virtualmodel_t *CMDLCache::GetVirtualModelFast( const studiohdr_t *pStudioHdr, M
 
 		CMDLCacheCriticalSection criticalSection( this );
 
-		AllocateVirtualModel( handle );
+		pStudioData->m_pVirtualModel = AllocateVirtualModel(handle);
 
 		// Group has to be zero to ensure refcounting is correct
 		int nGroup = pStudioData->m_pVirtualModel->m_group.AddToTail( );
