@@ -1317,7 +1317,7 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 			int intVal = pBounded ? pBounded->GetInt() : var->GetInt();
 			float floatVal = pBounded ? pBounded->GetFloat() : var->GetFloat();
 
-			if ( fabs( (float)intVal - floatVal ) < 0.000001 )
+			if ( fabsf( (float)intVal - floatVal ) < 0.000001f )
 			{
 				Q_snprintf( tempVal, sizeof( tempVal ), "%d", intVal );
 			}
@@ -1353,7 +1353,7 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 		ConMsg( "\n" );
 
 		// Handled virtualized cvars.
-		if ( pBounded && fabs( pBounded->GetFloat() - var->GetFloat() ) > 0.0001f )
+		if ( pBounded && fabsf( pBounded->GetFloat() - var->GetFloat() ) > 0.0001f )
 		{
 			ConColorMsg( clr, "** NOTE: The real value is %.3f but the server has temporarily restricted it to %.3f **\n",
 				var->GetFloat(), pBounded->GetFloat() );
