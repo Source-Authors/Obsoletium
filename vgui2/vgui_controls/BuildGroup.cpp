@@ -885,6 +885,19 @@ void BuildGroup::LoadControlSettings(const char *controlResourceName, const char
 	bool bShouldCacheKeys = true;
 	bool bDeleteKeys = false;
 
+	// dimhotepus: Ensure passed keyvalues cached only once.
+	if ( rDat && bUsePrecaching )
+	{
+		int nIndex = m_dictCachedResFiles.Find( controlResourceName );
+		if ( nIndex != m_dictCachedResFiles.InvalidIndex() )
+		{
+			rDat = m_dictCachedResFiles[nIndex];
+			bUsingPrecachedSourceKeys = true;
+			bDeleteKeys = false;
+			bShouldCacheKeys = false;
+		}
+	}
+
 	while ( !rDat )
 	{
 		if ( bUsePrecaching )
