@@ -10,7 +10,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: converts an english string to unicode
 //-----------------------------------------------------------------------------
-int ILocalize::ConvertANSIToUnicode(const char *ansi, wchar_t *unicode, int unicodeBufferSizeInBytes)
+int ILocalize::ConvertANSIToUnicode(const char *ansi, OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicode, int unicodeBufferSizeInBytes)
 {
 #ifdef POSIX
 	// Q_UTF8ToUnicode returns the number of bytes. This function is expected to return the number of chars.
@@ -23,7 +23,7 @@ int ILocalize::ConvertANSIToUnicode(const char *ansi, wchar_t *unicode, int unic
 //-----------------------------------------------------------------------------
 // Purpose: converts an unicode string to an english string
 //-----------------------------------------------------------------------------
-int ILocalize::ConvertUnicodeToANSI(const wchar_t *unicode, char *ansi, int ansiBufferSize)
+int ILocalize::ConvertUnicodeToANSI(const wchar_t *unicode, OUT_Z_BYTECAP(ansiBufferSize) char *ansi, int ansiBufferSize)
 {
 #ifdef POSIX
 	return Q_UnicodeToUTF8(unicode, ansi, ansiBufferSize);
