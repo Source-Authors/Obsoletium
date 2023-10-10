@@ -3380,7 +3380,7 @@ bool V_BasicHtmlEntityEncode( char *pDest, const int nDestSize, char const *pIn,
 }
 
 
-bool V_HtmlEntityDecodeToUTF8( char *pDest, const int nDestSize, char const *pIn, const int nInSize )
+bool V_HtmlEntityDecodeToUTF8( OUT_Z_CAP( nDestSize ) char *pDest, const int nDestSize, char const *pIn, const int nInSize )
 {
 	Assert( nDestSize == 0 || pDest != NULL );
   int iOutput = 0;
@@ -3868,7 +3868,7 @@ bool V_IsValidURLCharacter( const char *pch, int *pAdvanceBytes )
 // Purpose: helper function to get a domain from a url
 //			Checks both standard url and steam://openurl/<url>
 //-----------------------------------------------------------------------------
-bool V_ExtractDomainFromURL( const char *pchURL, char *pchDomain, int cchDomain )
+bool V_ExtractDomainFromURL( const char *pchURL, OUT_Z_CAP( cchDomain ) char *pchDomain, int cchDomain )
 {
 	pchDomain[ 0 ] = 0;
 
