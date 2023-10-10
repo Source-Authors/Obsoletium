@@ -51,7 +51,7 @@ bool UniqueIdFromString( UniqueId_t *pDest, const char *pBuf, int nMaxLen )
 	{
 		--nMaxLen;
 	}
-	pTemp[ nMaxLen + 1 ] = 0;
+	pTemp[ nMaxLen ] = 0;
 
 	while( *pTemp && isspace( *pTemp ) )
 	{
@@ -59,7 +59,7 @@ bool UniqueIdFromString( UniqueId_t *pDest, const char *pBuf, int nMaxLen )
 	}
 
 #ifdef IS_WINDOWS_PC
-	Assert( sizeof( UUID ) == sizeof( *pDest ) );
+	static_assert( sizeof( UUID ) == sizeof( *pDest ) );
 
 	if ( RPC_S_OK != UuidFromString( (unsigned char *)pTemp, (UUID *)pDest ) )
 	{
