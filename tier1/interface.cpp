@@ -281,7 +281,12 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 	if ( !Q_IsAbsolutePath( pModuleName ) )
 	{
 		// full path wasn't passed in, using the current working dir
-		_getcwd( szCwd, sizeof( szCwd ) );
+		if ( !_getcwd( szCwd, sizeof( szCwd ) ) )
+		{
+			const auto error = std::generic_category().message(errno);
+			Msg( "Failed to load %s: %s\n", pModuleName, error.c_str() );
+			return nullptr;
+		}
 
 		if ( IsX360() )
 		{
@@ -320,13 +325,12 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 #if defined( _DEBUG )
 		if ( !hDLL )
 		{
-// So you can see what the error is in the debugger...
+			// So you can see what the error is in the debugger...
 #if defined( _WIN32 ) && !defined( _X360 )
-      const auto error = std::system_category().message(::GetLastError());
-      Msg( "Failed to load %s: %s\n", pModuleName, error.c_str() );
+			const auto error = std::system_category().message(::GetLastError());
+			Msg( "Failed to load %s: %s\n", pModuleName, error.c_str() );
 #elif defined( _X360 )
-			DWORD error = GetLastError();
-			Msg( "Error(%d) - Failed to load %s:\n", error, pModuleName );
+			Msg( "Error(%d) - Failed to load %s:\n", GetLastError(), pModuleName );
 #else
 			Msg( "Failed to load %s: %s\n", pModuleName, dlerror() );
 #endif // _WIN32
