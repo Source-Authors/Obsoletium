@@ -4285,7 +4285,9 @@ void Host_Init( bool bDedicated )
 	// use the default settings.
 	if ( g_pFileSystem->FileExists( "//mod/cfg/modsettings.cfg" ) )
 	{
-		Cbuf_AddText( "exec modsettings.cfg mod\n" );
+		// dimhotepus: exec uses single argument.
+		// Cbuf_AddText( "exec modsettings.cfg mod\n" );
+		Cbuf_AddText( "exec modsettings.cfg\n" );
 	}
 
 	// Mark DLL as active
