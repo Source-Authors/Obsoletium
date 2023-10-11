@@ -1250,7 +1250,7 @@ inline JobStatus_t CJob::Execute()
 
 	case JOB_STATUS_INPROGRESS:
 		AssertMsg(0, "Mutex Should have protected use while processing");
-		// fall through...
+		[[fallthrough]];
 
 	case JOB_OK:
 		[[fallthrough]];
