@@ -1674,14 +1674,26 @@ int CMorphMgrRenderContext::GetRenderId( CMorph* pMorph )
 //-----------------------------------------------------------------------------
 CMorphMgr::CMorphMgr()
 {
+	m_nAccumulatorWidth = -1;
+	m_nAccumulatorHeight = -1;
+	m_nSubrectVerticalCount = -1;
+	m_nWeightWidth = -1;
+	m_nWeightHeight = -1;
+	m_nFrameCount = 0;
+	m_nTotalMorphSizeInBytes = 0;
+	m_pPrevMaterial = NULL;
+	m_pPrevProxy = NULL;
+	m_nPrevBoneCount = -1;
+	m_nPrevClipMode = MATERIAL_HEIGHTCLIPMODE_DISABLE;
+	m_bPrevClippingEnabled = false;
+	m_bUsingConstantRegisters = false;
+	m_bFlashlightMode = false;
+
 	m_pMorphAccumTexture = NULL;
 	m_pMorphWeightTexture = NULL;
 	m_pVisualizeMorphAccum = NULL;
 	m_pVisualizeMorphWeight = NULL;
 	m_pRenderMorphWeight = NULL;
-	m_nFrameCount = 0;
-	m_nTotalMorphSizeInBytes = 0;
-	m_bUsingConstantRegisters = false;
 }
 
 

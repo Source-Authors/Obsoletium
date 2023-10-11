@@ -106,6 +106,14 @@ void ColorCorrectionLookup_t::RestoreTexture()
 class CColorCorrectionSystem : public IColorCorrectionSystem
 {
 public:
+	CColorCorrectionSystem()
+		: m_DefaultColorCorrectionHandle{(ColorCorrectionHandle_t)-1},
+		m_UnnamedColorCorrectionHandle{(ColorCorrectionHandle_t)-1},
+		m_DefaultColorCorrectionWeight{0.0f},
+		m_bEnabled{false}
+	{
+	}
+
 	virtual void Init();
 	virtual void Shutdown();
 

@@ -67,12 +67,12 @@ inline CMaterialDict *CMatLightmaps::GetMaterialDict()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-CMatLightmaps::CMatLightmaps()
+CMatLightmaps::CMatLightmaps() : m_LightmapPixelWriter()
 {
+	m_numSortIDs = 0;
 	m_currentWhiteLightmapMaterial = NULL;
 	m_pLightmapPages = NULL;
 	m_NumLightmapPages = 0;
-	m_numSortIDs = 0;
 	m_nUpdatingLightmapsStackDepth = 0;
 	m_firstDynamicLightmap = 0;
 	m_nLockedLightmap = -1;
@@ -446,7 +446,7 @@ void CMatLightmaps::AllocateLightmapTexture( int lightmap )
 	{
 	default:
 		Assert( 0 );
-		// fall through.
+		[[fallthrough]];
 
 	case HDR_TYPE_NONE:
 #if !defined( _X360 )
@@ -696,7 +696,7 @@ Vector4D ConvertLightmapColorToRGBScale( const float *lightmapColor )
 			fScale = lightmapColor[i];
 	}
 
-	fScale = ceil( fScale * (255.0f/16.0f) ) * (16.0f/255.0f);
+	fScale = ceilf( fScale * (255.0f/16.0f) ) * (16.0f/255.0f);
 	fScale = min( fScale, 16.0f );
 
 	float fInvScale = 1.0f / fScale;
@@ -704,7 +704,7 @@ Vector4D ConvertLightmapColorToRGBScale( const float *lightmapColor )
 	for( int i = 0; i != 3; ++i )
 	{
 		result[i] = lightmapColor[i] * fInvScale;
-		result[i] = ceil( result[i] * 255.0f ) * (1.0f/255.0f);
+		result[i] = ceilf( result[i] * 255.0f ) * (1.0f/255.0f);
 		result[i] = min( result[i], 1.0f );
 	}
 

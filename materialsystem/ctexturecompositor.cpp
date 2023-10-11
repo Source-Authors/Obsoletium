@@ -442,6 +442,7 @@ public:
 	, m_fAdjustBlack( 0.0F )
 	, m_fAdjustWhite( 0.0F )
 	, m_fAdjustGamma( 0.0F )
+	, m_mTextureAdjust()
 	{ 
 	}
 
@@ -1069,6 +1070,7 @@ public:
 	, m_fAdjustBlack( 0.0F )
 	, m_fAdjustWhite( 0.0F )
 	, m_fAdjustGamma( 0.0F )
+	, m_mTextureAdjust()
 	{ 
 		SafeAssign( &m_pMaterial, materials->FindMaterial( cCombineMaterialName[ ECO_Blend ], TEXTURE_GROUP_RUNTIME_COMPOSITE ) );
 	} 
