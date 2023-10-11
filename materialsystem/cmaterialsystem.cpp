@@ -1548,22 +1548,24 @@ static void ReadInt( KeyValues *pGroup, const char *pName, int nDefaultVal, int 
 	Assert( *pDest != nUndefinedVal );
 }
 
-static void ReadFlt( KeyValues *pGroup, const char *pName, float flDefaultVal, float flUndefinedVal, float *pDest )
-{
-	*pDest = pGroup->GetFloat( pName, flDefaultVal );
-//	Warning( "\t%s = %f\n", pName, *pDest );
-	Assert( *pDest != flUndefinedVal );
-}
+// dimhotepus: Comment unused function.
+//static void ReadFlt( KeyValues *pGroup, const char *pName, float flDefaultVal, float flUndefinedVal, float *pDest )
+//{
+//	*pDest = pGroup->GetFloat( pName, flDefaultVal );
+////	Warning( "\t%s = %f\n", pName, *pDest );
+//	Assert( *pDest != flUndefinedVal );
+//}
 
-static void LoadFlags( KeyValues *pGroup, const char *pName, bool bDefaultValue, unsigned int nFlag, unsigned int *pFlags )
-{
-	int nValue = pGroup->GetInt( pName, bDefaultValue ? 1 : 0 );
-//	Warning( "\t%s = %s\n", pName, nValue ? "true" : "false" );
-	if ( nValue )
-	{
-		*pFlags |= nFlag;
-	}
-}
+// dimhotepus: Comment unused function.
+//static void LoadFlags( KeyValues *pGroup, const char *pName, bool bDefaultValue, unsigned int nFlag, unsigned int *pFlags )
+//{
+//	int nValue = pGroup->GetInt( pName, bDefaultValue ? 1 : 0 );
+////	Warning( "\t%s = %s\n", pName, nValue ? "true" : "false" );
+//	if ( nValue )
+//	{
+//		*pFlags |= nFlag;
+//	}
+//}
 
 #define ASPECT_4x3		0
 #define ASPECT_16x9		1
