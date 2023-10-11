@@ -550,10 +550,10 @@ void CMatRenderContextBase::PickMatrix( int x, int y, int nWidth, int nHeight )
 	GetViewport( vx, vy, vwidth, vheight );
 
 	// Compute the location of the pick region in projection space...
-	float px = 2.0 * (float)(x - vx) / (float)vwidth - 1;
-	float py = 2.0 * (float)(y - vy)/ (float)vheight - 1;
-	float pw = 2.0 * (float)nWidth / (float)vwidth;
-	float ph = 2.0 * (float)nHeight / (float)vheight;
+	float px = 2.0f * (float)(x - vx) / (float)vwidth - 1;
+	float py = 2.0f * (float)(y - vy)/ (float)vheight - 1;
+	float pw = 2.0f * (float)nWidth / (float)vwidth;
+	float ph = 2.0f * (float)nHeight / (float)vheight;
 
 	// we need to translate (px, py) to the origin
 	// and scale so (pw,ph) -> (2, 2)
@@ -917,7 +917,7 @@ float CMatRenderContextBase::ComputePixelDiameterOfSphere( const Vector& vecAbsO
 	GetViewport( vx, vy, vwidth, vheight );
 
 	// The divide-by-two here is because y goes from -1 to 1 in projection space
-	return vheight * fabs( clipPos2.y - clipPos1.y ) / 2.0f;
+	return vheight * fabsf( clipPos2.y - clipPos1.y ) / 2.0f;
 }
 
 ConVar mat_accelerate_adjust_exposure_down( "mat_accelerate_adjust_exposure_down", "3.0", FCVAR_CHEAT );
