@@ -1269,7 +1269,11 @@ void CMorph::RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture
 	pixelWriter.SetPixelMemory( pVTFTexture->Format(), pVTFTexture->ImageData(), pVTFTexture->RowSizeInBytes( 0 ) );
 
 	// Clear the buffer
-	MorphVertexInfo_t zeroDelta;
+	// dimhotepus: Zero init + set m_nVertexId & m_nMorphTargetId to invalid values.
+	MorphVertexInfo_t zeroDelta = {};
+	zeroDelta.m_nVertexId = -1;
+	zeroDelta.m_nMorphTargetId = -1;
+	zeroDelta.m_PositionDelta.Init();
 	zeroDelta.m_PositionDelta.Init();
 	zeroDelta.m_NormalDelta.Init();
 	zeroDelta.m_flWrinkleDelta = 0.0f;
