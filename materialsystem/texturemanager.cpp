@@ -275,7 +275,7 @@ public:
 				for (int x = 0; x < nWidth; ++x)
 				{
 					float u = x * flInvWidth - 1.0f;
-					float oow = 1.0f / sqrt( 1.0f + u*u + v*v );
+					float oow = 1.0f / sqrtf( 1.0f + u*u + v*v );
 
 					int ix = (int)(255.0f * 0.5f * (u*oow + 1.0f) + 0.5f);
 					ix = clamp( ix, 0, 255 );
@@ -349,12 +349,12 @@ public:
 				for (int x = 0; x < nWidth; ++x)
 				{
 					float u = x * flInvWidth - 1.0f;
-					float oow = 1.0f / sqrt( 1.0f + u*u + v*v );
+					float oow = 1.0f / sqrtf( 1.0f + u*u + v*v );
 
 #ifdef DX_TO_GL_ABSTRACTION
-					float flX = (255.0f * 0.5 * (u*oow + 1.0f) + 0.5f);
-					float flY = (255.0f * 0.5 * (v*oow + 1.0f) + 0.5f);
-					float flZ = (255.0f * 0.5 * (oow + 1.0f) + 0.5f);
+					float flX = (255.0f * 0.5f * (u*oow + 1.0f) + 0.5f);
+					float flY = (255.0f * 0.5f * (v*oow + 1.0f) + 0.5f);
+					float flZ = (255.0f * 0.5f * (oow + 1.0f) + 0.5f);
 
 					switch (iFace)
 					{
@@ -416,11 +416,11 @@ public:
 							break;
 					}
 #else
-					int ix = (int)(255 * 0.5 * (u*oow + 1.0f) + 0.5f);
+					int ix = (int)(255 * 0.5f * (u*oow + 1.0f) + 0.5f);
 					ix = clamp( ix, 0, 255 );
-					int iy = (int)(255 * 0.5 * (v*oow + 1.0f) + 0.5f);
+					int iy = (int)(255 * 0.5f * (v*oow + 1.0f) + 0.5f);
 					iy = clamp( iy, 0, 255 );
-					int iz = (int)(255 * 0.5 * (oow + 1.0f) + 0.5f);
+					int iz = (int)(255 * 0.5f * (oow + 1.0f) + 0.5f);
 					iz = clamp( iz, 0, 255 );
 
 					switch (iFace)
