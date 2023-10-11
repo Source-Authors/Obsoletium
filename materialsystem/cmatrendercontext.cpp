@@ -280,7 +280,7 @@ void	CMatRenderContextBase::PrintfVA( char *fmt, va_list vargs )
 {
 }
 
-void	CMatRenderContextBase::Printf( const char *fmt, ... )
+void	CMatRenderContextBase::Printf( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 }
 
@@ -3127,7 +3127,7 @@ void	CMatRenderContext::PrintfVA( char *fmt, va_list vargs )
 	#endif
 }
 
-void	CMatRenderContext::Printf( const char *fmt, ... )
+void	CMatRenderContext::Printf( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	#if GLMDEBUG
 		va_list	vargs;

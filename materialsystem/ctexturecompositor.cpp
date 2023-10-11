@@ -1571,7 +1571,7 @@ void CTextureCompositor::Resolve()
 }
 
 // ------------------------------------------------------------------------------------------------
-void CTextureCompositor::Error( bool _retry, const char* _debugDevMsg, ... )
+void CTextureCompositor::Error( bool _retry, PRINTF_FORMAT_STRING const char* _debugDevMsg, ... )
 {
 	m_bError = true;
 	m_bFatal = !_retry;
