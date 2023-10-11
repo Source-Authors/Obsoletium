@@ -113,7 +113,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
     return ShowErrorBoxAndExitWithCode(
         "Please check game installed in the folder with less "
         "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
-        "Unable to get module file name from GetModuleFileName",
+        "Unable to get module file name from GetModuleFileName.",
         ::GetLastError());
   }
 
@@ -123,19 +123,16 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   _snprintf_s(launcher_dll_path, _TRUNCATE, "%s\\bin\\launcher.dll",
               GetBaseDirectory(module_name, base_directory_path));
 
-  char user_error[1024];
-
   // Disable loading DLLs from current directory to protect against DLL preload
   // attacks.
   if (!::SetDllDirectoryA("")) {
-    const auto rc = ::GetLastError();
-    _snprintf_s(user_error, _TRUNCATE,
-                "Please contact publisher, very likely bug is detected.\n\n"
-                "Unable to remove current directory from DLL search order");
-
-    return ShowErrorBoxAndExitWithCode(user_error, rc);
+    return ShowErrorBoxAndExitWithCode(
+        "Please contact publisher, very likely bug is detected.\n\n"
+        "Unable to remove current directory from DLL search order.",
+        ::GetLastError());
   }
 
+  char user_error[1024];
   // STEAM OK ... filesystem not mounted yet.
   HMODULE launcher_dll{::LoadLibraryExA(launcher_dll_path, nullptr,
                                         LOAD_WITH_ALTERED_SEARCH_PATH)};
@@ -144,7 +141,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed in the folder with less "
                 "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
-                "Unable to load the launcher DLL from %s",
+                "Unable to load the launcher DLL from %s.",
                 launcher_dll_path);
 
     return ShowErrorBoxAndExitWithCode(user_error, rc);
@@ -164,7 +161,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
       const auto rc = ::GetLastError();
       _snprintf_s(user_error, _TRUNCATE,
                   "Please contact publisher, very likely bug is detected.\n\n"
-                  "Unable to unload the launcher DLL from %s",
+                  "Unable to unload the launcher DLL from %s.",
                   launcher_dll_path);
 
       return ShowErrorBoxAndExitWithCode(user_error, rc);
@@ -177,7 +174,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
     const auto rc = ::GetLastError();
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed correctly.\n\nUnable to find %s "
-                "entry point in the launcher DLL %s",
+                "entry point in the launcher DLL %s.",
                 launcher_main_function_name, launcher_dll_path);
 
     return ShowErrorBoxAndExitWithCode(user_error, rc);

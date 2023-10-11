@@ -92,7 +92,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
     return ShowErrorBoxAndExitWithCode(
         "Please check game installed in the folder with less "
         "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
-        "Unable to get module file name from GetModuleFileName",
+        "Unable to get module file name from GetModuleFileName.",
         ::GetLastError());
   }
 
@@ -102,16 +102,25 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   _snprintf_s(dedicated_dll_path, _TRUNCATE, "%s\\bin\\dedicated.dll",
               GetBaseDirectory(module_name, base_directory_path));
 
+  // Disable loading DLLs from current directory to protect against DLL preload
+  // attacks.
+  if (!::SetDllDirectoryA("")) {
+    return ShowErrorBoxAndExitWithCode(
+        "Please contact publisher, very likely bug is detected.\n\n"
+        "Unable to remove current directory from DLL search order.",
+        ::GetLastError());
+  }
+
+  char user_error[1024];
   // STEAM OK ... filesystem not mounted yet.
   HMODULE dedicated_dll{::LoadLibraryExA(dedicated_dll_path, nullptr,
                                          LOAD_WITH_ALTERED_SEARCH_PATH)};
   if (!dedicated_dll) [[unlikely]] {
     const auto rc = ::GetLastError();
-    char user_error[1024];
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed in the folder with less "
                 "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
-                "Unable to load the dedicated DLL from %s",
+                "Unable to load the dedicated DLL from %s.",
                 dedicated_dll_path);
 
     return ShowErrorBoxAndExitWithCode(user_error, rc);
@@ -132,10 +141,9 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 
   {
     const auto rc = ::GetLastError();
-    char user_error[1024];
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed correctly.\n\nUnable to find "
-                "DedicatedMain entry point in the dedicated DLL %s",
+                "DedicatedMain entry point in the dedicated DLL %s.",
                 dedicated_dll_path);
 
     return ShowErrorBoxAndExitWithCode(user_error, rc);
