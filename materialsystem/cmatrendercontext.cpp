@@ -50,7 +50,7 @@ static bool s_bDirtyDisk = false;
 #endif
 
 
-void ValidateMatrices( const VMatrix &m1, const VMatrix &m2, float eps = .001 )
+void ValidateMatrices( const VMatrix &m1, const VMatrix &m2, float eps = .001f )
 {
 	if ( !ShouldValidateMatrices() )
 		return;

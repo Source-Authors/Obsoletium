@@ -773,7 +773,7 @@ float CCurvesColorOperation::ComputeActualCorrectedColor( float flInColor )
 
 	Vector vecOut;
 	ComputeSplinePoint( flInColor, pControlPoints, vecOut );
-	AssertFloatEquals( vecOut.x, flInColor, 1e-3 );
+	AssertFloatEquals( vecOut.x, flInColor, 1e-3f );
 	return vecOut.y;
 }
 
@@ -1320,7 +1320,7 @@ float CLevelsColorOperation::ComputeNormalizedInputLevel( float flInLevel )
 
 	Vector vecOut;
 	ComputeSplinePoint( flInLevel, pControlPoints, vecOut );
-	AssertFloatEquals( vecOut.x, flInLevel, 1e-5 );
+	AssertFloatEquals( vecOut.x, flInLevel, 1e-5f );
 	return vecOut.y;
 }
 

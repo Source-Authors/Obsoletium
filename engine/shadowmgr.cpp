@@ -1494,7 +1494,7 @@ void CShadowMgr::ProjectShadow( ShadowHandle_t handle, const Vector &origin,
 	// We'd like to stop iterating as soon as the entire swept volume
 	// enters a solid leaf; that may be hard to determine. Instead,
 	// we should stop iterating when the ray center enters a solid leaf?
-	AssertFloatEquals( projectionDir.LengthSqr(), 1.0f, 1e-3 );
+	AssertFloatEquals( projectionDir.LengthSqr(), 1.0f, 1e-3f );
 
 	// The maximum ray distance is equal to the distance it takes the
 	// falloff to get to 15%.

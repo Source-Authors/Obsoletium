@@ -2124,9 +2124,9 @@ static void BuildOrthoWorldToShadowMatrix( VMatrix& worldToShadow,
 													 const Vector& origin, const Vector& dir, const Vector& xvec, const Vector& yvec )
 {
 	// This version is faster and assumes dir, xvec, yvec are perpendicular
-	AssertFloatEquals( DotProduct( dir, xvec ), 0.0f, 1e-3 );
-	AssertFloatEquals( DotProduct( dir, yvec ), 0.0f, 1e-3 );
-	AssertFloatEquals( DotProduct( xvec, yvec ), 0.0f, 1e-3 );
+	AssertFloatEquals( DotProduct( dir, xvec ), 0.0f, 1e-3f );
+	AssertFloatEquals( DotProduct( dir, yvec ), 0.0f, 1e-3f );
+	AssertFloatEquals( DotProduct( xvec, yvec ), 0.0f, 1e-3f );
 
 	// The shadow->world matrix is pretty simple:
 	// Just stick the origin in the translation component

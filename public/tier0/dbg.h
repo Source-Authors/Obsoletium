@@ -338,7 +338,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 #define  AssertMsgOnce( _exp, _msg )  						_AssertMsgOnce( _exp, _msg, false )
 #define  AssertFunc( _exp, _f )   							_AssertMsg( _exp, _T("Assertion Failed: ") _T(#_exp), _f, false )
 #define  AssertEquals( _exp, _expectedValue )              	AssertMsg2( (_exp) == (_expectedValue), _T("Expected %d but got %d!"), (_expectedValue), (_exp) ) 
-#define  AssertFloatEquals( _exp, _expectedValue, _tol )  	AssertMsg2( fabs((_exp) - (_expectedValue)) <= (_tol), _T("Expected %f but got %f!"), (_expectedValue), (_exp) )
+#define  AssertFloatEquals( _exp, _expectedValue, _tol )  	AssertMsg2( fabsf((_exp) - (_expectedValue)) <= (_tol), _T("Expected %f but got %f!"), (_expectedValue), (_exp) )
 #define  Verify( _exp )           							Assert( _exp )
 #define  VerifyMsg1( _exp, _msg, a1 )						AssertMsg1( _exp, _msg, a1 )
 #define	 VerifyMsg2( _exp, _msg, a1, a2 )					AssertMsg2( _exp, _msg, a1, a2 )
