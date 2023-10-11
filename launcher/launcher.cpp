@@ -1302,8 +1302,5 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 #error "Please define your platform"
 #endif
 
-	// dimhotepus: Free spew memory, etc.
-	SpewDeactivate();
-
 	return 0;
 }

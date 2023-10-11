@@ -389,10 +389,10 @@ bool IsSpewActive( const tchar* pGroupName, int level )
 
 inline bool IsSpewActive( StandardSpewGroup_t group, int level )
 {
-  if ( static_cast<unsigned>(group) >= std::size(s_pGroupIndices) )
+	if ( static_cast<unsigned>(group) >= std::size(s_pGroupIndices) )
 	{
-    AssertMsg( static_cast<int>(group) >= sizeof(s_pGroupIndices), "Group index is out of range." );
-    return false;
+		AssertMsg( static_cast<int>(group) >= sizeof(s_pGroupIndices), "Group index is out of range." );
+		return false;
 	}
 
 	// If we don't find the spew group, use the default level.
@@ -833,7 +833,8 @@ void SpewActivate( const tchar* pGroupName, int level )
 void SpewDeactivate()
 {
 	PvFree( s_pSpewGroups );
-  s_pSpewGroups = nullptr;
+	s_pSpewGroups = nullptr;
+	memset( &s_pGroupIndices, 0xFF, sizeof(s_pGroupIndices) );
 }
 
 // If we don't have a function from math.h, then it doesn't link certain floating-point
