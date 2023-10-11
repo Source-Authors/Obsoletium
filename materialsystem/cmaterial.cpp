@@ -603,6 +603,8 @@ void CMaterial::SetShaderAndParams( KeyValues *pKeyValues )
 			bool bSuccess = AccumulateRecursiveVmtPatches( *pPatchKeyValues, NULL, *pLoadedKeyValues, pPathID, NULL );
 			if ( bSuccess )
 			{
+				// dimhotepus: Ensure m_pVMTKeyValues present.
+				if ( !m_pVMTKeyValues ) m_pVMTKeyValues = new KeyValues( "vmt" );
 				// Apply accumulated patches to final vmt
 				ApplyPatchKeyValues( *m_pVMTKeyValues, *pPatchKeyValues );
 			}
