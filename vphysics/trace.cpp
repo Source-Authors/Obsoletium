@@ -902,8 +902,6 @@ CTraceAABB::CTraceAABB( const Vector &hlmins, const Vector &hlmaxs, bool isPoint
 
 int CTraceAABB::SupportMap( const Vector &dir, Vector *pOut ) const
 {
-	Vector out;
-
 	if ( m_empty )
 	{
 		pOut->Init();

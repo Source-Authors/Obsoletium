@@ -27,14 +27,15 @@ static void ReadVector( const char *pString, Vector& out )
 	out[2] = z;
 }
 
-static void ReadAngles( const char *pString, QAngle& out )
-{
-	float x = 0, y = 0, z = 0;
-	sscanf( pString, "%f %f %f", &x, &y, &z );
-	out[0] = x;
-	out[1] = y;
-	out[2] = z;
-}
+// dimhotepus: Unused.
+//static void ReadAngles( const char *pString, QAngle& out )
+//{
+//	float x = 0, y = 0, z = 0;
+//	sscanf( pString, "%f %f %f", &x, &y, &z );
+//	out[0] = x;
+//	out[1] = y;
+//	out[2] = z;
+//}
 
 static void ReadVector4D( const char *pString, Vector4D& out )
 {

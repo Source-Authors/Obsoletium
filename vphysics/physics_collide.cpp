@@ -553,7 +553,7 @@ void CPhysCollideCompactSurface::SetOrthographicAreas( const Vector &areas )
 
 void CPhysCollideCompactSurface::ComputeOrthographicAreas( float epsilon )
 {
-	Vector mins, maxs, areas;
+	Vector mins, maxs;
 
 	physcollision->CollideGetAABB( &mins, &maxs, this, vec3_origin, vec3_angle );
 	float side = sqrt( epsilon );
