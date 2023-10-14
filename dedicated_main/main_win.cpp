@@ -47,6 +47,107 @@ template <size_t buffer_size>
   return exit_code;
 }
 
+// Purpose: Apply process mitigation policies.
+[[nodiscard]] int ApplyProcessMitigations() {
+  // Disable loading DLLs from current directory to protect against DLL preload
+  // attacks.
+  if (!::SetDllDirectoryA("")) {
+    return ShowErrorBoxAndExitWithCode(
+        "Please contact publisher, very likely bug is detected.\n\n"
+        "Unable to remove current directory from DLL search order.",
+        ::GetLastError());
+  }
+
+  // Enable heap corruption detection & app termination.
+  if (!HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr,
+                          0)) {
+    return ShowErrorBoxAndExitWithCode(
+        "Please, contact publisher. Failed to enable termination on heap "
+        "corruption feature for your environment.",
+        ::GetLastError());
+  }
+
+#if !defined(_WIN64)
+  // DEP is always enabled on 64-bit.
+  const DWORD dep_flags =
+      PROCESS_DEP_ENABLE | PROCESS_DEP_DISABLE_ATL_THUNK_EMULATION;
+  if (!::SetProcessDEPPolicy(dep_flags) &&
+      ERROR_ACCESS_DENIED != ::GetLastError()) {
+    return ShowErrorBoxAndExitWithCode(
+        "Please, contact publisher. Failed to enable DEP policy for your "
+        "environment.",
+        ::GetLastError());
+  }
+#endif
+
+  {
+    // Enable ASLR policies.
+    PROCESS_MITIGATION_ASLR_POLICY policy = {};
+    policy.EnableForceRelocateImages = true;
+    policy.DisallowStrippedImages = true;
+
+    if (!SetProcessMitigationPolicy(ProcessASLRPolicy, &policy,
+                                    sizeof(policy)) &&
+        ERROR_ACCESS_DENIED != ::GetLastError()) {
+      return ShowErrorBoxAndExitWithCode(
+          "Please, contact publisher. Failed to enable ASLR policy for your "
+          "environment.",
+          ::GetLastError());
+    }
+  }
+
+  {
+    // Enable strict handle policies.
+    PROCESS_MITIGATION_STRICT_HANDLE_CHECK_POLICY policy = {};
+    policy.HandleExceptionsPermanentlyEnabled =
+        policy.RaiseExceptionOnInvalidHandleReference = true;
+
+    if (!SetProcessMitigationPolicy(ProcessStrictHandleCheckPolicy, &policy,
+                                    sizeof(policy)) &&
+        ERROR_ACCESS_DENIED != ::GetLastError()) {
+      return ShowErrorBoxAndExitWithCode(
+          "Please, contact publisher. Failed to enable Strict Handle policy "
+          "for your environment.",
+          ::GetLastError());
+    }
+  }
+
+  {
+    // Enable extension point policies.
+    PROCESS_MITIGATION_EXTENSION_POINT_DISABLE_POLICY policy = {};
+    policy.DisableExtensionPoints = true;
+
+    if (!SetProcessMitigationPolicy(ProcessExtensionPointDisablePolicy, &policy,
+                                    sizeof(policy)) &&
+        ERROR_ACCESS_DENIED != ::GetLastError()) {
+      return ShowErrorBoxAndExitWithCode(
+          "Please, contact publisher. Failed to enable Extension Points policy "
+          "for your environment.",
+          ::GetLastError());
+    }
+  }
+
+  {
+    // Enable image load policies.
+    PROCESS_MITIGATION_IMAGE_LOAD_POLICY policy = {};
+    policy.NoRemoteImages = true;
+    policy.NoLowMandatoryLabelImages = true;
+    // PreferSystem32 is only supported on >= Anniversary.
+    policy.PreferSystem32Images = true;
+
+    if (!SetProcessMitigationPolicy(ProcessImageLoadPolicy, &policy,
+                                    sizeof(policy)) &&
+        ERROR_ACCESS_DENIED != ::GetLastError()) {
+      return ShowErrorBoxAndExitWithCode(
+          "Please, contact publisher. Failed to harden Image Load policy for "
+          "your environment.",
+          ::GetLastError());
+    }
+  }
+
+  return 0;
+}
+
 }  // namespace
 
 #define VALVE_OB_STRINGIFY(x) #x
@@ -77,14 +178,9 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
       // The system does not display the Windows Error Reporting dialog.
       SEM_NOGPFAULTERRORBOX);
 
-  // Enable heap corruption detection & app termination.
-  if (!HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr,
-                          0)) {
-    return ShowErrorBoxAndExitWithCode(
-        "Please, contact publisher. Failed to enable termination on heap "
-        "corruption feature for your environment.",
-        ::GetLastError());
-  }
+  // Apply process mitigations.
+  int rc = ApplyProcessMitigations();
+  if (rc) return static_cast<int>(rc);
 
   // Use the .exe name to determine the base directory.
   char module_name[MAX_PATH];
@@ -101,15 +197,6 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   // Assemble the full path to our "dedicated.dll".
   _snprintf_s(dedicated_dll_path, _TRUNCATE, "%s\\bin\\dedicated.dll",
               GetBaseDirectory(module_name, base_directory_path));
-
-  // Disable loading DLLs from current directory to protect against DLL preload
-  // attacks.
-  if (!::SetDllDirectoryA("")) {
-    return ShowErrorBoxAndExitWithCode(
-        "Please contact publisher, very likely bug is detected.\n\n"
-        "Unable to remove current directory from DLL search order.",
-        ::GetLastError());
-  }
 
   char user_error[1024];
   // STEAM OK ... filesystem not mounted yet.
