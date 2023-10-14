@@ -21,8 +21,8 @@
 #define STRICT
 #endif
 
-// Access to Windows 7 features.
-#define _WIN32_WINNT 0x0601
+// Access to Windows 10 features.
+#define _WIN32_WINNT 0x0A00
 
 #define NOWINRES
 #define NOSERVICE
