@@ -175,7 +175,13 @@ void FileSystem_UseVProjectBinDir( bool bEnable );
 // This is used by all things that use the application framework:
 // Note that the application framework automatically takes care of step 1 if you use CSteamApplication.
 // Step 1: Ask filesystem_init for the name of the filesystem DLL to load
-FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLen, bool &bSteam );
+FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, size_t nMaxLen, bool &bSteam );
+
+template<size_t max_size>
+FSReturnCode_t FileSystem_GetFileSystemDLLName( char (&dll_name)[max_size], bool &is_steam )
+{
+	return FileSystem_GetFileSystemDLLName( dll_name, max_size, is_steam );
+}
 
 // Step 2: Use filesystem framework to load/connect/init that filesystem DLL
 // -or- just set up the steam environment and get back the gameinfo.txt path
@@ -199,7 +205,13 @@ void FileSystem_AddSearchPath_Platform( IFileSystem *pFileSystem, const char *sz
 // See FSErrorMode_t. If you don't specify one here, then the default is FS_ERRORMODE_VCONFIG.
 void FileSystem_SetErrorMode( FSErrorMode_t errorMode = FS_ERRORMODE_VCONFIG );
 
-bool FileSystem_GetExecutableDir( char *exedir, int exeDirLen );
+bool FileSystem_GetExecutableDir( char *exedir, size_t exeDirLen );
+
+template<size_t max_size>
+bool FileSystem_GetExecutableDir( char (&exedir)[max_size] )
+{
+	return FileSystem_GetExecutableDir( exedir, max_size );
+}
 
 // Clear SteamAppUser, SteamUserPassphrase, and SteamAppId from this process's environment.
 // TODO: always do this after LoadFileSysteModule.. there's no reason it should be

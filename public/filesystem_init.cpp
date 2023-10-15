@@ -127,7 +127,7 @@ public:
 #endif
 	}
 
-	void SetValue( const char *pValue, ... )
+	[[nodiscard]] bool SetValue( const char *pValue, ... )
 	{
 		char valueString[4096];
 		va_list marker;
@@ -138,20 +138,20 @@ public:
 #ifdef WIN32
 		char str[4096];
 		Q_snprintf( str, sizeof( str ), "%s=%s", m_pVarName, valueString );
-		_putenv( str );
+		return !_putenv( str );
 #else
-		setenv( m_pVarName, valueString, 1 );
+		return !setenv( m_pVarName, valueString, 1 );
 #endif
 	}
 
-	void ClearValue()
+	[[nodiscard]] bool ClearValue()
 	{
 #ifdef WIN32
 		char str[512];
 		Q_snprintf( str, sizeof( str ), "%s=", m_pVarName );
-		_putenv( str );
+		return !_putenv( str );
 #else
-		setenv( m_pVarName, "", 1 );
+		return !setenv( m_pVarName, "", 1 );
 #endif
 	}
 
@@ -192,15 +192,24 @@ public:
 // Helpers.
 // ---------------------------------------------------------------------------------------------------- //
 template<size_t outSize>
-void Q_getwd( char (&out)[outSize] ) {
+static [[nodiscard]] bool Q_getwd( char (&out)[outSize] ) {
 #if defined( _WIN32 ) || defined( WIN32 )
-	_getcwd( out, outSize );
-	Q_strncat( out, "\\", outSize, COPY_ALL_CHARACTERS );
+	bool ok = !!_getcwd( out, outSize );
+	if (ok)
+	{
+		Q_strncat( out, "\\", outSize, COPY_ALL_CHARACTERS );
+		Q_FixSlashes( out );
+	}
+	return ok;
 #else
-	getcwd( out, outSize );
-	strcat( out, "/" );
+	bool ok = !!getcwd( out, outSize );
+	if (ok)
+	{
+		strcat( out, "/" );
+		Q_FixSlashes( out );
+	}
+	return ok;
 #endif
-	Q_FixSlashes( out );
 }
 
 // ---------------------------------------------------------------------------------------------------- //
@@ -297,7 +306,7 @@ static bool Sys_GetExecutableName( char *out, int len )
 	return true;
 }
 
-bool FileSystem_GetExecutableDir( char *exedir, int exeDirLen )
+bool FileSystem_GetExecutableDir( char *exedir, size_t exeDirLen )
 {
 	exedir[0] = 0;
 
@@ -337,9 +346,10 @@ bool FileSystem_GetExecutableDir( char *exedir, int exeDirLen )
 	return true;
 }
 
-static bool FileSystem_GetBaseDir( char *baseDir, int baseDirLen )
+template<size_t max_size>
+static bool FileSystem_GetBaseDir( char (&baseDir)[max_size] )
 {
-	if ( FileSystem_GetExecutableDir( baseDir, baseDirLen ) )
+	if ( FileSystem_GetExecutableDir( baseDir ) )
 	{
 		Q_StripFilename( baseDir );
 		return true;
@@ -351,7 +361,7 @@ static bool FileSystem_GetBaseDir( char *baseDir, int baseDirLen )
 void LaunchVConfig()
 {
 	char vconfigExe[MAX_PATH];
-	FileSystem_GetExecutableDir( vconfigExe, sizeof( vconfigExe ) );
+	FileSystem_GetExecutableDir( vconfigExe );
 	Q_AppendSlash( vconfigExe, sizeof( vconfigExe ) );
 	Q_strncat( vconfigExe, "vconfig.exe", sizeof( vconfigExe ), COPY_ALL_CHARACTERS );
 
@@ -509,7 +519,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	
 	// All paths except those marked with |gameinfo_path| are relative to the base dir.
 	char baseDir[MAX_PATH];
-	if ( !FileSystem_GetBaseDir( baseDir, sizeof( baseDir ) ) )
+	if ( !FileSystem_GetBaseDir( baseDir ) )
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_GetBaseDir failed." );
 
 	// The MOD directory is always the one that contains gameinfo.txt
@@ -881,7 +891,10 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char (&pOutD
 			return FS_OK;
 
 		// Use the CWD
-		Q_getwd( pOutDir );
+		if ( !Q_getwd( pOutDir ) )
+			return SetupFileSystemError( false, FS_UNABLE_TO_INIT, 
+				"Unable to get current directory." );
+
 		if ( FS_OK == TryLocateGameInfoFile( pOutDir, true ) )
 			return FS_OK;
 	}
@@ -934,7 +947,7 @@ FSReturnCode_t GetSteamCfgPath( char *steamCfgPath, int steamCfgPathLen )
 {
 	steamCfgPath[0] = 0;
 	char executablePath[MAX_PATH];
-	if ( !FileSystem_GetExecutableDir( executablePath, sizeof( executablePath ) ) )
+	if ( !FileSystem_GetExecutableDir( executablePath ) )
 	{
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_GetExecutableDir failed." );
 	}
@@ -1013,12 +1026,12 @@ FSReturnCode_t FileSystem_SetBasePaths( IFileSystem *pFileSystem )
 	pFileSystem->RemoveSearchPaths( "EXECUTABLE_PATH" );
 
 	char executablePath[MAX_PATH];
-	if ( !FileSystem_GetExecutableDir( executablePath, sizeof( executablePath ) )	)
+	if ( !FileSystem_GetExecutableDir( executablePath )	)
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_GetExecutableDir failed." );
 
 	pFileSystem->AddSearchPath( executablePath, "EXECUTABLE_PATH" );
 
-	if ( !FileSystem_GetBaseDir( executablePath, sizeof( executablePath ) )  )
+	if ( !FileSystem_GetBaseDir( executablePath ) )
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_GetBaseDir failed." );
 
 	pFileSystem->AddSearchPath( executablePath, "BASE_PATH" );
@@ -1029,23 +1042,26 @@ FSReturnCode_t FileSystem_SetBasePaths( IFileSystem *pFileSystem )
 //-----------------------------------------------------------------------------
 // Returns the name of the file system DLL to use
 //-----------------------------------------------------------------------------
-FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLen, bool &bSteam )
+FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, size_t nMaxLen, bool &bSteam )
 {
 	bSteam = false;
 
 	// Inside of here, we don't have a filesystem yet, so we have to assume that the filesystem_stdio or filesystem_steam
 	// is in this same directory with us.
 	char executablePath[MAX_PATH];
-	if ( !FileSystem_GetExecutableDir( executablePath, sizeof( executablePath ) )	)
+	if ( !FileSystem_GetExecutableDir( executablePath )	)
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_GetExecutableDir failed." );
-
-	// Assume we'll use local files
-	Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_stdio" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
 
 	// Use filesystem_steam if it exists?
 	struct stat statBuf;
+
+	// Assume we'll use local files
+	Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_stdio" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
 	if ( stat( pFileSystemDLL, &statBuf ) == 0 )
+	{
+		bSteam = false;
 		return FS_OK;
+	}
 
 	Q_snprintf( pFileSystemDLL, nMaxLen, "%s%cfilesystem_steam" DLL_EXT_STRING, executablePath, CORRECT_PATH_SEPARATOR );
 	if ( stat( pFileSystemDLL, &statBuf ) == 0 )
@@ -1066,7 +1082,7 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, int nMaxLe
 FSReturnCode_t FileSystem_SetupSteamEnvironment( CFSSteamSetupInfo &fsInfo )
 {
 	// First, locate the directory with gameinfo.txt.
-	FSReturnCode_t ret = LocateGameInfoFile( fsInfo, fsInfo.m_GameInfoPath );
+	const FSReturnCode_t ret = LocateGameInfoFile( fsInfo, fsInfo.m_GameInfoPath );
 	if ( ret != FS_OK )
 		return ret;
 
@@ -1074,12 +1090,14 @@ FSReturnCode_t FileSystem_SetupSteamEnvironment( CFSSteamSetupInfo &fsInfo )
 #ifdef WIN32
 	char pEnvBuf[MAX_PATH+32];
 	Q_snprintf( pEnvBuf, sizeof(pEnvBuf), "%s=%s", GAMEDIR_TOKEN, fsInfo.m_GameInfoPath );
-	_putenv( pEnvBuf );
+	return !_putenv( pEnvBuf )
+		? FS_OK
+		: SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Unable to set env variable %s: %s.", pEnvBuf, strerror(errno) );
 #else
-	setenv( GAMEDIR_TOKEN, fsInfo.m_GameInfoPath, 1 );
+	return !setenv( GAMEDIR_TOKEN, fsInfo.m_GameInfoPath, 1 )
+		? FS_OK
+		: SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Unable to set env variable %s: %s.", pEnvBuf, strerror(errno) );
 #endif
-
-	return FS_OK;
 }
 
 
@@ -1135,10 +1153,10 @@ FSReturnCode_t FileSystem_MountContent( CFSMountContentInfo &mountContentInfo )
 //		// This is what Steam strips off absolute filenames like c:\program files\valve\steam\steamapps\username\sourcesdk
 //		// to get to the relative part of the path.
 //		char baseDir[MAX_PATH], oldWorkingDir[MAX_PATH];
-//		if ( !FileSystem_GetBaseDir( baseDir, sizeof( baseDir ) ) )
+//		if ( !FileSystem_GetBaseDir( baseDir ) )
 //			return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_GetBaseDir failed." );
 //
-//		Q_getwd( oldWorkingDir, sizeof( oldWorkingDir ) );
+//		if ( !Q_getwd( oldWorkingDir ) ) return SetupFileSystemError( true, FS_UNABLE_TO_INIT, "Unable to get current directory in the file system" );
 //		_chdir( baseDir );
 //
 //		// Filesystem_tools needs to add dependencies in here beforehand.

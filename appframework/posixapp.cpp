@@ -92,7 +92,7 @@ bool CSteamApplication::Create( )
 	FileSystem_SetErrorMode( FS_ERRORMODE_NONE );
 
 	char pFileSystemDLL[MAX_PATH];
-	if ( FileSystem_GetFileSystemDLLName( pFileSystemDLL, MAX_PATH, m_bSteam ) != FS_OK )
+	if ( FileSystem_GetFileSystemDLLName( pFileSystemDLL, m_bSteam ) != FS_OK )
 		return false;
 
 	// Add in the cvar factory

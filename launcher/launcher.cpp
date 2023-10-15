@@ -608,7 +608,7 @@ bool CSourceAppSystemGroup::Create()
 	// steam/stdio split for our steam filesystem
 	char pFileSystemDLL[MAX_PATH];
 	bool bSteam;
-	if ( FileSystem_GetFileSystemDLLName( pFileSystemDLL, MAX_PATH, bSteam ) != FS_OK )
+	if ( FileSystem_GetFileSystemDLLName( pFileSystemDLL, bSteam ) != FS_OK )
 		return false;
 
 	AppModule_t fileSystemModule = LoadModule( pFileSystemDLL );
