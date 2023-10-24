@@ -44,6 +44,7 @@
 #include "datacache/imdlcache.h"
 #include "eventqueue.h"
 #include "gamestats.h"
+#include "gameinterface.h"
 #include "filters.h"
 #include "tier0/icommandline.h"
 
@@ -1046,9 +1047,18 @@ bool CHL2_Player::HandleInteraction(int interactionType, void *data, CBaseCombat
 	return false;
 }
 
+ConVar sv_max_usercmd_future_ticks( "sv_max_usercmd_future_ticks", "8", 0, "Prevents clients from running usercmds too far in the future." );
 
 void CHL2_Player::PlayerRunCommand(CUserCmd *ucmd, IMoveHelper *moveHelper)
 {
+	// don't run commands in the future
+	if ( !IsEngineThreaded() && 
+		( ucmd->tick_count > (gpGlobals->tickcount + sv_max_usercmd_future_ticks.GetInt() ) ) )
+	{
+		DevMsg( "Client cmd out of sync (delta %i).\n", ucmd->tick_count - gpGlobals->tickcount );
+		return;
+	}
+
 	// Handle FL_FROZEN.
 	if ( m_afPhysicsFlags & PFLAG_ONBARNACLE )
 	{
