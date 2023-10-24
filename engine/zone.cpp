@@ -132,8 +132,17 @@ void Hunk_Print()
 //-----------------------------------------------------------------------------
 void Memory_Init( void )
 {
-	MEM_ALLOC_CREDIT();
-	int nMaxBytes = 48*1024*1024;
+    MEM_ALLOC_CREDIT();
+#if defined(_X360) || defined(HUNK_USE_16MB_PAGE)
+	int nMaxBytes = 48 * 1024 * 1024;
+#else
+	// dimhotepus: With r_hunkalloclightmaps 1 (default), the hunk is not large
+	// enough to alloc some lightmaps, and the game crashes with a hunk overflow
+	// error.
+	// We can do a modest bump up (48->64MB) to increase memory available to the hunk
+	// this was also done in CS:GO for 32 bit clients (64 bit got a bump to 128MB).
+    int nMaxBytes = 64 * 1024 * 1024;
+#endif
 	const int nMinCommitBytes = 0x8000;
 #ifndef HUNK_USE_16MB_PAGE
 	const int nInitialCommit = 0x280000;
