@@ -18,12 +18,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-bool InvariantIsSpace(unsigned char ch)
-{
-  return ch == ' ' || ch == '\f' || ch == '\n' || ch == '\r' || ch == '\t' ||
-         ch == '\v';
-}
-
 //-----------------------------------------------------------------------------
 // Character conversions for C strings
 //-----------------------------------------------------------------------------
@@ -395,7 +389,7 @@ void CUtlBuffer::EatWhiteSpace()
 	{
 		while ( CheckGet( sizeof(char) ) )
 		{
-			if ( !InvariantIsSpace( *(const unsigned char*)PeekGet() ) )
+			if ( !V_isspace( *(const unsigned char*)PeekGet() ) )
 				break;
 			m_Get += sizeof(char);
 		}
@@ -440,7 +434,7 @@ int CUtlBuffer::PeekWhiteSpace( int nOffset )
 
 	while ( CheckPeekGet( nOffset, sizeof(char) ) )
 	{
-		if ( !InvariantIsSpace( *(unsigned char*)PeekGet( nOffset ) ) )
+		if ( !V_isspace( *(unsigned char*)PeekGet( nOffset ) ) )
 			break;
 		nOffset += sizeof(char);
 	}
@@ -494,7 +488,7 @@ int	CUtlBuffer::PeekStringLength()
 			for ( int i = 0; i < nPeekAmount; ++i )
 			{
 				// The +1 here is so we eat the terminating 0
-				if ( InvariantIsSpace((unsigned char)pTest[i]) || (pTest[i] == 0) )
+				if ( V_isspace((unsigned char)pTest[i]) || (pTest[i] == 0) )
 					return (i + nOffset - nStartingOffset + 1);
 			}
 		}
@@ -1169,7 +1163,7 @@ bool CUtlBuffer::ParseToken( const char *pStartingDelim, const char *pEndingDeli
 	while ( *pStartingDelim )
 	{
 		nCurrChar = *pStartingDelim++;
-		if ( !InvariantIsSpace((unsigned char)nCurrChar) )
+		if ( !V_isspace((unsigned char)nCurrChar) )
 		{
 			if ( tolower( GetChar() ) != tolower( nCurrChar ) )
 				goto parseFailed;
@@ -1202,7 +1196,7 @@ bool CUtlBuffer::ParseToken( const char *pStartingDelim, const char *pEndingDeli
 		// Eat trailing whitespace
 		for ( ; nCharsToCopy > 0; --nCharsToCopy )
 		{
-			if ( !InvariantIsSpace( (unsigned char)pString[ nCharsToCopy-1 ] ) )
+			if ( !V_isspace( (unsigned char)pString[ nCharsToCopy-1 ] ) )
 				break;
 		}
 	}

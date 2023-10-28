@@ -657,7 +657,7 @@ public:
 			if ( *p == '/' && *(p+1) == '/' )
 				return false;
 
-			if ( !isspace( *p ) || isalnum( *p ) )
+			if ( !V_isspace( *p ) || isalnum( *p ) )
 				return true;
 
 			p++;

@@ -599,7 +599,7 @@ const char *KeyValues::ReadToken( CUtlBuffer &buf, bool &wasQuoted, bool &wasCon
 		}
 
 		// break on whitespace
-		if ( isspace(*c) )
+		if ( V_isspace(*c) )
 			break;
 
 		if (nCount < (KEYVALUES_TOKEN_SIZE-1) )

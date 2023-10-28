@@ -47,13 +47,13 @@ bool UniqueIdFromString( UniqueId_t *pDest, const char *pBuf, int nMaxLen )
 	char *pTemp = (char*)stackalloc( nMaxLen + 1 );
 	V_strncpy( pTemp, pBuf, nMaxLen + 1 );
 	--nMaxLen;
-	while( (nMaxLen >= 0) && isspace( pTemp[nMaxLen] ) )
+	while( (nMaxLen >= 0) && V_isspace( pTemp[nMaxLen] ) )
 	{
 		--nMaxLen;
 	}
 	pTemp[ nMaxLen ] = 0;
 
-	while( *pTemp && isspace( *pTemp ) )
+	while( *pTemp && V_isspace( *pTemp ) )
 	{
 		++pTemp;
 	}

@@ -763,7 +763,7 @@ void CDmxSerializerKeyValues2::EatWhitespacesAndComments( CUtlBuffer &buf )
 		const char *pPeek = NULL;
 		while ( (pPeek = (const char *)buf.PeekGet( sizeof(char), nOffset ) ) )
 		{
-			if ( !isspace( *pPeek ) )
+			if ( !V_isspace( *pPeek ) )
 				break;
 
 			if ( *pPeek == '\n' )

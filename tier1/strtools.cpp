@@ -1347,7 +1347,7 @@ bool Q_StripPrecedingAndTrailingWhitespace( char *pch )
 	int cch = Q_strlen( pch );
 
 	// Early out and don't convert if we don't have any chars or leading/trailing ws.
-	if ( ( cch < 1 ) || ( !isspace( (unsigned char)pch[ 0 ] ) && !isspace( (unsigned char)pch[ cch - 1 ] ) ) )
+	if ( ( cch < 1 ) || ( !V_isspace( (unsigned char)pch[ 0 ] ) && !V_isspace( (unsigned char)pch[ cch - 1 ] ) ) )
 		return false;
 
 	// convert to unicode
