@@ -1310,7 +1310,7 @@ bool CHudCloseCaption::SplitCommand( wchar_t const **ppIn, wchar_t *cmd, wchar_t
 	cmd[ 0 ]= 0;
 	wchar_t *out = cmd;
 	in++;
-	while ( *in != L'\0' && *in != L':' && *in != L'>' && !isspace( *in ) )
+	while ( *in != L'\0' && *in != L':' && *in != L'>' && !iswspace( *in ) )
 	{
 		*out++ = *in++;
 	}
