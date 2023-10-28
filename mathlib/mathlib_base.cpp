@@ -1453,10 +1453,10 @@ float SmoothCurve( float x )
 inline float MovePeak( float x, float flPeakPos )
 {
 	// Todo: make this higher-order?
-	if( x < flPeakPos )
+	if( ( x < flPeakPos && flPeakPos != 0.0f ) || flPeakPos == 1.0f )
 		return x * 0.5f / flPeakPos;
 	else
-		return 0.5f + 0.5f * (x - flPeakPos) / (1 - flPeakPos);
+		return 0.5f + 0.5f * (x - flPeakPos) / (1.0f - flPeakPos);
 }
 
 
