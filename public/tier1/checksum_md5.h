@@ -12,8 +12,9 @@
 #endif
 
 // 16 bytes == 128 bit digest
-#define MD5_DIGEST_LENGTH 16  
-#define MD5_BIT_LENGTH ( MD5_DIGEST_LENGTH * sizeof(unsigned char) )
+constexpr inline int MD5_DIGEST_LENGTH{16};
+constexpr inline size_t MD5_BIT_LENGTH{MD5_DIGEST_LENGTH *
+                                       sizeof(unsigned char)};
 struct MD5Value_t
 {
 	unsigned char bits[MD5_DIGEST_LENGTH];
