@@ -147,8 +147,8 @@ bool CheckSSE42Technology()
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
-  // SSE 4.1 is implemented by both Intel and AMD
-  // detection is done the same way for both vendors
+	// SSE 4.2 is implemented by both Intel and AMD
+	// detection is done the same way for both vendors
 	unsigned long eax,ebx,edx,ecx;
 	if( !cpuid(1,eax,ebx,ecx,edx) )
 		return false;
