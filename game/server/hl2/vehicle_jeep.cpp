@@ -606,14 +606,14 @@ void CPropJeep::CheckWaterLevel( void )
 		bool bEyes = ( UTIL_PointContents( vecAttachPoint ) & MASK_WATER ) ? true : false;
 		if ( bEyes )
 		{
-			pPlayer->SetWaterLevel( WL_Eyes );
+			pPlayer->SetWaterLevel( WaterLevel::WL_Eyes );
 			return;
 		}
 
 		// Check waist.  (vehicle_engine point -- see parent function).
 		if ( m_WaterData.m_bBodyInWater )
 		{
-			pPlayer->SetWaterLevel( WL_Waist );
+			pPlayer->SetWaterLevel( WaterLevel::WL_Waist );
 			return;
 		}
 
@@ -623,12 +623,12 @@ void CPropJeep::CheckWaterLevel( void )
 		bool bFeet = ( UTIL_PointContents( vecAttachPoint ) & MASK_WATER ) ? true : false;
 		if ( bFeet )
 		{
-			pPlayer->SetWaterLevel( WL_Feet );
+			pPlayer->SetWaterLevel( WaterLevel::WL_Feet );
 			return;
 		}
 
 		// Not in water.
-		pPlayer->SetWaterLevel( WL_NotInWater );
+		pPlayer->SetWaterLevel( WaterLevel::WL_NotInWater );
 	}
 }
 

@@ -30,7 +30,7 @@ enum soundlevel_t;
 // Purpose: Identifies how submerged in water a player is.
 //-----------------------------------------------------------------------------
 
-enum
+enum WaterLevel : unsigned char
 {
 	WL_NotInWater=0,
 	WL_Feet,

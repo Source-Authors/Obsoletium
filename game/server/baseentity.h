@@ -20,6 +20,7 @@
 #include "ServerNetworkProperty.h"
 #include "shareddefs.h"
 #include "engine/ivmodelinfo.h"
+#include "imovehelper.h"
 
 class CDamageModifier;
 class CDmgAccumulator;
@@ -1248,8 +1249,8 @@ public:
 	// Gets the velocity we impart to a player standing on us
 	virtual void			GetGroundVelocityToApply( Vector &vecGroundVel ) { vecGroundVel = vec3_origin; }
 
-	int						GetWaterLevel() const;
-	void					SetWaterLevel( int nLevel );
+	WaterLevel				GetWaterLevel() const;
+	void					SetWaterLevel( WaterLevel nLevel );
 	int						GetWaterType() const;
 	void					SetWaterType( int nType );
 
@@ -1641,7 +1642,7 @@ private:
 	unsigned char	m_nWaterTouch;
 	unsigned char	m_nSlimeTouch;
 	unsigned char	m_nWaterType;
-	CNetworkVarForDerived( unsigned char, m_nWaterLevel );
+	CNetworkVarForDerived( WaterLevel, m_nWaterLevel );
 	float			m_flNavIgnoreUntilTime;
 
 	CNetworkHandleForDerived( CBaseEntity, m_hGroundEntity );
@@ -2307,12 +2308,12 @@ inline CBaseEntity* CBaseEntity::Instance( int iEnt )
 	return Instance( INDEXENT( iEnt ) );
 }
 
-inline int CBaseEntity::GetWaterLevel() const
+inline WaterLevel CBaseEntity::GetWaterLevel() const
 {
 	return m_nWaterLevel;
 }
 
-inline void CBaseEntity::SetWaterLevel( int nLevel )
+inline void CBaseEntity::SetWaterLevel( WaterLevel nLevel )
 {
 	m_nWaterLevel = nLevel;
 }

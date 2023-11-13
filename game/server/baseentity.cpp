@@ -3850,12 +3850,12 @@ void CBaseEntity::OnEntityEvent( EntityEvent_t event, void *pEventData )
 
 	if (( nNewContents & MASK_WATER ) == 0)
 	{
-		SetWaterLevel( 0 );
+		SetWaterLevel( WaterLevel::WL_NotInWater );
 		SetWaterType( CONTENTS_EMPTY );
 		return;
 	}
 
-	SetWaterLevel( 1 );
+	SetWaterLevel( WaterLevel::WL_Feet );
 	SetWaterType( nNewContents );
 }
 

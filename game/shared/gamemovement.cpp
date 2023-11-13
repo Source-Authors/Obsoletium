@@ -3497,7 +3497,7 @@ bool CGameMovement::CheckWater( void )
 	point[2] = mv->GetAbsOrigin()[2] + vPlayerMins[2] + 1;
 	
 	// Assume that we are not in water at all.
-	player->SetWaterLevel( WL_NotInWater );
+	player->SetWaterLevel( WaterLevel::WL_NotInWater );
 	player->SetWaterType( CONTENTS_EMPTY );
 
 	// Grab point contents.
@@ -3510,7 +3510,7 @@ bool CGameMovement::CheckWater( void )
 		player->SetWaterType( cont );
 
 		// We are at least at level one
-		player->SetWaterLevel( WL_Feet );
+		player->SetWaterLevel( WaterLevel::WL_Feet );
 
 		// Now check a point that is at the player hull midpoint.
 		point[2] = mv->GetAbsOrigin()[2] + (vPlayerMins[2] + vPlayerMaxs[2])*0.5f;
@@ -3519,13 +3519,13 @@ bool CGameMovement::CheckWater( void )
 		if ( cont & MASK_WATER )
 		{
 			// Set a higher water level.
-			player->SetWaterLevel( WL_Waist );
+			player->SetWaterLevel( WaterLevel::WL_Waist );
 
 			// Now check the eye position.  (view_ofs is relative to the origin)
 			point[2] = mv->GetAbsOrigin()[2] + player->GetViewOffset()[2];
 			cont = GetPointContentsCached( point, 2 );
 			if ( cont & MASK_WATER )
-				player->SetWaterLevel( WL_Eyes );  // In over our eyes
+				player->SetWaterLevel( WaterLevel::WL_Eyes );  // In over our eyes
 		}
 
 		// Adjust velocity based on water current, if any.

@@ -1144,7 +1144,7 @@ void CBaseEntity::UpdateWaterState()
 	Vector	point;
 	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &point );
 
-	SetWaterLevel( 0 );
+	SetWaterLevel( WaterLevel::WL_NotInWater );
 	SetWaterType( CONTENTS_EMPTY );
 	int cont = UTIL_PointContents (point);
 
@@ -1152,12 +1152,12 @@ void CBaseEntity::UpdateWaterState()
 		return;
 
 	SetWaterType( cont );
-	SetWaterLevel( 1 );
+	SetWaterLevel( WaterLevel::WL_Feet );
 
 	// point sized entities are always fully submerged
 	if ( IsPointSized() )
 	{
-		SetWaterLevel( 3 );
+		SetWaterLevel( WaterLevel::WL_Eyes );
 	}
 	else
 	{
@@ -1168,13 +1168,13 @@ void CBaseEntity::UpdateWaterState()
 		if ( midcont & MASK_WATER )
 		{
 			// Now check where the eyes are...
-			SetWaterLevel( 2 );
+			SetWaterLevel( WaterLevel::WL_Waist );
 			point[2] = EyePosition().z;
 
 			int eyecont = UTIL_PointContents (point);
 			if ( eyecont & MASK_WATER )
 			{
-				SetWaterLevel( 3 );
+				SetWaterLevel( WaterLevel::WL_Eyes );
 			}
 		}
 	}

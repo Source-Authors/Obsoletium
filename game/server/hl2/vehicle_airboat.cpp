@@ -1113,18 +1113,18 @@ void CPropAirboat::Think(void)
 		if ( tr.contents & CONTENTS_SLIME )
 		{
 			// We fake this value to mean type, instead of level
-			SetWaterLevel( 2 );
+			SetWaterLevel( WaterLevel::WL_Waist );
 		}
 		else
 		{
 			// This simply signifies water
-			SetWaterLevel( 1 );
+			SetWaterLevel( WaterLevel::WL_Feet );
 		}
 	}
 	else
 	{
 		// Not in water
-		SetWaterLevel( 0 );
+		SetWaterLevel( WaterLevel::WL_NotInWater );
 	}
 
 	StudioFrameAdvance();
