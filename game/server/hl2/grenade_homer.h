@@ -74,7 +74,7 @@ private:
 	int			OnTakeDamage( const CTakeDamageInfo &info );
 
 public:
-	void EXPORT				Detonate(void);
+	void Detonate(void);
 	CGrenadeHomer(void);
 
 	DECLARE_DATADESC();
