@@ -182,8 +182,8 @@ void ThreadSleep(unsigned nMilliseconds)
 {
 	if ( nMilliseconds == 0 )
 	{
-    // dimhotepus: Pause a bit.
-    ThreadPause();
+		// dimhotepus: Pause a bit.
+		ThreadPause();
 	}
 	else
 	{
