@@ -72,6 +72,7 @@ typedef int SOCKET;
 
 #  include <winsock2.h>
 #  include <ws2tcpip.h>
+#  include <system_error>
 
 # endif
 
@@ -805,7 +806,9 @@ void CShaderManager::InitRemoteShaderCompile()
 		nResult = WSAStartup( MAKEWORD(2,0), &wsaData );
 		if ( nResult != 0 )
 		{
-			Warning( "CShaderManager::Init - Could not init socket for remote dynamic shader compilation\n" );
+			Warning( "CShaderManager::Init - Could not init socket for remote dynamic shader compilation: Network library winsock 2.0 unavailable: %s (0x%x).\n",
+				std::system_category().message(nResult).c_str(),
+				nResult );
 		}
 	#endif
 

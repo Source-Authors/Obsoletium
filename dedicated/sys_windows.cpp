@@ -7,6 +7,7 @@
 //=============================================================================//
 #include <cstdio>
 #include <cstdlib>
+#include <system_error>
 
 #include <eh.h>
 
@@ -300,14 +301,17 @@ bool CSys::LoadModules( CDedicatedAppSystemGroup *pAppSystemGroup )
 bool NET_Init( void )
 {
 	// Startup winock
-	WORD version = MAKEWORD( 1, 1 );
+	WORD version = MAKEWORD(2,0);
 	WSADATA wsaData;
 
-	int err = WSAStartup( version, &wsaData );
-	if ( err != 0 )
+	const int wsaError = WSAStartup( version, &wsaData );
+	if ( wsaError != 0 )
 	{
 		char msg[ 256 ];
-		Q_snprintf( msg, sizeof( msg ), "Winsock 1.1 unavailable...\n" );
+		Q_snprintf( msg, sizeof( msg ),
+			"Network library winsock 2.0 unavailable: %s (0x%x).\n",
+			std::system_category().message(wsaError).c_str(),
+			wsaError );
 		sys->Printf( "%s", msg );
 		Plat_DebugString( msg );
 		return false;

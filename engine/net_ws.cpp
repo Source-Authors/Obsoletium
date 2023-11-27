@@ -8,6 +8,8 @@
 // net_ws.c
 // Windows IP Support layer.
 
+#include <system_error>
+
 #include "tier0/etwprof.h"
 #include "tier0/vprof.h"
 #include "net_ws_headers.h"
@@ -3243,9 +3245,13 @@ void NET_Init( bool bIsDedicated )
 #else
 		// initialize winsock 2.0
 		WSAData wsaData;
-		if ( WSAStartup( MAKEWORD(2,0), &wsaData ) != 0 )
+		const int wsaError = WSAStartup( MAKEWORD(2,0), &wsaData );
+		if ( wsaError != 0 )
 		{
-			ConMsg( "Error! Failed to load network socket library.\n");
+			ConMsg(
+				"Network library winsock 2.0 unavailable: %s (0x%x).\n",
+				std::system_category().message(wsaError).c_str(),
+				wsaError );
 			net_noip = true;
 		}
 #endif	// _X360

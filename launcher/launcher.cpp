@@ -1119,10 +1119,13 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	{
 		// initialize winsock
 		WSAData wsaData;
-		int	nError = ::WSAStartup( MAKEWORD(2,0), &wsaData );
-		if ( nError )
+		const int wsaError = ::WSAStartup( MAKEWORD(2,0), &wsaData );
+		if ( wsaError )
 		{
-			Msg( "Warning! Failed to start Winsock via WSAStartup = 0x%x.\n", nError);
+			Msg(
+				"Network library winsock 2.0 unavailable: %s (0x%x).\n",
+				std::system_category().message(wsaError).c_str(),
+				wsaError );
 		}
 	}
 

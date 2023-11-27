@@ -838,46 +838,6 @@ static LONG WINAPI HLEngineWindowProc( HWND hWnd, UINT uMsg, WPARAM  wParam, LPA
 
 #define DEFAULT_EXE_ICON 101
 
-static void DoSomeSocketStuffInOrderToGetZoneAlarmToNoticeUs( void )
-{
-#ifdef IS_WINDOWS_PC
-	WSAData wsaData;
-	if ( ! WSAStartup( MAKEWORD(2,0), &wsaData ) )
-	{
-		SOCKET tmpSocket = socket( AF_INET, SOCK_DGRAM, 0 );
-		if ( tmpSocket != INVALID_SOCKET )
-		{
-			char Options[]={ 1 };
-			setsockopt( tmpSocket, SOL_SOCKET, SO_BROADCAST, Options, sizeof(Options));
-			char pszHostName[256];
-			gethostname( pszHostName, sizeof( pszHostName ) );
-			hostent *hInfo = gethostbyname( pszHostName );
-			if ( hInfo )
-			{
-				sockaddr_in myIpAddress;
-				memset( &myIpAddress, 0, sizeof( myIpAddress ) );
-				myIpAddress.sin_family = AF_INET;
-				myIpAddress.sin_port = htons( 27015 );			// our normal server port
-				myIpAddress.sin_addr.S_un.S_un_b.s_b1 = hInfo->h_addr_list[0][0];
-				myIpAddress.sin_addr.S_un.S_un_b.s_b2 = hInfo->h_addr_list[0][1];
-				myIpAddress.sin_addr.S_un.S_un_b.s_b3 = hInfo->h_addr_list[0][2];
-				myIpAddress.sin_addr.S_un.S_un_b.s_b4 = hInfo->h_addr_list[0][3];
-				if ( bind( tmpSocket, ( sockaddr * ) &myIpAddress, sizeof( myIpAddress ) ) != -1 )
-				{
-					if ( sendto( tmpSocket, pszHostName, 1, 0, ( sockaddr *) &myIpAddress, sizeof( myIpAddress ) ) == -1 )
-					{
-						// error?
-					}
-
-				}
-			}
-			closesocket( tmpSocket );
-		}
-		WSACleanup();
-	}
-	
-#endif
-}
 #endif
 
 bool CGame::CreateGameWindow( void )
@@ -940,13 +900,6 @@ bool CGame::CreateGameWindow( void )
 			wc.hIcon = (HICON)::LoadIcon( GetModuleHandle( 0 ), MAKEINTRESOURCE( DEFAULT_EXE_ICON ) );
 		}
 	}
-	
-
-#ifndef SWDS
-	char const *pszGameType = modinfo->GetString( "type" );
-	if ( pszGameType && Q_stristr( pszGameType, "multiplayer" ) )
-		DoSomeSocketStuffInOrderToGetZoneAlarmToNoticeUs();
-#endif
 
 	wchar_t uc[512];
 	if ( IsPC() )
