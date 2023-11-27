@@ -345,7 +345,7 @@ void MiniDumpFunction( unsigned int nExceptionCode, EXCEPTION_POINTERS *pExcepti
 #ifndef NO_STEAM
 	SteamAPI_WriteMiniDump( nExceptionCode, pException, 0 );
 #else
-  WriteMiniDumpUsingExceptionInfo( nExceptionCode, pException, 0x00000002 /* MiniDumpWithFullMemory */, "sys_error" );
+	WriteMiniDumpUsingExceptionInfo( nExceptionCode, pException, 0x00000002 /* MiniDumpWithFullMemory */, "sys_error" );
 #endif
 }
 
@@ -369,14 +369,14 @@ private:
 	const _se_translator_function m_oldTranslator;
 };
 
-extern "C" __declspec(dllexport) int DedicatedMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+extern "C" __declspec(dllexport)
+int DedicatedMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
 	SetAppInstance( hInstance );
 
-	// Check that we are running on Win32
-	if ( !IsWindows7OrGreater() )
+	if ( !IsWindows10OrGreater() )
 	{
-		Error( "Sorry, Windows 7+ required to run the game." );
+		Error( "Sorry, Windows 10+ required to run the game." );
 		return ERROR_OLD_WIN_VERSION;
 	}
 
@@ -392,7 +392,7 @@ extern "C" __declspec(dllexport) int DedicatedMain( HINSTANCE hInstance, HINSTAN
 
 	if ( !Plat_IsInDebugSession() && !CommandLine()->FindParm( "-nominidumps") )
 	{
-		ScopedSeTranslator seTranslator( MiniDumpFunction );
+		const ScopedSeTranslator seTranslator( MiniDumpFunction );
 
 		try  // this try block allows the SE translator to work
 		{
