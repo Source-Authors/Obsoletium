@@ -59,7 +59,6 @@ extern	IMaterial*	g_pMaterialDebugFlat;
 extern	IMaterial*	g_pMaterialDepthWrite[2][2];
 extern	IMaterial*	g_pMaterialSSAODepthWrite[2][2];
 
-extern	ConVar	r_norefresh;
 extern  ConVar	r_lightmapcolorscale;
 extern	ConVar	r_decals;
 extern	ConVar	mp_decals;
