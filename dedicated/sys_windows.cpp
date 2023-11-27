@@ -345,7 +345,7 @@ void MiniDumpFunction( unsigned int nExceptionCode, EXCEPTION_POINTERS *pExcepti
 #ifndef NO_STEAM
 	SteamAPI_WriteMiniDump( nExceptionCode, pException, 0 );
 #else
-	WriteMiniDumpUsingExceptionInfo( nExceptionCode, pException, 0x00000002 /* MiniDumpWithFullMemory */, "sys_error" );
+	WriteMiniDumpUsingExceptionInfo( nExceptionCode, pException, 0x00000002 /* MiniDumpWithFullMemory */, "dedicated_crash" );
 #endif
 }
 
@@ -374,7 +374,7 @@ int DedicatedMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
 	SetAppInstance( hInstance );
 
-	if ( !IsWindows10OrGreater() )
+	if ( !IsWindows10OrGreater() ) [[unlikely]]
 	{
 		Error( "Sorry, Windows 10+ required to run the game." );
 		return ERROR_OLD_WIN_VERSION;

@@ -462,7 +462,7 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 			SteamAPI_WriteMiniDump( 0, GetExceptionInformation(), build_number() )
 #else
 			// dimhotepus: Write dump via tier0 if no Steam.
-      WriteMiniDumpUsingExceptionInfo( GetExceptionCode(), GetExceptionInformation(), 0x00000002 /* MiniDumpWithFullMemory */, "sys_error" )
+			WriteMiniDumpUsingExceptionInfo( GetExceptionCode(), GetExceptionInformation(), 0x00000002 /* MiniDumpWithFullMemory */, "engine_error" )
 #endif
 			, EXCEPTION_EXECUTE_HANDLER )
 		{

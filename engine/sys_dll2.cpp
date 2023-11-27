@@ -1863,7 +1863,7 @@ extern "C" void __cdecl WriteSteamMiniDumpWithComment( unsigned int uStructuredE
 	SetMinidumpComment(errorText.m_errorText);
 
 	// dimhotepus: Write dump via tier0 if no Steam.
-	WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, 0x00000002 /* MiniDumpWithFullMemory */, "crash" );
+	WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, 0x00000002 /* MiniDumpWithFullMemory */, "engine_crash" );
 } 
 
  
