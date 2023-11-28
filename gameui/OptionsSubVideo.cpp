@@ -104,13 +104,13 @@ int GetScreenAspectMode( int width, int height )
 	// just find the closest ratio
 	float closestAspectRatioDist = 99999.0f;
 	int closestAnamorphic = 0;
-	for (int i = 0; i < ARRAYSIZE(g_RatioToAspectModes); i++)
+	for ( const auto &ram : g_RatioToAspectModes )
 	{
-		float dist = fabsf( g_RatioToAspectModes[i].aspectRatio - aspectRatio );
+		float dist = fabsf( ram.aspectRatio - aspectRatio );
 		if (dist < closestAspectRatioDist)
 		{
 			closestAspectRatioDist = dist;
-			closestAnamorphic = g_RatioToAspectModes[i].anamorphic;
+			closestAnamorphic = ram.anamorphic;
 		}
 	}
 
@@ -253,27 +253,29 @@ public:
 		SetSize( 260, 400 );
 
 		m_pDXLevel = new ComboBox(this, "dxlabel", 6, false );
+
 		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 		KeyValues *pKeyValues = new KeyValues( "config" );
 		materials->GetRecommendedConfigurationInfo( 0, pKeyValues );
 		m_pDXLevel->DeleteAllItems();
-		for (int i = 0; i < ARRAYSIZE(g_DirectXLevels); i++)
+
+		for ( auto &&dxl : g_DirectXLevels )
 		{
 			// don't allow choice of lower dxlevels than the default, 
 			// unless we're already at that lower level or have it forced
 			if (!CommandLine()->CheckParm("-dxlevel") &&
-				g_DirectXLevels[i] != config.dxSupportLevel &&
-				g_DirectXLevels[i] < pKeyValues->GetInt("ConVar.mat_dxlevel"))
+				dxl != config.dxSupportLevel &&
+				dxl < pKeyValues->GetInt("ConVar.mat_dxlevel"))
 				continue;
 
 			KeyValues *pTempKV = new KeyValues("config");
-			if (g_DirectXLevels[i] == pKeyValues->GetInt("ConVar.mat_dxlevel")
-				|| materials->GetRecommendedConfigurationInfo( g_DirectXLevels[i], pTempKV ))
+			if (dxl == pKeyValues->GetInt("ConVar.mat_dxlevel")
+				|| materials->GetRecommendedConfigurationInfo( dxl, pTempKV ))
 			{
 				// add the configuration in the combo
 				char szDXLevelName[64];
-				GetNameForDXLevel( g_DirectXLevels[i], szDXLevelName, sizeof(szDXLevelName) );
-				m_pDXLevel->AddItem( szDXLevelName, new KeyValues("dxlevel", "dxlevel", g_DirectXLevels[i]) );
+				GetNameForDXLevel( dxl, szDXLevelName, sizeof(szDXLevelName) );
+				m_pDXLevel->AddItem( szDXLevelName, new KeyValues("dxlevel", "dxlevel", dxl) );
 			}
 
 			pTempKV->deleteThis();
@@ -386,18 +388,16 @@ public:
 
 		m_pHDR = new ComboBox( this, "HDR", 6, false );
 		m_pHDR->AddItem("#GameUI_hdr_level0", NULL);
-		m_pHDR->AddItem("#GameUI_hdr_level1", NULL);
 
 		if ( materials->SupportsHDRMode( HDR_TYPE_INTEGER ) )
 		{
-			m_pHDR->AddItem("#GameUI_hdr_level2", NULL);
+			m_pHDR->AddItem("#GameUI_hdr_level1", NULL);
 		}
-#if 0
+
 		if ( materials->SupportsHDRMode( HDR_TYPE_FLOAT ) )
 		{
-			m_pHDR->AddItem("#GameUI_hdr_level3", NULL);
+			m_pHDR->AddItem("#GameUI_hdr_level2", NULL);
 		}
-#endif
 
 		m_pHDR->SetEnabled( mat_dxlevel.GetInt() >= 80 );
 

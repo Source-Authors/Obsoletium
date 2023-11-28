@@ -982,10 +982,11 @@ CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 			// stream everything but critical sounds
 			bStream = true;
 			const char *pFileName = pSfx->GetFileName();
-			for ( int i = 0; i<ARRAYSIZE( s_CriticalSounds ); i++ )
+			for ( const auto *criticalSound : s_CriticalSounds )
 			{
-				size_t len = strlen( s_CriticalSounds[i] );
-				if ( !Q_strnicmp( pFileName, s_CriticalSounds[i], len ) && ( pFileName[len] == '\\' || pFileName[len] == '/' ) )
+				size_t len = strlen( criticalSound );
+				if ( !Q_strnicmp( pFileName, criticalSound, len ) &&
+					 ( pFileName[len] == '\\' || pFileName[len] == '/' ) )
 				{
 					// never stream these, regardless of sound chars
 					bStream = false;

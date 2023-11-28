@@ -1628,10 +1628,10 @@ hinttypedescs_t g_pszHintDescriptions[] =
 //-----------------------------------------------------------------------------
 const char *GetHintTypeDescription( Hint_e iHintType )
 {
-	for ( int i = 0; i < ARRAYSIZE(g_pszHintDescriptions); i++ )
+	for ( const auto &d : g_pszHintDescriptions )
 	{
-		if ( g_pszHintDescriptions[i].iType == iHintType )
-			return g_pszHintDescriptions[i].pszDesc;
+		if ( d.iType == iHintType )
+			return d.pszDesc;
 	}
 
 	return "Obsolete / Unused";
@@ -1658,9 +1658,9 @@ void CC_ai_drop_hint( const CCommand &args )
 	{
 		Msg("Invalid hint type specified. Format: ai_drop_hint <hint type>\nValid hint types:\n");
 
-		for ( int i = 0; i < ARRAYSIZE(g_pszHintDescriptions); i++ )
+		for ( const auto &d : g_pszHintDescriptions )
 		{
-			Msg("%d : %s\n", g_pszHintDescriptions[i].iType, g_pszHintDescriptions[i].pszDesc );
+			Msg("%d : %s\n", d.iType, d.pszDesc );
 		}
 		return;
 	}

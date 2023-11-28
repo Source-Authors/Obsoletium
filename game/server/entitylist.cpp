@@ -143,9 +143,9 @@ public:
 	void Clear()
 	{
 		m_simThinkList.Purge();
-		for ( int i = 0; i < ARRAYSIZE(m_entinfoIndex); i++ )
+		for ( auto &&i : m_entinfoIndex )
 		{
-			m_entinfoIndex[i] = 0xFFFF;
+			i = 0xFFFF;
 		}
 	}
 	void LevelInitPreEntity()

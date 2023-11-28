@@ -52,26 +52,26 @@ public:
 		m_nItems( 0 ),
 		m_nMaxItems( INT_MAX )
 	{
-		for ( int i = 0; i < ARRAYSIZE( m_pQueues ); i++ )
+		for ( auto &queue : m_pQueues )
 		{
-			m_pQueues[i] = new CTSQueue<CJob *>;
+			queue = new CTSQueue<CJob *>;
 		}
 	}
 
 	~CJobQueue()
 	{
-		for ( int i = 0; i < ARRAYSIZE( m_pQueues ); i++ )
+		for ( auto *queue : m_pQueues )
 		{
-			delete m_pQueues[i];
+			delete queue;
 		}
 	}
 
-	int Count()
+	int Count() const
 	{
 		return m_nItems;
 	}
 
-	int Count( JobPriority_t priority )
+	int Count( JobPriority_t priority ) const
 	{
 		return m_pQueues[priority]->Count();
 	}

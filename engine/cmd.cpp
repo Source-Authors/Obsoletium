@@ -441,15 +441,12 @@ static char const *Cmd_TranslateFileAssociation(char const *param )
 	if (!extension)
 		return retval;
 
-	int c = ARRAYSIZE( g_FileAssociations );
-	for ( int i = 0; i < c; i++ )
+	for ( const auto &info : g_FileAssociations )
 	{
-		FileAssociationInfo& info = g_FileAssociations[ i ];
-		
 		if ( ! Q_strcmp( extension, info.extension+1 ) && 
 			 ! CommandLine()->FindParm(va( "+%s", info.command_to_issue ) ) )
 		{
-			// Translate if haven't already got one of these commands			
+			// Translate if haven't already got one of these commands
 			Q_strncpy( sz, temp, sizeof( sz ) );
 			Q_FileBase( sz, temp, sizeof( sz ) );
 
@@ -744,11 +741,11 @@ CON_COMMAND( alias, "Alias a command." )
 		return;
 	}
 
-	for ( int i = 0; i < ARRAYSIZE(g_pBlacklistedCommands); i++ )
+	for ( const auto *blacklistedCommand : g_pBlacklistedCommands )
 	{
-		if ( !V_stricmp( g_pBlacklistedCommands[i], s) )
+		if ( !V_stricmp( blacklistedCommand, s) )
 		{
-			ConMsg("Can't alias %s\n", g_pBlacklistedCommands[i] );
+			ConMsg("Can't alias %s\n", blacklistedCommand );
 			return;
 		}
 	}

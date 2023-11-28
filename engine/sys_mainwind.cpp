@@ -368,11 +368,11 @@ void CGame::DispatchInputEvent( const InputEvent_t &event )
 		if ( g_pMatSystemSurface && g_pMatSystemSurface->HandleInputEvent( event ) )
 			break;
 
-		for ( int i=0; i < ARRAYSIZE( g_GameMessageHandlers ); i++ )
+		for ( const auto &h : g_GameMessageHandlers )
 		{
-			if ( g_GameMessageHandlers[i].m_nEventType == event.m_nType )
+			if ( h.m_nEventType == event.m_nType )
 			{
-				(this->*g_GameMessageHandlers[i].pFn)( event );
+				(this->*h.pFn)( event );
 				break;
 			}
 		}

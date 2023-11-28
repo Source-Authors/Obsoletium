@@ -874,11 +874,11 @@ InitReturnVal_t CMaterialSystem::Init()
 #if defined(DEDICATED)
     m_bThreadingNotAvailable = true;
 #else
-	for ( int i = 0; i < ARRAYSIZE( m_QueuedRenderContexts ); i++ )
+	for ( auto &&context : m_QueuedRenderContexts )
 	{
-		if ( !m_QueuedRenderContexts[i].IsInitialized() )
+		if ( !context.IsInitialized() )
 		{
-			if ( !m_QueuedRenderContexts[i].Init( this, &m_HardwareRenderContext ) )
+			if ( !context.Init( this, &m_HardwareRenderContext ) )
 			{
 				m_bThreadingNotAvailable = true;
 				break;
@@ -1275,10 +1275,10 @@ void CMaterialSystem::ForceSingleThreaded()
 		g_pShaderAPI->EnableShaderShaderMutex( false );
 		m_HardwareRenderContext.InitializeFrom(&m_QueuedRenderContexts[m_iCurQueuedContext]);
 		m_pRenderContext.Set( &m_HardwareRenderContext );
-		for ( int i = 0; i < ARRAYSIZE( m_QueuedRenderContexts ); i++ )
+		for ( auto &&context : m_QueuedRenderContexts )
 		{
-			Assert( m_QueuedRenderContexts[i].IsInitialized() );
-			m_QueuedRenderContexts[i].EndQueue(true);
+			Assert( context.IsInitialized() );
+			context.EndQueue(true);
 		}
 		if( mat_debugalttab.GetBool() )
 		{
@@ -1599,13 +1599,13 @@ int GetScreenAspectMode( int width, int height )
 	// Just find the closest ratio
 	float flClosestAspectRatioDist = 99999.0f;
 	int nClosestAspectCode = ASPECT_4x3;
-	for ( int i = 0; i < ARRAYSIZE(g_RatioToAspectModes); i++ )
+	for ( auto &&ram : g_RatioToAspectModes )
 	{
-		float flDist = fabsf( g_RatioToAspectModes[i].flAspectRatio - flAspectRatio );
+		float flDist = fabsf( ram.flAspectRatio - flAspectRatio );
 		if ( flDist < flClosestAspectRatioDist )
 		{
 			flClosestAspectRatioDist = flDist;
-			nClosestAspectCode = g_RatioToAspectModes[i].nAspectCode;
+			nClosestAspectCode = ram.nAspectCode;
 		}
 	}
 
@@ -3835,10 +3835,10 @@ void CMaterialSystem::EndFrame( void )
 		{
 		case MATERIAL_SINGLE_THREADED:
 			m_pRenderContext.Set( &m_HardwareRenderContext );
-			for ( int i = 0; i < ARRAYSIZE( m_QueuedRenderContexts ); i++ )
+			for ( auto &&context : m_QueuedRenderContexts )
 			{
-				Assert( m_QueuedRenderContexts[i].IsInitialized() );
-				m_QueuedRenderContexts[i].EndQueue( true );
+				Assert( context.IsInitialized() );
+				context.EndQueue( true );
 			}
 			break;
 
@@ -5455,9 +5455,9 @@ IMaterialProxy *CMaterialSystem::DetermineProxyReplacements( IMaterial *pMateria
 //-----------------------------------------------------------------------------
 void CMaterialSystem::CompactMemory()
 {
-	for ( int i = 0; i < ARRAYSIZE(m_QueuedRenderContexts); i++)
+	for ( auto &&context : m_QueuedRenderContexts )
 	{
-		m_QueuedRenderContexts[i].CompactMemory();
+		context.CompactMemory();
 	}
 }
 

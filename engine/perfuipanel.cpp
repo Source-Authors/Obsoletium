@@ -136,10 +136,9 @@ const char *CPropFadeUIPanel::s_pFadeVisualizeLabel[CPropFadeUIPanel::VISUALIZE_
 CPropFadeUIPanel::CPropFadeUIPanel( vgui::Panel *parent ) : BaseClass( parent, "PropFadeUIPanel")
 {
 	m_pVisualization = new ComboBox(this, "VisualizeMode", VISUALIZE_TYPE_COUNT, false);
-	int i;
-	for ( i = 0; i < ARRAYSIZE(s_pFadeVisualizeLabel); i++ )
+	for ( const auto *l : s_pFadeVisualizeLabel )
 	{
-		m_pVisualization->AddItem( s_pFadeVisualizeLabel[i], NULL );
+		m_pVisualization->AddItem( l, NULL );
 	}
 	m_pVisualization->AddActionSignalTarget( this );
 	m_pVisualization->ActivateItem( 0 );

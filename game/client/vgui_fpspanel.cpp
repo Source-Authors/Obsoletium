@@ -566,10 +566,9 @@ void CBlockingFileIOPanel::Paint()
 		if ( list )
 		{
 			int i;
-			int c = ARRAYSIZE( m_History );
-			for ( i = 0; i < c; ++i )
+			for ( auto &&h : m_History )
 			{
-				m_History[ i ].m_flCurrent = 0.0f;
+				h.m_flCurrent = 0.0f;
 			}
 
 			// Grab mutex (prevents async thread from filling in even more data...)

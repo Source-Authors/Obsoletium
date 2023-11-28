@@ -1120,14 +1120,14 @@ void CAI_MappedActivityBehavior_Temporary::UpdateTranslateActivityMap()
 	
 	CBaseCombatWeapon *pWeapon = GetOuter()->GetActiveWeapon();
 	const char *pszWeaponClass = ( pWeapon ) ? pWeapon->GetClassname() : "";
-	for ( int i = 0; i < ARRAYSIZE(mappings); i++ )
+	for ( const auto &m : mappings )
 	{
-		if ( !mappings[i].pszWeapon || stricmp( mappings[i].pszWeapon, pszWeaponClass ) == 0 )
+		if ( !m.pszWeapon || stricmp( m.pszWeapon, pszWeaponClass ) == 0 )
 		{
-			if ( HaveSequenceForActivity( mappings[i].translation ) || HaveSequenceForActivity( GetOuter()->Weapon_TranslateActivity( mappings[i].translation ) ) )
+			if ( HaveSequenceForActivity( m.translation ) || HaveSequenceForActivity( GetOuter()->Weapon_TranslateActivity( m.translation ) ) )
 			{
-				Assert( m_ActivityMap.Find( MAKE_ACTMAP_KEY( mappings[i].posture, mappings[i].activity ) ) == m_ActivityMap.InvalidIndex() );
-				m_ActivityMap.Insert( MAKE_ACTMAP_KEY( mappings[i].posture, mappings[i].activity ), mappings[i].translation );
+				Assert( m_ActivityMap.Find( MAKE_ACTMAP_KEY( m.posture, m.activity ) ) == m_ActivityMap.InvalidIndex() );
+				m_ActivityMap.Insert( MAKE_ACTMAP_KEY( m.posture, m.activity ), m.translation );
 			}
 		}
 	}

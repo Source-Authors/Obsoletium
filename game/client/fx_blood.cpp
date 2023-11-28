@@ -46,13 +46,11 @@ PMaterialHandle g_Blood_Drops = NULL;
 //-----------------------------------------------------------------------------
 void GetBloodColor( int bloodtype, colorentry_t &color )
 {
-	int i;
-
-	for( i = 0 ; i < COLOR_TABLE_SIZE( bloodcolors ) ; i++ )
+	for( const auto &c : bloodcolors )
 	{
-		if( bloodcolors[i].index == bloodtype )
+		if( c.index == bloodtype )
 		{
-			color = bloodcolors[ i ];
+			color = c;
 			return;
 		}
 	}
@@ -504,13 +502,13 @@ void BloodImpactCallback( const CEffectData & data )
 	bool bFoundBlood = false;
 
 	// Find which sort of blood we are
-	for ( int i = 0; i < ARRAYSIZE( bloodCallbacks ); i++ )
+	for ( auto &&c : bloodCallbacks )
 	{
-		if ( bloodCallbacks[i].nColor == data.m_nColor )
+		if ( c.nColor == data.m_nColor )
 		{
 			QAngle	vecAngles;
 			VectorAngles( -data.m_vNormal, vecAngles );
-			DispatchParticleEffect( bloodCallbacks[i].lpszParticleSystemName, data.m_vOrigin, vecAngles );
+			DispatchParticleEffect( c.lpszParticleSystemName, data.m_vOrigin, vecAngles );
 			bFoundBlood = true;
 			break;
 		}
@@ -518,8 +516,7 @@ void BloodImpactCallback( const CEffectData & data )
 
 	if ( bFoundBlood == false )
 	{
-		Vector vecPosition;
-		vecPosition = data.m_vOrigin;
+		Vector vecPosition = data.m_vOrigin;
 		
 		// Fetch the blood color.
 		colorentry_t color;

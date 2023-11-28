@@ -504,14 +504,14 @@ void CClientLeafSystem::LevelShutdownPostEntity()
 	m_Shadows.Purge();
 
 	// delete subsystem data
-	for( int i = 0; i < m_Leaf.Count() ; i++ )
+	for( auto &&l : m_Leaf )
 	{
-		for( int j = 0 ; j < ARRAYSIZE( m_Leaf[i].m_pSubSystemData ) ; j++ )
+		for( auto &&s : l.m_pSubSystemData )
 		{
-			if ( m_Leaf[i].m_pSubSystemData[j] )
+			if ( s )
 			{
-				delete m_Leaf[i].m_pSubSystemData[j];
-				m_Leaf[i].m_pSubSystemData[j] = NULL;
+				delete s;
+				s = nullptr;
 			}
 		}
 	}

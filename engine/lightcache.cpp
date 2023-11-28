@@ -315,11 +315,11 @@ void R_StudioInitLightingCache( void )
 
 	memset( lightcache, 0, sizeof(lightcache) );
 
-	for ( i=0; i < ARRAYSIZE( lightcache ); i++ )
-		lightcache[i].bucket = 0xFFFF;
+	for ( auto &&l : lightcache )
+		l.bucket = 0xFFFF;
 
-	for ( i=0; i < ARRAYSIZE( lightbuckets ); i++ )
-			lightbuckets[i] = 0xFFFF;
+	for ( auto &&b : lightbuckets )
+		b = 0xFFFF;
 
 	unsigned short last = LIGHT_LRU_HEAD_INDEX;
 	// Link every node into the LRU

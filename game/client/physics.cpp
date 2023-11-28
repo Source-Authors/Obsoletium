@@ -692,15 +692,15 @@ void CCollisionEvent::Friction( IPhysicsObject *pObject, float energy, int surfa
 
 friction_t *CCollisionEvent::FindFriction( CBaseEntity *pObject )
 {
-	friction_t *pFree = NULL;
+	friction_t *pFree = nullptr;
 
-	for ( int i = 0; i < ARRAYSIZE(m_current); i++ )
+	for ( auto &&f : m_current )
 	{
-		if ( !m_current[i].pObject && !pFree )
-			pFree = &m_current[i];
+		if ( !f.pObject && !pFree )
+			pFree = &f;
 
-		if ( m_current[i].pObject == pObject )
-			return &m_current[i];
+		if ( f.pObject == pObject )
+			return &f;
 	}
 
 	return pFree;
@@ -716,14 +716,14 @@ void CCollisionEvent::ShutdownFriction( friction_t &friction )
 
 void CCollisionEvent::UpdateFrictionSounds( void )
 {
-	for ( int i = 0; i < ARRAYSIZE(m_current); i++ )
+	for ( auto &&f : m_current )
 	{
-		if ( m_current[i].patch )
+		if ( f.patch )
 		{
-			if ( m_current[i].flLastUpdateTime < (gpGlobals->curtime-0.1f) )
+			if ( f.flLastUpdateTime < (gpGlobals->curtime-0.1f) )
 			{
 				// friction wasn't updated the last 100msec, assume fiction finished
-				ShutdownFriction( m_current[i] );
+				ShutdownFriction( f );
 			}
 		}
 	}

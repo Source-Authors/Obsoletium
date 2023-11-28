@@ -191,13 +191,11 @@ AnimationController::RelativeAlignmentLookup AnimationController::g_AlignmentLoo
 //-----------------------------------------------------------------------------
 AnimationController::RelativeAlignment AnimationController::LookupAlignment( char const *token )
 {
-	int c = ARRAYSIZE( g_AlignmentLookup );
-
-	for ( int i = 0; i < c; i++ )
+	for ( const auto &alignmentLookup : g_AlignmentLookup )
 	{
-		if ( !Q_stricmp( token, g_AlignmentLookup[ i ].name ) )
+		if ( !Q_stricmp( token, alignmentLookup.name ) )
 		{
-			return g_AlignmentLookup[ i ].align;
+			return alignmentLookup.align;
 		}
 	}
 

@@ -841,12 +841,12 @@ void SV_InitGameDLL( void )
 		bool bVerifiedMod = false;
 
         // find the game dir we're running
-		for ( int i = 0; i < ARRAYSIZE( g_ModDirPermissions ); i++ )
+		for ( const auto &p : g_ModDirPermissions )
 		{
-			if ( !Q_stricmp( COM_GetModDirectory(), g_ModDirPermissions[i].m_pchGameDir ) )
+			if ( !Q_stricmp( COM_GetModDirectory(), p.m_pchGameDir ) )
 			{
 				// we've found the mod, make sure we own the app
-				if (  Steam3Client().SteamApps()->BIsSubscribedApp( g_ModDirPermissions[i].m_iAppID ) )
+				if ( Steam3Client().SteamApps()->BIsSubscribedApp( p.m_iAppID ) )
 				{
 					bVerifiedMod = true;
 				}

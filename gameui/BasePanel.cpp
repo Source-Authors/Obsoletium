@@ -916,16 +916,12 @@ static int CC_GameMenuCompletionFunc( char const *partial, char commands[ COMMAN
 
 	CUtlRBTree< CUtlString > symbols( 0, 0, UtlStringLessFunc );
 
-	int i;
-	int c = ARRAYSIZE( g_rgValidCommands );
-	for ( i = 0; i < c; ++i )
+	for ( const auto *c : g_rgValidCommands )
 	{
-		if ( Q_strnicmp( g_rgValidCommands[ i ], substring, checklen ) )
+		if ( Q_strnicmp( c, substring, checklen ) )
 			continue;
 
-		CUtlString str;
-		str = g_rgValidCommands[ i ];
-
+		CUtlString str = c;
 		symbols.Insert( str );
 
 		// Too many
@@ -935,7 +931,7 @@ static int CC_GameMenuCompletionFunc( char const *partial, char commands[ COMMAN
 
 	// Now fill in the results
 	int slot = 0;
-	for ( i = symbols.FirstInorder(); i != symbols.InvalidIndex(); i = symbols.NextInorder( i ) )
+	for ( auto i = symbols.FirstInorder(); i != symbols.InvalidIndex(); i = symbols.NextInorder( i ) )
 	{
 		char const *name = symbols[ i ].String();
 

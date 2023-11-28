@@ -2003,8 +2003,8 @@ CShaderAPIDx8::~CShaderAPIDx8()
 
 void CShaderAPIDx8::ClearStdTextureHandles( void )
 {
-	for(int i = 0 ; i < ARRAYSIZE( m_StdTextureHandles ) ; i++ )
-		m_StdTextureHandles[i] = INVALID_SHADERAPI_TEXTURE_HANDLE;
+	for( auto &&h : m_StdTextureHandles )
+		h = INVALID_SHADERAPI_TEXTURE_HANDLE;
 }
 
 
@@ -7229,10 +7229,10 @@ void CShaderAPIDx8::DeleteD3DTexture( ShaderAPITextureHandle_t hTexture )
 	}
 
 	// remove this texture from std textures
-	for( int i=0 ; i < ARRAYSIZE( m_StdTextureHandles ) ; i++ )
+	for( auto &&h : m_StdTextureHandles )
 	{
-		if ( m_StdTextureHandles[i] == hTexture )
-			m_StdTextureHandles[i] = INVALID_SHADERAPI_TEXTURE_HANDLE;
+		if ( h == hTexture )
+			h = INVALID_SHADERAPI_TEXTURE_HANDLE;
 	}
 
 }

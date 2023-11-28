@@ -59,10 +59,10 @@ bool lessFunc( const int &lhs, const int &rhs )
 //-----------------------------------------------------------------------------
 int StringToButtonCode( const char *name )
 {
-	for ( int i = 0; i < ARRAYSIZE( s_ControllerButtons ); ++i )
+	for ( const auto &controllerButton : s_ControllerButtons )
 	{
-		if ( !Q_stricmp( s_ControllerButtons[i].name, name ) )
-			return s_ControllerButtons[i].code;
+		if ( !Q_stricmp( controllerButton.name, name ) )
+			return controllerButton.code;
 	}
 	return -1;
 }

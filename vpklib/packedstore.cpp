@@ -106,9 +106,9 @@ public:
 
 	~CFileExtensionData( void )
 	{
-		for( int i = 0; i < ARRAYSIZE( m_pDirectoryHashTable ); i++ )
+		for( auto &&directoryHashTable : m_pDirectoryHashTable )
 		{
-			m_pDirectoryHashTable[i].Purge();
+			directoryHashTable.Purge();
 		}
 	}
 
@@ -224,9 +224,9 @@ void CPackedStore::Init( void )
 void CPackedStore::BuildHashTables( void )
 {
 	m_nHighestChunkFileIndex = -1;
-	for( int i = 0; i < ARRAYSIZE( m_pExtensionData ) ; i++ )
+	for( auto &&extensionData : m_pExtensionData )
 	{
-		m_pExtensionData[i].Purge();
+		extensionData.Purge();
 	}
 	char const *pData = reinterpret_cast< char const *>( DirectoryData() );
 	while( *pData )
@@ -451,19 +451,19 @@ void CPackedStore::GetDataFileName( char *pchFileNameOut, int cchFileNameOut, in
 
 CPackedStore::~CPackedStore( void )
 {
-	for( int i = 0; i < ARRAYSIZE( m_pExtensionData ) ; i++ )
+	for( auto &&extensionData : m_pExtensionData )
 	{
-		m_pExtensionData[i].Purge();
+		extensionData.Purge();
 	}
 
-	for (int i = 0; i < ARRAYSIZE( m_FileHandles ); i++ )
+	for ( auto &&fileHandle : m_FileHandles )
 	{
-		if ( m_FileHandles[i].m_nFileNumber != -1 )
+		if ( fileHandle.m_nFileNumber != -1 )
 		{
 #ifdef IS_WINDOWS_PC
-			CloseHandle( m_FileHandles[i].m_hFileHandle );
+			CloseHandle( fileHandle.m_hFileHandle );
 #else
-			m_pFileSystem->Close( m_FileHandles[i].m_hFileHandle );
+			m_pFileSystem->Close( fileHandle.m_hFileHandle );
 #endif
 
 		}

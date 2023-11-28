@@ -563,10 +563,10 @@ static CollisionGroupNameRecord_t s_NameMap[]={
 
 int CParticleSystemQuery::GetCollisionGroupFromName( const char *pszCollisionGroupName )
 {
-	for(int i = 0; i < ARRAYSIZE( s_NameMap ); i++ )
+	for( auto &&m : s_NameMap )
 	{
-		if ( ! stricmp( s_NameMap[i].m_pszGroupName, pszCollisionGroupName ) )
-			return s_NameMap[i].m_nGroupID;
+		if ( ! stricmp( m.m_pszGroupName, pszCollisionGroupName ) )
+			return m.m_nGroupID;
 	}
 	return COLLISION_GROUP_NONE;
 }

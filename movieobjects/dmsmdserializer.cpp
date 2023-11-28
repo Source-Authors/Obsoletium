@@ -641,9 +641,9 @@ public:
 	inline void Reset()
 	{
 		m_nWeights = 0;
-		for ( int i = 0; i < ARRAYSIZE( m_vertexWeights ); ++i )
+		for ( auto &&h : m_vertexWeights )
 		{
-			m_vertexWeights[i].Reset();
+			h.Reset();
 		}
 	}
 };
@@ -1032,9 +1032,9 @@ static void HandleVertexWeights(
 	const char *pszFilename,
 	int nLineNumber )
 {
-	for ( int i = 0; i < ARRAYSIZE( vertex.m_vertexWeights ); ++i )
+	for ( auto &&w : vertex.m_vertexWeights )
 	{
-		vertex.m_vertexWeights[i].Reset();
+		w.Reset();
 	}
 
 	CUtlVector< CVertexWeight > tmpVertexWeights;
@@ -1092,9 +1092,8 @@ static void HandleVertexWeights(
 		// If there are valid user specified weights then renormalize
 		if ( vertex.m_nWeights > 0 && flTotalWeight > flEps )
 		{
-			for ( uint i = 0; i != ARRAYSIZE( vertex.m_vertexWeights ); ++i )
+			for ( auto &&vertexWeight : vertex.m_vertexWeights )
 			{
-				CVertexWeight &vertexWeight( vertex.m_vertexWeights[ i ] );
 				if ( vertexWeight.m_nBoneIndex >= 0 )
 				{
 					vertexWeight.m_flWeight /= flTotalWeight;
@@ -1119,10 +1118,10 @@ static void HandleVertexWeights(
 			}
 
 			// Assign rest of weights to -1, 0.0f
-			for ( uint i = 1; i < ARRAYSIZE( vertex.m_vertexWeights ); ++i )
+			for ( auto &&w : vertex.m_vertexWeights )
 			{
-				vertex.m_vertexWeights[i].m_nBoneIndex = -1;
-				vertex.m_vertexWeights[i].m_flWeight = 0.0f;
+				w.m_nBoneIndex = -1;
+				w.m_flWeight = 0.0f;
 			}
 		}
 	}

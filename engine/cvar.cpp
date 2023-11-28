@@ -684,15 +684,12 @@ static ConVarFlags_t g_ConVarFlags[]=
 static void PrintListHeader( FileHandle_t& f )
 {
 	char csvflagstr[ 1024 ];
-
 	csvflagstr[ 0 ] = 0;
+	
+	char csvf[ 64 ];
 
-	int c = ARRAYSIZE( g_ConVarFlags );
-	for ( int i = 0 ; i < c; ++i )
+	for ( const auto &entry : g_ConVarFlags )
 	{
-		char csvf[ 64 ];
-
-		ConVarFlags_t & entry = g_ConVarFlags[ i ];
 		Q_snprintf( csvf, sizeof( csvf ), "\"%s\",", entry.desc );
 		Q_strncat( csvflagstr, csvf, sizeof( csvflagstr ), COPY_ALL_CHARACTERS );
 	}
@@ -708,24 +705,20 @@ static void PrintListHeader( FileHandle_t& f )
 static void PrintCvar( const ConVar *var, bool logging, FileHandle_t& fh )
 {
 	char flagstr[ 128 ];
-	char csvflagstr[ 1024 ];
-
 	flagstr[ 0 ] = 0;
-	csvflagstr[ 0 ] = 0;
 
-	int c = ARRAYSIZE( g_ConVarFlags );
-	for ( int i = 0 ; i < c; ++i )
+	char csvflagstr[ 1024 ];
+	csvflagstr[ 0 ] = 0;
+	
+	for ( const auto &entry : g_ConVarFlags )
 	{
 		char f[ 32 ];
 		char csvf[ 64 ];
 
-		ConVarFlags_t & entry = g_ConVarFlags[ i ];
 		if ( var->IsFlagSet( entry.bit ) )
 		{
 			Q_snprintf( f, sizeof( f ), ", %s", entry.shortdesc );
-
 			Q_strncat( flagstr, f, sizeof( flagstr ), COPY_ALL_CHARACTERS );
-
 			Q_snprintf( csvf, sizeof( csvf ), "\"%s\",", entry.desc );
 		}
 		else
@@ -776,6 +769,7 @@ static void PrintCommand( const ConCommand *cmd, bool logging, FileHandle_t& f )
 			Q_snprintf( csvf, sizeof( csvf ), "," );
 			Q_strncat( emptyflags, csvf, sizeof( emptyflags ), COPY_ALL_CHARACTERS );
 		}
+
 		// Names staring with +/- need to be wrapped in single quotes
 		char name[ 256 ];
 		Q_snprintf( name, sizeof( name ), "%s", cmd->GetName() );
@@ -1051,9 +1045,9 @@ void CCvarUtilities::CvarFindFlags_f( const CCommand &args )
 		ConMsg( "Usage:  findflags <string>\n" );
 		ConMsg( "Available flags to search for: \n" );
 
-		for ( int i=0; i < ARRAYSIZE( g_ConVarFlags ); i++ )
+		for ( const auto &flag : g_ConVarFlags )
 		{
-			ConMsg( "   - %s\n", g_ConVarFlags[i].desc );
+			ConMsg( "   - %s\n", flag.desc );
 		}
 		return;
 	}
@@ -1068,17 +1062,17 @@ void CCvarUtilities::CvarFindFlags_f( const CCommand &args )
 		if ( var->IsFlagSet(FCVAR_DEVELOPMENTONLY) || var->IsFlagSet(FCVAR_HIDDEN) )
 			continue;
 
-		for ( int i=0; i < ARRAYSIZE( g_ConVarFlags ); i++ )
+		for ( const auto &flag : g_ConVarFlags )
 		{
-			if ( !var->IsFlagSet( g_ConVarFlags[i].bit ) )
+			if ( !var->IsFlagSet( flag.bit ) )
 				continue;
 			
-			if ( !V_stristr( g_ConVarFlags[i].desc, search ) )
+			if ( !V_stristr( flag.desc, search ) )
 				continue;
 
-			ConVar_PrintDescription( var );	
+			ConVar_PrintDescription( var );
 		}
-	}	
+	}
 }
 
 

@@ -8476,14 +8476,9 @@ void DSP_CheckRestorePresets()
 
 	g_bNeedPresetRestore = false;
 
-	int i;
-	int c = ARRAYSIZE( g_PreserveDSP );
-
 	// Restore
-	for ( i = 0 ; i < c; ++i )
+	for ( const auto& slot : g_PreserveDSP )
 	{
-		PreserveDSP_t& slot = g_PreserveDSP[ i ];
-
 		ConVar *cv = slot.cvar;
 		Assert( cv );
 		if ( cv->GetFloat() != 0.0f )
@@ -8522,13 +8517,8 @@ void DSP_ClearState()
 
 	// Tracker 7155:  YWB:  This is a pretty ugly hack to zero out all of the dsp convars and bootstrap the dsp system into using them for a few frames
 	
-	int i;
-	int c = ARRAYSIZE( g_PreserveDSP );
-
-	for ( i = 0 ; i < c; ++i )
+	for ( auto &&slot : g_PreserveDSP )
 	{
-		PreserveDSP_t& slot = g_PreserveDSP[ i ];
-
 		ConVar *cv = slot.cvar;
 		Assert( cv );
 		slot.oldvalue = cv->GetFloat();
@@ -9263,13 +9253,9 @@ load_exit:
 //-----------------------------------------------------------------------------
 void DSP_FastReset( int dspType )
 {
-	int c = ARRAYSIZE( g_PreserveDSP );
-
 	// Restore
-	for ( int i = 0 ; i < c; ++i )
+	for ( auto &&slot : g_PreserveDSP )
 	{
-		PreserveDSP_t& slot = g_PreserveDSP[ i ];
-
 		if ( slot.cvar == &dsp_player )
 		{
 			slot.oldvalue = dspType;

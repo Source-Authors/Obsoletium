@@ -1774,9 +1774,9 @@ void Host_ReadPreStartupConfiguration()
 	};
 
 	// loop through looking for all the cvars to apply
-	for (int i = 0; i < ARRAYSIZE(s_PreStartupConfigConVars); i++)
+	for ( const auto *configVar : s_PreStartupConfigConVars )
 	{
-		const char *search = Q_stristr(configBuffer, s_PreStartupConfigConVars[i]);
+		const char *search = Q_stristr(configBuffer, configVar);
 		if (search)
 		{
 			// read over the token
@@ -1786,7 +1786,7 @@ void Host_ReadPreStartupConfiguration()
 			COM_Parse(search);
 
 			// apply the value
-			ConVar *var = (ConVar *)g_pCVar->FindVar( s_PreStartupConfigConVars[i] );
+			ConVar *var = (ConVar *)g_pCVar->FindVar( configVar );
 			if ( var )
 			{
 				var->SetValue( com_token );

@@ -141,9 +141,9 @@ public:
 	CConceptInfoMap() :
 	  CUtlMap<AIConcept_t, ConceptInfo_t *>( CaselessStringLessThan )
 	  {
-		  for ( int i = 0; i < ARRAYSIZE(g_ConceptInfos); i++ )
+		  for ( auto &&i : g_ConceptInfos )
 		  {
-			  Insert( g_ConceptInfos[i].concept, &g_ConceptInfos[i] );
+			  Insert( i.concept, &i );
 		  }
 	  }
 };
@@ -165,8 +165,8 @@ CAI_AllySpeechManager::~CAI_AllySpeechManager()
 void CAI_AllySpeechManager::Spawn()
 {
 	Assert( g_ConceptInfoMap.Count() != 0 );
-	for ( int i = 0; i < ARRAYSIZE(g_ConceptInfos); i++ )
-		m_ConceptTimers.Insert( AllocPooledString( g_ConceptInfos[i].concept ), CSimpleSimTimer() );
+	for ( const auto &i : g_ConceptInfos )
+		m_ConceptTimers.Insert( AllocPooledString( i.concept ), CSimpleSimTimer() );
 }
 
 void CAI_AllySpeechManager::AddCustomConcept( const ConceptInfo_t &conceptInfo )

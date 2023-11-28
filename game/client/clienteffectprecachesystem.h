@@ -125,9 +125,9 @@ const char *ClientEffectRegister::m_pszMaterials[] = {
 #define	CLIENTEFFECT_REGISTER_END( )	};					\
 void ClientEffectRegister::Cache( bool precache )			\
 {															\
-	for ( int i = 0; i < ARRAYSIZE( m_pszMaterials ); i++ )	\
+	for ( const auto *m : m_pszMaterials )					\
 	{														\
-		ReferenceMaterial( m_pszMaterials[i], precache );	\
+		ReferenceMaterial( m, precache );					\
 	}														\
 }															\
 ClientEffectRegister	register_ClientEffectRegister;		\
@@ -138,9 +138,9 @@ void ClientEffectRegister::Cache( bool precache )				\
 {																\
 	if ( condition)												\
 	{															\
-		for ( int i = 0; i < ARRAYSIZE( m_pszMaterials ); i++ )	\
+		for ( const auto *m : m_pszMaterials )					\
 		{														\
-			ReferenceMaterial( m_pszMaterials[i], precache );	\
+			ReferenceMaterial( m, precache );					\
 		}														\
 	}															\
 }																\

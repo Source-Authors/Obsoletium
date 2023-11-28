@@ -461,10 +461,10 @@ void Key_Init (void)
 
 void Key_Shutdown( void )
 {
-	for ( int i = 0; i < ARRAYSIZE( s_pKeyInfo ); ++i )
+	for ( auto &&keyInfo : s_pKeyInfo )
 	{
-		delete[] s_pKeyInfo[ i ].m_pKeyBinding;
-		s_pKeyInfo[ i ].m_pKeyBinding = NULL;
+		delete[] keyInfo.m_pKeyBinding;
+		keyInfo.m_pKeyBinding = nullptr;
 	}
 
 	ClearCheatCommands();

@@ -2694,14 +2694,14 @@ void CTextureListPanel::PerformLayout()
 		m_pResolveTexturePath,
 		m_pCopyToClipboardButton };
 
-	for ( int i=0; i < ARRAYSIZE( buttons ); i++ )
+	for ( auto *button : buttons )
 	{
-		buttons[i]->SetPos( x, yOffset );
-		buttons[i]->SetWide( w/2 );
-		yOffset += buttons[i]->GetTall();
-		buttons[i]->SetVisible( !bCollapsed );
+		button->SetPos( x, yOffset );
+		button->SetWide( w/2 );
+		yOffset += button->GetTall();
+		button->SetVisible( !bCollapsed );
 
-		if ( buttons[i] == m_pViewTextures )
+		if ( button == m_pViewTextures )
 		{
 			m_pViewTextures->SetWide( 170 );
 			int accumw = 170;
@@ -2713,7 +2713,7 @@ void CTextureListPanel::PerformLayout()
 			m_pThumbWarnings->SetWide( (accumw += 85, 85) );
 		}
 
-		if ( buttons[i] == m_pFilteringChk )
+		if ( button == m_pFilteringChk )
 		{
 			m_pFilteringChk->SetWide( 60 );
 			int accumw = 60;
@@ -2748,13 +2748,13 @@ void CTextureListPanel::PerformLayout()
 			{ m_pDiscardChangesButton, 130 },
 		};
 
-		for ( int k = 0; k < ARRAYSIZE( layout ); ++ k )
+		for ( auto &&l : layout )
 		{
-			layout[ k ].pPanel->SetPos( xOffset, 2 );
-			iWidth = layout[ k ].iWidth;
+			l.pPanel->SetPos( xOffset, 2 );
+			iWidth = l.iWidth;
 			iWidth = min( w - xOffset - 30, iWidth );
-			layout[ k ].pPanel->SetWide( iWidth );
-			layout[ k ].pPanel->SetVisible( iWidth > 50 );
+			l.pPanel->SetWide( iWidth );
+			l.pPanel->SetVisible( iWidth > 50 );
 			
 			if ( iWidth > 50 )
 				xOffset += iWidth + 5;

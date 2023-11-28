@@ -467,15 +467,15 @@ void CBreakable::Precache( void )
 	else
 	{
 		// Actually, precache all possible objects...
-		for ( int i = 0; i < ARRAYSIZE(pSpawnObjects) ; ++i )
+		for ( const auto *o : pSpawnObjects )
 		{
-			if ( !pSpawnObjects[ i ] )
+			if ( !o )
 				continue;
 
-			if ( !Q_strnicmp( pSpawnObjects[ i ], "unused", Q_strlen( "unused" ) ) )
+			if ( !Q_strnicmp( o, "unused", Q_strlen( "unused" ) ) )
 				continue;
 
-			UTIL_PrecacheOther( pSpawnObjects[ i ] );
+			UTIL_PrecacheOther( o );
 		}	
 	}
 

@@ -1413,9 +1413,9 @@ void CQueuedLoader::GetJobRequests()
 		while( true )
 		{
 			bool bIsDone = true;
-			for ( int i=0; i<ARRAYSIZE( jobs ); i++ )
+			for ( const auto *j : jobs )
 			{
-				if ( !jobs[i]->IsFinished() )
+				if ( !j->IsFinished() )
 				{
 					bIsDone = false;
 					break;
@@ -1436,9 +1436,9 @@ void CQueuedLoader::GetJobRequests()
 			}
 		}
 
-		for ( int i=0; i<ARRAYSIZE( jobs ); i++ )
+		for ( auto *j : jobs )
 		{
-			jobs[i]->Release();
+			j->Release();
 		}
 	}
 	else

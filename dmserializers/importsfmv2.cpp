@@ -81,33 +81,30 @@ static LayerType_t g_LayerTypes[] =
 
 int GetLogType( char const *type )
 {
-	int c = ARRAYSIZE( g_LayerTypes );
-	for ( int i = 0; i < c; ++i )
+	for ( const auto &layerType : g_LayerTypes )
 	{
-		if ( !Q_stricmp( type, g_LayerTypes[ i ].logtype ) )
-			return g_LayerTypes[ i ].datatype;
+		if ( !Q_stricmp( type, layerType.logtype ) )
+			return layerType.datatype;
 	}
 	return AT_UNKNOWN;
 }
 
 char const *GetLogLayerType( int nDataType )
 {
-	int c = ARRAYSIZE( g_LayerTypes );
-	for ( int i = 0; i < c; ++i )
+	for ( const auto &layerType : g_LayerTypes )
 	{
-		if ( nDataType == g_LayerTypes[ i ].datatype )
-			return g_LayerTypes[ i ].loglayertype;
+		if ( nDataType == layerType.datatype )
+			return layerType.loglayertype;
 	}
 	return NULL;
 }
 
 char const *GetLogLayerType( char const *logType )
 {
-	int c = ARRAYSIZE( g_LayerTypes );
-	for ( int i = 0; i < c; ++i )
+	for ( const auto &layerType : g_LayerTypes )
 	{
-		if ( !Q_stricmp( logType, g_LayerTypes[ i ].logtype ) )
-			return g_LayerTypes[ i ].loglayertype;
+		if ( !Q_stricmp( logType, layerType.logtype ) )
+			return layerType.loglayertype;
 	}
 	return NULL;
 }

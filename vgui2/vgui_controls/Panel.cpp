@@ -2428,11 +2428,10 @@ KEY_NAME( SCROLLLOCKTOGGLE, "Scroll Lock Toggle" ),
 
 char const *Panel::KeyCodeToString( KeyCode code )
 {
-	int c = ARRAYSIZE( g_KeyNames );
-	for ( int i = 0; i < c ; ++i )
+	for ( const auto &keyName : g_KeyNames )
 	{
-		if ( g_KeyNames[ i ].code == code )
-			return g_KeyNames[ i ].string;
+		if ( keyName.code == code )
+			return keyName.string;
 	}
 
 	return "";
@@ -2440,19 +2439,18 @@ char const *Panel::KeyCodeToString( KeyCode code )
 
 wchar_t const *Panel::KeyCodeToDisplayString( KeyCode code )
 {
-	int c = ARRAYSIZE( g_KeyNames );
-	for ( int i = 0; i < c ; ++i )
+	static wchar_t buf[ 64 ];
+	for ( const auto &keyName : g_KeyNames )
 	{
-		if ( g_KeyNames[ i ].code == code )
+		if ( keyName.code == code )
 		{
-			char const *str = g_KeyNames[ i ].displaystring;
+			char const *str = keyName.displaystring;
 			wchar_t *wstr = g_pVGuiLocalize->Find( str );
 			if ( wstr )
 			{
 				return wstr;
 			}
 
-			static wchar_t buf[ 64 ];
 			g_pVGuiLocalize->ConvertANSIToUnicode( str, buf, sizeof( buf ) );
 			return buf;
 		}
@@ -2495,7 +2493,7 @@ wchar_t const *Panel::KeyCodeModifiersToDisplayString( KeyCode code, int modifie
 		AddModifierToString( "Alt", sz, sizeof( sz ) );
 	}
 
-	if ( Q_strlen( sz ) > 0 )
+	if ( sz[0] != '\0' )
 	{
 		Q_strncat( sz, "+", sizeof( sz ), COPY_ALL_CHARACTERS );
 	}
@@ -2507,11 +2505,10 @@ wchar_t const *Panel::KeyCodeModifiersToDisplayString( KeyCode code, int modifie
 
 KeyCode Panel::StringToKeyCode( char const *str )
 {
-	int c = ARRAYSIZE( g_KeyNames );
-	for ( int i = 0; i < c ; ++i )
+	for ( auto &&keyName : g_KeyNames )
 	{
-		if ( !Q_stricmp( str, g_KeyNames[ i ].string ) )
-			return g_KeyNames[ i ].code;
+		if ( !Q_stricmp( str, keyName.string ) )
+			return keyName.code;
 	}
 
 	return KEY_NONE;

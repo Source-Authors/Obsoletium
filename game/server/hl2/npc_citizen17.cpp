@@ -405,17 +405,17 @@ void CNPC_Citizen::Precache()
 
 	for ( int i = 0; i < STATES_WITH_EXPRESSIONS; i++ )
 	{
-		for ( int j = 0; j < ARRAYSIZE(ScaredExpressions[i].szExpressions); j++ )
+		for ( const auto *e : ScaredExpressions[i].szExpressions )
 		{
-			PrecacheInstancedScene( ScaredExpressions[i].szExpressions[j] );
+			PrecacheInstancedScene( e );
 		}
-		for ( int j = 0; j < ARRAYSIZE(NormalExpressions[i].szExpressions); j++ )
+		for ( const auto *e : NormalExpressions[i].szExpressions )
 		{
-			PrecacheInstancedScene( NormalExpressions[i].szExpressions[j] );
+			PrecacheInstancedScene( e );
 		}
-		for ( int j = 0; j < ARRAYSIZE(AngryExpressions[i].szExpressions); j++ )
+		for ( const auto *e : AngryExpressions[i].szExpressions )
 		{
-			PrecacheInstancedScene( AngryExpressions[i].szExpressions[j] );
+			PrecacheInstancedScene( e );
 		}
 	}
 
@@ -610,11 +610,11 @@ void CNPC_Citizen::SelectModel()
 		Q_strncpy(szMapName, STRING(gpGlobals->mapname), sizeof(szMapName) );
 		Q_strlower(szMapName);
 
-		for ( int i = 0; i < ARRAYSIZE(CitizenTypeMappings); i++ )
+		for ( const auto &m : CitizenTypeMappings )
 		{
-			if ( Q_stristr( szMapName, CitizenTypeMappings[i].pszMapTag ) )
+			if ( Q_stristr( szMapName, m.pszMapTag ) )
 			{
-				m_Type = CitizenTypeMappings[i].type;
+				m_Type = m.type;
 				break;
 			}
 		}
@@ -2122,9 +2122,9 @@ Vector CNPC_Citizen::GetActualShootPosition( const Vector &shootOrigin )
 				128,
 				-128
 			};
-			for ( int i = 0; i < ARRAYSIZE(flShotOffsets); i++ )
+			for ( auto &&offset : flShotOffsets )
 			{
-				Vector vecTest = vecTarget + (vecRight * flShotOffsets[i]);
+				Vector vecTest = vecTarget + vecRight * offset;
 				// Add some random height to it
 				vecTest.z += RandomFloat( -512, 512 );
 				trace_t tr;

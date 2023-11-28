@@ -689,10 +689,10 @@ C_BaseAnimating::C_BaseAnimating() :
 	m_pRagdoll		= NULL;
 	m_builtRagdoll = false;
 	m_hitboxBoneCacheHandle = 0;
-	int i;
-	for ( i = 0; i < ARRAYSIZE( m_flEncodedController ); i++ )
+
+	for ( auto &&c : m_flEncodedController )
 	{
-		m_flEncodedController[ i ] = 0.0f;
+		c = 0.0f;
 	}
 
 	AddBaseAnimatingInterpolatedVars();

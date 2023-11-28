@@ -378,16 +378,16 @@ void FileWeaponInfo_t::Parse( KeyValues *pKeyValuesData, const char *szWeaponNam
 	// Weapon scripts should use the flag names.
 	iFlags = pKeyValuesData->GetInt( "item_flags", ITEM_FLAG_LIMITINWORLD );
 
-	for ( int i=0; i < ARRAYSIZE( g_ItemFlags ); i++ )
+	for ( auto &&f : g_ItemFlags )
 	{
-		int iVal = pKeyValuesData->GetInt( g_ItemFlags[i].m_pFlagName, -1 );
+		int iVal = pKeyValuesData->GetInt( f.m_pFlagName, -1 );
 		if ( iVal == 0 )
 		{
-			iFlags &= ~g_ItemFlags[i].m_iFlagValue;
+			iFlags &= ~f.m_iFlagValue;
 		}
 		else if ( iVal == 1 )
 		{
-			iFlags |= g_ItemFlags[i].m_iFlagValue;
+			iFlags |= f.m_iFlagValue;
 		}
 	}
 

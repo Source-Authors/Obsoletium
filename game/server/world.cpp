@@ -168,9 +168,9 @@ void CDecal::StaticDecal( void )
 			if ( pEntity->IsEffectActive( EF_NODRAW ) )
 				return false;
 
-			for ( int i = 0; i < ARRAYSIZE(ppszIgnoredClasses); i++ )
+			for ( const auto *c : ppszIgnoredClasses )
 			{
-				if ( pEntity->ClassMatches( ppszIgnoredClasses[i] ) )
+				if ( pEntity->ClassMatches( c ) )
 					return false;
 			}
 

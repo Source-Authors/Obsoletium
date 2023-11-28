@@ -178,10 +178,9 @@ static char const *g_ServerSideFlexControllers[] =
 //-----------------------------------------------------------------------------
 bool CAI_BaseActor::IsServerSideFlexController( char const *szName )
 {
-	int c = ARRAYSIZE( g_ServerSideFlexControllers );
-	for ( int i = 0; i < c; ++i )
+	for ( const auto *c : g_ServerSideFlexControllers )
 	{
-		if ( !Q_stricmp( szName, g_ServerSideFlexControllers[ i ] ) )
+		if ( !Q_stricmp( szName, c ) )
 			return true;
 	}
 	return false;

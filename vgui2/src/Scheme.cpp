@@ -607,24 +607,24 @@ void CScheme::LoadFromFile( VPANEL sizingPanel, const char *inFilename, const ch
 	}
 
 	// translate format from goldsrc scheme to new scheme
-	for (int i = 0; i < ARRAYSIZE(g_SchemeTranslation); i++)
+	for ( const auto &schemeTranslation : g_SchemeTranslation )
 	{
-		if (!m_pkvBaseSettings->FindKey(g_SchemeTranslation[i].pchNewEntry, false))
+		if (!m_pkvBaseSettings->FindKey(schemeTranslation.pchNewEntry, false))
 		{
 			const char *pchColor;
 
-			if (g_SchemeTranslation[i].pchOldEntry)
+			if (schemeTranslation.pchOldEntry)
 			{
-				pchColor = LookupSchemeSetting(g_SchemeTranslation[i].pchOldEntry);
+				pchColor = LookupSchemeSetting(schemeTranslation.pchOldEntry);
 			}
 			else
 			{
-				pchColor = g_SchemeTranslation[i].pchDefaultValue;
+				pchColor = schemeTranslation.pchDefaultValue;
 			}
 
 			Assert( pchColor );
 
-			m_pkvBaseSettings->SetString(g_SchemeTranslation[i].pchNewEntry, pchColor);
+			m_pkvBaseSettings->SetString(schemeTranslation.pchNewEntry, pchColor);
 		}
 	}
 

@@ -253,8 +253,8 @@ void UpdateQueryCache( void )
 void InvalidateQueryCache( void )
 {
 	s_VictimList.RemoveAll();
-	for( int i = 0; i < ARRAYSIZE( s_HashChains); i++ )
-		s_HashChains[i].RemoveAll();
+	for( auto &&c : s_HashChains )
+		c.RemoveAll();
 	// now, invalidate all cache entries and add them to the victims
 	for( int i = 0; i < ARRAYSIZE( s_QCache ); i++ )
 	{

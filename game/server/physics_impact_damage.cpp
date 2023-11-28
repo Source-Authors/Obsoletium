@@ -473,10 +473,10 @@ float CalculateDefaultPhysicsDamage( int index, gamevcollisionevent_t *pEvent, f
 	// If we have a specified damage table, find it and use it instead
 	if ( iszDamageTableName != NULL_STRING )
 	{
-		for ( int i = 0; i < ARRAYSIZE(gDamageTableRegistry); i++ )
+		for ( auto &&r : gDamageTableRegistry )
 		{
-			if ( !Q_strcmp( gDamageTableRegistry[i].pszTableName, STRING(iszDamageTableName) ) )
-				return CalculatePhysicsImpactDamage( index, pEvent, *(gDamageTableRegistry[i].pTable), energyScale, allowStaticDamage, damageType, bDamageFromHeldObjects );
+			if ( !Q_strcmp( r.pszTableName, STRING(iszDamageTableName) ) )
+				return CalculatePhysicsImpactDamage( index, pEvent, *r.pTable, energyScale, allowStaticDamage, damageType, bDamageFromHeldObjects );
 		}
 
 		Warning("Failed to find custom physics damage table name: %s\n", STRING(iszDamageTableName) );

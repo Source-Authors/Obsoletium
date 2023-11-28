@@ -1742,23 +1742,20 @@ void CServerGameDLL::GetTitleName( const char *pMapName, char* pTitleBuff, int t
 void CServerGameDLL::GetSaveComment( char *text, int maxlength, float flMinutes, float flSeconds, bool bNoTime )
 {
 	char comment[64];
-	const char	*pName;
-	int		i;
+	const char	*pName = nullptr;
 
 	char const *mapname = STRING( gpGlobals->mapname );
 
-	pName = NULL;
-
 	// Try to find a matching title comment for this mapname
-	for ( i = 0; i < ARRAYSIZE(gTitleComments) && !pName; i++ )
+	for ( const auto &c : gTitleComments )
 	{
-		if ( !Q_strnicmp( mapname, gTitleComments[i].pBSPName, strlen(gTitleComments[i].pBSPName) ) )
+		if ( !Q_strnicmp( mapname, c.pBSPName, strlen(c.pBSPName) ) )
 		{
 			// found one
 			int j;
 
 			// Got a message, post-process it to be save name friendly
-			Q_strncpy( comment, gTitleComments[i].pTitleName, sizeof( comment ) );
+			Q_strncpy( comment, c.pTitleName, sizeof( comment ) );
 			pName = comment;
 			j = 0;
 			// Strip out CRs
@@ -2104,12 +2101,13 @@ void UpdateChapterRestrictions( const char *mapname )
 	// look at the chapter for this map
 	char chapterTitle[64];
 	chapterTitle[0] = 0;
-	for ( int i = 0; i < ARRAYSIZE(gTitleComments); i++ )
+
+	for ( const auto &c : gTitleComments )
 	{
-		if ( !Q_strnicmp( mapname, gTitleComments[i].pBSPName, strlen(gTitleComments[i].pBSPName) ) )
+		if ( !Q_strnicmp( mapname, c.pBSPName, strlen(c.pBSPName) ) )
 		{
 			// found
-			Q_strncpy( chapterTitle, gTitleComments[i].pTitleName, sizeof( chapterTitle ) );
+			Q_strncpy( chapterTitle, c.pTitleName, sizeof( chapterTitle ) );
 			int j = 0;
 			while ( j < 64 && chapterTitle[j] )
 			{

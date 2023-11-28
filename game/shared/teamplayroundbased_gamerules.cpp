@@ -1410,10 +1410,10 @@ CGameRulesRoundStateInfo* CTeamplayRoundBasedRules::State_LookupInfo( gamerules_
 		{ GR_STATE_BETWEEN_RNDS, "GR_STATE_BETWEEN_RNDS", &CTeamplayRoundBasedRules::State_Enter_BETWEEN_RNDS, &CTeamplayRoundBasedRules::State_Leave_BETWEEN_RNDS,	&CTeamplayRoundBasedRules::State_Think_BETWEEN_RNDS },
 	};
 
-	for ( int i=0; i < ARRAYSIZE( playerStateInfos ); i++ )
+	for ( auto &&i : playerStateInfos )
 	{
-		if ( playerStateInfos[i].m_iRoundState == state )
-			return &playerStateInfos[i];
+		if ( i.m_iRoundState == state )
+			return &i;
 	}
 
 	return NULL;

@@ -118,25 +118,20 @@ static const char *_SoundLevelToString( soundlevel_t level )
 	}
 
 	static char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%i", (int)level );
+	Q_snprintf( sz, sizeof( sz ), "%d", (int)level );
 	return sz;
 }
 
 static const char *_ChannelToString( int channel )
 {
-	int c = ARRAYSIZE( g_pChannelNames );
-
-	int i;
-
-	for ( i = 0 ; i < c; i++ )
+	for ( const auto &entry : g_pChannelNames )
 	{
-		SoundChannels *entry = &g_pChannelNames[ i ];
-		if ( entry->channel == channel )
-			return entry->name;
+		if ( entry.channel == channel )
+			return entry.name;
 	}
 
 	static char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%i", (int)channel );
+	Q_snprintf( sz, sizeof( sz ), "%d", channel );
 	return sz;
 }
 
@@ -231,14 +226,11 @@ int TextToChannel( const char *name )
 		return atoi( name );
 	}
 
-	int c = ARRAYSIZE( g_pChannelNames );
-	int i;
-
-	for ( i = 0; i < c; i++ )
+	for ( const auto &channelName : g_pChannelNames )
 	{
-		if ( !Q_strcasecmp( name, g_pChannelNames[ i ].name ) )
+		if ( !Q_strcasecmp( name, channelName.name ) )
 		{
-			return g_pChannelNames[ i ].channel;
+			return channelName.channel;
 		}
 	}
 
@@ -269,19 +261,14 @@ const char *SoundLevelToString( soundlevel_t level )
 
 const char *ChannelToString( int channel )
 {
-	int c = ARRAYSIZE( g_pChannelNames );
-
-	int i;
-
-	for ( i = 0 ; i < c; i++ )
+	for ( const auto &entry : g_pChannelNames )
 	{
-		SoundChannels *entry = &g_pChannelNames[ i ];
-		if ( entry->channel == channel )
-			return entry->name;
+		if ( entry.channel == channel )
+			return entry.name;
 	}
 
 	static char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%i", (int)channel );
+	Q_snprintf( sz, sizeof( sz ), "%d", channel );
 	return sz;
 }
 

@@ -87,11 +87,10 @@ static PhonemeMap_t g_Phonemes[] =
 //-----------------------------------------------------------------------------
 const char *ConvertPhoneme( int code )
 {
-	for ( int i = 0; i < ARRAYSIZE( g_Phonemes ); ++i )
+	for ( auto &&p : g_Phonemes )
 	{
-		PhonemeMap_t *test = &g_Phonemes[ i ];
-		if ( test->code == code )
-			return test->string;
+		if ( p.code == code )
+			return p.string;
 	}
 
 	Warning( "Unrecognized phoneme code %i\n", code );
@@ -105,11 +104,10 @@ const char *ConvertPhoneme( int code )
 //-----------------------------------------------------------------------------
 int TextToPhoneme( const char *text )
 {
-	for ( int i = 0; i < ARRAYSIZE( g_Phonemes ); ++i )
+	for ( auto &&p : g_Phonemes )
 	{
-		PhonemeMap_t *test = &g_Phonemes[ i ];
-		if ( !stricmp( test->string, text ) )
-			return test->code;
+		if ( !stricmp( p.string, text ) )
+			return p.code;
 	}
 
 	Warning( "Unrecognized phoneme %s\n", text );
@@ -123,11 +121,10 @@ int TextToPhoneme( const char *text )
 //-----------------------------------------------------------------------------
 float WeightForPhonemeCode( int code )
 {
-	for ( int i = 0; i < ARRAYSIZE( g_Phonemes ); ++i )
+	for ( auto &&p : g_Phonemes )
 	{
-		PhonemeMap_t *test = &g_Phonemes[ i ];
-		if ( test->code == code )
-			return test->weight;
+		if ( p.code == code )
+			return p.weight;
 	}
 
 	Warning( "Unrecognized phoneme code %i\n", code );
@@ -141,11 +138,10 @@ float WeightForPhonemeCode( int code )
 //-----------------------------------------------------------------------------
 float WeightForPhoneme( char *text )
 {
-	for ( int i = 0; i < ARRAYSIZE( g_Phonemes ); ++i )
+	for ( auto &&p : g_Phonemes )
 	{
-		PhonemeMap_t *test = &g_Phonemes[ i ];
-		if ( !stricmp( test->string, text ) )
-			return test->weight;
+		if ( !stricmp( p.string, text ) )
+			return p.weight;
 	}
 
 	Warning( "WeightForPhoneme:: Unrecognized phoneme %s\n", text );

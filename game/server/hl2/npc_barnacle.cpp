@@ -1992,11 +1992,11 @@ void CNPC_Barnacle::SpawnDeathGibs( void )
 	bool bDroppedAny = false;
 
 	// Drop a random number of gibs
-	for ( int i=0; i < ARRAYSIZE(m_szGibNames); i++ )
+	for ( const auto *gibName : m_szGibNames )
 	{
 		if ( random->RandomInt( 0, 1 ) )
 		{
-			CGib::SpawnSpecificGibs( this, 1, 32, 1, m_szGibNames[i] );
+			CGib::SpawnSpecificGibs( this, 1, 32, 1, gibName );
 			bDroppedAny = true;
 		}
 	}
@@ -2299,9 +2299,9 @@ void CNPC_Barnacle::Precache()
 	PrecacheModel("models/barnacle.mdl");
 
 	// Precache all gibs
-	for ( int i=0; i < ARRAYSIZE(m_szGibNames); i++ )
+	for ( const auto *gibName : m_szGibNames )
 	{
-		PrecacheModel( m_szGibNames[i] );
+		PrecacheModel( gibName );
 	}
 
 	PrecacheScriptSound( "NPC_Barnacle.Digest" );

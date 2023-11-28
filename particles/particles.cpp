@@ -991,9 +991,9 @@ CParticleCollection::~CParticleCollection( void )
 		MemAlloc_FreeAligned( m_pOperatorContextData );
 	}
 
-	for( int i = 0 ; i < ARRAYSIZE( m_pCollisionCacheData ) ; i++ )
+	for( auto *d : m_pCollisionCacheData )
 	{
-		delete m_pCollisionCacheData[i];
+		delete d;
 	}
 }
 
