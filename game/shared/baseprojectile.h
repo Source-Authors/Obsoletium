@@ -39,6 +39,10 @@ public:
 	DECLARE_CLASS( CBaseProjectile, CBaseAnimating );
 	DECLARE_NETWORKCLASS();
 
+#if !defined( CLIENT_DLL )
+	DECLARE_DATADESC();
+#endif
+
 	CBaseProjectile();
 
 	virtual void Spawn();
@@ -58,10 +62,12 @@ public:
 	virtual void SetLauncher( CBaseEntity *pLauncher );
 	CBaseEntity *GetOriginalLauncher() const { return m_hOriginalLauncher; }
 
-protected:
 #ifdef GAME_DLL
 	void CollideWithTeammatesThink();
+#endif // GAME_DLL
 
+protected:
+#ifdef GAME_DLL
 	int m_iDestroyableHitCount;
 #endif // GAME_DLL
 

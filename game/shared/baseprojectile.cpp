@@ -8,6 +8,16 @@
 #include "cbase.h"
 #include "baseprojectile.h"
 
+#if !defined(CLIENT_DLL)
+
+BEGIN_DATADESC( CBaseProjectile )
+
+	// Function Pointers
+	DEFINE_THINKFUNC( CollideWithTeammatesThink )
+
+END_DATADESC()
+
+#endif
 
 IMPLEMENT_NETWORKCLASS_ALIASED( BaseProjectile, DT_BaseProjectile )
 
