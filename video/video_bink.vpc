@@ -1,0 +1,97 @@
+//-----------------------------------------------------------------------------
+//	video_bink.vpc
+//
+//	Project Script
+//
+//  Description:		Bink video sub-system (for video services system)
+// 
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		".."
+$Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+
+$Macro BINKSRCDIR $SRCDIR\thirdparty\bink
+$Macro BINKLIBDIR win32   [$WIN32]
+$Macro BINKLIBDIR win64   [$WIN64]
+$Macro BINKLIBDIR linux32 [$LINUX32]
+$Macro BINKLIBDIR linux64 [$LINUX64]
+$Macro BINKLIBDIR osx32   [$OSX32]
+$Macro BINKLIBDIR osx64   [$OSX64]
+
+$Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;$BINKSRCDIR\include"
+	}
+	$Linker
+	{
+		$IgnoreImportLibrary				"Yes" [$WINDOWS]
+		$AdditionalLibraryDirectories		"$BASE;$BINKSRCDIR\bin\$BINKLIBDIR"
+	}
+	
+	$PostBuildEvent [!$ANALYZE && $WIN32]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n"		\
+							"COPY $BINKSRCDIR\bin\$BINKLIBDIR\binkw32.dll $OUTBINDIR\binkw32.dll" "\n"	\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"$BASE"
+	}
+
+	$PostBuildEvent [!$ANALYZE && $WIN64]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n"		\
+							"COPY $BINKSRCDIR\bin\$BINKLIBDIR\binkw64.dll $OUTBINDIR\binkw64.dll" "\n"	\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"$BASE"
+	}
+}
+
+
+$Configuration  "Debug"
+{
+		$General
+		{
+				$OutputDirectory			"Debug_Video_Bink"
+				$IntermediateDirectory		"Debug_Video_Bink"
+		}
+}
+
+$Configuration  "Release"
+{
+		$General
+		{
+				$OutputDirectory			"Release_Video_Bink"
+				$IntermediateDirectory		"Release_Video_Bink"
+		}
+}
+
+
+$Project "video_bink"
+{
+	$Folder	"Source Files"	[$WINDOWS]
+	{
+		$file	"bink_video.cpp"
+		$file	"bink_material.cpp"
+		//$file	"bink_recorder.cpp"
+	}
+
+	$Folder	"Header Files"	[$WINDOWS]
+	{
+		$file	"videosubsystem.h"
+		$file	"video_macros.h"
+		$file	"bink_video.h"
+		//$file	"bink_recorder.h"
+		$file	"bink_common.h"
+	}
+
+	$Folder	"Link Libraries"
+	{
+		$Lib	tier1
+		$Lib	tier2
+		$File	"$BINKSRCDIR\bin\$BINKLIBDIR\binkw32.lib" [$WIN32]
+		$File	"$BINKSRCDIR\bin\$BINKLIBDIR\binkw64.lib" [$WIN64]
+	}
+}
