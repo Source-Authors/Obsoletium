@@ -13,16 +13,23 @@ $Macro LIBJPEGSRC2DIR	"$LIBJPEGSRCDIR\out"
 $Macro LIBJPEGOUTDIR	"$LIBJPEGSRCDIR\out\Release"
 $Macro SDL3SRCDIR		"$SRCDIR\thirdparty\SDL"
 $Macro SDL3OUTDIR		"$SDL3SRCDIR\out\Release"
+$Macro SNAPPYSRCDIR		"$SRCDIR\thirdparty\snappy"
+$Macro SNAPPYSRC2DIR	"$SNAPPYSRCDIR\out"
+$Macro SNAPPYOUTDIRDEBUG		"$SNAPPYSRCDIR\out\Debug"
+$Macro SNAPPYOUTDIRRELEASE		"$SNAPPYSRCDIR\out\Release"
 $Macro ZLIBSRCDIR		"$SRCDIR\thirdparty\zlib"
 $Macro ZLIBSRC2DIR		"$ZLIBSRCDIR\out"
 $Macro ZLIBOUTDIR		"$ZLIBSRCDIR\out\Release"
+
+$Macro MPAHEADERINFOOUTDIRDEBUG	"$SRCDIR\thirdparty\MPAHeaderInfo\out\Debug"
+$Macro MPAHEADERINFOOUTDIRRELEASE	"$SRCDIR\thirdparty\MPAHeaderInfo\out\Release"
 
 $include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 $include "$SRCDIR\vpc_scripts\source_replay.vpc"
 
 $Macro GPROFILER	"1" [$LINUX && $STAGING_ONLY]
 
-$Configuration
+$Configuration	"Debug"
 {
 	$Compiler
 	{
@@ -30,8 +37,10 @@ $Configuration
 		$AdditionalIncludeDirectories	"$BASE;$LIBJPEGSRCDIR;$LIBJPEGSRC2DIR;$LIBJPEGOUTDIR"
 		$AdditionalIncludeDirectories	"$BASE;$ZLIBSRCDIR;$ZLIBSRC2DIR;$ZLIBOUTDIR"
 		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include"	[$SDL]
+		$AdditionalIncludeDirectories	"$BASE;$SNAPPYSRCDIR;$SNAPPYSRC2DIR"
 		$PreprocessorDefinitions		"$BASE;USE_CONVARS;VOICE_OVER_IP;BUMPMAP;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER"
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
+		$PreprocessorDefinitions		"$BASE;MPA_BUILD_WITHOUT_ATL"
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY"	[$LINUXALL]
 
 		$AdditionalIncludeDirectories	"$BASE;..\common\quicktime_win32\"		[$QUICKTIME_WIN32]
@@ -46,7 +55,55 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE dsound.lib dxguid.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib" [$WINDOWS]
+		$AdditionalLibraryDirectories		"$BASE;$SNAPPYOUTDIRDEBUG;$MPAHEADERINFOOUTDIRDEBUG;"
+		$AdditionalDependencies			"$BASE dsound.lib dxguid.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib snappy.lib" [$WINDOWS]
+		$AdditionalDependencies			"$BASE mpaheaderinfo.lib" [$WINDOWS&&!$DEDICATED]
+		$SystemFrameworks				"Carbon;AppKit;OpenAL;CoreAudio;AudioToolbox;SystemConfiguration;Quicktime;AudioUnit" [$OSXALL]
+		$SystemLibraries				"iconv" [$OSXALL]
+		$SystemLibraries				"rt;openal;curl-gnutls" [$LINUXALL]
+		$GCC_ExtraLinkerFlags			"-L/usr/lib32 -L/usr/lib" [$LINUXALL]
+	}
+
+	$PostBuildEvent [!$ANALYZE && $SDL]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
+							"COPY $SDL3OUTDIR\SDL3.dll $OUTBINDIR\SDL3.dll" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $SDL3OUTDIR\SDL3.pdb COPY $SDL3OUTDIR\SDL3.pdb $OUTBINDIR\SDL3.pdb" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"$BASE"
+	}
+}
+
+$Configuration	"Release"
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;.\;audio;audio\private;audio\public;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls"
+		$AdditionalIncludeDirectories	"$BASE;$LIBJPEGSRCDIR;$LIBJPEGSRC2DIR;$LIBJPEGOUTDIR"
+		$AdditionalIncludeDirectories	"$BASE;$ZLIBSRCDIR;$ZLIBSRC2DIR;$ZLIBOUTDIR"
+		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include"	[$SDL]
+		$AdditionalIncludeDirectories	"$BASE;$SNAPPYSRCDIR;$SNAPPYSRC2DIR"
+		$PreprocessorDefinitions		"$BASE;USE_CONVARS;VOICE_OVER_IP;BUMPMAP;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER"
+		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
+		$PreprocessorDefinitions		"$BASE;MPA_BUILD_WITHOUT_ATL"
+		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY"	[$LINUXALL]
+
+		$AdditionalIncludeDirectories	"$BASE;..\common\quicktime_win32\"		[$QUICKTIME_WIN32]
+
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR/thirdparty/gperftools-2.0/src/" [$GPROFILER]
+		$PreprocessorDefinitions		"$BASE;GPROFILER" [$GPROFILER]
+		$PreprocessorDefinitions		"$BASE;ENABLE_RPT" [$ENABLE_RPT]
+
+		// dimhotepus: Enable exceptions as we use them in a single place
+		$EnableC++Exceptions				"Yes (/EHsc)"
+	}
+
+	$Linker
+	{
+		$AdditionalLibraryDirectories		"$BASE;$SNAPPYOUTDIRRELEASE;$MPAHEADERINFOOUTDIRRELEASE;"
+		$AdditionalDependencies			"$BASE dsound.lib dxguid.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib snappy.lib" [$WINDOWS]
+		$AdditionalDependencies			"$BASE mpaheaderinfo.lib" [$WINDOWS&&!$DEDICATED]
 		$SystemFrameworks				"Carbon;AppKit;OpenAL;CoreAudio;AudioToolbox;SystemConfiguration;Quicktime;AudioUnit" [$OSXALL]
 		$SystemLibraries				"iconv" [$OSXALL]
 		$SystemLibraries				"rt;openal;curl-gnutls" [$LINUXALL]
@@ -393,21 +450,6 @@ $Project "engine"
 		$File	"engsoundservice.cpp" [!$DEDICATED]
 		$File	"audio\private\mp3duration_helper.cpp"
 		$File	"audio\private\voice_wavefile.cpp"
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ApeTag.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ID3V1Tag.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ID3V2Tag.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\LameTag.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Lyrics3Tag.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAEndOfFileException.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAException.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFile.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFileStream.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFrame.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAHeader.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAStream.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MusicMatchTag.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Tag.cpp" [!$DEDICATED]
-		$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Tags.cpp" [!$DEDICATED]
 		$File	"audio\private\circularbuffer.cpp" [!$DEDICATED]
 		$File	"audio\private\snd_posix.cpp"		[$POSIX]	
 		
@@ -456,9 +498,6 @@ $Project "engine"
 		$File	"audio\private\snd_dev_direct.cpp"	[$WINDOWS]		\
 				"audio\private\snd_mp3_source.cpp"	[!$DEDICATED]		\
 				"audio\private\snd_wave_mixer_mp3.cpp"	[!$DEDICATED]	\
-				"$SRCDIR\thirdparty\MPAHeaderInfo\VBRHeader.cpp"		[!$DEDICATED]		\
-				"$SRCDIR\thirdparty\MPAHeaderInfo\VBRIHeader.cpp"		[!$DEDICATED]		\
-				"$SRCDIR\thirdparty\MPAHeaderInfo\XINGHeader.cpp"		[!$DEDICATED]		\
 				"audio\private\voice.cpp"			[!$DEDICATED]		\
 				"audio\private\voice_mixer_controls.cpp" [$WINDOWS]	\
 				"audio\private\voice_record_dsound.cpp"	[$WINDOWS]	\
@@ -513,21 +552,6 @@ $Project "engine"
 			$File	"audio\public\soundservice.h"
 			$File	"audio\public\voice.h"
 			$File	"audio\public\vox.h"
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ApeTag.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ID3V1Tag.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\ID3V2Tag.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\LameTag.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Lyrics3Tag.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAEndOfFileException.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAException.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFile.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFileStream.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAFrame.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAHeader.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MPAStream.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\MusicMatchTag.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Tag.h" [$WINDOWS]
-			$File	"$SRCDIR\thirdparty\MPAHeaderInfo\Tags.h" [$WINDOWS]
 			$File	"audio\private\circularbuffer.h"
 			$File	"audio\private\eax.h"
 			$File	"audio\private\snd_channels.h"
@@ -811,7 +835,7 @@ $Project "engine"
 		$File	"sbar.h"
 		$File	"$SRCDIR\public\scratchpad3d.h"
 		$File	"screen.h"
-		// dimhotepus: Keyabord hook to disable Win key.
+		// dimhotepus: Keyboard hook to disable Win key.
 		$File	"scoped_windows_hook.h"	[$WINDOWS]
 		$File	"server.h"
 		$File	"Session.h"
@@ -1125,7 +1149,7 @@ $Project "engine"
 
 	$Folder	"Link libraries"
 	{
-	  // dimhotepus: Exclude socketlib for now. 
+		// dimhotepus: Exclude socketlib for now. 
 		// $Lib	socketlib [$WIN32]
 
 		$Lib	appframework
@@ -1146,6 +1170,8 @@ $Project "engine"
 		$Libexternal	"$LIBBZOUTDIR/libbz2"
 		$Libexternal	"$LIBJPEGOUTDIR/jpeg-static" [!$DEDICATED]
 		$Libexternal	"$SDL3OUTDIR/SDL3" [$SDL]
+		$Libexternal	"$SNAPPYOUTDIRRELEASE/snappy" [!$WINDOWS]
+		$Libexternal	"$MPAHEADERINFOOUTDIRRELEASE/mpaheaderinfo" [!$WINDOWS&&!$DEDICATED]
 		$Libexternal	"$ZLIBOUTDIR/zlibstatic"
 		$Libexternal 	"$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL&&!$DEDICATED]
 

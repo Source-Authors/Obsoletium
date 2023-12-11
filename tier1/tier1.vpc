@@ -76,9 +76,6 @@ $Project "tier1"
 		$File	"utlsymbol.cpp"
 		$File	"utlbinaryblock.cpp"
 		$File	"pathmatch.cpp" [$LINUXALL]
-		$File	"snappy.cpp"
-		$File	"snappy-sinksource.cpp"
-		$File	"snappy-stubs-internal.cpp"
 	}
 
 	// Select bits from the LZMA SDK to support lzmaDecoder.h
@@ -92,11 +89,6 @@ $Project "tier1"
 
 	$Folder	"Header Files"
 	{
-		$Folder	"Internal Header Files"
-		{
-			$File	"snappy-internal.h"
-			$File	"snappy-stubs-internal.h"
-		}
 		$File	"$SRCDIR\public\tier1\bitbuf.h"
 		$File	"$SRCDIR\public\tier1\byteswap.h"
 		$File	"$SRCDIR\public\tier1\callqueue.h"
@@ -128,8 +120,6 @@ $Project "tier1"
 		$File	"$SRCDIR\public\tier1\rangecheckedvar.h"
 		$File	"$SRCDIR\public\tier1\refcount.h"
 		$File	"$SRCDIR\public\tier1\smartptr.h"
-		$File	"$SRCDIR\public\tier1\snappy.h"
-		$File	"$SRCDIR\public\tier1\snappy-sinksource.h"
 		$File	"$SRCDIR\public\tier1\stringpool.h"
 		$File	"$SRCDIR\public\tier1\strtools.h"
 		$File	"$SRCDIR\public\tier1\tier1.h"

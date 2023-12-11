@@ -1,28 +1,44 @@
-#pragma once
-#include "tag.h"
+// GNU LESSER GENERAL PUBLIC LICENSE
+// Version 3, 29 June 2007
+//
+// Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+//
+// Everyone is permitted to copy and distribute verbatim copies of this license
+// document, but changing it is not allowed.
+//
+// This version of the GNU Lesser General Public License incorporates the terms
+// and conditions of version 3 of the GNU General Public License, supplemented
+// by the additional permissions listed below.
 
-class CLAMETag :
-	public CTag
-{
-public:
-	static CLAMETag* CLAMETag::FindTag(CMPAStream* pStream, bool bAppended, DWORD dwBegin, DWORD dwEnd);
-	~CLAMETag(void);
+#ifndef MPA_HEADER_INFO_LAME_TAG_H_
+#define MPA_HEADER_INFO_LAME_TAG_H_
 
-	CString m_strEncoder;
-	DWORD m_dwLowpassFilterHz;
-	BYTE m_bBitrate;	// in kbps
-	BYTE m_bRevision;
+#include "Tag.h"
 
-	bool IsVBR() const;
-	bool IsABR() const;
-	bool IsCBR() const;
-	LPCTSTR GetVBRInfo() const;
-	bool IsSimpleTag() const { return m_bSimpleTag; };
+class CLAMETag : public CTag {
+ public:
+  [[nodiscard]] static CLAMETag* FindTag(CMPAStream* stream, bool is_appended,
+                                         unsigned begin_offset,
+                                         unsigned end_offset);
+  ~CLAMETag();
 
-private:
-	CLAMETag(CMPAStream* pStream, bool bAppended, DWORD dwOffset);
-	
-	BYTE m_bVBRInfo;
-	bool m_bSimpleTag;
-	static LPCTSTR m_szVBRInfo[10];
+  CString m_strEncoder;
+  unsigned m_dwLowpassFilterHz;
+  unsigned char m_bBitrate;  // in kbps
+  unsigned char m_bRevision;
+
+  bool IsVBR() const;
+  bool IsABR() const;
+  bool IsCBR() const;
+  LPCTSTR GetVBRInfo() const;
+  bool IsSimpleTag() const { return m_bSimpleTag; };
+
+ private:
+  CLAMETag(CMPAStream* stream, bool is_appended, unsigned offset);
+
+  unsigned char m_bVBRInfo;
+  bool m_bSimpleTag;
+  static LPCTSTR m_szVBRInfo[10];
 };
+
+#endif  // !MPA_HEADER_INFO_LAME_TAG_H_

@@ -11,21 +11,21 @@
 #include "draw.h"
 #include "zone.h"
 #include "sys.h"
-#include <edict.h>
-#include <coordsize.h>
-#include <characterset.h>
-#include <bitbuf.h>
+#include "edict.h"
+#include "coordsize.h"
+#include "characterset.h"
+#include "bitbuf.h"
 #include "common.h"
 #include <malloc.h>
 #include "traceinit.h"
-#include <filesystem.h>
+#include "filesystem.h"
 #include "filesystem_engine.h"
-#include <convar.h>
+#include "convar.h"
 #include "gl_matsysiface.h"
 #include "filesystem_init.h"
-#include <materialsystem/imaterialsystemhardwareconfig.h>
-#include <tier0/icommandline.h>
-#include <vstdlib/random.h>
+#include "materialsystem/imaterialsystemhardwareconfig.h"
+#include "tier0/icommandline.h"
+#include "vstdlib/random.h"
 #include "sys_dll.h"
 #include "datacache/idatacache.h"
 #include "matchmaking.h"
@@ -37,9 +37,9 @@
 #include "cl_steamauth.h"
 #endif
 #include "tier3/tier3.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "tier1/lzss.h"
-#include "tier1/snappy.h"
+#include <snappy.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

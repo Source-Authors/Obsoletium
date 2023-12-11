@@ -1,31 +1,47 @@
-#pragma once
+// GNU LESSER GENERAL PUBLIC LICENSE
+// Version 3, 29 June 2007
+//
+// Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+//
+// Everyone is permitted to copy and distribute verbatim copies of this license
+// document, but changing it is not allowed.
+//
+// This version of the GNU Lesser General Public License incorporates the terms
+// and conditions of version 3 of the GNU General Public License, supplemented
+// by the additional permissions listed below.
 
-// class CMPAFrame must be included first and must be known here
+#ifndef MPA_HEADER_INFO_VBR_HEADER_H_
+#define MPA_HEADER_INFO_VBR_HEADER_H_
+
 class CMPAFrame;
+class CMPAStream;
 
-class CVBRHeader
-{
-public:
-	static CVBRHeader* FindHeader(const CMPAFrame* pFrame);
-	virtual ~CVBRHeader(void);
-	bool SeekPosition(float& fPercent, DWORD& dwSeekPoint) const;
+class CVBRHeader {
+ public:
+  [[nodiscard]] static CVBRHeader* FindHeader(const CMPAFrame* frame);
 
-	DWORD m_dwBytes;		// total number of bytes
-	DWORD m_dwFrames;		// total number of frames
+  virtual ~CVBRHeader();
 
-protected:	
-	CVBRHeader(CMPAStream* pStream, DWORD dwOffset);
+  [[nodiscard]] bool SeekPosition(float& percent, unsigned& seek_point) const;
 
-	static bool CheckID(CMPAStream* pStream, DWORD dwOffset, char ch0, char ch1, char ch2, char ch3);
-	virtual DWORD SeekPosition(float& fPercent) const = 0;
-	CMPAStream* m_pStream;
+  unsigned m_dwBytes;   // total number of bytes
+  unsigned m_dwFrames;  // total number of frames
 
-public:	
-	DWORD m_dwOffset;
-	DWORD m_dwQuality;		// quality (0..100)
-	int* m_pnToc;			// TOC points for seeking (must be freed)
-	DWORD m_dwTableSize;	// size of table (number of entries)	
+ protected:
+  CVBRHeader(CMPAStream* stream, unsigned offset);
 
+  [[nodiscard]] static bool CheckID(CMPAStream* stream, unsigned offset,
+                                    char ch0, char ch1, char ch2, char ch3);
 
-	
+  virtual unsigned SeekPosition(float& percent) const = 0;
+
+  CMPAStream* m_pStream;
+
+ public:
+  unsigned m_dwOffset;
+  unsigned m_dwQuality;    // quality (0..100)
+  int* m_pnToc;            // TOC points for seeking (must be freed)
+  unsigned m_dwTableSize;  // size of table (number of entries)
 };
+
+#endif  // !MPA_HEADER_INFO_VBR_HEADER_H_

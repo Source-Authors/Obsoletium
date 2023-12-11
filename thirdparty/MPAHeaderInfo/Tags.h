@@ -1,52 +1,62 @@
-#pragma once
+// GNU LESSER GENERAL PUBLIC LICENSE
+// Version 3, 29 June 2007
+//
+// Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+//
+// Everyone is permitted to copy and distribute verbatim copies of this license
+// document, but changing it is not allowed.
+//
+// This version of the GNU Lesser General Public License incorporates the terms
+// and conditions of version 3 of the GNU General Public License, supplemented
+// by the additional permissions listed below.
 
-#define NUMBER_OF_ELEMENTS(X) (sizeof X / sizeof X[0])
-
+#ifndef MPA_HEADER_INFO_TAGS_H_
+#define MPA_HEADER_INFO_TAGS_H_
 
 #include <vector>
 
-#include "mpastream.h"
-#include "tag.h"
+#include "MPAStream.h"
+#include "Tag.h"
 
-class CTags
-{
-public:
-	CTags(CMPAStream* pStream);
-	~CTags(void);
+class CTags {
+ public:
+  explicit CTags(CMPAStream* stream);
+  ~CTags();
 
-	CTag* GetNextTag(unsigned int& nIndex) const;
-	template <class TagClass> bool FindTag(TagClass*& pTag) const;
+  [[nodiscard]] CTag* GetNextTag(size_t& nIndex) const;
+  template <typename TagClass>
+  [[nodiscard]] bool FindTag(TagClass*& pTag) const;
 
-	// get begin offset after prepended tags
-	DWORD GetBegin() const { return m_dwBegin; };
-	// get end offset before appended tags
-	DWORD GetEnd() const { return m_dwEnd; };
+  // get begin offset after prepended tags
+  [[nodiscard]] unsigned GetBegin() const { return m_dwBegin; };
+  // get end offset before appended tags
+  [[nodiscard]] unsigned GetEnd() const { return m_dwEnd; };
 
-	
-private:
-	bool FindAppendedTag(CMPAStream* pStream);
-	bool FindPrependedTag(CMPAStream* pStream);
+ private:
+  [[nodiscard]] bool FindAppendedTag(CMPAStream* stream);
+  [[nodiscard]] bool FindPrependedTag(CMPAStream* stream);
 
-	// definition of function pointer type
-	typedef CTag* (*FindTagFunctionPtr) (CMPAStream*, bool, DWORD, DWORD);
-	bool FindTag(FindTagFunctionPtr pFindTag, CMPAStream* pStream, bool bAppended);
+  // definition of function pointer type
+  using FindTagFunctionPtr = CTag* (*)(CMPAStream*, bool, unsigned, unsigned);
+  [[nodiscard]] bool FindTag(FindTagFunctionPtr find_tag, CMPAStream* stream,
+                             bool is_appended);
 
-	std::vector <CTag*> m_Tags;
-	DWORD m_dwBegin, m_dwEnd;
-	static const FindTagFunctionPtr m_appendedTagFactories[];
-	static const FindTagFunctionPtr m_prependedTagFactories[];
+  std::vector<CTag*> m_Tags;
+  unsigned m_dwBegin, m_dwEnd;
+
+  static const FindTagFunctionPtr m_appendedTagFactories[];
+  static const FindTagFunctionPtr m_prependedTagFactories[];
 };
 
-
 // you need to compile with runtime information to use this method
-template <class TagClass>
-bool CTags::FindTag(TagClass*& pTag) const
-{
-	for (unsigned int nIndex = 0; nIndex < m_Tags.size(); nIndex++)
-	{
-		pTag = dynamic_cast<TagClass*>(m_Tags[nIndex]);
-		if (pTag)
-			return true;
-	}
-	return false;
+template <typename TagClass>
+bool CTags::FindTag(TagClass*& pTag) const {
+  for (auto* tag : m_Tags) {
+    pTag = dynamic_cast<TagClass*>(tag);
+    if (pTag) return true;
+  }
+
+  return false;
 }
+
+#endif  // !MPA_HEADER_INFO_TAGS_H_

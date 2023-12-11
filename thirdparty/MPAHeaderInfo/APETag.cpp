@@ -1,62 +1,69 @@
-#include "StdAfx.h"
-#include ".\apetag.h"
+// Version 3, 29 June 2007
+//
+// Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+//
+// Everyone is permitted to copy and distribute verbatim copies of this license
+// document, but changing it is not allowed.
+//
+// This version of the GNU Lesser General Public License incorporates the terms
+// and conditions of version 3 of the GNU General Public License, supplemented
+// by the additional permissions listed below.
 
-CAPETag* CAPETag::FindTag(CMPAStream* pStream, bool bAppended, DWORD dwBegin, DWORD dwEnd)
-{
-	DWORD dwOffset;
+#include "stdafx.h"
 
-	if (!bAppended)
-	{
-		// stands at the beginning of file (complete header is 32 bytes)
-		dwOffset = dwBegin;
-	}
-	else
-	{
-		// stands at the end of the file (complete footer is 32 bytes)
-		dwOffset = dwEnd - 32;		
-	}
-	BYTE* pBuffer = pStream->ReadBytes(8, dwOffset, false);
+#include "APETag.h"
 
-	if (memcmp("APETAGEX", pBuffer, 8) == 0)
-		return new CAPETag(pStream, bAppended, dwOffset);
-	return NULL;
+CAPETag* CAPETag::FindTag(CMPAStream* stream, bool is_appended,
+                          unsigned begin_offset, unsigned end_offset) {
+  assert(stream);
+
+  unsigned offset;
+
+  if (!is_appended) {
+    // stands at the beginning of file (complete header is 32 bytes)
+    offset = begin_offset;
+  } else {
+    // stands at the end of the file (complete footer is 32 bytes)
+    offset = end_offset - 32U;
+  }
+
+  const unsigned char* buffer{stream->ReadBytes(8U, offset, false)};
+
+  if (memcmp("APETAGEX", buffer, 8U) == 0)
+    return new CAPETag{stream, is_appended, offset};
+
+  return nullptr;
 }
 
-CAPETag::CAPETag(CMPAStream* pStream, bool bAppended, DWORD dwOffset) :
-	CTag(pStream, _T("APE"), bAppended, dwOffset)
-{
-	dwOffset += 8;
-	DWORD dwVersion = pStream->ReadLEValue(4, dwOffset);
-	
-	// first byte is version number
-	m_fVersion = dwVersion/1000.0f;
-	
-	// get size
-	m_dwSize = pStream->ReadLEValue(4, dwOffset);
+CAPETag::CAPETag(CMPAStream* stream, bool is_appended, unsigned offset)
+    : CTag{stream, _T("APE"), is_appended, offset} {
+  offset += 8U;
 
-	/*DWORD dwNumItems = */pStream->ReadLEValue(4, dwOffset);
+  const unsigned version{stream->ReadLEValue(4U, offset)};
 
-	// only valid for version 2
-	DWORD dwFlags = pStream->ReadLEValue(4, dwOffset);
-	bool bHeader, bFooter;
-	if (m_fVersion > 1.0f)
-	{
-		bHeader = dwFlags >> 31 & 0x1;
-		bFooter = dwFlags >> 30 & 0x1;
-	}
-	else
-	{
-		bHeader = false;
-		bFooter = true;
-	}
+  // first byte is version number
+  m_fVersion = version / 1000.0f;
 
-	if (bHeader)
-		m_dwSize += 32;	// add header
+  // get size
+  m_dwSize = stream->ReadLEValue(4, offset);
 
-	if (bAppended)
-		m_dwOffset -= (m_dwSize - 32);
+  /*unsigned dwNumItems = */ stream->ReadLEValue(4U, offset);
+
+  // only valid for version 2
+  const unsigned flag{stream->ReadLEValue(4U, offset)};
+
+  bool is_header, is_footer;
+
+  if (m_fVersion > 1.0f) {
+    is_header = flag >> 31U & 0x1U;
+    is_footer = flag >> 30U & 0x1U;
+  } else {
+    is_header = false;
+    is_footer = true;
+  }
+
+  if (is_header) m_dwSize += 32U;  // add header
+  if (is_appended) m_dwOffset -= (m_dwSize - 32);
 }
 
-CAPETag::~CAPETag(void)
-{
-}
+CAPETag::~CAPETag() {}

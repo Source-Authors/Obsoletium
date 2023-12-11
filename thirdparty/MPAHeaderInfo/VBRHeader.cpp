@@ -1,68 +1,75 @@
-// dimhotepus: Add missed header.
-#include "audio_pch.h"
+// GNU LESSER GENERAL PUBLIC LICENSE
+// Version 3, 29 June 2007
+//
+// Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+//
+// Everyone is permitted to copy and distribute verbatim copies of this license
+// document, but changing it is not allowed.
+//
+// This version of the GNU Lesser General Public License incorporates the terms
+// and conditions of version 3 of the GNU General Public License, supplemented
+// by the additional permissions listed below.
 
 #include "stdafx.h"
-#include "mpaframe.h"	// also includes vbrheader.h
 
-#include "xingheader.h"
-#include "vbriheader.h"
+#include "MPAHeader.h"
+
+#include <algorithm>
+
+#include "XINGHeader.h"
+#include "VBRIHeader.h"
 
 // first test with this static method, if it does exist
-CVBRHeader* CVBRHeader::FindHeader(const CMPAFrame* pFrame)
-{
-	_ASSERTE(pFrame);
-	CVBRHeader* pVBRHeader = NULL;
+CVBRHeader* CVBRHeader::FindHeader(const CMPAFrame* frame) {
+  assert(frame);
 
-	pVBRHeader = CXINGHeader::FindHeader(pFrame);
-	if (!pVBRHeader)
-		pVBRHeader = CVBRIHeader::FindHeader(pFrame);
-	
-	return pVBRHeader;
+  CVBRHeader* header = CXINGHeader::FindHeader(frame);
+  if (!header) header = CVBRIHeader::FindHeader(frame);
+
+  return header;
 }
 
-CVBRHeader::CVBRHeader(CMPAStream* pStream, DWORD dwOffset) :
-	m_pStream(pStream), m_pnToc(NULL), m_dwOffset(dwOffset), m_dwFrames(0), m_dwBytes(0), m_dwQuality(0), m_dwTableSize(0)
-{
-}
+CVBRHeader::CVBRHeader(CMPAStream* stream, unsigned offset)
+    : m_pStream(stream),
+      m_pnToc(nullptr),
+      m_dwOffset(offset),
+      m_dwFrames(0),
+      m_dwBytes(0),
+      m_dwQuality(0),
+      m_dwTableSize(0) {}
 
-bool CVBRHeader::CheckID(CMPAStream* pStream, DWORD dwOffset, char ch0, char ch1, char ch2, char ch3)
-{
-	BYTE* pBuffer = pStream->ReadBytes(4, dwOffset, false);
-	if (pBuffer[0] == ch0 && pBuffer[1] == ch1 && pBuffer[2] == ch2 && pBuffer[3] == ch3)
-		return true;
-	return false;
+bool CVBRHeader::CheckID(CMPAStream* stream, unsigned offset, char ch0,
+                         char ch1, char ch2, char ch3) {
+  const unsigned char* buffer{stream->ReadBytes(4U, offset, false)};
+
+  if (buffer[0] == ch0 && buffer[1] == ch1 && buffer[2] == ch2 &&
+      buffer[3] == ch3)
+    return true;
+
+  return false;
 }
 
 /*
 // currently not used
-bool CVBRHeader::ExtractLAMETag( DWORD dwOffset )
+bool CVBRHeader::ExtractLAMETag( unsigned offset )
 {
-	// LAME ID found?
-	if( !CheckID( m_pMPAFile, dwOffset, 'L', 'A', 'M', 'E' ) && !CheckID( m_pMPAFile, dwOffset, 'G', 'O', 'G', 'O' ) )
-		return false;
+        // LAME ID found?
+        if( !CheckID( m_pMPAFile, offset, 'L', 'A', 'M', 'E' ) && !CheckID(
+m_pMPAFile, offset, 'G', 'O', 'G', 'O' ) ) return false;
 
-	return true;
+        return true;
 }*/
 
+CVBRHeader::~CVBRHeader() { delete[] m_pnToc; }
 
+// get byte position for percentage value (percent) of file
+bool CVBRHeader::SeekPosition(float& percent, unsigned& seek_point) const {
+  if (!m_pnToc || m_dwBytes == 0) return false;
 
-CVBRHeader::~CVBRHeader(void)
-{
-	delete[] m_pnToc;
-}
+  // check range of percent
+  if (percent < 0.0f) percent = 0.0f;
+  if (percent > 99.0f) percent = 99.0f;
 
-// get byte position for percentage value (fPercent) of file
-bool CVBRHeader::SeekPosition(float& fPercent, DWORD& dwSeekPoint) const
-{
-	if (!m_pnToc || m_dwBytes == 0)
-		return false;
-
-	// check range of fPercent
-	if (fPercent < 0.0f)   
-		fPercent = 0.0f;
-	if (fPercent > 99.0f) 
-		fPercent = 99.0f;
-
-	dwSeekPoint = SeekPosition(fPercent);
-	return true;
+  seek_point = SeekPosition(percent);
+  return true;
 }

@@ -33,3 +33,6 @@
 [submodule "ivp"]
 	path = ivp
 	url = git@github.com:Source-Authors/source-physics.git
+[submodule "thirdparty/snappy"]
+	path = thirdparty/snappy
+	url = git@github.com:Source-Authors/snappy.git

@@ -1,62 +1,72 @@
-#include "StdAfx.h"
-#include ".\lyrics3tag.h"
-#include "mpaexception.h"
+// GNU LESSER GENERAL PUBLIC LICENSE
+// Version 3, 29 June 2007
+//
+// Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+//
+// Everyone is permitted to copy and distribute verbatim copies of this license
+// document, but changing it is not allowed.
+//
+// This version of the GNU Lesser General Public License incorporates the terms
+// and conditions of version 3 of the GNU General Public License, supplemented
+// by the additional permissions listed below.
 
-CLyrics3Tag* CLyrics3Tag::FindTag(CMPAStream* pStream, bool bAppended, DWORD dwBegin, DWORD dwEnd)
-{
-	// stands at the end of file
-	DWORD dwOffset = dwEnd - 9;
-	BYTE* pBuffer = pStream->ReadBytes(9, dwOffset, false, true);
+#include "stdafx.h"
 
-	// is it Lyrics 2 Tag
-	if (memcmp("LYRICS200", pBuffer, 9) == 0)
-		return new CLyrics3Tag(pStream, dwOffset, true);
-	else if (memcmp("LYRICSEND", pBuffer, 9) == 0)
-		return new CLyrics3Tag(pStream, dwOffset, false);
-	
-	return NULL;
+#include "Lyrics3Tag.h"
+
+#include "MPAException.h"
+
+CLyrics3Tag* CLyrics3Tag::FindTag(CMPAStream* stream, bool, unsigned,
+                                  unsigned end) {
+  assert(stream);
+
+  // stands at the end of file
+  unsigned offset{end - 9U};
+  const unsigned char* buffer{stream->ReadBytes(9U, offset, false, true)};
+
+  // is it Lyrics 2 Tag
+  if (memcmp("LYRICS200", buffer, 9U) == 0)
+    return new CLyrics3Tag{stream, offset, true};
+
+  if (memcmp("LYRICSEND", buffer, 9U) == 0)
+    return new CLyrics3Tag{stream, offset, false};
+
+  return nullptr;
 }
 
-CLyrics3Tag::CLyrics3Tag(CMPAStream* pStream, DWORD dwOffset, bool bVersion2) :
-	CTag(pStream, _T("Lyrics3"), true, dwOffset)
-{
-	BYTE* pBuffer;
-	if (bVersion2)
-	{
-		SetVersion(2);
-		
-		// look for size of tag (stands before dwOffset)
-		dwOffset -= 6;
-		pBuffer = pStream->ReadBytes(6, dwOffset, false); 
+CLyrics3Tag::CLyrics3Tag(CMPAStream* stream, unsigned offset, bool version_2)
+    : CTag{stream, _T("Lyrics3"), true, offset} {
+  if (version_2) {
+    SetVersion(2);
 
-		// add null termination
-		char szSize[7];
-		memcpy(szSize, pBuffer, 6);
-		szSize[6] = '\0';
+    // look for size of tag (stands before offset)
+    offset -= 6U;
+    const unsigned char* buffer{stream->ReadBytes(6U, offset, false)};
 
-		// convert string to integer
-		m_dwSize = atoi(szSize); 
-		m_dwOffset = dwOffset - m_dwSize;
-		m_dwSize += 6 + 9;	// size must include size info and end string
-	}
-	else
-	{
-		SetVersion(1);
+    // add null termination
+    char size[7];
+    memcpy(size, buffer, 6U);
+    size[6] = '\0';
 
-		// seek back 5100 bytes and look for LYRICSBEGIN
-		m_dwOffset -= 5100;
-		pBuffer = pStream->ReadBytes(11, m_dwOffset, false);
+    // convert string to integer
+    m_dwSize = atoi(size);
+    m_dwOffset = offset - m_dwSize;
+    m_dwSize += 6U + 9U;  // size must include size info and end string
+  } else {
+    SetVersion(1);
 
-		while (memcmp("LYRICSBEGIN", pBuffer, 11) != 0)
-		{
-			if (dwOffset >= m_dwOffset)
-				throw CMPAException(CMPAException::CorruptLyricsTag);
-		}
-		m_dwSize = (dwOffset - m_dwOffset) + 9;
-	}
+    // seek back 5100 bytes and look for LYRICSBEGIN
+    m_dwOffset -= 5100U;
+
+    const unsigned char* buffer{stream->ReadBytes(11U, m_dwOffset, false)};
+
+    while (memcmp("LYRICSBEGIN", buffer, 11U) != 0) {
+      if (offset >= m_dwOffset)
+        throw CMPAException{CMPAException::ErrorIDs::CorruptLyricsTag};
+    }
+
+    m_dwSize = offset - m_dwOffset + 9U;
+  }
 }
 
-
-CLyrics3Tag::~CLyrics3Tag(void)
-{
-}
+CLyrics3Tag::~CLyrics3Tag() {}

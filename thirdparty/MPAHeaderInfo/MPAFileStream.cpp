@@ -1,138 +1,152 @@
-#include "StdAfx.h"
+// GNU LESSER GENERAL PUBLIC LICENSE
+// Version 3, 29 June 2007
+//
+// Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+//
+// Everyone is permitted to copy and distribute verbatim copies of this license
+// document, but changing it is not allowed.
+//
+// This version of the GNU Lesser General Public License incorporates the terms
+// and conditions of version 3 of the GNU General Public License, supplemented
+// by the additional permissions listed below.
+
+#include "stdafx.h"
+
 #include "MPAFileStream.h"
-#include "mpaexception.h"
-#include "mpaendoffileexception.h"
 
-// 1KB is inital buffersize
-const DWORD CMPAFileStream::INIT_BUFFERSIZE = 1024;	
+#include "MPAException.h"
+#include "MPAEndOfFileException.h"
 
-CMPAFileStream::CMPAFileStream(LPCTSTR szFilename) :
-	CMPAStream(szFilename), m_dwOffset(0)
-{
-	// open with CreateFile (no limitation of 128byte filename length, like in mmioOpen)
-	m_hFile = ::CreateFile(szFilename, GENERIC_READ, FILE_SHARE_READ, NULL, 
-										    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (m_hFile == INVALID_HANDLE_VALUE)
-	{
-		// throw error
-		throw CMPAException(CMPAException::ErrOpenFile, szFilename, _T("CreateFile"), true);
-	}
+#include <Windows.h>
 
-	m_bMustReleaseFile = true;
+// 1KB is initial buffersize
+const unsigned CMPAFileStream::INIT_BUFFERSIZE = 1024U;
 
-	Init();
+CMPAFileStream::CMPAFileStream(LPCTSTR file_name)
+    : CMPAStream(file_name), m_dwOffset(0) {
+  // open with CreateFile (no limitation of 128byte filename length, like in
+  // mmioOpen)
+  m_hFile = ::CreateFile(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr,
+                         OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+  if (m_hFile == INVALID_HANDLE_VALUE) {
+    // throw error
+    throw CMPAException{CMPAException::ErrorIDs::ErrOpenFile, file_name,
+                        _T("CreateFile"),
+                        true};
+  }
+
+  m_bMustReleaseFile = true;
+  Init();
 }
 
-CMPAFileStream::CMPAFileStream(LPCTSTR szFilename, HANDLE hFile) :
-	CMPAStream(szFilename), m_hFile(hFile), m_dwOffset(0)
-{
-	m_bMustReleaseFile = false;
-	Init();
+CMPAFileStream::CMPAFileStream(LPCTSTR file_name, HANDLE hFile)
+    : CMPAStream(file_name), m_hFile(hFile), m_dwOffset(0) {
+  m_bMustReleaseFile = false;
+  Init();
 }
 
+void CMPAFileStream::Init() {
+  m_dwBufferSize = INIT_BUFFERSIZE;
+  // fill buffer for first time
+  m_pBuffer = new unsigned char[m_dwBufferSize];
 
-void CMPAFileStream::Init() 
-{
-	m_dwBufferSize = INIT_BUFFERSIZE;
-	// fill buffer for first time
-	m_pBuffer = new BYTE[m_dwBufferSize];
-	FillBuffer(m_dwOffset, m_dwBufferSize, false);
+  FillBuffer(m_dwOffset, m_dwBufferSize, false);
 }
 
-CMPAFileStream::~CMPAFileStream(void)
-{
-	delete[] m_pBuffer;
-	
-	// close file
-	if (m_bMustReleaseFile)
-		::CloseHandle(m_hFile);	
+CMPAFileStream::~CMPAFileStream() {
+  delete[] m_pBuffer;
+
+  // close file
+  if (m_bMustReleaseFile) ::CloseHandle(m_hFile);
 }
 
 // set file position
-void CMPAFileStream::SetPosition(DWORD dwOffset) const
-{
-	// convert from unsigned DWORD to signed 64bit long
-	DWORD result = ::SetFilePointer(m_hFile, dwOffset, NULL, FILE_BEGIN); 
-	if (result == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
-	{ 
-		// != NO_ERROR
-		// throw error
-		throw CMPAException(CMPAException::ErrSetPosition, m_szFile, _T("SetFilePointer"), true);
-	}
+void CMPAFileStream::SetPosition(unsigned offset) const {
+  // convert from unsigned unsigned to signed 64bit long
+  const unsigned result =
+      ::SetFilePointer(m_hFile, offset, nullptr, FILE_BEGIN);
+
+  if (result == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR) {
+    // != NO_ERROR
+    // throw error
+    throw CMPAException{CMPAException::ErrorIDs::ErrSetPosition, m_szFile,
+                        _T("SetFilePointer"), true};
+  }
 }
 
+unsigned char* CMPAFileStream::ReadBytes(unsigned size, unsigned& offset,
+                                         bool move_offset,
+                                         bool should_reverse) const {
+  // enough bytes in buffer, otherwise read from file
+  if (m_dwOffset > offset || (((ptrdiff_t)((m_dwOffset + m_dwBufferSize) -
+                                           offset)) < (ptrdiff_t)size)) {
+    if (!FillBuffer(offset, size, should_reverse)) {
+      throw CMPAEndOfFileException{m_szFile};
+    }
+  }
 
-BYTE* CMPAFileStream::ReadBytes(DWORD dwSize, DWORD& dwOffset, bool bMoveOffset, bool bReverse) const
-{
-	// enough bytes in buffer, otherwise read from file
-	if (m_dwOffset > dwOffset || ( ((int)((m_dwOffset + m_dwBufferSize) - dwOffset)) < (int)dwSize))
-	{
-		if (!FillBuffer(dwOffset, dwSize, bReverse)) 
-		{
-			throw CMPAEndOfFileException(m_szFile);
-		}
-	}
+  unsigned char* buffer{m_pBuffer + (offset - m_dwOffset)};
 
-	BYTE* pBuffer = m_pBuffer + (dwOffset-m_dwOffset);
-	if (bMoveOffset)
-		dwOffset += dwSize;
-	
-	return pBuffer;
+  if (move_offset) offset += size;
+
+  return buffer;
 }
 
-DWORD CMPAFileStream::GetSize() const
-{
-	DWORD dwSize = ::GetFileSize(m_hFile, NULL);
-	if (dwSize == INVALID_FILE_SIZE)
-		throw CMPAException(CMPAException::ErrReadFile, m_szFile, _T("GetFileSize"), true);
-	return dwSize;
+unsigned CMPAFileStream::GetSize() const {
+  unsigned size = ::GetFileSize(m_hFile, nullptr);
+
+  if (size == INVALID_FILE_SIZE)
+    throw CMPAException{CMPAException::ErrorIDs::ErrReadFile, m_szFile,
+                        _T("GetFileSize"), true};
+
+  return size;
 }
 
-// fills internal buffer, returns false if EOF is reached, otherwise true. Throws exceptions
-bool CMPAFileStream::FillBuffer(DWORD dwOffset, DWORD dwSize, bool bReverse) const
-{
-	// calc new buffer size
-	if (dwSize > m_dwBufferSize)
-	{
-        m_dwBufferSize = dwSize;
-		
-		// release old buffer 
-		delete[] m_pBuffer;
+// fills internal buffer, returns false if EOF is reached, otherwise true.
+// Throws exceptions
+bool CMPAFileStream::FillBuffer(unsigned offset, unsigned size,
+                                bool should_reverse) const {
+  // calc new buffer size
+  if (size > m_dwBufferSize) {
+    m_dwBufferSize = size;
 
-		// reserve new buffer
-		m_pBuffer = new BYTE[m_dwBufferSize];
-	}	
+    // release old buffer
+    delete[] m_pBuffer;
 
-	if (bReverse)
-	{
-		if (dwOffset + dwSize < m_dwBufferSize)
-			dwOffset = 0;
-		else
-			dwOffset = dwOffset + dwSize - m_dwBufferSize;
-	}
+    // reserve new buffer
+    m_pBuffer = new unsigned char[m_dwBufferSize];
+  }
 
-	// read <m_dwBufferSize> bytes from offset <dwOffset>
-	m_dwBufferSize = Read(m_pBuffer, dwOffset, m_dwBufferSize);
+  if (should_reverse) {
+    if (offset + size < m_dwBufferSize)
+      offset = 0;
+    else
+      offset = offset + size - m_dwBufferSize;
+  }
 
-	// set new offset
-	m_dwOffset = dwOffset;
+  // read <m_dwBufferSize> bytes from offset <offset>
+  m_dwBufferSize = Read(m_pBuffer, offset, m_dwBufferSize);
 
-	if (m_dwBufferSize < dwSize)
-		return false;
+  // set new offset
+  m_dwOffset = offset;
 
-	return true;
+  if (m_dwBufferSize < size) return false;
+
+  return true;
 }
 
 // read from file, return number of bytes read
-DWORD CMPAFileStream::Read(LPVOID pData, DWORD dwOffset, DWORD dwSize) const
-{
-	DWORD dwBytesRead = 0;
-	
-	// set position first
-	SetPosition(dwOffset);
+unsigned CMPAFileStream::Read(void* data, unsigned offset,
+                              unsigned size) const {
+  DWORD bytes_read = 0;
 
-	if (!::ReadFile(m_hFile, pData, dwSize, &dwBytesRead, NULL))
-		throw CMPAException(CMPAException::ErrReadFile, m_szFile, _T("ReadFile"), true);
-	
-	return dwBytesRead;
+  // set position first
+  SetPosition(offset);
+
+  if (!::ReadFile(m_hFile, data, size, &bytes_read, nullptr))
+    throw CMPAException{CMPAException::ErrorIDs::ErrReadFile, m_szFile,
+                        _T("ReadFile"), true};
+
+  return bytes_read;
 }

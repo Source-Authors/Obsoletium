@@ -1,106 +1,108 @@
-// dimhotepus: Add missed header.
-#include "audio_pch.h"
+// GNU LESSER GENERAL PUBLIC LICENSE
+// Version 3, 29 June 2007
+//
+// Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+//
+// Everyone is permitted to copy and distribute verbatim copies of this license
+// document, but changing it is not allowed.
+//
+// This version of the GNU Lesser General Public License incorporates the terms
+// and conditions of version 3 of the GNU General Public License, supplemented
+// by the additional permissions listed below.
 
-#include "StdAfx.h"
-#include ".\vbriheader.h"
+#include "stdafx.h"
 
-CVBRIHeader* CVBRIHeader::FindHeader(const CMPAFrame* pFrame)
-{
-	// VBRI header always at fixed offset
-	DWORD dwOffset = pFrame->m_dwOffset + MPA_HEADER_SIZE + 32;
-	
-	// VBRI ID found?
-	if (!CheckID(pFrame->m_pStream, dwOffset, 'V', 'B', 'R', 'I'))
-		return NULL;
-	
-	return new CVBRIHeader(pFrame, dwOffset);
+#include "VBRIHeader.h"
+
+#include "MPAFrame.h"
+#include "MPAHeader.h"
+
+CVBRIHeader* CVBRIHeader::FindHeader(const CMPAFrame* frame) {
+  // VBRI header always at fixed offset
+  const unsigned offset{frame->m_dwOffset + MPA_HEADER_SIZE + 32U};
+
+  // VBRI ID found?
+  if (!CheckID(frame->m_pStream, offset, 'V', 'B', 'R', 'I')) return nullptr;
+
+  return new CVBRIHeader{frame, offset};
 }
 
+CVBRIHeader::CVBRIHeader(const CMPAFrame* frame, unsigned offset)
+    : CVBRHeader{frame->m_pStream, offset} {
+  /* FhG VBRI Header
 
-CVBRIHeader::CVBRIHeader(const CMPAFrame* pFrame, DWORD dwOffset) :
-	CVBRHeader(pFrame->m_pStream, dwOffset)
-{
-	/* FhG VBRI Header
+  size	description
+  4		'VBRI' (ID)
+  2		version
+  2		delay
+  2		quality
+  4		# bytes
+  4		# frames
+  2		table size (for TOC)
+  2		table scale (for TOC)
+  2		size of table entry (max. size = 4 byte (must be stored in an
+  integer)) 2		frames per table entry
 
-	size	description
-	4		'VBRI' (ID)
-	2		version
-	2		delay
-	2		quality
-	4		# bytes
-	4		# frames
-	2		table size (for TOC)
-	2		table scale (for TOC)
-	2		size of table entry (max. size = 4 byte (must be stored in an integer))
-	2		frames per table entry
-	
-	??		dynamic table consisting out of frames with size 1-4
-			whole length in table size! (for TOC)
+  ??		dynamic table consisting out of frames with size 1-4
+                  whole length in table size! (for TOC)
 
-	*/
+  */
 
-    // ID is already checked at this point
-	dwOffset += 4;
+  // ID is already checked at this point
+  offset += 4U;
 
-	// extract all fields from header (all mandatory)
-	m_dwVersion = m_pStream->ReadBEValue(2, dwOffset);
-	m_fDelay = (float)m_pStream->ReadBEValue(2, dwOffset);
-	m_dwQuality = m_pStream->ReadBEValue(2, dwOffset);
-	m_dwBytes = m_pStream->ReadBEValue(4, dwOffset);
-	m_dwFrames = m_pStream->ReadBEValue(4, dwOffset);
-	m_dwTableSize = m_pStream->ReadBEValue(2, dwOffset) + 1;	//!!!
-	m_dwTableScale = m_pStream->ReadBEValue(2, dwOffset);
-	m_dwBytesPerEntry = m_pStream->ReadBEValue(2, dwOffset);
-	m_dwFramesPerEntry = m_pStream->ReadBEValue(2, dwOffset);
+  // extract all fields from header (all mandatory)
+  m_dwVersion = m_pStream->ReadBEValue(2, offset);
+  m_fDelay = (float)m_pStream->ReadBEValue(2, offset);
+  m_dwQuality = m_pStream->ReadBEValue(2, offset);
+  m_dwBytes = m_pStream->ReadBEValue(4, offset);
+  m_dwFrames = m_pStream->ReadBEValue(4, offset);
+  m_dwTableSize = m_pStream->ReadBEValue(2, offset) + 1;  //!!!
+  m_dwTableScale = m_pStream->ReadBEValue(2, offset);
+  m_dwBytesPerEntry = m_pStream->ReadBEValue(2, offset);
+  m_dwFramesPerEntry = m_pStream->ReadBEValue(2, offset);
 
-	// extract TOC  (for more accurate seeking)
-	m_pnToc = new int[m_dwTableSize];
-	if (m_pnToc)
-	{
-		for (unsigned int i = 0 ; i < m_dwTableSize ; i++)
-		{
-			m_pnToc[i] = m_pStream->ReadBEValue(m_dwBytesPerEntry, dwOffset);
-		}
-	}
+  // extract TOC  (for more accurate seeking)
+  m_pnToc = new int[m_dwTableSize];
+  for (unsigned int i = 0; i < m_dwTableSize; i++) {
+    m_pnToc[i] = m_pStream->ReadBEValue(m_dwBytesPerEntry, offset);
+  }
 
-	// get length of file (needed for seeking)
-	m_dwLengthSec = pFrame->m_pHeader->GetLengthSecond(m_dwFrames);
+  // get length of file (needed for seeking)
+  m_dwLengthSec = frame->m_pHeader->GetLengthSecond(m_dwFrames);
 }
 
-CVBRIHeader::~CVBRIHeader(void) { delete[] m_pnToc; }
+CVBRIHeader::~CVBRIHeader() { delete[] m_pnToc; }
 
-DWORD CVBRIHeader::SeekPosition(float& fPercent) const
-{
-	return SeekPositionByTime((fPercent/100.0f) * m_dwLengthSec * 1000.0f);
+unsigned CVBRIHeader::SeekPosition(float& percent) const {
+  return SeekPositionByTime(percent / 100.0f * m_dwLengthSec * 1000.0f);
 }
 
-DWORD CVBRIHeader::SeekPositionByTime(float fEntryTimeMS) const
-{
-	unsigned int i=0,  fraction = 0;
-	DWORD dwSeekPoint = 0;
+unsigned CVBRIHeader::SeekPositionByTime(float entry_time_ms) const {
+  unsigned int i = 0;
 
-	float fLengthMS;
-	float fLengthMSPerTOCEntry;
-	float fAccumulatedTimeMS = 0.0f ;
-	 
-	fLengthMS = (float)m_dwLengthSec * 1000.0f ;
-	fLengthMSPerTOCEntry = fLengthMS / (float)m_dwTableSize;
-	 
-	if (fEntryTimeMS > fLengthMS) 
-		fEntryTimeMS = fLengthMS; 
-	 
-	while (fAccumulatedTimeMS <= fEntryTimeMS)
-	{
-		dwSeekPoint += m_pnToc[i++];
-		fAccumulatedTimeMS += fLengthMSPerTOCEntry;
-	}
-	  
-	// Searched too far; correct result
-	fraction = ( (int)((((fAccumulatedTimeMS - fEntryTimeMS) / fLengthMSPerTOCEntry) 
-				+ (1.0f/(2.0f*(float)m_dwFramesPerEntry))) * (float)m_dwFramesPerEntry));
+  float accumulated_time_ms{0.0f};
+  const float length_ms = static_cast<float>(m_dwLengthSec) * 1000.0f;
+  const float length_ms_per_toc_entry =
+      length_ms / static_cast<float>(m_dwTableSize);
 
-	dwSeekPoint -= (DWORD)((float)m_pnToc[i-1] * (float)(fraction) 
-					/ (float)m_dwFramesPerEntry);
+  if (entry_time_ms > length_ms) entry_time_ms = length_ms;
 
-	return dwSeekPoint;
+  unsigned seek_point = 0;
+  while (accumulated_time_ms <= entry_time_ms) {
+    seek_point += m_pnToc[i++];
+    accumulated_time_ms += length_ms_per_toc_entry;
+  }
+
+  // Searched too far; correct result
+  const unsigned fraction = static_cast<unsigned>(
+      (((accumulated_time_ms - entry_time_ms) / length_ms_per_toc_entry) +
+       (1.0f / (2.0f * static_cast<float>(m_dwFramesPerEntry)))) *
+      static_cast<float>(m_dwFramesPerEntry));
+
+  seek_point -= static_cast<unsigned>(static_cast<float>(m_pnToc[i - 1]) *
+                                      static_cast<float>(fraction) /
+                                      static_cast<float>(m_dwFramesPerEntry));
+
+  return seek_point;
 }

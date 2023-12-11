@@ -1,104 +1,91 @@
-#include "StdAfx.h"
-#include ".\tags.h"
-#include "mpaexception.h"
+// Version 3, 29 June 2007
+//
+// Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+//
+// Everyone is permitted to copy and distribute verbatim copies of this license
+// document, but changing it is not allowed.
+//
+// This version of the GNU Lesser General Public License incorporates the terms
+// and conditions of version 3 of the GNU General Public License, supplemented
+// by the additional permissions listed below.
 
-#include "id3v1tag.h"
-#include "id3v2tag.h"
-#include "lyrics3tag.h"
-#include "apetag.h"
-#include "musicmatchtag.h"
+#include "stdafx.h"
 
-const CTags::FindTagFunctionPtr CTags::m_appendedTagFactories[] = 
-{
-	(CTags::FindTagFunctionPtr)&CID3V1Tag::FindTag,
-	(CTags::FindTagFunctionPtr)&CMusicMatchTag::FindTag,
-	(CTags::FindTagFunctionPtr)&CID3V2Tag::FindTag,
-	(CTags::FindTagFunctionPtr)&CLyrics3Tag::FindTag,
-	(CTags::FindTagFunctionPtr)&CAPETag::FindTag
-};
+#include "Tags.h"
 
-const CTags::FindTagFunctionPtr CTags::m_prependedTagFactories[] = 
-{
-	(CTags::FindTagFunctionPtr)&CID3V2Tag::FindTag,
-	(CTags::FindTagFunctionPtr)&CAPETag::FindTag
-};
+#include "MPAException.h"
 
+#include "ID3V1Tag.h"
+#include "ID3V2Tag.h"
+#include "Lyrics3Tag.h"
+#include "APETag.h"
+#include "MusicMatchTag.h"
 
+const CTags::FindTagFunctionPtr CTags::m_appendedTagFactories[] = {
+    (CTags::FindTagFunctionPtr)&CID3V1Tag::FindTag,
+    (CTags::FindTagFunctionPtr)&CMusicMatchTag::FindTag,
+    (CTags::FindTagFunctionPtr)&CID3V2Tag::FindTag,
+    (CTags::FindTagFunctionPtr)&CLyrics3Tag::FindTag,
+    (CTags::FindTagFunctionPtr)&CAPETag::FindTag};
 
-CTags::CTags(CMPAStream* pStream) :
-	m_dwBegin(0), m_dwEnd(pStream->GetSize())
-{
-	// all appended tags
-	/////////////////////////////
+const CTags::FindTagFunctionPtr CTags::m_prependedTagFactories[] = {
+    (CTags::FindTagFunctionPtr)&CID3V2Tag::FindTag,
+    (CTags::FindTagFunctionPtr)&CAPETag::FindTag};
 
-	while (FindAppendedTag(pStream))
-		;
+CTags::CTags(CMPAStream* stream) : m_dwBegin(0), m_dwEnd(stream->GetSize()) {
+  // all appended tags
+  /////////////////////////////
+  while (FindAppendedTag(stream))
+    ;
 
-	// all prepended tags
-	/////////////////////////////
-	while (FindPrependedTag(pStream))
-		;
-	
+  // all prepended tags
+  /////////////////////////////
+  while (FindPrependedTag(stream))
+    ;
 }
 
-CTags::~CTags(void)
-{
-	for (unsigned int n=0; n<m_Tags.size(); n++)
-	{
-		delete m_Tags[n];
-	}
+CTags::~CTags() {
+  for (auto* tag : m_Tags) delete tag;
 }
 
-bool CTags::FindPrependedTag(CMPAStream* pStream)
-{
-	for (int i=0; i < NUMBER_OF_ELEMENTS(m_prependedTagFactories); i++) 
-	{
-		if (FindTag(m_prependedTagFactories[i], pStream, false))
-			return true;
-	}
-	return false;
+bool CTags::FindPrependedTag(CMPAStream* stream) {
+  for (auto&& f : m_prependedTagFactories) {
+    if (FindTag(f, stream, false)) return true;
+  }
+  return false;
 }
 
-bool CTags::FindAppendedTag(CMPAStream* pStream)
-{
-	for (int i=0; i < NUMBER_OF_ELEMENTS(m_appendedTagFactories); i++) 
-	{
-		if (FindTag(m_appendedTagFactories[i], pStream, true))
-			return true;
-	}
-	return false;
+bool CTags::FindAppendedTag(CMPAStream* stream) {
+  for (auto&& f : m_appendedTagFactories) {
+    if (FindTag(f, stream, true)) return true;
+  }
+  return false;
 }
 
-bool CTags::FindTag(FindTagFunctionPtr pFindTag, CMPAStream* pStream, bool bAppended)
-{
-	try
-	{
-		CTag* pTag = pFindTag(pStream, bAppended, m_dwBegin, m_dwEnd);
-		if (pTag)
-		{
-			if (bAppended)
-				m_dwEnd = pTag->GetOffset();
-			else
-				m_dwBegin = pTag->GetEnd();
-			m_Tags.push_back(pTag);
-			return true;
-		}
-	}
-	catch(CMPAException& Exc)
-	{
-		Exc.ShowError();
-	}
-	return false;
+bool CTags::FindTag(FindTagFunctionPtr find_tag, CMPAStream* stream,
+                    bool is_appended) {
+  try {
+    CTag* tag = find_tag(stream, is_appended, m_dwBegin, m_dwEnd);
+    if (tag) {
+      if (is_appended)
+        m_dwEnd = tag->GetOffset();
+      else
+        m_dwBegin = tag->GetEnd();
+
+      m_Tags.push_back(tag);
+      return true;
+    }
+  } catch (CMPAException& ex) {
+    ex.ShowError();
+  }
+
+  return false;
 }
 
-CTag* CTags::GetNextTag(unsigned int& nIndex) const
-{
-	CTag* pTag;
-	if (nIndex < m_Tags.size())
-		pTag = m_Tags[nIndex];
-	else
-		pTag = NULL;
+CTag* CTags::GetNextTag(size_t& index) const {
+  CTag* tag{index < m_Tags.size() ? m_Tags[index] : nullptr};
 
-	nIndex++;
-	return pTag;
+  index++;
+
+  return tag;
 }
