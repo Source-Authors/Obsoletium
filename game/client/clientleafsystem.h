@@ -195,7 +195,7 @@ public:
 	virtual int GetRenderableLeaves( ClientRenderHandle_t handle, int leaves[128] ) = 0;
 
 	// Get leaves this renderable is in
-	virtual bool GetRenderableLeaf ( ClientRenderHandle_t handle, int* pOutLeaf, const int* pInIterator = 0, int* pOutIterator = 0 ) = 0;
+	virtual bool GetRenderableLeaf ( ClientRenderHandle_t handle, int* pOutLeaf, const unsigned* pInIterator = 0, unsigned* pOutIterator = 0 ) = 0;
 
 	// Use alternate translucent sorting algorithm (draw translucent objects in the furthest leaf they lie in)
 	virtual void EnableAlternateSorting( ClientRenderHandle_t handle, bool bEnable ) = 0;

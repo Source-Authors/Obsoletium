@@ -142,7 +142,7 @@ public:
 	int GetRenderableLeaves( ClientRenderHandle_t handle, int leaves[128] );
 
 	// Get leaves this renderable is in
-	virtual bool GetRenderableLeaf ( ClientRenderHandle_t handle, int* pOutLeaf, const int* pInIterator = 0, int* pOutIterator = 0 );
+	bool GetRenderableLeaf ( ClientRenderHandle_t handle, int* pOutLeaf, const unsigned* pInIterator = 0, unsigned* pOutIterator = 0 ) override;
 
 	// Singleton instance...
 	static CClientLeafSystem s_ClientLeafSystem;
@@ -764,7 +764,7 @@ int CClientLeafSystem::GetRenderableLeaves( ClientRenderHandle_t handle, int lea
 		return -1;
 
 	int nLeaves = 0;
-	for ( int i=m_RenderablesInLeaf.FirstBucket( handle ); i != m_RenderablesInLeaf.InvalidIndex(); i = m_RenderablesInLeaf.NextBucket( i ) )
+	for ( auto i=m_RenderablesInLeaf.FirstBucket( handle ); i != m_RenderablesInLeaf.InvalidIndex(); i = m_RenderablesInLeaf.NextBucket( i ) )
 	{
 		leaves[nLeaves++] = m_RenderablesInLeaf.Bucket( i );
 		if ( nLeaves >= 128 )
@@ -784,7 +784,7 @@ int CClientLeafSystem::GetRenderableLeaves( ClientRenderHandle_t handle, int lea
 //
 // Returns false on failure cases where pOutLeaf will be invalid. CHECK THE RETURN!
 //-----------------------------------------------------------------------------
-bool CClientLeafSystem::GetRenderableLeaf(ClientRenderHandle_t handle, int* pOutLeaf, const int* pInIterator /* = 0 */, int* pOutIterator /* = 0  */)
+bool CClientLeafSystem::GetRenderableLeaf(ClientRenderHandle_t handle, int* pOutLeaf, const unsigned* pInIterator /* = 0 */, unsigned* pOutIterator /* = 0  */)
 {
 	// bail on invalid handle
 	if ( !m_Renderables.IsValidIndex( handle ) )
@@ -797,13 +797,13 @@ bool CClientLeafSystem::GetRenderableLeaf(ClientRenderHandle_t handle, int* pOut
 	// an iterator was specified
 	if ( pInIterator )
 	{
-		int iter = *pInIterator;
+		const auto iter = *pInIterator;
 
 		// test for invalid iterator
 		if ( iter == m_RenderablesInLeaf.InvalidIndex() )
 			return false;
 
-		int iterNext =  m_RenderablesInLeaf.NextBucket( iter );
+		const auto iterNext =  m_RenderablesInLeaf.NextBucket( iter );
 
 		// test for end of list
 		if ( iterNext == m_RenderablesInLeaf.InvalidIndex() )
@@ -821,7 +821,7 @@ bool CClientLeafSystem::GetRenderableLeaf(ClientRenderHandle_t handle, int* pOut
 	}
 	else // no iter param, give them the first bucket in the renderable's list
 	{
-		int iter = m_RenderablesInLeaf.FirstBucket( handle );
+		const auto iter = m_RenderablesInLeaf.FirstBucket( handle );
 
 		if ( iter == m_RenderablesInLeaf.InvalidIndex() )
 			return false;
