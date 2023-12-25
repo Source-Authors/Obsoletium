@@ -552,7 +552,7 @@ public:
 	struct Data_t
 	{
 		int m_Size;
-		T m_Elements[0];
+		T *m_Elements;
 	};
 
 	Data_t *m_pData;
