@@ -1533,7 +1533,7 @@ static void sv_WasteMemory( void )
 {
 	uint8 *pWastedRam = new uint8[ 100 * 1024 * 1024 ];
 	memset( pWastedRam, 0xff, 100 * 1024 * 1024 );			// make sure it gets committed
-	Msg( "waste 100mb. using %dMB with an sv_memory_limit of %dMB\n", ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), sv_memlimit.GetInt() );
+	Msg( "waste 100mb. using %zuMB with an sv_memory_limit of %dMB\n", ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), sv_memlimit.GetInt() );
 }
 
 static ConCommand sv_wastememory( "sv_wastememory", sv_WasteMemory, "Causes the server to allocate 100MB of ram and never free it", FCVAR_CHEAT );
@@ -1634,20 +1634,21 @@ void CGameServer::SetHibernating( bool bHibernating )
 			}
 			else
 			{
-				if ( sv_memlimit.GetInt() )
+				const int memlimit = sv_memlimit.GetInt();
+				if ( memlimit > 0 )
 				{
-					if ( ApproximateProcessMemoryUsage() > 1024 * 1024 * sv_memlimit.GetInt() )
+					if ( ApproximateProcessMemoryUsage() > static_cast<size_t>(memlimit) * 1024U * 1024U )
 					{
 						if ( ( sv_minuptimelimit.GetFloat() > 0 ) &&
 							( ( Plat_FloatTime() - s_flPlatFloatTimeBeginUptime ) / 3600.0 < sv_minuptimelimit.GetFloat() ) )
 						{
-							Warning( "Server is using %dMB with an sv_memory_limit of %dMB, but will not shutdown because sv_minuptimelimit is %.3f hr while current uptime is %.3f\n",
-								ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), sv_memlimit.GetInt(),
+							Warning( "Server is using %zuMB with an sv_memory_limit of %uMB, but will not shutdown because sv_minuptimelimit is %.3f hr while current uptime is %.3f\n",
+								ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), static_cast<unsigned>(memlimit),
 								sv_minuptimelimit.GetFloat(), ( Plat_FloatTime() - s_flPlatFloatTimeBeginUptime ) / 3600.0 );
 						}
 						else
 						{
-							Warning( "Server shutting down because of using %dMB with an sv_memory_limit of %dMB\n", ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), sv_memlimit.GetInt() );
+							Warning( "Server shutting down because of using %zuMB with an sv_memory_limit of %uMB\n", ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), static_cast<unsigned>(sv_memlimit.GetInt()) );
 							bExit = true;
 						}
 					}
@@ -1656,9 +1657,9 @@ void CGameServer::SetHibernating( bool bHibernating )
 				if ( ( sv_maxuptimelimit.GetFloat() > 0 ) &&
 					( ( Plat_FloatTime() - s_flPlatFloatTimeBeginUptime ) / 3600.0 > sv_maxuptimelimit.GetFloat() ) )
 				{
-					Warning( "Server will shutdown because sv_maxuptimelimit is %.3f hr while current uptime is %.3f, using %dMB with an sv_memory_limit of %dMB\n",
+					Warning( "Server will shutdown because sv_maxuptimelimit is %.3f hr while current uptime is %.3f, using %zuMB with an sv_memory_limit of %dMB\n",
 						sv_maxuptimelimit.GetFloat(), ( Plat_FloatTime() - s_flPlatFloatTimeBeginUptime ) / 3600.0,
-						ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), sv_memlimit.GetInt() );
+						ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), memlimit );
 					bExit = true;
 				}
 			}
