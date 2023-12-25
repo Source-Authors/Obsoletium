@@ -140,7 +140,7 @@ COM_ExtendedExplainDisconnection
 
 ==============================
 */
-void COM_ExtendedExplainDisconnection( bool bPrint, const char *fmt, ... )
+static void COM_ExtendedExplainDisconnection( bool bPrint, const char *fmt, ... )
 {
 	if ( IsX360() )
 	{
@@ -287,36 +287,38 @@ Parse a line out of a string
 */
 const char *COM_ParseLine (const char *data)
 {
-	int c;
-	int len;
-	
-	len = 0;
-	com_token[0] = 0;
+	com_token[0] = '\0';
 	
 	if (!data)
-		return NULL;
+		return nullptr;
 
-	c = *data;
+	size_t len = 0;
+	int c = *data;
 
 // parse a line out of the data
 	do
 	{
 		com_token[len] = c;
+
 		data++;
 		len++;
-		c = *data;
-	} while ( ( c>=' ' || c < 0 || c == '\t' ) && ( len < COM_TOKEN_MAX_LENGTH - 1 ) );
-	
-	com_token[len] = 0;
 
-	if (c==0) // end of file
-		return NULL;
+		c = *data;
+	} while ( ( c >= ' ' || c < 0 || c == '\t' ) && len < std::size(com_token) - 1 );
+	
+	com_token[len] = '\0';
+
+	// end of file
+	if (c == '\0')
+		return nullptr;
 
 // eat whitespace (LF,CR,etc.) at the end of this line
 	while ( (c = *data) < ' ' )
 	{
-		if (c == 0)
-			return NULL;                    // end of file;
+		// end of file
+		if (c == '\0')
+			return nullptr;
+
 		data++;
 	}
 
@@ -332,9 +334,7 @@ Returns 1 if additional data is waiting to be processed on this line
 */
 int COM_TokenWaiting( const char *buffer )
 {
-	const char *p;
-
-	p = buffer;
+	const char *p = buffer;
 	while ( *p && *p!='\n')
 	{
 		if ( !V_isspace( *p ) || V_isalnum( *p ) )
