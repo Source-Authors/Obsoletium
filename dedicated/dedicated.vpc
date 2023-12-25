@@ -19,8 +19,8 @@ $Configuration
 		$AdditionalIncludeDirectories		"$BASE;.\;$SRCDIR\engine"
 		$AdditionalIncludeDirectories		"$BASE;$SDL3SRCDIR;$SDL3SRCDIR/include" [$SDL]
 		$PreprocessorDefinitions			"$BASE;DEDICATED;LAUNCHERONLY;SUPPORT_PACKED_STORE"
-		// dimhotepus: Enable exceptions as we use them in a single place
-		$EnableC++Exceptions				"Yes (/EHsc)"
+		// dimhotepus: Enable exceptions + SEH as we use them in a single place
+		$EnableC++Exceptions				"Yes with SEH Exceptions (/EHa)"
 	}
 
 	$Linker
