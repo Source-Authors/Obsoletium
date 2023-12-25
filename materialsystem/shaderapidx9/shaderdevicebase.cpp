@@ -917,7 +917,7 @@ void* CShaderDeviceMgrBase::ShaderInterfaceFactory( const char *pInterfaceName, 
 CShaderDeviceBase::CShaderDeviceBase()
 {
 	m_bInitialized = false;
-	m_nAdapter = -1;
+	m_nAdapter = UINT_MAX;
 	m_hWnd = NULL;
 	m_hWndCookie = NULL;
 	m_dwThreadId = ThreadGetCurrentId();
