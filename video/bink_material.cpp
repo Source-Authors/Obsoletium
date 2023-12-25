@@ -650,7 +650,7 @@ int CBinkMaterial::GetCurrentFrame()
 {
 	AssertExitV( m_bMoviePlaying, -1 );
 
-	float curTime; // = m_bMoviePaused ? m_MoviePauseTime : GetMovieTime( m_QTMovie, nullptr );
+	float curTime = m_bMoviePaused ? m_MoviePauseTime : 0; //GetMovieTime( m_QTMovie, nullptr );
 
 	return curTime / m_QTMovieFrameRate.GetUnitsPerFrame();
 }
@@ -660,7 +660,7 @@ float CBinkMaterial::GetCurrentVideoTime()
 {
 	AssertExitV( m_bMoviePlaying, -1.0f );
 
-	float curTime; // = m_bMoviePaused ? m_MoviePauseTime : GetMovieTime( m_QTMovie, nullptr );
+	float curTime = m_bMoviePaused ? m_MoviePauseTime : 0; //GetMovieTime( m_QTMovie, nullptr );
 
 	return curTime / m_QTMovieFrameRate.GetUnitsPerSecond();
 }
@@ -682,7 +682,7 @@ bool CBinkMaterial::SetTime( float flTime )
 		return true;
 	}
 
-	float curMovieTime; // = GetMovieTime( m_QTMovie, nullptr );
+	float curMovieTime = 0; // = GetMovieTime( m_QTMovie, nullptr );
 
 	// Don't stop and reset movie if we are within 1 frame of the requested time
 	if ( newTime <= curMovieTime - m_QTMovieFrameRate.GetUnitsPerFrame() || newTime >= curMovieTime + m_QTMovieFrameRate.GetUnitsPerFrame() )
