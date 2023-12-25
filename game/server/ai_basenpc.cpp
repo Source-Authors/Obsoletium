@@ -13557,8 +13557,8 @@ void CAI_BaseNPC::CheckForcedNPCInteractions( void )
 	}
 
 	// Check to see if we can start our interaction. If we can, dance.
-	Vector vecOrigin;
-	QAngle angAngles;
+	Vector vecOrigin = {};
+	QAngle angAngles = {};
 
 	ScriptedNPCInteraction_t *pInteraction = &m_ScriptedInteractions[m_iInteractionPlaying];
 
