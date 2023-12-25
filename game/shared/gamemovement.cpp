@@ -517,35 +517,6 @@ void CGameMovement::DiffPrint( char const *fmt, ... )
 
 #endif // !PREDICTION_ERROR_CHECK_LEVEL
 
-#ifndef _XBOX
-void COM_Log( const char *pszFile, const char *fmt, ...)
-{
-	va_list		argptr;
-	char		string[1024];
-	FileHandle_t fp;
-	const char *pfilename;
-	
-	if ( !pszFile )
-	{
-		pfilename = "hllog.txt";
-	}
-	else
-	{
-		pfilename = pszFile;
-	}
-	va_start (argptr,fmt);
-	Q_vsnprintf(string, sizeof( string ), fmt,argptr);
-	va_end (argptr);
-
-	fp = filesystem->Open( pfilename, "a+t");
-	if (fp)
-	{
-		filesystem->FPrintf(fp, "%s", string);
-		filesystem->Close(fp);
-	}
-}
-#endif
-
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: Debug - draw the displacement collision plane.
