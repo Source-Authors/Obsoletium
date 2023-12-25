@@ -383,51 +383,45 @@ bool CQcData::ParseQc(
 
 	if ( _access( qcPath.Get(), 04 ) == 0 )
 	{
-		try
+		std::string buf;
+		std::ifstream ifs( qcPath.Get() );
+
+		CUtlVector< CUtlString > tokens;
+
+		while ( std::getline( ifs, buf ) )
 		{
-			std::string buf;
-			std::ifstream ifs( qcPath.Get() );
+			Tokenize( tokens, buf.c_str() );
 
-			CUtlVector< CUtlString > tokens;
+			if ( tokens.Count() < 1 )
+				continue;
 
-			while ( std::getline( ifs, buf ) )
+			if ( !V_stricmp( tokens[0], "$upaxis" ) )
 			{
-				Tokenize( tokens, buf.c_str() );
-
-				if ( tokens.Count() < 1 )
-					continue;
-
-				if ( !V_stricmp( tokens[0], "$upaxis" ) )
+				if ( strchr( tokens[1].Get(), 'y' ) || strchr( tokens[1].Get(), 'Y' ) )
 				{
-					if ( strchr( tokens[1].Get(), 'y' ) || strchr( tokens[1].Get(), 'Y' ) )
-					{
-						m_nUpAxis = CDmSmdSerializer::Y_AXIS;
-					}
-					else if ( strchr( tokens[1].Get(), 'x' ) || strchr( tokens[1].Get(), 'X' ) )
-					{
-						m_nUpAxis = CDmSmdSerializer::X_AXIS;
-					}
-					else
-					{
-						m_nUpAxis = CDmSmdSerializer::Z_AXIS;
-					}
+					m_nUpAxis = CDmSmdSerializer::Y_AXIS;
 				}
-				else if ( !V_stricmp( tokens[0], "$scale" ) )
+				else if ( strchr( tokens[1].Get(), 'x' ) || strchr( tokens[1].Get(), 'X' ) )
 				{
-					// dimhotepus: strtod -> strtof
-					m_scale = strtof( tokens[1].Get(), NULL );
+					m_nUpAxis = CDmSmdSerializer::X_AXIS;
 				}
-				else if ( !V_stricmp( tokens[0], "$cdmaterials" ) )
+				else
 				{
-					m_cdmaterials.push_back( tokens[1].Get() );
+					m_nUpAxis = CDmSmdSerializer::Z_AXIS;
 				}
 			}
+			else if ( !V_stricmp( tokens[0], "$scale" ) )
+			{
+				// dimhotepus: strtod -> strtof
+				m_scale = strtof( tokens[1].Get(), NULL );
+			}
+			else if ( !V_stricmp( tokens[0], "$cdmaterials" ) )
+			{
+				m_cdmaterials.push_back( tokens[1].Get() );
+			}
+		}
 
-			bRetVal = true;
-		}
-		catch ( ... )
-		{
-		}
+		bRetVal = true;
 	}
 
 	if ( m_cdmaterials.empty() )
