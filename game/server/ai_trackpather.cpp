@@ -800,8 +800,8 @@ CPathTrack *CAI_TrackPather::FindClosestPointOnPath( CPathTrack *pPath,
 
 	// Find the nearest node to the target (going forward)
 	CPathTrack *pNearestPath	= NULL;
-	float		flNearestDist2D	= 999999999;
-	float		flNearestDist	= 999999999;
+	float		flNearestDist2D	= std::numeric_limits<float>::max();
+	float		flNearestDist	= std::numeric_limits<float>::max();
 	float		flPathDist, flPathDist2D;
 
 	// NOTE: Gotta do it this crazy way because paths can be one-way.

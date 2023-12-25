@@ -21,6 +21,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#undef max
+#undef min
+
 // Minimum time between leader nags
 #define LEAD_NAG_TIME		3.0
 
@@ -265,8 +268,8 @@ bool CAI_LeadBehavior::GetClosestPointOnRoute( const Vector &targetPos, Vector *
 	}
 
 	// Find the nearest node to the target (going forward)
-	float		flNearestDist2D	= 999999999;
-	float		flNearestDist	= 999999999;
+	float		flNearestDist2D	= std::numeric_limits<float>::max();
+	float		flNearestDist	= std::numeric_limits<float>::max();
 	float		flPathDist, flPathDist2D;
 
 	Vector vecNearestPoint(0, 0, 0);
