@@ -283,7 +283,7 @@ public:
 const char *COM_GetModDirectory()
 {
 	static char modDir[MAX_PATH];
-	if ( Q_strlen( modDir ) == 0 )
+	if ( Q_isempty( modDir ) )
 	{
 		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
 		Q_strncpy( modDir, gamedir, sizeof(modDir) );

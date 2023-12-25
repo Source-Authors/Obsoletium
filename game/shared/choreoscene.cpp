@@ -313,11 +313,11 @@ void CChoreoScene::PrintEvent( int level, CChoreoEvent *e )
 	choreoprintf( level, "{\n" );
 	choreoprintf( level + 1, "time %f %f\n", e->GetStartTime(), e->GetEndTime() );
 	choreoprintf( level + 1, "param \"%s\"\n", e->GetParameters() );
-	if ( strlen( e->GetParameters2() ) > 0 )
+	if ( !Q_isempty( e->GetParameters2() ) )
 	{
 		choreoprintf( level + 1, "param2 \"%s\"\n", e->GetParameters2() );
 	}
-	if ( strlen( e->GetParameters3() ) > 0 )
+	if ( !Q_isempty( e->GetParameters3() ) )
 	{
 		choreoprintf( level + 1, "param3 \"%s\"\n", e->GetParameters3() );
 	}
@@ -575,7 +575,7 @@ void CCurveData::Parse( ISceneTokenProcessor *tokenizer, ICurveDataAccessor *dat
 		// Parse until }
 		tokenizer->GetToken( true );
 		
-		if ( strlen( tokenizer->CurrentToken() ) <= 0 )
+		if ( Q_isempty( tokenizer->CurrentToken() ) )
 		{
 			tokenizer->Error( "expecting ramp data\n" );
 			break;
@@ -713,7 +713,7 @@ void CChoreoScene::ParseFlexAnimations( ISceneTokenProcessor *tokenizer, CChoreo
 		// Parse until }
 		tokenizer->GetToken( true );
 		
-		if ( strlen( tokenizer->CurrentToken() ) <= 0 )
+		if ( Q_isempty( tokenizer->CurrentToken() ) )
 		{
 			tokenizer->Error( "expecting flex animation data\n" );
 			break;
@@ -780,7 +780,7 @@ void CChoreoScene::ParseFlexAnimations( ISceneTokenProcessor *tokenizer, CChoreo
 			{
 				tokenizer->GetToken( true );
 				
-				if ( strlen( tokenizer->CurrentToken() ) <= 0 )
+				if ( Q_isempty( tokenizer->CurrentToken() ) )
 				{
 					tokenizer->Error( "expecting flex animation data\n" );
 					break;
@@ -907,7 +907,7 @@ CChoreoEvent *CChoreoScene::ParseEvent( CChoreoActor *actor, CChoreoChannel *cha
 		if ( !Q_stricmp( m_pTokenizer->CurrentToken(), "}" ) )
 			break;
 
-		if ( strlen( m_pTokenizer->CurrentToken() ) <= 0 )
+		if ( Q_isempty( m_pTokenizer->CurrentToken() ) )
 		{
 			m_pTokenizer->Error( "expecting more tokens!" );
 			break;
@@ -1026,7 +1026,7 @@ CChoreoEvent *CChoreoScene::ParseEvent( CChoreoActor *actor, CChoreoChannel *cha
 				// Parse until }
 				m_pTokenizer->GetToken( true );
 
-				if ( strlen( m_pTokenizer->CurrentToken() ) <= 0 )
+				if ( Q_isempty( m_pTokenizer->CurrentToken() ) )
 				{
 					m_pTokenizer->Error( "expecting relative tag\n" );
 					break;
@@ -1077,7 +1077,7 @@ CChoreoEvent *CChoreoScene::ParseEvent( CChoreoActor *actor, CChoreoChannel *cha
 				// Parse until }
 				m_pTokenizer->GetToken( true );
 
-				if ( strlen( m_pTokenizer->CurrentToken() ) <= 0 )
+				if ( Q_isempty( m_pTokenizer->CurrentToken() ) )
 				{
 					m_pTokenizer->Error( "expecting relative tag\n" );
 					break;
@@ -1109,7 +1109,7 @@ CChoreoEvent *CChoreoScene::ParseEvent( CChoreoActor *actor, CChoreoChannel *cha
 				// Parse until }
 				m_pTokenizer->GetToken( true );
 
-				if ( strlen( m_pTokenizer->CurrentToken() ) <= 0 )
+				if ( Q_isempty( m_pTokenizer->CurrentToken() ) )
 				{
 					m_pTokenizer->Error( "expecting relative tag\n" );
 					break;
@@ -1387,7 +1387,7 @@ bool CChoreoScene::ParseFromBuffer( const char *pFilename, ISceneTokenProcessor 
 			break;
 		}
 
-		if ( strlen( m_pTokenizer->CurrentToken() ) <= 0 )
+		if ( Q_isempty( m_pTokenizer->CurrentToken() ) )
 			break;
 
 		if ( !Q_stricmp( m_pTokenizer->CurrentToken(), "event" ) )
@@ -1990,11 +1990,11 @@ void CChoreoScene::FileSaveEvent( CUtlBuffer& buf, int level, CChoreoEvent *e )
 
 	FilePrintf( buf, level + 1, "time %f %f\n", st, et );
 	FilePrintf( buf, level + 1, "param \"%s\"\n", e->GetParameters() );
-	if ( strlen( e->GetParameters2() ) > 0 )
+	if ( !Q_isempty( e->GetParameters2() ) )
 	{
 		FilePrintf( buf, level + 1, "param2 \"%s\"\n", e->GetParameters2() );
 	}
-	if ( strlen( e->GetParameters3() ) > 0 )
+	if ( !Q_isempty( e->GetParameters3() ) )
 	{
 		FilePrintf( buf, level + 1, "param3 \"%s\"\n", e->GetParameters3() );
 	}
@@ -2185,7 +2185,7 @@ void CChoreoScene::FileSaveActor( CUtlBuffer& buf, int level, CChoreoActor *a )
 		}
 	}
 
-	if ( Q_strlen( a->GetFacePoserModelName() ) > 0 )
+	if ( !Q_isempty( a->GetFacePoserModelName() ) )
 	{
 		FilePrintf( buf, level + 1, "faceposermodel \"%s\"\n", a->GetFacePoserModelName() );
 	}
@@ -3248,7 +3248,7 @@ void CChoreoScene::ImportEvents( ISceneTokenProcessor *tokenizer, CChoreoActor *
 			break;
 		}
 
-		if ( strlen( m_pTokenizer->CurrentToken() ) <= 0 )
+		if ( Q_isempty( m_pTokenizer->CurrentToken() ) )
 			break;
 
 		if ( !Q_stricmp( m_pTokenizer->CurrentToken(), "event" ) )
@@ -3421,7 +3421,7 @@ void CChoreoScene::ParseScaleSettings( ISceneTokenProcessor *tokenizer, CChoreoS
 		// Parse until }
 		tokenizer->GetToken( true );
 		
-		if ( strlen( tokenizer->CurrentToken() ) <= 0 )
+		if ( Q_isempty( tokenizer->CurrentToken() ) )
 		{
 			tokenizer->Error( "expecting scalesettings data\n" );
 			break;

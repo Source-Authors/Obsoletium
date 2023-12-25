@@ -181,7 +181,7 @@ void CTeamplayRules::InitHUD( CBasePlayer *pPlayer )
 	}
 
 	ChangePlayerTeam( pPlayer, pPlayer->TeamName(), false, false );
-	if ( Q_strlen( pPlayer->TeamName() ) > 0 )
+	if ( !Q_isempty( pPlayer->TeamName() ) )
 	{
 		UTIL_SayText( text, pPlayer );
 	}

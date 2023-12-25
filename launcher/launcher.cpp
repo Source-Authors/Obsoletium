@@ -342,7 +342,7 @@ void CLogAllFiles::Init( char (&baseDirectory)[MAX_PATH] )
 		Q_strlower( szDir );
 #endif
 		Q_FixSlashes( szDir );
-		if ( Q_strlen( szDir ) > 0 )
+		if ( !Q_isempty( szDir ) )
 		{
 			m_sResListDir = szDir;
 		}

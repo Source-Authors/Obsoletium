@@ -701,7 +701,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 	params.fixedConstraints = false;
 	RagdollCreate( m_ragdoll, params, physenv );
 	RagdollApplyAnimationAsVelocity( m_ragdoll, pPrevBones, pBoneToWorld, dt );
-	if ( m_anglesOverrideString != NULL_STRING && Q_strlen(m_anglesOverrideString.ToCStr()) > 0 )
+	if ( m_anglesOverrideString != NULL_STRING && !Q_isempty(m_anglesOverrideString.ToCStr()) )
 	{
 		char szToken[2048];
 		const char *pStr = nexttoken(szToken, STRING(m_anglesOverrideString), ',');

@@ -246,7 +246,7 @@ const unsigned char *CBaseCombatWeapon::GetEncryptionKey( void )
 void CBaseCombatWeapon::Precache( void )
 {
 #if defined( CLIENT_DLL )
-	Assert( Q_strlen( GetClassname() ) > 0 );
+	Assert( !Q_isempty( GetClassname() ) );
 	// Msg( "Client got %s\n", GetClassname() );
 #endif
 	m_iPrimaryAmmoType = m_iSecondaryAmmoType = -1;

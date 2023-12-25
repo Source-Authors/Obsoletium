@@ -9117,7 +9117,7 @@ bool DSP_LoadPresetFile( void )
 		{
 			pstart = COM_Parse( pstart );
 		
-			if ( strlen(com_token) <= 0)
+			if ( Q_isempty(com_token) )
 				break;
 
 			if ( com_token[0] != CHAR_LEFT_PAREN )
@@ -9212,7 +9212,7 @@ bool DSP_LoadPresetFile( void )
 			{
 				pstart = COM_Parse( pstart );
 
-				if ( strlen(com_token) <= 0)
+				if ( Q_isempty(com_token) )
 					break;
 
 				if ( com_token[0] == CHAR_RIGHT_PAREN )

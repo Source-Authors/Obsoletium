@@ -179,7 +179,7 @@ void CPluginGameUIDialog::OnCommand( const char *cmd )
 {
 	if ( !Q_stricmp( cmd, "close" ) )
 	{
-		if ( Q_strlen(m_szEntryCommand) > 0 )
+		if ( !Q_isempty(m_szEntryCommand) )
 		{
 			// Check that we can add the two execution markers
 			if ( !Cbuf_HasRoomForExecutionMarkers( 2 ) )

@@ -450,7 +450,7 @@ void CHudCredits::DrawLogo( void )
 	surface()->DrawSetTextPos( ( iWidth / 2 ) - ( iStringWidth / 2 ), ( iTall / 2 ) - ( iFontTall / 2 ) );
 	surface()->DrawUnicodeString( unicode );
 
-	if ( Q_strlen( m_szLogo2 ) > 0 )
+	if ( !Q_isempty( m_szLogo2 ) )
 	{
 		g_pVGuiLocalize->ConvertANSIToUnicode( m_szLogo2, unicode, sizeof( unicode ) );
 

@@ -674,7 +674,7 @@ CVGui::Tick_t* CVGui::CreateNewTick( VPANEL panel, int intervalMilliseconds )
 	t->nexttick = g_pSystem->GetTimeMillis() + t->interval;
 	t->bMarkDeleted = false;
 
-	if ( strlen( ((VPanel *)panel)->Client()->GetName() ) > 0 )
+	if ( !Q_isempty( ((VPanel *)panel)->Client()->GetName() ) )
 	{
 		strncpy( t->panelname, ((VPanel *)panel)->Client()->GetName(), sizeof( t->panelname ) );
 	}

@@ -96,12 +96,12 @@ void CImageMouseOverButton<T>::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
 	MouseOverButton<T>::ApplySchemeSettings( pScheme );
 
-	if ( m_pszActiveImageName && strlen( m_pszActiveImageName ) > 0 )
+	if ( m_pszActiveImageName && !Q_isempty( m_pszActiveImageName ) )
 	{
 		this->SetActiveImage( vgui::scheme()->GetImage( m_pszActiveImageName, m_bScaleImage ) );
 	}
 
-	if ( m_pszInactiveImageName && strlen( m_pszInactiveImageName ) > 0 )
+	if ( m_pszInactiveImageName && !Q_isempty( m_pszInactiveImageName ) )
 	{
 		this->SetInactiveImage( vgui::scheme()->GetImage( m_pszInactiveImageName, m_bScaleImage ) );
 	}

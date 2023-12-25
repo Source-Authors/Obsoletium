@@ -335,7 +335,7 @@ EOSType GetOSTypeFromString_Deprecated( const char *pchName )
 
 	// if this fires, make sure all OS types are in the map
 	Assert( Q_ARRAYSIZE( k_rgOSTypeToName ) == k_eOSTypeMax ); 
-	if ( !pchName || Q_strlen( pchName ) == 0 )
+	if ( !pchName || Q_isempty( pchName ) )
 		return eOSType;
 
 	for ( int iOS = 0; iOS < Q_ARRAYSIZE( k_rgOSTypeToName ) ; iOS++ )

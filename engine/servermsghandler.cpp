@@ -507,7 +507,7 @@ bool CClientState::ProcessVoiceData( SVC_VoiceData *msg )
 	player_info_t playerinfo;
 	engineClient->GetPlayerInfo( iEntity, &playerinfo );
 
-	if ( Q_strlen( cl_voice_filter.GetString() ) > 0 && Q_strstr( playerinfo.name, cl_voice_filter.GetString() ) == NULL )
+	if ( !Q_isempty( cl_voice_filter.GetString() ) && Q_strstr( playerinfo.name, cl_voice_filter.GetString() ) == NULL )
 		return true;
 
 #if defined( REPLAY_ENABLED )

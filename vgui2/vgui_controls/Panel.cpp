@@ -2462,7 +2462,7 @@ wchar_t const *Panel::KeyCodeToDisplayString( KeyCode code )
 static void AddModifierToString( char const *modifiername, char *buf, size_t bufsize )
 {
 	char add[ 32 ];
-	if ( Q_strlen( buf ) > 0 )
+	if ( !Q_isempty( buf ) )
 	{
 		Q_snprintf( add, sizeof( add ), "+%s", modifiername );
 	}

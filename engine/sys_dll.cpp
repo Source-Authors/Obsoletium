@@ -1513,7 +1513,7 @@ void Sys_CreateFileAssociations( int count, FileAssociationInfo *list )
 		// Create file association for our .exe
 		// HKEY_CLASSES_ROOT/.dem == "Valve.Source"
 		Sys_GetRegKeyValueUnderRoot( HKEY_CLASSES_ROOT, fa->extension, "", binding, sizeof(binding), "" );
-		if ( Q_strlen( binding ) == 0 )
+		if ( Q_isempty( binding ) )
 		{
 			Sys_SetRegKeyValueUnderRoot( HKEY_CLASSES_ROOT, fa->extension, "", SOURCE_ENGINE_APP_CLASS );
 		}

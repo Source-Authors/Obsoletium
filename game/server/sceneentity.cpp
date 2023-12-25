@@ -2916,7 +2916,7 @@ void CSceneEntity::StartEvent( float currenttime, CChoreoScene *scene, CChoreoEv
 			if ( pActor && !IsMultiplayer() )
 			{
 				CBaseEntity *pActor2 = NULL;
-				if ( event->GetParameters3( ) && strlen( event->GetParameters3( ) ) > 0 )
+				if ( event->GetParameters3( ) && !Q_isempty( event->GetParameters3( ) ) )
 				{
 					pActor2 = FindNamedEntityClosest( event->GetParameters( ), pActor, false, true, event->GetParameters3( ) );
 				}
@@ -3874,7 +3874,7 @@ CBaseEntity *CSceneEntity::FindNamedEntityClosest( const char *name, CBaseEntity
 
 	if (pActor && pActor->MyNPCPointer())
 	{
-		if (pszSecondary && strlen( pszSecondary ) > 0)
+		if (pszSecondary && !Q_isempty( pszSecondary ))
 		{
 			CBaseEntity *pActor2 = FindNamedEntityClosest( pszSecondary, pActor, false, false, NULL );
 

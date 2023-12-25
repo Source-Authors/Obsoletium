@@ -824,7 +824,7 @@ COM_GetModDirectory - return the final directory in the game dir (i.e "cstrike",
 const char *COM_GetModDirectory()
 {
 	static char modDir[MAX_PATH];
-	if ( Q_strlen( modDir ) == 0 )
+	if ( Q_isempty( modDir ) )
 	{
 		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
 		Q_strncpy( modDir, gamedir, sizeof(modDir) );
@@ -903,7 +903,7 @@ void COM_InitFilesystem( const char *pFullModPath )
 			}
 		}
 
-		if ( ( Q_strlen(language) > 0 ) && ( Q_stricmp(language, "english") ) )
+		if ( ( !Q_isempty(language) ) && ( Q_stricmp(language, "english") ) )
 		{
 			initInfo.m_pLanguage = language;
 		}
@@ -1176,7 +1176,7 @@ bool COM_IsValidPath( const char *pszFilename )
 		return false;
 	}
 
-	if ( Q_strlen( pszFilename ) <= 0    ||
+	if ( Q_isempty( pszFilename )    ||
 		Q_strstr( pszFilename, "\\\\" ) ||	// to protect network paths
 		Q_strstr( pszFilename, ":" )    || // to protect absolute paths
 		Q_strstr( pszFilename, ".." ) ||   // to protect relative paths

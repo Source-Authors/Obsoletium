@@ -2357,11 +2357,11 @@ bool CHudCloseCaption::AddAsyncWork( const char *tokenstream, bool bIsStream, fl
 		const char *p = tokenstream;
 		p = nexttoken( tokenname, p, ' ' );
 		// p points to reset of sentence tokens, build up a unicode string from them...
-		while ( p && Q_strlen( tokenname ) > 0 )
+		while ( p && !Q_isempty( tokenname ) )
 		{
 			p = nexttoken( tokenname, p, ' ' );
 
-			if ( Q_strlen( tokenname ) == 0 )
+			if ( Q_isempty( tokenname ) )
 				break;
 
 			async->AddToken
@@ -2396,7 +2396,7 @@ void CHudCloseCaption::ProcessSentenceCaptionStream( const char *tokenstream )
 
 	p = nexttoken( tokenname, p, ' ' );
 
-	if ( Q_strlen( tokenname ) > 0 )
+	if ( !Q_isempty( tokenname ) )
 	{
 		//  Use it to check for "norepeat" rules
 		CaptionRepeat entry;
@@ -2757,7 +2757,7 @@ void OnCaptionLanguageChanged( IConVar *pConVar, const char *pOldString, float f
 	CHudCloseCaption *hudCloseCaption = GET_HUDELEMENT( CHudCloseCaption );
 
 	// If it's not the default, load the language on top of the user's default language
-	if ( Q_strlen( var.GetString() ) > 0 && Q_stricmp( var.GetString(), uilanguage ) )
+	if ( !Q_isempty( var.GetString() ) && Q_stricmp( var.GetString(), uilanguage ) )
 	{
 		if ( !IsX360() )
 		{

@@ -218,7 +218,7 @@ public:
 					while ( 1 )
 					{
 						pFileList = COM_Parse( pFileList );
-						if ( strlen( com_token ) <= 0 )
+						if ( Q_isempty( com_token ) )
 							break;
 
 						char manifest_file[ 512 ];
@@ -283,7 +283,7 @@ public:
 						char resfile[ 512 ];
 
 						pFileList = COM_Parse( pFileList );
-						if ( strlen( com_token ) <= 0 )
+						if ( Q_isempty( com_token ) )
 							break;
 
 						Q_snprintf( resfile, sizeof( resfile ), "%s\\%s.lst", reslistdir, com_token );
@@ -427,7 +427,7 @@ private:
 					while ( 1 )
 					{
 						pFileList = COM_Parse( pFileList );
-						if ( strlen( com_token ) <= 0 )
+						if ( Q_isempty( com_token ) )
 							break;
 
 						if ( checkandcleanname )

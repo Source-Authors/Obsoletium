@@ -1860,7 +1860,7 @@ void CBugUIPanel::OnSubmit()
 	if ( isPublic )
 	{
 		m_pEmail->GetText( email, sizeof( email ) );
-		if ( Q_strlen( email ) > 0 )
+		if ( !Q_isempty( email ) )
 		{
 			Msg( "email %s\n", email );
 		}

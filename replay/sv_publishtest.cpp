@@ -107,7 +107,7 @@ bool CPublishTester::Test_Emptyness( const char *pDescription, const char *pStr,
 	g_pBlockSpewer->PrintValue( pDescription, pStr );
 	g_pBlockSpewer->PrintEventStartMsg( "Validating" );
 
-	if ( V_strlen( pStr ) == 0 )
+	if ( Q_isempty( pStr ) )
 	{
 		g_pBlockSpewer->PrintEventResult( false );
 		g_pBlockSpewer->PrintEventError( "Empty!" );
@@ -145,7 +145,7 @@ bool CPublishTester::Test_Path( const char *pDescription, const char *pPath, boo
 {
 	g_pBlockSpewer->PrintValue( pDescription, pPath );
 	g_pBlockSpewer->PrintEventStartMsg( "Validating" );
-	if ( V_strlen( pPath ) == 0 )
+	if ( Q_isempty( pPath ) )
 	{
 		g_pBlockSpewer->PrintEventResult( false );
 		g_pBlockSpewer->PrintEventError( "Empty path not allowed." );

@@ -368,7 +368,7 @@ void ValidateName( char *pszName, int nBuffSize )
 		return;
 
 	// did we get an empty string for the name?
-	if ( Q_strlen( pszName ) <= 0 )
+	if ( Q_isempty( pszName ) )
 	{
 		Q_snprintf( pszName, nBuffSize, "unnamed" );
 	}

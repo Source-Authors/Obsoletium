@@ -261,7 +261,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 		// append the language
 		if ( bValid )
 		{
-			if ( strlen(language) != 0 && stricmp(language, ENGLISH_STRING) != 0 )
+			if ( !Q_isempty(language) && stricmp(language, ENGLISH_STRING) != 0 )
 			{
 				// copy out the initial part of the string
 				offs = langptr - szFileName;

@@ -336,7 +336,7 @@ void CServerBrowserDialog::UpdateStatusText(const char *fmt, ...)
 	if ( !m_pStatusLabel )
 		return;
 
-	if ( fmt && strlen(fmt) > 0 )
+	if ( fmt && !Q_isempty(fmt) )
 	{
 		char str[ 1024 ];
 		va_list argptr;

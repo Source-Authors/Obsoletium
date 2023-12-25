@@ -249,7 +249,7 @@ void CChoreoActor::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoS
 	}
 
 	/*
-	if ( Q_strlen( a->GetFacePoserModelName() ) > 0 )
+	if ( !Q_isempty( a->GetFacePoserModelName() ) )
 	{
 		FilePrintf( buf, level + 1, "faceposermodel \"%s\"\n", a->GetFacePoserModelName() );
 	}

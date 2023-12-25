@@ -25,7 +25,7 @@ bool CServerRecordingSessionBlock::Read( KeyValues *pIn )
 		return false;
 
 	m_nWriteStatus = (WriteStatus_t)pIn->GetInt( "write_status", (int)WRITESTATUS_INVALID );	Assert( m_nWriteStatus != WRITESTATUS_INVALID );
-	V_strcpy_safe( m_szFullFilename, pIn->GetString( "filename" ) );			Assert( V_strlen( m_szFullFilename ) > 0 );
+	V_strcpy_safe( m_szFullFilename, pIn->GetString( "filename" ) );			Assert( !Q_isempty( m_szFullFilename ) );
 
 	return true;
 }

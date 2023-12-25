@@ -1131,12 +1131,12 @@ void UseDefaultBindings( void )
 	while ( 1 )
 	{
 		buf = COM_ParseFile( buf, token, sizeof( token ) );
-		if ( strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 			break;
 		Q_strncpy ( szKeyName, token, sizeof( szKeyName ) );
 
 		buf = COM_ParseFile( buf, token, sizeof( token ) );
-		if ( strlen( token ) <= 0 )  // Error
+		if ( Q_isempty( token ) )  // Error
 			break;
 
 		// finally, bind key
@@ -3699,12 +3699,12 @@ bool IsLowViolence_Registry()
 	Sys_GetRegKeyValue( szSubKey, "User Token 2", szBuffer,	nBufferLen, szBuffer );
 
 	// Gore reduction active?
-	bReducedGore = ( Q_strlen( szBuffer ) > 0 ) ? true : false;
+	bReducedGore = !Q_isempty( szBuffer );
 	if ( !bReducedGore )
 	{
 		Sys_GetRegKeyValue( szSubKey, "User Token 3", szBuffer, nBufferLen, szBuffer );
 
-		bReducedGore = ( Q_strlen( szBuffer ) > 0 ) ? true : false;
+		bReducedGore = !Q_isempty( szBuffer );
 	}
 
 	char gamedir[MAX_OSPATH];
@@ -3717,13 +3717,13 @@ bool IsLowViolence_Registry()
 	Q_strncpy( szBuffer, "", sizeof( szBuffer ) );
 
 	Sys_GetRegKeyValue( szSubKey, "User Token 2", szBuffer,	nBufferLen, szBuffer );
-	if ( Q_strlen( szBuffer ) > 0 )
+	if ( !Q_isempty( szBuffer ) )
 	{
 		bReducedGore = true;
 	}
 
 	Sys_GetRegKeyValue( szSubKey, "User Token 3", szBuffer,	nBufferLen, szBuffer );
-	if ( Q_strlen( szBuffer ) > 0 )
+	if ( !Q_isempty( szBuffer ) )
 	{
 		bReducedGore = true;
 	}

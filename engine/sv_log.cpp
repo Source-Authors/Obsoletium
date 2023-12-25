@@ -570,7 +570,7 @@ void CLog::FireGameEvent( IGameEvent *event )
 			const char *pszCmdGiver = event->GetString( "by" );
 			const char *pszResult = NULL;
 			
-			if ( Q_strlen( pszIP ) > 0 )
+			if ( !Q_isempty( pszIP ) )
 			{
 				pszResult = event->GetInt( "kicked" ) > 0 ? "was kicked and banned by IP" : "was banned by IP";
 
@@ -628,7 +628,7 @@ void CLog::FireGameEvent( IGameEvent *event )
 			const char *pszIP = event->GetString( "ip" );	
 			const char *pszCmdGiver = event->GetString( "by" );
 			
-			if ( Q_strlen( pszIP ) > 0 )
+			if ( !Q_isempty( pszIP ) )
 			{
 				Printf( "Removeip: \"<><><>\" was unbanned by \"%s\" (IP \"%s\")\n", 
 								pszCmdGiver,

@@ -1387,7 +1387,7 @@ void COptionsDialogXbox::FillInDefaultBindings( void )
 	{
 		char cmd[64];
 		data = UTIL_Parse( data, cmd, sizeof(cmd) );
-		if ( strlen( cmd ) <= 0 )
+		if ( Q_isempty( cmd ) )
 			break;
 
 		if ( !stricmp(cmd, "bind") )
@@ -1395,12 +1395,12 @@ void COptionsDialogXbox::FillInDefaultBindings( void )
 			// Key name
 			char szKeyName[256];
 			data = UTIL_Parse( data, szKeyName, sizeof(szKeyName) );
-			if ( strlen( szKeyName ) <= 0 )
+			if ( Q_isempty( szKeyName ) )
 				break; // Error
 
 			char szBinding[256];
 			data = UTIL_Parse( data, szBinding, sizeof(szBinding) );
-			if ( strlen( szKeyName ) <= 0 )  
+			if ( Q_isempty( szKeyName ) )
 				break; // Error
 
 			// Bind it

@@ -1135,7 +1135,7 @@ void CClientState::CheckOthersCustomFile( CRC32_t crcValue )
 
 void CClientState::AddCustomFile( int slot, const char *resourceFile)
 {
-	if ( Q_strlen(resourceFile) <= 0 )
+	if ( Q_isempty(resourceFile) )
 		return; // no resource file given
 
 	if ( !COM_IsValidPath( resourceFile ) )

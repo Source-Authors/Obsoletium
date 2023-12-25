@@ -1300,6 +1300,16 @@ size_t Q_URLDecode( OUT_CAP(nDecodeDestLen) char *pchDecodeDest, int nDecodeDest
 #define Q_MakeRelativePath		V_MakeRelativePath
 #define Q_qsort_s				V_qsort_s
 
+inline bool Q_isempty(const char *v) { return v[0] == '\0'; }
+
+inline bool Q_isempty(const wchar_t *v) { return v[0] == L'\0'; }
+
+template<size_t size>
+constexpr inline bool Q_isempty(char (&v)[size]) { return v[0] == '\0'; }
+
+template<size_t size>
+constexpr inline bool Q_isempty(wchar_t (&v)[size]) { return v[0] == L'\0'; }
+
 #endif // !defined( VSTDLIB_DLL_EXPORT )
 
 

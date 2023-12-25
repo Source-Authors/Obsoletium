@@ -161,7 +161,7 @@ void CValveVideoServices::Disconnect()
 
 void* CValveVideoServices::QueryInterface( const char *pInterfaceName )
 {
-	if ( Q_strncmp(	pInterfaceName, VIDEO_SERVICES_INTERFACE_VERSION, Q_strlen( VIDEO_SERVICES_INTERFACE_VERSION ) + 1) == 0 )
+	if ( Q_strncmp(	pInterfaceName, VIDEO_SERVICES_INTERFACE_VERSION, std::size( VIDEO_SERVICES_INTERFACE_VERSION ) ) == 0 )
 	{
 		return (IVideoServices*) this;
 	}

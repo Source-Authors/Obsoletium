@@ -493,7 +493,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	// Get the first token.
 	// The cvar we are setting
 	*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 		return false;
 
 	if ( isNewObject )
@@ -503,7 +503,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 	// Parse the {
 	*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 		return false;
 
 	if ( strcmp( token, "{" ) )
@@ -514,7 +514,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 	// Parse the Prompt
 	*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 		return false;
 
 	if ( isNewObject )
@@ -523,7 +523,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	}
 
 	*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 		return false;
 
 	// If it's not a {, consider it the optional tooltip
@@ -533,7 +533,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 		// Parse the next {
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-		if ( strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 			return false;
 	}
 
@@ -545,7 +545,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 	// Now parse the type:
 	*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 		return false;
 
 	objtype_t newType = GetType( token );
@@ -564,7 +564,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	{
 		// Parse the }
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-		if ( strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 			return false;
 		if ( strcmp( token, "}" ) )
 		{
@@ -574,7 +574,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 		// Parse the final }
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-		if ( strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 			return false;
 		if ( strcmp( token, "}" ) )
 		{
@@ -590,7 +590,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	case O_BOOL:
 		// Parse the next {
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-		if ( strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 			return false;
 
 		if ( strcmp( token, "}" ) )
@@ -603,7 +603,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	case O_SLIDER:
 		// Parse the Min
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-		if ( strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 			return false;
 	
 		if ( isNewObject )
@@ -613,7 +613,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 		// Parse the Min
 		*pBuffer = engine->ParseFile( *pBuffer, token , sizeof( token ));
-		if ( strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 			return false;
 	
 		if ( isNewObject )
@@ -623,7 +623,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 		// Parse the next {
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-		if ( strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 			return false;
 
 		if ( strcmp( token, "}" ) )
@@ -635,7 +635,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	case O_STRING:
 		// Parse the next {
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-		if ( strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 			return false;
 
 		if ( strcmp( token, "}" ) )
@@ -650,7 +650,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 		{
 			// Parse the next {
 			*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-			if ( strlen( token ) <= 0 )
+			if ( Q_isempty( token ) )
 				return false;
 
 			// Done?
@@ -667,7 +667,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 			// Parse the value
 				*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-			if ( strlen( token ) <= 0 )
+			if ( Q_isempty( token ) )
 				return false;
 
 			Q_strncpy( strValue, token, sizeof( strValue ) );
@@ -688,7 +688,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 	// Parse the {
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 		return false;
 
 	if ( strcmp( token, "{" ) )
@@ -699,7 +699,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 	// Parse the default
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	//if ( strlen( token ) <= 0 )
+	//if ( Q_isempty( token ) )
 	//	return false;
 
 	// Set the values
@@ -715,7 +715,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 	// Parse the }
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 		return false;
 
 	if ( strcmp( token, "}" ) )
@@ -726,7 +726,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 	// Parse the final }
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 		return false;
 
 	if ( !stricmp( token, "SetInfo" ) )
@@ -734,7 +734,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 		bSetInfo = true;
 		// Parse the final }
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-		if ( strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 			return false;
 	}
 
@@ -818,7 +818,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 {
 	// Get the first token.
 	*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 		return false;
 
 	// Read VERSION #
@@ -831,7 +831,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 	// Parse in the version #
 	// Get the first token.
 	*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 	{
 		Msg( "Expecting version #" );
 		return false;
@@ -848,7 +848,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 
 	// Get the "DESCRIPTION"
 	*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 		return false;
 
 	// Read DESCRIPTION
@@ -860,7 +860,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 
 	// Parse in the description type
 	*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 	{
 		Msg( "Expecting '%s'", m_pszDescriptionType );
 		return false;
@@ -874,7 +874,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 
 	// Parse the {
 	*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-	if ( strlen( token ) <= 0 )
+	if ( Q_isempty( token ) )
 		return false;
 
 	if ( strcmp( token, "{" ) )
@@ -892,7 +892,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 
 		// Get the first token.
 		*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
-		if ( strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 			return false;
 
 		// Read "cvar name" or  } when done

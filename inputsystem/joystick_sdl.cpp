@@ -85,8 +85,8 @@ void joy_gamecontroller_config_changed_f( IConVar *var, const char *pOldValue, f
 	CInputSystem *pInputSystem = (CInputSystem *)g_pInputSystem;
 	if ( pInputSystem && SDL_WasInit(SDL_INIT_GAMEPAD) )
 	{
-		bool oldValuePresent = pOldValue && ( strlen( pOldValue ) > 0 );
-		bool newValuePresent = ( strlen( joy_gamecontroller_config.GetString() ) > 0 );
+		bool oldValuePresent = pOldValue && !Q_isempty( pOldValue );
+		bool newValuePresent = !Q_isempty( joy_gamecontroller_config.GetString() );
 		if ( !oldValuePresent && !newValuePresent )
 		{
 			return;
@@ -183,7 +183,7 @@ void CInputSystem::InitializeJoysticks( void )
 	if ( CommandLine()->FindParm("-nojoy") ) return;
 
 	const char *controllerConfig = joy_gamecontroller_config.GetString();
-	if ( strlen(controllerConfig) > 0 )
+	if ( !Q_isempty(controllerConfig) )
 	{
 		DevMsg("Passing joy_gamecontroller_config to SDL ('%s').\n", controllerConfig);
 		// We need to pass this hint to SDL *before* we init the gamecontroller subsystem, otherwise it gets ignored.

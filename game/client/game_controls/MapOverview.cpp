@@ -577,7 +577,7 @@ void CMapOverview::DrawObjects( )
 
 		const char *text = NULL;
 
-		if ( Q_strlen(obj->name) > 0 )
+		if ( !Q_isempty(obj->name) )
 			text = obj->name;
 
 		float flAngle = obj->angle[YAW];

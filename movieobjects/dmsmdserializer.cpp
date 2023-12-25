@@ -1145,7 +1145,7 @@ static CDmeMesh *CreateDmeMesh(
 	{
 		V_FileBase( pszFilename, szFileBase, ARRAYSIZE( szFileBase ) );
 
-		if ( V_strlen( szFileBase ) > 0 )
+		if ( !Q_isempty( szFileBase ) )
 		{
 			pszMeshName = szFileBase;
 		}
@@ -1373,7 +1373,7 @@ CDmElement *CDmSmdSerializer::ReadSMD(
 		pszFilename = "unknown";
 	}
 
-	if ( V_strlen( szAnimationName ) > 0 )
+	if ( !Q_isempty( szAnimationName ) )
 	{
 		pDmeModel->SetName( szAnimationName );
 	}

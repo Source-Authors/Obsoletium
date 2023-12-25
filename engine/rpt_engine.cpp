@@ -392,7 +392,7 @@ CON_COMMAND_F( rpt, "Issue an rpt command.", FCVAR_DONTRECORD | FCVAR_HIDDEN )
 		const char *pParam = args[i];
 		// put quotes around empty arguments so we can pass things like this: rcon sv_password ""
 		// otherwise the "" on the end is lost
-		if ( strchr( pParam, ' ' ) || ( Q_strlen( pParam ) == 0 ) )
+		if ( strchr( pParam, ' ' ) || ( Q_isempty( pParam ) ) )
 		{
 			Q_snprintf( szParam, sizeof( szParam ), "\"%s\"", pParam );
 			Q_strncat( message, szParam, sizeof( message ), COPY_ALL_CHARACTERS );

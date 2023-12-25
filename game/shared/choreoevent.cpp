@@ -3931,7 +3931,7 @@ bool CChoreoEvent::ComputeCombinedBaseFileName( char *dest, int destlen, bool cr
 	char cleanedtoken[ MAX_CCTOKEN_STRING ];
 	CleanupTokenName( m_CCToken.Get(), cleanedtoken, sizeof( cleanedtoken ) );
 
-	if ( Q_strlen( cleanedtoken ) <= 0 )
+	if ( Q_isempty( cleanedtoken ) )
 		return false;
 
 	Q_strncpy( vcdpath, m_pScene->GetFilename(), sizeof( vcdpath ) );

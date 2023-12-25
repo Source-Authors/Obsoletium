@@ -31,19 +31,19 @@ bool CEventLog::PrintEvent( IGameEvent *event )
 {
 	const char * name = event->GetName();
 
-	if ( Q_strncmp(name, "server_", strlen("server_")) == 0 )
+	if ( Q_strncmp(name, "server_", std::size("server_") - 1) == 0 )
 	{
 		return true; // we don't care about server events (engine does)
 	}
-	else if ( Q_strncmp(name, "player_", strlen("player_")) == 0 )
+	else if ( Q_strncmp(name, "player_", std::size("player_") - 1) == 0 )
 	{
 		return PrintPlayerEvent( event );
 	}
-	else if ( Q_strncmp(name, "team_", strlen("team_")) == 0 )
+	else if ( Q_strncmp(name, "team_", std::size("team_") - 1) == 0 )
 	{
 		return PrintTeamEvent( event );
 	}
-	else if ( Q_strncmp(name, "game_", strlen("game_")) == 0 )
+	else if ( Q_strncmp(name, "game_", std::size("game_") - 1) == 0 )
 	{
 		return PrintGameEvent( event );
 	}

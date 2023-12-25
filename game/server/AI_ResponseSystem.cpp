@@ -2452,7 +2452,7 @@ void CResponseSystem::ParseEnumeration( void )
 		if ( !Q_stricmp( token, "}" ) )
 			break;
 
-		if ( Q_strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 		{
 			ResponseWarning( "Expecting more tokens in enumeration '%s'\n", enumerationName );
 			break;
@@ -2517,7 +2517,7 @@ void CResponseSystem::ParseRule( void )
 			break;
 		}
 
-		if ( Q_strlen( token ) <= 0 )
+		if ( Q_isempty( token ) )
 		{
 			ResponseWarning( "Expecting more tokens in rule '%s'\n", ruleName );
 			break;

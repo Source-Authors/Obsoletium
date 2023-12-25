@@ -94,7 +94,7 @@ bool CBaseRecordingSessionBlock::ReadHash( KeyValues *pIn, const char *pHashName
 {
 	const char *pHashStr = pIn->GetString( pHashName );
 	bool bResult = false;
-	if ( V_strlen( pHashStr ) > 0 )
+	if ( !Q_isempty( pHashStr ) )
 	{
 		int iHash = 0;
 		char *p = strtok( const_cast< char * >( pHashStr ), " " );

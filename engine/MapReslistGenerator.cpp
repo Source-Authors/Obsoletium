@@ -404,7 +404,7 @@ void CMapReslistGenerator::EnableReslistGeneration( bool usemaplistfile )
 		Q_strlower( szDir );
 		Q_FixSlashes( szDir );
 
-		if ( Q_strlen( szDir ) > 0 )
+		if ( !Q_isempty( szDir ) )
 		{
 			m_sResListDir = szDir;
 		}
@@ -828,7 +828,7 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 					char filename[ MAX_OSPATH ];
 
 					pFileList = COM_Parse( pFileList );
-					if ( strlen( com_token ) <= 0 )
+					if ( Q_isempty( com_token ) )
 						break;
 
 					if ( !Q_stricmp( com_token, "del" ) )
@@ -878,7 +878,7 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 				while ( 1 )
 				{
 					pFileList = COM_Parse( pFileList );
-					if ( strlen( com_token ) <= 0 )
+					if ( Q_isempty( com_token ) )
 						break;
 
 					Q_FixSlashes( com_token );

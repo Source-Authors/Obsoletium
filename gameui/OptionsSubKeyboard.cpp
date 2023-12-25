@@ -204,13 +204,13 @@ void COptionsSubKeyboard::ParseActionDescriptions( void )
 	{
 		data = UTIL_Parse( data, token, sizeof(token) );
 		// Done.
-		if ( strlen( token ) <= 0 )  
+		if ( Q_isempty( token ) )
 			break;
 
 		Q_strncpy( szBinding, token, sizeof( szBinding ) );
 
 		data = UTIL_Parse( data, token, sizeof(token) );
-		if ( strlen(token) <= 0 )
+		if ( Q_isempty( token ) )
 		{
 			break;
 		}

@@ -416,7 +416,7 @@ void CQCGenerator::OnBrowse( KeyValues *data )
     V_strcpy_safe( m_szTargetField, data->GetString( "targetField" ) );
 	const char *filter = data->GetString( "filter" );
 	
-	if ( Q_strlen( filter ) == 0 )
+	if ( Q_isempty( filter ) )
 	{
 //		BrowseDirectory( data );
 	}

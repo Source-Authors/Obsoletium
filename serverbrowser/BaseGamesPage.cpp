@@ -81,7 +81,7 @@ inline char *CloneString( const char *str )
 const char *COM_GetModDirectory()
 {
 	static char modDir[MAX_PATH];
-	if ( Q_strlen( modDir ) == 0 )
+	if ( Q_isempty( modDir ) )
 	{
 		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
 		Q_strncpy( modDir, gamedir, sizeof(modDir) );
@@ -1268,10 +1268,10 @@ void CBaseGamesPage::UpdateFilterSettings()
 	else
 	{
 		KeyValues *data = m_pGameFilter->GetActiveItemUserData();
-		if (data && Q_strlen( data->GetString( "gamedir" ) ) > 0 )
+		if (data && !Q_isempty( data->GetString( "gamedir" ) ) )
 		{
 			Q_strncpy( m_szGameFilter, data->GetString( "gamedir" ), sizeof( m_szGameFilter ) );
-			if ( Q_strlen( m_szGameFilter ) > 0 ) // if there is a gamedir
+			if ( !Q_isempty( m_szGameFilter ) ) // if there is a gamedir
 			{
 				m_iLimitToAppID = CGameID( data->GetUint64( "appid", 0 ) );
 			}

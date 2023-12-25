@@ -1434,7 +1434,7 @@ bool CBaseServer::CheckChallengeType( CBaseClient * client, int nNewUserID, neta
 		return false;
 	}
 
-	if ( ( nAuthProtocol == PROTOCOL_HASHEDCDKEY ) && (Q_strlen( pchLogonCookie ) <= 0 ||  Q_strlen(pchLogonCookie) != 32 ) )
+	if ( ( nAuthProtocol == PROTOCOL_HASHEDCDKEY ) && (Q_isempty( pchLogonCookie ) ||  Q_strlen(pchLogonCookie) != 32 ) )
 	{
 		RejectConnection( adr, clientChallenge, "#GameUI_ServerRejectInvalidCertLen" );
 		return false;

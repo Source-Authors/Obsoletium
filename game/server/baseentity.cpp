@@ -2614,7 +2614,7 @@ void CBaseEntity::PhysicsTouchTriggers( const Vector *pPrevAbsOrigin )
 
 		if ( GetSolid() == SOLID_BSP ) 
 		{
-			if ( !GetModel() && Q_strlen( STRING( GetModelName() ) ) == 0 ) 
+			if ( !GetModel() && Q_isempty( STRING( GetModelName() ) ) ) 
 			{
 				Warning( "Inserted %s with no model\n", GetClassname() );
 				return;

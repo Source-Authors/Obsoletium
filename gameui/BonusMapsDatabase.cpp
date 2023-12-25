@@ -761,7 +761,7 @@ void CBonusMapsDatabase::BuildBonusMapsList( const char *pCurrentPath, bool bOut
 	FileFindHandle_t mapHandle;
 	const char *pMapFileName = g_pFullFileSystem->FindFirst( szDirectory, &mapHandle );
 
-	while ( pMapFileName && Q_strlen(pMapFileName)>0 )
+	while ( pMapFileName && !Q_isempty(pMapFileName) )
 	{
 		// Skip it if it's a directory or is the folder info
 		if ( g_pFullFileSystem->FindIsDirectory( mapHandle ) || Q_strstr( pMapFileName, "folderinfo.bns" ) )

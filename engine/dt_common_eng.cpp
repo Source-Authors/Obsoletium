@@ -123,7 +123,7 @@ bool DataTable_SetupReceiveTableFromSendTable( SendTable *sendTable, bool bNeeds
 			if ( pSendTableProp->GetDataTable() )
 				pDTName = pSendTableProp->GetDataTable()->m_pNetTableName;
 
-			Assert( pDTName && Q_strlen(pDTName) > 0 );
+			Assert( pDTName && !Q_isempty(pDTName) );
 
 			pClientProp->SetTableName( COM_StringCopy( pDTName ) );
 			

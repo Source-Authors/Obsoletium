@@ -2005,7 +2005,7 @@ static bool IsValidPath( const char *pszFilename )
 		return false;
 	}
 
-	if ( Q_strlen( pszFilename ) <= 0    ||
+	if ( Q_isempty( pszFilename )    ||
 		 Q_IsAbsolutePath( pszFilename ) || // to protect absolute paths
 		 Q_strstr( pszFilename, ".." ) )    // to protect relative paths
 	{

@@ -1233,7 +1233,7 @@ const char *CScheme::GetResourceString(const char *stringName)
 //-----------------------------------------------------------------------------
 IImage *CSchemeManager::GetImage(const char *imageName, bool hardwareFiltered)
 {
-	if ( !imageName || strlen(imageName) <= 0 ) // frame icons and the like are in the scheme file and may not be defined, so if this is null then fail silently
+	if ( !imageName || Q_isempty(imageName) ) // frame icons and the like are in the scheme file and may not be defined, so if this is null then fail silently
 	{
 		return NULL; 
 	}

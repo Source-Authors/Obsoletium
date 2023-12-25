@@ -1200,7 +1200,7 @@ void CL_TakeScreenshot(const char *name)
 	{
 		cl_snapshotname[0] = 0;
 
-		if ( Q_strlen( cl_screenshotname.GetString() ) > 0 )
+		if ( !Q_isempty( cl_screenshotname.GetString() ) )
 		{
 			Q_snprintf( cl_snapshotname, sizeof( cl_snapshotname ), "%s", cl_screenshotname.GetString() );		
 		}
@@ -1733,7 +1733,7 @@ CL_Rcon_f
 */
 CON_COMMAND_F( rcon, "Issue an rcon command.", FCVAR_DONTRECORD )
 {
-	char	message[1024];   // Command message
+	char	message[ 1024 ] = {};   // Command message
 	char    szParam[ 256 ];
 	message[0] = 0;
 	for (int i=1 ; i<args.ArgC() ; i++)
@@ -1741,7 +1741,7 @@ CON_COMMAND_F( rcon, "Issue an rcon command.", FCVAR_DONTRECORD )
 		const char *pParam = args[i];
 		// put quotes around empty arguments so we can pass things like this: rcon sv_password ""
 		// otherwise the "" on the end is lost
-		if ( strchr( pParam, ' ' ) || ( Q_strlen( pParam ) == 0 ) )
+		if ( strchr( pParam, ' ' ) || ( Q_isempty( pParam ) ) )
 		{
 			Q_snprintf( szParam, sizeof( szParam ), "\"%s\"", pParam );
 			Q_strncat( message, szParam, sizeof( message ), COPY_ALL_CHARACTERS );

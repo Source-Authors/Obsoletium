@@ -74,7 +74,7 @@ void AddPhonemesFromFile( const char *pszFileName )
 
 			buf.GetString( token );
 
-			if ( strlen( token ) <= 0 )
+			if ( Q_isempty( token ) )
 				break;
 
 			if ( !stricmp( token, "{" ) )

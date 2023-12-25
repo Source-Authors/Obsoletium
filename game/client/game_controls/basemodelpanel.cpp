@@ -350,7 +350,7 @@ const char *CModelPanel::GetModelName( void )
 	if ( UseHWMorphModels() )
 	{
 		// do we have a valid HWM model filename
-		if ( m_pModelInfo->m_pszModelName_HWM && ( Q_strlen( m_pModelInfo->m_pszModelName_HWM  ) > 0 ) )
+		if ( m_pModelInfo->m_pszModelName_HWM && ( !Q_isempty( m_pModelInfo->m_pszModelName_HWM ) ) )
 		{
 			// does the file exist
 			model_t *pModel = (model_t *)engine->LoadModel( m_pModelInfo->m_pszModelName_HWM );
@@ -526,7 +526,7 @@ void CModelPanel::UpdateModel()
 		SetupModel();
 
 		// are we trying to play a VCD?
-		if ( Q_strlen( m_pModelInfo->m_pszVCD ) > 0 )
+		if ( !Q_isempty( m_pModelInfo->m_pszVCD ) )
 		{
 			SetupVCD();
 		}

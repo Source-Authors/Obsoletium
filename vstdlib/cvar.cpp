@@ -359,9 +359,9 @@ void CCvar::RegisterConCommand( ConCommandBase *variable )
 				}
 
 				// make sure we don't have conflicting help strings.
-				if ( pChildVar->m_pszHelpString && Q_strlen( pChildVar->m_pszHelpString ) != 0 )
+				if ( pChildVar->m_pszHelpString && !Q_isempty( pChildVar->m_pszHelpString ) )
 				{
-					if ( pParentVar->m_pszHelpString && Q_strlen( pParentVar->m_pszHelpString ) != 0 )
+					if ( pParentVar->m_pszHelpString && !Q_isempty( pParentVar->m_pszHelpString ) )
 					{
 						if ( Q_stricmp( pParentVar->m_pszHelpString, pChildVar->m_pszHelpString ) != 0 )
 						{

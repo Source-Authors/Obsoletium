@@ -7922,7 +7922,7 @@ int MXR_GetMixgroupFromName( const char *pszgroupname )
 	if ( !pszgroupname )
 		return -1;
 	
-	if ( Q_strlen(pszgroupname) == 0 )
+	if ( Q_isempty( pszgroupname ) )
 		return -1;
 
 	for (int i = 0; i < g_cgrouprules; i++)
@@ -8052,7 +8052,7 @@ bool MXR_LoadAllSoundMixers( void )
 	{
 		pstart = COM_Parse( pstart );
 	
-		if ( strlen(com_token) <= 0)
+		if ( Q_isempty(com_token) )
 			break; // eof
 
 		if ( com_token[0] != CHAR_LEFT_PAREN )

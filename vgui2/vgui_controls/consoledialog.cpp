@@ -755,7 +755,7 @@ void CConsolePanel::OnCommand(const char *command)
 			extra++;
 		}
 
-		if ( Q_strlen( szCommand ) > 0 )
+		if ( !Q_isempty( szCommand ) )
 		{
 			AddToHistory( szCommand, extra );
 		}

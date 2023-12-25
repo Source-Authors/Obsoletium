@@ -651,7 +651,7 @@ void Cmd_Exec_f( const CCommand &args )
 		pszDataPtr = COM_ParseLine( pszDataPtr );
 
 		// no more tokens
-		if ( Q_strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			break;
 
 		Cbuf_InsertText( com_token );

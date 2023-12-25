@@ -1231,7 +1231,7 @@ bool CBaseIssue::CanCallVote( int iEntIndex, const char *pszDetails, vote_create
 		bool bFailed = false;
 
 		// If this issue requires a parameter, see if we're voting for the same one again (i.e. changelevel ctf_2fort)
-		if ( Q_strlen( pCurrentFailure->szFailedVoteParameter ) > 0 )
+		if ( !Q_isempty( pCurrentFailure->szFailedVoteParameter ) )
 		{
 			if( nTimeRemaining > 1 && FStrEq( pCurrentFailure->szFailedVoteParameter, pszDetails ) )
 			{

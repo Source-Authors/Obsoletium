@@ -245,7 +245,7 @@ void CCreateMultiplayerGameServerPage::LoadConfig()
 		if (m_pSavedData->FindKey("RconPassword", false))
 		{
 			const char *password = m_pSavedData->GetString("RconPassword", "");
-			if (strlen(password)>0)
+			if (!Q_isempty(password))
 			{
 				SetControlString("RCONPasswordEdit", password);
 			}
@@ -261,7 +261,7 @@ void CCreateMultiplayerGameServerPage::LoadConfig()
 		if (m_pSavedData->FindKey("MOD", false))
 		{
 			const char *mod = m_pSavedData->GetString("MOD", "");
-			if (strlen(mod) > 0)
+			if (!Q_isempty(mod))
 			{
 				// look for the item in the dropdown
 				m_szMod[0] = 0;
@@ -282,7 +282,7 @@ void CCreateMultiplayerGameServerPage::LoadConfig()
 		if (m_pSavedData->FindKey("Map", false))
 		{
 			const char *map = m_pSavedData->GetString("Map", "");
-			if (strlen(map) > 0)
+			if (!Q_isempty(map))
 			{
 				SetControlString("MapList", map);			
 			}
@@ -304,7 +304,7 @@ void CCreateMultiplayerGameServerPage::LoadConfig()
 		if (m_pSavedData->FindKey("ServerName", false))
 		{
 			const char *serverName = m_pSavedData->GetString("ServerName","");
-			if (strlen(serverName) > 0)
+			if (!Q_isempty(serverName))
 			{
 				SetControlString("ServerNameEdit", serverName);
 			}
@@ -739,7 +739,7 @@ void CCreateMultiplayerGameServerPage::LoadMapList()
 	// clear the current list (if any)
 	m_pMapList->DeleteAllItems();
 
-	Assert( strlen(m_szMod ) > 0);
+	Assert( !Q_isempty(m_szMod) );
 	if ( strlen( m_szMod ) < 1)
 	{
 		m_pMapList->SetEnabled( false );

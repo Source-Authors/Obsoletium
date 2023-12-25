@@ -234,7 +234,7 @@ void AnimationController::SetupPosition( AnimCmdAnimate_t& cmd, float *output, c
 				{
 					*panelEnd = 0;
 
-					if ( Q_strlen( panelName ) > 0 )
+					if ( !Q_isempty( panelName ) )
 					{
 						// 
 						cmd.align.relativePosition	= true;

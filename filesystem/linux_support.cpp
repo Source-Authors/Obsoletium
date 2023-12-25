@@ -143,7 +143,7 @@ HANDLE FindFirstFile( const char *fileName, FIND_DATA *dat)
 		return (HANDLE)-1;
 	}
 
-	if( strlen(dir)>0 )
+	if( !Q_isempty(dir) )
 	{
 		if ( strlen(dir) == 1 ) // if it was the root dir
 			Q_strncpy(selectBuf,fileName+1, sizeof( selectBuf ) );

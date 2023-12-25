@@ -2220,7 +2220,7 @@ void VOX_ParseLineCommands( char *pSentenceData, int sentenceIndex )
 					while ( *pSentenceData && ( *pSentenceData != '}' && !( *pSentenceData <= 32 ) ) )
 						pSentenceData++;
 
-					if ( Q_strlen( com_token ) > 0 )
+					if ( !Q_isempty( com_token ) )
 					{
 						g_Sentences[sentenceIndex].caption = com_token;
 					}

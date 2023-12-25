@@ -402,7 +402,7 @@ void HTML::PostURL(const char *URL, const char *pchPostData, bool force)
 	}
 	else
 	{
-		if ( pchPostData && Q_strlen(pchPostData) > 0 )
+		if ( pchPostData && !Q_isempty(pchPostData) )
 		{
 			// dimhotepus: NO_STEAM
 #ifndef NO_STEAM

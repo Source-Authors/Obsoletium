@@ -63,7 +63,7 @@ private:
 	virtual void OnCursorEntered() 
 	{
 		Button::OnCursorEntered();
-		if ( m_pHTML && strlen(m_sPage) > 0 )
+		if ( m_pHTML && m_sPage[0] != '\0' )
 		{
 			m_pHTML->OpenURL(m_sPage);
 		}
