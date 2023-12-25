@@ -91,7 +91,7 @@ COM_ExplainDisconnection
 
 ==============================
 */
-void COM_ExplainDisconnection( bool bPrint, const char *fmt, ... )
+void COM_ExplainDisconnection( bool bPrint, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	if ( IsX360() )
 	{
@@ -370,7 +370,7 @@ does a varargs printf into a temp buffer, so I don't need to have
 varargs versions of all text functions.
 ============
 */
-char *va( const char *format, ... )
+char *va( PRINTF_FORMAT_STRING const char *format, ... )
 {
 	char* outbuf = tmpstr512();
 	va_list argptr;
