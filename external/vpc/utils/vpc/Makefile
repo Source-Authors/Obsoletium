@@ -60,6 +60,7 @@ VPC_SRC:= \
 	configuration.cpp \
 	dependencies.cpp \
 	main.cpp \
+	vpc.cpp \
 	projectgenerator_makefile.cpp \
 	solutiongenerator_makefile.cpp \
 	solutiongenerator_xcode.cpp \

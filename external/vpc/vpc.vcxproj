@@ -111,6 +111,7 @@
     <ClCompile Include="utils\vpc\solutiongenerator_win32.cpp" />
     <ClCompile Include="utils\vpc\solutiongenerator_xcode.cpp" />
     <ClCompile Include="utils\vpc\sys_utils.cpp" />
+    <ClCompile Include="utils\vpc\vpc.cpp" />
     <ClCompile Include="vstdlib\cvar.cpp" />
     <ClCompile Include="vstdlib\keyvaluessystem.cpp" />
     <ClCompile Include="vstdlib\random.cpp" />
@@ -327,14 +328,17 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <DisableSpecificWarnings>4005;4100;4127;4201;4324</DisableSpecificWarnings>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
       <IgnoreSpecificDefaultLibraries>libc;libcd;libcmt;libcpmt;libcpmt1</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -371,14 +375,20 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <DisableSpecificWarnings>4005;4100;4127;4201;4324</DisableSpecificWarnings>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <GuardEHContMetadata>true</GuardEHContMetadata>
+      <IntelJCCErratum>true</IntelJCCErratum>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
       <IgnoreSpecificDefaultLibraries>libc;libcd;libcmt;libcpmt;libcpmt1</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -395,6 +405,9 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4005;4100;4127;4201;4324</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <GuardEHContMetadata>true</GuardEHContMetadata>
+      <IntelJCCErratum>true</IntelJCCErratum>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

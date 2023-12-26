@@ -306,6 +306,9 @@
     <ClCompile Include="utils\vpccrccheck\crccheck_shared.cpp">
       <Filter>Source Files\vpccrccheck</Filter>
     </ClCompile>
+    <ClCompile Include="utils\vpc\vpc.cpp">
+      <Filter>Source Files\vpc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="public\appframework\iappsystem.h">

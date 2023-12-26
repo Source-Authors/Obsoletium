@@ -17,6 +17,7 @@
 		977F706512393A2A008D8433 /* ExprSimplifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 977F705512393A2A008D8433 /* ExprSimplifier.cpp */; };
 		977F706612393A2A008D8433 /* GroupScript.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 977F705612393A2A008D8433 /* GroupScript.cpp */; };
 		977F706712393A2A008D8433 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 977F705912393A2A008D8433 /* main.cpp */; };
+		977F706712393A2A008D8433 /* vpc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 977F705912393A2A008D8433 /* vpc.cpp */; };
 		977F706812393A2A008D8433 /* projectgenerator_makefile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 977F705A12393A2A008D8433 /* projectgenerator_makefile.cpp */; };
 		977F706912393A2A008D8433 /* projectgenerator_xcode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 977F705B12393A2A008D8433 /* projectgenerator_xcode.cpp */; };
 		977F706A12393A2A008D8433 /* ProjectScript.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 977F705D12393A2A008D8433 /* ProjectScript.cpp */; };
