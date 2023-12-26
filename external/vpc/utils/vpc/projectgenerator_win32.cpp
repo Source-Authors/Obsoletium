@@ -4,6 +4,9 @@
 
 #include "vpc.h"
 
+#include "projectgenerator_win32.h"
+#include "projectgenerator_vcproj.h"
+
 #include "tier0/memdbgon.h"
 
 #undef PROPERTYNAME

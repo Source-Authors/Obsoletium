@@ -13,7 +13,7 @@
 
 //-----------------------------------------------------------------------------
 
-typedef unsigned MemoryStackMark_t;
+typedef uintp MemoryStackMark_t;
 
 class CMemoryStack {
  public:
@@ -30,9 +30,9 @@ class CMemoryStack {
 #endif
   void Term();
 
-  int GetSize();
+  intp GetSize();
   int GetMaxSize();
-  int GetUsed();
+  intp GetUsed();
 
   void *Alloc(unsigned bytes, bool bClear = false) RESTRICT;
 
@@ -40,7 +40,7 @@ class CMemoryStack {
   void FreeToAllocPoint(MemoryStackMark_t mark, bool bDecommit = true);
   void FreeAll(bool bDecommit = true);
 
-  void Access(void **ppRegion, unsigned *pBytes);
+  void Access(void **ppRegion, intp *pBytes);
 
   void PrintContents();
 
@@ -119,7 +119,7 @@ inline int CMemoryStack::GetMaxSize() { return m_maxSize; }
 
 //-------------------------------------
 
-inline int CMemoryStack::GetUsed() { return (m_pNextAlloc - m_pBase); }
+inline intp CMemoryStack::GetUsed() { return (m_pNextAlloc - m_pBase); }
 
 //-------------------------------------
 

@@ -2,6 +2,10 @@
 
 #include "vpc.h"
 
+#include "projectgenerator_ps3.h"
+
+#include "projectgenerator_vcproj.h"
+
 #include "tier0/memdbgon.h"
 
 #undef PROPERTYNAME

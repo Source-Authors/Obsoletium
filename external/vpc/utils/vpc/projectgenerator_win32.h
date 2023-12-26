@@ -3,6 +3,8 @@
 #ifndef VPC_PROJECTGENERATOR_WIN32_H_
 #define VPC_PROJECTGENERATOR_WIN32_H_
 
+#include "projectgenerator_vcproj.h"
+
 #define PROPERTYNAME(X, Y) X##_##Y,
 
 enum Win32Properties_e {

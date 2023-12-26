@@ -1080,7 +1080,7 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
 
       ++cProjectsPreviously;
 
-      int len = strlen(line) - 1;
+      int len = V_strlen(line) - 1;
       while (line[len] == '\n' || line[len] == '\r') {
         line[len] = '\0';
         len--;

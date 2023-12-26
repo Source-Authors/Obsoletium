@@ -149,7 +149,7 @@ void CCommandLine::LoadParametersFromFile(const char *&pSrc, char *&pDst,
 
     fclose(fp);
   } else {
-    printf("Parameter file '%s' not found, skipping...", szFileName);
+    fprintf(stderr, "Parameter file '%s' not found, skipping...", szFileName);
   }
 }
 

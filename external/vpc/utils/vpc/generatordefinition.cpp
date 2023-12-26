@@ -268,7 +268,7 @@ void CGeneratorDefinition::LoadDefinition( const char *pDefnitionName, PropertyN
 	pScriptKV->LoadFromBuffer( g_pVPC->GetScript().GetName(), g_pVPC->GetScript().GetData() );
 
 	m_ScriptName = g_pVPC->GetScript().GetName();
-	m_ScriptCRC = CRC32_ProcessSingleBuffer( g_pVPC->GetScript().GetData(), strlen( g_pVPC->GetScript().GetData() ) );
+	m_ScriptCRC = CRC32_ProcessSingleBuffer( g_pVPC->GetScript().GetData(), V_strlen( g_pVPC->GetScript().GetData() ) );
 
 	m_NameString = pScriptKV->GetName();
 

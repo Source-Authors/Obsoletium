@@ -4,6 +4,8 @@
 
 #include "vpc.h"
 
+#include "projectgenerator_xbox360.h"
+
 #include "tier0/memdbgon.h"
 
 #undef PROPERTYNAME

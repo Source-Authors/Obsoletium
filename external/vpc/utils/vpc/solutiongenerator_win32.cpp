@@ -1,4 +1,4 @@
-// Copyright Valve Corporation, All rights reserved.
+﻿// Copyright Valve Corporation, All rights reserved.
 
 #include "vpc.h"
 #include "dependencies.h"
@@ -43,6 +43,9 @@ class CSolutionGenerator_Win32 : public IBaseSolutionGenerator {
            // Visual Studio Professional
            "Software\\Microsoft\\VisualStudio\\%d.0\\Projects"},
           {HKEY_LOCAL_MACHINE,
+           // Visual Studio Professional on x64 machine
+           "Software\\WOW6432Node\\Microsoft\\VisualStudio\\%d.0\\Projects"},
+          {HKEY_LOCAL_MACHINE,
            // VC Express 2010 and 2012
            "Software\\Microsoft\\VCExpress\\%d.0\\Projects"},
           {HKEY_CURRENT_USER,
@@ -57,6 +60,7 @@ class CSolutionGenerator_Win32 : public IBaseSolutionGenerator {
         HKEY hKey;
         LONG ret =
             RegOpenKeyEx(searchPoint.baseKey, pRegKeyName, 0, KEY_READ, &hKey);
+        if (!hKey) continue;
 
         for (int i = 0; i < 200; i++) {
           char szKeyName[MAX_PATH];

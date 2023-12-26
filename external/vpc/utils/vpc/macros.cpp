@@ -126,7 +126,7 @@ void CVPC::ResolveMacrosInStringInternal(char const *pString, char *pOutBuff,
     }
   } while (!bDone);
 
-  int len = strlen(buffer1);
+  int len = V_strlen(buffer1);
   if (outBuffSize < len) len = outBuffSize;
   memcpy(pOutBuff, buffer1, len);
   pOutBuff[len] = '\0';

@@ -1022,7 +1022,7 @@ CConCommandHash::CCommandHashHandle_t CConCommandHash::Insert(
 CConCommandHash::CCommandHashHandle_t CConCommandHash::FastInsert(
     ConCommandBase *cmd) {
   // Get a new element from the pool.
-  int iHashData = m_aDataPool.Alloc(true);
+  intp iHashData = m_aDataPool.Alloc(true);
   HashEntry_t *pHashData = &m_aDataPool[iHashData];
 
   HashKey_t key = Hash(cmd);

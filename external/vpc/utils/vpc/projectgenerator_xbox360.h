@@ -3,6 +3,8 @@
 #ifndef VPC_PROJECTGENERATOR_XBOX360_H_
 #define VPC_PROJECTGENERATOR_XBOX360_H_
 
+#include "projectgenerator_vcproj.h"
+
 #define PROPERTYNAME(X, Y) X##_##Y,
 enum Xbox360Properties_e {
 #include "projectgenerator_xbox360.inc"

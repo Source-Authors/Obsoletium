@@ -56,9 +56,9 @@ class CUtlFixedMemory {
  public:
   class Iterator_t {
    public:
-    Iterator_t(BlockHeader_t* p, int i) : m_pBlockHeader(p), m_nIndex(i) {}
+    Iterator_t(BlockHeader_t* p, intp i) : m_pBlockHeader(p), m_nIndex(i) {}
     BlockHeader_t* m_pBlockHeader;
-    int m_nIndex;
+    intp m_nIndex;
 
     bool operator==(const Iterator_t it) const {
       return m_pBlockHeader == it.m_pBlockHeader && m_nIndex == it.m_nIndex;
@@ -81,13 +81,13 @@ class CUtlFixedMemory {
     return pHeader->m_pNext ? Iterator_t(pHeader->m_pNext, 0)
                             : InvalidIterator();
   }
-  int GetIndex(const Iterator_t& it) const {
+  intp GetIndex(const Iterator_t& it) const {
     Assert(IsValidIterator(it));
     if (!IsValidIterator(it)) return InvalidIndex();
 
-    return (int)(HeaderToBlock(it.m_pBlockHeader) + it.m_nIndex);
+    return (intp)(HeaderToBlock(it.m_pBlockHeader) + it.m_nIndex);
   }
-  bool IsIdxAfter(int i, const Iterator_t& it) const {
+  bool IsIdxAfter(intp i, const Iterator_t& it) const {
     Assert(IsValidIterator(it));
     if (!IsValidIterator(it)) return false;
 
@@ -106,17 +106,17 @@ class CUtlFixedMemory {
   Iterator_t InvalidIterator() const { return Iterator_t(NULL, -1); }
 
   // element access
-  T& operator[](int i);
-  const T& operator[](int i) const;
-  T& Element(int i);
-  const T& Element(int i) const;
+  T& operator[](intp i);
+  const T& operator[](intp i) const;
+  T& Element(intp i);
+  const T& Element(intp i) const;
 
   // Can we use this index?
-  bool IsIdxValid(int i) const;
+  bool IsIdxValid(intp i) const;
 
   // Specify the invalid ('null') index that we'll only return on failure
-  static const int INVALID_INDEX = 0;  // For use with static_assert
-  static int InvalidIndex() { return INVALID_INDEX; }
+  static const intp INVALID_INDEX = 0;  // For use with static_assert
+  static intp InvalidIndex() { return INVALID_INDEX; }
 
   // Size
   int NumAllocated() const;
@@ -135,7 +135,7 @@ class CUtlFixedMemory {
   // Fast swap - WARNING: Swap invalidates all ptr-based indices!!!
   void Swap(CUtlFixedMemory<T>& mem);
 
-  bool IsInBlock(int i, BlockHeader_t* pBlockHeader) const {
+  bool IsInBlock(intp i, BlockHeader_t* pBlockHeader) const {
     T* p = (T*)i;
     const T* p0 = HeaderToBlock(pBlockHeader);
     return p >= p0 && p < p0 + pBlockHeader->m_nBlockSize;
@@ -200,25 +200,25 @@ void CUtlFixedMemory<T>::Init(int nGrowSize /* = 0 */,
 // element access
 //-----------------------------------------------------------------------------
 template <class T>
-inline T& CUtlFixedMemory<T>::operator[](int i) {
+inline T& CUtlFixedMemory<T>::operator[](intp i) {
   Assert(IsIdxValid(i));
   return *(T*)i;
 }
 
 template <class T>
-inline const T& CUtlFixedMemory<T>::operator[](int i) const {
+inline const T& CUtlFixedMemory<T>::operator[](intp i) const {
   Assert(IsIdxValid(i));
   return *(T*)i;
 }
 
 template <class T>
-inline T& CUtlFixedMemory<T>::Element(int i) {
+inline T& CUtlFixedMemory<T>::Element(intp i) {
   Assert(IsIdxValid(i));
   return *(T*)i;
 }
 
 template <class T>
-inline const T& CUtlFixedMemory<T>::Element(int i) const {
+inline const T& CUtlFixedMemory<T>::Element(intp i) const {
   Assert(IsIdxValid(i));
   return *(T*)i;
 }
@@ -235,7 +235,7 @@ inline int CUtlFixedMemory<T>::NumAllocated() const {
 // Is element index valid?
 //-----------------------------------------------------------------------------
 template <class T>
-inline bool CUtlFixedMemory<T>::IsIdxValid(int i) const {
+inline bool CUtlFixedMemory<T>::IsIdxValid(intp i) const {
 #ifdef _DEBUG
   for (BlockHeader_t* pbh = m_pBlocks; pbh; pbh = pbh->m_pNext) {
     if (IsInBlock(i, pbh)) return true;

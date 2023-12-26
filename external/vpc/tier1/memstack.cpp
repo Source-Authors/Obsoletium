@@ -246,7 +246,7 @@ void CMemoryStack::Term() {
 
 //-------------------------------------
 
-int CMemoryStack::GetSize() {
+intp CMemoryStack::GetSize() {
   if (m_bPhysical) return m_maxSize;
 
 #ifdef MEMSTACK_VIRTUAL_MEMORY_AVAILABLE
@@ -395,7 +395,7 @@ void CMemoryStack::FreeAll(bool bDecommit) {
 
 //-------------------------------------
 
-void CMemoryStack::Access(void **ppRegion, unsigned *pBytes) {
+void CMemoryStack::Access(void **ppRegion, intp *pBytes) {
   *ppRegion = m_pBase;
   *pBytes = (m_pNextAlloc - m_pBase);
 }

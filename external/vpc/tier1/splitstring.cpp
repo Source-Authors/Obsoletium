@@ -43,12 +43,12 @@ void CSplitString::Construct(const char *pString, const char **pSeparators,
 
     if (pFirstSeparator) {
       // Split on this separator and continue on.
-      int separatorLen = strlen(pSeparators[iFirstSeparator]);
+      int separatorLen = V_strlen(pSeparators[iFirstSeparator]);
       if (pFirstSeparator > pCurPos) {
         //////////////////////////////////////////////////////////////////////////
         /// Cut the token out of the duplicate string
         char *pTokenInDuplicate = m_szBuffer + (pCurPos - pString);
-        int nTokenLength = pFirstSeparator - pCurPos;
+        intp nTokenLength = pFirstSeparator - pCurPos;
         Assert(nTokenLength > 0 &&
                !memcmp(pTokenInDuplicate, pCurPos, nTokenLength));
         pTokenInDuplicate[nTokenLength] = '\0';
@@ -59,7 +59,7 @@ void CSplitString::Construct(const char *pString, const char **pSeparators,
       pCurPos = pFirstSeparator + separatorLen;
     } else {
       // Copy the rest of the string
-      if (int nTokenLength = strlen(pCurPos)) {
+      if (int nTokenLength = V_strlen(pCurPos)) {
         //////////////////////////////////////////////////////////////////////////
         // There's no need to cut this token, because there's no separator after
         // it. just add its copy in the buffer to the tail

@@ -454,7 +454,7 @@ bool CScript::ParsePropertyValue(const char *pBaseString, char *pOutBuff,
 
     g_pVPC->ResolveMacrosInString(buffer2, buffer1, sizeof(buffer1));
 
-    len = strlen(buffer1);
+    len = V_strlen(buffer1);
     if (remaining < len) len = remaining;
 
     if (len > 0) {

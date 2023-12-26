@@ -232,7 +232,7 @@ int Sys_LoadTextFileWithIncludes(const char *filename, char **bufferptr,
       // Need to insert actual files to make sure crc changes if disk-matched
       // files match
       if (bInsertFileMacroExpansion)
-        PerformFileSubstitions(ln, sizeof(lineBuffer) - (ln - lineBuffer));
+        PerformFileSubstitions(ln, (int)sizeof(lineBuffer) - (ln - lineBuffer));
 
       if (memcmp(ln, "#include", 8) == 0) {
         // omg, an include

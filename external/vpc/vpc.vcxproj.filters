@@ -309,6 +309,9 @@
     <ClCompile Include="utils\vpc\vpc.cpp">
       <Filter>Source Files\vpc</Filter>
     </ClCompile>
+    <ClCompile Include="utils\vpc\memory_reservation_x64.cpp">
+      <Filter>Source Files\vpc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="public\appframework\iappsystem.h">
@@ -685,6 +688,9 @@
     </ClInclude>
     <ClInclude Include="tier0\ValveETWProviderEvents.h">
       <Filter>Header Files\tier0</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\vpc\memory_reservation_x64.h">
+      <Filter>Header Files\public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

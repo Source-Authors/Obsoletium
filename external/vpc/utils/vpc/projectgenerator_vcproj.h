@@ -3,6 +3,8 @@
 #ifndef VPC_VCPROJGENERATOR_H_
 #define VPC_VCPROJGENERATOR_H_
 
+#include "baseprojectdatacollector.h"
+
 class CProjectConfiguration;
 class CVCProjGenerator;
 class CProjectTool;

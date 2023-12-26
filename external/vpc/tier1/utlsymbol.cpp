@@ -257,7 +257,7 @@ CUtlSymbol CUtlSymbolTable::AddString(const char *pString) {
 
   if (id.IsValid()) return id;
 
-  int lenString = strlen(pString) + 1;  // length of just the string
+  int lenString = V_strlen(pString) + 1;  // length of just the string
   int lenDecorated =
       lenString + sizeof(hashDecoration_t);  // and with its hash decoration
   // make sure that all strings are aligned on 2-byte boundaries so the hashes

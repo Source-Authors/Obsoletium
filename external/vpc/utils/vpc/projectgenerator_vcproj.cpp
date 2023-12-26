@@ -4,6 +4,8 @@
 
 #include "vpc.h"
 
+#include "projectgenerator_vcproj.h"
+
 #include "tier0/memdbgon.h"
 
 CProjectFile::CProjectFile(CVCProjGenerator *pGenerator,
@@ -323,7 +325,7 @@ bool CPropertyStates::SetStringProperty(ToolProperty_t *pToolProperty,
   }
 
   if (pToolProperty->m_bAppendSlash) {
-    int len = strlen(buff);
+    int len = V_strlen(buff);
     if (len >= 1 && buff[len - 1] != '\\') {
       V_strncat(buff, "\\", sizeof(buff));
     }
@@ -332,7 +334,7 @@ bool CPropertyStates::SetStringProperty(ToolProperty_t *pToolProperty,
   if (!V_stricmp(pToolProperty->m_ParseString.Get(), "$CommandLine") &&
       !V_strnicmp(buff, "echo ", 5)) {
     // the COM layer auto appended a CR-LF for a command line with an echo
-    int len = strlen(buff);
+    int len = V_strlen(buff);
     if ((len >= 1 && buff[len - 1] != '\n') &&
         (len >= 12 && V_stricmp(buff + len - 12, "&#x0D;&#x0A;"))) {
       V_strncat(buff, "\n", sizeof(buff));
@@ -981,7 +983,7 @@ void CVCProjGenerator::SetGUID(const char *pOutputFilename) {
   V_memset(&ctx, 0, sizeof(ctx));
   V_memset(digest, 0, sizeof(digest));
   MD5Init(&ctx);
-  MD5Update(&ctx, (unsigned char *)szBasename, strlen(szBasename));
+  MD5Update(&ctx, (unsigned char *)szBasename, V_strlen(szBasename));
   MD5Final(digest, &ctx);
 
   char szMD5[64];
@@ -1056,7 +1058,7 @@ bool CVCProjGenerator::StartFile(const char *pFilename,
   // problems (i.e. extension comparison, etc) all files get serialized to xml
   // output with mandatory surrounding quotes
   if (cleanFilename[0] == '\"') {
-    int len = strlen(cleanFilename);
+    int len = V_strlen(cleanFilename);
     if (len > 1 && cleanFilename[len - 1] == '\"') {
       memcpy(cleanFilename, cleanFilename + 1, len - 2);
       cleanFilename[len - 2] = '\0';

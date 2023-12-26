@@ -9,6 +9,10 @@
 
 #include "tier0/logging.h"
 
+#ifdef _WIN64
+#include "memory_reservation_x64.h"
+#endif
+
 #include "tier0/memdbgon.h"
 
 DEFINE_LOGGING_CHANNEL_NO_TAGS(LOG_VPC, "VPC");
@@ -50,6 +54,11 @@ int main(int argc, char **argv)
 int vpcmain(int argc, char **argv)
 #endif
 {
+#ifdef _WIN64
+  // Catch x64 errors early.
+  vpc::win::ReserveBottomMemoryFor64Bit();
+#endif
+
   const bool is_windows_two_phase{IsTwoPhaseVpc(argc, argv)};
 
   g_pVPC = new CVPC();
@@ -88,9 +97,9 @@ int vpcmain(int argc, char **argv)
 
         if (sign == '+' || sign == '-' || sign == '/' || sign == '*' ||
             sign == '@') {
-          V_strncpy(solution_path, &next_arg[1], std::size(solution_path));
+          V_strncpy(solution_path, &next_arg[1], (int)std::size(solution_path));
         } else {
-          V_strncpy(solution_path, next_arg, std::size(solution_path));
+          V_strncpy(solution_path, next_arg, (int)std::size(solution_path));
           i++;
         }
 

@@ -18,7 +18,7 @@
 // the linked list march part of the Find() operation more quickly.
 class CConCommandHash {
  public:
-  typedef int CCommandHashHandle_t;
+  typedef intp CCommandHashHandle_t;
   typedef unsigned int HashKey_t;
 
   // Constructor/Deconstructor.

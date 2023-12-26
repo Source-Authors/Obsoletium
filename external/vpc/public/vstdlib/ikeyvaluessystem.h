@@ -18,10 +18,10 @@ class IKeyValuesSystem {
   // registers the size of the KeyValues in the specified instance
   // so it can build a properly sized memory pool for the KeyValues objects
   // the sizes will usually never differ but this is for versioning safety
-  virtual void RegisterSizeofKeyValues(int size) = 0;
+  virtual void RegisterSizeofKeyValues(size_t size) = 0;
 
   // allocates/frees a KeyValues object from the shared mempool
-  virtual void *AllocKeyValuesMemory(int size) = 0;
+  virtual void *AllocKeyValuesMemory(size_t size) = 0;
   virtual void FreeKeyValuesMemory(void *pMem) = 0;
 
   // symbol table access (used for key names)

@@ -108,7 +108,7 @@ void *GetModuleHandle(const char *name) {
   }
 
   if ((handle = dlopen(name, RTLD_NOW)) == NULL) {
-    printf("DLOPEN Error:%s\n", dlerror());
+    fprintf(stderr, "DLOPEN Error:%s\n", dlerror());
     // couldn't open this file
     return NULL;
   }
@@ -122,8 +122,7 @@ void *GetModuleHandle(const char *name) {
 #endif
 
 #if defined(_WIN32) && !defined(_X360)
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
+#include "winlite.h"
 #endif
 
 //-----------------------------------------------------------------------------

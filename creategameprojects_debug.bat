@@ -190,9 +190,9 @@ POPD
 
 
 REM Build VPC.
-MSBuild.exe /m /p:Platform=%MSBUILD_PLATFORM% /p:Configuration=Release external/vpc/vpc.sln
+MSBuild.exe /m /p:Platform=x64 /p:Configuration=Release external/vpc/vpc.sln
 if ERRORLEVEL 1 (
-  ECHO MSBuild Release for external/vpc/vpc.sln failed.
+  ECHO MSBuild Release x64 for external/vpc/vpc.sln failed.
   EXIT /B 1
 )
 

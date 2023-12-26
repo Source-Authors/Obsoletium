@@ -15,18 +15,6 @@
 #undef malloc
 #undef free
 
-#ifdef _WIN64
-// Inline assembly is not supported in 64-bit.  Ideally, we would prefer to
-// use the __cpuid intrinsic to avoid having to drop to assembly altogether.
-// However, as of MSVC 9.0, the __cpuid intrinsic does not enable the
-// ability to set the ECX register, which is required for obtaining certain
-// extended CPU information.  To overcome these issues, we must call the
-// Cpuid64() external function, which is written in assembly and located in
-// the cpuid64.asm file included in this project.  This project contains a build
-// step that invokes 64-bit MASM on cpuid64.asm when building a 64-bit target.
-extern "C" void Cpuid64(void* argsPtr);
-#endif
-
 // Name: ICpuTopology
 // Desc: Specifies the interface that each class that provides an implementation
 //       for extracting cpu topology must conform to.  This is the Implementor
@@ -467,18 +455,16 @@ class Cpuid {
   //-----------------------------------------------------------------------------
   void UncheckedCall_(FnSet fnSet, DWORD fn) {
 #ifdef _WIN64
-    // Inline assembly is not supported in 64-bit.  Ideally, we would prefer to
-    // use the __cpuid intrinsic to avoid having to drop to assembly altogether.
-    // However, as of MSVC 9.0, the __cpuid intrinsic does not enable the
-    // ability to set the ECX register, which is required for obtaining certain
-    // extended CPU information.  To overcome these issues, we must call the
-    // Cpuid64() external function, which is written in assembly and located in
-    // the cpuid64.asm file included in this project.  This project contains a
-    // build step that invokes 64-bit MASM on cpuid64.asm when building a 64-bit
-    // target.
     m_eax = fnSet | fn;
     m_ecx = 0;
-    Cpuid64(this);
+
+    int reg[4];
+    __cpuidex(reg, m_eax, m_ecx);
+
+    m_eax = reg[0];
+    m_ebx = reg[1];
+    m_ecx = reg[2];
+    m_edx = reg[3];
 #else
     __asm
     {

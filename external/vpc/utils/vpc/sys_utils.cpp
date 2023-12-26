@@ -338,7 +338,7 @@ bool Sys_ReplaceString(const char *pStream, const char *pSearch,
   const char *pFind;
   const char *pStart = pStream;
   char *pOut = pOutBuff;
-  int len;
+  intp len;
   bool bReplaced = false;
 
   while (true) {
@@ -346,7 +346,7 @@ bool Sys_ReplaceString(const char *pStream, const char *pSearch,
     pFind = V_stristr(pStart, pSearch);
     if (!pFind) {
       /// end of string
-      len = strlen(pStart);
+      len = V_strlen(pStart);
       pFind = pStart + len;
       memcpy(pOut, pStart, len);
       pOut += len;
@@ -361,7 +361,7 @@ bool Sys_ReplaceString(const char *pStream, const char *pSearch,
     pOut += len;
 
     // substitute new string
-    len = strlen(pReplace);
+    len = V_strlen(pReplace);
     memcpy(pOut, pReplace, len);
     pOut += len;
 

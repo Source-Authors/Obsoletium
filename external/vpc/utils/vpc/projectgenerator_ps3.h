@@ -3,7 +3,9 @@
 #ifndef VPC_PROJECTGENERATOR_PS3_H_
 #define VPC_PROJECTGENERATOR_PS3_H_
 
-#define PROPERTYNAME(X, Y) X##_##Y,
+#include "projectgenerator_vcproj.h"
+
+#define PROPERTYNAME(X, Y) X##_##Y ,
 
 enum PS3Properties_e {
 #include "projectgenerator_ps3.inc"

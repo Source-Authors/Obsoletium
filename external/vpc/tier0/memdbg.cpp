@@ -2365,7 +2365,7 @@ void CDbgMemAlloc::SetCRTAllocFailed(size_t nSize) {
     abort();
   }
 #else
-  printf("%s\n", buffer);
+  fprintf(stderr, "%s\n", buffer);
   if (!Plat_IsInDebugSession()) {
     AssertFatalMsg(false, buffer);
     exit(0);

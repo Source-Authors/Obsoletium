@@ -1,5 +1,5 @@
 
-//========= Copyright © 1996-2006, Valve Corporation, All rights reserved. ============//
+//========= Copyright ?1996-2006, Valve Corporation, All rights reserved. ============//
 //
 //	Property Enumerations
 //

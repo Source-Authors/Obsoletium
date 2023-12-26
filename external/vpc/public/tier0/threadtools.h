@@ -83,23 +83,25 @@ extern bool gbCheckNotMultithreaded;
 
 #define USE_INTRINSIC_INTERLOCKED
 
-#define CHECK_NOT_MULTITHREADED()                                              \
-  {                                                                            \
-    static int init = 0;                                                       \
-    static sys_ppu_thread_t threadIDPrev;                                      \
-                                                                               \
-    if (!init) {                                                               \
-      sys_ppu_thread_get_id(&threadIDPrev);                                    \
-      init = 1;                                                                \
-    } else if (gbCheckNotMultithreaded) {                                      \
-      sys_ppu_thread_t threadID;                                               \
-      sys_ppu_thread_get_id(&threadID);                                        \
-      if (threadID != threadIDPrev) {                                          \
-        printf("CHECK_NOT_MULTITHREADED: prev thread = %x, cur thread = %x\n", \
-               (uint)threadIDPrev, (uint)threadID);                            \
-        *(int *)0 = 0;                                                         \
-      }                                                                        \
-    }                                                                          \
+#define CHECK_NOT_MULTITHREADED()                                           \
+  {                                                                         \
+    static int init = 0;                                                    \
+    static sys_ppu_thread_t threadIDPrev;                                   \
+                                                                            \
+    if (!init) {                                                            \
+      sys_ppu_thread_get_id(&threadIDPrev);                                 \
+      init = 1;                                                             \
+    } else if (gbCheckNotMultithreaded) {                                   \
+      sys_ppu_thread_t threadID;                                            \
+      sys_ppu_thread_get_id(&threadID);                                     \
+      if (threadID != threadIDPrev) {                                       \
+        fprintf(                                                            \
+            stderr,                                                         \
+            "CHECK_NOT_MULTITHREADED: prev thread = %x, cur thread = %x\n", \
+            (uint)threadIDPrev, (uint)threadID);                            \
+        *(int *)0 = 0;                                                      \
+      }                                                                     \
+    }                                                                       \
   }
 
 #else
@@ -118,7 +120,8 @@ extern bool gbCheckNotMultithreaded;
 
 const unsigned TT_INFINITE = 0xffffffff;
 
-#ifdef PLATFORM_64BITS
+// Win64 uses unsigned long aka 32 bit thread id.
+#if defined(PLATFORM_64BITS) && !defined(_WIN64)
 typedef uint64 ThreadId_t;
 #else
 typedef uint32 ThreadId_t;

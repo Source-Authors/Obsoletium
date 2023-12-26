@@ -186,32 +186,20 @@ class ia32detect {
 
  private:
   uint32 init0() {
-    uint32 m;
-
-#ifdef COMPILER_MSVC64
     int data[4];
-    tchar *s1;
+    char vendor_id[13];
 
-    s1 = (tchar *)&data[1];
-    s1[12] = '\0';
+    memset(vendor_id, 0, sizeof(vendor_id));
     __cpuid(data, 0);
-    m = data[0];
-    vendor_name = s1;
-#else
-    tchar s1[13];
 
-    s1[12] = '\0';
-    __asm
-    {
-			xor	eax, eax;
-			cpuid;
-			mov	m, eax;
-			mov dword ptr s1 + 0, ebx;
-			mov dword ptr s1 + 4, edx;
-			mov dword ptr s1 + 8, ecx;
-    }
-    vendor_name = s1;
-#endif
+    memcpy(vendor_id + 0, &data[1], sizeof(data[1]));
+    memcpy(vendor_id + 4, &data[3], sizeof(data[3]));
+    memcpy(vendor_id + 8, &data[2], sizeof(data[2]));
+    vendor_id[12] = '\0';
+
+    uint32 m = data[0];
+    vendor_name = vendor_id;
+
     return m;
   }
 
@@ -291,7 +279,6 @@ class ia32detect {
       uint32 *d = new uint32[(m - 0x80000000) * 4];
 
       for (uint32 i = 0x80000001; i <= m; i++) {
-
 #ifdef COMPILER_MSVC64
         __cpuid((int *)(d + (i - 0x80000001) * 4), i);
 #else

@@ -664,7 +664,7 @@ void KeyValues::WriteConvertedString(IBaseFileSystem *filesystem,
     j++;
   }
 
-  INTERNALWRITE(convertedString, strlen(convertedString));
+  INTERNALWRITE(convertedString, V_strlen(convertedString));
 }
 
 void KeyValues::InternalWrite(IBaseFileSystem *filesystem, FileHandle_t f,
@@ -820,7 +820,7 @@ KeyValues *KeyValues::FindKey(const char *keyName, bool bCreate) {
 
   // pull out the substring if it exists
   if (subStr) {
-    int size = subStr - keyName;
+    intp size = subStr - keyName;
     V_memcpy(szBuf, keyName, size);
     szBuf[size] = 0;
     searchStr = szBuf;
@@ -1129,6 +1129,7 @@ int KeyValues::GetInt(const char *keyName, int defaultValue) {
         // can't convert, since it would lose data
         Assert(0);
         return 0;
+        // Truncated on x64.
       case TYPE_INT:
       case TYPE_PTR:
       default:
@@ -1238,12 +1239,15 @@ const char *KeyValues::GetString(const char *keyName,
         SetString(keyName, buf);
         break;
       case TYPE_INT:
-      case TYPE_PTR:
         V_snprintf(buf, sizeof(buf), "%d", dat->m_iValue);
         SetString(keyName, buf);
         break;
+      case TYPE_PTR:
+        V_snprintf(buf, sizeof(buf), "%lld", (int64)dat->m_pValue);
+        SetString(keyName, buf);
+        break;
       case TYPE_UINT64:
-        V_snprintf(buf, sizeof(buf), "%lld", *((uint64 *)(dat->m_sValue)));
+        V_snprintf(buf, sizeof(buf), "%llu", *((uint64 *)(dat->m_sValue)));
         SetString(keyName, buf);
         break;
 
@@ -1281,8 +1285,11 @@ const wchar_t *KeyValues::GetWString(const char *keyName,
         SetWString(keyName, wbuf);
         break;
       case TYPE_INT:
-      case TYPE_PTR:
         swprintf(wbuf, V_ARRAYSIZE(wbuf), L"%d", dat->m_iValue);
+        SetWString(keyName, wbuf);
+        break;
+      case TYPE_PTR:
+        swprintf(wbuf, V_ARRAYSIZE(wbuf), L"%lld", (int64)dat->m_pValue);
         SetWString(keyName, wbuf);
         break;
       case TYPE_UINT64: {
@@ -1410,7 +1417,7 @@ void KeyValues::SetWString(const char *keyName, const wchar_t *value) {
     }
 
     // allocate memory for the new value and copy it in
-    int len = wcslen(value);
+    int len = V_wcslen(value);
     dat->m_wsValue = new wchar_t[len + 1];
     V_memcpy(dat->m_wsValue, value, (len + 1) * sizeof(wchar_t));
 
@@ -1620,7 +1627,7 @@ KeyValues *KeyValues::MakeCopy(void) const {
     } break;
     case TYPE_WSTRING: {
       if (m_wsValue) {
-        int len = wcslen(m_wsValue);
+        int len = V_wcslen(m_wsValue);
         newKeyValue->m_wsValue = new wchar_t[len + 1];
         V_memcpy(newKeyValue->m_wsValue, m_wsValue,
                  (len + 1) * sizeof(wchar_t));
@@ -2235,7 +2242,11 @@ bool KeyValues::WriteAsBinary(CUtlBuffer &buffer) const {
         break;
       }
       case TYPE_PTR: {
-        buffer.PutUnsignedInt((int)dat->m_pValue);
+#if !defined(PLATFORM_64BITS)
+        buffer.PutUnsignedInt((unsigned int)dat->m_pValue);
+#else
+        buffer.PutInt64((int64)dat->m_pValue);
+#endif
         break;
       }
 
@@ -2327,7 +2338,11 @@ bool KeyValues::ReadAsBinary(CUtlBuffer &buffer) {
         break;
       }
       case TYPE_PTR: {
+#if !defined(PLATFORM_64BITS)
         dat->m_pValue = (void *)buffer.GetUnsignedInt();
+#else
+        dat->m_pValue = (void *)buffer.GetInt64();
+#endif
         break;
       }
 
@@ -2441,7 +2456,11 @@ bool KeyValues::ReadAsBinaryPooledFormat(
       }
 
       case TYPE_PTR: {
+#if !defined(PLATFORM_64BITS)
         dat->m_pValue = (void *)buffer.GetUnsignedInt();
+#else
+        dat->m_pValue = (void *)buffer.GetInt64();
+#endif
         break;
       }
 
@@ -2782,7 +2801,7 @@ KeyValues *KeyValues::FromString(char const *szName, char const *szStringVal,
       szStringVal = szVarName + 1;
       break;
     }
-    V_strncpy(chName, szVarName, MIN(sizeof(chName), szEnd - szVarName + 1));
+    V_strncpy(chName, szVarName, MIN((intp)sizeof(chName), szEnd - szVarName + 1));
     szVarName = chName;
     szStringVal = szEnd;
 
@@ -2798,7 +2817,7 @@ KeyValues *KeyValues::FromString(char const *szName, char const *szStringVal,
       break;
     }
     V_strncpy(chValue, szVarValue,
-              MIN(sizeof(chValue), szEnd - szVarValue + 1));
+              MIN((intp)sizeof(chValue), szEnd - szVarValue + 1));
     szVarValue = chValue;
     szStringVal = szEnd;
 

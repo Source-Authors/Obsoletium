@@ -56,10 +56,10 @@ class CKeyValuesSystem : public IKeyValuesSystem {
   // registers the size of the KeyValues in the specified instance
   // so it can build a properly sized memory pool for the KeyValues objects
   // the sizes will usually never differ but this is for versioning safety
-  void RegisterSizeofKeyValues(int size);
+  void RegisterSizeofKeyValues(size_t size);
 
   // allocates/frees a KeyValues object from the shared mempool
-  void *AllocKeyValuesMemory(int size);
+  void *AllocKeyValuesMemory(size_t size);
   void FreeKeyValuesMemory(void *pMem);
 
   // symbol table access (used for key names)
@@ -93,7 +93,7 @@ class CKeyValuesSystem : public IKeyValuesSystem {
 #ifdef KEYVALUES_USE_POOL
   CUtlMemoryPool *m_pMemPool;
 #endif
-  int m_iMaxKeyValuesSize;
+  size_t m_iMaxKeyValuesSize;
 
   // string hash table
   /*
@@ -215,7 +215,7 @@ CKeyValuesSystem::~CKeyValuesSystem() {
 // KeyValues objects 			the sizes will usually never differ but
 // this is for versioning safety
 //-----------------------------------------------------------------------------
-void CKeyValuesSystem::RegisterSizeofKeyValues(int size) {
+void CKeyValuesSystem::RegisterSizeofKeyValues(size_t size) {
   if (size > m_iMaxKeyValuesSize) {
     m_iMaxKeyValuesSize = size;
   }
@@ -237,7 +237,7 @@ static void KVLeak(PRINTF_FORMAT_STRING char const *fmt, ...) {
 //-----------------------------------------------------------------------------
 // Purpose: allocates a KeyValues object from the shared mempool
 //-----------------------------------------------------------------------------
-void *CKeyValuesSystem::AllocKeyValuesMemory(int size) {
+void *CKeyValuesSystem::AllocKeyValuesMemory(size_t size) {
 #ifdef KEYVALUES_USE_POOL
   // allocate, if we don't have one yet
   if (!m_pMemPool) {
@@ -301,7 +301,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString(const char *name,
 
       // build up the new item
       item->next = NULL;
-      size_t numStringBytes = strlen(name);
+      int numStringBytes = V_strlen(name);
       char *pString = (char *)m_Strings.Alloc(numStringBytes + 1 + 3);
       if (!pString) {
         Error("Out of keyvalue string space");
@@ -383,7 +383,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive(
           Error("Out of keyvalue string space");
           return -1;
         }
-        int nNewAlternativeStringIndex = pString - (char *)m_Strings.GetBase();
+        intp nNewAlternativeStringIndex = pString - (char *)m_Strings.GetBase();
         V_memcpy(pString, name, numNameStringBytes);
         *reinterpret_cast<uint32 *>(pString + numNameStringBytes) =
             0;  // string null-terminator + 3 alternative spelling bytes
@@ -410,7 +410,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive(
 
       // build up the new item
       item->next = NULL;
-      size_t numStringBytes = strlen(name);
+      int numStringBytes = V_strlen(name);
       char *pString = (char *)m_Strings.Alloc(numStringBytes + 1 + 3);
       if (!pString) {
         Error("Out of keyvalue string space");

@@ -196,7 +196,9 @@ HRESULT PME::ReadMSR(uint32 dw_reg, int64* pi64_value) {
                        sizeof(int64),  // Length of output buffer in bytes.
                        &dw_ret_len,    // Bytes placed in output buffer.
                        NULL            // NULL means wait till op. completes
-  ) ? S_OK : E_FAIL;
+                       )
+           ? S_OK
+           : E_FAIL;
 
   if (hr == S_OK && dw_ret_len != sizeof(int64)) hr = E_BAD_DATA;
 
@@ -218,7 +220,9 @@ HRESULT PME::ReadMSR(uint32 dw_reg, uint64* pi64_value) {
                        sizeof(uint64),  // Length of output buffer in bytes.
                        &dw_ret_len,     // Bytes placed in output buffer.
                        NULL             // NULL means wait till op. completes
-  ) ? S_OK : E_FAIL;
+                       )
+           ? S_OK
+           : E_FAIL;
 
   if (hr == S_OK && dw_ret_len != sizeof(uint64)) hr = E_BAD_DATA;
 
@@ -247,7 +251,9 @@ HRESULT PME::WriteMSR(uint32 dw_reg, const int64& i64_value) {
                        0,            // Length of output buffer in bytes.
                        &dw_ret_len,  // Bytes placed in DataBuffer.
                        NULL          // NULL means wait till op. completes.
-  ) ? S_OK : E_FAIL;
+                       )
+           ? S_OK
+           : E_FAIL;
 
   if (hr == S_OK && dw_ret_len != 0) hr = E_BAD_DATA;
 
@@ -273,7 +279,9 @@ HRESULT PME::WriteMSR(uint32 dw_reg, const uint64& i64_value) {
                        0,            // Length of output buffer in bytes.
                        &dw_ret_len,  // Bytes placed in DataBuffer.
                        NULL          // NULL means wait till op. completes.
-  ) ? S_OK : E_FAIL;
+                       )
+           ? S_OK
+           : E_FAIL;
 
   // E_POINTER
   if (hr == S_OK && dw_ret_len != 0) hr = E_BAD_DATA;
@@ -328,8 +336,8 @@ double PME::GetCPUClockSpeedFast(void) {
 double PME::GetCPUClockSpeedSlow(void) {
   if (m_CPUClockSpeed != 0) return m_CPUClockSpeed;
 
-  unsigned long start_ms, stop_ms;
-  unsigned long start_tsc, stop_tsc;
+  unsigned long long start_ms, stop_ms;
+  unsigned long long start_tsc, stop_tsc;
 
   // boosting priority helps with noise. its optional and i dont think
   //  it helps all that much
@@ -339,14 +347,14 @@ double PME::GetCPUClockSpeedSlow(void) {
   pme->SetProcessPriority(ProcessPriorityHigh);
 
   // wait for millisecond boundary
-  start_ms = GetTickCount() + 5;
-  while (start_ms <= GetTickCount())
+  start_ms = GetTickCount64() + 5;
+  while (start_ms <= GetTickCount64())
     ;
 
     // read timestamp (you could use QueryPerformanceCounter in hires mode if
     // you want)
 #ifdef COMPILER_MSVC64
-  RDTSC(start_tsc);
+  start_tsc = __rdtsc();
 #else
   __asm
   {
@@ -358,13 +366,13 @@ double PME::GetCPUClockSpeedSlow(void) {
 
   // wait for end
   stop_ms = start_ms + 1000;  // longer wait gives better resolution
-  while (stop_ms > GetTickCount())
+  while (stop_ms > GetTickCount64())
     ;
 
     // read timestamp (you could use QueryPerformanceCounter in hires mode if
     // you want)
 #ifdef COMPILER_MSVC64
-  RDTSC(stop_tsc);
+  stop_tsc = __rdtsc();
 #else
   __asm
   {

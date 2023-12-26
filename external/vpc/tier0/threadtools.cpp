@@ -1367,7 +1367,7 @@ bool CThreadEvent::Wait( uint32 dwTimeout )
 			countTimeout++;
 			if (countTimeout > 30)
 			{
-				printf("WARNING: possible deadlock in CThreadEvent::Wait() !!!\n");
+				fprintf(stderr, "WARNING: possible deadlock in CThreadEvent::Wait() !!!\n");
 			}
 		}
 

@@ -33,46 +33,14 @@ static bool cpuid(uint32 function, uint32& out_eax, uint32& out_ebx,
       : "=a"(out_eax), "=S"(out_ebx), "=c"(out_ecx), "=d"(out_edx)
       : "a"(function));
   return true;
-#elif defined(_WIN64)
-  int pCPUInfo[4];
-  __cpuid(pCPUInfo, (int)function);
-  out_eax = pCPUInfo[0];
-  out_ebx = pCPUInfo[1];
-  out_ecx = pCPUInfo[2];
-  out_edx = pCPUInfo[3];
-  return false;
 #else
-  bool retval = true;
-  uint32 local_eax, local_ebx, local_ecx, local_edx;
-  _asm pushad;
-
-  __try {
-    _asm
-    {
-			xor edx, edx  // Clue the compiler that EDX & others is about to be used. 
-			xor ecx, ecx
-			xor ebx, ebx  // <Sergiy> Note: if I don't zero these out, cpuid sometimes won't
-          // work, I didn't find out why yet
-            mov eax, function  // set up CPUID to return processor version and features
-                //      0 = vendor string, 1 = version info, 2 = cache info
-            cpuid  // code bytes = 0fh,  0a2h
-            mov local_eax, eax  // features returned in eax
-            mov local_ebx, ebx  // features returned in ebx
-            mov local_ecx, ecx  // features returned in ecx
-            mov local_edx, edx       // features returned in edx
-    }
-  } __except (EXCEPTION_EXECUTE_HANDLER) {
-    retval = false;
-  }
-
-  out_eax = local_eax;
-  out_ebx = local_ebx;
-  out_ecx = local_ecx;
-  out_edx = local_edx;
-
-  _asm popad
-
-      return retval;
+  int data[4];
+  __cpuid(data, (int)function);
+  out_eax = data[0];
+  out_ebx = data[1];
+  out_ecx = data[2];
+  out_edx = data[3];
+  return true;
 #endif
 }
 
@@ -232,29 +200,29 @@ const tchar* GetProcessorVendorId() {
 #if defined(_X360) || defined(_PS3)
   return "PPC";
 #else
-  uint32 unused, VendorIDRegisters[3];
+  uint32 unused, regs[3];
 
   static tchar VendorID[13];
-
   memset(VendorID, 0, sizeof(VendorID));
-  if (!cpuid(0, unused, VendorIDRegisters[0], VendorIDRegisters[2],
-             VendorIDRegisters[1])) {
+
+  if (!cpuid(0, unused, regs[0], regs[2],
+             regs[1])) {
     if (IsPC()) {
       _tcscpy(VendorID, _T( "Generic_x86" ));
     } else if (IsX360()) {
       _tcscpy(VendorID, _T( "PowerPC" ));
     }
   } else {
-    memcpy(VendorID + 0, &(VendorIDRegisters[0]), sizeof(VendorIDRegisters[0]));
-    memcpy(VendorID + 4, &(VendorIDRegisters[1]), sizeof(VendorIDRegisters[1]));
-    memcpy(VendorID + 8, &(VendorIDRegisters[2]), sizeof(VendorIDRegisters[2]));
+    memcpy(VendorID + 0, &(regs[0]), sizeof(regs[0]));
+    memcpy(VendorID + 4, &(regs[1]), sizeof(regs[1]));
+    memcpy(VendorID + 8, &(regs[2]), sizeof(regs[2]));
   }
 
   return VendorID;
 #endif
 }
 
-// See Intel® 64 and IA-32 Architectures Developer's Manual: Vol. 2A
+// See Intel?64 and IA-32 Architectures Developer's Manual: Vol. 2A
 // https://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-software-developer-vol-2a-manual.html
 int LogicalProcessorsPerCore() {
 #if defined(_X360) || defined(_PS3) || defined(LINUX)

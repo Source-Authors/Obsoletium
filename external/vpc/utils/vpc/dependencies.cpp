@@ -113,7 +113,7 @@ bool CDependency::DependsOn( CDependency *pTest, int flags )
 			int i;
 			for( i = callTreeOutputStack.Count() - 1; i >= 0; i-- )
 			{
-          printf("%s", (const char *)callTreeOutputStack[i].Base());
+				printf("%s", (const char *)callTreeOutputStack[i].Base());
 			}
 			printf( "-------------------------------------------------------------------------------\n" );
 		}

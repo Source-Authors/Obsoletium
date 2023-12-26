@@ -906,14 +906,14 @@ abstract_class CFunctor : public IRefCounted {
 //-----------------------------------------------------------------------------
 abstract_class CFunctorData : public IRefCounted {
  public:
-  virtual void ComputeValidationString(char *pString, size_t nBufLen) const = 0;
+  virtual void ComputeValidationString(char *pString, int nBufLen) const = 0;
 };
 
 abstract_class CFunctorCallback : public IRefCounted {
  public:
   virtual bool IsEqual(CFunctorCallback * pSrc) const = 0;
   virtual void operator()(CFunctorData *pData) = 0;
-  virtual void ComputeValidationString(char *pString, size_t nBufLen) const = 0;
+  virtual void ComputeValidationString(char *pString, int nBufLen) const = 0;
   virtual const char *GetImplClassName() const = 0;
   virtual const void *GetTarget() const = 0;
 };
@@ -1096,21 +1096,20 @@ class CFunctorCallbackBase
   }
 };
 
-#define DEFINE_FUNCTOR_DATA_TEMPLATE(N)                          \
-  template <FUNC_SOLO_TEMPLATE_ARG_PARAMS_##N>                   \
-  class CFunctorData##N : public CFunctorDataBase {              \
-   public:                                                       \
-    CFunctorData##N(FUNC_PROXY_ARG_FORMAL_PARAMS_##N)            \
-        FUNC_SOLO_CALL_ARGS_INIT_##N {}                          \
-    virtual void ComputeValidationString(char *pString,          \
-                                         size_t nBufLen) const { \
-        FUNC_VALIDATION_STRING_##N} FUNC_ARG_MEMBERS_##N;        \
+#define DEFINE_FUNCTOR_DATA_TEMPLATE(N)                                      \
+  template <FUNC_SOLO_TEMPLATE_ARG_PARAMS_##N>                               \
+  class CFunctorData##N : public CFunctorDataBase {                          \
+   public:                                                                   \
+    CFunctorData##N(FUNC_PROXY_ARG_FORMAL_PARAMS_##N)                        \
+        FUNC_SOLO_CALL_ARGS_INIT_##N {}                                      \
+    virtual void ComputeValidationString(char *pString, int nBufLen) const { \
+        FUNC_VALIDATION_STRING_##N} FUNC_ARG_MEMBERS_##N;                    \
   }
 
 class CFunctorData0 : public CFunctorDataBase {
  public:
   CFunctorData0() {}
-  virtual void ComputeValidationString(char *pString, size_t nBufLen) const {
+  virtual void ComputeValidationString(char *pString, int nBufLen) const {
     FUNC_VALIDATION_STRING_0
   }
 };
@@ -1137,8 +1136,7 @@ FUNC_GENERATE_ALL_BUT0(DEFINE_FUNCTOR_DATA_TEMPLATE);
              (m_pfnProxied ==                                                 \
               static_cast<CFunctorCallback##N *>(pSrc)->m_pfnProxied);        \
     }                                                                         \
-    virtual void ComputeValidationString(char *pString,                       \
-                                         size_t nBufLen) const {              \
+    virtual void ComputeValidationString(char *pString, int nBufLen) const {  \
       FUNC_VALIDATION_STRING_##N                                              \
     }                                                                         \
     virtual const char *GetImplClassName() const {                            \
@@ -1159,7 +1157,7 @@ class CFunctorCallback0 : public CFunctorCallbackBase {
     ValidateFunctorData(pFunctorDataBase);
     m_pfnProxied();
   }
-  virtual void ComputeValidationString(char *pString, size_t nBufLen) const {
+  virtual void ComputeValidationString(char *pString, int nBufLen) const {
     FUNC_VALIDATION_STRING_0
   }
   virtual bool IsEqual(CFunctorCallback *pSrc) const {
@@ -1194,8 +1192,7 @@ FUNC_GENERATE_ALL_BUT0(DEFINE_FUNCTOR_CALLBACK_TEMPLATE);
               pFunctorDataBase);                                              \
       m_Proxy(FUNC_CALL_DATA_ARGS_##N(pFunctorData));                         \
     }                                                                         \
-    virtual void ComputeValidationString(char *pString,                       \
-                                         size_t nBufLen) const {              \
+    virtual void ComputeValidationString(char *pString, int nBufLen) const {  \
       FUNC_VALIDATION_STRING_##N                                              \
     }                                                                         \
     virtual bool IsEqual(CFunctorCallback *pSrc) const {                      \
@@ -1226,7 +1223,7 @@ class CMemberFunctorCallback0 : public CFunctorCallbackBase {
     ValidateFunctorData(pFunctorDataBase);
     m_Proxy();
   }
-  virtual void ComputeValidationString(char *pString, size_t nBufLen) const {
+  virtual void ComputeValidationString(char *pString, int nBufLen) const {
     FUNC_VALIDATION_STRING_0
   }
   virtual bool IsEqual(CFunctorCallback *pSrc) const {

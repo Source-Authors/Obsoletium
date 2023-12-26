@@ -95,6 +95,7 @@
     <ClCompile Include="utils\vpc\groupscript.cpp" />
     <ClCompile Include="utils\vpc\macros.cpp" />
     <ClCompile Include="utils\vpc\main.cpp" />
+    <ClCompile Include="utils\vpc\memory_reservation_x64.cpp" />
     <ClCompile Include="utils\vpc\p4sln.cpp" />
     <ClCompile Include="utils\vpc\projectgenerator_codelite.cpp" />
     <ClCompile Include="utils\vpc\projectgenerator_makefile.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="utils\vpc\generatordefinition.h" />
     <ClInclude Include="utils\vpc\ibaseprojectgenerator.h" />
     <ClInclude Include="utils\vpc\ibasesolutiongenerator.h" />
+    <ClInclude Include="utils\vpc\memory_reservation_x64.h" />
     <ClInclude Include="utils\vpc\p4sln.h" />
     <ClInclude Include="utils\vpc\projectgenerator_codelite.h" />
     <ClInclude Include="utils\vpc\projectgenerator_ps3.h" />
@@ -328,10 +330,11 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <DisableSpecificWarnings>
-      </DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4127;4201</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -353,8 +356,9 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <DisableSpecificWarnings>4005;4100;4127;4201;4324</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4127;4201</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -375,13 +379,14 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <DisableSpecificWarnings>
-      </DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4127;4201</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <GuardEHContMetadata>true</GuardEHContMetadata>
       <IntelJCCErratum>true</IntelJCCErratum>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -403,11 +408,12 @@
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <DisableSpecificWarnings>4005;4100;4127;4201;4324</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4127;4201</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <GuardEHContMetadata>true</GuardEHContMetadata>
       <IntelJCCErratum>true</IntelJCCErratum>
       <ControlFlowGuard>Guard</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

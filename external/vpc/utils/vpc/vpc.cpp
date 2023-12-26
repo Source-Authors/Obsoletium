@@ -1298,13 +1298,13 @@ bool CVPC::RestartFromCorrectLocation(bool *pIsChild) {
     newArgs[i++] = NULL;
 
     // restart using synchronous semantic, async semantic causes wierd hang
-    int status = _spawnv(_P_WAIT, szBinPath, newArgs);
+    intptr_t status = _spawnv(_P_WAIT, szBinPath, newArgs);
     if (!status) {
       // called process exited normally
       return true;
     } else if (status > 0) {
       // called process exited with error, pass it along
-      exit(status);
+      exit((int)status);
     }
 
     // called process could not be started
