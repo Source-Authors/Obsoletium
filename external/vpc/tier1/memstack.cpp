@@ -97,7 +97,7 @@ bool CMemoryStack::Init(const char *pszAllocOwner, unsigned maxSize,
   pageSize = 64 * 1024;
 #else
   SYSTEM_INFO sysInfo;
-  GetSystemInfo(&sysInfo);
+  GetNativeSystemInfo(&sysInfo);
   Assert(!(sysInfo.dwPageSize & (sysInfo.dwPageSize - 1)));
   pageSize = sysInfo.dwPageSize;
 #endif
