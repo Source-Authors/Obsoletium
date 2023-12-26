@@ -1801,11 +1801,11 @@ bool V_StrSubst(const char *pIn, const char *pMatch, const char *pReplaceWith,
 }
 
 char *AllocString(const char *pStr, int nMaxChars) {
-  int allocLen;
+  int allocLen = V_strlen(pStr);
   if (nMaxChars == -1)
-    allocLen = V_strlen(pStr) + 1;
+    allocLen += 1;
   else
-    allocLen = MIN((int)strlen(pStr), nMaxChars) + 1;
+    allocLen = min(allocLen, nMaxChars) + 1;
 
   char *pOut = new char[allocLen];
   V_strncpy(pOut, pStr, allocLen);
