@@ -1564,13 +1564,14 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
                i != g_vecPGenerators[iGenerator]->m_Files.InvalidIndex();
                i = g_vecPGenerators[iGenerator]->m_Files.Next(i)) {
             char rgchFilePath[MAX_PATH];
+            const char *file_name =
+                g_vecPGenerators[iGenerator]->m_Files[i]->m_Filename.String();
+
             V_snprintf(
-                rgchFilePath, sizeof(rgchFilePath), "%s/%s", rgchProjectDir,
-                g_vecPGenerators[iGenerator]->m_Files[i]->m_Filename.String());
+                rgchFilePath, sizeof(rgchFilePath), "%s/%s", rgchProjectDir, file_name);
             V_RemoveDotSlashes(rgchFilePath);
 
-            const char *pFileName = V_UnqualifiedFileName(
-                g_vecPGenerators[iGenerator]->m_Files[i]->m_Filename.String());
+            const char *pFileName = V_UnqualifiedFileName(file_name);
 
             char rgchFileType[MAX_PATH];
 
