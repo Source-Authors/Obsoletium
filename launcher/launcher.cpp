@@ -1034,9 +1034,24 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	// Hook the debug output stuff.
 	SpewOutputFunc( LauncherDefaultSpewFunc );
 
-	if ( !IsWindows10OrGreater() )
+	const CPUInformation *cpu_info{GetCPUInformation()};
+	if ( !cpu_info->m_bSSE || !cpu_info->m_bSSE2 || !cpu_info->m_bSSE3 || !cpu_info->m_bSSE41 || !cpu_info->m_bSSE42 )
+	{
+		Error( "Sorry, your CPU missed SSE / SSE2 / SSE3 / SSE4.1 / SSE4.2 instructions required for the game. Please upgrade your CPU." );
+		return STATUS_ILLEGAL_INSTRUCTION;
+	}
+
+	if ( !cpu_info->m_bRDTSC )
+	{
+		Error( "Sorry, your CPU missed RDTSC instruction required for the game. Please upgrade your CPU." );
+		return STATUS_ILLEGAL_INSTRUCTION;
+	}
+
+#ifdef WIN32
+	if ( !IsWindows10OrGreater() ) [[unlikely]]
 	{
 		Error( "Sorry, Windows 10+ required to run the game." );
+		return ERROR_OLD_WIN_VERSION;
 	}
 
 	using namespace std::chrono_literals;
@@ -1048,6 +1063,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		Warning( "Unable to set Windows timer resolution to %lld ms. Will use default one.",
 			(long long)newTimerResolution.count() );
 	}
+#endif
 
 	// dimhotepus: Remove Plat_VerifyHardwareKeyPrompt call as it is empty.
 
