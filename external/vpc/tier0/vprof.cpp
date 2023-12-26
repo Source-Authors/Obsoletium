@@ -452,7 +452,7 @@ void CVProfile::SumTimes(CVProfNode *pNode, int budgetGroupID) {
         (budgetGroupID == -1 || pNode->GetBudgetGroupID() == budgetGroupID)) {
       double timeLessChildren = pNode->GetTotalTimeLessChildren();
 
-      g_TimesLessChildren.insert(make_pair(pNode, timeLessChildren));
+      g_TimesLessChildren.emplace(pNode, timeLessChildren);
 
       map<const tchar *, uintp>::iterator iter;
       iter = g_TimeSumsMap.find(
@@ -462,7 +462,7 @@ void CVProfile::SumTimes(CVProfNode *pNode, int budgetGroupID) {
         TimeSums_t timeSums = {pNode->GetName(), pNode->GetTotalCalls(),
                                pNode->GetTotalTime(), timeLessChildren,
                                pNode->GetPeakTime()};
-        g_TimeSumsMap.insert(make_pair(pNode->GetName(), g_TimeSums.size()));
+        g_TimeSumsMap.emplace(pNode->GetName(), g_TimeSums.size());
         g_TimeSums.push_back(timeSums);
       } else {
         TimeSums_t &timeSums = g_TimeSums[iter->second];
@@ -1368,7 +1368,7 @@ void CVProfile::Term() {
   for (i = 0; i < m_nBudgetGroupNames; i++) {
     delete[] m_pBudgetGroups[i].m_pName;
   }
-  delete m_pBudgetGroups;
+  delete[] m_pBudgetGroups;
   m_nBudgetGroupNames = m_nBudgetGroupNamesAllocated = 0;
   m_pBudgetGroups = NULL;
 
