@@ -101,7 +101,7 @@ bool CUtlBinaryBlock::operator==(const CUtlBinaryBlock &src) const {
 //-----------------------------------------------------------------------------
 // Simple string class.
 //-----------------------------------------------------------------------------
-CUtlString::CUtlString() {}
+CUtlString::CUtlString() = default;
 
 CUtlString::CUtlString(const char *pString) { Set(pString); }
 
@@ -450,6 +450,5 @@ CUtlString CUtlString::operator+(const char *pOther) const {
 // Purpose: concatenate the provided string to our current content
 //-----------------------------------------------------------------------------
 void CUtlString::Append(const char *pchAddition) {
-  CUtlString s = *this;
-  s += pchAddition;
+  *this += pchAddition;
 }
