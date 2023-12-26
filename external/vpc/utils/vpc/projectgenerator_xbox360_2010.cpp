@@ -44,7 +44,7 @@ static const char *s_TypeKeyNames[] = {"Library",     "ClInclude",
 
 const char *CProjectGenerator_Xbox360_2010::GetKeyNameForFile(
     CProjectFile *pFile) {
-  static_assert(ARRAYSIZE(s_TypeKeyNames) == TKN_MAX_COUNT);
+  static_assert(V_ARRAYSIZE(s_TypeKeyNames) == TKN_MAX_COUNT);
 
   const char *pExtension = V_GetFileExtension(pFile->m_Name.Get());
 

@@ -128,10 +128,10 @@ FORCEINLINE void *realloc_aligned_internal(void *mem, size_t bytes,
 inline size_t compact_internal() {
   size_t start = 0, end = 0;
 
-  for (int i = 0; i < ARRAYSIZE(g_AllocRegions); i++) {
-    start += mspace_footprint(g_AllocRegions[i]);
-    mspace_trim(g_AllocRegions[i], 0);
-    end += mspace_footprint(g_AllocRegions[i]);
+  for (auto *reg : g_AllocRegions) {
+    start += mspace_footprint(reg);
+    mspace_trim(reg, 0);
+    end += mspace_footprint(reg);
   }
 
   return (start - end);
@@ -140,7 +140,7 @@ inline size_t compact_internal() {
 inline void heapstats_internal(FILE *pFile) {
   // @TODO: improve this presentation, as a table [6/1/2009 tom]
   char buf[1024];
-  for (size_t i = 0; i < ARRAYSIZE(g_AllocRegions); i++) {
+  for (size_t i = 0; i < std::size(g_AllocRegions); i++) {
     struct mallinfo info = mspace_mallinfo(g_AllocRegions[i]);
     size_t footPrint = mspace_footprint(g_AllocRegions[i]);
     size_t maxFootPrint = mspace_max_footprint(g_AllocRegions[i]);
@@ -2095,8 +2095,8 @@ int CStdMemAlloc::GetGenericMemoryStats(GenericMemoryStat_t **ppMemoryStats) {
     // allocations other than the SBH/MBH/LBH)
     size_t nHeapTotal = 1024 * 1024 * MBYTES_PRIMARY_SBH;
 #if defined(USE_DLMALLOC)
-    for (int i = 0; i < ARRAYSIZE(g_AllocRegions); i++) {
-      nHeapTotal += mspace_footprint(g_AllocRegions[i]);
+    for (auto *reg : g_AllocRegions) {
+      nHeapTotal += mspace_footprint(reg);
     }
 #endif  // USE_DLMALLOC
     size_t nMemStackTotal = nCommitted - nHeapTotal;

@@ -391,7 +391,7 @@ bool CExpressionEvaluator::Evaluate(bool &bResult, const char *pInfixExpression,
 
     // SECURITY: Bail on input buffers that are too large, they're used for RCEs
     // and we don't need to support them.
-    if (len + 1 > ARRAYSIZE(szCleanToken)) {
+    if (len + 1 > V_ARRAYSIZE(szCleanToken)) {
       return false;
     }
 

@@ -1746,8 +1746,8 @@ void VPC_Keyword_Project(int depth, bool bQuiet) {
 static const char *fileTypes[] = {"c",  "cpp", "cxx", "cc", "h",
                                   "hh", "hxx", "hpp", ""};
 bool VPC_IsBuiltInFileType(const char *extension) {
-  for (int i = 0; i < V_ARRAYSIZE(fileTypes); i++) {
-    if (!V_stricmp(fileTypes[i], extension)) return true;
+  for (auto *ft : fileTypes) {
+    if (!V_stricmp(ft, extension)) return true;
   }
 
   return false;

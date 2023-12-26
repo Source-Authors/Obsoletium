@@ -105,9 +105,8 @@ CBaseProjectDataCollector::~CBaseProjectDataCollector() { Term(); }
 
 void CBaseProjectDataCollector::StartProject() {
   for (int i = 0; i < m_RelevantPropertyNames.m_nNames; i++) {
-    for (int j = 0; j < V_ARRAYSIZE(s_rgsAmbiguousPropertyNames); j++) {
-      if (V_stricmp(m_RelevantPropertyNames.m_pNames[i],
-                    s_rgsAmbiguousPropertyNames[j]) == 0)
+    for (auto *amb : s_rgsAmbiguousPropertyNames) {
+      if (V_stricmp(m_RelevantPropertyNames.m_pNames[i], amb) == 0)
         g_pVPC->VPCWarning(
             "Property name %s may occur in multiple contexts and should be "
             "fully qualified",

@@ -29,7 +29,7 @@ static KeywordName_t s_KeywordNameTable[] = {
 };
 
 const char *CVPC::KeywordToName(configKeyword_e keyword) {
-  static_assert(ARRAYSIZE(s_KeywordNameTable) == KEYWORD_MAX);
+  static_assert(V_ARRAYSIZE(s_KeywordNameTable) == KEYWORD_MAX);
 
   if (keyword == KEYWORD_UNKNOWN) {
     return "???";
@@ -39,7 +39,7 @@ const char *CVPC::KeywordToName(configKeyword_e keyword) {
 }
 
 configKeyword_e CVPC::NameToKeyword(const char *pKeywordName) {
-  static_assert(ARRAYSIZE(s_KeywordNameTable) == KEYWORD_MAX);
+  static_assert(V_ARRAYSIZE(s_KeywordNameTable) == KEYWORD_MAX);
 
   for (auto &kn : s_KeywordNameTable) {
     if (!V_stricmp(pKeywordName, kn.m_pName)) {

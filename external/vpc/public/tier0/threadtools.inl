@@ -118,8 +118,8 @@ INLINE_ON_PS3 bool CThread::Start(unsigned nBytesStack,
   {
     int iValidEntries = GetCallStack_Fast(init.ParentStackTrace,
                                           ARRAYSIZE(init.ParentStackTrace), 0);
-    for (int i = iValidEntries; i < ARRAYSIZE(init.ParentStackTrace); ++i) {
-      init.ParentStackTrace[i] = NULL;
+    for (auto &&e : init.ParentStackTrace) {
+      e = NULL;
     }
   }
 #endif

@@ -3,6 +3,7 @@
 #include "vstdlib/cvar.h"
 
 #include <cctype>
+#include <string>
 
 #include "tier0/icommandline.h"
 #include "tier1/utlrbtree.h"
@@ -398,9 +399,9 @@ void CCvar::RegisterConCommand(ConCommandBase *variable) {
             "FCVAR_CHEAT", "FCVAR_REPLICATED", "FCVAR_DONTRECORD",
             "FCVAR_ARCHIVE", "FCVAR_ARCHIVE_GAMECONSOLE"};
 
-        COMPILE_TIME_ASSERT(ARRAYSIZE(nFlags) == ARRAYSIZE(szFlags));
+        COMPILE_TIME_ASSERT(std::size(nFlags) == std::size(szFlags));
 
-        for (int k = 0; k < ARRAYSIZE(nFlags); ++k) {
+        for (int k = 0; k < V_ARRAYSIZE(nFlags); ++k) {
           if ((pChildVar->m_nFlags & nFlags[k]) !=
               (pParentVar->m_nFlags & nFlags[k])) {
             Warning(

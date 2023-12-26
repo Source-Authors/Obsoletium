@@ -1177,10 +1177,10 @@ static PrintConVarFlags_t g_PrintConVarFlags[] = {
 // Purpose:
 //-----------------------------------------------------------------------------
 void ConVar_AppendFlags(const ConCommandBase *var, char *buf, size_t bufsize) {
-  for (int i = 0; i < ARRAYSIZE(g_PrintConVarFlags); ++i) {
-    const PrintConVarFlags_t &info = g_PrintConVarFlags[i];
+  char append[128];
+
+  for (const PrintConVarFlags_t &info : g_PrintConVarFlags) {
     if (var->IsFlagSet(info.flag)) {
-      char append[128];
       V_snprintf(append, sizeof(append), " %s", info.desc);
       V_strncat(buf, append, bufsize, COPY_ALL_CHARACTERS);
     }
