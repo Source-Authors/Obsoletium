@@ -2173,7 +2173,7 @@ void VPC_FakeKeyword_SchemaFolder(CBaseProjectDataCollector *pDataCollector) {
 
   //////////////////////////////////////////////////////////////////////////
 
-  KeyValues *pOutKeyValues = new KeyValues("schproj");
+  KeyValues *pOutKeyValues = KeyValues::AutoDelete("schproj");
   pOutKeyValues->SetString("project_name", g_pVPC->GetProjectName());
   pOutKeyValues->SetString("platform_name", pPlatformName);
   pOutKeyValues->SetString("anchor_path", szSchemaOutAnchorPath);
@@ -2214,7 +2214,6 @@ void VPC_FakeKeyword_SchemaFolder(CBaseProjectDataCollector *pDataCollector) {
   CUtlBuffer tmpBuf;
   tmpBuf.SetBufferType(true, true);
   pOutKeyValues->RecursiveSaveToFile(tmpBuf, 0);
-  pOutKeyValues->deleteThis();
 
   FILE *fp = fopen(szSchemaPath, "wt");
   if (!fp) {
