@@ -1968,7 +1968,7 @@ class PLATFORM_CLASS CThread {
   volatile pthread_t m_threadZombieId;
 #endif
   int m_result;
-  char m_szName[32];
+  char m_szName[64];
   void *m_pStackBase;
   unsigned m_flags;
   CThreadManualEvent m_NotSuspendedEvent;
