@@ -571,7 +571,7 @@ class TSLIST_HEAD_ALIGN CTSQueue {
                                  // between the sequence and node grabs above.
                                  // Later pushes or pops corrects
 
-    m_Count++;
+    ++m_Count;
 
     return oldTail.value.pNode;
   }
@@ -639,7 +639,7 @@ class TSLIST_HEAD_ALIGN CTSQueue {
       }
     }
 
-    m_Count--;
+    --m_Count;
     head.value.pNode->elem = elem;
     return head.value.pNode;
   }
