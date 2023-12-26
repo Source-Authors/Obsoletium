@@ -105,14 +105,6 @@ float (*pfInvRSquared)(const float* v) = _InvRSquared;
 void  (*pfFastSinCos)(float x, float* s, float* c) = SinCos;
 float (*pfFastCos)(float x) = cosf;
 
-float SinCosTable[SIN_TABLE_SIZE];
-void InitSinCosTable()
-{
-	for( int i = 0; i < SIN_TABLE_SIZE; i++ )
-	{
-		SinCosTable[i] = sinf(i * 2.0F * M_PI_F / SIN_TABLE_SIZE);
-	}
-}
 
 qboolean VectorsEqual( const float *v1, const float *v2 )
 {
@@ -3344,7 +3336,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 
 	s_bMathlibInitialized = true;
 
-	InitSinCosTable();
 	BuildGammaTable( gamma, texGamma, brightness, overbright );
 }
 
