@@ -452,11 +452,7 @@ PLATFORM_INTERFACE void _Error_AlwaysSpewCallStack_Length(
 // Macro to assist in asserting constant invariants during compilation
 
 #ifdef _DEBUG
-#define COMPILE_TIME_ASSERT(pred) \
-  switch (0) {                    \
-    case 0:                       \
-    case pred:;                   \
-  }
+#define COMPILE_TIME_ASSERT(pred) static_assert(pred)
 #define ASSERT_INVARIANT(pred) \
   static void UNIQUE_ID() { COMPILE_TIME_ASSERT(pred) }
 #else
