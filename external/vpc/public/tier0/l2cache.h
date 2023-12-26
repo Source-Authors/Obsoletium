@@ -24,11 +24,10 @@ class CL2Cache {
 #endif                            // DBGFLAG_VALIDATE
 
  private:
-  int m_nID;
-
   P4Event_BSQ_cache_reference *m_pL2CacheEvent;
   int64 m_i64Start;
   int64 m_i64End;
+  int m_nID;
   int m_iL2CacheMissCount;
 };
 
