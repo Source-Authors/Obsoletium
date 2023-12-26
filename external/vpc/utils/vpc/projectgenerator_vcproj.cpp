@@ -8,11 +8,8 @@
 
 #include "tier0/memdbgon.h"
 
-CProjectFile::CProjectFile(CVCProjGenerator *pGenerator,
-                           const char *pFilename) {
-  m_pGenerator = pGenerator;
-  m_Name = pFilename;
-}
+CProjectFile::CProjectFile(CVCProjGenerator *pGenerator, const char *pFilename)
+    : m_Name(pFilename), m_pGenerator(pGenerator) {}
 
 CProjectFile::~CProjectFile() { m_Configs.PurgeAndDeleteElements(); }
 
@@ -87,10 +84,8 @@ bool CProjectFile::RemoveConfiguration(CProjectConfiguration *pConfiguration) {
 }
 
 CProjectFolder::CProjectFolder(CVCProjGenerator *pGenerator,
-                               const char *pFolderName) {
-  m_pGenerator = pGenerator;
-  m_Name = pFolderName;
-}
+                               const char *pFolderName)
+    : m_Name(pFolderName), m_pGenerator(pGenerator) {}
 
 CProjectFolder::~CProjectFolder() {
   m_Folders.PurgeAndDeleteElements();
@@ -621,11 +616,10 @@ static bool FilesSortLessFunc(CProjectFile *const &pLHS,
 
 CProjectConfiguration::CProjectConfiguration(CVCProjGenerator *pGenerator,
                                              const char *pConfigName,
-                                             const char *pFilename) {
-  m_pGenerator = pGenerator;
-  m_Name = pConfigName;
-  m_bIsFileConfig = (pFilename != NULL);
-
+                                             const char *pFilename)
+    : m_pGenerator(pGenerator),
+      m_bIsFileConfig(pFilename != NULL),
+      m_Name(pConfigName) {
   m_pDebuggingTool = NULL;
   m_pCompilerTool = NULL;
   m_pLibrarianTool = NULL;

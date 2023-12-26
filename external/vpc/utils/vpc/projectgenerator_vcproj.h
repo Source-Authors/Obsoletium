@@ -114,9 +114,9 @@ class CCompilerTool : public CProjectTool {
  public:
   CCompilerTool(CVCProjGenerator *pGenerator, const char *pConfigName,
                 bool bIsFileConfig)
-      : CProjectTool(pGenerator) {
-    m_ConfigName = pConfigName;
-    m_bIsFileConfig = bIsFileConfig;
+      : CProjectTool(pGenerator),
+        m_ConfigName(pConfigName),
+        m_bIsFileConfig(bIsFileConfig) {
   }
 
   bool SetProperty(ToolProperty_t *pToolProperty,
@@ -177,9 +177,9 @@ class CCustomBuildTool : public CProjectTool {
  public:
   CCustomBuildTool(CVCProjGenerator *pGenerator, const char *pConfigName,
                    bool bIsFileConfig)
-      : CProjectTool(pGenerator) {
-    m_ConfigName = pConfigName;
-    m_bIsFileConfig = bIsFileConfig;
+      : CProjectTool(pGenerator),
+        m_ConfigName(pConfigName),
+        m_bIsFileConfig(bIsFileConfig) {
   }
 
   bool SetProperty(ToolProperty_t *pToolProperty,
@@ -355,7 +355,6 @@ class CVCProjGenerator : public CBaseProjectDataCollector {
   CSimplePointerStack<CCustomBuildTool *, CCustomBuildTool *, 128>
       m_spCustomBuildToolStack;
 
-  CUtlString m_ProjectName;
   CUtlString m_OutputFilename;
 
   CProjectFolder *m_pRootFolder;
