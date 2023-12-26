@@ -129,8 +129,6 @@ bool CVPC::Init(int argc, const char **argv) {
        (getenv("VPC_QUIET") && V_stricmp(getenv("VPC_QUIET"), "0")));
 
 #ifndef STEAM
-  // We don't really need to pop the logging state since the process will
-  // terminate when we're done.
   LoggingSystem_PushLoggingState();
 
   m_LoggingListener.m_bQuietPrintf = m_bQuiet;
@@ -179,6 +177,12 @@ void CVPC::Shutdown(bool bHasError) {
   }
 
   UnloadPerforceInterface();
+
+#ifndef STEAM
+  LoggingSystem_UnregisterLoggingListener(&m_LoggingListener);
+
+  LoggingSystem_PopLoggingState();
+#endif
 }
 
 // Usually you have no Perforce version control system.

@@ -775,7 +775,7 @@ void CUtlMemory<T, I>::Purge() {
   if (!IsExternallyAllocated()) {
     if (m_pMemory) {
       UTLMEMORY_TRACK_FREE();
-      free((void*)m_pMemory);
+      free(m_pMemory);
       m_pMemory = 0;
     }
     m_nAllocationCount = 0;
