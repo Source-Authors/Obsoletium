@@ -295,7 +295,7 @@ const char *COM_ParseLine (const char *data)
 	size_t len = 0;
 	int c = *data;
 
-// parse a line out of the data
+	// parse a line out of the data
 	do
 	{
 		com_token[len] = c;
@@ -312,7 +312,7 @@ const char *COM_ParseLine (const char *data)
 	if (c == '\0')
 		return nullptr;
 
-// eat whitespace (LF,CR,etc.) at the end of this line
+	// eat whitespace (LF,CR,etc.) at the end of this line
 	while ( (c = *data) < ' ' )
 	{
 		// end of file
@@ -1302,7 +1302,7 @@ void *COM_CompressBuffer_LZSS( const void *source, unsigned int sourceLen, unsig
 
 	CLZSS s;
 	unsigned int uCompressedLen = 0;
-	byte *pbOut = s.Compress( (const byte *)source, sourceLen, &uCompressedLen );
+	byte *pbOut = s.Compress( static_cast<const byte *>(source), sourceLen, &uCompressedLen );
 	if ( pbOut && uCompressedLen > 0 && ( uCompressedLen <= maxCompressedLen || maxCompressedLen == 0 ) )
 	{
 		*compressedLen = uCompressedLen;
@@ -1325,7 +1325,7 @@ bool COM_BufferToBufferCompress_LZSS( void *dest, unsigned int *destLen, const v
 
 	CLZSS s;
 	unsigned int uCompressedLen = 0;
-	if ( !s.CompressNoAlloc( (const byte *)source, sourceLen, (unsigned char *)dest, &uCompressedLen ) )
+	if ( !s.CompressNoAlloc( static_cast<const byte *>(source), sourceLen, static_cast<unsigned char *>(dest), &uCompressedLen ) )
 		return false;
 
 	*destLen = uCompressedLen;
@@ -1335,7 +1335,7 @@ bool COM_BufferToBufferCompress_LZSS( void *dest, unsigned int *destLen, const v
 //-----------------------------------------------------------------------------
 int COM_GetUncompressedSize( const void *compressed, unsigned int compressedLen )
 {
-	const lzss_header_t *pHeader = (const lzss_header_t *)compressed;
+	const lzss_header_t *pHeader = static_cast<const lzss_header_t *>(compressed);
 
 	// Check for our own LZSS compressed data
 	if ( ( compressedLen >= sizeof(lzss_header_t) ) && pHeader->id == LZSS_ID )
@@ -1368,11 +1368,11 @@ bool COM_BufferToBufferDecompress( void *dest, unsigned int *destLen, const void
 			return false;
 		}
 
-		const lzss_header_t *pHeader = (const lzss_header_t *)source;
+		const lzss_header_t *pHeader = static_cast<const lzss_header_t *>(source);
 		if ( pHeader->id == LZSS_ID )
 		{
 			CLZSS s;
-			int nActualDecompressedSize = s.SafeUncompress( (byte *)source, (byte *)dest, *destLen );
+			int nActualDecompressedSize = s.SafeUncompress( static_cast<const byte *>(source), static_cast<byte *>(dest), *destLen );
 			if ( nActualDecompressedSize != nDecompressedSize )
 			{
 				Warning( "NET_BufferToBufferDecompress: header said %d bytes would be decompressed, but we LZSS decompressed %d\n", nDecompressedSize, nActualDecompressedSize );
@@ -1384,7 +1384,7 @@ bool COM_BufferToBufferDecompress( void *dest, unsigned int *destLen, const void
 
 		if ( pHeader->id == SNAPPY_ID )
 		{
-			if ( !snappy::RawUncompress( (const char *)source + 4, sourceLen - 4, (char *)dest ) )
+			if ( !snappy::RawUncompress( static_cast<const char *>(source) + 4, sourceLen - 4, static_cast<char *>(dest) ) )
 			{
 				Warning( "NET_BufferToBufferDecompress: Snappy decompression failed\n" );
 				return false;
