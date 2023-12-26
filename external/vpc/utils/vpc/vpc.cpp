@@ -112,9 +112,8 @@ CVPC::CVPC() {
   m_pPhase1Projects = NULL;
 }
 
-CVPC::~CVPC() {
-  // BUGBUG: There is probably some actual cleanup to be done here.
-}
+// BUGBUG: There is probably some actual cleanup to be done here.
+CVPC::~CVPC() = default;
 
 bool CVPC::Init(int argc, const char **argv) {
   m_nArgc = argc;
