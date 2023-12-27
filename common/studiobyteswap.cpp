@@ -1223,8 +1223,8 @@ int ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, const
 		V_memcpy( pNewDest, pDestBase, pAnimBlock->datastart );
 		pNewDest += pAnimBlock->datastart;
 
-		int padding = AlignValue( (unsigned int)pNewDest - (unsigned int)pNewDestBase, 2048 );
-		padding -= (unsigned int)pNewDest - (unsigned int)pNewDestBase;
+		int padding = AlignValue( (uintp)pNewDest - (uintp)pNewDestBase, 2048 );
+		padding -= (uintp)pNewDest - (uintp)pNewDestBase;
 		pNewDest += padding;
 
 		// iterate and compress anim blocks
@@ -1235,7 +1235,7 @@ int ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, const
 			void *pInput = (byte *)pDestBase + pAnimBlock->datastart;
 			int inputSize = pAnimBlock->dataend - pAnimBlock->datastart;
 
-			pAnimBlock->datastart = (unsigned int)pNewDest - (unsigned int)pNewDestBase;
+			pAnimBlock->datastart = (uintp)pNewDest - (uintp)pNewDestBase;
 
 			void *pOutput;
 			int outputSize;
@@ -1252,11 +1252,11 @@ int ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, const
 				pNewDest += inputSize;
 			}
 
-			padding = AlignValue( (unsigned int)pNewDest - (unsigned int)pNewDestBase, 2048 );
-			padding -= (unsigned int)pNewDest - (unsigned int)pNewDestBase;
+			padding = AlignValue( (uintp)pNewDest - (uintp)pNewDestBase, 2048 );
+			padding -= (uintp)pNewDest - (uintp)pNewDestBase;
 			pNewDest += padding;
 
-			pAnimBlock->dataend = (unsigned int)pNewDest - (unsigned int)pNewDestBase;
+			pAnimBlock->dataend = (uintp)pNewDest - (uintp)pNewDestBase;
 		}
 
 		fixedFileSize = pNewDest - pNewDestBase;
