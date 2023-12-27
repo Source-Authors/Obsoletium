@@ -42,19 +42,6 @@ enum
 	WINDOW_BORDER_WIDTH=2 // the width of the window's border
 };
 
-
-#ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
-#endif
-
-#ifndef min
-#define min(a,b)    (((a) < (b)) ? (a) : (b))
-#endif
-
-#ifndef clamp
-#define clamp( val, min, max ) ( ((val) > (max)) ? (max) : ( ((val) < (min)) ? (min) : (val) ) )
-#endif
-
 //-----------------------------------------------------------------------------
 //
 // Button at the top of columns used to re-sort

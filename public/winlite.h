@@ -24,6 +24,7 @@
 // Access to Windows 10 features.
 #define _WIN32_WINNT 0x0A00
 
+#define NOMINMAX
 #define NOWINRES
 #define NOSERVICE
 #define NOMCX

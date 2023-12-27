@@ -496,9 +496,9 @@ const CPUInformation* GetCPUInformation()
 
 	// Ensure 256+ CPUs are at least 256.
 	pi.m_nPhysicalProcessors =
-		static_cast<uint8>( min( cpu_core_info.physical_cores, UCHAR_MAX ) );
+		static_cast<uint8>( min( cpu_core_info.physical_cores, static_cast<unsigned>(UCHAR_MAX) ) );
 	pi.m_nLogicalProcessors =
-		static_cast<uint8>( min( cpu_core_info.logical_cores, UCHAR_MAX ) );
+		static_cast<uint8>( min( cpu_core_info.logical_cores, static_cast<unsigned>(UCHAR_MAX) ) );
 
 	// Make sure I always report at least one, when running WinXP with the /ONECPU switch, 
 	// it likes to report 0 processors for some reason.

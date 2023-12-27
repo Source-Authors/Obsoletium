@@ -8,14 +8,6 @@
 #ifndef MINMAX_H
 #define MINMAX_H
 
-// Remove the MSVC defines
-#ifdef min
-#undef min
-#endif
-#ifdef max
-#undef max
-#endif
-
 // On older GCC #include <algorithm> gets obliterated by our silly -Dfopen=dont_use_fopen define. Since the other
 // buildbots will fail if someone does use fopen, I'm partially turning off the safety here to fix this.
 

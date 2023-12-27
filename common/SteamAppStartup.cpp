@@ -11,10 +11,15 @@
 #include <direct.h>
 #include <sys/stat.h>
 #include <cstdio>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "winlite.h"
 
 #define STEAM_PARM "-steam"
+
+#ifdef UNICODE
+#define PostMessage PostMessageW
+#else
+#define PostMessage PostMessageA
+#endif  // !UNICODE
 
 void LaunchSelfViaSteam(const char *params);
 

@@ -29,7 +29,6 @@ IVoiceRecord* CreateVoiceRecord_DSound(int sampleRate) { return new VoiceRecord_
 
 #else
 
-#define min(a,b)  (((a) < (b)) ? (a) : (b))
 #ifdef OSX
 #include <Carbon/Carbon.h>
 #include <OpenAL/al.h>

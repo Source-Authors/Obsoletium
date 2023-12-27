@@ -26,10 +26,6 @@
 
 using namespace vgui;
 
-#ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
-#endif
-
 DECLARE_BUILD_FACTORY_DEFAULT_TEXT( Label, Label );
 
 //-----------------------------------------------------------------------------

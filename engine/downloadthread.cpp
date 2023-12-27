@@ -204,7 +204,7 @@ void ReadData( RequestContext_t& rc )
 		{
 			// We've read some data.  Make sure we won't walk off the end of our buffer, then
 			// use memcpy() to save the data off.
-			DWORD safeSize = (DWORD) min( rc.nBytesTotal - rc.nBytesCurrent, (int)dwSize );
+			DWORD safeSize = min( rc.nBytesTotal - rc.nBytesCurrent, dwSize );
 			//Thread_DPrintf( "Read %d bytes @ offset %d\n", safeSize, rc.nBytesCurrent );
 			if ( safeSize != dwSize )
 			{

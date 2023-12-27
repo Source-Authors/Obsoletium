@@ -19,10 +19,6 @@
 
 using namespace vgui;
 
-#ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
-#endif
-
 vgui::Panel *MessageBox_Factory()
 {
 	return new MessageBox("MessageBox", "MessageBoxText");
