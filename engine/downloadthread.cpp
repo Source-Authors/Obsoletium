@@ -62,7 +62,7 @@ void WriteFileFromRequestContext( const RequestContext_t &rc )
 #ifdef _WIN32
 //--------------------------------------------------------------------------------------------------------------
 /**
- * Formats a string to spit out via OutputDebugString (only in debug).  OutputDebugString
+ * Formats a string to spit out via Plat_DebugString (only in debug).  Plat_DebugString
  * is threadsafe, so this should be fine.
  *
  * Since I don't want to be playing with the developer cvar in the other thread, I'll use
@@ -77,7 +77,7 @@ void Thread_DPrintf (char *fmt, ...)
 	va_start( argptr, fmt );
 	Q_vsnprintf( msg, sizeof(msg), fmt, argptr );
 	va_end( argptr );
-	OutputDebugString( msg );
+	Plat_DebugString( msg );
 #endif // _DEBUG
 }
 

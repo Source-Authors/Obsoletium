@@ -406,7 +406,7 @@ void CRConServer::FinishRedirect( const char *msg, const netadr_t &adr )
 		response.SeekPut( CUtlBuffer::SEEK_CURRENT, size );
 
 		
-//		OutputDebugString( va("RCON: String is %i long\n", Q_strlen(msg)) ); // can't use DevMsg(), we are potentially inside the RedirectFlush() function
+//		Plat_DebugString( va("RCON: String is %i long\n", Q_strlen(msg)) ); // can't use DevMsg(), we are potentially inside the RedirectFlush() function
 //		printf("RCON: String is %i long, packet size %i\n", Q_strlen(msg), size );
 
 		SendRCONResponse( i, response.Base(), response.TellPut() );
@@ -491,7 +491,7 @@ bool CRConServer::SendRCONResponse( int nIndex, const void *data, int len, bool 
 		}
 	}
 //	printf("RCON: Sending packet %i in len\n", len);
-//	OutputDebugString( va("RCON: Sending packet %i in len\n", len) ); // can't use DevMsg(), we are potentially inside the RedirectFlush() function
+//	Plat_DebugString( va("RCON: Sending packet %i in len\n", len) ); // can't use DevMsg(), we are potentially inside the RedirectFlush() function
 	return true;
 }
 

@@ -128,11 +128,7 @@ private:
 SpewRetval_t LauncherDefaultSpewFunc( SpewType_t spewType, char const *pMsg )
 {
 #ifndef _CERT
-#ifdef WIN32
-	OutputDebugStringA( pMsg );
-#else
-	fprintf( stderr, "%s", pMsg );
-#endif
+	Plat_DebugString( pMsg );
 	
 	switch( spewType )
 	{

@@ -1066,10 +1066,6 @@ void operator delete [] (void *pMem)
 }
 */
 
-#ifdef WIN32
-extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(_In_opt_ const char *lpOutputString);
-#endif
-
 void CVGui::DPrintf(const char* format,...)
 {
 	char    buf[2048];
@@ -1079,9 +1075,9 @@ void CVGui::DPrintf(const char* format,...)
 	Q_vsnprintf(buf,sizeof( buf ), format,argList);
 	va_end(argList);
 
-#ifdef WIN32
-	::OutputDebugStringA(buf);
-#else
+	Plat_DebugString(buf);
+
+#ifndef WIN32
 	Msg( "%s", buf );
 #endif
 }
@@ -1098,9 +1094,9 @@ void CVGui::DPrintf2(const char* format,...)
 	Q_vsnprintf(buf+strlen(buf),sizeof( buf )-strlen(buf),format,argList);
 	va_end(argList);
 
-#ifdef WIN32
-	::OutputDebugStringA(buf);
-#else
+	Plat_DebugString(buf);
+
+#ifndef WIN32
 	Msg( "%s", buf );
 #endif
 }

@@ -2092,7 +2092,7 @@ bool CalcPoseSingle(
 			/*
 			char buf[256];
 			sprintf( buf, "%d %6.2f  %d %6.2f : %6.2f %6.2f %6.2f\n", i0, s0, i1, s1, weight[0], weight[1], weight[2] );
-			OutputDebugString( buf );
+			Plat_DebugString( buf );
 			*/
 
 			if (weight[1] < 0.001)
@@ -4013,7 +4013,7 @@ void CIKContext::AutoIKRelease( void )
 								/*
 								char buf[256];
 								sprintf( buf, "dt %.4f ft %.4f weight %.4f latched %.4f\n", dt, ft, ikrule.flWeight, ikrule.latched );
-								OutputDebugString( buf );
+								Plat_DebugString( buf );
 								*/
 
 								int nIndex = m_ikChainRule.Element( ikrule.chain ).AddToTail( );

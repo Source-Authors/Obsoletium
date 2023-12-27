@@ -317,20 +317,15 @@ void Sys_Printf(char *fmt, ...)
 		
 	if ( developer.GetInt() )
 	{
+		Plat_DebugString( text );
 #ifdef _WIN32
-		wchar_t unicode[2048];
-		::MultiByteToWideChar(CP_UTF8, 0, text, -1, unicode, sizeof( unicode ) / sizeof(wchar_t));
-		unicode[(sizeof( unicode ) / sizeof(wchar_t)) - 1] = L'\0';
-		OutputDebugStringW( unicode );
 		ThreadSleep( 0 );
-#else
-		fprintf( stderr, "%s", text );
 #endif
 	}
 
 	if ( s_bIsDedicated )
 	{
-		printf( "%s", text );
+		fprintf( stderr, "%s", text );
 	}
 }
 

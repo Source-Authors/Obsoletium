@@ -506,7 +506,7 @@ bool Plat_IsInDebugSession()
 
 void Plat_DebugString( const char * psz )
 {
-	printf( "%s", psz );
+	fprintf( stderr, "%s", psz );
 }
 
 static char g_CmdLine[ 2048 ];

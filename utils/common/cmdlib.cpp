@@ -295,13 +295,13 @@ SpewRetval_t CmdLib_SpewOutputFunc( SpewType_t type, char const *pMsg )
 		}
 
 		if ( !g_bSuppressPrintfOutput || type == SPEW_ERROR )
-			printf( "%s", pMsg );
+			fprintf( stderr, "%s", pMsg );
 
 		OutputDebugString( pMsg );
 		
 		if ( type == SPEW_ERROR )
 		{
-			printf( "\n" );
+			fprintf( stderr, "\n" );
 			OutputDebugString( "\n" );
 		}
 

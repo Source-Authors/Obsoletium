@@ -175,7 +175,7 @@ void VGUIPrintf( const char *msg )
 {
 	if ( !g_pMainPanel || VGUIIsInConfig() || VGUIIsStopping() )
 	{
-		OutputDebugStringA( msg );
+		Plat_DebugString( msg );
 	}
 	else if ( g_pMainPanel )
 	{
