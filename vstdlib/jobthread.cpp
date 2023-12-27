@@ -537,15 +537,14 @@ int CThreadPool::NumIdleThreads()
 
 void CThreadPool::ExecuteHighPriorityFunctor( CFunctor *pFunctor )
 {
-	int i;
-	for ( i = 0; i < m_Threads.Count(); i++ )
+	for ( auto &&t : m_Threads )
 	{
-		m_Threads[i]->CallWorker( TPM_RUNFUNCTOR, 0, false, pFunctor );
+		t->CallWorker( TPM_RUNFUNCTOR, 0, false, pFunctor );
 	}
 
-	for ( i = 0; i < m_Threads.Count(); i++ )
+	for ( auto &&t : m_Threads )
 	{
-		m_Threads[i]->WaitForReply();
+		t->WaitForReply();
 	}
 }
 
@@ -560,22 +559,21 @@ int CThreadPool::SuspendExecution()
 	if ( m_nSuspend == 0 )
 	{
 		// Make sure state is correct
-		int i;
-		for ( i = 0; i < m_Threads.Count(); i++ )
+		for ( auto &&t : m_Threads )
 		{
-			m_Threads[i]->CallWorker( TPM_SUSPEND, 0 );
+			t->CallWorker( TPM_SUSPEND, 0 );
 		}
 
-		for ( i = 0; i < m_Threads.Count(); i++ )
+		for ( auto &&t : m_Threads )
 		{
-			m_Threads[i]->WaitForReply();
+			t->WaitForReply();
 		}
 
 		// Because worker must signal before suspending, we could reach
 		// here with the thread not actually suspended
-		for ( i = 0; i < m_Threads.Count(); i++ )
+		for ( auto &&t : m_Threads )
 		{
-			m_Threads[i]->BWaitForThreadSuspendCooperative();
+			t->BWaitForThreadSuspendCooperative();
 		}
 	}
 
@@ -591,9 +589,9 @@ int CThreadPool::ResumeExecution()
 	int result = m_nSuspend--;
 	if (m_nSuspend == 0 )
 	{
-		for ( int i = 0; i < m_Threads.Count(); i++ )
+		for ( auto &&t : m_Threads )
 		{
-			m_Threads[i]->ResumeCooperative();
+			t->ResumeCooperative();
 		}
 	}
 	return result;
@@ -808,15 +806,14 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 
 	CJob *pJob;
 	int nExecuted = 0;
-	int i;
 	int nJobsTotal = GetJobCount();
 	CUtlVector<CJob *> jobsToPutBack;
 
 	for ( int iCurPriority = JP_HIGH; iCurPriority >= iToPriority; --iCurPriority )
 	{
-		for ( i = 0; i < m_Threads.Count(); i++ )
+		for ( auto &&t : m_Threads )
 		{
-			CJobQueue &queue = m_Threads[i]->AccessDirectQueue();
+			CJobQueue &queue = t->AccessDirectQueue();
 			while ( queue.Count( (JobPriority_t)iCurPriority ) )
 			{
 				queue.Pop( &pJob );
@@ -865,10 +862,10 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 		}
 	}
 
-	for ( i = 0; i < jobsToPutBack.Count(); i++ )
+	for ( auto &&j : jobsToPutBack )
 	{
-		InsertJobInQueue( jobsToPutBack[i] );
-		jobsToPutBack[i]->Release();
+		InsertJobInQueue( j );
+		j->Release();
 	}
 
 	ResumeExecution();
@@ -893,9 +890,9 @@ int CThreadPool::AbortAll()
 		iAborted++;
 	}
 
-	for ( int i = 0; i < m_Threads.Count(); i++ )
+	for ( auto &&t : m_Threads )
 	{
-		CJobQueue &queue = m_Threads[i]->AccessDirectQueue();
+		CJobQueue &queue = t->AccessDirectQueue();
 		while ( queue.Pop( &pJob ) )
 		{
 			pJob->Abort();
@@ -1010,13 +1007,14 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 	{
 		int iThread = m_Threads.AddToTail();
 		m_IdleEvents.AddToTail();
-		m_Threads[iThread] = new CJobThread( this, iThread );
-		m_IdleEvents[iThread] = &m_Threads[iThread]->GetIdleEvent();
-		m_Threads[iThread]->SetName( CFmtStr( "%s%d", pszName, iThread ) );
-		m_Threads[iThread]->Start( nStackSize );
-		m_Threads[iThread]->GetIdleEvent().Wait();
+		auto *jobThread = new CJobThread( this, iThread );
+		m_Threads[iThread] = jobThread;
+		m_IdleEvents[iThread] = &jobThread->GetIdleEvent();
+		jobThread->SetName( CFmtStr( "%s%d", pszName, iThread ) );
+		jobThread->Start( nStackSize );
+		jobThread->GetIdleEvent().Wait();
 #ifdef WIN32
-		ThreadSetPriority( (ThreadHandle_t)m_Threads[iThread]->GetThreadHandle(), priority );
+		ThreadSetPriority( (ThreadHandle_t)jobThread->GetThreadHandle(), priority );
 #endif
 	}
 
@@ -1043,7 +1041,7 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 				SetThreadIdealProcessor( hMainThread, 0 );
 
 				int iProc = 0;
-				for ( int i = 0; i < m_Threads.Count(); i++ )
+				for ( auto &&t : m_Threads )
 				{
 					iProc += nHwThreadsPer;
 					if ( iProc >= ci.m_nLogicalProcessors )
@@ -1054,7 +1052,7 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 							iProc = ( iProc + 1 ) % nHwThreadsPer;
 						}
 					}
-					SetThreadIdealProcessor( (ThreadHandle_t)m_Threads[i]->GetThreadHandle(), iProc );
+					SetThreadIdealProcessor( t->GetThreadHandle(), iProc );
 				}
 #else
 				// no affinity table, distribution is cycled across all available
@@ -1078,13 +1076,14 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 			}
 			else
 			{
-				// distribution is from affinity table
-				for ( int i = 0; i < m_Threads.Count(); i++ )
-				{
 #ifdef WIN32
-					ThreadSetAffinity( (ThreadHandle_t)m_Threads[i]->GetThreadHandle(), pAffinityTable[i] );
-#endif
+				size_t i = 0;
+				// distribution is from affinity table
+				for ( auto &&t : m_Threads )
+				{
+					ThreadSetAffinity( (ThreadHandle_t)t->GetThreadHandle(), pAffinityTable[i++] );
 				}
+#endif
 			}
 		}
 	}
@@ -1094,9 +1093,9 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 		DWORD_PTR dwProcessAffinity, dwSystemAffinity;
 		if ( GetProcessAffinityMask( GetCurrentProcess(), &dwProcessAffinity, &dwSystemAffinity ) )
 		{
-			for ( int i = 0; i < m_Threads.Count(); i++ )
+			for ( auto &&t : m_Threads )
 			{
-				ThreadSetAffinity( (ThreadHandle_t)m_Threads[i]->GetThreadHandle(), dwProcessAffinity );
+				ThreadSetAffinity( (ThreadHandle_t)t->GetThreadHandle(), dwProcessAffinity );
 			}
 		}
 #endif
@@ -1107,18 +1106,18 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 
 bool CThreadPool::Stop( int timeout )
 {
-	for ( int i = 0; i < m_Threads.Count(); i++ )
+	for ( auto &&t : m_Threads )
 	{
-		m_Threads[i]->CallWorker( TPM_EXIT );
+		t->CallWorker( TPM_EXIT );
 	}
 
-	for ( int i = 0; i < m_Threads.Count(); ++i )
+	for ( auto &&t : m_Threads )
 	{
-		while( m_Threads[i]->IsAlive() )
+		while( t->IsAlive() )
 		{
 			ThreadSleep( 0 );
 		}
-		delete m_Threads[i];
+		delete t;
 	}
 
 	m_nJobs = 0;
