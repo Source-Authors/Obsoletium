@@ -28,7 +28,7 @@ $Configuration
 
 	$Linker
 	{
-		$SystemLibraries                "iconv" [$OSXALL]
+		$SystemLibraries				"iconv" [$OSXALL]
 	}
 }
 
