@@ -9,10 +9,12 @@
 #if defined( _WIN32 )
 #include "winlite.h"
 
-#include <winsock.h>
+#include <direct.h>
 #include <shellapi.h>
 #include <shlwapi.h> // registry stuff
-#include <direct.h>
+#include <winsock.h>
+
+#include "scoped_timer_resolution.h"
 
 #elif defined ( LINUX ) || defined( OSX )
 	#define O_EXLOCK 0
@@ -23,42 +25,45 @@
 #else
 #error "Please define your platform"
 #endif
+
 #include <chrono>
-#include "appframework/ilaunchermgr.h"
-#include "tier0/icommandline.h"
-#include "engine_launcher_api.h"
-#include "tier0/vcrmode.h"
-#include "ifilesystem.h"
-#include "tier1/interface.h"
-#include "tier0/dbg.h"
-#include "iregistry.h"
-#include "appframework/IAppSystem.h"
+
 #include "appframework/AppFramework.h"
-#include "vgui/VGUI.h"
-#include "vgui/ISurface.h"
-#include "tier0/platform.h"
+#include "appframework/ilaunchermgr.h"
+#include "appframework/IAppSystem.h"
+
+#include "tier0/dbg.h"
+#include "tier0/icommandline.h"
 #include "tier0/memalloc.h"
-#include "filesystem.h"
-#include "tier1/utlrbtree.h"
-#include "materialsystem/imaterialsystem.h"
-#include "istudiorender.h"
-#include "vgui/IVGui.h"
-#include "IHammer.h"
-#include "datacache/idatacache.h"
-#include "datacache/imdlcache.h"
-#include "vphysics_interface.h"
-#include "filesystem_init.h"
-#include "vstdlib/iprocessutils.h"
-#include "video/ivideoservices.h"
+#include "tier0/platform.h"
+#include "tier0/vcrmode.h"
+#include "tier1/fmtstr.h"
+#include "tier1/interface.h"
 #include "tier1/tier1.h"
+#include "tier1/utlrbtree.h"
 #include "tier2/tier2.h"
 #include "tier3/tier3.h"
-#include "inputsystem/iinputsystem.h"
+
+#include "datacache/idatacache.h"
+#include "datacache/imdlcache.h"
+#include "engine_launcher_api.h"
+#include "filesystem.h"
+#include "filesystem_init.h"
 #include "filesystem/IQueuedLoader.h"
+#include "ifilesystem.h"
+#include "inputsystem/iinputsystem.h"
+#include "istudiorender.h"
+#include "iregistry.h"
+#include "IHammer.h"
+#include "materialsystem/imaterialsystem.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
+#include "vgui/VGUI.h"
+#include "video/ivideoservices.h"
+#include "vphysics_interface.h"
+#include "vstdlib/iprocessutils.h"
 #include "reslistgenerator.h"
-#include "tier1/fmtstr.h"
 #include "sourcevr/isourcevirtualreality.h"
-#include "scoped_timer_resolution.h"
 
 #define VERSION_SAFE_STEAM_API_INTERFACES
 #include "steam/steam_api.h"
