@@ -88,20 +88,6 @@ int MessageBox( HWND hWnd, const char *message, const char *header, unsigned uTy
 extern void* CreateSDLMgr();
 #endif
 
-// copied from sys.h
-struct FileAssociationInfo
-{
-	char const  *extension;
-	char const  *command_to_issue;
-};
-
-static const FileAssociationInfo g_FileAssociations[] =
-{
-	{ ".dem", "playdemo" },
-	{ ".sav", "load" },
-	{ ".bsp", "map" },
-};
-
 class CLeakDump
 {
 public:
