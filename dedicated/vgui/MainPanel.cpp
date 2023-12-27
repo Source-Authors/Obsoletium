@@ -183,7 +183,7 @@ void CMainPanel::OnTick()
 
 		// This is here because without it, the dedicated server will consume a lot of CPU and it will slow Steam down
 		// so much that it'll download at 64k instead of 6M.
-		Sleep( 200 );
+		ThreadSleep( 200 );
 
 		// see if we're done
 		if (complete)

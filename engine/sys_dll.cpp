@@ -322,7 +322,7 @@ void Sys_Printf(char *fmt, ...)
 		::MultiByteToWideChar(CP_UTF8, 0, text, -1, unicode, sizeof( unicode ) / sizeof(wchar_t));
 		unicode[(sizeof( unicode ) / sizeof(wchar_t)) - 1] = L'\0';
 		OutputDebugStringW( unicode );
-		Sleep( 0 );
+		ThreadSleep( 0 );
 #else
 		fprintf( stderr, "%s", text );
 #endif
@@ -548,11 +548,7 @@ bool IsInErrorExit()
 //-----------------------------------------------------------------------------
 void Sys_Sleep( int msec )
 {
-#ifdef _WIN32
-	Sleep ( msec );
-#elif POSIX
-	usleep( msec * 1000 );
-#endif
+	ThreadSleep ( msec );
 }
 
 //-----------------------------------------------------------------------------

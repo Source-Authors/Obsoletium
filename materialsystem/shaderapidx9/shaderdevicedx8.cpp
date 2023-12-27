@@ -2212,7 +2212,7 @@ IDirect3DDevice9* CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, unsigned nAd
 		return NULL;
 
 	// try again, other applications may be taking their time
-	Sleep( 1000 );
+	ThreadSleep( 1000 );
 	hr = D3D()->CreateDevice( nAdapter, devType,
 		(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, &pD3DDevice );
 	if ( !FAILED( hr ) && pD3DDevice )

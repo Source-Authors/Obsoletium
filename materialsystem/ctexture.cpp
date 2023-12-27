@@ -4834,7 +4834,7 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 				GetModSubdirectory( "tmp_lod_psdinfo.txt", szTxtFileName, sizeof( szTxtFileName ) );
 				sprintf( chCommand, "/C psdinfo \"%s\" > \"%s\"", szTextureContentPath, szTxtFileName);
 				ShellExecute( NULL, NULL, "cmd.exe", chCommand, NULL, SW_HIDE );
-				Sleep( 200 );
+				ThreadSleep( 200 );
 
 				CUtlBuffer bufTxtFileBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
 				g_pFullFileSystem->ReadFile( szTxtFileName, 0, bufTxtFileBuffer );
@@ -4853,9 +4853,9 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 					CP4AutoEditFile autop4_edit( szTextureContentPath );
 
 					sprintf( chCommand, "/C psdinfo -write \"%s\" < \"%s\"", szTextureContentPath, szTxtFileName );
-					Sleep( 200 );
+					ThreadSleep( 200 );
 					ShellExecute( NULL, NULL, "cmd.exe", chCommand, NULL, SW_HIDE );
-					Sleep( 200 );
+					ThreadSleep( 200 );
 
 					Msg(" '%s' : saved.\n", szTextureContentPath );
 					CP4AutoAddFile autop4_add( szTextureContentPath );

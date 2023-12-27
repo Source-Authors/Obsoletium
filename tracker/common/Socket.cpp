@@ -214,7 +214,7 @@ CSocketThread::~CSocketThread( void )
 	if ( m_hThread )
 	{
 		SetEvent( m_hShutdown );
-		Sleep( 2 );
+		ThreadSleep( 2 );
 		TerminateThread( m_hThread, 0 );
 	}
 	Unlock();

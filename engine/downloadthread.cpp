@@ -279,7 +279,7 @@ void CleanUpDownload( RequestContext_t& rc, HTTPStatus_t status, HTTPError_t err
 	// wait until the main thread says we can go away (so it can look at rc.data).
 	while ( !rc.shouldStop )
 	{
-		Sleep( 100 );
+		ThreadSleep( 100 );
 	}
 
 	// Delete rc.data, which was allocated in this thread

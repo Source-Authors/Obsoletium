@@ -379,11 +379,7 @@ void CEngine::Frame( void )
 		else
 		{
 			int nSleepMicrosecs = (int) ceilf( clamp( ( m_flMinFrameTime - m_flFrameTime ) * 1000000.f, 1.f, 1000000.f ) );
-#ifdef POSIX
-			usleep( nSleepMicrosecs );
-#else
 			ThreadSleep( (nSleepMicrosecs + 999) / 1000 );
-#endif
 		}
 	}
 

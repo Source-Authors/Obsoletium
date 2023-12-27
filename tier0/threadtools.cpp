@@ -2031,11 +2031,7 @@ void CThread::Yield()
 
 void CThread::Sleep(unsigned duration)
 {
-#ifdef _WIN32
-	::Sleep(duration);
-#elif defined(POSIX)
-	usleep( duration * 1000 );
-#endif
+	::ThreadSleep(duration);
 }
 
 //---------------------------------------------------------

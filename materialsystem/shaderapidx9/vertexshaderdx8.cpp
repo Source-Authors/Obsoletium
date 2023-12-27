@@ -3294,11 +3294,7 @@ void CShaderManager::SetVertexShader( VertexShader_t shader )
 			while( dxshader == INVALID_HARDWARE_SHADER )
 			{
 				Warning( "A dynamically compiled vertex shader has failed to build. Pausing for 5 seconds and attempting rebuild.\n" );
-#ifdef _WIN32
-				Sleep( 5000 );
-#elif POSIX
-				usleep( 5000 );
-#endif
+				ThreadSleep( 5000 );
 				dxshader = CompileShader( m_ShaderSymbolTable.String( vshLookup.m_Name ), vshLookup.m_nStaticIndex, vshIndex, true );
 			}
 		}
@@ -3397,11 +3393,7 @@ void CShaderManager::SetPixelShader( PixelShader_t shader )
 			while( dxshader == INVALID_HARDWARE_SHADER )
 			{
 				Warning( "A dynamically compiled pixel shader has failed to build. Pausing for 5 seconds and attempting rebuild.\n" );
-#ifdef _WIN32
-				Sleep( 5000 );
-#elif POSIX
-				usleep( 5000 );
-#endif
+				ThreadSleep( 5000 );
 				dxshader = CompileShader( m_ShaderSymbolTable.String( pshLookup.m_Name ), pshLookup.m_nStaticIndex, pshIndex, false );
 			}
 		}

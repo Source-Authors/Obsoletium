@@ -445,7 +445,7 @@ void VCR_EnterPausedState()
 			g_bWaitingForStepKeyUp = false;
 		}
 	
-		Sleep( 2 );
+		ThreadSleep( 2 );
 	}
 #else
 	Assert( !"Impl me" );

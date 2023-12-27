@@ -216,7 +216,7 @@ static DWORD WINAPI HeartbeatThread( LPVOID )
 {
 	ThreadSetDebugName( "CPUMonitoringHeartbeatThread" );
 	// Arbitrary/hacky time to wait for results to become available.
-	Sleep( kFirstInterval );
+	ThreadSleep( kFirstInterval );
 	for ( ; ; )
 	{
 		unsigned delay;
@@ -254,7 +254,7 @@ static DWORD WINAPI HeartbeatThread( LPVOID )
 			// Wait until all of the measurement threads should have run.
 			// This is just to avoid having the heartbeat thread fighting for cycles
 			// but isn't strictly necessary.
-			Sleep( kPostMeasureInterval );
+			ThreadSleep( kPostMeasureInterval );
 
 			// Wait for all of the worker threads to finish.
 			for ( DWORD i = 0; i < g_numCPUs; ++i )
@@ -286,12 +286,12 @@ static DWORD WINAPI HeartbeatThread( LPVOID )
 				delay = s_nDelayMilliseconds;
 			}
 
-			Sleep( delay );
+			ThreadSleep( delay );
 		}
 		else
 		{
 			// If there is nothing to do then just sleep for a bit.
-			Sleep( kMinimumDelay );
+			ThreadSleep( kMinimumDelay );
 		}
 	}
 

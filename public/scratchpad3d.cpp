@@ -15,12 +15,6 @@
 #ifndef POSIX
 // NOTE - linux doesn't need any of this code!
 
-extern "C"
-{
-	extern void __stdcall Sleep( unsigned long ms );
-};
-
-
 class CFileRead
 {
 public:
@@ -430,11 +424,7 @@ void CScratchPad3D::Clear()
 	
 	while( ( fp = m_pFileSystem->Open(m_pFilename, "wb") ) == NULL )
 	{
-#ifdef _WIN32
-		Sleep( 5 );
-#elif POSIX
-		usleep( 5 );
-#endif
+		ThreadSleep( 5 );
 	}
 
 	m_pFileSystem->Close( fp );
@@ -449,11 +439,7 @@ void CScratchPad3D::Flush()
 
 	while( ( fp = m_pFileSystem->Open(m_pFilename, "ab+") ) == NULL )
 	{
-#ifdef _WIN32
-		Sleep( 5 );
-#elif POSIX
-		usleep( 5 );
-#endif
+		ThreadSleep( 5 );
 	}
 	
 	// Append the new commands to the file.

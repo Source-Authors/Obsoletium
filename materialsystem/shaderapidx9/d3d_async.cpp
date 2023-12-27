@@ -89,7 +89,7 @@ public:
 		Assert( !IsFull() );
 #else
 		while (IsFull())
-			Sleep(0);
+			ThreadSleep(0);
 #endif
 		Data[write_index]=unit;
 		n_added++;
@@ -128,7 +128,7 @@ void D3DDeviceWrapper::RunThread( void )
 		PushBuffer *Pbuf=PBQueue.GetWorkUnit();
 		if (! Pbuf)
 		{
-			; //Sleep(0);
+			; //ThreadSleep(0);
 		}
 		else
 		{
@@ -228,7 +228,7 @@ PushBuffer *D3DDeviceWrapper::FindFreePushBuffer( PushBufferState newstate )
 		}
 		// hmm, out of push buffers. better sleep and try again later
 		SubmitPushBufferAndGetANewOne();
-		Sleep(0);
+		ThreadSleep(0);
 	}
 }
 
@@ -281,7 +281,7 @@ void D3DDeviceWrapper::Synchronize( void )
 		// here, wait for queue to become empty
 		while (! PBQueue.IsEmpty() )
 		{
-			// Sleep(1);
+			// ThreadSleep(1);
 		}
 	}
 }
