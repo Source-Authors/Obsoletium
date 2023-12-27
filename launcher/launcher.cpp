@@ -1146,7 +1146,6 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 #ifdef WIN32
 	else
 	{
-		int retval = -1;
 		// Can only run one windowed source app at a time
 		if ( !GrabSourceMutex(hMutex) )
 		{
@@ -1155,9 +1154,9 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			bool multiRun = CommandLine()->CheckParm( "-multirun" ) != NULL;
 
 			if (!multiRun) {
-				::MessageBox(NULL, "Only one instance of the game can be running at one time.", "Source - Warning", MB_ICONINFORMATION | MB_OK);
+				::MessageBox(NULL, "Only one instance of the game can be running at one time.", "Source - Warning", MB_ICONWARNING | MB_OK);
 
-				return retval;
+				return ERROR_SINGLE_INSTANCE_APP;
 			}
 		}
 	}
