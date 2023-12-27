@@ -602,7 +602,7 @@ bool CDmePresetGroup::ExportToTXT( const char *pFileName, CDmeAnimationSet *pAni
 #ifdef ALIGN4
 #undef ALIGN4
 #endif // #ifdef ALIGN4
-#define ALIGN4( a ) a = (byte *)((int)((byte *)a + 3) & ~ 3)
+#define ALIGN4( a ) a = (byte *)((intp)((byte *)a + 3) & ~ 3)
 
 
 //-----------------------------------------------------------------------------
