@@ -931,7 +931,11 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 		}
 		else
 		{
-			nThreads = ( ci.m_nLogicalProcessors / (( ci.m_bHT ) ? 2 : 1) ) - 1; // One per
+			// dimhotepus: Use physical CPU cores count directly instead of dances with HT and logical cores.
+			// The 12th Gen Intel Core processor¡¯s performance hybrid architecture combines high-performance
+			// P-cores with highly efficient E-cores in one silicon chip.  So physical != logical / 2 (HT).
+			// See https://www.intel.com/content/www/us/en/developer/articles/guide/12th-gen-intel-core-processor-gamedev-guide.html
+			nThreads = ci.m_nPhysicalProcessors - 1;
 			if ( IsPC() )
 			{
 				if ( nThreads > 3 )
@@ -973,18 +977,20 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 	{
 		if ( startParams.bIOThreads )
 		{
-			priority = THREAD_PRIORITY_HIGHEST;
+			// dimhotepus: Highest -> normal. No sense in highest priority for IO threads.
+			priority = THREAD_PRIORITY_NORMAL;
 		}
 		else
 		{
-			priority = ThreadGetPriority();
+			// dimhotepus: Current -> above normal. Compute threads above normal priority for compute threads.
+			priority = THREAD_PRIORITY_ABOVE_NORMAL;
 		}
 	}
 
 	bool bDistribute;
 	if ( startParams.fDistribute != TRS_NONE )
 	{
-		bDistribute = ( startParams.fDistribute == TRS_TRUE );
+		bDistribute = startParams.fDistribute == TRS_TRUE;
 	}
 	else
 	{
@@ -1026,7 +1032,8 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 	if ( bDistribute )
 	{
 		const CPUInformation &ci = *GetCPUInformation();
-		int nHwThreadsPer = (( ci.m_bHT ) ? 2 : 1);
+		// dimhotepus: Need to rethink as 12th Gen Intel Core has >2 HT per core.
+		int nHwThreadsPer = ci.m_nPhysicalProcessors != ci.m_nLogicalProcessors ? 2 : 1;
 		if ( ci.m_nLogicalProcessors > 1 )
 		{
 			if ( !pAffinityTable )
