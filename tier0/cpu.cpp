@@ -306,7 +306,7 @@ static bool HTSupported()
 static uint8 LogicalProcessorsPerPackage()
 {
 #if defined( _X360 )
-	return 2;
+	return 6;
 #else
 	// EBX[23:16] indicate number of logical processors per package
 	const unsigned NUM_LOGICAL_BITS = 0x00FF0000;
@@ -319,6 +319,101 @@ static uint8 LogicalProcessorsPerPackage()
 	return (uint8) ((reg_ebx & NUM_LOGICAL_BITS) >> 16);
 #endif
 }
+
+#ifdef _WIN32
+
+struct CpuCoreInfo
+{
+	unsigned physical_cores;
+	unsigned logical_cores;
+};
+
+// Helper function to count set bits in the processor mask.
+static unsigned CountSetBits(ULONG_PTR mask)
+{
+#if !(defined(_M_ARM) || defined(_M_ARM64))
+	__try
+	{
+		// Requires CPU support.
+		return __popcnt(mask);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		// Do nothing.
+	}
+#endif
+
+	constexpr size_t kLeftShift{sizeof(ULONG_PTR) * 8 - 1};
+	size_t bit_test{static_cast<size_t>(1U) << kLeftShift};
+
+	unsigned bits_num{0};
+	for (size_t i = 0; i <= kLeftShift; ++i)
+	{
+		bits_num += ((mask & bit_test) ? 1U : 0U);
+
+		bit_test /= 2;
+	}
+
+	return bits_num;
+}
+
+static CpuCoreInfo GetProcessorCoresInfo()
+{
+	SYSTEM_LOGICAL_PROCESSOR_INFORMATION *buffer{nullptr};
+	DWORD size{0};
+
+	while ( true )
+	{
+		const BOOL rc{ ::GetLogicalProcessorInformation( buffer, &size ) };
+		if ( rc ) break;
+ 
+		if ( ::GetLastError() == ERROR_INSUFFICIENT_BUFFER )
+		{
+			if ( buffer ) ::HeapFree( ::GetProcessHeap(), 0, buffer );
+
+			buffer = static_cast<SYSTEM_LOGICAL_PROCESSOR_INFORMATION*>(
+				::HeapAlloc( ::GetProcessHeap(), 0, size ) );
+			if ( !buffer )
+			{
+				// Allocation failure.
+				return { 1, 1 };
+			}
+		}
+		else
+		{
+			// Error GetLastError()
+			return { 1, 1 };
+		}
+	}
+
+	SYSTEM_LOGICAL_PROCESSOR_INFORMATION *it{buffer};
+	size_t offset{0};
+	unsigned logical_cores_num{0}, physical_cores_num{0};
+
+	while ( offset + sizeof(*it) <= size )
+	{
+		switch (it->Relationship)
+		{
+			case RelationProcessorCore:
+				physical_cores_num++;
+				// A hyperthreaded core supplies more than one logical processor.
+				logical_cores_num += CountSetBits( it->ProcessorMask );
+				break;
+
+			default:
+				// Unsupported LOGICAL_PROCESSOR_RELATIONSHIP value.
+				break;
+		}
+
+		offset += sizeof(*it);
+		++it;
+	}
+
+	::HeapFree( GetProcessHeap(), 0, buffer );
+
+	return { physical_cores_num, logical_cores_num };
+}
+#endif
 
 #if defined(POSIX)
 // Move this declaration out of the CalculateClockSpeed() function because
@@ -393,13 +488,17 @@ const CPUInformation* GetCPUInformation()
 	
 	// Get the logical and physical processor counts:
 	pi.m_nLogicalProcessors = LogicalProcessorsPerPackage();
+	pi.m_nPhysicalProcessors = 1U;
 
 #if defined(_WIN32) && !defined( _X360 )
-	SYSTEM_INFO si = {0};
-	GetNativeSystemInfo( &si );
+	// dimhotepus: Correctly compute CPU cores count.
+	CpuCoreInfo cpu_core_info{ GetProcessorCoresInfo() };
 
-	pi.m_nPhysicalProcessors = (unsigned char)(si.dwNumberOfProcessors / pi.m_nLogicalProcessors);
-	pi.m_nLogicalProcessors = (unsigned char)(pi.m_nLogicalProcessors * pi.m_nPhysicalProcessors);
+	// Ensure 256+ CPUs are at least 256.
+	pi.m_nPhysicalProcessors =
+		static_cast<uint8>( min( cpu_core_info.physical_cores, UCHAR_MAX ) );
+	pi.m_nLogicalProcessors =
+		static_cast<uint8>( min( cpu_core_info.logical_cores, UCHAR_MAX ) );
 
 	// Make sure I always report at least one, when running WinXP with the /ONECPU switch, 
 	// it likes to report 0 processors for some reason.
@@ -469,12 +568,11 @@ const CPUInformation* GetCPUInformation()
 		Assert( !"couldn't read cpu information from /proc/cpuinfo" );
 	}
 #elif defined(OSX)
-	int mib[2], num_cpu = 1;
-	size_t len;
-	mib[0] = CTL_HW;
-	mib[1] = HW_NCPU;
-	len = sizeof(num_cpu);
-	sysctl(mib, 2, &num_cpu, &len, NULL, 0);
+	int mib[2] { CTL_HW, HW_NCPU }, num_cpu = 1;
+	size_t len = sizeof(num_cpu);
+
+	sysctl(mib, 2, &num_cpu, &len, nullptr, 0);
+
 	pi.m_nPhysicalProcessors = num_cpu;
 	pi.m_nLogicalProcessors  = num_cpu;
 #endif
@@ -493,7 +591,8 @@ const CPUInformation* GetCPUInformation()
 	pi.m_bSSE42        = CheckSSE42Technology();
 	pi.m_b3DNow        = Check3DNowTechnology();
 	pi.m_szProcessorID = (tchar*)GetProcessorVendorId();
-	pi.m_bHT		   = HTSupported();
+	// dimhotepus: Correctly check HyperThreading support.
+	pi.m_bHT		   = pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors;
 
 	unsigned long eax, ebx, edx, ecx;
 	if (cpuid(1, eax, ebx, ecx, edx))

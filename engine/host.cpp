@@ -3855,7 +3855,7 @@ void Host_InitProcessor( void )
 	// Dump CPU information:
 	if( pi.m_nLogicalProcessors == 1 )
 	{
-		ConDMsg( "1 CPU, Frequency: %.01f %s,  Features: %s\n", 
+		ConDMsg( "1 logical CPU, Frequency: %.01f %s,  Features: %s\n", 
 			fFrequency,
 			szFrequencyDenomination,
 			szFeatureString
@@ -3866,11 +3866,11 @@ void Host_InitProcessor( void )
 		char buffer[256] = "";
 		if( pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors )
 		{
-			Q_snprintf(buffer, sizeof( buffer ), " (%i physical)", (int) pi.m_nPhysicalProcessors );
+			Q_snprintf(buffer, sizeof( buffer ), " (%hhu cores)", (int) pi.m_nPhysicalProcessors );
 		}
 
-		ConDMsg( "%i CPUs%s, Frequency: %.01f %s,  Features: %s\n", 
-			(int)pi.m_nLogicalProcessors,
+		ConDMsg( "%hhu logical CPUs%s, Frequency: %.01f %s,  Features: %s\n", 
+			pi.m_nLogicalProcessors,
 			buffer,
 			fFrequency,
 			szFrequencyDenomination,
