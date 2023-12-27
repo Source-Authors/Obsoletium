@@ -2010,13 +2010,13 @@ CThread *CThread::GetCurrentCThread()
 
 //---------------------------------------------------------
 //
-// Offer a context switch. Under Win32, equivalent to Sleep(0)
+// Offer a context switch.
 //
 
 void CThread::Yield()
 {
 #ifdef _WIN32
-  ::Sleep(0);
+	SwitchToThread();
 #elif defined(POSIX)
 	pthread_yield();
 #endif

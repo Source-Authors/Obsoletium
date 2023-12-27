@@ -1293,7 +1293,7 @@ public:
 	// CThread
 	static CThread *GetCurrentCThread();
 
-	// Offer a context switch. Under Win32, equivalent to Sleep(0)
+	// Offer a context switch.
 #ifdef Yield
 #undef Yield
 #endif
