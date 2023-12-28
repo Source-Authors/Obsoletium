@@ -1342,7 +1342,7 @@ void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 
 				break;
 			default:
-				Assert("Unexpected version while deserializing lumps.");
+				Error( "Unexpected lump version %d while deserializing lumps.", nLumpVersion );
 		}
 
 		m_StaticProps[i].Init( i, lump, m_StaticPropDict[lump.m_PropType].m_pModel );
