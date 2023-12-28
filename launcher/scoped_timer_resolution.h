@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // Defines the entry point for the application.
 //
@@ -10,12 +10,20 @@
 #define SRC_LAUNCHER_SCOPED_TIMER_RESOLUTION_H
 
 #include <chrono>
-#include "winlite.h"
+#include <sal.h>
 
-#include <mmsystem.h>
 #pragma comment(lib, "winmm.lib")
 
 #include "tier0/dbg.h"
+
+typedef _Return_type_success_(return == 0) unsigned MMRESULT;
+
+extern "C" {
+
+__declspec(dllimport) MMRESULT __stdcall timeBeginPeriod(_In_ unsigned uPeriod);
+__declspec(dllimport) MMRESULT __stdcall timeEndPeriod(_In_ unsigned uPeriod);
+
+}  // extern "C"
 
 // Changes minimum resolution for periodic timers and reverts back when
 // out of scope.
@@ -75,4 +83,4 @@ class ScopedTimerResolution {
   unsigned m_errorCode;
 };
 
-#endif // SRC_LAUNCHER_SCOPED_TIMER_RESOLUTION_H
+#endif  // SRC_LAUNCHER_SCOPED_TIMER_RESOLUTION_H
