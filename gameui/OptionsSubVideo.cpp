@@ -1384,7 +1384,7 @@ void COptionsSubVideo::OnResetData()
 
     SetCurrentResolutionComboItem();
 
-	bool bVREnabled = config.m_nVRModeAdapter != -1;
+	bool bVREnabled = config.m_nVRModeAdapter != UINT_MAX;
 	m_pVRMode->ActivateItem( bVREnabled ? 1 : 0 );
 	EnableOrDisableWindowedForVR();
 
@@ -1491,7 +1491,7 @@ void COptionsSubVideo::OnApplyChanges()
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 
 	bool bVRMode = m_pVRMode->GetActiveItem() != 0;
-	if( ( -1 != config.m_nVRModeAdapter ) != bVRMode )
+	if( ( UINT_MAX != config.m_nVRModeAdapter ) != bVRMode )
 	{
 		// let engine fill in mat_vrmode_adapter 
 		char szCmd[256];
@@ -1615,7 +1615,7 @@ void COptionsSubVideo::OnTextChanged(Panel *pPanel, const char *pszText)
 		if ( !m_bDisplayedVRModeMessage )
 		{
 			bool bVRNowEnabled = m_pVRMode->GetActiveItem() == 1;
-			bool bVRWasEnabled = materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter != -1;
+			bool bVRWasEnabled = materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter != UINT_MAX;
 			if( bVRWasEnabled != bVRNowEnabled )
 			{
 				m_bDisplayedVRModeMessage = true;
@@ -1637,7 +1637,7 @@ void		COptionsSubVideo::EnableOrDisableWindowedForVR()
 {
 	bool bCanBeEnabled = g_pSourceVR && g_pSourceVR->IsHmdConnected();
 	bool bVRNowEnabled = m_pVRMode->GetActiveItem() == 1;
-	bool bVRWasEnabled = materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter != -1;
+	bool bVRWasEnabled = materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter != UINT_MAX;
 	if( bCanBeEnabled && ( bVRNowEnabled || bVRWasEnabled ) )
 	{
 		m_pWindowed->SetEnabled( false );

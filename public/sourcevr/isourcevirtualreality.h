@@ -123,7 +123,7 @@ public:
 	virtual VMatrix GetMidEyeFromEye( VREye eEye ) = 0;
 
 	// returns the adapter index to use for VR mode
-	virtual int GetVRModeAdapter() = 0;
+	virtual unsigned GetVRModeAdapter() = 0;
 
 	// ----------------------------------------------------------------------
 	// Information about the tracker

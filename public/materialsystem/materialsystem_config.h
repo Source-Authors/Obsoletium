@@ -142,7 +142,7 @@ struct MaterialSystem_Config_t
 	bool m_bMotionBlur;
 	bool m_bSupportFlashlight;
 
-	int m_nVRModeAdapter;
+	unsigned m_nVRModeAdapter;
 
 	MaterialSystem_Config_t()
 	{
@@ -187,7 +187,7 @@ struct MaterialSystem_Config_t
 		m_bMotionBlur = false;
 		m_bSupportFlashlight = true;
 
-		m_nVRModeAdapter = -1;
+		m_nVRModeAdapter = UINT_MAX;
 
 		// misc defaults
 		bAllowCheats = false;

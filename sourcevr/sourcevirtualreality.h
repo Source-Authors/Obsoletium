@@ -75,7 +75,7 @@ public:
 	virtual bool WillDriftInYaw() OVERRIDE;
 	virtual bool GetDisplayBounds( VRRect_t *pRect ) OVERRIDE;
 	virtual VMatrix GetMidEyeFromEye( VREye eEye ) OVERRIDE;
-	virtual int GetVRModeAdapter() OVERRIDE;
+	virtual unsigned GetVRModeAdapter() OVERRIDE;
 	virtual void CreateRenderTargets( IMaterialSystem *pMaterialSystem ) OVERRIDE;
 	virtual void ShutdownRenderTargets() OVERRIDE;
 	virtual ITexture *GetRenderTarget( VREye eEye, EWhichRenderTarget eWhich ) OVERRIDE;

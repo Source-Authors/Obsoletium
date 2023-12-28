@@ -513,7 +513,7 @@ static void ReadMaterialSystemConfigFromRegistry( MaterialSystem_Config_t &confi
 		if ( conVar.IsValid() )
 		{
 			conVar.SetValue( nValue );
-			config.m_nVRModeAdapter = ReadVideoConfigInt( "VRModeAdapter", -1 );
+			config.m_nVRModeAdapter = static_cast<unsigned>( ReadVideoConfigInt( "VRModeAdapter", -1 ) );
 		}
 	}
 
@@ -709,7 +709,7 @@ void OverrideMaterialSystemConfig( MaterialSystem_Config_t &config )
 
 	// if VRModeAdapter is set, don't let things come up full screen
 	// They will be on the HMD display and that's BAD.
-	if( config.m_nVRModeAdapter != -1 )
+	if( config.m_nVRModeAdapter != UINT_MAX )
 	{
 		WriteVideoConfigInt( "ScreenWindowed", 1 );
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, true );
@@ -939,12 +939,12 @@ CON_COMMAND( mat_enable_vrmode, "Switches the material system to VR mode (after 
 	if( bVRMode )
 	{
 #if defined( _WIN32 )
-		int32 nVRModeAdapter = g_pSourceVR->GetVRModeAdapter();
-		if( nVRModeAdapter == -1 )
+		uint32 nVRModeAdapter = g_pSourceVR->GetVRModeAdapter();
+		if( nVRModeAdapter == UINT_MAX )
 		{
 			Warning( "Unable to get VRModeAdapter from OpenVR. VR mode will not be enabled. Try restarting and then enabling VR again.\n" );
 		}
-		mat_vrmode_adapter.SetValue( nVRModeAdapter );
+		mat_vrmode_adapter.SetValue( static_cast<int>(nVRModeAdapter) );
 #else
 		mat_vrmode_adapter.SetValue( 0 ); // This convar isn't actually used on other platforms so just use 0 to indicate that it's set
 #endif

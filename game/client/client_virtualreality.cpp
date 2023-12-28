@@ -1368,15 +1368,15 @@ void CClientVirtualReality::Activate()
 	if ( !ShouldForceVRActive() )
 	{
 		// see if VR mode is even enabled
-		if ( materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter == -1 )
+		if ( materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter == UINT_MAX )
 		{
 			Warning( "Enable VR mode in the video options before trying to use it.\n" );
 			return;
 		}
 
 		// See if we have an actual adapter
-		int32 nVRModeAdapter = g_pSourceVR->GetVRModeAdapter();
-		if ( nVRModeAdapter == -1 )
+		uint32 nVRModeAdapter = g_pSourceVR->GetVRModeAdapter();
+		if ( nVRModeAdapter == UINT_MAX )
 		{
 			Warning( "Unable to get VRMode adapter from OpenVR. VR mode cannot be enabled. Try restarting and then enabling VR again.\n" );
 			return;
@@ -1385,7 +1385,7 @@ void CClientVirtualReality::Activate()
 		// we can only activate if we've got a VR device
 		if ( materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter != nVRModeAdapter )
 		{
-			Warning( "VR Mode expects adapter %d which is different from %d which we are currently using. Try restarting and enabling VR mode again.\n",
+			Warning( "VR Mode expects adapter %u which is different from %u which we are currently using. Try restarting and enabling VR mode again.\n",
 				nVRModeAdapter, materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter );
 			engine->ExecuteClientCmd( "mat_enable_vrmode 0\n" );
 			return;

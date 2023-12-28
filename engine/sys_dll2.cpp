@@ -1127,7 +1127,7 @@ void CEngineAPI::SetStartupInfo( StartupInfo_t &info )
 					{
 						if ( Steam3Client().SteamUtils()->IsSteamRunningInVR() && g_pSourceVR->IsHmdConnected() )
 						{
-							int nForceVRAdapterIndex = g_pSourceVR->GetVRModeAdapter();
+							uint nForceVRAdapterIndex = g_pSourceVR->GetVRModeAdapter();
 							materials->SetAdapter( nForceVRAdapterIndex, 0 );
 
 							g_pSourceVR->SetShouldForceVRMode();
@@ -1714,7 +1714,7 @@ bool CEngineAPI::ModInit( const char *pModName, const char *pGameDir )
 	Host_ReadPreStartupConfiguration();
 
 	bool bWindowed = g_pMaterialSystemConfig->Windowed();
-	if( g_pMaterialSystemConfig->m_nVRModeAdapter != -1 )
+	if( g_pMaterialSystemConfig->m_nVRModeAdapter != UINT_MAX )
 	{
 		// at init time we never want to start up full screen
 		bWindowed = true;

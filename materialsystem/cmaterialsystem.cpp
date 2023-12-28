@@ -1305,7 +1305,7 @@ bool CMaterialSystem::SetMode( void* hwnd, const MaterialSystem_Config_t &config
 	ConvertModeStruct( &info, config );
 
 	bool bPreviouslyUsingGraphics = g_pShaderDevice->IsUsingGraphics();
-	if( config.m_nVRModeAdapter != -1 && (unsigned)config.m_nVRModeAdapter < GetDisplayAdapterCount() && !bPreviouslyUsingGraphics )
+	if( config.m_nVRModeAdapter != UINT_MAX && config.m_nVRModeAdapter < GetDisplayAdapterCount() && !bPreviouslyUsingGraphics )
 	{
 		// if this is init-time, we need to override the adapter with the
 		// VR mode adapter
@@ -1938,8 +1938,8 @@ void CMaterialSystem::ReadConfigFromConVars( MaterialSystem_Config_t *pConfig )
 	}
 
 	// VR mode adapter will generally be -1 if VR mode is not disabled
-	pConfig->m_nVRModeAdapter = mat_vrmode_adapter.GetInt();
-	if( pConfig->m_nVRModeAdapter != -1 )
+	pConfig->m_nVRModeAdapter = static_cast<unsigned>( mat_vrmode_adapter.GetInt() );
+	if( pConfig->m_nVRModeAdapter != UINT_MAX )
 	{
 		// we must always be windowed in the config in VR mode
 		// so that we will start up on the main display. Once

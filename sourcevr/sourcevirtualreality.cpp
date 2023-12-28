@@ -506,7 +506,7 @@ VMatrix CSourceVirtualReality::GetMidEyeFromEye( VREye eEye )
 }
 
 // returns the adapter index to use for VR mode
-int CSourceVirtualReality::GetVRModeAdapter()
+unsigned CSourceVirtualReality::GetVRModeAdapter()
 {
 	if( EnsureOpenVRInited() )
 	{
@@ -515,7 +515,7 @@ int CSourceVirtualReality::GetVRModeAdapter()
 	}
 	else
 	{
-		return -1;
+		return UINT_MAX;
 	}
 }
 
