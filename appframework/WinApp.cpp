@@ -7,10 +7,6 @@
 #ifdef POSIX
 #error "Please exclude from compilation if POSIX"
 #else
-#if defined( _WIN32 )
-#include "winlite.h"
-#endif
-
 #include "appframework/appframework.h"
 #include "tier0/dbg.h"
 #include "tier0/icommandline.h"
@@ -24,6 +20,9 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
+extern "C" __declspec(dllimport) char* __stdcall GetCommandLineA();
+
+FORWARD_DECLARE_HANDLE(HINSTANCE);
 
 //-----------------------------------------------------------------------------
 // Globals...
@@ -55,7 +54,7 @@ int AppMain( void* hInstance, void*, const char*, int, CAppSystemGroup *pAppSyst
 	Assert( pAppSystemGroup );
 
 	s_HInstance = (HINSTANCE)hInstance;
-	CommandLine()->CreateCmdLine( ::GetCommandLine() );
+	CommandLine()->CreateCmdLine( ::GetCommandLineA() );
 
 	return pAppSystemGroup->Run();
 }
@@ -81,7 +80,7 @@ int AppStartup( void* hInstance, void*, const char*, int, CAppSystemGroup *pAppS
 	Assert( pAppSystemGroup );
 
 	s_HInstance = (HINSTANCE)hInstance;
-	CommandLine()->CreateCmdLine( ::GetCommandLine() );
+	CommandLine()->CreateCmdLine( ::GetCommandLineA() );
 
 	return pAppSystemGroup->Startup();
 }
