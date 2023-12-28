@@ -5,6 +5,10 @@
 //===========================================================================//
 
 /* For force feedback testing. */
+#ifdef _WIN32
+#include "winlite.h"
+#endif
+
 #include "inputsystem.h"
 #include "tier1/convar.h"
 #include "tier0/icommandline.h"

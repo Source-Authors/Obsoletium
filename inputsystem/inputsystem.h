@@ -14,9 +14,6 @@
 
 #ifdef WIN32
 #if !defined( _X360 )
-#include "winlite.h"
-
-#include <zmouse.h>
 #include "xbox/xboxstubs.h"
 #include <Xinput.h>
 #endif

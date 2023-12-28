@@ -2,6 +2,10 @@
 //
 // Purpose: Native Steam Controller Interface
 //=============================================================================//
+#ifdef _WIN32
+#include "winlite.h"
+#endif
+
 #include "inputsystem.h"
 #include "key_translation.h"
 #include "filesystem.h"
