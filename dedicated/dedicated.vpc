@@ -60,6 +60,7 @@ $Project "Dedicated"
 		$File	"sys_common.cpp"
 		$File	"sys_ded.cpp"
 		$File	"sys_windows.cpp" [$WINDOWS]
+		$File	"args_win.cpp" [$WINDOWS]
 		$File	"sys_linux.cpp" [$POSIX]
 		{
 			$Configuration
