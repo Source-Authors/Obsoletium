@@ -371,9 +371,9 @@ public:
 			bSourceModLoaded = IsSourceModLoaded();
 			if ( bSourceModLoaded )
 			{
+#if !defined(NO_STEAM)
 				AppId_t AppId = GetSteamInfIDVersionInfo().ServerAppID;
 
-#if !defined(NO_STEAM)				
 				// Bump up the number and report the crash. This should be something
 				//  like 232251 (instead of 232250). 232251 is for the TF2 Windows client,
 				//  but we actually report those crashes under ID 440, so this should be ok.
