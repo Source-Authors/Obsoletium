@@ -1162,11 +1162,6 @@ $Project "ui"
 	"utils\tfstats\ui\ui.vpc" [$WIN32]
 }
 
-$Project "unicode"
-{
-	"unicode\unicode.vpc" [$WIN32]
-}
-
 $Project "uninstall"
 {
 	"shell\uninstall\uninstall.vpc" [$WIN32]

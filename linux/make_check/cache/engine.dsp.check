@@ -4216,10 +4216,6 @@ SOURCE=..\public\vgui_controls\TreeViewListControl.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\public\unicode\unicode.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\public\tier1\utlbidirectionalset.h
 # End Source File
 # Begin Source File
