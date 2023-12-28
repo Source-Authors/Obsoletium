@@ -11,10 +11,6 @@
 #pragma once
 #endif
 
-#if defined(_WIN32) && !defined(_X360)
-#include "winlite.h"		// FILETIME
-#endif
-
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/Frame.h"
 

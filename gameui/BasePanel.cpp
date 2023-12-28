@@ -86,6 +86,10 @@ using namespace vgui;
 #include "tier1/utlstring.h"
 #include "steam/steam_api.h"
 
+#ifdef _WIN32
+#include "winlite.h"
+#endif
+
 #undef MessageBox	// Windows helpfully #define's this to MessageBoxA, we're using vgui::MessageBox
 
 // memdbgon must be the last include file in a .cpp file!!!
