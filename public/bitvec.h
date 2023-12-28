@@ -34,7 +34,7 @@ private:
 //-----------------------------------------------------------------------------
 
 #define LOG2_BITS_PER_INT	5
-#define BITS_PER_INT		32
+#define BITS_PER_INT (CHAR_BIT * sizeof(int))
 
 #if _WIN32 && !defined(_X360)
 #include <intrin.h>
@@ -99,107 +99,110 @@ inline int FirstBitInWord( unsigned int elem, int offset )
 
 //-------------------------------------
 
-inline unsigned GetEndMask( int numBits ) 
+template <typename T, typename = std::enable_if_t<sizeof(T) <= sizeof(unsigned)>>
+inline unsigned GetEndMask( T numBits ) 
 { 
 	static unsigned bitStringEndMasks[] = 
 	{
-		0xffffffff,
-		0x00000001,
-		0x00000003,
-		0x00000007,
-		0x0000000f,
-		0x0000001f,
-		0x0000003f,
-		0x0000007f,
-		0x000000ff,
-		0x000001ff,
-		0x000003ff,
-		0x000007ff,
-		0x00000fff,
-		0x00001fff,
-		0x00003fff,
-		0x00007fff,
-		0x0000ffff,
-		0x0001ffff,
-		0x0003ffff,
-		0x0007ffff,
-		0x000fffff,
-		0x001fffff,
-		0x003fffff,
-		0x007fffff,
-		0x00ffffff,
-		0x01ffffff,
-		0x03ffffff,
-		0x07ffffff,
-		0x0fffffff,
-		0x1fffffff,
-		0x3fffffff,
-		0x7fffffff,
+		0xffffffffU,
+		0x00000001U,
+		0x00000003U,
+		0x00000007U,
+		0x0000000fU,
+		0x0000001fU,
+		0x0000003fU,
+		0x0000007fU,
+		0x000000ffU,
+		0x000001ffU,
+		0x000003ffU,
+		0x000007ffU,
+		0x00000fffU,
+		0x00001fffU,
+		0x00003fffU,
+		0x00007fffU,
+		0x0000ffffU,
+		0x0001ffffU,
+		0x0003ffffU,
+		0x0007ffffU,
+		0x000fffffU,
+		0x001fffffU,
+		0x003fffffU,
+		0x007fffffU,
+		0x00ffffffU,
+		0x01ffffffU,
+		0x03ffffffU,
+		0x07ffffffU,
+		0x0fffffffU,
+		0x1fffffffU,
+		0x3fffffffU,
+		0x7fffffffU,
 	};
 
 	return bitStringEndMasks[numBits % BITS_PER_INT]; 
 }
 
-
-inline int GetBitForBitnum( int bitNum ) 
+template<typename T, typename = std::enable_if_t<sizeof(T) <= sizeof(unsigned)>>
+inline T GetBitForBitnum( T bitNum ) 
 { 
-	static int bitsForBitnum[] = 
+	static T bitsForBitnum[] = 
 	{
-		( 1 << 0 ),
-		( 1 << 1 ),
-		( 1 << 2 ),
-		( 1 << 3 ),
-		( 1 << 4 ),
-		( 1 << 5 ),
-		( 1 << 6 ),
-		( 1 << 7 ),
-		( 1 << 8 ),
-		( 1 << 9 ),
-		( 1 << 10 ),
-		( 1 << 11 ),
-		( 1 << 12 ),
-		( 1 << 13 ),
-		( 1 << 14 ),
-		( 1 << 15 ),
-		( 1 << 16 ),
-		( 1 << 17 ),
-		( 1 << 18 ),
-		( 1 << 19 ),
-		( 1 << 20 ),
-		( 1 << 21 ),
-		( 1 << 22 ),
-		( 1 << 23 ),
-		( 1 << 24 ),
-		( 1 << 25 ),
-		( 1 << 26 ),
-		( 1 << 27 ),
-		( 1 << 28 ),
-		( 1 << 29 ),
-		( 1 << 30 ),
-		( 1 << 31 ),
+		( static_cast<T>(1) << 0 ),
+		( static_cast<T>(1) << 1 ),
+		( static_cast<T>(1) << 2 ),
+		( static_cast<T>(1) << 3 ),
+		( static_cast<T>(1) << 4 ),
+		( static_cast<T>(1) << 5 ),
+		( static_cast<T>(1) << 6 ),
+		( static_cast<T>(1) << 7 ),
+		( static_cast<T>(1) << 8 ),
+		( static_cast<T>(1) << 9 ),
+		( static_cast<T>(1) << 10 ),
+		( static_cast<T>(1) << 11 ),
+		( static_cast<T>(1) << 12 ),
+		( static_cast<T>(1) << 13 ),
+		( static_cast<T>(1) << 14 ),
+		( static_cast<T>(1) << 15 ),
+		( static_cast<T>(1) << 16 ),
+		( static_cast<T>(1) << 17 ),
+		( static_cast<T>(1) << 18 ),
+		( static_cast<T>(1) << 19 ),
+		( static_cast<T>(1) << 20 ),
+		( static_cast<T>(1) << 21 ),
+		( static_cast<T>(1) << 22 ),
+		( static_cast<T>(1) << 23 ),
+		( static_cast<T>(1) << 24 ),
+		( static_cast<T>(1) << 25 ),
+		( static_cast<T>(1) << 26 ),
+		( static_cast<T>(1) << 27 ),
+		( static_cast<T>(1) << 28 ),
+		( static_cast<T>(1) << 29 ),
+		( static_cast<T>(1) << 30 ),
+		( static_cast<T>(1) << 31 ),
 	};
 
 	return bitsForBitnum[ (bitNum) & (BITS_PER_INT-1) ]; 
 }
 
-inline int GetBitForBitnumByte( int bitNum ) 
+template<typename T, typename = std::enable_if_t<sizeof(T) <= sizeof(unsigned)>>
+inline T GetBitForBitnumByte( T bitNum ) 
 { 
-	static int bitsForBitnum[] = 
+	static T bitsForBitnum[] =
 	{
-		( 1 << 0 ),
-		( 1 << 1 ),
-		( 1 << 2 ),
-		( 1 << 3 ),
-		( 1 << 4 ),
-		( 1 << 5 ),
-		( 1 << 6 ),
-		( 1 << 7 ),
+		( static_cast<T>(1) << 0 ),
+		( static_cast<T>(1) << 1 ),
+		( static_cast<T>(1) << 2 ),
+		( static_cast<T>(1) << 3 ),
+		( static_cast<T>(1) << 4 ),
+		( static_cast<T>(1) << 5 ),
+		( static_cast<T>(1) << 6 ),
+		( static_cast<T>(1) << 7 ),
 	};
 
-	return bitsForBitnum[ bitNum & 7 ]; 
+	return bitsForBitnum[ bitNum & 7 ];
 }
 
-inline int CalcNumIntsForBits( int numBits )	{ return (numBits + (BITS_PER_INT-1)) / BITS_PER_INT; }
+template<typename T, typename = std::enable_if_t<sizeof(T) <= sizeof(unsigned)>>
+constexpr inline T CalcNumIntsForBits( T numBits )	{ return (numBits + (BITS_PER_INT-1)) / BITS_PER_INT; }
 
 #ifdef _X360
 #define BitVec_Bit( bitNum ) GetBitForBitnum( bitNum )
@@ -226,7 +229,7 @@ class CBitVecT : public BASE_OPS
 {
 public:
 	CBitVecT();
-	CBitVecT(int numBits);			// Must be initialized with the number of bits
+	CBitVecT(typename BASE_OPS::BitCountType numBits);			// Must be initialized with the number of bits
 
 	void	Init(int val = 0);
 
@@ -280,22 +283,24 @@ template <typename BITCOUNTTYPE>
 class CVarBitVecBase
 {
 public:
+	using BitCountType = typename BITCOUNTTYPE;
+
 	bool	IsFixedSize() const			{ return false; }
-	int		GetNumBits(void) const		{ return m_numBits; }
-	void	Resize( int numBits, bool bClearAll = false );		// resizes bit array
+	BITCOUNTTYPE		GetNumBits(void) const		{ return m_numBits; }
+	void	Resize( BITCOUNTTYPE numBits, bool bClearAll = false );		// resizes bit array
 	
-	int 	GetNumDWords() const		{ return m_numInts; }
+	BITCOUNTTYPE 	GetNumDWords() const		{ return m_numInts; }
 	uint32 *Base()						{ return m_pInt;	}
 	const uint32 *Base() const			{ return m_pInt;	}
 
-	void Attach( uint32 *pBits, int numBits );
-	bool Detach( uint32 **ppBits, int *pNumBits );
+	void Attach( uint32 *pBits, BITCOUNTTYPE numBits );
+	bool Detach( uint32 **ppBits, BITCOUNTTYPE *pNumBits );
 
 	int		FindNextSetBit(int iStartBit) const; // returns -1 if no set bit was found
 
 protected:
 	CVarBitVecBase();
-	CVarBitVecBase(int numBits);
+	CVarBitVecBase( BITCOUNTTYPE numBits );
 	CVarBitVecBase( const CVarBitVecBase<BITCOUNTTYPE> &from );
 	CVarBitVecBase &operator=( const CVarBitVecBase<BITCOUNTTYPE> &from );
 	~CVarBitVecBase(void);
@@ -311,8 +316,8 @@ private:
 	uint32			m_iBitStringStorage;		// If the bit string fits in one int, it goes here
 	uint32 *		m_pInt;					// Array of ints containing the bitstring
 
-	void	AllocInts( int numInts );	// Free the allocated bits
-	void	ReallocInts( int numInts );
+	void	AllocInts( BITCOUNTTYPE numInts );	// Free the allocated bits
+	void	ReallocInts( BITCOUNTTYPE numInts );
 	void	FreeInts( void );			// Free the allocated bits
 };
 
@@ -362,6 +367,8 @@ template <int NUM_BITS>
 class CFixedBitVecBase
 {
 public:
+	using BitCountType = typename int;
+
 	bool	IsFixedSize() const								{ return true; }
 	int		GetNumBits(void) const							{ return NUM_BITS; }
 	void	Resize( int numBits, bool bClearAll = false )	{ Assert(numBits == NUM_BITS); if ( bClearAll ) Plat_FastMemset( m_Ints, 0, NUM_INTS * sizeof(uint32) ); }// for syntatic consistency (for when using templates)
@@ -404,6 +411,13 @@ public:
 	}
 	
 	CVarBitVec(int numBits)
+	 : CBitVecT< CVarBitVecBase<unsigned short> >(static_cast<unsigned short>(numBits))
+	{
+		Assert( 0 <= numBits );
+		Assert( USHRT_MAX >= numBits );
+	}
+
+	CVarBitVec(unsigned short numBits)
 	 : CBitVecT< CVarBitVecBase<unsigned short> >(numBits)
 	{
 	}
@@ -452,7 +466,7 @@ inline CVarBitVecBase<BITCOUNTTYPE>::CVarBitVecBase()
 //-----------------------------------------------------------------------------
 
 template <typename BITCOUNTTYPE>
-inline CVarBitVecBase<BITCOUNTTYPE>::CVarBitVecBase(int numBits)
+inline CVarBitVecBase<BITCOUNTTYPE>::CVarBitVecBase(BITCOUNTTYPE numBits)
 {
 	Assert( numBits );
 	m_numBits	= numBits;
@@ -506,12 +520,12 @@ inline CVarBitVecBase<BITCOUNTTYPE>::~CVarBitVecBase(void)
 //-----------------------------------------------------------------------------
 
 template <typename BITCOUNTTYPE>
-inline void CVarBitVecBase<BITCOUNTTYPE>::Attach( uint32 *pBits, int numBits )
+inline void CVarBitVecBase<BITCOUNTTYPE>::Attach( uint32 *pBits, BITCOUNTTYPE numBits )
 {
 	FreeInts();
 	m_numBits = numBits;
 	m_numInts = CalcNumIntsForBits( numBits );
-	if ( m_numInts > 1 )
+	if ( m_numInts > static_cast<BITCOUNTTYPE>(1) )
 	{
 		m_pInt = pBits;
 	}
@@ -526,7 +540,7 @@ inline void CVarBitVecBase<BITCOUNTTYPE>::Attach( uint32 *pBits, int numBits )
 //-----------------------------------------------------------------------------
 
 template <typename BITCOUNTTYPE>
-inline bool CVarBitVecBase<BITCOUNTTYPE>::Detach( uint32 **ppBits, int *pNumBits )
+inline bool CVarBitVecBase<BITCOUNTTYPE>::Detach( uint32 **ppBits, BITCOUNTTYPE *pNumBits )
 {
 	if ( !m_numBits )
 	{
@@ -534,7 +548,7 @@ inline bool CVarBitVecBase<BITCOUNTTYPE>::Detach( uint32 **ppBits, int *pNumBits
 	}
 
 	*pNumBits = m_numBits;
-	if ( m_numInts > 1 )
+	if ( m_numInts > static_cast<BITCOUNTTYPE>(1) )
 	{
 		*ppBits = m_pInt;
 	}
@@ -565,7 +579,7 @@ inline CBitVecT<BASE_OPS>::CBitVecT()
 
 //-----------------------------------------------------------------------------
 template <class BASE_OPS>
-inline CBitVecT<BASE_OPS>::CBitVecT(int numBits)
+inline CBitVecT<BASE_OPS>::CBitVecT(typename BASE_OPS::BitCountType numBits)
  : BASE_OPS( numBits )
 {
 	// undef this is ints are not 4 bytes
@@ -1300,9 +1314,9 @@ inline void CBitVecT< CFixedBitVecBase<32> >::Set( int bitNum, bool bNewVal )
 // Input  : resizeNumBits - 
 //-----------------------------------------------------------------------------
 template <typename BITCOUNTTYPE>
-inline void CVarBitVecBase<BITCOUNTTYPE>::Resize( int resizeNumBits, bool bClearAll )
+inline void CVarBitVecBase<BITCOUNTTYPE>::Resize( BITCOUNTTYPE resizeNumBits, bool bClearAll )
 {
-	Assert( resizeNumBits >= 0 && ((BITCOUNTTYPE)resizeNumBits == resizeNumBits) );
+	Assert( resizeNumBits >= 0 );
 
 	int newIntCount = CalcNumIntsForBits( resizeNumBits );
 	if ( newIntCount != GetNumDWords() )
@@ -1345,7 +1359,7 @@ inline void CVarBitVecBase<BITCOUNTTYPE>::Resize( int resizeNumBits, bool bClear
 // Input  : numInts - 
 //-----------------------------------------------------------------------------
 template <typename BITCOUNTTYPE>
-inline void CVarBitVecBase<BITCOUNTTYPE>::AllocInts( int numInts )
+inline void CVarBitVecBase<BITCOUNTTYPE>::AllocInts( BITCOUNTTYPE numInts )
 {
 	Assert( !m_pInt );
 
@@ -1367,7 +1381,7 @@ inline void CVarBitVecBase<BITCOUNTTYPE>::AllocInts( int numInts )
 // Input  : numInts - 
 //-----------------------------------------------------------------------------
 template <typename BITCOUNTTYPE>
-inline void CVarBitVecBase<BITCOUNTTYPE>::ReallocInts( int numInts )
+inline void CVarBitVecBase<BITCOUNTTYPE>::ReallocInts( BITCOUNTTYPE numInts )
 {
 	Assert( Base() );
 	if ( numInts == 0)
