@@ -16,7 +16,7 @@
 #include "tier0/icommandline.h"
 #include "interface.h"
 #include "filesystem.h"
-#include "appframework/iappsystemgroup.h"
+#include "appframework/IAppSystemGroup.h"
 #include "filesystem_init.h"
 #include "vstdlib/cvar.h"
 #include "xbox/xbox_console.h"
