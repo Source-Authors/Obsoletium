@@ -3,10 +3,28 @@
 #ifndef VPC_TIER0_IA32DETECT_H_
 #define VPC_TIER0_IA32DETECT_H_
 
-#ifdef COMPILER_MSVC64
-extern "C" void __cpuid(int *CPUInfo, int InfoType);
-#pragma intrinsic(__cpuid)
+#ifdef _MSC_VER
+#include <intrin.h>
 #endif
+
+inline void cpuid(int *info, int function_id) noexcept {
+#if defined(__clang__) || defined(__GNUC__)
+#if defined(_M_X64) || defined(__amd64__)
+  asm volatile(
+      "movq\t%%rbx, %%rsi\n\t"
+      "cpuid\n\t"
+      "xchgq\t%%rbx, %%rsi\n\t"
+      : "=a"(info[0]), "=S"(info[1]), "=c"(info[2]), "=d"(info[3])
+      : "a"(function_id));
+  return info;
+#else
+#error "Please add cpuid support for your arhitecture."
+  return info;
+#endif  // defined(_M_X64) || defined(__amd64__)
+#elif defined(_MSC_VER)
+  __cpuid(info, function_id);
+#endif
+}
 
 // This section from http://iss.cs.cornell.edu/ia32.htm
 typedef unsigned bit;
@@ -101,24 +119,7 @@ class ia32detect {
     uint32 *d = new uint32[m * 4];
 
     for (uint32 i = 1; i <= m; i++) {
-#ifdef COMPILER_MSVC64
-      __cpuid((int *)(d + (i - 1) * 4), i);
-
-#else
-      uint32 *t = d + (i - 1) * 4;
-      __asm
-      {
-				mov	eax, i;
-				mov esi, t;
-
-				cpuid;
-
-				mov dword ptr [esi + 0x0], eax;
-				mov dword ptr [esi + 0x4], ebx;
-				mov dword ptr [esi + 0x8], ecx;
-				mov dword ptr [esi + 0xC], edx;
-      }
-#endif
+      cpuid((int *)(d + (i - 1) * 4), i);
     }
 
     if (m >= 1) init1(d);
@@ -190,7 +191,7 @@ class ia32detect {
     char vendor_id[13];
 
     memset(vendor_id, 0, sizeof(vendor_id));
-    __cpuid(data, 0);
+    cpuid(data, 0);
 
     memcpy(vendor_id + 0, &data[1], sizeof(data[1]));
     memcpy(vendor_id + 4, &data[3], sizeof(data[3]));
@@ -221,20 +222,7 @@ class ia32detect {
     for (int ci1 = 0; ci1 < 256; ci1++) c[ci1] = false;
 
     for (int i = 0; i < count; i++) {
-#ifdef COMPILER_MSVC64
-      __cpuid((int *)d, 2);
-#else
-      __asm
-      {
-				mov	eax, 2;
-				lea esi, d;
-				cpuid;
-				mov [esi + 0x0], eax;
-				mov [esi + 0x4], ebx;
-				mov [esi + 0x8], ecx;
-				mov [esi + 0xC], edx;
-      }
-#endif
+      cpuid((int *)d, 2);
 
       if (i == 0) d[0] &= 0xFFFFFF00;
 
@@ -262,39 +250,16 @@ class ia32detect {
   void init0x80000000() {
     uint32 m;
 
-#ifdef COMPILER_MSVC64
     int data[4];
-    __cpuid(data, 0x80000000);
+    cpuid(data, 0x80000000);
+
     m = data[0];
-#else
-    __asm
-    {
-			mov	eax, 0x80000000;
-			cpuid;
-			mov m, eax
-    }
-#endif
 
     if ((m & 0x80000000) != 0) {
       uint32 *d = new uint32[(m - 0x80000000) * 4];
 
       for (uint32 i = 0x80000001; i <= m; i++) {
-#ifdef COMPILER_MSVC64
-        __cpuid((int *)(d + (i - 0x80000001) * 4), i);
-#else
-        uint32 *t = d + (i - 0x80000001) * 4;
-
-        __asm
-        {
-					mov	eax, i;
-					mov	esi, t;
-					cpuid;
-					mov dword ptr [esi + 0x0], eax;
-					mov dword ptr [esi + 0x4], ebx;
-					mov dword ptr [esi + 0x8], ecx;
-					mov dword ptr [esi + 0xC], edx;
-        }
-#endif
+        cpuid((int *)(d + (i - 0x80000001) * 4), i);
       }
 
       if (m >= 0x80000002) brand = (tchar *)(d + 4);

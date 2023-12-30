@@ -454,7 +454,6 @@ class Cpuid {
   //       support.
   //-----------------------------------------------------------------------------
   void UncheckedCall_(FnSet fnSet, DWORD fn) {
-#ifdef _WIN64
     m_eax = fnSet | fn;
     m_ecx = 0;
 
@@ -465,20 +464,6 @@ class Cpuid {
     m_ebx = reg[1];
     m_ecx = reg[2];
     m_edx = reg[3];
-#else
-    __asm
-    {
-            mov ecx, 0
-            mov eax, fn
-            or  eax, fnSet
-            cpuid
-            mov edi, this
-            mov [edi].m_eax, eax
-            mov [edi].m_ebx, ebx
-            mov [edi].m_ecx, ecx
-            mov [edi].m_edx, edx
-    }
-#endif
   }
 
   // Private Members

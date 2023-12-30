@@ -24,24 +24,31 @@ const tchar* GetProcessorVendorId();
 
 static bool cpuid(uint32 function, uint32& out_eax, uint32& out_ebx,
                   uint32& out_ecx, uint32& out_edx) {
+  int info[4] = {0};
+
 #if defined(_X360) || defined(_PS3)
   return false;
-#elif defined(GNUC)
-  asm("mov %%ebx, %%esi\n\t"
+#elif defined(__clang__) || defined(__GNUC__)
+#if defined(_M_X64) || defined(__amd64__)
+  asm volatile(
+      "movq\t%%rbx, %%rsi\n\t"
       "cpuid\n\t"
-      "xchg %%esi, %%ebx"
-      : "=a"(out_eax), "=S"(out_ebx), "=c"(out_ecx), "=d"(out_edx)
+      "xchgq\t%%rbx, %%rsi\n\t"
+      : "=a"(info[0]), "=S"(info[1]), "=c"(info[2]), "=d"(info[3])
       : "a"(function));
-  return true;
 #else
-  int data[4];
-  __cpuid(data, (int)function);
-  out_eax = data[0];
-  out_ebx = data[1];
-  out_ecx = data[2];
-  out_edx = data[3];
-  return true;
+#error "Please add cpuid support for your arhitecture."
+#endif  // defined(_M_X64) || defined(__amd64__)
+#elif defined(_MSC_VER)
+  __cpuid(info, function);
 #endif
+
+  out_eax = info[0];
+  out_ebx = info[1];
+  out_ecx = info[2];
+  out_edx = info[3];
+
+  return true;
 }
 
 static bool CheckMMXTechnology() {
@@ -205,8 +212,7 @@ const tchar* GetProcessorVendorId() {
   static tchar VendorID[13];
   memset(VendorID, 0, sizeof(VendorID));
 
-  if (!cpuid(0, unused, regs[0], regs[2],
-             regs[1])) {
+  if (!cpuid(0, unused, regs[0], regs[2], regs[1])) {
     if (IsPC()) {
       _tcscpy(VendorID, _T( "Generic_x86" ));
     } else if (IsX360()) {
