@@ -278,7 +278,7 @@ class CColorizedLoggingListener : public CSimpleLoggingListener {
 
       _tprintf(_T("%s"), pMessage);
 
-      if (nPrevColor >= UINT16_MAX) {
+      if (pContext->m_Color != UNSPECIFIED_LOGGING_COLOR) {
         RestoreWin32ConsoleColor(&m_ColorContext, nPrevColor);
       }
     }
