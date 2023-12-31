@@ -474,15 +474,10 @@ void CScriptObject::WriteToConfig( void )
 
 objtype_t CScriptObject::GetType( char *pszType )
 {
-	int i;
-	int nTypes;
-
-	nTypes = sizeof( objtypes ) / sizeof( objtypedesc_t);
-
-	for ( i = 0; i < nTypes; i++ )
+	for ( auto &&t : objtypes )
 	{
-		if ( !stricmp( objtypes[i].szDescription, pszType ) )
-			return objtypes[i].type;
+		if ( !stricmp( t.szDescription, pszType ) )
+			return t.type;
 	}
 
 	return O_BADTYPE;
