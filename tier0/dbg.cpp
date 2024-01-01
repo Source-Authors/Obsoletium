@@ -148,7 +148,12 @@ enum StandardSpewGroup_t
 	GROUP_COUNT,
 };
 
-static int s_pGroupIndices[GROUP_COUNT] = { -1, -1, -1 };
+static size_t s_pGroupIndices[GROUP_COUNT] =
+{
+	std::numeric_limits<size_t>::max(),
+	std::numeric_limits<size_t>::max(),
+	std::numeric_limits<size_t>::max()
+};
 static const char *s_pGroupNames[GROUP_COUNT] = { s_pDeveloper, s_pConsole, s_pNetwork };
 
 
@@ -391,12 +396,12 @@ inline bool IsSpewActive( StandardSpewGroup_t group, int level )
 {
 	if ( static_cast<unsigned>(group) >= std::size(s_pGroupIndices) )
 	{
-		AssertMsg( static_cast<int>(group) >= sizeof(s_pGroupIndices), "Group index is out of range." );
+		AssertMsg( static_cast<unsigned>(group) >= sizeof(s_pGroupIndices), "Group index is out of range." );
 		return false;
 	}
 
 	// If we don't find the spew group, use the default level.
-	if ( s_pGroupIndices[group] >= 0 )
+	if ( s_pGroupIndices[group] != std::numeric_limits<size_t>::max() )
 		return s_pSpewGroups[ s_pGroupIndices[group] ].m_Level >= level;
 	return s_DefaultLevel >= level;
 }
@@ -803,7 +808,7 @@ void SpewActivate( const tchar* pGroupName, int level )
 			// Update standard groups
 			for ( auto &&gi : s_pGroupIndices )
 			{
-				if ( ( ind <= gi ) && ( gi >= 0 ) )
+				if ( ( ind <= gi ) && ( gi != std::numeric_limits<size_t>::max() ) )
 				{
 					++gi;
 				}
@@ -820,7 +825,7 @@ void SpewActivate( const tchar* pGroupName, int level )
 		// Update standard groups
 		for ( int i = 0; i < GROUP_COUNT; ++i )
 		{
-			if ( ( s_pGroupIndices[i] < 0 ) && !_tcsicmp( s_pGroupNames[i], pGroupName ) )
+			if ( ( s_pGroupIndices[i] == std::numeric_limits<size_t>::max() ) && !_tcsicmp( s_pGroupNames[i], pGroupName ) )
 			{
 				s_pGroupIndices[i] = ind;
 				break;
@@ -834,7 +839,11 @@ void SpewDeactivate()
 {
 	PvFree( s_pSpewGroups );
 	s_pSpewGroups = nullptr;
-	memset( &s_pGroupIndices, 0xFF, sizeof(s_pGroupIndices) );
+
+	for ( auto&& gi : s_pGroupIndices )
+	{
+		gi = std::numeric_limits<size_t>::max();
+	}
 }
 
 // If we don't have a function from math.h, then it doesn't link certain floating-point
