@@ -457,8 +457,8 @@ void inline SinCos( float radians, float *sine, float *cosine )
 		fstp DWORD PTR [eax]
 	}
 #elif defined( PLATFORM_WINDOWS_PC64 )
-	*sine = sin( radians );
-	*cosine = cos( radians );
+	*sine = sinf( radians );
+	*cosine = cosf( radians );
 #elif defined( POSIX )
 	double __cosr, __sinr;
 	__asm ("fsincos" : "=t" (__cosr), "=u" (__sinr) : "0" (radians));
