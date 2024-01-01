@@ -11,9 +11,11 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
-const tchar* GetProcessorVendorId();
-
-static bool cpuid(unsigned long function, unsigned long& out_eax, unsigned long& out_ebx, unsigned long& out_ecx, unsigned long& out_edx)
+static bool cpuid(unsigned long function,
+	unsigned long& out_eax,
+	unsigned long& out_ebx,
+	unsigned long& out_ecx,
+	unsigned long& out_edx)
 {
 #if defined(GNUC)
 	asm("mov %%ebx, %%esi\n\t"
@@ -46,6 +48,39 @@ static bool cpuid(unsigned long function, unsigned long& out_eax, unsigned long&
 	}
 
 	return retval;
+#endif
+}
+
+// Return the Processor's vendor identification string, or "Generic_x86" if it doesn't exist on this CPU
+static const tchar* GetProcessorVendorId()
+{
+#if defined( _X360 ) || defined( _PS3 )
+	return "PPC";
+#else
+	unsigned long unused, VendorIDRegisters[3];
+
+	static tchar VendorID[13];
+	
+	memset( VendorID, 0, sizeof(VendorID) );
+	if ( !cpuid(0,unused, VendorIDRegisters[0], VendorIDRegisters[2], VendorIDRegisters[1] ) )
+	{
+		if ( IsPC() )
+		{
+			_tcscpy( VendorID, _T( "Generic_x86" ) ); 
+		}
+		else if ( IsX360() )
+		{
+			_tcscpy( VendorID, _T( "PowerPC" ) ); 
+		}
+	}
+	else
+	{
+		memcpy( VendorID+0, &(VendorIDRegisters[0]), sizeof( VendorIDRegisters[0] ) );
+		memcpy( VendorID+4, &(VendorIDRegisters[1]), sizeof( VendorIDRegisters[1] ) ); //-V112
+		memcpy( VendorID+8, &(VendorIDRegisters[2]), sizeof( VendorIDRegisters[2] ) );
+	}
+
+	return VendorID;
 #endif
 }
 
@@ -91,7 +126,7 @@ static bool CheckSSE2Technology()
 #endif
 }
 
-bool CheckSSE3Technology()
+static bool CheckSSE3Technology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
@@ -104,7 +139,7 @@ bool CheckSSE3Technology()
 #endif
 }
 
-bool CheckSSSE3Technology()
+static bool CheckSSSE3Technology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
@@ -119,7 +154,7 @@ bool CheckSSSE3Technology()
 #endif
 }
 
-bool CheckSSE41Technology()
+static bool CheckSSE41Technology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
@@ -134,7 +169,7 @@ bool CheckSSE41Technology()
 #endif
 }
 
-bool CheckSSE42Technology()
+static bool CheckSSE42Technology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
@@ -150,7 +185,7 @@ bool CheckSSE42Technology()
 }
 
 
-bool CheckSSE4aTechnology()
+static bool CheckSSE4aTechnology()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
@@ -228,36 +263,12 @@ static bool CheckRDTSCTechnology()
 #endif
 }
 
-// Return the Processor's vendor identification string, or "Generic_x86" if it doesn't exist on this CPU
-const tchar* GetProcessorVendorId()
+static bool CheckPopcntTechnology( unsigned long ecx )
 {
 #if defined( _X360 ) || defined( _PS3 )
-	return "PPC";
+	return false;
 #else
-	unsigned long unused, VendorIDRegisters[3];
-
-	static tchar VendorID[13];
-	
-	memset( VendorID, 0, sizeof(VendorID) );
-	if ( !cpuid(0,unused, VendorIDRegisters[0], VendorIDRegisters[2], VendorIDRegisters[1] ) )
-	{
-		if ( IsPC() )
-		{
-			_tcscpy( VendorID, _T( "Generic_x86" ) ); 
-		}
-		else if ( IsX360() )
-		{
-			_tcscpy( VendorID, _T( "PowerPC" ) ); 
-		}
-	}
-	else
-	{
-		memcpy( VendorID+0, &(VendorIDRegisters[0]), sizeof( VendorIDRegisters[0] ) );
-		memcpy( VendorID+4, &(VendorIDRegisters[1]), sizeof( VendorIDRegisters[1] ) ); //-V112
-		memcpy( VendorID+8, &(VendorIDRegisters[2]), sizeof( VendorIDRegisters[2] ) );
-	}
-
-	return VendorID;
+	return ( ecx & ( 1U << 23U ) ) != 0;	// bit 23 of ECX
 #endif
 }
 
@@ -288,27 +299,18 @@ struct CpuCoreInfo
 };
 
 // Helper function to count set bits in the processor mask.
-static unsigned CountSetBits(ULONG_PTR mask)
+static unsigned CountSetBits( ULONG_PTR mask, bool is_popcnt_supported )
 {
 #if !(defined(_M_ARM) || defined(_M_ARM64) || defined(_WIN64))
-	__try
+	if ( is_popcnt_supported )
 	{
-		// Requires CPU support.
 		return __popcnt(mask);
 	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		// Do nothing.
-	}
 #elif defined(_WIN64)
-	__try
+	if ( is_popcnt_supported )
 	{
 		// Requires CPU support.
-		return __popcnt64(mask);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-		// Do nothing.
+		return static_cast<unsigned>(__popcnt64(mask));
 	}
 #endif
 
@@ -326,7 +328,7 @@ static unsigned CountSetBits(ULONG_PTR mask)
 	return bits_num;
 }
 
-static CpuCoreInfo GetProcessorCoresInfo()
+static CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
 {
 	SYSTEM_LOGICAL_PROCESSOR_INFORMATION *buffer{nullptr};
 	DWORD size{0};
@@ -366,7 +368,7 @@ static CpuCoreInfo GetProcessorCoresInfo()
 			case RelationProcessorCore:
 				physical_cores_num++;
 				// A hyperthreaded core supplies more than one logical processor.
-				logical_cores_num += CountSetBits( it->ProcessorMask );
+				logical_cores_num += CountSetBits( it->ProcessorMask, is_popcnt_supported );
 				break;
 
 			default:
@@ -459,9 +461,18 @@ const CPUInformation* GetCPUInformation()
 	pi.m_nLogicalProcessors = LogicalProcessorsPerPackage();
 	pi.m_nPhysicalProcessors = 1U;
 
+	unsigned long eax, ebx, edx, ecx;
+	if (cpuid(1, eax, ebx, ecx, edx))
+	{
+		pi.m_nModel = eax; // full CPU model info
+		pi.m_nFeatures[0] = edx; // x87+ features
+		pi.m_nFeatures[1] = ecx; // sse3+ features
+		pi.m_nFeatures[2] = ebx; // some additional features
+	}
+
 #if defined(_WIN32) && !defined( _X360 )
 	// dimhotepus: Correctly compute CPU cores count.
-	CpuCoreInfo cpu_core_info{ GetProcessorCoresInfo() };
+	CpuCoreInfo cpu_core_info{ GetProcessorCoresInfo( CheckPopcntTechnology( ecx ) ) };
 
 	// Ensure 256+ CPUs are at least 256.
 	pi.m_nPhysicalProcessors =
@@ -563,15 +574,5 @@ const CPUInformation* GetCPUInformation()
 	// dimhotepus: Correctly check HyperThreading support.
 	pi.m_bHT		   = pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors;
 
-	unsigned long eax, ebx, edx, ecx;
-	if (cpuid(1, eax, ebx, ecx, edx))
-	{
-		pi.m_nModel = eax; // full CPU model info
-		pi.m_nFeatures[0] = edx; // x87+ features
-		pi.m_nFeatures[1] = ecx; // sse3+ features
-		pi.m_nFeatures[2] = ebx; // some additional features
-	}
-
 	return &pi;
 }
-
