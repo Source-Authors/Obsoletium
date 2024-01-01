@@ -604,7 +604,7 @@ of 16 will be 16-byte aligned. Existing uses of this class were not changed beca
 the cost/benefit did not justify it.
 */
 // template here to allow adding alignment at levels of hierarchy that aren't the base
-template< int bytesAlignment = 16, class T = aligned_tmp_t >
+template<size_t bytesAlignment = 16, typename T = aligned_tmp_t>
 class CAlignedNewDelete : public T
 {
 
