@@ -195,7 +195,7 @@ inline bool IsFinite( vec_t f )
 
 inline unsigned long FloatAbsBits( vec_t f )
 {
-	return FloatBits(f) & 0x7FFFFFFF;
+	return FloatBits(f) & 0x7FFFFFFF; //-V112
 }
 
 // Given today's processors, I cannot think of any circumstance
@@ -240,12 +240,12 @@ struct color24
 
 typedef struct color32_s
 {
-	bool operator!=( const struct color32_s &other ) const;
+	bool operator!=( color32_s other ) const;
 
 	byte r, g, b, a;
 } color32;
 
-inline bool color32::operator!=( const color32 &other ) const
+inline bool color32::operator!=( color32 other ) const
 {
 	return r != other.r || g != other.g || b != other.b || a != other.a;
 }
