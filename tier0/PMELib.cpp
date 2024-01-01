@@ -358,6 +358,8 @@ double PME::GetCPUClockSpeedFast(void)
 	QueryPerformanceCounter((LARGE_INTEGER*)&i64_perf_start);
 	i64_perf_end = 0;
 
+	unsigned aux;
+
 	//-----------------------------------------------------------------------
 	// Time of loop of 250000 windows cycles with RDTSC
 	//-----------------------------------------------------------------------
@@ -366,7 +368,7 @@ double PME::GetCPUClockSpeedFast(void)
 	{
 		QueryPerformanceCounter((LARGE_INTEGER*)&i64_perf_end);
 	}
-	RDTSC(i64_clock_end);
+	RDTSCP(i64_clock_end, &aux);
 
 	//-----------------------------------------------------------------------
 	// Caclulate the frequency of the RDTSC timer and therefore calculate
@@ -390,7 +392,7 @@ double PME::GetCPUClockSpeedSlow(void)
         return m_CPUClockSpeed;
 
     unsigned long long start_ms, stop_ms;
-    unsigned long start_tsc,stop_tsc;
+    unsigned long long start_tsc,stop_tsc;
 
     // boosting priority helps with noise. its optional and i dont think
     //  it helps all that much
@@ -403,34 +405,17 @@ double PME::GetCPUClockSpeedSlow(void)
     start_ms = GetTickCount64() + 5;
     while (start_ms <= GetTickCount64());
 
+    unsigned aux;
+
     // read timestamp (you could use QueryPerformanceCounter in hires mode if you want)
-#ifdef COMPILER_MSVC64 
     RDTSC(start_tsc);
-#else
-    __asm
-    {
-        rdtsc
-        mov dword ptr [start_tsc+0],eax
-        mov dword ptr [start_tsc+4],edx
-    }
-#endif
 
     // wait for end
     stop_ms = start_ms + 1000; // longer wait gives better resolution
     while (stop_ms > GetTickCount64());
 
     // read timestamp (you could use QueryPerformanceCounter in hires mode if you want)
-#ifdef COMPILER_MSVC64
-    RDTSC(stop_tsc);
-#else
-    __asm
-    {
-        rdtsc
-        mov dword ptr [stop_tsc+0],eax
-        mov dword ptr [stop_tsc+4],edx
-    }
-#endif
-
+    RDTSCP(stop_tsc, &aux);
 
     // normalize priority
     pme->SetProcessPriority(ProcessPriorityNormal);

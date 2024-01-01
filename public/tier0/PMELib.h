@@ -16,14 +16,8 @@
 #include "tier0/valve_on.h"
 
 // RDTSC Instruction macro
-#ifdef COMPILER_MSVC64
 #define RDTSC(var) (var = __rdtsc())
-#else
-#define RDTSC(var) \
-_asm RDTSC \
-_asm mov DWORD PTR var,eax \
-_asm mov DWORD PTR var+4,edx
-#endif
+#define RDTSCP(var, aux) (var = __rdtscp(aux))
 
 // RDPMC Instruction macro
 #ifdef COMPILER_MSVC64
