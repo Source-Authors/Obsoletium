@@ -90,7 +90,8 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 #ifdef DEBUG
 	MemDbgDllMain( hinstDLL, fdwReason, lpvReserved );
 #endif
-	return true;
+
+	return TRUE;
 }
 #endif
 
@@ -319,7 +320,7 @@ static BOOL CALLBACK ParentWindowEnumProc(
 	{
 		DWORD procID;
 		GetWindowThreadProcessId( hWnd, &procID );
-		if ( procID == (DWORD)lParam )
+		if ( procID == static_cast<DWORD>(lParam) )
 		{
 			g_hBestParentWindow = hWnd;
 			return FALSE; // don't iterate any more.
