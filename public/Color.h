@@ -8,6 +8,8 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+#include "tier0/dbg.h"
+
 #ifdef _WIN32
 #pragma once
 #endif
@@ -68,13 +70,15 @@ public:
 	inline int b() const	{ return _color[2]; }
 	inline int a() const	{ return _color[3]; }
 	
-	component &operator[](int index)
+	component &operator[](size_t index)
 	{
+		Assert( index <= std::size(_color) );
 		return _color[index];
 	}
 
-	const component &operator[](int index) const
+	const component &operator[](size_t index) const
 	{
+		Assert( index <= std::size(_color) );
 		return _color[index];
 	}
 
@@ -100,7 +104,7 @@ public:
 	}
 
 private:
-	component _color[4];
+	component _color[4]; //-V112
 };
 
 
