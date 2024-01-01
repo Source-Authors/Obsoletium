@@ -157,7 +157,7 @@ void CCommandLine::LoadParametersFromFile( const char *&pSrc, char *&pDst, size_
 			*pDst++ = static_cast<char>( c );
 			
 			// Don't go past the end, and allow for our terminating space character AND a terminating null character.
-			if ( (pDst - pDestStart) >= (maxDestLen-2) )
+			if ( (pDst - pDestStart) >= ((ptrdiff_t)maxDestLen-2) )
 				break;
 
 			// Get the next character, if there are more
