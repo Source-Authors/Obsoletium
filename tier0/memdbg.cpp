@@ -265,7 +265,7 @@ struct DbgMemHeader_t
 	: CrtDbgMemHeader_t
 #endif
 {
-	unsigned nLogicalSize;
+	size_t nLogicalSize;
 	byte reserved[12];	// MS allocator always returns mem aligned on 16 bytes, which some of our code depends on
 };
 
@@ -650,11 +650,11 @@ private:
 	const char *FindOrCreateFilename( const char *pFileName );
 
 	// Updates stats
-	void RegisterAllocation( const char *pFileName, int nLine, int nLogicalSize, int nActualSize, unsigned nTime );
-	void RegisterDeallocation( const char *pFileName, int nLine, int nLogicalSize, int nActualSize, unsigned nTime );
+	void RegisterAllocation( const char *pFileName, int nLine, size_t nLogicalSize, size_t nActualSize, unsigned nTime );
+	void RegisterDeallocation( const char *pFileName, int nLine, size_t nLogicalSize, size_t nActualSize, unsigned nTime );
 
-	void RegisterAllocation( MemInfo_t &info, int nLogicalSize, int nActualSize, unsigned nTime );
-	void RegisterDeallocation( MemInfo_t &info, int nLogicalSize, int nActualSize, unsigned nTime );
+	void RegisterAllocation( MemInfo_t &info, size_t nLogicalSize, size_t nActualSize, unsigned nTime );
+	void RegisterDeallocation( MemInfo_t &info, size_t nLogicalSize, size_t nActualSize, unsigned nTime );
 
 	// Gets the allocation file name
 	const char *GetAllocatonFileName( void *pMem );
@@ -1053,7 +1053,7 @@ CDbgMemAlloc::MemInfo_t &CDbgMemAlloc::FindOrCreateEntry( const char *pFileName,
 //-----------------------------------------------------------------------------
 // Updates stats
 //-----------------------------------------------------------------------------
-void CDbgMemAlloc::RegisterAllocation( const char *pFileName, int nLine, int nLogicalSize, int nActualSize, unsigned nTime )
+void CDbgMemAlloc::RegisterAllocation( const char *pFileName, int nLine, size_t nLogicalSize, size_t nActualSize, unsigned nTime )
 {
 	HEAP_LOCK();
 	RegisterAllocation( m_GlobalInfo, nLogicalSize, nActualSize, nTime );
@@ -1061,7 +1061,7 @@ void CDbgMemAlloc::RegisterAllocation( const char *pFileName, int nLine, int nLo
 	RegisterAllocation( info, nLogicalSize, nActualSize, nTime );
 }
 
-void CDbgMemAlloc::RegisterDeallocation( const char *pFileName, int nLine, int nLogicalSize, int nActualSize, unsigned nTime )
+void CDbgMemAlloc::RegisterDeallocation( const char *pFileName, int nLine, size_t nLogicalSize, size_t nActualSize, unsigned nTime )
 {
 	HEAP_LOCK();
 	RegisterDeallocation( m_GlobalInfo, nLogicalSize, nActualSize, nTime );
@@ -1069,7 +1069,7 @@ void CDbgMemAlloc::RegisterDeallocation( const char *pFileName, int nLine, int n
 	RegisterDeallocation( info, nLogicalSize, nActualSize, nTime );
 }
 
-void CDbgMemAlloc::RegisterAllocation( MemInfo_t &info, int nLogicalSize, int nActualSize, unsigned nTime )
+void CDbgMemAlloc::RegisterAllocation( MemInfo_t &info, size_t nLogicalSize, size_t nActualSize, unsigned nTime )
 {
 	++info.m_nCurrentCount;
 	++info.m_nTotalCount;
@@ -1106,7 +1106,7 @@ void CDbgMemAlloc::RegisterAllocation( MemInfo_t &info, int nLogicalSize, int nA
 	info.m_nTime += nTime;
 }
 
-void CDbgMemAlloc::RegisterDeallocation( MemInfo_t &info, int nLogicalSize, int nActualSize, unsigned nTime )
+void CDbgMemAlloc::RegisterDeallocation( MemInfo_t &info, size_t nLogicalSize, size_t nActualSize, unsigned nTime )
 {
 	// Check for decrementing these counters below zero. The checks
 	// must be done here because these unsigned counters will wrap-around and
@@ -1116,7 +1116,7 @@ void CDbgMemAlloc::RegisterDeallocation( MemInfo_t &info, int nLogicalSize, int 
 	// It is technically legal for code to request allocations of zero bytes, and there are a number of places in our code
 	// that do. So only assert that nLogicalSize >= 0. https://stackoverflow.com/questions/1087042/c-new-int0-will-it-allocate-memory
 	Assert( nLogicalSize >= 0 );
-	Assert( info.m_nCurrentSize >= (size_t)nLogicalSize );
+	Assert( info.m_nCurrentSize >= nLogicalSize );
 	--info.m_nCurrentCount;
 	info.m_nCurrentSize -= nLogicalSize;
 
@@ -1248,8 +1248,8 @@ void  CDbgMemAlloc::Free( void *pMem, const char * /*pFileName*/, int nLine )
 		return;
 	}
 
-	int nOldLogicalSize = InternalLogicalSize( pMem );
-	int nOldSize = InternalMSize( pMem );
+	size_t nOldLogicalSize = InternalLogicalSize( pMem );
+	size_t nOldSize = InternalMSize( pMem );
 	const char *pOldFileName = GetAllocatonFileName( pMem );
 	int oldLine = GetAllocatonLineNumber( pMem );
 

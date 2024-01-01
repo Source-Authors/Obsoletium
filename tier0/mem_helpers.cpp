@@ -6,7 +6,7 @@
 bool g_bInitMemory = true;
 
 #ifdef POSIX
-void DoApplyMemoryInitializations( void *pMem, int nSize )
+void DoApplyMemoryInitializations( void *pMem, size_t nSize )
 {
 }
 
@@ -41,34 +41,34 @@ unsigned char g_RandomValues[256] = {
 unsigned long g_iCurRandomValueOffset = 0;
 
 
-void InitializeToFeeFee( void *pMem, int nSize )
+void InitializeToFeeFee( void *pMem, size_t nSize )
 {
 	unsigned long *pCurDWord = (unsigned long*)pMem;
-	int nDWords = nSize >> 2;
+	size_t nDWords = nSize >> 2;
 	while ( nDWords )
 	{
-		*pCurDWord = 0xffeeffee;
+		*pCurDWord = 0xffeeffeeU;
 		++pCurDWord;
 		--nDWords;
 	}
 	
 	unsigned char *pCurChar = (unsigned char*)pCurDWord;
-	int nBytes = nSize & 3;
-	int iOffset = 0;
+	size_t nBytes = nSize & 3;
+	size_t iOffset = 0;
 	while ( nBytes )
 	{
 		*pCurChar = ((unsigned char*)&g_dwFeeFee)[iOffset];
 		++iOffset;
 		--nBytes;
 		++pCurChar;
-	}			
+	}
 }
 
 
-void InitializeToRandom( void *pMem, int nSize )
+void InitializeToRandom( void *pMem, size_t nSize )
 {
 	unsigned char *pOut = (unsigned char *)pMem;
-	for ( int i=0; i < nSize; i++ )
+	for ( size_t i=0; i < nSize; i++ )
 	{
 		pOut[i] = g_RandomValues[(g_iCurRandomValueOffset & 255)];
 		++g_iCurRandomValueOffset;
@@ -76,7 +76,7 @@ void InitializeToRandom( void *pMem, int nSize )
 }
 
 
-void DoApplyMemoryInitializations( void *pMem, int nSize )
+void DoApplyMemoryInitializations( void *pMem, size_t nSize )
 {
 	if ( !pMem )
 		return;

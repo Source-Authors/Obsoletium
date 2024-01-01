@@ -22,7 +22,7 @@
 // 0xffeeffee, which casts to a NAN.
 extern bool g_bInitMemory;
 #define ApplyMemoryInitializations( pMem, nSize ) if ( !g_bInitMemory ) ; else { DoApplyMemoryInitializations( pMem, nSize ); }
-void DoApplyMemoryInitializations( void *pMem, int nSize );
+void DoApplyMemoryInitializations( void *pMem, size_t nSize );
 
 size_t CalcHeapUsed();
 
