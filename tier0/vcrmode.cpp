@@ -33,8 +33,8 @@ VCRMode_t	g_VCRMode = VCR_Disabled;
 VCRMode_t	g_OldVCRMode = VCR_Invalid;		// Stored temporarily between SetEnabled(0)/SetEnabled(1) blocks.
 int			g_iCurEvent = 0;
 
-int			g_CurFilePos = 0;				// So it knows when we're done playing back.
-int			g_FileLen = 0;					
+size_t			g_CurFilePos = 0;				// So it knows when we're done playing back.
+size_t			g_FileLen = 0;					
 
 VCREvent	g_LastReadEvent = (VCREvent)-1;	// Last VCR_ReadEvent() call.
 int			g_LastEventThread;				// The thread index of the thread that g_LastReadEvent is intended for.
@@ -257,7 +257,7 @@ static void VCR_RuntimeAssertFn(int bAssert, char const *pStr)
 	}
 }
 
-static void VCR_Read(void *pDest, int size)
+static void VCR_Read(void *pDest, size_t size)
 {
 	if(!g_pVCRFile)
 	{
@@ -283,7 +283,7 @@ static void VCR_ReadVal(T &val)
 	VCR_Read(&val, sizeof(val));
 }
 
-static void VCR_Write(void const *pSrc, int size)
+static void VCR_Write(void const *pSrc, size_t size)
 {
 	fwrite(pSrc, 1, size, g_pVCRFile);
 	fflush(g_pVCRFile);
@@ -540,7 +540,7 @@ static void VCR_SyncToken(char const *pToken)
 
 	if(g_VCRMode == VCR_Record)
 	{
-		int intLen = strlen( pToken );
+		size_t intLen = strlen( pToken );
 		Assert( intLen <= 255 );
 
 		len = (unsigned char)intLen;
@@ -939,7 +939,7 @@ static void VCR_Hook_Cmd_Exec(char **f)
 	}
 	else if(g_VCRMode == VCR_Record)
 	{
-		int len;
+		size_t len;
 		char *str = *f;
 
 		if(str)
@@ -950,7 +950,7 @@ static void VCR_Hook_Cmd_Exec(char **f)
 		}
 		else
 		{
-			len = -1;
+			len = std::numeric_limits<size_t>::max();
 			VCR_Write(&len, sizeof(len));
 		}
 	}
@@ -971,7 +971,7 @@ static char* VCR_Hook_GetCommandLine()
 	VCR_THREADSAFE;
 	VCR_Event(VCREvent_CmdLine);
 
-	int len;
+	size_t len;
 	char *ret;
 
 	if(g_VCRMode == VCR_Playback)
@@ -1298,10 +1298,10 @@ void VCR_GenericRecord( const char *pEventName, const void *pData, int len )
 		Error( "VCR_GenericRecord( %s ): not recording a VCR file", pEventName );
 
 	// Write the event name (or 255 if none).
-	int nameLen = strlen( pEventName ) + 1;
+	size_t nameLen = strlen( pEventName ) + 1;
 	if ( nameLen >= 255 )
 	{
-		VCR_Error( "VCR_GenericRecord( %s ): nameLen too long (%d)", pEventName, nameLen );
+		VCR_Error( "VCR_GenericRecord( %s ): nameLen too long (%zu)", pEventName, nameLen );
 		return;
 	}
 	unsigned char ucNameLen = (unsigned char)nameLen;
@@ -1419,10 +1419,10 @@ void VCR_GenericValueVerify( const tchar *pEventName, const void *pData, int max
 
 void WriteShortString( const char *pStr )
 {
-	int len = strlen( pStr ) + 1;
+	size_t len = strlen( pStr ) + 1;
 	if ( len >= 0xFFFF )
 	{
-		Error( "VCR_WriteShortString, string too long (%d characters).", len );
+		Error( "VCR_WriteShortString, string too long (%zu characters).", len );
 	}
 
 	unsigned short twobytes = (unsigned short)len;
@@ -1433,7 +1433,7 @@ void WriteShortString( const char *pStr )
 
 void ReadAndVerifyShortString( const char *pStr )
 {
-	int len = strlen( pStr ) + 1;
+	size_t len = strlen( pStr ) + 1;
 
 	unsigned short incomingSize;
 	VCR_ReadVal( incomingSize );
@@ -1442,7 +1442,7 @@ void ReadAndVerifyShortString( const char *pStr )
 		VCR_Error( "ReadAndVerifyShortString (%s), lengths different.", pStr );
 
 	static char *pTempData = 0;
-	static int tempDataLen = 0;
+	static size_t tempDataLen = 0;
 	if ( tempDataLen < len )
 	{
 		delete [] pTempData;
