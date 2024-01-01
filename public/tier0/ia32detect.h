@@ -347,7 +347,7 @@ private:
 				uint32 *t = d + (i - 0x80000001) * 4;
 
 #ifdef COMPILER_MSVC64
-				__cpuid((int *) (d + (i - 0x80000001) * 4), i);
+				__cpuid((int *) t, i);
 #else
 				__asm
 				{
