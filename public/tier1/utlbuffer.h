@@ -316,7 +316,7 @@ public:
 
 	// memory allocation size, does *not* reflect size written or read,
 	//	use TellPut or TellGet for that
-	int Size() const;
+	intp Size() const;
 
 	// Am I a text buffer?
 	bool IsText() const;
@@ -1047,7 +1047,7 @@ inline const char *CUtlBuffer::String() const
 	return reinterpret_cast<const char*>( m_Memory.Base() );
 }
 
-inline int CUtlBuffer::Size() const			
+inline intp CUtlBuffer::Size() const			
 { 
 	return m_Memory.NumAllocated(); 
 }
