@@ -174,10 +174,10 @@ static bool Check3DNowTechnology()
 	return false;
 #else
 	unsigned long eax, unused;
-	if ( !cpuid(0x80000000,eax,unused,unused,unused) )
+	if ( !cpuid(0x80000000,eax,unused,unused,unused) ) //-V112
 		return false;
 
-	if ( eax > 0x80000000L )
+	if ( eax > 0x80000000L ) //-V112
 	{
 		if ( !cpuid(0x80000001,unused,unused,unused,eax) )
 			return false;
@@ -253,44 +253,11 @@ const tchar* GetProcessorVendorId()
 	else
 	{
 		memcpy( VendorID+0, &(VendorIDRegisters[0]), sizeof( VendorIDRegisters[0] ) );
-		memcpy( VendorID+4, &(VendorIDRegisters[1]), sizeof( VendorIDRegisters[1] ) );
+		memcpy( VendorID+4, &(VendorIDRegisters[1]), sizeof( VendorIDRegisters[1] ) ); //-V112
 		memcpy( VendorID+8, &(VendorIDRegisters[2]), sizeof( VendorIDRegisters[2] ) );
 	}
 
 	return VendorID;
-#endif
-}
-
-// Returns non-zero if Hyper-Threading Technology is supported on the processors and zero if not.  This does not mean that 
-// Hyper-Threading Technology is necessarily enabled.
-static bool HTSupported()
-{
-#if defined( _X360 )
-	// not entirtely sure about the semantic of HT support, it being an intel name
-	// are we asking about HW threads or HT?
-	return true;
-#else
-	const unsigned int HT_BIT		 = 0x10000000;  // EDX[28] - Bit 28 set indicates Hyper-Threading Technology is supported in hardware.
-	const unsigned int FAMILY_ID     = 0x0f00;      // EAX[11:8] - Bit 11 thru 8 contains family processor id
-	const unsigned int EXT_FAMILY_ID = 0x0f00000;	// EAX[23:20] - Bit 23 thru 20 contains extended family  processor id
-	const unsigned int PENTIUM4_ID   = 0x0f00;		// Pentium 4 family processor id
-
-	unsigned long unused,
-					reg_eax = 0, 
-					reg_edx = 0,
-					vendor_id[3] = {0, 0, 0};
-
-	// verify cpuid instruction is supported
-	if( !cpuid(0,unused, vendor_id[0],vendor_id[2],vendor_id[1]) 
-	 || !cpuid(1,reg_eax,unused,unused,reg_edx) )
-	 return false;
-
-	//  Check to see if this is a Pentium 4 or later processor
-	if (((reg_eax & FAMILY_ID) ==  PENTIUM4_ID) || (reg_eax & EXT_FAMILY_ID))
-		if (vendor_id[0] == 'uneG' && vendor_id[1] == 'Ieni' && vendor_id[2] == 'letn')
-			return (reg_edx & HT_BIT) != 0;	// Genuine Intel Processor with Hyper-Threading Technology
-
-	return false;  // This is not a genuine Intel processor.
 #endif
 }
 
@@ -323,11 +290,21 @@ struct CpuCoreInfo
 // Helper function to count set bits in the processor mask.
 static unsigned CountSetBits(ULONG_PTR mask)
 {
-#if !(defined(_M_ARM) || defined(_M_ARM64))
+#if !(defined(_M_ARM) || defined(_M_ARM64) || defined(_WIN64))
 	__try
 	{
 		// Requires CPU support.
 		return __popcnt(mask);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		// Do nothing.
+	}
+#elif defined(_WIN64)
+	__try
+	{
+		// Requires CPU support.
+		return __popcnt64(mask);
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
@@ -364,7 +341,7 @@ static CpuCoreInfo GetProcessorCoresInfo()
 			if ( buffer ) ::HeapFree( ::GetProcessHeap(), 0, buffer );
 
 			buffer = static_cast<SYSTEM_LOGICAL_PROCESSOR_INFORMATION*>(
-				::HeapAlloc( ::GetProcessHeap(), 0, size ) );
+				::HeapAlloc( ::GetProcessHeap(), 0, static_cast<size_t>( size ) ) );
 			if ( !buffer )
 			{
 				// Allocation failure.
@@ -382,7 +359,7 @@ static CpuCoreInfo GetProcessorCoresInfo()
 	size_t offset{0};
 	unsigned logical_cores_num{0}, physical_cores_num{0};
 
-	while ( offset + sizeof(*it) <= size )
+	while ( offset + sizeof(*it) <= static_cast<size_t>(size) )
 	{
 		switch (it->Relationship)
 		{
