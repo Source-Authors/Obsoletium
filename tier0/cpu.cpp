@@ -28,14 +28,6 @@ static bool cpuid(unsigned long function, unsigned long& out_eax, unsigned long&
 	return true;
 #elif defined( _X360 )
 	return false;
-#elif defined(_WIN64)
-	int pCPUInfo[4];
-	__cpuid( pCPUInfo, (int)function );
-	out_eax = pCPUInfo[0];
-	out_ebx = pCPUInfo[1];
-	out_ecx = pCPUInfo[2];
-	out_edx = pCPUInfo[3];
-	return true;
 #else
 	bool retval = true;
 
