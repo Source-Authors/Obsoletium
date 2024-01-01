@@ -115,7 +115,7 @@ static int			s_Line;
 static SpewType_t	s_SpewType;
 
 static SpewGroup_t* s_pSpewGroups = 0;
-static int			s_GroupCount = 0;
+static size_t		s_GroupCount = 0;
 static int			s_DefaultLevel = 0;
 #if !defined( _X360 )
 static Color		s_DefaultOutputColor( 255, 255, 255, 255 );
@@ -336,15 +336,15 @@ FORCEINLINE SpewRetval_t _SpewMessage( SpewType_t spewType, const tchar* pMsgFor
 // index of the found group, or the index of the group right before where the
 // group should be inserted into the list to maintain sorted order.
 //-----------------------------------------------------------------------------
-bool FindSpewGroup( const tchar* pGroupName, int* pInd )
+bool FindSpewGroup( const tchar* pGroupName, size_t* pInd )
 {
-	int s = 0;
+	size_t s = 0;
 	if (s_GroupCount)
 	{
-		int e = (int)(s_GroupCount - 1);
+		size_t e = s_GroupCount - 1;
 		while ( s <= e )
 		{
-			int m = (s+e) >> 1;
+			size_t m = (s+e) >> 1;
 			int cmp = _tcsicmp( pGroupName, s_pSpewGroups[m].m_GroupName );
 			if ( !cmp )
 			{
@@ -380,7 +380,7 @@ bool HushAsserts()
 bool IsSpewActive( const tchar* pGroupName, int level )
 {
 	// If we don't find the spew group, use the default level.
-	int ind;
+	size_t ind;
 	if ( FindSpewGroup( pGroupName, &ind ) )
 		return s_pSpewGroups[ind].m_Level >= level;
 	else
@@ -785,7 +785,7 @@ void SpewActivate( const tchar* pGroupName, int level )
 	// Normal case, search in group list using binary search.
 	// If not found, grow the list of groups and insert it into the
 	// right place to maintain sorted order. Then set the level.
-	int ind;
+	size_t ind;
 	if ( !FindSpewGroup( pGroupName, &ind ) )
 	{
 		// not defined yet, insert an entry.
@@ -796,16 +796,16 @@ void SpewActivate( const tchar* pGroupName, int level )
 				s_GroupCount * sizeof(SpewGroup_t) );
 			
 			// shift elements down to preserve order
-			int numToMove = s_GroupCount - ind - 1;
+			size_t numToMove = s_GroupCount - ind - 1;
 			memmove( &s_pSpewGroups[ind+1], &s_pSpewGroups[ind], 
 				numToMove * sizeof(SpewGroup_t) );
 
 			// Update standard groups
-			for ( int i = 0; i < GROUP_COUNT; ++i )
-			{   
-				if ( ( ind <= s_pGroupIndices[i] ) && ( s_pGroupIndices[i] >= 0 ) )
+			for ( auto &&gi : s_pGroupIndices )
+			{
+				if ( ( ind <= gi ) && ( gi >= 0 ) )
 				{
-					++s_pGroupIndices[i];
+					++gi;
 				}
 			}
 		}
@@ -847,7 +847,7 @@ DBG_INTERFACE float CrackSmokingCompiler( float a )
 void* Plat_SimpleLog( const tchar* file, int line )
 {
 	FILE* f = _tfopen( _T("simple.log"), _T("at+") );
-  if ( f )
+	if ( f )
 	{
 		_ftprintf( f, _T("%s:%i\n"), file, line );
 		fclose( f );
