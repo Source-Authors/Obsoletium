@@ -150,15 +150,15 @@ char (*RtlpNumberOf( UNALIGNED T (&)[N] ))[N];
 #define Q_ARRAYSIZE(p)		ARRAYSIZE(p)
 #define V_ARRAYSIZE(p)		ARRAYSIZE(p)
 
-template< typename IndexType, typename T, unsigned int N >
+template< typename IndexType, typename T, size_t N >
 IndexType ClampedArrayIndex( const T (&buffer)[N], IndexType index )
 {
 	NOTE_UNUSED( buffer );
 	return clamp( index, 0, (IndexType)N - 1 );
 }
 
-template< typename T, unsigned int N >
-T ClampedArrayElement( const T (&buffer)[N], unsigned int uIndex )
+template< typename T, size_t N >
+T ClampedArrayElement( const T (&buffer)[N], size_t uIndex )
 {
 	// Put index in an unsigned type to halve the clamping.
 	if ( uIndex >= N )
