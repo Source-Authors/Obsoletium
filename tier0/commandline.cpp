@@ -58,7 +58,7 @@ private:
 	};
 
 	// When the commandline contains @name, it reads the parameters from that file
-	void LoadParametersFromFile( const char *&pSrc, char *&pDst, int maxDestLen, bool bInQuotes );
+	void LoadParametersFromFile( const char *&pSrc, char *&pDst, size_t maxDestLen, bool bInQuotes );
 
 	// Parse command line...
 	void ParseCommandLine();
@@ -111,7 +111,7 @@ CCommandLine::~CCommandLine( void )
 //-----------------------------------------------------------------------------
 // Read commandline from file instead...
 //-----------------------------------------------------------------------------
-void CCommandLine::LoadParametersFromFile( const char *&pSrc, char *&pDst, int maxDestLen, bool bInQuotes )
+void CCommandLine::LoadParametersFromFile( const char *&pSrc, char *&pDst, size_t maxDestLen, bool bInQuotes )
 {
 	// Suck out the file name
 	char szFileName[ _MAX_PATH ];
@@ -171,7 +171,7 @@ void CCommandLine::LoadParametersFromFile( const char *&pSrc, char *&pDst, int m
 	}
 	else
 	{
-		printf( "Parameter file '%s' not found, skipping...", szFileName );
+		fprintf( stderr, "Parameter file '%s' not found, skipping...", szFileName );
 	}
 }
 
@@ -256,7 +256,7 @@ void CCommandLine::CreateCmdLine( const char *commandline )
 
 	*pDst = '\0';
 
-	int len = strlen( szFull ) + 1;
+	size_t len = strlen( szFull ) + 1;
 	m_pszCmdLine = new char[len];
 	memcpy( m_pszCmdLine, szFull, len );
 
@@ -323,8 +323,8 @@ void CCommandLine::RemoveParm( const char *pszParm )
 	// Search for first occurrence of pszParm
 	char *p, *found;
 	char *pnextparam;
-	int n;
-	int curlen;
+	size_t n;
+	size_t curlen;
 	size_t nParmLen = strlen( pszParm );
 
 	p = m_pszCmdLine;
@@ -373,15 +373,18 @@ void CCommandLine::RemoveParm( const char *pszParm )
 			memset( found, 0, n );
 		}
 	}
+	
+	size_t len = strlen( m_pszCmdLine );
 
 	// Strip and trailing ' ' characters left over.
 	while ( 1 )
 	{
-		int len = strlen( m_pszCmdLine );
 		if ( len == 0 || m_pszCmdLine[ len - 1 ] != ' ' )
 			break;
 		
 		m_pszCmdLine[len - 1] = '\0';
+
+		--len;
 	}
 
 	ParseCommandLine();
@@ -395,7 +398,7 @@ void CCommandLine::RemoveParm( const char *pszParm )
 //-----------------------------------------------------------------------------
 void CCommandLine::AppendParm( const char *pszParm, const char *pszValues )
 {
-	int nNewLength = 0;
+	size_t nNewLength = 0;
 	char *pCmdString;
 
 	nNewLength = strlen( pszParm );            // Parameter.
