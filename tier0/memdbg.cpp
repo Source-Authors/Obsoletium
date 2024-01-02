@@ -678,7 +678,7 @@ private:
 
 	HeapReportFunc_t m_OutputFunc;
 
-	static int s_pCountSizes[NUM_BYTE_COUNT_BUCKETS];
+	static size_t s_pCountSizes[NUM_BYTE_COUNT_BUCKETS];
 	static const char *s_pCountHeader[NUM_BYTE_COUNT_BUCKETS];
 
 	size_t				m_sMemoryAllocFailed;
@@ -720,9 +720,9 @@ CThreadMutex g_DbgMemMutex CONSTRUCT_EARLY;
 //-----------------------------------------------------------------------------
 // Byte count buckets
 //-----------------------------------------------------------------------------
-int CDbgMemAlloc::s_pCountSizes[CDbgMemAlloc::NUM_BYTE_COUNT_BUCKETS] = 
+size_t CDbgMemAlloc::s_pCountSizes[CDbgMemAlloc::NUM_BYTE_COUNT_BUCKETS] = 
 {
-	16, 32, 128, 1024, INT_MAX
+	16, 32, 128, 1024, SIZE_MAX
 };
 
 const char *CDbgMemAlloc::s_pCountHeader[CDbgMemAlloc::NUM_BYTE_COUNT_BUCKETS] = 
