@@ -362,7 +362,7 @@ private:
 
 #ifndef __AFXTLS_H__
 
-	template <class T>
+	template <typename T>
 	class CThreadLocal : public CThreadLocalBase
 	{
 	public:
@@ -373,12 +373,26 @@ private:
 
 		T Get() const
 		{
-			return reinterpret_cast<T>( CThreadLocalBase::Get() );
+			if constexpr (std::is_pointer_v<T>)
+			{
+				return reinterpret_cast<T>( reinterpret_cast<intp>( CThreadLocalBase::Get() ) );
+			}
+			else
+			{
+				return static_cast<T>( reinterpret_cast<intp>( CThreadLocalBase::Get() ) );
+			}
 		}
 
 		void Set(T val)
 		{
-			CThreadLocalBase::Set( reinterpret_cast<void *>(val) );
+			if constexpr (std::is_pointer_v<T>)
+			{
+				CThreadLocalBase::Set( reinterpret_cast<void *>( reinterpret_cast<intp>( val ) ) );
+			}
+			else
+			{
+				CThreadLocalBase::Set( reinterpret_cast<void *>( static_cast<intp>( val ) ) );
+			}
 		}
 	};
 
