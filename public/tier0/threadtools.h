@@ -453,8 +453,8 @@ template <typename T = intp>
 	const T *   operator->() const							{ return (T *)Get(); }
 	const T &   operator *() const							{ return *((T *)Get()); }
 
-	const T &	operator[]( int i ) const					{ return *((T *)Get() + i); }
-		T &			operator[]( int i )							{ return *((T *)Get() + i); }
+	const T &	operator[]( size_t i ) const					{ return *((T *)Get() + i); }
+		T &			operator[]( size_t i )							{ return *((T *)Get() + i); }
 
 	private:
 		// Disallowed operations
