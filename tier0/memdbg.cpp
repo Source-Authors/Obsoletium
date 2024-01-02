@@ -318,7 +318,7 @@ inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLine )
 	pInternalMem = (DbgMemHeader_t *)_malloc_dbg( nSize + sizeof(DbgMemHeader_t), _NORMAL_BLOCK, pFileName, nLine );
 #endif // defined( POSIX ) || !defined( _DEBUG )
 
-	if ( pInternalMem ) [[likely]]
+	if ( pInternalMem )
 	{
 		pInternalMem->nLogicalSize = nSize;
 		return pInternalMem + 1;
@@ -355,7 +355,7 @@ inline void *InternalRealloc( void *pMem, size_t nNewSize, const char *pFileName
 	pInternalMem = (DbgMemHeader_t *)_realloc_dbg( pInternalMem, nNewSize + sizeof(DbgMemHeader_t), _NORMAL_BLOCK, pFileName, nLine );
 #endif
 
-	if ( pInternalMem ) [[likely]]
+	if ( pInternalMem )
 	{
 		pInternalMem->nLogicalSize = nNewSize;
 		return pInternalMem + 1;
@@ -776,10 +776,10 @@ void CDbgMemAlloc::Initialize()
 	{
 		m_pFilenames = new Filenames_t;
 		// dimhotepus: Allocate reasonable amount.
-    m_pFilenames->reserve( 2048 + 1024 );
+		m_pFilenames->reserve( 2048 + 1024 );
 		m_pStatMap = new StatMap_t;
 		// dimhotepus: Allocate reasonable amount.
-    m_pStatMap->reserve( 2048 + 1024 );
+		m_pStatMap->reserve( 2048 + 1024 );
 		m_bInitialized = true;
 	}
 }
