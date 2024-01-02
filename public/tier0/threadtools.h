@@ -400,23 +400,24 @@ private:
 
 	//---------------------------------------------------------
 
-template <class T = intp>
+template <typename T = intp>
 	class CThreadLocalInt : public CThreadLocal<T>
 	{
 	public:
 	CThreadLocalInt()
 	{
 		COMPILE_TIME_ASSERT( sizeof(T) >= sizeof(int) );
+		COMPILE_TIME_ASSERT( sizeof(T) <= sizeof(void *) );
 	}
 
-	operator int() const { return (int)this->Get(); }
-	int	operator=( int i ) { this->Set( (intp)i ); return i; }
+	operator T() const { return this->Get(); }
+	T	operator=( T i ) { this->Set( i ); return i; }
 
-	int operator++()					{ T i = this->Get(); this->Set( ++i ); return (int)i; }
-	int operator++(int)				{ T i = this->Get(); this->Set( i + 1 ); return (int)i; }
+	T operator++()					{ T i = this->Get(); this->Set( ++i ); return i; }
+	T operator++(int)				{ T i = this->Get(); this->Set( i + 1 ); return i; }
 
-	int operator--()					{ T i = this->Get(); this->Set( --i ); return (int)i; }
-	int operator--(int)				{ T i = this->Get(); this->Set( i - 1 ); return (int)i; }
+	T operator--()					{ T i = this->Get(); this->Set( --i ); return i; }
+	T operator--(int)				{ T i = this->Get(); this->Set( i - 1 ); return i; }
 	};
 
 
