@@ -1125,9 +1125,9 @@ inline int ThreadWaitForEvents( int nEvents, CThreadEvent * const *pEvents, bool
 	return WAIT_TIMEOUT;
 #else
 	HANDLE handles[64];
-	for ( int i = 0; i < min( nEvents, (int)ARRAYSIZE(handles) ); i++ )
+	for ( int i = 0; i < min( nEvents, (int)std::size(handles) ); i++ )
 		handles[i] = pEvents[i]->GetHandle();
-	return ThreadWaitForObjects( nEvents, handles, bWaitAll, timeout );
+	return ThreadWaitForObjects( min( nEvents, (int)std::size(handles) ), handles, bWaitAll, timeout );
 #endif
 }
 
