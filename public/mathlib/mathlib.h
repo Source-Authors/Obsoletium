@@ -470,7 +470,7 @@ void inline SinCos( float radians, float *sine, float *cosine )
 
 
 template<class T>
-FORCEINLINE T Square( T const &a )
+FORCEINLINE T Square( T a )
 {
 	return a * a;
 }
@@ -1308,7 +1308,7 @@ FORCEINLINE unsigned char FastFToC( float c )
 	return convert.i & 255;
 #else
 	// consoles CPUs suffer from load-hit-store penalty
-	return Float2Int( c * 255.0f );
+	return static_cast<unsigned char>(Float2Int( c * 255.0f ));
 #endif
 }
 
