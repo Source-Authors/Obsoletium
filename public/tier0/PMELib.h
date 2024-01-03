@@ -19,36 +19,11 @@
 #define RDTSCP(var, aux) (var = __rdtscp(aux))
 
 // RDPMC Instruction macro
-#ifdef COMPILER_MSVC64
 #define RDPMC(counter, var) (var = __readpmc(counter))
-#else
-#define RDPMC(counter, var) \
-_asm mov ecx, counter \
-_asm RDPMC \
-_asm mov DWORD PTR var,eax \
-_asm mov DWORD PTR var+4,edx
-#endif
 
 // RDPMC Instruction macro, for performance counter 1 (ecx = 1)
-#ifdef COMPILER_MSVC64
 #define RDPMC0(var) (var = __readpmc(0))
-#else
-#define RDPMC0(var) \
-_asm mov ecx, 0 \
-_asm RDPMC \
-_asm mov DWORD PTR var,eax \
-_asm mov DWORD PTR var+4,edx
-#endif
-
-#ifdef COMPILER_MSVC64
 #define RDPMC1(var) (var = __readpmc(1))
-#else
-#define RDPMC1(var) \
-_asm mov ecx, 1 \
-_asm RDPMC \
-_asm mov DWORD PTR var,eax \
-_asm mov DWORD PTR var+4,edx
-#endif
 
 #define EVENT_TYPE(mode) EventType##mode
 #define EVENT_MASK(mode) EventMask##mode
