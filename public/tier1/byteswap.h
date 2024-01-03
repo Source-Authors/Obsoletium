@@ -13,13 +13,82 @@
 #include "datamap.h"	// Needed for typedescription_t.  Note datamap.h is tier1 as well.
 #include "tier0/dbg.h"
 
+#ifdef _MSC_VER
+
+#include <intrin.h>
+#define bswap_16(x) _byteswap_ushort(x)
+#define bswap_32(x) _byteswap_ulong(x)
+#define bswap_64(x) _byteswap_uint64(x)
+
+#elif defined(__APPLE__)
+
+// Mac OS X / Darwin features
+#include <libkern/OSByteOrder.h>
+#define bswap_16(x) OSSwapInt16(x)
+#define bswap_32(x) OSSwapInt32(x)
+#define bswap_64(x) OSSwapInt64(x)
+
+#elif defined(__sun) || defined(sun)
+
+#include <sys/byteorder.h>
+#define bswap_16(x) BSWAP_16(x)
+#define bswap_32(x) BSWAP_32(x)
+#define bswap_64(x) BSWAP_64(x)
+
+#elif defined(__FreeBSD__)
+
+#include <sys/endian.h>
+#define bswap_16(x) bswap16(x)
+#define bswap_32(x) bswap32(x)
+#define bswap_64(x) bswap64(x)
+
+#elif defined(__OpenBSD__)
+
+#include <sys/types.h>
+#define bswap_16(x) swap16(x)
+#define bswap_32(x) swap32(x)
+#define bswap_64(x) swap64(x)
+
+#elif defined(__NetBSD__)
+
+#include <sys/types.h>
+#include <machine/bswap.h>
+#if defined(__BSWAP_RENAME) && !defined(__bswap_32)
+#define bswap_16(x) bswap16(x)
+#define bswap_32(x) bswap32(x)
+#define bswap_64(x) bswap64(x)
+#endif
+
+#else
+
+#include <byteswap.h>
+
+#endif
+
+enum class endian
+{
+#if defined(_MSC_VER) && !defined(__clang__)
+	little = 0,
+	big    = 1,
+	native = little
+#else
+	little = __ORDER_LITTLE_ENDIAN__,
+	big    = __ORDER_BIG_ENDIAN__,
+	native = __BYTE_ORDER__
+#endif
+};
+
+#ifdef CByteswap
+#undef CByteswap
+#endif
+
+template<bool isBigEndian = endian::native == endian::big>
 class CByteswap
 {
 public:
-	CByteswap() 
+	constexpr CByteswap() : m_bBigEndian(isBigEndian), m_bSwapBytes(false)
 	{
 		// Default behavior sets the target endian to match the machine native endian (no swap).
-		SetTargetBigEndian( IsMachineBigEndian() );
 	}
 
 	//-----------------------------------------------------------------------------
@@ -53,12 +122,9 @@ public:
 	// (Endienness is effectively detected at compile time when optimizations are
 	// enabled)
 	//-----------------------------------------------------------------------------
-	static bool IsMachineBigEndian()
+	constexpr bool IsMachineBigEndian()
 	{
-		short nIsBigEndian = 1;
-
-		// if we are big endian, the first byte will be a 0, if little endian, it will be a one.
-		return (bool)(0 ==  *(char *)&nIsBigEndian );
+		return endian::native == endian::big;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -68,21 +134,21 @@ public:
 	//		x86 is LITTLE Endian
 	//		PowerPC is BIG Endian
 	//-----------------------------------------------------------------------------
-	inline void SetTargetBigEndian( bool bigEndian )
+	constexpr inline void SetTargetBigEndian( bool bigEndian )
 	{
 		m_bBigEndian = bigEndian;
 		m_bSwapBytes = IsMachineBigEndian() != bigEndian;
 	}
 
 	// Changes target endian
-	inline void FlipTargetEndian( void )	
+	constexpr inline void FlipTargetEndian()
 	{
 		m_bSwapBytes = !m_bSwapBytes;
 		m_bBigEndian = !m_bBigEndian;
 	}
 
 	// Forces byte swapping state, regardless of endianess
-	inline void ActivateByteSwapping( bool bActivate )	
+	constexpr inline void ActivateByteSwapping( bool bActivate )	
 	{
 		SetTargetBigEndian( IsMachineBigEndian() != bActivate );
 	}
@@ -92,12 +158,12 @@ public:
 	//
 	// Used to determine when a byteswap needs to take place.
 	//-----------------------------------------------------------------------------
-	inline bool IsSwappingBytes( void )	// Are bytes being swapped?
+	constexpr inline bool IsSwappingBytes() const	// Are bytes being swapped?
 	{
 		return m_bSwapBytes;
 	}
 
-	inline bool IsTargetBigEndian( void )	// What is the current target endian?
+	constexpr inline bool IsTargetBigEndian() const	// What is the current target endian?
 	{
 		return m_bBigEndian;
 	}
@@ -124,7 +190,7 @@ public:
 			return 1;
 
 		int output;
-		LowLevelByteSwap<T>( &output, &input );
+		LowLevelByteSwap<T>( output, input );
 		if( output == nativeConstant )
 			return 0;
 
@@ -157,7 +223,7 @@ public:
 		// Swap everything in the buffer:
 		for( int i = 0; i < count; i++ )
 		{
-			LowLevelByteSwap<T>( &outputBuffer[i], &inputBuffer[i] );
+			LowLevelByteSwap<T>( outputBuffer[i], inputBuffer[i] );
 		}
 	}
 
@@ -184,18 +250,17 @@ public:
 		}
 
 		// Are we already the correct endienness? ( or are we swapping 1 byte items? )
-		if( !m_bSwapBytes || ( sizeof(T) == 1 ) )
+		if ( !m_bSwapBytes || ( sizeof(T) == 1 ) )
 		{
 			// Otherwise copy the inputBuffer to the outputBuffer:
 			memcpy( outputBuffer, inputBuffer, count * sizeof( T ) );
 			return;
-
 		}
 
 		// Swap everything in the buffer:
 		for( int i = 0; i < count; i++ )
 		{
-			LowLevelByteSwap<T>( &outputBuffer[i], &inputBuffer[i] );
+			LowLevelByteSwap<T>( outputBuffer[i], inputBuffer[i] );
 		}
 	}
 
@@ -204,43 +269,72 @@ private:
 	// The lowest level byte swapping workhorse of doom.  output always contains the 
 	// swapped version of input.  ( Doesn't compare machine to target endianness )
 	//-----------------------------------------------------------------------------
-	template<typename T> static void LowLevelByteSwap( T *output, T *input )
+	template <typename T>
+	inline void LowLevelByteSwap( T &output, T &input )
 	{
-		T temp = *output;
-#if defined( _X360 )
-		// Intrinsics need the source type to be fixed-point
-		DWORD* word = (DWORD*)input;
-		switch( sizeof(T) )
+		if constexpr (sizeof(T) == 1U)
 		{
-		case 8:
+			output = input;
+		}
+		else if constexpr (sizeof(T) == sizeof(uint16))
+		{
+			if constexpr (std::is_same_v<T, unsigned short>)
 			{
-			__storewordbytereverse( *word, 0, &temp );
-			__storewordbytereverse( *(word+1), 4, &temp );
+				output = bswap_16(input);
 			}
-			break;
+			else
+			{
+				uint16 v;
+				memcpy(&v, &input, sizeof(T));
 
-		case 4:
-			__storewordbytereverse( *word, 0, &temp );
-			break;
+				v = bswap_16(v);
 
-		case 2:
-			__storeshortbytereverse( *input, 0, &temp );
-			break;
-
-		default:
-			Assert( "Invalid size in CByteswap::LowLevelByteSwap" && 0 );
+				memcpy(&output, &v, sizeof(T));
+			}
 		}
-#else
-		for( size_t i = 0; i < sizeof(T); i++ )
+		else if constexpr (sizeof(T) == sizeof(uint32))
 		{
-			((unsigned char* )&temp)[i] = ((unsigned char*)input)[sizeof(T)-(i+1)]; 
+			if constexpr (std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned long>)
+			{
+				output = bswap_32(input);
+			}
+			else
+			{
+				uint32 v;
+				memcpy(&v, &input, sizeof(T));
+
+				v = bswap_32(v);
+
+				memcpy(&output, &v, sizeof(T));
+			}
 		}
-#endif
-		Q_memcpy( output, &temp, sizeof(T) );
+		else if constexpr (sizeof(T) == sizeof(uint64))
+		{
+			if constexpr (std::is_same_v<T, uint64>)
+			{
+				output = bswap_64(input);
+			}
+			else
+			{
+				uint64 v;
+				memcpy(&v, &input, sizeof(T));
+
+				v = bswap_64(v);
+
+				memcpy(&output, &v, sizeof(T));
+			}
+		}
+		else
+		{
+			static_assert(false, "Unknown size " V_STRINGIFY(sizeof(T)) " not in {2,4,8} set.");
+		}
 	}
 
 	unsigned int m_bSwapBytes : 1;
 	unsigned int m_bBigEndian : 1;
 };
+
+
+#define CByteswap CByteswap<>
 
 #endif /* !BYTESWAP_H */
