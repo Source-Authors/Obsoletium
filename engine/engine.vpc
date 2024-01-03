@@ -289,6 +289,8 @@ $Project "engine"
 
 	$Folder	"Source Files"
 	{
+		// dimhotepus: Disable accessibility shortcut keys.
+		$File	"accessibility_shortcut_keys_toggler.cpp"	[$WINDOWS]
 		$File	"baseautocompletefilelist.cpp"
 		$File	"baseserver.cpp"
 		$File	"bitbuf_errorhandler.cpp"
@@ -414,7 +416,9 @@ $Project "engine"
 		}
 		$File	"sys_engine.cpp"
 		$File	"sys_mainwind.cpp" [!$DEDICATED]
-		$File	"sys_linuxwind.cpp" [$POSIX]		
+		$File	"sys_linuxwind.cpp" [$POSIX]
+		// dimhotepus: Keyboard hook to disable Win key.
+		$File	"scoped_windows_hook.cpp"	[$WINDOWS]
 		$File	"testscriptmgr.cpp"
 		$File	"traceinit.cpp"
 		$File	"$SRCDIR\public\vallocator.cpp"
@@ -422,6 +426,8 @@ $Project "engine"
 		$File	"vprof_engine.cpp"
 		$File	"vprof_record.cpp"
 		$File	"world.cpp"
+		// dimhotepus: Disable Win key.
+		$File	"windows_shortcut_keys_toggler.cpp"	[$WINDOWS]
 		$File	"$SRCDIR\public\XZip.cpp"
 		$File	"$SRCDIR\public\XUnzip.cpp"
 		$File	"zone.cpp"

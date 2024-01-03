@@ -10,30 +10,34 @@
 #pragma once
 #endif
 
+#include <cstdint>
 #include <system_error>
 
-#include "winlite.h"
 #include "tier0/dbg.h"
 
-namespace source::engine::windows {
+FORWARD_DECLARE_HANDLE(HHOOK);
+FORWARD_DECLARE_HANDLE(HINSTANCE);
+
+#if defined(_WIN64)
+using LONG_PTR = __int64;
+#else
+using LONG_PTR = _W64 long;
+#endif
+
+using HOOKPROC = LONG_PTR(__stdcall* )( int code, uintptr_t wParam, LONG_PTR lParam );
+
+namespace source::engine::win {
 
 // Scoped windows hook.
 class ScopedWindowsHook
 {
 public:
 	// Creates scoped windows hook by hook type, hook procedure, instance and thread id.
-	ScopedWindowsHook( int hook_type, HOOKPROC hook_proc, HINSTANCE instance, DWORD thread_id ) noexcept
-		: hook_{ ::SetWindowsHookExW( hook_type, hook_proc, instance, thread_id ) },
-		errno_code_{ std::error_code{ static_cast<int>(::GetLastError()), std::system_category() } } {}
-	// Destroys windows hook.
-	~ScopedWindowsHook() noexcept {
-		if ( !errno_code_ ) {
-			if ( !::UnhookWindowsHookEx(hook_) ) {
-				const auto lastErrorText = std::system_category().message( ::GetLastError() );
-				Warning( "Can't remove hook %p: %s\n", hook_, lastErrorText.c_str() );
-			}
-		}
-	}
+	ScopedWindowsHook( int hook_type,
+		HOOKPROC hook_proc,
+		HINSTANCE instance,
+		unsigned long thread_id ) noexcept;
+	~ScopedWindowsHook() noexcept;
 
 	ScopedWindowsHook( ScopedWindowsHook& ) = delete;
 	ScopedWindowsHook( ScopedWindowsHook&& ) = delete;
@@ -46,11 +50,9 @@ public:
 	}
 
 	// Calls next hook with hook code, wide_param and low_param.
-	[[nodiscard]] static LRESULT CallNextHookEx( _In_ int hook_code, _In_ WPARAM wide_param, _In_ LPARAM low_param ) {
-		// Hook parameter is ignored, see
-		// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-callnexthookex
-		return ::CallNextHookEx( nullptr, hook_code, wide_param, low_param );
-	}
+	[[nodiscard]] static LONG_PTR CallNextHookEx( int hook_code,
+		uintptr_t wide_param,
+		LONG_PTR low_param );
 
 private:
 	// Hook.
@@ -59,6 +61,6 @@ private:
 	const std::error_code errno_code_;
 };
 
-}  // namespace source::engine::windows
+}  // namespace source::engine::win
 
 #endif  // ENGINE_SCOPED_WINDOWS_HOOK_H_

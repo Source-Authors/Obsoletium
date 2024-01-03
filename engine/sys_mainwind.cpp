@@ -215,9 +215,9 @@ private:
 
 #if defined( IS_WINDOWS_PC )
 	// dimhotepus: Disable Win key.
-	source::engine::windows::WindowsShortcutKeysToggler m_windowsShortcutKeysToggler;
+	source::engine::win::WindowsShortcutKeysToggler m_windowsShortcutKeysToggler;
 	// dimhotepus: Disable accessibility keys (ex. five times Shift).
-	source::engine::windows::AccessibilityShortcutKeysToggler m_accessibilityShortcutKeysToggler;
+	source::engine::win::AccessibilityShortcutKeysToggler m_accessibilityShortcutKeysToggler;
 #endif
 
 	void			UpdateDesktopInformation();
