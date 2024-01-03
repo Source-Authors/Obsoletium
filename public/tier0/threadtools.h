@@ -9,6 +9,7 @@
 
 #include "tier0/type_traits.h"
 
+#include <atomic>
 #include <climits>
 
 #include "tier0/platform.h"
@@ -1827,6 +1828,61 @@ template<class T> FORCEINLINE T ReadVolatileMemory( T const *pPtr )
 	volatile const T * pVolatilePtr = ( volatile const T * ) pPtr;
 	return *pVolatilePtr;
 }
+
+// Thread-safe singleton.
+// Based on https://preshing.com/20130930/double-checked-locking-is-fixed-in-cpp11/
+// Licensed as https://unlicense.org/
+template<typename T>
+class Singleton
+{
+public:
+	T *GetInstance()
+	{
+		T *tmp{m_instance.load(std::memory_order_relaxed)};
+		std::atomic_thread_fence(std::memory_order_acquire);
+
+		if (tmp == nullptr)
+		{
+			AUTO_LOCK(m_mutex);
+			tmp = m_instance.load(std::memory_order_relaxed);
+
+			if (tmp == nullptr)
+			{
+				tmp = new T;
+
+				std::atomic_thread_fence(std::memory_order_release);
+				m_instance.store(tmp, std::memory_order_relaxed);
+			}
+		}
+
+		return tmp;
+	}
+
+	void Delete()
+	{
+		T *tmp{m_instance.load(std::memory_order_relaxed)};
+		std::atomic_thread_fence(std::memory_order_acquire);
+
+		if (tmp != nullptr)
+		{
+			AUTO_LOCK(m_mutex);
+			tmp = m_instance.load(std::memory_order_relaxed);
+
+			if (tmp != nullptr)
+			{
+				delete tmp;
+				tmp = nullptr;
+
+				std::atomic_thread_fence(std::memory_order_release);
+				m_instance.store(tmp, std::memory_order_relaxed);
+			}
+		}
+	}
+
+private:
+	std::atomic<T *> m_instance;
+	CThreadFastMutex m_mutex;
+};
 
 //-----------------------------------------------------------------------------
 
