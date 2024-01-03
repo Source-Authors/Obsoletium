@@ -2,7 +2,9 @@
 
 #include "pch_tier0.h"
 
-#if defined(_LINUX)
+#if defined(_WIN32)
+#include "winlite.h"
+#elif defined(_LINUX)
 #include <cstdlib>
 #elif defined(OSX)
 #include <sys/sysctl.h>
@@ -451,9 +453,6 @@ const CPUInformation* GetCPUInformation()
 	// Redundant, but just in case the user somehow messes with the size.
 	memset(&pi, 0x0, sizeof(pi));
 
-	// Fill out the structure, and return it:
-	pi.m_Size = sizeof(pi);
-
 	// Grab the processor frequency:
 	pi.m_Speed = CalculateClockSpeed();
 	
@@ -573,6 +572,9 @@ const CPUInformation* GetCPUInformation()
 	pi.m_szProcessorID = (tchar*)GetProcessorVendorId();
 	// dimhotepus: Correctly check HyperThreading support.
 	pi.m_bHT		   = pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors;
+
+	// Mark struct as ready and filled, return it:
+	pi.m_Size = sizeof(pi);
 
 	return &pi;
 }

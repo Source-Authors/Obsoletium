@@ -1,9 +1,5 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#if defined(_WIN32)
-#include "winlite.h"
-#endif
-
 // tier0
 #include "tier0/basetypes.h"
 #include "tier0/dbgflag.h"

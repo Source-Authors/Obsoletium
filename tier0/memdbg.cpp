@@ -10,6 +10,7 @@
 #include "tier0/memalloc.h"
 #include "mem_helpers.h"
 #ifdef _WIN32
+#include "winlite.h"
 #include <crtdbg.h>
 #endif
 #ifdef OSX

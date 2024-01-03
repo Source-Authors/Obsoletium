@@ -11,6 +11,8 @@
 
 #include <memory>
 
+#include "winlite.h"
+
 // After building the DLL if it has never been registered on this machine or
 // if the providers have changed you need to go:
 //    xcopy /y %vgame%\bin\tier0.dll %temp%

@@ -7,6 +7,7 @@
 #include "tier0/valve_off.h"
 
 #ifdef _WIN32
+#include "winlite.h"
 #include <tlhelp32.h>
 #endif
 

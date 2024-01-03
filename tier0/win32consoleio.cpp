@@ -7,6 +7,7 @@
 
 #if defined( _WIN32 )
 
+#include "winlite.h"
 #include <io.h>
 #include <fcntl.h>
 

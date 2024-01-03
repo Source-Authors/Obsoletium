@@ -6,6 +6,8 @@
 
 #if defined(_WIN32) && !defined(_X360)
 #include <cerrno>
+
+#include "winlite.h"
 #endif
 #include "tier0/platform.h"
 #include "tier0/minidump.h"

@@ -9,6 +9,7 @@
 
 #include "tier0/valve_off.h"
 
+#include "winlite.h"
 #include <dbghelp.h>
 #include <ctime>
 

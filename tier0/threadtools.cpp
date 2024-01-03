@@ -7,6 +7,7 @@
 #include "tier1/strtools.h"
 #include "tier0/dynfunction.h"
 #ifdef _WIN32
+	#include "winlite.h"
 	#include <process.h>
 
 #elif defined(POSIX)

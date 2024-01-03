@@ -23,9 +23,7 @@
 
 #ifdef PLATFORM_WINDOWS_PC32
 #include "tier0/threadtools.h"
-#define NOMINMAX
-#undef min
-#undef max
+#include "winlite.h"
 #include <powrprof.h>
 #include <algorithm>
 #pragma comment(lib, "PowrProf.lib")

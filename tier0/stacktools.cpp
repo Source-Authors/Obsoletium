@@ -8,6 +8,8 @@
 #include "tier0/valve_off.h"
 
 #if defined( PLATFORM_WINDOWS_PC )
+#include "winlite.h"
+
 #include <dbghelp.h>
 #endif
 

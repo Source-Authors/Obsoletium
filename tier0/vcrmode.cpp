@@ -3,6 +3,7 @@
 #include "pch_tier0.h"
 
 #ifdef _WIN32
+#include "winlite.h"
 #include <winsock.h>
 #endif
 

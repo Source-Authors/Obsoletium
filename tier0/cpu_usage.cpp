@@ -9,9 +9,12 @@
 // First call returns zero.
 
 #include "pch_tier0.h"
+
 #include "tier0/platform.h"
 
 #ifdef WIN32
+
+#include "winlite.h"
 
 #define SystemBasicInformation 0
 #define SystemPerformanceInformation 2

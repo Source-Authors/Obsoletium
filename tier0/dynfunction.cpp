@@ -6,6 +6,8 @@
 #include "tier0/dynfunction.h"
 
 #if defined(WIN32)
+#include "winlite.h"
+
 typedef HMODULE LibraryHandle;
 #define LoadLibraryHandle(libname) LoadLibrary(libname)
 #define CloseLibraryHandle(handle) FreeLibrary(handle)
