@@ -3,7 +3,6 @@
 #ifndef PMELIB_H
 #define PMELIB_H
 
-#include "winlite.h"
 #include "tier0/platform.h"
 
 #define VERSION "1.0.2"
@@ -95,13 +94,13 @@ public:
 
     static PME*		_singleton;
 
-    HANDLE			hFile;
+    void*			hFile;
     bool			bDriverOpen;
     double			m_CPUClockSpeed;
 
     //ia32detect detect;
-    HRESULT Init();
-    HRESULT Close();
+    long Init();
+    long Close();
 
 protected:
 
@@ -125,32 +124,15 @@ public:
     double GetCPUClockSpeedSlow( void );
     double GetCPUClockSpeedFast( void );
 
-    HRESULT SelectP5P6PerformanceEvent( uint32 dw_event, uint32 dw_counter, bool b_user, bool b_kernel );
+    long SelectP5P6PerformanceEvent( uint32 dw_event, uint32 dw_counter, bool b_user, bool b_kernel );
 
-    HRESULT ReadMSR( uint32 dw_reg, int64 * pi64_value );
-    HRESULT ReadMSR( uint32 dw_reg, uint64 * pi64_value );
+    long ReadMSR(uint32 dw_reg, int64* pi64_value);
+    long ReadMSR(uint32 dw_reg, uint64* pi64_value);
 
-    HRESULT WriteMSR( uint32 dw_reg, const int64 & i64_value );
-    HRESULT WriteMSR( uint32 dw_reg, const uint64 & i64_value );
+    long WriteMSR(uint32 dw_reg, const int64& i64_value);
+    long WriteMSR(uint32 dw_reg, const uint64& i64_value);
 
-    void SetProcessPriority( ProcessPriority priority )
-    {
-        switch( priority )
-        {
-        case ProcessPriorityNormal:
-			{
-				SetPriorityClass (GetCurrentProcess(),NORMAL_PRIORITY_CLASS);
-				SetThreadPriority (GetCurrentThread(),THREAD_PRIORITY_NORMAL);
-				break;
-			}
-        case ProcessPriorityHigh:
-			{
-				SetPriorityClass (GetCurrentProcess(),REALTIME_PRIORITY_CLASS);
-				SetThreadPriority (GetCurrentThread(),THREAD_PRIORITY_HIGHEST);
-				break;
-			}
-        }
-    }
+    void SetProcessPriority(ProcessPriority priority);
 
     //---------------------------------------------------------------------------
     // Return the family of the processor

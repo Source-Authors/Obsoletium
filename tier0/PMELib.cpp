@@ -1,10 +1,11 @@
 // Copyright Valve Corporation, All rights reserved.
 
 #ifdef _WIN32
+#include "tier0/pmelib.h"
+
 #include "winlite.h"
 
 #include "tier0/valve_off.h"
-#include "tier0/pmelib.h"
 #include "tier0/valve_on.h"
 
 #include "tier0/ioctlcodes.h"
@@ -105,6 +106,27 @@ HRESULT PME::Close(void)
 	    return E_DRIVER_NOT_OPEN;
 
 
+}
+
+void PME::SetProcessPriority(ProcessPriority priority)
+{
+#ifdef _WIN32
+	switch( priority )
+	{
+	case ProcessPriorityNormal:
+		{
+			SetPriorityClass (GetCurrentProcess(),NORMAL_PRIORITY_CLASS);
+			SetThreadPriority (GetCurrentThread(),THREAD_PRIORITY_NORMAL);
+			break;
+		}
+	case ProcessPriorityHigh:
+		{
+			SetPriorityClass (GetCurrentProcess(),REALTIME_PRIORITY_CLASS);
+			SetThreadPriority (GetCurrentThread(),THREAD_PRIORITY_HIGHEST);
+			break;
+		}
+	}
+#endif
 }
 
 //---------------------------------------------------------------------------
