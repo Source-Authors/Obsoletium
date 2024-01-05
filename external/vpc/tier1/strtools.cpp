@@ -95,7 +95,7 @@ static volatile char const *pDebugString;
 #define DEBUG_LINK_CHECK
 #endif
 
-void _V_memset(void *dest, int fill, int count) {
+void _V_memset(void *dest, int fill, intp count) {
   DEBUG_LINK_CHECK;
   Assert(count >= 0);
   AssertValidWritePtr(dest, count);
@@ -103,7 +103,7 @@ void _V_memset(void *dest, int fill, int count) {
   memset(dest, fill, count);
 }
 
-void _V_memcpy(void *dest, const void *src, int count) {
+void _V_memcpy(void *dest, const void *src, intp count) {
   Assert(count >= 0);
   AssertValidReadPtr(src, count);
   AssertValidWritePtr(dest, count);
@@ -111,7 +111,7 @@ void _V_memcpy(void *dest, const void *src, int count) {
   memcpy(dest, src, count);
 }
 
-void _V_memmove(void *dest, const void *src, int count) {
+void _V_memmove(void *dest, const void *src, intp count) {
   Assert(count >= 0);
   AssertValidReadPtr(src, count);
   AssertValidWritePtr(dest, count);
@@ -119,7 +119,7 @@ void _V_memmove(void *dest, const void *src, int count) {
   memmove(dest, src, count);
 }
 
-int _V_memcmp(const void *m1, const void *m2, int count) {
+int _V_memcmp(const void *m1, const void *m2, intp count) {
   DEBUG_LINK_CHECK;
   Assert(count >= 0);
   AssertValidReadPtr(m1, count);
@@ -128,7 +128,7 @@ int _V_memcmp(const void *m1, const void *m2, int count) {
   return memcmp(m1, m2, count);
 }
 
-int _V_strlen(const char *str) {
+intp _V_strlen(const char *str) {
   AssertValidStringPtr(str);
 #ifdef POSIX
   if (!str) return 0;
@@ -144,11 +144,11 @@ void _V_strcpy(char *dest, const char *src) {
   strcpy(dest, src);
 }
 
-int _V_wcslen(const wchar_t *pwch) { return wcslen(pwch); }
+intp _V_wcslen(const wchar_t *pwch) { return wcslen(pwch); }
 
 char *_V_strrchr(const char *s, char c) {
   AssertValidStringPtr(s);
-  int len = V_strlen(s);
+  intp len = V_strlen(s);
   s += len;
   while (len--)
     if (*--s == c) return (char *)s;
@@ -303,7 +303,7 @@ wchar_t *_V_wcslower(const char *file, int line, wchar_t *start) {
   return _wcslwr(start);
 }
 
-int V_strncmp(const char *s1, const char *s2, int count) {
+int V_strncmp(const char *s1, const char *s2, intp count) {
   Assert(count >= 0);
   AssertValidStringPtr(s1, count);
   AssertValidStringPtr(s2, count);
@@ -337,7 +337,7 @@ char *V_strnlwr(char *s, size_t count) {
   return pRet;
 }
 
-int V_strncasecmp(const char *s1, const char *s2, int n) {
+int V_strncasecmp(const char *s1, const char *s2, intp n) {
   Assert(n >= 0);
   AssertValidStringPtr(s1);
   AssertValidStringPtr(s2);
@@ -368,7 +368,7 @@ int V_strcasecmp(const char *s1, const char *s2) {
   return V_stricmp(s1, s2);
 }
 
-int V_strnicmp(const char *s1, const char *s2, int n) {
+int V_strnicmp(const char *s1, const char *s2, intp n) {
   DEBUG_LINK_CHECK;
   Assert(n >= 0);
   AssertValidStringPtr(s1);
@@ -582,7 +582,7 @@ float V_atof(const char *str) {
 void V_normalizeFloatString(char *pFloat) {
   // If we have a decimal point, remove trailing zeroes:
   if (strchr(pFloat, '.')) {
-    int len = V_strlen(pFloat);
+    intp len = V_strlen(pFloat);
 
     while (len > 1 && pFloat[len - 1] == '0') {
       pFloat[len - 1] = '\0';
@@ -655,7 +655,7 @@ char *V_stristr(char *pStr, char const *pSearch) {
 // Finds a string in another string with a case insensitive test w/ length
 // validation
 //-----------------------------------------------------------------------------
-char const *V_strnistr(char const *pStr, char const *pSearch, int n) {
+char const *V_strnistr(char const *pStr, char const *pSearch, intp n) {
   AssertValidStringPtr(pStr);
   AssertValidStringPtr(pSearch);
 
@@ -669,7 +669,7 @@ char const *V_strnistr(char const *pStr, char const *pSearch, int n) {
 
     // Skip over non-matches
     if (tolower_fast(*pLetter) == tolower_fast(*pSearch)) {
-      int n1 = n - 1;
+      intp n1 = n - 1;
 
       // Check for match
       char const *pMatch = pLetter + 1;
@@ -698,7 +698,7 @@ char const *V_strnistr(char const *pStr, char const *pSearch, int n) {
   return 0;
 }
 
-const char *V_strnchr(const char *pStr, char c, int n) {
+const char *V_strnchr(const char *pStr, char c, intp n) {
   char const *pLetter = pStr;
   char const *pLast = pStr + n;
 
@@ -710,7 +710,7 @@ const char *V_strnchr(const char *pStr, char c, int n) {
   return NULL;
 }
 
-void V_strncpy(char *pDest, char const *pSrc, int maxLen) {
+void V_strncpy(char *pDest, char const *pSrc, intp maxLen) {
   Assert(maxLen >= 0);
   AssertValidWritePtr(pDest, maxLen);
   AssertValidStringPtr(pSrc);
@@ -723,20 +723,20 @@ void V_strncpy(char *pDest, char const *pSrc, int maxLen) {
   }
 }
 
-void V_wcsncpy(wchar_t *pDest, wchar_t const *pSrc, int maxLenInBytes) {
+void V_wcsncpy(wchar_t *pDest, wchar_t const *pSrc, intp maxLenInBytes) {
   Assert(maxLenInBytes >= 0);
   AssertValidWritePtr(pDest, maxLenInBytes);
   AssertValidReadPtr(pSrc);
 
-  int maxLen = maxLenInBytes / sizeof(wchar_t);
+  intp maxLen = maxLenInBytes / sizeof(wchar_t);
 
   wcsncpy(pDest, pSrc, maxLen);
   if (maxLen) {
-    pDest[maxLen - 1] = 0;
+    pDest[maxLen - 1] = L'\0';
   }
 }
 
-int V_snwprintf(wchar_t *pDest, int maxLenInNumWideCharacters,
+int V_snwprintf(wchar_t *pDest, intp maxLenInNumWideCharacters,
                 PRINTF_FORMAT_STRING const wchar_t *pFormat, ...) {
   Assert(maxLenInNumWideCharacters >= 0);
   AssertValidWritePtr(pDest, maxLenInNumWideCharacters);
@@ -764,7 +764,7 @@ int V_snwprintf(wchar_t *pDest, int maxLenInNumWideCharacters,
   return len;
 }
 
-int V_snprintf(char *pDest, int maxLen,
+int V_snprintf(char *pDest, intp maxLen,
                PRINTF_FORMAT_STRING char const *pFormat, ...) {
   Assert(maxLen >= 0);
   AssertValidWritePtr(pDest, maxLen);
@@ -791,7 +791,7 @@ int V_snprintf(char *pDest, int maxLen,
   return len;
 }
 
-int V_vsnprintf(char *pDest, int maxLen, char const *pFormat, va_list params) {
+int V_vsnprintf(char *pDest, intp maxLen, char const *pFormat, va_list params) {
   Assert(maxLen > 0);
   AssertValidWritePtr(pDest, maxLen);
   AssertValidStringPtr(pFormat);
@@ -806,13 +806,13 @@ int V_vsnprintf(char *pDest, int maxLen, char const *pFormat, va_list params) {
   return len;
 }
 
-int V_vsnprintfRet(char *pDest, int maxLen, const char *pFormat, va_list params,
+int V_vsnprintfRet(char *pDest, intp maxLen, const char *pFormat, va_list params,
                    bool *pbTruncated) {
   Assert(maxLen > 0);
   AssertValidWritePtr(pDest, maxLen);
   AssertValidStringPtr(pFormat);
 
-  int len = _vsnprintf(pDest, maxLen, pFormat, params);
+  intp len = _vsnprintf(pDest, maxLen, pFormat, params);
 
   if (pbTruncated) {
     *pbTruncated = len < 0;
@@ -838,7 +838,7 @@ int V_vsnprintfRet(char *pDest, int maxLen, const char *pFormat, va_list params,
 // Output : char * the copied buffer
 //-----------------------------------------------------------------------------
 char *V_strncat(char *pDest, const char *pSrc, size_t maxLenInBytes,
-                int max_chars_to_copy) {
+                intp max_chars_to_copy) {
   DEBUG_LINK_CHECK;
   size_t charstocopy = (size_t)0;
 
@@ -850,7 +850,7 @@ char *V_strncat(char *pDest, const char *pSrc, size_t maxLenInBytes,
   if (max_chars_to_copy <= COPY_ALL_CHARACTERS) {
     charstocopy = srclen;
   } else {
-    charstocopy = (size_t)MIN(max_chars_to_copy, (int)srclen);
+    charstocopy = (size_t)MIN(max_chars_to_copy, (intp)srclen);
   }
 
   if (len + charstocopy >= maxLenInBytes) {
@@ -862,7 +862,7 @@ char *V_strncat(char *pDest, const char *pSrc, size_t maxLenInBytes,
   }
 
   char *pOut = strncat(pDest, pSrc, charstocopy);
-  pOut[maxLenInBytes - 1] = 0;
+  pOut[maxLenInBytes - 1] = '\0';
   return pOut;
 }
 
@@ -878,21 +878,21 @@ char *V_strncat(char *pDest, const char *pSrc, size_t maxLenInBytes,
 // max_chars_to_copy - COPY_ALL_CHARACTERS in pSrc or max # to copy
 // Output : char * the copied buffer
 //-----------------------------------------------------------------------------
-wchar_t *V_wcsncat(wchar_t *pDest, const wchar_t *pSrc, int maxLenInBytes,
-                   int max_chars_to_copy) {
+wchar_t *V_wcsncat(wchar_t *pDest, const wchar_t *pSrc, size_t maxLenInBytes,
+                   intp max_chars_to_copy) {
   DEBUG_LINK_CHECK;
   size_t charstocopy = (size_t)0;
 
   Assert(maxLenInBytes >= 0);
 
-  int maxLenInCharacters = maxLenInBytes / sizeof(wchar_t);
+  intp maxLenInCharacters = maxLenInBytes / sizeof(wchar_t);
 
   size_t len = wcslen(pDest);
   size_t srclen = wcslen(pSrc);
   if (max_chars_to_copy <= COPY_ALL_CHARACTERS) {
     charstocopy = srclen;
   } else {
-    charstocopy = (size_t)MIN(max_chars_to_copy, (int)srclen);
+    charstocopy = (size_t)MIN(max_chars_to_copy, (intp)srclen);
   }
 
   if (len + charstocopy >= (size_t)maxLenInCharacters) {
@@ -904,7 +904,7 @@ wchar_t *V_wcsncat(wchar_t *pDest, const wchar_t *pSrc, int maxLenInBytes,
   }
 
   wchar_t *pOut = wcsncat(pDest, pSrc, charstocopy);
-  pOut[maxLenInCharacters - 1] = 0;
+  pOut[maxLenInCharacters - 1] = L'\0';
   return pOut;
 }
 
@@ -946,7 +946,7 @@ char *V_pretifymem(float value, int digitsafterdecimal /*= 2*/,
   digitsafterdecimal = MAX(digitsafterdecimal, 0);
 
   // If it's basically integral, don't do any decimals
-  if (FloatMakePositive(value - (int)value) < 0.00001) {
+  if (FloatMakePositive(value - (int)value) < 0.00001f) {
     V_snprintf(val, sizeof(val), "%i%s", (int)value, suffix);
   } else {
     char fmt[32];
@@ -1093,9 +1093,9 @@ static unsigned char V_nibble(char c) {
 //			*out -
 //			maxoutputbytes -
 //-----------------------------------------------------------------------------
-void V_hextobinary(char const *in, int numchars, byte *out,
-                   int maxoutputbytes) {
-  int len = V_strlen(in);
+void V_hextobinary(char const *in, intp numchars, byte *out,
+                   intp maxoutputbytes) {
+  intp len = V_strlen(in);
   numchars = MIN(len, numchars);
   // Make sure it's even
   numchars = (numchars) & ~0x1;
@@ -1106,7 +1106,7 @@ void V_hextobinary(char const *in, int numchars, byte *out,
   memset(out, 0x00, maxoutputbytes);
 
   byte *p;
-  int i;
+  intp i;
 
   p = out;
   for (i = 0; (i < numchars) && ((p - out) < maxoutputbytes); i += 2, p++) {
@@ -1121,10 +1121,10 @@ void V_hextobinary(char const *in, int numchars, byte *out,
 //			*out -
 //			outsize -
 //-----------------------------------------------------------------------------
-void V_binarytohex(const byte *in, int inputbytes, char *out, int outsize) {
+void V_binarytohex(const byte *in, intp inputbytes, char *out, intp outsize) {
   Assert(outsize >= 1);
   char doublet[10];
-  int i;
+  intp i;
 
   out[0] = 0;
 
@@ -1143,7 +1143,7 @@ void V_binarytohex(const byte *in, int inputbytes, char *out, int outsize) {
 //			*out -
 //			maxlen -
 //-----------------------------------------------------------------------------
-void V_FileBase(const char *in, char *out, int maxlen) {
+void V_FileBase(const char *in, char *out, intp maxlen) {
   Assert(maxlen >= 1);
   Assert(in);
   Assert(out);
@@ -1153,7 +1153,7 @@ void V_FileBase(const char *in, char *out, int maxlen) {
     return;
   }
 
-  int len, start, end;
+  intp len, start, end;
 
   len = V_strlen(in);
 
@@ -1185,7 +1185,7 @@ void V_FileBase(const char *in, char *out, int maxlen) {
   // Length of new sting
   len = end - start + 1;
 
-  int maxcopy = MIN(len + 1, maxlen);
+  intp maxcopy = MIN(len + 1, maxlen);
 
   // Copy partial string
   V_strncpy(out, &in[start], maxcopy);
@@ -1198,7 +1198,7 @@ void V_FileBase(const char *in, char *out, int maxlen) {
 void V_StripTrailingSlash(char *ppath) {
   Assert(ppath);
 
-  int len = V_strlen(ppath);
+  intp len = V_strlen(ppath);
   if (len > 0) {
     if (PATHSEPARATOR(ppath[len - 1])) {
       ppath[len - 1] = 0;
@@ -1212,18 +1212,18 @@ void V_StripTrailingSlash(char *ppath) {
 //			*out -
 //			outSize -
 //-----------------------------------------------------------------------------
-void V_StripExtension(const char *in, char *out, int outSize) {
+void V_StripExtension(const char *in, char *out, intp outSize) {
   // Find the last dot. If it's followed by a dot or a slash, then it's part of
   // a directory specifier like ../../somedir/./blah.
 
   // scan backward for '.'
-  int end = V_strlen(in) - 1;
+  intp end = V_strlen(in) - 1;
   while (end > 0 && in[end] != '.' && !PATHSEPARATOR(in[end])) {
     --end;
   }
 
   if (end > 0 && !PATHSEPARATOR(in[end]) && end < outSize) {
-    int nChars = MIN(end, outSize - 1);
+    intp nChars = MIN(end, outSize - 1);
     if (out != in) {
       memcpy(out, in, nChars);
     }
@@ -1243,7 +1243,7 @@ void V_StripExtension(const char *in, char *out, int outSize) {
 //			pathStringLength -
 //-----------------------------------------------------------------------------
 void V_DefaultExtension(char *path, const char *extension,
-                        int pathStringLength) {
+                        intp pathStringLength) {
   Assert(path);
   Assert(pathStringLength >= 1);
   Assert(extension);
@@ -1278,7 +1278,7 @@ void V_DefaultExtension(char *path, const char *extension,
 //			*extension -
 //			pathStringLength -
 //-----------------------------------------------------------------------------
-void V_SetExtension(char *path, const char *extension, int pathStringLength) {
+void V_SetExtension(char *path, const char *extension, intp pathStringLength) {
   V_StripExtension(path, path, pathStringLength);
   V_DefaultExtension(path, extension, pathStringLength);
 }
@@ -1289,7 +1289,7 @@ void V_SetExtension(char *path, const char *extension, int pathStringLength) {
 // Output : void  V_StripFilename
 //-----------------------------------------------------------------------------
 void V_StripFilename(char *path) {
-  int length;
+  intp length;
 
   length = V_strlen(path) - 1;
   if (length <= 0) return;
@@ -1329,9 +1329,9 @@ void V_FixSlashes(char *pname, char separator /* = CORRECT_PATH_SEPARATOR */) {
 // somepath\otherpath\\ and removes the extra double slash.
 //-----------------------------------------------------------------------------
 void V_FixDoubleSlashes(char *pStr) {
-  int len = V_strlen(pStr);
+  intp len = V_strlen(pStr);
 
-  for (int i = 1; i < len - 1; i++) {
+  for (intp i = 1; i < len - 1; i++) {
     if ((pStr[i] == '/' || pStr[i] == '\\') &&
         (pStr[i + 1] == '/' || pStr[i + 1] == '\\')) {
       // This means there's a double slash somewhere past the start of the
@@ -1349,12 +1349,12 @@ void V_FixDoubleSlashes(char *pStr) {
 //			maxlen -
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool V_StripLastDir(char *dirName, int maxlen) {
+bool V_StripLastDir(char *dirName, intp maxlen) {
   if (dirName[0] == 0 || !V_stricmp(dirName, "./") ||
       !V_stricmp(dirName, ".\\"))
     return false;
 
-  int len = V_strlen(dirName);
+  intp len = V_strlen(dirName);
 
   Assert(len < maxlen);
 
@@ -1424,7 +1424,7 @@ char *V_UnqualifiedFileName(char *in) {
 //			destSize - size of destination buffer
 //-----------------------------------------------------------------------------
 void V_ComposeFileName(const char *path, const char *filename, char *dest,
-                       int destSize) {
+                       intp destSize) {
   V_strncpy(dest, path, destSize);
   V_FixSlashes(dest);
   V_AppendSlash(dest, destSize);
@@ -1439,14 +1439,14 @@ void V_ComposeFileName(const char *path, const char *filename, char *dest,
 //			destSize -
 // Output : void V_ExtractFilePath
 //-----------------------------------------------------------------------------
-bool V_ExtractFilePath(const char *path, char *dest, int destSize) {
+bool V_ExtractFilePath(const char *path, char *dest, intp destSize) {
   Assert(destSize >= 1);
   if (destSize < 1) {
     return false;
   }
 
   // Last char
-  int len = V_strlen(path);
+  intp len = V_strlen(path);
   const char *src = path + (len ? len - 1 : 0);
 
   // back up until a \ or the start
@@ -1468,7 +1468,7 @@ bool V_ExtractFilePath(const char *path, char *dest, int destSize) {
 //			destSize -
 // Output : void V_ExtractFileExtension
 //-----------------------------------------------------------------------------
-void V_ExtractFileExtension(const char *path, char *dest, int destSize) {
+void V_ExtractFileExtension(const char *path, char *dest, intp destSize) {
   *dest = 0;
   const char *extension = V_GetFileExtension(path);
   if (NULL != extension) V_strncpy(dest, extension, destSize);
@@ -1549,7 +1549,7 @@ bool V_RemoveDotSlashes(char *pFilename, char separator) {
   *pOut = 0;
 
   // Get rid of a trailing "/." (needless).
-  int len = V_strlen(pFilename);
+  intp len = V_strlen(pFilename);
   if (len > 2 && pFilename[len - 1] == '.' &&
       PATHSEPARATOR(pFilename[len - 2])) {
     pFilename[len - 2] = 0;
@@ -1594,8 +1594,8 @@ bool V_RemoveDotSlashes(char *pFilename, char separator) {
   return true;
 }
 
-void V_AppendSlash(char *pStr, int strSize) {
-  int len = V_strlen(pStr);
+void V_AppendSlash(char *pStr, intp strSize) {
+  intp len = V_strlen(pStr);
   if (len > 0 && !PATHSEPARATOR(pStr[len - 1])) {
     if (len + 1 >= strSize)
       Error("V_AppendSlash: ran out of space on %s.", pStr);
@@ -1605,7 +1605,7 @@ void V_AppendSlash(char *pStr, int strSize) {
   }
 }
 
-void V_MakeAbsolutePath(char *pOut, int outLen, const char *pPath,
+void V_MakeAbsolutePath(char *pOut, intp outLen, const char *pPath,
                         const char *pStartingDir) {
   if (V_IsAbsolutePath(pPath)) {
     // pPath is not relative.. just copy it.
@@ -1645,7 +1645,7 @@ void V_MakeAbsolutePath(char *pOut, int outLen, const char *pPath,
 // Makes a relative path
 //-----------------------------------------------------------------------------
 bool V_MakeRelativePath(const char *pFullPath, const char *pDirectory,
-                        char *pRelativePath, int nBufLen) {
+                        char *pRelativePath, intp nBufLen) {
   pRelativePath[0] = 0;
 
   const char *pPath = pFullPath;
@@ -1673,7 +1673,7 @@ bool V_MakeRelativePath(const char *pFullPath, const char *pDirectory,
   if (!pLastCommonPath) return false;
 
   // For each path separator remaining in the dir, need a ../
-  int nOutLen = 0;
+  intp nOutLen = 0;
   bool bLastCharWasSeparator = true;
   for (; *pLastCommonDir; ++pLastCommonDir) {
     if (PATHSEPARATOR(*pLastCommonDir)) {
@@ -1736,11 +1736,11 @@ void V_FixupPathName(char *pOut, size_t nOutLen, const char *pPath) {
 
 // Copies at most nCharsToCopy bytes from pIn into pOut.
 // Returns false if it would have overflowed pOut's buffer.
-static bool CopyToMaxChars(char *pOut, int outSize, const char *pIn,
-                           int nCharsToCopy) {
+static bool CopyToMaxChars(char *pOut, intp outSize, const char *pIn,
+                           intp nCharsToCopy) {
   if (outSize == 0) return false;
 
-  int iOut = 0;
+  intp iOut = 0;
   while (*pIn && nCharsToCopy > 0) {
     if (iOut == (outSize - 1)) {
       pOut[iOut] = 0;
@@ -1759,9 +1759,9 @@ static bool CopyToMaxChars(char *pOut, int outSize, const char *pIn,
 // Returns true if it completed successfully.
 // If it would overflow pOut, it fills as much as it can and returns false.
 bool V_StrSubst(const char *pIn, const char *pMatch, const char *pReplaceWith,
-                char *pOut, int outLen, bool bCaseSensitive) {
-  int replaceFromLen = V_strlen(pMatch);
-  int replaceToLen = V_strlen(pReplaceWith);
+                char *pOut, intp outLen, bool bCaseSensitive) {
+  intp replaceFromLen = V_strlen(pMatch);
+  intp replaceToLen = V_strlen(pReplaceWith);
 
   const char *pInStart = pIn;
   char *pOutPos = pOut;
@@ -1793,15 +1793,15 @@ bool V_StrSubst(const char *pIn, const char *pMatch, const char *pReplaceWith,
       pOutPos += replaceToLen;
     } else {
       // We're at the end of pIn. Copy whatever remains and get out.
-      int copyLen = V_strlen(pInStart);
+      intp copyLen = V_strlen(pInStart);
       V_strncpy(pOutPos, pInStart, nRemainingOut);
       return (copyLen <= nRemainingOut - 1);
     }
   }
 }
 
-char *AllocString(const char *pStr, int nMaxChars) {
-  int allocLen = V_strlen(pStr);
+char *AllocString(const char *pStr, intp nMaxChars) {
+  intp allocLen = V_strlen(pStr);
   if (nMaxChars == -1)
     allocLen += 1;
   else
@@ -1813,13 +1813,13 @@ char *AllocString(const char *pStr, int nMaxChars) {
 }
 
 void V_SplitString2(const char *pString, const char **pSeparators,
-                    int nSeparators, CUtlVector<char *> &outStrings) {
+                    intp nSeparators, CUtlVector<char *> &outStrings) {
   outStrings.Purge();
   const char *pCurPos = pString;
   while (1) {
-    int iFirstSeparator = -1;
+    intp iFirstSeparator = -1;
     const char *pFirstSeparator = 0;
-    for (int i = 0; i < nSeparators; i++) {
+    for (intp i = 0; i < nSeparators; i++) {
       const char *pTest = V_stristr(pCurPos, pSeparators[i]);
       if (pTest && (!pFirstSeparator || pTest < pFirstSeparator)) {
         iFirstSeparator = i;
@@ -1829,7 +1829,7 @@ void V_SplitString2(const char *pString, const char **pSeparators,
 
     if (pFirstSeparator) {
       // Split on this separator and continue on.
-      int separatorLen = V_strlen(pSeparators[iFirstSeparator]);
+      intp separatorLen = V_strlen(pSeparators[iFirstSeparator]);
       if (pFirstSeparator > pCurPos) {
         outStrings.AddToTail(AllocString(pCurPos, pFirstSeparator - pCurPos));
       }
@@ -1872,11 +1872,11 @@ bool V_SetCurrentDirectory(const char *pDirName) {
 // It follows the Python slice convention:
 // Negative numbers wrap around the string (-1 references the last character).
 // Numbers are clamped to the end of the string.
-void V_StrSlice(const char *pStr, int firstChar, int lastCharNonInclusive,
-                char *pOut, int outSize) {
+void V_StrSlice(const char *pStr, intp firstChar, intp lastCharNonInclusive,
+                char *pOut, intp outSize) {
   if (outSize == 0) return;
 
-  int length = V_strlen(pStr);
+  intp length = V_strlen(pStr);
 
   // Fixup the string indices.
   if (firstChar < 0) {
@@ -1897,7 +1897,7 @@ void V_StrSlice(const char *pStr, int firstChar, int lastCharNonInclusive,
     return;
   }
 
-  int copyLen = lastCharNonInclusive - firstChar;
+  intp copyLen = lastCharNonInclusive - firstChar;
   if (copyLen <= (outSize - 1)) {
     memcpy(pOut, &pStr[firstChar], copyLen);
     pOut[copyLen] = 0;
@@ -1907,7 +1907,7 @@ void V_StrSlice(const char *pStr, int firstChar, int lastCharNonInclusive,
   }
 }
 
-void V_StrLeft(const char *pStr, int nChars, char *pOut, int outSize) {
+void V_StrLeft(const char *pStr, intp nChars, char *pOut, intp outSize) {
   if (nChars == 0) {
     if (outSize != 0) pOut[0] = 0;
 
@@ -1917,8 +1917,8 @@ void V_StrLeft(const char *pStr, int nChars, char *pOut, int outSize) {
   V_StrSlice(pStr, 0, nChars, pOut, outSize);
 }
 
-void V_StrRight(const char *pStr, int nChars, char *pOut, int outSize) {
-  int len = V_strlen(pStr);
+void V_StrRight(const char *pStr, intp nChars, char *pOut, intp outSize) {
+  intp len = V_strlen(pStr);
   if (nChars >= len) {
     V_strncpy(pOut, pStr, outSize);
   } else {
@@ -1964,7 +1964,7 @@ static char s_BackSlashMap[] = "\tt\nn\rr\"\"\\\\";
 
 char *V_AddBackSlashesToSpecialChars(char const *pSrc) {
   // first, count how much space we are going to need
-  int nSpaceNeeded = 0;
+  intp nSpaceNeeded = 0;
   for (char const *pScan = pSrc; *pScan; pScan++) {
     nSpaceNeeded++;
     for (char const *pCharSet = s_BackSlashMap; *pCharSet; pCharSet += 2) {
@@ -1992,9 +1992,9 @@ char *V_AddBackSlashesToSpecialChars(char const *pSrc) {
   return pRet;
 }
 
-void V_StringToIntArray(int *pVector, int count, const char *pString) {
+void V_StringToIntArray(int *pVector, intp count, const char *pString) {
   char *pstr, *pfront, tempString[128];
-  int j;
+  intp j;
 
   V_strncpy(tempString, pString, sizeof(tempString));
   pstr = pfront = tempString;
@@ -2024,12 +2024,12 @@ void V_StringToColor32(color32 *color, const char *pString) {
 }
 
 // 3d memory copy
-void CopyMemory3D(void *pDest, void const *pSrc, int nNumCols, int nNumRows,
-                  int nNumSlices,  // dimensions of copy
-                  int nSrcBytesPerRow,
-                  int nSrcBytesPerSlice,  // strides for source.
-                  int nDestBytesPerRow,
-                  int nDestBytesPerSlice  // strides for dest
+void CopyMemory3D(void *pDest, void const *pSrc, intp nNumCols, intp nNumRows,
+                  intp nNumSlices,  // dimensions of copy
+                  intp nSrcBytesPerRow,
+                  intp nSrcBytesPerSlice,  // strides for source.
+                  intp nDestBytesPerRow,
+                  intp nDestBytesPerSlice  // strides for dest
 ) {
   if (nNumSlices && nNumRows && nNumCols) {
     uint8 *pDestAdr = reinterpret_cast<uint8 *>(pDest);
@@ -2038,7 +2038,7 @@ void CopyMemory3D(void *pDest, void const *pSrc, int nNumCols, int nNumRows,
     if ((nNumCols == nSrcBytesPerRow) &&
         (nNumCols == nDestBytesPerRow))  // no row-to-row stride?
     {
-      int n2DSize = nNumCols * nNumRows;
+      intp n2DSize = nNumCols * nNumRows;
       if (nSrcBytesPerSlice == nDestBytesPerSlice)  // can we do one memcpy?
       {
         memcpy(pDestAdr, pSrcAdr, n2DSize * nNumSlices);
@@ -2053,7 +2053,7 @@ void CopyMemory3D(void *pDest, void const *pSrc, int nNumCols, int nNumRows,
     } else {
       // there is row-by-row stride - we have to do the full nested loop
       do {
-        int nRowCtr = nNumRows;
+        intp nRowCtr = nNumRows;
         uint8 const *pSrcRow = pSrcAdr;
         uint8 *pDestRow = pDestAdr;
         do {
@@ -2097,12 +2097,12 @@ int HexToValue(char hex) {
   return -1;
 }
 
-bool V_StringToBin(const char *pString, void *pBin, uint nBinSize) {
-  if ((uint)V_strlen(pString) != nBinSize * 2) {
+bool V_StringToBin(const char *pString, void *pBin, size_t nBinSize) {
+  if ((size_t)V_strlen(pString) != nBinSize * 2) {
     return false;
   }
 
-  for (uint i = 0; i < nBinSize; ++i) {
+  for (size_t i = 0; i < nBinSize; ++i) {
     int high = HexToValue(pString[i * 2 + 0]);
     int low = HexToValue(pString[i * 2 + 1]);
     if (high < 0 || low < 0) {
@@ -2114,8 +2114,8 @@ bool V_StringToBin(const char *pString, void *pBin, uint nBinSize) {
   return true;
 }
 
-bool V_BinToString(char *pString, void *pBin, uint nBinSize) {
-  for (uint i = 0; i < nBinSize; ++i) {
+bool V_BinToString(char *pString, void *pBin, size_t nBinSize) {
+  for (size_t i = 0; i < nBinSize; ++i) {
     pString[i * 2 + 0] = s_hex[((uint8 *)pBin)[i] >> 4];
     pString[i * 2 + 1] = s_hex[((uint8 *)pBin)[i] & 0xF];
   }
@@ -2163,7 +2163,7 @@ static const wchar_t wszCantEndLine[] = {
 static const wchar_t wszCantBreakRepeated[] = {0x002d, 0x002e, 0x3002};
 
 bool AsianWordWrap::CanEndLine(wchar_t wcCandidate) {
-  for (int i = 0; i < SIZE_OF_ARRAY(wszCantEndLine); ++i) {
+  for (intp i = 0; i < SIZE_OF_ARRAY(wszCantEndLine); ++i) {
     if (wcCandidate == wszCantEndLine[i]) return false;
   }
 
@@ -2171,7 +2171,7 @@ bool AsianWordWrap::CanEndLine(wchar_t wcCandidate) {
 }
 
 bool AsianWordWrap::CanBeginLine(wchar_t wcCandidate) {
-  for (int i = 0; i < SIZE_OF_ARRAY(wszCantBeginLine); ++i) {
+  for (intp i = 0; i < SIZE_OF_ARRAY(wszCantBeginLine); ++i) {
     if (wcCandidate == wszCantBeginLine[i]) return false;
   }
 
@@ -2179,7 +2179,7 @@ bool AsianWordWrap::CanBeginLine(wchar_t wcCandidate) {
 }
 
 bool AsianWordWrap::CanBreakRepeated(wchar_t wcCandidate) {
-  for (int i = 0; i < SIZE_OF_ARRAY(wszCantBreakRepeated); ++i) {
+  for (intp i = 0; i < SIZE_OF_ARRAY(wszCantBreakRepeated); ++i) {
     if (wcCandidate == wszCantBreakRepeated[i]) return false;
   }
 

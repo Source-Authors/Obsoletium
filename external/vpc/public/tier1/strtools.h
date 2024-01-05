@@ -20,12 +20,12 @@
 // 3d memcpy. Copy (up-to) 3 dimensional data with arbitrary source and
 // destination strides. Optimizes to just a single memcpy when possible. For 2d
 // data, set numslices to 1.
-void CopyMemory3D(void *pDestAdr, void const *pSrcAdr, int nNumCols,
-                  int nNumRows, int nNumSlices,  // dimensions of copy
-                  int nSrcBytesPerRow,
-                  int nSrcBytesPerSlice,  // strides for source.
-                  int nDestBytesPerRow,
-                  int nDestBytesPerSlice  // strides for dest
+void CopyMemory3D(void *pDestAdr, void const *pSrcAdr, intp nNumCols,
+                  intp nNumRows, intp nNumSlices,  // dimensions of copy
+                  intp nSrcBytesPerRow,
+                  intp nSrcBytesPerSlice,  // strides for source.
+                  intp nDestBytesPerRow,
+                  intp nDestBytesPerSlice  // strides for dest
 );
 
 template <class T, class I>
@@ -36,11 +36,11 @@ class CUtlVector;
 //-----------------------------------------------------------------------------
 // Portable versions of standard string functions
 //-----------------------------------------------------------------------------
-void _V_memset(void *dest, int fill, int count);
-void _V_memcpy(void *dest, const void *src, int count);
-void _V_memmove(void *dest, const void *src, int count);
-int _V_memcmp(const void *m1, const void *m2, int count);
-int _V_strlen(const char *str);
+void _V_memset(void *dest, int fill, intp count);
+void _V_memcpy(void *dest, const void *src, intp count);
+void _V_memmove(void *dest, const void *src, intp count);
+int _V_memcmp(const void *m1, const void *m2, intp count);
+intp _V_strlen(const char *str);
 void _V_strcpy(char *dest, const char *src);
 char *_V_strrchr(const char *s, char c);
 int _V_strcmp(const char *s1, const char *s2);
@@ -49,7 +49,7 @@ int _V_stricmp(const char *s1, const char *s2);
 char *_V_strstr(const char *s1, const char *search);
 char *_V_strupr(char *start);
 char *_V_strlower(char *start);
-int _V_wcslen(const wchar_t *pwch);
+intp _V_wcslen(const wchar_t *pwch);
 
 wchar_t *_V_wcslower(const char *file, int line, wchar_t *start);
 wchar_t *_V_wcsupr(const char *file, int line, wchar_t *start);
@@ -141,21 +141,21 @@ inline wchar_t *_wcsupr(wchar_t *start) {
 
 #else
 
-inline void V_memset(void *dest, int fill, int count) {
+inline void V_memset(void *dest, int fill, intp count) {
   memset(dest, fill, count);
 }
-inline void V_memcpy(void *dest, const void *src, int count) {
+inline void V_memcpy(void *dest, const void *src, intp count) {
   memcpy(dest, src, count);
 }
-inline void V_memmove(void *dest, const void *src, int count) {
+inline void V_memmove(void *dest, const void *src, intp count) {
   memmove(dest, src, count);
 }
-inline int V_memcmp(const void *m1, const void *m2, int count) {
+inline int V_memcmp(const void *m1, const void *m2, intp count) {
   return memcmp(m1, m2, count);
 }
-inline int V_strlen(const char *str) { return (int)strlen(str); }
+inline intp V_strlen(const char *str) { return (intp)strlen(str); }
 inline void V_strcpy(char *dest, const char *src) { strcpy(dest, src); }
-inline int V_wcslen(const wchar_t *pwch) { return (int)wcslen(pwch); }
+inline intp V_wcslen(const wchar_t *pwch) { return (intp)wcslen(pwch); }
 inline char *V_strrchr(const char *s, char c) { return (char *)strrchr(s, c); }
 inline int V_strcmp(const char *s1, const char *s2) { return strcmp(s1, s2); }
 inline int V_wcscmp(const wchar_t *s1, const wchar_t *s2) {
@@ -173,18 +173,18 @@ inline wchar_t *V_wcsupr(wchar_t *start) { return _wcsupr(start); }
 
 #endif
 
-int V_strncmp(const char *s1, const char *s2, int count);
+int V_strncmp(const char *s1, const char *s2, intp count);
 int V_strcasecmp(const char *s1, const char *s2);
-int V_strncasecmp(const char *s1, const char *s2, int n);
-int V_strnicmp(const char *s1, const char *s2, int n);
+int V_strncasecmp(const char *s1, const char *s2, intp n);
+int V_strnicmp(const char *s1, const char *s2, intp n);
 int V_atoi(const char *str);
 int64 V_atoi64(const char *str);
 uint64 V_atoui64(const char *str);
 float V_atof(const char *str);
 char *V_stristr(char *pStr, const char *pSearch);
 const char *V_stristr(const char *pStr, const char *pSearch);
-const char *V_strnistr(const char *pStr, const char *pSearch, int n);
-const char *V_strnchr(const char *pStr, char c, int n);
+const char *V_strnistr(const char *pStr, const char *pSearch, intp n);
+const char *V_strnchr(const char *pStr, char c, intp n);
 
 // returns string immediately following prefix, (ie str+strlen(prefix)) or NULL
 // if prefix not found
@@ -240,19 +240,19 @@ inline bool V_isspace(int c) {
 // pDest[maxLen-1] is always NULL terminated if pSrc's length is >= maxLen.
 //
 // This means the last parameter can usually be a sizeof() of a string.
-void V_strncpy(char *pDest, const char *pSrc, int maxLen);
-int V_snprintf(char *pDest, int destLen,
+void V_strncpy(char *pDest, const char *pSrc, intp maxLen);
+int V_snprintf(char *pDest, intp destLen,
                PRINTF_FORMAT_STRING const char *pFormat, ...)
     FMTFUNCTION(3, 4);
-void V_wcsncpy(wchar_t *pDest, wchar_t const *pSrc, int maxLenInBytes);
-int V_snwprintf(wchar_t *pDest, int maxLenInNumWideCharacters,
+void V_wcsncpy(wchar_t *pDest, wchar_t const *pSrc, intp maxLenInBytes);
+int V_snwprintf(wchar_t *pDest, intp maxLenInNumWideCharacters,
                 PRINTF_FORMAT_STRING const wchar_t *pFormat, ...);
 
-#define COPY_ALL_CHARACTERS -1
+#define COPY_ALL_CHARACTERS (intp)-1
 char *V_strncat(char *, const char *, size_t maxLenInBytes,
-                int max_chars_to_copy = COPY_ALL_CHARACTERS);
-wchar_t *V_wcsncat(wchar_t *, const wchar_t *, int maxLenInBytes,
-                   int max_chars_to_copy = COPY_ALL_CHARACTERS);
+                intp max_chars_to_copy = COPY_ALL_CHARACTERS);
+wchar_t *V_wcsncat(wchar_t *, const wchar_t *, size_t maxLenInBytes,
+                   intp max_chars_to_copy = COPY_ALL_CHARACTERS);
 char *V_strnlwr(char *, size_t);
 
 // UNDONE: Find a non-compiler-specific way to do this
@@ -292,8 +292,8 @@ typedef char *va_list;
 #define INCORRECT_PATH_SEPARATOR_S "\\"
 #endif
 
-int V_vsnprintf(char *pDest, int maxLen, const char *pFormat, va_list params);
-int V_vsnprintfRet(char *pDest, int maxLen, const char *pFormat, va_list params,
+int V_vsnprintf(char *pDest, intp maxLen, const char *pFormat, va_list params);
+int V_vsnprintfRet(char *pDest, intp maxLen, const char *pFormat, va_list params,
                    bool *pbTruncated);
 
 // Prints out a pretified memory counter string value ( e.g., 7,233.27 Mb,
@@ -315,39 +315,39 @@ char *V_pretifynum(int64 value);
 // char buffer[ 9 ];
 // V_binarytohex( &output, sizeof( output ), buffer, sizeof( buffer ) );
 // would put "ffffffff" into buffer (note null terminator!!!)
-void V_hextobinary(char const *in, int numchars, byte *out, int maxoutputbytes);
-void V_binarytohex(const byte *in, int inputbytes, char *out, int outsize);
+void V_hextobinary(char const *in, intp numchars, byte *out, intp maxoutputbytes);
+void V_binarytohex(const byte *in, intp inputbytes, char *out, intp outsize);
 
 // Tools for working with filenames
 // Extracts the base name of a file (no path, no extension, assumes '/' or '\'
 // as path separator)
-void V_FileBase(const char *in, char *out, int maxlen);
+void V_FileBase(const char *in, char *out, intp maxlen);
 // Remove the final characters of ppath if it's '\' or '/'.
 void V_StripTrailingSlash(char *ppath);
 // Remove any extension from in and return resulting string in out
-void V_StripExtension(const char *in, char *out, int outLen);
+void V_StripExtension(const char *in, char *out, intp outLen);
 // Make path end with extension if it doesn't already have an extension
 void V_DefaultExtension(char *path, const char *extension,
-                        int pathStringLength);
+                        intp pathStringLength);
 // Strips any current extension from path and ensures that extension is the new
 // extension. NOTE: extension string MUST include the . character
-void V_SetExtension(char *path, const char *extension, int pathStringLength);
+void V_SetExtension(char *path, const char *extension, intp pathStringLength);
 // Removes any filename from path ( strips back to previous / or \ character )
 void V_StripFilename(char *path);
 // Remove the final directory from the path
-bool V_StripLastDir(char *dirName, int maxlen);
+bool V_StripLastDir(char *dirName, intp maxlen);
 // Returns a pointer to the unqualified file name (no path) of a file name
 const char *V_UnqualifiedFileName(const char *in);
 char *V_UnqualifiedFileName(char *in);
 // Given a path and a filename, composes "path\filename", inserting the (OS
 // correct) separator if necessary
 void V_ComposeFileName(const char *path, const char *filename, char *dest,
-                       int destSize);
+                       intp destSize);
 
 // Copy out the path except for the stuff after the final pathseparator
-bool V_ExtractFilePath(const char *path, char *dest, int destSize);
+bool V_ExtractFilePath(const char *path, char *dest, intp destSize);
 // Copy out the file extension into dest
-void V_ExtractFileExtension(const char *path, char *dest, int destSize);
+void V_ExtractFileExtension(const char *path, char *dest, intp destSize);
 
 const char *V_GetFileExtension(const char *path);
 
@@ -365,7 +365,7 @@ bool V_RemoveDotSlashes(char *pFilename,
 // using the current working directory as the base, or pStartingDir if it's
 // non-NULL. Returns false if it runs out of room in the string, or if pPath
 // tries to ".." past the root directory.
-void V_MakeAbsolutePath(char *pOut, int outLen, const char *pPath,
+void V_MakeAbsolutePath(char *pOut, intp outLen, const char *pPath,
                         const char *pStartingDir = NULL);
 
 // Creates a relative path given two full paths
@@ -374,7 +374,7 @@ void V_MakeAbsolutePath(char *pOut, int outLen, const char *pPath,
 // to Returns false if they can't be made relative (on separate drives, for
 // example)
 bool V_MakeRelativePath(const char *pFullPath, const char *pDirectory,
-                        char *pRelativePath, int nBufLen);
+                        char *pRelativePath, intp nBufLen);
 
 // Fixes up a file name, removing dot slashes, fixing slashes, converting to
 // lowercase, etc.
@@ -382,7 +382,7 @@ void V_FixupPathName(char *pOut, size_t nOutLen, const char *pPath);
 
 // Adds a path separator to the end of the string if there isn't one already.
 // Returns false if it would run out of space.
-void V_AppendSlash(char *pStr, int strSize);
+void V_AppendSlash(char *pStr, intp strSize);
 
 // Returns true if the path is an absolute path.
 bool V_IsAbsolutePath(const char *pPath);
@@ -392,19 +392,19 @@ bool V_IsAbsolutePath(const char *pPath);
 // Returns true if it completed successfully.
 // If it would overflow pOut, it fills as much as it can and returns false.
 bool V_StrSubst(const char *pIn, const char *pMatch, const char *pReplaceWith,
-                char *pOut, int outLen, bool bCaseSensitive = false);
+                char *pOut, intp outLen, bool bCaseSensitive = false);
 
 // Split the specified string on the specified separator.
 // Returns a list of strings separated by pSeparator.
 // You are responsible for freeing the contents of outStrings (call
 // outStrings.PurgeAndDeleteElements).
 void V_SplitString(const char *pString, const char *pSeparator,
-                   CUtlVector<char *, CUtlMemory<char *, int>> &outStrings);
+                   CUtlVector<char *, CUtlMemory<char *, intp>> &outStrings);
 
 // Just like V_SplitString, but it can use multiple possible separators.
 void V_SplitString2(const char *pString, const char **pSeparators,
-                    int nSeparators,
-                    CUtlVector<char *, CUtlMemory<char *, int>> &outStrings);
+                    intp nSeparators,
+                    CUtlVector<char *, CUtlMemory<char *, intp>> &outStrings);
 
 // Returns false if the buffer is not large enough to hold the working directory
 // name.
@@ -417,14 +417,14 @@ bool V_SetCurrentDirectory(const char *pDirName);
 // It follows the Python slice convention:
 // Negative numbers wrap around the string (-1 references the last character).
 // Large numbers are clamped to the end of the string.
-void V_StrSlice(const char *pStr, int firstChar, int lastCharNonInclusive,
-                char *pOut, int outSize);
+void V_StrSlice(const char *pStr, intp firstChar, intp lastCharNonInclusive,
+                char *pOut, intp outSize);
 
 // Chop off the left nChars of a string.
-void V_StrLeft(const char *pStr, int nChars, char *pOut, int outSize);
+void V_StrLeft(const char *pStr, intp nChars, char *pOut, intp outSize);
 
 // Chop off the right nChars of a string.
-void V_StrRight(const char *pStr, int nChars, char *pOut, int outSize);
+void V_StrRight(const char *pStr, intp nChars, char *pOut, intp outSize);
 
 // change "special" characters to have their c-style backslash sequence. like
 // \n, \r, \t, ", etc. returns a pointer to a newly allocated string, which you
@@ -446,17 +446,17 @@ void V_wcstostr(const wchar_t *pWString, int nInSize, char *pString,
                 int nOutSize);
 
 // buffer-safe strcat
-inline void V_strcat(char *dest, const char *src, int maxLenInBytes) {
+inline void V_strcat(char *dest, const char *src, size_t maxLenInBytes) {
   V_strncat(dest, src, maxLenInBytes, COPY_ALL_CHARACTERS);
 }
 
 // buffer-safe strcat
-inline void V_wcscat(wchar_t *dest, const wchar_t *src, int maxLenInBytes) {
+inline void V_wcscat(wchar_t *dest, const wchar_t *src, size_t maxLenInBytes) {
   V_wcsncat(dest, src, maxLenInBytes, COPY_ALL_CHARACTERS);
 }
 
 // Convert from a string to an array of integers.
-void V_StringToIntArray(int *pVector, int count, const char *pString);
+void V_StringToIntArray(int *pVector, intp count, const char *pString);
 
 // Convert from a string to a 4 byte color value.
 void V_StringToColor32(color32 *color, const char *pString);
@@ -469,8 +469,8 @@ void V_TranslateLineFeedsToUnix(char *pStr);
 //-----------------------------------------------------------------------------
 
 // returns -1 if no match, nDefault if pName==prefix, and N if pName==prefix+N
-inline int V_IndexAfterPrefix(const char *pName, const char *prefix,
-                              int nDefault = 0) {
+inline intp V_IndexAfterPrefix(const char *pName, const char *prefix,
+                              intp nDefault = 0) {
   if (!pName || !prefix) return -1;
 
   const char *pIndexStr = StringAfterPrefix(pName, prefix);
@@ -478,21 +478,21 @@ inline int V_IndexAfterPrefix(const char *pName, const char *prefix,
 
   if (!*pIndexStr) return nDefault;
 
-  return atoi(pIndexStr);
+  return strtoll(pIndexStr, nullptr, 10);
 }
 
 // returns startindex if none found, 2 if "prefix" found, and n+1 if "prefixn"
 // found
 template <class NameArray>
-int V_GenerateUniqueNameIndex(const char *prefix, const NameArray &nameArray,
-                              int startindex = 0) {
+intp V_GenerateUniqueNameIndex(const char *prefix, const NameArray &nameArray,
+                              intp startindex = 0) {
   if (!prefix) return 0;
 
-  int freeindex = startindex;
+  intp freeindex = startindex;
 
-  int nNames = nameArray.Count();
-  for (int i = 0; i < nNames; ++i) {
-    int index = V_IndexAfterPrefix(
+  intp nNames = nameArray.Count();
+  for (intp i = 0; i < nNames; ++i) {
+    intp index = V_IndexAfterPrefix(
         nameArray[i], prefix,
         1);  // returns -1 if no match, 0 for exact match, N for
     if (index >= freeindex) {
@@ -505,7 +505,7 @@ int V_GenerateUniqueNameIndex(const char *prefix, const NameArray &nameArray,
 }
 
 template <class NameArray>
-bool V_GenerateUniqueName(char *name, int memsize, const char *prefix,
+bool V_GenerateUniqueName(char *name, intp memsize, const char *prefix,
                           const NameArray &nameArray) {
   if (name == NULL || memsize == 0) return false;
 
@@ -514,30 +514,30 @@ bool V_GenerateUniqueName(char *name, int memsize, const char *prefix,
     return false;
   }
 
-  int prefixLength = V_strlen(prefix);
+  intp prefixLength = V_strlen(prefix);
   if (prefixLength + 1 > memsize) {
     name[0] = '\0';
     return false;
   }
 
-  int i = V_GenerateUniqueNameIndex(prefix, nameArray);
+  intp i = V_GenerateUniqueNameIndex(prefix, nameArray);
   if (i <= 0) {
     V_strncpy(name, prefix, memsize);
     return true;
   }
 
-  int newlen = prefixLength + (int)log10((float)i) + 1;
+  intp newlen = prefixLength + (int)log10((float)i) + 1;
   if (newlen + 1 > memsize) {
     V_strncpy(name, prefix, memsize);
     return false;
   }
 
-  V_snprintf(name, memsize, "%s%d", prefix, i);
+  V_snprintf(name, memsize, "%s%zi", prefix, i);
   return true;
 }
 
-extern bool V_StringToBin(const char *pString, void *pBin, uint nBinSize);
-extern bool V_BinToString(char *pString, void *pBin, uint nBinSize);
+extern bool V_StringToBin(const char *pString, void *pBin, size_t nBinSize);
+extern bool V_BinToString(char *pString, void *pBin, size_t nBinSize);
 
 template <typename T>
 struct BinString_t {
