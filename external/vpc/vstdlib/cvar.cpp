@@ -249,7 +249,7 @@ CreateInterfaceFn VStdLib_GetICVarFactory() { return Sys_GetFactoryThis(); }
 // Constructor
 //-----------------------------------------------------------------------------
 CCvar::CCvar()
-    : m_TempConsoleBuffer(0, 1024),
+    : m_TempConsoleBuffer((intp)0, (intp)1024),
       m_SplitScreenAddedConVarsMap(0, 0, DefLessFunc(ConVar *)) {
   m_nNextDLLIdentifier = 0;
   m_pConCommandList = NULL;

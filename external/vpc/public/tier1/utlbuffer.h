@@ -29,30 +29,30 @@ class CUtlCharConversion {
     const char *m_pReplacementString;
   };
 
-  CUtlCharConversion(char nEscapeChar, const char *pDelimiter, int nCount,
+  CUtlCharConversion(char nEscapeChar, const char *pDelimiter, intp nCount,
                      ConversionArray_t *pArray);
   char GetEscapeChar() const;
   const char *GetDelimiter() const;
-  int GetDelimiterLength() const;
+  intp GetDelimiterLength() const;
 
   const char *GetConversionString(char c) const;
-  int GetConversionLength(char c) const;
-  int MaxConversionLength() const;
+  intp GetConversionLength(char c) const;
+  intp MaxConversionLength() const;
 
   // Finds a conversion for the passed-in string, returns length
-  virtual char FindConversion(const char *pString, int *pLength);
+  virtual char FindConversion(const char *pString, intp *pLength);
 
  protected:
   struct ConversionInfo_t {
-    int m_nLength;
+    intp m_nLength;
     const char *m_pReplacementString;
   };
 
   char m_nEscapeChar;
   const char *m_pDelimiter;
-  int m_nDelimiterLength;
-  int m_nCount;
-  int m_nMaxConversionLength;
+  intp m_nDelimiterLength;
+  intp m_nCount;
+  intp m_nMaxConversionLength;
   char m_pList[256];
   ConversionInfo_t m_pReplacements[256];
 };
@@ -186,15 +186,15 @@ class CUtlBuffer {
   };
 
   // Overflow functions when a get or put overflows
-  typedef bool (CUtlBuffer::*UtlBufferOverflowFunc_t)(int nSize);
+  typedef bool (CUtlBuffer::*UtlBufferOverflowFunc_t)(intp nSize);
 
   // Constructors for growable + external buffers for
   // serialization/unserialization
-  CUtlBuffer(int growSize = 0, int initSize = 0, int nFlags = 0);
-  CUtlBuffer(const void *pBuffer, int size, int nFlags = 0);
+  CUtlBuffer(intp growSize = 0, intp initSize = 0, int nFlags = 0);
+  CUtlBuffer(const void *pBuffer, intp size, int nFlags = 0);
   // This one isn't actually defined so that we catch contructors that are
   // trying to pass a bool in as the third param.
-  CUtlBuffer(const void *pBuffer, int size, bool crap);
+  CUtlBuffer(const void *pBuffer, intp size, bool crap);
 
   unsigned char GetFlags() const;
 
@@ -203,16 +203,16 @@ class CUtlBuffer {
   void SetBufferType(bool bIsText, bool bContainsCRLF);
 
   // Makes sure we've got at least this much memory
-  void EnsureCapacity(int num);
+  void EnsureCapacity(intp num);
 
   // Access for direct read into buffer
-  void *AccessForDirectRead(int nBytes);
+  void *AccessForDirectRead(intp nBytes);
 
   // Attaches the buffer to external memory....
-  void SetExternalBuffer(void *pMemory, int nSize, int nInitialPut,
+  void SetExternalBuffer(void *pMemory, intp nSize, intp nInitialPut,
                          int nFlags = 0);
   bool IsExternallyAllocated() const;
-  void AssumeMemory(void *pMemory, int nSize, int nInitialPut, int nFlags = 0);
+  void AssumeMemory(void *pMemory, intp nSize, intp nInitialPut, int nFlags = 0);
   void *Detach();
   void *DetachMemory();
 
@@ -251,29 +251,29 @@ class CUtlBuffer {
   float GetFloat();
   double GetDouble();
   void *GetPtr();
-  void GetString(char *pString, int nMaxChars = 0);
-  void Get(void *pMem, int size);
-  void GetLine(char *pLine, int nMaxChars = 0);
+  void GetString(char *pString, intp nMaxChars = 0);
+  void Get(void *pMem, intp size);
+  void GetLine(char *pLine, intp nMaxChars = 0);
 
   // Used for getting objects that have a byteswap datadesc defined
   template <typename T>
-  void GetObjects(T *dest, int count = 1);
+  void GetObjects(T *dest, intp count = 1);
 
   // This will get at least 1 byte and up to nSize bytes.
   // It will return the number of bytes actually read.
-  int GetUpTo(void *pMem, int nSize);
+  intp GetUpTo(void *pMem, intp nSize);
 
   // This version of GetString converts \" to \\ and " to \, etc.
   // It also reads a " at the beginning and end of the string
   void GetDelimitedString(CUtlCharConversion *pConv, char *pString,
-                          int nMaxChars = 0);
+                          intp nMaxChars = 0);
   char GetDelimitedChar(CUtlCharConversion *pConv);
 
   // This will return the # of characters of the string about to be read out
   // NOTE: The count will *include* the terminating 0!!
   // In binary mode, it's the number of characters until the next 0
   // In text mode, it's the number of characters until the next space.
-  int PeekStringLength();
+  intp PeekStringLength();
 
   // This version of PeekStringLength converts \" to \\ and " to \, etc.
   // It also reads a " at the beginning and end of the string
@@ -284,12 +284,12 @@ class CUtlBuffer {
   // characters including the delimiters and the escape characters. So, \n
   // counts as 2 characters when bActualSize == false and only 1 character when
   // bActualSize == true
-  int PeekDelimitedStringLength(CUtlCharConversion *pConv,
+  intp PeekDelimitedStringLength(CUtlCharConversion *pConv,
                                 bool bActualSize = true);
 
   // Just like scanf, but doesn't work in binary mode
-  int Scanf(SCANF_FORMAT_STRING const char *pFmt, ...);
-  int VaScanf(const char *pFmt, va_list list);
+  intp Scanf(SCANF_FORMAT_STRING const char *pFmt, ...);
+  intp VaScanf(const char *pFmt, va_list list);
 
   // Eats white space, advances Get index
   void EatWhiteSpace();
@@ -304,7 +304,7 @@ class CUtlBuffer {
   // If successful, the get index is advanced and the function returns true,
   // otherwise the index is not advanced and the function returns false.
   bool ParseToken(const char *pStartingDelim, const char *pEndingDelim,
-                  char *pString, int nMaxLen);
+                  char *pString, intp nMaxLen);
 
   // Advance the get index until after the particular string is found
   // Do not eat whitespace before starting. Return false if it failed
@@ -313,7 +313,7 @@ class CUtlBuffer {
 
   // Parses the next token, given a set of character breaks to stop at
   // Returns the length of the token parsed in bytes (-1 if none parsed)
-  int ParseToken(characterset_t *pBreaks, char *pTokenBuf, int nMaxLen,
+  intp ParseToken(characterset_t *pBreaks, char *pTokenBuf, intp nMaxLen,
                  bool bParseComments = true);
 
   // Write stuff in
@@ -332,11 +332,11 @@ class CUtlBuffer {
   void PutDouble(double d);
   void PutPtr(void *);  // Writes the pointer, not the pointed to
   void PutString(const char *pString);
-  void Put(const void *pMem, int size);
+  void Put(const void *pMem, intp size);
 
   // Used for putting objects that have a byteswap datadesc defined
   template <typename T>
-  void PutObjects(T *src, int count = 1);
+  void PutObjects(T *src, intp count = 1);
 
   // This version of PutString converts \ to \\ and " to \", etc.
   // It also places " at the beginning and end of the string
@@ -348,24 +348,24 @@ class CUtlBuffer {
   void VaPrintf(const char *pFmt, va_list list);
 
   // What am I writing (put)/reading (get)?
-  void *PeekPut(int offset = 0);
-  const void *PeekGet(int offset = 0) const;
-  const void *PeekGet(int nMaxSize, int nOffset);
+  void *PeekPut(intp offset = 0);
+  const void *PeekGet(intp offset = 0) const;
+  const void *PeekGet(intp nMaxSize, intp nOffset);
 
   // Where am I writing (put)/reading (get)?
-  int TellPut() const;
-  int TellGet() const;
+  intp TellPut() const;
+  intp TellGet() const;
 
   // What's the most I've ever written?
-  int TellMaxPut() const;
+  intp TellMaxPut() const;
 
   // How many bytes remain to be read?
   // NOTE: This is not accurate for streaming text files; it overshoots
-  int GetBytesRemaining() const;
+  intp GetBytesRemaining() const;
 
   // Change where I'm writing (put)/reading (get)
-  void SeekPut(SeekType_t type, int offset);
-  void SeekGet(SeekType_t type, int offset);
+  void SeekPut(SeekType_t type, intp offset);
+  void SeekGet(SeekType_t type, intp offset);
 
   // Buffer base
   const void *Base() const;
@@ -373,7 +373,7 @@ class CUtlBuffer {
 
   // memory allocation size, does *not* reflect size written or read,
   //	use TellPut or TellGet for that
-  int Size() const;
+  intp Size() const;
 
   // Am I a text buffer?
   bool IsText() const;
@@ -419,18 +419,18 @@ class CUtlBuffer {
   void SetOverflowFuncs(UtlBufferOverflowFunc_t getFunc,
                         UtlBufferOverflowFunc_t putFunc);
 
-  bool OnPutOverflow(int nSize);
-  bool OnGetOverflow(int nSize);
+  bool OnPutOverflow(intp nSize);
+  bool OnGetOverflow(intp nSize);
 
  protected:
   // Checks if a get/put is ok
-  bool CheckPut(int size);
-  bool CheckGet(int size);
+  bool CheckPut(intp size);
+  bool CheckGet(intp size);
 
   // NOTE: Pass in nPut here even though it is just a copy of m_Put.  This is
   // almost always called immediately after modifying m_Put and this lets it
   // stay in a register
-  void AddNullTermination(int nPut);
+  void AddNullTermination(intp nPut);
 
   // Methods to help with pretty-printing
   bool WasLastCharacterCR();
@@ -441,24 +441,24 @@ class CUtlBuffer {
   void PutDelimitedCharInternal(CUtlCharConversion *pConv, char c);
 
   // Default overflow funcs
-  bool PutOverflow(int nSize);
-  bool GetOverflow(int nSize);
+  bool PutOverflow(intp nSize);
+  bool GetOverflow(intp nSize);
 
   // Does the next bytes of the buffer match a pattern?
-  bool PeekStringMatch(int nOffset, const char *pString, int nLen);
+  bool PeekStringMatch(intp nOffset, const char *pString, intp nLen);
 
   // Peek size of line to come, check memory bound
-  int PeekLineLength();
+  intp PeekLineLength();
 
   // How much whitespace should I skip?
-  int PeekWhiteSpace(int nOffset);
+  intp PeekWhiteSpace(intp nOffset);
 
   // Checks if a peek get is ok
-  bool CheckPeekGet(int nOffset, int nSize);
+  bool CheckPeekGet(intp nOffset, intp nSize);
 
   // Call this to peek arbitrarily long into memory. It doesn't fail unless
   // it can't read *anything* new
-  bool CheckArbitraryPeekGet(int nOffset, int &nIncrement);
+  bool CheckArbitraryPeekGet(intp nOffset, intp &nIncrement);
 
   template <typename T>
   void GetType(T &dest);
@@ -479,8 +479,8 @@ class CUtlBuffer {
   // be sure to also update the copy constructor
   // and SwapCopy() when adding members.
   CUtlMemory<unsigned char> m_Memory;
-  int m_Get;
-  int m_Put;
+  intp m_Get;
+  intp m_Put;
 
   unsigned char m_Error;
   unsigned char m_Flags;
@@ -489,9 +489,9 @@ class CUtlBuffer {
   unsigned char pad;
 #endif
 
-  int m_nTab;
-  int m_nMaxPut;
-  int m_nOffset;
+  intp m_nTab;
+  intp m_nMaxPut;
+  intp m_nOffset;
 
   UtlBufferOverflowFunc_t m_GetOverflowFunc;
   UtlBufferOverflowFunc_t m_PutOverflowFunc;
@@ -557,7 +557,7 @@ inline CUtlBuffer &operator<<(CUtlBuffer &b, const Vector2D &v) {
 
 class CUtlInplaceBuffer : public CUtlBuffer {
  public:
-  CUtlInplaceBuffer(int growSize = 0, int initSize = 0, int nFlags = 0);
+  CUtlInplaceBuffer(intp growSize = 0, intp initSize = 0, int nFlags = 0);
 
   //
   // Routines returning buffer-inplace-pointers
@@ -602,7 +602,7 @@ class CUtlInplaceBuffer : public CUtlBuffer {
   // error occurs
   //
   bool InplaceGetLinePtr(/* out */ char **ppszInBufferPtr,
-                         /* out */ int *pnLineLength);
+                         /* out */ intp *pnLineLength);
 
   //
   // Determines the line length, advances the "get" pointer offset by the line
@@ -638,19 +638,19 @@ class CUtlInplaceBuffer : public CUtlBuffer {
 //-----------------------------------------------------------------------------
 // Where am I reading?
 //-----------------------------------------------------------------------------
-inline int CUtlBuffer::TellGet() const { return m_Get; }
+inline intp CUtlBuffer::TellGet() const { return m_Get; }
 
 //-----------------------------------------------------------------------------
 // How many bytes remain to be read?
 //-----------------------------------------------------------------------------
-inline int CUtlBuffer::GetBytesRemaining() const {
+inline intp CUtlBuffer::GetBytesRemaining() const {
   return m_nMaxPut - TellGet();
 }
 
 //-----------------------------------------------------------------------------
 // What am I reading?
 //-----------------------------------------------------------------------------
-inline const void *CUtlBuffer::PeekGet(int offset) const {
+inline const void *CUtlBuffer::PeekGet(intp offset) const {
   return &m_Memory[m_Get + offset - m_nOffset];
 }
 
@@ -673,8 +673,8 @@ inline void CUtlBuffer::GetObject(T *dest) {
 }
 
 template <typename T>
-inline void CUtlBuffer::GetObjects(T *dest, int count) {
-  for (int i = 0; i < count; ++i, ++dest) {
+inline void CUtlBuffer::GetObjects(T *dest, intp count) {
+  for (intp i = 0; i < count; ++i, ++dest) {
     GetObject<T>(dest);
   }
 }
@@ -804,7 +804,7 @@ inline double StringToNumber(char *pString, char **ppEnd, int nRadix) {
 template <typename T>
 inline bool CUtlBuffer::GetTypeText(T &value, int nRadix /*= 10*/) {
   // NOTE: This is not bullet-proof; it assumes numbers are < 128 characters
-  int nLength = 128;
+  intp nLength = 128;
   if (!CheckArbitraryPeekGet(0, nLength)) {
     value = 0;
     return false;
@@ -814,7 +814,7 @@ inline bool CUtlBuffer::GetTypeText(T &value, int nRadix /*= 10*/) {
   char *pEnd = pStart;
   value = StringToNumber<T>(pStart, &pEnd, nRadix);
 
-  int nBytesRead = (int)(pEnd - pStart);
+  intp nBytesRead = pEnd - pStart;
   if (nBytesRead == 0) return false;
 
   m_Get += nBytesRead;
@@ -927,17 +927,17 @@ inline bool CUtlBuffer::IsExternallyAllocated() const {
 //-----------------------------------------------------------------------------
 // Where am I writing?
 //-----------------------------------------------------------------------------
-inline int CUtlBuffer::TellPut() const { return m_Put; }
+inline intp CUtlBuffer::TellPut() const { return m_Put; }
 
 //-----------------------------------------------------------------------------
 // What's the most I've ever written?
 //-----------------------------------------------------------------------------
-inline int CUtlBuffer::TellMaxPut() const { return m_nMaxPut; }
+inline intp CUtlBuffer::TellMaxPut() const { return m_nMaxPut; }
 
 //-----------------------------------------------------------------------------
 // What am I reading?
 //-----------------------------------------------------------------------------
-inline void *CUtlBuffer::PeekPut(int offset) {
+inline void *CUtlBuffer::PeekPut(intp offset) {
   return &m_Memory[m_Put + offset - m_nOffset];
 }
 
@@ -959,8 +959,8 @@ inline void CUtlBuffer::PutObject(T *src) {
 }
 
 template <typename T>
-inline void CUtlBuffer::PutObjects(T *src, int count) {
-  for (int i = 0; i < count; ++i, ++src) {
+inline void CUtlBuffer::PutObjects(T *src, intp count) {
+  for (intp i = 0; i < count; ++i, ++src) {
     PutObject<T>(src);
   }
 }
@@ -1058,8 +1058,8 @@ inline bool CUtlBuffer::WasLastCharacterCR() {
 }
 
 inline void CUtlBuffer::PutTabs() {
-  int nTabCount = (m_Flags & AUTO_TABS_DISABLED) ? 0 : m_nTab;
-  for (int i = nTabCount; --i >= 0;) {
+  intp nTabCount = (m_Flags & AUTO_TABS_DISABLED) ? 0 : m_nTab;
+  for (intp i = nTabCount; --i >= 0;) {
     PutTypeBin<char>('\t');
   }
 }
@@ -1164,7 +1164,7 @@ inline const void *CUtlBuffer::Base() const { return m_Memory.Base(); }
 
 inline void *CUtlBuffer::Base() { return m_Memory.Base(); }
 
-inline int CUtlBuffer::Size() const { return m_Memory.NumAllocated(); }
+inline intp CUtlBuffer::Size() const { return m_Memory.NumAllocated(); }
 
 //-----------------------------------------------------------------------------
 // Clears out the buffer; frees memory
@@ -1190,7 +1190,7 @@ inline void CUtlBuffer::Purge() {
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-inline void *CUtlBuffer::AccessForDirectRead(int nBytes) {
+inline void *CUtlBuffer::AccessForDirectRead(intp nBytes) {
   Assert(m_Get == 0 && m_Put == 0 && m_nMaxPut == 0);
   EnsureCapacity(nBytes);
   m_nMaxPut = nBytes;
