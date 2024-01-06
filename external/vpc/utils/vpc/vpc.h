@@ -310,7 +310,7 @@ class CVPC {
   const char *KeywordToName(configKeyword_e keyword);
   configKeyword_e NameToKeyword(const char *pKeywordName);
 
-  int GetProjectsInGroup(CUtlVector<projectIndex_t> &projectList,
+  intp GetProjectsInGroup(CUtlVector<projectIndex_t> &projectList,
                          const char *pGroupHame);
 
  private:

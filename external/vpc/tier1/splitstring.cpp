@@ -5,7 +5,7 @@
 #include "utlvector.h"
 
 CSplitString::CSplitString(const char *pString, const char **pSeparators,
-                           int nSeparators) {
+                           intp nSeparators) {
   Construct(pString, pSeparators, nSeparators);
 };
 
@@ -18,22 +18,22 @@ CSplitString::~CSplitString() {
 }
 
 void CSplitString::Construct(const char *pString, const char **pSeparators,
-                             int nSeparators) {
+                             intp nSeparators) {
   //////////////////////////////////////////////////////////////////////////
   // make a duplicate of the original string. We'll use pieces of this duplicate
   // to tokenize the string and create NULL-terminated tokens of the original
   // string
   //
-  int nOriginalStringLength = V_strlen(pString);
+  intp nOriginalStringLength = V_strlen(pString);
   m_szBuffer = new char[nOriginalStringLength + 1];
   memcpy(m_szBuffer, pString, nOriginalStringLength + 1);
 
   this->Purge();
   const char *pCurPos = pString;
   while (1) {
-    int iFirstSeparator = -1;
+    intp iFirstSeparator = -1;
     const char *pFirstSeparator = 0;
-    for (int i = 0; i < nSeparators; i++) {
+    for (intp i = 0; i < nSeparators; i++) {
       const char *pTest = V_stristr(pCurPos, pSeparators[i]);
       if (pTest && (!pFirstSeparator || pTest < pFirstSeparator)) {
         iFirstSeparator = i;
@@ -43,7 +43,7 @@ void CSplitString::Construct(const char *pString, const char **pSeparators,
 
     if (pFirstSeparator) {
       // Split on this separator and continue on.
-      int separatorLen = V_strlen(pSeparators[iFirstSeparator]);
+      intp separatorLen = V_strlen(pSeparators[iFirstSeparator]);
       if (pFirstSeparator > pCurPos) {
         //////////////////////////////////////////////////////////////////////////
         /// Cut the token out of the duplicate string
@@ -59,7 +59,7 @@ void CSplitString::Construct(const char *pString, const char **pSeparators,
       pCurPos = pFirstSeparator + separatorLen;
     } else {
       // Copy the rest of the string
-      if (int nTokenLength = V_strlen(pCurPos)) {
+      if (intp nTokenLength = V_strlen(pCurPos)) {
         //////////////////////////////////////////////////////////////////////////
         // There's no need to cut this token, because there's no separator after
         // it. just add its copy in the buffer to the tail

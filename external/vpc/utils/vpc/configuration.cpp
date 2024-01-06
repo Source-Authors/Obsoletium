@@ -119,7 +119,7 @@ void VPC_Keyword_Configuration() {
       bAllowNextLine = false;
     }
 
-    int index = configs.AddToTail();
+    intp index = configs.AddToTail();
     configs[index] = pToken;
 
     // check for another optional config

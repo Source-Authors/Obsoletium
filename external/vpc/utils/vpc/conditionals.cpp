@@ -94,7 +94,7 @@ conditional_t *CVPC::FindOrCreateConditional(const char *pName, bool bCreate,
     return NULL;
   }
 
-  int index = m_Conditionals.AddToTail();
+  intp index = m_Conditionals.AddToTail();
 
   char tempName[256];
   V_strncpy(tempName, pName, sizeof(tempName));

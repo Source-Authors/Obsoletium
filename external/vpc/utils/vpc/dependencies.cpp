@@ -110,7 +110,7 @@ bool CDependency::DependsOn( CDependency *pTest, int flags )
 		{
 			printf( "-------------------------------------------------------------------------------\n" );
 			printf( "%s\n", GetName() );
-			int i;
+			intp i;
 			for( i = callTreeOutputStack.Count() - 1; i >= 0; i-- )
 			{
 				printf("%s", (const char *)callTreeOutputStack[i].Base());
@@ -163,7 +163,7 @@ bool CDependency::FindDependency_Internal( CUtlVector<CUtlBuffer> &callTreeOutpu
 					V_strncpy( buf, "depends on ", sizeof( buf ) );
 					V_strcat( buf, pChild->GetName(), sizeof( buf ) );
 					V_strcat( buf, "\n", sizeof( buf ) );
-					int n = callTreeOutputStack.AddToTail();
+					intp n = callTreeOutputStack.AddToTail();
 					CUtlBuffer &b = callTreeOutputStack[n];
 					b.EnsureCapacity( V_strlen( buf ) + 2 );
 					b.PutString( buf );
@@ -972,10 +972,10 @@ bool CProjectDependencyGraph::SaveCache( const char *pFilename )
 		fwrite( &pDep->m_nCacheFileSize, sizeof( pDep->m_nCacheFileSize ), 1, fp );
 		fwrite( &pDep->m_nCacheModificationTime, sizeof( pDep->m_nCacheModificationTime ), 1, fp );
 
-		int nDependencies = pDep->m_Dependencies.Count();
+		intp nDependencies = pDep->m_Dependencies.Count();
 		fwrite( &nDependencies, sizeof( nDependencies ), 1, fp );
 
-		for ( int iDependency=0; iDependency < pDep->m_Dependencies.Count(); iDependency++ )
+		for ( intp iDependency=0; iDependency < pDep->m_Dependencies.Count(); iDependency++ )
 		{
 			WriteString( fp, pDep->m_Dependencies[iDependency]->m_Filename );
 		}
@@ -995,7 +995,7 @@ bool CProjectDependencyGraph::SaveCache( const char *pFilename )
 void CProjectDependencyGraph::WriteString( FILE *fp, CUtlString &utlString )
 {
 	const char *pStr = utlString.String();
-	int len = V_strlen( pStr );
+	intp len = V_strlen( pStr );
 	fwrite( &len, sizeof( len ), 1, fp );
 	fwrite( pStr, len, 1, fp );
 }

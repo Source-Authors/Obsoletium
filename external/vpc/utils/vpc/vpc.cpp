@@ -355,7 +355,7 @@ void CVPC::VPCStatus(bool bAlwaysSpew, PRINTF_FORMAT_STRING const char *format,
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int CVPC::GetProjectsInGroup(CUtlVector<projectIndex_t> &projectList,
+intp CVPC::GetProjectsInGroup(CUtlVector<projectIndex_t> &projectList,
                              const char *pGroupName) {
   projectList.RemoveAll();
 
@@ -1019,7 +1019,7 @@ void CVPC::HandleSingleCommandLineArg(const char *pArg) {
           FindOrCreateConditional(pArgName, false, CONDITIONAL_NULL);
       if (!pConditional) {
         // not a recognized conditional, add to build commands
-        int index = m_BuildCommands.AddToTail();
+        intp index = m_BuildCommands.AddToTail();
         m_BuildCommands[index] = pArg;
       } else {
         // found conditional, mark as defined
@@ -1028,7 +1028,7 @@ void CVPC::HandleSingleCommandLineArg(const char *pArg) {
     }
   } else if (pArg[0] == '+' || pArg[0] == '*' || pArg[0] == '@') {
     // add to build commands
-    int index = m_BuildCommands.AddToTail();
+    intp index = m_BuildCommands.AddToTail();
     m_BuildCommands[index] = pArg;
   }
 }
@@ -2340,7 +2340,7 @@ const char *CVPC::BuildTempGroupScript(const char *pVPCScriptName) {
   // fake a build command
   char buildCommand[MAX_PATH];
   V_snprintf(buildCommand, sizeof(buildCommand), "+%s", projectName);
-  int index = m_BuildCommands.AddToTail();
+  intp index = m_BuildCommands.AddToTail();
   m_BuildCommands[index] = buildCommand;
 
   return m_TempGroupScriptFilename.Get();
