@@ -20,21 +20,21 @@ class CMemoryStack {
   CMemoryStack();
   ~CMemoryStack();
 
-  bool Init(const char *pszAllocOwner, unsigned maxSize = 0,
-            unsigned commitSize = 0, unsigned initialCommit = 0,
+  bool Init(const char *pszAllocOwner, size_t maxSize = 0,
+            size_t commitSize = 0, size_t initialCommit = 0,
             unsigned alignment = 16);
 #ifdef _GAMECONSOLE
-  bool InitPhysical(const char *pszAllocOwner, uint size,
-                    uint nBaseAddrAlignment, uint alignment = 16,
+  bool InitPhysical(const char *pszAllocOwner, size_t size,
+                    size_t nBaseAddrAlignment, uint alignment = 16,
                     uint32 nAdditionalFlags = 0);
 #endif
   void Term();
 
   intp GetSize();
-  int GetMaxSize();
+  size_t GetMaxSize();
   intp GetUsed();
 
-  void *Alloc(unsigned bytes, bool bClear = false) RESTRICT;
+  void *Alloc(size_t bytes, bool bClear = false) RESTRICT;
 
   MemoryStackMark_t GetCurrentAllocPoint();
   void FreeToAllocPoint(MemoryStackMark_t mark, bool bDecommit = true);
@@ -49,7 +49,7 @@ class CMemoryStack {
     return const_cast<CMemoryStack *>(this)->GetBase();
   }
 
-  bool CommitSize(int);
+  bool CommitSize(intp);
 
   void SetAllocOwner(const char *pszAllocOwner);
 
@@ -67,11 +67,11 @@ class CMemoryStack {
   bool m_bPhysical;
   char *m_pszAllocOwner;
 
-  unsigned m_maxSize;
+  size_t m_maxSize;
   unsigned m_alignment;
 #ifdef MEMSTACK_VIRTUAL_MEMORY_AVAILABLE
-  unsigned m_commitSize;
-  unsigned m_minCommit;
+  size_t m_commitSize;
+  size_t m_minCommit;
 #endif
 #if defined(MEMSTACK_VIRTUAL_MEMORY_AVAILABLE) && defined(_PS3)
   IVirtualMemorySection *m_pVirtualMemorySection;
@@ -80,7 +80,7 @@ class CMemoryStack {
 
 //-------------------------------------
 
-FORCEINLINE void *CMemoryStack::Alloc(unsigned bytes, bool bClear) RESTRICT {
+FORCEINLINE void *CMemoryStack::Alloc(size_t bytes, bool bClear) RESTRICT {
   Assert(m_pBase);
 
   bytes = MAX(bytes, m_alignment);
@@ -106,7 +106,7 @@ FORCEINLINE void *CMemoryStack::Alloc(unsigned bytes, bool bClear) RESTRICT {
 
 //-------------------------------------
 
-inline bool CMemoryStack::CommitSize(int nBytes) {
+inline bool CMemoryStack::CommitSize(intp nBytes) {
   if (GetSize() != nBytes) {
     return CommitTo(m_pBase + nBytes);
   }
@@ -115,7 +115,7 @@ inline bool CMemoryStack::CommitSize(int nBytes) {
 
 //-------------------------------------
 
-inline int CMemoryStack::GetMaxSize() { return m_maxSize; }
+inline size_t CMemoryStack::GetMaxSize() { return m_maxSize; }
 
 //-------------------------------------
 
@@ -140,12 +140,12 @@ template <typename T, typename I, size_t MAX_SIZE, size_t COMMIT_SIZE = 0,
 class CUtlMemoryStack {
  public:
   // constructor, destructor
-  CUtlMemoryStack(int nGrowSize = 0, int nInitSize = 0) {
+  CUtlMemoryStack(intp nGrowSize = 0, intp nInitSize = 0) {
     m_MemoryStack.Init("CUtlMemoryStack", MAX_SIZE * sizeof(T),
                        COMMIT_SIZE * sizeof(T), INITIAL_COMMIT * sizeof(T), 4);
     static_assert(sizeof(T) % 4 == 0);
   }
-  CUtlMemoryStack(T *pMemory, int numElements) { Assert(0); }
+  CUtlMemoryStack(T *pMemory, intp numElements) { Assert(0); }
 
   // Can we use this index?
   bool IsIdxValid(I i) const {
@@ -206,18 +206,18 @@ class CUtlMemoryStack {
   void SetExternalBuffer(T *pMemory, int numElements) { Assert(0); }
 
   // Size
-  int NumAllocated() const { return m_nAllocated; }
-  int Count() const { return m_nAllocated; }
+  intp NumAllocated() const { return m_nAllocated; }
+  intp Count() const { return m_nAllocated; }
 
   // Grows the memory, so that at least allocated + num elements are allocated
-  void Grow(int num = 1) {
+  void Grow(intp num = 1) {
     Assert(num > 0);
     m_nAllocated += num;
     m_MemoryStack.Alloc(num * sizeof(T));
   }
 
   // Makes sure we've got at least this much memory
-  void EnsureCapacity(int num) {
+  void EnsureCapacity(intp num) {
     Assert(num <= MAX_SIZE);
     if (m_nAllocated < num) Grow(num - m_nAllocated);
   }
@@ -232,7 +232,7 @@ class CUtlMemoryStack {
   bool IsExternallyAllocated() const { return false; }
 
   // Set the size by which the memory grows
-  void SetGrowSize(int size) { Assert(0); }
+  void SetGrowSize(intp size) { Assert(0); }
 
   // Identify the owner of this memory stack's memory
   void SetAllocOwner(const char *pszAllocOwner) {
@@ -241,114 +241,7 @@ class CUtlMemoryStack {
 
  private:
   CMemoryStack m_MemoryStack;
-  int m_nAllocated;
+  intp m_nAllocated;
 };
-
-#ifdef _X360
-//-----------------------------------------------------------------------------
-// A memory stack used for allocating physical memory on the 360
-// Usage pattern anticipates we usually never go over the initial allocation
-// When we do so, we're ok with slightly slower allocation
-//-----------------------------------------------------------------------------
-class CPhysicalMemoryStack {
- public:
-  CPhysicalMemoryStack();
-  ~CPhysicalMemoryStack();
-
-  // The physical memory stack is allocated in chunks. We will initially
-  // allocate nInitChunkCount chunks, which will always be in memory.
-  // When FreeAll() is called, it will free down to the initial chunk count
-  // but not below it.
-  bool Init(size_t nChunkSizeInBytes, size_t nAlignment, int nInitialChunkCount,
-            uint32 nAdditionalFlags);
-  void Term();
-
-  size_t GetSize() const;
-  size_t GetPeakUsed() const;
-  size_t GetUsed() const;
-  size_t GetFramePeakUsed() const;
-
-  MemoryStackMark_t GetCurrentAllocPoint() const;
-  void FreeToAllocPoint(MemoryStackMark_t mark,
-                        bool bUnused = true);  // bUnused is for interface
-                                               // compat with CMemoryStack
-  void *Alloc(size_t nSizeInBytes, bool bClear = false) RESTRICT;
-  void FreeAll(bool bUnused =
-                   true);  // bUnused is for interface compat with CMemoryStack
-
-  void PrintContents();
-
- private:
-  void *AllocFromOverflow(size_t nSizeInBytes);
-
-  struct PhysicalChunk_t {
-    uint8 *m_pBase;
-    uint8 *m_pNextAlloc;
-    uint8 *m_pAllocLimit;
-  };
-
-  PhysicalChunk_t m_InitialChunk;
-  CUtlVector<PhysicalChunk_t> m_ExtraChunks;
-  size_t m_nUsage;
-  size_t m_nFramePeakUsage;
-  size_t m_nPeakUsage;
-  size_t m_nAlignment;
-  size_t m_nChunkSizeInBytes;
-  int m_nFirstAvailableChunk;
-  int m_nAdditionalFlags;
-  PhysicalChunk_t *m_pLastAllocedChunk;
-};
-
-//-------------------------------------
-
-FORCEINLINE void *CPhysicalMemoryStack::Alloc(size_t nSizeInBytes,
-                                              bool bClear) RESTRICT {
-  if (nSizeInBytes) {
-    nSizeInBytes = AlignValue(nSizeInBytes, m_nAlignment);
-  } else {
-    nSizeInBytes = m_nAlignment;
-  }
-
-  // Can't do an allocation bigger than the chunk size
-  Assert(nSizeInBytes <= m_nChunkSizeInBytes);
-
-  void *pResult = m_InitialChunk.m_pNextAlloc;
-  uint8 *pNextAlloc = m_InitialChunk.m_pNextAlloc + nSizeInBytes;
-  if (pNextAlloc <= m_InitialChunk.m_pAllocLimit) {
-    m_InitialChunk.m_pNextAlloc = pNextAlloc;
-    m_pLastAllocedChunk = &m_InitialChunk;
-  } else {
-    pResult = AllocFromOverflow(nSizeInBytes);
-  }
-
-  m_nUsage += nSizeInBytes;
-  m_nFramePeakUsage = MAX(m_nUsage, m_nFramePeakUsage);
-  m_nPeakUsage = MAX(m_nUsage, m_nPeakUsage);
-
-  if (bClear) {
-    memset(pResult, 0, nSizeInBytes);
-  }
-
-  return pResult;
-}
-
-//-------------------------------------
-
-inline size_t CPhysicalMemoryStack::GetPeakUsed() const { return m_nPeakUsage; }
-
-//-------------------------------------
-
-inline size_t CPhysicalMemoryStack::GetUsed() const { return m_nUsage; }
-
-inline size_t CPhysicalMemoryStack::GetFramePeakUsed() const {
-  return m_nFramePeakUsage;
-}
-
-inline MemoryStackMark_t CPhysicalMemoryStack::GetCurrentAllocPoint() const {
-  Assert(m_pLastAllocedChunk);
-  return (m_pLastAllocedChunk->m_pNextAlloc - m_pLastAllocedChunk->m_pBase);
-}
-
-#endif  // _X360
 
 #endif  // VPC_TIER1_MEMSTACK_H_

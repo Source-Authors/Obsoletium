@@ -62,8 +62,8 @@ CMemoryStack::~CMemoryStack() {
 
 //-------------------------------------
 
-bool CMemoryStack::Init(const char *pszAllocOwner, unsigned maxSize,
-                        unsigned commitSize, unsigned initialCommit,
+bool CMemoryStack::Init(const char *pszAllocOwner, size_t maxSize,
+                        size_t commitSize, size_t initialCommit,
                         unsigned alignment) {
   Assert(!m_pBase);
 
@@ -171,8 +171,8 @@ bool CMemoryStack::Init(const char *pszAllocOwner, unsigned maxSize,
 //-------------------------------------
 
 #ifdef _GAMECONSOLE
-bool CMemoryStack::InitPhysical(const char *pszAllocOwner, uint size,
-                                uint nBaseAddrAlignment, uint alignment,
+bool CMemoryStack::InitPhysical(const char *pszAllocOwner, size_t size,
+                                size_t nBaseAddrAlignment, uint alignment,
                                 uint32 nFlags) {
   m_bPhysical = true;
 
@@ -403,206 +403,6 @@ void CMemoryStack::Access(void **ppRegion, intp *pBytes) {
 //-------------------------------------
 
 void CMemoryStack::PrintContents() {
-  Msg("Total used memory:      %d\n", GetUsed());
-  Msg("Total committed memory: %d\n", GetSize());
+  Msg("Total used memory:      %zi\n", GetUsed());
+  Msg("Total committed memory: %zi\n", GetSize());
 }
-
-#ifdef _X360
-
-//-----------------------------------------------------------------------------
-//
-// A memory stack used for allocating physical memory on the 360 (can't
-// commit/decommit)
-//
-//-----------------------------------------------------------------------------
-
-MEMALLOC_DEFINE_EXTERNAL_TRACKING(CPhysicalMemoryStack);
-
-//-----------------------------------------------------------------------------
-// Constructor, destructor
-//-----------------------------------------------------------------------------
-CPhysicalMemoryStack::CPhysicalMemoryStack()
-    : m_nAlignment(16),
-      m_nAdditionalFlags(0),
-      m_nUsage(0),
-      m_nPeakUsage(0),
-      m_pLastAllocedChunk(NULL),
-      m_nFirstAvailableChunk(0),
-      m_nChunkSizeInBytes(0),
-      m_ExtraChunks(32, 32),
-      m_nFramePeakUsage(0) {
-  m_InitialChunk.m_pBase = NULL;
-  m_InitialChunk.m_pNextAlloc = NULL;
-  m_InitialChunk.m_pAllocLimit = NULL;
-}
-
-CPhysicalMemoryStack::~CPhysicalMemoryStack() { Term(); }
-
-//-----------------------------------------------------------------------------
-// Init, shutdown
-//-----------------------------------------------------------------------------
-bool CPhysicalMemoryStack::Init(size_t nChunkSizeInBytes, size_t nAlignment,
-                                int nInitialChunkCount,
-                                uint32 nAdditionalFlags) {
-  Assert(!m_InitialChunk.m_pBase);
-
-  m_pLastAllocedChunk = NULL;
-  m_nAdditionalFlags = nAdditionalFlags;
-  m_nFirstAvailableChunk = 0;
-  m_nUsage = 0;
-  m_nFramePeakUsage = 0;
-  m_nPeakUsage = 0;
-  m_nAlignment = AlignValue(nAlignment, 4);
-
-  // Chunk size must be aligned to the 360 page size
-  size_t nInitMemorySize = nChunkSizeInBytes * nInitialChunkCount;
-  nChunkSizeInBytes = AlignValue(nChunkSizeInBytes, 64 * 1024);
-  m_nChunkSizeInBytes = nChunkSizeInBytes;
-
-  // Fix up initial chunk count to get at least as much memory as requested
-  // based on changes to the chunk size owing to page alignment issues
-  nInitialChunkCount =
-      (nInitMemorySize + nChunkSizeInBytes - 1) / nChunkSizeInBytes;
-
-  int nFlags = PAGE_READWRITE | nAdditionalFlags;
-  int nAllocationSize = m_nChunkSizeInBytes * nInitialChunkCount;
-  if (nAllocationSize >= 16 * 1024 * 1024) {
-    nFlags |= MEM_16MB_PAGES;
-  } else {
-    nFlags |= MEM_LARGE_PAGES;
-  }
-  m_InitialChunk.m_pBase =
-      (uint8 *)XPhysicalAlloc(nAllocationSize, MAXULONG_PTR, 0, nFlags);
-  if (!m_InitialChunk.m_pBase) {
-    m_InitialChunk.m_pNextAlloc = m_InitialChunk.m_pAllocLimit = NULL;
-    g_pMemAlloc->OutOfMemory();
-    return false;
-  }
-
-  m_InitialChunk.m_pNextAlloc = m_InitialChunk.m_pBase;
-  m_InitialChunk.m_pAllocLimit = m_InitialChunk.m_pBase + nAllocationSize;
-
-  MemAlloc_RegisterExternalAllocation(CPhysicalMemoryStack,
-                                      m_InitialChunk.m_pBase,
-                                      XPhysicalSize(m_InitialChunk.m_pBase));
-  return true;
-}
-
-void CPhysicalMemoryStack::Term() {
-  FreeAll();
-  if (m_InitialChunk.m_pBase) {
-    MemAlloc_RegisterExternalDeallocation(
-        CPhysicalMemoryStack, m_InitialChunk.m_pBase,
-        XPhysicalSize(m_InitialChunk.m_pBase));
-    XPhysicalFree(m_InitialChunk.m_pBase);
-    m_InitialChunk.m_pBase = m_InitialChunk.m_pNextAlloc =
-        m_InitialChunk.m_pAllocLimit = NULL;
-  }
-}
-
-//-----------------------------------------------------------------------------
-// Returns the total allocation size
-//-----------------------------------------------------------------------------
-size_t CPhysicalMemoryStack::GetSize() const {
-  size_t nBaseSize =
-      (intp)m_InitialChunk.m_pAllocLimit - (intp)m_InitialChunk.m_pBase;
-  return nBaseSize + m_nChunkSizeInBytes * m_ExtraChunks.Count();
-}
-
-//-----------------------------------------------------------------------------
-// Allocate from the 'overflow' buffers, only happens if the initial allocation
-// isn't good enough
-//-----------------------------------------------------------------------------
-void *CPhysicalMemoryStack::AllocFromOverflow(size_t nSizeInBytes) {
-  // Completely full chunks are moved to the front and skipped
-  int nCount = m_ExtraChunks.Count();
-  for (int i = m_nFirstAvailableChunk; i < nCount; ++i) {
-    PhysicalChunk_t &chunk = m_ExtraChunks[i];
-
-    // Here we can check if a chunk is full and move it to the head
-    // of the list. We can't do it immediately *after* allocation
-    // because something may later free up some of the memory
-    if (chunk.m_pNextAlloc == chunk.m_pAllocLimit) {
-      if (i > 0) {
-        m_ExtraChunks.FastRemove(i);
-        m_ExtraChunks.InsertBefore(0);
-      }
-      ++m_nFirstAvailableChunk;
-      continue;
-    }
-
-    void *pResult = chunk.m_pNextAlloc;
-    uint8 *pNextAlloc = chunk.m_pNextAlloc + nSizeInBytes;
-    if (pNextAlloc > chunk.m_pAllocLimit) continue;
-
-    chunk.m_pNextAlloc = pNextAlloc;
-    m_pLastAllocedChunk = &chunk;
-    return pResult;
-  }
-
-  // No extra chunks to use; add a new one
-  int i = m_ExtraChunks.AddToTail();
-  PhysicalChunk_t &chunk = m_ExtraChunks[i];
-
-  int nFlags = PAGE_READWRITE | MEM_LARGE_PAGES | m_nAdditionalFlags;
-  chunk.m_pBase =
-      (uint8 *)XPhysicalAlloc(m_nChunkSizeInBytes, MAXULONG_PTR, 0, nFlags);
-  if (!chunk.m_pBase) {
-    chunk.m_pNextAlloc = chunk.m_pAllocLimit = NULL;
-    m_pLastAllocedChunk = NULL;
-    g_pMemAlloc->OutOfMemory();
-    return NULL;
-  }
-  MemAlloc_RegisterExternalAllocation(CPhysicalMemoryStack, chunk.m_pBase,
-                                      XPhysicalSize(chunk.m_pBase));
-
-  m_pLastAllocedChunk = &chunk;
-  chunk.m_pNextAlloc = chunk.m_pBase + nSizeInBytes;
-  chunk.m_pAllocLimit = chunk.m_pBase + m_nChunkSizeInBytes;
-  return chunk.m_pBase;
-}
-
-//-----------------------------------------------------------------------------
-// Allows us to free a portion of the previous allocation
-//-----------------------------------------------------------------------------
-void CPhysicalMemoryStack::FreeToAllocPoint(MemoryStackMark_t mark,
-                                            bool bUnused) {
-  mark = AlignValue(mark, m_nAlignment);
-  uint8 *pAllocPoint = m_pLastAllocedChunk->m_pBase + mark;
-  Assert(pAllocPoint >= m_pLastAllocedChunk->m_pBase &&
-         pAllocPoint <= m_pLastAllocedChunk->m_pNextAlloc);
-  if (pAllocPoint >= m_pLastAllocedChunk->m_pBase &&
-      pAllocPoint <= m_pLastAllocedChunk->m_pNextAlloc) {
-    m_nUsage -= (intp)m_pLastAllocedChunk->m_pNextAlloc - (intp)pAllocPoint;
-    m_pLastAllocedChunk->m_pNextAlloc = pAllocPoint;
-  }
-}
-
-//-----------------------------------------------------------------------------
-// Free overflow buffers, mark initial buffer as empty
-//-----------------------------------------------------------------------------
-void CPhysicalMemoryStack::FreeAll(bool bUnused) {
-  m_nUsage = 0;
-  m_nFramePeakUsage = 0;
-  m_InitialChunk.m_pNextAlloc = m_InitialChunk.m_pBase;
-  m_pLastAllocedChunk = NULL;
-  m_nFirstAvailableChunk = 0;
-  int nCount = m_ExtraChunks.Count();
-  for (int i = 0; i < nCount; ++i) {
-    PhysicalChunk_t &chunk = m_ExtraChunks[i];
-    MemAlloc_RegisterExternalDeallocation(CPhysicalMemoryStack, chunk.m_pBase,
-                                          XPhysicalSize(chunk.m_pBase));
-    XPhysicalFree(chunk.m_pBase);
-  }
-  m_ExtraChunks.RemoveAll();
-}
-
-//-------------------------------------
-
-void CPhysicalMemoryStack::PrintContents() {
-  Msg("Total used memory:      %8d\n", GetUsed());
-  Msg("Peak used memory:       %8d\n", GetPeakUsed());
-  Msg("Total allocated memory: %8d\n", GetSize());
-}
-
-#endif  // _X360
