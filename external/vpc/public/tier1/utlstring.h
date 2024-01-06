@@ -13,7 +13,7 @@
 //-----------------------------------------------------------------------------
 class CUtlBinaryBlock {
  public:
-  CUtlBinaryBlock(int growSize = 0, int initSize = 0);
+  CUtlBinaryBlock(intp growSize = 0, intp initSize = 0);
   ~CUtlBinaryBlock() {
 #ifdef _DEBUG
     m_nActualLength = 0x7BADF00D;
@@ -23,20 +23,20 @@ class CUtlBinaryBlock {
   }
 
   // NOTE: nInitialLength indicates how much of the buffer starts full
-  CUtlBinaryBlock(void *pMemory, int nSizeInBytes, int nInitialLength);
-  CUtlBinaryBlock(const void *pMemory, int nSizeInBytes);
+  CUtlBinaryBlock(void *pMemory, intp nSizeInBytes, intp nInitialLength);
+  CUtlBinaryBlock(const void *pMemory, intp nSizeInBytes);
   CUtlBinaryBlock(const CUtlBinaryBlock &src);
 
-  void Get(void *pValue, int nMaxLen) const;
-  void Set(const void *pValue, int nLen);
+  void Get(void *pValue, intp nMaxLen) const;
+  void Set(const void *pValue, intp nLen);
   const void *Get() const;
   void *Get();
 
-  unsigned char &operator[](int i);
-  const unsigned char &operator[](int i) const;
+  unsigned char &operator[](intp i);
+  const unsigned char &operator[](intp i) const;
 
-  int Length() const;
-  void SetLength(int nLength);  // Undefined memory will result
+  intp Length() const;
+  void SetLength(intp nLength);  // Undefined memory will result
   bool IsEmpty() const;
   void Clear();
   void Purge();
@@ -50,7 +50,7 @@ class CUtlBinaryBlock {
 
  private:
   CUtlMemory<unsigned char> m_Memory;
-  int m_nActualLength;
+  intp m_nActualLength;
 };
 
 //-----------------------------------------------------------------------------
@@ -60,11 +60,11 @@ inline const void *CUtlBinaryBlock::Get() const { return m_Memory.Base(); }
 
 inline void *CUtlBinaryBlock::Get() { return m_Memory.Base(); }
 
-inline int CUtlBinaryBlock::Length() const { return m_nActualLength; }
+inline intp CUtlBinaryBlock::Length() const { return m_nActualLength; }
 
-inline unsigned char &CUtlBinaryBlock::operator[](int i) { return m_Memory[i]; }
+inline unsigned char &CUtlBinaryBlock::operator[](intp i) { return m_Memory[i]; }
 
-inline const unsigned char &CUtlBinaryBlock::operator[](int i) const {
+inline const unsigned char &CUtlBinaryBlock::operator[](intp i) const {
   return m_Memory[i];
 }
 
@@ -98,8 +98,8 @@ class CUtlString {
   CUtlString(const CUtlString &string);
 
   // Attaches the string to external memory. Useful for avoiding a copy
-  CUtlString(void *pMemory, int nSizeInBytes, int nInitialLength);
-  CUtlString(const void *pMemory, int nSizeInBytes);
+  CUtlString(void *pMemory, intp nSizeInBytes, intp nInitialLength);
+  CUtlString(const void *pMemory, intp nSizeInBytes);
 
   const char *Get() const;
   void Set(const char *pValue);
@@ -113,12 +113,12 @@ class CUtlString {
   const char *String() const { return Get(); }
 
   // Returns strlen
-  int Length() const;
+  intp Length() const;
   bool IsEmpty() const;
 
   // Sets the length (used to serialize into the buffer )
   // Note: If nLen != 0, then this adds an extra byte for a null-terminator.
-  void SetLength(int nLen);
+  void SetLength(intp nLen);
   char *Get();
   void Purge();
 
@@ -160,7 +160,7 @@ class CUtlString {
       const;  // case SENSITIVE, use * for wildcard in pattern string
 
   int Format(PRINTF_FORMAT_STRING const char *pFormat, ...);
-  void SetDirect(const char *pValue, int nChars);
+  void SetDirect(const char *pValue, intp nChars);
 
   // Defining AltArgumentType_t hints that associative container classes should
   // also implement Find/Insert/Remove functions that take const char* params.
@@ -169,11 +169,11 @@ class CUtlString {
   // Take a piece out of the string.
   // If you only specify nStart, it'll go from nStart to the end.
   // You can use negative numbers and it'll wrap around to the start.
-  CUtlString Slice(int32 nStart = 0, int32 nEnd = INT_MAX) const;
+  CUtlString Slice(intp nStart = 0, intp nEnd = INT_MAX) const;
 
   // Grab a substring starting from the left or the right side.
-  CUtlString Left(int32 nChars) const;
-  CUtlString Right(int32 nChars) const;
+  CUtlString Left(intp nChars) const;
+  CUtlString Right(intp nChars) const;
 
   // Replace all instances of one character with another.
   CUtlString Replace(char cFrom, char cTo) const;
@@ -226,9 +226,9 @@ template <typename T>
 class StringFuncs {
  public:
   static T *Duplicate(const T *pValue);
-  static void Copy(T *out_pOut, const T *pIn, int iLength);
+  static void Copy(T *out_pOut, const T *pIn, intp iLength);
   static int Compare(const T *pLhs, const T *pRhs);
-  static int Length(const T *pValue);
+  static ptrdiff_t Length(const T *pValue);
   static const T *FindChar(const T *pStr, const T cSearch);
   static const T *EmptyString();
 };
@@ -237,7 +237,7 @@ template <>
 class StringFuncs<char> {
  public:
   static char *Duplicate(const char *pValue) { return _strdup(pValue); }
-  static void Copy(char *out_pOut, const char *pIn, int iLength) {
+  static void Copy(char *out_pOut, const char *pIn, intp iLength) {
     strncpy(out_pOut, pIn, iLength);
   }
   static int Compare(const char *pLhs, const char *pRhs) {
@@ -254,7 +254,7 @@ template <>
 class StringFuncs<wchar_t> {
  public:
   static wchar_t *Duplicate(const wchar_t *pValue) { return _wcsdup(pValue); }
-  static void Copy(wchar_t *out_pOut, const wchar_t *pIn, int iLength) {
+  static void Copy(wchar_t *out_pOut, const wchar_t *pIn, intp iLength) {
     wcsncpy(out_pOut, pIn, iLength);
   }
   static int Compare(const wchar_t *pLhs, const wchar_t *pRhs) {

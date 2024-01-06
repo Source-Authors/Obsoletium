@@ -253,18 +253,18 @@ int CUtlSortVector<T, LessFunc, BaseVector>::FindLessOrEqual(
   AssertFatal(!m_bNeedsSort);
 
   LessFunc less;
-  int start = 0, end = this->Count() - 1;
-  while (start <= end) {
-    int mid = (start + end) >> 1;
+  intp start = 0, endp = this->Count() - 1;
+  while (start <= endp) {
+    intp mid = (start + endp) >> 1;
     if (less.Less(this->Element(mid), src, m_pLessContext)) {
       start = mid + 1;
     } else if (less.Less(src, this->Element(mid), m_pLessContext)) {
-      end = mid - 1;
+      endp = mid - 1;
     } else {
       return mid;
     }
   }
-  return end;
+  return endp;
 }
 
 template <class T, class LessFunc, class BaseVector>

@@ -144,13 +144,13 @@ void MD5Init(MD5Context_t *ctx) {
 //			*buf -
 //			len -
 //-----------------------------------------------------------------------------
-void MD5Update(MD5Context_t *ctx, unsigned char const *buf, unsigned int len) {
+void MD5Update(MD5Context_t *ctx, unsigned char const *buf, size_t len) {
   unsigned int t;
 
   /* Update bitcount */
 
   t = ctx->bits[0];
-  if ((ctx->bits[0] = t + ((unsigned int)len << 3)) < t)
+  if ((ctx->bits[0] = t + (len << 3)) < t)
     ctx->bits[1]++; /* Carry from low to high */
   ctx->bits[1] += len >> 29;
 

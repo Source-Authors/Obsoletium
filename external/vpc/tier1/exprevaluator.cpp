@@ -387,7 +387,7 @@ bool CExpressionEvaluator::Evaluate(bool &bResult, const char *pInfixExpression,
   // strip the bracketing [] if present
   char szCleanToken[512];
   if (pInfixExpression[0] == '[') {
-    int len = V_strlen(pInfixExpression);
+    intp len = V_strlen(pInfixExpression);
 
     // SECURITY: Bail on input buffers that are too large, they're used for RCEs
     // and we don't need to support them.

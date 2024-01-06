@@ -350,7 +350,7 @@ class CNumStr {
 
   void AddQuotes() {
     Assert(m_szBuf[0] != '"');
-    const int nLength = V_strlen(m_szBuf);
+    const intp nLength = V_strlen(m_szBuf);
     V_memmove(m_szBuf + 1, m_szBuf, nLength);
     m_szBuf[0] = '"';
     m_szBuf[nLength + 1] = '"';

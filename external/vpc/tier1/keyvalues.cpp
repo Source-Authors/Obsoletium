@@ -196,7 +196,7 @@ class CKeyValuesGrowableStringTable {
  public:
   // Constructor
   CKeyValuesGrowableStringTable()
-      : m_vecStrings(0, 512 * 1024),
+      : m_vecStrings((intp)0, (intp)512 * 1024),
         m_hashLookup(2048, 0, 0, m_Functor, m_Functor) {
     m_vecStrings.AddToTail('\0');
   }

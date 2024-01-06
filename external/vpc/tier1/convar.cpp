@@ -234,7 +234,7 @@ ConCommandBase *ConCommandBase::GetNext(void) { return m_pNext; }
 // Output : char
 //-----------------------------------------------------------------------------
 char *ConCommandBase::CopyString(const char *from) {
-  int len;
+  intp len;
   char *to;
 
   len = V_strlen(from);
@@ -299,7 +299,7 @@ CCommand::CCommand(int nArgC, const char **ppArgV) {
   m_nArgc = nArgC;
   for (int i = 0; i < nArgC; ++i) {
     m_ppArgv[i] = pBuf;
-    int nLen = V_strlen(ppArgV[i]);
+    intp nLen = V_strlen(ppArgV[i]);
     memcpy(pBuf, ppArgV[i], nLen + 1);
     if (i == 0) {
       m_nArgv0Size = nLen;
@@ -343,7 +343,7 @@ bool CCommand::Tokenize(const char *pCommand, characterset_t *pBreakSet) {
   // NOTE: This is here to avoid the pointers returned by DequeueNextCommand
   // to become invalid by calling AddText. Is there a way we can avoid the
   // memcpy?
-  int nLen = V_strlen(pCommand);
+  intp nLen = V_strlen(pCommand);
   if (nLen >= COMMAND_MAX_LENGTH - 1) {
     Warning(
         "CCommand::Tokenize: Encountered command which overflows the tokenizer "
@@ -356,12 +356,12 @@ bool CCommand::Tokenize(const char *pCommand, characterset_t *pBreakSet) {
   // Parse the current command into the current command buffer
   CUtlBuffer bufParse(m_pArgSBuffer, nLen,
                       CUtlBuffer::TEXT_BUFFER | CUtlBuffer::READ_ONLY);
-  int nArgvBufferSize = 0;
+  intp nArgvBufferSize = 0;
   while (bufParse.IsValid() && (m_nArgc < COMMAND_MAX_ARGC)) {
     char *pArgvBuf = &m_pArgvBuffer[nArgvBufferSize];
-    int nMaxLen = COMMAND_MAX_LENGTH - nArgvBufferSize;
-    int nStartGet = bufParse.TellGet();
-    int nSize = bufParse.ParseToken(pBreakSet, pArgvBuf, nMaxLen);
+    intp nMaxLen = (intp)COMMAND_MAX_LENGTH - nArgvBufferSize;
+    intp nStartGet = bufParse.TellGet();
+    intp nSize = bufParse.ParseToken(pBreakSet, pArgvBuf, nMaxLen);
     if (nSize < 0) break;
 
     // Check for overflow condition
@@ -756,7 +756,7 @@ void ConVar::ChangeStringValue(const char *tempVal, float flOldValue) {
   char *pszOldValue = (char *)stackalloc(m_Value.m_StringLength);
   memcpy(pszOldValue, m_Value.m_pszString, m_Value.m_StringLength);
 
-  int len = V_strlen(tempVal) + 1;
+  intp len = V_strlen(tempVal) + 1;
 
   if (len > m_Value.m_StringLength) {
     delete[] m_Value.m_pszString;
@@ -768,7 +768,7 @@ void ConVar::ChangeStringValue(const char *tempVal, float flOldValue) {
   memcpy(m_Value.m_pszString, tempVal, len);
 
   // Invoke any necessary callback function
-  for (int i = 0; i < m_fnChangeCallbacks.Count(); ++i) {
+  for (intp i = 0; i < m_fnChangeCallbacks.Count(); ++i) {
     m_fnChangeCallbacks[i](this, pszOldValue, flOldValue);
   }
 

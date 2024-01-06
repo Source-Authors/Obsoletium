@@ -537,7 +537,7 @@ bool CUtlGraphVisitor<T, C>::Advance() {
           m_vecNodesVisited[m_vecNodesVisited.AddToTail()] =
               edge.m_DestinationNode;
 
-          int iNewFringeNode = m_vecFringeQueue.AddToTail();
+          intp iNewFringeNode = m_vecFringeQueue.AddToTail();
           m_vecFringeQueue[iNewFringeNode] = edge;
           // Accumulate the cost to get to the current point
           m_vecFringeQueue[iNewFringeNode].m_EdgeCost += node.m_EdgeCost;

@@ -119,16 +119,16 @@ int V_UnicodeToUTF8(const wchar_t *pUnicode, char *pUTF8,
 //-----------------------------------------------------------------------------
 // Purpose: Converts a ucs2 string to a unicode (wchar_t) one, no-op on win32
 //-----------------------------------------------------------------------------
-int V_UCS2ToUnicode(const ucs2 *pUCS2, wchar_t *pUnicode,
-                    int cubDestSizeInBytes) {
+intp V_UCS2ToUnicode(const ucs2 *pUCS2, wchar_t *pUnicode,
+                     intp cubDestSizeInBytes) {
   AssertValidWritePtr(pUnicode);
   AssertValidReadPtr(pUCS2);
 
   pUnicode[0] = L'\0';
 
 #if defined(_WIN32) || defined(_PS3)
-  int lenUCS2 = V_wcslen(pUCS2);
-  int cchResult = MIN((lenUCS2 + 1) * (int)sizeof(ucs2), cubDestSizeInBytes);
+  intp lenUCS2 = V_wcslen(pUCS2);
+  intp cchResult = MIN((lenUCS2 + 1) * (intp)sizeof(ucs2), cubDestSizeInBytes);
   V_wcsncpy((wchar_t *)pUCS2, pUnicode, cchResult);
 #else
   iconv_t conv_t = iconv_open("UCS-4LE", "UCS-2LE");

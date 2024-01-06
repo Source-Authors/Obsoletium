@@ -12,7 +12,7 @@
 #include "commonmacros.h"
 #include "generichash.h"
 
-typedef unsigned int UtlHashHandle_t;
+typedef unsigned UtlHashHandle_t;
 
 template <class Data, typename C = bool (*)(Data const &, Data const &),
           typename K = unsigned int (*)(Data const &)>

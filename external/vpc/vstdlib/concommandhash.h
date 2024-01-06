@@ -68,10 +68,10 @@ class CConCommandHash {
 
   // Iteration
   struct CCommandHashIterator_t {
-    int bucket;
+    intp bucket;
     CCommandHashHandle_t handle;
 
-    CCommandHashIterator_t(int _bucket, const CCommandHashHandle_t &_handle)
+    CCommandHashIterator_t(intp _bucket, const CCommandHashHandle_t &_handle)
         : bucket(_bucket), handle(_handle){};
     // inline operator UtlHashFastHandle_t() const { return handle; };
   };
@@ -139,9 +139,9 @@ inline ConCommandBase *const &CConCommandHash::operator[](
 //-----------------------------------------------------------------------------
 CConCommandHash::CCommandHashIterator_t CConCommandHash::First() const {
   // walk through the buckets to find the first one that has some data
-  int bucketCount = m_aBuckets.Count();
+  intp bucketCount = m_aBuckets.Count();
   const CCommandHashHandle_t invalidIndex = m_aDataPool.InvalidIndex();
-  for (int bucket = 0; bucket < bucketCount; ++bucket) {
+  for (intp bucket = 0; bucket < bucketCount; ++bucket) {
     CCommandHashHandle_t iElement =
         m_aBuckets[bucket];  // get the head of the bucket
     if (iElement != invalidIndex)
@@ -170,8 +170,8 @@ CConCommandHash::CCommandHashIterator_t CConCommandHash::Next(
 
   {
     // otherwise look for the next bucket with data
-    int bucketCount = m_aBuckets.Count();
-    for (int bucket = iter.bucket + 1; bucket < bucketCount; ++bucket) {
+    intp bucketCount = m_aBuckets.Count();
+    for (intp bucket = iter.bucket + 1; bucket < bucketCount; ++bucket) {
       CCommandHashHandle_t next =
           m_aBuckets[bucket];  // get the head of the bucket
       if (next != invalidIndex) return CCommandHashIterator_t(bucket, next);

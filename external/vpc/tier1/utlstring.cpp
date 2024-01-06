@@ -12,20 +12,20 @@
 //-----------------------------------------------------------------------------
 // Base class, containing simple memory management
 //-----------------------------------------------------------------------------
-CUtlBinaryBlock::CUtlBinaryBlock(int growSize, int initSize) {
+CUtlBinaryBlock::CUtlBinaryBlock(intp growSize, intp initSize) {
   MEM_ALLOC_CREDIT();
   m_Memory.Init(growSize, initSize);
 
   m_nActualLength = 0;
 }
 
-CUtlBinaryBlock::CUtlBinaryBlock(void *pMemory, int nSizeInBytes,
-                                 int nInitialLength)
+CUtlBinaryBlock::CUtlBinaryBlock(void *pMemory, intp nSizeInBytes,
+                                 intp nInitialLength)
     : m_Memory((unsigned char *)pMemory, nSizeInBytes) {
   m_nActualLength = nInitialLength;
 }
 
-CUtlBinaryBlock::CUtlBinaryBlock(const void *pMemory, int nSizeInBytes)
+CUtlBinaryBlock::CUtlBinaryBlock(const void *pMemory, intp nSizeInBytes)
     : m_Memory((const unsigned char *)pMemory, nSizeInBytes) {
   m_nActualLength = nSizeInBytes;
 }
@@ -34,7 +34,7 @@ CUtlBinaryBlock::CUtlBinaryBlock(const CUtlBinaryBlock &src) {
   Set(src.Get(), src.Length());
 }
 
-void CUtlBinaryBlock::Get(void *pValue, int nLen) const {
+void CUtlBinaryBlock::Get(void *pValue, intp nLen) const {
   Assert(nLen > 0);
   if (m_nActualLength < nLen) {
     nLen = m_nActualLength;
@@ -45,13 +45,13 @@ void CUtlBinaryBlock::Get(void *pValue, int nLen) const {
   }
 }
 
-void CUtlBinaryBlock::SetLength(int nLength) {
+void CUtlBinaryBlock::SetLength(intp nLength) {
   MEM_ALLOC_CREDIT();
   Assert(!m_Memory.IsReadOnly());
 
   m_nActualLength = nLength;
   if (nLength > m_Memory.NumAllocated()) {
-    int nOverFlow = nLength - m_Memory.NumAllocated();
+    intp nOverFlow = nLength - m_Memory.NumAllocated();
     m_Memory.Grow(nOverFlow);
 
     // If the reallocation failed, clamp length
@@ -68,7 +68,7 @@ void CUtlBinaryBlock::SetLength(int nLength) {
 #endif
 }
 
-void CUtlBinaryBlock::Set(const void *pValue, int nLen) {
+void CUtlBinaryBlock::Set(const void *pValue, intp nLen) {
   Assert(!m_Memory.IsReadOnly());
 
   if (!pValue) nLen = 0;
@@ -108,16 +108,16 @@ CUtlString::CUtlString(const char *pString) { Set(pString); }
 CUtlString::CUtlString(const CUtlString &string) { Set(string.Get()); }
 
 // Attaches the string to external memory. Useful for avoiding a copy
-CUtlString::CUtlString(void *pMemory, int nSizeInBytes, int nInitialLength)
+CUtlString::CUtlString(void *pMemory, intp nSizeInBytes, intp nInitialLength)
     : m_Storage(pMemory, nSizeInBytes, nInitialLength) {}
 
-CUtlString::CUtlString(const void *pMemory, int nSizeInBytes)
+CUtlString::CUtlString(const void *pMemory, intp nSizeInBytes)
     : m_Storage(pMemory, nSizeInBytes) {}
 
 //-----------------------------------------------------------------------------
 // Purpose: Set directly and don't look for a null terminator in pValue.
 //-----------------------------------------------------------------------------
-void CUtlString::SetDirect(const char *pValue, int nChars) {
+void CUtlString::SetDirect(const char *pValue, intp nChars) {
   if (nChars > 0) {
     m_Storage.SetLength(nChars + 1);
     m_Storage.Set(pValue, nChars);
@@ -129,17 +129,17 @@ void CUtlString::SetDirect(const char *pValue, int nChars) {
 
 void CUtlString::Set(const char *pValue) {
   Assert(!m_Storage.IsReadOnly());
-  int nLen = pValue ? V_strlen(pValue) + 1 : 0;
+  intp nLen = pValue ? V_strlen(pValue) + 1 : 0;
   m_Storage.Set(pValue, nLen);
 }
 
 // Returns strlen
-int CUtlString::Length() const {
+intp CUtlString::Length() const {
   return m_Storage.Length() ? m_Storage.Length() - 1 : 0;
 }
 
 // Sets the length (used to serialize into the buffer )
-void CUtlString::SetLength(int nLen) {
+void CUtlString::SetLength(intp nLen) {
   Assert(!m_Storage.IsReadOnly());
 
   // Add 1 to account for the NULL
@@ -174,7 +174,7 @@ char *CUtlString::Get() {
 void CUtlString::Purge() { m_Storage.Purge(); }
 
 void CUtlString::ToLower() {
-  for (int nLength = Length() - 1; nLength >= 0; nLength--) {
+  for (intp nLength = Length() - 1; nLength >= 0; nLength--) {
     m_Storage[nLength] =
         static_cast<unsigned char>(tolower(m_Storage[nLength]));
   }
@@ -203,13 +203,13 @@ bool CUtlString::operator==(const char *src) const {
 CUtlString &CUtlString::operator+=(const CUtlString &rhs) {
   Assert(!m_Storage.IsReadOnly());
 
-  const int lhsLength(Length());
-  const int rhsLength(rhs.Length());
-  const int requestedLength(lhsLength + rhsLength);
+  const intp lhsLength(Length());
+  const intp rhsLength(rhs.Length());
+  const intp requestedLength(lhsLength + rhsLength);
 
   SetLength(requestedLength);
-  const int allocatedLength(Length());
-  const int copyLength(allocatedLength - lhsLength < rhsLength
+  const intp allocatedLength(Length());
+  const intp copyLength(allocatedLength - lhsLength < rhsLength
                            ? allocatedLength - lhsLength
                            : rhsLength);
   memcpy(Get() + lhsLength, rhs.Get(), copyLength);
@@ -221,13 +221,13 @@ CUtlString &CUtlString::operator+=(const CUtlString &rhs) {
 CUtlString &CUtlString::operator+=(const char *rhs) {
   Assert(!m_Storage.IsReadOnly());
 
-  const int lhsLength(Length());
-  const int rhsLength(V_strlen(rhs));
-  const int requestedLength(lhsLength + rhsLength);
+  const intp lhsLength(Length());
+  const intp rhsLength(V_strlen(rhs));
+  const intp requestedLength(lhsLength + rhsLength);
 
   SetLength(requestedLength);
-  const int allocatedLength(Length());
-  const int copyLength(allocatedLength - lhsLength < rhsLength
+  const intp allocatedLength(Length());
+  const intp copyLength(allocatedLength - lhsLength < rhsLength
                            ? allocatedLength - lhsLength
                            : rhsLength);
   memcpy(Get() + lhsLength, rhs, copyLength);
@@ -239,7 +239,7 @@ CUtlString &CUtlString::operator+=(const char *rhs) {
 CUtlString &CUtlString::operator+=(char c) {
   Assert(!m_Storage.IsReadOnly());
 
-  int nLength = Length();
+  intp nLength = Length();
   SetLength(nLength + 1);
   m_Storage[nLength] = c;
   m_Storage[nLength + 1] = '\0';
@@ -289,7 +289,7 @@ bool CUtlString::MatchesPattern(const CUtlString &Pattern, int nFlags) const {
       continue;
     }
 
-    int nLength = 0;
+    intp nLength = 0;
 
     while ((*pszPattern) != '*' && (*pszPattern) != 0) {
       nLength++;
@@ -300,7 +300,7 @@ bool CUtlString::MatchesPattern(const CUtlString &Pattern, int nFlags) const {
       const char *pszStartPattern = pszPattern - nLength;
       const char *pszSearch = pszSource;
 
-      for (int i = 0; i < nLength; i++, pszSearch++, pszStartPattern++) {
+      for (intp i = 0; i < nLength; i++, pszSearch++, pszStartPattern++) {
         if ((*pszSearch) == 0) {
           return false;
         }
@@ -366,7 +366,7 @@ int CUtlString::Format(PRINTF_FORMAT_STRING const char *pFormat, ...) {
 void CUtlString::StripTrailingSlash() {
   if (IsEmpty()) return;
 
-  int nLastChar = Length() - 1;
+  intp nLastChar = Length() - 1;
   char c = m_Storage[nLastChar];
   if (c == '\\' || c == '/') {
     m_Storage[nLastChar] = 0;
@@ -374,7 +374,7 @@ void CUtlString::StripTrailingSlash() {
   }
 }
 
-CUtlString CUtlString::Slice(int32 nStart, int32 nEnd) const {
+CUtlString CUtlString::Slice(intp nStart, intp nEnd) const {
   if (nStart < 0)
     nStart = Length() - (-nStart % Length());
   else if (nStart >= Length())
@@ -402,14 +402,14 @@ CUtlString CUtlString::Slice(int32 nStart, int32 nEnd) const {
 }
 
 // Grab a substring starting from the left or the right side.
-CUtlString CUtlString::Left(int32 nChars) const { return Slice(0, nChars); }
+CUtlString CUtlString::Left(intp nChars) const { return Slice(0, nChars); }
 
-CUtlString CUtlString::Right(int32 nChars) const { return Slice(-nChars); }
+CUtlString CUtlString::Right(intp nChars) const { return Slice(-nChars); }
 
 CUtlString CUtlString::Replace(char cFrom, char cTo) const {
   CUtlString ret = *this;
-  int len = ret.Length();
-  for (int i = 0; i < len; i++) {
+  intp len = ret.Length();
+  for (intp i = 0; i < len; i++) {
     if (ret.m_Storage[i] == cFrom) ret.m_Storage[i] = cTo;
   }
 

@@ -308,12 +308,12 @@ bool CCountedStringPool::SaveToBuffer(CUtlBuffer &buffer) {
   buffer.PutUnsignedShort(m_FreeListStart);
 
   buffer.PutInt(m_HashTable.Count());
-  for (int i = 0; i < m_HashTable.Count(); i++) {
+  for (intp i = 0; i < m_HashTable.Count(); i++) {
     buffer.PutUnsignedShort(m_HashTable[i]);
   }
 
   buffer.PutInt(m_Elements.Count());
-  for (int i = 1; i < m_Elements.Count(); i++) {
+  for (intp i = 1; i < m_Elements.Count(); i++) {
     buffer.PutUnsignedShort(m_Elements[i].nNextElement);
     buffer.PutUnsignedChar(m_Elements[i].nReferenceCount);
 
@@ -340,20 +340,20 @@ bool CCountedStringPool::RestoreFromBuffer(CUtlBuffer &buffer) {
 
   m_FreeListStart = buffer.GetUnsignedShort();
 
-  int hashCount = buffer.GetInt();
+  intp hashCount = buffer.GetInt();
   m_HashTable.SetCount(hashCount);
 
-  for (int i = 0; i < hashCount; i++) {
+  for (intp i = 0; i < hashCount; i++) {
     m_HashTable[i] = buffer.GetUnsignedShort();
   }
 
-  int tableCount = buffer.GetInt();
+  intp tableCount = buffer.GetInt();
   if (tableCount > 1) {
     m_Elements.AddMultipleToTail(tableCount - 1);
   }
 
   char tempString[MAX_STRING_SAVE];
-  for (int i = 1; i < tableCount; i++) {
+  for (intp i = 1; i < tableCount; i++) {
     m_Elements[i].nNextElement = buffer.GetUnsignedShort();
     m_Elements[i].nReferenceCount = buffer.GetUnsignedChar();
     buffer.GetString(tempString, sizeof(tempString));

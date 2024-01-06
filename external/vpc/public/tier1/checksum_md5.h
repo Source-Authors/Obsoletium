@@ -17,7 +17,7 @@ struct MD5Context_t {
 
 void MD5Init(MD5Context_t *context);
 void MD5Update(MD5Context_t *context, unsigned char const *buf,
-               unsigned int len);
+               size_t len);
 void MD5Final(unsigned char digest[MD5_DIGEST_LENGTH], MD5Context_t *context);
 
 char *MD5_Print(unsigned char *digest, int hashlen);

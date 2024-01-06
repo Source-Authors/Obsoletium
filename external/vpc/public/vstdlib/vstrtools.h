@@ -30,8 +30,8 @@ VSTRTOOLS_INTERFACE int V_UTF8ToUnicode(const char *pUTF8, wchar_t *pwchDest,
                                         int cubDestSizeInBytes);
 VSTRTOOLS_INTERFACE int V_UnicodeToUTF8(const wchar_t *pUnicode, char *pUTF8,
                                         int cubDestSizeInBytes);
-VSTRTOOLS_INTERFACE int V_UCS2ToUnicode(const ucs2 *pUCS2, wchar_t *pUnicode,
-                                        int cubDestSizeInBytes);
+VSTRTOOLS_INTERFACE intp V_UCS2ToUnicode(const ucs2 *pUCS2, wchar_t *pUnicode,
+                                        intp cubDestSizeInBytes);
 VSTRTOOLS_INTERFACE int V_UCS2ToUTF8(const ucs2 *pUCS2, char *pUTF8,
                                      int cubDestSizeInBytes);
 VSTRTOOLS_INTERFACE int V_UnicodeToUCS2(const wchar_t *pUnicode,

@@ -204,7 +204,7 @@ class CCommand {
   };
 
   int m_nArgc;
-  int m_nArgv0Size;
+  intp m_nArgv0Size;
   char m_pArgSBuffer[COMMAND_MAX_LENGTH];
   char m_pArgvBuffer[COMMAND_MAX_LENGTH];
   const char *m_ppArgv[COMMAND_MAX_ARGC];
@@ -337,10 +337,10 @@ class ConVar : public ConCommandBase, public IConVar {
   void InstallChangeCallback(FnChangeCallback_t callback, bool bInvoke = true);
   void RemoveChangeCallback(FnChangeCallback_t callbackToRemove);
 
-  int GetChangeCallbackCount() const {
+  intp GetChangeCallbackCount() const {
     return m_pParent->m_fnChangeCallbacks.Count();
   }
-  FnChangeCallback_t GetChangeCallback(int slot) const {
+  FnChangeCallback_t GetChangeCallback(intp slot) const {
     return m_pParent->m_fnChangeCallbacks[slot];
   }
 
@@ -387,7 +387,7 @@ class ConVar : public ConCommandBase, public IConVar {
   // Value
   struct CVValue_t {
     char *m_pszString;
-    int m_StringLength;
+    intp m_StringLength;
 
     // Values
     float m_fValue;
@@ -543,7 +543,7 @@ class CSplitScreenAddedConVar : public ConVar {
             pBaseVar->GetMaxValue()),
         m_pBaseVar(pBaseVar),
         m_nSplitScreenSlot(nSplitScreenSlot) {
-    for (int i = 0; i < pBaseVar->GetChangeCallbackCount(); ++i) {
+    for (intp i = 0; i < pBaseVar->GetChangeCallbackCount(); ++i) {
       InstallChangeCallback(pBaseVar->GetChangeCallback(i), false);
     }
     Assert(nSplitScreenSlot >= 1);
