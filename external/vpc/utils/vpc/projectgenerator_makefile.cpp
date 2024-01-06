@@ -101,11 +101,11 @@ void V_MakeAbsoluteCygwinPath(char *pOut, int outLen,
 
 // caller is responsible for free'ing (or leaking) the allocated buffer
 static const char *UsePOSIXSlashes(const char *pStr) {
-  int len = V_strlen(pStr) + 2;
+  intp len = V_strlen(pStr) + 2;
   // Esnure str has '\0' in the end.
   char *str = (char *)calloc(len, sizeof(char));
   V_strncpy(str, pStr, len);
-  for (int i = 0; i < len; i++) {
+  for (intp i = 0; i < len; i++) {
     if (str[i] == '\\') {
       // allow escaping of bash special characters
       if (i + 1 < len && (str[i + 1] != '"' && str[i + 1] != '$' &&
@@ -122,8 +122,8 @@ static const char *UsePOSIXSlashes(const char *pStr) {
 static inline bool CheckExtension(const char *pFilename, const char *pExt) {
   Assert(pExt[0] != '.');
 
-  int nFilenameLen = V_strlen(pFilename);
-  int nExtensionLen = V_strlen(pExt);
+  intp nFilenameLen = V_strlen(pFilename);
+  intp nExtensionLen = V_strlen(pExt);
 
   return (nFilenameLen > nExtensionLen &&
           pFilename[nFilenameLen - nExtensionLen - 1] == '.' &&
@@ -331,7 +331,7 @@ class CProjectGenerator_Makefile : public CBaseProjectDataCollector {
 
   struct Filename_t {
     char szFilename[MAX_PATH];
-    int iBasename;
+    intp iBasename;
   };
 
   class FileSortSortFunc {
@@ -346,7 +346,7 @@ class CProjectGenerator_Makefile : public CBaseProjectDataCollector {
     // Add VPC macros marked to become defines.
     CUtlVector<macro_t *> macroDefines;
     g_pVPC->GetMacrosMarkedForCompilerDefines(macroDefines);
-    for (int i = 0; i < macroDefines.Count(); i++) {
+    for (intp i = 0; i < macroDefines.Count(); i++) {
       macro_t *pMacro = macroDefines[i];
       fprintf(fp, "-D%s=%s ", pMacro->name.String(), pMacro->value.String());
     }

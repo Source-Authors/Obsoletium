@@ -1136,7 +1136,7 @@ void CVPC::ParseBuildOptions(int argc, const char *argv[]) {
 
         // strip the braces
         CUtlString groupName = argv[i];
-        int nLastChar = groupName.Length() - 1;
+        intp nLastChar = groupName.Length() - 1;
         groupName = groupName.Slice(1, nLastChar);
 
         // Add the restricted group name

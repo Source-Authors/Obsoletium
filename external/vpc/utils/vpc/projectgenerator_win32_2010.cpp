@@ -73,10 +73,10 @@ bool CProjectGenerator_Win32_2010::WritePropertyGroupTool(
     CProjectTool *pProjectTool, CProjectConfiguration *pConfiguration) {
   if (!pProjectTool) return true;
 
-  for (int i = 0;
+  for (intp i = 0;
        i < pProjectTool->m_PropertyStates.m_PropertiesInOutputOrder.Count();
        i++) {
-    int sortedIndex =
+    intp sortedIndex =
         pProjectTool->m_PropertyStates.m_PropertiesInOutputOrder[i];
     if (!pProjectTool->m_PropertyStates.m_Properties[sortedIndex]
              .m_pToolProperty->m_bEmitAsGlobalProperty)
@@ -154,9 +154,9 @@ bool CProjectGenerator_Win32_2010::WriteConfiguration(
                                  "%s|%s'\" Label=\"Configuration\"",
                                  pConfig->m_Name.Get(), pTargetPlatformName));
 
-    for (int i = 0;
+    for (intp i = 0;
          i < pConfig->m_PropertyStates.m_PropertiesInOutputOrder.Count(); i++) {
-      int sortedIndex = pConfig->m_PropertyStates.m_PropertiesInOutputOrder[i];
+      intp sortedIndex = pConfig->m_PropertyStates.m_PropertiesInOutputOrder[i];
       if (pConfig->m_PropertyStates.m_Properties[sortedIndex]
               .m_pToolProperty->m_bEmitAsGlobalProperty)
         continue;
@@ -167,9 +167,9 @@ bool CProjectGenerator_Win32_2010::WriteConfiguration(
 
     m_XMLWriter.PopNode(true);
   } else {
-    for (int i = 0;
+    for (intp i = 0;
          i < pConfig->m_PropertyStates.m_PropertiesInOutputOrder.Count(); i++) {
-      int sortedIndex = pConfig->m_PropertyStates.m_PropertiesInOutputOrder[i];
+      intp sortedIndex = pConfig->m_PropertyStates.m_PropertiesInOutputOrder[i];
       if (!WriteProperty(&pConfig->m_PropertyStates.m_Properties[sortedIndex],
                          true, pConfig->m_Name.Get()))
         return false;
@@ -326,11 +326,11 @@ bool CProjectGenerator_Win32_2010::WritePrimaryXML(
     CProjectConfiguration *pConfiguration = NULL;
     if (m_pVCProjGenerator->GetRootConfiguration(configurationNames[i].Get(),
                                                  &pConfiguration)) {
-      for (int j = 0;
+      for (intp j = 0;
            j <
            pConfiguration->m_PropertyStates.m_PropertiesInOutputOrder.Count();
            j++) {
-        int sortedIndex =
+        intp sortedIndex =
             pConfiguration->m_PropertyStates.m_PropertiesInOutputOrder[j];
         if (!pConfiguration->m_PropertyStates.m_Properties[sortedIndex]
                  .m_pToolProperty->m_bEmitAsGlobalProperty)
@@ -534,10 +534,10 @@ bool CProjectGenerator_Win32_2010::WriteTool(const char *pToolName,
     m_XMLWriter.PushNode(pToolName, NULL);
   }
 
-  for (int i = 0;
+  for (intp i = 0;
        i < pProjectTool->m_PropertyStates.m_PropertiesInOutputOrder.Count();
        i++) {
-    int sortedIndex =
+    intp sortedIndex =
         pProjectTool->m_PropertyStates.m_PropertiesInOutputOrder[i];
     if (!pConfig->m_bIsFileConfig) {
       if (pProjectTool->m_PropertyStates.m_Properties[sortedIndex]

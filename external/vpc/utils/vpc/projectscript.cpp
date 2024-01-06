@@ -1962,7 +1962,7 @@ bool CVPC::ParseProjectScript(const char *pScriptName, int depth, bool bQuiet,
 }
 
 void CVPC::AddScriptToCRCCheck(const char *pScriptName, CRC32_t crc) {
-  for (int i = 0; i < m_ScriptList.Count(); i++) {
+  for (intp i = 0; i < m_ScriptList.Count(); i++) {
     if (!V_stricmp(m_ScriptList[i].m_scriptName, pScriptName)) {
       // update
       g_pVPC->m_ScriptList[i].m_crc = crc;
@@ -1970,7 +1970,7 @@ void CVPC::AddScriptToCRCCheck(const char *pScriptName, CRC32_t crc) {
     }
   }
 
-  int index = g_pVPC->m_ScriptList.AddToTail();
+  intp index = g_pVPC->m_ScriptList.AddToTail();
   g_pVPC->m_ScriptList[index].m_scriptName = pScriptName;
   g_pVPC->m_ScriptList[index].m_crc = crc;
 }

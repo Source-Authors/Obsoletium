@@ -290,14 +290,14 @@ uint64_t makeoid_raw(const char *pData, int nDataLen, EOIDType type,
 }
 
 // Make an oid for a unique string identifier, per type, per ordinal
-uint64_t makeoid(const char *pszIdentifier, EOIDType type, int ordinal = 0) {
+uint64_t makeoid(const char *pszIdentifier, EOIDType type, intp ordinal = 0) {
   CFmtStr oidStr("oid1.%s", pszIdentifier);
   return makeoid_raw(oidStr.Access(), oidStr.Length(), type, (int16_t)ordinal);
 }
 
 // Make an oid for a unique string tuple, per type, per ordinal
 uint64_t makeoid2(const char *pszIdentifierA, const char *pszIdentifierB,
-                  EOIDType type, int ordinal = 0) {
+                  EOIDType type, intp ordinal = 0) {
   CFmtStr oidStr("oid2.%s.%s", pszIdentifierA, pszIdentifierB);
   return makeoid_raw(oidStr.Access(), oidStr.Length(), type, (int16_t)ordinal);
 }
@@ -330,13 +330,13 @@ static bool IsDynamicLibrary(const char *pszFileName) {
   return false;
 }
 
-static void UsePOSIXSlashes(const char *pStr, char *pOut, int nOutSize) {
-  int len = V_strlen(pStr) + 2;
+static void UsePOSIXSlashes(const char *pStr, char *pOut, intp nOutSize) {
+  intp len = V_strlen(pStr) + 2;
   char *str = pOut;
   AssertFatal(len <= nOutSize);
 
   V_strncpy(str, pStr, len);
-  for (int i = 0; i < len; i++) {
+  for (intp i = 0; i < len; i++) {
     if (str[i] == '\\') {
       // allow escaping of bash special characters
       if (i + 1 < len && (str[i + 1] != '"' && str[i + 1] != '$' &&
@@ -351,7 +351,7 @@ static void UsePOSIXSlashes(const char *pStr, char *pOut, int nOutSize) {
 // Auto-allocating (not in-place) version.  Caller is responsible for free'ing
 // (or leaking) the allocated buffer. Most users leak. Is bad. :-/
 static char *UsePOSIXSlashes(const char *pStr) {
-  int len = V_strlen(pStr) + 2;
+  intp len = V_strlen(pStr) + 2;
   char *str = (char *)malloc(len * sizeof(char));
   UsePOSIXSlashes(pStr, str, len * sizeof(char));
   return str;
@@ -915,10 +915,10 @@ void CSolutionGenerator_Xcode::EmitBuildSettings(
     ++m_nIndent;
     {
       Write("\"$(GCC_PREPROCESSOR_DEFINITIONS)\",\n");
-      for (int i = 0; i < preprocessorDefines.Count(); i++) {
+      for (intp i = 0; i < preprocessorDefines.Count(); i++) {
         Write("\"%s\",\n", preprocessorDefines[i]);
       }
-      for (int i = 0; i < vpcMacroDefines.Count(); i++) {
+      for (intp i = 0; i < vpcMacroDefines.Count(); i++) {
         Write("\"%s=%s\",\n", vpcMacroDefines[i]->name.String(),
               vpcMacroDefines[i]->value.String());
       }
@@ -1080,7 +1080,7 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
 
       ++cProjectsPreviously;
 
-      int len = V_strlen(line) - 1;
+      intp len = V_strlen(line) - 1;
       while (line[len] == '\n' || line[len] == '\r') {
         line[len] = '\0';
         len--;
@@ -2073,7 +2073,7 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
             ResolveAdditionalProjectDependencies(pCurProject, projects,
                                                  additionalProjectDependencies);
 
-            for (int iTestProject = projects.Count() - 1; iTestProject >= 0;
+            for (intp iTestProject = projects.Count() - 1; iTestProject >= 0;
                  --iTestProject) {
               if (iProject == iTestProject) continue;
 
@@ -2330,7 +2330,7 @@ void CSolutionGenerator_Xcode::GenerateSolutionFile(
 
                 CUtlString sDescription;
                 if (pFileSpecificData->GetOption(g_pOption_Description)) {
-                  int cDescription = V_strlen(pFileSpecificData->GetOption(
+                  intp cDescription = V_strlen(pFileSpecificData->GetOption(
                                          g_pOption_Description)) *
                                      2;
                   sDescription.SetLength(cDescription);

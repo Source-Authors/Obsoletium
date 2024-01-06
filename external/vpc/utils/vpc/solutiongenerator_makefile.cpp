@@ -9,8 +9,8 @@ extern void V_MakeAbsoluteCygwinPath(char *pOut, int outLen,
                                      const char *pRelativePath);
 
 extern void MakeFriendlyProjectName(char *pchProject) {
-  int strLen = V_strlen(pchProject);
-  for (int j = 0; j < strLen; j++) {
+  intp strLen = V_strlen(pchProject);
+  for (intp j = 0; j < strLen; j++) {
     if (pchProject[j] == ' ') pchProject[j] = '_';
     if (pchProject[j] == '(' || pchProject[j] == ')') {
       V_memmove(pchProject + j, pchProject + j + 1, strLen - j);

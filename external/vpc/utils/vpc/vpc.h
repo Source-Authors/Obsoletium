@@ -96,24 +96,24 @@ struct macro_t {
   bool m_bInternalCreatedMacro;
 };
 
-typedef int scriptIndex_t;
+typedef intp scriptIndex_t;
 struct script_t {
   CUtlString name;
   CUtlString m_condition;
 };
 
-typedef int projectIndex_t;
+typedef intp projectIndex_t;
 struct project_t {
   CUtlString name;
   CUtlVector<script_t> scripts;
 };
 
-typedef int groupIndex_t;
+typedef intp groupIndex_t;
 struct group_t {
   CUtlVector<projectIndex_t> projects;
 };
 
-typedef int groupTagIndex_t;
+typedef intp groupTagIndex_t;
 struct groupTag_t {
   groupTag_t() { bSameAsProject = false; }
 
@@ -287,7 +287,7 @@ class CVPC {
                              const char *pValue);
   void ResolveMacrosInString(char const *pString, char *pOutBuff,
                              int outBuffSize);
-  int GetMacrosMarkedForCompilerDefines(CUtlVector<macro_t *> &macroDefines);
+  intp GetMacrosMarkedForCompilerDefines(CUtlVector<macro_t *> &macroDefines);
   void RemoveScriptCreatedMacros();
   const char *GetMacroValue(const char *pName);
   void SetMacro(const char *pName, const char *pValue,

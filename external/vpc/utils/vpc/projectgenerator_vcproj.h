@@ -72,7 +72,7 @@ class CPropertyStates {
   PropertyState_t *GetProperty(const char *pPropertyName);
 
   CUtlVector<PropertyState_t> m_Properties;
-  CUtlSortVector<int, CPropertyStateLessFunc> m_PropertiesInOutputOrder;
+  CUtlSortVector<intp, CPropertyStateLessFunc> m_PropertiesInOutputOrder;
 
  private:
   bool SetStringProperty(ToolProperty_t *pToolProperty,

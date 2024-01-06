@@ -110,7 +110,7 @@ void CGeneratorDefinition::IterateAttributesKey( ToolProperty_t *pProperty, KeyV
 				g_pVPC->VPCError( "Unknown ordinal value for name '%s' in '%s'", pOrdinalName, pProperty->m_ParseString.Get() );
 			}
 
-			int iIndex = pProperty->m_Ordinals.AddToTail();
+			intp iIndex = pProperty->m_Ordinals.AddToTail();
 			pProperty->m_Ordinals[iIndex].m_ParseString = pOrdinalName;
 			pProperty->m_Ordinals[iIndex].m_ValueString = pOrdinalValue;
 		}
@@ -125,7 +125,7 @@ void CGeneratorDefinition::IteratePropertyKey( GeneratorTool_t *pTool, KeyValues
 {
 	//Msg( "Property Key name: %s\n", pPropertyKV->GetName() );
 
-	int iIndex = pTool->m_Properties.AddToTail();
+	intp iIndex = pTool->m_Properties.AddToTail();
 	ToolProperty_t *pProperty = &pTool->m_Properties[iIndex];
 
 	pProperty->m_ParseString = pPropertyKV->GetName();
@@ -146,7 +146,7 @@ void CGeneratorDefinition::IterateToolKey( KeyValues *pToolKV )
 
 	// find or create
 	GeneratorTool_t *pTool = NULL;
-	for ( int i = 0; i < m_Tools.Count(); i++ )
+	for ( intp i = 0; i < m_Tools.Count(); i++ )
 	{
 		if ( !V_stricmp( pToolKV->GetName(), m_Tools[i].m_ParseString ) )
 		{
@@ -156,7 +156,7 @@ void CGeneratorDefinition::IterateToolKey( KeyValues *pToolKV )
 	}
 	if ( !pTool )
 	{
-		int iIndex = m_Tools.AddToTail();
+		intp iIndex = m_Tools.AddToTail();
 		pTool = &m_Tools[iIndex];
 	}
 
@@ -175,7 +175,7 @@ void CGeneratorDefinition::IterateToolKey( KeyValues *pToolKV )
 void CGeneratorDefinition::AssignIdentifiers()
 {
 	CUtlVector< bool > usedPropertyNames;
-	int nTotalPropertyNames = 0;
+	intp nTotalPropertyNames = 0;
 	while ( m_pPropertyNames[nTotalPropertyNames].m_nPropertyId >= 0 )
 	{
 		nTotalPropertyNames++;
@@ -183,7 +183,7 @@ void CGeneratorDefinition::AssignIdentifiers()
 	usedPropertyNames.SetCount( nTotalPropertyNames );
 
 	// assign property identifiers
-	for ( int i = 0; i < m_Tools.Count(); i++ )
+	for ( intp i = 0; i < m_Tools.Count(); i++ )
 	{
 		GeneratorTool_t *pTool = &m_Tools[i];
 
@@ -202,7 +202,7 @@ void CGeneratorDefinition::AssignIdentifiers()
 			pToolName++;
 		}
 		
-		for ( int j = 0; j < pTool->m_Properties.Count(); j++ )
+		for ( intp j = 0; j < pTool->m_Properties.Count(); j++ )
 		{
 			ToolProperty_t *pProperty = &pTool->m_Properties[j];
 
@@ -224,7 +224,7 @@ void CGeneratorDefinition::AssignIdentifiers()
 			CUtlString prefixString = CUtlString( CFmtStr( "%s_%s", pPrefix, pToolName ) );
 
 			bool bFound = false;
-			for ( int k = 0; k < nTotalPropertyNames && !bFound; k++ )
+			for ( intp k = 0; k < nTotalPropertyNames && !bFound; k++ )
 			{
 				if ( !V_stricmp( prefixString.Get(), m_pPropertyNames[k].m_pPrefixName ) )
 				{
@@ -245,7 +245,7 @@ void CGeneratorDefinition::AssignIdentifiers()
 
 	if ( g_pVPC->IsVerbose() )
 	{
-		for ( int i = 0; i < usedPropertyNames.Count(); i++ )
+		for ( intp i = 0; i < usedPropertyNames.Count(); i++ )
 		{
 			if ( !usedPropertyNames[i] )
 			{
@@ -306,13 +306,13 @@ const char *CGeneratorDefinition::GetScriptName( CRC32_t *pCRC )
 
 ToolProperty_t *CGeneratorDefinition::GetProperty( configKeyword_e keyword, const char *pPropertyName )
 {
-	for ( int i = 0; i < m_Tools.Count(); i++ )
+	for ( intp i = 0; i < m_Tools.Count(); i++ )
 	{
 		GeneratorTool_t *pTool = &m_Tools[i];
 		if ( pTool->m_nKeyword != keyword )
 			continue;
 
-		for ( int j = 0; j < pTool->m_Properties.Count(); j++ )
+		for ( intp j = 0; j < pTool->m_Properties.Count(); j++ )
 		{
 			ToolProperty_t *pToolProperty = &pTool->m_Properties[j];
 			if ( !V_stricmp( pToolProperty->m_ParseString.Get(), pPropertyName ) )

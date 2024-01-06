@@ -16,7 +16,7 @@ extern void VPC_SharedKeyword_Conditional();
 //-----------------------------------------------------------------------------
 projectIndex_t VPC_Group_FindOrCreateProject( const char *pName, bool bCreate )
 {
-	for ( int i = 0; i < g_pVPC->m_Projects.Count(); i++ )
+	for ( intp i = 0; i < g_pVPC->m_Projects.Count(); i++ )
 	{
 		if ( !V_stricmp( pName, g_pVPC->m_Projects[i].name.String() ) )
 		{
@@ -27,7 +27,7 @@ projectIndex_t VPC_Group_FindOrCreateProject( const char *pName, bool bCreate )
 	if ( !bCreate )
 		return INVALID_INDEX;
 
-	int index = g_pVPC->m_Projects.AddToTail();
+	intp index = g_pVPC->m_Projects.AddToTail();
 	g_pVPC->m_Projects[index].name = pName;
 
 	return index;
@@ -49,7 +49,7 @@ groupIndex_t VPC_Group_CreateGroup()
 //-----------------------------------------------------------------------------
 groupTagIndex_t VPC_Group_FindOrCreateGroupTag( const char *pName, bool bCreate )
 {
-	for (int i=0; i<g_pVPC->m_GroupTags.Count(); i++)
+	for (intp i=0; i<g_pVPC->m_GroupTags.Count(); i++)
 	{
 		if ( !V_stricmp( pName, g_pVPC->m_GroupTags[i].name.String() ) )
 			return i;
@@ -149,7 +149,7 @@ void VPC_GroupKeyword_Group()
 			projectIndex = VPC_Group_FindOrCreateProject( pToken, false );
 			if ( projectIndex != INVALID_INDEX )
 			{
-				int index = g_pVPC->m_Groups[groupIndex].projects.AddToTail();
+				intp index = g_pVPC->m_Groups[groupIndex].projects.AddToTail();
 				g_pVPC->m_Groups[groupIndex].projects[index] = projectIndex;
 			}
 			else
@@ -291,7 +291,7 @@ void VPC_ParseGroupScript( const char *pScriptName )
 void CVPC::GenerateBuildSet( CProjectDependencyGraph &dependencyGraph )
 {
 	// process +XXX commands
-	for ( int i = 0; i < m_BuildCommands.Count(); i++ )
+	for ( intp i = 0; i < m_BuildCommands.Count(); i++ )
 	{
 		const char *pCommand = m_BuildCommands[i].Get();
 		if ( pCommand[0] == '-' )
@@ -304,10 +304,10 @@ void CVPC::GenerateBuildSet( CProjectDependencyGraph &dependencyGraph )
 
 		CUtlVector<projectIndex_t> projectsToAdd;
 
-		for ( int j=0; j<pGroupTag->groups.Count(); j++ )
+		for ( intp j=0; j<pGroupTag->groups.Count(); j++ )
 		{
 			group_t *pGroup = &g_pVPC->m_Groups[pGroupTag->groups[j]];
-			for ( int k=0; k<pGroup->projects.Count(); k++ )
+			for ( intp k=0; k<pGroup->projects.Count(); k++ )
 			{
 				projectIndex_t targetProject = pGroup->projects[k];
 				if ( pCommand[0] == '*' )
@@ -334,7 +334,7 @@ void CVPC::GenerateBuildSet( CProjectDependencyGraph &dependencyGraph )
 		}
 
 		// Add all the projects in the list.
-		for ( int j=0; j < projectsToAdd.Count(); j++ )
+		for ( intp j=0; j < projectsToAdd.Count(); j++ )
 		{
 			projectIndex_t targetProject = projectsToAdd[j];
 
@@ -346,7 +346,7 @@ void CVPC::GenerateBuildSet( CProjectDependencyGraph &dependencyGraph )
 	}
 
 	// process -XXX commands, explicitly remove tagge projects
-	for ( int i=0; i<m_BuildCommands.Count(); i++ )
+	for ( intp i=0; i<m_BuildCommands.Count(); i++ )
 	{
 		const char *pCommand = m_BuildCommands[i].Get();
 		if ( pCommand[0] == '+' || pCommand[0] == '*' || pCommand[0] == '@' )
@@ -357,10 +357,10 @@ void CVPC::GenerateBuildSet( CProjectDependencyGraph &dependencyGraph )
 			continue;
 		groupTag_t *pGroupTag = &g_pVPC->m_GroupTags[groupTagIndex];
 
-		for ( int j=0; j<pGroupTag->groups.Count(); j++ )
+		for ( intp j=0; j<pGroupTag->groups.Count(); j++ )
 		{
 			group_t *pGroup = &g_pVPC->m_Groups[pGroupTag->groups[j]];
-			for ( int k=0; k<pGroup->projects.Count(); k++ )
+			for ( intp k=0; k<pGroup->projects.Count(); k++ )
 			{
 				g_pVPC->m_TargetProjects.FindAndRemove( pGroup->projects[k] );
 			}

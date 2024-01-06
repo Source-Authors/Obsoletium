@@ -405,15 +405,15 @@ void CScript::SkipToValidToken() {
 //due 	to an optional condition that evaluated false.
 //-----------------------------------------------------------------------------
 bool CScript::ParsePropertyValue(const char *pBaseString, char *pOutBuff,
-                                 int outBuffSize) {
+                                 intp outBuffSize) {
   const char **pScriptData = &m_pScriptData;
   int *pScriptLine = m_pScriptLine;
 
   const char *pToken;
   const char *pNextToken;
   char *pOut = pOutBuff;
-  int remaining = outBuffSize - 1;
-  int len;
+  intp remaining = outBuffSize - 1;
+  intp len;
   bool bAllowNextLine = false;
   char buffer1[MAX_SYSTOKENCHARS];
   char buffer2[MAX_SYSTOKENCHARS];

@@ -62,7 +62,7 @@ class CScript {
   void SkipToValidToken();
 
   bool ParsePropertyValue(const char *pBaseString, char *pOutBuff,
-                          int outBuffSize);
+                          intp outBuffSize);
 
  private:
   const char *SkipWhitespace(const char *data, bool *pHasNewLines,

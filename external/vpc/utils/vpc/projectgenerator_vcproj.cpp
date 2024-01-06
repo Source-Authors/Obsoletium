@@ -320,7 +320,7 @@ bool CPropertyStates::SetStringProperty(ToolProperty_t *pToolProperty,
   }
 
   if (pToolProperty->m_bAppendSlash) {
-    int len = V_strlen(buff);
+    intp len = V_strlen(buff);
     if (len >= 1 && buff[len - 1] != '\\') {
       V_strncat(buff, "\\", sizeof(buff));
     }
@@ -329,7 +329,7 @@ bool CPropertyStates::SetStringProperty(ToolProperty_t *pToolProperty,
   if (!V_stricmp(pToolProperty->m_ParseString.Get(), "$CommandLine") &&
       !V_strnicmp(buff, "echo ", 5)) {
     // the COM layer auto appended a CR-LF for a command line with an echo
-    int len = V_strlen(buff);
+    intp len = V_strlen(buff);
     if ((len >= 1 && buff[len - 1] != '\n') &&
         (len >= 12 && V_stricmp(buff + len - 12, "&#x0D;&#x0A;"))) {
       V_strncat(buff, "\n", sizeof(buff));
@@ -355,7 +355,7 @@ bool CPropertyStates::SetStringProperty(ToolProperty_t *pToolProperty,
   }
 
   // add
-  int iIndex = m_Properties.AddToTail();
+  intp iIndex = m_Properties.AddToTail();
   m_Properties[iIndex].m_pToolProperty = pToolProperty;
   m_Properties[iIndex].m_StringValue = buff;
 
@@ -431,7 +431,7 @@ bool CPropertyStates::SetListProperty(ToolProperty_t *pToolProperty,
   }
 
   // add
-  int iIndex = m_Properties.AddToTail();
+  intp iIndex = m_Properties.AddToTail();
   m_Properties[iIndex].m_pToolProperty = pToolProperty;
   m_Properties[iIndex].m_OrdinalString = buff;
   m_Properties[iIndex].m_StringValue = pNewOrdinalValue;
@@ -485,7 +485,7 @@ bool CPropertyStates::SetBoolProperty(ToolProperty_t *pToolProperty,
   }
 
   // add
-  int iIndex = m_Properties.AddToTail();
+  intp iIndex = m_Properties.AddToTail();
   m_Properties[iIndex].m_pToolProperty = pToolProperty;
   m_Properties[iIndex].m_StringValue = pNewOrdinalValue;
 
@@ -559,7 +559,7 @@ bool CPropertyStates::SetIntegerProperty(ToolProperty_t *pToolProperty,
   }
 
   // add
-  int iIndex = m_Properties.AddToTail();
+  intp iIndex = m_Properties.AddToTail();
   m_Properties[iIndex].m_pToolProperty = pToolProperty;
   m_Properties[iIndex].m_StringValue = buff;
 
@@ -1052,7 +1052,7 @@ bool CVCProjGenerator::StartFile(const char *pFilename,
   // problems (i.e. extension comparison, etc) all files get serialized to xml
   // output with mandatory surrounding quotes
   if (cleanFilename[0] == '\"') {
-    int len = V_strlen(cleanFilename);
+    intp len = V_strlen(cleanFilename);
     if (len > 1 && cleanFilename[len - 1] == '\"') {
       memcpy(cleanFilename, cleanFilename + 1, len - 2);
       cleanFilename[len - 2] = '\0';
@@ -1730,7 +1730,7 @@ void CVCProjGenerator::ApplyInternalPreprocessorDefinitions() {
   // get all the vpc macros that have been marked for auto adding as compiler
   // define
   CUtlString extraDefineString;
-  for (int i = 0; i < macroDefines.Count(); i++) {
+  for (intp i = 0; i < macroDefines.Count(); i++) {
     macro_t *pMacro = macroDefines[i];
 
     CUtlString tempString;

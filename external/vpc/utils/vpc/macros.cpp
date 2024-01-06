@@ -35,14 +35,14 @@ macro_t *CVPC::FindOrCreateMacro(const char *pName, bool bCreate,
     return NULL;
   }
 
-  int index = m_Macros.AddToTail();
+  intp index = m_Macros.AddToTail();
   m_Macros[index].name = pName;
   m_Macros[index].value = pValue;
 
   return &m_Macros[index];
 }
 
-int CVPC::GetMacrosMarkedForCompilerDefines(
+intp CVPC::GetMacrosMarkedForCompilerDefines(
     CUtlVector<macro_t *> &macroDefines) {
   macroDefines.Purge();
 
@@ -126,7 +126,7 @@ void CVPC::ResolveMacrosInStringInternal(char const *pString, char *pOutBuff,
     }
   } while (!bDone);
 
-  int len = V_strlen(buffer1);
+  intp len = V_strlen(buffer1);
   if (outBuffSize < len) len = outBuffSize;
   memcpy(pOutBuff, buffer1, len);
   pOutBuff[len] = '\0';
