@@ -217,10 +217,15 @@ bool Sys_LoadFileIntoBuffer(const char *pchFileIn, CUtlBuffer &buf,
                             bool bText) {
   buf.SetBufferType(bText, bText);
 
+#ifndef _WIN64
   struct stat statBuf;
   if (::stat(pchFileIn, &statBuf) != 0) return false;
+#else
+  struct _stat64 statBuf;
+  if (::_stat64(pchFileIn, &statBuf) != 0) return false;
+#endif
 
-  buf.EnsureCapacity((int)(statBuf.st_size + 1));
+  buf.EnsureCapacity(statBuf.st_size + 1);
   if (!buf.IsValid()) return false;
 
   FILE *f{fopen(pchFileIn, "rb")};
@@ -527,14 +532,14 @@ bool Sys_GetActualFilenameCase(const char *pFilename, char *pOutputBuffer,
   V_FixSlashes(filenameBuffer);
   V_RemoveDotSlashes(filenameBuffer);
 
-  int nFilenameLength = V_strlen(filenameBuffer);
+  intp nFilenameLength = V_strlen(filenameBuffer);
 
   CUtlString actualFilename;
 
   // march along filename, resolving up to next seperator
-  int nLastComponentStart = 0;
+  intp nLastComponentStart = 0;
   bool bAddSeparator = false;
-  int i = 0;
+  intp i = 0;
   while (i < nFilenameLength) {
     // cannot resolve these, emit as-is
     if (!V_strnicmp(filenameBuffer + i, ".\\", 2)) {
