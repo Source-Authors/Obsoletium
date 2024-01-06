@@ -129,7 +129,7 @@ class CKeyValuesSystem : public IKeyValuesSystem {
   };
   CUtlMemoryPool m_HashItemMemPool;
   CUtlVector<hash_item_t> m_HashTable;
-  int CaseInsensitiveHash(const char *string, int iBounds);
+  int CaseInsensitiveHash(const char *string, intp iBounds);
 
   struct MemoryLeakTracker_t {
     int nameIndex;
@@ -301,14 +301,14 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString(const char *name,
 
       // build up the new item
       item->next = NULL;
-      int numStringBytes = V_strlen(name);
+      intp numStringBytes = V_strlen(name);
       char *pString = (char *)m_Strings.Alloc(numStringBytes + 1 + 3);
       if (!pString) {
         Error("Out of keyvalue string space");
         return -1;
       }
 
-      item->stringIndex = pString - (char *)m_Strings.GetBase();
+      item->stringIndex = (int)(pString - (char *)m_Strings.GetBase());
       V_memcpy(pString, name, numStringBytes);
 
       // string null-terminator + 3 alternative spelling bytes
@@ -333,7 +333,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive(
   MEM_ALLOC_CREDIT();
 
   int hash = CaseInsensitiveHash(name, m_HashTable.Count());
-  int numNameStringBytes = -1;
+  intp numNameStringBytes = -1;
   int i = 0;
   hash_item_t *item = &m_HashTable[hash];
   while (1) {
@@ -410,14 +410,14 @@ HKeySymbol CKeyValuesSystem::GetSymbolForStringCaseSensitive(
 
       // build up the new item
       item->next = NULL;
-      int numStringBytes = V_strlen(name);
+      intp numStringBytes = V_strlen(name);
       char *pString = (char *)m_Strings.Alloc(numStringBytes + 1 + 3);
       if (!pString) {
         Error("Out of keyvalue string space");
         return -1;
       }
 
-      item->stringIndex = pString - (char *)m_Strings.GetBase();
+      item->stringIndex = (int)(pString - (char *)m_Strings.GetBase());
       V_memcpy(pString, name, numStringBytes);
       // string null-terminator + 3 alternative spelling bytes
       *reinterpret_cast<uint32 *>(pString + numStringBytes) = 0;
@@ -468,7 +468,7 @@ void CKeyValuesSystem::RemoveKeyValuesFromMemoryLeakList(void *pMem) {
 //-----------------------------------------------------------------------------
 // Purpose: generates a simple hash value for a string
 //-----------------------------------------------------------------------------
-int CKeyValuesSystem::CaseInsensitiveHash(const char *string, int iBounds) {
+int CKeyValuesSystem::CaseInsensitiveHash(const char *string, intp iBounds) {
   unsigned int hash = 0;
 
   for (; *string != 0; string++) {

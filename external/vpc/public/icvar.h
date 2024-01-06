@@ -101,7 +101,7 @@ abstract_class ICvar : public IAppSystem {
   virtual void AddSplitScreenConVars() = 0;
   virtual void RemoveSplitScreenConVars(CVarDLLIdentifier_t id) = 0;
 
-  virtual int GetConsoleDisplayFuncCount() const = 0;
+  virtual intp GetConsoleDisplayFuncCount() const = 0;
   virtual void GetConsoleText(int nDisplayFuncIndex, char *pchText,
                               size_t bufSize) const = 0;
 
