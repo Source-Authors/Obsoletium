@@ -26,7 +26,7 @@ namespace {
  * @return true if two phase, false if not.
  */
 bool IsTwoPhaseVpc(int argc, char **argv) noexcept {
-  for (int i = 0; i < argc; i++) {
+  for (int i{0}; i < argc; i++) {
     if (V_stricmp("/windows", argv[i]) == 0) {
       return true;
     }
@@ -97,9 +97,9 @@ int vpcmain(int argc, char **argv)
 
         if (sign == '+' || sign == '-' || sign == '/' || sign == '*' ||
             sign == '@') {
-          V_strncpy(solution_path, &next_arg[1], (int)std::size(solution_path));
+          V_strncpy(solution_path, &next_arg[1], static_cast<intp>(std::size(solution_path)));
         } else {
-          V_strncpy(solution_path, next_arg, (int)std::size(solution_path));
+          V_strncpy(solution_path, next_arg, static_cast<intp>(std::size(solution_path)));
           i++;
         }
 

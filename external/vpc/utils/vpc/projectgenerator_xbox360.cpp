@@ -91,7 +91,7 @@ bool CProjectGenerator_Xbox360::WriteConfiguration(
   // write configuration properties
   for (int i = 0;
        i < pConfig->m_PropertyStates.m_PropertiesInOutputOrder.Count(); i++) {
-    int sortedIndex = pConfig->m_PropertyStates.m_PropertiesInOutputOrder[i];
+    intp sortedIndex = pConfig->m_PropertyStates.m_PropertiesInOutputOrder[i];
     WriteProperty(&pConfig->m_PropertyStates.m_Properties[sortedIndex]);
   }
 
@@ -252,7 +252,7 @@ bool CProjectGenerator_Xbox360::WriteTool(const char *pToolName,
   for (int i = 0;
        i < pProjectTool->m_PropertyStates.m_PropertiesInOutputOrder.Count();
        i++) {
-    int sortedIndex =
+    intp sortedIndex =
         pProjectTool->m_PropertyStates.m_PropertiesInOutputOrder[i];
     WriteProperty(&pProjectTool->m_PropertyStates.m_Properties[sortedIndex]);
   }

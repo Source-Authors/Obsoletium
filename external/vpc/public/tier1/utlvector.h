@@ -55,6 +55,11 @@ class CUtlVector {
   T *Base() { return m_Memory.Base(); }
   const T *Base() const { return m_Memory.Base(); }
 
+  auto begin() noexcept { return Base(); }
+  auto end() noexcept { return Base() + Count(); }
+  auto begin() const noexcept { return Base(); }
+  auto end() const noexcept { return Base() + Count(); }
+
   // Returns the number of elements in the vector
   intp Count() const;
 

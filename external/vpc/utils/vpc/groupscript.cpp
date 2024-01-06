@@ -226,13 +226,13 @@ void VPC_GroupKeyword_Project()
 //	VPC_ParseGroupScript
 //
 //-----------------------------------------------------------------------------
-void VPC_ParseGroupScript( const char *pScriptName )
+void VPC_ParseGroupScript( const char *script_name )
 {
 	char	szScriptName[MAX_PATH];
 	const char	*pToken;
 
 	// caller's pointer is aliased
-	strcpy( szScriptName, pScriptName );
+	strcpy( szScriptName, script_name );
 	V_FixSlashes( szScriptName );
 
 	g_pVPC->VPCStatus( false, "Parsing: %s", szScriptName );

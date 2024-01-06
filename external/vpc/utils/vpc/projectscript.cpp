@@ -1481,9 +1481,9 @@ void VPC_PrepareToReadScript(const char *pInputScriptName, int depth,
 
   // load it with the file expansions to compute it's CRC, so we notice if new
   // matching files appear on disk and regenerate the project correctly.
-  int scriptLen =
+  size_t scriptLen =
       Sys_LoadTextFileWithIncludes(szScriptName, &pScriptBuffer, true);
-  if (scriptLen < 0) {
+  if (scriptLen == std::numeric_limits<size_t>::max()) {
     // unexpected due to existence check
     g_pVPC->VPCError("Cannot open %s", szScriptName);
   }

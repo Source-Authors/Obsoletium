@@ -282,16 +282,16 @@ const char *CScript::GetToken(const char **dataptr, bool allowLineBreaks,
   return m_Token;
 }
 
-void CScript::PushScript(const char *pFilename) {
+void CScript::PushScript(const char *file_name) {
   // parse the text script
-  if (!Sys_Exists(pFilename)) {
-    g_pVPC->VPCError("Cannot open %s", pFilename);
+  if (!Sys_Exists(file_name)) {
+    g_pVPC->VPCError("Cannot open %s", file_name);
   }
 
-  char *pScriptBuffer;
-  Sys_LoadTextFileWithIncludes(pFilename, &pScriptBuffer, false);
+  char *script;
+  Sys_LoadTextFileWithIncludes(file_name, &script, false);
 
-  PushScript(pFilename, pScriptBuffer, 1, true);
+  PushScript(file_name, script, 1, true);
 }
 
 void CScript::PushScript(const char *pScriptName, const char *pScriptData,

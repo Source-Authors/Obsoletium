@@ -15,12 +15,21 @@
 #define VPCCRCCHECK_FILE_VERSION_STRING "[vpc crc file version 2]"
 
 [[noreturn]] void Sys_Error(PRINTF_FORMAT_STRING const char *format, ...);
-int Sys_LoadTextFileWithIncludes(const char *filename, char **bufferptr,
-                                 bool bInsertFileMacroExpansion);
 
-bool VPC_CheckProjectDependencyCRCs(const char *pProjectFilename,
-                                    const char *pReferenceSupplementalString,
-                                    char *pErrorString, int nErrorStringLength);
+size_t Sys_LoadTextFileWithIncludes(const char *file_name, char **buffer,
+                                    bool should_insert_file_macro_expansion);
+
+bool VPC_CheckProjectDependencyCRCs(const char *project_file_name,
+                                    const char *reference_summplemental,
+                                    char *error, int error_length);
+
+template <int error_length>
+bool VPC_CheckProjectDependencyCRCs(const char *project_file_name,
+                                    const char *reference_summplemental,
+                                    char (&error)[error_length]) {
+  return VPC_CheckProjectDependencyCRCs(
+      project_file_name, reference_summplemental, error, error_length);
+}
 
 // Used by vpccrccheck.exe or by vpc.exe to do the CRC check that's initiated in
 // the pre-build steps.

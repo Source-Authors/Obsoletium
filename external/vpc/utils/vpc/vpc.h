@@ -163,7 +163,8 @@ enum EVSVersion {
 class CVPC {
  public:
   CVPC();
-  ~CVPC();
+  // BUGBUG: There is probably some actual cleanup to be done here.
+  ~CVPC() noexcept = default;
 
   bool Init(int argc, const char **argv);
   void Shutdown(bool bHasError = false);
@@ -182,38 +183,38 @@ class CVPC {
 
   CScript &GetScript() { return m_Script; }
 
-  bool IsVerbose() { return m_bVerbose; }
-  bool IsQuiet() { return m_bQuiet; }
-  bool IsShowDependencies() { return m_bShowDeps; }
-  bool IsForceGenerate() { return m_bForceGenerate; }
-  bool IsPosixPCHDisabled() { return m_bNoPosixPCH; }
-  bool IsForceIterate() { return m_bForceIterate; }
-  bool IsDecorateProject() { return m_bDecorateProject; }
+  bool IsVerbose() const { return m_bVerbose; }
+  bool IsQuiet() const { return m_bQuiet; }
+  bool IsShowDependencies() const { return m_bShowDeps; }
+  bool IsForceGenerate() const { return m_bForceGenerate; }
+  bool IsPosixPCHDisabled() const { return m_bNoPosixPCH; }
+  bool IsForceIterate() const { return m_bForceIterate; }
+  bool IsDecorateProject() const { return m_bDecorateProject; }
   const char *GetDecorateString() { return m_strDecorate.String(); }
-  bool IsCheckFiles() { return m_bCheckFiles; }
-  bool Is2010() {
+  bool IsCheckFiles() const { return m_bCheckFiles; }
+  bool Is2010() const {
     return m_bUseVS2010FileFormat || m_eVSVersion == k_EVSVersion_2010;
   }
-  bool Is2012() {
+  bool Is2012() const {
     return m_eVSVersion == k_EVSVersion_2012;
   }  // When this returns true so does Is2010() because of the file format
      // similarities
-  bool Is2013() {
+  bool Is2013() const {
     return m_eVSVersion == k_EVSVersion_2013;
   }  // When this returns true so does Is2010() because of the file format
      // similarities
-  bool Is2015() {
+  bool Is2015() const {
     return m_eVSVersion == k_EVSVersion_2015;
   }  // When this returns true so does Is2010() because of the file format
      // similarities
-  bool BUse2008() { return m_eVSVersion == k_EVSVersion_2008; }
-  bool IsDedicatedBuild() { return m_bDedicatedBuild; }
-  bool IsUnity() { return m_bUseUnity; }
-  bool IsShowCaseIssues() { return m_bShowCaseIssues; }
-  bool UseValveBinDir() { return m_bUseValveBinDir; }
-  bool IsVerboseMakefile() { return m_bVerboseMakefile; }
-  bool BUseP4SCC() { return m_bP4SCC; }
-  bool BUse32BitTools() { return m_b32BitTools; }
+  bool BUse2008() const { return m_eVSVersion == k_EVSVersion_2008; }
+  bool IsDedicatedBuild() const { return m_bDedicatedBuild; }
+  bool IsUnity() const { return m_bUseUnity; }
+  bool IsShowCaseIssues() const { return m_bShowCaseIssues; }
+  bool UseValveBinDir() const { return m_bUseValveBinDir; }
+  bool IsVerboseMakefile() const { return m_bVerboseMakefile; }
+  bool BUseP4SCC() const { return m_bP4SCC; }
+  bool BUse32BitTools() const { return m_b32BitTools; }
 
   void DecorateProjectName(char *pchProjectName);
 
@@ -221,7 +222,7 @@ class CVPC {
   void IncrementFileMissing() { ++m_FilesMissing; }
   void ResetMissingFilesCount() { m_FilesMissing = 0; }
 
-  bool IsIgnoreRedundancyWarning() { return m_bIgnoreRedundancyWarning; }
+  bool IsIgnoreRedundancyWarning() const { return m_bIgnoreRedundancyWarning; }
   void SetIgnoreRedundancyWarning(bool bSet) {
     m_bIgnoreRedundancyWarning = bSet;
   }
@@ -496,7 +497,7 @@ struct folderConfig_t {
   CUtlVector<CUtlString> vecConfigurationNames;
   CScriptSource scriptSource;
 
-  bool BHasConfig() { return vecConfigurationNames.Count() > 0; }
+  bool BHasConfig() const { return vecConfigurationNames.Count() > 0; }
   void Clear() { vecConfigurationNames.RemoveAll(); }
 };
 

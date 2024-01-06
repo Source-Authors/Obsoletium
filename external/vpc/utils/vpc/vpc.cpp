@@ -11,6 +11,7 @@
 
 #include "ilaunchabledll.h"
 #include <ctime>
+#include <algorithm>
 
 #ifdef _WIN32
 #include <process.h>
@@ -42,11 +43,11 @@ const char *g_IncludeSeparators[2] = {";", ","};
 #endif
 
 CVPC::CVPC() {
-  m_pP4Module = NULL;
-  m_pFilesystemModule = NULL;
+  m_pP4Module = nullptr;
+  m_pFilesystemModule = nullptr;
 
   m_nArgc = 0;
-  m_ppArgv = NULL;
+  m_ppArgv = nullptr;
 
   m_bVerbose = false;
   m_bQuiet = false;
@@ -80,7 +81,7 @@ CVPC::CVPC() {
 #ifdef VPC_SCC_INTEGRATION
   m_bP4SCC = true;
 #endif
-  if (getenv("VPC_SRCCTL") != NULL) {
+  if (getenv("VPC_SRCCTL") != nullptr) {
     m_bP4SCC = V_atoi(getenv("VPC_SRCCTL")) != 0;
   }
 
@@ -100,8 +101,8 @@ CVPC::CVPC() {
   // missing file) cause needles rebuilds
   m_bCheckFiles = true;
 
-  m_pProjectGenerator = NULL;
-  m_pSolutionGenerator = NULL;
+  m_pProjectGenerator = nullptr;
+  m_pSolutionGenerator = nullptr;
 
 #ifdef OSX
   m_bForceIterate = true;
@@ -109,13 +110,13 @@ CVPC::CVPC() {
   m_bForceIterate = false;
 #endif
 
-  m_pPhase1Projects = NULL;
+  m_pPhase1Projects = nullptr;
 }
 
-// BUGBUG: There is probably some actual cleanup to be done here.
-CVPC::~CVPC() = default;
-
 bool CVPC::Init(int argc, const char **argv) {
+  Assert(argc >= 0);
+  Assert(argv);
+
   m_nArgc = argc;
   m_ppArgv = argv;
 
@@ -141,12 +142,13 @@ bool CVPC::Init(int argc, const char **argv) {
   LoadPerforceInterface();
 
   // vpc may have been run from wrong location, restart self
-  bool bIsRestart = false;
-  if (RestartFromCorrectLocation(&bIsRestart)) {
+  bool is_restart_child{false};
+  if (RestartFromCorrectLocation(&is_restart_child)) {
     // successfully ran under restart condition, all done
     return false;
   }
-  if (bIsRestart) {
+
+  if (is_restart_child) {
     // this process is the restart child, cull the internal private restart
     // guard option otherwise it gets confused as a build option
     m_nArgc--;
@@ -156,7 +158,7 @@ bool CVPC::Init(int argc, const char **argv) {
   Log_Msg(LOG_VPC, "Visual Studio, Xbox 360, PlayStation 3, ");
   Log_Msg(LOG_VPC, "Xcode and Make (Build: %s %s)\n", __DATE__, __TIME__);
   Log_Msg(LOG_VPC,
-          "(C) Copyright 1996-2023, Valve Corporation, All rights reserved.\n");
+          "(C) Copyright 1996-2024, Valve Corporation, All rights reserved.\n");
   Log_Msg(LOG_VPC, "\n");
 
   return true;
@@ -170,8 +172,14 @@ void CVPC::Shutdown(bool bHasError) {
   }
 
   if (!m_TempGroupScriptFilename.IsEmpty()) {
+    const char *temp_path{m_TempGroupScriptFilename.Get()};
+
     // delete temp work file
-    _unlink(m_TempGroupScriptFilename.Get());
+    if (_unlink(temp_path)) {
+      VPCWarning("Unlinking temp file %s failed: %s", temp_path,
+                 strerror(errno));
+    }
+
     m_TempGroupScriptFilename.Clear();
   }
 
@@ -356,7 +364,7 @@ void CVPC::VPCStatus(bool bAlwaysSpew, PRINTF_FORMAT_STRING const char *format,
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 intp CVPC::GetProjectsInGroup(CUtlVector<projectIndex_t> &projectList,
-                             const char *pGroupName) {
+                              const char *pGroupName) {
   projectList.RemoveAll();
 
   // Find the specified group
@@ -486,47 +494,51 @@ bool CVPC::CheckBinPath(char *pOutBinPath, int outBinPathSize) {
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CVPC::DetermineSourcePath() {
-  char szSourcePath[MAX_PATH];
-  char szLastDirectory[MAX_PATH];
+  char source_path[MAX_PATH];
+  char last_directory[MAX_PATH];
 
-  char szOldPath[MAX_PATH];
-  V_GetCurrentDirectory(szOldPath, sizeof(szOldPath));
+  char old_path[MAX_PATH];
+  V_GetCurrentDirectory(old_path, sizeof(old_path));
 
   // find vpc_scripts from cwd
-  szLastDirectory[0] = '\0';
-  bool bFound = false;
+  last_directory[0] = '\0';
+  bool is_found{false};
+
   while (1) {
-    V_GetCurrentDirectory(szSourcePath, sizeof(szSourcePath));
-    if (!V_stricmp(szSourcePath, szLastDirectory)) {
+    V_GetCurrentDirectory(source_path, sizeof(source_path));
+    if (!V_stricmp(source_path, last_directory)) {
       // can back up no further
       break;
     }
-    V_strncpy(szLastDirectory, szSourcePath, sizeof(szLastDirectory));
 
-    char szTestDir[MAX_PATH];
-    V_ComposeFileName(szSourcePath, "vpc_scripts", szTestDir,
-                      sizeof(szTestDir));
+    V_strncpy(last_directory, source_path, sizeof(last_directory));
+
+    char test_directory[MAX_PATH];
+    V_ComposeFileName(source_path, "vpc_scripts", test_directory,
+                      sizeof(test_directory));
+
     struct _stat statBuf;
-    if (_stat(szTestDir, &statBuf) != -1) {
-      bFound = true;
+    if (_stat(test_directory, &statBuf) != -1) {
+      is_found = true;
       break;
     }
 
     // previous dir
-    char szPrevDir[MAX_PATH];
-    V_ComposeFileName(szSourcePath, "..", szPrevDir, sizeof(szPrevDir));
-    V_SetCurrentDirectory(szPrevDir);
+    char prev_directory[MAX_PATH];
+    V_ComposeFileName(source_path, "..", prev_directory,
+                      sizeof(prev_directory));
+    V_SetCurrentDirectory(prev_directory);
   }
 
-  if (!bFound) {
+  if (!is_found) {
     VPCError(
         "Failed to determine source directory from current path. Expecting "
         "'vpc_scripts' in source path.");
   }
 
   // Remember the source path and restore the path to where it was.
-  m_SourcePath = szSourcePath;
-  V_SetCurrentDirectory(szOldPath);
+  m_SourcePath = source_path;
+  V_SetCurrentDirectory(old_path);
 
   // always emit source path, identifies MANY redundant user problems
   // users can easily run from an unintended place due to botched path, mangled
@@ -552,21 +564,20 @@ bool CVPC::IsProjectCurrent(const char *pOutputFilename, bool bSpewStatus) {
     return false;
   }
 
-  char errorString[1024];
-  bool bCRCValid = VPC_CheckProjectDependencyCRCs(
-      pOutputFilename, m_SupplementalCRCString.Get(), errorString,
-      sizeof(errorString));
+  char error[1024];
+  bool is_crc_valid{VPC_CheckProjectDependencyCRCs(
+      pOutputFilename, m_SupplementalCRCString.Get(), error)};
 
   if (bSpewStatus) {
-    if (bCRCValid) {
+    if (is_crc_valid) {
       VPCStatus(true, "Valid: '%s' Passes CRC Checks.", pOutputFilename);
     } else {
       VPCStatus(true, "Stale: '%s' Requires Rebuild. [%s]", pOutputFilename,
-                errorString);
+                error);
     }
   }
 
-  return bCRCValid;
+  return is_crc_valid;
 }
 
 //-----------------------------------------------------------------------------
@@ -746,27 +757,31 @@ void CVPC::SpewUsage(void) {
 
   if (m_Conditionals.Count() && m_bSpewPlatforms) {
     bool bFirstDefine = false;
-    for (int i = 0; i < m_Conditionals.Count(); i++) {
-      if (m_Conditionals[i].type != CONDITIONAL_PLATFORM) continue;
+    for (auto &&c : m_Conditionals) {
+      if (c.type != CONDITIONAL_PLATFORM) continue;
+
       if (!bFirstDefine) {
         Log_Msg(LOG_VPC, "\n--- PLATFORMS ---\n");
         bFirstDefine = true;
       }
-      Log_Msg(LOG_VPC, "%s%s\n", m_Conditionals[i].upperCaseName.String(),
-              m_Conditionals[i].m_bDefined ? " = 1" : "");
+
+      Log_Msg(LOG_VPC, "%s%s\n", c.upperCaseName.String(),
+              c.m_bDefined ? " = 1" : "");
     }
   }
 
   if (m_Conditionals.Count() && m_bSpewGames) {
     bool bFirstGame = false;
-    for (int i = 0; i < m_Conditionals.Count(); i++) {
-      if (m_Conditionals[i].type != CONDITIONAL_GAME) continue;
+    for (auto &&c : m_Conditionals) {
+      if (c.type != CONDITIONAL_GAME) continue;
+
       if (!bFirstGame) {
         Log_Msg(LOG_VPC, "\n--- GAMES ---\n");
         bFirstGame = true;
       }
-      Log_Msg(LOG_VPC, "%s%s\n", m_Conditionals[i].upperCaseName.String(),
-              m_Conditionals[i].m_bDefined ? " = 1" : "");
+
+      Log_Msg(LOG_VPC, "%s%s\n", c.upperCaseName.String(),
+              c.m_bDefined ? " = 1" : "");
     }
   }
 
@@ -774,8 +789,8 @@ void CVPC::SpewUsage(void) {
     // spew all sorted projects
     Log_Msg(LOG_VPC, "\n--- PROJECTS ---\n");
     CUtlRBTree<const char *> sorted(0, 0, CaselessStringLessThan);
-    for (int i = 0; i < m_Projects.Count(); i++) {
-      sorted.Insert(m_Projects[i].name.String());
+    for (auto &&p : m_Projects) {
+      sorted.Insert(p.name.String());
     }
     for (auto i = sorted.FirstInorder(); i != sorted.InvalidIndex();
          i = sorted.NextInorder(i)) {
@@ -787,9 +802,9 @@ void CVPC::SpewUsage(void) {
     // spew all sorted groups
     Log_Msg(LOG_VPC, "\n--- GROUPS ---\n");
     CUtlRBTree<const char *> sorted(0, 0, CaselessStringLessThan);
-    for (int i = 0; i < g_pVPC->m_GroupTags.Count(); i++) {
-      if (!g_pVPC->m_GroupTags[i].bSameAsProject) {
-        sorted.Insert(g_pVPC->m_GroupTags[i].name.String());
+    for (auto &&gt : g_pVPC->m_GroupTags) {
+      if (!gt.bSameAsProject) {
+        sorted.Insert(gt.name.String());
       }
     }
     for (auto i = sorted.FirstInorder(); i != sorted.InvalidIndex();
@@ -814,19 +829,21 @@ void CVPC::SpewUsage(void) {
     // spew details about each command
     Log_Msg(LOG_VPC, "\nUser Build Commands:\n");
     Log_Msg(LOG_VPC, "--------------------\n");
-    for (int i = 0; i < m_BuildCommands.Count(); i++) {
-      Log_Msg(LOG_VPC, "%s\n", m_BuildCommands[i].String());
+    for (auto &&c : m_BuildCommands) {
+      Log_Msg(LOG_VPC, "%s\n", c.String());
+
       groupTagIndex_t groupTagIndex =
-          VPC_Group_FindOrCreateGroupTag(m_BuildCommands[i].Get() + 1, false);
+          VPC_Group_FindOrCreateGroupTag(c.Get() + 1, false);
       if (groupTagIndex == INVALID_INDEX) {
         Log_Msg(LOG_VPC, "   ??? (Unknown Group)\n");
       } else {
-        groupTag_t *pGroupTag = &g_pVPC->m_GroupTags[groupTagIndex];
-        for (int j = 0; j < pGroupTag->groups.Count(); j++) {
-          group_t *pGroup = &m_Groups[pGroupTag->groups[j]];
-          for (int k = 0; k < pGroup->projects.Count(); k++) {
-            Log_Msg(LOG_VPC, "   %s\n",
-                    m_Projects[pGroup->projects[k]].name.String());
+        const groupTag_t &groupTag = g_pVPC->m_GroupTags[groupTagIndex];
+
+        for (auto &&g : groupTag.groups) {
+          const group_t &group = m_Groups[g];
+
+          for (auto &&p : group.projects) {
+            Log_Msg(LOG_VPC, "   %s\n", m_Projects[p].name.String());
           }
         }
       }
@@ -834,9 +851,10 @@ void CVPC::SpewUsage(void) {
 
     Log_Msg(LOG_VPC, "\nTarget Projects:\n");
     Log_Msg(LOG_VPC, "----------------\n");
+
     if (m_TargetProjects.Count()) {
-      for (int i = 0; i < m_TargetProjects.Count(); i++) {
-        Log_Msg(LOG_VPC, "%s\n", m_Projects[m_TargetProjects[i]].name.String());
+      for (auto &&p : m_TargetProjects) {
+        Log_Msg(LOG_VPC, "%s\n", m_Projects[p].name.String());
       }
     } else {
       Log_Msg(LOG_VPC, "Empty Set (no output)\n");
@@ -844,42 +862,51 @@ void CVPC::SpewUsage(void) {
 
     Log_Msg(LOG_VPC, "\nTarget Games:\n");
     Log_Msg(LOG_VPC, "-------------\n");
+
     bool bHasDefine = false;
-    for (int i = 0; i < m_Conditionals.Count(); i++) {
-      if (m_Conditionals[i].type != CONDITIONAL_GAME) continue;
-      if (m_Conditionals[i].m_bDefined) {
-        Log_Msg(LOG_VPC, "$%s = 1\n", m_Conditionals[i].upperCaseName.String());
+    for (auto &&c : m_Conditionals) {
+      if (c.type != CONDITIONAL_GAME) continue;
+
+      if (c.m_bDefined) {
+        Log_Msg(LOG_VPC, "$%s = 1\n", c.upperCaseName.String());
         bHasDefine = true;
       }
     }
+
     if (!bHasDefine) {
       Log_Msg(LOG_VPC, "No Game Set!\n");
     }
 
     Log_Msg(LOG_VPC, "\nTarget Platforms:\n");
     Log_Msg(LOG_VPC, "-----------------\n");
+
     bHasDefine = false;
-    for (int i = 0; i < m_Conditionals.Count(); i++) {
-      if (m_Conditionals[i].type != CONDITIONAL_PLATFORM) continue;
-      if (m_Conditionals[i].m_bDefined) {
-        Log_Msg(LOG_VPC, "$%s = 1\n", m_Conditionals[i].upperCaseName.String());
+    for (auto &&c : m_Conditionals) {
+      if (c.type != CONDITIONAL_PLATFORM) continue;
+
+      if (c.m_bDefined) {
+        Log_Msg(LOG_VPC, "$%s = 1\n", c.upperCaseName.String());
         bHasDefine = true;
       }
     }
+
     if (!bHasDefine) {
       Log_Msg(LOG_VPC, "No Platform Set!\n");
     }
 
     Log_Msg(LOG_VPC, "\nCustom Conditionals:\n");
     Log_Msg(LOG_VPC, "---------------------\n");
+
     bHasDefine = false;
-    for (int i = 0; i < m_Conditionals.Count(); i++) {
-      if (m_Conditionals[i].type != CONDITIONAL_CUSTOM) continue;
-      if (m_Conditionals[i].m_bDefined) {
-        Log_Msg(LOG_VPC, "$%s = 1\n", m_Conditionals[i].upperCaseName.String());
+    for (auto &&c : m_Conditionals) {
+      if (c.type != CONDITIONAL_CUSTOM) continue;
+
+      if (c.m_bDefined) {
+        Log_Msg(LOG_VPC, "$%s = 1\n", c.upperCaseName.String());
         bHasDefine = true;
       }
     }
+
     if (!bHasDefine) {
       Log_Msg(LOG_VPC, "No Custom Defines Set!\n");
     }
@@ -1264,50 +1291,47 @@ void CVPC::GenerateOptionsCRCString() {
 //	Restart self from correct location and re-run. Returns FALSE if not
 // applicable, 	otherwise TRUE if restart occurred.
 //-----------------------------------------------------------------------------
-bool CVPC::RestartFromCorrectLocation(bool *pIsChild) {
+bool CVPC::RestartFromCorrectLocation(bool *is_restart_child) {
 #if defined(POSIX)
   return false;
 #else
   // recursive restart guard
   // restart is a hidden internal param, always the last argument
   // presence identifies spawned process
-  bool bIsRestart = false;
-  if (!V_stricmp(m_ppArgv[m_nArgc - 1], "/restart")) {
-    bIsRestart = true;
-  }
-  *pIsChild = bIsRestart;
+  bool is_restart{!V_stricmp(m_ppArgv[m_nArgc - 1], "/restart")};
+  *is_restart_child = is_restart;
 
-  char szBinPath[MAX_PATH];
-  if (!CheckBinPath(szBinPath, sizeof(szBinPath))) {
-    if (bIsRestart) {
+  char bin_path[MAX_PATH];
+  if (!CheckBinPath(bin_path, sizeof(bin_path))) {
+    if (is_restart) {
       VPCError("Cyclical Restart: Tell A Programmer!, Aborting.");
     }
 
     // replicate arguments, add -restart as a recursion guard for the new
     // process
-    const char *newArgs[128];
-    if (m_nArgc >= V_ARRAYSIZE(newArgs) - 2) {
+    const char *new_argv[128];
+    if (m_nArgc >= static_cast<int>(std::size(new_argv)) - 2) {
       VPCError("Excessive Arguments: Tell A Programmer!, Aborting.");
     }
+
     int i;
     for (i = 0; i < m_nArgc; i++) {
-      newArgs[i] = m_ppArgv[i];
+      new_argv[i] = m_ppArgv[i];
     }
-    newArgs[i++] = "/restart";
-    newArgs[i++] = NULL;
+    new_argv[i++] = "/restart";
+    new_argv[i++] = nullptr;
 
     // restart using synchronous semantic, async semantic causes wierd hang
-    intptr_t status = _spawnv(_P_WAIT, szBinPath, newArgs);
-    if (!status) {
-      // called process exited normally
-      return true;
-    } else if (status > 0) {
-      // called process exited with error, pass it along
-      exit((int)status);
-    }
+    intptr_t status{_spawnv(_P_WAIT, bin_path, new_argv)};
+
+    // called process exited normally
+    if (status == 0) return true;
+
+    // called process exited with error, pass it along
+    if (status > 0) exit((int)status);
 
     // called process could not be started
-    VPCError("Restart of '%s' failed\n", szBinPath);
+    VPCError("Restart of '%s' failed: %s\n", bin_path, strerror(errno));
   }
 
   // process is running from correct location
@@ -1593,6 +1617,7 @@ void CVPC::FindProjectFromVCPROJ(const char *pScriptNameVCProj) {
   // project names like foo_? and foo_bar_?
   char szProject[MAX_PATH];
   szProject[0] = '\0';
+
   size_t bestLen = 0;
   for (int i = 0; i < m_Projects.Count(); i++) {
     if (V_stristr(pScriptNameVCProj, m_Projects[i].name.String())) {
@@ -1602,6 +1627,7 @@ void CVPC::FindProjectFromVCPROJ(const char *pScriptNameVCProj) {
       }
     }
   }
+
   if (bestLen == 0) {
     VPCError("Could not resolve '%s' to any known projects", pScriptNameVCProj);
   }
@@ -2073,9 +2099,9 @@ void CVPC::DecorateProjectName(char *pchProjectName) {
 // Checks for command line /params ( +/- used for projects, so ICommandLine()
 // not suitable)
 //-----------------------------------------------------------------------------
-bool CVPC::HasCommandLineParameter(const char *pParamName) {
+bool CVPC::HasCommandLineParameter(const char *argv) {
   for (int i = 1; i < m_nArgc; i++) {
-    if (V_stricmp(m_ppArgv[i], pParamName) == 0) return true;
+    if (V_stricmp(m_ppArgv[i], argv) == 0) return true;
   }
   return false;
 }
@@ -2139,14 +2165,12 @@ void CVPC::GetProjectDependencies(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVPC::HandleMKSLN(IBaseSolutionGenerator *pSolutionGenerator) {
-  if (m_MKSolutionFilename.IsEmpty()) {
-    return;
-  }
+void CVPC::HandleMKSLN(IBaseSolutionGenerator *solution_generator) {
+  if (m_MKSolutionFilename.IsEmpty()) return;
 
   m_bInMkSlnPass = true;
 
-  if (!pSolutionGenerator) {
+  if (!solution_generator) {
     VPCError("No solution generator exists for this platform.");
   }
 
@@ -2158,26 +2182,25 @@ void CVPC::HandleMKSLN(IBaseSolutionGenerator *pSolutionGenerator) {
   // GenerateBuildSet basically generates what we want, except it uses
   // projectIndex_t's, meaning that we don't know what subset of games we should
   // use until we've called VPC_IterateTargetProjects.
-  CUtlVector<CDependency_Project *> referencedProjects;
+  CUtlVector<CDependency_Project *> projects;
   m_dependencyGraph.TranslateProjectIndicesToDependencyProjects(
-      m_TargetProjects, referencedProjects);
+      m_TargetProjects, projects);
 
   // Generate a solution file.
-  char szFullSolutionPath[MAX_PATH];
+  char full_solution_path[MAX_PATH];
   if (V_IsAbsolutePath(m_MKSolutionFilename.Get())) {
-    V_strncpy(szFullSolutionPath, m_MKSolutionFilename.Get(),
-              sizeof(szFullSolutionPath));
+    V_strncpy(full_solution_path, m_MKSolutionFilename.Get(),
+              sizeof(full_solution_path));
   } else {
     V_ComposeFileName(g_pVPC->GetStartDirectory(), m_MKSolutionFilename.Get(),
-                      szFullSolutionPath, sizeof(szFullSolutionPath));
+                      full_solution_path, sizeof(full_solution_path));
   }
 
-  if (m_pPhase1Projects != NULL) {
-    referencedProjects.AddVectorToTail(*m_pPhase1Projects);
+  if (m_pPhase1Projects != nullptr) {
+    projects.AddVectorToTail(*m_pPhase1Projects);
   }
 
-  pSolutionGenerator->GenerateSolutionFile(szFullSolutionPath,
-                                           referencedProjects);
+  solution_generator->GenerateSolutionFile(full_solution_path, projects);
 
   m_bInMkSlnPass = false;
 }
@@ -2275,11 +2298,11 @@ void CVPC::SetupGenerators() {
 // the CRC checker. Source uses vpccrccheck.exe to do this.
 //-----------------------------------------------------------------------------
 void CVPC::InProcessCRCCheck() {
-  for (int i = 1; i < m_nArgc; i++) {
+  for (int i{1}; i < m_nArgc; i++) {
     if (!V_stricmp(m_ppArgv[i], "-crc") || !V_stricmp(m_ppArgv[i], "-crc2")) {
       // caller wants the crc check only
-      int ret = VPC_CommandLineCRCChecks(m_nArgc, m_ppArgv);
-      exit(ret);
+      const int rc{VPC_CommandLineCRCChecks(m_nArgc, m_ppArgv)};
+      exit(rc);
     }
   }
 }
@@ -2355,75 +2378,77 @@ int CVPC::ProcessCommandLine() {
 
   // possible extensions determine operation mode beyond expected normal user
   // case
-  bool bScriptIsVGC = false;
-  bool bScriptIsVPC = false;
-  bool bScriptIsVCProj = false;
-  bool bHasBuildCommand = false;
-  const char *pScriptName = NULL;
-  const char *pScriptNameVCProj = NULL;
+  bool is_vgc = false, is_vpc = false, is_vcproj = false;
+  bool has_build_command = false;
+
+  const char *script_name = nullptr, *script_name_vcproj = nullptr;
 
   for (int i = 1; i < m_nArgc; i++) {
-    const char *pArg = m_ppArgv[i];
-    if (V_stristr(pArg, ".vgc")) {
+    const char *argv = m_ppArgv[i];
+    if (V_stristr(argv, ".vgc")) {
       // caller explicitly providing group
-      pScriptName = pArg;
-      bScriptIsVGC = true;
-      bHasBuildCommand = true;
+      script_name = argv;
+      is_vgc = true;
+      has_build_command = true;
       break;
-    } else if (V_stristr(pArg, ".vpc")) {
+    }
+
+    if (V_stristr(argv, ".vpc")) {
       // caller is using a local vpc, i.e. one that is not hooked into the
       // groups
-      pScriptName = pArg;
-      bScriptIsVPC = true;
-      bHasBuildCommand = true;
+      script_name = argv;
+      is_vpc = true;
+      has_build_command = true;
       break;
-    } else {
-      if (V_stristr(pArg, ".vcproj") || V_stristr(pArg, ".vcxproj")) {
-        // caller wants to re-gen the vcproj, this is commonly used by MSDEV to
-        // re-gen
-        pScriptNameVCProj = pArg;
-        bScriptIsVCProj = true;
-        bHasBuildCommand = true;
-        break;
-      }
     }
-  }
 
-  for (int i = 1; i < m_nArgc; i++) {
-    if (m_ppArgv[i][0] == '-' || m_ppArgv[i][0] == '+' ||
-        m_ppArgv[i][0] == '*' || m_ppArgv[i][0] == '@') {
-      bHasBuildCommand = true;
+    if (V_stristr(argv, ".vcproj") || V_stristr(argv, ".vcxproj")) {
+      // caller wants to re-gen the vc{x}proj, this is commonly used by MSDEV to
+      // re-gen
+      script_name_vcproj = argv;
+      is_vcproj = true;
+      has_build_command = true;
       break;
     }
   }
 
-  if (bScriptIsVPC) {
-    pScriptName = BuildTempGroupScript(pScriptName);
-    bScriptIsVPC = false;
-    bScriptIsVGC = true;
+  for (int i{1}; i < m_nArgc; i++) {
+    const char symbol{m_ppArgv[i][0]};
+
+    if (symbol == '-' || symbol == '+' || symbol == '*' || symbol == '@') {
+      has_build_command = true;
+      break;
+    }
   }
 
-  if (!bScriptIsVGC) {
+  if (is_vpc) {
+    script_name = BuildTempGroupScript(script_name);
+
+    is_vpc = false;
+    is_vgc = true;
+  }
+
+  if (!is_vgc) {
     // no script, use default group
-    pScriptName = "vpc_scripts\\default.vgc";
-    bScriptIsVGC = true;
+    script_name = "vpc_scripts\\default.vgc";
+    is_vgc = true;
   }
 
   // set the current directory, it is to be expected src, i.e. .\vpc_scripts\..
   SetDefaultSourcePath();
 
-  char szCurrentDirectory[MAX_PATH];
-  V_GetCurrentDirectory(szCurrentDirectory, sizeof(szCurrentDirectory));
-  m_StartDirectory = szCurrentDirectory;
+  char current_directory[MAX_PATH];
+  V_GetCurrentDirectory(current_directory, sizeof(current_directory));
+  m_StartDirectory = current_directory;
 
   // parse and build tables from group script that options will reference
-  VPC_ParseGroupScript(pScriptName);
+  VPC_ParseGroupScript(script_name);
 
-  if (bScriptIsVCProj) {
+  if (is_vcproj) {
     // this is commonly used as an extern tool in MSDEV to re-vpc in place
     // caller is msdev providing the vcproj name, solve to determine which
     // project and generate
-    FindProjectFromVCPROJ(pScriptNameVCProj);
+    FindProjectFromVCPROJ(script_name_vcproj);
   } else {
     ParseBuildOptions(m_nArgc, m_ppArgv);
   }
@@ -2441,7 +2466,7 @@ int CVPC::ProcessCommandLine() {
   CProjectDependencyGraph dependencyGraph;
   GenerateBuildSet(dependencyGraph);
 
-  if (!bHasBuildCommand && !HasP4SLNCommand()) {
+  if (!has_build_command && !HasP4SLNCommand()) {
     // spew usage
     m_bUsageOnly = true;
   }

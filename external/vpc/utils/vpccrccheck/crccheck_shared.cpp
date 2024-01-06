@@ -9,6 +9,8 @@
 #include <cstdio>
 #include <cstdarg>
 
+#include <algorithm>
+
 #ifdef _WIN32
 #include <process.h>
 #else
@@ -20,6 +22,8 @@
 
 #define MAX_INCLUDE_STACK_DEPTH 10
 
+extern const char *g_szArrPlatforms[];
+
 static bool IsValidPathChar(char token) {
   // does it look like a file?  If this ends up too tight, can probably just
   // check that it's not '[' or '{' cause conditional blocks are what we really
@@ -28,32 +32,32 @@ static bool IsValidPathChar(char token) {
          (token == '\\') || (token == '/');
 }
 
-extern const char *g_szArrPlatforms[];
-static void BuildReplacements(const char *token, char *szReplacements) {
+static void BuildReplacements(const char *token, char *replacements) {
   // Now go pickup the any files that exist, but were non-matches
-  *szReplacements = '\0';
-  for (int i = 0; g_szArrPlatforms[i] != NULL; i++) {
-    char szPath[MAX_PATH];
-    char szPathExpanded[MAX_PATH];
+  *replacements = '\0';
 
-    V_strncpy(szPath, token, sizeof(szPath));
-    Sys_ReplaceString(szPath, "$os", g_szArrPlatforms[i], szPathExpanded,
-                      sizeof(szPathExpanded));
-    V_FixSlashes(szPathExpanded);
-    V_RemoveDotSlashes(szPathExpanded);
-    V_FixDoubleSlashes(szPathExpanded);
+  for (ptrdiff_t i = 0; g_szArrPlatforms[i] != nullptr; i++) {
+    char path[MAX_PATH];
+    char path_expanded[MAX_PATH];
+
+    V_strncpy(path, token, sizeof(path));
+    Sys_ReplaceString(path, "$os", g_szArrPlatforms[i], path_expanded,
+                      sizeof(path_expanded));
+    V_FixSlashes(path_expanded);
+    V_RemoveDotSlashes(path_expanded);
+    V_FixDoubleSlashes(path_expanded);
 
     // this fopen is probably using a relative path, but that's ok, as
     // everything in the crc code is opening relative paths and assuming the cwd
     // is set ok.
-    FILE *f = fopen(szPathExpanded, "rb");
+    FILE *f{fopen(path_expanded, "rb")};
     if (f) {
       fclose(f);
+
       // strcat - blech
-      strcat(szReplacements,
-             g_szArrPlatforms[i]);  // really just need to stick the existing
-                                    // platforms seen in
-      strcat(szReplacements, ";");
+      // really just need to stick the existing platforms seen in
+      strcat(replacements, g_szArrPlatforms[i]);
+      strcat(replacements, ";");
     }
   }
 }
@@ -87,21 +91,28 @@ static const char *GetToken(const char *ln, char *token) {
   return ln;
 }
 
-static void PerformFileSubstitions(char *line, int linelen) {
-  static bool bFindFilePending = false;
-  const char *ln = line;
+static void PerformFileSubstitions(char *line, size_t line_length) {
+  static bool is_searching_file{false};
+  const char *ln{line};
 
-  if (!bFindFilePending) {
+  if (!is_searching_file) {
     ln = V_stristr(ln, "$file ");
-    if (ln) bFindFilePending = true;
+
+    if (ln) is_searching_file = true;
   }
 
-  if (bFindFilePending) {
+  if (is_searching_file) {
     char token[1024];
+    if (strlen(ln) >= std::size(token)) {
+      Sys_Error(
+          "Unable to find file in line. Line %s is too large to get token "
+          "from");
+    }
+
     ln = GetToken(ln, token);
     if (!ln) return;  // no more tokens on line, we should try the next line
 
-    bFindFilePending = false;
+    is_searching_file = false;
 
     if (V_stristr(token, "$os")) {
       if (!IsValidPathChar(*token))
@@ -109,53 +120,62 @@ static void PerformFileSubstitions(char *line, int linelen) {
                 "Warning: can't expand %s for crc calculation.  Changes to "
                 "this file set won't trigger automatic rebuild\n",
                 token);
-      char szReplacements[2048];
+
+      char replacements[2048];
       char buffer[4096];
-      BuildReplacements(token, szReplacements);
-      Sys_ReplaceString(line, "$os", szReplacements, buffer, sizeof(buffer));
-      V_strncpy(line, buffer, linelen);
+
+      BuildReplacements(token, replacements);
+      Sys_ReplaceString(line, "$os", replacements, buffer, sizeof(buffer));
+      V_strncpy(line, buffer, line_length);
     }
   }
 
-  static bool bFindFilePatternPending = false;
+  static bool is_searching_for_file_pattern{false};
   ln = line;
 
-  if (!bFindFilePatternPending) {
+  if (!is_searching_for_file_pattern) {
     ln = V_stristr(ln, "$filepattern");
     while (ln) {
       ln += 13;
       if (isspace(ln[-1])) {
-        bFindFilePatternPending = true;
+        is_searching_for_file_pattern = true;
         break;
       }
     }
   }
 
-  if (bFindFilePatternPending) {
+  if (is_searching_for_file_pattern) {
     char token[1024];
+    if (strlen(ln) >= std::size(token)) {
+      Sys_Error(
+          "Unable to find file pattern in line. Line %s is too large to get "
+          "token from");
+    }
+
     ln = GetToken(ln, token);
     if (!ln) return;  // no more tokens on line, we should try the next line
 
-    bFindFilePatternPending = false;
+    is_searching_for_file_pattern = false;
 
-    char szReplacements[2048];
-    szReplacements[0] = '\0';
+    char replacements[2048];
+    replacements[0] = '\0';
+
     char buffer[4096];
-    CUtlVector<CUtlString> vecResults;
-    Sys_ExpandFilePattern(token, vecResults);
-    if (vecResults.Count()) {
-      for (int i = 0; i < vecResults.Count(); i++) {
-        V_strncat(szReplacements,
-                  CFmtStr("%s;", vecResults[i].String()).Access(),
-                  V_ARRAYSIZE(szReplacements));
+    CUtlVector<CUtlString> results;
+    Sys_ExpandFilePattern(token, results);
+
+    if (results.Count()) {
+      for (auto &&r : results) {
+        V_strncat(replacements, CFmtStr("%s;", r.String()).Access(),
+                  V_ARRAYSIZE(replacements));
       }
 
-      CRC32_t nCRC =
-          CRC32_ProcessSingleBuffer(szReplacements, V_strlen(szReplacements));
+      CRC32_t crc{
+          CRC32_ProcessSingleBuffer(replacements, V_strlen(replacements))};
 
-      Sys_ReplaceString(line, token, CFmtStr("%s:%u", token, nCRC).Access(),
+      Sys_ReplaceString(line, token, CFmtStr("%s:%u", token, crc).Access(),
                         buffer, sizeof(buffer));
-      V_strncpy(line, buffer, linelen);
+      V_strncpy(line, buffer, line_length);
     } else {
       if (!IsValidPathChar(*token))
         fprintf(
@@ -181,14 +201,14 @@ static void PerformFileSubstitions(char *line, int linelen) {
   exit(1);
 }
 
-void SafeSnprintf(char *pOut, int nOutLen,
-                  PRINTF_FORMAT_STRING const char *pFormat, ...) {
+static void SafeSnprintf(char *out, int out_length,
+                         PRINTF_FORMAT_STRING const char *format, ...) {
   va_list marker;
-  va_start(marker, pFormat);
-  V_vsnprintf(pOut, nOutLen, pFormat, marker);
+  va_start(marker, format);
+  V_vsnprintf(out, out_length, format, marker);
   va_end(marker);
 
-  pOut[nOutLen - 1] = 0;
+  out[out_length - 1] = '\0';
 }
 
 // for linked lists of strings
@@ -197,124 +217,142 @@ struct StringNode_t {
   char m_Text[1];  // the string data
 };
 
-static StringNode_t *MakeStrNode(char const *pStr) {
-  size_t nLen = strlen(pStr);
-  alignas(unsigned char *) StringNode_t *nRet =
-      (StringNode_t *)new unsigned char[sizeof(StringNode_t) + nLen];
-  strcpy(nRet->m_Text, pStr);
-  return nRet;
+static StringNode_t *MakeStrNode(char const *str) {
+  constexpr size_t kNodeSize{sizeof(StringNode_t)};
+  const size_t node_size{kNodeSize + strlen(str)};
+
+  alignas(unsigned char *) auto *rc =
+      reinterpret_cast<StringNode_t *>(new unsigned char[node_size]);
+
+  strcpy(rc->m_Text, str);
+  rc->m_pNext = nullptr;
+  return rc;
 }
 
 //-----------------------------------------------------------------------------
 //	Sys_LoadTextFileWithIncludes
 //-----------------------------------------------------------------------------
-int Sys_LoadTextFileWithIncludes(const char *filename, char **bufferptr,
-                                 bool bInsertFileMacroExpansion) {
-  FILE *pFileStack[MAX_INCLUDE_STACK_DEPTH];
-  int nSP = MAX_INCLUDE_STACK_DEPTH;
+size_t Sys_LoadTextFileWithIncludes(const char *file_name, char **buffer,
+                                    bool should_insert_file_macro_expansion) {
+  FILE *file_stack[MAX_INCLUDE_STACK_DEPTH];
+  int file_stack_it{MAX_INCLUDE_STACK_DEPTH};
 
-  StringNode_t *pFileLines = NULL;  // tail ptr for fast adds
+  StringNode_t *file_lines{nullptr};  // tail ptr for fast adds
 
-  size_t nTotalFileBytes = 0;
-  FILE *handle = fopen(filename, "r");
-  if (!handle) return -1;
+  size_t total_file_bytes{0};
+  FILE *handle{fopen(file_name, "r")};
+  if (!handle) return std::numeric_limits<size_t>::max();
 
-  pFileStack[--nSP] = handle;  // push
-  while (nSP < MAX_INCLUDE_STACK_DEPTH) {
+  char line_buffer[4096];
+
+  file_stack[--file_stack_it] = handle;  // push
+  while (file_stack_it < MAX_INCLUDE_STACK_DEPTH) {
     // read lines
     for (;;) {
-      char lineBuffer[4096];
-      char *ln = fgets(lineBuffer, sizeof(lineBuffer), pFileStack[nSP]);
+      char *ln{
+          fgets(line_buffer, sizeof(line_buffer), file_stack[file_stack_it])};
       if (!ln) break;  // out of text
 
       ln += strspn(ln, "\t ");  // skip white space
 
       // Need to insert actual files to make sure crc changes if disk-matched
       // files match
-      if (bInsertFileMacroExpansion)
-        PerformFileSubstitions(ln, (int)sizeof(lineBuffer) - (ln - lineBuffer));
+      if (should_insert_file_macro_expansion)
+        PerformFileSubstitions(ln, sizeof(line_buffer) - (ln - line_buffer));
 
       if (memcmp(ln, "#include", 8) == 0) {
         // omg, an include
         ln += 8;
         ln += strspn(ln, " \t\"<");  // skip whitespace, ", and <
 
-        size_t nPathNameLength = strcspn(ln, " \t\">\n");
-        if (!nPathNameLength) {
-          Sys_Error("bad include %s via %s\n", lineBuffer, filename);
+        size_t path_name_length{strcspn(ln, " \t\">\n")};
+        if (!path_name_length) {
+          Sys_Error("bad include %s via %s\n", line_buffer, file_name);
         }
-        ln[nPathNameLength] = 0;  // kill everything after end of filename
+        ln[path_name_length] = 0;  // kill everything after end of filename
 
-        FILE *inchandle = fopen(ln, "r");
-        if (!inchandle) {
+        FILE *include_file{fopen(ln, "r")};
+        if (!include_file) {
           Sys_Error("can't open #include of %s\n", ln);
         }
-        if (!nSP) {
-          Sys_Error("include nesting too deep via %s", filename);
-        }
-        pFileStack[--nSP] = inchandle;
-      } else {
-        size_t nLen = strlen(ln);
-        nTotalFileBytes += nLen;
-        StringNode_t *pNewLine = MakeStrNode(ln);
 
-        pNewLine->m_pNext = pFileLines;
-        pFileLines = pNewLine;
+        if (!file_stack_it) {
+          Sys_Error("include nesting too deep via %s", file_name);
+        }
+
+        file_stack[--file_stack_it] = include_file;
+      } else {
+        const size_t line_length{strlen(ln)};
+
+        total_file_bytes += line_length;
+
+        StringNode_t *new_line{MakeStrNode(ln)};
+
+        new_line->m_pNext = file_lines;
+        file_lines = new_line;
       }
     }
-    fclose(pFileStack[nSP]);
-    nSP++;  // pop stack
+
+    fclose(file_stack[file_stack_it]);
+    file_stack_it++;  // pop stack
   }
 
   // Reverse the pFileLines list so it goes the right way.
-  StringNode_t *pPrev = NULL;
-  StringNode_t *pCur;
-  for (pCur = pFileLines; pCur;) {
-    StringNode_t *pNext = pCur->m_pNext;
-    pCur->m_pNext = pPrev;
-    pPrev = pCur;
-    pCur = pNext;
+  StringNode_t *prev{nullptr};
+  StringNode_t *it;
+
+  for (it = file_lines; it;) {
+    StringNode_t *next{it->m_pNext};
+
+    it->m_pNext = prev;
+    prev = it;
+    it = next;
   }
-  pFileLines = pPrev;
+  file_lines = prev;
 
   // Now dump all the lines out into a single buffer.
-  char *buffer = new char[nTotalFileBytes + 1];  // and null
-  *bufferptr = buffer;                           // tell caller
+  char *result_buffer = new char[total_file_bytes + 1];  // and null
+  *buffer = result_buffer;                               // tell caller
 
   // copy all strings and null terminate
-  int nLine = 0;
-  StringNode_t *pNext;
-  for (pCur = pFileLines; pCur; pCur = pNext) {
-    pNext = pCur->m_pNext;
-    size_t nLen = strlen(pCur->m_Text);
-    memcpy(buffer, pCur->m_Text, nLen);
-    buffer += nLen;
-    nLine++;
+  size_t line{0};
+  StringNode_t *next;
+  for (it = file_lines; it; it = next) {
+    next = it->m_pNext;
+
+    const size_t length{strlen(it->m_Text)};
+
+    memcpy(result_buffer, it->m_Text, length);
+    result_buffer += length;
+    line++;
 
     // Cleanup the line..
     // delete [] (unsigned char*)pCur;
   }
-  *(buffer++) = 0;  // null
 
-  return (int)nTotalFileBytes;
+  *(result_buffer++) = '\0';  // null
+
+  return total_file_bytes;
 }
 
 // Just like fgets() but it removes trailing newlines.
-char *ChompLineFromFile(char *pOut, int nOutBytes, FILE *fp) {
-  char *pReturn = fgets(pOut, nOutBytes, fp);
-  if (pReturn) {
-    int len = (int)strlen(pReturn);
-    if (len > 0 && pReturn[len - 1] == '\n') {
-      pReturn[len - 1] = 0;
-      if (len > 1 && pReturn[len - 2] == '\r') pReturn[len - 2] = 0;
+template <int out_bytes>
+static char *ChompLineFromFile(char (&out)[out_bytes], FILE *file) {
+  char *line{fgets(out, out_bytes, file)};
+  if (line) {
+    const size_t length{strlen(line)};
+    if (length > 0 && line[length - 1] == '\n') {
+      line[length - 1] = '\0';
+
+      if (length > 1 && line[length - 2] == '\r') line[length - 2] = '\0';
     }
   }
 
-  return pReturn;
+  return line;
 }
 
-bool CheckSupplementalString(const char *pSupplementalString,
-                             const char *pReferenceSupplementalString) {
+static bool CheckSupplementalString(const char *supplemental,
+                                    const char *reference) {
   // The supplemental string is only checked while VPC is determining if a
   // project file is stale or not. It's not used by the pre-build event's CRC
   // check. The supplemental string contains various options that tell how the
@@ -322,196 +360,203 @@ bool CheckSupplementalString(const char *pSupplementalString,
   //
   // If there's no reference supplemental string (which is the case if we're
   // running vpccrccheck.exe), then we ignore it and continue.
-  if (!pReferenceSupplementalString) return true;
+  if (!reference) return true;
 
-  return (pSupplementalString &&
-          stricmp(pSupplementalString, pReferenceSupplementalString) == 0);
+  return (supplemental && stricmp(supplemental, reference) == 0);
 }
 
-bool CheckVPCExeCRC(char *pVPCCRCCheckString, const char *szFilename,
-                    char *pErrorString, int nErrorStringLength) {
-  if (pVPCCRCCheckString == NULL) {
-    SafeSnprintf(pErrorString, nErrorStringLength,
-                 "Unexpected end-of-file in %s", szFilename);
+static bool CheckVPCExeCRC(char *vpc_crc_check, const char *file_name,
+                           char *error, int error_length) {
+  if (vpc_crc_check == NULL) {
+    SafeSnprintf(error, error_length, "Unexpected end-of-file in %s",
+                 file_name);
     return false;
   }
 
-  char *pSpace = strchr(pVPCCRCCheckString, ' ');
-  if (!pSpace) {
-    SafeSnprintf(pErrorString, nErrorStringLength, "Invalid line ('%s') in %s",
-                 pVPCCRCCheckString, szFilename);
+  char *space{strchr(vpc_crc_check, ' ')};
+  if (!space) {
+    SafeSnprintf(error, error_length, "Invalid line ('%s') in %s",
+                 vpc_crc_check, file_name);
     return false;
   }
 
   // Null-terminate it so we have the CRC by itself and the filename follows the
   // space.
-  *pSpace = 0;
-  const char *pVPCFilename = pSpace + 1;
+  *space = '\0';
+  const char *vpc_file_name{space + 1};
 
   // Parse the CRC out.
-  unsigned int nReferenceCRC;
-  sscanf(pVPCCRCCheckString, "%x", &nReferenceCRC);
-
-  char *pBuffer;
-  int cbVPCExe = Sys_LoadFile(pVPCFilename, (void **)&pBuffer);
-  if (!pBuffer) {
-    SafeSnprintf(pErrorString, nErrorStringLength,
-                 "Unable to load %s for comparison.", pVPCFilename);
+  unsigned int reference_crc;
+  if (sscanf(vpc_crc_check, "%x", &reference_crc) != 1) {
+    SafeSnprintf(error, error_length,
+                 "Missed reference CRC for %s: %s is not CRC.", vpc_file_name,
+                 vpc_crc_check);
     return false;
   }
 
-  if (cbVPCExe < 0) {
-    SafeSnprintf(pErrorString, nErrorStringLength,
-                 "Could not load file '%s' to check CRC", pVPCFilename);
+  char *buffer;
+  const int vpc_exe_size{Sys_LoadFile(vpc_file_name, (void **)&buffer)};
+  if (!buffer) {
+    SafeSnprintf(error, error_length, "Unable to load %s for comparison.",
+                 vpc_file_name);
+    return false;
+  }
+
+  if (vpc_exe_size < 0) {
+    SafeSnprintf(error, error_length, "Could not load file '%s' to check CRC",
+                 vpc_file_name);
     return false;
   }
 
   // Calculate the CRC from the contents of the file.
-  CRC32_t nCRCFromFileContents = CRC32_ProcessSingleBuffer(pBuffer, cbVPCExe);
+  const CRC32_t actual_crc{CRC32_ProcessSingleBuffer(buffer, vpc_exe_size)};
   // Allocated via malloc buffer.
-  free(pBuffer);
+  free(buffer);
 
   // Compare them.
-  if (nCRCFromFileContents != nReferenceCRC) {
-    SafeSnprintf(pErrorString, nErrorStringLength,
+  if (actual_crc != reference_crc) {
+    SafeSnprintf(error, error_length,
                  "VPC executable has changed since the project was generated.");
     return false;
   }
+
   return true;
 }
 
-bool VPC_CheckProjectDependencyCRCs(const char *pProjectFilename,
-                                    const char *pReferenceSupplementalString,
-                                    char *pErrorString,
-                                    int nErrorStringLength) {
+bool VPC_CheckProjectDependencyCRCs(const char *project_file_name,
+                                    const char *reference_supplemental,
+                                    char *error, int error_length) {
   // Build the xxxxx.vcproj.vpc_crc filename
-  char szFilename[512];
-  SafeSnprintf(szFilename, sizeof(szFilename), "%s.%s", pProjectFilename,
+  char file_name[512];
+  SafeSnprintf(file_name, sizeof(file_name), "%s.%s", project_file_name,
                VPCCRCCHECK_FILE_EXTENSION);
 
   // Open it up.
-  FILE *fp = fopen(szFilename, "rt");
-  if (!fp) {
-    SafeSnprintf(pErrorString, nErrorStringLength,
-                 "Unable to load %s to check CRC strings", szFilename);
+  FILE *file{fopen(file_name, "rt")};
+  if (!file) {
+    SafeSnprintf(error, error_length, "Unable to load %s to check CRC strings",
+                 file_name);
     return false;
   }
 
-  bool bReturnValue = false;
-  char lineBuffer[2048];
+  bool rc{false};
+  char line_buffer[2048];
 
   // Check the version of the CRC file.
-  const char *pVersionString =
-      ChompLineFromFile(lineBuffer, sizeof(lineBuffer), fp);
-  if (pVersionString &&
-      stricmp(pVersionString, VPCCRCCHECK_FILE_VERSION_STRING) == 0) {
-    char *pVPCExeCRCString =
-        ChompLineFromFile(lineBuffer, sizeof(lineBuffer), fp);
-    if (CheckVPCExeCRC(pVPCExeCRCString, szFilename, pErrorString,
-                       nErrorStringLength)) {
+  const char *version{ChompLineFromFile(line_buffer, file)};
+  if (version && stricmp(version, VPCCRCCHECK_FILE_VERSION_STRING) == 0) {
+    char *vpc_exe_crc{ChompLineFromFile(line_buffer, file)};
+    if (CheckVPCExeCRC(vpc_exe_crc, file_name, error, error_length)) {
       // Check the supplemental CRC string.
-      const char *pSupplementalString =
-          ChompLineFromFile(lineBuffer, sizeof(lineBuffer), fp);
-      if (CheckSupplementalString(pSupplementalString,
-                                  pReferenceSupplementalString)) {
+      const char *supplemental{ChompLineFromFile(line_buffer, file)};
+      if (CheckSupplementalString(supplemental, reference_supplemental)) {
         // Now read each line. Each line has a CRC and a filename on it.
         while (1) {
-          char *pLine = ChompLineFromFile(lineBuffer, sizeof(lineBuffer), fp);
-          if (!pLine) {
+          char *line{ChompLineFromFile(line_buffer, file)};
+          if (!line) {
             // We got all the way through the file without a CRC error, so all's
             // well.
-            bReturnValue = true;
+            rc = true;
             break;
           }
 
-          char *pSpace = strchr(pLine, ' ');
-          if (!pSpace) {
-            SafeSnprintf(pErrorString, nErrorStringLength,
-                         "Invalid line ('%s') in %s", pLine, szFilename);
+          char *space = strchr(line, ' ');
+          if (!space) {
+            SafeSnprintf(error, error_length, "Invalid line ('%s') in %s", line,
+                         file_name);
             break;
           }
 
           // Null-terminate it so we have the CRC by itself and the filename
           // follows the space.
-          *pSpace = 0;
-          const char *pVPCFilename = pSpace + 1;
+          *space = '\0';
+          const char *vpc_file_name = space + 1;
 
           // Parse the CRC out.
-          unsigned int nReferenceCRC;
-          sscanf(pLine, "%x", &nReferenceCRC);
-
-          // Calculate the CRC from the contents of the file.
-          char *pBuffer;
-          int nTotalFileBytes =
-              Sys_LoadTextFileWithIncludes(pVPCFilename, &pBuffer, true);
-          if (nTotalFileBytes == -1) {
-            SafeSnprintf(pErrorString, nErrorStringLength,
-                         "Unable to load %s for CRC comparison.", pVPCFilename);
+          unsigned int reference_crc;
+          if (sscanf(line, "%x", &reference_crc) != 1) {
+            SafeSnprintf(error, error_length,
+                         "Invalid reference CRC at line ('%s') in %s", line,
+                         file_name);
             break;
           }
 
-          CRC32_t nCRCFromTextContents =
-              CRC32_ProcessSingleBuffer(pBuffer, nTotalFileBytes);
-          delete[] pBuffer;
+          // Calculate the CRC from the contents of the file.
+          char *buffer;
+          const size_t total_file_bytes{
+              Sys_LoadTextFileWithIncludes(vpc_file_name, &buffer, true)};
+          if (total_file_bytes == std::numeric_limits<size_t>::max()) {
+            SafeSnprintf(error, error_length,
+                         "Unable to load %s for CRC comparison.",
+                         vpc_file_name);
+            break;
+          }
+
+          const CRC32_t actual_crc{
+              CRC32_ProcessSingleBuffer(buffer, total_file_bytes)};
+          delete[] buffer;
 
           // Compare them.
-          if (nCRCFromTextContents != nReferenceCRC) {
-            SafeSnprintf(pErrorString, nErrorStringLength,
+          if (actual_crc != reference_crc) {
+            SafeSnprintf(error, error_length,
                          "This VCPROJ is out of sync with its VPC scripts.\n  "
                          "%s mismatches (0x%x vs 0x%x).\n  Please use VPC to "
                          "re-generate!\n  \n",
-                         pVPCFilename, nReferenceCRC, nCRCFromTextContents);
+                         vpc_file_name, reference_crc, actual_crc);
             break;
           }
         }
       } else {
-        SafeSnprintf(pErrorString, nErrorStringLength,
-                     "Supplemental string mismatch.");
+        SafeSnprintf(error, error_length, "Supplemental string mismatch.");
       }
     }
   } else {
-    SafeSnprintf(pErrorString, nErrorStringLength,
-                 "CRC file %s has an invalid version string ('%s')", szFilename,
-                 pVersionString ? pVersionString : "[null]");
+    SafeSnprintf(error, error_length,
+                 "CRC file %s has an invalid version string ('%s')", file_name,
+                 version ? version : "[null]");
   }
 
-  fclose(fp);
-  return bReturnValue;
+  fclose(file);
+  return rc;
 }
 
-int VPC_OldeStyleCRCChecks(int argc, const char **argv) {
-  for (int i = 1; (i + 2) < argc;) {
-    const char *pTestArg = argv[i];
-    if (stricmp(pTestArg, "-crc") != 0) {
+static int VPC_OldStyleCRCChecks(int argc, const char **argv) {
+  for (int i{1}; i + 2 < argc;) {
+    const char *arg{argv[i]};
+
+    if (stricmp(arg, "-crc") != 0) {
       ++i;
       continue;
     }
 
-    const char *pVPCFilename = argv[i + 1];
+    const char *vpc_file_name{argv[i + 1]};
 
     // Get the CRC value on the command line.
-    const char *pTestCRC = argv[i + 2];
-    unsigned int nCRCFromCommandLine;
-    sscanf(pTestCRC, "%x", &nCRCFromCommandLine);
+    const char *test_crc{argv[i + 2]};
+    unsigned int crc_from_cmd;
 
-    // Calculate the CRC from the contents of the file.
-    char *pBuffer;
-    int nTotalFileBytes =
-        Sys_LoadTextFileWithIncludes(pVPCFilename, &pBuffer, true);
-    if (nTotalFileBytes == -1) {
-      Sys_Error("Unable to load %s for CRC comparison.", pVPCFilename);
+    if (sscanf(test_crc, "%x", &crc_from_cmd) != 1) {
+      Sys_Error("Unable to parse CRC from command line: %s not a hex CRC.",
+                test_crc);
     }
 
-    CRC32_t nCRCFromTextContents =
-        CRC32_ProcessSingleBuffer(pBuffer, nTotalFileBytes);
-    delete[] pBuffer;
+    // Calculate the CRC from the contents of the file.
+    char *buffer;
+    const size_t file_size{
+        Sys_LoadTextFileWithIncludes(vpc_file_name, &buffer, true)};
+    if (file_size == std::numeric_limits<size_t>::max()) {
+      Sys_Error("Unable to load %s for CRC comparison.", vpc_file_name);
+    }
+
+    CRC32_t actual_crc{CRC32_ProcessSingleBuffer(buffer, file_size)};
+    delete[] buffer;
 
     // Compare them.
-    if (nCRCFromTextContents != nCRCFromCommandLine) {
+    if (actual_crc != crc_from_cmd) {
       Sys_Error(
           "  \n  This VCPROJ is out of sync with its VPC scripts.\n  %s "
           "mismatches (0x%x vs 0x%x).\n  Please use VPC to re-generate!\n  \n",
-          pVPCFilename, nCRCFromCommandLine, nCRCFromTextContents);
+          vpc_file_name, crc_from_cmd, actual_crc);
     }
 
     i += 2;
@@ -525,34 +570,32 @@ int VPC_CommandLineCRCChecks(int argc, const char **argv) {
     fprintf(stderr,
             "Invalid arguments to " VPCCRCCHECK_EXE_FILENAME
             ". Format: " VPCCRCCHECK_EXE_FILENAME " [project filename]\n");
-    return 1;
+    return EINVAL;
   }
 
-  const char *pFirstCRC = argv[1];
+  const char *first_crc{argv[1]};
 
   // If the first argument starts with -crc but is not -crc2, then this is an
   // old CRC check command line with all the CRCs and filenames directly on the
   // command line. The new format puts all that in a separate file.
-  if (pFirstCRC[0] == '-' && pFirstCRC[1] == 'c' && pFirstCRC[2] == 'r' &&
-      pFirstCRC[3] == 'c' && pFirstCRC[4] != '2') {
-    return VPC_OldeStyleCRCChecks(argc, argv);
+  if (first_crc[0] == '-' && first_crc[1] == 'c' && first_crc[2] == 'r' &&
+      first_crc[3] == 'c' && first_crc[4] != '2') {
+    return VPC_OldStyleCRCChecks(argc, argv);
   }
 
-  if (stricmp(pFirstCRC, "-crc2") != 0) {
+  if (stricmp(first_crc, "-crc2") != 0) {
     fprintf(stderr, "Missing -crc2 parameter on vpc CRC check command line.");
-    return 1;
+    return EINVAL;
   }
 
-  const char *pProjectFilename = argv[2];
+  const char *project_file_name{argv[2]};
 
-  char errorString[1024];
-  bool bCRCsValid = VPC_CheckProjectDependencyCRCs(
-      pProjectFilename, NULL, errorString, sizeof(errorString));
+  char error[1024];
+  bool is_crc_valid{
+      VPC_CheckProjectDependencyCRCs(project_file_name, nullptr, error)};
 
-  if (bCRCsValid) {
-    return 0;
-  } else {
-    fprintf(stderr, "%s", errorString);
-    return 1;
-  }
+  if (is_crc_valid) return 0;
+
+  fprintf(stderr, "%s", error);
+  return EINVAL;
 }

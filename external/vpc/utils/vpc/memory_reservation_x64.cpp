@@ -38,12 +38,12 @@ bool ReserveBottomMemoryFor64Bit() noexcept {
   constexpr size_t kLowMemoryLine{0x100000000ULL};
   constexpr size_t kOneMiB{static_cast<size_t>(1024U) * 1024U};
 
-  size_t total_reserved_bytes = 0, virtual_allocs_num = 0, heap_allocs_num = 0;
+  size_t total_reserved_bytes{0}, virtual_allocs_num{0}, heap_allocs_num{0};
 
   // Virtually allocate memory.
   for (size_t size{256U * kOneMiB}; size >= kOneMiB; size /= 2U) {
     for (;;) {
-      void *p = ::VirtualAlloc(0, size, MEM_RESERVE, PAGE_NOACCESS);
+      void *p{::VirtualAlloc(0, size, MEM_RESERVE, PAGE_NOACCESS)};
       if (!p) break;
 
       if (reinterpret_cast<size_t>(p) >= kLowMemoryLine) {
