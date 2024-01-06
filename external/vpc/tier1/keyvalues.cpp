@@ -39,9 +39,9 @@
 static const char *s_LastFileLoadingFrom = "unknown";
 
 // Statics for the growable string table
-int (*KeyValues::s_pfGetSymbolForString)(const char *name, bool bCreate) =
+intp (*KeyValues::s_pfGetSymbolForString)(const char *name, bool bCreate) =
     &KeyValues::GetSymbolForStringClassic;
-const char *(*KeyValues::s_pfGetStringForSymbol)(int symbol) =
+const char *(*KeyValues::s_pfGetStringForSymbol)(intp symbol) =
     &KeyValues::GetStringForSymbolClassic;
 CKeyValuesGrowableStringTable *KeyValues::s_pGrowableStringTable = NULL;
 
@@ -202,7 +202,7 @@ class CKeyValuesGrowableStringTable {
   }
 
   // Translates a string to an index
-  int GetSymbolForString(const char *name, bool bCreate = true) {
+  intp GetSymbolForString(const char *name, bool bCreate = true) {
     AUTO_LOCK(m_mutex);
 
     // Put the current details into our hash functor
@@ -213,7 +213,7 @@ class CKeyValuesGrowableStringTable {
       bool bInserted = false;
       UtlHashHandle_t hElement = m_hashLookup.Insert(-1, &bInserted);
       if (bInserted) {
-        int iIndex = m_vecStrings.AddMultipleToTail(V_strlen(name) + 1, name);
+        intp iIndex = m_vecStrings.AddMultipleToTail(V_strlen(name) + 1, name);
         m_hashLookup[hElement] = iIndex;
       }
 
@@ -228,7 +228,7 @@ class CKeyValuesGrowableStringTable {
   }
 
   // Translates an index back to a string
-  const char *GetStringForSymbol(int symbol) {
+  const char *GetStringForSymbol(intp symbol) {
     return (const char *)m_vecStrings.Base() + symbol;
   }
 
@@ -246,7 +246,7 @@ class CKeyValuesGrowableStringTable {
     void SetCurStringBase(const char *pchCurBase) { m_pchCurBase = pchCurBase; }
 
     // The compare function.
-    bool operator()(int nLhs, int nRhs) const {
+    bool operator()(intp nLhs, intp nRhs) const {
       const char *pchLhs = nLhs > 0 ? m_pchCurBase + nLhs : m_pchCurString;
       const char *pchRhs = nRhs > 0 ? m_pchCurBase + nRhs : m_pchCurString;
 
@@ -254,7 +254,7 @@ class CKeyValuesGrowableStringTable {
     }
 
     // The hash function.
-    unsigned int operator()(int nItem) const {
+    unsigned int operator()(intp nItem) const {
       return HashStringCaseless(m_pchCurString);
     }
 
@@ -265,7 +265,7 @@ class CKeyValuesGrowableStringTable {
 
   CThreadFastMutex m_mutex;
   CLookupFunctor m_Functor;
-  CUtlHash<int, CLookupFunctor &, CLookupFunctor &> m_hashLookup;
+  CUtlHash<intp, CLookupFunctor &, CLookupFunctor &> m_hashLookup;
   CUtlVector<char> m_vecStrings;
 };
 
@@ -291,19 +291,19 @@ void KeyValues::SetUseGrowableStringTable(bool bUseGrowableTable) {
 // Purpose: Bodys of the function pointers used for interacting with the key
 //	name string table
 //-----------------------------------------------------------------------------
-int KeyValues::GetSymbolForStringClassic(const char *name, bool bCreate) {
+intp KeyValues::GetSymbolForStringClassic(const char *name, bool bCreate) {
   return KeyValuesSystem()->GetSymbolForString(name, bCreate);
 }
 
-const char *KeyValues::GetStringForSymbolClassic(int symbol) {
+const char *KeyValues::GetStringForSymbolClassic(intp symbol) {
   return KeyValuesSystem()->GetStringForSymbol(symbol);
 }
 
-int KeyValues::GetSymbolForStringGrowable(const char *name, bool bCreate) {
+intp KeyValues::GetSymbolForStringGrowable(const char *name, bool bCreate) {
   return s_pGrowableStringTable->GetSymbolForString(name, bCreate);
 }
 
-const char *KeyValues::GetStringForSymbolGrowable(int symbol) {
+const char *KeyValues::GetStringForSymbolGrowable(intp symbol) {
   return s_pGrowableStringTable->GetStringForSymbol(symbol);
 }
 
@@ -594,7 +594,7 @@ bool KeyValues::LoadFromFile(IBaseFileSystem *filesystem,
                                   CUtlBuffer::READ_ONLY);
     } else {
       // kv contents are text
-      int nLen = V_strlen(buffer);
+      intp nLen = V_strlen(buffer);
       utlBuffer.SetExternalBuffer(
           buffer, bufSize, nLen,
           CUtlBuffer::READ_ONLY | CUtlBuffer::TEXT_BUFFER);
@@ -649,9 +649,9 @@ void KeyValues::WriteConvertedString(IBaseFileSystem *filesystem,
                                      const char *pszString) {
   // handle double quote chars within the string
   // the worst possible case is that the whole string is quotes
-  int len = V_strlen(pszString);
+  intp len = V_strlen(pszString);
   char *convertedString = (char *)alloca((len + 1) * sizeof(char) * 2);
-  int j = 0;
+  intp j = 0;
   for (int i = 0; i <= len; i++) {
     if (pszString[i] == '\"') {
       convertedString[j] = '\\';
@@ -668,7 +668,7 @@ void KeyValues::WriteConvertedString(IBaseFileSystem *filesystem,
 }
 
 void KeyValues::InternalWrite(IBaseFileSystem *filesystem, FileHandle_t f,
-                              CUtlBuffer *pBuf, const void *pData, int len) {
+                              CUtlBuffer *pBuf, const void *pData, intp len) {
   if (filesystem) {
     filesystem->Write(pData, len, f);
   }
@@ -1301,7 +1301,7 @@ const wchar_t *KeyValues::GetWString(const char *keyName,
       case TYPE_WSTRING:
         break;
       case TYPE_STRING: {
-        int bufSize = V_strlen(dat->m_sValue) + 1;
+        intp bufSize = V_strlen(dat->m_sValue) + 1;
         wchar_t *pWBuf = new wchar_t[bufSize];
         int result =
             V_UTF8ToUnicode(dat->m_sValue, pWBuf, bufSize * sizeof(wchar_t));
@@ -1382,7 +1382,7 @@ void KeyValues::SetStringValue(char const *strValue) {
   }
 
   // allocate memory for the new value and copy it in
-  int len = V_strlen(strValue);
+  intp len = V_strlen(strValue);
   m_sValue = new char[len + 1];
   V_memcpy(m_sValue, strValue, len + 1);
 
@@ -1417,7 +1417,7 @@ void KeyValues::SetWString(const char *keyName, const wchar_t *value) {
     }
 
     // allocate memory for the new value and copy it in
-    int len = V_wcslen(value);
+    intp len = V_wcslen(value);
     dat->m_wsValue = new wchar_t[len + 1];
     V_memcpy(dat->m_wsValue, value, (len + 1) * sizeof(wchar_t));
 
@@ -1507,7 +1507,7 @@ void KeyValues::RecursiveCopyKeyValues(KeyValues &src) {
         break;
       case TYPE_STRING:
         if (src.m_sValue) {
-          int len = V_strlen(src.m_sValue) + 1;
+          intp len = V_strlen(src.m_sValue) + 1;
           m_sValue = new char[len];
           V_strncpy(m_sValue, src.m_sValue, len);
         }
@@ -1515,14 +1515,14 @@ void KeyValues::RecursiveCopyKeyValues(KeyValues &src) {
       case TYPE_INT: {
         m_iValue = src.m_iValue;
         V_snprintf(buf, sizeof(buf), "%d", m_iValue);
-        int len = V_strlen(buf) + 1;
+        intp len = V_strlen(buf) + 1;
         m_sValue = new char[len];
         V_strncpy(m_sValue, buf, len);
       } break;
       case TYPE_FLOAT: {
         m_flValue = src.m_flValue;
         V_snprintf(buf, sizeof(buf), "%f", m_flValue);
-        int len = V_strlen(buf) + 1;
+        intp len = V_strlen(buf) + 1;
         m_sValue = new char[len];
         V_strncpy(m_sValue, buf, len);
       } break;
@@ -1619,7 +1619,7 @@ KeyValues *KeyValues::MakeCopy(void) const {
   switch (m_iDataType) {
     case TYPE_STRING: {
       if (m_sValue) {
-        int len = V_strlen(m_sValue);
+        intp len = V_strlen(m_sValue);
         Assert(!newKeyValue->m_sValue);
         newKeyValue->m_sValue = new char[len + 1];
         V_memcpy(newKeyValue->m_sValue, m_sValue, len + 1);
@@ -1627,7 +1627,7 @@ KeyValues *KeyValues::MakeCopy(void) const {
     } break;
     case TYPE_WSTRING: {
       if (m_wsValue) {
-        int len = V_wcslen(m_wsValue);
+        intp len = V_wcslen(m_wsValue);
         newKeyValue->m_wsValue = new wchar_t[len + 1];
         V_memcpy(newKeyValue->m_wsValue, m_wsValue,
                  (len + 1) * sizeof(wchar_t));
@@ -1706,8 +1706,8 @@ void KeyValues::deleteThis() { delete this; }
 //-----------------------------------------------------------------------------
 void KeyValues::AppendIncludedKeys(CUtlVector<KeyValues *> &includedKeys) {
   // Append any included keys, too...
-  int includeCount = includedKeys.Count();
-  int i;
+  intp includeCount = includedKeys.Count();
+  intp i;
   for (i = 0; i < includeCount; i++) {
     KeyValues *kv = includedKeys[i];
     Assert(kv);
@@ -1741,7 +1741,7 @@ void KeyValues::ParseIncludedKeys(char const *resourceName,
   V_strncpy(fullpath, resourceName, sizeof(fullpath));
 
   // Strip off characters back to start or first /
-  int len = V_strlen(fullpath);
+  intp len = V_strlen(fullpath);
   while (true) {
     if (len <= 0) {
       break;
@@ -1785,8 +1785,8 @@ void KeyValues::ParseIncludedKeys(char const *resourceName,
 // Input  : baseKeys -
 //-----------------------------------------------------------------------------
 void KeyValues::MergeBaseKeys(CUtlVector<KeyValues *> &baseKeys) {
-  int includeCount = baseKeys.Count();
-  int i;
+  intp includeCount = baseKeys.Count();
+  intp i;
   for (i = 0; i < includeCount; i++) {
     KeyValues *kv = baseKeys[i];
     Assert(kv);
@@ -1970,8 +1970,7 @@ bool KeyValues::LoadFromBuffer(char const *resourceName, CUtlBuffer &buf,
   AppendIncludedKeys(includedKeys);
   {
     // delete included keys!
-    int i;
-    for (i = includedKeys.Count() - 1; i > 0; i--) {
+    for (intp i = includedKeys.Count() - 1; i > 0; i--) {
       KeyValues *kv = includedKeys[i];
       kv->deleteThis();
     }
@@ -1980,8 +1979,7 @@ bool KeyValues::LoadFromBuffer(char const *resourceName, CUtlBuffer &buf,
   MergeBaseKeys(baseKeys);
   {
     // delete base keys!
-    int i;
-    for (i = baseKeys.Count() - 1; i >= 0; i--) {
+    for (intp i = baseKeys.Count() - 1; i >= 0; i--) {
       KeyValues *kv = baseKeys[i];
       kv->deleteThis();
     }
@@ -2013,7 +2011,7 @@ bool KeyValues::LoadFromBuffer(char const *resourceName, const char *pBuffer,
     return false;
   }
 
-  int nLen = V_strlen(pBuffer);
+  intp nLen = V_strlen(pBuffer);
   CUtlBuffer buf(pBuffer, nLen,
                  CUtlBuffer::READ_ONLY | CUtlBuffer::TEXT_BUFFER);
   // Translate Unicode files into UTF-8 before proceeding
@@ -2107,7 +2105,7 @@ void KeyValues::RecursiveLoadFromBuffer(char const *resourceName,
         dat->m_sValue = NULL;
       }
 
-      int len = V_strlen(value);
+      intp len = V_strlen(value);
 
       // Here, let's determine if we got a float or an int....
       char *pIEnd;                      // pos where int scan ended
@@ -2161,7 +2159,7 @@ void KeyValues::RecursiveLoadFromBuffer(char const *resourceName,
       }
 
       // Look ahead one token for a conditional tag
-      int prevPos = buf.TellGet();
+      intp prevPos = buf.TellGet();
       const char *peek = ReadToken(buf, wasQuoted, wasConditional);
       if (wasConditional) {
         bAccepted = EvaluateConditional(peek, pfnEvaluateSymbolProc);
@@ -2297,7 +2295,7 @@ bool KeyValues::ReadAsBinary(CUtlBuffer &buffer) {
         buffer.GetString(token, KEYVALUES_TOKEN_SIZE - 1);
         token[KEYVALUES_TOKEN_SIZE - 1] = 0;
 
-        int len = V_strlen(token);
+        intp len = V_strlen(token);
         dat->m_sValue = new char[len + 1];
         V_memcpy(dat->m_sValue, token, len + 1);
 
@@ -2415,7 +2413,7 @@ bool KeyValues::ReadAsBinaryPooledFormat(
                  ->GetStringFromKVPool(poolKey, stringKeyI, token,
                                        sizeof(token)))
           return false;
-        int len = V_strlen(token);
+        intp len = V_strlen(token);
         dat->m_sValue = new char[len + 1];
         V_memcpy(dat->m_sValue, token, len + 1);
         break;
@@ -2922,10 +2920,10 @@ bool IKeyValuesDumpContextAsText::KvWriteValue(KeyValues *val,
 
     case KeyValues::TYPE_WSTRING: {
       wchar_t const *wsz = val->GetWString();
-      int nLen = V_wcslen(wsz);
-      int numBytes = nLen * 2 + 64;
+      intp nLen = V_wcslen(wsz);
+      intp numBytes = nLen * 2 + 64;
       char *chBuffer = (char *)stackalloc(numBytes);
-      V_snprintf(chBuffer, numBytes, "%ls [wstring, len = %d]", wsz, nLen);
+      V_snprintf(chBuffer, numBytes, "%ls [wstring, len = %zi]", wsz, nLen);
       if (!KvWriteText(chBuffer)) return false;
     } break;
 

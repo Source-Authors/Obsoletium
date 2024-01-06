@@ -233,8 +233,8 @@ CUtlSymbol CUtlSymbolTable::Find(const char *pString) const {
   return CUtlSymbol(idx);
 }
 
-int CUtlSymbolTable::FindPoolWithSpace(int len) const {
-  for (int i = 0; i < m_StringPools.Count(); i++) {
+intp CUtlSymbolTable::FindPoolWithSpace(intp len) const {
+  for (intp i = 0; i < m_StringPools.Count(); i++) {
     StringPool_t *pPool = m_StringPools[i];
 
     if ((pPool->m_TotalLen - pPool->m_SpaceUsed) >= len) {
@@ -257,8 +257,8 @@ CUtlSymbol CUtlSymbolTable::AddString(const char *pString) {
 
   if (id.IsValid()) return id;
 
-  int lenString = V_strlen(pString) + 1;  // length of just the string
-  int lenDecorated =
+  intp lenString = V_strlen(pString) + 1;  // length of just the string
+  intp lenDecorated =
       lenString + sizeof(hashDecoration_t);  // and with its hash decoration
   // make sure that all strings are aligned on 2-byte boundaries so the hashes
   // will read correctly
@@ -267,10 +267,10 @@ CUtlSymbol CUtlSymbolTable::AddString(const char *pString) {
       (lenDecorated + 1) & (~0x01);  // round up to nearest multiple of 2
 
   // Find a pool with space for this string, or allocate a new one.
-  int iPool = FindPoolWithSpace(lenDecorated);
+  intp iPool = FindPoolWithSpace(lenDecorated);
   if (iPool == -1) {
     // Add a new pool.
-    int newPoolSize =
+    intp newPoolSize =
         MAX(lenDecorated + sizeof(StringPool_t), MIN_STRING_POOL_SIZE);
     StringPool_t *pPool = (StringPool_t *)malloc(newPoolSize);
     pPool->m_TotalLen = newPoolSize - sizeof(StringPool_t);

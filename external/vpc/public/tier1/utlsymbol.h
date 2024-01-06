@@ -149,7 +149,7 @@ class CUtlSymbolTable {
   };
 
   struct StringPool_t {
-    int m_TotalLen;  // How large is
+    intp m_TotalLen;  // How large is
     int m_SpaceUsed;
     char m_Data[1];
   };
@@ -164,7 +164,7 @@ class CUtlSymbolTable {
   CUtlVector<StringPool_t*> m_StringPools;
 
  private:
-  int FindPoolWithSpace(int len) const;
+  intp FindPoolWithSpace(intp len) const;
   const char* StringFromIndex(const CStringPoolIndex& index) const;
   const char* DecoratedStringFromIndex(const CStringPoolIndex& index) const;
 

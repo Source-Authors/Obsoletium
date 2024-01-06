@@ -388,7 +388,7 @@ class KeyValues {
   // NOTE: If both filesystem and pBuf are non-null, it'll save to both of them.
   // If filesystem is null, it'll ignore f.
   void InternalWrite(IBaseFileSystem *filesystem, FileHandle_t f,
-                     CUtlBuffer *pBuf, const void *pData, int len);
+                     CUtlBuffer *pBuf, const void *pData, intp len);
 
   void Init();
   const char *ReadToken(CUtlBuffer &buf, bool &wasQuoted, bool &wasConditional);
@@ -436,18 +436,18 @@ class KeyValues {
  private:
   // Statics to implement the optional growable string table
   // Function pointers that will determine which mode we are in
-  static int (*s_pfGetSymbolForString)(const char *name, bool bCreate);
-  static const char *(*s_pfGetStringForSymbol)(int symbol);
+  static intp (*s_pfGetSymbolForString)(const char *name, bool bCreate);
+  static const char *(*s_pfGetStringForSymbol)(intp symbol);
   static CKeyValuesGrowableStringTable *s_pGrowableStringTable;
 
  public:
   // Functions that invoke the default behavior
-  static int GetSymbolForStringClassic(const char *name, bool bCreate = true);
-  static const char *GetStringForSymbolClassic(int symbol);
+  static intp GetSymbolForStringClassic(const char *name, bool bCreate = true);
+  static const char *GetStringForSymbolClassic(intp symbol);
 
   // Functions that use the growable string table
-  static int GetSymbolForStringGrowable(const char *name, bool bCreate = true);
-  static const char *GetStringForSymbolGrowable(int symbol);
+  static intp GetSymbolForStringGrowable(const char *name, bool bCreate = true);
+  static const char *GetStringForSymbolGrowable(intp symbol);
 };
 
 typedef KeyValues::AutoDelete KeyValuesAD;

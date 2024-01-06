@@ -98,23 +98,18 @@ static volatile char const *pDebugString;
 void _V_memset(void *dest, int fill, intp count) {
   DEBUG_LINK_CHECK;
   Assert(count >= 0);
-  AssertValidWritePtr(dest, count);
 
   memset(dest, fill, count);
 }
 
 void _V_memcpy(void *dest, const void *src, intp count) {
   Assert(count >= 0);
-  AssertValidReadPtr(src, count);
-  AssertValidWritePtr(dest, count);
 
   memcpy(dest, src, count);
 }
 
 void _V_memmove(void *dest, const void *src, intp count) {
   Assert(count >= 0);
-  AssertValidReadPtr(src, count);
-  AssertValidWritePtr(dest, count);
 
   memmove(dest, src, count);
 }
@@ -122,8 +117,6 @@ void _V_memmove(void *dest, const void *src, intp count) {
 int _V_memcmp(const void *m1, const void *m2, intp count) {
   DEBUG_LINK_CHECK;
   Assert(count >= 0);
-  AssertValidReadPtr(m1, count);
-  AssertValidReadPtr(m2, count);
 
   return memcmp(m1, m2, count);
 }
@@ -138,7 +131,6 @@ intp _V_strlen(const char *str) {
 
 void _V_strcpy(char *dest, const char *src) {
   DEBUG_LINK_CHECK;
-  AssertValidWritePtr(dest);
   AssertValidStringPtr(src);
 
   strcpy(dest, src);
@@ -305,8 +297,6 @@ wchar_t *_V_wcslower(const char *file, int line, wchar_t *start) {
 
 int V_strncmp(const char *s1, const char *s2, intp count) {
   Assert(count >= 0);
-  AssertValidStringPtr(s1, count);
-  AssertValidStringPtr(s2, count);
   VPROF_2("V_strcmp", VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false,
           BUDGETFLAG_ALL);
 
@@ -321,8 +311,6 @@ int V_strncmp(const char *s1, const char *s2, intp count) {
 }
 
 char *V_strnlwr(char *s, size_t count) {
-  AssertValidStringPtr(s, count);
-
   char *pRet = s;
   if (!s || !count) return s;
 
@@ -712,7 +700,6 @@ const char *V_strnchr(const char *pStr, char c, intp n) {
 
 void V_strncpy(char *pDest, char const *pSrc, intp maxLen) {
   Assert(maxLen >= 0);
-  AssertValidWritePtr(pDest, maxLen);
   AssertValidStringPtr(pSrc);
 
   DEBUG_LINK_CHECK;
@@ -725,7 +712,6 @@ void V_strncpy(char *pDest, char const *pSrc, intp maxLen) {
 
 void V_wcsncpy(wchar_t *pDest, wchar_t const *pSrc, intp maxLenInBytes) {
   Assert(maxLenInBytes >= 0);
-  AssertValidWritePtr(pDest, maxLenInBytes);
   AssertValidReadPtr(pSrc);
 
   intp maxLen = maxLenInBytes / sizeof(wchar_t);
@@ -739,7 +725,6 @@ void V_wcsncpy(wchar_t *pDest, wchar_t const *pSrc, intp maxLenInBytes) {
 int V_snwprintf(wchar_t *pDest, intp maxLenInNumWideCharacters,
                 PRINTF_FORMAT_STRING const wchar_t *pFormat, ...) {
   Assert(maxLenInNumWideCharacters >= 0);
-  AssertValidWritePtr(pDest, maxLenInNumWideCharacters);
   AssertValidReadPtr(pFormat);
 
   va_list marker;
@@ -767,7 +752,6 @@ int V_snwprintf(wchar_t *pDest, intp maxLenInNumWideCharacters,
 int V_snprintf(char *pDest, intp maxLen,
                PRINTF_FORMAT_STRING char const *pFormat, ...) {
   Assert(maxLen >= 0);
-  AssertValidWritePtr(pDest, maxLen);
   AssertValidStringPtr(pFormat);
 
   va_list marker;
@@ -793,7 +777,6 @@ int V_snprintf(char *pDest, intp maxLen,
 
 int V_vsnprintf(char *pDest, intp maxLen, char const *pFormat, va_list params) {
   Assert(maxLen > 0);
-  AssertValidWritePtr(pDest, maxLen);
   AssertValidStringPtr(pFormat);
 
   int len = _vsnprintf(pDest, maxLen, pFormat, params);
@@ -809,10 +792,9 @@ int V_vsnprintf(char *pDest, intp maxLen, char const *pFormat, va_list params) {
 int V_vsnprintfRet(char *pDest, intp maxLen, const char *pFormat, va_list params,
                    bool *pbTruncated) {
   Assert(maxLen > 0);
-  AssertValidWritePtr(pDest, maxLen);
   AssertValidStringPtr(pFormat);
 
-  intp len = _vsnprintf(pDest, maxLen, pFormat, params);
+  int len = _vsnprintf(pDest, maxLen, pFormat, params);
 
   if (pbTruncated) {
     *pbTruncated = len < 0;

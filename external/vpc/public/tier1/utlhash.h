@@ -173,8 +173,8 @@ inline UtlHashHandle_t CUtlHash<Data, C, K>::BuildHandle(int ndxBucket,
 //-----------------------------------------------------------------------------
 template <class Data, typename C, typename K>
 inline void CUtlHash<Data, C, K>::Purge(void) {
-  int bucketCount = m_Buckets.Count();
-  for (int ndxBucket = 0; ndxBucket < bucketCount; ndxBucket++) {
+  intp bucketCount = m_Buckets.Count();
+  for (intp ndxBucket = 0; ndxBucket < bucketCount; ndxBucket++) {
     m_Buckets[ndxBucket].Purge();
   }
 }
@@ -198,7 +198,7 @@ inline bool CUtlHash<Data, C, K>::DoFind(Data const &src, unsigned int *pBucket,
 
   int ndxKeyData = 0;
   const CUtlVector<Data> &bucket = m_Buckets[ndxBucket];
-  int keyDataCount = bucket.Count();
+  intp keyDataCount = bucket.Count();
   for (ndxKeyData = 0; ndxKeyData < keyDataCount; ndxKeyData++) {
     if (m_CompareFunc(bucket.Element(ndxKeyData), src)) break;
   }
