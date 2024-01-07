@@ -291,7 +291,7 @@ void ParseVectorFromKV( KeyValues* _kv, void* _pDest )
 	T parsedValue = T();
 	ParseTFromKV<T>( _kv, &parsedValue );
 
-	if ( realDest->Size() < N )
+	if ( realDest->Count() < N )
 	{
 		realDest->AddToTail( parsedValue );
 	}
@@ -912,7 +912,7 @@ protected:
 			V_snprintf( buffer, ARRAYSIZE( buffer ), "$selector%d", i );
 			IMaterialVar* pVar = m_pMaterial->FindVar( buffer, &bFound );
 			Assert(bFound);
-			if ( i < m_Parameters.m_Select.Size() )
+			if ( i < m_Parameters.m_Select.Count() )
 				pVar->SetIntValue( m_Parameters.m_Select[i] );
 			else
 				pVar->SetIntValue( 0 );

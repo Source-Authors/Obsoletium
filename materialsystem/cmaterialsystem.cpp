@@ -5562,5 +5562,5 @@ static int ReadListFromFile(CUtlVector<char*>* outReplacementMaterials, const ch
 	V_SplitString2( (char*)fileContents.Base(), seps, ARRAYSIZE(seps), *outReplacementMaterials );
 
 
-	return outReplacementMaterials->Size();
+	return outReplacementMaterials->Count();
 }
