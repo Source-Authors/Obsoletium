@@ -127,7 +127,7 @@ public:
 #endif
 	}
 
-	[[nodiscard]] bool SetValue( const char *pValue, ... )
+	bool SetValue( const char *pValue, ... )
 	{
 		char valueString[4096];
 		va_list marker;
@@ -138,21 +138,35 @@ public:
 #ifdef WIN32
 		char str[4096];
 		Q_snprintf( str, sizeof( str ), "%s=%s", m_pVarName, valueString );
-		return !_putenv( str );
+		bool ok = !_putenv( str );
 #else
-		return !setenv( m_pVarName, valueString, 1 );
+		bool ok = !setenv( m_pVarName, valueString, 1 );
 #endif
+
+		if (!ok)
+		{
+			Warning( "Unable to set env var %s to %s: %s", m_pVarName, valueString, strerror(errno) );
+		}
+
+		return ok;
 	}
 
-	[[nodiscard]] bool ClearValue()
+	bool ClearValue()
 	{
 #ifdef WIN32
 		char str[512];
 		Q_snprintf( str, sizeof( str ), "%s=", m_pVarName );
-		return !_putenv( str );
+		bool ok = !_putenv( str );
 #else
-		return !setenv( m_pVarName, "", 1 );
+		bool ok = !setenv( m_pVarName, "", 1 );
 #endif
+		
+		if (!ok)
+		{
+			Warning( "Unable to clear env var %s: %s", m_pVarName, strerror(errno) );
+		}
+
+		return ok;
 	}
 
 private:
