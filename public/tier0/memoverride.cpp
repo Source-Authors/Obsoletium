@@ -459,7 +459,7 @@ void* __cdecl operator new( std::size_t nSize, std::align_val_t align )
 }
 
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
-void* __cdecl operator new( std::size_t nSize, std::align_val_t align, std::nothrow_t const& )
+void* __cdecl operator new( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept
 {
 	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
 }
@@ -471,7 +471,7 @@ void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align )
 }
 
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
-void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align, std::nothrow_t const& )
+void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept
 {
 	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
 }
