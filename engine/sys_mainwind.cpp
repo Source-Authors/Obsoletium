@@ -17,7 +17,7 @@
 
 #if defined( WIN32 ) && !defined( DX_TO_GL_ABSTRACTION )
 #include "winlite.h"
-#include "xbox/xboxstubs.h"
+#include <imm.h>
 // dimhotepus: Disable accessibility keys (ex. five times Shift).
 #include "accessibility_shortcut_keys_toggler.h"
 // dimhotepus: Disable Win key.
@@ -86,9 +86,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-void S_BlockSound (void);
-void S_UnblockSound (void);
-void ClearIOStates( void );
+void S_BlockSound();
+void S_UnblockSound();
+void ClearIOStates();
 
 //-----------------------------------------------------------------------------
 // Game input events
@@ -106,13 +106,13 @@ enum GameInputEventType_t
 class CGame : public IGame
 {
 public:
-					CGame( void );
-	virtual			~CGame( void );
+					CGame();
+	virtual			~CGame();
 
 	bool			Init( void *pvInstance );
-	bool			Shutdown( void );
+	bool			Shutdown();
 
-	bool			CreateGameWindow( void );
+	bool			CreateGameWindow();
 	void			DestroyGameWindow();
 	void			SetGameWindow( void* hWnd );
 
@@ -120,15 +120,15 @@ public:
 	bool			InputAttachToGameWindow();
 	void			InputDetachFromGameWindow();
 
-	void			PlayStartupVideos( void );
+	void			PlayStartupVideos();
 	
 	// This is the SDL_Window* under SDL, HWND otherwise.
-	void*			GetMainWindow( void );
+	void*			GetMainWindow();
 	// This will be the HWND under D3D + Windows (both with and without SDL), SDL_Window* everywhere else.
-	void*			GetMainDeviceWindow( void );
+	void*			GetMainDeviceWindow();
 	// This will be the HWND under Windows, the WindowRef under Mac, and (for now) NULL on Linux
-	void*			GetMainWindowPlatformSpecificHandle( void );
-	void**			GetMainWindowAddress( void );
+	void*			GetMainWindowPlatformSpecificHandle();
+	void**			GetMainWindowAddress();
 
 	void			GetDesktopInfo( int &width, int &height, int &refreshrate );
 
@@ -137,7 +137,7 @@ public:
 	void			SetWindowSize( int w, int h );
 	void			GetWindowRect( int *x, int *y, int *w, int *h );
 
-	bool			IsActiveApp( void );
+	bool			IsActiveApp();
 
 	void			SetCanPostActivateEvents( bool bEnable );
 	bool			CanPostActivateEvents();
@@ -224,8 +224,8 @@ int g_iVCRPlaybackSleepInterval = 0;
 
 // During VCR playback, if this is true, then it'll pause at the end of each frame.
 bool g_bVCRSingleStep = false;
-
-bool g_bWaitingForStepKeyUp = false;	// Used to prevent it from running frames while you hold the S key down.
+// Used to prevent it from running frames while you hold the S key down.
+bool g_bWaitingForStepKeyUp = false;
 
 bool g_bShowVCRPlaybackDisplay = true;
 
@@ -473,24 +473,13 @@ static LONG WINAPI CallDefaultWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, L
 }
 #endif
 
-//-----------------------------------------------------------------------------
-// Purpose: The user has accepted an invitation to a game, we need to detect if 
-//			it's TF2 and restart properly if it is
-//-----------------------------------------------------------------------------
-void XBX_HandleInvite( DWORD nUserId )
-{
-}
-
 #if defined( WIN32 ) && !defined( USE_SDL )
 //-----------------------------------------------------------------------------
 // Main windows procedure
 //-----------------------------------------------------------------------------
 int CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-
 {
 	LONG			lRet = 0;
-	HDC				hdc;
-	PAINTSTRUCT		ps;
 
 	//
 	// NOTE: the way this function works is to handle all messages that just call through to
@@ -634,10 +623,13 @@ int CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
+	{
+		PAINTSTRUCT	ps;
+		HDC hdc = BeginPaint(hWnd, &ps);
+#ifndef SWDS
 		RECT rcClient;
 		GetClientRect( hWnd, &rcClient );
-#ifndef SWDS		
+
 		// Only renders stuff if running -noshaderapi
 		if ( videomode )
 		{
@@ -645,6 +637,7 @@ int CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 #endif
 		EndPaint(hWnd, &ps);
+	}
 		break;
 
 	case WM_DISPLAYCHANGE:
@@ -661,13 +654,13 @@ int CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 #ifndef SWDS
-		case 14:
-            if ( !videomode->IsWindowedMode() )
+		case IMN_PRIVATE:
+			if ( !videomode->IsWindowedMode() )
 				return 0;
 			break;
 #endif
 		}
-		return CallWindowProc( m_ChainedWindowProc, hWnd, uMsg, wParam, lParam);
+		return CallWindowProc( m_ChainedWindowProc, hWnd, uMsg, wParam, lParam );
 
 	default:
 		lRet = CallWindowProc( m_ChainedWindowProc, hWnd, uMsg, wParam, lParam );
@@ -706,15 +699,19 @@ bool CGame::CreateGameWindow( void )
 	// get the window name
 	char windowName[256];
 	windowName[0] = '\0';
-	KeyValues *modinfo = new KeyValues("ModInfo");
-	if (modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt"))
+
 	{
-		Q_strncpy( windowName, modinfo->GetString("game"), sizeof(windowName) );
+		auto modinfo = KeyValues::AutoDelete("ModInfo");
+		if (modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt"))
+		{
+			Q_strncpy( windowName, modinfo->GetString("game"), sizeof(windowName) );
+		}
 	}
 
 	if (!windowName[0])
 	{
-		Q_strncpy( windowName, "HALF-LIFE 2", sizeof(windowName) );
+		// dimhotepus: Not HALF-LIFE 2 when no info.
+		Q_strncpy( windowName, "N/A", sizeof(windowName) );
 	}
 
 	if ( IsOpenGL() )
@@ -737,7 +734,6 @@ bool CGame::CreateGameWindow( void )
 #if defined( WIN32 ) && !defined( USE_SDL )
 #ifndef SWDS
 	WNDCLASSW wc = {0};
-
 	wc.style         = CS_OWNDC | CS_DBLCLKS;
 	wc.lpfnWndProc   = CallDefaultWindowProc;
 	wc.hInstance     = m_hInstance;
@@ -761,11 +757,9 @@ bool CGame::CreateGameWindow( void )
 	wchar_t uc[512];
 	if ( IsPC() )
 	{
-		::MultiByteToWideChar(CP_UTF8, 0, windowName, -1, uc, sizeof( uc ) / sizeof(wchar_t));
+		Q_strtowcs( windowName, std::size(windowName), uc, sizeof(uc) );
 	}
 
-	modinfo->deleteThis();
-	modinfo = NULL;
 	// Oops, we didn't clean up the class registration from last cycle which
 	// might mean that the wndproc pointer is bogus
 	UnregisterClassW( CLASSNAME, m_hInstance );
@@ -801,13 +795,14 @@ bool CGame::CreateGameWindow( void )
 	}
 
 	HWND hwnd = CreateWindowExW( exFlags, CLASSNAME, uc, style, 
-		0, 0, w, h, NULL, NULL, m_hInstance, NULL );
+		0, 0, w, h, nullptr, nullptr, m_hInstance, nullptr );
 	// NOTE: On some cards, CreateWindowExW slams the FPU control word
 	SetupFPUControlWord();
 
 	if ( !hwnd )
 	{
-		Error( "Fatal Error:  Unable to create game window!" );
+		auto error = std::system_category().message(::GetLastError());
+		Error( "Fatal Error: Unable to create game window: %s!", error.c_str() );
 	}
 
 	SetMainWindow( hwnd );
@@ -905,7 +900,7 @@ void CGame::AttachToWindow()
 	SetWindowLongPtrW( m_hWindow, GWLP_WNDPROC, (LONG_PTR)HLEngineWindowProc );
 #endif
 #endif // WIN32
-    
+
 	if ( g_pInputSystem )
 	{
 		// Attach the input system window proc
