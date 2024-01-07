@@ -11,6 +11,8 @@
 #define DIFF_H
 #pragma once
 
+#include "tier0/basetypes.h"
+
 int FindDiffs(uint8 const *NewBlock, uint8 const *OldBlock,
 			  int NewSize, int OldSize, int &DiffListSize,uint8 *Output,uint32 OutSize);
 
