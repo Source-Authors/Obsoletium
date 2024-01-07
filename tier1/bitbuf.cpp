@@ -1066,7 +1066,7 @@ int32 bf_read::ReadSignedVarInt32()
 
 int64 bf_read::ReadSignedVarInt64()
 {
-	uint32 value = ReadVarInt64();
+	uint64 value = ReadVarInt64();
 	return bitbuf::ZigZagDecode64( value );
 }
 
