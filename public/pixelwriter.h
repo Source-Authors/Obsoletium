@@ -724,7 +724,6 @@ FORCEINLINE_PIXEL void CPixelWriter::WritePixelNoAdvanceSigned( int r, int g, in
 				[[fallthrough]];
 			case 1:
 				pSignedBits[0] = (signed char)((val & 0xff));
-				[[fallthrough]];
 				return;
 			}
 		}
