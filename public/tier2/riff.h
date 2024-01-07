@@ -178,7 +178,7 @@ private:
 };
 
 #define RIFF_ID					MAKEID('R','I','F','F')
-#define RIFF_WAVE				MAKEID('W','A','V','E')
+#define RIFF_WAVE				MAKEUID('W','A','V','E')
 #define WAVE_FMT				MAKEID('f','m','t',' ')
 #define WAVE_DATA				MAKEID('d','a','t','a')
 #define WAVE_FACT				MAKEID('f','a','c','t')

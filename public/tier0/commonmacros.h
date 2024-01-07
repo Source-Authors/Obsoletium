@@ -19,20 +19,59 @@
 // -------------------------------------------------------
 
 // Makes a 4-byte "packed ID" int out of 4 characters
-#define MAKEID(d,c,b,a)					( ((int)(a) << 24) | ((int)(b) << 16) | ((int)(c) << 8) | ((int)(d)) )
+constexpr inline int MAKEID( char d, char c, char b, char a )
+{
+	return ((int)a << 24) | ((int)b << 16) | ((int)c << 8) | ((int)d);
+}
+
+constexpr inline unsigned MAKEUID( char d, char c, char b, char a )
+{
+	return ((unsigned)a << 24) | ((unsigned)b << 16) | ((unsigned)c << 8) | ((unsigned)d);
+}
 
 // Compares a string with a 4-byte packed ID constant
-#define STRING_MATCHES_ID( p, id )		( (*((int *)(p)) == (id) ) ? true : false )
-#define ID_TO_STRING( id, p )			( (p)[3] = (((id)>>24) & 0xFF), (p)[2] = (((id)>>16) & 0xFF), (p)[1] = (((id)>>8) & 0xFF), (p)[0] = (((id)>>0) & 0xFF) )
+inline bool STRING_MATCHES_ID( const char* p, int id )
+{
+	return memcmp( p, &id, sizeof(id) ) == 0;
+}
 
-#define SETBITS(iBitVector, bits)		((iBitVector) |= (bits))
-#define CLEARBITS(iBitVector, bits)		((iBitVector) &= ~(bits))
-#define FBitSet(iBitVector, bits)		((iBitVector) & (bits))
+// Compares a string with a 4-byte packed ID constant
+inline bool STRING_MATCHES_ID( const char* p, unsigned id )
+{
+	return memcmp( p, &id, sizeof(id) ) == 0;
+}
+
+template<typename T>
+void ID_TO_STRING( T id, const char *p )
+{
+	p[3] = (id >> 24) & 0xFF;
+	p[2] = (id >> 16) & 0xFF;
+	p[1] = (id >>  8) & 0xFF;
+	p[0] = (id >>  0) & 0xFF;
+}
+
+template<typename T, typename Y>
+constexpr inline auto& SETBITS( T& iBitVector, Y bits )
+{
+	return iBitVector |= bits;
+}
+
+template <typename T, typename Y>
+constexpr inline auto& CLEARBITS( T& iBitVector, Y bits )
+{
+	return iBitVector &= ~bits;
+}
+
+template <typename T, typename Y>
+constexpr inline auto FBitSet( T iBitVector, Y bits )
+{
+	return iBitVector & bits;
+}
 
 template <typename T>
-inline bool IsPowerOfTwo( T value )
+constexpr inline bool IsPowerOfTwo( T value )
 {
-	return (value & ( value - (T)1 )) == (T)0;
+	return ( value & ( value - static_cast<T>(1) ) ) == T{};
 }
 
 #ifndef REFERENCE

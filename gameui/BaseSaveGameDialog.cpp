@@ -515,8 +515,6 @@ int CBaseSaveGameDialog::SaveGameSortFunc( const void *lhs, const void *rhs )
 	return strcmp(s1->szFileName, s2->szFileName);
 }
 
-#define MAKEID(d,c,b,a)	( ((int)(a) << 24) | ((int)(b) << 16) | ((int)(c) << 8) | ((int)(d)) )
-
 int SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) char *name, int nameSize, OUT_Z_CAP(commentSize) char *comment, int commentSize )
 {
 	int i, tag, size, tokenSize, tokenCount;
