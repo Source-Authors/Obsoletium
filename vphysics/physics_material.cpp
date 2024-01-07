@@ -121,13 +121,13 @@ public:
 	~CPhysicsSurfaceProps( void );
 
 	virtual int		ParseSurfaceData( const char *pFilename, const char *pTextfile );
-	virtual int		SurfacePropCount( void ) const;
-	virtual int		GetSurfaceIndex( const char *pPropertyName ) const;
-	virtual void	GetPhysicsProperties( int surfaceDataIndex, float *density, float *thickness, float *friction, float *elasticity ) const;
-	virtual void	GetPhysicsParameters( int surfaceDataIndex, surfacephysicsparams_t *pParamsOut ) const;
-	virtual surfacedata_t *GetSurfaceData( int surfaceDataIndex );
+	virtual intp	SurfacePropCount( void ) const override;
+	virtual intp	GetSurfaceIndex( const char *pPropertyName ) const override;
+	virtual void	GetPhysicsProperties( intp surfaceDataIndex, float *density, float *thickness, float *friction, float *elasticity ) const;
+	virtual void	GetPhysicsParameters( intp surfaceDataIndex, surfacephysicsparams_t *pParamsOut ) const override;
+	virtual surfacedata_t *GetSurfaceData( intp surfaceDataIndex ) override;
 	virtual const char *GetString( unsigned short stringTableIndex ) const;
-	virtual const char *GetPropName( int surfaceDataIndex ) const;
+	virtual const char *GetPropName( intp surfaceDataIndex ) const override;
 	virtual void SetWorldMaterialIndexTable( int *pMapArray, int mapSize );
 	virtual int RemapIVPMaterialIndex( int ivpMaterialIndex ) const
 	{
@@ -137,7 +137,7 @@ public:
 	virtual const char *GetReservedMaterialName( int materialIndex ) const;
 	int	GetReservedFallBack( int materialIndex ) const;
 
-	int GetReservedSurfaceIndex( const char *pPropertyName ) const;
+	intp GetReservedSurfaceIndex( const char *pPropertyName ) const;
 
 	// The database is derived from the IVP material class
 	const IVP_Material *GetIVPMaterial( int materialIndex ) const;
@@ -151,8 +151,8 @@ public:
 	}
 
 private:
-	const CSurface	*GetInternalSurface( int materialIndex ) const;
-	CSurface	*GetInternalSurface( int materialIndex );
+	const CSurface	*GetInternalSurface( intp materialIndex ) const;
+	CSurface	*GetInternalSurface( intp materialIndex );
 	
 	void			CopyPhysicsProperties( CSurface *pOut, int baseIndex );
 	bool			AddFileToDatabase( const char *pFilename );
@@ -196,9 +196,9 @@ CPhysicsSurfaceProps::~CPhysicsSurfaceProps( void )
 {
 }
 
-int CPhysicsSurfaceProps::SurfacePropCount( void ) const
+intp CPhysicsSurfaceProps::SurfacePropCount( void ) const
 {
-	return m_props.Size();
+	return m_props.Count();
 }
 
 // Add the filename to a list to make sure each file is only processed once
@@ -206,9 +206,9 @@ bool CPhysicsSurfaceProps::AddFileToDatabase( const char *pFilename )
 {
 	CUtlSymbol id = m_strings.AddString( pFilename );
 
-	for ( int i = 0; i < m_fileList.Size(); i++ )
+	for ( auto &&f : m_fileList )
 	{
-		if ( m_fileList[i] == id )
+		if ( f == id )
 			return false;
 	}
 
@@ -216,11 +216,11 @@ bool CPhysicsSurfaceProps::AddFileToDatabase( const char *pFilename )
 	return true;
 }
 
-int CPhysicsSurfaceProps::GetSurfaceIndex( const char *pPropertyName ) const
+intp CPhysicsSurfaceProps::GetSurfaceIndex( const char *pPropertyName ) const
 {
 	if ( pPropertyName[0] == '$' )
 	{
-		int index = GetReservedSurfaceIndex( pPropertyName );
+		intp index = GetReservedSurfaceIndex( pPropertyName );
 		if ( index >= 0 )
 			return index;
 	}
@@ -229,7 +229,7 @@ int CPhysicsSurfaceProps::GetSurfaceIndex( const char *pPropertyName ) const
 	if ( id.IsValid() )
 	{
 		// BUGBUG: Linear search is slow!!!
-		for ( int i = 0; i < m_props.Size(); i++ )
+		for ( intp i = 0; i < m_props.Count(); i++ )
 		{
 			// NOTE: Just comparing strings by index is pretty fast though
 			if ( m_props[i].m_name == id )
@@ -241,7 +241,7 @@ int CPhysicsSurfaceProps::GetSurfaceIndex( const char *pPropertyName ) const
 }
 
 
-const char *CPhysicsSurfaceProps::GetPropName( int surfaceDataIndex ) const
+const char *CPhysicsSurfaceProps::GetPropName( intp surfaceDataIndex ) const
 {
 	const CSurface *pSurface = GetInternalSurface( surfaceDataIndex );
 	if ( pSurface )
@@ -254,13 +254,13 @@ const char *CPhysicsSurfaceProps::GetPropName( int surfaceDataIndex ) const
 
 // UNDONE: move reserved materials into this table, or into a parallel table
 // that gets hooked out here.
-CSurface *CPhysicsSurfaceProps::GetInternalSurface( int materialIndex )
+CSurface *CPhysicsSurfaceProps::GetInternalSurface( intp materialIndex )
 {
 	if ( IsReservedMaterialIndex( materialIndex ) )
 	{
 		materialIndex = GetReservedFallBack( materialIndex );
 	}
-	if ( materialIndex < 0 || materialIndex > m_props.Size()-1 )
+	if ( materialIndex < 0 || materialIndex > m_props.Count()-1 )
 	{
 		return NULL;
 	}
@@ -268,12 +268,12 @@ CSurface *CPhysicsSurfaceProps::GetInternalSurface( int materialIndex )
 }
 
 // this function is actually const except for the return type, so this is safe
-const CSurface *CPhysicsSurfaceProps::GetInternalSurface( int materialIndex ) const
+const CSurface *CPhysicsSurfaceProps::GetInternalSurface( intp materialIndex ) const
 {
 	return const_cast<CPhysicsSurfaceProps *>(this)->GetInternalSurface(materialIndex);
 }
 
-void CPhysicsSurfaceProps::GetPhysicsProperties( int materialIndex, float *density, float *thickness, float *friction, float *elasticity ) const
+void CPhysicsSurfaceProps::GetPhysicsProperties( intp materialIndex, float *density, float *thickness, float *friction, float *elasticity ) const
 {
 	const CSurface *pSurface = GetInternalSurface( materialIndex );
 	if ( !pSurface )
@@ -302,7 +302,7 @@ void CPhysicsSurfaceProps::GetPhysicsProperties( int materialIndex, float *densi
 	}
 }
 
-void CPhysicsSurfaceProps::GetPhysicsParameters( int surfaceDataIndex, surfacephysicsparams_t *pParamsOut ) const
+void CPhysicsSurfaceProps::GetPhysicsParameters( intp surfaceDataIndex, surfacephysicsparams_t *pParamsOut ) const
 {
 	if ( !pParamsOut )
 		return;
@@ -314,7 +314,7 @@ void CPhysicsSurfaceProps::GetPhysicsParameters( int surfaceDataIndex, surfaceph
 	}
 }
 
-surfacedata_t *CPhysicsSurfaceProps::GetSurfaceData( int materialIndex )
+surfacedata_t *CPhysicsSurfaceProps::GetSurfaceData( intp materialIndex )
 {
 	CSurface *pSurface = GetInternalSurface( materialIndex );
 	if (!pSurface)
@@ -347,7 +347,7 @@ const char *CPhysicsSurfaceProps::GetReservedMaterialName( int materialIndex ) c
 	return NULL;
 }
 
-int CPhysicsSurfaceProps::GetReservedSurfaceIndex( const char *pPropertyName ) const
+intp CPhysicsSurfaceProps::GetReservedSurfaceIndex( const char *pPropertyName ) const
 {
 	if ( !Q_stricmp( pPropertyName, "$MATERIAL_INDEX_SHADOW" ) )
 	{
@@ -381,8 +381,8 @@ int	CPhysicsSurfaceProps::GetReservedFallBack( int materialIndex ) const
 
 int CPhysicsSurfaceProps::GetIVPMaterialIndex( const IVP_Material *pIVP ) const
 {
-	int index = (const CSurface *)pIVP - m_props.Base();
-	if ( index >= 0 && index < m_props.Size() )
+	intp index = (const CSurface *)pIVP - m_props.Base();
+	if ( index >= 0 && index < m_props.Count() )
 		return index;
 
 	return -1;
@@ -581,7 +581,7 @@ int CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *p
 		prop.data.physics.friction = 0.8f;
 		m_shadowFallback = m_props.AddToTail( prop );
 	}
-	return m_props.Size();
+	return m_props.Count();
 }
 
 

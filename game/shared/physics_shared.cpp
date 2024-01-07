@@ -1035,7 +1035,7 @@ static HSOUNDSCRIPTHANDLE PrecachePhysicsSoundByStringIndex( int idx )
 void PrecachePhysicsSounds()
 {
 	// precache the surface prop sounds
-	for ( int i = 0; i < physprops->SurfacePropCount(); i++ )
+	for ( intp i = 0; i < physprops->SurfacePropCount(); i++ )
 	{
 		surfacedata_t *pprop = physprops->GetSurfaceData( i );
 		Assert( pprop );
