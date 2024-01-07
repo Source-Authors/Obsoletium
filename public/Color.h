@@ -72,13 +72,13 @@ public:
 	
 	component &operator[](size_t index)
 	{
-		Assert( index <= std::size(_color) );
+		Assert( index < std::size(_color) );
 		return _color[index];
 	}
 
 	const component &operator[](size_t index) const
 	{
-		Assert( index <= std::size(_color) );
+		Assert( index < std::size(_color) );
 		return _color[index];
 	}
 
