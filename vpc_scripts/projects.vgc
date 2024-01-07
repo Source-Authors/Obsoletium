@@ -148,11 +148,6 @@ $Project "datamodel"
 	"datamodel\datamodel.vpc" [$WIN32]
 }
 
-$Project "dbmon"
-{
-	"devtools\dbmon\dbmon.vpc" [$WIN32]
-}
-
 $Project "dedicated"
 {
 	"dedicated\dedicated.vpc" [$WIN32||$POSIX]
@@ -233,11 +228,6 @@ $Project "engine"
 $Project "entcount"
 {
 	"utils\entcount\entcount.vpc" [$WIN32]
-}
-
-$Project "ep2_deathmap"
-{
-	"devtools\ep2_deathmap\ep2_deathmap.vpc" [$WIN32]
 }
 
 $Project "fbx2dmx"
@@ -343,11 +333,6 @@ $Project "genrandomvectors"
 $Project "getbugs"
 {
 	"utils\getbugs\getbugs.vpc" [$WIN32]
-}
-
-$Project "getmirror"
-{
-	"devtools\getmirror\getmirror.vpc" [$WIN32]
 }
 
 $Project "glview"
@@ -534,11 +519,6 @@ $Project "launcher"
 $Project "launcher_main"
 {
 	"launcher_main\launcher_main.vpc" [$WINDOWS||$POSIX]
-}
-
-$Project "LicenseViewed"
-{
-	"devtools\WiseInstallerHelpers\LicenseViewed.vpc" [$WIN32]
 }
 
 $Project "localization_check"
@@ -932,11 +912,6 @@ $Project "smp"
 	"utils\smp\smp.vpc" [$WIN32]
 }
 
-$Project "smtpmail"
-{
-	"devtools\smtpmail\smtpmail.vpc" [$WIN32]
-}
-
 $Project "socket_tests"
 {
 	"utils\socket_tests\socket_tests.vpc" [$WIN32]
@@ -1057,16 +1032,6 @@ $Project "SymbolStoreUpdate"
 	"utils\SymbolStoreUpdate\SymbolStoreUpdate.vpc" [$WIN32]
 }
 
-$Project "syncfrommirror"
-{
-	"devtools\syncfrommirror\syncfrommirror.vpc" [$WIN32]
-}
-
-$Project "tagbuild"
-{
-	"devtools\tagbuild\tagbuild.vpc" [$WIN32]
-}
-
 //$Project "test"
 //{
 //	"shell\uninstall\uninstalltester\test.vpc" [$WIN32]
@@ -1180,11 +1145,6 @@ $Project "unittest"
 $Project "unusedcontent"
 {
 	"utils\unusedcontent\unusedcontent.vpc" [$WIN32]
-}
-
-$Project "UpdateProgress"
-{
-	"devtools\WiseInstallerHelpers\UpdateProgress\UpdateProgress.vpc" [$WIN32]
 }
 
 $Project "valvelib"
