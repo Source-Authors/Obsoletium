@@ -1,14 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by MaterialSystem.rc
-//
+
+#define SRC_PRODUCT_FILE_DESCRIPTION_STRING   "Materials System"
 
 // Next default values for new objects
 // 

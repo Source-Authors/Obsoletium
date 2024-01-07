@@ -2,12 +2,12 @@
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
   <!-- Name format company name.product name.application name. -->
   <assemblyIdentity
-      version="0.0.0.0"
+      version="@PROJECT_VERSION@"
       processorArchitecture="*"
-      name="Valve.OrangeBox.Srcds"
+      name="TheSourceAuthors.Obsoletium.@PROJECT_NAME@"
       type="win32"
   />
-  <description>Half-Life 2 Dedicated Server.</description>
+  <description>@PROJECT_DESCRIPTION@.</description>
   <dependency>
     <dependentAssembly>
       <!-- Enable usage of ComCtl32.dll version 6 visual styles.

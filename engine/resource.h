@@ -1,16 +1,7 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-//{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
-// Used by halflife.rc
-//
-// Next default values for new objects
-// 
+
+#define SRC_PRODUCT_FILE_DESCRIPTION_STRING   "Orchestration Engine"
+
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        101

@@ -1,7 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
-//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by ServerBrowser.rc
+
+#define SRC_PRODUCT_FILE_DESCRIPTION_STRING   "Game Server Browser"
 
 // Next default values for new objects
 // 

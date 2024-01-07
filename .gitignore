@@ -417,6 +417,10 @@ devtools/bin/vpc.pdb
 *.idb
 *.lib
 
+# Resource scripts intermediate
+RC[a-z0-9]*
+*.res
+
 # Solution-specific
 ValveETWProviderEvents*
 gcsdk/generated_proto/
@@ -426,3 +430,7 @@ gcsdk/generated_proto/
 
 # Thirdparty out
 thirdparty/**/out/
+
+# CMake
+out/
+CMakeFiles/

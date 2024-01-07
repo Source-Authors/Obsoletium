@@ -1,0 +1,54 @@
+// Copyright (c) 2024 The Source Authors.  All rights reserved.
+//
+// Windows app base resources.
+
+#include <winresrc.h>
+
+#include "resource.h"
+
+#include "app_version_config.h"
+
+// clang-format off
+
+// Set resource file code page.
+#pragma code_page(65001)  // Unicode (UTF-8)
+
+// Resources are in default english.
+LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+SRC_IDI_APP_MAIN   ICON   DISCARDABLE   "resources\\app.ico"
+
+// Version info.
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     SRC_APP_VER_FILE_VERSION_HEADER
+PRODUCTVERSION  SRC_VER_PRODUCT_VERSION_HEADER
+FILEFLAGSMASK   SRC_VER_FFI_FILEFLAGSMASK
+FILEFLAGS       SRC_VER_FILEFLAGS
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName",      SRC_PRODUCT_COMPANY_NAME_STRING
+            VALUE "FileDescription",  SRC_PRODUCT_FILE_DESCRIPTION_STRING
+            VALUE "FileVersion",      SRC_PRODUCT_FILE_VERSION_INFO_STRING
+            VALUE "InternalName",     SRC_PRODUCT_INTERNAL_NAME_STRING
+            VALUE "LegalCopyright",   SRC_PRODUCT_LEGAL_COPYRIGHT_STRING
+            VALUE "OriginalFilename", SRC_PRODUCT_ORIGINAL_NAME_STRING
+            VALUE "ProductName",      SRC_PRODUCT_NAME_STRING
+            VALUE "ProductVersion",   SRC_PRODUCT_VERSION_INFO_STRING
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        // Language,codepage combination supported by the file.
+        VALUE "Translation", 0x409, 0x4B0
+    END
+END

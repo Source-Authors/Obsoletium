@@ -114,5 +114,10 @@ $Project
 		$Lib	"$LIBPUBLIC\tier1"
 		$Implib	"$LIBPUBLIC\vstdlib"
 	}
+
+	$Folder "Resource Scripts" [$WINDOWS]
+	{
+		$File	"$SRCDIR\build\win\resource_scripts\windows_dll_base.rc"
+	}
 }
 

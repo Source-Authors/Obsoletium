@@ -11,6 +11,9 @@
 
 // dimhotepus: Launcher icon id.
 #include "../launcher_main/resource.h"
+
+// dimhotepus: Remove launcher definition clashing with tier0 one.
+#undef SRC_PRODUCT_FILE_DESCRIPTION_STRING
 #elif defined( POSIX )
 #include <cstdlib>
 #endif
@@ -211,7 +214,7 @@ INT_PTR CALLBACK AssertDialogProc(
 			SetDlgItemInt( hDlg, IDC_IGNORE_NUMTIMES, g_nLastIgnoreNumTimes, false );
 
 			// dimhotepus: Add launcher icon for Assert dialog.
-			HANDLE hExeIcon = LoadImageW( GetModuleHandleW( nullptr ), MAKEINTRESOURCEW( IDI_LAUNCHER ), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE );
+			HANDLE hExeIcon = LoadImageW( GetModuleHandleW( nullptr ), MAKEINTRESOURCEW( SRC_IDI_APP_MAIN ), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE );
 			SendMessage( hDlg, WM_SETICON, ICON_BIG, (LPARAM)hExeIcon );
 		
 			// Center the dialog.

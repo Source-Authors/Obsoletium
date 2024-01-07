@@ -274,7 +274,7 @@ $Configuration "Release"
 		$UseFAT32WorkAround
 
 		// Input And Output
-		$AdditionalManifestFiles			"$SRCDIR\public\windows_default.manifest" [!$SOURCESDK]
+		$AdditionalManifestFiles			"$SRCDIR\build\win\manifests\supported-os.manifest" [!$SOURCESDK]
 		$InputResourceManifests
 		$EmbedManifest
 		$OutputManifestFile
@@ -310,16 +310,16 @@ $Configuration "Release"
 	$BrowseInformation
 	{
 		$SuppressStartupBanner
-		$OutputFile							"$(OutDir)/$OUTBINNAME.bsc"
+		$OutputFile
 		$AdditionalOptions
 	}
 
 	$Resources
 	{
 		// General
-		$PreprocessorDefinitions				"NDEBUG;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)"
+		$PreprocessorDefinitions				"NDEBUG;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTE$(TargetName)\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTE$(TargetFileName)\$QUOTE;%(PreprocessorDefinitions)"
 		$Culture								"English (United States) (0x409)"
-		$AdditionalIncludeDirectories
+		$AdditionalIncludeDirectories			"$(SolutionDir)out\build"
 		$IgnoreStandardIncludePath
 		$ShowProgress
 		$ResourceFileName

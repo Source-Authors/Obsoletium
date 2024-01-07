@@ -25,7 +25,13 @@ $Configuration
 	$ManifestTool
 	{
 		// Input And Output
-		$AdditionalManifestFiles			"$BASE;$SRCDIR\public\dpi-aware.manifest;$SRCDIR\public\ultra-high-scroll-resolution.manifest;$SRCDIR\public\utf-8-code-page.manifest;enable-visual-styles.manifest" [!$SOURCESDK]
+		$AdditionalManifestFiles			"$BASE;$SRCDIR\build\win\manifests\dpi-aware.manifest;$SRCDIR\build\win\manifests\ultra-high-scroll-resolution.manifest;$SRCDIR\build\win\manifests\utf-8-code-page.manifest;$SRCDIR\out\manifests\enable-visual-styles.manifest" [!$SOURCESDK]
+	}
+	
+	$Resources
+	{
+		// General
+		$PreprocessorDefinitions				"$BASE;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTEsrcds\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTEsrcds.exe\$QUOTE"
 	}
 }
 
@@ -41,9 +47,9 @@ $Project "Dedicated_main"
 
 	$Folder	"Resources"
 	{
-		$File "enable-visual-styles.manifest"
-		$File	"$SRCDIR\launcher\res\launcher.ico"
-		$File	"dedicated_main.rc"
+		$File	"resources\app.ico"
+		$File	"$SRCDIR\out\manifests\enable-visual-styles.manifest"
+		$File	"$SRCDIR\build\win\resource_scripts\windows_app_base.rc"
 	}
 
 	$Folder	"Link Libraries" 
