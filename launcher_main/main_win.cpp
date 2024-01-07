@@ -7,6 +7,7 @@
 
 #include <system_error>
 
+#include "scoped_dll.h"
 #include "winlite.h"
 
 extern "C" {
@@ -199,9 +200,11 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
       // The system does not display the Windows Error Reporting dialog.
       SEM_NOGPFAULTERRORBOX);
 
-  // Apply process mitigations.
-  int rc = ApplyProcessMitigations();
-  if (rc) return static_cast<int>(rc);
+  {
+    // Apply process mitigations.
+    int rc = ApplyProcessMitigations();
+    if (rc) return static_cast<int>(rc);
+  }
 
   // Use the .exe name to determine the base directory.
   char module_name[MAX_PATH];
@@ -216,14 +219,19 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   // Get the base directory the .exe is in.
   char base_directory_path[MAX_PATH], launcher_dll_path[MAX_PATH];
   // Assemble the full path to our "launcher.dll".
-  _snprintf_s(launcher_dll_path, _TRUNCATE, "%s\\bin\\launcher.dll",
+  _snprintf_s(launcher_dll_path, _TRUNCATE,
+#if !defined(_WIN64)
+              "%s\\bin\\launcher.dll",
+#else
+              "%s\\bin\\x64\\launcher.dll",
+#endif
               GetBaseDirectory(module_name, base_directory_path));
 
   char user_error[1024];
   // STEAM OK ... filesystem not mounted yet.
-  HMODULE launcher_dll{::LoadLibraryExA(launcher_dll_path, nullptr,
-                                        LOAD_WITH_ALTERED_SEARCH_PATH)};
-  if (!launcher_dll) [[unlikely]] {
+  const source::ScopedDll launcher_dll{launcher_dll_path,
+                               LOAD_WITH_ALTERED_SEARCH_PATH};
+  if (!launcher_dll) {
     const auto rc = ::GetLastError();
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed in the folder with less "
@@ -235,29 +243,11 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   }
 
   using LauncherMainFunction = int (*)(HINSTANCE, HINSTANCE, LPSTR, int);
-
   constexpr char launcher_main_function_name[]{"LauncherMain"};
 
-  const auto launcher_main = reinterpret_cast<LauncherMainFunction>(
-      ::GetProcAddress(launcher_dll, launcher_main_function_name));
-  if (launcher_main) [[likely]] {
-    const auto rc =
-        launcher_main(instance, old_instance, cmd_line, window_flags);
-
-    if (!::FreeLibrary(launcher_dll)) [[unlikely]] {
-      const auto rc = ::GetLastError();
-      _snprintf_s(user_error, _TRUNCATE,
-                  "Please contact publisher, very likely bug is detected.\n\n"
-                  "Unable to unload the launcher DLL from %s.",
-                  launcher_dll_path);
-
-      return ShowErrorBoxAndExitWithCode(user_error, rc);
-    }
-
-    return rc;
-  }
-
-  {
+  const auto launcher_main = launcher_dll.GetFunction<LauncherMainFunction>(
+      launcher_main_function_name);
+  if (!launcher_main) {
     const auto rc = ::GetLastError();
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed correctly.\n\nUnable to find %s "
@@ -266,4 +256,9 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 
     return ShowErrorBoxAndExitWithCode(user_error, rc);
   }
+
+  const auto rc = launcher_main(instance, old_instance, cmd_line, window_flags);
+
+  // Prevent tail call optimization and incorrect stack traces.
+  exit(rc);
 }

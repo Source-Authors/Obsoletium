@@ -7,6 +7,7 @@
 
 #include <system_error>
 
+#include "scoped_dll.h"
 #include "winlite.h"
 
 namespace {
@@ -178,9 +179,11 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
       // The system does not display the Windows Error Reporting dialog.
       SEM_NOGPFAULTERRORBOX);
 
-  // Apply process mitigations.
-  int rc = ApplyProcessMitigations();
-  if (rc) return static_cast<int>(rc);
+  {
+    // Apply process mitigations.
+    int rc = ApplyProcessMitigations();
+    if (rc) return static_cast<int>(rc);
+  }
 
   // Use the .exe name to determine the base directory.
   char module_name[MAX_PATH];
@@ -195,14 +198,19 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   // Get the base directory the .exe is in.
   char base_directory_path[MAX_PATH], dedicated_dll_path[MAX_PATH];
   // Assemble the full path to our "dedicated.dll".
-  _snprintf_s(dedicated_dll_path, _TRUNCATE, "%s\\bin\\dedicated.dll",
+  _snprintf_s(dedicated_dll_path, _TRUNCATE,
+#if !defined(_WIN64)
+              "%s\\bin\\dedicated.dll",
+#else
+              "%s\\bin\\x64\\dedicated.dll",
+#endif
               GetBaseDirectory(module_name, base_directory_path));
 
   char user_error[1024];
   // STEAM OK ... filesystem not mounted yet.
-  HMODULE dedicated_dll{::LoadLibraryExA(dedicated_dll_path, nullptr,
-                                         LOAD_WITH_ALTERED_SEARCH_PATH)};
-  if (!dedicated_dll) [[unlikely]] {
+  const source::ScopedDll dedicated_dll{dedicated_dll_path,
+                                        LOAD_WITH_ALTERED_SEARCH_PATH};
+  if (!dedicated_dll) {
     const auto rc = ::GetLastError();
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed in the folder with less "
@@ -215,18 +223,9 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 
   using DedicatedMainFunction = int (*)(HINSTANCE, HINSTANCE, LPSTR, int);
 
-  const auto dedicated_main = reinterpret_cast<DedicatedMainFunction>(
-      ::GetProcAddress(dedicated_dll, "DedicatedMain"));
-  if (dedicated_main) [[likely]] {
-    const auto rc =
-        dedicated_main(instance, old_instance, cmd_line, window_flags);
-
-    ::FreeLibrary(dedicated_dll);
-
-    return rc;
-  }
-
-  {
+  const auto dedicated_main =
+      dedicated_dll.GetFunction<DedicatedMainFunction>("DedicatedMain");
+  if (!dedicated_main) {
     const auto rc = ::GetLastError();
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed correctly.\n\nUnable to find "
@@ -235,4 +234,10 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 
     return ShowErrorBoxAndExitWithCode(user_error, rc);
   }
+
+  const auto rc =
+      dedicated_main(instance, old_instance, cmd_line, window_flags);
+
+  // Prevent tail call optimization and incorrect stack traces.
+  exit(rc);
 }

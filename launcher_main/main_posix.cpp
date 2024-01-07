@@ -2,14 +2,13 @@
 //
 // Purpose: A redirection tool that allows the DLLs to reside elsewhere.
 
-#include <dlfcn.h>
-
 #include <cstdio>
 #include <cstdlib>
 #include <climits>
 #include <cstring>
 
 #include "tier0/basetypes.h"
+#include "scoped_dll.h"
 
 namespace {
 
@@ -71,8 +70,16 @@ void WaitForDebuggerConnect(int argc, char *argv[], int time) {
 }  // namespace
 
 int main(int argc, char *argv[]) {
-  void *launcher_dll{::dlopen("bin/launcher" DLL_EXT_STRING, RTLD_NOW)};
-  if (!launcher_dll) [[unlikely]] {
+  const source::ScopedDll launcher_dll {
+#if !defined(PLATFORM_64BITS)
+    "bin/launcher" DLL_EXT_STRING
+#else
+    "bin/x64/launcher" DLL_EXT_STRING
+#endif
+        ,
+        RTLD_NOW
+  };
+  if (!launcher_dll) {
     fprintf(stderr, "Failed to load the bin/launcher" DLL_EXT_STRING ": %s.\n",
             ::dlerror());
     return 1;
@@ -80,9 +87,9 @@ int main(int argc, char *argv[]) {
 
   using LauncherMainFunction = int (*)(int argc, char **argv);
 
-  const auto main = reinterpret_cast<LauncherMainFunction>(
-      ::dlsym(launcher_dll, "LauncherMain"));
-  if (!main) [[unlikely]] {
+  const auto main =
+      launcher_dll.GetFunction<LauncherMainFunction>("LauncherMain");
+  if (!main) {
     fprintf(stderr, "Failed to get the launcher LauncherMain entry proc: %s.\n",
             ::dlerror());
     return 2;
@@ -125,11 +132,6 @@ int main(int argc, char *argv[]) {
 
   const auto rc = main(argc, argv);
 
-  if (::dlclose(launcher_dll)) [[unlikely]] {
-    fprintf(stderr, "Failed to close the bin/launcher" DLL_EXT_STRING ": %s.\n",
-            ::dlerror());
-    return 3;
-  }
-
-  return rc;
+  // Prevent tail call optimization and incorrect stack traces.
+  exit(rc);
 }

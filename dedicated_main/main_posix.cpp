@@ -2,7 +2,6 @@
 //
 // Purpose: A redirection tool that allows the DLLs to reside elsewhere.
 
-#include <dlfcn.h>
 #include <unistd.h>
 
 #include <cstdio>
@@ -11,7 +10,8 @@
 #include <climits>
 #include <cerrno>
 
-#include "basetypes.h"
+#include "tier0/basetypes.h"
+#include "scoped_dll.h"
 
 namespace {
 
@@ -77,46 +77,51 @@ int main(int argc, char *argv[]) {
   const char *path_env{::getenv("LD_LIBRARY_PATH")};
 
   char cwd[PATH_MAX];
-  if (!::getcwd(cwd, sizeof(cwd))) [[unlikely]] {
+  if (!::getcwd(cwd, sizeof(cwd))) {
     const auto rc = errno;
     fprintf(stderr, "getcwd failed: %s", strerror(rc));
     return rc;
   }
 
   char new_path_env[4096];
-  snprintf(new_path_env, sizeof(new_path_env) - 1, "LD_LIBRARY_PATH=%s/bin:%s",
+  snprintf(new_path_env, sizeof(new_path_env) - 1,
+#if !defined(PLATFORM_64BITS)
+           "LD_LIBRARY_PATH=%s/bin:%s",
+#else
+           "LD_LIBRARY_PATH=%s/bin/x64:%s",
+#endif
            cwd, path_env);
-  if (putenv(new_path_env)) [[unlikely]] {
+  if (putenv(new_path_env)) {
     const auto rc = errno;
-    fprintf(stderr, "putenv (%s) failed: %s\n", new_path_env, strerror(errno));
+    fprintf(stderr, "putenv (%s) failed: %s\n", new_path_env, strerror(rc));
     return rc;
   }
 
-  void *tier0{::dlopen("libtier0" DLL_EXT_STRING, RTLD_NOW)};
-  if (!tier0) [[unlikely]] {
+  const source::ScopedDll tier0{"libtier0" DLL_EXT_STRING, RTLD_NOW};
+  if (!tier0) {
     fprintf(stderr, "Failed to open %s: %s\n", "libtier0" DLL_EXT_STRING,
             ::dlerror());
     return 1;
   }
 
-  void *vstdlib{::dlopen("libvstdlib" DLL_EXT_STRING, RTLD_NOW)};
-  if (!vstdlib) [[unlikely]] {
+  const source::ScopedDll vstdlib{"libvstdlib" DLL_EXT_STRING, RTLD_NOW};
+  if (!vstdlib) {
     fprintf(stderr, "Failed to open %s: %s\n", "libvstdlib" DLL_EXT_STRING,
             ::dlerror());
     return 2;
   }
 
   constexpr char dedicated_name[]{"dedicated" DLL_EXT_STRING};
-  void *dedicated{::dlopen(dedicated_name, RTLD_NOW)};
-  if (!dedicated) [[unlikely]] {
+  const source::ScopedDll dedicated{dedicated_name, RTLD_NOW};
+  if (!dedicated) {
     fprintf(stderr, "Failed to open %s: %s\n", dedicated_name, ::dlerror());
     return 3;
   }
 
   using DedicatedMainFunction = int (*)(int argc, char *argv[]);
-  auto dedicated_main = reinterpret_cast<DedicatedMainFunction>(
-      ::dlsym(dedicated, "DedicatedMain"));
-  if (!dedicated_main) [[unlikely]] {
+  const auto dedicated_main =
+      dedicated.GetFunction<DedicatedMainFunction>("DedicatedMain");
+  if (!dedicated_main) {
     fprintf(stderr, "Failed to find dedicated server entry point: %s\n",
             ::dlerror());
     return 4;
@@ -128,23 +133,6 @@ int main(int argc, char *argv[]) {
 
   const int rc{dedicated_main(argc, argv)};
 
-  if (::dlclose(dedicated)) [[unlikely]] {
-    fprintf(stderr, "Failed to close the %s: %s.\n", dedicated_name,
-            ::dlerror());
-    return 5;
-  }
-
-  if (::dlclose(vstdlib)) [[unlikely]] {
-    fprintf(stderr, "Failed to close the %s: %s.\n",
-            "libvstdlib" DLL_EXT_STRING, ::dlerror());
-    return 6;
-  }
-
-  if (::dlclose(tier0)) [[unlikely]] {
-    fprintf(stderr, "Failed to close the %s: %s.\n", "libtier0" DLL_EXT_STRING,
-            ::dlerror());
-    return 7;
-  }
-
-  return rc;
+  // Prevent tail call optimization and incorrect stack traces.
+  exit(rc);
 }
