@@ -57,7 +57,7 @@
 
 
 template <typename T>
-inline T AlignValue( T val, uintptr_t alignment )
+constexpr inline T AlignValue( T val, uintptr_t alignment )
 {
 	return (T)( ( (uintptr_t)val + alignment - 1 ) & ~( alignment - 1 ) );
 }
@@ -65,29 +65,50 @@ inline T AlignValue( T val, uintptr_t alignment )
 
 // Pad a number so it lies on an N byte boundary.
 // So PAD_NUMBER(0,4) is 0 and PAD_NUMBER(1,4) is 4
-#define PAD_NUMBER(number, boundary) \
-	( ((number) + ((boundary)-1)) / (boundary) ) * (boundary)
+template<typename T, typename Y>
+constexpr inline auto PAD_NUMBER( T number, Y boundary )
+{
+	return ((number + (boundary - 1)) / boundary) * boundary;
+}
 
 // In case this ever changes
 #if !defined(M_PI) && !defined(HAVE_M_PI)
-#define M_PI			3.14159265358979323846
+constexpr inline double M_PI{3.14159265358979323846};
 #endif
 
 #if !defined(M_PI_F) && !defined(HAVE_M_PI_F)
-#define M_PI_F			3.14159265358979323846f
+constexpr inline float M_PI_F{3.14159265358979323846f};
 #endif
 
 #include "valve_minmax_on.h"
 
 // #define COMPILETIME_MAX and COMPILETIME_MIN for max/min in constant expressions
-#define COMPILETIME_MIN( a, b ) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
-#define COMPILETIME_MAX( a, b ) ( ( ( a ) > ( b ) ) ? ( a ) : ( b ) )
+template <typename T, typename Y>
+constexpr inline auto COMPILETIME_MIN( const T& a, const Y& b )
+{
+	return a < b ? a : b;
+}
+
+template <typename T, typename Y>
+constexpr inline auto COMPILETIME_MAX( const T& a, const Y& b)
+{
+	return a > b ? a : b;
+}
+
 #ifndef MIN
-#define MIN( a, b ) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
+template<typename T, typename Y>
+constexpr inline auto MIN( const T& a, const Y& b )
+{
+	return a < b ? a : b;
+}
 #endif
 
 #ifndef MAX
-#define MAX( a, b ) ( ( ( a ) > ( b ) ) ? ( a ) : ( b ) )
+template<typename T, typename Y>
+constexpr inline auto MAX( const T& a, const Y& b )
+{
+	return a > b ? a : b;
+}
 #endif
 
 #ifdef __cplusplus
@@ -96,8 +117,8 @@ inline T AlignValue( T val, uintptr_t alignment )
 // unexpected side-effects or more expensive code. Even the clamp (all
 // lower-case) function can generate more expensive code because of the
 // mixed types involved.
-template< class T >
-T Clamp( T const &val, T const &minVal, T const &maxVal )
+template< typename T >
+constexpr inline T Clamp( T const &val, T const &minVal, T const &maxVal )
 {
 	if( val < minVal )
 		return minVal;
@@ -109,16 +130,16 @@ T Clamp( T const &val, T const &minVal, T const &maxVal )
 
 // This is the preferred Min operator. Using the MIN macro can lead to unexpected
 // side-effects or more expensive code.
-template< class T >
-T Min( T const &val1, T const &val2 )
+template< typename T >
+constexpr inline T Min( T const &val1, T const &val2 )
 {
 	return val1 < val2 ? val1 : val2;
 }
 
 // This is the preferred Max operator. Using the MAX macro can lead to unexpected
 // side-effects or more expensive code.
-template< class T >
-T Max( T const &val1, T const &val2 )
+template< typename T >
+constexpr inline T Max( T const &val1, T const &val2 )
 {
 	return val1 > val2 ? val1 : val2;
 }
