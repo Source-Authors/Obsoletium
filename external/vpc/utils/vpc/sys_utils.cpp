@@ -285,12 +285,17 @@ void Sys_StripPath(const char *inpath, char *outpath) {
 //
 //	Returns TRUE if file exists.
 bool Sys_Exists(const char *filename) {
+#ifdef _WIN32
+  // dimhotepus: Fast way to check file exists.
+  return ::GetFileAttributesA(filename) != INVALID_FILE_ATTRIBUTES;
+#else
   if (FILE *test = fopen(filename, "rb")) {
     fclose(test);
     return true;
   }
 
   return false;
+#endif
 }
 
 //	Sys_Touch
