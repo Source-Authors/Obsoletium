@@ -7,6 +7,8 @@
 // Unique ID generation
 //=============================================================================//
 
+#include "tier1/uniqueid.h"
+
 #include "tier0/platform.h"
 
 #ifdef IS_WINDOWS_PC
@@ -15,7 +17,6 @@
 #else
 #include "checksum_crc.h"
 #endif
-#include "tier1/uniqueid.h"
 #include "tier1/utlbuffer.h"
 
 //-----------------------------------------------------------------------------

@@ -3,7 +3,6 @@
 // Purpose: String Tools
 //
 //===========================================================================//
-
 // These are redefined in the project settings to prevent anyone from using them.
 // We in this module are of a higher caste and thus are privileged in their use.
 #ifdef strncpy
@@ -42,9 +41,14 @@
 	#undef strncat
 #endif
 
+#include "tier1/strtools.h"
+
 // NOTE: I have to include stdio + stdarg first so vsnprintf gets compiled in
-#include <stdio.h>
-#include <stdarg.h>
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
+#include <cstdlib>
+#include <ctime>
 
 #ifdef POSIX
 #include <iconv.h>
@@ -65,10 +69,6 @@
 #endif
 #endif
 #include "tier0/dbg.h"
-#include "tier1/strtools.h"
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
 #include "tier0/basetypes.h"
 #include "tier1/utldict.h"
 #include "tier1/utlbuffer.h"

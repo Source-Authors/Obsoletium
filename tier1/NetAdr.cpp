@@ -5,12 +5,13 @@
 // NetAdr.cpp: implementation of the CNetAdr class.
 //
 //===========================================================================//
+#include "netadr.h"
+
 #if defined( _WIN32 ) && !defined( _X360 )
 #include "winlite.h"
 #endif
 
 #include "tier0/dbg.h"
-#include "netadr.h"
 #include "tier1/strtools.h"
 
 #if defined( _WIN32 ) && !defined( _X360 )

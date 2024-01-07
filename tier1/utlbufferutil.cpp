@@ -7,17 +7,20 @@
 //===========================================================================//
 
 #include "tier1/utlbufferutil.h"
+
 #include "tier1/utlbuffer.h"
 #include "mathlib/vector.h"
 #include "mathlib/vector2d.h"
 #include "mathlib/vector4d.h"
 #include "mathlib/vmatrix.h"
 #include "Color.h"
-#include <stdio.h>
-#include <stdarg.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <limits.h>
+
+#include <cstdio>
+#include <cstdarg>
+#include <cctype>
+#include <cstdlib>
+#include <climits>
+
 #include "tier1/utlbinaryblock.h"
 #include "tier1/utlstring.h"
 #include "tier1/strtools.h"

@@ -4,6 +4,8 @@
 //
 //=============================================================================//
 
+#include "memstack.h"
+
 #if defined( _WIN32 ) && !defined( _X360 )
 #include "winlite.h"
 #define VA_COMMIT_FLAGS MEM_COMMIT
@@ -14,7 +16,6 @@
 #endif
 
 #include "tier0/dbg.h"
-#include "memstack.h"
 #include "utlmap.h"
 #include "tier0/memdbgon.h"
 

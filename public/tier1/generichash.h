@@ -8,6 +8,8 @@
 #ifndef GENERICHASH_H
 #define GENERICHASH_H
 
+#include "tier0/platform.h"
+
 #if defined(_WIN32)
 #pragma once
 #endif

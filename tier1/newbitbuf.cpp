@@ -23,7 +23,7 @@
 #include "tier0/memdbgon.h"
 #endif
 
-#include "stdio.h"
+#include <cstdio>
 
 #if 0
 

@@ -5,11 +5,12 @@
 //===========================================================================//
 
 #include "mempool.h"
-#include <stdio.h>
+
 #include <malloc.h>
-#include <memory.h>
+#include <cstdio>
+#include <cctype>
+
 #include "tier0/dbg.h"
-#include <ctype.h>
 #include "tier1/strtools.h"
 
 // Should be last include

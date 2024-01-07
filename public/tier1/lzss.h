@@ -9,6 +9,8 @@
 #define _LZSS_H
 #pragma once
 
+#include "tier0/platform.h"
+
 #define LZSS_ID   uint32( BigLong( ('L'<<24)|('Z'<<16)|('S'<<8)|('S') ) )
 #define SNAPPY_ID uint32( BigLong( ('S'<<24)|('N'<<16)|('A'<<8)|('P') ) )
 

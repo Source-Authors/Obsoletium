@@ -5,9 +5,10 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include "stringpool.h"
+
 #include "convar.h"
 #include "tier0/dbg.h"
-#include "stringpool.h"
 #include "tier1/strtools.h"
 #include "generichash.h"
 

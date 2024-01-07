@@ -6,8 +6,9 @@
 //
 //=============================================================================//
 
-#include "basetypes.h"
 #include "datamanager.h"
+
+#include "tier0/basetypes.h"
 
 DECLARE_POINTER_HANDLE( memhandle_t );
 

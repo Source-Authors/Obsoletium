@@ -5,10 +5,12 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include <ctype.h>
-#include <stdio.h>
-#include <string.h>
 #include "tokenreader.h"
+
+#include <cctype>
+#include <cstdio>
+#include <cstring>
+
 #include "tier0/platform.h"
 #include "tier1/strtools.h"
 #include "tier0/dbg.h"

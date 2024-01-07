@@ -5,9 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include "tier1/diff.h"
+
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
-#include "tier1/diff.h"
 #include "mathlib/mathlib.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

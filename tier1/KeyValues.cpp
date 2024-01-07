@@ -13,13 +13,15 @@
 #define _wtoi64(arg) wcstoll(arg, NULL, 10)
 #endif
 
-#include <KeyValues.h>
+#include "KeyValues.h"
+
+#include <cstdlib>
+
 #include "filesystem.h"
-#include <vstdlib/IKeyValuesSystem.h>
+#include "vstdlib/IKeyValuesSystem.h"
 #include "tier0/icommandline.h"
 #include "tier0/vprof_telemetry.h"
-#include <Color.h>
-#include <stdlib.h>
+#include "Color.h"
 #include "tier0/dbg.h"
 #include "tier0/mem.h"
 #include "utlbuffer.h"

@@ -6,9 +6,10 @@
 //
 //=============================================================================//
 
-#include <limits.h>
-#include "tier0/dbg.h"
 #include "tier1/strtools.h"
+
+#include <climits>
+#include "tier0/dbg.h"
 
 // This code was copied from steam
 #define DbgAssert Assert

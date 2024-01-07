@@ -4,12 +4,13 @@
 //
 //=============================================================================
 
-#define __STDC_LIMIT_MACROS
-#include <stdint.h>
-
 #include "tier1/utlstring.h"
+
+#define __STDC_LIMIT_MACROS
+#include <cstdint>
+#include <cctype>
+
 #include "tier1/strtools.h"
-#include <ctype.h>
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"

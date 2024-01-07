@@ -7,6 +7,8 @@
 #ifndef MEMSTACK_H
 #define MEMSTACK_H
 
+#include "tier0/platform.h"
+
 #if defined( _WIN32 )
 #pragma once
 #endif

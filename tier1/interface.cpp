@@ -3,6 +3,8 @@
 // Purpose: 
 //
 //===========================================================================//
+#include "interface.h"
+
 #if defined( _WIN32 ) && !defined( _X360 )
 #include "winlite.h"
 #endif
@@ -20,8 +22,7 @@
 #include <cstdlib>
 #include <system_error>
 
-#include "interface.h"
-#include "basetypes.h"
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"
 #include "tier0/icommandline.h"

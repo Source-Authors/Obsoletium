@@ -7,11 +7,13 @@
 //===========================================================================//
 
 #include "utlbuffer.h"
-#include <stdio.h>
-#include <stdarg.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <limits.h>
+
+#include <cstdio>
+#include <cstdarg>
+#include <cctype>
+#include <cstdlib>
+#include <climits>
+
 #include "tier1/strtools.h"
 #include "tier1/characterset.h"
 

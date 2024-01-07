@@ -4,11 +4,14 @@
 //
 //===========================================================================//
 
-#include "basetypes.h"
-#include "commonmacros.h"
 #include "checksum_md5.h"
-#include <string.h>
-#include <stdio.h>
+
+#include "tier0/basetypes.h"
+#include "tier0/commonmacros.h"
+
+#include <cstring>
+#include <cstdio>
+
 #include "tier1/strtools.h"
 #include "tier0/dbg.h"
 

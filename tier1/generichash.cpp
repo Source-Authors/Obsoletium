@@ -5,11 +5,13 @@
 //
 //=============================================================================
 
-#include <stdlib.h>
+#include "generichash.h"
+
+#include <ctype.h>
+#include <cstdlib>
+
 #include "tier0/basetypes.h"
 #include "tier0/platform.h"
-#include "generichash.h"
-#include <ctype.h>
 #include "tier0/dbg.h"
 
 // NOTE: This has to be the last file included!

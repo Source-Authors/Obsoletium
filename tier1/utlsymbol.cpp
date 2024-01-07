@@ -7,6 +7,7 @@
 //=============================================================================//
 
 #include "utlsymbol.h"
+
 #include "KeyValues.h"
 #include "tier0/threadtools.h"
 #include "tier0/memdbgon.h"

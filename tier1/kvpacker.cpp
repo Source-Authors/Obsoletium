@@ -6,8 +6,9 @@
 //
 //=============================================================================//
 
-#include <KeyValues.h>
 #include "kvpacker.h"
+
+#include "KeyValues.h"
 
 #include "tier0/dbg.h"
 #include "utlbuffer.h"
