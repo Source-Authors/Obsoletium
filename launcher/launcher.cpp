@@ -1035,7 +1035,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	}
 
 #ifdef WIN32
-	if ( !IsWindows10OrGreater() ) [[unlikely]]
+	if ( !IsWindows10OrGreater() )
 	{
 		Error( "Sorry, Windows 10+ required to run the game." );
 		return ERROR_OLD_WIN_VERSION;

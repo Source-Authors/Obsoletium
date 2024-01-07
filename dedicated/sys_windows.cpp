@@ -387,14 +387,14 @@ int DedicatedMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return STATUS_ILLEGAL_INSTRUCTION;
 	}
 
-	if ( !IsWindows10OrGreater() ) [[unlikely]]
+	if ( !IsWindows10OrGreater() )
 	{
 		Error( "Sorry, Windows 10+ required to run the game." );
 		return ERROR_OLD_WIN_VERSION;
 	}
 
 	const auto args_result = Args::FromCommandLine( GetCommandLineW() );
-	if ( const auto *rc = std::get_if<std::error_code>( &args_result )) [[unlikely]]
+	if ( const auto *rc = std::get_if<std::error_code>( &args_result ))
 	{
 		Error( "Sorry, unable to parse command line arguments: %s", rc->message().c_str() );
 		return rc->value();
