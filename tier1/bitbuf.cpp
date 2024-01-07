@@ -152,12 +152,12 @@ void bf_write::StartWriting( void *pData, int nBytes, int iStartBit, int nBits )
 {
 	// Make sure it's dword aligned and padded.
 	Assert( (nBytes % 4) == 0 );
-	Assert(((unsigned long)pData & 3) == 0);
+	Assert(((uintp)pData & 3) == 0);
 
 	// The writing code will overrun the end of the buffer if it isn't dword aligned, so truncate to force alignment
 	nBytes &= ~3;
 
-	m_pData = (unsigned long*)pData;
+	m_pData = static_cast<unsigned long*>(pData);
 	m_nDataBytes = nBytes;
 
 	if ( nBits == -1 )
@@ -166,7 +166,7 @@ void bf_write::StartWriting( void *pData, int nBytes, int iStartBit, int nBits )
 	}
 	else
 	{
-		Assert( nBits <= nBytes*8 );
+		Assert( nBits <= nBytes * 8 );
 		m_nDataBits = nBits;
 	}
 
@@ -462,7 +462,7 @@ bool bf_write::WriteBits(const void *pInData, int nBits)
 	}
 
 	// Align output to dword boundary
-	while (((unsigned long)pOut & 3) != 0 && nBitsLeft >= 8)
+	while (((uintp)pOut & 3) != 0 && nBitsLeft >= 8)
 	{
 
 		WriteUBitLong( *pOut, 8, false );
