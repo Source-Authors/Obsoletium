@@ -39,16 +39,16 @@
 
 
 #ifdef POSIX
-#include <stdint.h>
+#include <cstdint>
 #endif
 
 #define ExecuteNTimes( nTimes, x )	\
 	{								\
-		static int __executeCount=0;\
-		if ( __executeCount < nTimes )\
+		static int executeCount__=0;\
+		if ( executeCount__ < nTimes )\
 		{							\
 			x;						\
-			++__executeCount;		\
+			++executeCount__;		\
 		}							\
 	}
 
