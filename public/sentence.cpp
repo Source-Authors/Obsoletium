@@ -143,7 +143,7 @@ CWordTag::~CWordTag( void )
 {
 	delete[] m_pszWord;
 
-	while ( m_Phonemes.Size() > 0 )
+	while ( m_Phonemes.Count() > 0 )
 	{
 		delete m_Phonemes[ 0 ];
 		m_Phonemes.Remove( 0 );
@@ -1058,10 +1058,10 @@ void CSentence::ResetToBase( void )
 {
 #if PHONEME_EDITOR
 	// Delete everything after m_nResetWordBase
-	while ( m_Words.Size() > m_nResetWordBase )
+	while ( m_Words.Count() > m_nResetWordBase )
 	{
-		delete m_Words[ m_Words.Size() - 1 ];
-		m_Words.Remove( m_Words.Size() - 1 );
+		delete m_Words[ m_Words.Count() - 1 ];
+		m_Words.Remove( m_Words.Count() - 1 );
 	}
 #endif
 	ClearRuntimePhonemes();
@@ -1073,7 +1073,7 @@ void CSentence::ResetToBase( void )
 void CSentence::MarkNewPhraseBase( void )
 {
 #if PHONEME_EDITOR
-	m_nResetWordBase = max( m_Words.Size(), 0 );
+	m_nResetWordBase = max( m_Words.Count(), 0 );
 #endif
 }
 
@@ -1085,7 +1085,7 @@ void CSentence::Reset( void )
 #if PHONEME_EDITOR
 	m_nResetWordBase = 0;
 
-	while ( m_Words.Size() > 0 )
+	while ( m_Words.Count() > 0 )
 	{
 		delete m_Words[ 0 ];
 		m_Words.Remove( 0 );
@@ -1120,13 +1120,13 @@ void CSentence::AddWordTag( CWordTag *tag )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CSentence::CountPhonemes( void )
+intp CSentence::CountPhonemes( void )
 {
-	int c = 0;
+	intp c = 0;
 #if PHONEME_EDITOR
 	for( auto *word : m_Words )
 	{
-		c += word->m_Phonemes.Size();
+		c += word->m_Phonemes.Count();
 	}
 #endif
 	return c;
@@ -1166,9 +1166,9 @@ CWordTag *CSentence::EstimateBestWord( float time )
 	}
 
 	// Return last word
-	if ( m_Words.Size() >= 1 )
+	if ( m_Words.Count() >= 1 )
 	{
-		return m_Words[ m_Words.Size() - 1 ];
+		return m_Words[ m_Words.Count() - 1 ];
 	}
 #endif
 	// Oh well
@@ -1344,13 +1344,13 @@ void CSentence::SetTextFromWords( void )
 #if PHONEME_EDITOR
 	char fulltext[ 1024 ];
 	fulltext[ 0 ] = '\0';
-	for ( int i = 0 ; i < m_Words.Size(); i++ )
+	for ( intp i = 0 ; i < m_Words.Count(); i++ )
 	{
 		CWordTag *word = m_Words[ i ];
 
 		Q_strncat( fulltext, word->GetWord(), sizeof( fulltext ), COPY_ALL_CHARACTERS );
 
-		if ( i != m_Words.Size() )
+		if ( i != m_Words.Count() )
 		{
 			Q_strncat( fulltext, " ", sizeof( fulltext ), COPY_ALL_CHARACTERS );
 		}
@@ -1365,10 +1365,10 @@ void CSentence::SetTextFromWords( void )
 //-----------------------------------------------------------------------------
 void CSentence::Resort( void )
 {
-	int c = m_EmphasisSamples.Size();
-	for ( int i = 0; i < c; i++ )
+	intp c = m_EmphasisSamples.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
-		for ( int j = i + 1; j < c; j++ )
+		for ( intp j = i + 1; j < c; j++ )
 		{
 			CEmphasisSample &src = m_EmphasisSamples[ i ];
 			CEmphasisSample &dest = m_EmphasisSamples[ j ];

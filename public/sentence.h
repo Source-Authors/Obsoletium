@@ -225,7 +225,7 @@ public:
 
 	int				GetWordBase( void );
 
-	int				CountPhonemes( void );
+	intp				CountPhonemes( void );
 
 	// For legacy loading, try to find a word that contains the time
 	CWordTag		*EstimateBestWord( float time );

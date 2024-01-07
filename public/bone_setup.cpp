@@ -5882,8 +5882,8 @@ int Studio_FindRandomAttachment( const CStudioHdr *pStudioHdr, const char *pAtta
 		}
 
 		// Then randomly return one of the attachments
-		if ( matchingAttachments.Size() > 0 )
-			return matchingAttachments[ RandomInt( 0, matchingAttachments.Size()-1 ) ];
+		if ( matchingAttachments.Count() > 0 )
+			return matchingAttachments[ RandomInt( 0, matchingAttachments.Count()-1 ) ];
 	}
 
 	return -1;
