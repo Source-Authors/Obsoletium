@@ -142,7 +142,7 @@ inline unsigned GetEndMask( T numBits )
 }
 
 template<typename T, typename = std::enable_if_t<sizeof(T) <= sizeof(unsigned)>>
-inline T GetBitForBitnum( T bitNum ) 
+constexpr inline T GetBitForBitnum( T bitNum ) 
 { 
 	static T bitsForBitnum[] = 
 	{
