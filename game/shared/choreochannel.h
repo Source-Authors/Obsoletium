@@ -42,8 +42,8 @@ public:
 	const char		*GetName( void );
 
 	// Iterate children
-	int				GetNumEvents( void );
-	CChoreoEvent	*GetEvent( int event );
+	intp				GetNumEvents( void );
+	CChoreoEvent	*GetEvent( intp event );
 
 	// Manipulate children
 	void			AddEvent( CChoreoEvent *event );

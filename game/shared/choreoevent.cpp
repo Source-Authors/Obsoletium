@@ -531,7 +531,7 @@ int CFlexAnimationTrack::GetNumSamples( int type /*=0*/ )
 {
 	Assert( type == 0 || type == 1 );
 
-	return m_Samples[ type ].Size();
+	return m_Samples[ type ].Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -935,9 +935,9 @@ void CFlexAnimationTrack::Resort( int type /*=0*/ )
 {
 	Assert( type == 0 || type == 1 );
 
-	for ( int i = 0; i < m_Samples[ type ].Size(); i++ )
+	for ( intp i = 0; i < m_Samples[ type ].Count(); i++ )
 	{
-		for ( int j = i + 1; j < m_Samples[ type ].Size(); j++ )
+		for ( intp j = i + 1; j < m_Samples[ type ].Count(); j++ )
 		{
 			CExpressionSample src = m_Samples[ type ][ i ];
 			CExpressionSample dest = m_Samples[ type ][ j ];
@@ -1120,8 +1120,8 @@ void CFlexAnimationTrack::RemoveOutOfRangeSamples( int type )
 	Assert( m_pEvent->HasEndTime() );
 	float duration = m_pEvent->GetDuration();
 
-	int c = m_Samples[ type ].Size();
-	for ( int i = c-1; i >= 0; i-- )
+	intp c = m_Samples[ type ].Count();
+	for ( intp i = c-1; i >= 0; i-- )
 	{
 		CExpressionSample src = m_Samples[ type ][ i ];
 		if ( src.time < 0 ||
@@ -2388,9 +2388,9 @@ void CChoreoEvent::ClearAllRelativeTags( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoEvent::GetNumRelativeTags( void )
+intp CChoreoEvent::GetNumRelativeTags( void )
 {
-	return m_RelativeTags.Size();
+	return m_RelativeTags.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -2398,9 +2398,9 @@ int CChoreoEvent::GetNumRelativeTags( void )
 // Input  : tagnum - 
 // Output : CEventRelativeTag
 //-----------------------------------------------------------------------------
-CEventRelativeTag *CChoreoEvent::GetRelativeTag( int tagnum )
+CEventRelativeTag *CChoreoEvent::GetRelativeTag( intp tagnum )
 {
-	Assert( tagnum >= 0 && tagnum < m_RelativeTags.Size() );
+	Assert( tagnum >= 0 && tagnum < m_RelativeTags.Count() );
 	return &m_RelativeTags[ tagnum ];
 }
 
@@ -2421,7 +2421,7 @@ void CChoreoEvent::AddRelativeTag( const char *tagname, float percentage )
 //-----------------------------------------------------------------------------
 void CChoreoEvent::RemoveRelativeTag( const char *tagname )
 {
-	for ( int i = 0; i < m_RelativeTags.Size(); i++ )
+	for ( intp i = 0; i < m_RelativeTags.Count(); i++ )
 	{
 		CEventRelativeTag &prt = m_RelativeTags[ i ];
 
@@ -2517,9 +2517,9 @@ void CChoreoEvent::ClearAllTimingTags( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoEvent::GetNumTimingTags( void )
+intp CChoreoEvent::GetNumTimingTags( void )
 {
-	return m_TimingTags.Size();
+	return m_TimingTags.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -2527,9 +2527,9 @@ int CChoreoEvent::GetNumTimingTags( void )
 // Input  : tagnum - 
 // Output : CEventRelativeTag
 //-----------------------------------------------------------------------------
-CFlexTimingTag *CChoreoEvent::GetTimingTag( int tagnum )
+CFlexTimingTag *CChoreoEvent::GetTimingTag( intp tagnum )
 {
-	Assert( tagnum >= 0 && tagnum < m_TimingTags.Size() );
+	Assert( tagnum >= 0 && tagnum < m_TimingTags.Count() );
 	return &m_TimingTags[ tagnum ];
 }
 
@@ -2547,18 +2547,16 @@ void CChoreoEvent::AddTimingTag( const char *tagname, float percentage, bool loc
 	CFlexTimingTag temp( (CChoreoEvent *)0x1, "", 0.0f, false );
 
 	// ugly bubble sort
-	for ( int i = 0; i < m_TimingTags.Size(); i++ )
+	for ( intp i = 0; i < m_TimingTags.Count(); i++ )
 	{
-		for ( int j = i + 1; j < m_TimingTags.Size(); j++ )
+		for ( intp j = i + 1; j < m_TimingTags.Count(); j++ )
 		{
 			CFlexTimingTag *t1 = &m_TimingTags[ i ];
 			CFlexTimingTag *t2 = &m_TimingTags[ j ];
 
 			if ( t1->GetPercentage() > t2->GetPercentage() )
 			{
-				temp = *t1;
-				*t1 = *t2;
-				*t2 = temp;
+				std::swap( *t1, *t2 );
 			}
 		}
 	}
@@ -2570,7 +2568,7 @@ void CChoreoEvent::AddTimingTag( const char *tagname, float percentage, bool loc
 //-----------------------------------------------------------------------------
 void CChoreoEvent::RemoveTimingTag( const char *tagname )
 {
-	for ( int i = 0; i < m_TimingTags.Size(); i++ )
+	for ( intp i = 0; i < m_TimingTags.Count(); i++ )
 	{
 		CFlexTimingTag &ptt = m_TimingTags[ i ];
 		if ( !stricmp( ptt.GetName(), tagname ) )
@@ -2619,9 +2617,9 @@ void CChoreoEvent::OnEndTimeChanged( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoEvent::GetNumFlexAnimationTracks( void )
+intp CChoreoEvent::GetNumFlexAnimationTracks( void )
 {
-	return m_FlexAnimationTracks.Size();
+	return m_FlexAnimationTracks.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -2629,7 +2627,7 @@ int CChoreoEvent::GetNumFlexAnimationTracks( void )
 // Input  : index - 
 // Output : CFlexAnimationTrack
 //-----------------------------------------------------------------------------
-CFlexAnimationTrack *CChoreoEvent::GetFlexAnimationTrack( int index )
+CFlexAnimationTrack *CChoreoEvent::GetFlexAnimationTrack( intp index )
 {
 	if ( index < 0 || index >= GetNumFlexAnimationTracks() )
 		return NULL;
@@ -2921,9 +2919,9 @@ void CChoreoEvent::ClearAllAbsoluteTags( AbsTagType type )
 // Input  : type - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoEvent::GetNumAbsoluteTags( AbsTagType type )
+intp CChoreoEvent::GetNumAbsoluteTags( AbsTagType type )
 {
-	return m_AbsoluteTags[ type ].Size();
+	return m_AbsoluteTags[ type ].Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -2934,7 +2932,7 @@ int CChoreoEvent::GetNumAbsoluteTags( AbsTagType type )
 //-----------------------------------------------------------------------------
 CEventAbsoluteTag *CChoreoEvent::GetAbsoluteTag( AbsTagType type, int tagnum )
 {
-	Assert( tagnum >= 0 && tagnum < m_AbsoluteTags[ type ].Size() );
+	Assert( tagnum >= 0 && tagnum < m_AbsoluteTags[ type ].Count() );
 	return &m_AbsoluteTags[ type ][ tagnum ];
 }
 
@@ -2971,9 +2969,9 @@ void CChoreoEvent::AddAbsoluteTag( AbsTagType type, const char *tagname, float t
 	CEventAbsoluteTag temp( (CChoreoEvent *)0x1, "", 0.0f );
 
 	// ugly bubble sort
-	for ( int i = 0; i < m_AbsoluteTags[ type ].Size(); i++ )
+	for ( intp i = 0; i < m_AbsoluteTags[ type ].Count(); i++ )
 	{
-		for ( int j = i + 1; j < m_AbsoluteTags[ type ].Size(); j++ )
+		for ( intp j = i + 1; j < m_AbsoluteTags[ type ].Count(); j++ )
 		{
 			CEventAbsoluteTag *t1 = &m_AbsoluteTags[ type ][ i ];
 			CEventAbsoluteTag *t2 = &m_AbsoluteTags[ type ][ j ];
@@ -2993,7 +2991,7 @@ void CChoreoEvent::AddAbsoluteTag( AbsTagType type, const char *tagname, float t
 //-----------------------------------------------------------------------------
 void CChoreoEvent::RemoveAbsoluteTag( AbsTagType type, const char *tagname )
 {
-	for ( int i = 0; i < m_AbsoluteTags[ type ].Size(); i++ )
+	for ( intp i = 0; i < m_AbsoluteTags[ type ].Count(); i++ )
 	{
 		auto &ptag = m_AbsoluteTags[ type ][ i ];
 		if ( !stricmp( ptag.GetName(), tagname ) )
@@ -3018,7 +3016,7 @@ bool CChoreoEvent::VerifyTagOrder( )
 	// Sort tags
 	CEventAbsoluteTag temp( (CChoreoEvent *)0x1, "", 0.0f );
 
-	for ( int i = 0; i < m_AbsoluteTags[ CChoreoEvent::ORIGINAL ].Size(); i++ )
+	for ( intp i = 0; i < m_AbsoluteTags[ CChoreoEvent::ORIGINAL ].Count(); i++ )
 	{
 		CEventAbsoluteTag &ptag = m_AbsoluteTags[ CChoreoEvent::ORIGINAL ][ i ];
 		CEventAbsoluteTag &t1 = m_AbsoluteTags[ CChoreoEvent::PLAYBACK ][ i ];
@@ -3027,7 +3025,7 @@ bool CChoreoEvent::VerifyTagOrder( )
 			continue;
 
 		bInOrder = false;
-		for ( int j = i + 1; j < m_AbsoluteTags[ CChoreoEvent::PLAYBACK ].Size(); j++ )
+		for ( intp j = i + 1; j < m_AbsoluteTags[ CChoreoEvent::PLAYBACK ].Count(); j++ )
 		{
 			CEventAbsoluteTag& t2 = m_AbsoluteTags[ CChoreoEvent::PLAYBACK ][ j ];
 
@@ -3510,9 +3508,9 @@ void CCurveData::Clear( void )
 //-----------------------------------------------------------------------------
 void CCurveData::Resort( ICurveDataAccessor *data )
 {
-	for ( int i = 0; i < m_Ramp.Size(); i++ )
+	for ( intp i = 0; i < m_Ramp.Count(); i++ )
 	{
-		for ( int j = i + 1; j < m_Ramp.Size(); j++ )
+		for ( intp j = i + 1; j < m_Ramp.Count(); j++ )
 		{
 			CExpressionSample src = m_Ramp[ i ];
 			CExpressionSample dest = m_Ramp[ j ];

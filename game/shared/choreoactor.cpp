@@ -89,9 +89,9 @@ const char *CChoreoActor::GetName( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoActor::GetNumChannels( void )
+intp CChoreoActor::GetNumChannels( void )
 {
-	return m_Channels.Size();
+	return m_Channels.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -99,9 +99,9 @@ int CChoreoActor::GetNumChannels( void )
 // Input  : channel - 
 // Output : CChoreoChannel
 //-----------------------------------------------------------------------------
-CChoreoChannel *CChoreoActor::GetChannel( int channel )
+CChoreoChannel *CChoreoActor::GetChannel( intp channel )
 {
-	if ( channel < 0 || channel >= m_Channels.Size() )
+	if ( channel < 0 || channel >= m_Channels.Count() )
 	{
 		return NULL;
 	}

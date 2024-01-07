@@ -41,8 +41,8 @@ public:
 	const char		*GetName( void );
 
 	// Iteration
-	int				GetNumChannels( void );
-	CChoreoChannel	*GetChannel( int channel );
+	intp				GetNumChannels( void );
+	CChoreoChannel	*GetChannel( intp channel );
 
 	CChoreoChannel	*FindChannel( const char *name );
 

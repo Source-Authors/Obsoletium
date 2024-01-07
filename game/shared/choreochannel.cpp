@@ -80,9 +80,9 @@ const char *CChoreoChannel::GetName( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoChannel::GetNumEvents( void )
+intp CChoreoChannel::GetNumEvents( void )
 {
-	return m_Events.Size();
+	return m_Events.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -90,9 +90,9 @@ int CChoreoChannel::GetNumEvents( void )
 // Input  : event - 
 // Output : CChoreoEvent
 //-----------------------------------------------------------------------------
-CChoreoEvent *CChoreoChannel::GetEvent( int event )
+CChoreoEvent *CChoreoChannel::GetEvent( intp event )
 {
-	if ( event < 0 || event >= m_Events.Size() )
+	if ( event < 0 || event >= m_Events.Count() )
 	{
 		return NULL;
 	}
@@ -137,7 +137,7 @@ void CChoreoChannel::RemoveAllEvents()
 //-----------------------------------------------------------------------------
 int CChoreoChannel::FindEventIndex( CChoreoEvent *event )
 {
-	for ( int i = 0; i < m_Events.Size(); i++ )
+	for ( intp i = 0; i < m_Events.Count(); i++ )
 	{
 		if ( event == m_Events[ i ] )
 		{

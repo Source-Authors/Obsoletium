@@ -725,7 +725,7 @@ char const *CBaseEntity::DamageDecal( int bitsDamageType, int gameMaterial )
 //-----------------------------------------------------------------------------
 int	CBaseEntity::GetIndexForThinkContext( const char *pszContext )
 {
-	for ( int i = 0; i < m_aThinkFunctions.Size(); i++ )
+	for ( intp i = 0; i < m_aThinkFunctions.Count(); i++ )
 	{
 		if ( !Q_strncmp( STRING( m_aThinkFunctions[i].m_iszContext ), pszContext, MAX_CONTEXT_LENGTH ) )
 			return i;

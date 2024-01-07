@@ -984,8 +984,8 @@ void CBasePlayer::SimulatePlayerSimulatedEntities( void )
 //-----------------------------------------------------------------------------
 void CBasePlayer::ClearPlayerSimulationList( void )
 {
-	int c = m_SimulatedByThisPlayer.Size();
-	int i;
+	intp c = m_SimulatedByThisPlayer.Count();
+	intp i;
 
 	for ( i = c - 1; i >= 0; i-- )
 	{

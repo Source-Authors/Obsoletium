@@ -249,28 +249,24 @@ void CChoreoScene::Init( IChoreoEventCallback *callback )
 //-----------------------------------------------------------------------------
 CChoreoScene::~CChoreoScene( void )
 {
-	int i;
-	for ( i = 0; i < m_Actors.Size(); i++ )
+	for ( auto *a : m_Actors )
 	{
-		CChoreoActor *a = m_Actors[ i ];
 		Assert( a );
 		delete a;
 	}
 
 	m_Actors.RemoveAll();
 
-	for ( i = 0; i < m_Events.Size(); i++ )
+	for ( auto *e : m_Events )
 	{
-		CChoreoEvent *e = m_Events[ i ];
 		Assert( e );
 		delete e;
 	}
 
 	m_Events.RemoveAll();
 
-	for ( i = 0 ; i < m_Channels.Size(); i++ )
+	for ( auto *c : m_Channels )
 	{
-		CChoreoChannel *c = m_Channels[ i ];
 		Assert( c );
 		delete c;
 	}

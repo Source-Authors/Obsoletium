@@ -441,8 +441,8 @@ public:
 	const char		*GetDescription( void );
 
 	void			ClearAllRelativeTags( void );
-	int				GetNumRelativeTags( void );
-	CEventRelativeTag *GetRelativeTag( int tagnum );
+	intp				GetNumRelativeTags( void );
+	CEventRelativeTag *GetRelativeTag( intp tagnum );
 	CEventRelativeTag *FindRelativeTag( const char *tagname );
 	void			AddRelativeTag( const char *tagname, float percentage );
 	void			RemoveRelativeTag( const char *tagname );
@@ -465,8 +465,8 @@ public:
 	bool			GetGestureSequenceDuration( float& duration );
 
 	void			ClearAllAbsoluteTags( AbsTagType type );
-	int				GetNumAbsoluteTags( AbsTagType type );
-	CEventAbsoluteTag *GetAbsoluteTag( AbsTagType type, int tagnum );
+	intp				GetNumAbsoluteTags( AbsTagType type );
+	CEventAbsoluteTag *GetAbsoluteTag( AbsTagType type, intp tagnum );
 	CEventAbsoluteTag *FindAbsoluteTag( AbsTagType type, const char *tagname );
 	void			AddAbsoluteTag( AbsTagType type, const char *tagname, float t );
 	void			RemoveAbsoluteTag( AbsTagType type, const char *tagname );
@@ -484,8 +484,8 @@ public:
 	CEventAbsoluteTag *FindExitTag( AbsTagType type );
 
 	// Flex animation type
-	int				GetNumFlexAnimationTracks( void );
-	CFlexAnimationTrack		*GetFlexAnimationTrack( int index );
+	intp				GetNumFlexAnimationTracks( void );
+	CFlexAnimationTrack		*GetFlexAnimationTrack( intp index );
 	CFlexAnimationTrack		*AddTrack( const char *controllername );
 	CFlexAnimationTrack		*FindTrack( const char *controllername );
 	void			RemoveTrack( int index );
@@ -497,8 +497,8 @@ public:
 
 	// Flex Timing Tags (used by editor only)
 	void			ClearAllTimingTags( void );
-	int				GetNumTimingTags( void );
-	CFlexTimingTag	*GetTimingTag( int tagnum );
+	intp				GetNumTimingTags( void );
+	CFlexTimingTag	*GetTimingTag( intp tagnum );
 	CFlexTimingTag	*FindTimingTag( const char *tagname );
 	void			AddTimingTag( const char *tagname, float percentage, bool locked );
 	void			RemoveTimingTag( const char *tagname );
