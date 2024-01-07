@@ -113,7 +113,7 @@ BEGIN_VS_SHADER( Cable_DX8,
 			}
 			
 			// This is the light direction [0,1,0,0] * A * 0.5
-			float lightDir[4] = {0, A*0.5, 0, 0};
+			float lightDir[4] = {0, A*0.5f, 0, 0};
 			if( g_pHardwareConfig->GetDXSupportLevel() >= 90)
 			{
 				SetVertexShaderConstantGammaToLinear( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, lightDir );

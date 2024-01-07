@@ -161,7 +161,7 @@ BEGIN_VS_SHADER( VortWarp_dx8,
 			pShaderAPI->SetPixelShaderConstant( 5, c5, 1 );
 
 			float curTime = pShaderAPI->CurrentTime();
-			float selfIllumScroll[4] = { .11f * curTime, .124 * curTime, 0.0f, 0.0f };
+			float selfIllumScroll[4] = { .11f * curTime, .124f * curTime, 0.0f, 0.0f };
 			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_4, selfIllumScroll, 1 );
 
 			vortwarp_vs11_Dynamic_Index vshIndex;
