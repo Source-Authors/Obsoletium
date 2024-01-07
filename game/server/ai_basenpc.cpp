@@ -7600,7 +7600,7 @@ void CAI_BaseNPC::RememberUnreachable(CBaseEntity *pEntity, float duration )
 
 	const float NPC_UNREACHABLE_TIMEOUT = ( duration > 0.0 ) ? duration : 3;
 	// Only add to list if not already on it
-	for (int i=m_UnreachableEnts.Size()-1;i>=0;i--)
+	for (intp i=m_UnreachableEnts.Count()-1;i>=0;i--)
 	{
 		// If record already exists just update mark time
 		if (pEntity == m_UnreachableEnts[i].hUnreachableEnt)
@@ -7630,7 +7630,7 @@ bool CAI_BaseNPC::IsUnreachable(CBaseEntity *pEntity)
 
 	// Note that it's ok to remove elements while I'm iterating
 	// as long as I iterate backwards and remove them using FastRemove
-	for (int i=m_UnreachableEnts.Size()-1;i>=0;i--)
+	for (intp i=m_UnreachableEnts.Count()-1;i>=0;i--)
 	{
 		// Remove any dead elements
 		if (m_UnreachableEnts[i].hUnreachableEnt == NULL)

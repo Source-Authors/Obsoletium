@@ -992,10 +992,8 @@ public:
 	const void *FindSceneFile( CBaseFlex *instance, const char *filename, bool allowBlockingIO )
 	{
 		// See if it's already loaded
-		int i;
-		for ( i = 0; i < m_FileList.Size(); i++ )
+		for ( auto *file : m_FileList )
 		{
-			CFlexSceneFile *file = m_FileList[ i ];
 			if ( file && !stricmp( file->filename, filename ) )
 			{
 				// Make sure translations (local to global flex controller) are set up for this instance
@@ -1071,7 +1069,7 @@ private:
 
 	void DeleteSceneFiles()
 	{
-		while ( m_FileList.Size() > 0 )
+		while ( m_FileList.Count() > 0 )
 		{
 			CFlexSceneFile *file = m_FileList[ 0 ];
 			m_FileList.Remove( 0 );

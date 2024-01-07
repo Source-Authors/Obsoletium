@@ -1678,12 +1678,12 @@ class CThinkContextsSaveDataOps : public CDefSaveRestoreOps
 
 		pSave->StartBlock();
 		// Now write out all the functions
-		for ( int i = 0; i < pUtlVector->Size(); i++ )
+		for ( auto &&v : *pUtlVector )
 		{
 #ifdef WIN32
-			void **ppV = (void**)&((*pUtlVector)[i].m_pfnThink);
+			void **ppV = (void**)&(v.m_pfnThink);
 #else
-			BASEPTR *ppV = &((*pUtlVector)[i].m_pfnThink);
+			BASEPTR *ppV = &(v.m_pfnThink);
 #endif
 			bool bHasFunc = (*ppV != NULL);
 			pSave->WriteBool( &bHasFunc, 1 );
@@ -1708,14 +1708,14 @@ class CThinkContextsSaveDataOps : public CDefSaveRestoreOps
 
 		pRestore->StartBlock();
 		// Now read in all the functions
-		for ( int i = 0; i < pUtlVector->Size(); i++ )
+		for ( auto &&v : *pUtlVector )
 		{
 			bool bHasFunc;
 			pRestore->ReadBool( &bHasFunc, 1 );
 #ifdef WIN32
-			void **ppV = (void**)&((*pUtlVector)[i].m_pfnThink);
+			void **ppV = (void**)&(v.m_pfnThink);
 #else
-			BASEPTR *ppV = &((*pUtlVector)[i].m_pfnThink);
+			BASEPTR *ppV = &(v.m_pfnThink);
 			Q_memset( (void *)ppV, 0x0, sizeof(inputfunc_t) );
 #endif
 			if ( bHasFunc )
