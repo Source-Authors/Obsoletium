@@ -45,6 +45,10 @@ ConVar hap_damagescale_game("hap_damagescale_game", HAP_DEFAULT_DAMAGE_SCALE_GAM
 
 #endif
 
+#if defined(CLIENT_DLL)
+IHaptics::~IHaptics() {}
+#endif
+
 void HapticSendWeaponAnim(CBaseCombatWeapon* weapon, int iActivity)
 {
 	//ignore idle

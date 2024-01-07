@@ -132,6 +132,7 @@ public: // Notify methods
 
 	virtual void WorldPrecache() = 0;
 
+	virtual ~IHaptics() = 0;
 };
 
 inline void IHaptics::ClearNavigationClass( void )
