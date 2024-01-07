@@ -19,12 +19,6 @@ $Configuration
 	$General
 	{
 		$ExecutableDirectories "$(ExecutablePath);$(Path)"
-		// We need to override mt.exe for Win7 compatibiity.  Append paths before $(ExecutablePath) if you need VS to use your tools rather than its own
-		$ExecutableDirectories "$SRCDIR\devtools\vstools;$BASE"
-		// VS 2012 compiles fine but does not link. We want to redirect to stub versions of
-		// the tools (like link.exe and mt.exe) so that the link stage will be NOPed when
-		// doing /analyze builds.
-		$ExecutableDirectories "$SRCDIR\devtools\vs_nop_tools;$BASE" [$ANALYZE]
 	}
 
 	$Compiler
