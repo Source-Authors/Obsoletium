@@ -261,7 +261,7 @@ void RichText::SetFgColor( Color color )
 {
 	// Replace default format color if 
 	// the stream is empty and the color is the default ( or the previous FgColor )
-	if ( m_FormatStream.Size() == 1 && 
+	if ( m_FormatStream.Count() == 1 && 
 		( m_FormatStream[0].color == _defaultTextColor || m_FormatStream[0].color == GetFgColor() ) )
 	{
 		m_FormatStream[0].color = color;

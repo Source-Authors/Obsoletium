@@ -813,7 +813,7 @@ void SectionedListPanel::ReSortList()
 
 	int sectionStart = 0;
 	// layout the buttons
-	for (int sectionIndex = 0; sectionIndex < m_Sections.Size(); sectionIndex++)
+	for (intp sectionIndex = 0; sectionIndex < m_Sections.Count(); sectionIndex++)
 	{
 		section_t &section = m_Sections[sectionIndex];
 		sectionStart = m_SortedItems.Count();
@@ -923,13 +923,13 @@ void SectionedListPanel::LayoutPanels(int &contentTall)
 
 	// layout the buttons
 	bool bFirstVisibleSection = true;
-	for (int sectionIndex = 0; sectionIndex < m_Sections.Size(); sectionIndex++)
+	for (intp sectionIndex = 0; sectionIndex < m_Sections.Count(); sectionIndex++)
 	{
 		section_t &section = m_Sections[sectionIndex];
 
 		iStart = -1;
 		iEnd = -1;
-        for (int i = 0; i < m_SortedItems.Count(); i++)
+        for (intp i = 0; i < m_SortedItems.Count(); i++)
         {
             if (m_SortedItems[i]->GetSectionID() == m_Sections[sectionIndex].m_iID)
             {
@@ -1454,7 +1454,7 @@ int SectionedListPanel::GetColumnCountBySection(int sectionID)
 	if (index < 0)
 		return NULL;
 
-	return m_Sections[index].m_Columns.Size();
+	return m_Sections[index].m_Columns.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -1464,7 +1464,7 @@ int SectionedListPanel::GetColumnCountBySection(int sectionID)
 const char *SectionedListPanel::GetColumnNameBySection(int sectionID, int columnIndex)
 {
 	int index = FindSectionIndexByID(sectionID);
-	if (index < 0 || columnIndex >= m_Sections[index].m_Columns.Size())
+	if (index < 0 || columnIndex >= m_Sections[index].m_Columns.Count())
 		return NULL;
 
 	return m_Sections[index].m_Columns[columnIndex].m_szColumnName;
@@ -1476,7 +1476,7 @@ const char *SectionedListPanel::GetColumnNameBySection(int sectionID, int column
 const wchar_t *SectionedListPanel::GetColumnTextBySection(int sectionID, int columnIndex)
 {
 	int index = FindSectionIndexByID(sectionID);
-	if (index < 0 || columnIndex >= m_Sections[index].m_Columns.Size())
+	if (index < 0 || columnIndex >= m_Sections[index].m_Columns.Count())
 		return NULL;
 	
 	return m_Sections[index].m_Columns[columnIndex].m_szColumnText;
@@ -1491,7 +1491,7 @@ int SectionedListPanel::GetColumnFlagsBySection(int sectionID, int columnIndex)
 	if (index < 0)
 		return 0;
 
-	if (columnIndex >= m_Sections[index].m_Columns.Size())
+	if (columnIndex >= m_Sections[index].m_Columns.Count())
 		return 0;
 
 	return m_Sections[index].m_Columns[columnIndex].m_iColumnFlags;
@@ -1506,7 +1506,7 @@ int SectionedListPanel::GetColumnWidthBySection(int sectionID, int columnIndex)
 	if (index < 0)
 		return 0;
 
-	if (columnIndex >= m_Sections[index].m_Columns.Size())
+	if (columnIndex >= m_Sections[index].m_Columns.Count())
 		return 0;
 
 	return m_Sections[index].m_Columns[columnIndex].m_iWidth;
@@ -1568,7 +1568,7 @@ int SectionedListPanel::GetColumnIndexByName(int sectionID, char* name)
 //-----------------------------------------------------------------------------
 int SectionedListPanel::FindSectionIndexByID(int sectionID)
 {
-	for (int i = 0; i < m_Sections.Size(); i++)
+	for (intp i = 0; i < m_Sections.Count(); i++)
 	{
 		if (m_Sections[i].m_iID == sectionID)
 		{
@@ -2222,7 +2222,7 @@ HFont SectionedListPanel::GetColumnFallbackFontBySection( int sectionID, int col
 	if (index < 0)
 		return INVALID_FONT;
 
-	if (columnIndex >= m_Sections[index].m_Columns.Size())
+	if (columnIndex >= m_Sections[index].m_Columns.Count())
 		return INVALID_FONT;
 
 	return m_Sections[index].m_Columns[columnIndex].m_hFallbackFont;

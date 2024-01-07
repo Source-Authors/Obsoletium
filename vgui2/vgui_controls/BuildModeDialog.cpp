@@ -90,12 +90,11 @@ public:
 
 	void RemoveAll( void )
 	{
-		for ( int i = 0; i < m_PanelList.Size(); i++ )
+		for ( auto &&item : m_PanelList )
 		{
-			PanelItem_t *item = &m_PanelList[i];
-			delete item->m_EditLabel;
-			delete item->m_EditPanel;
-			delete item->m_EditButton;
+			delete item.m_EditLabel;
+			delete item.m_EditPanel;
+			delete item.m_EditButton;
 		}
 
 		m_PanelList.RemoveAll();
@@ -831,12 +830,12 @@ void BuildModeDialog::UpdateControlData(Panel *control)
 	control->GetSettings( dat );
 
 	// apply the settings to the edit panels
-	for ( int i = 0; i < m_pPanelList->m_PanelList.Size(); i++ )
+	for ( auto &&p : m_pPanelList->m_PanelList )
 	{
-		const char *name = m_pPanelList->m_PanelList[i].m_szName;
+		const char *name = p.m_szName;
 		const char *datstring = dat->GetString( name, "" );
 
-		UpdateEditControl(m_pPanelList->m_PanelList[i], datstring);
+		UpdateEditControl(p, datstring);
 	}
 
 	char statusText[512];

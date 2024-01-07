@@ -1251,11 +1251,11 @@ void Panel::PaintTraverse( bool repaint, bool allowForce )
 			// outline all selected panels 
 			// outline all selected panels 
 			CUtlVector<PHandle> *controlGroup = _buildGroup->GetControlGroup();
-			for (int i=0; i < controlGroup->Size(); ++i)
+			for ( auto &&g : *controlGroup )
 			{
-				surface()->PushMakeCurrent( ((*controlGroup)[i].Get())->GetVPanel(), false );
-				((*controlGroup)[i].Get())->PaintBuildOverlay();
-				surface()->PopMakeCurrent( ((*controlGroup)[i].Get())->GetVPanel() );
+				surface()->PushMakeCurrent( g.Get()->GetVPanel(), false );
+				g.Get()->PaintBuildOverlay();
+				surface()->PopMakeCurrent( g.Get()->GetVPanel() );
 			}	
 			
 			_buildGroup->DrawRulers();						

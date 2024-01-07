@@ -148,7 +148,7 @@ void BaseTooltip::SetText(const char *text)
 		text = "";
 	}
 
-	if (m_Text.Size() > 0)
+	if (m_Text.Count() > 0)
 	{
 		m_Text.RemoveAll();
 	}

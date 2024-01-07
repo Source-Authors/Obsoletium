@@ -594,7 +594,7 @@ void CConsolePanel::OnAutoComplete(bool reverse)
 		if (m_iNextCompletion < 0)
 		{
 			// loop around in reverse
-			m_iNextCompletion = m_CompletionList.Size() - 1;
+			m_iNextCompletion = m_CompletionList.Count() - 1;
 		}
 	}
 
