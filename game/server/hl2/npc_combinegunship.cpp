@@ -2178,9 +2178,9 @@ void CNPC_CombineGunship::Flight( void )
 	VectorNormalize( goalUp );
 
 	// calc goal orientation to hit linear accel forces
-	float goalPitch = RAD2DEG( asin( DotProduct( forward, goalUp ) ) );
+	float goalPitch = RAD2DEG( asinf( DotProduct( forward, goalUp ) ) );
 	float goalYaw = UTIL_VecToYaw( m_vecDesiredFaceDir );
-	float goalRoll = RAD2DEG( asin( DotProduct( right, goalUp ) ) );
+	float goalRoll = RAD2DEG( asinf( DotProduct( right, goalUp ) ) );
 
 	// clamp goal orientations
 	goalPitch = clamp( goalPitch, -45, 60 );

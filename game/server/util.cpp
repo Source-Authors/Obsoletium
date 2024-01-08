@@ -2837,11 +2837,11 @@ void CC_KDTreeTest( const CCommand &args )
 			flRadius =  fabs( flRadius );
 
 			flTheta  += NUM_KDTREE_TESTS * 76.76;
-			flTheta  =  fmod( flTheta, (double) DEG2RAD( 360 ) );
+			flTheta  =  fmod( flTheta, DEG2RAD( 360.0 ) );
 			flTheta  =  fabs( flTheta );
 
 			flPhi    += NUM_KDTREE_TESTS * 1997.99;
-			flPhi    =  fmod( flPhi, (double) DEG2RAD( 180 ) );
+			flPhi    =  fmod( flPhi, DEG2RAD( 180.0 ) );
 			flPhi    =  fabs( flPhi );
 
 			float st, ct, sp, cp;
@@ -3136,9 +3136,9 @@ void CC_CollisionTest( const CCommand &args )
 			radius += NUM_COLLISION_TESTS * 123.123;
 			radius = fabs(fmod(radius, 128));
 			theta += NUM_COLLISION_TESTS * 76.76;
-			theta = fabs(fmod(theta, DEG2RAD(360)));
+			theta = fabsf(fmodf(theta, DEG2RAD(360.0f)));
 			phi += NUM_COLLISION_TESTS * 1997.99;
-			phi = fabs(fmod(phi, DEG2RAD(180)));
+			phi = fabsf(fmodf(phi, DEG2RAD(180.0f)));
 			
 			float st, ct, sp, cp;
 			SinCos( theta, &st, &ct );

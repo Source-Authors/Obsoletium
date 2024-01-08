@@ -2748,7 +2748,7 @@ void ComputeTextureMatrixFromRectangle( VMatrix* pOutMat, const Vector2D& bl, co
 	// Simplification of acos( ( A . L ) / ( mag( A ) * mag( L ) )
 	// Because A is ( 0, 1), which means A . L is just L.y
 	// and mag( A ) * mag( L ) is just mag( L )
-	float rotationD = RAD2DEG( acos( leftEdge.y / magLeftEdge ) ) 
+	float rotationD = RAD2DEG( acosf( leftEdge.y / magLeftEdge ) ) 
 		            * ( leftEdge.x < 0 ? 1 : -1 );
 	
 	VMatrix tmpMat;

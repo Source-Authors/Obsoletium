@@ -1293,7 +1293,7 @@ float CPhysicsObject::CalculateAngularDrag( const Vector &objectSpaceRotationAxi
 	ConvertDirectionToIVP( objectSpaceRotationAxis, ivpAxis );
 
 	// drag factor is per-radian, convert to per-degree
-	return GetAngularDragInDirection( ivpAxis ) * DEG2RAD(1.0);
+	return GetAngularDragInDirection( ivpAxis ) * DEG2RAD(1.0f);
 }
 
 

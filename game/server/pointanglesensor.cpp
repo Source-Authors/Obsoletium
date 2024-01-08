@@ -373,11 +373,11 @@ int CPointAngleSensor::DrawDebugTextOverlays(void)
 		bool bFacing = IsFacingWithinTolerance(m_hTargetEntity, m_hLookAtEntity, m_flDotTolerance, &flDot);
 
 		char tempstr[512];
-		Q_snprintf(tempstr, sizeof(tempstr), "delta ang (dot)    : %.2f (%f)", RAD2DEG(acos(flDot)), flDot);
+		Q_snprintf(tempstr, sizeof(tempstr), "delta ang (dot)    : %.2f (%f)", RAD2DEG(acosf(flDot)), flDot);
 		EntityText( nOffset, tempstr, 0);
 		nOffset++;
 
-		Q_snprintf(tempstr, sizeof(tempstr), "tolerance ang (dot): %.2f (%f)", RAD2DEG(acos(m_flDotTolerance)), m_flDotTolerance);
+		Q_snprintf(tempstr, sizeof(tempstr), "tolerance ang (dot): %.2f (%f)", RAD2DEG(acosf(m_flDotTolerance)), m_flDotTolerance);
 		EntityText( nOffset, tempstr, 0);
 		nOffset++;
 

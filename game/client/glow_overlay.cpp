@@ -60,7 +60,7 @@ ConVar cl_sun_decay_rate( "cl_sun_decay_rate", "0.05", FCVAR_CHEAT );
 
 // Dot product space the overlays are drawn in.
 // Here it's setup to allow you to see it if you're looking within 40 degrees of the source.
-float g_flOverlayRange = cos( DEG2RAD( 40 ) );
+float g_flOverlayRange = cosf( DEG2RAD( 40.0f ) );
 
 // ----------------------------------------------------------------------------- //
 // ----------------------------------------------------------------------------- //

@@ -562,7 +562,7 @@ void CReplayRenderer::SetupSampleView( int x, int y, int w, int h, int nSample, 
 	const float fov = viewSetup.fov;
 	float fHalfAngleRadians = DEG2RAD( 0.5f * fov );
 	float t = tan( fHalfAngleRadians ) * (viewSetup.m_flAspectRatio / ( 4.0f / 3.0f ));
-	viewSetup.fov = RAD2DEG( 2.0f * atan( t ) );
+	viewSetup.fov = RAD2DEG( 2.0f * atanf( t ) );
 
 	viewSetup.fovViewmodel = viewSetup.fov + GetViewModelFOVOffset();
 	viewSetup.zNearViewmodel = 1;

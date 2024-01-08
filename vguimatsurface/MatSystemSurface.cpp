@@ -3502,7 +3502,7 @@ void CMatSystemSurface::DrawColoredCircle( int centerx, int centery, float radiu
 
 	Assert( g_bInDrawing );
 	// Draw a circle
-	int iDegrees = 0;
+	float flDegrees = 0.0f;
 	Vector vecPoint, vecLastPoint(0,0,0);
 	vecPoint.z = 0.0f;
 	Color clr;
@@ -3511,12 +3511,12 @@ void CMatSystemSurface::DrawColoredCircle( int centerx, int centery, float radiu
 
 	for ( int i = 0; i < CIRCLE_POINTS; i++ )
 	{
-		float flRadians = DEG2RAD( iDegrees );
-		iDegrees += (360 / CIRCLE_POINTS);
+		float flRadians = DEG2RAD( flDegrees );
+		flDegrees += (360.0f / CIRCLE_POINTS);
 
-		float ca = cosf( flRadians );
-		float sa = sinf( flRadians );
-					 
+		float ca, sa;
+		SinCos( flRadians, &sa, &ca );
+
 		// Rotate it around the circle
 		vecPoint.x = centerx + (radius * sa);
 		vecPoint.y = centery - (radius * ca);

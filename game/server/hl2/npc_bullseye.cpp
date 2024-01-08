@@ -352,8 +352,8 @@ bool CNPC_Bullseye::CanBecomeRagdoll()
 //-----------------------------------------------------------------------------
 bool CNPC_Bullseye::CanBeAnEnemyOf( CBaseEntity *pEnemy )
 {
-	static const float flFullFov = cos( DEG2RAD(360) / 2.0 );
-	if ( fabsf( m_flFieldOfView - flFullFov ) > .01 )
+	static const float flFullFov = cosf( DEG2RAD(360.0f) / 2.0 );
+	if ( fabsf( m_flFieldOfView - flFullFov ) > .01f )
 	{
 		if ( !FInViewCone( pEnemy ) )
 		{

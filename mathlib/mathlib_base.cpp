@@ -1629,8 +1629,8 @@ float QuaternionAngleDiff( const Quaternion &p, const Quaternion &q )
 
 	// Note if the quaternion is slightly non-normalized the square root below may be more than 1,
 	// the value is clamped to one otherwise it may result in asin() returning an undefined result.
-	float sinang = MIN( 1.0f, sqrt( diff.x * diff.x + diff.y * diff.y + diff.z * diff.z ) );
-	float angle = RAD2DEG( 2 * asin( sinang ) );
+	float sinang = MIN( 1.0f, sqrtf( diff.x * diff.x + diff.y * diff.y + diff.z * diff.z ) );
+	float angle = RAD2DEG( 2 * asinf( sinang ) );
 	return angle;
 #else
 	Quaternion q2;
@@ -1917,9 +1917,9 @@ void QuaternionAngles( const Quaternion &q, QAngle &angles )
 	m33 = ( 2.0f * q.w * q.w ) + ( 2.0f * q.z * q.z ) - 1.0f;
 
 	// FIXME: this code has a singularity near PITCH +-90
-	angles[YAW] = RAD2DEG( atan2(m12, m11) );
-	angles[PITCH] = RAD2DEG( asin(-m13) );
-	angles[ROLL] = RAD2DEG( atan2(m23, m33) );
+	angles[YAW] = RAD2DEG( atan2f(m12, m11) );
+	angles[PITCH] = RAD2DEG( asinf(-m13) );
+	angles[ROLL] = RAD2DEG( atan2f(m23, m33) );
 #endif
 
 	Assert( angles.IsValid() );
@@ -1931,7 +1931,7 @@ void QuaternionAngles( const Quaternion &q, QAngle &angles )
 //-----------------------------------------------------------------------------
 void QuaternionAxisAngle( const Quaternion &q, Vector &axis, float &angle )
 {
-	angle = RAD2DEG(2 * acos(q.w));
+	angle = RAD2DEG(2 * acosf(q.w));
 	if ( angle > 180 )
 	{
 		angle -= 360;
@@ -3839,14 +3839,14 @@ float CalcFovY( float flFovX, float flAspect )
 	//return RAD2DEG( yRadians ) * 2;
 
 	// The short and sweet version.
-	float val = atan( tan( DEG2RAD( flFovX ) * 0.5f ) / flAspect );
+	float val = atanf( tanf( DEG2RAD( flFovX ) * 0.5f ) / flAspect );
 	val = RAD2DEG( val ) * 2.0f;
 	return val;
 }
 
 float CalcFovX( float flFovY, float flAspect )
 {
-	return RAD2DEG( atan( tan( DEG2RAD( flFovY ) * 0.5f ) * flAspect ) ) * 2.0f;
+	return RAD2DEG( atanf( tanf( DEG2RAD( flFovY ) * 0.5f ) * flAspect ) ) * 2.0f;
 }
 
 

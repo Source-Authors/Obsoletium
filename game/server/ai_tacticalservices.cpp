@@ -572,7 +572,7 @@ int CAI_TacticalServices::FindLosNode(const Vector &vThreatPos, const Vector &vT
 					
 					float flDot = DotProduct( vecEnemyToRef, vecEnemyToNode );
 					
-					if ( RAD2DEG( acos( flDot ) ) < flFlankParam )
+					if ( RAD2DEG( acosf( flDot ) ) < flFlankParam )
 					{
 						skip = true;
 					}

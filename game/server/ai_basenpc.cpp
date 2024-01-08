@@ -2447,7 +2447,7 @@ void CAI_BaseNPC::SetHeadDirection( const Vector &vTargetPos, float flInterval)
 	Vector	vEyePosition	= EyePosition();
 	float	fTargetDist		= (vTargetPos - vEyePosition).Length();
 	float	fVertDist		= vTargetPos.z - vEyePosition.z;
-	float	flDesiredPitch	= -RAD2DEG(atan(fVertDist/fTargetDist));
+	float	flDesiredPitch	= -RAD2DEG(atanf(fVertDist/fTargetDist));
 
 	// Make frame rate independent
 	timeToUse = flInterval;
@@ -9226,7 +9226,7 @@ int CAI_BaseNPC::DrawDebugTextOverlays(void)
 			if ( GetActiveWeapon() && GetEnemy() )
 			{
 				Vector curSpread = GetAttackSpread(GetActiveWeapon(), GetEnemy());
-				float curCone = RAD2DEG(asin(curSpread.x)) * 2;
+				float curCone = RAD2DEG(asinf(curSpread.x)) * 2;
 				float bias = GetSpreadBias( GetActiveWeapon(), GetEnemy());
 				EntityText(text_offset,msg.sprintf("Cone %.1f, Bias %.2f", curCone, bias),0);
 				text_offset++;

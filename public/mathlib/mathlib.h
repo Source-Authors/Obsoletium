@@ -288,21 +288,24 @@ struct matrix3x4_t
 };
 
 
-#ifndef M_PI
-	#define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
-#endif
-
-#ifndef M_PI_F
-	#define M_PI_F		((float)(M_PI))	// Shouldn't collide with anything.
-#endif
+// dimhotepus: tier0/basetypes.h already has these.
+//#ifndef M_PI
+//constexpr inline double M_PI{3.14159265358979323846};	// matches value in gcc v2 math.h
+//#endif
+//
+//#ifndef M_PI_F
+//constexpr inline float M_PI_F{3.14159265358979323846f};	// Shouldn't collide with anything.
+//#endif
 
 // NJS: Inlined to prevent floats from being autopromoted to doubles, as with the old system.
 #ifndef RAD2DEG
-	#define RAD2DEG( x  )  ( (float)(x) * (float)(180.f / M_PI_F) )
+constexpr inline float RAD2DEG(float x) { return x * (180.f / M_PI_F); }
+constexpr inline double RAD2DEG(double x) { return x * (180.0 / M_PI); }
 #endif
 
 #ifndef DEG2RAD
-	#define DEG2RAD( x  )  ( (float)(x) * (float)(M_PI_F / 180.f) )
+constexpr inline float DEG2RAD(float x) { return x * (M_PI_F / 180.f); }
+constexpr inline double DEG2RAD(double x) { return x * (M_PI / 180.0); }
 #endif
 
 // Used to represent sides of things like planes.

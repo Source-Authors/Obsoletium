@@ -289,7 +289,7 @@ void CAI_Spotlight::UpdateSpotlightDirection( void )
 	// Compute the amount to rotate
 	float flDot = DotProduct( vTargetDir, m_vSpotlightDir );
 	flDot = clamp( flDot, -1.0f, 1.0f );
-	float flAngle = AngleNormalize( RAD2DEG( acos( flDot ) ) );
+	float flAngle = AngleNormalize( RAD2DEG( acosf( flDot ) ) );
 	float flClampedAngle = clamp( flAngle, 0.0f, 45.0f );
 	float flBeamTurnRate = SimpleSplineRemapVal( flClampedAngle, 0.0f, 45.0f, 10.0f, 45.0f );
 	if ( fabs(flAngle) > flBeamTurnRate * gpGlobals->frametime )
@@ -312,7 +312,7 @@ void CAI_Spotlight::UpdateSpotlightDirection( void )
 	m_vAngularVelocity = resultQuat;
 
 	// If we're really close, and we're not moving very quickly, slam.
-	float flActualRotation = AngleNormalize( RAD2DEG(2 * acos(m_vAngularVelocity.w)) );
+	float flActualRotation = AngleNormalize( RAD2DEG(2 * acosf(m_vAngularVelocity.w)) );
 	if (( flActualRotation < 1e-3 ) && (flAngle < 1e-3 ))
 	{
 		m_vSpotlightDir = vTargetDir;

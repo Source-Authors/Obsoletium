@@ -601,7 +601,7 @@ void CNPC_CraneDriver::DriveVehicle( void )
 	float flDotForward = DotProduct( vecForward, vecToTarget );
 
 	// Start slowing if we're going to hit the point soon
-	float flTurnInDeg = RAD2DEG( acos(flDotForward) );
+	float flTurnInDeg = RAD2DEG( acosf(flDotForward) );
 	float flSpeed = m_hCrane->GetMaxTurnRate() * (flTurnInDeg / 15.0);
 	flSpeed = MIN( m_hCrane->GetMaxTurnRate(), flSpeed );
 	if ( fabs(flSpeed) < 0.05 )

@@ -779,7 +779,7 @@ void CInput::JoyStickMove( float frametime, CUserCmd *cmd )
 		{
 			// apply turn control [ YAW ]
 			// factor in the camera offset, so that the move direction is relative to the thirdperson camera
-			viewangles[ YAW ] = RAD2DEG(atan2(-m_flPreviousJoystickSide, -m_flPreviousJoystickForward)) + g_ThirdPersonManager.GetCameraOffsetAngles()[ YAW ];
+			viewangles[ YAW ] = RAD2DEG(atan2f(-m_flPreviousJoystickSide, -m_flPreviousJoystickForward)) + g_ThirdPersonManager.GetCameraOffsetAngles()[ YAW ];
 			engine->SetViewAngles( viewangles );
 
 			// apply movement

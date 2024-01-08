@@ -821,7 +821,7 @@ void CBasePlayerAnimState::ComputePoseParam_BodyYaw()
 		}
 		else
 		{
-			m_flGoalFeetYaw = RAD2DEG( atan2( vel.y, vel.x ) );
+			m_flGoalFeetYaw = RAD2DEG( atan2f( vel.y, vel.x ) );
 
 			// If he's running backwards, flip his feet backwards.
 			Vector vEyeYaw( cos( DEG2RAD( m_flEyeYaw ) ), sin( DEG2RAD( m_flEyeYaw ) ), 0 );

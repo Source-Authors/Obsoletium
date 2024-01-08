@@ -4032,9 +4032,9 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 		VectorNormalize( goalUp );
 
 		// calc goal orientation to hit linear accel forces
-		float goalPitch = RAD2DEG( asin( DotProduct( forward, goalUp ) ) );
+		float goalPitch = RAD2DEG( asinf( DotProduct( forward, goalUp ) ) );
 		float goalYaw = UTIL_VecToYaw( vecFacingDirection );
-		float goalRoll = RAD2DEG( asin( DotProduct( right, goalUp ) ) + m_flGoalRollDmg );
+		float goalRoll = RAD2DEG( asinf( DotProduct( right, goalUp ) ) + m_flGoalRollDmg );
 		goalPitch *= 0.75f;
 
 		// clamp goal orientations

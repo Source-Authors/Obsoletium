@@ -563,7 +563,7 @@ void CNPC_Ichthyosaur::SetPoses( Vector moveRel, float speed )
 
 	if ( speed != 0.0f )
 	{
-		pitch = -RAD2DEG( asin( GetAbsVelocity().z / speed ) );
+		pitch = -RAD2DEG( asinf( GetAbsVelocity().z / speed ) );
 	}
 
 	//FIXME: Framerate dependant

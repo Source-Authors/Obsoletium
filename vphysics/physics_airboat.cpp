@@ -1100,10 +1100,13 @@ void CPhysics_Airboat::DoSimulationKeepUprightPitch( IVP_Raycast_Airboat_Impact 
 		return;
 	}
 
+	float sa, ca;
+	SinCos( DEG2RAD(10.0f), &sa, &ca );
+
 	// Reference vector in core space.
 	// Pitch back by 10 degrees while airborne.
 	IVP_U_Float_Point vecUpCS; 
-	vecUpCS.set( 0, -cos(DEG2RAD(10)), sin(DEG2RAD(10)));
+	vecUpCS.set( 0, -ca, sa );
 
 	// Calculate the goal vector in core space. We will try to align the reference
 	// vector with the goal vector.
@@ -1154,9 +1157,9 @@ void CPhysics_Airboat::DoSimulationKeepUprightPitch( IVP_Raycast_Airboat_Impact 
 
 	// Clamp the impulse at a maximum length.
 	IVP_FLOAT len = vecAngularImpulse.real_length_plus_normize();
-	if ( len > ( DEG2RAD( 1.5 ) * m_pCore->get_mass() ) )
+	if ( len > ( DEG2RAD( 1.5f ) * m_pCore->get_mass() ) )
 	{
-		len = DEG2RAD( 1.5 ) * m_pCore->get_mass();
+		len = DEG2RAD( 1.5f ) * m_pCore->get_mass();
 	}
 	vecAngularImpulse.mult( len );
 
@@ -1201,10 +1204,13 @@ void CPhysics_Airboat::DoSimulationKeepUprightPitch( IVP_Raycast_Airboat_Impact 
 //-----------------------------------------------------------------------------
 void CPhysics_Airboat::DoSimulationKeepUprightRoll( IVP_Raycast_Airboat_Impact *pImpacts, IVP_Event_Sim *pEventSim )
 {
+	float sa, ca;
+	SinCos( DEG2RAD(10.0f), &sa, &ca );
+
 	// Reference vector in core space.
 	// Pitch back by 10 degrees while airborne.
 	IVP_U_Float_Point vecUpCS; 
-	vecUpCS.set( 0, -cos(DEG2RAD(10)), sin(DEG2RAD(10)));
+	vecUpCS.set( 0, -ca, sa );
 
 	// Calculate the goal vector in core space. We will try to align the reference
 	// vector with the goal vector.
@@ -1226,7 +1232,7 @@ void CPhysics_Airboat::DoSimulationKeepUprightRoll( IVP_Raycast_Airboat_Impact *
 	// atan2() is well defined, so do a Dot & Cross instead of asin(Cross)
 	IVP_FLOAT cosine = vecUpCS.dot_product( &vecGoalAxisCS );
 	IVP_FLOAT sine = vecRotAxisCS.real_length_plus_normize();
-	IVP_FLOAT angle = atan2( sine, cosine );
+	IVP_FLOAT angle = atan2f( sine, cosine );
 
 	//Msg("angle: %.2f, axis: (%.2f %.2f %.2f)\n", RAD2DEG(angle), vecRotAxisCS.k[0], vecRotAxisCS.k[1], vecRotAxisCS.k[2]);
 
@@ -1238,7 +1244,7 @@ void CPhysics_Airboat::DoSimulationKeepUprightRoll( IVP_Raycast_Airboat_Impact *
 	}
 	
 	// Don't do any correction if we're within 10 degrees of the goal orientation.
-	if ( fabs( angle ) < DEG2RAD( 10 ) )
+	if ( fabsf( angle ) < DEG2RAD( 10.0f ) )
 	{
 		m_flRollErrorPrev = angle;
 		return;
@@ -1255,9 +1261,9 @@ void CPhysics_Airboat::DoSimulationKeepUprightRoll( IVP_Raycast_Airboat_Impact *
 
 	// Clamp the impulse at a maximum length.
 	IVP_FLOAT len = vecAngularImpulse.real_length_plus_normize();
-	if ( len > ( DEG2RAD( 2 ) * m_pCore->get_mass() ) )
+	if ( len > ( DEG2RAD( 2.0f ) * m_pCore->get_mass() ) )
 	{
-		len = DEG2RAD( 2 ) * m_pCore->get_mass();
+		len = DEG2RAD( 2.0f ) * m_pCore->get_mass();
 	}
 	vecAngularImpulse.mult( len );
 	m_pCore->rot_push_core_cs( &vecAngularImpulse );
