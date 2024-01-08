@@ -3002,13 +3002,13 @@ void CC_VoxelTreeBox( const CCommand &args )
 	Vector vecMin, vecMax;
 	if ( args.ArgC() >= 6 )
 	{
-		vecMin.x = atof( args[ 1 ] );
-		vecMin.y = atof( args[ 2 ] );
-		vecMin.z = atof( args[ 3 ] );
+		vecMin.x = strtof( args[ 1 ], nullptr );
+		vecMin.y = strtof( args[ 2 ], nullptr );
+		vecMin.z = strtof( args[ 3 ], nullptr );
 
-		vecMax.x = atof( args[ 4 ] );
-		vecMax.y = atof( args[ 5 ] );
-		vecMax.z = atof( args[ 6 ] );
+		vecMax.x = strtof( args[ 4 ], nullptr );
+		vecMax.y = strtof( args[ 5 ], nullptr );
+		vecMax.z = strtof( args[ 6 ], nullptr );
 	}
 	else
 	{
@@ -3057,11 +3057,11 @@ void CC_VoxelTreeSphere( const CCommand &args )
 	float flRadius;
 	if ( args.ArgC() >= 4 )
 	{
-		vecCenter.x = atof( args[ 1 ] );
-		vecCenter.y = atof( args[ 2 ] );
-		vecCenter.z = atof( args[ 3 ] );
+		vecCenter.x = strtof( args[ 1 ], nullptr );
+		vecCenter.y = strtof( args[ 2 ], nullptr );
+		vecCenter.z = strtof( args[ 3 ], nullptr );
 
-		flRadius = atof( args[ 3 ] );
+		flRadius = strtof( args[ 3 ], nullptr );
 	}
 	else
 	{
