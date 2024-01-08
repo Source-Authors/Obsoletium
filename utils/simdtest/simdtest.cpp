@@ -1,28 +1,22 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#include "bitmap/float_bm.h"
 #include "mathlib/mathlib.h"
 #include "mathlib/ssemath.h"
-#include "tier0/platform.h"
-#include "tier0/progressbar.h"
 #include "tier2/tier2.h"
 
 #include <iostream>
 
-#ifdef _X360
-#include "xbox/xbox_console.h"
-#endif
-
 #include "tier0/memdbgon.h"
 
-#define PROBLEM_SIZE 1000
-#define N_ITERS 100000
-//#define RECORD_OUTPUT
+// #define RECORD_OUTPUT 1
 
-static FourVectors g_XYZ[PROBLEM_SIZE];
-static fltx4 g_CreationTime[PROBLEM_SIZE];
+namespace {
 
-bool SIMDTest() {
+constexpr inline int PROBLEM_SIZE{1000};
+constexpr inline int N_ITERS{100000};
+
+bool SIMDTest(FourVectors (&xyz)[PROBLEM_SIZE],
+              fltx4 (&creation_time)[PROBLEM_SIZE]) {
   const Vector StartPnt(0, 0, 0);
   const Vector MidP(0, 0, 100);
   const Vector EndPnt(100, 0, 50);
@@ -34,20 +28,26 @@ bool SIMDTest() {
 
   // Initialize g_XYZ[] and g_CreationTime[]
   SeedRandSIMD(1987301);
+
+  float fourStartTimes[4];
+  Vector fourPoints[4];
+  Vector offset;
+
   for (int i = 0; i < PROBLEM_SIZE; i++) {
-    float fourStartTimes[4];
-    Vector fourPoints[4];
-    Vector offset;
     for (int j = 0; j < 4; j++) {
       float t = (j + 4 * i) / (4.0f * (PROBLEM_SIZE - 1));
+
       fourStartTimes[j] = t;
       fourPoints[j] = StartPnt + t * (EndPnt - StartPnt);
+
       offset.Random(-10.0f, +10.0f);
+
       fourPoints[j] += offset;
     }
-    g_XYZ[i].LoadAndSwizzle(fourPoints[0], fourPoints[1], fourPoints[2],
-                            fourPoints[3]);
-    g_CreationTime[i] = LoadUnalignedSIMD(fourStartTimes);
+
+    xyz[i].LoadAndSwizzle(fourPoints[0], fourPoints[1], fourPoints[2],
+                          fourPoints[3]);
+    creation_time[i] = LoadUnalignedSIMD(fourStartTimes);
   }
 
 #ifdef RECORD_OUTPUT
@@ -61,9 +61,9 @@ bool SIMDTest() {
   bool bChangedSomething = false;
   for (int i = 0; i < N_ITERS; i++) {
     float t = i * (1.0F / N_ITERS);
-    FourVectors *__restrict pXYZ = g_XYZ;
 
-    fltx4 *__restrict pCreationTime = g_CreationTime;
+    FourVectors *__restrict pXYZ = xyz;
+    fltx4 *__restrict pCreationTime = creation_time;
 
     fltx4 CurTime = ReplicateX4(t);
     fltx4 TimeScale = ReplicateX4(1.0F / (max(0.001F, 1.0F)));
@@ -196,149 +196,50 @@ bool SIMDTest() {
   return bChangedSomething;
 }
 
-#ifdef _X360
-
-__declspec(passinreg) struct float4 {
-  operator __vector4() const { return vmx; }
-  __vector4 vmx;
-};
-
-void OctoberXDKCompilerIssueTestCode(const fltx4 &val, fltx4 *out) {
-  // UNDONE: This code demonstrates serious 360 compiler issues. XBox Developer
-  // Support has been contacted.
-  //         The assembly contains tons of useless instructions (vector stores
-  //         and supporting integer math), even in the below code - no use of
-  //         pointers or static constants, no wrapper layers on top of the
-  //         vector intrinsics. If/when the compiler issue is resolved, other
-  //         known issues are:
-  //          - pass vector params by const reference
-  //          - avoid putting __vector4 in a union or an array
-  //          - avoid default constructors, return constructed objects directly
-  //          ("return VecClass(__vector4Val);")
-
-#define DECL_ASS(_var_, _val_) fltx4 _var_ = _val_
-  //#define DECL_ASS( _var_, _val_ )	float4 _var_; _var_.vmx = _val_
-  //#define DECL_ASS( _var_, _val_ )	float4 _var_( _val_ )
-
-  DECL_ASS(resultx, Four_Zeros);
-  DECL_ASS(resulty, Four_Zeros);
-  DECL_ASS(resultz, Four_Zeros);
-
-  DECL_ASS(CurTime, __vmulfp(val, Four_PointFives));
-  DECL_ASS(TimeScale, val);
-  // fltx4 *pCreationTime = g_CreationTime;
-  DECL_ASS(Delta0x, val);
-  DECL_ASS(Delta0y, val);
-  DECL_ASS(Delta0z, val);
-  DECL_ASS(Delta1x, __vaddfp(Delta0x, Delta0x));
-  DECL_ASS(Delta1y, __vaddfp(Delta0y, Delta0y));
-  DECL_ASS(Delta1z, __vaddfp(Delta0z, Delta0z));
-  DECL_ASS(StartPx, __vaddfp(Delta0x, Delta0x));
-  DECL_ASS(StartPy, __vaddfp(Delta0y, Delta0y));
-  DECL_ASS(StartPz, __vaddfp(Delta0z, Delta0z));
-  DECL_ASS(MiddlePx, __vaddfp(StartPx, StartPx));
-  DECL_ASS(MiddlePy, __vaddfp(StartPy, StartPy));
-  DECL_ASS(MiddlePz, __vaddfp(StartPz, StartPz));
-  for (int i = 0; i < 1000; i++) {
-    DECL_ASS(TScale, __vsubfp(CurTime, resultx));  //*pCreationTime );
-    TScale = __vmulfp(TScale, TimeScale);
-    TScale = __vminfp(TScale, resulty);  // Four_Ones );
-
-    // resultx = __vaddfp( resultx, TScale );
-    // resulty = __vaddfp( resulty, TScale );
-    // resultz = __vaddfp( resultz, TScale );
-
-    DECL_ASS(L0x, Delta0x);
-    DECL_ASS(L0y, Delta0y);
-    DECL_ASS(L0z, Delta0z);
-    L0x = __vmulfp(L0x, TScale);
-    L0y = __vmulfp(L0y, TScale);
-    L0z = __vmulfp(L0z, TScale);
-    L0x = __vaddfp(StartPx, L0x);
-    L0y = __vaddfp(StartPy, L0y);
-    L0z = __vaddfp(StartPz, L0z);
-
-    DECL_ASS(L1x, Delta1x);
-    DECL_ASS(L1y, Delta1y);
-    DECL_ASS(L1z, Delta1z);
-    L1x = __vmulfp(L1x, TScale);
-    L1y = __vmulfp(L1y, TScale);
-    L1z = __vmulfp(L1z, TScale);
-    L1x = __vaddfp(MiddlePx, L1x);
-    L1y = __vaddfp(MiddlePy, L1y);
-    L1z = __vaddfp(MiddlePz, L1z);
-
-    L0x = __vaddfp(L0x, L1x);
-    L0y = __vaddfp(L0y, L1y);
-    L0z = __vaddfp(L0z, L1z);
-
-    resultx = __vaddfp(resultx, L0x);
-    resulty = __vaddfp(resulty, L0y);
-    resultz = __vaddfp(resultz, L0z);
-
-    // pCreationTime++;
-  }
-
-  out[0] = resultx;
-  out[1] = resulty;
-  out[2] = resultz;
-}
-
-#else  // _X360
-
-void SSEClassTest(const fltx4 &val, fltx4 &out) {
+fltx4 SSEClassTest(fltx4 val) {
   fltx4 result = Four_Zeros;
+
   for (int i = 0; i < N_ITERS; i++) {
     result = SubSIMD(val, result);
     result = MulSIMD(val, result);
     result = AddSIMD(val, result);
     result = MinSIMD(val, result);
   }
+
   FourVectors result4;
   result4.x = result;
   result4.y = result;
   result4.z = result;
+
   for (int i = 0; i < N_ITERS; i++) {
     result4 *= result4;
     result4 += result4;
     result4 *= result4;
     result4 += result4;
   }
+
   result = result4 * result4;
-  out = result;
+  return result;
 }
 
-#endif  // !_X360
+}  // namespace
 
 int main(int argc, char **argv) {
-#ifndef _X360
-
-  // UNDONE: InitCommandLineProgram needs fixing for 360 (if we want to make
-  // lots of new 360 executables)
   InitCommandLineProgram(argc, argv);
 
-  // This function is useful for inspecting compiler output
-  fltx4 result;
-  SSEClassTest(Four_PointFives, result);
+  std::cout << "Checking SSE APIs, expect 4 x 0.75\n";
+
+  // This function is useful for inspecting compiler output.
+  fltx4 result = SSEClassTest(Four_PointFives);
+
   std::cout << "(" << SubFloat(result, 0) << "," << SubFloat(result, 1) << ","
             << SubFloat(result, 2) << "," << SubFloat(result, 3) << ")\n";
 
-#else  // _X360
-
-  // Wait for VXConsole, so that all debug output goes there
-  XBX_InitConsoleMonitor(true);
-
-  // This function is useful for inspecting compiler output
-  FourVectors result;
-  OctoberXDKCompilerIssueTestCode(Four_PointFives, (fltx4 *)&result);
-  printf("(%f,%f,%f,%f)\n", result.X(0), result.X(1), result.X(2), result.X(3));
-  printf("(%f,%f,%f,%f)\n", result.Y(0), result.Y(1), result.Y(2), result.Y(3));
-  printf("(%f,%f,%f,%f)\n", result.Z(0), result.Z(1), result.Z(2), result.Z(3));
-
-#endif  // _X360
+  FourVectors xyzs[PROBLEM_SIZE];
+  fltx4 creation_times[PROBLEM_SIZE];
 
   // Run the perf. test
-  SIMDTest();
+  SIMDTest(xyzs, creation_times);
 
   return 0;
 }
