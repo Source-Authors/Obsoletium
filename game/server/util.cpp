@@ -101,7 +101,7 @@ void DumpEntityFactories_f()
 	CEntityFactoryDictionary *dict = ( CEntityFactoryDictionary * )EntityFactoryDictionary();
 	if ( dict )
 	{
-		for ( int i = dict->m_Factories.First(); i != dict->m_Factories.InvalidIndex(); i = dict->m_Factories.Next( i ) )
+		for ( auto i = dict->m_Factories.First(); i != dict->m_Factories.InvalidIndex(); i = dict->m_Factories.Next( i ) )
 		{
 			Warning( "%s\n", dict->m_Factories.GetElementName( i ) );
 		}
@@ -203,7 +203,7 @@ void CEntityFactoryDictionary::Destroy( const char *pClassName, IServerNetworkab
 //-----------------------------------------------------------------------------
 void CEntityFactoryDictionary::ReportEntitySizes()
 {
-	for ( int i = m_Factories.First(); i != m_Factories.InvalidIndex(); i = m_Factories.Next( i ) )
+	for ( auto i = m_Factories.First(); i != m_Factories.InvalidIndex(); i = m_Factories.Next( i ) )
 	{
 		Msg( " %s: %llu", m_Factories.GetElementName( i ), (uint64)(m_Factories[i]->GetEntitySize()) );
 	}
@@ -2926,7 +2926,6 @@ void CC_KDTreeTest( const CCommand &args )
 
 			int nCount = 0;
 
-			Vector vecDelta;
 			trace_t trace;
 			CBaseEntity *pList[1024];
 			for ( iTest = 0; iTest < NUM_KDTREE_TESTS; ++iTest )
