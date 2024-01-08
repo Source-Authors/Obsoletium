@@ -1672,11 +1672,11 @@ QAngle CFuncTank::AimBarrelAt( const Vector &parentTarget )
 		// and use atan2() to get angles
 
 		// angles from target pos to center
-		float targetToCenterYaw = atan2( target.y, target.x );
-		float centerToGunYaw = atan2( m_barrelPos.y, sqrt( quadTarget - (m_barrelPos.y*m_barrelPos.y) ) );
+		float targetToCenterYaw = atan2f( target.y, target.x );
+		float centerToGunYaw = atan2f( m_barrelPos.y, sqrtf( quadTarget - (m_barrelPos.y*m_barrelPos.y) ) );
 
-		float targetToCenterPitch = atan2( target.z, sqrt( quadTargetXY ) );
-		float centerToGunPitch = atan2( -m_barrelPos.z, sqrt( quadTarget - (m_barrelPos.z*m_barrelPos.z) ) );
+		float targetToCenterPitch = atan2f( target.z, sqrtf( quadTargetXY ) );
+		float centerToGunPitch = atan2f( -m_barrelPos.z, sqrtf( quadTarget - (m_barrelPos.z*m_barrelPos.z) ) );
 		return QAngle( -RAD2DEG(targetToCenterPitch+centerToGunPitch), RAD2DEG( targetToCenterYaw + centerToGunYaw ), 0 );
 	}
 }

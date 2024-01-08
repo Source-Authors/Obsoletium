@@ -685,7 +685,7 @@ void CProtoSniper::LaserOn( const Vector &vecTarget, const Vector &vecDeviance )
 
 	// Think faster whilst painting. Higher resolution on the 
 	// beam movement.
-	SetNextThink( gpGlobals->curtime + 0.02 );
+	SetNextThink( gpGlobals->curtime + 0.02f );
 }
 
 //-----------------------------------------------------------------------------
@@ -706,7 +706,7 @@ float CProtoSniper::GetPositionParameter( float flTime, bool fLinear )
 	}
 	else
 	{
-		return (1 + sin( (M_PI * flTimeParameter) - (M_PI / 2) ) ) / 2;
+		return (1 + sinf( (M_PI_F * flTimeParameter) - (M_PI_F / 2) ) ) / 2;
 	}
 }
 
@@ -1793,9 +1793,7 @@ int CProtoSniper::RangeAttack1Conditions ( float flDot, float flDist )
 			// the shot if he is being patient and the target is outside
 			// of the patience radius.
 
-			float flDist;
-
-			flDist = ( GetLocalOrigin() - GetEnemy()->GetLocalOrigin() ).Length2D();
+			float flDist = ( GetLocalOrigin() - GetEnemy()->GetLocalOrigin() ).Length2D();
 
 			if( flDist <= m_flPatience )
 			{
@@ -2364,7 +2362,7 @@ void CProtoSniper::PrescheduleThink( void )
 	// Think faster if the beam is on, this gives the beam higher resolution.
 	if( m_pBeam )
 	{
-		SetNextThink( gpGlobals->curtime + 0.03 );
+		SetNextThink( gpGlobals->curtime + 0.03f );
 	}
 	else
 	{
@@ -2657,11 +2655,6 @@ void CProtoSniper::InputDisableSniper( inputdata_t &inputdata )
 //---------------------------------------------------------
 bool CProtoSniper::FindFrustratedShot( float flNoise )
 {
-	Vector vecForward;
-	Vector vecStart;
-	Vector vecAimAt;
-	Vector vecAim;
-
 	if( !GetEnemy() )
 	{
 		return false;
@@ -2690,10 +2683,8 @@ bool CProtoSniper::FindFrustratedShot( float flNoise )
 		else
 			vecSpot.y += 32;
 
-		Vector vecSrc, vecDir;
-
-		vecSrc = GetAbsOrigin(); 
-		vecDir = vecSpot - vecSrc;
+		Vector vecSrc = GetAbsOrigin(); 
+		Vector vecDir = vecSpot - vecSrc;
 		VectorNormalize( vecDir );
 
 		if( GetEnemy()->FVisible( vecSpot ) || i == MAX_TRIES - 1 )
@@ -3172,7 +3163,7 @@ void CSniperBullet::Precache()
 void CSniperBullet::BulletThink( void )
 {
 	// Set the bullet up to think again.
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	SetNextThink( gpGlobals->curtime + 0.05f );
 
 	if( !GetOwnerEntity() )
 	{
@@ -3344,7 +3335,7 @@ bool CSniperBullet::Start( const Vector &vecOrigin, const Vector &vecTarget, CBa
 	UTIL_Tracer( vecOrigin, tr.endpos, 0, TRACER_DONT_USE_ATTACHMENT, m_Speed, true, "StriderTracer" );
 
 	float flElapsedTime = ( (tr.startpos - tr.endpos).Length() / m_Speed );
-	m_SoundTime = gpGlobals->curtime + flElapsedTime * 0.5;
+	m_SoundTime = gpGlobals->curtime + flElapsedTime * 0.5f;
 	
 	SetThink( &CSniperBullet::BulletThink );
 	SetNextThink( gpGlobals->curtime );
@@ -3472,7 +3463,7 @@ void CSniperBullet::Stop( void )
 	// in the world that is relying on the bullet's position as a react origin.
 	// So stick around for another second or so.
 	SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 1.0 );
+	SetNextThink( gpGlobals->curtime + 1.0f );
 }
 
 

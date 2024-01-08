@@ -275,7 +275,7 @@ int UTIL_PrecacheDecal( const char *name, bool preload )
 float UTIL_GetSimulationInterval()
 {
 	if ( CBaseEntity::IsSimulatingOnAlternateTicks() )
-		return ( TICK_INTERVAL * 2.0 );
+		return ( TICK_INTERVAL * 2.0f );
 	return TICK_INTERVAL;
 }
 
@@ -416,8 +416,8 @@ realcheck:
 	start[2] = mins[2] + flStepSize; // seems to help going up/down slopes.
 	
 	// the midpoint must be within 16 of the bottom
-	start[0] = stop[0] = (mins[0] + maxs[0])*0.5;
-	start[1] = stop[1] = (mins[1] + maxs[1])*0.5;
+	start[0] = stop[0] = (mins[0] + maxs[0])*0.5f;
+	start[1] = stop[1] = (mins[1] + maxs[1])*0.5f;
 	stop[2] = start[2] - 2*flStepSize;
 	
 	UTIL_TraceLine( start, stop, mask, pTraceFilter, &trace );
@@ -746,7 +746,7 @@ inline float ComputeShakeAmplitude( const Vector &center, const Vector &shakePt,
 	if ( distance <= radius )
 	{
 		// Make the amplitude fall off over distance
-		float flPerc = 1.0 - (distance / radius);
+		float flPerc = 1.0f - (distance / radius);
 		localAmplitude = amplitude * flPerc;
 	}
 
@@ -914,7 +914,7 @@ void UTIL_ViewPunch( const Vector &center, QAngle angPunch, float radius, bool b
 			if ( distance <= radius )
 			{
 				// Make the punch amplitude fall off over distance.
-				float flPerc = 1.0 - (distance / radius);
+				float flPerc = 1.0f - (distance / radius);
 				angTemp *= flPerc;
 			}
 			else
@@ -1496,9 +1496,9 @@ float UTIL_WaterLevel( const Vector &position, float minz, float maxz )
 		return maxz;
 
 	float diff = maxz - minz;
-	while (diff > 1.0)
+	while (diff > 1.0f)
 	{
-		midUp.z = minz + diff/2.0;
+		midUp.z = minz + diff/2.0f;
 		if ( UTIL_PointContents(midUp) & MASK_WATER )
 		{
 			minz = midUp.z;
@@ -3134,7 +3134,7 @@ void CC_CollisionTest( const CCommand &args )
 		for ( i = 0; i < NUM_COLLISION_TESTS; i++ )
 		{
 			radius += NUM_COLLISION_TESTS * 123.123;
-			radius = fabs(fmod(radius, 128));
+			radius = fabsf(fmodf(radius, 128));
 			theta += NUM_COLLISION_TESTS * 76.76;
 			theta = fabsf(fmodf(theta, DEG2RAD(360.0f)));
 			phi += NUM_COLLISION_TESTS * 1997.99;
