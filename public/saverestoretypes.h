@@ -214,14 +214,12 @@ public:
 	void BuildEntityHash()
 	{
 #ifdef GAME_DLL
-		int i;
-		entitytable_t *pTable;
-		int nEntities = NumEntities();
+		intp nEntities = NumEntities();
 
-		for ( i = 0; i < nEntities; i++ )
+		for ( intp i = 0; i < nEntities; i++ )
 		{
-			pTable = GetEntityInfo( i );
-			m_EntityToIndex.Insert(  CHashElement( pTable->hEnt.Get(), i ) );
+			entitytable_t *info = GetEntityInfo( i );
+			m_EntityToIndex.Insert(  CHashElement( info->hEnt.Get(), i ) );
 		}
 #endif
 	}
