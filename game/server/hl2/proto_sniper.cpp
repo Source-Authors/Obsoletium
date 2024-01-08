@@ -1573,7 +1573,7 @@ bool CProtoSniper::FCanCheckAttacks ( void )
 //---------------------------------------------------------
 bool CProtoSniper::FindDecoyObject( void )
 {
-#define SEARCH_DEPTH	50
+#define SEARCH_DEPTH	64
 
 	CBaseEntity *pDecoys[ SNIPER_NUM_DECOYS ];
 	CBaseEntity *pList[ SEARCH_DEPTH ];
