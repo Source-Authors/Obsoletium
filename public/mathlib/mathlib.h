@@ -51,15 +51,15 @@ public:
 private:
 	unsigned int mOldValues;
 #else
-	FPExceptionDisabler() {}
-	~FPExceptionDisabler() {}
+	FPExceptionDisabler() = default;
+	~FPExceptionDisabler() = default;
 #endif
 
 private:
 	// Make the copy constructor and assignment operator private
 	// and unimplemented to prohibit copying.
-	FPExceptionDisabler(const FPExceptionDisabler&);
-	FPExceptionDisabler& operator=(const FPExceptionDisabler&);
+	FPExceptionDisabler(const FPExceptionDisabler&) = delete;
+	FPExceptionDisabler& operator=(const FPExceptionDisabler&) = delete;
 };
 
 // Declare an object of this type in a scope in order to enable a
@@ -81,16 +81,14 @@ private:
 	FPExceptionEnabler([[maybe_unused]] unsigned int enableBits = 0)
 	{
 	}
-	~FPExceptionEnabler()
-	{
-	}
+	~FPExceptionEnabler() = default;
 #endif
 
 private:
 	// Make the copy constructor and assignment operator private
 	// and unimplemented to prohibit copying.
-	FPExceptionEnabler(const FPExceptionEnabler&);
-	FPExceptionEnabler& operator=(const FPExceptionEnabler&);
+	FPExceptionEnabler(const FPExceptionEnabler&) = delete;
+	FPExceptionEnabler& operator=(const FPExceptionEnabler&) = delete;
 };
 
 
@@ -325,7 +323,7 @@ extern	const Quaternion quat_identity;
 extern const Vector vec3_invalid;
 extern	const int nanmask;
 
-#define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
+#define	IS_NAN(x) (((*(int *)&x) & nanmask) == nanmask)
 
 FORCEINLINE vec_t DotProduct(const vec_t *v1, const vec_t *v2)
 {
