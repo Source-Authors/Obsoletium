@@ -82,29 +82,30 @@ CBoneSetupMemoryPool<matrix3x4_t> g_MatrixPool;
 // -----------------------------------------------------------------
 CBoneCache *CBoneCache::CreateResource( const bonecacheparams_t &params )
 {
-	short studioToCachedIndex[MAXSTUDIOBONES];
-	short cachedToStudioIndex[MAXSTUDIOBONES];
-	int cachedBoneCount = 0;
-	for ( int i = 0; i < params.pStudioHdr->numbones(); i++ )
+	unsigned short studioToCachedIndex[MAXSTUDIOBONES];
+	unsigned short cachedToStudioIndex[MAXSTUDIOBONES];
+	unsigned short cachedBoneCount = 0;
+	const unsigned short bonesCount = static_cast<unsigned short>(
+		std::clamp(params.pStudioHdr->numbones(), 0, MAXSTUDIOBONES));
+	for ( unsigned short i = 0; i < bonesCount; i++ )
 	{
 		// skip bones that aren't part of the boneMask (and aren't the root bone)
 		if (i != 0 && !(params.pStudioHdr->boneFlags(i) & params.boneMask))
 		{
-			studioToCachedIndex[i] = -1;
+			studioToCachedIndex[i] = std::numeric_limits<unsigned short>::max();
 			continue;
 		}
 		studioToCachedIndex[i] = cachedBoneCount;
 		cachedToStudioIndex[cachedBoneCount] = i;
 		cachedBoneCount++;
 	}
-	int tableSizeStudio = sizeof(short) * params.pStudioHdr->numbones();
-	int tableSizeCached = sizeof(short) * cachedBoneCount;
-	int matrixSize = sizeof(matrix3x4_t) * cachedBoneCount;
-	int size = ( sizeof(CBoneCache) + tableSizeStudio + tableSizeCached + matrixSize + 3 ) & ~3;
+	size_t tableSizeStudio = sizeof(short) * bonesCount;
+	size_t tableSizeCached = sizeof(short) * cachedBoneCount;
+	size_t matrixSize = sizeof(matrix3x4_t) * cachedBoneCount;
+	size_t size = ( sizeof(CBoneCache) + tableSizeStudio + tableSizeCached + matrixSize + 3U ) & ~3U;
 	
 	CBoneCache *pMem = (CBoneCache *)malloc( size );
-	Construct( pMem );
-	pMem->Init( params, size, studioToCachedIndex, cachedToStudioIndex, cachedBoneCount );
+	Construct( pMem, params, size, studioToCachedIndex, cachedToStudioIndex, cachedBoneCount );
 	return pMem;
 }
 
@@ -120,27 +121,21 @@ void CBoneCache::DestroyResource()
 }
 
 
-CBoneCache::CBoneCache()
-{
-	m_size = 0;
-	m_cachedBoneCount = 0;
-}
-
-void CBoneCache::Init( const bonecacheparams_t &params, unsigned int size, short *pStudioToCached, short *pCachedToStudio, int cachedBoneCount ) 
+CBoneCache::CBoneCache( const bonecacheparams_t &params, unsigned int size, unsigned short *pStudioToCached, unsigned short *pCachedToStudio, unsigned short cachedBoneCount ) 
 {
 	m_cachedBoneCount = cachedBoneCount;
 	m_size = size;
 	m_timeValid = params.curtime;
 	m_boneMask = params.boneMask;
 
-	int studioTableSize = params.pStudioHdr->numbones() * sizeof(short);
+	unsigned short studioTableSize = static_cast<unsigned short>(params.pStudioHdr->numbones()) * sizeof(short);
 	m_cachedToStudioOffset = studioTableSize;
 	memcpy( StudioToCached(), pStudioToCached, studioTableSize );
 
-	int cachedTableSize = cachedBoneCount * sizeof(short);
+	unsigned int cachedTableSize = cachedBoneCount * sizeof(short);
 	memcpy( CachedToStudio(), pCachedToStudio, cachedTableSize );
 
-	m_matrixOffset = ( m_cachedToStudioOffset + cachedTableSize + 3 ) & ~3;
+	m_matrixOffset = ( m_cachedToStudioOffset + cachedTableSize + 3U ) & ~3U;
 	
 	UpdateBones( params.pBoneToWorld, params.pStudioHdr->numbones(), params.curtime );
 }
@@ -148,11 +143,11 @@ void CBoneCache::Init( const bonecacheparams_t &params, unsigned int size, short
 void CBoneCache::UpdateBones( const matrix3x4_t *pBoneToWorld, int numbones, float curtime )
 {
 	matrix3x4_t *pBones = BoneArray();
-	const short *pCachedToStudio = CachedToStudio();
+	const unsigned short *pCachedToStudio = CachedToStudio();
 
-	for ( int i = 0; i < m_cachedBoneCount; i++ )
+	for ( unsigned short i = 0; i < m_cachedBoneCount; i++ )
 	{
-		int index = pCachedToStudio[i];
+		unsigned short index = pCachedToStudio[i];
 		MatrixCopy( pBoneToWorld[index], pBones[i] );
 	}
 	m_timeValid = curtime;
@@ -160,19 +155,19 @@ void CBoneCache::UpdateBones( const matrix3x4_t *pBoneToWorld, int numbones, flo
 
 matrix3x4_t *CBoneCache::GetCachedBone( int studioIndex )
 {
-	int cachedIndex = StudioToCached()[studioIndex];
-	if ( cachedIndex >= 0 )
+	unsigned short cachedIndex = StudioToCached()[studioIndex];
+	if ( cachedIndex != std::numeric_limits<unsigned short>::max() )
 	{
 		return BoneArray() + cachedIndex;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void CBoneCache::ReadCachedBones( matrix3x4_t *pBoneToWorld )
 {
 	matrix3x4_t *pBones = BoneArray();
-	const short *pCachedToStudio = CachedToStudio();
-	for ( int i = 0; i < m_cachedBoneCount; i++ )
+	const unsigned short *pCachedToStudio = CachedToStudio();
+	for ( unsigned short i = 0; i < m_cachedBoneCount; i++ )
 	{
 		MatrixCopy( pBones[i], pBoneToWorld[pCachedToStudio[i]] );
 	}
@@ -182,14 +177,14 @@ void CBoneCache::ReadCachedBonePointers( matrix3x4_t **bones, int numbones )
 {
 	memset( bones, 0, sizeof(matrix3x4_t *) * numbones );
 	matrix3x4_t *pBones = BoneArray();
-	const short *pCachedToStudio = CachedToStudio();
-	for ( int i = 0; i < m_cachedBoneCount; i++ )
+	const unsigned short *pCachedToStudio = CachedToStudio();
+	for ( unsigned short i = 0; i < m_cachedBoneCount; i++ )
 	{
 		bones[pCachedToStudio[i]] = pBones + i;
 	}
 }
 
-bool CBoneCache::IsValid( float curtime, float dt )
+bool CBoneCache::IsValid( float curtime, float dt ) const
 {
 	if ( curtime - m_timeValid <= dt )
 		return true;
@@ -203,14 +198,14 @@ matrix3x4_t *CBoneCache::BoneArray()
 	return (matrix3x4_t *)( (char *)(this+1) + m_matrixOffset );
 }
 
-short *CBoneCache::StudioToCached()
+unsigned short *CBoneCache::StudioToCached()
 {
-	return (short *)( (char *)(this+1) );
+	return (unsigned short *)( (char *)(this+1) );
 }
 
-short *CBoneCache::CachedToStudio()
+unsigned short *CBoneCache::CachedToStudio()
 {
-	return (short *)( (char *)(this+1) + m_cachedToStudioOffset );
+	return (unsigned short *)( (char *)(this+1) + m_cachedToStudioOffset );
 }
 
 // Construct a singleton

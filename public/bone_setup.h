@@ -400,20 +400,18 @@ public:
 	// member functions that must be present for the ResourceManager
 	void			DestroyResource();
 	CBoneCache		*GetData() { return this; }
-	unsigned int	Size() { return m_size; }
+	unsigned int	Size() const { return m_size; }
 	// -----------------------------------------------------------
 
-					CBoneCache();
+	// dimhotepus: Init -> ctor.
+					CBoneCache( const bonecacheparams_t &params, unsigned int size, unsigned short *pStudioToCached, unsigned short *pCachedToStudio, unsigned short cachedBoneCount );
 
-	// was constructor, but placement new is messy wrt memdebug - so cast & init instead
-	void			Init( const bonecacheparams_t &params, unsigned int size, short *pStudioToCached, short *pCachedToStudio, int cachedBoneCount );
-	
 	void			UpdateBones( const matrix3x4_t *pBoneToWorld, int numbones, float curtime );
 	matrix3x4_t		*GetCachedBone( int studioIndex );
 	void			ReadCachedBones( matrix3x4_t *pBoneToWorld );
 	void			ReadCachedBonePointers( matrix3x4_t **bones, int numbones );
 
-	bool			IsValid( float curtime, float dt = 0.1f );
+	bool			IsValid( float curtime, float dt = 0.1f ) const;
 
 public:
 	float			m_timeValid;
@@ -421,8 +419,8 @@ public:
 
 private:
 	matrix3x4_t		*BoneArray();
-	short			*StudioToCached();
-	short			*CachedToStudio();
+	unsigned short			*StudioToCached();
+	unsigned short			*CachedToStudio();
 
 	unsigned int	m_size;
 	unsigned short	m_cachedBoneCount;
