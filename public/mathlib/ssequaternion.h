@@ -69,7 +69,7 @@ FORCEINLINE fltx4 QuaternionNormalizeSIMD( const fltx4 &q )
 
 	if ( SubFloat( radius, 0 ) ) // > FLT_EPSILON && ((radius < 1.0f - 4*FLT_EPSILON) || (radius > 1.0f + 4*FLT_EPSILON))
 	{
-		float iradius = 1.0f / sqrt( SubFloat( radius, 0 ) );
+		float iradius = 1.0f / sqrtf( SubFloat( radius, 0 ) );
 		result = ReplicateX4( iradius );
 		result = MulSIMD( result, q );
 		return result;
@@ -143,10 +143,10 @@ FORCEINLINE fltx4 QuaternionScaleSIMD( const fltx4 &p, float t )
 {
 	// FIXME: nick, this isn't overly sensitive to accuracy, and it may be faster to 
 	// use the cos part (w) of the quaternion (sin(omega)*N,cos(omega)) to figure the new scale.
-	float sinom = sqrt( SubFloat( p, 0 ) * SubFloat( p, 0 ) + SubFloat( p, 1 ) * SubFloat( p, 1 ) + SubFloat( p, 2 ) * SubFloat( p, 2 ) );
+	float sinom = sqrtf( SubFloat( p, 0 ) * SubFloat( p, 0 ) + SubFloat( p, 1 ) * SubFloat( p, 1 ) + SubFloat( p, 2 ) * SubFloat( p, 2 ) );
 	sinom = min( sinom, 1.f );
 
-	float sinsom = sin( asin( sinom ) * t );
+	float sinsom = sinf( asinf( sinom ) * t );
 
 	t = sinsom / (sinom + FLT_EPSILON);
 
@@ -161,7 +161,7 @@ FORCEINLINE fltx4 QuaternionScaleSIMD( const fltx4 &p, float t )
 	// Assert( r >= 0 );
 	if (r < 0.0f) 
 		r = 0.0f;
-	r = sqrt( r );
+	r = sqrtf( r );
 
 	// keep sign of rotation
 	SubFloat( q, 3 ) = fsel( SubFloat( p, 3 ), r, -r );
@@ -188,10 +188,10 @@ FORCEINLINE fltx4 QuaternionSlerpNoAlignSIMD( const fltx4 &p, const fltx4 &q, fl
 	{
 		if ( (1.0f - cosom ) > 0.000001f ) 
 		{
-			omega = acos( cosom );
-			sinom = sin( omega );
-			sclp = sin( (1.0f - t)*omega) / sinom;
-			sclq = sin( t*omega ) / sinom;
+			omega = acosf( cosom );
+			sinom = sinf( omega );
+			sclp = sinf( (1.0f - t)*omega) / sinom;
+			sclq = sinf( t*omega ) / sinom;
 		}
 		else 
 		{
@@ -210,8 +210,8 @@ FORCEINLINE fltx4 QuaternionSlerpNoAlignSIMD( const fltx4 &p, const fltx4 &q, fl
 		SubFloat( result, 1 ) =  SubFloat( q, 0 );
 		SubFloat( result, 2 ) = -SubFloat( q, 3 );
 		SubFloat( result, 3 ) =  SubFloat( q, 2 );
-		sclp = sin( (1.0f - t) * (0.5f * M_PI_F));
-		sclq = sin( t * (0.5f * M_PI_F));
+		sclp = sinf( (1.0f - t) * (0.5f * M_PI_F));
+		sclq = sinf( t * (0.5f * M_PI_F));
 		SubFloat( result, 0 ) = sclp * SubFloat( p, 0 ) + sclq * SubFloat( result, 0 );
 		SubFloat( result, 1 ) = sclp * SubFloat( p, 1 ) + sclq * SubFloat( result, 1 );
 		SubFloat( result, 2 ) = sclp * SubFloat( p, 2 ) + sclq * SubFloat( result, 2 );
