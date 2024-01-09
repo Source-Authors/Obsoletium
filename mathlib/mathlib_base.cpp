@@ -1709,18 +1709,6 @@ void QuaternionScale( const Quaternion &p, float t, Quaternion &q )
 {
 	Assert( s_bMathlibInitialized );
 
-#if 0
-	Quaternion p0;
-	Quaternion q;
-	p0.Init( 0.0, 0.0, 0.0, 1.0 );
-
-	// slerp in "reverse order" so that p doesn't get realigned
-	QuaternionSlerp( p, p0, 1.0 - fabs( t ), q );
-	if (t < 0.0)
-	{
-		q.w = -q.w;
-	}
-#else
 	float r;
 
 	// FIXME: nick, this isn't overly sensitive to accuracy, and it may be faster to 
@@ -1746,7 +1734,6 @@ void QuaternionScale( const Quaternion &p, float t, Quaternion &q )
 		q.w = -r;
 	else
 		q.w = r;
-#endif
 
 	Assert( q.IsValid() );
 
