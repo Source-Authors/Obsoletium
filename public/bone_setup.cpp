@@ -529,7 +529,7 @@ void CalcBonePosition(	int frame, float s,
 		for (j = 0; j < 3; j++)
 		{
 			ExtractAnimValue( frame, pPosV->pAnimvalue( j ), baseBoneScale[j], v1, v2 );
-			pos[j] = v1 * (1.0 - s) + v2 * s;
+			pos[j] = v1 * (1.0f - s) + v2 * s;
 		}
 	}
 	else
@@ -1335,7 +1335,6 @@ void WorldSpaceSlerp(
 			Quaternion srcQ, destQ;
 			Vector srcPos, destPos;
 			Quaternion targetQ;
-			Vector targetPos;
 			Vector tmp;
 
 			BuildBoneChain( pStudioHdr, rootXform, pos1, q1, i, destBoneToWorld, destBoneComputed );
@@ -1489,7 +1488,7 @@ void SlerpBones(
 		if ( s2 <= 0.0f )
 			continue;
 
-		s1 = 1.0 - s2;
+		s1 = 1.0f - s2;
 
 #ifdef _X360
 		fltx4  q1simd, q2simd, result;
@@ -1645,7 +1644,6 @@ void ScaleBones(
 	int boneMask )
 {
 	int			i, j;
-	Quaternion		q3;
 
 	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( sequence );
 
@@ -1657,7 +1655,7 @@ void ScaleBones(
 	}
 
 	float s2 = s;
-	float s1 = 1.0 - s2;
+	float s1 = 1.0f - s2;
 
 	for (i = 0; i < pStudioHdr->numbones(); i++)
 	{
@@ -2050,7 +2048,7 @@ bool CalcPoseSingle(
 			if (PoseIsAllZeros( pStudioHdr, sequence, seqdesc, i0+1, i1 ))
 			{
 				CalcAnimation( pStudioHdr, pos,  q,  seqdesc, sequence, seqdesc.anim( i0  ,i1  ), cycle, boneMask );
-				ScaleBones( pStudioHdr, q, pos, sequence, 1.0 - s0, boneMask );
+				ScaleBones( pStudioHdr, q, pos, sequence, 1.0f - s0, boneMask );
 			}
 			else if (PoseIsAllZeros( pStudioHdr, sequence, seqdesc, i0, i1 ))
 			{
@@ -2475,7 +2473,6 @@ void CalcBoneAdj(
 	int					i, j, k;
 	float				value;
 	mstudiobonecontroller_t *pbonecontroller;
-	Vector p0;
 	RadianEuler a0;
 	Quaternion q0;
 	
@@ -2489,25 +2486,25 @@ void CalcBoneAdj(
 			i = pbonecontroller->inputfield;
 			value = controllers[i];
 			if (value < 0) value = 0;
-			if (value > 1.0) value = 1.0;
-			value = (1.0 - value) * pbonecontroller->start + value * pbonecontroller->end;
+			if (value > 1.0f) value = 1.0f;
+			value = (1.0f - value) * pbonecontroller->start + value * pbonecontroller->end;
 
 			switch(pbonecontroller->type & STUDIO_TYPES)
 			{
 			case STUDIO_XR: 
-				a0.Init( value * (M_PI / 180.0), 0, 0 ); 
+				a0.Init( value * (M_PI_F / 180.0f), 0, 0 ); 
 				AngleQuaternion( a0, q0 );
-				QuaternionSM( 1.0, q0, q[k], q[k] );
+				QuaternionSM( 1.0f, q0, q[k], q[k] );
 				break;
 			case STUDIO_YR: 
-				a0.Init( 0, value * (M_PI / 180.0), 0 ); 
+				a0.Init( 0, value * (M_PI_F / 180.0f), 0 ); 
 				AngleQuaternion( a0, q0 );
-				QuaternionSM( 1.0, q0, q[k], q[k] );
+				QuaternionSM( 1.0f, q0, q[k], q[k] );
 				break;
 			case STUDIO_ZR: 
-				a0.Init( 0, 0, value * (M_PI / 180.0) ); 
+				a0.Init( 0, 0, value * (M_PI_F / 180.0f) ); 
 				AngleQuaternion( a0, q0 );
-				QuaternionSM( 1.0, q0, q[k], q[k] );
+				QuaternionSM( 1.0f, q0, q[k], q[k] );
 				break;
 			case STUDIO_X:	
 				pos[k].x += value;
@@ -2526,10 +2523,10 @@ void CalcBoneAdj(
 
 void CalcBoneDerivatives( Vector &velocity, AngularImpulse &angVel, const matrix3x4_t &prev, const matrix3x4_t &current, float dt )
 {
-	float scale = 1.0;
+	float scale = 1.0f;
 	if ( dt > 0 )
 	{
-		scale = 1.0 / dt;
+		scale = 1.0f / dt;
 	}
 	
 	Vector endPosition, startPosition, deltaAxis;
@@ -2711,7 +2708,7 @@ bool Studio_SolveIK( mstudioikchain_t *pikchain, Vector &targetFoot, matrix3x4_t
 }
 
 
-#define KNEEMAX_EPSILON 0.9998 // (0.9998 is about 1 degree)
+#define KNEEMAX_EPSILON 0.9998f // (0.9998 is about 1 degree)
 
 //-----------------------------------------------------------------------------
 // Purpose: Solve Knee position for a known hip and foot location, but no specific knee direction preference
@@ -2824,7 +2821,7 @@ bool Studio_SolveIK( int iThigh, int iKnee, int iFoot, Vector &targetFoot, Vecto
 
 	// too close?
 	// limit distance to about an 80 degree knee bend
-	float minDist = max( fabs(l1 - l2) * 1.15, min( l1, l2 ) * 0.15 );
+	float minDist = max( fabsf(l1 - l2) * 1.15f, min( l1, l2 ) * 0.15f );
 	if (ikFoot.Length() < minDist)
 	{
 		// too close to get an accurate vector, just use original vector
@@ -3117,8 +3114,8 @@ bool Studio_IKSequenceError( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seq
 			return false;
 		if ((panim[0]->flags & STUDIO_LOOPING) && panim[0]->pIKRule( iRule )->type == IK_GROUND && ikRule.end - ikRule.start > 0.75 )
 		{
-			ikRule.flWeight = 0.001;
-			flCycle = ikRule.end - 0.001;
+			ikRule.flWeight = 0.001f;
+			flCycle = ikRule.end - 0.001f;
 		}
 		else
 		{
@@ -3610,16 +3607,15 @@ void CIKTarget::SetNormal( const Vector &normal )
 {
 	// recalculate foot angle based on slope of surface
 	matrix3x4_t m1;
-	Vector forward, right;
 	QuaternionMatrix( est.q, m1 );
 
+	Vector right;
 	MatrixGetColumn( m1, 1, right );
-	forward = CrossProduct( right, normal );
+	Vector forward = CrossProduct( right, normal );
 	right = CrossProduct( normal, forward );
 	MatrixSetColumn( forward, 0, m1 );
 	MatrixSetColumn( right, 1, m1 );
 	MatrixSetColumn( normal, 2, m1 );
-	QAngle a1;
 	Vector p1;
 	MatrixAngles( m1, est.q, p1 );
 }
@@ -3634,15 +3630,15 @@ void CIKTarget::SetPosWithNormalOffset( const Vector &pos, const Vector &normal 
 {
 	// assume it's a disc edge intersecting with the floor, so try to estimate the z location of the center
 	est.pos = pos;
-	if (normal.z > 0.9999)
+	if (normal.z > 0.9999f)
 	{
 		return;
 	}
 	// clamp at 45 degrees
-	else if (normal.z > 0.707)
+	else if (normal.z > 0.707f)
 	{
 		// tan == sin / cos
-		float tan = sqrt( 1 - normal.z * normal.z ) / normal.z;
+		float tan = sqrtf( 1 - normal.z * normal.z ) / normal.z;
 		est.pos.z = est.pos.z - est.radius * tan;
 	}
 	else
@@ -3749,7 +3745,6 @@ void CIKContext::UpdateTargets( Vector pos[], Quaternion q[], matrix3x4_t boneTo
 			case IK_GROUND:
 			// case IK_SELF:
 				{
-					matrix3x4_t footTarget;
 					CIKTarget *pTarget = &m_target[pRule->slot];
 					pTarget->chain = pRule->chain;
 					pTarget->type = pRule->type;
@@ -3941,9 +3936,9 @@ void CIKContext::UpdateTargets( Vector pos[], Quaternion q[], matrix3x4_t boneTo
 			pTarget->trace.kneeToFoot = d2;
 			pTarget->trace.hip = p1;
 			pTarget->trace.knee = p2;
-			pTarget->trace.closest = p1 + dt * (fabs( d1 - d2 ) * 1.01);
-			pTarget->trace.farthest = p1 + dt * (d1 + d2) * 0.99;
-			pTarget->trace.lowest = p1 + Vector( 0, 0, -1 ) * (d1 + d2) * 0.99;
+			pTarget->trace.closest = p1 + dt * (fabsf( d1 - d2 ) * 1.01f);
+			pTarget->trace.farthest = p1 + dt * (d1 + d2) * 0.99f;
+			pTarget->trace.lowest = p1 + Vector( 0, 0, -1 ) * (d1 + d2) * 0.99f;
 			// pTarget->trace.endpos = pTarget->est.pos;
 		}
 	}
@@ -3963,7 +3958,7 @@ void CIKContext::AutoIKRelease( void )
 		CIKTarget *pTarget = &m_target[i];
 
 		float dt = m_flTime - pTarget->error.flTime;
-		if (pTarget->error.bInError || dt < 0.5)
+		if (pTarget->error.bInError || dt < 0.5f)
 		{
 			if (!pTarget->error.bInError)
 			{
@@ -3973,15 +3968,15 @@ void CIKContext::AutoIKRelease( void )
 			}
 
 			float ft = m_flTime - pTarget->error.flErrorTime;
-			if (dt < 0.25)
+			if (dt < 0.25f)
 			{
-				pTarget->error.ramp = min( pTarget->error.ramp + ft * 4.0, 1.0 );
+				pTarget->error.ramp = min( pTarget->error.ramp + ft * 4.0f, 1.0f );
 			}
 			else
 			{
-				pTarget->error.ramp = max( pTarget->error.ramp - ft * 4.0, 0.0 );
+				pTarget->error.ramp = max( pTarget->error.ramp - ft * 4.0f, 0.0f );
 			}
-			if (pTarget->error.ramp > 0.0)
+			if (pTarget->error.ramp > 0.0f)
 			{
 				ikcontextikrule_t ikrule;
 
@@ -3990,8 +3985,8 @@ void CIKContext::AutoIKRelease( void )
 				ikrule.type = IK_RELEASE;
 				ikrule.slot = i;
 				ikrule.flWeight = SimpleSpline( pTarget->error.ramp );
-				ikrule.flRuleWeight = 1.0;
-				ikrule.latched = dt < 0.25 ? 0.0 : ikrule.flWeight;
+				ikrule.flRuleWeight = 1.0f;
+				ikrule.latched = dt < 0.25f ? 0.0f : ikrule.flWeight;
 
 				// don't bother with AutoIKRelease if the bone isn't going to be calculated
 				// this code is crashing for some unknown reason.
@@ -4119,7 +4114,7 @@ void CIKContext::SolveDependencies( Vector pos[], Quaternion q[], matrix3x4_t bo
 					// debugLine( pChainResult->pos, p2, 0, 0, 255, true, 0.1 );
 
 					// blend in position and angles
-					pChainResult->pos = pChainResult->pos * (1.0 - flWeight) + p2 * flWeight;
+					pChainResult->pos = pChainResult->pos * (1.0f - flWeight) + p2 * flWeight;
 					QuaternionSlerp( pChainResult->q, q2, flWeight, pChainResult->q );
 				}
 				break;
@@ -4147,7 +4142,7 @@ void CIKContext::SolveDependencies( Vector pos[], Quaternion q[], matrix3x4_t bo
 					MatrixAngles( boneToWorld[bone], q2, p2 );
 
 					// blend in position and angles
-					pChainResult->pos = pChainResult->pos * (1.0 - flWeight) + p2 * flWeight;
+					pChainResult->pos = pChainResult->pos * (1.0f - flWeight) + p2 * flWeight;
 					QuaternionSlerp( pChainResult->q, q2, flWeight, pChainResult->q );
 				}
 				break;
@@ -4190,7 +4185,7 @@ void CIKContext::SolveDependencies( Vector pos[], Quaternion q[], matrix3x4_t bo
 
 			// blend in position and angles
 			pChainResult->flWeight = pTarget->est.flWeight;
-			pChainResult->pos = pChainResult->pos * (1.0 - pChainResult->flWeight ) + p2 * pChainResult->flWeight;
+			pChainResult->pos = pChainResult->pos * (1.0f - pChainResult->flWeight ) + p2 * pChainResult->flWeight;
 			QuaternionSlerp( pChainResult->q, q2, pChainResult->flWeight, pChainResult->q );
 		}
 
@@ -4426,14 +4421,14 @@ void CIKContext::SolveLock(
 	// eval current ik'd bone
 	BuildBoneChain( pos, q, bone, boneToWorld, boneComputed );
 
-	Vector p1, p2, p3;
-	Quaternion q2, q3;
+	Vector p1, p3;
+	Quaternion q2;
 
 	// current p and q
 	MatrixPosition( boneToWorld[bone], p1 );
 
 	// blend in position
-	p3 = p1 * (1.0 - plock->flPosWeight ) + m_ikLock[i].pos * plock->flPosWeight;
+	p3 = p1 * (1.0f - plock->flPosWeight ) + m_ikLock[i].pos * plock->flPosWeight;
 
 	// do exact IK solution
 	if (m_ikLock[i].kneeDir.LengthSqr() > 0)
@@ -4712,7 +4707,6 @@ void DoQuatInterpBone(
 	)
 {
 	matrix3x4_t			bonematrix;
-	Vector				control;
 
 	mstudioquatinterpbone_t *pProc = (mstudioquatinterpbone_t *)pbones[ibone].pProcedure( );
 	if (pProc && pbones[pProc->control].parent != -1)
@@ -4748,7 +4742,7 @@ void DoQuatInterpBone(
 			return;
 		}
 
-		scale = 1.0 / scale;
+		scale = 1.0f / scale;
 
 		quat.Init( 0, 0, 0, 0);
 		pos.Init( );
@@ -4907,9 +4901,9 @@ void DoAimAtBone(
 
 		Quaternion upRotation;
 		//Assert( 1.0f - fabs( DotProduct( pUp, pParentUp ) ) > FLT_EPSILON );
-		if( 1.0f - fabs( DotProduct( pUp, pParentUp ) ) > FLT_EPSILON )
+		if( 1.0f - fabsf( DotProduct( pUp, pParentUp ) ) > FLT_EPSILON )
 		{
-			angle = acos( DotProduct( pUp, pParentUp ) );
+			angle = acosf( DotProduct( pUp, pParentUp ) );
 			CrossProduct( pUp, pParentUp, axis );			
 		}
 		else
@@ -5030,9 +5024,9 @@ float Studio_SetController( const CStudioHdr *pStudioHdr, int iController, float
 		else
 		{
 			if (flValue > 360)
-				flValue = flValue - (int)(flValue / 360.0) * 360.0;
+				flValue = flValue - (int)(flValue / 360.0f) * 360.0f;
 			else if (flValue < 0)
-				flValue = flValue + (int)((flValue / -360.0) + 1) * 360.0;
+				flValue = flValue + (int)((flValue / -360.0f) + 1) * 360.0f;
 		}
 	}
 
@@ -5167,9 +5161,9 @@ static int ClipRayToHitbox( const Ray_t &ray, mstudiobbox_t *pbox, matrix3x4_t& 
 	// OPTIMIZE: Store this in the box instead of computing it here
 	// compute center in local space
 	Vector boxextents;
-	boxextents.x = (pbox->bbmin.x + pbox->bbmax.x) * 0.5; 
-	boxextents.y = (pbox->bbmin.y + pbox->bbmax.y) * 0.5; 
-	boxextents.z = (pbox->bbmin.z + pbox->bbmax.z) * 0.5; 
+	boxextents.x = (pbox->bbmin.x + pbox->bbmax.x) * 0.5f; 
+	boxextents.y = (pbox->bbmin.y + pbox->bbmax.y) * 0.5f; 
+	boxextents.z = (pbox->bbmin.z + pbox->bbmax.z) * 0.5f; 
 	Vector boxCenter;
 	// transform to world space
 	VectorTransform( boxextents, matrix, boxCenter );
