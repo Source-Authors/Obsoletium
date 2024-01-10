@@ -869,9 +869,7 @@ void AngleVectors( const QAngle &angles, Vector *forward, Vector *right, Vector 
 	Assert( s_bMathlibInitialized );
 	
 	fltx4 sine, cosine;
-	fltx4 radians = LoadUnaligned3SIMD( angles.Base() );
-	fltx4 scale = ReplicateX4( M_PI_F / 180.f ); 
-	radians = MulSIMD( radians, scale );
+	fltx4 radians = MulSIMD( LoadUnaligned3SIMD( angles.Base() ), ReplicateX4( M_PI_F / 180.f ) );
 	SinCos3SIMD( sine, cosine, radians );
 
 	float sp = SubFloat( sine, 0 ), sy = SubFloat( sine, 1 ), sr = SubFloat( sine, 2 );
@@ -906,11 +904,13 @@ void AngleVectors( const QAngle &angles, Vector *forward, Vector *right, Vector 
 void AngleVectorsTranspose (const QAngle &angles, Vector *forward, Vector *right, Vector *up)
 {
 	Assert( s_bMathlibInitialized );
-	float sr, sp, sy, cr, cp, cy;
-	
-	SinCos( DEG2RAD( angles[YAW] ), &sy, &cy );
-	SinCos( DEG2RAD( angles[PITCH] ), &sp, &cp );
-	SinCos( DEG2RAD( angles[ROLL] ), &sr, &cr );
+
+	fltx4 sine, cosine;
+	fltx4 radians = MulSIMD( LoadUnaligned3SIMD( angles.Base() ), ReplicateX4( M_PI_F / 180.f ) );
+	SinCos3SIMD( sine, cosine, radians );
+
+	float sp = SubFloat( sine, 0 ), sy = SubFloat( sine, 1 ), sr = SubFloat( sine, 2 );
+	float cp = SubFloat( cosine, 0 ), cy = SubFloat( cosine, 1 ), cr = SubFloat( cosine, 2 );
 
 	if (forward)
 	{
@@ -1139,9 +1139,7 @@ void AngleMatrix( const QAngle &angles, matrix3x4_t& matrix )
 	Assert( s_bMathlibInitialized );
 
 	fltx4 sine, cosine;
-	fltx4 radians = LoadUnaligned3SIMD( angles.Base() );
-	fltx4 scale = ReplicateX4( M_PI_F / 180.f ); 
-	radians = MulSIMD( radians, scale );
+	fltx4 radians = MulSIMD( LoadUnaligned3SIMD( angles.Base() ), ReplicateX4( M_PI_F / 180.f ) );
 	SinCos3SIMD( sine, cosine, radians );
 
 	float sp = SubFloat( sine, 0 ), sy = SubFloat( sine, 1 ), sr = SubFloat( sine, 2 );
@@ -1900,9 +1898,7 @@ void AngleQuaternion( const RadianEuler &angles, Quaternion &outQuat )
 #endif
 
 	fltx4 sine, cosine;
-	fltx4 radians = LoadUnaligned3SIMD( &angles.x );
-	fltx4 scale = ReplicateX4( 0.5f ); 
-	radians = MulSIMD( radians, scale );
+	fltx4 radians = MulSIMD( LoadUnaligned3SIMD( &angles.x ), ReplicateX4( 0.5f ) );
 	SinCos3SIMD( sine, cosine, radians );
 
 	// NOTE: The ordering here is *different* from the AngleQuaternion below
@@ -1936,9 +1932,7 @@ void AngleQuaternion( const QAngle &angles, Quaternion &outQuat )
 #endif
 
 	fltx4 sine, cosine;
-	fltx4 radians = LoadUnaligned3SIMD( angles.Base() );
-	fltx4 scale = ReplicateX4( DEG2RAD( 0.5f ) );
-	radians = MulSIMD( radians, scale );
+	fltx4 radians = MulSIMD( LoadUnaligned3SIMD( angles.Base() ), ReplicateX4( DEG2RAD( 0.5f ) ) );
 	SinCos3SIMD( sine, cosine, radians );
 
 	// NOTE: The ordering here is *different* from the AngleQuaternion above
