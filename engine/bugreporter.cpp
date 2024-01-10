@@ -2002,7 +2002,8 @@ void CBugUIPanel::OnSubmit()
 		buginfo.Printf( "GameDirectory:  %s\n", gd );
 		buginfo.Printf( "Ram:  %lu\n", GetRam() );
 		buginfo.Printf( "CPU:  %i\n", (int)fFrequency );
-		buginfo.Printf( "Processor:  %s\n", pi.m_szProcessorID );
+		buginfo.Printf( "Processor Vendor:  %s\n", pi.m_szProcessorID );
+		buginfo.Printf( "Processor Name:  %s\n", pi.m_szProcessorBrand );
 		buginfo.Printf( "DXLevel:  %d\n", nDxLevel );
 		buginfo.Printf( "OSVersion:  %s\n", osversion );
 		// Terminate it

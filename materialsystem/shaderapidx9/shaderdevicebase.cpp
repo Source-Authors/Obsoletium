@@ -763,7 +763,7 @@ bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( unsigned nAdapter, i
 	bool bAMD = Q_stristr( pi.m_szProcessorID, "amd" ) != NULL;
 	
 	char buf[256];
-	V_snprintf( buf, sizeof( buf ), "CShaderDeviceMgrBase::GetRecommendedConfigurationInfo: CPU speed: %d MHz, Processor: %s\n", nCPUSpeedMhz, pi.m_szProcessorID );
+	V_snprintf( buf, sizeof( buf ), "CShaderDeviceMgrBase::GetRecommendedConfigurationInfo: CPU speed: %d MHz, Processor: %s\n", nCPUSpeedMhz, pi.m_szProcessorBrand );
 	Plat_DebugString( buf );
 
 	KeyValues *pCPUKeyValues = FindCPUSpecificConfig( pCfg, nCPUSpeedMhz, bAMD );

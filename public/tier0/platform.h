@@ -1113,6 +1113,8 @@ struct CPUInformation
 	uint32 m_nModel;
 	uint32 m_nFeatures[3];
 
+	const char *m_szProcessorBrand;
+
 	CPUInformation() { memset(this, 0, sizeof(*this)); }
 };
 

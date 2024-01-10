@@ -846,7 +846,7 @@ void GetMaterialSystemConfigForBenchmarkUpload(KeyValues *dataToUpload)
 	const CPUInformation& pi = *GetCPUInformation();
 	double fFrequency = pi.m_Speed / 1000000.0;
 	dataToUpload->SetInt( "cpu_speed", (int)fFrequency );
-	dataToUpload->SetString( "cpu", pi.m_szProcessorID );
+	dataToUpload->SetString( "cpu", pi.m_szProcessorBrand );
 
 	// material system settings
 	dataToUpload->SetInt( "width", g_pMaterialSystemConfig->m_VideoMode.m_Width );

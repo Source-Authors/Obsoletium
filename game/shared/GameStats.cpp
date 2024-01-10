@@ -1225,6 +1225,8 @@ void CBaseGameStats_Driver::ResetData()
 	OverWriteCharsWeHate( cpuVendorId );
 	pKV->SetString( "CPUID", cpuVendorId );
 
+	pKV->SetString( "CPUName", cpu.m_szProcessorBrand );
+
 	pKV->SetFloat( "CPUGhz", cpu.m_Speed * ( 1.0 / 1.0e9 ) );
 	pKV->SetUint64( "CPUModel", cpu.m_nModel );
 	pKV->SetUint64( "CPUFeatures0", cpu.m_nFeatures[ 0 ] );

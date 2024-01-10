@@ -10,6 +10,9 @@
 #include <cpuid.h>
 #endif
 
+#include <array>
+#include <vector>
+
 #if defined(_WIN32)
 #include "winlite.h"
 #elif defined(_LINUX)
@@ -42,26 +45,53 @@ static bool cpuid(unsigned int function,
 	return true;
 }
 
-// Return the Processor's vendor identification string, or "Generic_x86" if it doesn't exist on this CPU
+static bool cpuidex(unsigned int function,
+	unsigned int subfunction,
+	unsigned int& out_eax,
+	unsigned int& out_ebx,
+	unsigned int& out_ecx,
+	unsigned int& out_edx)
+{
+	int CPUInfo[4] = { -1 };
+#if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
+	__cpuid_count(function, subfunction, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
+#else
+	__cpuidex(CPUInfo, (int)function, (int)subfunction);
+#endif
+
+	out_eax = CPUInfo[0];
+	out_ebx = CPUInfo[1];
+	out_ecx = CPUInfo[2];
+	out_edx = CPUInfo[3];
+	
+	return true;
+}
+
+// Return the Processor's vendor identification string,
+//  or "Generic_x86{_64}" if it doesn't exist on this CPU.
 static const char* GetProcessorVendorId()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return "PPC";
 #else
-	unsigned int unused, vendorIdRegs[3];
 	static char vendorId[13];
-
 	if (vendorId[0] != '\0')
 	{
 		return vendorId;
 	}
 	
+	unsigned int unused, regs[3];
 	memset( vendorId, 0, sizeof(vendorId) );
-	if ( !cpuid(0,unused, vendorIdRegs[0], vendorIdRegs[2], vendorIdRegs[1] ) )
+
+	if ( !cpuid(0,unused, regs[0], regs[2], regs[1] ) )
 	{
 		if ( IsPC() )
 		{
+#if !defined(_WIN64) && !defined(__x86_64__)
 			strcpy( vendorId, "Generic_x86" );
+#else
+			strcpy( vendorId, "Generic_x86_64" );
+#endif
 		}
 		else if ( IsX360() )
 		{
@@ -70,12 +100,111 @@ static const char* GetProcessorVendorId()
 	}
 	else
 	{
-		memcpy( vendorId+0, &(vendorIdRegs[0]), sizeof( vendorIdRegs[0] ) );
-		memcpy( vendorId+4, &(vendorIdRegs[1]), sizeof( vendorIdRegs[1] ) ); //-V112
-		memcpy( vendorId+8, &(vendorIdRegs[2]), sizeof( vendorIdRegs[2] ) );
+		memcpy( vendorId+0, &regs[0], sizeof( regs[0] ) );
+		memcpy( vendorId+4, &regs[1], sizeof( regs[1] ) ); //-V112
+		memcpy( vendorId+8, &regs[2], sizeof( regs[2] ) );
 	}
 
 	return vendorId;
+#endif
+}
+
+// Trim spaces around data.
+static void TrimSpaces( char (&in)[0x40], char (&out)[0x40] )
+{
+	size_t i{0};
+	// Trim leading space.
+	while (std::isspace( in[i] )) ++i;
+	
+	if (in[i] == '\0')
+	{
+	  out[0] = '\0';
+	  return;
+	}
+	
+	// Trim trailing space.
+	char *end{in + strlen( in ) - 1};
+	
+	while (end > in && std::isspace( *end )) end--;
+	
+	// Write new null terminator character.
+	end[1] = '\0';
+	
+#ifdef _WIN32
+	strncpy_s( out, &in[0] + i, end + 1 - in + i );
+#else
+	const size_t size{static_cast<size_t>(end + 1 - in) + i};
+	strncpy( out, &in[0] + i, size );
+
+	out[ std::size(out) - 1 ] = '\0';
+#endif  // _WIN32
+}
+
+// Get CPU brand.
+static const char* GetCpuBrand
+(
+	const std::vector<std::array<unsigned, 4>> &in,
+	char (&brand)[0x40]
+)
+{
+	char brand_raw[0x40]{'\0'};
+
+	std::memcpy(brand_raw, in[2].data(), sizeof(in[2]));
+	std::memcpy(brand_raw + sizeof(in[2]), in[3].data(), sizeof(in[3]));
+	std::memcpy(brand_raw + sizeof(in[2]) + sizeof(in[3]), in[4].data(),  //-V119
+				sizeof(in[4]));
+
+	TrimSpaces(brand_raw, brand);
+
+	return brand;
+}
+
+// Return the Processor's brand.
+static const char* GetProcessorBrand()
+{
+#if defined( _X360 ) || defined( _PS3 )
+	return "PPC";
+#else
+	static char cpuBrand[0x40]{'\0'};
+	if (cpuBrand[0] != '\0')
+	{
+		return cpuBrand;
+	}
+
+	// Calling cpuid with 0x80000000 as the function_id argument gets the
+	// number of the highest valid extended ID.
+	unsigned eax, ebx, ecx, edx;
+	if ( !cpuid(0x80000000U, eax, ebx, ecx, edx) )
+	{
+		if ( IsPC() )
+		{
+#if !defined(_WIN64) && !defined(__x86_64__)
+			strcpy( cpuBrand, "Generic_x86" );
+#else
+			strcpy( cpuBrand, "Generic_x86_64" );
+#endif
+		}
+		else if ( IsX360() )
+		{
+			strcpy( cpuBrand, "PowerPC" );
+		}
+
+		return cpuBrand;
+	}
+
+	const unsigned extFuncsCount = eax;
+
+	std::vector<std::array<unsigned, 4>> extendedData;
+	extendedData.reserve(
+		std::max(extFuncsCount - 0x80000000U, 0U) + 1U);
+
+	for (unsigned i = 0x80000000U; i <= extFuncsCount; ++i) {
+		cpuidex( i, 0, eax, ebx, ecx, edx );
+
+		extendedData.emplace_back(std::array<unsigned, 4>{ eax, ebx, ecx, edx });
+	}
+
+	return GetCpuBrand( extendedData, cpuBrand );
 #endif
 }
 
@@ -504,21 +633,22 @@ const CPUInformation* GetCPUInformation()
 #endif
 
 	// Determine Processor Features:
-	pi.m_bRDTSC        = CheckRDTSCTechnology( edx );
-	pi.m_bCMOV         = CheckCMOVTechnology( edx );
-	pi.m_bFCMOV        = CheckFCMOVTechnology( edx );
-	pi.m_bSSE          = CheckSSETechnology( edx );
-	pi.m_bSSE2         = CheckSSE2Technology( edx );
-	pi.m_b3DNow        = Check3DNowTechnology();
-	pi.m_bMMX          = CheckMMXTechnology( edx );
+	pi.m_bRDTSC           = CheckRDTSCTechnology( edx );
+	pi.m_bCMOV            = CheckCMOVTechnology( edx );
+	pi.m_bFCMOV           = CheckFCMOVTechnology( edx );
+	pi.m_bSSE             = CheckSSETechnology( edx );
+	pi.m_bSSE2            = CheckSSE2Technology( edx );
+	pi.m_b3DNow           = Check3DNowTechnology();
+	pi.m_bMMX             = CheckMMXTechnology( edx );
 	// dimhotepus: Correctly check HyperThreading support.
-	pi.m_bHT		   = pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors;
-	pi.m_bSSE3         = CheckSSE3Technology( ecx );
-	pi.m_bSSSE3		   = CheckSSSE3Technology( ecx );
-	pi.m_bSSE4a        = CheckSSE4aTechnology();
-	pi.m_bSSE41        = CheckSSE41Technology( ecx );
-	pi.m_bSSE42        = CheckSSE42Technology( ecx );
-	pi.m_szProcessorID = GetProcessorVendorId();
+	pi.m_bHT              = pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors;
+	pi.m_bSSE3            = CheckSSE3Technology( ecx );
+	pi.m_bSSSE3           = CheckSSSE3Technology( ecx );
+	pi.m_bSSE4a           = CheckSSE4aTechnology();
+	pi.m_bSSE41           = CheckSSE41Technology( ecx );
+	pi.m_bSSE42           = CheckSSE42Technology( ecx );
+	pi.m_szProcessorID    = GetProcessorVendorId();
+	pi.m_szProcessorBrand = GetProcessorBrand();
 
 	// Mark struct as ready and filled, return it:
 	pi.m_Size = sizeof(pi);

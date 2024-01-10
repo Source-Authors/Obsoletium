@@ -3793,7 +3793,7 @@ void Host_InitProcessor( void )
 	}
 
 	char szFeatureString[256];
-	Q_strncpy( szFeatureString, pi.m_szProcessorID, sizeof( szFeatureString ) );
+	Q_strncpy( szFeatureString, pi.m_szProcessorBrand, sizeof( szFeatureString ) );
 	Q_strncat( szFeatureString, " ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
 
 	if( pi.m_bSSE )
