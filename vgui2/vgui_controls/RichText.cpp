@@ -837,7 +837,7 @@ void RichText::Paint()
 		// Stop at the next line break
 		if ( m_LineBreaks.IsValidIndex( lineBreakIndexIndex ) && m_LineBreaks[lineBreakIndexIndex] <= iLast )
 			iLast = m_LineBreaks[lineBreakIndexIndex] - 1;
-		
+
 		// Stop at the next format change
 		if ( m_FormatStream.IsValidIndex(renderState.formatStreamIndex) && 
 				m_FormatStream[renderState.formatStreamIndex].textStreamIndex <= iLast )
@@ -2201,6 +2201,15 @@ void RichText::CopySelected()
 
 			if (m_TextStream[i] == '\n') 
 			{
+				if ( buf.Count() == 0 )
+				{
+					// dimhotepus: CS:GO backport.
+					// Don't put an end line at the beginning
+					// It makes it really difficult to copy paste from the console into
+					// single line dialogs
+					continue;
+				}
+
 				buf.AddToTail( '\r' );
 			}
 			// remove any rich edit commands
