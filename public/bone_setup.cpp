@@ -1159,22 +1159,13 @@ static void CalcAnimation( const CStudioHdr *pStudioHdr,	Vector *pos, Quaternion
 
 }
 
-
 //-----------------------------------------------------------------------------
 // Purpose: qt = ( s * p ) * q
 //-----------------------------------------------------------------------------
-void QuaternionSM( float s, const Quaternion &p, const Quaternion &q, Quaternion &qt )
+#if !ALLOW_SIMD_QUATERNION_MATH
+
+static void QuaternionSMSlow( float s, const Quaternion &p, const Quaternion &q, Quaternion &qt )
 {
-#if ALLOW_SIMD_QUATERNION_MATH
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
-
-	fltx4 spsimd = QuaternionScaleSIMD( psimd, s );
-	fltx4 qtsimd = QuaternionMultSIMD( spsimd, qsimd );
-
-	fltx4 result = QuaternionNormalizeSIMD( qtsimd );
-	StoreUnalignedSIMD( qt.Base(), result );
-#else
 	Quaternion		p1, q1;
 
 	QuaternionScale( p, s, p1 );
@@ -1184,25 +1175,53 @@ void QuaternionSM( float s, const Quaternion &p, const Quaternion &q, Quaternion
 	qt[1] = q1[1];
 	qt[2] = q1[2];
 	qt[3] = q1[3];
+}
+
+#else
+
+static fltx4 XM_CALLCONV QuaternionSMSIMD( float s, fltx4 psimd, fltx4 qsimd )
+{
+	fltx4 spsimd = QuaternionScaleSIMD( psimd, s );
+	fltx4 qtsimd = QuaternionMultSIMD( spsimd, qsimd );
+
+	return QuaternionNormalizeSIMD( qtsimd );
+}
+
+#endif
+
+static void QuaternionSM( float s, const QuaternionAligned &p, const Quaternion &q, Quaternion &qt )
+{
+#if ALLOW_SIMD_QUATERNION_MATH
+	fltx4 psimd = LoadAlignedSIMD( p.Base() );
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+
+	fltx4 result = QuaternionSMSIMD( s, psimd, qsimd );
+	StoreUnalignedSIMD( qt.Base(), result );
+#else
+	QuaternionSMSlow( s, p, q, qt );
 #endif
 }
 
+void QuaternionSM( float s, const Quaternion &p, const Quaternion &q, Quaternion &qt )
+{
+#if ALLOW_SIMD_QUATERNION_MATH
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+
+	fltx4 result = QuaternionSMSIMD( s, psimd, qsimd );
+	StoreUnalignedSIMD( qt.Base(), result );
+#else
+	QuaternionSMSlow( s, p, q, qt );
+#endif
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: qt = p * ( s * q )
 //-----------------------------------------------------------------------------
-void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt )
+#if !ALLOW_SIMD_QUATERNION_MATH
+
+static void QuaternionMASlow( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt )
 {
-#if ALLOW_SIMD_QUATERNION_MATH
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
-
-	fltx4 sqsimd = QuaternionScaleSIMD( qsimd, s );
-	fltx4 qtsimd = QuaternionMultSIMD( psimd, sqsimd );
-
-	fltx4 result = QuaternionNormalizeSIMD( qtsimd );
-	StoreUnalignedSIMD( qt.Base(), result );
-#else
 	Quaternion p1, q1;
 
 	QuaternionScale( q, s, q1 );
@@ -1212,6 +1231,43 @@ void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion
 	qt[1] = p1[1];
 	qt[2] = p1[2];
 	qt[3] = p1[3];
+}
+
+#else
+
+static fltx4 XM_CALLCONV QuaternionMASIMD( fltx4 psimd, float s, fltx4 qsimd )
+{
+	fltx4 sqsimd = QuaternionScaleSIMD( qsimd, s );
+	fltx4 qtsimd = QuaternionMultSIMD( psimd, sqsimd );
+
+	return QuaternionNormalizeSIMD( qtsimd );
+}
+
+#endif
+
+static void QuaternionMA( const Quaternion &p, float s, const QuaternionAligned &q, Quaternion &qt )
+{
+#if ALLOW_SIMD_QUATERNION_MATH
+	fltx4 qsimd = LoadAlignedSIMD( q.Base() );
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+
+	fltx4 result = QuaternionMASIMD( psimd, s, qsimd );
+	StoreUnalignedSIMD( qt.Base(), result );
+#else
+	QuaternionMASlow( p, s, q, qt );
+#endif
+}
+
+void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt )
+{
+#if ALLOW_SIMD_QUATERNION_MATH
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+
+	fltx4 result = QuaternionMASIMD( psimd, s, qsimd );
+	StoreUnalignedSIMD( qt.Base(), result );
+#else
+	QuaternionMASlow( p, s, q, qt );
 #endif
 }
 
@@ -1219,7 +1275,7 @@ void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion
 //-----------------------------------------------------------------------------
 // Purpose: qt = p + s * q
 //-----------------------------------------------------------------------------
-void QuaternionAccumulate( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt )
+static void QuaternionAccumulate( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt )
 {
 #if ALLOW_SIMD_QUATERNION_MATH
 	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
@@ -1446,18 +1502,14 @@ void SlerpBones(
 				QuaternionMA( q1[i], s2, q2[i], q1[i] );
 
 				// FIXME: are these correct?
-				pos1[i][0] = pos1[i][0] + pos2[i][0] * s2;
-				pos1[i][1] = pos1[i][1] + pos2[i][1] * s2;
-				pos1[i][2] = pos1[i][2] + pos2[i][2] * s2;
+				VectorMA(pos1[i], s2, pos2[i], pos1[i]);
 			}
 			else
 			{
 				QuaternionSM( s2, q2[i], q1[i], q1[i] );
 
 				// FIXME: are these correct?
-				pos1[i][0] = pos1[i][0] + pos2[i][0] * s2;
-				pos1[i][1] = pos1[i][1] + pos2[i][1] * s2;
-				pos1[i][2] = pos1[i][2] + pos2[i][2] * s2;
+				VectorMA(pos1[i], s2, pos2[i], pos1[i]);
 			}
 		}
 		return;
