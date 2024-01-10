@@ -380,22 +380,12 @@ void _SSE_SinCos(float x, float* s, float* c)
 	DirectX::XMScalarSinCos( s, c, x );
 }
 
-float _SSE_cos( float x )
-{
-	return DirectX::XMScalarCos( x );
-}
-
 //-----------------------------------------------------------------------------
 // SSE2 implementations of optimized routines:
 //-----------------------------------------------------------------------------
 void _SSE2_SinCos(float x, float* s, float* c)  // any x
 {
 	DirectX::XMScalarSinCos( s, c, x );
-}
-
-float _SSE2_cos(float x)
-{
-	return DirectX::XMScalarCos( x );
 }
 
 #if 0

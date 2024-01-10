@@ -103,7 +103,6 @@ float (FASTCALL *pfVectorNormalize)(Vector& v) = _VectorNormalize;
 void  (FASTCALL *pfVectorNormalizeFast)(Vector& v) = _VectorNormalizeFast;
 float (*pfInvRSquared)(const float* v) = _InvRSquared;
 void  (*pfFastSinCos)(float x, float* s, float* c) = SinCos;
-float (*pfFastCos)(float x) = cosf;
 
 
 qboolean VectorsEqual( const float *v1, const float *v2 )
@@ -3249,7 +3248,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 	pfVectorNormalizeFast = _VectorNormalizeFast;
 	pfInvRSquared = _InvRSquared;
 	pfFastSinCos = SinCos;
-	pfFastCos = cosf;
 
 	if ( bAllowMMX && pi.m_bMMX )
 	{
@@ -3299,7 +3297,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 #endif
 #ifdef PLATFORM_WINDOWS_PC32
 		pfFastSinCos = _SSE_SinCos;
-		pfFastCos = _SSE_cos;
 #endif
 	}
 	else
@@ -3311,7 +3308,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 	{
 		s_bSSE2Enabled = true;
 		pfFastSinCos = _SSE2_SinCos;
-		pfFastCos = _SSE2_cos;
 	} 
 	else
 	{
