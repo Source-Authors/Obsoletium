@@ -375,19 +375,9 @@ typedef __m64 v2si;   // vector of 2 int (mmx)
 
 #endif
 
-void _SSE_SinCos(float x, float* s, float* c)
-{
-	DirectX::XMScalarSinCos( s, c, x );
-}
-
 //-----------------------------------------------------------------------------
 // SSE2 implementations of optimized routines:
 //-----------------------------------------------------------------------------
-void _SSE2_SinCos(float x, float* s, float* c)  // any x
-{
-	DirectX::XMScalarSinCos( s, c, x );
-}
-
 #if 0
 // SSE Version of VectorTransform
 void VectorTransformSSE(const float *in1, const matrix3x4_t& in2, float *out1)
