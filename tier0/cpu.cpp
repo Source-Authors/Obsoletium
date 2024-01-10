@@ -2,6 +2,14 @@
 
 #include "pch_tier0.h"
 
+#ifdef _MSC_VER
+#include <intrin.h>
+#endif
+
+#if (defined(__clang__) || defined(__GNUC__)) && (__x86_64__ || __i386__)
+#include <cpuid.h>
+#endif
+
 #if defined(_WIN32)
 #include "winlite.h"
 #elif defined(_LINUX)
@@ -13,44 +21,25 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
-static bool cpuid(unsigned long function,
-	unsigned long& out_eax,
-	unsigned long& out_ebx,
-	unsigned long& out_ecx,
-	unsigned long& out_edx)
+static bool cpuid(unsigned int function,
+	unsigned int& out_eax,
+	unsigned int& out_ebx,
+	unsigned int& out_ecx,
+	unsigned int& out_edx)
 {
-#if defined(GNUC)
-	asm("mov %%ebx, %%esi\n\t"
-		"cpuid\n\t"
-		"xchg %%esi, %%ebx"
-		: "=a" (out_eax),
-		"=S" (out_ebx),
-		"=c" (out_ecx),
-		"=d" (out_edx)
-		: "a" (function) 
-		);
-	return true;
-#elif defined( _X360 )
-	return false;
+	int CPUInfo[4] = { -1 };
+#if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
+	__cpuid(function, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
 #else
-	bool retval = true;
-
-	__try
-	{
-			int pCPUInfo[4];
-			__cpuid(pCPUInfo, (int)function);
-			out_eax = pCPUInfo[0];
-			out_ebx = pCPUInfo[1];
-			out_ecx = pCPUInfo[2];
-			out_edx = pCPUInfo[3];
-	} 
-	__except(EXCEPTION_EXECUTE_HANDLER)
-	{ 
-		retval = false;
-	}
-
-	return retval;
+	__cpuid(CPUInfo, (int)function);
 #endif
+
+	out_eax = CPUInfo[0];
+	out_ebx = CPUInfo[1];
+	out_ecx = CPUInfo[2];
+	out_edx = CPUInfo[3];
+	
+	return true;
 }
 
 // Return the Processor's vendor identification string, or "Generic_x86" if it doesn't exist on this CPU
@@ -59,7 +48,7 @@ static const tchar* GetProcessorVendorId()
 #if defined( _X360 ) || defined( _PS3 )
 	return "PPC";
 #else
-	unsigned long unused, VendorIDRegisters[3];
+	unsigned int unused, VendorIDRegisters[3];
 
 	static tchar VendorID[13];
 	
@@ -91,7 +80,7 @@ static bool CheckMMXTechnology()
 #if defined( _X360 ) || defined( _PS3 ) 
 	return true;
 #else
-	unsigned long eax,ebx,edx,unused;
+	unsigned int eax,ebx,edx,unused;
 	if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
@@ -105,7 +94,7 @@ static bool CheckSSETechnology()
 #if defined( _X360 ) || defined( _PS3 )
 	return true;
 #else
-	unsigned long eax,ebx,edx,unused;
+	unsigned int eax,ebx,edx,unused;
 	if ( !cpuid(1,eax,ebx,unused,edx) )
 	{
 		return false;
@@ -120,7 +109,7 @@ static bool CheckSSE2Technology()
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
-	unsigned long eax,ebx,edx,unused;
+	unsigned int eax,ebx,edx,unused;
 	if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
@@ -133,7 +122,7 @@ static bool CheckSSE3Technology()
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
-	unsigned long eax,ebx,edx,ecx;
+	unsigned int eax,ebx,edx,ecx;
 	if( !cpuid(1,eax,ebx,ecx,edx) )
 		return false;
 
@@ -148,7 +137,7 @@ static bool CheckSSSE3Technology()
 #else
 	// SSSE 3 is implemented by both Intel and AMD
 	// detection is done the same way for both vendors
-	unsigned long eax,ebx,edx,ecx;
+	unsigned int eax,ebx,edx,ecx;
 	if( !cpuid(1,eax,ebx,ecx,edx) )
 		return false;
 
@@ -163,7 +152,7 @@ static bool CheckSSE41Technology()
 #else
 	// SSE 4.1 is implemented by both Intel and AMD
 	// detection is done the same way for both vendors
-	unsigned long eax,ebx,edx,ecx;
+	unsigned int eax,ebx,edx,ecx;
 	if( !cpuid(1,eax,ebx,ecx,edx) )
 		return false;
 
@@ -178,7 +167,7 @@ static bool CheckSSE42Technology()
 #else
 	// SSE 4.2 is implemented by both Intel and AMD
 	// detection is done the same way for both vendors
-	unsigned long eax,ebx,edx,ecx;
+	unsigned int eax,ebx,edx,ecx;
 	if( !cpuid(1,eax,ebx,ecx,edx) )
 		return false;
 
@@ -197,7 +186,7 @@ static bool CheckSSE4aTechnology()
 	if ( 0 != V_tier0_stricmp( pchVendor, "AuthenticAMD" ) )
 		return false;
 
-	unsigned long eax,ebx,edx,ecx;
+	unsigned int eax,ebx,edx,ecx;
 	if( !cpuid( 0x80000001,eax,ebx,ecx,edx) )
 		return false;
 
@@ -210,7 +199,7 @@ static bool Check3DNowTechnology()
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
-	unsigned long eax, unused;
+	unsigned int eax, unused;
 	if ( !cpuid(0x80000000,eax,unused,unused,unused) ) //-V112
 		return false;
 
@@ -231,7 +220,7 @@ static bool CheckCMOVTechnology()
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
-	unsigned long eax,ebx,edx,unused;
+	unsigned int eax,ebx,edx,unused;
 	if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
@@ -244,7 +233,7 @@ static bool CheckFCMOVTechnology()
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
-	unsigned long eax,ebx,edx,unused;
+	unsigned int eax,ebx,edx,unused;
 	if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
@@ -257,7 +246,7 @@ static bool CheckRDTSCTechnology()
 #if defined( _X360 ) || defined( _PS3 )
 	return false;
 #else
-	unsigned long eax,ebx,edx,unused;
+	unsigned int eax,ebx,edx,unused;
 	if ( !cpuid(1,eax,ebx,unused,edx) )
 		return false;
 
@@ -283,7 +272,7 @@ static uint8 LogicalProcessorsPerPackage()
 	// EBX[23:16] indicate number of logical processors per package
 	const unsigned NUM_LOGICAL_BITS = 0x00FF0000;
 
-	unsigned long unused, reg_ebx = 0;
+	unsigned int unused, reg_ebx = 0;
 
 	if ( !cpuid(1,unused,reg_ebx,unused,unused) )
 		return 1;
@@ -460,7 +449,7 @@ const CPUInformation* GetCPUInformation()
 	pi.m_nLogicalProcessors = LogicalProcessorsPerPackage();
 	pi.m_nPhysicalProcessors = 1U;
 
-	unsigned long eax, ebx, edx, ecx;
+	unsigned int eax, ebx, edx, ecx;
 	if (cpuid(1, eax, ebx, ecx, edx))
 	{
 		pi.m_nModel = eax; // full CPU model info
@@ -560,18 +549,18 @@ const CPUInformation* GetCPUInformation()
 	pi.m_bRDTSC        = CheckRDTSCTechnology();
 	pi.m_bCMOV         = CheckCMOVTechnology();
 	pi.m_bFCMOV        = CheckFCMOVTechnology();
-	pi.m_bMMX          = CheckMMXTechnology();
 	pi.m_bSSE          = CheckSSETechnology();
 	pi.m_bSSE2         = CheckSSE2Technology();
+	pi.m_b3DNow        = Check3DNowTechnology();
+	pi.m_bMMX          = CheckMMXTechnology();
+	// dimhotepus: Correctly check HyperThreading support.
+	pi.m_bHT		   = pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors;
 	pi.m_bSSE3         = CheckSSE3Technology();
 	pi.m_bSSSE3		   = CheckSSSE3Technology();
 	pi.m_bSSE4a        = CheckSSE4aTechnology();
 	pi.m_bSSE41        = CheckSSE41Technology();
 	pi.m_bSSE42        = CheckSSE42Technology();
-	pi.m_b3DNow        = Check3DNowTechnology();
 	pi.m_szProcessorID = (tchar*)GetProcessorVendorId();
-	// dimhotepus: Correctly check HyperThreading support.
-	pi.m_bHT		   = pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors;
 
 	// Mark struct as ready and filled, return it:
 	pi.m_Size = sizeof(pi);

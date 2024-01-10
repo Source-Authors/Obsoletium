@@ -5,9 +5,28 @@
 
 #include "wchartypes.h"
 
-#ifdef PLATFORM_WINDOWS_PC
+#ifdef _MSC_VER
 #include <intrin.h>
 #endif
+
+#if (defined(__clang__) || defined(__GNUC__)) && (__x86_64__ || __i386__)
+#include <cpuid.h>
+#endif
+
+inline void cpuid(unsigned int regs[4], unsigned int function)
+{
+	int CPUInfo[4] = { -1 };
+#if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
+	__cpuid(function, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
+#else
+	__cpuid(CPUInfo, (int)function);
+#endif
+
+	regs[0] = CPUInfo[0];
+	regs[1] = CPUInfo[1];
+	regs[2] = CPUInfo[2];
+	regs[3] = CPUInfo[3];
+}
 
 /*
     This section from http://iss.cs.cornell.edu/ia32.htm
@@ -126,25 +145,7 @@ public:
 
 		for (uint32 i = 1; i <= m; i++)
 		{
-#ifdef COMPILER_MSVC64
-			__cpuid((int *) (d + (i-1) * 4), i);
-
-#else
-			uint32 *t = d + (i - 1) * 4;
-
-			__asm
-			{
-				mov	eax, i;
-				mov esi, t;
-
-				cpuid;
-
-				mov dword ptr [esi + 0x0], eax;
-				mov dword ptr [esi + 0x4], ebx;
-				mov dword ptr [esi + 0x8], ecx;
-				mov dword ptr [esi + 0xC], edx;
-			}
-#endif
+			cpuid((d + (i-1) * 4), i);
 		}
 
 		if (m >= 1)
@@ -233,13 +234,9 @@ private:
 
 	uint32 init0 ()
 	{
-		uint32 m;
-
-		int data[4 + 1];
-		tchar * s1;
-
-		s1 = (tchar *) &data[1];
-		__cpuid(data, 0);
+		uint32 data[4 + 1];
+		tchar * s1 = (tchar *) &data[1];
+		cpuid(data, 0);
 		data[4] = 0;
 		// Returns something like this:
 		//  data[0] = 0x0000000b
@@ -248,8 +245,8 @@ private:
 		//  data[3] = 0x49656e69 	ineI
 		//  data[4] = 0x00000000
 
-		m = data[0];
-		int t = data[2];
+		uint32 m = data[0];
+		unsigned t = data[2];
 		data[2] = data[3];
 		data[3] = t;
 		vendor_name = s1;
@@ -280,20 +277,7 @@ private:
 
 		for (int i = 0; i < count; i++)
 		{
-#ifdef COMPILER_MSVC64
-			__cpuid((int *) d, 2);
-#else
-			__asm
-			{
-				mov	eax, 2;
-				lea esi, d;
-				cpuid;
-				mov [esi + 0x0], eax;
-				mov [esi + 0x4], ebx;
-				mov [esi + 0x8], ecx;
-				mov [esi + 0xC], edx;
-			}
-#endif
+			cpuid(d, 2);
 
 			if (i == 0)
 				d[0] &= 0xFFFFFF00;
@@ -325,18 +309,9 @@ private:
 	{
 		uint32 m;
 
-#ifdef COMPILER_MSVC64
-		int data[4];
-		__cpuid(data, 0x80000000);
+		unsigned data[4];
+		cpuid(data, 0x80000000);
 		m = data[0];
-#else
-		__asm
-		{
-			mov	eax, 0x80000000;
-			cpuid;
-			mov m, eax
-		}
-#endif
 
 		if ((m & 0x80000000) != 0)
 		{
@@ -346,20 +321,7 @@ private:
 			{
 				uint32 *t = d + (i - 0x80000001) * 4;
 
-#ifdef COMPILER_MSVC64
-				__cpuid((int *) t, i);
-#else
-				__asm
-				{
-					mov	eax, i;
-					mov	esi, t;
-					cpuid;
-					mov dword ptr [esi + 0x0], eax;
-					mov dword ptr [esi + 0x4], ebx;
-					mov dword ptr [esi + 0x8], ecx;
-					mov dword ptr [esi + 0xC], edx;
-				}
-#endif
+				cpuid(t, i);
 			}
 
 			if (m >= 0x80000002)
