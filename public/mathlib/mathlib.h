@@ -7,7 +7,9 @@
 #ifndef MATH_LIB_H
 #define MATH_LIB_H
 
-#include <math.h>
+#include <DirectXMath.h>
+#include <cmath>
+
 #include "minmax.h"
 #include "tier0/basetypes.h"
 #include "tier0/commonmacros.h"
@@ -443,30 +445,7 @@ int Q_log2(int val);
 // Math routines done in optimized assembly math package routines
 void inline SinCos( float radians, float *sine, float *cosine )
 {
-#if defined( _X360 )
-	XMScalarSinCos( sine, cosine, radians );
-#elif defined( PLATFORM_WINDOWS_PC32 )
-	_asm
-	{
-		fld		DWORD PTR [radians]
-		fsincos
-
-		mov edx, DWORD PTR [cosine]
-		mov eax, DWORD PTR [sine]
-
-		fstp DWORD PTR [edx]
-		fstp DWORD PTR [eax]
-	}
-#elif defined( PLATFORM_WINDOWS_PC64 )
-	*sine = sinf( radians );
-	*cosine = cosf( radians );
-#elif defined( POSIX )
-	double __cosr, __sinr;
-	__asm ("fsincos" : "=t" (__cosr), "=u" (__sinr) : "0" (radians));
-
-  	*sine = __sinr;
-  	*cosine = __cosr;
-#endif
+	DirectX::XMScalarSinCos( sine, cosine, radians );
 }
 
 
