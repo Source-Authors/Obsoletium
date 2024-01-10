@@ -1485,17 +1485,12 @@ void QuaternionBlend( const Quaternion &p, const Quaternion &q, float t, Quatern
 void QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
 	Assert( s_bMathlibInitialized );
-	float sclp, sclq;
-	int i;
 
-	// 0.0 returns p, 1.0 return q.
-	sclp = 1.0f - t;
-	sclq = t;
-	for (i = 0; i < 4; i++) {
-		qt[i] = sclp * p[i] + sclq * q[i];
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 qtsimd = QuaternionBlendNoAlignSIMD( psimd, qsimd, t );
+	StoreUnalignedSIMD( qt.Base(), qtsimd );
 	}
-	QuaternionNormalize2( qt );
-}
 
 
 
