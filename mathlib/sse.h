@@ -14,9 +14,4 @@ float FASTCALL _SSE_VectorNormalize(Vector& vec);
 void FASTCALL _SSE_VectorNormalizeFast(Vector& vec);
 float _SSE_InvRSquared(const float* v);
 
-#if 0
-void VectorTransformSSE(const float *in1, const matrix3x4_t& in2, float *out1);
-void VectorRotateSSE( const float *in1, const matrix3x4_t& in2, float *out1 );
-#endif
-
 #endif // _SSE_H

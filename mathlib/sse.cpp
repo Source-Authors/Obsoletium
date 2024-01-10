@@ -102,23 +102,6 @@ float _SSE_Sqrt(float x)
 	return root;
 }
 
-// Single iteration NewtonRaphson reciprocal square root:
-// 0.5 * rsqrtps * (3 - x * rsqrtps(x) * rsqrtps(x)) 	
-// Very low error, and fine to use in place of 1.f / sqrtf(x).	
-#if 0
-float _SSE_RSqrtAccurate(float x)
-{
-	float rroot;
-	__asm
-	{
-		rsqrtss	xmm0, x
-		movss	rroot, xmm0
-	}
-
-	return (0.5f * rroot) * (3.f - (x * rroot) * rroot);
-}
-#else
-
 #ifdef POSIX
 const __m128  f3  = _mm_set_ss(3.0f);  // 3 as SSE value
 const __m128  f05 = _mm_set_ss(0.5f);  // 0.5 as SSE value
@@ -168,7 +151,6 @@ float _SSE_RSqrtAccurate(float a)
 #endif
 
 }
-#endif
 
 // Simple SSE rsqrt.  Usually accurate to around 6 (relative) decimal places 
 // or so, so ok for closed transforms.  (ie, computing lighting normals)
@@ -378,119 +360,6 @@ typedef __m64 v2si;   // vector of 2 int (mmx)
 //-----------------------------------------------------------------------------
 // SSE2 implementations of optimized routines:
 //-----------------------------------------------------------------------------
-#if 0
-// SSE Version of VectorTransform
-void VectorTransformSSE(const float *in1, const matrix3x4_t& in2, float *out1)
-{
-	Assert( in1 != out1 );
-
-#ifdef _WIN32
-	__asm
-	{
-		mov eax, in1;
-		mov ecx, in2;
-		mov edx, out1;
-
-		movss xmm0, [eax];
-		mulss xmm0, [ecx];
-		movss xmm1, [eax+4];
-		mulss xmm1, [ecx+4];
-		movss xmm2, [eax+8];
-		mulss xmm2, [ecx+8];
-		addss xmm0, xmm1;
-		addss xmm0, xmm2;
-		addss xmm0, [ecx+12]
- 		movss [edx], xmm0;
-		add ecx, 16;
-
-		movss xmm0, [eax];
-		mulss xmm0, [ecx];
-		movss xmm1, [eax+4];
-		mulss xmm1, [ecx+4];
-		movss xmm2, [eax+8];
-		mulss xmm2, [ecx+8];
-		addss xmm0, xmm1;
-		addss xmm0, xmm2;
-		addss xmm0, [ecx+12]
-		movss [edx+4], xmm0;
-		add ecx, 16;
-
-		movss xmm0, [eax];
-		mulss xmm0, [ecx];
-		movss xmm1, [eax+4];
-		mulss xmm1, [ecx+4];
-		movss xmm2, [eax+8];
-		mulss xmm2, [ecx+8];
-		addss xmm0, xmm1;
-		addss xmm0, xmm2;
-		addss xmm0, [ecx+12]
-		movss [edx+8], xmm0;
-	}
-#elif POSIX
-	#warning "VectorTransformSSE C implementation only"
-		out1[0] = DotProduct(in1, in2[0]) + in2[0][3];
-		out1[1] = DotProduct(in1, in2[1]) + in2[1][3];
-		out1[2] = DotProduct(in1, in2[2]) + in2[2][3];
-#else
-	#error "Not Implemented"
-#endif
-}
-#endif
-
-#if 0
-void VectorRotateSSE( const float *in1, const matrix3x4_t& in2, float *out1 )
-{
-	Assert( in1 != out1 );
-
-#ifdef _WIN32
-	__asm
-	{
-		mov eax, in1;
-		mov ecx, in2;
-		mov edx, out1;
-
-		movss xmm0, [eax];
-		mulss xmm0, [ecx];
-		movss xmm1, [eax+4];
-		mulss xmm1, [ecx+4];
-		movss xmm2, [eax+8];
-		mulss xmm2, [ecx+8];
-		addss xmm0, xmm1;
-		addss xmm0, xmm2;
- 		movss [edx], xmm0;
-		add ecx, 16;
-
-		movss xmm0, [eax];
-		mulss xmm0, [ecx];
-		movss xmm1, [eax+4];
-		mulss xmm1, [ecx+4];
-		movss xmm2, [eax+8];
-		mulss xmm2, [ecx+8];
-		addss xmm0, xmm1;
-		addss xmm0, xmm2;
-		movss [edx+4], xmm0;
-		add ecx, 16;
-
-		movss xmm0, [eax];
-		mulss xmm0, [ecx];
-		movss xmm1, [eax+4];
-		mulss xmm1, [ecx+4];
-		movss xmm2, [eax+8];
-		mulss xmm2, [ecx+8];
-		addss xmm0, xmm1;
-		addss xmm0, xmm2;
-		movss [edx+8], xmm0;
-	}
-#elif POSIX
-	#warning "VectorRotateSSE C implementation only"
-		out1[0] = DotProduct( in1, in2[0] );
-		out1[1] = DotProduct( in1, in2[1] );
-		out1[2] = DotProduct( in1, in2[2] );
-#else
-	#error "Not Implemented"
-#endif
-}
-#endif
 
 #ifdef _WIN32
 void _declspec(naked) _SSE_VectorMA( const float *start, float scale, const float *direction, float *dest )
@@ -556,36 +425,5 @@ void _declspec(naked) __cdecl _SSE_VectorMA( const Vector &start, float scale, c
 float (__cdecl *pfVectorMA)(Vector& v) = _VectorMA;
 #endif
 #endif
-
-
-// SSE DotProduct -- it's a smidgen faster than the asm DotProduct...
-//   Should be validated too!  :)
-//   NJS: (Nov 1 2002) -NOT- faster.  may time a couple cycles faster in a single function like 
-//   this, but when inlined, and instruction scheduled, the C version is faster.  
-//   Verified this via VTune
-/*
-vec_t DotProduct (const vec_t *a, const vec_t *c)
-{
-	vec_t temp;
-
-	__asm
-	{
-		mov eax, a;
-		mov ecx, c;
-		mov edx, DWORD PTR [temp]
-		movss xmm0, [eax];
-		mulss xmm0, [ecx];
-		movss xmm1, [eax+4];
-		mulss xmm1, [ecx+4];
-		movss xmm2, [eax+8];
-		mulss xmm2, [ecx+8];
-		addss xmm0, xmm1;
-		addss xmm0, xmm2;
-		movss [edx], xmm0;
-		fld DWORD PTR [edx];
-		ret
-	}
-}
-*/
 
 #endif // COMPILER_MSVC64 
