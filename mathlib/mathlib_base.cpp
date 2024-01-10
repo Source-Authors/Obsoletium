@@ -96,7 +96,6 @@ float _InvRSquared(const float* v)
 //-----------------------------------------------------------------------------
 // Function pointers selecting the appropriate implementation
 //-----------------------------------------------------------------------------
-float (*pfSqrt)(float x)  = _sqrtf;
 float (*pfRSqrt)(float x) = _rsqrtf;
 float (*pfRSqrtFast)(float x) = _rsqrtf;
 float (FASTCALL *pfVectorNormalize)(Vector& v) = _VectorNormalize;
@@ -3240,7 +3239,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 	const CPUInformation& pi = *GetCPUInformation();
 
 	// Select the default generic routines.
-	pfSqrt = _sqrtf;
 	pfRSqrt = _rsqrtf;
 	pfRSqrtFast = _rsqrtf;
 	pfVectorNormalize = _VectorNormalize;
@@ -3269,7 +3267,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 		pfVectorNormalize = _3DNow_VectorNormalize;
 		pfVectorNormalizeFast = _3DNow_VectorNormalizeFast;
 		pfInvRSquared = _3DNow_InvRSquared;
-		pfSqrt = _3DNow_Sqrt;
 		pfRSqrt = _3DNow_RSqrt;
 		pfRSqrtFast = _3DNow_RSqrt;
 	}
@@ -3289,7 +3286,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 		pfVectorNormalize = _VectorNormalize;
 		pfVectorNormalizeFast = _SSE_VectorNormalizeFast;
 		pfInvRSquared = _SSE_InvRSquared;
-		pfSqrt = _SSE_Sqrt;
 		pfRSqrt = _SSE_RSqrtAccurate;
 		pfRSqrtFast = _SSE_RSqrtFast;
 #endif

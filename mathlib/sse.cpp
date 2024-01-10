@@ -75,21 +75,6 @@ _PS_CONST(sincos_p3, -0.468175413106023168e-2f);
 //-----------------------------------------------------------------------------
 // SSE implementations of optimized routines:
 //-----------------------------------------------------------------------------
-float _SSE_Sqrt(float x)
-{
-	float	root = 0.f;
-#ifdef _WIN32
-	__asm
-	{
-		sqrtss		xmm0, x
-		movss		root, xmm0
-	}
-#elif POSIX
-	_mm_store_ss( &root, _mm_sqrt_ss( _mm_load_ss( &x ) ) );
-#endif
-	return root;
-}
-
 #ifdef POSIX
 const __m128  f3  = _mm_set_ss(3.0f);  // 3 as SSE value
 const __m128  f05 = _mm_set_ss(0.5f);  // 0.5 as SSE value
