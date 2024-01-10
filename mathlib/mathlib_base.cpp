@@ -1497,23 +1497,21 @@ void QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, 
 void QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt )
 {
 	Assert( s_bMathlibInitialized );
-	float sclp;
 
-	sclp = 1.0f - t;
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 sclp = ReplicateX4( 1.0f - t );
 
-	qt.x = p.x * sclp;
-	qt.y = p.y * sclp;
-	qt.z = p.z * sclp;
-	if (qt.w < 0.0)
+	fltx4 result = MulSIMD( psimd, sclp );
+
+	if (qt.w < 0.0f)
 	{
-		qt.w = p.w * sclp - t;
+		t = -t;
 	}
-	else
-	{
-		qt.w = p.w * sclp + t;
+
+	result = DirectX::XMVectorSetW( result, DirectX::XMVectorGetW( result ) + t );
+
+	StoreUnalignedSIMD( qt.Base(), QuaternionNormalizeSIMD( result ) );
 	}
-	QuaternionNormalize2( qt );
-}
 
 //-----------------------------------------------------------------------------
 // Quaternion sphereical linear interpolation
