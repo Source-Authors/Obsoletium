@@ -13,22 +13,16 @@
 #pragma once
 #endif
 
-#include <math.h>
-#include <float.h>
+#include <DirectXMath.h>
 
-// For vec_t, put this somewhere else?
-#include "tier0/basetypes.h"
+#include <cmath>
+#include <cfloat>
+#include <cstdlib>  // rand
 
-// For rand(). We really need a library!
-#include <stdlib.h>
-
-#ifndef _X360
-// For MMX intrinsics
-#include <xmmintrin.h>
-#endif
-
+#include "tier0/basetypes.h"  // vec_t
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
+
 #include "mathlib/vector2d.h"
 #include "mathlib/math_pfns.h"
 
@@ -95,6 +89,20 @@ public:
 	// Base address...
 	vec_t* Base();
 	vec_t const* Base() const;
+
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT3* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT3) == alignof(Vector));
+		return reinterpret_cast<DirectX::XMFLOAT3*>(this);
+	}
+	DirectX::XMFLOAT3 const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT3) == alignof(Vector));
+		return reinterpret_cast<DirectX::XMFLOAT3 const*>(this);
+	}
 
 	// Cast to Vector2D...
 	Vector2D& AsVector2D();
@@ -308,6 +316,20 @@ public:
 	int* Base();
 	int const* Base() const;
 
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMINT4* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMINT4) == sizeof(*this));
+		static_assert(alignof(DirectX::XMINT4) == alignof(IntVector4D));
+		return reinterpret_cast<DirectX::XMINT4*>(this);
+	}
+	DirectX::XMINT4 const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMINT4) == sizeof(*this));
+		static_assert(alignof(DirectX::XMINT4) == alignof(IntVector4D));
+		return reinterpret_cast<DirectX::XMINT4 const*>(this);
+	}
+
 	// equality
 	bool operator==(const IntVector4D& v) const;
 	bool operator!=(const IntVector4D& v) const;	
@@ -370,6 +392,20 @@ public:
 		Assert( (i >= 0) && (i < 3) );
 		return ((vec_t*)this)[i];
 	}
+
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT3* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT3) == alignof(TableVector));
+		return reinterpret_cast<DirectX::XMFLOAT3*>(this);
+	}
+	DirectX::XMFLOAT3 const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT3) == alignof(TableVector));
+		return reinterpret_cast<DirectX::XMFLOAT3 const*>(this);
+	}
 };
 
 
@@ -406,6 +442,20 @@ public:
 	{
 		Init(vOther.x, vOther.y, vOther.z);
 		return *this;
+	}
+	
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT4A* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4A) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(VectorAligned));
+		return reinterpret_cast<DirectX::XMFLOAT4A*>(this);
+	}
+	DirectX::XMFLOAT4A const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4A) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(VectorAligned));
+		return reinterpret_cast<DirectX::XMFLOAT4A const*>(this);
 	}
 	
 #endif
@@ -1563,6 +1613,20 @@ public:
 	vec_t* Base() { return (vec_t*)this; }
 	const vec_t* Base() const { return (vec_t*)this; }
 
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT4* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT4) == alignof(Quaternion));
+		return reinterpret_cast<DirectX::XMFLOAT4*>(this);
+	}
+	DirectX::XMFLOAT4 const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT4) == alignof(Quaternion));
+		return reinterpret_cast<DirectX::XMFLOAT4 const*>(this);
+	}
+
 	// array access...
 	vec_t operator[](int i) const;
 	vec_t& operator[](int i);
@@ -1649,6 +1713,20 @@ public:
 		return *this;
 	}
 
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT4A* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4A) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(QuaternionAligned));
+		return reinterpret_cast<DirectX::XMFLOAT4A*>(this);
+	}
+	DirectX::XMFLOAT4A const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4A) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(QuaternionAligned));
+		return reinterpret_cast<DirectX::XMFLOAT4A const*>(this);
+	}
+
 #endif
 } ALIGN16_POST;
 
@@ -1676,6 +1754,20 @@ public:
 	// array access...
 	vec_t operator[](int i) const;
 	vec_t& operator[](int i);
+
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT3* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT3) == alignof(RadianEuler));
+		return reinterpret_cast<DirectX::XMFLOAT3*>(this);
+	}
+	DirectX::XMFLOAT3 const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT3) == alignof(RadianEuler));
+		return reinterpret_cast<DirectX::XMFLOAT3 const*>(this);
+	}
 
 	vec_t x, y, z;
 };
@@ -1800,6 +1892,20 @@ public:
 	// Base address...
 	vec_t* Base();
 	vec_t const* Base() const;
+	
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT3* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT3) == alignof(QAngle));
+		return reinterpret_cast<DirectX::XMFLOAT3*>(this);
+	}
+	DirectX::XMFLOAT3 const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT3) == alignof(QAngle));
+		return reinterpret_cast<DirectX::XMFLOAT3 const*>(this);
+	}
 	
 	// equality
 	bool operator==(const QAngle& v) const;

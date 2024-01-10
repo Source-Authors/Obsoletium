@@ -13,16 +13,14 @@
 #pragma once
 #endif
 
-#include <math.h>
-#include <stdlib.h>		// For rand(). We really need a library!
-#include <float.h>
-#if !defined( _X360 )
-#include <xmmintrin.h>	// For SSE
-#endif
-#include "basetypes.h"	// For vec_t, put this somewhere else?
+#include <cfloat>
+#include <cmath>
+#include <cstdlib>  // rand
+
+#include "tier0/basetypes.h" // vec_t
 #include "tier0/dbg.h"
-// dimhotepus: For CAlignedNewDelete<X>
-#include "tier0/memalloc.h"
+#include "tier0/memalloc.h"  // CAlignedNewDelete<X>
+
 #include "mathlib/math_pfns.h"
 
 // forward declarations
@@ -33,7 +31,7 @@ class Vector2D;
 // 4D Vector4D
 //=========================================================
 
-class Vector4D					
+class Vector4D
 {
 public:
 	// Members
@@ -57,6 +55,20 @@ public:
 	// Base address...
 	inline vec_t* Base();
 	inline vec_t const* Base() const;
+
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT4* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT4) == alignof(Vector4D));
+		return reinterpret_cast<DirectX::XMFLOAT4*>(this);
+	}
+	DirectX::XMFLOAT4 const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT4) == alignof(Vector4D));
+		return reinterpret_cast<DirectX::XMFLOAT4 const*>(this);
+	}
 
 	// Cast to Vector and Vector2D...
 	Vector& AsVector3D();
@@ -147,6 +159,19 @@ public:
 
 	inline __m128 &AsM128() { return *(__m128*)&x; }
 	inline const __m128 &AsM128() const { return *(const __m128*)&x; } 
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT4A* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4A) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(Vector4DAligned));
+		return reinterpret_cast<DirectX::XMFLOAT4A*>(this);
+	}
+	DirectX::XMFLOAT4A const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4A) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(Vector4DAligned));
+		return reinterpret_cast<DirectX::XMFLOAT4A const*>(this);
+	}
 
 private:
 	// No copy constructors allowed if we're in optimal mode

@@ -30,7 +30,9 @@
 #pragma once
 #endif
 
-#include <string.h>
+#include <DirectXMath.h>
+#include <cstring>
+
 #include "mathlib/vector.h"
 #include "mathlib/vplane.h"
 #include "mathlib/vector4d.h"
@@ -91,6 +93,34 @@ public:
 	inline const float *Base() const
 	{
 		return &m[0][0];
+	}
+
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT4* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(m[0]));
+		static_assert(alignof(DirectX::XMFLOAT4) == alignof(decltype(m)));
+		return reinterpret_cast<DirectX::XMFLOAT4*>(&m[0][0]);
+	}
+	DirectX::XMFLOAT4 const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(m[0]));
+		static_assert(alignof(DirectX::XMFLOAT4) == alignof(decltype(m)));
+		return reinterpret_cast<DirectX::XMFLOAT4 const*>(&m[0][0]);
+	}
+
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT4X4* XmMBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4X4) == sizeof(m));
+		static_assert(alignof(DirectX::XMFLOAT4X4) == alignof(decltype(m)));
+		return reinterpret_cast<DirectX::XMFLOAT4X4*>(&m[0][0]);
+	}
+	DirectX::XMFLOAT4X4 const* XmMBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4X4) == sizeof(m));
+		static_assert(alignof(DirectX::XMFLOAT4X4) == alignof(decltype(m)));
+		return reinterpret_cast<DirectX::XMFLOAT4X4 const*>(&m[0][0]);
 	}
 
 	void		SetLeft(const Vector &vLeft);

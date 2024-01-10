@@ -13,15 +13,13 @@
 #pragma once
 #endif
 
-#include <math.h>
-#include <float.h>
+#include <DirectXMath.h>
 
-// For vec_t, put this somewhere else?
-#include "tier0/basetypes.h"
+#include <cfloat>
+#include <cmath>
+#include <cstdlib>  // rand
 
-// For rand(). We really need a library!
-#include <stdlib.h>
-
+#include "tier0/basetypes.h"  // vec_t
 #include "tier0/dbg.h"
 #include "mathlib/math_pfns.h"
 
@@ -61,6 +59,20 @@ public:
 	// Base address...
 	vec_t* Base();
 	vec_t const* Base() const;
+
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT2* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT2) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT2) == alignof(Vector2D));
+		return reinterpret_cast<DirectX::XMFLOAT2*>(this);
+	}
+	DirectX::XMFLOAT2 const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT2) == sizeof(*this));
+		static_assert(alignof(DirectX::XMFLOAT2) == alignof(Vector2D));
+		return reinterpret_cast<DirectX::XMFLOAT2 const*>(this);
+	}
 
 	// Initialization methods
 	void Random( float minVal, float maxVal );

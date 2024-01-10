@@ -13,16 +13,11 @@
 #include "minmax.h"
 #include "tier0/basetypes.h"
 #include "tier0/commonmacros.h"
-#include "mathlib/vector.h"
-#include "mathlib/vector2d.h"
 #include "tier0/dbg.h"
 
+#include "mathlib/vector.h"
+#include "mathlib/vector2d.h"
 #include "mathlib/math_pfns.h"
-
-#if defined(__i386__) || defined(_M_IX86)
-// For MMX intrinsics
-#include <xmmintrin.h>
-#endif
 
 // XXX remove me
 #undef clamp
@@ -269,6 +264,33 @@ struct matrix3x4_t
 	const float *operator[]( int i ) const	{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; }
 	float *Base()							{ return &m_flMatVal[0][0]; }
 	const float *Base() const				{ return &m_flMatVal[0][0]; }
+
+	// dimhotepus: Better DirectX math integration.
+	DirectX::XMFLOAT4* XmBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(m_flMatVal[0]));
+		static_assert(alignof(DirectX::XMFLOAT4) == alignof(decltype(m_flMatVal[0])));
+		return reinterpret_cast<DirectX::XMFLOAT4*>(&m_flMatVal[0][0]);
+	}
+	DirectX::XMFLOAT4 const* XmBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(m_flMatVal[0]));
+		static_assert(alignof(DirectX::XMFLOAT4) == alignof(decltype(m_flMatVal[0])));
+		return reinterpret_cast<DirectX::XMFLOAT4 const*>(&m_flMatVal[0][0]);
+	}
+
+	DirectX::XMFLOAT3X4* XmMBase()
+	{
+		static_assert(sizeof(DirectX::XMFLOAT3X4) == sizeof(m_flMatVal));
+		static_assert(alignof(DirectX::XMFLOAT3X4) == alignof(decltype(m_flMatVal)));
+		return reinterpret_cast<DirectX::XMFLOAT3X4*>(&m_flMatVal[0][0]);
+	}
+	DirectX::XMFLOAT3X4 const* XmMBase() const
+	{
+		static_assert(sizeof(DirectX::XMFLOAT3X4) == sizeof(m_flMatVal));
+		static_assert(alignof(DirectX::XMFLOAT3X4) == alignof(decltype(m_flMatVal)));
+		return reinterpret_cast<DirectX::XMFLOAT3X4 const*>(&m_flMatVal[0][0]);
+	}
 
 	float m_flMatVal[3][4];
 };
