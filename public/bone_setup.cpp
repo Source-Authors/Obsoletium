@@ -1165,6 +1165,16 @@ static void CalcAnimation( const CStudioHdr *pStudioHdr,	Vector *pos, Quaternion
 //-----------------------------------------------------------------------------
 void QuaternionSM( float s, const Quaternion &p, const Quaternion &q, Quaternion &qt )
 {
+#if ALLOW_SIMD_QUATERNION_MATH
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+
+	fltx4 spsimd = QuaternionScaleSIMD( psimd, s );
+	fltx4 qtsimd = QuaternionMultSIMD( spsimd, qsimd );
+
+	fltx4 result = QuaternionNormalizeSIMD( qtsimd );
+	StoreUnalignedSIMD( qt.Base(), result );
+#else
 	Quaternion		p1, q1;
 
 	QuaternionScale( p, s, p1 );
@@ -1174,18 +1184,9 @@ void QuaternionSM( float s, const Quaternion &p, const Quaternion &q, Quaternion
 	qt[1] = q1[1];
 	qt[2] = q1[2];
 	qt[3] = q1[3];
+#endif
 }
 
-#if ALLOW_SIMD_QUATERNION_MATH
-FORCEINLINE fltx4 QuaternionSMSIMD( float s, const fltx4 &p, const fltx4 &q )
-{
-	fltx4 p1, q1, result;
-	p1 = QuaternionScaleSIMD( p, s );
-	q1 = QuaternionMultSIMD( p1, q );
-	result = QuaternionNormalizeSIMD( q1 );
-	return result;
-}
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: qt = p * ( s * q )
@@ -1193,8 +1194,9 @@ FORCEINLINE fltx4 QuaternionSMSIMD( float s, const fltx4 &p, const fltx4 &q )
 void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt )
 {
 #if ALLOW_SIMD_QUATERNION_MATH
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
 	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+
 	fltx4 sqsimd = QuaternionScaleSIMD( qsimd, s );
 	fltx4 qtsimd = QuaternionMultSIMD( psimd, sqsimd );
 
@@ -1451,14 +1453,7 @@ void SlerpBones(
 			}
 			else
 			{
-#ifndef _X360
 				QuaternionSM( s2, q2[i], q1[i], q1[i] );
-#else
-				fltx4 q1simd = LoadUnalignedSIMD( q1[i].Base() );
-				fltx4 q2simd = LoadAlignedSIMD( q2[i] );
-				fltx4 result = QuaternionSMSIMD( s2, q2simd, q1simd );
-				StoreUnalignedSIMD( q1[i].Base(), result );
-#endif
 
 				// FIXME: are these correct?
 				pos1[i][0] = pos1[i][0] + pos2[i][0] * s2;
