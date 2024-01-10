@@ -1221,6 +1221,16 @@ void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion
 //-----------------------------------------------------------------------------
 void QuaternionAccumulate( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt )
 {
+#if ALLOW_SIMD_QUATERNION_MATH
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+
+	fltx4 pqsimd = QuaternionAlignSIMD( psimd, qsimd );
+	fltx4 s4 = ReplicateX4( s );
+
+	fltx4 result = MaddSIMD( s4, pqsimd, psimd );
+	StoreUnalignedSIMD( qt.Base(), result );
+#else
 	Quaternion q2;
 	QuaternionAlign( p, q, q2 );
 
@@ -1228,19 +1238,8 @@ void QuaternionAccumulate( const Quaternion &p, float s, const Quaternion &q, Qu
 	qt[1] = p[1] + s * q2[1];
 	qt[2] = p[2] + s * q2[2];
 	qt[3] = p[3] + s * q2[3];
-}
-
-#if ALLOW_SIMD_QUATERNION_MATH
-FORCEINLINE fltx4 QuaternionAccumulateSIMD( const fltx4 &p, float s, const fltx4 &q )
-{
-	fltx4 q2, s4, result;
-	q2 = QuaternionAlignSIMD( p, q );
-	s4 = ReplicateX4( s );
-	result = MaddSIMD( s4, q2, p );
-	return result;
-}
 #endif
-
+}
 
 
 //-----------------------------------------------------------------------------
