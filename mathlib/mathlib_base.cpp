@@ -47,16 +47,6 @@ const int nanmask = 255<<23;
 //-----------------------------------------------------------------------------
 // Standard C implementations of optimized routines:
 //-----------------------------------------------------------------------------
-float _sqrtf(float _X)
-{
-	return sqrtf(_X); 
-}
-
-float _rsqrtf(float x)
-{
-	return 1.f / _sqrtf( x );
-}
-
 float FASTCALL _VectorNormalize (Vector& vec)
 {
 #ifdef _VPROF_MATHLIB
@@ -96,8 +86,6 @@ float _InvRSquared(const float* v)
 //-----------------------------------------------------------------------------
 // Function pointers selecting the appropriate implementation
 //-----------------------------------------------------------------------------
-float (*pfRSqrt)(float x) = _rsqrtf;
-float (*pfRSqrtFast)(float x) = _rsqrtf;
 float (FASTCALL *pfVectorNormalize)(Vector& v) = _VectorNormalize;
 void  (FASTCALL *pfVectorNormalizeFast)(Vector& v) = _VectorNormalizeFast;
 float (*pfInvRSquared)(const float* v) = _InvRSquared;
@@ -3239,8 +3227,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 	const CPUInformation& pi = *GetCPUInformation();
 
 	// Select the default generic routines.
-	pfRSqrt = _rsqrtf;
-	pfRSqrtFast = _rsqrtf;
 	pfVectorNormalize = _VectorNormalize;
 	pfVectorNormalizeFast = _VectorNormalizeFast;
 	pfInvRSquared = _InvRSquared;
@@ -3267,8 +3253,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 		pfVectorNormalize = _3DNow_VectorNormalize;
 		pfVectorNormalizeFast = _3DNow_VectorNormalizeFast;
 		pfInvRSquared = _3DNow_InvRSquared;
-		pfRSqrt = _3DNow_RSqrt;
-		pfRSqrtFast = _3DNow_RSqrt;
 	}
 	else
 #endif
@@ -3286,8 +3270,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 		pfVectorNormalize = _VectorNormalize;
 		pfVectorNormalizeFast = _SSE_VectorNormalizeFast;
 		pfInvRSquared = _SSE_InvRSquared;
-		pfRSqrt = _SSE_RSqrtAccurate;
-		pfRSqrtFast = _SSE_RSqrtFast;
 #endif
 	}
 	else

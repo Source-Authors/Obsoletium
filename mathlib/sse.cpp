@@ -10,6 +10,7 @@
 #include "tier0/platform.h"
 
 #include "mathlib/vector.h"
+#include "mathlib/math_pfns.h"
 #include "sse.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -75,87 +76,14 @@ _PS_CONST(sincos_p3, -0.468175413106023168e-2f);
 //-----------------------------------------------------------------------------
 // SSE implementations of optimized routines:
 //-----------------------------------------------------------------------------
-#ifdef POSIX
-const __m128  f3  = _mm_set_ss(3.0f);  // 3 as SSE value
-const __m128  f05 = _mm_set_ss(0.5f);  // 0.5 as SSE value
-#endif
-
-// Intel / Kipps SSE RSqrt.  Significantly faster than above.
-float _SSE_RSqrtAccurate(float a)
-{
-
-#ifdef _WIN32
-	float x;
-	float half = 0.5f;
-	float three = 3.f;
-
-	__asm
-	{
-		movss   xmm3, a;
-		movss   xmm1, half;
-		movss   xmm2, three;
-		rsqrtss xmm0, xmm3;
-
-		mulss   xmm3, xmm0;
-		mulss   xmm1, xmm0;
-		mulss   xmm3, xmm0;
-		subss   xmm2, xmm3;
-		mulss   xmm1, xmm2;
-
-		movss   x,    xmm1;
-	}
-
-	return x;
-#elif POSIX	
-	__m128  xx = _mm_load_ss( &a );
-    __m128  xr = _mm_rsqrt_ss( xx );
-    __m128  xt;
-	
-    xt = _mm_mul_ss( xr, xr );
-    xt = _mm_mul_ss( xt, xx );
-    xt = _mm_sub_ss( f3, xt );
-    xt = _mm_mul_ss( xt, f05 );
-    xr = _mm_mul_ss( xr, xt );
-	
-    _mm_store_ss( &a, xr );
-    return a;
-#else
-	#error "Not Implemented"
-#endif
-
-}
-
-// Simple SSE rsqrt.  Usually accurate to around 6 (relative) decimal places 
-// or so, so ok for closed transforms.  (ie, computing lighting normals)
-float _SSE_RSqrtFast(float x)
-{
-	float rroot;
-#ifdef _WIN32
-	__asm
-	{
-		rsqrtss	xmm0, x
-		movss	rroot, xmm0
-	}
-#elif POSIX
-	__asm__ __volatile__( "rsqrtss %0, %1" : "=x" (rroot) : "x" (x) );
-#else
-#error "Please define your platform"
-#endif
-
-	return rroot;
-}
-
 float FASTCALL _SSE_VectorNormalize (Vector& vec)
 {
 	// NOTE: This is necessary to prevent an memory overwrite...
 	// sice vec only has 3 floats, we can't "movaps" directly into it.
-#ifdef _WIN32
 	alignas(16) float result[4];
-#elif POSIX
-	 float result[4] __attribute__((aligned(16)));
-#endif
 
 	float *v = &vec[0];
+
 #ifdef _WIN32
 	float *r = &result[0];
 #endif
@@ -229,7 +157,7 @@ float FASTCALL _SSE_VectorNormalize (Vector& vec)
 
 void FASTCALL _SSE_VectorNormalizeFast (Vector& vec)
 {
-	float ool = _SSE_RSqrtAccurate( FLT_EPSILON + vec.x * vec.x + vec.y * vec.y + vec.z * vec.z );
+	float ool = details::SSE_RSqrtAccurate( FLT_EPSILON + vec.x * vec.x + vec.y * vec.y + vec.z * vec.z );
 
 	vec.x *= ool;
 	vec.y *= ool;
