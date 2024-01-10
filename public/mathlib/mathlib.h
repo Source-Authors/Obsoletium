@@ -542,7 +542,9 @@ void QuaternionAlign( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 float QuaternionDotProduct( const Quaternion &p, const Quaternion &q );
 void QuaternionConjugate( const Quaternion &p, Quaternion &q );
 void QuaternionInvert( const Quaternion &p, Quaternion &q );
-float QuaternionNormalize( Quaternion &q );
+float QuaternionNormalize(Quaternion &q);
+// dimhotepus: QuaternionNormalize without length.
+void QuaternionNormalize2( Quaternion &q );
 void QuaternionAdd( const Quaternion &p, const Quaternion &q, Quaternion &qt );
 void QuaternionMult( const Quaternion &p, const Quaternion &q, Quaternion &qt );
 void QuaternionMatrix( const Quaternion &q, matrix3x4_t &matrix );

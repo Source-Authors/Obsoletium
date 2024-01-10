@@ -1170,7 +1170,7 @@ static void QuaternionSMSlow( float s, const Quaternion &p, const Quaternion &q,
 
 	QuaternionScale( p, s, p1 );
 	QuaternionMult( p1, q, q1 );
-	QuaternionNormalize( q1 );
+	QuaternionNormalize2( q1 );
 	qt[0] = q1[0];
 	qt[1] = q1[1];
 	qt[2] = q1[2];
@@ -1226,7 +1226,7 @@ static void QuaternionMASlow( const Quaternion &p, float s, const Quaternion &q,
 
 	QuaternionScale( q, s, q1 );
 	QuaternionMult( p, q1, p1 );
-	QuaternionNormalize( p1 );
+	QuaternionNormalize2( p1 );
 	qt[0] = p1[0];
 	qt[1] = p1[1];
 	qt[2] = p1[2];
@@ -3241,7 +3241,7 @@ bool Studio_IKSequenceError( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seq
 			return false;
 	}
 
-	QuaternionNormalize( ikRule.q );
+	QuaternionNormalize2( ikRule.q );
 	return true;
 }
 

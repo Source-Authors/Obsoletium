@@ -156,7 +156,7 @@ void MatrixAngles( const matrix3x4_t &matrix, Quaternion &q, Vector &pos )
 		q.w = (matrix[1][0] - matrix[0][1] );
 	}
 
-	QuaternionNormalize( q );
+	QuaternionNormalize2( q );
 
 #if 0
 	// check against the angle version
@@ -1496,7 +1496,7 @@ void QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, 
 	for (i = 0; i < 4; i++) {
 		qt[i] = sclp * p[i] + sclq * q[i];
 	}
-	QuaternionNormalize( qt );
+	QuaternionNormalize2( qt );
 }
 
 
@@ -1519,7 +1519,7 @@ void QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt )
 	{
 		qt.w = p.w * sclp + t;
 	}
-	QuaternionNormalize( qt );
+	QuaternionNormalize2( qt );
 }
 
 //-----------------------------------------------------------------------------
@@ -1655,24 +1655,24 @@ void QuaternionInvert( const Quaternion &p, Quaternion &q )
 //-----------------------------------------------------------------------------
 float QuaternionNormalize( Quaternion &q )
 {
-	float radius, iradius;
-
 	Assert( q.IsValid() );
 
-	radius = q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3];
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 normalized = QuaternionNormalizeSIMD( qsimd );
 
-	if ( radius ) // > FLT_EPSILON && ((radius < 1.0f - 4*FLT_EPSILON) || (radius > 1.0f + 4*FLT_EPSILON))
-	{
-		radius = sqrt(radius);
-		iradius = 1.0f/radius;
-		q[3] *= iradius;
-		q[2] *= iradius;
-		q[1] *= iradius;
-		q[0] *= iradius;
-	}
-	return radius;
+	StoreUnalignedSIMD( q.Base(), normalized );
+
+	return DirectX::XMVectorGetX( DirectX::XMQuaternionLength( qsimd ) );
 }
 
+// dimhotepus: QuaternionNormalize without length.
+void QuaternionNormalize2( Quaternion &q )
+{
+	Assert( q.IsValid() );
+
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	StoreUnalignedSIMD( q.Base(), QuaternionNormalizeSIMD( qsimd ) );
+}
 
 void QuaternionScale( const Quaternion &p, float t, Quaternion &q )
 {
@@ -2042,7 +2042,7 @@ void BasisToQuaternion( const Vector &vecForward, const Vector &vecRight, const 
 			q.w = ( vecLeft.x - vecForward.y ) * s;
 		}
 	}
-	QuaternionNormalize( q );
+	QuaternionNormalize2( q );
 	*/
 
 	// Version 2: Go through angles
@@ -2433,7 +2433,7 @@ void Hermite_Spline( const Quaternion &q0, const Quaternion &q1, const Quaternio
 	output.z = Hermite_Spline( q0a.z, q1a.z, q2.z, t );
 	output.w = Hermite_Spline( q0a.w, q1a.w, q2.w, t );
 
-	QuaternionNormalize( output );
+	QuaternionNormalize2( output );
 }
 
 // See https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline
@@ -3401,7 +3401,7 @@ void RotationDeltaAxisAngle( const QAngle &srcAngles, const QAngle &destAngles, 
 	QuaternionScale( srcQuat, -1, srcQuatInv );
 	QuaternionMult( destQuat, srcQuatInv, out );
 
-	QuaternionNormalize( out );
+	QuaternionNormalize2( out );
 	QuaternionAxisAngle( out, deltaAxis, deltaAngle );
 }
 

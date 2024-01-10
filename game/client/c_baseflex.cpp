@@ -264,7 +264,7 @@ void C_BaseFlex::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quaternio
 		angle = clamp( angle, -45, 45 );
 		AxisAngleQuaternion( p1, angle, q1 );
 		QuaternionMult( q1, q[0], q[0] );
-		QuaternionNormalize( q[0] );
+		QuaternionNormalize2( q[0] );
 
 		// DevMsgRT( "   (%.2f) %.2f %.2f %.2f\n", angle, p1.x, p1.y, p1.z );
 		// auto_ik.SolveAllLocks( pos, q );
