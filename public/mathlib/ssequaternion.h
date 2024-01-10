@@ -125,13 +125,10 @@ FORCEINLINE fltx4 QuaternionBlendSIMD( const fltx4 &p, const fltx4 &q, float t )
 FORCEINLINE fltx4 QuaternionMultSIMD( const fltx4 &p, const fltx4 &q )
 {
 	// decide if one of the quaternions is backwards
-	fltx4 result;
-	fltx4 q2 = QuaternionAlignSIMD( p, q );
-	SubFloat( result, 0 ) =  SubFloat( p, 0 ) * SubFloat( q2, 3 ) + SubFloat( p, 1 ) * SubFloat( q2, 2 ) - SubFloat( p, 2 ) * SubFloat( q2, 1 ) + SubFloat( p, 3 ) * SubFloat( q2, 0 );
-	SubFloat( result, 1 ) = -SubFloat( p, 0 ) * SubFloat( q2, 2 ) + SubFloat( p, 1 ) * SubFloat( q2, 3 ) + SubFloat( p, 2 ) * SubFloat( q2, 0 ) + SubFloat( p, 3 ) * SubFloat( q2, 1 );
-	SubFloat( result, 2 ) =  SubFloat( p, 0 ) * SubFloat( q2, 1 ) - SubFloat( p, 1 ) * SubFloat( q2, 0 ) + SubFloat( p, 2 ) * SubFloat( q2, 3 ) + SubFloat( p, 3 ) * SubFloat( q2, 2 );
-	SubFloat( result, 3 ) = -SubFloat( p, 0 ) * SubFloat( q2, 0 ) - SubFloat( p, 1 ) * SubFloat( q2, 1 ) - SubFloat( p, 2 ) * SubFloat( q2, 2 ) + SubFloat( p, 3 ) * SubFloat( q2, 3 );
-	return result;
+	fltx4 q1 = QuaternionAlignSIMD( p, q );
+
+	// Yep, q1, then p.
+	return DirectX::XMQuaternionMultiply( q1, p );
 }
 
 //---------------------------------------------------------------------
