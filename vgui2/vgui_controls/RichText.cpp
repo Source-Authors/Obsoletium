@@ -818,18 +818,6 @@ void RichText::Paint()
 			AddAnotherLine(renderState.x, renderState.y);
 			lineBreakIndexIndex++;
 
-			// Skip white space unless the previous line ended from the hard carriage return
-			if ( i && ( m_TextStream[i-1] != '\n' ) && ( m_TextStream[i-1] != '\r') )
-			{
-				while ( m_TextStream[i] == L' ' )
-				{
-					if ( i+1 < m_TextStream.Count() )
-						++i;
-					else
-						break;
-				}
-			}
-
 			if (renderState.textClickable)
 			{
 				// move to the next URL
@@ -844,34 +832,39 @@ void RichText::Paint()
 
 		// 3.
 		// Calculate the range of text to draw all at once
-		int iLim = m_TextStream.Count();
+		int iLast = m_TextStream.Count() - 1;
+		
+		// Stop at the next line break
+		if ( m_LineBreaks.IsValidIndex( lineBreakIndexIndex ) && m_LineBreaks[lineBreakIndexIndex] <= iLast )
+			iLast = m_LineBreaks[lineBreakIndexIndex] - 1;
 		
 		// Stop at the next format change
 		if ( m_FormatStream.IsValidIndex(renderState.formatStreamIndex) && 
-			m_FormatStream[renderState.formatStreamIndex].textStreamIndex < iLim &&
-			m_FormatStream[renderState.formatStreamIndex].textStreamIndex >= i &&
-			m_FormatStream[renderState.formatStreamIndex].textStreamIndex )
+				m_FormatStream[renderState.formatStreamIndex].textStreamIndex <= iLast )
 		{
-			iLim = m_FormatStream[renderState.formatStreamIndex].textStreamIndex;
+			iLast = m_FormatStream[renderState.formatStreamIndex].textStreamIndex - 1;
 		}
 
-		// Stop at the next line break
-		if ( m_LineBreaks.IsValidIndex( lineBreakIndexIndex ) && m_LineBreaks[lineBreakIndexIndex] < iLim )
-			iLim = m_LineBreaks[lineBreakIndexIndex];
+		// dimhotepus: CS:GO backport. Allow to select words in line.
+		// Stop when entering or exiting the selected range
+		if ( i < selection0 && iLast >= selection0 )
+			iLast = selection0 - 1;
+		if ( i >= selection0 && i < selection1 && iLast >= selection1 )
+			iLast = selection1 - 1;
 
 		// Handle non-drawing characters specially
-		for ( int iT = i; iT < iLim; iT++ )
+		for ( int iT = i; iT <= iLast; iT++ )
 		{
 			if ( iswcntrl(m_TextStream[iT]) )
 			{
-				iLim = iT;
+				iLast = iT - 1;
 				break;
 			}
 		}
 
 		// 4.
 		// Draw the current text range
-		if ( iLim <= i )
+		if ( iLast < i )
 		{
 			if ( m_TextStream[i] == '\t' )
 			{
@@ -884,8 +877,8 @@ void RichText::Paint()
 		}
 		else
 		{
-			renderState.x += DrawString(i, iLim - 1, renderState, hFontCurrent );
-			i = iLim;
+			renderState.x += DrawString(i, iLast, renderState, hFontCurrent );
+			i = iLast + 1;
 		}
 	}
 
