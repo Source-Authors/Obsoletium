@@ -1192,6 +1192,15 @@ FORCEINLINE fltx4 QuaternionSMSIMD( float s, const fltx4 &p, const fltx4 &q )
 //-----------------------------------------------------------------------------
 void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt )
 {
+#if ALLOW_SIMD_QUATERNION_MATH
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 sqsimd = QuaternionScaleSIMD( qsimd, s );
+	fltx4 qtsimd = QuaternionMultSIMD( psimd, sqsimd );
+
+	fltx4 result = QuaternionNormalizeSIMD( qtsimd );
+	StoreUnalignedSIMD( qt.Base(), result );
+#else
 	Quaternion p1, q1;
 
 	QuaternionScale( q, s, q1 );
@@ -1201,18 +1210,8 @@ void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion
 	qt[1] = p1[1];
 	qt[2] = p1[2];
 	qt[3] = p1[3];
-}
-
-#if ALLOW_SIMD_QUATERNION_MATH
-FORCEINLINE fltx4 QuaternionMASIMD( const fltx4 &p, float s, const fltx4 &q )
-{
-	fltx4 p1, q1, result;
-	q1 = QuaternionScaleSIMD( q, s );
-	p1 = QuaternionMultSIMD( p, q1 );
-	result = QuaternionNormalizeSIMD( p1 );
-	return result;
-}
 #endif
+}
 
 
 //-----------------------------------------------------------------------------
@@ -1443,14 +1442,8 @@ void SlerpBones(
 
 			if ( seqdesc.flags & STUDIO_POST )
 			{
-#ifndef _X360
 				QuaternionMA( q1[i], s2, q2[i], q1[i] );
-#else
-				fltx4 q1simd = LoadUnalignedSIMD( q1[i].Base() );
-				fltx4 q2simd = LoadAlignedSIMD( q2[i] );
-				fltx4 result = QuaternionMASIMD( q1simd, s2, q2simd );
-				StoreUnalignedSIMD( q1[i].Base(), result );
-#endif
+
 				// FIXME: are these correct?
 				pos1[i][0] = pos1[i][0] + pos2[i][0] * s2;
 				pos1[i][1] = pos1[i][1] + pos2[i][1] * s2;
