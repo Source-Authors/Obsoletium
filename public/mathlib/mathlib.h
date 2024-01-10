@@ -98,14 +98,7 @@ private:
 #ifdef DEBUG  // stop crashing edit-and-continue
 FORCEINLINE float clamp( float val, float minVal, float maxVal )
 {
-	if ( maxVal < minVal )
-		return maxVal;
-	else if( val < minVal )
-		return minVal;
-	else if( val > maxVal )
-		return maxVal;
-	else
-		return val;
+	return std::clamp( val, minVal, maxVal );
 }
 #else // DEBUG
 FORCEINLINE float clamp( float val, float minVal, float maxVal )
@@ -128,17 +121,10 @@ FORCEINLINE float clamp( float val, float minVal, float maxVal )
 //
 // Returns a clamped value in the range [min, max].
 //
-template< class T >
-inline T clamp( T const &val, T const &minVal, T const &maxVal )
+template<typename T>
+inline T clamp( T val, T minVal, T maxVal )
 {
-	if ( maxVal < minVal )
-		return maxVal;
-	else if( val < minVal )
-		return minVal;
-	else if( val > maxVal )
-		return maxVal;
-	else
-		return val;
+	return std::clamp( val, minVal, maxVal );
 }
 
 
@@ -443,7 +429,7 @@ inline vec_t RoundInt (vec_t in)
 int Q_log2(int val);
 
 // Math routines done in optimized assembly math package routines
-void inline SinCos( float radians, float *sine, float *cosine )
+FORCEINLINE void SinCos( float radians, float *sine, float *cosine )
 {
 	DirectX::XMScalarSinCos( sine, cosine, radians );
 }
