@@ -764,7 +764,7 @@ bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( unsigned nAdapter, i
 	
 	char buf[256];
 	V_snprintf( buf, sizeof( buf ), "CShaderDeviceMgrBase::GetRecommendedConfigurationInfo: CPU speed: %d MHz, Processor: %s\n", nCPUSpeedMhz, pi.m_szProcessorBrand );
-	Plat_DebugString( buf );
+	DevMsg( buf );
 
 	KeyValues *pCPUKeyValues = FindCPUSpecificConfig( pCfg, nCPUSpeedMhz, bAMD );
 	LoadConfig( pCPUKeyValues, pConfiguration );
