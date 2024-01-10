@@ -79,14 +79,14 @@ FORCEINLINE fltx4 QuaternionNormalizeSIMD( const fltx4 &q )
 
 #else
 
-// SSE + X360 implementation
 FORCEINLINE fltx4 QuaternionNormalizeSIMD( const fltx4 &q )
 {
-	fltx4 radius = Dot4SIMD( q, q );
-	fltx4 mask = CmpEqSIMD( radius, Four_Zeros ); // all ones iff radius = 0
-	fltx4 result = ReciprocalSqrtSIMD( radius );
-	result = MulSIMD( result, q );
-	return MaskedAssign( mask, q, result );	// if radius was 0, just return q
+	fltx4 radiusSq = DirectX::XMVector4Dot( q, q );
+	fltx4 zeroMask = DirectX::XMVectorEqual( radiusSq, Four_Zeros ); // all ones iff radius = 0
+	fltx4 result = DirectX::XMVectorMultiply( ReciprocalSqrtSIMD( radiusSq ), q );
+	return MaskedAssign( zeroMask, q, result );	// if radius was 0, just return q
+	// dimhotepus: DirectX behavior differs here. Returns infinity quaternion when radius is 0.
+	// return DirectX::XMQuaternionNormalize( q );
 }
 
 #endif
