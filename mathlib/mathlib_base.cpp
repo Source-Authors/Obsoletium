@@ -1528,54 +1528,25 @@ void QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt )
 
 void QuaternionSlerp( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
-	Quaternion q2;
-	// 0.0 returns p, 1.0 return q.
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
 
-	// decide if one of the quaternions is backwards
-	QuaternionAlign( p, q, q2 );
+	fltx4 result = QuaternionSlerpSIMD( psimd, qsimd, t );
 
-	QuaternionSlerpNoAlign( p, q2, t, qt );
+	StoreUnalignedSIMD( qt.Base(), result );
+
+	Assert( qt.IsValid() );
 }
 
 
 void QuaternionSlerpNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
-	float omega, cosom, sinom, sclp, sclq;
-	int i;
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
 
-	// 0.0 returns p, 1.0 return q.
+	fltx4 result = QuaternionSlerpNoAlignSIMD( psimd, qsimd, t );
 
-	cosom = p[0]*q[0] + p[1]*q[1] + p[2]*q[2] + p[3]*q[3];
-
-	if ((1.0f + cosom) > 0.000001f) {
-		if ((1.0f - cosom) > 0.000001f) {
-			omega = acos( cosom );
-			sinom = sin( omega );
-			sclp = sin( (1.0f - t)*omega) / sinom;
-			sclq = sin( t*omega ) / sinom;
-		}
-		else {
-			// TODO: add short circuit for cosom == 1.0f?
-			sclp = 1.0f - t;
-			sclq = t;
-		}
-		for (i = 0; i < 4; i++) {
-			qt[i] = sclp * p[i] + sclq * q[i];
-		}
-	}
-	else {
-		Assert( &qt != &q );
-
-		qt[0] = -q[1];
-		qt[1] = q[0];
-		qt[2] = -q[3];
-		qt[3] = q[2];
-		sclp = sinf( (1.0f - t) * (0.5f * M_PI_F));
-		sclq = sinf( t * (0.5f * M_PI_F));
-		for (i = 0; i < 3; i++) {
-			qt[i] = sclp * p[i] + sclq * qt[i];
-		}
-	}
+	StoreUnalignedSIMD( qt.Base(), result );
 
 	Assert( qt.IsValid() );
 }
