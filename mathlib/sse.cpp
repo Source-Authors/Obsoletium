@@ -5,15 +5,10 @@
 //=====================================================================================//
 
 #include <float.h>	// Needed for FLT_EPSILON
-#include <memory.h>
-#include <cmath>
-
 #include <DirectXMath.h>
 
-#include "tier0/basetypes.h"
-#include "tier0/dbg.h"
+#include "tier0/platform.h"
 
-#include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 #include "sse.h"
 
@@ -22,9 +17,6 @@
 
 #ifndef COMPILER_MSVC64
 // Implement for 64-bit Windows if needed.
-
-static const uint32 _sincos_masks[]	  = { (uint32)0x0,  (uint32)~0x0 };
-static const uint32 _sincos_inv_masks[] = { (uint32)~0x0, (uint32)0x0 };
 
 //-----------------------------------------------------------------------------
 // Macros and constants required by some of the SSE assembly:
@@ -79,10 +71,6 @@ _PS_CONST(sincos_p0, 0.15707963267948963959e1f);
 _PS_CONST(sincos_p1, -0.64596409750621907082e0f);
 _PS_CONST(sincos_p2, 0.7969262624561800806e-1f);
 _PS_CONST(sincos_p3, -0.468175413106023168e-2f);
-
-#ifdef PFN_VECTORMA
-void  __cdecl _SSE_VectorMA( const float *start, float scale, const float *direction, float *dest );
-#endif
 
 //-----------------------------------------------------------------------------
 // SSE implementations of optimized routines:
@@ -355,75 +343,6 @@ typedef union xmm_mm_union {
 typedef __m128 v4sf;  // vector of 4 float (sse1)
 typedef __m64 v2si;   // vector of 2 int (mmx)
 
-#endif
-
-//-----------------------------------------------------------------------------
-// SSE2 implementations of optimized routines:
-//-----------------------------------------------------------------------------
-
-#ifdef _WIN32
-void _declspec(naked) _SSE_VectorMA( const float *start, float scale, const float *direction, float *dest )
-{
-	// FIXME: This don't work!! It will overwrite memory in the write to dest
-	Assert(0);
-
-	__asm {  // Intel SSE only routine
-		mov	eax, DWORD PTR [esp+0x04]	; *start, s0..s2
-		mov ecx, DWORD PTR [esp+0x0c]	; *direction, d0..d2
-		mov edx, DWORD PTR [esp+0x10]	; *dest
-		movss	xmm2, [esp+0x08]		; x2 = scale, 0, 0, 0
-#ifdef ALIGNED_VECTOR
-		movaps	xmm3, [ecx]				; x3 = dir0,dir1,dir2,X
-		pshufd	xmm2, xmm2, 0			; x2 = scale, scale, scale, scale
-		movaps	xmm1, [eax]				; x1 = start1, start2, start3, X
-		mulps	xmm3, xmm2				; x3 *= x2
-		addps	xmm3, xmm1				; x3 += x1
-		movaps	[edx], xmm3				; *dest = x3
-#else
-		movups	xmm3, [ecx]				; x3 = dir0,dir1,dir2,X
-		pshufd	xmm2, xmm2, 0			; x2 = scale, scale, scale, scale
-		movups	xmm1, [eax]				; x1 = start1, start2, start3, X
-		mulps	xmm3, xmm2				; x3 *= x2
-		addps	xmm3, xmm1				; x3 += x1
-		movups	[edx], xmm3				; *dest = x3
-#endif
-	}
-}
-#endif
-
-#ifdef _WIN32
-#ifdef PFN_VECTORMA
-void _declspec(naked) __cdecl _SSE_VectorMA( const Vector &start, float scale, const Vector &direction, Vector &dest )
-{
-	// FIXME: This don't work!! It will overwrite memory in the write to dest
-	Assert(0);
-
-	__asm 
-	{  
-		// Intel SSE only routine
-		mov	eax, DWORD PTR [esp+0x04]	; *start, s0..s2
-		mov ecx, DWORD PTR [esp+0x0c]	; *direction, d0..d2
-		mov edx, DWORD PTR [esp+0x10]	; *dest
-		movss	xmm2, [esp+0x08]		; x2 = scale, 0, 0, 0
-#ifdef ALIGNED_VECTOR
-		movaps	xmm3, [ecx]				; x3 = dir0,dir1,dir2,X
-		pshufd	xmm2, xmm2, 0			; x2 = scale, scale, scale, scale
-		movaps	xmm1, [eax]				; x1 = start1, start2, start3, X
-		mulps	xmm3, xmm2				; x3 *= x2
-		addps	xmm3, xmm1				; x3 += x1
-		movaps	[edx], xmm3				; *dest = x3
-#else
-		movups	xmm3, [ecx]				; x3 = dir0,dir1,dir2,X
-		pshufd	xmm2, xmm2, 0			; x2 = scale, scale, scale, scale
-		movups	xmm1, [eax]				; x1 = start1, start2, start3, X
-		mulps	xmm3, xmm2				; x3 *= x2
-		addps	xmm3, xmm1				; x3 += x1
-		movups	[edx], xmm3				; *dest = x3
-#endif
-	}
-}
-float (__cdecl *pfVectorMA)(Vector& v) = _VectorMA;
-#endif
 #endif
 
 #endif // COMPILER_MSVC64 
