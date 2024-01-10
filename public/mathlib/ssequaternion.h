@@ -199,22 +199,21 @@ FORCEINLINE fltx4 QuaternionSlerpNoAlignSIMD( const fltx4 &p, const fltx4 &q, fl
 			sclp = 1.0f - t;
 			sclq = t;
 		}
-		SubFloat( result, 0 ) = sclp * SubFloat( p, 0 ) + sclq * SubFloat( q, 0 );
-		SubFloat( result, 1 ) = sclp * SubFloat( p, 1 ) + sclq * SubFloat( q, 1 );
-		SubFloat( result, 2 ) = sclp * SubFloat( p, 2 ) + sclq * SubFloat( q, 2 );
-		SubFloat( result, 3 ) = sclp * SubFloat( p, 3 ) + sclq * SubFloat( q, 3 );
+
+		result = DirectX::XMVectorAdd( DirectX::XMVectorScale( p, sclp ), DirectX::XMVectorScale( q, sclq ) );
 	}
 	else 
 	{
 		SubFloat( result, 0 ) = -SubFloat( q, 1 );
 		SubFloat( result, 1 ) =  SubFloat( q, 0 );
 		SubFloat( result, 2 ) = -SubFloat( q, 3 );
-		SubFloat( result, 3 ) =  SubFloat( q, 2 );
+
 		sclp = sinf( (1.0f - t) * (0.5f * M_PI_F));
 		sclq = sinf( t * (0.5f * M_PI_F));
-		SubFloat( result, 0 ) = sclp * SubFloat( p, 0 ) + sclq * SubFloat( result, 0 );
-		SubFloat( result, 1 ) = sclp * SubFloat( p, 1 ) + sclq * SubFloat( result, 1 );
-		SubFloat( result, 2 ) = sclp * SubFloat( p, 2 ) + sclq * SubFloat( result, 2 );
+
+		result = DirectX::XMVectorAdd( DirectX::XMVectorScale( p, sclp ), DirectX::XMVectorScale( result, sclq ) );
+
+		SubFloat( result, 3 ) = SubFloat( q, 2 );
 	}
 
 	return result;
