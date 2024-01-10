@@ -43,35 +43,39 @@ static bool cpuid(unsigned int function,
 }
 
 // Return the Processor's vendor identification string, or "Generic_x86" if it doesn't exist on this CPU
-static const tchar* GetProcessorVendorId()
+static const char* GetProcessorVendorId()
 {
 #if defined( _X360 ) || defined( _PS3 )
 	return "PPC";
 #else
-	unsigned int unused, VendorIDRegisters[3];
+	unsigned int unused, vendorIdRegs[3];
+	static char vendorId[13];
 
-	static tchar VendorID[13];
+	if (vendorId[0] != '\0')
+	{
+		return vendorId;
+	}
 	
-	memset( VendorID, 0, sizeof(VendorID) );
-	if ( !cpuid(0,unused, VendorIDRegisters[0], VendorIDRegisters[2], VendorIDRegisters[1] ) )
+	memset( vendorId, 0, sizeof(vendorId) );
+	if ( !cpuid(0,unused, vendorIdRegs[0], vendorIdRegs[2], vendorIdRegs[1] ) )
 	{
 		if ( IsPC() )
 		{
-			_tcscpy( VendorID, _T( "Generic_x86" ) ); 
+			strcpy( vendorId, "Generic_x86" );
 		}
 		else if ( IsX360() )
 		{
-			_tcscpy( VendorID, _T( "PowerPC" ) ); 
+			strcpy( vendorId, "PowerPC" );
 		}
 	}
 	else
 	{
-		memcpy( VendorID+0, &(VendorIDRegisters[0]), sizeof( VendorIDRegisters[0] ) );
-		memcpy( VendorID+4, &(VendorIDRegisters[1]), sizeof( VendorIDRegisters[1] ) ); //-V112
-		memcpy( VendorID+8, &(VendorIDRegisters[2]), sizeof( VendorIDRegisters[2] ) );
+		memcpy( vendorId+0, &(vendorIdRegs[0]), sizeof( vendorIdRegs[0] ) );
+		memcpy( vendorId+4, &(vendorIdRegs[1]), sizeof( vendorIdRegs[1] ) ); //-V112
+		memcpy( vendorId+8, &(vendorIdRegs[2]), sizeof( vendorIdRegs[2] ) );
 	}
 
-	return VendorID;
+	return vendorId;
 #endif
 }
 
@@ -560,7 +564,7 @@ const CPUInformation* GetCPUInformation()
 	pi.m_bSSE4a        = CheckSSE4aTechnology();
 	pi.m_bSSE41        = CheckSSE41Technology();
 	pi.m_bSSE42        = CheckSSE42Technology();
-	pi.m_szProcessorID = (tchar*)GetProcessorVendorId();
+	pi.m_szProcessorID = GetProcessorVendorId();
 
 	// Mark struct as ready and filled, return it:
 	pi.m_Size = sizeof(pi);

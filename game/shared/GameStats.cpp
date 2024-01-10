@@ -1219,8 +1219,12 @@ void CBaseGameStats_Driver::ResetData()
 
 #ifdef CLIENT_DLL
 	const CPUInformation &cpu = *GetCPUInformation();
-	OverWriteCharsWeHate( cpu.m_szProcessorID );
-	pKV->SetString( "CPUID", cpu.m_szProcessorID );
+
+	char cpuVendorId[16];
+	V_strcpy_safe( cpuVendorId, cpu.m_szProcessorID );
+	OverWriteCharsWeHate( cpuVendorId );
+	pKV->SetString( "CPUID", cpuVendorId );
+
 	pKV->SetFloat( "CPUGhz", cpu.m_Speed * ( 1.0 / 1.0e9 ) );
 	pKV->SetUint64( "CPUModel", cpu.m_nModel );
 	pKV->SetUint64( "CPUFeatures0", cpu.m_nFeatures[ 0 ] );

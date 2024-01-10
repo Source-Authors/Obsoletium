@@ -1108,7 +1108,7 @@ struct CPUInformation
 
 	int64 m_Speed;						// In cycles per second.
 
-	tchar* m_szProcessorID;				// Processor vendor Identification.
+	const char* m_szProcessorID;				// Processor vendor Identification.
 
 	uint32 m_nModel;
 	uint32 m_nFeatures[3];
