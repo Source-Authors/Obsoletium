@@ -178,7 +178,7 @@ T DestNative( T *idx )
 #define DECLARE_OBJECT_POINTERS( objPtr, base, type ) \
 	type* objPtr##Src = (type*)base##Src;		\
 	type* objPtr##Dest = (type*)base##Dest;	\
-	type* objPtr = objPtr##Src;
+	[[maybe_unused]] type* objPtr = objPtr##Src;
 
 //----------------------------------------------------------------------
 //	Declares src/dest byte pointers and sets them to some index offset in the buffers.
@@ -1824,7 +1824,7 @@ int ByteswapMDLFile( void *pDestBase, void *pSrcBase, const int fileSize )
 
 		int destnameindex = SrcNative( &pTexture->sznameindex ) + nameOffset;
 		pTextureDest->sznameindex = DestNative( &destnameindex );
-		char *pName = (char*)pTexture + SrcNative( &pTexture->sznameindex );
+		[[maybe_unused]] char *pName = (char*)pTexture + SrcNative( &pTexture->sznameindex );
 #if 0 // Undone: Killing textures here can cause crashes at runtime.
 		// Don't need pupil textures 
  		if ( Q_stristr( pName, "pupil_" ) || !Q_stricmp( pName, "pupil" ) )

@@ -2114,9 +2114,9 @@ void CShaderAPIDx8::ReleaseInternalRenderTargets( )
 	{
 #if POSIX
 		// dxabstract's AddRef/Release have optional args to help track usage
-		int nRetVal = m_pBackBufferSurface->Release( 0, "-B  CShaderAPIDx8::ReleaseInternalRenderTargets public release color buffer");
+		[[maybe_unused]] ULONG nRetVal = m_pBackBufferSurface->Release( 0, "-B  CShaderAPIDx8::ReleaseInternalRenderTargets public release color buffer");
 #else
-		int nRetVal = m_pBackBufferSurface->Release();
+		[[maybe_unused]] ULONG nRetVal = m_pBackBufferSurface->Release();
 #endif
 		//Assert( nRetVal == 0 );
 		m_pBackBufferSurface = NULL;
@@ -2126,9 +2126,9 @@ void CShaderAPIDx8::ReleaseInternalRenderTargets( )
 	{
 #if POSIX
 		// dxabstract's AddRef/Release have optional args to help track usage
-		int nRetVal = m_pZBufferSurface->Release( 0, "-B  CShaderAPIDx8::ReleaseInternalRenderTargets public release zbuffer");
+		[[maybe_unused]] ULONG nRetVal = m_pZBufferSurface->Release( 0, "-B  CShaderAPIDx8::ReleaseInternalRenderTargets public release zbuffer");
 #else
-		int nRetVal = m_pZBufferSurface->Release();
+		[[maybe_unused]] ULONG nRetVal = m_pZBufferSurface->Release();
 #endif
 
 		//Assert( nRetVal == 0 );		//FIXME not sure why we're seeing a refcount of 3 here
@@ -7628,7 +7628,7 @@ void CShaderAPIDx8::SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHand
 		}
 		else
 		{	
-			HRESULT hr = ((IDirect3DTexture9*)tex.GetTexture())->GetSurfaceLevel( 0, &pZSurface );
+			[[maybe_unused]] HRESULT hr = ((IDirect3DTexture9*)tex.GetTexture())->GetSurfaceLevel( 0, &pZSurface );
 		}
 
 		if ( !pZSurface )
@@ -10483,8 +10483,6 @@ void CShaderAPIDx8::SetSkinningMatrices()
 		return;
 	}
 	
-	uint nMaxVertexConstantIndex = 0;
-
 	if ( IsX360() || UsesVertexShader(m_pMaterial->GetVertexFormat()) )
 	{
 		SetVertexShaderStateSkinningMatrices();
@@ -10682,7 +10680,7 @@ void CShaderAPIDx8::CommitVertexShaderLighting()
 void CShaderAPIDx8::CommitPixelShaderLighting( int pshReg )
 {
 #ifndef NDEBUG
-	char const *materialName = m_pMaterial->GetName();
+	[[maybe_unused]] char const *materialName = m_pMaterial->GetName();
 #endif
 
 	// First, gotta sort the lights by their type

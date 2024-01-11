@@ -38,7 +38,7 @@ AIMoveResult_t DbgResult( AIMoveResult_t result )
 {
 	if ( result < AIMR_OK )
 	{
-		int breakHere = 1;
+		[[maybe_unused]] int breakHere = 1;
 	}
 
 	switch ( result )

@@ -3058,12 +3058,12 @@ void CMaterial::DrawMesh( VertexCompressionType_t vertexCompression )
 		{
 			// Putcher breakpoint here to catch the rendering of a material
 			// marked for debugging ($debug = 1 in a .vmt file) dynamic state version
-			int x = 0;
+			[[maybe_unused]] int x = 0;
 		}
 #endif
 		if ((GetMaterialVarFlags() & MATERIAL_VAR_NO_DRAW) == 0)
 		{
-			const char *pName = m_pShader->GetName();
+			[[maybe_unused]] const char *pName = m_pShader->GetName();
 			ShaderSystem()->DrawElements( m_pShader, m_pShaderParams, &m_ShaderRenderState, vertexCompression, m_ChangeID ^ g_nDebugVarsSignature );
 		}
 	}

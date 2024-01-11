@@ -2959,7 +2959,7 @@ int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int sk
 			continue;
 
 #ifdef _DEBUG
-		char const *materialName = pMaterial->GetName();
+		[[maybe_unused]] char const *materialName = pMaterial->GetName();
 #endif
 		// Set up flex data
 		m_VertexCache.SetMesh( i );
