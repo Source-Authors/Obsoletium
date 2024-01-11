@@ -160,7 +160,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   if (!IsWindows10OrGreater()) {
     return ShowErrorBoxAndExitWithCode(
         "Unfortunately, your environment is not supported."
-        "App requires at least Windows 10 to survive.",
+        "\n\nApp requires at least Windows 10 to survive.",
         ERROR_EXE_MACHINE_TYPE_MISMATCH);
   }
 
