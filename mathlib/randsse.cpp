@@ -4,9 +4,7 @@
 //
 //=====================================================================================//
 
-#include <float.h>	// Needed for FLT_EPSILON
-#include <memory.h>
-
+#include <cfloat>	// Needed for FLT_EPSILON
 #include <cmath>
 
 #include "tier0/basetypes.h"
@@ -21,80 +19,102 @@
 
 // see knuth volume 3 for insight.
 
-class SIMDRandStreamContext
+static constexpr inline float GetStepRand( uint32 seed )
+{
+	return (seed >> 16) / 65536.0f;
+}
+
+static constexpr inline float GetNextStepSeed( uint32 seed )
+{
+	return (seed + 1) * 3141592621u;
+}
+
+struct SIMDRandStreamContext
 {
 	fltx4 m_RandY[55];
-
 	fltx4 *m_pRand_J, *m_pRand_K;
 
-
-public:
 	void Seed( uint32 seed )
 	{
-		m_pRand_J=m_RandY+23; m_pRand_K=m_RandY+54;
-		for(int i=0;i<55;i++)
+		m_pRand_J = m_RandY + 23; m_pRand_K = m_RandY + 54;
+		for (auto &&r : m_RandY)
 		{
-			for(int j=0;j<4;j++)
-			{
-				SubFloat( m_RandY[i], j) = (seed>>16)/65536.0f;
-				seed=(seed+1)*3141592621u;
-			}
+			float r1 = GetStepRand( seed );
+			seed = GetNextStepSeed( seed );
+
+			float r2 = GetStepRand( seed );
+			seed = GetNextStepSeed( seed );
+
+			float r3 = GetStepRand( seed );
+			seed = GetNextStepSeed( seed );
+
+			float r4 = GetStepRand( seed );
+
+			r = DirectX::XMVectorSet( r1, r2, r3, r4 );
 		}
 	}
 
 	inline fltx4 RandSIMD( void )
 	{
-		// ret= rand[k]+rand[j]
-		fltx4 retval=AddSIMD( *m_pRand_K, *m_pRand_J );
+		// ret = rand[k]+rand[j]
+		fltx4 retval = AddSIMD( *m_pRand_K, *m_pRand_J );
 		
 		// if ( ret>=1.0) ret-=1.0
-		fltx4 overflow_mask=CmpGeSIMD( retval, Four_Ones );
-		retval=SubSIMD( retval, AndSIMD( Four_Ones, overflow_mask ) );
+		fltx4 overflow_mask = CmpGeSIMD( retval, Four_Ones );
+		retval = SubSIMD( retval, AndSIMD( Four_Ones, overflow_mask ) );
 		
 		*m_pRand_K = retval;
 		
 		// update pointers w/ wrap-around
 		if ( --m_pRand_J < m_RandY )
-			m_pRand_J=m_RandY+54;
+			m_pRand_J = m_RandY + 54;
+
 		if ( --m_pRand_K < m_RandY )
-			m_pRand_K=m_RandY+54;
+			m_pRand_K = m_RandY + 54;
 		
 		return retval;
 	}
 };
 
-#define MAX_SIMULTANEOUS_RANDOM_STREAMS 32
+constexpr inline int MAX_SIMULTANEOUS_RANDOM_STREAMS = 32;
 
 static SIMDRandStreamContext s_SIMDRandContexts[MAX_SIMULTANEOUS_RANDOM_STREAMS];
-
 static volatile int s_nRandContextsInUse[MAX_SIMULTANEOUS_RANDOM_STREAMS];
 
 void SeedRandSIMD(uint32 seed)
 {
-	for( int i = 0; i<MAX_SIMULTANEOUS_RANDOM_STREAMS; i++)
-		s_SIMDRandContexts[i].Seed( seed+i );
+	int i = 0;
+	for ( auto &&c : s_SIMDRandContexts )
+	{
+		c.Seed( seed + i++ );
+	}
 }
 
 fltx4 RandSIMD( int nContextIndex )
 {
+	Assert( nContextIndex < (int)std::size(s_nRandContextsInUse) );
+
 	return s_SIMDRandContexts[nContextIndex].RandSIMD();
 }
 
-int GetSIMDRandContext( void )
+int GetSIMDRandContext()
 {
 	for(;;)
 	{
-		for(int i=0; i < NELEMS( s_SIMDRandContexts ); i++)
+		int i = 0;
+		for ( auto &&u : s_nRandContextsInUse )
 		{
-			if ( ! s_nRandContextsInUse[i] )				// available?
+			if ( !u )				// available?
 			{
 				// try to take it!
-				if ( ThreadInterlockedAssignIf( &( s_nRandContextsInUse[i]), 1, 0 ) )
+				if ( ThreadInterlockedAssignIf( &u, 1, 0 ) )
 				{
 					return i;								// done!
 				}
 			}
+			++i;
 		}
+
 		Assert(0);											// why don't we have enough buffers?
 		ThreadSleep();
 	}
@@ -102,6 +122,8 @@ int GetSIMDRandContext( void )
 
 void ReleaseSIMDRandContext( int nContext )
 {
+	Assert( nContext < (int)std::size(s_nRandContextsInUse) );
+
 	s_nRandContextsInUse[ nContext ] = 0;
 }
 
