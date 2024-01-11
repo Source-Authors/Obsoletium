@@ -54,7 +54,7 @@ struct SIMDRandStreamContext
 		}
 	}
 
-	inline fltx4 RandSIMD( void )
+	inline fltx4 XM_CALLCONV RandSIMD()
 	{
 		// ret = rand[k]+rand[j]
 		fltx4 retval = AddSIMD( *m_pRand_K, *m_pRand_J );
@@ -90,7 +90,7 @@ void SeedRandSIMD(uint32 seed)
 	}
 }
 
-fltx4 RandSIMD( int nContextIndex )
+fltx4 XM_CALLCONV RandSIMD( int nContextIndex )
 {
 	Assert( nContextIndex < (int)std::size(s_nRandContextsInUse) );
 
@@ -127,8 +127,7 @@ void ReleaseSIMDRandContext( int nContext )
 	s_nRandContextsInUse[ nContext ] = 0;
 }
 
-
-fltx4 RandSIMD( void )
+fltx4 XM_CALLCONV RandSIMD()
 {
 	return s_SIMDRandContexts[0].RandSIMD();
 }

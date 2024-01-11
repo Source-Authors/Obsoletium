@@ -61,11 +61,11 @@ void C_OP_RandomForce::AddForces( FourVectors *pAccumulatedForces,
 	for(int i=0;i<nBlocks;i++)
 	{
 		pAccumulatedForces->x = AddSIMD(
-			pAccumulatedForces->x, AddSIMD( box_min.x, MulSIMD( box_max.x, RandSIMD( nContext) ) ) );
+			pAccumulatedForces->x, MaddSIMD( box_max.x, RandSIMD( nContext), box_min.x ) );
 		pAccumulatedForces->y = AddSIMD(									   
-			pAccumulatedForces->y, AddSIMD( box_min.y, MulSIMD( box_max.y, RandSIMD( nContext) ) ) );
+			pAccumulatedForces->y, MaddSIMD( box_max.y, RandSIMD( nContext), box_min.y ) );
 		pAccumulatedForces->z = AddSIMD(									   
-			pAccumulatedForces->z, AddSIMD( box_min.z, MulSIMD( box_max.z, RandSIMD( nContext) ) ) );
+			pAccumulatedForces->z, MaddSIMD( box_max.z, RandSIMD( nContext), box_min.z ) );
 		pAccumulatedForces++;
 	}
 	ReleaseSIMDRandContext( nContext );

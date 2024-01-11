@@ -78,7 +78,7 @@ const int DECALCACHE_ENTRY_COUNT = 1024;
 const int INVALID_CACHE_ENTRY = 0xFFFF;
 
 // dimhotepus: Fix aligned alloc.
-class ALIGN16 CDecalVertCache : public CAlignedNewDelete<16>
+class alignas(16) CDecalVertCache : public CAlignedNewDelete<16>
 {
 	enum decalindex_ordinal
 	{
@@ -124,15 +124,15 @@ private:
 	int AllocBlock();
 	int AllocBlocks( int blockCount );
 
-	ALIGN16 decalcache_t	m_cache[DECALCACHE_ENTRY_COUNT] ALIGN16_POST;
+	alignas(16) decalcache_t	m_cache[DECALCACHE_ENTRY_COUNT];
 	int m_freeBlockCount;
 	int m_firstFree;
 	int m_frameBlocks;
 	int m_lastFrameCount;
 	int m_freeTestIndex;
-} ALIGN16_POST;
+};
 
-static CDecalVertCache ALIGN16 g_DecalVertCache;
+static CDecalVertCache alignas(16) g_DecalVertCache;
 static decal_t	*s_pDecalDestroyList = NULL;
 
 int	g_nMaxDecals = 0;

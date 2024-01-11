@@ -808,8 +808,8 @@ BOX TRACING
 // Custom SIMD implementation for box brushes
 
 const fltx4 Four_DistEpsilons={DIST_EPSILON,DIST_EPSILON,DIST_EPSILON,DIST_EPSILON};
-const int32 ALIGN16 g_CubeFaceIndex0[4] ALIGN16_POST = {0,1,2,-1};
-const int32 ALIGN16 g_CubeFaceIndex1[4] ALIGN16_POST = {3,4,5,-1};
+const int32 alignas(16) g_CubeFaceIndex0[4] = {0,1,2,-1};
+const int32 alignas(16) g_CubeFaceIndex1[4] = {3,4,5,-1};
 bool IntersectRayWithBoxBrush( TraceInfo_t *pTraceInfo, const cbrush_t *pBrush, cboxbrush_t *pBox )
 {
 	// Suppress floating-point exceptions in this function because invDelta's
@@ -818,11 +818,11 @@ bool IntersectRayWithBoxBrush( TraceInfo_t *pTraceInfo, const cbrush_t *pBrush, 
 	FPExceptionDisabler hideExceptions;
 
 	// Load the unaligned ray/box parameters into SIMD registers
-	fltx4 start = LoadUnaligned3SIMD(pTraceInfo->m_start.Base());
-	fltx4 extents = LoadUnaligned3SIMD(pTraceInfo->m_extents.Base());
-	fltx4 delta = LoadUnaligned3SIMD(pTraceInfo->m_delta.Base());
-	fltx4 boxMins = LoadAlignedSIMD( pBox->mins.Base() );
-	fltx4 boxMaxs = LoadAlignedSIMD( pBox->maxs.Base() );
+	fltx4 start = DirectX::XMLoadFloat3(pTraceInfo->m_start.XmBase());
+	fltx4 extents = DirectX::XMLoadFloat3(pTraceInfo->m_extents.XmBase());
+	fltx4 delta = DirectX::XMLoadFloat3(pTraceInfo->m_delta.XmBase());
+	fltx4 boxMins = DirectX::XMLoadFloat4A( pBox->mins.XmBase() );
+	fltx4 boxMaxs = DirectX::XMLoadFloat4A( pBox->maxs.XmBase() );
 
 	// compute the mins/maxs of the box expanded by the ray extents
 	// relocate the problem so that the ray start is at the origin.
@@ -844,7 +844,7 @@ bool IntersectRayWithBoxBrush( TraceInfo_t *pTraceInfo, const cbrush_t *pBrush, 
 
 	fltx4 crossPlane = OrSIMD(XorSIMD(startOutMins,endOutMins), XorSIMD(startOutMaxs,endOutMaxs));
 	// now build the per-axis interval of t for intersections
-	fltx4 invDelta = LoadUnaligned3SIMD(pTraceInfo->m_invDelta.Base());
+	fltx4 invDelta = DirectX::XMLoadFloat3(pTraceInfo->m_invDelta.XmBase());
 	fltx4 tmins = MulSIMD( offsetMinsExpanded, invDelta );
 	fltx4 tmaxs = MulSIMD( offsetMaxsExpanded, invDelta );
 	// now sort the interval per axis
@@ -873,8 +873,8 @@ bool IntersectRayWithBoxBrush( TraceInfo_t *pTraceInfo, const cbrush_t *pBrush, 
 		tmins = MulSIMD( offsetMinsExpanded, invDelta );
 		tmaxs = MulSIMD( offsetMaxsExpanded, invDelta );
 
-		fltx4 minface0 = LoadAlignedSIMD( (float *) g_CubeFaceIndex0 );
-		fltx4 minface1 = LoadAlignedSIMD( (float *) g_CubeFaceIndex1 );
+		fltx4 minface0 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex0 ) );
+		fltx4 minface1 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex1 ) );
 		fltx4 faceMask = CmpLeSIMD( tmins, tmaxs );
 		mint = MinSIMD( tmins, tmaxs );
 		maxt = MaxSIMD( tmins, tmaxs );
@@ -982,11 +982,11 @@ bool IntersectRayWithBox( const Ray_t &ray, const VectorAligned &inInvDelta, con
 	pTrace->fraction = 1.0f;
 
 	// Load the unaligned ray/box parameters into SIMD registers
-	fltx4 start = LoadUnaligned3SIMD(ray.m_Start.Base());
-	fltx4 extents = LoadUnaligned3SIMD(ray.m_Extents.Base());
-	fltx4 delta = LoadUnaligned3SIMD(ray.m_Delta.Base());
-	fltx4 boxMins = LoadAlignedSIMD( inBoxMins.Base() );
-	fltx4 boxMaxs = LoadAlignedSIMD( inBoxMaxs.Base() );
+	fltx4 start   = SetWToZeroSIMD( DirectX::XMLoadFloat4A( ray.m_Start.XmBase() ) );
+	fltx4 extents = SetWToZeroSIMD( DirectX::XMLoadFloat4A( ray.m_Extents.XmBase() ) );
+	fltx4 delta   = SetWToZeroSIMD( DirectX::XMLoadFloat4A( ray.m_Delta.XmBase() ) );
+	fltx4 boxMins = DirectX::XMLoadFloat4A( inBoxMins.XmBase() );
+	fltx4 boxMaxs = DirectX::XMLoadFloat4A( inBoxMaxs.XmBase() );
 
 	// compute the mins/maxs of the box expanded by the ray extents
 	// relocate the problem so that the ray start is at the origin.
@@ -1008,7 +1008,7 @@ bool IntersectRayWithBox( const Ray_t &ray, const VectorAligned &inInvDelta, con
 
 	fltx4 crossPlane = OrSIMD(XorSIMD(startOutMins,endOutMins), XorSIMD(startOutMaxs,endOutMaxs));
 	// now build the per-axis interval of t for intersections
-	fltx4 invDelta = LoadAlignedSIMD(inInvDelta.Base());
+	fltx4 invDelta = DirectX::XMLoadFloat4A(inInvDelta.XmBase());
 	fltx4 tmins = MulSIMD( offsetMinsExpanded, invDelta );
 	fltx4 tmaxs = MulSIMD( offsetMaxsExpanded, invDelta );
 	// now sort the interval per axis
@@ -1037,8 +1037,8 @@ bool IntersectRayWithBox( const Ray_t &ray, const VectorAligned &inInvDelta, con
 		tmins = MulSIMD( offsetMinsExpanded, invDelta );
 		tmaxs = MulSIMD( offsetMaxsExpanded, invDelta );
 
-		fltx4 minface0 = LoadAlignedSIMD( (float *) g_CubeFaceIndex0 );
-		fltx4 minface1 = LoadAlignedSIMD( (float *) g_CubeFaceIndex1 );
+		fltx4 minface0 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex0 ) );
+		fltx4 minface1 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex1 ) );
 		fltx4 faceMask = CmpLeSIMD( tmins, tmaxs );
 		mint = MinSIMD( tmins, tmaxs );
 		maxt = MaxSIMD( tmins, tmaxs );
@@ -1317,12 +1317,12 @@ void FASTCALL CM_ClipBoxToBrush( TraceInfo_t * RESTRICT pTraceInfo, const cbrush
 
 inline bool IsTraceBoxIntersectingBoxBrush( TraceInfo_t *pTraceInfo, cboxbrush_t *pBox )
 {
-	fltx4 start = LoadUnaligned3SIMD(pTraceInfo->m_start.Base());
-	fltx4 mins = LoadUnaligned3SIMD(pTraceInfo->m_mins.Base());
-	fltx4 maxs = LoadUnaligned3SIMD(pTraceInfo->m_maxs.Base());
+	fltx4 start = DirectX::XMLoadFloat3(pTraceInfo->m_start.XmBase());
+	fltx4 mins = DirectX::XMLoadFloat3(pTraceInfo->m_mins.XmBase());
+	fltx4 maxs = DirectX::XMLoadFloat3(pTraceInfo->m_maxs.XmBase());
 
-	fltx4 boxMins = LoadAlignedSIMD( pBox->mins.Base() );
-	fltx4 boxMaxs = LoadAlignedSIMD( pBox->maxs.Base() );
+	fltx4 boxMins = DirectX::XMLoadFloat4A( pBox->mins.XmBase() );
+	fltx4 boxMaxs = DirectX::XMLoadFloat4A( pBox->maxs.XmBase() );
 	fltx4 offsetMins = AddSIMD(mins, start);
 	fltx4 offsetMaxs = AddSIMD(maxs,start);
 	fltx4 minsOut = MaxSIMD(boxMins, offsetMins);
@@ -1514,15 +1514,15 @@ void FASTCALL CM_TraceToLeaf( TraceInfo_t * RESTRICT pTraceInfo, int ndxLeaf, fl
 		if (IsX360())
 		{
 			// set up some relatively constant variables we'll use in the loop below
-			fltx4 traceStart = LoadUnaligned3SIMD(pTraceInfo->m_start.Base());
-			fltx4 traceDelta = LoadUnaligned3SIMD(pTraceInfo->m_delta.Base());
-			fltx4 traceInvDelta = LoadUnaligned3SIMD(pTraceInfo->m_invDelta.Base());
+			fltx4 traceStart = DirectX::XMLoadFloat3(pTraceInfo->m_start.XmBase());
+			fltx4 traceDelta = DirectX::XMLoadFloat3(pTraceInfo->m_delta.XmBase());
+			fltx4 traceInvDelta = DirectX::XMLoadFloat3(pTraceInfo->m_invDelta.XmBase());
 			static const fltx4 vecEpsilon = {DISPCOLL_DIST_EPSILON,DISPCOLL_DIST_EPSILON,DISPCOLL_DIST_EPSILON,DISPCOLL_DIST_EPSILON};
 			// only used in !IS_POINT version:
 			fltx4 extents;
 			if (!IS_POINT)
 			{
-				extents = LoadUnaligned3SIMD(pTraceInfo->m_extents.Base());
+				extents = DirectX::XMLoadFloat3(pTraceInfo->m_extents.XmBase());
 			}
 
 			// TODO: this loop probably ought to be unrolled so that we can make a more efficient
@@ -1547,14 +1547,15 @@ void FASTCALL CM_TraceToLeaf( TraceInfo_t * RESTRICT pTraceInfo, int ndxLeaf, fl
 
 				if ( IS_POINT )
 				{
-					if (!IsBoxIntersectingRay( LoadAlignedSIMD(pDispBounds->mins.Base()), LoadAlignedSIMD(pDispBounds->maxs.Base()), 
+					if (!IsBoxIntersectingRay( DirectX::XMLoadFloat4A(pDispBounds->mins.XmBase()),
+											   DirectX::XMLoadFloat4A(pDispBounds->maxs.XmBase()), 
 											   traceStart, traceDelta, traceInvDelta, vecEpsilon ))
 						continue;
 				}
 				else
 				{
-					fltx4 mins = SubSIMD(LoadAlignedSIMD(pDispBounds->mins.Base()),extents);
-					fltx4 maxs = AddSIMD(LoadAlignedSIMD(pDispBounds->maxs.Base()),extents);
+					fltx4 mins = SubSIMD(DirectX::XMLoadFloat4A(pDispBounds->mins.XmBase()),extents);
+					fltx4 maxs = AddSIMD(DirectX::XMLoadFloat4A(pDispBounds->maxs.XmBase()),extents);
 					if (!IsBoxIntersectingRay( mins, maxs, 
 											   traceStart, traceDelta, traceInvDelta, vecEpsilon ))
 						continue;
@@ -2791,10 +2792,10 @@ bool FASTCALL IsBoxIntersectingRayNoLowest( fltx4 boxMin, fltx4  boxMax,
 	fltx4 closestExit,furthestEntry;
 	{
 		VectorAligned temp;
-		StoreAlignedSIMD(temp.Base(),vt2);
+		DirectX::XMStoreFloat4A(temp.XmBase(),vt2);
 		closestExit = ReplicateX4( min( min(temp.x,temp.y), temp.z) );
 
-		StoreAlignedSIMD(temp.Base(),vt1);
+		DirectX::XMStoreFloat4A(temp.XmBase(),vt1);
 		furthestEntry = ReplicateX4( max( max(temp.x,temp.y), temp.z) );
 	}
 

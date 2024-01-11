@@ -169,7 +169,7 @@ const inline Vector4D vec4_invalid( FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX );
 // SSE optimized routines
 //-----------------------------------------------------------------------------
 // dimhotepus: Fix aligned alloc.
-class ALIGN16 Vector4DAligned : public CAlignedNewDelete<16, Vector4D>
+class alignas(16) Vector4DAligned : public CAlignedNewDelete<16, Vector4D>
 {
 public:
 	Vector4DAligned() = default;
@@ -203,7 +203,7 @@ private:
 
 	// No assignment operators either...
 	Vector4DAligned& operator=( Vector4DAligned const& src ) = delete;
-} ALIGN16_POST;
+};
 
 //-----------------------------------------------------------------------------
 // Vector4D related operations

@@ -29,17 +29,17 @@
 // Using STDC or SSE
 FORCEINLINE fltx4 LoadAlignedSIMD( const QuaternionAligned & pSIMD )
 {
-	return LoadAlignedSIMD( pSIMD.Base() );
+	return DirectX::XMLoadFloat4A( pSIMD.XmBase() );
 }
 
 FORCEINLINE fltx4 LoadAlignedSIMD( const QuaternionAligned * RESTRICT pSIMD )
 {
-	return LoadAlignedSIMD( pSIMD );
+	return DirectX::XMLoadFloat4A( pSIMD->XmBase() );
 }
 
 FORCEINLINE void StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, const fltx4 & a )
 {
-	StoreAlignedSIMD( pSIMD->Base(), a );
+	DirectX::XMStoreFloat4A( pSIMD->XmBase(), a );
 }
 
 //---------------------------------------------------------------------

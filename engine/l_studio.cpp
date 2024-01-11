@@ -3433,15 +3433,13 @@ void CModelRender::ComputeModelVertexLightingOld( mstudiomodel_t *pModel,
 	{
 		if ( vertData )
 		{
-#ifdef _WIN32
+#if defined(_XM_SSE_INTRINSICS_)
 			if (bHasSSE)
 			{
 				// hint the next vertex
 				// data is loaded with one extra vertex for read past
-#if !defined( _X360 ) // X360TBD
 				_mm_prefetch( (char*)&pFatVerts[i+1], _MM_HINT_T0 );
-#endif
-		}
+			}
 #endif
 
 			VectorTransform( pFatVerts[i].m_vecPosition, matrix, worldPos );

@@ -56,7 +56,7 @@ struct KeyBindingMap_t
 	~KeyBindingMap_t() = default;
 
 	char const				*bindingname; // for the script file
-	ALIGN16 MessageFunc_t	func;
+	alignas(16) MessageFunc_t	func;
 	char const 				*helpstring; // e.g., #KeybindingPasteHelp
 	char const 				*docstring;  // e.g., #KeybindingPasteHelp
 	bool					passive; // dispatch command, but still chain

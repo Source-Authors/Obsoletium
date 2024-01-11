@@ -10,7 +10,7 @@
 #include "tier0/memdbgon.h"
 
 
-fltx4 Pow_FixedPoint_Exponent_SIMD( const fltx4 & x, int exponent)
+fltx4 XM_CALLCONV Pow_FixedPoint_Exponent_SIMD( DirectX::FXMVECTOR x, int exponent )
 {
 	fltx4 rslt=Four_Ones;									// x^0=1.0
 	int xp=abs(exponent);
@@ -56,7 +56,7 @@ fltx4 Pow_FixedPoint_Exponent_SIMD( const fltx4 & x, int exponent)
 static float shift23=(1<<23);
 static float OOshift23=1.0/(1<<23);
 
-float FastLog2(float i)
+float XM_CALLCONV FastLog2(float i)
 {
 	float LogBodge=0.346607f;
 	float x;
@@ -69,7 +69,7 @@ float FastLog2(float i)
 	y=(y-y*y)*LogBodge;
 	return x+y;
 }
-float FastPow2(float i)
+float XM_CALLCONV FastPow2(float i)
 {
 	float PowBodge=0.33971f;
 	float x;
@@ -81,7 +81,7 @@ float FastPow2(float i)
 	*(int*)&x=(int)x;
 	return x;
 }
-float FastPow(float a, float b)
+float XM_CALLCONV FastPow(float a, float b)
 {
 	if (a <= OOshift23)
 	{
@@ -89,7 +89,7 @@ float FastPow(float a, float b)
 	}
 	return FastPow2(b*FastLog2(a));
 }
-float FastPow10( float i )
+float XM_CALLCONV FastPow10( float i )
 {
 	return FastPow2( i * 3.321928f );
 }

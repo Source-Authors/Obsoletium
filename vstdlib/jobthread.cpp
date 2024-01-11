@@ -45,7 +45,7 @@ inline void ServiceJobAndRelease( CJob *pJob, int iThread = -1 )
 
 //-----------------------------------------------------------------------------
 
-class ALIGN16 CJobQueue : CAlignedNewDelete<16>
+class alignas(16) CJobQueue : CAlignedNewDelete<16>
 {
 public:
 	CJobQueue() :
@@ -173,7 +173,7 @@ private:
 	CThreadMutex		m_mutex;
 	CThreadManualEvent	m_JobAvailableEvent;
 
-} ALIGN16_POST;
+};
 
 //-----------------------------------------------------------------------------
 //

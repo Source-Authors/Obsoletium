@@ -503,26 +503,30 @@ void RayTracingEnvironment::Trace4Rays(const FourRays &rays, fltx4 TMin, fltx4 T
 						continue;
 
 					// now, check 3 edges
-					fltx4 hitc1 = AddSIMD( rays.origin[tri->m_nCoordSelect0],
-										MulSIMD( isect_t, rays.direction[ tri->m_nCoordSelect0] ) );
-					fltx4 hitc2 = AddSIMD( rays.origin[tri->m_nCoordSelect1],
-										   MulSIMD( isect_t, rays.direction[tri->m_nCoordSelect1] ) );
+					fltx4 hitc1 = MaddSIMD(
+						isect_t,
+						rays.direction[ tri->m_nCoordSelect0],
+						rays.origin[tri->m_nCoordSelect0] );
+					fltx4 hitc2 = MaddSIMD(
+						isect_t,
+						rays.direction[tri->m_nCoordSelect1],
+						rays.origin[tri->m_nCoordSelect1] );
 					
 					// do barycentric coordinate check
 					fltx4 B0 = MulSIMD( ReplicateX4( tri->m_ProjectedEdgeEquations[0] ), hitc1 );
 
-					B0 = AddSIMD(
-						B0,
-						MulSIMD( ReplicateX4( tri->m_ProjectedEdgeEquations[1] ), hitc2 ) );
+					B0 = MaddSIMD(
+						ReplicateX4( tri->m_ProjectedEdgeEquations[1] ), hitc2,
+						B0 );
 					B0 = AddSIMD(
 						B0, ReplicateX4( tri->m_ProjectedEdgeEquations[2] ) );
 
 					did_hit = AndSIMD( did_hit, CmpGeSIMD( B0, FourZeros ) );
 
 					fltx4 B1 = MulSIMD( ReplicateX4( tri->m_ProjectedEdgeEquations[3] ), hitc1 );
-					B1 = AddSIMD(
-						B1,
-						MulSIMD( ReplicateX4( tri->m_ProjectedEdgeEquations[4]), hitc2 ) );
+					B1 = MaddSIMD(
+						ReplicateX4( tri->m_ProjectedEdgeEquations[4]), hitc2,
+						B1 );
 
 					B1 = AddSIMD(
 						B1, ReplicateX4( tri->m_ProjectedEdgeEquations[5] ) );
@@ -555,10 +559,10 @@ void RayTracingEnvironment::Trace4Rays(const FourRays &rays, fltx4 TMin, fltx4 T
 					}
 					// now, set the hit_id and closest_hit fields for any enabled rays
 					fltx4 replicated_n = ReplicateIX4(tnum);
-					StoreAlignedSIMD((float *) rslt_out->HitIds,
+					DirectX::XMStoreInt4A((uint32_t *) rslt_out->HitIds,
 								 OrSIMD(AndSIMD(replicated_n,did_hit),
-										   AndNotSIMD(did_hit,LoadAlignedSIMD(
-															 (float *) rslt_out->HitIds))));
+										   AndNotSIMD(did_hit,DirectX::XMLoadInt4A(
+															 (uint32_t *) rslt_out->HitIds))));
 					rslt_out->HitDistance=OrSIMD(AndSIMD(isect_t,did_hit),
 									 AndNotSIMD(did_hit,rslt_out->HitDistance));
 

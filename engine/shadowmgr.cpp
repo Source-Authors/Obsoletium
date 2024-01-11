@@ -925,7 +925,7 @@ void CShadowMgr::ComputeSurfaceBounds( SurfaceBounds_t* pBounds, SurfaceHandle_t
 		const Vector &position = host_state.worldbrush->vertexes[ nVertIndex ].position;
 		pBounds->m_vecCenter += position;
 
-		fltx4 pos4 = LoadUnaligned3SIMD( position.Base() );
+		fltx4 pos4 = DirectX::XMLoadFloat3( position.XmBase() );
 		pBounds->m_vecMins = MinSIMD( pos4, pBounds->m_vecMins );
 		pBounds->m_vecMaxs = MaxSIMD( pos4, pBounds->m_vecMaxs );
 	}

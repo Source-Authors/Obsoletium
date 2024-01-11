@@ -416,7 +416,7 @@ public:
 // Here's where we add all those lovely SSE optimized routines
 //-----------------------------------------------------------------------------
 // dimhotepus: Fix aligned alloc.
-class ALIGN16 VectorAligned : public CAlignedNewDelete<16, Vector>
+class alignas(16) VectorAligned : public CAlignedNewDelete<16, Vector>
 {
 public:
   inline VectorAligned() = default;
@@ -463,7 +463,7 @@ public:
 	
 #endif
 	float w;	// this space is used anyway
-} ALIGN16_POST;
+};
 
 //-----------------------------------------------------------------------------
 // Vector related operations
@@ -1850,7 +1850,7 @@ inline bool QuaternionsAreEqual( const Quaternion& src1, const Quaternion& src2,
 // Here's where we add all those lovely SSE optimized routines
 //-----------------------------------------------------------------------------
 // dimhotepus: Fix aligned alloc.
-class ALIGN16 QuaternionAligned : public CAlignedNewDelete<16, Quaternion>
+class alignas(16) QuaternionAligned : public CAlignedNewDelete<16, Quaternion>
 {
 public:
 	inline QuaternionAligned(void) {};
@@ -1894,7 +1894,7 @@ public:
 	}
 
 #endif
-} ALIGN16_POST;
+};
 
 
 //-----------------------------------------------------------------------------
@@ -2589,12 +2589,6 @@ FORCEINLINE vec_t InvRSquared( float const *v ) = delete;
 //	return 1.f/fpmax(1.f, v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
 //#endif
 //}
-
-FORCEINLINE vec_t InvRSquared( const Vector &v )
-{
-	DirectX::XMVECTOR xmV = DirectX::XMVector3ReciprocalLength( DirectX::XMLoadFloat3( v.XmBase() ) );
-	return DirectX::XMVectorGetX( DirectX::XMVector3Dot( xmV, xmV ) );
-}
 
 #if defined(__i386__) || defined(_M_IX86)
 // dimhotepus: Unused? Drop.

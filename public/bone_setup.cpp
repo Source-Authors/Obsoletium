@@ -428,10 +428,10 @@ void CalcBoneQuaternion( int frame, float s,
 
 	#ifdef _X360
 			fltx4 q1simd, q2simd, qsimd;
-			q1simd = LoadAlignedSIMD( q1 );
-			q2simd = LoadAlignedSIMD( q2 );
+			q1simd = DirectX::XMLoadFloat4A( q1.XmBase() );
+			q2simd = DirectX::XMLoadFloat4A( q2.XmBase() );
 			qsimd = QuaternionBlendSIMD( q1simd, q2simd, s );
-			StoreUnalignedSIMD( q.Base(), qsimd );
+			DirectX::XMStoreFloat4( q.XmBase(), qsimd );
 	#else
 			QuaternionBlend( q1, q2, s, q );
 	#endif
@@ -684,7 +684,7 @@ static void CalcLocalHierarchyAnimation(
 	Quaternion localQ;
 
 	// make fake root transform
-	static ALIGN16 matrix3x4_t rootXform ALIGN16_POST ( 1.0f, 0, 0, 0,   0, 1.0f, 0, 0,  0, 0, 1.0f, 0 );
+	static alignas(16) matrix3x4_t rootXform ( 1.0f, 0, 0, 0,   0, 1.0f, 0, 0,  0, 0, 1.0f, 0 );
 
 	// FIXME: missing check to see if seq has a weight for this bone
 	float weight = 1.0f;
@@ -1192,11 +1192,11 @@ static fltx4 XM_CALLCONV QuaternionSMSIMD( float s, fltx4 psimd, fltx4 qsimd )
 static void QuaternionSM( float s, const QuaternionAligned &p, const Quaternion &q, Quaternion &qt )
 {
 #if ALLOW_SIMD_QUATERNION_MATH
-	fltx4 psimd = LoadAlignedSIMD( p.Base() );
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = DirectX::XMLoadFloat4A( p.XmBase() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 
 	fltx4 result = QuaternionSMSIMD( s, psimd, qsimd );
-	StoreUnalignedSIMD( qt.Base(), result );
+	DirectX::XMStoreFloat4( qt.XmBase(), result );
 #else
 	QuaternionSMSlow( s, p, q, qt );
 #endif
@@ -1205,11 +1205,11 @@ static void QuaternionSM( float s, const QuaternionAligned &p, const Quaternion 
 void QuaternionSM( float s, const Quaternion &p, const Quaternion &q, Quaternion &qt )
 {
 #if ALLOW_SIMD_QUATERNION_MATH
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 
 	fltx4 result = QuaternionSMSIMD( s, psimd, qsimd );
-	StoreUnalignedSIMD( qt.Base(), result );
+	DirectX::XMStoreFloat4( qt.XmBase(), result );
 #else
 	QuaternionSMSlow( s, p, q, qt );
 #endif
@@ -1248,11 +1248,11 @@ static fltx4 XM_CALLCONV QuaternionMASIMD( fltx4 psimd, float s, fltx4 qsimd )
 static void QuaternionMA( const Quaternion &p, float s, const QuaternionAligned &q, Quaternion &qt )
 {
 #if ALLOW_SIMD_QUATERNION_MATH
-	fltx4 qsimd = LoadAlignedSIMD( q.Base() );
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
 
 	fltx4 result = QuaternionMASIMD( psimd, s, qsimd );
-	StoreUnalignedSIMD( qt.Base(), result );
+	DirectX::XMStoreFloat4( qt.XmBase(), result );
 #else
 	QuaternionMASlow( p, s, q, qt );
 #endif
@@ -1261,11 +1261,11 @@ static void QuaternionMA( const Quaternion &p, float s, const QuaternionAligned 
 void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt )
 {
 #if ALLOW_SIMD_QUATERNION_MATH
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
 
 	fltx4 result = QuaternionMASIMD( psimd, s, qsimd );
-	StoreUnalignedSIMD( qt.Base(), result );
+	DirectX::XMStoreFloat4( qt.XmBase(), result );
 #else
 	QuaternionMASlow( p, s, q, qt );
 #endif
@@ -1278,14 +1278,14 @@ void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion
 static void QuaternionAccumulate( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt )
 {
 #if ALLOW_SIMD_QUATERNION_MATH
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 
 	fltx4 pqsimd = QuaternionAlignSIMD( psimd, qsimd );
 	fltx4 s4 = ReplicateX4( s );
 
 	fltx4 result = MaddSIMD( s4, pqsimd, psimd );
-	StoreUnalignedSIMD( qt.Base(), result );
+	DirectX::XMStoreFloat4( qt.XmBase(), result );
 #else
 	Quaternion q2;
 	QuaternionAlign( p, q, q2 );
@@ -1526,8 +1526,8 @@ void SlerpBones(
 
 #ifdef _X360
 		fltx4  q1simd, q2simd, result;
-		q1simd = LoadUnalignedSIMD( q1[i].Base() );
-		q2simd = LoadAlignedSIMD( q2[i] );
+		q1simd = DirectX::XMLoadFloat4( q1[i].XmBase() );
+		q2simd = DirectX::XMLoadFloat4A( q2[i].XmBase() );
 #endif
 		if ( pStudioHdr->boneFlags(i) & BONE_FIXED_ALIGNMENT )
 		{
@@ -1552,7 +1552,7 @@ void SlerpBones(
 		q1[i][2] = q3[2];
 		q1[i][3] = q3[3];
 #else
-		StoreUnalignedSIMD( q1[i].Base(), result );
+		DirectX::XMStoreFloat4( q1[i].XmBase(), result );
 #endif
 
 		pos1[i][0] = pos1[i][0] * s1 + pos2[i][0] * s2;

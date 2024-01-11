@@ -95,30 +95,30 @@ void R_LightAmbient_4D( const FourVectors& normal, Vector4D* pLightBoxColor, Fou
 	ColorSelect1=ReplicateX4(pLightBoxColor[3].AsVector3D().x);
 	DirectionalColor=OrSIMD(AndSIMD(ColorSelect1,NegMask),AndNotSIMD(NegMask,ColorSelect0));
 	NormCompSquared=MulSIMD(normal.y,normal.y);
-	lv.x=AddSIMD(lv.x,MulSIMD(DirectionalColor,NormCompSquared));
+	lv.x=MaddSIMD(DirectionalColor,NormCompSquared,lv.x);
 	ColorSelect0=ReplicateX4(pLightBoxColor[2].AsVector3D().y);
 	ColorSelect1=ReplicateX4(pLightBoxColor[3].AsVector3D().y);
 	DirectionalColor=OrSIMD(AndSIMD(ColorSelect1,NegMask),AndNotSIMD(NegMask,ColorSelect0));
-	lv.y=AddSIMD(lv.y,MulSIMD(DirectionalColor,NormCompSquared));
+	lv.y=MaddSIMD(DirectionalColor,NormCompSquared,lv.y);
 	ColorSelect0=ReplicateX4(pLightBoxColor[2].AsVector3D().z);
 	ColorSelect1=ReplicateX4(pLightBoxColor[3].AsVector3D().z);
 	DirectionalColor=OrSIMD(AndSIMD(ColorSelect1,NegMask),AndNotSIMD(NegMask,ColorSelect0));
-	lv.z=AddSIMD(lv.z,MulSIMD(DirectionalColor,NormCompSquared));
+	lv.z=MaddSIMD(DirectionalColor,NormCompSquared,lv.z);
 
 	NegMask=CmpLtSIMD(normal.z,FourZeros);
 	ColorSelect0=ReplicateX4(pLightBoxColor[4].AsVector3D().x);
 	ColorSelect1=ReplicateX4(pLightBoxColor[5].AsVector3D().x);
 	DirectionalColor=OrSIMD(AndSIMD(ColorSelect1,NegMask),AndNotSIMD(NegMask,ColorSelect0));
 	NormCompSquared=MulSIMD(normal.z,normal.z);
-	lv.x=AddSIMD(lv.x,MulSIMD(DirectionalColor,NormCompSquared));
+	lv.x=MaddSIMD(DirectionalColor,NormCompSquared,lv.x);
 	ColorSelect0=ReplicateX4(pLightBoxColor[4].AsVector3D().y);
 	ColorSelect1=ReplicateX4(pLightBoxColor[5].AsVector3D().y);
 	DirectionalColor=OrSIMD(AndSIMD(ColorSelect1,NegMask),AndNotSIMD(NegMask,ColorSelect0));
-	lv.y=AddSIMD(lv.y,MulSIMD(DirectionalColor,NormCompSquared));
+	lv.y=MaddSIMD(DirectionalColor,NormCompSquared,lv.y);
 	ColorSelect0=ReplicateX4(pLightBoxColor[4].AsVector3D().z);
 	ColorSelect1=ReplicateX4(pLightBoxColor[5].AsVector3D().z);
 	DirectionalColor=OrSIMD(AndSIMD(ColorSelect1,NegMask),AndNotSIMD(NegMask,ColorSelect0));
-	lv.z=AddSIMD(lv.z,MulSIMD(DirectionalColor,NormCompSquared));
+	lv.z=MaddSIMD(DirectionalColor,NormCompSquared,lv.z);
 }
 #endif
 
@@ -427,12 +427,12 @@ fltx4 FASTCALL R_WorldLightDistanceFalloff( const LightDesc_t *wl, const FourVec
 
 	if( wl->m_Flags & LIGHTTYPE_OPTIMIZATIONFLAGS_HAS_ATTENUATION1 )
 	{
-		fTotal=AddSIMD(fTotal,MulSIMD(ReplicateX4(wl->m_Attenuation1),SqrtEstSIMD(dist2)));
+		fTotal=MaddSIMD(ReplicateX4(wl->m_Attenuation1),SqrtEstSIMD(dist2),fTotal);
 	}
 
 	if( wl->m_Flags & LIGHTTYPE_OPTIMIZATIONFLAGS_HAS_ATTENUATION2 )
 	{
-		fTotal=AddSIMD(fTotal,MulSIMD(ReplicateX4(wl->m_Attenuation2),dist2));
+		fTotal=MaddSIMD(ReplicateX4(wl->m_Attenuation2),dist2,fTotal);
 	}
 
 	fTotal=ReciprocalEstSIMD(fTotal);

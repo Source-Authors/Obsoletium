@@ -449,31 +449,19 @@ private:
 #endif
 };
 
-// GCC 4.2.1 can't handle loading a static const into a m128 register :(
-#ifdef WIN32
-static const 
-#endif
-fltx4 g_IVPToHLDir = { 1.0f, -1.0f, 1.0f, 1.0f };
+static const fltx4 g_IVPToHLDir = { 1.0f, -1.0f, 1.0f, 1.0f };
 
-//static const fltx4 g_IVPToHLPosition = { IVP2HL(1.0f), -IVP2HL(1.0f), IVP2HL(1.0f), IVP2HL(1.0f) };
-
-#if defined(_X360)
-
-FORCEINLINE fltx4 ConvertDirectionToIVP( const fltx4 & a )
-{
-	fltx4 t = __vpermwi( a, VPERMWI_CONST( 0, 2, 1, 3 ) );
-	// negate Y
-	return MulSIMD( t, g_IVPToHLDir );
-}
-#else
-FORCEINLINE fltx4 ConvertDirectionToIVP( const fltx4 & a )
+FORCEINLINE fltx4 XM_CALLCONV ConvertDirectionToIVP( DirectX::FXMVECTOR a )
 {
 	// swap Z & Y
-	fltx4 t = _mm_shuffle_ps( a, a, MM_SHUFFLE_REV( 0, 2, 1, 3 ) );
+	DirectX::XMVECTOR t = DirectX::XMVectorSwizzle<
+		DirectX::XM_SWIZZLE_X,
+		DirectX::XM_SWIZZLE_Z,
+		DirectX::XM_SWIZZLE_Y,
+		DirectX::XM_SWIZZLE_W>( a );
 	// negate Y
 	return MulSIMD( t, g_IVPToHLDir );
 }
-#endif
 
 CTraceIVP::CTraceIVP( const CPhysCollide *pCollide, const Vector &origin, const QAngle &angles )
 {
@@ -514,9 +502,9 @@ CTraceIVP::CTraceIVP( const CPhysCollide *pCollide, const Vector &origin, const 
 	// negate the position, so add another minus to cancel out
 	right.w = -HL2IVP(origin.y);
 	up.w = HL2IVP(origin.z);
-	fltx4 rx = ConvertDirectionToIVP(LoadAlignedSIMD(forward.Base()));
-	fltx4 ry = ConvertDirectionToIVP(SubSIMD( Four_Zeros, LoadAlignedSIMD(right.Base())) );
-	fltx4 rz = ConvertDirectionToIVP(LoadAlignedSIMD(up.Base()) );
+	fltx4 rx = ConvertDirectionToIVP(DirectX::XMLoadFloat4A(forward.XmBase()));
+	fltx4 ry = ConvertDirectionToIVP(SubSIMD( Four_Zeros, DirectX::XMLoadFloat4A(right.XmBase())) );
+	fltx4 rz = ConvertDirectionToIVP(DirectX::XMLoadFloat4A(up.XmBase()) );
 
 	fltx4 scaleHL = ReplicateX4(IVP2HL(1.0f));
 	m_ivpLocalToHLWorld.x = MulSIMD( scaleHL, rx );
@@ -599,12 +587,12 @@ bool CTraceIVP::BuildLeafmapCacheRLE( const leafmap_t * RESTRICT pLeafmap )
 			}
 			v3 = baseVert++;
 			countThisSpan--;
-			m_vertCache[i].LoadAndSwizzleAligned( pVerts[v0].Base(), pVerts[v1].Base(), pVerts[v2].Base(), pVerts[v3].Base() );
+			m_vertCache[i].LoadAndSwizzleAligned( pVerts[v0], pVerts[v1], pVerts[v2], pVerts[v3] );
 		}
 		else
 		{
 			// we have four verts in this span, just grab the next four
-			m_vertCache[i].LoadAndSwizzleAligned( pVerts[baseVert+0].Base(), pVerts[baseVert+1].Base(), pVerts[baseVert+2].Base(), pVerts[baseVert+3].Base() );
+			m_vertCache[i].LoadAndSwizzleAligned( pVerts[baseVert+0], pVerts[baseVert+1], pVerts[baseVert+2], pVerts[baseVert+3] );
 			baseVert += 4;
 			countThisSpan -= 4;
 		}
@@ -635,7 +623,7 @@ bool CTraceIVP::BuildLeafmapCacheRLE( const leafmap_t * RESTRICT pLeafmap )
 			}
 		}
 	}
-	m_vertCache[m_cacheCount-1].LoadAndSwizzleAligned( pVerts[v[0]].Base(), pVerts[v[1]].Base(), pVerts[v[2]].Base(), pVerts[v[3]].Base() );
+	m_vertCache[m_cacheCount-1].LoadAndSwizzleAligned( pVerts[v[0]], pVerts[v[1]], pVerts[v[2]], pVerts[v[3]] );
 	FourVectors::RotateManyBy( &m_vertCache[0], m_cacheCount, *((const matrix3x4_t *)&m_ivpLocalToHLWorld) );
 
 	return true;
@@ -665,7 +653,7 @@ bool CTraceIVP::BuildLeafmapCache( const leafmap_t * RESTRICT pLeafmap )
 	const VectorAligned * RESTRICT pVerts = (const VectorAligned *)&m_pLedge->get_point_array()[startPoint];
 	for ( int i = 0; i < m_cacheCount-1; i++ )
 	{
-		m_vertCache[i].LoadAndSwizzleAligned( pVerts[0].Base(), pVerts[1].Base(), pVerts[2].Base(), pVerts[3].Base() );
+		m_vertCache[i].LoadAndSwizzleAligned( pVerts[0], pVerts[1], pVerts[2], pVerts[3] );
 		pVerts += 4;
 	}
 
@@ -674,7 +662,7 @@ bool CTraceIVP::BuildLeafmapCache( const leafmap_t * RESTRICT pLeafmap )
 	int x1 = min(1,remIndex);
 	int x2 = min(2,remIndex);
 	int x3 = min(3,remIndex);
-	m_vertCache[m_cacheCount-1].LoadAndSwizzleAligned( pVerts[x0].Base(), pVerts[x1].Base(), pVerts[x2].Base(), pVerts[x3].Base() );
+	m_vertCache[m_cacheCount-1].LoadAndSwizzleAligned( pVerts[x0], pVerts[x1], pVerts[x2], pVerts[x3] );
 	FourVectors::RotateManyBy( &m_vertCache[0], m_cacheCount, *((const matrix3x4_t *)&m_ivpLocalToHLWorld) );
 	return true;
 #endif
@@ -686,14 +674,7 @@ int CTraceIVP::SupportMapCached( const Vector &dir, Vector *pOut ) const
 	VPROF("SupportMapCached");
 #if USE_VERT_CACHE
 	FourVectors fourDir;
-#if defined(_X360)
-	fltx4 vec = LoadUnaligned3SIMD( dir.Base() );
-	fourDir.x = SplatXSIMD(vec);
-	fourDir.y = SplatYSIMD(vec);
-	fourDir.z = SplatZSIMD(vec);
-#else
 	fourDir.DuplicateVector(dir);
-#endif
 
 	fltx4 index = g_IndexBase;
 	fltx4 maxIndex = g_IndexBase;

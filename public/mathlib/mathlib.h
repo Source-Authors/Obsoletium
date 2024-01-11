@@ -90,28 +90,18 @@ private:
 
 
 
-#ifdef DEBUG  // stop crashing edit-and-continue
 FORCEINLINE float clamp( float val, float minVal, float maxVal )
 {
-	return std::clamp( val, minVal, maxVal );
+	DirectX::XMVECTOR vres = DirectX::XMVectorClamp
+	(
+		DirectX::XMLoadFloat( &val ),
+		DirectX::XMLoadFloat( &minVal ),
+		DirectX::XMLoadFloat( &maxVal )
+	);
+	return DirectX::XMVectorGetX( vres );
+	//val = fpmax(minVal, val);
+	//val = fpmin(maxVal, val);
 }
-#else // DEBUG
-FORCEINLINE float clamp( float val, float minVal, float maxVal )
-{
-#if defined(__i386__) || defined(_M_IX86)
-	_mm_store_ss( &val,
-		_mm_min_ss(
-			_mm_max_ss(
-				_mm_load_ss(&val),
-				_mm_load_ss(&minVal) ),
-			_mm_load_ss(&maxVal) ) );
-#else
-	val = fpmax(minVal, val);
-	val = fpmin(maxVal, val);
-#endif
-	return val;
-}
-#endif // DEBUG
 
 //
 // Returns a clamped value in the range [min, max].
@@ -1178,19 +1168,8 @@ inline float SimpleSplineRemapValClamped( float val, float A, float B, float C, 
 
 FORCEINLINE int RoundFloatToInt(float f)
 {
-#if defined(__i386__) || defined(_M_IX86) || defined( PLATFORM_WINDOWS_PC64 ) || defined(__x86_64__)
+#if defined(_XM_SSE_INTRINSICS_)
 	return _mm_cvtss_si32(_mm_load_ss(&f));
-#elif defined( _X360 )
-#ifdef Assert
-	Assert( IsFPUControlWordSet() );
-#endif
-	union
-	{
-		double flResult;
-		int pResult[2];
-	};
-	flResult = __fctiw( f );
-	return pResult[1];
 #else
 #error "Please define your platform"
 #endif
@@ -1285,7 +1264,8 @@ FORCEINLINE int Float2Int( float a )
 inline int Floor2Int( float a )
 {
 	int RetVal;
-#if defined( __i386__ )
+
+#if defined(_XM_SSE_INTRINSICS_)
 	// Convert to int and back, compare, subtract one if too big
 	__m128 a128 = _mm_set_ss(a);
 	RetVal = _mm_cvtss_si32(a128);
@@ -1343,7 +1323,7 @@ inline float ClampToMsec( float in )
 inline int Ceil2Int( float a )
 {
    int RetVal;
-#if defined( __i386__ )
+#if defined(_XM_SSE_INTRINSICS_)
    // Convert to int and back, compare, add one if too small
    __m128 a128 = _mm_load_ss(&a);
    RetVal = _mm_cvtss_si32(a128);
@@ -2133,10 +2113,10 @@ void HSVtoRGB( const Vector &hsv, Vector &rgb );
 // Fast version of pow and log
 //-----------------------------------------------------------------------------
 
-float FastLog2(float i);			// log2( i )
-float FastPow2(float i);			// 2^i
-float FastPow(float a, float b);	// a^b
-float FastPow10( float i );			// 10^i
+float XM_CALLCONV FastLog2(float i);			// log2( i )
+float XM_CALLCONV FastPow2(float i);			// 2^i
+float XM_CALLCONV FastPow(float a, float b);	// a^b
+float XM_CALLCONV FastPow10( float i );			// 10^i
 
 //-----------------------------------------------------------------------------
 // For testing float equality

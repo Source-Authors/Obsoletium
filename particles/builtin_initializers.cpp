@@ -34,7 +34,7 @@ void CParticleOperatorInstance::InitScalarAttributeRandomRangeBlock(
 	int nRandContext = GetSIMDRandContext();
 	while( n_blocks-- )
 	{
-		*( pAttr ) = AddSIMD( val0, MulSIMD( RandSIMD( nRandContext ), val_d ) );
+		*( pAttr ) = MaddSIMD( RandSIMD( nRandContext ), val_d, val0 );
 		pAttr += attr_stride;
 	}
 	ReleaseSIMDRandContext( nRandContext );
@@ -55,7 +55,7 @@ void CParticleOperatorInstance::InitScalarAttributeRandomRangeExpBlock(
 	int nRandContext = GetSIMDRandContext();
 	while( n_blocks-- )
 	{
-		*( pAttr ) = AddSIMD( val0, MulSIMD( Pow_FixedPoint_Exponent_SIMD( RandSIMD( nRandContext ), nExp ), val_d ) );
+		*( pAttr ) = MaddSIMD( Pow_FixedPoint_Exponent_SIMD( RandSIMD( nRandContext ), nExp ), val_d, val0 );
 		pAttr += attr_stride;
 	}
 	ReleaseSIMDRandContext( nRandContext );
@@ -78,7 +78,7 @@ void CParticleOperatorInstance::AddScalarAttributeRandomRangeBlock(
 			int nExp = (int)(4.0f * fExp);
 			while( nBlockCount-- )
 			{
-				*( pAttr ) = AddSIMD( *pAttr, AddSIMD( val0, MulSIMD( Pow_FixedPoint_Exponent_SIMD( RandSIMD( nRandContext ), nExp ), val_d ) ) );
+				*( pAttr ) = AddSIMD( *pAttr, MaddSIMD( Pow_FixedPoint_Exponent_SIMD( RandSIMD( nRandContext ), nExp ), val_d, val0 ) );
 				pAttr += nAttrStride;
 			}
 		}
@@ -86,7 +86,7 @@ void CParticleOperatorInstance::AddScalarAttributeRandomRangeBlock(
 		{
 			while( nBlockCount-- )
 			{
-				*pAttr = AddSIMD( *pAttr, AddSIMD( val0, MulSIMD( RandSIMD( nRandContext ), val_d ) ) );
+				*pAttr = AddSIMD( *pAttr, MaddSIMD( RandSIMD( nRandContext ), val_d, val0 ) );
 				pAttr += nAttrStride;
 			}
 		}
@@ -99,9 +99,9 @@ void CParticleOperatorInstance::AddScalarAttributeRandomRangeBlock(
 			int nExp = (int)(4.0f * fExp);
 			while( nBlockCount-- )
 			{
-				fltx4 fl4RandVal = AddSIMD( val0, MulSIMD( Pow_FixedPoint_Exponent_SIMD( RandSIMD( nRandContext ), nExp ), val_d ) );
+				fltx4 fl4RandVal = MaddSIMD( Pow_FixedPoint_Exponent_SIMD( RandSIMD( nRandContext ), nExp ), val_d, val0 );
 				fltx4 fl4Sign = MaskedAssign( CmpGeSIMD( RandSIMD( nRandContext ), Four_PointFives ), Four_Ones, fl4NegOne ); 
-				*pAttr = AddSIMD( *pAttr, MulSIMD( fl4RandVal, fl4Sign ) );
+				*pAttr = MaddSIMD( fl4RandVal, fl4Sign, *pAttr );
 				pAttr += nAttrStride;
 			}
 		}
@@ -109,9 +109,9 @@ void CParticleOperatorInstance::AddScalarAttributeRandomRangeBlock(
 		{
 			while( nBlockCount-- )
 			{
-				fltx4 fl4RandVal = AddSIMD( val0, MulSIMD( RandSIMD( nRandContext ), val_d ) );
+				fltx4 fl4RandVal = MaddSIMD( RandSIMD( nRandContext ), val_d, val0 );
 				fltx4 fl4Sign = MaskedAssign( CmpGeSIMD( RandSIMD( nRandContext ), Four_PointFives ), Four_Ones, fl4NegOne ); 
-				*pAttr = AddSIMD( *pAttr, MulSIMD( fl4RandVal, fl4Sign ) );
+				*pAttr = MaddSIMD( fl4RandVal, fl4Sign, *pAttr );
 				pAttr += nAttrStride;
 			}
 		}
@@ -486,8 +486,8 @@ void C_INIT_CreateWithinSphere::InitNewParticlesBlock( CParticleCollection *pPar
 		for( int nComp = 0 ; nComp < 3; nComp++ )
 		{
 			v4ConditionalAbsMask[nComp] = ( m_vecDistanceBiasAbs[nComp] > 0 ) ?
-				LoadAlignedSIMD( ( const float *) g_SIMD_clear_signmask ) :
-				LoadAlignedSIMD( ( const float *) g_SIMD_AllOnesMask );
+				DirectX::XMLoadInt4A( g_SIMD_clear_signmask ) :
+				DirectX::XMLoadInt4A( g_SIMD_AllOnesMask );
 		}
 		fltx4 fl4RadiusMin = ReplicateX4( m_fRadiusMin );
 		fltx4 fl4RadiusSpread = ReplicateX4( m_fRadiusMax - m_fRadiusMin );
@@ -543,7 +543,7 @@ void C_INIT_CreateWithinSphere::InitNewParticlesBlock( CParticleCollection *pPar
 			FourVectors v4randDir = v4RandPos;
 			
 			// lerp radius
-			v4RandPos *= AddSIMD( fl4RadiusMin, MulSIMD( fl4Length, fl4RadiusSpread ) );
+			v4RandPos *= MaddSIMD( fl4Length, fl4RadiusSpread, fl4RadiusMin );
 			v4RandPos += v4PrevControlPointPosition;
 
 			FourVectors cpnt = v4ControlPointDelta;
@@ -557,24 +557,21 @@ void C_INIT_CreateWithinSphere::InitNewParticlesBlock( CParticleCollection *pPar
 				if ( bDoRandSpeed )
 				{
 					fltx4 fl4Rand_speed = Pow_FixedPoint_Exponent_SIMD( RandSIMD( nContext ), nPowSSEMask );
-					fl4Rand_speed = AddSIMD( fl4SpeedMin, MulSIMD( fl4SpeedRange, fl4Rand_speed ) );
+					fl4Rand_speed = MaddSIMD( fl4SpeedRange, fl4Rand_speed, fl4SpeedMin );
 					v4randDir *= fl4Rand_speed;
 
 					// local speed
 					FourVectors v4LocalOffset = v4CPForward;
-					v4LocalOffset *= AddSIMD( fl4LocalSpeedMinX, 
-											  MulSIMD( fl4LocalSpeedXSpread, RandSIMD( nContext ) ) );
+					v4LocalOffset *= MaddSIMD( fl4LocalSpeedXSpread, RandSIMD( nContext ), fl4LocalSpeedMinX );
 					v4randDir += v4LocalOffset;
 
 					v4LocalOffset = v4CPRight;
-					v4LocalOffset *= AddSIMD( fl4LocalSpeedMinY, 
-											  MulSIMD( fl4LocalSpeedYSpread, RandSIMD( nContext ) ) );
+					v4LocalOffset *= MaddSIMD( fl4LocalSpeedYSpread, RandSIMD( nContext ), fl4LocalSpeedMinY );
 					v4randDir += v4LocalOffset;
 
 
 					v4LocalOffset = v4CPUp;
-					v4LocalOffset *= AddSIMD( fl4LocalSpeedMinZ, 
-											  MulSIMD( fl4LocalSpeedZSpread, RandSIMD( nContext ) ) );
+					v4LocalOffset *= MaddSIMD( fl4LocalSpeedZSpread, RandSIMD( nContext ), fl4LocalSpeedMinZ );
 					v4randDir += v4LocalOffset;
 					v4randDir *= fl4PreviousDt;
 					v4RandPos -= v4randDir;
@@ -994,17 +991,17 @@ void C_INIT_InitialVelocityNoise::InitNewParticlesBlock( CParticleCollection *pP
 	// Set up values for more optimal absolute value calculations inside the loop
 	if ( m_vecAbsVal.x	!= 0.0f )
 	{
-		fl4AbsValX = LoadAlignedSIMD( (float *) g_SIMD_clear_signmask );
+		fl4AbsValX = DirectX::XMLoadInt4A( g_SIMD_clear_signmask );
 		flAbsScaleX = 1.0;
 	}
 	if ( m_vecAbsVal.y	!= 0.0f )
 	{
-		fl4AbsValY = LoadAlignedSIMD( (float *) g_SIMD_clear_signmask );
+		fl4AbsValY = DirectX::XMLoadInt4A( g_SIMD_clear_signmask );
 		flAbsScaleY = 1.0;
 	}
 	if ( m_vecAbsVal.z	!= 0.0f )
 	{
-		fl4AbsValZ = LoadAlignedSIMD( (float *) g_SIMD_clear_signmask );
+		fl4AbsValZ = DirectX::XMLoadInt4A( g_SIMD_clear_signmask );
 		flAbsScaleZ = 1.0;
 	}
 
@@ -1104,9 +1101,9 @@ void C_INIT_InitialVelocityNoise::InitNewParticlesBlock( CParticleCollection *pP
 
 		FourVectors fvOffset;
 
-		fvOffset.x = AddSIMD( fl4ValueBaseX, ( MulSIMD( fl4ValueScaleX , fl4NoiseX ) ) );
-		fvOffset.y = AddSIMD( fl4ValueBaseY, ( MulSIMD( fl4ValueScaleY , fl4NoiseY ) ) );
-		fvOffset.z = AddSIMD( fl4ValueBaseZ, ( MulSIMD( fl4ValueScaleZ , fl4NoiseZ ) ) );
+		fvOffset.x = MaddSIMD( fl4ValueScaleX , fl4NoiseX, fl4ValueBaseX );
+		fvOffset.y = MaddSIMD( fl4ValueScaleY , fl4NoiseY, fl4ValueBaseY );
+		fvOffset.z = MaddSIMD( fl4ValueScaleZ , fl4NoiseZ, fl4ValueBaseZ );
 
 		fvOffset *= pParticles->m_flPreviousDt;  
 
@@ -2162,7 +2159,7 @@ void C_INIT_CreationNoise::InitNewParticlesBlock( CParticleCollection *pParticle
 	// Set up values for more optimal absolute value calculations inside the loop
 	if ( m_bAbsVal )
 	{
-		fl4AbsVal = LoadAlignedSIMD( (float *) g_SIMD_clear_signmask );
+		fl4AbsVal = DirectX::XMLoadInt4A( g_SIMD_clear_signmask );
 		flAbsScale = 1.0;
 	}
 
@@ -2225,7 +2222,7 @@ void C_INIT_CreationNoise::InitNewParticlesBlock( CParticleCollection *pParticle
 
 		fltx4 fl4InitialNoise;
 
-		fl4InitialNoise = AddSIMD( fl4ValueBase, ( MulSIMD( fl4ValueScale, fl4Noise ) ) );
+		fl4InitialNoise = MaddSIMD( fl4ValueScale, fl4Noise, fl4ValueBase );
 
 		if ( ATTRIBUTES_WHICH_ARE_0_TO_1 & (1 << m_nFieldOutput ) )
 		{

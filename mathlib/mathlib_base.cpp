@@ -524,41 +524,38 @@ void ConcatTransforms_Aligned( const matrix3x4_t &m0, const matrix3x4_t &m1, mat
 	Assert( (((size_t)&out) % 16) == 0 );
 
 	fltx4 lastMask = *(fltx4 *)(&g_SIMD_ComponentMask[3]);
-	fltx4 rowA0 = LoadAlignedSIMD( m0.m_flMatVal[0] );
-	fltx4 rowA1 = LoadAlignedSIMD( m0.m_flMatVal[1] );
-	fltx4 rowA2 = LoadAlignedSIMD( m0.m_flMatVal[2] );
+	fltx4 rowA0 = DirectX::XMLoadFloat4( m0.XmBase() );
+	fltx4 rowA1 = DirectX::XMLoadFloat4( m0.XmBase() + 1 );
+	fltx4 rowA2 = DirectX::XMLoadFloat4( m0.XmBase() + 2 );
 
-	fltx4 rowB0 = LoadAlignedSIMD( m1.m_flMatVal[0] );
-	fltx4 rowB1 = LoadAlignedSIMD( m1.m_flMatVal[1] );
-	fltx4 rowB2 = LoadAlignedSIMD( m1.m_flMatVal[2] );
+	fltx4 rowB0 = DirectX::XMLoadFloat4( m1.XmBase() );
+	fltx4 rowB1 = DirectX::XMLoadFloat4( m1.XmBase() + 1 );
+	fltx4 rowB2 = DirectX::XMLoadFloat4( m1.XmBase() + 2 );
 
 	// now we have the rows of m0 and the columns of m1
 	// first output row
 	fltx4 A0 = SplatXSIMD(rowA0);
 	fltx4 A1 = SplatYSIMD(rowA0);
 	fltx4 A2 = SplatZSIMD(rowA0);
-	fltx4 mul00 = MulSIMD( A0, rowB0 );
 	fltx4 mul01 = MulSIMD( A1, rowB1 );
 	fltx4 mul02 = MulSIMD( A2, rowB2 );
-	fltx4 out0 = AddSIMD( mul00, AddSIMD(mul01,mul02) );
+	fltx4 out0 = MaddSIMD( A0, rowB0, AddSIMD(mul01,mul02) );
 
 	// second output row
 	A0 = SplatXSIMD(rowA1);
 	A1 = SplatYSIMD(rowA1);
 	A2 = SplatZSIMD(rowA1);
-	fltx4 mul10 = MulSIMD( A0, rowB0 );
 	fltx4 mul11 = MulSIMD( A1, rowB1 );
 	fltx4 mul12 = MulSIMD( A2, rowB2 );
-	fltx4 out1 = AddSIMD( mul10, AddSIMD(mul11,mul12) );
+	fltx4 out1 = MaddSIMD( A0, rowB0, AddSIMD(mul11,mul12) );
 
 	// third output row
 	A0 = SplatXSIMD(rowA2);
 	A1 = SplatYSIMD(rowA2);
 	A2 = SplatZSIMD(rowA2);
-	fltx4 mul20 = MulSIMD( A0, rowB0 );
 	fltx4 mul21 = MulSIMD( A1, rowB1 );
 	fltx4 mul22 = MulSIMD( A2, rowB2 );
-	fltx4 out2 = AddSIMD( mul20, AddSIMD(mul21,mul22) );
+	fltx4 out2 = MaddSIMD( A0, rowB0, AddSIMD(mul21,mul22) );
 
 	// add in translation vector
 	A0 = AndSIMD(rowA0,lastMask);
@@ -568,9 +565,9 @@ void ConcatTransforms_Aligned( const matrix3x4_t &m0, const matrix3x4_t &m1, mat
 	out1 = AddSIMD(out1, A1);
 	out2 = AddSIMD(out2, A2);
 
-	StoreAlignedSIMD( out.m_flMatVal[0], out0 );
-	StoreAlignedSIMD( out.m_flMatVal[1], out1 );
-	StoreAlignedSIMD( out.m_flMatVal[2], out2 );
+	DirectX::XMStoreFloat4(out.XmBase(), out0);
+	DirectX::XMStoreFloat4(out.XmBase() + 1, out1 );
+	DirectX::XMStoreFloat4(out.XmBase() + 2, out2 );
 }
 
 /*
@@ -591,41 +588,38 @@ void ConcatTransforms (const matrix3x4_t& in1, const matrix3x4_t& in2, matrix3x4
 #endif
 
 	fltx4 lastMask = *(fltx4 *)(&g_SIMD_ComponentMask[3]);
-	fltx4 rowA0 = LoadUnalignedSIMD( in1.m_flMatVal[0] );
-	fltx4 rowA1 = LoadUnalignedSIMD( in1.m_flMatVal[1] );
-	fltx4 rowA2 = LoadUnalignedSIMD( in1.m_flMatVal[2] );
+	fltx4 rowA0 = DirectX::XMLoadFloat4( in1.XmBase() );
+	fltx4 rowA1 = DirectX::XMLoadFloat4( in1.XmBase() + 1 );
+	fltx4 rowA2 = DirectX::XMLoadFloat4( in1.XmBase() + 2 );
 
-	fltx4 rowB0 = LoadUnalignedSIMD( in2.m_flMatVal[0] );
-	fltx4 rowB1 = LoadUnalignedSIMD( in2.m_flMatVal[1] );
-	fltx4 rowB2 = LoadUnalignedSIMD( in2.m_flMatVal[2] );
+	fltx4 rowB0 = DirectX::XMLoadFloat4( in2.XmBase() );
+	fltx4 rowB1 = DirectX::XMLoadFloat4( in2.XmBase() + 1 );
+	fltx4 rowB2 = DirectX::XMLoadFloat4( in2.XmBase() + 2 );
 
 	// now we have the rows of m0 and the columns of m1
 	// first output row
 	fltx4 A0 = SplatXSIMD(rowA0);
 	fltx4 A1 = SplatYSIMD(rowA0);
 	fltx4 A2 = SplatZSIMD(rowA0);
-	fltx4 mul00 = MulSIMD( A0, rowB0 );
 	fltx4 mul01 = MulSIMD( A1, rowB1 );
 	fltx4 mul02 = MulSIMD( A2, rowB2 );
-	fltx4 out0 = AddSIMD( mul00, AddSIMD(mul01,mul02) );
+	fltx4 out0 = MaddSIMD( A0, rowB0, AddSIMD(mul01,mul02) );
 
 	// second output row
 	A0 = SplatXSIMD(rowA1);
 	A1 = SplatYSIMD(rowA1);
 	A2 = SplatZSIMD(rowA1);
-	fltx4 mul10 = MulSIMD( A0, rowB0 );
 	fltx4 mul11 = MulSIMD( A1, rowB1 );
 	fltx4 mul12 = MulSIMD( A2, rowB2 );
-	fltx4 out1 = AddSIMD( mul10, AddSIMD(mul11,mul12) );
+	fltx4 out1 = MaddSIMD( A0, rowB0, AddSIMD(mul11,mul12) );
 
 	// third output row
 	A0 = SplatXSIMD(rowA2);
 	A1 = SplatYSIMD(rowA2);
 	A2 = SplatZSIMD(rowA2);
-	fltx4 mul20 = MulSIMD( A0, rowB0 );
 	fltx4 mul21 = MulSIMD( A1, rowB1 );
 	fltx4 mul22 = MulSIMD( A2, rowB2 );
-	fltx4 out2 = AddSIMD( mul20, AddSIMD(mul21,mul22) );
+	fltx4 out2 = MaddSIMD( A0, rowB0, AddSIMD(mul21,mul22) );
 
 	// add in translation vector
 	A0 = AndSIMD(rowA0,lastMask);
@@ -636,9 +630,9 @@ void ConcatTransforms (const matrix3x4_t& in1, const matrix3x4_t& in2, matrix3x4
 	out2 = AddSIMD(out2, A2);
 
 	// write to output
-	StoreUnalignedSIMD( out.m_flMatVal[0], out0 );
-	StoreUnalignedSIMD( out.m_flMatVal[1], out1 );
-	StoreUnalignedSIMD( out.m_flMatVal[2], out2 );
+	DirectX::XMStoreFloat4( out.XmBase(), out0 );
+	DirectX::XMStoreFloat4( out.XmBase() + 1, out1 );
+	DirectX::XMStoreFloat4( out.XmBase() + 2, out2 );
 }
 
 
@@ -840,7 +834,7 @@ void AngleVectors( const QAngle &angles, Vector *forward, Vector *right, Vector 
 	Assert( s_bMathlibInitialized );
 	
 	fltx4 sine, cosine;
-	fltx4 radians = MulSIMD( LoadUnaligned3SIMD( angles.Base() ), ReplicateX4( M_PI_F / 180.f ) );
+	fltx4 radians = MulSIMD( DirectX::XMLoadFloat3( angles.XmBase() ), ReplicateX4( M_PI_F / 180.f ) );
 	SinCos3SIMD( sine, cosine, radians );
 
 	float sp = SubFloat( sine, 0 ), sy = SubFloat( sine, 1 ), sr = SubFloat( sine, 2 );
@@ -877,7 +871,7 @@ void AngleVectorsTranspose (const QAngle &angles, Vector *forward, Vector *right
 	Assert( s_bMathlibInitialized );
 
 	fltx4 sine, cosine;
-	fltx4 radians = MulSIMD( LoadUnaligned3SIMD( angles.Base() ), ReplicateX4( M_PI_F / 180.f ) );
+	fltx4 radians = MulSIMD( DirectX::XMLoadFloat3( angles.XmBase() ), ReplicateX4( M_PI_F / 180.f ) );
 	SinCos3SIMD( sine, cosine, radians );
 
 	float sp = SubFloat( sine, 0 ), sy = SubFloat( sine, 1 ), sr = SubFloat( sine, 2 );
@@ -1110,7 +1104,7 @@ void AngleMatrix( const QAngle &angles, matrix3x4_t& matrix )
 	Assert( s_bMathlibInitialized );
 
 	fltx4 sine, cosine;
-	fltx4 radians = MulSIMD( LoadUnaligned3SIMD( angles.Base() ), ReplicateX4( M_PI_F / 180.f ) );
+	fltx4 radians = MulSIMD( DirectX::XMLoadFloat3( angles.XmBase() ), ReplicateX4( M_PI_F / 180.f ) );
 	SinCos3SIMD( sine, cosine, radians );
 
 	float sp = SubFloat( sine, 0 ), sy = SubFloat( sine, 1 ), sr = SubFloat( sine, 2 );
@@ -1440,10 +1434,10 @@ void QuaternionBlend( const Quaternion &p, const Quaternion &q, float t, Quatern
 {
 	Assert( s_bMathlibInitialized );
 #if ALLOW_SIMD_QUATERNION_MATH
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 	fltx4 qtsimd = QuaternionBlendSIMD( psimd, qsimd, t );
-	StoreUnalignedSIMD( qt.Base(), qtsimd );
+	DirectX::XMStoreFloat4( qt.XmBase(), qtsimd );
 #else
 	// decide if one of the quaternions is backwards
 	Quaternion q2;
@@ -1457,10 +1451,10 @@ void QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, 
 {
 	Assert( s_bMathlibInitialized );
 
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 	fltx4 qtsimd = QuaternionBlendNoAlignSIMD( psimd, qsimd, t );
-	StoreUnalignedSIMD( qt.Base(), qtsimd );
+	DirectX::XMStoreFloat4( qt.XmBase(), qtsimd );
 }
 
 
@@ -1469,7 +1463,7 @@ void QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt )
 {
 	Assert( s_bMathlibInitialized );
 
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
 	fltx4 sclp = ReplicateX4( 1.0f - t );
 
 	fltx4 result = MulSIMD( psimd, sclp );
@@ -1481,7 +1475,7 @@ void QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt )
 
 	result = DirectX::XMVectorSetW( result, DirectX::XMVectorGetW( result ) + t );
 
-	StoreUnalignedSIMD( qt.Base(), QuaternionNormalizeSIMD( result ) );
+	DirectX::XMStoreFloat4( qt.XmBase(), QuaternionNormalizeSIMD( result ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1490,12 +1484,12 @@ void QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt )
 
 void QuaternionSlerp( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 
 	fltx4 result = QuaternionSlerpSIMD( psimd, qsimd, t );
 
-	StoreUnalignedSIMD( qt.Base(), result );
+	DirectX::XMStoreFloat4( qt.XmBase(), result );
 
 	Assert( qt.IsValid() );
 }
@@ -1503,12 +1497,12 @@ void QuaternionSlerp( const Quaternion &p, const Quaternion &q, float t, Quatern
 
 void QuaternionSlerpNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 
 	fltx4 result = QuaternionSlerpNoAlignSIMD( psimd, qsimd, t );
 
-	StoreUnalignedSIMD( qt.Base(), result );
+	DirectX::XMStoreFloat4( qt.XmBase(), result );
 
 	Assert( qt.IsValid() );
 }
@@ -1590,10 +1584,10 @@ float QuaternionNormalize( Quaternion &q )
 {
 	Assert( q.IsValid() );
 
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 	fltx4 normalized = QuaternionNormalizeSIMD( qsimd );
 
-	StoreUnalignedSIMD( q.Base(), normalized );
+	DirectX::XMStoreFloat4( q.XmBase(), normalized );
 
 	return DirectX::XMVectorGetX( DirectX::XMQuaternionLength( qsimd ) );
 }
@@ -1603,8 +1597,8 @@ void QuaternionNormalize2( Quaternion &q )
 {
 	Assert( q.IsValid() );
 
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
-	StoreUnalignedSIMD( q.Base(), QuaternionNormalizeSIMD( qsimd ) );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
+	DirectX::XMStoreFloat4( q.XmBase(), QuaternionNormalizeSIMD( qsimd ) );
 }
 
 void QuaternionScale( const Quaternion &p, float t, Quaternion &q )
@@ -1648,8 +1642,8 @@ void QuaternionAdd( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 	Assert( p.IsValid() );
 	Assert( q.IsValid() );
 
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 	
 	// decide if one of the quaternions is backwards
 	fltx4 q2 = QuaternionAlignSIMD( psimd, qsimd );
@@ -1657,7 +1651,7 @@ void QuaternionAdd( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 	// is this right???
 	fltx4 result = DirectX::XMVectorAdd( psimd, q2 );
 
-	StoreUnalignedSIMD( qt.Base(), result );
+	DirectX::XMStoreFloat4( qt.XmBase(), result );
 }
 
 
@@ -1666,8 +1660,8 @@ float QuaternionDotProduct( const Quaternion &p, const Quaternion &q )
 	Assert( p.IsValid() );
 	Assert( q.IsValid() );
 
-	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 
 	return DirectX::XMVectorGetX( DirectX::XMQuaternionDot( psimd, qsimd ) );
 }
@@ -1687,12 +1681,12 @@ void QuaternionMult( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 		return;
 	}
 
-	fltx4 psimd = LoadAlignedSIMD( p.Base() );
-	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
+	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 
 	fltx4 result = QuaternionMultSIMD( psimd, qsimd );
 
-	StoreUnalignedSIMD( qt.Base(), result );
+	DirectX::XMStoreFloat4( qt.XmBase(), result );
 }
 
 
@@ -1861,7 +1855,7 @@ void AngleQuaternion( const RadianEuler &angles, Quaternion &outQuat )
 #endif
 
 	fltx4 sine, cosine;
-	fltx4 radians = MulSIMD( LoadUnaligned3SIMD( &angles.x ), ReplicateX4( 0.5f ) );
+	fltx4 radians = MulSIMD( DirectX::XMLoadFloat3( angles.XmBase() ), ReplicateX4( 0.5f ) );
 	SinCos3SIMD( sine, cosine, radians );
 
 	// NOTE: The ordering here is *different* from the AngleQuaternion below
@@ -1895,7 +1889,7 @@ void AngleQuaternion( const QAngle &angles, Quaternion &outQuat )
 #endif
 
 	fltx4 sine, cosine;
-	fltx4 radians = MulSIMD( LoadUnaligned3SIMD( angles.Base() ), ReplicateX4( DEG2RAD( 0.5f ) ) );
+	fltx4 radians = MulSIMD( DirectX::XMLoadFloat3( angles.XmBase() ), ReplicateX4( DEG2RAD( 0.5f ) ) );
 	SinCos3SIMD( sine, cosine, radians );
 
 	// NOTE: The ordering here is *different* from the AngleQuaternion above
@@ -2485,7 +2479,7 @@ void Cubic_Spline(
 
 	output.Init();
 
-	Vector a, b, c, d;
+	Vector b, c;
 
 	// matrix row 1
 	VectorScale( p2, tSqrSqr * 2, b );
@@ -2620,7 +2614,7 @@ void Parabolic_Spline(
 
 	output.Init();
 
-	Vector a, b, c, d;
+	Vector a, b, c;
 
 	// matrix row 1
 	// no influence from t cubed

@@ -108,7 +108,7 @@ bool C_OP_ConstrainDistance::EnforceConstraint( int nStartBlock,
 			// change squared distance into approximate rsqr root
 			fltx4 guess = ReciprocalSqrtEstSaturateSIMD(dist_squared);
 			// newton iteration for 1/sqrt(x) : y(n+1)=1/2 (y(n)*(3-x*y(n)^2));
-			guess=MulSIMD(guess,SubSIMD(Four_Threes,MulSIMD(dist_squared,MulSIMD(guess,guess))));
+			guess=MulSIMD(guess,MsubSIMD(dist_squared,MulSIMD(guess,guess),Four_Threes));
 			guess=MulSIMD(Four_PointFives,guess);
 			pts *= guess;
 
@@ -265,9 +265,9 @@ bool C_OP_ConstrainDistanceToPath::EnforceConstraint( int nStartBlock,
 			// need to calculate and adjust for true radius =- we've only trivilally rejected note
 			// voodoo here - we update simdmaxdist for true radius, but not max dist^2, since
 			// that's used only for the trivial reject case, which we've already done
-			fltx4 R0=AddSIMD( Rad0, MulSIMD( RadmMinusRad0, TScale ) );
-			fltx4 R1=AddSIMD( Radm, MulSIMD( Rad1MinusRadm, TScale ) );
-			SIMDMaxDist = AddSIMD( R0, MulSIMD( SubSIMD( R1, R0 ), TScale) );
+			fltx4 R0=MaddSIMD( RadmMinusRad0, TScale, Rad0 );
+			fltx4 R1=MaddSIMD( Rad1MinusRadm, TScale, Radm );
+			SIMDMaxDist = MaddSIMD( SubSIMD( R1, R0 ), TScale, R0 );
 			
 			// now that we know the true radius, update our mask
 			TooFarMask = CmpGtSIMD( dist_squared, MulSIMD( SIMDMaxDist, SIMDMaxDist ) );
@@ -286,7 +286,7 @@ bool C_OP_ConstrainDistanceToPath::EnforceConstraint( int nStartBlock,
 			// change squared distance into approximate rsqr root
 			fltx4 guess=ReciprocalSqrtEstSIMD(dist_squared);
 			// newton iteration for 1/sqrt(x) : y(n+1)=1/2 (y(n)*(3-x*y(n)^2));
-			guess=MulSIMD(guess,SubSIMD(Four_Threes,MulSIMD(dist_squared,MulSIMD(guess,guess))));
+			guess=MulSIMD(guess,MsubSIMD(dist_squared,MulSIMD(guess,guess),Four_Threes));
 			guess=MulSIMD(Four_PointFives,guess);
 			pts *= guess;
 			
@@ -1012,9 +1012,9 @@ template<bool bKillonContact, bool bCached> bool C_OP_WorldTraceConstraint::Enfo
 		{
 			fltx4 fl4TailMask;
 			if ( nNumBlocks > 1 )
-				fl4TailMask = LoadAlignedIntSIMD( g_SIMD_AllOnesMask );
+				fl4TailMask = DirectX::XMLoadInt4A( g_SIMD_AllOnesMask );
 			else
-				fl4TailMask = LoadAlignedIntSIMD( g_SIMD_SkipTailMask[nNumValidParticlesInLastChunk] );
+				fl4TailMask = DirectX::XMLoadInt4A( g_SIMD_SkipTailMask[nNumValidParticlesInLastChunk] );
 			
 			WorldIntersectTNew( pPrevXYZ, &endPnt, m_nCollisionGroupNumber, nMask, &iData, m_nCollisionMode, pCtx, fl4TailMask, flTol );
 		}

@@ -25,7 +25,7 @@
 static fltx4 Four_MagicNumbers = { MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
 
 
-static ALIGN16 int32 idx_mask[4]= {0xffff, 0xffff, 0xffff, 0xffff};
+static alignas(16) int32 idx_mask[4]= {0xffff, 0xffff, 0xffff, 0xffff};
 
 #define MASK255 (*((fltx4 *)(& idx_mask )))
 
@@ -43,7 +43,7 @@ static inline float GetLatticePointValue( int idx_x, int idx_y, int idx_z )
 
 }
 
-fltx4 NoiseSIMD( const fltx4 & x, const fltx4 & y, const fltx4 & z )
+fltx4 XM_CALLCONV NoiseSIMD( DirectX::FXMVECTOR x, DirectX::FXMVECTOR y, DirectX::FXMVECTOR z )
 {
 	// use magic to convert to integer index
 	fltx4 x_idx = AndSIMD( MASK255, AddSIMD( x, Four_MagicNumbers ) );
@@ -87,17 +87,17 @@ fltx4 NoiseSIMD( const fltx4 & x, const fltx4 & y, const fltx4 & z )
 	// each axis in m128 form in [xyz]frac. Perfom the trilinear interpolation as SIMD ops
 
 	// first, do x interpolation
-	fltx4 l2d00 = AddSIMD( lattice000, MulSIMD( xfrac, SubSIMD( lattice100, lattice000 ) ) );
-	fltx4 l2d01 = AddSIMD( lattice001, MulSIMD( xfrac, SubSIMD( lattice101, lattice001 ) ) );
-	fltx4 l2d10 = AddSIMD( lattice010, MulSIMD( xfrac, SubSIMD( lattice110, lattice010 ) ) );
-	fltx4 l2d11 = AddSIMD( lattice011, MulSIMD( xfrac, SubSIMD( lattice111, lattice011 ) ) );
+	fltx4 l2d00 = MaddSIMD( xfrac, SubSIMD( lattice100, lattice000 ), lattice000 );
+	fltx4 l2d01 = MaddSIMD( xfrac, SubSIMD( lattice101, lattice001 ), lattice001 );
+	fltx4 l2d10 = MaddSIMD( xfrac, SubSIMD( lattice110, lattice010 ), lattice010 );
+	fltx4 l2d11 = MaddSIMD( xfrac, SubSIMD( lattice111, lattice011 ), lattice011 );
 
 	// now, do y interpolation
-	fltx4 l1d0 = AddSIMD( l2d00, MulSIMD( yfrac, SubSIMD( l2d10, l2d00 ) ) );
-	fltx4 l1d1 = AddSIMD( l2d01, MulSIMD( yfrac, SubSIMD( l2d11, l2d01 ) ) );
+	fltx4 l1d0 = MaddSIMD( yfrac, SubSIMD( l2d10, l2d00 ), l2d00 );
+	fltx4 l1d1 = MaddSIMD( yfrac, SubSIMD( l2d11, l2d01 ), l2d01 );
 
 	// final z interpolation
-	fltx4 rslt = AddSIMD( l1d0, MulSIMD( zfrac, SubSIMD( l1d1, l1d0 ) ) );
+	fltx4 rslt = MaddSIMD( zfrac, SubSIMD( l1d1, l1d0 ), l1d0 );
 
 	// map to 0..1
 	return MulSIMD( Four_Twos, SubSIMD( rslt, Four_PointFives ) );
@@ -105,7 +105,7 @@ fltx4 NoiseSIMD( const fltx4 & x, const fltx4 & y, const fltx4 & z )
 
 }
 
-fltx4 NoiseSIMD( FourVectors const &pos )
+fltx4 XM_CALLCONV NoiseSIMD( FourVectors const &pos )
 {
 	return NoiseSIMD( pos.x, pos.y, pos.z );
 }

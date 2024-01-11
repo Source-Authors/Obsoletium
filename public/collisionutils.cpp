@@ -645,10 +645,10 @@ bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax,
 	
 #if USE_SIMD_RAY_CHECKS
 	// Load the unaligned ray/box parameters into SIMD registers
-	fltx4 start = LoadUnaligned3SIMD(origin.Base());
-	fltx4 delta = LoadUnaligned3SIMD(vecDelta.Base());
-	fltx4 boxMins = LoadUnaligned3SIMD( boxMin.Base() );
-	fltx4 boxMaxs = LoadUnaligned3SIMD( boxMax.Base() );
+	fltx4 start = DirectX::XMLoadFloat3(origin.XmBase());
+	fltx4 delta = DirectX::XMLoadFloat3(vecDelta.XmBase());
+	fltx4 boxMins = DirectX::XMLoadFloat3(boxMin.XmBase());
+	fltx4 boxMaxs = DirectX::XMLoadFloat3(boxMax.XmBase());
 	fltx4 epsilon = ReplicateX4(flTolerance);
 	// compute the mins/maxs of the box expanded by the ray extents
 	// relocate the problem so that the ray start is at the origin.
@@ -698,10 +698,10 @@ bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax,
 #if defined(_X360) 
 	if (IsX360())
 	{
-		fltx4 delta = LoadUnaligned3SIMD(vecDelta.Base());
+		fltx4 delta = DirectX::XMLoadFloat3(vecDelta.XmBase());
 		return IsBoxIntersectingRay( 
-			LoadUnaligned3SIMD(boxMin.Base()), LoadUnaligned3SIMD(boxMax.Base()),
-			LoadUnaligned3SIMD(origin.Base()), delta, ReciprocalSIMD(delta), // ray parameters
+			DirectX::XMLoadFloat3(boxMin.XmBase()), DirectX::XMLoadFloat3(boxMax.XmBase()),
+			DirectX::XMLoadFloat3(origin.XmBase()), delta, ReciprocalSIMD(delta), // ray parameters
 			ReplicateX4(flTolerance) ///< eg from ReplicateX4(flTolerance)
 			);
 	}
@@ -769,10 +769,10 @@ bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax,
 {	
 #if USE_SIMD_RAY_CHECKS
 	// Load the unaligned ray/box parameters into SIMD registers
-	fltx4 start = LoadUnaligned3SIMD(origin.Base());
-	fltx4 delta = LoadUnaligned3SIMD(vecDelta.Base());
-	fltx4 boxMins = LoadUnaligned3SIMD( boxMin.Base() );
-	fltx4 boxMaxs = LoadUnaligned3SIMD( boxMax.Base() );
+	fltx4 start = DirectX::XMLoadFloat3(origin.XmBase());
+	fltx4 delta = DirectX::XMLoadFloat3(vecDelta.XmBase());
+	fltx4 boxMins = DirectX::XMLoadFloat3( boxMin.XmBase() );
+	fltx4 boxMaxs = DirectX::XMLoadFloat3( boxMax.XmBase() );
 	// compute the mins/maxs of the box expanded by the ray extents
 	// relocate the problem so that the ray start is at the origin.
 	boxMins = SubSIMD(boxMins, start);
@@ -791,7 +791,7 @@ bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax,
 
 	// now build the per-axis interval of t for intersections
 	fltx4 epsilon = ReplicateX4(flTolerance);
-	fltx4 invDelta = LoadUnaligned3SIMD(vecInvDelta.Base());
+	fltx4 invDelta = DirectX::XMLoadFloat3(vecInvDelta.XmBase());
 	boxMins = SubSIMD(boxMins, epsilon);
 	boxMaxs = AddSIMD(boxMaxs, epsilon);
 
@@ -824,8 +824,8 @@ bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax,
 	if (IsX360())
 	{
 		return IsBoxIntersectingRay( 
-			LoadUnaligned3SIMD(boxMin.Base()), LoadUnaligned3SIMD(boxMax.Base()),
-			LoadUnaligned3SIMD(origin.Base()), LoadUnaligned3SIMD(vecDelta.Base()), LoadUnaligned3SIMD(vecInvDelta.Base()), // ray parameters
+			DirectX::XMLoadFloat3(boxMin.XmBase()), DirectX::XMLoadFloat3(boxMax.XmBase()),
+			DirectX::XMLoadFloat3(origin.XmBase()), DirectX::XMLoadFloat3(vecDelta.XmBase()), DirectX::XMLoadFloat3(vecInvDelta.XmBase()), // ray parameters
 			ReplicateX4(flTolerance) ///< eg from ReplicateX4(flTolerance)
 			);
 	}
@@ -927,29 +927,16 @@ bool FASTCALL IsBoxIntersectingRay( const Vector& vecBoxMin, const Vector& vecBo
 //-----------------------------------------------------------------------------
 
 
-#ifdef _X360
-bool FASTCALL IsBoxIntersectingRay( fltx4 boxMin, fltx4 boxMax, 
-								    fltx4 origin, fltx4 delta, fltx4 invDelta, // ray parameters
-									fltx4 vTolerance ///< eg from ReplicateX4(flTolerance)
-									)
-#else
-bool FASTCALL IsBoxIntersectingRay( const fltx4 &inBoxMin, const fltx4 & inBoxMax, 
-								   const fltx4 & origin, const fltx4 & delta, const fltx4 & invDelta, // ray parameters
-								   const fltx4 & vTolerance ///< eg from ReplicateX4(flTolerance)
+bool XM_CALLCONV IsBoxIntersectingRay( DirectX::FXMVECTOR inBoxMin, DirectX::FXMVECTOR inBoxMax, 
+								   DirectX::FXMVECTOR origin, DirectX::GXMVECTOR delta, DirectX::HXMVECTOR invDelta, // ray parameters
+								   DirectX::HXMVECTOR vTolerance ///< eg from ReplicateX4(flTolerance)
 								   )
-#endif
 {
 	// Load the unaligned ray/box parameters into SIMD registers
 	// compute the mins/maxs of the box expanded by the ray extents
 	// relocate the problem so that the ray start is at the origin.
-
-#ifdef _X360
-	boxMin = SubSIMD(boxMin, origin);
-	boxMax = SubSIMD(boxMax, origin);
-#else
 	fltx4 boxMin = SubSIMD(inBoxMin, origin);
 	fltx4 boxMax = SubSIMD(inBoxMax, origin);
-#endif
 
 	// Check to see if the origin (start point) and the end point (delta) are on the same side
 	// of any of the box sides - if so there can be no intersection
@@ -983,11 +970,11 @@ bool FASTCALL IsBoxIntersectingRay( const fltx4 &inBoxMin, const fltx4 & inBoxMa
 }
 
 
-bool FASTCALL IsBoxIntersectingRay( const fltx4& boxMin, const fltx4& boxMax, 
+bool XM_CALLCONV IsBoxIntersectingRay(DirectX::FXMVECTOR boxMin, DirectX::FXMVECTOR boxMax, 
 								   const Ray_t& ray, float flTolerance )
 {
-	fltx4 rayStart = LoadAlignedSIMD(ray.m_Start);
-	fltx4 rayExtents = LoadAlignedSIMD(ray.m_Extents);
+	fltx4 rayStart = DirectX::XMLoadFloat4A(ray.m_Start.XmBase());
+	fltx4 rayExtents = DirectX::XMLoadFloat4A(ray.m_Extents.XmBase());
 	if ( !ray.m_IsSwept )
 	{
 		fltx4 rayMins = SubSIMD(rayStart, rayExtents);
@@ -997,15 +984,15 @@ bool FASTCALL IsBoxIntersectingRay( const fltx4& boxMin, const fltx4& boxMax,
 		rayMaxs = AddSIMD(rayMaxs, vTolerance);
 
 		VectorAligned vecBoxMin, vecBoxMax, vecRayMins, vecRayMaxs;
-		StoreAlignedSIMD( vecBoxMin.Base(), boxMin );
-		StoreAlignedSIMD( vecBoxMax.Base(), boxMax );
-		StoreAlignedSIMD( vecRayMins.Base(), rayMins );
-		StoreAlignedSIMD( vecRayMaxs.Base(), rayMaxs );
+		DirectX::XMStoreFloat4A( vecBoxMin.XmBase(), boxMin );
+		DirectX::XMStoreFloat4A( vecBoxMax.XmBase(), boxMax );
+		DirectX::XMStoreFloat4A( vecRayMins.XmBase(), rayMins );
+		DirectX::XMStoreFloat4A( vecRayMaxs.XmBase(), rayMaxs );
 
 		return IsBoxIntersectingBox( vecBoxMin, vecBoxMax, vecRayMins, vecRayMaxs );
 	}
 
-	fltx4 rayDelta = LoadAlignedSIMD(ray.m_Delta);
+	fltx4 rayDelta = DirectX::XMLoadFloat4A(ray.m_Delta.XmBase());
 	fltx4 vecExpandedBoxMin, vecExpandedBoxMax;
 	vecExpandedBoxMin = SubSIMD( boxMin, rayExtents );
 	vecExpandedBoxMax = AddSIMD( boxMax, rayExtents );

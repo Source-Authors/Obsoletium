@@ -47,7 +47,9 @@ bool SIMDTest(FourVectors (&xyz)[PROBLEM_SIZE],
 
     xyz[i].LoadAndSwizzle(fourPoints[0], fourPoints[1], fourPoints[2],
                           fourPoints[3]);
-    creation_time[i] = LoadUnalignedSIMD(fourStartTimes);
+
+    const DirectX::XMFLOAT4A t(fourStartTimes);
+    creation_time[i] = DirectX::XMLoadFloat4A(&t);
   }
 
 #ifdef RECORD_OUTPUT
@@ -128,9 +130,9 @@ bool SIMDTest(FourVectors (&xyz)[PROBLEM_SIZE],
         // rejected note voodoo here - we update simdmaxdist for true radius,
         // but not max dist^2, since that's used only for the trivial reject
         // case, which we've already done
-        fltx4 R0 = AddSIMD(Rad0, MulSIMD(RadmMinusRad0, TScale));
-        fltx4 R1 = AddSIMD(Radm, MulSIMD(Rad1MinusRadm, TScale));
-        SIMDMaxDist = AddSIMD(R0, MulSIMD(SubSIMD(R1, R0), TScale));
+        fltx4 R0 = MaddSIMD(RadmMinusRad0, TScale, Rad0);
+        fltx4 R1 = MaddSIMD(Rad1MinusRadm, TScale, Radm);
+        SIMDMaxDist = MaddSIMD(SubSIMD(R1, R0), TScale, R0);
 
         // now that we know the true radius, update our mask
         TooFarMask = CmpGtSIMD(dist_squared, MulSIMD(SIMDMaxDist, SIMDMaxDist));
@@ -145,7 +147,7 @@ bool SIMDTest(FourVectors (&xyz)[PROBLEM_SIZE],
         // newton iteration for 1/sqrt(x) : y(n+1)=1/2 (y(n)*(3-x*y(n)^2));
         guess = MulSIMD(
             guess,
-            SubSIMD(Four_Threes, MulSIMD(dist_squared, MulSIMD(guess, guess))));
+            MsubSIMD(dist_squared, MulSIMD(guess, guess),Four_Threes));
         guess = MulSIMD(Four_PointFives, guess);
         pts *= guess;
 

@@ -941,9 +941,9 @@ struct ExtendedParticleRenderData_t : ParticleRenderData_t
 };
 
 
-typedef struct ALIGN16 _FourInts : CAlignedNewDelete<16> {
+typedef struct alignas(16) _FourInts : CAlignedNewDelete<16> {
 	int32 m_nValue[4];
-} ALIGN16_POST FourInts;
+} FourInts;
 
 
 
@@ -1001,9 +1001,9 @@ struct CParticleSIMDTransformation
 
 	FORCEINLINE void VectorRotate( FourVectors &InPnt )
 	{
-		fltx4 fl4OutX = SubSIMD( AddSIMD( MulSIMD( InPnt.x, m_v4Fwd.x ), MulSIMD( InPnt.z, m_v4Up.x ) ), MulSIMD( InPnt.y, m_v4Right.x ) );
-		fltx4 fl4OutY = SubSIMD( AddSIMD( MulSIMD( InPnt.x, m_v4Fwd.y ), MulSIMD( InPnt.z, m_v4Up.y ) ), MulSIMD( InPnt.y, m_v4Right.y ) );
-		InPnt.z = SubSIMD( AddSIMD( MulSIMD( InPnt.x, m_v4Fwd.z ), MulSIMD( InPnt.z, m_v4Up.z ) ), MulSIMD( InPnt.y, m_v4Right.z ) );
+		fltx4 fl4OutX = SubSIMD( MaddSIMD( InPnt.x, m_v4Fwd.x, MulSIMD( InPnt.z, m_v4Up.x ) ), MulSIMD( InPnt.y, m_v4Right.x ) );
+		fltx4 fl4OutY = SubSIMD( MaddSIMD( InPnt.x, m_v4Fwd.y, MulSIMD( InPnt.z, m_v4Up.y ) ), MulSIMD( InPnt.y, m_v4Right.y ) );
+		InPnt.z = SubSIMD( MaddSIMD( InPnt.x, m_v4Fwd.z, MulSIMD( InPnt.z, m_v4Up.z ) ), MulSIMD( InPnt.y, m_v4Right.z ) );
 		InPnt.x = fl4OutX;
 		InPnt.y = fl4OutY;
 	}

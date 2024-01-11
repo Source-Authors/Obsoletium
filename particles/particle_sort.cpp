@@ -14,7 +14,7 @@
 #include "tier0/memdbgon.h"
 
 
-static ALIGN16 ParticleRenderData_t s_SortedIndexList[MAX_PARTICLES_IN_A_SYSTEM] ALIGN16_POST;
+static alignas(16) ParticleRenderData_t s_SortedIndexList[MAX_PARTICLES_IN_A_SYSTEM];
 
 
 enum EParticleSortKeyType
@@ -85,8 +85,8 @@ template<EParticleSortKeyType eSortKeyMode> void s_GenerateData( Vector CameraPo
 				Zdiff = SubSIMD( EyePos.z, fl4Z );
 			}
 
-			fl4SortKey = AddSIMD( MulSIMD( Xdiff, Xdiff ),
-								  AddSIMD( MulSIMD( Ydiff, Ydiff ),
+			fl4SortKey = MaddSIMD( Xdiff, Xdiff,
+								  MaddSIMD( Ydiff, Ydiff,
 										   MulSIMD( Zdiff, Zdiff ) ) );
 		}
 		else 
@@ -105,10 +105,10 @@ template<EParticleSortKeyType eSortKeyMode> void s_GenerateData( Vector CameraPo
 		}
 
 		// convert float 0..1 to int 0..255
-		fl4FinalAlpha = AddSIMD( MulSIMD( fl4FinalAlpha, fl4AlphaScale ), Four_2ToThe23s );
+		fl4FinalAlpha = MaddSIMD( fl4FinalAlpha, fl4AlphaScale, Four_2ToThe23s );
 
 		// now, we will use simd transpose to write the output
-		fltx4 i4Indices = AndSIMD( fl4OutIdx, 	LoadAlignedSIMD( (float *) g_SIMD_Low16BitsMask ) );
+		fltx4 i4Indices = AndSIMD( fl4OutIdx, DirectX::XMLoadInt4A( g_SIMD_Low16BitsMask ) );
 		TransposeSIMD( fl4SortKey, i4Indices, fl4FinalRadius, fl4FinalAlpha );
 		pOutUnSorted[0] = fl4SortKey;
 		pOutUnSorted[1] = i4Indices;

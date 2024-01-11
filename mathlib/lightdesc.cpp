@@ -56,14 +56,14 @@ void LightDesc_t::ComputeLightAtPointsForDirectional(
 	fltx4 strength=delta*normal;
 	if (DoHalfLambert)
 	{
-		strength=AddSIMD(MulSIMD(strength,Four_PointFives),Four_PointFives);
+		strength=MaddSIMD(strength,Four_PointFives,Four_PointFives);
 	}
 	else
 		strength=MaxSIMD(Four_Zeros,delta*normal);
 		
-	color.x=AddSIMD(color.x,MulSIMD(strength,ReplicateX4(m_Color.x)));
-	color.y=AddSIMD(color.y,MulSIMD(strength,ReplicateX4(m_Color.y)));
-	color.z=AddSIMD(color.z,MulSIMD(strength,ReplicateX4(m_Color.z)));
+	color.x=MaddSIMD(strength,ReplicateX4(m_Color.x),color.x);
+	color.y=MaddSIMD(strength,ReplicateX4(m_Color.y),color.y);
+	color.z=MaddSIMD(strength,ReplicateX4(m_Color.z),color.z);
 }
 
 
@@ -103,12 +103,12 @@ void LightDesc_t::ComputeLightAtPoints( const FourVectors &pos, const FourVector
 
 	if( m_Flags & LIGHTTYPE_OPTIMIZATIONFLAGS_HAS_ATTENUATION1 )
 	{
-		falloff=AddSIMD(falloff,MulSIMD(ReplicateX4(m_Attenuation1),SqrtEstSIMD(dist2)));
+		falloff=MaddSIMD(ReplicateX4(m_Attenuation1),SqrtEstSIMD(dist2),falloff);
 	}
 
 	if( m_Flags & LIGHTTYPE_OPTIMIZATIONFLAGS_HAS_ATTENUATION2 )
 	{
-		falloff=AddSIMD(falloff,MulSIMD(ReplicateX4(m_Attenuation2),dist2));
+		falloff=MaddSIMD(ReplicateX4(m_Attenuation2),dist2,falloff);
 	}
 
 	falloff=ReciprocalEstSIMD(falloff);
@@ -124,7 +124,7 @@ void LightDesc_t::ComputeLightAtPoints( const FourVectors &pos, const FourVector
 	fltx4 strength=delta*normal;
 	if (DoHalfLambert)
 	{
-		strength=AddSIMD(MulSIMD(strength,Four_PointFives),Four_PointFives);
+		strength=MaddSIMD(strength,Four_PointFives,Four_PointFives);
 	}
 	else
 		strength=MaxSIMD(Four_Zeros,delta*normal);
@@ -162,9 +162,9 @@ void LightDesc_t::ComputeLightAtPoints( const FourVectors &pos, const FourVector
 			break;
 	}
 	strength=MulSIMD(strength,falloff);
-	color.x=AddSIMD(color.x,MulSIMD(strength,ReplicateX4(m_Color.x)));
-	color.y=AddSIMD(color.y,MulSIMD(strength,ReplicateX4(m_Color.y)));
-	color.z=AddSIMD(color.z,MulSIMD(strength,ReplicateX4(m_Color.z)));
+	color.x=MaddSIMD(strength,ReplicateX4(m_Color.x),color.x);
+	color.y=MaddSIMD(strength,ReplicateX4(m_Color.y),color.y);
+	color.z=MaddSIMD(strength,ReplicateX4(m_Color.z),color.z);
 }
 
 
@@ -203,12 +203,12 @@ void LightDesc_t::ComputeNonincidenceLightAtPoints( const FourVectors &pos, Four
 
 	if( m_Flags & LIGHTTYPE_OPTIMIZATIONFLAGS_HAS_ATTENUATION1 )
 	{
-		falloff=AddSIMD(falloff,MulSIMD(ReplicateX4(m_Attenuation1),SqrtEstSIMD(dist2)));
+		falloff=MaddSIMD(ReplicateX4(m_Attenuation1),SqrtEstSIMD(dist2),falloff);
 	}
 
 	if( m_Flags & LIGHTTYPE_OPTIMIZATIONFLAGS_HAS_ATTENUATION2 )
 	{
-		falloff=AddSIMD(falloff,MulSIMD(ReplicateX4(m_Attenuation2),dist2));
+		falloff=MaddSIMD(ReplicateX4(m_Attenuation2),dist2,falloff);
 	}
 
 	falloff=ReciprocalEstSIMD(falloff);
@@ -258,9 +258,9 @@ void LightDesc_t::ComputeNonincidenceLightAtPoints( const FourVectors &pos, Four
 			break;
 	}
 	strength=MulSIMD(strength,falloff);
-	color.x=AddSIMD(color.x,MulSIMD(strength,ReplicateX4(m_Color.x)));
-	color.y=AddSIMD(color.y,MulSIMD(strength,ReplicateX4(m_Color.y)));
-	color.z=AddSIMD(color.z,MulSIMD(strength,ReplicateX4(m_Color.z)));
+	color.x=MaddSIMD(strength,ReplicateX4(m_Color.x),color.x);
+	color.y=MaddSIMD(strength,ReplicateX4(m_Color.y),color.y);
+	color.z=MaddSIMD(strength,ReplicateX4(m_Color.z),color.z);
 }
 
 

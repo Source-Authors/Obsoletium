@@ -259,28 +259,19 @@ bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax,
 									const Vector& invDelta, float flTolerance = 0.0f );
 
 
-// On the PC, we can't pass fltx4's in registers like this. On the x360, it is 
-// much better if we do.
-#ifdef _X360
-bool FASTCALL IsBoxIntersectingRay( fltx4 boxMin, fltx4 boxMax, 
-								   fltx4 origin, fltx4 delta, fltx4 invDelta, // ray parameters
-								   fltx4 vTolerance = LoadZeroSIMD() ///< eg from ReplicateX4(flTolerance)
+bool XM_CALLCONV IsBoxIntersectingRay( DirectX::FXMVECTOR boxMin, DirectX::FXMVECTOR boxMax, 
+								   DirectX::FXMVECTOR origin, DirectX::GXMVECTOR delta, DirectX::HXMVECTOR invDelta, // ray parameters
+								   DirectX::HXMVECTOR vTolerance = Four_Zeros ///< eg from ReplicateX4(flTolerance)
 								   );
-#else
-bool FASTCALL IsBoxIntersectingRay( const fltx4 &boxMin, const fltx4 &boxMax, 
-								   const fltx4 & origin, const fltx4 & delta, const fltx4 & invDelta, // ray parameters
-								   const fltx4 & vTolerance = Four_Zeros ///< eg from ReplicateX4(flTolerance)
-								   );
-#endif
 
-bool inline FASTCALL IsBoxIntersectingRay( const fltx4& boxMin, const fltx4& boxMax, 
-								   const fltx4& origin, const fltx4& delta, float flTolerance = 0.0f )
+bool inline XM_CALLCONV IsBoxIntersectingRay( DirectX::FXMVECTOR boxMin, DirectX::FXMVECTOR boxMax, 
+								   DirectX::FXMVECTOR origin, DirectX::GXMVECTOR delta, float flTolerance = 0.0f )
 {
 	return IsBoxIntersectingRay( boxMin, boxMax, origin, delta, ReciprocalSIMD(delta), ReplicateX4(flTolerance) );
 }
 
 
-bool FASTCALL IsBoxIntersectingRay( const fltx4& boxMin, const fltx4& boxMax, 
+bool XM_CALLCONV IsBoxIntersectingRay( DirectX::FXMVECTOR boxMin, DirectX::FXMVECTOR boxMax, 
 								   const Ray_t& ray, float flTolerance = 0.0f );
 
 
@@ -296,9 +287,9 @@ bool IsPointInBox( const Vector& pt, const Vector& boxMin, const Vector& boxMax 
 
 
 // SIMD version
-FORCEINLINE bool IsPointInBox( const fltx4& pt, const fltx4& boxMin, const fltx4& boxMax )
+FORCEINLINE bool XM_CALLCONV IsPointInBox( DirectX::FXMVECTOR pt, DirectX::FXMVECTOR boxMin, DirectX::FXMVECTOR boxMax )
 {
-	fltx4 greater = CmpGtSIMD( pt,boxMax );
+	fltx4 greater = CmpGtSIMD( pt, boxMax );
 	fltx4 less = CmpLtSIMD( pt, boxMin );
 	return (IsAllZeros(SetWToZeroSIMD(OrSIMD(greater,less))));
 }

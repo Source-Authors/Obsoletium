@@ -969,7 +969,7 @@ inline void CStudioRender::R_ComputeLightAtPoints3( const FourVectors &pos, cons
 		fltx4 strength=delta*normal;
 		if (SSELightingHalfLambert)
 		{
-			strength=AddSIMD(MulSIMD(strength,Four_PointFives),Four_PointFives);
+			strength=MaddSIMD(strength,Four_PointFives,Four_PointFives);
 		}
 		else
 			strength=MaxSIMD(Four_Zeros,delta*normal);
@@ -1009,9 +1009,9 @@ inline void CStudioRender::R_ComputeLightAtPoints3( const FourVectors &pos, cons
 				break;
 		}
 		strength=MulSIMD(strength,falloff);
-		color.x=AddSIMD(color.x,MulSIMD(strength,ReplicateX4(wl->m_Color.x)));
-		color.y=AddSIMD(color.y,MulSIMD(strength,ReplicateX4(wl->m_Color.y)));
-		color.z=AddSIMD(color.z,MulSIMD(strength,ReplicateX4(wl->m_Color.z)));
+		color.x=MaddSIMD(strength,ReplicateX4(wl->m_Color.x),color.x);
+		color.y=MaddSIMD(strength,ReplicateX4(wl->m_Color.y),color.y);
+		color.z=MaddSIMD(strength,ReplicateX4(wl->m_Color.z),color.z);
 	}
 }
 
@@ -1095,15 +1095,15 @@ public:
 		Vector *pSrcNorm;
 		Vector4D *pSrcTangentS = NULL;
 
-		ALIGN16 ModelVertexDX8_t dstVertex ALIGN16_POST;
+		alignas(16) ModelVertexDX8_t dstVertex;
 		dstVertex.m_flBoneWeights[0] = 1.0f;
 		dstVertex.m_flBoneWeights[1] = 0.0f;
 		dstVertex.m_nBoneIndices = 0;
 		dstVertex.m_nColor = 0xFFFFFFFF;
 		dstVertex.m_vecUserData.Init( 1.0f, 0.0f, 0.0f, 1.0f );
 
-		ALIGN16 matrix3x4_t temp ALIGN16_POST;
-		ALIGN16 matrix3x4_t *pSkinMat ALIGN16_POST;
+		alignas(16) matrix3x4_t temp;
+		alignas(16) matrix3x4_t *pSkinMat;
 
 		int ntemp[PREFETCH_VERT_COUNT];
 
@@ -1138,7 +1138,7 @@ public:
 		}
 #endif
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined(_XM_SSE_INTRINSICS_)
 		if ( nHasSIMD )
 		{
 			// Precaches the data
@@ -1148,7 +1148,7 @@ public:
 		for ( int i = 0; i < PREFETCH_VERT_COUNT; ++i )
 		{
 			ntemp[i] = pGroupToMesh[i];
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined(_XM_SSE_INTRINSICS_)
 			if ( nHasSIMD )
 			{
 				char *pMem = (char*)&pVertices[ntemp[i]];
@@ -1165,7 +1165,7 @@ public:
 		int n, idx;
 		for ( int j=0; j < numVertices; ++j )
 		{
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined(_XM_SSE_INTRINSICS_)
 			if ( nHasSIMD )
 			{
 				char *pMem = (char*)&pGroupToMesh[j + PREFETCH_VERT_COUNT + 1];
@@ -1218,7 +1218,7 @@ public:
 			R_TransformVert( pSrcPos, pSrcNorm, pSrcTangentS, pSkinMat, 
 				*(VectorAligned*)&dstVertex.m_vecPosition, dstVertex.m_vecNormal, *(Vector4DAligned*)&dstVertex.m_vecUserData );
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined(_XM_SSE_INTRINSICS_)
 			if ( nHasSIMD )
 			{
 				_mm_prefetch( (char*)&pVertices[ntemp[idx]], _MM_HINT_NTA);
@@ -1362,7 +1362,7 @@ public:
 		Vector *pSrcPos;
 		Vector *pSrcNorm;
 		
-		ALIGN16 ModelVertexDX8_t dstVertexBuf[N_VERTS_TO_DO_AT_ONCE] ALIGN16_POST;
+		alignas(16) ModelVertexDX8_t dstVertexBuf[N_VERTS_TO_DO_AT_ONCE];
 		for(int i=0;i<N_VERTS_TO_DO_AT_ONCE;i++)
 		{
 			dstVertexBuf[i].m_flBoneWeights[0] = 1.0f;
@@ -1393,8 +1393,8 @@ public:
 			}
 		}
 
-		ALIGN16 matrix3x4_t temp ALIGN16_POST;
-		ALIGN16 matrix3x4_t *pSkinMat ALIGN16_POST;
+		alignas(16) matrix3x4_t temp;
+		alignas(16) matrix3x4_t *pSkinMat;
 
 		// Mouth related stuff...
 		float fIllum = 1.0f;
@@ -1735,8 +1735,8 @@ void CStudioRender::R_StudioSoftwareProcessMesh_Normals( mstudiomesh_t* pmesh, C
 		int numVertices, unsigned short* pGroupToMesh, StudioModelLighting_t lighting, bool doFlex, float r_blend,
 		bool bShowNormals, bool bShowTangentFrame )
 {
-	ALIGN16 matrix3x4_t temp ALIGN16_POST;
-	ALIGN16 matrix3x4_t *pSkinMat ALIGN16_POST;
+	alignas(16) matrix3x4_t temp;
+	alignas(16) matrix3x4_t *pSkinMat;
 
 	Vector *pSrcPos = NULL;
 	Vector *pSrcNorm = NULL;

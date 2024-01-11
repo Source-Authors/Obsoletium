@@ -9,6 +9,7 @@
 
 #include "tier0/type_traits.h"
 
+#include <DirectXMath.h>
 #include <atomic>
 #include <climits>
 
@@ -134,12 +135,36 @@ extern "C" unsigned long __declspec(dllimport) __stdcall GetCurrentThreadId();
 
 inline void ThreadPause()
 {
-#if defined( PLATFORM_WINDOWS_PC )
+#if defined(_XM_SSE_INTRINSICS_)
 	// Intrinsic for __asm pause; from <intrin.h>
 	_mm_pause();
-#elif POSIX
-	__asm __volatile( "pause" );
-#elif defined( _X360 )
+#elif defined(_XM_ARM_NEON_INTRINSICS_)
+	// Copyright (c) 2015-2024 SSE2NEON Contributors
+	// 
+	// Permission is hereby granted, free of charge, to any person obtaining a copy
+	// of this software and associated documentation files (the "Software"), to deal
+	// in the Software without restriction, including without limitation the rights
+	// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	// copies of the Software, and to permit persons to whom the Software is
+	// furnished to do so, subject to the following conditions:
+	// 
+	// The above copyright notice and this permission notice shall be included in all
+	// copies or substantial portions of the Software.
+	// 
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	// SOFTWARE.
+	// 
+	// Pause the processor. This is typically used in spin-wait loops and depending
+	// on the x86 processor typical values are in the 40-100 cycle range. The
+	// 'yield' instruction isn't a good fit beacuse it's effectively a nop on most
+	// Arm cores. Experience with several databases has shown has shown an 'isb' is
+	// a reasonable approximation.
+	__asm__ __volatile__("isb\n");
 #else
 #error "Please define your platform"
 #endif
@@ -260,7 +285,7 @@ inline void const *ThreadInterlockedCompareExchangePointerToConst( void const * 
 inline bool ThreadInterlockedAssignPointerToConstIf( void const * volatile *p, void const *value, void const *comperand )			{ return ThreadInterlockedAssignPointerIf( const_cast < void * volatile * > ( p ), const_cast < void * > ( value ), const_cast < void * > ( comperand ) ); }
 
 #if defined( PLATFORM_64BITS )
-#if defined (_WIN32) 
+#if defined (_WIN32) && defined( _XM_SSE_INTRINSICS_ )
 typedef __m128i int128;
 inline int128 int128_zero()	{ return _mm_setzero_si128(); }
 #else

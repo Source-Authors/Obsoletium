@@ -574,7 +574,7 @@ void C_OP_FadeOut::Operate( CParticleCollection *pParticles, float flStrength,  
 		fltx4 fl4FadeOutTime = Pow_FixedPoint_Exponent_SIMD(
 			pParticles->RandomFloat( *pParticleID, nRandomOffset ),
 			nSSEFixedExponent );
-		fl4FadeOutTime = AddSIMD( FadeTimeMin, MulSIMD( FadeTimeWidth, fl4FadeOutTime ) );
+		fl4FadeOutTime = MaddSIMD( FadeTimeWidth, fl4FadeOutTime, FadeTimeMin );
 
 		fltx4 fl4Lifespan;
 
@@ -700,7 +700,7 @@ void C_OP_OscillateScalar::Operate( CParticleCollection *pParticles, float flStr
 	fltx4 fl4CosFactorMultiplier = ReplicateX4( m_flOscMult );
 	fltx4 fl4CosFactorAdd = ReplicateX4( m_flOscAdd );
 
-	fltx4 fl4CosFactor = AddSIMD( MulSIMD( fl4CosFactorMultiplier, fl4CurTime ), fl4CosFactorAdd );
+	fltx4 fl4CosFactor = MaddSIMD( fl4CosFactorMultiplier, fl4CurTime, fl4CosFactorAdd );
 	fltx4 fl4CosFactorProp = fl4CosFactorMultiplier;
 
 	fltx4 fl4StartTimeMin = ReplicateX4( m_flStartTime_min );
@@ -731,29 +731,29 @@ void C_OP_OscillateScalar::Operate( CParticleCollection *pParticles, float flStr
 		}
 
 		fltx4 fl4StartTime= pParticles->RandomFloat( *pParticleId, nRandomOffset + 11);
-		fl4StartTime = AddSIMD( fl4StartTimeMin, MulSIMD( fl4StartTimeWidth, fl4StartTime ) );
+		fl4StartTime = MaddSIMD( fl4StartTimeWidth, fl4StartTime, fl4StartTimeMin );
 		fltx4 fl4EndTime= pParticles->RandomFloat( *pParticleId, nRandomOffset + 12);
-		fl4EndTime = AddSIMD( fl4EndTimeMin, MulSIMD( fl4EndTimeWidth, fl4EndTime ) );
+		fl4EndTime = MaddSIMD( fl4EndTimeWidth, fl4EndTime, fl4EndTimeMin );
 		fl4GoodMask = AndSIMD( fl4GoodMask, CmpGeSIMD( fl4LifeTime, fl4StartTime ) );
 		fl4GoodMask = AndSIMD( fl4GoodMask, CmpLtSIMD( fl4LifeTime, fl4EndTime ) );
 		if ( IsAnyNegative( fl4GoodMask ) )
 		{
 			fltx4 fl4Frequency = pParticles->RandomFloat( *pParticleId, nRandomOffset );
-			fl4Frequency = AddSIMD( fl4FrequencyMin, MulSIMD( fl4FrequencyWidth, fl4Frequency ) );
+			fl4Frequency = MaddSIMD( fl4FrequencyWidth, fl4Frequency, fl4FrequencyMin );
 			fltx4 fl4Rate= pParticles->RandomFloat( *pParticleId, nRandomOffset + 1);
-			fl4Rate = AddSIMD( fl4RateMin, MulSIMD( fl4RateWidth, fl4Rate ) );
+			fl4Rate = MaddSIMD( fl4RateWidth, fl4Rate, fl4RateMin );
 			fltx4 fl4Cos;
 			if ( m_bProportional )
 			{
 				fl4LifeTime = MulSIMD( SubSIMD( fl4CurTime, *pCreationTime ), ReciprocalEstSIMD( fl4LifeDuration ) );
-				fl4Cos = AddSIMD( MulSIMD( fl4CosFactorProp, MulSIMD( fl4LifeTime, fl4Frequency )), fl4CosFactorAdd );
+				fl4Cos = MaddSIMD( fl4CosFactorProp, MulSIMD( fl4LifeTime, fl4Frequency ), fl4CosFactorAdd );
 			}
 			else
 			{
 				fl4Cos = MulSIMD( fl4CosFactor, fl4Frequency );
 			}
 			fltx4 fl4OscMultiplier = MulSIMD( fl4Rate, fl4ScaleFactor);
-			fl4OscVal = AddSIMD ( *pOscField, MulSIMD ( fl4OscMultiplier, SinEst01SIMD( fl4Cos ) ) );
+			fl4OscVal = MaddSIMD( fl4OscMultiplier, SinEst01SIMD( fl4Cos ), *pOscField );
 			if ( m_nField == 7)
 			{
 				*pOscField = MaskedAssign( fl4GoodMask, 
@@ -848,7 +848,7 @@ void C_OP_OscillateVector::Operate( CParticleCollection *pParticles, float flStr
 	fltx4 fl4CosFactorMultiplier = ReplicateX4( m_flOscMult );
 	fltx4 fl4CosFactorAdd = ReplicateX4( m_flOscAdd );
 
-	fltx4 fl4CosFactor = AddSIMD( MulSIMD( fl4CosFactorMultiplier, fl4CurTime ), fl4CosFactorAdd );
+	fltx4 fl4CosFactor = MaddSIMD( fl4CosFactorMultiplier, fl4CurTime, fl4CosFactorAdd );
 	fltx4 fl4CosFactorProp = fl4CosFactorMultiplier;
 
 	fltx4 fl4StartTimeMin = ReplicateX4( m_flStartTime_min );
@@ -883,9 +883,9 @@ void C_OP_OscillateVector::Operate( CParticleCollection *pParticles, float flStr
 		}
 
 		fltx4 fl4StartTime= pParticles->RandomFloat( *pParticleId, nRandomOffset + 11);
-		fl4StartTime = AddSIMD( fl4StartTimeMin, MulSIMD( fl4StartTimeWidth, fl4StartTime ) );
+		fl4StartTime = MaddSIMD( fl4StartTimeWidth, fl4StartTime, fl4StartTimeMin );
 		fltx4 fl4EndTime= pParticles->RandomFloat( *pParticleId, nRandomOffset + 12);
-		fl4EndTime = AddSIMD( fl4EndTimeMin, MulSIMD( fl4EndTimeWidth, fl4EndTime ) );
+		fl4EndTime = MaddSIMD( fl4EndTimeWidth, fl4EndTime, fl4EndTimeMin );
 		fl4GoodMask = AndSIMD( fl4GoodMask, CmpGeSIMD( fl4LifeTime, fl4StartTime ) );
 		fl4GoodMask = AndSIMD( fl4GoodMask, CmpLtSIMD( fl4LifeTime, fl4EndTime ) );
 		if ( IsAnyNegative( fl4GoodMask ) )
@@ -910,9 +910,9 @@ void C_OP_OscillateVector::Operate( CParticleCollection *pParticles, float flStr
 			if ( m_bProportional )
 			{
 				fl4LifeTime = MulSIMD( SubSIMD( fl4CurTime, *pCreationTime ), ReciprocalEstSIMD( fl4LifeDuration ) );
-				fvCos.x = AddSIMD( MulSIMD( fl4CosFactorProp, MulSIMD( fvFrequency.x, fl4LifeTime )), fl4CosFactorAdd );
-				fvCos.y = AddSIMD( MulSIMD( fl4CosFactorProp, MulSIMD( fvFrequency.y, fl4LifeTime )), fl4CosFactorAdd );
-				fvCos.z = AddSIMD( MulSIMD( fl4CosFactorProp, MulSIMD( fvFrequency.z, fl4LifeTime )), fl4CosFactorAdd );
+				fvCos.x = MaddSIMD( fl4CosFactorProp, MulSIMD( fvFrequency.x, fl4LifeTime ), fl4CosFactorAdd );
+				fvCos.y = MaddSIMD( fl4CosFactorProp, MulSIMD( fvFrequency.y, fl4LifeTime ), fl4CosFactorAdd );
+				fvCos.z = MaddSIMD( fl4CosFactorProp, MulSIMD( fvFrequency.z, fl4LifeTime ), fl4CosFactorAdd );
 			}
 			else
 			{
@@ -929,9 +929,9 @@ void C_OP_OscillateVector::Operate( CParticleCollection *pParticles, float flStr
 
 			FourVectors fvOutput = *pOscField;
 
-			fvOscVal.x = AddSIMD ( fvOutput.x, MulSIMD ( fvOscMultiplier.x, SinEst01SIMD( fvCos.x ) ) );
-			fvOscVal.y = AddSIMD ( fvOutput.y, MulSIMD ( fvOscMultiplier.y, SinEst01SIMD( fvCos.y ) ) );
-			fvOscVal.z = AddSIMD ( fvOutput.z, MulSIMD ( fvOscMultiplier.z, SinEst01SIMD( fvCos.z ) ) );
+			fvOscVal.x = MaddSIMD( fvOscMultiplier.x, SinEst01SIMD( fvCos.x ), fvOutput.x );
+			fvOscVal.y = MaddSIMD( fvOscMultiplier.y, SinEst01SIMD( fvCos.y ), fvOutput.y );
+			fvOscVal.z = MaddSIMD( fvOscMultiplier.z, SinEst01SIMD( fvCos.z ), fvOutput.z );
 
 			if ( m_nField == 6)
 			{
@@ -1077,7 +1077,7 @@ void C_OP_Noise::Operate( CParticleCollection *pParticles, float flStrength, voi
 	{
 		FourVectors Coord = *pXYZ;
 		Coord *= CoordScale;
-		*( pAttr )=AddSIMD( ValueBase, MulSIMD( ValueScale, NoiseSIMD( Coord ) ) );
+		*( pAttr )=MaddSIMD( ValueScale, NoiseSIMD( Coord ), ValueBase );
 
 		++pAttr;
 		++pXYZ;
@@ -1145,11 +1145,11 @@ void C_OP_VectorNoise::Operate( CParticleCollection *pParticles, float flStrengt
 	{
 		FourVectors Coord = *pXYZ;
 		Coord *= CoordScale;
-		pAttr->x=AddSIMD( ValueBaseX, MulSIMD( ValueScaleX, NoiseSIMD( Coord ) ) );
+		pAttr->x=MaddSIMD( ValueScaleX, NoiseSIMD( Coord ), ValueBaseX );
 		Coord += ofs_y;
-		pAttr->y=AddSIMD( ValueBaseY, MulSIMD( ValueScaleY, NoiseSIMD( Coord ) ) );
+		pAttr->y=MaddSIMD( ValueScaleY, NoiseSIMD( Coord ), ValueBaseY );
 		Coord += ofs_z;
-		pAttr->z=AddSIMD( ValueBaseZ, MulSIMD( ValueScaleZ, NoiseSIMD( Coord ) ) );
+		pAttr->z=MaddSIMD( ValueScaleZ, NoiseSIMD( Coord ), ValueBaseZ );
 
 		++pAttr;
 		++pXYZ;
@@ -1432,7 +1432,7 @@ void CGeneralSpin::Operate( CParticleCollection *pParticles, float flStrength,  
 		
 		fltx4 Age = SubSIMD( now, *pCreationTimeStamp );
 		fltx4 RScale = MaxSIMD( Four_Zeros, 
-								  SubSIMD( Four_Ones, MulSIMD( Age, OOSpinFadeRate ) ) );
+								  MsubSIMD( Age, OOSpinFadeRate, Four_Ones ) );
 
 		// Cap the rotation at a minimum speed
 		fltx4 deltaRot = MulSIMD( Rot_Add, RScale );
@@ -1646,7 +1646,7 @@ void C_OP_InterpolateRadius::Operate( CParticleCollection *pParticles, float flS
 			if ( IsAnyNegative( fl4GoodMask ) )
 			{
 				fltx4 fl4FadeWindow = MulSIMD( SubSIMD( fl4LifeTime, fl4StartTime ), fl4OOTimeWidth );
-				fl4FadeWindow = AddSIMD( fl4StartScale, MulSIMD( SimpleSpline( fl4FadeWindow ), fl4ScaleWidth ) );
+				fl4FadeWindow = MaddSIMD( SimpleSpline( fl4FadeWindow ), fl4ScaleWidth, fl4StartScale );
 				// !!speed!! - can anyone really tell the diff between spline and lerp here?
 				*pRadius = MaskedAssign( 
 					fl4GoodMask, MulSIMD( *pInitialRadius, fl4FadeWindow ), *pRadius );
@@ -1671,7 +1671,7 @@ void C_OP_InterpolateRadius::Operate( CParticleCollection *pParticles, float flS
 				if ( IsAnyNegative( fl4GoodMask ) )
 				{
 					fltx4 fl4FadeWindow = MulSIMD( SubSIMD( fl4LifeTime, fl4StartTime ), fl4OOTimeWidth );
-					fl4FadeWindow = AddSIMD( fl4StartScale, MulSIMD( fl4FadeWindow, fl4ScaleWidth ) );
+					fl4FadeWindow = MaddSIMD( fl4FadeWindow, fl4ScaleWidth, fl4StartScale );
 					*pRadius = MaskedAssign( fl4GoodMask, MulSIMD( *pInitialRadius, fl4FadeWindow ), *pRadius );
 				}
 				++pCreationTime;
@@ -1699,7 +1699,7 @@ void C_OP_InterpolateRadius::Operate( CParticleCollection *pParticles, float flS
 					// should do the trick...
 					fl4FadeWindow = OrSIMD( AndSIMD( fl4GoodMask, fl4EndTime ), AndNotSIMD( fl4GoodMask, fl4EndTime ) );
 #endif
-					fl4FadeWindow = AddSIMD( fl4StartScale, MulSIMD( BiasSIMD( fl4FadeWindow, m_fl4BiasParam ), fl4ScaleWidth ) );
+					fl4FadeWindow = MaddSIMD( BiasSIMD( fl4FadeWindow, m_fl4BiasParam ), fl4ScaleWidth, fl4StartScale );
 					*pRadius = MaskedAssign( 
 						fl4GoodMask, 
 						MulSIMD( *pInitialRadius, fl4FadeWindow ), *pRadius );
@@ -1787,9 +1787,9 @@ void C_OP_ColorInterpolate::Operate( CParticleCollection *pParticles, float flSt
 				fltx4 T = MulSIMD( SubSIMD( flLifeTime, lowRange ), ooInRange );
 				T = MinSIMD( Four_Ones, MaxSIMD( Four_Zeros, T ) );
 				T = SimpleSpline( T );
-				pColor->x = MaskedAssign( goodMask, AddSIMD( pInitialColor->x, MulSIMD( T, SubSIMD( targetR, pInitialColor->x ) ) ), pColor->x );
-				pColor->y = MaskedAssign( goodMask, AddSIMD( pInitialColor->y, MulSIMD( T, SubSIMD( targetG, pInitialColor->y ) ) ), pColor->y );
-				pColor->z = MaskedAssign( goodMask, AddSIMD( pInitialColor->z, MulSIMD( T, SubSIMD( targetB, pInitialColor->z ) ) ), pColor->z );
+				pColor->x = MaskedAssign( goodMask, MaddSIMD( T, SubSIMD( targetR, pInitialColor->x ), pInitialColor->x ), pColor->x );
+				pColor->y = MaskedAssign( goodMask, MaddSIMD( T, SubSIMD( targetG, pInitialColor->y ), pInitialColor->y ), pColor->y );
+				pColor->z = MaskedAssign( goodMask, MaddSIMD( T, SubSIMD( targetB, pInitialColor->z ), pInitialColor->z ), pColor->z );
 			}
 			++pColor;
 			++pCreationTime;
@@ -1810,9 +1810,9 @@ void C_OP_ColorInterpolate::Operate( CParticleCollection *pParticles, float flSt
 				fltx4 T = MulSIMD( SubSIMD( flLifeTime, lowRange ), ooInRange );
 				T = MinSIMD( Four_Ones, MaxSIMD( Four_Zeros, T ) );
 			
-				pColor->x = MaskedAssign( goodMask, AddSIMD( pInitialColor->x, MulSIMD( T, SubSIMD( targetR, pInitialColor->x ) ) ), pColor->x );
-				pColor->y = MaskedAssign( goodMask, AddSIMD( pInitialColor->y, MulSIMD( T, SubSIMD( targetG, pInitialColor->y ) ) ), pColor->y );
-				pColor->z = MaskedAssign( goodMask, AddSIMD( pInitialColor->z, MulSIMD( T, SubSIMD( targetB, pInitialColor->z ) ) ), pColor->z );
+				pColor->x = MaskedAssign( goodMask, MaddSIMD( T, SubSIMD( targetR, pInitialColor->x ), pInitialColor->x ), pColor->x );
+				pColor->y = MaskedAssign( goodMask, MaddSIMD( T, SubSIMD( targetG, pInitialColor->y ), pInitialColor->y ), pColor->y );
+				pColor->z = MaskedAssign( goodMask, MaddSIMD( T, SubSIMD( targetB, pInitialColor->z ), pInitialColor->z ), pColor->z );
 			}
 			++pColor;
 			++pCreationTime;
@@ -2060,7 +2060,7 @@ void C_OP_PositionLock::Operate( CParticleCollection *pParticles, float flStreng
 				fltx4 fl4Dist = ofs.length();
 				fl4Dist = BiasSIMD( MinSIMD( Four_Ones, MulSIMD( fl4Dist, fl4OORange ) ), fl4BiasParm );
 				v4ScaledDelta *= SubSIMD( Four_Ones, fl4Dist );
-				fl4LockStrength = SubSIMD( Four_Ones, MulSIMD ( fl4Dist, fl4LockStrength ) );
+				fl4LockStrength = MsubSIMD( fl4Dist, fl4LockStrength, Four_Ones );
 			}
 			if ( m_bLockRot )
 			{
@@ -2110,10 +2110,10 @@ void C_OP_PositionLock::Operate( CParticleCollection *pParticles, float flStreng
 			fl4LifeTime = MaxSIMD( Four_Zeros, MinSIMD( Four_Ones,
 														MulSIMD( fl4LifeTime, ReciprocalEstSIMD( *pLifeDuration ) ) ) );
 			fltx4 fl4StartTime = Pow_FixedPoint_Exponent_SIMD( RandSIMD( nContext ), nSSEStartExponent );
-			fl4StartTime = AddSIMD( fl4StartBias, MulSIMD( fl4StartTime, fl4StartRange ) );
+			fl4StartTime = MaddSIMD( fl4StartTime, fl4StartRange, fl4StartBias );
 
 			fltx4 fl4EndTime = Pow_FixedPoint_Exponent_SIMD( RandSIMD( nContext ), nSSEEndExponent );
-			fl4EndTime = AddSIMD( fl4EndBias, MulSIMD( fl4EndTime, fl4EndRange ) );
+			fl4EndTime = MaddSIMD( fl4EndTime, fl4EndRange, fl4EndBias );
 	   
 			// now, determine "lockedness"
 			fltx4 fl4LockScale = DivSIMD( SubSIMD( fl4LifeTime, fl4StartTime ), SubSIMD( fl4EndTime, fl4StartTime ) );
@@ -2132,7 +2132,7 @@ void C_OP_PositionLock::Operate( CParticleCollection *pParticles, float flStreng
 					fltx4 fl4Dist = ofs.length();
 					fl4Dist = BiasSIMD( MinSIMD( Four_Ones, MulSIMD( fl4Dist, fl4OORange ) ), fl4BiasParm );
 					v4ScaledDelta *= SubSIMD( Four_Ones, fl4Dist );
-					fl4LockStrength = SubSIMD( Four_Ones, MulSIMD ( fl4Dist, fl4LockStrength ) );
+					fl4LockStrength = MsubSIMD( fl4Dist, fl4LockStrength, Four_Ones );
 				}
 				if ( m_bLockRot )
 				{

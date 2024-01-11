@@ -2123,7 +2123,7 @@ int CDetailObjectSystem::SortSpritesBackToFront( int nLeaf, const Vector &viewOr
 static fltx4 Four_MagicNumbers={ MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
 static fltx4 Four_255s={ 255.0, 255.0, 255.0, 255.0 };
 
-static ALIGN16 int32 And255Mask[4] ALIGN16_POST = {0xff,0xff,0xff,0xff};
+static alignas(16) int32 And255Mask[4] = {0xff,0xff,0xff,0xff};
 #define PIXMASK ( * ( reinterpret_cast< fltx4 *>( &And255Mask ) ) )
 
 int CDetailObjectSystem::BuildOutSortedSprites( CFastDetailLeafSpriteList *pData,
@@ -2178,8 +2178,8 @@ int CDetailObjectSystem::BuildOutSortedSprites( CFastDetailLeafSpriteList *pData
 			fltx4 alpha = MulSIMD( falloffFactor, SubSIMD( distanceSquared, startFade ) );
 			alpha = SubSIMD( Four_Ones, MinSIMD( MaxSIMD( alpha, Four_Zeros), Four_Ones ) );
 
-			pQuadBufferOut->m_Alpha = AddSIMD( Four_MagicNumbers, 
-											   MulSIMD( Four_255s,alpha ) );
+			pQuadBufferOut->m_Alpha = MaddSIMD( Four_255s, alpha, 
+												Four_MagicNumbers );
 
 			vecPos0 += vecDx;
 			pQuadBufferOut->m_Coords[0] = vecPos0;

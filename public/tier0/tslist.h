@@ -25,7 +25,7 @@
 
 #if defined( PLATFORM_64BITS )
 
-#if defined (PLATFORM_WINDOWS) 
+#if defined (PLATFORM_WINDOWS)  && defined( _XM_SSE_INTRINSICS_ )
 //typedef __m128i int128;
 //inline int128 int128_zero()	{ return _mm_setzero_si128(); }
 #else  // PLATFORM_WINDOWS

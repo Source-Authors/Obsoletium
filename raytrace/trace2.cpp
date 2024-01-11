@@ -18,7 +18,7 @@ static uint32 MapDistanceToPixel(float t)
 #define MAGIC_NUMBER (1<<23)
 
 static fltx4 Four_MagicNumbers={ MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
-static ALIGN16 int32 Four_255s[4]= {0xff,0xff,0xff,0xff};
+static alignas(16) int32 Four_255s[4] = { 0xff,0xff,0xff,0xff };
 #define PIXMASK ( * ( reinterpret_cast< fltx4 *>( &Four_255s ) ) )
 
 void MapLinearIntensities(FourVectors const &intens,uint32 *p1, uint32 *p2, uint32 *p3, uint32 *p4)
@@ -43,8 +43,8 @@ void MapLinearIntensities(FourVectors const &intens,uint32 *p1, uint32 *p2, uint
 	*(p4)=(SubInt(r, 3))|(SubInt(g, 3)<<8)|(SubInt(b, 3)<<16);
 }
 
-static ALIGN16 uint32 signmask[4]={0x80000000,0x80000000,0x80000000,0x80000000};
-static ALIGN16 int32 all_ones[4]={-1,-1,-1,-1};
+static alignas(16) uint32 signmask[4]={0x80000000,0x80000000,0x80000000,0x80000000};
+static alignas(16) int32 all_ones[4]={-1,-1,-1,-1};
 static fltx4 all_zeros={0,0,0,0};
 static fltx4 TraceLimit={1.0e20,1.0e20,1.0e20,1.0e20};
 
