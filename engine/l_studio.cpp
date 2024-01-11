@@ -2200,7 +2200,7 @@ void CModelRender::DrawModelExecute( const DrawModelState_t &state, const ModelR
 	g_pStudioRender->SetViewState( CurrentViewOrigin(), CurrentViewRight(), CurrentViewUp(), CurrentViewForward() );
 
 	// Color + alpha modulation
-	g_pStudioRender->SetColorModulation( r_colormod );
+	g_pStudioRender->SetColorModulation( r_colormod.Base() );
 	g_pStudioRender->SetAlphaModulation( r_blend );
 
 	Assert( modelloader->IsLoaded( pInfo.pModel ) );

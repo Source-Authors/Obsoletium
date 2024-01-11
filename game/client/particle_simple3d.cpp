@@ -12,9 +12,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-// Defined in pm_math.c
-float anglemod( float a );
-
 //------------------------------------------------------------------------------
 // Purpose :
 // Input   :

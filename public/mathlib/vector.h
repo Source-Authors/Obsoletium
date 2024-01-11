@@ -79,7 +79,7 @@ public:
 	 // TODO (Ilya): Should there be an init that takes a single float for consistency?
 
 	// Got any nasty NAN's?
-	bool IsValid() const;
+	bool XM_CALLCONV IsValid() const;
 	void Invalidate();
 
 	// array access...
@@ -136,15 +136,18 @@ public:
 	FORCEINLINE vec_t LengthSqr(void) const
 	{ 
 		CHECK_VALID(*this);
-		return (x*x + y*y + z*z);		
+		return DirectX::XMVectorGetX( DirectX::XMVector3LengthSq( DirectX::XMLoadFloat3( XmBase() ) ) );
 	}
 
 	// return true if this vector is (0,0,0) within tolerance
 	bool IsZero( float tolerance = 0.01f ) const
 	{
-		return (x > -tolerance && x < tolerance &&
-				y > -tolerance && y < tolerance &&
-				z > -tolerance && z < tolerance);
+		return DirectX::XMVector3NearEqual
+		(
+			DirectX::g_XMZero,
+			DirectX::XMLoadFloat3( XmBase() ),
+			DirectX::XMVectorReplicate( tolerance )
+		);
 	}
 
 	vec_t	NormalizeInPlace();
@@ -153,7 +156,7 @@ public:
 	bool	IsLengthLessThan( float val ) const;
 
 	// check if a vector is within the box defined by two other vectors
-	FORCEINLINE bool WithinAABox( Vector const &boxmin, Vector const &boxmax);
+	FORCEINLINE bool WithinAABox( Vector const &boxmin, Vector const &boxmax) const;
  
 	// Get the distance from this vector to the other one.
 	vec_t	DistTo(const Vector &vOther) const;
@@ -163,13 +166,13 @@ public:
 	// may be able to tidy this up after switching to VC7
 	FORCEINLINE vec_t DistToSqr(const Vector &vOther) const
 	{
-		Vector delta;
+		DirectX::XMVECTOR self = DirectX::XMLoadFloat3( XmBase() );
+		DirectX::XMVECTOR other = DirectX::XMLoadFloat3( vOther.XmBase() );
 
-		delta.x = x - vOther.x;
-		delta.y = y - vOther.y;
-		delta.z = z - vOther.z;
-
-		return delta.LengthSqr();
+		return DirectX::XMVectorGetX
+		(
+			DirectX::XMVector3LengthSq( DirectX::XMVectorSubtract( self, other ) )
+		);
 	}
 
 	// Copy
@@ -178,7 +181,7 @@ public:
 	// Multiply, add, and assign to this (ie: *this = a + b * scalar). This
 	// is about 12% faster than the actual vector equation (because it's done per-component
 	// rather than per-vector).
-	void	MulAdd(const Vector& a, const Vector& b, float scalar);	
+	[[deprecated("Use VectorMA")]] void	MulAdd(const Vector& a, const Vector& b, float scalar);	
 
 	// Dot product.
 	vec_t	Dot(const Vector& vOther) const;			
@@ -443,7 +446,7 @@ public:
 		Init(vOther.x, vOther.y, vOther.z);
 		return *this;
 	}
-	
+
 	// dimhotepus: Better DirectX math integration.
 	DirectX::XMFLOAT4A* XmBase()
 	{
@@ -502,6 +505,9 @@ FORCEINLINE vec_t DotProduct(const Vector& a, const Vector& b);
 
 // Cross product
 void CrossProduct(const Vector& a, const Vector& b, Vector& result );
+void CrossProduct(const Vector& a, const Vector& b, DirectX::XMFLOAT4 *result );
+void CrossProduct(const DirectX::XMFLOAT4 *a, const Vector& b, DirectX::XMFLOAT4 *result );
+void CrossProduct(const DirectX::XMFLOAT4 *a, const Vector& b, Vector &result );
 
 // Store the min or max of each of x, y, and z into the result.
 void VectorMin( const Vector &a, const Vector &b, Vector &result );
@@ -602,9 +608,26 @@ inline void Vector::Init( vec_t ix, vec_t iy, vec_t iz )
 
 inline void Vector::Random( vec_t minVal, vec_t maxVal )
 {
-	x = minVal + ((float)rand() / VALVE_RAND_MAX) * (maxVal - minVal);
-	y = minVal + ((float)rand() / VALVE_RAND_MAX) * (maxVal - minVal);
-	z = minVal + ((float)rand() / VALVE_RAND_MAX) * (maxVal - minVal);
+	DirectX::XMVECTOR rn = DirectX::XMVectorSet
+	(
+		(static_cast<float>(rand()) / VALVE_RAND_MAX),
+		(static_cast<float>(rand()) / VALVE_RAND_MAX),
+		(static_cast<float>(rand()) / VALVE_RAND_MAX),
+		0.0f
+	);
+	DirectX::XMVECTOR mn = DirectX::XMVectorReplicate( minVal );
+
+	DirectX::XMStoreFloat3
+	(
+		XmBase(),
+		DirectX::XMVectorMultiplyAdd
+		(
+			rn,
+			DirectX::XMVectorSubtract( DirectX::XMVectorReplicate( maxVal ), mn ),
+			mn
+		)
+	);
+
 	CHECK_VALID(*this);
 }
 
@@ -680,7 +703,7 @@ inline const Vector2D& Vector::AsVector2D() const
 
 inline bool Vector::IsValid() const
 {
-	return IsFinite(x) && IsFinite(y) && IsFinite(z);
+	return !DirectX::XMVector3IsNaN( DirectX::XMLoadFloat3( XmBase() ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -691,7 +714,7 @@ inline void Vector::Invalidate()
 {
 //#ifdef _DEBUG
 //#ifdef VECTOR_PARANOIA
-	x = y = z = VEC_T_NAN;
+	DirectX::XMStoreFloat3( XmBase(), DirectX::XMVectorSplatQNaN() );
 //#endif
 //#endif
 }
@@ -704,14 +727,17 @@ inline bool Vector::operator==( const Vector& src ) const
 {
 	CHECK_VALID(src);
 	CHECK_VALID(*this);
-	return (src.x == x) && (src.y == y) && (src.z == z);
+
+	return DirectX::XMVector3Equal
+	(
+		DirectX::XMLoadFloat3( XmBase() ),
+		DirectX::XMLoadFloat3( src.XmBase() )
+	);
 }
 
 inline bool Vector::operator!=( const Vector& src ) const
 {
-	CHECK_VALID(src);
-	CHECK_VALID(*this);
-	return (src.x != x) || (src.y != y) || (src.z != z);
+	return !(*this == src);
 }
 
 
@@ -727,7 +753,7 @@ FORCEINLINE void VectorCopy( const Vector& src, Vector& dst )
 	dst.z = src.z;
 }
 
-inline void	Vector::CopyToArray(float* rgfl) const		
+inline void	Vector::CopyToArray(float* rgfl) const
 { 
 	Assert( rgfl );
 	CHECK_VALID(*this);
@@ -742,26 +768,26 @@ inline void	Vector::CopyToArray(float* rgfl) const
 inline void Vector::Negate()
 { 
 	CHECK_VALID(*this);
-	x = -x; y = -y; z = -z; 
+	x = -x; y = -y; z = -z;
 } 
 
-FORCEINLINE  Vector& Vector::operator+=(const Vector& v)	
+FORCEINLINE  Vector& Vector::operator+=(const Vector& v)
 { 
 	CHECK_VALID(*this);
 	CHECK_VALID(v);
-	x+=v.x; y+=v.y; z += v.z;	
+	x+=v.x; y+=v.y; z += v.z;
 	return *this;
 }
 
-FORCEINLINE  Vector& Vector::operator-=(const Vector& v)	
+FORCEINLINE  Vector& Vector::operator-=(const Vector& v)
 { 
 	CHECK_VALID(*this);
 	CHECK_VALID(v);
-	x-=v.x; y-=v.y; z -= v.z;	
+	x-=v.x; y-=v.y; z -= v.z;
 	return *this;
 }
 
-FORCEINLINE  Vector& Vector::operator*=(float fl)	
+FORCEINLINE  Vector& Vector::operator*=(float fl)
 {
 	x *= fl;
 	y *= fl;
@@ -770,7 +796,7 @@ FORCEINLINE  Vector& Vector::operator*=(float fl)
 	return *this;
 }
 
-FORCEINLINE  Vector& Vector::operator*=(const Vector& v)	
+FORCEINLINE  Vector& Vector::operator*=(const Vector& v)
 { 
 	CHECK_VALID(v);
 	x *= v.x;
@@ -781,7 +807,7 @@ FORCEINLINE  Vector& Vector::operator*=(const Vector& v)
 }
 
 // this ought to be an opcode.
-FORCEINLINE Vector&	Vector::operator+=(float fl) 
+FORCEINLINE Vector&	Vector::operator+=(float fl)
 {
 	x += fl;
 	y += fl;
@@ -1129,36 +1155,52 @@ FORCEINLINE void VectorAdd( const Vector& a, const Vector& b, Vector& c )
 {
 	CHECK_VALID(a);
 	CHECK_VALID(b);
-	c.x = a.x + b.x;
-	c.y = a.y + b.y;
-	c.z = a.z + b.z;
+
+	DirectX::XMStoreFloat3
+	(
+		c.XmBase(),
+		DirectX::XMVectorAdd( DirectX::XMLoadFloat3( a.XmBase() ), DirectX::XMLoadFloat3( b.XmBase() ) )
+	);
 }
 
 FORCEINLINE void VectorSubtract( const Vector& a, const Vector& b, Vector& c )
 {
 	CHECK_VALID(a);
 	CHECK_VALID(b);
-	c.x = a.x - b.x;
-	c.y = a.y - b.y;
-	c.z = a.z - b.z;
+
+	DirectX::XMStoreFloat3
+	(
+		c.XmBase(),
+		DirectX::XMVectorSubtract( DirectX::XMLoadFloat3( a.XmBase() ), DirectX::XMLoadFloat3( b.XmBase() ) )
+	);
 }
 
 FORCEINLINE void VectorMultiply( const Vector& a, vec_t b, Vector& c )
 {
 	CHECK_VALID(a);
 	Assert( IsFinite(b) );
-	c.x = a.x * b;
-	c.y = a.y * b;
-	c.z = a.z * b;
+
+	DirectX::XMStoreFloat3
+	(
+		c.XmBase(),
+		DirectX::XMVectorScale( DirectX::XMLoadFloat3( a.XmBase() ), b )
+	);
 }
 
 FORCEINLINE void VectorMultiply( const Vector& a, const Vector& b, Vector& c )
 {
 	CHECK_VALID(a);
 	CHECK_VALID(b);
-	c.x = a.x * b.x;
-	c.y = a.y * b.y;
-	c.z = a.z * b.z;
+
+	DirectX::XMStoreFloat3
+	(
+		c.XmBase(),
+		DirectX::XMVectorMultiply
+		(
+			DirectX::XMLoadFloat3( a.XmBase() ),
+			DirectX::XMLoadFloat3( b.XmBase() )
+		)
+	);
 }
 
 // for backwards compatability
@@ -1172,10 +1214,8 @@ FORCEINLINE void VectorDivide( const Vector& a, vec_t b, Vector& c )
 {
 	CHECK_VALID(a);
 	Assert( b != 0.0f );
-	vec_t oob = 1.0f / b;
-	c.x = a.x * oob;
-	c.y = a.y * oob;
-	c.z = a.z * oob;
+
+	VectorMultiply( a, 1.0f / b, c );
 }
 
 FORCEINLINE void VectorDivide( const Vector& a, const Vector& b, Vector& c )
@@ -1183,9 +1223,17 @@ FORCEINLINE void VectorDivide( const Vector& a, const Vector& b, Vector& c )
 	CHECK_VALID(a);
 	CHECK_VALID(b);
 	Assert( (b.x != 0.0f) && (b.y != 0.0f) && (b.z != 0.0f) );
-	c.x = a.x / b.x;
-	c.y = a.y / b.y;
-	c.z = a.z / b.z;
+
+	DirectX::XMStoreFloat3
+	(
+		c.XmBase(),
+		DirectX::XMVectorDivide
+		(
+			DirectX::XMLoadFloat3( a.XmBase() ),
+			// Ensure no zero division on W.
+			DirectX::XMVectorSetW( DirectX::XMLoadFloat3( b.XmBase() ), 1.0f )
+		)
+	);
 }
 
 // FIXME: Remove
@@ -1194,18 +1242,34 @@ inline void	Vector::MulAdd(const Vector& a, const Vector& b, float scalar)
 {
 	CHECK_VALID(a);
 	CHECK_VALID(b);
-	x = a.x + b.x * scalar;
-	y = a.y + b.y * scalar;
-	z = a.z + b.z * scalar;
+
+	DirectX::XMStoreFloat3
+	(
+		XmBase(),
+		DirectX::XMVectorMultiplyAdd
+		(
+			DirectX::XMLoadFloat3( b.XmBase() ),
+			DirectX::XMVectorReplicate( scalar ),
+			DirectX::XMLoadFloat3( a.XmBase() )
+		)
+	);
 }
 
 inline void VectorLerp(const Vector& src1, const Vector& src2, vec_t t, Vector& dest )
 {
 	CHECK_VALID(src1);
 	CHECK_VALID(src2);
-	dest.x = src1.x + (src2.x - src1.x) * t;
-	dest.y = src1.y + (src2.y - src1.y) * t;
-	dest.z = src1.z + (src2.z - src1.z) * t;
+
+	DirectX::XMStoreFloat3
+	(
+		dest.XmBase(),
+		DirectX::XMVectorLerp
+		(
+			DirectX::XMLoadFloat3( src1.XmBase() ),
+			DirectX::XMLoadFloat3( src2.XmBase() ),
+			t
+		)
+	);
 }
 
 inline Vector VectorLerp(const Vector& src1, const Vector& src2, vec_t t )
@@ -1247,7 +1311,15 @@ FORCEINLINE vec_t DotProduct(const Vector& a, const Vector& b)
 { 
 	CHECK_VALID(a);
 	CHECK_VALID(b);
-	return( a.x*b.x + a.y*b.y + a.z*b.z ); 
+
+	return DirectX::XMVectorGetX
+	(
+		DirectX::XMVector3Dot
+		(
+			DirectX::XMLoadFloat3( a.XmBase() ),
+			DirectX::XMLoadFloat3( b.XmBase() )
+		)
+	);
 }
 
 // for backwards compatability
@@ -1257,28 +1329,118 @@ inline vec_t Vector::Dot( const Vector& vOther ) const
 	return DotProduct( *this, vOther );
 }
 
-inline void CrossProduct(const Vector& a, const Vector& b, Vector& result )
+inline void CrossProduct( const Vector& a, const Vector& b, Vector& result )
 {
 	CHECK_VALID(a);
 	CHECK_VALID(b);
 	Assert( &a != &result );
 	Assert( &b != &result );
-	result.x = a.y*b.z - a.z*b.y;
-	result.y = a.z*b.x - a.x*b.z;
-	result.z = a.x*b.y - a.y*b.x;
+
+	DirectX::XMStoreFloat3
+	(
+		result.XmBase(),
+		DirectX::XMVector3Cross
+		(
+			DirectX::XMLoadFloat3( a.XmBase() ),
+			DirectX::XMLoadFloat3( b.XmBase() )
+		)
+	);
+}
+
+inline void CrossProduct( const Vector& a, const Vector& b, DirectX::XMFLOAT4 *result )
+{
+	CHECK_VALID(a);
+	CHECK_VALID(b);
+	Assert(result);
+
+	DirectX::XMStoreFloat4
+	(
+		result,
+		DirectX::XMVector3Cross
+		(
+			DirectX::XMLoadFloat3( a.XmBase() ),
+			DirectX::XMLoadFloat3( b.XmBase() )
+		)
+	);
+}
+
+inline void CrossProduct(const DirectX::XMFLOAT4 *a, const Vector& b, DirectX::XMFLOAT4 *result )
+{
+	Assert(a);
+	CHECK_VALID(b);
+	Assert(result);
+
+	DirectX::XMStoreFloat4
+	(
+		result,
+		DirectX::XMVector3Cross
+		(
+			DirectX::XMLoadFloat4( a ),
+			DirectX::XMLoadFloat3( b.XmBase() )
+		)
+	);
+}
+
+inline void CrossProduct(const DirectX::XMFLOAT4 *a, const Vector& b, Vector &result )
+{
+	Assert(a);
+	CHECK_VALID(b);
+
+	DirectX::XMStoreFloat3
+	(
+		result.XmBase(),
+		DirectX::XMVector3Cross
+		(
+			DirectX::XMLoadFloat4( a ),
+			DirectX::XMLoadFloat3( b.XmBase() )
+		)
+	);
+}
+
+inline vec_t DotProductAbs( const Vector &v0, const DirectX::XMFLOAT4 *v1 )
+{
+	CHECK_VALID(v0);
+	Assert(v1);
+
+	return DirectX::XMVectorGetX
+	(
+		DirectX::XMVectorSum
+		(
+			DirectX::XMVectorAbs
+			(
+				DirectX::XMVectorMultiply
+				(
+					DirectX::XMLoadFloat3( v0.XmBase() ),
+					DirectX::XMLoadFloat4( v1 )
+				)
+			)
+		)
+	);
 }
 
 inline vec_t DotProductAbs( const Vector &v0, const Vector &v1 )
 {
 	CHECK_VALID(v0);
 	CHECK_VALID(v1);
-	return FloatMakePositive(v0.x*v1.x) + FloatMakePositive(v0.y*v1.y) + FloatMakePositive(v0.z*v1.z);
+
+	return DirectX::XMVectorGetX
+	(
+		DirectX::XMVectorSum
+		(
+			DirectX::XMVectorAbs
+			(
+				DirectX::XMVectorMultiply
+				(
+					DirectX::XMLoadFloat3( v0.XmBase() ),
+					DirectX::XMLoadFloat3( v1.XmBase() )
+				)
+			)
+		)
+	);
 }
 
-inline vec_t DotProductAbs( const Vector &v0, const float *v1 )
-{
-	return FloatMakePositive(v0.x * v1[0]) + FloatMakePositive(v0.y * v1[1]) + FloatMakePositive(v0.z * v1[2]);
-}
+// dimhotepus: Too error prone. Use safer XMFLOAT3 variant above.
+inline vec_t DotProductAbs( const Vector &v0, const float *v1 ) = delete;
 
 //-----------------------------------------------------------------------------
 // length
@@ -1287,7 +1449,14 @@ inline vec_t DotProductAbs( const Vector &v0, const float *v1 )
 inline vec_t VectorLength( const Vector& v )
 {
 	CHECK_VALID(v);
-	return (vec_t)FastSqrt(v.x*v.x + v.y*v.y + v.z*v.z);		
+
+	return DirectX::XMVectorGetX
+	(
+		DirectX::XMVector3Length
+		(
+			DirectX::XMLoadFloat3( v.XmBase() )
+		)
+	);
 }
 
 
@@ -1302,35 +1471,15 @@ inline vec_t Vector::Length(void) const
 // Normalization
 //-----------------------------------------------------------------------------
 
-/*
-// FIXME: Can't use until we're un-macroed in mathlib.h
-inline vec_t VectorNormalize( Vector& v )
-{
-	Assert( v.IsValid() );
-	vec_t l = v.Length();
-	if (l != 0.0f)
-	{
-		v /= l;
-	}
-	else
-	{
-		// FIXME: 
-		// Just copying the existing implemenation; shouldn't res.z == 0?
-		v.x = v.y = 0.0f; v.z = 1.0f;
-	}
-	return l;
-}
-*/
-
-
 // check a point against a box
-bool Vector::WithinAABox( Vector const &boxmin, Vector const &boxmax)
+bool Vector::WithinAABox( Vector const &boxmin, Vector const &boxmax) const
 {
-	return ( 
-		( x >= boxmin.x ) && ( x <= boxmax.x) &&
-		( y >= boxmin.y ) && ( y <= boxmax.y) &&
-		( z >= boxmin.z ) && ( z <= boxmax.z)
-		);
+	DirectX::XMVECTOR bmin = DirectX::XMLoadFloat3( boxmin.XmBase() );
+	DirectX::XMVECTOR bmax = DirectX::XMLoadFloat3( boxmax.XmBase() );
+	DirectX::XMVECTOR self = DirectX::XMLoadFloat3( XmBase() );
+
+	return DirectX::XMVector3GreaterOrEqual( self, bmin ) &&
+		DirectX::XMVector3LessOrEqual( self, bmax );
 }
 
 //-----------------------------------------------------------------------------
@@ -1349,11 +1498,12 @@ inline vec_t Vector::DistTo(const Vector &vOther) const
 //-----------------------------------------------------------------------------
 inline bool VectorsAreEqual( const Vector& src1, const Vector& src2, float tolerance )
 {
-	if (FloatMakePositive(src1.x - src2.x) > tolerance)
-		return false;
-	if (FloatMakePositive(src1.y - src2.y) > tolerance)
-		return false;
-	return (FloatMakePositive(src1.z - src2.z) <= tolerance);
+	return DirectX::XMVector3NearEqual
+	(
+		DirectX::XMLoadFloat3( src1.XmBase() ),
+		DirectX::XMLoadFloat3( src2.XmBase() ),
+		DirectX::XMVectorReplicate( tolerance )
+	);
 }
 
 
@@ -1382,9 +1532,11 @@ inline void ComputeClosestPoint( const Vector& vecStart, float flMaxDist, const 
 //-----------------------------------------------------------------------------
 inline void VectorAbs( const Vector& src, Vector& dst )
 {
-	dst.x = FloatMakePositive(src.x);
-	dst.y = FloatMakePositive(src.y);
-	dst.z = FloatMakePositive(src.z);
+	DirectX::XMStoreFloat3
+	(
+		dst.XmBase(),
+		DirectX::XMVectorAbs( DirectX::XMLoadFloat3( src.XmBase() ) )
+	);
 }
 
 
@@ -1401,16 +1553,28 @@ inline void VectorAbs( const Vector& src, Vector& dst )
 //-----------------------------------------------------------------------------
 inline Vector Vector::Min(const Vector &vOther) const
 {
-	return Vector(x < vOther.x ? x : vOther.x, 
-		y < vOther.y ? y : vOther.y, 
-		z < vOther.z ? z : vOther.z);
+	DirectX::XMVECTOR result = DirectX::XMVectorMin
+	(
+		DirectX::XMLoadFloat3( XmBase() ),
+		DirectX::XMLoadFloat3( vOther.XmBase() )
+	);
+
+	Vector r;
+	DirectX::XMStoreFloat3( r.XmBase(), result );
+	return r;
 }
 
 inline Vector Vector::Max(const Vector &vOther) const
 {
-	return Vector(x > vOther.x ? x : vOther.x, 
-		y > vOther.y ? y : vOther.y, 
-		z > vOther.z ? z : vOther.z);
+	DirectX::XMVECTOR result = DirectX::XMVectorMax
+	(
+		DirectX::XMLoadFloat3( XmBase() ),
+		DirectX::XMLoadFloat3( vOther.XmBase() )
+	);
+
+	Vector r;
+	DirectX::XMStoreFloat3( r.XmBase(), result );
+	return r;
 }
 
 
@@ -1420,7 +1584,14 @@ inline Vector Vector::Max(const Vector &vOther) const
 
 inline Vector Vector::operator-(void) const
 { 
-	return Vector(-x,-y,-z);				
+	DirectX::XMVECTOR result = DirectX::XMVectorNegate
+	(
+		DirectX::XMLoadFloat3( XmBase() )
+	);
+	
+	Vector r;
+	DirectX::XMStoreFloat3( r.XmBase(), result );
+	return r;
 }
 
 inline Vector Vector::operator+(const Vector& v) const	
@@ -1496,22 +1667,38 @@ inline vec_t Vector::Length2DSqr(void) const
 }
 
 inline Vector CrossProduct(const Vector& a, const Vector& b) 
-{ 
-	return Vector( a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x ); 
+{
+	DirectX::XMVECTOR result = DirectX::XMVector3Cross
+	(
+		DirectX::XMLoadFloat3( a.XmBase() ),
+		DirectX::XMLoadFloat3( b.XmBase() )
+	);
+
+	Vector r;
+	DirectX::XMStoreFloat3( r.XmBase(), result );
+	return r;
 }
 
 inline void VectorMin( const Vector &a, const Vector &b, Vector &result )
 {
-	result.x = fpmin(a.x, b.x);
-	result.y = fpmin(a.y, b.y);
-	result.z = fpmin(a.z, b.z);
+	DirectX::XMVECTOR r = DirectX::XMVectorMin
+	(
+		DirectX::XMLoadFloat3( a.XmBase() ),
+		DirectX::XMLoadFloat3( b.XmBase() )
+	);
+
+	DirectX::XMStoreFloat3( result.XmBase(), r );
 }
 
 inline void VectorMax( const Vector &a, const Vector &b, Vector &result )
 {
-	result.x = fpmax(a.x, b.x);
-	result.y = fpmax(a.y, b.y);
-	result.z = fpmax(a.z, b.z);
+	DirectX::XMVECTOR r = DirectX::XMVectorMax
+	(
+		DirectX::XMLoadFloat3( a.XmBase() ),
+		DirectX::XMLoadFloat3( b.XmBase() )
+	);
+
+	DirectX::XMStoreFloat3( result.XmBase(), r );
 }
 
 inline float ComputeVolume( const Vector &vecMins, const Vector &vecMaxs )
@@ -1535,34 +1722,10 @@ inline Vector RandomVector( float minVal, float maxVal )
 // Helper debugging stuff....
 //-----------------------------------------------------------------------------
 
-inline bool operator==( float const*, const Vector& )
-{
-	// AIIIEEEE!!!!
-	Assert(0);
-	return false;
-}
-
-inline bool operator==( const Vector&, float const* )
-{
-	// AIIIEEEE!!!!
-	Assert(0);
-	return false;
-}
-
-inline bool operator!=( float const*, const Vector& )
-{
-	// AIIIEEEE!!!!
-	Assert(0);
-	return false;
-}
-
-inline bool operator!=( const Vector&, float const* )
-{
-	// AIIIEEEE!!!!
-	Assert(0);
-	return false;
-}
-
+inline bool operator==( float const*, const Vector& ) = delete;
+inline bool operator==( const Vector&, float const* ) = delete;
+inline bool operator!=( float const*, const Vector& ) = delete;
+inline bool operator!=( const Vector&, float const* ) = delete;
 
 //-----------------------------------------------------------------------------
 // AngularImpulse
@@ -1656,12 +1819,16 @@ inline vec_t Quaternion::operator[](int i) const
 //-----------------------------------------------------------------------------
 inline bool Quaternion::operator==( const Quaternion &src ) const
 {
-	return ( x == src.x ) && ( y == src.y ) && ( z == src.z ) && ( w == src.w );
+	return DirectX::XMVector4Equal
+	(
+		DirectX::XMLoadFloat4( XmBase() ),
+		DirectX::XMLoadFloat4( src.XmBase() )
+	);
 }
 
 inline bool Quaternion::operator!=( const Quaternion &src ) const
 {
-	return !operator==( src );
+	return !(*this == src);
 }
 
 
@@ -1670,13 +1837,12 @@ inline bool Quaternion::operator!=( const Quaternion &src ) const
 //-----------------------------------------------------------------------------
 inline bool QuaternionsAreEqual( const Quaternion& src1, const Quaternion& src2, float tolerance )
 {
-	if (FloatMakePositive(src1.x - src2.x) > tolerance)
-		return false;
-	if (FloatMakePositive(src1.y - src2.y) > tolerance)
-		return false;
-	if (FloatMakePositive(src1.z - src2.z) > tolerance)
-		return false;
-	return (FloatMakePositive(src1.w - src2.w) <= tolerance);
+	return DirectX::XMVector4NearEqual
+	(
+		DirectX::XMLoadFloat4( src1.XmBase() ),
+		DirectX::XMLoadFloat4( src2.XmBase() ),
+		DirectX::XMVectorReplicate( tolerance )
+	);
 }
 
 
@@ -1738,7 +1904,7 @@ class QAngle;
 class RadianEuler
 {
 public:
-  inline RadianEuler() = default;
+	inline RadianEuler() = default;
 	inline RadianEuler(vec_t X, vec_t Y, vec_t Z)		{ x = X; y = Y; z = Z; }
 	inline RadianEuler(Quaternion const &q);	// evil auto type promotion!!!
 	inline RadianEuler(QAngle const &angles);	// evil auto type promotion!!!
@@ -1785,14 +1951,14 @@ inline Quaternion::Quaternion(RadianEuler const &angle) //-V730
 
 inline bool Quaternion::IsValid() const
 {
-	return IsFinite(x) && IsFinite(y) && IsFinite(z) && IsFinite(w);
+	return !DirectX::XMVector4IsNaN( DirectX::XMLoadFloat4( XmBase() ) );
 }
 
 inline void Quaternion::Invalidate()
 {
 //#ifdef _DEBUG
 //#ifdef VECTOR_PARANOIA
-	x = y = z = w = VEC_T_NAN;
+	DirectX::XMStoreFloat4( XmBase(), DirectX::XMVectorSplatQNaN() );
 //#endif
 //#endif
 }
@@ -1814,21 +1980,24 @@ inline void VectorScale( RadianEuler const& src, float b, RadianEuler &dst )
 {
 	CHECK_VALID(src);
 	Assert( IsFinite(b) );
-	dst.x = src.x * b;
-	dst.y = src.y * b;
-	dst.z = src.z * b;
+
+	DirectX::XMStoreFloat3
+	(
+		dst.XmBase(),
+		DirectX::XMVectorScale( DirectX::XMLoadFloat3( src.XmBase() ), b )
+	);
 }
 
 inline bool RadianEuler::IsValid() const
 {
-	return IsFinite(x) && IsFinite(y) && IsFinite(z);
+	return !DirectX::XMVector3IsNaN( DirectX::XMLoadFloat3( XmBase() ) );
 }
 
 inline void RadianEuler::Invalidate()
 {
 //#ifdef _DEBUG
 //#ifdef VECTOR_PARANOIA
-	x = y = z = VEC_T_NAN;
+	DirectX::XMStoreFloat3( XmBase(), DirectX::XMVectorSplatQNaN() );
 //#endif
 //#endif
 }
@@ -1892,7 +2061,7 @@ public:
 	// Base address...
 	vec_t* Base();
 	vec_t const* Base() const;
-	
+
 	// dimhotepus: Better DirectX math integration.
 	DirectX::XMFLOAT3* XmBase()
 	{
@@ -1965,25 +2134,40 @@ inline void VectorAdd( const QAngle& a, const QAngle& b, QAngle& result )
 {
 	CHECK_VALID(a);
 	CHECK_VALID(b);
-	result.x = a.x + b.x;
-	result.y = a.y + b.y;
-	result.z = a.z + b.z;
+
+	DirectX::XMStoreFloat3
+	(
+		result.XmBase(),
+		DirectX::XMVectorAdd
+		(
+			DirectX::XMLoadFloat3( a.XmBase() ),
+			DirectX::XMLoadFloat3( b.XmBase() )
+		)
+	);
 }
 
 inline void VectorMA( const QAngle &start, float scale, const QAngle &direction, QAngle &dest )
 {
 	CHECK_VALID(start);
 	CHECK_VALID(direction);
-	dest.x = start.x + scale * direction.x;
-	dest.y = start.y + scale * direction.y;
-	dest.z = start.z + scale * direction.z;
+
+	DirectX::XMStoreFloat3
+	(
+		dest.XmBase(),
+		DirectX::XMVectorMultiplyAdd
+		(
+			DirectX::XMLoadFloat3( direction.XmBase() ),
+			DirectX::XMVectorReplicate( scale ),
+			DirectX::XMLoadFloat3( start.XmBase() )
+		)
+	);
 }
 
 
 //-----------------------------------------------------------------------------
 // constructors
 //-----------------------------------------------------------------------------
-inline QAngle::QAngle(vec_t X, vec_t Y, vec_t Z)						
+inline QAngle::QAngle(vec_t X, vec_t Y, vec_t Z)
 { 
 	x = X; y = Y; z = Z;
 	CHECK_VALID(*this);
@@ -1993,7 +2177,7 @@ inline QAngle::QAngle(vec_t X, vec_t Y, vec_t Z)
 //-----------------------------------------------------------------------------
 // initialization
 //-----------------------------------------------------------------------------
-inline void QAngle::Init( vec_t ix, vec_t iy, vec_t iz )    
+inline void QAngle::Init( vec_t ix, vec_t iy, vec_t iz )
 { 
 	x = ix; y = iy; z = iz;
 	CHECK_VALID(*this);
@@ -2001,9 +2185,26 @@ inline void QAngle::Init( vec_t ix, vec_t iy, vec_t iz )
 
 inline void QAngle::Random( vec_t minVal, vec_t maxVal )
 {
-	x = minVal + ((float)rand() / VALVE_RAND_MAX) * (maxVal - minVal);
-	y = minVal + ((float)rand() / VALVE_RAND_MAX) * (maxVal - minVal);
-	z = minVal + ((float)rand() / VALVE_RAND_MAX) * (maxVal - minVal);
+	DirectX::XMVECTOR rn = DirectX::XMVectorSet
+	(
+		(static_cast<float>(rand()) / VALVE_RAND_MAX),
+		(static_cast<float>(rand()) / VALVE_RAND_MAX),
+		(static_cast<float>(rand()) / VALVE_RAND_MAX),
+		0.0f
+	);
+	DirectX::XMVECTOR mn = DirectX::XMVectorReplicate( minVal );
+
+	DirectX::XMStoreFloat3
+	(
+		XmBase(),
+		DirectX::XMVectorMultiplyAdd
+		(
+			rn,
+			DirectX::XMVectorSubtract( DirectX::XMVectorReplicate( maxVal ), mn ),
+			mn
+		)
+	);
+
 	CHECK_VALID(*this);
 }
 
@@ -2011,9 +2212,8 @@ inline void QAngle::Random( vec_t minVal, vec_t maxVal )
 
 inline QAngle RandomAngle( float minVal, float maxVal )
 {
-	Vector vRandom;
-	vRandom.Random( minVal, maxVal );
-	QAngle ret( vRandom.x, vRandom.y, vRandom.z );
+	QAngle ret;
+	ret.Random( minVal, maxVal );
 	return ret;
 }
 
@@ -2022,21 +2222,50 @@ inline QAngle RandomAngle( float minVal, float maxVal )
 
 inline RadianEuler::RadianEuler(QAngle const &angles)
 {
-	Init(
-		angles.z * 3.14159265358979323846f / 180.f,
-		angles.x * 3.14159265358979323846f / 180.f, 
-		angles.y * 3.14159265358979323846f / 180.f );
+	DirectX::XMVECTOR qa = DirectX::XMVectorMultiply
+	(
+		DirectX::XMLoadFloat3( angles.XmBase() ),
+		DirectX::XMVectorReplicate( M_PI_F / 180.0f )
+	);
+
+	DirectX::XMStoreFloat3
+	(
+		XmBase(),
+		// qa z -> re x, qa x -> re y, qa y -> re z
+		DirectX::XMVectorSwizzle
+		<
+			DirectX::XM_SWIZZLE_Z,
+			DirectX::XM_SWIZZLE_X,
+			DirectX::XM_SWIZZLE_Y,
+			DirectX::XM_SWIZZLE_W
+		>( qa )
+	);
 }
 
 
-
-
-inline QAngle RadianEuler::ToQAngle( void) const
+inline QAngle RadianEuler::ToQAngle() const
 {
-	return QAngle(
-		y * 180.f / 3.14159265358979323846f,
-		z * 180.f / 3.14159265358979323846f,
-		x * 180.f / 3.14159265358979323846f );
+	DirectX::XMVECTOR re = DirectX::XMVectorMultiply
+	(
+		DirectX::XMLoadFloat3( XmBase() ),
+		DirectX::XMVectorReplicate( 180.0f / M_PI_F )
+	);
+
+	QAngle qa;
+	DirectX::XMStoreFloat3
+	(
+		qa.XmBase(),
+		// re y -> qa x, re z -> qa y, re x -> qa z
+		DirectX::XMVectorSwizzle
+		<
+			DirectX::XM_SWIZZLE_Y,
+			DirectX::XM_SWIZZLE_Z,
+			DirectX::XM_SWIZZLE_X,
+			DirectX::XM_SWIZZLE_W
+		>( re )
+	);
+
+	return qa;
 }
 
 
@@ -2086,7 +2315,7 @@ inline vec_t const* QAngle::Base() const
 //-----------------------------------------------------------------------------
 inline bool QAngle::IsValid() const
 {
-	return IsFinite(x) && IsFinite(y) && IsFinite(z);
+	return !DirectX::XMVector3IsNaN( DirectX::XMLoadFloat3( XmBase() ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -2097,7 +2326,7 @@ inline void QAngle::Invalidate()
 {
 //#ifdef _DEBUG
 //#ifdef VECTOR_PARANOIA
-	x = y = z = VEC_T_NAN;
+	DirectX::XMStoreFloat3( XmBase(), DirectX::XMVectorSplatQNaN() );
 //#endif
 //#endif
 }
@@ -2109,14 +2338,13 @@ inline bool QAngle::operator==( const QAngle& src ) const
 {
 	CHECK_VALID(src);
 	CHECK_VALID(*this);
-	return (src.x == x) && (src.y == y) && (src.z == z);
+
+	return DirectX::XMVector3Equal( DirectX::XMLoadFloat3( XmBase() ), DirectX::XMLoadFloat3( src.XmBase() ) );
 }
 
 inline bool QAngle::operator!=( const QAngle& src ) const
 {
-	CHECK_VALID(src);
-	CHECK_VALID(*this);
-	return (src.x != x) || (src.y != y) || (src.z != z);
+	return !(*this == src);
 }
 
 
@@ -2135,38 +2363,73 @@ inline void VectorCopy( const QAngle& src, QAngle& dst )
 //-----------------------------------------------------------------------------
 // standard math operations
 //-----------------------------------------------------------------------------
-inline QAngle& QAngle::operator+=(const QAngle& v)	
+inline QAngle& QAngle::operator+=(const QAngle& v)
 { 
 	CHECK_VALID(*this);
 	CHECK_VALID(v);
-	x+=v.x; y+=v.y; z += v.z;	
+
+	DirectX::XMStoreFloat3
+	(
+		XmBase(),
+		DirectX::XMVectorAdd
+		(
+			DirectX::XMLoadFloat3( XmBase() ),
+			DirectX::XMLoadFloat3( v.XmBase() )
+		)
+	);
+
 	return *this;
 }
 
-inline QAngle& QAngle::operator-=(const QAngle& v)	
+inline QAngle& QAngle::operator-=(const QAngle& v)
 { 
 	CHECK_VALID(*this);
 	CHECK_VALID(v);
-	x-=v.x; y-=v.y; z -= v.z;	
+
+	DirectX::XMStoreFloat3
+	(
+		XmBase(),
+		DirectX::XMVectorSubtract
+		(
+			DirectX::XMLoadFloat3( XmBase() ),
+			DirectX::XMLoadFloat3( v.XmBase() )
+		)
+	);
+
 	return *this;
 }
 
-inline QAngle& QAngle::operator*=(float fl)	
+inline QAngle& QAngle::operator*=(float fl)
 {
-	x *= fl;
-	y *= fl;
-	z *= fl;
+	DirectX::XMStoreFloat3
+	(
+		XmBase(),
+		DirectX::XMVectorScale
+		(
+			DirectX::XMLoadFloat3( XmBase() ),
+			fl
+		)
+	);
+
 	CHECK_VALID(*this);
 	return *this;
 }
 
-inline QAngle& QAngle::operator/=(float fl)	
+inline QAngle& QAngle::operator/=(float fl)
 {
 	Assert( fl != 0.0f );
 	float oofl = 1.0f / fl;
-	x *= oofl;
-	y *= oofl;
-	z *= oofl;
+
+	DirectX::XMStoreFloat3
+	(
+		XmBase(),
+		DirectX::XMVectorScale
+		(
+			DirectX::XMLoadFloat3( XmBase() ),
+			oofl
+		)
+	);
+
 	CHECK_VALID(*this);
 	return *this;
 }
@@ -2175,17 +2438,25 @@ inline QAngle& QAngle::operator/=(float fl)
 //-----------------------------------------------------------------------------
 // length
 //-----------------------------------------------------------------------------
-inline vec_t QAngle::Length( ) const
+inline vec_t QAngle::Length() const
 {
 	CHECK_VALID(*this);
-	return (vec_t)FastSqrt( LengthSqr( ) );		
+
+	return DirectX::XMVectorGetX
+	(
+		DirectX::XMVector3Length( DirectX::XMLoadFloat3( XmBase() ) )
+	);
 }
 
 
-inline vec_t QAngle::LengthSqr( ) const
+inline vec_t QAngle::LengthSqr() const
 {
 	CHECK_VALID(*this);
-	return x * x + y * y + z * z;
+
+	return DirectX::XMVectorGetX
+	(
+		DirectX::XMVector3LengthSq( DirectX::XMLoadFloat3( XmBase() ) )
+	);
 }
 	
 
@@ -2194,11 +2465,12 @@ inline vec_t QAngle::LengthSqr( ) const
 //-----------------------------------------------------------------------------
 inline bool QAnglesAreEqual( const QAngle& src1, const QAngle& src2, float tolerance = 0.0f )
 {
-	if (FloatMakePositive(src1.x - src2.x) > tolerance)
-		return false;
-	if (FloatMakePositive(src1.y - src2.y) > tolerance)
-		return false;
-	return (FloatMakePositive(src1.z - src2.z) <= tolerance);
+	return DirectX::XMVector3NearEqual
+	(
+		DirectX::XMLoadFloat3( src1.XmBase() ),
+		DirectX::XMLoadFloat3( src2.XmBase() ),
+		DirectX::XMVectorReplicate( tolerance )
+	);
 }
 
 
@@ -2207,51 +2479,80 @@ inline bool QAnglesAreEqual( const QAngle& src1, const QAngle& src2, float toler
 //-----------------------------------------------------------------------------
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 
-inline QAngle QAngle::operator-(void) const
-{ 
-	QAngle ret(-x,-y,-z);
-	return ret;
+inline QAngle QAngle::operator-() const
+{
+	QAngle r;
+	DirectX::XMStoreFloat3
+	(
+		r.XmBase(),
+		DirectX::XMVectorNegate( DirectX::XMLoadFloat3( XmBase() ) )
+	);
+	return r;
 }
 
-inline QAngle QAngle::operator+(const QAngle& v) const	
-{ 
-	QAngle res;
-	res.x = x + v.x;
-	res.y = y + v.y;
-	res.z = z + v.z;
-	return res;	
+inline QAngle QAngle::operator+(const QAngle& v) const
+{
+	QAngle r;
+	DirectX::XMStoreFloat3
+	(
+		r.XmBase(),
+		DirectX::XMVectorAdd
+		(
+			DirectX::XMLoadFloat3( XmBase() ),
+			DirectX::XMLoadFloat3( v.XmBase() )
+		)
+	);
+	return r;
 }
 
-inline QAngle QAngle::operator-(const QAngle& v) const	
-{ 
-	QAngle res;
-	res.x = x - v.x;
-	res.y = y - v.y;
-	res.z = z - v.z;
-	return res;	
+inline QAngle QAngle::operator-(const QAngle& v) const
+{
+	QAngle r;
+	DirectX::XMStoreFloat3
+	(
+		r.XmBase(),
+		DirectX::XMVectorSubtract
+		(
+			DirectX::XMLoadFloat3( XmBase() ),
+			DirectX::XMLoadFloat3( v.XmBase() )
+		)
+	);
+	return r;
 }
 
-inline QAngle QAngle::operator*(float fl) const	
-{ 
-	QAngle res;
-	res.x = x * fl;
-	res.y = y * fl;
-	res.z = z * fl;
-	return res;	
+inline QAngle QAngle::operator*(float fl) const
+{
+	QAngle r;
+	DirectX::XMStoreFloat3
+	(
+		r.XmBase(),
+		DirectX::XMVectorScale
+		(
+			DirectX::XMLoadFloat3( XmBase() ),
+			fl
+		)
+	);
+	return r;
 }
 
-inline QAngle QAngle::operator/(float fl) const	
-{ 
-	QAngle res;
-	res.x = x / fl;
-	res.y = y / fl;
-	res.z = z / fl;
-	return res;	
+inline QAngle QAngle::operator/(float fl) const
+{
+	QAngle r;
+	DirectX::XMStoreFloat3
+	(
+		r.XmBase(),
+		DirectX::XMVectorScale
+		(
+			DirectX::XMLoadFloat3( XmBase() ),
+			1.0f / fl
+		)
+	);
+	return r;
 }
 
-inline QAngle operator*(float fl, const QAngle& v)	
-{ 
-        QAngle ret( v * fl );
+inline QAngle operator*(float fl, const QAngle& v)
+{
+	QAngle ret( v * fl );
 	return ret;
 }
 
@@ -2277,111 +2578,96 @@ inline void AngularImpulseToQAngle( const AngularImpulse &impulse, QAngle &angle
 
 #if !defined( _X360 )
 
-FORCEINLINE vec_t InvRSquared( float const *v )
-{
-#if defined(__i386__) || defined(_M_IX86)
-	float sqrlen = v[0]*v[0]+v[1]*v[1]+v[2]*v[2] + 1.0e-10f, result;
-	_mm_store_ss(&result, _mm_rcp_ss( _mm_max_ss( _mm_set_ss(1.0f), _mm_load_ss(&sqrlen) ) ));
-	return result;
-#else
-	return 1.f/fpmax(1.f, v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
-#endif
-}
+// dimhotepus: Too unsafe. Use safer alternatives.
+FORCEINLINE vec_t InvRSquared( float const *v ) = delete;
+//{
+//#if defined(__i386__) || defined(_M_IX86)
+//	float sqrlen = v[0]*v[0]+v[1]*v[1]+v[2]*v[2] + 1.0e-10f, result;
+//	_mm_store_ss(&result, _mm_rcp_ss( _mm_max_ss( _mm_set_ss(1.0f), _mm_load_ss(&sqrlen) ) ));
+//	return result;
+//#else
+//	return 1.f/fpmax(1.f, v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+//#endif
+//}
 
 FORCEINLINE vec_t InvRSquared( const Vector &v )
 {
-	return InvRSquared(&v.x);
+	DirectX::XMVECTOR xmV = DirectX::XMVector3ReciprocalLength( DirectX::XMLoadFloat3( v.XmBase() ) );
+	return DirectX::XMVectorGetX( DirectX::XMVector3Dot( xmV, xmV ) );
 }
 
 #if defined(__i386__) || defined(_M_IX86)
-inline void _SSE_RSqrtInline( float a, float* out )
-{
-	__m128  xx = _mm_load_ss( &a );
-	__m128  xr = _mm_rsqrt_ss( xx );
-	__m128  xt;
-	xt = _mm_mul_ss( xr, xr );
-	xt = _mm_mul_ss( xt, xx );
-	xt = _mm_sub_ss( _mm_set_ss(3.f), xt );
-	xt = _mm_mul_ss( xt, _mm_set_ss(0.5f) );
-	xr = _mm_mul_ss( xr, xt );
-	_mm_store_ss( out, xr );
-}
+// dimhotepus: Unused? Drop.
+inline void _SSE_RSqrtInline( float a, float* out ) = delete;
+//{
+//	__m128  xx = _mm_load_ss( &a );
+//	__m128  xr = _mm_rsqrt_ss( xx );
+//	__m128  xt;
+//	xt = _mm_mul_ss( xr, xr );
+//	xt = _mm_mul_ss( xt, xx );
+//	xt = _mm_sub_ss( _mm_set_ss(3.f), xt );
+//	xt = _mm_mul_ss( xt, _mm_set_ss(0.5f) );
+//	xr = _mm_mul_ss( xr, xt );
+//	_mm_store_ss( out, xr );
+//}
 #endif
 
-// FIXME: Change this back to a #define once we get rid of the vec_t version
+FORCEINLINE float VectorNormalize( DirectX::XMVECTOR& val )
+{
+	DirectX::XMVECTOR len = DirectX::XMVector3Length( val );
+	float slen = DirectX::XMVectorGetX( len );
+	// Prevent division on zero.
+	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( slen + FLT_EPSILON ) );
+
+	val = DirectX::XMVectorMultiply( val, den );
+	
+	return slen;
+}
+
 FORCEINLINE float VectorNormalize( Vector& vec )
 {
-#ifndef DEBUG // stop crashing my edit-and-continue!
-	#if defined(__i386__) || defined(_M_IX86)
-		#define DO_SSE_OPTIMIZATION
-	#endif
-#endif
+	CHECK_VALID(vec);
 
-#if defined( DO_SSE_OPTIMIZATION )
-	float sqrlen = vec.LengthSqr() + 1.0e-10f, invlen;
-	_SSE_RSqrtInline(sqrlen, &invlen);
-	vec.x *= invlen;
-	vec.y *= invlen;
-	vec.z *= invlen;
-	return sqrlen * invlen;
-#else
-	extern float (FASTCALL *pfVectorNormalize)(Vector& v);
-	return (*pfVectorNormalize)(vec);
-#endif
+	DirectX::XMVECTOR val = DirectX::XMLoadFloat3( vec.XmBase() );
+	float slen = VectorNormalize( val );
+
+	DirectX::XMStoreFloat3( vec.XmBase(), val );
+
+	return slen;
+}
+
+FORCEINLINE float VectorNormalize( DirectX::XMFLOAT4 *v )
+{
+	Assert(v);
+	
+	// Looks like DirectX::XMVector3Normalize honors w component, which is not we want to.
+	DirectX::XMVECTOR val = DirectX::XMVectorSetW
+	(
+		DirectX::XMLoadFloat4( v ),
+		0.0f
+	);
+	float slen = VectorNormalize( val );
+
+	DirectX::XMStoreFloat4( v, val );
+	
+	return slen;
 }
 
 // FIXME: Obsolete version of VectorNormalize, once we remove all the friggin float*s
-FORCEINLINE float VectorNormalize( float * v )
-{
-	return VectorNormalize(*(reinterpret_cast<Vector *>(v)));
-}
+// dimhotepus: Too unsafe. Use safer alternatives.
+FORCEINLINE float VectorNormalize( float * v ) = delete;
+//{
+//	return VectorNormalize(*(reinterpret_cast<Vector *>(v)));
+//}
 
 FORCEINLINE void VectorNormalizeFast( Vector &vec )
 {
-	VectorNormalize(vec);
-}
+	DirectX::XMVECTOR val = DirectX::XMLoadFloat3( vec.XmBase() );
+	DirectX::XMVECTOR len = DirectX::XMVector3LengthEst( val );
+	// Prevent division on zero.
+	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( DirectX::XMVectorGetX( len ) + FLT_EPSILON ) );
 
-#else
-
-FORCEINLINE float _VMX_InvRSquared( const Vector &v )
-{
-	XMVECTOR xmV = XMVector3ReciprocalLength( XMLoadVector3( v.Base() ) );
-	xmV = XMVector3Dot( xmV, xmV );
-	return xmV.x;
-}
-
-// call directly
-FORCEINLINE float _VMX_VectorNormalize( Vector &vec )
-{
-	float mag = XMVector3Length( XMLoadVector3( vec.Base() ) ).x;
-	float den = 1.f / (mag + FLT_EPSILON );
-	vec.x *= den;
-	vec.y *= den;
-	vec.z *= den;
-	return mag;
-}
-
-#define InvRSquared(x) _VMX_InvRSquared(x)
-
-// FIXME: Change this back to a #define once we get rid of the vec_t version
-FORCEINLINE float VectorNormalize( Vector& v )
-{
-	return _VMX_VectorNormalize( v );
-}
-// FIXME: Obsolete version of VectorNormalize, once we remove all the friggin float*s
-FORCEINLINE float VectorNormalize( float *pV )
-{
-	return _VMX_VectorNormalize(*(reinterpret_cast<Vector*>(pV)));
-}
-
-// call directly
-FORCEINLINE void VectorNormalizeFast( Vector &vec )
-{
-	XMVECTOR xmV = XMVector3LengthEst( XMLoadVector3( vec.Base() ) );
-	float den = 1.f / (xmV.x + FLT_EPSILON);
-	vec.x *= den;
-	vec.y *= den;
-	vec.z *= den;
+	DirectX::XMStoreFloat3( vec.XmBase(), DirectX::XMVectorMultiply( val, den ) );
 }
 
 #endif // _X360

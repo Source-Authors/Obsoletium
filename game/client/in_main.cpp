@@ -55,9 +55,6 @@ int g_iAlive = 1;
 
 static int s_ClearInputState = 0;
 
-// Defined in pm_math.c
-float anglemod( float a );
-
 // FIXME void V_Init( void );
 static int in_impulse = 0;
 static int in_cancel = 0;

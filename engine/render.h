@@ -18,7 +18,7 @@
 // render.h -- public interface to refresh functions
 
 extern float r_blend; // Global blending factor for the current entity
-extern float r_colormod[3]; // Global color modulation for the current entity
+extern Vector r_colormod; // Global color modulation for the current entity
 extern bool g_bIsBlendingOrModulating;
 
 

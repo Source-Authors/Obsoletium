@@ -1006,9 +1006,13 @@ int	CStaticProp::DrawModelSlow( int flags )
 		hash[0] = HashItem( m_ModelInstance );
 		hash[1] = HashItem( hash[0] );
 		hash[2] = HashItem( hash[1] );
-		r_colormod[0] = (float)hash[0] * 1.0f/65535.0f;
-		r_colormod[1] = (float)hash[1] * 1.0f/65535.0f;
-		r_colormod[2] = (float)hash[2] * 1.0f/65535.0f;
+
+		r_colormod =
+		{
+			(float)hash[0] * 1.0f/65535.0f,
+			(float)hash[1] * 1.0f/65535.0f,
+			(float)hash[2] * 1.0f/65535.0f
+		};
 		VectorNormalize( r_colormod );
 	}
 
@@ -1025,7 +1029,7 @@ int	CStaticProp::DrawModelSlow( int flags )
 
 	ModelRenderInfo_t sInfo;
 	InitModelRenderInfo( sInfo, flags );
-	g_pStudioRender->SetColorModulation( r_colormod );
+	g_pStudioRender->SetColorModulation( r_colormod.Base() );
 	g_pStudioRender->SetAlphaModulation( r_blend );
 	// Restore the matrices if we're skinning
 	CMatRenderContextPtr pRenderContext( materials );
@@ -1077,7 +1081,7 @@ int CStaticProp::DrawModel( int flags )
 
 	ModelRenderInfo_t sInfo;
 	InitModelRenderInfo( sInfo, flags );
-	g_pStudioRender->SetColorModulation( r_colormod );
+	g_pStudioRender->SetColorModulation( r_colormod.Base() );
 	g_pStudioRender->SetAlphaModulation( r_blend );
 	// Restore the matrices if we're skinning
 	CMatRenderContextPtr pRenderContext( materials );

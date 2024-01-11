@@ -54,7 +54,7 @@
 class IClientEntity;
 
 float r_blend;
-float r_colormod[3] = { 1, 1, 1 };
+Vector r_colormod = { 1, 1, 1 };
 bool g_bIsBlendingOrModulating = false;
 
 bool g_bIsRenderingVGuiOnly = false;
@@ -326,8 +326,8 @@ public:
 
 	FORCEINLINE void CheckBlend( void )
 	{
-		g_bIsBlendingOrModulating = ( r_blend != 1.0 ) || 
-			( r_colormod[0] != 1.0 ) || ( r_colormod[1] != 1.0 ) || ( r_colormod[2] != 1.0 );
+		g_bIsBlendingOrModulating = ( r_blend != 1.0 ) ||
+			( r_colormod[0] != 1.0f ) || ( r_colormod[1] != 1.0f ) || ( r_colormod[2] != 1.0f );
 
 	}
 	void SetBlend( float blend )
@@ -343,13 +343,13 @@ public:
 
 	void SetColorModulation( float const* blend )
 	{
-		VectorCopy( blend, r_colormod );
+		VectorCopy( blend, r_colormod.Base() );
 		CheckBlend();
 	}
 
 	void GetColorModulation( float* blend )
 	{
-		VectorCopy( r_colormod, blend );
+		VectorCopy( r_colormod.Base(), blend );
 	}
 
 	void SceneBegin( void )

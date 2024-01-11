@@ -6,14 +6,14 @@
 
 /// FIXME: As soon as all references to mathlib.c are gone, include it in here
 
-#include <memory.h>
-#include <float.h>	// Needed for FLT_EPSILON
+#include <memory>
+#include <cfloat>	// Needed for FLT_EPSILON
 #include <cmath>
 
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
-
 #include "tier0/vprof.h"
+
 //#define _VPROF_MATHLIB
 
 #include "mathlib/mathlib.h"
@@ -44,26 +44,6 @@ const QAngle vec3_angle(0,0,0);
 const Vector vec3_invalid( FLT_MAX, FLT_MAX, FLT_MAX );
 const int nanmask = 255<<23;
 
-//-----------------------------------------------------------------------------
-// Standard C implementations of optimized routines:
-//-----------------------------------------------------------------------------
-float FASTCALL _VectorNormalize (Vector& vec)
-{
-#ifdef _VPROF_MATHLIB
-	VPROF_BUDGET( "_VectorNormalize", "Mathlib" );
-#endif
-	float radius = sqrtf(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
-
-	// FLT_EPSILON is added to the radius to eliminate the possibility of divide by zero.
-	float iradius = 1.f / ( radius + FLT_EPSILON );
-	
-	vec.x *= iradius;
-	vec.y *= iradius;
-	vec.z *= iradius;
-	
-	return radius;
-}
-
 // TODO: Add fast C VectorNormalizeFast.
 // Perhaps use approximate rsqrt trick, if the accuracy isn't too bad.
 void FASTCALL _VectorNormalizeFast (Vector& vec)
@@ -86,7 +66,6 @@ float _InvRSquared(const float* v)
 //-----------------------------------------------------------------------------
 // Function pointers selecting the appropriate implementation
 //-----------------------------------------------------------------------------
-float (FASTCALL *pfVectorNormalize)(Vector& v) = _VectorNormalize;
 void  (FASTCALL *pfVectorNormalizeFast)(Vector& v) = _VectorNormalizeFast;
 float (*pfInvRSquared)(const float* v) = _InvRSquared;
 
@@ -423,14 +402,14 @@ int VectorCompare (const float *v1, const float *v2)
 	return 1;
 }
 
-void CrossProduct (const float* v1, const float* v2, float* cross)
-{
-	Assert( v1 != cross );
-	Assert( v2 != cross );
-	cross[0] = v1[1]*v2[2] - v1[2]*v2[1];
-	cross[1] = v1[2]*v2[0] - v1[0]*v2[2];
-	cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
-}
+//void CrossProduct (const float* v1, const float* v2, float* cross) = delete;
+//{
+//	Assert( v1 != cross );
+//	Assert( v2 != cross );
+//	cross[0] = v1[1]*v2[2] - v1[2]*v2[1];
+//	cross[1] = v1[2]*v2[0] - v1[0]*v2[2];
+//	cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
+//}
 
 // Matrix is right-handed x=forward, y=left, z=up.  We a left-handed convention for vectors in the game code (forward, right, up)
 void MatrixVectors( const matrix3x4_t &matrix, Vector* pForward, Vector *pRight, Vector *pUp )
@@ -1482,7 +1461,7 @@ void QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, 
 	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
 	fltx4 qtsimd = QuaternionBlendNoAlignSIMD( psimd, qsimd, t );
 	StoreUnalignedSIMD( qt.Base(), qtsimd );
-	}
+}
 
 
 
@@ -1503,7 +1482,7 @@ void QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt )
 	result = DirectX::XMVectorSetW( result, DirectX::XMVectorGetW( result ) + t );
 
 	StoreUnalignedSIMD( qt.Base(), QuaternionNormalizeSIMD( result ) );
-	}
+}
 
 //-----------------------------------------------------------------------------
 // Quaternion sphereical linear interpolation
@@ -1567,7 +1546,7 @@ float QuaternionAngleDiff( const Quaternion &p, const Quaternion &q )
 		{
 			float omega = 2 * fabs( acos( cosom ) );
 			return RAD2DEG( omega );
-		}
+}
 		return 0.0f;
 	}
 
@@ -1666,21 +1645,19 @@ void QuaternionScale( const Quaternion &p, float t, Quaternion &q )
 
 void QuaternionAdd( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 {
-	Assert( s_bMathlibInitialized );
 	Assert( p.IsValid() );
 	Assert( q.IsValid() );
 
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+	
 	// decide if one of the quaternions is backwards
-	Quaternion q2;
-	QuaternionAlign( p, q, q2 );
+	fltx4 q2 = QuaternionAlignSIMD( psimd, qsimd );
 
 	// is this right???
-	qt[0] = p[0] + q2[0];
-	qt[1] = p[1] + q2[1];
-	qt[2] = p[2] + q2[2];
-	qt[3] = p[3] + q2[3];
+	fltx4 result = DirectX::XMVectorAdd( psimd, q2 );
 
-	return;
+	StoreUnalignedSIMD( qt.Base(), result );
 }
 
 
@@ -1689,7 +1666,10 @@ float QuaternionDotProduct( const Quaternion &p, const Quaternion &q )
 	Assert( p.IsValid() );
 	Assert( q.IsValid() );
 
-	return p.x * q.x + p.y * q.y + p.z * q.z + p.w * q.w;
+	fltx4 psimd = LoadUnalignedSIMD( p.Base() );
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
+
+	return DirectX::XMVectorGetX( DirectX::XMQuaternionDot( psimd, qsimd ) );
 }
 
 
@@ -1707,14 +1687,12 @@ void QuaternionMult( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 		return;
 	}
 
-	// decide if one of the quaternions is backwards
-	Quaternion q2;
-	QuaternionAlign( p, q, q2 );
+	fltx4 psimd = LoadAlignedSIMD( p.Base() );
+	fltx4 qsimd = LoadUnalignedSIMD( q.Base() );
 
-	qt.x =  p.x * q2.w + p.y * q2.z - p.z * q2.y + p.w * q2.x;
-	qt.y = -p.x * q2.z + p.y * q2.w + p.z * q2.x + p.w * q2.y;
-	qt.z =  p.x * q2.y - p.y * q2.x + p.z * q2.w + p.w * q2.z;
-	qt.w = -p.x * q2.x - p.y * q2.y - p.z * q2.z + p.w * q2.w;
+	fltx4 result = QuaternionMultSIMD( psimd, qsimd );
+
+	StoreUnalignedSIMD( qt.Base(), result );
 }
 
 
@@ -2748,9 +2726,9 @@ void TransformAABB( const matrix3x4_t& transform, const Vector &vecMinsIn, const
 	VectorTransform( localCenter, transform, worldCenter );
 
 	Vector worldExtents;
-	worldExtents.x = DotProductAbs( localExtents, transform[0] );
-	worldExtents.y = DotProductAbs( localExtents, transform[1] );
-	worldExtents.z = DotProductAbs( localExtents, transform[2] );
+	worldExtents.x = DotProductAbs( localExtents, transform.XmBase() );
+	worldExtents.y = DotProductAbs( localExtents, transform.XmBase() + 1 );
+	worldExtents.z = DotProductAbs( localExtents, transform.XmBase() + 2 );
 
 	VectorSubtract( worldCenter, worldExtents, vecMinsOut );
 	VectorAdd( worldCenter, worldExtents, vecMaxsOut );
@@ -2805,9 +2783,9 @@ void RotateAABB( const matrix3x4_t &transform, const Vector &vecMinsIn, const Ve
 	VectorRotate( localCenter, transform, newCenter );
 
 	Vector newExtents;
-	newExtents.x = DotProductAbs( localExtents, transform[0] );
-	newExtents.y = DotProductAbs( localExtents, transform[1] );
-	newExtents.z = DotProductAbs( localExtents, transform[2] );
+	newExtents.x = DotProductAbs( localExtents, transform.XmBase() );
+	newExtents.y = DotProductAbs( localExtents, transform.XmBase() + 1 );
+	newExtents.z = DotProductAbs( localExtents, transform.XmBase() + 2 );
 
 	VectorSubtract( newCenter, newExtents, vecMinsOut );
 	VectorAdd( newCenter, newExtents, vecMaxsOut );
@@ -2943,7 +2921,7 @@ void CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, const Vector
 	Vector vDir;
 	float t = CalcClosestPointToLineT( P, vLineA, vLineB, vDir );
 	if ( outT ) *outT = t;
-	vClosest.MulAdd( vLineA, vDir, t );
+	VectorMA( vLineA, t, vDir, vClosest );
 }
 
 
@@ -2972,7 +2950,7 @@ void CalcClosestPointOnLineSegment( const Vector &P, const Vector &vLineA, const
 	{
 		*outT = t;
 	}
-	vClosest.MulAdd( vLineA, vDir, t );
+	VectorMA( vLineA, t, vDir, vClosest );
 }
 
 
@@ -3016,7 +2994,7 @@ void CalcClosestPointOnLine2D( const Vector2D &P, const Vector2D &vLineA, const 
 	Vector2D vDir;
 	float t = CalcClosestPointToLineT2D( P, vLineA, vLineB, vDir );
 	if ( outT ) *outT = t;
-	vClosest.MulAdd( vLineA, vDir, t );
+	Vector2DMA( vLineA, t, vDir, vClosest );
 }
 
 float CalcDistanceToLine2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
@@ -3044,7 +3022,8 @@ void CalcClosestPointOnLineSegment2D( const Vector2D &P, const Vector2D &vLineA,
 	{
 		*outT = t;
 	}
-	vClosest.MulAdd( vLineA, vDir, t );
+	
+	Vector2DMA( vLineA, t, vDir, vClosest );
 }
 
 float CalcDistanceToLineSegment2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
@@ -3145,7 +3124,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 	const CPUInformation& pi = *GetCPUInformation();
 
 	// Select the default generic routines.
-	pfVectorNormalize = _VectorNormalize;
 	pfVectorNormalizeFast = _VectorNormalizeFast;
 	pfInvRSquared = _InvRSquared;
 
@@ -3168,7 +3146,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 		s_b3DNowEnabled = true;
 
 		// Select the 3DNow specific routines if available;
-		pfVectorNormalize = _3DNow_VectorNormalize;
 		pfVectorNormalizeFast = _3DNow_VectorNormalizeFast;
 		pfInvRSquared = _3DNow_InvRSquared;
 	}
@@ -3185,7 +3162,6 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 #ifndef PLATFORM_WINDOWS_PC64
 		// These are not yet available.
 		// Select the SSE specific routines if available
-		pfVectorNormalize = _VectorNormalize;
 		pfVectorNormalizeFast = _SSE_VectorNormalizeFast;
 		pfInvRSquared = _SSE_InvRSquared;
 #endif

@@ -673,14 +673,11 @@ inline void	VMatrix::Set3x4( matrix3x4_t& matrix3x4 ) const
 //-----------------------------------------------------------------------------
 inline const VMatrix& VMatrix::operator+=(const VMatrix &other)
 {
-	for(int i=0; i < 4; i++)
-	{
-		for(int j=0; j < 4; j++)
-		{
-			m[i][j] += other.m[i][j];
-		}
-	}
-
+	DirectX::XMStoreFloat4x4
+	(
+		XmMBase(),
+		DirectX::XMLoadFloat4x4( XmMBase() ) + DirectX::XMLoadFloat4x4( other.XmMBase() )
+	);
 	return *this;
 }
 
@@ -690,25 +687,22 @@ inline const VMatrix& VMatrix::operator+=(const VMatrix &other)
 inline VMatrix VMatrix::operator+(const VMatrix &other) const
 {
 	VMatrix ret;
-	for(int i=0; i < 16; i++)
-	{
-		((float*)ret.m)[i] = ((float*)m)[i] + ((float*)other.m)[i];
-	}
+	DirectX::XMStoreFloat4x4
+	(
+		ret.XmMBase(),
+		DirectX::XMLoadFloat4x4( XmMBase() ) + DirectX::XMLoadFloat4x4( other.XmMBase() )
+	);
 	return ret;
 }
 
 inline VMatrix VMatrix::operator-(const VMatrix &other) const
 {
 	VMatrix ret;
-
-	for(int i=0; i < 4; i++)
-	{
-		for(int j=0; j < 4; j++)
-		{
-			ret.m[i][j] = m[i][j] - other.m[i][j];
-		}
-	}
-
+	DirectX::XMStoreFloat4x4
+	(
+		ret.XmMBase(),
+		DirectX::XMLoadFloat4x4( XmMBase() ) - DirectX::XMLoadFloat4x4( other.XmMBase() )
+	);
 	return ret;
 }
 
@@ -826,11 +820,7 @@ inline void VMatrix::Identity()
 
 inline bool VMatrix::IsIdentity() const
 {
-	return 
-		m[0][0] == 1.0f && m[0][1] == 0.0f && m[0][2] == 0.0f && m[0][3] == 0.0f &&
-		m[1][0] == 0.0f && m[1][1] == 1.0f && m[1][2] == 0.0f && m[1][3] == 0.0f &&
-		m[2][0] == 0.0f && m[2][1] == 0.0f && m[2][2] == 1.0f && m[2][3] == 0.0f &&
-		m[3][0] == 0.0f && m[3][1] == 0.0f && m[3][2] == 0.0f && m[3][3] == 1.0f;
+	return DirectX::XMMatrixIsIdentity( DirectX::XMLoadFloat4x4( XmMBase() ) );
 }
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS

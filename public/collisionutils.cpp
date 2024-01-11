@@ -2312,7 +2312,7 @@ static bool ComputeSeparatingPlane( const matrix3x4_t &worldToBox1, const matrix
 		if ( FloatBits(originProjection) > FloatBits(boxProjectionSum) )
 		{
 			MatrixGetColumn( box2ToWorld, 0, tmp );	
-			CrossProduct( worldToBox1[0], tmp.Base(), pPlane->normal.Base() ); 
+			CrossProduct( worldToBox1.XmBase(), tmp, pPlane->normal ); 
 			return true;
 		}
 	}
@@ -2327,7 +2327,7 @@ static bool ComputeSeparatingPlane( const matrix3x4_t &worldToBox1, const matrix
 		if ( FloatBits(originProjection) > FloatBits(boxProjectionSum) )
 		{
 			MatrixGetColumn( box2ToWorld, 1, tmp );	
-			CrossProduct( worldToBox1[0], tmp.Base(), pPlane->normal.Base() ); 
+			CrossProduct( worldToBox1.XmBase(), tmp, pPlane->normal ); 
 			return true;
 		}
 	}
@@ -2342,7 +2342,7 @@ static bool ComputeSeparatingPlane( const matrix3x4_t &worldToBox1, const matrix
 		if ( FloatBits(originProjection) > FloatBits(boxProjectionSum) )
 		{
 			MatrixGetColumn( box2ToWorld, 2, tmp );	
-			CrossProduct( worldToBox1[0], tmp.Base(), pPlane->normal.Base() ); 
+			CrossProduct( worldToBox1.XmBase(), tmp, pPlane->normal ); 
 			return true;
 		}
 	}
@@ -2357,7 +2357,7 @@ static bool ComputeSeparatingPlane( const matrix3x4_t &worldToBox1, const matrix
 		if ( FloatBits(originProjection) > FloatBits(boxProjectionSum) )
 		{
 			MatrixGetColumn( box2ToWorld, 0, tmp );	
-			CrossProduct( worldToBox1[1], tmp.Base(), pPlane->normal.Base() ); 
+			CrossProduct( worldToBox1.XmBase() + 1, tmp, pPlane->normal ); 
 			return true;
 		}
 	}
@@ -2372,7 +2372,7 @@ static bool ComputeSeparatingPlane( const matrix3x4_t &worldToBox1, const matrix
 		if ( FloatBits(originProjection) > FloatBits(boxProjectionSum) )
 		{
 			MatrixGetColumn( box2ToWorld, 1, tmp );	
-			CrossProduct( worldToBox1[1], tmp.Base(), pPlane->normal.Base() ); 
+			CrossProduct( worldToBox1.XmBase() + 1, tmp, pPlane->normal ); 
 			return true;
 		}
 	}
@@ -2387,7 +2387,7 @@ static bool ComputeSeparatingPlane( const matrix3x4_t &worldToBox1, const matrix
 		if ( FloatBits(originProjection) > FloatBits(boxProjectionSum) )
 		{
 			MatrixGetColumn( box2ToWorld, 2, tmp );	
-			CrossProduct( worldToBox1[1], tmp.Base(), pPlane->normal.Base() ); 
+			CrossProduct( worldToBox1.XmBase() + 1, tmp, pPlane->normal ); 
 			return true;
 		}
 	}
@@ -2402,7 +2402,7 @@ static bool ComputeSeparatingPlane( const matrix3x4_t &worldToBox1, const matrix
 		if ( FloatBits(originProjection) > FloatBits(boxProjectionSum) )
 		{
 			MatrixGetColumn( box2ToWorld, 0, tmp );	
-			CrossProduct( worldToBox1[2], tmp.Base(), pPlane->normal.Base() ); 
+			CrossProduct( worldToBox1.XmBase() + 2, tmp, pPlane->normal ); 
 			return true;
 		}
 	}
@@ -2417,7 +2417,7 @@ static bool ComputeSeparatingPlane( const matrix3x4_t &worldToBox1, const matrix
 		if ( FloatBits(originProjection) > FloatBits(boxProjectionSum) )
 		{
 			MatrixGetColumn( box2ToWorld, 1, tmp );	
-			CrossProduct( worldToBox1[2], tmp.Base(), pPlane->normal.Base() ); 
+			CrossProduct( worldToBox1.XmBase() + 2, tmp, pPlane->normal ); 
 			return true;
 		}
 	}
@@ -2432,7 +2432,7 @@ static bool ComputeSeparatingPlane( const matrix3x4_t &worldToBox1, const matrix
 		if ( FloatBits(originProjection) > FloatBits(boxProjectionSum) )
 		{
 			MatrixGetColumn( box2ToWorld, 2, tmp );	
-			CrossProduct( worldToBox1[2], tmp.Base(), pPlane->normal.Base() ); 
+			CrossProduct( worldToBox1.XmBase() + 2, tmp, pPlane->normal ); 
 			return true;
 		}
 	}

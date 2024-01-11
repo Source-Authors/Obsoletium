@@ -126,7 +126,7 @@ void CDustEffect::SimulateParticles( CParticleSimulateIterator *pIterator )
 				}
 
 				// Apply velocity.
-				pParticle->m_Pos.MulAdd( pParticle->m_Pos, pParticle->m_vVelocity, pIterator->GetTimeDelta() );
+				VectorMA( pParticle->m_Pos, pIterator->GetTimeDelta(), pParticle->m_vVelocity, pParticle->m_Pos );
 			}
 		}
 

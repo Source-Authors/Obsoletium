@@ -49,10 +49,10 @@ void GetBumpNormals( const Vector& sVect, const Vector& tVect, const Vector& fla
 
 	// Build a basis for the face around the phong normal
 	matrix3x4_t smoothBasis;
-	CrossProduct( phongNormal.Base(), sVect.Base(), smoothBasis[1] );
-	VectorNormalize( smoothBasis[1] );
-	CrossProduct( smoothBasis[1], phongNormal.Base(), smoothBasis[0] );
-	VectorNormalize( smoothBasis[0] );
+	CrossProduct( phongNormal, sVect, smoothBasis.XmBase() + 1 );
+	VectorNormalize( smoothBasis.XmBase() + 1 );
+	CrossProduct( smoothBasis.XmBase() + 1, phongNormal, smoothBasis.XmBase() );
+	VectorNormalize( smoothBasis.XmBase() );
 	VectorCopy( phongNormal.Base(), smoothBasis[2] );
 	
 	if( leftHanded )

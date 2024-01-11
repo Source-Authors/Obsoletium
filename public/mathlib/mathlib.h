@@ -443,7 +443,8 @@ inline float VectorLength(const float *v)
 	return FastSqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] + FLT_EPSILON );
 }
 
-void CrossProduct (const float *v1, const float *v2, float *cross);
+// dimhotepus: Too unsafe. Use safer alternatives.
+void CrossProduct (const float *v1, const float *v2, float *cross) = delete;
 
 qboolean VectorsEqual( const float *v1, const float *v2 );
 
