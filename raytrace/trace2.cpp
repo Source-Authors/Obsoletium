@@ -106,7 +106,7 @@ void RayTracingEnvironment::RenderScene(
 				// make sure normal points back towards ray origin
 				fltx4 ndoti=rslt.surface_normal*myrays.direction;
 				fltx4 bad_dirs=AndSIMD(CmpGtSIMD(ndoti,Four_Zeros),
-										   LoadAlignedSIMD((float *) signmask));
+										   DirectX::XMLoadInt4A(signmask));
 
 				// flip signs of all "wrong" normals
 				rslt.surface_normal.x=XorSIMD(bad_dirs,rslt.surface_normal.x);
@@ -231,7 +231,7 @@ void RayTracingEnvironment::ComputeVirtualLightSources(void)
 						// make sure normal points back towards ray origin
 						fltx4 ndoti=rslt.surface_normal*myrays.direction;
 						fltx4 bad_dirs=AndSIMD(CmpGtSIMD(ndoti,Four_Zeros),
-												   LoadAlignedSIMD((float *) signmask));
+												   DirectX::XMLoadInt4A(signmask));
 						
 						// flip signs of all "wrong" normals
 						rslt.surface_normal.x=XorSIMD(bad_dirs,rslt.surface_normal.x);

@@ -40,25 +40,48 @@ static void Collision_ClearTrace( const Vector &vecRayStart, const Vector &vecRa
 //-----------------------------------------------------------------------------
 // Compute the offset in t along the ray that we'll use for the collision
 //-----------------------------------------------------------------------------
-static float ComputeBoxOffset( const Ray_t& ray )
+static DirectX::XMVECTOR XM_CALLCONV ComputeBoxOffset
+(
+	DirectX::XMVECTOR extent,
+	DirectX::XMVECTOR delta,
+	bool isRay
+)
 {
-	if (ray.m_IsRay)
-		return 1e-3F;
+	if (isRay)
+		return DirectX::XMVectorReplicate( 1e-3F );
+
+	extent = DirectX::XMVectorSetW( extent, 0.0f );
+	delta = DirectX::XMVectorSetW( delta, 0.0f );
 
 	// Find the projection of the box diagonal along the ray...
-	float offset = FloatMakePositive(ray.m_Extents[0] * ray.m_Delta[0]) +
-					FloatMakePositive(ray.m_Extents[1] * ray.m_Delta[1]) +
-					FloatMakePositive(ray.m_Extents[2] * ray.m_Delta[2]);
-
+	DirectX::XMVECTOR offset = DirectX::XMVectorSum
+	(
+		DirectX::XMVectorAbs( DirectX::XMVectorMultiply( extent, delta ) )
+	);
+	
 	// We need to divide twice: Once to normalize the computation above
 	// so we get something in units of extents, and the second to normalize
 	// that with respect to the entire raycast.
-	offset *= InvRSquared( ray.m_Delta );
-
-	// 1e-3 is an epsilon
-	return offset + 1e-3F;
+	return DirectX::XMVectorSetW
+	(
+		DirectX::XMVectorAdd
+		(
+			DirectX::XMVectorMultiply( offset, InvRSquared( delta ) ),
+			// 1e-3 is an epsilon
+			DirectX::XMVectorReplicate( 1e-3F )
+		),
+		0.0f
+	);
 }
 
+// dimhotepus: Unused, drop.
+static float ComputeBoxOffset(const Ray_t &ray) = delete;
+//{
+//	DirectX::XMVECTOR extent = DirectX::XMLoadFloat4A( ray.m_Extents.XmBase() );
+//	DirectX::XMVECTOR delta  = DirectX::XMLoadFloat4A( ray.m_Delta.XmBase() );
+//
+//	return DirectX::XMVectorGetX( ComputeBoxOffset( extent, delta, ray.m_IsRay ) );
+//}
 
 //-----------------------------------------------------------------------------
 // Intersects a swept box against a triangle
@@ -77,60 +100,94 @@ float IntersectRayWithTriangle( const Ray_t& ray,
 	// det | A B C | = -( A x C ) dot B or -(C x B) dot A
 	// which we'll use below..
 
-	Vector edge1, edge2, org;
-	VectorSubtract( v2, v1, edge1 );
-	VectorSubtract( v3, v1, edge2 );
+	DirectX::XMVECTOR vv1  = DirectX::XMLoadFloat3( v1.XmBase() );
+	DirectX::XMVECTOR vv2  = DirectX::XMLoadFloat3( v2.XmBase() );
+	DirectX::XMVECTOR vv3  = DirectX::XMLoadFloat3( v3.XmBase() );
+
+	DirectX::XMVECTOR edge1 = DirectX::XMVectorSubtract( vv2, vv1 );
+	DirectX::XMVECTOR edge2 = DirectX::XMVectorSubtract( vv3, vv1 );
+	
+	DirectX::XMVECTOR delta  = DirectX::XMLoadFloat4A( ray.m_Delta.XmBase() );
 
 	// Cull out one-sided stuff
 	if (oneSided)
 	{
-		Vector normal;
-		CrossProduct( edge1, edge2, normal );
-		if (DotProduct( normal, ray.m_Delta ) >= 0.0f)
+		DirectX::XMVECTOR dot = DirectX::XMVector3Dot
+		(
+			DirectX::XMVector3Cross( edge1, edge2 ),
+			delta
+		);
+
+		if ( DirectX::XMVector3GreaterOrEqual( dot, DirectX::g_XMZero ) )
+		{
 			return -1.0f;
+		}
 	}
 
 	// FIXME: This is inaccurate, but fast for boxes
 	// We want to do a fast separating axis implementation here
 	// with a swept triangle along the reverse direction of the ray.
-
+	
 	// Compute some intermediary terms
-	Vector dirCrossEdge2, orgCrossEdge1;
-	CrossProduct( ray.m_Delta, edge2, dirCrossEdge2 );
+	DirectX::XMVECTOR dirCrossEdge2 = DirectX::XMVector3Cross( delta, edge2 );
 
 	// Compute the denominator of Cramer's rule:
 	//		| -Dx E1x E2x |
 	// det	| -Dy E1y E2y | = (D x E2) dot E1
 	//		| -Dz E1z E2z |
-	float denom = DotProduct( dirCrossEdge2, edge1 );
-	if( FloatMakePositive( denom ) < 1e-6 )
+	DirectX::XMVECTOR denom = DirectX::XMVectorSetW( DirectX::XMVector3Dot( dirCrossEdge2, edge1 ), 1.0f );
+	if ( DirectX::XMVector3Less( DirectX::XMVectorAbs( denom ), DirectX::XMVectorReplicate( 1e-6f ) ) )
+	{
 		return -1.0f;
-	denom = 1.0f / denom;
+	}
+	denom = DirectX::XMVectorDivide( DirectX::g_XMOne3, denom );
 
 	// Compute u. It's gotta lie in the range of 0 to 1.
 	//				   | -Dx orgx E2x |
 	// u = denom * det | -Dy orgy E2y | = (D x E2) dot org
 	//				   | -Dz orgz E2z |
-	VectorSubtract( ray.m_Start, v1, org );
-	float u = DotProduct( dirCrossEdge2, org ) * denom;
-	if ((u < 0.0f) || (u > 1.0f))
+	DirectX::XMVECTOR org = DirectX::XMVectorSubtract
+	(
+		DirectX::XMLoadFloat4A( ray.m_Start.XmBase() ),
+		vv1
+	);
+	DirectX::XMVECTOR u = DirectX::XMVectorMultiply
+	(
+		DirectX::XMVector3Dot( dirCrossEdge2, org ),
+		denom
+	);
+	if ( DirectX::XMVector3Less( u, DirectX::g_XMZero ) ||
+		 DirectX::XMVector3Greater( u, DirectX::g_XMOne3 ) )
+	{
 		return -1.0f;
-
+	}
+	
 	// Compute t and v the same way...
 	// In barycentric coords, u + v < 1
-	CrossProduct( org, edge1, orgCrossEdge1 );
-	float v = DotProduct( orgCrossEdge1, ray.m_Delta ) * denom;
-	if ((v < 0.0f) || (v + u > 1.0f))
+	DirectX::XMVECTOR orgCrossEdge1 = DirectX::XMVector3Cross( org, edge1 );
+	DirectX::XMVECTOR v = DirectX::XMVectorMultiply
+	(
+		DirectX::XMVector3Dot( orgCrossEdge1, delta ),
+		denom
+	);
+	if ( DirectX::XMVector3Less( v, DirectX::g_XMZero ) ||
+		 DirectX::XMVector3Greater( DirectX::XMVectorAdd( v, u ), DirectX::g_XMOne3 ) )
+	{
 		return -1.0f;
+	}
 
 	// Compute the distance along the ray direction that we need to fudge 
 	// when using swept boxes
-	float boxt = ComputeBoxOffset( ray );
-	float t = DotProduct( orgCrossEdge1, edge2 ) * denom;
-	if ((t < -boxt) || (t > 1.0f + boxt))
+	DirectX::XMVECTOR extent = DirectX::XMLoadFloat4A( ray.m_Extents.XmBase() );
+	DirectX::XMVECTOR boxt   = ComputeBoxOffset( extent, delta, ray.m_IsRay );
+	DirectX::XMVECTOR t      = DirectX::XMVectorMultiply( DirectX::XMVector3Dot( orgCrossEdge1, edge2 ), denom );
+	if ( DirectX::XMVector3Less( t, DirectX::XMVectorNegate( boxt ) ) ||
+		 DirectX::XMVector3Greater( t, DirectX::XMVectorAdd( DirectX::g_XMOne3, boxt ) ) )
+	{
 		return -1.0f;
+	}
 
-	return clamp( t, 0.f, 1.f );
+	return DirectX::XMVectorGetX( DirectX::XMVectorClamp( t, DirectX::g_XMZero, DirectX::g_XMOne ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -141,43 +198,86 @@ bool ComputeIntersectionBarycentricCoordinates( const Ray_t& ray,
 		const Vector& v1, const Vector& v2, const Vector& v3, float& u, float& v,
 		float *t )
 {
-	Vector edge1, edge2, org;
-	VectorSubtract( v2, v1, edge1 );
-	VectorSubtract( v3, v1, edge2 );
+	DirectX::XMVECTOR vv1   = DirectX::XMLoadFloat3( v1.XmBase() );
+	DirectX::XMVECTOR vv2   = DirectX::XMLoadFloat3( v2.XmBase() );
+	DirectX::XMVECTOR vv3   = DirectX::XMLoadFloat3( v3.XmBase() );
+
+	DirectX::XMVECTOR edge1 = DirectX::XMVectorSubtract( vv2, vv1 );
+	DirectX::XMVECTOR edge2 = DirectX::XMVectorSubtract( vv3, vv1 );
 
 	// Compute some intermediary terms
-	Vector dirCrossEdge2, orgCrossEdge1;
-	CrossProduct( ray.m_Delta, edge2, dirCrossEdge2 );
+	DirectX::XMVECTOR delta         = DirectX::XMLoadFloat4A( ray.m_Delta.XmBase() );
+	DirectX::XMVECTOR dirCrossEdge2 = DirectX::XMVector3Cross( delta, edge2 );
 
 	// Compute the denominator of Cramer's rule:
 	//		| -Dx E1x E2x |
 	// det	| -Dy E1y E2y | = (D x E2) dot E1
 	//		| -Dz E1z E2z |
-	float denom = DotProduct( dirCrossEdge2, edge1 );
-	if( FloatMakePositive( denom ) < 1e-6 )
+	DirectX::XMVECTOR denom = DirectX::XMVectorSetW( DirectX::XMVector3Dot( dirCrossEdge2, edge1 ), 1.0f );
+	if ( DirectX::XMVector3Less( DirectX::XMVectorAbs( denom ), DirectX::XMVectorReplicate( 1e-6f ) ) )
+	{
 		return false;
-	denom = 1.0f / denom;
+	}
+	denom = DirectX::XMVectorDivide( DirectX::g_XMOne3, denom );
 
 	// Compute u. It's gotta lie in the range of 0 to 1.
 	//				   | -Dx orgx E2x |
 	// u = denom * det | -Dy orgy E2y | = (D x E2) dot org
 	//				   | -Dz orgz E2z |
-	VectorSubtract( ray.m_Start, v1, org );
-	u = DotProduct( dirCrossEdge2, org ) * denom;
+	DirectX::XMVECTOR org = DirectX::XMVectorSubtract
+	(
+		DirectX::XMLoadFloat4A( ray.m_Start.XmBase() ),
+		vv1
+	);
+	DirectX::XMVECTOR vu = DirectX::XMVectorMultiply
+	(
+		DirectX::XMVector3Dot( dirCrossEdge2, org ),
+		denom
+	);
+	if ( DirectX::XMVector3Less( vu, DirectX::g_XMZero ) ||
+		 DirectX::XMVector3Greater( vu, DirectX::g_XMOne3 ) )
+	{
+		return false;
+	}
+
+	u = DirectX::XMVectorGetX( vu );
 
 	// Compute t and v the same way...
 	// In barycentric coords, u + v < 1
-	CrossProduct( org, edge1, orgCrossEdge1 );
-	v = DotProduct( orgCrossEdge1, ray.m_Delta ) * denom;
+	DirectX::XMVECTOR orgCrossEdge1 = DirectX::XMVector3Cross( org, edge1 );
+	DirectX::XMVECTOR vv = DirectX::XMVectorMultiply
+	(
+		DirectX::XMVector3Dot( orgCrossEdge1, delta ),
+		denom
+	);
+	if ( DirectX::XMVector3Less( vv, DirectX::g_XMZero ) ||
+		 DirectX::XMVector3Greater( DirectX::XMVectorAdd( vv, vu ), DirectX::g_XMOne3 ) )
+	{
+		return false;
+	}
+
+	v = DirectX::XMVectorGetX( vv );
 
 	// Compute the distance along the ray direction that we need to fudge 
 	// when using swept boxes
-	if( t )
+	if ( t )
 	{
-		float boxt = ComputeBoxOffset( ray );
-		*t = DotProduct( orgCrossEdge1, edge2 ) * denom;
-		if( ( *t < -boxt ) || ( *t > 1.0f + boxt ) )
+		DirectX::XMVECTOR extent = DirectX::XMLoadFloat4A( ray.m_Extents.XmBase() );
+
+		DirectX::XMVECTOR boxt   = ComputeBoxOffset( extent, delta, ray.m_IsRay );
+		DirectX::XMVECTOR vt     = DirectX::XMVectorMultiply
+		(
+			DirectX::XMVector3Dot( orgCrossEdge1, edge2 ),
+			denom
+		);
+
+		if ( DirectX::XMVector3Less( vt, DirectX::XMVectorNegate( boxt ) ) ||
+			 DirectX::XMVector3Greater( vt, DirectX::XMVectorAdd( DirectX::g_XMOne3, boxt ) ) )
+		{
 			return false;
+		}
+
+		*t = DirectX::XMVectorGetX( vt );
 	}
 
 	return true;
@@ -538,23 +638,18 @@ bool IsSphereIntersectingCone( const Vector &sphereCenter, float sphereRadius, c
 //-----------------------------------------------------------------------------
 bool IsPointInBox( const Vector& pt, const Vector& boxMin, const Vector& boxMax )
 {
-	Assert( boxMin[0] <= boxMax[0] );
-	Assert( boxMin[1] <= boxMax[1] );
-	Assert( boxMin[2] <= boxMax[2] );
+	DirectX::XMVECTOR min = DirectX::XMLoadFloat3( boxMin.XmBase() );
+	DirectX::XMVECTOR max = DirectX::XMLoadFloat3( boxMax.XmBase() );
 
-	// on x360, force use of SIMD version.
-	if (IsX360())
-	{
-		return IsPointInBox( LoadUnaligned3SIMD(pt.Base()), LoadUnaligned3SIMD(boxMin.Base()), LoadUnaligned3SIMD(boxMax.Base()) ) ;
-	}
+	Assert( DirectX::XMVector3LessOrEqual( min, max ) );
 
-	if ( (pt[0] > boxMax[0]) || (pt[0] < boxMin[0]) )
-		return false;
-	if ( (pt[1] > boxMax[1]) || (pt[1] < boxMin[1]) )
-		return false;
-	if ( (pt[2] > boxMax[2]) || (pt[2] < boxMin[2]) )
-		return false;
-	return true;
+	// dimhotepus: SIMD version.
+	return IsPointInBox
+	(
+		DirectX::XMLoadFloat3(pt.XmBase()),
+		min,
+		max
+	);
 }
 
 
@@ -578,12 +673,17 @@ bool IsPointInCone( const Vector &pt, const Vector &origin, const Vector &axis, 
 bool IsBoxIntersectingBox( const Vector& boxMin1, const Vector& boxMax1, 
 						const Vector& boxMin2, const Vector& boxMax2 )
 {
-	Assert( boxMin1[0] <= boxMax1[0] );
-	Assert( boxMin1[1] <= boxMax1[1] );
-	Assert( boxMin1[2] <= boxMax1[2] );
-	Assert( boxMin2[0] <= boxMax2[0] );
-	Assert( boxMin2[1] <= boxMax2[1] );
-	Assert( boxMin2[2] <= boxMax2[2] );
+#ifdef _DEBUG
+	DirectX::XMVECTOR min1 = DirectX::XMLoadFloat3( boxMin1.XmBase() );
+	DirectX::XMVECTOR max1 = DirectX::XMLoadFloat3( boxMax1.XmBase() );
+
+	Assert( DirectX::XMVector3LessOrEqual( min1, max1 ) );
+
+	DirectX::XMVECTOR min2 = DirectX::XMLoadFloat3( boxMin2.XmBase() );
+	DirectX::XMVECTOR max2 = DirectX::XMLoadFloat3( boxMax2.XmBase() );
+	
+	Assert( DirectX::XMVector3LessOrEqual( min2, max2 ) );
+#endif
 
 	if ( (boxMin1[0] > boxMax2[0]) || (boxMax1[0] < boxMin2[0]) )
 		return false;
@@ -597,12 +697,16 @@ bool IsBoxIntersectingBox( const Vector& boxMin1, const Vector& boxMax1,
 bool IsBoxIntersectingBoxExtents( const Vector& boxCenter1, const Vector& boxHalfDiagonal1, 
 						   const Vector& boxCenter2, const Vector& boxHalfDiagonal2 )
 {
-	Vector vecDelta, vecSize;
-	VectorSubtract( boxCenter1, boxCenter2, vecDelta );
-	VectorAdd( boxHalfDiagonal1, boxHalfDiagonal2, vecSize );
-	return ( FloatMakePositive( vecDelta.x ) <= vecSize.x ) &&
-			( FloatMakePositive( vecDelta.y ) <= vecSize.y ) &&
-			( FloatMakePositive( vecDelta.z ) <= vecSize.z );
+	// dimhotepus: SIMD version.
+	DirectX::XMVECTOR center1 = DirectX::XMLoadFloat3( boxCenter1.XmBase() );
+	DirectX::XMVECTOR center2 = DirectX::XMLoadFloat3( boxCenter2.XmBase() );
+	DirectX::XMVECTOR delta = DirectX::XMVectorAbs( DirectX::XMVectorSubtract( center1, center2 ) );
+
+	DirectX::XMVECTOR diagonal1 = DirectX::XMLoadFloat3( boxHalfDiagonal1.XmBase() );
+	DirectX::XMVECTOR diagonal2 = DirectX::XMLoadFloat3( boxHalfDiagonal2.XmBase() );
+	DirectX::XMVECTOR size = DirectX::XMVectorAdd( diagonal1, diagonal2 );
+
+	return DirectX::XMVector3LessOrEqual( delta, size );
 }
 
 
@@ -892,33 +996,14 @@ bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax,
 //-----------------------------------------------------------------------------
 bool FASTCALL IsBoxIntersectingRay( const Vector& vecBoxMin, const Vector& vecBoxMax, const Ray_t& ray, float flTolerance )
 {
-	// On the x360, we force use of the SIMD functions.
-#if defined(_X360) 
-	if (IsX360())
-	{
-		return IsBoxIntersectingRay( 
-			LoadUnaligned3SIMD(vecBoxMin.Base()), LoadUnaligned3SIMD(vecBoxMax.Base()),
-			ray, flTolerance);
-	}
-#endif
-
-	if ( !ray.m_IsSwept )
-	{
-		Vector rayMins, rayMaxs;
-		VectorSubtract( ray.m_Start, ray.m_Extents, rayMins );
-		VectorAdd( ray.m_Start, ray.m_Extents, rayMaxs );
-		if ( flTolerance != 0.0f )
-		{
-			rayMins.x -= flTolerance; rayMins.y -= flTolerance; rayMins.z -= flTolerance;
-			rayMaxs.x += flTolerance; rayMaxs.y += flTolerance; rayMaxs.z += flTolerance;
-		}
-		return IsBoxIntersectingBox( vecBoxMin, vecBoxMax, rayMins, rayMaxs );
-	}
-
-	Vector vecExpandedBoxMin, vecExpandedBoxMax;
-	VectorSubtract( vecBoxMin, ray.m_Extents, vecExpandedBoxMin );
-	VectorAdd( vecBoxMax, ray.m_Extents, vecExpandedBoxMax );
-	return IsBoxIntersectingRay( vecExpandedBoxMin, vecExpandedBoxMax, ray.m_Start, ray.m_Delta, flTolerance );
+	// dimhotepus: SIMD version.
+	return IsBoxIntersectingRay
+	( 
+		DirectX::XMLoadFloat3( vecBoxMin.XmBase() ),
+		DirectX::XMLoadFloat3( vecBoxMax.XmBase() ),
+		ray,
+		flTolerance
+	);
 }
 
 
