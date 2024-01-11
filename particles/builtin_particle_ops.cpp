@@ -2033,7 +2033,8 @@ void C_OP_PositionLock::Operate( CParticleCollection *pParticles, float flStreng
 
 	int nCtr = pParticles->m_nPaddedActiveParticles;
 	bool bUseRange = ( m_flRange != 0.0f );
-	fltx4 fl4OORange;
+	// dimhotepus: Ensure fl4OORange always initialized.
+	fltx4 fl4OORange = Four_Zeros;
 	if ( bUseRange )
 		fl4OORange = ReplicateX4( 1.0f / m_flRange );
 

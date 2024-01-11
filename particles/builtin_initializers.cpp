@@ -4505,7 +4505,8 @@ void C_INIT_LifespanFromVelocity::InitNewParticlesBlock( CParticleCollection *pP
 			fvEndPnt += fvStartPnt;
 
 			// Test versus existing Data
-			FourVectors v4PointOnPlane;
+			// dimhotepus: Always initialize by default.
+			FourVectors v4PointOnPlane(vec3_origin, vec3_origin, vec3_origin, vec3_origin);
 			fltx4 fl4ClosestDist = Four_FLT_MAX;
 			for( int i = 0 ; i < pCtx->m_nActivePlanes; i++ )
 			{

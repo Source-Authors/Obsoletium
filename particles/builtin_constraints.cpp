@@ -721,8 +721,10 @@ static void WorldIntersectTNew( FourVectors const *pStartPnt, FourVectors const 
 			// find which of our traces is closest to our start / end points
 			pISectData->m_ISectT = Four_Twos;				// no hit
 
-			FourVectors v4PointOnPlane;
-			FourVectors v4PlaneNormal;
+			// dimhotepus: Always initialize by default.
+			FourVectors v4PointOnPlane(vec3_origin, vec3_origin, vec3_origin, vec3_origin);
+			// dimhotepus: Always initialize by default.
+			FourVectors v4PlaneNormal(vec3_origin, vec3_origin, vec3_origin, vec3_origin);
 			fltx4 fl4ClosestDist = Four_FLT_MAX;
 			for( int i = 0 ; i < pCtx->m_nActivePlanes; i++ )
 			{
