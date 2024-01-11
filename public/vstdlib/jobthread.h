@@ -95,7 +95,7 @@ enum JobPriority_t
 	JP_HIGH
 };
 
-#define TP_MAX_POOL_THREADS	64
+#define TP_MAX_POOL_THREADS	64u
 struct ThreadPoolStartParams_t
 {
 	ThreadPoolStartParams_t( bool bIOThreads = false, unsigned nThreads = -1, int *pAffinities = NULL, ThreeState_t fDistribute = TRS_NONE, unsigned nStackSize = -1, int iThreadPriority = SHRT_MIN )
