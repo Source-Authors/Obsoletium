@@ -740,11 +740,82 @@ BoxOnPlaneSide
 Returns 1, 2, or 1 + 2
 ==================
 */
-int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane_t *p)
-{
-	float	dist1, dist2;
-	int		sides;
+//int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane_t *p)
+//{
+//	float	dist1, dist2;
+//	int		sides;
+//
+//	// fast axial cases
+//	if (p->type < 3)
+//	{
+//		if (p->dist <= emins[p->type])
+//			return 1;
+//		if (p->dist >= emaxs[p->type])
+//			return 2;
+//		return 3;
+//	}
+//	
+//	// general case
+//	switch (p->signbits)
+//	{
+//	case 0:
+//		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+//		dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+//		break;
+//	case 1:
+//		dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+//		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+//		break;
+//	case 2:
+//		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+//		dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+//		break;
+//	case 3:
+//		dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+//		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+//		break;
+//	case 4:
+//		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+//		dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+//		break;
+//	case 5:
+//		dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+//		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+//		break;
+//	case 6:
+//		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+//		dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+//		break;
+//	case 7:
+//		dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+//		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+//		break;
+//	default:
+//		dist1 = dist2 = 0;		// shut up compiler
+//		Assert( 0 );
+//		break;
+//	}
+//
+//	sides = 0;
+//	if (dist1 >= p->dist)
+//		sides = 1;
+//	if (dist2 < p->dist)
+//		sides |= 2;
+//
+//	Assert( sides != 0 );
+//
+//	return sides;
+//}
 
+/*
+==================
+BoxOnPlaneSide
+
+Returns 1, 2, or 1 + 2
+==================
+*/
+int XM_CALLCONV BoxOnPlaneSide ( Vector emins, Vector emaxs, const cplane_t *p )
+{
 	// fast axial cases
 	if (p->type < 3)
 	{
@@ -754,53 +825,164 @@ int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane
 			return 2;
 		return 3;
 	}
+
+	DirectX::XMVECTOR normal = DirectX::XMLoadFloat3( p->normal.XmBase() );
+	DirectX::XMVECTOR vemins = DirectX::XMLoadFloat3( emins.XmBase() );
+	DirectX::XMVECTOR vemaxs = DirectX::XMLoadFloat3( emaxs.XmBase() );
 	
+	DirectX::XMVECTOR vdist1, vdist2;
+
 	// general case
 	switch (p->signbits)
 	{
 	case 0:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+		vdist1 = DirectX::XMVectorSum( DirectX::XMVectorMultiply( normal, vemaxs ) );
+		vdist2 = DirectX::XMVectorSum( DirectX::XMVectorMultiply( normal, vemins ) );
 		break;
 	case 1:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+		vdist1 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emins[0], emaxs[1], emaxs[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_0X, DirectX::XM_PERMUTE_1Y, DirectX::XM_PERMUTE_1Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
+		vdist2 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emaxs[0], emins[1], emins[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_1X, DirectX::XM_PERMUTE_0Y, DirectX::XM_PERMUTE_0Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
 		break;
 	case 2:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+		vdist1 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emaxs[0], emins[1], emaxs[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_1X, DirectX::XM_PERMUTE_0Y, DirectX::XM_PERMUTE_1Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
+		vdist2 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emins[0], emaxs[1], emins[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_0X, DirectX::XM_PERMUTE_1Y, DirectX::XM_PERMUTE_0Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
 		break;
 	case 3:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+		vdist1 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emins[0], emins[1], emaxs[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_0X, DirectX::XM_PERMUTE_0Y, DirectX::XM_PERMUTE_1Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
+		vdist2 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emaxs[0], emaxs[1], emins[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_1X, DirectX::XM_PERMUTE_1Y, DirectX::XM_PERMUTE_0Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
 		break;
 	case 4:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+		vdist1 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emaxs[0], emaxs[1], emins[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_1X, DirectX::XM_PERMUTE_1Y, DirectX::XM_PERMUTE_0Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
+		vdist2 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emins[0], emins[1], emaxs[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_0X, DirectX::XM_PERMUTE_0Y, DirectX::XM_PERMUTE_1Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
 		break;
 	case 5:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+		vdist1 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emins[0], emaxs[1], emins[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_0X, DirectX::XM_PERMUTE_1Y, DirectX::XM_PERMUTE_0Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
+		vdist2 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emaxs[0], emins[1], emaxs[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_1X, DirectX::XM_PERMUTE_0Y, DirectX::XM_PERMUTE_1Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
 		break;
 	case 6:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+		vdist1 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emaxs[0], emins[1], emins[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_1X, DirectX::XM_PERMUTE_0Y, DirectX::XM_PERMUTE_0Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
+		vdist2 = DirectX::XMVectorSum
+		(
+			DirectX::XMVectorMultiply
+			(
+				normal,
+				// emins[0], emaxs[1], emaxs[2]
+				DirectX::XMVectorPermute<DirectX::XM_PERMUTE_0X, DirectX::XM_PERMUTE_1Y, DirectX::XM_PERMUTE_1Z, DirectX::XM_PERMUTE_0W>( vemins, vemaxs )
+			)
+		);
 		break;
 	case 7:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+		vdist1 = DirectX::XMVectorSum( DirectX::XMVectorMultiply( normal, vemins ) );
+		vdist2 = DirectX::XMVectorSum( DirectX::XMVectorMultiply( normal, vemaxs ) );
 		break;
 	default:
-		dist1 = dist2 = 0;		// shut up compiler
+		vdist1 = DirectX::g_XMZero;
+		vdist2 = DirectX::g_XMZero;   // shut up compiler
 		Assert( 0 );
 		break;
 	}
 
-	sides = 0;
-	if (dist1 >= p->dist)
+	DirectX::XMVECTOR planeDist = DirectX::XMVectorReplicate( p->dist );
+
+	int sides = 0;
+
+	if ( DirectX::XMVector3GreaterOrEqual( vdist1, planeDist ) )
+	{
 		sides = 1;
-	if (dist2 < p->dist)
+	}
+
+	if ( DirectX::XMVector3Less( vdist2, planeDist ) )
+	{
 		sides |= 2;
+	}
 
 	Assert( sides != 0 );
 

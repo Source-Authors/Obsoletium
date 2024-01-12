@@ -594,7 +594,8 @@ inline float MatrixColumnDotProduct( const matrix3x4_t &in1, int col, const Vect
 	return in1[0][col] * in2[0] + in1[1][col] * in2[1] + in1[2][col] * in2[2]; 
 }
 
-int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane_t *plane);
+// dimhotepus: Too unsafe. Use safer overload.
+int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane_t *plane) = delete;
 
 inline float anglemod(float a)
 {
@@ -878,10 +879,7 @@ inline void DecomposeRotation( const matrix3x4_t &mat, Vector &out )
 }
 */
 
-inline int BoxOnPlaneSide (const Vector& emins, const Vector& emaxs, const cplane_t *plane )
-{
-	return BoxOnPlaneSide( &emins.x, &emaxs.x, plane );
-}
+int XM_CALLCONV BoxOnPlaneSide ( Vector emins, Vector emaxs, const cplane_t *plane );
 
 inline void VectorFill(Vector& a, float b)
 {
