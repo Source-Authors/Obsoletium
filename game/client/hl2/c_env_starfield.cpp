@@ -97,7 +97,7 @@ void C_EnvStarfield::ClientThink( void )
 	Vector vecViewOrigin = MainViewOrigin();
 
 	// Determine the number of particles
-	m_flNumParticles += 1.0 * (m_flDensity);
+	m_flNumParticles += 1.0f * (m_flDensity);
 	int iNumParticles = floor(m_flNumParticles);
 	m_flNumParticles -= iNumParticles;
 

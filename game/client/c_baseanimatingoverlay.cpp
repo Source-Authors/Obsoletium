@@ -278,7 +278,7 @@ void C_BaseAnimatingOverlay::CheckForLayerChanges( CStudioHdr *hdr, float curren
 			m_iv_AnimOverlay[i].Interpolate( currentTime );
 
 			// reset event indexes
-			m_flOverlayPrevEventCycle[i] = pHead->m_flPrevCycle - 0.01;
+			m_flOverlayPrevEventCycle[i] = pHead->m_flPrevCycle - 0.01f;
 		}
 	}
 

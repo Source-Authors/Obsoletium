@@ -48,7 +48,7 @@ static ConVar	net_graphproportionalfont( "net_graphproportionalfont", "1", FCVAR
 
 
 #define	TIMINGS	1024       // Number of values to track (must be power of 2) b/c of masking
-#define FRAMERATE_AVG_FRAC 0.9
+constexpr inline float FRAMERATE_AVG_FRAC{0.9f};
 #define PACKETLOSS_AVG_FRAC 0.5
 #define PACKETCHOKE_AVG_FRAC 0.5
 
@@ -609,7 +609,7 @@ void CNetGraphPanel::GetFrameData( 	INetChannelInfo *netchannel, int *biggest_me
 	}
 
 	// Can't be below zero
-	m_AvgLatency = MAX( 0.0, m_AvgLatency );
+	m_AvgLatency = MAX( 0.0f, m_AvgLatency );
 
 	flAdjust *= 1000.0f;
 
@@ -726,7 +726,7 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 	HFont font = GetNetgraphFont();
 
 	// Move rolling average
-	m_Framerate = FRAMERATE_AVG_FRAC * m_Framerate + ( 1.0 - FRAMERATE_AVG_FRAC ) * gpGlobals->absoluteframetime;
+	m_Framerate = FRAMERATE_AVG_FRAC * m_Framerate + ( 1.0f - FRAMERATE_AVG_FRAC ) * gpGlobals->absoluteframetime;
 
 	// Print it out
 	y -= m_nNetGraphHeight;

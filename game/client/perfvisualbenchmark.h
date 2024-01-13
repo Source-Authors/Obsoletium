@@ -9,9 +9,9 @@
 #if !defined PERFVISUALBENCHMARK_H
 #define PERFVISUALBENCHMARK_H
 
-#define FPS_STABILIZE_TIME 1.5
-#define FPS_STABILIZE_TIME_RELOAD_MATERIALS 10.0
-#define FPS_MEASURE_TIME 2.0
+constexpr inline float FPS_STABILIZE_TIME{1.5f};
+constexpr inline float FPS_STABILIZE_TIME_RELOAD_MATERIALS{10.0f};
+constexpr inline float FPS_MEASURE_TIME{2.0f};
 
 #ifdef _WIN32
 #pragma once

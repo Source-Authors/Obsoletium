@@ -283,12 +283,12 @@ void C_ScriptIntro::ClientThink( void )
 
 	if ( m_IntroData.m_Passes.Count() == 2 )
 	{
-		m_IntroData.m_Passes[0].m_Alpha = 1.0 - flPerc;
+		m_IntroData.m_Passes[0].m_Alpha = 1.0f - flPerc;
 		m_IntroData.m_Passes[1].m_Alpha = flPerc;
 	}
 	else
 	{
-		m_IntroData.m_Passes[0].m_Alpha = 1.0 - flPerc;
+		m_IntroData.m_Passes[0].m_Alpha = 1.0f - flPerc;
 	}
 }
 

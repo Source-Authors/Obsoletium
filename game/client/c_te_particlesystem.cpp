@@ -255,8 +255,8 @@ void CTEParticleRenderer::SimulateParticles( CParticleSimulateIterator *pIterato
 				colorIndex = &gSparkRamp[ iRamp ];
 				pParticle->SetColor((float)(*colorIndex)[0] / 255.0f, (float)(*colorIndex)[1] / 255.0f, (float)(*colorIndex)[2] / 255.0f);
 				
-				pParticle->m_Velocity[0] -= pParticle->m_Velocity[0]*0.5*ft;
-				pParticle->m_Velocity[1] -= pParticle->m_Velocity[1]*0.5*ft;
+				pParticle->m_Velocity[0] -= pParticle->m_Velocity[0]*0.5f*ft;
+				pParticle->m_Velocity[1] -= pParticle->m_Velocity[1]*0.5f*ft;
 				pParticle->m_Velocity[2] -= grav * 5;
 
 				if ( random->RandomInt(0,3) )

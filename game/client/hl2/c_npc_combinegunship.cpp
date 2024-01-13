@@ -328,10 +328,10 @@ int	C_GunshipFX::DrawModel( int )
 		dl->color.b = 255*params[GUNSHIPFX_AFTERGLOW_COLOR].x;
 		dl->color.exponent = 5;
 		dl->radius = 128.0f;
-		dl->die = gpGlobals->curtime + 0.001;
+		dl->die = gpGlobals->curtime + 0.001f;
 	}
 
-	if ( m_t >= 4.0 && !hasAny )
+	if ( m_t >= 4.0f && !hasAny )
 	{
 		EffectShutdown();
 	}

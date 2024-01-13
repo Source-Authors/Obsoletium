@@ -180,7 +180,7 @@ void CCommentaryModelViewer::HandleMovementInput( void )
 		{
 			m_flYawSpeed = 0;
 		}
-		m_flYawSpeed = MAX(m_flYawSpeed-flAccel, -3.0);
+		m_flYawSpeed = MAX(m_flYawSpeed-flAccel, -3.0f);
 	}
 	else if ( bRightDown )
 	{
@@ -188,7 +188,7 @@ void CCommentaryModelViewer::HandleMovementInput( void )
 		{
 			m_flYawSpeed = 0;
 		}
-		m_flYawSpeed = MIN(m_flYawSpeed+flAccel, 3.0);
+		m_flYawSpeed = MIN(m_flYawSpeed+flAccel, 3.0f);
 	}
 	if ( m_flYawSpeed != 0 )
 	{
@@ -203,7 +203,7 @@ void CCommentaryModelViewer::HandleMovementInput( void )
 
 		if ( !bLeftDown && !bRightDown )
 		{
-			m_flYawSpeed = ( m_flYawSpeed > 0 ) ? MAX(0,m_flYawSpeed-0.1) : MIN(0,m_flYawSpeed+0.1);
+			m_flYawSpeed = ( m_flYawSpeed > 0 ) ? MAX(0,m_flYawSpeed-0.1f) : MIN(0,m_flYawSpeed+0.1f);
 		}
 	}
 
@@ -214,7 +214,7 @@ void CCommentaryModelViewer::HandleMovementInput( void )
 		{
 			m_flZoomSpeed = 0;
 		}
-		m_flZoomSpeed = MAX(m_flZoomSpeed-flAccel, -3.0);
+		m_flZoomSpeed = MAX(m_flZoomSpeed-flAccel, -3.0f);
 	}
 	else if ( bBackDown )
 	{
@@ -222,7 +222,7 @@ void CCommentaryModelViewer::HandleMovementInput( void )
 		{
 			m_flZoomSpeed = 0;
 		}
-		m_flZoomSpeed = MIN(m_flZoomSpeed+flAccel, 3.0);
+		m_flZoomSpeed = MIN(m_flZoomSpeed+flAccel, 3.0f);
 	}
 	if ( m_flZoomSpeed != 0 )
 	{
@@ -232,14 +232,14 @@ void CCommentaryModelViewer::HandleMovementInput( void )
 		}
 		else
 		{
-			float flZoomMin = m_pModelPanel->m_flFrameDistance * 0.75;
-			float flZoomMax = m_pModelPanel->m_flFrameDistance * 1.5;
+			float flZoomMin = m_pModelPanel->m_flFrameDistance * 0.75f;
+			float flZoomMax = m_pModelPanel->m_flFrameDistance * 1.5f;
 			m_pModelPanel->m_pModelInfo->m_vecOriginOffset.x = clamp( m_pModelPanel->m_pModelInfo->m_vecOriginOffset.x + m_flZoomSpeed, flZoomMin, flZoomMax );
 		}
 
 		if ( !bForwardDown && !bBackDown )
 		{
-			m_flZoomSpeed = ( m_flZoomSpeed > 0 ) ? MAX(0,m_flZoomSpeed-0.1) : MIN(0,m_flZoomSpeed+0.1);
+			m_flZoomSpeed = ( m_flZoomSpeed > 0 ) ? MAX(0,m_flZoomSpeed-0.1f) : MIN(0,m_flZoomSpeed+0.1f);
 		}
 	}
 }

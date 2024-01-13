@@ -199,8 +199,8 @@ void C_TEShatterSurface::PostDataUpdate( DataUpdateType_t updateType )
 	// Create glass shards
 	// ----------------------
 	Vector vCurPos = m_vecOrigin;
-	vCurPos.x += 0.5*m_flShardSize;
-	vCurPos.z += 0.5*m_flShardSize;
+	vCurPos.x += 0.5f*m_flShardSize;
+	vCurPos.z += 0.5f*m_flShardSize;
 
 	float flMinSpeed = 9999999999.0f;
 	float flMaxSpeed = 0;

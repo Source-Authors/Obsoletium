@@ -193,11 +193,11 @@ static void Noise( float *noise, int divs, float scale )
 		return;
 
 	// Noise is normalized to +/- scale
-	noise[ div2 ] = (noise[0] + noise[divs]) * 0.5 + scale * beamRandom.RandomFloat(-1, 1);
+	noise[ div2 ] = (noise[0] + noise[divs]) * 0.5f + scale * beamRandom.RandomFloat(-1, 1);
 	if ( div2 > 1 )
 	{
-		Noise( &noise[div2], div2, scale * 0.5 );
-		Noise( noise, div2, scale * 0.5 );
+		Noise( &noise[div2], div2, scale * 0.5f );
+		Noise( noise, div2, scale * 0.5f );
 	}
 }
 
@@ -662,13 +662,13 @@ void CViewRenderBeams::KillDeadBeams( C_BaseEntity *pDeadEntity )
 		if ( pbeam->type != TE_BEAMFOLLOW )
 		{
 			// Die Die Die!
-			pbeam->die = gpGlobals->curtime - 0.1;  
+			pbeam->die = gpGlobals->curtime - 0.1f;  
 
 			// Kill off particles
 			pHead = pbeam->trail;
 			while (pHead)
 			{
-				pHead->die = gpGlobals->curtime - 0.1;
+				pHead->die = gpGlobals->curtime - 0.1f;
 				pHead = pHead->next;
 			}
 
@@ -1905,7 +1905,7 @@ void CViewRenderBeams::DrawLaser( Beam_t *pbeam, int frame, int rendermode, floa
 			}
 			else
 			{
-				flFade *= pow( flDistance, 3 );
+				flFade *= powf( flDistance, 3 );
 			}
 		}
 

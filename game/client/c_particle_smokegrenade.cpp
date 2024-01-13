@@ -478,7 +478,7 @@ inline void C_ParticleSmokeGrenade::UpdateParticleDuringTrade( int iParticle, fl
 		{			
 			// Ok, move them closer.
 			float percent = (float)cos(pInfo->m_TradeClock * 2 * 1.57079632f / pInfo->m_TradeDuration);
-			percent = percent * 0.5 + 0.5;
+			percent = percent * 0.5f + 0.5f;
 			
 			pInfo->m_pParticle->m_FadeAlpha  = pInfo->m_FadeAlpha + (pOther->m_FadeAlpha - pInfo->m_FadeAlpha) * (1 - percent);
 			pOther->m_pParticle->m_FadeAlpha = pInfo->m_FadeAlpha + (pOther->m_FadeAlpha - pInfo->m_FadeAlpha) * percent;
@@ -560,7 +560,7 @@ void C_ParticleSmokeGrenade::Update(float fTimeDelta)
 	else if(flLifetime < m_FadeEndTime)
 	{
 		float fadePercent = (flLifetime - m_FadeStartTime) / (m_FadeEndTime - m_FadeStartTime);
-		m_FadeAlpha = cos(fadePercent * 3.14159) * 0.5 + 0.5;
+		m_FadeAlpha = cos(fadePercent * 3.14159f) * 0.5f + 0.5f;
 	}
 	else
 	{

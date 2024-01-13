@@ -317,9 +317,9 @@ void C_AR2Explosion::Start(CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArg
 						pParticle->m_Dist = 8.0;
 						pParticle->m_Velocity = velocity;
 						// sound == 13031.496062992125984251968503937ips
-						pParticle->m_Lifetime = -dist / 13031.5f - 0.1;
-						pParticle->m_Roll = FRand( 0, M_PI * 2 );
-						pParticle->m_RollSpeed = FRand( -1, 1 ) * 0.4;
+						pParticle->m_Lifetime = -dist / 13031.5f - 0.1f;
+						pParticle->m_Roll = FRand( 0, M_PI_F * 2 );
+						pParticle->m_RollSpeed = FRand( -1, 1 ) * 0.4f;
 						pParticle->m_Dwell = AR2_DUST_LIFETIME + random->RandomFloat( 0, AR2_DUST_LIFETIME_DELTA );
 						nParticles++;
 						break;
@@ -356,10 +356,10 @@ void C_AR2Explosion::Start(CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArg
 			pParticle->m_Dist = 8.0;
 			pParticle->m_Velocity = velocity;
 			// sound == 13031.496062992125984251968503937ips
-			pParticle->m_Lifetime = -dist / 13031.5f - 0.1;
-			pParticle->m_Roll = FRand( 0, M_PI * 2 );
-			pParticle->m_RollSpeed = FRand( -1, 1 ) * 4.0;
-			pParticle->m_Dwell = 0.5 * (AR2_DUST_LIFETIME + random->RandomFloat( 0, AR2_DUST_LIFETIME_DELTA ));
+			pParticle->m_Lifetime = -dist / 13031.5f - 0.1f;
+			pParticle->m_Roll = FRand( 0, M_PI_F * 2 );
+			pParticle->m_RollSpeed = FRand( -1, 1 ) * 4.0f;
+			pParticle->m_Dwell = 0.5f * (AR2_DUST_LIFETIME + random->RandomFloat( 0, AR2_DUST_LIFETIME_DELTA ));
 		}
 	}
 }

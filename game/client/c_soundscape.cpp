@@ -500,7 +500,7 @@ void C_SoundscapeSystem::UpdateLoopingSounds( float frametime )
 	float amount = frametime;
 	if ( period > 0 )
 	{
-		amount *= 1.0 / period;
+		amount *= 1.0f / period;
 	}
 
 	int fadeCount = m_loopingSounds.Count();
@@ -1237,7 +1237,7 @@ void C_SoundscapeSystem::UpdateLoopingSound( loopingsound_t &loopSound )
 int C_SoundscapeSystem::AddRandomSound( const randomsound_t &sound )
 {
 	int index = m_randomSounds.AddToTail( sound );
-	m_randomSounds[index].nextPlayTime = gpGlobals->curtime + 0.5 * RandomInterval( sound.time );
+	m_randomSounds[index].nextPlayTime = gpGlobals->curtime + 0.5f * RandomInterval( sound.time );
 	
 	return index;
 }

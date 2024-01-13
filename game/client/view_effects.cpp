@@ -500,7 +500,7 @@ void CViewEffects::FadeCalculate( void )
 		// Keep pushing reset time out indefinitely
 		if ( pFade->Flags & FFADE_STAYOUT )
 		{
-			pFade->Reset = gpGlobals->curtime + 0.1;
+			pFade->Reset = gpGlobals->curtime + 0.1f;
 		}
 
 		// All done?

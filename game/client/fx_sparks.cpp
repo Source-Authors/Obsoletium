@@ -832,7 +832,7 @@ void FX_Sparks( const Vector &pos, int nMagnitude, int nTrailLength, const Vecto
 		dir += vecDir;
 		VectorNormalize( dir );
 		
-		pParticle->m_flWidth		= (flWidth * 0.25) + random->RandomFloat( 0.0f, 0.5f );
+		pParticle->m_flWidth		= (flWidth * 0.25f) + random->RandomFloat( 0.0f, 0.5f );
 		pParticle->m_flLength		= nTrailLength * random->RandomFloat( 0.02f, 0.03f );
 		pParticle->m_flDieTime		= nMagnitude * random->RandomFloat( 0.3f, 0.5f );
 		
@@ -1374,7 +1374,7 @@ void FX_ConcussiveExplosion( Vector &origin, Vector &normal )
 	dl->origin	= offset;
 	dl->color.r = dl->color.g = dl->color.b = 64;
 	dl->radius	= random->RandomFloat(128,256);
-	dl->die		= gpGlobals->curtime + 0.1;
+	dl->die		= gpGlobals->curtime + 0.1f;
 
 
 	//

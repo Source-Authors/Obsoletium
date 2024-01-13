@@ -285,8 +285,8 @@ void C_PropVehicleDriveable::DrawHudElements( )
 
 #if TRIANGULATED_CROSSHAIR
 				ScreenTransform( m_vecGunCrosshair, screen );
-				x += 0.5 * screen[0] * ScreenWidth() + 0.5;
-				y -= 0.5 * screen[1] * ScreenHeight() + 0.5;
+				x += 0.5f * screen[0] * ScreenWidth() + 0.5f;
+				y -= 0.5f * screen[1] * ScreenHeight() + 0.5f;
 #endif
 			}
 

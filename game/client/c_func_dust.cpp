@@ -55,8 +55,8 @@ void CDustEffect::RenderParticles( CParticleRenderIterator *pIterator )
 		else
 		{
 			// Alpha.
-			float flAngle = (pParticle->m_flLifetime / pParticle->m_flDieTime) * M_PI * 2;
-			flAlpha = sin( flAngle - (M_PI * 0.5f) ) * 0.5f + 0.5f;
+			float flAngle = (pParticle->m_flLifetime / pParticle->m_flDieTime) * M_PI_F * 2;
+			flAlpha = sin( flAngle - (M_PI_F * 0.5f) ) * 0.5f + 0.5f;
 		}
 
 		Vector tPos;

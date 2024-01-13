@@ -159,7 +159,7 @@ void C_DynamicLight::ClientThink(void)
 		m_pDynamicLight->origin		= GetAbsOrigin();
 		m_pDynamicLight->m_InnerAngle = m_InnerAngle;
 		m_pDynamicLight->m_OuterAngle = m_OuterAngle;
-		m_pDynamicLight->die = gpGlobals->curtime + 1e6;
+		m_pDynamicLight->die = gpGlobals->curtime + 1e6f;
 		m_pDynamicLight->m_Direction = forward;
 	}
 	else
@@ -209,7 +209,7 @@ void C_DynamicLight::ClientThink(void)
 			m_pSpotlightEnd->style = m_LightStyle;
 			m_pSpotlightEnd->flags = DLIGHT_NO_MODEL_ILLUMINATION | (m_Flags & DLIGHT_DISPLACEMENT_MASK);
 			m_pSpotlightEnd->radius		= m_SpotRadius; // * falloff;
-			m_pSpotlightEnd->die		= gpGlobals->curtime + 1e6;
+			m_pSpotlightEnd->die		= gpGlobals->curtime + 1e6f;
 			m_pSpotlightEnd->color.r	= m_clrRender->r * falloff;
 			m_pSpotlightEnd->color.g	= m_clrRender->g * falloff;
 			m_pSpotlightEnd->color.b	= m_clrRender->b * falloff;

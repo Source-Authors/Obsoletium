@@ -76,13 +76,13 @@ CON_COMMAND_F( viewanim_addkeyframe, "", FCVAR_CHEAT )
 		float flDelay = 0.2;
 		if (args.ArgC() > 1)
 		{
-			flDelay = atof( args[1] );
+			flDelay = strtof( args[1], nullptr );
 		}
 
 		int iFlags = 0;
 		if (args.ArgC() > 1)
 		{
-			iFlags = atof( args[2] );
+			iFlags = strtof( args[2], nullptr );
 		}
 
 		g_pTestAnimation->AddKeyFrame( new CViewAngleKeyFrame( vecTarget, flDelay, iFlags ) );

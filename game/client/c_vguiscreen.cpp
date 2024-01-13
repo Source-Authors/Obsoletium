@@ -310,7 +310,7 @@ void ScreenToWorld( int mousex, int mousey, float fov,
 	dy = c_y - (float)mousey;
 
 	// Convert view plane distance
-	dist = c_x / tan( M_PI * scaled_fov / 360.0 );
+	dist = c_x / tan( M_PI_F * scaled_fov / 360.0f );
 
 	// Decompose view angles
 	AngleVectors( vecRenderAngles, &vpn, &vright, &vup );

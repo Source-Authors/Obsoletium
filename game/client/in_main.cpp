@@ -594,19 +594,19 @@ float CInput::KeyState ( kbutton_t *key )
 	if ( impulsedown && !impulseup )
 	{
 		// pressed and held this frame?
-		val = down ? 0.5 : 0.0;
+		val = down ? 0.5f : 0.0f;
 	}
 
 	if ( impulseup && !impulsedown )
 	{
 		// released this frame?
-		val = down ? 0.0 : 0.0;
+		val = down ? 0.0f : 0.0f;
 	}
 
 	if ( !impulsedown && !impulseup )
 	{
 		// held the entire frame?
-		val = down ? 1.0 : 0.0;
+		val = down ? 1.0f : 0.0f;
 	}
 
 	if ( impulsedown && impulseup )
@@ -614,12 +614,12 @@ float CInput::KeyState ( kbutton_t *key )
 		if ( down )
 		{
 			// released and re-pressed this frame
-			val = 0.75;	
+			val = 0.75f;	
 		}
 		else
 		{
 			// pressed and released this frame
-			val = 0.25;	
+			val = 0.25f;	
 		}
 	}
 

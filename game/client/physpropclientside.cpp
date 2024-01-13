@@ -91,7 +91,7 @@ bool C_PhysPropClientside::KeyValue( const char *szKeyName, const char *szValue 
 {
 	if (FStrEq(szKeyName, "physdamagescale"))
 	{
-		m_impactEnergyScale = atof(szValue);
+		m_impactEnergyScale = strtof(szValue, nullptr);
 	}
 	else if ( FStrEq(szKeyName, "health") )
 	{

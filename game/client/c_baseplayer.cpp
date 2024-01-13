@@ -1652,7 +1652,7 @@ void C_BasePlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, floa
 	{
 		// Look at their chest, not their head
 		Vector maxs = pTarget->GetBaseAnimating() ? VEC_HULL_MAX_SCALED( pTarget->GetBaseAnimating() ) : VEC_HULL_MAX;
-		vecCamTarget.z -= (maxs.z * 0.5);
+		vecCamTarget.z -= (maxs.z * 0.5f);
 	}
 	else
 	{
@@ -1684,7 +1684,7 @@ void C_BasePlayer::CalcFreezeCamView( Vector& eyeOrigin, QAngle& eyeAngles, floa
 		vecCamTarget = vecCamDesired;
 
 		// To stop all close in views looking up at character's chins, move the view up.
-		vecTargetPos.z += fabs(vecCamTarget.z - vecTargetPos.z) * 0.85;
+		vecTargetPos.z += fabs(vecCamTarget.z - vecTargetPos.z) * 0.85f;
 		C_BaseEntity::PushEnableAbsRecomputations( false ); // HACK don't recompute positions while doing RayTrace
 		UTIL_TraceHull( vecCamTarget, vecTargetPos, WALL_MIN, WALL_MAX, MASK_SOLID, pTarget, COLLISION_GROUP_NONE, &trace );
 		C_BaseEntity::PopEnableAbsRecomputations();

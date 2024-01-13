@@ -655,7 +655,7 @@ void CHudMessage::Paint()
 		{
 			pMessage = m_pMessages[i];
 			if ( m_startTime[i] > gpGlobals->curtime )
-				m_startTime[i] = gpGlobals->curtime + m_parms.time - m_startTime[i] + 0.2;	// Server takes 0.2 seconds to spawn, adjust for this
+				m_startTime[i] = gpGlobals->curtime + m_parms.time - m_startTime[i] + 0.2f;	// Server takes 0.2 seconds to spawn, adjust for this
 		}
 	}
 

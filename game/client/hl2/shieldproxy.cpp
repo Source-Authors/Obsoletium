@@ -79,8 +79,8 @@ void CShieldProxy::OnBind( C_BaseEntity *pEnt )
 	
 	float sOffset, tOffset;
 	
-	sOffset = gpGlobals->curtime * sin( m_ScrollAngle * ( M_PI / 180.0f ) ) * m_ScrollRate;
-	tOffset = gpGlobals->curtime * cos( m_ScrollAngle * ( M_PI / 180.0f ) ) * m_ScrollRate;
+	sOffset = gpGlobals->curtime * sin( m_ScrollAngle * ( M_PI_F / 180.0f ) ) * m_ScrollRate;
+	tOffset = gpGlobals->curtime * cos( m_ScrollAngle * ( M_PI_F / 180.0f ) ) * m_ScrollRate;
 
 	// make sure that we are positive
 	if( sOffset < 0.0f )

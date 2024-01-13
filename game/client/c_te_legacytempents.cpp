@@ -118,7 +118,7 @@ void C_LocalTempEntity::Prepare( const model_t *pmodel, float time )
 
 	// Use these to set per-frame and termination conditions / actions
 	flags = FTENT_NONE;		
-	die = time + 0.75;
+	die = time + 0.75f;
 	SetModelPointer( pmodel );
 	SetRenderMode( kRenderNormal );
 	m_nRenderFX = kRenderFxNone;
@@ -211,8 +211,8 @@ int	C_LocalTempEntity::DrawModel( int modelFlags )
 		float flDot = DotProduct( m_vecNormal, vecDelta );
 		if ( flDot > 0 )
 		{
-			float flAlpha = RemapVal( MIN(flDot,0.3), 0, 0.3, 0, 1 );
-			flAlpha = MAX( 1.0, tempent_renderamt - (tempent_renderamt * flAlpha) );
+			float flAlpha = RemapVal( MIN(flDot,0.3f), 0, 0.3f, 0, 1 );
+			flAlpha = MAX( 1.0f, tempent_renderamt - (tempent_renderamt * flAlpha) );
 			SetRenderColorA( flAlpha );
 		}
 	}
@@ -578,7 +578,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 		dl->color.r = 255;
 		dl->color.g = 120;
 		dl->color.b = 0;
-		dl->die = gpGlobals->curtime + 0.01;
+		dl->die = gpGlobals->curtime + 0.01f;
 	}
 
 	if ( flags & FTENT_SMOKETRAIL )
@@ -835,10 +835,10 @@ void CTempEnts::FizzEffect( C_BaseEntity *pent, int modelIndex, int density, int
 
 		float zspeed = random->RandomInt(80,140);
 		pTemp->SetVelocity( Vector(xspeed, yspeed, zspeed) );
-		pTemp->die = gpGlobals->curtime + (maxHeight / zspeed) - 0.1;
+		pTemp->die = gpGlobals->curtime + (maxHeight / zspeed) - 0.1f;
 		pTemp->m_flFrame = random->RandomInt(0,frameCount-1);
 		// Set sprite scale
-		pTemp->m_flSpriteScale = 1.0 / random->RandomFloat(2,5);
+		pTemp->m_flSpriteScale = 1.0f / random->RandomFloat(2,5);
 		pTemp->SetRenderMode( kRenderTransAlpha );
 		pTemp->SetRenderColorA( 255 );
 	}
@@ -887,11 +887,11 @@ void CTempEnts::Bubbles( const Vector &mins, const Vector &maxs, float height, i
 		
 		float zspeed = random->RandomInt(80,140);
 		pTemp->SetVelocity( Vector(speed * cosine, speed * sine, zspeed) );
-		pTemp->die = gpGlobals->curtime + ((height - (origin[2] - mins[2])) / zspeed) - 0.1;
+		pTemp->die = gpGlobals->curtime + ((height - (origin[2] - mins[2])) / zspeed) - 0.1f;
 		pTemp->m_flFrame = random->RandomInt( 0, frameCount-1 );
 		
 		// Set sprite scale
-		pTemp->m_flSpriteScale = 1.0 / random->RandomFloat(4,16);
+		pTemp->m_flSpriteScale = 1.0f / random->RandomFloat(4,16);
 		pTemp->SetRenderMode( kRenderTransAlpha );
 		
 		pTemp->SetRenderColor( 255, 255, 255, 192 );
@@ -940,10 +940,10 @@ void CTempEnts::BubbleTrail( const Vector &start, const Vector &end, float flWat
 
 		float zspeed = random->RandomInt(80,140);
 		pTemp->SetVelocity( Vector(speed * cos(angle), speed * sin(angle), zspeed) );
-		pTemp->die = gpGlobals->curtime + ((flWaterZ - origin[2]) / zspeed) - 0.1;
+		pTemp->die = gpGlobals->curtime + ((flWaterZ - origin[2]) / zspeed) - 0.1f;
 		pTemp->m_flFrame = random->RandomInt(0,frameCount-1);
 		// Set sprite scale
-		pTemp->m_flSpriteScale = 1.0 / random->RandomFloat(4,8);
+		pTemp->m_flSpriteScale = 1.0f / random->RandomFloat(4,8);
 		pTemp->SetRenderMode( kRenderTransAlpha );
 		
 		pTemp->SetRenderColor( 255, 255, 255, 192 );
@@ -1247,7 +1247,7 @@ C_LocalTempEntity *CTempEnts::TempSprite( const Vector &pos, const Vector &dir, 
 	if ( life )
 		pTemp->die = gpGlobals->curtime + life;
 	else
-		pTemp->die = gpGlobals->curtime + (frameCount * 0.1) + 1;
+		pTemp->die = gpGlobals->curtime + (frameCount * 0.1f) + 1;
 
 	pTemp->m_flFrame = 0;
 	return pTemp;
@@ -1274,7 +1274,7 @@ void CTempEnts::Sprite_Spray( const Vector &pos, const Vector &dir, int modelInd
 	noise = (float)iRand / 100;
 
 	// more vertical displacement
-	znoise = noise * 1.5;
+	znoise = noise * 1.5f;
 	
 	if ( znoise > 1 )
 	{
@@ -1311,12 +1311,12 @@ void CTempEnts::Sprite_Spray( const Vector &pos, const Vector &dir, int modelInd
 		velocity.x = dir[ 0 ] + random->RandomFloat ( -noise, noise );
 		velocity.y = dir[ 1 ] + random->RandomFloat ( -noise, noise );
 		velocity.z = dir[ 2 ] + random->RandomFloat ( 0, znoise );
-		velocity *= random->RandomFloat( (speed * 0.8), (speed * 1.2) );
+		velocity *= random->RandomFloat( (speed * 0.8f), (speed * 1.2f) );
 		pTemp->SetVelocity( velocity );
 
 		pTemp->SetLocalOrigin( pos );
 
-		pTemp->die = gpGlobals->curtime + 0.35;
+		pTemp->die = gpGlobals->curtime + 0.35f;
 
 		pTemp->m_flFrame = random->RandomInt( 0, frameCount );
 	}
@@ -2235,17 +2235,17 @@ void CTempEnts::PlaySound ( C_LocalTempEntity *pTemp, float damp )
 
 	fvol = params.volume;
 
-	if ( damp > 0.0 )
+	if ( damp > 0.0f )
 	{
 		int pitch;
 		
 		if ( isshellcasing )
 		{
-			fvol *= MIN (1.0, ((float)zvel) / 350.0); 
+			fvol *= MIN (1.0f, ((float)zvel) / 350.0f); 
 		}
 		else
 		{
-			fvol *= MIN (1.0, ((float)zvel) / 450.0); 
+			fvol *= MIN (1.0f, ((float)zvel) / 450.0f); 
 		}
 		
 		if ( !random->RandomInt(0,3) && !isshellcasing )
@@ -3264,7 +3264,7 @@ void CTempEnts::RocketFlare( const Vector& pos )
 	pTemp->m_flFrame = random->RandomInt( 0, nframeCount - 1);
 	pTemp->m_flSpriteScale = 1.0;
 	pTemp->SetAbsOrigin( pos );
-	pTemp->die = gpGlobals->curtime + 0.01;
+	pTemp->die = gpGlobals->curtime + 0.01f;
 }
 
 
@@ -3318,7 +3318,7 @@ void CTempEnts::HL1EjectBrass( const Vector &vecPosition, const QAngle &angAngle
 
 	pTemp->SetVelocity( vecVelocity );
 
-	pTemp->die = gpGlobals->curtime + 2.5;
+	pTemp->die = gpGlobals->curtime + 2.5f;
 }
 
 #define SHELLTYPE_PISTOL	0

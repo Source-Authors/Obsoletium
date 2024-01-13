@@ -409,7 +409,7 @@ void CSineProxy::OnBind( void *pC_BaseEntity )
 		flSinePeriod = 1;
 
 	// get a value in [0,1]
-	flValue = ( sin( 2.0f * M_PI * (gpGlobals->curtime - flSineTimeOffset) / flSinePeriod ) * 0.5f ) + 0.5f;
+	flValue = ( sin( 2.0f * M_PI_F * (gpGlobals->curtime - flSineTimeOffset) / flSinePeriod ) * 0.5f ) + 0.5f;
 	// get a value in [min,max]	
 	flValue = ( flSineMax - flSineMin ) * flValue + flSineMin;
 	

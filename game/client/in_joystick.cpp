@@ -844,7 +844,7 @@ void CInput::JoyStickMove( float frametime, CUserCmd *cmd )
 	}
 	else
 	{
-		angle = m_flPreviousJoystickYaw * joy_yawsensitivity.GetFloat() * aspeed * 180.0;
+		angle = m_flPreviousJoystickYaw * joy_yawsensitivity.GetFloat() * aspeed * 180.0f;
 	}
 
 	angle = JoyStickAdjustYaw( angle );
@@ -862,7 +862,7 @@ void CInput::JoyStickMove( float frametime, CUserCmd *cmd )
 		}
 		else
 		{
-			angle = m_flPreviousJoystickPitch * joy_pitchsensitivity.GetFloat() * aspeed * 180.0;
+			angle = m_flPreviousJoystickPitch * joy_pitchsensitivity.GetFloat() * aspeed * 180.0f;
 		}
 		viewangles[PITCH] += angle;
 		cmd->mousedy = angle;

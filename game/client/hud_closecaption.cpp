@@ -1892,13 +1892,13 @@ void CHudCloseCaption::DrawStream( wrect_t &rcText, wrect_t &rcWindow, CCloseCap
 		}
 		else if ( rcOut.top > rcWindow.bottom )
 		{
-			float flFadeHeight = (float)wu->GetHeight() * 0.25;
+			float flFadeHeight = (float)wu->GetHeight() * 0.25f;
 			float flDist = (float)(rcOut.top - rcWindow.bottom) / flFadeHeight;
-			flDist = Bias( flDist, 0.2 );
+			flDist = Bias( flDist, 0.2f );
 			if ( flDist > 1 )
 				continue;
 
-			flLineAlpha *= 1.0 - flDist;
+			flLineAlpha *= 1.0f - flDist;
 		}
 
 		Color useColor = wu->GetColor();

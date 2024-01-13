@@ -2982,7 +2982,7 @@ void C_BaseEntity::CreateLightEffects( void )
 		dl->origin[2] += 16;
 		dl->color.r = dl->color.g = dl->color.b = 250;
 		dl->radius = random->RandomFloat(400,431);
-		dl->die = gpGlobals->curtime + 0.001;
+		dl->die = gpGlobals->curtime + 0.001f;
 	}
 	if (IsEffectActive(EF_DIMLIGHT))
 	{			
@@ -2990,7 +2990,7 @@ void C_BaseEntity::CreateLightEffects( void )
 		dl->origin = GetAbsOrigin();
 		dl->color.r = dl->color.g = dl->color.b = 100;
 		dl->radius = random->RandomFloat(200,231);
-		dl->die = gpGlobals->curtime + 0.001;
+		dl->die = gpGlobals->curtime + 0.001f;
 	}
 }
 
@@ -3326,7 +3326,7 @@ void C_BaseEntity::ComputeFxBlend( void )
 	int blend=0;
 	float offset;
 
-	offset = ((int)index) * 363.0;// Use ent index to de-sync these fx
+	offset = ((int)index) * 363.0f;// Use ent index to de-sync these fx
 
 	switch( m_nRenderFX ) 
 	{

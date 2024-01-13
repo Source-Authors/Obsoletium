@@ -1141,7 +1141,7 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 		}
 	}
 
-	int boneControllerCount = MIN( hdr->numbonecontrollers(), ARRAYSIZE( m_flEncodedController ) );
+	int boneControllerCount = MIN( hdr->numbonecontrollers(), (int)ARRAYSIZE( m_flEncodedController ) );
 
 	m_iv_flEncodedController.SetMaxCount( boneControllerCount );
 
@@ -1639,7 +1639,7 @@ void C_BaseAnimating::ApplyBoneMatrixTransform( matrix3x4_t& transform )
 		{
 			float scale;
 			
-			scale = 1.0 + (gpGlobals->curtime - m_flAnimTime) * 10.0;
+			scale = 1.0f + (gpGlobals->curtime - m_flAnimTime) * 10.0f;
 			if ( scale > 2 )	// Don't blow up more than 200%
 				scale = 2;
 			transform[0][1] *= scale;
@@ -2704,7 +2704,7 @@ void C_BaseAnimating::ControlMouth( CStudioHdr *pstudiohdr )
 		float start, end;
 		GetPoseParameterRange( index_, start, end );
 
-		value = (1.0 - value) * start + value * end;
+		value = (1.0f - value) * start + value * end;
 
 		//Adrian - Set the pose parameter value. 
 		//It has to be called "mouth".

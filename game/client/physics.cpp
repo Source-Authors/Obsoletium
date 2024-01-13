@@ -150,16 +150,10 @@ bool PhysicsDLLInit( CreateInterfaceFn physicsFactory )
 		return false;
 	}
 
-	if ( IsX360() )
-	{
-		// Reduce timescale to save perf on 360
-		cl_phys_timescale.SetValue(0.9f);
-	}
 	PhysParseSurfaceData( physprops, filesystem );
 	return true;
 }
 
-#define DEFAULT_XBOX_CLIENT_VPHYSICS_TICK	0.025		// 25ms ticks on xbox ragdolls
 void PhysicsLevelInit( void )
 {
 	physenv = physics->CreateEnvironment();
@@ -177,7 +171,7 @@ void PhysicsLevelInit( void )
 	physenv->SetGravity( Vector(0, 0, -GetCurrentGravity() ) );
 	// 15 ms per tick
 	// NOTE: Always run client physics at this rate - helps keep ragdolls stable
-	physenv->SetSimulationTimestep( IsXbox() ? DEFAULT_XBOX_CLIENT_VPHYSICS_TICK : gpGlobals->interval_per_tick );
+	physenv->SetSimulationTimestep( gpGlobals->interval_per_tick );
 	physenv->SetCollisionEventHandler( &g_Collisions );
 	physenv->SetCollisionSolver( &g_Collisions );
 
@@ -808,8 +802,8 @@ void PhysicsSplash( IPhysicsFluidController *pFluid, IPhysicsObject *pObject, CB
 	mins[1] = DotProduct( binPts[0], binormal );
 	maxs[1] = DotProduct( binPts[1], binormal );
 
-	center[0] = 0.5 * (mins[0] + maxs[0]);
-	center[1] = 0.5 * (mins[1] + maxs[1]);
+	center[0] = 0.5f * (mins[0] + maxs[0]);
+	center[1] = 0.5f * (mins[1] + maxs[1]);
 
 	extents[0] = maxs[0] - center[0];
 	extents[1] = maxs[1] - center[1];

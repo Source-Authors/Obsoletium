@@ -606,7 +606,7 @@ int	C_StriderFX::DrawModel( int )
 		dl->color.b = 255;
 		dl->color.exponent = 5;
 		dl->radius = bright * 128;
-		dl->die = gpGlobals->curtime + 0.001;
+		dl->die = gpGlobals->curtime + 0.001f;
 	}
 
 	if ( m_t >= STRIDERFX_END_ALL_TIME && !hasAny )

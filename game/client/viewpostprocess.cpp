@@ -746,15 +746,15 @@ float CLuminanceHistogramSystem::GetTargetTonemapScalar( bool bGetIdealTargetFor
 				average_luminance = 0.5; // always return 0.5 until we've queried a whole frame
 		}
 		if ( total_pixels > 0 )
-			average_luminance = total * ( 1.0 / total_pixels );
+			average_luminance = total * ( 1.0f / total_pixels );
 		else
-			average_luminance = 0.5;
+			average_luminance = 0.5f;
 
 		// Make sure this is > 0.0f
 		average_luminance = MAX( 0.0001f, average_luminance );
 
 		// Compute target scalar
-		float flTargetScalar = 0.005 / average_luminance;
+		float flTargetScalar = 0.005f / average_luminance;
 
 		return flTargetScalar;
 	}
@@ -868,8 +868,8 @@ void CLuminanceHistogramSystem::UpdateLuminanceRanges( void )
 			if ( mat_tonemap_algorithm.GetInt() == 0 ) // Original algorithm
 			{
 				// Use a logarithmic ramp for high range in the low range
-				e.m_min_lum = - 0.01 + exp( FLerp( log( .01 ), log( .01 + 1 ), 0, nNumRanges - 1, bucket ) );
-				e.m_max_lum = - 0.01 + exp( FLerp( log( .01 ), log( .01 + 1 ), 0, nNumRanges - 1, bucket + 1 ) );
+				e.m_min_lum = - 0.01f + exp( FLerp( log( .01f ), log( .01f + 1 ), 0, nNumRanges - 1, bucket ) );
+				e.m_max_lum = - 0.01f + exp( FLerp( log( .01f ), log( .01f + 1 ), 0, nNumRanges - 1, bucket + 1 ) );
 			}
 			else
 			{
@@ -1174,7 +1174,7 @@ static void SetToneMapScale(IMatRenderContext *pRenderContext, float newvalue, f
 			sumweights += weight;
 			avg += weight * s_MovingAverageToneMapScale[i];
 		}
-		avg *= ( 1.0 / sumweights );
+		avg *= ( 1.0f / sumweights );
 		avg = MIN( maxvalue, MAX( minvalue, avg ));
 		pRenderContext->SetGoalToneMappingScale( avg );
 		mat_hdr_tonemapscale.SetValue( avg );

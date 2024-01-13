@@ -1921,7 +1921,7 @@ void CDetailObjectSystem::UnserializeFastSprite( FastSpriteX4_t *pSpritex4, int 
 	pSpritex4->m_Pos.Z( nSubField ) = pos.z;
 	DetailPropSpriteDict_t *pSDef = &m_DetailSpriteDict[lump.m_DetailModel];
 
-	SubFloat( pSpritex4->m_HalfWidth, nSubField ) = 0.5 * lump.m_flScale * ( pSDef->m_LR.x - pSDef->m_UL.x );
+	SubFloat( pSpritex4->m_HalfWidth, nSubField ) = 0.5f * lump.m_flScale * ( pSDef->m_LR.x - pSDef->m_UL.x );
 	SubFloat( pSpritex4->m_Height, nSubField ) = lump.m_flScale * ( pSDef->m_LR.y - pSDef->m_UL.y );
 	if ( !bFlipped )
 	{
@@ -2046,7 +2046,7 @@ int CDetailObjectSystem::SortSpritesBackToFront( int nLeaf, const Vector &viewOr
 	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
 	if ( pLocalPlayer )
 	{
-		flFactor = 1.0 / pLocalPlayer->GetFOVDistanceAdjustFactor();
+		flFactor = 1.0f / pLocalPlayer->GetFOVDistanceAdjustFactor();
 	}
 
 	float flMaxSqDist;

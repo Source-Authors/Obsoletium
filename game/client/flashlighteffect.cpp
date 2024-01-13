@@ -401,7 +401,7 @@ void CFlashlightEffect::UpdateLightOld(const Vector &vecPos, const Vector &vecDi
 	if ( falloff < 500 )
 		falloff = 1.0;
 	else
-		falloff = 500.0 / falloff;
+		falloff = 500.0f / falloff;
 	
 	falloff *= falloff;
 	

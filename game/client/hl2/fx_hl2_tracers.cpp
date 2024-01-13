@@ -498,7 +498,7 @@ void MuzzleFlash_Airboat( ClientEntityHandle_t hEntity, int attachmentIndex )
 	
 	float spokePos = random->RandomInt( 0, 5 );
 
-	pParticle->m_flRoll			= (360.0/6.0f)*spokePos;
+	pParticle->m_flRoll			= (360.0f/6.0f)*spokePos;
 	pParticle->m_flRollDelta	= 0.0f;
 	
 #ifndef _XBOX

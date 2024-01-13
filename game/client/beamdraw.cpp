@@ -249,12 +249,12 @@ void DrawSegs( int noise_divisions, float *prgNoise, const model_t* spritemodel,
 	
 	length = VectorLength( delta );
 	float flMaxWidth = MAX(startWidth, endWidth) * 0.5f;
-	div = 1.0 / (segments-1);
+	div = 1.0f / (segments-1);
 
-	if ( length*div < flMaxWidth * 1.414 )
+	if ( length*div < flMaxWidth * 1.414f )
 	{
 		// Here, we have too many segments; we could get overlap... so lets have less segments
-		segments = (int)(length / (flMaxWidth * 1.414)) + 1;
+		segments = (int)(length / (flMaxWidth * 1.414f)) + 1;
 		if ( segments < 2 )
 		{
 			segments = 2;
@@ -266,8 +266,8 @@ void DrawSegs( int noise_divisions, float *prgNoise, const model_t* spritemodel,
 		segments = noise_divisions;
 	}
 
-	div = 1.0 / (segments-1);
-	length *= 0.01;
+	div = 1.0f / (segments-1);
+	length *= 0.01f;
 
 	// UNDONE: Expose texture length scale factor to control "fuzziness"
 
@@ -283,17 +283,17 @@ void DrawSegs( int noise_divisions, float *prgNoise, const model_t* spritemodel,
 	}
 	
 	// UNDONE: Expose this paramter as well(3.5)?  Texture scroll rate along beam
-	vLast = fmod(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
+	vLast = fmodf(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
 
 	if ( flags & FBEAM_SINENOISE )
 	{
 		if ( segments < 16 )
 		{
 			segments = 16;
-			div = 1.0 / (segments-1);
+			div = 1.0f / (segments-1);
 		}
 		scale *= 100;
-		length = segments * (1.0/10);
+		length = segments * (1.0f/10);
 	}
 	else
 	{
@@ -349,7 +349,7 @@ void DrawSegs( int noise_divisions, float *prgNoise, const model_t* spritemodel,
 			}
 			else
 			{
-				brightness = 2*(1.0 - (fraction/fadeFraction));
+				brightness = 2*(1.0f - (fraction/fadeFraction));
 			}
 		}
 		else if ( flags & FBEAM_SHADEIN )
@@ -358,7 +358,7 @@ void DrawSegs( int noise_divisions, float *prgNoise, const model_t* spritemodel,
 		}
 		else if ( flags & FBEAM_SHADEOUT )
 		{
-			brightness = 1.0 - (fraction/fadeFraction);
+			brightness = 1.0f - (fraction/fadeFraction);
 		}
 
 		// clamps
@@ -435,7 +435,7 @@ void CalcSegOrigin( Vector *vecOut, int iPoint, int noise_divisions, float *prgN
 	// Sine noise beams have different length calculations
 	if ( flags & FBEAM_SINENOISE )
 	{
-		length = segments * (1.0/10);
+		length = segments * (1.0f/10);
 		noiseIndex = 0;
 	}
 
@@ -504,14 +504,14 @@ void DrawTeslaSegs( int noise_divisions, float *prgNoise, const model_t* spritem
 	if ( segments > noise_divisions )		// UNDONE: Allow more segments?
 		segments = noise_divisions;
 
-	length = VectorLength( delta ) * 0.01;
-	div = 1.0 / (segments-1);
+	length = VectorLength( delta ) * 0.01f;
+	div = 1.0f / (segments-1);
 
 	// UNDONE: Expose texture length scale factor to control "fuzziness"
 	vStep = length*div;	// Texture length texels per space pixel
 
 	// UNDONE: Expose this paramter as well(3.5)?  Texture scroll rate along beam
-	vLast = fmod(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
+	vLast = fmodf(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
 
 	brightness = 1.0;
 	if ( flags & FBEAM_SHADEIN )
@@ -550,13 +550,13 @@ void DrawTeslaSegs( int noise_divisions, float *prgNoise, const model_t* spritem
 
 		if ( (flags & FBEAM_SHADEIN) && (flags & FBEAM_SHADEOUT) )
 		{
-			if (fraction < 0.5)
+			if (fraction < 0.5f)
 			{
 				brightness = 2*(fraction/fadeFraction);
 			}
 			else
 			{
-				brightness = 2*(1.0 - (fraction/fadeFraction));
+				brightness = 2*(1.0f - (fraction/fadeFraction));
 			}
 		}
 		else if ( flags & FBEAM_SHADEIN )
@@ -565,7 +565,7 @@ void DrawTeslaSegs( int noise_divisions, float *prgNoise, const model_t* spritem
 		}
 		else if ( flags & FBEAM_SHADEOUT )
 		{
-			brightness = 1.0 - (fraction/fadeFraction);
+			brightness = 1.0f - (fraction/fadeFraction);
 		}
 
 		// clamps
@@ -607,7 +607,7 @@ void DrawTeslaSegs( int noise_divisions, float *prgNoise, const model_t* spritem
 		{
 			// Figure out what the new width would be
 			// Halve the width because the beam is breaking in two, and halve it again because width is doubled above
-			flWidth = curSeg.m_flWidth * 0.25;
+			flWidth = curSeg.m_flWidth * 0.25f;
 			if ( flWidth > 1 )
 			{
 				iBranches++;
@@ -765,21 +765,21 @@ void DrawSplineSegs( int noise_divisions, float *prgNoise,
 
 		Vector vDelta;
 		VectorSubtract(pEnd,pStart,vDelta);
-		length = VectorLength( vDelta ) * 0.01;
-		if ( length < 0.5 )	// Don't lose all of the noise/texture on short beams
-			length = 0.5;
-		div = 1.0 / (segments-1);
+		length = VectorLength( vDelta ) * 0.01f;
+		if ( length < 0.5f )	// Don't lose all of the noise/texture on short beams
+			length = 0.5f;
+		div = 1.0f / (segments-1);
 
 		// UNDONE: Expose texture length scale factor to control "fuzziness"
 		vStep = length*div;	// Texture length texels per space pixel
 
 		// UNDONE: Expose this paramter as well(3.5)?  Texture scroll rate along beam
-		vLast = fmod(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
+		vLast = fmodf(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
 
 		if ( flags & FBEAM_SINENOISE )
 		{
 			scale = scale * 100;
-			length = segments * (1.0/10);
+			length = segments * (1.0f/10);
 		}
 		else
 			scale = scale * length;
@@ -832,7 +832,7 @@ void DrawSplineSegs( int noise_divisions, float *prgNoise,
 			else if ( flags & FBEAM_SHADEOUT )
 			{
 				float fadeFractionOut = fadeLength/length;
-				brightness = 1.0 - (fraction/ fadeFractionOut);
+				brightness = 1.0f - (fraction/ fadeFractionOut);
 				if (brightness < 0)
 				{
 					brightness = 0;
@@ -892,7 +892,7 @@ void DrawSplineSegs( int noise_divisions, float *prgNoise,
 				{
 					VectorMA( seg.m_vPos, factor, CurrentViewUp(), seg.m_vPos );
 					// Rotate the noise along the perpendicluar axis a bit to keep the bolt from looking diagonal
-					factor = prgNoise[noiseIndex>>16] * scale * cos(fraction*M_PI*3+freq);
+					factor = prgNoise[noiseIndex>>16] * scale * cos(fraction*M_PI_F*3+freq);
 					VectorMA( seg.m_vPos, factor, CurrentViewRight(), seg.m_vPos );
 				}
 			}
@@ -1032,16 +1032,16 @@ void DrawDisk( int noise_divisions, float *prgNoise, const model_t* spritemodel,
 	if ( segments > noise_divisions )		// UNDONE: Allow more segments?
 		segments = noise_divisions;
 
-	length = VectorLength( delta ) * 0.01;
-	if ( length < 0.5 )	// Don't lose all of the noise/texture on short beams
-		length = 0.5;
-	div = 1.0 / (segments-1);
+	length = VectorLength( delta ) * 0.01f;
+	if ( length < 0.5f )	// Don't lose all of the noise/texture on short beams
+		length = 0.5f;
+	div = 1.0f / (segments-1);
 
 	// UNDONE: Expose texture length scale factor to control "fuzziness"
 	vStep = length*div;	// Texture length texels per space pixel
 	
 	// UNDONE: Expose this paramter as well(3.5)?  Texture scroll rate along beam
-	vLast = fmod(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
+	vLast = fmodf(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
 	scale = scale * length;
 
 	w = freq * delta[2];
@@ -1130,16 +1130,16 @@ void DrawCylinder( int noise_divisions, float *prgNoise, const model_t* spritemo
 	if ( segments > noise_divisions )		// UNDONE: Allow more segments?
 		segments = noise_divisions;
 
-	length = VectorLength( delta ) * 0.01;
-	if ( length < 0.5 )	// Don't lose all of the noise/texture on short beams
-		length = 0.5;
-	div = 1.0 / (segments-1);
+	length = VectorLength( delta ) * 0.01f;
+	if ( length < 0.5f )	// Don't lose all of the noise/texture on short beams
+		length = 0.5f;
+	div = 1.0f / (segments-1);
 
 	// UNDONE: Expose texture length scale factor to control "fuzziness"
 	vStep = length*div;	// Texture length texels per space pixel
 	
 	// UNDONE: Expose this paramter as well(3.5)?  Texture scroll rate along beam
-	vLast = fmod(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
+	vLast = fmodf(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
 	scale = scale * length;
 	
 	CMatRenderContextPtr pRenderContext( materials );
@@ -1218,28 +1218,28 @@ void DrawRing( int noise_divisions, float *prgNoise, void (*pfnNoise)( float *no
 	if ( segments < 2 )
 		return;
 
-	segments = segments * M_PI;
+	segments = segments * M_PI_F;
 	
 	if ( segments > noise_divisions * 8 )		// UNDONE: Allow more segments?
 		segments = noise_divisions * 8;
 
-	length = VectorLength( d ) * 0.01 * M_PI;
-	if ( length < 0.5 )	// Don't lose all of the noise/texture on short beams
-		length = 0.5;
-	div = 1.0 / (segments-1);
+	length = VectorLength( d ) * 0.01f * M_PI_F;
+	if ( length < 0.5f )	// Don't lose all of the noise/texture on short beams
+		length = 0.5f;
+	div = 1.0f / (segments-1);
 
 	// UNDONE: Expose texture length scale factor to control "fuzziness"
-	vStep = length*div/8.0;	// Texture length texels per space pixel
+	vStep = length*div/8.0f;	// Texture length texels per space pixel
 	
 	// UNDONE: Expose this paramter as well(3.5)?  Texture scroll rate along beam
-	vLast = fmod(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
-	scale = amplitude * length / 8.0;
+	vLast = fmodf(freq*speed,1);	// Scroll speed 3.5 -- initial texture position, scrolls 3.5/sec (1.0 is entire texture)
+	scale = amplitude * length / 8.0f;
 
 	// Iterator to resample noise waveform (it needs to be generated in powers of 2)
-	noiseStep = (int)((noise_divisions-1) * div * 65536.0) * 8;
+	noiseStep = (int)((noise_divisions-1) * div * 65536.0f) * 8;
 	noiseIndex = 0;
 
-	VectorScale( d, 0.5, d );
+	VectorScale( d, 0.5f, d );
 	VectorAdd( source, d, center );
 	zaxis[0] = 0; zaxis[1] = 0; zaxis[2] = 1;
 
@@ -1276,7 +1276,7 @@ void DrawRing( int noise_divisions, float *prgNoise, void (*pfnNoise)( float *no
 	for ( i = 0; i < segments + 1; i++ )
 	{
 		fraction = i * div;
-		SinCos( fraction * 2 * M_PI, &x, &y );
+		SinCos( fraction * 2 * M_PI_F, &x, &y );
 
 		point[0] = xaxis[0] * x + yaxis[0] * y + center[0];
 		point[1] = xaxis[1] * x + yaxis[1] * y + center[1];
@@ -1289,7 +1289,7 @@ void DrawRing( int noise_divisions, float *prgNoise, void (*pfnNoise)( float *no
 			VectorMA( point, factor, CurrentViewUp(), point );
 
 			// Rotate the noise along the perpendicluar axis a bit to keep the bolt from looking diagonal
-			factor = prgNoise[(noiseIndex>>16) & 0x7F] * scale * cos(fraction*M_PI*3*8+freq);
+			factor = prgNoise[(noiseIndex>>16) & 0x7F] * scale * cos(fraction*M_PI_F*3*8+freq);
 			VectorMA( point, factor, CurrentViewRight(), point );
 		}
 		
@@ -1393,7 +1393,7 @@ void DrawBeamFollow( const model_t* spritemodel, BeamTrail_t* pHead, int frame, 
 	VectorMA( delta, width, normal, last1 );
 	VectorMA( delta, -width, normal, last2 );
 
-	div = 1.0 / amplitude;
+	div = 1.0f / amplitude;
 	fraction = ( die - gpGlobals->curtime ) * div;
 	unsigned char nColor[3];
 

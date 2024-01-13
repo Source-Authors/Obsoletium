@@ -183,7 +183,7 @@ void CHudGeiger::Paint()
 		flvol = 0.5;		//Msg ( "range < 50\n");
 	}
 
-	flvol = (flvol * (random->RandomInt(0,127)) / 255) + 0.25;
+	flvol = (flvol * (random->RandomInt(0,127)) / 255) + 0.25f;
 
 	if ( random->RandomInt(0,127) < pct )
 	{

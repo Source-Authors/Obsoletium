@@ -267,8 +267,8 @@ void C_PropAirboat::DrawHudElements( )
 		VectorMA( vehicleEyeOrigin, 100.0f, vecForward, vehicleEyeOrigin );
 
 		ScreenTransform( vehicleEyeOrigin, screen );
-		x += 0.5 * screen[0] * screenWidth + 0.5;
-		y -= 0.5 * screen[1] * screenHeight + 0.5;
+		x += 0.5f * screen[0] * screenWidth + 0.5f;
+		y -= 0.5f * screen[1] * screenHeight + 0.5f;
 
 		x -= pIcon->Width() / 2; 
 		y -= pIcon->Height() / 2; 
@@ -572,7 +572,7 @@ void C_PropAirboat::UpdateWake( void )
 		if ( pLast )
 		{
 			pNewPoint->m_flTexCoord	= pLast->m_flTexCoord + pLast->m_vecScreenPos.DistTo( screenPos );
-			pNewPoint->m_flTexCoord = fmod( pNewPoint->m_flTexCoord, 1 );
+			pNewPoint->m_flTexCoord = fmodf( pNewPoint->m_flTexCoord, 1 );
 		}
 		else
 		{
@@ -855,7 +855,7 @@ int C_PropAirboat::DrawWake( void )
 	currentPoint.m_vecScreenPos = GetAbsOrigin();
 	currentPoint.m_vecScreenPos[2] = m_nExactWaterLevel + 16;
 	currentPoint.m_flTexCoord = pLast->m_flTexCoord + currentPoint.m_vecScreenPos.DistTo(pLast->m_vecScreenPos);
-	currentPoint.m_flTexCoord = fmod( currentPoint.m_flTexCoord, 1 );
+	currentPoint.m_flTexCoord = fmodf( currentPoint.m_flTexCoord, 1 );
 	currentPoint.m_flWidthVariance = 0.0f;
 
 	TrailPoint_t *pPrevPoint = NULL;

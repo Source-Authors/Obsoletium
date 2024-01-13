@@ -468,8 +468,8 @@ void C_FuncSmokeVolume::Update( float fTimeDelta )
 				else
 				{			
 					// Ok, move them closer.
-					float percent = (float)cos(pInfo->m_TradeClock * 2 * 1.57079632f / pInfo->m_TradeDuration);
-					percent = percent * 0.5 + 0.5;
+					float percent = cos(pInfo->m_TradeClock * 2 * 1.57079632f / pInfo->m_TradeDuration);
+					percent = percent * 0.5f + 0.5f;
 					
 					pInfo->m_pParticle->m_FadeAlpha  = pInfo->m_FadeAlpha + (pOther->m_FadeAlpha - pInfo->m_FadeAlpha) * (1 - percent);
 					pOther->m_pParticle->m_FadeAlpha = pInfo->m_FadeAlpha + (pOther->m_FadeAlpha - pInfo->m_FadeAlpha) * percent;
@@ -551,7 +551,7 @@ void C_FuncSmokeVolume::SimulateParticles( CParticleSimulateIterator *pIterator 
 	SmokeGrenadeParticle *pParticle = (SmokeGrenadeParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
-		pParticle->m_CurRotation += pParticle->m_RotationFactor * ( M_PI / 180.0f ) * m_RotationSpeed * pIterator->GetTimeDelta();
+		pParticle->m_CurRotation += pParticle->m_RotationFactor * ( M_PI_F / 180.0f ) * m_RotationSpeed * pIterator->GetTimeDelta();
 		pParticle = (SmokeGrenadeParticle*)pIterator->GetNext();
 	}
 }

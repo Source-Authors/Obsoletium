@@ -86,7 +86,7 @@ void CLampHaloProxy::OnBind( C_BaseEntity *pEnt )
 	}
 	else
 	{
-		fade = MIN( (fade - 0.25) * 1.35, 1.0f );
+		fade = MIN( (fade - 0.25f) * 1.35f, 1.0f );
 	}
 
 	m_pFadeValue->SetFloatValue( fade );

@@ -329,7 +329,7 @@ void C_SpriteRenderer::GetSpriteAxes( SPRITETYPE type,
 			// generate the sprite's axes, parallel to the viewplane, but rotated in
 			// that plane around the center according to the sprite entity's roll
 			// angle. So vpn stays the same, but vright and vup rotate
-			angle = angles[ROLL] * (M_PI*2.0f/360.0f);
+			angle = angles[ROLL] * (M_PI_F*2.0f/360.0f);
 			SinCos( angle, &sr, &cr );
 			
 			for (i=0 ; i<3 ; i++)
