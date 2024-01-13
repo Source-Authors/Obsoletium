@@ -82,10 +82,10 @@ void CStudioRender::R_StudioEyeballPosition( const mstudioeyeball_t *peyeball, e
 	CrossProduct( pstate->right, pstate->forward, pstate->up );
 	VectorNormalize( pstate->up );
 
-	float scale = (1.0 / peyeball->iris_scale) + m_pRC->m_Config.fEyeSize;
+	float scale = (1.0f / peyeball->iris_scale) + m_pRC->m_Config.fEyeSize;
 
 	if (scale > 0)
-		scale = 1.0 / scale;
+		scale = 1.0f / scale;
 
 	VectorScale( &pstate->right[0], -scale, pstate->mat[0] );
 	VectorScale( &pstate->up[0], -scale, pstate->mat[1] );
@@ -873,7 +873,7 @@ void CStudioRender::R_MouthComputeLightingValues( float& fIllum, Vector& forward
 	fIllum = m_pFlexWeights[pMouth->flexdesc];
 	if (fIllum < 0) fIllum = 0;
 	if (fIllum > 1) fIllum = 1;
-	fIllum = LinearToTexture( fIllum ) / 255.0;
+	fIllum = LinearToTexture( fIllum ) / 255.0f;
 
 	VectorRotate( pMouth->forward, m_pBoneToWorld[ pMouth->bone ], forward );
 }
