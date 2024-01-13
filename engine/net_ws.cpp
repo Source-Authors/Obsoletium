@@ -1114,7 +1114,7 @@ public:
 	{
 		memset( &from, 0, sizeof( from ) );
 
-		int i;
+		unsigned i;
 		for ( i = 0; i < MAX_SPLITPACKET_SPLITS; i++ )
 		{
 			splitflags[ i ] = -1;
