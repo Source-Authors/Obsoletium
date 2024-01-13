@@ -9,6 +9,7 @@
 #define COLOR_H
 
 #include "tier0/dbg.h"
+#include "minmax.h"
 
 #ifdef _WIN32
 #pragma once
@@ -26,10 +27,10 @@ public:
 	Color() : Color{0,0,0}
 	{
 	}
-	Color(component r,component g,component b) : Color{r,g,b,0}
+	Color(int r,int g,int b) : Color{r,g,b,0}
 	{
 	}
-	Color(component r,component g,component b,component a)
+	Color(int r,int g,int b,int a)
 	{
 		SetColor(r, g, b, a);
 	}
@@ -39,12 +40,18 @@ public:
 	// g - green component (0-255)
 	// b - blue component (0-255)
 	// a - alpha component, controls transparency (0 - transparent, 255 - opaque);
-	void SetColor(component _r, component _g, component _b, component _a = 0)
+	void SetColor(int _r, int _g, int _b, int _a = 0)
 	{
-		_color[0] = _r;
-		_color[1] = _g;
-		_color[2] = _b;
-		_color[3] = _a;
+		Assert( _r >= 0 && _r <= 255 &&
+				_g >= 0 && _g <= 255 &&
+				_b >= 0 && _b <= 255 &&
+				_a >= 0 && _a <= 255
+		);
+
+		_color[0] = static_cast<component>( max( min( _r, 255 ), 0 ) );
+		_color[1] = static_cast<component>( max( min( _g, 255 ), 0 ) );
+		_color[2] = static_cast<component>( max( min( _b, 255 ), 0 ) );
+		_color[3] = static_cast<component>( max( min( _a, 255 ), 0 ) );
 	}
 
 	void GetColor(int &_r, int &_g, int &_b, int &_a) const
