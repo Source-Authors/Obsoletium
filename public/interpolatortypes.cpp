@@ -246,14 +246,14 @@ void Interpolator_CurveInterpolate( int interpolationType,
 		break;
 	case INTERPOLATE_EASE_IN:
 		{
-			f = sin( M_PI * f * 0.5f );
+			f = sin( M_PI_F * f * 0.5f );
 			// Fixme, since this ignores vPre and vNext we could omit computing them aove
 			VectorLerp( vStart, vEnd, f, vOut );
 		}
 		break;
 	case INTERPOLATE_EASE_OUT:
 		{
-			f = 1.0f - sin( M_PI * f * 0.5f + 0.5f * M_PI );
+			f = 1.0f - sin( M_PI_F * f * 0.5f + 0.5f * M_PI_F );
 			// Fixme, since this ignores vPre and vNext we could omit computing them aove
 			VectorLerp( vStart, vEnd, f, vOut );
 		}
@@ -358,14 +358,14 @@ void Interpolator_CurveInterpolate_NonNormalized( int interpolationType,
 		break;
 	case INTERPOLATE_EASE_IN:
 		{
-			f = sin( M_PI * f * 0.5f );
+			f = sin( M_PI_F * f * 0.5f );
 			// Fixme, since this ignores vPre and vNext we could omit computing them aove
 			VectorLerp( vStart, vEnd, f, vOut );
 		}
 		break;
 	case INTERPOLATE_EASE_OUT:
 		{
-			f = 1.0f - sin( M_PI * f * 0.5f + 0.5f * M_PI );
+			f = 1.0f - sin( M_PI_F * f * 0.5f + 0.5f * M_PI_F );
 			// Fixme, since this ignores vPre and vNext we could omit computing them aove
 			VectorLerp( vStart, vEnd, f, vOut );
 		}
@@ -471,14 +471,14 @@ void Interpolator_CurveInterpolate_NonNormalized( int interpolationType,
 		break;
 	case INTERPOLATE_EASE_IN:
 		{
-			f = sin( M_PI * f * 0.5f );
+			f = sin( M_PI_F * f * 0.5f );
 			// Fixme, since this ignores vPre and vNext we could omit computing them aove
 			QuaternionSlerp( vStart, vEnd, f, vOut );
 		}
 		break;
 	case INTERPOLATE_EASE_OUT:
 		{
-			f = 1.0f - sin( M_PI * f * 0.5f + 0.5f * M_PI );
+			f = 1.0f - sin( M_PI_F * f * 0.5f + 0.5f * M_PI );
 			// Fixme, since this ignores vPre and vNext we could omit computing them aove
 			QuaternionSlerp( vStart, vEnd, f, vOut );
 		}
