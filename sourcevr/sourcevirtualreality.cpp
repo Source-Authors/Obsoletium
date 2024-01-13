@@ -641,10 +641,10 @@ bool CSourceVirtualReality::CompositeHud ( VREye eEye, float ndcHudBounds[4], bo
 	// The ndcHudBounds are the min x, min y, max x, max y of where we want to paste the HUD texture in NDC coordinates
 	// of the main 3D view.  We conver to UV (0->1) space here for the shader.
 	float huduvs[4];
-	huduvs[0] = ndcHudBounds[0] * 0.5 + 0.5;
-	huduvs[1] = ndcHudBounds[1] * 0.5 + 0.5;
-	huduvs[2] = ndcHudBounds[2] * 0.5 + 0.5;
-	huduvs[3] = ndcHudBounds[3] * 0.5 + 0.5;
+	huduvs[0] = ndcHudBounds[0] * 0.5f + 0.5f;
+	huduvs[1] = ndcHudBounds[1] * 0.5f + 0.5f;
+	huduvs[2] = ndcHudBounds[2] * 0.5f + 0.5f;
+	huduvs[3] = ndcHudBounds[3] * 0.5f + 0.5f;
 
 	// Fix up coordinates depending on whether we're rendering to a buffer sized for one eye or two.
 	// (note that disabling distortion also disables use of the offscreen render target)
