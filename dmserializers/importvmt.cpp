@@ -345,7 +345,7 @@ int ParseVectorFromKeyValueString( const char *pParamName, const char* pScan, co
 
 		char* pEnd;
 
-		vecVal[i] = strtod( pScan, &pEnd );
+		vecVal[i] = strtof( pScan, &pEnd );
 		if (pScan == pEnd)
 		{
 			Warning( "Error in .VMT file: error parsing vector element \"%s\" in \"%s\"\n", pParamName, pMaterialName );
