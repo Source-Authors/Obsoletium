@@ -311,7 +311,11 @@ extern	const Quaternion quat_identity;
 extern const Vector vec3_invalid;
 extern	const int nanmask;
 
-#define	IS_NAN(x) (((*(int *)&x) & nanmask) == nanmask)
+template<typename T>
+inline bool IS_NAN(T x)
+{
+	return std::isnan(x);
+}
 
 FORCEINLINE vec_t DotProduct(const vec_t *v1, const vec_t *v2)
 {
