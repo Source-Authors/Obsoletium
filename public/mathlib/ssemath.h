@@ -2438,4 +2438,10 @@ FORCEINLINE vec_t XM_CALLCONV InvRSquared( VectorAligned v )
 	return DirectX::XMVectorGetX( InvRSquared( DirectX::XMLoadFloat4A( v.XmBase() ) ) );
 }
 
+inline void XM_CALLCONV VectorNegate( DirectX::XMFLOAT4 *v )
+{
+	Assert(v);
+	DirectX::XMStoreFloat4( v, DirectX::XMVectorNegate( DirectX::XMLoadFloat4( v ) ) );
+}
+
 #endif // _ssemath_h

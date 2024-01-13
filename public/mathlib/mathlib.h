@@ -825,14 +825,19 @@ inline void MatrixPosition( const matrix3x4_t &matrix, Vector &position )
 	MatrixGetColumn( matrix, 3, position );
 }
 
-inline void VectorRotate( const Vector& in1, const matrix3x4_t &in2, Vector &out)
-{
-	VectorRotate( &in1.x, in2, &out.x );
-}
+void VectorRotate( const Vector& in1, const matrix3x4_t &in2, Vector &out );
 
-inline void VectorIRotate( const Vector& in1, const matrix3x4_t &in2, Vector &out)
+void XM_CALLCONV VectorIRotate( Vector in1, const matrix3x4_t &in2, Vector &out );
+
+inline DirectX::XMVECTOR XM_CALLCONV VectorIRotate( DirectX::FXMVECTOR in1, const matrix3x4_t &in2 )
 {
-	VectorIRotate( &in1.x, in2, &out.x );
+	return DirectX::XMVectorSet
+	(
+		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][0], in2[1][0], in2[2][0], 0.0F ) ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][1], in2[1][1], in2[2][1], 0.0F ) ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][2], in2[1][2], in2[2][2], 0.0F ) ) ) ),
+		0.0F
+	);
 }
 
 inline void MatrixAngles( const matrix3x4_t &matrix, QAngle &angles )

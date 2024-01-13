@@ -233,6 +233,26 @@ void VectorRotate( const float *in1, const matrix3x4_t& in2, float *out )
 	out[2] = DotProduct( in1, in2[2] );
 }
 
+static DirectX::XMVECTOR XM_CALLCONV VectorRotate( DirectX::XMVECTOR vin1, const matrix3x4_t& in2 )
+{
+	return DirectX::XMVectorSet
+	(
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 1 ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 2 ) ) ),
+		0.0f
+	);
+}
+
+// assume in2 is a rotation and rotate the input vector
+void VectorRotate( const Vector &in1, const matrix3x4_t& in2, Vector &out )
+{
+	Assert( &in1 != &out );
+
+	DirectX::XMVECTOR vin1 = DirectX::XMLoadFloat3( in1.XmBase() );
+	DirectX::XMStoreFloat3( out.XmBase(), VectorRotate( vin1, in2 ) );
+}
+
 // assume in2 is a rotation and rotate the input vector
 void VectorRotate( const Vector &in1, const QAngle &in2, Vector &out )
 {
@@ -257,6 +277,12 @@ void VectorIRotate( const float *in1, const matrix3x4_t& in2, float *out )
 	out[0] = in1[0]*in2[0][0] + in1[1]*in2[1][0] + in1[2]*in2[2][0];
 	out[1] = in1[0]*in2[0][1] + in1[1]*in2[1][1] + in1[2]*in2[2][1];
 	out[2] = in1[0]*in2[0][2] + in1[1]*in2[1][2] + in1[2]*in2[2][2];
+}
+
+void XM_CALLCONV VectorIRotate( Vector in1, const matrix3x4_t &in2, Vector &out )
+{
+	DirectX::XMVECTOR vin1 = DirectX::XMLoadFloat3( in1.XmBase() );
+	DirectX::XMStoreFloat3( out.XmBase(), VectorIRotate( vin1, in2 ) );
 }
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS

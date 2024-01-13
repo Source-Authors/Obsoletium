@@ -13,58 +13,66 @@
 
 #if !defined(_STATIC_LINKED) || defined(_SHARED_LIB)
 
-
-#ifdef QUIVER
-#include "r_local.h"
-#endif
-
 #include "mathlib/bumpvects.h"
 #include "mathlib/vector.h"
+#include "mathlib/ssemath.h"
 #include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+
+static const DirectX::XMVECTOR g_localBumpBasis2[NUM_BUMP_VECTS] = 
+{
+	DirectX::XMVectorSet( OO_SQRT_2_OVER_3, 0.0f,       OO_SQRT_3, 0.0f ),
+	DirectX::XMVectorSet( -OO_SQRT_6,       OO_SQRT_2,  OO_SQRT_3, 0.0f ),
+	DirectX::XMVectorSet( -OO_SQRT_6,       -OO_SQRT_2, OO_SQRT_3, 0.0f )
+};
+
 // z is coming out of the face.
 
-void GetBumpNormals( const Vector& sVect, const Vector& tVect, const Vector& flatNormal, 
-					 const Vector& phongNormal, Vector bumpNormals[NUM_BUMP_VECTS] )
+void XM_CALLCONV GetBumpNormals( Vector sVect, Vector tVect, const Vector& flatNormal, 
+					 const Vector& phongNormal, Vector (&bumpNormals)[NUM_BUMP_VECTS] )
 {
-	Vector tmpNormal;
-	bool leftHanded;
-	int i;
-
-	Assert( NUM_BUMP_VECTS == 3 );
+	DirectX::XMVECTOR vsVect = DirectX::XMLoadFloat3( sVect.XmBase() );
+	DirectX::XMVECTOR vtVect = DirectX::XMLoadFloat3( tVect.XmBase() );
+	DirectX::XMVECTOR vflatNormal = DirectX::XMLoadFloat3( flatNormal.XmBase() );
 	
 	// Are we left or right handed?
-	CrossProduct( sVect, tVect, tmpNormal );
-	if( DotProduct( flatNormal, tmpNormal ) < 0.0f )
-	{
-		leftHanded = true;
-	}
-	else
-	{
-		leftHanded = false;
-	}
+	DirectX::XMVECTOR tmpNormal = DirectX::XMVector3Cross( vsVect, vtVect );
+	const bool leftHanded = DirectX::XMVector3Less( DirectX::XMVector3Dot( vflatNormal, tmpNormal ), DirectX::g_XMZero );
 
 	// Build a basis for the face around the phong normal
+	DirectX::XMVECTOR vphongNormal = DirectX::XMLoadFloat3( phongNormal.XmBase() );
 	matrix3x4_t smoothBasis;
-	CrossProduct( phongNormal, sVect, smoothBasis.XmBase() + 1 );
-	VectorNormalize( smoothBasis.XmBase() + 1 );
-	CrossProduct( smoothBasis.XmBase() + 1, phongNormal, smoothBasis.XmBase() );
-	VectorNormalize( smoothBasis.XmBase() );
-	VectorCopy( phongNormal.Base(), smoothBasis[2] );
-	
+
+	DirectX::XMVECTOR vsmooth1 = DirectX::XMVector3Cross( vphongNormal, vsVect );
+	VectorNormalize( vsmooth1 );
+
+	DirectX::XMVECTOR vsmooth2 = DirectX::XMVector3Cross( vsmooth1, vphongNormal );
+	VectorNormalize( vsmooth2 );
+
+	DirectX::XMStoreFloat4( smoothBasis.XmBase(), vsmooth2 );
+
 	if( leftHanded )
 	{
-		VectorNegate( smoothBasis[1] );
+		vsmooth1 = DirectX::XMVectorNegate( vsmooth1 );
 	}
+
+	DirectX::XMStoreFloat4( smoothBasis.XmBase() + 1, vsmooth1 );
+	DirectX::XMStoreFloat4( smoothBasis.XmBase() + 2, vphongNormal );
 	
-	// move the g_localBumpBasis into world space to create bumpNormals
-	for( i = 0; i < 3; i++ )
-	{
-		VectorIRotate( g_localBumpBasis[i], smoothBasis, bumpNormals[i] );
-	}
+	static_assert(std::size(g_localBumpBasis2) == NUM_BUMP_VECTS);
+	static_assert(V_ARRAYSIZE(bumpNormals) == NUM_BUMP_VECTS);
+
+	// move the g_localBumpBasis2 into world space to create bumpNormals
+	DirectX::XMVECTOR n0 = VectorIRotate( g_localBumpBasis2[0], smoothBasis );
+	DirectX::XMVECTOR n1 = VectorIRotate( g_localBumpBasis2[1], smoothBasis );
+	DirectX::XMVECTOR n2 = VectorIRotate( g_localBumpBasis2[2], smoothBasis );
+
+	DirectX::XMStoreFloat3( bumpNormals[0].XmBase(), n0 );
+	DirectX::XMStoreFloat3( bumpNormals[1].XmBase(), n1 );
+	DirectX::XMStoreFloat3( bumpNormals[2].XmBase(), n2 );
 }
 
 #endif // !_STATIC_LINKED || _SHARED_LIB

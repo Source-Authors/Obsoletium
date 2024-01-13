@@ -196,7 +196,7 @@ static bool AddSingleDynamicLight( dlight_t& dl, SurfaceHandle_t surfID, const V
 // Adds a dynamic light to the bumped lighting
 //-----------------------------------------------------------------------------
 static void AddSingleDynamicLightToBumpLighting( dlight_t& dl, SurfaceHandle_t surfID, 
-	const Vector &lightOrigin, float perpDistSq, float lightRadiusSq, Vector* pBumpBasis, const Vector& luxelBasePosition )
+	const Vector &lightOrigin, float perpDistSq, float lightRadiusSq, Vector (&pBumpBasis)[NUM_BUMP_VECTS], const Vector& luxelBasePosition )
 {
 	Vector local;
 	// FIXME: For now, only elights can be spotlights
@@ -323,7 +323,7 @@ static void AddSingleDynamicLightToBumpLighting( dlight_t& dl, SurfaceHandle_t s
 //-----------------------------------------------------------------------------
 // Compute the bumpmap basis for this surface
 //-----------------------------------------------------------------------------
-static void R_ComputeSurfaceBasis( SurfaceHandle_t surfID, Vector *pBumpNormals, Vector &luxelBasePosition )
+static void R_ComputeSurfaceBasis( SurfaceHandle_t surfID, Vector (&pBumpNormals)[NUM_BUMP_VECTS], Vector &luxelBasePosition )
 {
 	// Get the bump basis vects in the space of the surface.
 	Vector sVect, tVect;
@@ -365,7 +365,6 @@ static void R_ComputeSurfaceBasis( SurfaceHandle_t surfID, Vector *pBumpNormals,
 unsigned int R_ComputeDynamicLightMask( dlight_t *pLights, SurfaceHandle_t surfID, msurfacelighting_t *pLighting, const matrix3x4_t& entityToWorld )
 {
 	ASSERT_SURF_VALID( surfID );
-	Vector luxelBasePosition;
 
 	// Displacements do dynamic lights different
 	if( SurfaceHasDispInfo( surfID ) )
@@ -438,7 +437,7 @@ void R_AddDynamicLights( dlight_t *pLights, SurfaceHandle_t surfID, const matrix
 	ASSERT_SURF_VALID( surfID );
 	VPROF( "R_AddDynamicLights" );
 
-	Vector bumpNormals[3];
+	Vector bumpNormals[NUM_BUMP_VECTS];
 	bool computedBumpBasis = false;
 	Vector luxelBasePosition;
 
