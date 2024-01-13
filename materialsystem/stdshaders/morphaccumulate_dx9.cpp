@@ -85,12 +85,17 @@ BEGIN_VS_SHADER_FLAGS( MorphAccumulate_DX9, "Help for MorphAccumulate", SHADER_N
 				int nYOffset = pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_MORPH_WEIGHT_Y_OFFSET );
 				int nSubrectWidth = pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_MORPH_WEIGHT_SUBRECT_WIDTH );
 				int nSubrectHeight = pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_MORPH_WEIGHT_SUBRECT_HEIGHT );
-				float pMorphWeightSubrect[4] = { nXOffset, nYOffset, nSubrectWidth, nSubrectHeight };
+				float pMorphWeightSubrect[4] = {
+					static_cast<float>(nXOffset),
+					static_cast<float>(nYOffset),
+					static_cast<float>(nSubrectWidth),
+					static_cast<float>(nSubrectHeight)
+				};
 				pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, pMorphWeightSubrect );
 
 				int nWidth, nHeight;
 				pShaderAPI->GetStandardTextureDimensions( &nWidth, &nHeight, TEXTURE_MORPH_WEIGHTS );
-				float pMorphWeightDim[4] = { nWidth, nHeight, 0, 0 };
+				float pMorphWeightDim[4] = { static_cast<float>(nWidth), static_cast<float>(nHeight), 0, 0 };
 				pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_1, pMorphWeightDim );
 			}
 
