@@ -1047,7 +1047,7 @@ static void HandleVertexWeights(
 		{
 			nId = strtol( tokens[ i ].Get(), NULL, 0 );
 			++i;
-			flWeight = strtod( tokens[ i ].Get(), NULL );
+			flWeight = strtof( tokens[ i ].Get(), NULL );
 
 			if ( nId < 0 || flWeight < flEps )
 				continue;

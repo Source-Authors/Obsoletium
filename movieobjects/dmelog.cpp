@@ -6129,7 +6129,7 @@ void GenerateRotationLog( CDmeQuaternionLogLayer *pLayer, const Vector &vecAxis,
 		}
 		float dt = pTime[i].GetSeconds() - pTime[i-1].GetSeconds();
 		float dRot = pRevolutionsPerSec[i] - pRevolutionsPerSec[i-1];
-		pTotalRotation[i] = 360.0f * ( dRot * dt * 0.5 + pRevolutionsPerSec[i-1] * dt ) + pTotalRotation[i-1];
+		pTotalRotation[i] = 360.0f * ( dRot * dt * 0.5f + pRevolutionsPerSec[i-1] * dt ) + pTotalRotation[i-1];
 	}
 
 	// We need to compute how long a single rotation takes, then create samples

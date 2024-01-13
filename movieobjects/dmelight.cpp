@@ -282,8 +282,8 @@ bool CDmeSpotLight::GetLightDesc( LightDesc_t *pDesc )
 	pDesc->m_Range = m_flMaxDistance;
 
 	// Convert to radians
-	pDesc->m_Theta = m_flSpotInnerAngle * M_PI / 180.0f;
-	pDesc->m_Phi = m_flSpotOuterAngle * M_PI / 180.0f;
+	pDesc->m_Theta = m_flSpotInnerAngle * M_PI_F / 180.0f;
+	pDesc->m_Phi = m_flSpotOuterAngle * M_PI_F / 180.0f;
 	pDesc->m_Falloff = m_flSpotAngularFalloff;
 
 	return true;
