@@ -351,15 +351,18 @@ FORCEINLINE void VectorCopy(const vec_t *a, vec_t *b)
 	b[1]=a[1];
 	b[2]=a[2];
 }
-FORCEINLINE void VectorClear(vec_t *a)
-{
-	a[0]=a[1]=a[2]=0;
-}
 
-FORCEINLINE float VectorMaximum(const vec_t *v)
-{
-	return max( v[0], max( v[1], v[2] ) );
-}
+// dimhotepus: Too unsafe, Use overloads.
+FORCEINLINE void VectorClear(vec_t *a) = delete;
+//{
+//	a[0]=a[1]=a[2]=0;
+//}
+
+// dimhotepus: Too unsafe, Use overloads.
+FORCEINLINE float VectorMaximum(const vec_t *v) = delete;
+//{
+//	return max( v[0], max( v[1], v[2] ) );
+//}
 
 FORCEINLINE float VectorMaximum(const Vector& v)
 {
@@ -375,17 +378,19 @@ FORCEINLINE void VectorScale (const float* in, vec_t scale, float* out)
 
 
 // Cannot be forceinline as they have overloads:
-inline void VectorFill(vec_t *a, float b)
-{
-	a[0]=a[1]=a[2]=b;
-}
+// dimhotepus: Unsafe. Use safe overloads.
+inline void VectorFill(vec_t *a, float b) = delete;
+//{
+//	a[0]=a[1]=a[2]=b;
+//}
 
-inline void VectorNegate(vec_t *a)
-{
-	a[0]=-a[0];
-	a[1]=-a[1];
-	a[2]=-a[2];
-}
+// dimhotepus: Unsafe. Use safe overloads.
+inline void VectorNegate(vec_t *a) = delete;
+//{
+//	a[0]=-a[0];
+//	a[1]=-a[1];
+//	a[2]=-a[2];
+//}
 
 
 //#define VectorMaximum(a)		( max( (a)[0], max( (a)[1], (a)[2] ) ) )
@@ -401,12 +406,13 @@ inline void VectorNegate(vec_t *a)
 #define VECTOR_COPY( A, B ) do { (B)[0] = (A)[0]; (B)[1] = (A)[1]; (B)[2]=(A)[2]; } while(0)
 #define DOT_PRODUCT( A, B ) ( (A)[0]*(B)[0] + (A)[1]*(B)[1] + (A)[2]*(B)[2] )
 
-FORCEINLINE void VectorMAInline( const float* start, float scale, const float* direction, float* dest )
-{
-	dest[0]=start[0]+direction[0]*scale;
-	dest[1]=start[1]+direction[1]*scale;
-	dest[2]=start[2]+direction[2]*scale;
-}
+// dimhotepus: Too unsafe. Use overloads.
+FORCEINLINE void VectorMAInline( const float* start, float scale, const float* direction, float* dest ) = delete;
+//{
+//	dest[0]=start[0]+direction[0]*scale;
+//	dest[1]=start[1]+direction[1]*scale;
+//	dest[2]=start[2]+direction[2]*scale;
+//}
 
 FORCEINLINE void VectorMAInline( const Vector& start, float scale, const Vector& direction, Vector& dest )
 {
@@ -420,13 +426,14 @@ FORCEINLINE void VectorMA( const Vector& start, float scale, const Vector& direc
 	VectorMAInline(start, scale, direction, dest);
 }
 
-FORCEINLINE void VectorMA( const float * start, float scale, const float *direction, float *dest )
-{
-	VectorMAInline(start, scale, direction, dest);
-}
+// dimhotepus: Unsafe. Use overloads.
+FORCEINLINE void VectorMA( const float * start, float scale, const float *direction, float *dest ) = delete;
+//{
+//	VectorMAInline(start, scale, direction, dest);
+//}
 
-
-int VectorCompare (const float *v1, const float *v2);
+// dimhotepus: Too unsafe. Use overloads.
+int VectorCompare (const float *v1, const float *v2) = delete;
 
 inline float VectorLength(const float *v)
 {
@@ -436,7 +443,8 @@ inline float VectorLength(const float *v)
 // dimhotepus: Too unsafe. Use safer alternatives.
 void CrossProduct (const float *v1, const float *v2, float *cross) = delete;
 
-qboolean VectorsEqual( const float *v1, const float *v2 );
+// dimhotepus: Too unsafe. Use safer alternatives.
+qboolean VectorsEqual( const float *v1, const float *v2 ) = delete;
 
 inline vec_t RoundInt (vec_t in)
 {

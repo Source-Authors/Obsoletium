@@ -44,40 +44,15 @@ const QAngle vec3_angle(0,0,0);
 const Vector vec3_invalid( FLT_MAX, FLT_MAX, FLT_MAX );
 const int nanmask = 255<<23;
 
-// TODO: Add fast C VectorNormalizeFast.
-// Perhaps use approximate rsqrt trick, if the accuracy isn't too bad.
-void FASTCALL _VectorNormalizeFast (Vector& vec)
-{
-	// FLT_EPSILON is added to the radius to eliminate the possibility of divide by zero.
-	float iradius = 1.f / ( sqrtf(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z) + FLT_EPSILON );
+// dimhotepus: Unsafe.
+//qboolean VectorsEqual( const float *v1, const float *v2 )
+//{
+//	return ( ( v1[0] == v2[0] ) &&
+//		     ( v1[1] == v2[1] ) &&
+//			 ( v1[2] == v2[2] ) );
+//}
 	
-	vec.x *= iradius;
-	vec.y *= iradius;
-	vec.z *= iradius;
 	
-}
-
-float _InvRSquared(const float* v)
-{
-	float	r2 = DotProduct(v, v);
-	return r2 < 1.f ? 1.f : 1/r2;
-}
-
-//-----------------------------------------------------------------------------
-// Function pointers selecting the appropriate implementation
-//-----------------------------------------------------------------------------
-void  (FASTCALL *pfVectorNormalizeFast)(Vector& v) = _VectorNormalizeFast;
-float (*pfInvRSquared)(const float* v) = _InvRSquared;
-
-
-qboolean VectorsEqual( const float *v1, const float *v2 )
-{
-	return ( ( v1[0] == v2[0] ) &&
-		     ( v1[1] == v2[1] ) &&
-			 ( v1[2] == v2[2] ) );
-}
-
-
 //-----------------------------------------------------------------------------
 // Purpose: Generates Euler angles given a left-handed orientation matrix. The
 //			columns of the matrix contain the forward, left, and up vectors.
@@ -203,6 +178,7 @@ void MatrixAngles( const matrix3x4_t& matrix, float *angles )
 void VectorTransform (const float *in1, const matrix3x4_t& in2, float *out)
 {
 	Assert( in1 != out );
+
 	out[0] = DotProduct(in1, in2[0]) + in2[0][3];
 	out[1] = DotProduct(in1, in2[1]) + in2[1][3];
 	out[2] = DotProduct(in1, in2[2]) + in2[2][3];
@@ -418,16 +394,17 @@ void MatrixScaleByZero ( matrix3x4_t &out )
 }
 
 
+// dimhotepus: Unsafe.
+//int VectorCompare (const float *v1, const float *v2)
+//{
+//	for (int i=0 ; i<3 ; i++)
+//		if (v1[i] != v2[i])
+//			return 0;
+//			
+//	return 1;
+//}
 
-int VectorCompare (const float *v1, const float *v2)
-{
-	for (int i=0 ; i<3 ; i++)
-		if (v1[i] != v2[i])
-			return 0;
-			
-	return 1;
-}
-
+// dimhotepus: Unsafe.
 //void CrossProduct (const float* v1, const float* v2, float* cross) = delete;
 //{
 //	Assert( v1 != cross );
@@ -3319,69 +3296,17 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 	if ( s_bMathlibInitialized )
 		return;
 
-	// FIXME: Hook SSE into VectorAligned + Vector4DAligned
-
-#if !defined( _X360 )
 	// Grab the processor information:
 	const CPUInformation& pi = *GetCPUInformation();
 
-	// Select the default generic routines.
-	pfVectorNormalizeFast = _VectorNormalizeFast;
-	pfInvRSquared = _InvRSquared;
-
-	if ( bAllowMMX && pi.m_bMMX )
-	{
 		// Select the MMX specific routines if available
 		// (MMX routines were used by SW span fillers - not currently used for HW)
-		s_bMMXEnabled = true;
-	}
-	else
-	{
-		s_bMMXEnabled = false;
-	}
-
+	s_bMMXEnabled = bAllowMMX && pi.m_bMMX;
 	// SSE Generally performs better than 3DNow when present, so this is placed 
 	// first to allow SSE to override these settings.
-#if !defined( OSX ) && !defined( PLATFORM_WINDOWS_PC64 ) && !defined(LINUX)
-	if ( bAllow3DNow && pi.m_b3DNow )
-	{
-		s_b3DNowEnabled = true;
-
-		// Select the 3DNow specific routines if available;
-		pfVectorNormalizeFast = _3DNow_VectorNormalizeFast;
-		pfInvRSquared = _3DNow_InvRSquared;
-	}
-	else
-#endif
-	{
-		s_b3DNowEnabled = false;
-	}
-
-	if ( bAllowSSE && pi.m_bSSE )
-	{
-		s_bSSEEnabled = true;
-
-#ifndef PLATFORM_WINDOWS_PC64
-		// These are not yet available.
-		// Select the SSE specific routines if available
-		pfVectorNormalizeFast = _SSE_VectorNormalizeFast;
-		pfInvRSquared = _SSE_InvRSquared;
-#endif
-	}
-	else
-	{
-		s_bSSEEnabled = false;
-	}
-
-	if ( bAllowSSE2 && pi.m_bSSE2 )
-	{
-		s_bSSE2Enabled = true;
-	} 
-	else
-	{
-		s_bSSE2Enabled = false;
-	}
-#endif // !_X360
+	s_b3DNowEnabled = bAllow3DNow && pi.m_b3DNow;
+	s_bSSEEnabled = bAllowSSE && pi.m_bSSE;
+	s_bSSE2Enabled = bAllowSSE2 && pi.m_bSSE2;
 
 	s_bMathlibInitialized = true;
 
