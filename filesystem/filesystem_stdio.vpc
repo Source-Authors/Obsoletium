@@ -44,6 +44,7 @@ $Configuration
 
 		// Add VPK support
 		$PreprocessorDefinitions	"$BASE;SUPPORT_PACKED_STORE" [!$WIN64]
+		$EnableC++Exceptions		"Yes (/EHsc)"
 	}
 	$Linker
 	{

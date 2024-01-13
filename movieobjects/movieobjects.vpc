@@ -12,6 +12,7 @@ $Configuration
 	$Compiler
 	{
 		$PreprocessorDefinitions			"$BASE;MOVIEOBJECTS_LIB"
+		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
 }
 

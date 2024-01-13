@@ -32,6 +32,8 @@ $Configuration
 		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include"	[$SDL]
 		$AdditionalIncludeDirectories	"$BASE;$ZLIBSRCDIR;$ZLIBSRC2DIR;$ZLIBOUTDIR"
 		$PreprocessorDefinitions		"$BASE;GAMEUI_EXPORTS;VERSION_SAFE_STEAM_API_INTERFACES"
+
+		$EnableC++Exceptions			"Yes (/EHsc)"
 	}
 
 	$Linker

@@ -13,6 +13,7 @@ $Configuration
 	$Compiler
 	{
 		$PreprocessorDefinitions		"$BASE;TIER1_STATIC_LIB"
+		$EnableC++Exceptions			"Yes (/EHsc)"
 	}
 
 	$Librarian [$WINDOWS]
