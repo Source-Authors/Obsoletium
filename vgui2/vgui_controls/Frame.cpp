@@ -1693,8 +1693,8 @@ void Frame::ApplySchemeSettings(IScheme *pScheme)
 	_closeButton->SetFont(marfont);
 #endif
 
-	m_flTransitionEffectTime = atof(pScheme->GetResourceString("Frame.TransitionEffectTime"));
-	m_flFocusTransitionEffectTime = atof(pScheme->GetResourceString("Frame.FocusTransitionEffectTime"));
+	m_flTransitionEffectTime = strtof(pScheme->GetResourceString("Frame.TransitionEffectTime"), nullptr);
+	m_flFocusTransitionEffectTime = strtof(pScheme->GetResourceString("Frame.FocusTransitionEffectTime"), nullptr);
 
 	SetOverridableColor( &m_InFocusBgColor, pScheme->GetColor("Frame.BgColor", GetBgColor()) );
 	SetOverridableColor( &m_OutOfFocusBgColor, pScheme->GetColor("Frame.OutOfFocusBgColor", m_InFocusBgColor) );

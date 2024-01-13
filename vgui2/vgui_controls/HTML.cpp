@@ -728,7 +728,7 @@ void HTML::ShowFindDialog()
 	resourceString = pClientScheme->GetResourceString( "HTML.SearchAnimationTime");
 	if ( resourceString )
 	{
-		flAnimationTime = atof(resourceString);
+		flAnimationTime = strtof(resourceString, nullptr);
 	}
 
 	GetAnimationController()->RunAnimationCommand( m_pFindBar, "ypos", iSearchInsetY, 0.0f, flAnimationTime, AnimationController::INTERPOLATOR_LINEAR );
@@ -750,7 +750,7 @@ void HTML::HideFindDialog()
 	const char *resourceString = pClientScheme->GetResourceString( "HTML.SearchAnimationTime");
 	if ( resourceString )
 	{
-		flAnimationTime = atof(resourceString);
+		flAnimationTime = strtof(resourceString, nullptr);
 	}
 
 	GetAnimationController()->RunAnimationCommand( m_pFindBar, "ypos", -1*h-5, 0.0f, flAnimationTime, AnimationController::INTERPOLATOR_LINEAR );

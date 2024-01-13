@@ -5723,7 +5723,7 @@ public:
 	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry )
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
-		*(float *)data = atof( entry->defaultvalue() );
+		*(float *)data = strtof( entry->defaultvalue(), nullptr );
 	}
 };
 

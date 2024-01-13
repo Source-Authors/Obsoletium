@@ -963,7 +963,7 @@ AnimationController::Value_t AnimationController::GetInterpolatedValue(int inter
 		break;
 	case INTERPOLATOR_PULSE:
 		// Make sure we end at 1.0, so use cosine
-		pos = 0.5f + 0.5f * ( cos( pos * 2.0f * M_PI * interpolatorParam ) );
+		pos = 0.5f + 0.5f * ( cos( pos * 2.0f * M_PI_F * interpolatorParam ) );
 		break;
 	case INTERPOLATOR_BIAS:
 		pos = Bias( pos, interpolatorParam );
@@ -990,15 +990,15 @@ AnimationController::Value_t AnimationController::GetInterpolatedValue(int inter
 
 		if ( pos < hit1 )
 		{
-			pos = 1.0f - sin( M_PI * pos / hit1 );
+			pos = 1.0f - sin( M_PI_F * pos / hit1 );
 		}
 		else if ( pos < hit2 )
 		{
-			pos = 0.5f + 0.5f * ( 1.0f - sin( M_PI * ( pos - hit1 ) / ( hit2 - hit1 ) ) );
+			pos = 0.5f + 0.5f * ( 1.0f - sin( M_PI_F * ( pos - hit1 ) / ( hit2 - hit1 ) ) );
 		}
 		else
 		{
-			pos = 0.8f + 0.2f * ( 1.0f - sin( M_PI * ( pos - hit2 ) / ( hit3 - hit2 ) ) );
+			pos = 0.8f + 0.2f * ( 1.0f - sin( M_PI_F * ( pos - hit2 ) / ( hit3 - hit2 ) ) );
 		}
 		break;
 	}

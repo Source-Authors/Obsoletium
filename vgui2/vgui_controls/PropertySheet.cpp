@@ -894,7 +894,7 @@ void PropertySheet::ApplySchemeSettings(IScheme *pScheme)
 	}
 
 	SetBorder(pBorder);
-	m_flPageTransitionEffectTime = atof(pScheme->GetResourceString("PropertySheet.TransitionEffectTime"));
+	m_flPageTransitionEffectTime = strtof(pScheme->GetResourceString("PropertySheet.TransitionEffectTime"), nullptr);
 
 	m_tabFont = pScheme->GetFont( m_bSmallTabs ? "DefaultVerySmall" : "Default" );
 
