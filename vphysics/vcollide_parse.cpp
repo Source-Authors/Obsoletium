@@ -166,7 +166,7 @@ void CVPhysicsParse::ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKe
 		}
 		else if ( !Q_stricmp( key, "mass" ) )
 		{
-			pSolid->params.mass = atof(value);
+			pSolid->params.mass = strtof(value, nullptr);
 		}
 		else if ( !Q_stricmp( key, "massCenterOverride" ) )
 		{
@@ -175,23 +175,23 @@ void CVPhysicsParse::ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKe
 		}
 		else if ( !Q_stricmp( key, "inertia" ) )
 		{
-			pSolid->params.inertia = atof(value);
+			pSolid->params.inertia = strtof(value, nullptr);
 		}
 		else if ( !Q_stricmp( key, "damping" ) )
 		{
-			pSolid->params.damping = atof(value);
+			pSolid->params.damping = strtof(value, nullptr);
 		}
 		else if ( !Q_stricmp( key, "rotdamping" ) )
 		{
-			pSolid->params.rotdamping = atof(value);
+			pSolid->params.rotdamping = strtof(value, nullptr);
 		}
 		else if ( !Q_stricmp( key, "volume" ) )
 		{
-			pSolid->params.volume = atof(value);
+			pSolid->params.volume = strtof(value, nullptr);
 		}
 		else if ( !Q_stricmp( key, "drag" ) )
 		{
-			pSolid->params.dragCoefficient = atof(value);
+			pSolid->params.dragCoefficient = strtof(value, nullptr);
 		}
 		else if ( !Q_stricmp( key, "rollingdrag" ) )
 		{
@@ -246,42 +246,42 @@ void CVPhysicsParse::ParseRagdollConstraint( constraint_ragdollparams_t *pConstr
 		}
 		else if ( !Q_stricmp( key, "xmin" ) )
 		{
-			pConstraint->axes[0].minRotation = atof( value );
+			pConstraint->axes[0].minRotation = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "xmax" ) )
 		{
-			pConstraint->axes[0].maxRotation = atof( value );
+			pConstraint->axes[0].maxRotation = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "xfriction" ) )
 		{
 			pConstraint->axes[0].angularVelocity = 0;
-			pConstraint->axes[0].torque = atof( value );
+			pConstraint->axes[0].torque = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "ymin" ) )
 		{
-			pConstraint->axes[1].minRotation = atof( value );
+			pConstraint->axes[1].minRotation = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "ymax" ) )
 		{
-			pConstraint->axes[1].maxRotation = atof( value );
+			pConstraint->axes[1].maxRotation = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "yfriction" ) )
 		{
 			pConstraint->axes[1].angularVelocity = 0;
-			pConstraint->axes[1].torque = atof( value );
+			pConstraint->axes[1].torque = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "zmin" ) )
 		{
-			pConstraint->axes[2].minRotation = atof( value );
+			pConstraint->axes[2].minRotation = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "zmax" ) )
 		{
-			pConstraint->axes[2].maxRotation = atof( value );
+			pConstraint->axes[2].maxRotation = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "zfriction" ) )
 		{
 			pConstraint->axes[2].angularVelocity = 0;
-			pConstraint->axes[2].torque = atof( value );
+			pConstraint->axes[2].torque = strtof( value, nullptr );
 		}
 		else
 		{
@@ -326,7 +326,7 @@ void CVPhysicsParse::ParseFluid( fluid_t *pFluid, IVPhysicsKeyHandler *unknownKe
 		}
 		else if ( !Q_stricmp( key, "damping" ) )
 		{
-			pFluid->params.damping = atof( value );
+			pFluid->params.damping = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "surfaceplane" ) )
 		{
@@ -439,11 +439,11 @@ void CVPhysicsParse::ParseVehicleAxle( vehicle_axleparams_t &axle )
 		}
 		else if ( !Q_stricmp( key, "torquefactor" ) )
 		{
-			axle.torqueFactor = atof( value );
+			axle.torqueFactor = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "brakefactor" ) )
 		{
-			axle.brakeFactor = atof( value );
+			axle.brakeFactor = strtof( value, nullptr );
 		}
 	}
 }
@@ -461,27 +461,27 @@ void CVPhysicsParse::ParseVehicleWheel( vehicle_wheelparams_t &wheel )
 		
 		if ( !Q_stricmp( key, "radius" ) )
 		{
-			wheel.radius = atof( value );
+			wheel.radius = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "mass" ) )
 		{
-			wheel.mass = atof( value );
+			wheel.mass = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "inertia" ) )
 		{
-			wheel.inertia = atof( value );
+			wheel.inertia = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "damping" ) )
 		{
-			wheel.damping = atof( value );
+			wheel.damping = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "rotdamping" ) )
 		{
-			wheel.rotdamping = atof( value );
+			wheel.rotdamping = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "frictionscale" ) )
 		{
-			wheel.frictionScale = atof( value );
+			wheel.frictionScale = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "material" ) )
 		{
@@ -512,23 +512,23 @@ void CVPhysicsParse::ParseVehicleSuspension( vehicle_suspensionparams_t &suspens
 		
 		if ( !Q_stricmp( key, "springconstant" ) )
 		{
-			suspension.springConstant = atof( value );
+			suspension.springConstant = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "springdamping" ) )
 		{
-			suspension.springDamping = atof( value );
+			suspension.springDamping = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "stabilizerconstant" ) )
 		{
-			suspension.stabilizerConstant = atof( value );
+			suspension.stabilizerConstant = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "springdampingcompression" ) )
 		{
-			suspension.springDampingCompression = atof( value );
+			suspension.springDampingCompression = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "maxbodyforce" ) )
 		{
-			suspension.maxBodyForce = atof( value );
+			suspension.maxBodyForce = strtof( value, nullptr );
 		}
 	}
 }
@@ -551,31 +551,31 @@ void CVPhysicsParse::ParseVehicleBody( vehicle_bodyparams_t &body )
 		}
 		else if ( !Q_stricmp( key, "addgravity" ) )
 		{
-			body.addGravity = atof( value );
+			body.addGravity = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "maxAngularVelocity" ) )
 		{
-			body.maxAngularVelocity = atof( value );
+			body.maxAngularVelocity = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "massOverride" ) )
 		{
-			body.massOverride = atof( value );
+			body.massOverride = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "tiltforce" ) )
 		{
-			body.tiltForce = atof( value );
+			body.tiltForce = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "tiltforceheight" ) )
 		{
-			body.tiltForceHeight = atof( value );
+			body.tiltForceHeight = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "countertorquefactor" ) )
 		{
-			body.counterTorqueFactor = atof( value );
+			body.counterTorqueFactor = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "keepuprighttorque" ) )
 		{
-			body.keepUprightTorque = atof( value );
+			body.keepUprightTorque = strtof( value, nullptr );
 		}
 	}
 }
@@ -594,19 +594,19 @@ void CVPhysicsParse::ParseVehicleEngineBoost( vehicle_engineparams_t &engine )
 		// parse subchunks
 		if ( !Q_stricmp( key, "force" ) )
 		{
-			engine.boostForce = atof( value );
+			engine.boostForce = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "duration" ) )
 		{
-			engine.boostDuration = atof( value );
+			engine.boostDuration = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "delay" ) )
 		{
-			engine.boostDelay = atof( value );
+			engine.boostDelay = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "maxspeed" ) )
 		{
-			engine.boostMaxSpeed = atof( value );
+			engine.boostMaxSpeed = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "torqueboost" ) )
 		{
@@ -643,7 +643,7 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 			// Protect against exploits/overruns
 			if ( engine.gearCount < ARRAYSIZE(engine.gearRatio) )
 			{
-				engine.gearRatio[engine.gearCount] = atof( value );
+				engine.gearRatio[engine.gearCount] = strtof( value, nullptr );
 				engine.gearCount++;
 			}
 			else
@@ -653,27 +653,27 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 		}
 		else if ( !Q_stricmp( key, "horsepower" ) )
 		{
-			engine.horsepower = atof( value );
+			engine.horsepower = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "maxSpeed" ) )
 		{
-			engine.maxSpeed = atof( value );
+			engine.maxSpeed = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "maxReverseSpeed" ) )
 		{
-			engine.maxRevSpeed = atof( value );
+			engine.maxRevSpeed = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "axleratio" ) )
 		{
-			engine.axleRatio = atof( value );
+			engine.axleRatio = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "maxRPM" ) )
 		{
-			engine.maxRPM = atof( value );
+			engine.maxRPM = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "throttleTime" ) )
 		{
-			engine.throttleTime = atof( value );
+			engine.throttleTime = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "AutoTransmission" ) )
 		{
@@ -681,19 +681,19 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 		}
 		else if ( !Q_stricmp( key, "shiftUpRPM" ) )
 		{
-			engine.shiftUpRPM = atof( value );
+			engine.shiftUpRPM = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "shiftDownRPM" ) )
 		{
-			engine.shiftDownRPM = atof( value );
+			engine.shiftDownRPM = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "autobrakeSpeedGain" ) )
 		{
-			engine.autobrakeSpeedGain = atof( value );
+			engine.autobrakeSpeedGain = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "autobrakeSpeedFactor" ) )
 		{
-			engine.autobrakeSpeedFactor = atof( value );
+			engine.autobrakeSpeedFactor = strtof( value, nullptr );
 		}
 	}
 }
@@ -712,71 +712,71 @@ void CVPhysicsParse::ParseVehicleSteering( vehicle_steeringparams_t &steering )
 		// parse subchunks
 		if ( !Q_stricmp( key, "degreesSlow" ) )
 		{
-			steering.degreesSlow = atof( value );
+			steering.degreesSlow = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "degreesFast" ) )
 		{
-			steering.degreesFast = atof( value );
+			steering.degreesFast = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "degreesBoost" ) )
 		{
-			steering.degreesBoost = atof( value );
+			steering.degreesBoost = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "fastcarspeed" ) )
 		{
-			steering.speedFast = atof( value );
+			steering.speedFast = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "slowcarspeed" ) )
 		{
-			steering.speedSlow = atof( value );
+			steering.speedSlow = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "slowsteeringrate" ) )
 		{
-			steering.steeringRateSlow = atof( value );
+			steering.steeringRateSlow = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "faststeeringrate" ) )
 		{
-			steering.steeringRateFast = atof( value );
+			steering.steeringRateFast = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "steeringRestRateSlow" ) )
 		{
-			steering.steeringRestRateSlow = atof( value );
+			steering.steeringRestRateSlow = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "steeringRestRateFast" ) )
 		{
-			steering.steeringRestRateFast = atof( value );
+			steering.steeringRestRateFast = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "throttleSteeringRestRateFactor" ) )
 		{
-			steering.throttleSteeringRestRateFactor = atof( value );
+			steering.throttleSteeringRestRateFactor = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "boostSteeringRestRateFactor" ) )
 		{
-			steering.boostSteeringRestRateFactor = atof( value );
+			steering.boostSteeringRestRateFactor = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "boostSteeringRateFactor" ) )
 		{
-			steering.boostSteeringRateFactor = atof( value );
+			steering.boostSteeringRateFactor = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "steeringExponent" ) )
 		{
-			steering.steeringExponent = atof( value );
+			steering.steeringExponent = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "turnThrottleReduceSlow" ) )
 		{
-			steering.turnThrottleReduceSlow = atof( value );
+			steering.turnThrottleReduceSlow = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "turnThrottleReduceFast" ) )
 		{
-			steering.turnThrottleReduceFast = atof( value );
+			steering.turnThrottleReduceFast = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "brakeSteeringRateFactor" ) )
 		{
-			steering.brakeSteeringRateFactor = atof( value );
+			steering.brakeSteeringRateFactor = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "powerSlideAccel" ) )
 		{
-			steering.powerSlideAccel = atof( value );
+			steering.powerSlideAccel = strtof( value, nullptr );
 		}
 		else if ( !Q_stricmp( key, "skidallowed" ) )
 		{

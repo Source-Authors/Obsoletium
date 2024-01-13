@@ -1177,7 +1177,7 @@ static bool IsEqual( const IVP_U_Point &pt0, const IVP_U_Point &pt1 )
 // with EXACTLY the same data repeatedly
 static bool IsEqual( const IVP_U_Quat &pt0, const IVP_U_Quat &pt1 )
 {
-	float delta = fabs(pt0.x - pt1.x);
+	double delta = fabs(pt0.x - pt1.x);
 	delta += fabs(pt0.y - pt1.y);
 	delta += fabs(pt0.z - pt1.z);
 	delta += fabs(pt0.w - pt1.w);

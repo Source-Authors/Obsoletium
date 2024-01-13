@@ -28,16 +28,35 @@ struct vphysics_units_t
 
 extern vphysics_units_t g_PhysicsUnits;
 
-#define HL2IVP_FACTOR	g_PhysicsUnits.unitScaleMeters
-#define IVP2HL(x)		(float)(x * (g_PhysicsUnits.unitScaleMetersInv))
-#define HL2IVP(x)		(double)(x * HL2IVP_FACTOR)
+const inline float HL2IVP_FACTOR{g_PhysicsUnits.unitScaleMeters};
+const inline float IVP2HL_fACTOR{g_PhysicsUnits.unitScaleMetersInv};
+
+template<typename T>
+inline float IVP2HL(double x)
+{
+	return (float)(x * IVP2HL_fACTOR);
+}
+
+inline float IVP2HL(float x)
+{
+	return x * IVP2HL_fACTOR;
+}
+
+template<typename T>
+inline double HL2IVP(T x)
+{
+	return (double)(x * HL2IVP_FACTOR)
+}
+
+inline float HL2IVP(float x)
+{
+	return x * HL2IVP_FACTOR;
+}
 
 // Convert HL engine units to IVP units
 inline void ConvertPositionToIVP( const Vector &in, IVP_U_Float_Point &out )
 {
-	float tmpZ;
-
-	tmpZ = in[1];
+	float tmpZ = in[1];
 
 	out.k[0] = HL2IVP(in[0]);
 	out.k[1] = -HL2IVP(in[2]);
@@ -46,9 +65,7 @@ inline void ConvertPositionToIVP( const Vector &in, IVP_U_Float_Point &out )
 
 inline void ConvertPositionToIVP( const Vector &in, IVP_U_Point &out )
 {
-	float tmpZ;
-
-	tmpZ = in[1];
+	float tmpZ = in[1];
 
 	out.k[0] = HL2IVP(in[0]);
 	out.k[1] = -HL2IVP(in[2]);
@@ -57,9 +74,7 @@ inline void ConvertPositionToIVP( const Vector &in, IVP_U_Point &out )
 
 inline void ConvertPositionToIVP( const Vector &in, IVP_U_Float_Point3 &out )
 {
-	float tmpZ;
-
-	tmpZ = in[1];
+	float tmpZ = in[1];
 
 	out.k[0] = HL2IVP(in[0]);
 	out.k[1] = -HL2IVP(in[2]);
@@ -68,9 +83,7 @@ inline void ConvertPositionToIVP( const Vector &in, IVP_U_Float_Point3 &out )
 
 inline void ConvertPositionToIVP( float &x, float &y, float &z )
 {
-	float tmpZ;
-
-	tmpZ = y;
+	float tmpZ = y;
 	y = -HL2IVP(z);
 	z = HL2IVP(tmpZ);
 	x = HL2IVP(x);
@@ -78,9 +91,7 @@ inline void ConvertPositionToIVP( float &x, float &y, float &z )
 
 inline void ConvertDirectionToIVP( const Vector &in, IVP_U_Float_Point &out )
 {
-	float tmpZ;
-
-	tmpZ = in[1];
+	float tmpZ = in[1];
 
 	out.k[0] = in[0];
 	out.k[1] = -in[2];
@@ -90,9 +101,7 @@ inline void ConvertDirectionToIVP( const Vector &in, IVP_U_Float_Point &out )
 
 inline void ConvertDirectionToIVP( const Vector &in, IVP_U_Point &out )
 {
-	float tmpZ;
-
-	tmpZ = in[1];
+	float tmpZ = in[1];
 
 	out.k[0] = in[0];
 	out.k[1] = -in[2];
@@ -111,9 +120,7 @@ inline float ConvertAngleToIVP( float angleIn )
 
 inline void ConvertAngularImpulseToIVP( const AngularImpulse &in, IVP_U_Float_Point &out )
 {
-	float tmpZ;
-
-	tmpZ = in[1];
+	float tmpZ = in[1];
 
 	out.k[0] = DEG2RAD(in[0]);
 	out.k[1] = -DEG2RAD(in[2]);

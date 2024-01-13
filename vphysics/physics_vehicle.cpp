@@ -547,7 +547,7 @@ IVP_Real_Object *CVehicleController::CreateWheel( int wheelIndex, vehicle_axlepa
 	// the wheels
 	float radius = axle.wheels.radius;
 	float r3 = radius * radius * radius;
-	params.volume = (4.0f / 3) * M_PI * r3;
+	params.volume = (4.0f / 3) * M_PI_F * r3;
 
 	CPhysicsObject *pWheel = (CPhysicsObject *)m_pEnv->CreateSphereObject( radius, axle.wheels.materialIndex, wheelPositionHL, bodyAngles, &params, false );
     pWheel->Wake();
@@ -1471,8 +1471,8 @@ void CVehicleController::InitFromTemplate( CPhysicsEnvironment *pEnv, void *pGam
 	SET_DEFAULT( m_vehicleData.steering.steeringRateFast, 0.5 );
 	SET_DEFAULT( m_vehicleData.steering.steeringRestRateSlow, 3.0 );
 	SET_DEFAULT( m_vehicleData.steering.steeringRestRateFast, 1.8 );
-	SET_DEFAULT( m_vehicleData.steering.speedSlow, m_vehicleData.engine.maxSpeed*0.25 );
-	SET_DEFAULT( m_vehicleData.steering.speedFast, m_vehicleData.engine.maxSpeed*0.75 );
+	SET_DEFAULT( m_vehicleData.steering.speedSlow, m_vehicleData.engine.maxSpeed*0.25f );
+	SET_DEFAULT( m_vehicleData.steering.speedFast, m_vehicleData.engine.maxSpeed*0.75f );
 	SET_DEFAULT( m_vehicleData.steering.degreesSlow, 50 );
 	SET_DEFAULT( m_vehicleData.steering.degreesFast, 18 );
 	SET_DEFAULT( m_vehicleData.steering.degreesBoost, 10 );

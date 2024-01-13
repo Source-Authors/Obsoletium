@@ -451,27 +451,27 @@ int CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *p
 				}
 				else if ( !strcmpi( key, "thickness" ) )
 				{
-					prop.data.physics.thickness = atof(value);
+					prop.data.physics.thickness = strtof(value, nullptr);
 				}
 				else if ( !strcmpi( key, "density" ) )
 				{
-					prop.data.physics.density = atof(value);
+					prop.data.physics.density = strtof(value, nullptr);
 				}
 				else if ( !strcmpi( key, "elasticity" ) )
 				{
-					prop.data.physics.elasticity = atof(value);
+					prop.data.physics.elasticity = strtof(value, nullptr);
 				}
 				else if ( !strcmpi( key, "friction" ) )
 				{
-					prop.data.physics.friction = atof(value);
+					prop.data.physics.friction = strtof(value, nullptr);
 				}
 				else if ( !strcmpi( key, "maxspeedfactor" ) )
 				{
-					prop.data.game.maxSpeedFactor = atof(value);
+					prop.data.game.maxSpeedFactor = strtof(value, nullptr);
 				}
 				else if ( !strcmpi( key, "jumpfactor" ) )
 				{
-					prop.data.game.jumpFactor = atof(value);
+					prop.data.game.jumpFactor = strtof(value, nullptr);
 				}
 				else if ( !strcmpi( key, "climbable" ) )
 				{
@@ -480,27 +480,27 @@ int CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *p
 				// audio parameters
 				else if ( !strcmpi( key, "audioReflectivity" ) )
 				{
-					prop.data.audio.reflectivity = atof(value);
+					prop.data.audio.reflectivity = strtof(value, nullptr);
 				}
 				else if ( !strcmpi( key, "audioHardnessFactor" ) )
 				{
-					prop.data.audio.hardnessFactor = atof(value);
+					prop.data.audio.hardnessFactor = strtof(value, nullptr);
 				}
 				else if ( !strcmpi( key, "audioHardMinVelocity" ) )
 				{
-					prop.data.audio.hardVelocityThreshold = atof(value);
+					prop.data.audio.hardVelocityThreshold = strtof(value, nullptr);
 				}
 				else if ( !strcmpi( key, "audioRoughnessFactor" ) )
 				{
-					prop.data.audio.roughnessFactor = atof(value);
+					prop.data.audio.roughnessFactor = strtof(value, nullptr);
 				}
 				else if ( !strcmpi( key, "scrapeRoughThreshold" ) )
 				{
-					prop.data.audio.roughThreshold = atof(value);
+					prop.data.audio.roughThreshold = strtof(value, nullptr);
 				}
 				else if ( !strcmpi( key, "impactHardThreshold" ) )
 				{
-					prop.data.audio.hardThreshold = atof(value);
+					prop.data.audio.hardThreshold = strtof(value, nullptr);
 				}
 				// sound names
 				else if ( !strcmpi( key, "stepleft" ) )
@@ -556,7 +556,7 @@ int CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *p
 				}
 				else if ( !strcmpi( key, "dampening" ) )
 				{
-					prop.data.physics.dampening = atof(value);
+					prop.data.physics.dampening = strtof(value, nullptr);
 				}
 				else
 				{

@@ -1604,7 +1604,7 @@ CPhysicsObject *CreatePhysicsSphere( CPhysicsEnvironment *pEnvironment, float ra
 	float volume = pParams->volume;
 	if ( volume <= 0 )
 	{
-		volume = 4.0f * radius * radius * radius * M_PI / 3.0f;
+		volume = 4.0f * radius * radius * radius * M_PI_F / 3.0f;
 	}
 	CPhysicsObject *pObject = new CPhysicsObject();
 	pObject->Init( NULL, realObject, materialIndex, volume, 0, 0 ); //, pParams->dragCoefficient, pParams->dragCoefficient
