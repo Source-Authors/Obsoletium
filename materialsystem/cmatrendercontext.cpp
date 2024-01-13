@@ -559,10 +559,10 @@ void CMatRenderContextBase::PickMatrix( int x, int y, int nWidth, int nHeight )
 	// and scale so (pw,ph) -> (2, 2)
 	VMatrix mat;
 	MatrixSetIdentity( mat );
-	mat.m[0][0] = 2.0 / pw;
-	mat.m[1][1] = 2.0 / ph;
-	mat.m[0][3] = -2.0 * px / pw;
-	mat.m[1][3] = -2.0 * py / ph;
+	mat.m[0][0] = 2.0f / pw;
+	mat.m[1][1] = 2.0f / ph;
+	mat.m[0][3] = -2.0f * px / pw;
+	mat.m[1][3] = -2.0f * py / ph;
 
 	CMatRenderContextBase::MultMatrixLocal( mat );
 }

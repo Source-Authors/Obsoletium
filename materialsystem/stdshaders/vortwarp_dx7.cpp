@@ -237,7 +237,7 @@ BEGIN_SHADER( VortWarp_DX7,
 			float mat[16];
 			mat[0] = 1.0f;		mat[1] = 0.0f;		mat[2] = 0.0f;
 			mat[4] = 0.0f;		mat[5] = 1.0f;		mat[6] = 0.0f;
-			mat[8] = .11f * curTime; mat[9] = .124 * curTime; mat[10] = 1.0f;
+			mat[8] = .11f * curTime; mat[9] = .124f * curTime; mat[10] = 1.0f;
 
 			// Better set the stuff we don't set with some sort of value!
 			mat[3] = mat[7] = mat[11] = 0;

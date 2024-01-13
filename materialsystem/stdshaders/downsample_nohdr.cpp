@@ -94,14 +94,14 @@ BEGIN_VS_SHADER_FLAGS( Downsample_nohdr, "Help for Downsample_nohdr", SHADER_NOT
 			float dX = 1.0f/width;
 			float dY = 1.0f/height;
 
-			v[0][0] = .5*dX;
-			v[0][1] = .5*dY;
-			v[1][0] = 2.5*dX;
-			v[1][1] = .5*dY;
-			v[2][0] = .5*dX;
-			v[2][1] = 2.5*dY;
-			v[3][0] = 2.5*dX;
-			v[3][1] = 2.5*dY;
+			v[0][0] = .5f*dX;
+			v[0][1] = .5f*dY;
+			v[1][0] = 2.5f*dX;
+			v[1][1] = .5f*dY;
+			v[2][0] = .5f*dX;
+			v[2][1] = 2.5f*dY;
+			v[3][0] = 2.5f*dX;
+			v[3][1] = 2.5f*dY;
 			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, &v[0][0], 4 );
 
 			pShaderAPI->SetVertexShaderIndex( 0 );
