@@ -553,11 +553,11 @@ public:
 		}
 		else if ( !strcmpi( pKey, "health" ) )
 		{
-			pModel->health = atof(pValue);
+			pModel->health = strtof(pValue, nullptr);
 		}
 		else if ( !strcmpi( pKey, "fadetime" ) )
 		{
-			pModel->fadeTime = atof(pValue);
+			pModel->fadeTime = strtof(pValue, nullptr);
 			if ( !m_wroteCollisionGroup )
 			{
 				pModel->collisionGroup = COLLISION_GROUP_DEBRIS;
@@ -565,11 +565,11 @@ public:
 		}
 		else if ( !strcmpi( pKey, "fademindist" ) )
 		{
-			pModel->fadeMinDist = atof(pValue);
+			pModel->fadeMinDist = strtof(pValue, nullptr);
 		}
 		else if ( !strcmpi( pKey, "fademaxdist" ) )
 		{
-			pModel->fadeMaxDist = atof(pValue);
+			pModel->fadeMaxDist = strtof(pValue, nullptr);
 		}
 		else if ( !strcmpi( pKey, "debris" ) )
 		{
@@ -578,7 +578,7 @@ public:
 		}
 		else if ( !strcmpi( pKey, "burst" ) )
 		{
-			pModel->burstScale = atof( pValue );
+			pModel->burstScale = strtof( pValue, nullptr );
 		}
 		else if ( !strcmpi( pKey, "placementbone" ) )
 		{

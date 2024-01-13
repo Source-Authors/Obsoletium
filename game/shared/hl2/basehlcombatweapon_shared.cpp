@@ -289,15 +289,15 @@ float CBaseHLCombatWeapon::CalcViewmodelBob( void )
 
 	if ( cycle < HL2_BOB_UP )
 	{
-		cycle = M_PI * cycle / HL2_BOB_UP;
+		cycle = M_PI_F * cycle / HL2_BOB_UP;
 	}
 	else
 	{
-		cycle = M_PI + M_PI*(cycle-HL2_BOB_UP)/(1.0 - HL2_BOB_UP);
+		cycle = M_PI_F + M_PI_F*(cycle-HL2_BOB_UP)/(1.0f - HL2_BOB_UP);
 	}
 	
 	g_verticalBob = speed*0.005f;
-	g_verticalBob = g_verticalBob*0.3 + g_verticalBob*0.7*sin(cycle);
+	g_verticalBob = g_verticalBob*0.3f + g_verticalBob*0.7f*sin(cycle);
 
 	g_verticalBob = clamp( g_verticalBob, -7.0f, 4.0f );
 
@@ -307,15 +307,15 @@ float CBaseHLCombatWeapon::CalcViewmodelBob( void )
 
 	if ( cycle < HL2_BOB_UP )
 	{
-		cycle = M_PI * cycle / HL2_BOB_UP;
+		cycle = M_PI_F * cycle / HL2_BOB_UP;
 	}
 	else
 	{
-		cycle = M_PI + M_PI*(cycle-HL2_BOB_UP)/(1.0 - HL2_BOB_UP);
+		cycle = M_PI_F + M_PI_F*(cycle-HL2_BOB_UP)/(1.0f - HL2_BOB_UP);
 	}
 
 	g_lateralBob = speed*0.005f;
-	g_lateralBob = g_lateralBob*0.3 + g_lateralBob*0.7*sin(cycle);
+	g_lateralBob = g_lateralBob*0.3f + g_lateralBob*0.7f*sin(cycle);
 	g_lateralBob = clamp( g_lateralBob, -7.0f, 4.0f );
 	
 	//NOTENOTE: We don't use this return value in our case (need to restructure the calculation function setup!)

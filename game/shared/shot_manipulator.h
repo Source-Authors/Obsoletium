@@ -80,8 +80,8 @@ inline const Vector &CShotManipulator::ApplySpread( const Vector &vecSpread, flo
 		y = random->RandomFloat(-1,1) * flatness + random->RandomFloat(-1,1) * (1 - flatness);
 		if ( shotBias < 0 )
 		{
-			x = ( x >= 0 ) ? 1.0 - x : -1.0 - x;
-			y = ( y >= 0 ) ? 1.0 - y : -1.0 - y;
+			x = ( x >= 0 ) ? 1.0f - x : -1.0f - x;
+			y = ( y >= 0 ) ? 1.0f - y : -1.0f - y;
 		}
 		z = x*x+y*y;
 	} while (z > 1);

@@ -924,7 +924,7 @@ void UTIL_StringToFloatArray( float *pVector, int count, const char *pString )
 
 	for ( j = 0; j < count; j++ )			// lifted from pr_edict.c
 	{
-		pVector[j] = atof( pfront );
+		pVector[j] = strtof( pfront, nullptr );
 
 		// skip any leading whitespace
 		while ( *pstr && *pstr <= ' ' )

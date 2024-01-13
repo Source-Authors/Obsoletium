@@ -31,11 +31,11 @@ interval_t ReadInterval( const char *pString )
 	char *token = strtok( tempString, "," );
 	if ( token )
 	{
-		tmp.start = atof( token );
+		tmp.start = strtof( token, nullptr );
 		token = strtok( NULL, "," );
 		if ( token )
 		{
-			tmp.range = atof( token ) - tmp.start;
+			tmp.range = strtof( token, nullptr ) - tmp.start;
 		}
 	}
 

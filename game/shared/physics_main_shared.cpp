@@ -1302,7 +1302,7 @@ void CBaseEntity::PhysicsAddGravityMove( Vector &move )
 	// linear acceleration due to gravity
 	float newZVelocity = vecAbsVelocity.z - GetActualGravity( this ) * gpGlobals->frametime;
 
-	move.z = ((vecAbsVelocity.z + newZVelocity) / 2.0 + GetBaseVelocity().z ) * gpGlobals->frametime;
+	move.z = ((vecAbsVelocity.z + newZVelocity) / 2.0f + GetBaseVelocity().z ) * gpGlobals->frametime;
 
 	Vector vecBaseVelocity = GetBaseVelocity();
 	vecBaseVelocity.z = 0.0f;

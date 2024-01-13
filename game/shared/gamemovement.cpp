@@ -3488,8 +3488,8 @@ bool CGameMovement::CheckWater( void )
 	Vector vPlayerMaxs = GetPlayerMaxs();
 
 	// Pick a spot just above the players feet.
-	point[0] = mv->GetAbsOrigin()[0] + (vPlayerMins[0] + vPlayerMaxs[0]) * 0.5;
-	point[1] = mv->GetAbsOrigin()[1] + (vPlayerMins[1] + vPlayerMaxs[1]) * 0.5;
+	point[0] = mv->GetAbsOrigin()[0] + (vPlayerMins[0] + vPlayerMaxs[0]) * 0.5f;
+	point[1] = mv->GetAbsOrigin()[1] + (vPlayerMins[1] + vPlayerMaxs[1]) * 0.5f;
 	point[2] = mv->GetAbsOrigin()[2] + vPlayerMins[2] + 1;
 	
 	// Assume that we are not in water at all.
@@ -3509,7 +3509,7 @@ bool CGameMovement::CheckWater( void )
 		player->SetWaterLevel( WL_Feet );
 
 		// Now check a point that is at the player hull midpoint.
-		point[2] = mv->GetAbsOrigin()[2] + (vPlayerMins[2] + vPlayerMaxs[2])*0.5;
+		point[2] = mv->GetAbsOrigin()[2] + (vPlayerMins[2] + vPlayerMaxs[2])*0.5f;
 		cont = GetPointContentsCached( point, 1 );
 		// If that point is also under water...
 		if ( cont & MASK_WATER )
@@ -4679,7 +4679,7 @@ void CGameMovement::PerformFlyCollisionResolution( trace_t &pm, Vector &move )
 	case MOVECOLLIDE_DEFAULT:
 		{
 			if (player->GetMoveCollide() == MOVECOLLIDE_FLY_BOUNCE)
-				backoff = 2.0 - player->m_surfaceFriction;
+				backoff = 2.0f - player->m_surfaceFriction;
 			else
 				backoff = 1;
 

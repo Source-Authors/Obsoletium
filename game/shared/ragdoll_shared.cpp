@@ -129,15 +129,15 @@ public:
 		}
 		else if ( !strcmpi( pKey, "animfrictiontimein" ) )
 		{
-			m_ragdoll->animfriction.flFrictionTimeIn = atof( pValue );
+			m_ragdoll->animfriction.flFrictionTimeIn = strtof( pValue, nullptr );
 		}
 		else if ( !strcmpi( pKey, "animfrictiontimeout" ) )
 		{
-			m_ragdoll->animfriction.flFrictionTimeOut = atof( pValue );
+			m_ragdoll->animfriction.flFrictionTimeOut = strtof( pValue, nullptr );
 		}
 		else if ( !strcmpi( pKey, "animfrictiontimehold" ) )
 		{
-			m_ragdoll->animfriction.flFrictionTimeHold = atof( pValue );
+			m_ragdoll->animfriction.flFrictionTimeHold = strtof( pValue, nullptr );
 		}
 	}
 

@@ -62,11 +62,11 @@ int CEnvDetailController::UpdateTransmitState()
 	{
 		if (FStrEq(szKeyName, "fademindist"))
 		{
-			m_flFadeStartDist = atof(szValue);
+			m_flFadeStartDist = strtof( szValue, nullptr );
 		}
 		else if (FStrEq(szKeyName, "fademaxdist"))
 		{
-			m_flFadeEndDist = atof(szValue);
+			m_flFadeEndDist = strtof( szValue, nullptr );
 		}
 
 		return true;

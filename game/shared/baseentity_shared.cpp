@@ -393,7 +393,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		static char szBuf[64];
 
-		float y = atof( szValue );
+		float y = strtof( szValue, nullptr );
 		if (y >= 0)
 		{
 			Q_snprintf( szBuf,sizeof(szBuf), "%f %f %f", GetLocalAngles()[0], y, GetLocalAngles()[2] );

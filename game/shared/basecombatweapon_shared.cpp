@@ -1049,7 +1049,7 @@ void CBaseCombatWeapon::SetActivity( Activity act, float duration )
 		{
 			// FIXME: does this even make sense in non-shoot animations?
 			m_flPlaybackRate = SequenceDuration( sequence ) / duration;
-			m_flPlaybackRate = MIN( m_flPlaybackRate, 12.0);  // FIXME; magic number!, network encoding range
+			m_flPlaybackRate = MIN( m_flPlaybackRate, 12.0f );  // FIXME; magic number!, network encoding range
 		}
 		else
 		{
@@ -1702,7 +1702,7 @@ void CBaseCombatWeapon::ItemPostFrame( void )
 			if (m_flNextEmptySoundTime < gpGlobals->curtime)
 			{
 				WeaponSound(EMPTY);
-				m_flNextSecondaryAttack = m_flNextEmptySoundTime = gpGlobals->curtime + 0.5;
+				m_flNextSecondaryAttack = m_flNextEmptySoundTime = gpGlobals->curtime + 0.5f;
 			}
 		}
 		else if (pOwner->GetWaterLevel() == 3 && m_bAltFiresUnderwater == false)
@@ -1818,7 +1818,7 @@ void CBaseCombatWeapon::HandleFireOnEmpty()
 		if (m_flNextEmptySoundTime < gpGlobals->curtime)
 		{
 			WeaponSound(EMPTY);
-			m_flNextEmptySoundTime = gpGlobals->curtime + 0.5;
+			m_flNextEmptySoundTime = gpGlobals->curtime + 0.5f;
 		}
 		m_bFireOnEmpty = true;
 	}

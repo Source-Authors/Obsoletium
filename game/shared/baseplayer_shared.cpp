@@ -570,7 +570,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 
 	height = GetPlayerMaxs()[ 2 ] - GetPlayerMins()[ 2 ];
 
-	knee[2] = vecOrigin[2] + 0.2 * height;
+	knee[2] = vecOrigin[2] + 0.2f * height;
 
 	// find out what we're stepping in or on...
 	if ( fLadder )
@@ -605,7 +605,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 	else if ( GetWaterLevel() == WL_Feet )
 	{
 		psurface = physprops->GetSurfaceData( physprops->GetSurfaceIndex( "water" ) );
-		fvol = bWalking ? 0.2 : 0.5;
+		fvol = bWalking ? 0.2f : 0.5f;
 
 		SetStepSoundTime( STEPSOUNDTIME_WATER_FOOT, bWalking );
 	}
@@ -619,32 +619,32 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 		switch ( psurface->game.material )
 		{
 		default:
-		case CHAR_TEX_CONCRETE:						
-			fvol = bWalking ? 0.2 : 0.5;
+		case CHAR_TEX_CONCRETE:
+			fvol = bWalking ? 0.2f : 0.5f;
 			break;
 
-		case CHAR_TEX_METAL:	
-			fvol = bWalking ? 0.2 : 0.5;
+		case CHAR_TEX_METAL:
+			fvol = bWalking ? 0.2f : 0.5f;
 			break;
 
 		case CHAR_TEX_DIRT:
-			fvol = bWalking ? 0.25 : 0.55;
+			fvol = bWalking ? 0.25f : 0.55f;
 			break;
 
 		case CHAR_TEX_VENT:	
-			fvol = bWalking ? 0.4 : 0.7;
+			fvol = bWalking ? 0.4f : 0.7f;
 			break;
 
 		case CHAR_TEX_GRATE:
-			fvol = bWalking ? 0.2 : 0.5;
+			fvol = bWalking ? 0.2f : 0.5f;
 			break;
 
 		case CHAR_TEX_TILE:	
-			fvol = bWalking ? 0.2 : 0.5;
+			fvol = bWalking ? 0.2f : 0.5f;
 			break;
 
 		case CHAR_TEX_SLOSH:
-			fvol = bWalking ? 0.2 : 0.5;
+			fvol = bWalking ? 0.2f : 0.5f;
 			break;
 		}
 	}

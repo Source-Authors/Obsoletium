@@ -134,7 +134,7 @@ void CEnvWindShared::ComputeWindVariation( float flTime )
 	while( flTime >= m_flVariationTime )
 	{
 		m_flWindAngleVariation = m_WindVariationStream.RandomFloat( -10, 10 );
-		m_flWindSpeedVariation = 1.0 + m_WindVariationStream.RandomFloat( -0.2, 0.2 );
+		m_flWindSpeedVariation = 1.0f + m_WindVariationStream.RandomFloat( -0.2f, 0.2f );
 		m_flVariationTime += WIND_VARIATION_UPDATE_TIME;
 	}
 }
