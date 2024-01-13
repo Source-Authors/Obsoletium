@@ -51,7 +51,7 @@ struct WideArgs
 	// Compute the size of the required buffer.
 	const int size{::WideCharToMultiByte( CP_UTF8, 0, wide, -1, nullptr, 0,
 																			  nullptr, nullptr )};
-	if ( size <= 0 ) [[unlikely]]
+	if ( size <= 0 )
 	{
 		// This should never happen.
 		const auto rc = std::error_code{ (int)::GetLastError(), std::system_category() };
@@ -61,7 +61,7 @@ struct WideArgs
 
 	// Do the actual conversion.
 	std::unique_ptr<char[]> argv{std::make_unique<char[]>( static_cast<size_t>(size) )};
-	if ( !argv ) [[unlikely]]
+	if ( !argv )
 	{
 		const auto rc = std::error_code{ (int)ERROR_OUTOFMEMORY, std::system_category() };
 		Warning( "Could not allocate memory to convert wchar_t {argc, argv} to UTF-8." );
@@ -70,7 +70,8 @@ struct WideArgs
 
 	const int result{::WideCharToMultiByte( CP_UTF8, 0, wide, -1, argv.get(), size,
 																				  nullptr, nullptr )};
-	if ( result <= 0 ) [[unlikely]] {
+	if ( result <= 0 )
+	{
 		// This should never happen.
 		const auto rc = std::error_code{ (int)::GetLastError(), std::system_category() };
 		Warning( "Could not convert command line arguments to utf8." );
@@ -91,7 +92,7 @@ struct WideArgs
 	wchar_t **wargv{wargs.argv};
 	const int argc{wargs.argc};
 
-	if ( !wargv || argc <= 0 ) [[unlikely]]
+	if ( !wargv || argc <= 0 )
 	{
 		const auto rc = std::error_code{ (int)::GetLastError() , std::system_category() };
 		Warning( "Could not parse command line to {argc, argv} tuple." );
@@ -100,7 +101,7 @@ struct WideArgs
 
 	// Convert argv to UTF-8.
 	std::unique_ptr<char *[]> argv{std::make_unique<char *[]>( static_cast<size_t>(argc) + 1) };
-	if ( !argv ) [[unlikely]]
+	if ( !argv )
 	{
 		const auto rc = std::error_code{ ERROR_OUTOFMEMORY, std::system_category() };
 		Warning( "Could not allocate memory to convert wchar_t {argc, argv} to UTF-8." );
@@ -111,7 +112,7 @@ struct WideArgs
 		size_t out_size{0};
 
 		auto utf8_result = WideToUtf8( wargv[i], out_size );
-		if ( auto *arg = std::get_if<std::unique_ptr<char[]>>( &utf8_result )) [[likely]]
+		if ( auto *arg = std::get_if<std::unique_ptr<char[]>>( &utf8_result ))
 		{
 			argv[i] = arg->release();
 		}
