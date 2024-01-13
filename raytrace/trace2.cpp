@@ -27,6 +27,7 @@ void MapLinearIntensities(FourVectors const &intens,uint32 *p1, uint32 *p2, uint
 	// NOTE the _mm_empty macro is voodoo. do not mess with this routine casually - simply throwing
 	// anything that ends up generating a fpu stack references in here would be bad news.
 	static fltx4 pixscale={255.0,255.0,255.0,255.0};
+
 	fltx4 r,g,b;
 	r=MinSIMD(pixscale,MulSIMD(pixscale,PowSIMD(intens.x,IGAMMA)));
 	g=MinSIMD(pixscale,MulSIMD(pixscale,PowSIMD(intens.y,IGAMMA)));
@@ -62,13 +63,13 @@ void RayTracingEnvironment::RenderScene(
 	// first, compute deltas
 	Vector dxvector=URCorner;
 	dxvector-=ULCorner;
-	dxvector*=(1.0/width);
+	dxvector*=(1.0f/width);
 	Vector dxvectortimes2=dxvector;
 	dxvectortimes2+=dxvector;
 
 	Vector dyvector=LLCorner;
 	dyvector-=ULCorner;
-	dyvector*=(1.0/height);
+	dyvector*=(1.0f/height);
 
 
 	// block_offsets-relative offsets for eahc of the 4 pixels in the block, in sse format
@@ -200,8 +201,6 @@ void RayTracingEnvironment::RenderScene(
 
 
 
-#define SQ(x) ((x)*(x))
-
 void RayTracingEnvironment::ComputeVirtualLightSources(void)
 {
 	int start_pos=0;
@@ -245,7 +244,7 @@ void RayTracingEnvironment::ComputeVirtualLightSources(void)
 						// and its radius scaled by the amount of the solid angle this probe
 						// represents.
 						float area_of_virtual_light=
-							4.0*M_PI*SQ( SubFloat( rslt.HitDistance, 0 ) )*(1.0/n_desired);
+							4.0f*M_PI_F*Square( SubFloat( rslt.HitDistance, 0 ) )*(1.0/n_desired);
 
 						FourVectors intens;
 						intens.DuplicateVector(Vector(0,0,0));
