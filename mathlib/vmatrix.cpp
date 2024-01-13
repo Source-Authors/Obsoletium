@@ -220,27 +220,15 @@ bool VMatrix::operator==( const VMatrix& src ) const
 
 void VMatrix::MatrixMul( const VMatrix &vm, VMatrix &out ) const
 {
-	out.Init(
-		m[0][0]*vm.m[0][0] + m[0][1]*vm.m[1][0] + m[0][2]*vm.m[2][0] + m[0][3]*vm.m[3][0],
-		m[0][0]*vm.m[0][1] + m[0][1]*vm.m[1][1] + m[0][2]*vm.m[2][1] + m[0][3]*vm.m[3][1],
-		m[0][0]*vm.m[0][2] + m[0][1]*vm.m[1][2] + m[0][2]*vm.m[2][2] + m[0][3]*vm.m[3][2],
-		m[0][0]*vm.m[0][3] + m[0][1]*vm.m[1][3] + m[0][2]*vm.m[2][3] + m[0][3]*vm.m[3][3],
-
-		m[1][0]*vm.m[0][0] + m[1][1]*vm.m[1][0] + m[1][2]*vm.m[2][0] + m[1][3]*vm.m[3][0],
-		m[1][0]*vm.m[0][1] + m[1][1]*vm.m[1][1] + m[1][2]*vm.m[2][1] + m[1][3]*vm.m[3][1],
-		m[1][0]*vm.m[0][2] + m[1][1]*vm.m[1][2] + m[1][2]*vm.m[2][2] + m[1][3]*vm.m[3][2],
-		m[1][0]*vm.m[0][3] + m[1][1]*vm.m[1][3] + m[1][2]*vm.m[2][3] + m[1][3]*vm.m[3][3],
-
-		m[2][0]*vm.m[0][0] + m[2][1]*vm.m[1][0] + m[2][2]*vm.m[2][0] + m[2][3]*vm.m[3][0],
-		m[2][0]*vm.m[0][1] + m[2][1]*vm.m[1][1] + m[2][2]*vm.m[2][1] + m[2][3]*vm.m[3][1],
-		m[2][0]*vm.m[0][2] + m[2][1]*vm.m[1][2] + m[2][2]*vm.m[2][2] + m[2][3]*vm.m[3][2],
-		m[2][0]*vm.m[0][3] + m[2][1]*vm.m[1][3] + m[2][2]*vm.m[2][3] + m[2][3]*vm.m[3][3],
-
-		m[3][0]*vm.m[0][0] + m[3][1]*vm.m[1][0] + m[3][2]*vm.m[2][0] + m[3][3]*vm.m[3][0],
-		m[3][0]*vm.m[0][1] + m[3][1]*vm.m[1][1] + m[3][2]*vm.m[2][1] + m[3][3]*vm.m[3][1],
-		m[3][0]*vm.m[0][2] + m[3][1]*vm.m[1][2] + m[3][2]*vm.m[2][2] + m[3][3]*vm.m[3][2],
-		m[3][0]*vm.m[0][3] + m[3][1]*vm.m[1][3] + m[3][2]*vm.m[2][3] + m[3][3]*vm.m[3][3]
-		);
+	DirectX::XMStoreFloat4x4
+	(
+		out.XmMBase(),
+		DirectX::XMMatrixMultiply
+		(
+			DirectX::XMLoadFloat4x4( XmMBase() ),
+			DirectX::XMLoadFloat4x4( vm.XmMBase() )
+		)
+	);
 }
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
@@ -506,13 +494,18 @@ bool VMatrix::IsRotationMatrix() const
 		FloatMakePositive( v2.Dot(v3) ) < 0.01f;
 }
 
-static void SetupMatrixAnglesInternal( vec_t m[4][4], const QAngle & vAngles )
+static void SetupMatrixAnglesInternal( vec_t (&m)[4][4], const QAngle & vAngles )
 {
-	float		sr, sp, sy, cr, cp, cy;
+	DirectX::XMVECTOR sine, cosine;
+	DirectX::XMVECTOR radians = DirectX::XMVectorMultiply
+	(
+		DirectX::XMLoadFloat3( vAngles.XmBase() ),
+		DirectX::XMVectorReplicate( M_PI_F / 180.f )
+	);
+	DirectX::XMVectorSinCos( &sine, &cosine, radians );
 
-	SinCos( DEG2RAD( vAngles[YAW] ), &sy, &cy );
-	SinCos( DEG2RAD( vAngles[PITCH] ), &sp, &cp );
-	SinCos( DEG2RAD( vAngles[ROLL] ), &sr, &cr );
+	float sp = DirectX::XMVectorGetX( sine ),   sy = DirectX::XMVectorGetY( sine ),   sr = DirectX::XMVectorGetZ( sine );
+	float cp = DirectX::XMVectorGetX( cosine ), cy = DirectX::XMVectorGetY( cosine ), cr = DirectX::XMVectorGetZ( cosine );
 
 	// matrix = (YAW * PITCH) * ROLL
 	m[0][0] = cp*cy;
@@ -634,23 +627,16 @@ void MatrixToAngles( const VMatrix& src, QAngle& vAngles )
 //-----------------------------------------------------------------------------
 // Transpose
 //-----------------------------------------------------------------------------
-inline void Swap( float& a, float& b )
-{
-	float tmp = a;
-	a = b;
-	b = tmp;
-}
-
 void MatrixTranspose( const VMatrix& src, VMatrix& dst )
 {
 	if (&src == &dst)
 	{
-		Swap( dst[0][1], dst[1][0] );
-		Swap( dst[0][2], dst[2][0] );
-		Swap( dst[0][3], dst[3][0] );
-		Swap( dst[1][2], dst[2][1] );
-		Swap( dst[1][3], dst[3][1] );
-		Swap( dst[2][3], dst[3][2] );
+		std::swap( dst[0][1], dst[1][0] );
+		std::swap( dst[0][2], dst[2][0] );
+		std::swap( dst[0][3], dst[3][0] );
+		std::swap( dst[1][2], dst[2][1] );
+		std::swap( dst[1][3], dst[3][1] );
+		std::swap( dst[2][3], dst[3][2] );
 	}
 	else
 	{
@@ -670,21 +656,19 @@ void MatrixCopy( const VMatrix& src, VMatrix& dst )
 {
 	if (&src != &dst)
 	{
-		memcpy( dst.m, src.m, 16 * sizeof(float) );
+		memcpy( dst.m, src.m, sizeof(dst.m) );
 	}
 }
 
 //-----------------------------------------------------------------------------
 // Matrix multiply
 //-----------------------------------------------------------------------------
-typedef float VMatrixRaw_t[4];
-
 void MatrixMultiply( const VMatrix& src1, const VMatrix& src2, VMatrix& dst )
 {
 	// Make sure it works if src1 == dst or src2 == dst
 	VMatrix tmp1, tmp2;
-	const VMatrixRaw_t* s1 = (&src1 == &dst) ? tmp1.m : src1.m;
-	const VMatrixRaw_t* s2 = (&src2 == &dst) ? tmp2.m : src2.m;
+	const VMatrix &s1 = (&src1 == &dst) ? tmp1 : src1;
+	const VMatrix &s2 = (&src2 == &dst) ? tmp2 : src2;
 
 	if (&src1 == &dst)
 	{
@@ -695,25 +679,7 @@ void MatrixMultiply( const VMatrix& src1, const VMatrix& src2, VMatrix& dst )
 		MatrixCopy( src2, tmp2 );
 	}
 
-	dst[0][0] = s1[0][0] * s2[0][0] + s1[0][1] * s2[1][0] + s1[0][2] * s2[2][0] + s1[0][3] * s2[3][0];
-	dst[0][1] = s1[0][0] * s2[0][1] + s1[0][1] * s2[1][1] + s1[0][2] * s2[2][1] + s1[0][3] * s2[3][1];
-	dst[0][2] = s1[0][0] * s2[0][2] + s1[0][1] * s2[1][2] + s1[0][2] * s2[2][2] + s1[0][3] * s2[3][2];
-	dst[0][3] = s1[0][0] * s2[0][3] + s1[0][1] * s2[1][3] + s1[0][2] * s2[2][3] + s1[0][3] * s2[3][3];
-
-	dst[1][0] = s1[1][0] * s2[0][0] + s1[1][1] * s2[1][0] + s1[1][2] * s2[2][0] + s1[1][3] * s2[3][0];
-	dst[1][1] = s1[1][0] * s2[0][1] + s1[1][1] * s2[1][1] + s1[1][2] * s2[2][1] + s1[1][3] * s2[3][1];
-	dst[1][2] = s1[1][0] * s2[0][2] + s1[1][1] * s2[1][2] + s1[1][2] * s2[2][2] + s1[1][3] * s2[3][2];
-	dst[1][3] = s1[1][0] * s2[0][3] + s1[1][1] * s2[1][3] + s1[1][2] * s2[2][3] + s1[1][3] * s2[3][3];
-
-	dst[2][0] = s1[2][0] * s2[0][0] + s1[2][1] * s2[1][0] + s1[2][2] * s2[2][0] + s1[2][3] * s2[3][0];
-	dst[2][1] = s1[2][0] * s2[0][1] + s1[2][1] * s2[1][1] + s1[2][2] * s2[2][1] + s1[2][3] * s2[3][1];
-	dst[2][2] = s1[2][0] * s2[0][2] + s1[2][1] * s2[1][2] + s1[2][2] * s2[2][2] + s1[2][3] * s2[3][2];
-	dst[2][3] = s1[2][0] * s2[0][3] + s1[2][1] * s2[1][3] + s1[2][2] * s2[2][3] + s1[2][3] * s2[3][3];
-
-	dst[3][0] = s1[3][0] * s2[0][0] + s1[3][1] * s2[1][0] + s1[3][2] * s2[2][0] + s1[3][3] * s2[3][0];
-	dst[3][1] = s1[3][0] * s2[0][1] + s1[3][1] * s2[1][1] + s1[3][2] * s2[2][1] + s1[3][3] * s2[3][1];
-	dst[3][2] = s1[3][0] * s2[0][2] + s1[3][1] * s2[1][2] + s1[3][2] * s2[2][2] + s1[3][3] * s2[3][2];
-	dst[3][3] = s1[3][0] * s2[0][3] + s1[3][1] * s2[1][3] + s1[3][2] * s2[2][3] + s1[3][3] * s2[3][3];
+	s1.MatrixMul( s2, dst );
 }
 
 //-----------------------------------------------------------------------------
@@ -766,18 +732,28 @@ void Vector4DMultiplyPosition( const VMatrix& src1, Vector const& src2, Vector4D
 
 void Vector3DMultiply( const VMatrix &src1, const Vector &src2, Vector &dst )
 {
-	// Make sure it works if src2 == dst
-	Vector tmp;
-	const Vector &v = (&src2 == &dst) ?  static_cast<const Vector&>(tmp) : src2;
+	DirectX::XMVECTOR vsrc2 = DirectX::XMLoadFloat3( src2.XmBase() );
 
-	if( &src2 == &dst )
-	{
-		VectorCopy( src2, tmp );
-	}
-
-	dst[0] = src1[0][0] * v[0] + src1[0][1] * v[1] + src1[0][2] * v[2];
-	dst[1] = src1[1][0] * v[0] + src1[1][1] * v[1] + src1[1][2] * v[2];
-	dst[2] = src1[2][0] * v[0] + src1[2][1] * v[1] + src1[2][2] * v[2];
+	DirectX::XMStoreFloat3
+	(
+		dst.XmBase(),
+		DirectX::XMVectorSet
+		(
+			DirectX::XMVectorGetX
+			(
+				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() ), vsrc2 ) )
+			),
+			DirectX::XMVectorGetX
+			(
+				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 1 ), vsrc2 ) )
+			),
+			DirectX::XMVectorGetX
+			(
+				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 2 ), vsrc2 ) )
+			),
+			0.0f
+		)
+	);
 }
 
 
@@ -787,24 +763,41 @@ void Vector3DMultiply( const VMatrix &src1, const Vector &src2, Vector &dst )
 //-----------------------------------------------------------------------------
 void Vector3DMultiplyPositionProjective( const VMatrix& src1, const Vector &src2, Vector& dst )
 {
-	// Make sure it works if src2 == dst
-	Vector tmp;
-	const Vector &v = (&src2 == &dst) ? static_cast<const Vector&>(tmp): src2;
-	if( &src2 == &dst )
+	DirectX::XMVECTOR vsrc2 = DirectX::XMVectorSetW( DirectX::XMLoadFloat3( src2.XmBase() ), 1.0f );
+	DirectX::XMVECTOR vwden = DirectX::XMVectorSum
+	(
+		DirectX::XMVectorMultiply
+		(
+			DirectX::XMLoadFloat4( src1.XmBase() + 3 ),
+			vsrc2
+		)
+	);
+
+	if ( DirectX::XMVector3NotEqual( vwden, DirectX::g_XMZero ) )
 	{
-		VectorCopy( src2, tmp );
+		vwden = DirectX::XMVectorDivide( DirectX::g_XMOne, vwden );
 	}
 
-	float w = src1[3][0] * v[0] + src1[3][1] * v[1] + src1[3][2] * v[2] + src1[3][3];
-	if ( w != 0.0f ) 
-	{
-		w = 1.0f / w;
-	}
+	DirectX::XMVECTOR vdest = DirectX::XMVectorSet
+	(
+		DirectX::XMVectorGetX
+		(
+			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() ), vsrc2 ) )
+		),
+		DirectX::XMVectorGetX
+		(
+			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 1 ), vsrc2 ) )
+		),
+		DirectX::XMVectorGetX
+		(
+			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 2 ), vsrc2 ) )
+		),
+		0.0f
+	);
 
-	dst[0] = src1[0][0] * v[0] + src1[0][1] * v[1] + src1[0][2] * v[2] + src1[0][3];
-	dst[1] = src1[1][0] * v[0] + src1[1][1] * v[1] + src1[1][2] * v[2] + src1[1][3];
-	dst[2] = src1[2][0] * v[0] + src1[2][1] * v[1] + src1[2][2] * v[2] + src1[2][3];
-	dst *= w;
+	vdest = DirectX::XMVectorMultiply( vdest, vwden );
+
+	DirectX::XMStoreFloat3( dst.XmBase(), vdest );
 }
 
 
@@ -1019,10 +1012,10 @@ void MatrixBuildRotation( VMatrix &dst, const Vector& initialDirection, const Ve
 //-----------------------------------------------------------------------------
 void MatrixBuildRotateZ( VMatrix &dst, float angleDegrees )
 {
-	float radians = angleDegrees * ( M_PI_F / 180.0f );
+	float radians = DEG2RAD( angleDegrees );
 
-	float fSin = sinf( radians );
-	float fCos = cosf( radians );
+	float fSin, fCos;
+	SinCos( radians, &fSin, &fCos );
 
 	dst[0][0] = fCos; dst[0][1] = -fSin; dst[0][2] = 0.0f; dst[0][3] = 0.0f;
 	dst[1][0] = fSin; dst[1][1] =  fCos; dst[1][2] = 0.0f; dst[1][3] = 0.0f;

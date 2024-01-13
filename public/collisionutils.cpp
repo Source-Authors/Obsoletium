@@ -10,10 +10,9 @@
 
 #include "collisionutils.h"
 #include "cmodel.h"
+#include "tier0/dbg.h"
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
-#include "tier0/dbg.h"
-#include <float.h>
 #include "mathlib/vector4d.h"
 #include "trace.h"
 

@@ -780,20 +780,86 @@ inline Vector VMatrix::VMul3x3Transpose(const Vector &vVec) const
 
 inline void VMatrix::V3Mul(const Vector &vIn, Vector &vOut) const
 {
-	vec_t rw;
+	DirectX::XMVECTOR vvin = DirectX::XMVectorSetW( DirectX::XMLoadFloat3( vIn.XmBase() ), 1.0f );
+	DirectX::XMVECTOR vden = DirectX::XMVectorSum
+	(
+		DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 3 ), vvin )
+	);
+	DirectX::XMVECTOR vrw  = DirectX::XMVectorDivide( DirectX::g_XMOne, vden );
 
-	rw = 1.0f / (m[3][0]*vIn.x + m[3][1]*vIn.y + m[3][2]*vIn.z + m[3][3]);
-	vOut.x = (m[0][0]*vIn.x + m[0][1]*vIn.y + m[0][2]*vIn.z + m[0][3]) * rw;
-	vOut.y = (m[1][0]*vIn.x + m[1][1]*vIn.y + m[1][2]*vIn.z + m[1][3]) * rw;
-	vOut.z = (m[2][0]*vIn.x + m[2][1]*vIn.y + m[2][2]*vIn.z + m[2][3]) * rw;
+	DirectX::XMStoreFloat3
+	(
+		vOut.XmBase(),
+		DirectX::XMVectorSet
+		(
+			DirectX::XMVectorGetX
+			(
+				DirectX::XMVectorMultiply
+				(
+					DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() ), vvin ) ),
+					vrw
+				)
+			),
+			DirectX::XMVectorGetX
+			(
+				DirectX::XMVectorMultiply
+				(
+					DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 1 ), vvin ) ),
+					vrw
+				)
+			),
+			DirectX::XMVectorGetX
+			(
+				DirectX::XMVectorMultiply
+				(
+					DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 2 ), vvin ) ),
+					vrw
+				)
+			),
+			0.0f
+		)
+	);
 }
 
 inline void VMatrix::V4Mul(const Vector4D &vIn, Vector4D &vOut) const
 {
-	vOut[0] = m[0][0]*vIn[0] + m[0][1]*vIn[1] + m[0][2]*vIn[2] + m[0][3]*vIn[3];
-	vOut[1] = m[1][0]*vIn[0] + m[1][1]*vIn[1] + m[1][2]*vIn[2] + m[1][3]*vIn[3];
-	vOut[2] = m[2][0]*vIn[0] + m[2][1]*vIn[1] + m[2][2]*vIn[2] + m[2][3]*vIn[3];
-	vOut[3] = m[3][0]*vIn[0] + m[3][1]*vIn[1] + m[3][2]*vIn[2] + m[3][3]*vIn[3];
+	DirectX::XMVECTOR vvin = DirectX::XMLoadFloat4( vIn.XmBase() );
+
+	DirectX::XMStoreFloat4
+	(
+		vOut.XmBase(),
+		DirectX::XMVectorSet
+		(
+			DirectX::XMVectorGetX
+			(
+				DirectX::XMVectorSum
+				(
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() ), vvin )
+				)
+			),
+			DirectX::XMVectorGetX
+			(
+				DirectX::XMVectorSum
+				(
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 1 ), vvin )
+				)
+			),
+			DirectX::XMVectorGetX
+			(
+				DirectX::XMVectorSum
+				(
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 2 ), vvin )
+				)
+			),
+			DirectX::XMVectorGetX
+			(
+				DirectX::XMVectorSum
+				(
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 3 ), vvin )
+				)
+			)
+		)
+	);
 }
 
 
