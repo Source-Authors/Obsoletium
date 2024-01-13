@@ -1715,7 +1715,7 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 		m_pGameMenuButtons[i]->SetDepressedColor(buttonColor[i], Color(0, 0, 0, 0));
 	}
 
-	m_flFrameFadeInTime = atof(pScheme->GetResourceString("Frame.TransitionEffectTime"));
+	m_flFrameFadeInTime = strtof(pScheme->GetResourceString("Frame.TransitionEffectTime"), nullptr);
 
 	// work out current focus - find the topmost panel
 	SetBgColor(Color(0, 0, 0, 0));

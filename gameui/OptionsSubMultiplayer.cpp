@@ -824,7 +824,7 @@ void CrosshairImagePanelAdvanced::SetCrosshairTexture( const char *crosshairname
 	m_pFrameVar = m_pAdvCrosshairMaterial->FindVarFactory( "$frame", NULL );
 	m_nNumFrames = m_pAdvCrosshairMaterial->GetNumAnimationFrames();
 
-	m_flNextFrameChange = system()->GetFrameTime() + 0.2;
+	m_flNextFrameChange = system()->GetFrameTime() + 0.2f;
 	m_bAscending = true;
 }
 
@@ -846,7 +846,7 @@ void CrosshairImagePanelAdvanced::Paint()
 
 		if ( curtime >= m_flNextFrameChange )
 		{
-			m_flNextFrameChange = curtime + 0.2;
+			m_flNextFrameChange = curtime + 0.2f;
 
 			int frame = m_pFrameVar->GetIntValue();
 
@@ -1339,32 +1339,6 @@ void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 	// change the cursor back to normal
 	surface()->SetCursor(dc_user);
 #endif
-}
-
-struct ValveJpegErrorHandler_t 
-{
-	// The default manager
-	struct jpeg_error_mgr	m_Base;
-	// For handling any errors
-	jmp_buf					m_ErrorContext;
-};
-
-//-----------------------------------------------------------------------------
-// Purpose: We'll override the default error handler so we can deal with errors without having to exit the engine
-//-----------------------------------------------------------------------------
-static void ValveJpegErrorHandler( j_common_ptr cinfo )
-{
-	ValveJpegErrorHandler_t *pError = reinterpret_cast< ValveJpegErrorHandler_t * >( cinfo->err );
-
-	char buffer[ JMSG_LENGTH_MAX ];
-
-	/* Create the message */
-	( *cinfo->err->format_message )( cinfo, buffer );
-
-	Warning( "%s\n", buffer );
-
-	// Bail
-	longjmp( pError->m_ErrorContext, 1 );
 }
 
 //-----------------------------------------------------------------------------
