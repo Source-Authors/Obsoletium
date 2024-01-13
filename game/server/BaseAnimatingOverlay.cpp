@@ -422,7 +422,7 @@ void CAnimationLayer::DispatchAnimEvents( CBaseAnimating *eventHandler, CBaseAni
 			float flCycle = event.cycle;
 			if (flCycle > m_flCycle)
 			{
-				flCycle = flCycle - 1.0;
+				flCycle = flCycle - 1.0f;
 			}
 			event.eventtime = pOwner->m_flAnimTime + (flCycle - m_flCycle) / flCycleRate + pOwner->GetAnimTimeInterval();
 		}

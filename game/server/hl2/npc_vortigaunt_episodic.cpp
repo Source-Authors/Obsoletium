@@ -35,11 +35,11 @@ class CVortigauntChargeToken;
 #define	VORTIGAUNT_SENTENCE_VOLUME			(float)0.35 // volume of vortigaunt sentences
 #define	VORTIGAUNT_VOL						0.35		// volume of vortigaunt sounds
 #define	VORTIGAUNT_ATTN						ATTN_NORM	// attenutation of vortigaunt sentences
-#define	VORTIGAUNT_HEAL_RECHARGE			30.0		// How long to rest between heals
+constexpr inline float VORTIGAUNT_HEAL_RECHARGE{30.0};	// How long to rest between heals
 #define	VORTIGAUNT_ZAP_GLOWGROW_TIME		0.5			// How long does glow last
 #define	VORTIGAUNT_HEAL_GLOWGROW_TIME		1.4			// How long does glow last
 #define	VORTIGAUNT_GLOWFADE_TIME			0.5			// How long does it fade
-#define VORTIGAUNT_CURE_LIFESPAN			8.0			// cure tokens only live this long (so they don't get stuck on geometry)
+constexpr inline float VORTIGAUNT_CURE_LIFESPAN{8.0f};	// cure tokens only live this long (so they don't get stuck on geometry)
 
 #define	VORTIGAUNT_BLUE_FADE_TIME			2.25f		// takes this long to fade from green to blue or back
 

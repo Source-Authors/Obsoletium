@@ -1998,7 +1998,7 @@ bool CAI_ScriptedSentence::KeyValue( const char *szKeyName, const char *szValue 
 {
 	if(FStrEq(szKeyName, "volume"))
 	{
-		m_flVolume = atof( szValue ) * 0.1;
+		m_flVolume = strtof( szValue, nullptr ) * 0.1f;
 	}
 	else
 	{

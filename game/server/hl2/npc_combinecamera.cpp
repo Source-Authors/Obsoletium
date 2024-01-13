@@ -660,7 +660,7 @@ void CNPC_CombineCamera::ActiveThink()
 			else
 			{
 				SetEyeState(CAMERA_EYE_HAPPY);
-				m_flEyeHappyTime = gpGlobals->curtime + 2.0;
+				m_flEyeHappyTime = gpGlobals->curtime + 2.0f;
 
 				// Now forget about this target forever
 				AddEntityRelationship( pTarget, D_NU, 99 );
@@ -752,7 +752,7 @@ void CNPC_CombineCamera::MaintainEye()
 
 			EmitSound("NPC_CombineCamera.Click");
 
-			m_flTurnOffEyeFlashTime = gpGlobals->curtime + 0.1;
+			m_flTurnOffEyeFlashTime = gpGlobals->curtime + 0.1f;
 			m_flClickTime = gpGlobals->curtime + CAMERA_CLICK_INTERVAL;
 		}
 		else if ((m_flTurnOffEyeFlashTime != 0) && (m_flTurnOffEyeFlashTime < gpGlobals->curtime))
@@ -1028,7 +1028,7 @@ void CNPC_CombineCamera::SetAngry(bool bAngry)
 	{
 		m_bAngry = true;
 		m_nClickCount = 0;
-		m_flClickTime = gpGlobals->curtime + 0.4;
+		m_flClickTime = gpGlobals->curtime + 0.4f;
 		EmitSound("NPC_CombineCamera.Angry");
 		SetEyeState(CAMERA_EYE_ANGRY);
 	}

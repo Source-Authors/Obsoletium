@@ -1099,7 +1099,7 @@ void CBaseAnimating::DispatchAnimEvents ( CBaseAnimating *eventHandler )
 			float flCycle = event.cycle;
 			if (flCycle > GetCycle())
 			{
-				flCycle = flCycle - 1.0;
+				flCycle = flCycle - 1.0f;
 			}
 			event.eventtime = m_flAnimTime + (flCycle - GetCycle()) / flCycleRate + GetAnimTimeInterval();
 		}
@@ -1552,7 +1552,7 @@ void CBaseAnimating::UpdateStepOrigin()
 				}
 
 				// debounce floor location
-				m_flEstIkFloor = m_flEstIkFloor * 0.2 + m_flIKGroundMinHeight * 0.8;
+				m_flEstIkFloor = m_flEstIkFloor * 0.2f + m_flIKGroundMinHeight * 0.8f;
 
 				// don't let heigth difference between min and max exceed step height
 				float bias = clamp( (m_flIKGroundMaxHeight - m_flIKGroundMinHeight) - height, 0.f, height );

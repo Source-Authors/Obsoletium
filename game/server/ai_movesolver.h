@@ -210,7 +210,7 @@ inline void AI_Arc_t::SetByLimits( float yawRight, float yawLeft )
 	if ( span < 0 )
 		span += 360;
 
-	center = yawRight + span * 0.5;
+	center = yawRight + span * 0.5f;
 
 	if ( center >= 360 )
 		center -= 360;

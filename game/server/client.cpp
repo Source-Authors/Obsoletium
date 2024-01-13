@@ -766,9 +766,9 @@ void killvector_helper( const CCommand &args, bool bExplode )
 				{
 					// Build world-space force vector.
 					Vector vecForce;
-					vecForce.x = atof( args[2] );
-					vecForce.y = atof( args[3] );
-					vecForce.z = atof( args[4] );
+					vecForce.x = strtof( args[2], nullptr );
+					vecForce.y = strtof( args[3], nullptr );
+					vecForce.z = strtof( args[4], nullptr );
 
 					ClientKill( pPlayer->edict(), vecForce, bExplode );
 				}
@@ -970,14 +970,14 @@ void CC_Player_TestDispatchEffect( const CCommand &args )
 	float magnitude = 0;
 	if ( args.ArgC() >= 5 )
 	{
-		magnitude = atof( args[ 4 ] );
+		magnitude = strtof( args[ 4 ], nullptr );
 	}
 
 	// Optional scale
 	float scale = 0;
 	if ( args.ArgC() >= 6 )
 	{
-		scale = atof( args[ 5 ] );
+		scale = strtof( args[ 5 ], nullptr );
 	}
 
 	Vector vecForward;
@@ -1283,9 +1283,9 @@ void CC_setang_f (const CCommand &args)
 	QAngle oldang = pPlayer->GetAbsAngles();
 
 	QAngle newang;
-	newang.x = atof( args[1] );
-	newang.y = atof( args[2] );
-	newang.z = args.ArgC() == 4 ? atof( args[3] ) : oldang.z;
+	newang.x = strtof( args[1], nullptr );
+	newang.y = strtof( args[2], nullptr );
+	newang.z = args.ArgC() == 4 ? strtof( args[3], nullptr ) : oldang.z;
 
 	pPlayer->SnapEyeAngles( newang );
 }

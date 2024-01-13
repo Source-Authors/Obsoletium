@@ -600,11 +600,11 @@ bool CFuncRotating::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "fanfriction"))
 	{
-		m_flFanFriction = atof(szValue)/100;
+		m_flFanFriction = strtof(szValue, nullptr)/100;
 	}
 	else if (FStrEq(szKeyName, "Volume"))
 	{
-		m_flVolume = atof(szValue) / 10.0;
+		m_flVolume = strtof(szValue, nullptr) / 10.0f;
 		m_flVolume = clamp(m_flVolume, 0.0f, 1.0f);
 	}
 	else

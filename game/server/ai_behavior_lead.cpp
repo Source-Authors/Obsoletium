@@ -25,7 +25,7 @@
 #undef min
 
 // Minimum time between leader nags
-#define LEAD_NAG_TIME		3.0
+constexpr inline float LEAD_NAG_TIME{3.0f};
 
 #define LEAD_MIN_RETRIEVEDIST_OFFSET		24
 

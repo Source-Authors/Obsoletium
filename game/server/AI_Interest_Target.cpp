@@ -43,12 +43,12 @@ float CAI_InterestTarget_t::Interest( void )
 	if (m_flRamp && t < 1 - m_flRamp)
 	{
 		//t = t / m_flRamp;
-		t = 1.0 - ExponentialDecay( 0.2, m_flRamp, t );
+		t = 1.0f - ExponentialDecay( 0.2f, m_flRamp, t );
 		//t = 1.0 - ExponentialDecay( 0.01, 1 - m_flRamp, t );
 	}
 	else if (t > 1.0f - m_flRamp)
 	{
-		t = (1.0 - t) / m_flRamp;
+		t = (1.0f - t) / m_flRamp;
 		t = 3.0f * t * t - 2.0f * t * t * t;
 	} 
 	else

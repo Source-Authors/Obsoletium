@@ -1099,7 +1099,7 @@ CBaseEntity *CBaseCombatCharacter::CheckTraceHullAttack( float flDist, const Vec
 	{
 		// There isn't enough room to trace this hull, it's going to drag the ground.
 		// so make the vertical offset just enough to clear the ground.
-		flVerticalOffset = maxs.z + 1.0;
+		flVerticalOffset = maxs.z + 1.0f;
 	}
 
 	vStart.z += flVerticalOffset;

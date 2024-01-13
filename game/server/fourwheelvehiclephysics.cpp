@@ -394,7 +394,7 @@ bool CFourWheelVehiclePhysics::Initialize( const char *pVehicleScript, unsigned 
 	m_throttleRate = 10000.0;
 	if ( vehicle.engine.throttleTime > 0 )
 	{
-		m_throttleRate = 1.0 / vehicle.engine.throttleTime;
+		m_throttleRate = 1.0f / vehicle.engine.throttleTime;
 	}
 
 	m_flMaxSpeed = vehicle.engine.maxSpeed;

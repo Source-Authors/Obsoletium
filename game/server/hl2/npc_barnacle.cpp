@@ -1815,7 +1815,7 @@ void CNPC_Barnacle::SwallowPrey( void )
 		// compiler warnings.
 		m_flDigestFinish = ( gpGlobals->curtime + m_bSwallowingPoison ) ? 0.48f : 10.0f;
 #else
-		m_flDigestFinish = gpGlobals->curtime + 10.0;
+		m_flDigestFinish = gpGlobals->curtime + 10.0f;
 #endif
 	}
 
@@ -2128,7 +2128,7 @@ void CNPC_Barnacle::WaitTillDead ( void )
 			}
 			else
 			{
-				goalAltitude = distToFloor * .5;
+				goalAltitude = distToFloor * .5f;
 			}
 		}
 	}

@@ -106,7 +106,7 @@ bool CPointAngleSensor::KeyValue(const char *szKeyName, const char *szValue)
 {
 	if (FStrEq(szKeyName, "tolerance"))
 	{
-		float flTolerance = atof(szValue);
+		float flTolerance = strtof( szValue, nullptr );
 		m_flDotTolerance = cos(DEG2RAD(flTolerance));
 	}
 	else

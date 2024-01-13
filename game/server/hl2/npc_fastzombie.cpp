@@ -37,7 +37,7 @@
 #define FASTZOMBIE_IDLE_PITCH			35
 #define FASTZOMBIE_MIN_PITCH			70
 #define FASTZOMBIE_MAX_PITCH			130
-#define FASTZOMBIE_SOUND_UPDATE_FREQ	0.5
+constexpr inline float FASTZOMBIE_SOUND_UPDATE_FREQ{0.5f};
 
 #define FASTZOMBIE_MAXLEAP_Z		128
 
@@ -432,7 +432,7 @@ void CFastZombie::OnScheduleChange( void )
 	if ( m_flNextMeleeAttack > gpGlobals->curtime + 1 )
 	{
 		// Allow melee attacks again.
-		m_flNextMeleeAttack = gpGlobals->curtime + 0.5;
+		m_flNextMeleeAttack = gpGlobals->curtime + 0.5f;
 	}
 
 	BaseClass::OnScheduleChange();
@@ -546,7 +546,7 @@ void CFastZombie::PrescheduleThink( void )
 			// Zombie is close! Recalculate pitch.
 			int iPitch;
 
-			m_flDistFactor = MIN( 1.0, 1 - flDistNoBBox / FASTZOMBIE_EXCITE_DIST ); 
+			m_flDistFactor = MIN( 1.0f, 1 - flDistNoBBox / FASTZOMBIE_EXCITE_DIST ); 
 			iPitch = FASTZOMBIE_MIN_PITCH + ( ( FASTZOMBIE_MAX_PITCH - FASTZOMBIE_MIN_PITCH ) * m_flDistFactor); 
 			ENVELOPE_CONTROLLER.SoundChangePitch( m_pMoanSound, iPitch, FASTZOMBIE_SOUND_UPDATE_FREQ );
 		}
@@ -1378,7 +1378,7 @@ void CFastZombie::RunTask( const Task_t *pTask )
 			TaskComplete();
 
 			// Allow melee attacks again.
-			m_flNextMeleeAttack = gpGlobals->curtime + 0.5;
+			m_flNextMeleeAttack = gpGlobals->curtime + 0.5f;
 			return;
 		}
 		break;
@@ -1591,11 +1591,11 @@ bool CFastZombie::MovementCost( int moveType, const Vector &vecStart, const Vect
 	float multiplier = 1;
 	if ( moveType == bits_CAP_MOVE_JUMP )
 	{
-		multiplier = ( delta < 0 ) ? 0.5 : 1.5;
+		multiplier = ( delta < 0 ) ? 0.5f : 1.5f;
 	}
 	else if ( moveType == bits_CAP_MOVE_CLIMB )
 	{
-		multiplier = ( delta > 0 ) ? 0.5 : 4.0;
+		multiplier = ( delta > 0 ) ? 0.5f : 4.0f;
 	}
 
 	*pCost *= multiplier;

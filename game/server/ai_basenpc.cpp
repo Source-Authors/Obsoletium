@@ -2634,7 +2634,7 @@ void CAI_BaseNPC::SetAim( const Vector &aimDir )
 	if( GetEnemy() )
 	{
 		// clamp and dampen movement
-		newPitch = curPitch + 0.8 * UTIL_AngleDiff( UTIL_ApproachAngle( angDir.x, curPitch, 20 ), curPitch );
+		newPitch = curPitch + 0.8f * UTIL_AngleDiff( UTIL_ApproachAngle( angDir.x, curPitch, 20 ), curPitch );
 
 		float flRelativeYaw = UTIL_AngleDiff( angDir.y, GetAbsAngles().y );
 		// float flNewTargetYaw = UTIL_ApproachAngle( flRelativeYaw, curYaw, 20 );
@@ -2644,10 +2644,10 @@ void CAI_BaseNPC::SetAim( const Vector &aimDir )
 	else
 	{
 		// Sweep your weapon more slowly if you're not fighting someone
-		newPitch = curPitch + 0.6 * UTIL_AngleDiff( UTIL_ApproachAngle( angDir.x, curPitch, 20 ), curPitch );
+		newPitch = curPitch + 0.6f * UTIL_AngleDiff( UTIL_ApproachAngle( angDir.x, curPitch, 20 ), curPitch );
 
 		float flRelativeYaw = UTIL_AngleDiff( angDir.y, GetAbsAngles().y );
-		newYaw = curYaw + 0.6 * UTIL_AngleDiff( flRelativeYaw, curYaw );
+		newYaw = curYaw + 0.6f * UTIL_AngleDiff( flRelativeYaw, curYaw );
 	}
 
 	newPitch = AngleNormalize( newPitch );
@@ -2800,7 +2800,7 @@ void CAI_BaseNPC::MaintainLookTargets ( float flInterval )
 		m_vEyeLookTarget	= EyePosition() + lookDist*vecDir;
 		*/
 		m_vEyeLookTarget	= EyePosition() + 500*vBodyDir;
-		m_flNextEyeLookTime = gpGlobals->curtime + 0.5; // random->RandomInt(1,5);
+		m_flNextEyeLookTime = gpGlobals->curtime + 0.5f; // random->RandomInt(1,5);
 	}
 	SetHeadDirection(m_vEyeLookTarget,flInterval);
 
@@ -12639,7 +12639,7 @@ float CAI_BaseNPC::SetWait( float minWait, float maxWait )
 
 	if ( maxWait == 0.0 )
 	{
-		m_flWaitFinished = gpGlobals->curtime + ( 0.1 * minThinks );
+		m_flWaitFinished = gpGlobals->curtime + ( 0.1f * minThinks );
 	}
 	else
 	{
@@ -12647,7 +12647,7 @@ float CAI_BaseNPC::SetWait( float minWait, float maxWait )
 			minThinks = 1;
 		int maxThinks = Ceil2Int( maxWait * 10 );
 
-		m_flWaitFinished = gpGlobals->curtime + ( 0.1 * random->RandomInt( minThinks, maxThinks ) );
+		m_flWaitFinished = gpGlobals->curtime + ( 0.1f * random->RandomInt( minThinks, maxThinks ) );
 	}
 	return m_flWaitFinished;
 }

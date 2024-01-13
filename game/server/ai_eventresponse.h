@@ -9,9 +9,9 @@
 
 #include "utldict.h"
 
-#define NPCEVENTRESPONSE_DISTANCE_SQR		(768 * 768) // Maximum distance for responding to NPCs
-#define NPCEVENTRESPONSE_REFIRE_TIME		15.0		// Time after giving a response before giving any more
-#define NPCEVENTRESPONSE_GIVEUP_TIME		4.0			// Time after a response trigger was fired before discarding it without responding
+constexpr inline float NPCEVENTRESPONSE_DISTANCE_SQR{768 * 768};	// Maximum distance for responding to NPCs
+constexpr inline float NPCEVENTRESPONSE_REFIRE_TIME{15.0f};		// Time after giving a response before giving any more
+constexpr inline float NPCEVENTRESPONSE_GIVEUP_TIME{4.0f};		// Time after a response trigger was fired before discarding it without responding
 
 //-----------------------------------------------------------------------------
 // Purpose: AI system that makes NPCs verbally respond to game events

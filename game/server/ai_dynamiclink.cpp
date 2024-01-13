@@ -53,11 +53,11 @@ void CAI_DynamicLinkController::GenerateLinksFromVolume()
 	float MinDistCareSq = 0;
 	if (m_bUseAirLinkRadius)
 	{
-		 MinDistCareSq = Square(MAX_AIR_NODE_LINK_DIST + 0.1);
+		 MinDistCareSq = Square(MAX_AIR_NODE_LINK_DIST + 0.1f);
 	}
 	else
 	{
-		 MinDistCareSq = Square(MAX_NODE_LINK_DIST + 0.1);
+		 MinDistCareSq = Square(MAX_NODE_LINK_DIST + 0.1f);
 	}
 
 	const Vector &origin = WorldSpaceCenter();

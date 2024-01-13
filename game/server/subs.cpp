@@ -169,11 +169,11 @@ bool CBaseToggle::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "lip"))
 	{
-		m_flLip = atof(szValue);
+		m_flLip = strtof( szValue, nullptr );
 	}
 	else if (FStrEq(szKeyName, "wait"))
 	{
-		m_flWait = atof(szValue);
+		m_flWait = strtof( szValue, nullptr );
 	}
 	else if (FStrEq(szKeyName, "master"))
 	{
@@ -181,7 +181,7 @@ bool CBaseToggle::KeyValue( const char *szKeyName, const char *szValue )
 	}
 	else if (FStrEq(szKeyName, "distance"))
 	{
-		m_flMoveDistance = atof(szValue);
+		m_flMoveDistance = strtof( szValue, nullptr );
 	}
 	else
 		return BaseClass::KeyValue( szKeyName, szValue );

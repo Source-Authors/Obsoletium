@@ -221,7 +221,7 @@ void CGrenadePathfollower::PlayFlySound(void)
 		ep.m_SoundLevel = SNDLVL_NORM;
 
 		EmitSound( filter, entindex(), ep );
-		m_flNextFlySoundTime	= gpGlobals->curtime + 1.0;
+		m_flNextFlySoundTime	= gpGlobals->curtime + 1.0f;
 	}
 }
 

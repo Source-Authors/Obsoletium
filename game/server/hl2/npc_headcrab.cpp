@@ -50,13 +50,13 @@
 #define HEADCRAB_RUN_MINSPEED	0.5
 #define HEADCRAB_RUN_MAXSPEED	1.0
 
-const float HEADCRAB_BURROWED_FOV = -1.0f;
-const float HEADCRAB_UNBURROWED_FOV = 0.5f;
+constexpr inline float HEADCRAB_BURROWED_FOV{-1.0f};
+constexpr inline float HEADCRAB_UNBURROWED_FOV{0.5f};
 
-#define HEADCRAB_IGNORE_WORLD_COLLISION_TIME 0.5
+constexpr inline float HEADCRAB_IGNORE_WORLD_COLLISION_TIME{0.5f};
 
-const int HEADCRAB_MIN_JUMP_DIST = 48;
-const int HEADCRAB_MAX_JUMP_DIST = 256;
+constexpr inline int HEADCRAB_MIN_JUMP_DIST = 48;
+constexpr inline int HEADCRAB_MAX_JUMP_DIST = 256;
 
 #define HEADCRAB_BURROW_POINT_SEARCH_RADIUS 256.0
 
@@ -493,13 +493,13 @@ void CBaseHeadcrab::ThrowThink( void )
 	if (gpGlobals->curtime > m_flNextNPCThink)
 	{
 		NPCThink();
-		m_flNextNPCThink = gpGlobals->curtime + 0.1;
+		m_flNextNPCThink = gpGlobals->curtime + 0.1f;
 	}
 
 	if( GetFlags() & FL_ONGROUND )
 	{
 		SetThink( &CBaseHeadcrab::CallNPCThink );
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		SetNextThink( gpGlobals->curtime + 0.1f );
 		return;
 	}
 

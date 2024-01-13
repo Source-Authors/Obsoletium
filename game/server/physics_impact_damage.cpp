@@ -725,7 +725,7 @@ float CalculateObjectStress( IPhysicsObject *pObject, CBaseEntity *pInputOwnerEn
 		// assume object is at rest
 		if ( sum > objMass )
 		{
-			sum = objMass + (sum-objMass) * 0.5;
+			sum = objMass + (sum-objMass) * 0.5f;
 		}
 	}
 

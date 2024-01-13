@@ -3012,7 +3012,7 @@ bool CTriggerCamera::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "wait"))
 	{
-		m_flWait = atof(szValue);
+		m_flWait = strtof( szValue, nullptr );
 	}
 	else if (FStrEq(szKeyName, "moveto"))
 	{
@@ -3020,11 +3020,11 @@ bool CTriggerCamera::KeyValue( const char *szKeyName, const char *szValue )
 	}
 	else if (FStrEq(szKeyName, "acceleration"))
 	{
-		m_acceleration = atof( szValue );
+		m_acceleration = strtof( szValue, nullptr );
 	}
 	else if (FStrEq(szKeyName, "deceleration"))
 	{
-		m_deceleration = atof( szValue );
+		m_deceleration = strtof( szValue, nullptr );
 	}
 	else
 		return BaseClass::KeyValue( szKeyName, szValue );
@@ -3787,7 +3787,7 @@ public:
 		AngleVectors(vWindAngle,&vWind);
 
 		// Add lift with noise
-		vWind.z = 1.1 + (1.0 * sin(nNoiseMod * gpGlobals->curtime + nNoiseMod));
+		vWind.z = 1.1f + (1.0f * sin(nNoiseMod * gpGlobals->curtime + nNoiseMod));
 
 		linear = 3*vWind*m_flWindSpeed;
 		angular = vec3_origin;
@@ -5026,7 +5026,7 @@ bool CFrictionModifier::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "modifier"))
 	{
-		m_frictionFraction = atof(szValue) / 100.0;
+		m_frictionFraction = strtof( szValue, nullptr ) / 100.0;
 	}
 	else
 	{

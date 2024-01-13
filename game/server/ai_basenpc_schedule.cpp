@@ -3404,7 +3404,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 
 					CSound *pBestSound = GetBestSound();
 					if ( pBestSound )
-						goal.maxInitialSimplificationDist = pBestSound->Volume() * 0.5;
+						goal.maxInitialSimplificationDist = pBestSound->Volume() * 0.5f;
 
 					if ( GetNavigator()->SetGoal( goal ) )
 					{

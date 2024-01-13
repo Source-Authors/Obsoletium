@@ -521,7 +521,7 @@ bool CAI_MoveProbe::TestGroundMove( const Vector &vecActualStart, const Vector &
 	checkStepArgs.stepSize				= 0;
 	checkStepArgs.stepHeight			= StepHeight();
 	checkStepArgs.stepDownMultiplier	= GetOuter()->GetStepDownMultiplier();
-	checkStepArgs.minStepLanding		= GetHullWidth() * 0.3333333;
+	checkStepArgs.minStepLanding		= GetHullWidth() * 0.3333333f;
 	checkStepArgs.collisionMask			= collisionMask;
 	checkStepArgs.groundTest			= groundTest;
 
@@ -866,14 +866,14 @@ void CAI_MoveProbe::JumpMoveLimit( const Vector &vecStart, const Vector &vecEnd,
 		if (!IsJumpLegal(vecFrom, vecApex, vecTo))
 		{
 			// too high, try lower
-			minJumpStep = minJumpStep / 2.0;
+			minJumpStep = minJumpStep / 2.0f;
 			minJumpHeight = minJumpHeight - minJumpStep;
 		}
 		else
 		{
 			// Calculate the total time of the jump minus a tiny fraction
 			float jumpTime		= (vecFrom - vecTo).Length2D()/rawJumpVel.Length2D();
-			float timeStep		= jumpTime / 10.0;	
+			float timeStep		= jumpTime / 10.0f;	
 
 			Vector vecTest = vecFrom;
 			bool bMadeIt = true;
@@ -901,13 +901,13 @@ void CAI_MoveProbe::JumpMoveLimit( const Vector &vecStart, const Vector &vecEnd,
 					if (trace.plane.normal.z < 0.0)
 					{
 						// hit a ceiling looking thing, too high, try lower
-						minJumpStep = minJumpStep / 2.0;
+						minJumpStep = minJumpStep / 2.0f;
 						minJumpHeight = minJumpHeight - minJumpStep;
 					}
 					else
 					{
 						// hit wall looking thing, try higher
-						minJumpStep = minJumpStep / 2.0;
+						minJumpStep = minJumpStep / 2.0f;
 						minJumpHeight += minJumpStep;
 					}
 					
@@ -935,12 +935,12 @@ void CAI_MoveProbe::JumpMoveLimit( const Vector &vecStart, const Vector &vecEnd,
 			{
 				// made it, try lower
 				minSuccessfulJumpHeight = minJumpHeight;
-				minJumpStep = minJumpStep / 2.0;
+				minJumpStep = minJumpStep / 2.0f;
 				minJumpHeight -= minJumpStep;
 			}
 		}
 	}
-	while (minJumpHeight > baselineJumpHeight && minJumpHeight <= 1024.0 && minJumpStep >= 16.0);
+	while (minJumpHeight > baselineJumpHeight && minJumpHeight <= 1024.0f && minJumpStep >= 16.0f);
 
 	// DevMsg( "(%.0f)\n", minSuccessfulJumpHeight );
 
@@ -1168,10 +1168,10 @@ bool CAI_MoveProbe::CheckStandPosition( const Vector &vecStart, unsigned int col
 		vHullMaxs = GetHullMaxs();
 	}
 
-	contactMin.x = vHullMins.x * 0.75 + vHullMaxs.x * 0.25;
-	contactMax.x = vHullMins.x * 0.25 + vHullMaxs.x * 0.75;
-	contactMin.y = vHullMins.y * 0.75 + vHullMaxs.y * 0.25;
-	contactMax.y = vHullMins.y * 0.25 + vHullMaxs.y * 0.75;
+	contactMin.x = vHullMins.x * 0.75f + vHullMaxs.x * 0.25f;
+	contactMax.x = vHullMins.x * 0.25f + vHullMaxs.x * 0.75f;
+	contactMin.y = vHullMins.y * 0.75f + vHullMaxs.y * 0.25f;
+	contactMax.y = vHullMins.y * 0.25f + vHullMaxs.y * 0.75f;
 	contactMin.z = vHullMins.z;
 	contactMax.z = vHullMins.z;
 
@@ -1240,10 +1240,10 @@ bool CAI_MoveProbe::OldCheckStandPosition( const Vector &vecStart, unsigned int 
 	const Vector &vHullMins = WorldAlignMins();
 	const Vector &vHullMaxs = WorldAlignMaxs();
 
-	contactMin.x = vHullMins.x * 0.75 + vHullMaxs.x * 0.25;
-	contactMax.x = vHullMins.x * 0.25 + vHullMaxs.x * 0.75;
-	contactMin.y = vHullMins.y * 0.75 + vHullMaxs.y * 0.25;
-	contactMax.y = vHullMins.y * 0.25 + vHullMaxs.y * 0.75;
+	contactMin.x = vHullMins.x * 0.75f + vHullMaxs.x * 0.25f;
+	contactMax.x = vHullMins.x * 0.25f + vHullMaxs.x * 0.75f;
+	contactMin.y = vHullMins.y * 0.75f + vHullMaxs.y * 0.25f;
+	contactMax.y = vHullMins.y * 0.25f + vHullMaxs.y * 0.75f;
 	contactMin.z = vHullMins.z;
 	contactMax.z = vHullMins.z;
 

@@ -483,7 +483,7 @@ int CWeaponSMG1::WeaponRangeAttack2Condition( float flDot, float flDist )
 		// don't check again for a while.
 		// JAY: HL1 keeps checking - test?
 		//m_flNextGrenadeCheck = gpGlobals->curtime;
-		m_flNextGrenadeCheck = gpGlobals->curtime + 0.3; // 1/3 second.
+		m_flNextGrenadeCheck = gpGlobals->curtime + 0.3f; // 1/3 second.
 		return COND_CAN_RANGE_ATTACK2;
 	}
 	else

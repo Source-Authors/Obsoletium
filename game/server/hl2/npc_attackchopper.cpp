@@ -3451,12 +3451,12 @@ void CNPC_AttackHelicopter::DropCorpse( int nDamage )
 	if( nDamage > 250.0f )
 		nDamage = 250.0f;
 
-	m_flLastCorpseFall = gpGlobals->curtime + 3.0;
+	m_flLastCorpseFall = gpGlobals->curtime + 3.0f;
 
 	// Spawn a ragdoll combine guard
 	float forceScale = nDamage * 75 * 4;
 	Vector vecForceVector = RandomVector(-1,1);
-	vecForceVector.z = 0.5;
+	vecForceVector.z = 0.5f;
 	vecForceVector *= forceScale;
 
 	CBaseEntity *pGib = CreateRagGib( "models/combine_soldier.mdl", GetAbsOrigin(), GetAbsAngles(), vecForceVector );
@@ -4043,9 +4043,9 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 
 		// calc angular accel needed to hit goal pitch in dt time.
 		float dt = 0.6;
-		goalAngAccel.x = 2.0 * (AngleDiff( goalPitch, AngleNormalize( GetAbsAngles().x ) ) - GetLocalAngularVelocity().x * dt) / (dt * dt);
-		goalAngAccel.y = 2.0 * (AngleDiff( goalYaw, AngleNormalize( GetAbsAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
-		goalAngAccel.z = 2.0 * (AngleDiff( goalRoll, AngleNormalize( GetAbsAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
+		goalAngAccel.x = 2.0f * (AngleDiff( goalPitch, AngleNormalize( GetAbsAngles().x ) ) - GetLocalAngularVelocity().x * dt) / (dt * dt);
+		goalAngAccel.y = 2.0f * (AngleDiff( goalYaw, AngleNormalize( GetAbsAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
+		goalAngAccel.z = 2.0f * (AngleDiff( goalRoll, AngleNormalize( GetAbsAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
 
 		goalAngAccel.x = clamp( goalAngAccel.x, -300, 300 );
 		//goalAngAccel.y = clamp( goalAngAccel.y, -60, 60 );

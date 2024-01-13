@@ -212,7 +212,7 @@ void CLookDoor::MoveThink(void)
 		}
 		else
 		{
-			flViewMove = (flDotPr-m_flFieldOfView)/(1.0 - m_flFieldOfView);
+			flViewMove = (flDotPr-m_flFieldOfView)/(1.0f - m_flFieldOfView);
 		}
 	}
 

@@ -423,8 +423,8 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 			}
 			flSpineYaw = MIN( diff, 30 );
 			flBodyYaw = MIN( diff - flSpineYaw, 30 );
-			m_goalSpineYaw = m_goalSpineYaw * (1.0 - intensity) + intensity * flSpineYaw * dir;
-			m_goalBodyYaw = m_goalBodyYaw * (1.0 - intensity) + intensity * flBodyYaw * dir;
+			m_goalSpineYaw = m_goalSpineYaw * (1.0f - intensity) + intensity * flSpineYaw * dir;
+			m_goalBodyYaw = m_goalBodyYaw * (1.0f - intensity) + intensity * flBodyYaw * dir;
 
 			/*
 			NDebugOverlay::YawArrow( GetAbsOrigin(), GetLocalAngles().y, 64, 16, 255, 255, 255, 0, true, 0.1 );
@@ -516,7 +516,7 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 					{
 						if (info->m_flNext < gpGlobals->curtime)
 						{
-							info->m_flNext = gpGlobals->curtime + PickLookTarget( m_syntheticLookQueue ) - 0.4;
+							info->m_flNext = gpGlobals->curtime + PickLookTarget( m_syntheticLookQueue ) - 0.4f;
 							if (m_syntheticLookQueue.Count() > 0)
 							{
 								float flDuration = (event->GetEndTime() - scene->GetTime());
@@ -569,7 +569,7 @@ bool CAI_BaseActor::RandomFaceFlex( CSceneEventInfo *info, CChoreoScene *scene, 
 		}
 		if ( pSettinghdr )
 		{
-			info->m_flNext = gpGlobals->curtime + random->RandomFloat( 0.3, 0.5 ) * (30.0 / pSettinghdr->numflexsettings);
+			info->m_flNext = gpGlobals->curtime + random->RandomFloat( 0.3f, 0.5f ) * (30.0f / pSettinghdr->numflexsettings);
 
 			flexsetting_t const *pSetting = NULL;
 			pSetting = pSettinghdr->pSetting( random->RandomInt( 0, pSettinghdr->numflexsettings - 1 ) );
@@ -1133,12 +1133,12 @@ void CAI_BaseActor::ClearLookTarget( CBaseEntity *pTarget )
 		m_randomLookQueue.Remove(iIndex);
 
 		// Figure out the new random look time
-		m_flNextRandomLookTime = gpGlobals->curtime + 1.0;
+		m_flNextRandomLookTime = gpGlobals->curtime + 1.0f;
 		for (int i = 0; i < m_randomLookQueue.Count(); i++)
 		{
 			if ( m_randomLookQueue[i].m_flEndTime > m_flNextRandomLookTime )
 			{
-				m_flNextRandomLookTime = m_randomLookQueue[i].m_flEndTime + 0.4;
+				m_flNextRandomLookTime = m_randomLookQueue[i].m_flEndTime + 0.4f;
 			}
 		}
 	}
@@ -1439,9 +1439,9 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 	}
 
 	// decay body/spine yaw
-	m_goalSpineYaw = m_goalSpineYaw * 0.8;
-	m_goalBodyYaw = m_goalBodyYaw * 0.8;
-	m_goalHeadCorrection = m_goalHeadCorrection * 0.8;
+	m_goalSpineYaw = m_goalSpineYaw * 0.8f;
+	m_goalBodyYaw = m_goalBodyYaw * 0.8f;
+	m_goalHeadCorrection = m_goalHeadCorrection * 0.8f;
 
 	// ARRGGHHH, this needs to be moved!!!!
 	SetAccumulatedYawAndUpdate( );
@@ -1480,17 +1480,17 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 	{
 		for (i = 0; i < m_randomLookQueue.Count(); i++)
 		{
-			if (gpGlobals->curtime < m_randomLookQueue[i].m_flEndTime - m_randomLookQueue[i].m_flRamp - 0.2)
+			if (gpGlobals->curtime < m_randomLookQueue[i].m_flEndTime - m_randomLookQueue[i].m_flRamp - 0.2f)
 			{
-				m_randomLookQueue[i].m_flEndTime = gpGlobals->curtime + m_randomLookQueue[i].m_flRamp + 0.2;
+				m_randomLookQueue[i].m_flEndTime = gpGlobals->curtime + m_randomLookQueue[i].m_flRamp + 0.2f;
 			}
 		}
-		m_flNextRandomLookTime = gpGlobals->curtime + 1.0;
+		m_flNextRandomLookTime = gpGlobals->curtime + 1.0f;
 	}
 	else if (gpGlobals->curtime >= m_flNextRandomLookTime && GetState() != NPC_STATE_SCRIPT)
 	{
 		// Look at whatever!
-		m_flNextRandomLookTime = gpGlobals->curtime + PickLookTarget( m_randomLookQueue ) - 0.4;
+		m_flNextRandomLookTime = gpGlobals->curtime + PickLookTarget( m_randomLookQueue ) - 0.4f;
 	}
 
 	// don't bother with any of the rest if the player can't see you
@@ -1600,7 +1600,7 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 		// no target, decay all head control direction
 		m_goalHeadDirection = m_goalHeadDirection * 0.8 + vHead * 0.2;
 
-		m_goalHeadInfluence = MAX( m_goalHeadInfluence - 0.2, 0 );
+		m_goalHeadInfluence = MAX( m_goalHeadInfluence - 0.2f, 0.0f );
 
 		VectorNormalize( m_goalHeadDirection );
 		UpdateHeadControl( vEyePosition + m_goalHeadDirection * 100, m_goalHeadInfluence );

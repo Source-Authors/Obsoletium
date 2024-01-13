@@ -219,7 +219,7 @@ void CNPC_MissileDefense::FireCannons( void )
 	{
 		// Incite a reload.
 		EmitSound( "NPC_MissileDefense.Reload" );
-		m_flReloadedTime = gpGlobals->curtime + 0.3;
+		m_flReloadedTime = gpGlobals->curtime + 0.3f;
 		return;
 	}
 

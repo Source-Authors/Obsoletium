@@ -209,7 +209,7 @@ bool CBreakable::KeyValue( const char *szKeyName, const char *szValue )
 	}
 	else if (FStrEq(szKeyName, "shards"))
 	{
-//			m_iShards = atof(szValue);
+//			m_iShards = strtof( szValue, nullptr );
 	}
 	else if (FStrEq(szKeyName, "gibmodel") )
 	{
@@ -580,7 +580,7 @@ void CBreakable::BreakTouch( CBaseEntity *pOther )
 	// can I be broken when run into?
 	if ( HasSpawnFlags( SF_BREAK_TOUCH ) )
 	{
-		flDamage = pOther->GetSmoothedVelocity().Length() * 0.01;
+		flDamage = pOther->GetSmoothedVelocity().Length() * 0.01f;
 
 		if (flDamage >= m_iHealth)
 		{
@@ -932,7 +932,7 @@ void CBreakable::Die( void )
 	// The more negative m_iHealth, the louder
 	// the sound should be.
 
-	fvol = random->RandomFloat(0.85, 1.0) + (abs(m_iHealth) / 100.0);
+	fvol = random->RandomFloat(0.85f, 1.0f) + (abs(m_iHealth) / 100.0f);
 	if (fvol > 1.0)
 	{
 		fvol = 1.0;

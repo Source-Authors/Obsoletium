@@ -252,13 +252,13 @@ CBaseEntity *CNPC_MetroPolice::CheckTraceHullAttack( float flDist, const Vector 
 	// The ideal place to start the trace is in the center of the attacker's bounding box.
 	// however, we need to make sure there's enough clearance. Some of the smaller monsters aren't 
 	// as big as the hull we try to trace with. (SJB)
-	float flVerticalOffset = WorldAlignSize().z * 0.5;
+	float flVerticalOffset = WorldAlignSize().z * 0.5f;
 
 	if( flVerticalOffset < maxs.z )
 	{
 		// There isn't enough room to trace this hull, it's going to drag the ground.
 		// so make the vertical offset just enough to clear the ground.
-		flVerticalOffset = maxs.z + 1.0;
+		flVerticalOffset = maxs.z + 1.0f;
 	}
 
 	vStart.z += flVerticalOffset;

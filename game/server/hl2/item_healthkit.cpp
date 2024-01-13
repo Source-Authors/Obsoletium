@@ -323,7 +323,7 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 	{
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
-			m_flSoundTime = gpGlobals->curtime + 0.62;
+			m_flSoundTime = gpGlobals->curtime + 0.62f;
 			EmitSound( "WallHealth.Deny" );
 		}
 		return;
@@ -355,7 +355,7 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 	{
 		m_iOn++;
 		EmitSound( "WallHealth.Start" );
-		m_flSoundTime = 0.56 + gpGlobals->curtime;
+		m_flSoundTime = 0.56f + gpGlobals->curtime;
 
 		m_OnPlayerUse.FireOutput( pActivator, this );
 	}
@@ -378,7 +378,7 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 	m_OutRemainingHealth.Set(flRemaining, pActivator, this);
 
 	// govern the rate of charge
-	m_flNextCharge = gpGlobals->curtime + 0.1;
+	m_flNextCharge = gpGlobals->curtime + 0.1f;
 }
 
 
@@ -633,7 +633,7 @@ void CNewWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	{
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
-			m_flSoundTime = gpGlobals->curtime + 0.62;
+			m_flSoundTime = gpGlobals->curtime + 0.62f;
 			EmitSound( "WallHealth.Deny" );
 		}
 		return;
@@ -666,7 +666,7 @@ void CNewWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	{
 		m_iOn++;
 		EmitSound( "WallHealth.Start" );
-		m_flSoundTime = 0.56 + gpGlobals->curtime;
+		m_flSoundTime = 0.56f + gpGlobals->curtime;
 
 		m_OnPlayerUse.FireOutput( pActivator, this );
 	}
@@ -689,7 +689,7 @@ void CNewWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	m_OutRemainingHealth.Set(flRemaining, pActivator, this);
 
 	// govern the rate of charge
-	m_flNextCharge = gpGlobals->curtime + 0.1;
+	m_flNextCharge = gpGlobals->curtime + 0.1f;
 }
 
 

@@ -3633,8 +3633,8 @@ public:
 		if (pActor)
 		{
 			m_vecPos1 = pActor->GetAbsOrigin();
-			m_flMaxSegmentDistance = MIN( flMaxRadius, (m_vecPos1 - m_vecPos2).Length() + 1.0 );
-			if (m_flMaxSegmentDistance <= 1.0)
+			m_flMaxSegmentDistance = MIN( flMaxRadius, (m_vecPos1 - m_vecPos2).Length() + 1.0f );
+			if (m_flMaxSegmentDistance <= 1.0f)
 			{
 				// must be closest to self
 				m_flMaxSegmentDistance = MIN( flMaxRadius, MAX_TRACE_LENGTH );
@@ -4830,7 +4830,7 @@ void CSceneManager::Think()
 	// The manager is always thinking at 20 hz
 	SetNextThink( gpGlobals->curtime + SCENE_THINK_INTERVAL );
 	float frameTime = ( gpGlobals->curtime - GetLastThink() );
-	frameTime = MIN( 0.1, frameTime );
+	frameTime = MIN( 0.1f, frameTime );
 
 	// stop if AI is diabled
 	if (CAI_BaseNPC::m_nDebugBits & bits_debugDisableAI)

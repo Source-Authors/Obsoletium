@@ -77,7 +77,7 @@ void CNPCEventResponseSystem::FrameUpdatePreEntityThink()
 
 	if ( m_flNextEventPoll > gpGlobals->curtime )
 		return;
-	m_flNextEventPoll = gpGlobals->curtime + 0.2;
+	m_flNextEventPoll = gpGlobals->curtime + 0.2f;
 
 	// Move through all events, removing expired ones and finding NPCs for active ones.
 	for ( int i = m_ActiveEvents.First(); i != m_ActiveEvents.InvalidIndex(); )

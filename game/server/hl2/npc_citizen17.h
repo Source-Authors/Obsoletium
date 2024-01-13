@@ -369,9 +369,9 @@ inline bool CNPC_Citizen::VeryFarFromCommandGoal()
 //		 It has been superseded by the ai_eventresponse system.
 //
 //==============================================================================
-#define CITIZEN_RESPONSE_DISTANCE			768			// Maximum distance for responding citizens
-#define CITIZEN_RESPONSE_REFIRE_TIME		15.0		// Time after giving a response before giving any more
-#define CITIZEN_RESPONSE_GIVEUP_TIME		4.0			// Time after a response trigger was fired before discarding it without responding
+constexpr inline float CITIZEN_RESPONSE_DISTANCE{768};	// Maximum distance for responding citizens
+constexpr inline float CITIZEN_RESPONSE_REFIRE_TIME{15.0f};	// Time after giving a response before giving any more
+constexpr inline float CITIZEN_RESPONSE_GIVEUP_TIME{4.0f};	// Time after a response trigger was fired before discarding it without responding
 
 enum citizenresponses_t
 {

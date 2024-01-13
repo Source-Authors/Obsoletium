@@ -3157,8 +3157,8 @@ void CAI_Navigator::SimplifyFlyPath( unsigned collisionMask, const CBaseEntity *
 
 //-----------------------------------------------------------------------------
 
-#define FLY_ROUTE_SIMPLIFY_TIME_DELAY 0.3
-#define FLY_ROUTE_SIMPLIFY_LOOK_DIST (12.0*12.0)
+constexpr inline float FLY_ROUTE_SIMPLIFY_TIME_DELAY{0.3f};
+constexpr inline float FLY_ROUTE_SIMPLIFY_LOOK_DIST(12.0f * 12.0f);
 
 bool CAI_Navigator::SimplifyFlyPath(  const AI_ProgressFlyPathParams_t &params )
 {
@@ -3499,7 +3499,7 @@ bool CAI_Navigator::MarkCurWaypointFailedLink( void )
 			{
 				CAI_Link *pLink = pDestNode->GetLinkByIndex( i );
 				pLink->m_LinkInfo |= bits_LINK_STALE_SUGGESTED;
-				pLink->m_timeStaleExpires = gpGlobals->curtime + 4.0;
+				pLink->m_timeStaleExpires = gpGlobals->curtime + 4.0f;
 				didMark = true;
 			}
 
@@ -3512,7 +3512,7 @@ bool CAI_Navigator::MarkCurWaypointFailedLink( void )
 			if ( pLink )
 			{
 				pLink->m_LinkInfo |= bits_LINK_STALE_SUGGESTED;
-				pLink->m_timeStaleExpires = gpGlobals->curtime + 4.0;
+				pLink->m_timeStaleExpires = gpGlobals->curtime + 4.0f;
 				didMark = true;
 			}
 		}

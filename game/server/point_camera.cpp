@@ -120,7 +120,7 @@ void CPointCamera::InputChangeFOV( inputdata_t &inputdata )
 	char *pszParam = strtok(parseString," ");
 	if(pszParam)
 	{
-		m_TargetFOV = atof( pszParam );
+		m_TargetFOV = strtof( pszParam, nullptr );
 	}
 	else
 	{
@@ -133,7 +133,7 @@ void CPointCamera::InputChangeFOV( inputdata_t &inputdata )
 	pszParam = strtok(NULL," ");
 	if(pszParam)
 	{
-		flChangeTime = atof( pszParam );
+		flChangeTime = strtof( pszParam, nullptr );
 	}
 	else
 	{

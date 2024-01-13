@@ -923,7 +923,7 @@ void CNPC_Citizen::GatherConditions()
 		else
 			ClearCondition( COND_HEALTH_ITEM_AVAILABLE );
 
-		m_flNextHealthSearchTime = gpGlobals->curtime + 4.0;
+		m_flNextHealthSearchTime = gpGlobals->curtime + 4.0f;
 	}
 
 	// If the player is standing near a medic and can see the medic, 
@@ -1336,9 +1336,9 @@ int CNPC_Citizen::SelectScheduleRetrieveItem()
 		CBaseHLCombatWeapon *pWeapon = dynamic_cast<CBaseHLCombatWeapon *>(Weapon_FindUsable( WEAPON_SEARCH_DELTA ));
 		if ( pWeapon )
 		{
-			m_flNextWeaponSearchTime = gpGlobals->curtime + 10.0;
+			m_flNextWeaponSearchTime = gpGlobals->curtime + 10.0f;
 			// Now lock the weapon for several seconds while we go to pick it up.
-			pWeapon->Lock( 10.0, this );
+			pWeapon->Lock( 10.0f, this );
 			SetTarget( pWeapon );
 			return SCHED_NEW_WEAPON;
 		}

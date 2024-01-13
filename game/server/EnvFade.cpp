@@ -121,7 +121,7 @@ static void GetFadeParms( const CCommand &args, float &flTime, color32 &clrFade)
 
 	if ( args.ArgC() > 1 )
 	{
-		flTime = atof( args[1] );
+		flTime = strtof( args[1], nullptr );
 	}
 	
 	clrFade.r = 0;

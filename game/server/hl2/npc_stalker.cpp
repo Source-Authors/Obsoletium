@@ -205,7 +205,7 @@ void CNPC_Stalker::PrescheduleThink()
 	if (gpGlobals->curtime > m_flNextBreatheSoundTime)
 	{
 		EmitSound( "NPC_Stalker.Ambient01" );
-		m_flNextBreatheSoundTime = gpGlobals->curtime + 3.0 + random->RandomFloat( 0.0, 5.0 );
+		m_flNextBreatheSoundTime = gpGlobals->curtime + 3.0f + random->RandomFloat( 0.0f, 5.0f );
 	}
 }
 
@@ -407,9 +407,9 @@ void CNPC_Stalker::DeathSound( const CTakeDamageInfo &info )
 void CNPC_Stalker::PainSound( const CTakeDamageInfo &info )
 { 
 	EmitSound( "NPC_Stalker.Pain" );
-	m_flNextScrambleSoundTime	= gpGlobals->curtime + 1.5;
-	m_flNextBreatheSoundTime	= gpGlobals->curtime + 1.5;
-	m_flNextAttackSoundTime		= gpGlobals->curtime + 1.5;
+	m_flNextScrambleSoundTime	= gpGlobals->curtime + 1.5f;
+	m_flNextBreatheSoundTime	= gpGlobals->curtime + 1.5f;
+	m_flNextAttackSoundTime		= gpGlobals->curtime + 1.5f;
 };
 
 //-----------------------------------------------------------------------------
@@ -976,7 +976,7 @@ void CNPC_Stalker::DoSmokeEffect( const Vector &position )
 {
 	if ( gpGlobals->curtime > m_nextSmokeTime )
 	{
-		m_nextSmokeTime = gpGlobals->curtime + 0.5;
+		m_nextSmokeTime = gpGlobals->curtime + 0.5f;
 		UTIL_Smoke(position, random->RandomInt(5, 10), 10);
 	}
 }
@@ -1043,7 +1043,7 @@ void CNPC_Stalker::DrawAttackBeam(void)
 			CalculateMeleeDamageForce( &info, m_vLaserDir, tr.endpos );
 			pBCC->DispatchTraceAttack( info, m_vLaserDir, &tr );
 			ApplyMultiDamage();
-			m_fNextDamageTime = gpGlobals->curtime + 0.1;
+			m_fNextDamageTime = gpGlobals->curtime + 0.1f;
 		}
 		if (pBCC->Classify()!=CLASS_BULLSEYE)
 		{

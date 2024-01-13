@@ -67,8 +67,8 @@ void PhysicsSplash( IPhysicsFluidController *pFluid, IPhysicsObject *pObject, CB
 	mins[1] = DotProduct( binPts[0], binormal );
 	maxs[1] = DotProduct( binPts[1], binormal );
 
-	center[0] = 0.5 * (mins[0] + maxs[0]);
-	center[1] = 0.5 * (mins[1] + maxs[1]);
+	center[0] = 0.5f * (mins[0] + maxs[0]);
+	center[1] = 0.5f * (mins[1] + maxs[1]);
 
 	extents[0] = maxs[0] - center[0];
 	extents[1] = maxs[1] - center[1];

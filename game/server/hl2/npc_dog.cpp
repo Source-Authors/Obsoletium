@@ -1247,9 +1247,9 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 				 TaskComplete();
 			else
 			{
-				m_flTimeToCatch = gpGlobals->curtime + 0.1;
-				m_flNextRouteTime = gpGlobals->curtime + 0.3;
-				m_flNextSwat = gpGlobals->curtime + 0.1;
+				m_flTimeToCatch = gpGlobals->curtime + 0.1f;
+				m_flNextRouteTime = gpGlobals->curtime + 0.3f;
+				m_flNextSwat = gpGlobals->curtime + 0.1f;
 
 				if ( m_hUnreachableObjects.Find( m_hPhysicsEnt ) == -1 )
 					 m_hUnreachableObjects.AddToTail( m_hPhysicsEnt );
@@ -1578,9 +1578,9 @@ void CNPC_Dog::StartTask( const Task_t *pTask )
 					
 				 FindPhysicsObject( NULL, m_hPhysicsEnt );
 
-				 m_flTimeToCatch = gpGlobals->curtime + 0.1;
-				 m_flNextRouteTime = gpGlobals->curtime + 0.3;
-				 m_flNextSwat = gpGlobals->curtime + 0.1;
+				 m_flTimeToCatch = gpGlobals->curtime + 0.1f;
+				 m_flNextRouteTime = gpGlobals->curtime + 0.3f;
+				 m_flNextSwat = gpGlobals->curtime + 0.1f;
 
 				 GetNavigator()->ClearGoal();
 			}

@@ -1367,12 +1367,12 @@ void CNPC_Blob::InitializeElements()
 void CNPC_Blob::RecomputeIdealElementDist()
 {
 	float radius = blob_radius.GetFloat();
-	float area = M_PI * Square(radius);
+	float area = M_PI_F * Square(radius);
 
 	//Msg("Area of blob is: %f\n", area );
 
 	//m_flMinElementDist =  2.75f * sqrt( area / m_iNumElements );
-	m_flMinElementDist =  M_PI * sqrt( area / m_iNumElements );
+	m_flMinElementDist =  M_PI_F * sqrt( area / m_iNumElements );
 
 	//Msg("New element dist: %f\n", m_flMinElementDist );
 }

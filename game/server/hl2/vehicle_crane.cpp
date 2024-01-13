@@ -679,7 +679,7 @@ void CPropCrane::RunCraneMovement( float flTime )
 			// We hit the ground, stop dropping
 			m_hCraneTip->m_pSpring->SetSpringConstant( CRANE_SPRING_CONSTANT_INITIAL_RAISING );
 			m_bDropping = false;
-			m_flNextDropAllowedTime = gpGlobals->curtime + 3.0;
+			m_flNextDropAllowedTime = gpGlobals->curtime + 3.0f;
 			m_flSlowRaiseTime = gpGlobals->curtime;
 
 			m_ServerVehicle.PlaySound( VS_MISC2 );
@@ -744,7 +744,7 @@ void CPropCrane::RunCraneMovement( float flTime )
 
 				CBaseEntity::EmitSound( filter, m_hCraneMagnet->entindex(), ep );
 			}
-			m_flNextCreakSound = gpGlobals->curtime + 5.0;
+			m_flNextCreakSound = gpGlobals->curtime + 5.0f;
 		}
 	}
 }

@@ -489,7 +489,7 @@ void CEnvEffectsScript::ParseNewEffect( void )
 				{
 					ParseToken();
 
-					NewElement.m_flScale = atof( token );
+					NewElement.m_flScale = strtof( token, nullptr );
 					continue;
 				}
 
@@ -497,7 +497,7 @@ void CEnvEffectsScript::ParseNewEffect( void )
 				{
 					ParseToken();
 
-					float flTextureScale = atof( token );
+					float flTextureScale = strtof( token, nullptr );
 					NewElement.m_flTextureRes = (flTextureScale > 0.0f) ? 1.0f / flTextureScale : 0.0f;
 					continue;
 				}
@@ -506,7 +506,7 @@ void CEnvEffectsScript::ParseNewEffect( void )
 				{
 					ParseToken();
 
-					NewElement.m_flFadeTime = atof( token );
+					NewElement.m_flFadeTime = strtof( token, nullptr );
 					continue;
 				}
 

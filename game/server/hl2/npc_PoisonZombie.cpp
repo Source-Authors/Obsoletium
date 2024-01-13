@@ -803,12 +803,12 @@ void CNPC_PoisonZombie::EvacuateNest( bool bExplosion, float flDamage, CBaseEnti
 			float flVelocityScale = 2.0f;
 			if ( bExplosion && ( flDamage > 10 ) )
 			{
-				flVelocityScale = 0.1 * flDamage;
+				flVelocityScale = 0.1f * flDamage;
 			}
 
 			if (IsOnFire())
 			{
-				pCrab->Ignite( 100.0 );
+				pCrab->Ignite( 100.0f );
 			}
 
 			pCrab->Eject( vecAngles, flVelocityScale, pAttacker );

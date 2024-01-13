@@ -452,8 +452,8 @@ void CFish::Update( float deltaT )
 	m_angle += m_angleChange;
 	m_angleChange = 0.0f;
 
-	m_forward.x = cos( m_angle * M_PI/180.0f );
-	m_forward.y = sin( m_angle * M_PI/180.0f );
+	m_forward.x = cos( m_angle * M_PI_F/180.0f );
+	m_forward.y = sin( m_angle * M_PI_F/180.0f );
 	m_forward.z = 0.0f;
 
 	m_perp.x = -m_forward.y;
@@ -606,7 +606,7 @@ bool CFishPool::KeyValue( const char *szKeyName, const char *szValue )
 	}
 	else if (FStrEq( szKeyName, "max_range" ))
 	{
-		m_maxRange = atof(szValue);
+		m_maxRange = strtof(szValue, nullptr);
 		if (m_maxRange <= 1.0f)
 		{
 			m_maxRange = 1.0f;

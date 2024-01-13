@@ -137,7 +137,7 @@ void CEnvTonemapController::InputBlendTonemapScale( inputdata_t &inputdata )
 		Warning("%s (%s) received BlendTonemapScale input without a target tonemap scale. Syntax: <target tonemap scale> <blend time>\n", GetClassname(), GetDebugName() );
 		return;
 	}
-	m_flBlendTonemapEnd = atof( pszParam );
+	m_flBlendTonemapEnd = strtof( pszParam, nullptr );
 
 	// Get the blend time
 	pszParam = strtok(NULL," ");
@@ -146,7 +146,7 @@ void CEnvTonemapController::InputBlendTonemapScale( inputdata_t &inputdata )
 		Warning("%s (%s) received BlendTonemapScale input without a blend time. Syntax: <target tonemap scale> <blend time>\n", GetClassname(), GetDebugName() );
 		return;
 	}
-	m_flBlendEndTime = gpGlobals->curtime + atof( pszParam );
+	m_flBlendEndTime = gpGlobals->curtime + strtof( pszParam, nullptr );
 
 	m_flBlendStartTime = gpGlobals->curtime;
 	m_flBlendTonemapStart = mat_hdr_tonemapscale.GetFloat();

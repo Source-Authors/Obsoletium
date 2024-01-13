@@ -503,7 +503,7 @@ bool CBaseButton::OnUseLocked( CBaseEntity *pActivator )
 	if ( gpGlobals->curtime > m_flUseLockedTime )
 	{
 		m_OnUseLocked.FireOutput( pActivator, this );
-		m_flUseLockedTime = gpGlobals->curtime + 0.5;
+		m_flUseLockedTime = gpGlobals->curtime + 0.5f;
 		return true;
 	}
 

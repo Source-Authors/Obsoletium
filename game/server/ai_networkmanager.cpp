@@ -1575,9 +1575,9 @@ void CAI_NetworkEditTools::DrawAINetworkOverlay(void)
 	static int		endDrawNode		= 0;
 	static float	flDrawDuration;
 	endDrawNode		= startDrawNode + 20;
-	flDrawDuration	= 0.1 * (m_pNetwork->NumNodes()-1)/20;
-	if ( flDrawDuration < .1 )
-		flDrawDuration = .1;
+	flDrawDuration	= 0.1f * (m_pNetwork->NumNodes()-1)/20;
+	if ( flDrawDuration < .1f )
+		flDrawDuration = .1f;
 	if (endDrawNode > m_pNetwork->NumNodes())
 	{
 		endDrawNode		= m_pNetwork->NumNodes();
@@ -2549,9 +2549,9 @@ void CAI_NetworkBuilder::InitGroundNodePosition(CAI_Network *pNetwork, CAI_Node 
 		AI_TraceHull( origin, origin + Vector( 0, 0, -384 ), mins, maxs, MASK_NPCSOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &tr );
 
 		if ( !tr.startsolid )
-			pNode->m_flVOffset[hull] = tr.endpos.z - pNode->GetOrigin().z + 0.1;
+			pNode->m_flVOffset[hull] = tr.endpos.z - pNode->GetOrigin().z + 0.1f;
 		else
-			pNode->m_flVOffset[hull] = -mins.z + 0.1;
+			pNode->m_flVOffset[hull] = -mins.z + 0.1f;
 	}
 }
 

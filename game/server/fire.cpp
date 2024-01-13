@@ -731,7 +731,7 @@ void CFire::Spawn( void )
 	SetToOutSize();
 
 	// set up the ignition point
-	m_flHeatAbsorb = m_flHeatLevel * 0.05;
+	m_flHeatAbsorb = m_flHeatLevel * 0.05f;
 	m_flHeatLevel = 0;
 	Init( GetAbsOrigin(), m_flFireSize, m_flAttackTime, m_flFuel, m_spawnflags, m_nFireType );
 	
@@ -1106,7 +1106,7 @@ void CFire::AddHeat( float heat, bool selfHeat )
 				heat *= fire_incomingheatscale.GetFloat();
 			}
 		}
-		m_lastDamage = gpGlobals->curtime + 0.5;
+		m_lastDamage = gpGlobals->curtime + 0.5f;
 		bool start = m_flHeatLevel <= 0 ? true : false;
 		if ( m_flHeatAbsorb > 0 )
 		{
@@ -1158,7 +1158,7 @@ void CFire::Extinguish( float heat )
 	if ( !m_bEnabled )
 		return;
 
-	m_lastDamage = gpGlobals->curtime + 0.5;
+	m_lastDamage = gpGlobals->curtime + 0.5f;
 	bool out = m_flHeatLevel > 0 ? true : false;
 
 	m_flHeatLevel -= heat;

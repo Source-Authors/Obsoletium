@@ -192,7 +192,7 @@ void CEnvExplosion::Spawn( void )
 	*/
 
 	float flSpriteScale;
-	flSpriteScale = ( m_iMagnitude - 50) * 0.6;
+	flSpriteScale = ( m_iMagnitude - 50) * 0.6f;
 
 	// Control the clamping of the fireball sprite
 	if( m_spawnflags & SF_ENVEXPLOSION_NOCLAMPMIN )

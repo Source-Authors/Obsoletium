@@ -42,7 +42,7 @@
 #define MACHINE_GUN_BURST_PAUSE_TIME	2.0f
 
 #define ROCKET_SALVO_SIZE				5
-#define ROCKET_DELAY_TIME				1.5
+constexpr inline float ROCKET_DELAY_TIME{1.5f};
 #define ROCKET_MIN_BURST_PAUSE_TIME		3
 #define ROCKET_MAX_BURST_PAUSE_TIME		4
 #define ROCKET_SPEED					800
@@ -150,7 +150,7 @@ void CPropAPC::Spawn( void )
 	m_lifeState = LIFE_ALIVE;
 	m_bInFiringCone = false;
 
-	m_flHandbrakeTime = gpGlobals->curtime + 0.1;
+	m_flHandbrakeTime = gpGlobals->curtime + 0.1f;
 	m_bInitialHandbrake = false;
 
 	// Reset the gun to a default pose.
@@ -628,7 +628,7 @@ void CPropAPC::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData )
 	UTIL_TraceLine( vecStart, vecSpot, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 	CSoundEnt::InsertSound( SOUND_DANGER, vecSpot, 400, 0.1, this);
 
-	m_flDangerSoundTime = gpGlobals->curtime + 0.3;
+	m_flDangerSoundTime = gpGlobals->curtime + 0.3f;
 }
 
 

@@ -82,13 +82,13 @@ bool CWaterLODControl::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if ( FStrEq( szKeyName, "cheapwaterstartdistance" ) )
 	{
-		m_flCheapWaterStartDistance = atof( szValue );
+		m_flCheapWaterStartDistance = strtof( szValue, nullptr );
 		return true;
 	}
 
 	if ( FStrEq( szKeyName, "cheapwaterenddistance" ) )
 	{
-		m_flCheapWaterEndDistance = atof( szValue );
+		m_flCheapWaterEndDistance = strtof( szValue, nullptr );
 		return true;
 	}
 

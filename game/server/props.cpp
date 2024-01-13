@@ -1103,13 +1103,13 @@ int CBreakableProp::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 			float flFactor;
 			flFactor = flDist / MAX_BLAST_DIST;
 			const float MAX_BURN_TIME = 5.0f;
-			flBurnTime = MAX( 0.5, MAX_BURN_TIME * flFactor );
-			flBurnTime += random->RandomFloat( 0, 0.5 );
+			flBurnTime = MAX( 0.5f, MAX_BURN_TIME * flFactor );
+			flBurnTime += random->RandomFloat( 0, 0.5f );
 		}
 		else
 		{
 			// Very near the explosion. explode almost immediately.
-			flBurnTime = random->RandomFloat( 0.1, 0.2 );
+			flBurnTime = random->RandomFloat( 0.1f, 0.2f );
 		}
 
 		// Change my health so that I burn for flBurnTime seconds.

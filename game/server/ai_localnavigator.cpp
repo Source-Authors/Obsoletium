@@ -433,7 +433,7 @@ AIMoveResult_t CAI_LocalNavigator::MoveCalc( AILocalMoveGoal_t *pMoveGoal, bool 
 		deltaYaw = fabs( UTIL_AngleDiff( goalYaw, currentYaw ) );
 		if ( deltaYaw > 15 )
 		{
-			speed = deltaYaw * 4.0; // i.e., any maneuver takes a quarter a second
+			speed = deltaYaw * 4.0f; // i.e., any maneuver takes a quarter a second
 			clampedYaw = AI_ClampYaw( speed, currentYaw, goalYaw, interval );
 
 			if ( clampedYaw != goalYaw )

@@ -1467,7 +1467,7 @@ void CPropCombineBall::DeflectTowardEnemy( float flSpeed, int index, gamevcollis
 			{
 				flMaxDot *= flGuideFactor;
 			}
-			flMaxDot = cos( flMaxDot * M_PI / 180.0f );
+			flMaxDot = cos( flMaxDot * M_PI_F / 180.0f );
 
 			if ( flMaxDot > 1.0f )
 			{

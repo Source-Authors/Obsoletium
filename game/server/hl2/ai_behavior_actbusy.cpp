@@ -1154,7 +1154,7 @@ int CAI_ActBusyBehavior::SelectScheduleWhileNotBusy( int iBase )
 		// If we're being forced, think again quickly
 		if ( m_bForceActBusy || IsCombatActBusy() )
 		{
-			m_flNextBusySearchTime = gpGlobals->curtime + 2.0;
+			m_flNextBusySearchTime = gpGlobals->curtime + 2.0f;
 		}
 		else
 		{
@@ -1294,7 +1294,7 @@ int CAI_ActBusyBehavior::SelectScheduleWhileNotBusy( int iBase )
 			{
 				// Don't try again right away, not enough state will have changed.
 				// Just go do something useful for a few seconds.
-				m_flNextBusySearchTime = gpGlobals->curtime + 10.0;
+				m_flNextBusySearchTime = gpGlobals->curtime + 10.0f;
 			}
 		}
 	}
@@ -2542,7 +2542,7 @@ void CAI_ActBusyGoal::InputForceNPCToActBusy( inputdata_t &inputdata )
 		else 
 		{
 			// Do we have a specified time?
-			flMaxTime = atof( pszParam );
+			flMaxTime = strtof( pszParam, nullptr );
 		}
 
 		pszParam = strtok(NULL," ");

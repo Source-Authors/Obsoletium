@@ -1824,7 +1824,7 @@ void CNPC_CScanner::SpotlightUpdate(void)
 	// Avoid sudden change in where beam fades out when cross disconinuities
 	m_hSpotlightTarget->m_vSpotlightDir = m_hSpotlightTarget->GetLocalOrigin() - m_hSpotlightTarget->m_vSpotlightOrg;
 	float flBeamLength	= VectorNormalize( m_hSpotlightTarget->m_vSpotlightDir );
-	m_flSpotlightCurLength = (0.80*m_flSpotlightCurLength) + (0.2*flBeamLength);
+	m_flSpotlightCurLength = (0.80f*m_flSpotlightCurLength) + (0.2f*flBeamLength);
 
 	// Fade out spotlight end if past max length.  
 	if (m_flSpotlightCurLength > 2*m_flSpotlightMaxLength)
@@ -2184,7 +2184,7 @@ void CNPC_CScanner::StartTask( const Task_t *pTask )
 		m_bPhotoTaken = false;
 
 		// Leave spotlight off for a while
-		m_fNextSpotlightTime = gpGlobals->curtime + 2.0;
+		m_fNextSpotlightTime = gpGlobals->curtime + 2.0f;
 
 		TaskComplete();
 		break;

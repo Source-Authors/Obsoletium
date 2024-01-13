@@ -95,7 +95,7 @@ void CNPC_GroundTurret::Spawn( void )
 
 	SetBloodColor( DONT_BLEED );
 	m_iHealth			= 125;
-	m_flFieldOfView		= cos( ((GROUNDTURRET_VIEWCONE / 2.0f) * M_PI / 180.0f) );
+	m_flFieldOfView		= cos( ((GROUNDTURRET_VIEWCONE / 2.0f) * M_PI_F / 180.0f) );
 	m_NPCState			= NPC_STATE_NONE;
 
 	m_vecSpread.x = 0.5;
@@ -557,11 +557,11 @@ void CNPC_GroundTurret::Shoot()
 
 	if( IsX360() )
 	{
-		m_flTimeNextShoot = gpGlobals->curtime + 0.2;
+		m_flTimeNextShoot = gpGlobals->curtime + 0.2f;
 	}
 	else
 	{
-		m_flTimeNextShoot = gpGlobals->curtime + 0.09;
+		m_flTimeNextShoot = gpGlobals->curtime + 0.09f;
 	}
 }
 

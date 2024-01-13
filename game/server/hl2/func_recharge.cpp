@@ -210,7 +210,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	{
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
-			m_flSoundTime = gpGlobals->curtime + 0.62;
+			m_flSoundTime = gpGlobals->curtime + 0.62f;
 			EmitSound( "SuitRecharge.Deny" );
 		}
 		return;
@@ -228,7 +228,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	{
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
-			m_flSoundTime = gpGlobals->curtime + 0.62;
+			m_flSoundTime = gpGlobals->curtime + 0.62f;
 			EmitSound( "SuitRecharge.Deny" );
 		}
 		return;
@@ -257,7 +257,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	{
 		m_iOn++;
 		EmitSound( "SuitRecharge.Start" );
-		m_flSoundTime = 0.56 + gpGlobals->curtime;
+		m_flSoundTime = 0.56f + gpGlobals->curtime;
 
 		m_OnPlayerUse.FireOutput( pActivator, this );
 	}
@@ -298,7 +298,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	m_OutRemainingCharge.Set(flRemaining, pActivator, this);
 
 	// govern the rate of charge
-	m_flNextCharge = gpGlobals->curtime + 0.1;
+	m_flNextCharge = gpGlobals->curtime + 0.1f;
 }
 
 void CRecharge::Recharge(void)
@@ -615,7 +615,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	{
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
-			m_flSoundTime = gpGlobals->curtime + 0.62;
+			m_flSoundTime = gpGlobals->curtime + 0.62f;
 			EmitSound( "SuitRecharge.Deny" );
 		}
 		return;
@@ -635,7 +635,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 		// Play a deny sound
 		if ( m_flSoundTime <= gpGlobals->curtime )
 		{
-			m_flSoundTime = gpGlobals->curtime + 0.62;
+			m_flSoundTime = gpGlobals->curtime + 0.62f;
 			EmitSound( "SuitRecharge.Deny" );
 		}
 
@@ -695,7 +695,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	{
 		m_iOn++;
 		EmitSound( "SuitRecharge.Start" );
-		m_flSoundTime = 0.56 + gpGlobals->curtime;
+		m_flSoundTime = 0.56f + gpGlobals->curtime;
 
 		m_OnPlayerUse.FireOutput( pActivator, this );
 	}
@@ -720,7 +720,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	m_OutRemainingCharge.Set(flRemaining, pActivator, this);
 
 	// govern the rate of charge
-	m_flNextCharge = gpGlobals->curtime + 0.1;
+	m_flNextCharge = gpGlobals->curtime + 0.1f;
 }
 
 void CNewRecharge::Recharge(void)

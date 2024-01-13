@@ -208,7 +208,7 @@ void CPropJeep::Spawn( void )
 	SetVehicleType( VEHICLE_TYPE_CAR_WHEELS );
 
 	BaseClass::Spawn();
-	m_flHandbrakeTime = gpGlobals->curtime + 0.1;
+	m_flHandbrakeTime = gpGlobals->curtime + 0.1f;
 	m_bInitialHandbrake = false;
 
 	m_flMinimumSpeedToEnterExit = LOCK_SPEED;
@@ -1446,7 +1446,7 @@ void CPropJeep::CreateDangerSounds( void )
 	// Make engine sounds even when we're not going fast.
 	CSoundEnt::InsertSound( SOUND_PLAYER | SOUND_CONTEXT_PLAYER_VEHICLE, GetAbsOrigin(), 800, soundDuration, this, 0 );
 
-	m_flDangerSoundTime = gpGlobals->curtime + 0.1;
+	m_flDangerSoundTime = gpGlobals->curtime + 0.1f;
 }
 
 //-----------------------------------------------------------------------------

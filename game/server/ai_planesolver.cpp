@@ -308,7 +308,7 @@ void CAI_PlaneSolver::CalcYawsFromOffset( float yawScanCenter, float spanPerProb
 		else if ( *pYawCenter >= 360 )
 			*pYawCenter -= 360;
 
-		*pYawTest = *pYawCenter - ( sign * spanPerProbe * 0.5 );
+		*pYawTest = *pYawCenter - ( sign * spanPerProbe * 0.5f );
 		if ( *pYawTest < 0 )
 			*pYawTest += 360;
 		else if ( *pYawTest >= 360 )
@@ -765,7 +765,7 @@ bool CAI_PlaneSolver::GenerateCircleObstacleSuggestions( const AILocalMoveGoal_t
 			}
 
 			pObstacleEntity->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
-			zDistTooFar = ( maxs.z - mins.z ) * 0.5 + GetNpc()->GetHullHeight() * 0.5;
+			zDistTooFar = ( maxs.z - mins.z ) * 0.5f + GetNpc()->GetHullHeight() * 0.5f;
 		}
 		else
 			zDistTooFar = GetNpc()->GetHullHeight();

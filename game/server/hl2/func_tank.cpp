@@ -697,19 +697,19 @@ bool CFuncTank::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "barrel"))
 	{
-		m_barrelPos.x = atof(szValue);
+		m_barrelPos.x = strtof(szValue, nullptr);
 		return true;
 	}
 	
 	if (FStrEq(szKeyName, "barrely"))
 	{
-		m_barrelPos.y = atof(szValue);
+		m_barrelPos.y = strtof(szValue, nullptr);
 		return true;
 	}
 	
 	if (FStrEq(szKeyName, "barrelz"))
 	{
-		m_barrelPos.z = atof(szValue);
+		m_barrelPos.z = strtof(szValue, nullptr);
 		return true;
 	}
 
@@ -1150,7 +1150,7 @@ void CFuncTank::ControllerPostFrame( void )
 
 	Vector forward;
 	AngleVectors( GetAbsAngles(), &forward );
-	m_fireLast = gpGlobals->curtime - (1/m_fireRate) - 0.01;  // to make sure the gun doesn't fire too many bullets
+	m_fireLast = gpGlobals->curtime - (1/m_fireRate) - 0.01f;  // to make sure the gun doesn't fire too many bullets
 	
 	int bulletCount = (gpGlobals->curtime - m_fireLast) * m_fireRate;
 	
@@ -2016,17 +2016,17 @@ void CFuncTank::AimFuncTankAtTarget( void )
 
 	if ( bUpdateTime )
 	{
-		if( (gpGlobals->curtime - m_lastSightTime >= 1.0) && (gpGlobals->curtime > m_flNextAttack) )
+		if( (gpGlobals->curtime - m_lastSightTime >= 1.0f) && (gpGlobals->curtime > m_flNextAttack) )
 		{
 			// Enemy was hidden for a while, and I COULD fire right now. Instead, tack a delay on.
-			m_flNextAttack = gpGlobals->curtime + 0.5;
+			m_flNextAttack = gpGlobals->curtime + 0.5f;
 		}
 
 		m_lastSightTime = gpGlobals->curtime;
 		m_persist2burst = 0;
 	}
 
-	SetMoveDoneTime( 0.1 );
+	SetMoveDoneTime( 0.1f );
 
 	if ( CanFire() && ( ( (fabs(distX) <= m_pitchTolerance) && (fabs(distY) <= m_yawTolerance) ) || (m_spawnflags & SF_TANK_LINEOFSIGHT) ) )
 	{
@@ -3404,7 +3404,7 @@ CMortarShell *CMortarShell::Create( const Vector &vecStart, const Vector &vecTar
 	pShell->m_flLifespan = flImpactDelay;
 	pShell->m_flImpactTime = gpGlobals->curtime + flImpactDelay;
 	pShell->m_flWarnTime = pShell->m_flImpactTime - flWarnDelay;
-	pShell->m_flNPCWarnTime = pShell->m_flWarnTime - 0.5;
+	pShell->m_flNPCWarnTime = pShell->m_flWarnTime - 0.5f;
 	pShell->m_warnSound = warnSound;
 	pShell->Spawn();
 

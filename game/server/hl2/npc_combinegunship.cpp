@@ -124,7 +124,7 @@ Wedge's notes:
 
 #define GUNSHIP_BELLYBLAST_TARGET_HEIGHT	512.0		// Height above targets that the gunship wants to be when bellyblasting
 
-#define GUNSHIP_MISSILE_MAX_RESPONSE_TIME	0.4
+constexpr inline float GUNSHIP_MISSILE_MAX_RESPONSE_TIME{0.4f};
 #define GUNSHIP_MAX_HITS_PER_BURST			5
 
 #define GUNSHIP_FLARE_IGNORE_TIME		6.0
@@ -1253,7 +1253,7 @@ void CNPC_CombineGunship::DoCombat( void )
 		{
 			if ( GetEnemy() && GetEnemy()->IsPlayer() && m_flNextSeeEnemySound < gpGlobals->curtime )
 			{
-				m_flNextSeeEnemySound = gpGlobals->curtime + 5.0;
+				m_flNextSeeEnemySound = gpGlobals->curtime + 5.0f;
 
 				if ( !HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 				{
@@ -1429,12 +1429,12 @@ void CNPC_CombineGunship::MoveHead( void )
 				float flDiff;
 
 				float flDesiredYaw = VecToYaw(vTargetPos - vGunPosition);
-				flDiff = UTIL_AngleDiff( flDesiredYaw, vGunAngles.y ) * 0.90;
-				flYaw = UTIL_Approach( flYaw + flDiff, flYaw, 5.0 );	
+				flDiff = UTIL_AngleDiff( flDesiredYaw, vGunAngles.y ) * 0.90f;
+				flYaw = UTIL_Approach( flYaw + flDiff, flYaw, 5.0f );	
 
 				float flDesiredPitch = UTIL_VecToPitch(vTargetPos - vGunPosition);
-				flDiff = UTIL_AngleDiff( flDesiredPitch, vGunAngles.x ) * 0.90;
-				flPitch = UTIL_Approach( flPitch + flDiff, flPitch, 5.0 );	
+				flDiff = UTIL_AngleDiff( flDesiredPitch, vGunAngles.x ) * 0.90f;
+				flPitch = UTIL_Approach( flPitch + flDiff, flPitch, 5.0f );	
 
 				break;
 			}
@@ -1941,8 +1941,8 @@ bool CNPC_CombineGunship::FindNearestGunshipCrash( void )
 		// don't blow up yet. This will give us 3 seconds to attempt to find one before dying.
 		if ( !m_hCrashTarget && bFoundAnyCrashTargets )
 		{
-			m_flNextGunshipCrashFind = gpGlobals->curtime + 0.5;
-			m_flEndDestructTime = gpGlobals->curtime + 3.0;
+			m_flNextGunshipCrashFind = gpGlobals->curtime + 0.5f;
+			m_flEndDestructTime = gpGlobals->curtime + 3.0f;
 			return true;
 		}
 
@@ -1951,13 +1951,13 @@ bool CNPC_CombineGunship::FindNearestGunshipCrash( void )
 
 	// Fly to the crash point and destruct there
   	m_hCrashTarget = pNearest;
-	m_flNextGunshipCrashFind = gpGlobals->curtime + 0.5;
+	m_flNextGunshipCrashFind = gpGlobals->curtime + 0.5f;
 	m_flEndDestructTime = 0;
 
 	if ( g_debug_gunship.GetInt() )
 	{
-		NDebugOverlay::Line(GetAbsOrigin(), m_hCrashTarget->GetAbsOrigin(), 0,255,0, true, 0.5);
-		NDebugOverlay::Box( m_hCrashTarget->GetAbsOrigin(), -Vector(200,200,200), Vector(200,200,200), 0,255,0, 128, 0.5 );
+		NDebugOverlay::Line(GetAbsOrigin(), m_hCrashTarget->GetAbsOrigin(), 0,255,0, true, 0.5f);
+		NDebugOverlay::Box( m_hCrashTarget->GetAbsOrigin(), -Vector(200,200,200), Vector(200,200,200), 0,255,0, 128, 0.5f );
 	}
 
 	return true;
@@ -1968,7 +1968,7 @@ bool CNPC_CombineGunship::FindNearestGunshipCrash( void )
 //-----------------------------------------------------------------------------
 void CNPC_CombineGunship::BeginDestruct( void )
 {
-	m_flEndDestructTime = gpGlobals->curtime + 3.0;
+	m_flEndDestructTime = gpGlobals->curtime + 3.0f;
 
 	// Clamp velocity
 	if( hl2_episodic.GetBool() && GetAbsVelocity().Length() > 700.0f )
@@ -2137,9 +2137,9 @@ void CNPC_CombineGunship::Flight( void )
 	deltaPos -= GetAbsOrigin();
 
 	// calc goal linear accel to hit deltaPos in dt time.
-	accel.x = 2.0 * (deltaPos.x - GetAbsVelocity().x * dt) / (dt * dt);
-	accel.y = 2.0 * (deltaPos.y - GetAbsVelocity().y * dt) / (dt * dt);
-	accel.z = 2.0 * (deltaPos.z - GetAbsVelocity().z * dt + 0.5 * 384 * dt * dt) / (dt * dt);
+	accel.x = 2.0f * (deltaPos.x - GetAbsVelocity().x * dt) / (dt * dt);
+	accel.y = 2.0f * (deltaPos.y - GetAbsVelocity().y * dt) / (dt * dt);
+	accel.z = 2.0f * (deltaPos.z - GetAbsVelocity().z * dt + 0.5f * 384 * dt * dt) / (dt * dt);
 	
 	float flDistFromPath = 0.0f;
 	Vector vecPoint, vecDelta;
@@ -2189,9 +2189,9 @@ void CNPC_CombineGunship::Flight( void )
 	// calc angular accel needed to hit goal pitch in dt time.
 	dt = 0.6;
 	QAngle goalAngAccel;
-	goalAngAccel.x = 2.0 * (AngleDiff( goalPitch, AngleNormalize( GetLocalAngles().x ) ) - GetLocalAngularVelocity().x * dt) / (dt * dt);
-	goalAngAccel.y = 2.0 * (AngleDiff( goalYaw, AngleNormalize( GetLocalAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
-	goalAngAccel.z = 2.0 * (AngleDiff( goalRoll, AngleNormalize( GetLocalAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
+	goalAngAccel.x = 2.0f * (AngleDiff( goalPitch, AngleNormalize( GetLocalAngles().x ) ) - GetLocalAngularVelocity().x * dt) / (dt * dt);
+	goalAngAccel.y = 2.0f * (AngleDiff( goalYaw, AngleNormalize( GetLocalAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
+	goalAngAccel.z = 2.0f * (AngleDiff( goalRoll, AngleNormalize( GetLocalAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
 
 	goalAngAccel.x = clamp( goalAngAccel.x, -300, 300 );
 	//goalAngAccel.y = clamp( goalAngAccel.y, -60, 60 );
@@ -2228,7 +2228,7 @@ void CNPC_CombineGunship::Flight( void )
 
 	SetLocalAngularVelocity( angVel );
 
-	m_flForce = m_flForce * 0.8 + (accel.z + fabs( accel.x ) * 0.1 + fabs( accel.y ) * 0.1) * 0.1 * 0.2;
+	m_flForce = m_flForce * 0.8f + (accel.z + fabs( accel.x ) * 0.1f + fabs( accel.y ) * 0.1f) * 0.1f * 0.2f;
 
 	Vector vecImpulse = m_flForce * up;
 	
@@ -2240,7 +2240,7 @@ void CNPC_CombineGunship::Flight( void )
 	}
 	else
 	{
-		vecImpulse.z -= 38.4;  // 32ft/sec	
+		vecImpulse.z -= 38.4f;  // 32ft/sec	
 	}
 	
 	// Find our current velocity
@@ -3085,7 +3085,7 @@ void CNPC_CombineGunship::StopCannonBurst( void )
 	float flDelay = clamp( flPerc * m_flBurstDelay, 0.5, m_flBurstDelay );
 
 	// If we didn't finish the burst, don't wait so long
-	flPerc = 1.0 - (m_iBurstSize / sk_gunship_burst_size.GetFloat());
+	flPerc = 1.0f - (m_iBurstSize / sk_gunship_burst_size.GetFloat());
 	flDelay *= flPerc;
 
 	m_flTimeNextAttack = gpGlobals->curtime + flDelay;

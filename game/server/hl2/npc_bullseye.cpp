@@ -146,9 +146,9 @@ void CNPC_Bullseye::Spawn( void )
 	SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( BLOOD_COLOR_RED );
 	ClearEffects();
-	SetGravity( 0.0 );
+	SetGravity( 0.0f );
 
-	m_flFieldOfView = cos( DEG2RAD(m_flFieldOfView) / 2.0 );
+	m_flFieldOfView = cos( DEG2RAD(m_flFieldOfView) / 2.0f );
 
 	//Got blood?
 	if ( m_spawnflags & SF_BULLSEYE_BLEED )

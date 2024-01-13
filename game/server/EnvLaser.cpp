@@ -98,7 +98,7 @@ bool CEnvLaser::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "width"))
 	{
-		SetWidth( atof(szValue) );
+		SetWidth( strtof( szValue, nullptr ) );
 	}
 	else if (FStrEq(szKeyName, "NoiseAmplitude"))
 	{

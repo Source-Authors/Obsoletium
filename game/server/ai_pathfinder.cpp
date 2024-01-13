@@ -252,7 +252,7 @@ bool CAI_Pathfinder::IsLinkStillStale(int moveType, CAI_Link *nodeLink)
 		return false;
 	}
 
-	nodeLink->m_timeStaleExpires = gpGlobals->curtime + 1.0;
+	nodeLink->m_timeStaleExpires = gpGlobals->curtime + 1.0f;
 
 	return true;
 }
@@ -307,7 +307,7 @@ AI_Waypoint_t *CAI_Pathfinder::FindBestPath(int startID, int endID)
 
 	nodeG[startID] = 0;
 
-	nodeH[startID] = 0.1*(pAInode[startID]->GetPosition(GetHullType())-pAInode[endID]->GetPosition(GetHullType())).Length(); // Don't want to over estimate
+	nodeH[startID] = 0.1f*(pAInode[startID]->GetPosition(GetHullType())-pAInode[endID]->GetPosition(GetHullType())).Length(); // Don't want to over estimate
 	nodeF[startID] = nodeG[startID] + nodeH[startID];
 
 	openBS.Set(startID);

@@ -296,7 +296,7 @@ AIMoveResult_t CAI_Motor::MoveClimbExecute( const Vector &climbDest, const Vecto
 	if (m_nDismountSequence != ACT_INVALID)
 	{
 		// catch situations where the climb mount/dismount finished before reaching goal
-		climbSpeed = MAX( climbSpeed, 30.0 );
+		climbSpeed = MAX( climbSpeed, 30.0f );
 	}
 	else
 	{

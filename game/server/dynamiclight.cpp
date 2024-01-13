@@ -95,7 +95,7 @@ bool CDynamicLight::KeyValue( const char *szKeyName, const char *szValue )
 	}
 	else if ( FStrEq( szKeyName, "pitch" ) )
 	{
-		float angle = atof(szValue);
+		float angle = strtof( szValue, nullptr );
 		if ( angle )
 		{
 			QAngle angles = GetAbsAngles();

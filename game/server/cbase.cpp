@@ -166,7 +166,7 @@ CEventAction::CEventAction( const char *ActionData )
 	psz = nexttoken(szToken, psz, ',');
 	if (szToken[0] != '\0')
 	{
-		m_flDelay = atof(szToken);
+		m_flDelay = strtof(szToken, nullptr);
 	}
 
 	//

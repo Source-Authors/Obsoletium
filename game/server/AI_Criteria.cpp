@@ -479,7 +479,7 @@ const char *SplitContext( const char *raw, char *key, int keylen, char *value, i
 	if ( colon2 && ( colon2 < end ) )
 	{
 		if ( duration )
-			*duration = atof( colon2 + 1 );
+			*duration = strtof( colon2 + 1, nullptr );
 
 		len = MIN( colon2 - ( colon1 + 1 ), valuelen - 1 );
 		Q_strncpy( value, colon1 + 1, len + 1 );

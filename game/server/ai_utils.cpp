@@ -250,7 +250,7 @@ void CAI_AccelDecay::SetParameters( float minVelocity, float maxVelocity, float 
 	m_maxVelocity = maxVelocity;
 
 	m_accel = accelPercentPerTick;
-	m_invDecay = 1.0 - decelPercentPerTick;
+	m_invDecay = 1.0f - decelPercentPerTick;
 
 	m_decayTime = 0.0;
 	float d = 1.0;
@@ -259,7 +259,7 @@ void CAI_AccelDecay::SetParameters( float minVelocity, float maxVelocity, float 
 	while (d * m_maxVelocity > m_minVelocity && i < 10)
 	{
 		d = d * m_invDecay;
-		m_decayTime = m_decayTime + 0.1 * d; // appox interval call
+		m_decayTime = m_decayTime + 0.1f * d; // appox interval call
 		i++;
 	}
 }

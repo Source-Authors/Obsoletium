@@ -272,7 +272,7 @@ void CAI_Enemies::RefreshMemories(void)
 
 	if ( m_flFreeKnowledgeDuration >= m_flEnemyDiscardTime )
 	{
-		m_flFreeKnowledgeDuration = m_flEnemyDiscardTime - .1;
+		m_flFreeKnowledgeDuration = m_flEnemyDiscardTime - .1f;
 	}
 
 	// -------------------
@@ -371,7 +371,7 @@ bool CAI_Enemies::UpdateMemory(CAI_Network* pAINet, CBaseEntity *pEnemy, const V
 	else
 	{
 		// Block free knowledge
-		pAddMemory->timeLastReacquired = pAddMemory->timeFirstSeen = pAddMemory->timeLastSeen = ( gpGlobals->curtime - (m_flFreeKnowledgeDuration + 0.01) );
+		pAddMemory->timeLastReacquired = pAddMemory->timeFirstSeen = pAddMemory->timeLastSeen = ( gpGlobals->curtime - (m_flFreeKnowledgeDuration + 0.01f) );
 		pAddMemory->timeAtFirstHand = AI_INVALID_TIME;
 	}
 
@@ -634,7 +634,7 @@ void CAI_Enemies::SetFreeKnowledgeDuration( float flDuration )
 		// as soon as you're given them.
 		Assert( m_flFreeKnowledgeDuration < m_flEnemyDiscardTime );
 
-		m_flFreeKnowledgeDuration = m_flEnemyDiscardTime - .1;
+		m_flFreeKnowledgeDuration = m_flEnemyDiscardTime - .1f;
 	}
 }
 
@@ -651,6 +651,6 @@ void CAI_Enemies::SetEnemyDiscardTime( float flTime )
 		// as soon as you're given them.
 		Assert( m_flFreeKnowledgeDuration < m_flEnemyDiscardTime );
 
-		m_flFreeKnowledgeDuration = m_flEnemyDiscardTime - .1;
+		m_flFreeKnowledgeDuration = m_flEnemyDiscardTime - .1f;
 	}
 }

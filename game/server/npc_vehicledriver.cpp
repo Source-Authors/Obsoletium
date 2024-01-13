@@ -690,7 +690,7 @@ bool CNPC_VehicleDriver::WaypointReached( void )
 	m_pNextWaypoint = m_Waypoints[1];
 
 	// Drop the spline marker back
-	m_flDistanceAlongSpline = MAX( 0, m_flDistanceAlongSpline - 1.0 );
+	m_flDistanceAlongSpline = MAX( 0, m_flDistanceAlongSpline - 1.0f );
 
 	CheckForTeleport();
 
@@ -794,7 +794,7 @@ bool CNPC_VehicleDriver::OverridePathMove( float flInterval )
 	Vector vecNormVel = m_vecDesiredVelocity;
 	VectorNormalize( vecNormVel );
 	float flDotRight = DotProduct( vecRight, vecNormVel );
-	flSpeed = (1.0 - fabs(flDotRight));
+	flSpeed = (1.0f - fabs(flDotRight));
 	// Don't go slower than we've been told to go
 	if ( flSpeed < m_flDriversMinSpeed )
 	{

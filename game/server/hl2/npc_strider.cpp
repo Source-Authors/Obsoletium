@@ -573,7 +573,7 @@ void CNPC_Strider::SetupGlobalModelData()
 	// BMCD: Get the conservative boxes from sequences
 	Vector mins, maxs;
 	ExtractBbox( SelectHeaviestSequence( ACT_WALK ), mins, maxs );
-	CNPC_Strider::gm_strideLength = (maxs.x - mins.x) * 0.5;
+	CNPC_Strider::gm_strideLength = (maxs.x - mins.x) * 0.5f;
 
 	// UNDONE: use crouch when crouched
 	CollisionProp()->SetSurroundingBoundsType( USE_HITBOXES );
@@ -3549,9 +3549,9 @@ bool CNPC_Strider::OverrideMove( float flInterval )
 		const float maxVelocity = 300;
 		const float minVelocity = 10;
 
-		#define HEIGHTINVDECAY	0.8	// maintain X percent of velocity when slowing down
-		#define HEIGHTDECAYTIME	0.4161	// Sum( 1..cycle, HEIGHTINVDECAY^cycle ) 
-		#define HEIGHTACCEL		0.5		// accel toward maxVelocity by X percent each cycle
+		constexpr float HEIGHTINVDECAY = 0.8f;	// maintain X percent of velocity when slowing down
+		constexpr float HEIGHTDECAYTIME	= 0.4161f;	// Sum( 1..cycle, HEIGHTINVDECAY^cycle ) 
+		constexpr float HEIGHTACCEL = 0.5f;	// accel toward maxVelocity by X percent each cycle
 
 		if (fabsf( m_HeightVelocity ) < minVelocity)
 			m_HeightVelocity = minVelocity * heightMoveSign;
@@ -3630,7 +3630,7 @@ void CNPC_Strider::MaintainTurnActivity( void )
 			else
 			{
 				// too busy, try again in half a second
-				m_flNextTurnAct = gpGlobals->curtime + 0.5;
+				m_flNextTurnAct = gpGlobals->curtime + 0.5f;
 			}
 		}
 		m_doTurn = m_doLeft = m_doRight = 0.0;

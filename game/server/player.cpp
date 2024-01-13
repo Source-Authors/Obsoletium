@@ -4137,7 +4137,7 @@ Things powered by the battery
 
 // if in range of radiation source, ping geiger counter
 
-#define GEIGERDELAY 0.25
+constexpr inline float GEIGERDELAY{0.25f};
 
 void CBasePlayer::UpdateGeigerCounter( void )
 {
@@ -4184,8 +4184,8 @@ Play suit update if it's time
 ================
 */
 
-#define SUITUPDATETIME	3.5
-#define SUITFIRSTUPDATETIME 0.1
+constexpr inline float SUITUPDATETIME{3.5f};
+constexpr inline float SUITFIRSTUPDATETIME{0.1f};
 
 void CBasePlayer::CheckSuitUpdate()
 {
@@ -4948,10 +4948,10 @@ void CBasePlayer::Spawn( void )
 
 	m_flNextDecalTime	= 0;// let this player decal as soon as he spawns.
 
-	m_flgeigerDelay = gpGlobals->curtime + 2.0;	// wait a few seconds until user-defined message registrations
+	m_flgeigerDelay = gpGlobals->curtime + 2.0f;	// wait a few seconds until user-defined message registrations
 												// are recieved by all clients
 	
-	m_flFieldOfView		= 0.766;// some NPCs use this to determine whether or not the player is looking at them.
+	m_flFieldOfView		= 0.766f;// some NPCs use this to determine whether or not the player is looking at them.
 
 	m_vecAdditionalPVSOrigin = vec3_origin;
 	m_vecCameraPVSOrigin = vec3_origin;
@@ -6510,13 +6510,13 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 			 args.ArgC() == 6 )
 		{
 			Vector origin;
- 			origin.x = clamp( atof( args[1] ), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
- 			origin.y = clamp( atof( args[2] ), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
- 			origin.z = clamp( atof( args[3] ), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+ 			origin.x = clamp( strtof( args[1], nullptr ), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+ 			origin.y = clamp( strtof( args[2], nullptr ), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+ 			origin.z = clamp( strtof( args[3], nullptr ), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
 
 			QAngle angle;
-			angle.x = atof( args[4] );
-			angle.y = atof( args[5] );
+			angle.x = strtof( args[4], nullptr );
+			angle.y = strtof( args[5], nullptr );
 			angle.z = 0.0f;
 
 			JumptoPosition( origin, angle );

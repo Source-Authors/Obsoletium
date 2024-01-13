@@ -433,7 +433,7 @@ void CNPC_CraneDriver::StartTask( const Task_t *pTask )
 			// Don't check to see if drop's finished until this time is up.
 			// This is necessary because the crane won't start dropping this
 			// frame, and our cranedriver will think it's finished immediately.
-			m_flDropWait = gpGlobals->curtime + 0.5;
+			m_flDropWait = gpGlobals->curtime + 0.5f;
 		}
 		break;
 

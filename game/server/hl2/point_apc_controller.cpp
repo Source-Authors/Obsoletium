@@ -210,15 +210,15 @@ bool CAPCController::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "barrel"))
 	{
-		m_barrelPos.x = atof(szValue);
+		m_barrelPos.x = strtof( szValue, nullptr );
 	}
 	else if (FStrEq(szKeyName, "barrely"))
 	{
-		m_barrelPos.y = atof(szValue);
+		m_barrelPos.y = strtof( szValue, nullptr );
 	}
 	else if (FStrEq(szKeyName, "barrelz"))
 	{
-		m_barrelPos.z = atof(szValue);
+		m_barrelPos.z = strtof( szValue, nullptr );
 	}
 	else
 		return BaseClass::KeyValue( szKeyName, szValue );
@@ -430,7 +430,7 @@ void CAPCController::TrackTarget( void )
 				if ( !m_bFireDelayed )
 				{
 					m_bFireDelayed = true;
-					m_flFiringDelay = gpGlobals->curtime + 1.5;	// setup delay time before we start firing
+					m_flFiringDelay = gpGlobals->curtime + 1.5f;	// setup delay time before we start firing
 					return;
 				}
 				if ( gpGlobals->curtime > m_flFiringDelay )

@@ -340,7 +340,7 @@ void CBounceBomb::SetMineState( int iState )
 			// Since we just nudged the mine, ignore collisions with the world until
 			// the mine is in the air. We only want to explode if the player tries to 
 			// run over the mine before it jumps up.
-			m_flIgnoreWorldTime = gpGlobals->curtime + 1.0;
+			m_flIgnoreWorldTime = gpGlobals->curtime + 1.0f;
 			UpdateLight( true, 255, 0, 0, 190 );
 
 			// use the correct bounce behavior
@@ -1266,12 +1266,12 @@ void CBounceBomb::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t re
 		m_bPlacedByPlayer = true;
 		SetTouch( NULL );
 		SetThink( &CBounceBomb::SettleThink );
-		SetNextThink( gpGlobals->curtime + 0.1);
+		SetNextThink( gpGlobals->curtime + 0.1f);
 
 		// Since being punted causes the mine to flip, sometimes it 'catches an edge'
 		// and ends up touching the ground from whence it came, exploding instantly. 
 		// This little stunt prevents that by ignoring world collisions for a very short time.
-		m_flIgnoreWorldTime = gpGlobals->curtime + 0.1;
+		m_flIgnoreWorldTime = gpGlobals->curtime + 0.1f;
 	}
 }
 

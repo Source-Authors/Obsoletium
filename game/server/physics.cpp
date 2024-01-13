@@ -1633,7 +1633,7 @@ CON_COMMAND( physics_budget, "Times the cost of each active object" )
 			lastTime = elapsed;
  		}
 
-		totalTime = MAX( totalTime, 0.001 );
+		totalTime = MAX( totalTime, 0.001f );
 		for ( i = 0; i < ents.Count(); i++ )
 		{
 			float fraction = times[i] / totalTime;

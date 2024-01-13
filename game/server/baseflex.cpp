@@ -1397,7 +1397,7 @@ bool CBaseFlex::ProcessMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 			myNpc->SetTarget( info->m_hTarget );
 
 			float flDistTolerance;
-			flDistTolerance = myNpc->GetHullWidth() / 2.0;
+			flDistTolerance = myNpc->GetHullWidth() / 2.0f;
 			// flDistTolerance = AIN_HULL_TOLERANCE;
 
 			if (event->m_bForceShortMovement)
@@ -1834,11 +1834,11 @@ bool CBaseFlex::ProcessGestureSceneEvent( CSceneEventInfo *info, CChoreoScene *s
 		{
 			if (IsMoving())
 			{
-				info->m_flWeight = MAX( info->m_flWeight - 0.2, 0.0 );
+				info->m_flWeight = MAX( info->m_flWeight - 0.2f, 0.0f );
 			}
 			else
 			{
-				info->m_flWeight = MIN( info->m_flWeight + 0.2, 1.0 );
+				info->m_flWeight = MIN( info->m_flWeight + 0.2f, 1.0f );
 			}
 		}
 
@@ -1912,11 +1912,11 @@ bool CBaseFlex::ProcessSequenceSceneEvent( CSceneEventInfo *info, CChoreoScene *
 
 		if (bFadeOut)
 		{
-			info->m_flWeight = MAX( info->m_flWeight - 0.2, 0.0 );
+			info->m_flWeight = MAX( info->m_flWeight - 0.2f, 0.0f );
 		}
 		else
 		{
-			info->m_flWeight = MIN( info->m_flWeight + 0.2, 1.0 );
+			info->m_flWeight = MIN( info->m_flWeight + 0.2f, 1.0f );
 		}
 
 		float spline = 3 * info->m_flWeight * info->m_flWeight - 2 * info->m_flWeight * info->m_flWeight * info->m_flWeight;
@@ -2199,11 +2199,11 @@ float CSceneEventInfo::UpdateWeight( CBaseFlex *pActor )
 	// decay if this is a background scene and there's other flex animations playing
 	if (pActor->IsSuppressedFlexAnimation( this ))
 	{
-		m_flWeight = MAX( m_flWeight - 0.2, 0.0 );
+		m_flWeight = MAX( m_flWeight - 0.2f, 0.0f );
 	}
 	else
 	{
-		m_flWeight = MIN( m_flWeight + 0.1, 1.0 );
+		m_flWeight = MIN( m_flWeight + 0.1f, 1.0f );
 	}
 	return m_flWeight;
 }
@@ -2567,7 +2567,7 @@ void CFlexCycler::Think( void )
 		else if (m_flextime < gpGlobals->curtime)
 		{
 			// m_flextime = gpGlobals->curtime + 1.0; // RandomFloat( 0.1, 0.5 );
-			m_flextime = gpGlobals->curtime + random->RandomFloat( 0.3, 0.5 ) * (30.0 / GetNumFlexControllers());
+			m_flextime = gpGlobals->curtime + random->RandomFloat( 0.3f, 0.5f ) * (30.0f / GetNumFlexControllers());
 			m_flexnum = (LocalFlexController_t)random->RandomInt( 0, GetNumFlexControllers() - 1 );
 
 			// m_flexnum = (pflex->num + 1) % r_psubmodel->numflexes;

@@ -866,7 +866,7 @@ bool CProtoSniper::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "radius"))
 	{
-		m_flPatience = atof(szValue);
+		m_flPatience = strtof( szValue, nullptr );
 
 		// If the designer specifies a patience radius of 0, the
 		// sniper won't have any patience at all. The sniper will 

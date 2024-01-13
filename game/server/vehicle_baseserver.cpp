@@ -2665,12 +2665,12 @@ void CVehicleSoundsParser::ParseKeyValue( void *pData, const char *pKey, const c
 			// Check gear keys
 			if ( !strcmpi( pKey, "max_speed" ) )
 			{
-				pSounds->pGears[m_iCurrentGear].flMaxSpeed = atof(pValue);
+				pSounds->pGears[m_iCurrentGear].flMaxSpeed = strtof( pValue, nullptr );
 				return;
 			}
 			if ( !strcmpi( pKey, "speed_approach_factor" ) )
 			{
-				pSounds->pGears[m_iCurrentGear].flSpeedApproachFactor = atof(pValue);
+				pSounds->pGears[m_iCurrentGear].flSpeedApproachFactor = strtof( pValue, nullptr );
 				return;
 			}
 		}
@@ -2693,7 +2693,7 @@ void CVehicleSoundsParser::ParseKeyValue( void *pData, const char *pKey, const c
 			}
 			else if ( !strcmpi( pKey, "min_time" ) )
 			{
-				pSounds->minStateTime[m_iCurrentState] = atof(pValue);
+				pSounds->minStateTime[m_iCurrentState] = strtof( pValue, nullptr );
 				return;
 			}
 		}
@@ -2704,7 +2704,7 @@ void CVehicleSoundsParser::ParseKeyValue( void *pData, const char *pKey, const c
 		{
 			if ( !strcmpi( pKey, "min_speed" ) )
 			{
-				pSounds->crashSounds[m_iCurrentCrashSound].flMinSpeed = atof(pValue);
+				pSounds->crashSounds[m_iCurrentCrashSound].flMinSpeed = strtof( pValue, nullptr );
 				return;
 			}
 			else if ( !strcmpi( pKey, "sound" ) )
@@ -2714,7 +2714,7 @@ void CVehicleSoundsParser::ParseKeyValue( void *pData, const char *pKey, const c
 			}
 			else if ( !strcmpi( pKey, "min_speed_change" ) )
 			{
-				pSounds->crashSounds[m_iCurrentCrashSound].flMinDeltaSpeed = atof(pValue);
+				pSounds->crashSounds[m_iCurrentCrashSound].flMinDeltaSpeed = strtof( pValue, nullptr );
 				return;
 			}
 			else if ( !strcmpi( pKey, "gear_limit" ) )

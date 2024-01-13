@@ -668,7 +668,7 @@ void CPropAirboat::EnterVehicle( CBaseCombatCharacter *pPlayer )
 	m_VehiclePhysics.TurnOn();
 
 	// Start playing the engine's idle sound as the startup sound finishes.
-	m_flEngineIdleTime = gpGlobals->curtime + flDuration - 0.1;
+	m_flEngineIdleTime = gpGlobals->curtime + flDuration - 0.1f;
 }
 
 
@@ -1359,11 +1359,11 @@ void CPropAirboat::StopLoopingSounds()
 //-----------------------------------------------------------------------------
 void CPropAirboat::UpdateEngineSound( CSoundEnvelopeController &controller, float speedRatio )
 {
-	#define ENGINE_MIN_VOLUME	0.22
-	#define ENGINE_MAX_VOLUME	0.62
-	#define	ENGINE_MIN_PITCH	80
-	#define	ENGINE_MAX_PITCH	140
-	#define ENGINE_DUCK_TIME	4.0
+	constexpr float ENGINE_MIN_VOLUME{0.22f};
+	constexpr float ENGINE_MAX_VOLUME{0.62f};
+	constexpr float	ENGINE_MIN_PITCH{80};
+	constexpr float	ENGINE_MAX_PITCH{140};
+	constexpr float ENGINE_DUCK_TIME{4.0f};
 
 	if ( controller.SoundGetVolume(m_pEngineSound ) == 0 )
 	{ 
@@ -1646,7 +1646,7 @@ void CPropAirboat::FireGun( )
 	if ( gpGlobals->curtime >= m_flNextGunShakeTime )
 	{
 		UTIL_ScreenShakeObject( this, WorldSpaceCenter(), 0.2, 250.0, CANNON_SHAKE_INTERVAL, 250, SHAKE_START );
-		m_flNextGunShakeTime = gpGlobals->curtime + 0.5 * CANNON_SHAKE_INTERVAL; 
+		m_flNextGunShakeTime = gpGlobals->curtime + 0.5f * CANNON_SHAKE_INTERVAL; 
 	}
 
 	// Specifically kill APC missiles in the cone. But we're going to totally cheat

@@ -444,7 +444,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			}
 			else
 			{
-				tempTask[taskNum].flTaskData = atof(token);
+				tempTask[taskNum].flTaskData = strtof(token, nullptr);
 			}
 			taskNum++;
 

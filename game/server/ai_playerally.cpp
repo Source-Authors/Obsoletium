@@ -1132,9 +1132,9 @@ int CAI_PlayerAlly::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		if ( Classify() == CLASS_PLAYER_ALLY_VITAL && !(subInfo.GetDamageType() & DMG_CRUSH) )
 		{
 			float flDamage = subInfo.GetDamage();
-			if ( flDamage > ( GetMaxHealth() * 0.25 ) )
+			if ( flDamage > ( GetMaxHealth() * 0.25f ) )
 			{
-				flDamage = ( GetMaxHealth() * 0.25 );
+				flDamage = ( GetMaxHealth() * 0.25f );
 				subInfo.SetDamage( flDamage );
 			}
 		}

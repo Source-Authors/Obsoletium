@@ -491,7 +491,7 @@ void CPointSpotlight::SpotlightUpdate(void)
 	// Avoid sudden change in where beam fades out when cross disconinuities
 	VectorSubtract( m_hSpotlightTarget->GetAbsOrigin(), m_hSpotlightTarget->m_vSpotlightOrg, m_hSpotlightTarget->m_vSpotlightDir );
 	float flBeamLength	= VectorNormalize( m_hSpotlightTarget->m_vSpotlightDir );
-	m_flSpotlightCurLength = (0.60*m_flSpotlightCurLength) + (0.4*flBeamLength);
+	m_flSpotlightCurLength = (0.60f*m_flSpotlightCurLength) + (0.4f*flBeamLength);
 
 	ComputeRenderInfo();
 

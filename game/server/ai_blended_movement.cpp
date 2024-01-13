@@ -314,7 +314,7 @@ void CAI_BlendedMotor::SetMoveScriptAnim( float flNewSpeed )
 		flWeight = 0.0;
 	}
 	// Msg("weight %.3f rate %.3f\n", flWeight, m_flCurrRate );
-	m_flCurrRate = MIN( m_flCurrRate + (1.0 - m_flCurrRate) * 0.8f, 1.0f );
+	m_flCurrRate = MIN( m_flCurrRate + (1.0f - m_flCurrRate) * 0.8f, 1.0f );
 
 	if (m_nSavedGoalActivity == ACT_INVALID)
 	{
@@ -392,7 +392,7 @@ void CAI_BlendedMotor::SetMoveScriptAnim( float flNewSpeed )
 			m_flSecondaryWeight = 0.0;
 		}
 
-		m_flSecondaryWeight = MIN( m_flSecondaryWeight + 0.3, 1.0 );
+		m_flSecondaryWeight = MIN( m_flSecondaryWeight + 0.3f, 1.0f );
 
 		if (m_flSecondaryWeight < 1.0)
 		{
@@ -1053,7 +1053,7 @@ void CAI_BlendedMotor::BuildVelocityScript( const AILocalMoveGoal_t &move )
 			flDelta = 0;
 		}
 
-		m_flPredictiveSpeedAdjust = 1.1 - fabs( flDelta );
+		m_flPredictiveSpeedAdjust = 1.1f - fabs( flDelta );
 		m_flPredictiveSpeedAdjust = clamp( m_flPredictiveSpeedAdjust, (flHeight > 0.0f) ? 0.5f : 0.8f, 1.0f );
 
 		/*
@@ -1438,7 +1438,7 @@ void CAI_BlendedMotor::BuildVelocityScript( const AILocalMoveGoal_t &move )
 				// check to make sure it's really worth it
 				if (t1 > 0.0 && t2 > 0.0)
 				{
-					d1 = v1 * t1 + 0.5 * idealAccel * t1 * t1;
+					d1 = v1 * t1 + 0.5f * idealAccel * t1 * t1;
 					
 					/*
 					d2 = v2 * t2 + 0.5 * idealAccel * t2 * t2;
@@ -1572,7 +1572,7 @@ void CAI_BlendedMotor::MaintainTurnActivity( void )
 		m_doTurn = m_doRight = m_doLeft = 0;
 		if ( GetOuter()->IsMoving())
 		{
-			m_flNextTurnAct = gpGlobals->curtime + 0.3;
+			m_flNextTurnAct = gpGlobals->curtime + 0.3f;
 		}
 	}
 	else 
@@ -1631,7 +1631,7 @@ void CAI_BlendedMotor::MaintainTurnActivity( void )
 			else
 			{
 				// too many active gestures, try again in half a second
-				m_flNextTurnAct = gpGlobals->curtime + 0.3;
+				m_flNextTurnAct = gpGlobals->curtime + 0.3f;
 			}
 		}
 		m_doTurn = m_doRight = m_doLeft = 0;
@@ -1746,7 +1746,7 @@ bool CAI_BlendedMotor::AddTurnGesture( float flYD )
 			speed = clamp( speed, 15.f, 35.f );
 			speed = MIN( speed, diff );
 
-			actualDuration = (diff / (turnCompletion * speed)) * 0.1 ;
+			actualDuration = (diff / (turnCompletion * speed)) * 0.1f;
 
 			GetOuter()->SetLayerDuration( iLayer, actualDuration );
 
@@ -1757,7 +1757,7 @@ bool CAI_BlendedMotor::AddTurnGesture( float flYD )
 			Remember( bits_MEMORY_TURNING );
 
 			// don't overlap the turn portion of the gestures, and don't play them too often
-			m_flNextTurnGesture = gpGlobals->curtime + MAX( turnCompletion * actualDuration, 0.3 );
+			m_flNextTurnGesture = gpGlobals->curtime + MAX( turnCompletion * actualDuration, 0.3f );
 
 			/*
 			if ( GetOuter()->m_debugOverlays & OVERLAY_NPC_SELECTED_BIT )
@@ -1875,7 +1875,7 @@ float ChangeDistance( float flInterval, float flGoalDistance, float flGoalVeloci
 		// don't overshoot
 		if (0.5*(flNewVelocity + flCurVelocity) * flInterval > flGoalDistance)
 		{
-			flNewVelocity = 0.5 * (2 * flGoalDistance / flInterval - flCurVelocity);
+			flNewVelocity = 0.5f * (2 * flGoalDistance / flInterval - flCurVelocity);
 		}
 	}
 	else if (flNewVelocity > flIdealVelocity)

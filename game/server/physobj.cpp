@@ -891,7 +891,7 @@ float CPhysExplosion::GetRadius( void )
 	if ( radius <= 0 )
 	{
 		// Use the same radius as combat
-		radius = m_damage * 2.5;
+		radius = m_damage * 2.5f;
 	}
 
 	return radius;
@@ -1786,7 +1786,7 @@ void CPhysMagnet::DoMagnetSuck( CBaseEntity *pOther )
 		}
 	}
 
-	m_flNextSuckTime = gpGlobals->curtime + 2.0;
+	m_flNextSuckTime = gpGlobals->curtime + 2.0f;
 }
 
 //-----------------------------------------------------------------------------

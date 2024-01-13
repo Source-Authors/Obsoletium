@@ -222,7 +222,7 @@ void CColorCorrection::FadeInThink( void )
 	{	
 		float flWeightRatio		= m_flStartFadeInWeight / m_flMaxWeight;
 		flWeightRatio = clamp ( flWeightRatio, 0.0f, 0.99f );
-		flTimeToFade			= m_flFadeInDuration * (1.0 - flWeightRatio);
+		flTimeToFade			= m_flFadeInDuration * (1.0f - flWeightRatio);
 	}	
 	
 	Assert ( flTimeToFade > 0.0f );

@@ -55,7 +55,7 @@ float CNPC_FloorTurret::fMaxTipControllerAngularVelocity = 90.0f * 90.0f;
 // #define FLOOR_TURRET_BC_PITCH		"aim_pitch"
 #define	FLOOR_TURRET_RANGE			1200
 #define	FLOOR_TURRET_MAX_WAIT		5
-#define FLOOR_TURRET_SHORT_WAIT		2.0		// Used for FAST_RETIRE spawnflag
+constexpr inline float FLOOR_TURRET_SHORT_WAIT{2.0f};	// Used for FAST_RETIRE spawnflag
 #define	FLOOR_TURRET_PING_TIME		1.0f	//LPB!!
 
 #define	FLOOR_TURRET_VOICE_PITCH_LOW	45
@@ -542,7 +542,7 @@ void CNPC_FloorTurret::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t R
 	// If this is a friendly turret, remember that it was just dropped
 	if ( IRelationType( pPhysGunUser ) != D_HT )
 	{
-		m_flPlayerDropTime = gpGlobals->curtime + 2.0;
+		m_flPlayerDropTime = gpGlobals->curtime + 2.0f;
 	}
 
 	// Restore our mass to the original value
@@ -598,7 +598,7 @@ bool CNPC_FloorTurret::HandleInteraction(int interactionType, void *data, CBaseC
 		if ( !m_hLastNPCToKickMe )
 		{
 			m_hLastNPCToKickMe = sourceEnt;
-			m_flKnockOverFailedTime = gpGlobals->curtime + 3.0;
+			m_flKnockOverFailedTime = gpGlobals->curtime + 3.0f;
 		}
 
 		// Get knocked away
@@ -1069,7 +1069,7 @@ void CNPC_FloorTurret::SearchThink( void )
 		if ( gpGlobals->curtime > m_flNextActivateSoundTime )
 		{
 			EmitSound( "NPC_FloorTurret.Activate" );
-			m_flNextActivateSoundTime = gpGlobals->curtime + 3.0;
+			m_flNextActivateSoundTime = gpGlobals->curtime + 3.0f;
 		}
 		return;
 	}

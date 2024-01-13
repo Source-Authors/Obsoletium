@@ -364,9 +364,9 @@ int CAI_TacticalServices::FindCoverNode(const Vector &vNearPos, const Vector &vT
 		flMaxDist = 784;
 	}
 
-	if ( flMinDist > 0.5 * flMaxDist)
+	if ( flMinDist > 0.5f * flMaxDist)
 	{
-		flMinDist = 0.5 * flMaxDist;
+		flMinDist = 0.5f * flMaxDist;
 	}
 
 	// ------------------------------------------------------------------------------------

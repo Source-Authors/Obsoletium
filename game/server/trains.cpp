@@ -79,7 +79,7 @@ bool CBasePlatTrain::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "rotation"))
 	{
-		m_vecFinalAngle.x = atof(szValue);
+		m_vecFinalAngle.x = strtof(szValue, nullptr);
 	}
 	else
 	{
@@ -793,7 +793,7 @@ void CFuncTrain::Blocked( CBaseEntity *pOther )
 	if ( gpGlobals->curtime < m_flNextBlockTime )
 		return;
 
-	m_flNextBlockTime = gpGlobals->curtime + 0.5;
+	m_flNextBlockTime = gpGlobals->curtime + 0.5f;
 	
 	//Inflict damage
 	pOther->TakeDamage( CTakeDamageInfo( this, this, m_flBlockDamage, DMG_CRUSH ) );
@@ -1446,11 +1446,11 @@ void CFuncTrackTrain::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 	{
 		float delta = value;
 
-		delta = ((int)(m_flSpeed * 4) / (int)m_maxSpeed)*0.25 + 0.25 * delta;
+		delta = ((int)(m_flSpeed * 4) / (int)m_maxSpeed)*0.25f + 0.25f * delta;
 		if ( delta > 1 )
 			delta = 1;
-		else if ( delta < -0.25 )
-			delta = -0.25;
+		else if ( delta < -0.25f )
+			delta = -0.25f;
 		if ( m_spawnflags & SF_TRACKTRAIN_FORWARDONLY )
 		{
 			if ( delta < 0 )
@@ -1795,7 +1795,7 @@ void CFuncTrackTrain::SoundUpdate( void )
 		if ( m_flNextMPSoundTime > gpGlobals->curtime )
 			return;
 
-		m_flNextMPSoundTime = gpGlobals->curtime + 1.0;
+		m_flNextMPSoundTime = gpGlobals->curtime + 1.0f;
 	}
 
 	float flSpeedRatio = 0;

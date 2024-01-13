@@ -55,7 +55,7 @@ bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, c
 
 			case FIELD_TIME:
 			case FIELD_FLOAT:
-				(*(float *)((char *)pObject + fieldOffset)) = atof( szValue );
+				(*(float *)((char *)pObject + fieldOffset)) = strtof( szValue, nullptr );
 				return true;
 
 			case FIELD_BOOLEAN:

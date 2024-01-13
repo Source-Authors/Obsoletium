@@ -67,7 +67,7 @@ void	CTestTraceline::Spin( void )
 		float s = sin( gpGlobals->curtime );
 		QAngle angles = GetLocalAngles();
 
-		angles[0] = 180.0 * 0.5 * (s * s * s + 1.0f) + 90;
+		angles[0] = 180.0f * 0.5f * (s * s * s + 1.0f) + 90;
 		angles[1] = gpGlobals->curtime * 10;
 		   
 		SetLocalAngles( angles );

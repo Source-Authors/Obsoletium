@@ -2011,7 +2011,7 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 	// Do a shock effect
 	ShockTarget( pOther );
 
-	m_flShockTime = gpGlobals->curtime + 1.25;
+	m_flShockTime = gpGlobals->curtime + 1.25f;
 
 	// Calculate physics force
 	Vector out;

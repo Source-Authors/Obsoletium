@@ -96,7 +96,7 @@ bool CFunc_LOD::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "DisappearDist"))
 	{
-		m_fDisappearDist = (float)atof(szValue);
+		m_fDisappearDist = strtof( szValue, nullptr );
 	}
 	else if (FStrEq(szKeyName, "Solid"))
 	{
