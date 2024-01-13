@@ -432,14 +432,6 @@ void CrossProduct (const float* v1, const float* v2, float* cross)
 	cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
 }
 
-int Q_log2(int val)
-{
-	int answer=0;
-	while (val>>=1)
-		answer++;
-	return answer;
-}
-
 // Matrix is right-handed x=forward, y=left, z=up.  We a left-handed convention for vectors in the game code (forward, right, up)
 void MatrixVectors( const matrix3x4_t &matrix, Vector* pForward, Vector *pRight, Vector *pUp )
 {
@@ -3676,26 +3668,6 @@ int ClipPolyToPlane_Precise( double *inVerts, int vertCount, double *outVerts, c
 	}
 
 	return outCount;
-}
-
-int CeilPow2( int in )
-{
-	int retval;
-	
-	retval = 1;
-	while( retval < in )
-		retval <<= 1;
-	return retval;
-}
-
-int FloorPow2( int in )
-{
-	int retval;
-	
-	retval = 1;
-	while( retval < in )
-		retval <<= 1;
-	return retval >> 1;
 }
 
 

@@ -426,7 +426,13 @@ inline vec_t RoundInt (vec_t in)
 	return floorf(in + 0.5f);
 }
 
-int Q_log2(int val);
+constexpr inline int Q_log2(int val)
+{
+	int answer=0;
+	while (val>>=1)
+		answer++;
+	return answer;
+}
 
 // Math routines done in optimized assembly math package routines
 FORCEINLINE void SinCos( float radians, float *sine, float *cosine )
@@ -1816,8 +1822,21 @@ inline void MatrixITransformPlane( const matrix3x4_t &src, const cplane_t &inPla
 	outPlane.dist -= outPlane.normal.x * vecInvTranslation[0] + outPlane.normal.y * vecInvTranslation[1] + outPlane.normal.z * vecInvTranslation[2];
 }
 
-int CeilPow2( int in );
-int FloorPow2( int in );
+constexpr inline int CeilPow2( int in )
+{
+	int retval = 1;
+	while( retval < in )
+		retval <<= 1;
+	return retval;
+}
+
+constexpr inline int FloorPow2( int in )
+{
+	int retval = 1;
+	while( retval < in )
+		retval <<= 1;
+	return retval >> 1;
+}
 
 FORCEINLINE float * UnpackNormal_HEND3N( const unsigned int *pPackedNormal, float *pNormal )
 {
