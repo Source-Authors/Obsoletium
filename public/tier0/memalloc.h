@@ -166,9 +166,9 @@ inline void MemAlloc_Free( void *ptr, const char *pFileName, int nLine )
 
 //-----------------------------------------------------------------------------
 
-inline bool ValueIsPowerOfTwo( size_t value )			// don't clash with mathlib definition
+constexpr inline bool ValueIsPowerOfTwo( size_t value )			// don't clash with mathlib definition
 {
-	return (value & ( value - 1 )) == 0;
+	return IsPowerOfTwo( value );
 }
 
 inline void *MemAlloc_AllocAligned( size_t size, size_t align )

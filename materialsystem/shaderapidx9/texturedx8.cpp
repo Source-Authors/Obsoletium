@@ -538,7 +538,7 @@ void UnlockTexture( ShaderAPITextureHandle_t bindId, int copy, IDirect3DBaseText
 // Compute texture size based on compression
 //-----------------------------------------------------------------------------
 
-static inline int DetermineGreaterPowerOfTwo( int val )
+static constexpr inline int DetermineGreaterPowerOfTwo( int val )
 {
 	int num = 1;
 	while (val > num)
@@ -549,7 +549,7 @@ static inline int DetermineGreaterPowerOfTwo( int val )
 	return num;
 }
 
-inline int DeterminePowerOfTwo( int val )
+constexpr inline int DeterminePowerOfTwo( int val )
 {
 	int pow = 0;
 	while ((val & 0x1) == 0x0)

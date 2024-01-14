@@ -446,7 +446,7 @@ FORCEINLINE T Square( T a )
 // returns 0 if x == 0 or x > 0x80000000 (ie numbers that would be negative if x was signed)
 // NOTE: the old code took an int, and if you pass in an int of 0x80000000 casted to a uint,
 //       you'll get 0x80000000, which is correct for uints, instead of 0, which was correct for ints
-FORCEINLINE uint SmallestPowerOfTwoGreaterOrEqual( uint x )
+FORCEINLINE constexpr uint SmallestPowerOfTwoGreaterOrEqual( uint x )
 {
 	x -= 1;
 	x |= x >> 1;
@@ -458,7 +458,7 @@ FORCEINLINE uint SmallestPowerOfTwoGreaterOrEqual( uint x )
 }
 
 // return the largest power of two <= x. Will return 0 if passed 0
-FORCEINLINE uint LargestPowerOfTwoLessThanOrEqual( uint x )
+FORCEINLINE constexpr uint LargestPowerOfTwoLessThanOrEqual( uint x )
 {
 	if ( x >= 0x80000000 )
 		return 0x80000000;
