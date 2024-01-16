@@ -264,7 +264,7 @@ void DebugDrawPhysCollide( const CPhysCollide *pCollide, IMaterial *pMaterial, m
 		for ( int j = 0; j < vertCount; j++ )
 		{
 			Vector out;
-			VectorTransform( outVerts[j].Base(), transform, out.Base() );
+			VectorTransform( outVerts[j], transform, out );
 			meshBuilder.Position3fv( out.Base() );
 			meshBuilder.Color4ub( color.r, color.g, color.b, color.a );
 			meshBuilder.TexCoord2f( 0, 0, 0 );
@@ -292,7 +292,7 @@ void DebugDrawPhysCollide( const CPhysCollide *pCollide, IMaterial *pMaterial, m
 		meshBuilder.Color4ub( 255, 0, 0, 255 );
 		meshBuilder.TexCoord2f( 0, 0, 0 );
 		meshBuilder.AdvanceVertex();
-		VectorTransform( xaxis.Base(), transform, out.Base() );
+		VectorTransform( xaxis, transform, out );
 		meshBuilder.Position3fv( out.Base() );
 		meshBuilder.Color4ub( 255, 0, 0, 255 );
 		meshBuilder.TexCoord2f( 0, 0, 0 );
@@ -303,7 +303,7 @@ void DebugDrawPhysCollide( const CPhysCollide *pCollide, IMaterial *pMaterial, m
 		meshBuilder.Color4ub( 0, 255, 0, 255 );
 		meshBuilder.TexCoord2f( 0, 0, 0 );
 		meshBuilder.AdvanceVertex();
-		VectorTransform( yaxis.Base(), transform, out.Base() );
+		VectorTransform( yaxis, transform, out );
 		meshBuilder.Position3fv( out.Base() );
 		meshBuilder.Color4ub( 0, 255, 0, 255 );
 		meshBuilder.TexCoord2f( 0, 0, 0 );
@@ -314,7 +314,7 @@ void DebugDrawPhysCollide( const CPhysCollide *pCollide, IMaterial *pMaterial, m
 		meshBuilder.Color4ub( 0, 0, 255, 255 );
 		meshBuilder.TexCoord2f( 0, 0, 0 );
 		meshBuilder.AdvanceVertex();
-		VectorTransform( zaxis.Base(), transform, out.Base() );
+		VectorTransform( zaxis, transform, out );
 		meshBuilder.Position3fv( out.Base() );
 		meshBuilder.Color4ub( 0, 0, 255, 255 );
 		meshBuilder.TexCoord2f( 0, 0, 0 );

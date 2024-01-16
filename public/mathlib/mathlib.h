@@ -416,9 +416,16 @@ FORCEINLINE void VectorMAInline( const float* start, float scale, const float* d
 
 FORCEINLINE void VectorMAInline( const Vector& start, float scale, const Vector& direction, Vector& dest )
 {
-	dest.x=start.x+direction.x*scale;
-	dest.y=start.y+direction.y*scale;
-	dest.z=start.z+direction.z*scale;
+	DirectX::XMStoreFloat3
+	(
+		dest.XmBase(),
+		DirectX::XMVectorMultiplyAdd
+		(
+			DirectX::XMLoadFloat3( direction.XmBase() ),
+			DirectX::XMVectorReplicate( scale ),
+			DirectX::XMLoadFloat3( start.XmBase() )
+		)
+	);
 }
 
 FORCEINLINE void VectorMA( const Vector& start, float scale, const Vector& direction, Vector& dest )
@@ -875,15 +882,9 @@ inline int VectorCompare (const Vector& v1, const Vector& v2)
 	return v1 == v2;
 }
 
-inline void VectorTransform (const Vector& in1, const matrix3x4_t &in2, Vector &out)
-{
-	VectorTransform( &in1.x, in2, &out.x );
-}
+void VectorTransform (const Vector& in1, const matrix3x4_t &in2, Vector &out);
 
-inline void VectorITransform (const Vector& in1, const matrix3x4_t &in2, Vector &out)
-{
-	VectorITransform( &in1.x, in2, &out.x );
-}
+void VectorITransform (const Vector& in1, const matrix3x4_t &in2, Vector &out);
 
 /*
 inline void DecomposeRotation( const matrix3x4_t &mat, Vector &out )
@@ -1710,7 +1711,7 @@ float RangeCompressor( float flValue, float flMin, float flMax, float flBase );
 // using voronoi regions.
 // 0 is returned if the origin is inside the box.
 float CalcSqrDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point );
-void CalcClosestPointOnAABB( const Vector &mins, const Vector &maxs, const Vector &point, Vector &closestOut );
+void XM_CALLCONV CalcClosestPointOnAABB( Vector mins, Vector maxs, Vector point, Vector &closestOut );
 void CalcSqrDistAndClosestPointOnAABB( const Vector &mins, const Vector &maxs, const Vector &point, Vector &closestOut, float &distSqrOut );
 
 inline float CalcDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point )
@@ -1798,7 +1799,7 @@ void RotateAABB( const matrix3x4_t &in1, const Vector &vecMinsIn, const Vector &
 //-----------------------------------------------------------------------------
 // Uses the inverse transform of in1
 //-----------------------------------------------------------------------------
-void IRotateAABB( const matrix3x4_t &in1, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut );
+void XM_CALLCONV IRotateAABB( const matrix3x4_t &in1, Vector vecMinsIn, Vector vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut );
 
 //-----------------------------------------------------------------------------
 // Transform a plane

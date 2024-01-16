@@ -360,7 +360,7 @@ void CMDLPanel::DrawCollisionModel()
 				for ( int j = 0; j < vertCount; j++ )
 				{
 					Vector out;
-					VectorTransform( outVerts[j].Base(), xform, out.Base() );
+					VectorTransform( outVerts[j], xform, out );
 					meshBuilder.Position3fv( out.Base() );
 					meshBuilder.Color4ub( color.r, color.g, color.b, color.a );
 					meshBuilder.TexCoord2f( 0, 0, 0 );

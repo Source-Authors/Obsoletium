@@ -51,8 +51,8 @@ const int nanmask = 255<<23;
 //		     ( v1[1] == v2[1] ) &&
 //			 ( v1[2] == v2[2] ) );
 //}
-	
-	
+
+
 //-----------------------------------------------------------------------------
 // Purpose: Generates Euler angles given a left-handed orientation matrix. The
 //			columns of the matrix contain the forward, left, and up vectors.
@@ -184,6 +184,29 @@ void VectorTransform (const float *in1, const matrix3x4_t& in2, float *out)
 	out[2] = DotProduct(in1, in2[2]) + in2[2][3];
 }
 
+static DirectX::XMVECTOR XM_CALLCONV VectorTransform( DirectX::FXMVECTOR vin1, const matrix3x4_t &in2 )
+{
+	DirectX::XMVECTOR vin2 = DirectX::XMVectorSet( in2[0][3], in2[1][3], in2[2][3], 0.0f );
+	DirectX::XMVECTOR vdot = DirectX::XMVectorSet
+	(
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 1 ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 2 ) ) ),
+		0.0f
+	);
+
+	return DirectX::XMVectorAdd( vdot, vin2 );
+}
+
+// transform in1 by the matrix in2
+void VectorTransform (const Vector& in1, const matrix3x4_t &in2, Vector &out)
+{
+	Assert( &in1 != &out );
+
+	DirectX::XMVECTOR vin1 = DirectX::XMLoadFloat3( in1.XmBase() );
+	DirectX::XMStoreFloat3( out.XmBase(), VectorTransform( vin1, in2 ) );
+}
+
 
 // assuming the matrix is orthonormal, transform in1 by the transpose (also the inverse in this case) of in2.
 void VectorITransform (const float *in1, const matrix3x4_t& in2, float *out)
@@ -199,11 +222,53 @@ void VectorITransform (const float *in1, const matrix3x4_t& in2, float *out)
 	out[2] = in1t[0] * in2[0][2] + in1t[1] * in2[1][2] + in1t[2] * in2[2][2];
 }
 
+static DirectX::XMVECTOR XM_CALLCONV VectorITransform( DirectX::FXMVECTOR vin1, const matrix3x4_t &in2 )
+{
+	DirectX::XMVECTOR vin1t = DirectX::XMVectorSubtract
+	(
+		vin1,
+		DirectX::XMVectorSet( in2[0][3], in2[1][3], in2[2][3], 0.0f )
+	);
+
+	return DirectX::XMVectorSet
+	(
+		DirectX::XMVectorGetX
+		(
+			DirectX::XMVectorSum
+			(
+				DirectX::XMVectorMultiply( vin1t, DirectX::XMVectorSet( in2[0][0], in2[1][0], in2[2][0], 0.0f ) )
+			)
+		),
+		DirectX::XMVectorGetX
+		(
+			DirectX::XMVectorSum
+			(
+				DirectX::XMVectorMultiply( vin1t, DirectX::XMVectorSet( in2[0][1], in2[1][1], in2[2][1], 0.0f ) )
+			)
+		),
+		DirectX::XMVectorGetX
+		(
+			DirectX::XMVectorSum
+			(
+				DirectX::XMVectorMultiply( vin1t, DirectX::XMVectorSet( in2[0][2], in2[1][2], in2[2][2], 0.0f ) )
+			)
+		),
+		0.0f
+	);
+}
+
+void VectorITransform (const Vector& in1, const matrix3x4_t &in2, Vector &out)
+{
+	DirectX::XMVECTOR vin1  = DirectX::XMLoadFloat3( in1.XmBase() );
+	DirectX::XMStoreFloat3( out.XmBase(), VectorITransform( vin1, in2 ) );
+}
+
 
 // assume in2 is a rotation and rotate the input vector
 void VectorRotate( const float *in1, const matrix3x4_t& in2, float *out )
 {
 	Assert( in1 != out );
+
 	out[0] = DotProduct( in1, in2[0] );
 	out[1] = DotProduct( in1, in2[1] );
 	out[2] = DotProduct( in1, in2[2] );
@@ -250,6 +315,7 @@ void VectorRotate( const Vector &in1, const Quaternion &in2, Vector &out )
 void VectorIRotate( const float *in1, const matrix3x4_t& in2, float *out )
 {
 	Assert( in1 != out );
+
 	out[0] = in1[0]*in2[0][0] + in1[1]*in2[1][0] + in1[2]*in2[2][0];
 	out[1] = in1[0]*in2[0][1] + in1[1]*in2[1][1] + in1[2]*in2[2][1];
 	out[2] = in1[0]*in2[0][2] + in1[1]*in2[1][2] + in1[2]*in2[2][2];
@@ -306,12 +372,19 @@ void MatrixCopy( const matrix3x4_t& in, matrix3x4_t& out )
 //-----------------------------------------------------------------------------
 bool MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float flTolerance )
 {
+	DirectX::XMVECTOR vtol = DirectX::XMVectorReplicate( flTolerance );
+
 	for ( int i = 0; i < 3; ++i )
 	{
-		for ( int j = 0; j < 4; ++j )
+		if ( !DirectX::XMVector3NearEqual
+			(
+				DirectX::XMLoadFloat4( src1.XmBase() + i ),
+				DirectX::XMLoadFloat4( src2.XmBase() + i ),
+				vtol
+			)
+		   )
 		{
-			if ( fabs( src1[i][j] - src2[i][j] ) > flTolerance )
-				return false;
+			return false;
 		}
 	}
 	return true;
@@ -1238,17 +1311,16 @@ void MatrixBuildRotationAboutAxis( const Vector &vAxisOfRot, float angleDegrees,
 //-----------------------------------------------------------------------------
 void MatrixTranspose( matrix3x4_t& mat )
 {
-	vec_t tmp;
-	tmp = mat[0][1]; mat[0][1] = mat[1][0]; mat[1][0] = tmp;
-	tmp = mat[0][2]; mat[0][2] = mat[2][0]; mat[2][0] = tmp;
-	tmp = mat[1][2]; mat[1][2] = mat[2][1]; mat[2][1] = tmp;
+	std::swap( mat[0][1], mat[1][0] );
+	std::swap( mat[0][2], mat[2][0] );
+	std::swap( mat[1][2], mat[2][1] );
 }
 
 void MatrixTranspose( const matrix3x4_t& src, matrix3x4_t& dst )
 {
-	dst[0][0] = src[0][0]; dst[0][1] = src[1][0]; dst[0][2] = src[2][0]; dst[0][3] = 0.0f;
-	dst[1][0] = src[0][1]; dst[1][1] = src[1][1]; dst[1][2] = src[2][1]; dst[1][3] = 0.0f;
-	dst[2][0] = src[0][2]; dst[2][1] = src[1][2]; dst[2][2] = src[2][2]; dst[2][3] = 0.0f;
+	DirectX::XMMATRIX msrc = DirectX::XMLoadFloat3x4( src.XmMBase() );
+
+	DirectX::XMStoreFloat3x4( dst.XmMBase(), DirectX::XMMatrixTranspose( msrc ) );
 }
 
 
@@ -2974,31 +3046,64 @@ void RotateAABB( const matrix3x4_t &transform, const Vector &vecMinsIn, const Ve
 //-----------------------------------------------------------------------------
 // Uses the inverse transform of in1
 //-----------------------------------------------------------------------------
-void IRotateAABB( const matrix3x4_t &transform, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut )
+void XM_CALLCONV IRotateAABB( const matrix3x4_t &transform, Vector vecMinsIn, Vector vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut )
 {
-	Vector oldCenter;
-	VectorAdd( vecMinsIn, vecMaxsIn, oldCenter );
-	oldCenter *= 0.5f;
+	DirectX::XMVECTOR vminsIn = DirectX::XMLoadFloat3( vecMinsIn.XmBase() );
+	DirectX::XMVECTOR vmaxsIn = DirectX::XMLoadFloat3( vecMaxsIn.XmBase() );
 
-	Vector oldExtents;
-	VectorSubtract( vecMaxsIn, oldCenter, oldExtents );
+	DirectX::XMVECTOR oldCenter  = DirectX::XMVectorScale( DirectX::XMVectorAdd( vminsIn, vmaxsIn ), 0.5F );
+	DirectX::XMVECTOR oldExtents = DirectX::XMVectorSubtract( vmaxsIn, oldCenter );
 
-	Vector newCenter;
-	VectorIRotate( oldCenter, transform, newCenter );
+	DirectX::XMVECTOR newCenter  = VectorIRotate( oldCenter, transform );
+	DirectX::XMVECTOR newExtents = DirectX::XMVectorSet
+	(
+		DirectX::XMVectorGetX
+		(
+			DirectX::XMVectorSum
+			(
+				DirectX::XMVectorAbs
+				(
+					DirectX::XMVectorMultiply
+					(
+						oldExtents,
+						DirectX::XMVectorSet( transform[0][0], transform[1][0], transform[2][0], 0.0F )
+					)
+				)
+			)
+		),
+		DirectX::XMVectorGetX
+		(
+			DirectX::XMVectorSum
+			(
+				DirectX::XMVectorAbs
+				(
+					DirectX::XMVectorMultiply
+					(
+						oldExtents,
+						DirectX::XMVectorSet( transform[0][1], transform[1][1], transform[2][1], 0.0F )
+					)
+				)
+			)
+		),
+		DirectX::XMVectorGetX
+		(
+			DirectX::XMVectorSum
+			(
+				DirectX::XMVectorAbs
+				(
+					DirectX::XMVectorMultiply
+					(
+						oldExtents,
+						DirectX::XMVectorSet( transform[0][2], transform[1][2], transform[2][2], 0.0F )
+					)
+				)
+			)
+		),
+		0.0F
+	);
 
-	Vector newExtents;
-	newExtents.x =	FloatMakePositive( oldExtents.x * transform[0][0] ) + 
-					FloatMakePositive( oldExtents.y * transform[1][0] ) + 
-					FloatMakePositive( oldExtents.z * transform[2][0] );
-	newExtents.y =	FloatMakePositive( oldExtents.x * transform[0][1] ) + 
-					FloatMakePositive( oldExtents.y * transform[1][1] ) + 
-					FloatMakePositive( oldExtents.z * transform[2][1] );
-	newExtents.z =	FloatMakePositive( oldExtents.x * transform[0][2] ) + 
-					FloatMakePositive( oldExtents.y * transform[1][2] ) + 
-					FloatMakePositive( oldExtents.z * transform[2][2] );
-
-	VectorSubtract( newCenter, newExtents, vecMinsOut );
-	VectorAdd( newCenter, newExtents, vecMaxsOut );
+	DirectX::XMStoreFloat3( vecMinsOut.XmBase(), DirectX::XMVectorSubtract( newCenter, newExtents ) );
+	DirectX::XMStoreFloat3( vecMaxsOut.XmBase(), DirectX::XMVectorAdd( newCenter, newExtents ) );
 }
 
 
@@ -3044,11 +3149,18 @@ float CalcSqrDistanceToAABB( const Vector &mins, const Vector &maxs, const Vecto
 }
 
 
-void CalcClosestPointOnAABB( const Vector &mins, const Vector &maxs, const Vector &point, Vector &closestOut )
+void XM_CALLCONV CalcClosestPointOnAABB( Vector mins, Vector maxs, Vector point, Vector &closestOut )
 {
-	closestOut.x = clamp( point.x, mins.x, maxs.x );
-	closestOut.y = clamp( point.y, mins.y, maxs.y );
-	closestOut.z = clamp( point.z, mins.z, maxs.z );
+	DirectX::XMStoreFloat3
+	(
+		closestOut.XmBase(),
+		DirectX::XMVectorClamp
+		(
+			DirectX::XMLoadFloat3( point.XmBase() ),
+			DirectX::XMLoadFloat3( mins.XmBase() ),
+			DirectX::XMLoadFloat3( maxs.XmBase() )
+		)
+	);
 }
 
 void CalcSqrDistAndClosestPointOnAABB( const Vector &mins, const Vector &maxs, const Vector &point, Vector &closestOut, float &distSqrOut )
@@ -3299,8 +3411,8 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 	// Grab the processor information:
 	const CPUInformation& pi = *GetCPUInformation();
 
-		// Select the MMX specific routines if available
-		// (MMX routines were used by SW span fillers - not currently used for HW)
+	// Select the MMX specific routines if available
+	// (MMX routines were used by SW span fillers - not currently used for HW)
 	s_bMMXEnabled = bAllowMMX && pi.m_bMMX;
 	// SSE Generally performs better than 3DNow when present, so this is placed 
 	// first to allow SSE to override these settings.
