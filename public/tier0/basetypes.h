@@ -5,6 +5,7 @@
 
 #include "commonmacros.h"
 #include "wchartypes.h"
+#include <limits>  // std::numeric_limits
 
 #include "tier0/valve_off.h"
 
@@ -227,7 +228,7 @@ inline unsigned long FloatAbsBits( vec_t f )
 #endif
 extern "C" _Check_return_ float fabsf(_In_ float);
 #else
-#include <math.h>
+#include <cmath>
 #endif
 
 inline float FloatMakeNegative( vec_t f )
@@ -249,7 +250,7 @@ inline float FloatNegate( vec_t f )
 #define FLOAT32_NAN_BITS     (unsigned long)0x7FC00000	// not a number!
 #define FLOAT32_NAN          BitsToFloat( FLOAT32_NAN_BITS )
 
-#define VEC_T_NAN FLOAT32_NAN
+constexpr inline vec_t VEC_T_NAN{std::numeric_limits<vec_t>::quiet_NaN()};
 
 
 
