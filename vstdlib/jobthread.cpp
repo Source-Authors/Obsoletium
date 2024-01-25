@@ -700,7 +700,7 @@ void CThreadPool::AddJob( CJob *pJob )
 		return;
 	}
 
-	int flags = pJob->GetFlags();
+	unsigned char flags = pJob->GetFlags();
 
 	if ( !m_bExecOnThreadPoolThreadsOnly && ( ( flags & ( JF_IO | JF_QUEUE ) ) == 0 ) /* @TBD && !m_queue.Count() */ )
 	{

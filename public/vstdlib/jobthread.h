@@ -460,8 +460,8 @@ public:
 
 	//-----------------------------------------------------
 
-	void SetFlags( unsigned flags )					{ m_flags = flags; }
-	unsigned GetFlags() const						{ return m_flags; }
+	void SetFlags( unsigned char flags )					{ m_flags = flags; }
+	unsigned char GetFlags() const						{ return m_flags; }
 
 	//-----------------------------------------------------
 
