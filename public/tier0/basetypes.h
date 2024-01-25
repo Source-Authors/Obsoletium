@@ -195,18 +195,21 @@ typedef float vec_t;
 // This assumes the ANSI/IEEE 754-1985 standard
 //-----------------------------------------------------------------------------
 
-inline unsigned long& FloatBits( vec_t& f )
+inline unsigned& FloatBits( vec_t& f )
 {
-	return *reinterpret_cast<unsigned long*>(&f);
+	static_assert(sizeof(f) == sizeof(unsigned));
+	return *reinterpret_cast<unsigned*>(&f);
 }
 
-inline unsigned long const& FloatBits( vec_t const& f )
+inline unsigned const& FloatBits( vec_t const& f )
 {
-	return *reinterpret_cast<unsigned long const*>(&f);
+	static_assert(sizeof(f) == sizeof(unsigned));
+	return *reinterpret_cast<unsigned const*>(&f);
 }
 
-inline vec_t BitsToFloat( unsigned long i )
+inline vec_t BitsToFloat( unsigned i )
 {
+	static_assert(sizeof(vec_t) == sizeof(i));
 	return *reinterpret_cast<vec_t*>(&i);
 }
 
@@ -215,9 +218,9 @@ inline bool IsFinite( vec_t f )
 	return ((FloatBits(f) & 0x7F800000) != 0x7F800000);
 }
 
-inline unsigned long FloatAbsBits( vec_t f )
+inline unsigned FloatAbsBits( vec_t f )
 {
-	return FloatBits(f) & 0x7FFFFFFF; //-V112
+	return FloatBits(f) & 0x7FFFFFFFu; //-V112
 }
 
 // Given today's processors, I cannot think of any circumstance
@@ -247,8 +250,8 @@ inline float FloatNegate( vec_t f )
 }
 
 
-#define FLOAT32_NAN_BITS     (unsigned long)0x7FC00000	// not a number!
-#define FLOAT32_NAN          BitsToFloat( FLOAT32_NAN_BITS )
+constexpr inline unsigned FLOAT32_NAN_BITS{0x7FC00000u};  // not a number!
+constexpr inline float FLOAT32_NAN{std::numeric_limits<float>::quiet_NaN()};
 
 constexpr inline vec_t VEC_T_NAN{std::numeric_limits<vec_t>::quiet_NaN()};
 
