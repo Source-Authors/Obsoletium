@@ -1173,7 +1173,7 @@ public:
 		if ( bDoWork )
 		{
 			byte pMemory[1024];
-			for ( auto &b : pMemory ) b = rand();
+			for ( auto &b : pMemory ) b = static_cast<byte>(rand() % UCHAR_MAX);
 
 			double acc{0.0};
 			for ( size_t i = 0; i < 50; i++ )
@@ -1278,7 +1278,7 @@ public:
 	virtual JobStatus_t DoExecute()
 	{
 		byte pMemory[1024];
-		for ( auto &b : pMemory ) b = rand();
+		for ( auto &b : pMemory ) b = static_cast<byte>(rand() % UCHAR_MAX);
 
 		double acc{0.0};
 		for ( int i = 0; i < 50; i++ )
