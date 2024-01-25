@@ -213,9 +213,25 @@ inline vec_t BitsToFloat( unsigned i )
 	return *reinterpret_cast<vec_t*>(&i);
 }
 
+inline bool IsNaN( vec_t f )
+{
+	static_assert(sizeof(f) == 4u);
+
+	// NaN check.
+	// std::isnan is slower on MSVC due to call to fpclassify.
+
+	// & 0x7FFFFFFF to ignore sign bit.  The sign bit does not matter for NaN.
+	// 0x7F800000 is the mask for NaN bits of the exponential field.
+
+	// > 0x7F800000 because for NaN:
+	// "The state/value of the remaining bits [...] are not defined by the standard
+	// except that they must not be all zero."
+	return (FloatBits(f) & 0x7FFFFFFFu) > 0x7F800000u;
+}
+
 inline bool IsFinite( vec_t f )
 {
-	return ((FloatBits(f) & 0x7F800000) != 0x7F800000);
+	return !IsNaN(f);
 }
 
 inline unsigned FloatAbsBits( vec_t f )
