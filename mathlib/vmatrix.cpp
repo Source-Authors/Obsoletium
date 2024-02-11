@@ -395,7 +395,7 @@ void MatrixInverseTranspose( const VMatrix& src, VMatrix& dst )
 //-----------------------------------------------------------------------------
 // Computes the inverse transpose
 //-----------------------------------------------------------------------------
-void MatrixInverseTranspose( const matrix3x4_t& src, matrix3x4_t& dst )
+void XM_CALLCONV MatrixInverseTranspose( const matrix3x4_t& src, matrix3x4_t& dst )
 {
 	VMatrix tmp, out;
 	tmp.CopyFrom3x4( src );

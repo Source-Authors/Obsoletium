@@ -90,7 +90,7 @@ private:
 
 
 
-FORCEINLINE float clamp( float val, float minVal, float maxVal )
+FORCEINLINE float XM_CALLCONV clamp( float val, float minVal, float maxVal )
 {
 	DirectX::XMVECTOR vres = DirectX::XMVectorClamp
 	(
@@ -194,17 +194,17 @@ private:
 };
 
 // Computes Y fov from an X fov and a screen aspect ratio + X from Y
-float CalcFovY( float flFovX, float flScreenAspect );
-float CalcFovX( float flFovY, float flScreenAspect );
+float XM_CALLCONV CalcFovY( float flFovX, float flScreenAspect );
+float XM_CALLCONV CalcFovX( float flFovY, float flScreenAspect );
 
 // Generate a frustum based on perspective view parameters
 // NOTE: FOV is specified in degrees, as the *full* view angle (not half-angle)
-void GeneratePerspectiveFrustum( const Vector& origin, const QAngle &angles, float flZNear, float flZFar, float flFovX, float flAspectRatio, Frustum_t &frustum );
-void GeneratePerspectiveFrustum( const Vector& origin, const Vector &forward, const Vector &right, const Vector &up, float flZNear, float flZFar, float flFovX, float flFovY, Frustum_t &frustum );
+void XM_CALLCONV GeneratePerspectiveFrustum( const Vector& origin, const QAngle &angles, float flZNear, float flZFar, float flFovX, float flAspectRatio, Frustum_t &frustum );
+void XM_CALLCONV GeneratePerspectiveFrustum( const Vector& origin, const Vector &forward, const Vector &right, const Vector &up, float flZNear, float flZFar, float flFovX, float flFovY, Frustum_t &frustum );
 
 // Cull the world-space bounding box to the specified frustum.
-bool R_CullBox( const Vector& mins, const Vector& maxs, const Frustum_t &frustum );
-bool R_CullBoxSkipNear( const Vector& mins, const Vector& maxs, const Frustum_t &frustum );
+bool XM_CALLCONV R_CullBox( const Vector& mins, const Vector& maxs, const Frustum_t &frustum );
+bool XM_CALLCONV R_CullBoxSkipNear( const Vector& mins, const Vector& maxs, const Frustum_t &frustum );
 
 struct matrix3x4_t
 {
@@ -223,7 +223,7 @@ struct matrix3x4_t
 	// Creates a matrix where the X axis = forward
 	// the Y axis = left, and the Z axis = up
 	//-----------------------------------------------------------------------------
-	void Init( const Vector& xAxis, const Vector& yAxis, const Vector& zAxis, const Vector &vecOrigin )
+	void XM_CALLCONV Init( const Vector& xAxis, const Vector& yAxis, const Vector& zAxis, const Vector &vecOrigin )
 	{
 		m_flMatVal[0][0] = xAxis.x; m_flMatVal[0][1] = yAxis.x; m_flMatVal[0][2] = zAxis.x; m_flMatVal[0][3] = vecOrigin.x;
 		m_flMatVal[1][0] = xAxis.y; m_flMatVal[1][1] = yAxis.y; m_flMatVal[1][2] = zAxis.y; m_flMatVal[1][3] = vecOrigin.y;
@@ -239,7 +239,7 @@ struct matrix3x4_t
 		Init( xAxis, yAxis, zAxis, vecOrigin );
 	}
 
-	inline void Invalidate( void )
+	inline void Invalidate()
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -250,32 +250,32 @@ struct matrix3x4_t
 		}
 	}
 
-	float *operator[]( int i )				{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; }
-	const float *operator[]( int i ) const	{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; }
-	float *Base()							{ return &m_flMatVal[0][0]; }
-	const float *Base() const				{ return &m_flMatVal[0][0]; }
+	float * XM_CALLCONV operator[]( int i )				{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; }
+	const float * XM_CALLCONV operator[]( int i ) const	{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; }
+	float * XM_CALLCONV Base()							{ return &m_flMatVal[0][0]; }
+	const float * XM_CALLCONV Base() const				{ return &m_flMatVal[0][0]; }
 
 	// dimhotepus: Better DirectX math integration.
-	DirectX::XMFLOAT4* XmBase()
+	DirectX::XMFLOAT4* XM_CALLCONV XmBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(m_flMatVal[0]));
 		static_assert(alignof(DirectX::XMFLOAT4) == alignof(decltype(m_flMatVal[0])));
 		return reinterpret_cast<DirectX::XMFLOAT4*>(&m_flMatVal[0][0]);
 	}
-	DirectX::XMFLOAT4 const* XmBase() const
+	DirectX::XMFLOAT4 const* XM_CALLCONV XmBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(m_flMatVal[0]));
 		static_assert(alignof(DirectX::XMFLOAT4) == alignof(decltype(m_flMatVal[0])));
 		return reinterpret_cast<DirectX::XMFLOAT4 const*>(&m_flMatVal[0][0]);
 	}
 
-	DirectX::XMFLOAT3X4* XmMBase()
+	DirectX::XMFLOAT3X4* XM_CALLCONV XmMBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3X4) == sizeof(m_flMatVal));
 		static_assert(alignof(DirectX::XMFLOAT3X4) == alignof(decltype(m_flMatVal)));
 		return reinterpret_cast<DirectX::XMFLOAT3X4*>(&m_flMatVal[0][0]);
 	}
-	DirectX::XMFLOAT3X4 const* XmMBase() const
+	DirectX::XMFLOAT3X4 const* XM_CALLCONV XmMBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3X4) == sizeof(m_flMatVal));
 		static_assert(alignof(DirectX::XMFLOAT3X4) == alignof(decltype(m_flMatVal)));
@@ -297,13 +297,13 @@ struct matrix3x4_t
 
 // NJS: Inlined to prevent floats from being autopromoted to doubles, as with the old system.
 #ifndef RAD2DEG
-constexpr inline float RAD2DEG(float x) { return x * (180.f / M_PI_F); }
-constexpr inline double RAD2DEG(double x) { return x * (180.0 / M_PI); }
+constexpr inline float XM_CALLCONV RAD2DEG(float x) { return x * (180.f / M_PI_F); }
+constexpr inline double XM_CALLCONV RAD2DEG(double x) { return x * (180.0 / M_PI); }
 #endif
 
 #ifndef DEG2RAD
-constexpr inline float DEG2RAD(float x) { return x * (M_PI_F / 180.f); }
-constexpr inline double DEG2RAD(double x) { return x * (M_PI / 180.0); }
+constexpr inline float XM_CALLCONV DEG2RAD(float x) { return x * (M_PI_F / 180.f); }
+constexpr inline double XM_CALLCONV DEG2RAD(double x) { return x * (M_PI / 180.0); }
 #endif
 
 // Used to represent sides of things like planes.
@@ -329,23 +329,23 @@ inline bool IS_NAN(T x)
 	return std::isnan(x);
 }
 
-FORCEINLINE vec_t DotProduct(const vec_t *v1, const vec_t *v2)
+FORCEINLINE vec_t XM_CALLCONV DotProduct(const vec_t *v1, const vec_t *v2)
 {
 	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
 }
-FORCEINLINE void VectorSubtract(const vec_t *a, const vec_t *b, vec_t *c)
+FORCEINLINE void XM_CALLCONV VectorSubtract(const vec_t *a, const vec_t *b, vec_t *c)
 {
 	c[0]=a[0]-b[0];
 	c[1]=a[1]-b[1];
 	c[2]=a[2]-b[2];
 }
-FORCEINLINE void VectorAdd(const vec_t *a, const vec_t *b, vec_t *c)
+FORCEINLINE void XM_CALLCONV VectorAdd(const vec_t *a, const vec_t *b, vec_t *c)
 {
 	c[0]=a[0]+b[0];
 	c[1]=a[1]+b[1];
 	c[2]=a[2]+b[2];
 }
-FORCEINLINE void VectorCopy(const vec_t *a, vec_t *b)
+FORCEINLINE void XM_CALLCONV VectorCopy(const vec_t *a, vec_t *b)
 {
 	b[0]=a[0];
 	b[1]=a[1];
@@ -364,12 +364,12 @@ FORCEINLINE float VectorMaximum(const vec_t *v) = delete;
 //	return max( v[0], max( v[1], v[2] ) );
 //}
 
-FORCEINLINE float VectorMaximum(const Vector& v)
+FORCEINLINE float XM_CALLCONV VectorMaximum(const Vector& v)
 {
 	return max( v.x, max( v.y, v.z ) );
 }
 
-FORCEINLINE void VectorScale (const float* in, vec_t scale, float* out)
+FORCEINLINE void XM_CALLCONV VectorScale (const float* in, vec_t scale, float* out)
 {
 	out[0] = in[0]*scale;
 	out[1] = in[1]*scale;
@@ -414,7 +414,7 @@ FORCEINLINE void VectorMAInline( const float* start, float scale, const float* d
 //	dest[2]=start[2]+direction[2]*scale;
 //}
 
-FORCEINLINE void VectorMAInline( const Vector& start, float scale, const Vector& direction, Vector& dest )
+FORCEINLINE void XM_CALLCONV VectorMAInline( const Vector& start, float scale, const Vector& direction, Vector& dest )
 {
 	DirectX::XMStoreFloat3
 	(
@@ -428,7 +428,7 @@ FORCEINLINE void VectorMAInline( const Vector& start, float scale, const Vector&
 	);
 }
 
-FORCEINLINE void VectorMA( const Vector& start, float scale, const Vector& direction, Vector& dest )
+FORCEINLINE void XM_CALLCONV VectorMA( const Vector& start, float scale, const Vector& direction, Vector& dest )
 {
 	VectorMAInline(start, scale, direction, dest);
 }
@@ -442,7 +442,7 @@ FORCEINLINE void VectorMA( const float * start, float scale, const float *direct
 // dimhotepus: Too unsafe. Use overloads.
 int VectorCompare (const float *v1, const float *v2) = delete;
 
-inline float VectorLength(const float *v)
+inline float XM_CALLCONV VectorLength(const float *v)
 {
 	return FastSqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] + FLT_EPSILON );
 }
@@ -453,12 +453,12 @@ void CrossProduct (const float *v1, const float *v2, float *cross) = delete;
 // dimhotepus: Too unsafe. Use safer alternatives.
 qboolean VectorsEqual( const float *v1, const float *v2 ) = delete;
 
-inline vec_t RoundInt (vec_t in)
+inline vec_t XM_CALLCONV RoundInt(vec_t in)
 {
 	return floorf(in + 0.5f);
 }
 
-constexpr inline int Q_log2(int val)
+constexpr inline int XM_CALLCONV Q_log2(int val)
 {
 	int answer=0;
 	while (val>>=1)
@@ -467,7 +467,7 @@ constexpr inline int Q_log2(int val)
 }
 
 // Math routines done in optimized assembly math package routines
-FORCEINLINE void SinCos( float radians, float *sine, float *cosine )
+FORCEINLINE void XM_CALLCONV SinCos( float radians, float *sine, float *cosine )
 {
 	DirectX::XMScalarSinCos( sine, cosine, radians );
 }
@@ -484,7 +484,7 @@ FORCEINLINE T Square( T a )
 // returns 0 if x == 0 or x > 0x80000000 (ie numbers that would be negative if x was signed)
 // NOTE: the old code took an int, and if you pass in an int of 0x80000000 casted to a uint,
 //       you'll get 0x80000000, which is correct for uints, instead of 0, which was correct for ints
-FORCEINLINE constexpr uint SmallestPowerOfTwoGreaterOrEqual( uint x )
+FORCEINLINE constexpr uint XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( uint x )
 {
 	x -= 1;
 	x |= x >> 1;
@@ -496,7 +496,7 @@ FORCEINLINE constexpr uint SmallestPowerOfTwoGreaterOrEqual( uint x )
 }
 
 // return the largest power of two <= x. Will return 0 if passed 0
-FORCEINLINE constexpr uint LargestPowerOfTwoLessThanOrEqual( uint x )
+FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( uint x )
 {
 	if ( x >= 0x80000000 )
 		return 0x80000000;
@@ -506,11 +506,11 @@ FORCEINLINE constexpr uint LargestPowerOfTwoLessThanOrEqual( uint x )
 
 
 // Math routines for optimizing division
-void FloorDivMod (double numer, double denom, int *quotient, int *rem);
-int GreatestCommonDivisor (int i1, int i2);
+void XM_CALLCONV FloorDivMod (double numer, double denom, int *quotient, int *rem);
+int XM_CALLCONV GreatestCommonDivisor (int i1, int i2);
 
 // Test for FPU denormal mode
-bool IsDenormal( const float &val );
+bool XM_CALLCONV IsDenormal( float val );
 
 // MOVEMENT INFO
 enum
@@ -520,90 +520,90 @@ enum
 	ROLL		// fall over
 };
 
-void MatrixAngles( const matrix3x4_t & matrix, float *angles ); // !!!!
-void MatrixVectors( const matrix3x4_t &matrix, Vector* pForward, Vector *pRight, Vector *pUp );
-void VectorTransform (const float *in1, const matrix3x4_t & in2, float *out);
-void VectorITransform (const float *in1, const matrix3x4_t & in2, float *out);
-void VectorRotate( const float *in1, const matrix3x4_t & in2, float *out);
-void VectorRotate( const Vector &in1, const QAngle &in2, Vector &out );
-void VectorRotate( const Vector &in1, const Quaternion &in2, Vector &out );
-void VectorIRotate( const float *in1, const matrix3x4_t & in2, float *out);
+void XM_CALLCONV MatrixAngles( const matrix3x4_t & matrix, float *angles ); // !!!!
+void XM_CALLCONV MatrixVectors( const matrix3x4_t &matrix, Vector* pForward, Vector *pRight, Vector *pUp );
+void XM_CALLCONV VectorTransform (const float *in1, const matrix3x4_t & in2, float *out);
+void XM_CALLCONV VectorITransform (const float *in1, const matrix3x4_t & in2, float *out);
+void XM_CALLCONV VectorRotate( const float *in1, const matrix3x4_t & in2, float *out);
+void XM_CALLCONV VectorRotate( const Vector &in1, const QAngle &in2, Vector &out );
+void XM_CALLCONV VectorRotate( const Vector &in1, const Quaternion &in2, Vector &out );
+void XM_CALLCONV VectorIRotate( const float *in1, const matrix3x4_t & in2, float *out);
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 
-QAngle TransformAnglesToLocalSpace( const QAngle &angles, const matrix3x4_t &parentMatrix );
-QAngle TransformAnglesToWorldSpace( const QAngle &angles, const matrix3x4_t &parentMatrix );
+QAngle XM_CALLCONV TransformAnglesToLocalSpace( const QAngle &angles, const matrix3x4_t &parentMatrix );
+QAngle XM_CALLCONV TransformAnglesToWorldSpace( const QAngle &angles, const matrix3x4_t &parentMatrix );
 
 #endif
 
-void MatrixInitialize( matrix3x4_t &mat, const Vector &vecOrigin, const Vector &vecXAxis, const Vector &vecYAxis, const Vector &vecZAxis );
-void MatrixCopy( const matrix3x4_t &in, matrix3x4_t &out );
-void MatrixInvert( const matrix3x4_t &in, matrix3x4_t &out );
+void XM_CALLCONV MatrixInitialize( matrix3x4_t &mat, const Vector &vecOrigin, const Vector &vecXAxis, const Vector &vecYAxis, const Vector &vecZAxis );
+void XM_CALLCONV MatrixCopy( const matrix3x4_t &in, matrix3x4_t &out );
+void XM_CALLCONV MatrixInvert( const matrix3x4_t &in, matrix3x4_t &out );
 
 // Matrix equality test
-bool MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float flTolerance = 1e-5 );
+bool XM_CALLCONV MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float flTolerance = 1e-5 );
 
-void MatrixGetColumn( const matrix3x4_t &in, int column, Vector &out );
-void MatrixSetColumn( const Vector &in, int column, matrix3x4_t &out );
+void XM_CALLCONV MatrixGetColumn( const matrix3x4_t &in, int column, Vector &out );
+void XM_CALLCONV MatrixSetColumn( const Vector &in, int column, matrix3x4_t &out );
 
-inline void MatrixGetTranslation( const matrix3x4_t &in, Vector &out )
+inline void XM_CALLCONV MatrixGetTranslation( const matrix3x4_t &in, Vector &out )
 {
 	MatrixGetColumn ( in, 3, out );
 }
 
-inline void MatrixSetTranslation( const Vector &in, matrix3x4_t &out )
+inline void XM_CALLCONV MatrixSetTranslation( const Vector &in, matrix3x4_t &out )
 {
 	MatrixSetColumn ( in, 3, out );
 }
 
-void MatrixScaleBy ( const float flScale, matrix3x4_t &out );
-void MatrixScaleByZero ( matrix3x4_t &out );
+void XM_CALLCONV MatrixScaleBy ( const float flScale, matrix3x4_t &out );
+void XM_CALLCONV MatrixScaleByZero ( matrix3x4_t &out );
 
 //void DecomposeRotation( const matrix3x4_t &mat, float *out );
-void ConcatRotations (const matrix3x4_t &in1, const matrix3x4_t &in2, matrix3x4_t &out);
-void ConcatTransforms (const matrix3x4_t &in1, const matrix3x4_t &in2, matrix3x4_t &out);
+void XM_CALLCONV ConcatRotations (const matrix3x4_t &in1, const matrix3x4_t &in2, matrix3x4_t &out);
+void XM_CALLCONV ConcatTransforms (const matrix3x4_t &in1, const matrix3x4_t &in2, matrix3x4_t &out);
 
 // For identical interface w/ VMatrix
-inline void MatrixMultiply ( const matrix3x4_t &in1, const matrix3x4_t &in2, matrix3x4_t &out )
+inline void XM_CALLCONV MatrixMultiply ( const matrix3x4_t &in1, const matrix3x4_t &in2, matrix3x4_t &out )
 {
 	ConcatTransforms( in1, in2, out );
 }
 
-void QuaternionSlerp( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt );
-void QuaternionSlerpNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt );
-void QuaternionBlend( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt );
-void QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt );
-void QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt );
-float QuaternionAngleDiff( const Quaternion &p, const Quaternion &q );
-void QuaternionScale( const Quaternion &p, float t, Quaternion &q );
-void QuaternionAlign( const Quaternion &p, const Quaternion &q, Quaternion &qt );
-float QuaternionDotProduct( const Quaternion &p, const Quaternion &q );
-void QuaternionConjugate( const Quaternion &p, Quaternion &q );
-void QuaternionInvert( const Quaternion &p, Quaternion &q );
-float QuaternionNormalize(Quaternion &q);
+void XM_CALLCONV QuaternionSlerp( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt );
+void XM_CALLCONV QuaternionSlerpNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt );
+void XM_CALLCONV QuaternionBlend( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt );
+void XM_CALLCONV QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt );
+void XM_CALLCONV QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt );
+float XM_CALLCONV QuaternionAngleDiff( const Quaternion &p, const Quaternion &q );
+void XM_CALLCONV QuaternionScale( const Quaternion &p, float t, Quaternion &q );
+void XM_CALLCONV QuaternionAlign( const Quaternion &p, const Quaternion &q, Quaternion &qt );
+float XM_CALLCONV QuaternionDotProduct( const Quaternion &p, const Quaternion &q );
+void XM_CALLCONV QuaternionConjugate( const Quaternion &p, Quaternion &q );
+void XM_CALLCONV QuaternionInvert( const Quaternion &p, Quaternion &q );
+float XM_CALLCONV QuaternionNormalize(Quaternion &q);
 // dimhotepus: QuaternionNormalize without length.
-void QuaternionNormalize2( Quaternion &q );
-void QuaternionAdd( const Quaternion &p, const Quaternion &q, Quaternion &qt );
-void QuaternionMult( const Quaternion &p, const Quaternion &q, Quaternion &qt );
-void QuaternionMatrix( const Quaternion &q, matrix3x4_t &matrix );
-void QuaternionMatrix( const Quaternion &q, const Vector &pos, matrix3x4_t &matrix );
-void QuaternionAngles( const Quaternion &q, QAngle &angles );
-void AngleQuaternion( const QAngle& angles, Quaternion &qt );
-void QuaternionAngles( const Quaternion &q, RadianEuler &angles );
-void AngleQuaternion( RadianEuler const &angles, Quaternion &qt );
-void QuaternionAxisAngle( const Quaternion &q, Vector &axis, float &angle );
-void AxisAngleQuaternion( const Vector &axis, float angle, Quaternion &q );
-void BasisToQuaternion( const Vector &vecForward, const Vector &vecRight, const Vector &vecUp, Quaternion &q );
-void MatrixQuaternion( const matrix3x4_t &mat, Quaternion &q );
+void XM_CALLCONV QuaternionNormalize2( Quaternion &q );
+void XM_CALLCONV QuaternionAdd( const Quaternion &p, const Quaternion &q, Quaternion &qt );
+void XM_CALLCONV QuaternionMult( const Quaternion &p, const Quaternion &q, Quaternion &qt );
+void XM_CALLCONV QuaternionMatrix( const Quaternion &q, matrix3x4_t &matrix );
+void XM_CALLCONV QuaternionMatrix( const Quaternion &q, const Vector &pos, matrix3x4_t &matrix );
+void XM_CALLCONV QuaternionAngles( const Quaternion &q, QAngle &angles );
+void XM_CALLCONV AngleQuaternion( const QAngle& angles, Quaternion &qt );
+void XM_CALLCONV QuaternionAngles(const Quaternion &q, RadianEuler &angles);
+void XM_CALLCONV AngleQuaternion(RadianEuler const &angles, Quaternion &qt);
+void XM_CALLCONV QuaternionAxisAngle( const Quaternion &q, Vector &axis, float &angle );
+void XM_CALLCONV AxisAngleQuaternion( const Vector &axis, float angle, Quaternion &q );
+void XM_CALLCONV BasisToQuaternion( const Vector &vecForward, const Vector &vecRight, const Vector &vecUp, Quaternion &q );
+void XM_CALLCONV MatrixQuaternion( const matrix3x4_t &mat, Quaternion &q );
 
 // A couple methods to find the dot product of a vector with a matrix row or column...
-inline float MatrixRowDotProduct( const matrix3x4_t &in1, int row, const Vector& in2 )
+inline float XM_CALLCONV MatrixRowDotProduct( const matrix3x4_t &in1, int row, const Vector& in2 )
 {
 	Assert( (row >= 0) && (row < 3) );
 	return DotProduct( in1[row], in2.Base() ); 
 }
 
-inline float MatrixColumnDotProduct( const matrix3x4_t &in1, int col, const Vector& in2 )
+inline float XM_CALLCONV MatrixColumnDotProduct( const matrix3x4_t &in1, int col, const Vector& in2 )
 {
 	Assert( (col >= 0) && (col < 4) );
 	return in1[0][col] * in2[0] + in1[1][col] * in2[1] + in1[2][col] * in2[2]; 
@@ -612,21 +612,21 @@ inline float MatrixColumnDotProduct( const matrix3x4_t &in1, int col, const Vect
 // dimhotepus: Too unsafe. Use safer overload.
 int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane_t *plane) = delete;
 
-inline float anglemod(float a)
+inline float XM_CALLCONV anglemod(float a)
 {
 	a = (360.f/65536) * ((int)(a*(65536.f/360.0f)) & 65535);
 	return a;
 }
 
 // Remap a value in the range [A,B] to [C,D].
-inline float RemapVal( float val, float A, float B, float C, float D)
+inline float XM_CALLCONV RemapVal( float val, float A, float B, float C, float D)
 {
 	if ( A == B )
 		return val >= B ? D : C;
 	return C + (D - C) * (val - A) / (B - A);
 }
 
-inline float RemapValClamped( float val, float A, float B, float C, float D)
+inline float XM_CALLCONV RemapValClamped( float val, float A, float B, float C, float D)
 {
 	if ( A == B )
 		return val >= B ? D : C;
@@ -644,7 +644,7 @@ FORCEINLINE T Lerp( float flPercent, T const &A, T const &B )
 	return A + (B - A) * flPercent;
 }
 
-FORCEINLINE float Sqr( float f )
+FORCEINLINE float XM_CALLCONV Sqr( float f )
 {
 	return f*f;
 }
@@ -659,7 +659,7 @@ FORCEINLINE float Sqr( float f )
 //   If you know a function f(x)'s value (f1) at position i1, and its value (f2) at position i2,
 //   the function can be linearly interpolated with FLerp(f1,f2,i1,i2,x)
 //    i2=i1 will cause a divide by zero.
-static inline float FLerp(float f1, float f2, float i1, float i2, float x)
+static inline float XM_CALLCONV FLerp(float f1, float f2, float i1, float i2, float x)
 {
   return f1+(f2-f1)*(x-i1)/(i2-i1);
 }
@@ -743,7 +743,7 @@ template <class T> FORCEINLINE T AVG(T a, T b)
 #define XYZ(v) (v).x,(v).y,(v).z
 
 
-inline float Sign( float x )
+inline float XM_CALLCONV Sign( float x )
 {
 	return (x <0.0f) ? -1.0f : 1.0f;
 }
@@ -761,7 +761,7 @@ inline float Sign( float x )
 //
 // Note: This code has been run against all possible integers.
 //
-inline int ClampArrayBounds( int n, unsigned maxindex )
+inline int XM_CALLCONV ClampArrayBounds( int n, unsigned maxindex )
 {
 	// mask is 0 if less than 4096, 0xFFFFFFFF if greater than
 	unsigned int inrangemask = 0xFFFFFFFF + (((unsigned) n) > maxindex );
@@ -797,50 +797,50 @@ inline int ClampArrayBounds( int n, unsigned maxindex )
 // FIXME: Vector versions.... the float versions will go away hopefully soon!
 //-----------------------------------------------------------------------------
 
-void AngleVectors (const QAngle& angles, Vector *forward);
-void AngleVectors (const QAngle& angles, Vector *forward, Vector *right, Vector *up);
-void AngleVectorsTranspose (const QAngle& angles, Vector *forward, Vector *right, Vector *up);
-void AngleMatrix (const QAngle &angles, matrix3x4_t &mat );
-void AngleMatrix( const QAngle &angles, const Vector &position, matrix3x4_t &mat );
-void AngleMatrix (const RadianEuler &angles, matrix3x4_t &mat );
-void AngleMatrix( RadianEuler const &angles, const Vector &position, matrix3x4_t &mat );
-void AngleIMatrix (const QAngle &angles, matrix3x4_t &mat );
-void AngleIMatrix (const QAngle &angles, const Vector &position, matrix3x4_t &mat );
-void AngleIMatrix (const RadianEuler &angles, matrix3x4_t &mat );
-void VectorAngles( const Vector &forward, QAngle &angles );
-void VectorAngles( const Vector &forward, const Vector &pseudoup, QAngle &angles );
-void VectorMatrix( const Vector &forward, matrix3x4_t &mat );
-void VectorVectors( const Vector &forward, Vector &right, Vector &up );
-void SetIdentityMatrix( matrix3x4_t &mat );
-void SetScaleMatrix( float x, float y, float z, matrix3x4_t &dst );
-void MatrixBuildRotationAboutAxis( const Vector &vAxisOfRot, float angleDegrees, matrix3x4_t &dst );
+void XM_CALLCONV AngleVectors (const QAngle& angles, Vector *forward);
+void XM_CALLCONV AngleVectors (const QAngle& angles, Vector *forward, Vector *right, Vector *up);
+void XM_CALLCONV AngleVectorsTranspose (const QAngle& angles, Vector *forward, Vector *right, Vector *up);
+void XM_CALLCONV AngleMatrix (const QAngle &angles, matrix3x4_t &mat );
+void XM_CALLCONV AngleMatrix( const QAngle &angles, const Vector &position, matrix3x4_t &mat );
+void XM_CALLCONV AngleMatrix (const RadianEuler &angles, matrix3x4_t &mat );
+void XM_CALLCONV AngleMatrix( RadianEuler const &angles, const Vector &position, matrix3x4_t &mat );
+void XM_CALLCONV AngleIMatrix (const QAngle &angles, matrix3x4_t &mat );
+void XM_CALLCONV AngleIMatrix (const QAngle &angles, const Vector &position, matrix3x4_t &mat );
+void XM_CALLCONV AngleIMatrix (const RadianEuler &angles, matrix3x4_t &mat );
+void XM_CALLCONV VectorAngles( const Vector &forward, QAngle &angles );
+void XM_CALLCONV VectorAngles( const Vector &forward, const Vector &pseudoup, QAngle &angles );
+void XM_CALLCONV VectorMatrix( const Vector &forward, matrix3x4_t &mat );
+void XM_CALLCONV VectorVectors( const Vector &forward, Vector &right, Vector &up );
+void XM_CALLCONV SetIdentityMatrix( matrix3x4_t &mat );
+void XM_CALLCONV SetScaleMatrix( float x, float y, float z, matrix3x4_t &dst );
+void XM_CALLCONV MatrixBuildRotationAboutAxis( const Vector &vAxisOfRot, float angleDegrees, matrix3x4_t &dst );
 
-inline void SetScaleMatrix( float flScale, matrix3x4_t &dst )
+inline void XM_CALLCONV SetScaleMatrix( float flScale, matrix3x4_t &dst )
 {
 	SetScaleMatrix( flScale, flScale, flScale, dst );
 }
 
-inline void SetScaleMatrix( const Vector& scale, matrix3x4_t &dst )
+inline void XM_CALLCONV SetScaleMatrix( const Vector& scale, matrix3x4_t &dst )
 {
 	SetScaleMatrix( scale.x, scale.y, scale.z, dst );
 }
 
 // Computes the inverse transpose
-void MatrixTranspose( matrix3x4_t& mat );
-void MatrixTranspose( const matrix3x4_t& src, matrix3x4_t& dst );
-void MatrixInverseTranspose( const matrix3x4_t& src, matrix3x4_t& dst );
+void XM_CALLCONV MatrixTranspose( matrix3x4_t& mat );
+void XM_CALLCONV MatrixTranspose( const matrix3x4_t& src, matrix3x4_t& dst );
+void XM_CALLCONV MatrixInverseTranspose( const matrix3x4_t& src, matrix3x4_t& dst );
 
-inline void PositionMatrix( const Vector &position, matrix3x4_t &mat )
+inline void XM_CALLCONV PositionMatrix( const Vector &position, matrix3x4_t &mat )
 {
 	MatrixSetColumn( position, 3, mat );
 }
 
-inline void MatrixPosition( const matrix3x4_t &matrix, Vector &position )
+inline void XM_CALLCONV MatrixPosition( const matrix3x4_t &matrix, Vector &position )
 {
 	MatrixGetColumn( matrix, 3, position );
 }
 
-void VectorRotate( const Vector& in1, const matrix3x4_t &in2, Vector &out );
+void XM_CALLCONV VectorRotate( const Vector& in1, const matrix3x4_t &in2, Vector &out );
 
 void XM_CALLCONV VectorIRotate( Vector in1, const matrix3x4_t &in2, Vector &out );
 
@@ -855,36 +855,36 @@ inline DirectX::XMVECTOR XM_CALLCONV VectorIRotate( DirectX::FXMVECTOR in1, cons
 	);
 }
 
-inline void MatrixAngles( const matrix3x4_t &matrix, QAngle &angles )
+inline void XM_CALLCONV MatrixAngles( const matrix3x4_t &matrix, QAngle &angles )
 {
 	MatrixAngles( matrix, &angles.x );
 }
 
-inline void MatrixAngles( const matrix3x4_t &matrix, QAngle &angles, Vector &position )
+inline void XM_CALLCONV MatrixAngles( const matrix3x4_t &matrix, QAngle &angles, Vector &position )
 {
 	MatrixAngles( matrix, angles );
 	MatrixPosition( matrix, position );
 }
 
-inline void MatrixAngles( const matrix3x4_t &matrix, RadianEuler &angles )
+inline void XM_CALLCONV MatrixAngles( const matrix3x4_t &matrix, RadianEuler &angles )
 {
 	MatrixAngles( matrix, &angles.x );
 
 	angles.Init( DEG2RAD( angles.z ), DEG2RAD( angles.x ), DEG2RAD( angles.y ) );
 }
 
-void MatrixAngles( const matrix3x4_t &mat, RadianEuler &angles, Vector &position );
+void XM_CALLCONV MatrixAngles( const matrix3x4_t &mat, RadianEuler &angles, Vector &position );
 
-void MatrixAngles( const matrix3x4_t &mat, Quaternion &q, Vector &position );
+void XM_CALLCONV MatrixAngles( const matrix3x4_t &mat, Quaternion &q, Vector &position );
 
-inline int VectorCompare (const Vector& v1, const Vector& v2)
+inline int XM_CALLCONV VectorCompare (const Vector& v1, const Vector& v2)
 {
 	return v1 == v2;
 }
 
-void VectorTransform (const Vector& in1, const matrix3x4_t &in2, Vector &out);
+void XM_CALLCONV VectorTransform (const Vector& in1, const matrix3x4_t &in2, Vector &out);
 
-void VectorITransform (const Vector& in1, const matrix3x4_t &in2, Vector &out);
+void XM_CALLCONV VectorITransform (const Vector& in1, const matrix3x4_t &in2, Vector &out);
 
 /*
 inline void DecomposeRotation( const matrix3x4_t &mat, Vector &out )
@@ -895,19 +895,19 @@ inline void DecomposeRotation( const matrix3x4_t &mat, Vector &out )
 
 int XM_CALLCONV BoxOnPlaneSide ( Vector emins, Vector emaxs, const cplane_t *plane );
 
-inline void VectorFill(Vector& a, float b)
+inline void XM_CALLCONV VectorFill(Vector& a, float b)
 {
 	a[0]=a[1]=a[2]=b;
 }
 
-inline void VectorNegate(Vector& a)
+inline void XM_CALLCONV VectorNegate(Vector& a)
 {
 	a[0] = -a[0];
 	a[1] = -a[1];
 	a[2] = -a[2];
 }
 
-inline vec_t VectorAvg(Vector& a)
+inline vec_t XM_CALLCONV VectorAvg(Vector& a)
 {
 	return ( a[0] + a[1] + a[2] ) / 3;
 }
@@ -915,7 +915,7 @@ inline vec_t VectorAvg(Vector& a)
 //-----------------------------------------------------------------------------
 // Box/plane test (slow version)
 //-----------------------------------------------------------------------------
-inline int FASTCALL BoxOnPlaneSide2 (const Vector& emins, const Vector& emaxs, const cplane_t *p, float tolerance = 0.f )
+inline int XM_CALLCONV BoxOnPlaneSide2 (const Vector& emins, const Vector& emaxs, const cplane_t *p, float tolerance = 0.f )
 {
 	Vector	corners[2];
 
@@ -969,16 +969,16 @@ inline int FASTCALL BoxOnPlaneSide2 (const Vector& emins, const Vector& emaxs, c
 // Helpers for bounding box construction
 //-----------------------------------------------------------------------------
 
-void ClearBounds (Vector& mins, Vector& maxs);
-void AddPointToBounds (const Vector& v, Vector& mins, Vector& maxs);
+void XM_CALLCONV ClearBounds (Vector& mins, Vector& maxs);
+void XM_CALLCONV AddPointToBounds (const Vector& v, Vector& mins, Vector& maxs);
 
 //
 // COLORSPACE/GAMMA CONVERSION STUFF
 //
-void BuildGammaTable( float gamma, float texGamma, float brightness, int overbright );
+void XM_CALLCONV BuildGammaTable( float gamma, float texGamma, float brightness, int overbright );
 
 // convert texture to linear 0..1 value
-inline float TexLightToLinear( int c, int exponent )
+inline float XM_CALLCONV TexLightToLinear( int c, int exponent )
 {
 	extern ALIGN128 float power2_n[256]; 
 	Assert( exponent >= -128 && exponent <= 127 );
@@ -987,10 +987,10 @@ inline float TexLightToLinear( int c, int exponent )
 
 
 // convert texture to linear 0..1 value
-int LinearToTexture( float f );
+int XM_CALLCONV LinearToTexture( float f );
 // converts 0..1 linear value to screen gamma (0..255)
-int LinearToScreenGamma( float f );
-float TextureToLinear( int c );
+int XM_CALLCONV LinearToScreenGamma( float f );
+float XM_CALLCONV TextureToLinear( int c );
 
 // compressed color format 
 struct ColorRGBExp32
@@ -999,30 +999,30 @@ struct ColorRGBExp32
 	signed char exponent;
 };
 
-void ColorRGBExp32ToVector( const ColorRGBExp32& in, Vector& out );
-void VectorToColorRGBExp32( const Vector& v, ColorRGBExp32 &c );
+void XM_CALLCONV ColorRGBExp32ToVector( const ColorRGBExp32& in, Vector& out );
+void XM_CALLCONV VectorToColorRGBExp32( const Vector& v, ColorRGBExp32 &c );
 
 // solve for "x" where "a x^2 + b x + c = 0", return true if solution exists
-bool SolveQuadratic( float a, float b, float c, float &root1, float &root2 );
+bool XM_CALLCONV SolveQuadratic( float a, float b, float c, float &root1, float &root2 );
 
 // solves for "a, b, c" where "a x^2 + b x + c = y", return true if solution exists
-bool SolveInverseQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c );
+bool XM_CALLCONV SolveInverseQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c );
 
 // solves for a,b,c specified as above, except that it always creates a monotonically increasing or
 // decreasing curve if the data is monotonically increasing or decreasing. In order to enforce the
 // monoticity condition, it is possible that the resulting quadratic will only approximate the data
 // instead of interpolating it. This code is not especially fast.
-bool SolveInverseQuadraticMonotonic( float x1, float y1, float x2, float y2, 
+bool XM_CALLCONV SolveInverseQuadraticMonotonic( float x1, float y1, float x2, float y2, 
 									 float x3, float y3, float &a, float &b, float &c );
 
 
 
 
 // solves for "a, b, c" where "1/(a x^2 + b x + c ) = y", return true if solution exists
-bool SolveInverseReciprocalQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c );
+bool XM_CALLCONV SolveInverseReciprocalQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c );
 
 // rotate a vector around the Z axis (YAW)
-void VectorYawRotate( const Vector& in, float flYaw, Vector &out);
+void XM_CALLCONV VectorYawRotate( const Vector& in, float flYaw, Vector &out);
 
 
 // Bias takes an X value between 0 and 1 and returns another value between 0 and 1
@@ -1057,7 +1057,7 @@ void VectorYawRotate( const Vector& in, float flYaw, Vector &out);
 // 0                   1
 //
 // With a biasAmt of 0.5, Bias returns X.
-float Bias( float x, float biasAmt );
+float XM_CALLCONV Bias( float x, float biasAmt );
 
 
 // Gain is similar to Bias, but biasAmt biases towards or away from 0.5.
@@ -1089,7 +1089,7 @@ float Bias( float x, float biasAmt );
 // |*****
 // |___________________
 // 0                   1
-float Gain( float x, float biasAmt );
+float XM_CALLCONV Gain( float x, float biasAmt );
 
 
 // SmoothCurve maps a 0-1 value into another 0-1 value based on a cosine wave
@@ -1109,7 +1109,7 @@ float Gain( float x, float biasAmt );
 // |___________________
 // 0                   1
 //
-float SmoothCurve( float x );
+float XM_CALLCONV SmoothCurve( float x );
 
 
 // This works like SmoothCurve, with two changes:
@@ -1119,29 +1119,29 @@ float SmoothCurve( float x );
 //
 // 2. flPeakSharpness is a 0-1 value controlling the sharpness of the peak.
 //    Low values blunt the peak and high values sharpen the peak.
-float SmoothCurve_Tweak( float x, float flPeakPos=0.5, float flPeakSharpness=0.5 );
+float XM_CALLCONV SmoothCurve_Tweak( float x, float flPeakPos=0.5, float flPeakSharpness=0.5 );
 
 
 //float ExponentialDecay( float halflife, float dt );
 //float ExponentialDecay( float decayTo, float decayTime, float dt );
 
 // halflife is time for value to reach 50%
-inline float ExponentialDecay( float halflife, float dt )
+inline float XM_CALLCONV ExponentialDecay( float halflife, float dt )
 {
 	// log(0.5) == -0.69314718055994530941723212145818
 	return expf( -0.69314718f / halflife * dt);
 }
 
 // decayTo is factor the value should decay to in decayTime
-inline float ExponentialDecay( float decayTo, float decayTime, float dt )
-{
+inline float XM_CALLCONV ExponentialDecay(float decayTo, float decayTime,
+                                          float dt) {
 	return expf( logf( decayTo ) / decayTime * dt);
 }
 
 // Get the integrated distanced traveled
 // decayTo is factor the value should decay to in decayTime
 // dt is the time relative to the last velocity update
-inline float ExponentialDecayIntegral( float decayTo, float decayTime, float dt  )
+inline float XM_CALLCONV ExponentialDecayIntegral( float decayTo, float decayTime, float dt  )
 {
 	return (powf( decayTo, dt / decayTime) * decayTime - decayTime) / logf( decayTo );
 }
@@ -1149,7 +1149,7 @@ inline float ExponentialDecayIntegral( float decayTo, float decayTime, float dt 
 // hermite basis function for smooth interpolation
 // Similar to Gain() above, but very cheap to call
 // value should be between 0 & 1 inclusive
-inline float SimpleSpline( float value )
+inline float XM_CALLCONV SimpleSpline( float value )
 {
 	float valueSquared = value * value;
 
@@ -1159,7 +1159,7 @@ inline float SimpleSpline( float value )
 
 // remaps a value in [startInterval, startInterval+rangeInterval] from linear to
 // spline using SimpleSpline
-inline float SimpleSplineRemapVal( float val, float A, float B, float C, float D)
+inline float XM_CALLCONV SimpleSplineRemapVal( float val, float A, float B, float C, float D)
 {
 	if ( A == B )
 		return val >= B ? D : C;
@@ -1169,7 +1169,7 @@ inline float SimpleSplineRemapVal( float val, float A, float B, float C, float D
 
 // remaps a value in [startInterval, startInterval+rangeInterval] from linear to
 // spline using SimpleSpline
-inline float SimpleSplineRemapValClamped( float val, float A, float B, float C, float D )
+inline float XM_CALLCONV SimpleSplineRemapValClamped( float val, float A, float B, float C, float D )
 {
 	if ( A == B )
 		return val >= B ? D : C;
@@ -1178,7 +1178,7 @@ inline float SimpleSplineRemapValClamped( float val, float A, float B, float C, 
 	return C + (D - C) * SimpleSpline( cVal );
 }
 
-FORCEINLINE int RoundFloatToInt(float f)
+FORCEINLINE int XM_CALLCONV RoundFloatToInt(float f)
 {
 #if defined(_XM_SSE_INTRINSICS_)
 	return _mm_cvtss_si32(_mm_load_ss(&f));
@@ -1187,7 +1187,7 @@ FORCEINLINE int RoundFloatToInt(float f)
 #endif
 }
 
-FORCEINLINE unsigned char RoundFloatToByte(float f)
+FORCEINLINE unsigned char XM_CALLCONV RoundFloatToByte(float f)
 {
 	int nResult = RoundFloatToInt(f);
 #ifdef Assert
@@ -1196,7 +1196,7 @@ FORCEINLINE unsigned char RoundFloatToByte(float f)
 	return (unsigned char) nResult;
 }
 
-FORCEINLINE unsigned long RoundFloatToUnsignedLong(float f)
+FORCEINLINE unsigned long XM_CALLCONV RoundFloatToUnsignedLong(float f)
 {
 #if defined( _X360 )
 #ifdef Assert
@@ -1231,7 +1231,7 @@ FORCEINLINE unsigned long RoundFloatToUnsignedLong(float f)
 	}
 	return nRet;
 #else // PLATFORM_WINDOWS_PC64
-  alignas(unsigned long) unsigned char nResult[8];
+	alignas(unsigned long) unsigned char nResult[8];
 
 	#if defined( _WIN32 )
 		__asm
@@ -1245,18 +1245,18 @@ FORCEINLINE unsigned long RoundFloatToUnsignedLong(float f)
 		);
 	#endif
 
-		return *((unsigned long*)nResult);
+	return *((unsigned long*)nResult);
 #endif // PLATFORM_WINDOWS_PC64
 #endif // !X360
 }
 
-FORCEINLINE bool IsIntegralValue( float flValue, float flTolerance = 0.001f )
+FORCEINLINE bool XM_CALLCONV IsIntegralValue( float flValue, float flTolerance = 0.001f )
 {
 	return fabsf( RoundFloatToInt( flValue ) - flValue ) < flTolerance;
 }
 
 // Fast, accurate ftol:
-FORCEINLINE int Float2Int( float a )
+FORCEINLINE int XM_CALLCONV Float2Int( float a )
 {
 #if defined( _X360 )
 	union
@@ -1273,7 +1273,7 @@ FORCEINLINE int Float2Int( float a )
 }
 
 // Over 15x faster than: (int)floor(value)
-inline int Floor2Int( float a )
+inline int XM_CALLCONV Floor2Int( float a )
 {
 	int RetVal;
 
@@ -1293,7 +1293,7 @@ inline int Floor2Int( float a )
 // Fast color conversion from float to unsigned char
 //-----------------------------------------------------------------------------
 // dimhotepus: Use unsigned char as return type.
-FORCEINLINE unsigned char FastFToC( float c )
+FORCEINLINE unsigned char XM_CALLCONV FastFToC( float c )
 {
 #if defined( __i386__ )
 	// IEEE float bit manipulation works for values between [0, 1<<23)
@@ -1308,7 +1308,7 @@ FORCEINLINE unsigned char FastFToC( float c )
 //-----------------------------------------------------------------------------
 // Fast conversion from float to integer with magnitude less than 2**22
 //-----------------------------------------------------------------------------
-FORCEINLINE int FastFloatToSmallInt( float c )
+FORCEINLINE int XM_CALLCONV FastFloatToSmallInt( float c )
 {
 #if defined( __i386__ )
 	// IEEE float bit manipulation works for values between [-1<<22, 1<<22)
@@ -1325,14 +1325,14 @@ FORCEINLINE int FastFloatToSmallInt( float c )
 // Input  : in - 
 // Output : inline float
 //-----------------------------------------------------------------------------
-inline float ClampToMsec( float in )
+inline float XM_CALLCONV ClampToMsec( float in )
 {
 	int msec = Floor2Int( in * 1000.0f + 0.5f );
 	return 0.001f * msec;
 }
 
 // Over 15x faster than: (int)ceil(value)
-inline int Ceil2Int( float a )
+inline int XM_CALLCONV Ceil2Int( float a )
 {
    int RetVal;
 #if defined(_XM_SSE_INTRINSICS_)
@@ -1358,7 +1358,7 @@ inline int Ceil2Int( float a )
 
 
 // Get the barycentric coordinates of "pt" in triangle [A,B,C].
-inline void GetBarycentricCoords2D( 
+inline void XM_CALLCONV GetBarycentricCoords2D( 
 	Vector2D const &A,
 	Vector2D const &B,
 	Vector2D const &C,
@@ -1379,7 +1379,7 @@ inline void GetBarycentricCoords2D(
 // Return true of the sphere might touch the box (the sphere is actually treated
 // like a box itself, so this may return true if the sphere's bounding box touches
 // a corner of the box but the sphere itself doesn't).
-inline bool QuickBoxSphereTest( 
+inline bool XM_CALLCONV QuickBoxSphereTest( 
 	const Vector& vOrigin,
 	float flRadius,
 	const Vector& bbMin,
@@ -1392,7 +1392,7 @@ inline bool QuickBoxSphereTest(
 
 
 // Return true of the boxes intersect (but not if they just touch).
-inline bool QuickBoxIntersectTest( 
+inline bool XM_CALLCONV QuickBoxIntersectTest( 
 	const Vector& vBox1Min,
 	const Vector& vBox1Max,
 	const Vector& vBox2Min,
@@ -1405,19 +1405,19 @@ inline bool QuickBoxIntersectTest(
 }
 
 
-extern float GammaToLinearFullRange( float gamma );
-extern float LinearToGammaFullRange( float linear );
-extern float GammaToLinear( float gamma );
-extern float LinearToGamma( float linear );
+extern float XM_CALLCONV GammaToLinearFullRange( float gamma );
+extern float XM_CALLCONV LinearToGammaFullRange( float linear );
+extern float XM_CALLCONV GammaToLinear( float gamma );
+extern float XM_CALLCONV LinearToGamma( float linear );
 
-extern float SrgbGammaToLinear( float flSrgbGammaValue );
-extern float SrgbLinearToGamma( float flLinearValue );
-extern float X360GammaToLinear( float fl360GammaValue );
-extern float X360LinearToGamma( float flLinearValue );
-extern float SrgbGammaTo360Gamma( float flSrgbGammaValue );
+extern float XM_CALLCONV SrgbGammaToLinear( float flSrgbGammaValue );
+extern float XM_CALLCONV SrgbLinearToGamma( float flLinearValue );
+extern float XM_CALLCONV X360GammaToLinear( float fl360GammaValue );
+extern float XM_CALLCONV X360LinearToGamma( float flLinearValue );
+extern float XM_CALLCONV SrgbGammaTo360Gamma( float flSrgbGammaValue );
 
 // linear (0..4) to screen corrected vertex space (0..1?)
-FORCEINLINE float LinearToVertexLight( float f )
+FORCEINLINE float XM_CALLCONV LinearToVertexLight( float f )
 {
 	extern float lineartovertex[4096];	
 
@@ -1438,7 +1438,7 @@ FORCEINLINE float LinearToVertexLight( float f )
 }
 
 
-FORCEINLINE unsigned char LinearToLightmap( float f )
+FORCEINLINE unsigned char XM_CALLCONV LinearToLightmap( float f )
 {
 	extern unsigned char lineartolightmap[4096];	
 
@@ -1457,7 +1457,7 @@ FORCEINLINE unsigned char LinearToLightmap( float f )
 	return lineartolightmap[i];
 }
 
-FORCEINLINE void ColorClamp( Vector& color )
+FORCEINLINE void XM_CALLCONV ColorClamp( Vector& color )
 {
 	float maxc = max( color.x, max( color.y, color.z ) );
 	if ( maxc > 1.0f )
@@ -1473,7 +1473,7 @@ FORCEINLINE void ColorClamp( Vector& color )
 	if ( color[2] < 0.f ) color[2] = 0.f;
 }
 
-inline void ColorClampTruncate( Vector& color )
+inline void XM_CALLCONV ColorClampTruncate( Vector& color )
 {
 	if (color[0] > 1.0f) color[0] = 1.0f; else if (color[0] < 0.0f) color[0] = 0.0f;
 	if (color[1] > 1.0f) color[1] = 1.0f; else if (color[1] < 0.0f) color[1] = 0.0f;
@@ -1482,7 +1482,7 @@ inline void ColorClampTruncate( Vector& color )
 
 // Interpolate a Catmull-Rom spline.
 // t is a [0,1] value and interpolates a curve between p2 and p3.
-void Catmull_Rom_Spline(
+void XM_CALLCONV Catmull_Rom_Spline(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -1492,7 +1492,7 @@ void Catmull_Rom_Spline(
 
 // Interpolate a Catmull-Rom spline.
 // Returns the tangent of the point at t of the spline
-void Catmull_Rom_Spline_Tangent( 
+void XM_CALLCONV Catmull_Rom_Spline_Tangent( 
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -1501,7 +1501,7 @@ void Catmull_Rom_Spline_Tangent(
 	Vector &output );
 
 // area under the curve [0..t]
-void Catmull_Rom_Spline_Integral( 
+void XM_CALLCONV Catmull_Rom_Spline_Integral( 
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -1510,7 +1510,7 @@ void Catmull_Rom_Spline_Integral(
 	Vector& output );
 
 // area under the curve [0..1]
-void Catmull_Rom_Spline_Integral( 
+void XM_CALLCONV Catmull_Rom_Spline_Integral( 
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -1519,7 +1519,7 @@ void Catmull_Rom_Spline_Integral(
 
 // Interpolate a Catmull-Rom spline.
 // Normalize p2->p1 and p3->p4 to be the same length as p2->p3
-void Catmull_Rom_Spline_Normalize(
+void XM_CALLCONV Catmull_Rom_Spline_Normalize(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -1539,7 +1539,7 @@ void Catmull_Rom_Spline_Integral_Normalize(
 
 // Interpolate a Catmull-Rom spline.
 // Normalize p2.x->p1.x and p3.x->p4.x to be the same length as p2.x->p3.x
-void Catmull_Rom_Spline_NormalizeX(
+void XM_CALLCONV Catmull_Rom_Spline_NormalizeX(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -1548,7 +1548,7 @@ void Catmull_Rom_Spline_NormalizeX(
 	Vector &output );
 
 // area under the curve [0..t]
-void Catmull_Rom_Spline_NormalizeX(
+void XM_CALLCONV Catmull_Rom_Spline_NormalizeX(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -1558,7 +1558,7 @@ void Catmull_Rom_Spline_NormalizeX(
 
 // Interpolate a Hermite spline.
 // t is a [0,1] value and interpolates a curve between p1 and p2 with the deltas d1 and d2.
-void Hermite_Spline(
+void XM_CALLCONV Hermite_Spline(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &d1,
@@ -1566,7 +1566,7 @@ void Hermite_Spline(
 	float t, 
 	Vector& output );
 
-float Hermite_Spline(
+float XM_CALLCONV Hermite_Spline(
 	float p1,
 	float p2,
 	float d1,
@@ -1574,23 +1574,23 @@ float Hermite_Spline(
 	float t );
 
 // t is a [0,1] value and interpolates a curve between p1 and p2 with the slopes p0->p1 and p1->p2
-void Hermite_Spline(
+void XM_CALLCONV Hermite_Spline(
 	const Vector &p0,
 	const Vector &p1,
 	const Vector &p2,
 	float t, 
 	Vector& output );
 
-float Hermite_Spline(
+float XM_CALLCONV Hermite_Spline(
 	float p0,
 	float p1,
 	float p2,
 	float t );
 
 
-void Hermite_SplineBasis( float t, float basis[] );
+void XM_CALLCONV Hermite_SplineBasis( float t, float basis[] );
 
-void Hermite_Spline( 
+void XM_CALLCONV Hermite_Spline( 
 	const Quaternion &q0, 
 	const Quaternion &q1, 
 	const Quaternion &q2, 
@@ -1611,7 +1611,7 @@ void Hermite_Spline(
 // See http://news.povray.org/povray.binaries.tutorials/attachment/%3CXns91B880592482seed7@povray.org%3E/Splines.bas.txt
 // for example code and descriptions of various spline types...
 // 
-void Kochanek_Bartels_Spline(
+void XM_CALLCONV Kochanek_Bartels_Spline(
 	float tension, 
 	float bias, 
 	float continuity,
@@ -1622,7 +1622,7 @@ void Kochanek_Bartels_Spline(
 	float t, 
 	Vector& output );
 
-void Kochanek_Bartels_Spline_NormalizeX(
+void XM_CALLCONV Kochanek_Bartels_Spline_NormalizeX(
 	float tension, 
 	float bias, 
 	float continuity,
@@ -1634,7 +1634,7 @@ void Kochanek_Bartels_Spline_NormalizeX(
 	Vector& output );
 
 // See link at Kochanek_Bartels_Spline for info on the basis matrix used
-void Cubic_Spline(
+void XM_CALLCONV Cubic_Spline(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -1642,24 +1642,7 @@ void Cubic_Spline(
 	float t, 
 	Vector& output );
 
-void Cubic_Spline_NormalizeX(
-	const Vector &p1,
-	const Vector &p2,
-	const Vector &p3,
-	const Vector &p4,
-	float t, 
-	Vector& output );
-
-// See link at Kochanek_Bartels_Spline for info on the basis matrix used
-void BSpline(
-	const Vector &p1,
-	const Vector &p2,
-	const Vector &p3,
-	const Vector &p4,
-	float t, 
-	Vector& output );
-
-void BSpline_NormalizeX(
+void XM_CALLCONV Cubic_Spline_NormalizeX(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -1668,7 +1651,7 @@ void BSpline_NormalizeX(
 	Vector& output );
 
 // See link at Kochanek_Bartels_Spline for info on the basis matrix used
-void Parabolic_Spline(
+void XM_CALLCONV BSpline(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -1676,7 +1659,24 @@ void Parabolic_Spline(
 	float t, 
 	Vector& output );
 
-void Parabolic_Spline_NormalizeX(
+void XM_CALLCONV BSpline_NormalizeX(
+	const Vector &p1,
+	const Vector &p2,
+	const Vector &p3,
+	const Vector &p4,
+	float t, 
+	Vector& output );
+
+// See link at Kochanek_Bartels_Spline for info on the basis matrix used
+void XM_CALLCONV Parabolic_Spline(
+	const Vector &p1,
+	const Vector &p2,
+	const Vector &p3,
+	const Vector &p4,
+	float t, 
+	Vector& output );
+
+void XM_CALLCONV Parabolic_Spline_NormalizeX(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -1695,7 +1695,7 @@ FORCEINLINE float QuinticInterpolatingPolynomial(float t)
 // given a table of sorted tabulated positions, return the two indices and blendfactor to linear
 // interpolate. Does a search. Can be used to find the blend value to interpolate between
 // keyframes.
-void GetInterpolationData( float const *pKnotPositions, 
+void XM_CALLCONV GetInterpolationData( float const *pKnotPositions, 
 						   float const *pKnotValues,
 						   int nNumValuesinList,
 						   int nInterpolationRange,
@@ -1705,16 +1705,16 @@ void GetInterpolationData( float const *pKnotPositions,
 						   float *pValueB,
 						   float *pInterpolationValue);
 
-float RangeCompressor( float flValue, float flMin, float flMax, float flBase );
+float XM_CALLCONV RangeCompressor( float flValue, float flMin, float flMax, float flBase );
 
 // Get the minimum distance from vOrigin to the bounding box defined by [mins,maxs]
 // using voronoi regions.
 // 0 is returned if the origin is inside the box.
-float CalcSqrDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point );
+float XM_CALLCONV CalcSqrDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point );
 void XM_CALLCONV CalcClosestPointOnAABB( Vector mins, Vector maxs, Vector point, Vector &closestOut );
-void CalcSqrDistAndClosestPointOnAABB( const Vector &mins, const Vector &maxs, const Vector &point, Vector &closestOut, float &distSqrOut );
+void XM_CALLCONV CalcSqrDistAndClosestPointOnAABB( const Vector &mins, const Vector &maxs, const Vector &point, Vector &closestOut, float &distSqrOut );
 
-inline float CalcDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point )
+inline float XM_CALLCONV CalcDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point )
 {
 	float flDistSqr = CalcSqrDistanceToAABB( mins, maxs, point );
 	return sqrtf(flDistSqr);
@@ -1724,77 +1724,77 @@ inline float CalcDistanceToAABB( const Vector &mins, const Vector &maxs, const V
 // calculate the shortest distance from P to the line.
 // If you pass in a value for t, it will tell you the t for (A + (B-A)t) to get the closest point.
 // If the closest point lies on the segment between A and B, then 0 <= t <= 1.
-void  CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=0 );
-float CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
-float CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
+void  XM_CALLCONV CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=0 );
+float XM_CALLCONV CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
+float XM_CALLCONV CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
 
 // The same three functions as above, except now the line is closed between A and B.
-void  CalcClosestPointOnLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=0 );
-float CalcDistanceToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
-float CalcDistanceSqrToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
+void  XM_CALLCONV CalcClosestPointOnLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=0 );
+float XM_CALLCONV CalcDistanceToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
+float XM_CALLCONV CalcDistanceSqrToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
 
 // A function to compute the closes line segment connnection two lines (or false if the lines are parallel, etc.)
-bool CalcLineToLineIntersectionSegment(
+bool XM_CALLCONV CalcLineToLineIntersectionSegment(
    const Vector& p1,const Vector& p2,const Vector& p3,const Vector& p4,Vector *s1,Vector *s2,
    float *t1, float *t2 );
 
 // The above functions in 2D
-void  CalcClosestPointOnLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, Vector2D &vClosest, float *t=0 );
-float CalcDistanceToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
-float CalcDistanceSqrToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
-void  CalcClosestPointOnLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, Vector2D &vClosest, float *t=0 );
-float CalcDistanceToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
-float CalcDistanceSqrToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
+void  XM_CALLCONV CalcClosestPointOnLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, Vector2D &vClosest, float *t=0 );
+float XM_CALLCONV CalcDistanceToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
+float XM_CALLCONV CalcDistanceSqrToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
+void  XM_CALLCONV CalcClosestPointOnLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, Vector2D &vClosest, float *t=0 );
+float XM_CALLCONV CalcDistanceToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
+float XM_CALLCONV CalcDistanceSqrToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
 
 // Init the mathlib
-void MathLib_Init( float gamma = 2.2f, float texGamma = 2.2f, float brightness = 0.0f, int overbright = 2.0f, bool bAllow3DNow = true, bool bAllowSSE = true, bool bAllowSSE2 = true, bool bAllowMMX = true );
-bool MathLib_3DNowEnabled( void );
-bool MathLib_MMXEnabled( void );
-bool MathLib_SSEEnabled( void );
-bool MathLib_SSE2Enabled( void );
+void XM_CALLCONV MathLib_Init( float gamma = 2.2f, float texGamma = 2.2f, float brightness = 0.0f, int overbright = 2.0f, bool bAllow3DNow = true, bool bAllowSSE = true, bool bAllowSSE2 = true, bool bAllowMMX = true );
+bool XM_CALLCONV MathLib_3DNowEnabled( void );
+bool XM_CALLCONV MathLib_MMXEnabled( void );
+bool XM_CALLCONV MathLib_SSEEnabled( void );
+bool XM_CALLCONV MathLib_SSE2Enabled( void );
 
-float Approach( float target, float value, float speed );
-float ApproachAngle( float target, float value, float speed );
-float AngleDiff( float destAngle, float srcAngle );
-float AngleDistance( float next, float cur );
-float AngleNormalize( float angle );
+float XM_CALLCONV Approach( float target, float value, float speed );
+float XM_CALLCONV ApproachAngle( float target, float value, float speed );
+float XM_CALLCONV AngleDiff( float destAngle, float srcAngle );
+float XM_CALLCONV AngleDistance( float next, float cur );
+float XM_CALLCONV AngleNormalize( float angle );
 
 // ensure that 0 <= angle <= 360
-float AngleNormalizePositive( float angle );
+float XM_CALLCONV AngleNormalizePositive( float angle );
 
-bool AnglesAreEqual( float a, float b, float tolerance = 0.0f );
+bool XM_CALLCONV AnglesAreEqual( float a, float b, float tolerance = 0.0f );
 
 
-void RotationDeltaAxisAngle( const QAngle &srcAngles, const QAngle &destAngles, Vector &deltaAxis, float &deltaAngle );
-void RotationDelta( const QAngle &srcAngles, const QAngle &destAngles, QAngle *out );
+void XM_CALLCONV RotationDeltaAxisAngle( const QAngle &srcAngles, const QAngle &destAngles, Vector &deltaAxis, float &deltaAngle );
+void XM_CALLCONV RotationDelta( const QAngle &srcAngles, const QAngle &destAngles, QAngle *out );
 
-void ComputeTrianglePlane( const Vector& v1, const Vector& v2, const Vector& v3, Vector& normal, float& intercept );
-int PolyFromPlane( Vector *outVerts, const Vector& normal, float dist, float fHalfScale = 9000.0f );
-int ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVerts, const Vector& normal, float dist, float fOnPlaneEpsilon = 0.1f );
-int ClipPolyToPlane_Precise( double *inVerts, int vertCount, double *outVerts, const double *normal, double dist, double fOnPlaneEpsilon = 0.1 );
+void XM_CALLCONV ComputeTrianglePlane( const Vector& v1, const Vector& v2, const Vector& v3, Vector& normal, float& intercept );
+int XM_CALLCONV PolyFromPlane( Vector *outVerts, const Vector& normal, float dist, float fHalfScale = 9000.0f );
+int XM_CALLCONV ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVerts, const Vector& normal, float dist, float fOnPlaneEpsilon = 0.1f );
+int XM_CALLCONV ClipPolyToPlane_Precise( double *inVerts, int vertCount, double *outVerts, const double *normal, double dist, double fOnPlaneEpsilon = 0.1 );
 
 //-----------------------------------------------------------------------------
 // Computes a reasonable tangent space for a triangle
 //-----------------------------------------------------------------------------
-void CalcTriangleTangentSpace( const Vector &p0, const Vector &p1, const Vector &p2,
+void XM_CALLCONV CalcTriangleTangentSpace( const Vector &p0, const Vector &p1, const Vector &p2,
 							  const Vector2D &t0, const Vector2D &t1, const Vector2D& t2,
 							  Vector &sVect, Vector &tVect );
 
 //-----------------------------------------------------------------------------
 // Transforms a AABB into another space; which will inherently grow the box.
 //-----------------------------------------------------------------------------
-void TransformAABB( const matrix3x4_t &in1, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut );
+void XM_CALLCONV TransformAABB( const matrix3x4_t &in1, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut );
 
 //-----------------------------------------------------------------------------
 // Uses the inverse transform of in1
 //-----------------------------------------------------------------------------
-void ITransformAABB( const matrix3x4_t &in1, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut );
+void XM_CALLCONV ITransformAABB( const matrix3x4_t &in1, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut );
 
 //-----------------------------------------------------------------------------
 // Rotates a AABB into another space; which will inherently grow the box. 
 // (same as TransformAABB, but doesn't take the translation into account)
 //-----------------------------------------------------------------------------
-void RotateAABB( const matrix3x4_t &in1, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut );
+void XM_CALLCONV RotateAABB( const matrix3x4_t &in1, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut );
 
 //-----------------------------------------------------------------------------
 // Uses the inverse transform of in1
@@ -1804,7 +1804,7 @@ void XM_CALLCONV IRotateAABB( const matrix3x4_t &in1, Vector vecMinsIn, Vector v
 //-----------------------------------------------------------------------------
 // Transform a plane
 //-----------------------------------------------------------------------------
-inline void MatrixTransformPlane( const matrix3x4_t &src, const cplane_t &inPlane, cplane_t &outPlane )
+inline void XM_CALLCONV MatrixTransformPlane( const matrix3x4_t &src, const cplane_t &inPlane, cplane_t &outPlane )
 {
 	// What we want to do is the following:
 	// 1) transform the normal into the new space.
@@ -1826,7 +1826,7 @@ inline void MatrixTransformPlane( const matrix3x4_t &src, const cplane_t &inPlan
 	outPlane.dist += outPlane.normal.x * src[0][3] + outPlane.normal.y * src[1][3] + outPlane.normal.z * src[2][3];
 }
 
-inline void MatrixITransformPlane( const matrix3x4_t &src, const cplane_t &inPlane, cplane_t &outPlane )
+inline void XM_CALLCONV MatrixITransformPlane( const matrix3x4_t &src, const cplane_t &inPlane, cplane_t &outPlane )
 {
 	// The trick here is that Tn = translational component of transform,
 	// but for an inverse transform, Tn = - R^-1 * T
@@ -1841,7 +1841,7 @@ inline void MatrixITransformPlane( const matrix3x4_t &src, const cplane_t &inPla
 	outPlane.dist -= outPlane.normal.x * vecInvTranslation[0] + outPlane.normal.y * vecInvTranslation[1] + outPlane.normal.z * vecInvTranslation[2];
 }
 
-constexpr inline int CeilPow2( int in )
+constexpr inline int XM_CALLCONV CeilPow2( int in )
 {
 	int retval = 1;
 	while( retval < in )
@@ -1849,7 +1849,7 @@ constexpr inline int CeilPow2( int in )
 	return retval;
 }
 
-constexpr inline int FloorPow2( int in )
+constexpr inline int XM_CALLCONV FloorPow2( int in )
 {
 	int retval = 1;
 	while( retval < in )
@@ -1857,7 +1857,7 @@ constexpr inline int FloorPow2( int in )
 	return retval >> 1;
 }
 
-FORCEINLINE float * UnpackNormal_HEND3N( const unsigned int *pPackedNormal, float *pNormal )
+FORCEINLINE float * XM_CALLCONV UnpackNormal_HEND3N( const unsigned int *pPackedNormal, float *pNormal )
 {
 	int temp[3];
 	temp[0] = ((*pPackedNormal >> 0L) & 0x7ff);
@@ -1881,7 +1881,7 @@ FORCEINLINE float * UnpackNormal_HEND3N( const unsigned int *pPackedNormal, floa
 	return pNormal;
 }
 
-FORCEINLINE unsigned int * PackNormal_HEND3N( const float *pNormal, unsigned int *pPackedNormal )
+FORCEINLINE unsigned int * XM_CALLCONV PackNormal_HEND3N( const float *pNormal, unsigned int *pPackedNormal )
 {
 	int temp[3];
 
@@ -1901,7 +1901,7 @@ FORCEINLINE unsigned int * PackNormal_HEND3N( const float *pNormal, unsigned int
 	return pPackedNormal;
 }
 
-FORCEINLINE unsigned int * PackNormal_HEND3N( float nx, float ny, float nz, unsigned int *pPackedNormal )
+FORCEINLINE unsigned int * XM_CALLCONV PackNormal_HEND3N( float nx, float ny, float nz, unsigned int *pPackedNormal )
 {
 	int temp[3];
 
@@ -1921,7 +1921,7 @@ FORCEINLINE unsigned int * PackNormal_HEND3N( float nx, float ny, float nz, unsi
 	return pPackedNormal;
 }
 
-FORCEINLINE float * UnpackNormal_SHORT2( const unsigned int *pPackedNormal, float *pNormal, bool bIsTangent = FALSE )
+FORCEINLINE float * XM_CALLCONV UnpackNormal_SHORT2( const unsigned int *pPackedNormal, float *pNormal, bool bIsTangent = FALSE )
 {
 	// Unpacks from Jason's 2-short format (fills in a 4th binormal-sign (+1/-1) value, if this is a tangent vector)
 
@@ -1953,7 +1953,7 @@ FORCEINLINE float * UnpackNormal_SHORT2( const unsigned int *pPackedNormal, floa
 	return pNormal;
 }
 
-FORCEINLINE unsigned int * PackNormal_SHORT2( float nx, float ny, float nz, unsigned int *pPackedNormal, float binormalSign = +1.0f )
+FORCEINLINE unsigned int * XM_CALLCONV PackNormal_SHORT2( float nx, float ny, float nz, unsigned int *pPackedNormal, float binormalSign = +1.0f )
 {
 	// Pack a vector (ASSUMED TO BE NORMALIZED) into Jason's 4-byte (SHORT2) format.
 	// This simply reconstructs Z from X & Y. It uses the sign bits of the X & Y coords
@@ -1987,13 +1987,13 @@ FORCEINLINE unsigned int * PackNormal_SHORT2( float nx, float ny, float nz, unsi
 	return pPackedNormal;
 }
 
-FORCEINLINE unsigned int * PackNormal_SHORT2( const float *pNormal, unsigned int *pPackedNormal, float binormalSign = +1.0f )
+FORCEINLINE unsigned int * XM_CALLCONV PackNormal_SHORT2( const float *pNormal, unsigned int *pPackedNormal, float binormalSign = +1.0f )
 {
 	return PackNormal_SHORT2( pNormal[0], pNormal[1], pNormal[2], pPackedNormal, binormalSign );
 }
 
 // Unpacks a UBYTE4 normal (for a tangent, the result's fourth component receives the binormal 'sign')
-FORCEINLINE float * UnpackNormal_UBYTE4( const unsigned int *pPackedNormal, float *pNormal, bool bIsTangent = FALSE )
+FORCEINLINE float * XM_CALLCONV UnpackNormal_UBYTE4( const unsigned int *pPackedNormal, float *pNormal, bool bIsTangent = FALSE )
 {
 	unsigned char cX, cY;
 	if ( bIsTangent )
@@ -2058,7 +2058,7 @@ FORCEINLINE float * UnpackNormal_UBYTE4( const unsigned int *pPackedNormal, floa
 // bIsTangent is used to specify which WORD of the output to store the data
 // The expected usage is to call once with the normal and once with
 // the tangent and binormal sign flag, bitwise OR'ing the returned DWORDs
-FORCEINLINE unsigned int * PackNormal_UBYTE4( float nx, float ny, float nz, unsigned int *pPackedNormal, bool bIsTangent = false, float binormalSign = +1.0f )
+FORCEINLINE unsigned int * XM_CALLCONV PackNormal_UBYTE4( float nx, float ny, float nz, unsigned int *pPackedNormal, bool bIsTangent = false, float binormalSign = +1.0f )
 {
 	float xSign = nx < 0.0f ? -1.0f : 1.0f;			// -1 or 1 sign
 	float ySign = ny < 0.0f ? -1.0f : 1.0f;
@@ -2103,7 +2103,7 @@ FORCEINLINE unsigned int * PackNormal_UBYTE4( float nx, float ny, float nz, unsi
 	return pPackedNormal;
 }
 
-FORCEINLINE unsigned int * PackNormal_UBYTE4( const float *pNormal, unsigned int *pPackedNormal, bool bIsTangent = false, float binormalSign = +1.0f )
+FORCEINLINE unsigned int * XM_CALLCONV PackNormal_UBYTE4( const float *pNormal, unsigned int *pPackedNormal, bool bIsTangent = false, float binormalSign = +1.0f )
 {
 	return PackNormal_UBYTE4( pNormal[0], pNormal[1], pNormal[2], pPackedNormal, bIsTangent, binormalSign );
 }
@@ -2118,7 +2118,7 @@ void RGBtoHSV( const Vector &rgb, Vector &hsv );
 //-----------------------------------------------------------------------------
 // Convert HSV to RGB
 //-----------------------------------------------------------------------------
-void HSVtoRGB( const Vector &hsv, Vector &rgb );
+void XM_CALLCONV HSVtoRGB( const Vector &hsv, Vector &rgb );
 
 
 //-----------------------------------------------------------------------------
@@ -2134,12 +2134,12 @@ float XM_CALLCONV FastPow10( float i );			// 10^i
 // For testing float equality
 //-----------------------------------------------------------------------------
 
-inline bool CloseEnough( float a, float b, float epsilon = EQUAL_EPSILON )
+inline bool XM_CALLCONV CloseEnough( float a, float b, float epsilon = EQUAL_EPSILON )
 {
 	return fabsf( a - b ) <= epsilon;
 }
 
-inline bool CloseEnough( const Vector &a, const Vector &b, float epsilon = EQUAL_EPSILON )
+inline bool XM_CALLCONV CloseEnough( const Vector &a, const Vector &b, float epsilon = EQUAL_EPSILON )
 {
 	return fabsf( a.x - b.x ) <= epsilon &&
 		fabsf( a.y - b.y ) <= epsilon &&
@@ -2153,9 +2153,9 @@ inline bool CloseEnough( const Vector &a, const Vector &b, float epsilon = EQUAL
 // representation. maxUlps can also be interpreted in terms of how many 
 // representable floats we are willing to accept between A and B. 
 // This function will allow maxUlps-1 floats between A and B.
-bool AlmostEqual(float a, float b, int maxUlps = 10);
+bool XM_CALLCONV AlmostEqual(float a, float b, int maxUlps = 10);
 
-inline bool AlmostEqual( const Vector &a, const Vector &b, int maxUlps = 10)
+inline bool XM_CALLCONV AlmostEqual( const Vector &a, const Vector &b, int maxUlps = 10)
 {
 	return AlmostEqual( a.x, b.x, maxUlps ) &&
 		AlmostEqual( a.y, b.y, maxUlps ) &&

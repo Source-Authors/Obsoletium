@@ -61,13 +61,13 @@ const int nanmask = 255<<23;
 //				rotations in degrees around Y, Z, and X respectively.
 //-----------------------------------------------------------------------------
 
-void MatrixAngles( const matrix3x4_t& matrix, RadianEuler &angles, Vector &position )
+void XM_CALLCONV MatrixAngles( const matrix3x4_t& matrix, RadianEuler &angles, Vector &position )
 {
 	MatrixGetColumn( matrix, 3, position );
 	MatrixAngles( matrix, angles );
 }
 
-void MatrixAngles( const matrix3x4_t &matrix, Quaternion &q, Vector &pos )
+void XM_CALLCONV MatrixAngles( const matrix3x4_t &matrix, Quaternion &q, Vector &pos )
 {
 #ifdef _VPROF_MATHLIB
 	VPROF_BUDGET( "MatrixQuaternion", "Mathlib" );
@@ -125,7 +125,7 @@ void MatrixAngles( const matrix3x4_t &matrix, Quaternion &q, Vector &pos )
 	MatrixGetColumn( matrix, 3, pos );
 }
 
-void MatrixAngles( const matrix3x4_t& matrix, float *angles )
+void XM_CALLCONV MatrixAngles( const matrix3x4_t& matrix, float *angles )
 { 
 #ifdef _VPROF_MATHLIB
 	VPROF_BUDGET( "MatrixAngles", "Mathlib" );
@@ -175,7 +175,7 @@ void MatrixAngles( const matrix3x4_t& matrix, float *angles )
 
 
 // transform in1 by the matrix in2
-void VectorTransform (const float *in1, const matrix3x4_t& in2, float *out)
+void XM_CALLCONV VectorTransform (const float *in1, const matrix3x4_t& in2, float *out)
 {
 	Assert( in1 != out );
 
@@ -199,7 +199,7 @@ static DirectX::XMVECTOR XM_CALLCONV VectorTransform( DirectX::FXMVECTOR vin1, c
 }
 
 // transform in1 by the matrix in2
-void VectorTransform (const Vector& in1, const matrix3x4_t &in2, Vector &out)
+void XM_CALLCONV VectorTransform (const Vector& in1, const matrix3x4_t &in2, Vector &out)
 {
 	Assert( &in1 != &out );
 
@@ -209,7 +209,7 @@ void VectorTransform (const Vector& in1, const matrix3x4_t &in2, Vector &out)
 
 
 // assuming the matrix is orthonormal, transform in1 by the transpose (also the inverse in this case) of in2.
-void VectorITransform (const float *in1, const matrix3x4_t& in2, float *out)
+void XM_CALLCONV VectorITransform (const float *in1, const matrix3x4_t& in2, float *out)
 {
 	float in1t[3];
 
@@ -257,7 +257,7 @@ static DirectX::XMVECTOR XM_CALLCONV VectorITransform( DirectX::FXMVECTOR vin1, 
 	);
 }
 
-void VectorITransform (const Vector& in1, const matrix3x4_t &in2, Vector &out)
+void XM_CALLCONV VectorITransform (const Vector& in1, const matrix3x4_t &in2, Vector &out)
 {
 	DirectX::XMVECTOR vin1  = DirectX::XMLoadFloat3( in1.XmBase() );
 	DirectX::XMStoreFloat3( out.XmBase(), VectorITransform( vin1, in2 ) );
@@ -265,7 +265,7 @@ void VectorITransform (const Vector& in1, const matrix3x4_t &in2, Vector &out)
 
 
 // assume in2 is a rotation and rotate the input vector
-void VectorRotate( const float *in1, const matrix3x4_t& in2, float *out )
+void XM_CALLCONV VectorRotate( const float *in1, const matrix3x4_t& in2, float *out )
 {
 	Assert( in1 != out );
 
@@ -286,7 +286,7 @@ static DirectX::XMVECTOR XM_CALLCONV VectorRotate( DirectX::XMVECTOR vin1, const
 }
 
 // assume in2 is a rotation and rotate the input vector
-void VectorRotate( const Vector &in1, const matrix3x4_t& in2, Vector &out )
+void XM_CALLCONV VectorRotate( const Vector &in1, const matrix3x4_t& in2, Vector &out )
 {
 	Assert( &in1 != &out );
 
@@ -295,7 +295,7 @@ void VectorRotate( const Vector &in1, const matrix3x4_t& in2, Vector &out )
 }
 
 // assume in2 is a rotation and rotate the input vector
-void VectorRotate( const Vector &in1, const QAngle &in2, Vector &out )
+void XM_CALLCONV VectorRotate( const Vector &in1, const QAngle &in2, Vector &out )
 {
 	matrix3x4_t matRotate;
 	AngleMatrix( in2, matRotate );
@@ -303,7 +303,7 @@ void VectorRotate( const Vector &in1, const QAngle &in2, Vector &out )
 }
 
 // assume in2 is a rotation and rotate the input vector
-void VectorRotate( const Vector &in1, const Quaternion &in2, Vector &out )
+void XM_CALLCONV VectorRotate( const Vector &in1, const Quaternion &in2, Vector &out )
 {
 	matrix3x4_t matRotate;
 	QuaternionMatrix( in2, matRotate );
@@ -312,7 +312,7 @@ void VectorRotate( const Vector &in1, const Quaternion &in2, Vector &out )
 
 
 // rotate by the inverse of the matrix
-void VectorIRotate( const float *in1, const matrix3x4_t& in2, float *out )
+void XM_CALLCONV VectorIRotate( const float *in1, const matrix3x4_t& in2, float *out )
 {
 	Assert( in1 != out );
 
@@ -329,7 +329,7 @@ void XM_CALLCONV VectorIRotate( Vector in1, const matrix3x4_t &in2, Vector &out 
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 // transform a set of angles in the output space of parentMatrix to the input space
-QAngle TransformAnglesToLocalSpace( const QAngle &angles, const matrix3x4_t &parentMatrix )
+QAngle XM_CALLCONV TransformAnglesToLocalSpace( const QAngle &angles, const matrix3x4_t &parentMatrix )
 {
 	matrix3x4_t angToWorld, worldToParent, localMatrix;
 	MatrixInvert( parentMatrix, worldToParent );
@@ -342,7 +342,7 @@ QAngle TransformAnglesToLocalSpace( const QAngle &angles, const matrix3x4_t &par
 }
 
 // transform a set of angles in the input space of parentMatrix to the output space
-QAngle TransformAnglesToWorldSpace( const QAngle &angles, const matrix3x4_t &parentMatrix )
+QAngle XM_CALLCONV TransformAnglesToWorldSpace( const QAngle &angles, const matrix3x4_t &parentMatrix )
 {
 	matrix3x4_t angToParent, angToWorld;
 	AngleMatrix( angles, angToParent );
@@ -354,7 +354,7 @@ QAngle TransformAnglesToWorldSpace( const QAngle &angles, const matrix3x4_t &par
 
 #endif // VECTOR_NO_SLOW_OPERATIONS
 
-void MatrixInitialize( matrix3x4_t &mat, const Vector &vecOrigin, const Vector &vecXAxis, const Vector &vecYAxis, const Vector &vecZAxis )
+void XM_CALLCONV MatrixInitialize( matrix3x4_t &mat, const Vector &vecOrigin, const Vector &vecXAxis, const Vector &vecYAxis, const Vector &vecZAxis )
 {
 	MatrixSetColumn( vecXAxis, 0, mat );
 	MatrixSetColumn( vecYAxis, 1, mat );
@@ -362,7 +362,7 @@ void MatrixInitialize( matrix3x4_t &mat, const Vector &vecOrigin, const Vector &
 	MatrixSetColumn( vecOrigin, 3, mat );
 }
 
-void MatrixCopy( const matrix3x4_t& in, matrix3x4_t& out )
+void XM_CALLCONV MatrixCopy( const matrix3x4_t& in, matrix3x4_t& out )
 {
 	memcpy( out.Base(), in.Base(), sizeof( float ) * 3 * 4 );
 }
@@ -370,7 +370,7 @@ void MatrixCopy( const matrix3x4_t& in, matrix3x4_t& out )
 //-----------------------------------------------------------------------------
 // Matrix equality test
 //-----------------------------------------------------------------------------
-bool MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float flTolerance )
+bool XM_CALLCONV MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float flTolerance )
 {
 	DirectX::XMVECTOR vtol = DirectX::XMVectorReplicate( flTolerance );
 
@@ -391,7 +391,7 @@ bool MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float f
 }
 
 // NOTE: This is just the transpose not a general inverse
-void MatrixInvert( const matrix3x4_t& in, matrix3x4_t& out )
+void XM_CALLCONV MatrixInvert( const matrix3x4_t& in, matrix3x4_t& out )
 {
 	if ( &in == &out )
 	{
@@ -426,21 +426,21 @@ void MatrixInvert( const matrix3x4_t& in, matrix3x4_t& out )
 	out[2][3] = -DotProduct( tmp, out[2] );
 }
 
-void MatrixGetColumn( const matrix3x4_t& in, int column, Vector &out )
+void XM_CALLCONV MatrixGetColumn( const matrix3x4_t& in, int column, Vector &out )
 {
 	out.x = in[0][column];
 	out.y = in[1][column];
 	out.z = in[2][column];
 }
 
-void MatrixSetColumn( const Vector &in, int column, matrix3x4_t& out )
+void XM_CALLCONV MatrixSetColumn( const Vector &in, int column, matrix3x4_t& out )
 {
 	out[0][column] = in.x;
 	out[1][column] = in.y;
 	out[2][column] = in.z;
 }
 
-void MatrixScaleBy ( const float flScale, matrix3x4_t &out )
+void XM_CALLCONV MatrixScaleBy ( const float flScale, matrix3x4_t &out )
 {
 	out[0][0] *= flScale;
 	out[1][0] *= flScale;
@@ -453,7 +453,7 @@ void MatrixScaleBy ( const float flScale, matrix3x4_t &out )
 	out[2][2] *= flScale;
 }
 
-void MatrixScaleByZero ( matrix3x4_t &out )
+void XM_CALLCONV MatrixScaleByZero ( matrix3x4_t &out )
 {
 	out[0][0] = 0.0f;
 	out[1][0] = 0.0f;
@@ -488,7 +488,7 @@ void MatrixScaleByZero ( matrix3x4_t &out )
 //}
 
 // Matrix is right-handed x=forward, y=left, z=up.  We a left-handed convention for vectors in the game code (forward, right, up)
-void MatrixVectors( const matrix3x4_t &matrix, Vector* pForward, Vector *pRight, Vector *pUp )
+void XM_CALLCONV MatrixVectors( const matrix3x4_t &matrix, Vector* pForward, Vector *pRight, Vector *pUp )
 {
 	MatrixGetColumn( matrix, 0, *pForward );
 	MatrixGetColumn( matrix, 1, *pRight );
@@ -497,7 +497,7 @@ void MatrixVectors( const matrix3x4_t &matrix, Vector* pForward, Vector *pRight,
 }
 
 
-void VectorVectors( const Vector &forward, Vector &right, Vector &up )
+void XM_CALLCONV VectorVectors( const Vector &forward, Vector &right, Vector &up )
 {
 	Assert( s_bMathlibInitialized );
 	Vector tmp;
@@ -522,7 +522,7 @@ void VectorVectors( const Vector &forward, Vector &right, Vector &up )
 	}
 }
 
-void VectorMatrix( const Vector &forward, matrix3x4_t& matrix)
+void XM_CALLCONV VectorMatrix( const Vector &forward, matrix3x4_t& matrix)
 {
 	Assert( s_bMathlibInitialized );
 	Vector right, up;
@@ -652,7 +652,7 @@ R_ConcatTransforms
 ================
 */
 
-void ConcatTransforms (const matrix3x4_t& in1, const matrix3x4_t& in2, matrix3x4_t& out)
+void XM_CALLCONV ConcatTransforms (const matrix3x4_t& in1, const matrix3x4_t& in2, matrix3x4_t& out)
 {
 #if 0
 	// test for ones that'll be 2x faster
@@ -722,7 +722,7 @@ quotient must fit in 32 bits.
 ====================
 */
 
-void FloorDivMod (double numer, double denom, int *quotient,
+void XM_CALLCONV FloorDivMod (double numer, double denom, int *quotient,
 		int *rem)
 {
 	Assert( s_bMathlibInitialized );
@@ -770,7 +770,7 @@ void FloorDivMod (double numer, double denom, int *quotient,
 GreatestCommonDivisor
 ====================
 */
-int GreatestCommonDivisor (int i1, int i2)
+int XM_CALLCONV GreatestCommonDivisor (int i1, int i2)
 {
 	if (i1 > i2)
 	{
@@ -787,7 +787,7 @@ int GreatestCommonDivisor (int i1, int i2)
 }
 
 
-bool IsDenormal( const float &val )
+bool XM_CALLCONV IsDenormal( float val )
 {
 	const int x = *reinterpret_cast <const int *> (&val); // needs 32-bit int
 	const int abs_mantissa = x & 0x007FFFFF;
@@ -1069,7 +1069,7 @@ int XM_CALLCONV BoxOnPlaneSide ( Vector emins, Vector emaxs, const cplane_t *p )
 // Euler QAngle -> Basis Vectors
 //-----------------------------------------------------------------------------
 
-void AngleVectors (const QAngle &angles, Vector *forward)
+void XM_CALLCONV AngleVectors (const QAngle &angles, Vector *forward)
 {
 	Assert( s_bMathlibInitialized );
 	Assert( forward );
@@ -1087,7 +1087,7 @@ void AngleVectors (const QAngle &angles, Vector *forward)
 //-----------------------------------------------------------------------------
 // Euler QAngle -> Basis Vectors.  Each vector is optional
 //-----------------------------------------------------------------------------
-void AngleVectors( const QAngle &angles, Vector *forward, Vector *right, Vector *up )
+void XM_CALLCONV AngleVectors( const QAngle &angles, Vector *forward, Vector *right, Vector *up )
 {
 	Assert( s_bMathlibInitialized );
 	
@@ -1124,7 +1124,7 @@ void AngleVectors( const QAngle &angles, Vector *forward, Vector *right, Vector 
 // Euler QAngle -> Basis Vectors transposed
 //-----------------------------------------------------------------------------
 
-void AngleVectorsTranspose (const QAngle &angles, Vector *forward, Vector *right, Vector *up)
+void XM_CALLCONV AngleVectorsTranspose (const QAngle &angles, Vector *forward, Vector *right, Vector *up)
 {
 	Assert( s_bMathlibInitialized );
 
@@ -1161,7 +1161,7 @@ void AngleVectorsTranspose (const QAngle &angles, Vector *forward, Vector *right
 // Forward direction vector -> Euler angles
 //-----------------------------------------------------------------------------
 
-void VectorAngles( const Vector& forward, QAngle &angles )
+void XM_CALLCONV VectorAngles( const Vector& forward, QAngle &angles )
 {
 	float	tmp, yaw, pitch;
 	
@@ -1194,7 +1194,7 @@ void VectorAngles( const Vector& forward, QAngle &angles )
 // Forward direction vector with a reference up vector -> Euler angles
 //-----------------------------------------------------------------------------
 
-void VectorAngles( const Vector &forward, const Vector &pseudoup, QAngle &angles )
+void XM_CALLCONV VectorAngles( const Vector &forward, const Vector &pseudoup, QAngle &angles )
 {
 	Assert( s_bMathlibInitialized );
 
@@ -1236,7 +1236,7 @@ void VectorAngles( const Vector &forward, const Vector &pseudoup, QAngle &angles
 	}	
 }
 
-void SetIdentityMatrix( matrix3x4_t& matrix )
+void XM_CALLCONV SetIdentityMatrix( matrix3x4_t& matrix )
 {
 	memset( matrix.Base(), 0, sizeof(float)*3*4 );
 	matrix[0][0] = 1.0;
@@ -1248,7 +1248,7 @@ void SetIdentityMatrix( matrix3x4_t& matrix )
 //-----------------------------------------------------------------------------
 // Builds a scale matrix
 //-----------------------------------------------------------------------------
-void SetScaleMatrix( float x, float y, float z, matrix3x4_t &dst )
+void XM_CALLCONV SetScaleMatrix( float x, float y, float z, matrix3x4_t &dst )
 {
 	dst[0][0] = x;		dst[0][1] = 0.0f;	dst[0][2] = 0.0f;	dst[0][3] = 0.0f;
 	dst[1][0] = 0.0f;	dst[1][1] = y;		dst[1][2] = 0.0f;	dst[1][3] = 0.0f;
@@ -1267,7 +1267,7 @@ void SetScaleMatrix( float x, float y, float z, matrix3x4_t &dst )
 //			vAxisOrRot - 
 //			angle - 
 //-----------------------------------------------------------------------------
-void MatrixBuildRotationAboutAxis( const Vector &vAxisOfRot, float angleDegrees, matrix3x4_t &dst )
+void XM_CALLCONV MatrixBuildRotationAboutAxis( const Vector &vAxisOfRot, float angleDegrees, matrix3x4_t &dst )
 {
 	float radians;
 	float axisXSquared;
@@ -1309,14 +1309,14 @@ void MatrixBuildRotationAboutAxis( const Vector &vAxisOfRot, float angleDegrees,
 //-----------------------------------------------------------------------------
 // Computes the transpose
 //-----------------------------------------------------------------------------
-void MatrixTranspose( matrix3x4_t& mat )
+void XM_CALLCONV MatrixTranspose( matrix3x4_t& mat )
 {
 	std::swap( mat[0][1], mat[1][0] );
 	std::swap( mat[0][2], mat[2][0] );
 	std::swap( mat[1][2], mat[2][1] );
 }
 
-void MatrixTranspose( const matrix3x4_t& src, matrix3x4_t& dst )
+void XM_CALLCONV MatrixTranspose( const matrix3x4_t& src, matrix3x4_t& dst )
 {
 	DirectX::XMMATRIX msrc = DirectX::XMLoadFloat3x4( src.XmMBase() );
 
@@ -1333,13 +1333,13 @@ void MatrixTranspose( const matrix3x4_t& src, matrix3x4_t& dst )
 //			matrix[][1] is left
 //			matrix[][2] is up
 //-----------------------------------------------------------------------------
-void AngleMatrix( RadianEuler const &angles, const Vector &position, matrix3x4_t& matrix )
+void XM_CALLCONV AngleMatrix( RadianEuler const &angles, const Vector &position, matrix3x4_t& matrix )
 {
 	AngleMatrix( angles, matrix );
 	MatrixSetColumn( position, 3, matrix );
 }
 
-void AngleMatrix( const RadianEuler& angles, matrix3x4_t& matrix )
+void XM_CALLCONV AngleMatrix( const RadianEuler& angles, matrix3x4_t& matrix )
 {
 	QAngle quakeEuler( RAD2DEG( angles.y ), RAD2DEG( angles.z ), RAD2DEG( angles.x ) );
 
@@ -1347,13 +1347,13 @@ void AngleMatrix( const RadianEuler& angles, matrix3x4_t& matrix )
 }
 
 
-void AngleMatrix( const QAngle &angles, const Vector &position, matrix3x4_t& matrix )
+void XM_CALLCONV AngleMatrix( const QAngle &angles, const Vector &position, matrix3x4_t& matrix )
 {
 	AngleMatrix( angles, matrix );
 	MatrixSetColumn( position, 3, matrix );
 }
 
-void AngleMatrix( const QAngle &angles, matrix3x4_t& matrix )
+void XM_CALLCONV AngleMatrix( const QAngle &angles, matrix3x4_t& matrix )
 {
 #ifdef _VPROF_MATHLIB
 	VPROF_BUDGET( "AngleMatrix", "Mathlib" );
@@ -1389,14 +1389,14 @@ void AngleMatrix( const QAngle &angles, matrix3x4_t& matrix )
 	matrix[2][3] = 0.0f;
 }
 
-void AngleIMatrix( const RadianEuler& angles, matrix3x4_t& matrix )
+void XM_CALLCONV AngleIMatrix( const RadianEuler& angles, matrix3x4_t& matrix )
 {
 	QAngle quakeEuler( RAD2DEG( angles.y ), RAD2DEG( angles.z ), RAD2DEG( angles.x ) );
 
 	AngleIMatrix( quakeEuler, matrix );
 }
 
-void AngleIMatrix (const QAngle& angles, matrix3x4_t& matrix )
+void XM_CALLCONV AngleIMatrix (const QAngle& angles, matrix3x4_t& matrix )
 {
 	Assert( s_bMathlibInitialized );
 	float		sr, sp, sy, cr, cp, cy;
@@ -1420,7 +1420,7 @@ void AngleIMatrix (const QAngle& angles, matrix3x4_t& matrix )
 	matrix[2][3] = 0.f;
 }
 
-void AngleIMatrix (const QAngle &angles, const Vector &position, matrix3x4_t &mat )
+void XM_CALLCONV AngleIMatrix (const QAngle &angles, const Vector &position, matrix3x4_t &mat )
 {
 	AngleIMatrix( angles, mat );
 
@@ -1435,13 +1435,13 @@ void AngleIMatrix (const QAngle &angles, const Vector &position, matrix3x4_t &ma
 // Bounding box construction methods
 //-----------------------------------------------------------------------------
 
-void ClearBounds (Vector& mins, Vector& maxs)
+void XM_CALLCONV ClearBounds (Vector& mins, Vector& maxs)
 {
 	mins[0] = mins[1] = mins[2] = 99999;
 	maxs[0] = maxs[1] = maxs[2] = -99999;
 }
 
-void AddPointToBounds (const Vector& v, Vector& mins, Vector& maxs)
+void XM_CALLCONV AddPointToBounds (const Vector& v, Vector& mins, Vector& maxs)
 {
 	for (int i=0 ; i<3 ; i++)
 	{
@@ -1454,7 +1454,7 @@ void AddPointToBounds (const Vector& v, Vector& mins, Vector& maxs)
 }
 
 // solve a x^2 + b x + c = 0
-bool SolveQuadratic( float a, float b, float c, float &root1, float &root2 )
+bool XM_CALLCONV SolveQuadratic( float a, float b, float c, float &root1, float &root2 )
 {
 	if (a == 0)
 	{
@@ -1488,7 +1488,7 @@ bool SolveQuadratic( float a, float b, float c, float &root1, float &root2 )
 }
 
 // solves for "a, b, c" where "a x^2 + b x + c = y", return true if solution exists
-bool SolveInverseQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c )
+bool XM_CALLCONV SolveInverseQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c )
 {
 	float det = (x1 - x2)*(x1 - x3)*(x2 - x3);
 
@@ -1505,7 +1505,7 @@ bool SolveInverseQuadratic( float x1, float y1, float x2, float y2, float x3, fl
 	return true;
 }
 
-bool SolveInverseQuadraticMonotonic( float x1, float y1, float x2, float y2, float x3, float y3, 
+bool XM_CALLCONV SolveInverseQuadraticMonotonic( float x1, float y1, float x2, float y2, float x3, float y3, 
 									 float &a, float &b, float &c )
 {
 	// use SolveInverseQuadratic, but if the sigm of the derivative at the start point is the wrong
@@ -1558,7 +1558,7 @@ bool SolveInverseQuadraticMonotonic( float x1, float y1, float x2, float y2, flo
 
 
 // solves for "a, b, c" where "1/(a x^2 + b x + c ) = y", return true if solution exists
-bool SolveInverseReciprocalQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c )
+bool XM_CALLCONV SolveInverseReciprocalQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c )
 {
 	float det = (x1 - x2)*(x1 - x3)*(x2 - x3)*y1*y2*y3;
 
@@ -1577,7 +1577,7 @@ bool SolveInverseReciprocalQuadratic( float x1, float y1, float x2, float y2, fl
 
 
 // Rotate a vector around the Z axis (YAW)
-void VectorYawRotate( const Vector &in, float flYaw, Vector &out)
+void XM_CALLCONV VectorYawRotate( const Vector &in, float flYaw, Vector &out)
 {
 	Assert( s_bMathlibInitialized );
 	if (&in == &out )
@@ -1599,7 +1599,7 @@ void VectorYawRotate( const Vector &in, float flYaw, Vector &out)
 
 
 
-float Bias( float x, float biasAmt )
+float XM_CALLCONV Bias( float x, float biasAmt )
 {
 	// WARNING: not thread safe
 	static float lastAmt = -1;
@@ -1614,7 +1614,7 @@ float Bias( float x, float biasAmt )
 }
 
 
-float Gain( float x, float biasAmt )
+float XM_CALLCONV Gain( float x, float biasAmt )
 {
 	// WARNING: not thread safe
 	if( x < 0.5 )
@@ -1624,7 +1624,7 @@ float Gain( float x, float biasAmt )
 }
 
 
-float SmoothCurve( float x )
+float XM_CALLCONV SmoothCurve( float x )
 {
 	// Actual smooth curve. Visualization:
 	// https://www.wolframalpha.com/input/?i=plot%5B+0.5+*+%281+-+cos%5B2+*+pi+*+x%5D%29+for+x+%3D+%280%2C+1%29+%5D
@@ -1632,7 +1632,7 @@ float SmoothCurve( float x )
 }
 
 
-inline float MovePeak( float x, float flPeakPos )
+inline float XM_CALLCONV MovePeak( float x, float flPeakPos )
 {
 	// Todo: make this higher-order?
 	if( ( x < flPeakPos && flPeakPos != 0.0f ) || flPeakPos == 1.0f )
@@ -1642,7 +1642,7 @@ inline float MovePeak( float x, float flPeakPos )
 }
 
 
-float SmoothCurve_Tweak( float x, float flPeakPos, float flPeakSharpness )
+float XM_CALLCONV SmoothCurve_Tweak( float x, float flPeakPos, float flPeakSharpness )
 {
 	float flMovedPeak = MovePeak( x, flPeakPos );
 	float flSharpened = Gain( flMovedPeak, flPeakSharpness );
@@ -1653,7 +1653,7 @@ float SmoothCurve_Tweak( float x, float flPeakPos, float flPeakSharpness )
 // make sure quaternions are within 180 degrees of one another, if not, reverse q
 //-----------------------------------------------------------------------------
 
-void QuaternionAlign( const Quaternion &p, const Quaternion &q, Quaternion &qt )
+void XM_CALLCONV QuaternionAlign( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 {
 	// FIXME: can this be done with a quat dot product?
 
@@ -1687,7 +1687,7 @@ void QuaternionAlign( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 // Do a piecewise addition of the quaternion elements. This actually makes little 
 // mathematical sense, but it's a cheap way to simulate a slerp.
 //-----------------------------------------------------------------------------
-void QuaternionBlend( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
+void XM_CALLCONV QuaternionBlend( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
 	Assert( s_bMathlibInitialized );
 #if ALLOW_SIMD_QUATERNION_MATH
@@ -1704,7 +1704,7 @@ void QuaternionBlend( const Quaternion &p, const Quaternion &q, float t, Quatern
 }
 
 
-void QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
+void XM_CALLCONV QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
 	Assert( s_bMathlibInitialized );
 
@@ -1716,7 +1716,7 @@ void QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, 
 
 
 
-void QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt )
+void XM_CALLCONV QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt )
 {
 	Assert( s_bMathlibInitialized );
 
@@ -1739,7 +1739,7 @@ void QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt )
 // Quaternion sphereical linear interpolation
 //-----------------------------------------------------------------------------
 
-void QuaternionSlerp( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
+void XM_CALLCONV QuaternionSlerp( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
 	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
 	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
@@ -1752,7 +1752,7 @@ void QuaternionSlerp( const Quaternion &p, const Quaternion &q, float t, Quatern
 }
 
 
-void QuaternionSlerpNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
+void XM_CALLCONV QuaternionSlerpNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
 	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
 	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
@@ -1768,7 +1768,7 @@ void QuaternionSlerpNoAlign( const Quaternion &p, const Quaternion &q, float t, 
 //-----------------------------------------------------------------------------
 // Purpose: Returns the angular delta between the two normalized quaternions in degrees.
 //-----------------------------------------------------------------------------
-float QuaternionAngleDiff( const Quaternion &p, const Quaternion &q )
+float XM_CALLCONV QuaternionAngleDiff( const Quaternion &p, const Quaternion &q )
 {
 #if 1
 	// this code path is here for 2 reasons:
@@ -1805,7 +1805,7 @@ float QuaternionAngleDiff( const Quaternion &p, const Quaternion &q )
 #endif
 }
 
-void QuaternionConjugate( const Quaternion &p, Quaternion &q )
+void XM_CALLCONV QuaternionConjugate( const Quaternion &p, Quaternion &q )
 {
 	Assert( q.IsValid() );
 
@@ -1815,7 +1815,7 @@ void QuaternionConjugate( const Quaternion &p, Quaternion &q )
 	q.w = p.w;
 }
 
-void QuaternionInvert( const Quaternion &p, Quaternion &q )
+void XM_CALLCONV QuaternionInvert( const Quaternion &p, Quaternion &q )
 {
 	Assert( s_bMathlibInitialized );
 	Assert( q.IsValid() );
@@ -1837,7 +1837,7 @@ void QuaternionInvert( const Quaternion &p, Quaternion &q )
 //-----------------------------------------------------------------------------
 // Make sure the quaternion is of unit length
 //-----------------------------------------------------------------------------
-float QuaternionNormalize( Quaternion &q )
+float XM_CALLCONV QuaternionNormalize( Quaternion &q )
 {
 	Assert( q.IsValid() );
 
@@ -1850,7 +1850,7 @@ float QuaternionNormalize( Quaternion &q )
 }
 
 // dimhotepus: QuaternionNormalize without length.
-void QuaternionNormalize2( Quaternion &q )
+void XM_CALLCONV QuaternionNormalize2( Quaternion &q )
 {
 	Assert( q.IsValid() );
 
@@ -1858,7 +1858,7 @@ void QuaternionNormalize2( Quaternion &q )
 	DirectX::XMStoreFloat4( q.XmBase(), QuaternionNormalizeSIMD( qsimd ) );
 }
 
-void QuaternionScale( const Quaternion &p, float t, Quaternion &q )
+void XM_CALLCONV QuaternionScale( const Quaternion &p, float t, Quaternion &q )
 {
 	Assert( s_bMathlibInitialized );
 
@@ -1894,7 +1894,7 @@ void QuaternionScale( const Quaternion &p, float t, Quaternion &q )
 }
 
 
-void QuaternionAdd( const Quaternion &p, const Quaternion &q, Quaternion &qt )
+void XM_CALLCONV QuaternionAdd( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 {
 	Assert( p.IsValid() );
 	Assert( q.IsValid() );
@@ -1912,7 +1912,7 @@ void QuaternionAdd( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 }
 
 
-float QuaternionDotProduct( const Quaternion &p, const Quaternion &q )
+float XM_CALLCONV QuaternionDotProduct( const Quaternion &p, const Quaternion &q )
 {
 	Assert( p.IsValid() );
 	Assert( q.IsValid() );
@@ -1925,7 +1925,7 @@ float QuaternionDotProduct( const Quaternion &p, const Quaternion &q )
 
 
 // qt = p * q
-void QuaternionMult( const Quaternion &p, const Quaternion &q, Quaternion &qt )
+void XM_CALLCONV QuaternionMult( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 {
 	Assert( s_bMathlibInitialized );
 	Assert( p.IsValid() );
@@ -1947,7 +1947,7 @@ void QuaternionMult( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 }
 
 
-void QuaternionMatrix( const Quaternion &q, const Vector &pos, matrix3x4_t& matrix )
+void XM_CALLCONV QuaternionMatrix( const Quaternion &q, const Vector &pos, matrix3x4_t& matrix )
 {
 	if ( !HushAsserts() )
 	{
@@ -1961,7 +1961,7 @@ void QuaternionMatrix( const Quaternion &q, const Vector &pos, matrix3x4_t& matr
 	matrix[2][3] = pos.z;
 }
 
-void QuaternionMatrix( const Quaternion &q, matrix3x4_t& matrix )
+void XM_CALLCONV QuaternionMatrix( const Quaternion &q, matrix3x4_t& matrix )
 {
 	Assert( s_bMathlibInitialized );
 	if ( !HushAsserts() )
@@ -2032,7 +2032,7 @@ void QuaternionMatrix( const Quaternion &q, matrix3x4_t& matrix )
 // Input  : *quaternion - q3 + q0.i + q1.j + q2.k
 //			*outAngles - PITCH, YAW, ROLL
 //-----------------------------------------------------------------------------
-void QuaternionAngles( const Quaternion &q, QAngle &angles )
+void XM_CALLCONV QuaternionAngles( const Quaternion &q, QAngle &angles )
 {
 	Assert( s_bMathlibInitialized );
 	Assert( q.IsValid() );
@@ -2068,7 +2068,7 @@ void QuaternionAngles( const Quaternion &q, QAngle &angles )
 // Purpose: Converts a quaternion to an axis / angle in degrees
 //			(exponential map)
 //-----------------------------------------------------------------------------
-void QuaternionAxisAngle( const Quaternion &q, Vector &axis, float &angle )
+void XM_CALLCONV QuaternionAxisAngle( const Quaternion &q, Vector &axis, float &angle )
 {
 	angle = RAD2DEG(2 * acosf(q.w));
 	if ( angle > 180 )
@@ -2084,7 +2084,7 @@ void QuaternionAxisAngle( const Quaternion &q, Vector &axis, float &angle )
 //-----------------------------------------------------------------------------
 // Purpose: Converts an exponential map (ang/axis) to a quaternion
 //-----------------------------------------------------------------------------
-void AxisAngleQuaternion( const Vector &axis, float angle, Quaternion &q )
+void XM_CALLCONV AxisAngleQuaternion( const Vector &axis, float angle, Quaternion &q )
 {
 	float sa, ca;
 	
@@ -2102,7 +2102,7 @@ void AxisAngleQuaternion( const Vector &axis, float angle, Quaternion &q )
 // Input  : *pfAngles - Right-handed Euler angles in radians
 //			*outQuat - quaternion of form (i,j,k,real)
 //-----------------------------------------------------------------------------
-void AngleQuaternion( const RadianEuler &angles, Quaternion &outQuat )
+void XM_CALLCONV AngleQuaternion( const RadianEuler &angles, Quaternion &outQuat )
 {
 	Assert( s_bMathlibInitialized );
 //	Assert( angles.IsValid() );
@@ -2139,7 +2139,7 @@ void AngleQuaternion( const RadianEuler &angles, Quaternion &outQuat )
 //				[2]: ROLL:	Counterclockwise rotation around the X axis.
 //			*outQuat - quaternion of form (i,j,k,real)
 //-----------------------------------------------------------------------------
-void AngleQuaternion( const QAngle &angles, Quaternion &outQuat )
+void XM_CALLCONV AngleQuaternion( const QAngle &angles, Quaternion &outQuat )
 {
 #ifdef _VPROF_MATHLIB
 	VPROF_BUDGET( "AngleQuaternion", "Mathlib" );
@@ -2168,7 +2168,7 @@ void AngleQuaternion( const QAngle &angles, Quaternion &outQuat )
 //-----------------------------------------------------------------------------
 // Purpose: Converts a basis to a quaternion
 //-----------------------------------------------------------------------------
-void BasisToQuaternion( const Vector &vecForward, const Vector &vecRight, const Vector &vecUp, Quaternion &q )
+void XM_CALLCONV BasisToQuaternion( const Vector &vecForward, const Vector &vecRight, const Vector &vecUp, Quaternion &q )
 {
 	Assert( fabs( vecForward.LengthSqr() - 1.0f ) < 1e-3 );
 	Assert( fabs( vecRight.LengthSqr() - 1.0f ) < 1e-3 );
@@ -2244,7 +2244,7 @@ void BasisToQuaternion( const Vector &vecForward, const Vector &vecRight, const 
 }
 
 // FIXME: Optimize!
-void MatrixQuaternion( const matrix3x4_t &mat, Quaternion &q )
+void XM_CALLCONV MatrixQuaternion( const matrix3x4_t &mat, Quaternion &q )
 {
 	QAngle angles;
 	MatrixAngles( mat, angles );
@@ -2257,7 +2257,7 @@ void MatrixQuaternion( const matrix3x4_t &mat, Quaternion &q )
 // Input  : *quaternion - q3 + q0.i + q1.j + q2.k
 //			*outAngles - PITCH, YAW, ROLL
 //-----------------------------------------------------------------------------
-void QuaternionAngles( const Quaternion &q, RadianEuler &angles )
+void XM_CALLCONV QuaternionAngles( const Quaternion &q, RadianEuler &angles )
 {
 	Assert( s_bMathlibInitialized );
 	Assert( q.IsValid() );
@@ -2310,7 +2310,7 @@ void Spline_Normalize(
 // Input  : 
 //-----------------------------------------------------------------------------
 
-void Catmull_Rom_Spline(
+void XM_CALLCONV Catmull_Rom_Spline(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2365,7 +2365,7 @@ void Catmull_Rom_Spline(
 	VectorAdd( p2, output, output );	// p2
 }
 
-void Catmull_Rom_Spline_Tangent(
+void XM_CALLCONV Catmull_Rom_Spline_Tangent(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2418,7 +2418,7 @@ void Catmull_Rom_Spline_Tangent(
 }
 
 // area under the curve [0..t]
-void Catmull_Rom_Spline_Integral( 
+void XM_CALLCONV Catmull_Rom_Spline_Integral( 
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2434,7 +2434,7 @@ void Catmull_Rom_Spline_Integral(
 
 
 // area under the curve [0..1]
-void Catmull_Rom_Spline_Integral( 
+void XM_CALLCONV Catmull_Rom_Spline_Integral( 
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2445,7 +2445,7 @@ void Catmull_Rom_Spline_Integral(
 }
 
 
-void Catmull_Rom_Spline_Normalize(
+void XM_CALLCONV Catmull_Rom_Spline_Normalize(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2495,7 +2495,7 @@ void Catmull_Rom_Spline_Integral_Normalize(
 }
 
 
-void Catmull_Rom_Spline_NormalizeX(
+void XM_CALLCONV Catmull_Rom_Spline_NormalizeX(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2515,7 +2515,7 @@ void Catmull_Rom_Spline_NormalizeX(
 // Input  : 
 //-----------------------------------------------------------------------------
 
-void Hermite_Spline(
+void XM_CALLCONV Hermite_Spline(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &d1,
@@ -2543,7 +2543,7 @@ void Hermite_Spline(
 	VectorMA( output, b4, d2, output );
 }
 
-float Hermite_Spline(
+float XM_CALLCONV Hermite_Spline(
 	float p1,
 	float p2,
 	float d1,
@@ -2568,7 +2568,7 @@ float Hermite_Spline(
 }
 
 
-void Hermite_SplineBasis( float t, float basis[4] )
+void XM_CALLCONV Hermite_SplineBasis( float t, float basis[4] )
 {
 	float tSqr = t*t;
 	float tCube = t*tSqr;
@@ -2586,19 +2586,19 @@ void Hermite_SplineBasis( float t, float basis[4] )
 //			this is reasonable C1 method when there's no "p3" data yet.
 // Input  : 
 //-----------------------------------------------------------------------------
-void Hermite_Spline( const Vector &p0, const Vector &p1, const Vector &p2, float t, Vector& output )
+void XM_CALLCONV Hermite_Spline( const Vector &p0, const Vector &p1, const Vector &p2, float t, Vector& output )
 {
   Vector e10 = p1 - p0, e21 = p2 - p1;
 	Hermite_Spline( p1, p2, e10, e21, t, output );
 }
 
-float Hermite_Spline( float p0, float p1, float p2,	float t )
+float XM_CALLCONV Hermite_Spline( float p0, float p1, float p2,	float t )
 {
 	return Hermite_Spline( p1, p2, p1 - p0, p2 - p1, t );
 }
 
 
-void Hermite_Spline( const Quaternion &q0, const Quaternion &q1, const Quaternion &q2, float t, Quaternion &output )
+void XM_CALLCONV Hermite_Spline( const Quaternion &q0, const Quaternion &q1, const Quaternion &q2, float t, Quaternion &output )
 {
 	// cheap, hacked version of quaternions
 	Quaternion q0a;
@@ -2628,7 +2628,7 @@ void Hermite_Spline( const Quaternion &q0, const Quaternion &q1, const Quaternio
 // See http://news.povray.org/povray.binaries.tutorials/attachment/%3CXns91B880592482seed7@povray.org%3E/Splines.bas.txt
 // for example code and descriptions of various spline types...
 // 
-void Kochanek_Bartels_Spline(
+void XM_CALLCONV Kochanek_Bartels_Spline(
 	float tension, 
 	float bias, 
 	float continuity,
@@ -2700,7 +2700,7 @@ void Kochanek_Bartels_Spline(
 	VectorAdd( p2, output, output );
 }
 
-void Kochanek_Bartels_Spline_NormalizeX(
+void XM_CALLCONV Kochanek_Bartels_Spline_NormalizeX(
 	float tension, 
 	float bias, 
 	float continuity,
@@ -2716,7 +2716,7 @@ void Kochanek_Bartels_Spline_NormalizeX(
 	Kochanek_Bartels_Spline( tension, bias, continuity, p1n, p2, p3, p4n, t, output );
 }
 
-void Cubic_Spline(
+void XM_CALLCONV Cubic_Spline(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2761,7 +2761,7 @@ void Cubic_Spline(
 	VectorAdd( p2, output, output );
 }
 
-void Cubic_Spline_NormalizeX(
+void XM_CALLCONV Cubic_Spline_NormalizeX(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2774,7 +2774,7 @@ void Cubic_Spline_NormalizeX(
 	Cubic_Spline( p1n, p2, p3, p4n, t, output );
 }
 
-void BSpline(
+void XM_CALLCONV BSpline(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2838,7 +2838,7 @@ void BSpline(
 	VectorAdd( c, output, output );
 }
 
-void BSpline_NormalizeX(
+void XM_CALLCONV BSpline_NormalizeX(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2851,7 +2851,7 @@ void BSpline_NormalizeX(
 	BSpline( p1n, p2, p3, p4n, t, output );
 }
 
-void Parabolic_Spline(
+void XM_CALLCONV Parabolic_Spline(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2901,7 +2901,7 @@ void Parabolic_Spline(
 	VectorAdd( b, output, output );
 }
 
-void Parabolic_Spline_NormalizeX(
+void XM_CALLCONV Parabolic_Spline_NormalizeX(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
@@ -2918,7 +2918,7 @@ void Parabolic_Spline_NormalizeX(
 // Purpose: Compress the input values for a ranged result such that from 75% to 200% smoothly of the range maps 
 //-----------------------------------------------------------------------------
 
-float RangeCompressor( float flValue, float flMin, float flMax, float flBase )
+float XM_CALLCONV RangeCompressor( float flValue, float flMin, float flMax, float flBase )
 {
 	// clamp base
 	if (flBase < flMin)
@@ -2964,7 +2964,7 @@ float RangeCompressor( float flValue, float flMin, float flMax, float flBase )
 //-----------------------------------------------------------------------------
 // Transforms a AABB into another space; which will inherently grow the box.
 //-----------------------------------------------------------------------------
-void TransformAABB( const matrix3x4_t& transform, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut )
+void XM_CALLCONV TransformAABB( const matrix3x4_t& transform, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut )
 {
 	Vector localCenter;
 	VectorAdd( vecMinsIn, vecMaxsIn, localCenter );
@@ -2989,7 +2989,7 @@ void TransformAABB( const matrix3x4_t& transform, const Vector &vecMinsIn, const
 //-----------------------------------------------------------------------------
 // Uses the inverse transform of in1
 //-----------------------------------------------------------------------------
-void ITransformAABB( const matrix3x4_t& transform, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut )
+void XM_CALLCONV ITransformAABB( const matrix3x4_t& transform, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut )
 {
 	Vector worldCenter;
 	VectorAdd( vecMinsIn, vecMaxsIn, worldCenter );
@@ -3021,7 +3021,7 @@ void ITransformAABB( const matrix3x4_t& transform, const Vector &vecMinsIn, cons
 // Rotates a AABB into another space; which will inherently grow the box. 
 // (same as TransformAABB, but doesn't take the translation into account)
 //-----------------------------------------------------------------------------
-void RotateAABB( const matrix3x4_t &transform, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut )
+void XM_CALLCONV RotateAABB( const matrix3x4_t &transform, const Vector &vecMinsIn, const Vector &vecMaxsIn, Vector &vecMinsOut, Vector &vecMaxsOut )
 {
 	Vector localCenter;
 	VectorAdd( vecMinsIn, vecMaxsIn, localCenter );
@@ -3107,7 +3107,7 @@ void XM_CALLCONV IRotateAABB( const matrix3x4_t &transform, Vector vecMinsIn, Ve
 }
 
 
-float CalcSqrDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point )
+float XM_CALLCONV CalcSqrDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point )
 {
 	float flDelta;
 	float flDistSqr = 0.0f;
@@ -3163,7 +3163,7 @@ void XM_CALLCONV CalcClosestPointOnAABB( Vector mins, Vector maxs, Vector point,
 	);
 }
 
-void CalcSqrDistAndClosestPointOnAABB( const Vector &mins, const Vector &maxs, const Vector &point, Vector &closestOut, float &distSqrOut )
+void XM_CALLCONV CalcSqrDistAndClosestPointOnAABB( const Vector &mins, const Vector &maxs, const Vector &point, Vector &closestOut, float &distSqrOut )
 {
 	distSqrOut = 0.0f;
 	for ( int i = 0; i < 3; i++ )
@@ -3206,7 +3206,7 @@ float CalcClosestPointToLineT( const Vector &P, const Vector &vLineA, const Vect
 	}
 }
 
-void CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *outT )
+void XM_CALLCONV CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *outT )
 {
 	Assert( s_bMathlibInitialized );
 	Vector vDir;
@@ -3216,7 +3216,7 @@ void CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, const Vector
 }
 
 
-float CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
+float XM_CALLCONV CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
 {
 	Assert( s_bMathlibInitialized );
 	Vector vClosest;
@@ -3224,7 +3224,7 @@ float CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &v
 	return P.DistTo(vClosest);
 }
 
-float CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
+float XM_CALLCONV CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
 {
 	Assert( s_bMathlibInitialized );
 	Vector vClosest;
@@ -3232,7 +3232,7 @@ float CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector
 	return P.DistToSqr(vClosest);
 }
 
-void CalcClosestPointOnLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *outT )
+void XM_CALLCONV CalcClosestPointOnLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *outT )
 {
 	Vector vDir;
 	float t = CalcClosestPointToLineT( P, vLineA, vLineB, vDir );
@@ -3245,7 +3245,7 @@ void CalcClosestPointOnLineSegment( const Vector &P, const Vector &vLineA, const
 }
 
 
-float CalcDistanceToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
+float XM_CALLCONV CalcDistanceToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
 {
 	Assert( s_bMathlibInitialized );
 	Vector vClosest;
@@ -3253,7 +3253,7 @@ float CalcDistanceToLineSegment( const Vector &P, const Vector &vLineA, const Ve
 	return P.DistTo( vClosest );
 }
 
-float CalcDistanceSqrToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
+float XM_CALLCONV CalcDistanceSqrToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
 {
 	Assert( s_bMathlibInitialized );
 	Vector vClosest;
@@ -3279,7 +3279,7 @@ float CalcClosestPointToLineT2D( const Vector2D &P, const Vector2D &vLineA, cons
 	}
 }
 
-void CalcClosestPointOnLine2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, Vector2D &vClosest, float *outT )
+void XM_CALLCONV CalcClosestPointOnLine2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, Vector2D &vClosest, float *outT )
 {
 	Assert( s_bMathlibInitialized );
 	Vector2D vDir;
@@ -3288,7 +3288,7 @@ void CalcClosestPointOnLine2D( const Vector2D &P, const Vector2D &vLineA, const 
 	Vector2DMA( vLineA, t, vDir, vClosest );
 }
 
-float CalcDistanceToLine2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
+float XM_CALLCONV CalcDistanceToLine2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
 {
 	Assert( s_bMathlibInitialized );
 	Vector2D vClosest;
@@ -3296,7 +3296,7 @@ float CalcDistanceToLine2D( const Vector2D &P, const Vector2D &vLineA, const Vec
 	return P.DistTo( vClosest );
 }
 
-float CalcDistanceSqrToLine2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
+float XM_CALLCONV CalcDistanceSqrToLine2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
 {
 	Assert( s_bMathlibInitialized );
 	Vector2D vClosest;
@@ -3304,7 +3304,7 @@ float CalcDistanceSqrToLine2D( const Vector2D &P, const Vector2D &vLineA, const 
 	return P.DistToSqr(vClosest);
 }
 
-void CalcClosestPointOnLineSegment2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, Vector2D &vClosest, float *outT )
+void XM_CALLCONV CalcClosestPointOnLineSegment2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, Vector2D &vClosest, float *outT )
 {
 	Vector2D vDir;
 	float t = CalcClosestPointToLineT2D( P, vLineA, vLineB, vDir );
@@ -3317,7 +3317,7 @@ void CalcClosestPointOnLineSegment2D( const Vector2D &P, const Vector2D &vLineA,
 	Vector2DMA( vLineA, t, vDir, vClosest );
 }
 
-float CalcDistanceToLineSegment2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
+float XM_CALLCONV CalcDistanceToLineSegment2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
 {
 	Assert( s_bMathlibInitialized );
 	Vector2D vClosest;
@@ -3325,7 +3325,7 @@ float CalcDistanceToLineSegment2D( const Vector2D &P, const Vector2D &vLineA, co
 	return P.DistTo( vClosest );
 }
 
-float CalcDistanceSqrToLineSegment2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
+float XM_CALLCONV CalcDistanceSqrToLineSegment2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
 {
 	Assert( s_bMathlibInitialized );
 	Vector2D vClosest;
@@ -3347,7 +3347,7 @@ float CalcDistanceSqrToLineSegment2D( const Vector2D &P, const Vector2D &vLineA,
 //			*s2 - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CalcLineToLineIntersectionSegment(
+bool XM_CALLCONV CalcLineToLineIntersectionSegment(
    const Vector& p1,const Vector& p2,const Vector& p3,const Vector& p4,Vector *s1,Vector *s2,
    float *t1, float *t2)
 {
@@ -3403,7 +3403,7 @@ static bool s_bMMXEnabled = false;
 static bool s_bSSEEnabled = false;
 static bool s_bSSE2Enabled = false;
 
-void MathLib_Init( float gamma, float texGamma, float brightness, int overbright, bool bAllow3DNow, bool bAllowSSE, bool bAllowSSE2, bool bAllowMMX )
+void XM_CALLCONV MathLib_Init( float gamma, float texGamma, float brightness, int overbright, bool bAllow3DNow, bool bAllowSSE, bool bAllowSSE2, bool bAllowMMX )
 {
 	if ( s_bMathlibInitialized )
 		return;
@@ -3425,31 +3425,31 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 	BuildGammaTable( gamma, texGamma, brightness, overbright );
 }
 
-bool MathLib_3DNowEnabled( void )
+bool XM_CALLCONV MathLib_3DNowEnabled( void )
 {
 	Assert( s_bMathlibInitialized );
 	return s_b3DNowEnabled;
 }
 
-bool MathLib_MMXEnabled( void )
+bool XM_CALLCONV MathLib_MMXEnabled( void )
 {
 	Assert( s_bMathlibInitialized );
 	return s_bMMXEnabled;
 }
 
-bool MathLib_SSEEnabled( void )
+bool XM_CALLCONV MathLib_SSEEnabled( void )
 {
 	Assert( s_bMathlibInitialized );
 	return s_bSSEEnabled;
 }
 
-bool MathLib_SSE2Enabled( void )
+bool XM_CALLCONV MathLib_SSE2Enabled( void )
 {
 	Assert( s_bMathlibInitialized );
 	return s_bSSE2Enabled;
 }
 
-float Approach( float target, float value, float speed )
+float XM_CALLCONV Approach( float target, float value, float speed )
 {
 	float delta = target - value;
 
@@ -3464,7 +3464,7 @@ float Approach( float target, float value, float speed )
 }
 
 // BUGBUG: Why doesn't this call angle diff?!?!?
-float ApproachAngle( float target, float value, float speed )
+float XM_CALLCONV ApproachAngle( float target, float value, float speed )
 {
 	target = anglemod( target );
 	value = anglemod( value );
@@ -3492,7 +3492,7 @@ float ApproachAngle( float target, float value, float speed )
 
 
 // BUGBUG: Why do we need both of these?
-float AngleDiff( float destAngle, float srcAngle )
+float XM_CALLCONV AngleDiff( float destAngle, float srcAngle )
 {
 	float delta;
 
@@ -3511,7 +3511,7 @@ float AngleDiff( float destAngle, float srcAngle )
 }
 
 
-float AngleDistance( float next, float cur )
+float XM_CALLCONV AngleDistance( float next, float cur )
 {
 	float delta = next - cur;
 
@@ -3524,7 +3524,7 @@ float AngleDistance( float next, float cur )
 }
 
 
-float AngleNormalize( float angle )
+float XM_CALLCONV AngleNormalize( float angle )
 {
 	angle = fmodf(angle, 360.0f);
 	if (angle > 180) 
@@ -3540,7 +3540,7 @@ float AngleNormalize( float angle )
 
 //--------------------------------------------------------------------------------------------------------------
 // ensure that 0 <= angle <= 360
-float AngleNormalizePositive( float angle )
+float XM_CALLCONV AngleNormalizePositive( float angle )
 {
 	angle = fmodf( angle, 360.0f );
 
@@ -3553,12 +3553,12 @@ float AngleNormalizePositive( float angle )
 }
 
 //--------------------------------------------------------------------------------------------------------------
-bool AnglesAreEqual( float a, float b, float tolerance )
+bool XM_CALLCONV AnglesAreEqual( float a, float b, float tolerance )
 {
 	return (fabs( AngleDiff( a, b ) ) < tolerance);
 }
 
-void RotationDeltaAxisAngle( const QAngle &srcAngles, const QAngle &destAngles, Vector &deltaAxis, float &deltaAngle )
+void XM_CALLCONV RotationDeltaAxisAngle( const QAngle &srcAngles, const QAngle &destAngles, Vector &deltaAxis, float &deltaAngle )
 {
 	Quaternion srcQuat, destQuat, srcQuatInv, out;
 	AngleQuaternion( srcAngles, srcQuat );
@@ -3570,7 +3570,7 @@ void RotationDeltaAxisAngle( const QAngle &srcAngles, const QAngle &destAngles, 
 	QuaternionAxisAngle( out, deltaAxis, deltaAngle );
 }
 
-void RotationDelta( const QAngle &srcAngles, const QAngle &destAngles, QAngle *out )
+void XM_CALLCONV RotationDelta( const QAngle &srcAngles, const QAngle &destAngles, QAngle *out )
 {
 	matrix3x4_t src, srcInv;
 	matrix3x4_t dest;
@@ -3591,7 +3591,7 @@ void RotationDelta( const QAngle &srcAngles, const QAngle &destAngles, QAngle *o
 //-----------------------------------------------------------------------------
 // Purpose: Computes a triangle normal
 //-----------------------------------------------------------------------------
-void ComputeTrianglePlane( const Vector& v1, const Vector& v2, const Vector& v3, Vector& normal, float& intercept )
+void XM_CALLCONV ComputeTrianglePlane( const Vector& v1, const Vector& v2, const Vector& v3, Vector& normal, float& intercept )
 {
 	Vector e1, e2;
 	VectorSubtract( v2, v1, e1 );
@@ -3608,7 +3608,7 @@ void ComputeTrianglePlane( const Vector& v1, const Vector& v2, const Vector& v3,
 //			dist - the plane constant
 // Output : int - vert count (always 4)
 //-----------------------------------------------------------------------------
-int PolyFromPlane( Vector *outVerts, const Vector& normal, float dist, float fHalfScale )
+int XM_CALLCONV PolyFromPlane( Vector *outVerts, const Vector& normal, float dist, float fHalfScale )
 {
 	int		i, x;
 	vec_t	max, v;
@@ -3686,7 +3686,7 @@ int PolyFromPlane( Vector *outVerts, const Vector& normal, float dist, float fHa
 // Output : int - # verts in output poly
 //-----------------------------------------------------------------------------
 
-int ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVerts, const Vector& normal, float dist, float fOnPlaneEpsilon )
+int XM_CALLCONV ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVerts, const Vector& normal, float dist, float fOnPlaneEpsilon )
 {
 	vec_t	*dists = (vec_t *)stackalloc( sizeof(vec_t) * vertCount * 4 ); //4x vertcount should cover all cases
 	int		*sides = (int *)stackalloc( sizeof(vec_t) * vertCount * 4 );
@@ -3776,7 +3776,7 @@ int ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVerts, const Vec
 }
 
 
-int ClipPolyToPlane_Precise( double *inVerts, int vertCount, double *outVerts, const double *normal, double dist, double fOnPlaneEpsilon )
+int XM_CALLCONV ClipPolyToPlane_Precise( double *inVerts, int vertCount, double *outVerts, const double *normal, double dist, double fOnPlaneEpsilon )
 {
 	double	*dists = (double *)stackalloc( sizeof(double) * vertCount * 4 ); //4x vertcount should cover all cases
 	int		*sides = (int *)stackalloc( sizeof(double) * vertCount * 4 );
@@ -3889,7 +3889,7 @@ int ClipPolyToPlane_Precise( double *inVerts, int vertCount, double *outVerts, c
 //-----------------------------------------------------------------------------
 // Computes Y fov from an X fov and a screen aspect ratio
 //-----------------------------------------------------------------------------
-float CalcFovY( float flFovX, float flAspect )
+float XM_CALLCONV CalcFovY( float flFovX, float flAspect )
 {
 	if ( flFovX < 1 || flFovX > 179)
 	{
@@ -3910,7 +3910,7 @@ float CalcFovY( float flFovX, float flAspect )
 	return val;
 }
 
-float CalcFovX( float flFovY, float flAspect )
+float XM_CALLCONV CalcFovX( float flFovY, float flAspect )
 {
 	return RAD2DEG( atanf( tanf( DEG2RAD( flFovY ) * 0.5f ) * flAspect ) ) * 2.0f;
 }
@@ -3919,7 +3919,7 @@ float CalcFovX( float flFovY, float flAspect )
 //-----------------------------------------------------------------------------
 // Generate a frustum based on perspective view parameters
 //-----------------------------------------------------------------------------
-void GeneratePerspectiveFrustum( const Vector& origin, const Vector &forward, 
+void XM_CALLCONV GeneratePerspectiveFrustum( const Vector& origin, const Vector &forward, 
 	const Vector &right, const Vector &up, float flZNear, float flZFar, 
 	float flFovX, float flFovY, Frustum_t &frustum )
 {
@@ -3961,7 +3961,7 @@ void GeneratePerspectiveFrustum( const Vector& origin, const Vector &forward,
 //-----------------------------------------------------------------------------
 // Version that accepts angles instead of vectors
 //-----------------------------------------------------------------------------
-void GeneratePerspectiveFrustum( const Vector& origin, const QAngle &angles, float flZNear, float flZFar, float flFovX, float flAspectRatio, Frustum_t &frustum )
+void XM_CALLCONV GeneratePerspectiveFrustum( const Vector& origin, const QAngle &angles, float flZNear, float flZFar, float flFovX, float flAspectRatio, Frustum_t &frustum )
 {
 	Vector vecForward, vecRight, vecUp;
 	AngleVectors( angles, &vecForward, &vecRight, &vecUp );
@@ -3969,7 +3969,7 @@ void GeneratePerspectiveFrustum( const Vector& origin, const QAngle &angles, flo
 	GeneratePerspectiveFrustum( origin, vecForward, vecRight, vecUp, flZNear, flZFar, flFovX, flFovY, frustum );
 }
 
-bool R_CullBox( const Vector& mins, const Vector& maxs, const Frustum_t &frustum )
+bool XM_CALLCONV R_CullBox( const Vector& mins, const Vector& maxs, const Frustum_t &frustum )
 {
 	return (( BoxOnPlaneSide( mins, maxs, frustum.GetPlane(FRUSTUM_RIGHT) ) == 2 ) || 
 			( BoxOnPlaneSide( mins, maxs, frustum.GetPlane(FRUSTUM_LEFT) ) == 2 ) ||
@@ -3979,7 +3979,7 @@ bool R_CullBox( const Vector& mins, const Vector& maxs, const Frustum_t &frustum
 			( BoxOnPlaneSide( mins, maxs, frustum.GetPlane(FRUSTUM_FARZ) ) == 2 ) );
 }
 
-bool R_CullBoxSkipNear( const Vector& mins, const Vector& maxs, const Frustum_t &frustum )
+bool XM_CALLCONV R_CullBoxSkipNear( const Vector& mins, const Vector& maxs, const Frustum_t &frustum )
 {
 	return (( BoxOnPlaneSide( mins, maxs, frustum.GetPlane(FRUSTUM_RIGHT) ) == 2 ) || 
 			( BoxOnPlaneSide( mins, maxs, frustum.GetPlane(FRUSTUM_LEFT) ) == 2 ) ||
@@ -3995,7 +3995,7 @@ bool R_CullBoxSkipNear( const Vector& mins, const Vector& maxs, const Frustum_t 
 // of how this computation works
 #define SMALL_FLOAT 1e-12
 
-void CalcTriangleTangentSpace( const Vector &p0, const Vector &p1, const Vector &p2,
+void XM_CALLCONV CalcTriangleTangentSpace( const Vector &p0, const Vector &p1, const Vector &p2,
 							   const Vector2D &t0, const Vector2D &t1, const Vector2D& t2,
 							   Vector &sVect, Vector &tVect )
 {
@@ -4098,7 +4098,7 @@ void RGBtoHSV( const Vector &rgb, Vector &hsv )
 //-----------------------------------------------------------------------------
 // Convert HSV to RGB
 //-----------------------------------------------------------------------------
-void HSVtoRGB( const Vector &hsv, Vector &rgb )
+void XM_CALLCONV HSVtoRGB( const Vector &hsv, Vector &rgb )
 {         
 	if ( hsv.y == 0.0F )
 	{
@@ -4129,7 +4129,7 @@ void HSVtoRGB( const Vector &hsv, Vector &rgb )
 }
 
 
-void GetInterpolationData( float const *pKnotPositions, 
+void XM_CALLCONV GetInterpolationData( float const *pKnotPositions, 
 						   float const *pKnotValues,
 						   int nNumValuesinList,
 						   int nInterpolationRange,
@@ -4199,7 +4199,7 @@ void GetInterpolationData( float const *pKnotPositions,
 	return;
 }
 
-float RandomVectorInUnitSphere( Vector *pVector )
+float XM_CALLCONV RandomVectorInUnitSphere( Vector *pVector )
 {
 	// Guarantee uniform random distribution within a sphere
 	// Graphics gems III contains this algorithm ("Nonuniform random point sets via warping")
@@ -4222,7 +4222,7 @@ float RandomVectorInUnitSphere( Vector *pVector )
 	return flRadius;
 }
 
-float RandomVectorInUnitCircle( Vector2D *pVector )
+float XM_CALLCONV RandomVectorInUnitCircle( Vector2D *pVector )
 {
 	// Guarantee uniform random distribution within a sphere
 	// Graphics gems III contains this algorithm ("Nonuniform random point sets via warping")

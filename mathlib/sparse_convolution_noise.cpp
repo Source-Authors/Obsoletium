@@ -27,12 +27,12 @@
 
 //(0.5/N_IMPULSES_PER_CELL)
 
-static inline int LatticeCoord(float x)
+static inline int XM_CALLCONV LatticeCoord(float x)
 {
 	return ((int) floor(x)) & 0xff;
 }
 
-static inline int Hash4D(int ix, int iy, int iz, int idx)
+static inline int XM_CALLCONV Hash4D(int ix, int iy, int iz, int idx)
 {
 	int ret=perm_a[ix];
 	ret=perm_b[(ret+iy) & 0xff];
@@ -43,7 +43,7 @@ static inline int Hash4D(int ix, int iy, int iz, int idx)
 
 #define SQ(x) ((x)*(x))
 
-static float CellNoise( int ix, int iy, int iz, float xfrac, float yfrac, float zfrac,
+static float XM_CALLCONV CellNoise( int ix, int iy, int iz, float xfrac, float yfrac, float zfrac,
 						float (*pNoiseShapeFunction)(float) )
 {
 	float ret=0;
@@ -63,12 +63,12 @@ static float CellNoise( int ix, int iy, int iz, float xfrac, float yfrac, float 
 }
 
 
-float SparseConvolutionNoise( Vector const &pnt )
+float XM_CALLCONV SparseConvolutionNoise( Vector const &pnt )
 {
 	return SparseConvolutionNoise( pnt, QuinticInterpolatingPolynomial );
 }
 
-float FractalNoise( Vector const &pnt, int n_octaves)
+float XM_CALLCONV FractalNoise( Vector const &pnt, int n_octaves)
 {
 	float scale=1.0;
 	float iscale=1.0;
@@ -86,7 +86,7 @@ float FractalNoise( Vector const &pnt, int n_octaves)
 	return ret * ( 1.0f/sumscale );
 }
 
-float Turbulence( Vector const &pnt, int n_octaves)
+float XM_CALLCONV Turbulence( Vector const &pnt, int n_octaves)
 {
 	float scale=1.0;
 	float iscale=1.0;
@@ -109,7 +109,7 @@ float fmin1=10000000.0;
 float fmax1=-1000000.0;
 #endif
 
-float SparseConvolutionNoise(Vector const &pnt, float (*pNoiseShapeFunction)(float) )
+float XM_CALLCONV SparseConvolutionNoise(Vector const &pnt, float (*pNoiseShapeFunction)(float) )
 {
 	// computer integer lattice point
 	int ix=LatticeCoord(pnt.x);
@@ -144,7 +144,7 @@ float SparseConvolutionNoise(Vector const &pnt, float (*pNoiseShapeFunction)(flo
 // "JAVA REFERENCE IMPLEMENTATION OF IMPROVED NOISE - COPYRIGHT 2002 KEN PERLIN"
 // as available here: https://mrl.cs.nyu.edu/~perlin/noise/
 
-float NoiseGradient(int hash, float x, float y, float z)
+float XM_CALLCONV NoiseGradient(int hash, float x, float y, float z)
 {
 	int h = hash & 15;                      // CONVERT LO 4 BITS OF HASH CODE
 	float u = h<8 ? x : y;                  // INTO 12 GRADIENT DIRECTIONS.
@@ -152,7 +152,7 @@ float NoiseGradient(int hash, float x, float y, float z)
 	return ((h&1) == 0 ? u : -u) + ((h&2) == 0 ? v : -v);
 }
 
-int NoiseHashIndex( int i )
+int XM_CALLCONV NoiseHashIndex( int i )
 {
 	static int s_permutation[] = 
 	{
@@ -174,7 +174,7 @@ int NoiseHashIndex( int i )
 	return s_permutation[ i & 0xff ];
 }
 
-float ImprovedPerlinNoise( Vector const &pnt )
+float XM_CALLCONV ImprovedPerlinNoise( Vector const &pnt )
 {
 	float fx = floor(pnt.x);
 	float fy = floor(pnt.y);

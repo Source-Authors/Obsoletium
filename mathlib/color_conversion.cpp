@@ -123,7 +123,7 @@ ALIGN128 float	power2_n[256] = 			// 2**(index - 128) / 255
 //}
 //#endif
 
-void BuildGammaTable( float gamma, float texGamma, float brightness, int overbright )
+void XM_CALLCONV BuildGammaTable( float gamma, float texGamma, float brightness, int overbright )
 {
 	int		i;
 
@@ -220,17 +220,17 @@ void BuildGammaTable( float gamma, float texGamma, float brightness, int overbri
 	}
 }
 
-float GammaToLinearFullRange( float gamma )
+float XM_CALLCONV GammaToLinearFullRange( float gamma )
 {
 	return pow( gamma, 2.2f );
 }
 
-float LinearToGammaFullRange( float linear )
+float XM_CALLCONV LinearToGammaFullRange( float linear )
 {
 	return pow( linear, 1.0f / 2.2f );
 }
 
-float GammaToLinear( float gamma )
+float XM_CALLCONV GammaToLinear( float gamma )
 {
 	Assert( s_bMathlibInitialized );
 	if ( gamma < 0.0f )
@@ -251,7 +251,7 @@ float GammaToLinear( float gamma )
 	return g_Mathlib_GammaToLinear[index];
 }
 
-float LinearToGamma( float linear )
+float XM_CALLCONV LinearToGamma( float linear )
 {
 	Assert( s_bMathlibInitialized );
 	if ( linear < 0.0f )
@@ -273,19 +273,19 @@ float LinearToGamma( float linear )
 //-----------------------------------------------------------------------------
 // Helper functions to convert between sRGB and 360 gamma space
 //-----------------------------------------------------------------------------
-float SrgbGammaToLinear( float flSrgbGammaValue )
+float XM_CALLCONV SrgbGammaToLinear( float flSrgbGammaValue )
 {
 	float x = clamp( flSrgbGammaValue, 0.0f, 1.0f );
 	return ( x <= 0.04045f ) ? ( x / 12.92f ) : ( pow( ( x + 0.055f ) / 1.055f, 2.4f ) );
 }
 
-float SrgbLinearToGamma( float flLinearValue )
+float XM_CALLCONV SrgbLinearToGamma( float flLinearValue )
 {
 	float x = clamp( flLinearValue, 0.0f, 1.0f );
 	return ( x <= 0.0031308f ) ? ( x * 12.92f ) : ( 1.055f * pow( x, ( 1.0f / 2.4f ) ) ) - 0.055f;
 }
 
-float X360GammaToLinear( float fl360GammaValue )
+float XM_CALLCONV X360GammaToLinear( float fl360GammaValue )
 {
 	float flLinearValue;
 
@@ -322,7 +322,7 @@ float X360GammaToLinear( float fl360GammaValue )
 	return flLinearValue;
 }
 
-float X360LinearToGamma( float flLinearValue )
+float XM_CALLCONV X360LinearToGamma( float flLinearValue )
 {
 	float fl360GammaValue;
 
@@ -358,7 +358,7 @@ float X360LinearToGamma( float flLinearValue )
 	return fl360GammaValue;
 }
 
-float SrgbGammaTo360Gamma( float flSrgbGammaValue )
+float XM_CALLCONV SrgbGammaTo360Gamma( float flSrgbGammaValue )
 {
 	float flLinearValue = SrgbGammaToLinear( flSrgbGammaValue );
 	float fl360GammaValue = X360LinearToGamma( flLinearValue );
@@ -366,7 +366,7 @@ float SrgbGammaTo360Gamma( float flSrgbGammaValue )
 }
 
 // convert texture to linear 0..1 value
-float TextureToLinear( int c )
+float XM_CALLCONV TextureToLinear( int c )
 {
 	Assert( s_bMathlibInitialized );
 	if (c < 0)
@@ -378,7 +378,7 @@ float TextureToLinear( int c )
 }
 
 // convert texture to linear 0..1 value
-int LinearToTexture( float f )
+int XM_CALLCONV LinearToTexture( float f )
 {
 	Assert( s_bMathlibInitialized );
 	int i = max( min( static_cast<int>( f * 1023 ), 1023 ), 0 );	// assume 0..1 range
@@ -387,14 +387,14 @@ int LinearToTexture( float f )
 
 
 // converts 0..1 linear value to screen gamma (0..255)
-int LinearToScreenGamma( float f )
+int XM_CALLCONV LinearToScreenGamma( float f )
 {
 	Assert( s_bMathlibInitialized );
 	int i = max( min( static_cast<int>( f * 1023 ), 1023 ), 0 );	// assume 0..1 range
 	return lineartoscreen[i];
 }
 
-void ColorRGBExp32ToVector( const ColorRGBExp32& in, Vector& out )
+void XM_CALLCONV ColorRGBExp32ToVector( const ColorRGBExp32& in, Vector& out )
 {
 	Assert( s_bMathlibInitialized );
 	// FIXME: Why is there a factor of 255 built into this?
@@ -437,7 +437,7 @@ inline static int VectorToColorRGBExp32_CalcExponent( const float *pin )
 /// moving it onto the cell.
 /// \warning: Assumes an IEEE 754 single-precision float representation! Those of you
 /// porting to an 8080 are out of luck.
-void VectorToColorRGBExp32( const Vector& vin, ColorRGBExp32 &c )
+void XM_CALLCONV VectorToColorRGBExp32( const Vector& vin, ColorRGBExp32 &c )
 {
 	Assert( s_bMathlibInitialized );
 	Assert( vin.x >= 0.0f && vin.y >= 0.0f && vin.z >= 0.0f );

@@ -43,7 +43,7 @@ static inline int AE_Sign(float a)
 // This is the 'final' version of the AlmostEqualUlps function.
 // The optional checks are included for completeness, but in many
 // cases they are not necessary, or even not desirable.
-bool AlmostEqual(float a, float b, int maxUlps)
+bool XM_CALLCONV AlmostEqual(float a, float b, int maxUlps)
 {
     // There are several optional checks that you can do, depending
     // on what behavior you want from your floating point comparisons.
