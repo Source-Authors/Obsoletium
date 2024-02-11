@@ -202,7 +202,7 @@ class CResourcePreloadMaterial : public CResourcePreload
 			{
 				if ( IsPosix() )
 				{
-					printf("\n ##### CResourcePreloadMaterial::CreateResource can't find material %s\n", pName);
+					fprintf( stderr, "\n ##### CResourcePreloadMaterial::CreateResource can't find material %s\n", pName);
 				}
 			}
 		}

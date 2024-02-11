@@ -871,7 +871,7 @@ bool GrabSourceMutex(
 	g_lockfd = open( g_lockFilename, O_WRONLY | O_CREAT, 0666 );
 	if ( g_lockfd == -1 )
 	{
-		printf( "open(%s) failed\n", g_lockFilename );
+		fprintf( stderr, "open(%s) failed\n", g_lockFilename );
 		return false;
 	}
 
@@ -889,7 +889,7 @@ bool GrabSourceMutex(
 
 	if ( fcntl ( g_lockfd, F_SETLK, &fl ) == -1 )
 	{
-		printf( "fcntl(%d) for %s failed\n", g_lockfd, g_lockFilename );
+		fprintf( stderr, "fcntl(%d) for %s failed\n", g_lockfd, g_lockFilename );
 		return false;
 	}
 

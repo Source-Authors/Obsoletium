@@ -2190,7 +2190,7 @@ void CMaterial::ReloadFromWhitelistIfMarked()
 		#if DEBUG
 		if (IsOSX())
 		{
-			printf("\n ##### CMaterial::ReloadFromWhitelistIfMarked: GetShader failed on %s, calling SetupErrorShader", m_pDebugName );
+			fprintf( stderr, "\n ##### CMaterial::ReloadFromWhitelistIfMarked: GetShader failed on %s, calling SetupErrorShader", m_pDebugName );
 		}
 		#endif
 		
