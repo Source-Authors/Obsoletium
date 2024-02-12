@@ -169,7 +169,7 @@ POPD
 REM Build snappy.
 MKDIR thirdparty\snappy\out
 PUSHD thirdparty\snappy\out
-cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DBUILD_SHARED_LIBS=OFF ..
+cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DBUILD_SHARED_LIBS=OFF -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF ..
 if ERRORLEVEL 1 (
   ECHO cmake generation for thirdparty\snappy failed.
   EXIT /B 1

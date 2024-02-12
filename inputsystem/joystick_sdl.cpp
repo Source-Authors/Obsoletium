@@ -334,8 +334,8 @@ void CInputSystem::JoystickHotplugAdded( int joystickIndex )
 
 	// XXX: This will fail if this is a *real* hotplug event (and not coming from the initial InitializeJoysticks call).
 	// That's because the SDL haptic subsystem currently doesn't do hotplugging. Everything but haptics will work fine.
-	SDL_Haptic *haptic = SDL_HapticOpenFromJoystick(SDL_GetGamepadJoystick(controller));
-	if ( haptic == NULL || SDL_HapticRumbleInit(haptic) != 0 )
+	SDL_Haptic *haptic = SDL_OpenHapticFromJoystick(SDL_GetGamepadJoystick(controller));
+	if ( haptic == NULL || SDL_InitHapticRumble(haptic) != 0 )
 	{
 		Warning("Unable to initialize rumble for joystick #%i: %s\n", joystickId, SDL_GetError());
 		haptic = NULL;
@@ -378,7 +378,7 @@ void CInputSystem::JoystickHotplugRemoved( int joystickId )
 	EnableJoystickInput(0, false);
 	SetJoyXControllerFound(false);
 
-	SDL_HapticClose((SDL_Haptic *)info.m_pHaptic);
+	SDL_CloseHaptic((SDL_Haptic *)info.m_pHaptic);
 	SDL_CloseGamepad((SDL_Gamepad *)info.m_pDevice);
 
 	info.m_pHaptic = NULL;
@@ -548,7 +548,7 @@ void CInputSystem::SetXDeviceRumble( float fLeftMotor, float fRightMotor, int us
 	{
 		if ( info.m_bRumbleEnabled )
 		{
-			SDL_HapticRumbleStop( (SDL_Haptic *)info.m_pHaptic );
+			SDL_StopHapticRumble( (SDL_Haptic *)info.m_pHaptic );
 			info.m_bRumbleEnabled = false;
 			info.m_fCurrentRumble = 0.0f;
 		}
@@ -565,7 +565,7 @@ void CInputSystem::SetXDeviceRumble( float fLeftMotor, float fRightMotor, int us
 	info.m_bRumbleEnabled = true;
 	info.m_fCurrentRumble = strength;
 
-	if ( SDL_HapticRumblePlay((SDL_Haptic *)info.m_pHaptic, strength, SDL_HAPTIC_INFINITY) != 0 )
+	if ( SDL_PlayHapticRumble((SDL_Haptic *)info.m_pHaptic, strength, SDL_HAPTIC_INFINITY) != 0 )
 	{
 		Warning("Couldn't play rumble (strength %.1f): %s\n", strength, SDL_GetError());
 	}
