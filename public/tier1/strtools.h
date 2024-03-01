@@ -548,7 +548,7 @@ template <size_t maxLenInChars> int Q_NormalizeUTF8ToASCII( OUT_Z_ARRAY char (&p
 		if constexpr (isCharUnsigned)
 		{
 			// dimhotepus: Makes sense only if char is unsigned.
-			if ( pchDest[i] > 127 )
+			if ( pchDest[i] > 127 ) //-V547
 			{
 				pchDest[i] = '?';
 			}
@@ -1094,7 +1094,7 @@ private:
 
 		// each Unicode code point can expand to as many as four bytes in UTF-8; we
 		// also need to leave room for the terminating NUL.
-		uint32 cbMax = 4 * static_cast<uint32>( V_wcslen( m_pwch ) ) + 1;
+		size_t cbMax = 4 * wcslen( m_pwch ) + 1; //-V112
 		char *pchTemp = new char[ cbMax ];
 		if ( V_UnicodeToUTF8( m_pwch, pchTemp, cbMax ) )
 		{
