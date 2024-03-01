@@ -1270,44 +1270,34 @@ CThreadMutex::~CThreadMutex()
 }
 #endif // !POSIX
 
-#if defined( _WIN32 ) && !defined( _X360 )
-typedef BOOL (WINAPI*TryEnterCriticalSectionFunc_t)(LPCRITICAL_SECTION);
-static CDynamicFunction<TryEnterCriticalSectionFunc_t> DynTryEnterCriticalSection( "Kernel32.dll", "TryEnterCriticalSection" );
-#elif defined( _X360 )
-#define DynTryEnterCriticalSection TryEnterCriticalSection
-#endif
-
 bool CThreadMutex::TryLock()
 {
-
 #if defined( _WIN32 )
 #ifdef THREAD_MUTEX_TRACING_ENABLED
 	ThreadId_t thisThreadID = ThreadGetCurrentId();
 	if ( m_bTrace && m_currentOwnerID && ( m_currentOwnerID != thisThreadID ) )
 		Msg( "Thread %lu about to try-wait for lock %p owned by %lu\n", ThreadGetCurrentId(), (CRITICAL_SECTION *)&m_CriticalSection, m_currentOwnerID );
 #endif
-	if ( DynTryEnterCriticalSection != NULL )
+
+	// dimhotepus: Use TryEnterCriticalSection directly instead of dynamic linking.
+	if ( TryEnterCriticalSection( (CRITICAL_SECTION *)&m_CriticalSection ) != FALSE )
 	{
-		if ( (*DynTryEnterCriticalSection )( (CRITICAL_SECTION *)&m_CriticalSection ) != FALSE )
-		{
 #ifdef THREAD_MUTEX_TRACING_ENABLED
-			if (m_lockCount == 0)
-			{
-				// we now own it for the first time.  Set owner information
-				m_currentOwnerID = thisThreadID;
-				if ( m_bTrace )
-					Msg( "Thread %lu now owns lock 0x%p\n", m_currentOwnerID, (CRITICAL_SECTION *)&m_CriticalSection );
-			}
-			m_lockCount++;
-#endif
-			return true;
+		if (m_lockCount == 0)
+		{
+			// we now own it for the first time.  Set owner information
+			m_currentOwnerID = thisThreadID;
+			if ( m_bTrace )
+				Msg( "Thread %lu now owns lock 0x%p\n", m_currentOwnerID, (CRITICAL_SECTION *)&m_CriticalSection );
 		}
-		return false;
+		m_lockCount++;
+#endif
+		return true;
 	}
-	Lock();
-	return true;
+
+	return false;
 #elif defined( POSIX )
-	 return pthread_mutex_trylock( &m_Mutex ) == 0;
+	return pthread_mutex_trylock( &m_Mutex ) == 0;
 #else
 #error "Implement me!"
 	return true;
