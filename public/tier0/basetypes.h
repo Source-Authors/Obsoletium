@@ -215,7 +215,7 @@ using vec_t = float;
 
 [[nodiscard]] inline bool IsNaN( vec_t f )
 {
-	static_assert(sizeof(f) == 4u);
+	static_assert(sizeof(f) == 4u); //-V112
 
 	// NaN check.
 	// std::isnan is slower on MSVC due to call to fpclassify.
@@ -226,7 +226,7 @@ using vec_t = float;
 	// > 0x7F800000 because for NaN:
 	// "The state/value of the remaining bits [...] are not defined by the standard
 	// except that they must not be all zero."
-	return (FloatBits(f) & 0x7FFFFFFFu) > 0x7F800000u;
+	return (FloatBits(f) & 0x7FFFFFFFu) > 0x7F800000u; //-V112
 }
 
 [[nodiscard]] inline bool IsFinite( vec_t f )

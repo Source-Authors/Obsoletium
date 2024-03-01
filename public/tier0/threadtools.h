@@ -179,7 +179,7 @@ PLATFORM_INTERFACE void ThreadSetAffinity( ThreadHandle_t hThread, ptrdiff_t nAf
 
 enum ThreadWaitResult_t
 {
-	TW_FAILED = 0xffffffff, // WAIT_FAILED
+	TW_FAILED = 0xffffffff, // WAIT_FAILED //-V112
 	TW_TIMEOUT = 0x00000102, // WAIT_TIMEOUT
 };
 
@@ -288,9 +288,9 @@ inline unsigned ThreadInterlockedExchangeSubtract( long volatile *p, long value 
 
 #if defined( USE_INTRINSIC_INTERLOCKED ) && !defined( _WIN64 )
 #define TIPTR()
-inline void *ThreadInterlockedExchangePointer( void * volatile *p, void *value )							{ return (void *)_InterlockedExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value) ); }
-inline void *ThreadInterlockedCompareExchangePointer( void * volatile *p, void *value, void *comperand )	{ return (void *)_InterlockedCompareExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value), reinterpret_cast<long>(comperand) ); }
-inline bool ThreadInterlockedAssignPointerIf( void * volatile *p, void *value, void *comperand )			{ return ( _InterlockedCompareExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value), reinterpret_cast<long>(comperand) ) == reinterpret_cast<long>(comperand) ); }
+inline void *ThreadInterlockedExchangePointer( void * volatile *p, void *value )							{ return (void *)_InterlockedExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value) ); } //-V114 //-V205 //-V204
+inline void *ThreadInterlockedCompareExchangePointer( void * volatile *p, void *value, void *comperand )	{ return (void *)_InterlockedCompareExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value), reinterpret_cast<long>(comperand) ); } //-V114 //-V205 //-V204
+inline bool ThreadInterlockedAssignPointerIf( void * volatile *p, void *value, void *comperand )			{ return ( _InterlockedCompareExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value), reinterpret_cast<long>(comperand) ) == reinterpret_cast<long>(comperand) ); } //-V114 //-V205
 #else
 PLATFORM_INTERFACE void *ThreadInterlockedExchangePointer( void * volatile *, void *value ) NOINLINE;
 PLATFORM_INTERFACE void *ThreadInterlockedCompareExchangePointer( void * volatile *, void *value, void *comperand ) NOINLINE;
@@ -1180,7 +1180,8 @@ inline int ThreadWaitForEvents( int nEvents, CThreadEvent * const *pEvents, bool
 	return WAIT_TIMEOUT;
 #else
 	HANDLE handles[64];
-	for ( int i = 0; i < min( nEvents, static_cast<int>(ssize(handles)) ); i++ )
+	// dimhotepus: Prevent overflow of handles buffer.
+	for ( intp i = 0; i < min( static_cast<intp>(nEvents), ssize(handles) ); i++ )
 		handles[i] = pEvents[i]->GetHandle();
 	return ThreadWaitForObjects( min( nEvents, static_cast<int>(ssize(handles)) ), handles, bWaitAll, timeout );
 #endif
