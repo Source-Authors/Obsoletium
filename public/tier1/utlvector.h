@@ -81,10 +81,15 @@ public:
 
 	// STL compatible member functions. These allow easier use of std::sort
 	// and they are forward compatible with the C++ 11 range-based for loops.
-	iterator begin()						{ return Base(); }
-	const_iterator begin() const			{ return Base(); }
-	iterator end()							{ return Base() + Count(); }
-	const_iterator end() const				{ return Base() + Count(); }
+	std::conditional_t<!std::is_same_v<A, CUtlBlockMemory<T, intp>>, iterator, void*>
+	begin()					{ return Base(); }
+	std::conditional_t<!std::is_same_v<A, CUtlBlockMemory<T, intp>>, const_iterator, const void*>
+	begin() const			{ return Base(); }
+
+	std::conditional_t<!std::is_same_v<A, CUtlBlockMemory<T, intp>>, iterator, void*>
+	end()					{ return Base() + Count(); }
+	std::conditional_t<!std::is_same_v<A, CUtlBlockMemory<T, intp>>, const_iterator, const void*>
+	end() const				{ return Base() + Count(); }
 
 	// Gets the base address (can change when adding elements!)
 	T* Base()								{ return m_Memory.Base(); }
