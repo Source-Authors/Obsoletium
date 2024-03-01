@@ -609,7 +609,7 @@ private:
 		}
 
 		const char *m_pFileName;
-		int					m_nLine;
+		int			m_nLine;
 	};
 
 	struct MemInfoKeyHasher 
@@ -617,7 +617,7 @@ private:
 		std::size_t operator()( const MemInfoKey_t &key ) const
 		{
 			std::size_t h1 = std::hash<const char*>{}( key.m_pFileName );
-			return h1 ^ (key.m_nLine << 1);
+			return h1 ^ (static_cast<size_t>(key.m_nLine) << 1);
 		}
 	};
 

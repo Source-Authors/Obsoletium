@@ -1064,7 +1064,7 @@ void DumpMemoryLog( int nThresh )
 
 	std::sort( memList.begin(), memList.end(), SortLessFunc );
 	
-	for( int i = 0; i < memList.size(); i++ )
+	for( size_t i = 0; i < memList.size(); i++ )
 	{
 		CLinuxMallocContext *p = memList[i];
 		char **strings = backtrace_symbols( p->pStackTraceBack, MAX_STACK_TRACEBACK );
@@ -1098,7 +1098,7 @@ void DumpChangedMemory( int nThresh )
 	}
 
 	std::sort( memList.begin(), memList.end(), SortLessFunc );
-	for( int i = 0; i < memList.size(); i++ )
+	for( size_t i = 0; i < memList.size(); i++ )
 	{
 		CLinuxMallocContext *p = memList[i];
 		char **strings = backtrace_symbols( p->pStackTraceBack, MAX_STACK_TRACEBACK );
