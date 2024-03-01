@@ -514,33 +514,36 @@ void CVProfile::DumpNodes( CVProfNode *pNode, int indent, bool bAverageAndCountO
 	}
 }
 
-static void DumpSorted( CVProfile::StreamOut_t outputStream, const tchar *pszHeading, double totalTime, bool (*pfnSort)( const TimeSums_t &, const TimeSums_t & ), int maxLen = 999999 )
+template<typename FSort>
+static void DumpSorted( CVProfile::StreamOut_t outputStream, const tchar *pszHeading, double totalTime, FSort sortFn, size_t maxLen = 999999 )
 {
-	unsigned i;
-	vector<TimeSums_t> sortedSums;
-	sortedSums = g_TimeSums;
-	sort( sortedSums.begin(), sortedSums.end(), pfnSort );
+	vector<TimeSums_t> sortedSums{g_TimeSums};
+	sort( sortedSums.begin(), sortedSums.end(), sortFn );
 
 	outputStream( _T("%s\n"), pszHeading);
     outputStream( _T("  Scope                                                      Calls Calls/Frame  Time+Child    Pct        Time    Pct   Avg/Frame    Avg/Call Avg-NoChild        Peak\n"));
     outputStream( _T("  ---------------------------------------------------- ----------- ----------- ----------- ------ ----------- ------ ----------- ----------- ----------- -----------\n"));
-    for ( i = 0; i < sortedSums.size() && i < (unsigned)maxLen; i++ )
+
+	size_t i{0};
+	for ( const auto &sum : sortedSums )
     {
-		double avg = ( sortedSums[i].calls ) ? sortedSums[i].time / (double)sortedSums[i].calls : 0.0;
-		double avgLessChildren = ( sortedSums[i].calls ) ? sortedSums[i].timeLessChildren / (double)sortedSums[i].calls : 0.0;
+		if ( i >= maxLen ) break;
+
+		double avg = sum.calls ? sum.time / (double)sum.calls : 0.0;
+		double avgLessChildren = sum.calls ? sum.timeLessChildren / (double)sum.calls : 0.0;
 		
         outputStream( _T("  %52.52s%12d%12.3f%12.3f%7.2f%12.3f%7.2f%12.3f%12.3f%12.3f%12.3f\n"), 
-             sortedSums[i].pszProfileScope,
-             sortedSums[i].calls,
-			 (float)sortedSums[i].calls / (float)g_TotalFrames,
-			 sortedSums[i].time,
-			 min( ( sortedSums[i].time / totalTime ) * 100.0, 100.0 ),
-			 sortedSums[i].timeLessChildren,
-			 min( ( sortedSums[i].timeLessChildren / totalTime ) * 100.0, 100.0 ),
-			 sortedSums[i].time / (float)g_TotalFrames,
+             sum.pszProfileScope,
+             sum.calls,
+			 (double)sum.calls / (double)g_TotalFrames,
+			 sum.time,
+			 min( ( sum.time / totalTime ) * 100.0, 100.0 ),
+			 sum.timeLessChildren,
+			 min( ( sum.timeLessChildren / totalTime ) * 100.0, 100.0 ),
+			 sum.time / (double)g_TotalFrames,
 			 avg,
 			 avgLessChildren,
-			 sortedSums[i].peak );
+			 sum.peak );
 	}
 }
 
