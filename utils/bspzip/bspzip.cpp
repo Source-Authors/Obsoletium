@@ -1,4 +1,8 @@
-// Copyright Valve Corporation, All rights reserved.
+﻿// Copyright Valve Corporation, All rights reserved.
+//
+// Command-line tool that allows arbitrary files to be embedded within a BSP.
+// When the map is being loaded the files will be mounted as if they were
+// present in the game's real content folders.
 //
 // See https://developer.valvesoftware.com/wiki/BSPZIP
 
@@ -6,6 +10,7 @@
 #include "cmdlib.h"
 #include "tier0/icommandline.h"
 #include "tier1/utlbuffer.h"
+#include "tools_minidump.h"
 
 namespace {
 
@@ -37,7 +42,6 @@ bool RepackBSP(const char *pszMapFile, bool bCompress) {
   }
 
   CUtlBuffer outputBuffer;
-
   if (!RepackBSP(inputBuffer, outputBuffer,
                  bCompress ? RepackBSPCallback_LZMA : NULL,
                  bCompress ? IZip::eCompressionType_LZMA
@@ -90,12 +94,16 @@ bool RepackBSP(const char *pszMapFile, bool bCompress) {
 }  // namespace
 
 int main(int argc, char **argv) {
+  // Install an exception handler.
+  const se::utils::common::ScopedDefaultMinidumpHandler
+      scoped_default_minidumps;
+
   const ScopedHDRMode scoped_hdr_mode{false};
 
 #ifdef PLATFORM_64BITS
-  Msg("\nValve Software - bspzip.exe [64 bit] (%s)\n", __DATE__);
+  Msg("\nValve Software - bspzip [64 bit] (%s)\n", __DATE__);
 #else
-  Msg("\nValve Software - bspzip.exe (%s)\n", __DATE__);
+  Msg("\nValve Software - bspzip (%s)\n", __DATE__);
 #endif
 
   int curArg = 1;
@@ -110,10 +118,8 @@ int main(int argc, char **argv) {
   }
 
   // Should have at least action
-  if (curArg >= argc) {
-    // End of args
-    return Usage();
-  }
+  // End of args
+  if (curArg >= argc) return Usage();
 
   // Pointers to the action, the file, and any action args so I can remove all
   // the messy argc pointer math this was using.
@@ -123,7 +129,6 @@ int main(int argc, char **argv) {
   int nActionArgs = argc - curArg;
 
   CommandLine()->CreateCmdLine(argc, argv);
-
   MathLib_Init(2.2f, 2.2f, 0.0f, 2);
 
   if ((stricmp(pAction, "-extract") == 0) && nActionArgs == 2) {

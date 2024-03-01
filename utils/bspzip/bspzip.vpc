@@ -34,22 +34,27 @@ $Project "bspzip"
 	$Folder	"Source Files"
 	{
 		$File	"..\common\bsplib.cpp"
-		$File	"bspzip.cpp"
 		$File	"..\common\cmdlib.cpp"
+		$File	"..\common\tools_minidump.cpp"
+		$File	"..\common\filesystem_tools.cpp"
+		$File	"..\common\scriplib.cpp"
 		$File	"$SRCDIR\public\filesystem_helpers.cpp"
 		$File	"$SRCDIR\public\filesystem_init.cpp"
-		$File	"..\common\filesystem_tools.cpp"
 		$File	"$SRCDIR\public\lumpfiles.cpp"
-		$File	"..\common\scriplib.cpp"
 		$File	"$SRCDIR\public\zip_utils.cpp"
+		$File	"bspzip.cpp"
 	}
 
 	$Folder	"Header Files"
 	{
+		$File	"..\common\bsplib.h"
+		$File	"..\common\cmdlib.h"
+		$File	"..\common\tools_minidump.h"
+		$File	"..\common\filesystem_tools.h"
+		$File	"..\common\scriplib.h"
 		$File	"$SRCDIR\public\bspfile.h"
 		$File	"$SRCDIR\public\tier1\characterset.h"
 		$File	"$SRCDIR\public\filesystem_helpers.h"
-		$File	"..\common\filesystem_tools.h"
 		$File	"$SRCDIR\public\zip_utils.h"
 	}
 
