@@ -1956,8 +1956,8 @@ void KeyValues::CopySubkeys( KeyValues *pParent ) const
 {
 	// recursively copy subkeys
 	// Also maintain ordering....
-	KeyValues *pPrev = NULL;
-	for ( KeyValues *sub = m_pSub; sub != NULL; sub = sub->m_pPeer )
+	KeyValues *pPrev = nullptr;
+	for ( KeyValues *sub = m_pSub; sub != nullptr; sub = sub->m_pPeer )
 	{
 		// take a copy of the subkey
 		KeyValues *dat = sub->MakeCopy();

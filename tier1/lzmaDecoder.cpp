@@ -147,8 +147,8 @@ size_t CLZMA::Uncompress( unsigned char *pInput, unsigned char *pOutput )
 	SizeT outProcessed = pHeader->actualSize;
 	SizeT inProcessed = pHeader->lzmaSize;
 	ELzmaStatus status;
-	SRes result = LzmaDecode( (Byte *)pOutput, &outProcessed, (Byte *)(pInput + sizeof( lzma_header_t ) ),
-	                          &inProcessed, (Byte *)pHeader->properties, LZMA_PROPS_SIZE, LZMA_FINISH_END, &status, &g_Alloc );
+	SRes result = LzmaDecode( pOutput, &outProcessed, pInput + sizeof( lzma_header_t ),
+	                          &inProcessed, pHeader->properties, LZMA_PROPS_SIZE, LZMA_FINISH_END, &status, &g_Alloc );
 
 
 	LzmaDec_Free(&state, &g_Alloc);
