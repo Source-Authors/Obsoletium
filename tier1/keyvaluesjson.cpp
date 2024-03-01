@@ -386,6 +386,7 @@ void KeyValuesJSONParser::NextToken()
 				// | fall 
 				// | through
 				// V
+				[[fallthrough]];
 
 			default:
 			unexpected_char:

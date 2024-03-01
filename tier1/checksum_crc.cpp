@@ -113,12 +113,15 @@ JustAfew:
     {
     case 7:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 6:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 5:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 4:
         ulCrc ^= LittleLong( *(CRC32_t *)pb );
@@ -131,12 +134,15 @@ JustAfew:
 
     case 3:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 2:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 1:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 0:
 		*pulCRC = ulCrc;
@@ -155,8 +161,10 @@ JustAfew:
     {
     case 3:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
     case 2:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
     case 1:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
     }
