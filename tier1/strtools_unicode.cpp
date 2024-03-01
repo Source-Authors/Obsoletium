@@ -445,7 +445,7 @@ uchar32 *Q_UnicodeAdvance( uchar32 *pUTF32, ptrdiff_t nChars )
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF8ToUTF16( const char *pUTF8, uchar16 *pUTF16, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF8ToUTF16( const char *pUTF8, OUT_Z_BYTECAP(cubDestSizeInBytes) uchar16 *pUTF16, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< char, uchar16, true, Q_UTF8ToUChar32, Q_UChar32ToUTF16Len, Q_UChar32ToUTF16 >( pUTF8, 0, pUTF16, cubDestSizeInBytes, ePolicy );
 }
@@ -453,7 +453,7 @@ ptrdiff_t Q_UTF8ToUTF16( const char *pUTF8, uchar16 *pUTF16, ptrdiff_t cubDestSi
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF8ToUTF32( const char *pUTF8, uchar32 *pUTF32, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF8ToUTF32( const char *pUTF8, OUT_Z_BYTECAP(cubDestSizeInBytes) uchar32 *pUTF32, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< char, uchar32, true, Q_UTF8ToUChar32, Q_UChar32ToUTF32Len, Q_UChar32ToUTF32 >( pUTF8, 0, pUTF32, cubDestSizeInBytes, ePolicy );
 }
@@ -461,7 +461,7 @@ ptrdiff_t Q_UTF8ToUTF32( const char *pUTF8, uchar32 *pUTF32, ptrdiff_t cubDestSi
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF16ToUTF8( const uchar16 *pUTF16, char *pUTF8, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF16ToUTF8( const uchar16 *pUTF16, OUT_Z_BYTECAP(cubDestSizeInBytes) char *pUTF8, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< uchar16, char, true, Q_UTF16ToUChar32, Q_UChar32ToUTF8Len, Q_UChar32ToUTF8 >( pUTF16, 0, pUTF8, cubDestSizeInBytes, ePolicy );
 }
@@ -469,7 +469,7 @@ ptrdiff_t Q_UTF16ToUTF8( const uchar16 *pUTF16, char *pUTF8, ptrdiff_t cubDestSi
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF16ToUTF32( const uchar16 *pUTF16, uchar32 *pUTF32, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF16ToUTF32( const uchar16 *pUTF16, OUT_Z_BYTECAP(cubDestSizeInBytes) uchar32 *pUTF32, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< uchar16, uchar32, true, Q_UTF16ToUChar32, Q_UChar32ToUTF32Len, Q_UChar32ToUTF32 >( pUTF16, 0, pUTF32, cubDestSizeInBytes, ePolicy );
 }
@@ -477,7 +477,7 @@ ptrdiff_t Q_UTF16ToUTF32( const uchar16 *pUTF16, uchar32 *pUTF32, ptrdiff_t cubD
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF32ToUTF8( const uchar32 *pUTF32, char *pUTF8, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF32ToUTF8( const uchar32 *pUTF32, OUT_Z_BYTECAP(cubDestSizeInBytes) char *pUTF8, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< uchar32, char, true, Q_UTF32ToUChar32, Q_UChar32ToUTF8Len, Q_UChar32ToUTF8 >( pUTF32, 0, pUTF8, cubDestSizeInBytes, ePolicy );
 }
@@ -485,7 +485,7 @@ ptrdiff_t Q_UTF32ToUTF8( const uchar32 *pUTF32, char *pUTF8, ptrdiff_t cubDestSi
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF32ToUTF16( const uchar32 *pUTF32, uchar16 *pUTF16, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF32ToUTF16( const uchar32 *pUTF32, OUT_Z_BYTECAP(cubDestSizeInBytes) uchar16 *pUTF16, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< uchar32, uchar16, true, Q_UTF32ToUChar32, Q_UChar32ToUTF16Len, Q_UChar32ToUTF16 >( pUTF32, 0, pUTF16, cubDestSizeInBytes, ePolicy );
 }
@@ -493,7 +493,7 @@ ptrdiff_t Q_UTF32ToUTF16( const uchar32 *pUTF32, uchar16 *pUTF16, ptrdiff_t cubD
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF32ToUTF32( const uchar32 *pUTF32Source, uchar32 *pUTF32Dest, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF32ToUTF32( const uchar32 *pUTF32Source, OUT_Z_BYTECAP(cubDestSizeInBytes) uchar32 *pUTF32Dest, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< uchar32, uchar32, true, Q_UTF32ToUChar32, Q_UChar32ToUTF32Len, Q_UChar32ToUTF32 >( pUTF32Source, 0, pUTF32Dest, cubDestSizeInBytes, ePolicy );
 }
@@ -501,7 +501,7 @@ ptrdiff_t Q_UTF32ToUTF32( const uchar32 *pUTF32Source, uchar32 *pUTF32Dest, ptrd
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF8CharsToUTF16( const char *pUTF8, ptrdiff_t nElements, uchar16 *pUTF16, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF8CharsToUTF16( const char *pUTF8, ptrdiff_t nElements, OUT_Z_BYTECAP(cubDestSizeInBytes) uchar16 *pUTF16, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< char, uchar16, false, Q_UTF8ToUChar32, Q_UChar32ToUTF16Len, Q_UChar32ToUTF16 >( pUTF8, nElements, pUTF16, cubDestSizeInBytes, ePolicy );
 }
@@ -509,7 +509,7 @@ ptrdiff_t Q_UTF8CharsToUTF16( const char *pUTF8, ptrdiff_t nElements, uchar16 *p
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF8CharsToUTF32( const char *pUTF8, ptrdiff_t nElements, uchar32 *pUTF32, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF8CharsToUTF32( const char *pUTF8, ptrdiff_t nElements, OUT_Z_BYTECAP(cubDestSizeInBytes) uchar32 *pUTF32, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< char, uchar32, false, Q_UTF8ToUChar32, Q_UChar32ToUTF32Len, Q_UChar32ToUTF32 >( pUTF8, nElements, pUTF32, cubDestSizeInBytes, ePolicy );
 }
@@ -517,7 +517,7 @@ ptrdiff_t Q_UTF8CharsToUTF32( const char *pUTF8, ptrdiff_t nElements, uchar32 *p
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF16CharsToUTF8( const uchar16 *pUTF16, ptrdiff_t nElements, char *pUTF8, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF16CharsToUTF8( const uchar16 *pUTF16, ptrdiff_t nElements, OUT_Z_BYTECAP(cubDestSizeInBytes) char *pUTF8, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< uchar16, char, false, Q_UTF16ToUChar32, Q_UChar32ToUTF8Len, Q_UChar32ToUTF8 >( pUTF16, nElements, pUTF8, cubDestSizeInBytes, ePolicy );
 }
@@ -525,7 +525,7 @@ ptrdiff_t Q_UTF16CharsToUTF8( const uchar16 *pUTF16, ptrdiff_t nElements, char *
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF16CharsToUTF32( const uchar16 *pUTF16, ptrdiff_t nElements, uchar32 *pUTF32, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF16CharsToUTF32( const uchar16 *pUTF16, ptrdiff_t nElements, OUT_Z_BYTECAP(cubDestSizeInBytes) uchar32 *pUTF32, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< uchar16, uchar32, false, Q_UTF16ToUChar32, Q_UChar32ToUTF32Len, Q_UChar32ToUTF32 >( pUTF16, nElements, pUTF32, cubDestSizeInBytes, ePolicy );
 }
@@ -533,7 +533,7 @@ ptrdiff_t Q_UTF16CharsToUTF32( const uchar16 *pUTF16, ptrdiff_t nElements, uchar
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF32CharsToUTF8( const uchar32 *pUTF32, ptrdiff_t nElements, char *pUTF8, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF32CharsToUTF8( const uchar32 *pUTF32, ptrdiff_t nElements, OUT_Z_BYTECAP(cubDestSizeInBytes) char *pUTF8, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< uchar32, char, false, Q_UTF32ToUChar32, Q_UChar32ToUTF8Len, Q_UChar32ToUTF8 >( pUTF32, nElements, pUTF8, cubDestSizeInBytes, ePolicy );
 }
@@ -541,7 +541,7 @@ ptrdiff_t Q_UTF32CharsToUTF8( const uchar32 *pUTF32, ptrdiff_t nElements, char *
 //-----------------------------------------------------------------------------
 // Purpose: Perform conversion. Returns number of *bytes* required if output pointer is NULL.
 //-----------------------------------------------------------------------------
-ptrdiff_t Q_UTF32CharsToUTF16( const uchar32 *pUTF32, ptrdiff_t nElements, uchar16 *pUTF16, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
+ptrdiff_t Q_UTF32CharsToUTF16( const uchar32 *pUTF32, ptrdiff_t nElements, OUT_Z_BYTECAP(cubDestSizeInBytes) uchar16 *pUTF16, ptrdiff_t cubDestSizeInBytes, EStringConvertErrorPolicy ePolicy )
 {
 	return Q_UnicodeConvertT< uchar32, uchar16, false, Q_UTF32ToUChar32, Q_UChar32ToUTF16Len, Q_UChar32ToUTF16 >( pUTF32, nElements, pUTF16, cubDestSizeInBytes, ePolicy );
 }

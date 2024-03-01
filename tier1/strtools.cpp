@@ -747,17 +747,17 @@ void V_wcsncpy( OUT_Z_BYTECAP(maxLenInBytes) wchar_t *pDest, wchar_t const *pSrc
 	AssertValidWritePtr( pDest, maxLenInBytes );
 	AssertValidReadPtr( pSrc );
 
-	ptrdiff_t maxLen = maxLenInBytes / static_cast<ptrdiff_t>(sizeof(wchar_t));
-	if ( maxLen > 0 )
+	ptrdiff_t maxLenInChars = maxLenInBytes / static_cast<intp>(sizeof(wchar_t));
+	if ( maxLenInChars > 0 )
 	{
-		wcsncpy( pDest, pSrc, maxLen - 1 );
-		pDest[maxLen - 1] = L'\0';
+		wcsncpy( pDest, pSrc, maxLenInChars - 1 );
+		pDest[maxLenInChars - 1] = L'\0';
 	}
 }
 
 
 
-int V_snwprintf( OUT_Z_CAP(maxLen) wchar_t *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_STRING const wchar_t *pFormat, ... )
+int V_snwprintf( OUT_Z_CAP(maxLenInChars) wchar_t *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_STRING const wchar_t *pFormat, ... )
 {
 	Assert( maxLen > 0 );
 	AssertValidWritePtr( pDest, maxLen );
@@ -786,7 +786,7 @@ int V_snwprintf( OUT_Z_CAP(maxLen) wchar_t *pDest, ptrdiff_t maxLen, PRINTF_FORM
 }
 
 
-int V_vsnwprintf( OUT_Z_CAP(maxLen) wchar_t *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_STRING const wchar_t *pFormat, va_list params )
+int V_vsnwprintf( OUT_Z_CAP(maxLenInChars) wchar_t *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_STRING const wchar_t *pFormat, va_list params )
 {
 	Assert( maxLen > 0 );
 
@@ -811,7 +811,7 @@ int V_vsnwprintf( OUT_Z_CAP(maxLen) wchar_t *pDest, ptrdiff_t maxLen, PRINTF_FOR
 }
 
 
-int V_snprintf( OUT_Z_CAP(maxLen) char *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_STRING char const *pFormat, ... )
+int V_snprintf( OUT_Z_CAP(maxLenInChars) char *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_STRING char const *pFormat, ... )
 {
 	Assert( maxLen > 0 );
 	AssertValidWritePtr( pDest, maxLen );
@@ -840,7 +840,7 @@ int V_snprintf( OUT_Z_CAP(maxLen) char *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_S
 }
 
 
-int V_vsnprintf( OUT_Z_CAP(maxLen) char *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_STRING char const *pFormat, va_list params )
+int V_vsnprintf( OUT_Z_CAP(maxLenInChars) char *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_STRING char const *pFormat, va_list params )
 {
 	Assert( maxLen > 0 );
 	AssertValidWritePtr( pDest, maxLen );
@@ -859,7 +859,7 @@ int V_vsnprintf( OUT_Z_CAP(maxLen) char *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_
 }
 
 
-int V_vsnprintfRet( OUT_Z_CAP(maxLen) char *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_STRING const char *pFormat, va_list params, bool *pbTruncated )
+int V_vsnprintfRet( OUT_Z_CAP(maxLenInChars) char *pDest, ptrdiff_t maxLen, PRINTF_FORMAT_STRING const char *pFormat, va_list params, bool *pbTruncated )
 {
 	Assert( maxLen > 0 );
 	AssertValidWritePtr( pDest, maxLen );
@@ -2479,7 +2479,7 @@ void V_SplitString( IN_Z const char *pString, IN_Z const char *pSeparator, CUtlV
 }
 
 
-bool V_GetCurrentDirectory( OUT_Z_CAP(maxLen) char *pOut, int maxLen )
+bool V_GetCurrentDirectory( OUT_Z_CAP(maxLenInChars) char *pOut, int maxLen )
 {
 	return _getcwd( pOut, maxLen ) == pOut;
 }
@@ -2602,7 +2602,7 @@ void V_strtowcs( const char *pString, int nInSize, OUT_Z_BYTECAP(nOutSizeInBytes
 	{
 		// We have successfully converted our string. Now we need to null-terminate it, because
 		// MultiByteToWideChar will only do that if nInSize includes the source null-terminator!
-		pWString[ result ] = 0;
+		pWString[ result ] = L'\0';
 	}
 #elif POSIX
 	if ( mbstowcs( pWString, pString, nOutSizeInBytes / sizeof(pWString[0]) ) <= 0 )
@@ -3359,7 +3359,7 @@ bool V_BasicHtmlEntityEncode( OUT_Z_CAP( nDestSize ) char *pDest, const ptrdiff_
 	}
 
 	// Null terminate the output
-	pDest[ iOutput ] = 0;
+	pDest[ iOutput ] = '\0';
 	return true;
 }
 
@@ -3461,7 +3461,7 @@ bool V_HtmlEntityDecodeToUTF8( OUT_Z_CAP( nDestSize ) char *pDest, const ptrdiff
 	return true;
 }
 
-static constexpr char * const g_pszSimpleBBCodeReplacements[] = {
+static const char * const g_pszSimpleBBCodeReplacements[] = {
 	"[b]", "<b>",
 	"[/b]", "</b>",
 	"[i]", "<i>",
