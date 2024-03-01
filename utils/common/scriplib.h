@@ -15,6 +15,7 @@
 #endif
 
 #include "tier0/basetypes.h"
+#include "tier0/platform.h"
 
 
 enum ScriptPathMode_t
@@ -39,7 +40,7 @@ extern	qboolean	endofscript;
 // trying to open it. Otherwise, it passes the filename straight into the filesystem
 // (so you can leave it as a relative path).
 void LoadScriptFile (char *filename, ScriptPathMode_t pathMode=SCRIPT_USE_ABSOLUTE_PATH);
-void ParseFromMemory (char *buffer, int size);
+void ParseFromMemory (char *buffer, intp size);
 
 qboolean GetToken (qboolean crossline);
 qboolean GetExprToken (qboolean crossline);

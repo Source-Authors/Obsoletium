@@ -358,7 +358,7 @@ bool ExpandVariableToken( char *&token_p )
 
 		// lookup macro parameter
 
-		int index;
+		intp index;
 		for (index = 0; index < g_definevariable.Count(); index++)
 		{
 			if (Q_strnicmp( g_definevariable[index].param, tp, len ) == 0)
@@ -395,7 +395,7 @@ bool ExpandVariableToken( char *&token_p )
 ParseFromMemory
 ==============
 */
-void ParseFromMemory (char *buffer, int size)
+void ParseFromMemory (char *buffer, intp size)
 {
 	script = scriptstack;
 	script++;
@@ -708,7 +708,7 @@ skipspace:
 
 		if ( CmdLib_ExpandWithBasePaths( expandedPathList, token ) > 0 )
 		{
-			for ( int i = 0; i < expandedPathList.Count(); ++i )
+			for ( intp i = 0; i < expandedPathList.Count(); ++i )
 			{
 				CUtlVector< CUtlString > findFileList;
 				FindFileAbsoluteList( findFileList, expandedPathList[i].String() );
@@ -718,7 +718,7 @@ skipspace:
 					bFallbackToToken = false;
 
 					// Only add the first set of glob matches from the first base path
-					for ( int j = 0; j < findFileList.Count(); ++j )
+					for ( intp j = 0; j < findFileList.Count(); ++j )
 					{
 						AddScriptToStack( const_cast< char * >( findFileList[j].String() ) );
 					}
@@ -1052,8 +1052,8 @@ bool CScriptLib::WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer,
 //-----------------------------------------------------------------------------
 int CScriptLib::CompareFileTime( const char *pFilenameA, const char *pFilenameB )
 {
-	int timeA = g_pFullFileSystem->GetFileTime( (char *)pFilenameA );
-	int timeB = g_pFullFileSystem->GetFileTime( (char *)pFilenameB );
+	time_t timeA = g_pFullFileSystem->GetFileTime( (char *)pFilenameA );
+	time_t timeB = g_pFullFileSystem->GetFileTime( (char *)pFilenameB );
 
 	if ( timeA == -1)
 	{
@@ -1066,11 +1066,11 @@ int CScriptLib::CompareFileTime( const char *pFilenameA, const char *pFilenameB 
 		timeB = 0;
 	}
 
-	if ( (unsigned int)timeA < (unsigned int)timeB )
+	if ( (uintp)timeA < (uintp)timeB )
 	{
 		return -1;
 	}
-	else if ( (unsigned int)timeA > (unsigned int)timeB )
+	else if ( (uintp)timeA > (uintp)timeB )
 	{
 		return 1;
 	}
@@ -1122,7 +1122,7 @@ void CScriptLib::DeleteTemporaryFiles( const char *pFileMask )
 
 		CUtlVector<fileList_t> fileList;
 		FindFiles( tempPath, false, fileList );
-		for ( int i=0; i<fileList.Count(); i++ )
+		for ( intp i=0; i<fileList.Count(); i++ )
 		{
 			_unlink( fileList[i].fileName.String() );
 		}
