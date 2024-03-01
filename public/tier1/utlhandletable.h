@@ -116,7 +116,7 @@ UtlHandle_t CUtlHandleTable<T, HandleBits>::AddHandle()
 	Assert(m_nValidHandles < std::numeric_limits<int>::max());
 	++m_nValidHandles;
 
-	Assert(nIndex >= 0 && nIndex <= std::numeric_limits<unsigned>::max());
+	Assert(nIndex >= 0 && static_cast<size_t>(nIndex) <= std::numeric_limits<unsigned>::max());
 	return CreateHandle( entry.m_nSerial, static_cast<unsigned>(nIndex) );
 }
 
