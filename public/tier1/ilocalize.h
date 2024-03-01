@@ -99,7 +99,7 @@ public:
 	// builds a localized formatted string
 	// uses the format strings first: %s1, %s2, ...  unicode strings (wchar_t *)
 	template < typename T >
-	static void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOuput, int unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, ...)
+	static void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOuput, intp unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, ...)
 	{
 		va_list argList;
 		va_start( argList, numFormatParameters );
@@ -110,13 +110,13 @@ public:
 	}
 
 	template < typename T >
-	static void ConstructStringVArgs(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOuput, int unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, va_list argList)
+	static void ConstructStringVArgs(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOuput, intp unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, va_list argList)
 	{
 		ConstructStringVArgsInternal( unicodeOuput, unicodeBufferSizeInBytes, formatString, numFormatParameters, argList );
 	}
 
 	template < typename T >
-	static void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOutput, int unicodeBufferSizeInBytes, const T *formatString, KeyValues *localizationVariables)
+	static void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOutput, intp unicodeBufferSizeInBytes, const T *formatString, KeyValues *localizationVariables)
 	{
 		ConstructStringKeyValuesInternal( unicodeOutput, unicodeBufferSizeInBytes, formatString, localizationVariables );
 	}
@@ -149,11 +149,11 @@ public:
 
 private:
 	// internal "interface"
-	static void ConstructStringVArgsInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) char *unicodeOutput, int unicodeBufferSizeInBytes, const char *formatString, int numFormatParameters, va_list argList);
-	static void ConstructStringVArgsInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const wchar_t *formatString, int numFormatParameters, va_list argList);
+	static void ConstructStringVArgsInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) char *unicodeOutput, intp unicodeBufferSizeInBytes, const char *formatString, int numFormatParameters, va_list argList);
+	static void ConstructStringVArgsInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, intp unicodeBufferSizeInBytes, const wchar_t *formatString, int numFormatParameters, va_list argList);
 
-	static void ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) char *unicodeOutput, int unicodeBufferSizeInBytes, const char *formatString, KeyValues *localizationVariables);
-	static void ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const wchar_t *formatString, KeyValues *localizationVariables);
+	static void ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) char *unicodeOutput, intp unicodeBufferSizeInBytes, const char *formatString, KeyValues *localizationVariables);
+	static void ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, intp unicodeBufferSizeInBytes, const wchar_t *formatString, KeyValues *localizationVariables);
 };
 
 #ifdef GC
@@ -392,7 +392,7 @@ public:
 			::ILocalize::ConstructString( m_loc_Buffer,
 										  sizeof( m_loc_Buffer ),
 										  loc_Format,
-										  4,
+										  4, //-V112
 										  CLocalizedStringArg<T>( arg0 ).GetLocArg(),
 										  CLocalizedStringArg<U>( arg1 ).GetLocArg(),
 										  CLocalizedStringArg<V>( arg2 ).GetLocArg(),
