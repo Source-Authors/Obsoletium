@@ -473,7 +473,7 @@ inline	I CUtlRBTree<T, I, L, M>::Count() const
 template < class T, class I, typename L, class M >
 inline	I  CUtlRBTree<T, I, L, M>::MaxElement() const       
 {
-	return ( I )m_Elements.NumAllocated();
+	return static_cast<I>(m_Elements.NumAllocated());
 }
 
 
@@ -557,7 +557,7 @@ inline	bool CUtlRBTree<T, I, L, M>::IsValidIndex( I i ) const
 template < class T, class I, typename L, class M >
 inline constexpr I CUtlRBTree<T, I, L, M>::InvalidIndex()         
 {
-	return ( I )M::InvalidIndex();
+	return static_cast<I>(M::InvalidIndex());
 }
 
 
@@ -646,7 +646,7 @@ inline typename CUtlRBTree<T, I, L, M>::NodeColor_t  CUtlRBTree<T, I, L, M>::Col
 template < class T, class I, typename L, class M >
 inline void CUtlRBTree<T, I, L, M>::SetColor( I i, typename CUtlRBTree<T, I, L, M>::NodeColor_t c ) 
 { 
-	Links(i).m_Tag = (I)c; 
+	Links(i).m_Tag = static_cast<I>(c); 
 }
 
 //-----------------------------------------------------------------------------

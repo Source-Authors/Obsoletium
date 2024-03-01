@@ -78,7 +78,7 @@ public:
 	bool IsIdxValid( I i ) const;
 
 	// Specify the invalid ('null') index that we'll only return on failure
-	static constexpr I INVALID_INDEX = ( I )-1; // For use with COMPILE_TIME_ASSERT
+	static constexpr I INVALID_INDEX = static_cast<I>(-1); // For use with COMPILE_TIME_ASSERT
 	static constexpr I InvalidIndex() { return INVALID_INDEX; }
 
 	// Gets the base address (can change when adding elements!)
@@ -200,7 +200,7 @@ class CUtlMemoryFixed
 {
 public:
 	// constructor, destructor
-	CUtlMemoryFixed( intp nGrowSize = 0, intp nInitSize = 0 )	{ Assert( nInitSize == 0 || nInitSize == SIZE ); 	}
+	CUtlMemoryFixed( intp nGrowSize = 0, intp nInitSize = 0 )	{ Assert( nInitSize == 0 || nInitSize == SIZE ); 	} //-V730
 	CUtlMemoryFixed( T* pMemory, intp numElements ) = delete;
 
 	// Can we use this index?

@@ -75,7 +75,7 @@ public:
 
 	// Can we use this index?
 	bool IsIdxValid( I i ) const;
-	static constexpr I InvalidIndex() { return ( I )-1; }
+	static constexpr I InvalidIndex() { return static_cast<I>(-1); }
 
 	void Swap( CUtlBlockMemory< T, I > &mem );
 
