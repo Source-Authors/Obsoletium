@@ -316,7 +316,7 @@ public:
 	const void* Base() const;
 	void* Base();
 	template<typename T>
-	const T* Base() const { return static_cast<T*>(Base()); }
+	const T* Base() const { return static_cast<const T*>(Base()); }
 	template<typename T>
 	T* Base() { return static_cast<T*>(Base()); }
 	// Returns the base as a const char*, only valid in text mode.
