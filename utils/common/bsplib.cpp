@@ -1449,27 +1449,24 @@ CompressVis
 */
 int CompressVis (byte *vis, byte *dest)
 {
-	int		j;
-	int		rep;
-	int		visrow;
-	byte	*dest_p;
-	
-	dest_p = dest;
+	byte *dest_p = dest;
 //	visrow = (r_numvisleafs + 7)>>3;
-	visrow = (dvis->numclusters + 7)>>3;
+	int visrow = (dvis->numclusters + 7)>>3;
 	
-	for (j=0 ; j<visrow ; j++)
+	for (int j=0 ; j<visrow ; j++)
 	{
 		*dest_p++ = vis[j];
 		if (vis[j])
 			continue;
 
-		rep = 1;
+		// dimhotepus: Use byte instead of int to fix truncation warnings.
+		byte rep = 1;
 		for ( j++; j<visrow ; j++)
-			if (vis[j] || rep == 255)
+			if (vis[j] || rep == std::numeric_limits<byte>::max())
 				break;
 			else
 				rep++;
+
 		*dest_p++ = rep;
 		j--;
 	}
@@ -1485,7 +1482,7 @@ DecompressVis
 */
 void DecompressVis (byte *in, byte *decompressed)
 {
-	int		c;
+	intp	c;
 	byte	*out;
 	int		row;
 
@@ -1782,7 +1779,7 @@ static void SwapPhyscollideLump( byte *pDestBase, byte *pSrcBase, unsigned int &
 		}
 
 		// avoid infinite loop on badly formed file
-		if ( (pSrc - basePtr) > count )
+		if ( (pSrc - basePtr) > static_cast<intp>(count) )
 			break;
 
 	} while ( pPhysModel->dataSize > 0 );
@@ -2792,24 +2789,24 @@ bool GenerateNextLumpFileName( const char *bspfilename, char *lumpfilename, int 
 	return false;
 }
 
-void WriteLumpToFile( dheader_t *header, char *filename, int lump )
+bool WriteLumpToFile( dheader_t *header, char *filename, int lump )
 {
 	if ( !HasLump(header, lump) )
-		return;
+		return false;
 
 	char lumppre[MAX_PATH];	
 	if ( !GenerateNextLumpFileName( filename, lumppre, MAX_PATH ) )
 	{
 		Warning( "Failed to find valid lump filename for bsp %s.\n", filename );
-		return;
+		return false;
 	}
 
 	// Open the file
 	FileHandle_t lumpfile = g_pFileSystem->Open(lumppre, "wb");
 	if ( !lumpfile )
 	{
-		Error ("Error opening %s! (Check for write enable).\n",filename);
-		return;
+		Error ("Error opening %s! (Check for write enable).\n", lumppre);
+		return false;
 	}
 
 	int ofs = header->lumps[lump].fileofs;
@@ -2826,6 +2823,11 @@ void WriteLumpToFile( dheader_t *header, char *filename, int lump )
 
 	// Write the lump
 	SafeWrite (lumpfile, (byte *)header + ofs, length);
+
+	// dimhotepus: Do not leak file handle.
+	g_pFileSystem->Close(lumpfile);
+
+	return true;
 }
 
 void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer, size_t nBufLen )
@@ -3221,13 +3223,50 @@ int		IntForKeyWithDefault(entity_t *ent, char *key, int nDefault )
 	return atol(k);
 }
 
+// dimhotepus: Dispatch vec_t type.
+using vector_type_t = std::conditional_t<
+	std::is_same_v<float, vec_t>,
+	float,
+	std::conditional_t<
+		std::is_same_v<double, vec_t>,
+		double,
+		void
+	>
+>;
+static constexpr const char* GetVector2FormatSpecifier() {
+	if constexpr (std::is_same_v<float, vector_type_t>)
+		return "%f %f";
+
+	if constexpr (std::is_same_v<double, vector_type_t>)
+		return "%lf %lf";
+
+	return "";
+};
+static constexpr const char* GetVector3FormatSpecifier() {
+	if constexpr (std::is_same_v<float, vector_type_t>)
+		return "%f %f %f";
+
+	if constexpr (std::is_same_v<double, vector_type_t>)
+		return "%lf %lf %lf";
+
+	return "";
+};
+static constexpr const char *GetAnglesFormatSpecifier() {
+	if constexpr (std::is_same_v<float, vector_type_t>)
+		return "%f %f %f";
+
+	if constexpr (std::is_same_v<double, vector_type_t>)
+		return "%lf %lf %lf";
+
+	return "";
+};
+
 void 	GetVectorForKey (entity_t *ent, char *key, Vector& vec)
 {
 	const char *k = ValueForKey (ent, key);
-// scanf into doubles, then assign, so it is vec_t size independent
-	double	v1, v2, v3;
-	v1 = v2 = v3 = 0;
-	if ( !Q_isempty( k ) && sscanf (k, "%lf %lf %lf", &v1, &v2, &v3) != 3 )
+	vector_type_t v1 = 0, v2 = 0, v3 = 0;
+	constexpr auto format = GetVector3FormatSpecifier();
+	if ( !Q_isempty( k ) && sscanf (k, format, &v1, &v2, &v3) != 3 )
 	{
 		Warning( "Key '%s' has value '%s' which is not a vector3.\n", key, k );
 	}
@@ -3239,12 +3278,10 @@ void 	GetVectorForKey (entity_t *ent, char *key, Vector& vec)
 
 void 	GetVector2DForKey (entity_t *ent, char *key, Vector2D& vec)
 {
-	double	v1, v2;
-
 	const char *k = ValueForKey (ent, key);
-// scanf into doubles, then assign, so it is vec_t size independent
-	v1 = v2 = 0;
-	if ( sscanf (k, "%lf %lf", &v1, &v2) != 2 )
+	vector_type_t v1 = 0, v2 = 0;
+	constexpr auto format = GetVector2FormatSpecifier();
+	if ( sscanf (k, format, &v1, &v2) != 2 )
 	{
 		Warning( "key '%s' has value '%s' which is not a vector2.\n", key, k );
 	}
@@ -3255,12 +3292,10 @@ void 	GetVector2DForKey (entity_t *ent, char *key, Vector2D& vec)
 
 void 	GetAnglesForKey (entity_t *ent, char *key, QAngle& angle)
 {
-	double	v1, v2, v3;
-
 	const char *k = ValueForKey (ent, key);
-// scanf into doubles, then assign, so it is vec_t size independent
-	v1 = v2 = v3 = 0;
-	if ( sscanf (k, "%lf %lf %lf", &v1, &v2, &v3) != 3 )
+	vector_type_t v1 = 0, v2 = 0, v3 = 0;
+	constexpr auto format = GetAnglesFormatSpecifier();
+	if ( sscanf (k, format, &v1, &v2, &v3) != 3 )
 	{
 		Warning( "key '%s' has value '%s' which is not a qangle.\n", key, k );
 	}
@@ -4447,11 +4482,11 @@ void BuildStaticPropNameTable(dheader_t *header)
 	g_GameLumps.DestroyAllGameLumps();
 }
 
-int AlignBuffer( CUtlBuffer &buffer, int alignment )
+intp AlignBuffer( CUtlBuffer &buffer, int alignment )
 {
-	unsigned int newPosition = AlignValue( buffer.TellPut(), alignment );
-	int padLength = newPosition - buffer.TellPut();
-	for ( int i = 0; i<padLength; i++ )
+	intp newPosition = AlignValue( buffer.TellPut(), alignment );
+	intp padLength = newPosition - buffer.TellPut();
+	for ( intp i = 0; i<padLength; i++ )
 	{
 		buffer.PutChar( '\0' );
 	}
@@ -4500,7 +4535,7 @@ bool CompressGameLump( dheader_t *pInBSPHeader, dheader_t *pOutBSPHeader, CUtlBu
 	dgamelumpheader_t* pInGameLumpHeader = (dgamelumpheader_t*)(((byte *)pInBSPHeader) + pInBSPHeader->lumps[LUMP_GAME_LUMP].fileofs);
 	dgamelump_t* pInGameLump = (dgamelump_t*)(pInGameLumpHeader + 1);
 
-	unsigned int newOffset = outputBuffer.TellPut();
+	intp newOffset = outputBuffer.TellPut();
 	// Make room for gamelump header and gamelump structs, which we'll write at the end
 	outputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, sizeof( dgamelumpheader_t ) );
 	outputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, pInGameLumpHeader->lumpCount * sizeof( dgamelump_t ) );
@@ -4534,11 +4569,11 @@ bool CompressGameLump( dheader_t *pInBSPHeader, dheader_t *pOutBSPHeader, CUtlBu
 				{
 					unsigned int actualSize = CLZMA::GetActualSize( pCompressedLump );
 					inputBuffer.EnsureCapacity( actualSize );
-					unsigned int outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
+					size_t outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
 					inputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, outSize );
 					if ( outSize != actualSize )
 					{
-						Warning( "Decompressed size %u differs from header %u one, BSP may be corrupt.\n",
+						Warning( "Decompressed size %zu differs from header %u one, BSP may be corrupt.\n",
 							outSize, actualSize );
 					}
 				}
@@ -4583,7 +4618,7 @@ bool CompressGameLump( dheader_t *pInBSPHeader, dheader_t *pOutBSPHeader, CUtlBu
 	pOutBSPHeader->lumps[LUMP_GAME_LUMP].uncompressedSize = 0;
 
 	// Rewind to start and write lump headers
-	unsigned int endOffset = outputBuffer.TellPut();
+	intp endOffset = outputBuffer.TellPut();
 	outputBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, newOffset );
 	outputBuffer.Put( &sOutGameLumpHeader, sizeof( dgamelumpheader_t ) );
 	outputBuffer.Put( sOutGameLumpBuf.Base(), sOutGameLumpBuf.TellPut() );
@@ -4629,7 +4664,7 @@ bool RepackBSP( CUtlBuffer &inputBufferIn, CUtlBuffer &outputBuffer, CompressFun
 		return false;
 	}
 
-	unsigned int headerOffset = outputBuffer.TellPut();
+	intp headerOffset = outputBuffer.TellPut();
 	outputBuffer.Put( pInBSPHeader, sizeof( dheader_t ) );
 
 	// This buffer grows dynamically, don't keep pointers to it around. Write out header at end.
@@ -4665,7 +4700,7 @@ bool RepackBSP( CUtlBuffer &inputBufferIn, CUtlBuffer &outputBuffer, CompressFun
 			{
 				alignment = 2048;
 			}
-			unsigned int newOffset = AlignBuffer( outputBuffer, alignment );
+			int newOffset = AlignBuffer( outputBuffer, alignment );
 
 			CUtlBuffer inputBuffer;
 			if ( pSortedLump->pLump->uncompressedSize )
@@ -4675,11 +4710,11 @@ bool RepackBSP( CUtlBuffer &inputBufferIn, CUtlBuffer &outputBuffer, CompressFun
 				if ( CLZMA::IsCompressed( pCompressedLump ) && headerSize == CLZMA::GetActualSize( pCompressedLump ) )
 				{
 					inputBuffer.EnsureCapacity( CLZMA::GetActualSize( pCompressedLump ) );
-					unsigned int outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
+					size_t outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
 					inputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, outSize );
 					if ( outSize != headerSize )
 					{
-						Warning( "Decompressed size %u differs from header %u one, BSP may be corrupt.\n",
+						Warning( "Decompressed size %zu differs from header %u one, BSP may be corrupt.\n",
 							outSize, headerSize );
 					}
 				}
