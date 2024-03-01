@@ -7,9 +7,10 @@
 #include "shadercompile.h"
 #include "cmdsink.h"
 
+#include "dx_proxy/dx_proxy.h"
+
 #include <d3dcompiler.h>
 #include "com_ptr.h"
-#include "dx_proxy/dx_proxy.h"
 
 #include "tier0/icommandline.h"
 #include "tier1/strtools.h"

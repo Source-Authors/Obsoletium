@@ -10,6 +10,15 @@ $Macro OUTBINNAME	"shadercompile"
 
 $Include "$SRCDIR\vpc_scripts\source_exe_con_base.vpc"
 
+$Configuration
+{
+	$Compiler
+	{
+		// dimhotepus: Enable exceptions as we use them in a single place
+		$EnableC++Exceptions				"Yes (/EHsc)"
+	}
+}
+
 $Project "shader-compiler"
 {
 	$Folder "Header Files"

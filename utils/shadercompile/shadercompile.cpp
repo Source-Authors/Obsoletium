@@ -1,6 +1,9 @@
 // Copyright Valve Corporation, All rights reserved.
 //
+// Command-line tool used to compile shaders in the Source engine.
 //
+// See
+// https://developer.valvesoftware.com/wiki/Shader_authoring/Compiling_Shaders
 
 #include "shadercompile.h"
 

@@ -5,6 +5,11 @@
 #ifndef SRC_COMMON_DX_PROXY_H_
 #define SRC_COMMON_DX_PROXY_H_
 
+#include "tier0/commonmacros.h"
+#include "winlite.h"
+
+#include <d3dcommon.h>
+
 namespace se::dx_proxy {
 
 /**
@@ -83,10 +88,10 @@ inline HRESULT DxProxyModule::D3DCompileFromFile(
     LPCSTR pFileName, const D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude,
     LPCSTR pEntrypoint, LPCSTR pTarget, UINT Flags1, UINT Flags2,
     ID3DBlob** ppCode, ID3DBlob** ppErrorMsgs) {
-  if (!Load()) return MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, 1);
+  if (!Load()) return HRESULT_FROM_WIN32(::GetLastError());
 
   if (!m_arrFuncs[to_underlying(Function::D3DCompileFromFile)])
-    return MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, 2);
+    return HRESULT_FROM_WIN32(ERROR_PROC_NOT_FOUND);
 
   HRESULT WINAPI D3DCompileFromFileProxy(
       LPCSTR pFileName, CONST D3D_SHADER_MACRO * pDefines,
