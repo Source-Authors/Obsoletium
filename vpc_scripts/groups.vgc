@@ -264,6 +264,7 @@ $Group "hammer"
 	"vtex_dll"
 	"vtex_launcher"
 	"vtf"
+	"vtf2tga"
 	"vvis_dll"
 	"vvis_launcher"
 }	

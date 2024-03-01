@@ -1,320 +1,373 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
+// Command-line tool used to convert files from the VTF format to the TGA
+// format.  The tool can also decompile uncompressed HDR VTFs into PFM files,
+// despite the name.
 //
-// $NoKeywords: $
-//=============================================================================//
+// See https://developer.valvesoftware.com/wiki/VTF2TGA
 
 #ifdef _WIN32
 #include <direct.h>
 #endif
+
+#include <memory>
+
 #include "mathlib/mathlib.h"
 #include "bitmap/tgawriter.h"
-#include "tier1/strtools.h"
 #include "vtf/vtf.h"
-#include "tier1/utlbuffer.h"
+
 #include "tier0/dbg.h"
 #include "tier0/icommandline.h"
+#include "tier1/strtools.h"
 #include "tier1/utlbuffer.h"
 #include "tier2/tier2.h"
+
 #include "filesystem.h"
+#include "../common/tools_minidump.h"
+#include "posix_file_stream.h"
 
+namespace {
 
-//-----------------------------------------------------------------------------
 // HDRFIXME: move this somewhere else.
-//-----------------------------------------------------------------------------
-static void PFMWrite( float *pFloatImage, const char *pFilename, int width, int height )
-{
-	FILE *fp;
-	fp = fopen( pFilename, "wb" );
-	fprintf( fp, "PF\n%d %d\n-1.000000\n", width, height );
-	int i;
-	for( i = height-1; i >= 0; i-- )
-	{
-		float *pRow = &pFloatImage[3 * width * i];
-		fwrite( pRow, width * sizeof( float ) * 3, 1, fp );
-	}
-	fclose( fp );
+bool PFMWrite(float *img, const char *file_path, int width, int height) {
+  // dimhotepus: Use RAII FILE wrapper.
+  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_path, "wb");
+  if (errc) {
+    Warning("Unable to open '%s' for writing: %s.\n", file_path,
+            errc.message().c_str());
+    return false;
+  }
+
+  std::tie(std::ignore, errc) =
+      f.print("PF\n%d %d\n-1.000000\n", width, height);
+  if (errc) {
+    Warning("Unable to write header to '%s': %s.\n", file_path,
+            errc.message().c_str());
+    return false;
+  }
+
+  for (int i = height - 1; i >= 0; i--) {
+    float *row = &img[3 * width * i];
+
+    std::tie(std::ignore, errc) = f.write(row, width * sizeof(float) * 3, 1);
+    if (errc) {
+      Warning("Unable to write row to '%s': %s.\n", file_path,
+              errc.message().c_str());
+      return false;
+    }
+  }
+
+  return true;
 }
 
-SpewRetval_t VTF2TGAOutputFunc( SpewType_t spewType, char const *pMsg )
-{
-	printf( "%s", pMsg );
-	fflush( stdout );
+SpewRetval_t VTF2TGAOutputFunc(SpewType_t spewType, char const *pMsg) {
+  if (spewType == SPEW_ERROR || spewType == SPEW_WARNING) {
+    fprintf(stderr, "%s", pMsg);
+  } else {
+    printf("%s", pMsg);
+    fflush(stdout);
+  }
 
-	if (spewType == SPEW_ERROR)
-		return SPEW_ABORT;
-	return (spewType == SPEW_ASSERT) ? SPEW_DEBUGGER : SPEW_CONTINUE; 
+  Plat_DebugString(pMsg);
+
+  if (spewType == SPEW_ERROR) return SPEW_ABORT;
+
+  return (spewType == SPEW_ASSERT) ? SPEW_DEBUGGER : SPEW_CONTINUE;
 }
 
-static void Usage( void )
-{
-	Error( "Usage: vtf2tga -i <input vtf> [-o <output tga>] [-mip]\n" );
-	exit( -1 );
+[[noreturn]] void Usage() {
+  Error("Usage: vtf2tga -i <input vtf> [-o <output tga>] [-mip]\n");
+  exit(EINVAL);
 }
 
-int main( int argc, char **argv )
-{
-	SpewOutputFunc( VTF2TGAOutputFunc );
-	CommandLine()->CreateCmdLine( argc, argv );
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 1.0f, false, false, false, false );
-	InitDefaultFileSystem();
+}  // namespace
 
-	const char *pVTFFileName = CommandLine()->ParmValue( "-i" );
-	const char *pTGAFileName = CommandLine()->ParmValue( "-o" );
-	bool bGenerateMipLevels = CommandLine()->CheckParm( "-mip" ) != NULL;
-	if ( !pVTFFileName )
-	{
-		Usage();
-	}
+int main(int argc, char **argv) {
+  // Install an exception handler.
+  const se::utils::common::ScopedDefaultMinidumpHandler
+      scoped_default_minidumps;
 
-	if ( !pTGAFileName )
-	{
-		pTGAFileName = pVTFFileName;
-	}
+  const ScopedSpewOutputFunc scoped_spew_output{VTF2TGAOutputFunc};
 
-	char pCurrentDirectory[MAX_PATH];
-	if ( _getcwd( pCurrentDirectory, sizeof(pCurrentDirectory) ) == NULL )
-	{
-		fprintf( stderr, "Unable to get the current directory\n" );
-		return -1;
-	}
-	Q_StripTrailingSlash( pCurrentDirectory );
+  CommandLine()->CreateCmdLine(argc, argv);
+  MathLib_Init(2.2f, 2.2f, 0.0f, 1, false, false, false, false);
+  InitDefaultFileSystem();
 
-	char pBuf[MAX_PATH];
-	if ( !Q_IsAbsolutePath( pTGAFileName ) )
-	{
-		Q_snprintf( pBuf, sizeof(pBuf), "%s\\%s", pCurrentDirectory, pTGAFileName );
-	}
-	else
-	{
-		Q_strncpy( pBuf, pTGAFileName, sizeof(pBuf) );
-	}
-	Q_FixSlashes( pBuf );
+  const char *vtf_file_name{CommandLine()->ParmValue("-i")};
+  const char *tga_file_name{CommandLine()->ParmValue("-o")};
+  const bool should_generate_mpi_levels{CommandLine()->HasParm("-mip")};
 
-	char pOutFileNameBase[MAX_PATH];
-	Q_StripExtension( pBuf, pOutFileNameBase, MAX_PATH );
+  if (!vtf_file_name) Usage();
+  if (!tga_file_name) tga_file_name = vtf_file_name;
 
-	char pActualVTFFileName[MAX_PATH];
-	Q_strncpy( pActualVTFFileName, pVTFFileName, MAX_PATH );
-	if ( !Q_strstr( pActualVTFFileName, ".vtf" ) )
-	{
-		Q_strcat( pActualVTFFileName, ".vtf", MAX_PATH ); 
-	}
+  char cwd[MAX_PATH];
+  if (_getcwd(cwd, sizeof(cwd)) == nullptr) {
+    fprintf(stderr, "Unable to get the current directory: %s.\n",
+            std::generic_category().message(errno).c_str());
+    return 1;
+  }
+  Q_StripTrailingSlash(cwd);
 
-	FILE *vtfFp = fopen( pActualVTFFileName, "rb" );
-	if( !vtfFp )
-	{
-		Error( "Can't open %s\n", pActualVTFFileName );
-		exit( -1 );
-	}
+  char buffer[MAX_PATH];
+  if (!Q_IsAbsolutePath(tga_file_name)) {
+    V_sprintf_safe(buffer, "%s\\%s", cwd, tga_file_name);
+  } else {
+    V_strcpy_safe(buffer, tga_file_name);
+  }
+  Q_FixSlashes(buffer);
 
-	fseek( vtfFp, 0, SEEK_END );
-	int srcVTFLength = ftell( vtfFp );
-	fseek( vtfFp, 0, SEEK_SET );
+  char out_file_base[MAX_PATH];
+  Q_StripExtension(buffer, out_file_base, MAX_PATH);
 
-	CUtlBuffer buf;
-	buf.EnsureCapacity( srcVTFLength );
-	int nBytesRead = fread( buf.Base(), 1, srcVTFLength, vtfFp );
-	fclose( vtfFp );
-	buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
+  char actual_vtf_file_name[MAX_PATH];
+  V_strcpy_safe(actual_vtf_file_name, vtf_file_name);
+  if (!Q_strstr(actual_vtf_file_name, ".vtf")) {
+    V_strcat_safe(actual_vtf_file_name, ".vtf");
+  }
 
-	IVTFTexture *pTex = CreateVTFTexture();
-	if (!pTex->Unserialize( buf ))
-	{
-		Error( "*** Error reading in .VTF file %s\n", pActualVTFFileName );
-		exit(-1);
-	}
-	
-	Msg( "vtf width: %d\n", pTex->Width() );
-	Msg( "vtf height: %d\n", pTex->Height() );
-	Msg( "vtf numFrames: %d\n", pTex->FrameCount() );
+  auto [f, errc] =
+      se::posix::posix_file_stream_factory::open(actual_vtf_file_name, "rb");
+  if (errc) {
+    Error("Unable to open '%s' for reading: %s.\n", actual_vtf_file_name,
+          errc.message().c_str());
+    exit(errc.value());
+  }
 
-	Msg( "TEXTUREFLAGS_POINTSAMPLE=%s\n", ( pTex->Flags() & TEXTUREFLAGS_POINTSAMPLE ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_TRILINEAR=%s\n", ( pTex->Flags() & TEXTUREFLAGS_TRILINEAR ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_CLAMPS=%s\n", ( pTex->Flags() & TEXTUREFLAGS_CLAMPS ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_CLAMPT=%s\n", ( pTex->Flags() & TEXTUREFLAGS_CLAMPT ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_CLAMPU=%s\n", ( pTex->Flags() & TEXTUREFLAGS_CLAMPU ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_BORDER=%s\n", ( pTex->Flags() & TEXTUREFLAGS_BORDER ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_ANISOTROPIC=%s\n", ( pTex->Flags() & TEXTUREFLAGS_ANISOTROPIC ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_HINT_DXT5=%s\n", ( pTex->Flags() & TEXTUREFLAGS_HINT_DXT5 ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_SRGB=%s\n", ( pTex->Flags() & TEXTUREFLAGS_SRGB ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_NORMAL=%s\n", ( pTex->Flags() & TEXTUREFLAGS_NORMAL ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_NOMIP=%s\n", ( pTex->Flags() & TEXTUREFLAGS_NOMIP ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_NOLOD=%s\n", ( pTex->Flags() & TEXTUREFLAGS_NOLOD ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_ALL_MIPS=%s\n", ( pTex->Flags() & TEXTUREFLAGS_ALL_MIPS ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_PROCEDURAL=%s\n", ( pTex->Flags() & TEXTUREFLAGS_PROCEDURAL ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_ONEBITALPHA=%s\n", ( pTex->Flags() & TEXTUREFLAGS_ONEBITALPHA ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_EIGHTBITALPHA=%s\n", ( pTex->Flags() & TEXTUREFLAGS_EIGHTBITALPHA ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_ENVMAP=%s\n", ( pTex->Flags() & TEXTUREFLAGS_ENVMAP ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_RENDERTARGET=%s\n", ( pTex->Flags() & TEXTUREFLAGS_RENDERTARGET ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_DEPTHRENDERTARGET=%s\n", ( pTex->Flags() & TEXTUREFLAGS_DEPTHRENDERTARGET ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_NODEBUGOVERRIDE=%s\n", ( pTex->Flags() & TEXTUREFLAGS_NODEBUGOVERRIDE ) ? "true" : "false" );
-	Msg( "TEXTUREFLAGS_SINGLECOPY=%s\n", ( pTex->Flags() & TEXTUREFLAGS_SINGLECOPY ) ? "true" : "false" );
-	
-	Vector vecReflectivity = pTex->Reflectivity();
-	Msg( "vtf reflectivity: %f %f %f\n", vecReflectivity[0], vecReflectivity[1], vecReflectivity[2] );
-	Msg( "transparency: " );
-	if( pTex->Flags() & TEXTUREFLAGS_EIGHTBITALPHA )
-	{
-		Msg( "eightbitalpha\n" );
-	}
-	else if( pTex->Flags() & TEXTUREFLAGS_ONEBITALPHA )
-	{
-		Msg( "onebitalpha\n" );
-	}
-	else
-	{
-		Msg( "noalpha\n" );
-	}
-	ImageFormat srcFormat = pTex->Format();
-	Msg( "vtf format: %s\n", ImageLoader::GetName( srcFormat ) );
-		
-	int iTGANameLen = Q_strlen( pOutFileNameBase );
+  int64 size;
+  std::tie(size, errc) = f.size();
+  if (errc) {
+    Error("Unable to get size of '%s': %s.\n", actual_vtf_file_name,
+          errc.message().c_str());
+    exit(errc.value());
+  }
 
-	int iFaceCount = pTex->FaceCount();
-	int nFrameCount = pTex->FrameCount();
-	bool bIsCubeMap = pTex->IsCubeMap();
+  CUtlBuffer vtf_buffer;
+  vtf_buffer.EnsureCapacity(size);
 
-	int iLastMipLevel = bGenerateMipLevels ? pTex->MipCount() - 1 : 0;
-	for( int iFrame = 0; iFrame < nFrameCount; ++iFrame )
-	{
-		for ( int iMipLevel = 0; iMipLevel <= iLastMipLevel; ++iMipLevel )
-		{
-			int iWidth, iHeight, iDepth;
-			pTex->ComputeMipLevelDimensions( iMipLevel, &iWidth, &iHeight, &iDepth );
+  size_t bytes_read;
+  std::tie(bytes_read, errc) = f.read(vtf_buffer.Base(), size, 1, size);
+  if (errc) {
+    Error("Unable to read '%s': %s.\n", actual_vtf_file_name,
+          errc.message().c_str());
+    exit(errc.value());
+  }
 
-			for (int iCubeFace = 0; iCubeFace < iFaceCount; ++iCubeFace)
-			{
-				for ( int z = 0; z < iDepth; ++z )
-				{
-					// Construct output filename
-					char *pTempNameBuf = new char[iTGANameLen + 13];//(char *)stackalloc( iTGANameLen + 13 );
-					Q_strncpy( pTempNameBuf, pOutFileNameBase, iTGANameLen + 1 );
-					char *pExt = Q_strrchr( pTempNameBuf, '.' );
-					if ( pExt )
-					{
-						pExt = 0;
-					}
+  vtf_buffer.SeekPut(CUtlBuffer::SEEK_HEAD, bytes_read);
 
-					if ( bIsCubeMap )
-					{
-						Assert( pTex->Depth() == 1 ); // shouldn't this be 1 instead of 0?
-						static const char *pCubeFaceName[7] = { "rt", "lf", "bk", "ft", "up", "dn", "sph" };
-						Q_strcat( pTempNameBuf, pCubeFaceName[iCubeFace], iTGANameLen + 13 ); 
-					}
+  IVTFTexture *pTex = CreateVTFTexture();
+  if (!pTex) {
+    Error("Error allocating .VTF for file '%s'.\n", actual_vtf_file_name);
+    exit(ENOMEM);
+  }
 
-					if ( nFrameCount > 1 )
-					{
-						char pTemp[4];
-						Q_snprintf( pTemp, 4, "%03d", iFrame );
-						Q_strcat( pTempNameBuf, pTemp, iTGANameLen + 13 ); 
-					}
+  if (!pTex->Unserialize(vtf_buffer)) {
+    Error("Error deserializing .VTF file '%s'.\n", actual_vtf_file_name);
+    exit(-1);
+  }
 
-					if ( iLastMipLevel != 0 )
-					{
-						char pTemp[8];
-						Q_snprintf( pTemp, 8, "_mip%d", iMipLevel );
-						Q_strcat( pTempNameBuf, pTemp, iTGANameLen + 13 ); 
-					}
+  Msg("vtf width: %d\n", pTex->Width());
+  Msg("vtf height: %d\n", pTex->Height());
+  Msg("vtf numFrames: %d\n", pTex->FrameCount());
 
-					if ( pTex->Depth() > 1 )
-					{
-						char pTemp[6];
-						Q_snprintf( pTemp, 6, "_z%03d", z );
-						Q_strcat( pTempNameBuf, pTemp, iTGANameLen + 13 ); 
-					}
+  // dimhotepus: Extract duplicated code to lambda.
+  const auto BoolFlag = [pTex](int flag) {
+    return (pTex->Flags() & flag) ? "true" : "false";
+  };
 
-					if( srcFormat == IMAGE_FORMAT_RGBA16161616F )
-					{
-						Q_strcat( pTempNameBuf, ".pfm", iTGANameLen + 13 ); 
-					}
-					else
-					{
-						Q_strcat( pTempNameBuf, ".tga", iTGANameLen + 13 ); 
-					}
+  Msg("TEXTUREFLAGS_POINTSAMPLE=%s\n", BoolFlag(TEXTUREFLAGS_POINTSAMPLE));
+  Msg("TEXTUREFLAGS_TRILINEAR=%s\n", BoolFlag(TEXTUREFLAGS_TRILINEAR));
+  Msg("TEXTUREFLAGS_CLAMPS=%s\n", BoolFlag(TEXTUREFLAGS_CLAMPS));
+  Msg("TEXTUREFLAGS_CLAMPT=%s\n", BoolFlag(TEXTUREFLAGS_CLAMPT));
+  Msg("TEXTUREFLAGS_CLAMPU=%s\n", BoolFlag(TEXTUREFLAGS_CLAMPU));
+  Msg("TEXTUREFLAGS_BORDER=%s\n", BoolFlag(TEXTUREFLAGS_BORDER));
+  Msg("TEXTUREFLAGS_ANISOTROPIC=%s\n", BoolFlag(TEXTUREFLAGS_ANISOTROPIC));
+  Msg("TEXTUREFLAGS_HINT_DXT5=%s\n", BoolFlag(TEXTUREFLAGS_HINT_DXT5));
+  Msg("TEXTUREFLAGS_SRGB=%s\n", BoolFlag(TEXTUREFLAGS_SRGB));
+  Msg("TEXTUREFLAGS_NORMAL=%s\n", BoolFlag(TEXTUREFLAGS_NORMAL));
+  Msg("TEXTUREFLAGS_NOMIP=%s\n", BoolFlag(TEXTUREFLAGS_NOMIP));
+  Msg("TEXTUREFLAGS_NOLOD=%s\n", BoolFlag(TEXTUREFLAGS_NOLOD));
+  Msg("TEXTUREFLAGS_ALL_MIPS=%s\n", BoolFlag(TEXTUREFLAGS_ALL_MIPS));
+  Msg("TEXTUREFLAGS_PROCEDURAL=%s\n", BoolFlag(TEXTUREFLAGS_PROCEDURAL));
+  Msg("TEXTUREFLAGS_ONEBITALPHA=%s\n", BoolFlag(TEXTUREFLAGS_ONEBITALPHA));
+  Msg("TEXTUREFLAGS_EIGHTBITALPHA=%s\n", BoolFlag(TEXTUREFLAGS_EIGHTBITALPHA));
+  Msg("TEXTUREFLAGS_ENVMAP=%s\n", BoolFlag(TEXTUREFLAGS_ENVMAP));
+  Msg("TEXTUREFLAGS_RENDERTARGET=%s\n", BoolFlag(TEXTUREFLAGS_RENDERTARGET));
+  Msg("TEXTUREFLAGS_DEPTHRENDERTARGET=%s\n",
+      BoolFlag(TEXTUREFLAGS_DEPTHRENDERTARGET));
+  Msg("TEXTUREFLAGS_NODEBUGOVERRIDE=%s\n",
+      BoolFlag(TEXTUREFLAGS_NODEBUGOVERRIDE));
+  Msg("TEXTUREFLAGS_SINGLECOPY=%s\n", BoolFlag(TEXTUREFLAGS_SINGLECOPY));
 
-					unsigned char *pSrcImage = pTex->ImageData( iFrame, iCubeFace, iMipLevel, 0, 0, z );
+  const Vector reflectivity = pTex->Reflectivity();
+  Msg("vtf reflectivity: %f %f %f\n", reflectivity[0], reflectivity[1],
+      reflectivity[2]);
+  Msg("transparency: ");
+  // dimhotepus: Unify transparency handling with other flags.
+  Msg("TEXTUREFLAGS_EIGHTBITALPHA=%s\n", BoolFlag(TEXTUREFLAGS_EIGHTBITALPHA));
+  Msg("TEXTUREFLAGS_ONEBITALPHA=%s\n", BoolFlag(TEXTUREFLAGS_ONEBITALPHA));
+  if (!(pTex->Flags() &
+        (TEXTUREFLAGS_EIGHTBITALPHA & TEXTUREFLAGS_ONEBITALPHA))) {
+    Msg("noalpha\n");
+  }
 
-					ImageFormat dstFormat;
-					if( srcFormat == IMAGE_FORMAT_RGBA16161616F )
-					{
-						dstFormat = IMAGE_FORMAT_RGB323232F;
-					}
-					else
-					{
-						if( ImageLoader::IsTransparent( srcFormat ) || (srcFormat == IMAGE_FORMAT_ATI1N ) || (srcFormat == IMAGE_FORMAT_ATI2N ))
-						{
-							dstFormat = IMAGE_FORMAT_BGRA8888;
-						}
-						else
-						{
-							dstFormat = IMAGE_FORMAT_BGR888;
-						}
-					}
-				//	dstFormat = IMAGE_FORMAT_RGBA8888;
-				//	dstFormat = IMAGE_FORMAT_RGB888;
-				//	dstFormat = IMAGE_FORMAT_BGRA8888;
-				//	dstFormat = IMAGE_FORMAT_BGR888;
-				//	dstFormat = IMAGE_FORMAT_BGRA5551;
-				//	dstFormat = IMAGE_FORMAT_BGR565;
-				//	dstFormat = IMAGE_FORMAT_BGRA4444;
-				//	printf( "dstFormat: %s\n", ImageLoader::GetName( dstFormat ) );
-					unsigned char *pDstImage = new unsigned char[ImageLoader::GetMemRequired( iWidth, iHeight, 1, dstFormat, false )];
-					if( !ImageLoader::ConvertImageFormat( pSrcImage, srcFormat, 
-						pDstImage, dstFormat, iWidth, iHeight, 0, 0 ) )
-					{
-						Error( "Error converting from %s to %s\n",
-							ImageLoader::GetName( srcFormat ), ImageLoader::GetName( dstFormat ) );
-						exit( -1 );
-					}
+  const ImageFormat src_format = pTex->Format();
+  Msg("vtf format: %s\n", ImageLoader::GetName(src_format));
 
-					if( dstFormat != IMAGE_FORMAT_RGB323232F )
-					{
-						if( ImageLoader::IsTransparent( dstFormat ) && ( dstFormat != IMAGE_FORMAT_RGBA8888 ) )
-						{
-							unsigned char *tmpImage = pDstImage;
-							pDstImage = new unsigned char[ImageLoader::GetMemRequired( iWidth, iHeight, 1, IMAGE_FORMAT_RGBA8888, false )];
-							if( !ImageLoader::ConvertImageFormat( tmpImage, dstFormat, pDstImage, IMAGE_FORMAT_RGBA8888,
-								iWidth, iHeight, 0, 0 ) )
-							{
-								Error( "Error converting from %s to %s\n",
-									ImageLoader::GetName( dstFormat ), ImageLoader::GetName( IMAGE_FORMAT_RGBA8888 ) );
-							}
-							dstFormat = IMAGE_FORMAT_RGBA8888;
-						}
-						else if( !ImageLoader::IsTransparent( dstFormat ) && ( dstFormat != IMAGE_FORMAT_RGB888 ) )
-						{
-							unsigned char *tmpImage = pDstImage;
-							pDstImage = new unsigned char[ImageLoader::GetMemRequired( iWidth, iHeight, 1, IMAGE_FORMAT_RGB888, false )];
-							if( !ImageLoader::ConvertImageFormat( tmpImage, dstFormat, pDstImage, IMAGE_FORMAT_RGB888,
-								iWidth, iHeight, 0, 0 ) )
-							{
-								Error( "Error converting from %s to %s\n",
-									ImageLoader::GetName( dstFormat ), ImageLoader::GetName( IMAGE_FORMAT_RGB888 ) );
-							}
-							dstFormat = IMAGE_FORMAT_RGB888;
-						}
+  const intp tga_name_size = V_strlen(out_file_base);
 
-						CUtlBuffer outBuffer;
-						TGAWriter::WriteToBuffer( pDstImage, outBuffer, iWidth, iHeight,
-							dstFormat, dstFormat );
-						if ( !g_pFullFileSystem->WriteFile( pTempNameBuf, NULL, outBuffer ) )
-						{
-							fprintf( stderr, "unable to write %s\n", pTempNameBuf );
-						}
-					}
-					else
-					{
-						PFMWrite( ( float * )pDstImage, pTempNameBuf, iWidth, iHeight );
-					}
+  const int src_face_count = pTex->FaceCount();
+  const int src_frame_count = pTex->FrameCount();
+  const bool src_is_cubemap = pTex->IsCubeMap();
 
-					delete[] pTempNameBuf;
-				}
-			}
-		}
-	}
+  const char *cube_face_names[7] = {"rt", "lf", "bk", "ft", "up", "dn", "sph"};
 
-	// leak leak leak leak leak, leak leak, leak leak (Blue Danube)
-	return 0;
+  const int last_mip_level =
+      should_generate_mpi_levels ? pTex->MipCount() - 1 : 0;
+  for (int frame_no = 0; frame_no < src_frame_count; ++frame_no) {
+    for (int mip_level_no = 0; mip_level_no <= last_mip_level; ++mip_level_no) {
+      int mip_width, mip_height, mip_depth;
+      pTex->ComputeMipLevelDimensions(mip_level_no, &mip_width, &mip_height,
+                                      &mip_depth);
+
+      for (int cube_face_no = 0; cube_face_no < src_face_count;
+           ++cube_face_no) {
+        for (int z = 0; z < mip_depth; ++z) {
+          // Construct output filename
+          std::unique_ptr<char[]> temp_name =
+              std::make_unique<char[]>(tga_name_size + 13);
+          Q_strncpy(temp_name.get(), out_file_base, tga_name_size + 1);
+
+          char *ext = Q_strrchr(temp_name.get(), '.');
+          if (ext) ext = 0;
+
+          if (src_is_cubemap) {
+            Assert(pTex->Depth() == 1);  // shouldn't this be 1 instead of 0?
+
+            Q_strcat(temp_name.get(), cube_face_names[cube_face_no],
+                     tga_name_size + 13);
+          }
+
+          if (src_frame_count > 1) {
+            char pTemp[4];
+            V_sprintf_safe(pTemp, "%03d", frame_no);
+            Q_strcat(temp_name.get(), pTemp, tga_name_size + 13);
+          }
+
+          if (last_mip_level != 0) {
+            char pTemp[8];
+            V_sprintf_safe(pTemp, "_mip%d", mip_level_no);
+            Q_strcat(temp_name.get(), pTemp, tga_name_size + 13);
+          }
+
+          if (pTex->Depth() > 1) {
+            char pTemp[6];
+            V_sprintf_safe(pTemp, "_z%03d", z);
+            Q_strcat(temp_name.get(), pTemp, tga_name_size + 13);
+          }
+
+          if (src_format == IMAGE_FORMAT_RGBA16161616F) {
+            Q_strcat(temp_name.get(), ".pfm", tga_name_size + 13);
+          } else {
+            Q_strcat(temp_name.get(), ".tga", tga_name_size + 13);
+          }
+
+          unsigned char *src_data =
+              pTex->ImageData(frame_no, cube_face_no, mip_level_no, 0, 0, z);
+
+          ImageFormat dst_format;
+          if (src_format == IMAGE_FORMAT_RGBA16161616F) {
+            dst_format = IMAGE_FORMAT_RGB323232F;
+          } else {
+            if (ImageLoader::IsTransparent(src_format) ||
+                src_format == IMAGE_FORMAT_ATI1N ||
+                src_format == IMAGE_FORMAT_ATI2N) {
+              dst_format = IMAGE_FORMAT_BGRA8888;
+            } else {
+              dst_format = IMAGE_FORMAT_BGR888;
+            }
+          }
+          //	dstFormat = IMAGE_FORMAT_RGBA8888;
+          //	dstFormat = IMAGE_FORMAT_RGB888;
+          //	dstFormat = IMAGE_FORMAT_BGRA8888;
+          //	dstFormat = IMAGE_FORMAT_BGR888;
+          //	dstFormat = IMAGE_FORMAT_BGRA5551;
+          //	dstFormat = IMAGE_FORMAT_BGR565;
+          //	dstFormat = IMAGE_FORMAT_BGRA4444;
+          //	printf( "dstFormat: %s\n", ImageLoader::GetName( dstFormat ) );
+          std::unique_ptr<unsigned char[]> dst_data =
+              std::make_unique<unsigned char[]>(ImageLoader::GetMemRequired(
+                  mip_width, mip_height, 1, dst_format, false));
+          if (!ImageLoader::ConvertImageFormat(src_data, src_format,
+                                               dst_data.get(), dst_format,
+                                               mip_width, mip_height, 0, 0)) {
+            Error("Error converting '%s' from '%s' to '%s'.\n",
+                  actual_vtf_file_name, ImageLoader::GetName(src_format),
+                  ImageLoader::GetName(dst_format));
+            exit(-1);
+          }
+
+          if (dst_format != IMAGE_FORMAT_RGB323232F) {
+            if (ImageLoader::IsTransparent(dst_format) &&
+                dst_format != IMAGE_FORMAT_RGBA8888) {
+              std::unique_ptr<unsigned char[]> tmp_data{std::move(dst_data)};
+              dst_data =
+                  std::make_unique<unsigned char[]>(ImageLoader::GetMemRequired(
+                      mip_width, mip_height, 1, IMAGE_FORMAT_RGBA8888, false));
+
+              if (!ImageLoader::ConvertImageFormat(
+                      tmp_data.get(), dst_format, dst_data.get(),
+                      IMAGE_FORMAT_RGBA8888, mip_width, mip_height, 0, 0)) {
+                Error("Error converting '%s' from '%s' to '%s'.\n",
+                      actual_vtf_file_name, ImageLoader::GetName(dst_format),
+                      ImageLoader::GetName(IMAGE_FORMAT_RGBA8888));
+                exit(-1);
+              }
+
+              dst_format = IMAGE_FORMAT_RGBA8888;
+            } else if (!ImageLoader::IsTransparent(dst_format) &&
+                       dst_format != IMAGE_FORMAT_RGB888) {
+              std::unique_ptr<unsigned char[]> tmp_data{std::move(dst_data)};
+              dst_data =
+                  std::make_unique<unsigned char[]>(ImageLoader::GetMemRequired(
+                      mip_width, mip_height, 1, IMAGE_FORMAT_RGB888, false));
+
+              if (!ImageLoader::ConvertImageFormat(
+                      tmp_data.get(), dst_format, dst_data.get(),
+                      IMAGE_FORMAT_RGB888, mip_width, mip_height, 0, 0)) {
+                Error("Error converting '%s' from '%s' to '%s'.\n",
+                      actual_vtf_file_name, ImageLoader::GetName(dst_format),
+                      ImageLoader::GetName(IMAGE_FORMAT_RGB888));
+                exit(-1);
+              }
+
+              dst_format = IMAGE_FORMAT_RGB888;
+            }
+
+            CUtlBuffer outBuffer;
+            if (!TGAWriter::WriteToBuffer(dst_data.get(), outBuffer, mip_width,
+                                          mip_height, dst_format, dst_format)) {
+              Error("Unable to write TGA in format '%s'.\n",
+                    ImageLoader::GetName(dst_format));
+              exit(-1);
+            }
+
+            if (!g_pFullFileSystem->WriteFile(temp_name.get(), nullptr,
+                                              outBuffer)) {
+              Error("Unable to write result '%s'.\n", temp_name.get());
+              exit(-1);
+            }
+          } else {
+            if (!PFMWrite((float *)dst_data.get(), temp_name.get(), mip_width,
+                          mip_height)) {
+              exit(-1);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  ShutdownDefaultFileSystem();
+
+  return 0;
 }
