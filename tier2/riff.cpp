@@ -113,14 +113,16 @@ OutFileRIFF::OutFileRIFF( const char *pFileName, IFileWriteBinary &io ) : m_io( 
 {
 	m_file = m_io.create( pFileName );
 
-	if ( !m_file )
-		return;
+	m_riffName = 0;
+	m_riffSize = 0;
+	m_nNamePos = 0;
+	m_bUseIncorrectLISETLength = false;
+	m_nLISETSize = 0;
+	
+	if (!m_file) return;
 
 	int riff = RIFF_ID;
 	m_io.write( &riff, 4, m_file );
-
-	m_riffName = 0;
-	m_riffSize = 0;
 	m_nNamePos = m_io.tell( m_file );
 
 	// Save room for the size and name now
@@ -128,9 +130,6 @@ OutFileRIFF::OutFileRIFF( const char *pFileName, IFileWriteBinary &io ) : m_io( 
 
 	// Write out the name
 	WriteInt( RIFF_WAVE );
-
-	m_bUseIncorrectLISETLength = false;
-	m_nLISETSize = 0;
 }
 
 OutFileRIFF::~OutFileRIFF( void )
@@ -340,10 +339,7 @@ int IterateRIFF::ChunkReadInt( void )
 IterateOutputRIFF::IterateOutputRIFF( OutFileRIFF &riff )
 : m_riff( riff )
 {
-	if ( !m_riff.IsValid() )
-		return;
-
-	m_start = m_riff.PositionGet();
+	m_start = m_riff.IsValid() ? m_riff.PositionGet() : -1;
 	m_size = -1;
 	m_chunkName = UINT_MAX;
 	m_chunkSize = -1;
