@@ -14,6 +14,9 @@
 #include <shlwapi.h> // registry stuff
 #include <winsock.h>
 
+#include <chrono>
+#include <clocale>
+
 #include "scoped_timer_resolution.h"
 
 #elif defined ( LINUX ) || defined( OSX )
@@ -21,12 +24,10 @@
 	#include <sys/types.h>
 	#include <sys/stat.h>
 	#include <fcntl.h>
-	#include <locale.h>
 #else
 #error "Please define your platform"
 #endif
 
-#include <chrono>
 
 #include "appframework/AppFramework.h"
 #include "appframework/ilaunchermgr.h"
@@ -80,10 +81,6 @@ int MessageBox( HWND hWnd, const char *message, const char *header, unsigned uTy
 
 #endif // USE_SDL
 
-#if defined( POSIX )
-#define RELAUNCH_FILE "/tmp/hl2_relaunch"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -93,15 +90,15 @@ int MessageBox( HWND hWnd, const char *message, const char *header, unsigned uTy
 extern void* CreateSDLMgr();
 #endif
 
-class CLeakDump
+class CHeapLeakDump
 {
 public:
-	CLeakDump( bool m_bCheckLeaks )
+	CHeapLeakDump( bool m_bCheckLeaks )
 	 :	m_bCheckLeaks( m_bCheckLeaks )
 	{
 	}
 
-	~CLeakDump()
+	~CHeapLeakDump()
 	{
 		if ( m_bCheckLeaks )
 		{
@@ -110,7 +107,7 @@ public:
 	}
 
 private:
-	bool m_bCheckLeaks;
+	const bool m_bCheckLeaks;
 };
 
 //-----------------------------------------------------------------------------
@@ -244,17 +241,21 @@ BOOL WINAPI MyHandlerRoutine( DWORD dwCtrlType )
 }
 #endif
 
-void InitTextMode()
+bool InitTextMode()
 {
 #ifdef WIN32
-	AllocConsole();
-
-	SetConsoleCtrlHandler( MyHandlerRoutine, TRUE );
+	bool ok = AllocConsole() != 0;
+	if (ok)
+	{
+		ok = SetConsoleCtrlHandler( MyHandlerRoutine, TRUE ) != 0;
+	}
 
 	(void)freopen( "CONIN$", "rb", stdin );		// reopen stdin handle as console window input
 	(void)freopen( "CONOUT$", "wb", stdout );	// reopen stout handle as console window output
 	(void)freopen( "CONOUT$", "wb", stderr );	// reopen stderr handle as console window output
 #endif
+
+	return ok;
 }
 
 void SortResList( char const *pchFileName, char const *pchSearchPath );
@@ -816,135 +817,6 @@ int MessageBox( HWND hWnd, const char *message, const char *header, unsigned uTy
 
 #endif
 
-//-----------------------------------------------------------------------------
-// Allow only one windowed source app to run at a time
-//-----------------------------------------------------------------------------
-#if defined(POSIX)
-int g_lockfd = -1;
-char g_lockFilename[MAX_PATH];
-#endif
-bool GrabSourceMutex(
-#ifdef WIN32
-	HANDLE &hMutex
-#endif
-)
-{
-#ifdef WIN32
-	// don't allow more than one instance to run
-	hMutex = ::CreateMutex(NULL, FALSE, TEXT("hl2_singleton_mutex"));
-	if (!hMutex) return false;
-
-	unsigned int waitResult = ::WaitForSingleObject(hMutex, 0);
-
-	// Here, we have the mutex
-	if (waitResult == WAIT_OBJECT_0 || waitResult == WAIT_ABANDONED)
-		return true;
-
-	// couldn't get the mutex, we must be running another instance
-	::CloseHandle(hMutex);
-
-	return false;
-#elif defined(POSIX)
-
-	// Under OSX use flock in /tmp/source_engine_<game>.lock, create the file if it doesn't exist
-	const char *pchGameParam = CommandLine()->ParmValue( "-game", DEFAULT_HL2_GAMEDIR );
-	CRC32_t gameCRC;
-	CRC32_Init(&gameCRC);
-	CRC32_ProcessBuffer( &gameCRC, (void *)pchGameParam, Q_strlen( pchGameParam ) );
-	CRC32_Final( &gameCRC );
-
-#ifdef LINUX
-	/*
-	 * Linux
- 	 */
-
-	// Check TMPDIR environment variable for temp directory.
-	char *tmpdir = getenv( "TMPDIR" );
-
-	// If it's NULL, or it doesn't exist, or it isn't a directory, fallback to /tmp.
-	struct stat buf;
-	if( !tmpdir || stat( tmpdir, &buf ) || !S_ISDIR ( buf.st_mode ) )
-		tmpdir = "/tmp";
-
-	V_snprintf( g_lockFilename, sizeof(g_lockFilename), "%s/source_engine_%u.lock", tmpdir, gameCRC );
-
-	g_lockfd = open( g_lockFilename, O_WRONLY | O_CREAT, 0666 );
-	if ( g_lockfd == -1 )
-	{
-		fprintf( stderr, "open(%s) failed\n", g_lockFilename );
-		return false;
-	}
-
-	// dimhotepus: Looks like CS:GO do this.
-	// In case we have a umask setting creation to something other than 0666,
-	// force it to 0666 so we don't lock other users out of the game if
-	// the game dies etc.
-	fchmod( g_lockfd, 0666 );
-
-	struct flock fl;
-	fl.l_type = F_WRLCK;
-	fl.l_whence = SEEK_SET;
-	fl.l_start = 0;
-	fl.l_len = 1;
-
-	if ( fcntl ( g_lockfd, F_SETLK, &fl ) == -1 )
-	{
-		fprintf( stderr, "fcntl(%d) for %s failed\n", g_lockfd, g_lockFilename );
-		return false;
-	}
-
-	return true;
-#else
-	/*
-	 * OSX
- 	 */
-	V_snprintf( g_lockFilename, sizeof(g_lockFilename), "/tmp/source_engine_%u.lock", gameCRC );
-
-	g_lockfd = open( g_lockFilename, O_CREAT | O_WRONLY | O_EXLOCK | O_NONBLOCK | O_TRUNC, 0777 );
-	if (g_lockfd >= 0)
-	{
-		// make sure we give full perms to the file, we only one instance per machine
-		fchmod( g_lockfd, 0777 );
-
-		// we leave the file open, under unix rules when we die we'll automatically close and remove the locks
-		return true;
-	}   		 
-
-	// We were unable to open the file, it should be because we are unable to retain a lock
-	if ( errno != EWOULDBLOCK)
-	{
-		fprintf( stderr, "unexpected error %d trying to exclusively lock %s\n", errno, g_lockFilename );
-	}
-
-	return false;
-#endif // OSX
-
-#endif // POSIX
-}
-
-void ReleaseSourceMutex(
-#ifdef WIN32
-	HANDLE &hMutex
-#endif
-)
-{
-#ifdef WIN32
-	if ( IsPC() && hMutex )
-	{
-		::ReleaseMutex( hMutex );
-		::CloseHandle( hMutex );
-		hMutex = NULL;
-	}
-#elif defined(POSIX)
-	if ( g_lockfd != -1 )
-	{
-		close( g_lockfd );
-		g_lockfd = -1;
-		unlink( g_lockFilename ); 
-	}
-#endif
-}
-
 // Remove all but the last -game parameter.
 // This is for mods based off something other than Half-Life 2 (like HL2MP mods).
 // The Steam UI does 'steam -applaunch 320 -game c:\steam\steamapps\sourcemods\modname', but applaunch inserts
@@ -972,6 +844,320 @@ void RemoveSpuriousGameParameters()
 	}
 }
 
+class CScopedAppLocale
+{
+public:
+  CScopedAppLocale( const char *newLocale ) noexcept
+	  : oldLocale_{ CurrentLocale() }, newLocale_{ newLocale }
+  {
+#ifdef LINUX
+    setenv("LC_ALL", newLocale, 1);
+#endif
+
+	std::setlocale( LC_ALL, newLocale );
+  }
+
+  static const char* CurrentLocale() noexcept
+  {
+    const char *locale{ std::setlocale( LC_ALL, nullptr ) };
+    return locale ? locale : emptyLocale_;
+  }
+
+  ~CScopedAppLocale() noexcept
+  {
+		const char *locale { CurrentLocale() };
+		if ( !Q_strcmp( locale, newLocale_.c_str() ) )
+		{
+			std::setlocale( LC_ALL, oldLocale_.c_str() );
+		}
+  }
+
+private:
+  std::string oldLocale_, newLocale_;
+
+  static constexpr char emptyLocale_[1]{""};
+};
+
+#ifdef WIN32
+class CScopedWinsock
+{
+public:
+    CScopedWinsock( unsigned short version )
+		: errc_{::WSAStartup( version, &wsaData_ )}, version_{version}
+	{
+	}
+
+	[[nodiscard]]
+	int errc() const noexcept
+	{
+		return errc_;
+	}
+
+	CScopedWinsock(CScopedWinsock &) = delete;
+    CScopedWinsock(CScopedWinsock &&) = delete;
+	CScopedWinsock& operator=(const CScopedWinsock &) = delete;
+	CScopedWinsock& operator=(CScopedWinsock &&) = delete;
+
+	~CScopedWinsock() noexcept
+	{
+		if (!errc_)
+		{
+			const int rc{ ::WSACleanup() };
+			if ( rc )
+			{
+				Warning( "Windows sockets shutdown failure (%d): %s.\n",
+					rc, std::system_category().message(rc).c_str() );
+			}
+		}
+	}
+
+private:
+	WSAData wsaData_;
+	const int errc_;
+	const unsigned short version_;
+};
+#endif
+
+class CScopedAppRelaunch
+{
+public:
+	CScopedAppRelaunch() noexcept
+	{
+#ifndef WIN32
+		struct stat st;
+		if ( !stat( RELAUNCH_FILE, &st ) ) {
+			unlink( RELAUNCH_FILE );
+		}
+#endif
+	}
+
+	CScopedAppRelaunch(CScopedAppRelaunch &) = delete;
+	CScopedAppRelaunch(CScopedAppRelaunch &&) = delete;
+	CScopedAppRelaunch& operator=(const CScopedAppRelaunch &) = delete;
+	CScopedAppRelaunch& operator=(CScopedAppRelaunch &&) = delete;
+
+	~CScopedAppRelaunch() noexcept
+	{
+#ifndef WIN32
+		struct stat st;
+		if ( stat( RELAUNCH_FILE, &st ) ) 
+		{
+			return;
+		}
+
+		FILE *fp = fopen( RELAUNCH_FILE, "r" );
+		if ( fp )
+		{
+			char szCmd[256];
+			int nChars = fread( szCmd, 1, sizeof(szCmd), fp );
+
+			fclose( fp );
+
+			if ( nChars > 0 )
+			{
+				if ( nChars > (sizeof(szCmd)-1) )
+				{
+					nChars = (sizeof(szCmd)-1);
+				}
+				szCmd[nChars] = 0;
+				char szOpenLine[ MAX_PATH ];
+
+				#if defined( LINUX )
+					Q_snprintf( szOpenLine, sizeof(szOpenLine), "xdg-open \"%s\"", szCmd );
+				#else
+					Q_snprintf( szOpenLine, sizeof(szOpenLine), "open \"%s\"", szCmd );
+				#endif
+
+				system( szOpenLine );
+			}
+		}
+#else
+		// Now that the mutex has been released, check HKEY_CURRENT_USER\Software\Valve\Source\Relaunch URL. If there is a URL here, exec it.
+		// This supports the capability of immediately re-launching the the game via Steam in a different audio language 
+		HKEY hKey; 
+		if ( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS )
+		{
+			char szValue[MAX_PATH];
+			DWORD dwValueLen = MAX_PATH;
+
+			if ( RegQueryValueEx( hKey, "Relaunch URL", NULL, NULL, (unsigned char*)szValue, &dwValueLen ) == ERROR_SUCCESS )
+			{
+				ShellExecute (0, "open", szValue, 0, 0, SW_SHOW);
+				RegDeleteValue( hKey, "Relaunch URL" );
+			}
+
+			RegCloseKey(hKey);
+		}
+#endif
+	}
+
+private:
+	static constexpr char RELAUNCH_FILE[18] = {"/tmp/hl2_relaunch"};
+};
+
+class CScopedAppMultiRun
+{
+public:
+	CScopedAppMultiRun() noexcept
+#if defined(WIN32)
+		// don't allow more than one instance to run
+		: mutex_{ ::CreateMutex( nullptr, FALSE, TEXT("hl2_singleton_mutex") ) }
+#endif
+	{
+#if defined(WIN32)
+		if ( mutex_ )
+		{
+			const DWORD waitResult{ ::WaitForSingleObject(mutex_, 0) };
+
+			// Here, we have the mutex
+			if (waitResult == WAIT_OBJECT_0 || waitResult == WAIT_ABANDONED)
+				return;
+
+			// couldn't get the mutex, we must be running another instance
+			::CloseHandle( mutex_ );
+			mutex_ = nullptr;
+		}
+#else
+	// Under OSX use flock in /tmp/source_engine_<game>.lock, create
+	// the file if it doesn't exist
+	const char *gameArg =
+		CommandLine()->ParmValue("-game", DEFAULT_HL2_GAMEDIR);
+
+	CRC32_t gameCRC;
+	CRC32_Init(&gameCRC);
+	CRC32_ProcessBuffer(&gameCRC, gameArg, Q_strlen(gameArg));
+	CRC32_Final(&gameCRC);
+
+#if defined(LINUX)
+	// Check TMPDIR environment variable for temp directory.
+	const char *tmpdir{ getenv("TMPDIR") };
+
+	// If it's NULL, or it doesn't exist, or it isn't a directory,
+	// fallback to /tmp.
+	struct stat buf;
+	if (!tmpdir || stat(tmpdir, &buf) || !S_ISDIR(buf.st_mode))
+		tmpdir = "/tmp";
+
+	V_snprintf(lockFileName_, sizeof(lockFileName_),
+				"%s/source_engine_%u.lock", tmpdir, gameCRC);
+
+	lockHandle_ = open(lockFileName_, O_WRONLY | O_CREAT, 0666);
+	if (lockHandle_ == -1) {
+		fprintf(stderr,
+			"open(%s) failed: %s\n",
+			lockFileName_,
+			std::generic_category().message(errno));
+		return;
+	}
+
+	// dimhotepus: Looks like CS:GO do this.
+	// In case we have a umask setting creation to something other
+	// than 0666, force it to 0666 so we don't lock other users out
+	// of the game if the game dies etc.
+	if (fchmod(lockHandle_, 0666) == -1) {
+		fprintf(stderr,
+			"fchmod(%s, %d) failed: %s\n",
+			lockFileName_,
+			0666,
+			std::generic_category().message(errno));
+		close(lockHandle_);
+		lockHandle_ = -1;
+		return;
+	}
+
+	struct flock fl;
+	fl.l_type = F_WRLCK;
+	fl.l_whence = SEEK_SET;
+	fl.l_start = 0;
+	fl.l_len = 1;
+
+	if (fcntl(lockHandle_, F_SETLK, &fl) == -1) {
+		fprintf(stderr,
+			"fcntl(%s) failed: %s\n",
+			lockFileName_,
+			std::generic_category().message(errno));
+		close(lockHandle_);
+		lockHandle_ = -1;
+		return;
+	}
+#else
+	V_snprintf(lockFileName_, sizeof(lockFileName_),
+				"/tmp/source_engine_%u.lock", gameCRC);
+
+	lockHandle_ = open(
+		lockFileName_,
+		O_CREAT | O_WRONLY | O_EXLOCK | O_NONBLOCK | O_TRUNC, 0777);
+	if (lockHandle_ >= 0) {
+		// make sure we give full perms to the file, we only one
+		// instance per machine
+		if (fchmod(lockHandle_, 0777) < 0) {
+			fprintf(stderr,
+				"fchmod(%s, %d) failed: %s\n",
+				lockFileName_,
+				0777,
+				std::generic_category().message(errno));
+			close(lockHandle_);
+			lockHandle_ = -1;
+			return;
+		}
+
+		// we leave the file open, under unix rules when we die we'll
+		// automatically close and remove the locks
+		return;
+	}
+
+	// We were unable to open the file, it should be because we are
+	// unable to retain a lock
+	if (errno != EWOULDBLOCK) {
+		fprintf(stderr,
+			"open(%s) failed: %s\n",
+			lockFileName_,
+			std::generic_category().message(errno) );
+	}
+#endif  // OSX
+#endif  // !WIN32
+	}
+
+	CScopedAppMultiRun(CScopedAppMultiRun &) = delete;
+    CScopedAppMultiRun(CScopedAppMultiRun &&) = delete;
+	CScopedAppMultiRun& operator=(const CScopedAppMultiRun &) = delete;
+	CScopedAppMultiRun& operator=(CScopedAppMultiRun &&) = delete;
+
+	bool IsSingleRun() const noexcept
+	{
+#if defined(WIN32)
+		return !!mutex_;
+#else
+		return lockHandle_ != -1
+#endif
+	}
+
+	~CScopedAppMultiRun() noexcept
+	{
+#if defined(WIN32)
+		if ( mutex_ )
+		{
+			::ReleaseMutex( mutex_ );
+			::CloseHandle( mutex_ );
+		}
+#else
+		if (lockHandle_ != -1) {
+			close(lockHandle_);
+			lockHandle_ = -1;
+			unlink(lockFileName_);
+		}
+#endif
+	}
+
+private:
+#ifdef WIN32
+	HANDLE mutex_;
+#else
+	int lockHandle_ = -1;
+	char lockFileName_[MAX_PATH];
+#endif
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: The real entry point for the application
 // Output : int APIENTRY
@@ -986,24 +1172,22 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	SetAppInstance( hInstance );
 #endif
 
-#ifdef LINUX
-	// Fix to stop us from crashing in printf/sscanf functions that don't expect localization to mess with
-	// your "." and "," float seperators.  Mac OSX also sets LANG to en_US.UTF-8 before starting up (in
-	// info.plist I believe).  We need to double check that localization for libcef is handled correctly
-	// when we slam things to en_US.UTF-8.  Also check if C.UTF-8 exists and use it?
-	// This file: /usr/lib/locale/C.UTF-8.
-	// It looks like it's only installed on Debian distros right now though.
-	const char en_US[] = "en_US.UTF-8";
+	// Printf/sscanf functions expect en_US UTF8 localization.  Mac OSX also
+	// sets LANG to en_US.UTF-8 before starting up (in info.plist I believe).
+	//
+	// Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C
+	// Runtime supports using a UTF-8 code page. 
+	//
+	// Need to double check that localization for libcef is handled correctly
+	// when slam things to en_US.UTF-8.
+	constexpr char en_US_UTF_8[]{ "en_US.UTF-8" };
 
-	setenv( "LC_ALL", en_US, 1 );
-	setlocale( LC_ALL, en_US );
-
-	const char *CurrentLocale = setlocale( LC_ALL, NULL );
-	if ( Q_stricmp( CurrentLocale, en_US ) )
+	const CScopedAppLocale scopedAppLocale{ en_US_UTF_8 };
+	if ( Q_stricmp( scopedAppLocale.CurrentLocale(), en_US_UTF_8 ) )
 	{
-		Warning( "WARNING: setlocale('%s') failed, using locale:'%s'. International characters may not work.\n", en_US, CurrentLocale );
+		Warning( "setlocale('%s') failed, current locale is '%s'.\n",
+			en_US_UTF_8, CScopedAppLocale::CurrentLocale() );
 	}
-#endif // LINUX
 
 #if defined( POSIX )
 	// Store off command line for argument searching
@@ -1079,15 +1263,8 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	// Figure out the directory the executable is running from
 	UTIL_ComputeBaseDir( baseDirectory );
 	
-#ifdef POSIX
-	{
-		struct stat st;
-		if ( stat( RELAUNCH_FILE, &st ) == 0 ) 
-		{
-			unlink( RELAUNCH_FILE );
-		}
-	}
-#endif
+	// Relaunch app if needed.
+	const CScopedAppRelaunch scopedAppRelaunch;
 
 	// This call is to emulate steam's injection of the GameOverlay DLL into our process if we
 	// are running from the command line directly, this allows the same experience the user gets
@@ -1118,58 +1295,40 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	RemoveSpuriousGameParameters();
 
 #ifdef WIN32
-	if ( IsPC() )
+	const CScopedWinsock scopedWinsock{MAKEWORD(2,0)};
+	if (scopedWinsock.errc())
 	{
-		// initialize winsock
-		WSAData wsaData;
-		const int wsaError = ::WSAStartup( MAKEWORD(2,0), &wsaData );
-		if ( wsaError )
-		{
-			Msg(
-				"Network library winsock 2.0 unavailable: %s (0x%x).\n",
-				std::system_category().message(wsaError).c_str(),
-				wsaError );
-		}
+		Warning(
+			"Windows sockets 2.0 unavailable (%d): %s.\n",
+			scopedWinsock.errc(),
+			std::system_category().message(scopedWinsock.errc()).c_str() );
 	}
-
-	HANDLE hMutex = nullptr;
 #endif
-
-	bool bTextMode = false;
-
+	
 	// Run in text mode? (No graphics or sound).
-	if ( CommandLine()->CheckParm( "-textmode" ) )
+	const bool bTextMode = CommandLine()->CheckParm( "-textmode" ) && InitTextMode();
+	
+	// Can only run one windowed source app at a time.
+	const CScopedAppMultiRun scopedAppMultiRun;
+	if ( !scopedAppMultiRun.IsSingleRun() )
 	{
-		bTextMode = true;
-		InitTextMode();
-	}
-#ifdef WIN32
-	else
-	{
-		// Can only run one windowed source app at a time
-		if ( !GrabSourceMutex(hMutex) )
-		{
-			// Allow the user to explicitly say they want to be able to run multiple instances of the source mutex.
-			// Useful for side-by-side comparisons of different renderers.
-			bool multiRun = CommandLine()->CheckParm( "-multirun" ) != NULL;
+		// Allow the user to explicitly say they want to be able to run
+		// multiple instances of the source mutex.  Useful for side-by-side
+		// comparisons of different renderers.
+		const bool allowMultiRun{ CommandLine()->CheckParm( "-multirun" ) != nullptr };
+		if (!allowMultiRun) {
+			::MessageBox(nullptr,
+				"Oops, the game is already launched\n\nSorry, but only single game can run at the same time.",
+				"Source - Warning",
+				MB_ICONERROR | MB_OK);
 
-			if (!multiRun) {
-				::MessageBox(NULL, "Only one instance of the game can be running at one time.", "Source - Warning", MB_ICONWARNING | MB_OK);
-
-				return ERROR_SINGLE_INSTANCE_APP;
-			}
-		}
-	}
-#elif defined( POSIX )
-	else
-	{
-		if ( !GrabSourceMutex() )
-		{
-			::MessageBox(NULL, "Only one instance of the game can be running at one time.", "Source - Warning", 0 );
-			return -1;
-		}
-	}
+#if defined(WIN32)
+			return ERROR_SINGLE_INSTANCE_APP;
+#else
+			return EEXIST;
 #endif
+		}
+	}
 
 #ifdef WIN32
 	// Make low priority?
@@ -1201,7 +1360,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		Warning( "Unable to change current directory to %s.", baseDirectory );
 	}
 
-	CLeakDump leakDump( CommandLine()->CheckParm( "-leakcheck" ) );
+	const CHeapLeakDump heapLeakDump(CommandLine()->CheckParm("-leakcheck"));
 
 	bool bRestart = true;
 	while ( bRestart )
@@ -1245,72 +1404,6 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			CommandLine()->RemoveParm( "+mat_hdr_level" );
 		}
 	}
-
-#ifdef WIN32
-	if ( IsPC() )
-	{
-		// shutdown winsock
-		int nError = ::WSACleanup();
-		if ( nError )
-		{
-			Msg( "Warning! Failed to complete WSACleanup = 0x%x.\n", nError );
-		}
-	}
-#endif
-
-	// Allow other source apps to run
-	ReleaseSourceMutex(hMutex);
-
-#if defined( WIN32 )
-
-	// Now that the mutex has been released, check HKEY_CURRENT_USER\Software\Valve\Source\Relaunch URL. If there is a URL here, exec it.
-	// This supports the capability of immediately re-launching the the game via Steam in a different audio language 
-	HKEY hKey; 
-	if ( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS )
-	{
-		char szValue[MAX_PATH];
-		DWORD dwValueLen = MAX_PATH;
-
-		if ( RegQueryValueEx( hKey, "Relaunch URL", NULL, NULL, (unsigned char*)szValue, &dwValueLen ) == ERROR_SUCCESS )
-		{
-			ShellExecute (0, "open", szValue, 0, 0, SW_SHOW);
-			RegDeleteValue( hKey, "Relaunch URL" );
-		}
-
-		RegCloseKey(hKey);
-	}
-
-#elif defined( OSX ) || defined( LINUX )
-	struct stat st;
-	if ( stat( RELAUNCH_FILE, &st ) == 0 ) 
-	{
-		FILE *fp = fopen( RELAUNCH_FILE, "r" );
-		if ( fp )
-		{
-			char szCmd[256];
-			int nChars = fread( szCmd, 1, sizeof(szCmd), fp );
-			if ( nChars > 0 )
-			{
-				if ( nChars > (sizeof(szCmd)-1) )
-				{
-					nChars = (sizeof(szCmd)-1);
-				}
-				szCmd[nChars] = 0;
-				char szOpenLine[ MAX_PATH ];
-				#if defined( LINUX )
-					Q_snprintf( szOpenLine, sizeof(szOpenLine), "xdg-open \"%s\"", szCmd );
-				#else
-					Q_snprintf( szOpenLine, sizeof(szOpenLine), "open \"%s\"", szCmd );
-				#endif
-				system( szOpenLine );
-			}
-			fclose( fp );
-			unlink( RELAUNCH_FILE );
-		}
-	}
-#else
-#error "Please define your platform"
-#endif
 
 	return 0;
 }
