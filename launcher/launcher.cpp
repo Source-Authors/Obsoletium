@@ -1,17 +1,13 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose:
+// Copyright Valve Corporation, All rights reserved.
 //
 // Defines the entry point for the application.
-//
-//===========================================================================//
 
-#if defined( _WIN32 )
+#if defined(_WIN32)
 #include "winlite.h"
 
 #include <direct.h>
 #include <shellapi.h>
-#include <shlwapi.h> // registry stuff
+#include <shlwapi.h>  // registry stuff
 #include <winsock.h>
 
 #include <chrono>
@@ -19,15 +15,14 @@
 
 #include "scoped_timer_resolution.h"
 
-#elif defined ( LINUX ) || defined( OSX )
-	#define O_EXLOCK 0
-	#include <sys/types.h>
-	#include <sys/stat.h>
-	#include <fcntl.h>
+#elif defined(LINUX) || defined(OSX)
+#define O_EXLOCK 0
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #else
 #error "Please define your platform"
 #endif
-
 
 #include "appframework/AppFramework.h"
 #include "appframework/ilaunchermgr.h"
@@ -69,1092 +64,1004 @@
 #define VERSION_SAFE_STEAM_API_INTERFACES
 #include "steam/steam_api.h"
 
-#if defined( USE_SDL )
+#if defined(USE_SDL)
 #include "include/SDL3/SDL.h"
 
-#if !defined( _WIN32 )
-#define MB_OK 			0x00000001
-#define MB_SYSTEMMODAL	0x00000002
-#define MB_ICONERROR	0x00000004
-int MessageBox( HWND hWnd, const char *message, const char *header, unsigned uType );
-#endif // _WIN32
+#if !defined(_WIN32)
+#define MB_OK 0x00000001
+#define MB_SYSTEMMODAL 0x00000002
+#define MB_ICONERROR 0x00000004
+int MessageBox(HWND hWnd, const char *message, const char *header,
+               unsigned uType);
+#endif  // _WIN32
 
-#endif // USE_SDL
+#endif  // USE_SDL
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define DEFAULT_HL2_GAMEDIR	"hl2"
+#define DEFAULT_HL2_GAMEDIR "hl2"
 
-#if defined( USE_SDL )
-extern void* CreateSDLMgr();
+#if defined(USE_SDL)
+extern void *CreateSDLMgr();
 #endif
 
-class CHeapLeakDump
-{
-public:
-	CHeapLeakDump( bool m_bCheckLeaks )
-	 :	m_bCheckLeaks( m_bCheckLeaks )
-	{
-	}
+class CHeapLeakDump {
+ public:
+  CHeapLeakDump(bool m_bCheckLeaks) : m_bCheckLeaks(m_bCheckLeaks) {}
 
-	~CHeapLeakDump()
-	{
-		if ( m_bCheckLeaks )
-		{
-			MemAlloc_DumpStats();
-		}
-	}
+  ~CHeapLeakDump() {
+    if (m_bCheckLeaks) {
+      MemAlloc_DumpStats();
+    }
+  }
 
-private:
-	const bool m_bCheckLeaks;
+ private:
+  const bool m_bCheckLeaks;
 };
 
 //-----------------------------------------------------------------------------
 // Spew function!
 //-----------------------------------------------------------------------------
-SpewRetval_t LauncherDefaultSpewFunc( SpewType_t spewType, char const *pMsg )
-{
+SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spewType, char const *pMsg) {
 #ifndef _CERT
-	Plat_DebugString( pMsg );
-	
-	switch( spewType )
-	{
-	case SPEW_MESSAGE:
-	case SPEW_LOG:
-		return SPEW_CONTINUE;
+  Plat_DebugString(pMsg);
 
-	case SPEW_WARNING:
-		if ( !stricmp( GetSpewOutputGroup(), "init" ) )
-		{
-#if defined( WIN32 ) || defined( USE_SDL )
-			::MessageBox( NULL, pMsg, "Launcher - Warning", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
-#endif
-		}
-		return SPEW_CONTINUE;
+  switch (spewType) {
+    case SPEW_MESSAGE:
+    case SPEW_LOG:
+      return SPEW_CONTINUE;
 
-	case SPEW_ASSERT:
-		if ( !ShouldUseNewAssertDialog() )
-		{
-#if defined( WIN32 ) || defined( USE_SDL )
-			::MessageBox( NULL, pMsg, "Launcher - Assert", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
+    case SPEW_WARNING:
+      if (!stricmp(GetSpewOutputGroup(), "init")) {
+#if defined(WIN32) || defined(USE_SDL)
+        ::MessageBox(NULL, pMsg, "Launcher - Warning",
+                     MB_OK | MB_SYSTEMMODAL | MB_ICONERROR);
 #endif
-		}
-		return SPEW_DEBUGGER;
-	
-	case SPEW_ERROR:
-	default:
-#if defined( WIN32 ) || defined( USE_SDL )
-		::MessageBox( NULL, pMsg, "Launcher - Error", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
+      }
+      return SPEW_CONTINUE;
+
+    case SPEW_ASSERT:
+      if (!ShouldUseNewAssertDialog()) {
+#if defined(WIN32) || defined(USE_SDL)
+        ::MessageBox(NULL, pMsg, "Launcher - Assert",
+                     MB_OK | MB_SYSTEMMODAL | MB_ICONERROR);
 #endif
-		_exit( 1 );
-	}
+      }
+      return SPEW_DEBUGGER;
+
+    case SPEW_ERROR:
+    default:
+#if defined(WIN32) || defined(USE_SDL)
+      ::MessageBox(NULL, pMsg, "Launcher - Error",
+                   MB_OK | MB_SYSTEMMODAL | MB_ICONERROR);
+#endif
+      _exit(1);
+  }
 #else
-	if ( spewType != SPEW_ERROR)
-		return SPEW_CONTINUE;
-	_exit( 1 );
+  if (spewType != SPEW_ERROR) return SPEW_CONTINUE;
+  _exit(1);
 #endif
 }
-
 
 //-----------------------------------------------------------------------------
 // Implementation of VCRHelpers.
 //-----------------------------------------------------------------------------
-class CVCRHelpers : public IVCRHelpers
-{
-public:
-	virtual void ErrorMessage( const char *pMsg )
-	{
-#if defined( WIN32 ) || defined( LINUX )
-		NOVCR( ::MessageBox( NULL, pMsg, "VCR Error", MB_OK ) );
+class CVCRHelpers : public IVCRHelpers {
+ public:
+  virtual void ErrorMessage(const char *pMsg) {
+#if defined(WIN32) || defined(LINUX)
+    NOVCR(::MessageBox(NULL, pMsg, "VCR Error", MB_OK));
 #endif
-	}
+  }
 
-	virtual void* GetMainWindow()
-	{
-		return NULL;
-	}
+  virtual void *GetMainWindow() { return NULL; }
 };
 
 //-----------------------------------------------------------------------------
 // Gets the executable name
 //-----------------------------------------------------------------------------
 template <DWORD outSize>
-bool GetExecutableName( char (&out)[outSize] )
-{
+bool GetExecutableName(char (&out)[outSize]) {
 #ifdef WIN32
-	if ( !::GetModuleFileName( GetModuleHandle( nullptr ), out, outSize ) )
-	{
-		return false;
-	}
-	return true;
+  if (!::GetModuleFileName(GetModuleHandle(nullptr), out, outSize)) {
+    return false;
+  }
+  return true;
 #else
-	return false;
+  return false;
 #endif
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Determine the directory where this .exe is running from
 //-----------------------------------------------------------------------------
-void UTIL_ComputeBaseDir( char (&szBasedir)[MAX_PATH] )
-{
-	szBasedir[0] = '\0';
+void UTIL_ComputeBaseDir(char (&szBasedir)[MAX_PATH]) {
+  szBasedir[0] = '\0';
 
-	if ( !szBasedir[0] && GetExecutableName( szBasedir ) )
-	{
-		char *pBuffer = strrchr( szBasedir, '\\' );
-		if ( pBuffer && *pBuffer )
-		{
-			*(pBuffer+1) = '\0';
-		}
+  if (!szBasedir[0] && GetExecutableName(szBasedir)) {
+    char *pBuffer = strrchr(szBasedir, '\\');
+    if (pBuffer && *pBuffer) {
+      *(pBuffer + 1) = '\0';
+    }
 
-		size_t j = strlen( szBasedir );
-		if (j > 0)
-		{
-			if ( szBasedir[j-1] == '\\' || szBasedir[j-1] == '/' )
-			{
-				szBasedir[j-1] = '\0';
-			}
-		}
-	}
+    size_t j = strlen(szBasedir);
+    if (j > 0) {
+      if (szBasedir[j - 1] == '\\' || szBasedir[j - 1] == '/') {
+        szBasedir[j - 1] = '\0';
+      }
+    }
+  }
 
-	if ( IsPC() )
-	{
-		char const *pOverrideDir = CommandLine()->CheckParm( "-basedir" );
-		if ( pOverrideDir )
-		{
-			strcpy( szBasedir, pOverrideDir );
-		}
-	}
+  if (IsPC()) {
+    char const *pOverrideDir = CommandLine()->CheckParm("-basedir");
+    if (pOverrideDir) {
+      strcpy(szBasedir, pOverrideDir);
+    }
+  }
 
 #ifdef WIN32
-	Q_strlower( szBasedir );
+  Q_strlower(szBasedir);
 #endif
-	Q_FixSlashes( szBasedir );
+  Q_FixSlashes(szBasedir);
 }
 
 #ifdef WIN32
-BOOL WINAPI MyHandlerRoutine( DWORD dwCtrlType )
-{
-	TerminateProcess( GetCurrentProcess(), 2 );
-	return TRUE;
+BOOL WINAPI MyHandlerRoutine(DWORD dwCtrlType) {
+  TerminateProcess(GetCurrentProcess(), 2);
+  return TRUE;
 }
 #endif
 
-bool InitTextMode()
-{
+bool InitTextMode() {
 #ifdef WIN32
-	bool ok = AllocConsole() != 0;
-	if (ok)
-	{
-		ok = SetConsoleCtrlHandler( MyHandlerRoutine, TRUE ) != 0;
-	}
+  bool ok = AllocConsole() != 0;
+  if (ok) {
+    ok = SetConsoleCtrlHandler(MyHandlerRoutine, TRUE) != 0;
+  }
 
-	(void)freopen( "CONIN$", "rb", stdin );		// reopen stdin handle as console window input
-	(void)freopen( "CONOUT$", "wb", stdout );	// reopen stout handle as console window output
-	(void)freopen( "CONOUT$", "wb", stderr );	// reopen stderr handle as console window output
+  (void)freopen("CONIN$", "rb",
+                stdin);  // reopen stdin handle as console window input
+  (void)freopen("CONOUT$", "wb",
+                stdout);  // reopen stout handle as console window output
+  (void)freopen("CONOUT$", "wb",
+                stderr);  // reopen stderr handle as console window output
 #endif
 
-	return ok;
+  return ok;
 }
 
-void SortResList( char const *pchFileName, char const *pchSearchPath );
+void SortResList(char const *pchFileName, char const *pchSearchPath);
 
-#define ALL_RESLIST_FILE	"all.lst"
-#define ENGINE_RESLIST_FILE  "engine.lst"
+#define ALL_RESLIST_FILE "all.lst"
+#define ENGINE_RESLIST_FILE "engine.lst"
 
 // create file to dump out to
-class CLogAllFiles
-{
-public:
-	CLogAllFiles();
-	void Init( char (&baseDirectory)[MAX_PATH] );
-	void Shutdown();
-	void LogFile( const char *fullPathFileName, const char *options );
+class CLogAllFiles {
+ public:
+  CLogAllFiles();
+  void Init(char (&baseDirectory)[MAX_PATH]);
+  void Shutdown();
+  void LogFile(const char *fullPathFileName, const char *options);
 
-private:
-	static void LogAllFilesFunc( const char *fullPathFileName, const char *options );
-	void LogToAllReslist( char const *line );
-	
-	char		m_szCurrentDir[_MAX_PATH];
-	char		m_szBaseDir[_MAX_PATH];
-	bool		m_bActive;
+ private:
+  static void LogAllFilesFunc(const char *fullPathFileName,
+                              const char *options);
+  void LogToAllReslist(char const *line);
 
-	// persistent across restarts
-	CUtlRBTree< CUtlString, int > m_Logged;
-	CUtlString	m_sResListDir;
-	CUtlString	m_sFullGamePath;
+  char m_szCurrentDir[_MAX_PATH];
+  char m_szBaseDir[_MAX_PATH];
+  bool m_bActive;
+
+  // persistent across restarts
+  CUtlRBTree<CUtlString, int> m_Logged;
+  CUtlString m_sResListDir;
+  CUtlString m_sFullGamePath;
 };
 
 static CLogAllFiles *g_LogFiles = nullptr;
 
-static bool AllLogLessFunc( CUtlString const &pLHS, CUtlString const &pRHS )
-{
-	return CaselessStringLessThan( pLHS.Get(), pRHS.Get() );
+static bool AllLogLessFunc(CUtlString const &pLHS, CUtlString const &pRHS) {
+  return CaselessStringLessThan(pLHS.Get(), pRHS.Get());
 }
 
-CLogAllFiles::CLogAllFiles() :
-	m_bActive( false ),
-	m_Logged( 0, 0, AllLogLessFunc )
-{
-	MEM_ALLOC_CREDIT();
+CLogAllFiles::CLogAllFiles()
+    : m_bActive(false), m_Logged(0, 0, AllLogLessFunc) {
+  MEM_ALLOC_CREDIT();
   m_szBaseDir[0] = '\0';
-	m_szCurrentDir[0] = '\0';
-	m_sResListDir = "reslists";
+  m_szCurrentDir[0] = '\0';
+  m_sResListDir = "reslists";
 }
 
-void CLogAllFiles::Init( char (&baseDirectory)[MAX_PATH] )
-{
-	// Can't do this in edit mode
-	if ( CommandLine()->CheckParm( "-edit" ) )
-	{
-		return;
-	}
+void CLogAllFiles::Init(char (&baseDirectory)[MAX_PATH]) {
+  // Can't do this in edit mode
+  if (CommandLine()->CheckParm("-edit")) {
+    return;
+  }
 
-	if ( !CommandLine()->CheckParm( "-makereslists" ) )
-	{
-		return;
-	}
+  if (!CommandLine()->CheckParm("-makereslists")) {
+    return;
+  }
 
-	Q_strcpy(m_szBaseDir, baseDirectory);
+  Q_strcpy(m_szBaseDir, baseDirectory);
 
-	m_bActive = true;
+  m_bActive = true;
 
-	char const *pszDir = NULL;
-	if ( CommandLine()->CheckParm( "-reslistdir", &pszDir ) && pszDir )
-	{
-		char szDir[ MAX_PATH ];
-		Q_strncpy( szDir, pszDir, sizeof( szDir ) );
-		Q_StripTrailingSlash( szDir );
+  char const *pszDir = NULL;
+  if (CommandLine()->CheckParm("-reslistdir", &pszDir) && pszDir) {
+    char szDir[MAX_PATH];
+    Q_strncpy(szDir, pszDir, sizeof(szDir));
+    Q_StripTrailingSlash(szDir);
 #ifdef WIN32
-		Q_strlower( szDir );
+    Q_strlower(szDir);
 #endif
-		Q_FixSlashes( szDir );
-		if ( !Q_isempty( szDir ) )
-		{
-			m_sResListDir = szDir;
-		}
-	}
+    Q_FixSlashes(szDir);
+    if (!Q_isempty(szDir)) {
+      m_sResListDir = szDir;
+    }
+  }
 
-	// game directory has not been established yet, must derive ourselves
-	char path[MAX_PATH];
-	Q_snprintf( path, sizeof(path), "%s/%s", m_szBaseDir, CommandLine()->ParmValue( "-game", "hl2" ) );
-	Q_FixSlashes( path );
+  // game directory has not been established yet, must derive ourselves
+  char path[MAX_PATH];
+  Q_snprintf(path, sizeof(path), "%s/%s", m_szBaseDir,
+             CommandLine()->ParmValue("-game", "hl2"));
+  Q_FixSlashes(path);
 #ifdef WIN32
-	Q_strlower( path );
+  Q_strlower(path);
 #endif
-	m_sFullGamePath = path;
+  m_sFullGamePath = path;
 
-	// create file to dump out to
-	char szDir[ MAX_PATH ];
-	V_snprintf( szDir, sizeof( szDir ), "%s\\%s", m_sFullGamePath.String(), m_sResListDir.String() );
-	g_pFullFileSystem->CreateDirHierarchy( szDir, "GAME" );
+  // create file to dump out to
+  char szDir[MAX_PATH];
+  V_snprintf(szDir, sizeof(szDir), "%s\\%s", m_sFullGamePath.String(),
+             m_sResListDir.String());
+  g_pFullFileSystem->CreateDirHierarchy(szDir, "GAME");
 
-	g_pFullFileSystem->AddLoggingFunc( &LogAllFilesFunc );
+  g_pFullFileSystem->AddLoggingFunc(&LogAllFilesFunc);
 
-	if ( !CommandLine()->FindParm( "-startmap" ) && !CommandLine()->FindParm( "-startstage" ) )
-	{
-		m_Logged.RemoveAll();
-		g_pFullFileSystem->RemoveFile( CFmtStr( "%s\\%s\\%s", m_sFullGamePath.String(), m_sResListDir.String(), ALL_RESLIST_FILE ), "GAME" );
-	}
+  if (!CommandLine()->FindParm("-startmap") &&
+      !CommandLine()->FindParm("-startstage")) {
+    m_Logged.RemoveAll();
+    g_pFullFileSystem->RemoveFile(
+        CFmtStr("%s\\%s\\%s", m_sFullGamePath.String(), m_sResListDir.String(),
+                ALL_RESLIST_FILE),
+        "GAME");
+  }
 
 #ifdef WIN32
-	::GetCurrentDirectory( sizeof(m_szCurrentDir), m_szCurrentDir );
-	Q_strncat( m_szCurrentDir, "\\", sizeof(m_szCurrentDir), 1 );
-	_strlwr( m_szCurrentDir );
+  ::GetCurrentDirectory(sizeof(m_szCurrentDir), m_szCurrentDir);
+  Q_strncat(m_szCurrentDir, "\\", sizeof(m_szCurrentDir), 1);
+  _strlwr(m_szCurrentDir);
 #else
-	getcwd( m_szCurrentDir, sizeof(m_szCurrentDir) );
-	Q_strncat( m_szCurrentDir, "/", sizeof(m_szCurrentDir), 1 );
+  getcwd(m_szCurrentDir, sizeof(m_szCurrentDir));
+  Q_strncat(m_szCurrentDir, "/", sizeof(m_szCurrentDir), 1);
 #endif
 }
 
-void CLogAllFiles::Shutdown()
-{
-	if ( !m_bActive )
-		return;
+void CLogAllFiles::Shutdown() {
+  if (!m_bActive) return;
 
-	m_bActive = false;
+  m_bActive = false;
 
-	if ( CommandLine()->CheckParm( "-makereslists" ) )
-	{
-		g_pFullFileSystem->RemoveLoggingFunc( &LogAllFilesFunc );
-	}
+  if (CommandLine()->CheckParm("-makereslists")) {
+    g_pFullFileSystem->RemoveLoggingFunc(&LogAllFilesFunc);
+  }
 
-	// Now load and sort all.lst
-	SortResList( CFmtStr( "%s\\%s\\%s", m_sFullGamePath.String(), m_sResListDir.String(), ALL_RESLIST_FILE ), "GAME" );
-	// Now load and sort engine.lst
-	SortResList( CFmtStr( "%s\\%s\\%s", m_sFullGamePath.String(), m_sResListDir.String(), ENGINE_RESLIST_FILE ), "GAME" );
+  // Now load and sort all.lst
+  SortResList(CFmtStr("%s\\%s\\%s", m_sFullGamePath.String(),
+                      m_sResListDir.String(), ALL_RESLIST_FILE),
+              "GAME");
+  // Now load and sort engine.lst
+  SortResList(CFmtStr("%s\\%s\\%s", m_sFullGamePath.String(),
+                      m_sResListDir.String(), ENGINE_RESLIST_FILE),
+              "GAME");
 
-	m_Logged.Purge();
+  m_Logged.Purge();
 }
 
-void CLogAllFiles::LogToAllReslist( char const *line )
-{
-	// Open for append, write data, close.
-	FileHandle_t fh = g_pFullFileSystem->Open( CFmtStr( "%s\\%s\\%s", m_sFullGamePath.String(), m_sResListDir.String(), ALL_RESLIST_FILE ), "at", "GAME" );
-	if ( fh != FILESYSTEM_INVALID_HANDLE )
-	{
-		g_pFullFileSystem->Write("\"", 1, fh);
-		g_pFullFileSystem->Write( line, Q_strlen(line), fh );
-		g_pFullFileSystem->Write("\"\n", 2, fh);
-		g_pFullFileSystem->Close( fh );
-	}
+void CLogAllFiles::LogToAllReslist(char const *line) {
+  // Open for append, write data, close.
+  FileHandle_t fh =
+      g_pFullFileSystem->Open(CFmtStr("%s\\%s\\%s", m_sFullGamePath.String(),
+                                      m_sResListDir.String(), ALL_RESLIST_FILE),
+                              "at", "GAME");
+  if (fh != FILESYSTEM_INVALID_HANDLE) {
+    g_pFullFileSystem->Write("\"", 1, fh);
+    g_pFullFileSystem->Write(line, Q_strlen(line), fh);
+    g_pFullFileSystem->Write("\"\n", 2, fh);
+    g_pFullFileSystem->Close(fh);
+  }
 }
 
-void CLogAllFiles::LogFile(const char *fullPathFileName, const char *options)
-{
-	if ( !m_bActive )
-	{
-		Assert( 0 );
-		return;
-	}
+void CLogAllFiles::LogFile(const char *fullPathFileName, const char *options) {
+  if (!m_bActive) {
+    Assert(0);
+    return;
+  }
 
-	// write out to log file
-	Assert( fullPathFileName[1] == ':' );
+  // write out to log file
+  Assert(fullPathFileName[1] == ':');
 
-	int idx = m_Logged.Find( fullPathFileName );
-	if ( idx != m_Logged.InvalidIndex() )
-	{
-		return;
-	}
+  int idx = m_Logged.Find(fullPathFileName);
+  if (idx != m_Logged.InvalidIndex()) {
+    return;
+  }
 
-	m_Logged.Insert( fullPathFileName );
+  m_Logged.Insert(fullPathFileName);
 
-	// make it relative to our root directory
-	const char *relative = Q_stristr( fullPathFileName, m_szBaseDir );
-	if ( relative )
-	{
-		relative += ( Q_strlen( m_szBaseDir ) + 1 );
+  // make it relative to our root directory
+  const char *relative = Q_stristr(fullPathFileName, m_szBaseDir);
+  if (relative) {
+    relative += (Q_strlen(m_szBaseDir) + 1);
 
-		char rel[ MAX_PATH ];
-		Q_strncpy( rel, relative, sizeof( rel ) );
+    char rel[MAX_PATH];
+    Q_strncpy(rel, relative, sizeof(rel));
 #ifdef WIN32
-		Q_strlower( rel );
+    Q_strlower(rel);
 #endif
-		Q_FixSlashes( rel );
-		
-		LogToAllReslist( rel );
-	}
+    Q_FixSlashes(rel);
+
+    LogToAllReslist(rel);
+  }
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: callback function from filesystem
 //-----------------------------------------------------------------------------
-void CLogAllFiles::LogAllFilesFunc(const char *fullPathFileName, const char *options)
-{
-	g_LogFiles->LogFile( fullPathFileName, options );
+void CLogAllFiles::LogAllFilesFunc(const char *fullPathFileName,
+                                   const char *options) {
+  g_LogFiles->LogFile(fullPathFileName, options);
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Figure out if Steam is running, then load the GameOverlayRenderer.dll
+// Purpose: Figure out if Steam is running, then load the
+// GameOverlayRenderer.dll
 //-----------------------------------------------------------------------------
-void TryToLoadSteamOverlayDLL()
-{
+void TryToLoadSteamOverlayDLL() {
 // dimhotepus: NO_STEAM
-#if defined( WIN32 ) && !defined( NO_STEAM )
-	// First, check if the module is already loaded, perhaps because we were run from Steam directly
-	HMODULE hMod = GetModuleHandle( "GameOverlayRenderer" DLL_EXT_STRING );
-	if ( hMod )
-	{
-		return;
-	}
+#if defined(WIN32) && !defined(NO_STEAM)
+  // First, check if the module is already loaded, perhaps because we were run
+  // from Steam directly
+  HMODULE hMod = GetModuleHandle("GameOverlayRenderer" DLL_EXT_STRING);
+  if (hMod) {
+    return;
+  }
 
-	if ( 0 == GetEnvironmentVariableA( "SteamGameId", NULL, 0 ) )
-	{
-		// Initializing the Steam client API has the side effect of setting up the AppId
-		// which is immediately queried in GameOverlayRenderer.dll's DllMain entry point
-		if( SteamAPI_InitSafe() )
-		{
-			const char *pchSteamInstallPath = SteamAPI_GetSteamInstallPath();
-			if ( pchSteamInstallPath )
-			{
-				char rgchSteamPath[MAX_PATH];
-				V_ComposeFileName( pchSteamInstallPath, "GameOverlayRenderer" DLL_EXT_STRING, rgchSteamPath, Q_ARRAYSIZE(rgchSteamPath) );
-				// This could fail, but we can't fix it if it does so just ignore failures
-				LoadLibrary( rgchSteamPath );
-			
-			}
+  if (0 == GetEnvironmentVariableA("SteamGameId", NULL, 0)) {
+    // Initializing the Steam client API has the side effect of setting up the
+    // AppId which is immediately queried in GameOverlayRenderer.dll's DllMain
+    // entry point
+    if (SteamAPI_InitSafe()) {
+      const char *pchSteamInstallPath = SteamAPI_GetSteamInstallPath();
+      if (pchSteamInstallPath) {
+        char rgchSteamPath[MAX_PATH];
+        V_ComposeFileName(pchSteamInstallPath,
+                          "GameOverlayRenderer" DLL_EXT_STRING, rgchSteamPath,
+                          Q_ARRAYSIZE(rgchSteamPath));
+        // This could fail, but we can't fix it if it does so just ignore
+        // failures
+        LoadLibrary(rgchSteamPath);
+      }
 
-			SteamAPI_Shutdown();
-		}
-	}
+      SteamAPI_Shutdown();
+    }
+  }
 
 #endif
 }
 
 //-----------------------------------------------------------------------------
-// Inner loop: initialize, shutdown main systems, load steam to 
+// Inner loop: initialize, shutdown main systems, load steam to
 //-----------------------------------------------------------------------------
-class CSourceAppSystemGroup : public CSteamAppSystemGroup
-{
-public:
-  CSourceAppSystemGroup(  char (&baseDirectory)[MAX_PATH], bool bTextMode )
-		: m_pEngineApi(nullptr),
-		m_pHammer(nullptr),
-		m_pReslistgenerator(CreateReslistGenerator()),
-		m_bEditMode(false),
-		m_bTextMode(false)
-	{
-		Q_strcpy( m_szBaseDir, baseDirectory );
-	}
-	~CSourceAppSystemGroup()
-	{
-		DestroyReslistGenerator( m_pReslistgenerator );
-	}
+class CSourceAppSystemGroup : public CSteamAppSystemGroup {
+ public:
+  CSourceAppSystemGroup(char (&baseDirectory)[MAX_PATH], bool bTextMode)
+      : m_pEngineApi(nullptr),
+        m_pHammer(nullptr),
+        m_pReslistgenerator(CreateReslistGenerator()),
+        m_bEditMode(false),
+        m_bTextMode(false) {
+    Q_strcpy(m_szBaseDir, baseDirectory);
+  }
+  ~CSourceAppSystemGroup() { DestroyReslistGenerator(m_pReslistgenerator); }
 
-	// Methods of IApplication
-	virtual bool Create();
-	virtual bool PreInit();
-	virtual int Main();
-	virtual void PostShutdown();
-	virtual void Destroy();
+  // Methods of IApplication
+  virtual bool Create();
+  virtual bool PreInit();
+  virtual int Main();
+  virtual void PostShutdown();
+  virtual void Destroy();
 
-	bool ShouldContinueGenerateReslist();
+  bool ShouldContinueGenerateReslist();
 
-private:
-	const char *DetermineDefaultMod();
-	const char *DetermineDefaultGame();
+ private:
+  const char *DetermineDefaultMod();
+  const char *DetermineDefaultGame();
 
-	char m_szBaseDir[_MAX_PATH];
-	IEngineAPI *m_pEngineApi;
-	IHammer *m_pHammer;
-	IResListGenerator *m_pReslistgenerator;
-	bool m_bEditMode;
-	bool m_bTextMode;
+  char m_szBaseDir[_MAX_PATH];
+  IEngineAPI *m_pEngineApi;
+  IHammer *m_pHammer;
+  IResListGenerator *m_pReslistgenerator;
+  bool m_bEditMode;
+  bool m_bTextMode;
 };
-
 
 //-----------------------------------------------------------------------------
 // The dirty disk error report function
 //-----------------------------------------------------------------------------
-void ReportDirtyDiskNoMaterialSystem()
-{
-}
-
+void ReportDirtyDiskNoMaterialSystem() {}
 
 //-----------------------------------------------------------------------------
 // Instantiate all main libraries
 //-----------------------------------------------------------------------------
-bool CSourceAppSystemGroup::Create()
-{
-	double st = Plat_FloatTime();
+bool CSourceAppSystemGroup::Create() {
+  double st = Plat_FloatTime();
 
-	IFileSystem *pFileSystem = (IFileSystem*)FindSystem( FILESYSTEM_INTERFACE_VERSION );
-	pFileSystem->InstallDirtyDiskReportFunc( ReportDirtyDiskNoMaterialSystem );
+  IFileSystem *pFileSystem =
+      (IFileSystem *)FindSystem(FILESYSTEM_INTERFACE_VERSION);
+  pFileSystem->InstallDirtyDiskReportFunc(ReportDirtyDiskNoMaterialSystem);
 
 #ifdef WIN32
-	HRESULT hr{CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE )};
-	if ( FAILED(hr) )
-	{
-		Error("Unable to initialize COM: 0x%x.\n\n", hr );
-	}
+  HRESULT hr{
+      CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE)};
+  if (FAILED(hr)) {
+    Error("Unable to initialize COM: 0x%x.\n\n", hr);
+  }
 #endif
 
-	// Are we running in edit mode?
-	m_bEditMode = CommandLine()->CheckParm( "-edit" );
+  // Are we running in edit mode?
+  m_bEditMode = CommandLine()->CheckParm("-edit");
 
-	AppSystemInfo_t appSystems[] = 
-	{
-		{ "engine" DLL_EXT_STRING,			CVAR_QUERY_INTERFACE_VERSION },	// NOTE: This one must be first!!
-		{ "inputsystem" DLL_EXT_STRING,		INPUTSYSTEM_INTERFACE_VERSION },
-		{ "materialsystem" DLL_EXT_STRING,	MATERIAL_SYSTEM_INTERFACE_VERSION },
-		{ "datacache" DLL_EXT_STRING,		DATACACHE_INTERFACE_VERSION },
-		{ "datacache" DLL_EXT_STRING,		MDLCACHE_INTERFACE_VERSION },
-		{ "datacache" DLL_EXT_STRING,		STUDIO_DATA_CACHE_INTERFACE_VERSION },
-		{ "studiorender" DLL_EXT_STRING,	STUDIO_RENDER_INTERFACE_VERSION },
-		{ "vphysics" DLL_EXT_STRING,		VPHYSICS_INTERFACE_VERSION },
-		{ "video_services" DLL_EXT_STRING,  VIDEO_SERVICES_INTERFACE_VERSION },
-  
-		// NOTE: This has to occur before vgui2.dll so it replaces vgui2's surface implementation
-		{ "vguimatsurface" DLL_EXT_STRING,	VGUI_SURFACE_INTERFACE_VERSION },
-		{ "vgui2" DLL_EXT_STRING,			VGUI_IVGUI_INTERFACE_VERSION },
-		{ "engine" DLL_EXT_STRING,			VENGINE_LAUNCHER_API_VERSION },
+  AppSystemInfo_t appSystems[] = {
+      {"engine" DLL_EXT_STRING,
+       CVAR_QUERY_INTERFACE_VERSION},  // NOTE: This one must be first!!
+      {"inputsystem" DLL_EXT_STRING, INPUTSYSTEM_INTERFACE_VERSION},
+      {"materialsystem" DLL_EXT_STRING, MATERIAL_SYSTEM_INTERFACE_VERSION},
+      {"datacache" DLL_EXT_STRING, DATACACHE_INTERFACE_VERSION},
+      {"datacache" DLL_EXT_STRING, MDLCACHE_INTERFACE_VERSION},
+      {"datacache" DLL_EXT_STRING, STUDIO_DATA_CACHE_INTERFACE_VERSION},
+      {"studiorender" DLL_EXT_STRING, STUDIO_RENDER_INTERFACE_VERSION},
+      {"vphysics" DLL_EXT_STRING, VPHYSICS_INTERFACE_VERSION},
+      {"video_services" DLL_EXT_STRING, VIDEO_SERVICES_INTERFACE_VERSION},
 
-		{ "", "" }							// Required to terminate the list
-	};
+      // NOTE: This has to occur before vgui2.dll so it replaces vgui2's surface
+      // implementation
+      {"vguimatsurface" DLL_EXT_STRING, VGUI_SURFACE_INTERFACE_VERSION},
+      {"vgui2" DLL_EXT_STRING, VGUI_IVGUI_INTERFACE_VERSION},
+      {"engine" DLL_EXT_STRING, VENGINE_LAUNCHER_API_VERSION},
 
-#if defined( USE_SDL )
-	AddSystem( (IAppSystem *)CreateSDLMgr(), SDLMGR_INTERFACE_VERSION );
+      {"", ""}  // Required to terminate the list
+  };
+
+#if defined(USE_SDL)
+  AddSystem((IAppSystem *)CreateSDLMgr(), SDLMGR_INTERFACE_VERSION);
 #endif
 
-	if ( !AddSystems( appSystems ) ) 
-	{
-		Error("Please check game installed correctly.\n\n"
-			"Unable to add launcher systems from *" DLL_EXT_STRING
-			"s. Looks like required components are missed or broken." );
-	}
+  if (!AddSystems(appSystems)) {
+    Error(
+        "Please check game installed correctly.\n\n"
+        "Unable to add launcher systems from *" DLL_EXT_STRING
+        "s. Looks like required components are missed or broken.");
+  }
 
+  // This will be NULL for games that don't support VR. That's ok. Just don't
+  // load the DLL
+  AppModule_t sourceVRModule = LoadModule("sourcevr" DLL_EXT_STRING);
+  if (sourceVRModule != APP_MODULE_INVALID) {
+    AddSystem(sourceVRModule, SOURCE_VIRTUAL_REALITY_INTERFACE_VERSION);
+  }
 
-	// This will be NULL for games that don't support VR. That's ok. Just don't load the DLL
-	AppModule_t sourceVRModule = LoadModule( "sourcevr" DLL_EXT_STRING );
-	if( sourceVRModule != APP_MODULE_INVALID )
-	{
-		AddSystem( sourceVRModule, SOURCE_VIRTUAL_REALITY_INTERFACE_VERSION );
-	}
+  // pull in our filesystem dll to pull the queued loader from it, we need to do
+  // it this way due to the steam/stdio split for our steam filesystem
+  char pFileSystemDLL[MAX_PATH];
+  bool bSteam;
+  if (FileSystem_GetFileSystemDLLName(pFileSystemDLL, bSteam) != FS_OK)
+    return false;
 
-	// pull in our filesystem dll to pull the queued loader from it, we need to do it this way due to the 
-	// steam/stdio split for our steam filesystem
-	char pFileSystemDLL[MAX_PATH];
-	bool bSteam;
-	if ( FileSystem_GetFileSystemDLLName( pFileSystemDLL, bSteam ) != FS_OK )
-		return false;
+  AppModule_t fileSystemModule = LoadModule(pFileSystemDLL);
+  AddSystem(fileSystemModule, QUEUEDLOADER_INTERFACE_VERSION);
 
-	AppModule_t fileSystemModule = LoadModule( pFileSystemDLL );
-	AddSystem( fileSystemModule, QUEUEDLOADER_INTERFACE_VERSION );
-
-	// Hook in datamodel and p4 control if we're running with -tools
-	if ( IsPC() && ( ( CommandLine()->FindParm( "-tools" ) && !CommandLine()->FindParm( "-nop4" ) ) || CommandLine()->FindParm( "-p4" ) ) )
-	{
+  // Hook in datamodel and p4 control if we're running with -tools
+  if (IsPC() && ((CommandLine()->FindParm("-tools") &&
+                  !CommandLine()->FindParm("-nop4")) ||
+                 CommandLine()->FindParm("-p4"))) {
 #ifdef STAGING_ONLY
-		AppModule_t p4libModule = LoadModule( "p4lib" DLL_EXT_STRING );
-		IP4 *p4 = (IP4*)AddSystem( p4libModule, P4_INTERFACE_VERSION );
-		
-		// If we are running with -steam then that means the tools are being used by an SDK user. Don't exit in this case!
-		if ( !p4 && !CommandLine()->FindParm( "-steam" ) )
-		{
-			return false;
-		}
-#endif // STAGING_ONLY
+    AppModule_t p4libModule = LoadModule("p4lib" DLL_EXT_STRING);
+    IP4 *p4 = (IP4 *)AddSystem(p4libModule, P4_INTERFACE_VERSION);
 
-		AppModule_t vstdlibModule = LoadModule( "vstdlib" DLL_EXT_STRING );
-		IProcessUtils *processUtils = ( IProcessUtils* )AddSystem( vstdlibModule, PROCESS_UTILS_INTERFACE_VERSION );
-		if ( !processUtils )
-			return false;
-	}
+    // If we are running with -steam then that means the tools are being used by
+    // an SDK user. Don't exit in this case!
+    if (!p4 && !CommandLine()->FindParm("-steam")) {
+      return false;
+    }
+#endif  // STAGING_ONLY
 
-	// Connect to iterfaces loaded in AddSystems that we need locally
-	IMaterialSystem *pMaterialSystem = (IMaterialSystem*)FindSystem( MATERIAL_SYSTEM_INTERFACE_VERSION );
-	if ( !pMaterialSystem )
-		return false;
+    AppModule_t vstdlibModule = LoadModule("vstdlib" DLL_EXT_STRING);
+    IProcessUtils *processUtils = (IProcessUtils *)AddSystem(
+        vstdlibModule, PROCESS_UTILS_INTERFACE_VERSION);
+    if (!processUtils) return false;
+  }
 
-	m_pEngineApi = (IEngineAPI*)FindSystem( VENGINE_LAUNCHER_API_VERSION );
+  // Connect to iterfaces loaded in AddSystems that we need locally
+  IMaterialSystem *pMaterialSystem =
+      (IMaterialSystem *)FindSystem(MATERIAL_SYSTEM_INTERFACE_VERSION);
+  if (!pMaterialSystem) return false;
 
-	// Load the hammer DLL if we're in editor mode
-#if defined( _WIN32 ) && defined( STAGING_ONLY )
-	if ( m_bEditMode )
-	{
-		AppModule_t hammerModule = LoadModule( "hammer_dll" DLL_EXT_STRING );
-		g_pHammer = (IHammer*)AddSystem( hammerModule, INTERFACEVERSION_HAMMER );
-		if ( !g_pHammer )
-		{
-			return false;
-		}
-	}
-#endif // defined( _WIN32 ) && defined( STAGING_ONLY )
+  m_pEngineApi = (IEngineAPI *)FindSystem(VENGINE_LAUNCHER_API_VERSION);
 
-	// Load up the appropriate shader DLL
-	// This has to be done before connection.
-	char const* pDLLName = "shaderapidx9" DLL_EXT_STRING;
-	if ( CommandLine()->FindParm( "-noshaderapi" ) )
-	{
-		pDLLName = "shaderapiempty" DLL_EXT_STRING;
-	}
-	// dimhotepus: Allow to override shader API DLL.
-	const char *pArg = nullptr;
-	if ( CommandLine()->CheckParm( "-shaderapi", &pArg ))
-	{
-		pDLLName = pArg;
-	}
-	pMaterialSystem->SetShaderAPI( pDLLName );
-	// dimhotepus: Detect missed shader API.
-	if ( !pMaterialSystem->HasShaderAPI() )
-	{
-		Error("Please check game installed correctly.\n\n"
-			"Unable to set shader API %s. Looks like required components are missed or broken.", pDLLName );
-	}
+  // Load the hammer DLL if we're in editor mode
+#if defined(_WIN32) && defined(STAGING_ONLY)
+  if (m_bEditMode) {
+    AppModule_t hammerModule = LoadModule("hammer_dll" DLL_EXT_STRING);
+    g_pHammer = (IHammer *)AddSystem(hammerModule, INTERFACEVERSION_HAMMER);
+    if (!g_pHammer) {
+      return false;
+    }
+  }
+#endif  // defined( _WIN32 ) && defined( STAGING_ONLY )
 
-	double elapsed = Plat_FloatTime() - st;
-	COM_TimestampedLog( "CSourceAppSystemGroup::Create:  Took %.4f secs to load libraries and get factories.", (float)elapsed );
+  // Load up the appropriate shader DLL
+  // This has to be done before connection.
+  char const *pDLLName = "shaderapidx9" DLL_EXT_STRING;
+  if (CommandLine()->FindParm("-noshaderapi")) {
+    pDLLName = "shaderapiempty" DLL_EXT_STRING;
+  }
+  // dimhotepus: Allow to override shader API DLL.
+  const char *pArg = nullptr;
+  if (CommandLine()->CheckParm("-shaderapi", &pArg)) {
+    pDLLName = pArg;
+  }
+  pMaterialSystem->SetShaderAPI(pDLLName);
+  // dimhotepus: Detect missed shader API.
+  if (!pMaterialSystem->HasShaderAPI()) {
+    Error(
+        "Please check game installed correctly.\n\n"
+        "Unable to set shader API %s. Looks like required components are "
+        "missed or broken.",
+        pDLLName);
+  }
 
-	return true;
+  double elapsed = Plat_FloatTime() - st;
+  COM_TimestampedLog(
+      "CSourceAppSystemGroup::Create:  Took %.4f secs to load libraries and "
+      "get factories.",
+      (float)elapsed);
+
+  return true;
 }
 
-bool CSourceAppSystemGroup::PreInit()
-{
-	CreateInterfaceFn factory = GetFactory();
-	ConnectTier1Libraries( &factory, 1 );
-	ConVar_Register( );
-	ConnectTier2Libraries( &factory, 1 );
-	ConnectTier3Libraries( &factory, 1 );
+bool CSourceAppSystemGroup::PreInit() {
+  CreateInterfaceFn factory = GetFactory();
+  ConnectTier1Libraries(&factory, 1);
+  ConVar_Register();
+  ConnectTier2Libraries(&factory, 1);
+  ConnectTier3Libraries(&factory, 1);
 
-	if ( !g_pFullFileSystem || !g_pMaterialSystem )
-		return false;
+  if (!g_pFullFileSystem || !g_pMaterialSystem) return false;
 
-	CFSSteamSetupInfo steamInfo;
-	steamInfo.m_bToolsMode = false;
-	steamInfo.m_bSetSteamDLLPath = false;
-	steamInfo.m_bSteam = g_pFullFileSystem->IsSteam();
-	steamInfo.m_bOnlyUseDirectoryName = true;
-	steamInfo.m_pDirectoryName = DetermineDefaultMod();
-	if ( !steamInfo.m_pDirectoryName )
-	{
-		steamInfo.m_pDirectoryName = DetermineDefaultGame();
-		if ( !steamInfo.m_pDirectoryName )
-		{
-			Error( "FileSystem_LoadFileSystemModule: no -defaultgamedir or -game specified." );
-		}
-	}
-	if ( FileSystem_SetupSteamEnvironment( steamInfo ) != FS_OK )
-		return false;
+  CFSSteamSetupInfo steamInfo;
+  steamInfo.m_bToolsMode = false;
+  steamInfo.m_bSetSteamDLLPath = false;
+  steamInfo.m_bSteam = g_pFullFileSystem->IsSteam();
+  steamInfo.m_bOnlyUseDirectoryName = true;
+  steamInfo.m_pDirectoryName = DetermineDefaultMod();
+  if (!steamInfo.m_pDirectoryName) {
+    steamInfo.m_pDirectoryName = DetermineDefaultGame();
+    if (!steamInfo.m_pDirectoryName) {
+      Error(
+          "FileSystem_LoadFileSystemModule: no -defaultgamedir or -game "
+          "specified.");
+    }
+  }
+  if (FileSystem_SetupSteamEnvironment(steamInfo) != FS_OK) return false;
 
-	CFSMountContentInfo fsInfo;
-	fsInfo.m_pFileSystem = g_pFullFileSystem;
-	fsInfo.m_bToolsMode = m_bEditMode;
-	fsInfo.m_pDirectoryName = steamInfo.m_GameInfoPath;
-	if ( FileSystem_MountContent( fsInfo ) != FS_OK )
-		return false;
+  CFSMountContentInfo fsInfo;
+  fsInfo.m_pFileSystem = g_pFullFileSystem;
+  fsInfo.m_bToolsMode = m_bEditMode;
+  fsInfo.m_pDirectoryName = steamInfo.m_GameInfoPath;
+  if (FileSystem_MountContent(fsInfo) != FS_OK) return false;
 
-	if ( IsPC() )
-	{
-		fsInfo.m_pFileSystem->AddSearchPath( "platform", "PLATFORM" );
+  if (IsPC()) {
+    fsInfo.m_pFileSystem->AddSearchPath("platform", "PLATFORM");
 
-		// This will get called multiple times due to being here, but only the first one will do anything
-		m_pReslistgenerator->Init( m_szBaseDir, CommandLine()->ParmValue( "-game", "hl2" ) );
+    // This will get called multiple times due to being here, but only the first
+    // one will do anything
+    m_pReslistgenerator->Init(m_szBaseDir,
+                              CommandLine()->ParmValue("-game", "hl2"));
 
-		// This will also get called each time, but will actually fix up the command line as needed
-		m_pReslistgenerator->SetupCommandLine();
-	}
-	
-	Assert( !g_LogFiles );
+    // This will also get called each time, but will actually fix up the command
+    // line as needed
+    m_pReslistgenerator->SetupCommandLine();
+  }
 
-	g_LogFiles = new CLogAllFiles();
-	// FIXME: Logfiles is mod-specific, needs to move into the engine.
-	g_LogFiles->Init( m_szBaseDir );
+  Assert(!g_LogFiles);
 
-	// Required to run through the editor
-	if ( m_bEditMode )
-	{
-		g_pMaterialSystem->EnableEditorMaterials();	
-	}
+  g_LogFiles = new CLogAllFiles();
+  // FIXME: Logfiles is mod-specific, needs to move into the engine.
+  g_LogFiles->Init(m_szBaseDir);
 
-	StartupInfo_t info;
-	info.m_pInstance = GetAppInstance();
-	info.m_pBaseDirectory = m_szBaseDir;
-	info.m_pInitialMod = DetermineDefaultMod();
-	info.m_pInitialGame = DetermineDefaultGame();
-	info.m_pParentAppSystemGroup = this;
-	info.m_bTextMode = m_bTextMode;
+  // Required to run through the editor
+  if (m_bEditMode) {
+    g_pMaterialSystem->EnableEditorMaterials();
+  }
 
-	m_pEngineApi->SetStartupInfo( info );
+  StartupInfo_t info;
+  info.m_pInstance = GetAppInstance();
+  info.m_pBaseDirectory = m_szBaseDir;
+  info.m_pInitialMod = DetermineDefaultMod();
+  info.m_pInitialGame = DetermineDefaultGame();
+  info.m_pParentAppSystemGroup = this;
+  info.m_bTextMode = m_bTextMode;
 
-	return true;
+  m_pEngineApi->SetStartupInfo(info);
+
+  return true;
 }
 
-int CSourceAppSystemGroup::Main()
-{
-	return m_pEngineApi->Run();
+int CSourceAppSystemGroup::Main() { return m_pEngineApi->Run(); }
+
+void CSourceAppSystemGroup::PostShutdown() {
+  // FIXME: Logfiles is mod-specific, needs to move into the engine.
+  g_LogFiles->Shutdown();
+  // dimhotepus: Fix log files leak.
+  delete g_LogFiles;
+  g_LogFiles = nullptr;
+
+  if (IsPC()) {
+    m_pReslistgenerator->Shutdown();
+  }
+
+  DisconnectTier3Libraries();
+  DisconnectTier2Libraries();
+  ConVar_Unregister();
+  DisconnectTier1Libraries();
 }
 
-void CSourceAppSystemGroup::PostShutdown()
-{
-	// FIXME: Logfiles is mod-specific, needs to move into the engine.
-	g_LogFiles->Shutdown();
-	// dimhotepus: Fix log files leak.
-	delete g_LogFiles;
-	g_LogFiles = nullptr;
-
-	if ( IsPC() )
-	{
-		m_pReslistgenerator->Shutdown();
-	}
-
-	DisconnectTier3Libraries();
-	DisconnectTier2Libraries();
-	ConVar_Unregister( );
-	DisconnectTier1Libraries();
-}
-
-void CSourceAppSystemGroup::Destroy() 
-{
-	m_pEngineApi = NULL;
-	g_pMaterialSystem = NULL;
-	m_pHammer = NULL;
+void CSourceAppSystemGroup::Destroy() {
+  m_pEngineApi = NULL;
+  g_pMaterialSystem = NULL;
+  m_pHammer = NULL;
 
 #ifdef WIN32
-	CoUninitialize();
+  CoUninitialize();
 #endif
 }
 
-bool CSourceAppSystemGroup::ShouldContinueGenerateReslist()
-{
+bool CSourceAppSystemGroup::ShouldContinueGenerateReslist() {
   return m_pReslistgenerator->ShouldContinue();
 }
-
 
 //-----------------------------------------------------------------------------
 // Determines the initial mod to use at load time.
 // We eventually (hopefully) will be able to switch mods at runtime
 // because the engine/hammer integration really wants this feature.
 //-----------------------------------------------------------------------------
-const char *CSourceAppSystemGroup::DetermineDefaultMod()
-{
-	if ( !m_bEditMode )
-	{   		 
-		return CommandLine()->ParmValue( "-game", DEFAULT_HL2_GAMEDIR );
-	}
-	return m_pHammer->GetDefaultMod();
+const char *CSourceAppSystemGroup::DetermineDefaultMod() {
+  if (!m_bEditMode) {
+    return CommandLine()->ParmValue("-game", DEFAULT_HL2_GAMEDIR);
+  }
+  return m_pHammer->GetDefaultMod();
 }
 
-const char *CSourceAppSystemGroup::DetermineDefaultGame()
-{
-	if ( !m_bEditMode )
-	{
-		return CommandLine()->ParmValue( "-defaultgamedir", DEFAULT_HL2_GAMEDIR );
-	}
-	return m_pHammer->GetDefaultGame();
+const char *CSourceAppSystemGroup::DetermineDefaultGame() {
+  if (!m_bEditMode) {
+    return CommandLine()->ParmValue("-defaultgamedir", DEFAULT_HL2_GAMEDIR);
+  }
+  return m_pHammer->GetDefaultGame();
 }
 
 //-----------------------------------------------------------------------------
 // MessageBox for SDL/OSX
 //-----------------------------------------------------------------------------
-#if defined( USE_SDL ) && !defined( _WIN32 )
+#if defined(USE_SDL) && !defined(_WIN32)
 
-int MessageBox( HWND hWnd, const char *message, const char *header, unsigned uType )
-{
-	SDL_ShowSimpleMessageBox( 0, header, message, GetAssertDialogParent() );
-	return 0;
+int MessageBox(HWND hWnd, const char *message, const char *header,
+               unsigned uType) {
+  SDL_ShowSimpleMessageBox(0, header, message, GetAssertDialogParent());
+  return 0;
 }
 
 #endif
 
 // Remove all but the last -game parameter.
-// This is for mods based off something other than Half-Life 2 (like HL2MP mods).
-// The Steam UI does 'steam -applaunch 320 -game c:\steam\steamapps\sourcemods\modname', but applaunch inserts
-// its own -game parameter, which would supercede the one we really want if we didn't intercede here.
-void RemoveSpuriousGameParameters()
-{
-	// Find the last -game parameter.
-	int nGameArgs = 0;
-	char lastGameArg[MAX_PATH];
-	for ( int i=0; i < CommandLine()->ParmCount()-1; i++ )
-	{
-		if ( Q_stricmp( CommandLine()->GetParm( i ), "-game" ) == 0 )
-		{
-			Q_snprintf( lastGameArg, sizeof( lastGameArg ), "\"%s\"", CommandLine()->GetParm( i+1 ) );
-			++nGameArgs;
-			++i;
-		}
-	}
+// This is for mods based off something other than Half-Life 2 (like HL2MP
+// mods). The Steam UI does 'steam -applaunch 320 -game
+// c:\steam\steamapps\sourcemods\modname', but applaunch inserts its own -game
+// parameter, which would supercede the one we really want if we didn't
+// intercede here.
+void RemoveSpuriousGameParameters() {
+  // Find the last -game parameter.
+  int nGameArgs = 0;
+  char lastGameArg[MAX_PATH];
+  for (int i = 0; i < CommandLine()->ParmCount() - 1; i++) {
+    if (Q_stricmp(CommandLine()->GetParm(i), "-game") == 0) {
+      Q_snprintf(lastGameArg, sizeof(lastGameArg), "\"%s\"",
+                 CommandLine()->GetParm(i + 1));
+      ++nGameArgs;
+      ++i;
+    }
+  }
 
-	// We only care if > 1 was specified.
-	if ( nGameArgs > 1 )
-	{
-		CommandLine()->RemoveParm( "-game" );
-		CommandLine()->AppendParm( "-game", lastGameArg );
-	}
+  // We only care if > 1 was specified.
+  if (nGameArgs > 1) {
+    CommandLine()->RemoveParm("-game");
+    CommandLine()->AppendParm("-game", lastGameArg);
+  }
 }
 
-class CScopedAppLocale
-{
-public:
-  CScopedAppLocale( const char *newLocale ) noexcept
-	  : oldLocale_{ CurrentLocale() }, newLocale_{ newLocale }
-  {
+class CScopedAppLocale {
+ public:
+  CScopedAppLocale(const char *newLocale) noexcept
+      : oldLocale_{CurrentLocale()}, newLocale_{newLocale} {
 #ifdef LINUX
     setenv("LC_ALL", newLocale, 1);
 #endif
 
-	std::setlocale( LC_ALL, newLocale );
+    std::setlocale(LC_ALL, newLocale);
   }
 
-  static const char* CurrentLocale() noexcept
-  {
-    const char *locale{ std::setlocale( LC_ALL, nullptr ) };
+  static const char *CurrentLocale() noexcept {
+    const char *locale{std::setlocale(LC_ALL, nullptr)};
     return locale ? locale : emptyLocale_;
   }
 
-  ~CScopedAppLocale() noexcept
-  {
-		const char *locale { CurrentLocale() };
-		if ( !Q_strcmp( locale, newLocale_.c_str() ) )
-		{
-			std::setlocale( LC_ALL, oldLocale_.c_str() );
-		}
+  ~CScopedAppLocale() noexcept {
+    const char *locale{CurrentLocale()};
+    if (!Q_strcmp(locale, newLocale_.c_str())) {
+      std::setlocale(LC_ALL, oldLocale_.c_str());
+    }
   }
 
-private:
+ private:
   std::string oldLocale_, newLocale_;
 
   static constexpr char emptyLocale_[1]{""};
 };
 
 #ifdef WIN32
-class CScopedWinsock
-{
-public:
-    CScopedWinsock( unsigned short version )
-		: errc_{::WSAStartup( version, &wsaData_ )}, version_{version}
-	{
-	}
+class CScopedWinsock {
+ public:
+  CScopedWinsock(unsigned short version)
+      : errc_{::WSAStartup(version, &wsaData_)}, version_{version} {}
 
-	[[nodiscard]]
-	int errc() const noexcept
-	{
-		return errc_;
-	}
+  [[nodiscard]] int errc() const noexcept { return errc_; }
 
-	CScopedWinsock(CScopedWinsock &) = delete;
-    CScopedWinsock(CScopedWinsock &&) = delete;
-	CScopedWinsock& operator=(const CScopedWinsock &) = delete;
-	CScopedWinsock& operator=(CScopedWinsock &&) = delete;
+  CScopedWinsock(CScopedWinsock &) = delete;
+  CScopedWinsock(CScopedWinsock &&) = delete;
+  CScopedWinsock &operator=(const CScopedWinsock &) = delete;
+  CScopedWinsock &operator=(CScopedWinsock &&) = delete;
 
-	~CScopedWinsock() noexcept
-	{
-		if (!errc_)
-		{
-			const int rc{ ::WSACleanup() };
-			if ( rc )
-			{
-				Warning( "Windows sockets shutdown failure (%d): %s.\n",
-					rc, std::system_category().message(rc).c_str() );
-			}
-		}
-	}
+  ~CScopedWinsock() noexcept {
+    if (!errc_) {
+      const int rc{::WSACleanup()};
+      if (rc) {
+        Warning("Windows sockets shutdown failure (%d): %s.\n", rc,
+                std::system_category().message(rc).c_str());
+      }
+    }
+  }
 
-private:
-	WSAData wsaData_;
-	const int errc_;
-	const unsigned short version_;
+ private:
+  WSAData wsaData_;
+  const int errc_;
+  const unsigned short version_;
 };
 #endif
 
-class CScopedAppRelaunch
-{
-public:
-	CScopedAppRelaunch() noexcept
-	{
+class CScopedAppRelaunch {
+ public:
+  CScopedAppRelaunch() noexcept {
 #ifndef WIN32
-		struct stat st;
-		if ( !stat( RELAUNCH_FILE, &st ) ) {
-			unlink( RELAUNCH_FILE );
-		}
+    struct stat st;
+    if (!stat(RELAUNCH_FILE, &st)) {
+      unlink(RELAUNCH_FILE);
+    }
 #endif
-	}
+  }
 
-	CScopedAppRelaunch(CScopedAppRelaunch &) = delete;
-	CScopedAppRelaunch(CScopedAppRelaunch &&) = delete;
-	CScopedAppRelaunch& operator=(const CScopedAppRelaunch &) = delete;
-	CScopedAppRelaunch& operator=(CScopedAppRelaunch &&) = delete;
+  CScopedAppRelaunch(CScopedAppRelaunch &) = delete;
+  CScopedAppRelaunch(CScopedAppRelaunch &&) = delete;
+  CScopedAppRelaunch &operator=(const CScopedAppRelaunch &) = delete;
+  CScopedAppRelaunch &operator=(CScopedAppRelaunch &&) = delete;
 
-	~CScopedAppRelaunch() noexcept
-	{
+  ~CScopedAppRelaunch() noexcept {
 #ifndef WIN32
-		struct stat st;
-		if ( stat( RELAUNCH_FILE, &st ) ) 
-		{
-			return;
-		}
+    struct stat st;
+    if (stat(RELAUNCH_FILE, &st)) {
+      return;
+    }
 
-		FILE *fp = fopen( RELAUNCH_FILE, "r" );
-		if ( fp )
-		{
-			char szCmd[256];
-			int nChars = fread( szCmd, 1, sizeof(szCmd), fp );
+    FILE *fp = fopen(RELAUNCH_FILE, "r");
+    if (fp) {
+      char szCmd[256];
+      int nChars = fread(szCmd, 1, sizeof(szCmd), fp);
 
-			fclose( fp );
+      fclose(fp);
 
-			if ( nChars > 0 )
-			{
-				if ( nChars > (sizeof(szCmd)-1) )
-				{
-					nChars = (sizeof(szCmd)-1);
-				}
-				szCmd[nChars] = 0;
-				char szOpenLine[ MAX_PATH ];
-
-				#if defined( LINUX )
-					Q_snprintf( szOpenLine, sizeof(szOpenLine), "xdg-open \"%s\"", szCmd );
-				#else
-					Q_snprintf( szOpenLine, sizeof(szOpenLine), "open \"%s\"", szCmd );
-				#endif
-
-				system( szOpenLine );
-			}
-		}
-#else
-		// Now that the mutex has been released, check HKEY_CURRENT_USER\Software\Valve\Source\Relaunch URL. If there is a URL here, exec it.
-		// This supports the capability of immediately re-launching the the game via Steam in a different audio language 
-		HKEY hKey; 
-		if ( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS )
-		{
-			char szValue[MAX_PATH];
-			DWORD dwValueLen = MAX_PATH;
-
-			if ( RegQueryValueEx( hKey, "Relaunch URL", NULL, NULL, (unsigned char*)szValue, &dwValueLen ) == ERROR_SUCCESS )
-			{
-				ShellExecute (0, "open", szValue, 0, 0, SW_SHOW);
-				RegDeleteValue( hKey, "Relaunch URL" );
-			}
-
-			RegCloseKey(hKey);
-		}
-#endif
-	}
-
-private:
-	static constexpr char RELAUNCH_FILE[18] = {"/tmp/hl2_relaunch"};
-};
-
-class CScopedAppMultiRun
-{
-public:
-	CScopedAppMultiRun() noexcept
-#if defined(WIN32)
-		// don't allow more than one instance to run
-		: mutex_{ ::CreateMutex( nullptr, FALSE, TEXT("hl2_singleton_mutex") ) }
-#endif
-	{
-#if defined(WIN32)
-		if ( mutex_ )
-		{
-			const DWORD waitResult{ ::WaitForSingleObject(mutex_, 0) };
-
-			// Here, we have the mutex
-			if (waitResult == WAIT_OBJECT_0 || waitResult == WAIT_ABANDONED)
-				return;
-
-			// couldn't get the mutex, we must be running another instance
-			::CloseHandle( mutex_ );
-			mutex_ = nullptr;
-		}
-#else
-	// Under OSX use flock in /tmp/source_engine_<game>.lock, create
-	// the file if it doesn't exist
-	const char *gameArg =
-		CommandLine()->ParmValue("-game", DEFAULT_HL2_GAMEDIR);
-
-	CRC32_t gameCRC;
-	CRC32_Init(&gameCRC);
-	CRC32_ProcessBuffer(&gameCRC, gameArg, Q_strlen(gameArg));
-	CRC32_Final(&gameCRC);
+      if (nChars > 0) {
+        if (nChars > (sizeof(szCmd) - 1)) {
+          nChars = (sizeof(szCmd) - 1);
+        }
+        szCmd[nChars] = 0;
+        char szOpenLine[MAX_PATH];
 
 #if defined(LINUX)
-	// Check TMPDIR environment variable for temp directory.
-	const char *tmpdir{ getenv("TMPDIR") };
-
-	// If it's NULL, or it doesn't exist, or it isn't a directory,
-	// fallback to /tmp.
-	struct stat buf;
-	if (!tmpdir || stat(tmpdir, &buf) || !S_ISDIR(buf.st_mode))
-		tmpdir = "/tmp";
-
-	V_snprintf(lockFileName_, sizeof(lockFileName_),
-				"%s/source_engine_%u.lock", tmpdir, gameCRC);
-
-	lockHandle_ = open(lockFileName_, O_WRONLY | O_CREAT, 0666);
-	if (lockHandle_ == -1) {
-		fprintf(stderr,
-			"open(%s) failed: %s\n",
-			lockFileName_,
-			std::generic_category().message(errno));
-		return;
-	}
-
-	// dimhotepus: Looks like CS:GO do this.
-	// In case we have a umask setting creation to something other
-	// than 0666, force it to 0666 so we don't lock other users out
-	// of the game if the game dies etc.
-	if (fchmod(lockHandle_, 0666) == -1) {
-		fprintf(stderr,
-			"fchmod(%s, %d) failed: %s\n",
-			lockFileName_,
-			0666,
-			std::generic_category().message(errno));
-		close(lockHandle_);
-		lockHandle_ = -1;
-		return;
-	}
-
-	struct flock fl;
-	fl.l_type = F_WRLCK;
-	fl.l_whence = SEEK_SET;
-	fl.l_start = 0;
-	fl.l_len = 1;
-
-	if (fcntl(lockHandle_, F_SETLK, &fl) == -1) {
-		fprintf(stderr,
-			"fcntl(%s) failed: %s\n",
-			lockFileName_,
-			std::generic_category().message(errno));
-		close(lockHandle_);
-		lockHandle_ = -1;
-		return;
-	}
+        Q_snprintf(szOpenLine, sizeof(szOpenLine), "xdg-open \"%s\"", szCmd);
 #else
-	V_snprintf(lockFileName_, sizeof(lockFileName_),
-				"/tmp/source_engine_%u.lock", gameCRC);
+        Q_snprintf(szOpenLine, sizeof(szOpenLine), "open \"%s\"", szCmd);
+#endif
 
-	lockHandle_ = open(
-		lockFileName_,
-		O_CREAT | O_WRONLY | O_EXLOCK | O_NONBLOCK | O_TRUNC, 0777);
-	if (lockHandle_ >= 0) {
-		// make sure we give full perms to the file, we only one
-		// instance per machine
-		if (fchmod(lockHandle_, 0777) < 0) {
-			fprintf(stderr,
-				"fchmod(%s, %d) failed: %s\n",
-				lockFileName_,
-				0777,
-				std::generic_category().message(errno));
-			close(lockHandle_);
-			lockHandle_ = -1;
-			return;
-		}
+        system(szOpenLine);
+      }
+    }
+#else
+    // Now that the mutex has been released, check
+    // HKEY_CURRENT_USER\Software\Valve\Source\Relaunch URL. If there is a URL
+    // here, exec it. This supports the capability of immediately re-launching
+    // the the game via Steam in a different audio language
+    HKEY hKey;
+    if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL,
+                     KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS) {
+      char szValue[MAX_PATH];
+      DWORD dwValueLen = MAX_PATH;
 
-		// we leave the file open, under unix rules when we die we'll
-		// automatically close and remove the locks
-		return;
-	}
+      if (RegQueryValueEx(hKey, "Relaunch URL", NULL, NULL,
+                          (unsigned char *)szValue,
+                          &dwValueLen) == ERROR_SUCCESS) {
+        ShellExecute(0, "open", szValue, 0, 0, SW_SHOW);
+        RegDeleteValue(hKey, "Relaunch URL");
+      }
 
-	// We were unable to open the file, it should be because we are
-	// unable to retain a lock
-	if (errno != EWOULDBLOCK) {
-		fprintf(stderr,
-			"open(%s) failed: %s\n",
-			lockFileName_,
-			std::generic_category().message(errno) );
-	}
+      RegCloseKey(hKey);
+    }
+#endif
+  }
+
+ private:
+  static constexpr char RELAUNCH_FILE[18] = {"/tmp/hl2_relaunch"};
+};
+
+class CScopedAppMultiRun {
+ public:
+  CScopedAppMultiRun() noexcept
+#if defined(WIN32)
+      // don't allow more than one instance to run
+      : mutex_{::CreateMutex(nullptr, FALSE, TEXT("hl2_singleton_mutex"))}
+#endif
+  {
+#if defined(WIN32)
+    if (mutex_) {
+      const DWORD waitResult{::WaitForSingleObject(mutex_, 0)};
+
+      // Here, we have the mutex
+      if (waitResult == WAIT_OBJECT_0 || waitResult == WAIT_ABANDONED) return;
+
+      // couldn't get the mutex, we must be running another instance
+      ::CloseHandle(mutex_);
+      mutex_ = nullptr;
+    }
+#else
+    // Under OSX use flock in /tmp/source_engine_<game>.lock, create
+    // the file if it doesn't exist
+    const char *gameArg =
+        CommandLine()->ParmValue("-game", DEFAULT_HL2_GAMEDIR);
+
+    CRC32_t gameCRC;
+    CRC32_Init(&gameCRC);
+    CRC32_ProcessBuffer(&gameCRC, gameArg, Q_strlen(gameArg));
+    CRC32_Final(&gameCRC);
+
+#if defined(LINUX)
+    // Check TMPDIR environment variable for temp directory.
+    const char *tmpdir{getenv("TMPDIR")};
+
+    // If it's NULL, or it doesn't exist, or it isn't a directory,
+    // fallback to /tmp.
+    struct stat buf;
+    if (!tmpdir || stat(tmpdir, &buf) || !S_ISDIR(buf.st_mode)) tmpdir = "/tmp";
+
+    V_snprintf(lockFileName_, sizeof(lockFileName_), "%s/source_engine_%u.lock",
+               tmpdir, gameCRC);
+
+    lockHandle_ = open(lockFileName_, O_WRONLY | O_CREAT, 0666);
+    if (lockHandle_ == -1) {
+      fprintf(stderr, "open(%s) failed: %s\n", lockFileName_,
+              std::generic_category().message(errno));
+      return;
+    }
+
+    // dimhotepus: Looks like CS:GO do this.
+    // In case we have a umask setting creation to something other
+    // than 0666, force it to 0666 so we don't lock other users out
+    // of the game if the game dies etc.
+    if (fchmod(lockHandle_, 0666) == -1) {
+      fprintf(stderr, "fchmod(%s, %d) failed: %s\n", lockFileName_, 0666,
+              std::generic_category().message(errno));
+      close(lockHandle_);
+      lockHandle_ = -1;
+      return;
+    }
+
+    struct flock fl;
+    fl.l_type = F_WRLCK;
+    fl.l_whence = SEEK_SET;
+    fl.l_start = 0;
+    fl.l_len = 1;
+
+    if (fcntl(lockHandle_, F_SETLK, &fl) == -1) {
+      fprintf(stderr, "fcntl(%s) failed: %s\n", lockFileName_,
+              std::generic_category().message(errno));
+      close(lockHandle_);
+      lockHandle_ = -1;
+      return;
+    }
+#else
+    V_snprintf(lockFileName_, sizeof(lockFileName_),
+               "/tmp/source_engine_%u.lock", gameCRC);
+
+    lockHandle_ =
+        open(lockFileName_,
+             O_CREAT | O_WRONLY | O_EXLOCK | O_NONBLOCK | O_TRUNC, 0777);
+    if (lockHandle_ >= 0) {
+      // make sure we give full perms to the file, we only one
+      // instance per machine
+      if (fchmod(lockHandle_, 0777) < 0) {
+        fprintf(stderr, "fchmod(%s, %d) failed: %s\n", lockFileName_, 0777,
+                std::generic_category().message(errno));
+        close(lockHandle_);
+        lockHandle_ = -1;
+        return;
+      }
+
+      // we leave the file open, under unix rules when we die we'll
+      // automatically close and remove the locks
+      return;
+    }
+
+    // We were unable to open the file, it should be because we are
+    // unable to retain a lock
+    if (errno != EWOULDBLOCK) {
+      fprintf(stderr, "open(%s) failed: %s\n", lockFileName_,
+              std::generic_category().message(errno));
+    }
 #endif  // OSX
 #endif  // !WIN32
-	}
+  }
 
-	CScopedAppMultiRun(CScopedAppMultiRun &) = delete;
-    CScopedAppMultiRun(CScopedAppMultiRun &&) = delete;
-	CScopedAppMultiRun& operator=(const CScopedAppMultiRun &) = delete;
-	CScopedAppMultiRun& operator=(CScopedAppMultiRun &&) = delete;
+  CScopedAppMultiRun(CScopedAppMultiRun &) = delete;
+  CScopedAppMultiRun(CScopedAppMultiRun &&) = delete;
+  CScopedAppMultiRun &operator=(const CScopedAppMultiRun &) = delete;
+  CScopedAppMultiRun &operator=(CScopedAppMultiRun &&) = delete;
 
-	bool IsSingleRun() const noexcept
-	{
+  bool IsSingleRun() const noexcept {
 #if defined(WIN32)
-		return !!mutex_;
+    return !!mutex_;
 #else
-		return lockHandle_ != -1
+    return lockHandle_ != -1
 #endif
-	}
+  }
 
-	~CScopedAppMultiRun() noexcept
-	{
+  ~CScopedAppMultiRun() noexcept {
 #if defined(WIN32)
-		if ( mutex_ )
-		{
-			::ReleaseMutex( mutex_ );
-			::CloseHandle( mutex_ );
-		}
+    if (mutex_) {
+      ::ReleaseMutex(mutex_);
+      ::CloseHandle(mutex_);
+    }
 #else
-		if (lockHandle_ != -1) {
-			close(lockHandle_);
-			lockHandle_ = -1;
-			unlink(lockFileName_);
-		}
+    if (lockHandle_ != -1) {
+      close(lockHandle_);
+      lockHandle_ = -1;
+      unlink(lockFileName_);
+    }
 #endif
-	}
+  }
 
-private:
+ private:
 #ifdef WIN32
-	HANDLE mutex_;
+  HANDLE mutex_;
 #else
-	int lockHandle_ = -1;
-	char lockFileName_[MAX_PATH];
+  int lockHandle_ = -1;
+  char lockFileName_[MAX_PATH];
 #endif
 };
 
@@ -1163,247 +1070,234 @@ private:
 // Output : int APIENTRY
 //-----------------------------------------------------------------------------
 #ifdef WIN32
-DLL_EXPORT int LauncherMain( HINSTANCE hInstance, HINSTANCE , LPSTR lpCmdLine, int )
+DLL_EXPORT int LauncherMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine,
+                            int)
 #else
-DLL_EXPORT int LauncherMain( int argc, char **argv )
+DLL_EXPORT int LauncherMain(int argc, char **argv)
 #endif
 {
 #ifdef WIN32
-	SetAppInstance( hInstance );
+  SetAppInstance(hInstance);
 #endif
 
-	// Printf/sscanf functions expect en_US UTF8 localization.  Mac OSX also
-	// sets LANG to en_US.UTF-8 before starting up (in info.plist I believe).
-	//
-	// Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C
-	// Runtime supports using a UTF-8 code page. 
-	//
-	// Need to double check that localization for libcef is handled correctly
-	// when slam things to en_US.UTF-8.
-	constexpr char en_US_UTF_8[]{ "en_US.UTF-8" };
+  // Printf/sscanf functions expect en_US UTF8 localization.  Mac OSX also
+  // sets LANG to en_US.UTF-8 before starting up (in info.plist I believe).
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C
+  // Runtime supports using a UTF-8 code page.
+  //
+  // Need to double check that localization for libcef is handled correctly
+  // when slam things to en_US.UTF-8.
+  constexpr char en_US_UTF_8[]{"en_US.UTF-8"};
 
-	const CScopedAppLocale scopedAppLocale{ en_US_UTF_8 };
-	if ( Q_stricmp( scopedAppLocale.CurrentLocale(), en_US_UTF_8 ) )
-	{
-		Warning( "setlocale('%s') failed, current locale is '%s'.\n",
-			en_US_UTF_8, CScopedAppLocale::CurrentLocale() );
-	}
+  const CScopedAppLocale scopedAppLocale{en_US_UTF_8};
+  if (Q_stricmp(scopedAppLocale.CurrentLocale(), en_US_UTF_8)) {
+    Warning("setlocale('%s') failed, current locale is '%s'.\n", en_US_UTF_8,
+            CScopedAppLocale::CurrentLocale());
+  }
 
-#if defined( POSIX )
-	// Store off command line for argument searching
-	Plat_SetCommandLine( BuildCmdLine( argc, argv, false ) );
+#if defined(POSIX)
+  // Store off command line for argument searching
+  Plat_SetCommandLine(BuildCmdLine(argc, argv, false));
 
-	if( CommandLine()->CheckParm( "-sleepatstartup" ) )
-	{
-		// When launching from Steam, it can be difficult to get a debugger attached when you're
-		//	crashing quickly at startup. So add a -sleepatstartup command line and sleep for 5
-		//	seconds which should allow time to attach a debugger.
-		sleep( 5 );
-	}
+  if (CommandLine()->CheckParm("-sleepatstartup")) {
+    // When launching from Steam, it can be difficult to get a debugger attached
+    // when you're
+    //	crashing quickly at startup. So add a -sleepatstartup command line and
+    //sleep for 5 	seconds which should allow time to attach a debugger.
+    sleep(5);
+  }
 #endif
 
-	// Hook the debug output stuff.
-	SpewOutputFunc( LauncherDefaultSpewFunc );
+  // Hook the debug output stuff.
+  SpewOutputFunc(LauncherDefaultSpewFunc);
 
-	const CPUInformation *cpu_info{GetCPUInformation()};
-	if ( !cpu_info->m_bSSE || !cpu_info->m_bSSE2 || !cpu_info->m_bSSE3 || !cpu_info->m_bSSE41 || !cpu_info->m_bSSE42 )
-	{
-		Error( "Sorry, your CPU missed SSE / SSE2 / SSE3 / SSE4.1 / SSE4.2 instructions required for the game.\n\nPlease upgrade your CPU." );
-		return STATUS_ILLEGAL_INSTRUCTION;
-	}
+  const CPUInformation *cpu_info{GetCPUInformation()};
+  if (!cpu_info->m_bSSE || !cpu_info->m_bSSE2 || !cpu_info->m_bSSE3 ||
+      !cpu_info->m_bSSE41 || !cpu_info->m_bSSE42) {
+    Error(
+        "Sorry, your CPU missed SSE / SSE2 / SSE3 / SSE4.1 / SSE4.2 "
+        "instructions required for the game.\n\nPlease upgrade your CPU.");
+    return STATUS_ILLEGAL_INSTRUCTION;
+  }
 
-	if ( !cpu_info->m_bRDTSC )
-	{
-		Error( "Sorry, your CPU missed RDTSC instruction required for the game.\n\nPlease upgrade your CPU." );
-		return STATUS_ILLEGAL_INSTRUCTION;
-	}
+  if (!cpu_info->m_bRDTSC) {
+    Error(
+        "Sorry, your CPU missed RDTSC instruction required for the "
+        "game.\n\nPlease upgrade your CPU.");
+    return STATUS_ILLEGAL_INSTRUCTION;
+  }
 
 #ifdef WIN32
-	if ( !IsWindows10OrGreater() )
-	{
-		Error( "Sorry, Windows 10+ required to run the game.\n\nPlease update your operating system." );
-		return ERROR_OLD_WIN_VERSION;
-	}
+  if (!IsWindows10OrGreater()) {
+    Error(
+        "Sorry, Windows 10+ required to run the game.\n\nPlease update your "
+        "operating system.");
+    return ERROR_OLD_WIN_VERSION;
+  }
 
-	using namespace std::chrono_literals;
-	constexpr std::chrono::milliseconds newTimerResolution{8ms};
+  using namespace std::chrono_literals;
+  constexpr std::chrono::milliseconds newTimerResolution{8ms};
 
-	ScopedTimerResolution scopedTimerResolution{newTimerResolution};
-	if ( !scopedTimerResolution.IsSucceeded() )
-	{
-		Warning( "Unable to set Windows timer resolution to %lld ms. Will use default one.",
-			(long long)newTimerResolution.count() );
-	}
+  ScopedTimerResolution scopedTimerResolution{newTimerResolution};
+  if (!scopedTimerResolution.IsSucceeded()) {
+    Warning(
+        "Unable to set Windows timer resolution to %lld ms. Will use default "
+        "one.",
+        (long long)newTimerResolution.count());
+  }
 #endif
 
-	// dimhotepus: Remove Plat_VerifyHardwareKeyPrompt call as it is empty.
+  // dimhotepus: Remove Plat_VerifyHardwareKeyPrompt call as it is empty.
 
 #ifdef WIN32
-	CommandLine()->CreateCmdLine( IsPC() ? VCRHook_GetCommandLine() : lpCmdLine );
+  CommandLine()->CreateCmdLine(IsPC() ? VCRHook_GetCommandLine() : lpCmdLine);
 #else
-	CommandLine()->CreateCmdLine( argc, argv );
+  CommandLine()->CreateCmdLine(argc, argv);
 #endif
 
-	// No -dxlevel or +mat_hdr_level allowed on POSIX
-#ifdef POSIX	
-	CommandLine()->RemoveParm( "-dxlevel" );
-	CommandLine()->RemoveParm( "+mat_hdr_level" );
-	CommandLine()->RemoveParm( "+mat_dxlevel" );
+  // No -dxlevel or +mat_hdr_level allowed on POSIX
+#ifdef POSIX
+  CommandLine()->RemoveParm("-dxlevel");
+  CommandLine()->RemoveParm("+mat_hdr_level");
+  CommandLine()->RemoveParm("+mat_dxlevel");
 #endif
 
-	// If we're using -default command line parameters, get rid of DX8 settings. 
-	if ( CommandLine()->CheckParm( "-default" ) )
-	{
-		CommandLine()->RemoveParm( "-dxlevel" );
-		CommandLine()->RemoveParm( "-maxdxlevel" );
-		CommandLine()->RemoveParm( "+mat_dxlevel" );
-	}
-	
-	char baseDirectory[MAX_PATH];
-	// Figure out the directory the executable is running from
-	UTIL_ComputeBaseDir( baseDirectory );
-	
-	// Relaunch app if needed.
-	const CScopedAppRelaunch scopedAppRelaunch;
+  // If we're using -default command line parameters, get rid of DX8 settings.
+  if (CommandLine()->CheckParm("-default")) {
+    CommandLine()->RemoveParm("-dxlevel");
+    CommandLine()->RemoveParm("-maxdxlevel");
+    CommandLine()->RemoveParm("+mat_dxlevel");
+  }
 
-	// This call is to emulate steam's injection of the GameOverlay DLL into our process if we
-	// are running from the command line directly, this allows the same experience the user gets
-	// to be present when running from perforce, the call has no effect on X360
-	TryToLoadSteamOverlayDLL();
-	
-	const char *filename;
-	CVCRHelpers VCRHelpers;
-	// Start VCR mode?
-	if ( CommandLine()->CheckParm( "-vcrrecord", &filename ) )
-	{
-		if ( !VCRStart( filename, true, &VCRHelpers ) )
-		{
-			Error( "-vcrrecord: can't open '%s' for writing.\n", filename );
-			return -1;
-		}
-	}
-	else if ( CommandLine()->CheckParm( "-vcrplayback", &filename ) )
-	{
-		if ( !VCRStart( filename, false, &VCRHelpers ) )
-		{
-			Error( "-vcrplayback: can't open '%s' for reading.\n", filename );
-			return -1;
-		}
-	}
+  char baseDirectory[MAX_PATH];
+  // Figure out the directory the executable is running from
+  UTIL_ComputeBaseDir(baseDirectory);
 
-	// See the function for why we do this.
-	RemoveSpuriousGameParameters();
+  // Relaunch app if needed.
+  const CScopedAppRelaunch scopedAppRelaunch;
+
+  // This call is to emulate steam's injection of the GameOverlay DLL into our
+  // process if we are running from the command line directly, this allows the
+  // same experience the user gets to be present when running from perforce, the
+  // call has no effect on X360
+  TryToLoadSteamOverlayDLL();
+
+  const char *filename;
+  CVCRHelpers VCRHelpers;
+  // Start VCR mode?
+  if (CommandLine()->CheckParm("-vcrrecord", &filename)) {
+    if (!VCRStart(filename, true, &VCRHelpers)) {
+      Error("-vcrrecord: can't open '%s' for writing.\n", filename);
+      return -1;
+    }
+  } else if (CommandLine()->CheckParm("-vcrplayback", &filename)) {
+    if (!VCRStart(filename, false, &VCRHelpers)) {
+      Error("-vcrplayback: can't open '%s' for reading.\n", filename);
+      return -1;
+    }
+  }
+
+  // See the function for why we do this.
+  RemoveSpuriousGameParameters();
 
 #ifdef WIN32
-	const CScopedWinsock scopedWinsock{MAKEWORD(2,0)};
-	if (scopedWinsock.errc())
-	{
-		Warning(
-			"Windows sockets 2.0 unavailable (%d): %s.\n",
-			scopedWinsock.errc(),
-			std::system_category().message(scopedWinsock.errc()).c_str() );
-	}
+  const CScopedWinsock scopedWinsock{MAKEWORD(2, 0)};
+  if (scopedWinsock.errc()) {
+    Warning("Windows sockets 2.0 unavailable (%d): %s.\n", scopedWinsock.errc(),
+            std::system_category().message(scopedWinsock.errc()).c_str());
+  }
 #endif
-	
-	// Run in text mode? (No graphics or sound).
-	const bool bTextMode = CommandLine()->CheckParm( "-textmode" ) && InitTextMode();
-	
-	// Can only run one windowed source app at a time.
-	const CScopedAppMultiRun scopedAppMultiRun;
-	if ( !scopedAppMultiRun.IsSingleRun() )
-	{
-		// Allow the user to explicitly say they want to be able to run
-		// multiple instances of the source mutex.  Useful for side-by-side
-		// comparisons of different renderers.
-		const bool allowMultiRun{ CommandLine()->CheckParm( "-multirun" ) != nullptr };
-		if (!allowMultiRun) {
-			::MessageBox(nullptr,
-				"Oops, the game is already launched\n\nSorry, but only single game can run at the same time.",
-				"Source - Warning",
-				MB_ICONERROR | MB_OK);
+
+  // Run in text mode? (No graphics or sound).
+  const bool bTextMode =
+      CommandLine()->CheckParm("-textmode") && InitTextMode();
+
+  // Can only run one windowed source app at a time.
+  const CScopedAppMultiRun scopedAppMultiRun;
+  if (!scopedAppMultiRun.IsSingleRun()) {
+    // Allow the user to explicitly say they want to be able to run
+    // multiple instances of the source mutex.  Useful for side-by-side
+    // comparisons of different renderers.
+    const bool allowMultiRun{CommandLine()->CheckParm("-multirun") != nullptr};
+    if (!allowMultiRun) {
+      ::MessageBox(nullptr,
+                   "Oops, the game is already launched\n\nSorry, but only "
+                   "single game can run at the same time.",
+                   "Source - Warning", MB_ICONERROR | MB_OK);
 
 #if defined(WIN32)
-			return ERROR_SINGLE_INSTANCE_APP;
+      return ERROR_SINGLE_INSTANCE_APP;
 #else
-			return EEXIST;
+      return EEXIST;
 #endif
-		}
-	}
+    }
+  }
 
 #ifdef WIN32
-	// Make low priority?
-	if ( CommandLine()->CheckParm( "-low" ) )
-	{
-		SetPriorityClass( GetCurrentProcess(), IDLE_PRIORITY_CLASS );
-	}
-	else if ( CommandLine()->CheckParm( "-high" ) )
-	{
-		SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS );
-	}
-	// dimhotepus: Above normal by default.
-	else if ( !CommandLine()->CheckParm( "-normal" ) )
-	{
-		SetPriorityClass( GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS );
-	}
+  // Make low priority?
+  if (CommandLine()->CheckParm("-low")) {
+    SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
+  } else if (CommandLine()->CheckParm("-high")) {
+    SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+  }
+  // dimhotepus: Above normal by default.
+  else if (!CommandLine()->CheckParm("-normal")) {
+    SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
+  }
 #endif
 
-	// If game is not run from Steam then add -insecure in order to avoid client timeout message
-	if ( NULL == CommandLine()->CheckParm( "-steam" ) )
-	{
-		CommandLine()->AppendParm( "-insecure", NULL );
-	}
+  // If game is not run from Steam then add -insecure in order to avoid client
+  // timeout message
+  if (NULL == CommandLine()->CheckParm("-steam")) {
+    CommandLine()->AppendParm("-insecure", NULL);
+  }
 
-	// Figure out the directory the executable is running from
-	// and make that be the current working directory
-	if ( _chdir( baseDirectory ) )
-	{
-		Warning( "Unable to change current directory to %s.", baseDirectory );
-	}
+  // Figure out the directory the executable is running from
+  // and make that be the current working directory
+  if (_chdir(baseDirectory)) {
+    Warning("Unable to change current directory to %s.", baseDirectory);
+  }
 
-	const CHeapLeakDump heapLeakDump(CommandLine()->CheckParm("-leakcheck"));
+  const CHeapLeakDump heapLeakDump(CommandLine()->CheckParm("-leakcheck"));
 
-	bool bRestart = true;
-	while ( bRestart )
-	{
-		bRestart = false;
+  bool bRestart = true;
+  while (bRestart) {
+    bRestart = false;
 
-		CSourceAppSystemGroup sourceSystems( baseDirectory, bTextMode );
-		CSteamApplication steamApplication( &sourceSystems );
-		int nRetval = steamApplication.Run();
-		if ( steamApplication.GetErrorStage() == CSourceAppSystemGroup::INITIALIZATION )
-		{
-			bRestart = (nRetval == INIT_RESTART);
-		}
-		else if ( nRetval == RUN_RESTART )
-		{
-			bRestart = true;
-		}
+    CSourceAppSystemGroup sourceSystems(baseDirectory, bTextMode);
+    CSteamApplication steamApplication(&sourceSystems);
+    int nRetval = steamApplication.Run();
+    if (steamApplication.GetErrorStage() ==
+        CSourceAppSystemGroup::INITIALIZATION) {
+      bRestart = (nRetval == INIT_RESTART);
+    } else if (nRetval == RUN_RESTART) {
+      bRestart = true;
+    }
 
-		bool bReslistCycle = false;
-		if ( !bRestart )
-		{
-			bReslistCycle = sourceSystems.ShouldContinueGenerateReslist();
-			bRestart = bReslistCycle;
-		}
-		
-		if ( !bReslistCycle )
-		{
-			// Remove any overrides in case settings changed
-			CommandLine()->RemoveParm( "-w" );
-			CommandLine()->RemoveParm( "-h" );
-			CommandLine()->RemoveParm( "-width" );
-			CommandLine()->RemoveParm( "-height" );
-			CommandLine()->RemoveParm( "-sw" );
-			CommandLine()->RemoveParm( "-startwindowed" );
-			CommandLine()->RemoveParm( "-windowed" );
-			CommandLine()->RemoveParm( "-window" );
-			CommandLine()->RemoveParm( "-full" );
-			CommandLine()->RemoveParm( "-fullscreen" );
-			CommandLine()->RemoveParm( "-dxlevel" );
-			CommandLine()->RemoveParm( "-autoconfig" );
-			CommandLine()->RemoveParm( "+mat_hdr_level" );
-		}
-	}
+    bool bReslistCycle = false;
+    if (!bRestart) {
+      bReslistCycle = sourceSystems.ShouldContinueGenerateReslist();
+      bRestart = bReslistCycle;
+    }
 
-	return 0;
+    if (!bReslistCycle) {
+      // Remove any overrides in case settings changed
+      CommandLine()->RemoveParm("-w");
+      CommandLine()->RemoveParm("-h");
+      CommandLine()->RemoveParm("-width");
+      CommandLine()->RemoveParm("-height");
+      CommandLine()->RemoveParm("-sw");
+      CommandLine()->RemoveParm("-startwindowed");
+      CommandLine()->RemoveParm("-windowed");
+      CommandLine()->RemoveParm("-window");
+      CommandLine()->RemoveParm("-full");
+      CommandLine()->RemoveParm("-fullscreen");
+      CommandLine()->RemoveParm("-dxlevel");
+      CommandLine()->RemoveParm("-autoconfig");
+      CommandLine()->RemoveParm("+mat_hdr_level");
+    }
+  }
+
+  return 0;
 }
