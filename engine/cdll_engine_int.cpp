@@ -1717,14 +1717,14 @@ bool ClientDLL_Load()
 
 	// Check the signature on the client dll.  If this fails we load it anyway but put this client
 	// into insecure mode so it won't connect to secure servers and get VAC banned
-	if ( !Host_AllowLoadModule( "client.dll", "GAMEBIN", true ) )
+	if ( !Host_AllowLoadModule( "client" DLL_EXT_STRING, "GAMEBIN", true ) )
 	{
 		// not supposed to load this but we will anyway
 		Host_DisallowSecureServers();
-		Host_AllowLoadModule( "client.dll","GAMEBIN", true );
+		Host_AllowLoadModule( "client" DLL_EXT_STRING, "GAMEBIN", true );
 	}
 
-	g_ClientDLLModule = g_pFileSystem->LoadModule( "client", "GAMEBIN", false );
+	g_ClientDLLModule = g_pFileSystem->LoadModule( "client" DLL_EXT_STRING, "GAMEBIN", false );
 	if ( g_ClientDLLModule )
 	{
 		g_ClientFactory = Sys_GetFactory( g_ClientDLLModule );
@@ -1736,7 +1736,7 @@ bool ClientDLL_Load()
 			g_bClientGameDLLGreaterThanV13 = false;
 			if ( !g_ClientDLL )
 			{
-				Sys_Error( "Could not get client.dll interface from library client" );
+				Sys_Error( "Could not get " "client" DLL_EXT_STRING " interface from library client" );
 			}
 
 			if( g_pSourceVR )
@@ -1744,7 +1744,7 @@ bool ClientDLL_Load()
 				g_pClientVR = (IClientVirtualReality *)g_ClientFactory( CLIENTVIRTUALREALITY_INTERFACE_VERSION, NULL );
 				if( !g_pClientVR )
 				{
-					Msg( "client.dll is not VR-compatible.\n" );
+					Msg( "client" DLL_EXT_STRING " is not VR-compatible.\n" );
 				}
 			}
 		}
