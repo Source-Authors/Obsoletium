@@ -31,7 +31,7 @@ size_t GetVidMemBytes( unsigned nAdapter )
 	nBeenAdapter = nAdapter;
 	
 	// Initialize COM
-	HRESULT hr{CoInitializeEx( nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE )};
+	HRESULT hr{CoInitializeEx( nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY )};
 	if ( FAILED(hr) )
 	{
 		Warning( "Unable to get GPU VRAM size: COM initialization failure.\n" );

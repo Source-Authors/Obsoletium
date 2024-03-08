@@ -543,7 +543,7 @@ bool CBinkVideoSubSystem::SetupBink()
 
 	// Bink needs COM.
 #ifdef _WIN32
-	if ( SUCCEEDED( ::CoInitializeEx( nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE ) ) )
+	if ( SUCCEEDED( ::CoInitializeEx( nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY ) ) )
 	{
 		// Note that we are now open for business....	
 		m_bBinkInitialized = true;

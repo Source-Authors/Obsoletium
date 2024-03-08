@@ -1,10 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose:
-//
-// Defines the entry point for the application.
-//
-//===========================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #ifndef SRC_LAUNCHER_SCOPED_TIMER_RESOLUTION_H
 #define SRC_LAUNCHER_SCOPED_TIMER_RESOLUTION_H
@@ -24,6 +18,8 @@ __declspec(dllimport) MMRESULT __stdcall timeBeginPeriod(_In_ unsigned uPeriod);
 __declspec(dllimport) MMRESULT __stdcall timeEndPeriod(_In_ unsigned uPeriod);
 
 }  // extern "C"
+
+namespace src::launcher {
 
 // Changes minimum resolution for periodic timers and reverts back when
 // out of scope.
@@ -61,12 +57,12 @@ class ScopedTimerResolution {
       : m_resolutionMs{resolution_ms},
         m_errorCode{
             ::timeBeginPeriod(static_cast<unsigned>(resolution_ms.count()))} {
-    AssertMsg(IsSucceeded(), "Unable to set windows timer resolution.");
+    AssertMsg(!!this, "Unable to set windows timer resolution.");
   }
 
   // Restores previous minimum timer resolution.
   ~ScopedTimerResolution() noexcept {
-    if (IsSucceeded()) {
+    if (!!this) {
       [[maybe_unused]] const bool isSucceeded{
           ::timeEndPeriod(static_cast<unsigned>(m_resolutionMs.count())) == 0};
       AssertMsg(isSucceeded, "Unable to restore windows timer resolution.");
@@ -74,7 +70,7 @@ class ScopedTimerResolution {
   }
 
   // Is set minimum timers resolution succeeded?
-  [[nodiscard]] bool IsSucceeded() const noexcept { return m_errorCode == 0; }
+  [[nodiscard]] bool operator!() const noexcept { return m_errorCode != 0; }
 
  private:
   // New minimum timer resolution in ms.
@@ -82,5 +78,7 @@ class ScopedTimerResolution {
   // Minimum timer resolution creation error_code.
   unsigned m_errorCode;
 };
+
+}  // namespace src::launcher
 
 #endif  // SRC_LAUNCHER_SCOPED_TIMER_RESOLUTION_H
