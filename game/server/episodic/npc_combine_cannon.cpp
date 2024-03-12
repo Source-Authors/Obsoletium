@@ -423,7 +423,7 @@ void CNPC_Combine_Cannon::UpdateAncillaryBeams( float flConvergencePerc, const V
 	// flConvergencePerc.  The beams are most deviated at 0 and fully converged at 1.
 
 	float flRotationOffset = (2*M_PI)/(float)NUM_ANCILLARY_BEAMS; // Degrees separating each beam, in radians
-	float flDeviation = DEG2RAD(90) * ( 1.0f - flConvergencePerc );
+	float flDeviation = DEG2RAD(90.0f) * ( 1.0f - flConvergencePerc );
 	float flOffset;
 	Vector vecFinal;
 	Vector vecOffset;
