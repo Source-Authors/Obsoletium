@@ -12,11 +12,7 @@
 ## How to build
 
 * Use `git clone --recurse-submodules`
-* Add registry keys:
-  | Path                        | Name  | Type | Data |
-  | ----                        | ----  | ---- | ---- |
-  | `HKLM\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\10.0\Projects\{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}` | `DefaultProjectExtension` | string | vcproj
-* Run `creategameprojects_debug.bat` from `Developer Command Prompt`.
+* Run `create_<GAME_NAME>_dev.bat` from `Developer Command Prompt`. See directory tree for supported games.
 * Open `hl2.sln`.
 * Build.
 
@@ -24,7 +20,7 @@
 ## How to debug
 
 * Ensure you placed hl2 / episodic / portal game into `game` folder near cloned repo.
-* Open `hl2.sln`.
+* Open `<GAME_NAME>.sln`.
 * Set `launcher_main` project `Command` property to `$(SolutionDir)..\game\hl2.exe`.
 * Set `launcher_main` project `Command Arguments` property to `-dxlevel 85 -windowed`.
 * Set `launcher_main` project `Working Directory` property to `$(SolutionDir)..\game\`.
@@ -35,7 +31,7 @@
 ## How to release
 
 * Ensure you placed hl2 / episodic / portal game into `game` folder near cloned repo.
-* Open `hl2.sln`.
+* Open `<GAME_NAME>.sln`.
 * Choose `Release` Configuration.
 * Build.
 * `game` folder contains the ready game.

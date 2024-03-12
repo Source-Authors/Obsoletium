@@ -7,18 +7,6 @@ IF ERRORLEVEL 1 (
   EXIT /B 1
 )
 
-REM Add/check registry keys for VPC MSVC project genereation.
-REG QUERY HKLM\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\10.0\Projects\{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942} /t REG_SZ /v DefaultProjectExtension /f vcproj
-if ERRORLEVEL 1 (
-  ECHO Missed registry key HKLM\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\10.0\Projects\{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942} REG_SZ DefaultProjectExtension vcproj.
-  REG ADD HKLM\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\10.0\Projects\{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942} /t REG_SZ /v DefaultProjectExtension /d vcproj
-
-  if ERRORLEVEL 1 (
-    ECHO Unable to add registry key HKLM\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\10.0\Projects\{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942} REG_SZ DefaultProjectExtension vcproj.
-    EXIT /B 1
-  )
-)
-
 REM Set CMake / MSVC generator / architecture / platform.
 SET CMAKE_MSVC_ARCH_NAME=Win32
 SET CMAKE_MSVC_GEN_NAME="Visual Studio 17 2022"
@@ -209,8 +197,8 @@ if ERRORLEVEL 1 (
 
 
 REM Finally create solution.
-devtools\bin\vpc.exe /2015 /define:WORKSHOP_IMPORT_DISABLE /define:SIXENSE_DISABLE /define:NO_X360_XDK /define:RAD_TELEMETRY_DISABLED /define:DISABLE_ETW /define:NO_STEAM /define:NO_ATI_COMPRESS /define:NO_NVTC /define:LTCG /no_ceg /nofpo /hl2 +game /mksln hl2.sln
+devtools\bin\vpc.exe /2022 /define:WORKSHOP_IMPORT_DISABLE /define:SIXENSE_DISABLE /define:NO_X360_XDK /define:RAD_TELEMETRY_DISABLED /define:DISABLE_ETW /define:NO_STEAM /define:NO_ATI_COMPRESS /define:NO_NVTC /define:LTCG /no_ceg /nofpo /%1 +game /mksln %1.sln
 if ERRORLEVEL 1 (
-  ECHO MSBuild for hl2.sln failed.
+  ECHO MSBuild for %1.sln failed.
   EXIT /B 1
 )

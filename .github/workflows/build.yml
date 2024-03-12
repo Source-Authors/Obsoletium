@@ -28,7 +28,7 @@ permissions:
 
 jobs:
   build:
-    name: Build & test
+    name: Build Half-Life 2
     runs-on: windows-latest
 
     steps:
@@ -40,10 +40,10 @@ jobs:
     - name: Add msbuild / cmake / nmake to PATH
       uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Build dependencies
+    - name: Build dependencies & generate solution
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: .\creategameprojects_debug.bat
+      run: .\create_hl2_dev.bat
 
     - name: Build the app
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} ${{env.SOLUTION_FILE_PATH}}
+      run: msbuild /m -verbosity:detailed /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} ${{env.SOLUTION_FILE_PATH}}
