@@ -50,14 +50,17 @@ $Project "launcher"
 	$Folder	"Source Files"
 	{
 		$File	"$SRCDIR\public\filesystem_init.cpp"
+		$File	"boot_app_system_group.cpp"
+		$File	"file_logger.cpp"
 		$File	"launcher.cpp"
-		$File	"reslistgenerator.cpp"
+		$File	"resource_listing.cpp"
 	}
 
 	$Folder	"Header Files"
 	{
-		$File	"ifilesystem.h"
-		$File	"reslistgenerator.h"
+		$File	"file_logger.h"
+		$File	"boot_app_system_group.h"
+		$File	"resource_listing.h"
 		$File	"scoped_app_locale.h"
 		$File	"scoped_app_multirun.h"
 		$File	"scoped_app_relaunch.h"

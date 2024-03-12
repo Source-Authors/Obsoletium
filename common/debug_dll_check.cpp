@@ -10,7 +10,7 @@
 #define _DEBUGONLYSTRING(x) #x
 #define DEBUGONLYSTRING(x) _DEBUGONLYSTRING(x)
 
-DLL_GLOBAL_EXPORT char const *pDebugString =
+DLL_GLOBAL_EXPORT const char *pDebugString =
     DEBUGONLYSTRING(DLLNAME) ".dll is built debug!";
 
 #endif

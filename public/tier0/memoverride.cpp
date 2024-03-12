@@ -71,16 +71,17 @@ const char *MakeModuleFileName()
 	return NULL;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: helper class to detect when static construction has been done by the CRT
-//-----------------------------------------------------------------------------
-class CStaticConstructionCheck
-{
-public:
-	volatile bool m_bConstructed = true;
+namespace {
+// helper class to detect when static construction has been done by the
+// CRT
+class CStaticConstructionCheck {
+ public:
+  volatile bool m_bConstructed = true;
 };
 
 static CStaticConstructionCheck s_CheckStaticsConstructed;
+
+}  // namespace
 
 const char *GetModuleFileName()
 {
@@ -631,29 +632,27 @@ void __cdecl operator delete[]( void *pMem )
 // made in the c runtime library
 #define CRT_INTERNAL_FILE_NAME "C-runtime internal"
 
-class CAttibCRT
-{
-public:
-	CAttibCRT(int nBlockUse) : m_nBlockUse(nBlockUse)
-	{
-		if (m_nBlockUse == _CRT_BLOCK)
-		{
-			g_pMemAlloc->PushAllocDbgInfo(CRT_INTERNAL_FILE_NAME, 0);
-		}
-	}
-	
-	~CAttibCRT()
-	{
-		if (m_nBlockUse == _CRT_BLOCK)
-		{
-			g_pMemAlloc->PopAllocDbgInfo();
-		}
-	}
-	
-private:
-	int m_nBlockUse;
+namespace {
+
+class CAttibCRT {
+ public:
+  CAttibCRT(int nBlockUse) : m_nBlockUse(nBlockUse) {
+    if (m_nBlockUse == _CRT_BLOCK) {
+      g_pMemAlloc->PushAllocDbgInfo(CRT_INTERNAL_FILE_NAME, 0);
+    }
+  }
+
+  ~CAttibCRT() {
+    if (m_nBlockUse == _CRT_BLOCK) {
+      g_pMemAlloc->PopAllocDbgInfo();
+    }
+  }
+
+ private:
+  int m_nBlockUse;
 };
 
+}  // namespace
 
 #define AttribIfCrt() CAttibCRT _attrib(nBlockUse)
 #elif defined(POSIX)
@@ -1067,23 +1066,27 @@ void VInvalidParameterHandler(const wchar_t* expression,
 // Restore compiler optimizations.
 #pragma optimize("", on)
 
+namespace {
+
 // Helper class for registering error callbacks. See above for details.
 class ErrorHandlerRegistrar {
  public:
   ErrorHandlerRegistrar() noexcept
-		: old_pure_{_set_purecall_handler(VPureCall)},
-			old_invalid_{_set_invalid_parameter_handler(VInvalidParameterHandler)} {
-	}
-	// dimhotepus: Restore old handlers on exit.
+      : old_pure_{_set_purecall_handler(VPureCall)},
+        old_invalid_{_set_invalid_parameter_handler(VInvalidParameterHandler)} {
+  }
+  // dimhotepus: Restore old handlers on exit.
   ~ErrorHandlerRegistrar() noexcept {
-		_set_invalid_parameter_handler(old_invalid_);
-		_set_purecall_handler(old_pure_);
-	}
+    _set_invalid_parameter_handler(old_invalid_);
+    _set_purecall_handler(old_pure_);
+  }
 
  private:
   _purecall_handler old_pure_;
   _invalid_parameter_handler old_invalid_;
 } s_ErrorHandlerRegistration;
+
+}  // namespace
 
 #if defined( _DEBUG )
  

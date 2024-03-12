@@ -46,6 +46,8 @@ void FileSystem_UseVProjectBinDir( bool bEnable )
 	s_bUseVProjectBinDir = bEnable;
 }
 
+namespace {
+
 // This class lets you modify environment variables, and it restores the original value
 // when it goes out of scope.
 class CTempEnvVar
@@ -202,11 +204,12 @@ public:
 	CTempEnvVar m_Path;
 };
 
+
 // ---------------------------------------------------------------------------------------------------- //
 // Helpers.
 // ---------------------------------------------------------------------------------------------------- //
 template<size_t outSize>
-static [[nodiscard]] bool Q_getwd( char (&out)[outSize] ) {
+[[nodiscard]] bool Q_getwd( char (&out)[outSize] ) {
 #if defined( _WIN32 ) || defined( WIN32 )
 	bool ok = !!_getcwd( out, outSize );
 	if (ok)
@@ -225,6 +228,8 @@ static [[nodiscard]] bool Q_getwd( char (&out)[outSize] ) {
 	return ok;
 #endif
 }
+
+}  // namespace
 
 // ---------------------------------------------------------------------------------------------------- //
 // Module interface.
