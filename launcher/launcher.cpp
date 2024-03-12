@@ -33,22 +33,7 @@
 #define VERSION_SAFE_STEAM_API_INTERFACES
 #include "steam/steam_api.h"
 
-#if defined(USE_SDL)
 #include "include/SDL3/SDL.h"
-
-#if !defined(_WIN32)
-#define MB_OK 0x00000001
-#define MB_SYSTEMMODAL 0x00000002
-#define MB_ICONERROR 0x00000004
-
-int MessageBox(HWND hWnd, const char *message, const char *header,
-               unsigned uType) {
-  SDL_ShowSimpleMessageBox(0, header, message, GetAssertDialogParent());
-  return 0;
-}
-#endif
-#endif  // USE_SDL
-
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -72,28 +57,22 @@ SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type,
 
     case SPEW_WARNING:
       if (!stricmp(GetSpewOutputGroup(), "init")) {
-#if defined(WIN32) || defined(USE_SDL)
-        ::MessageBox(NULL, message, "Launcher - Warning",
-                     MB_OK | MB_SYSTEMMODAL | MB_ICONERROR);
-#endif
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Launcher - Warning",
+                                 message, nullptr);
       }
       return SPEW_CONTINUE;
 
     case SPEW_ASSERT:
       if (!ShouldUseNewAssertDialog()) {
-#if defined(WIN32) || defined(USE_SDL)
-        ::MessageBox(NULL, message, "Launcher - Assert",
-                     MB_OK | MB_SYSTEMMODAL | MB_ICONERROR);
-#endif
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Launcher - Assert",
+                                 message, nullptr);
       }
       return SPEW_DEBUGGER;
 
     case SPEW_ERROR:
     default:
-#if defined(WIN32) || defined(USE_SDL)
-      ::MessageBox(NULL, message, "Launcher - Error",
-                   MB_OK | MB_SYSTEMMODAL | MB_ICONERROR);
-#endif
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Launcher - Error",
+                               message, nullptr);
       _exit(1);
   }
 #else
@@ -105,13 +84,14 @@ SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type,
 // Implementation of VCRHelpers.
 class CVCRHelpers : public IVCRHelpers {
  public:
-  virtual void ErrorMessage(const char *message) {
+  void ErrorMessage(const char *message) override {
 #if defined(WIN32) || defined(LINUX)
-    NOVCR(::MessageBox(NULL, message, "VCR Error", MB_OK));
+    NOVCR(SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "VCR Error", message,
+                                   nullptr));
 #endif
   }
 
-  virtual void *GetMainWindow() { return nullptr; }
+  void *GetMainWindow() override { return nullptr; }
 };
 
 // Gets the executable name
@@ -269,7 +249,7 @@ int RunApp(ICommandLine *command_line, const char (&base_directory)[MAX_PATH],
 
   do {
     src::launcher::BootAppSystemGroup systems{command_line, base_directory,
-                                                 is_text_mode};
+                                              is_text_mode};
     CSteamApplication app{&systems};
 
     const int rc{app.Run()};
@@ -463,10 +443,9 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
     // different renderers.
     const bool allow_multirun{command_line->CheckParm("-multirun") != nullptr};
     if (!allow_multirun) {
-      ::MessageBox(nullptr,
-                   "Oops, the game is already launched\n\nSorry, but only "
-                   "single game can run at the same time.",
-                   "Source - Warning", MB_ICONERROR | MB_OK);
+      Error(
+          "Oops, the game is already launched\n\nSorry, but only "
+          "single game can run at the same time.");
 
 #if defined(WIN32)
       return ERROR_SINGLE_INSTANCE_APP;
