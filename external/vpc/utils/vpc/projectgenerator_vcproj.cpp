@@ -891,7 +891,8 @@ void CVCProjGenerator::SetupGeneratorDefinition(
 }
 
 const char *CVCProjGenerator::GetProjectFileExtension() {
-  if (g_pVPC->Is2010()) {
+  if (g_pVPC->Is2010() || g_pVPC->Is2012() || g_pVPC->Is2013() ||
+      g_pVPC->Is2015() || g_pVPC->Is2022()) {
     return "vcxproj";
   }
   return "vcproj";

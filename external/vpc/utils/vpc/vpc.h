@@ -158,6 +158,7 @@ enum EVSVersion {
   k_EVSVersion_2012,
   k_EVSVersion_2013,
   k_EVSVersion_2015,
+  k_EVSVersion_2022,
 };
 
 class CVPC {
@@ -192,6 +193,7 @@ class CVPC {
   bool IsDecorateProject() const { return m_bDecorateProject; }
   const char *GetDecorateString() { return m_strDecorate.String(); }
   bool IsCheckFiles() const { return m_bCheckFiles; }
+  bool Is2008() const { return m_eVSVersion == k_EVSVersion_2008; }
   bool Is2010() const {
     return m_bUseVS2010FileFormat || m_eVSVersion == k_EVSVersion_2010;
   }
@@ -207,7 +209,10 @@ class CVPC {
     return m_eVSVersion == k_EVSVersion_2015;
   }  // When this returns true so does Is2010() because of the file format
      // similarities
-  bool BUse2008() const { return m_eVSVersion == k_EVSVersion_2008; }
+  bool Is2022() const {
+    return m_eVSVersion == k_EVSVersion_2022;
+  }  // When this returns true so does Is2010() because of the file format
+     // similarities
   bool IsDedicatedBuild() const { return m_bDedicatedBuild; }
   bool IsUnity() const { return m_bUseUnity; }
   bool IsShowCaseIssues() const { return m_bShowCaseIssues; }
@@ -312,7 +317,7 @@ class CVPC {
   configKeyword_e NameToKeyword(const char *pKeywordName);
 
   intp GetProjectsInGroup(CUtlVector<projectIndex_t> &projectList,
-                         const char *pGroupHame);
+                          const char *pGroupHame);
 
  private:
   void SpewUsage(void);

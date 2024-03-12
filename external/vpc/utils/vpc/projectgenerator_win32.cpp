@@ -159,7 +159,7 @@ bool CProjectGenerator_Win32::WriteToXML() {
   m_XMLWriter.PushNode("VisualStudioProject");
   m_XMLWriter.Write("ProjectType=\"Visual C++\"");
 
-  if (g_pVPC->BUse2008())
+  if (g_pVPC->Is2008())
     m_XMLWriter.Write("Version=\"9.00\"");
   else
     m_XMLWriter.Write("Version=\"8.00\"");
