@@ -1236,14 +1236,12 @@ void CMaterialVar::SetVecComponentValue( float fVal, int nComponent )
 {
 	ASSERT_NOT_DUMMY_VAR();
 
-#ifndef _CERT
 	// DIAF
 	if ( nComponent < 0 || nComponent > 3 )
 	{
 		Error( "Invalid vector component (%d) of variable %s referenced in material %s", nComponent, GetName(), GetOwningMaterial()->GetName() );
 		return;
 	}
-#endif
 
 	CMatCallQueue *pCallQueue = MaterialSystem()->GetRenderCallQueue();
 	if ( !m_bFakeMaterialVar && pCallQueue )

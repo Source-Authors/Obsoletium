@@ -47,7 +47,6 @@ namespace {
 // Spew function!
 SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type,
                                      const char *message) {
-#ifndef _CERT
   Plat_DebugString(message);
 
   switch (spew_type) {
@@ -75,10 +74,6 @@ SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type,
                                message, nullptr);
       _exit(1);
   }
-#else
-  if (spew_type != SPEW_ERROR) return SPEW_CONTINUE;
-  _exit(1);
-#endif
 }
 
 // Implementation of VCRHelpers.

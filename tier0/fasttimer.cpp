@@ -11,9 +11,6 @@ uint64 g_ClockSpeed;	// Clocks/sec
 // Storing CPU clock speed in a 32-bit variable is dangerous and can already overflow
 // on some CPUs. This variable is deprecated.
 unsigned long g_dwClockSpeed;
-#if defined( _X360 ) && defined( _CERT )
-unsigned long g_dwFakeFastCounter;
-#endif
 double g_ClockSpeedMicrosecondsMultiplier;
 double g_ClockSpeedMillisecondsMultiplier;
 double g_ClockSpeedSecondsMultiplier;

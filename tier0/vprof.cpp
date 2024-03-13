@@ -39,13 +39,6 @@ using namespace std;
 
 #ifdef VPROF_ENABLED
 
-
-#if defined(_X360) && !defined(_CERT)  // enable PIX CPU trace:
-#include "tracerecording.h"
-#pragma comment( lib, "tracerecording.lib" )
-#pragma comment( lib, "xbdm.lib" )
-#endif
-
 //-----------------------------------------------------------------------------
 bool g_VProfSignalSpike;
 
