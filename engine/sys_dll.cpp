@@ -57,6 +57,7 @@
 #include "eifacev21.h"
 #include "cl_steamauth.h"
 #include "tier0/etwprof.h"
+#include "tier2/tier2.h"
 
 // dimhotepus: NO_STEAM
 #ifdef NO_STEAM
@@ -1566,30 +1567,197 @@ void UnloadEntityDLLs( void )
 	sv_noclipduringpause = NULL;
 }
 
-CON_COMMAND( star_memory, "Dump memory stats" )
+CON_COMMAND( star_cpu, "Dump CPU stats" )
 {
-	// get a current stat of available memory
-	// 32 MiB is reserved and fixed by OS, so not reporting to allow memory loggers sync
+	const CPUInformation& pi{*GetCPUInformation()};
+
+	// Compute Frequency in GHz:
+	constexpr char frequence_denomination[]{"GHz"};
+	const float frequency{pi.m_Speed / 1000'000'000.0f};
+
+	char features[256];
+	features[0] = '\0';
+
+	if( pi.m_bSSE )
+	{
+		Q_strncat(features,
+			MathLib_SSEEnabled() ? "SSE " : "(SSE) ",
+			sizeof( features ) );
+	}
+
+	if( pi.m_bSSE2 )
+	{
+		Q_strncat(features,
+			MathLib_SSE2Enabled() ? "SSE2 " : "(SSE2) ",
+			sizeof( features ) );
+	}
+
+	if (pi.m_bSSE3)
+	{
+		Q_strncat( features,
+#ifdef _XM_SSE3_INTRINSICS_
+			"SSE3 ",
+#else
+			"(SSE3) ",
+#endif
+			sizeof(features) );
+	}
+
+	if (pi.m_bSSSE3)
+	{
+		Q_strncat( features,
+			"(SSSE3) ",
+			sizeof(features) );
+	}
+
+	if (pi.m_bSSE4a)
+	{
+		Q_strncat( features,
+			"(SSE4a) ",
+			sizeof(features) );
+	}
+
+	if (pi.m_bSSE41)
+	{
+		Q_strncat( features,
+#ifdef _XM_SSE4_INTRINSICS_
+			"SSE4.1 ",
+#else
+			"(SSE4.1) ",
+#endif
+			sizeof(features) );
+	}
+
+	if (pi.m_bSSE42)
+	{
+		Q_strncat( features,
+#ifdef _XM_SSE4_INTRINSICS_
+			"SSE4.2 ",
+#else
+			"(SSE4.2) ",
+#endif
+			sizeof(features) );
+	}
+
+	if( pi.m_bMMX )
+	{
+		Q_strncat(features,
+			MathLib_SSEEnabled() ? "MMX " : "(MMX) ",
+			sizeof( features ) );
+	}
+
+	if( pi.m_b3DNow )
+	{
+		Q_strncat(features,
+			MathLib_SSEEnabled() ? "3DNow " : "(3DNow) ",
+			sizeof( features ) );
+	}
+
+	if( pi.m_bRDTSC )
+		Q_strncat(features, "RDTSC ", sizeof( features ) );
+	if( pi.m_bCMOV )
+		Q_strncat(features, "CMOV ", sizeof( features ) );
+	if( pi.m_bFCMOV )
+		Q_strncat(features, "FCMOV ", sizeof( features ) );
+
+	// Remove the trailing space.  There will always be one.
+	features[Q_strlen(features)-1] = '\0';
+
+	// Dump CPU information:
+	if( pi.m_nLogicalProcessors != 1 )
+	{
+		char buffer[256] = "";
+		if( pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors )
+		{
+			Q_snprintf(buffer,
+				sizeof( buffer ),
+				" (%hhu physical)",
+				pi.m_nPhysicalProcessors );
+		}
+
+		ConDMsg( "hardware: CPU %s, %hhu logical%s cores, Frequency: %.01f %s,  Features: %s\n",
+			pi.m_szProcessorBrand,
+			pi.m_nLogicalProcessors,
+			buffer,
+			frequency,
+			frequence_denomination,
+			features
+		);
+		return;
+	}
+
+	ConDMsg( "hardware: CPU %s, 1 logical (1 physical) core, Frequency: %.01f %s,  Features: %s\n",
+		pi.m_szProcessorBrand,
+		frequency,
+		frequence_denomination,
+		features
+	);
+}
+
+CON_COMMAND( star_memory, "Dump RAM stats" )
+{
 #ifdef LINUX
-	struct mallinfo memstats = mallinfo( );
-	Msg( "sbrk size: %.2f MiB, Used: %.2f MiB, #mallocs = %d\n",
-		 memstats.arena / ( 1024.0 * 1024.0), memstats.uordblks / ( 1024.0 * 1024.0 ), memstats.hblks );
+	struct mallinfo memstats{ mallinfo( ) };
+	ConDMsg( "hardware: RAM sbrk size: %s, Used: %s, #mallocs = %d\n",
+		Q_pretifymem(memstats.arena, 2, true),
+		Q_pretifymem(memstats.uordblks, 2, true),
+		memstats.hblks );
 #elif OSX
-	struct mstats memstats = mstats( );
-	Msg( "Available %.2f MiB, Used: %.2f MiB, #mallocs = %lu\n",
-		 memstats.bytes_free / ( 1024.0 * 1024.0), memstats.bytes_used / ( 1024.0 * 1024.0 ), memstats.chunks_used );
+	struct mstats memstats{ mstats( ) };
+	ConDMsg( "hardware: RAM available %s, Used: %s, #mallocs = %lu\n",
+		Q_pretifymem(memstats.bytes_free, 2, true),
+		Q_pretifymem(memstats.bytes_used, 2, true),
+		memstats.chunks_used );
 #else
 	MEMORYSTATUSEX stat = { sizeof(stat) };
 	if ( GlobalMemoryStatusEx( &stat ) )
 	{
-		Msg( "Available: %.2f MiB, Used: %.2f MiB, Free: %.2f MiB\n", 
-			stat.ullTotalPhys/( 1024.0f*1024.0f ) - 32.0f,
-			( stat.ullTotalPhys - stat.ullAvailPhys )/( 1024.0f*1024.0f ) - 32.0f, 
-			stat.ullAvailPhys/( 1024.0f*1024.0f ) );
+		ConDMsg( "hardware: RAM available: %s, Used: %s, Free: %s\n",
+			Q_pretifymem(stat.ullTotalPhys, 2, true),
+			Q_pretifymem(stat.ullTotalPhys - stat.ullAvailPhys, 2, true),
+			Q_pretifymem(stat.ullAvailPhys, 2, true) );
 	}
 	else
 	{
-		Warning( "Unable to dump memory stats: %s ", std::system_category().message( (int) ::GetLastError() ).c_str() );
+		Warning( "hardware: Unable to get RAM available: %s ",
+			std::system_category().message( (int) ::GetLastError() ).c_str() );
 	}
+
+	ConDMsg( "hardware: Host RAM available: %s\n",
+			Q_pretifymem(host_parms.memsize, 2, true) );
 #endif
+}
+
+CON_COMMAND( star_gpu, "Dump GPU stats" )
+{
+	MaterialAdapterInfo_t info;
+	materials->GetDisplayAdapterInfo( materials->GetCurrentAdapter(), info );
+	char gpuInfo[ 2048 ];
+
+	const char *dxlevel{ "N/A" };
+	const char *gpuRamSize{ nullptr };
+	if ( g_pMaterialSystemHardwareConfig )
+	{
+		dxlevel = COM_DXLevelToString( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() ) ;
+		gpuRamSize = Q_pretifymem(g_pMaterialSystemHardwareConfig->TextureMemorySize(), 2, true);
+	}
+
+	Q_snprintf( gpuInfo, sizeof( gpuInfo ),
+		"GPU %s, VRAM %s, DirectX level '%s', Viewport %d x %d",
+		info.m_pDriverName,
+		gpuRamSize,
+		dxlevel ? dxlevel : "N/A",
+		videomode->GetModeWidth(), videomode->GetModeHeight());
+
+	ConDMsg( "hardware: %s\n", gpuInfo );
+}
+
+void DisplaySystemVersion(char *osversion, int maxlen);
+
+CON_COMMAND( star_os, "Dump operating system stats" )
+{
+	char osversion[ 256 ];
+	DisplaySystemVersion( osversion, sizeof( osversion ) );
+
+	ConDMsg( "os: %s\n", osversion );
 }

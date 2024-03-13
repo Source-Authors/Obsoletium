@@ -10,6 +10,8 @@
 #include "tier0/memdbgon.h" // needed because in release builds crtdbg.h is handled specially if USE_MEM_DEBUG is defined
 #include "tier0/memdbgoff.h"
 #include <crtdbg.h>   // For getting at current heap size
+
+#include "winlite.h"
 #endif
 
 #include "tier1/fmtstr.h"
@@ -3774,109 +3776,9 @@ void Host_CheckGore( void )
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void Host_InitProcessor( void )
+void Host_InitCpu()
 {
-	const CPUInformation& pi = *GetCPUInformation();
-
-	// Compute Frequency in Mhz: 
-	char* szFrequencyDenomination = "MHz";
-	float fFrequency = pi.m_Speed / 1000000.0f;
-
-	// Adjust to Ghz if nessecary:
-	if( fFrequency > 1000.0f )
-	{
-		fFrequency /= 1000.0f;
-		szFrequencyDenomination = "GHz";
-	}
-
-	char szFeatureString[256];
-	Q_strncpy( szFeatureString, pi.m_szProcessorBrand, sizeof( szFeatureString ) );
-	Q_strncat( szFeatureString, " ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-
-	if( pi.m_bSSE )
-	{
-		if( MathLib_SSEEnabled() ) Q_strncat(szFeatureString, "SSE ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-		else					   Q_strncat(szFeatureString, "(SSE) ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-	}
-
-	if( pi.m_bSSE2 )
-	{
-		if( MathLib_SSE2Enabled() ) Q_strncat(szFeatureString, "SSE2 ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-		else					   Q_strncat(szFeatureString, "(SSE2) ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-	}
-
-	if (pi.m_bSSE3)
-	{
-		Q_strncat( szFeatureString, "(SSE3) ", sizeof(szFeatureString), COPY_ALL_CHARACTERS );
-	}
-
-	if (pi.m_bSSSE3)
-	{
-		Q_strncat( szFeatureString, "(SSSE3) ", sizeof(szFeatureString), COPY_ALL_CHARACTERS );
-	}
-
-	if (pi.m_bSSE4a)
-	{
-		Q_strncat( szFeatureString, "(SSE4a) ", sizeof(szFeatureString), COPY_ALL_CHARACTERS );
-	}
-
-	if (pi.m_bSSE41)
-	{
-		Q_strncat( szFeatureString, "(SSE4.1) ", sizeof(szFeatureString), COPY_ALL_CHARACTERS );
-	}
-
-	if (pi.m_bSSE42)
-	{
-		Q_strncat( szFeatureString, "(SSE4.2) ", sizeof(szFeatureString), COPY_ALL_CHARACTERS );
-	}
-
-	if( pi.m_bMMX )
-	{
-		if( MathLib_MMXEnabled() ) Q_strncat(szFeatureString, "MMX ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-		else					   Q_strncat(szFeatureString, "(MMX) ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-	}
-
-	if( pi.m_b3DNow )
-	{
-		if( MathLib_3DNowEnabled() ) Q_strncat(szFeatureString, "3DNow ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-		else					   Q_strncat(szFeatureString, "(3DNow) ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-	}
-
-	if( pi.m_bRDTSC )	Q_strncat(szFeatureString, "RDTSC ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-	if( pi.m_bCMOV )	Q_strncat(szFeatureString, "CMOV ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-	if( pi.m_bFCMOV )	Q_strncat(szFeatureString, "FCMOV ", sizeof( szFeatureString ), COPY_ALL_CHARACTERS );
-
-	// Remove the trailing space.  There will always be one.
-	szFeatureString[Q_strlen(szFeatureString)-1] = '\0';
-
-	// Dump CPU information:
-	if( pi.m_nLogicalProcessors == 1 )
-	{
-		ConDMsg( "hardware: 1 logical CPU, Frequency: %.01f %s,  Features: %s\n", 
-			fFrequency,
-			szFrequencyDenomination,
-			szFeatureString
-			);
-	} 
-	else
-	{
-		char buffer[256] = "";
-		if( pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors )
-		{
-			Q_snprintf(buffer, sizeof( buffer ), " (%hhu cores)", (int) pi.m_nPhysicalProcessors );
-		}
-
-		ConDMsg( "hardware: %hhu logical CPUs%s, Frequency: %.01f %s,  Features: %s\n", 
-			pi.m_nLogicalProcessors,
-			buffer,
-			fFrequency,
-			szFrequencyDenomination,
-			szFeatureString
-			);
-	}
+	Cbuf_AddText("star_cpu");
 
 #if defined( _WIN32 )
 	if ( s_bInitPME )
@@ -3885,6 +3787,21 @@ void Host_InitProcessor( void )
 		InitPME();
 	}
 #endif
+}
+
+void Host_InitRam()
+{
+	Cbuf_AddText("star_memory");
+}
+
+void Host_InitGpu()
+{
+	Cbuf_AddText("star_gpu");
+}
+
+void Host_InitOperatingSystem()
+{
+	Cbuf_AddText("star_os");
 }
 
 //-----------------------------------------------------------------------------
@@ -4216,8 +4133,6 @@ void Host_Init( bool bDedicated )
 
 	TRACEINIT( HLTV_Init(), HLTV_Shutdown() );
 
-	ConDMsg( "Heap size: %5.2f MiB\n", host_parms.memsize/(1024.0f*1024.0f) );
-
 #if !defined( SWDS )
 	if ( !bDedicated )
 	{
@@ -4299,8 +4214,14 @@ void Host_Init( bool bDedicated )
 
 	TelemetryTick();
 
-	// Initialize processor subsystem, and print relevant information:
-	Host_InitProcessor();
+	// Initialize CPU subsystem, and print relevant information:
+	Host_InitCpu();
+	// Print RAM info.
+	Host_InitRam();
+	// Print GPU info.
+	Host_InitGpu();
+	// Print OS info.
+	Host_InitOperatingSystem();
 
 	// Mark hunklevel at end of startup
 	Hunk_AllocName( 0, "-HOST_HUNKLEVEL-" );
