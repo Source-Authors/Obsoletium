@@ -25,10 +25,10 @@
 
 #include "tier0/dbg.h"
 #include "tier0/icommandline.h"
-#include "tier0/vcrmode.h"
 
 #include "boot_app_system_group.h"
 #include "file_logger.h"
+#include "vcr_helpers.h"
 
 #define VERSION_SAFE_STEAM_API_INTERFACES
 #include "steam/steam_api.h"
@@ -76,24 +76,11 @@ SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type,
   }
 }
 
-// Implementation of VCRHelpers.
-class CVCRHelpers : public IVCRHelpers {
- public:
-  void ErrorMessage(const char *message) override {
-#if defined(WIN32) || defined(LINUX)
-    NOVCR(SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "VCR Error", message,
-                                   nullptr));
-#endif
-  }
-
-  void *GetMainWindow() override { return nullptr; }
-};
-
 // Gets the executable name
-template <DWORD outSize>
-bool GetExecutableName(char (&out)[outSize]) {
+template <DWORD out_size>
+bool GetExecutableName(char (&out)[out_size]) {
 #ifdef WIN32
-  if (!::GetModuleFileName(GetModuleHandle(nullptr), out, outSize)) {
+  if (!::GetModuleFileName(GetModuleHandle(nullptr), out, out_size)) {
     return false;
   }
   return true;
@@ -124,7 +111,9 @@ void GetBaseDirectory(ICommandLine *command_line,
   if (IsPC()) {
     const char *override_directory{command_line->CheckParm("-basedir")};
 
-    if (override_directory) strcpy(base_directory, override_directory);
+    if (override_directory) {
+      Q_strncpy(base_directory, override_directory, std::size(base_directory));
+    }
   }
 
 #ifdef WIN32
@@ -150,11 +139,10 @@ bool InitTextMode() {
   }
 
   // reopen stdin handle as console window input
-  (void)freopen("CONIN$", "rb", stdin);
   // reopen stout handle as console window output
-  (void)freopen("CONOUT$", "wb", stdout);
   // reopen stderr handle as console window output
-  (void)freopen("CONOUT$", "wb", stderr);
+  ok = !!freopen("CONIN$", "rb", stdin) && !!freopen("CONOUT$", "wb", stdout) &&
+       !!freopen("CONOUT$", "wb", stderr);
 #endif
 
   return ok;
@@ -199,7 +187,7 @@ void TryToLoadSteamOverlayDLL() {
 // -applaunch 320 -game c:\steam\steamapps\sourcemods\modname', but applaunch
 // inserts its own -game parameter, which would supercede the one we really want
 // if we didn't intercede here.
-void RemoveSpuriousGameParameters(ICommandLine *command_line) {
+void RemoveDuplicatedGameParameters(ICommandLine *command_line) {
   // Find the last -game parameter.
   int game_args_count = 0;
   char last_game_arg[MAX_PATH];
@@ -237,6 +225,26 @@ void RemoveParametersOverrides(ICommandLine *command_line) {
   command_line->RemoveParm("-autoconfig");
   command_line->RemoveParm("+mat_hdr_level");
 }
+
+#ifdef WIN32
+bool ApplyProcessPriorityClass(ICommandLine *command_line) {
+  // Make low priority?
+  if (command_line->CheckParm("-low")) {
+    return !!SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
+  }
+
+  if (command_line->CheckParm("-high")) {
+    return !!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+  }
+
+  if (!command_line->CheckParm("-normal")) {
+    // dimhotepus: Above normal by default.
+    return !!SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
+  }
+
+  return true;
+}
+#endif
 
 int RunApp(ICommandLine *command_line, const char (&base_directory)[MAX_PATH],
            bool is_text_mode) {
@@ -345,7 +353,29 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
         "operating system.");
     return ERROR_OLD_WIN_VERSION;
   }
+#endif
 
+  // Can only run one windowed source app at a time.
+  const src::launcher::ScopedAppMultiRun scoped_app_multi_run;
+  if (!scoped_app_multi_run.is_single_run()) {
+    // Allow the user to explicitly say they want to be able to run multiple
+    // instances of the source mutex.  Useful for side-by-side comparisons of
+    // different renderers.
+    const bool allow_multirun{command_line->CheckParm("-multirun") != nullptr};
+    if (!allow_multirun) {
+      Error(
+          "Oops, the game is already launched\n\nSorry, but only "
+          "single game can run at the same time.");
+
+#ifdef WIN32
+      return ERROR_SINGLE_INSTANCE_APP;
+#else
+      return EEXIST;
+#endif
+    }
+  }
+
+#ifdef WIN32
   // COM is required.
   const src::launcher::ScopedCom scoped_com{
       static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE |
@@ -367,6 +397,18 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
         "Unable to set Windows timer resolution to %lld ms. Will use default "
         "one.",
         (long long)kSystemTimerResolution.count());
+  }
+
+  const src::launcher::ScopedWinsock scoped_winsock{MAKEWORD(2, 0)};
+  if (scoped_winsock.errc()) {
+    Warning("Windows sockets 2.0 unavailable (%d): %s.\n",
+            scoped_winsock.errc(),
+            std::system_category().message(scoped_winsock.errc()).c_str());
+  }
+
+  if (!ApplyProcessPriorityClass(command_line)) {
+    Warning("Unable to change game process priority. Will run as is: %s.",
+            std::system_category().message(::GetLastError()).c_str());
   }
 #endif
 
@@ -390,8 +432,16 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   // Figure out the directory the executable is running from.
   GetBaseDirectory(command_line, base_directory);
 
-  // Relaunch app if needed.
-  const src::launcher::ScopedAppRelaunch scoped_app_relaunch;
+  // Figure out the directory the executable is running from and make that be
+  // the current working directory.
+#ifdef WIN32
+  if (_chdir(base_directory)) {
+#else
+  if (chdir(base_directory)) {
+#endif
+    Warning("Unable to change current directory to %s: %s.", base_directory,
+            std::generic_category().message(errno).c_str());
+  }
 
   // This call is to emulate steam's injection of the GameOverlay DLL into our
   // process if we are running from the command line directly, this allows the
@@ -399,68 +449,11 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   // call has no effect on X360
   TryToLoadSteamOverlayDLL();
 
-  const char *vcr_file_path;
-  CVCRHelpers vcr_helpers;
-  // Start VCR mode?
-  if (command_line->CheckParm("-vcrrecord", &vcr_file_path)) {
-    if (!VCRStart(vcr_file_path, true, &vcr_helpers)) {
-      Error("-vcrrecord: can't open '%s' for writing.\n", vcr_file_path);
-      return -1;
-    }
-  } else if (command_line->CheckParm("-vcrplayback", &vcr_file_path)) {
-    if (!VCRStart(vcr_file_path, false, &vcr_helpers)) {
-      Error("-vcrplayback: can't open '%s' for reading.\n", vcr_file_path);
-      return -1;
-    }
-  }
+  auto [vcr_helpers, rc] = src::launcher::CreateVcrHelpers(command_line);
+  if (rc != 0) return rc;
 
   // See the function for why we do this.
-  RemoveSpuriousGameParameters(command_line);
-
-#ifdef WIN32
-  const src::launcher::ScopedWinsock scoped_winsock{MAKEWORD(2, 0)};
-  if (scoped_winsock.errc()) {
-    Warning("Windows sockets 2.0 unavailable (%d): %s.\n",
-            scoped_winsock.errc(),
-            std::system_category().message(scoped_winsock.errc()).c_str());
-  }
-#endif
-
-  // Run in text mode (no graphics & sound)?
-  const bool is_text_mode{command_line->CheckParm("-textmode") &&
-                          InitTextMode()};
-
-  // Can only run one windowed source app at a time.
-  const src::launcher::ScopedAppMultiRun scoped_app_multi_run;
-  if (!scoped_app_multi_run.IsSingleRun()) {
-    // Allow the user to explicitly say they want to be able to run multiple
-    // instances of the source mutex.  Useful for side-by-side comparisons of
-    // different renderers.
-    const bool allow_multirun{command_line->CheckParm("-multirun") != nullptr};
-    if (!allow_multirun) {
-      Error(
-          "Oops, the game is already launched\n\nSorry, but only "
-          "single game can run at the same time.");
-
-#if defined(WIN32)
-      return ERROR_SINGLE_INSTANCE_APP;
-#else
-      return EEXIST;
-#endif
-    }
-  }
-
-#ifdef WIN32
-  // Make low priority?
-  if (command_line->CheckParm("-low")) {
-    SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
-  } else if (command_line->CheckParm("-high")) {
-    SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
-  } else if (!command_line->CheckParm("-normal")) {
-    // dimhotepus: Above normal by default.
-    SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
-  }
-#endif
+  RemoveDuplicatedGameParameters(command_line);
 
   // If game is not run from Steam then add -insecure in order to avoid client
   // timeout message.
@@ -468,15 +461,15 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
     command_line->AppendParm("-insecure", nullptr);
   }
 
-  // Figure out the directory the executable is running from and make that be
-  // the current working directory.
-  if (_chdir(base_directory)) {
-    Warning("Unable to change current directory to %s: %s.", base_directory,
-            std::generic_category().message(errno).c_str());
-  }
-
+  // Relaunch app if needed.
+  const src::launcher::ScopedAppRelaunch scoped_app_relaunch;
+  // Dump heap leaks if needed.
   const src::launcher::ScopedHeapLeakDumper scoped_heap_leak_dumper{
       !!command_line->CheckParm("-leakcheck")};
+
+  // Run in text mode (no graphics & sound)?
+  const bool is_text_mode{command_line->CheckParm("-textmode") &&
+                          InitTextMode()};
 
   return RunApp(command_line, base_directory, is_text_mode);
 }

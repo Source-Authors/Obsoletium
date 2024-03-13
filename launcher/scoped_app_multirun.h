@@ -153,7 +153,7 @@ class ScopedAppMultiRun {
   ScopedAppMultiRun &operator=(const ScopedAppMultiRun &) = delete;
   ScopedAppMultiRun &operator=(ScopedAppMultiRun &&) = delete;
 
-  bool IsSingleRun() const noexcept {
+  bool is_single_run() const noexcept {
 #if defined(WIN32)
     return !!mutex_;
 #else

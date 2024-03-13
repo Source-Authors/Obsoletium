@@ -32,9 +32,7 @@ class ScopedCom {
   [[nodiscard]] HRESULT errc() const noexcept { return errc_; }
 
   ~ScopedCom() noexcept {
-    if (SUCCEEDED(errc_)) {
-      CoUninitialize();
-    }
+    if (SUCCEEDED(errc_)) CoUninitialize();
   }
 
  private:
