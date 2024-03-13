@@ -165,9 +165,14 @@ static const char *get_consolelog_filename()
 
 SpewRetval_t DedicatedSpewOutputFunc( SpewType_t spewType, char const *pMsg )
 {
+	constexpr char swdsGroup[] = "swds";
+	const char* group = GetSpewOutputGroup();
+
+	group = group && group[0] ? group : swdsGroup;
+
 	if ( sys )
 	{
-		sys->Printf( "%s", pMsg );
+		sys->Printf( "%s: %s", group, pMsg );
 
 		// If they have specified -consolelog, log this message there. Otherwise these
 		//	wind up being lost because Sys_InitGame hasn't been called yet, and 
@@ -194,7 +199,7 @@ SpewRetval_t DedicatedSpewOutputFunc( SpewType_t spewType, char const *pMsg )
 		extern bool g_bVGui;
 		if ( g_bVGui )
 		{
-			MessageBox( NULL, pMsg, "Error", MB_OK | MB_TASKMODAL );
+			MessageBox( NULL, pMsg, "Error", MB_OK | MB_TASKMODAL | MB_ICONERROR );
 		}
 		TerminateProcess( GetCurrentProcess(), 1 );
 #elif POSIX

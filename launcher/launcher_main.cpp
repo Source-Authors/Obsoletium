@@ -45,8 +45,16 @@ extern void *CreateSDLMgr();
 namespace {
 
 // Spew function!
-SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type,
-                                     const char *message) {
+SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type, const char *raw) {
+  char message[4096];
+
+  constexpr char engineGroup[] = "launcher";
+  const char *group = GetSpewOutputGroup();
+
+  group = group && group[0] ? group : engineGroup;
+
+  Q_snprintf(message, std::size(message), "%s: %s", group, raw);
+
   Plat_DebugString(message);
 
   switch (spew_type) {
@@ -471,5 +479,9 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   const bool is_text_mode{command_line->CheckParm("-textmode") &&
                           InitTextMode()};
 
-  return RunApp(command_line, base_directory, is_text_mode);
+  rc = RunApp(command_line, base_directory, is_text_mode);
+
+  SpewOutputFunc(nullptr);
+
+  return rc;
 }

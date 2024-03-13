@@ -4087,7 +4087,8 @@ bool DLL_LOCAL Host_AllowLoadModule( const char *pFilename, const char *pPathID,
 		}
 		else
 		{
-			Warning("Loading unsigned module %s\nAccess to secure servers is disabled.\n", pFilename );
+			Warning("Loading unsigned module %s\n", pFilename);
+			Warning("Access to secure servers is disabled.\n");
 			return true;
 		}
 

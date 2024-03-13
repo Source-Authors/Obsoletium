@@ -851,6 +851,11 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 	// excessive spew. Having the output in traces is also generically useful
 	// for understanding slowdowns.
 	ETWMark1I( pMsg, spewType );
+	
+	constexpr char engineGroup[] = "engine";
+	const char* group = GetSpewOutputGroup();
+
+	group = group && group[0] ? group : engineGroup;
 
 	if ( !suppress )
 	{
@@ -868,11 +873,11 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 		{
 			if (spewType == SPEW_MESSAGE || spewType == SPEW_LOG)
 			{
-				printf( "%s", pMsg );
+				printf( "%s: %s", group, pMsg );
 			}
 			else
 			{
-				fprintf( stderr, "%s", pMsg );
+				fprintf( stderr, "%s: %s", group, pMsg );
 			}
 		}
 
@@ -904,12 +909,12 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 				}
 				break;
 			}
-			Con_ColorPrintf( color, "%s", pMsg );
+			Con_ColorPrintf( color, "%s: %s", group, pMsg );
 
 		}
 		else
 		{
-			g_Log.Printf( "%s", pMsg );
+			g_Log.Printf( "%s: %s", group, pMsg );
 		}
 	}
 
@@ -917,7 +922,7 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 
 	if (spewType == SPEW_ERROR)
 	{
-		Sys_Error( "%s", pMsg );
+		Sys_Error( "%s: %s", group, pMsg );
 		return SPEW_ABORT;
 	}
 	if (spewType == SPEW_ASSERT)
