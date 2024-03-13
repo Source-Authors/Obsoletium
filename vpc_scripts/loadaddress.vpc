@@ -21,7 +21,7 @@
 //	"ProjectName" is the internal short project name reference and is usually the name of
 //	the project inside a group definition.
 //
-//	"Length" is either floating point MB or integer bytes, and is used to successively
+//	"Length" is either floating point MiB or integer bytes, and is used to successively
 //	to determine the next base address.
 //-----------------------------------------------------------------------------
 

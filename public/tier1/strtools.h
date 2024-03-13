@@ -631,7 +631,7 @@ template <size_t maxLenInChars> int V_swprintf_safe( OUT_Z_ARRAY wchar_t (&pDest
 	return result;
 }
 
-// Prints out a pretified memory counter string value ( e.g., 7,233.27 Mb, 1,298.003 Kb, 127 bytes )
+// Prints out a pretified memory counter string value ( e.g., 7,233.27 MiB, 1,298.003 KiB, 127 bytes )
 char *V_pretifymem( float value, int digitsafterdecimal = 2, bool usebinaryonek = false );
 
 // Prints out a pretified integer with comma separators (eg, 7,233,270,000)

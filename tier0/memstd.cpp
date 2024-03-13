@@ -94,7 +94,7 @@ void *operator new[] ( unsigned int nSize, int nBlockUse, const char *pFileName,
 // Support for CHeapMemAlloc for easy switching to using the process heap.
 #ifdef ALLOW_PROCESS_HEAP
 
-// Round a size up to a multiple of 4 KB to aid in calculating how much
+// Round a size up to a multiple of 4 KiB to aid in calculating how much
 // memory is required if full pageheap is enabled.
 static size_t RoundUpToPage( size_t nSize )
 {
@@ -271,16 +271,16 @@ public:
 
 	virtual void DumpStats()
 	{
-		const size_t MB = 1024 * 1024;
+		const size_t MiB = 1024 * 1024;
 		Msg( "Sorry -- no stats saved to file memstats.txt when the heap allocator is enabled.\n" );
 		// Print requested memory.
-		Msg( "%u MB allocated.\n", ( unsigned )( m_nOutstandingBytes / MB ) );
+		Msg( "%u MiB allocated.\n", ( unsigned )( m_nOutstandingBytes / MiB ) );
 		// Print memory after rounding up to pages.
-		Msg( "%u MB assuming maximum PageHeap overhead.\n", ( unsigned )( m_nOutstandingPageHeapBytes / MB ));
+		Msg( "%u MiB assuming maximum PageHeap overhead.\n", ( unsigned )( m_nOutstandingPageHeapBytes / MiB ));
 		// Print memory after adding in reserved page after every allocation. Do 64-bit calculations
-		// because the pageHeap required memory can easily go over 4 GB.
+		// because the pageHeap required memory can easily go over 4 GiB.
 		__int64 pageHeapBytes = m_nOutstandingPageHeapBytes + m_nOutstandingAllocations * 4096LL;
-		Msg( "%u MB address space used assuming maximum PageHeap overhead.\n", ( unsigned )( pageHeapBytes / MB ));
+		Msg( "%u MiB address space used assuming maximum PageHeap overhead.\n", ( unsigned )( pageHeapBytes / MiB ));
 		Msg( "%u outstanding allocations (%d delta).\n", ( unsigned )m_nOutstandingAllocations, ( int )( m_nOutstandingAllocations - m_nOldOutstandingAllocations ) );
 		Msg( "%u lifetime allocations (%u delta).\n", ( unsigned )m_nLifetimeAllocations, ( unsigned )( m_nLifetimeAllocations - m_nOldLifetimeAllocations ) );
 		Msg( "%u allocation failures.\n", ( unsigned )m_nAllocFailures );
@@ -332,12 +332,12 @@ private:
 	volatile size_t m_nOutstandingBytes;
 
 	// Total outstanding committed bytes assuming that all allocations are
-	// put on individual 4-KB pages (true when using full PageHeap from
+	// put on individual 4-KiB pages (true when using full PageHeap from
 	// App Verifier).
 	volatile size_t m_nOutstandingPageHeapBytes;
 
 	// Total outstanding allocations. With PageHeap enabled each allocation
-	// requires an extra 4-KB page of address space.
+	// requires an extra 4-KiB page of address space.
 	volatile LONG m_nOutstandingAllocations;
 	LONG m_nOldOutstandingAllocations;
 
@@ -456,11 +456,11 @@ bool CheckWindowsAllocSettings( const char* upperCommandLine )
 	bool bETWHeapEnabled = false;
 	s_bPageHeapEnabled = IsPageHeapEnabled( bETWHeapEnabled );
 
-	// Should we reserve the bottom 4 GB of RAM in order to flush out pointer
+	// Should we reserve the bottom 4 GiB of RAM in order to flush out pointer
 	// truncation bugs? This helps ensure 64-bit compatibility.
 	// However this needs to be off by default to avoid causing compatibility problems,
 	// with Steam detours and other systems. It should also be disabled when PageHeap
-	// is on because for some reason the combination turns into 4 GB of working set, which
+	// is on because for some reason the combination turns into 4 GiB of working set, which
 	// can easily cause problems.
 	if ( strstr( upperCommandLine, "-RESERVELOWMEM" ) && !s_bPageHeapEnabled )
 		ReserveBottomMemory();
@@ -1028,13 +1028,13 @@ void CSmallBlockHeap::DumpStats( FILE *pFile )
 
 		for ( int i = 0; i < NUM_POOLS; i++ )
 		{
-			Msg( "Pool %i: (size: %llu) blocks: allocated:%i free:%i committed:%i (committed size:%u kb)\n",i, (uint64)m_Pools[i].GetBlockSize(),m_Pools[i].CountAllocatedBlocks(), m_Pools[i].CountFreeBlocks(),m_Pools[i].CountCommittedBlocks(), m_Pools[i].GetCommittedSize() / 1024);
+			Msg( "Pool %i: (size: %llu) blocks: allocated:%i free:%i committed:%i (committed size:%u KiB)\n",i, (uint64)m_Pools[i].GetBlockSize(),m_Pools[i].CountAllocatedBlocks(), m_Pools[i].CountFreeBlocks(),m_Pools[i].CountCommittedBlocks(), m_Pools[i].GetCommittedSize() / 1024);
 
 			bytesCommitted += m_Pools[i].GetCommittedSize();
 			bytesAllocated += ( m_Pools[i].CountAllocatedBlocks() * m_Pools[i].GetBlockSize() );
 		}
 
-		Msg( "Totals: Committed:%u kb Allocated:%u kb\n", bytesCommitted / 1024, bytesAllocated / 1024 );
+		Msg( "Totals: Committed:%u KiB Allocated:%u KiB\n", bytesCommitted / 1024, bytesAllocated / 1024 );
 	}
 }
 
@@ -1426,7 +1426,7 @@ void CX360SmallBlockHeap::DumpStats( FILE *pFile )
 			bytesAllocated += ( m_Pools[i].CountAllocatedBlocks() * m_Pools[i].GetBlockSize() );
 		}
 
-		Msg( "Totals: Committed:%u kb Allocated:%u kb\n", bytesCommitted / 1024, bytesAllocated / 1024 );
+		Msg( "Totals: Committed:%u KiB Allocated:%u KiB\n", bytesCommitted / 1024, bytesAllocated / 1024 );
 	}
 }
 
@@ -1804,7 +1804,7 @@ size_t CStdMemAlloc::MemoryAllocFailed()
 void ReserveBottomMemory()
 {
 	// If we are running a 64-bit build then reserve all addresses below the
-	// 4 GB line to push as many pointers as possible above the line.
+	// 4 GiB line to push as many pointers as possible above the line.
 #ifdef PLATFORM_WINDOWS_PC64
 	// Avoid the cost of calling this multiple times.
 	static bool s_initialized = false;
@@ -1814,7 +1814,7 @@ void ReserveBottomMemory()
 
 	// If AppVerifier is enabled then memory reservations get turned into committed
 	// memory in the working set. This means that ReserveBottomMemory() can end
-	// up adding almost 4 GB to the working set, which is a significant problem if
+	// up adding almost 4 GiB to the working set, which is a significant problem if
 	// you run many processes in parallel. Therefore, if vfbasics.dll (part of AppVerifier)
 	// is loaded, don't do the reservation.
 	HMODULE vfBasicsDLL = GetModuleHandle( "vfbasics.dll" );
@@ -1822,12 +1822,12 @@ void ReserveBottomMemory()
 		return;
 
 	// Start by reserving large blocks of memory. When those reservations
-	// have exhausted the bottom 4 GB then halve the size and try again.
-	// The granularity for reserving address space is 64 KB so if we wanted
-	// to reserve every single page we would need to continue down to 64 KB.
-	// However stopping at 1 MB is sufficient because it prevents the Windows
+	// have exhausted the bottom 4 GiB then halve the size and try again.
+	// The granularity for reserving address space is 64 KiB so if we wanted
+	// to reserve every single page we would need to continue down to 64 KiB.
+	// However stopping at 1 MiB is sufficient because it prevents the Windows
 	// heap (and dlmalloc and the small block heap) from grabbing address space
-	// from the bottom 4 GB, while still allowing Steam to allocate a few pages
+	// from the bottom 4 GiB, while still allowing Steam to allocate a few pages
 	// for setting up detours.
 	const size_t LOW_MEM_LINE = 0x100000000LL;
 	size_t totalReservation = 0;
@@ -1854,8 +1854,8 @@ void ReserveBottomMemory()
 	}
 
 	// Now repeat the same process but making heap allocations, to use up the
-	// already committed heap blocks that are below the 4 GB line. Now we start
-	// with 64-KB allocations and proceed down to 16-byte allocations.
+	// already committed heap blocks that are below the 4 GiB line. Now we start
+	// with 64-KiB allocations and proceed down to 16-byte allocations.
 	HANDLE heap = GetProcessHeap();
 	for ( size_t blockSize = 64 * 1024; blockSize >= 16; blockSize /= 2 )
 	{
@@ -1880,10 +1880,10 @@ void ReserveBottomMemory()
 	// Print diagnostics showing how many allocations we had to make in order to
 	// reserve all of low memory. In one test run it took 55 virtual allocs and
 	// 85 heap allocs. Note that since the process may have multiple heaps (each
-	// CRT seems to have its own) there is likely to be a few MB of address space
+	// CRT seems to have its own) there is likely to be a few MiB of address space
 	// that was previously reserved and is available to be handed out by some allocators.
 	//char buffer[1000];
-	//sprintf_s( buffer, "Reserved %1.3f MB (%d vallocs, %d heap allocs) to keep allocations out of low-memory.\n",
+	//sprintf_s( buffer, "Reserved %1.3f MiB (%d vallocs, %d heap allocs) to keep allocations out of low-memory.\n",
 	//			totalReservation / (1024 * 1024.0), (int)numVAllocs, (int)numHeapAllocs );
 	// Can't use Msg here because it isn't necessarily initialized yet.
 	//OutputDebugString( buffer );

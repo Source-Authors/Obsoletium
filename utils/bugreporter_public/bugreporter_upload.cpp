@@ -834,7 +834,7 @@ EBugReportUploadStatus Win32UploadBugReportBlocking
 	encrypted.PutString( rBugReportParameters.m_sGameDirectory );
 	encrypted.PutString( rBugReportParameters.m_sMapName );
 
-	encrypted.PutInt( rBugReportParameters.m_uRAM );					// ram mb
+	encrypted.PutInt( rBugReportParameters.m_uRAM );					// ram MiB
 	encrypted.PutInt( rBugReportParameters.m_uCPU );		// cpu mhz
 
 	encrypted.PutString( rBugReportParameters.m_sProcessor );

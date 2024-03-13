@@ -4248,7 +4248,7 @@ void CShaderAPIDx8::ExportTextureList()
 		}
 		totalMemory += pXTextureList[i].size;
 	}
-	Msg( "Total D3D Texture Memory: %.2f MB\n", (float)totalMemory/( 1024.0f * 1024.0f ) );
+	Msg( "Total D3D Texture Memory: %.2f MiB\n", (float)totalMemory/( 1024.0f * 1024.0f ) );
 
 	// transmit to console
 	XBX_rTextureList( numTextures, pXTextureList );

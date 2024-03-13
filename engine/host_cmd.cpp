@@ -1523,7 +1523,7 @@ CON_COMMAND( memory, "Print memory stats." )
 	}
 	else
 	{
-		ConMsg( "%5.2f MB (%d bytes)\n", nTotal/(1024.0f*1024.0f), nTotal );
+		ConMsg( "%5.2f MiB (%d bytes)\n", nTotal/(1024.0f*1024.0f), nTotal );
 	}
 #endif
 
@@ -1543,11 +1543,11 @@ CON_COMMAND( memory, "Print memory stats." )
 			{
 				pName += prefixLen;
 			}
-			ConMsg( "%5.2f MB: %s\n", value, pName );
+			ConMsg( "%5.2f MiB: %s\n", value, pName );
 		}
 	}
 	ConMsg("------------------\n");
-	ConMsg( "%5.2f MB: total\n", total );
+	ConMsg( "%5.2f MiB: total\n", total );
 #endif
 
 	ConMsg( "\nHunk Memory Used:\n" );

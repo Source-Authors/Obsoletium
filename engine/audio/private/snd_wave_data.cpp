@@ -1757,7 +1757,7 @@ void CAsyncWavDataCache::SpewMemoryUsage( int level )
 			}
 		}
 
-		ConMsg( "CAsyncWavDataCache: %.2f MB used of %.2f MB, %.2f%% of capacity", (float)bytesUsed/(1024.0f*1024.0f), (float)bytesTotal/(1024.0f*1024.0f), percent );
+		ConMsg( "CAsyncWavDataCache: %.2f MiB used of %.2f MiB, %.2f%% of capacity", (float)bytesUsed/(1024.0f*1024.0f), (float)bytesTotal/(1024.0f*1024.0f), percent );
 	}
 }
 

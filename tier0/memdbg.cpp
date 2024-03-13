@@ -1509,7 +1509,7 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 		size_t usedMemory, freeMemory;
 		GlobalMemoryStatus( &usedMemory, &freeMemory );
 		MemInfo_t info;
-		// OS takes 32 MB, report our internal allocations only
+		// OS takes 32 MiB, report our internal allocations only
 		info.m_nCurrentSize = usedMemory;
 		DumpMemInfo( "Used Memory", 0, info );
 	}

@@ -526,7 +526,7 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 
 	if ( !bQuiet )
 	{
-		Msg( "Scenes: Final size: %.2f MB\n", targetBuffer.TellMaxPut() / (1024.0f * 1024.0f ) );
+		Msg( "Scenes: Final size: %.2f MiB\n", targetBuffer.TellMaxPut() / (1024.0f * 1024.0f ) );
 	}
 
 	// cleanup

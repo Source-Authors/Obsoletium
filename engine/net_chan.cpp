@@ -40,7 +40,7 @@ static ConVar net_blockmsg( "net_blockmsg", "none", FCVAR_CHEAT, "Discards incom
 static ConVar net_showdrop( "net_showdrop", "0", 0, "Show dropped packets in console" );
 static ConVar net_drawslider( "net_drawslider", "0", 0, "Draw completion slider during signon" );
 static ConVar net_chokeloopback( "net_chokeloop", "0", 0, "Apply bandwidth choke to loopback packets" );
-static ConVar net_maxfilesize( "net_maxfilesize", "16", 0, "Maximum allowed file size for uploading in MB", true, 0, true, 64 );
+static ConVar net_maxfilesize( "net_maxfilesize", "16", 0, "Maximum allowed file size for uploading in MiB", true, 0, true, 64 );
 static ConVar net_compresspackets( "net_compresspackets", "1", 0, "Use compression on game packets." );
 static ConVar net_compresspackets_minsize( "net_compresspackets_minsize", "1024", 0, "Don't bother compressing packets below this size." );
 static ConVar net_maxcleartime( "net_maxcleartime", "4.0", 0, "Max # of seconds we can wait for next packets to be sent based on rate setting (0 == no limit)." );
@@ -1110,7 +1110,7 @@ bool CNetChan::CreateFragmentsFromFile( const char *filename, int stream, unsign
 
 	if ( totalBytes >= (net_maxfilesize.GetInt()*1024*1024) )
 	{
-		ConMsg( "CreateFragmentsFromFile: '%s' size exceeds net_maxfilesize limit (%i MB).\n", filename, net_maxfilesize.GetInt() );
+		ConMsg( "CreateFragmentsFromFile: '%s' size exceeds net_maxfilesize limit (%i MiB).\n", filename, net_maxfilesize.GetInt() );
 		return false;
 	}
 	
@@ -1323,7 +1323,7 @@ bool CNetChan::ReadSubChannelData( bf_read &buf, int stream  )
 
 	if ( !bSingleBlock )
 	{
-		startFragment = buf.ReadUBitLong( MAX_FILE_SIZE_BITS-FRAGMENT_BITS ); // 16 MB max
+		startFragment = buf.ReadUBitLong( MAX_FILE_SIZE_BITS-FRAGMENT_BITS ); // 16 MiB max
 		numFragments = buf.ReadUBitLong( 3 );  // 8 fragments per packet max
 		offset = startFragment * FRAGMENT_SIZE;
 		length = numFragments * FRAGMENT_SIZE;

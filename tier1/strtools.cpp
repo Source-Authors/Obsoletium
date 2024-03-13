@@ -980,7 +980,7 @@ wchar_t *V_wcsncat( INOUT_Z_CAP(cchDest) wchar_t *pDest, const wchar_t *pSrc, si
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Converts value into x.xx MB/ x.xx KB, x.xx bytes format, including commas
+// Purpose: Converts value into x.xx MiB/ x.xx KiB, x.xx bytes format, including commas
 // Input  : value - 
 //			2 - 
 //			false - 
@@ -994,6 +994,8 @@ char *V_pretifymem( float value, int digitsafterdecimal /*= 2*/, bool usebinaryo
 
 	float		onekb = usebinaryonek ? 1024.0f : 1000.0f;
 	float		onemb = onekb * onekb;
+	float		onegb = onemb * onekb;
+	float		onetb = onegb * onekb;
 
 	char *out = output[ current ];
 	current = ( current + 1 ) & ( NUM_PRETIFYMEM_BUFFERS -1 );
@@ -1001,15 +1003,25 @@ char *V_pretifymem( float value, int digitsafterdecimal /*= 2*/, bool usebinaryo
 	char suffix[ 8 ];
 
 	// First figure out which bin to use
-	if ( value > onemb )
+	if ( value > onetb )
+	{
+		value /= onetb;
+		V_snprintf(suffix, sizeof(suffix), usebinaryonek ? " TiB" : " TB" );
+	}
+	else if ( value > onegb )
+	{
+		value /= onegb;
+		V_snprintf(suffix, sizeof(suffix), usebinaryonek ? " GiB" : " GB" );
+	}
+	else if ( value > onemb )
 	{
 		value /= onemb;
-		V_snprintf( suffix, sizeof( suffix ), " MB" );
+		V_snprintf(suffix, sizeof(suffix), usebinaryonek ? " MiB" : " MB" );
 	}
 	else if ( value > onekb )
 	{
 		value /= onekb;
-		V_snprintf( suffix, sizeof( suffix ), " KB" );
+		V_snprintf( suffix, sizeof( suffix ), usebinaryonek ? " KiB" : " KB" );
 	}
 	else
 	{
@@ -1022,7 +1034,7 @@ char *V_pretifymem( float value, int digitsafterdecimal /*= 2*/, bool usebinaryo
 	digitsafterdecimal = max( digitsafterdecimal, 0 );
 
 	// If it's basically integral, don't do any decimals
-	if ( FloatMakePositive( value - (int)value ) < 0.00001 )
+	if ( FloatMakePositive( value - (int)value ) < 0.00001F )
 	{
 		V_snprintf( val, sizeof( val ), "%i%s", (int)value, suffix );
 	}

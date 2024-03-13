@@ -695,7 +695,7 @@ InitReturnVal_t CMDLCache::Init()
 
 	if ( !m_pAnimBlockCacheSection )
 	{
-		// 360 tuned to worst case, ep_outland_12a, less than 6 MB is not a viable working set
+		// 360 tuned to worst case, ep_outland_12a, less than 6 MiB is not a viable working set
 		unsigned int animBlockLimit = IsX360() ? 6*1024*1024 : (unsigned)-1;
 		DataCacheLimits_t limits( animBlockLimit, (unsigned)-1, 0, 0 );
 		m_pAnimBlockCacheSection = g_pDataCache->AddSection( this, MODEL_CACHE_ANIMBLOCK_SECTION_NAME, limits );

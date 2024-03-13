@@ -443,7 +443,7 @@ void CMessageList::PrintMultiplexStats( MsgInfo_t::EStatsGroup eGroup, bool bSor
 		mapValueToMsg.Insert( bSortByFrequency ? (uint64)nCount : uBytes, n );
 	}
 
-	EmitInfo( SPEW_CONSOLE, SPEW_ALWAYS, LOG_ALWAYS, "%s", "EMsg  MessageName                                         Count      %             KB      %    Avg/Msg       KBPS  Msg Saved      %       KB Saved      %\n" );
+	EmitInfo( SPEW_CONSOLE, SPEW_ALWAYS, LOG_ALWAYS, "%s", "EMsg  MessageName                                         Count      %            KiB      %    Avg/Msg       KBPS  Msg Saved      %      KiB Saved      %\n" );
 	EmitInfo( SPEW_CONSOLE, SPEW_ALWAYS, LOG_ALWAYS, "%s", "----- ---------------------------------------------- ---------- ------ -------------- ------ ---------- ---------- ---------- ------ -------------- ------\n" );
 
 	uint32 unTotalMessages = 0;

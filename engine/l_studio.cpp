@@ -640,7 +640,7 @@ struct colormeshparams_t
 {
 	int					m_nMeshes;
 	int					m_nTotalVertexes;
-	// Given memory alignment (VBs must be 4-KB aligned on X360, for example), it can be more efficient
+	// Given memory alignment (VBs must be 4-KiB aligned on X360, for example), it can be more efficient
 	// to allocate many color meshes out of a single shared vertex buffer (using vertex 'stream offset')
 	IPooledVBAllocator *m_pPooledVBAllocator;
 	int					m_nVertexes[256];
@@ -3305,7 +3305,7 @@ void CModelRender::InitColormeshParams( ModelInstance_t &instance, studiohwdata_
 		 ( r_proplightingpooling.GetInt() == 1 ) )
 	{
 		// Color meshes can be allocated in a shared pool for static props
-		// (saves memory on X360 due to 4-KB VB alignment)
+		// (saves memory on X360 due to 4-KiB VB alignment)
 		pColorMeshParams->m_pPooledVBAllocator = (IPooledVBAllocator *)&m_colorMeshVBAllocator;
 	}
 
@@ -4563,7 +4563,7 @@ void CModelRender::SetupColorMeshes( int nTotalVerts )
 	// Set up the appropriate default value for color mesh pooling
 	if ( r_proplightingpooling.GetInt() == -1 )
 	{
-		// This is useful on X360 because VBs are 4-KB aligned, so using a shared VB saves tons of memory
+		// This is useful on X360 because VBs are 4-KiB aligned, so using a shared VB saves tons of memory
 		r_proplightingpooling.SetValue( true );
 	}
 

@@ -1459,7 +1459,7 @@ void LoadSubTexture( TextureLoadInfo_t &info, int xOffset, int yOffset, int srcS
 
 
 //-----------------------------------------------------------------------------
-// Returns the size of texture memory, in MB
+// Returns the size of texture memory, in MiB
 //-----------------------------------------------------------------------------
 // Helps with startup time.. we don't use the texture memory size for anything anyways
 #define DONT_CHECK_MEM

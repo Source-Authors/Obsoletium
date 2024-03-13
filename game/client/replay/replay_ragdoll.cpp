@@ -363,7 +363,7 @@ void CReplayRagdollRecorder::PrintDebug()
 	int nLine = 0;
 
 	// Print memory usage
-	engine->Con_NPrintf( nLine++, "ragdolls: %.2f MB", gs_nBytesAllocated / 1048576.0f );
+	engine->Con_NPrintf( nLine++, "ragdolls: %.2f MiB", gs_nBytesAllocated / 1048576.0f );
 
 	// Print server time
 	engine->Con_NPrintf( nLine++, "server time: %d", GetServerTickCount() );

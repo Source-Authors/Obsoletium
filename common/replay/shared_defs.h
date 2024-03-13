@@ -66,7 +66,7 @@
 
 #define JOB_FAILED					( (JobStatus_t) -1 )
 
-#define DOWNLOAD_MAX_SIZE			( 8 * 1024 * 1024 )		// 8 MB
+#define DOWNLOAD_MAX_SIZE			( 8 * 1024 * 1024 )		// 8 MiB
 
 //----------------------------------------------------------------------------------------
 

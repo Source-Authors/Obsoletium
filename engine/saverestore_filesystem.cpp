@@ -710,7 +710,7 @@ void CSaveRestoreFileSystem::DirectorCopyToMemory( const char *pPath, const char
 				saveFile.pCompressedBuffer->Put( &fileSize, sizeof(fileSize) );
 				saveFile.pCompressedBuffer->Put( file.pCompressedBuffer->Base(), file.nCompressedSize );
 				
-				SaveMsg("SIM: Packed: %s [Size: %.02f KB]\n", GetString( file.name ), (float)file.nCompressedSize / 1024.0f );
+				SaveMsg("SIM: Packed: %s [Size: %.02f KiB]\n", GetString( file.name ), (float)file.nCompressedSize / 1024.0f );
 				nNumFilesPacked++;
 			}
 		}
@@ -718,7 +718,7 @@ void CSaveRestoreFileSystem::DirectorCopyToMemory( const char *pPath, const char
 
 	// Set the final, complete size of the file
 	saveFile.nCompressedSize = saveFile.pCompressedBuffer->TellMaxPut();
-	SaveMsg("SIM: (%s) Total Files Packed: %d [Size: %.02f KB]\n", GetString( saveFile.name ), nNumFilesPacked, (float) saveFile.nCompressedSize / 1024.0f );
+	SaveMsg("SIM: (%s) Total Files Packed: %d [Size: %.02f KiB]\n", GetString( saveFile.name ), nNumFilesPacked, (float) saveFile.nCompressedSize / 1024.0f );
 }
 
 //-----------------------------------------------------------------------------
@@ -831,7 +831,7 @@ bool CSaveRestoreFileSystem::DirectoryExtract( FileHandle_t pFile, int fileCount
 		destFile.pCompressedBuffer->SeekPut( CUtlBuffer::SEEK_HEAD, fileSize );
 		destFile.nCompressedSize = fileSize;	
 
-		SaveMsg("SIM: Extracted: %s [Size: %d KB]\n", GetString( destFile.name ), destFile.nCompressedSize / 1024 );
+		SaveMsg("SIM: Extracted: %s [Size: %d KiB]\n", GetString( destFile.name ), destFile.nCompressedSize / 1024 );
 	}
 
 	return true;
@@ -994,11 +994,11 @@ void CSaveRestoreFileSystem::AuditFiles( void )
 		nTotalFiles++;
 		nTotalCompressed += file.nCompressedSize;
 		nTotalUncompressed += file.nSize;
-		Msg("SIM: File: %s [c: %.02f KB / u: %.02f KB]\n", GetString( file.name ), (float)file.nCompressedSize/1024.0f, (float)file.nSize/1024.0f );
+		Msg("SIM: File: %s [c: %.02f KiB / u: %.02f KiB]\n", GetString( file.name ), (float)file.nCompressedSize/1024.0f, (float)file.nSize/1024.0f );
 	}
 
 	Msg("SIM: ------------------------------------------------------------");
-	Msg("SIM: Total files: %d [c: %.02f KB / c: %.02f KB] : Total Size: %.02f KB\n", nTotalFiles, (float)nTotalCompressed/1024.0f, (float)nTotalUncompressed/1024.0f, (float)(nTotalCompressed+nTotalUncompressed)/1024.0f );
+	Msg("SIM: Total files: %d [c: %.02f KiB / c: %.02f KiB] : Total Size: %.02f KiB\n", nTotalFiles, (float)nTotalCompressed/1024.0f, (float)nTotalUncompressed/1024.0f, (float)(nTotalCompressed+nTotalUncompressed)/1024.0f );
 }
 
 CON_COMMAND( audit_save_in_memory, "Audit the memory usage and files in the save-to-memory system" )
@@ -1467,8 +1467,8 @@ void CSaveRestoreFileSystem::DumpSaveDirectory( void )
 	float percent = 0.f;
 	if ( totalUncompressedSize )
 		percent = 100.f - ((float)totalCompressedSize / totalUncompressedSize * 100.f);
-	Msg( "Total Size: %.2f Mb (%d bytes)\n", totalCompressedSize / (1024.f*1024.f), totalCompressedSize );
-	Msg( "Compression: %.2f Mb to %.2f Mb (%.0f%%)\n", totalUncompressedSize/(1024.f*1024.f), totalCompressedSize/(1024.f*1024.f), percent );
+	Msg( "Total Size: %.2f MiB (%d bytes)\n", totalCompressedSize / (1024.f*1024.f), totalCompressedSize );
+	Msg( "Compression: %.2f MiB to %.2f MiB (%.0f%%)\n", totalUncompressedSize/(1024.f*1024.f), totalCompressedSize/(1024.f*1024.f), percent );
 }
 
 CON_COMMAND( dumpsavedir, "List the contents of the save directory in memory" )

@@ -3039,7 +3039,7 @@ void CParticleSystemMgr::UncacheAllParticleSystems()
 		m_pParticleSystemDictionary->FindParticleSystem( h )->Uncache();
 	}
 	
-	// Flush sheets, as they can accumulate several MB of memory per map
+	// Flush sheets, as they can accumulate several MiB of memory per map
 	FlushAllSheets();
 }
 

@@ -747,7 +747,7 @@ bool CGameClient::SetSignonState(int state, int spawncount)
 		m_NetChannel->SetFileTransmissionMode( true );
 
 #ifdef _XBOX
-		// to save memory on the XBOX reduce reliable buffer size from 96 to 8 kB
+		// to save memory on the XBOX reduce reliable buffer size from 96 to 8 KiB
 		m_NetChannel->SetMaxBufferSize( true, 8*1024 );
 #endif
 	}

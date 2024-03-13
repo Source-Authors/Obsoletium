@@ -26,7 +26,7 @@ void DoApplyMemoryInitializations( void *pMem, size_t nSize );
 
 size_t CalcHeapUsed();
 
-// Call this to reserve the bottom 4 GB of memory in order to ensure that we will
+// Call this to reserve the bottom 4 GiB of memory in order to ensure that we will
 // get crashes if we put pointers in DWORDs or ints. This will be a NOP on some
 // platforms (Xbox 360, PS3, 32-bit Windows, etc.)
 void ReserveBottomMemory();

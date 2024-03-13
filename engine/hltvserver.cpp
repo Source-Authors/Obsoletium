@@ -2152,7 +2152,7 @@ CON_COMMAND( tv_status, "Show SourceTV server status." )
 
 	hltv->GetNetStats( in, out );
 
-	in /= 1024; // as KB
+	in /= 1024; // as KiB
 	out /= 1024;
 
 	ConMsg("--- SourceTV Status ---\n");
@@ -2188,7 +2188,7 @@ CON_COMMAND( tv_status, "Show SourceTV server status." )
 	ConMsg("Game Time %s, Mod \"%s\", Map \"%s\", Players %i\n", COM_FormatSeconds( hltv->GetTime() ),
 		gd, hltv->GetMapName(), hltv->GetNumPlayers() );
 
-	ConMsg("Local IP %s:%i, KB/sec In %.1f, Out %.1f\n",
+	ConMsg("Local IP %s:%i, KiB/sec In %.1f, Out %.1f\n",
 		net_local_adr.ToString( true ), hltv->GetUDPPort(), in ,out );
 
 	hltv->GetLocalStats( proxies, slots, clients );

@@ -735,7 +735,7 @@ void CheckForFlushMemory( const char *pCurrentMapName, const char *pDestMapName 
 	// There are three cases in which we flush memory
 	//   Case 1: changing from one map to another
 	//          -> flush temp data caches
-	//   Case 2: loading any map (inc. A to A) and free memory is below host_flush_threshold MB
+	//   Case 2: loading any map (inc. A to A) and free memory is below host_flush_threshold MiB
 	//          -> flush everything
 	//   Case 3: loading a 'blacklisted' map (the known biggest memory users, or where texture sets change)
 	//          -> flush everything
@@ -3855,7 +3855,7 @@ void Host_InitProcessor( void )
 	// Dump CPU information:
 	if( pi.m_nLogicalProcessors == 1 )
 	{
-		ConDMsg( "1 logical CPU, Frequency: %.01f %s,  Features: %s\n", 
+		ConDMsg( "hardware: 1 logical CPU, Frequency: %.01f %s,  Features: %s\n", 
 			fFrequency,
 			szFrequencyDenomination,
 			szFeatureString
@@ -3869,7 +3869,7 @@ void Host_InitProcessor( void )
 			Q_snprintf(buffer, sizeof( buffer ), " (%hhu cores)", (int) pi.m_nPhysicalProcessors );
 		}
 
-		ConDMsg( "%hhu logical CPUs%s, Frequency: %.01f %s,  Features: %s\n", 
+		ConDMsg( "hardware: %hhu logical CPUs%s, Frequency: %.01f %s,  Features: %s\n", 
 			pi.m_nLogicalProcessors,
 			buffer,
 			fFrequency,
@@ -4216,7 +4216,7 @@ void Host_Init( bool bDedicated )
 
 	TRACEINIT( HLTV_Init(), HLTV_Shutdown() );
 
-	ConDMsg( "Heap: %5.2f Mb\n", host_parms.memsize/(1024.0f*1024.0f) );
+	ConDMsg( "Heap size: %5.2f MiB\n", host_parms.memsize/(1024.0f*1024.0f) );
 
 #if !defined( SWDS )
 	if ( !bDedicated )

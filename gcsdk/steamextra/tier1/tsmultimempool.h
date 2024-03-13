@@ -61,7 +61,7 @@ public:
 	// total number of alloc'd elements
 	int Count();
 	
-	// Return the total size in MB allocated for this pool
+	// Return the total size in MiB allocated for this pool
 	int CMBPoolSize() const;
 	// Return the amount of memory in use
 	int CMBPoolSizeInUse() const;

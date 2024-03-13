@@ -1954,7 +1954,7 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 		(caps.RasterCaps & D3DPRASTERCAPS_DEPTHBIAS) ? " Y " : " N ",
 		(caps.RasterCaps & D3DPRASTERCAPS_ZTEST) ? " Y " : "*N*" );
 
-	Warning("Size of Texture Memory : %zu kb\n", g_pHardwareConfig->Caps().m_TextureMemorySize / 1024 );
+	Warning("Size of Texture Memory : %zu KiB\n", g_pHardwareConfig->Caps().m_TextureMemorySize / 1024 );
 	Warning("Max Texture Dimensions : %d x %d\n", 
 		caps.MaxTextureWidth, caps.MaxTextureHeight );
 	if (caps.MaxTextureAspectRatio != 0)

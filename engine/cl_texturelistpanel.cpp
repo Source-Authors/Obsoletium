@@ -540,12 +540,12 @@ static bool ShallWarnTx( KeyValues *kv, ITexture *tx )
 static void FmtCommaNumber( char *pchBuffer, unsigned int uiNumber )
 {
 	pchBuffer[0] = 0;
-	for ( unsigned int uiDivisor = 1000 * 1000 * 1000; uiDivisor > 0; uiDivisor /= 1000 )
+	for ( unsigned int uiDivisor = 1024 * 1024 * 1024; uiDivisor > 0; uiDivisor /= 1024 )
 	{
 		if ( uiNumber > uiDivisor )
 		{
-			unsigned int uiPrint = ( uiNumber / uiDivisor ) % 1000;
-			sprintf( pchBuffer + strlen( pchBuffer ), ( uiNumber / uiDivisor < 1000 ) ? "%d," : "%03d,", uiPrint );
+			unsigned int uiPrint = ( uiNumber / uiDivisor ) % 1024;
+			sprintf( pchBuffer + strlen( pchBuffer ), ( uiNumber / uiDivisor < 1024 ) ? "%d," : "%03d,", uiPrint );
 		}
 	}
 
@@ -1785,7 +1785,7 @@ void CRenderTextureEditor::Paint()
 	g_pMatSystemSurface->DrawColoredTextRect( GetFont(), x, y, TILE_SIZE, TILE_TEXT / 2,
 		255, 255, 255, 255,
 		"%s%s\n"
-		"%s Kb    %dx%d    %s",
+		"%s KiB    %dx%d    %s",
 		szPrintFilePrefix, szPrintFileName,
 		chSizeBuf,
 		iTxWidth, iTxHeight,
@@ -1796,7 +1796,7 @@ void CRenderTextureEditor::Paint()
 	{
 		m_bufInfoText.Printf(
 			"%s%s\r\n"
-			"%s Kb    %dx%d    %s",
+			"%s KiB    %dx%d    %s",
 			szPrintFilePrefix, szPrintFileName,
 			chSizeBuf,
 			iTxWidth, iTxHeight,
@@ -1812,7 +1812,7 @@ void CRenderTextureEditor::Paint()
 		// Line 1
 		//
 		if ( iTxSize > g_warn_texkbytes )
-			sprintf( chLine1 + strlen( chLine1 ), "  Size(%s Kb)", chSizeBuf );
+			sprintf( chLine1 + strlen( chLine1 ), "  Size(%s KiB)", chSizeBuf );
 		if ( ( iTxWidth > g_warn_texdimensions ) ||
 			( iTxHeight > g_warn_texdimensions ) )
 			sprintf( chLine1 + strlen( chLine1 ), "  Dimensions(%dx%d)", iTxWidth, iTxHeight );
@@ -1842,7 +1842,7 @@ void CRenderTextureEditor::Paint()
 				mem = ( mem + 511 ) / 1024;
 				FmtCommaNumber( chbuf, mem );
 				
-				sprintf ( chLine2 + strlen( chLine2 ), "  %s Kb @ lower mip", chbuf );
+				sprintf ( chLine2 + strlen( chLine2 ), "  %s KiB @ lower mip", chbuf );
 			}
 
 			if ( wmap > wact || hmap > hact || dmap > dact )
@@ -1852,7 +1852,7 @@ void CRenderTextureEditor::Paint()
 				mem = ( mem + 511 ) / 1024;
 				FmtCommaNumber( chbuf, mem );
 
-				sprintf ( chLine2 + strlen( chLine2 ), "      %s Kb @ higher mip", chbuf );
+				sprintf ( chLine2 + strlen( chLine2 ), "      %s KiB @ higher mip", chbuf );
 			}
 		}
 
@@ -2237,7 +2237,7 @@ fmtlenreduce:
 	g_pMatSystemSurface->DrawFilledRect( x - TILE_BORDER/2, y, x + TILE_BORDER/2 + TILE_SIZE, y + TILE_TEXT );
 
 	char chInfoText[256] = { 0 };
-	sprintf( chInfoText, "%s Kb  %dx%d  %.*s%s  %s",
+	sprintf( chInfoText, "%s KiB  %dx%d  %.*s%s  %s",
 		chSizeBuf,
 		iTxWidth, iTxHeight,
 		iTxFormatLen, szTxFormat, szTxFormatSuffix,
@@ -2906,7 +2906,7 @@ void CTextureListPanel::UpdateTotalUsageLabel()
 	if ( bool bCollapsed = m_pCollapse->IsSelected() )
 	{
 		char const *szTitle = "";
-		Q_snprintf( data, sizeof( data ), "%s[F %s Kb] / [T %s Kb] / [S %s Kb]", szTitle, kb1, kb2, kb3 );
+		Q_snprintf( data, sizeof( data ), "%s[F %s KiB] / [T %s KiB] / [S %s KiB]", szTitle, kb1, kb2, kb3 );
 	}
 	else
 	{
@@ -2914,7 +2914,7 @@ void CTextureListPanel::UpdateTotalUsageLabel()
 		char kbMip1[ 20 ], kbMip2[ 20 ];
 		FmtCommaNumber( kbMip1, (g_pMaterialSystemDebugTextureInfo->GetTextureMemoryUsed( IDebugTextureInfo::MEMORY_ESTIMATE_PICMIP_1 ) + 511) / 1024 );
 		FmtCommaNumber( kbMip2, (g_pMaterialSystemDebugTextureInfo->GetTextureMemoryUsed( IDebugTextureInfo::MEMORY_ESTIMATE_PICMIP_2 ) + 511) / 1024 );
-		Q_snprintf( data, sizeof( data ), "%s:  frame %s Kb  /  total %s Kb ( picmip1 = %s Kb, picmip2 = %s Kb )  /  shown %s Kb", szTitle, kb1, kb2, kbMip1, kbMip2, kb3 );
+		Q_snprintf( data, sizeof( data ), "%s:  frame %s KiB  /  total %s KiB ( picmip1 = %s KiB, picmip2 = %s KiB )  /  shown %s KiB", szTitle, kb1, kb2, kbMip1, kbMip2, kb3 );
 	}
 
 	wchar_t unicodeString[1024];
@@ -3280,7 +3280,7 @@ void VGui_UpdateTextureListPanel()
 		FmtCommaNumber( kb1, (g_pMaterialSystemDebugTextureInfo->GetTextureMemoryUsed( IDebugTextureInfo::MEMORY_BOUND_LAST_FRAME ) + 511) / 1024 );
 		FmtCommaNumber( kb2, (g_pMaterialSystemDebugTextureInfo->GetTextureMemoryUsed( IDebugTextureInfo::MEMORY_TOTAL_LOADED ) + 511) / 1024 );
 
-		Con_NXPrintf( &info, "Texture Memory Usage: %s Kb / %s Kb", kb1, kb2 );
+		Con_NXPrintf( &info, "Texture Memory Usage: %s KiB / %s KiB", kb1, kb2 );
 	}
 
 	MatViewOverride::DisplaySelectedTextures();

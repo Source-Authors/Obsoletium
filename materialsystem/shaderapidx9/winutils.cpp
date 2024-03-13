@@ -10,7 +10,7 @@
 
 #include "appframework/ilaunchermgr.h"
 
-// LINUX path taken from //Steam/main/src/tier0/platform_posix.cpp - Returns installed RAM in MB. 
+// LINUX path taken from //Steam/main/src/tier0/platform_posix.cpp - Returns installed RAM in MiB. 
 static unsigned long GetInstalledRAM()
 {
 	unsigned long ulTotalRamMB = 2047;
@@ -30,15 +30,15 @@ static unsigned long GetInstalledRAM()
 			char *pszVal = rgchLine+cchSearchString;
 			while( isspace(*pszVal) )
 				++pszVal;
-			ulTotalRamMB = atol( pszVal ) / 1024; // go from kB to MB
+			ulTotalRamMB = atol( pszVal ) / 1024; // go from KiB to MiB
 			break;
 		}
 	}
 	fclose( fpMemInfo );
 #endif
 
-	// 128 Gb limit for now (should future proof us for a while)
-	ulTotalRamMB = MIN( ulTotalRamMB, 1024 * 128 );
+	// 512 GiB limit for now (should future proof us for a while)
+	ulTotalRamMB = MIN( ulTotalRamMB, 1024 * 512 );
 	return ulTotalRamMB;
 }
 

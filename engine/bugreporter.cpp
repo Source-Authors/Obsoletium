@@ -163,7 +163,7 @@ unsigned long GetRam()
 		{
 			if ( !Q_strnicmp( buf, szMemTotal, sizeof( szMemTotal ) - 1 ) )
 			{
-				// Should already be in kB
+				// Should already be in KiB
 				Ram = atoi( buf + sizeof( szMemTotal ) - 1 ) / 1024;
 				break;
 			}

@@ -440,7 +440,7 @@ void AdjustAsyncIOSpeed()
 			{
 				if ( g_QueuedLoader.GetSpewDetail() )
 				{
-					Msg( "QueuedLoader: Suspending I/O at %.2f MB\n", (float)g_nIOMemory / ( 1024.0f * 1024.0f ) );
+					Msg( "QueuedLoader: Suspending I/O at %.2f MiB\n", (float)g_nIOMemory / ( 1024.0f * 1024.0f ) );
 				}
 				g_pFullFileSystem->AsyncSuspend();
 			}
@@ -455,7 +455,7 @@ void AdjustAsyncIOSpeed()
 			{
 				if ( g_QueuedLoader.GetSpewDetail() )
 				{
-					Msg( "QueuedLoader: Resuming I/O at %.2f MB\n", (float)g_nIOMemory / ( 1024.0f * 1024.0f ) );
+					Msg( "QueuedLoader: Resuming I/O at %.2f MiB\n", (float)g_nIOMemory / ( 1024.0f * 1024.0f ) );
 				}
 				g_pFullFileSystem->AsyncResume();
 			}
@@ -1274,8 +1274,8 @@ void CQueuedLoader::SpewInfo()
 
 	Msg( "%d Queued Jobs\n", (int)g_nQueuedJobs );
 	Msg( "%d Active Jobs\n", (int)g_nActiveJobs );
-	Msg( "Peak IO Memory: %.2f MB\n", (float)g_nIOMemoryPeak / ( 1024.0f * 1024.0f ) );
-	Msg( "Peak Anonymous IO Memory: %.2f MB\n", (float)g_nAnonymousIOMemoryPeak / ( 1024.0f * 1024.0f ) );
+	Msg( "Peak IO Memory: %.2f MiB\n", (float)g_nIOMemoryPeak / ( 1024.0f * 1024.0f ) );
+	Msg( "Peak Anonymous IO Memory: %.2f MiB\n", (float)g_nAnonymousIOMemoryPeak / ( 1024.0f * 1024.0f ) );
 	Msg( "  Total Anonymous Claimed: %d\n", totalClaimed );
 	Msg( "  Total Anonymous Unclaimed: %d\n", totalUnclaimed );
 	if ( m_EndTime )
@@ -1643,7 +1643,7 @@ bool CQueuedLoader::BeginMapLoading( const char *pMapName, bool bLoadForHDR, boo
 
 	if ( GetSpewDetail() )
 	{
-		Msg( "QueuedLoader: Suspend I/O at [%.2f,%.2f] MB\n", (float)g_nLowIOSuspensionMark/(1024.0f*1024.0f), (float)g_nHighIOSuspensionMark/(1024.0f*1024.0f) );
+		Msg( "QueuedLoader: Suspend I/O at [%.2f,%.2f] MiB\n", (float)g_nLowIOSuspensionMark/(1024.0f*1024.0f), (float)g_nHighIOSuspensionMark/(1024.0f*1024.0f) );
 	}
 
 	m_bStarted = true;

@@ -148,17 +148,17 @@ void Memory_Init( void )
 	const int nInitialCommit = 0x280000;
 	while ( !g_HunkMemoryStack.Init( nMaxBytes, nMinCommitBytes, nInitialCommit ) )	 
 	{
-		Warning( "Unable to allocate %d MB of memory, trying %d MB instead\n", nMaxBytes, nMaxBytes/2 );
+		Warning( "Unable to allocate %d MiB of memory, trying %d MiB instead\n", nMaxBytes, nMaxBytes/2 );
 		nMaxBytes /= 2;
 		if ( nMaxBytes < MINIMUM_WIN_MEMORY )
 		{
-			Error( "Failed to allocate minimum memory requirement for game (%d MB)\n", MINIMUM_WIN_MEMORY/(1024*1024));
+			Error( "Failed to allocate minimum memory requirement for game (%d MiB)\n", MINIMUM_WIN_MEMORY/(1024*1024));
 		}
 	}
 #else
 	if ( !g_HunkMemoryStack.InitPhysical( 16*1024*1024 ) || !g_HunkOverflow.Init( nMaxBytes - 16*1024*1024, nMinCommitBytes ) )
 	{
-		Error( "Failed to allocate minimum memory requirement for game (%d MB)\n", nMaxBytes );
+		Error( "Failed to allocate minimum memory requirement for game (%d MiB)\n", nMaxBytes );
 	}
 
 #endif

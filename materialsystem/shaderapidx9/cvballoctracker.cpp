@@ -327,7 +327,7 @@ void CVBAllocTracker::SpewElements( const char * allocatorName, short nameHash )
 				const ElementData & elementData = elementTable[ i ];
 				if ( numVerts > 0 )
 				{
-					Msg( "              element:  %5.2f MB 'U', %5.2f MB 'C', %5.2f MB 'I', %6.2f MB 'D', %s\n",
+					Msg( "              element:  %5.2f MiB 'U', %5.2f MiB 'C', %5.2f MiB 'I', %6.2f MiB 'D', %s\n",
 						numVerts*elementData.uncompressed / ( 1024.0f*1024.0f ),
 						( numCompressed*elementData.currentCompressed + numUncompressed*elementData.uncompressed ) / ( 1024.0f*1024.0f ),
 						numVerts*elementData.idealCompressed / ( 1024.0f*1024.0f ),
@@ -335,7 +335,7 @@ void CVBAllocTracker::SpewElements( const char * allocatorName, short nameHash )
 						elementData.name );
 				}
 			}
-			Msg( "[VBMEM]         total:  %5.2f MB 'U', %5.2f MB 'C', %5.2f MB 'I', %6.2f MB 'D'\n",
+			Msg( "[VBMEM]         total:  %5.2f MiB 'U', %5.2f MiB 'C', %5.2f MiB 'I', %6.2f MiB 'D'\n",
 				originalSum / ( 1024.0f*1024.0f ),
 				currentSum / ( 1024.0f*1024.0f ),
 				idealSum / ( 1024.0f*1024.0f ),
@@ -523,16 +523,16 @@ void CVBAllocTracker::SpewExpectedSavings( void )
 
 	if ( IsX360() )
 	{
-		// We expect to avoid 4-KB-alignment wastage for color meshes, by allocating them
+		// We expect to avoid 4-KiB-alignment wastage for color meshes, by allocating them
 		// out of a single, shared VB and adding per-mesh offsets in vertex shaders
 		AddSaving( alreadySaved, yetToSave, "CColorMeshData::CreateResource",			VERTEX_ELEMENT_USERDATA4,		SAVING_ALIGNMENT );
 	}
 
 	Msg("[VBMEM]\n");
-	Msg("[VBMEM] Total expected memory saving by disabling/compressing vertex elements: %6.2f MB\n", yetToSave / ( 1024.0f*1024.0f ) );
-	Msg("[VBMEM] ( total memory already saved: %6.2f MB)\n", alreadySaved / ( 1024.0f*1024.0f ) );
+	Msg("[VBMEM] Total expected memory saving by disabling/compressing vertex elements: %6.2f MiB\n", yetToSave / ( 1024.0f*1024.0f ) );
+	Msg("[VBMEM] ( total memory already saved: %6.2f MiB)\n", alreadySaved / ( 1024.0f*1024.0f ) );
 	Msg("[VBMEM]  - compression of model texcoords, [DONE: normals+tangents, bone weights]\n" );
-	Msg("[VBMEM]  - avoidance of 4-KB alignment wastage for color meshes (on 360)\n" );
+	Msg("[VBMEM]  - avoidance of 4-KiB alignment wastage for color meshes (on 360)\n" );
 	Msg("[VBMEM]  - [DONE: removal of unneeded bone weights+indices on models]\n" );
 	Msg("[VBMEM]\n");
 }
@@ -573,14 +573,14 @@ void CVBAllocTracker::SpewData( const char * allocatorName, short nameHash )
 		CounterData & data = m_VBCountTable.Element( handle );
 		if ( data.m_memCount > 0 )
 		{
-			Msg("[VBMEM]    running mem usage: (%5.2f M-verts) %6.2f MB | '%s'\n",
+			Msg("[VBMEM]    running mem usage: (%5.2f M-verts) %6.2f MiB | '%s'\n",
 				data.m_vertCount / ( 1024.0f*1024.0f ),
 				data.m_memCount / ( 1024.0f*1024.0f ),
 				data.m_AllocatorName );
 		}
 		if ( data.m_paddingCount > 0 )
 		{
-			Msg("[VBMEM]    4KB  VB  alignment  wastage:       %6.2f MB | '%s'\n",
+			Msg("[VBMEM]    4KB  VB  alignment  wastage:       %6.2f MiB | '%s'\n",
 				data.m_paddingCount / ( 1024.0f*1024.0f ),
 				data.m_AllocatorName );
 		}
@@ -626,7 +626,7 @@ void CVBAllocTracker::DumpVBAllocs()
 	Msg("[VBMEM]   'C' - current memory usage (some compression)\n" );
 	Msg("[VBMEM]   'I' - ideal memory usage (all verts maximally compressed)\n" );
 	Msg("[VBMEM]   'D' - difference between C and I (-> how much more compression could save)\n" );
-	Msg("[VBMEM]   'W' - memory wasted due to 4-KB vertex buffer alignment\n" );
+	Msg("[VBMEM]   'W' - memory wasted due to 4-KiB vertex buffer alignment\n" );
 	Msg("[VBMEM]\n");
 	for ( int i = ( m_VBTableNameHashes.Count() - 1 ); i >= 0; i-- )
 	{
@@ -672,7 +672,7 @@ void CVBAllocTracker::CountVB( void * buffer, bool isDynamic, int bufferSize, in
 	if ( m_bSuperSpew )
 	{
 		// Spew every alloc
-		Msg( "[VBMEM] VB-alloc  | %6.2f MB | %s | %s\n", bufferSize / ( 1024.0f*1024.0f ), ( isDynamic ? "DYNamic" : " STAtic" ), allocatorName );
+		Msg( "[VBMEM] VB-alloc  | %6.2f MiB | %s | %s\n", bufferSize / ( 1024.0f*1024.0f ), ( isDynamic ? "DYNamic" : " STAtic" ), allocatorName );
 		SpewData( allocatorName );
 	}
 	SpewDataSometimes( +1 );
@@ -710,7 +710,7 @@ void CVBAllocTracker::UnCountVB( void * buffer )
 
 		if ( m_bSuperSpew )
 		{
-			Msg( "[VBMEM] VB-free   | %6.2f MB | %s | %s\n", bufferSize / ( 1024.0f*1024.0f ), ( isDynamic ? "DYNamic" : " STAtic" ), nameString );
+			Msg( "[VBMEM] VB-free   | %6.2f MiB | %s | %s\n", bufferSize / ( 1024.0f*1024.0f ), ( isDynamic ? "DYNamic" : " STAtic" ), nameString );
 			SpewData( nameString );
 		}
 		SpewDataSometimes( -1 );

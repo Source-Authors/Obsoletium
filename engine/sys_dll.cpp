@@ -80,9 +80,9 @@
 
 #define ONE_HUNDRED_TWENTY_EIGHT_MB	(128 * 1024 * 1024)
 
-ConVar mem_min_heapsize( "mem_min_heapsize", "48", FCVAR_INTERNAL_USE, "Minimum amount of memory to dedicate to engine hunk and datacache (in mb)" );
-ConVar mem_max_heapsize( "mem_max_heapsize", "256", FCVAR_INTERNAL_USE, "Maximum amount of memory to dedicate to engine hunk and datacache (in mb)" );
-ConVar mem_max_heapsize_dedicated( "mem_max_heapsize_dedicated", "64", FCVAR_INTERNAL_USE, "Maximum amount of memory to dedicate to engine hunk and datacache, for dedicated server (in mb)" );
+ConVar mem_min_heapsize( "mem_min_heapsize", "48", FCVAR_INTERNAL_USE, "Minimum amount of memory to dedicate to engine hunk and datacache (in MiB)" );
+ConVar mem_max_heapsize( "mem_max_heapsize", "256", FCVAR_INTERNAL_USE, "Maximum amount of memory to dedicate to engine hunk and datacache (in MiB)" );
+ConVar mem_max_heapsize_dedicated( "mem_max_heapsize_dedicated", "64", FCVAR_INTERNAL_USE, "Maximum amount of memory to dedicate to engine hunk and datacache, for dedicated server (in MiB)" );
 
 #define MINIMUM_WIN_MEMORY			(unsigned)(mem_min_heapsize.GetInt()*1024*1024)
 #define MAXIMUM_WIN_MEMORY			max( (unsigned)(mem_max_heapsize.GetInt()*1024*1024), MINIMUM_WIN_MEMORY )
@@ -609,7 +609,7 @@ void Sys_InitMemory( void )
 		}
 		if ( host_parms.memsize < ONE_HUNDRED_TWENTY_EIGHT_MB )
 		{
-			Sys_Error( "Available memory less than 128MB!!! %i\n", host_parms.memsize );
+			Sys_Error( "Available memory less than 128MiB!!! %u\n", host_parms.memsize );
 		}
 
 		// take one quarter the physical memory
@@ -630,7 +630,7 @@ void Sys_InitMemory( void )
 			host_parms.memsize >>= 2;
 		}
 
-		// At least MINIMUM_WIN_MEMORY mb, even if we have to swap a lot.
+		// At least MINIMUM_WIN_MEMORY MiB, even if we have to swap a lot.
 		if (host_parms.memsize < MINIMUM_WIN_MEMORY)
 		{
 			host_parms.memsize = MINIMUM_WIN_MEMORY;
@@ -683,7 +683,7 @@ void Sys_InitMemory( void )
 			// we've got a complete line.
 			*ptr = '\0';
 			unsigned long long ull = 0;
-			if (sscanf(line, "MemTotal: %llu kB", &ull) == 1)
+			if (sscanf(line, "MemTotal: %llu KiB", &ull) == 1)
 			{
 				// found it!
 				memsize = ((uint64_t) ull) * 1024;
@@ -708,7 +708,7 @@ void Sys_InitMemory( void )
 
 	if ( host_parms.memsize < ONE_HUNDRED_TWENTY_EIGHT_MB )
 	{
-		Sys_Error( "Available memory less than 128MB!!! %i\n", host_parms.memsize );
+		Sys_Error( "Available memory less than 128MiB!!! %u\n", host_parms.memsize );
 	}
 
 	// take one quarter the physical memory
@@ -729,7 +729,7 @@ void Sys_InitMemory( void )
 		host_parms.memsize >>= 2;
 	}
 
-	// At least MINIMUM_WIN_MEMORY mb, even if we have to swap a lot.
+	// At least MINIMUM_WIN_MEMORY MiB, even if we have to swap a lot.
 	if (host_parms.memsize < MINIMUM_WIN_MEMORY)
 	{
 		host_parms.memsize = MINIMUM_WIN_MEMORY;
@@ -1569,7 +1569,7 @@ void UnloadEntityDLLs( void )
 CON_COMMAND( star_memory, "Dump memory stats" )
 {
 	// get a current stat of available memory
-	// 32 MB is reserved and fixed by OS, so not reporting to allow memory loggers sync
+	// 32 MiB is reserved and fixed by OS, so not reporting to allow memory loggers sync
 #ifdef LINUX
 	struct mallinfo memstats = mallinfo( );
 	Msg( "sbrk size: %.2f MiB, Used: %.2f MiB, #mallocs = %d\n",

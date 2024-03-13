@@ -771,7 +771,7 @@ bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( unsigned nAdapter, i
 
 	// override with system memory-size based overrides
 	int nSystemMB = GetRam();
-	DevMsg( "%d MB of system RAM\n", nSystemMB );
+	DevMsg( "%d MiB of system RAM\n", nSystemMB );
 	KeyValues *pMemoryKeyValues = FindMemorySpecificConfig( pCfg, nSystemMB );
 	LoadConfig( pMemoryKeyValues, pConfiguration );
 

@@ -222,7 +222,7 @@ void CThreadSafeMultiMemoryPool::PrintStats()
 
 
 //-----------------------------------------------------------------------------
-// Purpose: return the total mem alloced by this pool in MB
+// Purpose: return the total mem alloced by this pool in MiB
 //-----------------------------------------------------------------------------
 int CThreadSafeMultiMemoryPool::CMBPoolSize() const
 {
@@ -241,7 +241,7 @@ int CThreadSafeMultiMemoryPool::CMBPoolSize() const
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: return the total mem alloced by this pool in MB
+// Purpose: return the total mem alloced by this pool in MiB
 //-----------------------------------------------------------------------------
 int CThreadSafeMultiMemoryPool::CMBPoolSizeInUse() const
 {

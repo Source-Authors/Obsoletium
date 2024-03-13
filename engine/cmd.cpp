@@ -599,12 +599,12 @@ void Cmd_Exec_f( const CCommand &args )
 	{
 		if ( g_pFileSystem->FileExists( fileName ) )
 		{
-			// don't want to exec files larger than 1 MB
+			// don't want to exec files larger than 1 MiB
 			// probably not a valid file to exec
 			unsigned int size = g_pFileSystem->Size( fileName );
 			if ( size > 1*1024*1024 )
 			{
-				ConMsg( "exec %s: file size larger than 1 MB!\n", szFile );
+				ConMsg( "exec %s: file size larger than 1 MiB!\n", szFile );
 				return;
 			}
 		}

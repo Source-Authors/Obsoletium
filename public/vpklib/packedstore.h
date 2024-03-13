@@ -248,9 +248,9 @@ public:
 	void RetryAllBadCacheLines();
 
 
-	// cache 64 MB total
+	// cache 64 MiB total
 	static const int k_nCacheBuffersToKeep = 4;
-	static const int k_cubCacheBufferSize = 0x00100000; // 1MB
+	static const int k_cubCacheBufferSize = 0x00100000; // 1MiB
 	static const int k_nCacheBufferMask = 0x7FF00000;
 
 	CThreadRWLock m_rwlock;
