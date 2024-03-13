@@ -292,17 +292,16 @@ static SpewRetval_t _SpewMessage( SpewType_t spewType, const char *pGroupName, i
 	assert( s_SpewOutputFunc );
 	
 	/* direct it to the appropriate target(s) */
-	SpewRetval_t ret;
-	assert( g_pSpewInfo == NULL );
 	SpewInfo_t spewInfo =
 	{
 		pColor,
 		pGroupName,
 		nLevel
 	};
+	assert( g_pSpewInfo == nullptr );
 
 	g_pSpewInfo = &spewInfo;
-	ret = s_SpewOutputFunc( spewType, pTempBuffer );
+	SpewRetval_t ret = s_SpewOutputFunc( spewType, pTempBuffer );
 	g_pSpewInfo = (int)NULL;
 
 	switch (ret)
