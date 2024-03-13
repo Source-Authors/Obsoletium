@@ -270,7 +270,7 @@ void CInputSystem::AttachToWindow( void* hWnd )
 	Assert( m_hAttachedHWnd == nullptr );
 	if ( m_hAttachedHWnd )
 	{
-		Warning( "CInputSystem::AttachToWindow: Cannot attach to two windows at once!\n" );
+		Warning( "inputsystem: Cannot attach to two windows at once!\n" );
 		return;
 	}
 

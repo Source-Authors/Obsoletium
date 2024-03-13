@@ -114,7 +114,7 @@ int JoystickSDLWatcher( void *userInfo, SDL_Event *event )
 
 	if ( event == NULL || pInputSystem == NULL )
 	{
-		Warning("No input system\n");
+		Warning("inputsystem: No input system\n");
 		return 1;
 	}
 
@@ -189,14 +189,14 @@ void CInputSystem::InitializeJoysticks( void )
 	const char *controllerConfig = joy_gamecontroller_config.GetString();
 	if ( !Q_isempty(controllerConfig) )
 	{
-		DevMsg("Passing joy_gamecontroller_config to SDL ('%s').\n", controllerConfig);
+		DevMsg("inputsystem: Passing joy_gamecontroller_config to SDL ('%s').\n", controllerConfig);
 		// We need to pass this hint to SDL *before* we init the gamecontroller subsystem, otherwise it gets ignored.
 		SDL_SetHint(SDL_HINT_GAMECONTROLLERCONFIG, controllerConfig);
 	}
 
 	if ( SDL_InitSubSystem( SDL_INIT_GAMEPAD | SDL_INIT_HAPTIC ) == -1 )
 	{
-		Warning("Joystick init failed -- SDL_Init(SDL_INIT_GAMECONTROLLER|SDL_INIT_HAPTIC) failed: %s.\n", SDL_GetError());
+		Warning("inputsystem: Joystick init failed -- SDL_Init(SDL_INIT_GAMEPAD|SDL_INIT_HAPTIC) failed: %s.\n", SDL_GetError());
 		return;
 	}
 
@@ -221,14 +221,14 @@ void CInputSystem::InitializeJoysticks( void )
 			char szGUID[sizeof(joyGUID.data)*2 + 1];
 			SDL_GetJoystickGUIDString(joyGUID, szGUID, sizeof(szGUID));
 
-			Msg("Found joystick '%s' (%s), but no recognized controller configuration for it.\n", SDL_GetJoystickInstanceName(joystickId), szGUID);
+			Msg("inputsystem: Found joystick '%s' (%s), but no recognized controller configuration for it.\n", SDL_GetJoystickInstanceName(joystickId), szGUID);
 		}
 	}
 	SDL_free(joystickIds);
 
 	if ( totalSticks < 1 )
 	{
-		Msg("Did not detect any valid joysticks.\n");
+		Msg("inputsystem: Did not detect any valid joysticks.\n");
 	}
 }
 
@@ -280,14 +280,14 @@ void CInputSystem::JoystickHotplugAdded( int joystickIndex )
 
 	if ( !SDL_IsGamepad(joystickIndex) )
 	{
-		Warning("Joystick is not recognized by the game controller system. You can configure the controller in Steam Big Picture mode.\n");
+		Warning("inputsystem: Joystick is not recognized by the game controller system. You can configure the controller in Steam Big Picture mode.\n");
 		return;
 	}
 
 	SDL_Joystick *joystick = SDL_OpenJoystick(joystickIndex);
 	if ( joystick == NULL )
 	{
-		Warning("Could not open joystick %i: %s", joystickIndex, SDL_GetError());
+		Warning("inputsystem: Could not open joystick %d: %s", joystickIndex, SDL_GetError());
 		return;
 	}
 
@@ -301,13 +301,13 @@ void CInputSystem::JoystickHotplugAdded( int joystickIndex )
 		// Only opportunistically open devices if we don't have one open already.
 		if ( info.m_nDeviceId != -1 )
 		{
-			Msg("Detected supported joystick #%i '%s'. Currently active joystick is #%i.\n", joystickId, SDL_GetJoystickInstanceName(joystickIndex), info.m_nDeviceId);
+			Msg("inputsystem: Detected supported joystick #%d '%s'. Currently active joystick is #%i.\n", joystickId, SDL_GetJoystickInstanceName(joystickIndex), info.m_nDeviceId);
 			return;
 		}
 	}
 	else if ( activeJoystick != joystickId )
 	{
-		Msg("Detected supported joystick #%i '%s'. Currently active joystick is #%i.\n", joystickId, SDL_GetJoystickInstanceName(joystickIndex), activeJoystick);
+		Msg("inputsystem: Detected supported joystick #%d '%s'. Currently active joystick is #%i.\n", joystickId, SDL_GetJoystickInstanceName(joystickIndex), activeJoystick);
 		return;
 	}
 
@@ -319,16 +319,16 @@ void CInputSystem::JoystickHotplugAdded( int joystickIndex )
 			return;
 		}
 
-		DevMsg("Joystick #%i already initialized, removing it first.\n", info.m_nDeviceId);
+		DevMsg("inputsystem: Joystick #%d already initialized, removing it first.\n", info.m_nDeviceId);
 		JoystickHotplugRemoved(info.m_nDeviceId);
 	}
 
-	Msg("Initializing joystick #%i and making it active.\n", joystickId);
+	Msg("inputsystem: Initializing joystick #%d and making it active.\n", joystickId);
 
 	SDL_Gamepad *controller = SDL_OpenGamepad(joystickIndex);
 	if ( controller == NULL )
 	{
-		Warning("Failed to open joystick %i: %s\n", joystickId, SDL_GetError());
+		Warning("inputsystem: Failed to open joystick %d: %s\n", joystickId, SDL_GetError());
 		return;
 	}
 
@@ -337,7 +337,7 @@ void CInputSystem::JoystickHotplugAdded( int joystickIndex )
 	SDL_Haptic *haptic = SDL_OpenHapticFromJoystick(SDL_GetGamepadJoystick(controller));
 	if ( haptic == NULL || SDL_InitHapticRumble(haptic) != 0 )
 	{
-		Warning("Unable to initialize rumble for joystick #%i: %s\n", joystickId, SDL_GetError());
+		Warning("inputsystem: Unable to initialize rumble for joystick #%d: %s\n", joystickId, SDL_GetError());
 		haptic = NULL;
 	}
 
@@ -362,14 +362,14 @@ void CInputSystem::JoystickHotplugRemoved( int joystickId )
 	JoystickInfo_t& info = m_pJoystickInfo[ 0 ];
 	if ( info.m_nDeviceId != joystickId )
 	{
-		DevMsg("Ignoring hotplug remove for #%i, active joystick is #%i.\n", joystickId, info.m_nDeviceId);
+		DevMsg("inputsystem: Ignoring hotplug remove for #%i, active joystick is #%i.\n", joystickId, info.m_nDeviceId);
 		return;
 	}
 
 	if ( info.m_pDevice == NULL )
 	{
 		info.m_nDeviceId = -1;
-		DevMsg("Got hotplug remove event for removed joystick #%i, ignoring.\n", joystickId);
+		DevMsg("inputsystem: Got hotplug remove event for removed joystick #%i, ignoring.\n", joystickId);
 		return;
 	}
 
@@ -387,7 +387,7 @@ void CInputSystem::JoystickHotplugRemoved( int joystickId )
 	info.m_nDeviceId = -1;
 	info.m_bRumbleEnabled = false;
 
-	Msg("Joystick %i removed.\n", joystickId);
+	Msg("inputsystem: Joystick #%d removed.\n", joystickId);
 }
 
 void CInputSystem::JoystickButtonPress( int joystickId, int button )
@@ -395,7 +395,7 @@ void CInputSystem::JoystickButtonPress( int joystickId, int button )
 	JoystickInfo_t& info = m_pJoystickInfo[ 0 ];
 	if ( info.m_nDeviceId != joystickId )
 	{
-		Warning("Not active device input system (%i x %i)\n", info.m_nDeviceId, joystickId);
+		Warning("inputsystem: Not active device input system (%d x #%d)\n", info.m_nDeviceId, joystickId);
 		return;
 	}
 
@@ -427,7 +427,7 @@ void CInputSystem::JoystickAxisMotion( int joystickId, int axis, int value )
 	AnalogCode_t code = ControllerAxisToAnalogCode((SDL_GamepadAxis)axis);
 	if ( code == ANALOG_CODE_INVALID )
 	{
-		Warning("Invalid code for axis %i\n", axis);
+		Warning("inputsystem: Invalid code for axis %d\n", axis);
 		return;
 	}
 
@@ -567,7 +567,7 @@ void CInputSystem::SetXDeviceRumble( float fLeftMotor, float fRightMotor, int us
 
 	if ( SDL_PlayHapticRumble((SDL_Haptic *)info.m_pHaptic, strength, SDL_HAPTIC_INFINITY) != 0 )
 	{
-		Warning("Couldn't play rumble (strength %.1f): %s\n", strength, SDL_GetError());
+		Warning("inputsystem: Couldn't play rumble (strength %.1f): %s\n", strength, SDL_GetError());
 	}
 }
 
