@@ -18,7 +18,7 @@
 static bool s_bAllow3DNow = true;
 static bool s_bAllowSSE2 = true;
 
-void InitMathlib( void )
+void InitMathlib()
 {
 	MathLib_Init( 2.2f, // v_gamma.GetFloat()
 		2.2f, // v_texgamma.GetFloat()

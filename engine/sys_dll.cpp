@@ -866,7 +866,14 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 
 		if ( g_bTextMode )
 		{
-			printf( "%s", pMsg );
+			if (spewType == SPEW_MESSAGE || spewType == SPEW_LOG)
+			{
+				printf( "%s", pMsg );
+			}
+			else
+			{
+				fprintf( stderr, "%s", pMsg );
+			}
 		}
 
 		if ((spewType != SPEW_LOG) || (sv.GetMaxClients() == 1))
@@ -989,7 +996,7 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory, const char* pBaseDir, void
 	}
 #endif
 
-	extern void InitMathlib( void );
+	extern void InitMathlib();
 	InitMathlib();
 	
 	FileSystem_SetWhitelistSpewFlags();
@@ -1088,7 +1095,7 @@ void Sys_ShutdownGame( void )
 
 	// Remove debug spew output....
 	developer.InstallChangeCallback( 0 );
-	SpewOutputFunc( 0 );
+	SpewOutputFunc( nullptr );
 
 	// dimhotepus: Free spew memory, etc.
 	SpewDeactivate();
