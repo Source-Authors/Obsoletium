@@ -559,11 +559,72 @@ PLATFORM_INTERFACE const char *Plat_GetCommandLineA()
 
 PLATFORM_INTERFACE bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo )
 {
-	#if defined( LINUX ) || defined( OSX )
+	if ( !pOutMemoryInfo )
 		return false;
-	#else
-		#error "Need to fill out GetMemoryInformation or at least return false for this platform"
-	#endif
+	
+	constexpr uint32_t cOneMib{1024 * 1024};
+
+#ifdef OSX
+	uint64_t val = 0;
+	size_t len = sizeof( val );
+	// The bytes of physical memory.
+	int mib[] = { CTL_HW, HW_PHYSMEM };
+
+	if ( sysctl( mib, std::size( mib ), &val, &len, NULL, 0 ) == 0 )
+	{
+		pOutMemoryInfo->m_nPhysicalRamMbTotal = val / cOneMib;
+	}
+
+	// The bytes of non-kernel memory.
+	mib[1] = HW_USERMEM;
+
+	if ( sysctl( mib, std::size( mib ), &val, &len, NULL, 0 ) == 0 )
+	{
+		pOutMemoryInfo->m_nPhysicalRamMbAvailable = val / cOneMib;
+	}
+
+	return true;
+#elif defined(LINUX)
+	const int fd = open("/proc/meminfo", O_RDONLY);
+	if (fd < 0)
+	{
+		Sys_Error( "Can't open /proc/meminfo (%s)!\n", strerror(errno) );
+	}
+
+	char buf[1024 * 16];
+	const ssize_t br = read(fd, buf, sizeof (buf));
+	close(fd);
+	if (br < 0)
+	{
+		Sys_Error( "Can't read /proc/meminfo (%s)!\n", strerror(errno) );
+	}
+	buf[br] = '\0';
+
+	uint64_t memsize = 0;
+	// Split up the buffer by lines...
+	char *line = buf;
+	for (char *ptr = buf; *ptr; ptr++)
+	{
+		if (*ptr == '\n')
+		{
+			// we've got a complete line.
+			*ptr = '\0';
+			unsigned long long ull = 0;
+			if (sscanf(line, "MemTotal: %llu KiB", &ull) == 1)
+			{
+				// found it!
+				memsize = ((uint64_t) ull) * 1024;
+				break;
+			}
+			line = ptr;
+		}
+	}
+
+	pOutMemoryInfo->m_nPhysicalRamMbTotal = memsize / cOneMib;
+	return true;
+#else
+	#error "Need to fill out GetMemoryInformation or at least return false for this platform"
+#endif
 }
 
 

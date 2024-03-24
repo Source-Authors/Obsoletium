@@ -696,19 +696,14 @@ void CShaderDeviceMgrBase::LoadConfig( KeyValues *pKeyValues, KeyValues *pConfig
 //-----------------------------------------------------------------------------
 static unsigned long GetRam()
 {
-  MEMORYSTATUSEX stat = { sizeof(stat) };
-	if ( GlobalMemoryStatusEx( &stat ) )
+	MemoryInformation info;
+	if ( GetMemoryInformation( &info ) )
 	{
-		char buf[256];
-		V_snprintf( buf, sizeof( buf ), "GlobalMemoryStatusEx: %llu\n", (uint64)stat.ullTotalPhys );
-		Plat_DebugString( buf );
-	}
-	else
-	{
-		Plat_DebugString( "GetRam failed" );
+		return info.m_nPhysicalRamMbTotal;
 	}
 
-	return stat.ullTotalPhys / (1024 * 1024);
+	Plat_DebugString( "GetRam failed" );
+	return 0;
 }
 
 
@@ -762,16 +757,11 @@ bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( unsigned nAdapter, i
 		
 	bool bAMD = Q_stristr( pi.m_szProcessorID, "amd" ) != NULL;
 	
-	char buf[256];
-	V_snprintf( buf, sizeof( buf ), "CShaderDeviceMgrBase::GetRecommendedConfigurationInfo: CPU speed: %d MHz, Processor: %s\n", nCPUSpeedMhz, pi.m_szProcessorBrand );
-	DevMsg( buf );
-
 	KeyValues *pCPUKeyValues = FindCPUSpecificConfig( pCfg, nCPUSpeedMhz, bAMD );
 	LoadConfig( pCPUKeyValues, pConfiguration );
 
 	// override with system memory-size based overrides
 	int nSystemMB = GetRam();
-	DevMsg( "%d MiB of system RAM\n", nSystemMB );
 	KeyValues *pMemoryKeyValues = FindMemorySpecificConfig( pCfg, nSystemMB );
 	LoadConfig( pMemoryKeyValues, pConfiguration );
 

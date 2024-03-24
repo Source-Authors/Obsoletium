@@ -135,47 +135,13 @@ using namespace vgui;
 
 unsigned long GetRam()
 {
-#ifdef WIN32
-	MEMORYSTATUSEX stat = { sizeof(stat) };
-	GlobalMemoryStatusEx( &stat );
-	return stat.ullTotalPhys / (1024 * 1024);
-#elif defined(OSX)
-	int mib[2] = { CTL_HW, HW_MEMSIZE };
-	u_int namelen = sizeof(mib) / sizeof(mib[0]);
-	uint64_t memsize;
-	size_t len = sizeof(memsize);
-	
-	if (sysctl(mib, namelen, &memsize, &len, NULL, 0) >= 0) 
+	MemoryInformation info;
+	if (GetMemoryInformation(&info))
 	{
-		return memsize / (1024*1024);
+		return info.m_nPhysicalRamMbTotal;
 	}
-	else
-		return 0;
-#elif defined( LINUX )
-	unsigned long Ram = 0;
-	FILE *fh = fopen( "/proc/meminfo", "r" );
-	if( fh )
-	{
-		char buf[ 256 ];
-		const char szMemTotal[] = "MemTotal:";
 
-		while( fgets( buf, sizeof( buf ), fh ) )
-		{
-			if ( !Q_strnicmp( buf, szMemTotal, sizeof( szMemTotal ) - 1 ) )
-			{
-				// Should already be in KiB
-				Ram = atoi( buf + sizeof( szMemTotal ) - 1 ) / 1024;
-				break;
-			}
-		}
-
-		fclose( fh );
-	}
-	return Ram;
-#else
-	Assert( !"Impl GetRam" );
 	return 0;
-#endif
 }
 
 const char *GetInternalBugReporterDLL( void )

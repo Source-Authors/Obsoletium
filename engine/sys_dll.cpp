@@ -585,126 +585,17 @@ void Sys_InitMemory( void )
 
 	host_parms.memsize = 0;
 
-#ifdef _WIN32
-	if ( IsPC() )
+	MemoryInformation info;
+	if (GetMemoryInformation(&info))
 	{
-		MEMORYSTATUSEX	memStat = { sizeof(memStat) };
-		if ( GlobalMemoryStatusEx( &memStat ) )
-		{
-			if ( memStat.ullTotalPhys > 0xFFFFFFFFUL )
-			{
-				host_parms.memsize = 0xFFFFFFFFUL;
-			}
-			else
-			{
-				host_parms.memsize = memStat.ullTotalPhys;
-			}
-		}
+		host_parms.memsize = info.m_nPhysicalRamMbTotal > 4095
+			? 0xFFFFFFFFUL
+			: info.m_nPhysicalRamMbTotal * 1024 * 1024;
 	}
 
-	if ( !IsX360() )
+	if ( host_parms.memsize == 0 )
 	{
-		if ( host_parms.memsize == 0 )
-		{
-			host_parms.memsize = MAXIMUM_WIN_MEMORY;
-		}
-		if ( host_parms.memsize < ONE_HUNDRED_TWENTY_EIGHT_MB )
-		{
-			Sys_Error( "Available memory less than 128MiB!!! %u\n", host_parms.memsize );
-		}
-
-		// take one quarter the physical memory
-		if ( host_parms.memsize <= 512*1024*1024)
-		{
-			host_parms.memsize >>= 2;
-			// Apply cap of 64MB for 512MB systems
-			// this keeps the code the same as HL2 gold
-			// but allows us to use more memory on 1GB+ systems
-			if (host_parms.memsize > MAXIMUM_DEDICATED_MEMORY)
-			{
-				host_parms.memsize = MAXIMUM_DEDICATED_MEMORY;
-			}
-		}
-		else
-		{
-			// just take one quarter, no cap
-			host_parms.memsize >>= 2;
-		}
-
-		// At least MINIMUM_WIN_MEMORY MiB, even if we have to swap a lot.
-		if (host_parms.memsize < MINIMUM_WIN_MEMORY)
-		{
-			host_parms.memsize = MINIMUM_WIN_MEMORY;
-		}
-
-		// Apply cap
-		if (host_parms.memsize > MAXIMUM_WIN_MEMORY)
-		{
-			host_parms.memsize = MAXIMUM_WIN_MEMORY;
-		}
-	}
-	else
-	{
-		host_parms.memsize = 128*1024*1024;
-	}
-#elif defined(POSIX)
-	uint64_t memsize = ONE_HUNDRED_TWENTY_EIGHT_MB;
-
-#if defined(OSX)
-	int mib[2] = { CTL_HW, HW_MEMSIZE };
-	u_int namelen = sizeof(mib) / sizeof(mib[0]);
-	size_t len = sizeof(memsize);
-
-	if (sysctl(mib, namelen, &memsize, &len, NULL, 0) < 0) 
-	{
-		memsize = ONE_HUNDRED_TWENTY_EIGHT_MB;
-	}
-#elif defined(LINUX)
-	const int fd = open("/proc/meminfo", O_RDONLY);
-	if (fd < 0)
-	{
-		Sys_Error( "Can't open /proc/meminfo (%s)!\n", strerror(errno) );
-	}
-
-	char buf[1024 * 16];
-	const ssize_t br = read(fd, buf, sizeof (buf));
-	close(fd);
-	if (br < 0)
-	{
-		Sys_Error( "Can't read /proc/meminfo (%s)!\n", strerror(errno) );
-	}
-	buf[br] = '\0';
-
-	// Split up the buffer by lines...
-	char *line = buf;
-	for (char *ptr = buf; *ptr; ptr++)
-	{
-		if (*ptr == '\n')
-		{
-			// we've got a complete line.
-			*ptr = '\0';
-			unsigned long long ull = 0;
-			if (sscanf(line, "MemTotal: %llu KiB", &ull) == 1)
-			{
-				// found it!
-				memsize = ((uint64_t) ull) * 1024;
-				break;
-			}
-			line = ptr;
-		}
-	}
-
-#else
-#error "Please define your platform"
-#endif
-
-	if ( memsize > 0xFFFFFFFFUL )
-	{
-		host_parms.memsize = 0xFFFFFFFFUL;
-	}
-	else
-	{
-		host_parms.memsize = memsize;
+		host_parms.memsize = MAXIMUM_WIN_MEMORY;
 	}
 
 	if ( host_parms.memsize < ONE_HUNDRED_TWENTY_EIGHT_MB )
@@ -730,22 +621,7 @@ void Sys_InitMemory( void )
 		host_parms.memsize >>= 2;
 	}
 
-	// At least MINIMUM_WIN_MEMORY MiB, even if we have to swap a lot.
-	if (host_parms.memsize < MINIMUM_WIN_MEMORY)
-	{
-		host_parms.memsize = MINIMUM_WIN_MEMORY;
-	}
-
-	// Apply cap
-	if (host_parms.memsize > MAXIMUM_WIN_MEMORY)
-	{
-		host_parms.memsize = MAXIMUM_WIN_MEMORY;
-	}
-
-#else
-#error "Please define your platform"
-
-#endif
+	host_parms.memsize = std::clamp(host_parms.memsize, MINIMUM_WIN_MEMORY, MAXIMUM_WIN_MEMORY);
 }
 
 
