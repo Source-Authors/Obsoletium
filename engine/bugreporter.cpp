@@ -184,9 +184,13 @@ BOOL IsUserAdmin()
 bool Plat_IsUserAnAdmin()
 {
 #if defined( _WIN32 ) && !defined( _X360 )
-  return ::IsUserAdmin() ? true : false;
+	return ::IsUserAdmin() ? true : false;
 #else
-	return true;
+	const uid_t uid{getuid()}, euid{geteuid()};
+
+	// We might have elevated privileges beyond that of the user who invoked the
+	// program, due to suid bit.
+	return uid < 0 || euid == 0 || uid != euid;
 #endif
 }
 
@@ -288,6 +292,8 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 				int ccVersion = Q_strlen(pchVersion); // trim the \n
 				Q_strncpy ( osversion, pchVersion, ccVersion );
 				osversion[ ccVersion ] = 0;
+				Q_strncat ( osversion, " (super user: " );
+				Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "no)" : "yes)" );
 				break;
 			}
 		}
@@ -304,6 +310,8 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 	{
 		fgets( osversion, maxlen, fpKernelVer );
 		osversion[ maxlen - 1 ] = 0;
+		Q_strncat ( osversion, " (super user: " );
+		Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "no)" : "yes)" );
 
 		char *szlf = Q_strrchr( osversion, '\n' );
 		if( szlf )
