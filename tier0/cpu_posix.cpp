@@ -14,12 +14,16 @@
 #define rdtsc(x) \
 	__asm__ __volatile__ ("rdtsc" : "=A" (x))
 
-class TimeVal
+namespace
 {
-public:
-	TimeVal() {}
-	TimeVal& operator=(const TimeVal &val) { m_TimeVal = val.m_TimeVal; return *this; } 
-	inline double operator-(const TimeVal &left)
+
+struct TimeVal
+{
+	TimeVal() = default;
+
+	TimeVal& operator=(const TimeVal &val) { m_TimeVal = val.m_TimeVal; return *this; }
+
+	inline double operator-(const TimeVal &left) const
 	{
 		uint64 left_us = (uint64) left.m_TimeVal.tv_sec * 1000000 + left.m_TimeVal.tv_usec;
 		uint64 right_us = (uint64) m_TimeVal.tv_sec * 1000000 + m_TimeVal.tv_usec;
@@ -31,27 +35,30 @@ public:
 };
 
 // Compute the positive difference between two 64 bit numbers.
-static inline uint64 diff(uint64 v1, uint64 v2)
+constexpr inline uint64 diff(uint64 v1, uint64 v2)
 {
-	int64 d = v1 - v2;
-	if (d >= 0)
-		return d;
-	else
-		return -d;
+	return v1 > v2 ? v1 - v2 : v2 - v1;
 }
+
+}  // namespace
 
 #ifdef OSX
 
 // Mac
 uint64 GetCPUFreqFromPROC()
 {
-	int mib[2] = {CTL_HW, HW_CPU_FREQ};
-	uint64 frequency = 0;
+	uint64_t frequency = 0;
 	size_t len = sizeof(frequency);
 
-	if (sysctl(mib, 2, &frequency, &len, NULL, 0) == -1)
-		return 0;
-	return frequency;
+	// Only for Intel Macs. M1+ have multiple CPUs with different frequency.
+	if (sysctlbyname("hw.cpufrequency",
+		&frequency, &len, NULL, 0) == 0)
+	{
+		return frequency;
+	}
+
+	// Assume 2.4 GHz for M1+ for now.
+	return 2400000000;
 }
 
 #else
@@ -94,11 +101,11 @@ uint64 GetCPUFreqFromPROC()
 uint64 CalculateCPUFreq()
 {
 #ifdef LINUX
-	char const *pFreq = getenv( "CPU_MHZ" );
-	if ( pFreq )
+	const char *cpu_mhz{getenv( "CPU_MHZ" )};
+	if ( cpu_mhz )
 	{
-		uint64 retVal = 1000000;
-		return retVal * atoi( pFreq );
+		constexpr uint64 factor = 1000000;
+		return factor * atoi( cpu_mhz );
 	}
 #endif
 

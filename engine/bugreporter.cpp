@@ -18,8 +18,6 @@
 
 #ifdef OSX
 #include <copyfile.h>
-#import <mach/mach_host.h>
-#import <sys/sysctl.h>
 #elif defined(LINUX)
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -10,9 +10,6 @@
 #if defined(_WIN32) && !defined(_X360)
 #include "winlite.h"
 #include <system_error>
-#elif defined(OSX)
-#include <Carbon/Carbon.h>
-#include <sys/sysctl.h>
 #endif
 #if defined(LINUX)
 #include <unistd.h>

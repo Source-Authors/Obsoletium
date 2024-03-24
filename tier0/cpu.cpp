@@ -24,7 +24,10 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
-static bool cpuid(unsigned int function,
+namespace
+{
+
+bool cpuid(unsigned int function,
 	unsigned int& out_eax,
 	unsigned int& out_ebx,
 	unsigned int& out_ecx,
@@ -45,7 +48,7 @@ static bool cpuid(unsigned int function,
 	return true;
 }
 
-static bool cpuidex(unsigned int function,
+bool cpuidex(unsigned int function,
 	unsigned int subfunction,
 	unsigned int& out_eax,
 	unsigned int& out_ebx,
@@ -68,18 +71,19 @@ static bool cpuidex(unsigned int function,
 }
 
 // Return the Processor's vendor identification string,
-//  or "Generic_x86{_64}" if it doesn't exist on this CPU.
-static const char* GetProcessorVendorId()
+// or "Generic_x86{_64}" if it doesn't exist on this CPU.
+const char* GetProcessorVendorId()
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return "PPC";
 #else
-	static char vendorId[13];
+	static char vendorId[16];
 	if (vendorId[0] != '\0')
 	{
 		return vendorId;
 	}
 	
+#ifndef OSX
 	unsigned int unused, regs[3];
 	memset( vendorId, 0, sizeof(vendorId) );
 
@@ -93,10 +97,6 @@ static const char* GetProcessorVendorId()
 			strcpy( vendorId, "Generic_x86_64" );
 #endif
 		}
-		else if ( IsX360() )
-		{
-			strcpy( vendorId, "PowerPC" );
-		}
 	}
 	else
 	{
@@ -104,13 +104,25 @@ static const char* GetProcessorVendorId()
 		memcpy( vendorId+4, &regs[1], sizeof( regs[1] ) ); //-V112
 		memcpy( vendorId+8, &regs[2], sizeof( regs[2] ) );
 	}
+#else
+	// Works both on Intel Macs and M1+
+	size_t len = sizeof(vendorId);
+
+	if (sysctlbyname("machdep.cpu.vendor",
+		vendorId, &len, nullptr, 0) == 0)
+	{
+		return vendorId;
+	}
+
+	return "N/A";
+#endif
 
 	return vendorId;
 #endif
 }
 
 // Trim spaces around data.
-static void TrimSpaces( char (&in)[0x40], char (&out)[0x40] )
+void TrimSpaces( char (&in)[128], char (&out)[128] )
 {
 	size_t i{0};
 	// Trim leading space.
@@ -141,13 +153,13 @@ static void TrimSpaces( char (&in)[0x40], char (&out)[0x40] )
 }
 
 // Get CPU brand.
-static const char* GetCpuBrand
+const char* GetCpuBrand
 (
 	const std::vector<std::array<unsigned, 4>> &in,
-	char (&brand)[0x40]
+	char (&brand)[128]
 )
 {
-	char brand_raw[0x40]{'\0'};
+	char brand_raw[128]{'\0'};
 
 	std::memcpy(brand_raw, in[2].data(), sizeof(in[2]));
 	std::memcpy(brand_raw + sizeof(in[2]), in[3].data(), sizeof(in[3]));
@@ -160,17 +172,31 @@ static const char* GetCpuBrand
 }
 
 // Return the Processor's brand.
-static const char* GetProcessorBrand()
+const char* GetProcessorBrand()
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return "PPC";
 #else
-	static char cpuBrand[0x40]{'\0'};
+	static char cpuBrand[128]{'\0'};
 	if (cpuBrand[0] != '\0')
 	{
 		return cpuBrand;
 	}
 
+#ifdef OSX
+	char brand_raw[128]{'\0'};
+	// Works both on Intel Macs and M1+
+	size_t len = sizeof(brand_raw);
+
+	if (sysctlbyname("machdep.cpu.brand_string",
+		brand_raw, &len, nullptr, 0) == 0)
+	{
+		TrimSpaces(brand_raw, cpuBrand);
+		return cpuBrand;
+	}
+
+	return "N/A";
+#else
 	// Calling cpuid with 0x80000000 as the function_id argument gets the
 	// number of the highest valid extended ID.
 	unsigned eax, ebx, ecx, edx;
@@ -183,10 +209,6 @@ static const char* GetProcessorBrand()
 #else
 			strcpy( cpuBrand, "Generic_x86_64" );
 #endif
-		}
-		else if ( IsX360() )
-		{
-			strcpy( cpuBrand, "PowerPC" );
 		}
 
 		return cpuBrand;
@@ -206,48 +228,48 @@ static const char* GetProcessorBrand()
 
 	return GetCpuBrand( extendedData, cpuBrand );
 #endif
+#endif
 }
 
-static bool CheckMMXTechnology( unsigned edx )
+bool CheckMMXTechnology( unsigned edx )
 {
-#if defined( _X360 ) || defined( _PS3 ) 
+#if defined( _PS3 ) 
 	return true;
 #else
 	return ( edx & ( 1U << 23U ) ) != 0;
 #endif
 }
 
-
-static bool CheckSSETechnology( unsigned edx )
+bool CheckSSETechnology( unsigned edx )
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return true;
 #else
 	return ( edx & ( 1U << 25U ) ) != 0;
 #endif
 }
 
-static bool CheckSSE2Technology( unsigned edx )
+bool CheckSSE2Technology( unsigned edx )
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return false;
 #else
 	return ( edx & ( 1U << 26U ) ) != 0;
 #endif
 }
 
-static bool CheckSSE3Technology( unsigned ecx )
+bool CheckSSE3Technology( unsigned ecx )
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return false;
 #else
 	return ( ecx & 1U ) != 0;
 #endif
 }
 
-static bool CheckSSSE3Technology( unsigned ecx )
+bool CheckSSSE3Technology( unsigned ecx )
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return false;
 #else
 	// SSSE 3 is implemented by both Intel and AMD
@@ -256,9 +278,9 @@ static bool CheckSSSE3Technology( unsigned ecx )
 #endif
 }
 
-static bool CheckSSE41Technology( unsigned ecx )
+bool CheckSSE41Technology( unsigned ecx )
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return false;
 #else
 	// SSE 4.1 is implemented by both Intel and AMD
@@ -267,9 +289,9 @@ static bool CheckSSE41Technology( unsigned ecx )
 #endif
 }
 
-static bool CheckSSE42Technology( unsigned ecx )
+bool CheckSSE42Technology( unsigned ecx )
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return false;
 #else
 	// SSE 4.2 is implemented by both Intel and AMD
@@ -278,10 +300,9 @@ static bool CheckSSE42Technology( unsigned ecx )
 #endif
 }
 
-
-static bool CheckSSE4aTechnology()
+bool CheckSSE4aTechnology()
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return false;
 #else
 	// SSE 4a is an AMD-only feature
@@ -297,9 +318,9 @@ static bool CheckSSE4aTechnology()
 #endif
 }
 
-static bool Check3DNowTechnology()
+bool Check3DNowTechnology()
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return false;
 #else
 	unsigned int eax, unused;
@@ -318,18 +339,18 @@ static bool Check3DNowTechnology()
 #endif
 }
 
-static bool CheckCMOVTechnology( unsigned edx )
+bool CheckCMOVTechnology( unsigned edx )
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return false;
 #else
 	return ( edx & (1U << 15U) ) != 0;
 #endif
 }
 
-static bool CheckFCMOVTechnology( unsigned edx )
+bool CheckFCMOVTechnology( unsigned edx )
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return false;
 #else
 	// Has x87 FPU and CMOV => have FCMOV.
@@ -337,18 +358,18 @@ static bool CheckFCMOVTechnology( unsigned edx )
 #endif
 }
 
-static bool CheckRDTSCTechnology( unsigned edx )
+bool CheckRDTSCTechnology( unsigned edx )
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return false;
 #else
 	return ( edx & (1U << 4U) ) != 0;
 #endif
 }
 
-static bool CheckPopcntTechnology( unsigned int ecx )
+bool CheckPopcntTechnology( unsigned int ecx )
 {
-#if defined( _X360 ) || defined( _PS3 )
+#if defined( _PS3 )
 	return false;
 #else
 	return ( ecx & ( 1U << 23U ) ) != 0;	// bit 23 of ECX
@@ -356,16 +377,12 @@ static bool CheckPopcntTechnology( unsigned int ecx )
 }
 
 // Returns the number of logical processors per physical processors.
-static uint8 LogicalProcessorsPerPackage( unsigned ebx )
+uint8 LogicalProcessorsPerPackage( unsigned ebx )
 {
-#if defined( _X360 )
-	return 6;
-#else
 	// EBX[23:16] indicate number of logical processors per package
 	constexpr unsigned NUM_LOGICAL_BITS = 0x00FF0000U;
 
 	return (uint8) ((ebx & NUM_LOGICAL_BITS) >> 16U);
-#endif
 }
 
 #ifdef _WIN32
@@ -377,7 +394,7 @@ struct CpuCoreInfo
 };
 
 // Helper function to count set bits in the processor mask.
-static unsigned CountSetBits( ULONG_PTR mask, bool is_popcnt_supported )
+unsigned CountSetBits( ULONG_PTR mask, bool is_popcnt_supported )
 {
 #if !(defined(_M_ARM) || defined(_M_ARM64) || defined(_WIN64))
 	if ( is_popcnt_supported )
@@ -406,7 +423,7 @@ static unsigned CountSetBits( ULONG_PTR mask, bool is_popcnt_supported )
 	return bits_num;
 }
 
-static CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
+CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
 {
 	SYSTEM_LOGICAL_PROCESSOR_INFORMATION *buffer{nullptr};
 	DWORD size{0};
@@ -462,6 +479,7 @@ static CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
 
 	return { physical_cores_num, logical_cores_num };
 }
+
 #endif
 
 #if defined(POSIX)
@@ -471,12 +489,13 @@ static CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
 uint64 CalculateCPUFreq(); // from cpu_linux.cpp
 #endif
 
+}  // namespace
+
 // Measure the processor clock speed by sampling the cycle count, waiting
 // for some fraction of a second, then measuring the elapsed number of cycles.
 static int64 CalculateClockSpeed()
 {
 #if defined( _WIN32 )
-#if !defined( _X360 )
 	LARGE_INTEGER waitTime, startCount, curCount;
 	CCycleCount start, end;
 
@@ -504,10 +523,6 @@ static int64 CalculateClockSpeed()
 		freq = 2000000000;
 	}
 	return freq;
-
-#else
-	return 3200000000LL;
-#endif
 #elif defined(POSIX)
 	int64 freq =(int64)CalculateCPUFreq();
 	if ( freq == 0 ) // couldn't calculate clock speed
@@ -545,7 +560,7 @@ const CPUInformation* GetCPUInformation()
 	pi.m_nLogicalProcessors = LogicalProcessorsPerPackage( ebx );
 	pi.m_nPhysicalProcessors = 1U;
 
-#if defined(_WIN32) && !defined( _X360 )
+#if defined(_WIN32)
 	// dimhotepus: Correctly compute CPU cores count.
 	CpuCoreInfo cpu_core_info{ GetProcessorCoresInfo( CheckPopcntTechnology( ecx ) ) };
 
@@ -562,9 +577,6 @@ const CPUInformation* GetCPUInformation()
 		pi.m_nPhysicalProcessors = 1;
 		pi.m_nLogicalProcessors  = 1;
 	}
-#elif defined( _X360 )
-	pi.m_nPhysicalProcessors = 3;
-	pi.m_nLogicalProcessors  = 6;
 #elif defined(_LINUX)
 	// TODO: poll /dev/cpuinfo when we have some benefits from multithreading
 	FILE *fpCpuInfo = fopen( "/proc/cpuinfo", "r" );
@@ -623,13 +635,19 @@ const CPUInformation* GetCPUInformation()
 		Assert( !"couldn't read cpu information from /proc/cpuinfo" );
 	}
 #elif defined(OSX)
-	int mib[2] { CTL_HW, HW_NCPU }, num_cpu = 1;
-	size_t len = sizeof(num_cpu);
+	uint32_t physical_core_count = 1, logical_core_count = 1;
+	size_t len = sizeof(uint32_t);
 
-	sysctl(mib, 2, &num_cpu, &len, nullptr, 0);
-
-	pi.m_nPhysicalProcessors = num_cpu;
-	pi.m_nLogicalProcessors  = num_cpu;
+	// Works both for Intel Macs and M1+
+	// See https://discussions.apple.com/thread/252285216?sortBy=best
+	pi.m_nPhysicalProcessors =
+		sysctlbyname("machdep.cpu.core_count",
+			&physical_core_count, &len, nullptr, 0) == 0
+		? physical_core_count : 1;
+	pi.m_nLogicalProcessors =
+		sysctlbyname("machdep.cpu.thread_count",
+			&logical_core_count, &len, nullptr, 0) == 0
+		? logical_core_count : 1;
 #endif
 
 	// Determine Processor Features:
