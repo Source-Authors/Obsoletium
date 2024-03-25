@@ -36,3 +36,6 @@
 [submodule "thirdparty/snappy"]
 	path = thirdparty/snappy
 	url = git@github.com:Source-Authors/snappy.git
+[submodule "external/vpc"]
+	path = external/vpc
+	url = git@github.com:Source-Authors/vpc.git
