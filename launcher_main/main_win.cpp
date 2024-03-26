@@ -8,6 +8,7 @@
 #include <system_error>
 
 #include "scoped_dll.h"
+#include "scoped_process_error_mode.h"
 #include "winlite.h"
 
 extern "C" {
@@ -175,8 +176,8 @@ template <size_t buffer_size>
 #define VALVE_OB_STRINGIFY(x) #x
 #define VALVE_OB_TOSTRING(x) VALVE_OB_STRINGIFY(x)
 
-int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
-                     _In_ LPSTR cmd_line, _In_ int window_flags) {
+int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
+        _In_ LPSTR cmd_line, _In_ int window_flags) {
   // Game uses features of Windows 10.
   if (!IsWindows10OrGreater()) {
     return ShowErrorBoxAndExitWithCode(
@@ -186,7 +187,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   }
 
   // Do not show fault error boxes, etc.
-  (void)::SetErrorMode(
+  const source::ScopedProcessErrorMode scoped_process_error_mode{
 #ifdef NDEBUG
       // The system does not display the critical-error-handler message box.
       // Instead, the system sends the error to the calling process.
@@ -194,15 +195,16 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
       SEM_FAILCRITICALERRORS |
 #endif
       // The system automatically fixes memory alignment faults and makes them
-      // invisible to the application.  It does this for the calling process and
+      // invisible to the application.  It does this for the calling process
+      // and
       // any descendant processes.
       SEM_NOALIGNMENTFAULTEXCEPT |
       // The system does not display the Windows Error Reporting dialog.
-      SEM_NOGPFAULTERRORBOX);
+      SEM_NOGPFAULTERRORBOX};
 
   {
     // Apply process mitigations.
-    int rc = ApplyProcessMitigations();
+    const int rc{ApplyProcessMitigations()};
     if (rc) return static_cast<int>(rc);
   }
 
@@ -230,7 +232,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   char user_error[1024];
   // STEAM OK ... filesystem not mounted yet.
   const source::ScopedDll launcher_dll{launcher_dll_path,
-                               LOAD_WITH_ALTERED_SEARCH_PATH};
+                                       LOAD_WITH_ALTERED_SEARCH_PATH};
   if (!launcher_dll) {
     const auto rc = ::GetLastError();
     _snprintf_s(user_error, _TRUNCATE,
@@ -257,7 +259,12 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
     return ShowErrorBoxAndExitWithCode(user_error, rc);
   }
 
-  const auto rc = launcher_main(instance, old_instance, cmd_line, window_flags);
+  return launcher_main(instance, old_instance, cmd_line, window_flags);
+}
+
+int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
+                     _In_ LPSTR cmd_line, _In_ int window_flags) {
+  const auto rc = Run(instance, old_instance, cmd_line, window_flags);
 
   // Prevent tail call optimization and incorrect stack traces.
   exit(rc);
