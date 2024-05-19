@@ -33,7 +33,10 @@ void IncrementRefMiles()
 		AIL_set_redist_directory( MSS_REDIST_DIR_NAME );
 #endif
 
-		AIL_startup();
+		if ( AIL_startup() == 0 )
+		{
+			Warning( "Miles Audio startup failed. Audio may not be available. ");
+		}
 	}
 	
 	++s_MilesRefCount;

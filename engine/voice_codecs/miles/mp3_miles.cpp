@@ -122,12 +122,12 @@ public:
 		IncrementRefMiles();
 	}
 
-	virtual ~CVAudio()
+	virtual ~CVAudio() override
 	{
 		DecrementRefMiles();
 	}
 
-	IAudioStream *CreateMP3StreamDecoder( IAudioStreamEvent *pEventHandler )
+	IAudioStream *CreateMP3StreamDecoder( IAudioStreamEvent *pEventHandler ) override
 	{
 		CMilesMP3 *pMP3 = new CMilesMP3;
 		if ( !pMP3->Init( pEventHandler ) )
@@ -138,20 +138,24 @@ public:
 		return pMP3;
 	}
 
-	void DestroyMP3StreamDecoder( IAudioStream *pDecoder )
+	void DestroyMP3StreamDecoder( IAudioStream *pDecoder ) override
 	{
 		delete pDecoder;
 	}
 
-	void *CreateMilesAudioEngine()
+	void *CreateMilesAudioEngine() override
 	{
 		IncrementRefMiles();
 		// dimhotepus: Use system configuration instead of 5:1 as it is now always the case.
 		HDIGDRIVER hDriver = AIL_open_digital_driver( 44100, 16, MSS_MC_USE_SYSTEM_CONFIG, 0 );
+		if ( !hDriver )
+		{
+			Warning( "Unable to open Miles Audio driver on 44100 Hz / 16 bits / system speaker config: %s", AIL_last_error() );
+		}
 		return hDriver;
 	}
 
-	void DestroyMilesAudioEngine( void *pEngine )
+	void DestroyMilesAudioEngine( void *pEngine ) override
 	{
 		HDIGDRIVER hDriver = HDIGDRIVER(pEngine);
 		AIL_close_digital_driver( hDriver );

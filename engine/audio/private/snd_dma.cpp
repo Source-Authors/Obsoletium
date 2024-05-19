@@ -661,12 +661,17 @@ bool IsValidSampleRate( int rate )
 
 void VAudioInit()
 {
-	if ( IsPC() )
+	if ( IsPC() && !g_pVAudioModule )
 	{
 		if ( !IsPosix() )
 		{
+#ifdef _WIN64
+			// vaudio_miles.dll will load this...
+			g_pFileSystem->GetLocalCopy( "mss64.dll" );
+#else
 			// vaudio_miles.dll will load this...
 			g_pFileSystem->GetLocalCopy( "mss32.dll" );
+#endif
 		}
 
 		g_pVAudioModule = FileSystem_LoadModule( "vaudio_miles" );

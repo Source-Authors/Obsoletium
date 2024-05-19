@@ -62,6 +62,7 @@
 #include "video/ivideoservices.h"
 #include "sys.h"
 #include "materialsystem/imaterial.h"
+#include "vaudio/ivaudio.h"
 
 #if defined( LINUX )
   #include "snd_dev_sdl.h"
@@ -1010,6 +1011,42 @@ void CGame::InputDetachFromGameWindow()
 	DetachFromWindow();
 }
 
+class ScopedMilesAudioDevice
+{
+ public:
+  ScopedMilesAudioDevice(IVAudio *audio, IVideoServices *video_services) noexcept
+      : m_vaudio{audio},
+        m_video_services{video_services},
+        m_miles_sound_device{m_vaudio->CreateMilesAudioEngine()} {
+    const VideoResult_t audio_rc = m_video_services->SoundDeviceCommand(
+        VideoSoundDeviceOperation_t::SET_MILES_SOUND_DEVICE, m_miles_sound_device);
+    if (audio_rc != VideoResult_t::SUCCESS) {
+      Warning(
+          "Miles Audio startup failed. Startup videos may be played without "
+          "sound.");
+    }
+  }
+  ScopedMilesAudioDevice(const ScopedMilesAudioDevice &) noexcept = delete;
+  ScopedMilesAudioDevice& operator=(const ScopedMilesAudioDevice &) noexcept = delete;
+  ScopedMilesAudioDevice(ScopedMilesAudioDevice &&) noexcept = delete;
+  ScopedMilesAudioDevice &operator=(ScopedMilesAudioDevice &&) noexcept = delete;
+
+  ~ScopedMilesAudioDevice() noexcept {
+    // dimhotepus: Clear Miles audio device from Bink.
+    if (m_miles_sound_device) {
+      m_video_services->SoundDeviceCommand(
+          VideoSoundDeviceOperation_t::SET_MILES_SOUND_DEVICE, nullptr);
+
+      m_vaudio->DestroyMilesAudioEngine(m_miles_sound_device);
+    }
+  }
+
+ private:
+  IVAudio *m_vaudio;
+  IVideoServices *m_video_services;
+  void *m_miles_sound_device;
+};
+
 void CGame::PlayStartupVideos( void )
 {
 	if ( Plat_IsInBenchmarkMode() )
@@ -1069,6 +1106,14 @@ void CGame::PlayStartupVideos( void )
 		return;
 	}
 
+	// dimhotepus: Need to play startup videos sound, but sound devices are not ready.
+	extern void VAudioInit();
+	VAudioInit();
+
+	extern IVAudio *vaudio;
+	// dimhotepus: Use Miles audio device.
+	const ScopedMilesAudioDevice scoped_miles_audio_device{vaudio, g_pVideo};
+
 	// hide cursor while playing videos
   #if defined( USE_SDL )
 	g_pLauncherMgr->SetMouseVisible( false );
@@ -1077,8 +1122,6 @@ void CGame::PlayStartupVideos( void )
   #endif
 
 #if defined( LINUX )
-	extern void VAudioInit();
-	VAudioInit();
 	Audio_CreateSDLAudioDevice();
 #endif
 

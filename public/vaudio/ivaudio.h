@@ -49,8 +49,8 @@ public:
 	// reset?
 };
 
-
-#define VAUDIO_INTERFACE_VERSION		"VAudio002"
+// dimhotepus: Increment version.
+#define VAUDIO_INTERFACE_VERSION		"VAudio003"
 class IVAudio
 {
 public:
@@ -58,6 +58,10 @@ public:
 
 	virtual IAudioStream	*CreateMP3StreamDecoder( IAudioStreamEvent *pEventHandler ) = 0;
 	virtual void			DestroyMP3StreamDecoder( IAudioStream *pDecoder ) = 0;
+
+	// dimhotepus: Export Miles Audio engine.
+	virtual void *			CreateMilesAudioEngine() = 0;
+	virtual void			DestroyMilesAudioEngine( void *pEngine ) = 0;
 };
 
 

@@ -32,9 +32,9 @@ $Configuration
 	{
 		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n"		\
 									"COPY $MSSSRCDIR\bin\$MSSLIBDIR\mss32.dll $OUTBINDIR\mss32.dll" "\n"				\
-									"COPY $MSSSRCDIR\bin\$MSSLIBDIR\mssmp3.asi $OUTBINDIR\mssmp3.asi" "\n"			\
-									"COPY $MSSSRCDIR\bin\$MSSLIBDIR\mssogg.asi $OUTBINDIR\mssogg.asi" "\n"			\
-									"COPY $MSSSRCDIR\bin\$MSSLIBDIR\mssvoice.asi $OUTBINDIR\mssvoice.asi" "\n"	\
+									"REM COPY $MSSSRCDIR\bin\$MSSLIBDIR\mssmp3.asi $OUTBINDIR\mssmp3.asi" "\n"			\
+									"REM COPY $MSSSRCDIR\bin\$MSSLIBDIR\mssogg.asi $OUTBINDIR\mssogg.asi" "\n"			\
+									"REM COPY $MSSSRCDIR\bin\$MSSLIBDIR\mssvoice.asi $OUTBINDIR\mssvoice.asi" "\n"	\
 									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
 									"$BASE"
 	}
