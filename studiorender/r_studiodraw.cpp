@@ -2642,7 +2642,7 @@ int CStudioRender::R_StudioDrawEyeball( IMatRenderContext *pRenderContext, mstud
 	int nAlpnaInt = RoundFloatToInt( m_pRC->m_AlphaMod * 255 );
 	unsigned char a = clamp( nAlpnaInt, 0, 255 );
 
-	Vector position, normal, color;
+	Vector color;
 
 	// setup the call
 	R_InitLightEffectsWorld3();

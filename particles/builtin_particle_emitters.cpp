@@ -750,17 +750,11 @@ uint32 C_OP_NoiseEmitter::Emit( CParticleCollection *pParticles, float flCurStre
 
 	float ValueScale, ValueBase;
 
-	Vector Coord, CoordLoc, CoordWorldTime;
-	//CoordLoc.x = pxyz[0]; 
-	//CoordLoc.y = pxyz[4];
-	//CoordLoc.z = pxyz[8];
-	//CoordLoc += m_vecOffsetLoc;
+	Vector Coord, CoordWorldTime;
 
 	float Offset = m_flOffset;
 	Coord = Vector ( (pParticles->m_flCurTime + Offset), (pParticles->m_flCurTime + Offset), (pParticles->m_flCurTime + Offset) );
 	Coord *= CoordScale;
-	//CoordLoc *= CoordScaleLoc;
-	//Coord += CoordLoc;
 
 	CoordWorldTime = Vector( (Plat_MSTime() * m_flWorldTimeScale), (Plat_MSTime() * m_flWorldTimeScale), (Plat_MSTime() * m_flWorldTimeScale) );
 	Coord += CoordWorldTime;

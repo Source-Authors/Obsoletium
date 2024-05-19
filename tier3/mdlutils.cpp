@@ -342,8 +342,6 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 	// FIXME: Try enabling this?
 	//	CalcAutoplaySequences( pStudioHdr, NULL, pos, q, pPoseParameter, BONE_USED_BY_VERTEX_AT_LOD( m_nLOD ), flTime );
 
-	matrix3x4_t temp;
-
 	if ( nMaxBoneCount > studioHdr.numbones() )
 	{
 		nMaxBoneCount = studioHdr.numbones();

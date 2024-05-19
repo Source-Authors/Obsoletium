@@ -700,8 +700,6 @@ int CDmObjSerializer::OutputVectors(
 	const char *pPrefix,
 	const CUtlVector< Vector2D > &vData )
 {
-	Vector v;
-
 	const int nv( vData.Count() );
 
 	for ( int i( 0 ); i < nv; ++i )

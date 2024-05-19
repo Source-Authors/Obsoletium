@@ -873,7 +873,6 @@ bool CDmMeshUtils::MirrorVertices( CDmeMesh *pMesh, CDmeVertexData *pBase, int a
 	{
 		bool mirror;
 
-		Vector tmpVec;
 		Vector2D tmpVec2D;
 
 		for ( int i = 0; i < nIndices; ++i )

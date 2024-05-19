@@ -66,7 +66,7 @@ void Plat_SetBenchmarkMode( bool bBenchmark )
 
 double Plat_FloatTime()
 {
-  if ( !s_bTimeInitted ) [[unlikely]]
+  if ( !s_bTimeInitted )
 		InitTime();
 	if ( g_bBenchmarkMode )
 	{
@@ -85,7 +85,7 @@ double Plat_FloatTime()
 
 uint32 Plat_MSTime()
 {
-	if ( !s_bTimeInitted ) [[unlikely]]
+	if ( !s_bTimeInitted )
 		InitTime();
 	if ( g_bBenchmarkMode )
 	{
@@ -102,7 +102,7 @@ uint32 Plat_MSTime()
 
 uint64 Plat_USTime()
 {
-	if ( !s_bTimeInitted ) [[unlikely]]
+	if ( !s_bTimeInitted )
 		InitTime();
 	if ( g_bBenchmarkMode )
 	{

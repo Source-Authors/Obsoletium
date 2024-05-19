@@ -773,7 +773,7 @@ CDbgMemAlloc::~CDbgMemAlloc()
 
 void CDbgMemAlloc::Initialize()
 {
-  if (!m_bInitialized) [[unlikely]]
+  if (!m_bInitialized)
 	{
 		m_pFilenames = new Filenames_t;
 		// dimhotepus: Allocate reasonable amount.
@@ -898,7 +898,7 @@ void SetupDebugInfoStack(DbgInfoStack_t *&stack, int &stack_depth)
 //-----------------------------------------------------------------------------
 void CDbgMemAlloc::PushAllocDbgInfo( const char *pFileName, int nLine )
 {
-	if ( g_DbgInfoStack == NULL ) [[unlikely]]
+	if ( g_DbgInfoStack == NULL )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -914,7 +914,7 @@ void CDbgMemAlloc::PushAllocDbgInfo( const char *pFileName, int nLine )
 
 void CDbgMemAlloc::PopAllocDbgInfo()
 {
-  if ( g_DbgInfoStack == NULL ) [[unlikely]]
+  if ( g_DbgInfoStack == NULL )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -934,7 +934,7 @@ uint32 CDbgMemAlloc::GetDebugInfoSize()
 
 void CDbgMemAlloc::SaveDebugInfo( void *pvDebugInfo )
 {
-	if ( g_DbgInfoStack == NULL ) [[unlikely]]
+	if ( g_DbgInfoStack == NULL )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -946,7 +946,7 @@ void CDbgMemAlloc::SaveDebugInfo( void *pvDebugInfo )
 
 void CDbgMemAlloc::RestoreDebugInfo( const void *pvDebugInfo )
 {
-	if ( g_DbgInfoStack == NULL ) [[unlikely]]
+	if ( g_DbgInfoStack == NULL )
 	{
     SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -986,7 +986,7 @@ void CDbgMemAlloc::GetActualDbgInfo( const char *&pFileName, int &nLine )
 	return;
 #endif
 
-	if ( g_DbgInfoStack == NULL ) [[unlikely]]
+	if ( g_DbgInfoStack == NULL )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
