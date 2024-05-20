@@ -1089,7 +1089,8 @@ void CEngineAPI::SetStartupInfo( StartupInfo_t &info )
 		// Try again with filesystem available. This is commonly needed for SDK mods which need the filesystem to find
 		// their steam.inf, due to mounting SDK search paths.
 		steamInfo = Sys_TryInitSteamInfo( this, g_SteamInfIDVersionInfo, info.m_pInitialMod, info.m_pBaseDirectory, bDedicated );
-		Assert( steamInfo == eSteamInfo_Initialized );
+		// dimhotepus: Steam is not needed, so continue to fly without. 
+		// Assert( steamInfo == eSteamInfo_Initialized );
 		if ( steamInfo != eSteamInfo_Initialized )
 		{
 			Warning( "Failed to find steam.inf or equivalent steam info. May not have proper information to connect to Steam.\n" );
