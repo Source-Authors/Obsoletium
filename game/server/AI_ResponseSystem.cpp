@@ -1743,19 +1743,17 @@ bool CResponseSystem::FindBestResponse( const AI_CriteriaSet& set, AI_Response& 
 	AI_ResponseParams rp;
 
 	char ruleName[ 128 ];
-	char responseName[ 128 ];
-	const char *context;
-	bool bcontexttoworld;
 	ruleName[ 0 ] = 0;
+	char responseName[ 128 ];
 	responseName[ 0 ] = 0;
-	context = NULL;
-	bcontexttoworld = false;
+	const char *context = nullptr;
+	bool bcontexttoworld = false;
 	if ( bestRule != -1 )
 	{
-		Rule *r = &m_Rules[ bestRule ];
+		Rule &r = m_Rules[ bestRule ];
 
 		ResponseSearchResult result;
-		if ( GetBestResponse( result, r, showResult, pFilter ) )
+		if ( GetBestResponse( result, &r, showResult, pFilter ) )
 		{
 			Q_strncpy( responseName, result.action->value, sizeof( responseName ) );
 			responseType = result.action->GetType();
@@ -1765,17 +1763,21 @@ bool CResponseSystem::FindBestResponse( const AI_CriteriaSet& set, AI_Response& 
 		Q_strncpy( ruleName, m_Rules.GetElementName( bestRule ), sizeof( ruleName ) );
 
 		// Disable the rule if it only allows for matching one time
-		if ( r->IsMatchOnce() )
+		if ( r.IsMatchOnce() )
 		{
-			r->Disable();
+			r.Disable();
 		}
-		context = r->GetContext();
-		bcontexttoworld = r->IsApplyContextToWorld();
+		context = r.GetContext();
+		bcontexttoworld = r.IsApplyContextToWorld();
 
 		valid = true;
 	}
 
-	response.Init( responseType, responseName, set, rp, ruleName, context, bcontexttoworld );
+	if ( valid )
+	{
+		// dimhotepus: Init only if response valid. Or leak inside.
+		response.Init( responseType, responseName, set, rp, ruleName, context, bcontexttoworld );
+	}
 
 	if ( showResult )
 	{
