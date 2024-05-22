@@ -71,16 +71,16 @@ void CFontAmalgam::RemoveAll()
 //-----------------------------------------------------------------------------
 font_t *CFontAmalgam::GetFontForChar(int ch)
 {
-	for (int i = 0; i < m_Fonts.Count(); i++)
+	for (auto &&f : m_Fonts)
 	{
 #if defined(LINUX)
-        if ( ch >= m_Fonts[i].lowRange && ch <= m_Fonts[i].highRange && m_Fonts[i].font->HasChar(ch))
+		if ( ch >= f.lowRange && ch <= f.highRange && f.font->HasChar(ch))
 #else
-		if (ch >= m_Fonts[i].lowRange && ch <= m_Fonts[i].highRange)
+		if (ch >= f.lowRange && ch <= f.highRange)
 #endif
 		{
-			Assert( m_Fonts[i].font->IsValid() );
-			return m_Fonts[i].font;
+			Assert( f.font->IsValid() );
+			return f.font;
 		}
 	}
 
