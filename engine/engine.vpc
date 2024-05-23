@@ -21,8 +21,8 @@ $Macro ZLIBSRCDIR		"$SRCDIR\thirdparty\zlib"
 $Macro ZLIBSRC2DIR		"$ZLIBSRCDIR\out"
 $Macro ZLIBOUTDIR		"$ZLIBSRCDIR\out\Release"
 
-$Macro MPAHEADERINFOOUTDIRDEBUG	"$SRCDIR\thirdparty\MPAHeaderInfo\out\Debug"
-$Macro MPAHEADERINFOOUTDIRRELEASE	"$SRCDIR\thirdparty\MPAHeaderInfo\out\Release"
+$Macro MPAHEADERINFOOUTDIRDEBUG	"$SRCDIR\thirdparty\mpaheaderinfo\out\Debug"
+$Macro MPAHEADERINFOOUTDIRRELEASE	"$SRCDIR\thirdparty\mpaheaderinfo\out\Release"
 
 $include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 $include "$SRCDIR\vpc_scripts\source_replay.vpc"

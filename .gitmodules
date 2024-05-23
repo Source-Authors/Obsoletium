@@ -39,3 +39,6 @@
 [submodule "external/vpc"]
 	path = external/vpc
 	url = git@github.com:Source-Authors/vpc.git
+[submodule "thirdparty/mpaheaderinfo"]
+	path = thirdparty/mpaheaderinfo
+	url = git@github.com:Source-Authors/mpaheaderInfo.git

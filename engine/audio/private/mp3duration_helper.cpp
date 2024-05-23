@@ -5,8 +5,8 @@
 //=============================================================================
 
 #include "tier0/platform.h"
-#include "MPAHeaderInfo/stdafx.h"
-#include "MPAHeaderInfo/MPAFile.h"
+#include "mpaheaderinfo/stdafx.h"
+#include "mpaheaderinfo/MPAFile.h"
 #include "filesystem.h"
 #include "soundchars.h"
 #include "tier1/utlsymbol.h"
