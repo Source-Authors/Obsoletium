@@ -33,11 +33,6 @@ extern IMaterialSystem	*materials;
 	#include <quicktime/QTML.h>
 	#include <quicktime/Movies.h>
 	#include <quicktime/MediaHandlers.h>
-#elif defined ( WIN32 )
-	#include <QTML.h>
-	#include <Movies.h>
-	#include <windows.h>
-	#include <MediaHandlers.h>
 #elif
     #error "Quicktime not supported on this target platform"	
 #endif

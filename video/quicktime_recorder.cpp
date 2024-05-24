@@ -2,14 +2,8 @@
 //
 //----------------------------------------------------------------------------------------
 
-#define WIN32_LEAN_AND_MEAN
-
 #include "quicktime_recorder.h"
 #include "filesystem.h"
-
-#ifdef _WIN32
-	#include "windows.h"
-#endif
 
 //-----------------------------------------------------------------------------
 
@@ -21,7 +15,7 @@
 
 
 // Platform check
-#if defined ( OSX ) || defined ( WIN32 )
+#if defined ( OSX )
 	// platform is supported
 #else	
 	#error "Unsupported Platform for QuickTime"

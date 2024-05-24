@@ -43,8 +43,6 @@ $Configuration	"Debug"
 		$PreprocessorDefinitions		"$BASE;MPA_BUILD_WITHOUT_ATL"
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY"	[$LINUXALL]
 
-		$AdditionalIncludeDirectories	"$BASE;..\common\quicktime_win32\"		[$QUICKTIME_WIN32]
-
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR/thirdparty/gperftools-2.0/src/" [$GPROFILER]
 		$PreprocessorDefinitions		"$BASE;GPROFILER" [$GPROFILER]
 		$PreprocessorDefinitions		"$BASE;ENABLE_RPT" [$ENABLE_RPT]
@@ -88,8 +86,6 @@ $Configuration	"Release"
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
 		$PreprocessorDefinitions		"$BASE;MPA_BUILD_WITHOUT_ATL"
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY"	[$LINUXALL]
-
-		$AdditionalIncludeDirectories	"$BASE;..\common\quicktime_win32\"		[$QUICKTIME_WIN32]
 
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR/thirdparty/gperftools-2.0/src/" [$GPROFILER]
 		$PreprocessorDefinitions		"$BASE;GPROFILER" [$GPROFILER]

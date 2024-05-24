@@ -1239,7 +1239,7 @@ $Project "video_bink"
 
 $Project "video_quicktime"
 {
-	"video\video_quicktime.vpc" [$WINDOWS||$OSXALL]
+	"video\video_quicktime.vpc" [$OSXALL]
 }
 
 $Project "video_webm"

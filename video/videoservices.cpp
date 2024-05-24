@@ -80,7 +80,7 @@ struct VideoSystemInfo_t
 
 static VideoSystemInfo_t s_VideoAppSystems[] = 
 {
-	{ VideoSystem::QUICKTIME,	PLATFORM_WIN32 | PLATFORM_OSX,							"video_quicktime",  VIDEO_SUBSYSTEM_INTERFACE_VERSION },
+	{ VideoSystem::QUICKTIME,	PLATFORM_OSX,							"video_quicktime",  VIDEO_SUBSYSTEM_INTERFACE_VERSION },
 	{ VideoSystem::BINK,		PLATFORM_WIN32 | PLATFORM_OSX | PLATFORM_XBOX_360 | PLATFORM_LINUX,		"video_bink",	    VIDEO_SUBSYSTEM_INTERFACE_VERSION },
 	//{ VideoSystem::AVI,			PLATFORM_WIN32,											"avi",				VIDEO_SUBSYSTEM_INTERFACE_VERSION },
 	//{ VideoSystem::WMV,			PLATFORM_WIN32,											"wmv",				VIDEO_SUBSYSTEM_INTERFACE_VERSION },
