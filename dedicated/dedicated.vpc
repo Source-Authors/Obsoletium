@@ -25,7 +25,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies					"$BASE wsock32.lib odbc32.lib odbccp32.lib winmm.lib"
+		$AdditionalDependencies					"$BASE Shell32.lib wsock32.lib odbc32.lib odbccp32.lib winmm.lib User32.lib"
 		$SystemLibraries						"iconv;edit;curses" [$OSXALL]
 		$SystemFrameworks						"AppKit" [$OSXALL]
 	}
@@ -158,7 +158,7 @@ $Project "Dedicated"
 		$Lib	mathlib
 		$Lib	tier2
 		$Lib	tier3
-		$Lib	vgui_controls [$WIN32]
+		$Lib	vgui_controls [$WINDOWS]
 		$LibExternal "$SRCDIR/thirdparty/libedit-3.1/src/.libs/libedit" [$LINUXALL]
 		$ImpLibExternal steam_api [!$NO_STEAM]
 		$Libexternal	"$SDL3OUTDIR/SDL3" [$SDL]

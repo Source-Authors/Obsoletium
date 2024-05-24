@@ -6,7 +6,9 @@
 
 $Macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game"
-$Macro OUTBINNAME	"srcds" [$WINDOWS]
+$Macro OUTBINDIRX64	"$SRCDIR\..\game"
+$Macro OUTBINNAME	"srcds" [$WIN32]
+$Macro OUTBINNAME	"srcds_win64" [$WIN64]
 $Macro OUTBINNAME	"srcds_osx" [$OSXALL]
 $Macro OUTBINNAME	"srcds_linux" [$LINUXALL]
 
@@ -19,7 +21,7 @@ $Configuration
 {
 	$Linker [$WINDOWS]
 	{
-		$AdditionalDependencies				"$BASE Advapi32.lib"
+		$AdditionalDependencies				"$BASE Advapi32.lib User32.lib"
 	}
 
 	$ManifestTool
@@ -32,6 +34,40 @@ $Configuration
 	{
 		// General
 		$PreprocessorDefinitions				"$BASE;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTEsrcds\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTEsrcds.exe\$QUOTE"
+	}
+
+	$PostBuildEvent	[$WIN32 && !$ANALYZE]
+	{
+		$CommandLine				"IF NOT EXIST $OUTBINDIR MKDIR $OUTBINDIR" "\n"				\
+									"COPY $(TargetPath) $OUTBINDIR\$OUTBINNAME.exe" "\n"					\
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"COPY $(IntDir)\$OUTBINNAME.pdb $OUTBINDIR\$OUTBINNAME.pdb" "\n"					\
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"IF EXIST $(TargetDir)$(TargetName).map COPY $(TargetDir)$(TargetName).map $OUTBINDIR\$OUTBINNAME.map" "\n" \
+									"$OUTBINDIR\bin\newdat $OUTBINDIR\$OUTBINNAME.exe" "\n"					\
+									"GOTO BuildEventOK" "\n" \
+									":BuildEventFailed" "\n" \
+									"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
+									"DEL /Q $(TargetPath)" "\n" \
+									"EXIT 1" "\n" \
+									":BuildEventOK" "\n"
+	}
+
+	$PostBuildEvent	[$WIN64 && !$ANALYZE]
+	{
+		$CommandLine				"IF NOT EXIST $OUTBINDIRX64 MKDIR $OUTBINDIRX64" "\n"				\
+									"COPY $(TargetPath) $OUTBINDIRX64\$OUTBINNAME.exe" "\n"					\
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"COPY $(IntDir)\$OUTBINNAME.pdb $OUTBINDIRX64\$OUTBINNAME.pdb" "\n"					\
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"IF EXIST $(TargetDir)$(TargetName).map COPY $(TargetDir)$(TargetName).map $OUTBINDIRX64\$OUTBINNAME.map" "\n" \
+									"$OUTBINDIRX64\bin\x64\newdat $OUTBINDIRX64\$OUTBINNAME.exe" "\n"					\
+									"GOTO BuildEventOK" "\n" \
+									":BuildEventFailed" "\n" \
+									"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
+									"DEL /Q $(TargetPath)" "\n" \
+									"EXIT 1" "\n" \
+									":BuildEventOK" "\n"
 	}
 }
 

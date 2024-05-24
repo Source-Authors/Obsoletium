@@ -55,16 +55,11 @@ inline bool ThreadInterlockedAssignIf64x128( volatile int64 *pDest, const int64 
 	{ return ThreadInterlockedAssignIf64( pDest, value, comperand ); }
 #endif
 
-#ifdef _MSC_VER
-#define TSLIST_HEAD_ALIGN DECL_ALIGN(TSLIST_HEAD_ALIGNMENT)
-#define TSLIST_NODE_ALIGN DECL_ALIGN(TSLIST_NODE_ALIGNMENT)
+#if defined(_MSC_VER) || defined(GNUC)
+#define TSLIST_HEAD_ALIGN alignas(TSLIST_HEAD_ALIGNMENT)
+#define TSLIST_NODE_ALIGN alignas(TSLIST_NODE_ALIGNMENT)
 #define TSLIST_HEAD_ALIGN_POST
 #define TSLIST_NODE_ALIGN_POST
-#elif defined( GNUC )
-#define TSLIST_HEAD_ALIGN 
-#define TSLIST_NODE_ALIGN 
-#define TSLIST_HEAD_ALIGN_POST DECL_ALIGN(TSLIST_HEAD_ALIGNMENT)
-#define TSLIST_NODE_ALIGN_POST DECL_ALIGN(TSLIST_NODE_ALIGNMENT)
 #elif defined( _PS3 )
 #define TSLIST_HEAD_ALIGNMENT 8
 #define TSLIST_NODE_ALIGNMENT 8
@@ -135,7 +130,7 @@ union TSLIST_HEAD_ALIGN TSLHead_t
 #endif
 
 //-------------------------------------
-class CTSListBase
+class TSLIST_HEAD_ALIGN CTSListBase
 {
 public:
 
@@ -609,21 +604,21 @@ private:
 //-----------------------------------------------------------------------------
 
 template <typename T, bool bTestOptimizer = false>
-class TSLIST_HEAD_ALIGN CTSQueue
+class TSLIST_NODE_ALIGN CTSQueue
 {
 public:
 
 	// override new/delete so we can guarantee 8-byte aligned allocs
 	static void * operator new( size_t size )
 	{
-		CTSQueue *pNode = (CTSQueue *)MemAlloc_AllocAligned( size, TSLIST_HEAD_ALIGNMENT, __FILE__, __LINE__ );
+		CTSQueue *pNode = (CTSQueue *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, __FILE__, __LINE__ );
 		return pNode;
 	}
 
 	// override new/delete so we can guarantee 8-byte aligned allocs
 	static void * operator new( size_t size, int nBlockUse, const char *pFileName, int nLine )
 	{
-		CTSQueue *pNode = (CTSQueue *)MemAlloc_AllocAligned( size, TSLIST_HEAD_ALIGNMENT, pFileName, nLine );
+		CTSQueue *pNode = (CTSQueue *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, pFileName, nLine );
 		return pNode;
 	}
 
@@ -655,13 +650,13 @@ public:
 		// override new/delete so we can guarantee 8-byte aligned allocs
 		static void * operator new( size_t size )
 		{
-			Node_t *pNode = (Node_t *)MemAlloc_AllocAligned( size, TSLIST_HEAD_ALIGNMENT, __FILE__, __LINE__ );
+			Node_t *pNode = (Node_t *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, __FILE__, __LINE__ );
 			return pNode;
 		}
 
 		static void * operator new( size_t size, int nBlockUse, const char *pFileName, int nLine )
 		{
-			Node_t *pNode = (Node_t *)MemAlloc_AllocAligned( size, TSLIST_HEAD_ALIGNMENT, pFileName, nLine );
+			Node_t *pNode = (Node_t *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, pFileName, nLine );
 			return pNode;
 		}
 
@@ -995,7 +990,7 @@ private:
 
 	CInterlockedInt m_Count;
 	
-	CTSListBase m_FreeNodes;
+	 CTSListBase m_FreeNodes;
 } TSLIST_NODE_ALIGN_POST;
 
 #endif // TSLIST_H

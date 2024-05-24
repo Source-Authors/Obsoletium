@@ -120,16 +120,16 @@ private:
 	void UnloadAllShaderDLLs();
 
 	// Sets up the shader dictionary.
-	void SetupShaderDictionary( int nShaderDLLIndex );
+	void SetupShaderDictionary( intp nShaderDLLIndex );
 
 	// Cleans up the shader dictionary.
-	void CleanupShaderDictionary( int nShaderDLLIndex );
+	void CleanupShaderDictionary( intp nShaderDLLIndex );
 
 	// Finds an already loaded shader DLL
-	int FindShaderDLL( const char *pFullPath );
+	intp FindShaderDLL( const char *pFullPath );
 
 	// Unloads a particular shader DLL
-	void UnloadShaderDLL( int nShaderDLLIndex );
+	void UnloadShaderDLL( intp nShaderDLLIndex );
 
 	// Sets up the current ShaderState_t for rendering
 	void PrepForShaderDraw( IShader *pShader, IMaterialVar** ppParams, 
@@ -471,8 +471,8 @@ void CShaderSystem::VerifyBaseShaderDLL( CSysModule *pModule )
 	CRC32_t testCRC;
 	CRC32_Init( &testCRC );
 	CRC32_ProcessBuffer( &testCRC, testData1, SHADER_DLL_VERIFY_DATA_LEN1 );
-	CRC32_ProcessBuffer( &testCRC, &pModule, 4 );
-	CRC32_ProcessBuffer( &testCRC, &pVerify, 4 );
+	CRC32_ProcessBuffer( &testCRC, &pModule, sizeof(pModule) );
+	CRC32_ProcessBuffer( &testCRC, &pVerify, sizeof(pVerify) );
 	CRC32_Final( &testCRC );
 	if ( testCRC != pVerify->Function1( testData1 - SHADER_DLL_VERIFY_DATA_PTR_OFFSET ) )
 		Error( pErrorStr );
@@ -542,7 +542,7 @@ bool CShaderSystem::LoadShaderDLL( const char *pFullPath, const char *pPathID, b
 	// FIXME: We need to do some sort of shader validation here for anticheat.
 
 	// Now replace any existing shader
-	int nShaderDLLIndex = FindShaderDLL( pFullPath );
+	intp nShaderDLLIndex = FindShaderDLL( pFullPath );
 	if ( nShaderDLLIndex >= 0 )
 	{
 		UnloadShaderDLL( nShaderDLLIndex );
@@ -572,9 +572,9 @@ bool CShaderSystem::LoadShaderDLL( const char *pFullPath, const char *pPathID, b
 //-----------------------------------------------------------------------------
 // Finds an already loaded shader DLL
 //-----------------------------------------------------------------------------
-int CShaderSystem::FindShaderDLL( const char *pFullPath )
+intp CShaderSystem::FindShaderDLL( const char *pFullPath )
 {
-	for ( int i = m_ShaderDLLs.Count(); --i >= 0; )
+	for ( intp i = m_ShaderDLLs.Count(); --i >= 0; )
 	{
 		if ( !Q_stricmp( pFullPath, m_ShaderDLLs[i].m_pFileName ) )
 			return i;
@@ -586,7 +586,7 @@ int CShaderSystem::FindShaderDLL( const char *pFullPath )
 //-----------------------------------------------------------------------------
 // Unloads a particular shader DLL
 //-----------------------------------------------------------------------------
-void CShaderSystem::UnloadShaderDLL( int nShaderDLLIndex )
+void CShaderSystem::UnloadShaderDLL( intp nShaderDLLIndex )
 {
 	if ( nShaderDLLIndex < 0 )
 		return;
@@ -607,7 +607,7 @@ void CShaderSystem::UnloadShaderDLL( int nShaderDLLIndex )
 //-----------------------------------------------------------------------------
 void CShaderSystem::UnloadShaderDLL( const char *pFullPath )
 {
-	int nShaderDLLIndex = FindShaderDLL( pFullPath );
+	intp nShaderDLLIndex = FindShaderDLL( pFullPath );
 	if ( nShaderDLLIndex >= 0 )
 	{
 		UnloadShaderDLL( nShaderDLLIndex );
@@ -681,7 +681,7 @@ char const* CShaderSystem::ShaderStateString( int i ) const
 //-----------------------------------------------------------------------------
 // Sets up the shader dictionary.
 //-----------------------------------------------------------------------------
-void CShaderSystem::SetupShaderDictionary( int nShaderDLLIndex )
+void CShaderSystem::SetupShaderDictionary( intp nShaderDLLIndex )
 {
 	// We could have put the shader dictionary into each shader DLL
 	// I'm not sure if that makes this system any less secure than it already is
@@ -701,7 +701,7 @@ void CShaderSystem::SetupShaderDictionary( int nShaderDLLIndex )
 		// Make sure it doesn't try to override another shader DLL's names.
 		if ( info.m_bModShaderDLL )
 		{
-			for ( int iTestDLL=0; iTestDLL < m_ShaderDLLs.Count(); iTestDLL++ )
+			for ( intp iTestDLL=0; iTestDLL < m_ShaderDLLs.Count(); iTestDLL++ )
 			{
 				ShaderDLLInfo_t *pTestDLL = &m_ShaderDLLs[iTestDLL];
 				if ( !pTestDLL->m_bModShaderDLL )
@@ -721,7 +721,7 @@ void CShaderSystem::SetupShaderDictionary( int nShaderDLLIndex )
 //-----------------------------------------------------------------------------
 // Cleans up the shader dictionary.
 //-----------------------------------------------------------------------------
-void CShaderSystem::CleanupShaderDictionary( int nShaderDLLIndex )
+void CShaderSystem::CleanupShaderDictionary( intp nShaderDLLIndex )
 {
 }
 
@@ -732,7 +732,7 @@ IShader* CShaderSystem::FindShader( char const* pShaderName )
 {
 	// FIXME: What kind of search order should we use here?
 	// I'm currently assuming last added, first searched.
-	for (int i = m_ShaderDLLs.Count(); --i >= 0; )
+	for (intp i = m_ShaderDLLs.Count(); --i >= 0; )
 	{
 		ShaderDLLInfo_t &info = m_ShaderDLLs[i];
 		unsigned short idx = info.m_ShaderDict.Find( pShaderName );
@@ -760,7 +760,7 @@ int CShaderSystem::GetShaders( int nFirstShader, int nMaxCount, IShader **ppShad
 
 	int nCount = 0;
 	int nActualCount = 0;
-	for ( int i = m_ShaderDLLs.Count(); --i >= 0; )
+	for ( intp i = m_ShaderDLLs.Count(); --i >= 0; )
 	{
 		const ShaderDLLInfo_t &info = m_ShaderDLLs[i];
 		for ( unsigned short j = info.m_ShaderDict.First(); 

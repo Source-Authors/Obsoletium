@@ -184,7 +184,7 @@ private:
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CWingedEdgeList::CWingedEdgeList() : m_WingedEdges( 0, 64 )
+CWingedEdgeList::CWingedEdgeList() : m_WingedEdges( (intp)0, 64 )
 {
 	m_StartTerminal.m_vecPosition.Init( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 	m_StartTerminal.m_vecPositionEnd.Init( -FLT_MAX, FLT_MAX, -FLT_MAX );
@@ -1010,7 +1010,7 @@ bool CEdgeList::EdgeLess::Less( const unsigned short& src1, const unsigned short
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CEdgeList::CEdgeList() : m_Edges( 0, 32 ), m_OrigSortIndices( 0, 32 )
+CEdgeList::CEdgeList() : m_Edges( (intp)0, 32 ), m_OrigSortIndices( 0, 32 )
 {
 	m_OrigSortIndices.SetLessContext( &m_Edges );
 
@@ -2134,7 +2134,7 @@ IOcclusionSystem *OcclusionSystem()
 //-----------------------------------------------------------------------------
 // Constructor, destructor
 //-----------------------------------------------------------------------------
-COcclusionSystem::COcclusionSystem() : m_ClippedVerts( 0, 64 )
+COcclusionSystem::COcclusionSystem() : m_ClippedVerts( (intp)0, 64 )
 {
 	m_bEdgeListDirty = false;
 	m_nTests = 0;

@@ -20,7 +20,7 @@
 // but it also redefines malloc as a macro in release.
 // To disable this, we gotta define _DEBUG before including it.. BLEAH!
 #define _DEBUG 1
-#include "crtdbg.h"
+#include <crtdbg.h>
 #ifdef NDEBUG
 #undef _DEBUG
 #endif
@@ -32,8 +32,11 @@
 
 #include "tier0/dbg.h"
 #include "tier0/memalloc.h"
-#include <string.h>
-#include <stdio.h>
+#include "tier0/threadtools.h"
+
+#include <cstring>
+#include <cstdio>
+
 #include "memdbgoff.h"
 
 
@@ -76,7 +79,7 @@ namespace {
 // CRT
 class CStaticConstructionCheck {
  public:
-  volatile bool m_bConstructed = true;
+  std::atomic_bool m_bConstructed = true;
 };
 
 static CStaticConstructionCheck s_CheckStaticsConstructed;
@@ -182,7 +185,7 @@ ALLOC_CALL void *calloc(
 	void *pMem = AllocUnattributed( nElementSize * nCount );
 	if ( pMem )
 	{
-		memset(pMem, 0, nElementSize * nCount);
+		memset( pMem, 0, nElementSize * nCount );
 	}
 	return pMem;
 }
@@ -210,9 +213,9 @@ ALLOC_CALL void *_calloc_base(
 )
 {
 	void *pMem = AllocUnattributed( nSize*nCount );
-	if (pMem)
+	if ( pMem )
 	{
-		memset(pMem, 0, nSize*nCount );
+		memset( pMem, 0, nSize*nCount );
 	}
 	return pMem;
 }
@@ -683,7 +686,10 @@ void *__cdecl _calloc_dbg( size_t nNum, size_t nSize, int nBlockUse,
 {
 	AttribIfCrt();
 	void *pMem = g_pMemAlloc->Alloc(nSize * nNum, pFileName, nLine);
-	memset(pMem, 0, nSize * nNum);
+	if ( pMem )
+	{
+		memset( pMem, 0, nSize * nNum );
+	}
 	return pMem;
 }
 

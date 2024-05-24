@@ -27,7 +27,8 @@ $Configuration
 		$AdditionalIncludeDirectories	"$BASE;$BINKSRCDIR\include"
 	}
 	$Linker
-	{
+	{	
+		$AdditionalDependencies				"$BASE Ole32.lib"	[$WINDOWS]
 		$IgnoreImportLibrary				"Yes" [$WINDOWS]
 		$AdditionalLibraryDirectories		"$BASE;$BINKSRCDIR\bin\$BINKLIBDIR"
 	}

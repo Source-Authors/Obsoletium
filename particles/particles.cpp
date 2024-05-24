@@ -130,15 +130,15 @@ public:
 	~CParticleSystemDictionary();
 
 	CParticleSystemDefinition* AddParticleSystem( CDmxElement *pParticleSystem );
-	int Count() const;
-	int NameCount() const;
-	CParticleSystemDefinition* GetParticleSystem( int i );
+	intp Count() const;
+	intp NameCount() const;
+	CParticleSystemDefinition* GetParticleSystem( intp i );
 	ParticleSystemHandle_t FindParticleSystemHandle( const char *pName );
 	CParticleSystemDefinition* FindParticleSystem( ParticleSystemHandle_t h );
 	CParticleSystemDefinition* FindParticleSystem( const char *pName );
 	CParticleSystemDefinition* FindParticleSystem( const DmObjectId_t &id );
 	
-	CParticleSystemDefinition* operator[]( int idx )
+	CParticleSystemDefinition* operator[]( intp idx )
 	{
 		return m_ParticleNameMap[ idx ];
 	}
@@ -229,17 +229,17 @@ CParticleSystemDefinition* CParticleSystemDictionary::AddParticleSystem( CDmxEle
 	return pDef;
 }
 
-int CParticleSystemDictionary::NameCount() const
+intp CParticleSystemDictionary::NameCount() const
 {
 	return m_ParticleNameMap.GetNumStrings();
 }
 
-int CParticleSystemDictionary::Count() const
+intp CParticleSystemDictionary::Count() const
 {
 	return m_ParticleIdMap.Count();
 }
 
-CParticleSystemDefinition* CParticleSystemDictionary::GetParticleSystem( int i )
+CParticleSystemDefinition* CParticleSystemDictionary::GetParticleSystem( intp i )
 {
 	return m_ParticleIdMap[i];
 }
@@ -1021,7 +1021,7 @@ void CParticleCollection::Init( CParticleSystemDefinition *pDef, float flDelay, 
 	}
 	else
 	{
-		m_nRandomSeed = (int)this;
+		m_nRandomSeed = (intp)this;
 #ifndef _DEBUG
 		m_nRandomSeed += Plat_MSTime();
 #endif
@@ -2672,7 +2672,7 @@ void CParticleCollection::MoveParticle( int nInitialIndex, int nNewIndex )
 
 #if THREADED_PARTICLES
 #define MAX_SIMULTANEOUS_KILL_LISTS 16
-static volatile int g_nKillBufferInUse[MAX_SIMULTANEOUS_KILL_LISTS];
+static CInterlockedInt g_nKillBufferInUse[MAX_SIMULTANEOUS_KILL_LISTS];
 static int32 *g_pKillBuffers[MAX_SIMULTANEOUS_KILL_LISTS];
 
 void CParticleSystemMgr::DetachKillList( CParticleCollection *pParticles )
@@ -2703,7 +2703,7 @@ void CParticleSystemMgr::AttachKillList( CParticleCollection *pParticles )
 			if ( ! g_nKillBufferInUse[i] )					// available?
 			{
 				// try to take it!
-				if ( ThreadInterlockedAssignIf( &( g_nKillBufferInUse[i]), 1, 0 ) )
+				if ( g_nKillBufferInUse->AssignIf( 0, 1 ) )
 				{
 					if ( ! g_pKillBuffers[i] )
 					{
@@ -3779,7 +3779,7 @@ void CParticleSystemMgr::DrawRenderCache( bool bShadowDepth )
 	pRenderContext->PushMatrix();
 	pRenderContext->LoadIdentity();
 
-	CUtlVector< Batch_t > batches( 0, 8 );
+	CUtlVector< Batch_t > batches( (intp)0, 8 );
 
 	for ( int iRenderCache = 0; iRenderCache < nRenderCacheCount; ++iRenderCache )
 	{

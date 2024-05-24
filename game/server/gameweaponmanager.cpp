@@ -187,7 +187,7 @@ void CGameWeaponManager::Think()
 
 	const char *pszWeaponName = STRING( m_iszWeaponName );
 
-	CUtlVector<CBaseEntity *> candidates( 0, 64 );
+	CUtlVector<CBaseEntity *> candidates( (intp)0, 64 );
 
 	if ( m_bExpectingWeapon )
 	{

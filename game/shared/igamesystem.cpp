@@ -35,9 +35,9 @@ static void InvokePerFrameMethod( PerFrameGameSystemFunc_t f, char const *timed 
 static bool s_bSystemsInitted = false; 
 
 // List of all installed Game systems
-static CUtlVector<IGameSystem*> s_GameSystems( 0, 4 );
+static CUtlVector<IGameSystem*> s_GameSystems( (intp)0, 4 );
 // List of all installed Game systems
-static CUtlVector<IGameSystemPerFrame*> s_GameSystemsPerFrame( 0, 4 );
+static CUtlVector<IGameSystemPerFrame*> s_GameSystemsPerFrame( (intp)0, 4 );
 
 // The map name
 static char* s_pMapName = 0;

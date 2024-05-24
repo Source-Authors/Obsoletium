@@ -39,14 +39,14 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;fxctmp9;vshtmp9;"	[$WIN32||$POSIX]
+		$AdditionalIncludeDirectories	"$BASE;fxctmp9;vshtmp9;"	[$WINDOWS||$POSIX]
 		$PreprocessorDefinitions		"$BASE;STDSHADER_DX9_DLL_EXPORT;FAST_MATERIALVAR_ACCESS"
-		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [$WIN32 && !$GL]
+		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [$WINDOWS && !$GL]
 	}
 
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE version.lib winmm.lib"	[$WIN32]
+		$AdditionalDependencies			"$BASE version.lib winmm.lib"	[$WINDOWS]
 		$SystemLibraries                                                        "iconv" [$OSXALL]
 	}
 }
@@ -75,7 +75,7 @@ $Project "stdshader_dx9"
 		$File	"core_dx9.cpp"
 		$File	"color_projection.cpp"
 		$File	"debugmrttexture.cpp"
-		$File	"debugmorphaccumulator_dx9.cpp"					[$WIN32]
+		$File	"debugmorphaccumulator_dx9.cpp"					[$WINDOWS]
 		$File	"DebugTextureView.cpp"
 		$File	"DecalBaseTimesLightmapAlphaBlendSelfIllum_dx9.cpp"
 		$File	"DecalModulate_dx9.cpp"
@@ -107,8 +107,8 @@ $Project "stdshader_dx9"
 		$File	"lightmappedreflective.cpp"
 		$File	"modulate_dx9.cpp"
 		$File	"MonitorScreen_dx9.cpp"
-		$File	"morphaccumulate_dx9.cpp"					[$WIN32]
-		$File	"morphweight_dx9.cpp"						[$WIN32]
+		$File	"morphaccumulate_dx9.cpp"					[$WINDOWS]
+		$File	"morphweight_dx9.cpp"						[$WINDOWS]
 		$File	"motion_blur_dx9.cpp"
 		$File	"occlusion_dx9.cpp"
 		$File	"particlelitgeneric_dx9.cpp"
@@ -161,7 +161,7 @@ $Project "stdshader_dx9"
 		$File	"writez_dx9.cpp"
 		$File	"writestencil_dx9.cpp"
 
-		$Folder	"Remove me when VAC2 is out" [$WIN32]
+		$Folder	"Remove me when VAC2 is out" [$WINDOWS]
 		{
 			$File	"$SRCDIR\tier1\checksum_crc.cpp"
 			$File	"$SRCDIR\tier1\checksum_md5.cpp"

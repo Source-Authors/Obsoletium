@@ -433,7 +433,7 @@ bool CQcData::ParseQc(
 		V_StripFilename( szBuf0 );
 		V_FixSlashes( szBuf0, '/' );
 
-		CUtlVector< char *, CUtlMemory< char *, int > > sPathArray;
+		CUtlVector< char *, CUtlMemory< char *, intp > > sPathArray;
 		V_SplitString( szBuf0, "/", sPathArray );
 
 		CUtlString sRelSmdPath;

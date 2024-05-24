@@ -101,16 +101,16 @@ $Project "classcheck"
 
 $Project "client"
 {
-	"game\client\client_hl2.vpc"		[($WIN32||$POSIX) && $HL2]
-	"game\client\client_dod.vpc"		[($WIN32||$POSIX) && $DOD]
-	"game\client\client_episodic.vpc"	[($WIN32||$POSIX) && $EPISODIC]
-	"game\client\client_lostcoast.vpc"	[($WIN32||$POSIX) && $LOSTCOAST]
+	"game\client\client_hl2.vpc"		[($WINDOWS||$POSIX) && $HL2]
+	"game\client\client_dod.vpc"		[($WINDOWS||$POSIX) && $DOD]
+	"game\client\client_episodic.vpc"	[($WINDOWS||$POSIX) && $EPISODIC]
+	"game\client\client_lostcoast.vpc"	[($WINDOWS||$POSIX) && $LOSTCOAST]
 	"game\client\client_tf.vpc"			[($WINDOWS||$POSIX) && $TF]
-	"game\client\client_cstrike.vpc"	[($WIN32||$POSIX) && $CSTRIKE]
-	"game\client\client_portal.vpc"		[($WIN32||$POSIX) && $PORTAL]
-	"game\client\client_hl2mp.vpc"		[($WIN32||$POSIX) && $HL2MP]
-	"game\client\client_hl1.vpc"		[($WIN32||$POSIX) && $HL1]
-	"game\client\client_hl1mp.vpc"		[($WIN32||$POSIX) && $HL1MP]
+	"game\client\client_cstrike.vpc"	[($WINDOWS||$POSIX) && $CSTRIKE]
+	"game\client\client_portal.vpc"		[($WINDOWS||$POSIX) && $PORTAL]
+	"game\client\client_hl2mp.vpc"		[($WINDOWS||$POSIX) && $HL2MP]
+	"game\client\client_hl1.vpc"		[($WINDOWS||$POSIX) && $HL1]
+	"game\client\client_hl1mp.vpc"		[($WINDOWS||$POSIX) && $HL1MP]
 }
 
 $Project "client_sdk"
@@ -145,17 +145,17 @@ $Project "datacache"
 
 $Project "datamodel"
 {
-	"datamodel\datamodel.vpc" [$WIN32]
+	"datamodel\datamodel.vpc" [$WINDOWS]
 }
 
 $Project "dedicated"
 {
-	"dedicated\dedicated.vpc" [$WIN32||$POSIX]
+	"dedicated\dedicated.vpc" [$WINDOWS||$POSIX]
 }
 
 $Project "dedicated_main"
 {
-	"dedicated_main\dedicated_main.vpc" [$WIN32||$POSIX]
+	"dedicated_main\dedicated_main.vpc" [$WINDOWS||$POSIX]
 }
 
 $Project "demoinfo"
@@ -180,7 +180,7 @@ $Project "dme_controls"
 
 $Project "dmserializers"
 {
-	"dmserializers\dmserializers.vpc" [$WIN32]
+	"dmserializers\dmserializers.vpc" [$WINDOWS]
 }
 
 $Project "dmxconvert"
@@ -408,16 +408,16 @@ $Project "sdktoolslib"
 
 $Project "server"
 {
-	"game\server\server_hl2.vpc"		[($WIN32||$POSIX) && $HL2]
-	"game\server\server_dod.vpc"		[($WIN32||$POSIX) && $DOD]
-	"game\server\server_episodic.vpc"	[($WIN32||$POSIX) && $EPISODIC]
-	"game\server\server_lostcoast.vpc"	[($WIN32||$POSIX) && $LOSTCOAST]
+	"game\server\server_hl2.vpc"		[($WINDOWS||$POSIX) && $HL2]
+	"game\server\server_dod.vpc"		[($WINDOWS||$POSIX) && $DOD]
+	"game\server\server_episodic.vpc"	[($WINDOWS||$POSIX) && $EPISODIC]
+	"game\server\server_lostcoast.vpc"	[($WINDOWS||$POSIX) && $LOSTCOAST]
 	"game\server\server_tf.vpc"			[($WINDOWS||$POSIX) && $TF]
-	"game\server\server_cstrike.vpc"	[($WIN32||$POSIX) && $CSTRIKE]
-	"game\server\server_portal.vpc"		[($WIN32||$POSIX) && $PORTAL]
-	"game\server\server_hl2mp.vpc"		[($WIN32||$POSIX) && $HL2MP]
-	"game\server\server_hl1.vpc"		[($WIN32||$POSIX) && $HL1]
-	"game\server\server_hl1mp.vpc"		[($WIN32||$POSIX) && $HL1MP]
+	"game\server\server_cstrike.vpc"	[($WINDOWS||$POSIX) && $CSTRIKE]
+	"game\server\server_portal.vpc"		[($WINDOWS||$POSIX) && $PORTAL]
+	"game\server\server_hl2mp.vpc"		[($WINDOWS||$POSIX) && $HL2MP]
+	"game\server\server_hl1.vpc"		[($WINDOWS||$POSIX) && $HL1]
+	"game\server\server_hl1mp.vpc"		[($WINDOWS||$POSIX) && $HL1MP]
 }
 
 $Project "simdtest"
@@ -618,7 +618,7 @@ $Project "mdlobjects"
 
 $Project "movieobjects"
 {
-	"movieobjects\movieobjects.vpc" [$WIN32]
+	"movieobjects\movieobjects.vpc" [$WINDOWS]
 }
 
 $Project "mxtoolkitwin32"
@@ -859,7 +859,7 @@ $Project "togl"
 
 $Project "shaderapidx10"
 {
-	"materialsystem\shaderapidx9\shaderapidx10.vpc" [$WIN32]
+	"materialsystem\shaderapidx9\shaderapidx10.vpc" [$WINDOWS]
 }
 
 $Project "shaderapiempty"
@@ -979,22 +979,22 @@ $Project "Status"
 
 $Project "stdshader_dbg"
 {
-	"materialsystem\stdshaders\stdshader_dbg.vpc" [$WIN32||$POSIX]
+	"materialsystem\stdshaders\stdshader_dbg.vpc" [$WINDOWS||$POSIX]
 }
 
 $Project "stdshader_dx6"
 {
-	"materialsystem\stdshaders\stdshader_dx6.vpc" [$WIN32]
+	"materialsystem\stdshaders\stdshader_dx6.vpc" [$WINDOWS]
 }
 
 $Project "stdshader_dx7"
 {
-	"materialsystem\stdshaders\stdshader_dx7.vpc" [$WIN32]
+	"materialsystem\stdshaders\stdshader_dx7.vpc" [$WINDOWS]
 }
 
 $Project "stdshader_dx8"
 {
-	"materialsystem\stdshaders\stdshader_dx8.vpc" [$WIN32]
+	"materialsystem\stdshaders\stdshader_dx8.vpc" [$WINDOWS]
 }
 
 $Project "stdshader_dx9"

@@ -636,7 +636,7 @@ bool CAI_Network::IsConnected(int srcID, int destID)
 IterationRetval_t CAI_Network::EnumElement( IHandleEntity *pHandleEntity )
 {
 #ifdef AI_NODE_TREE
-	m_GatheredNodes.AddToTail( (int)pHandleEntity );
+	m_GatheredNodes.AddToTail( (intp)pHandleEntity );
 #endif
 	return ITERATION_CONTINUE;
 }

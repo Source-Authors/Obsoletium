@@ -28,11 +28,7 @@ HMODULE win32DLLHandle;
 BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 {
 	// ensure data sizes are stable
-	if ( sizeof(inputfunc_t) != sizeof(int) )
-	{
-		Assert( sizeof(inputfunc_t) == sizeof(int) );
-		return FALSE;
-	}
+	static_assert( sizeof(inputfunc_t) == sizeof(void*) );
 
 	if ( fdwReason == DLL_PROCESS_ATTACH )
     {

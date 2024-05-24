@@ -23,7 +23,7 @@ CInterlockedInt g_nPushes;
 CInterlockedInt g_nPops;
 CTSQueue<int, true> g_TestQueue;
 CTSList<int> g_TestList;
-volatile bool g_bStart;
+std::atomic_bool g_bStart;
 std::list<ThreadHandle_t> g_ThreadHandles;
 
 int *g_pTestBuckets;

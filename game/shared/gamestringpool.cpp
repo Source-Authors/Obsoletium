@@ -49,7 +49,7 @@ public:
 
 	void Dump( void )
 	{
-		CUtlVector<const char*> strings( 0, m_Strings.Count() );
+		CUtlVector<const char*> strings( (intp)0, m_Strings.Count() );
 		for (UtlHashHandle_t i = m_Strings.FirstHandle(); i != m_Strings.InvalidHandle(); i = m_Strings.NextHandle(i))
 		{
 			strings.AddToTail( strings[i] );

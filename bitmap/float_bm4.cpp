@@ -276,7 +276,7 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 		trace_directions[ r ]= trace_dir;
 	}
 
-	volatile SSBumpCalculationContext ctxs[32];
+	SSBumpCalculationContext ctxs[32];
 	ctxs[0].m_pRtEnv =& rtEnv;
 	ctxs[0].ret_bm = ret;
 	ctxs[0].src_bm = this;

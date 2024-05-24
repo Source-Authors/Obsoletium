@@ -511,7 +511,7 @@ public:
 	}
 
 private:
-	volatile unsigned long _refCount;
+	CInterlockedUInt _refCount;
 	KeyValues *_dragData;
 
     virtual HRESULT STDMETHODCALLTYPE QueryInterface( 
@@ -529,12 +529,12 @@ private:
     
     virtual ULONG STDMETHODCALLTYPE AddRef( void)
 	{
-		return ::InterlockedIncrement(&_refCount);
+		return ++_refCount;
 	}
     
     virtual ULONG STDMETHODCALLTYPE Release( void)
 	{
-		return ::InterlockedDecrement(&_refCount);
+		return --_refCount;
 	}
 
 	virtual HRESULT STDMETHODCALLTYPE DragEnter(IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)

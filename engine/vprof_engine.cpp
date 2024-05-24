@@ -837,7 +837,7 @@ public:
 
 	virtual int GetNumBudgetGroups()
 	{
-		int nTotalGroups = min( m_Times.Count(), GetActiveVProfile()->GetNumBudgetGroups() );
+		int nTotalGroups = min( m_Times.Count(), (intp)GetActiveVProfile()->GetNumBudgetGroups() );
 		int nRet = 0;
 		for ( int i=0; i < nTotalGroups; i++ )
 		{
@@ -850,7 +850,7 @@ public:
 	virtual void GetBudgetGroupInfos( CExportedBudgetGroupInfo *pInfos )
 	{
 		int iOut = 0;
-		int nTotalGroups = min( m_Times.Count(), GetActiveVProfile()->GetNumBudgetGroups() );
+		int nTotalGroups = min( m_Times.Count(), (intp)GetActiveVProfile()->GetNumBudgetGroups() );
 		for ( int i=0; i < nTotalGroups; i++ )
 		{
 			if ( CanShowBudgetGroup( i ) )
@@ -869,7 +869,7 @@ public:
 
 	virtual void GetBudgetGroupTimes( float times[IVProfExport::MAX_BUDGETGROUP_TIMES] )
 	{
-		int nTotalGroups = min( m_Times.Count(), GetActiveVProfile()->GetNumBudgetGroups() );
+		int nTotalGroups = min( m_Times.Count(), (intp)GetActiveVProfile()->GetNumBudgetGroups() );
 		int nGroups = min( nTotalGroups, (int)IVProfExport::MAX_BUDGETGROUP_TIMES );
 		memset( times, 0, sizeof( times[0] ) * nGroups );
 
@@ -940,7 +940,7 @@ public:
 
 		int groupID = pTestNode->GetBudgetGroupID();
 		double nodeTime = pNode->GetPrevTimeLessChildren();
-		if ( groupID >= 0 && groupID < min( m_Times.Count(), (int)IVProfExport::MAX_BUDGETGROUP_TIMES ) )
+		if ( groupID >= 0 && groupID < min( m_Times.Count(), (intp)IVProfExport::MAX_BUDGETGROUP_TIMES ) )
 		{
 			m_Times[groupID] += nodeTime;
 		}

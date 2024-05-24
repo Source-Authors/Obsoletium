@@ -394,7 +394,7 @@ private:
 	public:
 		CThreadLocal()
 		{
-			COMPILE_TIME_ASSERT( sizeof(T) == sizeof(void *) );
+			COMPILE_TIME_ASSERT( sizeof(T) <= sizeof(void *) );
 		}
 
 		T Get() const
@@ -511,6 +511,15 @@ class CInterlockedIntT
 public:
 	CInterlockedIntT() : m_value( 0 ) 				{ COMPILE_TIME_ASSERT( sizeof(T) == sizeof(long) ); }
 	CInterlockedIntT( T value ) : m_value( value ) 	{}
+	CInterlockedIntT( const CInterlockedIntT &c )
+	{
+		m_value.exchange( c.GetRaw() );
+	}
+	CInterlockedIntT& operator=( const CInterlockedIntT &c )
+	{
+		m_value.exchange( c.GetRaw() );
+		return *this;
+	}
 
 	T GetRaw() const				{ return m_value; }
 
@@ -520,17 +529,20 @@ public:
 	bool operator==( T rhs ) const	{ return ( m_value == rhs ); }
 	bool operator!=( T rhs ) const	{ return ( m_value != rhs ); }
 
-	T operator++()					{ return (T)ThreadInterlockedIncrement( (long *)&m_value ); }
+	T operator++()					{ return ++m_value; }
 	T operator++(int)				{ return operator++() - 1; }
 
-	T operator--()					{ return (T)ThreadInterlockedDecrement( (long *)&m_value ); }
+	T operator--()					{ return --m_value; }
 	T operator--(int)				{ return operator--() + 1; }
 
-	bool AssignIf( T conditionValue, T newValue )	{ return ThreadInterlockedAssignIf( (long *)&m_value, (long)newValue, (long)conditionValue ); }
+	bool AssignIf( T conditionValue, T newValue )	{ return m_value.compare_exchange_strong( conditionValue, newValue ); }
+	// AssignIfWeak is allowed to fail spuriously, that is, acts as if *this != conditionValue even if they are equal.
+	// When a compare-and-exchange is in a loop, AssignIfWeak will yield better performance on some platforms.
+	bool AssignIfWeak( T conditionValue, T newValue )	{ return m_value.compare_exchange_weak( conditionValue, newValue ); }
 
-	T operator=( T newValue )		{ ThreadInterlockedExchange((long *)&m_value, newValue); return m_value; }
+	T operator=( T newValue )		{ m_value.exchange(newValue); return m_value; }
 
-	void operator+=( T add )		{ ThreadInterlockedExchangeAdd( (long *)&m_value, (long)add ); }
+	void operator+=( T add )		{ m_value += add; }
 	void operator-=( T subtract )	{ operator+=( -subtract ); }
 	void operator*=( T multiplier )	{ 
 		T original, result; 
@@ -538,7 +550,7 @@ public:
 		{ 
 			original = m_value; 
 			result = original * multiplier; 
-		} while ( !AssignIf( original, result ) );
+		} while ( !AssignIfWeak( original, result ) );
 	}
 	void operator/=( T divisor )	{ 
 		T original, result; 
@@ -546,14 +558,14 @@ public:
 		{ 
 			original = m_value; 
 			result = original / divisor;
-		} while ( !AssignIf( original, result ) );
+		} while ( !AssignIfWeak( original, result ) );
 	}
 
 	T operator+( T rhs ) const		{ return m_value + rhs; }
 	T operator-( T rhs ) const		{ return m_value - rhs; }
 
 private:
-	volatile T m_value;
+	std::atomic<T> m_value;
 };
 
 typedef CInterlockedIntT<int> CInterlockedInt;
@@ -737,9 +749,9 @@ public:
 	}
 
 private:
-	FORCEINLINE bool TryLockInline( const uint32 threadId ) volatile
+	FORCEINLINE bool TryLockInline( const uint32 threadId )
 	{
-		if ( threadId != m_ownerID && !ThreadInterlockedAssignIf( (volatile long *)&m_ownerID, (long)threadId, 0 ) )
+		if ( threadId != m_ownerID.GetRaw() && !m_ownerID.AssignIf( 0, threadId ) )
 			return false;
 
 		ThreadMemoryBarrier();
@@ -747,15 +759,15 @@ private:
 		return true;
 	}
 
-	bool TryLock( const uint32 threadId ) volatile
+	bool TryLock( const uint32 threadId )
 	{
 		return TryLockInline( threadId );
 	}
 
-	PLATFORM_CLASS void Lock( const uint32 threadId, unsigned nSpinSleepTime ) volatile;
+	PLATFORM_CLASS void Lock( const uint32 threadId, unsigned nSpinSleepTime );
 
 public:
-	bool TryLock() volatile
+	bool TryLock()
 	{
 #ifdef _DEBUG
 		if ( m_depth == INT_MAX )
@@ -770,7 +782,7 @@ public:
 #ifndef _DEBUG 
 	FORCEINLINE 
 #endif
-	void Lock( unsigned int nSpinSleepTime = 0 ) volatile
+	void Lock( unsigned int nSpinSleepTime = 0 )
 	{
 		const uint32 threadId = ThreadGetCurrentId();
 
@@ -780,7 +792,7 @@ public:
 			Lock( threadId, nSpinSleepTime );
 		}
 #ifdef _DEBUG
-		if ( m_ownerID != ThreadGetCurrentId() )
+		if ( m_ownerID.GetRaw() != ThreadGetCurrentId() )
 			DebuggerBreak();
 
 		if ( m_depth == INT_MAX )
@@ -794,10 +806,10 @@ public:
 #ifndef _DEBUG
 	FORCEINLINE 
 #endif
-	void Unlock() volatile
+	void Unlock()
 	{
 #ifdef _DEBUG
-		if ( m_ownerID != ThreadGetCurrentId() )
+		if ( m_ownerID.GetRaw() != ThreadGetCurrentId() )
 			DebuggerBreak();
 
 		if ( m_depth <= 0 )
@@ -808,7 +820,7 @@ public:
 		if ( !m_depth )
 		{
 			ThreadMemoryBarrier();
-			ThreadInterlockedExchange( &m_ownerID, 0 );
+			m_ownerID = 0u;
     	}
     }
 
@@ -824,7 +836,7 @@ public:
 	uint32 GetOwnerId() const			{ return m_ownerID;	}
 	int	GetDepth() const				{ return m_depth; }
 private:
-	volatile uint32 m_ownerID;
+	CInterlockedUInt m_ownerID;
 	int				m_depth;
 };
 

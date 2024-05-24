@@ -359,6 +359,11 @@ bool FileSystem_GetExecutableDir( char *exedir, size_t exeDirLen )
 	{
 		Q_strncat( exedir, CORRECT_PATH_SEPARATOR_S, exeDirLen, COPY_ALL_CHARACTERS );
 		Q_strncat( exedir, "bin", exeDirLen, COPY_ALL_CHARACTERS );
+
+#ifdef PLATFORM_64BITS
+		Q_strncat( exedir, CORRECT_PATH_SEPARATOR_S "x64", exeDirLen, COPY_ALL_CHARACTERS );
+#endif
+
 		Q_FixSlashes( exedir );
 	}
 	
@@ -703,10 +708,14 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 				
 				if ( Q_stricmp("game", pPathID) == 0 )
 				{
-					char szGameBinPath[MAX_PATH];		
-					Q_snprintf( szGameBinPath, sizeof(szGameBinPath), "%s\\bin", pFullPath );
+					char szGameBinPath[MAX_PATH];
+#ifdef PLATFORM_64BITS
+					Q_snprintf( szGameBinPath, sizeof(szGameBinPath), "%s" CORRECT_PATH_SEPARATOR_S "bin" CORRECT_PATH_SEPARATOR_S "x64", pFullPath );
+#else
+					Q_snprintf( szGameBinPath, sizeof(szGameBinPath), "%s" CORRECT_PATH_SEPARATOR_S ¡°bin", pFullPath );
+#endif
 
-					// 1. For each "Game" search path, it adds a "GameBin" path, in <dir>\bin
+					// 1. For each "Game" search path, it adds a "GameBin" path, in <dir>\bin[\x64]
 					FileSystem_AddLoadedSearchPath( initInfo, "GAMEBIN", szGameBinPath, bLowViolence );
 					
 					// 2. For each "Game" search path, it adds another "Game" path in front of it with _<langage> at the end.

@@ -2836,7 +2836,7 @@ void Mod_TouchAllData( model_t *pModel, int nServerCount )
 		// skip self, start at children
 		for ( int i=1; i<pVirtualModel->m_group.Count(); ++i )
 		{
-			MDLHandle_t childHandle = (MDLHandle_t)(int)pVirtualModel->m_group[i].cache&0xffff;
+			MDLHandle_t childHandle = (MDLHandle_t)(intp)pVirtualModel->m_group[i].cache&0xffff;
 			model_t *pChildModel = (model_t *)g_pMDLCache->GetUserData( childHandle );
 			if ( pChildModel )
 			{
@@ -4040,7 +4040,7 @@ int Mod_GetMaterialCount( model_t* mod )
 	{
 	case mod_brush:
 		{
-			CUtlVector<IMaterial*> uniqueMaterials( 0, 32 );
+			CUtlVector<IMaterial*> uniqueMaterials( (intp)0, 32 );
 
 			for (int i = 0; i < mod->brush.nummodelsurfaces; ++i)
 			{

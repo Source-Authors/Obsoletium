@@ -20,7 +20,7 @@ namespace GCSDK
 //------------------------------------------------------------------------------
 CGCClient::CGCClient( ISteamGameCoordinator *pSteamGameCoordinator, bool bGameserver )
 : m_pSteamGameCoordinator( NULL ),
-	m_memMsg( 0, 1024 ),
+	m_memMsg( (intp)0, 1024 ),
 #ifndef STEAM
 	m_callbackGCMessageAvailable( NULL, NULL ),
 #endif

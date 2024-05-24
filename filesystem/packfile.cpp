@@ -941,7 +941,7 @@ int CLZMAZipPackFileHandle::Read( void* pBuffer, int nDestSize, int nBytes )
 
 	// If we read less than BackSeekBuffer.Size() bytes, shift the end of the old backseek buffer up
 	int nOldBackSeek = m_BackSeekBuffer.TellPut();
-	int nReuseBackSeek = Max( Min( m_BackSeekBuffer.Size() - nBytesRead, nOldBackSeek ), 0 );
+	int nReuseBackSeek = Max( Min( m_BackSeekBuffer.Size() - nBytesRead, static_cast<intp>(nOldBackSeek) ), static_cast<intp>(0) );
 	if ( nReuseBackSeek )
 	{
 		// Shift the reused chunk to the front
@@ -955,7 +955,7 @@ int CLZMAZipPackFileHandle::Read( void* pBuffer, int nDestSize, int nBytes )
 	m_BackSeekBuffer.SeekGet( CUtlBuffer::SEEK_HEAD, nReuseBackSeek );
 
 	// Fill in remainder from what we just read
-	int nReadIntoBackSeek = Min( m_BackSeekBuffer.Size() - nReuseBackSeek, nBytesRead );
+	int nReadIntoBackSeek = Min( m_BackSeekBuffer.Size() - nReuseBackSeek, static_cast<intp>(nBytesRead) );
 	m_BackSeekBuffer.Put( (unsigned char *)pBuffer + nBytesRead - nReadIntoBackSeek, nReadIntoBackSeek );
 	m_BackSeekBuffer.SeekGet( CUtlBuffer::SEEK_CURRENT, nReadIntoBackSeek );
 
@@ -1064,7 +1064,7 @@ int CLZMAZipPackFileHandle::FillReadBuffer()
 	// Reset empty read buffer
 	m_ReadBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, 0 );
 	m_ReadBuffer.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
-	int nRefillSize = Min( nRemainingCompressedBytes, m_ReadBuffer.Size() );
+	int nRefillSize = Min( static_cast<intp>(nRemainingCompressedBytes), m_ReadBuffer.Size() );
 	int nRefillResult = CZipPackFileHandle::Read( m_ReadBuffer.PeekPut(), m_ReadBuffer.Size(), nRefillSize );
 	AssertMsg( nRefillSize == nRefillResult, "Don't expect to fail to read here" );
 

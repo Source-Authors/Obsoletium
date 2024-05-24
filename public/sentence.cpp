@@ -1073,7 +1073,7 @@ void CSentence::ResetToBase( void )
 void CSentence::MarkNewPhraseBase( void )
 {
 #if PHONEME_EDITOR
-	m_nResetWordBase = max( m_Words.Count(), 0 );
+	m_nResetWordBase = max( m_Words.Count(), (intp)0 );
 #endif
 }
 

@@ -1490,7 +1490,7 @@ bool variant_t::Convert( fieldtype_t newType )
 //-----------------------------------------------------------------------------
 const char *variant_t::ToString( void ) const
 {
-	COMPILE_TIME_ASSERT( sizeof(string_t) == sizeof(int) );
+	COMPILE_TIME_ASSERT( sizeof(string_t) == sizeof(int*) );
 
 	static char szBuf[512];
 

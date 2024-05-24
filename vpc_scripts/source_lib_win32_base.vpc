@@ -27,12 +27,9 @@ $Configuration
 		$TargetName	"$OUTLIBNAME"
 	}
 
-
 	$Compiler
 	{
-		$PreprocessorDefinitions			"$BASE;PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64" [$WIN64]
-		$PreprocessorDefinitions			"$BASE;COMPILER_MSVC32" [$WIN32]
-		$PreprocessorDefinitions			"$BASE;COMPILER_MSVC;_DLL_EXT=$_DLL_EXT"
+		$PreprocessorDefinitions			"$BASE;_DLL_EXT=$_DLL_EXT"
 		$PreprocessorDefinitions			"$BASE;LIBNAME=$OUTLIBNAME"
 	}
 
@@ -48,7 +45,6 @@ $Configuration
 							"set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
 							"if $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE (" "\n" \
 							"    attrib -r $OUTLIBDIR\$(TargetName).lib" "\n" \
-							"    $SRCDIR\devtools\bin\gnu\touch.exe -d $QUOTE1999-01-01$QUOTE $OUTLIBDIR\$(TargetName).lib" "\n" \
 							"    attrib +r $OUTLIBDIR\$(TargetName).lib" "\n" \
 							")" "\n" \
 							"$CRCCHECK" "\n" 			

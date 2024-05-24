@@ -657,7 +657,7 @@ static matrix3x4_t *ComputeSkinMatrix( mstudioboneweight_t &boneweights, matrix3
 static matrix3x4_t *ComputeSkinMatrixSSE( mstudioboneweight_t &boneweights, matrix3x4_t *pPoseToWorld, matrix3x4_t &result )
 {
 	// NOTE: pPoseToWorld, being cache aligned, doesn't need explicit initialization
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 ) && !defined(_WIN64) && !defined( _X360 )
 	switch( boneweights.numbones )
 	{
 	default:
@@ -869,14 +869,12 @@ static matrix3x4_t *ComputeSkinMatrixSSE( mstudioboneweight_t &boneweights, matr
 #elif POSIX
 #warning "ComputeSkinMatrixSSE C implementation only"
 	return ComputeSkinMatrix( boneweights, pPoseToWorld, result );
-#elif defined( _X360 )
+#elif defined(_WIN64) || defined(_X360)
+#pragma message ("WARNING: ComputeSkinMatrixSSE C implementation only")
 	return ComputeSkinMatrix( boneweights, pPoseToWorld, result );
 #else
 #error "Please define your platform"
 #endif
-
-	Assert( 0 );
-	return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -1142,7 +1140,7 @@ public:
 		if ( nHasSIMD )
 		{
 			// Precaches the data
-			_mm_prefetch( (char*)((int)pGroupToMesh & (~0x1F)), _MM_HINT_NTA );
+			_mm_prefetch( (char*)((intp)pGroupToMesh & (~0x1F)), _MM_HINT_NTA );
 		}
 #endif
 		for ( int i = 0; i < PREFETCH_VERT_COUNT; ++i )
@@ -1169,7 +1167,7 @@ public:
 			if ( nHasSIMD )
 			{
 				char *pMem = (char*)&pGroupToMesh[j + PREFETCH_VERT_COUNT + 1];
-				_mm_prefetch( (char*)((int)pMem & (~0x1F)), _MM_HINT_NTA );
+				_mm_prefetch( (char*)((intp)pMem & (~0x1F)), _MM_HINT_NTA );
 			}
 #endif
 			idx = j & (PREFETCH_VERT_COUNT-1);
@@ -1383,7 +1381,7 @@ public:
 				{
 					// note - this quantity is very sensitive to round off error. the sse
 					// reciprocal approximation won't cut it here.
-					OneOver_ThetaDot_Minus_PhiDot[l]=ReplicateX4(1.0/spread);
+					OneOver_ThetaDot_Minus_PhiDot[l]=ReplicateX4(1.0f/spread);
 				}
 				else
 				{

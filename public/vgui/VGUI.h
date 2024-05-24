@@ -12,20 +12,24 @@
 #pragma once
 #endif
 
+#include <limits> 
+
+#include "tier0/platform.h"
+
 #define null 0L
 
 #ifndef NULL
 #ifdef __cplusplus
 #define NULL    0
 #else
-#define NULL    ((void *)0)
+#define NULL    nullptr
 #endif
 #endif
 
-typedef unsigned char  uchar;
-typedef unsigned short ushort;
-typedef unsigned int   uint;
-typedef unsigned long  ulong;
+using uchar = unsigned char;
+using ushort = unsigned short;
+using uint = unsigned int;
+using ulong = unsigned long;
 
 #ifndef _WCHAR_T_DEFINED
 // DAL - wchar_t is a built in define in gcc 3.2 with a size of 4 bytes
@@ -42,18 +46,20 @@ namespace vgui
 {
 // handle to an internal vgui panel
 // this is the only handle to a panel that is valid across dll boundaries
-typedef unsigned int VPANEL;
+using VPANEL = uintp;
 
 // handles to vgui objects
 // NULL values signify an invalid value
-typedef unsigned long HScheme;
+using HScheme = unsigned long;
 // Both -1 and 0 are used for invalid textures. Be careful.
-typedef unsigned long HTexture;
-typedef unsigned long HCursor;
-typedef unsigned long HPanel;
-const HPanel INVALID_PANEL = 0xffffffff;
-typedef unsigned long HFont;
-const HFont INVALID_FONT = 0; // the value of an invalid font handle
+using HTexture = unsigned long;
+using HCursor = unsigned long;
+using HPanel = unsigned long;
+
+constexpr inline HPanel INVALID_PANEL{std::numeric_limits<HPanel>::max()};
+
+using HFont = unsigned long;
+constexpr HFont INVALID_FONT{0};  // the value of an invalid font handle
 }
 
 #include "tier1/strtools.h"

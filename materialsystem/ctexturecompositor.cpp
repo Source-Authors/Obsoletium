@@ -455,7 +455,7 @@ public:
 
 	virtual void OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs ) 
 	{ 
-		switch ( ( int ) pExtraArgs )
+		switch ( ( intp ) pExtraArgs )
 		{
 		case Neutral:
 			SafeAssign( &m_pTex, pTex ); 
@@ -1211,7 +1211,7 @@ protected:
 
 	virtual void OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs )
 	{
-		switch ( ( int ) pExtraArgs )
+		switch ( ( intp ) pExtraArgs )
 		{
 		case Albedo:
 			SafeAssign( &m_pTex, pTex );
@@ -1839,12 +1839,12 @@ void CTCStage::Render( ITexture* _destRT, IMaterial* _mat, const CUtlVector<CTCS
 		{
 			if (_inputs[i].m_pTexture)
 			{
-				V_snprintf(buffer, ARRAYSIZE(buffer), "composite_%s_input_%02d_in%01d_%08x.tga", _comp->GetName().Get(), s_nDumpCount, i, (int) this);
+				V_snprintf(buffer, ARRAYSIZE(buffer), "composite_%s_input_%02d_in%01d_%16x.tga", _comp->GetName().Get(), s_nDumpCount, i, (intp) this);
 				_inputs[i].m_pTexture->SaveToFile(buffer);
 			}
 		}
 
-		V_snprintf(buffer, ARRAYSIZE(buffer), "composite_%s_result_%02d_%08x.tga", _comp->GetName().Get(), s_nDumpCount++, (int) this);
+		V_snprintf(buffer, ARRAYSIZE(buffer), "composite_%s_result_%02d_%16x.tga", _comp->GetName().Get(), s_nDumpCount++, (intp) this);
 		_destRT->SaveToFile(buffer);
 	}
 #endif

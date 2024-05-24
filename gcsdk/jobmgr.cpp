@@ -25,7 +25,7 @@ typedef int (__cdecl *QSortCompareFuncCtx_t)(void *, const void *, const void *)
 //-----------------------------------------------------------------------------
 CJobMgr::CJobMgr()
 :	m_MapJob( 0, 0, DefLessFunc( GID_t ) ), 
-	m_QueueJobSleeping( 0, 0, &JobSleepingLessFunc ),
+	m_QueueJobSleeping( (intp)0, 0, &JobSleepingLessFunc ),
 	m_unNextJobID( 0 ),
 	m_mapStatsBucket( 0, 0, DefLessFunc(uint32) ),
 	m_WorkThreadPool( "CJobMgr::m_WorkThreadPool" ),
@@ -1187,7 +1187,7 @@ int CJobMgr::DumpJobSummary()
 	jobprofilestats.m_iJobProfileSort = k_EJobProfileSortOrder_Count;
 	jobprofilestats.pmapStatsBucket = &mapStatsBucket;
 
-	CUtlVector<int> vecSort( 0, mapStatsBucket.Count() );
+	CUtlVector<int> vecSort( (intp)0, mapStatsBucket.Count() );
 	FOR_EACH_MAP_FAST( mapStatsBucket, iBucket )
 	{
 		vecSort.AddToTail( iBucket );
@@ -1485,7 +1485,7 @@ void CJobMgr::ProfileJobs( EJobProfileAction ejobProfileAction, EJobProfileSortO
 	jobprofilestats.m_iJobProfileSort = iSortOrder;
 	jobprofilestats.pmapStatsBucket = &m_mapStatsBucket;
 
-	CUtlVector<int> vecSort( 0, m_mapStatsBucket.Count() );
+	CUtlVector<int> vecSort( (intp)0, m_mapStatsBucket.Count() );
 	FOR_EACH_MAP_FAST( m_mapStatsBucket, iBucket )
 	{
 		vecSort.AddToTail( iBucket );

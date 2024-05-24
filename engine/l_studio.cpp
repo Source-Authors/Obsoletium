@@ -872,7 +872,7 @@ public:
 	virtual void SetupLighting( const Vector &vecCenter );
 	virtual void SuppressEngineLighting( bool bSuppress );
 
-	inline vertexFileHeader_t *CacheVertexData() { return g_pMDLCache->GetVertexData( (MDLHandle_t)(int)m_pStudioHdr->virtualModel&0xffff ); }
+	inline vertexFileHeader_t *CacheVertexData() { return g_pMDLCache->GetVertexData( (MDLHandle_t)(intp)m_pStudioHdr->virtualModel&0xffff ); }
 
 	bool Init();
 	void Shutdown();
@@ -4123,7 +4123,7 @@ bool CModelRender::UpdateStaticPropColorData( IHandleEntity *pProp, ModelInstanc
 	if ( !bDebugColor )
 	{
 		// vertexes must be available for lighting calculation
-		vertexFileHeader_t *pVertexHdr = g_pMDLCache->GetVertexData( (MDLHandle_t)(int)pStudioHdr->virtualModel&0xffff );
+		vertexFileHeader_t *pVertexHdr = g_pMDLCache->GetVertexData( (MDLHandle_t)(intp)pStudioHdr->virtualModel&0xffff );
 		if ( !pVertexHdr )
 		{
 			// data not available yet

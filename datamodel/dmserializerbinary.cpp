@@ -489,7 +489,7 @@ bool CDmSerializerBinary::UnserializeElements( CUtlBuffer &buf, DmFileId_t filei
 	CUtlHash< DmIdPair_t > idmap( nBuckets, 0, 0, DmIdPair_t::Compare, DmIdPair_t::HashKey );
 
 	// Read + create all elements
-	CUtlVector<CDmElement*> elementList( 0, nElementCount );
+	CUtlVector<CDmElement*> elementList( (intp)0, nElementCount );
 	for ( int i = 0; i < nElementCount; ++i )
 	{
 		char pName[2048];

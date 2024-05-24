@@ -24,7 +24,7 @@ $Configuration
 	
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE ws2_32.lib"						[$WINDOWS]
+		$AdditionalDependencies			"$BASE Advapi32.lib ws2_32.lib"						[$WINDOWS]
 
 		// pc publishes the import library directly
 		$ImportLibrary					"$LIBPUBLIC\$(TargetName).lib"				[$WINDOWS]

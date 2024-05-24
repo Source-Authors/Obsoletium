@@ -1816,7 +1816,7 @@ void CDmeMesh::ComputeDefaultTangentData( CDmeVertexData *pVertexData, bool bSmo
 	// the face set data to refer to the new vertices
 
 	// Build a map from vertex to a list of triangles that share the vert.
-	CUtlVector<Triangle_t> triangles( 0, 1024 );
+	CUtlVector<Triangle_t> triangles( (intp)0, 1024 );
 	CUtlVector< CUtlVector<int> > vertToTriMap;
 	vertToTriMap.AddMultipleToTail( pVertexData->VertexCount() );
 
@@ -2204,7 +2204,7 @@ void CDmeMesh::ComputeDeltaStateNormals()
 	const int nPosCount = basePosData.Count();
 
 	// Build a map from vertex to a list of triangles that share the vert.
-	CUtlVector< Triangle_t > triangles( 0, 1024 );
+	CUtlVector< Triangle_t > triangles( (intp)0, 1024 );
 	CUtlVector< CUtlVector<int> > vertToTriMap;
 	vertToTriMap.AddMultipleToTail( pBind->VertexCount() );
 

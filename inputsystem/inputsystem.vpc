@@ -41,7 +41,7 @@ $Project "inputsystem"
 		$File	"inputsystem.cpp"
 		$File	"inputsystem.h"
 		$File	"joystick_sdl.cpp"
-		$File	"novint.cpp"			[$WIN32]
+		$File	"novint.cpp"			[$WINDOWS]
 		$File	"key_translation.cpp"
 		$File	"key_translation.h"
 		$File	"steamcontroller.cpp"

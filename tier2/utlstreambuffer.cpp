@@ -76,7 +76,7 @@ CUtlStreamBuffer::CUtlStreamBuffer( const char *pFileName, const char *pPath, in
 		// Read in the first bytes of the file
 		if ( Size() > 0 )
 		{
-			int nSizeToRead = min( Size(), m_nMaxPut );
+			int nSizeToRead = min( Size(), static_cast<intp>(m_nMaxPut) );
 			ReadBytesFromFile( nSizeToRead, 0 );
 		}
 	}
@@ -169,7 +169,7 @@ void CUtlStreamBuffer::Open( const char *pFileName, const char *pPath, int nFlag
 		// Read in the first bytes of the file
 		if ( Size() > 0 )
 		{
-			int nSizeToRead = min( Size(), m_nMaxPut );
+			int nSizeToRead = min( Size(), static_cast<intp>(m_nMaxPut) );
 			ReadBytesFromFile( nSizeToRead, 0 );
 		}
 	}

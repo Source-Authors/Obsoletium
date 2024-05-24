@@ -764,7 +764,7 @@ BASEPTR	CBaseEntity::ThinkSet( BASEPTR func, float thinkTime, const char *szCont
 #ifdef GNUC
 	COMPILE_TIME_ASSERT( sizeof(func) == 8 );
 #else
-	COMPILE_TIME_ASSERT( sizeof(func) == 4 );
+	COMPILE_TIME_ASSERT( sizeof(func) == sizeof(void*) );
 #endif
 #endif
 #endif

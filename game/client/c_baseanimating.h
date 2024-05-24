@@ -83,7 +83,7 @@ public:
 };
 
 
-typedef unsigned int			ClientSideAnimationListHandle_t;
+typedef uintp			ClientSideAnimationListHandle_t;
 
 #define		INVALID_CLIENTSIDEANIMATION_LIST_HANDLE	(ClientSideAnimationListHandle_t)~0
 

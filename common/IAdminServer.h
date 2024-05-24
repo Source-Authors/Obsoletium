@@ -14,7 +14,7 @@
 #include "interface.h"
 
 // handle to a game window
-typedef unsigned int ManageServerUIHandle_t;
+typedef uintp ManageServerUIHandle_t;
 class IManageServer;
 
 //-----------------------------------------------------------------------------

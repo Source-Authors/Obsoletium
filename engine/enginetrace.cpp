@@ -1168,7 +1168,7 @@ void CEngineTrace::ClipRayToEntity( const Ray_t &ray, unsigned int fMask, IHandl
 class CEntitiesAlongRay : public IPartitionEnumerator
 {
 public:
-	CEntitiesAlongRay( ) : m_EntityHandles(0, 32) {}
+	CEntitiesAlongRay( ) : m_EntityHandles((intp)0, 32) {}
 
 	void Reset()
 	{

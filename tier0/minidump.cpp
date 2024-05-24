@@ -4,6 +4,7 @@
 
 #include "tier0/minidump.h"
 #include "tier0/platform.h"
+#include "tier0/threadtools.h"
 
 #if defined( _WIN32 ) && !defined( _X360 )
 
@@ -18,7 +19,7 @@ using MINIDUMPWRITEDUMP = decltype(&::MiniDumpWriteDump);
 
 
 // counter used to make sure minidump names are unique
-static volatile long g_nMinidumpsWritten = 0;
+static CInterlockedInt g_nMinidumpsWritten = 0;
 
 // process-wide prefix to use for minidumps
 static tchar g_rgchMinidumpFilenamePrefix[MAX_PATH];
@@ -64,7 +65,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 		time_t currTime = ::time( NULL );
 		struct tm * pTime = ::localtime( &currTime );
 
-		::InterlockedIncrement( &g_nMinidumpsWritten );
+		++g_nMinidumpsWritten;
 
 		// If they didn't set a dump prefix, then set one for them using the module name
 		if ( g_rgchMinidumpFilenamePrefix[0] == TCHAR(0) )
@@ -99,7 +100,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 		// can't use the normal string functions since we're in tier0
 		tchar rgchFileName[MAX_PATH];
 		_sntprintf( rgchFileName, ARRAYSIZE(rgchFileName),
-			_T("%s_%d%02d%02d_%02d%02d%02d_%ld%hs%hs.mdmp"),
+			_T("%s_%d%02d%02d_%02d%02d%02d_%d%hs%hs.mdmp"),
 			g_rgchMinidumpFilenamePrefix,
 			pTime->tm_year + 1900,	/* Year less 2000 */
 			pTime->tm_mon + 1,		/* month (0 - 11 : 0 = January) */
@@ -107,7 +108,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 			pTime->tm_hour,			/* hour (0 - 23) */
 			pTime->tm_min,		    /* minutes (0 - 59) */
 			pTime->tm_sec,		    /* seconds (0 - 59) */
-			g_nMinidumpsWritten,	// ensures the filename is unique
+			g_nMinidumpsWritten.GetRaw(),	// ensures the filename is unique
 			( pszFilenameSuffix != NULL ) ? _T("_") : _T(""),
 			( pszFilenameSuffix != NULL ) ? pszFilenameSuffix : _T("")
 			);

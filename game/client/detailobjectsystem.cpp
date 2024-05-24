@@ -1394,7 +1394,7 @@ void CDetailModel::DrawSwayingQuad( CMeshBuilder &meshBuilder, Vector vecOrigin,
 //-----------------------------------------------------------------------------
 // constructor, destructor
 //-----------------------------------------------------------------------------
-CDetailObjectSystem::CDetailObjectSystem() : m_DetailSpriteDict( 0, 32 ), m_DetailObjectDict( 0, 32 ), m_DetailSpriteDictFlipped( 0, 32 )
+CDetailObjectSystem::CDetailObjectSystem() : m_DetailSpriteDict( (intp)0, 32 ), m_DetailObjectDict( (intp)0, 32 ), m_DetailSpriteDictFlipped( (intp)0, 32 )
 {
 	m_pFastSpriteData = NULL;
 	m_pSortInfo = NULL;

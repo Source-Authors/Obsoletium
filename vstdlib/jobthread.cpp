@@ -1269,7 +1269,7 @@ void Test( bool bDistribute, bool bSleep = true, bool bFinishExecute = false, bo
 
 
 bool g_bOutputError;
-volatile int g_ReadyToExecute;
+std::atomic_bool g_ReadyToExecute;
 CInterlockedInt g_nReady;
 
 class CExecuteTestJob : public CJob

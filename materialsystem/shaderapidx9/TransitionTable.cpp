@@ -101,8 +101,8 @@ bool CTransitionTable::UniqueSnapshotLessFunc::Less( const CTransitionTable::Tra
 // Constructor, destructor
 //-----------------------------------------------------------------------------
 CTransitionTable::CTransitionTable() : m_DefaultStateSnapshot(-1),
-	m_CurrentShadowId(-1), m_CurrentSnapshotId(-1), m_TransitionOps( 0, 8192 ), m_ShadowStateList( 0, 256 ),
-	m_TransitionTable( 0, 256 ), m_SnapshotList( 0, 256 ), 
+	m_CurrentShadowId(-1), m_CurrentSnapshotId(-1), m_TransitionOps( (intp)0, 8192 ), m_ShadowStateList( (intp)0, 256 ),
+	m_TransitionTable( (intp)0, 256 ), m_SnapshotList( (intp)0, 256 ), 
 	m_ShadowStateDict(0, 256 ), 
 	m_SnapshotDict( 0, 256 ), 
 	m_UniqueTransitions( 0, 4096 ) 

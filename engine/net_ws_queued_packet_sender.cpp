@@ -60,7 +60,7 @@ private:
 	CUtlPriorityQueue< CQueuedPacket * > m_QueuedPackets;
 	CThreadMutex m_QueuedPacketsCS;
 	CThreadEvent m_hThreadEvent;
-	volatile bool m_bThreadShouldExit;
+	std::atomic_bool m_bThreadShouldExit;
 };
 
 static CQueuedPacketSender g_QueuedPacketSender;
@@ -68,7 +68,7 @@ IQueuedPacketSender *g_pQueuedPackedSender = &g_QueuedPacketSender;
 
 
 CQueuedPacketSender::CQueuedPacketSender() :
-	m_QueuedPackets( 0, 0, CQueuedPacket::LessFunc )
+	m_QueuedPackets( (intp)0, 0, CQueuedPacket::LessFunc )
 {
 	SetName( "QueuedPacketSender" );
 	m_bThreadShouldExit = false;

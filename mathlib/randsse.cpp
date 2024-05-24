@@ -9,6 +9,7 @@
 
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
+#include "tier0/threadtools.h"
 
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
@@ -79,7 +80,7 @@ struct SIMDRandStreamContext
 constexpr inline int MAX_SIMULTANEOUS_RANDOM_STREAMS = 32;
 
 static SIMDRandStreamContext s_SIMDRandContexts[MAX_SIMULTANEOUS_RANDOM_STREAMS];
-static volatile int s_nRandContextsInUse[MAX_SIMULTANEOUS_RANDOM_STREAMS];
+static CInterlockedInt s_nRandContextsInUse[MAX_SIMULTANEOUS_RANDOM_STREAMS];
 
 void SeedRandSIMD(uint32 seed)
 {
@@ -107,7 +108,7 @@ int GetSIMDRandContext()
 			if ( !u )				// available?
 			{
 				// try to take it!
-				if ( ThreadInterlockedAssignIf( &u, 1, 0 ) )
+				if ( u.AssignIf( 0, 1 ) )
 				{
 					return i;								// done!
 				}

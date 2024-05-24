@@ -653,7 +653,7 @@ bool GetFileFromRemoteStorage( ISteamRemoteStorage *pRemoteStorage, const char *
 
 	if ( nFileSize > 0 )
 	{
-		CUtlMemory<char> buf( 0, nFileSize );
+		CUtlMemory<char> buf( (intp)0, nFileSize );
 		if ( pRemoteStorage->FileRead( pszRemoteFileName, buf.Base(), nFileSize ) == nFileSize )
 		{
 

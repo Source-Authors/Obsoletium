@@ -1,6 +1,6 @@
 # Source engine
 
-[![CI](https://github.com/Source-Authors/obsolete-source-engine/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Source-Authors/obsolete-source-engine/actions/workflows/build.yml)
+[![Build](https://github.com/Source-Authors/Obsoletium/actions/workflows/build.yml/badge.svg)](https://github.com/Source-Authors/Obsoletium/actions/workflows/build.yml)
 
 
 ## Prerequisites
