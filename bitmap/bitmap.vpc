@@ -51,7 +51,7 @@ $Project "bitmap"
 		$File	"$SRCDIR\thirdparty\stb\stb_dxt.h"
 	}
 
-	$Folder "Link Libraries" [$WIN32]
+	$Folder "Link Libraries" [$WINDOWS]
 	{
 	  // dimhotepus: Exclude nvtc & ATI compress, as proprietary.
 		$Lib nvtc [!$NO_NVTC]

@@ -289,7 +289,7 @@ void CGenericClassBasedReplay::AddKill( const char *pPlayerName, int nPlayerClas
 	ConVarRef replay_debug( "replay_debug" );
 	if ( replay_debug.IsValid() && replay_debug.GetBool() )
 	{
-		DevMsg( "\n\nRecorded kill: name=%s, class=%s (this=%i)\n\n", pPlayerName, GetPlayerClass( nPlayerClass ), (int)this );
+		DevMsg( "\n\nRecorded kill: name=%s, class=%s (this=%zd)\n\n", pPlayerName, GetPlayerClass( nPlayerClass ), (intp)this );
 	}
 
 	m_vecKills.AddToTail( pNewKillData );

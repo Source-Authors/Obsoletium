@@ -314,7 +314,11 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 		}
 		else
 		{
+#ifdef PLATFORM_64BITS
+			Q_snprintf( szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s/bin/x64/%s", szCwd, pModuleName );
+#else
 			Q_snprintf( szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s/bin/%s", szCwd, pModuleName );
+#endif
 		}
 		hDLL = Sys_LoadLibrary( szAbsoluteModuleName, flags );
 	}

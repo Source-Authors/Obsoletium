@@ -402,7 +402,7 @@ public:
 
 	void	ComputeCentroid();
 
-	void	DoBlobBatchedAI( int iStart, int iEnd );
+	void	DoBlobBatchedAI( intp iStart, intp iEnd );
 
 	int		ComputeBatchSize();
 	void	AdvanceBatch();
@@ -615,7 +615,7 @@ void CNPC_Blob::RunAI()
 
 	if( npc_blob_use_threading.GetBool() )
 	{
-		IterRangeParallel( this, &CNPC_Blob::DoBlobBatchedAI, 0, m_Elements.Count() );
+		IterRangeParallel( this, &CNPC_Blob::DoBlobBatchedAI, (intp)0, m_Elements.Count() );
 	}
 	else
 	{
@@ -709,7 +709,7 @@ void CNPC_Blob::ComputeCentroid()
 //-----------------------------------------------------------------------------
 // Run all of the AI for elements within the range iStart to iEnd 
 //-----------------------------------------------------------------------------
-void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
+void CNPC_Blob::DoBlobBatchedAI( intp iStart, intp iEnd )
 {
 	float flInterval = gpGlobals->curtime - GetLastThink();
 
@@ -761,7 +761,7 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 	//--
 	// MAIN LOOP - Run all of the elements in the set iStart to iEnd
 	//--
-	for( int i = iStart ; i < iEnd ; i++ )
+	for( intp i = iStart ; i < iEnd ; i++ )
 	{
 		CBlobElement *pThisElement = m_Elements[ i ];
 

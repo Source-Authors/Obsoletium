@@ -185,7 +185,7 @@ public:
 		virtual void Completed() = 0;			// Executed on the main thread
 
 	public:
-		void * volatile m_hThreadHandle;		// Handle to an async job thread waiting for
+		CInterlockedPtr<void> m_hThreadHandle;		// Handle to an async job thread waiting for
 		float m_flLeastExecuteTime;				// Least amount of time this job should keep executing
 	};
 

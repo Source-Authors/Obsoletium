@@ -1574,7 +1574,7 @@ void	GLMDisplayInfo::PopulateModes( void )
 
 void	GLMDisplayInfo::Dump( int which )
 {
-	GLMPRINTF(("\n         #%d: GLMDisplayInfo @ %08x, cg-id=%08x  display-mask=%08x  pixwidth=%d  pixheight=%d", which, (int)this, m_info.m_cgDisplayID, m_info.m_glDisplayMask, m_info.m_displayPixelWidth,  m_info.m_displayPixelHeight ));
+	GLMPRINTF(("\n         #%d: GLMDisplayInfo @ %08x, cg-id=%16x  display-mask=%08x  pixwidth=%d  pixheight=%d", which, (intp)this, m_info.m_cgDisplayID, m_info.m_glDisplayMask, m_info.m_displayPixelWidth,  m_info.m_displayPixelHeight ));
 
 	FOR_EACH_VEC( *m_modes, i )
 	{

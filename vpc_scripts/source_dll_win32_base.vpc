@@ -31,10 +31,8 @@ $Configuration
 
 	$Compiler
 	{
-		$PreprocessorDefinitions			"$BASE;PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64" [$WIN64]
-		$PreprocessorDefinitions			"$BASE;COMPILER_MSVC32" [$WIN32]		
-		$PreprocessorDefinitions			"$BASE;COMPILER_MSVC;_DLL_EXT=$_DLL_EXT"
-		$PreprocessorDefinitions			"$BASE;DLLNAME=$OUTBINNAME"		
+		$PreprocessorDefinitions			"$BASE;_DLL_EXT=$_DLL_EXT"
+		$PreprocessorDefinitions			"$BASE;DLLNAME=$OUTBINNAME"
 	}
 
 	$Compiler [$WIN32]
@@ -44,7 +42,6 @@ $Configuration
 	
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE shell32.lib user32.lib advapi32.lib gdi32.lib comdlg32.lib ole32.lib" [$WIN32||$WIN64]
 		$TargetMachine						"MachineX86 (/MACHINE:X86)"	[$WIN32]
 		$TargetMachine						"MachineX64 (/MACHINE:X64)"	[$WIN64]
 		// dimhotepus: Hardening build.

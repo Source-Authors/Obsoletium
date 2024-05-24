@@ -22,7 +22,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE d3d10.lib d3dcompiler.lib dxgi.lib" [$WINDOWS]
+		$AdditionalDependencies				"$BASE d3d10.lib d3dcompiler.lib dxgi.lib Gdi32.lib" [$WINDOWS]
 	}
 }
 

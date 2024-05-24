@@ -60,7 +60,7 @@ bool CHLTVTestSystem::StartTest(int nClients, const char *pszAddress)
 
 void CHLTVTestSystem::RetryTest(int nClients)
 {
-	int maxClients = min( nClients+1, m_Servers.Count() );
+	int maxClients = min( (intp)nClients+1, m_Servers.Count() );
 		
 	for ( int i=0; i<maxClients; i++ )
 	{

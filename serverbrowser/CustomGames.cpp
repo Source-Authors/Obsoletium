@@ -357,7 +357,7 @@ void CCustomGames::RecalculateCommonTags( void )
 
 	aTagsInUse.Sort( SortTagsInUse );
 
-	int iTagsToAdd = min( aTagsInUse.Count(), NUM_COMMON_TAGS );
+	int iTagsToAdd = min( aTagsInUse.Count(), (intp)NUM_COMMON_TAGS );
 	for ( int i = 0; i < iTagsToAdd; i++ )
 	{
 		const char *pszTag = aTagsInUse[i].pszTag;

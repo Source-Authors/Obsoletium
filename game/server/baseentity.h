@@ -1095,7 +1095,7 @@ public:
 #ifdef GNUC
 #define ENTITYFUNCPTR_SIZE	8
 #else
-#define ENTITYFUNCPTR_SIZE	4
+#define ENTITYFUNCPTR_SIZE sizeof(void*)
 #endif
 
 	void FunctionCheck( void *pFunction, const char *name );

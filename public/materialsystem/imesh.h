@@ -1155,10 +1155,6 @@ inline void CVertexBuilder::FastAdvanceNVertices( int n )
 	m_nVertexCount = m_nCurrentVertex;
 }
 
-
-
-#ifndef COMPILER_MSVC64
-// Implement for 64-bit Windows if needed.
 //-----------------------------------------------------------------------------
 // Fast Vertex! No need to call advance vertex, and no random access allowed
 //-----------------------------------------------------------------------------
@@ -1290,7 +1286,6 @@ inline void CVertexBuilder::FastVertexSSE( const ModelVertexDX8_t &vertex )
 	m_bWrittenUserData = false;
 #endif
 }
-#endif // COMPILER_MSVC64
 
 
 //-----------------------------------------------------------------------------

@@ -45,7 +45,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE version.lib winmm.lib"	[$WIN32]
+		$AdditionalDependencies			"$BASE version.lib winmm.lib"	[$WINDOWS]
 	}
 }
 
@@ -61,7 +61,7 @@ $Project "stdshader_dbg"
 		$File	"debugtangentspace.cpp"
 		$File	"fillrate.cpp"
 
-		$Folder	"Remove me when VAC2 is out" [$WIN32]
+		$Folder	"Remove me when VAC2 is out" [$WINDOWS]
 		{
 			$File	"..\shader_dll_verify.cpp"
 			$File	"..\shader_dll_verify.h"

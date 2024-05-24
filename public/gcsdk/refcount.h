@@ -6,6 +6,7 @@
 #ifndef GCREFCOUNT_H
 #define GCREFCOUNT_H
 
+#include "tier0/threadtools.h"
 #include "tier0/memdbgon.h"
 
 namespace GCSDK
@@ -78,13 +79,13 @@ public:
 	CRefCount() { m_cRef = 1; }		// we are born with a ref count of 1
 
 	// increment ref count
-	int AddRef() { return ThreadInterlockedIncrement( &m_cRef ); }
+	int AddRef() { return ++m_cRef; }
 
 	// delete ourselves when ref count reaches 0
 	int Release() 
 	{ 
 		Assert( m_cRef > 0 ); 
-		int cRef = ThreadInterlockedDecrement( &m_cRef ); 
+		int cRef = --m_cRef; 
 		if ( 0 == cRef )
 			DestroyThis();
 		return cRef;
@@ -95,7 +96,7 @@ protected:
 
 	virtual void DestroyThis() { delete this; }		// derived classes may override this if they want to be part of a mem pool
 
-	volatile int32 m_cRef;					// ref count of this object
+	CInterlockedInt m_cRef;					// ref count of this object
 };
 
 #define SAFE_RELEASE( x )		if ( NULL != ( x ) ) { ( x )->Release(); x = NULL; }

@@ -1,7 +1,7 @@
-# Source engine
+# Source V1 Engine
 
-[![CI](https://github.com/Source-Authors/obsolete-source-engine/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Source-Authors/obsolete-source-engine/actions/workflows/build.yml)
-
+[![Build](https://github.com/Source-Authors/Obsoletium/actions/workflows/build.yml/badge.svg)](https://github.com/Source-Authors/Obsoletium/actions/workflows/build.yml)
+[![GitHub Repo Size in Bytes](https://img.shields.io/github/repo-size/Source-Authors/Obsoletium.svg)](https://github.com/Source-Authors/Obsoletium)
 
 ## Prerequisites
 
@@ -12,15 +12,15 @@
 ## How to build
 
 * Use `git clone --recurse-submodules`
-* Run `create_<GAME_NAME>_dev.bat` from `Developer Command Prompt`. See directory tree for supported games.
-* Open `hl2.sln`.
+* Run `create_<GAME_NAME>_dev_<ARCH>.bat` from `Developer Command Prompt` (Use x64 version for x64 CPU arch). See directory tree for supported games.
+* Open `hl2_<ARCH>.sln`.
 * Build.
 
 
 ## How to debug
 
 * Ensure you placed hl2 / episodic / portal game into `game` folder near cloned repo.
-* Open `<GAME_NAME>.sln`.
+* Open `<GAME_NAME>_<ARCH>.sln`.
 * Set `launcher_main` project `Command` property to `$(SolutionDir)..\game\hl2.exe`.
 * Set `launcher_main` project `Command Arguments` property to `-dxlevel 85 -windowed`.
 * Set `launcher_main` project `Working Directory` property to `$(SolutionDir)..\game\`.
@@ -31,10 +31,15 @@
 ## How to release
 
 * Ensure you placed hl2 / episodic / portal game into `game` folder near cloned repo.
-* Open `<GAME_NAME>.sln`.
+* Open `<GAME_NAME>_<ARCH>.sln`.
 * Choose `Release` Configuration.
 * Build.
 * `game` folder contains the ready game.
 
 
 If you found a bug, please file it at https://github.com/Source-Authors/obsolete-source-engine/issues.
+
+
+## SAST Tools
+
+[PVS-Studio](https://pvs-studio.com/en/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code.

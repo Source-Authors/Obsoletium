@@ -4,7 +4,7 @@ $include "$SRCDIR\vpc_scripts\source_base.vpc"
 $MacroRequired OUTLIBDIR	"$SRCDIR\lib\public$PLATSUBDIR"
 
 $include "$SRCDIR\vpc_scripts\source_lib_posix_base.vpc"	[$POSIX]
-$include "$SRCDIR\vpc_scripts\source_lib_win32_base.vpc"	[$WIN32 || $WIN64]
+$include "$SRCDIR\vpc_scripts\source_lib_win32_base.vpc"	[$WINDOWS]
 $include "$SRCDIR\vpc_scripts\source_ppu_lib_ps3_base.vpc"	[$PS3]
 
 $include "$SRCDIR\vpc_scripts\source_video_base.vpc"
@@ -16,7 +16,10 @@ $Configuration
 		$PreprocessorDefinitions			"$BASE;DEV_BUILD"						[!$PUBLISH]
 		$PreprocessorDefinitions			"$BASE;_PROFILE"						[$PROFILE && !$RETAIL]
 		$PreprocessorDefinitions			"$BASE;RETAIL_ASSERTS"					[$RETAIL && $RETAILASSERTS]
-		$PreprocessorDefinitions			"$BASE;FRAME_POINTER_OMISSION_DISABLED" // This is now always true.
+
+		// This is now always true.
+		$PreprocessorDefinitions			"$BASE;FRAME_POINTER_OMISSION_DISABLED"
+
 		// dimhotepus: SSE4 is baseline on non-ARM. _XM_ARM_NEON_INTRINSICS_ defined on ARM automatically when needed.
 		$PreprocessorDefinitions			"$BASE;_XM_SSE3_INTRINSICS_;_XM_SSE4_INTRINSICS_" [!$ARM && !$ARM64]
 	}

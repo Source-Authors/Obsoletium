@@ -2142,7 +2142,7 @@ void CInputSystem::OnChangeIME( bool forward )
 		oldKb += forward ? 1 : -1;
 		if ( oldKb < 0 )
 		{
-			oldKb = max( 0, selections.Count() - 1 );
+			oldKb = max( static_cast<intp>(0), selections.Count() - 1 );
 		}
 		else if ( oldKb >= selections.Count() )
 		{

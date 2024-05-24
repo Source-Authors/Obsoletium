@@ -1440,7 +1440,7 @@ public:
 	FORCEINLINE void SetPixelShader( IDirect3DPixelShader9 *pShader )
 	{
 		RECORD_COMMAND( DX8_SET_PIXEL_SHADER, 1 );
-		RECORD_INT( ( int ) pShader );
+		RECORD_INT( ( intp ) pShader );
 		if ( ASyncMode() )
 			Push( PBCMD_SET_PIXEL_SHADER, pShader );
 		else

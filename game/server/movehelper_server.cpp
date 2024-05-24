@@ -112,7 +112,7 @@ static inline edict_t* GetEdict( EntityHandle_t handle )
 // Constructor
 //-----------------------------------------------------------------------------
 
-CMoveHelperServer::CMoveHelperServer( void ) : m_TouchList( 0, 128 )
+CMoveHelperServer::CMoveHelperServer( void ) : m_TouchList( (intp)0, 128 )
 {
 	m_pHostPlayer = 0;
 	SetSingleton( this );

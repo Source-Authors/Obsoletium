@@ -832,7 +832,7 @@ public:
 
 private:
 	CInterlockedInt m_nReferenceCount;
-	volatile bool m_bSignalled;
+	std::atomic_bool m_bSignalled;
 };
 
 class CAsyncMapResult : public IAsyncTextureOperationReceiver
@@ -877,11 +877,11 @@ public:
 
 	ITextureInternal* const m_pTexToMap;
 	CInterlockedInt m_nReferenceCount;
-	volatile void* m_pMemory; 
-	volatile int m_nPitch;
+	CInterlockedPtr<void> m_pMemory; 
+	CInterlockedInt m_nPitch;
 
 private:
-	volatile bool m_bSignalled;
+	std::atomic_bool m_bSignalled;
 };
 
 struct AsyncReadJob_t 
@@ -982,7 +982,7 @@ bool IsJobCancelled( AsyncLoadJob_t* pJob )
 
 //-----------------------------------------------------------------------------
 // Functions can be called from any thread, unless they are prefixed with a thread name. 
-class AsyncLoader
+class TSLIST_HEAD_ALIGN AsyncLoader : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT>
 {
 public:
 	AsyncLoader()
@@ -1107,7 +1107,7 @@ private:
 	}
 
 	ThreadHandle_t m_LoaderThread; 
-	volatile bool m_bQuit;
+	std::atomic_bool m_bQuit;
 
 	CTSQueue< AsyncLoadJob_t *> m_pendingJobs;
 	CTSQueue< AsyncLoadJob_t *> m_completedJobs;
@@ -1116,7 +1116,7 @@ private:
 
 //-----------------------------------------------------------------------------
 // Functions can be called from any thread, unless they are prefixed with a thread name. 
-class AsyncReader
+class TSLIST_HEAD_ALIGN AsyncReader : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT>
 {
 public:
 	AsyncReader()
@@ -1334,7 +1334,7 @@ private:
 
 		{
 			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s-ByteSwapInPlace", __FUNCTION__ );
-			ImageLoader::ConvertImageFormat( (unsigned char*) pJob->m_pAsyncMap->m_pMemory, GetImageFormatRawReadback( srcFmt ), srcBufferFinestMip.Base(), srcFmt, w, h );
+			ImageLoader::ConvertImageFormat( (unsigned char*) pJob->m_pAsyncMap->m_pMemory.operator void *(), GetImageFormatRawReadback( srcFmt ), srcBufferFinestMip.Base(), srcFmt, w, h );
 		}
 		
 		if ( pJob->m_bGenMips )
@@ -1408,7 +1408,7 @@ private:
 	}
 
 	ThreadHandle_t m_HelperThread;
-	volatile bool m_bQuit;
+	std::atomic_bool m_bQuit;
 
 	CTSQueue< AsyncReadJob_t*> m_requestedCopies;
 	CUtlQueue< AsyncReadJob_t* > m_queuedReads;
@@ -1796,7 +1796,7 @@ void CTextureManager::CleanupPossiblyUnreferencedTextures()
 
 	// It is perfectly valid for a texture to become referenced again (it lives on in our texture list, and can be
 	// re-loaded) and then free'd again, so ensure we don't have any duplicates in queue.
-	CUtlVector< ITextureInternal * > texturesToDelete( /* growSize */ 0, /* initialSize */ m_PossiblyUnreferencedTextures.Count() );
+	CUtlVector< ITextureInternal * > texturesToDelete( /* growSize */ (intp)0, /* initialSize */ m_PossiblyUnreferencedTextures.Count() );
 	ITextureInternal *pMaybeUnreferenced = NULL;
 	while ( m_PossiblyUnreferencedTextures.PopItem( &pMaybeUnreferenced ) )
 	{

@@ -464,7 +464,7 @@ bool CDmxSerializer::Unserialize( CUtlBuffer &buf, int nEncodingVersion, CDmxEle
 	DmObjectId_t id;
 
 	// Read + create all elements
-	CUtlVector<CDmxElement*> elementList( 0, nElementCount );
+	CUtlVector<CDmxElement*> elementList( (intp)0, nElementCount );
 	for ( int i = 0; i < nElementCount; ++i )
 	{
 		const char *pType = NULL;

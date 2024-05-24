@@ -12,6 +12,7 @@ $Configuration
 	{
 		// Request a specific compiler toolset.
 		$PlatformToolset "v100" [$VS2010]
+
 		// dimhotepus: Use newer toolset as XP is out of support.
 		$PlatformToolset "v143" [$VS2015]
 	}
@@ -38,6 +39,7 @@ $Configuration
 		// window since F8 stops on both warnings and errors. The only way to
 		// keep the warning count down is to have warnings-as-errors.
 		// We will not be warning free on 64-bit for a while...
+
 		// dimhotepus: Do not treat warnings as errors, there are too much warnings to fix at once.
 		// $TreatWarningsAsErrors			"Yes (/WX)" [!$ANALYZE && !$WIN64]
 		$TreatWarningsAsErrors				"No (/WX-)"
@@ -54,15 +56,15 @@ $Configuration
 		// reduces the client.dll size by about 1.14%. When linker optimizations are disabled this has no
 		// effect. This option does not show up in the IDE so we need to add it in $AdditionalOptions.
 		// http://blogs.msdn.com/b/vcblog/archive/2013/09/11/introducing-gw-compiler-switch.aspx
-		$AdditionalOptions	"$BASE /Gw" [$AT_LEAST_VS2013]
+		$AdditionalOptions	"$BASE /Gw"
 		// Strip unreferenced inline functions from object files to shrink .obj files and .lib files,
-		// improve linker speed, and improve conformance. Requires VS 2013 Update 3
-		$AdditionalOptions	"$BASE /Zc:inline" [$AT_LEAST_VS2013]
+		// improve linker speed, and improve conformance.
+		$AdditionalOptions	"$BASE /Zc:inline"
 
 		// dimhotepus: Use thread-safe init by default.
-		// $AdditionalOptions	"$BASE /Zc:threadSafeInit-" [$AT_LEAST_VS2015] //thread-safe static initialization will crash on Windows XP if the dll is dynamically loaded
+		// $AdditionalOptions	"$BASE /Zc:threadSafeInit-"
 
 		// dimhotepus: Drop warning suppression.
-		// $AdditionalOptions	"$BASE /Wv:18" [$AT_LEAST_VS2015&&!$WARN_ALL] //warning C4456: declaration of 'accFactorZ' hides previous local declaration suppression
+		// $AdditionalOptions	"$BASE /Wv:18" //warning C4456: declaration of 'accFactorZ' hides previous local declaration suppression
 	}
 }

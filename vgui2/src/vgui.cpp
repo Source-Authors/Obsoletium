@@ -261,7 +261,7 @@ IVGui *g_pIVgui = &g_VGui;
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CVGui::CVGui() : m_DelayedMessageQueue(0, 4, PriorityQueueComp)
+CVGui::CVGui() : m_DelayedMessageQueue( (intp)0, 4, PriorityQueueComp)
 {
 	m_iCurrentMessageID = -1;
 	m_bRunning = false;

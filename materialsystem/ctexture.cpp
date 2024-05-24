@@ -1537,10 +1537,8 @@ bool CTexture::MakeFullyResident()
 	return true;
 }
 
-void CTexture::CancelStreamingJob( bool bJobMustExist )
+void CTexture::CancelStreamingJob( [[maybe_unused]] bool bJobMustExist )
 {
-	bJobMustExist; // Only used by asserts ensuring correctness, so reference it for release builds. 
-
 	// Most callers should be aware of whether the job exists, but for cleanup we don't know and we 
 	// should be safe in that case.
 	Assert( !bJobMustExist || m_pStreamingJob ); 
@@ -1662,11 +1660,13 @@ void CTexture::InitRenderTarget(
 	m_nOriginalRTWidth = w;
 	m_nOriginalRTHeight = h;
 
-	if ( ImageLoader::ImageFormatInfo(fmt).m_NumAlphaBits > 1 )
+	const ImageFormatInfo_t &fmtInfo = ImageLoader::ImageFormatInfo(fmt);
+
+	if ( fmtInfo.m_NumAlphaBits > 1 )
 	{
 		nFlags  |= TEXTUREFLAGS_EIGHTBITALPHA;
 	}
-	else if ( ImageLoader::ImageFormatInfo(fmt).m_NumAlphaBits == 1 )
+	else if ( fmtInfo.m_NumAlphaBits == 1 )
 	{
 		nFlags  |= TEXTUREFLAGS_ONEBITALPHA;
 	}
@@ -2512,7 +2512,7 @@ bool CTexture::SetRenderTarget( int nRenderTargetID, ITexture *pDepthTexture )
 
 	ShaderAPITextureHandle_t textureHandle = m_pTextureHandles[0];
 
-	ShaderAPITextureHandle_t depthTextureHandle = (unsigned int)SHADER_RENDERTARGET_DEPTHBUFFER;
+	ShaderAPITextureHandle_t depthTextureHandle = SHADER_RENDERTARGET_DEPTHBUFFER;
 
 	if ( m_nFlags & TEXTUREFLAGS_DEPTHRENDERTARGET )
 	{
@@ -2522,7 +2522,7 @@ bool CTexture::SetRenderTarget( int nRenderTargetID, ITexture *pDepthTexture )
 	else if ( m_nFlags & TEXTUREFLAGS_NODEPTHBUFFER )
 	{
 		// GR - render target without depth buffer	
-		depthTextureHandle = (unsigned int)SHADER_RENDERTARGET_NONE;
+		depthTextureHandle = SHADER_RENDERTARGET_NONE;
 	}
 
 	if ( pDepthTexture)
@@ -4073,7 +4073,7 @@ bool CTexture::UpdateExcludedState( void )
 
 void CTextureStreamingJob::OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs )
 {
-	const int cArgsAsInt = ( int ) pExtraArgs;
+	const intp cArgsAsInt = ( intp ) pExtraArgs;
 
 	Assert( m_pOwner == NULL || m_pOwner == pTex );
 	if ( m_pOwner )

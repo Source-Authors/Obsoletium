@@ -581,19 +581,6 @@ typedef void * HINSTANCE;
   #define GCC_DIAG_POP()
 #endif
 
-#ifdef LINUX
-#pragma GCC diagnostic ignored "-Wconversion-null"	// passing NULL to non-pointer argument 1
-#pragma GCC diagnostic ignored "-Wpointer-arith"	// NULL used in arithmetic. Ie, vpanel == NULL where VPANEL is uint.
-#pragma GCC diagnostic ignored "-Wswitch"				// enumeration values not handled in switch
-#endif
-
-#ifdef OSX
-#pragma GCC diagnostic ignored "-Wconversion-null"			// passing NULL to non-pointer argument 1
-#pragma GCC diagnostic ignored "-Wnull-arithmetic"			// NULL used in arithmetic. Ie, vpanel == NULL where VPANEL is uint.
-#pragma GCC diagnostic ignored "-Wswitch-enum"				// enumeration values not handled in switch
-#pragma GCC diagnostic ignored "-Wswitch"					// enumeration values not handled in switch
-#endif
-
 // MSVC specific.
 #ifdef COMPILER_MSVC
 // Begins MSVC warning override scope.

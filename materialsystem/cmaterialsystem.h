@@ -707,7 +707,7 @@ private:
 	bool									m_bInFrame;
 	bool									m_bForcedSingleThreaded;
 	bool									m_bAllowQueuedRendering;
-	volatile bool							m_bThreadHasOwnership;
+	std::atomic_bool						m_bThreadHasOwnership;
 	uint									m_ThreadOwnershipID;
 
 	//---------------------------------

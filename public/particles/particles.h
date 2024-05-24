@@ -296,7 +296,7 @@ public:
 // separate particle system .libs
 //
 //-----------------------------------------------------------------------------
-typedef int ParticleSystemHandle_t;
+typedef intp ParticleSystemHandle_t;
 
 class CParticleSystemMgr
 {

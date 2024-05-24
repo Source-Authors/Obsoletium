@@ -169,7 +169,7 @@ private:
 
 #ifdef AI_NODE_TREE
 	ISpatialPartition * m_pNodeTree;
-	CUtlVector<int>		m_GatheredNodes;
+	CUtlVector<intp>		m_GatheredNodes;
 #endif
 };
 

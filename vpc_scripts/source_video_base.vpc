@@ -32,11 +32,11 @@ $Configuration
 {
 	$Compiler
 	{
-		$PreprocessorDefinitions		"$BASE;QUICKTIME_VIDEO;FORCE_QUICKTIME"		[$OSXALL]				
+		$PreprocessorDefinitions		"$BASE;QUICKTIME_VIDEO;FORCE_QUICKTIME"		[$OSXALL]
 
 		// dimhotepus: Drop Quicktime on Windows as Apple not support it (no x64 for example)
 
-		$PreprocessorDefinitions		"$BASE;BINK_VIDEO;AVI_VIDEO;WMV_VIDEO"							[$WIN32]
+		$PreprocessorDefinitions		"$BASE;BINK_VIDEO;AVI_VIDEO;WMV_VIDEO"		[$WINDOWS]
 		$PreprocessorDefinitions		"$BASE;BINK_VIDEO"							[$LINUXALL]
 		
 		$PreprocessorDefinitions		"$BASE;GL_GLEXT_PROTOTYPES;DX_TO_GL_ABSTRACTION"			[$GL]

@@ -771,12 +771,12 @@ bool V_StrSubst( IN_Z const char *pIn, IN_Z const char *pMatch, const char *pRep
 // Split the specified string on the specified separator.
 // Returns a list of strings separated by pSeparator.
 // You are responsible for freeing the contents of outStrings (call outStrings.PurgeAndDeleteElements).
-void V_SplitString( IN_Z const char *pString, IN_Z const char *pSeparator, CUtlVector<char*, CUtlMemory<char*, int> > &outStrings );
+void V_SplitString( IN_Z const char *pString, IN_Z const char *pSeparator, CUtlVector<char*, CUtlMemory<char*, intp> > &outStrings );
 
-void V_SplitString( const char *pString, const char *pSeparator, CUtlVector< CUtlString, CUtlMemory<CUtlString, int> > &outStrings, bool bIncludeEmptyStrings = false );
+void V_SplitString( const char *pString, const char *pSeparator, CUtlVector< CUtlString, CUtlMemory<CUtlString, intp> > &outStrings, bool bIncludeEmptyStrings = false );
 
 // Just like V_SplitString, but it can use multiple possible separators.
-void V_SplitString2( IN_Z const char *pString, const char **pSeparators, int nSeparators, CUtlVector<char*, CUtlMemory<char*, int> > &outStrings );
+void V_SplitString2( IN_Z const char *pString, const char **pSeparators, int nSeparators, CUtlVector<char*, CUtlMemory<char*, intp> > &outStrings );
 
 // Returns false if the buffer is not large enough to hold the working directory name.
 bool V_GetCurrentDirectory( OUT_Z_CAP(maxLen) char *pOut, int maxLen );

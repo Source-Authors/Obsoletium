@@ -28,7 +28,7 @@ class CUtlBuffer;
 //-----------------------------------------------------------------------------
 // Invalid command handle
 //-----------------------------------------------------------------------------
-typedef int CommandHandle_t;
+typedef intp CommandHandle_t;
 enum
 {
 	COMMAND_BUFFER_INVALID_COMMAND_HANDLE = 0

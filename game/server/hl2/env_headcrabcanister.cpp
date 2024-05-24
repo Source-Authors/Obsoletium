@@ -553,7 +553,7 @@ class CCollideList : public IEntityEnumerator
 {
 public:
 	CCollideList( Ray_t *pRay, CBaseEntity* pIgnoreEntity, int nContentsMask ) : 
-		m_Entities( 0, 32 ), m_pIgnoreEntity( pIgnoreEntity ),
+		m_Entities( (intp)0, 32 ), m_pIgnoreEntity( pIgnoreEntity ),
 		m_nContentsMask( nContentsMask ), m_pRay(pRay) {}
 
 	virtual bool EnumEntity( IHandleEntity *pHandleEntity )

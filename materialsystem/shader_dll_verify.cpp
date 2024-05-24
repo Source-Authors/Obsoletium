@@ -48,8 +48,8 @@ static CShaderDLLVerification g_Blah;
 void __declspec( dllexport ) _ftol3( char *pData )
 {
 	pData += SHADER_DLL_VERIFY_DATA_PTR_OFFSET;
-	char *pToFillIn = (char*)&g_Blah;
-	memcpy( pData, &pToFillIn, 4 );
+	IShaderDLLVerification *pToFillIn = &g_Blah;
+	memcpy( pData, &pToFillIn, sizeof(IShaderDLLVerification*) );
 }
 
 
@@ -63,8 +63,8 @@ CRC32_t CShaderDLLVerification::Function1( unsigned char *pData )
 	CRC32_t testCRC;
 	CRC32_Init( &testCRC );
 	CRC32_ProcessBuffer( &testCRC, pData, SHADER_DLL_VERIFY_DATA_LEN1 );
-	CRC32_ProcessBuffer( &testCRC, &g_hDLLInst, 4 );
-	CRC32_ProcessBuffer( &testCRC, &pVerifyPtr1, 4 );
+	CRC32_ProcessBuffer( &testCRC, &g_hDLLInst, sizeof(g_hDLLInst) );
+	CRC32_ProcessBuffer( &testCRC, &pVerifyPtr1, sizeof(pVerifyPtr1) );
 	CRC32_Final( &testCRC );
 
 	return testCRC;

@@ -608,7 +608,7 @@ private:
 		ShaderStaticCombos_t	m_ShaderStaticCombos;
 		DWORD					m_Flags;
 		int						m_nRefCount;
-		unsigned int			m_hShaderFileCache;
+		size_t					m_hShaderFileCache;
 
 		// for queued loading, bias an aligned optimal buffer forward to correct location
 		int						m_nDataOffset;
@@ -2488,7 +2488,7 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 	ShaderFileCache_t fileCacheLookup;
 	fileCacheLookup.m_Name = lookup.m_Name;
 	fileCacheLookup.m_bVertexShader = bVertexShader;
-	int fileCacheIndex = m_ShaderFileCache.Find( fileCacheLookup );
+	intp fileCacheIndex = m_ShaderFileCache.Find( fileCacheLookup );
 	if ( fileCacheIndex == m_ShaderFileCache.InvalidIndex() )
 	{
 		// not found, create a new entry
@@ -3552,7 +3552,7 @@ void CShaderManager::SpewVertexAndPixelShaders( void )
 {
 	// only spew a populated shader file cache
 	Msg( "\nShader File Cache:\n" );
-	for ( int cacheIndex = m_ShaderFileCache.Head(); 
+	for ( auto cacheIndex = m_ShaderFileCache.Head(); 
 		 cacheIndex != m_ShaderFileCache.InvalidIndex();
 		 cacheIndex = m_ShaderFileCache.Next( cacheIndex ) )
 	{

@@ -771,7 +771,7 @@ void CColorCorrectionSystem::RestoreTextures( )
 void CColorCorrectionSystem::GetNormalizedWeights( float *pDefaultWeight, float *pLookupWeights )
 {
 	float total_weight = 0.0f;
-	int nLoopCount = min( m_ColorCorrectionList.Count(), (int)COLOR_CORRECTION_MAX_TEXTURES );
+	int nLoopCount = min( m_ColorCorrectionList.Count(), (intp)COLOR_CORRECTION_MAX_TEXTURES );
 	for ( int i=0; i<nLoopCount; i++ )
 	{
 		total_weight += m_ColorCorrectionList[i]->m_flWeight;

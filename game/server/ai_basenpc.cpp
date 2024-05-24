@@ -11306,7 +11306,7 @@ bool CAI_BaseNPC::LoadedSchedules(void)
 // Output :
 //-----------------------------------------------------------------------------
 CAI_BaseNPC::CAI_BaseNPC(void)
- :	m_UnreachableEnts( 0, 4 ),
+ :	m_UnreachableEnts( (intp)0, 4 ),
     m_bDeferredNavigation( false )
 {
 	m_pMotor = NULL;

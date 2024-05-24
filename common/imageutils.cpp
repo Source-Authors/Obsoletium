@@ -783,7 +783,7 @@ fail:
     png_read_update_info( png_ptr, info_ptr );
 
     rowbytes = png_get_rowbytes( png_ptr, info_ptr );
-    png_byte channels = (int)png_get_channels( png_ptr, info_ptr );
+    png_byte channels = png_get_channels( png_ptr, info_ptr );
 	if ( channels != 4 )
 	{
 		Assert( channels == 4 );

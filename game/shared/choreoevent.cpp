@@ -2930,7 +2930,7 @@ intp CChoreoEvent::GetNumAbsoluteTags( AbsTagType type )
 //			tagnum - 
 // Output : CEventAbsoluteTag
 //-----------------------------------------------------------------------------
-CEventAbsoluteTag *CChoreoEvent::GetAbsoluteTag( AbsTagType type, int tagnum )
+CEventAbsoluteTag *CChoreoEvent::GetAbsoluteTag( AbsTagType type, intp tagnum )
 {
 	Assert( tagnum >= 0 && tagnum < m_AbsoluteTags[ type ].Count() );
 	return &m_AbsoluteTags[ type ][ tagnum ];

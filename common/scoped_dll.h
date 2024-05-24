@@ -14,7 +14,7 @@
 FORWARD_DECLARE_HANDLE(HINSTANCE);
 using HMODULE = HINSTANCE;
 
-using FARPROC = int(__stdcall *)();
+using FARPROC = ptrdiff_t(__stdcall *)();
 
 extern "C" {
 

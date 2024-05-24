@@ -290,7 +290,7 @@ public:
 
 	void Purge()
 	{
-		g_MaxLeavesVisible = max(g_MaxLeavesVisible,m_VisibleLeaves.Count());
+		g_MaxLeavesVisible = max((intp)g_MaxLeavesVisible,m_VisibleLeaves.Count());
 
 		m_VisibleLeaves.Purge();
 		m_VisibleLeafFogVolumes.Purge();
@@ -307,7 +307,7 @@ public:
 
 	void Reset()
 	{
-		g_MaxLeavesVisible = max(g_MaxLeavesVisible,m_VisibleLeaves.Count());
+		g_MaxLeavesVisible = max((intp)g_MaxLeavesVisible,m_VisibleLeaves.Count());
 		m_SortList.Reset();
 		m_AlphaSortList.Reset();
 		m_DispSortList.Reset();

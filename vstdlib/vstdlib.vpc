@@ -58,27 +58,27 @@ $Project "vstdlib"
 	$Folder	"Source Files"
 	{
         $File "GetStackPtr64.masm" [$WIN64]
-        {
-            $Configuration
-            {   
-                $CustomBuildStep
-                {
-                    // General
-                    $CommandLine                "$QUOTE$(VCInstallDir)bin\x86_amd64\ml64.exe$QUOTE /nologo /c /Fo$QUOTE$(IntDir)\$(InputName).obj$QUOTE $QUOTE$(InputPath)$QUOTE"
-                    $Description                "Compiling GetStackPtr64.masm"
-                    $Outputs                    "$(IntDir)\$(InputName).obj"
-                }       
-            }           
-        }
-		$File "coroutine_win64.masm" [$WIN64]
 		{
 			$Configuration
-			{
+			{   
 				$CustomBuildStep
 				{
 					// General
-					$CommandLine                "$QUOTE$(VCInstallDir)bin\x86_amd64\ml64.exe$QUOTE /c /Fo$QUOTE$(IntDir)\$(InputName).obj$QUOTE $QUOTE$(InputPath)$QUOTE"
-					$Description                "Compiling coroutine_win64.masm"
+					$CommandLine                "ml64.exe /nologo /c /Fo$QUOTE$(IntDir)\$(InputName).obj$QUOTE $QUOTE$(InputPath)$QUOTE"
+					$Description                "Compiling $(InputName).masm"
+					$Outputs                    "$(IntDir)\$(InputName).obj"
+				}
+			}
+		}
+		$File "coroutine_win64.masm" [$WIN64]
+		{
+			$Configuration
+			{   
+				$CustomBuildStep
+				{
+					// General
+					$CommandLine                "ml64.exe /nologo /c /Fo$QUOTE$(IntDir)\$(InputName).obj$QUOTE $QUOTE$(InputPath)$QUOTE"
+					$Description                "Compiling $(InputName).masm"
 					$Outputs                    "$(IntDir)\$(InputName).obj"
 				}
 			}

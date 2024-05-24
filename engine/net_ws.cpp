@@ -2188,7 +2188,7 @@ void NET_SendQueuedPackets()
 //			tolen - 
 // Output : int
 //-----------------------------------------------------------------------------
-static volatile int32 s_SplitPacketSequenceNumber[ MAX_SOCKETS ] = {1};
+static CInterlockedInt s_SplitPacketSequenceNumber[ MAX_SOCKETS ] = {1};
 static ConVar net_splitpacket_maxrate( "net_splitpacket_maxrate", SPLITPACKET_MAX_DATA_BYTES_PER_SECOND, 0, "Max bytes per second when queueing splitpacket chunks", true, MIN_RATE, true, MAX_RATE );
 
 int NET_SendLong( INetChannel *chan, int sock, SOCKET s, const char FAR * buf, int len, const struct sockaddr FAR * to, int tolen, int nMaxRoutableSize )
@@ -2206,7 +2206,7 @@ int NET_SendLong( INetChannel *chan, int sock, SOCKET s, const char FAR * buf, i
 	}
 	else
 	{
-		nSequenceNumber = ThreadInterlockedIncrement( &s_SplitPacketSequenceNumber[ sock ] );
+		nSequenceNumber = ++s_SplitPacketSequenceNumber[ sock ];
 	}
 
 	const char *sendbuf = buf;

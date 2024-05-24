@@ -74,7 +74,7 @@ typedef CDataManager<DataCacheItem_t, DataCacheItemData_t, DataCacheItem_t *, CT
 //			areas of the cache with thier own memory constraints and common
 //			management.
 //-----------------------------------------------------------------------------
-class CDataCacheSection : public IDataCacheSection
+class CDataCacheSection : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT, IDataCacheSection>
 {
 public:
 	CDataCacheSection( CDataCache *pSharedCache, IDataCacheClient *pClient, const char *pszName );
@@ -173,7 +173,7 @@ private:
 	void NoteUnlock( int size );
 	void NoteSizeChanged( int oldSize, int newSize );
 
-	struct FrameLock_t
+	struct TSLIST_NODE_ALIGN FrameLock_t : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT>
 	{
 		//$ WARNING: This needs a TSLNodeBase_t as the first item in here.
 		TSLNodeBase_t	base;

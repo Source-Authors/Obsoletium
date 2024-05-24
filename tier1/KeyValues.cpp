@@ -234,7 +234,7 @@ public:
 	// Constructor
 	CKeyValuesGrowableStringTable() :
 		#ifdef PLATFORM_64BITS
-			m_vecStrings( 0, 4 * 512 * 1024 )
+			m_vecStrings( (intp)0, 4 * 512 * 1024 )
 		#else
 			m_vecStrings( 0, 512 * 1024 )
 		#endif

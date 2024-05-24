@@ -312,7 +312,7 @@ private:
 	// Structures used to assign sort order handles
 	struct SortOrderInfo_t
 	{
-		int	m_MaterialEnum;
+		intp	m_MaterialEnum;
 		int	m_RefCount;
 	};
 
@@ -605,7 +605,7 @@ void CShadowMgr::SetMaterial( Shadow_t& shadow, IMaterial* pMaterial, IMaterial*
 	}
 
 	// Search the sort order handles for an enumeration id match
-	int materialEnum = (int)pMaterial;
+	intp materialEnum = (intp)pMaterial;
 	for (unsigned short i = m_SortOrderIds.Head(); i != m_SortOrderIds.InvalidIndex();
 		i = m_SortOrderIds.Next(i) )
 	{

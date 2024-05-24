@@ -24,11 +24,13 @@ $Configuration "Debug"
 		$PreprocessorDefinitions		"$BASE;STAGING_ONLY" [$STAGING_ONLY]
 		$PreprocessorDefinitions		"$BASE;TF_BETA" [$TF_BETA]
 		$PreprocessorDefinitions		"$BASE;RAD_TELEMETRY_DISABLED" [$SOURCESDK]
+
 		// dimhotepus: NO_STEAM
 		$PreprocessorDefinitions		"$BASE;NO_STEAM" [$NO_STEAM]
-// Need to revisit the code to make things run with the _RETAIL preprocessor definition
-// This line was added in the previous check-in, but had previously not been defined in this branch
-//		$PreprocessorDefinitions		"$BASE;_RETAIL"		[$RETAIL]
+
+		// Need to revisit the code to make things run with the _RETAIL preprocessor definition
+		// This line was added in the previous check-in, but had previously not been defined in this branch
+		// $PreprocessorDefinitions		"$BASE;_RETAIL"		[$RETAIL]
 	}
 }
 
@@ -41,10 +43,12 @@ $Configuration "Release"
 		$PreprocessorDefinitions		"$BASE;STAGING_ONLY" [$STAGING_ONLY]
 		$PreprocessorDefinitions		"$BASE;TF_BETA" [$TF_BETA]
 		$PreprocessorDefinitions		"$BASE;RAD_TELEMETRY_DISABLED" [$SOURCESDK]
+
 		// dimhotepus: NO_STEAM
 		$PreprocessorDefinitions		"$BASE;NO_STEAM" [$NO_STEAM]
-// Need to revisit the code to make things run with the _RETAIL preprocessor definition
-// This line was added in the previous check-in, but had previously not been defined in this branch
-//		$PreprocessorDefinitions		"$BASE;_RETAIL"		[$RETAIL]
+
+		// Need to revisit the code to make things run with the _RETAIL preprocessor definition
+		// This line was added in the previous check-in, but had previously not been defined in this branch
+		// $PreprocessorDefinitions		"$BASE;_RETAIL"		[$RETAIL]
 	}
 }

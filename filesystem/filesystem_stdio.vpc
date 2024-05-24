@@ -48,7 +48,8 @@ $Configuration
 	}
 	$Linker
 	{
-			$SystemLibraries                                                        "iconv" [$OSXALL]
+			$AdditionalDependencies			"$BASE Shell32.lib" [$WINDOWS]
+			$SystemLibraries				"iconv" [$OSXALL]
 	}
 }
 

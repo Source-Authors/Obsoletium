@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------
 // Handle to a process
 //-----------------------------------------------------------------------------
-typedef int ProcessHandle_t;
+typedef intp ProcessHandle_t;
 enum
 {
 	PROCESS_HANDLE_INVALID = 0,

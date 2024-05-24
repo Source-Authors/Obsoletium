@@ -2300,7 +2300,7 @@ static unsigned PanelJobWrapperFn( void *pvContext )
 		ThreadSleep( ( pAsync->m_flLeastExecuteTime - flElapsedTime ) * 1000 );
 	}
 
-	ReleaseThreadHandle( ( ThreadHandle_t ) pAsync->m_hThreadHandle );
+	ReleaseThreadHandle( ( ThreadHandle_t ) pAsync->m_hThreadHandle.operator void *() );
 	pAsync->m_hThreadHandle = NULL;
 
 	return 0;

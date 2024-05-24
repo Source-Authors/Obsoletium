@@ -198,8 +198,8 @@ inline UtlHashHandle_t CUtlHash<Data, C, K>::BuildHandle( int ndxBucket, int ndx
 template<class Data, typename C, typename K>
 inline void CUtlHash<Data, C, K>::Purge( void )
 {
-	int bucketCount = m_Buckets.Count();
-	for( int ndxBucket = 0; ndxBucket < bucketCount; ndxBucket++ )
+	intp bucketCount = m_Buckets.Count();
+	for( intp ndxBucket = 0; ndxBucket < bucketCount; ndxBucket++ )
 	{
 		m_Buckets[ndxBucket].Purge();
 	}

@@ -70,18 +70,18 @@ void WaitForDebuggerConnect(int argc, char *argv[], int time) {
 }  // namespace
 
 int main(int argc, char *argv[]) {
-  const source::ScopedDll launcher_dll {
-#if !defined(PLATFORM_64BITS)
-    "bin/launcher" DLL_EXT_STRING
+  const char kLauncherPath[] =
+#ifndef
+      "bin/x64/launcher" DLL_EXT_STRING;
 #else
-    "bin/x64/launcher" DLL_EXT_STRING
+      "bin/launcher" DLL_EXT_STRING;
 #endif
-        ,
-        RTLD_NOW
+  const source::ScopedDll launcher_dll {
+     kLauncherPath, RTLD_NOW
   };
   if (!launcher_dll) {
-    fprintf(stderr, "Failed to load the bin/launcher" DLL_EXT_STRING ": %s.\n",
-            ::dlerror());
+    fprintf(stderr, "Failed to load the %s: %s.\n",
+            kLauncherPath, ::dlerror());
     return 1;
   }
 

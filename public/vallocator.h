@@ -19,12 +19,13 @@
 #ifndef VALLOCATOR_H
 #define VALLOCATOR_H
 
+#include <cstddef>
 
 class VAllocator
 {
 public:
-	virtual void*	Alloc(unsigned long size)=0;
-	virtual void	Free(void *ptr)=0;
+	virtual void*	Alloc(size_t size) = 0;
+	virtual void	Free(void *ptr) = 0;
 };
 
 
@@ -32,11 +33,11 @@ public:
 class VStdAllocator : public VAllocator
 {
 public:
-	virtual void*	Alloc(unsigned long size);
-	virtual void	Free(void *ptr);
+	void*	Alloc(size_t size) override;
+	void	Free(void *ptr) override;
 };
-extern VStdAllocator g_StdAllocator;
 
+extern VStdAllocator g_StdAllocator;
 
 
 // Use these to allocate classes through VAllocator.
@@ -67,16 +68,16 @@ inline void operator delete(void *ptrToDelete, void *ptr, DummyAllocatorHelper *
 
 // Use these to manually construct and destruct lists of objects.
 template<class T>
-inline void VAllocator_CallConstructors(T *pObjects, int count=1)
+inline void VAllocator_CallConstructors(T *pObjects, ptrdiff_t count=1)
 {
-	for(int i=0; i < count; i++)
+	for(ptrdiff_t i=0; i < count; i++)
 		new(&pObjects[i], (DummyAllocatorHelper*)0) T;
 }
 
 template<class T>
-inline void VAllocator_CallDestructors(T *pObjects, int count)
+inline void VAllocator_CallDestructors(T *pObjects, ptrdiff_t count)
 {
-	for(int i=0; i < count; i++)
+	for(ptrdiff_t i=0; i < count; i++)
 		pObjects[i].~T();
 }
 
