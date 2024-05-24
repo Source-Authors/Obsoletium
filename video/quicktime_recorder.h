@@ -15,10 +15,6 @@
 	#include <quicktime/QTML.h>
 	#include <quicktime/Movies.h>
 	#include <quicktime/QuickTimeComponents.h>
-#elif defined( WIN32 )
-	#include "QTML.h"
-	#include "Movies.h"
-	#include "QuickTimeComponents.h"
 #else
     #error "Quicktime encoding is not supported on this platform"
 #endif

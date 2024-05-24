@@ -13,54 +13,27 @@ $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
+// dimhotepus: Win32 - drop Quicktime support as Apple dropped it (no x64 for example)
+
 $Configuration
 {
-	$Compiler
-	{
-		// Win32 - need to point to Quicktime 7 for Win SDK directory so that dependant includes will work
-		$AdditionalIncludeDirectories	"$BASE,..\common\quicktime_win32\"		[$WIN32]
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\dx9sdk\include"			[$WIN32]
-	}
 	$Linker
 	{
-		$IgnoreImportLibrary				"Yes" [$WIN32]
-		$AdditionalDependencies				"$BASE vfw32.lib dsound.lib dxguid.lib" [$WIN32]
 		$SystemLibraries                    "iconv" [$OSXALL]
 		$SystemFrameworks					"Quicktime;Carbon" [$OSXALL]
-		$AdditionalLibraryDirectories		"$BASE;$SRCDIR\dx9sdk\lib"	[$WIN32]
 	}
 }
-
-
-$Configuration  "Debug"
-{
-        $General
-        {
-                $OutputDirectory                        "Debug_Video_Quicktime" [$WINDOWS]
-                $IntermediateDirectory                  "Debug_Video_Quicktime" [$WINDOWS]
-        }
-}
-
-$Configuration  "Release"
-{
-        $General
-        {
-                $OutputDirectory                        "Release_Video_Quicktime" [$WINDOWS]
-                $IntermediateDirectory                  "Release_Video_Quicktime" [$WINDOWS]
-        }
-}
-
 
 $Project "video_quicktime"
 {
-	$Folder	"Source Files"   [$OSXALL||$WIN32]
+	$Folder	"Source Files"   [$OSXALL]
 	{
 		$file	"quicktime_video.cpp"
 		$file	"quicktime_material.cpp"
 		$file	"quicktime_recorder.cpp"
 	}
 
-	$Folder	"Header Files"   [$OSXALL||$WIN32]
+	$Folder	"Header Files"   [$OSXALL]
 	{
 		$file   "videosubsystem.h"
 		$file   "video_macros.h"
@@ -75,8 +48,6 @@ $Project "video_quicktime"
 	$Folder "Link Libraries"
 	{
 		$Lib tier2
-		$File   "$SRCDIR\lib\common\quicktime\QTMLClient.lib"		[$WIN32]
-		
 	}
 }
 
