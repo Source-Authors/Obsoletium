@@ -155,9 +155,20 @@ IAudioStream *CAudioMixerWaveMP3::GetStream()
 			//Assert( m_pStream->GetOutputRate() == m_pData->Source().SampleRate() );
 		}
 
+		static char lastFileName[MAX_PATH] = {'\0'};
+
 		if ( !m_pStream )
 		{
-			Warning( "Failed to create decoder for MP3 [ %s ]\n", m_pData->Source().GetFileName() );
+			const char *fileName{m_pData->Source().GetFileName()};
+
+			// dimhotepus: Do not spam console when no MSS codec.
+			if ( V_strcmp( lastFileName, fileName ) )
+			{
+				Warning( "Failed to create decoder for MP3 [ %s ]\n", fileName );
+
+				V_strcpy_safe( lastFileName, fileName );
+			}
+
 		}
 	}
 

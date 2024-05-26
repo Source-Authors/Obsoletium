@@ -7,6 +7,7 @@
 
 #include "milesbase.h"
 #include "tier0/dbg.h"
+#include "tier1/strtools.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -158,13 +159,23 @@ void ASISTRUCT::Clear()
 
 bool ASISTRUCT::Init( void *pCallbackObject, const char *pInputFileType, const char *pOutputFileType, AILASIFETCHCB cb )
 {
+	static char lastInputFileType[128] = {'\0'}, lastOutputFileType[128] = {'\0'};
+
 	// Get the provider.
 	HPROVIDER hProvider = RIB_find_files_provider( "ASI codec", 
 		"Output file types", pOutputFileType, "Input file types", pInputFileType );
 	if ( !hProvider )
 	{
-		DevWarning( "Can't find provider 'ASI codec' for input %s, output %s\n",
-			pInputFileType, pOutputFileType );
+		// dimhotepus: Do not spam console when no MSS codec.
+		if ( V_strcmp( lastInputFileType, pInputFileType ) || strcmp( lastOutputFileType, pOutputFileType ) )
+		{
+			DevWarning( "Can't find provider 'ASI codec' for input %s, output %s\n",
+				pInputFileType, pOutputFileType );
+
+			V_strcpy_safe( lastInputFileType, pInputFileType );
+			V_strcpy_safe( lastOutputFileType, pOutputFileType );
+		}
+
 		return false;
 	}
 
