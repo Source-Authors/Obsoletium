@@ -324,9 +324,6 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 
 		return SetResult( VideoResult::VIDEO_ERROR_OCCURED );
 	}
-	
-	nNewWidth = ( displayXOffset + nBufferWidth );
-	nNewHeight = ( displayYOffset + nBufferHeight );
 
 	// Create a buffer to decompress to
 	// NOTE: The DIB version is the only one we can call on without DirectDraw
@@ -343,7 +340,7 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 	}
 
 	// Scale if we need to
-	BinkBufferSetScale( hBINKBuffer, nNewWidth, nNewHeight );
+	BinkBufferSetScale( hBINKBuffer, nBufferWidth, nBufferHeight );
 
 	// Offset to the middle of the screen
 	BinkBufferSetOffset( hBINKBuffer, displayXOffset, displayYOffset );
