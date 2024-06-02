@@ -10,14 +10,15 @@
 
 #include "winlite.h"
 
-#include "appframework/vguimatsysapp.h"
+#include "appframework/AppFramework.h"
+#include "appframework/VguiMatSysApp.h"
 #include "filesystem.h"
 #include "materialsystem/imaterialsystem.h"
-#include "vgui/ivgui.h"
+#include "vgui/IVGui.h"
 #include "vgui/ISurface.h"
-#include "vgui_controls/controls.h"
-#include "vgui/ischeme.h"
-#include "vgui/ilocalize.h"
+#include "vgui_controls/Controls.h"
+#include "vgui/IScheme.h"
+#include "vgui/ILocalize.h"
 #include "tier0/dbg.h"
 #include "tier0/icommandline.h"
 #include "materialsystem/materialsystem_config.h"
@@ -48,8 +49,7 @@ bool CVguiMatSysApp::Create()
 	if ( !AddSystems( appSystems ) ) 
 		return false;
 
-	IMaterialSystem *pMaterialSystem = (IMaterialSystem*)FindSystem( MATERIAL_SYSTEM_INTERFACE_VERSION );
-
+	IMaterialSystem *pMaterialSystem = FindSystem<IMaterialSystem>( MATERIAL_SYSTEM_INTERFACE_VERSION );
 	if ( !pMaterialSystem )
 	{
 		Warning( "CVguiMatSysApp::Create: Unable to connect to necessary interface!\n" );
@@ -79,13 +79,12 @@ void CVguiMatSysApp::Destroy()
 //-----------------------------------------------------------------------------
 void*CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w, int h )
 {
-	WNDCLASSEX		wc = {sizeof( wc )};
+	WNDCLASSEX	wc = {sizeof( wc ), 0, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	wc.style         = CS_OWNDC | CS_DBLCLKS;
 	wc.lpfnWndProc   = DefWindowProc;
-	wc.hInstance     = (HINSTANCE)GetAppInstance();
+	wc.hInstance     = static_cast<HINSTANCE>(GetAppInstance());
 	wc.lpszClassName = "Valve001";
-	wc.hIcon				 = NULL;
-	wc.hIconSm			 = wc.hIcon;
+	wc.hIconSm       = wc.hIcon;
 
 	RegisterClassEx( &wc );
 
@@ -102,9 +101,7 @@ void*CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w,
 	// Never a max box
 	style &= ~WS_MAXIMIZEBOX;
 
-	RECT windowRect;
-	windowRect.top		= 0;
-	windowRect.left		= 0;
+	RECT windowRect = {};
 	windowRect.right	= w;
 	windowRect.bottom	= h;
 
@@ -114,10 +111,10 @@ void*CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w,
 	// Create the window
 	HWND hWnd = CreateWindow( wc.lpszClassName, pTitle, style, 0, 0, 
 		windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, 
-		NULL, NULL, (HINSTANCE)GetAppInstance(), NULL );
+		nullptr, nullptr, static_cast<HINSTANCE>(GetAppInstance()), nullptr );
 
 	if (!hWnd)
-		return NULL;
+		return nullptr;
 
 	int CenterX = (GetSystemMetrics(SM_CXSCREEN) - w) / 2;
 	int CenterY = (GetSystemMetrics(SM_CYSCREEN) - h) / 2;
@@ -125,7 +122,7 @@ void*CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w,
 	CenterY = (CenterY < 0) ? 0: CenterY;
 
 	// In VCR modes, keep it in the upper left so mouse coordinates are always relative to the window.
-	SetWindowPos( (HWND)hWnd, NULL, CenterX, CenterY, 0, 0,
+	SetWindowPos( hWnd, nullptr, CenterX, CenterY, 0, 0,
 		SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_DRAWFRAME);
 
 	return hWnd;
@@ -169,13 +166,13 @@ bool CVguiMatSysApp::PreInit( )
 	}
 
 	// Add paths...
-	if ( !SetupSearchPaths( NULL, false, true ) )
+	if ( !SetupSearchPaths( nullptr, false, true ) )
 		return false;
 
 	const char *pArg;
 	int iWidth = 1024;
 	int iHeight = 768;
-	bool bWindowed = (CommandLine()->CheckParm( "-fullscreen" ) == NULL);
+	bool bWindowed = (CommandLine()->CheckParm( "-fullscreen" ) == nullptr);
 	if (CommandLine()->CheckParm( "-width", &pArg ))
 	{
 		iWidth = atoi( pArg );
@@ -224,7 +221,7 @@ void CVguiMatSysApp::PostShutdown()
 {
 	if ( g_pMatSystemSurface && g_pInputSystem )
 	{
-		g_pMatSystemSurface->AttachToWindow( NULL );
+		g_pMatSystemSurface->AttachToWindow( nullptr );
 		g_pInputSystem->DetachFromWindow( );
 	}
 

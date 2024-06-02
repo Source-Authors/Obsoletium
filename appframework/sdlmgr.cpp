@@ -1444,7 +1444,7 @@ void CSDLMgr::handleKeyInput( const SDL_Event &event )
 	if ( CommandLine()->FindParm( "-nonqwerty" ) )
 	{
 		const char* keyname = SDL_GetKeyName( event.key.keysym.sym );
-		if ( keyname != NULL && strlen( keyname ) == 1) {
+		if ( keyname != NULL && V_strlen( keyname ) == 1) {
 			const char c = *keyname;
 			if ( c >= 'A' && c <= 'Z' )
 			{

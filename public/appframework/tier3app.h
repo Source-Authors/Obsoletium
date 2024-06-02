@@ -16,6 +16,7 @@
 
 
 #include "appframework/tier2app.h"
+#include "tier1/interface.h"
 #include "tier3/tier3.h"
 #include "vgui_controls/Controls.h"
 
