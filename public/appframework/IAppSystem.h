@@ -10,6 +10,7 @@
 #define IAPPSYSTEM_H
 
 #include "tier1/interface.h"
+#include "tier0/platform.h"
 
 
 //-----------------------------------------------------------------------------
@@ -49,17 +50,17 @@ public:
 //-----------------------------------------------------------------------------
 // Helper empty implementation of an IAppSystem
 //-----------------------------------------------------------------------------
-template< typename IInterface > 
+template<typename IInterface> 
 class CBaseAppSystem : public IInterface
 {
 public:
 	// Here's where the app systems get to learn about each other 
-	bool Connect( CreateInterfaceFn factory ) override { return true; }
+	bool Connect( CreateInterfaceFn ) override { return true; }
 	void Disconnect() override {}
 
 	// Here's where systems can access other interfaces implemented by this object
 	// Returns NULL if it doesn't implement the requested interface
-	void *QueryInterface( const char *pInterfaceName ) override { return NULL; }
+	void *QueryInterface( const char * ) override { return nullptr; }
 
 	// Init, shutdown
 	InitReturnVal_t Init() override { return INIT_OK; }
@@ -70,8 +71,8 @@ public:
 //-----------------------------------------------------------------------------
 // Helper implementation of an IAppSystem for tier0
 //-----------------------------------------------------------------------------
-template< typename IInterface > 
-class CTier0AppSystem : public CBaseAppSystem< IInterface >
+template<typename IInterface> 
+class CTier0AppSystem : public CBaseAppSystem<IInterface>
 {
 public:
 	CTier0AppSystem( bool bIsPrimaryAppSystem = true ) : m_bIsPrimaryAppSystem{ bIsPrimaryAppSystem }
