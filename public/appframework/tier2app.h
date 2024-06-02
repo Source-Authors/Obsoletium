@@ -15,8 +15,12 @@
 #define TIER2APP_H
 
 
-#include "appframework/AppFramework.h"
+#include "appframework/IAppSystemGroup.h"
+#include "appframework/IAppSystem.h"
+#include "tier2/tier2.h"
 #include "tier2/tier2dm.h"
+#include "tier1/tier1.h"
+#include "tier1/interface.h"
 #include "tier1/convar.h"
 
 

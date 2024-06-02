@@ -15,11 +15,13 @@
 #ifndef IAPPSYSTEMGROUP_H
 #define IAPPSYSTEMGROUP_H
 
+#include <type_traits>
 
+#include "tier0/platform.h"
 #include "tier1/interface.h"
 #include "tier1/utlvector.h"
 #include "tier1/utldict.h"
-#include "IAppSystem.h"
+#include "appframework/IAppSystem.h"
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -32,7 +34,7 @@ class IFileSystem;
 //-----------------------------------------------------------------------------
 // Handle to a DLL
 //-----------------------------------------------------------------------------
-using AppModule_t = int;
+using AppModule_t = intp;
 
 enum
 {
@@ -103,7 +105,8 @@ public:
 
 public:
 	// constructor
-	CAppSystemGroup( CAppSystemGroup *pParentAppSystem = NULL );
+	CAppSystemGroup( CAppSystemGroup *pParentAppSystem = nullptr );
+	virtual ~CAppSystemGroup() {}
 
 	// Runs the app system group.
 	// First, modules are loaded, next they are connected, followed by initialization
@@ -128,6 +131,14 @@ protected:
 
 	// Method to add various global singleton systems 
 	IAppSystem *AddSystem( AppModule_t module, const char *pInterfaceName );
+
+	template<typename TAppSystem>
+	std::enable_if_t<std::is_base_of_v<IAppSystem, TAppSystem>, TAppSystem *>
+	AddSystem( AppModule_t module, const char *pInterfaceName )
+	{
+		return static_cast<TAppSystem *>( AddSystem( module, pInterfaceName ) );
+	}
+
 	void AddSystem( IAppSystem *pAppSystem, const char *pInterfaceName );
 
 	// Simpler method of doing the LoadModule/AddSystem thing.
@@ -136,6 +147,12 @@ protected:
 
 	// Method to look up a particular named system...
 	void *FindSystem( const char *pInterfaceName );
+
+	template<typename TSystem>
+	TSystem *FindSystem( const char *pInterfaceName )
+	{
+		return static_cast<TSystem *>( FindSystem( pInterfaceName ) );
+	}
 
 	// Gets at a class factory for the topmost appsystem group in an appsystem stack
 	static CreateInterfaceFn GetFactory();
@@ -161,7 +178,7 @@ private:
 	// Loads a module the standard way
 	virtual CSysModule *LoadModuleDLL( const char *pDLLName );
 
-	void	ReportStartupFailure( int nErrorStage, int nSysIndex );
+	void	ReportStartupFailure( int nErrorStage, intp nSysIndex );
 
 	struct Module_t
 	{
@@ -172,7 +189,7 @@ private:
 
 	CUtlVector<Module_t> m_Modules;
 	CUtlVector<IAppSystem*> m_Systems;
-	CUtlDict<int, unsigned short> m_SystemDict;
+	CUtlDict<intp> m_SystemDict;
 	CAppSystemGroup *m_pParentAppSystem;
 	AppSystemGroupStage_t m_nErrorStage;
 
@@ -187,7 +204,7 @@ private:
 class CSteamAppSystemGroup : public CAppSystemGroup
 {
 public:
-	CSteamAppSystemGroup( IFileSystem *pFileSystem = NULL, CAppSystemGroup *pParentAppSystem = NULL );
+	CSteamAppSystemGroup( IFileSystem *pFileSystem = nullptr, CAppSystemGroup *pParentAppSystem = nullptr );
 
 	// Used by CSteamApplication to set up necessary pointers if we can't do it in the constructor
 	void Setup( IFileSystem *pFileSystem, CAppSystemGroup *pParentAppSystem );
@@ -200,7 +217,7 @@ protected:
 	const char *GetGameInfoPath() const;
 
 private:
-	virtual CSysModule *LoadModuleDLL( const char *pDLLName );
+	CSysModule *LoadModuleDLL( const char *pDLLName ) override;
 
 	IFileSystem *m_pFileSystem;
 	char m_pGameInfoPath[ MAX_PATH ];
@@ -210,7 +227,7 @@ private:
 //-----------------------------------------------------------------------------
 // Helper empty decorator implementation of an IAppSystemGroup
 //-----------------------------------------------------------------------------
-template< typename CBaseClass > 
+template<typename CBaseClass> 
 class CDefaultAppSystemGroup : public CBaseClass
 {
 public:

@@ -23,7 +23,7 @@
 CAppSystemGroup::CAppSystemGroup( CAppSystemGroup *pAppSystemParent ) : m_SystemDict(false, 0, 16)
 {
 	m_pParentAppSystem = pAppSystemParent;
-  m_nErrorStage = NONE;
+	m_nErrorStage = NONE;
 }
 
 
@@ -42,16 +42,18 @@ CSysModule *CAppSystemGroup::LoadModuleDLL( const char *pDLLName )
 AppModule_t CAppSystemGroup::LoadModule( const char *pDLLName )
 {
 	// Remove the extension when creating the name.
-	size_t nLen = strlen( pDLLName ) + 1;
+	size_t nLen = V_strlen( pDLLName ) + 1;
 	char *pModuleName = (char*)stackalloc( nLen );
 	Q_StripExtension( pDLLName, pModuleName, nLen );
 
 	// See if we already loaded it...
-	for ( int i = m_Modules.Count(); --i >= 0; ) 
+	for ( auto i = m_Modules.Count(); --i >= 0; ) 
 	{
-		if ( m_Modules[i].m_pModuleName )
+		const auto &module = m_Modules[i];
+
+		if ( module.m_pModuleName )
 		{
-			if ( !Q_stricmp( pModuleName, m_Modules[i].m_pModuleName ) )
+			if ( !Q_stricmp( pModuleName, module.m_pModuleName ) )
 				return i;
 		}
 	}
@@ -81,19 +83,21 @@ AppModule_t CAppSystemGroup::LoadModule( CreateInterfaceFn factory )
 	}
 
 	// See if we already loaded it...
-	for ( int i = m_Modules.Count(); --i >= 0; ) 
+	for ( auto i = m_Modules.Count(); --i >= 0; ) 
 	{
-		if ( m_Modules[i].m_Factory )
+		const auto &module = m_Modules[i];
+
+		if ( module.m_Factory )
 		{
-			if ( m_Modules[i].m_Factory == factory )
+			if ( module.m_Factory == factory )
 				return i;
 		}
 	}
 
 	auto nIndex = m_Modules.AddToTail();
-	m_Modules[nIndex].m_pModule = NULL;
+	m_Modules[nIndex].m_pModule = nullptr;
 	m_Modules[nIndex].m_Factory = factory;
-	m_Modules[nIndex].m_pModuleName = NULL; 
+	m_Modules[nIndex].m_pModuleName = nullptr; 
 	return nIndex;
 }
 
@@ -101,15 +105,17 @@ void CAppSystemGroup::UnloadAllModules()
 {
 	// NOTE: Iterate in reverse order so they are unloaded in opposite order
 	// from loading
-	for (int i = m_Modules.Count(); --i >= 0; )
+	for ( auto i = m_Modules.Count(); --i >= 0; )
 	{
-		if ( m_Modules[i].m_pModule )
+		const auto &module = m_Modules[i];
+
+		if ( module.m_pModule )
 		{
-			Sys_UnloadModule( m_Modules[i].m_pModule );
+			Sys_UnloadModule( module.m_pModule );
 		}
-		if ( m_Modules[i].m_pModuleName )
+		if ( module.m_pModuleName )
 		{
-			free( m_Modules[i].m_pModuleName );
+			free( module.m_pModuleName );
 		}
 	}
 	m_Modules.RemoveAll();
@@ -125,7 +131,9 @@ IAppSystem *CAppSystemGroup::AddSystem( AppModule_t module, const char *pInterfa
 		return NULL;
 
 	Assert( (module >= 0) && (module < m_Modules.Count()) );
-	CreateInterfaceFn pFactory = m_Modules[module].m_pModule ? Sys_GetFactory( m_Modules[module].m_pModule ) : m_Modules[module].m_Factory;
+	CreateInterfaceFn pFactory = m_Modules[module].m_pModule
+		? Sys_GetFactory( m_Modules[module].m_pModule )
+		: m_Modules[module].m_Factory;
 
 	int retval;
 	void *pSystem = pFactory( pInterfaceName, &retval );
@@ -157,10 +165,10 @@ static char const *g_StageLookup[] =
 	"NONE",
 };
 
-void CAppSystemGroup::ReportStartupFailure( int nErrorStage, int nSysIndex )
+void CAppSystemGroup::ReportStartupFailure( int nErrorStage, intp nSysIndex )
 {
 	char const *pszStageDesc = "Unknown";
-	if ( nErrorStage >= 0 && nErrorStage < ARRAYSIZE( g_StageLookup ) )
+	if ( nErrorStage >= 0 && nErrorStage < ssize( g_StageLookup ) )
 	{
 		pszStageDesc = g_StageLookup[ nErrorStage ];
 	}
@@ -228,7 +236,7 @@ bool CAppSystemGroup::AddSystems( AppSystemInfo_t *pSystemList )
 //-----------------------------------------------------------------------------
 void *CAppSystemGroup::FindSystem( const char *pSystemName )
 {
-	unsigned short i = m_SystemDict.Find( pSystemName );
+	auto i = m_SystemDict.Find( pSystemName );
 	if (i != m_SystemDict.InvalidIndex())
 		return m_Systems[m_SystemDict[i]];
 
@@ -271,7 +279,7 @@ CAppSystemGroup *CAppSystemGroup::GetParent()
 //-----------------------------------------------------------------------------
 bool CAppSystemGroup::ConnectSystems()
 {
-	int i { 0 };
+	intp i { 0 };
 	for ( auto *sys : m_Systems )
 	{
 		if (!sys->Connect( GetFactory() ))
@@ -288,7 +296,7 @@ bool CAppSystemGroup::ConnectSystems()
 void CAppSystemGroup::DisconnectSystems()
 {
 	// Disconnect in reverse order of connection
-	for (int i = m_Systems.Count(); --i >= 0; )
+	for ( auto i = m_Systems.Count(); --i >= 0; )
 	{
 		m_Systems[i]->Disconnect();
 	}
@@ -300,7 +308,7 @@ void CAppSystemGroup::DisconnectSystems()
 //-----------------------------------------------------------------------------
 InitReturnVal_t CAppSystemGroup::InitSystems()
 {
-	int i { 0 };
+	intp i { 0 };
 	for ( auto *sys : m_Systems )
 	{
 		InitReturnVal_t nRetVal = sys->Init();
@@ -318,7 +326,7 @@ InitReturnVal_t CAppSystemGroup::InitSystems()
 void CAppSystemGroup::ShutdownSystems()
 {
 	// Shutdown in reverse order of initialization
-	for (int i = m_Systems.Count(); --i >= 0; )
+	for ( auto i = m_Systems.Count(); --i >= 0; )
 	{
 		m_Systems[i]->Shutdown();
 	}
@@ -339,7 +347,7 @@ CAppSystemGroup::AppSystemGroupStage_t CAppSystemGroup::GetErrorStage() const
 //-----------------------------------------------------------------------------
 // This function is used to make this system appear to the outside world to
 // function exactly like the currently existing factory system
-CAppSystemGroup *s_pCurrentAppSystem;
+static CAppSystemGroup *s_pCurrentAppSystem;
 void *AppSystemCreateInterfaceFn(const char *pName, int *pReturnCode)
 {
 	void *pInterface = s_pCurrentAppSystem->FindSystem( pName );
@@ -374,7 +382,6 @@ int CAppSystemGroup::Run()
 		return nRetVal;
 
 	// Main loop implemented by the application
-	// FIXME: HACK workaround to avoid vgui porting
 	nRetVal = Main();
 
 	// Shutdown, disconnect, unload
