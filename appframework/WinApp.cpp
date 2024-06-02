@@ -43,7 +43,7 @@ void *GetAppInstance()
 //-----------------------------------------------------------------------------
 void SetAppInstance( void* hInstance )
 {
-	s_HInstance = (HINSTANCE)hInstance;
+	s_HInstance = static_cast<HINSTANCE>(hInstance);
 }
 
 //-----------------------------------------------------------------------------
@@ -53,7 +53,7 @@ int AppMain( void* hInstance, void*, const char*, int, CAppSystemGroup *pAppSyst
 {
 	Assert( pAppSystemGroup );
 
-	s_HInstance = (HINSTANCE)hInstance;
+	s_HInstance = static_cast<HINSTANCE>(hInstance);
 	CommandLine()->CreateCmdLine( ::GetCommandLineA() );
 
 	return pAppSystemGroup->Run();
@@ -66,7 +66,7 @@ int AppMain( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 {
 	Assert( pAppSystemGroup );
 
-	s_HInstance = NULL;
+	s_HInstance = nullptr;
 	CommandLine()->CreateCmdLine( argc, argv );
 
 	return pAppSystemGroup->Run();
@@ -79,7 +79,7 @@ int AppStartup( void* hInstance, void*, const char*, int, CAppSystemGroup *pAppS
 {
 	Assert( pAppSystemGroup );
 
-	s_HInstance = (HINSTANCE)hInstance;
+	s_HInstance = static_cast<HINSTANCE>(hInstance);
 	CommandLine()->CreateCmdLine( ::GetCommandLineA() );
 
 	return pAppSystemGroup->Startup();
@@ -89,7 +89,7 @@ int AppStartup( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 {
 	Assert( pAppSystemGroup );
 
-	s_HInstance = NULL;
+	s_HInstance = nullptr;
 	CommandLine()->CreateCmdLine( argc, argv );
 
 	return pAppSystemGroup->Startup();
@@ -115,7 +115,7 @@ void AppShutdown( CAppSystemGroup *pAppSystemGroup )
 CSteamApplication::CSteamApplication( CSteamAppSystemGroup *pAppSystemGroup )
 {
 	m_pChildAppSystemGroup = pAppSystemGroup;
-	m_pFileSystem = NULL;
+	m_pFileSystem = nullptr;
 	m_bSteam = false;
 }
 
@@ -135,7 +135,7 @@ bool CSteamApplication::Create()
 	AddSystem( cvarModule, CVAR_INTERFACE_VERSION );
 
 	AppModule_t fileSystemModule = LoadModule( pFileSystemDLL );
-	m_pFileSystem = (IFileSystem*)AddSystem( fileSystemModule, FILESYSTEM_INTERFACE_VERSION );
+	m_pFileSystem = AddSystem<IFileSystem>( fileSystemModule, FILESYSTEM_INTERFACE_VERSION );
 	if ( !m_pFileSystem )
 	{
 		Error( "Unable to load %s from %s", FILESYSTEM_INTERFACE_VERSION, pFileSystemDLL );
@@ -149,7 +149,7 @@ bool CSteamApplication::Create()
 //-----------------------------------------------------------------------------
 void CSteamApplication::Destroy()
 {
-	m_pFileSystem = NULL;
+	m_pFileSystem = nullptr;
 }
 
 //-----------------------------------------------------------------------------
