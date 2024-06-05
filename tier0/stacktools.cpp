@@ -10,15 +10,7 @@
 #if defined( PLATFORM_WINDOWS_PC )
 #include "winlite.h"
 
-#include <dbghelp.h>
-#endif
-
-#if defined( PLATFORM_X360 )
-#include <xbdm.h>
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_vxconsole.h"
-#include <map>
-#include <set>
+#include <DbgHelp.h>
 #endif
 
 #if defined( LINUX )
@@ -274,20 +266,19 @@ int GetCallStack_Fast( void **pReturnAddressesOut, int iArrayCount, int iSkipCou
 #		define STACKWALK64_MACHINETYPE IMAGE_FILE_MACHINE_AMD64
 #	endif
 #endif
-
-typedef DWORD (WINAPI *PFN_SymGetOptions)( VOID );
-typedef DWORD (WINAPI *PFN_SymSetOptions)( IN DWORD SymOptions );
-typedef BOOL (WINAPI *PFN_SymSetSearchPath)( IN HANDLE hProcess, IN PSTR SearchPath );
-typedef BOOL (WINAPI *PFN_SymInitialize)( IN HANDLE hProcess, IN PSTR UserSearchPath, IN BOOL fInvadeProcess );
-typedef BOOL (WINAPI *PFN_SymCleanup)( IN HANDLE hProcess );
-typedef BOOL (WINAPI *PFN_SymEnumerateModules64)( IN HANDLE hProcess, IN PSYM_ENUMMODULES_CALLBACK64  EnumModulesCallback, IN PVOID UserContext );
-typedef BOOL (WINAPI *PFN_EnumerateLoadedModules64)( IN HANDLE hProcess, IN PENUMLOADED_MODULES_CALLBACK64 EnumLoadedModulesCallback, IN PVOID UserContext );
-typedef DWORD64 (WINAPI *PFN_SymLoadModule64)( IN HANDLE hProcess, IN HANDLE hFile, IN PSTR ImageName, IN PSTR ModuleName, IN DWORD64 BaseOfDll, IN DWORD SizeOfDll );
-typedef BOOL (WINAPI *PFN_SymUnloadModule64)( IN HANDLE hProcess, IN DWORD64 BaseOfDll );
-typedef BOOL (WINAPI *PFN_SymFromAddr)( IN HANDLE hProcess, IN DWORD64 Address, OUT PDWORD64 Displacement, IN OUT PSYMBOL_INFO Symbol );
-typedef BOOL (WINAPI *PFN_SymGetLineFromAddr64)( IN HANDLE hProcess, IN DWORD64 qwAddr, OUT PDWORD pdwDisplacement, OUT PIMAGEHLP_LINE64 Line64 );
-typedef BOOL (WINAPI *PFN_SymGetModuleInfo64)( IN HANDLE hProcess, IN DWORD64 dwAddr, OUT PIMAGEHLP_MODULE64 ModuleInfo );
-typedef BOOL (WINAPI *PFN_StackWalk64)( DWORD MachineType, HANDLE hProcess, HANDLE hThread, LPSTACKFRAME64 StackFrame, PVOID ContextRecord, PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine, PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine, PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine, PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress );
+using PFN_SymGetOptions = decltype(&SymGetOptions);
+using PFN_SymSetOptions = decltype(&SymSetOptions);
+using PFN_SymSetSearchPath = decltype(&SymSetSearchPath);
+using PFN_SymInitialize = decltype(&SymInitialize);
+using PFN_SymCleanup = decltype(&SymCleanup);
+using PFN_SymEnumerateModules64 = decltype(&SymEnumerateModules64);
+using PFN_EnumerateLoadedModules64 = decltype(&EnumerateLoadedModules64);
+using PFN_SymLoadModule64 = decltype(&SymLoadModule64);
+using PFN_SymUnloadModule64 = decltype(&SymUnloadModule64);
+using PFN_SymFromAddr = decltype(&SymFromAddr);
+using PFN_SymGetLineFromAddr64 = decltype(&SymGetLineFromAddr64);
+using PFN_SymGetModuleInfo64 = decltype(&SymGetModuleInfo64);
+using PFN_StackWalk64 = decltype(&StackWalk64);
 using PFN_CaptureStackBackTrace = decltype(&RtlCaptureStackBackTrace);
 
 
@@ -296,69 +287,69 @@ DWORD WINAPI SymGetOptions_DummyFn( VOID )
 	return 0;
 }
 
-DWORD WINAPI SymSetOptions_DummyFn( IN DWORD SymOptions )
+DWORD WINAPI SymSetOptions_DummyFn( IN DWORD )
 {
 	return 0;
 }
 
-BOOL WINAPI SymSetSearchPath_DummyFn( IN HANDLE hProcess, IN PSTR SearchPath )
+BOOL WINAPI SymSetSearchPath_DummyFn( IN HANDLE, IN PCSTR )
 {
 	return FALSE;
 }
 
-BOOL WINAPI SymInitialize_DummyFn( IN HANDLE hProcess, IN PSTR UserSearchPath, IN BOOL fInvadeProcess )
+BOOL WINAPI SymInitialize_DummyFn( IN HANDLE, IN PCSTR, IN BOOL )
 {
 	return FALSE;
 }
 
-BOOL WINAPI SymCleanup_DummyFn( IN HANDLE hProcess )
+BOOL WINAPI SymCleanup_DummyFn( IN HANDLE )
 {
 	return TRUE;
 }
 
-BOOL WINAPI SymEnumerateModules64_DummyFn( IN HANDLE hProcess, IN PSYM_ENUMMODULES_CALLBACK64 EnumModulesCallback, IN PVOID UserContext )
+BOOL WINAPI SymEnumerateModules64_DummyFn( IN HANDLE, IN PSYM_ENUMMODULES_CALLBACK64, IN PVOID )
 {
 	return FALSE;
 }
 
-BOOL WINAPI EnumerateLoadedModules64_DummyFn( IN HANDLE hProcess, IN PENUMLOADED_MODULES_CALLBACK64 EnumLoadedModulesCallback, IN PVOID UserContext )
+BOOL WINAPI EnumerateLoadedModules64_DummyFn( IN HANDLE, IN PENUMLOADED_MODULES_CALLBACK64, IN PVOID )
 {
 	return FALSE;
 }
 
-DWORD64 WINAPI SymLoadModule64_DummyFn( IN HANDLE hProcess, IN HANDLE hFile, IN PSTR ImageName, IN PSTR ModuleName, IN DWORD64 BaseOfDll, IN DWORD SizeOfDll )
+DWORD64 WINAPI SymLoadModule64_DummyFn( IN HANDLE, IN HANDLE, IN PCSTR, IN PCSTR, IN DWORD64, IN DWORD )
 {
 	return 0;
 }
 
-BOOL WINAPI SymUnloadModule64_DummyFn( IN HANDLE hProcess, IN DWORD64 BaseOfDll )
+BOOL WINAPI SymUnloadModule64_DummyFn( IN HANDLE, IN DWORD64 )
 {
 	return FALSE;
 }
 
-BOOL WINAPI SymFromAddr_DummyFn( IN HANDLE hProcess, IN DWORD64 Address, OUT PDWORD64 Displacement, IN OUT PSYMBOL_INFO Symbol )
+BOOL WINAPI SymFromAddr_DummyFn( IN HANDLE, IN DWORD64, OUT PDWORD64, IN OUT PSYMBOL_INFO )
 {
 	return FALSE;
 }
 
-BOOL WINAPI SymGetLineFromAddr64_DummyFn( IN HANDLE hProcess, IN DWORD64 qwAddr, OUT PDWORD pdwDisplacement, OUT PIMAGEHLP_LINE64 Line64 )
+BOOL WINAPI SymGetLineFromAddr64_DummyFn( IN HANDLE, IN DWORD64, OUT PDWORD, OUT PIMAGEHLP_LINE64 )
 {
 	return FALSE;
 }
 
-BOOL WINAPI SymGetModuleInfo64_DummyFn( IN HANDLE hProcess, IN DWORD64 dwAddr, OUT PIMAGEHLP_MODULE64 ModuleInfo )
+BOOL WINAPI SymGetModuleInfo64_DummyFn( IN HANDLE, IN DWORD64, OUT PIMAGEHLP_MODULE64 )
 {
 	return FALSE;
 }
 
 
 
-BOOL WINAPI StackWalk64_DummyFn( DWORD MachineType, HANDLE hProcess, HANDLE hThread, LPSTACKFRAME64 StackFrame, PVOID ContextRecord, PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine, PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine, PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine, PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress )
+BOOL WINAPI StackWalk64_DummyFn( DWORD, HANDLE, HANDLE, LPSTACKFRAME64, PVOID, PREAD_PROCESS_MEMORY_ROUTINE64, PFUNCTION_TABLE_ACCESS_ROUTINE64, PGET_MODULE_BASE_ROUTINE64, PTRANSLATE_ADDRESS_ROUTINE64 )
 {
 	return FALSE;
 }
 
-USHORT WINAPI CaptureStackBackTrace_DummyFn( IN ULONG FramesToSkip, IN ULONG FramesToCapture, OUT PVOID *BackTrace, OUT OPTIONAL PULONG BackTraceHash )
+USHORT WINAPI CaptureStackBackTrace_DummyFn( IN ULONG, IN ULONG, OUT PVOID *, OUT OPTIONAL PULONG )
 {
 	return 0;
 }
@@ -411,22 +402,18 @@ public:
 		delete []m_szPDBSearchPath;
 	}
 
-	static BOOL CALLBACK UnloadSymbolsCallback( PSTR ModuleName, DWORD64 BaseOfDll, PVOID UserContext )
+	static BOOL CALLBACK UnloadSymbolsCallback( [[maybe_unused]] PSTR ModuleName, DWORD64 BaseOfDll, PVOID UserContext )
 	{
 		const CHelperFunctionsLoader *pThis = ((CHelperFunctionsLoader *)UserContext);
 		pThis->m_pSymUnloadModule64( pThis->m_hProcess, BaseOfDll );
 		return TRUE;
 	}
 
-#if _MSC_VER >= 1600
 	static BOOL CALLBACK LoadSymbolsCallback( PCSTR ModuleName, DWORD64 ModuleBase, ULONG ModuleSize, PVOID UserContext )
-#else
-	static BOOL CALLBACK LoadSymbolsCallback( PSTR ModuleName, DWORD64 ModuleBase, ULONG ModuleSize, PVOID UserContext )
-#endif
 	{
 		const CHelperFunctionsLoader *pThis = ((CHelperFunctionsLoader *)UserContext);
 		//SymLoadModule64( IN HANDLE hProcess, IN HANDLE hFile, IN PSTR ImageName, IN PSTR ModuleName, IN DWORD64 BaseOfDll, IN DWORD SizeOfDll );
-		pThis->m_pSymLoadModule64( pThis->m_hProcess, NULL, (PSTR)ModuleName, (PSTR)ModuleName, ModuleBase, ModuleSize );
+		pThis->m_pSymLoadModule64( pThis->m_hProcess, NULL, ModuleName, ModuleName, ModuleBase, ModuleSize );
 		return TRUE;
 	}
 
@@ -454,7 +441,7 @@ public:
 			return;
 		}
 
-		int iLength = (int)strlen( szSemicolonSeparatedList ) + 1;
+		intp iLength = (intp)strlen( szSemicolonSeparatedList ) + 1;
 		char *pNewPath = new char [iLength];
 		memcpy( pNewPath, szSemicolonSeparatedList, iLength );
 		m_szPDBSearchPath = pNewPath;
@@ -551,14 +538,14 @@ public:
 
 		tchar *pWrite = pTranslationOut;
 		*pWrite = '\0';
-		int iLength;
+		intp iLength;
 
 		if( style & TSISTYLEFLAG_MODULENAME )
 		{
 			if( !this->GetModuleNameFromAddress( pAddress, pWrite, iTranslationBufferLength ) )
 				strncpy( pWrite, "unknown_module", iTranslationBufferLength );
 
-			iLength = (int)strlen( pWrite );
+			iLength = (intp)strlen( pWrite );
 			pWrite += iLength;
 			iTranslationBufferLength -= iLength;
 
@@ -587,7 +574,7 @@ public:
 		}
 		else if( style & TSISTYLEFLAG_SYMBOLNAME )
 		{
-			iLength = (int)strlen( pWrite );
+			iLength = (intp)strlen( pWrite );
 			pWrite += iLength;
 			iTranslationBufferLength -= iLength;
 		}
@@ -618,7 +605,7 @@ public:
 			{
 				if( style & TSISTYLEFLAG_FULLPATH )
 				{
-					iLength = (int)strlen( szFileName );
+					iLength = (intp)strlen( szFileName );
 					if ( iTranslationBufferLength < iLength + 1 )
 						return false;
 
@@ -629,7 +616,7 @@ public:
 				else if( style & TSISTYLEFLAG_SHORTPATH )
 				{
 					//shorten the path and copy
-					iLength = (int)strlen( szFileName );
+					iLength = (intp)strlen( szFileName );
 					char *pShortened = szFileName + iLength;
 					int iSlashesAllowed = 3;
 					while( pShortened > szFileName )
@@ -644,7 +631,7 @@ public:
 						--pShortened;
 					}
 					
-					iLength = (int)strlen( pShortened );
+					iLength = (intp)strlen( pShortened );
 					if( iTranslationBufferLength < iLength + 1 )
 					{
 						//Remove the " - " that we can't append to
@@ -848,7 +835,7 @@ int CrawlStack_StackWalk64( CONTEXT *pExceptionContext, void **pReturnAddressesO
 	CONTEXT currentContext;
 	memcpy( &currentContext, pExceptionContext, sizeof( CONTEXT ) );
 
-	STACKFRAME64 sfFrame = { 0 }; //memset(&sfFrame, 0x0, sizeof(sfFrame));
+	STACKFRAME64 sfFrame = {}; //memset(&sfFrame, 0x0, sizeof(sfFrame));
 	sfFrame.AddrPC.Mode = sfFrame.AddrFrame.Mode = AddrModeFlat;
 #ifdef _M_X64
 	sfFrame.AddrPC.Offset = currentContext.Rip;	
@@ -929,7 +916,7 @@ void SetStackTranslationSymbolSearchPath( const char *szSemicolonSeparatedList )
 	s_HelperFunctions.SetStackTranslationSymbolSearchPath( szSemicolonSeparatedList );
 }
 
-void StackToolsNotify_LoadedLibrary( const char *szLibName )
+void StackToolsNotify_LoadedLibrary( [[maybe_unused]] const char *szLibName )
 {
 	s_HelperFunctions.m_bShouldReloadSymbols = true;
 }
@@ -942,7 +929,7 @@ int TranslateStackInfo( const void * const *pCallStack, int iCallStackCount, tch
 	if( szEntrySeparator == NULL )
 		szEntrySeparator = _T("");
 
-	int iSeparatorSize = (int)strlen( szEntrySeparator );
+	intp iSeparatorSize = (intp)strlen( szEntrySeparator );
 
 	for( int i = 0; i < iCallStackCount; ++i )
 	{
@@ -951,7 +938,7 @@ int TranslateStackInfo( const void * const *pCallStack, int iCallStackCount, tch
 			return i;
 		}
 
-		int iLength = (int)strlen( szOutput );
+		intp iLength = (intp)strlen( szOutput );
 		szOutput += iLength;
 		iOutBufferSize -= iLength;
 
@@ -971,7 +958,7 @@ int TranslateStackInfo( const void * const *pCallStack, int iCallStackCount, tch
 	return iCallStackCount;
 }
 
-void PreloadStackInformation( void * const *pAddresses, int iAddressCount )
+void PreloadStackInformation( [[maybe_unused]] void * const *pAddresses, [[maybe_unused]] int iAddressCount )
 {
 	//nop on anything but 360
 }
@@ -994,454 +981,6 @@ bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, int 
 	return s_HelperFunctions.GetModuleNameFromAddress( pAddress, pModuleNameOut, iMaxModuleNameLength );
 }
 
-#else //#if defined( WIN32 ) && !defined( _X360 )
-
-//===============================================================================================================
-// X360 version of the toolset
-//===============================================================================================================
-
-class C360StackTranslationHelper
-{
-public:
-	C360StackTranslationHelper( void )
-	{
-		m_bInitialized = true;
-	}
-
-	~C360StackTranslationHelper( void )
-	{
-		StringSet_t::const_iterator iter;
-		
-		//module names
-		{
-			iter = m_ModuleNameSet.begin();
-			while(iter != m_ModuleNameSet.end())
-			{
-				char *pModuleName = (char*)(*iter);
-				delete []pModuleName;
-				iter++;
-			}
-			m_ModuleNameSet.clear();
-		}
-
-		//file names
-		{
-			iter = m_FileNameSet.begin();
-			while(iter != m_FileNameSet.end())
-			{
-				char *pFileName = (char*)(*iter);
-				delete []pFileName;
-				iter++;
-			}
-			m_FileNameSet.clear();
-		}
-
-		//symbol names
-		{
-			iter = m_SymbolNameSet.begin();
-			while(iter != m_SymbolNameSet.end())
-			{
-				char *pSymbolName = (char*)(*iter);
-				delete []pSymbolName;
-				iter++;
-			}
-			m_SymbolNameSet.clear();
-		}		
-
-		m_bInitialized = false;
-	}
-
-private:
-	struct StackAddressInfo_t;
-public:
-
-	inline StackAddressInfo_t *CreateEntry( const FullStackInfo_t &info )
-	{
-		std::pair<AddressInfoMapIter_t, bool> retval = m_AddressInfoMap.insert( AddressInfoMapEntry_t( info.pAddress, StackAddressInfo_t() ) );
-		if( retval.first->second.szModule != NULL )
-			return &retval.first->second; //already initialized
-
-		retval.first->second.iLine = info.iLine;
-		
-
-		//share strings
-
-		//module
-		{
-			const char *pModuleName;
-			StringSet_t::const_iterator iter = m_ModuleNameSet.find( info.szModuleName );
-			if ( iter == m_ModuleNameSet.end() )
-			{
-				int nLen = strlen(info.szModuleName) + 1;
-				pModuleName = new char [nLen];
-				memcpy( (char *)pModuleName, info.szModuleName, nLen );
-				m_ModuleNameSet.insert( pModuleName );
-			}
-			else
-			{
-				pModuleName = (char *)(*iter);
-			}
-
-			retval.first->second.szModule = pModuleName;
-		}
-
-		//file
-		{
-			const char *pFileName;
-			StringSet_t::const_iterator iter = m_FileNameSet.find( info.szFileName );
-			if ( iter == m_FileNameSet.end() )
-			{
-				int nLen = strlen(info.szFileName) + 1;
-				pFileName = new char [nLen];
-				memcpy( (char *)pFileName, info.szFileName, nLen );
-				m_FileNameSet.insert( pFileName );
-			}
-			else
-			{
-				pFileName = (char *)(*iter);
-			}
-
-			retval.first->second.szFileName = pFileName;
-		}
-
-		//symbol
-		{
-			const char *pSymbolName;
-			StringSet_t::const_iterator iter = m_SymbolNameSet.find( info.szSymbol );
-			if ( iter == m_SymbolNameSet.end() )
-			{
-				int nLen = strlen(info.szSymbol) + 1;
-				pSymbolName = new char [nLen];
-				memcpy( (char *)pSymbolName, info.szSymbol, nLen );
-				m_SymbolNameSet.insert( pSymbolName );
-			}
-			else
-			{
-				pSymbolName = (char *)(*iter);
-			}
-
-			retval.first->second.szSymbol = pSymbolName;
-		}
-
-		return &retval.first->second;
-	}
-
-	inline StackAddressInfo_t *FindInfoEntry( const void *pAddress )
-	{
-		AddressInfoMapIter_t Iter = m_AddressInfoMap.find( pAddress );
-		if( Iter != m_AddressInfoMap.end() )
-			return &Iter->second;
-
-		return NULL;
-	}
-
-	inline int RetrieveStackInfo(  const void * const *pAddresses, FullStackInfo_t *pReturnedStructs, int iAddressCount )
-	{
-		int ReturnedTranslatedCount = -1;
-		//construct the message
-		//				Header	Finished Count(out)		Input Count					Input Array			Returned data write address
-		int iMessageSize = 2 + sizeof( int * ) + sizeof( uint32 ) + (sizeof( void * ) * iAddressCount) + sizeof( FullStackInfo_t * );
-		uint8 *pMessage = (uint8 *)stackalloc( iMessageSize );
-		uint8 *pMessageWrite = pMessage;
-		pMessageWrite[0] = XBX_DBG_BNH_STACKTRANSLATOR; //have this message handled by stack translator handler
-		pMessageWrite[1] = ST_BHC_GETTRANSLATIONINFO;
-		pMessageWrite += 2;
-		*(int **)pMessageWrite = (int *)BigDWord( (DWORD)&ReturnedTranslatedCount );
-		pMessageWrite += sizeof( int * );
-		*(uint32 *)pMessageWrite = (uint32)BigDWord( (DWORD)iAddressCount );
-		pMessageWrite += sizeof( uint32 );
-		memcpy( pMessageWrite, pAddresses, iAddressCount * sizeof( void * ) );
-		pMessageWrite += iAddressCount * sizeof( void * );
-		*(FullStackInfo_t **)pMessageWrite = (FullStackInfo_t *)BigDWord( (DWORD)pReturnedStructs );
-		bool bSuccess = XBX_SendBinaryData( pMessage, iMessageSize, false, 30000 );
-		ReturnedTranslatedCount = BigDWord( ReturnedTranslatedCount );
-
-		if( bSuccess && (ReturnedTranslatedCount > 0) )
-		{
-			return ReturnedTranslatedCount;
-		}
-		return 0;
-	}
-
-	inline StackAddressInfo_t *CreateEntry( const void *pAddress )
-	{
-		//ask VXConsole for information about the addresses we're clueless about
-
-		FullStackInfo_t ReturnedData;
-		ReturnedData.pAddress = pAddress;
-		ReturnedData.szFileName[0] = '\0'; //strncpy( ReturnedData.szFileName, "FileUninitialized", sizeof( ReturnedData.szFileName ) );
-		ReturnedData.szModuleName[0] = '\0'; //strncpy( ReturnedData.szModuleName, "ModuleUninitialized", sizeof( ReturnedData.szModuleName ) );
-		ReturnedData.szSymbol[0] = '\0'; //strncpy( ReturnedData.szSymbol, "SymbolUninitialized", sizeof( ReturnedData.szSymbol ) );
-		ReturnedData.iLine = 0;
-		ReturnedData.iSymbolOffset = 0;
-
-		int iTranslated = RetrieveStackInfo( &pAddress, &ReturnedData, 1 );
-
-		if( iTranslated == 1 )
-		{
-			//store
-			return CreateEntry( ReturnedData );
-		}
-
-		return FindInfoEntry( pAddress ); //probably won't work, but last ditch.
-	}
-
-	inline StackAddressInfo_t *FindOrCreateEntry( const void *pAddress )
-	{
-		StackAddressInfo_t *pReturn = FindInfoEntry( pAddress );
-		if( pReturn == NULL )
-		{
-			pReturn = CreateEntry( pAddress );
-		}
-
-		return pReturn;
-	}
-
-	inline void LoadStackInformation( void * const *pAddresses, int iAddressCount )
-	{
-		Assert( (iAddressCount > 0) && (pAddresses != NULL) );
-		
-		int iNeedLoading = 0;
-		void **pNeedLoading = (void **)stackalloc( sizeof( const void * ) * iAddressCount ); //addresses we need to ask VXConsole about		
-		
-		for( int i = 0; i != iAddressCount; ++i )
-		{
-			if( FindInfoEntry( pAddresses[i] ) == NULL )
-			{
-				//need to load this address
-				pNeedLoading[iNeedLoading] = pAddresses[i];
-				++iNeedLoading;
-			}
-		}
-
-		if( iNeedLoading != 0 )
-		{
-			//ask VXConsole for information about the addresses we're clueless about			
-			FullStackInfo_t *pReturnedStructs = (FullStackInfo_t *)stackalloc( sizeof( FullStackInfo_t ) * iNeedLoading );
-			
-			for( int i = 0; i < iNeedLoading; ++i )
-			{				
-				pReturnedStructs[i].pAddress = 0;
-				pReturnedStructs[i].szFileName[0] = '\0'; //strncpy( pReturnedStructs[i].szFileName, "FileUninitialized", sizeof( pReturnedStructs[i].szFileName ) );
-				pReturnedStructs[i].szModuleName[0] = '\0'; //strncpy( pReturnedStructs[i].szModuleName, "ModuleUninitialized", sizeof( pReturnedStructs[i].szModuleName ) );
-				pReturnedStructs[i].szSymbol[0] = '\0'; //strncpy( pReturnedStructs[i].szSymbol, "SymbolUninitialized", sizeof( pReturnedStructs[i].szSymbol ) );
-				pReturnedStructs[i].iLine = 0;
-				pReturnedStructs[i].iSymbolOffset = 0;
-			}
-
-			int iTranslated = RetrieveStackInfo( pNeedLoading, pReturnedStructs, iNeedLoading );
-
-			if( iTranslated == iNeedLoading )
-			{				
-				//store
-				for( int i = 0; i < iTranslated; ++i )
-				{
-					CreateEntry( pReturnedStructs[i] );
-				}
-			}
-		}
-	}
-
-	inline bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, int iMaxFileNameLength, uint32 &iLineNumberOut, uint32 *pDisplacementOut )
-	{
-		StackAddressInfo_t *pInfo = FindOrCreateEntry( pAddress );
-		if( pInfo && (pInfo->szFileName[0] != '\0') )
-		{
-			strncpy( pFileNameOut, pInfo->szFileName, iMaxFileNameLength );
-			iLineNumberOut = pInfo->iLine;
-
-			if( pDisplacementOut )
-				*pDisplacementOut = 0; //can't get line displacement on 360
-
-			return true;
-		}
-
-		return false;
-	}
-
-	inline bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, int iMaxSymbolNameLength, uint64 *pDisplacementOut )
-	{
-		StackAddressInfo_t *pInfo = FindOrCreateEntry( pAddress );
-		if( pInfo && (pInfo->szSymbol[0] != '\0') )
-		{
-			strncpy( pSymbolNameOut, pInfo->szSymbol, iMaxSymbolNameLength );
-
-			if( pDisplacementOut )
-				*pDisplacementOut = pInfo->iSymbolOffset;
-
-			return true;
-		}
-
-		return false;
-	}
-
-	inline bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, int iMaxModuleNameLength )
-	{
-		StackAddressInfo_t *pInfo = FindOrCreateEntry( pAddress );
-		if( pInfo && (pInfo->szModule[0] != '\0') )
-		{
-			strncpy( pModuleNameOut, pInfo->szModule, iMaxModuleNameLength );
-			return true;
-		}
-
-		return false;
-	}
-
-
-	CThreadFastMutex m_hMutex;
-
-private:
-
-#pragma pack(push)
-#pragma pack(1)
-	struct StackAddressInfo_t
-	{
-		StackAddressInfo_t( void ) : szModule(NULL), szFileName(NULL), szSymbol(NULL), iLine(0), iSymbolOffset(0) {}
-		const char *szModule;
-		const char *szFileName;
-		const char *szSymbol;
-		uint32 iLine;
-		uint32 iSymbolOffset;
-	};
-#pragma pack(pop)
-
-	typedef std::map< const void *, StackAddressInfo_t, std::less<const void *>> AddressInfoMap_t;
-	typedef AddressInfoMap_t::iterator AddressInfoMapIter_t;
-	typedef AddressInfoMap_t::value_type AddressInfoMapEntry_t;
-
-	class CStringLess
-	{
-	public:
-		bool operator()(const char *pszLeft, const char *pszRight ) const 
-		{
-			return ( V_tier0_stricmp( pszLeft, pszRight ) < 0 );
-		}
-	};
-
-	typedef std::set<const char *, CStringLess> StringSet_t;
-
-	AddressInfoMap_t	m_AddressInfoMap; //TODO: retire old entries?
-	StringSet_t			m_ModuleNameSet;
-	StringSet_t			m_FileNameSet;
-	StringSet_t			m_SymbolNameSet;
-	bool				m_bInitialized;
-
-};
-static C360StackTranslationHelper s_360StackTranslator;
-
-
-int GetCallStack( void **pReturnAddressesOut, int iArrayCount, int iSkipCount )
-{
-	++iSkipCount; //skip this function
-
-	//DmCaptureStackBackTrace() has no skip functionality, so we need to grab everything and skip within that list
-	void **pAllResults = (void **)stackalloc( sizeof( void * ) * (iArrayCount + iSkipCount) );
-	if( DmCaptureStackBackTrace( iArrayCount + iSkipCount, pAllResults ) == XBDM_NOERR )
-	{
-		for( int i = 0; i != iSkipCount; ++i )
-		{
-			if( *pAllResults == NULL ) //DmCaptureStackBackTrace() NULL terminates the list instead of telling us how many were returned
-				return AppendParentStackTrace( pReturnAddressesOut, iArrayCount, 0 );
-
-			++pAllResults; //move the pointer forward so the second loop indices match up
-		}
-
-		for( int i = 0; i != iArrayCount; ++i )
-		{
-			if( pAllResults[i] == NULL ) //DmCaptureStackBackTrace() NULL terminates the list instead of telling us how many were returned
-				return AppendParentStackTrace( pReturnAddressesOut, iArrayCount, i );
-
-			pReturnAddressesOut[i] = pAllResults[i];
-		}
-
-		return iArrayCount; //no room to append parent
-	}
-
-	return GetCallStack_Fast( pReturnAddressesOut, iArrayCount, iSkipCount );
-}
-
-
-void SetStackTranslationSymbolSearchPath( const char *szSemicolonSeparatedList )
-{
-	//nop on 360
-}
-
-
-void StackToolsNotify_LoadedLibrary( const char *szLibName )
-{
-	//send off the notice to VXConsole
-	uint8 message[2];
-	message[0] = XBX_DBG_BNH_STACKTRANSLATOR; //have this message handled by stack translator handler
-	message[1] = ST_BHC_LOADEDLIBARY; //loaded a library notification
-	XBX_SendBinaryData( message, 2 );
-}
-
-
-int TranslateStackInfo( const void * const *pCallStack, int iCallStackCount, tchar *szOutput, int iOutBufferSize, const tchar *szEntrySeparator, TranslateStackInfo_StyleFlags_t style )
-{
-	if( iCallStackCount == 0 )
-	{
-		if( iOutBufferSize > 1 )
-			*szOutput = '\0';
-
-		return 0;
-	}
-
-	if( szEntrySeparator == NULL )
-		szEntrySeparator = "";
-
-	int iSeparatorLength = strlen( szEntrySeparator ) + 1;
-	int iDataSize = (sizeof( void * ) * iCallStackCount) + (iSeparatorLength * sizeof( tchar )) + 1; //1 for style flags
-
-	//360 is incapable of translation on it's own. Encode the stack for translation in VXConsole
-	//Encoded section is as such ":CSDECODE[encoded binary]"
-	int iEncodedSize = -EncodeBinaryToString( NULL, iDataSize, NULL, 0 ); //get needed buffer size
-	static const tchar cControlPrefix[] = XBX_CALLSTACKDECODEPREFIX;
-	const size_t cControlLength = (sizeof( cControlPrefix )/sizeof(tchar)) - 1; //-1 to remove null terminator
-
-	if( iOutBufferSize > (iEncodedSize + (int)cControlLength + 2) ) //+2 for ']' and null term
-	{
-		COMPILE_TIME_ASSERT( TSISTYLEFLAG_LAST < (1<<8) ); //need to update the encoder/decoder to use more than a byte for style flags
-
-		uint8 *pData = (uint8 *)stackalloc( iDataSize );		
-		pData[0] = (uint8)style;
-		memcpy( pData + 1, szEntrySeparator, iSeparatorLength * sizeof( tchar ) );
-		memcpy( pData + 1 + (iSeparatorLength * sizeof( tchar )), pCallStack, iCallStackCount * sizeof( void * ) );
-
-		memcpy( szOutput, XBX_CALLSTACKDECODEPREFIX, cControlLength * sizeof( tchar ) );
-		int iLength = cControlLength + EncodeBinaryToString( pData, iDataSize, &szOutput[cControlLength], (iOutBufferSize - cControlLength) );
-
-		szOutput[iLength] = ']';
-		szOutput[iLength + 1] = '\0';
-	}
-
-	return iCallStackCount;
-}
-
-void PreloadStackInformation( void * const *pAddresses, int iAddressCount )
-{
-	AUTO_LOCK( s_360StackTranslator.m_hMutex );
-	s_360StackTranslator.LoadStackInformation( pAddresses, iAddressCount );
-}
-
-bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, int iMaxFileNameLength, uint32 &iLineNumberOut, uint32 *pDisplacementOut )
-{
-	AUTO_LOCK( s_360StackTranslator.m_hMutex );
-	return s_360StackTranslator.GetFileAndLineFromAddress( pAddress, pFileNameOut, iMaxFileNameLength, iLineNumberOut, pDisplacementOut );
-}
-
-bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, int iMaxSymbolNameLength, uint64 *pDisplacementOut )
-{
-	AUTO_LOCK( s_360StackTranslator.m_hMutex );
-	return s_360StackTranslator.GetSymbolNameFromAddress( pAddress, pSymbolNameOut, iMaxSymbolNameLength, pDisplacementOut );
-}
-
-bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, int iMaxModuleNameLength )
-{
-	AUTO_LOCK( s_360StackTranslator.m_hMutex );
-	return s_360StackTranslator.GetModuleNameFromAddress( pAddress, pModuleNameOut, iMaxModuleNameLength );
-}
-
 #endif //#else //#if defined( WIN32 ) && !defined( _X360 )
 
 #endif //#if !defined( ENABLE_RUNTIME_STACK_TRANSLATION )
@@ -1451,7 +990,7 @@ bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, int 
 
 CCallStackStorage::CCallStackStorage( FN_GetCallStack GetStackFunction, uint32 iSkipCalls )
 {
-	iValidEntries = GetStackFunction( pStack, ARRAYSIZE( pStack ), iSkipCalls + 1 );
+	iValidEntries = GetStackFunction( pStack, std::size( pStack ), iSkipCalls + 1 );
 }
 
 

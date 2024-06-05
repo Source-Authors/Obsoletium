@@ -1,11 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef MEM_HELPERS_H
-#define MEM_HELPERS_H
-#ifdef _WIN32
-#pragma once
-#endif
-
+#ifndef TIER0_MEM_HELPERS_H_
+#define TIER0_MEM_HELPERS_H_
 
 // Normally, the runtime libraries like to mess with the memory returned by malloc(), 
 // which can create problems trying to repro bugs in debug builds or in the debugger.
@@ -21,7 +17,7 @@
 // In here, we make sure the memory is either random garbage, or it's set to
 // 0xffeeffee, which casts to a NAN.
 extern bool g_bInitMemory;
-#define ApplyMemoryInitializations( pMem, nSize ) if ( !g_bInitMemory ) ; else { DoApplyMemoryInitializations( pMem, nSize ); }
+#define ApplyMemoryInitializations( pMem, nSize ) do { if ( !g_bInitMemory ) ; else { DoApplyMemoryInitializations( pMem, nSize ); } } while (false)
 void DoApplyMemoryInitializations( void *pMem, size_t nSize );
 
 size_t CalcHeapUsed();
@@ -31,4 +27,4 @@ size_t CalcHeapUsed();
 // platforms (Xbox 360, PS3, 32-bit Windows, etc.)
 void ReserveBottomMemory();
 
-#endif // MEM_HELPERS_H
+#endif  // TIER0_MEM_HELPERS_H_

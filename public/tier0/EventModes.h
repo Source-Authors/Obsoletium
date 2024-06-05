@@ -1,10 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef EVENTMODES_H
-#define EVENTMODES_H
-
-
-#pragma once
+#ifndef TIER0_EVENTMODES_H_
+#define TIER0_EVENTMODES_H_
 
 /*
  
@@ -128,7 +125,7 @@ public:
 
     void UseCounter4()
     {
-        SetCounter(4);;
+        SetCounter(4);
     }
     void UseCounter5()
     {
@@ -915,7 +912,7 @@ public:
 
     void UseCounter4()
     {
-        SetCounter(4);;
+        SetCounter(4);
     }
     void UseCounter5()
     {
@@ -983,7 +980,7 @@ public:
 
     void UseCounter4()
     {
-        SetCounter(4);;
+        SetCounter(4);
     }
     void UseCounter5()
     {
@@ -1017,7 +1014,7 @@ public:
 
     void UseCounter4()
     {
-        SetCounter(4);;
+        SetCounter(4);
     }
     void UseCounter5()
     {
@@ -1051,7 +1048,7 @@ public:
 
     void UseCounter4()
     {
-        SetCounter(4);;
+        SetCounter(4);
     }
     void UseCounter5()
     {
@@ -1085,7 +1082,7 @@ public:
 
     void UseCounter4()
     {
-        SetCounter(4);;
+        SetCounter(4);
     }
     void UseCounter5()
     {
@@ -1779,4 +1776,4 @@ public:
 
 };
 
-#endif // EVENTMODES_H
+#endif  // TIER0_EVENTMODES_H_

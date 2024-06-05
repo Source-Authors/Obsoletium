@@ -4,20 +4,16 @@
 // in to CValidator.  Whenever a new object reports in (via CValidator::Push),
 // we create a new CValObject to aggregate stats for it.
 
-#ifndef VALOBJECT_H
-#define VALOBJECT_H
-#ifdef _WIN32
-#pragma once
-#endif
-
+#ifndef TIER0_VALOBJECT_H_
+#define TIER0_VALOBJECT_H_
 
 #ifdef DBGFLAG_VALIDATE
 class CValObject
 {
 public:
 	// Constructors & destructors
-	CValObject( void ) { };
-	~CValObject( void );
+	CValObject() { };
+	~CValObject();
 
 	void Init( tchar *pchType, void *pvObj, tchar *pchName, CValObject *pValObjectParent,
 		CValObject *pValObjectPrev );
@@ -29,20 +25,20 @@ public:
 	void ClaimChildMemoryBlock( int cubUser );
 
 	// Accessors
-	tchar *PchType( void ) { return m_rgchType; };
-	void *PvObj( void ) { return m_pvObj; };
-	tchar *PchName( void ) { return m_rgchName; };
-	CValObject *PValObjectParent( void ) { return m_pValObjectParent; };
-	int NLevel( void ) { return m_nLevel; };
-	CValObject *PValObjectNext( void ) { return m_pValObjectNext; };
-	int CpubMemSelf( void ) { return m_cpubMemSelf; };
-	int CubMemSelf( void ) { return m_cubMemSelf; };
-	int CpubMemTree( void ) { return m_cpubMemTree; };
-	int CubMemTree( void ) { return m_cubMemTree; };
-	int NUser( void ) { return m_nUser; };
+	tchar *PchType() { return m_rgchType; };
+	void *PvObj() { return m_pvObj; };
+	tchar *PchName() { return m_rgchName; };
+	CValObject *PValObjectParent() { return m_pValObjectParent; };
+	int NLevel() { return m_nLevel; };
+	CValObject *PValObjectNext() { return m_pValObjectNext; };
+	int CpubMemSelf() { return m_cpubMemSelf; };
+	int CubMemSelf() { return m_cubMemSelf; };
+	int CpubMemTree() { return m_cpubMemTree; };
+	int CubMemTree() { return m_cubMemTree; };
+	int NUser() { return m_nUser; };
 	void SetNUser( int nUser ) { m_nUser = nUser; };
 	void SetBNewSinceSnapshot( bool bNewSinceSnapshot ) { m_bNewSinceSnapshot = bNewSinceSnapshot; }
-	bool BNewSinceSnapshot( void ) { return m_bNewSinceSnapshot; }
+	bool BNewSinceSnapshot() { return m_bNewSinceSnapshot; }
 
 private:
 	bool  m_bNewSinceSnapshot;				// If this block is new since the snapshot.
@@ -63,7 +59,7 @@ private:
 
 	int m_nUser;							// Field provided for use by our users
 };
-#endif // DBGFLAG_VALIDATE
+#endif  // DBGFLAG_VALIDATE
 
 
-#endif // VALOBJECT_H
+#endif  // TIER0_VALOBJECT_H_

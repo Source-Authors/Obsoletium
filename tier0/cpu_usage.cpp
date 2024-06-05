@@ -66,8 +66,8 @@ float GetCPUUsage()
 	double dbIdleTime;
 	double dbSystemTime;
 	LONG status;
-	static LARGE_INTEGER liOldIdleTime = {0,0};
-	static LARGE_INTEGER liOldSystemTime = {0,0};
+	static LARGE_INTEGER liOldIdleTime = {};
+	static LARGE_INTEGER liOldSystemTime = {};
 
 	if ( !NtQuerySystemInformation)
 	{

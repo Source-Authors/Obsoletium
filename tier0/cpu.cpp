@@ -6,7 +6,7 @@
 #include <intrin.h>
 #endif
 
-#if (defined(__clang__) || defined(__GNUC__)) && (__x86_64__ || __i386__)
+#if (defined(__clang__) || defined(__GNUC__)) && (defined(__x86_64__) || defined(__i386__))
 #include <cpuid.h>
 #endif
 
@@ -588,7 +588,7 @@ const CPUInformation* GetCPUInformation()
 		int anKnownIds[kMaxPhysicalCores];
 		int nKnownIdCount = 0;
 		char buf[255];
-		while ( fgets( buf, ARRAYSIZE(buf), fpCpuInfo ) )
+		while ( fgets( buf, std::size(buf), fpCpuInfo ) )
 		{
 			if ( char *value = strchr( buf, ':' ) )
 			{
@@ -632,7 +632,7 @@ const CPUInformation* GetCPUInformation()
 	{
 		pi.m_nPhysicalProcessors = 1;
 		pi.m_nLogicalProcessors  = 1;
-		Assert( !"couldn't read cpu information from /proc/cpuinfo" );
+		AssertMsg( false, "couldn't read cpu information from /proc/cpuinfo" );
 	}
 #elif defined(OSX)
 	uint32_t physical_core_count = 1, logical_core_count = 1;

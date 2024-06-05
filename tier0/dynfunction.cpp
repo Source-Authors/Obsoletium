@@ -136,7 +136,7 @@ void *VoidFnPtrLookup_Tier0(const char *libname, const char *fn, void *fallback)
 	void *retval = NULL;
 	if (lib != NULL)
 	{
-		retval = LookupInLibraryHandle(lib, fn);
+		retval = reinterpret_cast<void *>(LookupInLibraryHandle(lib, fn));
 		dbgdynfn("CDynamicFunction: Lookup of '%s' in '%s': %p\n", fn, libname, retval);
 	}
 

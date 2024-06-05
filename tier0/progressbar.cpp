@@ -1,10 +1,11 @@
 // Copyright Valve Corporation, All rights reserved.
 
 #include "pch_tier0.h"
+#include "tier0/progressbar.h"
+
 #include "vstdlib/pch_vstdlib.h"
 
 #include "tier0/platform.h"
-#include "tier0/progressbar.h"
 
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 #include "tier0/memalloc.h"

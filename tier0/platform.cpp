@@ -4,19 +4,16 @@
 
 #include <ctime>
 
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 #include <cerrno>
 
 #include "winlite.h"
 #endif
+
 #include "tier0/platform.h"
 #include "tier0/minidump.h"
-#ifdef _X360
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_win32stubs.h"
-#else
 #include "tier0/vcrmode.h"
-#endif
+
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 #include "tier0/memalloc.h"
 
@@ -29,9 +26,7 @@
 //CPP sets this value while initializing its static space
 static ExitProcessWithErrorCBFn g_pfnExitProcessWithErrorCB; //= NULL
 
-#ifndef _X360
 extern VCRMode_t g_VCRMode;
-#endif
 static LARGE_INTEGER g_PerformanceFrequency;
 static double g_PerformanceCounterToS;
 static double g_PerformanceCounterToMS;
@@ -42,16 +37,31 @@ static bool s_bTimeInitted;
 // Benchmark mode uses this heavy-handed method 
 static bool g_bBenchmarkMode = false;
 static double g_FakeBenchmarkTime = 0;
-static double g_FakeBenchmarkTimeInc = 1.0 / 66.0;
+constexpr double g_FakeBenchmarkTimeInc = 1.0 / 66.0;
 
-static void InitTime()
+void InitTime()
 {
-	s_bTimeInitted = true;
 	QueryPerformanceFrequency(&g_PerformanceFrequency);
-	g_PerformanceCounterToS = 1.0 / g_PerformanceFrequency.QuadPart;
-	g_PerformanceCounterToMS = 1e3 / g_PerformanceFrequency.QuadPart;
-	g_PerformanceCounterToUS = 1e6 / g_PerformanceFrequency.QuadPart;
+
+	// Common case, frequency is 10000000.
+	const long long frequency{ g_PerformanceFrequency.QuadPart };
+	if ( frequency == 10000000 )
+	{
+		g_PerformanceCounterToS = 1.0e-7;
+		g_PerformanceCounterToMS = 1.0e-4;
+		g_PerformanceCounterToUS = 0.1;
+	}
+	else
+	{
+		g_PerformanceCounterToS = 1.0 / frequency;
+		g_PerformanceCounterToMS = 1e3 / frequency;
+		g_PerformanceCounterToUS = 1e6 / frequency;
+	}
+
 	QueryPerformanceCounter(&g_ClockStart);
+
+	// dimhotepus: Race, set to initted only when time set.
+	s_bTimeInitted = true;
 }
 
 bool Plat_IsInBenchmarkMode()
@@ -64,57 +74,56 @@ void Plat_SetBenchmarkMode( bool bBenchmark )
 	g_bBenchmarkMode = bBenchmark;
 }
 
+static long long Plat_CycleTime()
+{
+	Assert( s_bTimeInitted );
+
+	LARGE_INTEGER now;
+	QueryPerformanceCounter( &now );
+
+	return now.QuadPart - g_ClockStart.QuadPart;
+}
+
 double Plat_FloatTime()
 {
-  if ( !s_bTimeInitted )
-		InitTime();
-	if ( g_bBenchmarkMode )
+	if ( !g_bBenchmarkMode )
 	{
-		g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
-		return g_FakeBenchmarkTime;
+		Assert( s_bTimeInitted );
+
+		double seconds = static_cast<double>( Plat_CycleTime() ) * g_PerformanceCounterToS;
+		return seconds;
 	}
 
-	LARGE_INTEGER CurrentTime;
-
-	QueryPerformanceCounter( &CurrentTime );
-
-	double fRawSeconds = (double)( CurrentTime.QuadPart - g_ClockStart.QuadPart ) * g_PerformanceCounterToS;
-
-	return fRawSeconds;
+	g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
+	return g_FakeBenchmarkTime;
 }
 
 uint32 Plat_MSTime()
 {
-	if ( !s_bTimeInitted )
-		InitTime();
-	if ( g_bBenchmarkMode )
+	if ( !g_bBenchmarkMode )
 	{
-		g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
-		return (uint32)(g_FakeBenchmarkTime * 1000.0);
+		Assert( s_bTimeInitted );
+
+		double ms = static_cast<double>( Plat_CycleTime() ) * g_PerformanceCounterToMS;
+		return static_cast<uint32>( ms );
 	}
 
-	LARGE_INTEGER CurrentTime;
-
-	QueryPerformanceCounter( &CurrentTime );
-
-	return (uint32) ( ( CurrentTime.QuadPart - g_ClockStart.QuadPart ) * g_PerformanceCounterToMS );
+	g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
+	return (uint32)(g_FakeBenchmarkTime * 1000.0);
 }
 
 uint64 Plat_USTime()
 {
-	if ( !s_bTimeInitted )
-		InitTime();
-	if ( g_bBenchmarkMode )
+	if ( !g_bBenchmarkMode )
 	{
-		g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
-		return (uint64)(g_FakeBenchmarkTime * 1e6);
+		Assert ( s_bTimeInitted );
+
+		double us = static_cast<double>( Plat_CycleTime() ) * g_PerformanceCounterToUS;
+		return static_cast<uint64>( us );
 	}
 
-	LARGE_INTEGER CurrentTime;
-
-	QueryPerformanceCounter( &CurrentTime );
-
-	return (uint64) ( ( CurrentTime.QuadPart - g_ClockStart.QuadPart ) * g_PerformanceCounterToUS );
+	g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
+	return (uint64)(g_FakeBenchmarkTime * 1e6);
 }
 
 void GetCurrentDate( int *pDay, int *pMonth, int *pYear )
@@ -303,7 +312,7 @@ bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo )
 	if ( !pOutMemoryInfo ) 
 		return false;
 
-	MEMORYSTATUSEX memStat = { sizeof(memStat) };
+	MEMORYSTATUSEX memStat = { sizeof(memStat), 0, 0, 0, 0, 0, 0, 0, 0 };
 	if ( !GlobalMemoryStatusEx( &memStat ) ) 
 		return false;
 
@@ -320,7 +329,7 @@ bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo )
 
 	default:
 		return false;
-	};
+	}
 
 	return true;
 }
@@ -334,7 +343,7 @@ const char *Plat_GetCommandLineA()
 //--------------------------------------------------------------------------------------------------
 // Watchdog timer
 //--------------------------------------------------------------------------------------------------
-void Plat_BeginWatchdogTimer( int nSecs )
+void Plat_BeginWatchdogTimer( [[maybe_unused]] int nSecs )
 {
 }
 void Plat_EndWatchdogTimer( void )
@@ -344,7 +353,7 @@ int Plat_GetWatchdogTime( void )
 {
 	return 0;
 }
-void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFunction_t function )
+void Plat_SetWatchdogHandlerFunction( [[maybe_unused]] Plat_WatchDogHandlerFunction_t function )
 {
 }
 
@@ -379,7 +388,7 @@ bool Is64BitOS()
 
 typedef void (*Plat_AllocErrorFn)( unsigned long size );
 
-void Plat_DefaultAllocErrorFn( unsigned long size )
+void Plat_DefaultAllocErrorFn( [[maybe_unused]] unsigned long size )
 {
 }
 

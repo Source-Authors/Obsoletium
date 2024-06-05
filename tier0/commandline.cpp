@@ -16,8 +16,6 @@
 #include "tier0/memdbgon.h"
 
 
-static const int MAX_PARAMETER_LEN = 128;
-
 //-----------------------------------------------------------------------------
 // Purpose: Implements ICommandLine
 //-----------------------------------------------------------------------------
@@ -29,26 +27,26 @@ public:
 	virtual 			~CCommandLine( void );
 
 	// Implements ICommandLine
-	virtual void		CreateCmdLine( const char *commandline  );
-	virtual void		CreateCmdLine( int argc, char **argv );
-	virtual const char	*GetCmdLine( void ) const;
-	virtual	const char	*CheckParm( const char *psz, const char **ppszValue = 0 ) const;
+	void		CreateCmdLine( const char *commandline  ) override;
+	void		CreateCmdLine( int argc, char **argv ) override;
+	const char	*GetCmdLine( void ) const override;
+	const char	*CheckParm( const char *psz, const char **ppszValue = 0 ) const override;
 	// A bool return of whether param exists, useful for just checking if param that is just a flag is set
-	virtual bool		HasParm( const char *psz ) const;
+	bool		HasParm( const char *psz ) const override;
 
-	virtual void		RemoveParm( const char *parm );
-	virtual void		AppendParm( const char *pszParm, const char *pszValues );
+	void		RemoveParm( const char *parm ) override;
+	void		AppendParm( const char *pszParm, const char *pszValues ) override;
 
-	virtual int			ParmCount() const;
-	virtual int			FindParm( const char *psz ) const;
-	virtual const char* GetParm( int nIndex ) const;
+	int			ParmCount() const override;
+	int			FindParm( const char *psz ) const override;
+	const char* GetParm( int nIndex ) const override;
 
-	virtual const char	*ParmValue( const char *psz, const char *pDefaultVal = NULL ) const OVERRIDE;
-	virtual int			ParmValue( const char *psz, int nDefaultVal ) const OVERRIDE;
-	virtual float		ParmValue( const char *psz, float flDefaultVal ) const OVERRIDE;
-	virtual const char *ParmValueByIndex( int nIndex, const char *pDefaultVal = 0 ) const OVERRIDE;
+	const char	*ParmValue( const char *psz, const char *pDefaultVal = NULL ) const override;
+	int			ParmValue( const char *psz, int nDefaultVal ) const override;
+	float		ParmValue( const char *psz, float flDefaultVal ) const override;
+	const char *ParmValueByIndex( int nIndex, const char *pDefaultVal = 0 ) const override;
 
-	virtual void        SetParm( int nIndex, char const *pParm );
+	void        SetParm( int nIndex, char const *pParm )  override;
 
 private:
 	enum
@@ -248,7 +246,7 @@ void CCommandLine::CreateCmdLine( const char *commandline )
 		}	
 		
 		// Don't go past the end.
-		if ( (pDst - szFull) >= (sizeof( szFull ) - 1) )
+		if ( (pDst - szFull) >= (static_cast<ptrdiff_t>(sizeof( szFull )) - 1) )
 			break;
 
 		*pDst++ = *pSrc++;

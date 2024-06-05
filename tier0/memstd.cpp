@@ -9,25 +9,15 @@
 #if defined( _WIN32 ) && !defined( _X360 )
 #define VA_COMMIT_FLAGS MEM_COMMIT
 #define VA_RESERVE_FLAGS MEM_RESERVE
-#elif defined( _X360 )
-#undef Verify
-#define VA_COMMIT_FLAGS (MEM_COMMIT|MEM_NOZERO|MEM_LARGE_PAGES)
-#define VA_RESERVE_FLAGS (MEM_RESERVE|MEM_LARGE_PAGES)
 #endif
 
-#include "tier0/valve_minmax_off.h"	// GCC 4.2.2 headers screw up our min/max defs.
 #include <algorithm>
-#include "tier0/valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
 
 #include "tier0/dbg.h"
 #include "tier0/memalloc.h"
 #include "tier0/threadtools.h"
 #include "mem_helpers.h"
 #include "memstd.h"
-#ifdef _X360
-#include "xbox/xbox_console.h"
-#endif
-
 
 // Force on redirecting all allocations to the process heap on Win64,
 // which currently means the GC.  This is to make AppVerifier more effective
@@ -46,8 +36,10 @@
 #define ALLOW_PROCESS_HEAP
 #endif
 
+#if (!defined(_DEBUG) && !defined(USE_MEM_DEBUG))
 // Track this to decide how to handle out-of-memory.
 static bool s_bPageHeapEnabled = false;
+#endif
 
 #ifdef TIME_ALLOC
 CAverageCycleCounter g_MallocCounter;
@@ -114,7 +106,7 @@ static void InterlockedAddSizeT( size_t volatile *Addend, size_t Value )
 #endif
 }
 
-class CHeapMemAlloc : public IMemAlloc
+class CHeapMemAlloc final : public IMemAlloc
 {
 public:
 	CHeapMemAlloc()
@@ -397,10 +389,10 @@ static bool IsPageHeapEnabled( bool& bETWHeapEnabled )
 	if ( exeHandle )
 	{
 		char appName[ MAX_PATH ];
-		if ( GetModuleFileNameA( exeHandle, appName, ARRAYSIZE( appName ) ) )
+		if ( GetModuleFileNameA( exeHandle, appName, std::size( appName ) ) )
 		{
 			// Guarantee null-termination -- not guaranteed on Windows XP!
-			appName[ ARRAYSIZE( appName ) - 1 ] = 0;
+			appName[ std::size( appName ) - 1 ] = 0;
 			// Find the file part of the name.
 			const char* pFilePart = strrchr( appName, '\\' );
 			if ( pFilePart )
@@ -415,10 +407,10 @@ static bool IsPageHeapEnabled( bool& bETWHeapEnabled )
 
 				// Generate the key name for App Verifier settings for this process.
 				char regPathName[ MAX_PATH ];
-				_snprintf( regPathName, ARRAYSIZE( regPathName ),
+				_snprintf( regPathName, std::size( regPathName ),
 							"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%s",
 							pFilePart );
-				regPathName[ ARRAYSIZE( regPathName ) - 1 ] = 0;
+				regPathName[ std::size( regPathName ) - 1 ] = 0;
 
 				HKEY key;
 				LONG regResult = RegOpenKeyA( HKEY_LOCAL_MACHINE,
@@ -653,9 +645,9 @@ int CSmallBlockPool::CountFreeBlocks()
 }
 
 // Size of committed memory managed by this heap:
-int CSmallBlockPool::GetCommittedSize()
+intp CSmallBlockPool::GetCommittedSize()
 {
-	unsigned totalSize = (unsigned)m_pCommitLimit - (unsigned)m_pBase;
+	uintp totalSize = (uintp)m_pCommitLimit - (uintp)m_pBase;
 	Assert( 0 != m_nBlockSize );
 
 	return totalSize;
@@ -699,7 +691,7 @@ int CSmallBlockPool::Compact()
 
 		for ( i = nFree - 1; i >= 0; i-- )
 			{
-			if ( (byte *)pSortArray[i] == m_pNextAlloc - m_nBlockSize )
+			if ( (byte *)pSortArray[i] == static_cast<byte*>( m_pNextAlloc ) - m_nBlockSize )
 				{
 				pSortArray[i] = NULL;
 				m_pNextAlloc -= m_nBlockSize;
@@ -1318,7 +1310,7 @@ bool CX360SmallBlockHeap::ShouldUse( size_t nBytes )
 bool CX360SmallBlockHeap::IsOwner( void * p )
 {
 	int index = (size_t)((byte *)p - CX360SmallBlockPool::gm_pPhysicalBase) / PAGESIZE_X360_SBH;
-	return ( UsingSBH() && ( index >= 0 && index < ARRAYSIZE(CX360SmallBlockPool::gm_AddressToPool) ) );
+	return ( UsingSBH() && ( index >= 0 && index < ssize(CX360SmallBlockPool::gm_AddressToPool) ) );
 	}
 
 void *CX360SmallBlockHeap::Alloc( size_t nBytes )
@@ -1729,7 +1721,7 @@ void CStdMemAlloc::GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory 
 
 #if defined( USE_DLMALLOC )
 	// Account for free memory contained within DLMalloc
-	for ( int i = 0; i < ARRAYSIZE( g_AllocRegions ); i++ )
+	for ( int i = 0; i < ssize( g_AllocRegions ); i++ )
 	{
 		mallinfo info = mspace_mallinfo( g_AllocRegions[ i ] );
 		*pFreeMemory += info.fordblks;
@@ -1765,19 +1757,6 @@ MemAllocFailHandler_t CStdMemAlloc::SetAllocFailHandler( MemAllocFailHandler_t p
 
 size_t CStdMemAlloc::DefaultFailHandler( size_t nBytes )
 {
-	if ( IsX360() && !IsRetail() )
-	{
-#ifdef _X360 
-		ExecuteOnce(
-		{
-			char buffer[256];
-			_snprintf( buffer, sizeof( buffer ), "***** Memory pool overflow, attempted allocation size: %u ****\n", nBytes );
-			XBX_OutputDebugString( buffer ); 
-		}
-		);
-#endif
-	}
-
 	return 0;
 }
 
@@ -1810,6 +1789,7 @@ void ReserveBottomMemory()
 	static bool s_initialized = false;
 	if ( s_initialized )
 		return;
+
 	s_initialized = true;
 
 	// If AppVerifier is enabled then memory reservations get turned into committed

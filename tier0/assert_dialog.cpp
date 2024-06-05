@@ -3,10 +3,8 @@
 #include "pch_tier0.h"
 
 #include "tier0/valve_off.h"
-#ifdef _X360
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_vxconsole.h"
-#elif defined( _WIN32 )
+
+#if defined( _WIN32 )
 #include "winlite.h"
 
 // dimhotepus: Launcher icon id.
@@ -60,7 +58,7 @@ struct CAssertDisable
 };
 
 #ifdef _WIN32
-static HINSTANCE g_hTier0Instance = 0;
+static HINSTANCE g_hTier0Instance = nullptr;
 #endif
 
 static bool g_bAssertsEnabled = true;
@@ -70,9 +68,6 @@ static CAssertDisable *g_pAssertDisables = NULL;
 #if ( defined( _WIN32 ) && !defined( _X360 ) )
 static int g_iLastLineRange = 5;
 static int g_nLastIgnoreNumTimes = 1;
-#endif
-#if defined( _X360 )
-static int g_VXConsoleAssertReturnValue = -1;
 #endif
 
 // Set to true if they want to break in the debugger.
@@ -86,15 +81,22 @@ static CDialogInitInfo g_Info;
 // -------------------------------------------------------------------------------- //
 
 #if defined(_WIN32) && !defined(STATIC_TIER0)
-extern "C" BOOL APIENTRY MemDbgDllMain( HMODULE hDll, DWORD dwReason, PVOID pvReserved );
+extern "C" BOOL APIENTRY MemDbgDllMain( HMODULE hDll, DWORD dwReason, void* );
+
+extern void InitTime();
 
 BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 {
-	g_hTier0Instance = hinstDLL;
+	if (fdwReason == DLL_PROCESS_ATTACH)
+	{
+		g_hTier0Instance = hinstDLL;
+
+		InitTime();
 
 #ifdef DEBUG
-	MemDbgDllMain( hinstDLL, fdwReason, lpvReserved );
+		MemDbgDllMain( hinstDLL, fdwReason, lpvReserved );
 #endif
+	}
 
 	return TRUE;
 }
@@ -117,7 +119,7 @@ static bool AreAssertsDisabled()
 static bool AreAssertsEnabledInFileLine( const tchar *pFilename, int iLine )
 {
 	CAssertDisable **pPrev = &g_pAssertDisables;
-	CAssertDisable *pNext;
+	CAssertDisable *pNext = nullptr;
 	for ( CAssertDisable *pCur=g_pAssertDisables; pCur; pCur=pNext )
 	{
 		pNext = pCur->m_pNext;
@@ -168,7 +170,8 @@ CAssertDisable* CreateNewAssertDisable( const tchar *pFilename )
 	pDisable->m_LineMin = pDisable->m_LineMax = -1;
 	pDisable->m_nIgnoreTimes = -1;
 	
-	_tcsncpy( pDisable->m_Filename, g_Info.m_pFilename, sizeof( pDisable->m_Filename ) - 1 );
+	// dimhotepus: Use passed file name to create assert disable.
+	_tcsncpy( pDisable->m_Filename, pFilename, sizeof( pDisable->m_Filename ) - 1 );
 	pDisable->m_Filename[ sizeof( pDisable->m_Filename ) - 1 ] = 0;
 	
 	return pDisable;
@@ -195,7 +198,7 @@ INT_PTR CALLBACK AssertDialogProc(
   HWND hDlg,  // handle to dialog box
   UINT uMsg,     // message
   WPARAM wParam, // first message parameter
-  LPARAM lParam  // second message parameter
+  [[maybe_unused]] LPARAM lParam  // second message parameter
 )
 {
 	switch( uMsg )
@@ -395,7 +398,7 @@ DBG_INTERFACE bool ShouldUseNewAssertDialog()
 static void SpewBacktrace()
 {
 	void *buffer[ 16 ];
-	int nptrs = backtrace( buffer, ARRAYSIZE( buffer ) );
+	int nptrs = backtrace( buffer, std::size( buffer ) );
 	if ( nptrs )
 	{
 		char **strings = backtrace_symbols(buffer, nptrs);
@@ -464,61 +467,11 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 	g_bBreak = false;
 
-#if defined( _X360 )
-
-	char cmdString[XBX_MAX_RCMDLENGTH];
-
-	// Before calling VXConsole, init the global variable that receives the result
-	g_VXConsoleAssertReturnValue = -1;
-
-	// Message VXConsole to pop up a PC-side Assert dialog
-	_snprintf( cmdString, sizeof(cmdString), "Assert() 0x%.8x File: %s\tLine: %d\t%s",
-				&g_VXConsoleAssertReturnValue, pFilename, line, pExpression );
-	XBX_SendRemoteCommand( cmdString, false );
-
-	// We sent a synchronous message, so g_xbx_dbgVXConsoleAssertReturnValue should have been overwritten by now
-	if ( g_VXConsoleAssertReturnValue == -1 )
-	{
-		// VXConsole isn't connected/running - default to the old behaviour (break)
-		g_bBreak = true;
-	}
-	else
-	{
-		// Respond to what the user selected
-		switch( g_VXConsoleAssertReturnValue )
-		{
-		case ASSERT_ACTION_IGNORE_FILE:
-			IgnoreAssertsInCurrentFile();
-			break;
-		case ASSERT_ACTION_IGNORE_THIS:
-			// Ignore this Assert once
-			break;
-		case ASSERT_ACTION_BREAK:
-			// Break on this Assert
-			g_bBreak = true;
-			break;
-		case ASSERT_ACTION_IGNORE_ALL:
-			// Ignore all Asserts from now on
-			g_bAssertsEnabled = false;
-			break;
-		case ASSERT_ACTION_IGNORE_ALWAYS:
-			// Ignore this Assert from now on
-			IgnoreAssertsNearby( 0 );
-			break;
-		case ASSERT_ACTION_OTHER:
-		default:
-			// Error... just break
-			XBX_Error( "DoNewAssertDialog: invalid Assert response returned from VXConsole - breaking to debugger" );
-			g_bBreak = true;
-			break;
-		}
-	}
-
-#elif defined( _WIN32 )
+#if defined( _WIN32 )
 
 	if ( !ThreadInMainThread() )
 	{
-		int result = MessageBox( NULL,  pExpression, "Assertion Failed", MB_SYSTEMMODAL | MB_CANCELTRYCONTINUE );
+		int result = MessageBox( NULL, pExpression, "Source - Assertion Failed", MB_SYSTEMMODAL | MB_CANCELTRYCONTINUE | MB_ICONQUESTION );
 
 		if ( result == IDCANCEL )
 		{
@@ -570,7 +523,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		messageboxdata.window = g_SDLWindow;
 		messageboxdata.title = "Assertion Failed";
 		messageboxdata.message = text;
-		messageboxdata.numbuttons = ARRAYSIZE( buttondata );
+		messageboxdata.numbuttons = ssize( buttondata );
 		messageboxdata.buttons = buttondata;
 
 		int Ret = ( *pfnSDLShowMessageBox )( &messageboxdata, &buttonid );

@@ -36,7 +36,7 @@ PLATFORM_INTERFACE int GetCallStack_Fast( void **pReturnAddressesOut, int iArray
 typedef int (*FN_GetCallStack)( void **pReturnAddressesOut, int iArrayCount, int iSkipCount );
 
 //where we'll find our PDB's for win32.
-PLATFORM_INTERFACE void SetStackTranslationSymbolSearchPath( const char *szSemicolonSeparatedList = NULL );
+PLATFORM_INTERFACE void SetStackTranslationSymbolSearchPath( const char *szSemicolonSeparatedList = nullptr );
 PLATFORM_INTERFACE void StackToolsNotify_LoadedLibrary( const char *szLibName );
 
 //maximum output sample "tier0.dll!TranslateStackInfo - u:\Dev\L4D\src\tier0\stacktools.cpp(162) + 4 bytes"
@@ -58,8 +58,8 @@ enum TranslateStackInfo_StyleFlags_t
 PLATFORM_INTERFACE int TranslateStackInfo( const void * const *pCallStack, int iCallStackCount, tchar *szOutput, int iOutBufferSize, const tchar *szEntrySeparator, TranslateStackInfo_StyleFlags_t style = TSISTYLEFLAG_DEFAULT );
 
 PLATFORM_INTERFACE void PreloadStackInformation( void * const *pAddresses, int iAddressCount ); //caches data and reduces communication with VXConsole to speed up 360 decoding when using any of the Get***FromAddress() functions. Nop on PC.
-PLATFORM_INTERFACE bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, int iMaxFileNameLength, uint32 &iLineNumberOut, uint32 *pDisplacementOut = NULL );
-PLATFORM_INTERFACE bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, int iMaxSymbolNameLength, uint64 *pDisplacementOut = NULL );
+PLATFORM_INTERFACE bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, int iMaxFileNameLength, uint32 &iLineNumberOut, uint32 *pDisplacementOut = nullptr );
+PLATFORM_INTERFACE bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, int iMaxSymbolNameLength, uint64 *pDisplacementOut = nullptr );
 PLATFORM_INTERFACE bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, int iMaxModuleNameLength );
 
 
@@ -106,7 +106,7 @@ public:
 class PLATFORM_CLASS CStackTop_ReferenceParentStack : public CStackTop_Base
 {
 public:
-	CStackTop_ReferenceParentStack( void * const * pParentStackTrace = NULL, int iParentStackTraceLength = 0 );
+	CStackTop_ReferenceParentStack( void * const * pParentStackTrace = nullptr, int iParentStackTraceLength = 0 );
 	~CStackTop_ReferenceParentStack( void );
 	void ReleaseParentStackReferences( void ); //in case you need to delete the parent stack trace before this class goes out of scope
 };
@@ -123,7 +123,7 @@ PLATFORM_INTERFACE int EncodeBinaryToString( const void *pToEncode, int iDataLen
 //	>= 0 is the decoded data size
 //	INT_MIN (most negative value possible) indicates an improperly formatted string (not our data)
 //	all other negative values are the negative of how much dest buffer size is necessary.
-PLATFORM_INTERFACE int DecodeBinaryFromString( const char *pString, void *pDestBuffer, int iDestBufferSize, char **ppParseFinishOut = NULL );
+PLATFORM_INTERFACE int DecodeBinaryFromString( const char *pString, void *pDestBuffer, int iDestBufferSize, char **ppParseFinishOut = nullptr );
 
 
 
