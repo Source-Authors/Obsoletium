@@ -5,12 +5,18 @@
 //=============================================================================//
 
 #include "bitmap/imageformat.h"
+
+#include <malloc.h>
+
+#include <cmath>
+#include <cstring>
+#include <utility>
+
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
-#include "mathlib/mathlib.h"
+#include "tier0/platform.h"
+#include "tier0/wchartypes.h"
 #include "mathlib/vector.h"
-#include "tier1/utlmemory.h"
-#include "tier1/strtools.h"
 #include "mathlib/compressed_vector.h"
 // dimhotepus: Exclude nvtc as proprietary.
 #ifndef NO_NVTC
@@ -101,7 +107,7 @@ static UserFormatToRGBA8888Func_t GetUserFormatToRGBA8888Func_t( ImageFormat src
 	case IMAGE_FORMAT_BGR888:
 		return BGR888ToRGBA8888;
 	case IMAGE_FORMAT_RGB565:
-		return NULL; //-V1037
+		return nullptr; //-V1037
 	case IMAGE_FORMAT_I8:
 		return I8ToRGBA8888;
 	case IMAGE_FORMAT_IA88:
@@ -135,10 +141,10 @@ static UserFormatToRGBA8888Func_t GetUserFormatToRGBA8888Func_t( ImageFormat src
 	case IMAGE_FORMAT_RGBA16161616:
 		return RGBA16161616ToRGBA8888;
 	case IMAGE_FORMAT_RGBA16161616F:
-		return NULL;
+		return nullptr;
 
 	default:
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -155,7 +161,7 @@ static RGBA8888ToUserFormatFunc_t GetRGBA8888ToUserFormatFunc_t( ImageFormat dst
 	case IMAGE_FORMAT_BGR888:
 		return RGBA8888ToBGR888;
 	case IMAGE_FORMAT_RGB565:
-		return NULL; //-V1037
+		return nullptr; //-V1037
 	case IMAGE_FORMAT_I8:
 		return RGBA8888ToI8;
 	case IMAGE_FORMAT_IA88:
@@ -187,10 +193,10 @@ static RGBA8888ToUserFormatFunc_t GetRGBA8888ToUserFormatFunc_t( ImageFormat dst
 	case IMAGE_FORMAT_UVLX8888:
 		return RGBA8888ToUVLX8888;
 	case IMAGE_FORMAT_RGBA16161616F:
-		return NULL;
+		return nullptr;
 
 	default:
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -223,7 +229,7 @@ static inline void GetColorBlockColorsBGRA8888( DXTColBlock *pBlock, BGRA8888_t 
 {
 	// input data is assumed to be x86 order
 	// swap to target platform for proper dxt decoding
-  word color0 = LittleShort( pBlock->col0 );
+	word color0 = LittleShort( pBlock->col0 );
 	word color1 = LittleShort( pBlock->col1 );
 
 	// convert to full precision correctly.
@@ -291,7 +297,7 @@ static inline void GetColorBlockColorsBGRA8888( DXTColBlock *pBlock, BGRA8888_t 
 		col_3->b = 0xff;
 		col_3->a = 0x00;
 	}
-}			
+}
 
 template <class CDestPixel> 
 static inline void DecodeColorBlock( CDestPixel *pOutputImage, DXTColBlock *pColorBlock, int width,
@@ -355,7 +361,7 @@ static inline void DecodeAlpha3BitLinear( CDestPixel *pImPos, DXTAlphaBlock3BitL
 	gAlphas[0] = pAlphaBlock->alpha0;
 	gAlphas[1] = pAlphaBlock->alpha1;
 
-	// 8-alpha or 6-alpha block?    
+	// 8-alpha or 6-alpha block?
 
 	if( gAlphas[0] > gAlphas[1] )
 	{
@@ -473,17 +479,17 @@ static inline void DecodeAlpha3BitLinear( CDestPixel *pImPos, DXTAlphaBlock3BitL
 template <class CDestPixel> 
 static void ConvertFromDXT1( const uint8 *src, CDestPixel *dst, int width, int height )
 {
-	Assert( sizeof( BGRA8888_t ) == 4 );
-	Assert( sizeof( RGBA8888_t ) == 4 );
-	Assert( sizeof( RGB888_t ) == 3 );
-	Assert( sizeof( BGR888_t ) == 3 );
-	Assert( sizeof( BGR565_t ) == 2 );
-	Assert( sizeof( BGRA5551_t ) == 2 );
-	Assert( sizeof( BGRA4444_t ) == 2 );
+	static_assert( sizeof( BGRA8888_t ) == 4 );
+	static_assert( sizeof( RGBA8888_t ) == 4 );
+	static_assert( sizeof( RGB888_t ) == 3 );
+	static_assert( sizeof( BGR888_t ) == 3 );
+	static_assert( sizeof( BGR565_t ) == 2 );
+	static_assert( sizeof( BGRA5551_t ) == 2 );
+	static_assert( sizeof( BGRA4444_t ) == 2 );
 
 	int realWidth = 0;
 	int realHeight = 0;
-	CDestPixel *realDst = NULL;
+	CDestPixel *realDst = nullptr;
 
 	// Deal with the case where we have a dimension smaller than 4.
 	if ( width < 4 || height < 4 )
@@ -494,7 +500,7 @@ static void ConvertFromDXT1( const uint8 *src, CDestPixel *dst, int width, int h
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( width * height * sizeof( CDestPixel ) );
+		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );
@@ -545,7 +551,7 @@ static void ConvertFromDXT5( const uint8 *src, CDestPixel *dst, int width, int h
 {
 	int realWidth = 0;
 	int realHeight = 0;
-	CDestPixel *realDst = NULL;
+	CDestPixel *realDst = nullptr;
 
 	// Deal with the case where we have a dimension smaller than 4.
 	if ( width < 4 || height < 4 )
@@ -556,7 +562,7 @@ static void ConvertFromDXT5( const uint8 *src, CDestPixel *dst, int width, int h
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( width * height * sizeof( CDestPixel ) );
+		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );
@@ -625,7 +631,7 @@ static void ConvertFromDXT5IgnoreAlpha( const uint8 *src, CDestPixel *dst, int w
 {
 	int realWidth = 0;
 	int realHeight = 0;
-	CDestPixel *realDst = NULL;
+	CDestPixel *realDst = nullptr;
 
 	// Deal with the case where we have a dimension smaller than 4.
 	if ( width < 4 || height < 4 )
@@ -636,7 +642,7 @@ static void ConvertFromDXT5IgnoreAlpha( const uint8 *src, CDestPixel *dst, int w
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( width * height * sizeof( CDestPixel ) );
+		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );
@@ -697,7 +703,7 @@ static void ConvertFromATIxN( const uint8 *src, CDestPixel *dst, int width, int 
 {
 	int realWidth = 0;
 	int realHeight = 0;
-	CDestPixel *realDst = NULL;
+	CDestPixel *realDst = nullptr;
 
 	// Deal with the case where we have a dimension smaller than 4.
 	if ( width < 4 || height < 4 )
@@ -708,7 +714,7 @@ static void ConvertFromATIxN( const uint8 *src, CDestPixel *dst, int width, int 
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( width * height * sizeof( CDestPixel ) );
+		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );
@@ -780,9 +786,9 @@ static dword GetDXTCEncodeType( ImageFormat imageFormat )
 #endif
 
 // Convert RGBA input to ATI1N or ATI2N format
-bool ConvertToATIxN(  const uint8 *src, ImageFormat srcImageFormat,
-					  uint8 *dst, ImageFormat dstImageFormat,
-					  int width, int height, int srcStride, int dstStride )
+bool ConvertToATIxN(  [[maybe_unused]] const uint8 *src, [[maybe_unused]]ImageFormat srcImageFormat,
+					  [[maybe_unused]] uint8 *dst, [[maybe_unused]] ImageFormat dstImageFormat,
+					  [[maybe_unused]] int width, [[maybe_unused]] int height, [[maybe_unused]] int srcStride, [[maybe_unused]] int dstStride )
 {
 // dimhotepus: Exclude ATI compress as proprietary.
 #if !defined(NO_ATI_COMPRESS) && !defined(POSIX)
@@ -815,7 +821,7 @@ bool ConvertToATIxN(  const uint8 *src, ImageFormat srcImageFormat,
 	destTexture.dwDataSize = ATI_TC_CalculateBufferSize( &destTexture );
 	destTexture.pData = (ATI_TC_BYTE*) dst;
 
-	ATI_TC_ERROR errATI = ATI_TC_ConvertTexture( &srcTexture, &destTexture, NULL, NULL, NULL, NULL );		// Convert it!
+	ATI_TC_ERROR errATI = ATI_TC_ConvertTexture( &srcTexture, &destTexture, nullptr, nullptr, nullptr, nullptr );		// Convert it!
 	
 	free( srcTexture.pData );																				// Free temporary buffers
 
@@ -830,9 +836,9 @@ bool ConvertToATIxN(  const uint8 *src, ImageFormat srcImageFormat,
 }
 
 
-bool ConvertToDXTLegacy(  const uint8 *src, ImageFormat srcImageFormat,
- 						  uint8 *dst, ImageFormat dstImageFormat, 
-					      int width, int height, int srcStride, int dstStride )
+bool ConvertToDXTLegacy(  [[maybe_unused]] const uint8 *src, [[maybe_unused]] ImageFormat srcImageFormat,
+ 						  [[maybe_unused]] uint8 *dst, [[maybe_unused]] ImageFormat dstImageFormat, 
+					      [[maybe_unused]] int width, [[maybe_unused]] int height, [[maybe_unused]] int srcStride, [[maybe_unused]] int dstStride )
 {
 // dimhotepus: Exclude nvtc as proprietary.
 #if !defined(NO_NVTC) && !defined( _X360 ) && !defined( POSIX )
@@ -901,7 +907,7 @@ bool ConvertToDXTLegacy(  const uint8 *src, ImageFormat srcImageFormat,
 	descOut.dwSize = sizeof( descOut );
 	
 	// Encode the texture
-	S3TCencode( &descIn, NULL, &descOut, dst, dwEncodeType, weight );
+	S3TCencode( &descIn, nullptr, &descOut, dst, dwEncodeType, weight );
 	return true;
 #else
 	Assert( 0 );
@@ -922,7 +928,7 @@ void CompressSTB( uint8 *pDstBytes, ImageFormat dstFmt, const uint8 *pSrcBytes, 
 	const uint32 cLastY = cPixY - 1;
 
 	// STB always takes blocks as 4x4 of RGBA8888_t
-	RGBA8888_t srcBlock[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	RGBA8888_t srcBlock[16] = { {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{} };
 	SrcPixel_t* pSrcs[4] = { 0, 0, 0, 0 };
 
 	for ( uint32 y = 0; y < cPixY; y += 4 ) 
@@ -981,9 +987,9 @@ bool ConvertToDXTRuntime( const uint8 *src, ImageFormat srcImageFormat,
 		case IMAGE_FORMAT_BGRA8888: CompressSTB<BGRA8888_t>( dst, dstImageFormat, src, width, height ); return true;
 		case IMAGE_FORMAT_BGRX8888: CompressSTB<BGRX8888_t>( dst, dstImageFormat, src, width, height ); return true;
 		default:
-			Assert( !"Unexpected format here, wtf." );
+			AssertMsg( false, "Unexpected format here, wtf." );
 			break;
-	};
+	}
 
 	return false;
 }
@@ -1292,8 +1298,7 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 		// Fast path for compressed textures . . stride doesn't make as much sense.
 //		Assert( srcStride == 0 && dstStride == 0 );
 
-		int memRequired;
-		memRequired = GetMemRequired( width, height, 1, srcImageFormat, false );
+		intp memRequired = GetMemRequired( width, height, 1, srcImageFormat, false );
 		memcpy( dst, src, memRequired );
 		return true;
 	}
@@ -1517,7 +1522,7 @@ void ConvertIA88ImageToNormalMapRGBA8888( const uint8 *src, int width,
 {
 	float heightScale = ( 1.0f / 255.0f ) * bumpScale;
 	float c, cx, cy;
-	float maxDim = ( width > height ) ? width : height;
+	float maxDim = ( width > height ) ? (float)width : (float)height;
 	float ooMaxDim = 1.0f / maxDim;
 
 	int s, t;
@@ -1618,10 +1623,12 @@ void NormalizeNormalMapRGBA8888( uint8 *src, int numTexels )
 
 	for( uint8 *pixel = src; pixel < lastPixel; pixel += 4 )
 	{
-		Vector tmpVect;
-		tmpVect[0] = ( ( float )pixel[0] - 128.0f ) * ( 1.0f / 127.0f );
-		tmpVect[1] = ( ( float )pixel[1] - 128.0f ) * ( 1.0f / 127.0f );
-		tmpVect[2] = ( ( float )pixel[2] - 128.0f ) * ( 1.0f / 127.0f );
+		Vector tmpVect
+		{
+			( ( float )pixel[0] - 128.0f ) * ( 1.0f / 127.0f ),
+			( ( float )pixel[1] - 128.0f ) * ( 1.0f / 127.0f ),
+			( ( float )pixel[2] - 128.0f ) * ( 1.0f / 127.0f )
+		};		
 
 		VectorNormalize( tmpVect );
 

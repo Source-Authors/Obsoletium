@@ -4,15 +4,15 @@
 //
 //===========================================================================//
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "tier0/dbg.h"
-#include <malloc.h>
-#include "filesystem.h"
 #include "bitmap/tgawriter.h"
+
+#include <cstring>
+
+#include "tier0/dbg.h"
+#include "tier0/wchartypes.h"
+#include "filesystem.h"
 #include "tier1/utlbuffer.h"
 #include "bitmap/imageformat.h"
-#include "tier2/tier2.h"
 #include "tier2/fileutils.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -39,25 +39,11 @@ struct TGAHeader_t
 };
 #pragma pack()
 
-#define fputc myfputc
-#define fwrite myfwrite
-
 static void fputLittleShort( unsigned short s, CUtlBuffer &buffer )
 {
 	buffer.PutChar( s & 0xff );
 	buffer.PutChar( s >> 8 );
 }
-
-static inline void myfputc( unsigned char c, FileHandle_t fileHandle )
-{
-	g_pFullFileSystem->Write( &c, 1, fileHandle );
-}
-
-static inline void myfwrite( void const *data, int size1, int size2, FileHandle_t fileHandle )
-{
-	g_pFullFileSystem->Write( data, size1 * size2, fileHandle );
-}
-
 
 //-----------------------------------------------------------------------------
 // FIXME: assumes that we don't need to do gamma correction.
@@ -65,8 +51,6 @@ static inline void myfwrite( void const *data, int size1, int size2, FileHandle_
 bool WriteToBuffer( unsigned char *pImageData, CUtlBuffer &buffer, int width, int height, 
 					ImageFormat srcFormat, ImageFormat dstFormat )
 {
-	TGAHeader_t header;
-
 	// Fix the dstFormat to match what actually is going to go into the file
 	switch( dstFormat )
 	{
@@ -77,7 +61,8 @@ bool WriteToBuffer( unsigned char *pImageData, CUtlBuffer &buffer, int width, in
 		dstFormat = IMAGE_FORMAT_BGRA8888;
 		break;
 	}
-
+	
+	TGAHeader_t header = {};
 	header.id_length = 0; // comment length
 	header.colormap_type = 0; // ???
 
@@ -97,7 +82,6 @@ bool WriteToBuffer( unsigned char *pImageData, CUtlBuffer &buffer, int width, in
 		break;
 	default:
 		return false;
-		break;
 	}
 
 	header.colormap_index = 0;
@@ -165,7 +149,6 @@ bool WriteDummyFileNoAlloc( const char *fileName, int width, int height, enum Im
 		break;
 	default:
 		return false;
-		break;
 	}
 
     memset( &tgaHeader, 0, sizeof(tgaHeader) );
@@ -226,7 +209,6 @@ bool WriteTGAFile( const char *fileName, int width, int height, enum ImageFormat
 		break;
 	default:
 		return false;
-		break;
 	}
 
     memset( &tgaHeader, 0, sizeof(tgaHeader) );
@@ -300,7 +282,6 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 		break;
 	default:
 		return false;
-		break;
 	}
 
 	// Verify src data matches the targa we're going to write into

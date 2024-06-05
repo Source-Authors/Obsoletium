@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include "bitmap/imageformat.h" //ImageFormat enum definition
+#include "bitmap/imageformat.h"   // ImageFormat enum definition
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -35,7 +35,8 @@ public:
 	};
 
 public:
-	explicit PSDImageResources( unsigned int numBytes, unsigned char const *pvBuffer ) : m_numBytes( numBytes ), m_pvBuffer( pvBuffer ) {}
+	explicit PSDImageResources( unsigned int numBytes, unsigned char const *pvBuffer )
+		: m_numBytes( numBytes ), m_pvBuffer( pvBuffer ) {}
 
 public:
 	ResElement FindElement( Resource eType ) const;

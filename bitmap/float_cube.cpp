@@ -1,12 +1,14 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
-#include <tier0/platform.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <stdlib.h>
+
 #include "bitmap/float_bm.h"
-#include <filesystem.h>
-#include <mathlib/vector.h>
+
+#include <cstdio>
+#include <cmath>
+
+#include "mathlib/vector.h"
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 static Vector face_xvector[6]={								// direction of x pixels on face
 	Vector(-1,0,0),											// back
@@ -49,7 +51,7 @@ FloatCubeMap_t::FloatCubeMap_t(char const *basename)
 	}
 }
 
-void FloatCubeMap_t::WritePFMs(char const *basename)
+void FloatCubeMap_t::WritePFMs(char const *basename) const
 {
 	for(int f=0;f<6;f++)
 	{
@@ -59,7 +61,7 @@ void FloatCubeMap_t::WritePFMs(char const *basename)
 	}
 }
 
-Vector FloatCubeMap_t::PixelDirection(int face, int x, int y)
+Vector FloatCubeMap_t::PixelDirection(int face, int x, int y) const
 {
 	FloatBitMap_t const &bm=face_maps[face];
 	float xc=x*1.0f/(bm.Width-1);

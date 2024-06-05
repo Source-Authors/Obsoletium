@@ -5,10 +5,14 @@
 //===========================================================================//
 
 #include "bitmap/psd.h"
+
+#include <malloc.h>
+#include <cstring>
+
 #include "tier0/dbg.h"
+#include "tier0/platform.h"
 #include "tier1/utlbuffer.h"
 #include "filesystem.h"
-#include "tier2/tier2.h"
 #include "tier2/utlstreambuffer.h"
 #include "bitmap/imageformat.h"
 #include "bitmap/bitmap.h"
@@ -20,8 +24,8 @@
 //-----------------------------------------------------------------------------
 // The PSD signature bytes
 //-----------------------------------------------------------------------------
-#define PSD_SIGNATURE 0x38425053
-#define PSD_IMGRES_SIGNATURE 0x3842494D
+constexpr int PSD_SIGNATURE{0x38425053};
+constexpr int PSD_IMGRES_SIGNATURE{0x3842494D};
 
 //-----------------------------------------------------------------------------
 // Format of the PSD header on disk
@@ -93,7 +97,7 @@ struct PSDPalette_t
 //-----------------------------------------------------------------------------
 bool IsPSDFile( CUtlBuffer &buf )
 {
-	int nGet = buf.TellGet();
+	intp nGet = buf.TellGet();
 	PSDHeader_t header;
 	buf.Get( &header, sizeof(header) );
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, nGet );
@@ -122,7 +126,7 @@ bool IsPSDFile( const char *pFileName, const char *pPathID )
 //-----------------------------------------------------------------------------
 bool PSDGetInfo( CUtlBuffer &buf, int *pWidth, int *pHeight, ImageFormat *pImageFormat, float *pSourceGamma )
 {
-	int nGet = buf.TellGet();
+	intp nGet = buf.TellGet();
 	PSDHeader_t header;
 	buf.Get( &header, sizeof(header) );
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, nGet );
@@ -158,7 +162,7 @@ bool PSDGetInfo( const char *pFileName, const char *pPathID, int *pWidth, int *p
 //-----------------------------------------------------------------------------
 PSDImageResources PSDGetImageResources( CUtlBuffer &buf )
 {
-	int nGet = buf.TellGet();
+	intp nGet = buf.TellGet();
 
 	// Header
 	PSDHeader_t header;
@@ -256,6 +260,9 @@ static void PSDConvertToRGBA8888( int nChannelsCount, PSDMode_t mode, PSDPalette
 				}
 			}
 		}
+		break;
+
+	default:
 		break;
 	}
 
@@ -419,8 +426,7 @@ bool PSDReadFileRGBA8888( CUtlBuffer &buf, Bitmap_t &bitmap )
 	int nColorModeSize = BigLong( buf.GetUnsignedInt() );
 	Assert( nColorModeSize % 3 == 0 );
 	unsigned char *pPaletteBits = (unsigned char*)_alloca( nColorModeSize );
-	PSDPalette_t palette;
-	palette.m_pRed = palette.m_pGreen = palette.m_pBlue = 0;
+	PSDPalette_t palette{nullptr, nullptr, nullptr};
 	if ( nColorModeSize )
 	{
 		int nPaletteSize = nColorModeSize / 3;

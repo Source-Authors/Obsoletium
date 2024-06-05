@@ -13,9 +13,14 @@
 #pragma once
 #endif
 
-#include <tier0/platform.h>
+#include <algorithm>  // clamp
+#include <cstring>
+#include <utility>    // min, max
+
+#include "tier0/commonmacros.h"
 #include "tier0/dbg.h"
-#include <mathlib/mathlib.h>
+#include "tier0/platform.h"
+#include "mathlib/vector.h"
 
 struct PixRGBAF 
 {
@@ -35,31 +40,30 @@ struct PixRGBA8
 
 inline PixRGBAF PixRGBA8_to_F( PixRGBA8 const &x )
 {
-	PixRGBAF f;
-	f.Red = x.Red / 255.f;
-	f.Green = x.Green / 255.f;
-	f.Blue = x.Blue / 255.f;
-	f.Alpha = x.Alpha / 255.f;
+	PixRGBAF f{x.Red / 255.f, x.Green / 255.f, x.Blue / 255.f, x.Alpha / 255.f};
 	return f;
 }
 
 inline PixRGBA8 PixRGBAF_to_8( PixRGBAF const &f )
 {
-	PixRGBA8 x;
-	x.Red = static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Red ) ));
-	x.Green = static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Green ) ));
-	x.Blue = static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Blue ) ));
-	x.Alpha = static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Alpha ) ));
+	PixRGBA8 x{
+		static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Red ) )),
+		static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Green ) )),
+		static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Blue ) )),
+		static_cast<unsigned char>(max( 0.f, min( 255.f,255.f*f.Alpha ) ))
+	};
 	return x;
 }
 
-#define SPFLAGS_MAXGRADIENT 1
+constexpr int SPFLAGS_MAXGRADIENT{1};
 
 // bit flag options for ComputeSelfShadowedBumpmapFromHeightInAlphaChannel:
-#define SSBUMP_OPTION_NONDIRECTIONAL 1						// generate ambient occlusion only
-#define SSBUMP_MOD2X_DETAIL_TEXTURE 2						// scale so that a flat unshadowed
-                                                            // value is 0.5, and bake rgb luminance
-                                                            // in.
+// generate ambient occlusion only
+constexpr int SSBUMP_OPTION_NONDIRECTIONAL{1};
+// scale so that a flat unshadowed
+// value is 0.5, and bake rgb luminance
+// in.
+constexpr int SSBUMP_MOD2X_DETAIL_TEXTURE{2};
 
 
 
@@ -69,13 +73,11 @@ public:
 	int Width, Height;										// bitmap dimensions
 	float *RGBAData;										// actual data
 
-	FloatBitMap_t(void)										// empty one
+	FloatBitMap_t()										// empty one
 	{
 		Width=Height=0;
-		RGBAData=0;
+		RGBAData=nullptr;
 	}
-
-
 
 	FloatBitMap_t(int width, int height);                  // make one and allocate space
 	FloatBitMap_t(char const *filename);                   // read one from a file (tga or pfm)
@@ -84,10 +86,10 @@ public:
 	bool WriteTGAFile(char const *filename) const;
 
 	bool LoadFromPFM(char const *filename);					// load from floating point pixmap (.pfm) file
-	bool WritePFM(char const *filename);					// save to floating point pixmap (.pfm) file
+	bool WritePFM(char const *filename) const;					// save to floating point pixmap (.pfm) file
 
 
-	void InitializeWithRandomPixelsFromAnotherFloatBM(FloatBitMap_t const &other);
+	void InitializeWithRandomPixelsFromAnotherFloatBM(FloatBitMap_t const &other) const;
 
 	inline float & Pixel(int x, int y, int comp) const
 	{
@@ -117,8 +119,8 @@ public:
 	inline float & PixelClamped(int x, int y, int comp) const
 	{
 		// like Pixel except wraps around to other side
-		x=clamp(x,0,Width-1);
-		y=clamp(y,0,Height-1);
+		x=std::clamp(x,0,Width-1);
+		y=std::clamp(y,0,Height-1);
 		return RGBAData[4*(x+Width*y)+comp];
 	}
 
@@ -138,13 +140,14 @@ public:
 	{
 		Assert((x>=0) && (x<Width));
 		Assert((y>=0) && (y<Height));
-
-		PixRGBAF RetPix;
+		
 		int RGBoffset= 4*(x+Width*y);
-		RetPix.Red= RGBAData[RGBoffset+0];
-		RetPix.Green= RGBAData[RGBoffset+1];
-		RetPix.Blue= RGBAData[RGBoffset+2];
-		RetPix.Alpha= RGBAData[RGBoffset+3];
+		PixRGBAF RetPix {
+			RGBAData[RGBoffset+0],
+			RGBAData[RGBoffset+1],
+			RGBAData[RGBoffset+2],
+			RGBAData[RGBoffset+3]
+		};
 
 		return RetPix;
 	}
@@ -176,12 +179,12 @@ public:
 	void SmartPaste(FloatBitMap_t const &brush, int xofs, int yofs, uint32 flags);
 
 	// force to be tileable using poisson formula
-	void MakeTileable(void);
+	void MakeTileable(void) const;
 
 	void ReSize(int NewXSize, int NewYSize);
 
 	// find the bounds of the area that has non-zero alpha.
-	void GetAlphaBounds(int &minx, int &miny, int &maxx,int &maxy);
+	void GetAlphaBounds(int &minx, int &miny, int &maxx,int &maxy) const;
 
 	// Solve the poisson equation for an image. The alpha channel of the image controls which
 	// pixels are "modifiable", and can be used to set boundary conditions. Alpha=0 means the pixel
@@ -197,27 +200,27 @@ public:
 	FloatBitMap_t *QuarterSizeWithGaussian(void) const;		// downsample 2x using a gaussian
 
 
-	void RaiseToPower(float pow);
+	void RaiseToPower(float pow) const;
 	void ScaleGradients(void);
-	void Logize(void);                                        // pix=log(1+pix)
-	void UnLogize(void);                                      // pix=exp(pix)-1
+	void Logize(void) const;                                        // pix=log(1+pix)
+	void UnLogize(void) const;                                      // pix=exp(pix)-1
 
 	// compress to 8 bits converts the hdr texture to an 8 bit texture, encoding a scale factor
 	// in the alpha channel. upon return, the original pixel can be (approximately) recovered
 	// by the formula rgb*alpha*overbright. 
 	// this function performs special numerical optimization on the texture to minimize the error
 	// when using bilinear filtering to read the texture.
-	void CompressTo8Bits(float overbright);
+	void CompressTo8Bits(float overbright) const;
 	// decompress a bitmap converted by CompressTo8Bits
-	void Uncompress(float overbright);
+	void Uncompress(float overbright) const;
 
 
-	Vector AverageColor(void);								// average rgb value of all pixels
-	float BrightestColor(void);								// highest vector magnitude
+	Vector AverageColor() const;								// average rgb value of all pixels
+	float BrightestColor() const;								// highest vector magnitude
 
-	void Clear(float r, float g, float b, float alpha);		// set all pixels to speicifed values (0..1 nominal)
+	void Clear(float r, float g, float b, float alpha) const;		// set all pixels to speicifed values (0..1 nominal)
 
-	void ScaleRGB(float scale_factor);						// for all pixels, r,g,b*=scale_factor
+	void ScaleRGB(float scale_factor) const;						// for all pixels, r,g,b*=scale_factor
 
 	// given a bitmap with height stored in the alpha channel, generate vector positions and normals
 	void ComputeVertexPositionsAndNormals( float flHeightScale, Vector **ppPosOut, Vector **ppNormalOut ) const;
@@ -272,34 +275,37 @@ public:
 	FloatCubeMap_t(char const *basename);
 
 	// save basenamebk,pfm, basenamedn.pfm, basenameft.pfm, ...
-	void WritePFMs(char const *basename);
+	void WritePFMs(char const *basename) const;
 
-	Vector AverageColor(void)
+	Vector AverageColor() const
 	{
-		Vector ret(0,0,0);
-		int nfaces=0;
-		for(int f=0;f<6;f++)
-			if (face_maps[f].RGBAData)
+		Vector ret{0, 0, 0};
+
+		int nfaces = 0;
+		for (auto &map : face_maps)
+			if (map.RGBAData)
 			{
 				nfaces++;
-				ret+=face_maps[f].AverageColor();
+				ret += map.AverageColor();
 			}
-			if (nfaces)
-				ret*=(1.0f/nfaces);
-			return ret;
+
+		if (nfaces)
+			ret *= 1.0f / nfaces;
+
+		return ret;
 	}
 
-	float BrightestColor(void)
+	float BrightestColor() const
 	{
 		float ret=0.0;
-		int nfaces=0;
-		for(int f=0;f<6;f++)
-			if (face_maps[f].RGBAData)
+
+		for (auto &map : face_maps)
+			if (map.RGBAData)
 			{
-				nfaces++;
-				ret=max(ret,face_maps[f].BrightestColor());
+				ret = max(ret, map.BrightestColor());
 			}
-			return ret;
+
+		return ret;
 	}
 
 
@@ -308,7 +314,7 @@ public:
 	void Resample(FloatCubeMap_t &dest, float flPhongExponent);
 
 	// returns the normalized direciton vector through a given pixel of a given face
-	Vector PixelDirection(int face, int x, int y);
+	Vector PixelDirection(int face, int x, int y) const;
 
 	// returns the direction vector throught the center of a cubemap face
 	Vector FaceNormal( int nFaceNumber );
@@ -322,7 +328,7 @@ static inline float FLerp(float f1, float f2, float t)
 
 
 // Image Pyramid class.
-#define MAX_IMAGE_PYRAMID_LEVELS 16							// up to 64kx64k
+constexpr int MAX_IMAGE_PYRAMID_LEVELS{16};  // up to 64kx64k;
 
 enum ImagePyramidMode_t 
 {
@@ -335,7 +341,7 @@ public:
 	int m_nLevels;
 	FloatBitMap_t *m_pLevels[MAX_IMAGE_PYRAMID_LEVELS];		// level 0 is highest res
 
-	FloatImagePyramid_t(void)
+	FloatImagePyramid_t()
 	{
 		m_nLevels=0;
 		memset(m_pLevels,0,sizeof(m_pLevels));
@@ -350,13 +356,13 @@ public:
 	FloatBitMap_t *Level(int lvl) const
 	{
 		Assert(lvl<m_nLevels);
-		Assert(lvl<ARRAYSIZE(m_pLevels));
+		Assert(lvl<ssize(m_pLevels));
 		return m_pLevels[lvl];
 	}
 	// rebuild all levels above the specified level
 	void ReconstructLowerResolutionLevels(int starting_level);
 
-	~FloatImagePyramid_t(void);
+	~FloatImagePyramid_t();
 
 	void WriteTGAs(char const *basename) const;				// outputs name_00.tga, name_01.tga,...
 };

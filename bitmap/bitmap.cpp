@@ -5,18 +5,24 @@
 //=============================================================================//
 
 #include "bitmap/bitmap.h"
-#include "dbg.h"
+
+#include <cstring>
+
+#include "bitmap/imageformat.h"
+#include "Color.h"
+#include "tier0/dbg.h"
+#include "tier0/wchartypes.h"  // byte
 
 // Should be last include
 #include "tier0/memdbgon.h"
 
 bool Bitmap_t::IsValid() const
 {
-	if ( m_nWidth <= 0 || m_nHeight <= 0 || m_pBits == NULL )
+	if ( m_nWidth <= 0 || m_nHeight <= 0 || m_pBits == nullptr )
 	{
 		Assert( m_nWidth == 0 );
 		Assert( m_nHeight == 0 );
-		Assert( m_pBits == NULL );
+		Assert( m_pBits == nullptr );
 		return false;
 	}
 	return true;
@@ -78,7 +84,7 @@ void Bitmap_t::Init( int xs, int ys, ImageFormat imageFormat, int nStride )
 
 	// Allocate buffer.  Because this is a PC game,
 	// failure is impossible....right?
-	m_pBits = (byte *)malloc( ys * m_nStride );
+	m_pBits = static_cast<byte *>(malloc( ys * m_nStride ));
 
 	// Assume ownership
 	m_bOwnsBuffer = true;
@@ -136,7 +142,7 @@ Color Bitmap_t::GetColor( int x, int y ) const
 			return Color( ptr[3], ptr[2], ptr[1], ptr[0] );
 
 		default:
-			Assert( !"Unsupport image format!");
+			AssertMsg( false, "Unsupport image format!");
 			return Color( 255,0,255,255 );
 	}
 }
@@ -154,160 +160,24 @@ void Bitmap_t::SetColor( int x, int y, Color c )
 	switch ( m_ImageFormat )
 	{
 		case IMAGE_FORMAT_RGBA8888:
-			ptr[0] = c.r();
-			ptr[1] = c.g();
-			ptr[2] = c.b();
-			ptr[3] = c.a();
+			ptr[0] = static_cast<byte>(c.r());
+			ptr[1] = static_cast<byte>(c.g());
+			ptr[2] = static_cast<byte>(c.b());
+			ptr[3] = static_cast<byte>(c.a());
 			break;
 
 		case IMAGE_FORMAT_ABGR8888:
-			ptr[0] = c.a();
-			ptr[1] = c.b();
-			ptr[2] = c.g();
-			ptr[3] = c.r();
+			ptr[0] = static_cast<byte>(c.a());
+			ptr[1] = static_cast<byte>(c.b());
+			ptr[2] = static_cast<byte>(c.g());
+			ptr[3] = static_cast<byte>(c.r());
 			break;
 
 		default:
-			Assert( !"Unsupport image format!");
+			AssertMsg( false, "Unsupport image format!" );
 			break;
 	}
 }
-
-//bool LoadVTF( const char *pszFilename )
-//{
-//
-//	// Load the raw file data
-//	CUtlBuffer fileData;
-//	if ( !filesystem->ReadFile( pszFilename, "game", fileData ) )
-//	{
-//		Warning( "Failed to load %s\n", pszFilename);
-//		return false;
-//	}
-//
-//	return LoadVTFFromBuffer( fileData, pszFilename );
-//}
-//
-//bool LoadVTFFromBuffer( CUtlBuffer fileData, const char *pszDebugName = "buffer" )
-//{
-//
-//	// Parse it into VTF object
-//	IVTFTexture *pVTFTexture( CreateVTFTexture() );
-//	if ( !pVTFTexture->Unserialize( fileData ) )
-//	{
-//		DestroyVTFTexture( pVTFTexture );
-//		Warning( "Failed to deserialize VTF %s\n", pszDebugName);
-//		return false;
-//	}
-//
-//	// We are re-reading our own files, so they should be 8888's
-//	if ( pVTFTexture->Format() != IMAGE_FORMAT_RGBA8888 )
-//	{
-//		DestroyVTFTexture( pVTFTexture );
-//		Warning( "%s isn't RGBA8888\n", pszDebugName);
-//		return false;
-//	}
-//
-//	// Copy the image data
-//	Allocate( pVTFTexture->Width(), pVTFTexture->Height() );
-//	for ( int y = 0 ; y < m_nHeight ; ++y )
-//	{
-//		memcpy( PixPtr(0, y), pVTFTexture->ImageData(0, 0, 0, 0, y), m_nWidth*4 );
-//	}
-//
-//	// Clean up
-//	DestroyVTFTexture( pVTFTexture );
-//	return true;
-//}
-//
-//bool SaveVTF( CUtlBuffer &outBuffer )
-//{
-//	// Create the VTF to write into
-//	IVTFTexture *pVTFTexture( CreateVTFTexture() );
-//	const int nFlags = TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD | TEXTUREFLAGS_SRGB;
-//	if ( !pVTFTexture->Init( m_nWidth, m_nHeight, 1, IMAGE_FORMAT_RGBA8888, nFlags, 1, 1 ) )
-//	{
-//		DestroyVTFTexture( pVTFTexture );
-//		return false;
-//	}
-//
-//	// write the rgba image to the vtf texture using the pixel writer
-//	CPixelWriter pixelWriter;		
-//	pixelWriter.SetPixelMemory( pVTFTexture->Format(), pVTFTexture->ImageData(), pVTFTexture->RowSizeInBytes( 0 ) );
-//
-//	for (int y = 0; y < m_nHeight; ++y)
-//	{
-//		pixelWriter.Seek( 0, y );
-//		for (int x = 0; x < m_nWidth; ++x)
-//		{
-//			Color c = GetPix( x, y );
-//			pixelWriter.WritePixel( c.r(), c.g(), c.b(), c.a() );
-//		}
-//	}
-//
-//	// Serialize to the buffer
-//	if ( !pVTFTexture->Serialize( outBuffer ) )
-//	{
-//		DestroyVTFTexture( pVTFTexture );
-//		return false;
-//	}
-//	DestroyVTFTexture( pVTFTexture );
-//	return true;
-//}
-
-//void Resize( int nNewSizeX, int nNewSizeY, const Image *pImgSrc = NULL )
-//{
-//	if ( pImgSrc == NULL )
-//	{
-//		pImgSrc = this;
-//	}
-//
-//	if ( nNewSizeX == m_nWidth && nNewSizeY == m_nHeight && pImgSrc == this )
-//	{
-//		return;
-//	}
-//
-//	byte *pNewData = (byte *)malloc( nNewSizeX * nNewSizeY * 4 );
-//	ImgUtl_StretchRGBAImage( pImgSrc->m_pBits, pImgSrc->m_nWidth, pImgSrc->m_nHeight, pNewData, nNewSizeX, nNewSizeY );
-//	Clear();
-//	m_pBits = pNewData;
-//	m_nWidth = nNewSizeX;
-//	m_nHeight = nNewSizeY;
-//}
-//
-//void Crop( int x0, int y0, int nNewSizeX, int nNewSizeY, const Image *pImgSrc )
-//{
-//	if ( pImgSrc == NULL )
-//	{
-//		pImgSrc = this;
-//	}
-//
-//	if ( nNewSizeX == m_nWidth && nNewSizeY == m_nHeight && pImgSrc == this )
-//	{
-//		return;
-//	}
-//
-//
-//	Assert( x0 >= 0 );
-//	Assert( y0 >= 0 );
-//	Assert( x0 + nNewSizeX <= pImgSrc->m_nWidth );
-//	Assert( y0 + nNewSizeY <= pImgSrc->m_nHeight );
-//
-//	// Allocate new buffer
-//	int nRowSize = nNewSizeX * 4;
-//	byte *pNewData = (byte *)malloc( nNewSizeY * nRowSize );
-//
-//	// Copy data, one row at a time
-//	for ( int y = 0 ; y < nNewSizeY ; ++y )
-//	{
-//		memcpy( pNewData + y*nRowSize, pImgSrc->PixPtr(x0, y0+y), nRowSize );
-//	}
-//
-//	// Replace current buffer with the new one
-//	Clear();
-//	m_pBits = pNewData;
-//	m_nWidth = nNewSizeX;
-//	m_nHeight = nNewSizeY;
-//}
 
 void Bitmap_t::MakeLogicalCopyOf( Bitmap_t &src, bool bTransferBufferOwnership )
 {
