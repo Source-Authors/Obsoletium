@@ -4,22 +4,16 @@
 //
 //=============================================================================//
 
+#include "s3tc_decode.h"
 
 #include "bitmap/imageformat.h"
-#include "basetypes.h"
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
-#include <malloc.h>
-#include <memory.h>
+
 // dimhotepus: Exclude nvtc as proprietary.
 #ifndef NO_NVTC
 #include "nvtc.h"
 #endif
-#include "mathlib/mathlib.h"
-#include "mathlib/vector.h"
-#include "utlmemory.h"
-#include "tier1/strtools.h"
-#include "s3tc_decode.h"
-#include "utlvector.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -28,26 +22,16 @@
 // When set to 8 or 12, it generates a palette given an 8x4 or 12x4 texture.
 extern int S3TC_BLOCK_WIDTH;
 
-
-class S3Palette
+struct S3TCBlock_DXT1
 {
-public:
-	S3RGBA m_Colors[4];
-};
-
-
-class S3TCBlock_DXT1
-{
-public:
 	unsigned short m_Ref1;		// The two colors that this block blends betwixt.
 	unsigned short m_Ref2;
 	unsigned int m_PixelBits;
 };
 
 
-class S3TCBlock_DXT5
+struct S3TCBlock_DXT5
 {
-public:
 	unsigned char m_AlphaRef[2];
 	unsigned char m_AlphaBits[6];
 
@@ -62,13 +46,15 @@ public:
 // S3TCBlock
 // ------------------------------------------------------------------------------------------ //
 
-int ReadBitInt( const char *pBits, int iBaseBit, int nBits )
+template<typename T>
+T ReadBitInt( const char *pBits, T iBaseBit, T nBits )
 {
-	int ret = 0;
-	for ( int i=0; i < nBits; i++ )
+	T ret = 0;
+	for ( T i=0; i < nBits; i++ )
 	{
-		int iBit = iBaseBit + i;
-		int val = ((pBits[iBit>>3] >> (iBit&7)) & 1) << i;
+		T iBit = iBaseBit + i;
+		T val = ((pBits[iBit>>3] >> (iBit&7)) & 1) << i;
+
 		ret |= val;
 	}
 	return ret;
@@ -220,11 +206,11 @@ char* S3TC_GetBlock(
 
 
 void GenerateRepresentativePalette(
-	ImageFormat format,
-	S3RGBA **pOriginals,	// Original RGBA colors in the texture. This allows it to avoid doubly compressing.
-	int nBlocks,
-	int lPitch,	// (in BYTES)
-	char mergedBlocks[16*MAX_S3TC_BLOCK_BYTES]
+	[[maybe_unused]] ImageFormat format,
+	[[maybe_unused]] S3RGBA **pOriginals,	// Original RGBA colors in the texture. This allows it to avoid doubly compressing.
+	[[maybe_unused]] int nBlocks,
+	[[maybe_unused]] int lPitch,	// (in BYTES)
+	[[maybe_unused]] char mergedBlocks[16*MAX_S3TC_BLOCK_BYTES]
 	)
 {
 	Error( "GenerateRepresentativePalette: not implemented" );	
@@ -314,7 +300,7 @@ void S3TC_MergeBlocks(
 					int iBaseBit = (y*nBlocks*4 + x + iBlock*4) * 2;
 					
 					S3PaletteIndex index = {0, 0};
-					index.m_ColorIndex = ReadBitInt( pBase, iBaseBit, 2 );
+					index.m_ColorIndex = ReadBitInt<unsigned>( pBase, iBaseBit, 2 );
 					
 					S3TC_SetPixelPaletteIndex( format, (char*)pBlock, x, y, index );
 				}
@@ -349,8 +335,8 @@ void S3TC_MergeBlocks(
 					int iBasePixel = (y*nBlocks*4 + x + iBlock*4);
 					
 					S3PaletteIndex index;
-					index.m_ColorIndex = ReadBitInt( pColorBits, iBasePixel * 2, 2 );
-					index.m_AlphaIndex = ReadBitInt( pAlphaBits, iBasePixel * 3, 3 );
+					index.m_ColorIndex = ReadBitInt<unsigned>( pColorBits, iBasePixel * 2, 2 );
+					index.m_AlphaIndex = ReadBitInt<unsigned>( pAlphaBits, iBasePixel * 3, 3 );
 					
 					S3TC_SetPixelPaletteIndex( format, (char*)pBlock, x, y, index );
 				}
