@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <stdio.h>
+#include <cstdio>
 
 enum NormalDecodeMode_t
 {
@@ -20,14 +20,14 @@ enum NormalDecodeMode_t
 
 // Forward declaration
 #ifdef _WIN32
-typedef enum _D3DFORMAT D3DFORMAT;
+using D3DFORMAT = enum _D3DFORMAT;
 #endif
 
 //-----------------------------------------------------------------------------
 // The various image format types
 //-----------------------------------------------------------------------------
 
-enum ImageFormat 
+enum ImageFormat : int
 {
 	IMAGE_FORMAT_UNKNOWN  = -1,
 	IMAGE_FORMAT_RGBA8888 = 0, 
@@ -313,8 +313,8 @@ RGBA8888_t& RGBA8888_t::operator=( const BGRX8888_t& in )
 //-----------------------------------------------------------------------------
 // some important constants
 //-----------------------------------------------------------------------------
-#define ARTWORK_GAMMA ( 2.2f )
-#define IMAGE_MAX_DIM ( 2048 )
+constexpr float ARTWORK_GAMMA{2.2f};
+constexpr int IMAGE_MAX_DIM{2048};
 
 
 //-----------------------------------------------------------------------------
@@ -338,27 +338,27 @@ struct ImageFormatInfo_t
 namespace ImageLoader
 {
 
-	bool GetInfo( const char *fileName, int *width, int *height, enum ImageFormat *imageFormat, float *sourceGamma );
-	int  GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, bool mipmap );
-	int  GetMipMapLevelByteOffset( int width, int height, enum ImageFormat imageFormat, int skipMipLevels );
+	bool GetInfo( const char *fileName, int *width, int *height, ImageFormat *imageFormat, float *sourceGamma );
+	ptrdiff_t  GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, bool mipmap );
+	ptrdiff_t  GetMipMapLevelByteOffset( int width, int height, ImageFormat imageFormat, int skipMipLevels );
 	void GetMipMapLevelDimensions( int *width, int *height, int skipMipLevels );
 	int  GetNumMipMapLevels( int width, int height, int depth = 1 );
-	bool Load( unsigned char *imageData, const char *fileName, int width, int height, enum ImageFormat imageFormat, float targetGamma, bool mipmap );
+	bool Load( unsigned char *imageData, const char *fileName, int width, int height, ImageFormat imageFormat, float targetGamma, bool mipmap );
 	bool Load( unsigned char *imageData, FILE *fp, int width, int height, 
-			   enum ImageFormat imageFormat, float targetGamma, bool mipmap );
+			   ImageFormat imageFormat, float targetGamma, bool mipmap );
 
 	// convert from any image format to any other image format.
 	// return false if the conversion cannot be performed.
 	// Strides denote the number of bytes per each line, 
 	// by default assumes width * # of bytes per pixel
-	bool ConvertImageFormat( const unsigned char *src, enum ImageFormat srcImageFormat,
-							 unsigned char *dst, enum ImageFormat dstImageFormat, 
+	bool ConvertImageFormat( const unsigned char *src, ImageFormat srcImageFormat,
+							 unsigned char *dst, ImageFormat dstImageFormat, 
 							 int width, int height, int srcStride = 0, int dstStride = 0 );
 
 	// must be used in conjunction with ConvertImageFormat() to pre-swap and post-swap
-	void PreConvertSwapImageData( unsigned char *pImageData, int nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
-	void PostConvertSwapImageData( unsigned char *pImageData, int nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
-	void ByteSwapImageData( unsigned char *pImageData, int nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
+	void PreConvertSwapImageData( unsigned char *pImageData, ptrdiff_t nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
+	void PostConvertSwapImageData( unsigned char *pImageData, ptrdiff_t nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
+	void ByteSwapImageData( unsigned char *pImageData, ptrdiff_t nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
 	bool IsFormatValidForConversion( ImageFormat fmt );
 
 	//-----------------------------------------------------------------------------
@@ -388,8 +388,15 @@ namespace ImageLoader
 			m_flSrcGamma(0.0F), m_flDestGamma(0.0F),
 			m_flAlphaThreshhold(0.4f), m_flAlphaHiFreqThreshhold(0.4f), m_nFlags(0)
 		{
-			m_flColorScale[0] = 1.0f, m_flColorScale[1] = 1.0f, m_flColorScale[2] = 1.0f, m_flColorScale[3] = 1.0f;
-			m_flColorGoal[0] = 0.0f, m_flColorGoal[1] = 0.0f, m_flColorGoal[2] = 0.0f, m_flColorGoal[3] = 0.0f;
+			m_flColorScale[0] = 1.0f;
+			m_flColorScale[1] = 1.0f;
+			m_flColorScale[2] = 1.0f;
+			m_flColorScale[3] = 1.0f;
+
+			m_flColorGoal[0] = 0.0f;
+			m_flColorGoal[1] = 0.0f;
+			m_flColorGoal[2] = 0.0f;
+			m_flColorGoal[3] = 0.0f;
 		}
 
 		unsigned char *m_pSrc;

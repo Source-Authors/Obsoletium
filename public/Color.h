@@ -8,8 +8,8 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+#include <utility>
 #include "tier0/dbg.h"
-#include "minmax.h"
 
 #ifdef _WIN32
 #pragma once

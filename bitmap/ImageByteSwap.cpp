@@ -5,7 +5,6 @@
 //
 //=============================================================================//
 
-#include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "bitmap/imageformat.h"
 
@@ -79,7 +78,8 @@ namespace ImageLoader
 // as expected by the conversion process, which varies according to format,
 // input, and output.
 //-----------------------------------------------------------------------------
-	void PreConvertSwapImageData( unsigned char *pImageData, int nImageSize, ImageFormat imageFormat, int width, int stride )
+
+	void PreConvertSwapImageData( [[maybe_unused]] unsigned char *pImageData, [[maybe_unused]] ptrdiff_t nImageSize, [[maybe_unused]] ImageFormat imageFormat, [[maybe_unused]] int width, [[maybe_unused]] int stride )
 	{
 
 		Assert( IsFormatValidForConversion( imageFormat ) );
@@ -129,7 +129,7 @@ namespace ImageLoader
 // Swaps image bytes for use on a big endian platform. This is used after the conversion
 // process to match the 360 d3dformats.
 //-----------------------------------------------------------------------------
-	void PostConvertSwapImageData( unsigned char *pImageData, int nImageSize, ImageFormat imageFormat, int width, int stride )
+	void PostConvertSwapImageData( [[maybe_unused]] unsigned char *pImageData, [[maybe_unused]] ptrdiff_t nImageSize, [[maybe_unused]] ImageFormat imageFormat, [[maybe_unused]] int width, [[maybe_unused]] int stride )
 	{
 		Assert( IsFormatValidForConversion( imageFormat ) );
 
@@ -193,7 +193,7 @@ namespace ImageLoader
 //-----------------------------------------------------------------------------
 // Swaps image bytes.
 //-----------------------------------------------------------------------------
-	void ByteSwapImageData( unsigned char *pImageData, int nImageSize, ImageFormat imageFormat, int width, int stride )
+	void ByteSwapImageData( [[maybe_unused]] unsigned char *pImageData, [[maybe_unused]] ptrdiff_t nImageSize, [[maybe_unused]] ImageFormat imageFormat, [[maybe_unused]] int width, [[maybe_unused]] int stride )
 	{
 		Assert( IsFormatValidForConversion( imageFormat ) );
 
