@@ -10,26 +10,21 @@
 #pragma once
 #endif
 
+enum ImageFormat : int;
 
-#include "bitmap/imageformat.h"
-enum ImageFormat;
-
-
-class S3RGBA
+struct S3RGBA
 {
-public:
 	unsigned char b, g, r, a;
 };
 
-class S3PaletteIndex
+struct S3PaletteIndex
 {
-public:
 	unsigned char m_AlphaIndex;
 	unsigned char m_ColorIndex;
 };
 
 
-#define MAX_S3TC_BLOCK_BYTES	16
+constexpr int MAX_S3TC_BLOCK_BYTES{16};
 
 
 S3PaletteIndex S3TC_GetPixelPaletteIndex( ImageFormat format, const char *pS3Block, int x, int y );
