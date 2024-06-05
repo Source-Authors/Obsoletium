@@ -2762,7 +2762,7 @@ void CTexture::Precache()
 	char pCacheFileName[MATERIAL_MAX_PATH];
 	Q_snprintf( pCacheFileName, sizeof( pCacheFileName ), "materials/%s" TEXTURE_FNAME_EXTENSION, m_Name.String() );
 
-	int nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
+	unsigned short nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 	unsigned char *pMem = (unsigned char *)stackalloc( nHeaderSize );
 	CUtlBuffer buf( pMem, nHeaderSize );
 	if ( !g_pFullFileSystem->ReadFile( pCacheFileName, NULL, buf, nHeaderSize ) )	
@@ -4133,7 +4133,7 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - ReadHeaderFromFile", __FUNCTION__ );
-		int nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
+		unsigned int nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 
 		// restrict read to the header only!
 		// header provides info to avoid reading the entire file

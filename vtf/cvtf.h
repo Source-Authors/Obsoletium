@@ -13,15 +13,22 @@
 #pragma once
 #endif
 
+#include <cstring>
+
 #include "s3tc_decode.h"
 #include "vtf/vtf.h"
-#include "byteswap.h"
-#include "filesystem.h"
+#include "tier1/byteswap.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utlvector.h"
+#include "bitmap/imageformat.h"
+#include "tier0/basetypes.h"
+#include "tier0/platform.h"
+#include "mathlib/vector.h"
 
 class CEdgePos
 {
 public:
-  CEdgePos() = default;
+	CEdgePos() = default;
 	CEdgePos( int ix, int iy )
 	{
 		x = ix;
@@ -110,8 +117,8 @@ public:
 };
 
 
-#define NUM_EDGE_MATCHES	12
-#define NUM_CORNER_MATCHES	8
+constexpr int NUM_EDGE_MATCHES{12};
+constexpr int NUM_CORNER_MATCHES{8};
 
 
 //-----------------------------------------------------------------------------
@@ -140,16 +147,16 @@ public:
 	// Returns:
 	//		number of resource types available (can be greater than "numTypesBufferElems"
 	//		in which case only first "numTypesBufferElems" are copied to "arrTypesBuffer")
-	virtual unsigned int GetResourceTypes( uint32 *arrTypesBuffer, int numTypesBufferElems ) const;
+	virtual size_t GetResourceTypes( uint32 *arrTypesBuffer, size_t numTypesBufferElems ) const;
 
 	// Methods to set other texture fields
 	virtual void SetBumpScale( float flScale );
 	virtual void SetReflectivity( const Vector &vecReflectivity );
 
 	// These are methods to help with optimization of file access
-	virtual void LowResFileInfo( int *pStartLocation, int *pSizeInBytes ) const;
-	virtual void ImageFileInfo( int nFrame, int nFace, int nMip, int *pStartLocation, int *pSizeInBytes) const;
-	virtual int FileSize( int nMipSkipCount = 0 ) const;
+	virtual void LowResFileInfo( intp *pStartLocation, intp *pSizeInBytes ) const;
+	virtual void ImageFileInfo( int nFrame, int nFace, int nMip, intp *pStartLocation, intp *pSizeInBytes) const;
+	virtual intp FileSize( int nMipSkipCount = 0 ) const;
 
 	// When unserializing, we can skip a certain number of mip levels,
 	// and we also can just load everything but the image data
@@ -165,8 +172,8 @@ public:
 	virtual int Depth() const;
 	virtual int MipCount() const;
 
-	virtual int RowSizeInBytes( int nMipLevel ) const;
-	virtual int FaceSizeInBytes( int nMipLevel ) const;
+	virtual intp RowSizeInBytes( int nMipLevel ) const;
+	virtual intp FaceSizeInBytes( int nMipLevel ) const;
 
 	virtual ImageFormat Format() const;
 	virtual int FaceCount() const;
@@ -185,14 +192,14 @@ public:
 	virtual ImageFormat LowResFormat() const;
 
 	// Computes the size (in bytes) of a single mipmap of a single face of a single frame 
-	virtual int ComputeMipSize( int iMipLevel ) const;
+	virtual intp ComputeMipSize( int iMipLevel ) const;
 
 	// Computes the size (in bytes) of a single face of a single frame
 	// All mip levels starting at the specified mip level are included
-	virtual int ComputeFaceSize( int iStartingMipLevel = 0 ) const;
+	virtual intp ComputeFaceSize( int iStartingMipLevel = 0 ) const;
 
 	// Computes the total size of all faces, all frames
-	virtual int ComputeTotalSize( ) const;
+	virtual intp ComputeTotalSize( ) const;
 
 	// Computes the dimensions of a particular mip level
 	virtual void ComputeMipLevelDimensions( int iMipLevel, int *pWidth, int *pHeight, int *pMipDepth ) const;
@@ -254,19 +261,6 @@ public:
 	// Sets threshhold values for alphatest mipmapping
 	virtual void SetAlphaTestThreshholds( float flBase, float flHighFreq );
 
-#if defined( _X360 )
-	virtual int UpdateOrCreate( const char *pFilename, const char *pPathID = NULL, bool bForce = false );
-	virtual int FileSize( bool bPreloadOnly, int nMipSkipCount ) const;
-	virtual bool UnserializeFromBuffer( CUtlBuffer &buf, bool bBufferIsVolatile, bool bHeaderOnly, bool bPreloadOnly, int nMipSkipCount );
-	virtual bool IsPreTiled() const;
-	virtual int MappingWidth() const;
-	virtual int MappingHeight() const;
-	virtual int MappingDepth() const;
-	virtual int MipSkipCount() const;
-	virtual unsigned char *LowResImageSample();
-	virtual void ReleaseImageMemory();
-#endif
-
 private:
 	// Unserialization
 	bool ReadHeader( CUtlBuffer &buf, VTFFileHeader_t &header );
@@ -309,8 +303,8 @@ private:
 	void BuildCubeMapMatchLists( CEdgeMatch edgeMatches[NUM_EDGE_MATCHES], CCornerMatch cornerMatches[NUM_CORNER_MATCHES], bool bSkybox );
 
 	// Allocate image data blocks with an eye toward re-using memory
-	bool AllocateImageData( int nMemorySize );
-	bool AllocateLowResImageData( int nMemorySize );
+	bool AllocateImageData( intp nMemorySize );
+	bool AllocateLowResImageData( intp nMemorySize );
 
 	// Compute the mip count based on the size + flags
 	int ComputeMipCount( ) const;
@@ -338,17 +332,17 @@ private:
 	bool WriteImageData( CUtlBuffer &buf );
 
 	// Computes the size (in bytes) of a single mipmap of a single face of a single frame 
-	int ComputeMipSize( int iMipLevel, ImageFormat fmt ) const;
+	intp ComputeMipSize( int iMipLevel, ImageFormat fmt ) const;
 
 	// Computes the size (in bytes) of a single face of a single frame
 	// All mip levels starting at the specified mip level are included
-	int ComputeFaceSize( int iStartingMipLevel, ImageFormat fmt ) const;
+	intp ComputeFaceSize( int iStartingMipLevel, ImageFormat fmt ) const;
 
 	// Computes the total size of all faces, all frames
-	int ComputeTotalSize( ImageFormat fmt ) const;
+	intp ComputeTotalSize( ImageFormat fmt ) const;
 
 	// Computes the location of a particular face, frame, and mip level
-	int GetImageOffset( int iFrame, int iFace, int iMipLevel, ImageFormat fmt ) const;
+	intp GetImageOffset( int iFrame, int iFace, int iMipLevel, ImageFormat fmt ) const;
 
 	// Determines if the vtf or vtfx file needs to be swapped to the current platform
 	bool SetupByteSwap( CUtlBuffer &buf );
@@ -363,11 +357,6 @@ private:
 	// Removes the resource entry info if it's present
 	bool RemoveResourceEntryInfo( unsigned int eType );
 
-#if defined( _X360 )
-	bool ReadHeader( CUtlBuffer &buf, VTFFileHeaderX360_t &header );
-	bool LoadImageData( CUtlBuffer &buf, bool bBufferIsVolatile, int nMipSkipCount );
-#endif
-
 private:
 	// This is to make sure old-format .vtf files are read properly
 	int				m_nVersion[2];
@@ -381,7 +370,7 @@ private:
 	int				m_nFaceCount;
 	int				m_nFrameCount;
 
-	int				m_nImageAllocSize;
+	intp				m_nImageAllocSize;
 	int				m_nFlags;
 	unsigned char	*m_pImageData;
 
@@ -392,7 +381,7 @@ private:
 	int				m_iStartFrame;
 
 	// Low res data
-	int				m_nLowResImageAllocSize;
+	intp				m_nLowResImageAllocSize;
 	ImageFormat		m_LowResImageFormat;
 	int				m_nLowResImageWidth;
 	int				m_nLowResImageHeight;
@@ -410,25 +399,17 @@ private:
 	int				m_nFinestMipmapLevel;
 	int				m_nCoarsestMipmapLevel;
 
-#if defined( _X360 )
-	int				m_iPreloadDataSize;
-	int				m_iCompressedSize;
-	// resolves actual dimensions to/from mapping dimensions due to pre-picmipping
-	int				m_nMipSkipCount;
-	unsigned char	m_LowResImageSample[4];
-#endif
-
 	CUtlVector< ResourceEntryInfo > m_arrResourcesInfo;
 
 	struct ResourceMemorySection
 	{
 		ResourceMemorySection() { memset( this, 0, sizeof( *this ) ); }
 
-		int				m_nDataAllocSize;
-		int				m_nDataLength;
+		intp				m_nDataAllocSize;
+		intp				m_nDataLength;
 		unsigned char	*m_pData;
 
-		bool AllocateData( int nMemorySize );
+		bool AllocateData( intp nMemorySize );
 		bool LoadData( CUtlBuffer &buf, CByteswap &byteSwap );
 		bool WriteData( CUtlBuffer &buf ) const;
 	};
