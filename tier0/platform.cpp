@@ -4,19 +4,16 @@
 
 #include <ctime>
 
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 #include <cerrno>
 
 #include "winlite.h"
 #endif
+
 #include "tier0/platform.h"
 #include "tier0/minidump.h"
-#ifdef _X360
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_win32stubs.h"
-#else
 #include "tier0/vcrmode.h"
-#endif
+
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 #include "tier0/memalloc.h"
 
@@ -29,9 +26,7 @@
 //CPP sets this value while initializing its static space
 static ExitProcessWithErrorCBFn g_pfnExitProcessWithErrorCB; //= NULL
 
-#ifndef _X360
 extern VCRMode_t g_VCRMode;
-#endif
 static LARGE_INTEGER g_PerformanceFrequency;
 static double g_PerformanceCounterToS;
 static double g_PerformanceCounterToMS;
@@ -303,7 +298,7 @@ bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo )
 	if ( !pOutMemoryInfo ) 
 		return false;
 
-	MEMORYSTATUSEX memStat = { sizeof(memStat) };
+	MEMORYSTATUSEX memStat = { sizeof(memStat), 0, 0, 0, 0, 0, 0, 0, 0 };
 	if ( !GlobalMemoryStatusEx( &memStat ) ) 
 		return false;
 
@@ -320,7 +315,7 @@ bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo )
 
 	default:
 		return false;
-	};
+	}
 
 	return true;
 }
@@ -334,7 +329,7 @@ const char *Plat_GetCommandLineA()
 //--------------------------------------------------------------------------------------------------
 // Watchdog timer
 //--------------------------------------------------------------------------------------------------
-void Plat_BeginWatchdogTimer( int nSecs )
+void Plat_BeginWatchdogTimer( [[maybe_unused]] int nSecs )
 {
 }
 void Plat_EndWatchdogTimer( void )
@@ -344,7 +339,7 @@ int Plat_GetWatchdogTime( void )
 {
 	return 0;
 }
-void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFunction_t function )
+void Plat_SetWatchdogHandlerFunction( [[maybe_unused]] Plat_WatchDogHandlerFunction_t function )
 {
 }
 
@@ -379,7 +374,7 @@ bool Is64BitOS()
 
 typedef void (*Plat_AllocErrorFn)( unsigned long size );
 
-void Plat_DefaultAllocErrorFn( unsigned long size )
+void Plat_DefaultAllocErrorFn( [[maybe_unused]] unsigned long size )
 {
 }
 

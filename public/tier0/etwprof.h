@@ -16,12 +16,8 @@
 //  wevtutil um src\tier0\ValveETWProvider.man
 //  wevtutil im src\tier0\ValveETWProvider.man
 
-#ifndef ETWPROF_H
-#define ETWPROF_H
-
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef TIER0_ETWPROF_H_
+#define TIER0_ETWPROF_H_
 
 #include "tier0/platform.h"
 
@@ -99,8 +95,8 @@ public:
 	}
 private:
 	// Private and unimplemented to disable copying.
-	CETWScope( const CETWScope& rhs );
-	CETWScope& operator=( const CETWScope& rhs );
+	CETWScope( const CETWScope& rhs ) = delete;
+	CETWScope& operator=( const CETWScope& rhs ) = delete;
 
 	const char* m_pMessage;
 	int64 m_nStartTime;
@@ -155,4 +151,4 @@ private:
 
 #endif
 
-#endif // ETWPROF_H
+#endif  // TIER0_ETWPROF_H_

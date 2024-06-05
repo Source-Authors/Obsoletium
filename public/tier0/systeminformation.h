@@ -1,11 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SYSTEMINFORMATION_H
-#define SYSTEMINFORMATION_H
-
-#ifdef _WIN32
-	#pragma once
-#endif
+#ifndef TIER0_SYSTEMINFORMATION_H_
+#define TIER0_SYSTEMINFORMATION_H_
 
 #ifndef PLATFORM_INTERFACE
 	#define PLATFORM_INTERFACE
@@ -45,6 +41,4 @@ PLATFORM_INTERFACE unsigned long Plat_GetMemPageSize();
 //
 PLATFORM_INTERFACE SYSTEM_CALL_RESULT_t Plat_GetPagedPoolInfo( PAGED_POOL_INFO_t *pPPI );
 
-
-
-#endif // #ifndef SYSTEMINFORMATION_H
+#endif  // TIER0_SYSTEMINFORMATION_H_

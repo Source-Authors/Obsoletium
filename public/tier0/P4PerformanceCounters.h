@@ -1,22 +1,17 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef P4PERFORMANCECOUNTERS_H
-#define P4PERFORMANCECOUNTERS_H
+#ifndef TIER0_P4PERFORMANCECOUNTERS_H_
+#define TIER0_P4PERFORMANCECOUNTERS_H_
 
-#pragma once
 // Pentium 4 support
 
 /*
     https://www.intel.com/content/www/us/en/documentation-resources/developer.html#panel-top-resources|most-popular
 
     IA-32 Intel Architecture Software Developer's Manual Volume 1: Basic Architecture 
-
     IA-32 Intel Architecture Software Developer's Manual Volume 2A: Instruction Set Reference, A-M 
-
     IA-32 Intel Architecture Software Developer's Manual Volume 2B: Instruction Set Reference, N-Z 
-
     IA-32 Intel Architecture Software Developer's Manual Volume 3: System Programming Guide 
-
 
     From Mikael Pettersson's perfctr:
     
@@ -201,7 +196,7 @@ public:
 
     int64 ReadCounter()
     {
-#if PME_DEBUG
+#ifdef PME_DEBUG
         if ( escr.USR == 0 && escr.OS == 0 )
             return -1; // no area to collect, use SetCaptureMode
 
@@ -310,7 +305,7 @@ public:
     }
 };
 
-#include "EventMasks.h" 
-#include "EventModes.h" 
+#include "tier0/EventMasks.h" 
+#include "tier0/EventModes.h" 
 
-#endif // P4PERFORMANCECOUNTERS_H
+#endif   // TIER0_P4PERFORMANCECOUNTERS_H_

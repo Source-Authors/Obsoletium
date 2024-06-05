@@ -3,11 +3,8 @@
 // Purpose:	All of our code is completely Unicode.  Instead of char, you should
 // use wchar, uint8, or char8, as explained below.
 
-#ifndef WCHARTYPES_H
-#define WCHARTYPES_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef TIER0_WCHARTYPES_H_
+#define TIER0_WCHARTYPES_H_
 
 #ifdef _INC_TCHAR
 #error "Must include tier0 type headers before tchar.h"
@@ -99,6 +96,4 @@ typedef wchar_t uchar32;
 #include "tier0/valve_on.h"
 
 
-#endif // WCHARTYPES
-
-
+#endif  // TIER0_WCHARTYPES_H_

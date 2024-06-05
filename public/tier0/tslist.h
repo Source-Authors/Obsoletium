@@ -5,10 +5,10 @@
 // FIFO from
 // https://stackoverflow.com/questions/2979165/fober-et-al-lock-free-fifo-queue-multiple-consumers-and-producers
 
-#ifndef TSLIST_H
-#define TSLIST_H
+#ifndef TIER0_TSLIST_H_
+#define TIER0_TSLIST_H_
 
-#if defined( USE_NATIVE_SLIST ) && !defined( _X360 )
+#if defined( USE_NATIVE_SLIST )
 #include "winlite.h"
 #endif
 
@@ -16,10 +16,6 @@
 #include "tier0/threadtools.h"
 #include "tier0/memalloc.h"
 #include "tier0/memdbgoff.h"
-
-#if defined( _X360 )
-#define USE_NATIVE_SLIST
-#endif
 
 //-----------------------------------------------------------------------------
 
@@ -195,12 +191,7 @@ public:
 #endif
 
 #ifdef USE_NATIVE_SLIST
-#ifdef _X360
-		// integrated write-release barrier
-		return (TSLNodeBase_t *)InterlockedPushEntrySListRelease( &m_Head, pNode );
-#else
 		return (TSLNodeBase_t *)InterlockedPushEntrySList( &m_Head, pNode );
-#endif
 #else
 		TSLHead_t oldHead;
 		TSLHead_t newHead;
@@ -226,7 +217,7 @@ public:
 				break;
 			}
 			ThreadPause();
-		};
+		}
 
 		return (TSLNodeBase_t *)oldHead.value.Next;
 #endif
@@ -235,12 +226,7 @@ public:
 	TSLNodeBase_t *Pop()
 	{
 #ifdef USE_NATIVE_SLIST
-#ifdef _X360
-		// integrated read-acquire barrier
-		TSLNodeBase_t *pNode = (TSLNodeBase_t *)InterlockedPopEntrySListAcquire( &m_Head );
-#else
 		TSLNodeBase_t *pNode = (TSLNodeBase_t *)InterlockedPopEntrySList( &m_Head );
-#endif
 		return pNode;
 #else
 		TSLHead_t oldHead;
@@ -267,7 +253,7 @@ public:
 				break;
 			}
 			ThreadPause();
-		};
+		}
 
 		return (TSLNodeBase_t *)oldHead.value.Next;
 #endif
@@ -277,9 +263,6 @@ public:
 	{
 #ifdef USE_NATIVE_SLIST
 		TSLNodeBase_t *pBase = (TSLNodeBase_t *)InterlockedFlushSList( &m_Head );
-#if defined( _X360 ) || defined( _PS3 )
-		__lwsync(); // read-acquire barrier
-#endif
 		return pBase;
 #else
 		TSLHead_t oldHead;
@@ -423,7 +406,7 @@ public:
 	    }
 
 		// override new/delete so we can guarantee 8-byte aligned allocs
-		static void * operator new( size_t size, int nBlockUse, const char *pFileName, int nLine )
+		static void * operator new( size_t size, int, const char *pFileName, int nLine )
 		{
 			Node_t *pNode = (Node_t *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, pFileName, nLine );
 			return pNode;
@@ -433,7 +416,7 @@ public:
 	    {
 			MemAlloc_FreeAligned( p );
 	    }
-		static void operator delete( void *p, int nBlockUse, const char *pFileName, int nLine )
+		static void operator delete( void *p, int, const char *, int )
 		{
 			MemAlloc_FreeAligned( p );
 		}
@@ -616,7 +599,7 @@ public:
 	}
 
 	// override new/delete so we can guarantee 8-byte aligned allocs
-	static void * operator new( size_t size, int nBlockUse, const char *pFileName, int nLine )
+	static void * operator new( size_t size, int, const char *pFileName, int nLine )
 	{
 		CTSQueue *pNode = (CTSQueue *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, pFileName, nLine );
 		return pNode;
@@ -634,7 +617,7 @@ public:
 
 private:
 	// These ain't gonna work
-	static void * operator new[] ( size_t size ) throw()
+	static void * operator new[] ( size_t size )
 	{
 		return NULL;
 	}
@@ -868,7 +851,12 @@ public:
 
 	Node_t *Pop()
 	{
-		#define TSQUEUE_BAD_NODE_LINK ( (Node_t *)INT_TO_POINTER( 0xdeadbeef ) )
+		// dimhtepus: x64 support.
+#ifdef PLATFORM_64BITS
+		Node_t * TSQUEUE_BAD_NODE_LINK = (Node_t *)(void*)0xdeadbeefdeadbeef;
+#else
+		Node_t * TSQUEUE_BAD_NODE_LINK = (Node_t *)(void*)0xdeadbeef;
+#endif
 		NodeLink_t * volatile		pHead = &m_Head;
 		NodeLink_t * volatile		pTail = &m_Tail;
 		Node_t * volatile *			pHeadNode = &m_Head.value.pNode;
@@ -977,7 +965,7 @@ private:
 
 	Node_t *InterlockedCompareExchangeNode( Node_t * volatile *ppNode, Node_t *value, Node_t *comperand )
 	{
-		return (Node_t *)::ThreadInterlockedCompareExchangePointer( (void **)ppNode, value, comperand );
+		return (Node_t *)::ThreadInterlockedCompareExchangePointer( (void * volatile *)ppNode, value, comperand );
 	}
 
 	bool InterlockedCompareExchangeNodeLink( NodeLink_t volatile *pLink, const NodeLink_t &value, const NodeLink_t &comperand )
@@ -993,4 +981,4 @@ private:
 	 CTSListBase m_FreeNodes;
 } TSLIST_NODE_ALIGN_POST;
 
-#endif // TSLIST_H
+#endif  // TIER0_TSLIST_H_

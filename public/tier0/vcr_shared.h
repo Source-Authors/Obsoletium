@@ -1,19 +1,15 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef VCR_SHARED_H
-#define VCR_SHARED_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef TIER0_VCR_SHARED_H_
+#define TIER0_VCR_SHARED_H_
 
-
-#define VCRFILE_VERSION		2
+constexpr inline int VCRFILE_VERSION{2};
 
 
 // Identifiers for the things we record. When playing back, these things should
 // be asked for in the exact same order (otherwise, the engine isn't making all
 // the calls in the same order).
-typedef enum
+enum VCREvent
 {
 	VCREvent_Sys_FloatTime=0,
 	VCREvent_recvfrom,
@@ -43,7 +39,7 @@ typedef enum
 	VCREvent_LocalTime,
 	VCREvent_GenericString,
 	VCREvent_NUMEVENTS
-} VCREvent;
+};
 
 
-#endif // VCR_SHARED_H
+#endif  // TIER0_VCR_SHARED_H_

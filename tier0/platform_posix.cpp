@@ -153,7 +153,7 @@ static void InitTimeSystem( void )
 				printf( "Running a benchmark to measure system clock frequency...\n" );
 				// run n iterations and use the median
 				double flRDTSCToMicroSeconds[N_ITERATIONS_OF_RDTSC_TEST_TO_RUN];
-				for( int i = 0; i < ARRAYSIZE( flRDTSCToMicroSeconds ) ; i++ )
+				for( int i = 0; i < ssize( flRDTSCToMicroSeconds ) ; i++ )
 				{
 					uint64 stime = Plat_Rdtsc();
 					struct timeval stimeval;
@@ -168,9 +168,9 @@ static void InitTimeSystem( void )
 					uint64 nUs = 1000000 * elapsedtimeval.tv_sec + elapsedtimeval.tv_usec;
 					flRDTSCToMicroSeconds[ i ] = ( etime / nUs );
 				}
-				std::make_heap( flRDTSCToMicroSeconds, flRDTSCToMicroSeconds + ARRAYSIZE( flRDTSCToMicroSeconds ) - 1 );
-				std::sort_heap( flRDTSCToMicroSeconds, flRDTSCToMicroSeconds + ARRAYSIZE( flRDTSCToMicroSeconds ) - 1 );
-				s_flRDTSCToMicroSeconds = flRDTSCToMicroSeconds[ARRAYSIZE( flRDTSCToMicroSeconds ) / 2 ];
+				std::make_heap( flRDTSCToMicroSeconds, flRDTSCToMicroSeconds + ssize( flRDTSCToMicroSeconds ) - 1 );
+				std::sort_heap( flRDTSCToMicroSeconds, flRDTSCToMicroSeconds + ssize( flRDTSCToMicroSeconds ) - 1 );
+				s_flRDTSCToMicroSeconds = flRDTSCToMicroSeconds[std::size( flRDTSCToMicroSeconds ) / 2 ];
 				s_flRDTSCScale = 1.0  / ( 1000.0 * 1000.0 * s_flRDTSCToMicroSeconds );
 				printf( "Finished RDTSC test. To prevent the startup delay from this benchmark, set the environment variable RDTSC_FREQUENCY to %f on this system."
 						" This value is dependent upon the CPU clock speed and architecture and should be determined separately for each server. The use of this mechanism"
@@ -180,7 +180,7 @@ static void InitTimeSystem( void )
 				s_bUseRDTSC = true;
 #if TEST_RDTSC_FLOATTIME
 				printf( "RDTSC test results:\n" );
-				for( int i = 0; i < ARRAYSIZE( flRDTSCToMicroSeconds ); i++ )
+				for( int i = 0; i < ssize( flRDTSCToMicroSeconds ); i++ )
 					printf(" [%d] = %f\n", i, flRDTSCToMicroSeconds[i] );
 				printf( "scale factor = %f\n", s_flRDTSCScale );
 				uint64 srdtsc_time = Plat_Rdtsc();
@@ -528,10 +528,10 @@ PLATFORM_INTERFACE const tchar *Plat_GetCommandLine()
 			size_t nCharRead = 0;
 
 			// -1 to leave room for the '\0'
-			nCharRead = fread( g_CmdLine, sizeof( g_CmdLine[0] ), ARRAYSIZE( g_CmdLine ) - 1, fp );
+			nCharRead = fread( g_CmdLine, sizeof( g_CmdLine[0] ), std::size( g_CmdLine ) - 1, fp );
 			if ( feof( fp ) && !ferror( fp ) ) // Should have read the whole command line without error
 			{
-				Assert ( nCharRead < ARRAYSIZE( g_CmdLine ) );
+				Assert ( nCharRead < std::size( g_CmdLine ) );
 
 				for( int i = 0; i < nCharRead; i++ )
 				{
@@ -643,7 +643,7 @@ PLATFORM_INTERFACE bool Is64BitOS()
 			return true;
 	}
 #else
-	Assert( !"implement Is64BitOS" );
+	AssertMsg( false, "implement Is64BitOS" );
 #endif
 	return false;
 }
@@ -872,7 +872,7 @@ static void AddMemoryAllocation( void *pResult, size_t size )
 
 		// now, find the stack traceback context for this call
 		void *pTraceBack[MAX_STACK_TRACEBACK];
-		int nNumGot = backtrace( pTraceBack, ARRAYSIZE( pTraceBack ) );
+		int nNumGot = backtrace( pTraceBack, std::size( pTraceBack ) );
 		for( int n = MAX( 0, nNumGot - 1 ); n < MAX_STACK_TRACEBACK; n++ )
 			pTraceBack[n] = NULL;
 

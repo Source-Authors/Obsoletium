@@ -1,14 +1,14 @@
 // Copyright Valve Corporation, All rights reserved.
 
 #ifdef _WIN32
-#include "tier0/pmelib.h"
+#include "tier0/PMELib.h"
 
 #include "winlite.h"
 
 #include "tier0/valve_off.h"
 #include "tier0/valve_on.h"
 
-#include "tier0/ioctlcodes.h"
+#include "tier0/IOCTLCodes.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -158,19 +158,7 @@ HRESULT PME::SelectP5P6PerformanceEvent(uint32 dw_event, uint32 dw_counter,
     case PENTIUM_FAMILY:
         {
             uint64	i64_cesr;
-            int	i_kernel_bit,i_user_bit;
             BYTE u1_event = (BYTE)((dw_event & (0x3F0000))>>16);
-
-            if (dw_counter==0)		// the kernel and user mode bits depend on
-            {						// counter being used.
-                i_kernel_bit = 6;
-                i_user_bit = 7;
-            }
-            else
-            {
-                i_kernel_bit = 22;
-                i_user_bit = 23;
-            }
 
             ReadMSR(0x11, &i64_cesr);	// get current P5 event select (cesr)
 
@@ -401,7 +389,7 @@ double PME::GetCPUClockSpeedFast(void)
 	d_loop_period = ((double)(i64_perf_freq)) / 250000.0;
 	d_clock_freq = ((double)(i64_clock_end & 0xffffffff))*d_loop_period;
 
-	return (float)d_clock_freq;
+	return d_clock_freq;
 }
 
 

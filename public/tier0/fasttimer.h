@@ -1,10 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef FASTTIMER_H
-#define FASTTIMER_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef TIER0_FASTTIMER_H_
+#define TIER0_FASTTIMER_H_
 
 #ifdef _WIN32
 #include <intrin.h>
@@ -149,7 +146,7 @@ inline void CTimeAdder::End()
 	{
 		m_Timer.End();
 		*m_pTotal += m_Timer.GetDuration();
-		m_pTotal = 0;
+		m_pTotal = nullptr;
 	}
 }
 
@@ -558,4 +555,4 @@ inline uint64 CLimitTimer::CMicroSecLeft() const
 }
 
 
-#endif // FASTTIMER_H
+#endif  // TIER0_FASTTIMER_H_

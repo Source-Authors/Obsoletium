@@ -3,10 +3,8 @@
 #include "pch_tier0.h"
 
 #include "tier0/valve_off.h"
-#ifdef _X360
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_vxconsole.h"
-#elif defined( _WIN32 )
+
+#if defined( _WIN32 )
 #include "winlite.h"
 
 // dimhotepus: Launcher icon id.
@@ -71,9 +69,6 @@ static CAssertDisable *g_pAssertDisables = NULL;
 static int g_iLastLineRange = 5;
 static int g_nLastIgnoreNumTimes = 1;
 #endif
-#if defined( _X360 )
-static int g_VXConsoleAssertReturnValue = -1;
-#endif
 
 // Set to true if they want to break in the debugger.
 static bool g_bBreak = false;
@@ -117,7 +112,7 @@ static bool AreAssertsDisabled()
 static bool AreAssertsEnabledInFileLine( const tchar *pFilename, int iLine )
 {
 	CAssertDisable **pPrev = &g_pAssertDisables;
-	CAssertDisable *pNext;
+	CAssertDisable *pNext = nullptr;
 	for ( CAssertDisable *pCur=g_pAssertDisables; pCur; pCur=pNext )
 	{
 		pNext = pCur->m_pNext;
@@ -168,7 +163,8 @@ CAssertDisable* CreateNewAssertDisable( const tchar *pFilename )
 	pDisable->m_LineMin = pDisable->m_LineMax = -1;
 	pDisable->m_nIgnoreTimes = -1;
 	
-	_tcsncpy( pDisable->m_Filename, g_Info.m_pFilename, sizeof( pDisable->m_Filename ) - 1 );
+	// dimhotepus: Use passed file name to create assert disable.
+	_tcsncpy( pDisable->m_Filename, pFilename, sizeof( pDisable->m_Filename ) - 1 );
 	pDisable->m_Filename[ sizeof( pDisable->m_Filename ) - 1 ] = 0;
 	
 	return pDisable;
@@ -195,7 +191,7 @@ INT_PTR CALLBACK AssertDialogProc(
   HWND hDlg,  // handle to dialog box
   UINT uMsg,     // message
   WPARAM wParam, // first message parameter
-  LPARAM lParam  // second message parameter
+  [[maybe_unused]] LPARAM lParam  // second message parameter
 )
 {
 	switch( uMsg )
@@ -395,7 +391,7 @@ DBG_INTERFACE bool ShouldUseNewAssertDialog()
 static void SpewBacktrace()
 {
 	void *buffer[ 16 ];
-	int nptrs = backtrace( buffer, ARRAYSIZE( buffer ) );
+	int nptrs = backtrace( buffer, std::size( buffer ) );
 	if ( nptrs )
 	{
 		char **strings = backtrace_symbols(buffer, nptrs);
@@ -570,7 +566,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		messageboxdata.window = g_SDLWindow;
 		messageboxdata.title = "Assertion Failed";
 		messageboxdata.message = text;
-		messageboxdata.numbuttons = ARRAYSIZE( buttondata );
+		messageboxdata.numbuttons = ssize( buttondata );
 		messageboxdata.buttons = buttondata;
 
 		int Ret = ( *pfnSDLShowMessageBox )( &messageboxdata, &buttonid );
