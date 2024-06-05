@@ -4,13 +4,14 @@
 //
 //===========================================================================//
 
-#include <tier0/platform.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <stdlib.h>
 #include "bitmap/float_bm.h"
 
+#include <cmath>
+#include <cstring>
+#include <utility>
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 static float ScaleValue(float f, float overbright)
 {
@@ -53,7 +54,7 @@ void MaybeSetScaleVaue(FloatBitMap_t const &orig, FloatBitMap_t &newbm, int x, i
 }
 
 
-void FloatBitMap_t::Uncompress(float overbright)
+void FloatBitMap_t::Uncompress(float overbright) const
 {
 	for(int y=0;y<Height;y++)
 		for(int x=0;x<Width;x++)
@@ -69,10 +70,9 @@ void FloatBitMap_t::Uncompress(float overbright)
 		}
 }
 
-#define GAUSSIAN_WIDTH 5
-#define SQ(x) ((x)*(x))
+constexpr int GAUSSIAN_WIDTH{5};
 
-void FloatBitMap_t::CompressTo8Bits(float overbright)
+void FloatBitMap_t::CompressTo8Bits(float overbright) const
 {
 	FloatBitMap_t TmpFBM(Width,Height);
 	// first, saturate to max overbright
@@ -122,7 +122,7 @@ void FloatBitMap_t::CompressTo8Bits(float overbright)
 						r=0.26*GAUSSIAN_WIDTH;
 						float x1=xofs/r;
 						float y1=yofs/r;
-						float a=(SQ(x1)+SQ(y1))/(2.0*SQ(r));
+						float a=(Square(x1)+Square(y1))/(2.0*Square(r));
 						float w=exp(-a);
 						sum_scales+=w*TmpFBM.PixelClamped(x+xofs,y+yofs,3);
 						sum_weights+=w;

@@ -4,15 +4,15 @@
 //
 //===========================================================================//
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "tier0/dbg.h"
-#include <malloc.h>
-#include "filesystem.h"
 #include "bitmap/tgawriter.h"
+
+#include <cstring>
+
+#include "tier0/dbg.h"
+#include "tier0/wchartypes.h"
+#include "filesystem.h"
 #include "tier1/utlbuffer.h"
 #include "bitmap/imageformat.h"
-#include "tier2/tier2.h"
 #include "tier2/fileutils.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -65,8 +65,6 @@ static inline void myfwrite( void const *data, int size1, int size2, FileHandle_
 bool WriteToBuffer( unsigned char *pImageData, CUtlBuffer &buffer, int width, int height, 
 					ImageFormat srcFormat, ImageFormat dstFormat )
 {
-	TGAHeader_t header;
-
 	// Fix the dstFormat to match what actually is going to go into the file
 	switch( dstFormat )
 	{
@@ -77,7 +75,8 @@ bool WriteToBuffer( unsigned char *pImageData, CUtlBuffer &buffer, int width, in
 		dstFormat = IMAGE_FORMAT_BGRA8888;
 		break;
 	}
-
+	
+	TGAHeader_t header = {0};
 	header.id_length = 0; // comment length
 	header.colormap_type = 0; // ???
 

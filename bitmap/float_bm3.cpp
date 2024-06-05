@@ -4,17 +4,19 @@
 //
 //===========================================================================//
 
-#include <tier0/platform.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <stdlib.h>
 #include "bitmap/float_bm.h"
-#include "vstdlib/vstdlib.h"
+
+#include <utility>
+#include <cstring>
+
 #include "vstdlib/random.h"
+#include "tier0/dbg.h"
 #include "tier1/strtools.h"
 
-void FloatBitMap_t::InitializeWithRandomPixelsFromAnotherFloatBM(FloatBitMap_t const &other)
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
+void FloatBitMap_t::InitializeWithRandomPixelsFromAnotherFloatBM(FloatBitMap_t const &other) const
 {
 	for(int y=0;y<Height;y++)
 		for(int x=0;x<Width;x++)

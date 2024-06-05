@@ -4,15 +4,14 @@
 //
 //=============================================================================//
 
-#include <stdio.h>
 #include "bitmap/tgaloader.h"
+
 #include "tier0/dbg.h"
-#include "basetypes.h"
-#include <math.h>
-#include "tier1/utlvector.h"
+#include "tier0/dbgflag.h"
 #include "tier1/utlbuffer.h"
+#include "tier1/utlmemory.h"
 #include "filesystem.h"
-#include "tier2/tier2.h"
+#include "bitmap/imageformat.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -61,8 +60,8 @@ typedef void (*OutputRowFunc_t)( CUtlBuffer& buf, TGAHeader_t const& header, uns
 // Important constants
 //-----------------------------------------------------------------------------
 
-#define TGA_MAX_COLORMAP_SIZE ( 256 * 4 )
-#define TGA_MAX_ROW_LENGTH_IN_PIXELS IMAGE_MAX_DIM
+constexpr int TGA_MAX_COLORMAP_SIZE{256 * 4};
+constexpr int TGA_MAX_ROW_LENGTH_IN_PIXELS{IMAGE_MAX_DIM};
 
 
 //-----------------------------------------------------------------------------
@@ -701,7 +700,7 @@ static ReadRowFunc_t GetReadRowFunc( TGAHeader_t const& header )
 				break;
 			default:
 				//Error( "unsupported tga colordepth: %d", TGAHeader_t.pixel_size" );
-				return NULL;
+				return nullptr;
 				break;
 			}
 		}
@@ -748,7 +747,7 @@ static bool ReadSourceImage( CUtlBuffer& buf, TGAHeader_t& header, CTempImage& i
 	g_PixelsLeftInPacket = 0;
 
 	// Only allocate the memory once
-	int memRequired = ImageLoader::GetMemRequired( header.width, header.height, 1,
+	intp memRequired = ImageLoader::GetMemRequired( header.width, header.height, 1,
 		IMAGE_FORMAT_RGBA8888, false );
 	image.EnsureCapacity( memRequired );
 
@@ -870,7 +869,7 @@ bool LoadRGBA8888( CUtlBuffer& buf, CUtlMemory<unsigned char> &outputData, int &
 	
 	// Stores the RGBA8888 temp version of the image which we'll use to
 	// to do mipmapping...
-	int memSize = ImageLoader::GetMemRequired( 
+	intp memSize = ImageLoader::GetMemRequired( 
 		header.width, header.height, 1, IMAGE_FORMAT_RGBA8888, false );
 
 	outputData.EnsureCapacity( memSize );
