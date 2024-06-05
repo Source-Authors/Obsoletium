@@ -5,16 +5,16 @@
 //=====================================================================================//
 
 #undef fopen
-#include "bitmap/imageformat.h"
 #include "cvtf.h"
-#include "utlbuffer.h"
+
+#include "bitmap/imageformat.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/strtools.h"
+#include "tier1/utlvector.h"
 #include "tier0/dbg.h"
 #include "mathlib/vector.h"
 #include "mathlib/mathlib.h"
-#include "tier1/strtools.h"
-#include "tier0/mem.h"
 #include "s3tc_decode.h"
-#include "utlvector.h"
 #include "vprof_telemetry.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -196,7 +196,7 @@ void DestroyVTFTexture( IVTFTexture *pTexture )
 //-----------------------------------------------------------------------------
 // Allows us to only load in the first little bit of the VTF file to get info
 //-----------------------------------------------------------------------------
-int VTFFileHeaderSize( int nMajorVersion, int nMinorVersion )
+unsigned short VTFFileHeaderSize( int nMajorVersion, int nMinorVersion )
 {
 	if ( nMajorVersion == -1 )
 	{
@@ -221,11 +221,10 @@ int VTFFileHeaderSize( int nMajorVersion, int nMinorVersion )
 		case 3:
 			return sizeof( VTFFileHeaderV7_3_t ) + sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES;
 		case VTF_MINOR_VERSION:
-			int size1 = sizeof( VTFFileHeader_t );
-			int size2 = sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES;
-			int result = size1 + size2;
-			//printf("\n VTFFileHeaderSize (%i %i) is %i + %i -> %i",nMajorVersion,nMinorVersion, size1, size2, result );
-			return result;
+			constexpr size_t size1 = sizeof( VTFFileHeader_t );
+			constexpr size_t size2 = sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES;
+			constexpr size_t result = size1 + size2;
+			return static_cast<unsigned int>(result);
 		}
 		break;
 	
@@ -316,7 +315,7 @@ int CVTFTexture::ComputeMipCount() const
 // Allocate data blocks with an eye toward re-using memory
 //-----------------------------------------------------------------------------
 
-static bool GenericAllocateReusableData( unsigned char **ppData, int *pNumAllocated, int numRequested )
+static bool GenericAllocateReusableData( unsigned char **ppData, intp *pNumAllocated, intp numRequested )
 {
 	// If we're asking for memory and we have way more than we expect, free some.
 	if ( *pNumAllocated < numRequested || ( numRequested > 0 && *pNumAllocated > 16 * numRequested ) )
@@ -336,12 +335,12 @@ static bool GenericAllocateReusableData( unsigned char **ppData, int *pNumAlloca
 	return true;
 }
 
-bool CVTFTexture::AllocateImageData( int nMemorySize )
+bool CVTFTexture::AllocateImageData( intp nMemorySize )
 {
 	return GenericAllocateReusableData( &m_pImageData, &m_nImageAllocSize, nMemorySize );
 }
 
-bool CVTFTexture::ResourceMemorySection::AllocateData( int nMemorySize )
+bool CVTFTexture::ResourceMemorySection::AllocateData( intp nMemorySize )
 {
 	if ( GenericAllocateReusableData( &m_pData, &m_nDataAllocSize, nMemorySize ) )
 	{
@@ -352,7 +351,7 @@ bool CVTFTexture::ResourceMemorySection::AllocateData( int nMemorySize )
 	return false;
 }
 
-bool CVTFTexture::AllocateLowResImageData( int nMemorySize )
+bool CVTFTexture::AllocateLowResImageData( intp nMemorySize )
 {
 	return GenericAllocateReusableData( &m_pLowResImageData, &m_nLowResImageAllocSize, nMemorySize );
 }
@@ -438,7 +437,7 @@ bool CVTFTexture::Init( int nWidth, int nHeight, int nDepth, ImageFormat fmt, in
 	m_nLowResImageWidth = m_nLowResImageHeight = 0;
 
 	// Allocate me some bits!
-	int iMemorySize = ComputeTotalSize();
+	intp iMemorySize = ComputeTotalSize();
 	if ( !AllocateImageData( iMemorySize ) )
 		return false;
 
@@ -461,7 +460,7 @@ void CVTFTexture::InitLowResImage( int nWidth, int nHeight, ImageFormat fmt )
 	m_LowResImageFormat = fmt;
 
 	// Allocate low-res bits
-	int iLowResImageSize = ImageLoader::GetMemRequired( m_nLowResImageWidth, 
+	intp iLowResImageSize = ImageLoader::GetMemRequired( m_nLowResImageWidth, 
 		m_nLowResImageHeight, 1, m_LowResImageFormat, false );
 
 	if ( !AllocateLowResImageData( iLowResImageSize ) )
@@ -541,7 +540,7 @@ void CVTFTexture::Shutdown()
 //-----------------------------------------------------------------------------
 // These are methods to help with optimization of file access
 //-----------------------------------------------------------------------------
-void CVTFTexture::LowResFileInfo( int *pStartLocation, int *pSizeInBytes ) const
+void CVTFTexture::LowResFileInfo( intp *pStartLocation, intp *pSizeInBytes ) const
 {
 	// Once the header is read in, they indicate where to start reading
 	// other data, and how many bytes to read....
@@ -559,7 +558,7 @@ void CVTFTexture::LowResFileInfo( int *pStartLocation, int *pSizeInBytes ) const
 	}
 }
 
-void CVTFTexture::ImageFileInfo( int nFrame, int nFace, int nMipLevel, int *pStartLocation, int *pSizeInBytes) const
+void CVTFTexture::ImageFileInfo( int nFrame, int nFace, int nMipLevel, intp *pStartLocation, intp *pSizeInBytes) const
 {
 	int i;
 	int iMipWidth;
@@ -578,19 +577,19 @@ void CVTFTexture::ImageFileInfo( int nFrame, int nFace, int nMipLevel, int *pSta
 	}
 
 	// The image data start offset
-	int nOffset = pImageDataInfo->resData;
+	intp nOffset = pImageDataInfo->resData;
 
 	// get to the right miplevel
 	for( i = m_nMipCount - 1; i > nMipLevel; --i )
 	{
 		ComputeMipLevelDimensions( i, &iMipWidth, &iMipHeight, &iMipDepth );
-		int iMipLevelSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, m_Format, false );
+		intp iMipLevelSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, m_Format, false );
 		nOffset += iMipLevelSize * m_nFrameCount * m_nFaceCount;
 	}
 
 	// get to the right frame
 	ComputeMipLevelDimensions( nMipLevel, &iMipWidth, &iMipHeight, &iMipDepth );
-	int nFaceSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, m_Format, false );
+	intp nFaceSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, m_Format, false );
 
 	// For backwards compatibility, we don't read in the spheremap fallback on
 	// older format .VTF files...
@@ -607,7 +606,7 @@ void CVTFTexture::ImageFileInfo( int nFrame, int nFace, int nMipLevel, int *pSta
 		}
 	}
 
-	int nFrameSize = nFacesToRead * nFaceSize;
+	intp nFrameSize = nFacesToRead * nFaceSize;
 	nOffset += nFrameSize * nFrame;
 	
 	// get to the right face
@@ -617,7 +616,7 @@ void CVTFTexture::ImageFileInfo( int nFrame, int nFace, int nMipLevel, int *pSta
 	*pSizeInBytes = nFaceSize;
 }
 
-int CVTFTexture::FileSize( int nMipSkipCount ) const
+intp CVTFTexture::FileSize( int nMipSkipCount ) const
 {
 	ResourceEntryInfo const *pImageDataInfo = FindResourceEntryInfo( VTF_LEGACY_RSRC_IMAGE );
 
@@ -629,10 +628,10 @@ int CVTFTexture::FileSize( int nMipSkipCount ) const
 		return 0;
 	}
 
-	int nOffset = pImageDataInfo->resData;
+	intp nOffset = pImageDataInfo->resData;
 
-	int nFaceSize = ComputeFaceSize( nMipSkipCount );
-	int nImageSize = nFaceSize * m_nFaceCount * m_nFrameCount;
+	intp nFaceSize = ComputeFaceSize( nMipSkipCount );
+	intp nImageSize = nFaceSize * m_nFaceCount * m_nFrameCount;
 	return nOffset + nImageSize;
 }
 
@@ -643,7 +642,7 @@ bool CVTFTexture::LoadLowResData( CUtlBuffer &buf )
 {
 	// Allocate low-res bits
 	InitLowResImage( m_nLowResImageWidth, m_nLowResImageHeight, m_LowResImageFormat );
-	int nLowResImageSize = ImageLoader::GetMemRequired( m_nLowResImageWidth, 
+	intp nLowResImageSize = ImageLoader::GetMemRequired( m_nLowResImageWidth, 
 		m_nLowResImageHeight, 1, m_LowResImageFormat, false );
 	buf.Get( m_pLowResImageData, nLowResImageSize );
 
@@ -673,7 +672,7 @@ bool CVTFTexture::LoadImageData( CUtlBuffer &buf, const VTFFileHeader_t &header,
 	}
 
 	// read the texture image (including mipmaps if they are there and needed.)
-	int iImageSize = ComputeFaceSize();
+	intp iImageSize = ComputeFaceSize();
 	iImageSize *= m_nFaceCount * m_nFrameCount;
 
 	// For backwards compatibility, we don't read in the spheremap fallback on
@@ -732,7 +731,7 @@ bool CVTFTexture::LoadImageData( CUtlBuffer &buf, const VTFFileHeader_t &header,
 		if (header.numMipLevels - nSkipMipLevels <= iMip)
 			continue;
 
-		int iMipSize = ComputeMipSize( iMip );
+		intp iMipSize = ComputeMipSize( iMip );
 
 		// Skip over any levels we don't have data for--we'll get them later. 
 		if ( iMip > nLastAvailableMip || iMip < nFirstAvailableMip )
@@ -772,7 +771,7 @@ void *CVTFTexture::SetResourceData( uint32 eType, void const *pData, size_t nNum
 	if ( nNumBytes )
 	{
 		ResourceEntryInfo *pInfo = FindOrCreateResourceEntryInfo( eType );
-		int idx = pInfo - m_arrResourcesInfo.Base();
+		intp idx = pInfo - m_arrResourcesInfo.Base();
 		ResourceMemorySection &rms = m_arrResourcesData[ idx ];
 
 		if ( nNumBytes == sizeof( pInfo->resData ) )
@@ -780,7 +779,7 @@ void *CVTFTexture::SetResourceData( uint32 eType, void const *pData, size_t nNum
 			// store 4 bytes directly
 			pInfo->eType |= RSRCF_HAS_NO_DATA_CHUNK;
 			if ( pData )
-				pInfo->resData = reinterpret_cast< const int * >( pData )[0];
+				pInfo->resData = reinterpret_cast< const unsigned * >( pData )[0];
 			return &pInfo->resData;
 		}
 		else
@@ -813,7 +812,7 @@ void *CVTFTexture::GetResourceData( uint32 eType, size_t *pDataSize ) const
 	{
 		if ( ( pInfo->eType & RSRCF_HAS_NO_DATA_CHUNK ) == 0 )
 		{
-			int idx = pInfo - m_arrResourcesInfo.Base();
+			intp idx = pInfo - m_arrResourcesInfo.Base();
 			ResourceMemorySection const &rms = m_arrResourcesData[ idx ];
 			if ( pDataSize )
 			{
@@ -844,7 +843,7 @@ bool CVTFTexture::HasResourceEntry( uint32 eType ) const
 	return ( FindResourceEntryInfo( eType ) != NULL );
 }
 
-unsigned int CVTFTexture::GetResourceTypes( unsigned int *arrTypesBuffer, int numTypesBufferElems ) const
+size_t CVTFTexture::GetResourceTypes( unsigned int *arrTypesBuffer, size_t numTypesBufferElems ) const
 {
 	for ( ResourceEntryInfo const *pInfo = m_arrResourcesInfo.Base(),
 		  *pInfoEnd = pInfo + m_arrResourcesInfo.Count();
@@ -882,7 +881,8 @@ bool CVTFTexture::ResourceMemorySection::LoadData( CUtlBuffer &buf, CByteswap &b
 bool CVTFTexture::ResourceMemorySection::WriteData( CUtlBuffer &buf ) const
 {
 	Assert( m_nDataLength && m_pData );
-	int iBufSize = m_nDataLength;
+	// dimhotepus(x64): Oh, unable to bump to size_t as data will not be interchangable between x86 & x64.
+	int iBufSize = static_cast<int>(m_nDataLength);
 	
 	buf.Put( &iBufSize, sizeof( iBufSize ) );
 	buf.Put( m_pData, m_nDataLength );
@@ -1094,7 +1094,7 @@ bool CVTFTexture::UnserializeEx( CUtlBuffer &buf, bool bHeaderOnly, int nForceFl
 		return false;
 
 	// Keep the allocated memory chunks of data
-	if ( int( header.numResources ) < m_arrResourcesData.Count() )
+	if ( intp( header.numResources ) < m_arrResourcesData.Count() )
 	{
 		m_arrResourcesData_ForReuse.EnsureCapacity( m_arrResourcesData_ForReuse.Count() + m_arrResourcesData.Count() - header.numResources );
 		for ( ResourceMemorySection const *pRms = &m_arrResourcesData[ header.numResources ],
@@ -1102,7 +1102,7 @@ bool CVTFTexture::UnserializeEx( CUtlBuffer &buf, bool bHeaderOnly, int nForceFl
 		{
 			if ( pRms->m_pData )
 			{
-				int idxReuse = m_arrResourcesData_ForReuse.AddToTail( *pRms );
+				intp idxReuse = m_arrResourcesData_ForReuse.AddToTail( *pRms );
 				m_arrResourcesData_ForReuse[ idxReuse ].m_nDataLength = 0; // Data for reuse shouldn't have length set
 			}
 		}
@@ -1122,7 +1122,7 @@ bool CVTFTexture::UnserializeEx( CUtlBuffer &buf, bool bHeaderOnly, int nForceFl
 		if ( IsX360() )
 		{
 			// Byte-swap the dictionary data offsets
-			for ( int k = 0; k < m_arrResourcesInfo.Count(); ++ k )
+			for ( intp k = 0; k < m_arrResourcesInfo.Count(); ++ k )
 			{
 				ResourceEntryInfo &rei = m_arrResourcesInfo[k];
 				if ( ( rei.eType & RSRCF_HAS_NO_DATA_CHUNK ) == 0 )
@@ -1140,7 +1140,7 @@ bool CVTFTexture::UnserializeEx( CUtlBuffer &buf, bool bHeaderOnly, int nForceFl
 		m_arrResourcesInfo.RemoveAll();
 
 		// Low-res image data
-		int nLowResImageSize = ImageLoader::GetMemRequired( m_nLowResImageWidth, 
+		intp nLowResImageSize = ImageLoader::GetMemRequired( m_nLowResImageWidth, 
 			m_nLowResImageHeight, 1, m_LowResImageFormat, false );
 		if ( nLowResImageSize )
 		{
@@ -1199,7 +1199,7 @@ void CVTFTexture::GetMipmapRange( int* pOutFinest, int* pOutCoarsest )
 bool CVTFTexture::LoadNewResources( CUtlBuffer &buf )
 {
 	// Load the new resources
-	for ( int idxRsrc = 0; idxRsrc < m_arrResourcesInfo.Count(); ++idxRsrc )
+	for ( intp idxRsrc = 0; idxRsrc < m_arrResourcesInfo.Count(); ++idxRsrc )
 	{
 		ResourceEntryInfo &rei = m_arrResourcesInfo[ idxRsrc ];
 		ResourceMemorySection &rms = m_arrResourcesData[ idxRsrc ];
@@ -1276,7 +1276,7 @@ ResourceEntryInfo * CVTFTexture::FindOrCreateResourceEntryInfo( uint32 eType )
 {
 	Assert( ( eType & RSRCF_MASK ) == 0 );
 
-	int k = 0;
+	intp k = 0;
 	for ( ; k < m_arrResourcesInfo.Count(); ++ k )
 	{
 		uint32 rsrcType = ( m_arrResourcesInfo[ k ].eType & ~RSRCF_MASK );
@@ -1317,7 +1317,7 @@ bool CVTFTexture::RemoveResourceEntryInfo( uint32 eType )
 {
 	Assert( ( eType & RSRCF_MASK ) == 0 );
 
-	for ( int k = 0; k < m_arrResourcesInfo.Count(); ++ k )
+	for ( intp k = 0; k < m_arrResourcesInfo.Count(); ++ k )
 	{
 		if ( ( m_arrResourcesInfo[ k ].eType & ~RSRCF_MASK ) == eType )
 		{
@@ -1325,7 +1325,7 @@ bool CVTFTexture::RemoveResourceEntryInfo( uint32 eType )
 
 			if ( m_arrResourcesData[k].m_pData )
 			{
-				int idxReuse = m_arrResourcesData_ForReuse.AddToTail( m_arrResourcesData[k] );
+				intp idxReuse = m_arrResourcesData_ForReuse.AddToTail( m_arrResourcesData[k] );
 				m_arrResourcesData_ForReuse[ idxReuse ].m_nDataLength = 0; // Data for reuse shouldn't have length set
 			}
 
@@ -1350,7 +1350,7 @@ bool CVTFTexture::WriteImageData( CUtlBuffer &buf )
 	// NOTE: The smallest mip levels are stored first!!
 	for (int iMip = m_nMipCount; --iMip >= 0; )
 	{
-		int iMipSize = ComputeMipSize( iMip );
+		intp iMipSize = ComputeMipSize( iMip );
 
 		for (int iFrame = 0; iFrame < m_nFrameCount; ++iFrame)
 		{
@@ -1363,24 +1363,6 @@ bool CVTFTexture::WriteImageData( CUtlBuffer &buf )
 	}
 
 	return buf.IsValid();
-}
-
-// Inserts padding to have a multiple of "iAlignment" bytes in the buffer
-// Returns number of pad bytes written
-static int PadBuffer( CUtlBuffer &buf, int iAlignment )
-{
-	unsigned int uiCurrentBytes = buf.TellPut();
-	int iPadBytes = AlignValue( uiCurrentBytes, iAlignment ) - uiCurrentBytes;
-
-	// Fill data
-	for ( int i=0; i<iPadBytes; i++ )
-	{
-		buf.PutChar( '\0' );
-	}
-
-	buf.SeekPut( CUtlBuffer::SEEK_HEAD, uiCurrentBytes + iPadBytes );
-
-	return iPadBytes;
 }
 
 //-----------------------------------------------------------------------------
@@ -1406,7 +1388,9 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 	Q_strncpy( header.fileTypeString, "VTF", 4 );
 	header.version[0] = VTF_MAJOR_VERSION;
 	header.version[1] = VTF_MINOR_VERSION;
-	header.headerSize = sizeof(VTFFileHeader_t) + m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo );
+	size_t headerSize = sizeof(VTFFileHeader_t) + m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo );
+	Assert(headerSize <= std::numeric_limits<unsigned>::max());
+	header.headerSize = static_cast<unsigned>(headerSize);
 
 	header.width = m_nWidth;
 	header.height = m_nHeight;
@@ -1425,14 +1409,15 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 	header.lowResImageHeight = m_nLowResImageHeight;
 	header.lowResImageFormat = m_LowResImageFormat;
 
-	header.numResources = m_arrResourcesInfo.Count();
+	// dimhotepus(x64): Backward portability. Anyway why more than UINT_MAX resources?
+	header.numResources = static_cast<unsigned>(m_arrResourcesInfo.Count());
 
 	buf.Put( &header, sizeof(VTFFileHeader_t) );
 	if ( !buf.IsValid() )
 		return false;
 
 	// Write the dictionary of resource entry infos
-	int iSeekOffsetResInfoFixup = buf.TellPut();
+	intp iSeekOffsetResInfoFixup = buf.TellPut();
 	buf.Put( m_arrResourcesInfo.Base(), m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo ) );
 	if ( !buf.IsValid() )
 		return false;
@@ -1443,7 +1428,7 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 		pRei->resData = buf.TellPut();
 
 		Assert( m_pLowResImageData );
-		int iLowResImageSize = ImageLoader::GetMemRequired( m_nLowResImageWidth, 
+		intp iLowResImageSize = ImageLoader::GetMemRequired( m_nLowResImageWidth, 
 			m_nLowResImageHeight, 1, m_LowResImageFormat, false );
 		buf.Put( m_pLowResImageData, iLowResImageSize );
 		if ( !buf.IsValid() )
@@ -1451,7 +1436,7 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 	}
 
 	// Serialize the new resources
-	for ( int iRsrc = 0; iRsrc < m_arrResourcesInfo.Count(); ++ iRsrc )
+	for ( intp iRsrc = 0; iRsrc < m_arrResourcesInfo.Count(); ++ iRsrc )
 	{
 		ResourceEntryInfo &rei = m_arrResourcesInfo[ iRsrc ];
 
@@ -1484,7 +1469,7 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 		return false;
 
 	// Now fixup the resources dictionary
-	int iTotalBytesPut = buf.TellPut();
+	intp iTotalBytesPut = buf.TellPut();
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, iSeekOffsetResInfoFixup );
 	buf.Put( m_arrResourcesInfo.Base(), m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo ) );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, iTotalBytesPut );
@@ -1586,9 +1571,9 @@ unsigned char *CVTFTexture::LowResImageData()
 	return m_pLowResImageData;
 }
 
-int CVTFTexture::RowSizeInBytes( int nMipLevel ) const
+intp CVTFTexture::RowSizeInBytes( int nMipLevel ) const
 {
-	int nWidth = (m_nWidth >> nMipLevel);
+	intp nWidth = (m_nWidth >> nMipLevel);
 	if (nWidth < 1)
 	{
 		nWidth = 1;
@@ -1600,14 +1585,14 @@ int CVTFTexture::RowSizeInBytes( int nMipLevel ) const
 //-----------------------------------------------------------------------------
 // returns the size of one face of a particular mip level
 //-----------------------------------------------------------------------------
-int CVTFTexture::FaceSizeInBytes( int nMipLevel ) const
+intp CVTFTexture::FaceSizeInBytes( int nMipLevel ) const
 {
-	int nWidth = (m_nWidth >> nMipLevel);
+	intp nWidth = (m_nWidth >> nMipLevel);
 	if (nWidth < 1)
 	{
 		nWidth = 1;
 	}
-	int nHeight = (m_nHeight >> nMipLevel);
+	intp nHeight = (m_nHeight >> nMipLevel);
 	if (nHeight < 1)
 	{
 		nHeight = 1;
@@ -1622,7 +1607,7 @@ int CVTFTexture::FaceSizeInBytes( int nMipLevel ) const
 unsigned char *CVTFTexture::ImageData( int iFrame, int iFace, int iMipLevel )
 {
 	Assert( m_pImageData );
-	int iOffset = GetImageOffset( iFrame, iFace, iMipLevel, m_Format );
+	intp iOffset = GetImageOffset( iFrame, iFace, iMipLevel, m_Format );
 	return &m_pImageData[iOffset];
 }
 
@@ -1638,9 +1623,9 @@ unsigned char *CVTFTexture::ImageData( int iFrame, int iFace, int iMipLevel, int
 	Assert( (x >= 0) && (x <= nWidth) && (y >= 0) && (y <= nHeight) && (z >= 0) && (z <= nDepth) );
 #endif
 
-	int nFaceBytes = FaceSizeInBytes( iMipLevel );
-	int nRowBytes = RowSizeInBytes( iMipLevel );
-	int nTexelBytes = ImageLoader::SizeInBytes( m_Format );
+	intp nFaceBytes = FaceSizeInBytes( iMipLevel );
+	intp nRowBytes = RowSizeInBytes( iMipLevel );
+	intp nTexelBytes = ImageLoader::SizeInBytes( m_Format );
 
 	unsigned char *pMipBits = ImageData( iFrame, iFace, iMipLevel );
 	pMipBits += z * nFaceBytes + y * nRowBytes + x * nTexelBytes;
@@ -1650,7 +1635,7 @@ unsigned char *CVTFTexture::ImageData( int iFrame, int iFace, int iMipLevel, int
 //-----------------------------------------------------------------------------
 // Computes the size (in bytes) of a single mipmap of a single face of a single frame 
 //-----------------------------------------------------------------------------
-inline int CVTFTexture::ComputeMipSize( int iMipLevel, ImageFormat fmt ) const
+inline intp CVTFTexture::ComputeMipSize( int iMipLevel, ImageFormat fmt ) const
 {
 	Assert( iMipLevel < m_nMipCount );
 	int w, h, d;
@@ -1658,7 +1643,7 @@ inline int CVTFTexture::ComputeMipSize( int iMipLevel, ImageFormat fmt ) const
 	return ImageLoader::GetMemRequired( w, h, d, fmt, false );		
 }
 
-int CVTFTexture::ComputeMipSize( int iMipLevel ) const
+intp CVTFTexture::ComputeMipSize( int iMipLevel ) const
 {
 	// Version for the public interface; don't want to expose the fmt parameter
 	return ComputeMipSize( iMipLevel, m_Format );
@@ -1669,9 +1654,9 @@ int CVTFTexture::ComputeMipSize( int iMipLevel ) const
 // Computes the size of a single face of a single frame 
 // All mip levels starting at the specified mip level are included
 //-----------------------------------------------------------------------------
-inline int CVTFTexture::ComputeFaceSize( int iStartingMipLevel, ImageFormat fmt ) const
+inline intp CVTFTexture::ComputeFaceSize( int iStartingMipLevel, ImageFormat fmt ) const
 {
-	int iSize = 0;
+	intp iSize = 0;
 	int w = m_nWidth;
 	int h = m_nHeight;
 	int d = m_nDepth;
@@ -1701,7 +1686,7 @@ inline int CVTFTexture::ComputeFaceSize( int iStartingMipLevel, ImageFormat fmt 
 	return iSize;
 }
 
-int CVTFTexture::ComputeFaceSize( int iStartingMipLevel ) const
+intp CVTFTexture::ComputeFaceSize( int iStartingMipLevel ) const
 {
 	// Version for the public interface; don't want to expose the fmt parameter
 	return ComputeFaceSize( iStartingMipLevel, m_Format );
@@ -1711,16 +1696,16 @@ int CVTFTexture::ComputeFaceSize( int iStartingMipLevel ) const
 //-----------------------------------------------------------------------------
 // Computes the total size of all faces, all frames
 //-----------------------------------------------------------------------------
-inline int CVTFTexture::ComputeTotalSize( ImageFormat fmt ) const
+inline intp CVTFTexture::ComputeTotalSize( ImageFormat fmt ) const
 {
 	// Compute the number of bytes required to store a single face/frame
-	int iMemRequired = ComputeFaceSize( 0, fmt );
+	intp iMemRequired = ComputeFaceSize( 0, fmt );
 
 	// Now compute the total image size
 	return m_nFaceCount * m_nFrameCount * iMemRequired;
 }
 
-int CVTFTexture::ComputeTotalSize( ) const
+intp CVTFTexture::ComputeTotalSize( ) const
 {
 	// Version for the public interface; don't want to expose the fmt parameter
 	return ComputeTotalSize( m_Format );
@@ -1730,14 +1715,14 @@ int CVTFTexture::ComputeTotalSize( ) const
 //-----------------------------------------------------------------------------
 // Computes the location of a particular frame, face, and mip level
 //-----------------------------------------------------------------------------
-int CVTFTexture::GetImageOffset( int iFrame, int iFace, int iMipLevel, ImageFormat fmt ) const
+intp CVTFTexture::GetImageOffset( int iFrame, int iFace, int iMipLevel, ImageFormat fmt ) const
 {
 	Assert( iFrame < m_nFrameCount );
 	Assert( iFace < m_nFaceCount );
 	Assert( iMipLevel < m_nMipCount );
 
 	int i;
-	int iOffset = 0;
+	intp iOffset = 0;
 
 	if ( IsX360() && ( m_nVersion[0] == VTF_X360_MAJOR_VERSION ) )
 	{
@@ -1747,13 +1732,13 @@ int CVTFTexture::GetImageOffset( int iFrame, int iFace, int iMipLevel, ImageForm
 		for ( i = m_nMipCount - 1; i > iMipLevel; --i )
 		{
 			ComputeMipLevelDimensions( i, &iMipWidth, &iMipHeight, &iMipDepth );
-			int iMipLevelSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, fmt, false );
+			intp iMipLevelSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, fmt, false );
 			iOffset += m_nFrameCount * m_nFaceCount * iMipLevelSize;
 		}
 
 		// get to the right frame
 		ComputeMipLevelDimensions( iMipLevel, &iMipWidth, &iMipHeight, &iMipDepth );
-		int nFaceSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, fmt, false );
+		intp nFaceSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, fmt, false );
 		iOffset += iFrame * m_nFaceCount * nFaceSize;
 		
 		// get to the right face
@@ -1763,7 +1748,7 @@ int CVTFTexture::GetImageOffset( int iFrame, int iFace, int iMipLevel, ImageForm
 	}
 
 	// get to the right frame
-	int iFaceSize = ComputeFaceSize( 0, fmt );
+	intp iFaceSize = ComputeFaceSize( 0, fmt );
 	iOffset = iFrame * m_nFaceCount * iFaceSize;
 
 	// Get to the right face
@@ -1820,8 +1805,8 @@ void CVTFTexture::ComputeMipLevelSubRect( Rect_t *pSrcRect, int nMipLevel, Rect_
 	}
 
 	float flInvShrink = 1.0f / (float)(1 << nMipLevel);
-	pSubRect->x = pSrcRect->x * flInvShrink;
-	pSubRect->y = pSrcRect->y * flInvShrink;
+	pSubRect->x = static_cast<int>(pSrcRect->x * flInvShrink);
+	pSubRect->y = static_cast<int>(pSrcRect->y * flInvShrink);
 	pSubRect->width = (int)ceilf( (pSrcRect->x + pSrcRect->width) * flInvShrink ) - pSubRect->x;
 	pSubRect->height = (int)ceilf( (pSrcRect->y + pSrcRect->height) * flInvShrink ) - pSubRect->y;
 }
@@ -1862,7 +1847,7 @@ void CVTFTexture::ConvertImageFormat( ImageFormat fmt, bool bNormalToDUDV )
 	}
 
 	// FIXME: Should this be re-written to not do an allocation?
-	int iConvertedSize = ComputeTotalSize( fmt );
+	intp iConvertedSize = ComputeTotalSize( fmt );
 
 	unsigned char *pConvertedImage = new unsigned char[ iConvertedSize ];
 
@@ -1875,8 +1860,8 @@ void CVTFTexture::ConvertImageFormat( ImageFormat fmt, bool bNormalToDUDV )
 		int nMipWidth, nMipHeight, nMipDepth;
 		ComputeMipLevelDimensions( iMip, &nMipWidth, &nMipHeight, &nMipDepth );
 
- 		int nSrcFaceStride = ImageLoader::GetMemRequired( nMipWidth, nMipHeight, 1, m_Format, false ); 
- 		int nDstFaceStride = ImageLoader::GetMemRequired( nMipWidth, nMipHeight, 1, fmt, false ); 
+ 		intp nSrcFaceStride = ImageLoader::GetMemRequired( nMipWidth, nMipHeight, 1, m_Format, false ); 
+ 		intp nDstFaceStride = ImageLoader::GetMemRequired( nMipWidth, nMipHeight, 1, fmt, false ); 
 
 		for (int iFrame = 0; iFrame < m_nFrameCount; ++iFrame)
 		{
@@ -2261,7 +2246,7 @@ void CVTFTexture::ComputeSpheremapFrame( unsigned char **ppCubeFaces, unsigned c
 			b += sphere.m_pColor[2];
 			a += sphere.m_pColor[3];
 
-			v += 0.25;
+			v += 0.25f;
 			CalcSphereColor( &sphere, u + 0.25f, v );
 			r += sphere.m_pColor[0];
 			g += sphere.m_pColor[1];
@@ -2274,10 +2259,10 @@ void CVTFTexture::ComputeSpheremapFrame( unsigned char **ppCubeFaces, unsigned c
 			b += sphere.m_pColor[2];
 			a += sphere.m_pColor[3];
 
-			pSpheremap[ offset + 0 ] = r >> 2;
-			pSpheremap[ offset + 1 ] = g >> 2;
-			pSpheremap[ offset + 2 ] = b >> 2;
-			pSpheremap[ offset + 3 ] = a >> 2;
+			pSpheremap[ offset + 0 ] = static_cast<unsigned char>(r >> 2);
+			pSpheremap[ offset + 1 ] = static_cast<unsigned char>(g >> 2);
+			pSpheremap[ offset + 2 ] = static_cast<unsigned char>(b >> 2);
+			pSpheremap[ offset + 3 ] = static_cast<unsigned char>(a >> 2);
 			offset += 4;
 		}
 	}
@@ -2308,7 +2293,7 @@ void CVTFTexture::ComputeHemispheremapFrame( unsigned char **ppCubeFaces, unsign
 			b += sphere.m_pColor[2];
 			a += sphere.m_pColor[3];
 
-			v += 0.25;
+			v += 0.25f;
 			CalcHemisphereColor( &sphere, u + 0.25f, v );
 			r += sphere.m_pColor[0];
 			g += sphere.m_pColor[1];
@@ -2321,10 +2306,10 @@ void CVTFTexture::ComputeHemispheremapFrame( unsigned char **ppCubeFaces, unsign
 			b += sphere.m_pColor[2];
 			a += sphere.m_pColor[3];
 
-			pSpheremap[ offset + 0 ] = r >> 2;
-			pSpheremap[ offset + 1 ] = g >> 2;
-			pSpheremap[ offset + 2 ] = b >> 2;
-			pSpheremap[ offset + 3 ] = a >> 2;
+			pSpheremap[ offset + 0 ] = static_cast<unsigned char>(r >> 2);
+			pSpheremap[ offset + 1 ] = static_cast<unsigned char>(g >> 2);
+			pSpheremap[ offset + 2 ] = static_cast<unsigned char>(b >> 2);
+			pSpheremap[ offset + 3 ] = static_cast<unsigned char>(a >> 2);
 			offset += 4;
 		}
 	}
@@ -2347,7 +2332,7 @@ void CVTFTexture::GenerateSpheremap( LookDir_t lookDir )
 
 	// Allocate the bits for the spheremap
 	Assert( m_nDepth == 1 );
-	int iMemRequired = ComputeFaceSize( 0, IMAGE_FORMAT_RGBA8888 );
+	intp iMemRequired = ComputeFaceSize( 0, IMAGE_FORMAT_RGBA8888 );
 	unsigned char *pSphereMapBits = new unsigned char [ iMemRequired ];
 
 	// Generate a spheremap for each frame of the cubemap
@@ -2369,7 +2354,7 @@ void CVTFTexture::GenerateSpheremap( LookDir_t lookDir )
 		// Compute the mip levels of the spheremap, converting from RGBA8888 to our format
 		unsigned char *pFinalSphereMapBits = ImageData( iFrame, CUBEMAP_FACE_SPHEREMAP, 0 );
 		ImageLoader::GenerateMipmapLevels( pSphereMapBits, pFinalSphereMapBits, 
-			m_nWidth, m_nHeight, m_nDepth, m_Format, 2.2, 2.2, m_nMipCount );
+			m_nWidth, m_nHeight, m_nDepth, m_Format, 2.2f, 2.2f, m_nMipCount );
 	}
 
 	// Free memory
@@ -2602,7 +2587,7 @@ void CVTFTexture::GenerateMipmaps()
 			}
 			else if ( m_Options.flags0 & ( VtfProcessingOptions::OPT_DECAY_EXP_R << ch ) )
 			{
-				info.m_flColorScale[ch] = powf( m_Options.fDecayExponentBase[ch], iMipLevel - iLastNonDecayMip );
+				info.m_flColorScale[ch] = powf( m_Options.fDecayExponentBase[ch], static_cast<float>(iMipLevel - iLastNonDecayMip) );
 			}
 			else
 			{
@@ -2713,13 +2698,13 @@ void CVTFTexture::ComputeReflectivity( )
 				vecFaceReflect[2] += TextureToLinear( pSrc[2] );
 			}	
 
-			vecFaceReflect /= nNumPixels;
+			vecFaceReflect /= static_cast<float>(nNumPixels);
 
 			m_vecReflectivity += vecFaceReflect;
 			++divisor;
 		}
 	}
-	m_vecReflectivity /= divisor;
+	m_vecReflectivity /= static_cast<float>(divisor);
 }
 
 //-----------------------------------------------------------------------------
@@ -3294,12 +3279,12 @@ void CVTFTexture::MatchCubeMapBorders( int iStage, ImageFormat finalFormat, bool
 			// If we're going to S3 compress the image eventually, then store off the original version
 			// because we can use that while matching the S3 compressed edges (we have to do some tricky
 			// repalettizing).
-			int nTotalBytes = ComputeTotalSize();
+			intp nTotalBytes = ComputeTotalSize();
 			m_OriginalData.SetSize( nTotalBytes / 4 );
 			memcpy( m_OriginalData.Base(), ImageData(), nTotalBytes );
 			
 			// Swap R and B in these because IMAGE_FORMAT_RGBA8888 is swapped from the way S3RGBAs are.
-			for ( int i=0; i < nTotalBytes/4; i++ )
+			for ( intp i=0; i < nTotalBytes/4; i++ )
 				V_swap( m_OriginalData[i].r, m_OriginalData[i].b );
 		
 			return;
