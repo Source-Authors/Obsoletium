@@ -15,23 +15,6 @@
 #define COMPILER_CLANG 1
 #endif
 
-#if defined( _X360 )
-	#define NO_STEAM
-	#define NO_VOICE
-	// for the 360, the ppc platform and the rtos are tightly coupled
-	// setup the 360 environment here !once! for much less leaf module include wackiness
-	// these are critical order and purposely appear *before* anything else
-	#define _XBOX
-#include <xtl.h>
-	#include <xaudio2.h>
-	#include <xbdm.h>
-#include <Xgraphics.h>
-	#include <xui.h>
-	#include <pmcpbsetup.h>
-#include <XMAHardwareAbstraction.h>
-	#undef _XBOX
-#endif
-
 #define __STDC_LIMIT_MACROS
 #include <cstdint>
 
@@ -89,7 +72,6 @@
 	#define IsOSX() false
 	#define IsPosix() false
 	#define PLATFORM_WINDOWS 1 // Windows PC or Xbox 360
-	#ifndef _X360
 		#define IsWindows() true
 		#define IsPC() true
 		#define IsConsole() false
@@ -106,17 +88,6 @@
 			#define IsPlatformWindowsPC32() true
 			#define PLATFORM_WINDOWS_PC32 1
 		#endif
-	#else
-		#define PLATFORM_X360 1
-		#ifndef _CONSOLE
-			#define _CONSOLE
-		#endif
-		#define IsWindows() false
-		#define IsPC() false
-		#define IsConsole() true
-		#define IsX360() true
-		#define IsPS3() false
-	#endif
 	// Adding IsPlatformOpenGL() to help fix a bunch of code that was using IsPosix() to infer if the DX->GL translation layer was being used.
 	#if defined( DX_TO_GL_ABSTRACTION )
 		#define IsPlatformOpenGL() true
@@ -166,20 +137,11 @@ using intp = ptrdiff_t;
 // (ie, sizeof(uintp) >= sizeof(unsigned int) && sizeof(uintp) >= sizeof(void *)
 using uintp = size_t;
 
-#if defined( _WIN32 )
-
-	#if defined( _X360 )
-		#ifdef __m128
-			#undef __m128
-		#endif
-		#define __m128				__vector4
-	#endif
-
-#else // _WIN32
+#if !defined( _WIN32 )
 
 	typedef void *HWND;
 
-#endif // else _WIN32
+#endif // !_WIN32
 
 // Avoid redefinition warnings if a previous header defines
 // this.
@@ -195,16 +157,8 @@ using uintp = size_t;
 //-----------------------------------------------------------------------------
 // Set up platform type defines.
 //-----------------------------------------------------------------------------
-#if defined( PLATFORM_X360 ) || defined( _PS3 )
-	#if !defined( _GAMECONSOLE )
-		#define _GAMECONSOLE
-	#endif
-	#define IsPC()			false
-	#define IsGameConsole()	true
-#else
-	#define IsPC()			true
-	#define IsGameConsole()	false
-#endif
+#define IsPC()			true
+#define IsGameConsole()	false
 
 #ifdef PLATFORM_64BITS
 	#define IsPlatform64Bits()	true
@@ -271,14 +225,18 @@ typedef unsigned int		uint;
 //
 // MSDN __declspec(novtable) documentation: https://docs.microsoft.com/en-us/cpp/cpp/novtable
 //
-// Note: NJS: This is not enabled for regular PC, due to not knowing the implications of exporting a class with no no vtable.
-//       It's probable that this shouldn't be an issue, but an experiment should be done to verify this.
+// This form of __declspec can be applied to any class declaration, but should only be applied to
+// pure interface classes, that is, classes that will never be instantiated on their own.  The
+// __declspec stops the compiler from generating code to initialize the vfptr in the constructor(s)
+// and destructor of the class.  In many cases, this removes the only references to the vtable that
+// are associated with the class and, thus, the linker will remove it.  Using this form of
+// __declspec can result in a significant reduction in code size.
 //
-#ifndef _X360
-#define abstract_class class
-#else
+// If you attempt to instantiate a class marked with novtable and then access a class member, you
+// will receive an access violation(AV).
+//
+// dimhotepus: Enable for PC to reduce code size.
 #define abstract_class class NO_VTABLE
-#endif
 
 
 // MSVC CRT uses 0x7fff while gcc uses MAX_INT, leading to mismatches between platforms
@@ -335,10 +293,8 @@ typedef void * HINSTANCE;
 #define ALIGN_VALUE( val, alignment ) ( ( (val) + (alignment) - 1 ) & ~( (alignment) - 1 ) ) //  need macro for constant expression
 
 // Used to step into the debugger
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #define DebuggerBreak()  __debugbreak()
-#elif defined( _X360 )
-#define DebuggerBreak() DebugBreak()
 #else
 	// On OSX, SIGTRAP doesn't really stop the thread cold when debugging.
 	// So if being debugged, use INT3 which is precise.
@@ -761,78 +717,81 @@ static FORCEINLINE double fsel(double fComparand, double fValGE, double fLT)
 // Basic swaps
 //-------------------------------------
 
+#ifdef _MSC_VER
+
+#include <intrin.h>
+#define bswap_16(x) _byteswap_ushort(x)
+#define bswap_32(x) _byteswap_ulong(x)
+#define bswap_64(x) _byteswap_uint64(x)
+
+#elif defined(__APPLE__)
+
+// Mac OS X / Darwin features
+#include <libkern/OSByteOrder.h>
+#define bswap_16(x) OSSwapInt16(x)
+#define bswap_32(x) OSSwapInt32(x)
+#define bswap_64(x) OSSwapInt64(x)
+
+#elif defined(__sun) || defined(sun)
+
+#include <sys/byteorder.h>
+#define bswap_16(x) BSWAP_16(x)
+#define bswap_32(x) BSWAP_32(x)
+#define bswap_64(x) BSWAP_64(x)
+
+#elif defined(__FreeBSD__)
+
+#include <sys/endian.h>
+#define bswap_16(x) bswap16(x)
+#define bswap_32(x) bswap32(x)
+#define bswap_64(x) bswap64(x)
+
+#elif defined(__OpenBSD__)
+
+#include <sys/types.h>
+#define bswap_16(x) swap16(x)
+#define bswap_32(x) swap32(x)
+#define bswap_64(x) swap64(x)
+
+#elif defined(__NetBSD__)
+
+#include <sys/types.h>
+#include <machine/bswap.h>
+#if defined(__BSWAP_RENAME) && !defined(__bswap_32)
+#define bswap_16(x) bswap16(x)
+#define bswap_32(x) bswap32(x)
+#define bswap_64(x) bswap64(x)
+#endif
+
+#else
+
+#include <byteswap.h>
+
+#endif
+
 template <typename T>
-inline T WordSwapC( T w )
+inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 2 && alignof(T) == alignof(unsigned short), T> WordSwapC( T w )
 {
-   uint16 temp;
-
-   temp  = ((*((uint16 *)&w) & 0xff00) >> 8);
-   temp |= ((*((uint16 *)&w) & 0x00ff) << 8);
-
-   return *((T*)&temp);
+   return static_cast<T>( bswap_16( w ) );
 }
 
 template <typename T>
-inline T DWordSwapC( T dw )
+inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 4 && alignof(T) == alignof(unsigned int), T> DWordSwapC( T dw )
 {
-   uint32 temp;
-
-   temp  =   *((uint32 *)&dw) 				>> 24;
-   temp |= ((*((uint32 *)&dw) & 0x00FF0000) >> 8);
-   temp |= ((*((uint32 *)&dw) & 0x0000FF00) << 8);
-   temp |= ((*((uint32 *)&dw) & 0x000000FF) << 24);
-
-   return *((T*)&temp);
+   return static_cast<T>( bswap_32( dw ) );
 }
 
 template <typename T>
-inline T QWordSwapC( T dw )
+inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == alignof(unsigned long long), T> QWordSwapC( T qdw )
 {
-	// Assert sizes passed to this are already correct, otherwise
-	// the cast to uint64 * below is unsafe and may have wrong results 
-	// or even crash.
-	PLAT_COMPILE_TIME_ASSERT( sizeof( dw ) == sizeof(uint64) );
-
-	uint64 temp;
-
-	temp  =   *((uint64 *)&dw) 				         >> 56;
-	temp |= ((*((uint64 *)&dw) & 0x00FF000000000000ull) >> 40);
-	temp |= ((*((uint64 *)&dw) & 0x0000FF0000000000ull) >> 24);
-	temp |= ((*((uint64 *)&dw) & 0x000000FF00000000ull) >> 8);
-	temp |= ((*((uint64 *)&dw) & 0x00000000FF000000ull) << 8);
-	temp |= ((*((uint64 *)&dw) & 0x0000000000FF0000ull) << 24);
-	temp |= ((*((uint64 *)&dw) & 0x000000000000FF00ull) << 40);
-	temp |= ((*((uint64 *)&dw) & 0x00000000000000FFull) << 56);
-
-	return *((T*)&temp);
+   return static_cast<T>( bswap_64( qdw ) );
 }
 
 //-------------------------------------
 // Fast swaps
 //-------------------------------------
 
-#if defined( _X360 )
-
-	#define WordSwap  WordSwap360Intr
-	#define DWordSwap DWordSwap360Intr
-
-	template <typename T>
-	inline T WordSwap360Intr( T w )
-	{
-		T output;
-		__storeshortbytereverse( w, 0, &output );
-		return output;
-	}
-
-	template <typename T>
-	inline T DWordSwap360Intr( T dw )
-	{
-		T output;
-		__storewordbytereverse( dw, 0, &output );
-		return output;
-	}
-
-#elif defined( _MSC_VER ) && !defined( PLATFORM_WINDOWS_PC64 )
+#if defined( _MSC_VER ) && !defined( PLATFORM_WINDOWS_PC64 )
 
 	#define WordSwap  WordSwapAsm
 	#define DWordSwap DWordSwapAsm
@@ -875,7 +834,7 @@ inline T QWordSwapC( T dw )
 #define VALVE_LITTLE_ENDIAN 1
 #endif
 
-#if defined( _SGI_SOURCE ) || defined( _X360 )
+#if defined( _SGI_SOURCE )
 #define	VALVE_BIG_ENDIAN 1
 #endif
 
@@ -951,17 +910,6 @@ inline void SwapFloat( float *pOut, const float *pIn )		{ SafeSwapFloat( pOut, p
 
 #endif
 
-#if _X360
-FORCEINLINE unsigned long LoadLittleDWord( const unsigned long *base, unsigned int dwordIndex )
-		{
-			return __loadwordbytereverse( dwordIndex<<2, base );
-		}
-
-FORCEINLINE void StoreLittleDWord( unsigned long *base, unsigned int dwordIndex, unsigned long dword )
-		{
-			__storewordbytereverse( dword, dwordIndex<<2, base );
-		}
-#else
 FORCEINLINE unsigned long LoadLittleDWord( const unsigned long *base, size_t dwordIndex )
 	{
 		return LittleDWord( base[dwordIndex] );
@@ -971,7 +919,6 @@ FORCEINLINE void StoreLittleDWord( unsigned long *base, size_t dwordIndex, unsig
 	{
 		base[dwordIndex] = LittleDWord(dword);
 	}
-#endif
 
 
 //-----------------------------------------------------------------------------
@@ -1035,9 +982,7 @@ PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *
 
 inline uint64 Plat_Rdtsc()
 {
-#if defined( _X360 )
-	return ( uint64 )__mftb32();
-#elif defined( _WIN64 ) || defined ( _WIN32 )
+#if defined( _WIN64 ) || defined ( _WIN32 )
 	return ( uint64 )__rdtsc();
 #elif defined( __i386__ )
 	uint64 val;
@@ -1055,18 +1000,33 @@ inline uint64 Plat_Rdtsc()
 // b/w compatibility
 #define Sys_FloatTime Plat_FloatTime
 
+// Type-safe copying for trivial types.
+template<typename T>
+std::enable_if_t<std::is_trivially_copyable_v<T>>
+BitwiseCopy(const T* src, T* dest, size_t size) noexcept
+{
+  std::memcpy(dest, src, sizeof(T) * size);
+}
+
+// Type-safe copying for non-trivial types.
+template<typename T>
+std::enable_if_t<!std::is_trivially_copyable_v<T>>
+constexpr BitwiseCopy(const T* src, T* dest, size_t size) noexcept
+{
+  std::copy_n(src, size, dest);
+}
+
 // Protect against bad auto operator=
 #define DISALLOW_OPERATOR_EQUAL( _classname )			\
-	private:											\
-		_classname &operator=( const _classname & );	\
-	public:
+	public:											\
+		_classname &operator=( const _classname & ) = delete;
 
 // Define a reasonable operator=
 #define IMPLEMENT_OPERATOR_EQUAL( _classname )			\
 	public:												\
 		_classname &operator=( const _classname &src )	\
 		{												\
-			memcpy( this, &src, sizeof(_classname) );	\
+			BitwiseCopy( this, &src, sizeof(_classname) );	\
 			return *this;								\
 		}
 
@@ -1188,13 +1148,8 @@ PLATFORM_INTERFACE bool Plat_FastVerifyHardwareKey();
 //-----------------------------------------------------------------------------
 PLATFORM_INTERFACE void* Plat_SimpleLog( const tchar* file, int line );
 
-#if _X360
-#define Plat_FastMemset XMemSet
-#define Plat_FastMemcpy XMemCpy
-#else
 #define Plat_FastMemset memset
 #define Plat_FastMemcpy memcpy
-#endif
 
 //-----------------------------------------------------------------------------
 // Returns true if debugger attached, false otherwise
@@ -1272,10 +1227,6 @@ inline const char *GetPlatformExt( void )
 // Include additional dependant header components.
 //-----------------------------------------------------------------------------
 #include "tier0/fasttimer.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_core.h"
-#endif
 
 //-----------------------------------------------------------------------------
 // Methods to invoke the constructor, copy constructor, and destructor
@@ -1426,7 +1377,7 @@ inline void Destruct( T (*pMemory)[N] )
 		}
 	}
 
-	typedef int (*FunctionType)( int blah, int blah );
+	using FunctionType = int (*)( int blah, int blah );
 
 	class FunctionName
 	{
@@ -1455,7 +1406,7 @@ PLATFORM_INTERFACE bool vtune( bool resume );
 
 #define TEMPLATE_FUNCTION_TABLE(RETURN_TYPE, NAME, ARGS, COUNT)			\
 																		\
-typedef RETURN_TYPE (FASTCALL *__Type_##NAME) ARGS;						\
+using __Type_##NAME = RETURN_TYPE (FASTCALL *) ARGS;					\
 																		\
 template<const int nArgument>											\
 struct __Function_##NAME												\
@@ -1463,7 +1414,7 @@ struct __Function_##NAME												\
 	static RETURN_TYPE FASTCALL Run ARGS;								\
 };																		\
 																		\
-template <const int i>														\
+template <const int i>													\
 struct __MetaLooper_##NAME : __MetaLooper_##NAME<i-1>					\
 {																		\
 	__Type_##NAME func;													\
@@ -1487,7 +1438,7 @@ public:																	\
 };																		\
 const __MetaLooper_##NAME<COUNT> NAME::m;								\
 const __Type_##NAME* NAME::functions = (__Type_##NAME*)&m;				\
-template<const int nArgument>													\
+template<const int nArgument>											\
 RETURN_TYPE FASTCALL __Function_##NAME<nArgument>::Run ARGS
 
 
@@ -1500,37 +1451,6 @@ RETURN_TYPE FASTCALL __Function_##NAME<nArgument>::Run ARGS
 		CODE;\
 	}
 
-//-----------------------------------------------------------------------------
-// Dynamic libs support
-//-----------------------------------------------------------------------------
-#if 0 // defined( PLATFORM_WINDOWS_PC )
-
-PLATFORM_INTERFACE void *Plat_GetProcAddress( const char *pszModule, const char *pszName );
-
-template <typename FUNCPTR_TYPE>
-class CDynamicFunction
-{
-public:
-	CDynamicFunction( const char *pszModule, const char *pszName, FUNCPTR_TYPE pfnFallback = NULL )
-	{
-		m_pfn = pfnFallback;
-		void *pAddr = Plat_GetProcAddress( pszModule, pszName );
-		if ( pAddr )
-		{
-			m_pfn = (FUNCPTR_TYPE)pAddr;
-		}
-	}
-
-	operator bool()			{ return m_pfn != NULL;	}
-	bool operator !()		{ return !m_pfn;	}
-	operator FUNCPTR_TYPE()	{ return m_pfn; }
-
-private:
-	FUNCPTR_TYPE m_pfn;
-};
-#endif
-
-
 // Watchdog timer support. Call Plat_BeginWatchdogTimer( nn ) to kick the timer off.  if you don't call
 // Plat_EndWatchdogTimer within nn seconds, the program will kick off an exception.  This is for making
 // sure that hung dedicated servers abort (and restart) instead of staying hung. Calling
@@ -1538,10 +1458,10 @@ private:
 // under linux right now. It should be possible to implement this functionality in windows via a
 // thread, if desired.
 PLATFORM_INTERFACE void Plat_BeginWatchdogTimer( int nSecs );
-PLATFORM_INTERFACE void Plat_EndWatchdogTimer( void );
-PLATFORM_INTERFACE int Plat_GetWatchdogTime( void );
+PLATFORM_INTERFACE void Plat_EndWatchdogTimer();
+PLATFORM_INTERFACE int Plat_GetWatchdogTime();
 
-typedef void (*Plat_WatchDogHandlerFunction_t)(void);
+using Plat_WatchDogHandlerFunction_t = void (*)();
 PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFunction_t function );
 
 

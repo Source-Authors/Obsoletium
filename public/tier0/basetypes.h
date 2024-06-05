@@ -83,6 +83,8 @@ constexpr inline float M_PI_F{3.14159265358979323846f};
 
 #include "valve_minmax_on.h"
 
+#ifdef __cplusplus
+
 // #define COMPILETIME_MAX and COMPILETIME_MIN for max/min in constant expressions
 template <typename T, typename Y>
 constexpr inline auto COMPILETIME_MIN( const T& a, const Y& b )
@@ -112,8 +114,6 @@ constexpr inline auto MAX( const T& a, const Y& b )
 }
 #endif
 
-#ifdef __cplusplus
-
 // This is the preferred clamp operator. Using the clamp macro can lead to
 // unexpected side-effects or more expensive code. Even the clamp (all
 // lower-case) function can generate more expensive code because of the
@@ -129,16 +129,14 @@ constexpr inline T Clamp( T const &val, T const &minVal, T const &maxVal )
 		return val;
 }
 
-// This is the preferred Min operator. Using the MIN macro can lead to unexpected
-// side-effects or more expensive code.
+// This is the preferred Min operator.
 template< typename T >
 constexpr inline T Min( T const &val1, T const &val2 )
 {
 	return val1 < val2 ? val1 : val2;
 }
 
-// This is the preferred Max operator. Using the MAX macro can lead to unexpected
-// side-effects or more expensive code.
+// This is the preferred Max operator.
 template< typename T >
 constexpr inline T Max( T const &val1, T const &val2 )
 {
@@ -154,22 +152,24 @@ constexpr inline T Max( T const &val1, T const &val2 )
 
 
 #ifndef DONT_DEFINE_BOOL // Needed for Cocoa stuff to compile.
-typedef int BOOL;
+using BOOL = int;
 #endif
 
-typedef int qboolean;
-typedef unsigned long ULONG;
-typedef unsigned char byte;
-typedef unsigned short word;
+using qboolean = int;
+using ULONG = unsigned long;
+using byte = unsigned char;
+using word = unsigned short;
+
 #ifdef _WIN32
-typedef unsigned long dword;
+using dword = unsigned long;
 #else
-typedef unsigned int dword;
+using dword = unsigned int;
 #endif
+
 #ifdef _WIN32
-typedef wchar_t ucs2; // under windows wchar_t is ucs2
+using ucs2 = wchar_t; // under windows wchar_t is ucs2
 #else
-typedef unsigned short ucs2;
+using ucs2 = unsigned short;
 #endif
 
 enum ThreeState_t
@@ -179,7 +179,7 @@ enum ThreeState_t
 	TRS_NONE,
 };
 
-typedef float vec_t;
+using vec_t = float;
 
 #if defined(__GNUC__)
 #define fpmin __builtin_fminf
@@ -197,18 +197,21 @@ typedef float vec_t;
 
 inline unsigned& FloatBits( vec_t& f )
 {
+	static_assert(alignof(vec_t) == alignof(unsigned));
 	static_assert(sizeof(f) == sizeof(unsigned));
 	return *reinterpret_cast<unsigned*>(&f);
 }
 
 inline unsigned const& FloatBits( vec_t const& f )
 {
+	static_assert(alignof(vec_t) == alignof(unsigned));
 	static_assert(sizeof(f) == sizeof(unsigned));
 	return *reinterpret_cast<unsigned const*>(&f);
 }
 
 inline vec_t BitsToFloat( unsigned i )
 {
+	static_assert(alignof(vec_t) == alignof(unsigned));
 	static_assert(sizeof(vec_t) == sizeof(i));
 	return *reinterpret_cast<vec_t*>(&i);
 }
@@ -281,15 +284,13 @@ struct color24
 
 typedef struct color32_s
 {
-	bool operator!=( color32_s other ) const;
+	bool operator!=( color32_s other ) const
+	{
+		return r != other.r || g != other.g || b != other.b || a != other.a;
+	}
 
 	byte r, g, b, a;
 } color32;
-
-inline bool color32::operator!=( color32 other ) const
-{
-	return r != other.r || g != other.g || b != other.b || a != other.a;
-}
 
 struct colorVec
 {

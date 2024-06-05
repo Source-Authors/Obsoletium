@@ -299,7 +299,7 @@ bool ThreadSetPriority( ThreadHandle_t hThread, int priority )
 
 //-----------------------------------------------------------------------------
 
-void ThreadSetAffinity( ThreadHandle_t hThread, int nAffinityMask )
+void ThreadSetAffinity( ThreadHandle_t hThread, ptrdiff_t nAffinityMask )
 {
 	if ( !hThread )
 	{

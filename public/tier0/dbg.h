@@ -582,22 +582,22 @@ inline DEST_POINTER_TYPE assert_cast(SOURCE_POINTER_TYPE* pSource)
 
 // Have to use these stubs so we don't have to include windows.h here.
 
-DBG_INTERFACE void _AssertValidReadPtr( void* ptr, int count = 1 );
-DBG_INTERFACE void _AssertValidWritePtr( void* ptr, int count = 1 );
-DBG_INTERFACE void _AssertValidReadWritePtr( void* ptr, int count = 1 );
-DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, int maxchar = 0xFFFFFF );
+DBG_INTERFACE void _AssertValidReadPtr( void* ptr, intp count = 1 );
+DBG_INTERFACE void _AssertValidWritePtr( void* ptr, intp count = 1 );
+DBG_INTERFACE void _AssertValidReadWritePtr( void* ptr, intp count = 1 );
+DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, intp maxchar = 0xFFFFFF );
 
 #ifdef DBGFLAG_ASSERT
 
-FORCEINLINE void AssertValidReadPtr( const void* ptr, int count = 1 )	    { _AssertValidReadPtr( (void*)ptr, count ); }
-FORCEINLINE void AssertValidWritePtr( const void* ptr, int count = 1 )		{ _AssertValidWritePtr( (void*)ptr, count ); }
-FORCEINLINE void AssertValidReadWritePtr( const void* ptr, int count = 1 )	{ _AssertValidReadWritePtr( (void*)ptr, count ); }
+FORCEINLINE void AssertValidReadPtr( const void* ptr, intp count = 1 )	    { _AssertValidReadPtr( (void*)ptr, count ); }
+FORCEINLINE void AssertValidWritePtr( const void* ptr, intp count = 1 )		{ _AssertValidWritePtr( (void*)ptr, count ); }
+FORCEINLINE void AssertValidReadWritePtr( const void* ptr, intp count = 1 )	{ _AssertValidReadWritePtr( (void*)ptr, count ); }
 
 #else
 
-FORCEINLINE void AssertValidReadPtr( const void* ptr, int count = 1 )			 { }
-FORCEINLINE void AssertValidWritePtr( const void* ptr, int count = 1 )		     { }
-FORCEINLINE void AssertValidReadWritePtr( const void* ptr, int count = 1 )	     { }
+FORCEINLINE void AssertValidReadPtr( const void* ptr, intp count = 1 )			 { }
+FORCEINLINE void AssertValidWritePtr( const void* ptr, intp count = 1 )		     { }
+FORCEINLINE void AssertValidReadWritePtr( const void* ptr, intp count = 1 )	     { }
 #define AssertValidStringPtr AssertValidReadPtr
 
 #endif
@@ -654,7 +654,7 @@ public:
 		m_szBuf[sizeof(m_szBuf)-1] = 0;
 	}
 
-	operator const tchar *() const				
+	operator const tchar *() const
 	{ 
 		return m_szBuf; 
 	}

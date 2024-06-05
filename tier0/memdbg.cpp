@@ -251,14 +251,29 @@ inline int WalkStack( void **ppAddresses, int nMaxAddresses, [[maybe_unused]] in
 
 //-----------------------------------------------------------------------------
 
+// The size of the no-man's land used in unaligned and aligned allocations:
+static size_t const no_mans_land_size = 4;
+static size_t const align_gap_size    = sizeof(void *);
+
 // NOTE: This exactly mirrors the dbg header in the MSDEV crt
 // eventually when we write our own allocator, we can kill this
+// See struct _CrtMemBlockHeader at debug_heap.cpp
 struct CrtDbgMemHeader_t
 {
-	unsigned char m_Reserved[8];
+    CrtDbgMemHeader_t* m_pBlockHeaderNext;
+    CrtDbgMemHeader_t* m_pBlockHeaderPrev;
 	const char *m_pFileName;
 	int			m_nLineNumber;
-	unsigned char m_Reserved2[16];
+
+    int			m_BlockUse;
+    size_t		m_DataSize;
+
+    long		m_RequestNumber;
+    unsigned char m_Gap[no_mans_land_size];
+
+    // Followed by:
+    // unsigned char    m_data[_data_size];
+    // unsigned char    m_AnotherGap[no_mans_land_size];
 };
 
 struct DbgMemHeader_t
@@ -267,7 +282,7 @@ struct DbgMemHeader_t
 #endif
 {
 	size_t nLogicalSize;
-	byte reserved[12];	// MS allocator always returns mem aligned on 16 bytes, which some of our code depends on
+	byte reserved[16 - sizeof(size_t)];	// MS allocator always returns mem aligned on 16 bytes, which some of our code depends on
 };
 
 //-----------------------------------------------------------------------------

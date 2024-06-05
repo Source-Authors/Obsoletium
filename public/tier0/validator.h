@@ -17,32 +17,32 @@ class CValidator
 {
 public:
 	// Constructors & destructors
-	CValidator( void );
-	~CValidator( void );
+	CValidator();
+	~CValidator();
 
 	// Call this each time we enter a new Validate function
 	void Push( tchar *pchType, void *pvObj, tchar *pchName );
 
 	// Call this each time we exit a Validate function
-	void Pop( void );
+	void Pop();
 
 	// Claim ownership of a memory block
 	void ClaimMemory( void *pvMem );
 
 	// Finish performing a check and perform necessary computations
-	void Finalize( void );
+	void Finalize();
 
 	// Render our results to the console
 	void RenderObjects( int cubThreshold );	// Render all reported objects
-	void RenderLeaks( void );				// Render all memory leaks
+	void RenderLeaks();				// Render all memory leaks
 
 	// List manipulation functions:
 	CValObject *FindObject( void *pvObj );				// Returns CValObject containing pvObj, or NULL.
 	void DiffAgainst( CValidator *pOtherValidator );	// Removes any entries from this validator that are also present in the other.
 
 	// Accessors
-	bool BMemLeaks( void ) { return m_bMemLeaks; };
-	CValObject *PValObjectFirst( void ) { return m_pValObjectFirst; };
+	bool BMemLeaks() { return m_bMemLeaks; };
+	CValObject *PValObjectFirst() { return m_pValObjectFirst; };
 
 	void Validate( CValidator &validator, tchar *pchName );		// Validate our internal structures
 

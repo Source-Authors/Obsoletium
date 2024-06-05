@@ -7,7 +7,8 @@
 #pragma once
 #endif
 
-#include "tier0/platform.h"
+#include <cstddef>
+#include <cstring>
 
 // -------------------------------------------------------
 //

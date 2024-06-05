@@ -653,9 +653,9 @@ int CSmallBlockPool::CountFreeBlocks()
 }
 
 // Size of committed memory managed by this heap:
-int CSmallBlockPool::GetCommittedSize()
+intp CSmallBlockPool::GetCommittedSize()
 {
-	unsigned totalSize = (unsigned)m_pCommitLimit - (unsigned)m_pBase;
+	uintp totalSize = (uintp)m_pCommitLimit - (uintp)m_pBase;
 	Assert( 0 != m_nBlockSize );
 
 	return totalSize;

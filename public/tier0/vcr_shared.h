@@ -13,7 +13,7 @@
 // Identifiers for the things we record. When playing back, these things should
 // be asked for in the exact same order (otherwise, the engine isn't making all
 // the calls in the same order).
-typedef enum
+enum VCREvent
 {
 	VCREvent_Sys_FloatTime=0,
 	VCREvent_recvfrom,
@@ -43,7 +43,7 @@ typedef enum
 	VCREvent_LocalTime,
 	VCREvent_GenericString,
 	VCREvent_NUMEVENTS
-} VCREvent;
+};
 
 
 #endif // VCR_SHARED_H

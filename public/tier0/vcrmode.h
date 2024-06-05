@@ -290,11 +290,7 @@ PLATFORM_INTERFACE VCR_t *g_pVCR;
 #define VCRHook_GetKeyState						GetKeyState
 #define VCRHook_recv							recv
 #define VCRHook_send							send
-#if defined( _X360 )
-#define VCRHook_CreateThread					CreateThread
-#else
 #define VCRHook_CreateThread					(void*)_beginthreadex
-#endif
 #define VCRHook_WaitForSingleObject				WaitForSingleObject
 #define VCRHook_EnterCriticalSection			EnterCriticalSection
 #define VCRHook_WaitForMultipleObjects( a, b, c, d) WaitForMultipleObjects( a, (const HANDLE *)b, c, d)

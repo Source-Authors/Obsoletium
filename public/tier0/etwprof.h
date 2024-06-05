@@ -99,8 +99,8 @@ public:
 	}
 private:
 	// Private and unimplemented to disable copying.
-	CETWScope( const CETWScope& rhs );
-	CETWScope& operator=( const CETWScope& rhs );
+	CETWScope( const CETWScope& rhs ) = delete;
+	CETWScope& operator=( const CETWScope& rhs ) = delete;
 
 	const char* m_pMessage;
 	int64 m_nStartTime;

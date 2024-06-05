@@ -78,7 +78,7 @@ public:
 	void *Alloc();
 	void Free( void *p );
 	int CountFreeBlocks();
-	int GetCommittedSize();
+	intp GetCommittedSize();
 	int CountCommittedBlocks();
 	int CountAllocatedBlocks();
 	int Compact();
@@ -140,7 +140,7 @@ public:
 	void *Alloc();
 	void Free( void *p );
 	int CountFreeBlocks();
-	int GetCommittedSize();
+	intp GetCommittedSize();
 	int CountCommittedBlocks();
 	int CountAllocatedBlocks();
 

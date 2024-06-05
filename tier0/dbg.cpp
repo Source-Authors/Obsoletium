@@ -194,23 +194,23 @@ void _ExitOnFatalAssert( const tchar* pFile, int line )
 //-----------------------------------------------------------------------------
 
 
-DBG_INTERFACE void _AssertValidReadPtr( void* ptr, int count/* = 1*/ )
+DBG_INTERFACE void _AssertValidReadPtr( void* ptr, intp count/* = 1*/ )
 {
 	Assert( !count || ptr );
 }
 
-DBG_INTERFACE void _AssertValidWritePtr( void* ptr, int count/* = 1*/ )
+DBG_INTERFACE void _AssertValidWritePtr( void* ptr, intp count/* = 1*/ )
 {
 	Assert( !count || ptr );
 }
 
-DBG_INTERFACE void _AssertValidReadWritePtr( void* ptr, int count/* = 1*/ )
+DBG_INTERFACE void _AssertValidReadWritePtr( void* ptr, intp count/* = 1*/ )
 {
 	Assert( !count || ptr );
 }
 
 #undef AssertValidStringPtr
-DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, int /* = 0xFFFFFF */ )
+DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, intp /* = 0xFFFFFF */ )
 {
 	Assert( ptr );
 }

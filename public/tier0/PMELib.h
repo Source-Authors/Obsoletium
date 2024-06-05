@@ -112,12 +112,12 @@ public:
     //---------------------------------------------------------------------------
     // Return the family of the processor
     //---------------------------------------------------------------------------
-    CPUVendor GetVendor(void)
+    CPUVendor GetVendor() const
     {
         return vendor;
     }
 
-    int GetProcessorFamily(void)
+    int GetProcessorFamily() const
     {
         return version.Family;
     }
