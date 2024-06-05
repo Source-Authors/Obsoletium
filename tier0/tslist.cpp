@@ -37,6 +37,8 @@ const char *g_pListType;
 class CTestOps
 {
 public:
+	virtual ~CTestOps() {}
+
 	virtual void Push( int item ) = 0;
 	virtual bool Pop( int *pResult ) = 0;
 	virtual bool Validate() { return true; }
@@ -45,12 +47,16 @@ public:
 
 class CQueueOps : public CTestOps
 {
-	void Push( int item )
+public:
+	virtual ~CQueueOps() = default;
+
+private:
+	void Push( int item ) override
 	{
 		g_TestQueue.PushItem( item );
 		++g_nPushes;
 	}
-	bool Pop( int *pResult )
+	bool Pop( int *pResult ) override
 	{
 		if ( g_TestQueue.PopItem( pResult ) )
 		{
@@ -59,11 +65,11 @@ class CQueueOps : public CTestOps
 		}
 		return false;
 	}
-	bool Validate()
+	bool Validate() override
 	{
 		return g_TestQueue.ValidateQueue();
 	}
-	bool IsEmpty()
+	bool IsEmpty() override
 	{
 		return ( g_TestQueue.Count() == 0 );
 	}
@@ -71,12 +77,16 @@ class CQueueOps : public CTestOps
 
 class CListOps : public CTestOps
 {
-	void Push( int item )
+public:
+	virtual ~CListOps() = default;
+
+private:
+	void Push( int item ) override
 	{
 		g_TestList.PushItem( item );
 		++g_nPushes;
 	}
-	bool Pop( int *pResult )
+	bool Pop( int *pResult ) override
 	{
 		if ( g_TestList.PopItem( pResult ) )
 		{
@@ -85,11 +95,11 @@ class CListOps : public CTestOps
 		}
 		return false;
 	}
-	bool Validate()
+	bool Validate() override
 	{
 		return true;
 	}
-	bool IsEmpty()
+	bool IsEmpty() override
 	{
 		return ( g_TestList.Count() == 0 );
 	}

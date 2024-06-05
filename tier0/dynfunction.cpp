@@ -25,7 +25,7 @@ typedef void *LibraryHandle;
 #if 1
 static inline void dbgdynfn(const char *, ...) {}
 #else
-#define dbgdynfn printf
+#define dbgdynfn Msg
 #endif
 
 // NOTE: This has to be the last file included!
@@ -136,7 +136,7 @@ void *VoidFnPtrLookup_Tier0(const char *libname, const char *fn, void *fallback)
 	void *retval = NULL;
 	if (lib != NULL)
 	{
-		retval = LookupInLibraryHandle(lib, fn);
+		retval = reinterpret_cast<void *>(LookupInLibraryHandle(lib, fn));
 		dbgdynfn("CDynamicFunction: Lookup of '%s' in '%s': %p\n", fn, libname, retval);
 	}
 

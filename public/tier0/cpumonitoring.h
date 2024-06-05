@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef CPU_MONITORING_H
-#define CPU_MONITORING_H
+#ifndef TIER0_CPU_MONITORING_H_
+#define TIER0_CPU_MONITORING_H_
 
 /*
 This header defines functions and structures for controlling the measurement of CPU frequency
@@ -29,7 +29,7 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds );
 
 // Warn with increasing strident colors when CPU percentages go below these levels.
 // They are const int instead of float because const float in C++ is stupid.
-const int kCPUMonitoringWarning1 = 80;
-const int kCPUMonitoringWarning2 = 50;
+constexpr int kCPUMonitoringWarning1 = 80;
+constexpr int kCPUMonitoringWarning2 = 50;
 
-#endif
+#endif  // TIER0_CPU_MONITORING_H_

@@ -7,15 +7,11 @@
 // Most of the VCR mode functionality is accomplished through hooks
 // called at various points in the engine.
 
-#ifndef VCRMODE_H
-#define VCRMODE_H
+#ifndef TIER0_VCRMODE_H_
+#define TIER0_VCRMODE_H_
 
 #ifdef _WIN32
 #include <process.h>
-#endif
-
-#ifdef _WIN32
-#pragma once
 #endif
 
 #include "tier0/platform.h"
@@ -27,19 +23,14 @@ DBG_INTERFACE const char *BuildCmdLine( int argc, char **argv, bool fAddSteam = 
 tchar *GetCommandLine();
 #endif
 
-#ifdef _X360
-#define NO_VCR 1
-#endif
-
-
 // Enclose lines of code in this if you don't want anything in them written to or read from the VCR file.
 #ifndef NO_VCR
 #define NOVCR(x)	\
-{\
+do {\
 	VCRSetEnabled(0);\
 	x;\
 	VCRSetEnabled(1);\
-}
+} while (false)
 #else
 #define NOVCR(x)	\
 {\
@@ -290,15 +281,11 @@ PLATFORM_INTERFACE VCR_t *g_pVCR;
 #define VCRHook_GetKeyState						GetKeyState
 #define VCRHook_recv							recv
 #define VCRHook_send							send
-#if defined( _X360 )
-#define VCRHook_CreateThread					CreateThread
-#else
 #define VCRHook_CreateThread					(void*)_beginthreadex
-#endif
 #define VCRHook_WaitForSingleObject				WaitForSingleObject
 #define VCRHook_EnterCriticalSection			EnterCriticalSection
 #define VCRHook_WaitForMultipleObjects( a, b, c, d) WaitForMultipleObjects( a, (const HANDLE *)b, c, d)
 #define VCRHook_Time							Time
 #endif
 
-#endif // VCRMODE_H
+#endif  // TIER0_VCRMODE_H_

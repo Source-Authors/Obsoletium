@@ -1,10 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef CL2CACHE_H
-#define CL2CACHE_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef TIER0_CL2CACHE_H_
+#define TIER0_CL2CACHE_H_
 
 class P4Event_BSQ_cache_reference;
 
@@ -21,7 +18,7 @@ public:
 	//-------------------------------------------------------------------------
 	// GetL2CacheMisses
 	//-------------------------------------------------------------------------
-	int GetL2CacheMisses( void )
+	int GetL2CacheMisses() const
 	{
 		return m_iL2CacheMissCount;
 	}
@@ -40,4 +37,4 @@ private:
 	int								m_iL2CacheMissCount;
 };
 
-#endif   // CL2CACHE_H
+#endif   // TIER0_CL2CACHE_H_

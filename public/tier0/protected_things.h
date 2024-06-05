@@ -1,11 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef PROTECTED_THINGS_H
-#define PROTECTED_THINGS_H
-#ifdef _WIN32
-#pragma once
-#endif
-
+#ifndef TIER0_PROTECTED_THINGS_H_
+#define TIER0_PROTECTED_THINGS_H_
 
 // This header tries to prevent people from using potentially dangerous functions
 // (like the notorious non-null-terminating strncpy) and functions that will break
@@ -263,4 +259,4 @@
 #endif
 
 
-#endif // PROTECTED_THINGS_H
+#endif  // TIER0_PROTECTED_THINGS_H_

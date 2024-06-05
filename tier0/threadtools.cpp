@@ -77,9 +77,9 @@ ASSERT_INVARIANT(TT_INFINITE == INFINITE);
 //-----------------------------------------------------------------------------
 struct ThreadProcInfo_t
 {
-	ThreadProcInfo_t( ThreadFunc_t pfnThread, void *pParam )
-	  : pfnThread( pfnThread),
-		pParam( pParam )
+	ThreadProcInfo_t( ThreadFunc_t pfnThread_, void *pParam_ )
+	  : pfnThread( pfnThread_ ),
+		pParam( pParam_ )
 	{
 	}
 	
@@ -117,7 +117,7 @@ ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, ThreadI
 	ThreadId_t idIgnored;
 	if ( !pID )
 		pID = &idIgnored;
-	HANDLE h = VCRHook_CreateThread(NULL, stackSize, (LPTHREAD_START_ROUTINE)ThreadProcConvert, new ThreadProcInfo_t( pfnThread, pParam ), CREATE_SUSPENDED, pID);
+	HANDLE h = VCRHook_CreateThread(NULL, stackSize, reinterpret_cast<void*>(ThreadProcConvert), new ThreadProcInfo_t( pfnThread, pParam ), CREATE_SUSPENDED, pID);
 	if ( h != INVALID_HANDLE_VALUE )
 	{
 		Plat_ApplyHardwareDataBreakpointsToNewThread( *pID );
@@ -153,7 +153,7 @@ ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, unsigne
 	return CreateSimpleThread( pfnThread, pParam, NULL, stackSize );
 }
 
-PLATFORM_INTERFACE void ThreadDetach( ThreadHandle_t hThread )
+PLATFORM_INTERFACE void ThreadDetach( [[maybe_unused]] ThreadHandle_t hThread )
 {
 #if defined( POSIX )
 	// The resources of this thread will be freed immediately when it terminates,
@@ -299,7 +299,7 @@ bool ThreadSetPriority( ThreadHandle_t hThread, int priority )
 
 //-----------------------------------------------------------------------------
 
-void ThreadSetAffinity( ThreadHandle_t hThread, int nAffinityMask )
+void ThreadSetAffinity( ThreadHandle_t hThread, ptrdiff_t nAffinityMask )
 {
 	if ( !hThread )
 	{
@@ -451,8 +451,8 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 			So we need to truncate the threadname to 16 or the call will just fail.
 		*/
 		char szThreadName[ 16 ];
-		strncpy( szThreadName, pszName, ARRAYSIZE( szThreadName ) );
-		szThreadName[ ARRAYSIZE( szThreadName ) - 1 ] = 0;
+		strncpy( szThreadName, pszName, std::size( szThreadName ) );
+		szThreadName[ std::size( szThreadName ) - 1 ] = 0;
 		(*s_pthread_setname_np_func)( id, szThreadName );
 	}
 #endif
@@ -935,7 +935,7 @@ int64 ThreadInterlockedCompareExchange64( int64 volatile *pDest, int64 value, in
 		mov ebx,[edi];
 		mov ecx,4[edi];
 		mov esi,pDest;
-		lock CMPXCHG8B [esi];			
+		lock cmpxchg8b [esi];			
 	}
 #endif
 }
@@ -955,7 +955,7 @@ bool ThreadInterlockedAssignIf64(volatile int64 *pDest, int64 value, int64 compe
 		mov ebx,[edi];
 		mov ecx,4[edi];
 		mov esi,pDest;
-		lock CMPXCHG8B [esi];			
+		lock cmpxchg8b [esi];			
 		mov eax,0;
 		setz al;
 	}
@@ -1597,11 +1597,11 @@ void CThreadSpinRWLock::UnlockRead()
 void CThreadSpinRWLock::UnlockWrite()
 {
 	Assert( m_lockInfo.m_writerId == ThreadGetCurrentId()  && m_lockInfo.m_nReaders == 0 );
-	static const alignas(int64) LockInfo_t newValue = { 0, 0 };
+	alignas(int64) static const LockInfo_t newValue = { 0, 0 };
 #if defined(_X360)
 	// X360TBD: Serious Perf implications, not yet. __sync();
 #endif
-	ThreadInterlockedExchange64(  (int64 *)&m_lockInfo, *((int64 *)&newValue) );
+	ThreadInterlockedExchange64(  (volatile int64 *)&m_lockInfo, *((const int64 *)&newValue) );
 	--m_nWriters;
 }
 
@@ -1709,7 +1709,7 @@ bool CThread::Start( unsigned nBytesStack )
 	HANDLE       hThread;
 	m_hThread = hThread = (HANDLE)VCRHook_CreateThread( NULL,
 														nBytesStack,
-														(LPTHREAD_START_ROUTINE)GetThreadProc(),
+														reinterpret_cast<void*>(GetThreadProc()),
 														new ThreadInit_t(init),
 														CREATE_SUSPENDED,
 														&m_threadId );
@@ -1800,7 +1800,7 @@ bool CThread::IsAlive()
 
 //---------------------------------------------------------
 
-bool CThread::Join(unsigned timeout)
+bool CThread::Join([[maybe_unused]] unsigned timeout)
 {
 #ifdef _WIN32
 	if ( m_hThread )
@@ -1917,7 +1917,7 @@ void CThread::SuspendCooperative()
 	}
 	else
 	{
-		Assert( !"Suspend not called from worker thread, this would be a bug" );
+		AssertMsg( false, "Suspend not called from worker thread, this would be a bug" );
 	}
 }
 
@@ -1925,7 +1925,9 @@ void CThread::SuspendCooperative()
 
 void CThread::ResumeCooperative()
 {
-	Assert( m_nSuspendCount == 1 );
+	// TODO: dimhotepus: Sometimes Assert fires, investigate.
+	[[maybe_unused]] int suspendCount = m_nSuspendCount;
+	AssertMsg( suspendCount == 1, "Suspend event count %d should be 1", suspendCount );
 	m_SuspendEvent.Set();
 }
 
@@ -1942,7 +1944,12 @@ void CThread::BWaitForThreadSuspendCooperative()
 unsigned int CThread::Suspend()
 {
 #ifdef _WIN32
-	return ( SuspendThread(m_hThread) != 0 ); //-V720
+  // dimhotepus: x64 support.
+#ifndef PLATFORM_64BITS
+  return SuspendThread(m_hThread) != static_cast<DWORD>(-1);
+#else
+  return Wow64SuspendThread(m_hThread) != static_cast<DWORD>(-1);
+#endif
 #elif defined(OSX)
 	int susCount = m_nSuspendCount++;
 	while ( thread_suspend( pthread_mach_thread_np(m_threadId) ) != KERN_SUCCESS )
@@ -2287,7 +2294,7 @@ int CWorkerThread::WaitForReply( unsigned timeout, WaitFunc_t pfnWait )
 			break;
 		}
 #endif
-		result = (*pfnWait)((sizeof(waits) / sizeof(waits[0])), waits, 0,
+		result = (*pfnWait)(std::size(waits), waits, 0,
 			(timeout != TT_INFINITE) ? timeout : 30000);
 
 		AssertMsg(timeout != TT_INFINITE || result != WAIT_TIMEOUT, "Possible hung thread, call to thread timed out");

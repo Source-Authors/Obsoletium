@@ -12,6 +12,7 @@
 #ifndef _WIN32
 
 #include <sys/ioctl.h>
+#include <atomic>
 
 #include "TextConsoleUnix.h"
 #include "tier0/icommandline.h"
@@ -25,7 +26,7 @@
 static pthread_mutex_t g_lock;
 static pthread_t g_threadid = (pthread_t)-1;
 CUtlLinkedList< CUtlString > g_Commands;
-static volatile int g_ProcessingCommands = false;
+static std::atomic_bool g_ProcessingCommands = false;
 
 #if defined( LINUX )
 

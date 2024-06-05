@@ -2,11 +2,8 @@
 //
 // This file sets all of our debugging flags.  It should be called before all other header files.
 
-#ifndef DBGFLAG_H
-#define DBGFLAG_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef TIER0_DBGFLAG_H_
+#define TIER0_DBGFLAG_H_
 
 
 // Here are all the flags we support:
@@ -58,4 +55,4 @@
 
 #endif // _DEBUG
 
-#endif // DBGFLAG_H
+#endif  // TIER0_DBGFLAG_H_

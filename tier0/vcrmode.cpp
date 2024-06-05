@@ -12,7 +12,7 @@
 #include "tier0/dbg.h"
 
 // FIXME: We totally have a bad tier dependency here
-#include "inputsystem/inputenums.h"
+#include "inputsystem/InputEnums.h"
 												
 #ifndef NO_VCR
 
@@ -216,7 +216,7 @@ public:
 	}
 } g_VCRThreadSafeInitter;
 
-#define VCR_THREADSAFE CVCRThreadSafe vcrThreadSafe;
+#define VCR_THREADSAFE CVCRThreadSafe vcrThreadSafe
 
 
 
@@ -230,7 +230,7 @@ static void VCR_Error( const char *pFormat, ... )
 	#ifdef _DEBUG
 		// Figure out which thread we're in, for the debugger.
 		DWORD curThreadId = GetCurrentThreadId();
-		int iCurThread = -1;
+		[[maybe_unused]] int iCurThread = -1;
 		for ( int i=0; i < g_nVCRThreads; i++ )
 		{
 			if ( g_pVCRThreads[i].m_ThreadID == curThreadId )
@@ -383,12 +383,14 @@ static void VCR_Event(VCREvent type)
 class CVCRTrace : public IVCRTrace
 {
 public:
-	virtual VCREvent	ReadEvent()
+	virtual ~CVCRTrace() {}
+
+	VCREvent ReadEvent() override
 	{
 		return VCR_ReadEvent();
 	}
 
-	virtual void		Read( void *pDest, int size )
+	void Read( void *pDest, int size ) override
 	{
 		VCR_Read( pDest, size );
 	}
@@ -458,7 +460,7 @@ static int VCR_Start( char const *pFilename, bool bRecord, IVCRHelpers *pHelpers
 			VCR_Read(&version, sizeof(version));
 			if(version != VCRFILE_VERSION)
 			{
-				Assert(!"VCR_Start: invalid file version");
+				AssertMsg( false, "VCR_Start: invalid file version" );
 				VCREnd();
 				return FALSE;
 			}
@@ -491,7 +493,7 @@ static void VCR_End()
 				DebuggerBreak();
 		#endif
 
-		TerminateProcess( GetCurrentProcess(), 1 );
+		ExitProcess( 1 );
 	}
 
 	g_VCRMode = VCR_Disabled;
@@ -1023,7 +1025,7 @@ static long VCR_Hook_RegOpenKeyEx( void *hKey, const char *lpSubKey, unsigned lo
 }
 
 
-static long VCR_Hook_RegSetValueEx(void *hKey, tchar const *lpValueName, unsigned long Reserved, unsigned long dwType, unsigned char const *lpData, unsigned long cbData)
+static long VCR_Hook_RegSetValueEx(void *hKey, tchar const *lpValueName, unsigned long, unsigned long dwType, unsigned char const *lpData, unsigned long cbData)
 {
 	// Preamble.
 	if ( !IsVCRModeEnabledForThisThread() )
@@ -1087,7 +1089,7 @@ static long VCR_Hook_RegQueryValueEx(void *hKey, tchar const *lpValueName, unsig
 }
 
 
-static long VCR_Hook_RegCreateKeyEx(void *hKey, char const *lpSubKey, unsigned long Reserved, char *lpClass, unsigned long dwOptions, 
+static long VCR_Hook_RegCreateKeyEx(void *hKey, char const *lpSubKey, unsigned long, char *lpClass, unsigned long dwOptions, 
 	unsigned long samDesired, void *lpSecurityAttributes, void *phkResult, unsigned long *lpdwDisposition)
 {
 	// Preamble.
@@ -1760,4 +1762,4 @@ VCR_t g_VCR =
 
 VCR_t *g_pVCR = &g_VCR;
 
-#endif // NO_VCR
+#endif  // NO_VCR

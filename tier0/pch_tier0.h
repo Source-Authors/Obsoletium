@@ -11,17 +11,15 @@
 
 // First include standard libraries
 #include "tier0/valve_off.h"
+
 #include <malloc.h>
 #include <memory.h>
 #include <cctype>
+#include <cstddef>
 #include <cstdio>
 #include <climits>
-
-#include "tier0/valve_minmax_off.h"	// GCC 4.2.2 headers screw up our min/max defs.
 #include <map>
-#include "tier0/valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
 
-#include <cstddef>
 #ifdef POSIX
 #include <cctype>
 #include <climits>

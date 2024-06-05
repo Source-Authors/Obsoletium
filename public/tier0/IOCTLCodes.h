@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef IOCTLCODES_H
-#define IOCTLCODES_H
+#ifndef TIER0_IOCTLCODES_H_
+#define TIER0_IOCTLCODES_H_
 
 #ifdef _WIN32
 #include <winioctl.h>
@@ -23,5 +23,4 @@
 #define IOCTL_READ_MSR \
     CTL_CODE( DEVICE_FILE_TYPE, 0x901, METHOD_BUFFERED, FILE_READ_ACCESS )
 
-
-#endif IOCTLCODES_H
+#endif  // TIER0_IOCTLCODES_H_

@@ -1,15 +1,15 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef IA32DETECT_H
-#define IA32DETECT_H
+#ifndef TIER0_IA32DETECT_H_
+#define TIER0_IA32DETECT_H_
 
-#include "wchartypes.h"
+#include "tier0/wchartypes.h"
 
 #ifdef _MSC_VER
 #include <intrin.h>
 #endif
 
-#if (defined(__clang__) || defined(__GNUC__)) && (__x86_64__ || __i386__)
+#if (defined(__clang__) || defined(__GNUC__)) && (defined(__x86_64__) || defined(__i386__))
 #include <cpuid.h>
 #endif
 
@@ -298,7 +298,7 @@ private:
 
 		m = 0;
 
-		for (byte ci3 = 1U; ci3 > 0 && ci3 <= 255U; ci3++)
+		for (byte ci3 = 1U; ci3 > 0; ci3++)
 			if (c[ci3])
 				cache[m++] = ci3;
 
@@ -333,4 +333,4 @@ private:
 	}
 };
 
-#endif // IA32DETECT_H
+#endif  // TIER0_IA32DETECT_H_

@@ -11,7 +11,7 @@
 #include <io.h>
 #include <fcntl.h>
 
-#include <iostream>
+#include <iostream>  // sync_with_stdio
 
 #endif // defined( _WIN32 )
 
@@ -56,7 +56,7 @@ bool SetupWin32ConsoleIO()
 
 	if ( GetFileType( GetStdHandle( STD_OUTPUT_HANDLE ) ) == FILE_TYPE_UNKNOWN )
 	{
-		if ( !( AttachConsole( ( DWORD ) - 1 ) ) )
+		if ( !( AttachConsole( static_cast<DWORD>(-1) ) ) )
 		{
 			newConsole = true;
 			AllocConsole();

@@ -8,7 +8,7 @@
 
 #ifdef _WIN32
 #include "winlite.h"
-#include <tlhelp32.h>
+#include <TlHelp32.h>
 #endif
 
 #include "tier0/platform.h"
@@ -66,7 +66,12 @@ static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
 	HANDLE hThread = OpenThread( THREAD_SUSPEND_RESUME | THREAD_SET_CONTEXT, FALSE, dwThreadId );
 	if ( hThread )
 	{
-		if ( SuspendThread( hThread ) != -1 ) //-V720
+		// dimhotepus: x64 support.
+#ifndef PLATFORM_64BITS
+		if ( SuspendThread( hThread ) != static_cast<DWORD>(-1) ) //-V720
+#else
+		if ( Wow64SuspendThread( hThread ) != static_cast<DWORD>(-1) )
+#endif
 		{
 			SetThreadContext( hThread, &ctx );
 			ResumeThread( hThread );

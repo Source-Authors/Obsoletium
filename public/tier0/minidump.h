@@ -1,10 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef MINIDUMP_H
-#define MINIDUMP_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef TIER0_MINIDUMP_H_
+#define TIER0_MINIDUMP_H_
 
 #include "tier0/platform.h"
 
@@ -16,7 +13,7 @@ PLATFORM_INTERFACE void SetMinidumpFilenamePrefix( const char *pszPrefix );
 PLATFORM_INTERFACE void SetMinidumpComment( const char *pszComment );
 
 // writes out a minidump of the current stack trace with a unique filename
-PLATFORM_INTERFACE void WriteMiniDump( const char *pszFilenameSuffix = NULL );
+PLATFORM_INTERFACE void WriteMiniDump( const char *pszFilenameSuffix = nullptr );
 
 typedef void (*FnWMain)( int , tchar *[] );
 typedef void (*FnVoidPtrFn)( void * );
@@ -67,8 +64,8 @@ PLATFORM_INTERFACE bool WriteMiniDumpUsingExceptionInfo(
 	unsigned int uStructuredExceptionCode,
 	_EXCEPTION_POINTERS * pExceptionInfo, 
 	int /* MINIDUMP_TYPE */ minidumpType,
-	const char *pszFilenameSuffix = NULL,
-	tchar *ptchMinidumpFileNameBuffer = NULL
+	const char *pszFilenameSuffix = nullptr,
+	tchar *ptchMinidumpFileNameBuffer = nullptr
 	);
 
 // Call this to enable a handler for unhandled exceptions.
@@ -96,5 +93,5 @@ PLATFORM_INTERFACE void MinidumpUserStreamInfoAppend( const char *pFormat, ... )
 //  Empty strings ("\0") can be returned if comment hasn't been set
 PLATFORM_INTERFACE const char *MinidumpUserStreamInfoGet( int Index );
 
-#endif // MINIDUMP_H
+#endif  // TIER0_MINIDUMP_H_
 

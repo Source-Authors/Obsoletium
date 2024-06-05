@@ -194,23 +194,23 @@ void _ExitOnFatalAssert( const tchar* pFile, int line )
 //-----------------------------------------------------------------------------
 
 
-DBG_INTERFACE void _AssertValidReadPtr( void* ptr, int count/* = 1*/ )
+DBG_INTERFACE void _AssertValidReadPtr( void* ptr, intp count/* = 1*/ )
 {
 	Assert( !count || ptr );
 }
 
-DBG_INTERFACE void _AssertValidWritePtr( void* ptr, int count/* = 1*/ )
+DBG_INTERFACE void _AssertValidWritePtr( void* ptr, intp count/* = 1*/ )
 {
 	Assert( !count || ptr );
 }
 
-DBG_INTERFACE void _AssertValidReadWritePtr( void* ptr, int count/* = 1*/ )
+DBG_INTERFACE void _AssertValidReadWritePtr( void* ptr, intp count/* = 1*/ )
 {
 	Assert( !count || ptr );
 }
 
 #undef AssertValidStringPtr
-DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, int /* = 0xFFFFFF */ )
+DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, intp /* = 0xFFFFFF */ )
 {
 	Assert( ptr );
 }
@@ -288,7 +288,7 @@ static SpewRetval_t _SpewMessage( SpewType_t spewType, const char *pGroupName, i
 		len += _stprintf( &pTempBuffer[len], _T("\n") ); 
 	}
 	
-	assert( len < sizeof(pTempBuffer)/sizeof(pTempBuffer[0]) - 1 ); /* use normal assert here; to avoid recursion. */
+	assert( len < ssize(pTempBuffer) - 1 ); /* use normal assert here; to avoid recursion. */
 	assert( s_SpewOutputFunc );
 	
 	/* direct it to the appropriate target(s) */
@@ -302,7 +302,7 @@ static SpewRetval_t _SpewMessage( SpewType_t spewType, const char *pGroupName, i
 
 	g_pSpewInfo = &spewInfo;
 	SpewRetval_t ret = s_SpewOutputFunc( spewType, pTempBuffer );
-	g_pSpewInfo = (int)NULL;
+	g_pSpewInfo = nullptr;
 
 	switch (ret)
 	{

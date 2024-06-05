@@ -2,14 +2,10 @@
 //
 // Memory allocation!
 
-#ifndef TIER0_MEM_H
-#define TIER0_MEM_H
+#ifndef TIER0_MEM_H_
+#define TIER0_MEM_H_
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include <stddef.h>
+#include <cstddef>
 
 #include "tier0/platform.h"
 
@@ -41,4 +37,4 @@ MEM_INTERFACE void ZeroMemory( void *mem, size_t length );
 #endif
 
 
-#endif /* TIER0_MEM_H */
+#endif  // TIER0_MEM_H_

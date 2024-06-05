@@ -1,13 +1,9 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_ICOMMANDLINE_H
-#define TIER0_ICOMMANDLINE_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef TIER0_ICOMMANDLINE_H_
+#define TIER0_ICOMMANDLINE_H_
 
 #include "tier0/platform.h"
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Interface to engine command line
@@ -20,14 +16,14 @@ public:
 	virtual const char	*GetCmdLine( void ) const = 0;
 
 	// Check whether a particular parameter exists
-	virtual	const char	*CheckParm( const char *psz, const char **ppszValue = 0 ) const = 0;
+	virtual	const char	*CheckParm( const char *psz, const char **ppszValue = nullptr ) const = 0;
 	// A bool return of whether param exists, useful for just checking if param that is just a flag is set
 	virtual bool		HasParm( const char *psz ) const = 0;
 	virtual void		RemoveParm( const char *parm ) = 0;
 	virtual void		AppendParm( const char *pszParm, const char *pszValues ) = 0;
 
 	// Returns the argument after the one specified, or the default if not found
-	virtual const char	*ParmValue( const char *psz, const char *pDefaultVal = 0 ) const = 0;
+	virtual const char	*ParmValue( const char *psz, const char *pDefaultVal = nullptr ) const = 0;
 	virtual int			ParmValue( const char *psz, int nDefaultVal ) const = 0;
 	virtual float		ParmValue( const char *psz, float flDefaultVal ) const = 0;
 
@@ -37,9 +33,9 @@ public:
 	virtual const char* GetParm( int nIndex ) const = 0;
 	
 	// copies the string passwed
-	virtual void SetParm( int nIndex, char const *pNewParm ) =0;
+	virtual void SetParm( int nIndex, char const *pNewParm ) = 0;
 
-	virtual const char *ParmValueByIndex( int nIndex, const char *pDefaultVal = 0 ) const = 0;
+	virtual const char *ParmValueByIndex( int nIndex, const char *pDefaultVal = nullptr ) const = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -53,5 +49,5 @@ PLATFORM_INTERFACE ICommandLine *CommandLine_Tier0();
 #define CommandLine CommandLine_Tier0
 #endif
 
-#endif // TIER0_ICOMMANDLINE_H
+#endif  // TIER0_ICOMMANDLINE_H_
 

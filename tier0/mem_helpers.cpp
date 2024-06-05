@@ -114,7 +114,7 @@ void DoApplyMemoryInitializations( void *pMem, size_t nSize )
 		bCheckedCommandLine = true;
 		
 		//APS
-		char *pStr = (char*)Plat_GetCommandLineA();
+		const char *pStr = Plat_GetCommandLineA();
 		if ( pStr )
 		{
 			char tempStr[512];
@@ -157,7 +157,7 @@ size_t CalcHeapUsed()
 #if defined( _X360 )
 	return 0;
 #else
-	_HEAPINFO	hinfo = {0};
+	_HEAPINFO	hinfo = {};
 	int			heapstatus;
 	size_t		nTotal{0};
 

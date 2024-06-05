@@ -365,7 +365,7 @@ static int VCR_Hook_PeekMessage(
 	unsigned int wRemoveMsg
 	)
 {
-	Assert( "VCR_Hook_PeekMessage unsupported" );
+	AssertMsg( false, "VCR_Hook_PeekMessage unsupported" );
 	return 0;
 }
 
@@ -422,13 +422,13 @@ bool VCR_Hook_PlaybackGameMsg( InputEvent_t* pEvent  )
 
 static void VCR_Hook_GetCursorPos(struct tagPOINT *pt)
 {
-	Assert( "VCR_Hook_GetCursorPos unsupported" );
+	AssertMsg( false, "VCR_Hook_GetCursorPos unsupported" );
 }
 
 
 static void VCR_Hook_ScreenToClient(void *hWnd, struct tagPOINT *pt)
 {
-	Assert( "VCR_Hook_GetCursorPos unsupported" );
+	AssertMsg( false, "VCR_Hook_GetCursorPos unsupported" );
 }
 
 
@@ -600,21 +600,21 @@ static char* VCR_Hook_GetCommandLine()
 
 static long VCR_Hook_RegOpenKeyEx( void *hKey, const char *lpSubKey, unsigned long ulOptions, unsigned long samDesired, void *pHKey )
 {
-	Assert( "VCR_Hook_RegOpenKeyEx unsupported" );
+	AssertMsg( false, "VCR_Hook_RegOpenKeyEx unsupported" );
 	return 0;
 }
 
 
 static long VCR_Hook_RegSetValueEx(void *hKey, char const *lpValueName, unsigned long Reserved, unsigned long dwType, unsigned char const *lpData, unsigned long cbData)
 {
-	Assert( "VCR_Hook_RegSetValueEx unsupported" );
+	AssertMsg( false, "VCR_Hook_RegSetValueEx unsupported" );
 	return 0;
 }
 
 
 static long VCR_Hook_RegQueryValueEx(void *hKey, char const *lpValueName, unsigned long *lpReserved, unsigned long *lpType, unsigned char *lpData, unsigned long *lpcbData)
 {
-	Assert( "VCR_Hook_RegQueryValueEx unsupported" );
+	AssertMsg( false, "VCR_Hook_RegQueryValueEx unsupported" );
 	return 0;
 }
 
@@ -622,14 +622,14 @@ static long VCR_Hook_RegQueryValueEx(void *hKey, char const *lpValueName, unsign
 static long VCR_Hook_RegCreateKeyEx(void *hKey, char const *lpSubKey, unsigned long Reserved, char *lpClass, unsigned long dwOptions, 
 	unsigned long samDesired, void *lpSecurityAttributes, void *phkResult, unsigned long *lpdwDisposition)
 {
-	Assert( "VCR_Hook_RegCreateKeyEx unsupported" );
+	AssertMsg( false, "VCR_Hook_RegCreateKeyEx unsupported" );
 	return 0;
 }
 
 
 static void VCR_Hook_RegCloseKey(void *hKey)
 {
-	Assert( "VCR_Hook_RegCloseKey unsupported" );
+	AssertMsg( false, "VCR_Hook_RegCloseKey unsupported" );
 }
 
 
@@ -660,7 +660,7 @@ int VCR_Hook_GetNumberOfConsoleInputEvents( void *hInput, unsigned long *pNumEve
 
 int	VCR_Hook_ReadConsoleInput( void *hInput, void *pRecs, int nMaxRecs, unsigned long *pNumRead )
 {
-	Assert( "VCR_Hook_ReadConsoleInput unsupported" );
+	AssertMsg( false, "VCR_Hook_ReadConsoleInput unsupported" );
 	return 0;
 }
 
@@ -677,7 +677,7 @@ void VCR_Hook_LocalTime( struct tm *today )
 
 short VCR_Hook_GetKeyState( int nVirtKey )
 {
-	Assert( "VCREvent_GetKeyState unsupported" );
+	AssertMsg( false, "VCREvent_GetKeyState unsupported" );
 	return 0;
 }
 

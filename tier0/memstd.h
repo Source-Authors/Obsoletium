@@ -8,7 +8,7 @@
 #if defined(_WIN32)
 #if !defined(_X360)
 #define WIN_32_LEAN_AND_MEAN
-#include <windows.h>
+#include <Windows.h>
 #else
 #undef Verify
 #define _XBOX
@@ -47,7 +47,7 @@
 #define SBH_PAGE_SIZE		(64*1024)
 #define COMMIT_SIZE		(SBH_PAGE_SIZE)
 #endif
-#if _M_X64
+#ifdef _M_X64
 #define NUM_POOLS		34
 #else
 #define NUM_POOLS		42
@@ -78,7 +78,7 @@ public:
 	void *Alloc();
 	void Free( void *p );
 	int CountFreeBlocks();
-	int GetCommittedSize();
+	intp GetCommittedSize();
 	int CountCommittedBlocks();
 	int CountAllocatedBlocks();
 	int Compact();
@@ -140,7 +140,7 @@ public:
 	void *Alloc();
 	void Free( void *p );
 	int CountFreeBlocks();
-	int GetCommittedSize();
+	intp GetCommittedSize();
 	int CountCommittedBlocks();
 	int CountAllocatedBlocks();
 
@@ -214,62 +214,64 @@ public:
 		// Make sure that we return 64-bit addresses in 64-bit builds.
 		ReserveBottomMemory();
 	}
+	virtual ~CStdMemAlloc() {}
+
 	// Release versions
-	virtual void *Alloc( size_t nSize );
-	virtual void *Realloc( void *pMem, size_t nSize );
-	virtual void  Free( void *pMem );
-    virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize );
+	void *Alloc( size_t nSize ) override;
+	void *Realloc( void *pMem, size_t nSize ) override;
+	void  Free( void *pMem ) override;
+    void *Expand_NoLongerSupported( void *pMem, size_t nSize ) override;
 
 	// Debug versions
-    virtual void *Alloc( size_t nSize, const char *pFileName, int nLine );
-    virtual void *Realloc( void *pMem, size_t nSize, const char *pFileName, int nLine );
-    virtual void  Free( void *pMem, const char *pFileName, int nLine );
-    virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize, const char *pFileName, int nLine );
+    void *Alloc( size_t nSize, const char *pFileName, int nLine ) override;
+    void *Realloc( void *pMem, size_t nSize, const char *pFileName, int nLine ) override;
+    void  Free( void *pMem, const char *pFileName, int nLine ) override;
+    void *Expand_NoLongerSupported( void *pMem, size_t nSize, const char *pFileName, int nLine ) override;
 
 	// Returns size of a particular allocation
-	virtual size_t GetSize( void *pMem );
+	size_t GetSize( void *pMem ) override;
 
     // Force file + line information for an allocation
-    virtual void PushAllocDbgInfo( const char *pFileName, int nLine );
-    virtual void PopAllocDbgInfo();
+    void PushAllocDbgInfo( const char *pFileName, int nLine ) override;
+    void PopAllocDbgInfo() override;
 
-	virtual long CrtSetBreakAlloc( long lNewBreakAlloc );
-	virtual	int CrtSetReportMode( int nReportType, int nReportMode );
-	virtual int CrtIsValidHeapPointer( const void *pMem );
-	virtual int CrtIsValidPointer( const void *pMem, unsigned int size, int access );
-	virtual int CrtCheckMemory( void );
-	virtual int CrtSetDbgFlag( int nNewFlag );
-	virtual void CrtMemCheckpoint( _CrtMemState *pState );
-	void* CrtSetReportFile( int nRptType, void* hFile );
-	void* CrtSetReportHook( void* pfnNewHook );
+	long CrtSetBreakAlloc( long lNewBreakAlloc ) override;
+	int CrtSetReportMode( int nReportType, int nReportMode ) override;
+	int CrtIsValidHeapPointer( const void *pMem ) override;
+	int CrtIsValidPointer( const void *pMem, unsigned int size, int access ) override;
+	int CrtCheckMemory( void ) override;
+	int CrtSetDbgFlag( int nNewFlag ) override;
+	void CrtMemCheckpoint( _CrtMemState *pState ) override;
+	void* CrtSetReportFile( int nRptType, void* hFile ) override;
+	void* CrtSetReportHook( void* pfnNewHook ) override;
 	int CrtDbgReport( int nRptType, const char * szFile,
-			int nLine, const char * szModule, const char * pMsg );
-	virtual int heapchk();
+			int nLine, const char * szModule, const char * pMsg ) override;
+	int heapchk() override;
 
-	virtual void DumpStats();
-	virtual void DumpStatsFileBase( char const *pchFileBase );
-	virtual void GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory );
+	void DumpStats() override;
+	void DumpStatsFileBase( char const *pchFileBase ) override;
+	void GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory ) override;
 
-	virtual bool IsDebugHeap() { return false; }
+	bool IsDebugHeap() override { return false; }
 
-	virtual void GetActualDbgInfo( const char *&pFileName, int &nLine ) {}
-	virtual void RegisterAllocation( const char *pFileName, int nLine, size_t nLogicalSize, size_t nActualSize, unsigned nTime ) {}
-	virtual void RegisterDeallocation( const char *pFileName, int nLine, size_t nLogicalSize, size_t nActualSize, unsigned nTime ) {}
+	void GetActualDbgInfo( const char *&, int & ) override {}
+	void RegisterAllocation( const char *, int, size_t, size_t, unsigned ) override {}
+	void RegisterDeallocation( const char *, int, size_t, size_t, unsigned ) override {}
 
-	virtual int GetVersion() { return MEMALLOC_VERSION; }
+	int GetVersion() override { return MEMALLOC_VERSION; }
 
-	virtual void CompactHeap();
+	void CompactHeap() override;
 
-	virtual MemAllocFailHandler_t SetAllocFailHandler( MemAllocFailHandler_t pfnMemAllocFailHandler );
+	MemAllocFailHandler_t SetAllocFailHandler( MemAllocFailHandler_t pfnMemAllocFailHandler ) override;
 	size_t CallAllocFailHandler( size_t nBytes ) { return (*m_pfnFailHandler)( nBytes); }
 
-	virtual uint32 GetDebugInfoSize() { return 0; }
-	virtual void SaveDebugInfo( void *pvDebugInfo ) { }
-	virtual void RestoreDebugInfo( const void *pvDebugInfo ) {}	
-	virtual void InitDebugInfo( void *pvDebugInfo, const char *pchRootFileName, int nLine ) {}
+	uint32 GetDebugInfoSize() override { return 0; }
+	void SaveDebugInfo( void * ) override { }
+	void RestoreDebugInfo( const void * ) override {}	
+	void InitDebugInfo( void *, const char *, int ) override {}
 
 	static size_t DefaultFailHandler( size_t );
-	void DumpBlockStats( void *p ) {}
+	void DumpBlockStats( void * ) override {}
 #ifdef MEM_SBH_ENABLED
 	CSmallBlockHeap m_SmallBlockHeap;
 #ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
@@ -281,9 +283,9 @@ public:
 	virtual void SetStatsExtraInfo( const char *pMapName, const char *pComment );
 #endif
 
-	virtual size_t MemoryAllocFailed();
+	size_t MemoryAllocFailed() override;
 
-	void		SetCRTAllocFailed( size_t nMemSize );
+	void SetCRTAllocFailed( size_t nMemSize );
 
 	MemAllocFailHandler_t m_pfnFailHandler;
 	size_t				m_sMemoryAllocFailed;

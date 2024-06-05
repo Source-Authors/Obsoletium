@@ -117,7 +117,7 @@ uint64 CalculateCPUFreq()
 		uint64 retVal = 0;
 
 		buf[ 0 ] = 0;
-		if( fread( buf, 1, ARRAYSIZE( buf ), fp ) )
+		if( fread( buf, 1, std::size( buf ), fp ) )
 		{
 			retVal = ( uint64 )atoll( buf );
 		}

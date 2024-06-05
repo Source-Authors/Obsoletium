@@ -32,8 +32,11 @@ bool VGui_InitInterfacesList( const char *moduleName, CreateInterfaceFn *factory
 #if !defined(NO_MALLOC_OVERRIDE) && defined( WIN32 )
 	if ( _heapmin() != 1 )
 	{
+// dimhotepus: ASAN doesn't play well with our custom allocators.
+#ifndef __SANITIZE_ADDRESS__
 		Assert( false );
 		Error( "Must include memoverride.cpp in your project." );
+#endif
 	}
 #endif	
 	// keep a record of this module name

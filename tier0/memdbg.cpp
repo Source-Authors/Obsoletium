@@ -251,14 +251,28 @@ inline int WalkStack( void **ppAddresses, int nMaxAddresses, [[maybe_unused]] in
 
 //-----------------------------------------------------------------------------
 
+// The size of the no-man's land used in unaligned and aligned allocations:
+static size_t const no_mans_land_size = 4;
+
 // NOTE: This exactly mirrors the dbg header in the MSDEV crt
 // eventually when we write our own allocator, we can kill this
+// See struct _CrtMemBlockHeader at debug_heap.cpp
 struct CrtDbgMemHeader_t
 {
-	unsigned char m_Reserved[8];
+    CrtDbgMemHeader_t* m_pBlockHeaderNext;
+    CrtDbgMemHeader_t* m_pBlockHeaderPrev;
 	const char *m_pFileName;
 	int			m_nLineNumber;
-	unsigned char m_Reserved2[16];
+
+    int			m_BlockUse;
+    size_t		m_DataSize;
+
+    long		m_RequestNumber;
+    unsigned char m_Gap[no_mans_land_size];
+
+    // Followed by:
+    // unsigned char    m_data[_data_size];
+    // unsigned char    m_AnotherGap[no_mans_land_size];
 };
 
 struct DbgMemHeader_t
@@ -267,7 +281,7 @@ struct DbgMemHeader_t
 #endif
 {
 	size_t nLogicalSize;
-	byte reserved[12];	// MS allocator always returns mem aligned on 16 bytes, which some of our code depends on
+	byte reserved[16 - sizeof(size_t)];	// MS allocator always returns mem aligned on 16 bytes, which some of our code depends on
 };
 
 //-----------------------------------------------------------------------------
@@ -475,65 +489,65 @@ bool operator!=(const CNoRecurseAllocator<T1>&, const CNoRecurseAllocator<T2>&)
 // NOTE! This should never be called directly from leaf code
 // Just use new,delete,malloc,free etc. They will call into this eventually
 //-----------------------------------------------------------------------------
-class CDbgMemAlloc : public IMemAlloc
+class CDbgMemAlloc final : public IMemAlloc
 {
 public:
 	CDbgMemAlloc();
 	virtual ~CDbgMemAlloc();
 
 	// Release versions
-	virtual void *Alloc( size_t nSize );
-	virtual void *Realloc( void *pMem, size_t nSize );
-	virtual void  Free( void *pMem );
-	virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize );
+	void *Alloc( size_t nSize ) override;
+	void *Realloc( void *pMem, size_t nSize ) override;
+	void  Free( void *pMem ) override;
+	void *Expand_NoLongerSupported( void *pMem, size_t nSize ) override;
 
 	// Debug versions
-	virtual void *Alloc( size_t nSize, const char *pFileName, int nLine );
-	virtual void *Realloc( void *pMem, size_t nSize, const char *pFileName, int nLine );
-	virtual void  Free( void *pMem, const char *pFileName, int nLine );
-	virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize, const char *pFileName, int nLine );
+	void *Alloc( size_t nSize, const char *pFileName, int nLine ) override;
+	void *Realloc( void *pMem, size_t nSize, const char *pFileName, int nLine ) override;
+	void  Free( void *pMem, const char *pFileName, int nLine ) override;
+	void *Expand_NoLongerSupported( void *pMem, size_t nSize, const char *pFileName, int nLine ) override;
 
 	// Returns size of a particular allocation
-	virtual size_t GetSize( void *pMem );
+	size_t GetSize( void *pMem ) override;
 
 	// Force file + line information for an allocation
-	virtual void PushAllocDbgInfo( const char *pFileName, int nLine );
-	virtual void PopAllocDbgInfo();
+	void PushAllocDbgInfo( const char *pFileName, int nLine ) override;
+	void PopAllocDbgInfo() override;
 
-	virtual long CrtSetBreakAlloc( long lNewBreakAlloc );
-	virtual	int CrtSetReportMode( int nReportType, int nReportMode );
-	virtual int CrtIsValidHeapPointer( const void *pMem );
-	virtual int CrtIsValidPointer( const void *pMem, unsigned int size, int access );
-	virtual int CrtCheckMemory( void );
-	virtual int CrtSetDbgFlag( int nNewFlag );
-	virtual void CrtMemCheckpoint( _CrtMemState *pState );
+	long CrtSetBreakAlloc( long lNewBreakAlloc ) override;
+	int CrtSetReportMode( int nReportType, int nReportMode ) override;
+	int CrtIsValidHeapPointer( const void *pMem ) override;
+	int CrtIsValidPointer( const void *pMem, unsigned int size, int access ) override;
+	int CrtCheckMemory( void ) override;
+	int CrtSetDbgFlag( int nNewFlag ) override;
+	void CrtMemCheckpoint( _CrtMemState *pState ) override;
 
 	// handles storing allocation info for coroutines
-	virtual uint32 GetDebugInfoSize();
-	virtual void SaveDebugInfo( void *pvDebugInfo );
-	virtual void RestoreDebugInfo( const void *pvDebugInfo );	
-	virtual void InitDebugInfo( void *pvDebugInfo, const char *pchRootFileName, int nLine );
+	uint32 GetDebugInfoSize() override;
+	void SaveDebugInfo( void *pvDebugInfo ) override;
+	void RestoreDebugInfo( const void *pvDebugInfo ) override;
+	void InitDebugInfo( void *pvDebugInfo, const char *pchRootFileName, int nLine ) override;
 
 	// FIXME: Remove when we have our own allocator
-	virtual void* CrtSetReportFile( int nRptType, void* hFile );
-	virtual void* CrtSetReportHook( void* pfnNewHook );
-	virtual int CrtDbgReport( int nRptType, const char * szFile,
-			int nLine, const char * szModule, const char * szFormat );
+	void* CrtSetReportFile( int nRptType, void* hFile ) override;
+	void* CrtSetReportHook( void* pfnNewHook ) override;
+	int CrtDbgReport( int nRptType, const char * szFile,
+			int nLine, const char * szModule, const char * szFormat ) override;
 
-	virtual int heapchk();
+	int heapchk() override;
 
-	virtual bool IsDebugHeap() { return true; }
+	bool IsDebugHeap() override { return true; }
 
-	virtual int GetVersion() { return MEMALLOC_VERSION; }
+	int GetVersion() override { return MEMALLOC_VERSION; }
 
-	virtual void CompactHeap() 
+	void CompactHeap() override
 	{
-#if defined( _X360 ) && defined( _DEBUG )
+#if defined( _DEBUG )
 		HeapCompact( GetProcessHeap(), 0 );
 #endif
 	}
 
-	virtual MemAllocFailHandler_t SetAllocFailHandler( MemAllocFailHandler_t pfnMemAllocFailHandler ) { return NULL; } // debug heap doesn't attempt retries
+	MemAllocFailHandler_t SetAllocFailHandler( MemAllocFailHandler_t ) override { return nullptr; } // debug heap doesn't attempt retries
 
 #if defined( _MEMTEST )
 	void SetStatsExtraInfo( const char *pMapName, const char *pComment )
@@ -546,8 +560,8 @@ public:
 	}
 #endif
 
-	virtual size_t MemoryAllocFailed();
-	void		SetCRTAllocFailed( size_t nMemSize );
+	size_t MemoryAllocFailed() override;
+	void SetCRTAllocFailed( size_t nMemSize );
 
 	enum
 	{
@@ -642,7 +656,7 @@ private:
 
 private:
 	// Returns the actual debug info
-	void GetActualDbgInfo( const char *&pFileName, int &nLine );
+	void GetActualDbgInfo( const char *&pFileName, int &nLine ) override;
 
 	void Initialize();
 
@@ -651,8 +665,8 @@ private:
 	const char *FindOrCreateFilename( const char *pFileName );
 
 	// Updates stats
-	void RegisterAllocation( const char *pFileName, int nLine, size_t nLogicalSize, size_t nActualSize, unsigned nTime );
-	void RegisterDeallocation( const char *pFileName, int nLine, size_t nLogicalSize, size_t nActualSize, unsigned nTime );
+	void RegisterAllocation( const char *pFileName, int nLine, size_t nLogicalSize, size_t nActualSize, unsigned nTime ) override;
+	void RegisterDeallocation( const char *pFileName, int nLine, size_t nLogicalSize, size_t nActualSize, unsigned nTime ) override;
 
 	void RegisterAllocation( MemInfo_t &info, size_t nLogicalSize, size_t nActualSize, unsigned nTime );
 	void RegisterDeallocation( MemInfo_t &info, size_t nLogicalSize, size_t nActualSize, unsigned nTime );
@@ -665,10 +679,10 @@ private:
 	// Stat output
 	void DumpMemInfo( const char *pAllocationName, int line, const MemInfo_t &info );
 	void DumpFileStats();
-	void DumpStats();
-	void DumpStatsFileBase( char const *pchFileBase );
-	void DumpBlockStats( void *p );
-	virtual void GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory );
+	void DumpStats() override;
+	void DumpStatsFileBase( char const *pchFileBase ) override;
+	void DumpBlockStats( void *p ) override;
+	void GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory ) override;
 
 private:
 	StatMap_t *m_pStatMap;
@@ -805,10 +819,8 @@ void CDbgMemAlloc::Shutdown()
 
 
 #ifdef WIN32
-extern "C" BOOL APIENTRY MemDbgDllMain( HMODULE hDll, DWORD dwReason, PVOID pvReserved )
+extern "C" BOOL APIENTRY MemDbgDllMain( [[maybe_unused]] HMODULE hDll, DWORD dwReason, void* )
 {
-	UNREFERENCED_PARAMETER( pvReserved );
-
 	// Check if we are shutting down
 	if ( dwReason == DLL_PROCESS_DETACH )
 	{
@@ -882,7 +894,7 @@ void CDbgMemAlloc::Free( void *pMem )
 //	free( pMem );
 }
 
-void *CDbgMemAlloc::Expand_NoLongerSupported( void *pMem, size_t nSize )
+void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t )
 {
 	return NULL;
 }
@@ -1072,6 +1084,7 @@ void CDbgMemAlloc::RegisterDeallocation( const char *pFileName, int nLine, size_
 
 void CDbgMemAlloc::RegisterAllocation( MemInfo_t &info, size_t nLogicalSize, size_t nActualSize, unsigned nTime )
 {
+#ifndef __SANITIZE_ADDRESS__
 	++info.m_nCurrentCount;
 	++info.m_nTotalCount;
 	if (info.m_nCurrentCount > info.m_nPeakCount)
@@ -1105,10 +1118,12 @@ void CDbgMemAlloc::RegisterAllocation( MemInfo_t &info, size_t nLogicalSize, siz
 	}
 
 	info.m_nTime += nTime;
+#endif
 }
 
 void CDbgMemAlloc::RegisterDeallocation( MemInfo_t &info, size_t nLogicalSize, size_t nActualSize, unsigned nTime )
 {
+#ifndef __SANITIZE_ADDRESS__
 	// Check for decrementing these counters below zero. The checks
 	// must be done here because these unsigned counters will wrap-around and
 	// still be positive.
@@ -1136,6 +1151,7 @@ void CDbgMemAlloc::RegisterDeallocation( MemInfo_t &info, size_t nLogicalSize, s
 	info.m_nOverheadSize -= (nActualSize - nLogicalSize);
 
 	info.m_nTime += nTime;
+#endif
 }
 
 
@@ -1148,11 +1164,15 @@ const char *CDbgMemAlloc::GetAllocatonFileName( void *pMem )
 	if (!pMem)
 		return "";
 
+#ifndef __SANITIZE_ADDRESS__
 	CrtDbgMemHeader_t *pHeader = GetCrtDbgMemHeader( pMem );
 	if ( pHeader->m_pFileName )
 		return pHeader->m_pFileName;
 	else
 		return g_pszUnknown;
+#else
+	return g_pszUnknown;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1163,8 +1183,12 @@ int CDbgMemAlloc::GetAllocatonLineNumber( void *pMem )
 	if ( !pMem )
 		return 0;
 
+#ifndef __SANITIZE_ADDRESS__
 	CrtDbgMemHeader_t *pHeader = GetCrtDbgMemHeader( pMem );
 	return pHeader->m_nLineNumber;
+#else
+	return 0;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1236,7 +1260,7 @@ void *CDbgMemAlloc::Realloc( void *pMem, size_t nSize, const char *pFileName, in
 	return pMem;
 }
 
-void  CDbgMemAlloc::Free( void *pMem, const char * /*pFileName*/, int nLine )
+void  CDbgMemAlloc::Free( void *pMem, const char * /*pFileName*/, int )
 {
 	if ( !pMem )
 		return;
@@ -1261,7 +1285,7 @@ void  CDbgMemAlloc::Free( void *pMem, const char * /*pFileName*/, int nLine )
 	RegisterDeallocation( pOldFileName, oldLine, nOldLogicalSize, nOldSize, m_Timer.GetDuration().GetMicroseconds() );
 }
 
-void *CDbgMemAlloc::Expand_NoLongerSupported( void *pMem, size_t nSize, const char *pFileName, int nLine )
+void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t, const char *, int )
 {
 	return NULL;
 }
@@ -1459,7 +1483,7 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	static int s_FileCount = 0;
 	if (m_OutputFunc == DefaultHeapReportFunc)
 	{
-		char *pPath = "";
+		const char *pPath = "";
 		if ( IsX360() )
 		{
 			pPath = "D:\\";
@@ -1482,7 +1506,7 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 #else
 		_snprintf( szFileName, sizeof( szFileName ), "%s%s%d.txt", pPath, pchFileBase, s_FileCount );
 #endif
-		szFileName[ ARRAYSIZE(szFileName) - 1 ] = 0;
+		szFileName[ std::size(szFileName) - 1 ] = 0;
 
 		++s_FileCount;
 

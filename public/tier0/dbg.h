@@ -1,15 +1,12 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef DBG_H
-#define DBG_H
+#ifndef TIER0_DBG_H_
+#define TIER0_DBG_H_
 
-#ifdef _WIN32
-#pragma once
-#endif
+#include "tier0/basetypes.h"
+#include "tier0/dbgflag.h"
+#include "tier0/platform.h"
 
-#include "basetypes.h"
-#include "dbgflag.h"
-#include "platform.h"
 #include <cstdio>
 #include <cstdarg>
 
@@ -199,7 +196,7 @@ DBG_INTERFACE void   _SpewInfo( SpewType_t type, const tchar* pFile, int line );
 DBG_INTERFACE SpewRetval_t   _SpewMessage( PRINTF_FORMAT_STRING const tchar* pMsg, ... ) FMTFUNCTION( 1, 2 );
 DBG_INTERFACE SpewRetval_t   _DSpewMessage( const tchar *pGroupName, int level, PRINTF_FORMAT_STRING const tchar* pMsg, ... ) FMTFUNCTION( 3, 4 );
 DBG_INTERFACE SpewRetval_t   ColorSpewMessage( SpewType_t type, const Color *pColor, PRINTF_FORMAT_STRING const tchar* pMsg, ... ) FMTFUNCTION( 3, 4 );
-DBG_INTERFACE void _ExitOnFatalAssert( const tchar* pFile, int line );
+DBG_INTERFACE void _ExitOnFatalAssert [[noreturn]] ( const tchar* pFile, int line );
 DBG_INTERFACE bool ShouldUseNewAssertDialog();
 
 DBG_INTERFACE bool SetupWin32ConsoleIO();
@@ -425,8 +422,8 @@ DBG_INTERFACE void LogV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist
 // be consistent with the Warning prototype.
 DBG_INTERFACE void Error( PRINTF_FORMAT_STRING const tchar *pMsg, ... ) FMTFUNCTION( 1, 2 );
 #else
-DBG_INTERFACE void NORETURN Error( PRINTF_FORMAT_STRING const tchar *pMsg, ... ) FMTFUNCTION( 1, 2 );
-DBG_INTERFACE void NORETURN ErrorV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist );
+DBG_INTERFACE void Error [[noreturn]] ( PRINTF_FORMAT_STRING const tchar *pMsg, ... ) FMTFUNCTION( 1, 2 );
+DBG_INTERFACE void ErrorV [[noreturn]] ( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist );
 
 #endif
 
@@ -582,22 +579,22 @@ inline DEST_POINTER_TYPE assert_cast(SOURCE_POINTER_TYPE* pSource)
 
 // Have to use these stubs so we don't have to include windows.h here.
 
-DBG_INTERFACE void _AssertValidReadPtr( void* ptr, int count = 1 );
-DBG_INTERFACE void _AssertValidWritePtr( void* ptr, int count = 1 );
-DBG_INTERFACE void _AssertValidReadWritePtr( void* ptr, int count = 1 );
-DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, int maxchar = 0xFFFFFF );
+DBG_INTERFACE void _AssertValidReadPtr( void* ptr, intp count = 1 );
+DBG_INTERFACE void _AssertValidWritePtr( void* ptr, intp count = 1 );
+DBG_INTERFACE void _AssertValidReadWritePtr( void* ptr, intp count = 1 );
+DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, intp maxchar = 0xFFFFFF );
 
 #ifdef DBGFLAG_ASSERT
 
-FORCEINLINE void AssertValidReadPtr( const void* ptr, int count = 1 )	    { _AssertValidReadPtr( (void*)ptr, count ); }
-FORCEINLINE void AssertValidWritePtr( const void* ptr, int count = 1 )		{ _AssertValidWritePtr( (void*)ptr, count ); }
-FORCEINLINE void AssertValidReadWritePtr( const void* ptr, int count = 1 )	{ _AssertValidReadWritePtr( (void*)ptr, count ); }
+FORCEINLINE void AssertValidReadPtr( const void* ptr, intp count = 1 )	    { _AssertValidReadPtr( (void*)ptr, count ); }
+FORCEINLINE void AssertValidWritePtr( const void* ptr, intp count = 1 )		{ _AssertValidWritePtr( (void*)ptr, count ); }
+FORCEINLINE void AssertValidReadWritePtr( const void* ptr, intp count = 1 )	{ _AssertValidReadWritePtr( (void*)ptr, count ); }
 
 #else
 
-FORCEINLINE void AssertValidReadPtr( const void* ptr, int count = 1 )			 { }
-FORCEINLINE void AssertValidWritePtr( const void* ptr, int count = 1 )		     { }
-FORCEINLINE void AssertValidReadWritePtr( const void* ptr, int count = 1 )	     { }
+FORCEINLINE void AssertValidReadPtr( const void* ptr, intp count = 1 )			 { }
+FORCEINLINE void AssertValidWritePtr( const void* ptr, intp count = 1 )		     { }
+FORCEINLINE void AssertValidReadWritePtr( const void* ptr, intp count = 1 )	     { }
 #define AssertValidStringPtr AssertValidReadPtr
 
 #endif
@@ -654,7 +651,7 @@ public:
 		m_szBuf[sizeof(m_szBuf)-1] = 0;
 	}
 
-	operator const tchar *() const				
+	operator const tchar *() const
 	{ 
 		return m_szBuf; 
 	}
@@ -814,4 +811,4 @@ private:
 #define DEFINE_LOGGING_CHANNEL_NO_TAGS( ... );
 #define Plat_FatalError( ... ) do { Log_Error( LOG_GENERAL, __VA_ARGS__ ); Plat_ExitProcess( EXIT_FAILURE ); } while( 0 )
 
-#endif /* DBG_H */
+#endif  // TIER0_DBG_H_

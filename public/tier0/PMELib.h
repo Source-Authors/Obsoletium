@@ -1,11 +1,11 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef PMELIB_H
-#define PMELIB_H
+#ifndef TIER0_PMELIB_H_
+#define TIER0_PMELIB_H_
 
 #include "tier0/platform.h"
 
-#define VERSION "1.0.2"
+constexpr inline char VERSION[]{"1.0.2"};
 
 // uncomment this list to add some runtime checks
 //#define PME_DEBUG   
@@ -28,7 +28,7 @@
 #define EVENT_TYPE(mode) EventType##mode
 #define EVENT_MASK(mode) EventMask##mode
 
-#include "ia32detect.h"    
+#include "tier0/ia32detect.h"
 
 enum ProcessPriority
 {
@@ -112,12 +112,12 @@ public:
     //---------------------------------------------------------------------------
     // Return the family of the processor
     //---------------------------------------------------------------------------
-    CPUVendor GetVendor(void)
+    CPUVendor GetVendor() const
     {
         return vendor;
     }
 
-    int GetProcessorFamily(void)
+    int GetProcessorFamily() const
     {
         return version.Family;
     }
@@ -128,9 +128,9 @@ public:
 
 };
 
-#include "P5P6PerformanceCounters.h"    
-#include "P4PerformanceCounters.h"    
-#include "K8PerformanceCounters.h"    
+#include "tier0/P5P6PerformanceCounters.h"    
+#include "tier0/P4PerformanceCounters.h"    
+#include "tier0/K8PerformanceCounters.h"    
 
 enum PerfErrors
 {
@@ -146,5 +146,4 @@ enum PerfErrors
     E_ILLEGAL_OPERATION		= -10,
 };
 
-
-#endif // PMELIB_H
+#endif  // TIER0_PMELIB_H_

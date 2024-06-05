@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef K8PERFORMANCECOUNTERS_H
-#define K8PERFORMANCECOUNTERS_H
+#ifndef TIER0_K8PERFORMANCECOUNTERS_H_
+#define TIER0_K8PERFORMANCECOUNTERS_H_
 
 /*
  * AMD K8 events.
@@ -82,7 +82,7 @@ public:
 
     unsigned short m_eventMask;
     int event_id;
-    tchar * name;
+    const tchar * name;
     tchar revRequired;
     int eventSelectNum;
     UnitEncode unitEncode;
@@ -212,7 +212,7 @@ public:
     int64 ReadCounter()
     {
 
-#if PME_DEBUG
+#ifdef PME_DEBUG
         PerfEvtSel & select = eventSelect[eventSelectNum]; 
 
         if (select.USR == 0 && select.OS == 0)
@@ -1969,60 +1969,4 @@ public:
 
 };
 
-//
-//typedef union EVENT_MASK( perfctr_event_set k8_common_event_set)
-//{
-//
-//    .cpu_type = PERFCTR_X86_AMD_K8,
-//    .event_prefix = _T("K8_"),
-//    .include = &k7_official_event_set,
-//    .nevents = ARRAY_SIZE(k8_common_events),
-//    .events = k8_common_events,
-//}EVENT_MASK( perfctr_event_set k8_common_event_set);
-//
-//typedef union EVENT_MASK( perfctr_event k8_events[])
-//{
-//
-//     { 0x24, 0xF, UM(NULL), _T("LOCKED_OP"), /* unit mask changed in Rev. C */
-//       _T("Locked operation") },
-//}EVENT_MASK( perfctr_event k8_events[]);
-
-
-
-
-//const struct perfctr_event_set perfctr_k8_event_set)
-//{
-//
-//    .cpu_type = PERFCTR_X86_AMD_K8,
-//    .event_prefix = _T("K8_"),
-//    .include = &k8_common_event_set,
-//    .nevents = ARRAY_SIZE(k8_events),
-//    .events = k8_events,
-//};
-//
-/*
- * K8 Revision C. Starts at CPUID 0xF58 for Opteron/Athlon64FX and
- * CPUID 0xF48 for Athlon64. (CPUID 0xF51 is Opteron Revision B3.)
- */
-
-
-
-
-
-
-
-
-//
-//typedef union EVENT_MASK(  k8_lock_accesses)
-//{
-//    struct 
-//    {
-//        uint16 DcacheAccesses:1;       // Number of dcache accesses by lock instructions" },
-//        uint16 DcacheMisses:1;       // Number of dcache misses by lock instructions" } }
-//    };
-//    uint16 flat;
-//
-//}EVENT_MASK(  k8_lock_accesses);
-//
-
-#endif // K8PERFORMANCECOUNTERS_H
+#endif  // TIER0_K8PERFORMANCECOUNTERS_H_

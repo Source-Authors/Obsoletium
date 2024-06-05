@@ -1,31 +1,27 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef BASETYPES_H
-#define BASETYPES_H
+#ifndef TIER0_BASETYPES_H_
+#define TIER0_BASETYPES_H_
 
-#include "commonmacros.h"
-#include "wchartypes.h"
+#include "tier0/commonmacros.h"
+#include "tier0/wchartypes.h"
+
+#include <cstdint>
 #include <limits>  // std::numeric_limits
 
 #include "tier0/valve_off.h"
-
-#ifdef _WIN32
-#pragma once
-#endif
-
 
 // This is a trick to get the DLL extension off the -D option on the command line.
 #define DLLExtTokenPaste(x) #x
 #define DLLExtTokenPaste2(x) DLLExtTokenPaste(x)
 #define DLL_EXT_STRING DLLExtTokenPaste2( _DLL_EXT )
 
-
-#include "protected_things.h"
+#include "tier0/protected_things.h"
 
 // There's a different version of this file in the xbox codeline
 // so the PC version built in the xbox branch includes things like 
 // tickrate changes.
-#include "xbox_codeline_defines.h"
+#include "tier0/xbox_codeline_defines.h"
 
 #ifdef IN_XBOX_CODELINE
 #define XBOX_CODELINE_ONLY()
@@ -33,32 +29,24 @@
 #define XBOX_CODELINE_ONLY() Error_Compiling_Code_Only_Valid_in_Xbox_Codeline
 #endif
 
-// stdio.h
+// cstdio
 #ifndef NULL
 #define NULL 0
 #endif
 
-
-#ifdef POSIX
-#include <cstdint>
-#endif
-
-#define ExecuteNTimes( nTimes, x )	\
-	{								\
-		static int executeCount__=0;\
-		if ( executeCount__ < nTimes )\
-		{							\
-			x;						\
-			++executeCount__;		\
-		}							\
+#define ExecuteNTimes( nTimes, x )	   \
+	{								   \
+		static int executeCount__{0};  \
+		if ( executeCount__ < nTimes ) \
+		{							   \
+			x;						   \
+			++executeCount__;		   \
+		}							   \
 	}
-
-
 #define ExecuteOnce( x )			ExecuteNTimes( 1, x )
 
-
 template <typename T>
-constexpr inline T AlignValue( T val, uintptr_t alignment )
+[[nodiscard]] constexpr inline T AlignValue( T val, uintptr_t alignment )
 {
 	return (T)( ( (uintptr_t)val + alignment - 1 ) & ~( alignment - 1 ) );
 }
@@ -67,7 +55,7 @@ constexpr inline T AlignValue( T val, uintptr_t alignment )
 // Pad a number so it lies on an N byte boundary.
 // So PAD_NUMBER(0,4) is 0 and PAD_NUMBER(1,4) is 4
 template<typename T, typename Y>
-constexpr inline auto PAD_NUMBER( T number, Y boundary )
+[[nodiscard]] constexpr inline auto PAD_NUMBER( T number, Y boundary )
 {
 	return ((number + (boundary - 1)) / boundary) * boundary;
 }
@@ -81,24 +69,26 @@ constexpr inline double M_PI{3.14159265358979323846};
 constexpr inline float M_PI_F{3.14159265358979323846f};
 #endif
 
-#include "valve_minmax_on.h"
+#include "tier0/valve_minmax_on.h"
+
+#ifdef __cplusplus
 
 // #define COMPILETIME_MAX and COMPILETIME_MIN for max/min in constant expressions
 template <typename T, typename Y>
-constexpr inline auto COMPILETIME_MIN( const T& a, const Y& b )
+[[nodiscard]] constexpr inline auto COMPILETIME_MIN( const T& a, const Y& b )
 {
 	return a < b ? a : b;
 }
 
 template <typename T, typename Y>
-constexpr inline auto COMPILETIME_MAX( const T& a, const Y& b)
+[[nodiscard]] constexpr inline auto COMPILETIME_MAX( const T& a, const Y& b)
 {
 	return a > b ? a : b;
 }
 
 #ifndef MIN
 template<typename T, typename Y>
-constexpr inline auto MIN( const T& a, const Y& b )
+[[nodiscard]] constexpr inline auto MIN( const T& a, const Y& b )
 {
 	return a < b ? a : b;
 }
@@ -106,41 +96,37 @@ constexpr inline auto MIN( const T& a, const Y& b )
 
 #ifndef MAX
 template<typename T, typename Y>
-constexpr inline auto MAX( const T& a, const Y& b )
+[[nodiscard]] constexpr inline auto MAX( const T& a, const Y& b )
 {
 	return a > b ? a : b;
 }
 #endif
-
-#ifdef __cplusplus
 
 // This is the preferred clamp operator. Using the clamp macro can lead to
 // unexpected side-effects or more expensive code. Even the clamp (all
 // lower-case) function can generate more expensive code because of the
 // mixed types involved.
 template< typename T >
-constexpr inline T Clamp( T const &val, T const &minVal, T const &maxVal )
+[[nodiscard]] constexpr inline T Clamp( T const &val, T const &minVal, T const &maxVal )
 {
 	if( val < minVal )
 		return minVal;
-	else if( val > maxVal )
+	if( val > maxVal )
 		return maxVal;
-	else
-		return val;
+	
+	return val;
 }
 
-// This is the preferred Min operator. Using the MIN macro can lead to unexpected
-// side-effects or more expensive code.
+// This is the preferred Min operator.
 template< typename T >
-constexpr inline T Min( T const &val1, T const &val2 )
+[[nodiscard]] constexpr inline T Min( T const &val1, T const &val2 )
 {
 	return val1 < val2 ? val1 : val2;
 }
 
-// This is the preferred Max operator. Using the MAX macro can lead to unexpected
-// side-effects or more expensive code.
+// This is the preferred Max operator.
 template< typename T >
-constexpr inline T Max( T const &val1, T const &val2 )
+[[nodiscard]] constexpr inline T Max( T const &val1, T const &val2 )
 {
 	return val1 > val2 ? val1 : val2;
 }
@@ -154,22 +140,24 @@ constexpr inline T Max( T const &val1, T const &val2 )
 
 
 #ifndef DONT_DEFINE_BOOL // Needed for Cocoa stuff to compile.
-typedef int BOOL;
+using BOOL = int;
 #endif
 
-typedef int qboolean;
-typedef unsigned long ULONG;
-typedef unsigned char byte;
-typedef unsigned short word;
+using qboolean = int;
+using ULONG = unsigned long;
+using byte = unsigned char;
+using word = unsigned short;
+
 #ifdef _WIN32
-typedef unsigned long dword;
+using dword = unsigned long;
 #else
-typedef unsigned int dword;
+using dword = unsigned int;
 #endif
+
 #ifdef _WIN32
-typedef wchar_t ucs2; // under windows wchar_t is ucs2
+using ucs2 = wchar_t; // under windows wchar_t is ucs2
 #else
-typedef unsigned short ucs2;
+using ucs2 = unsigned short;
 #endif
 
 enum ThreeState_t
@@ -179,7 +167,7 @@ enum ThreeState_t
 	TRS_NONE,
 };
 
-typedef float vec_t;
+using vec_t = float;
 
 #if defined(__GNUC__)
 #define fpmin __builtin_fminf
@@ -194,26 +182,38 @@ typedef float vec_t;
 // look for NANs, infinities, and underflows. 
 // This assumes the ANSI/IEEE 754-1985 standard
 //-----------------------------------------------------------------------------
+// dimhotepus: Fix UB reintrepret casts.
+//[[deprecated("UB in reinterpret cast. Use non-ref overload.")]] inline unsigned& FloatBits( vec_t& f )
+//{
+//	static_assert(alignof(vec_t) == alignof(unsigned));
+//	static_assert(sizeof(f) == sizeof(unsigned));
+//	return *reinterpret_cast<unsigned*>(&f);
+//}
+//
+//[[deprecated("UB in reinterpret cast. Use non-ref overload.")]] inline unsigned const& FloatBits( vec_t const& f )
+//{
+//	static_assert(alignof(vec_t) == alignof(unsigned));
+//	static_assert(sizeof(f) == sizeof(unsigned));
+//	return *reinterpret_cast<unsigned const*>(&f);
+//}
 
-inline unsigned& FloatBits( vec_t& f )
+[[nodiscard]] inline unsigned FloatBits( vec_t f )
 {
-	static_assert(sizeof(f) == sizeof(unsigned));
-	return *reinterpret_cast<unsigned*>(&f);
+	unsigned r;
+	static_assert(sizeof(r) == sizeof(f));
+	memcpy( &r, &f, sizeof(unsigned) );
+	return r;
 }
 
-inline unsigned const& FloatBits( vec_t const& f )
+[[nodiscard]] inline vec_t BitsToFloat( unsigned i )
 {
-	static_assert(sizeof(f) == sizeof(unsigned));
-	return *reinterpret_cast<unsigned const*>(&f);
+	vec_t r;
+	static_assert(sizeof(r) == sizeof(i));
+	memcpy( &r, &i, sizeof(unsigned) );
+	return r;
 }
 
-inline vec_t BitsToFloat( unsigned i )
-{
-	static_assert(sizeof(vec_t) == sizeof(i));
-	return *reinterpret_cast<vec_t*>(&i);
-}
-
-inline bool IsNaN( vec_t f )
+[[nodiscard]] inline bool IsNaN( vec_t f )
 {
 	static_assert(sizeof(f) == 4u);
 
@@ -229,12 +229,12 @@ inline bool IsNaN( vec_t f )
 	return (FloatBits(f) & 0x7FFFFFFFu) > 0x7F800000u;
 }
 
-inline bool IsFinite( vec_t f )
+[[nodiscard]] inline bool IsFinite( vec_t f )
 {
 	return !IsNaN(f);
 }
 
-inline unsigned FloatAbsBits( vec_t f )
+[[nodiscard]] inline unsigned FloatAbsBits( vec_t f )
 {
 	return FloatBits(f) & 0x7FFFFFFFu; //-V112
 }
@@ -250,17 +250,17 @@ extern "C" _Check_return_ float fabsf(_In_ float);
 #include <cmath>
 #endif
 
-inline float FloatMakeNegative( vec_t f )
+[[nodiscard]] inline float FloatMakeNegative( vec_t f )
 {
 	return -fabsf(f);
 }
 
-inline float FloatMakePositive( vec_t f )
+[[nodiscard]] inline float FloatMakePositive( vec_t f )
 {
 	return fabsf(f);
 }
 
-inline float FloatNegate( vec_t f )
+[[nodiscard]] inline float FloatNegate( vec_t f )
 {
 	return -f;
 }
@@ -281,15 +281,18 @@ struct color24
 
 typedef struct color32_s
 {
-	bool operator!=( color32_s other ) const;
+	[[nodiscard]] constexpr bool operator!=( color32_s other ) const
+	{
+		return !(*this == other);
+	}
+
+	[[nodiscard]] constexpr bool operator==( color32_s other ) const
+	{
+		return r == other.r && g == other.g && b == other.b && a == other.a;
+	}
 
 	byte r, g, b, a;
 } color32;
-
-inline bool color32::operator!=( color32 other ) const
-{
-	return r != other.r || g != other.g || b != other.b || a != other.a;
-}
 
 struct colorVec
 {
@@ -340,12 +343,12 @@ class CBaseIntHandle
 {
 public:
 	
-	inline bool			operator==( const CBaseIntHandle &other )	{ return m_Handle == other.m_Handle; }
-	inline bool			operator!=( const CBaseIntHandle &other )	{ return m_Handle != other.m_Handle; }
+	[[nodiscard]] inline bool			operator==( const CBaseIntHandle &other ) const	{ return m_Handle == other.m_Handle; }
+	[[nodiscard]] inline bool			operator!=( const CBaseIntHandle &other ) const	{ return m_Handle != other.m_Handle; }
 
 	// Only the code that doles out these handles should use these functions.
 	// Everyone else should treat them as a transparent type.
-	inline HandleType	GetHandleValue()					{ return m_Handle; }
+	[[nodiscard]] inline HandleType	GetHandleValue()					{ return m_Handle; }
 	inline void			SetHandleValue( HandleType val )	{ m_Handle = val; }
 
 	typedef HandleType	HANDLE_TYPE;
@@ -361,13 +364,13 @@ class CIntHandle16 : public CBaseIntHandle< unsigned short >
 public:
 	inline CIntHandle16() = default;
 
-	static inline	CIntHandle16<DummyType> MakeHandle( HANDLE_TYPE val )
+	[[nodiscard]] static inline	CIntHandle16<DummyType> MakeHandle( HANDLE_TYPE val )
 	{
 		return CIntHandle16<DummyType>( val );
 	}
 
 protected:
-	inline			CIntHandle16( HANDLE_TYPE val )
+	inline CIntHandle16( HANDLE_TYPE val )
 	{
 		m_Handle = val;
 	}
@@ -380,13 +383,13 @@ class CIntHandle32 : public CBaseIntHandle< unsigned long >
 public:
 	inline			CIntHandle32() = default;
 
-	static inline	CIntHandle32<DummyType> MakeHandle( HANDLE_TYPE val )
+	[[nodiscard]] static inline	CIntHandle32<DummyType> MakeHandle( HANDLE_TYPE val )
 	{
 		return CIntHandle32<DummyType>( val );
 	}
 
 protected:
-	inline			CIntHandle32( HANDLE_TYPE val )
+	inline CIntHandle32( HANDLE_TYPE val )
 	{
 		m_Handle = val;
 	}
@@ -394,11 +397,11 @@ protected:
 
 
 // NOTE: This macro is the same as windows uses; so don't change the guts of it
-#define DECLARE_HANDLE_16BIT(name)	typedef CIntHandle16< struct name##__handle * > name;
-#define DECLARE_HANDLE_32BIT(name)	typedef CIntHandle32< struct name##__handle * > name;
+#define DECLARE_HANDLE_16BIT(name)	using name = CIntHandle16< struct name##__handle * >;
+#define DECLARE_HANDLE_32BIT(name)	using name = CIntHandle32< struct name##__handle * >;
 
-#define DECLARE_POINTER_HANDLE(name) struct name##__ { int unused; }; typedef struct name##__ *name
-#define FORWARD_DECLARE_HANDLE(name) typedef struct name##__ *name
+#define DECLARE_POINTER_HANDLE(name) struct name##__ { int unused; }; using name = struct name##__ *
+#define FORWARD_DECLARE_HANDLE(name) using name = struct name##__ *
 
 // @TODO: Find a better home for this
 #if !defined(_STATIC_LINKED) && !defined(PUBLISH_DLL_SUBSYSTEM)
@@ -418,25 +421,25 @@ protected:
 
 // this allows enumerations to be used as flags, and still remain type-safe!
 #define DEFINE_ENUM_BITWISE_OPERATORS( Type ) \
-	inline Type  operator|  ( Type  a, Type b ) { return Type( int( a ) | int( b ) ); } \
-	inline Type  operator&  ( Type  a, Type b ) { return Type( int( a ) & int( b ) ); } \
-	inline Type  operator^  ( Type  a, Type b ) { return Type( int( a ) ^ int( b ) ); } \
-	inline Type  operator<< ( Type  a, int  b ) { return Type( int( a ) << b ); } \
-	inline Type  operator>> ( Type  a, int  b ) { return Type( int( a ) >> b ); } \
+	inline Type  operator|  ( Type  a, Type b ) { return static_cast<Type>( to_underlying( a ) | to_underlying( b ) ); } \
+	inline Type  operator&  ( Type  a, Type b ) { return static_cast<Type>( to_underlying( a ) & to_underlying( b ) ); } \
+	inline Type  operator^  ( Type  a, Type b ) { return static_cast<Type>( to_underlying( a ) ^ to_underlying( b ) ); } \
+	inline Type  operator<< ( Type  a, int  b ) { return static_cast<Type>( to_underlying( a ) << b ); } \
+	inline Type  operator>> ( Type  a, int  b ) { return static_cast<Type>( to_underlying( a ) >> b ); } \
 	inline Type &operator|= ( Type &a, Type b ) { return a = a |  b; } \
 	inline Type &operator&= ( Type &a, Type b ) { return a = a &  b; } \
 	inline Type &operator^= ( Type &a, Type b ) { return a = a ^  b; } \
 	inline Type &operator<<=( Type &a, int  b ) { return a = a << b; } \
 	inline Type &operator>>=( Type &a, int  b ) { return a = a >> b; } \
-	inline Type  operator~( Type a ) { return Type( ~int( a ) ); }
+	inline Type  operator~( Type a ) { return static_cast<Type>( ~to_underlying( a ) ); }
 
 // defines increment/decrement operators for enums for easy iteration
 #define DEFINE_ENUM_INCREMENT_OPERATORS( Type ) \
-	inline Type &operator++( Type &a      ) { return a = Type( int( a ) + 1 ); } \
-	inline Type &operator--( Type &a      ) { return a = Type( int( a ) - 1 ); } \
-	inline Type  operator++( Type &a, int ) { Type t = a; ++a; return t; } \
-	inline Type  operator--( Type &a, int ) { Type t = a; --a; return t; }
+	inline Type &operator++( Type &a      ) { return a = static_cast<Type>( to_underlying( a ) + 1 ); } \
+	inline Type &operator--( Type &a      ) { return a = static_cast<Type>( to_underlying( a ) - 1 ); } \
+	inline Type  operator++( Type &a, int ) { Type t{a}; ++a; return t; } \
+	inline Type  operator--( Type &a, int ) { Type t{a}; --a; return t; }
 
 #include "tier0/valve_on.h"
 
-#endif // BASETYPES_H
+#endif  // TIER0_BASETYPES_H_
