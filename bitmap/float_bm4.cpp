@@ -4,22 +4,27 @@
 //
 //===========================================================================//
 
-#include <tier0/platform.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <stdlib.h>
 #include "bitmap/float_bm.h"
-#include "vstdlib/vstdlib.h"
+
+#include <utility>
+#include <cmath>
+#include <cstring>
+
+#include "tier0/platform.h"
+#include "tier0/threadtools.h"
+#include "tier0/progressbar.h"
+#include "tier0/wchartypes.h"
 #include "raytrace.h"
 #include "mathlib/bumpvects.h"
 #include "mathlib/halton.h"
-#include "tier0/threadtools.h"
-#include "tier0/progressbar.h"
+#include "mathlib/vector.h"
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 // In order to handle intersections with wrapped copies, we repeat the bitmap triangles this many
 // times
-#define NREPS_TILE 1
+constexpr int NREPS_TILE{1};
 extern int n_intersection_calculations;
 
 
@@ -42,7 +47,7 @@ struct SSBumpCalculationContext								// what each thread needs to see
 
 static unsigned SSBumpCalculationThreadFN( void * ctx1 )
 {
-	SSBumpCalculationContext *ctx = ( SSBumpCalculationContext * ) ctx1;
+	auto *ctx = static_cast<SSBumpCalculationContext *>(ctx1);
 
 	RayStream ray_trace_stream_ctx;
 
@@ -58,12 +63,12 @@ static unsigned SSBumpCalculationThreadFN( void * ctx1 )
 		{
 			for( int x = 0; x < ctx->ret_bm->Width; x++ )
 			{
-				Vector surf_pnt( x, y, ctx->bump_scale * ctx->src_bm->Pixel( x, y, 3 ) );
+				Vector surf_pnt( (vec_t)x, (vec_t)y, ctx->bump_scale * ctx->src_bm->Pixel( x, y, 3 ) );
 				// move the ray origin up a hair
-				surf_pnt.z += 0.55;
+				surf_pnt.z += 0.55f;
 				Vector trace_end = surf_pnt;
 				Vector trace_dir = ctx->trace_directions[ r ];
-				trace_dir *= ( 1 + NREPS_TILE * 2 ) * max( ctx->src_bm->Width, ctx->src_bm->Height );
+				trace_dir *= ( 1 + NREPS_TILE * 2.0f ) * (vec_t)max( ctx->src_bm->Width, ctx->src_bm->Height );
 				trace_end += trace_dir;
 				ctx->m_pRtEnv->AddToRayStream( ray_trace_stream_ctx, surf_pnt, trace_end,
 											 & ( rslts[ r + ctx->nrays_to_trace_per_pixel * ( x )] ));
@@ -136,8 +141,8 @@ void FloatBitMap_t::ComputeVertexPositionsAndNormals( float flHeightScale, Vecto
 		for( int x = 0; x < Width; x++ )
 		{
 			Vector * out = verts + x + y * Width;
-			out->x = x;
-			out->y = y;
+			out->x = (vec_t)x;
+			out->y = (vec_t)y;
 			out->z = flHeightScale * Pixel( x, y, 3 );
 		}
 
@@ -230,17 +235,17 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 				for( int y = min_y; y <= max_y; y++ )
 					for( int x = min_x; x <= max_x; x++ )
 					{
-						Vector ofs( tilex * Width, tiley * Height, 0 );
+						Vector ofs( (vec_t)tilex * (vec_t)Width, (vec_t)tiley * (vec_t)Height, 0 );
 						int x1 = ( x + 1 ) % Width;
 						int y1 = ( y + 1 ) % Height;
 						Vector v0 = verts[x + y * Width];
 						Vector v1 = verts[x1 + y * Width];
 						Vector v2 = verts[x1 + y1 * Width];
 						Vector v3 = verts[x + y1 * Width];
-						v0.x = x; v0.y = y;
-						v1.x = x + 1; v1.y = y;
-						v2.x = x + 1; v2.y = y + 1;
-						v3.x = x; v3.y = y + 1;
+						v0.x = (vec_t)x; v0.y = (vec_t)y;
+						v1.x = (vec_t)x + 1; v1.y = (vec_t)y;
+						v2.x = (vec_t)x + 1; v2.y = (vec_t)y + 1;
+						v3.x = (vec_t)x; v3.y = (vec_t)y + 1;
 						v0 += ofs; v1 += ofs; v2 += ofs; v3 += ofs;
 						rtEnv.AddTriangle( tcnt++, v0, v1, v2, Vector( 1, 1, 1 ) );
 						rtEnv.AddTriangle( tcnt++, v0, v3, v2, Vector( 1, 1, 1 ) );
@@ -275,8 +280,9 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 		trace_dir.z=fabsf(trace_dir.z);						// upwards facing only
 		trace_directions[ r ]= trace_dir;
 	}
-
-	SSBumpCalculationContext ctxs[32];
+	
+	constexpr uint8 kParallelContextsCount = 32;
+	SSBumpCalculationContext ctxs[kParallelContextsCount];
 	ctxs[0].m_pRtEnv =& rtEnv;
 	ctxs[0].ret_bm = ret;
 	ctxs[0].src_bm = this;
@@ -287,9 +293,9 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 	ctxs[0].min_y = 0;
 	ctxs[0].max_y = Height - 1;
 	ctxs[0].m_nOptionFlags = nOptionFlags;
-	int nthreads = min( 32, (int)GetCPUInformation()->m_nPhysicalProcessors );
+	int nthreads = min( kParallelContextsCount, GetCPUInformation()->m_nPhysicalProcessors );
 
-	ThreadHandle_t waithandles[32];
+	ThreadHandle_t waithandles[kParallelContextsCount];
 	int starty = 0;
 	int ystep = Height / nthreads;
 	for( int t = 0;t < nthreads; t++ )
@@ -311,7 +317,7 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 	}
 	if ( nOptionFlags & SSBUMP_MOD2X_DETAIL_TEXTURE )
 	{
-		const float flOutputScale = 0.5 * ( 1.0 / .57735026 ); // normalize so that a flat normal yields 0.5
+		const float flOutputScale = 0.5f * ( 1.0f / .57735026f ); // normalize so that a flat normal yields 0.5
 		// scale output weights by color channel
 		for( int nY = 0; nY < Height; nY++ )
 			for( int nX = 0; nX < Width; nX++ )

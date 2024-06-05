@@ -8,16 +8,18 @@
 #ifndef NO_NVTC
 #include "nvtc.h"
 #endif
+
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <utility>
+
 #include "bitmap/imageformat.h"
-#include "basetypes.h"
+#include "tier0/basetypes.h"
+#include "tier0/commonmacros.h"
 #include "tier0/dbg.h"
-#include <malloc.h>
-#include <memory.h>
 #include "mathlib/mathlib.h"
-#include "mathlib/vector.h"
 #include "tier1/utlmemory.h"
-#include "tier1/strtools.h"
-#include "mathlib/compressed_vector.h"
 
 // Should be last include
 #include "tier0/memdbgon.h"
@@ -110,9 +112,9 @@ static void GenerateNiceFilter( float wratio, float hratio, float dratio, int ke
 {
 	// Compute a kernel...
 	int h, i, j;
-	int kernelWidth = kernelDiameter * wratio;
-	int kernelHeight = kernelDiameter * hratio;
-	int kernelDepth = ( dratio != 0 ) ? kernelDiameter * dratio : 1;
+	int kernelWidth = static_cast<int>(kernelDiameter * wratio);
+	int kernelHeight = static_cast<int>(kernelDiameter * hratio);
+	int kernelDepth = ( dratio != 0 ) ? static_cast<int>(kernelDiameter * dratio) : 1;
 
 	// This is a NICE filter
 	// sinc pi*x * a box from -3 to 3 * sinc ( pi * x/3)
@@ -196,7 +198,7 @@ static void GenerateNiceFilter( float wratio, float hratio, float dratio, int ke
 static inline unsigned char Clamp( float x )
 {
 	int idx = (int)(x + 0.5f);
-  return static_cast<unsigned char>(std::clamp(idx, 0, 255));
+	return static_cast<unsigned char>(std::clamp(idx, 0, 255));
 }
 
 struct KernelInfo_t
@@ -423,9 +425,7 @@ public:
 
 							for ( int l = 0, srcX = startX; l < wratio; ++l, ++srcX )
 							{
-								// HACK: This temp variable fixes an internal compiler error in vs2005
-								int temp = srcX;
-								int sx = ActualX( temp, info );
+								int sx = ActualX( srcX, info );
 
 								int srcPixel = sz + sy + sx;
 								flAlphaDelta += pAlphaResult[srcPixel];
@@ -557,27 +557,26 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 		lastSrcGamma =  info.m_flSrcGamma;
 	}
 
-	int wratio = info.m_nSrcWidth / info.m_nDestWidth;
-	int hratio = info.m_nSrcHeight / info.m_nDestHeight;
-	int dratio = (info.m_nSrcDepth != info.m_nDestDepth) ? info.m_nSrcDepth / info.m_nDestDepth : 0;
+	float wratio = (float)info.m_nSrcWidth / info.m_nDestWidth;
+	float hratio = (float)info.m_nSrcHeight / info.m_nDestHeight;
+	float dratio = (info.m_nSrcDepth != info.m_nDestDepth) ? (float)info.m_nSrcDepth / info.m_nDestDepth : 0;
 	
-	KernelInfo_t kernel;
+	KernelInfo_t kernel = {};
 
 	float* pTempMemory = 0;
 	float* pTempInvMemory = 0;
 	static float* kernelCache[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	static float* pInvKernelCache[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	float pKernelMem[1];
-	float pInvKernelMem[1];
+	float pKernelMem, pInvKernelMem;
 	if ( info.m_nFlags & RESAMPLE_NICE_FILTER )
 	{
 		// Kernel size is measured in dst pixels
 		kernel.m_nDiameter = 6;
 
 		// Compute a kernel...
-		kernel.m_nWidth = kernel.m_nDiameter * wratio;
-		kernel.m_nHeight = kernel.m_nDiameter * hratio;
-		kernel.m_nDepth = kernel.m_nDiameter * dratio;
+		kernel.m_nWidth = static_cast<int>(kernel.m_nDiameter * wratio);
+		kernel.m_nHeight = static_cast<int>(kernel.m_nDiameter * hratio);
+		kernel.m_nDepth = static_cast<int>(kernel.m_nDiameter * dratio);
 		if ( kernel.m_nDepth == 0 )
 		{
 			kernel.m_nDepth = 1;
@@ -589,7 +588,7 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 		if ( (wratio == hratio) && (dratio == 0) )
 		{
 			power = 0;
-			int tempWidth = wratio;
+			int tempWidth = (int)wratio;
 			while (tempWidth > 1)
 			{
 				++power;
@@ -628,20 +627,20 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 	else
 	{
 		// Compute a kernel...
-		kernel.m_nWidth = wratio;
-		kernel.m_nHeight = hratio;
-		kernel.m_nDepth = dratio ? dratio : 1;
+		kernel.m_nWidth = static_cast<int>(wratio);
+		kernel.m_nHeight = static_cast<int>(hratio);
+		kernel.m_nDepth = static_cast<int>(dratio ? dratio : 1);
 
 		kernel.m_nDiameter = 1;
 
 		// Simple implementation of a box filter that doesn't block the stack!
-		pKernelMem[0] = 1.0f / (float)(kernel.m_nWidth * kernel.m_nHeight * kernel.m_nDepth);
-		pInvKernelMem[0] = 1.0f;
-		kernel.m_pKernel = pKernelMem;
-		kernel.m_pInvKernel = pInvKernelMem;
+		pKernelMem = 1.0f / (float)(kernel.m_nWidth * kernel.m_nHeight * kernel.m_nDepth);
+		pInvKernelMem = 1.0f;
+		kernel.m_pKernel = &pKernelMem;
+		kernel.m_pInvKernel = &pInvKernelMem;
 	}
 
-	float *pAlphaResult = NULL;
+	float *pAlphaResult = nullptr;
 	KernelType_t type;
 	if ( info.m_nFlags & RESAMPLE_NORMALMAP )
 	{
@@ -649,7 +648,7 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 	}
 	else if ( info.m_nFlags & RESAMPLE_ALPHATEST )
 	{
-		int nSize = info.m_nSrcHeight * info.m_nSrcWidth * info.m_nSrcDepth * sizeof(float);
+		intp nSize = static_cast<intp>(info.m_nSrcHeight) * info.m_nSrcWidth * info.m_nSrcDepth * sizeof(float);
 		pAlphaResult = (float*)malloc( nSize );
 		memset( pAlphaResult, 0, nSize );
 		type = KERNEL_ALPHATEST;
@@ -662,10 +661,7 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 	if ( info.m_nFlags & RESAMPLE_NICE_FILTER )
 	{	
 		g_KernelFuncNice[type]( kernel, info, wratio, hratio, dratio, gammaToLinear, pAlphaResult );
-		if (pTempMemory)
-		{
-			delete[] pTempMemory;
-		}
+		delete[] pTempMemory;
 	}
 	else
 	{
@@ -704,8 +700,7 @@ bool ResampleRGBA16161616( const ResampleInfo_t& info )
 	{
 		for( x = 0; x < info.m_nDestWidth; x++ )
 		{
-			int accum[4];
-			accum[0] = accum[1] = accum[2] = accum[3] = 0;
+			int accum[4] = {0};
 			int nSampleY;
 			for( nSampleY = 0; nSampleY < nSampleHeight; nSampleY++ )
 			{
@@ -755,8 +750,7 @@ bool ResampleRGB323232F( const ResampleInfo_t& info )
 	{
 		for( x = 0; x < info.m_nDestWidth; x++ )
 		{
-			float accum[4];
-			accum[0] = accum[1] = accum[2] = accum[3] = 0;
+            float accum[4] = {0};
 			int nSampleY;
 			for( nSampleY = 0; nSampleY < nSampleHeight; nSampleY++ )
 			{
@@ -790,7 +784,7 @@ void GenerateMipmapLevels( unsigned char* pSrc, unsigned char* pDst, int width,
 	int dstDepth = depth;
 
 	// temporary storage for the mipmaps
-	int tempMem = GetMemRequired( dstWidth, dstHeight, dstDepth, IMAGE_FORMAT_RGBA8888, false );
+	intp tempMem = GetMemRequired( dstWidth, dstHeight, dstDepth, IMAGE_FORMAT_RGBA8888, false );
 	CUtlMemory<unsigned char> tmpImage;
 	tmpImage.EnsureCapacity( tempMem );
 
@@ -828,7 +822,7 @@ void GenerateMipmapLevels( unsigned char* pSrc, unsigned char* pDst, int width,
 		}
 
 		// Figure out where the next level goes
-		int memRequired = ImageLoader::GetMemRequired( dstWidth, dstHeight, dstDepth, imageFormat, false);
+		intp memRequired = ImageLoader::GetMemRequired( dstWidth, dstHeight, dstDepth, imageFormat, false);
 		pDst += memRequired;
 
 		// shrink by a factor of 2, but clamp at 1 pixel (non-square textures)
@@ -838,14 +832,15 @@ void GenerateMipmapLevels( unsigned char* pSrc, unsigned char* pDst, int width,
 	}
 }
 
+// dimhotepus: Use numLevels?
 void GenerateMipmapLevelsLQ( unsigned char* pSrc, unsigned char* pDst, int width, int height,
-		                     ImageFormat imageFormat, int numLevels )
+		                     ImageFormat imageFormat, [[maybe_unused]] int numLevels )
 {
 	CUtlMemory<unsigned char> tmpImage;
 
 	const unsigned char* pSrcLevel = pSrc;
 
-	int mipmap0Size = GetMemRequired( width, height, 1, IMAGE_FORMAT_RGBA8888, false );
+	intp mipmap0Size = GetMemRequired( width, height, 1, IMAGE_FORMAT_RGBA8888, false );
 
 	// TODO: Could work with any 8888 format without conversion.
 	if ( imageFormat != IMAGE_FORMAT_RGBA8888 )

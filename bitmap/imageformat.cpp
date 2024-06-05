@@ -10,17 +10,12 @@
 #endif
 
 #include "bitmap/imageformat.h"
-#include "tier0/basetypes.h"
+#include "tier0/platform.h"
 #include "tier0/dbg.h"
 // dimhotepus: Exclude nvtc as proprietary.
 #ifndef NO_NVTC
 #include "nvtc.h"
 #endif
-#include "mathlib/mathlib.h"
-#include "mathlib/vector.h"
-#include "tier1/utlmemory.h"
-#include "tier1/strtools.h"
-#include "mathlib/compressed_vector.h"
 
 // Should be last include
 #include "tier0/memdbgon.h"
@@ -88,12 +83,12 @@ namespace ImageLoader
 //-----------------------------------------------------------------------------
 const ImageFormatInfo_t& ImageFormatInfo( ImageFormat fmt )
 {
-	Assert( ( NUM_IMAGE_FORMATS + 1 ) == sizeof( g_ImageFormatInfo ) / sizeof( g_ImageFormatInfo[0] ) );
+	static_assert( ( NUM_IMAGE_FORMATS + 1 ) == std::size( g_ImageFormatInfo ) );
 	Assert( unsigned( fmt + 1 ) <= ( NUM_IMAGE_FORMATS ) );
 	return g_ImageFormatInfo[ fmt + 1 ];
 }
 
-int GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, bool mipmap )
+ptrdiff_t GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, bool mipmap )
 {
 	if ( depth <= 0 )
 	{
@@ -106,18 +101,6 @@ int GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, b
 		
 		if ( IsCompressed( imageFormat ) )
 		{
-/*
-			DDSURFACEDESC desc;
-			memset( &desc, 0, sizeof(desc) );
-
-			DWORD dwEncodeType;
-			dwEncodeType = GetDXTCEncodeType( imageFormat );
-			desc.dwSize = sizeof( desc );
-			desc.dwFlags = DDSD_WIDTH | DDSD_HEIGHT;
-			desc.dwWidth = width;
-			desc.dwHeight = height;
-			return S3TCgetEncodeSize( &desc, dwEncodeType );
-*/
 			Assert( ( width < 4 ) || !( width % 4 ) );
 			Assert( ( height < 4 ) || !( height % 4 ) );
 			Assert( ( depth < 4 ) || !( depth % 4 ) );
@@ -133,7 +116,7 @@ int GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, b
 			{
 				depth = 4;
 			}
-			int numBlocks = ( width * height ) >> 4;
+			ptrdiff_t numBlocks = ( static_cast<ptrdiff_t>(width) * height ) >> 4;
 			numBlocks *= depth;
 			switch ( imageFormat )
 			{
@@ -153,11 +136,11 @@ int GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, b
 			return 0;
 		}
 
-		return width * height * depth * SizeInBytes( imageFormat );
+		return static_cast<ptrdiff_t>(width) * height * depth * SizeInBytes( imageFormat );
 	}
 
 	// Mipmap version
-	int memSize = 0;
+	ptrdiff_t memSize = 0;
 	while ( 1 )
 	{
 		memSize += GetMemRequired( width, height, depth, imageFormat, false );
@@ -185,13 +168,13 @@ int GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, b
 	return memSize;
 }
 
-int GetMipMapLevelByteOffset( int width, int height, ImageFormat imageFormat, int skipMipLevels )
+ptrdiff_t GetMipMapLevelByteOffset( int width, int height, ImageFormat imageFormat, int skipMipLevels )
 {
-	int offset = 0;
+	ptrdiff_t offset = 0;
 
 	while( skipMipLevels > 0 )
 	{
-		offset += width * height * SizeInBytes(imageFormat);
+		offset += static_cast<ptrdiff_t>(width) * height * SizeInBytes(imageFormat);
 		if( width == 1 && height == 1 )
 		{
 			break;

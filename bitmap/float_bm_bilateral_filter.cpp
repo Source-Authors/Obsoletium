@@ -4,15 +4,19 @@
 //
 //===========================================================================//
 
-#include <tier0/platform.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <stdlib.h>
 #include "bitmap/float_bm.h"
-#include <tier2/tier2.h>
+
+#include <utility>
+#include <cmath>
+
+#include "mathlib/mathlib.h"
+#include "tier0/platform.h"
 #include "tier0/threadtools.h"
 #include "tier0/progressbar.h"
+#include "tier0/wchartypes.h"
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 struct TBFCalculationContext
 {
@@ -26,7 +30,7 @@ struct TBFCalculationContext
 
 static unsigned TBFCalculationThreadFN( void *ctx1 )
 {
-	TBFCalculationContext *ctx = (TBFCalculationContext *) ctx1;
+	auto *ctx = static_cast<TBFCalculationContext *>(ctx1);
 	for(int y=ctx->min_y; y <= ctx->max_y; y++)
 	{
 		if ( ctx->thread_number == 0 )
@@ -44,7 +48,7 @@ static unsigned TBFCalculationThreadFN( void *ctx1 )
 						float this_p=ctx->orig_bm->PixelWrapped(x+ix,y+iy,c);
 						
 						// caluclate the g() term. We use a gaussian
-						float exp1=(ix*ix+iy*iy)*(1.0f/(2.0f*ctx->radius_in_pixels*.033f));
+						float exp1=(static_cast<float>(ix)*ix+iy*iy)*(1.0f/(2.0f*ctx->radius_in_pixels*.033f));
 						float g=expf(-exp1);
 						// calculate the "similarity" term. We use a triangle filter
 						float cdiff=fabsf(centerp-this_p);
@@ -62,14 +66,16 @@ static unsigned TBFCalculationThreadFN( void *ctx1 )
 void FloatBitMap_t::TileableBilateralFilter( int radius_in_pixels, 
 											 float edge_threshold_value )
 {
+	constexpr uint8 kParallelContextsCount = 32;
+
 	FloatBitMap_t orig( this );								// need a copy for the source
-	TBFCalculationContext ctxs[32];
+	TBFCalculationContext ctxs[kParallelContextsCount];
 	ctxs[0].radius_in_pixels = radius_in_pixels;
 	ctxs[0].edge_threshold_value = edge_threshold_value;
 	ctxs[0].orig_bm = &orig;
 	ctxs[0].dest_bm = this;
-	int nthreads = min( 32, (int)GetCPUInformation()->m_nPhysicalProcessors );
-	ThreadHandle_t waithandles[32];
+	int nthreads = min( kParallelContextsCount, GetCPUInformation()->m_nPhysicalProcessors );
+	ThreadHandle_t waithandles[kParallelContextsCount];
 	int starty=0;
 	int ystep=Height/nthreads;
 
@@ -86,6 +92,7 @@ void FloatBitMap_t::TileableBilateralFilter( int radius_in_pixels,
 		waithandles[t]=CreateSimpleThread(TBFCalculationThreadFN, &ctxs[t]);
 		starty+=ystep;
 	}
+
 	for(int t=0;t<nthreads;t++)
 	{
 		ThreadJoin( waithandles[t] );

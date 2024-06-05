@@ -5,7 +5,6 @@
 //
 //=============================================================================//
 
-#include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "bitmap/imageformat.h"
 
@@ -13,15 +12,6 @@
 #include "tier0/memdbgon.h"
 
 #define NO_X360_XDK
-
-#if defined( _WIN32 ) && !defined( NO_X360_XDK ) && !defined( DX_TO_GL_ABSTRACTION )
-// the x86 version of the 360 (used by win32 tools)
-// It would have been nice to use the 360 D3DFORMAT bit encodings, but the codes
-// are different for WIN32, and this routine is used by a WIN32 library to
-// manipulate 360 data, so there can be no reliance on WIN32 D3DFORMAT bits
-#include "..\x360xdk\include\win32\vs2005\d3d9.h"
-#include "..\x360xdk\include\win32\vs2005\XGraphics.h"
-#endif
 
 namespace ImageLoader
 {
@@ -79,7 +69,8 @@ namespace ImageLoader
 // as expected by the conversion process, which varies according to format,
 // input, and output.
 //-----------------------------------------------------------------------------
-	void PreConvertSwapImageData( unsigned char *pImageData, int nImageSize, ImageFormat imageFormat, int width, int stride )
+
+	void PreConvertSwapImageData( [[maybe_unused]] unsigned char *pImageData, [[maybe_unused]] ptrdiff_t nImageSize, [[maybe_unused]] ImageFormat imageFormat, [[maybe_unused]] int width, [[maybe_unused]] int stride )
 	{
 
 		Assert( IsFormatValidForConversion( imageFormat ) );
@@ -129,7 +120,7 @@ namespace ImageLoader
 // Swaps image bytes for use on a big endian platform. This is used after the conversion
 // process to match the 360 d3dformats.
 //-----------------------------------------------------------------------------
-	void PostConvertSwapImageData( unsigned char *pImageData, int nImageSize, ImageFormat imageFormat, int width, int stride )
+	void PostConvertSwapImageData( [[maybe_unused]] unsigned char *pImageData, [[maybe_unused]] ptrdiff_t nImageSize, [[maybe_unused]] ImageFormat imageFormat, [[maybe_unused]] int width, [[maybe_unused]] int stride )
 	{
 		Assert( IsFormatValidForConversion( imageFormat ) );
 
@@ -193,7 +184,7 @@ namespace ImageLoader
 //-----------------------------------------------------------------------------
 // Swaps image bytes.
 //-----------------------------------------------------------------------------
-	void ByteSwapImageData( unsigned char *pImageData, int nImageSize, ImageFormat imageFormat, int width, int stride )
+	void ByteSwapImageData( [[maybe_unused]] unsigned char *pImageData, [[maybe_unused]] ptrdiff_t nImageSize, [[maybe_unused]] ImageFormat imageFormat, [[maybe_unused]] int width, [[maybe_unused]] int stride )
 	{
 		Assert( IsFormatValidForConversion( imageFormat ) );
 

@@ -4,15 +4,14 @@
 //
 //=============================================================================//
 
-#include <stdio.h>
 #include "bitmap/tgaloader.h"
+
 #include "tier0/dbg.h"
-#include "basetypes.h"
-#include <math.h>
-#include "tier1/utlvector.h"
+#include "tier0/dbgflag.h"
 #include "tier1/utlbuffer.h"
+#include "tier1/utlmemory.h"
 #include "filesystem.h"
-#include "tier2/tier2.h"
+#include "bitmap/imageformat.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -61,8 +60,8 @@ typedef void (*OutputRowFunc_t)( CUtlBuffer& buf, TGAHeader_t const& header, uns
 // Important constants
 //-----------------------------------------------------------------------------
 
-#define TGA_MAX_COLORMAP_SIZE ( 256 * 4 )
-#define TGA_MAX_ROW_LENGTH_IN_PIXELS IMAGE_MAX_DIM
+constexpr int TGA_MAX_COLORMAP_SIZE{256 * 4};
+constexpr int TGA_MAX_ROW_LENGTH_IN_PIXELS{IMAGE_MAX_DIM};
 
 
 //-----------------------------------------------------------------------------
@@ -73,9 +72,6 @@ static unsigned char g_ColorMap[TGA_MAX_COLORMAP_SIZE];
 // run-length state from row to row for RLE images
 static bool g_IsRunLengthPacket;
 static int g_PixelsLeftInPacket;
-
-static unsigned char g_SrcGammaTable[256];
-static unsigned char g_DstGammaTable[256];
 
 typedef CUtlMemory<unsigned char> CTempImage;
 
@@ -170,7 +166,6 @@ bool GetInfo( CUtlBuffer& buf, int *width, int *height,
 
 	default:
 		return false;
-		break;
 	}
 
 	*width = header.width;
@@ -262,11 +257,6 @@ void OutputRowBGR888( CUtlBuffer& buf, TGAHeader_t const& header, unsigned char*
 		pDst[0] = pSrc[2];
 		buf.SeekGet( CUtlBuffer::SEEK_CURRENT, 4 );
 	}
-}
-
-void OutputRowRGB565( CUtlBuffer& buf, TGAHeader_t const& header, unsigned char* pDst )
-{
-	Assert( 0 );
 }
 
 void OutputRowI8( CUtlBuffer& buf, TGAHeader_t const& header, unsigned char* pDst )
@@ -674,14 +664,11 @@ static ReadRowFunc_t GetReadRowFunc( TGAHeader_t const& header )
 		{
 		case 24:
 			return &ReadRow24BitUncompressedWithoutColormap;
-			break;
 		case 32:
 			return &ReadRow32BitUncompressedWithoutColormap;
-			break;
 		default:
 			//Error( "unsupported tga colordepth: %d", TGAHeader_t.pixel_size" );
 			return 0;
-			break;
 		}
 	case 10: // 24/32 bit compressed TGA image
 		if( header.colormap_length )
@@ -695,20 +682,16 @@ static ReadRowFunc_t GetReadRowFunc( TGAHeader_t const& header )
 			{
 			case 24:
 				return &ReadRow24BitCompressedWithoutColormap;
-				break;
 			case 32:
 				return &ReadRow32BitCompressedWithoutColormap;
-				break;
 			default:
 				//Error( "unsupported tga colordepth: %d", TGAHeader_t.pixel_size" );
-				return NULL;
-				break;
+				return nullptr;
 			}
 		}
 	default:
 		// Error( "unsupported tga pixel format" );
 		return 0;
-		break;
 	}
 }
 
@@ -748,7 +731,7 @@ static bool ReadSourceImage( CUtlBuffer& buf, TGAHeader_t& header, CTempImage& i
 	g_PixelsLeftInPacket = 0;
 
 	// Only allocate the memory once
-	int memRequired = ImageLoader::GetMemRequired( header.width, header.height, 1,
+	intp memRequired = ImageLoader::GetMemRequired( header.width, header.height, 1,
 		IMAGE_FORMAT_RGBA8888, false );
 	image.EnsureCapacity( memRequired );
 
@@ -870,7 +853,7 @@ bool LoadRGBA8888( CUtlBuffer& buf, CUtlMemory<unsigned char> &outputData, int &
 	
 	// Stores the RGBA8888 temp version of the image which we'll use to
 	// to do mipmapping...
-	int memSize = ImageLoader::GetMemRequired( 
+	intp memSize = ImageLoader::GetMemRequired( 
 		header.width, header.height, 1, IMAGE_FORMAT_RGBA8888, false );
 
 	outputData.EnsureCapacity( memSize );
