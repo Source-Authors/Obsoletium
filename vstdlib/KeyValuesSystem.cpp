@@ -5,10 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vstdlib/IKeyValuesSystem.h>
-#include <KeyValues.h>
-#include "mempool.h"
-#include "utlsymbol.h"
+#include "vstdlib/IKeyValuesSystem.h"
+#include "tier1/KeyValues.h"
+#include "tier1/mempool.h"
+#include "tier1/utlsymbol.h"
 #include "tier0/threadtools.h"
 #include "tier1/memstack.h"
 #include "tier1/utlmap.h"
@@ -25,7 +25,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: Central storage point for KeyValues memory and symbols
 //-----------------------------------------------------------------------------
-class CKeyValuesSystem : public IKeyValuesSystem
+class CKeyValuesSystem final : public IKeyValuesSystem
 {
 public:
 	CKeyValuesSystem();
@@ -34,11 +34,11 @@ public:
 	// registers the size of the KeyValues in the specified instance
 	// so it can build a properly sized memory pool for the KeyValues objects
 	// the sizes will usually never differ but this is for versioning safety
-	void RegisterSizeofKeyValues(int size);
+	void RegisterSizeofKeyValues(intp size);
 
 	// allocates/frees a KeyValues object from the shared mempool
-	void *AllocKeyValuesMemory(int size);
-	void FreeKeyValuesMemory(void *pMem);
+	void *AllocKeyValuesMemory(intp size) override;
+	void FreeKeyValuesMemory(void *pMem) override;
 
 	// symbol table access (used for key names)
 	HKeySymbol GetSymbolForString( const char *name, bool bCreate );
@@ -49,11 +49,11 @@ public:
 	void GetANSIFromLocalized( const wchar_t *wchar, char *outBuf, int ansiBufferSizeInBytes );
 
 	// for debugging, adds KeyValues record into global list so we can track memory leaks
-	virtual void AddKeyValuesToMemoryLeakList(void *pMem, HKeySymbol name);
-	virtual void RemoveKeyValuesFromMemoryLeakList(void *pMem);
+	void AddKeyValuesToMemoryLeakList(void *pMem, HKeySymbol name) override;
+	void RemoveKeyValuesFromMemoryLeakList(void *pMem) override;
 
 	// maintain a cache of KeyValues we load from disk. This saves us quite a lot of time on app startup. 
-	virtual void AddFileKeyValuesToCache( const KeyValues* _kv, const char *resourceName, const char *pathID );
+	void AddFileKeyValuesToCache( const KeyValues* _kv, const char *resourceName, const char *pathID ) override;
 	virtual bool LoadFileKeyValuesFromCache( KeyValues* outKv, const char *resourceName, const char *pathID, IBaseFileSystem *filesystem ) const;
 	virtual void InvalidateCache();
 	virtual void InvalidateCacheForFile( const char *resourceName, const char *pathID );
@@ -62,31 +62,31 @@ private:
 #ifdef KEYVALUES_USE_POOL
 	CUtlMemoryPool *m_pMemPool;
 #endif
-	int m_iMaxKeyValuesSize;
+	intp m_iMaxKeyValuesSize;
 
 	// string hash table
 	CMemoryStack m_Strings;
 	struct hash_item_t
 	{
-		int stringIndex;
+		HKeySymbol stringIndex;
 		hash_item_t *next;
 	};
 	CUtlMemoryPool m_HashItemMemPool;
 	CUtlVector<hash_item_t> m_HashTable;
-	int CaseInsensitiveHash(const char *string, int iBounds);
+	intp CaseInsensitiveHash(const char *string, intp iBounds);
 
 	void DoInvalidateCache();
 
 	struct MemoryLeakTracker_t
 	{
-		int nameIndex;
+		HKeySymbol nameIndex;
 		void *pMem;
 	};
 	static bool MemoryLeakTrackerLessFunc( const MemoryLeakTracker_t &lhs, const MemoryLeakTracker_t &rhs )
 	{
 		return lhs.pMem < rhs.pMem;
 	}
-	CUtlRBTree<MemoryLeakTracker_t, int> m_KeyValuesTrackingList;
+	CUtlRBTree<MemoryLeakTracker_t, intp> m_KeyValuesTrackingList;
 
 	CThreadFastMutex m_mutex;
 
@@ -115,10 +115,10 @@ CKeyValuesSystem::CKeyValuesSystem()
 {
 	// initialize hash table
 	m_HashTable.AddMultipleToTail(2047);
-	for (int i = 0; i < m_HashTable.Count(); i++)
+	for ( auto &t : m_HashTable )
 	{
-		m_HashTable[i].stringIndex = 0;
-		m_HashTable[i].next = NULL;
+		t.stringIndex = 0;
+		t.next = NULL;
 	}
 
 	m_Strings.Init( 4*1024*1024, 64*1024, 0, 4 );
@@ -141,11 +141,11 @@ CKeyValuesSystem::~CKeyValuesSystem()
 	// display any memory leaks
 	if (m_pMemPool && m_pMemPool->Count() > 0)
 	{
-		DevMsg("Leaked KeyValues blocks: %d\n", m_pMemPool->Count());
+		DevMsg("Leaked KeyValues blocks: %zd\n", m_pMemPool->Count());
 	}
 
 	// iterate all the existing keyvalues displaying their names
-	for (int i = 0; i < m_KeyValuesTrackingList.MaxElement(); i++)
+	for (intp i = 0; i < m_KeyValuesTrackingList.MaxElement(); i++)
 	{
 		if (m_KeyValuesTrackingList.IsValidIndex(i))
 		{
@@ -165,7 +165,7 @@ CKeyValuesSystem::~CKeyValuesSystem()
 //			so it can build a properly sized memory pool for the KeyValues objects
 //			the sizes will usually never differ but this is for versioning safety
 //-----------------------------------------------------------------------------
-void CKeyValuesSystem::RegisterSizeofKeyValues(int size)
+void CKeyValuesSystem::RegisterSizeofKeyValues(intp size)
 {
 	if (size > m_iMaxKeyValuesSize)
 	{
@@ -190,7 +190,7 @@ static void KVLeak( char const *fmt, ... )
 //-----------------------------------------------------------------------------
 // Purpose: allocates a KeyValues object from the shared mempool
 //-----------------------------------------------------------------------------
-void *CKeyValuesSystem::AllocKeyValuesMemory(int size)
+void *CKeyValuesSystem::AllocKeyValuesMemory(intp size)
 {
 #ifdef KEYVALUES_USE_POOL
 	// allocate, if we don't have one yet
@@ -230,8 +230,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 
 	AUTO_LOCK( m_mutex );
 
-	int hash = CaseInsensitiveHash(name, m_HashTable.Count());
-	int i = 0;
+	intp hash = CaseInsensitiveHash(name, m_HashTable.Count());
 	hash_item_t *item = &m_HashTable[hash];
 	while (1)
 	{
@@ -239,8 +238,6 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 		{
 			return (HKeySymbol)item->stringIndex;
 		}
-
-		i++;
 
 		if (item->next == NULL)
 		{
@@ -311,7 +308,7 @@ void CKeyValuesSystem::RemoveKeyValuesFromMemoryLeakList(void *pMem)
 #ifdef _DEBUG
 	// only track the memory leaks in debug builds
 	MemoryLeakTracker_t item = { 0, pMem };
-	int index = m_KeyValuesTrackingList.Find(item);
+	intp index = m_KeyValuesTrackingList.Find(item);
 	m_KeyValuesTrackingList.RemoveAt(index);
 #endif
 }
@@ -345,7 +342,7 @@ void CKeyValuesSystem::AddFileKeyValuesToCache(const KeyValues* _kv, const char 
 //-----------------------------------------------------------------------------
 // Purpose: Fetches a particular keyvalue from the cache, and copies into _outKv (clearing anything there already). 
 //-----------------------------------------------------------------------------
-bool CKeyValuesSystem::LoadFileKeyValuesFromCache(KeyValues* outKv, const char *resourceName, const char *pathID, IBaseFileSystem *filesystem) const
+bool CKeyValuesSystem::LoadFileKeyValuesFromCache(KeyValues* outKv, const char *resourceName, const char *pathID, IBaseFileSystem *) const
 {
 	Assert( outKv );
 	Assert( resourceName );
@@ -378,9 +375,9 @@ void CKeyValuesSystem::InvalidateCache()
 //-----------------------------------------------------------------------------
 // Purpose: generates a simple hash value for a string
 //-----------------------------------------------------------------------------
-int CKeyValuesSystem::CaseInsensitiveHash(const char *string, int iBounds)
+intp CKeyValuesSystem::CaseInsensitiveHash(const char *string, intp iBounds)
 {
-	unsigned int hash = 0;
+	uintp hash = 0;
 
 	for ( ; *string != 0; string++ )
 	{

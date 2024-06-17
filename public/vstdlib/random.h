@@ -14,7 +14,7 @@
 #include "tier0/threadtools.h"
 #include "tier1/interface.h"
 
-#define NTAB 32
+constexpr inline int NTAB{32};
 
 //-----------------------------------------------------------------------------
 // A generator of uniformly distributed random numbers
@@ -41,14 +41,15 @@ class VSTDLIB_CLASS CUniformRandomStream : public IUniformRandomStream
 {
 public:
 	CUniformRandomStream();
+	virtual ~CUniformRandomStream() {}
 
 	// Sets the seed of the random number generator
-	virtual void	SetSeed( int iSeed );
+	void	SetSeed( int iSeed ) override;
 
 	// Generates random numbers
-	virtual float	RandomFloat( float flMinVal = 0.0f, float flMaxVal = 1.0f );
-	virtual int		RandomInt( int iMinVal, int iMaxVal );
-	virtual float	RandomFloatExp( float flMinVal = 0.0f, float flMaxVal = 1.0f, float flExponent = 1.0f );
+	float	RandomFloat( float flMinVal = 0.0f, float flMaxVal = 1.0f ) override;
+	int		RandomInt( int iMinVal, int iMaxVal ) override;
+	float	RandomFloatExp( float flMinVal = 0.0f, float flMaxVal = 1.0f, float flExponent = 1.0f ) override;
 
 private:
 	int		GenerateRandomNumber();
@@ -57,11 +58,11 @@ private:
 	int m_iy;
 	int m_iv[NTAB];
 
-	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
-	// DLL export looks safe.
-	MSVC_DISABLE_WARNING(4251)
+MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+// DLL export looks safe.
+MSVC_DISABLE_WARNING(4251)
 	CThreadFastMutex m_mutex;
-  MSVC_END_WARNING_OVERRIDE_SCOPE()
+MSVC_END_WARNING_OVERRIDE_SCOPE()
 };
 
 
@@ -73,10 +74,10 @@ class VSTDLIB_CLASS CGaussianRandomStream
 public:
 	// Passing in NULL will cause the gaussian stream to use the
 	// installed global random number generator
-	CGaussianRandomStream( IUniformRandomStream *pUniformStream = NULL );
+	CGaussianRandomStream( IUniformRandomStream *pUniformStream = nullptr );
 
 	// Attaches to a random uniform stream
-	void	AttachToStream( IUniformRandomStream *pUniformStream = NULL );
+	void	AttachToStream( IUniformRandomStream *pUniformStream = nullptr );
 
 	// Generates random numbers
 	float	RandomFloat( float flMean = 0.0f, float flStdDev = 1.0f );
@@ -86,11 +87,11 @@ private:
 	bool	m_bHaveValue;
 	float	m_flRandomValue;
 
-	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
-	// DLL export looks safe. 
-	MSVC_DISABLE_WARNING(4251)
+MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+// DLL export looks safe. 
+MSVC_DISABLE_WARNING(4251)
 	CThreadFastMutex m_mutex;
-	MSVC_END_WARNING_OVERRIDE_SCOPE()
+MSVC_END_WARNING_OVERRIDE_SCOPE()
 };
 
 //-----------------------------------------------------------------------------
@@ -108,10 +109,11 @@ VSTDLIB_INTERFACE float	RandomGaussianFloat( float flMean = 0.0f, float flStdDev
 class VSTDLIB_CLASS CDefaultUniformRandomStream : public IUniformRandomStream
 {
 public:
-	virtual void	SetSeed( int iSeed ) OVERRIDE												{ RandomSeed( iSeed ); }
-	virtual float	RandomFloat( float flMinVal, float flMaxVal ) OVERRIDE						{ return ::RandomFloat( flMinVal, flMaxVal ); }
-	virtual int		RandomInt( int iMinVal, int iMaxVal ) OVERRIDE								{ return ::RandomInt( iMinVal, iMaxVal ); }
-	virtual float	RandomFloatExp( float flMinVal, float flMaxVal, float flExponent ) OVERRIDE	{ return ::RandomFloatExp( flMinVal, flMaxVal, flExponent ); }
+	virtual ~CDefaultUniformRandomStream() {}
+	void	SetSeed( int iSeed ) override												{ RandomSeed( iSeed ); }
+	float	RandomFloat( float flMinVal, float flMaxVal ) override						{ return ::RandomFloat( flMinVal, flMaxVal ); }
+	int		RandomInt( int iMinVal, int iMaxVal ) override								{ return ::RandomInt( iMinVal, iMaxVal ); }
+	float	RandomFloatExp( float flMinVal, float flMaxVal, float flExponent ) override	{ return ::RandomFloatExp( flMinVal, flMaxVal, flExponent ); }
 };
 
 //-----------------------------------------------------------------------------
@@ -121,6 +123,3 @@ VSTDLIB_INTERFACE void	InstallUniformRandomStream( IUniformRandomStream *pStream
 
 
 #endif // VSTDLIB_RANDOM_H
-
-
-

@@ -46,7 +46,7 @@ void CCompiledKeyValuesWriter::BuildKVData_R( KeyValues *kv, int parent )
 	info.SetSubTree( kv->GetFirstSubKey() != NULL ? true : false );
 	info.SetParent( parent );
 
-	int newParent = m_Data.AddToTail( info );
+	intp newParent = m_Data.AddToTail( info );
 
 	// Then add children
 	for ( KeyValues *sub = kv->GetFirstSubKey(); sub; sub = sub->GetNextKey() )

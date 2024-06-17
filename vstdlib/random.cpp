@@ -8,23 +8,22 @@
 
 
 #include "vstdlib/random.h"
-#include <math.h>
-#include "dbg.h"
+#include "tier0/dbg.h"
 
 #include "tier0/memdbgon.h"
 
-#define IA 16807
-#define IM 2147483647
-#define IQ 127773
-#define IR 2836
-#define NDIV (1+(IM-1)/NTAB)
-#define MAX_RANDOM_RANGE 0x7FFFFFFFUL
+constexpr inline int IA{16807};
+constexpr inline int IM{2147483647};
+constexpr inline int IQ{127773};
+constexpr inline int IR{2836};
+constexpr inline int NDIV{1 + (IM - 1) / NTAB};
+constexpr inline unsigned long MAX_RANDOM_RANGE{0x7FFFFFFFUL};
 
 // fran1 -- return a random floating-point number on the interval [0,1)
 //
-#define AM (1.0f/IM)
-#define EPS 1.2e-7f
-#define RNMX (1.0f-EPS)
+constexpr inline float AM{1.0f / IM};
+constexpr inline float EPS{1.2e-7f};
+constexpr inline float RNMX{1.0f - EPS};
 
 //-----------------------------------------------------------------------------
 // globals

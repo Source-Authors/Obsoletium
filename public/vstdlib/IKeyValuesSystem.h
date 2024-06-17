@@ -13,8 +13,8 @@
 #include "vstdlib/vstdlib.h"
 
 // handle to a KeyValues key name symbol
-typedef int HKeySymbol;
-#define INVALID_KEY_SYMBOL (-1)
+typedef intp HKeySymbol;
+constexpr inline HKeySymbol INVALID_KEY_SYMBOL{static_cast<HKeySymbol>(-1)};
 
 class IBaseFileSystem;
 class KeyValues;
@@ -29,10 +29,10 @@ public:
 	// registers the size of the KeyValues in the specified instance
 	// so it can build a properly sized memory pool for the KeyValues objects
 	// the sizes will usually never differ but this is for versioning safety
-	virtual void RegisterSizeofKeyValues(int size) = 0;
+	virtual void RegisterSizeofKeyValues(intp size) = 0;
 
 	// allocates/frees a KeyValues object from the shared mempool
-	virtual void *AllocKeyValuesMemory(int size) = 0;
+	virtual void *AllocKeyValuesMemory(intp size) = 0;
 	virtual void FreeKeyValuesMemory(void *pMem) = 0;
 
 	// symbol table access (used for key names)
