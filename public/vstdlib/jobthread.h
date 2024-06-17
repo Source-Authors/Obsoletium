@@ -27,7 +27,6 @@
 //
 //=============================================================================
 
-#include <limits.h>
 #include "tier0/threadtools.h"
 #include "tier1/refcount.h"
 #include "tier1/utllinkedlist.h"
@@ -95,15 +94,20 @@ enum JobPriority_t
 	JP_HIGH
 };
 
-#define TP_MAX_POOL_THREADS	64u
+constexpr inline unsigned TP_MAX_POOL_THREADS{64u};
 struct ThreadPoolStartParams_t
 {
-	ThreadPoolStartParams_t( bool bIOThreads = false, unsigned nThreads = -1, int *pAffinities = NULL, ThreeState_t fDistribute = TRS_NONE, unsigned nStackSize = -1, int iThreadPriority = SHRT_MIN )
-		: bIOThreads( bIOThreads ), nThreads( nThreads ), fDistribute( fDistribute ), nStackSize( nStackSize ), iThreadPriority( iThreadPriority ), nThreadsMax( -1 )
+	ThreadPoolStartParams_t( bool bIOThreads_ = false, unsigned nThreads_ = -1, int *pAffinities = nullptr, ThreeState_t fDistribute_ = TRS_NONE, unsigned nStackSize_ = -1, int iThreadPriority_ = SHRT_MIN )
+		: nThreads( nThreads_ ),
+		  nThreadsMax( -1 ),
+		  fDistribute( fDistribute_ ),
+		  nStackSize( nStackSize_ ),
+		  iThreadPriority( iThreadPriority_ ),
+		  bIOThreads( bIOThreads_ )
 	{
 		bExecOnThreadPoolThreadsOnly = false;
 
-		bUseAffinityTable = ( pAffinities != NULL ) && ( fDistribute == TRS_TRUE ) && ( nThreads != -1 );
+		bUseAffinityTable = ( pAffinities != nullptr ) && ( fDistribute == TRS_TRUE ) && ( nThreads != UINT_MAX );
 		if ( bUseAffinityTable )
 		{
 			// user supplied an optional 1:1 affinity mapping to override normal distribute behavior
@@ -161,9 +165,9 @@ public:
 	//-----------------------------------------------------
 	// Functions for any thread
 	//-----------------------------------------------------
-	virtual unsigned GetJobCount() = 0;
-	virtual int NumThreads() = 0;
-	virtual int NumIdleThreads() = 0;
+	virtual unsigned GetJobCount() const = 0;
+	virtual intp NumThreads() const = 0;
+	virtual intp NumIdleThreads() const = 0;
 
 	//-----------------------------------------------------
 	// Pause/resume processing jobs
@@ -435,19 +439,19 @@ JOB_INTERFACE IThreadPool *g_pThreadPool;
 // the operation. Meant for inheritance. All functions inline, defers to executor
 //-----------------------------------------------------------------------------
 DECLARE_POINTER_HANDLE( ThreadPoolData_t );
-#define JOB_NO_DATA ((ThreadPoolData_t)-1)
+const inline ThreadPoolData_t JOB_NO_DATA{reinterpret_cast<ThreadPoolData_t>(-1)};
 
 class CJob : public CRefCounted1<IRefCounted, CRefCountServiceMT>
 {
 public:
 	CJob( JobPriority_t priority = JP_NORMAL )
 	  : m_status( JOB_STATUS_UNSERVICED ),
-		m_ThreadPoolData( JOB_NO_DATA ),
 		m_priority( priority ),
 		m_flags( 0 ),
+		m_iServicingThread( -1 ),
+		m_ThreadPoolData( JOB_NO_DATA ),
 		m_pThreadPool( NULL ),
-		m_CompleteEvent( true ),
-		m_iServicingThread( -1 )
+		m_CompleteEvent( true )
 	{
 		m_szDescription[ 0 ] = 0;
 	}
@@ -465,7 +469,7 @@ public:
 
 	//-----------------------------------------------------
 
-	void SetServiceThread( int iServicingThread )	{ m_iServicingThread = (char)iServicingThread; }
+	void SetServiceThread( intp iServicingThread )	{ m_iServicingThread = (char)iServicingThread; }
 	int GetServiceThread() const					{ return m_iServicingThread; }
 	void ClearServiceThread()						{ m_iServicingThread = -1; }
 
@@ -509,7 +513,7 @@ public:
 	//-----------------------------------------------------
 	JobStatus_t Abort( bool bDiscard = true );
 
-	virtual char const *Describe()					{ return m_szDescription[ 0 ] ? m_szDescription : "Job"; }
+	virtual char const *Describe() const			{ return m_szDescription[ 0 ] ? m_szDescription : "Job"; }
 	virtual void SetDescription( const char *pszDescription )
 	{
 		if( pszDescription )
@@ -543,7 +547,7 @@ private:
 	void operator=(const CJob &fromRequest );
 
 	virtual JobStatus_t DoExecute() = 0;
-	virtual JobStatus_t DoAbort( bool bDiscard ) { return JOB_STATUS_ABORTED; }
+	virtual JobStatus_t DoAbort( [[maybe_unused]] bool bDiscard ) { return JOB_STATUS_ABORTED; }
 	virtual void DoCleanup() {}
 };
 
@@ -565,13 +569,13 @@ public:
 		}
 	}
 
-	virtual JobStatus_t DoExecute()
+	JobStatus_t DoExecute() override
 	{
 		(*m_pFunctor)();
 		return JOB_OK;
 	}
 
-	const char *Describe()
+	const char *Describe() const override
 	{
 		return m_szDescription;
 	}
@@ -606,9 +610,9 @@ public:
 
 	~CJobSet()
 	{
-		for ( int i = 0; i < m_jobs.Count(); i++ )
+		for ( auto j : m_jobs )
 		{
-			m_jobs[i]->Release();
+			j->Release();
 		}
 	}
 
@@ -624,12 +628,12 @@ public:
 
 	void Execute( bool bRelease = true )
 	{
-		for ( int i = 0; i < m_jobs.Count(); i++ )
+		for ( auto j : m_jobs )
 		{
-			m_jobs[i]->Execute();
+			j->Execute();
 			if ( bRelease )
 			{
-				m_jobs[i]->Release();
+				j->Release();
 			}
 		}
 
@@ -641,12 +645,12 @@ public:
 
 	void Abort( bool bRelease = true )
 	{
-		for ( int i = 0; i < m_jobs.Count(); i++ )
+		for ( auto j : m_jobs )
 		{
-			m_jobs[i]->Abort();
+			j->Abort();
 			if ( bRelease )
 			{
-				m_jobs[i]->Release();
+				j->Release();
 			}
 		}
 
@@ -658,12 +662,12 @@ public:
 
 	void WaitForFinish( bool bRelease = true )
 	{
-		for ( int i = 0; i < m_jobs.Count(); i++ )
+		for ( auto j : m_jobs )
 		{
-			m_jobs[i]->WaitForFinish();
+			j->WaitForFinish();
 			if ( bRelease )
 			{
-				m_jobs[i]->Release();
+				j->Release();
 			}
 		}
 
@@ -679,9 +683,9 @@ public:
 
 		if ( bRelease )
 		{
-			for ( int i = 0; i < m_jobs.Count(); i++ )
+			for ( auto j : m_jobs )
 			{
-				m_jobs[i]->Release();
+				j->Release();
 			}
 
 			m_jobs.RemoveAll();
@@ -985,7 +989,7 @@ public:
 		{
 			m_lIndex = lBegin;
 			m_lLimit = lBegin + nItems;
-			int i = g_pThreadPool->NumIdleThreads();
+			intp i = g_pThreadPool->NumIdleThreads();
 
 			if ( nMaxParallel < i)
 			{

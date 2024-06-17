@@ -51,7 +51,7 @@ enum EOSType
 	k_eWindows8_1,
 	k_eWindows10,
 	k_eWinMAX,
-	k_eOSTypeMax = k_eWinMAX + 11 // win types + other ifdef'd types
+	k_eOSTypeMax = k_eWinMAX + 12 // win types + other ifdef'd types
 };
 
 VSTDLIB_INTERFACE const char *GetNameFromOSType( EOSType eOSType );
