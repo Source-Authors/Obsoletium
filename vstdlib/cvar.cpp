@@ -7,7 +7,6 @@
 //===========================================================================//
 
 #include "vstdlib/cvar.h"
-#include <ctype.h>
 #include "tier0/icommandline.h"
 #include "tier1/utlrbtree.h"
 #include "tier1/strtools.h"
@@ -219,7 +218,7 @@ CreateInterfaceFn VStdLib_GetICVarFactory()
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CCvar::CCvar() : m_TempConsoleBuffer( 0, 1024 )
+CCvar::CCvar() : m_TempConsoleBuffer( (intp)0, 1024 )
 {
 	// dimhotepus: Preallocate diplay funcs.
   m_DisplayFuncs.EnsureCapacity( 2 );
@@ -546,7 +545,7 @@ ConCommand *CCvar::FindCommand( const char *pCommandName )
 
 const char* CCvar::GetCommandLineValue( const char *pVariableName )
 {
-	int nLen = Q_strlen(pVariableName);
+	intp nLen = Q_strlen(pVariableName);
 	char *pSearch = (char*)stackalloc( nLen + 2 );
 	pSearch[0] = '+';
 	memcpy( &pSearch[1], pVariableName, nLen + 1 );
@@ -589,10 +588,9 @@ void CCvar::RemoveGlobalChangeCallback( FnChangeCallback_t callback )
 //-----------------------------------------------------------------------------
 void CCvar::CallGlobalChangeCallbacks( ConVar *var, const char *pOldString, float flOldValue )
 {
-	int nCallbackCount = m_GlobalChangeCallbacks.Count();
-	for ( int i = 0; i < nCallbackCount; ++i )
+	for ( auto c : m_GlobalChangeCallbacks )
 	{
-		(*m_GlobalChangeCallbacks[i])( var, pOldString, flOldValue );
+		c( var, pOldString, flOldValue );
 	}
 }
 
@@ -635,7 +633,7 @@ bool CCvar::IsMaterialThreadSetAllowed( ) const
 void CCvar::QueueMaterialThreadSetValue( ConVar *pConVar, const char *pValue )
 {
 	Assert( ThreadInMainThread() );
-	int j = m_QueuedConVarSets.AddToTail();
+	intp j = m_QueuedConVarSets.AddToTail();
 	m_QueuedConVarSets[j].m_pConVar = pConVar;
 	m_QueuedConVarSets[j].m_nType = CONVAR_SET_STRING;
 	m_QueuedConVarSets[j].m_String = pValue;
@@ -644,7 +642,7 @@ void CCvar::QueueMaterialThreadSetValue( ConVar *pConVar, const char *pValue )
 void CCvar::QueueMaterialThreadSetValue( ConVar *pConVar, int nValue )
 {
 	Assert( ThreadInMainThread() );
-	int j = m_QueuedConVarSets.AddToTail();
+	intp j = m_QueuedConVarSets.AddToTail();
 	m_QueuedConVarSets[j].m_pConVar = pConVar;
 	m_QueuedConVarSets[j].m_nType = CONVAR_SET_INT;
 	m_QueuedConVarSets[j].m_nInt = nValue;
@@ -653,7 +651,7 @@ void CCvar::QueueMaterialThreadSetValue( ConVar *pConVar, int nValue )
 void CCvar::QueueMaterialThreadSetValue( ConVar *pConVar, float flValue )
 {
 	Assert( ThreadInMainThread() );
-	int j = m_QueuedConVarSets.AddToTail();
+	intp j = m_QueuedConVarSets.AddToTail();
 	m_QueuedConVarSets[j].m_pConVar = pConVar;
 	m_QueuedConVarSets[j].m_nType = CONVAR_SET_FLOAT;
 	m_QueuedConVarSets[j].m_flFloat = flValue;
@@ -671,10 +669,8 @@ int CCvar::ProcessQueuedMaterialThreadConVarSets()
 	m_bMaterialSystemThreadSetAllowed = true;
 
 	int nUpdateFlags = 0;
-	int nCount = m_QueuedConVarSets.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( const auto& set : m_QueuedConVarSets )
 	{
-		const QueuedConVarSet_t& set = m_QueuedConVarSets[i];
 		switch( set.m_nType )
 		{
 		case CONVAR_SET_FLOAT:
@@ -691,7 +687,7 @@ int CCvar::ProcessQueuedMaterialThreadConVarSets()
 		nUpdateFlags |= set.m_pConVar->GetFlags() & FCVAR_MATERIAL_THREAD_MASK;
 	}
 
-	m_QueuedConVarSets.RemoveAll(); 
+	m_QueuedConVarSets.RemoveAll();
 	m_bMaterialSystemThreadSetAllowed = false;
 	return nUpdateFlags;
 }
@@ -707,7 +703,7 @@ void CCvar::DisplayQueuedMessages( )
 		return;
 
 	Color clr;
-	int nStringLength;
+	intp nStringLength;
 	while( m_TempConsoleBuffer.IsValid() )
 	{
 		int nType = m_TempConsoleBuffer.GetChar();
@@ -763,7 +759,7 @@ void CCvar::ConsoleColorPrintf( const Color& clr, const char *pFormat, ... ) con
 	va_end( argptr );
 	temp[ sizeof( temp ) - 1 ] = 0;
 
-	int c = m_DisplayFuncs.Count();
+	intp c = m_DisplayFuncs.Count();
 	if ( c == 0 )
 	{
 		m_TempConsoleBuffer.PutChar( CONSOLE_COLOR_PRINT );
@@ -772,9 +768,9 @@ void CCvar::ConsoleColorPrintf( const Color& clr, const char *pFormat, ... ) con
 		return;
 	}
 
-	for ( int i = 0 ; i < c; ++i )
+	for ( auto f : m_DisplayFuncs )
 	{
-		m_DisplayFuncs[ i ]->ColorPrint( clr, temp );
+		f->ColorPrint( clr, temp );
 	}
 }
 
@@ -787,7 +783,7 @@ void CCvar::ConsolePrintf( const char *pFormat, ... ) const
 	va_end( argptr );
 	temp[ sizeof( temp ) - 1 ] = 0;
 
-	int c = m_DisplayFuncs.Count();
+	intp c = m_DisplayFuncs.Count();
 	if ( c == 0 )
 	{
 		m_TempConsoleBuffer.PutChar( CONSOLE_PRINT );
@@ -795,7 +791,7 @@ void CCvar::ConsolePrintf( const char *pFormat, ... ) const
 		return;
 	}
 
-	for ( int i = 0 ; i < c; ++i )
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		m_DisplayFuncs[ i ]->Print( temp );
 	}
@@ -810,7 +806,7 @@ void CCvar::ConsoleDPrintf( const char *pFormat, ... ) const
 	va_end( argptr );
 	temp[ sizeof( temp ) - 1 ] = 0;
 
-	int c = m_DisplayFuncs.Count();
+	intp c = m_DisplayFuncs.Count();
 	if ( c == 0 )
 	{
 		m_TempConsoleBuffer.PutChar( CONSOLE_DPRINT );
@@ -818,9 +814,9 @@ void CCvar::ConsoleDPrintf( const char *pFormat, ... ) const
 		return;
 	}
 
-	for ( int i = 0 ; i < c; ++i )
+	for ( auto f : m_DisplayFuncs )
 	{
-		m_DisplayFuncs[ i ]->DPrint( temp );
+		f->DPrint( temp );
 	}
 }
 

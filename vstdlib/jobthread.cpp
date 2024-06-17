@@ -29,7 +29,7 @@ class CJobThread;
 
 //-----------------------------------------------------------------------------
 
-inline void ServiceJobAndRelease( CJob *pJob, int iThread = -1 )
+inline void ServiceJobAndRelease( CJob *pJob, intp iThread = -1 )
 {
 	// TryLock() would only fail if another thread has entered
 	// Execute() or Abort()
@@ -198,9 +198,9 @@ public:
 	//-----------------------------------------------------
 	// Functions for any thread
 	//-----------------------------------------------------
-	unsigned GetJobCount()							{ return m_nJobs; }
-	int NumThreads();
-	int NumIdleThreads();
+	unsigned GetJobCount() const { return m_nJobs; }
+	intp NumThreads() const;
+	intp NumIdleThreads() const;
 
 	//-----------------------------------------------------
 	// Pause/resume processing jobs
@@ -330,7 +330,7 @@ public:
 class CJobThread : public CAlignedNewDelete<16, CWorkerThread>
 {
 public:
-	CJobThread( CThreadPool *pOwner, int iThread ) : 
+	CJobThread( CThreadPool *pOwner, intp iThread ) : 
 		m_SharedQueue( pOwner->m_SharedQueue ),
 		m_pOwner( pOwner ),
 		m_iThread( iThread )
@@ -490,7 +490,7 @@ private:
 	CJobQueue &			m_SharedQueue;
 	CThreadPool *		m_pOwner;
 	CThreadManualEvent	m_IdleEvent;
-	int					m_iThread;
+	intp				m_iThread;
 };
 
 //-----------------------------------------------------------------------------
@@ -522,7 +522,7 @@ CThreadPool::~CThreadPool()
 //---------------------------------------------------------
 // 
 //---------------------------------------------------------
-int CThreadPool::NumThreads()
+intp CThreadPool::NumThreads() const
 {
 	return m_Threads.Count();
 }
@@ -530,7 +530,7 @@ int CThreadPool::NumThreads()
 //---------------------------------------------------------
 // 
 //---------------------------------------------------------
-int CThreadPool::NumIdleThreads()
+intp CThreadPool::NumIdleThreads() const
 {
 	return m_nIdleThreads;
 }
@@ -1005,12 +1005,12 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 	}
 	while ( nThreads-- )
 	{
-		int iThread = m_Threads.AddToTail();
+		intp iThread = m_Threads.AddToTail();
 		m_IdleEvents.AddToTail();
 		auto *jobThread = new CJobThread( this, iThread );
 		m_Threads[iThread] = jobThread;
 		m_IdleEvents[iThread] = &jobThread->GetIdleEvent();
-		jobThread->SetName( CFmtStr( "%s%d", pszName, iThread ) );
+		jobThread->SetName( CFmtStr( "%s%zd", pszName, iThread ) );
 		jobThread->Start( nStackSize );
 		jobThread->GetIdleEvent().Wait();
 #ifdef WIN32

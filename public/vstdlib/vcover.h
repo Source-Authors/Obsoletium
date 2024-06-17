@@ -100,7 +100,7 @@ private:
 	};
 
 	bool m_bActive;
-	int m_depth;
+	intp m_depth;
 	unsigned m_token;
 
 	CUtlRBTree< Location_t, unsigned short, CLocationLess > m_locations;

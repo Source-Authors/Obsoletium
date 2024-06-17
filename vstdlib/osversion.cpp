@@ -8,7 +8,7 @@
 
 #include "vstdlib/osversion.h"
 #include "winlite.h"
-#include "strtools.h"
+#include "tier1/strtools.h"
 #include "tier0/dbg.h"
 
 #ifdef OSX
