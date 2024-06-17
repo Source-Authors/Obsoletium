@@ -7,7 +7,6 @@
 //===========================================================================//
 
 #include "vstdlib/cvar.h"
-#include <ctype.h>
 #include "tier0/icommandline.h"
 #include "tier1/utlrbtree.h"
 #include "tier1/strtools.h"
@@ -33,10 +32,10 @@
 //-----------------------------------------------------------------------------
 // Default implementation  of CvarQuery
 //-----------------------------------------------------------------------------
-class CDefaultCvarQuery : public CBaseAppSystem< ICvarQuery >
+class CDefaultCvarQuery final : public CBaseAppSystem< ICvarQuery >
 {
 public:
-	virtual void *QueryInterface( const char *pInterfaceName )
+	void *QueryInterface( const char *pInterfaceName ) override
 	{
 		if ( !Q_stricmp( pInterfaceName, CVAR_QUERY_INTERFACE_VERSION ) )
 			return (ICvarQuery*)this;
@@ -44,7 +43,7 @@ public:
 	
 	}
 
-	virtual bool AreConVarsLinkable( const ConVar *child, const ConVar *parent )
+	bool AreConVarsLinkable( [[maybe_unused]] const ConVar *child, [[maybe_unused]] const ConVar *parent ) override
 	{
 		return true;
 	}
@@ -57,53 +56,49 @@ static ICvarQuery *s_pCVarQuery = NULL;
 //-----------------------------------------------------------------------------
 // Default implementation
 //-----------------------------------------------------------------------------
-class CCvar : public ICvar
+class CCvar final : public ICvar
 {
 public:
 	CCvar();
 
 	// Methods of IAppSystem
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
-	virtual void *QueryInterface( const char *pInterfaceName );
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
+	void *QueryInterface( const char *pInterfaceName ) override;
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 	// Inherited from ICVar
-	virtual CVarDLLIdentifier_t AllocateDLLIdentifier();
-	virtual void			RegisterConCommand( ConCommandBase *pCommandBase );
-	virtual void			UnregisterConCommand( ConCommandBase *pCommandBase );
-	virtual void			UnregisterConCommands( CVarDLLIdentifier_t id );
-	virtual const char*		GetCommandLineValue( const char *pVariableName );
-	virtual ConCommandBase *FindCommandBase( const char *name );
-	virtual const ConCommandBase *FindCommandBase( const char *name ) const;
-	virtual ConVar			*FindVar ( const char *var_name );
-	virtual const ConVar	*FindVar ( const char *var_name ) const;
-	virtual ConCommand		*FindCommand( const char *name );
-	virtual const ConCommand *FindCommand( const char *name ) const;
-	virtual ConCommandBase	*GetCommands( void );
-	virtual const ConCommandBase *GetCommands( void ) const;
-	virtual void			InstallGlobalChangeCallback( FnChangeCallback_t callback );
-	virtual void			RemoveGlobalChangeCallback( FnChangeCallback_t callback );
-	virtual void			CallGlobalChangeCallbacks( ConVar *var, const char *pOldString, float flOldValue );
-	virtual void			InstallConsoleDisplayFunc( IConsoleDisplayFunc* pDisplayFunc );
-	virtual void			RemoveConsoleDisplayFunc( IConsoleDisplayFunc* pDisplayFunc );
-	virtual void			ConsoleColorPrintf( const Color& clr, const char *pFormat, ... ) const;
-	virtual void			ConsolePrintf( const char *pFormat, ... ) const;
-	virtual void			ConsoleDPrintf( const char *pFormat, ... ) const;
-	virtual void			RevertFlaggedConVars( int nFlag );
-	virtual void			InstallCVarQuery( ICvarQuery *pQuery );
+	CVarDLLIdentifier_t AllocateDLLIdentifier() override;
+	void			RegisterConCommand( ConCommandBase *pCommandBase ) override;
+	void			UnregisterConCommand( ConCommandBase *pCommandBase ) override;
+	void			UnregisterConCommands( CVarDLLIdentifier_t id ) override;
+	const char*		GetCommandLineValue( const char *pVariableName ) override;
+	ConCommandBase *FindCommandBase( const char *name ) override;
+	const ConCommandBase *FindCommandBase( const char *name ) const override;
+	ConVar			*FindVar ( const char *var_name ) override;
+	const ConVar	*FindVar ( const char *var_name ) const override;
+	ConCommand		*FindCommand( const char *name ) override;
+	const ConCommand *FindCommand( const char *name ) const override;
+	ConCommandBase	*GetCommands( void ) override;
+	const ConCommandBase *GetCommands( void ) const override;
+	void			InstallGlobalChangeCallback( FnChangeCallback_t callback ) override;
+	void			RemoveGlobalChangeCallback( FnChangeCallback_t callback ) override;
+	void			CallGlobalChangeCallbacks( ConVar *var, const char *pOldString, float flOldValue ) override;
+	void			InstallConsoleDisplayFunc( IConsoleDisplayFunc* pDisplayFunc ) override;
+	void			RemoveConsoleDisplayFunc( IConsoleDisplayFunc* pDisplayFunc ) override;
+	void			ConsoleColorPrintf( const Color& clr, const char *pFormat, ... ) const override;
+	void			ConsolePrintf( const char *pFormat, ... ) const override;
+	void			ConsoleDPrintf( const char *pFormat, ... ) const override;
+	void			RevertFlaggedConVars( int nFlag ) override;
+	void			InstallCVarQuery( ICvarQuery *pQuery ) override;
 
-#if defined( _X360 )
-	virtual void			PublishToVXConsole( );
-#endif
-
-	virtual bool			IsMaterialThreadSetAllowed( ) const;
-	virtual void			QueueMaterialThreadSetValue( ConVar *pConVar, const char *pValue );
-	virtual void			QueueMaterialThreadSetValue( ConVar *pConVar, int nValue );
-	virtual void			QueueMaterialThreadSetValue( ConVar *pConVar, float flValue );
-	virtual bool			HasQueuedMaterialThreadConVarSets() const;
-	virtual int				ProcessQueuedMaterialThreadConVarSets();
+	bool			IsMaterialThreadSetAllowed( ) const override;
+	void			QueueMaterialThreadSetValue( ConVar *pConVar, const char *pValue ) override;
+	void			QueueMaterialThreadSetValue( ConVar *pConVar, int nValue ) override;
+	void			QueueMaterialThreadSetValue( ConVar *pConVar, float flValue ) override;
+	bool			HasQueuedMaterialThreadConVarSets() const override;
+	int				ProcessQueuedMaterialThreadConVarSets() override;
 private:
 	enum
 	{
@@ -124,7 +119,7 @@ private:
 protected:
 
 	// internals for  ICVarIterator
-	class CCVarIteratorInternal : public ICVarIteratorInternal
+	class CCVarIteratorInternal final : public ICVarIteratorInternal
 	{
 	public:
 		CCVarIteratorInternal( CCvar *outer ) 
@@ -133,10 +128,10 @@ protected:
 			//m_hashIter( -1, -1 ) // and invalid iterator
 			, m_pCur( NULL )
 		{}
-		virtual void		SetFirst( void );
-		virtual void		Next( void );
-		virtual	bool		IsValid( void );
-		virtual ConCommandBase *Get( void );
+		void		SetFirst( void ) RESTRICT override;
+		void		Next( void ) RESTRICT override;
+		bool		IsValid( void ) RESTRICT override;
+		RESTRICT_FUNC ConCommandBase *Get( void ) override;
 	protected:
 		CCvar * const m_pOuter;
 		//CConCommandHash * const m_pHash;
@@ -144,7 +139,7 @@ protected:
 		ConCommandBase *m_pCur;
 	};
 
-	virtual ICVarIteratorInternal	*FactoryInternalIterator( void );
+	ICVarIteratorInternal	*FactoryInternalIterator( void ) override;
 	friend class CCVarIteratorInternal;
 
 	enum ConVarSetType_t
@@ -188,7 +183,7 @@ bool CCvar::CCVarIteratorInternal::IsValid( void ) RESTRICT
 	return m_pCur != NULL;
 }
 
-ConCommandBase *CCvar::CCVarIteratorInternal::Get( void ) RESTRICT
+RESTRICT_FUNC ConCommandBase *CCvar::CCVarIteratorInternal::Get( void )
 {
 	Assert( IsValid( ) );
 	//return (*m_pHash)[m_hashIter];
@@ -219,7 +214,7 @@ CreateInterfaceFn VStdLib_GetICVarFactory()
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CCvar::CCvar() : m_TempConsoleBuffer( 0, 1024 )
+CCvar::CCvar() : m_TempConsoleBuffer( (intp)0, 1024 )
 {
 	// dimhotepus: Preallocate diplay funcs.
   m_DisplayFuncs.EnsureCapacity( 2 );
@@ -443,8 +438,6 @@ void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
 
 void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 {
-	size_t iCommandsLooped = 0;
-
 	ConCommandBase *pNewList = NULL;
 	ConCommandBase  *pCommand = m_pConCommandList;
 	while ( pCommand )
@@ -463,7 +456,6 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 		}
 
 		pCommand = pNext;
-		iCommandsLooped++;
 	}
 
 	m_pConCommandList = pNewList;
@@ -546,7 +538,7 @@ ConCommand *CCvar::FindCommand( const char *pCommandName )
 
 const char* CCvar::GetCommandLineValue( const char *pVariableName )
 {
-	int nLen = Q_strlen(pVariableName);
+	intp nLen = Q_strlen(pVariableName);
 	char *pSearch = (char*)stackalloc( nLen + 2 );
 	pSearch[0] = '+';
 	memcpy( &pSearch[1], pVariableName, nLen + 1 );
@@ -589,10 +581,9 @@ void CCvar::RemoveGlobalChangeCallback( FnChangeCallback_t callback )
 //-----------------------------------------------------------------------------
 void CCvar::CallGlobalChangeCallbacks( ConVar *var, const char *pOldString, float flOldValue )
 {
-	int nCallbackCount = m_GlobalChangeCallbacks.Count();
-	for ( int i = 0; i < nCallbackCount; ++i )
+	for ( auto c : m_GlobalChangeCallbacks )
 	{
-		(*m_GlobalChangeCallbacks[i])( var, pOldString, flOldValue );
+		c( var, pOldString, flOldValue );
 	}
 }
 
@@ -635,7 +626,7 @@ bool CCvar::IsMaterialThreadSetAllowed( ) const
 void CCvar::QueueMaterialThreadSetValue( ConVar *pConVar, const char *pValue )
 {
 	Assert( ThreadInMainThread() );
-	int j = m_QueuedConVarSets.AddToTail();
+	intp j = m_QueuedConVarSets.AddToTail();
 	m_QueuedConVarSets[j].m_pConVar = pConVar;
 	m_QueuedConVarSets[j].m_nType = CONVAR_SET_STRING;
 	m_QueuedConVarSets[j].m_String = pValue;
@@ -644,7 +635,7 @@ void CCvar::QueueMaterialThreadSetValue( ConVar *pConVar, const char *pValue )
 void CCvar::QueueMaterialThreadSetValue( ConVar *pConVar, int nValue )
 {
 	Assert( ThreadInMainThread() );
-	int j = m_QueuedConVarSets.AddToTail();
+	intp j = m_QueuedConVarSets.AddToTail();
 	m_QueuedConVarSets[j].m_pConVar = pConVar;
 	m_QueuedConVarSets[j].m_nType = CONVAR_SET_INT;
 	m_QueuedConVarSets[j].m_nInt = nValue;
@@ -653,7 +644,7 @@ void CCvar::QueueMaterialThreadSetValue( ConVar *pConVar, int nValue )
 void CCvar::QueueMaterialThreadSetValue( ConVar *pConVar, float flValue )
 {
 	Assert( ThreadInMainThread() );
-	int j = m_QueuedConVarSets.AddToTail();
+	intp j = m_QueuedConVarSets.AddToTail();
 	m_QueuedConVarSets[j].m_pConVar = pConVar;
 	m_QueuedConVarSets[j].m_nType = CONVAR_SET_FLOAT;
 	m_QueuedConVarSets[j].m_flFloat = flValue;
@@ -671,10 +662,8 @@ int CCvar::ProcessQueuedMaterialThreadConVarSets()
 	m_bMaterialSystemThreadSetAllowed = true;
 
 	int nUpdateFlags = 0;
-	int nCount = m_QueuedConVarSets.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( const auto& set : m_QueuedConVarSets )
 	{
-		const QueuedConVarSet_t& set = m_QueuedConVarSets[i];
 		switch( set.m_nType )
 		{
 		case CONVAR_SET_FLOAT:
@@ -691,7 +680,7 @@ int CCvar::ProcessQueuedMaterialThreadConVarSets()
 		nUpdateFlags |= set.m_pConVar->GetFlags() & FCVAR_MATERIAL_THREAD_MASK;
 	}
 
-	m_QueuedConVarSets.RemoveAll(); 
+	m_QueuedConVarSets.RemoveAll();
 	m_bMaterialSystemThreadSetAllowed = false;
 	return nUpdateFlags;
 }
@@ -707,7 +696,7 @@ void CCvar::DisplayQueuedMessages( )
 		return;
 
 	Color clr;
-	int nStringLength;
+	intp nStringLength;
 	while( m_TempConsoleBuffer.IsValid() )
 	{
 		int nType = m_TempConsoleBuffer.GetChar();
@@ -763,7 +752,7 @@ void CCvar::ConsoleColorPrintf( const Color& clr, const char *pFormat, ... ) con
 	va_end( argptr );
 	temp[ sizeof( temp ) - 1 ] = 0;
 
-	int c = m_DisplayFuncs.Count();
+	intp c = m_DisplayFuncs.Count();
 	if ( c == 0 )
 	{
 		m_TempConsoleBuffer.PutChar( CONSOLE_COLOR_PRINT );
@@ -772,9 +761,9 @@ void CCvar::ConsoleColorPrintf( const Color& clr, const char *pFormat, ... ) con
 		return;
 	}
 
-	for ( int i = 0 ; i < c; ++i )
+	for ( auto f : m_DisplayFuncs )
 	{
-		m_DisplayFuncs[ i ]->ColorPrint( clr, temp );
+		f->ColorPrint( clr, temp );
 	}
 }
 
@@ -787,7 +776,7 @@ void CCvar::ConsolePrintf( const char *pFormat, ... ) const
 	va_end( argptr );
 	temp[ sizeof( temp ) - 1 ] = 0;
 
-	int c = m_DisplayFuncs.Count();
+	intp c = m_DisplayFuncs.Count();
 	if ( c == 0 )
 	{
 		m_TempConsoleBuffer.PutChar( CONSOLE_PRINT );
@@ -795,7 +784,7 @@ void CCvar::ConsolePrintf( const char *pFormat, ... ) const
 		return;
 	}
 
-	for ( int i = 0 ; i < c; ++i )
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		m_DisplayFuncs[ i ]->Print( temp );
 	}
@@ -810,7 +799,7 @@ void CCvar::ConsoleDPrintf( const char *pFormat, ... ) const
 	va_end( argptr );
 	temp[ sizeof( temp ) - 1 ] = 0;
 
-	int c = m_DisplayFuncs.Count();
+	intp c = m_DisplayFuncs.Count();
 	if ( c == 0 )
 	{
 		m_TempConsoleBuffer.PutChar( CONSOLE_DPRINT );
@@ -818,45 +807,11 @@ void CCvar::ConsoleDPrintf( const char *pFormat, ... ) const
 		return;
 	}
 
-	for ( int i = 0 ; i < c; ++i )
+	for ( auto f : m_DisplayFuncs )
 	{
-		m_DisplayFuncs[ i ]->DPrint( temp );
+		f->DPrint( temp );
 	}
 }
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-
-void CCvar::PublishToVXConsole()
-{
-	const char *commands[4096];
-	const char *helptext[4096];
-	const ConCommandBase *pCur;
-	int	numCommands = 0;
-
-	// iterate and publish commands to the remote console
-	for ( pCur = m_pConCommandList; pCur; pCur=pCur->GetNext() )
-	{
-		// add unregistered commands to list
-		if ( numCommands < sizeof(commands)/sizeof(commands[0]) )
-		{
-			commands[numCommands] = pCur->GetName();
-			helptext[numCommands] = pCur->GetHelpText();
-			numCommands++;
-		}
-	}
-
-	if ( numCommands )
-	{
-		XBX_rAddCommands( numCommands, commands, helptext );
-	}
-}
-
-#endif
-
 
 //-----------------------------------------------------------------------------
 // Console commands

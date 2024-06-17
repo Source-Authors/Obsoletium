@@ -8,7 +8,7 @@
 
 #include "vstdlib/osversion.h"
 #include "winlite.h"
-#include "strtools.h"
+#include "tier1/strtools.h"
 #include "tier0/dbg.h"
 
 #ifdef OSX
@@ -130,7 +130,7 @@ EOSType GetOSType()
 		eOSVersion = k_eLinuxUnknown;
 		
 		// move past "Linux version "
-		const char *pchVersion = rgchVersionLine + Q_strlen( "Linux version " );
+		const char *pchVersion = rgchVersionLine + ssize( "Linux version " ) - 1;
 		if ( pchRet && *pchVersion == '2' && *(pchVersion+1) == '.' )
 		{
 			pchVersion += 2; // move past "2."
@@ -179,7 +179,7 @@ const char *GetOSDetailString( char *pchOutBuf, int cchOutBuf )
 	if ( !pchOutBuf )
 		return NULL;
 
-	for (int i = 0; i < Q_ARRAYSIZE( pszIssueFile ); i++ )
+	for (size_t i = 0; i < std::size( pszIssueFile ); i++ )
 	{
 		FILE *fdInfo = fopen( pszIssueFile[i], "r" );
 		if ( !fdInfo  )
@@ -187,7 +187,7 @@ const char *GetOSDetailString( char *pchOutBuf, int cchOutBuf )
 		
 		// prepend the buffer with the name of the file we found for easier grouping
 		snprintf( pchOutBuf, cchOutBuf, "%s\n", pszIssueFile[i] );
-		int cchIssueFile = strlen( pszIssueFile[i] ) + 1;
+		intp cchIssueFile = strlen( pszIssueFile[i] ) + 1;
 		ssize_t cubRead = fread( (void*) (pchOutBuf + cchIssueFile) , sizeof(char), cchOutBuf - cchIssueFile, fdInfo );
 		fclose( fdInfo );
 
@@ -334,14 +334,14 @@ EOSType GetOSTypeFromString_Deprecated( const char *pchName )
 #endif
 
 	// if this fires, make sure all OS types are in the map
-	Assert( Q_ARRAYSIZE( k_rgOSTypeToName ) == k_eOSTypeMax ); 
+	static_assert( ssize( k_rgOSTypeToName ) == k_eOSTypeMax ); 
 	if ( !pchName || Q_isempty( pchName ) )
 		return eOSType;
 
-	for ( int iOS = 0; iOS < Q_ARRAYSIZE( k_rgOSTypeToName ) ; iOS++ )
+	for ( auto &m : k_rgOSTypeToName )
 	{
-		if ( !Q_stricmp( k_rgOSTypeToName[iOS].m_pchOSName, pchName ) ) 
-			return k_rgOSTypeToName[iOS].m_OSType;
+		if ( !Q_stricmp( m.m_pchOSName, pchName ) ) 
+			return m.m_OSType;
 	}
 	return eOSType;
 }

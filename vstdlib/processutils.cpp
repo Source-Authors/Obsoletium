@@ -7,6 +7,8 @@
 #if !defined( _X360 )
 #include "winlite.h"
 #endif
+
+#include <system_error>
 #include "vstdlib/iprocessutils.h"
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlstring.h"
@@ -16,7 +18,7 @@
 //-----------------------------------------------------------------------------
 // At the moment, we can only run one process at a time 
 //-----------------------------------------------------------------------------
-class CProcessUtils : public CTier1AppSystem< IProcessUtils >
+class CProcessUtils final : public CTier1AppSystem< IProcessUtils >
 {
 	typedef CTier1AppSystem< IProcessUtils > BaseClass;
 
@@ -30,13 +32,13 @@ public:
 	// Inherited from IProcessUtils
 	virtual ProcessHandle_t StartProcess( const char *pCommandLine, bool bConnectStdPipes );
 	virtual ProcessHandle_t StartProcess( int argc, const char **argv, bool bConnectStdPipes );
-	virtual void CloseProcess( ProcessHandle_t hProcess );
-	virtual void AbortProcess( ProcessHandle_t hProcess );
+	void CloseProcess( ProcessHandle_t hProcess ) override;
+	void AbortProcess( ProcessHandle_t hProcess ) override;
 	virtual bool IsProcessComplete( ProcessHandle_t hProcess );
 	virtual void WaitUntilProcessCompletes( ProcessHandle_t hProcess );
-	virtual int SendProcessInput( ProcessHandle_t hProcess, char *pBuf, int nBufLen );
-	virtual int GetProcessOutputSize( ProcessHandle_t hProcess );
-	virtual int GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, int nBufLen );
+	virtual intp SendProcessInput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen );
+	virtual ptrdiff_t GetProcessOutputSize( ProcessHandle_t hProcess );
+	virtual ptrdiff_t GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen );
 	virtual int GetProcessExitCode( ProcessHandle_t hProcess );
 
 private:
@@ -63,8 +65,8 @@ private:
 	void ShutdownProcess( ProcessHandle_t hProcess );
 
 	// Methods used to read	output back from a process
-	int GetActualProcessOutputSize( ProcessHandle_t hProcess );
-	int GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf, int nBufLen );
+	intp GetActualProcessOutputSize( ProcessHandle_t hProcess );
+	intp GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen );
 
 	CUtlFixedLinkedList< ProcessInfo_t >	m_Processes;
 	ProcessHandle_t m_hCurrentProcess;
@@ -111,12 +113,15 @@ void CProcessUtils::Shutdown()
 //-----------------------------------------------------------------------------
 char *CProcessUtils::GetErrorString( char *pBuf, int nBufLen )
 {
-	FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0, pBuf, nBufLen, NULL );
-	char *p = strchr(pBuf, '\r');	// get rid of \r\n
-	if(p) 
+	const std::string error{std::system_category().message( ::GetLastError() )};
+	const size_t index{error.find('\r')};
+	if ( index != std::string::npos )
 	{
-		p[0] = 0;
+		const std::string substr{error.substr( 0, std::max( index, static_cast<size_t>(1) ) - 1 )};
+		V_strncpy( pBuf, substr.c_str(), nBufLen );
+		return pBuf;
 	}
+	V_strncpy( pBuf, error.c_str(), nBufLen );
 	return pBuf;
 }
 
@@ -128,7 +133,7 @@ ProcessHandle_t CProcessUtils::CreateProcess( ProcessInfo_t &info, bool bConnect
 	si.cb = sizeof(si);
 	if ( bConnectStdPipes )
 	{
-		si.dwFlags = STARTF_USESTDHANDLES;
+		si.dwFlags = STARTF_USESTDHANDLES | STARTF_UNTRUSTEDSOURCE;
 		si.hStdInput = info.m_hChildStdinRd;
 		si.hStdError = info.m_hChildStderrWr;
 		si.hStdOutput = info.m_hChildStdoutWr;
@@ -298,7 +303,7 @@ bool CProcessUtils::IsProcessComplete( ProcessHandle_t hProcess )
 //-----------------------------------------------------------------------------
 // Methods used to write input into a process
 //-----------------------------------------------------------------------------
-int CProcessUtils::SendProcessInput( ProcessHandle_t hProcess, char *pBuf, int nBufLen )
+intp CProcessUtils::SendProcessInput( ProcessHandle_t, char *, intp )
 {
 	// Unimplemented yet
 	Assert( 0 );
@@ -309,7 +314,7 @@ int CProcessUtils::SendProcessInput( ProcessHandle_t hProcess, char *pBuf, int n
 //-----------------------------------------------------------------------------
 // Methods used to read	output back from a process
 //-----------------------------------------------------------------------------
-int CProcessUtils::GetActualProcessOutputSize( ProcessHandle_t hProcess )
+intp CProcessUtils::GetActualProcessOutputSize( ProcessHandle_t hProcess )
 {
 	Assert( hProcess != PROCESS_HANDLE_INVALID );
 
@@ -328,10 +333,10 @@ int CProcessUtils::GetActualProcessOutputSize( ProcessHandle_t hProcess )
 	}
 
 	// Add 1 for auto-NULL termination
-	return ( dwCount > 0 ) ? (int)dwCount + 1 : 0;
+	return ( dwCount > 0 ) ? (intp)dwCount + 1 : 0;
 }
 
-int CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf, int nBufLen )
+intp CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen )
 {
 	ProcessInfo_t& info = m_Processes[ hProcess ];
 	if ( info.m_hChildStdoutRd == INVALID_HANDLE_VALUE )
@@ -362,7 +367,7 @@ int CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf,
 	}
 	
 	// Convert /n/r -> /n
-	int nActualCountRead = 0;
+	intp nActualCountRead = 0;
 	for ( unsigned int i = 0; i < dwRead; ++i )
 	{
 		char c = pTempBuf[i];
@@ -383,7 +388,7 @@ int CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf,
 }
 
 
-int CProcessUtils::GetProcessOutputSize( ProcessHandle_t hProcess )
+intp CProcessUtils::GetProcessOutputSize( ProcessHandle_t hProcess )
 {
 	Assert( m_bInitialized );
 	if ( hProcess == PROCESS_HANDLE_INVALID )
@@ -393,7 +398,7 @@ int CProcessUtils::GetProcessOutputSize( ProcessHandle_t hProcess )
 }
 
 
-int CProcessUtils::GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, int nBufLen )
+intp CProcessUtils::GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen )
 {
 	Assert( m_bInitialized );
 
@@ -401,8 +406,8 @@ int CProcessUtils::GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, int n
 		return 0;
 
 	ProcessInfo_t &info = m_Processes[hProcess];
-	int nCachedBytes = info.m_ProcessOutput.TellPut();
-	int nBytesRead = 0;
+	intp nCachedBytes = info.m_ProcessOutput.TellPut();
+	intp nBytesRead = 0;
 	if ( nCachedBytes )
 	{
 		nBytesRead = min( nBufLen-1, nCachedBytes );
@@ -420,7 +425,7 @@ int CProcessUtils::GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, int n
 	}
 
 	// Auto-NULL terminate
-	int nActualCountRead = GetActualProcessOutput( hProcess, pBuf, nBufLen );
+	intp nActualCountRead = GetActualProcessOutput( hProcess, pBuf, nBufLen );
 	pBuf[nActualCountRead] = 0;
 	return nActualCountRead + nBytesRead + 1;
 }
@@ -466,12 +471,12 @@ void CProcessUtils::WaitUntilProcessCompletes( ProcessHandle_t hProcess )
 		// process to continue
 		while ( WaitForSingleObject( info.m_hProcess, 100 ) == WAIT_TIMEOUT )
 		{
-			int nLen = GetActualProcessOutputSize( hProcess );
+			intp nLen = GetActualProcessOutputSize( hProcess );
 			if ( nLen > 0 )
 			{
-				int nPut = info.m_ProcessOutput.TellPut();
+				intp nPut = info.m_ProcessOutput.TellPut();
 				info.m_ProcessOutput.EnsureCapacity( nPut + nLen );
-				int nBytesRead = GetActualProcessOutput( hProcess, (char*)info.m_ProcessOutput.PeekPut(), nLen );
+				intp nBytesRead = GetActualProcessOutput( hProcess, (char*)info.m_ProcessOutput.PeekPut(), nLen );
 				info.m_ProcessOutput.SeekPut( CUtlBuffer::SEEK_HEAD, nPut + nBytesRead );
 			}
 		}

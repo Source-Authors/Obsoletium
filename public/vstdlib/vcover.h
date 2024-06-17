@@ -85,7 +85,7 @@ private:
 	class CLocationLess
 	{
 	public:
-		CLocationLess( int ignored ) {}
+		CLocationLess( int ) {}
 		bool operator!() { return false; }
 
 		bool operator()(  const Location_t &lhs, const Location_t &rhs ) const
@@ -100,7 +100,7 @@ private:
 	};
 
 	bool m_bActive;
-	int m_depth;
+	intp m_depth;
 	unsigned m_token;
 
 	CUtlRBTree< Location_t, unsigned short, CLocationLess > m_locations;

@@ -64,10 +64,10 @@ static const Language_t s_LanguageNames[] =
 //-----------------------------------------------------------------------------
 int GetLanguageCodeID(ELanguage eLang)
 {
-	for ( uint iLang = 0; iLang < Q_ARRAYSIZE(s_LanguageNames); ++iLang )
+	for ( auto &n : s_LanguageNames )
 	{
-		if ( s_LanguageNames[iLang].m_ELanguage == eLang )
-			return s_LanguageNames[iLang].m_LanguageCodeID;
+		if ( n.m_ELanguage == eLang )
+			return n.m_LanguageCodeID;
 	}
 
 	// default to English
@@ -79,15 +79,15 @@ int GetLanguageCodeID(ELanguage eLang)
 //-----------------------------------------------------------------------------
 ELanguage PchLanguageToELanguage( const char *pchShortName, ELanguage eDefault )
 {
-	Assert( Q_ARRAYSIZE(s_LanguageNames) == k_Lang_MAX + 1 );
+	Assert( ssize(s_LanguageNames) == k_Lang_MAX + 1 );
 	if ( !pchShortName )
 		return eDefault;
 
-	for ( uint iLang = 0; iLang < Q_ARRAYSIZE(s_LanguageNames); ++iLang )
+	for ( auto &n : s_LanguageNames )
 	{
-		if ( !Q_stricmp( pchShortName, s_LanguageNames[iLang].m_pchShortName ) )
+		if ( !Q_stricmp( pchShortName, n.m_pchShortName ) )
 		{
-			return s_LanguageNames[iLang].m_ELanguage;
+			return n.m_ELanguage;
 		}
 	}
 
@@ -100,7 +100,7 @@ ELanguage PchLanguageToELanguage( const char *pchShortName, ELanguage eDefault )
 //-----------------------------------------------------------------------------
 ELanguage PchLanguageICUCodeToELanguage( const char *pchICUCode, ELanguage eDefault )
 {
-	Assert( Q_ARRAYSIZE(s_LanguageNames) == k_Lang_MAX + 1 );
+	Assert( ssize(s_LanguageNames) == k_Lang_MAX + 1 );
 	if ( !pchICUCode )
 		return eDefault;
 
@@ -110,17 +110,17 @@ ELanguage PchLanguageICUCodeToELanguage( const char *pchICUCode, ELanguage eDefa
 
 	// we only have 5 character ICU codes so this should be enough room
 	char rchCleanedCode[ 6 ];
-	Q_strncpy( rchCleanedCode, pchICUCode, Q_ARRAYSIZE( rchCleanedCode ) );
+	V_strcpy_safe( rchCleanedCode, pchICUCode );
 	if( nLen >= 3 && rchCleanedCode[ 2 ] == '-' )
 	{
 		rchCleanedCode[ 2 ] = '_';
 	}
 
-	for ( uint iLang = 0; iLang < Q_ARRAYSIZE(s_LanguageNames); ++iLang )
+	for ( auto &n : s_LanguageNames )
 	{
-		if ( !Q_strnicmp( rchCleanedCode, s_LanguageNames[iLang].m_pchICUName, nLen ) )
+		if ( !Q_strnicmp( rchCleanedCode, n.m_pchICUName, nLen ) )
 		{
-			return s_LanguageNames[iLang].m_ELanguage;
+			return n.m_ELanguage;
 		}
 	}
 
@@ -134,14 +134,14 @@ ELanguage PchLanguageICUCodeToELanguage( const char *pchICUCode, ELanguage eDefa
 //-----------------------------------------------------------------------------
 const char *GetLanguageShortName( ELanguage eLang )
 {
-	COMPILE_TIME_ASSERT( Q_ARRAYSIZE(s_LanguageNames) == k_Lang_MAX + 1 );
+	COMPILE_TIME_ASSERT( ssize(s_LanguageNames) == k_Lang_MAX + 1 );
 	if ( s_LanguageNames[ eLang + 1 ].m_ELanguage == eLang )
 	{
-		Assert( eLang + 1 < ARRAYSIZE(s_LanguageNames) );
+		Assert( eLang + 1 < ssize(s_LanguageNames) );
 		return s_LanguageNames[ eLang + 1 ].m_pchShortName;
 	}
 
-	Assert( !"enum ELanguage order mismatched from Language_t s_LanguageNames, fix it!" );
+	AssertMsg( false, "enum ELanguage order mismatched from Language_t s_LanguageNames, fix it!" );
 	return s_LanguageNames[0].m_pchShortName;
 }
 
@@ -150,14 +150,14 @@ const char *GetLanguageShortName( ELanguage eLang )
 //-----------------------------------------------------------------------------
 const char *GetLanguageICUName( ELanguage eLang )
 {
-	COMPILE_TIME_ASSERT( Q_ARRAYSIZE(s_LanguageNames) == k_Lang_MAX + 1 );
+	COMPILE_TIME_ASSERT( ssize(s_LanguageNames) == k_Lang_MAX + 1 );
 	if ( s_LanguageNames[ eLang + 1 ].m_ELanguage == eLang )
 	{
-		Assert( eLang + 1 < ARRAYSIZE(s_LanguageNames) );
+		Assert( eLang + 1 < ssize(s_LanguageNames) );
 		return s_LanguageNames[ eLang + 1 ].m_pchICUName;
 	}
 
-	Assert( !"enum ELanguage order mismatched from Language_t s_LanguageNames, fix it!" );
+	AssertMsg( false, "enum ELanguage order mismatched from Language_t s_LanguageNames, fix it!" );
 	return s_LanguageNames[0].m_pchICUName;
 }
 
@@ -205,14 +205,14 @@ const char *GetLangugeCLocaleName( ELanguage eLang )
 //-----------------------------------------------------------------------------
 const char *GetLanguageVGUILocalization( ELanguage eLang )
 {
-	COMPILE_TIME_ASSERT( Q_ARRAYSIZE(s_LanguageNames) == k_Lang_MAX + 1 );
+	COMPILE_TIME_ASSERT( ssize(s_LanguageNames) == k_Lang_MAX + 1 );
 	if ( s_LanguageNames[ eLang + 1 ].m_ELanguage == eLang )
 	{
-		Assert( eLang + 1 < ARRAYSIZE(s_LanguageNames) );
+		Assert( eLang + 1 < ssize(s_LanguageNames) );
 		return s_LanguageNames[ eLang + 1 ].m_pchVGUILocalizationName;
 	}
 
-	Assert( !"enum ELanguage order mismatched from Language_t s_LanguageNames, fix it!" );
+	AssertMsg( false, "enum ELanguage order mismatched from Language_t s_LanguageNames, fix it!" );
 	return s_LanguageNames[0].m_pchVGUILocalizationName;
 }
 

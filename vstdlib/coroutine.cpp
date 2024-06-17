@@ -318,7 +318,7 @@ public:
 			// if we do the free here at our normal point though the stack is invalid since it's in 
 			// the middle of swapping.  Instead move it to a temp buffer now and free  while the stack 
 			// frames in place are still ok.
-			Assert( m_cubSavedStack < Q_ARRAYSIZE( rgStackTempBuffer ) );
+			Assert( m_cubSavedStack < ssize( rgStackTempBuffer ) );
 			memcpy( &rgStackTempBuffer[0], m_pSavedStack, m_cubSavedStack );
 
 			FreePv( m_pSavedStack );
@@ -454,7 +454,7 @@ public:
 	byte *m_pStackHigh;		// position of initial entry to the coroutine (stack ptr before continue is ran)
 	byte *m_pStackLow;		// low point on the stack we plan on saving (stack ptr when we yield)
 	byte *m_pSavedStack;	// pointer to the saved stack (allocated on heap)
-	int m_cubSavedStack;	// amount of data on stack
+	ptrdiff_t m_cubSavedStack;	// amount of data on stack
 	const char *m_pchName;
 	int m_iJumpCode;
 	const char *m_pchDebugMsg;
@@ -613,7 +613,7 @@ void Coroutine_ReleaseThreadMemory()
 
 	if ( g_ThreadLocalCoroutineMgr != NULL )
 	{
-		int iCoroutineMgr = g_VecPCoroutineMgr.Find( g_ThreadLocalCoroutineMgr );
+		intp iCoroutineMgr = g_VecPCoroutineMgr.Find( g_ThreadLocalCoroutineMgr );
 		delete g_VecPCoroutineMgr[iCoroutineMgr];
 		g_VecPCoroutineMgr.Remove( iCoroutineMgr );
 	}
@@ -712,10 +712,10 @@ bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchDebugMsg
 				if ( coroutine.m_pStackLow < pStackSavePoint )
 				{
 					// push ourselves down
-					int cubPush = pStackSavePoint - coroutine.m_pStackLow + 512;
+					ptrdiff_t cubPush = pStackSavePoint - coroutine.m_pStackLow + 512;
 					volatile byte *pvStackGap = (byte*)stackalloc( cubPush );
 					pvStackGap[ cubPush-1 ] = 0xF;
-					CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %d (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );
+					CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );
 				}
 			}
 
@@ -926,7 +926,7 @@ void Coroutine_YieldToMain()
 			if ( coroutine.m_pchDebugMsg )
 			{
 				// Generate a failed assertion
-				AssertMsg1( !"Coroutine assert requested", "%s", coroutine.m_pchDebugMsg );
+				AssertMsg1( false, "%s", coroutine.m_pchDebugMsg );
 			}
 			else
 			{
@@ -951,10 +951,10 @@ void Coroutine_YieldToMain()
 		GetStackPtr( pStackPtr );
 		if ( pStackPtr >= (coroutinePrev.m_pStackHigh - coroutinePrev.m_cubSavedStack) && ( pStackPtr - 2048 ) <= coroutinePrev.m_pStackHigh )
 		{
-			int cubPush = coroutinePrev.m_cubSavedStack + 512;
+			ptrdiff_t cubPush = coroutinePrev.m_cubSavedStack + 512;
 			volatile byte *pvStackGap = (byte*)stackalloc( cubPush );
 			pvStackGap[ cubPush - 1 ] = 0xF;
-			CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %d (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );
+			CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );
 		}
 
 		CoroutineDbgMsg( g_fmtstr.sprintf( "RestoreStack() %s#%x [%x - %x]\n", coroutinePrev.m_pchName, coroutinePrev.m_hCoroutine, coroutinePrev.m_pStackLow, coroutinePrev.m_pStackHigh ) );
@@ -964,8 +964,6 @@ void Coroutine_YieldToMain()
 		// Our stack may have been mucked with, can't use local vars anymore!
 		RW_MEMORY_BARRIER;
 		Coroutine_longjmp( GCoroutineMgr().GetPreviouslyActiveCoroutine().GetRegisters(), k_iSetJmpContinue );
-
-		UNREACHABLE();
 	}
 	else
 	{
@@ -991,8 +989,6 @@ void Coroutine_Finish()
 	RW_MEMORY_BARRIER;
 	// go back to the main thread, signaling that we're done
 	Coroutine_longjmp( GCoroutineMgr().GetPreviouslyActiveCoroutine().GetRegisters(), k_iSetJmpDone );
-
-	UNREACHABLE();
 }
 
 //-----------------------------------------------------------------------------
@@ -1014,7 +1010,7 @@ void CoroutineTestFunc( void *pvRelaunch )
 	if ( !pvRelaunch )
 	{
 		// test launching coroutines inside of coroutines
-		HCoroutine hCoroutine = Coroutine_Create( &CoroutineTestFunc, (void *)(size_t)0xFFFFFFFF );
+		HCoroutine hCoroutine = Coroutine_Create( &CoroutineTestFunc, (void *)(size_t)-1 );
 		// first pass the coroutines should all still be running
 		DbgVerify( Coroutine_Continue( hCoroutine, NULL ) );
 		// second pass the coroutines should all be finished
@@ -1100,7 +1096,7 @@ bool Coroutine_Test()
 	}
 
 	// now do a whole bunch of them
-	static const int k_nSimultaneousCoroutines = 10 * 1000;
+	constexpr int k_nSimultaneousCoroutines = 10 * 1000;
 	CUtlVector<HCoroutine> coroutines;
 	Assert( coroutines.Base() == NULL );
 	for (int i = 0; i < k_nSimultaneousCoroutines; i++)
@@ -1108,16 +1104,16 @@ bool Coroutine_Test()
 		coroutines.AddToTail( Coroutine_Create( &CoroutineTestFunc, NULL ) );
 	}
 
-	for (int i = 0; i < coroutines.Count(); i++)
+	for ( auto h : coroutines )
 	{
 		// first pass the coroutines should all still be running
-		DbgVerify( Coroutine_Continue( coroutines[i], NULL ) );
+		DbgVerify( Coroutine_Continue( h, NULL ) );
 	}
 
-	for (int i = 0; i < coroutines.Count(); i++)
+	for ( auto h : coroutines )
 	{
 		// second pass the coroutines should all be finished
-		DbgVerifyNot( Coroutine_Continue( coroutines[i], NULL ) );
+		DbgVerifyNot( Coroutine_Continue( h, NULL ) );
 	}
 
 	return true;
@@ -1143,14 +1139,14 @@ size_t Coroutine_GetStackDepth()
 //-----------------------------------------------------------------------------
 // Purpose: validates memory
 //-----------------------------------------------------------------------------
-void Coroutine_ValidateGlobals( class CValidator &validator )
+void Coroutine_ValidateGlobals( [[maybe_unused]] class CValidator &validator )
 {
 #ifdef DBGFLAG_VALIDATE
 	AUTO_LOCK( g_ThreadMutexCoroutineMgr );
 
-	for ( int i = 0; i < g_VecPCoroutineMgr.Count(); i++ )
+	for ( auto m : g_VecPCoroutineMgr )
 	{
-		ValidatePtr( g_VecPCoroutineMgr[i] );
+		ValidatePtr( m );
 	}
 	ValidateObj( g_VecPCoroutineMgr );
 

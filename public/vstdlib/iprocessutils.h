@@ -28,7 +28,7 @@ enum
 //-----------------------------------------------------------------------------
 // Interface version
 //-----------------------------------------------------------------------------
-#define PROCESS_UTILS_INTERFACE_VERSION "VProcessUtils001"
+constexpr inline char PROCESS_UTILS_INTERFACE_VERSION[]{"VProcessUtils001"};
 
 
 //-----------------------------------------------------------------------------
@@ -50,11 +50,11 @@ public:
 	virtual void WaitUntilProcessCompletes( ProcessHandle_t hProcess ) = 0;
 
 	// Methods used to write input into a process
-	virtual int SendProcessInput( ProcessHandle_t hProcess, char *pBuf, int nBufLen ) = 0;
+	virtual intp SendProcessInput( ProcessHandle_t hProcess, char *pBuf, ptrdiff_t nBufLen ) = 0;
 
 	// Methods used to read	output back from a process
-	virtual int GetProcessOutputSize( ProcessHandle_t hProcess ) = 0;
-	virtual int GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, int nBufLen ) = 0;
+	virtual ptrdiff_t GetProcessOutputSize( ProcessHandle_t hProcess ) = 0;
+	virtual ptrdiff_t GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, ptrdiff_t nBufLen ) = 0;
 	
 	// Returns the exit code for the process. Doesn't work unless the process is complete
 	virtual int GetProcessExitCode( ProcessHandle_t hProcess ) = 0;

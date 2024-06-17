@@ -29,7 +29,7 @@ class CJobThread;
 
 //-----------------------------------------------------------------------------
 
-inline void ServiceJobAndRelease( CJob *pJob, int iThread = -1 )
+inline void ServiceJobAndRelease( CJob *pJob, intp iThread = -1 )
 {
 	// TryLock() would only fail if another thread has entered
 	// Execute() or Abort()
@@ -45,7 +45,7 @@ inline void ServiceJobAndRelease( CJob *pJob, int iThread = -1 )
 
 //-----------------------------------------------------------------------------
 
-class alignas(16) CJobQueue : CAlignedNewDelete<16>
+class alignas(16) CJobQueue final : CAlignedNewDelete<16>
 {
 public:
 	CJobQueue() :
@@ -90,7 +90,7 @@ public:
 		return NULL;
 	}
 
-	int Push( CJob *pJob, int iThread = -1 )
+	int Push( CJob *pJob, [[maybe_unused]] int iThread = -1 )
 	{
 		pJob->AddRef();
 
@@ -190,23 +190,23 @@ public:
 	//-----------------------------------------------------
 	// Thread functions
 	//-----------------------------------------------------
-	bool Start( const ThreadPoolStartParams_t &startParams = ThreadPoolStartParams_t() ) { return Start( startParams, NULL ); }
-	bool Start( const ThreadPoolStartParams_t &startParams, const char *pszNameOverride );
-	bool Stop( int timeout = TT_INFINITE );
-	void Distribute( bool bDistribute = true, int *pAffinityTable = NULL );
+	bool Start( const ThreadPoolStartParams_t &startParams = ThreadPoolStartParams_t() ) override { return Start( startParams, NULL ); }
+	bool Start( const ThreadPoolStartParams_t &startParams, const char *pszNameOverride ) override;
+	bool Stop( int timeout = TT_INFINITE ) override;
+	void Distribute( bool bDistribute = true, int *pAffinityTable = NULL ) override;
 
 	//-----------------------------------------------------
 	// Functions for any thread
 	//-----------------------------------------------------
-	unsigned GetJobCount()							{ return m_nJobs; }
-	int NumThreads();
-	int NumIdleThreads();
+	unsigned GetJobCount() const override { return m_nJobs; }
+	intp NumThreads() const override;
+	intp NumIdleThreads() const override;
 
 	//-----------------------------------------------------
 	// Pause/resume processing jobs
 	//-----------------------------------------------------
-	int SuspendExecution();
-	int ResumeExecution();
+	int SuspendExecution() override;
+	int ResumeExecution() override;
 
 	//-----------------------------------------------------
 	// Offer the current thread to the pool
@@ -218,7 +218,7 @@ public:
 	//-----------------------------------------------------
 	// Add a native job to the queue (master thread)
 	//-----------------------------------------------------
-	void AddJob( CJob * );
+	void AddJob( CJob * ) override;
 	void InsertJobInQueue( CJob * );
 
 	//-----------------------------------------------------
@@ -231,18 +231,18 @@ public:
 	//-----------------------------------------------------
 	// Add an function object to the queue (master thread)
 	//-----------------------------------------------------
-	void AddFunctorInternal( CFunctor *, CJob ** = NULL, const char *pszDescription = NULL, unsigned flags = 0 );
+	void AddFunctorInternal( CFunctor *, CJob ** = NULL, const char *pszDescription = NULL, unsigned flags = 0 ) override;
 
 	//-----------------------------------------------------
 	// Remove a job from the queue (master thread)
 	//-----------------------------------------------------
-	virtual void ChangePriority( CJob *p, JobPriority_t priority );
+	void ChangePriority( CJob *p, JobPriority_t priority ) override;
 
 	//-----------------------------------------------------
 	// Bulk job manipulation (blocking)
 	//-----------------------------------------------------
 	int ExecuteToPriority( JobPriority_t toPriority, JobFilter_t pfnFilter = NULL  );
-	int AbortAll();
+	int AbortAll() override;
 
 	virtual void Reserved1() {}
 
@@ -327,10 +327,10 @@ public:
 
 //-----------------------------------------------------------------------------
 // dimhotepus: Fix aligned alloc.
-class CJobThread : public CAlignedNewDelete<16, CWorkerThread>
+class CJobThread final : public CAlignedNewDelete<16, CWorkerThread>
 {
 public:
-	CJobThread( CThreadPool *pOwner, int iThread ) : 
+	CJobThread( CThreadPool *pOwner, intp iThread ) : 
 		m_SharedQueue( pOwner->m_SharedQueue ),
 		m_pOwner( pOwner ),
 		m_iThread( iThread )
@@ -369,12 +369,12 @@ private:
 		waitHandles[DIRECT_QUEUE] 		= m_DirectQueue.GetEventHandle().GetHandle();
 		
 #ifdef _DEBUG
-		while ( ( waitResult = WaitForMultipleObjects( ARRAYSIZE(waitHandles), waitHandles, FALSE, 10 ) ) == WAIT_TIMEOUT )
+		while ( ( waitResult = WaitForMultipleObjects( ssize(waitHandles), waitHandles, FALSE, 10 ) ) == WAIT_TIMEOUT )
 		{
-			waitResult = waitResult; // break here //-V570
+			(void) waitResult; // break here
 		}
 #else
-		waitResult = WaitForMultipleObjects( ARRAYSIZE(waitHandles), waitHandles, FALSE, INFINITE );
+		waitResult = WaitForMultipleObjects( ssize(waitHandles), waitHandles, FALSE, INFINITE );
 #endif
 #else // !win32
 		bool bSet = false;
@@ -490,7 +490,7 @@ private:
 	CJobQueue &			m_SharedQueue;
 	CThreadPool *		m_pOwner;
 	CThreadManualEvent	m_IdleEvent;
-	int					m_iThread;
+	intp				m_iThread;
 };
 
 //-----------------------------------------------------------------------------
@@ -522,7 +522,7 @@ CThreadPool::~CThreadPool()
 //---------------------------------------------------------
 // 
 //---------------------------------------------------------
-int CThreadPool::NumThreads()
+intp CThreadPool::NumThreads() const
 {
 	return m_Threads.Count();
 }
@@ -530,7 +530,7 @@ int CThreadPool::NumThreads()
 //---------------------------------------------------------
 // 
 //---------------------------------------------------------
-int CThreadPool::NumIdleThreads()
+intp CThreadPool::NumIdleThreads() const
 {
 	return m_nIdleThreads;
 }
@@ -587,7 +587,7 @@ int CThreadPool::ResumeExecution()
 	AUTO_LOCK( m_SuspendMutex );
 	AssertMsg( m_nSuspend >= 1, "Attempted resume when not suspended");
 	int result = m_nSuspend--;
-	if (m_nSuspend == 0 )
+	if ( m_nSuspend == 0 )
 	{
 		for ( auto &&t : m_Threads )
 		{
@@ -929,17 +929,16 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 		else
 		{
 			// dimhotepus: Use physical CPU cores count directly instead of dances with HT and logical cores.
-			// The 12th Gen Intel Core processor¡¯s performance hybrid architecture combines high-performance
+			// The 12th Gen Intel Core processors performance hybrid architecture combines high-performance
 			// P-cores with highly efficient E-cores in one silicon chip.  So physical != logical / 2 (HT).
 			// See https://www.intel.com/content/www/us/en/developer/articles/guide/12th-gen-intel-core-processor-gamedev-guide.html
 			nThreads = ci.m_nPhysicalProcessors - 1;
-			if ( IsPC() )
+			// dimhotepus: Max 6 cores instead of old 4. Handle 6 good enough (+need to optimise).
+			if ( nThreads > 5 )
 			{
-				if ( nThreads > 3 )
-				{
-					DevMsg( "Defaulting to limit of 3 worker threads, use -threads on command line if want more\n" ); // Current >4 processor configs don't really work so well, probably due to cache issues? (toml 7/12/2007)
-					nThreads = 3;
-				}
+				// Current >6 processor configs don't really work so well, probably due to cache issues? (toml 7/12/2007)
+				DevMsg( "Defaulting to limit of 5 worker threads, use -threads on command line if want more\n" );
+				nThreads = 5;
 			}
 		}
 
@@ -1005,14 +1004,16 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 	}
 	while ( nThreads-- )
 	{
-		int iThread = m_Threads.AddToTail();
+		intp iThread = m_Threads.AddToTail();
 		m_IdleEvents.AddToTail();
+
 		auto *jobThread = new CJobThread( this, iThread );
 		m_Threads[iThread] = jobThread;
 		m_IdleEvents[iThread] = &jobThread->GetIdleEvent();
-		jobThread->SetName( CFmtStr( "%s%d", pszName, iThread ) );
+		jobThread->SetName( CFmtStr( "%s%zd", pszName, iThread ) );
 		jobThread->Start( nStackSize );
 		jobThread->GetIdleEvent().Wait();
+
 #ifdef WIN32
 		ThreadSetPriority( (ThreadHandle_t)jobThread->GetThreadHandle(), priority );
 #endif
@@ -1057,7 +1058,7 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 #else
 				// no affinity table, distribution is cycled across all available
 				int iProc = 0;
-				for ( int i = 0; i < m_Threads.Count(); i++ )
+				for ( intp i = 0; i < m_Threads.Count(); i++ )
 				{
 					iProc += nHwThreadsPer;
 					if ( iProc >= ci.m_nLogicalProcessors )
@@ -1104,7 +1105,7 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 
 //---------------------------------------------------------
 
-bool CThreadPool::Stop( int timeout )
+bool CThreadPool::Stop( [[maybe_unused]] int timeout )
 {
 	for ( auto &&t : m_Threads )
 	{
@@ -1216,13 +1217,13 @@ void Test( bool bDistribute, bool bSleep = true, bool bFinishExecute = false, bo
 				}
 
 				CCountJob jobs[4000];
-				g_nTotalToComplete = ARRAYSIZE(jobs);
+				g_nTotalToComplete = ssize(jobs);
 
 				CFastTimer timer, suspendTimer;
 
 				suspendTimer.Start();
 				timer.Start();
-				for ( int j = 0; j < ARRAYSIZE(jobs); j++ )
+				for ( size_t j = 0; j < std::size(jobs); j++ )
 				{
 					jobs[j].SetFlags( JF_QUEUE );
 					jobs[j].bDoWork = bDoWork;
@@ -1249,7 +1250,7 @@ void Test( bool bDistribute, bool bSleep = true, bool bFinishExecute = false, bo
 				g_done.Reset();
 
 				int counts[8] = { 0 };
-				for ( int j = 0; j < ARRAYSIZE(jobs); j++ )
+				for ( size_t j = 0; j < std::size(jobs); j++ )
 				{
 					if ( jobs[j].GetServiceThread() != -1 )
 					{
@@ -1335,7 +1336,7 @@ void TestForcedExecute()
 			g_pTestThreadPool->Start( params, "Tst" );
 
 			static CExecuteTestJob jobs[4000];
-			for ( int j = 0; j < ARRAYSIZE(jobs); j++ )
+			for ( size_t j = 0; j < std::size(jobs); j++ )
 			{
 				g_ReadyToExecute = false;
 				for ( int k = 0; k < i; k++ )
