@@ -74,7 +74,7 @@ struct CFileHeaderFixedData
 
 #define PACKEDFILE_DIR_HASH_SIZE 43
 
-static int s_FileHeaderSize( char const *pName, int nNumDataParts, int nNumMetaDataBytes )
+static intp s_FileHeaderSize( char const *pName, int nNumDataParts, int nNumMetaDataBytes )
 {
 	return 1 + strlen( pName ) + 							// name plus nul
 		sizeof( uint32 ) +									// file crc
@@ -260,8 +260,8 @@ bool CPackedStore::IsEmpty( void ) const
 
 static void StripTrailingString( char *pszBuf, const char *pszStrip )
 {
-	int lBuf = V_strlen( pszBuf );
-	int lStrip = V_strlen( pszStrip );
+	intp lBuf = V_strlen( pszBuf );
+	intp lStrip = V_strlen( pszStrip );
 	if ( lBuf < lStrip )
 		return;
 	char *pExpectedPos = pszBuf + lBuf - lStrip;
@@ -374,7 +374,7 @@ CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, IBaseFile
 			dirFile.MustRead( m_vecChunkHashFraction.Base(), cbVecHashes );
 			FOR_EACH_VEC( m_vecChunkHashFraction, i )
 			{
-				int idxFound = m_vecChunkHashFraction.Find( m_vecChunkHashFraction[i] );
+				intp idxFound = m_vecChunkHashFraction.Find( m_vecChunkHashFraction[i] );
 				Assert ( idxFound == i ); idxFound;
 			}
 
@@ -647,19 +647,19 @@ void CPackedStore::Write( void )
 
 	if ( m_EmbeddedChunkData.Count() )
 	{
-		int nRemainingSize = m_EmbeddedChunkData.Count();
+		intp nRemainingSize = m_EmbeddedChunkData.Count();
 		CUtlVector<uint8> writeBuffer;
 		
 		writeBuffer.SetCount( 524288 );
-		int nChunkOffset = 0;
+		intp nChunkOffset = 0;
 
 		while ( nRemainingSize > 0 )
 		{
 			// We'll write around half a meg of contiguous memory at once. Any more and the SDK's VPK 
 			// utility has a higher chance of choking on low-end machines.
-			int nWriteSize = MIN( nRemainingSize, 524288 );
+			intp nWriteSize = MIN( nRemainingSize, 524288 );
 			
-			for ( int i = 0; i < nWriteSize; i++ )
+			for ( intp i = 0; i < nWriteSize; i++ )
 			{
 				writeBuffer[i] = m_EmbeddedChunkData[nChunkOffset++];
 			}
@@ -1408,7 +1408,7 @@ bool CPackedStore::FindFileHashFraction( int nPackFileNumber, int nFileFraction,
 	fileHashFractionFind.m_nFileFraction = nFileFraction;
 	fileHashFractionFind.m_nPackFileNumber = nPackFileNumber;
 
-	int idx = m_vecChunkHashFraction.Find( fileHashFractionFind );
+	intp idx = m_vecChunkHashFraction.Find( fileHashFractionFind );
 	if ( idx == m_vecChunkHashFraction.InvalidIndex() )
 	{
 		Assert( false );
@@ -1515,8 +1515,8 @@ void CPackedStore::AddFileToDirectory( const VPKContentFileInfo_t &info )
 	char pszDir[MAX_PATH];
 	SplitFileComponents( info.m_sName, pszDir, pszBase, pszExt );
 	int nNumDataParts = 1;
-	int nFileDataSize = s_FileHeaderSize( pszBase, nNumDataParts, info.m_iPreloadSize );
-	int nTotalHeaderSize = ( int )( nFileDataSize + ( 2 + strlen( pszExt ) ) + ( 2 + strlen( pszDir ) ) );
+	intp nFileDataSize = s_FileHeaderSize( pszBase, nNumDataParts, info.m_iPreloadSize );
+	intp nTotalHeaderSize = ( intp )( nFileDataSize + ( 2 + strlen( pszExt ) ) + ( 2 + strlen( pszDir ) ) );
 	char *pBuf = ( char * ) stackalloc( nTotalHeaderSize );
 	char *pOut = pBuf;
 	strcpy( pOut, pszExt );
@@ -1561,7 +1561,7 @@ void CPackedStore::AddFileToDirectory( const VPKContentFileInfo_t &info )
 
 	// now, we need to insert our header, figuring out how many of the fields are already there
 	int nExtensionHash = HashString( pszExt ) % PACKEDFILE_EXT_HASH_SIZE;
-	int nInsertOffset = 0;
+	intp nInsertOffset = 0;
 	CFileExtensionData const *pExt = m_pExtensionData[nExtensionHash].FindNamedNodeCaseSensitive( pszExt );
 	char *pHeaderInsertPtr = pBuf;
 
@@ -1847,7 +1847,7 @@ void CPackedStore::BuildFindFirstCache()
 
 	// Init
 	V_strncpy( szLastDirFound, "$$$$$$$HighlyUnlikelyPathForInitializationPurposes#######", sizeof( szLastDirFound ) );
-	m_dirContents.SetLessFunc( DefLessFunc( int ) );
+	m_dirContents.SetLessFunc( DefLessFunc( intp ) );
 
 	// Get all files in the VPK
 	GetFileList( allVPKFiles, false, true );
@@ -1905,9 +1905,9 @@ int CPackedStore::GetFileAndDirLists( const char *pWildCard, CUtlStringList &out
 		char szWildCardBase[64];
 		char szWildCardExt[20];
 		
-		int nLenWildcardPath = 0;
-		int nLenWildcardBase = 0;
-		int nLenWildcardExt = 0;
+		intp nLenWildcardPath = 0;
+		intp nLenWildcardBase = 0;
+		intp nLenWildcardExt = 0;
 
 		bool bBaseWildcard = true;
 		bool bExtWildcard = true;

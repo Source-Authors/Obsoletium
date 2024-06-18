@@ -95,14 +95,14 @@ struct EntityInfo_t
 	uint8						m_flags;
 	char						m_nLevel[NUM_TREES];	// Which level voxel tree is it in?
 	unsigned short				m_nVisitBit[NUM_TREES];
-	int							m_iLeafList[NUM_TREES];	// Index into the leaf pool - leaf list for entity (m_aLeafList).
+	intp						m_iLeafList[NUM_TREES];	// Index into the leaf pool - leaf list for entity (m_aLeafList).
 };
 
 
 struct LeafListData_t
 {
 	UtlHashFastHandle_t		m_hVoxel;	// Voxel handle the entity is in.
-	int						m_iEntity;	// Entity list index for voxel
+	intp					m_iEntity;	// Entity list index for voxel
 };
 
 typedef CUtlFixedLinkedList<LeafListData_t>	CLeafList;
@@ -206,7 +206,7 @@ private:
 
 	inline void PackVoxel( int iX, int iY, int iZ, Voxel_t &voxel );
 
-	typedef CUtlHashFixed<int, SPHASH_BUCKET_COUNT, CUtlHashFixedGenericHash<SPHASH_BUCKET_COUNT> > CHashTable;
+	typedef CUtlHashFixed<intp, SPHASH_BUCKET_COUNT, CUtlHashFixedGenericHash<SPHASH_BUCKET_COUNT> > CHashTable;
 
 	Vector											m_vecVoxelOrigin;	// Voxel space (hash) origin.
 	CHashTable										m_aVoxelHash;		// Voxel tree (hash) - data = entity list head handle (m_aEntityList)
@@ -603,7 +603,7 @@ void CVoxelHash::InsertIntoTree( SpatialPartitionHandle_t hPartition, const Vect
 #endif
 
 				// Entity list.
-				int iEntity = m_aEntityList.Alloc( true );
+				intp iEntity = m_aEntityList.Alloc( true );
 				m_aEntityList[iEntity] = hPartition;
 				
 				UtlHashFastHandle_t hHash = m_aVoxelHash.Find( voxel.uiVoxel );
@@ -614,13 +614,13 @@ void CVoxelHash::InsertIntoTree( SpatialPartitionHandle_t hPartition, const Vect
 				}
 				else
 				{
-					int iHead = m_aVoxelHash.Element( hHash );
+					intp iHead = m_aVoxelHash.Element( hHash );
 					m_aEntityList.LinkBefore( iHead, iEntity );
 					m_aVoxelHash[hHash] = iEntity;
 				}
 				
 				// Leaf list.
-				int iLeafList = leafList.Alloc( true );
+				intp iLeafList = leafList.Alloc( true );
 				leafList[iLeafList].m_hVoxel = hHash;
 				leafList[iLeafList].m_iEntity = iEntity;
 				
@@ -630,7 +630,7 @@ void CVoxelHash::InsertIntoTree( SpatialPartitionHandle_t hPartition, const Vect
 				}
 				else
 				{
-					int iHead = info.m_iLeafList[treeId];
+					intp iHead = info.m_iLeafList[treeId];
 					leafList.LinkBefore( iHead, iLeafList );
 					info.m_iLeafList[treeId] = iLeafList;
 				}
@@ -649,8 +649,8 @@ void CVoxelHash::RemoveFromTree( SpatialPartitionHandle_t hPartition )
 	CLeafList &leafList = m_pTree->LeafList();
 	int treeId = m_pTree->GetTreeId();
 
-	int iLeaf = data.m_iLeafList[treeId];
-	int iNext;
+	intp iLeaf = data.m_iLeafList[treeId];
+	intp iNext;
 	while ( iLeaf != leafList.InvalidIndex() )
 	{
 		// Get the next voxel - if any.
@@ -664,12 +664,12 @@ void CVoxelHash::RemoveFromTree( SpatialPartitionHandle_t hPartition )
 		}
 
 		// Get the head of the entity list for the voxel.
-		int iEntity = leafList[iLeaf].m_iEntity;
-		int iEntityHead = m_aVoxelHash[hHash];
+		intp iEntity = leafList[iLeaf].m_iEntity;
+		intp iEntityHead = m_aVoxelHash[hHash];
 
 		if ( iEntityHead == iEntity )
 		{
-			int iEntityNext = m_aEntityList.Next( iEntityHead );
+			intp iEntityNext = m_aEntityList.Next( iEntityHead );
 			if ( iEntityNext == m_aEntityList.InvalidIndex() )
 			{
 				m_aVoxelHash.Remove( hHash );
@@ -1563,7 +1563,7 @@ int CVoxelHash::EntityCount()
 	
 		while ( hHash != bucket.InvalidIndex() )
 		{
-			int iEntity = bucket[hHash].m_Data;
+			intp iEntity = bucket[hHash].m_Data;
 			while ( iEntity!= m_aEntityList.InvalidIndex() )
 			{
 				++nCount;
@@ -1645,7 +1645,7 @@ void CVoxelHash::RenderAllObjectsInTree( float flTime )
 
 		while ( hHash != bucket.InvalidIndex() )
 		{
-			int iEntity = bucket[hHash].m_Data;
+			intp iEntity = bucket[hHash].m_Data;
 			while ( iEntity!= m_aEntityList.InvalidIndex() )
 			{
 				SpatialPartitionHandle_t hPartition = m_aEntityList[iEntity];

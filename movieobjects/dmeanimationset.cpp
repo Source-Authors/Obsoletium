@@ -451,7 +451,7 @@ bool CDmePresetGroup::ExportToTXT( const char *pFileName, CDmeAnimationSet *pAni
 	CUtlVector< ExportedControl_t > exportedControls;
 	BuildExportedControlList( pAnimationSet, pPresetGroup, exportedControls );
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	// Output the unique keys
 	buf.Printf( "$keys " );

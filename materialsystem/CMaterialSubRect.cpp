@@ -134,7 +134,7 @@ public:
 	bool				IsTwoSided()									{ return m_pMaterialPage->IsTwoSided(); }
 
 	int					GetNumPasses( void )							{ return m_pMaterialPage->GetNumPasses(); }
-	int					GetTextureMemoryBytes( void )					{ return m_pMaterialPage->GetTextureMemoryBytes(); }
+	intp				GetTextureMemoryBytes( void )					{ return m_pMaterialPage->GetTextureMemoryBytes(); }
 
 	// IMaterialInternal Interface.
 	void				DrawMesh( VertexCompressionType_t vertexCompression )	{ m_pMaterialPage->DrawMesh( vertexCompression ); }

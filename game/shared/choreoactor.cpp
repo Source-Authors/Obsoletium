@@ -80,7 +80,7 @@ void CChoreoActor::SetName( const char *name )
 // Purpose: 
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *CChoreoActor::GetName( void )
+const char *CChoreoActor::GetName() const
 {
 	return m_szName;
 }
@@ -89,7 +89,7 @@ const char *CChoreoActor::GetName( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-intp CChoreoActor::GetNumChannels( void )
+intp CChoreoActor::GetNumChannels() const
 {
 	return m_Channels.Count();
 }
@@ -124,7 +124,7 @@ void CChoreoActor::AddChannel( CChoreoChannel *channel )
 //-----------------------------------------------------------------------------
 void CChoreoActor::RemoveChannel( CChoreoChannel *channel )
 {
-	int idx = FindChannelIndex( channel );
+	intp idx = FindChannelIndex( channel );
 	if ( idx == -1 )
 		return;
 
@@ -154,12 +154,12 @@ void CChoreoActor::SwapChannels( int c1, int c2 )
 // Input  : *channel - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoActor::FindChannelIndex( CChoreoChannel *channel )
+ptrdiff_t CChoreoActor::FindChannelIndex( CChoreoChannel *channel )
 {
 	ptrdiff_t i{ 0 };
-	for ( auto *channel : m_Channels )
+	for ( auto *ch : m_Channels )
 	{
-		if ( channel == m_Channels[ i ] )
+		if ( channel == ch )
 		{
 			return i;
 		}
@@ -237,11 +237,11 @@ void CChoreoActor::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoS
 {
 	buf.PutShort( pStringPool->FindOrAddString( GetName() ) );
 
-	int c = GetNumChannels();
+	intp c = GetNumChannels();
 	Assert( c <= 255 );
-	buf.PutUnsignedChar( c );
+	buf.PutUnsignedChar( static_cast<unsigned char>(c) );
 
-	for ( int i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		CChoreoChannel *channel = GetChannel( i );
 		Assert( channel );
@@ -264,8 +264,8 @@ bool CChoreoActor::RestoreFromBuffer( CUtlBuffer& buf, CChoreoScene *pScene, ICh
 
 	SetName( sz );
 
-	int c = buf.GetUnsignedChar();
-	for ( int i = 0; i < c; i++ )
+	intp c = buf.GetUnsignedChar();
+	for ( intp i = 0; i < c; i++ )
 	{
 		CChoreoChannel *channel = pScene->AllocChannel();
 		Assert( channel );

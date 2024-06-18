@@ -35,7 +35,7 @@ public:
 	void OnConnectToGame();
 	void OnDisconnectFromGame( void );
 
-	blacklisted_server_t *GetBlacklistedServer( int iServerID );
+	blacklisted_server_t *GetBlacklistedServer( intp iServerID );
 	bool IsServerBlacklisted(gameserveritem_t &server); 
 
 private:

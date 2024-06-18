@@ -807,8 +807,8 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 			return;
 		}
 
-		int srcSize = ImageLoader::GetMemRequired( info.m_nWidth, info.m_nHeight, 1, info.m_SrcFormat, false );
-		int dstSize = ImageLoader::GetMemRequired( info.m_nWidth, info.m_nHeight, 1, dstFormat, false );
+		intp srcSize = ImageLoader::GetMemRequired( info.m_nWidth, info.m_nHeight, 1, info.m_SrcFormat, false );
+		intp dstSize = ImageLoader::GetMemRequired( info.m_nWidth, info.m_nHeight, 1, dstFormat, false );
 		formatConvertMemory.EnsureCapacity( dstSize );
 
 		// due to format conversion, source is in non-native order
@@ -1123,7 +1123,7 @@ static void BlitTextureBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 	RECORD_INT( srcStride );
 	RECORD_INT( GetImageFormat( info.m_pTexture ) );
 	// strides are in bytes.
-	int srcDataSize;
+	intp srcDataSize;
 	if ( srcStride == 0 )
 	{
 		srcDataSize = ImageLoader::GetMemRequired( info.m_nWidth, info.m_nHeight, 1, info.m_SrcFormat, false );
@@ -1492,9 +1492,9 @@ int ComputeTextureMemorySize( const GUID &nDeviceGUID, D3DDEVTYPE deviceType )
 	// Sadly, the only way to compute texture memory size
 	// is to allocate a crapload of textures until we can't any more
 	ImageFormat fmt = FindNearestSupportedFormat( IMAGE_FORMAT_BGR565, false, false, false );
-	int textureSize = ShaderUtil()->GetMemRequired( 256, 256, 1, fmt, false );
+	intp textureSize = ShaderUtil()->GetMemRequired( 256, 256, 1, fmt, false );
 
-	int totalSize = 0;
+	intp totalSize = 0;
 	CUtlVector< IDirect3DBaseTexture* > textures;
 
 	s_bTestingVideoMemorySize = true;

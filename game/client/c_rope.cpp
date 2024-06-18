@@ -194,7 +194,8 @@ public:
 		if( pReturn == NULL )
 		{
 			int iMaxSize = m_QueuedRopeMemory[m_nCurrentStack].GetMaxSize();
-			Warning( "Overflowed rope queued rendering memory stack. Needed %llu, have %d/%d\n", (uint64)bytes, iMaxSize - m_QueuedRopeMemory[m_nCurrentStack].GetUsed(), iMaxSize );
+			Warning( "Overflowed rope queued rendering memory stack. Needed %zu, have %zd/%d\n",
+				bytes, iMaxSize - m_QueuedRopeMemory[m_nCurrentStack].GetUsed(), iMaxSize );
 			pReturn = malloc( bytes );
 			m_DeleteOnSwitch[m_nCurrentStack].AddToTail( pReturn );
 		}
@@ -1701,7 +1702,7 @@ void C_RopeKeyframe::BuildRope( RopeSegData_t *pSegmentData, const Vector &vCurr
 
 		if ( !bQueued && RopeManager()->IsHolidayLightMode() && r_rope_holiday_light_scale.GetFloat() > 0.0f )
 		{
-			data.m_nMaterial = reinterpret_cast< int >( this );
+			data.m_nMaterial = reinterpret_cast< intp >( this );
 			data.m_nHitBox = ( iNode << 8 );
 			data.m_flScale = r_rope_holiday_light_scale.GetFloat();
 			data.m_vOrigin = pSegmentData->m_Segments[nSegmentCount].m_vPos;

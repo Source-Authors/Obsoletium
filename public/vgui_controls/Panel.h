@@ -673,13 +673,13 @@ protected:
 protected:
 	virtual void OnChildSettingsApplied( KeyValues *pInResourceData, Panel *pChild );
 
-	MESSAGE_FUNC_ENUM_ENUM( OnRequestFocus, "OnRequestFocus", VPANEL, subFocus, VPANEL, defaultPanel);
+	MESSAGE_FUNC_HANDLE_HANDLE( OnRequestFocus, "OnRequestFocus", subFocus, defaultPanel);
 	MESSAGE_FUNC_INT_INT( OnScreenSizeChanged, "OnScreenSizeChanged", oldwide, oldtall );
 	virtual void *QueryInterface(EInterfaceID id);
 
 	void AddToOverridableColors( Color *pColor, char const *scriptname )
 	{
-		int iIdx = m_OverridableColorEntries.AddToTail();
+		intp iIdx = m_OverridableColorEntries.AddToTail();
 		m_OverridableColorEntries[iIdx].m_pszScriptName = scriptname;
 		m_OverridableColorEntries[iIdx].m_pColor = pColor;
 		m_OverridableColorEntries[iIdx].m_bOverridden = false;

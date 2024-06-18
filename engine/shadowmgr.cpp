@@ -166,7 +166,7 @@ public:
 	virtual unsigned short InvalidShadowIndex( );
 
 	// Methods of ISpatialLeafEnumerator
-	virtual bool EnumerateLeaf( int leaf, int context );
+	virtual bool EnumerateLeaf( int leaf, intp context );
 
 	// Sets the texture coordinate range for a shadow...
 	virtual void SetShadowTexCoord( ShadowHandle_t handle, float x, float y, float w, float h );
@@ -1536,7 +1536,7 @@ void CShadowMgr::ProjectShadow( ShadowHandle_t handle, const Vector &origin,
 	for ( int i  = 0; i < nLeafCount; ++i )
 	{
 		// NOTE: Scope specifier eliminates virtual function call
-		CShadowMgr::EnumerateLeaf( pLeafList[i], (int)&build );
+		CShadowMgr::EnumerateLeaf( pLeafList[i], (intp)&build );
 	}
 }
 
@@ -1650,7 +1650,7 @@ void CShadowMgr::ProjectFlashlight( ShadowHandle_t handle, const VMatrix& worldT
 	for ( int i = 0; i < nLeafCount; ++i )
 	{
 		// NOTE: Scope specifier eliminates virtual function call
-		CShadowMgr::EnumerateLeaf( pLeafList[i], (int)&build );
+		CShadowMgr::EnumerateLeaf( pLeafList[i], (intp)&build );
 	}
 }
 
@@ -1809,7 +1809,7 @@ void CShadowMgr::ApplyShadowToLeaf( const Shadow_t &shadow, mleaf_t* RESTRICT pL
 //-----------------------------------------------------------------------------
 // Applies a projected texture to all surfaces in the leaf
 //-----------------------------------------------------------------------------
-bool CShadowMgr::EnumerateLeaf( int leaf, int context )
+bool CShadowMgr::EnumerateLeaf( int leaf, intp context )
 {
 	VPROF( "CShadowMgr::EnumerateLeaf" );
 	ShadowBuildInfo_t* pBuild = (ShadowBuildInfo_t*)context;

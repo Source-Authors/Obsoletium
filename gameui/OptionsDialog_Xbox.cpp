@@ -1372,7 +1372,7 @@ void COptionsDialogXbox::UpdateAllBinds( ButtonCode_t code )
 //-----------------------------------------------------------------------------
 void COptionsDialogXbox::FillInDefaultBindings( void )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( "cfg/config.360.cfg", NULL, buf ) )
 		return;
 

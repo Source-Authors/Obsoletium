@@ -27,7 +27,7 @@ class CChoreoChannel
 {
 public:
 	// Construction
-					CChoreoChannel( void );
+					CChoreoChannel();
 					CChoreoChannel( const char *name );
 
 	// Assignment
@@ -39,23 +39,23 @@ public:
 
 	// Accessors
 	void			SetName( const char *name );
-	const char		*GetName( void );
+	const char		*GetName() const;
 
 	// Iterate children
-	intp				GetNumEvents( void );
+	intp			GetNumEvents() const;
 	CChoreoEvent	*GetEvent( intp event );
 
 	// Manipulate children
 	void			AddEvent( CChoreoEvent *event );
 	void			RemoveEvent( CChoreoEvent *event );
-	int				FindEventIndex( CChoreoEvent *event );
+	intp			FindEventIndex( CChoreoEvent *event ) const;
 	void			RemoveAllEvents();
 
-	CChoreoActor	*GetActor( void );
+	CChoreoActor	*GetActor();
 	void			SetActor( CChoreoActor *actor );
 
 	void						SetActive( bool active );
-	bool						GetActive( void ) const;
+	bool						GetActive() const;
 
 	// Compute true start/end times for gesture events in this channel, factoring in "null" gestures as needed
 	void			ReconcileGestureTimes();
@@ -71,7 +71,7 @@ public:
 
 private:
 	// Initialize fields
-	void			Init( void );
+	void			Init();
 
 	enum
 	{

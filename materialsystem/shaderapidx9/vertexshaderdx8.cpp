@@ -2158,7 +2158,7 @@ bool CShaderManager::CreateDynamicCombos_Ver4( void *pContext, uint8 *pComboBuff
 			Assert( nReferenceComboSizeForDiffs >= nByteCodeSize );
 
 			// use the differencing algorithm to recover the full shader
-			int nOriginalSize;
+			intp nOriginalSize;
 			ApplyDiffs( 
 				pReferenceShader, 
 				pByteCode,

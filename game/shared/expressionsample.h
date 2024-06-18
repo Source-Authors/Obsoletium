@@ -82,7 +82,7 @@ public:
 class CCurveData
 {
 public:
-	int				GetCount( void );
+	intp				GetCount( void ) const;
 	CExpressionSample *Get( int index );
 	CExpressionSample *Add( float time, float value, bool selected );
 	void			Delete( int index );
@@ -106,7 +106,7 @@ public:
 	void				FileSave( CUtlBuffer& buf, int level, const char *name );
 
 	float	GetIntensity( ICurveDataAccessor *data, float time );
-	CExpressionSample *GetBoundedSample( ICurveDataAccessor *data, int number, bool& bClamped );
+	CExpressionSample *GetBoundedSample( ICurveDataAccessor *data, intp number, bool& bClamped );
 
 	CCurveData & operator = (const CCurveData &src) 
 	{

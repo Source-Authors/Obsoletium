@@ -408,8 +408,6 @@ inline class IDispInfo *MLeaf_Disaplcement( mleaf_t *pLeaf, int index, worldbrus
 	return DispInfo_IndexArray( pData->hDispInfos, dispIndex );
 }
 
-#define	MAXLIGHTMAPS	4
-
 // drawing surface flags
 #define SURFDRAW_NOLIGHT		0x00000001		// no lightmap
 #define	SURFDRAW_NODE			0x00000002		// This surface is on a node

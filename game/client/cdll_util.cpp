@@ -1250,7 +1250,7 @@ void UTIL_IncrementMapKey( const char *pszCustomKey )
 		// force create this directory incase it doesn't exist
 		filesystem->CreateDirHierarchy( MAP_KEY_FILE_DIR, "MOD");
 
-		CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 		kvMapLoadFile->RecursiveSaveToFile( buf, 0 );
 		g_pFullFileSystem->WriteFile( szFilename, "MOD", buf );
 
@@ -1285,7 +1285,7 @@ int UTIL_GetMapKeyCount( const char *pszCustomKey )
 			// force create this directory incase it doesn't exist
 			filesystem->CreateDirHierarchy( MAP_KEY_FILE_DIR, "MOD");
 
-			CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			g_pFullFileSystem->WriteFile( szFilename, "MOD", buf );
 		}
 

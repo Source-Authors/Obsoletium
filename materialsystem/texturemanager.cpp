@@ -1301,9 +1301,9 @@ private:
 		// Convert the data
 		CUtlMemory< unsigned char > srcBufferFinestMip;
 		CUtlMemory< unsigned char > srcBufferAllMips;
-		const int srcFinestMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, false );
-		const int srcAllMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, pJob->m_bGenMips );
-		const int srcPitch = ImageLoader::GetMemRequired( w, 1, 1, srcFmt, false );
+		const intp srcFinestMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, false );
+		const intp srcAllMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, pJob->m_bGenMips );
+		const intp srcPitch = ImageLoader::GetMemRequired( w, 1, 1, srcFmt, false );
 
 		const ImageFormat dstFmt = pJob->m_dstFmt;
 		CUtlMemory< unsigned char > dstBufferAllMips;
@@ -1329,7 +1329,7 @@ private:
 
 		// If this fires, you will get data corruption below. We can fix this case, it just doesn't seem
 		// to be needed right now.
-		Assert( pJob->m_pAsyncMap->m_nPitch == srcPitch );
+		Assert( pJob->m_pAsyncMap->m_nPitch.operator int() == srcPitch );
 		srcPitch; // Hush compiler.
 
 		{
@@ -2121,7 +2121,7 @@ void CTextureManager::SetExcludedTextures( const char *pScriptName )
 	MEM_ALLOC_CREDIT();
 
 	// get optional script
-	CUtlBuffer excludeBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer excludeBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( g_pFullFileSystem->ReadFile( pScriptName, NULL, excludeBuffer ) )
 	{
 		char szToken[MAX_PATH];
@@ -2872,7 +2872,7 @@ void CTextureManager::ReadFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 	if ( !fh )
 		return;
 
-	CUtlBuffer fileContents( 0, 0, CUtlBuffer::TEXT_BUFFER ); 
+	CUtlBuffer fileContents( (intp)0, 0, CUtlBuffer::TEXT_BUFFER ); 
 	if ( !g_pFullFileSystem->ReadToBuffer( fh, fileContents ) )
 		goto cleanup;
 

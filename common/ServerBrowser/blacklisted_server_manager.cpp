@@ -179,9 +179,9 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverNa
 //-----------------------------------------------------------------------------
 // Purpose: Remove server with matching 'server id' from list
 //-----------------------------------------------------------------------------
-void CBlacklistedServerManager::RemoveServer( int iServerID )
+void CBlacklistedServerManager::RemoveServer( intp iServerID )
 {
-	for ( int i = 0; i < m_Blacklist.Count(); i++ )
+	for ( intp i = 0; i < m_Blacklist.Count(); i++ )
 	{
 		if ( m_Blacklist[i].m_nServerID == iServerID )
 		{
@@ -195,9 +195,9 @@ void CBlacklistedServerManager::RemoveServer( int iServerID )
 //-----------------------------------------------------------------------------
 // Purpose: Given a serverID, return its blacklist entry
 //-----------------------------------------------------------------------------
-blacklisted_server_t *CBlacklistedServerManager::GetServer( int iServerID )
+blacklisted_server_t *CBlacklistedServerManager::GetServer( intp iServerID )
 {
-	for ( int i = 0; i < m_Blacklist.Count(); i++ )
+	for ( intp i = 0; i < m_Blacklist.Count(); i++ )
 	{
 		if ( m_Blacklist[i].m_nServerID == iServerID )
 			return &m_Blacklist[i];

@@ -82,9 +82,9 @@ ConVar mem_min_heapsize( "mem_min_heapsize", "48", FCVAR_INTERNAL_USE, "Minimum 
 ConVar mem_max_heapsize( "mem_max_heapsize", "256", FCVAR_INTERNAL_USE, "Maximum amount of memory to dedicate to engine hunk and datacache (in MiB)" );
 ConVar mem_max_heapsize_dedicated( "mem_max_heapsize_dedicated", "64", FCVAR_INTERNAL_USE, "Maximum amount of memory to dedicate to engine hunk and datacache, for dedicated server (in MiB)" );
 
-#define MINIMUM_WIN_MEMORY			(unsigned)(mem_min_heapsize.GetInt()*1024*1024)
-#define MAXIMUM_WIN_MEMORY			max( (unsigned)(mem_max_heapsize.GetInt()*1024*1024), MINIMUM_WIN_MEMORY )
-#define MAXIMUM_DEDICATED_MEMORY	(unsigned)(mem_max_heapsize_dedicated.GetInt()*1024*1024)
+#define MINIMUM_WIN_MEMORY			(size_t)(mem_min_heapsize.GetInt()*1024*1024)
+#define MAXIMUM_WIN_MEMORY			max( (size_t)(mem_max_heapsize.GetInt()*1024*1024), MINIMUM_WIN_MEMORY )
+#define MAXIMUM_DEDICATED_MEMORY	(size_t)(mem_max_heapsize_dedicated.GetInt()*1024*1024)
 
 
 char *CheckParm(const char *psz, char **ppszValue = NULL);
@@ -601,7 +601,7 @@ void Sys_InitMemory( void )
 	}
 
 	// take one quarter the physical memory
-	if ( host_parms.memsize <= 512*1024*1024)
+	if ( host_parms.memsize <= 512u*1024u*1024u)
 	{
 		host_parms.memsize >>= 2;
 		// Apply cap of 64MB for 512MB systems

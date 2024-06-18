@@ -192,7 +192,7 @@ void COptionsSubKeyboard::ParseActionDescriptions( void )
 	KeyValues *item;
 
 	// Load the default keys list
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( "scripts/kb_act.lst", NULL, buf ) )
 		return;
 
@@ -565,7 +565,7 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
 //-----------------------------------------------------------------------------
 void COptionsSubKeyboard::FillInDefaultBindings( void )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( "cfg/config_default.cfg", NULL, buf ) )
 		return;
 

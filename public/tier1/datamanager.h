@@ -16,7 +16,7 @@
 
 FORWARD_DECLARE_HANDLE( memhandle_t );
 
-#define INVALID_MEMHANDLE ((memhandle_t)0xffffffff)
+#define INVALID_MEMHANDLE ((memhandle_t)-1)
 
 class CDataManagerBase
 {
@@ -251,7 +251,7 @@ private:
 
 inline unsigned short CDataManagerBase::FromHandle( memhandle_t handle )
 {
-	unsigned int fullWord = (unsigned int)handle;
+	unsigned int fullWord = (unsigned int)(size_t)handle;
 	unsigned short serial = fullWord>>16;
 	unsigned short index = fullWord & 0xFFFF;
 	index--;

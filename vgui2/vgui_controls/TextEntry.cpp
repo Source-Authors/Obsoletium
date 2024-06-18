@@ -3938,6 +3938,36 @@ void TextEntry::OnChangeIME( bool forward )
 	}
 }
 
+#ifdef PLATFORM_64BITS
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : handleValue - 
+//-----------------------------------------------------------------------------
+void TextEntry::LanguageChanged( uint64 handleValue )
+{
+	input()->OnChangeIMEByHandle( handleValue );
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : handleValue - 
+//-----------------------------------------------------------------------------
+void TextEntry::ConversionModeChanged( uint64 handleValue )
+{
+	input()->OnChangeIMEConversionModeByHandle( handleValue );
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : handleValue - 
+//-----------------------------------------------------------------------------
+void TextEntry::SentenceModeChanged( uint64 handleValue )
+{
+	input()->OnChangeIMESentenceModeByHandle( handleValue );
+}
+#else
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : handleValue - 
@@ -3966,6 +3996,7 @@ void TextEntry::SentenceModeChanged( int handleValue )
 {
 	input()->OnChangeIMESentenceModeByHandle( handleValue );
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 

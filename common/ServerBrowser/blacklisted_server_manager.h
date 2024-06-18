@@ -42,12 +42,12 @@ public:
 	blacklisted_server_t *AddServer( const char *serverName, uint32 serverIP, int serverPort );
 	blacklisted_server_t *AddServer( const char *serverName, const char *netAddressString, uint32 timestamp );
 
-	void RemoveServer( int iServerID );		// remove server with matching 'server id' from list
+	void RemoveServer( intp iServerID );		// remove server with matching 'server id' from list
 
 	void SaveToFile( const char *filename );
 	int LoadServersFromFile( const char *pszFilename, bool bResetTimes );		// returns count of appended servers, zero for failure
 
-	blacklisted_server_t *GetServer( int iServerID );		// return server with matching 'server id'
+	blacklisted_server_t *GetServer( intp iServerID );		// return server with matching 'server id'
 	int GetServerCount( void ) const;
 
 	const CUtlVector< blacklisted_server_t > &GetServerVector( void ) const;

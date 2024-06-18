@@ -165,8 +165,8 @@ public:
 	bool				IsInverted( void );
 	void				SetInverted( bool isInverted );
 
-	int					GetNumSamples( int type = 0 );
-	CExpressionSample	*GetSample( int index, int type = 0 );
+	intp				GetNumSamples( int type = 0 ) const;
+	CExpressionSample	*GetSample( intp index, int type = 0 );
 
 	bool				IsTrackActive( void );
 	void				SetTrackActive( bool active );
@@ -182,7 +182,7 @@ public:
 
 	// Puts in dummy start/end samples to spline to zero ( or 0.5 for
 	//  left/right data) at the origins
-	CExpressionSample	*GetBoundedSample( int number, bool& bClamped, int type = 0 );
+	CExpressionSample	*GetBoundedSample( intp number, bool& bClamped, int type = 0 );
 
 	int					GetFlexControllerIndex( int side = 0 );
 	LocalFlexController_t	GetRawFlexControllerIndex( int side = 0 );
@@ -393,7 +393,7 @@ public:
 	void			SetPlayOverScript( bool bPlayOverScript );
 	bool			GetPlayOverScript( void );
 
-	int				GetRampCount( void ) { return m_Ramp.GetCount(); };
+	intp				GetRampCount( void ) const { return m_Ramp.GetCount(); };
 	CExpressionSample *GetRamp( int index ) { return m_Ramp.Get( index ); };
 	CExpressionSample *AddRamp( float time, float value, bool selected ) { return m_Ramp.Add( time, value, selected ); };
 	void			DeleteRamp( int index ) { m_Ramp.Delete( index ); };
@@ -592,7 +592,7 @@ private:
 	void SaveFlexAnimationsToBuffer( CUtlBuffer& buf, IChoreoStringPool *pStringPool );
 	bool RestoreFlexAnimationsFromBuffer( CUtlBuffer& buf, IChoreoStringPool *pStringPool );
 
-	float			GetBoundedAbsoluteTagPercentage( AbsTagType type, int tagnum );
+	float			GetBoundedAbsoluteTagPercentage( AbsTagType type, intp tagnum );
 
 	float			_GetIntensity( float time );
 

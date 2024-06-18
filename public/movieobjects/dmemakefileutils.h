@@ -245,7 +245,7 @@ public:
 	// Inherited from IDmeMakefileUtils
 	virtual void PerformCompile( CDmElement *pElement, bool bBuildAllDependencies );
 	virtual bool IsCurrentlyCompiling( );
-	virtual int GetCompileOutputSize();
+	virtual intp GetCompileOutputSize();
 	virtual CompilationState_t UpdateCompilation( char *pOutputBuf, int nBufLen );
 	virtual void AbortCurrentCompilation();
 	virtual void PerformOpenEditor( CDmElement *pElement );

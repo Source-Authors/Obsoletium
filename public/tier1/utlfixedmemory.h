@@ -41,11 +41,11 @@ class CUtlFixedMemory
 {
 public:
 	// constructor, destructor
-	CUtlFixedMemory( int nGrowSize = 0, int nInitSize = 0 );
+	CUtlFixedMemory( intp nGrowSize = 0, intp nInitSize = 0 );
 	~CUtlFixedMemory();
 
 	// Set the size by which the memory grows
-	void Init( int nGrowSize = 0, int nInitSize = 0 );
+	void Init( intp nGrowSize = 0, intp nInitSize = 0 );
 
 	// here to match CUtlMemory, but only used by ResetDbgInfo, so it can just return NULL
 	T* Base() { return NULL; }
@@ -58,7 +58,7 @@ public:
 	class Iterator_t
 	{
 	public:
-		Iterator_t( BlockHeader_t *p, int i ) : m_pBlockHeader( p ), m_nIndex( i ) {}
+		Iterator_t( BlockHeader_t *p, intp i ) : m_pBlockHeader( p ), m_nIndex( i ) {}
 		BlockHeader_t *m_pBlockHeader;
 		intp m_nIndex;
 
@@ -121,14 +121,14 @@ public:
 	static intp InvalidIndex() { return INVALID_INDEX; }
 
 	// Size
-	int NumAllocated() const;
-	int Count() const { return NumAllocated(); }
+	intp NumAllocated() const;
+	intp Count() const { return NumAllocated(); }
 
 	// Grows memory by max(num,growsize), and returns the allocation index/ptr
-	void Grow( int num = 1 );
+	void Grow( intp num = 1 );
 
 	// Makes sure we've got at least this much memory
-	void EnsureCapacity( int num );
+	void EnsureCapacity( intp num );
 
 	// Memory deallocation
 	void Purge();
@@ -154,8 +154,8 @@ protected:
 	const BlockHeader_t *BlockToHeader( const T *pBlock ) const { return ( BlockHeader_t* )( pBlock ) - 1; }
 
 	BlockHeader_t* m_pBlocks;
-	int m_nAllocationCount;
-	int m_nGrowSize;
+	intp m_nAllocationCount;
+	intp m_nGrowSize;
 };
 
 //-----------------------------------------------------------------------------
@@ -163,7 +163,7 @@ protected:
 //-----------------------------------------------------------------------------
 
 template< class T >
-CUtlFixedMemory<T>::CUtlFixedMemory( int nGrowSize, int nInitAllocationCount )
+CUtlFixedMemory<T>::CUtlFixedMemory( intp nGrowSize, intp nInitAllocationCount )
 : m_pBlocks( 0 ), m_nAllocationCount( 0 ), m_nGrowSize( 0 )
 {
 	Init( nGrowSize, nInitAllocationCount );
@@ -192,7 +192,7 @@ void CUtlFixedMemory<T>::Swap( CUtlFixedMemory< T > &mem )
 // Set the size by which the memory grows - round up to the next power of 2
 //-----------------------------------------------------------------------------
 template< class T >
-void CUtlFixedMemory<T>::Init( int nGrowSize /* = 0 */, int nInitSize /* = 0 */ )
+void CUtlFixedMemory<T>::Init( intp nGrowSize /* = 0 */, intp nInitSize /* = 0 */ )
 {
 	Purge();
 
@@ -237,7 +237,7 @@ inline const T& CUtlFixedMemory<T>::Element( intp i ) const
 // Size
 //-----------------------------------------------------------------------------
 template< class T >
-inline int CUtlFixedMemory<T>::NumAllocated() const
+inline intp CUtlFixedMemory<T>::NumAllocated() const
 {
 	return m_nAllocationCount;
 }
@@ -262,12 +262,12 @@ inline bool CUtlFixedMemory<T>::IsIdxValid( intp i ) const
 }
 
 template< class T >
-void CUtlFixedMemory<T>::Grow( int num )
+void CUtlFixedMemory<T>::Grow( intp num )
 {
 	if ( num <= 0 )
 		return;
 
-	int nBlockSize = m_nGrowSize;
+	intp nBlockSize = m_nGrowSize;
 	if ( nBlockSize == 0 )
 	{
 		if ( m_nAllocationCount )
@@ -283,7 +283,7 @@ void CUtlFixedMemory<T>::Grow( int num )
 	}
 	if ( nBlockSize < num )
 	{
-		int n = ( num + nBlockSize -1 ) / nBlockSize;
+		intp n = ( num + nBlockSize -1 ) / nBlockSize;
 		Assert( n * nBlockSize >= num );
 		Assert( ( n - 1 ) * nBlockSize < num );
 		nBlockSize *= n;
@@ -324,7 +324,7 @@ void CUtlFixedMemory<T>::Grow( int num )
 // Makes sure we've got at least this much memory
 //-----------------------------------------------------------------------------
 template< class T >
-inline void CUtlFixedMemory<T>::EnsureCapacity( int num )
+inline void CUtlFixedMemory<T>::EnsureCapacity( intp num )
 {
 	Grow( num - NumAllocated() );
 }

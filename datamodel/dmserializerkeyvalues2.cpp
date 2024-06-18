@@ -710,7 +710,7 @@ bool CDmSerializerKeyValues2::UnserializeElementArrayAttribute( CUtlBuffer &buf,
 
 	// Arrays first must have a '[' specified
 	TokenType_t token;
-	CUtlBuffer tokenBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer tokenBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	CUtlCharConversion *pConv;
 	token = ReadToken( buf, tokenBuf );
 	if ( token != TOKEN_OPEN_BRACKET )
@@ -866,7 +866,7 @@ bool CDmSerializerKeyValues2::UnserializeArrayAttribute( CUtlBuffer &buf, DmElem
 
 	// Arrays first must have a '[' specified
 	TokenType_t token;
-	CUtlBuffer tokenBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer tokenBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	token = ReadToken( buf, tokenBuf );
 	if ( token != TOKEN_OPEN_BRACKET )
 	{
@@ -931,7 +931,7 @@ bool CDmSerializerKeyValues2::UnserializeAttribute( CUtlBuffer &buf,
 	DmElementDictHandle_t hElement, const char *pAttributeName, DmAttributeType_t nAttrType )
 {
 	// Read the attribute value
-	CUtlBuffer tokenBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer tokenBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	TokenType_t token = ReadToken( buf, tokenBuf );
 	if ( token != TOKEN_DELIMITED_STRING )
 	{
@@ -1183,7 +1183,7 @@ bool CDmSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, const char *p
 	CKeyValues2ErrorContext errorReport( pElementType );
 
 	TokenType_t token;
-	CUtlBuffer tokenBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer tokenBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	CUtlCharConversion *pConv;
 	int nLength;
 
@@ -1276,7 +1276,7 @@ bool CDmSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, DmElementDict
 	*pHandle = ELEMENT_DICT_HANDLE_INVALID;
 
 	// First, read the type name
-	CUtlBuffer tokenBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer tokenBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	CUtlCharConversion* pConv;
 
 	TokenType_t token = ReadToken( buf, tokenBuf );

@@ -1,4 +1,4 @@
-//========= Copyright � 1996-2008, Valve LLC, All rights reserved. ============
+//========= Copyright 1996-2008, Valve LLC, All rights reserved. ============
 //
 // Purpose:
 //
@@ -962,7 +962,7 @@ public:
 		V_FileBase( pchModPath, rgchModDir, sizeof( rgchModDir ) );
 		CRC32_t crc32;
 		CRC32_Init( &crc32 );
-		CRC32_ProcessBuffer( &crc32, rgchModDir, V_strlen( rgchModDir ) );
+		CRC32_ProcessBuffer( &crc32, rgchModDir, (int)V_strlen( rgchModDir ) );
 		CRC32_Final( &crc32 );
 
 		// set the high-bit on the mod-id 
@@ -979,8 +979,8 @@ public:
 
 		CRC32_t crc32;
 		CRC32_Init( &crc32 );
-		CRC32_ProcessBuffer( &crc32, pchExePath, V_strlen( pchExePath ) );
-		CRC32_ProcessBuffer( &crc32, pchAppName, V_strlen( pchAppName ) );
+		CRC32_ProcessBuffer( &crc32, pchExePath, (int)V_strlen( pchExePath ) );
+		CRC32_ProcessBuffer( &crc32, pchAppName, (int)V_strlen( pchAppName ) );
 		CRC32_Final( &crc32 );
 
 		// set the high-bit on the mod-id 

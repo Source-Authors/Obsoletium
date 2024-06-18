@@ -47,7 +47,7 @@ public:
 	virtual bool IsCurrentlyCompiling( ) = 0;
 
 	// Returns the size of the buffer to pass into UpdateCompilation()
-	virtual int GetCompileOutputSize() = 0;
+	virtual intp GetCompileOutputSize() = 0;
 
 	// Updates the compilation
 	virtual CompilationState_t UpdateCompilation( char *pOutputBuf, int nBufLen ) = 0;

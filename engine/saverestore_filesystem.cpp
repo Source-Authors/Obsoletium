@@ -153,8 +153,8 @@ public:
 private:
 	CSaveDirectory	*m_pSaveDirectory;
 	CUtlMap<CUtlSymbol, SaveFile_t> &GetDirectory( void ) { return m_pSaveDirectory->m_Files; }
-	SaveFile_t &GetFile( const int idx ) { return m_pSaveDirectory->m_Files[idx]; }
-	SaveFile_t &GetFile( const FileHandle_t hFile ) { return GetFile( (unsigned int)hFile ); }
+	SaveFile_t &GetFile( const uintp idx ) { return m_pSaveDirectory->m_Files[idx]; }
+	SaveFile_t &GetFile( const FileHandle_t hFile ) { return GetFile( (uintp)hFile ); }
 
 	FileHandle_t	GetFileHandle( const char *pFileName );
 	int				GetFileIndex( const char *pFileName );
@@ -331,7 +331,7 @@ bool CSaveRestoreFileSystem::FileExists( const char *pFileName, const char *pPat
 //-----------------------------------------------------------------------------
 bool CSaveRestoreFileSystem::HandleIsValid( FileHandle_t hFile )
 {
-	return hFile && GetDirectory().IsValidIndex( (unsigned int)hFile );
+	return hFile && GetDirectory().IsValidIndex( (uintp)hFile );
 }
 
 //-----------------------------------------------------------------------------
@@ -588,7 +588,7 @@ FSAsyncStatus_t CSaveRestoreFileSystem::AsyncWrite( const char *pFileName, const
 	FileHandle_t hFile = Open( pFileName, "wb" );
 	if ( hFile )
 	{
-		SaveFile_t &file = GetFile( (unsigned int)hFile );
+		SaveFile_t &file = GetFile( (uintp)hFile );
 
 		if( file.eType == WRITE_ONLY )
 		{
@@ -1037,7 +1037,7 @@ CON_COMMAND( dump_x360_saves, "Dump X360 save games to disk" )
 		// Create the proper read path
 		Q_snprintf( szInName, sizeof( szInName ), "%s:\\%s", GetCurrentMod(), pFileName );
 		// Read the file and blat it out
-		CUtlBuffer buf( 0, 0, 0 );
+		CUtlBuffer buf( (intp)0, 0, 0 );
 		if ( g_pFileSystem->ReadFile( szInName, NULL, buf ) )
 		{
 			// Strip us down to just our filename
@@ -1086,7 +1086,7 @@ CON_COMMAND( dump_x360_cfg, "Dump X360 config files to disk" )
 		// Create the proper read path
 		Q_snprintf( szInName, sizeof( szInName ), "cfg:\\%s", pFileName );
 		// Read the file and blat it out
-		CUtlBuffer buf( 0, 0, 0 );
+		CUtlBuffer buf( (intp)0, 0, 0 );
 		if ( g_pFileSystem->ReadFile( szInName, NULL, buf ) )
 		{
 			// Strip us down to just our filename

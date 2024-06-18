@@ -102,9 +102,10 @@ private:
 			CopyUniqueId( that.m_newId, &m_newId );
 			return *this;
 		}
-		static unsigned int HashKey( const DmIdPair_t& that )
+		static uintp HashKey( const DmIdPair_t& that )
 		{
-			return *( unsigned int* )&that.m_oldId.m_Value;
+			static_assert( sizeof(uintp) <= sizeof(that.m_oldId.m_Value) );
+			return *( uintp* )&that.m_oldId.m_Value;
 		}
 		static bool Compare( const DmIdPair_t& a, const DmIdPair_t& b )
 		{

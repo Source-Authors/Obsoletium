@@ -1801,21 +1801,21 @@ bool Mod_LoadSurfaceLightingV1( msurfacelighting_t *pLighting, dface_t *in, Colo
 	return ((pLighting->m_nStyles[0] != 0) && (pLighting->m_nStyles[0] != 255)) || (pLighting->m_nStyles[1] != 255);
 }
 
-void *Hunk_AllocNameAlignedClear_( int size, int alignment, const char *pHunkName )
+void *Hunk_AllocNameAlignedClear_( intp size, intp alignment, const char *pHunkName )
 {
 	Assert(IsPowerOfTwo(alignment));
 	void *pMem = Hunk_AllocName( alignment + size, pHunkName );
 	memset( pMem, 0, size + alignment );
-	pMem = (void *)( ( ( ( unsigned long )pMem ) + (alignment-1) ) & ~(alignment-1) );
+	pMem = (void *)( ( ( ( uintp )pMem ) + (alignment-1) ) & ~(alignment-1) );
 
 	return pMem;
 }
 
 // Allocates a block of T from the hunk.  Aligns as specified and clears the memory
 template< typename T > 
-T *Hunk_AllocNameAlignedClear( int count, int alignment, const char *pHunkName )
+T *Hunk_AllocNameAlignedClear( intp count, intp alignment, const char *pHunkName )
 {
-	return (T *)Hunk_AllocNameAlignedClear_( alignment + count * sizeof(T), alignment, pHunkName );
+	return static_cast<T *>(Hunk_AllocNameAlignedClear_( alignment + count * sizeof(T), alignment, pHunkName ));
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1845,9 +1845,14 @@ void Mod_LoadFaces( void )
 
 	// align these allocations
 	// If you trip one of these, you need to rethink the alignment of the struct
-	Assert( sizeof(msurface1_t) == 16 );
-	Assert( sizeof(msurface2_t) == 32 );
-	Assert( sizeof(msurfacelighting_t) == 32 );
+	static_assert( sizeof(msurface1_t) == 16 );
+#ifdef PLATFORM_64BITS
+	static_assert( sizeof(msurface2_t) == 40 );
+	static_assert( sizeof(msurfacelighting_t) == 40 );
+#else
+	static_assert( sizeof(msurface2_t) == 32 );
+	static_assert( sizeof(msurfacelighting_t) == 32 );
+#endif
 
 	msurface1_t *out1 = Hunk_AllocNameAlignedClear< msurface1_t >( count, 16, va( "%s [%s]", lh.GetLoadName(), "surface1" ) );
 	msurface2_t *out2 = Hunk_AllocNameAlignedClear< msurface2_t >( count, 32, va( "%s [%s]", lh.GetLoadName(), "surface2" ) );
@@ -4301,7 +4306,7 @@ public:
 		m_pShared = pBrush->brush.pShared;
 		m_count = 0;
 	}
-	bool EnumerateLeaf( int leaf, int )
+	bool EnumerateLeaf( int leaf, intp )
 	{
 		// garymcthack - need to test identity brush models
 		int flags = ( m_pShared->leafs[leaf].leafWaterDataID == -1 ) ? SURFDRAW_ABOVEWATER : SURFDRAW_UNDERWATER;
@@ -5256,42 +5261,6 @@ void CModelLoader::Print( void )
 		}
 	}
 }
-
-//-----------------------------------------------------------------------------
-// Callback for UpdateOrCreate utility function - swaps a bsp.
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-static bool BSPCreateCallback( const char *pSourceName, const char *pTargetName, const char *pPathID, void *pExtraData )
-{
-	// load the bsppack dll
-	IBSPPack *iBSPPack = NULL;
-	CSysModule *pmodule = g_pFullFileSystem->LoadModule( "bsppack" );
-	if ( pmodule )
-	{
-		CreateInterfaceFn factory = Sys_GetFactory( pmodule );
-		if ( factory )
-		{
-			iBSPPack = ( IBSPPack * )factory( IBSPPACK_VERSION_STRING, NULL );
-		}
-	}
-	if( !iBSPPack )
-	{
-		Warning( "Can't load bsppack.dll - unable to swap bsp.\n" );
-		return false;
-	}
-
-	bool bOk = true;
-	if ( !iBSPPack->SwapBSPFile( g_pFileSystem, pSourceName, pTargetName, IsX360(), ConvertVTFTo360Format, NULL, NULL ) )
-	{
-		bOk = false;
-		Warning( "Failed to create %s\n", pTargetName );
-	}
-
-	Sys_UnloadModule( pmodule );
-
-	return bOk;
-}
-#endif
 
 //-----------------------------------------------------------------------------
 // Calls utility function to create .360 version of a file.

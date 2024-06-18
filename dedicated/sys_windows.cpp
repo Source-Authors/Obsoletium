@@ -287,9 +287,9 @@ bool CSys::LoadModules( CDedicatedAppSystemGroup *pAppSystemGroup )
 	if ( !pAppSystemGroup->AddSystems( appSystems ) ) 
 		return false;
 	
-	engine = (IDedicatedServerAPI *)pAppSystemGroup->FindSystem( VENGINE_HLDS_API_VERSION );
+	engine = pAppSystemGroup->FindSystem<IDedicatedServerAPI>( VENGINE_HLDS_API_VERSION );
 
-	IMaterialSystem* pMaterialSystem = (IMaterialSystem*)pAppSystemGroup->FindSystem( MATERIAL_SYSTEM_INTERFACE_VERSION );
+	auto* pMaterialSystem = pAppSystemGroup->FindSystem<IMaterialSystem>( MATERIAL_SYSTEM_INTERFACE_VERSION );
 	pMaterialSystem->SetShaderAPI( "shaderapiempty.dll" );
 	return true;
 }

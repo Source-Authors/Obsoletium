@@ -588,7 +588,7 @@ void CDmeParticleSystemDefinition::RecompileParticleSystem()
 	const char *pFileFormat = "pcf";
 	const char *pEncoding = g_pDataModel->GetDefaultEncoding( pFileFormat );
 	int nFlags = g_pDataModel->IsEncodingBinary( pEncoding ) ? 0 : CUtlBuffer::TEXT_BUFFER;
-	CUtlBuffer buf( 0, 0, nFlags );
+	CUtlBuffer buf( (intp)0, 0, nFlags );
 	if ( g_pDataModel->Serialize( buf, pEncoding, pFileFormat, GetHandle() ) )
 	{
 		g_pParticleSystemMgr->ReadParticleConfigFile( buf, true, NULL );

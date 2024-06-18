@@ -542,7 +542,7 @@ bool SerializeDMX( const char *pFileName, const char *pPathID, bool bTextMode, C
 		}
 	}
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER |  CUtlBuffer::READ_ONLY );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER |  CUtlBuffer::READ_ONLY );
 	g_pFullFileSystem->ReadFile( pFullPath, pPathID, buf );
 
 	if ( !buf.IsValid() )
@@ -675,7 +675,7 @@ bool UnserializeDMX( const char *pFileName, const char *pPathID, bool bTextMode,
 		nFlags |= CUtlBuffer::TEXT_BUFFER;
 	}
 
-	CUtlBuffer buf( 0, 0, nFlags );
+	CUtlBuffer buf( (intp)0, 0, nFlags );
 	g_pFullFileSystem->ReadFile( pFullPath, pPathID, buf );
 
 	if ( !buf.IsValid() )

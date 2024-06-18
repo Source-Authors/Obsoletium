@@ -30,7 +30,7 @@ void CUtlMemoryPool::SetErrorReportFunc( MemoryPoolReportFunc_t func )
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CUtlMemoryPool::CUtlMemoryPool( int blockSize, int numElements, int growMode, const char *pszAllocOwner, int nAlignment )
+CUtlMemoryPool::CUtlMemoryPool( intp blockSize, intp numElements, int growMode, const char *pszAllocOwner, int nAlignment )
 {
 #ifdef _X360
 	if( numElements > 0 && growMode != UTLMEMORYPOOL_GROW_NONE )
@@ -179,8 +179,8 @@ void CUtlMemoryPool::AddNewBlob()
 	}
 
 	// maybe use something other than malloc?
-	int nElements = m_BlocksPerBlob * sizeMultiplier;
-	int blobSize = m_BlockSize * nElements;
+	intp nElements = m_BlocksPerBlob * sizeMultiplier;
+	intp blobSize = m_BlockSize * nElements;
 	CBlob *pBlob = (CBlob*)malloc( sizeof(CBlob) - 1 + blobSize + ( m_nAlignment - 1 ) );
 	Assert( pBlob );
 	
@@ -195,7 +195,7 @@ void CUtlMemoryPool::AddNewBlob()
 	Assert (m_pHeadOfFreeList);
 
 	void **newBlob = (void**)m_pHeadOfFreeList;
-	for (int j = 0; j < nElements-1; j++)
+	for (intp j = 0; j < nElements-1; j++)
 	{
 		newBlob[0] = (char*)newBlob + m_BlockSize;
 		newBlob = (void**)newBlob[0];
@@ -227,7 +227,7 @@ void *CUtlMemoryPool::Alloc( size_t amount )
 {
 	void *returnBlock;
 
-	if ( amount > (unsigned int)m_BlockSize )
+	if ( amount > (size_t)m_BlockSize )
 		return NULL;
 
 	if( !m_pHeadOfFreeList )

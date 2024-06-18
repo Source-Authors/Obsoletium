@@ -523,7 +523,7 @@ public:
 		int m_nLeafWaterDataID;
 	};
 	
-	bool EnumerateLeaf( int leaf, int context )
+	bool EnumerateLeaf( int leaf, intp context )
 	{
 		BoxIntersectWaterContext_t *pSearchContext = ( BoxIntersectWaterContext_t * )context;
 		mleaf_t *pLeaf = &host_state.worldmodel->brush.pShared->leafs[leaf];

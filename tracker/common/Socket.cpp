@@ -869,7 +869,7 @@ const netadr_t *CSocket::GetAddress( void )
 // Purpose: Let the user store/retrieve a 32 bit value
 // Input  : userData - 
 //-----------------------------------------------------------------------------
-void CSocket::SetUserData( unsigned int userData )
+void CSocket::SetUserData( uintp userData )
 {
 	m_nUserData = userData;
 }
@@ -878,7 +878,7 @@ void CSocket::SetUserData( unsigned int userData )
 // Purpose: Let the user store/retrieve a 32 bit value
 // Output : unsigned int
 //-----------------------------------------------------------------------------
-unsigned int CSocket::GetUserData(void ) const
+uintp CSocket::GetUserData(void ) const
 {
 	return m_nUserData;
 }

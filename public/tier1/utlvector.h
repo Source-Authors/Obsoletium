@@ -34,8 +34,7 @@
 // UtlVector derives from this so we can do the type check above
 struct base_vector_t
 {
-public:
-	enum { IsUtlVector = true }; // Used to match this at compiletime 		
+	enum { IsUtlVector = true }; // Used to match this at compiletime
 };
 
 //-----------------------------------------------------------------------------
@@ -1491,7 +1490,7 @@ public:
 		SplitString( pString, pSeparator );
 	}
 
-	CUtlStringList( char const *pString, const char **pSeparators, int nSeparators )
+	CUtlStringList( char const *pString, const char **pSeparators, intp nSeparators )
 	{
 		SplitString2( pString, pSeparators, nSeparators );
 	}
@@ -1501,7 +1500,7 @@ public:
 		V_SplitString( pString, pSeparator, *this );
 	}
 
-	void SplitString2( char const *pString, const char **pSeparators, int nSeparators )
+	void SplitString2( char const *pString, const char **pSeparators, intp nSeparators )
 	{
 		V_SplitString2( pString, pSeparators, nSeparators, *this );
 	}
@@ -1512,17 +1511,17 @@ private:
 
 
 // <Sergiy> placing it here a few days before Cert to minimize disruption to the rest of codebase
-class CSplitString: public CUtlVector<char*, CUtlMemory<char*, int> >
+class CSplitString: public CUtlVector<char*, CUtlMemory<char*, intp> >
 {
 public:
 	CSplitString(const char *pString, const char *pSeparator);
-	CSplitString(const char *pString, const char **pSeparators, int nSeparators);
+	CSplitString(const char *pString, const char **pSeparators, intp nSeparators);
 	~CSplitString();
 	//
 	// NOTE: If you want to make Construct() public and implement Purge() here, you'll have to free m_szBuffer there
 	//
 private:
-	void Construct(const char *pString, const char **pSeparators, int nSeparators);
+	void Construct(const char *pString, const char **pSeparators, intp nSeparators);
 	void PurgeAndDeleteElements();
 private:
 	char *m_szBuffer; // a copy of original string, with '\0' instead of separators

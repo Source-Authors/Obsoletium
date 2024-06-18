@@ -268,7 +268,8 @@ public:
 
 			if ( data )
 			{
-				g_DrawTreeSelectedPanel = (data) ? (vgui::VPANEL)data->GetInt( "PanelPtr", 0 ) : 0;
+				// dimhotepus: GetInt -> GetPtr
+				g_DrawTreeSelectedPanel = (data) ? (vgui::VPANEL)data->GetPtr( "PanelPtr", nullptr ) : 0;
 			}
 			else
 			{
@@ -388,7 +389,8 @@ void VGui_RecursivePrintTree(
 		Q_snprintf( str, sizeof( str ), "%s", name );
 
 	pVal->SetString( "Text", str );
-	pVal->SetInt( "PanelPtr", current );
+	// dimhotepus: SetInt -> SetPtr
+	pVal->SetPtr( "PanelPtr", reinterpret_cast<void*>(current) );
 
 	pNewParent = pVal;
 
@@ -417,7 +419,8 @@ bool UpdateItemState(
 	vgui::IPanel *ipanel = vgui::ipanel();
 
 	KeyValues *pItemData = pTree->GetItemData( iChildItemId );
-	if ( pItemData->GetInt( "PanelPtr" ) != pSub->GetInt( "PanelPtr" ) ||
+	// dimhotepus: GetInt -> GetPtr
+	if ( pItemData->GetPtr( "PanelPtr" ) != pSub->GetPtr( "PanelPtr" ) ||
 		Q_stricmp( pItemData->GetString( "Text" ), pSub->GetString( "Text" ) ) != 0 )
 	{
 		pTree->ModifyItem( iChildItemId, pSub );
@@ -425,7 +428,8 @@ bool UpdateItemState(
 	}
 
 	// Ok, this is a new panel.
-	vgui::VPANEL vPanel = pSub->GetInt( "PanelPtr" );
+	// dimhotepus: GetInt -> GetPtr
+	vgui::VPANEL vPanel = reinterpret_cast<vgui::VPANEL>( pSub->GetPtr( "PanelPtr" ) );
 
 	int iBaseColor[3] = { 255, 255, 255 };
 	if ( ipanel->IsPopup( vPanel ) )

@@ -117,8 +117,8 @@ public:
 	virtual const netadr_t	*GetAddress( void );
 
 	// Allow creating object to store a 32 bit value and retrieve it
-	virtual void			SetUserData( unsigned int userData );
-	virtual unsigned int	GetUserData(void ) const;
+	virtual void			SetUserData( uintp userData );
+	virtual uintp	GetUserData(void ) const;
 
 	// Allow other objects to get the raw socket interger
 	virtual int				GetSocketNumber( void ) const;
@@ -144,8 +144,8 @@ private:
 	CMsgHandler				*m_pMessageHandlers;
 	// Winsock socket number
 	int						m_Socket;
-	// User 32 bit value
-	unsigned int			m_nUserData;
+	// User native-size value
+	uintp					m_nUserData;
 	// Socket to which non Broadcast SendMessage was directed.  The socket will wait for a response
 	//  from that exact address
 	netadr_t				m_ToAddress;

@@ -269,7 +269,7 @@ public:
 	virtual void Download( Rect_t *pRect = 0, int nAdditionalCreationFlags = 0 ) {}
 
 	// Uses for stats. . .get the approximate size of the texture in it's current format.
-	virtual int GetApproximateVidMemBytes( void ) const { return 64; }
+	virtual intp GetApproximateVidMemBytes( void ) const { return 64; }
 
 	virtual bool IsError() const { return false; }
 
@@ -744,7 +744,7 @@ public:
 	}
 
 	// Can't be const because the material might have to precache itself.
-	virtual int				GetTextureMemoryBytes( void )
+	virtual intp				GetTextureMemoryBytes( void )
 	{
 		return 64;
 	}

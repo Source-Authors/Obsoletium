@@ -624,7 +624,7 @@ public:
 
 		const char *base = BaseClass::GetDesc();
 		CDmAttribute *pAtt = GetAttribute();
-		CUtlBuffer serialized( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer serialized( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 		if ( pAtt && pAtt->GetType() != AT_ELEMENT )
 		{
 			::Serialize( serialized, m_Value );
@@ -2584,9 +2584,9 @@ bool HandleCompare( const DmElementHandle_t &a, const DmElementHandle_t &b )
 	return a == b;
 }
 
-unsigned int HandleHash( const DmElementHandle_t &h )
+uintp HandleHash( const DmElementHandle_t &h )
 {
-	return (unsigned int)h;
+	return (uintp)h;
 }
 
 int CDmAttribute::EstimateMemoryUsage( TraversalDepth_t depth ) const

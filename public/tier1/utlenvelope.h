@@ -20,7 +20,7 @@
 class CUtlDataEnvelope
 {
 public:
-	CUtlDataEnvelope( const void *pData, int nBytes );
+	CUtlDataEnvelope( const void *pData, intp nBytes );
 	CUtlDataEnvelope( const CUtlDataEnvelope &from );
 	~CUtlDataEnvelope();
 
@@ -30,7 +30,7 @@ public:
 	operator void *() const;
 
 private:
-	void Assign( const void *pData, int nBytes );
+	void Assign( const void *pData, intp nBytes );
 	void Assign( const CUtlDataEnvelope &from );
 	void Purge();
 
@@ -38,9 +38,9 @@ private:
 	union
 	{
 		byte *m_pData;
-		byte m_data[4];
+		byte m_data[ sizeof(size_t) ];
 	};
-	int m_nBytes;
+	intp m_nBytes;
 };
 
 
@@ -50,7 +50,7 @@ template <typename T>
 class CUtlEnvelope : protected CUtlDataEnvelope
 {
 public:
-	CUtlEnvelope( const T *pData, int nElems = 1 );
+	CUtlEnvelope( const T *pData, intp nElems = 1 );
 	CUtlEnvelope( const CUtlEnvelope<T> &from );
 
 	CUtlEnvelope<T> &operator=( const CUtlEnvelope<T> &from );
@@ -112,12 +112,12 @@ private:
 
 #include "tier0/memdbgon.h"
 
-inline void CUtlDataEnvelope::Assign( const void *pData, int nBytes )
+inline void CUtlDataEnvelope::Assign( const void *pData, intp nBytes )
 {
 	if ( pData )
 	{
 		m_nBytes = nBytes;
-		if ( m_nBytes > 4 )
+		if ( m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) )
 		{
 			m_pData = new byte[nBytes];
 			memcpy( m_pData, pData, nBytes );
@@ -129,7 +129,7 @@ inline void CUtlDataEnvelope::Assign( const void *pData, int nBytes )
 	}
 	else
 	{
-		m_pData = NULL;
+		m_pData = nullptr;
 		m_nBytes = 0;
 	}
 }
@@ -141,12 +141,12 @@ inline void CUtlDataEnvelope::Assign( const CUtlDataEnvelope &from )
 
 inline void CUtlDataEnvelope::Purge()
 {
-	if (m_nBytes > 4)
+	if (m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) )
 		delete [] m_pData;
 	m_nBytes = 0;
 }
 
-inline CUtlDataEnvelope::CUtlDataEnvelope( const void *pData, int nBytes )
+inline CUtlDataEnvelope::CUtlDataEnvelope( const void *pData, intp nBytes )
 {
 	Assign( pData, nBytes );
 }
@@ -172,26 +172,26 @@ inline CUtlDataEnvelope::operator void *()
 {
 	if ( !m_nBytes )
 	{
-		return NULL;
+		return nullptr;
 	}
 
-	return ( m_nBytes > 4) ? m_pData : m_data;
+	return ( m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) ) ? m_pData : m_data;
 }
 
 inline CUtlDataEnvelope::operator void *() const
 {
 	if ( !m_nBytes )
 	{
-		return NULL;
+		return nullptr;
 	}
 
-	return ( m_nBytes > 4) ? (void *)m_pData : (void *)m_data;
+	return ( m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) ) ? (void *)m_pData : (void *)m_data;
 }
 
 //-----------------------------------------------------------------------------
 
 template <typename T>
-inline CUtlEnvelope<T>::CUtlEnvelope( const T *pData, int nElems )
+inline CUtlEnvelope<T>::CUtlEnvelope( const T *pData, intp nElems )
 	: CUtlDataEnvelope( pData, sizeof(T) * nElems )
 {
 }

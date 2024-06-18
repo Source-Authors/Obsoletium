@@ -1645,7 +1645,7 @@ void CVideoMode_Common::ReleaseVideo( void )
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::ReadScreenPixels( int x, int y, int w, int h, void *pBuffer, ImageFormat format )
 {
-    int nBytes = ImageLoader::GetMemRequired( w, h, 1, format, false );
+    intp nBytes = ImageLoader::GetMemRequired( w, h, 1, format, false );
     memset( pBuffer, 0, nBytes );
 }
 
@@ -2187,7 +2187,7 @@ void CVideoMode_Common::TakeSnapshotJPEG( const char *pFilename, int quality )
     Assert( pFilename );
 
     // Output buffer
-    CUtlBuffer buf( 0, 0 );
+    CUtlBuffer buf( (intp)0, 0 );
     TakeSnapshotJPEGToBuffer( buf, quality );
 
     int finalSize = 0;
@@ -2647,7 +2647,7 @@ void CVideoMode_MaterialSystem::ReadScreenPixels( int x, int y, int w, int h, vo
     }
     else
     {
-        int nBytes = ImageLoader::GetMemRequired( w, h, 1, format, false );
+        intp nBytes = ImageLoader::GetMemRequired( w, h, 1, format, false );
         memset( pBuffer, 0, nBytes );
     }
 }

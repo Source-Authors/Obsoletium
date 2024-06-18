@@ -321,7 +321,7 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 	height = pVTFTexture->Height();
 	pVTFTexture->ConvertImageFormat( IMAGE_FORMAT_RGBA8888, false );
 
-	int nMemSize = ImageLoader::GetMemRequired( width, height, 1, IMAGE_FORMAT_RGBA8888, false );
+	intp nMemSize = ImageLoader::GetMemRequired( width, height, 1, IMAGE_FORMAT_RGBA8888, false );
 	unsigned char *pMemImage = (unsigned char *)malloc(nMemSize);
 	if ( pMemImage == NULL )
 	{
@@ -1463,7 +1463,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 
 	int imageMemoryFootprint = header.width * header.height * header.bits / 8;
 
-	CUtlBuffer inbuf(0, imageMemoryFootprint);
+	CUtlBuffer inbuf((intp)0, imageMemoryFootprint);
 
 	// read in the image
 	int nBytesRead = fread(inbuf.Base(), imageMemoryFootprint, 1, infile);

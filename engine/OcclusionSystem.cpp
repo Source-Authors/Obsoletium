@@ -1010,7 +1010,7 @@ bool CEdgeList::EdgeLess::Less( const unsigned short& src1, const unsigned short
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CEdgeList::CEdgeList() : m_Edges( (intp)0, 32 ), m_OrigSortIndices( 0, 32 )
+CEdgeList::CEdgeList() : m_Edges( (intp)0, 32 ), m_OrigSortIndices( (intp)0, 32 )
 {
 	m_OrigSortIndices.SetLessContext( &m_Edges );
 

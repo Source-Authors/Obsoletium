@@ -108,7 +108,7 @@ public:
 	bool	IsTwoSided();
 
 	int		GetNumPasses( void );
-	int		GetTextureMemoryBytes( void );
+	intp		GetTextureMemoryBytes( void );
 
 	void	SetUseFixedFunctionBakedLighting( bool bEnable );
 
@@ -2681,7 +2681,7 @@ PreviewImageRetVal_t CMaterial::GetPreviewImageProperties( int *width, int *heig
 		return MATERIAL_NO_PREVIEW_IMAGE;
 	}
 
-	int nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
+	unsigned short nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 	unsigned char *pMem = (unsigned char *)stackalloc( nHeaderSize );
 	CUtlBuffer buf( pMem, nHeaderSize );
 	if( !g_pFullFileSystem->ReadFile( pFileName, NULL, buf, nHeaderSize ) )
@@ -2710,8 +2710,8 @@ PreviewImageRetVal_t CMaterial::GetPreviewImage( unsigned char *pData, int width
 					             ImageFormat imageFormat ) const
 {
 	CUtlBuffer buf;
-	int nHeaderSize;
-	int nImageOffset, nImageSize;
+	unsigned short nHeaderSize;
+	intp nImageOffset, nImageSize;
 
 	char const* pFileName = GetPreviewImageFileName();
 	if ( IsX360() || !pFileName )
@@ -2731,8 +2731,7 @@ PreviewImageRetVal_t CMaterial::GetPreviewImage( unsigned char *pData, int width
 	buf.EnsureCapacity( nHeaderSize );
 	
 	// read the header first.. it's faster!!
-	int nBytesRead; // GCC won't let this be initialized right away
-	nBytesRead = g_pFullFileSystem->Read( buf.Base(), nHeaderSize, fileHandle );
+	int nBytesRead = g_pFullFileSystem->Read( buf.Base(), nHeaderSize, fileHandle );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
 		
 	// Unserialize the header
@@ -2776,7 +2775,7 @@ fail:
 	{
 		g_pFullFileSystem->Close( fileHandle );
 	}
-	int nSize = ImageLoader::GetMemRequired( width, height, 1, imageFormat, false );
+	intp nSize = ImageLoader::GetMemRequired( width, height, 1, imageFormat, false );
 	memset( pData, 0xff, nSize );
 	DestroyVTFTexture( pVTFTexture );
 	return MATERIAL_PREVIEW_IMAGE_BAD;
@@ -3548,10 +3547,10 @@ int CMaterial::GetNumPasses( void )
 	return m_ShaderRenderState.m_pSnapshots[mod].m_nPassCount;
 }
 
-int CMaterial::GetTextureMemoryBytes( void )
+intp CMaterial::GetTextureMemoryBytes( void )
 {
 	Precache();
-	int bytes = 0;
+	intp bytes = 0;
 	int i;
 	for( i = 0; i < m_VarCount; i++ )
 	{
@@ -3559,7 +3558,7 @@ int CMaterial::GetTextureMemoryBytes( void )
 		if( pVar->GetType() == MATERIAL_VAR_TYPE_TEXTURE )
 		{
 			ITexture *pTexture = pVar->GetTextureValue();
-			if( pTexture && pTexture != ( ITexture * )0xffffffff )
+			if( pTexture && pTexture != ( ITexture * )-1 )
 			{
 				bytes += pTexture->GetApproximateVidMemBytes();
 			}

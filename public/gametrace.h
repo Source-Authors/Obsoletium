@@ -133,11 +133,11 @@ public:
 	bool	IsEmpty( void ) const			{ return ( m_nLeafCount == 0 && m_nEntityCount == 0 ); }
 
 	int		LeafCount( void ) const			{ return m_nLeafCount; }
-	int		LeafCountMax( void ) const		{ return m_aLeafList.Count(); }
+	intp		LeafCountMax( void ) const		{ return m_aLeafList.Count(); }
 	void    LeafCountReset( void )			{ m_nLeafCount = 0; }
 
 	int		EntityCount( void ) const		{ return m_nEntityCount; }
-	int		EntityCountMax( void ) const	{ return m_aEntityList.Count(); }
+	intp		EntityCountMax( void ) const	{ return m_aEntityList.Count(); }
 	void	EntityCountReset( void )		{ m_nEntityCount = 0; }
 
 	// For leaves...

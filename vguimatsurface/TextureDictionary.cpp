@@ -31,7 +31,7 @@ static CRC32_t Texture_CRCName( const char *string )
 	CRC32_t crc;
 	
 	CRC32_Init( &crc );
-	CRC32_ProcessBuffer( &crc, (void *)string, strlen( string ) );
+	CRC32_ProcessBuffer( &crc, (void *)string, Q_strlen( string ) );
 	CRC32_Final( &crc );
 
 	return crc;
@@ -165,7 +165,7 @@ public:
 
 		if ( IsPC() )
 		{
-			int size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
+			intp size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
 			m_pTextureBits = new unsigned char[size];
 			memset( m_pTextureBits, 0, size );
 		}
@@ -183,7 +183,7 @@ public:
 
 	void UpdateBackingBits( Rect_t &subRect, const unsigned char *pBits, Rect_t &uploadRect, ImageFormat format )
 	{
-		int size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
+		intp size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
 		if ( IsPC() )
 		{
 			if ( !m_pTextureBits )
@@ -242,7 +242,7 @@ public:
 				{
 					// copy each row across for the update
 					char *pchData = (char *)pVTFTexture->ImageData( 0, 0, 0, 0, y ) + pSubRect->x *nFormatBytes;
-					int size = ImageLoader::GetMemRequired( pSubRect->width, 1, 1, m_nFormat, false );
+					intp size = ImageLoader::GetMemRequired( pSubRect->width, 1, 1, m_nFormat, false );
 					V_memcpy( pchData, m_pTextureBits + (y * m_nWidth + pSubRect->x) * nFormatBytes, size );
 				}
 			}
@@ -281,7 +281,7 @@ public:
 				Assert( 0 );
 				return;
 			}
-			int size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
+			intp size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
 			Q_memcpy( pVTFTexture->ImageData( 0, 0, 0 ), m_pTextureBits, size );
 		}
 	}

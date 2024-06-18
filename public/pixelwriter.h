@@ -33,7 +33,7 @@
 class CPixelWriter
 {
 public:
-	FORCEINLINE void SetPixelMemory( ImageFormat format, void* pMemory, int stride );
+	FORCEINLINE void SetPixelMemory( ImageFormat format, void* pMemory, unsigned stride );
 	FORCEINLINE void *GetPixelMemory() { return m_pBase; }
 
 	// this is no longer used:
@@ -88,7 +88,7 @@ private:
 
 	unsigned char*	m_pBase;
 	unsigned char*	m_pBits;
-	unsigned short	m_BytesPerRow;
+	unsigned int	m_BytesPerRow;
 	unsigned char	m_Size;
 	unsigned char	m_nFlags;
 	signed short	m_RShift;
@@ -113,11 +113,11 @@ FORCEINLINE_PIXEL bool CPixelWriter::IsUsingFloatFormat() const
 	return (m_nFlags & PIXELWRITER_USING_FLOAT_FORMAT) != 0;
 }
 
-FORCEINLINE_PIXEL void CPixelWriter::SetPixelMemory( ImageFormat format, void* pMemory, int stride )
+FORCEINLINE_PIXEL void CPixelWriter::SetPixelMemory( ImageFormat format, void* pMemory, unsigned stride )
 {
 	m_pBits = (unsigned char*)pMemory;
 	m_pBase = m_pBits;
-	m_BytesPerRow = (unsigned short)stride;
+	m_BytesPerRow = stride;
 	m_nFlags = 0;
 #ifdef _X360
 	m_Format = format;

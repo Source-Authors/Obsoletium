@@ -211,7 +211,7 @@ void CBlacklistedServers::AddServer( gameserveritem_t &server )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-blacklisted_server_t *CBlacklistedServers::GetBlacklistedServer( int iServerID )
+blacklisted_server_t *CBlacklistedServers::GetBlacklistedServer( intp iServerID )
 {
 	return m_blackList.GetServer( iServerID );
 }
@@ -371,7 +371,7 @@ void CBlacklistedServers::OnRemoveFromBlacklist()
 	for ( int iGame = (m_pGameList->GetSelectedItemsCount() - 1); iGame >= 0; iGame-- )
 	{
 		int itemID = m_pGameList->GetSelectedItem( iGame );
-		int serverID = m_pGameList->GetItemData( itemID )->userData;
+		intp serverID = m_pGameList->GetItemData( itemID )->userData;
 
 		m_pGameList->RemoveItem( itemID );
 		m_blackList.RemoveServer( serverID );

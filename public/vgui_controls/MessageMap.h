@@ -70,9 +70,9 @@ struct MessageMapItem_t
 	DataType_t secondParamType;
 	const char *secondParamName;
 
-	int nameSymbol;
-	int firstParamSymbol;
-	int secondParamSymbol;
+	intp nameSymbol;
+	intp firstParamSymbol;
+	intp secondParamSymbol;
 };
 
 #define DECLARE_PANELMESSAGEMAP( className )												\
@@ -221,6 +221,7 @@ public:							\
 #define MESSAGE_FUNC_PTR_WCHARPTR( name, scriptname, p1, p2 )	_MessageFuncCommon( name, scriptname, 2, vgui::DATATYPE_PTR, #p1, vgui::DATATYPE_CONSTWCHARPTR, #p2 );	virtual void name( vgui::Panel *p1, const wchar_t *p2 )
 #define MESSAGE_FUNC_HANDLE_WCHARPTR( name, scriptname, p1, p2 )	_MessageFuncCommon( name, scriptname, 2, vgui::DATATYPE_HANDLE, #p1, vgui::DATATYPE_CONSTWCHARPTR, #p2 );	virtual void name( vgui::VPANEL p1, const wchar_t *p2 )
 #define MESSAGE_FUNC_CHARPTR_CHARPTR( name, scriptname, p1, p2 )	_MessageFuncCommon( name, scriptname, 2, vgui::DATATYPE_CONSTCHARPTR, #p1, vgui::DATATYPE_CONSTCHARPTR, #p2 );	virtual void name( const char *p1, const char *p2 )
+#define MESSAGE_FUNC_HANDLE_HANDLE( name, scriptname, p1, p2 )	_MessageFuncCommon( name, scriptname, 2, vgui::DATATYPE_HANDLE, #p1, vgui::DATATYPE_HANDLE, #p2 );	virtual void name( vgui::VPANEL p1, vgui::VPANEL p2 )
 
 // unlimited parameters (passed in the whole KeyValues)
 #define MESSAGE_FUNC_PARAMS( name, scriptname, p1 )	_MessageFuncCommon( name, scriptname, 1, vgui::DATATYPE_KEYVALUES, NULL, 0, 0 );	virtual void name( KeyValues *p1 )

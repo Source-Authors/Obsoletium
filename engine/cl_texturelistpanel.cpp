@@ -1089,7 +1089,7 @@ CRenderTextureEditor::CRenderTextureEditor( vgui::Panel *parent, char const *szN
 	m_pInfo( NULL ),
 	m_iInfoHint( 0 ),
 	m_hFont( vgui::INVALID_FONT ),
-	m_bufInfoText( 0, 0, CUtlBuffer::TEXT_BUFFER )
+	m_bufInfoText( (intp)0, 0, CUtlBuffer::TEXT_BUFFER )
 {
 	m_pMaterials = vgui::SETUP_PANEL( new CVmtTextEntry( this, "Materials" ) );
 	m_pMaterials->SetMultiline( true );
@@ -1215,7 +1215,7 @@ void CRenderTextureEditor::SetDispInfo( KeyValues *kv, int iHint )
 	}
 
 	// Now that we have a list of materials make a printable version
-	CUtlBuffer bufText( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer bufText( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	if ( !arrMaterials.GetNumStrings() )
 	{
@@ -1415,7 +1415,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 
 	if ( !stricmp( command, "Reload" ) && m_lstMaterials.Count() )
 	{
-		CUtlBuffer bufCommand( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer bufCommand( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 		int idxMaterial = 0;
 
 		//
@@ -1530,7 +1530,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 			// Have tga - pump in the txt file
 			sprintf( pExtPut, ".txt" );
 
-			CUtlBuffer bufTxtFileBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+			CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			g_pFullFileSystem->ReadFile( szFileName, 0, bufTxtFileBuffer );
 			for ( int k = 0; k < 1024; ++ k ) bufTxtFileBuffer.PutChar( 0 );
 
@@ -1567,7 +1567,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 				vgui::system()->ShellExecuteEx( "open", "cmd.exe", chCommand );
 				Sys_Sleep( 200 );
 
-				CUtlBuffer bufTxtFileBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+				CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 				g_pFullFileSystem->ReadFile( szTxtFileName, 0, bufTxtFileBuffer );
 				for ( int k = 0; k < 1024; ++ k ) bufTxtFileBuffer.PutChar( 0 );
 
@@ -1838,7 +1838,7 @@ void CRenderTextureEditor::Paint()
 			if ( wact > 4 || hact > 4 )
 			{
 				char chbuf[50];
-				int mem = ImageLoader::GetMemRequired( max( min( wact, 4 ), wact / 2 ), max( min( hact, 4 ), hact / 2 ), max( 1, dact / 2 ), fmt, true );
+				intp mem = ImageLoader::GetMemRequired( max( min( wact, 4 ), wact / 2 ), max( min( hact, 4 ), hact / 2 ), max( 1, dact / 2 ), fmt, true );
 				mem = ( mem + 511 ) / 1024;
 				FmtCommaNumber( chbuf, mem );
 				
@@ -1848,7 +1848,7 @@ void CRenderTextureEditor::Paint()
 			if ( wmap > wact || hmap > hact || dmap > dact )
 			{
 				char chbuf[ 50 ];
-				int mem = ImageLoader::GetMemRequired( min( wmap, wact * 2 ), min( hmap, hact * 2 ), min( dmap, dact * 2 ), fmt, true );
+				intp mem = ImageLoader::GetMemRequired( min( wmap, wact * 2 ), min( hmap, hact * 2 ), min( dmap, dact * 2 ), fmt, true );
 				mem = ( mem + 511 ) / 1024;
 				FmtCommaNumber( chbuf, mem );
 

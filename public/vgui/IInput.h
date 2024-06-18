@@ -101,21 +101,21 @@ public:
 	{
 		wchar_t		shortname[ 4 ];
 		wchar_t		menuname[ 128 ];
-		int			handleValue;
+		intp		handleValue;
 		bool		active; // true if this is the active language
 	};
 
 	struct ConversionModeItem
 	{
 		wchar_t		menuname[ 128 ];
-		int			handleValue;
+		intp		handleValue;
 		bool		active; // true if this is the active conversion mode
 	};
 
 	struct SentenceModeItem
 	{
 		wchar_t		menuname[ 128 ];
-		int			handleValue;
+		intp		handleValue;
 		bool		active; // true if this is the active sentence mode
 	};
 
@@ -124,9 +124,9 @@ public:
 	virtual int	 GetIMEConversionModes( ConversionModeItem *dest, int destcount ) = 0;
 	virtual int	 GetIMESentenceModes( SentenceModeItem *dest, int destcount ) = 0;
 
-	virtual void OnChangeIMEByHandle( int handleValue ) = 0;
-	virtual void OnChangeIMEConversionModeByHandle( int handleValue ) = 0;
-	virtual void OnChangeIMESentenceModeByHandle( int handleValue ) = 0;
+	virtual void OnChangeIMEByHandle( intp handleValue ) = 0;
+	virtual void OnChangeIMEConversionModeByHandle( intp handleValue ) = 0;
+	virtual void OnChangeIMESentenceModeByHandle( intp handleValue ) = 0;
 
 	virtual void OnInputLanguageChanged() = 0;
 	virtual void OnIMEStartComposition() = 0;

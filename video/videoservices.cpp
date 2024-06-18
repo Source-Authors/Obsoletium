@@ -234,13 +234,13 @@ bool CValveVideoServices::ConnectVideoLibraries( CreateInterfaceFn factory )
 			int eCount = pSubSystem->GetSupportedFileExtensionCount();
 			Assert( eCount > 0 );
 			
-			for ( int n = 0; n < eCount; n++ )
+			for ( int nv = 0; nv < eCount; nv++ )
 			{
 				VideoFileExtensionInfo_t	extInfoRec;
 				
-				extInfoRec.m_FileExtension = pSubSystem->GetSupportedFileExtension( n );
+				extInfoRec.m_FileExtension = pSubSystem->GetSupportedFileExtension( nv );
 				extInfoRec.m_VideoSubSystem = pSubSystem->GetSystemID();
-				extInfoRec.m_VideoFeatures = pSubSystem->GetSupportedFileExtensionFeatures( n );
+				extInfoRec.m_VideoFeatures = pSubSystem->GetSupportedFileExtensionFeatures( nv );
 				
 				AssertPtr( extInfoRec.m_FileExtension );
 				
@@ -290,16 +290,16 @@ bool CValveVideoServices::DisconnectVideoLibraries()
 }
 
 
-int CValveVideoServices::DestroyAllVideoInterfaces()
+ptrdiff_t CValveVideoServices::DestroyAllVideoInterfaces()
 {
-	int n = m_RecorderList.Count() + m_MaterialList.Count();
+	ptrdiff_t n = m_RecorderList.Count() + m_MaterialList.Count();
 
-	for ( int i = m_RecorderList.Count() -1; i >= 0; i-- )
+	for ( ptrdiff_t i = m_RecorderList.Count() -1; i >= 0; i-- )
 	{
 		DestroyVideoRecorder( (IVideoRecorder*) m_RecorderList[i].m_pObject );
 	}
 
-	for ( int i = m_MaterialList.Count() -1; i >= 0; i-- )
+	for ( ptrdiff_t i = m_MaterialList.Count() -1; i >= 0; i-- )
 	{
 		DestroyVideoMaterial( (IVideoMaterial*) m_MaterialList[i].m_pObject );
 	}
@@ -615,9 +615,6 @@ VideoResult_t CValveVideoServices::DestroyVideoMaterial( IVideoMaterial* pVideoM
 	}
 
 	return SetResult( VideoResult::RECORDER_NOT_FOUND );
-
-
-	return VideoResult::SUCCESS;
 }
 
 
@@ -1334,7 +1331,7 @@ bool CVideoCommonServices::ProcessFullScreenInput( bool &bAbortEvent, bool &bPau
 		// did we get a quit message?
 		if ( msg.message == WM_QUIT )
 		{
-			::PostQuitMessage( msg.wParam );
+			::PostQuitMessage( static_cast<int>(msg.wParam) );
 			return true;			
 		}
 	

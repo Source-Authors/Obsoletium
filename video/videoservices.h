@@ -116,7 +116,7 @@ class CValveVideoServices : public CTier3AppSystem< IVideoServices >
 		bool							ConnectVideoLibraries( CreateInterfaceFn factory );
 		bool							DisconnectVideoLibraries();
 		
-		int								DestroyAllVideoInterfaces();
+		ptrdiff_t								DestroyAllVideoInterfaces();
 
 		int								GetIndexForSystem( VideoSystem_t n );
 		VideoSystem_t					GetSystemForIndex( int n );

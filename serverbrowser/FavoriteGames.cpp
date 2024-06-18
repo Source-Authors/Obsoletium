@@ -129,7 +129,7 @@ void CFavoriteGames::OnRemoveFromFavorites()
 	for ( int iGame = 0; iGame < m_pGameList->GetSelectedItemsCount(); iGame++ )
 	{
 		int itemID = m_pGameList->GetSelectedItem( iGame );
-		int serverID = m_pGameList->GetItemData(itemID)->userData;
+		intp serverID = m_pGameList->GetItemData(itemID)->userData;
 		
 		gameserveritem_t *pServer = steamapicontext->SteamMatchmakingServers()->GetServerDetails( m_hRequest, serverID );
 		

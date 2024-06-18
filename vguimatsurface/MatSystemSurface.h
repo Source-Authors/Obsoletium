@@ -205,7 +205,7 @@ public:
 
 	//!! these functions Should not be accessed directly, but only through other vgui items
 	//!! need to move these to seperate interface
-	virtual int GetPopupCount();
+	virtual intp GetPopupCount();
 	virtual vgui::VPANEL GetPopup( int index );
 	virtual bool ShouldPaintChildPanel(vgui::VPANEL childPanel);
 	virtual bool RecreateContext(vgui::VPANEL panel);
@@ -533,7 +533,7 @@ private:
 	float	m_flZPos;
 	CUtlDict< vgui::IImage *, unsigned short >	m_FileTypeImages;
 
-	int		GetTitleEntry( vgui::VPANEL panel );
+	intp		GetTitleEntry( vgui::VPANEL panel );
 
 	virtual void DrawSetTextureRGBAEx(int id, const unsigned char *rgba, int wide, int tall, ImageFormat format );
 

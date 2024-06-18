@@ -47,7 +47,7 @@ bool BootAppSystemGroup::Create() {
   double start_time{Plat_FloatTime()};
 
   IFileSystem *file_system =
-      (IFileSystem *)FindSystem(FILESYSTEM_INTERFACE_VERSION);
+      FindSystem<IFileSystem>(FILESYSTEM_INTERFACE_VERSION);
   file_system->InstallDirtyDiskReportFunc(ReportDirtyDiskNoMaterialSystem);
 
   resource_listing_ =
@@ -108,7 +108,7 @@ bool BootAppSystemGroup::Create() {
                  command_line_->FindParm("-p4"))) {
 #ifdef STAGING_ONLY
     AppModule_t p4libModule = LoadModule("p4lib" DLL_EXT_STRING);
-    IP4 *p4 = (IP4 *)AddSystem(p4libModule, P4_INTERFACE_VERSION);
+    IP4 *p4 = AddSystem<IP4>(p4libModule, P4_INTERFACE_VERSION);
 
     // If we are running with -steam then that means the tools are being used by
     // an SDK user. Don't exit in this case!
@@ -118,23 +118,23 @@ bool BootAppSystemGroup::Create() {
 #endif  // STAGING_ONLY
 
     const AppModule_t vstdlib_module{LoadModule("vstdlib" DLL_EXT_STRING)};
-    const IProcessUtils *process_utils = (IProcessUtils *)AddSystem(
+    const IProcessUtils *process_utils = AddSystem<IProcessUtils>(
         vstdlib_module, PROCESS_UTILS_INTERFACE_VERSION);
     if (!process_utils) return false;
   }
 
   // Connect to iterfaces loaded in AddSystems that we need locally
   IMaterialSystem *material_system =
-      (IMaterialSystem *)FindSystem(MATERIAL_SYSTEM_INTERFACE_VERSION);
+      FindSystem<IMaterialSystem>(MATERIAL_SYSTEM_INTERFACE_VERSION);
   if (!material_system) return false;
 
-  engine_api_ = (IEngineAPI *)FindSystem(VENGINE_LAUNCHER_API_VERSION);
+  engine_api_ = FindSystem<IEngineAPI>(VENGINE_LAUNCHER_API_VERSION);
 
   // Load the hammer DLL if we're in editor mode
 #if defined(_WIN32) && defined(STAGING_ONLY)
   if (m_bEditMode) {
     AppModule_t hammerModule = LoadModule("hammer_dll" DLL_EXT_STRING);
-    g_pHammer = (IHammer *)AddSystem(hammerModule, INTERFACEVERSION_HAMMER);
+    g_pHammer = AddSystem<IHammer>(hammerModule, INTERFACEVERSION_HAMMER);
     if (!g_pHammer) {
       return false;
     }

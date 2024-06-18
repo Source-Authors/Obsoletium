@@ -93,7 +93,7 @@ void CBinkMaterialRGBTextureRegenerator::RegenerateTextureBits( ITexture *pTextu
 
 	// Copy directly from the Bink GWorld
 	unsigned char   *pImageData	= pVTFTexture->ImageData();
-	int dstStride = pVTFTexture->RowSizeInBytes( 0 );
+	intp dstStride = pVTFTexture->RowSizeInBytes( 0 );
 
 	unsigned char *pSrcData = m_SrcImage;
 

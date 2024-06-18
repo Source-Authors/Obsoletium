@@ -325,7 +325,7 @@ void CMapReslistGenerator::BuildEngineLogFromReslist()
 {
 	m_EngineLog.RemoveAll();
 
-	CUtlBuffer buffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFileSystem->ReadFile( CFmtStr( "%s\\%s", m_sResListDir.String(), ENGINE_RESLIST_FILE ), "DEFAULT_WRITE_PATH", buffer ) )
 	{
 		// does not exist

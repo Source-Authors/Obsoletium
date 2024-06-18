@@ -757,7 +757,7 @@ void DispInfo_BatchDecals( CDispInfo **pVisibleDisps, int nVisibleDisps )
 			// There is only one group at a time.
 			int iGroup = 0;
 
-			int iPool = g_aDispDecalSortPool.Alloc( true );
+			intp iPool = g_aDispDecalSortPool.Alloc( true );
 			g_aDispDecalSortPool[iPool] = decal.m_pDecal;
 			
 			int iSortTree = decal.m_pDecal->m_iSortTree;
@@ -766,7 +766,7 @@ void DispInfo_BatchDecals( CDispInfo **pVisibleDisps, int nVisibleDisps )
 			DecalMaterialBucket_t &materialBucket = g_aDispDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].Element( iSortMaterial );
 			if ( materialBucket.m_nCheckCount == g_nDispDecalSortCheckCount )
 			{	
-				int iHead = materialBucket.m_iHead;
+				intp iHead = materialBucket.m_iHead;
 				g_aDispDecalSortPool.LinkBefore( iHead, iPool );
 			}
 			
@@ -837,7 +837,7 @@ void DispInfo_DrawDecalsGroup( int iGroup, int iTreeType )
 			if ( materialBucketList.Element( iBucket ).m_nCheckCount != g_nDispDecalSortCheckCount )
 				continue;
 			
-			int iHead = materialBucketList.Element( iBucket ).m_iHead;
+			intp iHead = materialBucketList.Element( iBucket ).m_iHead;
 			if ( !g_aDispDecalSortPool.IsValidIndex( iHead ) )
 				continue;
 
@@ -856,7 +856,7 @@ void DispInfo_DrawDecalsGroup( int iGroup, int iTreeType )
 			bool bBatchInit = true;
 			
 			int nCount;
-			int iElement = iHead;
+			intp iElement = iHead;
 			while ( iElement != g_aDispDecalSortPool.InvalidIndex() )
 			{
 				decal_t *pDecal = g_aDispDecalSortPool.Element( iElement );

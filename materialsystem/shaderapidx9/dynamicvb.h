@@ -256,8 +256,8 @@ private:
 
 #ifdef VPROF_ENABLED
 	int				m_Frame;
-	int				*m_pFrameCounter;
-	int				*m_pGlobalCounter;
+	intp				*m_pFrameCounter;
+	intp				*m_pGlobalCounter;
 #endif
 
 #ifdef _DEBUG

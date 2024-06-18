@@ -2244,7 +2244,7 @@ inline ShadowType_t CClientShadowMgr::GetActualShadowCastType( IClientRenderable
 class CShadowLeafEnum : public ISpatialLeafEnumerator
 {
 public:
-	bool EnumerateLeaf( int leaf, int context )
+	bool EnumerateLeaf( int leaf, intp context )
 	{
 		m_LeafList.AddToTail( leaf );
 		return true;

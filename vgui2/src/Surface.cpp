@@ -185,7 +185,7 @@ public:
 	virtual bool SupportsFeature(SurfaceFeature_e feature);
 	virtual void SetTopLevelFocus(VPANEL panel);
 
-	virtual int GetPopupCount();
+	virtual intp GetPopupCount();
 	virtual VPANEL GetPopup(int index);
 	virtual void AddPanel(VPANEL panel);
 	virtual void ReleasePanel(VPANEL panel);
@@ -2359,7 +2359,7 @@ void CWin32Surface::SetAsToolBar(VPANEL panel, bool state)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CWin32Surface::GetPopupCount()
+intp CWin32Surface::GetPopupCount()
 {
 	return _popupList.GetCount();
 }

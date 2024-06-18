@@ -40,7 +40,8 @@ typedef struct
 
 } script_t;
 
-#define	MAX_INCLUDES	64
+constexpr int MAX_INCLUDES{64};
+
 script_t	scriptstack[MAX_INCLUDES];
 script_t	*script = NULL;
 int			scriptline;
@@ -303,7 +304,7 @@ bool ExpandMacroToken( char *&token_p )
 
 		// get token pointer
 		char *tp = script->script_p + 1;
-		int len = (cp - tp);
+		intp len = (cp - tp);
 		*(tp + len) = '\0';
 
 		// lookup macro parameter
@@ -360,7 +361,7 @@ bool ExpandVariableToken( char *&token_p )
 
 		// get token pointer
 		char *tp = script->script_p + 1;
-		int len = (cp - tp);
+		intp len = (cp - tp);
 		*(tp + len) = '\0';
 
 		// lookup macro parameter

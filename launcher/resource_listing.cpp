@@ -46,7 +46,7 @@ bool SaveResourceListing(IFileSystem *file_system,
 void LoadResourceListing(IFileSystem *file_system,
                          CUtlRBTree<CUtlString, int> &list,
                          const char *pchFileName, const char *pchSearchPath) {
-  CUtlBuffer buffer(0, 0, CUtlBuffer::TEXT_BUFFER);
+  CUtlBuffer buffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
   if (!file_system->ReadFile(pchFileName, pchSearchPath, buffer)) {
     // does not exist
     return;
@@ -322,7 +322,7 @@ void ResourceListing::LoadMapList(const char *pchGameDir,
   Q_snprintf(fullpath, sizeof(fullpath), "%s/%s", pchGameDir, pchMapFile);
 
   // Load them in
-  CUtlBuffer buf(0, 0, CUtlBuffer::TEXT_BUFFER);
+  CUtlBuffer buf((intp)0, 0, CUtlBuffer::TEXT_BUFFER);
 
   if (file_system_->ReadFile(fullpath, "GAME", buf)) {
     char szMap[MAX_PATH];

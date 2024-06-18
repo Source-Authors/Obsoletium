@@ -202,7 +202,7 @@ public:
 	const T *Base() const;
 
 	// Iteration
-	int		Count() const;
+	intp		Count() const;
 	const T& operator[]( int i ) const;
 	const T& Element( int i ) const;
 	const T& Get( int i ) const;
@@ -1231,7 +1231,7 @@ const void* CDmaArrayConstBase<T,B>::GetUntyped( int i ) const
 }
 
 template< class T, class B >
-inline int CDmaArrayConstBase<T,B>::Count() const
+inline intp CDmaArrayConstBase<T,B>::Count() const
 {
 	return this->Value().Count();
 }

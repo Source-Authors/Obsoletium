@@ -120,9 +120,15 @@ public:
 	MESSAGE_FUNC( CopySelected, "DoCopySelected" );
 	MESSAGE_FUNC( Paste, "DoPaste" );
 
+#ifndef PLATFORM_64BITS
 	MESSAGE_FUNC_INT( LanguageChanged, "DoLanguageChanged", handle );
 	MESSAGE_FUNC_INT( ConversionModeChanged, "DoConversionModeChanged", handle );
 	MESSAGE_FUNC_INT( SentenceModeChanged, "DoSentenceModeChanged", handle );
+#else
+	MESSAGE_FUNC_UINT64( LanguageChanged, "DoLanguageChanged", handle );
+	MESSAGE_FUNC_UINT64( ConversionModeChanged, "DoConversionModeChanged", handle );
+	MESSAGE_FUNC_UINT64( SentenceModeChanged, "DoSentenceModeChanged", handle );
+#endif
 
 	MESSAGE_FUNC_WCHARPTR( CompositionString, "DoCompositionString", string );
 

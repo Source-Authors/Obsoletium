@@ -452,7 +452,7 @@ int	CAudioSourceWave::ZeroCrossingAfter( int sample )
 //-----------------------------------------------------------------------------
 void CAudioSourceWave::ParseSentence( IterateRIFF &walk )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	buf.EnsureCapacity( walk.ChunkSize() );
 	walk.ChunkRead( buf.Base() );
@@ -723,7 +723,7 @@ bool CAudioSourceWave::GetStartupData( void *dest, int destsize, int& bytesCopie
 	// requesting precache snippet as leader for streaming startup latency
 	if ( destsize )
 	{
-		int file = g_pSndIO->open( m_pSfx->GetFileName() );
+		intp file = g_pSndIO->open( m_pSfx->GetFileName() );
 		if ( !file )
 		{
 			return false;
@@ -2308,7 +2308,7 @@ public:
 		m_bSndCacheDebug = false;
 	}
 
-	bool Init( unsigned int memSize );
+	bool Init( size_t memSize );
 	void Shutdown();
 
 	void CheckSaveDirtyCaches();
@@ -2358,7 +2358,7 @@ void CAudioSourceCachedInfoHandle_t::InvalidateCache()
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CAudioSourceCache::Init( unsigned int memSize )
+bool CAudioSourceCache::Init( size_t memSize )
 {
 #if defined( _DEBUG )
 	Msg( "CAudioSourceCache: Init\n" );

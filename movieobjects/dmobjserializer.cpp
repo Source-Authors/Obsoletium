@@ -337,7 +337,7 @@ CDmElement *CDmObjSerializer::ReadOBJ(
 	Q_strncpy( filename, pFilename, sizeof( filename ) );
 	Q_FixSlashes( filename );
 
-	CUtlBuffer utlBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer utlBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( filename, NULL, utlBuf ) )
 		return NULL;
 
@@ -542,7 +542,7 @@ CDmElement *CDmObjSerializer::ReadOBJ( CUtlBuffer &buf,
 				char mtlLibPath[ MAX_PATH ];
 
 				Q_ComposeFileName( tmpBuf0, tmpBuf1, mtlLibPath, sizeof( mtlLibPath ) );
-				CUtlBuffer utlBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+				CUtlBuffer utlBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 				if ( g_pFullFileSystem->ReadFile( mtlLibPath, NULL, utlBuf ) )
 				{
@@ -1033,7 +1033,7 @@ bool CDmObjSerializer::WriteOBJ( const char *pFilename, CDmElement *pRoot, bool 
 
 	if ( !pDeltaName )
 	{
-		CUtlBuffer b( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer b( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 		b << "# OBJ\n";
 		b << "#\n";
@@ -1090,7 +1090,7 @@ bool CDmObjSerializer::WriteOBJ( const char *pFilename, CDmElement *pRoot, bool 
 
 				if ( !pDeltaName || !Q_strcmp( pDeltaName, pDelta->GetName() ) )
 				{
-					CUtlBuffer b( 0, 0, CUtlBuffer::TEXT_BUFFER );
+					CUtlBuffer b( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 					b << "# Delta OBJ: " << pDelta->GetName() << "\n";
 					b << "#\n";

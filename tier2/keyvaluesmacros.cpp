@@ -261,7 +261,7 @@ static void UpdateKeyValuesBlock( KeyValues *pkvDst, KeyValues *pkvUpdate )
 
 	for ( KeyValues *pkvUpdateSubKey = pkvUpdate->GetFirstSubKey(); pkvUpdateSubKey; pkvUpdateSubKey = pkvUpdateSubKey->GetNextKey() )
 	{
-		const int nSrcName = pkvUpdateSubKey->GetNameSymbol();
+		const intp nSrcName = pkvUpdateSubKey->GetNameSymbol();
 
 		if ( pkvUpdateSubKey->GetFirstSubKey() )
 		{
@@ -277,7 +277,7 @@ static void UpdateKeyValuesBlock( KeyValues *pkvDst, KeyValues *pkvUpdate )
 			if ( pkvDstSubKey == pkvUpdate )
 				continue;
 
-			const int nDstName = pkvDstSubKey->GetNameSymbol();
+			const intp nDstName = pkvDstSubKey->GetNameSymbol();
 
 			if ( nSrcName == nDstName )
 			{

@@ -11,7 +11,7 @@
 #ifdef IS_WINDOWS_PC
 #include "winlite.h"
 #else
-#define INVALID_HANDLE_VALUE (void *)0
+#define INVALID_HANDLE_VALUE (void *)nullptr
 #define FILE_BEGIN SEEK_SET
 #define FILE_END SEEK_END
 #endif
@@ -244,8 +244,8 @@ public:
 abstract_class IWriteStream
 {
 public:
-	virtual void Put( const void* pMem, int size ) = 0;
-	virtual unsigned int Tell( void ) = 0;
+	virtual void Put( const void* pMem, unsigned size ) = 0;
+	virtual unsigned Tell( void ) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -257,10 +257,10 @@ public:
 	CBufferStream( CUtlBuffer& buff ) : IWriteStream(), m_buff( &buff ) {}
 
 	// Implementing IWriteStream method
-	virtual void Put( const void* pMem, int size ) {m_buff->Put( pMem, size );}
+	virtual void Put( const void* pMem, unsigned size ) {m_buff->Put( pMem, size );}
 
 	// Implementing IWriteStream method
-	virtual unsigned int Tell( void ) { return m_buff->TellPut(); }
+	virtual unsigned Tell( void ) { return m_buff->TellPut(); }
 
 private:
 	CUtlBuffer *m_buff;
@@ -276,7 +276,7 @@ public:
 	CFileStream( HANDLE hOutFile ) : IWriteStream(), m_file( NULL ), m_hFile( hOutFile ) {}
 
 	// Implementing IWriteStream method
-	virtual void Put( const void* pMem, int size ) 
+	virtual void Put( const void* pMem, unsigned size ) 
 	{ 
 		if ( m_file )
 		{
@@ -292,7 +292,7 @@ public:
 	}
 
 	// Implementing IWriteStream method
-	virtual unsigned int Tell( void ) 
+	virtual unsigned Tell( void ) 
 	{ 
 		if ( m_file )
 		{
@@ -350,7 +350,7 @@ public:
 	HANDLE			ParseFromDisk( const char *pFilename );
 
 	// Estimate the size of the zip file (including header, padding, etc.)
-	unsigned int	EstimateSize();
+	uintp	EstimateSize();
 
 	// Print out a directory of files in the zip.
 	void			PrintDirectory( void );
@@ -365,7 +365,7 @@ public:
 	void			SaveToDisk( FILE *fout );
 	void			SaveToDisk( HANDLE hOutFile );
 
-	unsigned int	CalculateSize( void );
+	uintp	CalculateSize( void );
 
 	void			ForceAlignment( bool aligned, bool bCompatibleFormat, unsigned int alignmentSize );
 
@@ -397,7 +397,7 @@ private:
 
 	unsigned short	CalculatePadding( unsigned int filenameLen, unsigned int pos );
 	void			SaveDirectory( IWriteStream& stream );
-	int				MakeXZipCommentString( char *pComment );
+	unsigned short	MakeXZipCommentString( char *pComment );
 	void			ParseXZipCommentString( const char *pComment );
 	
 	// Internal entry for faster searching, etc.
@@ -623,7 +623,7 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 	Reset();
 
 	// Initialize a buffer
-	CUtlBuffer buf( 0, bufferlength +1  );					// +1 for null termination
+	CUtlBuffer buf( (intp)0, bufferlength +1  );					// +1 for null termination
 
 	// need to swap bytes, so set the buffer opposite the machine's endian
 	buf.ActivateByteSwapping( m_Swap.IsSwappingBytes() );
@@ -631,7 +631,7 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 	buf.Put( buffer, bufferlength );
 
 	buf.SeekGet( CUtlBuffer::SEEK_TAIL, 0 );
-	unsigned int fileLen = buf.TellGet();
+	uintp fileLen = buf.TellGet();
 
 	// Start from beginning
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
@@ -641,11 +641,11 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 #ifdef DBGFLAG_ASSERT
 	bool bFoundEndOfCentralDirRecord = false;
 #endif
-	unsigned int offset = fileLen - sizeof( ZIP_EndOfCentralDirRecord );
+	uintp offset = fileLen - sizeof( ZIP_EndOfCentralDirRecord );
 	// If offset is ever greater than startOffset then it means that it has
 	// wrapped. This used to be a tautological >= 0 test.
 	ANALYZE_SUPPRESS( 6293 ); // warning C6293: Ill-defined for-loop: counts down from minimum
-	for ( unsigned int startOffset = offset; offset <= startOffset; offset-- )
+	for ( uintp startOffset = offset; offset <= startOffset; offset-- )
 	{
 		buf.SeekGet( CUtlBuffer::SEEK_HEAD, offset );
 		buf.GetObjects( &rec );
@@ -848,7 +848,7 @@ HANDLE CZipFile::ParseFromDisk( const char *pFilename )
 	CWin32File::FileSeek( hFile, rec.startOfCentralDirOffset, FILE_BEGIN );
 
 	// read entire central dir into memory
-	CUtlBuffer zipDirBuff( 0, rec.centralDirectorySize, 0 );
+	CUtlBuffer zipDirBuff( (intp)0, rec.centralDirectorySize, 0 );
 	zipDirBuff.ActivateByteSwapping( m_Swap.IsSwappingBytes() );
 	CWin32File::FileRead( hFile, zipDirBuff.Base(), rec.centralDirectorySize );
 	zipDirBuff.SeekPut( CUtlBuffer::SEEK_HEAD, rec.centralDirectorySize );
@@ -1302,7 +1302,7 @@ unsigned short CZipFile::CalculatePadding( unsigned int filenameLen, unsigned in
 // Purpose: Create the XZIP identifying comment string
 // Output : Length
 //-----------------------------------------------------------------------------
-int CZipFile::MakeXZipCommentString( char *pCommentString )
+unsigned short CZipFile::MakeXZipCommentString( char *pCommentString )
 {
 	char tempString[XZIP_COMMENT_LENGTH];
 
@@ -1346,11 +1346,11 @@ void CZipFile::ParseXZipCommentString( const char *pCommentString )
 // Purpose: Calculate the exact size of zip file, with headers and padding
 // Output : int
 //-----------------------------------------------------------------------------
-unsigned int CZipFile::CalculateSize( void )
+uintp CZipFile::CalculateSize( void )
 {
-	unsigned int size = 0;
-	unsigned int dirHeaders = 0;
-	for ( int i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
+	uintp size = 0;
+	uintp dirHeaders = 0;
+	for ( auto i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
 	{
 		CZipEntry *e = &m_Files[ i ];
 
@@ -1368,7 +1368,7 @@ unsigned int CZipFile::CalculateSize( void )
 		if ( m_AlignmentSize != 0 )
 		{
 			// round up to next boundary
-			unsigned int nextBoundary = ( size + m_AlignmentSize ) & ~( m_AlignmentSize - 1 );
+			uintp nextBoundary = ( size + m_AlignmentSize ) & ~( m_AlignmentSize - 1 );
 
 			// the directory header also duplicates the padding
 			dirHeaders += nextBoundary - size;
@@ -1393,7 +1393,7 @@ unsigned int CZipFile::CalculateSize( void )
 //-----------------------------------------------------------------------------
 void CZipFile::PrintDirectory( void )
 {
-	for ( int i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
+	for ( auto i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
 	{
 		CZipEntry *e = &m_Files[ i ];
 
@@ -1450,13 +1450,13 @@ void CZipFile::SaveToBuffer( CUtlBuffer& buf )
 {
 	// Estimate size for buffer, since the linear growth of CUtlBuffer is a virtual memory steamroller. This is
 	// best-effort. Ideally CUtlBuffer's growth strategy would be sane and this would be unnecessary.
-	int sizeEstimate = 0;
+	intp sizeEstimate = 0;
 	for ( int i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
 	{
 		CZipEntry *e = &m_Files[i];
 		Assert( e );
 
-		int nameLen = V_strlen( e->m_Name.String() );
+		intp nameLen = V_strlen( e->m_Name.String() );
 		// Both the per-file header and central directory have these
 		sizeEstimate += 2 * sizeof( ZIP_LocalFileHeader );
 		sizeEstimate += 2 * nameLen;
@@ -1469,20 +1469,20 @@ void CZipFile::SaveToBuffer( CUtlBuffer& buf )
 		sizeEstimate += m_AlignmentSize * 2;
 	}
 
-	int start = buf.TellPut();
+	intp start = buf.TellPut();
 	buf.EnsureCapacity( start + sizeEstimate );
 	CBufferStream stream( buf );
 
 	SaveDirectory( stream );
 
-	int end = buf.TellPut();
+	intp end = buf.TellPut();
 	if ( start + sizeEstimate < end )
 	{
-		Warning( "ZIP Output overshot buffer estimate: Estimated %i, actual %i\n", sizeEstimate, end - start );
+		Warning( "ZIP Output overshot buffer estimate: Estimated %zd, actual %zd\n", sizeEstimate, end - start );
 	}
 	else
 	{
-		DevMsg( "Wrote ZIP buffer, estimated size %i, actual size %i\n", sizeEstimate, end - start );
+		DevMsg( "Wrote ZIP buffer, estimated size %zd, actual size %zd\n", sizeEstimate, end - start );
 	}
 }
 
@@ -1509,7 +1509,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 	}
 
 	// Might be writing a zip into a larger stream
-	unsigned int zipOffsetInStream = stream.Tell();
+	uintp zipOffsetInStream = stream.Tell();
 
 	int i;
 	for ( i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
@@ -1570,7 +1570,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 				free( e->m_pData );
 
 				// temp hackery for the logic below to succeed
-				e->m_pData = (void*)0xFFFFFFFF;
+				e->m_pData = (void*)-1;
 			}
 		}
 	}
@@ -1580,12 +1580,12 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 		CWin32File::FileSeek( m_hDiskCacheWriteFile, 0, FILE_END );
 	}
 
-	unsigned int centralDirStart = stream.Tell() - zipOffsetInStream;
+	uintp centralDirStart = stream.Tell() - zipOffsetInStream;
 	if ( m_AlignmentSize )
 	{
 		// align the central directory starting position
-		unsigned int newDirStart = AlignValue( centralDirStart, m_AlignmentSize );
-		int padLength = newDirStart - centralDirStart;
+		uintp newDirStart = AlignValue( centralDirStart, m_AlignmentSize );
+		intp padLength = newDirStart - centralDirStart;
 		if ( padLength )
 		{
 			stream.Put( pPaddingBuffer, padLength );
@@ -1673,7 +1673,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 	rec.startOfCentralDirOffset = centralDirStart;
 
 	char commentString[128];
-	int commentLength = MakeXZipCommentString( commentString );
+	unsigned short commentLength = MakeXZipCommentString( commentString );
 	rec.commentLength = commentLength;
 
 	// Swap the header in place
@@ -1715,7 +1715,7 @@ public:
 	virtual void			PrintDirectory( void ) OVERRIDE;
 
 	// Estimate the size of the Zip (including header, padding, etc.)
-	virtual unsigned int	EstimateSize( void ) OVERRIDE;
+	virtual uintp	EstimateSize( void ) OVERRIDE;
 
 	// Add buffer to zip as a file with given name - uses current alignment size, default 0 (no alignment)
 	virtual void			AddBufferToZip( const char *relativename, void *data, int length,
@@ -1825,7 +1825,7 @@ void CZip::Reset()
 	m_ZipFile.Reset();
 }
 
-unsigned int CZip::EstimateSize( void )
+uintp CZip::EstimateSize( void )
 {
 	return m_ZipFile.CalculateSize();
 }

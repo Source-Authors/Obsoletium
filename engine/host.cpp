@@ -1249,7 +1249,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 
 	// Generate a new .cfg file.
 	char		szFileName[MAX_PATH];
-	CUtlBuffer	configBuff( 0, 0, CUtlBuffer::TEXT_BUFFER);
+	CUtlBuffer	configBuff( (intp)0, 0, CUtlBuffer::TEXT_BUFFER);
 
 	Q_snprintf( szFileName, sizeof(szFileName), "cfg/%s", filename );
 	g_pFileSystem->CreateDirHierarchy( "cfg", "MOD" );

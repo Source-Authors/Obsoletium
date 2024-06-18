@@ -299,7 +299,7 @@ private:
 class IAudioSourceCache
 {
 public:
-	virtual bool Init( unsigned int memSize ) = 0;
+	virtual bool Init( size_t memSize ) = 0;
 	virtual void Shutdown() = 0;
 	virtual void LevelInit( char const *mapname ) = 0;
 	virtual void LevelShutdown() = 0;
@@ -339,7 +339,7 @@ enum
 abstract_class IAsyncWavDataCache
 {
 public:
-	virtual bool			Init( unsigned int memSize ) = 0;
+	virtual bool			Init( size_t memSize ) = 0;
 	virtual void			Shutdown() = 0;
 
 	// implementation that treats file as monolithic

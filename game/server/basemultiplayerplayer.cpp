@@ -254,7 +254,7 @@ void CBaseMultiplayerPlayer::AwardAchievement( int iAchievement, int iCount )
 		CBaseMultiplayerPlayer *pPlayer = ToBaseMultiplayerPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
 		if ( pPlayer && pPlayer->GetPerLifeCounterKeys() )
 		{
-			CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			pPlayer->GetPerLifeCounterKeys()->RecursiveSaveToFile( buf, 0 );
 
 			char szBuf[1024];

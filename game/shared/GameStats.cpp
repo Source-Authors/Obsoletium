@@ -1048,7 +1048,7 @@ void CBaseGameStats_Driver::SendData()
 		return;
 
 	// save the data to a buffer
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	m_pGamestatsData->m_pKVData->RecursiveSaveToFile( buf, 0 );
 
 	if ( CommandLine()->FindParm( "-gamestatsfileoutputonly" ) )

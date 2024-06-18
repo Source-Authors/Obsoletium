@@ -344,7 +344,7 @@ public:
 	void AddQuotes()
 	{
 		Assert( m_szBuf[0] != '"' );
-		const int nLength = Q_strlen( m_szBuf );
+		const ptrdiff_t nLength = Q_strlen( m_szBuf );
 		Q_memmove( m_szBuf + 1, m_szBuf, nLength );
 		m_szBuf[0] = '"';
 		m_szBuf[nLength + 1] = '"';

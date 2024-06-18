@@ -561,7 +561,7 @@ void CBaseGamesPage::PrepareQuickListMap( const char *pMapName, int iListID )
 //-----------------------------------------------------------------------------
 // Purpose: gets information about specified server
 //-----------------------------------------------------------------------------
-gameserveritem_t *CBaseGamesPage::GetServer( unsigned int serverID )
+gameserveritem_t *CBaseGamesPage::GetServer( uintp serverID )
 {
 	if ( !steamapicontext->SteamMatchmakingServers() )
 		return NULL;

@@ -208,7 +208,7 @@ private:
 	};
 
 	int		m_nArgc;
-	int		m_nArgv0Size;
+	ptrdiff_t		m_nArgv0Size;
 	char	m_pArgSBuffer[ COMMAND_MAX_LENGTH ];
 	char	m_pArgvBuffer[ COMMAND_MAX_LENGTH ];
 	const char*	m_ppArgv[ COMMAND_MAX_ARGC ];
@@ -418,7 +418,7 @@ private:
 	// Value
 	// Dynamically allocated
 	char						*m_pszString;
-	int							m_StringLength;
+	intp						m_StringLength;
 
 	// Values
 	float						m_fValue;

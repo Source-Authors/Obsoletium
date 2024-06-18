@@ -31,7 +31,7 @@ public:
 	void		Open( void );
 
 	// gets server info
-	gameserveritem_t *GetServer(unsigned int serverID);
+	gameserveritem_t *GetServer(uintp serverID);
 	// called every frame
 	virtual void OnTick();
 

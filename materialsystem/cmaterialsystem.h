@@ -317,7 +317,7 @@ public:
 	//---------------------------------------------------------
 	ImageFormatInfo_t const&				ImageFormatInfo( ImageFormat fmt) const;
 	
-	int										GetMemRequired( int width, int height, int depth, ImageFormat format, bool mipmap );
+	intp										GetMemRequired( int width, int height, int depth, ImageFormat format, bool mipmap );
 
 	bool									ConvertImageFormat( unsigned char *src, enum ImageFormat srcImageFormat,
 																unsigned char *dst, enum ImageFormat dstImageFormat, 

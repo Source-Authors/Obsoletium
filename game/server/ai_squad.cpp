@@ -440,7 +440,7 @@ CAI_BaseNPC *CAI_Squad::GetFirstMember( AISquadIter_t *pIter, bool bIgnoreSilent
 
 CAI_BaseNPC *CAI_Squad::GetNextMember( AISquadIter_t *pIter, bool bIgnoreSilentMembers )
 {
-	int &i = (int &)*pIter;
+	intp &i = (intp &)*pIter;
 	i++;
 	if ( bIgnoreSilentMembers )
 	{

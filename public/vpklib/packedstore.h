@@ -26,7 +26,7 @@
 
 #define VPK_ENABLE_SIGNING
 
-const int k_nVPKDefaultChunkSize = 200 * 1024 * 1024;
+constexpr int k_nVPKDefaultChunkSize = 200 * 1024 * 1024;
 
 class CPackedStore;
 
@@ -234,7 +234,7 @@ struct CachedVPKRead_t
 // The primary reason we do this is so that the FileTracker can calculate the 
 // MD5 of the 1MB chunks asynchronously in another thread - while we hold
 // the chunk in cache - making the MD5 calculation "free"
-class CPackedStoreReadCache
+class CPackedStoreReadCache : CAlignedNewDelete<16>
 {
 public:
 	CPackedStoreReadCache( IBaseFileSystem *pFS );
@@ -249,7 +249,7 @@ public:
 
 
 	// cache 64 MiB total
-	static const int k_nCacheBuffersToKeep = 4;
+	static const int k_nCacheBuffersToKeep = 8;
 	static const int k_cubCacheBufferSize = 0x00100000; // 1MiB
 	static const int k_nCacheBufferMask = 0x7FF00000;
 
@@ -279,7 +279,7 @@ public:
 	int m_cFileResultsDifferent;
 };
 
-class CPackedStore
+class CPackedStore : public CAlignedNewDelete<16>
 {
 public:
 	CPackedStore( char const *pFileBasename, char *pszFName, IBaseFileSystem *pFS, bool bOpenForWrite = false );
@@ -370,7 +370,7 @@ public:
 
 	int GetWriteChunkSize() const { return m_nWriteChunkSize; }
 
-	int GetHighestChunkFileIndex() { return m_nHighestChunkFileIndex; }
+	int GetHighestChunkFileIndex() const { return m_nHighestChunkFileIndex; }
 
 	void DiscardChunkHashes( int iChunkFileIndex );
 
@@ -451,7 +451,7 @@ private:
 
 	// For cache-ing directory and contents data
 	CUtlStringList m_directoryList; // The index of this list of directories...
-	CUtlMap<int, CUtlStringList*> m_dirContents; // ...is the key to this map of filenames
+	CUtlMap<intp, CUtlStringList*> m_dirContents; // ...is the key to this map of filenames
 	void BuildFindFirstCache();
 
 	bool InternalRemoveFileFromDirectory( const char *pszName );

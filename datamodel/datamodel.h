@@ -67,7 +67,7 @@ enum
 class CElementIdHash : public CUtlHash< DmElementHandle_t >
 {
 public:
-	CElementIdHash( int nBucketCount = 0, int nGrowCount = 0, int nInitCount = 0 )
+	CElementIdHash( intp nBucketCount = 0, intp nGrowCount = 0, intp nInitCount = 0 )
 		: CUtlHash< DmElementHandle_t >( nBucketCount, nGrowCount, nInitCount, CompareFunc, KeyFunc )
 	{
 	}
@@ -86,41 +86,43 @@ protected:
 		return IsUniqueIdEqual( id, pElement->GetId() );
 	}
 
-	static unsigned int KeyFunc( DmElementHandle_t const& hElement )
+	static uintp KeyFunc( DmElementHandle_t const& hElement )
 	{
 		CDmElement *pElement = g_pDataModel->GetElement( hElement );
 		Assert( pElement );
 		if ( !pElement )
 			return 0;
-
-		return *( unsigned int* )&pElement->GetId();
+		
+		static_assert(sizeof(uintp) <= sizeof(decltype(pElement->GetId())));
+		return *( uintp* )&pElement->GetId();
 	}
-	static unsigned int IdKeyFunc( DmObjectId_t const &src )
+	static uintp IdKeyFunc( DmObjectId_t const &src )
 	{
-		return *(unsigned int*)&src;
+		static_assert(sizeof(uintp) <= sizeof(decltype(src)));
+		return *(uintp*)&src;
 	}
 
 protected:
-	bool DoFind( DmObjectId_t const &src, unsigned int *pBucket, int *pIndex )
+	bool DoFind( DmObjectId_t const &src, uintp *pBucket, intp *pIndex )
 	{
 		// generate the data "key"
-		unsigned int key = IdKeyFunc( src );
+		uintp key = IdKeyFunc( src );
 
 		// hash the "key" - get the correct hash table "bucket"
-		unsigned int ndxBucket;
+		uintp ndxBucket;
 		if( m_bPowerOfTwo )
 		{
 			*pBucket = ndxBucket = ( key & m_ModMask );
 		}
 		else
 		{
-			int bucketCount = m_Buckets.Count();
+			intp bucketCount = m_Buckets.Count();
 			*pBucket = ndxBucket = key % bucketCount;
 		}
 
-		int ndxKeyData;
+		intp ndxKeyData;
 		CUtlVector< DmElementHandle_t > &bucket = m_Buckets[ndxBucket];
-		int keyDataCount = bucket.Count();
+		intp keyDataCount = bucket.Count();
 		for( ndxKeyData = 0; ndxKeyData < keyDataCount; ndxKeyData++ )
 		{
 			if( IdCompareFunc( bucket.Element( ndxKeyData ), src ) )
@@ -138,8 +140,8 @@ public:
 	UtlHashHandle_t Find( DmElementHandle_t const &src ) { return BaseClass::Find( src ); }
 	UtlHashHandle_t Find( DmObjectId_t const &src )
 	{
-		unsigned int ndxBucket;
-		int ndxKeyData;
+		uintp ndxBucket;
+		intp ndxKeyData;
 
 		if ( DoFind( src, &ndxBucket, &ndxKeyData ) )
 			return BuildHandle( ndxBucket, ndxKeyData );
@@ -361,7 +363,7 @@ public:
 
 	void NotifyState( int nNotifyFlags );
 
-	int EstimateMemoryOverhead() const;
+	constexpr int EstimateMemoryOverhead() const;
 
 	bool IsCreatingUntypedElements() const { return m_bOnlyCreateUntypedElements; }
 
@@ -396,9 +398,10 @@ private:
 			m_ref = that.m_ref;
 			return *this;
 		}
-		static unsigned int HashKey( const ElementIdHandlePair_t& that )
+		static uintp HashKey( const ElementIdHandlePair_t& that )
 		{
-			return *( unsigned int* )&that.m_id.m_Value;
+			static_assert( sizeof(uintp) <= sizeof(decltype(that.m_id.m_Value)) );
+			return *( uintp* )&that.m_id.m_Value;
 		}
 		static bool Compare( const ElementIdHandlePair_t& a, const ElementIdHandlePair_t& b )
 		{

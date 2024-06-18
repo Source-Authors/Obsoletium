@@ -344,7 +344,7 @@ public:
 	const char *GetParticleSystemNameFromIndex( ParticleSystemHandle_t iIndex );
 
 	// Return the number of particle systems in our dictionary
-	int GetParticleSystemCount( void );
+	intp GetParticleSystemCount( void );
 
 	// call to get available particle operator definitions
 	// NOTE: FUNCTION_CHILDREN will return a faked one, for ease of writing the editor
@@ -436,7 +436,7 @@ private:
 	bool WriteParticleConfigFile( CDmxElement *pParticleSystem, CUtlBuffer &buf, bool bPreventNameBasedLookup );
 
 	// Builds a list of batches to render
-	void BuildBatchList( int iRenderCache, IMatRenderContext *pRenderContext, CUtlVector< Batch_t >& batches );
+	void BuildBatchList( intp iRenderCache, IMatRenderContext *pRenderContext, CUtlVector< Batch_t >& batches );
 
 	// Known operators
 	CUtlVector<IParticleOperatorDefinition *> m_ParticleOperators[PARTICLE_FUNCTION_COUNT];
@@ -1164,9 +1164,9 @@ public:
 	bool IsBatchable() const;
 
 	// Renderer iteration
-	int GetRendererCount() const;
-	CParticleOperatorInstance *GetRenderer( int i );
-	void *GetRendererContext( int i );
+	intp GetRendererCount() const;
+	CParticleOperatorInstance *GetRenderer( intp i );
+	void *GetRendererContext( intp i );
 
 
 	bool CheckIfOperatorShouldRun( CParticleOperatorInstance const * op, float *pflCurStrength = NULL );

@@ -547,7 +547,7 @@ struct AsyncCaptionData_t
 		return data;
 	}
 
-	static unsigned int EstimatedSize( const asynccaptionparams_t &params )
+	static size_t EstimatedSize( const asynccaptionparams_t &params )
 	{
 		// The block size is assumed to be 4K
 		return ( sizeof( AsyncCaptionData_t ) + params.blocksize );

@@ -291,7 +291,7 @@ public:
 	// the texture goes away - you want to copy this data!
 	virtual void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const;
 
-	virtual int GetApproximateVidMemBytes( void ) const;
+	virtual intp GetApproximateVidMemBytes( void ) const;
 
 	// Stretch blit the framebuffer into this texture.
 	virtual void CopyFrameBufferToMe( int nRenderTargetID = 0, Rect_t *pSrcRect = NULL, Rect_t *pDstRect = NULL );
@@ -659,7 +659,7 @@ public:
 	// the texture goes away - you want to copy this data!
 	virtual void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const { return NULL; }
 
-	virtual int GetApproximateVidMemBytes( void ) const { return 32; }
+	virtual intp GetApproximateVidMemBytes( void ) const { return 32; }
 
 	// Stretch blit the framebuffer into this texture.
 	virtual void CopyFrameBufferToMe( int nRenderTargetID = 0, Rect_t *pSrcRect = NULL, Rect_t *pDstRect = NULL ) { NULL; }
@@ -3262,7 +3262,7 @@ IVTFTexture *CTexture::LoadTextureBitsFromFile( char *pCacheFileName, char **ppR
 	LoadLowResTexture( pVTFTexture );
 
 	// Load the resources
-	if ( unsigned int uiRsrcCount = pVTFTexture->GetResourceTypes( NULL, 0 ) )
+	if ( uintp uiRsrcCount = pVTFTexture->GetResourceTypes( NULL, 0 ) )
 	{
 		uint32 *arrRsrcTypes = ( uint32 * )_alloca( uiRsrcCount * sizeof( unsigned int ) );
 		pVTFTexture->GetResourceTypes( arrRsrcTypes, uiRsrcCount );
@@ -3488,7 +3488,7 @@ void CTexture::ReconstructPartialTexture( const Rect_t *pRect )
 	GetDownloadFaceCount( nFirstFace, nFaceCount );
 	
 	// Blit down portions of the various VTF frames into the board memory
-	int nStride;
+	intp nStride;
 	Rect_t mipRect;
 	for ( int iFrame = 0; iFrame < m_nFrameCount; ++iFrame )
 	{
@@ -3928,7 +3928,7 @@ void CTexture::GetLowResColorSample( float s, float t, float *color ) const
 	color[2] = sColor[0][2] * ( 1.0f - fracT ) + sColor[1][2] * fracT;
 }
 
-int CTexture::GetApproximateVidMemBytes( void ) const
+intp CTexture::GetApproximateVidMemBytes( void ) const
 {
 	ImageFormat format = GetImageFormat();
 	int width = GetActualWidth();
@@ -4138,7 +4138,7 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 		// restrict read to the header only!
 		// header provides info to avoid reading the entire file
 		int nBytesOptimalRead = GetOptimalReadBuffer( &buf, hFile, nHeaderSize );
-		int nBytesRead = g_pFullFileSystem->ReadEx( buf.Base(), nBytesOptimalRead, Min( nHeaderSize, ( int ) g_pFullFileSystem->Size( hFile ) ), hFile ); // only read as much as the file has
+		int nBytesRead = g_pFullFileSystem->ReadEx( buf.Base(), nBytesOptimalRead, Min( nHeaderSize, ( unsigned ) g_pFullFileSystem->Size( hFile ) ), hFile ); // only read as much as the file has
 		buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
 		nBytesRead = nHeaderSize = ( ( VTFFileBaseHeader_t * ) buf.Base() )->headerSize;
 		g_pFullFileSystem->Seek( hFile, nHeaderSize, FILESYSTEM_SEEK_HEAD );
@@ -4169,12 +4169,12 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - ReadDataFromFile", __FUNCTION__ );
 
 	// Determine how much of the file to read in
-	int nFileSize = ( *ppOutVtfTexture )->FileSize( nMipSkipCount );
-	int nActualFileSize = (int)g_pFullFileSystem->Size( hFile );
+	intp nFileSize = ( *ppOutVtfTexture )->FileSize( nMipSkipCount );
+	intp nActualFileSize = (intp)g_pFullFileSystem->Size( hFile );
 	if ( nActualFileSize < nFileSize )
 	{
 		if ( mat_spew_on_texture_size.GetInt() )
-			DevMsg( "Bad VTF data for %s, expected file size:%d actual file size:%d \n", pCacheFileName, nFileSize, nActualFileSize );
+			DevMsg( "Bad VTF data for %s, expected file size:%zd actual file size:%zd \n", pCacheFileName, nFileSize, nActualFileSize );
 		nFileSize = nActualFileSize;
 	}
 
@@ -4797,7 +4797,7 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 				// Have tga - pump in the txt file
 				sprintf( pExtPut, ".txt" );
 				
-				CUtlBuffer bufTxtFileBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+				CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 				g_pFullFileSystem->ReadFile( szTextureContentPath, 0, bufTxtFileBuffer );
 				for ( int kCh = 0; kCh < 1024; ++kCh ) bufTxtFileBuffer.PutChar( 0 );
 
@@ -4836,7 +4836,7 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 				ShellExecute( NULL, NULL, "cmd.exe", chCommand, NULL, SW_HIDE );
 				ThreadSleep( 200 );
 
-				CUtlBuffer bufTxtFileBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+				CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 				g_pFullFileSystem->ReadFile( szTxtFileName, 0, bufTxtFileBuffer );
 				for ( int kCh = 0; kCh < 1024; ++ kCh ) bufTxtFileBuffer.PutChar( 0 );
 

@@ -15,7 +15,7 @@
 #endif
 
 #include "tier0/dbg.h"
-#include <string.h>
+#include <cstring>
 #include "tier0/platform.h"
 #include "mathlib/mathlib.h"
 
@@ -84,6 +84,13 @@ public:
 	// Gets the base address (can change when adding elements!)
 	T* Base();
 	const T* Base() const;
+	
+	// STL compatible member functions. These allow easier use of std::sort
+	// and they are forward compatible with the C++ 11 range-based for loops.
+	T* begin()						{ return Base(); }
+	const T* begin() const			{ return Base(); }
+	T* end()						{ return Base() + Count(); }
+	const T* end() const			{ return Base() + Count(); }
 
 	// Attaches the buffer to external memory....
 	void SetExternalBuffer( T* pMemory, intp numElements );
@@ -548,16 +555,16 @@ inline T& CUtlMemory<T,I>::operator[]( I i )
 {
 	// Avoid function calls in the asserts to improve debug build performance
 	Assert( m_nGrowSize != EXTERNAL_CONST_BUFFER_MARKER ); //Assert( !IsReadOnly() );
-	Assert( (uint32)i < (uint32)m_nAllocationCount );
-	return m_pMemory[(uint32)i];
+	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	return m_pMemory[(uintp)i];
 }
 
 template< class T, class I >
 inline const T& CUtlMemory<T,I>::operator[]( I i ) const
 {
 	// Avoid function calls in the asserts to improve debug build performance
-	Assert( (uint32)i < (uint32)m_nAllocationCount );
-	return m_pMemory[(uint32)i];
+	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	return m_pMemory[(uintp)i];
 }
 
 template< class T, class I >
@@ -565,16 +572,16 @@ inline T& CUtlMemory<T,I>::Element( I i )
 {
 	// Avoid function calls in the asserts to improve debug build performance
 	Assert( m_nGrowSize != EXTERNAL_CONST_BUFFER_MARKER ); //Assert( !IsReadOnly() );
-	Assert( (uint32)i < (uint32)m_nAllocationCount );
-	return m_pMemory[(uint32)i];
+	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	return m_pMemory[(uintp)i];
 }
 
 template< class T, class I >
 inline const T& CUtlMemory<T,I>::Element( I i ) const
 {
 	// Avoid function calls in the asserts to improve debug build performance
-	Assert( (uint32)i < (uint32)m_nAllocationCount );
-	return m_pMemory[(uint32)i];
+	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	return m_pMemory[(uintp)i];
 }
 
 

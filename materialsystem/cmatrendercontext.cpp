@@ -258,7 +258,7 @@ void CMatRenderContextBase::MarkRenderDataUnused( bool bFrameBegin )
 
 }
 
-int CMatRenderContextBase::RenderDataSizeUsed() const
+intp CMatRenderContextBase::RenderDataSizeUsed() const
 {
 	return sm_RenderData[sm_nRenderStack].GetUsed();
 }

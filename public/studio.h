@@ -938,28 +938,28 @@ struct mstudioflexcontrollerui_t
 		return !stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex0 ) : NULL;
 	}
 	inline char * const	pszControllerName( void ) const { return !stereo ? pController()->pszName() : NULL; }
-	inline int			controllerIndex( const CStudioHdr &cStudioHdr ) const;
+	inline intp			controllerIndex( const CStudioHdr &cStudioHdr ) const;
 
 	inline const mstudioflexcontroller_t *pLeftController( void ) const
 	{
 		return stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex0 ) : NULL;
 	}
 	inline char * const	pszLeftName( void ) const { auto *c = pLeftController(); return c ? c->pszName() : NULL; }
-	inline int			leftIndex( const CStudioHdr &cStudioHdr ) const;
+	inline intp			leftIndex( const CStudioHdr &cStudioHdr ) const;
 
 	inline const mstudioflexcontroller_t *pRightController( void ) const
 	{
 		return stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex1 ): NULL;
 	}
 	inline char * const	pszRightName( void ) const { auto *c = pRightController(); return c ? c->pszName() : NULL; }
-	inline int			rightIndex( const CStudioHdr &cStudioHdr ) const;
+	inline intp			rightIndex( const CStudioHdr &cStudioHdr ) const;
 
 	inline const mstudioflexcontroller_t *pNWayValueController( void ) const
 	{
 		return remaptype == FLEXCONTROLLER_REMAP_NWAY ? (mstudioflexcontroller_t *)( (char *)this + szindex2 ) : NULL;
 	}
 	inline char * const	pszNWayValueName( void ) const { auto *c = pNWayValueController(); return c ? c->pszName() : NULL; }
-	inline int			nWayValueIndex( const CStudioHdr &cStudioHdr ) const;
+	inline intp			nWayValueIndex( const CStudioHdr &cStudioHdr ) const;
 
 	// Number of controllers this ui description contains, 1, 2 or 3
 	inline int			Count() const { return ( stereo ? 2 : 1 ) + ( remaptype == FLEXCONTROLLER_REMAP_NWAY ? 1 : 0 ); }
@@ -2867,27 +2867,27 @@ inline int flexsetting_t::psetting( byte *base, int i, flexweight_t **weights ) 
 // If these functions are called and the ui controller isn't of the type
 // specified then -1 is returned
 //-----------------------------------------------------------------------------
-inline int mstudioflexcontrollerui_t::controllerIndex( const CStudioHdr &cStudioHdr ) const
+inline intp mstudioflexcontrollerui_t::controllerIndex( const CStudioHdr &cStudioHdr ) const
 {
 	return !stereo ? pController() - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
 }
 
 
-inline int mstudioflexcontrollerui_t::rightIndex( const CStudioHdr &cStudioHdr ) const
+inline intp mstudioflexcontrollerui_t::rightIndex( const CStudioHdr &cStudioHdr ) const
 {
 	auto *c = pRightController();
 	return c ? c - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
 }
 
 
-inline int mstudioflexcontrollerui_t::leftIndex( const CStudioHdr &cStudioHdr ) const
+inline intp mstudioflexcontrollerui_t::leftIndex( const CStudioHdr &cStudioHdr ) const
 {
 	auto *c = pLeftController();
 	return c ? c - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
 }
 
 
-inline int mstudioflexcontrollerui_t::nWayValueIndex( const CStudioHdr &cStudioHdr ) const
+inline intp mstudioflexcontrollerui_t::nWayValueIndex( const CStudioHdr &cStudioHdr ) const
 {
 	auto *c = pNWayValueController();
 	return c ? c - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;

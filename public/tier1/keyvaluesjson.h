@@ -37,7 +37,7 @@ private:
 	bool ParseObject( KeyValues *pObject );
 	bool ParseArray( KeyValues *pArray );
 	bool ParseValue( KeyValues *pValue );
-	void Init( const char *pszText, int cbSize );
+	void Init( const char *pszText, intp cbSize );
 
 	const char *m_cur;
 	const char *m_end;

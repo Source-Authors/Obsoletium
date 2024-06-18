@@ -103,9 +103,9 @@ bool CTransitionTable::UniqueSnapshotLessFunc::Less( const CTransitionTable::Tra
 CTransitionTable::CTransitionTable() : m_DefaultStateSnapshot(-1),
 	m_CurrentShadowId(-1), m_CurrentSnapshotId(-1), m_TransitionOps( (intp)0, 8192 ), m_ShadowStateList( (intp)0, 256 ),
 	m_TransitionTable( (intp)0, 256 ), m_SnapshotList( (intp)0, 256 ), 
-	m_ShadowStateDict(0, 256 ), 
-	m_SnapshotDict( 0, 256 ), 
-	m_UniqueTransitions( 0, 4096 ) 
+	m_ShadowStateDict( (intp)0, 256 ), 
+	m_SnapshotDict( (intp)0, 256 ), 
+	m_UniqueTransitions( (intp)0, 4096 ) 
 {
 	Assert( !g_pTransitionTable );
 	g_pTransitionTable = this;

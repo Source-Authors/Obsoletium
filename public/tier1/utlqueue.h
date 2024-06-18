@@ -15,7 +15,12 @@
 
 //#define TEST_UTLQUEUE
 
-enum QueueIter_t { QUEUE_ITERATOR_INVALID = 0xffffffff };
+#define newmax max
+#undef max
+
+enum QueueIter_t : intp { QUEUE_ITERATOR_INVALID = std::numeric_limits<intp>::max() };
+
+#define max newmax
 
 // T is the type stored in the queue
 template< class T, class M = CUtlMemory< T > > 
@@ -23,8 +28,8 @@ class CUtlQueue
 {
 public:
 
-	CUtlQueue( int growSize = 0, int initSize = 0 );
-	CUtlQueue( T *pMemory, int numElements );
+	CUtlQueue( intp growSize = 0, intp initSize = 0 );
+	CUtlQueue( T *pMemory, intp numElements );
 
 	// return the item from the front of the queue and delete it
 	T RemoveAtHead();
@@ -54,7 +59,7 @@ public:
 	T const& Element( QueueIter_t it ) const;
 
 	// Returns the count of elements in the queue
-	int			Count() const;
+	intp			Count() const;
 
 	// Return whether the queue is empty or not, faster than Count().
 	bool		IsEmpty() const;
@@ -91,18 +96,18 @@ class CUtlQueueFixed : public CUtlQueue< T, CUtlMemoryFixed<T, MAX_SIZE > >
 public:
 
 	// constructor, destructor
-	CUtlQueueFixed( int growSize = 0, int initSize = 0 ) : BaseClass( growSize, initSize ) {}
-	CUtlQueueFixed( T* pMemory, int numElements ) : BaseClass( pMemory, numElements ) {}
+	CUtlQueueFixed( intp growSize = 0, intp initSize = 0 ) : BaseClass( growSize, initSize ) {}
+	CUtlQueueFixed( T* pMemory, intp numElements ) : BaseClass( pMemory, numElements ) {}
 };
 
 template< class T, class M >
-inline CUtlQueue<T, M>::CUtlQueue( int growSize, int initSize ) :
+inline CUtlQueue<T, M>::CUtlQueue( intp growSize, intp initSize ) :
 	m_memory( growSize, initSize ), m_head( QUEUE_ITERATOR_INVALID ), m_tail( QUEUE_ITERATOR_INVALID )
 {
 }
 
 template< class T, class M >
-inline CUtlQueue<T, M>::CUtlQueue( T *pMemory, int numElements ) : 
+inline CUtlQueue<T, M>::CUtlQueue( T *pMemory, intp numElements ) : 
 	m_memory( pMemory, numElements ), m_head( QUEUE_ITERATOR_INVALID ), m_tail( QUEUE_ITERATOR_INVALID )
 {
 }
@@ -211,10 +216,10 @@ void CUtlQueue<T, M>::Insert( T const &element )
 		QueueIter_t nextTail = Next_Unchecked( m_tail );
 		if ( nextTail == m_head ) // if non-empty, and growing by 1 appears to make the queue of length 1, then we were already full before the Insert
 		{
-			int nOldAllocCount = m_memory.NumAllocated();
+			intp nOldAllocCount = m_memory.NumAllocated();
 			m_memory.Grow();
-			int nNewAllocCount = m_memory.NumAllocated();
-			int nGrowAmount = nNewAllocCount - nOldAllocCount;
+			intp nNewAllocCount = m_memory.NumAllocated();
+			intp nGrowAmount = nNewAllocCount - nOldAllocCount;
 
 			nextTail = Next_Unchecked( m_tail ); // if nextTail was 0, then it now should be nOldAllocCount
 
@@ -331,7 +336,7 @@ T const& CUtlQueue<T, M>::Element( QueueIter_t it ) const
 }
 
 template <class T, class M>
-int CUtlQueue<T, M>::Count() const
+intp CUtlQueue<T, M>::Count() const
 {
 	if ( m_head == QUEUE_ITERATOR_INVALID )
 	{

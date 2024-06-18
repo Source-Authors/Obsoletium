@@ -295,8 +295,8 @@ protected:
 
 	void SetCurrentlySelectedItem(MenuItem *item);
 	void SetCurrentlySelectedItem(int itemID);
-	MESSAGE_FUNC_INT( OnCursorEnteredMenuItem, "CursorEnteredMenuItem", VPanel);
-	MESSAGE_FUNC_INT( OnCursorExitedMenuItem, "CursorExitedMenuItem", VPanel);
+	MESSAGE_FUNC_HANDLE( OnCursorEnteredMenuItem, "CursorEnteredMenuItem", VPanel);
+	MESSAGE_FUNC_HANDLE( OnCursorExitedMenuItem, "CursorExitedMenuItem", VPanel);
 
 	void MoveAlongMenuItemList(int direction, int loopCount); 
 

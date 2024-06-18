@@ -103,7 +103,7 @@ public:
 			return stringId;
 		}
 
-		int &nOffset = m_StringMap[pString];
+		intp &nOffset = m_StringMap[pString];
 		nOffset = m_nOffset;
 		// advance by string and null
 		m_nOffset += strlen( pString ) + 1;
@@ -130,13 +130,13 @@ public:
 		return m_StringMap.GetNumStrings();
 	}
 
-	unsigned int GetPoolSize()
+	size_t GetPoolSize() const
 	{
 		return m_nOffset;
 	}
 
 	// build the final pool
-	void GetTableAndPool( CUtlVector< unsigned int > &offsets, CUtlBuffer &buffer )
+	void GetTableAndPool( CUtlVector< size_t > &offsets, CUtlBuffer &buffer )
 	{
 		offsets.Purge();
 		buffer.Purge();
@@ -144,8 +144,8 @@ public:
 		offsets.EnsureCapacity( m_StringMap.GetNumStrings() );
 		buffer.EnsureCapacity( m_nOffset );
 
-		unsigned int currentOffset = 0;
-		for ( int i = 0; i < m_StringMap.GetNumStrings(); i++ )
+		size_t currentOffset = 0;
+		for ( intp i = 0; i < m_StringMap.GetNumStrings(); i++ )
 		{
 			offsets.AddToTail( currentOffset );
 
@@ -166,7 +166,7 @@ public:
 
 	void DumpPool()
 	{
-		for ( int i = 0; i < m_StringMap.GetNumStrings(); i++ )
+		for ( intp i = 0; i < m_StringMap.GetNumStrings(); i++ )
 		{
 			const char *pString = m_StringMap.String( i );
 			Msg( "%s\n", pString );
@@ -180,8 +180,8 @@ public:
 	}
 
 private:
-	CUtlStringMap< int >	m_StringMap;
-	unsigned int			m_nOffset;
+	CUtlStringMap< intp >	m_StringMap;
+	size_t			m_nOffset;
 };
 CChoreoStringPool g_ChoreoStringPool;
 
@@ -360,18 +360,18 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 		return true;
 	}
 
-	Msg( "Scenes: Finalizing %d unique scenes.\n", g_SceneFiles.Count() );
+	Msg( "Scenes: Finalizing %zd unique scenes.\n", g_SceneFiles.Count() );
 
 
 	// get the string pool
-	CUtlVector< unsigned int > stringOffsets;
+	CUtlVector< size_t > stringOffsets;
 	CUtlBuffer stringPool;
 	g_ChoreoStringPool.GetTableAndPool( stringOffsets, stringPool );
 
 	if ( !bQuiet )
 	{
 		Msg( "Scenes: String Table: %llu bytes\n", ((uint64)stringOffsets.Count() * sizeof( int )) );
-		Msg( "Scenes: String Pool: %d bytes\n", stringPool.TellMaxPut() );
+		Msg( "Scenes: String Pool: %zd bytes\n", stringPool.TellMaxPut() );
 	}
 
 	// first header, then lookup table, then string pool blob
@@ -401,9 +401,9 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 	targetBuffer.Put( &imageHeader, sizeof( imageHeader ) );
 
 	// header is immediately followed by string table and pool
-	for ( int i = 0; i < stringOffsets.Count(); i++ )
+	for ( intp i = 0; i < stringOffsets.Count(); i++ )
 	{
-		unsigned int offset = stringPoolStart + stringOffsets[i];
+		size_t offset = stringPoolStart + stringOffsets[i];
 		if ( !bLittleEndian )
 		{
 			offset = BigLong( offset );

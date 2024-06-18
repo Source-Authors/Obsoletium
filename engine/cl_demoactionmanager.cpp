@@ -332,7 +332,7 @@ void CDemoActionManager::SaveToFile( void )
 	Q_DefaultExtension( metafile, ".vdm", sizeof( metafile ) );
 
 	// Save data
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	SaveToBuffer( buf );
 
 	// Write to file

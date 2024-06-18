@@ -227,8 +227,8 @@ struct CSmoothingContext
 		Q_strncpy( filename, src.filename, sizeof( filename ) );
 
 		smooth.RemoveAll();
-		int c = src.smooth.Count();
-		int i;
+		intp c = src.smooth.Count();
+		intp i;
 		for ( i = 0; i < c; i++ )
 		{
 			demosmoothing_t newitem;

@@ -187,7 +187,7 @@ void CollisionBSPData_Destroy( CCollisionBSPData *pBSPData )
 // Returns the collision tree associated with the ith displacement
 //-----------------------------------------------------------------------------
 
-CDispCollTree* CollisionBSPData_GetCollisionTree( int i )
+CDispCollTree* CollisionBSPData_GetCollisionTree( intp i )
 {
 	if ((i < 0) || (i >= g_DispCollTreeCount))
 		return 0;

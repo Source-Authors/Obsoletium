@@ -151,14 +151,14 @@ public:
 	void			SwapActors( int a1, int a2 );
 
 	// General data access
-	int				GetNumEvents( void );
-	CChoreoEvent	*GetEvent( int event );
+	intp			GetNumEvents() const;
+	CChoreoEvent	*GetEvent( intp event );
 
-	int				GetNumActors( void );
-	CChoreoActor	*GetActor( int actor );
+	intp			GetNumActors() const;
+	CChoreoActor	*GetActor( intp actor );
 	
-	int				GetNumChannels( void );
-	CChoreoChannel	*GetChannel( int channel );
+	intp			GetNumChannels() const;
+	CChoreoChannel	*GetChannel( intp channel );
 
 	// Object allocation/destruction
 	void			DeleteReferencedObjects( CChoreoActor *actor );
@@ -200,7 +200,7 @@ public:
 
 	float			SnapTime( float t );
 
-	int				GetSceneRampCount( void ) { return m_SceneRamp.GetCount(); };
+	intp				GetSceneRampCount( void ) const { return m_SceneRamp.GetCount(); };
 	CExpressionSample *GetSceneRamp( int index ) { return m_SceneRamp.Get( index ); };
 	CExpressionSample *AddSceneRamp( float time, float value, bool selected ) { return m_SceneRamp.Add( time, value, selected ); };
 	void			DeleteSceneRamp( int index ) { m_SceneRamp.Delete( index ); };

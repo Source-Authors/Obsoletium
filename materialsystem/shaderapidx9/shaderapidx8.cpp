@@ -452,11 +452,11 @@ struct Texture_t
 
 	CUtlSymbol				m_DebugName;
 	CUtlSymbol				m_TextureGroupName;
-	int						*m_pTextureGroupCounterGlobal;	// Global counter for this texture's group.
-	int						*m_pTextureGroupCounterFrame;	// Per-frame global counter for this texture's group.
+	intp						*m_pTextureGroupCounterGlobal;	// Global counter for this texture's group.
+	intp						*m_pTextureGroupCounterFrame;	// Per-frame global counter for this texture's group.
 
 	// stats stuff
-	int						m_SizeBytes;
+	intp					m_SizeBytes;
 	int						m_SizeTexels;
 	int						m_LastBoundFrame;
 	int						m_nTimesBoundMax;
@@ -529,7 +529,7 @@ struct Texture_t
 		m_ppTexture[copy] = pPtr;
 	}
 
-	int GetMemUsage() const
+	intp GetMemUsage() const
 	{
 		return m_SizeBytes;
 	}
@@ -1254,8 +1254,8 @@ private:
 	bool m_bDebugGetAllTextures;
 	bool m_bDebugTexturesRendering;
 	KeyValues *m_pDebugTextureList;
-	int m_nTextureMemoryUsedLastFrame, m_nTextureMemoryUsedTotal;
-	int m_nTextureMemoryUsedPicMip1, m_nTextureMemoryUsedPicMip2;
+	intp m_nTextureMemoryUsedLastFrame, m_nTextureMemoryUsedTotal;
+	intp m_nTextureMemoryUsedPicMip1, m_nTextureMemoryUsedPicMip2;
 	int m_nDebugDataExportFrame;
 
 	FlashlightState_t m_FlashlightState;
@@ -4060,13 +4060,13 @@ void CShaderAPIDx8::ExportTextureList()
 
 			// Compute picmip memory usage
 			{
-				int numBytes = tex.GetMemUsage();
+				intp numBytes = tex.GetMemUsage();
 
 				if ( tex.m_NumLevels > 1 )
 				{
 					if ( tex.GetWidth() > 4 || tex.GetHeight() > 4 || tex.GetDepth() > 4 )
 					{
-						int topmipsize = ImageLoader::GetMemRequired( tex.GetWidth(), tex.GetHeight(), tex.GetDepth(), tex.GetImageFormat(), false );
+						intp topmipsize = ImageLoader::GetMemRequired( tex.GetWidth(), tex.GetHeight(), tex.GetDepth(), tex.GetImageFormat(), false );
 						numBytes -= topmipsize;
 
 						m_nTextureMemoryUsedPicMip1 += numBytes;
@@ -4103,6 +4103,11 @@ void CShaderAPIDx8::ExportTextureList()
 			KeyValues *pSubKey = m_pDebugTextureList->CreateNewKey();
 			pSubKey->SetString( "Name", tex.m_DebugName.String() );
 			pSubKey->SetString( "TexGroup", tex.m_TextureGroupName.String() );
+#ifdef PLATFORM_64BITS
+			pSubKey->SetUint64( "Size", tex.GetMemUsage() );
+#else
+			pSubKey->SetInt( "Size", tex.GetMemUsage() );
+#endif
 			pSubKey->SetInt( "Size", tex.GetMemUsage() );
 			if ( tex.GetCount() > 1 )
 				pSubKey->SetInt( "Count", tex.GetCount() );
@@ -4192,7 +4197,7 @@ void CShaderAPIDx8::ExportTextureList()
 	// build special entries for implicit surfaces/textures
 	D3DSURFACE_DESC desc;
 	m_pBackBufferSurface->GetDesc( &desc );
-	int size = ImageLoader::GetMemRequired( 
+	intp size = ImageLoader::GetMemRequired( 
 		desc.Width,
 		desc.Height,
 		0,
@@ -4277,7 +4282,7 @@ void CShaderAPIDx8::ReleaseShaderObjects()
 			{
 				if ( GetTexture( hTexture ).GetTexture() )
 				{
-					Warning( "Didn't correctly clean up texture 0x%8.8x (%s)\n", hTexture, GetTexture( hTexture ).m_DebugName.String() ); 
+					Warning( "Didn't correctly clean up texture 0x%8.8zx (%s)\n", hTexture, GetTexture( hTexture ).m_DebugName.String() ); 
 				}
 			}
 			else
@@ -4555,7 +4560,7 @@ void CShaderAPIDx8::ComputeFillRate()
 	// Snapshot; look at total # pixels drawn...
 	if ( !pBuf )
 	{
-		int memSize = ShaderUtil()->GetMemRequired(
+		intp memSize = ShaderUtil()->GetMemRequired(
 									width, 
 									height, 
 									1, 
@@ -6506,7 +6511,7 @@ inline bool CShaderAPIDx8::WouldBeOverTextureLimit( ShaderAPITextureHandle_t hTe
 		if ( tex.m_LastBoundFrame == m_CurrentFrame )
 			return false;
 
-		return m_nTextureMemoryUsedLastFrame + tex.GetMemUsage() > (mat_texture_limit.GetInt() * 1024);
+		return m_nTextureMemoryUsedLastFrame + tex.GetMemUsage() > (mat_texture_limit.GetInt() * static_cast<intp>(1024));
 	}
 	return false;
 }

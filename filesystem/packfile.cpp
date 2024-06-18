@@ -654,7 +654,7 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	MEM_ALLOC_CREDIT();
 
 	// read central directory into memory and parse
-	CUtlBuffer zipDirBuff( 0, rec.centralDirectorySize, 0 );
+	CUtlBuffer zipDirBuff( (intp)0, rec.centralDirectorySize, 0 );
 	zipDirBuff.EnsureCapacity( rec.centralDirectorySize );
 	zipDirBuff.ActivateByteSwapping( IsX360() );
 	ReadFromPack( -1, zipDirBuff.Base(), -1, rec.centralDirectorySize, rec.startOfCentralDirOffset );
@@ -850,8 +850,8 @@ static std::atomic<int> sLZMAPackFileHandles( 0 );
 CLZMAZipPackFileHandle::CLZMAZipPackFileHandle( CZipPackFile* pOwner, int64 nBase, unsigned int nOriginalSize, unsigned int nCompressedSize,
                                                 unsigned int nIndex, unsigned int nFilePointer )
 	: CZipPackFileHandle( pOwner, nBase, nCompressedSize, nIndex, nFilePointer ),
-	  m_BackSeekBuffer( 0, PACKFILE_COMPRESSED_FILEHANDLE_SEEK_BUFFER ),
-	  m_ReadBuffer( 0, PACKFILE_COMPRESSED_FILEHANDLE_READ_BUFFER ),
+	  m_BackSeekBuffer( (intp)0, PACKFILE_COMPRESSED_FILEHANDLE_SEEK_BUFFER ),
+	  m_ReadBuffer( (intp)0, PACKFILE_COMPRESSED_FILEHANDLE_READ_BUFFER ),
 	  m_pLZMAStream( NULL ), m_nSeekPosition( 0 ), m_nOriginalSize( nOriginalSize )
 {
 	Reset();

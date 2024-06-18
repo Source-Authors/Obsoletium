@@ -122,7 +122,7 @@ void CHistoryGames::OnRemoveFromHistory()
 	for ( int i = m_pGameList->GetSelectedItemsCount() - 1; i >= 0; i-- )
 	{
 		int itemID = m_pGameList->GetSelectedItem( i );
-		int serverID = m_pGameList->GetItemData(itemID)->userData;
+		intp serverID = m_pGameList->GetItemData(itemID)->userData;
 		
 		gameserveritem_t *pServer = steamapicontext->SteamMatchmakingServers()->GetServerDetails( m_hRequest, serverID );
 		if ( pServer )

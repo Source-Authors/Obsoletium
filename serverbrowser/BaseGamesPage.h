@@ -119,7 +119,7 @@ public:
 	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
 
 	// gets information about specified server
-	virtual gameserveritem_t *GetServer(unsigned int serverID);
+	virtual gameserveritem_t *GetServer(uintp serverID);
 	virtual const char *GetConnectCode();
 
 	uint32 GetServerFilters( MatchMakingKeyValuePair_t **pFilters );

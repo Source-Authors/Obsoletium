@@ -391,7 +391,7 @@ InitReturnVal_t CBaseFileSystem::Init()
 			V_ComposeFileName( pRemotePath, "xbox_exclude_paths.txt", szExcludeFile, sizeof( szExcludeFile ) );
 
 			// populate the exclusion list
-			CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			if ( ReadFile( szExcludeFile, NULL, buf, 0, 0 ) )
 			{
 				characterset_t breakSet;

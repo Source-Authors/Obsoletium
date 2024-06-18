@@ -341,12 +341,11 @@ int CProfileHierarchyPanel::AddItem( KeyValues *data, int parentItemIndex, Colum
 	{
 		m_Panels.Insert( columnPanels );
 
-		int c = columnPanels.m_Columns.Count();
-		for ( int i = 0; i < c; ++i )
+		for ( auto &&c : columnPanels.m_Columns )
 		{
-			if ( columnPanels.m_Columns[ i ].label )
+			if ( c.label )
 			{
-				columnPanels.m_Columns[ i ].label->SetParent( this );
+				c.label->SetParent( this );
 			}
 		}
 	}

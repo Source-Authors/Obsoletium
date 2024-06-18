@@ -148,7 +148,7 @@ public:
 	virtual void							ReleaseRenderData();
 	virtual bool							IsRenderData( const void *pData ) const;
 	void									MarkRenderDataUnused( bool bFrameEnd );
-	int										RenderDataSizeUsed() const;
+	intp									RenderDataSizeUsed() const;
 
 	// debugging
 	virtual void							PrintfVA( char *fmt, va_list vargs );

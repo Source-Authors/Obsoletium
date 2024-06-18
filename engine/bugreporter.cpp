@@ -156,9 +156,9 @@ const char *GetInternalBugReporterDLL( void )
 // See https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-checktokenmembership
 BOOL IsUserAdmin()
 {
-  SID_IDENTIFIER_AUTHORITY ntAuthority{ SECURITY_NT_AUTHORITY };
+	SID_IDENTIFIER_AUTHORITY ntAuthority{ SECURITY_NT_AUTHORITY };
 	PSID administratorsGroup;
-	BOOL b = AllocateAndInitializeSid(
+	BOOL ok = AllocateAndInitializeSid(
 			&ntAuthority,
 			2,
 			SECURITY_BUILTIN_DOMAIN_RID,
@@ -166,17 +166,17 @@ BOOL IsUserAdmin()
 			0, 0, 0, 0, 0, 0,
 			&administratorsGroup);
 
-	if (b)
+	if (ok)
 	{
-			if (!CheckTokenMembership( NULL, administratorsGroup, &b)) 
+			if (!CheckTokenMembership( NULL, administratorsGroup, &ok)) 
 			{
-					 b = FALSE;
+				ok = FALSE;
 			}
 
 			FreeSid(administratorsGroup); 
 	}
 
-	return b;
+	return ok;
 }
 #endif
 
@@ -256,12 +256,12 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 		// Display version, service pack (if any), and build number.
 		
 		char build[256];
-		Q_snprintf (build, sizeof( build ), "%s (Build %lu) version %lu.%lu (LimitedUser: %s)",
+		Q_snprintf (build, sizeof( build ), "%s (Build %lu) version %lu.%lu (super user: %s)",
 			osvi.szCSDVersion,
 			osvi.dwBuildNumber & 0xFFFF,
 			osvi.dwMajorVersion,
 			osvi.dwMinorVersion,
-			Plat_IsUserAnAdmin() ? "no" : "yes" );
+			Plat_IsUserAnAdmin() ? "yes" : "no" );
 		Q_strncat ( osversion, build, maxlen, COPY_ALL_CHARACTERS );
 		break;
 	
@@ -293,7 +293,7 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 				Q_strncpy ( osversion, pchVersion, ccVersion );
 				osversion[ ccVersion ] = 0;
 				Q_strncat ( osversion, " (super user: " );
-				Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "no)" : "yes)" );
+				Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "yes)" : "no)" );
 				break;
 			}
 		}
@@ -311,7 +311,7 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 		fgets( osversion, maxlen, fpKernelVer );
 		osversion[ maxlen - 1 ] = 0;
 		Q_strncat ( osversion, " (super user: " );
-		Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "no)" : "yes)" );
+		Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "yes)" : "no)" );
 
 		char *szlf = Q_strrchr( osversion, '\n' );
 		if( szlf )
@@ -1958,7 +1958,7 @@ void CBugUIPanel::OnSubmit()
 		bool attachedSave = false;
 		bool attachedScreenshot = false;
 
-		CUtlBuffer buginfo( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer buginfo( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 		buginfo.Printf( "Title:  %s\n", title );
 		buginfo.Printf( "Description:  %s\n\n", desc );
@@ -1982,7 +1982,7 @@ void CBugUIPanel::OnSubmit()
 		buginfo.PutChar( 0 );
 
 
-		int maxlen = buginfo.TellPut() * 2 + 1;
+		intp maxlen = buginfo.TellPut() * 2 + 1;
 		char *fixed = new char [ maxlen ];
 		Assert( fixed );
 		if ( fixed )
@@ -2356,8 +2356,8 @@ bool CBugUIPanel::UploadBugSubmission( char const *levelname, int bugId, char co
 	if ( files.Count() > 0 )
 	{
 		bAsync = false;
-		int c = files.Count();
-		for ( int i = 0 ; i < c; ++i )
+		intp c = files.Count();
+		for ( intp i = 0 ; i < c; ++i )
 		{
 			Q_snprintf( localfile, sizeof( localfile ), "%s/%s", com_gamedir, files[ i ].name );
 			Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s", GetSubmissionURL(bugId), files[ i ].fixedname );
@@ -2971,7 +2971,7 @@ int CBugUIPanel::GetArea()
 		V_strcpy_safe( szAreaMap, m_pBugReporter->GetAreaMap( i ) );
 		char *pszAreaDir = Q_strrchr( szAreaMap, '@' );
 		char *pszAreaPrefix = Q_strrchr( szAreaMap, '%' );
-		int iDirLength = 0;
+		intp iDirLength = 0;
 		if ( pszAreaDir && pszAreaPrefix )
 		{
 			iDirLength = pszAreaPrefix - pszAreaDir - 1;

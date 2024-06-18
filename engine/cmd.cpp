@@ -478,7 +478,7 @@ CON_COMMAND( stuffcmds, "Parses and stuffs command line + commands to command bu
 
 	MEM_ALLOC_CREDIT();
 
-	CUtlBuffer build( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer build( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	// arg[0] is the executable name
 	for ( int i=1; i < CommandLine()->ParmCount(); i++ )
@@ -641,7 +641,7 @@ void Cmd_Exec_f( const CCommand &args )
 	ConDMsg( "execing %s\n", szFile );
 
 	// check to make sure we're not going to overflow the cmd_text buffer
-	int hCommand = s_CommandBuffer.GetNextCommandHandle();
+	CommandHandle_t hCommand = s_CommandBuffer.GetNextCommandHandle();
 
 	// Execute each command immediately
 	const char *pszDataPtr = f;

@@ -83,12 +83,12 @@ public:
 	// APIS required by CManagedDataCacheClient
 	void DestroyResource();
 	CAsyncWaveData *GetData();
-	unsigned int Size();
+	size_t Size();
 
 	static void AsyncCallback( const FileAsyncRequest_t &asyncRequest, int numReadBytes, FSAsyncStatus_t err );
 	static void QueuedLoaderCallback( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError );
 	static CAsyncWaveData *CreateResource( const asyncwaveparams_t &params );
-	static unsigned int EstimatedSize( const asyncwaveparams_t &params );
+	static size_t EstimatedSize( const asyncwaveparams_t &params );
 
 	void OnAsyncCompleted( const FileAsyncRequest_t* asyncFilePtr, int numReadBytes, FSAsyncStatus_t err );
 	bool BlockingCopyData( void *destbuffer, int destbufsize, int startoffset, int count );
@@ -232,9 +232,9 @@ CAsyncWaveData *CAsyncWaveData::GetData()
 // Purpose: 
 // Output : unsigned int
 //-----------------------------------------------------------------------------
-unsigned int CAsyncWaveData::Size()
+size_t CAsyncWaveData::Size()
 { 
-	int size = sizeof( *this );
+	size_t size = sizeof( *this );
 	
 	if ( IsPC() )
 	{
@@ -280,9 +280,9 @@ CAsyncWaveData *CAsyncWaveData::CreateResource( const asyncwaveparams_t &params 
 // Input  : &params - 
 // Output : static unsigned int
 //-----------------------------------------------------------------------------
-unsigned int CAsyncWaveData::EstimatedSize( const asyncwaveparams_t &params )
+size_t CAsyncWaveData::EstimatedSize( const asyncwaveparams_t &params )
 {
-	int size = sizeof( CAsyncWaveData );
+	size_t size = sizeof( CAsyncWaveData );
 
 	if ( IsPC() )
 	{
@@ -684,7 +684,7 @@ public:
 	CAsyncWavDataCache();
 	~CAsyncWavDataCache() = default;
 
-	virtual bool			Init( unsigned int memSize );
+	virtual bool			Init( size_t memSize );
 	virtual void			Shutdown();
 
 	// implementation that treats file as monolithic
@@ -801,7 +801,7 @@ CAsyncWavDataCache::CAsyncWavDataCache() :
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CAsyncWavDataCache::Init( unsigned int memSize )
+bool CAsyncWavDataCache::Init( size_t memSize )
 {
 	if ( m_bInitialized )
 		return true;
@@ -828,7 +828,7 @@ bool CAsyncWavDataCache::Init( unsigned int memSize )
 
 #if FORCE_SMALL_MEMORY_CACHE_SIZE
 	memSize = FORCE_SMALL_MEMORY_CACHE_SIZE;
-	Msg( "WARNING CAsyncWavDataCache::Init() forcing small memory cache size: %u\n", memSize );
+	Msg( "WARNING CAsyncWavDataCache::Init() forcing small memory cache size: %zu\n", memSize );
 #endif
 
 	CCacheClientBaseClass::Init( g_pDataCache, "WaveData", memSize );

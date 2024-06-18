@@ -1690,10 +1690,10 @@ FORCEINLINE void XM_CALLCONV ConvertStoreAsIntsSIMD(intx4 * RESTRICT pDest, Dire
 {
 #if defined( COMPILER_MSVC64 ) || !defined(_XM_SSE_INTRINSICS_)
 
-	(*pDest)[0] = SubFloat( vSrc, 0 );
-	(*pDest)[1] = SubFloat( vSrc, 1 );
-	(*pDest)[2] = SubFloat( vSrc, 2 );
-	(*pDest)[3] = SubFloat( vSrc, 3 );
+	(*pDest)[0] = (int)SubFloat( vSrc, 0 );
+	(*pDest)[1] = (int)SubFloat( vSrc, 1 );
+	(*pDest)[2] = (int)SubFloat( vSrc, 2 );
+	(*pDest)[3] = (int)SubFloat( vSrc, 3 );
 
 #else
 	__m64 bottom = _mm_cvttps_pi32( vSrc );

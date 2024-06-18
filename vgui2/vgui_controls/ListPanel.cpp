@@ -850,7 +850,7 @@ int ListPanel::FindColumn(const char *columnName)
 //			data->GetName() is used to uniquely identify an item
 //			data sub items are matched against column header name to be used in the table
 //-----------------------------------------------------------------------------
-int ListPanel::AddItem( const KeyValues *item, unsigned int userData, bool bScrollToItem, bool bSortOnAdd)
+int ListPanel::AddItem( const KeyValues *item, uintp userData, bool bScrollToItem, bool bSortOnAdd)
 {
 	FastSortListPanelItem *newitem = new FastSortListPanelItem;
 	newitem->kv = item->MakeCopy();
@@ -886,7 +886,7 @@ int ListPanel::AddItem( const KeyValues *item, unsigned int userData, bool bScro
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void ListPanel::SetUserData( int itemID, unsigned int userData )
+void ListPanel::SetUserData( int itemID, uintp userData )
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return;
@@ -897,7 +897,7 @@ void ListPanel::SetUserData( int itemID, unsigned int userData )
 //-----------------------------------------------------------------------------
 // Purpose: Finds the first itemID with a matching userData
 //-----------------------------------------------------------------------------
-int ListPanel::GetItemIDFromUserData( unsigned int userData )
+int ListPanel::GetItemIDFromUserData( uintp userData )
 {
 	FOR_EACH_LL( m_DataItems, itemID )
 	{
@@ -1052,7 +1052,7 @@ ListPanelItem *ListPanel::GetItemData( int itemID )
 //-----------------------------------------------------------------------------
 // Purpose: returns user data for itemID
 //-----------------------------------------------------------------------------
-unsigned int ListPanel::GetItemUserData(int itemID)
+uintp ListPanel::GetItemUserData(int itemID)
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return 0;

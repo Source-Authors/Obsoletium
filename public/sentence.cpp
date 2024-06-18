@@ -999,7 +999,7 @@ void CSentence::SaveToBuffer( CUtlBuffer& buf )
 //-----------------------------------------------------------------------------
 void CSentence::InitFromDataChunk( void *data, int size )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	buf.EnsureCapacity( size );
 	buf.Put( data, size );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, size );

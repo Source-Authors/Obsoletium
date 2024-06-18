@@ -196,7 +196,7 @@ public:
 
 		// Msg( "%s Startcommand %d\n", bServer ? "sv" : "cl", nCommandNumber );
 
-		diffcheck.SetValue( reinterpret_cast< int >( this ) );
+		diffcheck.SetValue( reinterpret_cast< intp >( this ) );
 
 		Assert( CBaseEntity::IsServer() );
 

@@ -1513,7 +1513,7 @@ bool CMaterialSystem::ConvertImageFormat( unsigned char *src, enum ImageFormat s
 //-----------------------------------------------------------------------------
 // Figures out the amount of memory needed by a bitmap
 //-----------------------------------------------------------------------------
-int CMaterialSystem::GetMemRequired( int width, int height, int depth, ImageFormat format, bool mipmap )
+intp CMaterialSystem::GetMemRequired( int width, int height, int depth, ImageFormat format, bool mipmap )
 {
 	return ImageLoader::GetMemRequired( width, height, depth, format, mipmap );
 }
@@ -4524,7 +4524,7 @@ ITexture *CMaterialSystem::CreateNamedRenderTargetTextureEx2(
 class CTextureBitsRegenerator : public ITextureRegenerator
 {
 public:
-	CTextureBitsRegenerator( int w, int h, int mips, ImageFormat fmt, int srcBufferSize, byte* srcBits )
+	CTextureBitsRegenerator( int w, int h, int mips, ImageFormat fmt, intp srcBufferSize, byte* srcBits )
 		: m_nWidth( w )
 		, m_nHeight( h )
 		, m_nMipmaps( mips )
@@ -4564,8 +4564,8 @@ public:
 		{
 			int srcResX = m_nWidth;
 			int srcResY = m_nHeight;
-			int srcOffset = 0;
-			int dstOffset = 0;
+			intp srcOffset = 0;
+			intp dstOffset = 0;
 			int mip = 0;
 
 			// Skip the mips we're not including.

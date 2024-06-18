@@ -44,7 +44,7 @@ bool WriteBonusMapSavedData( KeyValues *data )
 	if ( IsX360() && ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED ) )
 		return false;
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	data->RecursiveSaveToFile( buf, 0 );
 

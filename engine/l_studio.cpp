@@ -781,7 +781,7 @@ public:
 		return data;
 	}
 
-	static unsigned int EstimatedSize( const colormeshparams_t &params )
+	static size_t EstimatedSize( const colormeshparams_t &params )
 	{
 		// each vertex is a 4 byte color
 		return params.m_nMeshes * sizeof( IMesh* ) + params.m_nTotalVertexes * 4;
@@ -2808,7 +2808,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
 	CMatRenderContextPtr pRenderContext( materials );
 	const int MAX_OBJECTS = 1024;
-	CUtlSortVector<robject_t, CRobjectLess> objectList(0, MAX_OBJECTS);
+	CUtlSortVector<robject_t, CRobjectLess> objectList( (intp)0, MAX_OBJECTS);
 	CUtlVectorFixedGrowable<rmodel_t, 256> modelList;
 	CUtlVectorFixedGrowable<short,256> lightObjects;
 	CUtlVectorFixedGrowable<short,64> shadowObjects;

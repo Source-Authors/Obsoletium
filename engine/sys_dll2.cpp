@@ -399,7 +399,7 @@ public:
 				CommentCat( pchSysErrorText );
 
 				// Trim trailing \n.
-				int len = V_strlen( m_errorText );
+				intp len = V_strlen( m_errorText );
 				if ( len > 0 && m_errorText[ len - 1 ] == '\n' )
 					m_errorText[ len - 1 ] = 0;
 

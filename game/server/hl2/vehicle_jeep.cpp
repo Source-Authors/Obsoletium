@@ -600,7 +600,7 @@ void CPropJeep::CheckWaterLevel( void )
 		// Add the jeep's Z view offset
 		Vector vecUp;
 		AngleVectors( vecAttachAngles, NULL, NULL, &vecUp );
-		vecUp.z = clamp( vecUp.z, 0.0f, vecUp.z );
+		vecUp.z = max( vecUp.z, 0.0f );
 		vecAttachPoint.z += r_JeepViewZHeight.GetFloat() * vecUp.z;
 
 		bool bEyes = ( UTIL_PointContents( vecAttachPoint ) & MASK_WATER ) ? true : false;
@@ -1275,7 +1275,7 @@ void CPropJeep::DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeA
 	// Get up vector.
 	Vector vecUp;
 	AngleVectors( vecVehicleEyeAngles, NULL, NULL, &vecUp );
-	vecUp.z = clamp( vecUp.z, 0.0f, vecUp.z );
+	vecUp.z = max( vecUp.z, 0.0f );
 	vecVehicleEyePos.z += r_JeepViewZHeight.GetFloat() * vecUp.z;
 
 	// NOTE: Should probably use some damped equation here.

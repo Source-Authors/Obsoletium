@@ -805,7 +805,7 @@ void CMatSystemSurface::PushMakeCurrent(VPANEL pPanel, bool useInSets)
 
 	g_pVGuiPanel->GetClipRect(pPanel, clipRect[0], clipRect[1], clipRect[2], clipRect[3]);
 
-	int i = m_PaintStateStack.AddToTail();
+	intp i = m_PaintStateStack.AddToTail();
 	PaintState_t &paintState = m_PaintStateStack[i];
 	paintState.m_pPanel = pPanel;
 
@@ -832,7 +832,7 @@ void CMatSystemSurface::PopMakeCurrent(VPANEL pPanel)
 		DrawFlushText();
 	}
 
-	int top = m_PaintStateStack.Count() - 1;
+	intp top = m_PaintStateStack.Count() - 1;
 
 	// More pops that pushes?
 	Assert( top >= 0 );
@@ -2680,7 +2680,7 @@ void CMatSystemSurface::FlashWindow(VPANEL panel, bool state)
 //-----------------------------------------------------------------------------
 void CMatSystemSurface::SetTitle(VPANEL panel, const wchar_t *title)
 {
-	int entry = GetTitleEntry( panel );
+	intp entry = GetTitleEntry( panel );
 	if ( entry == -1 )
 	{
 		entry = m_Titles.AddToTail();
@@ -2697,7 +2697,7 @@ void CMatSystemSurface::SetTitle(VPANEL panel, const wchar_t *title)
 //-----------------------------------------------------------------------------
 wchar_t const *CMatSystemSurface::GetTitle( VPANEL panel )
 {
-	int entry = GetTitleEntry( panel );
+	intp entry = GetTitleEntry( panel );
 	if ( entry != -1 )
 	{
 		TitleEntry *e = &m_Titles[ entry ];
@@ -2712,9 +2712,9 @@ wchar_t const *CMatSystemSurface::GetTitle( VPANEL panel )
 // Input  : *panel - 
 // Output : TitleEntry
 //-----------------------------------------------------------------------------
-int CMatSystemSurface::GetTitleEntry( vgui::VPANEL panel )
+intp CMatSystemSurface::GetTitleEntry( vgui::VPANEL panel )
 {
-	for ( int i = 0; i < m_Titles.Count(); i++ )
+	for ( intp i = 0; i < m_Titles.Count(); i++ )
 	{
 		TitleEntry* entry = &m_Titles[ i ];
 		if ( entry->panel == panel )
@@ -2918,7 +2918,7 @@ void CMatSystemSurface::ReleasePanel(VPANEL panel)
 	// Remove from popup list if needed and remove any dead popups while we're at it
 	RemovePopup( panel );
 
-	int entry = GetTitleEntry( panel );
+	intp entry = GetTitleEntry( panel );
 	if ( entry != -1 )
 	{
 		m_Titles.Remove( entry );
@@ -2929,7 +2929,7 @@ void CMatSystemSurface::ReleasePanel(VPANEL panel)
 //-----------------------------------------------------------------------------
 // Popup accessors used by VGUI
 //-----------------------------------------------------------------------------
-int CMatSystemSurface::GetPopupCount(  )
+intp CMatSystemSurface::GetPopupCount(  )
 {
 	return m_PopupList.Count();
 }
@@ -2960,9 +2960,9 @@ void CMatSystemSurface::AddPopup( VPANEL panel )
 void CMatSystemSurface::RemovePopup( vgui::VPANEL panel )
 {
 	// Remove from popup list if needed and remove any dead popups while we're at it
-	int c = GetPopupCount();
+	intp c = GetPopupCount();
 
-	for ( int i = c -  1; i >= 0 ; i-- )
+	for ( intp i = c -  1; i >= 0 ; i-- )
 	{
 		VPANEL popup = GetPopup(i );
 		if ( popup && ( popup != panel ) )
@@ -3219,7 +3219,7 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 		// since depth-test and depth-write are on, the front panels will occlude the underlying ones
 		{
 			VPROF( "CMatSystemSurface::PaintTraverse popups loop" );
-			int popups = GetPopupCount();
+			intp popups = GetPopupCount();
 			if ( popups > 254 )
 			{
 				Warning( "Too many popups! Rendering will be bad!\n" );
@@ -3227,7 +3227,7 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 
 			// HACK! Using stencil ref 254 so drag/drop helper can use 255.
 			int nStencilRef = 254;
-			for ( int i = popups - 1; i >= 0; --i )
+			for ( intp i = popups - 1; i >= 0; --i )
 			{
 				VPANEL popupPanel = GetPopup( i );
 
@@ -3560,7 +3560,7 @@ int CMatSystemSurface::DrawColoredText( vgui::HFont font, int x, int y, int r, i
 
 	wchar_t szconverted[ 1024 ];
 	g_pVGuiLocalize->ConvertANSIToUnicode( data, szconverted, 1024 );
-	DrawPrintText( szconverted, wcslen(szconverted ) );
+	DrawPrintText( szconverted, Q_wcslen(szconverted ) );
 
 	int totalLength = DrawTextLen( font, data );
 
@@ -3743,7 +3743,7 @@ void CMatSystemSurface::DrawColoredTextRect( vgui::HFont font, int x, int y, int
 
 		wchar_t szconverted[ 1024 ];
 		g_pVGuiLocalize->ConvertANSIToUnicode( word, szconverted, 1024 );
-		DrawPrintText( szconverted, wcslen(szconverted ) );
+		DrawPrintText( szconverted, Q_wcslen(szconverted ) );
 
 		// Leave room for space, too
 		x += DrawTextLen( font, word );
@@ -3843,7 +3843,7 @@ void CMatSystemSurface::MovePopupToFront(VPANEL panel)
 {
 	HPanel p = ivgui()->PanelToHandle( panel );
 
-	int index = m_PopupList.Find( p );
+	intp index = m_PopupList.Find( p );
 	if ( index == m_PopupList.InvalidIndex() )
 		return;
 
@@ -3878,7 +3878,7 @@ void CMatSystemSurface::MovePopupToBack(VPANEL panel)
 {
 	HPanel p = ivgui()->PanelToHandle( panel );
 
-	int index = m_PopupList.Find( p );
+	intp index = m_PopupList.Find( p );
 	if ( index == m_PopupList.InvalidIndex() )
 	{
 		return;
@@ -4047,14 +4047,14 @@ static bool IsChildOfModalSubTree(VPANEL panel)
 
 void CMatSystemSurface::CalculateMouseVisible()
 {
-	int i;
+	intp i;
 	m_bNeedsMouse = false;
 	m_bNeedsKeyboard = false;
 
 	if ( input()->GetMouseCapture() != 0 )
 		return;
 
-	int c = surface()->GetPopupCount();
+	intp c = surface()->GetPopupCount();
 
 	VPANEL modalSubTree = input()->GetModalSubTree();
 	if ( modalSubTree )

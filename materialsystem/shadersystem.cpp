@@ -230,7 +230,7 @@ const char *CShaderSystem::s_pDebugShaderName[MATERIAL_DEBUG_COUNT]	=
 //-----------------------------------------------------------------------------
 CShaderSystem::CShaderSystem()
 	: m_SaveSpewOutput( nullptr ),
-		m_StoredSpew( 0, 512, 0 ),
+		m_StoredSpew( (intp)0, 512, 0 ),
 		m_pRenderState( nullptr ),
 		m_hShaderDLL( USHRT_MAX ),
 		m_nModulation( UCHAR_MAX ),

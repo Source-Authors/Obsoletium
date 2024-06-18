@@ -56,7 +56,7 @@ public:
 	virtual bool			NeedsTangentSpace( void );
 	virtual bool			NeedsSoftwareSkinning( void );
 	virtual int				GetNumPasses( void );
-	virtual int				GetTextureMemoryBytes( void );
+	virtual intp			GetTextureMemoryBytes( void );
 	virtual bool			NeedsLightmapBlendAlpha( void );
 	virtual bool			NeedsSoftwareLighting( void );
 	virtual MorphFormat_t	GetMorphFormat() const;

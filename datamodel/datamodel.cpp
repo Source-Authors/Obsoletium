@@ -257,7 +257,7 @@ DmElementHandle_t CDataModel::NextAllocatedElement( DmElementHandle_t hElement )
 //-----------------------------------------------------------------------------
 // estimate memory overhead
 //-----------------------------------------------------------------------------
-int CDataModel::EstimateMemoryOverhead() const
+constexpr int CDataModel::EstimateMemoryOverhead() const
 {
 	int nHandlesOverhead = sizeof( int ) + sizeof( CDmElement* ); // m_Handles
 	int nElementIdsOverhead = sizeof( DmElementHandle_t ); // this also has a 80k static overhead, since hash tables can't grow
@@ -269,9 +269,9 @@ static bool HandleCompare( const DmElementHandle_t & a, const DmElementHandle_t 
 	return a == b;
 }
 
-static unsigned int HandleHash( const DmElementHandle_t &h )
+static uintp HandleHash( const DmElementHandle_t &h )
 {
-	return (unsigned int)h;
+	return (uintp)h;
 }
 
 int CDataModel::EstimateMemoryUsage( DmElementHandle_t hElement, TraversalDepth_t depth )
@@ -724,7 +724,7 @@ bool CDataModel::Serialize( CUtlBuffer &outBuf, const char *pEncodingName, const
 	bool bIsText = outBuf.IsText();
 	bool bIsCRLF = outBuf.ContainsCRLF();
 
-	CUtlBuffer outTextBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer outTextBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	CUtlBuffer *pActualOutBuf = &outBuf;
 
 	if ( pSerializer->IsBinaryFormat() )

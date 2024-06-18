@@ -95,7 +95,7 @@ public:
 		return pGroup->followers.Count();
 	}
 
-	int CountFollowers( CBaseEntity *pFollowTarget, string_t iszClassname )
+	intp CountFollowers( CBaseEntity *pFollowTarget, string_t iszClassname )
 	{
 		AI_FollowGroup_t *pGroup = FindGroup( pFollowTarget );
 
@@ -110,8 +110,8 @@ public:
 		}
 		else
 		{
-			int result = 0;
-			for ( int i = pGroup->followers.Head(); i != pGroup->followers.InvalidIndex(); i = pGroup->followers.Next( i ) )
+			intp result = 0;
+			for ( intp i = pGroup->followers.Head(); i != pGroup->followers.InvalidIndex(); i = pGroup->followers.Next( i ) )
 			{
 				if ( pGroup->followers[i].hFollower && pGroup->followers[i].hFollower->ClassMatches( iszClassname ) )
 				{

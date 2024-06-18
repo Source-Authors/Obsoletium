@@ -1292,7 +1292,7 @@ void CSoundEmitterSystemBase::SaveChangesToSoundScript( int scriptindex )
 		return;
 	}
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	// FIXME:  Write sound script header
 	if ( filesystem->FileExists( GAME_SOUNDS_HEADER_BLOCK ) )
@@ -1623,8 +1623,8 @@ void CSoundEmitterSystemBase::AddSoundOverrides( char const *scriptfile, bool bP
 // Called by either client or server in LevelShutdown to clear out custom overrides
 void CSoundEmitterSystemBase::ClearSoundOverrides()
 {
-	int i;
-	int removed = 0;
+	UtlHashHandle_t i;
+	ptrdiff_t removed = 0;
 
 	for ( UtlHashHandle_t i = m_Sounds.FirstHandle(); i != m_Sounds.InvalidHandle(); )
 	{
@@ -1642,7 +1642,7 @@ void CSoundEmitterSystemBase::ClearSoundOverrides()
 
 	if (removed > 0 || m_SavedOverrides.Count() > 0 )
 	{
-		Warning( "SoundEmitter:  removing map sound overrides [%i to remove, %i to restore]\n", 
+		Warning( "SoundEmitter:  removing map sound overrides [%zd to remove, %zd to restore]\n", 
 			removed,
 			m_SavedOverrides.Count() );
 	}

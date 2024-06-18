@@ -182,7 +182,7 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 	{
 		struct newPageEntry_t
 		{
-			int	page;	// The font page a new character will go in
+			intp	page;	// The font page a new character will go in
 			int	drawX;	// X location within the font page
 			int	drawY;	// Y location within the font page
 		};
@@ -221,7 +221,8 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 				}
 
 				// Get a texture to render into
-				int page, drawX, drawY, twide, ttall;
+				intp page;
+				int drawX, drawY, twide, ttall;
 				if ( !AllocatePageForChar( fontWide, fontTall, page, drawX, drawY, twide, ttall ) )
 					return false;
 
@@ -253,7 +254,7 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 				Assert( m_CharCache.IsValidIndex( cacheHandle ) );
 			}
 			
-			int page = m_CharCache[cacheHandle].page;
+			intp page = m_CharCache[cacheHandle].page;
 			textureID[i] = m_PageList[page].textureID[typePage];
 			texCoords[i] = m_CharCache[cacheHandle].texCoords;
 		}
@@ -404,7 +405,7 @@ int CFontTextureCache::ComputePageType( int charTall ) const
 //-----------------------------------------------------------------------------
 // Purpose: allocates a new page for a given character
 //-----------------------------------------------------------------------------
-bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, int &pageIndex, int &drawX, int &drawY, int &twide, int &ttall)
+bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, intp &pageIndex, int &drawX, int &drawY, int &twide, int &ttall)
 {
 	// see if there is room in the last page for this character
 	int nPageType = ComputePageType( charTall );

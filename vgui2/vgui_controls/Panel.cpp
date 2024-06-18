@@ -478,7 +478,7 @@ void Panel::SaveKeyBindings( KeyBindingContextHandle_t handle )
 //-----------------------------------------------------------------------------
 void Panel::SaveKeyBindingsToFile( KeyBindingContextHandle_t handle, char const *filename, char const *pathID /*= 0*/ )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	BufPrint( buf, 0, "keybindings\n" );
 	BufPrint( buf, 0, "{\n" );
@@ -3564,7 +3564,7 @@ void Panel::RequestFocus(int direction)
 //-----------------------------------------------------------------------------
 void Panel::OnRequestFocus(VPANEL subFocus, VPANEL defaultPanel)
 {
-	CallParentFunction(new KeyValues("OnRequestFocus", "subFocus", subFocus, "defaultPanel", defaultPanel));
+	CallParentFunction(new KeyValues("OnRequestFocus", "subFocus", ivgui()->PanelToHandle(subFocus), "defaultPanel", ivgui()->PanelToHandle(defaultPanel)));
 }
 
 //-----------------------------------------------------------------------------
@@ -3789,13 +3789,23 @@ void Panel::SetTall(int tall)
 
 void Panel::SetBuildGroup(BuildGroup* buildGroup)
 {
-	//TODO: remove from old group
-
 	Assert(buildGroup != NULL);
-	
+
+	if ( _buildGroup == buildGroup )
+		return;
+
+	// dimhotepus: Not implemented already, and has problems with load game / achievements.
+	/*if ( _buildGroup.Get() )
+	{
+		_buildGroup->PanelRemoved( this );
+	}*/
+
 	_buildGroup = buildGroup;
 
-	_buildGroup->PanelAdded(this);
+	if ( _buildGroup.Get() )
+	{
+		_buildGroup->PanelAdded( this );
+	}
 }
 
 bool Panel::IsBuildGroupEnabled()
@@ -5108,8 +5118,8 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 					}
 					else if ( (DATATYPE_PTR == pMap->firstParamType) && (DATATYPE_CONSTWCHARPTR == pMap->secondParamType) )
 					{
-						typedef void (Panel::*MessageFunc_PtrConstCharPtr_t)(void *, const wchar_t *);
-						(this->*((MessageFunc_PtrConstCharPtr_t)pMap->func))( param1->GetPtr(), param2->GetWString() );
+						typedef void (Panel::*MessageFunc_PtrConstWCharPtr_t)(void *, const wchar_t *);
+						(this->*((MessageFunc_PtrConstWCharPtr_t)pMap->func))( param1->GetPtr(), param2->GetWString() );
 					}
 					else if ( (DATATYPE_HANDLE == pMap->firstParamType) && (DATATYPE_CONSTCHARPTR == pMap->secondParamType) )
 					{
@@ -5119,9 +5129,16 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 					}
 					else if ( (DATATYPE_HANDLE == pMap->firstParamType) && (DATATYPE_CONSTWCHARPTR == pMap->secondParamType) )
 					{
-						typedef void (Panel::*MessageFunc_HandleConstCharPtr_t)(VPANEL, const wchar_t *);
+						typedef void (Panel::*MessageFunc_HandleConstWCharPtr_t)(VPANEL, const wchar_t *);
 						VPANEL vp = ivgui()->HandleToPanel( param1->GetInt() );
-						(this->*((MessageFunc_HandleConstCharPtr_t)pMap->func))( vp, param2->GetWString() );
+						(this->*((MessageFunc_HandleConstWCharPtr_t)pMap->func))( vp, param2->GetWString() );
+					}
+					else if ( (DATATYPE_HANDLE == pMap->firstParamType) && (DATATYPE_HANDLE == pMap->secondParamType) )
+					{
+						typedef void (Panel::*MessageFunc_HandleHandle_t)(VPANEL, VPANEL);
+						VPANEL vp1 = ivgui()->HandleToPanel( param1->GetInt() );
+						VPANEL vp2 = ivgui()->HandleToPanel( param2->GetInt() );
+						(this->*((MessageFunc_HandleHandle_t)pMap->func))( vp1, vp2 );
 					}
 					else
 					{
@@ -5504,7 +5521,7 @@ void Panel::OnDelete()
 // Purpose: Panel handle implementation
 //			Returns a pointer to a valid panel, NULL if the panel has been deleted
 //-----------------------------------------------------------------------------
-Panel *PHandle::Get() 
+Panel *PHandle::Get() const
 {
 	if (m_iPanelID != INVALID_PANEL)
 	{

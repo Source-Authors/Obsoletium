@@ -265,7 +265,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 			case SERVERDATA_SEND_CONSOLE_LOG:
 				{
 #ifndef SWDS
-					CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+					CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 					if ( GetConsoleLogFileData( buf ) )
 					{
 						HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
@@ -525,7 +525,7 @@ int CServerRemoteAccess::ReadDataResponse( ra_listener_id listener, void *buffer
 void CServerRemoteAccess::RequestValue( ra_listener_id listener, int requestID, const char *variable)
 {
 	// look up the cvar
-	CUtlBuffer value(0, 256, CUtlBuffer::TEXT_BUFFER);		// text-mode buffer
+	CUtlBuffer value( (intp)0, 256, CUtlBuffer::TEXT_BUFFER );		// text-mode buffer
 	LookupValue(variable, value);
 
 	// allocate a spot in the list for the response

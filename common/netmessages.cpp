@@ -1752,7 +1752,7 @@ bool SVC_Menu::ReadFromBuffer( bf_read &buffer )
 	m_Type = (DIALOG_TYPE)buffer.ReadShort();
 	m_iLength = buffer.ReadWord();
 
-	CUtlBuffer buf( 0, m_iLength );
+	CUtlBuffer buf( (intp)0, m_iLength );
 	buffer.ReadBytes( buf.Base(), m_iLength );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, m_iLength );
 

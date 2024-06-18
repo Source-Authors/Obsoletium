@@ -52,8 +52,8 @@ public:
 	// Used to iterate over all commands appropriate for the current time
 	void BeginProcessingCommands( int nDeltaTicks );
 	bool DequeueNextCommand( );
-	int DequeueNextCommand( const char **& ppArgv );
-	int ArgC() const;
+	intp DequeueNextCommand( const char **& ppArgv );
+	intp ArgC() const;
 	const char **ArgV() const;
 	const char *ArgS() const;		// All args that occur after the 0th arg, in string form
 	const char *GetCommandString() const;	// The entire command in string form, including the 0th arg
@@ -61,7 +61,7 @@ public:
 	void EndProcessingCommands();
 
 	// Are we in the middle of processing commands?
-	bool IsProcessingCommands();
+	bool IsProcessingCommands() const;
 
 	// Delays all queued commands to execute at a later time
 	void DelayAllQueuedCommands( int nTickDelay );
@@ -78,13 +78,13 @@ public:
     CommandHandle_t GetNextCommandHandle();
 
 	// Specifies a max limit of the args buffer. For unittesting. Size == 0 means use default
-	void LimitArgumentBufferSize( int nSize );
+	void LimitArgumentBufferSize( intp nSize );
 
 	void SetWaitEnabled( bool bEnable )		{ m_bWaitEnabled = bEnable; }
-	bool IsWaitEnabled( void )				{ return m_bWaitEnabled; }
+	bool IsWaitEnabled( void ) const		{ return m_bWaitEnabled; }
 
-	int GetArgumentBufferSize() { return m_nArgSBufferSize; }
-	int GetMaxArgumentBufferSize() { return m_nMaxArgSBufferLength; }
+	intp GetArgumentBufferSize() const { return m_nArgSBufferSize; }
+	intp GetMaxArgumentBufferSize() const { return m_nMaxArgSBufferLength; }
 
 private:
 	enum
@@ -96,37 +96,37 @@ private:
 	{
 		int m_nTick;
 		int m_nFirstArgS;
-		int m_nBufferSize;
+		intp m_nBufferSize;
 	};
 
 	// Insert a command into the command queue at the appropriate time
-	void InsertCommandAtAppropriateTime( int hCommand );
+	void InsertCommandAtAppropriateTime( CommandHandle_t hCommand );
 						   
 	// Insert a command into the command queue
 	// Only happens if it's inserted while processing other commands
-	void InsertImmediateCommand( int hCommand );
+	void InsertImmediateCommand( CommandHandle_t hCommand );
 
 	// Insert a command into the command queue
-	bool InsertCommand( const char *pArgS, int nCommandSize, int nTick );
+	bool InsertCommand( const char *pArgS, intp nCommandSize, int nTick );
 
 	// Returns the length of the next command, as well as the offset to the next command
-	void GetNextCommandLength( const char *pText, int nMaxLen, int *pCommandLength, int *pNextCommandOffset );
+	void GetNextCommandLength( const char *pText, intp nMaxLen, intp *pCommandLength, intp *pNextCommandOffset );
 
 	// Compacts the command buffer
 	void Compact();
 
 	// Parses argv0 out of the buffer
-	bool ParseArgV0( CUtlBuffer &buf, char *pArgv0, int nMaxLen, const char **pArgs );
+	bool ParseArgV0( CUtlBuffer &buf, char *pArgv0, intp nMaxLen, const char **pArgs );
 
 	char	m_pArgSBuffer[ ARGS_BUFFER_LENGTH ];
-	int		m_nLastUsedArgSSize;
-	int		m_nArgSBufferSize;
+	intp	m_nLastUsedArgSSize;
+	intp	m_nArgSBufferSize;
 	CUtlFixedLinkedList< Command_t >	m_Commands;
 	int		m_nCurrentTick;
 	int		m_nLastTickToProcess;
 	int		m_nWaitDelayTicks;
-	int		m_hNextCommand;
-	int		m_nMaxArgSBufferLength;
+	CommandHandle_t		m_hNextCommand;
+	intp	m_nMaxArgSBufferLength;
 	bool	m_bIsProcessingCommands;
 	bool	m_bWaitEnabled;
 
@@ -139,7 +139,7 @@ private:
 //-----------------------------------------------------------------------------
 // Returns the next command
 //-----------------------------------------------------------------------------
-inline int CCommandBuffer::ArgC() const
+inline intp CCommandBuffer::ArgC() const
 {
 	return m_CurrentCommand.ArgC();
 }

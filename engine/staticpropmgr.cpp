@@ -1438,7 +1438,7 @@ void CStaticPropMgr::UnserializeStaticProps()
 	COM_TimestampedLog( "UnserializeStaticProps - start");
 
 	MEM_ALLOC_CREDIT();
-	CUtlBuffer buf( 0, size );
+	CUtlBuffer buf( (intp)0, size );
 	if ( Mod_LoadGameLump( GAMELUMP_STATIC_PROPS, buf.PeekPut(), size ))
 	{
 		buf.SeekPut( CUtlBuffer::SEEK_HEAD, size );

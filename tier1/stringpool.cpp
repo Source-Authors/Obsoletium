@@ -43,7 +43,7 @@ CStringPool::~CStringPool()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-unsigned int CStringPool::Count() const
+size_t CStringPool::Count() const
 {
 	return m_Strings.Count();
 }
@@ -100,7 +100,7 @@ CCountedStringPool::CCountedStringPool()
 	MEM_ALLOC_CREDIT();
 	m_HashTable.EnsureCount(HASH_TABLE_SIZE);
 
-	for( int i = 0; i < m_HashTable.Count(); i++ )
+	for( intp i = 0; i < m_HashTable.Count(); i++ )
 	{
 		m_HashTable[i] = INVALID_ELEMENT;		
 	}
@@ -119,7 +119,7 @@ CCountedStringPool::~CCountedStringPool()
 
 void CCountedStringPool::FreeAll()
 {
-	int i;
+	intp i;
 
 	// Reset the hash table:
 	for( i = 0; i < m_HashTable.Count(); i++ )
@@ -295,15 +295,14 @@ char* CCountedStringPool::HandleToString( unsigned short handle )
 
 void CCountedStringPool::SpewStrings()
 {
-	int i;
-	for ( i = 0; i < m_Elements.Count(); i++ )
+	for ( intp i = 0; i < m_Elements.Count(); i++ )
 	{
 		char* string = m_Elements[i].pString;
 
 		Msg("String %d: ref:%d %s", i, m_Elements[i].nReferenceCount, string == NULL? "EMPTY - ok for slot zero only!" : string);
 	}
 
-	Msg("\n%d total counted strings.", m_Elements.Count());
+	Msg("\n%zd total counted strings.", m_Elements.Count());
 }
 
 #ifdef _DEBUG

@@ -416,7 +416,7 @@ int CDmeMakefileUtils::GetExitCode()
 //-----------------------------------------------------------------------------
 // Returns output from the compilation
 //-----------------------------------------------------------------------------
-int CDmeMakefileUtils::GetCompileOutputSize()
+intp CDmeMakefileUtils::GetCompileOutputSize()
 {
 	if ( m_hCompileProcess == PROCESS_HANDLE_INVALID )
 		return 0;

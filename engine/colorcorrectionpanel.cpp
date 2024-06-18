@@ -4884,7 +4884,7 @@ void CColorOperationListPanel::PopulateList( )
 			KeyValues *kv = new KeyValues( "operation", "layer", op->GetName() );
 			kv->SetInt( "image", (op->IsEnabled())?1:0 );
 			
-			m_pOperationListPanel->AddItem( kv, (unsigned int)op, false, false );
+			m_pOperationListPanel->AddItem( kv, (uintp)op, false, false );
 		}
 	}
 }

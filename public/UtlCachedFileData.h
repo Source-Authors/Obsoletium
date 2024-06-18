@@ -444,7 +444,7 @@ void CUtlCachedFileData<T>::InitSmallBuffer( FileHandle_t& fh, int fileSize, boo
 				
 				Assert( count < 2000000 );
 
-				CUtlBuffer buf( 0, 0, 0 );
+				CUtlBuffer buf( (intp)0, 0, 0 );
 
 				for ( int i = 0 ; i < count; ++i )
 				{
@@ -535,7 +535,7 @@ void CUtlCachedFileData<T>::InitLargeBuffer( FileHandle_t& fh, bool& deleteFile 
 
 				Assert( count < 2000000 );
 
-				CUtlBuffer buf( 0, 0, 0 );
+				CUtlBuffer buf( (intp)0, 0, 0 );
 
 				for ( int i = 0 ; i < count; ++i )
 				{
@@ -700,7 +700,7 @@ void CUtlCachedFileData<T>::Save()
 		g_pFullFileSystem->Write( &c, sizeof( c ), fh );
 
 		// Save repository back out to disk...
-		CUtlBuffer buf( 0, 0, 0 );
+		CUtlBuffer buf( (intp)0, 0, 0 );
 
 		for ( int i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
 		{
@@ -772,9 +772,9 @@ template <class T>
 void CUtlCachedFileData<T>::SaveManifest()
 {
 	// Save manifest out to disk...
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
-	for ( int i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
+	for ( auto i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
 	{
 		ElementType_t& element = m_Elements[ i ];
 

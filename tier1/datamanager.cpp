@@ -43,7 +43,7 @@ unsigned int CDataManagerBase::FlushAllUnlocked()
 {
 	Lock();
 
-	int nFlush = m_memoryLists.Count( m_lruList );
+	intp nFlush = m_memoryLists.Count( m_lruList );
 	void **pScratch = (void **)_alloca( nFlush * sizeof(void *) );
 	CUtlVector<void *> destroyList( pScratch, nFlush );
 
@@ -60,7 +60,7 @@ unsigned int CDataManagerBase::FlushAllUnlocked()
 
 	Unlock();
 
-	for ( int i = 0; i < nFlush; i++ )
+	for ( intp i = 0; i < nFlush; i++ )
 	{
 		DestroyResourceStorage( destroyList[i] );
 	}
@@ -80,7 +80,7 @@ unsigned int CDataManagerBase::FlushAll()
 {
 	Lock();
 
-	int nFlush = m_memoryLists.Count( m_lruList ) + m_memoryLists.Count( m_lockList );
+	intp nFlush = m_memoryLists.Count( m_lruList ) + m_memoryLists.Count( m_lockList );
 	void **pScratch = (void **)_alloca( nFlush * sizeof(void *) );
 	CUtlVector<void *> destroyList( pScratch, nFlush );
 

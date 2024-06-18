@@ -86,7 +86,7 @@ CDmElement *CDmSmdSerializer::ReadSMD(
 	V_strncpy( szFilename, pszFilename, ARRAYSIZE( szFilename ) );
 	V_FixSlashes( szFilename );
 
-	CUtlBuffer utlBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer utlBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	if ( !g_pFullFileSystem->ReadFile( szFilename, NULL, utlBuf ) )
 		return NULL;

@@ -173,7 +173,7 @@ void CServerBrowserDialog::Initialize()
 //-----------------------------------------------------------------------------
 // Purpose: returns a server in the list
 //-----------------------------------------------------------------------------
-gameserveritem_t *CServerBrowserDialog::GetServer( unsigned int serverID )
+gameserveritem_t *CServerBrowserDialog::GetServer( uintp serverID )
 {
 	if (m_pGameList)
 		return m_pGameList->GetServer( serverID );

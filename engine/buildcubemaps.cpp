@@ -468,7 +468,7 @@ static void WriteLightProbe( const char *pBasePath, const LightingState_t& state
 		}
 	}
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( SerializeDMX( buf, pLightProbe, pFullPath ) )
 	{
 		g_pFullFileSystem->WriteFile( pFullPath, "MOD", buf );

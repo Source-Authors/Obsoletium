@@ -132,7 +132,7 @@ void AddIntersectingLeafSurfaces( mleaf_t *pLeaf, GetIntersectingSurfaces_Struct
 		bool foundSurf = false;
 		for(int iTest=0; iTest < pStruct->m_nSetInfos; iTest++)
 		{
-			if(pStruct->m_pInfos[iTest].m_pEngineData == (void *)surfID)
+			if(pStruct->m_pInfos[iTest].m_pEngineData == surfID)
 			{
 				foundSurf = true;
 				break;
@@ -146,7 +146,7 @@ void AddIntersectingLeafSurfaces( mleaf_t *pLeaf, GetIntersectingSurfaces_Struct
 			return;
 		SurfInfo *pOut = &pStruct->m_pInfos[pStruct->m_nSetInfos];
 		pOut->m_nVerts = 0;
-		pOut->m_pEngineData = (void *)surfID;
+		pOut->m_pEngineData = surfID;
 
 		// Build vertex list and bounding box.			
 		Vector vMin( 1000000.0f,  1000000.0f,  1000000.0f);

@@ -107,7 +107,7 @@ static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamClo
 
 	// Never call pKV->SaveToFile!!!!
 	// Save to a buffer instead.
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	pKV->RecursiveSaveToFile( buf, 0 );
 	filesystem->WriteFile( szFilename, NULL, buf );
 	pKV->deleteThis();

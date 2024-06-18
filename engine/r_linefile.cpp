@@ -50,7 +50,7 @@ void Linefile_Read_f( void )
 
 	Q_snprintf( name, sizeof( name ), "maps/%s.lin", sv.GetMapName() );
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFileSystem->ReadFile( name, NULL, buf ) )
 	{
 		ConMsg ("couldn't open %s\n", name);
