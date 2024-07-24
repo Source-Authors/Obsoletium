@@ -55,16 +55,16 @@ public:
 				CVPhysicsParse( const char *pKeyData );
 	void		NextBlock( void );
 
-	const char *GetCurrentBlockName( void );
-	bool		Finished( void );
-	void		ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKeyHandler );
-	void		ParseFluid( fluid_t *pFluid, IVPhysicsKeyHandler *unknownKeyHandler );
-	void		ParseRagdollConstraint( constraint_ragdollparams_t *pConstraint, IVPhysicsKeyHandler *unknownKeyHandler );
-	void		ParseSurfaceTable( int *table, IVPhysicsKeyHandler *unknownKeyHandler );
+	const char *GetCurrentBlockName( void ) override;
+	bool		Finished( void ) override;
+	void		ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKeyHandler ) override;
+	void		ParseFluid( fluid_t *pFluid, IVPhysicsKeyHandler *unknownKeyHandler ) override;
+	void		ParseRagdollConstraint( constraint_ragdollparams_t *pConstraint, IVPhysicsKeyHandler *unknownKeyHandler ) override;
+	void		ParseSurfaceTable( int *table, IVPhysicsKeyHandler *unknownKeyHandler ) override;
 	void		ParseSurfaceTablePacked( CUtlVector<char> &out );
-	void		ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandler *unknownKeyHandler );
-	void		ParseCustom( void *pCustom, IVPhysicsKeyHandler *unknownKeyHandler );
-	void		SkipBlock( void ) { ParseCustom(NULL, NULL); }
+	void		ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandler *unknownKeyHandler ) override;
+	void		ParseCustom( void *pCustom, IVPhysicsKeyHandler *unknownKeyHandler ) override;
+	void		SkipBlock( void ) override { ParseCustom(NULL, NULL); }
 
 private:
 	void		ParseVehicleAxle( vehicle_axleparams_t &axle );
@@ -641,7 +641,7 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 		else if ( !Q_stricmp( key, "gear" ) )
 		{
 			// Protect against exploits/overruns
-			if ( engine.gearCount < ARRAYSIZE(engine.gearRatio) )
+			if ( engine.gearCount < ssize(engine.gearRatio) )
 			{
 				engine.gearRatio[engine.gearCount] = strtof( value, nullptr );
 				engine.gearCount++;
@@ -818,7 +818,7 @@ void CVPhysicsParse::ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandle
 			if ( !Q_stricmp( key, "axle" ) )
 			{
 				// Protect against exploits/overruns
-				if ( pVehicle->axleCount < ARRAYSIZE(pVehicle->axles) )
+				if ( pVehicle->axleCount < ssize(pVehicle->axles) )
 				{
 					ParseVehicleAxle( pVehicle->axles[pVehicle->axleCount] );
 					pVehicle->axleCount++;

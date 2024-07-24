@@ -80,7 +80,7 @@ public:
 		m_centerBase = m_cone.origin + m_cone.h * m_cone.normal;
 	}
 
-	virtual int SupportMap( const Vector &dir, Vector *pOut ) const
+	int SupportMap( const Vector &dir, Vector *pOut ) const override
 	{
 		Vector unitDir = dir;
 		VectorNormalize(unitDir);
@@ -111,8 +111,8 @@ public:
 	}
 
 	// BUGBUG: Doesn't work!
-	virtual Vector GetVertByIndex( int index ) const { return  m_cone.origin; }
-	virtual float Radius( void ) const { return m_cone.h + m_radius; }
+	Vector GetVertByIndex( int index ) const override { return  m_cone.origin; }
+	float Radius( void ) const override { return m_cone.h + m_radius; }
 
 	truncatedcone_t	m_cone;
 	float			m_radius;
@@ -324,13 +324,13 @@ public:
 		if ( m_pVisitHash )
 			FreeVisitHash(m_pVisitHash);
 	}
-	virtual int SupportMap( const Vector &dir, Vector *pOut ) const;
-	virtual Vector GetVertByIndex( int index ) const;
+	int SupportMap( const Vector &dir, Vector *pOut ) const override;
+	Vector GetVertByIndex( int index ) const override;
 
 	// UNDONE: Do general ITraceObject center/offset computation and move the ray to account
 	// for this delta like we do in TraceSweepIVP()
 	// Then we can shrink the radius of objects with mass centers NOT at the origin
-	virtual float Radius( void ) const 
+	float Radius( void ) const override
 	{ 
 		return m_radius;
 	}
@@ -440,8 +440,8 @@ private:
 	IVP_U_Matrix				m_matrix;
 	// transform that includes scale from IVP to HL coords, do not VectorITransform or VectorRotate with this
 	float						m_radius;
-	int							m_nPointTest;
-	int							m_nStartPoint;
+	// int							m_nPointTest;
+	// int							m_nStartPoint;
 	bool						m_bHasTranslation;
 #if USE_VERT_CACHE
 	int							m_cacheCount;	// number of FourVectors used
@@ -844,9 +844,9 @@ class CTraceAABB : public ITraceObject
 {
 public:
 	CTraceAABB( const Vector &hlmins, const Vector &hlmaxs, bool isPoint );
-	virtual int SupportMap( const Vector &dir, Vector *pOut ) const;
-	virtual Vector GetVertByIndex( int index ) const;
-	virtual float Radius( void ) const { return m_radius; }
+	int SupportMap( const Vector &dir, Vector *pOut ) const override;
+	Vector GetVertByIndex( int index ) const override;
+	float Radius( void ) const override { return m_radius; }
 
 private:
 	float	m_x[2];
@@ -990,8 +990,8 @@ int CTraceRay::SupportMap( const Vector &dir, Vector *pOut ) const
 	return 0;
 }
 
-static char			*map_nullname = "**empty**";
-static csurface_t	nullsurface = { map_nullname, 0 };
+static const char	*map_nullname = "**empty**";
+static csurface_t	nullsurface = { map_nullname, 0, 0 };
 
 static void CM_ClearTrace( trace_t *trace )
 {
@@ -1006,7 +1006,7 @@ class CDefConvexInfo : public IConvexInfo
 public:
 	IConvexInfo *GetPtr() { return this; }
 
-	virtual unsigned int GetContents( int convexGameData ) { return CONTENTS_SOLID; }
+	unsigned int GetContents( [[maybe_unused]] int convexGameData ) override { return CONTENTS_SOLID; }
 };
 
 class CTraceSolver
@@ -1064,7 +1064,7 @@ public:
 	void InitOSRay( void );
 	void SweepLedgeTree_r( const IVP_Compact_Ledgetree_Node *node );
 	inline bool SweepHitsSphereOS( const IVP_U_Float_Point *sphereCenter, float radius );
-	virtual void DoSweep( void );
+	void DoSweep( void ) override;
 	inline void SweepAgainstNode( const IVP_Compact_Ledgetree_Node *node );
 
 	CTraceIVP			*m_obstacleIVP;
@@ -1227,7 +1227,7 @@ loop_without_store:
 				if ( node0 )
 				{
 					// can hit, push on stack
-					int index = list.AddToTail();
+					auto index = list.AddToTail();
 					float dist1 = m_rayStartOS.quad_distance_to(&center);
 					if ( lastDist < dist1 )
 					{

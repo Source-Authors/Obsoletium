@@ -30,7 +30,7 @@ static void AddPtrAssociation( void *pOldValue, void *pNewValue )
 //-----------------------------------------------------------------------------
 // Purpose: Save/load part of CPhysicsEnvironment
 //-----------------------------------------------------------------------------
-static bool NoPhysSaveFunc( const physsaveparams_t &params, void * )
+static bool NoPhysSaveFunc( const physsaveparams_t &, void * )
 {
 	AssertMsg( 0, "Physics cannot save the specified type" );
 	return false;
@@ -55,7 +55,7 @@ bool CPhysicsEnvironment::Save( const physsaveparams_t &params )
 		(PhysSaveFunc_t)SavePhysicsVehicleController,
 	};
 	
-	if ( type >= 0 && type < PIID_NUM_TYPES )
+	if ( type >= PIID_UNKNOWN && type < PIID_NUM_TYPES )
 	{
 		params.pSave->WriteData( (char *)&params.pObject, sizeof(void*) );
 		return (*saveFuncs[type])( params, params.pObject );
@@ -63,7 +63,7 @@ bool CPhysicsEnvironment::Save( const physsaveparams_t &params )
 	return false;
 }
 
-static bool NoPhysRestoreFunc( const physrestoreparams_t &params, void ** )
+static bool NoPhysRestoreFunc( const physrestoreparams_t &, void ** )
 {
 	AssertMsg( 0, "Physics cannot save the specified type" );
 	return false;
@@ -102,7 +102,7 @@ bool CPhysicsEnvironment::Restore( const physrestoreparams_t &params )
 		(PhysRestoreFunc_t)RestorePhysicsVehicleController,
 	};
 	
-	if ( type >= 0 && type < PIID_NUM_TYPES )
+	if ( type >= PIID_UNKNOWN && type < PIID_NUM_TYPES )
 	{
 		void *pOldObject;
 		params.pRestore->ReadData( (char *)&pOldObject, sizeof(void*), 0 );

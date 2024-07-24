@@ -21,25 +21,25 @@
 class CPhysicsCollisionSet : public IPhysicsCollisionSet
 {
 public:
-	~CPhysicsCollisionSet() {}
+	virtual ~CPhysicsCollisionSet() {}
 	CPhysicsCollisionSet()
 	{
 		memset( m_bits, 0, sizeof(m_bits) );
 	}
-	void EnableCollisions( int index0, int index1 )
+	void EnableCollisions( int index0, int index1 ) override
 	{
 		Assert(index0<32&&index1<32);
 		m_bits[index0] |= 1<<index1;
 		m_bits[index1] |= 1<<index0;
 	}
-	void DisableCollisions( int index0, int index1 )
+	void DisableCollisions( int index0, int index1 ) override
 	{
 		Assert(index0<32&&index1<32);
 		m_bits[index0] &= ~(1<<index1);
 		m_bits[index1] &= ~(1<<index0);
 	}
 
-	bool ShouldCollide( int index0, int index1 )
+	bool ShouldCollide( int index0, int index1 ) override
 	{
 		Assert(index0<32&&index1<32);
 		return (m_bits[index0] & (1<<index1)) ? true : false;
@@ -56,15 +56,15 @@ class CPhysicsInterface : public CTier1AppSystem<IPhysics>
 {
 public:
 	CPhysicsInterface() : m_pCollisionSetHash(NULL) {}
-	virtual void *QueryInterface( const char *pInterfaceName );
-	virtual	IPhysicsEnvironment *CreateEnvironment( void );
-	virtual void DestroyEnvironment( IPhysicsEnvironment *pEnvironment );
-	virtual IPhysicsEnvironment *GetActiveEnvironmentByIndex( int index );
-	virtual IPhysicsObjectPairHash *CreateObjectPairHash();
-	virtual void DestroyObjectPairHash( IPhysicsObjectPairHash *pHash );
-	virtual IPhysicsCollisionSet *FindOrCreateCollisionSet( unsigned int id, int maxElementCount );
-	virtual IPhysicsCollisionSet *FindCollisionSet( unsigned int id );
-	virtual void DestroyAllCollisionSets();
+	void *QueryInterface( const char *pInterfaceName ) override;
+	IPhysicsEnvironment *CreateEnvironment( void ) override;
+	void DestroyEnvironment( IPhysicsEnvironment *pEnvironment ) override;
+	IPhysicsEnvironment *GetActiveEnvironmentByIndex( int index ) override;
+	IPhysicsObjectPairHash *CreateObjectPairHash() override;
+	void DestroyObjectPairHash( IPhysicsObjectPairHash *pHash ) override;
+	IPhysicsCollisionSet *FindOrCreateCollisionSet( unsigned int id, int maxElementCount ) override;
+	IPhysicsCollisionSet *FindCollisionSet( unsigned int id ) override;
+	void DestroyAllCollisionSets() override;
 
 private:
 	CUtlVector<IPhysicsEnvironment *>	m_envList;

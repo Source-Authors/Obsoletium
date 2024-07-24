@@ -338,8 +338,8 @@ public:
 
 	virtual void PostSimulationFrame() = 0;
 
-	virtual void ObjectEnterTrigger( IPhysicsObject *pTrigger, IPhysicsObject *pObject ) {}
-	virtual void ObjectLeaveTrigger( IPhysicsObject *pTrigger, IPhysicsObject *pObject ) {}
+	virtual void ObjectEnterTrigger( IPhysicsObject *, IPhysicsObject * ) {}
+	virtual void ObjectLeaveTrigger( IPhysicsObject *, IPhysicsObject * ) {}
 };
 
 

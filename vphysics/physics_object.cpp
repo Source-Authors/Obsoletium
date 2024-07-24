@@ -64,7 +64,7 @@ static float AngDragIntegral( float invInertia, float l, float w, float h )
 	float l2 = l*l;
 	float h2 = h*h;
 
-	return invInertia * ( (1.f/3.f)*w2*l*l2 + 0.5 * w2*w2*l + l*w2*h2 );
+	return invInertia * ( (1.f/3.f)*w2*l*l2 + 0.5f * w2*w2*l + l*w2*h2 );
 }
 
 
@@ -225,7 +225,7 @@ void CPhysicsObject::NotifyWake( void )
 
 void CPhysicsObject::SetCallbackFlags( unsigned short callbackflags )
 {
-#if IVP_ENABLE_VISUALIZER
+#if defined(IVP_ENABLE_VISUALIZER)
 	unsigned short changedFlags = m_callbacks ^ callbackflags;
 	if ( changedFlags & CALLBACK_MARKED_FOR_TEST )
 	{
@@ -1489,7 +1489,7 @@ static void InitObjectTemplate( IVP_Template_Real_Object &objectTemplate, int ma
 		objectTemplate.set_name(pParams->pName);
 	}
 	END_IVP_ALLOCATION();
-#if USE_COLLISION_GROUP_STRING
+#if defined(USE_COLLISION_GROUP_STRING)
 	objectTemplate.set_nocoll_group_ident( NULL );
 #endif
 
@@ -1624,7 +1624,7 @@ class CMaterialIndexOps : public CDefSaveRestoreOps
 {
 public:
 	// save data type interface
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) 
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override
 	{
 		int materialIndex = *((int *)fieldInfo.pField);
 		const char *pMaterialName = physprops->GetPropName( materialIndex );
@@ -1637,7 +1637,7 @@ public:
 		pSave->WriteString( pMaterialName );
 	}
 
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) 
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override
 	{
 		char nameBuf[1024];
 		int nameLen = pRestore->ReadInt();
@@ -1650,13 +1650,13 @@ public:
 		}
 	}
 
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) 
+	bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override 
 	{ 
 		int *pMaterialIndex = (int *)fieldInfo.pField;
 		return (*pMaterialIndex == 0);
 	}
 
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) 
+	void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
 		int *pMaterialIndex = (int *)fieldInfo.pField;
 		*pMaterialIndex = 0;
@@ -1785,7 +1785,7 @@ void CPhysicsObject::InitFromTemplate( CPhysicsEnvironment *pEnvironment, void *
 	Assert( ivpObjectTemplate.material );
 	// HACKHACK: Pass this name in for debug
 	ivpObjectTemplate.set_name(objectTemplate.pName);
-#if USE_COLLISION_GROUP_STRING
+#if defined(USE_COLLISION_GROUP_STRING)
 	ivpObjectTemplate.set_nocoll_group_ident( NULL );
 #endif
 
