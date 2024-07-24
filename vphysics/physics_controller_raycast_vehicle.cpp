@@ -57,7 +57,7 @@ IPhysicsObject *CPhysics_Car_System_Raycast_Wheels::GetWheel( int index )
 // Purpose: Setup the car system wheels.
 //-----------------------------------------------------------------------------
 void CPhysics_Car_System_Raycast_Wheels::do_raycasts( IVP_Event_Sim *es,
-						                              int n_wheels,
+						                              int n_wheels_in,
 						                              class IVP_Ray_Solver_Template *t_in,
 						                              class IVP_Ray_Hit *hits_out,
 						                              IVP_FLOAT *friction_of_object_out )
@@ -66,15 +66,15 @@ void CPhysics_Car_System_Raycast_Wheels::do_raycasts( IVP_Event_Sim *es,
 
     int j = 0;                     
 	IVP_Ray_Solver_Min ray_solver0(&t_in[j]);
-    j++; if ( j >= n_wheels) j--;    
+    j++; if ( j >= n_wheels_in) j--;    
 	IVP_Ray_Solver_Min ray_solver1(&t_in[j]); 
-    j++; if ( j >= n_wheels) j--;    
+    j++; if ( j >= n_wheels_in) j--;    
 	IVP_Ray_Solver_Min ray_solver2(&t_in[j]);
-    j++; if ( j >= n_wheels) j--;    
+    j++; if ( j >= n_wheels_in) j--;    
 	IVP_Ray_Solver_Min ray_solver3(&t_in[j]);
     
     IVP_Ray_Solver_Min *solvers[4] = { &ray_solver0, &ray_solver1, &ray_solver2, &ray_solver3 };
-    IVP_Ray_Solver_Group rs_group( n_wheels, (IVP_Ray_Solver **)solvers );
+    IVP_Ray_Solver_Group rs_group( n_wheels_in, (IVP_Ray_Solver **)solvers );
 
 #if 0
 	// Debug!
@@ -93,7 +93,7 @@ void CPhysics_Car_System_Raycast_Wheels::do_raycasts( IVP_Event_Sim *es,
     // check which objects are hit	    
     rs_group.check_ray_group_against_all_objects_in_sim(es->environment);
 
-    for ( int i = 0; i < n_wheels; i++ )
+    for ( int i = 0; i < n_wheels_in; i++ )
 	{
 		IVP_Ray_Hit *hit = solvers[i]->get_ray_hit();
 		if (hit)

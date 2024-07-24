@@ -45,7 +45,7 @@ inline float IVP2HL(float x)
 template<typename T>
 inline double HL2IVP(T x)
 {
-	return (double)(x * HL2IVP_FACTOR)
+	return (double)(x * HL2IVP_FACTOR);
 }
 
 inline float HL2IVP(float x)
@@ -113,7 +113,7 @@ inline void ConvertDirectionToIVP( const Vector &in, IVP_U_Point &out )
 #define ConvertForceImpulseToIVP ConvertPositionToIVP
 #define ConvertForceImpulseToHL ConvertPositionToHL
 
-inline float ConvertAngleToIVP( float angleIn )
+constexpr inline float ConvertAngleToIVP( float angleIn )
 {
 	return DEG2RAD(angleIn);
 }
@@ -128,7 +128,7 @@ inline void ConvertAngularImpulseToIVP( const AngularImpulse &in, IVP_U_Float_Po
 }
 
 
-inline float ConvertDistanceToIVP( float distance )
+constexpr inline float ConvertDistanceToIVP( float distance )
 {
 	return HL2IVP( distance );
 }
@@ -150,7 +150,7 @@ inline void ConvertPlaneToIVP( const Vector &pNormal, float dist, IVP_U_Float_He
 	plane.hesse_val = -ConvertDistanceToIVP( dist );
 }
 
-inline float ConvertDensityToIVP( float density )
+constexpr inline float ConvertDensityToIVP( float density )
 {
 	return density;
 }
@@ -167,46 +167,46 @@ extern int ConvertCoordinateAxisToHL( int axisIndex );
 inline void ConvertPositionToHL( const IVP_U_Point &point, Vector& out )
 {
 	float tmpY = IVP2HL(point.k[2]);
-	out[2] = -IVP2HL(point.k[1]);
-	out[1] = tmpY;
-	out[0] = IVP2HL(point.k[0]);
+	out.x = IVP2HL(point.k[0]);
+	out.y = tmpY;
+	out.z = -IVP2HL(point.k[1]);
 }
 
 inline void ConvertPositionToHL( const IVP_U_Float_Point &point, Vector& out )
 {
 	float tmpY = IVP2HL(point.k[2]);
-	out[2] = -IVP2HL(point.k[1]);
-	out[1] = tmpY;
-	out[0] = IVP2HL(point.k[0]);
+	out.x = IVP2HL(point.k[0]);
+	out.y = tmpY;
+	out.z = -IVP2HL(point.k[1]);
 }
 
 inline void ConvertPositionToHL( const IVP_U_Float_Point3 &point, Vector& out )
 {
 	float tmpY = IVP2HL(point.k[2]);
-	out[2] = -IVP2HL(point.k[1]);
-	out[1] = tmpY;
-	out[0] = IVP2HL(point.k[0]);
+	out.x = IVP2HL(point.k[0]);
+	out.y = tmpY;
+	out.z = -IVP2HL(point.k[1]);
 }
 
 inline void ConvertDirectionToHL( const IVP_U_Point &point, Vector& out )
 {
 	float tmpY = point.k[2];
-	out[2] = -point.k[1];
-	out[1] = tmpY;
-	out[0] = point.k[0];
+	out.x = point.k[0];
+	out.y = tmpY;
+	out.z = -point.k[1];
 }
 
 
 inline void ConvertDirectionToHL( const IVP_U_Float_Point &point, Vector& out )
 {
 	float tmpY = point.k[2];
-	out[2] = -point.k[1];
-	out[1] = tmpY;
-	out[0] = point.k[0];
+	out.x = point.k[0];
+	out.y = tmpY;
+	out.z = -point.k[1];
 }
 
 
-inline float ConvertAngleToHL( float angleIn )
+constexpr inline float ConvertAngleToHL( float angleIn )
 {
 	return RAD2DEG(angleIn);
 }
@@ -214,9 +214,9 @@ inline float ConvertAngleToHL( float angleIn )
 inline void ConvertAngularImpulseToHL( const IVP_U_Float_Point &point, AngularImpulse &out )
 {
 	float tmpY = point.k[2];
-	out[2] = -RAD2DEG(point.k[1]);
-	out[1] = RAD2DEG(tmpY);
-	out[0] = RAD2DEG(point.k[0]);
+	out.x = RAD2DEG(point.k[0]);
+	out.y = RAD2DEG(tmpY);
+	out.z = -RAD2DEG(point.k[1]);
 }
 
 inline float ConvertDistanceToHL( float distance )
@@ -257,7 +257,7 @@ inline float ConvertVolumeToHL( float volume )
 }
 
 #define INSQR_PER_METERSQR (1.f / (METERS_PER_INCH*METERS_PER_INCH))
-inline float ConvertEnergyToHL( float energy )
+constexpr inline float ConvertEnergyToHL( float energy )
 {
 	return energy * INSQR_PER_METERSQR;
 }

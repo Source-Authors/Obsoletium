@@ -25,12 +25,12 @@ public:
 	CPhysicsFluidController( CBuoyancyAttacher *pBuoy, IVP_Liquid_Surface_Descriptor *pLiquid, CPhysicsObject *pObject, int nContents );
 	~CPhysicsFluidController( void );
 
-	virtual void SetGameData( void *pGameData );
-	virtual void *GetGameData( void ) const;
-	virtual void GetSurfacePlane( Vector *pNormal, float *pDist ) const;
-	virtual float GetDensity() const;
-	virtual void WakeAllSleepingObjects(); 
-	virtual int	GetContents() const;
+	void SetGameData( void *pGameData ) override;
+	void *GetGameData( void ) const override;
+	void GetSurfacePlane( Vector *pNormal, float *pDist ) const override;
+	float GetDensity() const override;
+	void WakeAllSleepingObjects() override; 
+	int	GetContents() const override;
 
 	class IVP_Real_Object *GetIVPObject();
 	const class IVP_Real_Object *GetIVPObject() const;

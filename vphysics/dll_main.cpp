@@ -25,10 +25,10 @@ void ivu_string_print_function(const char *message) { Msg("%s", message); }
 }  // namespace
 
 #ifdef _WIN32
-BOOL WINAPI DllMain(HINSTANCE instance, DWORD call_reason, LPVOID) {
+BOOL WINAPI DllMain(HINSTANCE, DWORD call_reason, LPVOID) {
   if (call_reason == DLL_PROCESS_ATTACH) {
     // ivp_set_message_print_function( ivu_string_print_function );
-    MathLib_Init(2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false);
+    MathLib_Init(2.2f, 2.2f, 0.0f, 2, false, false, false, false);
   }
   return TRUE;
 }

@@ -107,7 +107,7 @@ void ConvertHLLocalMatrixToHavanaLocal( const matrix3x4_t& hlMatrix, hk_Transfor
 {
 	IVP_U_Matrix ivpMatrix;
 	ConvertMatrixToIVP( hlMatrix, ivpMatrix );
-	ivpMatrix.get_4x4_column_major( (hk_real *)&out );
+	ivpMatrix.get_4x4_column_major( &out );
 }
 
 void set_4x4_column_major( IVP_U_Matrix &ivpMatrix, const float *in4x4 )
@@ -152,7 +152,7 @@ inline void ConvertDirectionToHL( const hk_Vector3 &point, Vector& out )
 	out.x = point.x;
 }
 
-void ConvertHavanaLocalMatrixToHL( const hk_Transform &in, matrix3x4_t& hlMatrix, IVP_Real_Object *pObject )
+void ConvertHavanaLocalMatrixToHL( const hk_Transform &in, matrix3x4_t& hlMatrix, [[maybe_unused]] IVP_Real_Object *pObject )
 {
 	IVP_U_Matrix ivpMatrix;
 	set_4x4_column_major( ivpMatrix, (const hk_real *)&in );
@@ -202,12 +202,12 @@ public:
 public:
 	CPhysicsConstraintGroup( IVP_Environment *pEnvironment, const constraint_groupparams_t &group );
 	~CPhysicsConstraintGroup();
-	virtual void Activate();
-	virtual bool IsInErrorState();
-	virtual void ClearErrorState();
-	void GetErrorParams( constraint_groupparams_t *pParams );
-	void SetErrorParams( const constraint_groupparams_t &params );
-	void SolvePenetration( IPhysicsObject *pObj0, IPhysicsObject *pObj1 );
+	void Activate() override;
+	bool IsInErrorState() override;
+	void ClearErrorState() override;
+	void GetErrorParams( constraint_groupparams_t *pParams ) override;
+	void SetErrorParams( const constraint_groupparams_t &params ) override;
+	void SolvePenetration( IPhysicsObject *pObj0, IPhysicsObject *pObj1 ) override;
 	
 private:
 	hk_Local_Constraint_System *m_pLCS;
@@ -482,7 +482,7 @@ public:
 		bp.m_linear_strength = forceLimit > 0 ? forceLimit : UNBREAKABLE_BREAK_LIMIT;
 		bp.m_angular_strength = constraint.torqueLimit > 0 ? DEG2RAD(constraint.torqueLimit) : UNBREAKABLE_BREAK_LIMIT;
 		bp.m_bodyMassScale[0] = constraint.bodyMassScale[0] > 0 ? constraint.bodyMassScale[0] : 1.0f;
-		bp.m_bodyMassScale[1] = constraint.bodyMassScale[1] > 0 ? constraint.bodyMassScale[1] : 1.0f;;
+		bp.m_bodyMassScale[1] = constraint.bodyMassScale[1] > 0 ? constraint.bodyMassScale[1] : 1.0f;
 		return new hk_Breakable_Constraint( pLcs, &bp );
 	}
 	void ReadBreakableConstraint( constraint_breakableparams_t &params ) const;
@@ -498,22 +498,22 @@ public:
 		return m_HkConstraint;
 	}
 
-	void Activate( void );
-	void Deactivate( void );
+	void Activate( void ) override;
+	void Deactivate( void ) override;
 	void SetupRagdollAxis( int axis, const constraint_axislimit_t &axisData, hk_Limited_Ball_Socket_BP *ballsocketBP );
 	// UNDONE: Implement includeStatic for havana
 
-	void SetGameData( void *gameData ) { m_pGameData = gameData; }
-	void *GetGameData( void ) const { return m_pGameData; }
-	IPhysicsObject *GetReferenceObject( void ) const;
-	IPhysicsObject *GetAttachedObject( void ) const;
+	void SetGameData( void *gameData ) override { m_pGameData = gameData; }
+	void *GetGameData( void ) const override { return m_pGameData; }
+	IPhysicsObject *GetReferenceObject( void ) const override;
+	IPhysicsObject *GetAttachedObject( void ) const override;
 
-	void SetLinearMotor( float speed, float maxForce );
-	void SetAngularMotor( float rotSpeed, float maxAngularImpulse );
-	void UpdateRagdollTransforms( const matrix3x4_t &constraintToReference, const matrix3x4_t &constraintToAttached );
-	bool GetConstraintTransform( matrix3x4_t *pConstraintToReference, matrix3x4_t *pConstraintToAttached ) const;
-	bool GetConstraintParams( constraint_breakableparams_t *pParams ) const;
-	void OutputDebugInfo()
+	void SetLinearMotor( float speed, float maxForce ) override;
+	void SetAngularMotor( float rotSpeed, float maxAngularImpulse ) override;
+	void UpdateRagdollTransforms( const matrix3x4_t &constraintToReference, const matrix3x4_t &constraintToAttached ) override;
+	bool GetConstraintTransform( matrix3x4_t *pConstraintToReference, matrix3x4_t *pConstraintToAttached ) const override;
+	bool GetConstraintParams( constraint_breakableparams_t *pParams ) const override;
+	void OutputDebugInfo() override
 	{
 		hk_Local_Constraint_System *pLCS = m_HkLCS;
 		if ( m_HkConstraint )
@@ -537,10 +537,10 @@ public:
 
 	void DetachListener();
 	// Object listener
-    virtual void event_object_deleted( IVP_Event_Object *);
-    virtual void event_object_created( IVP_Event_Object *) {}
-    virtual void event_object_revived( IVP_Event_Object *) {}
-    virtual void event_object_frozen ( IVP_Event_Object *) {}
+    void event_object_deleted( IVP_Event_Object *) override;
+    void event_object_created( IVP_Event_Object *) override {}
+    void event_object_revived( IVP_Event_Object *) override {}
+    void event_object_frozen ( IVP_Event_Object *) override {}
 
 private:
 	CPhysicsObject			*m_pObjReference;
@@ -705,8 +705,8 @@ void CPhysicsConstraint::InitRagdoll( IVP_Environment *pEnvironment, CPhysicsCon
 	hk_Environment *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
 	if ( !lcs )
 	{
-		hk_Local_Constraint_System_BP bp;
-		lcs = new hk_Local_Constraint_System( hkEnvironment, &bp );
+		hk_Local_Constraint_System_BP csbp;
+		lcs = new hk_Local_Constraint_System( hkEnvironment, &csbp );
 		m_HkLCS = lcs;
 	}
 
@@ -906,8 +906,8 @@ void CPhysicsConstraint::InitSliding( IVP_Environment *pEnvironment, CPhysicsCon
 	hk_Local_Constraint_System *lcs = constraint_group ? constraint_group->GetLCS() : NULL;
 	if ( !lcs )
 	{
-		hk_Local_Constraint_System_BP bp;
-		lcs = new hk_Local_Constraint_System( hkEnvironment, &bp );
+		hk_Local_Constraint_System_BP csbp;
+		lcs = new hk_Local_Constraint_System( hkEnvironment, &csbp );
 		m_HkLCS = lcs;
 	}
 
@@ -1829,7 +1829,7 @@ bool RestorePhysicsConstraintGroup( const physrestoreparams_t &params, CPhysicsC
 void PostRestorePhysicsConstraintGroup()
 {
 	MEM_ALLOC_CREDIT();
-	for ( int i = 0; i < g_ConstraintGroupActivateList.Count(); i++ )
+	for ( intp i = 0; i < g_ConstraintGroupActivateList.Count(); i++ )
 	{
 		g_ConstraintGroupActivateList[i]->Activate();
 	}

@@ -64,36 +64,39 @@ static float AngDragIntegral( float invInertia, float l, float w, float h )
 	float l2 = l*l;
 	float h2 = h*h;
 
-	return invInertia * ( (1.f/3.f)*w2*l*l2 + 0.5 * w2*w2*l + l*w2*h2 );
+	return invInertia * ( (1.f/3.f)*w2*l*l2 + 0.5f * w2*w2*l + l*w2*h2 );
 }
 
 
 CPhysicsObject::CPhysicsObject( void )
+	: m_pGameData{nullptr},
+	m_pObject{nullptr},
+	m_pCollide{nullptr},
+	m_pShadow{nullptr},
+	m_dragBasis{},
+	m_angDragBasis{},
+	m_shadowTempGravityDisable{false},
+	m_hasTouchedDynamic{false},
+	m_asleepSinceCreation{false},
+	m_forceSilentDelete{false},
+	m_sleepState{0},
+	m_hingedAxis{0},
+	m_collideType{0},
+	m_gameIndex{0},
+	m_materialIndex{0},
+	m_activeIndex{0},
+	m_callbacks{0},
+	m_gameFlags{0},
+	m_contentsMask{0},
+	m_volume{0.0f},
+	m_buoyancyRatio{0.0f},
+	m_dragCoefficient{0.0f},
+	m_angDragCoefficient{0.0f}
 {
-#ifdef _WIN32
-	void *pData = ((char *)this) + sizeof(void *); // offset beyond vtable
-	int dataSize = sizeof(*this) - sizeof(void *);
-
-	Assert( pData == &m_pGameData );
-
-	memset( pData, 0, dataSize );
-#elif POSIX
-
-	//!!HACK HACK - rework this if we ever change compiler versions (from gcc 3.2!!!)
-	void *pData = ((char *)this) + sizeof(void *); // offset beyond vtable
-	int dataSize = sizeof(*this) - sizeof(void *);
-
-	Assert( pData == &m_pGameData );
-
-	memset( pData, 0, dataSize );	
-#else
-#error
-#endif
-
 	// HACKHACK: init this as a sphere until someone attaches a surfacemanager
 	m_collideType = COLLIDE_BALL;
 	m_contentsMask = CONTENTS_SOLID;
-	m_hasTouchedDynamic = 0;
+	m_hasTouchedDynamic = false;
 }
 
 void CPhysicsObject::Init( const CPhysCollide *pCollisionModel, IVP_Real_Object *pObject, int materialIndex, float volume, float drag, float angDrag )
@@ -225,7 +228,7 @@ void CPhysicsObject::NotifyWake( void )
 
 void CPhysicsObject::SetCallbackFlags( unsigned short callbackflags )
 {
-#if IVP_ENABLE_VISUALIZER
+#if defined(IVP_ENABLE_VISUALIZER)
 	unsigned short changedFlags = m_callbacks ^ callbackflags;
 	if ( changedFlags & CALLBACK_MARKED_FOR_TEST )
 	{
@@ -1489,7 +1492,7 @@ static void InitObjectTemplate( IVP_Template_Real_Object &objectTemplate, int ma
 		objectTemplate.set_name(pParams->pName);
 	}
 	END_IVP_ALLOCATION();
-#if USE_COLLISION_GROUP_STRING
+#if defined(USE_COLLISION_GROUP_STRING)
 	objectTemplate.set_nocoll_group_ident( NULL );
 #endif
 
@@ -1624,7 +1627,7 @@ class CMaterialIndexOps : public CDefSaveRestoreOps
 {
 public:
 	// save data type interface
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) 
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override
 	{
 		int materialIndex = *((int *)fieldInfo.pField);
 		const char *pMaterialName = physprops->GetPropName( materialIndex );
@@ -1632,12 +1635,12 @@ public:
 		{
 			pMaterialName = physprops->GetPropName( 0 );
 		}
-		int len = strlen(pMaterialName) + 1;
+		int len = V_strlen(pMaterialName) + 1;
 		pSave->WriteInt( &len );
 		pSave->WriteString( pMaterialName );
 	}
 
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) 
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override
 	{
 		char nameBuf[1024];
 		int nameLen = pRestore->ReadInt();
@@ -1650,13 +1653,13 @@ public:
 		}
 	}
 
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) 
+	bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override 
 	{ 
 		int *pMaterialIndex = (int *)fieldInfo.pField;
 		return (*pMaterialIndex == 0);
 	}
 
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) 
+	void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
 		int *pMaterialIndex = (int *)fieldInfo.pField;
 		*pMaterialIndex = 0;
@@ -1785,7 +1788,7 @@ void CPhysicsObject::InitFromTemplate( CPhysicsEnvironment *pEnvironment, void *
 	Assert( ivpObjectTemplate.material );
 	// HACKHACK: Pass this name in for debug
 	ivpObjectTemplate.set_name(objectTemplate.pName);
-#if USE_COLLISION_GROUP_STRING
+#if defined(USE_COLLISION_GROUP_STRING)
 	ivpObjectTemplate.set_nocoll_group_ident( NULL );
 #endif
 
@@ -1993,17 +1996,18 @@ IPhysicsObject *CreateObjectFromBuffer_UseExistingMemory( CPhysicsEnvironment *p
 // So now we need to recreate them or some objects may not wake up when this object (or its neighbors) are deleted.
 void PostRestorePhysicsObject()
 {
-	for ( int i = g_PostRestoreObjectList.Count()-1; i >= 0; --i )
+	for ( intp i = g_PostRestoreObjectList.Count()-1; i >= 0; --i )
 	{
-		if ( g_PostRestoreObjectList[i].pObject )
+		auto &list = g_PostRestoreObjectList[i];
+		if ( list.pObject )
 		{
-			if ( g_PostRestoreObjectList[i].growFriction )
+			if ( list.growFriction )
 			{
-				g_PostRestoreObjectList[i].pObject->GetObject()->force_grow_friction_system();
+				list.pObject->GetObject()->force_grow_friction_system();
 			}
-			if ( g_PostRestoreObjectList[i].enableCollisions )
+			if ( list.enableCollisions )
 			{
-				g_PostRestoreObjectList[i].pObject->EnableCollisions( true );
+				list.pObject->EnableCollisions( true );
 			}
 		}
 	}

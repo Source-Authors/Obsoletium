@@ -45,19 +45,19 @@ class CVPhysPtrSaveRestoreOps : public CDefSaveRestoreOps
 {
 public:
 	CVPhysPtrSaveRestoreOps();
-	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave );
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override;
 	void PreRestore();
 	void PostRestore();
-	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore );
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override;
 };
 
 extern CVPhysPtrSaveRestoreOps g_VPhysPtrSaveRestoreOps;
 
 #define DEFINE_VPHYSPTR(name) \
-	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, &g_VPhysPtrSaveRestoreOps, NULL }
+	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, nullptr, &g_VPhysPtrSaveRestoreOps, nullptr, nullptr, 0, nullptr, 0, 0.0f }
 
 #define DEFINE_VPHYSPTR_ARRAY(name,count) \
-	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, count, FTYPEDESC_SAVE, NULL, &g_VPhysPtrSaveRestoreOps, NULL }
+	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, count, FTYPEDESC_SAVE, nullptr, &g_VPhysPtrSaveRestoreOps, nullptr, nullptr, 0, nullptr, 0, 0.0f }
 
 
 //-----------------------------------------------------------------------------
@@ -65,8 +65,8 @@ extern CVPhysPtrSaveRestoreOps g_VPhysPtrSaveRestoreOps;
 class CVPhysPtrUtlVectorSaveRestoreOps : public CVPhysPtrSaveRestoreOps
 {
 public:
-	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave );
-	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore );
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override;
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override;
 
 private:
 	typedef CUtlVector<intp> VPhysPtrVector;
@@ -75,7 +75,7 @@ private:
 extern CVPhysPtrUtlVectorSaveRestoreOps g_VPhysPtrUtlVectorSaveRestoreOps;
 
 #define DEFINE_VPHYSPTR_UTLVECTOR(name) \
-	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, &g_VPhysPtrUtlVectorSaveRestoreOps, NULL }
+	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, nullptr, &g_VPhysPtrUtlVectorSaveRestoreOps, nullptr, nullptr, 0, nullptr, 0, 0.0f }
 
 
 //-----------------------------------------------------------------------------

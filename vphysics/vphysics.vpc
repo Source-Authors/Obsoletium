@@ -119,7 +119,6 @@ $Project "vphysics"
 		$File	"$SRCDIR\public\vcollide_parse.h"
 		$File	"$SRCDIR\public\vphysics\vehicles.h"
 		$File	"$SRCDIR\public\vphysics_interface.h"
-		$File	"$SRCDIR\public\vphysics_interfaceV30.h"
 	}
 		
 	$Folder	"Link Libraries" 

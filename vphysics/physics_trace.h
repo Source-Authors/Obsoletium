@@ -67,7 +67,7 @@ struct leafmap_t
 		flags = LEAFMAP_HAS_CUBEMAP;
 	}
 
-	void SetSingleVertexSpan( int startVertIndex, int vertCountIn )
+	void SetSingleVertexSpan( unsigned short startVertIndex, int vertCountIn )
 	{
 		flags = 0;
 		flags |= LEAFMAP_HAS_SINGLE_VERTEX_SPAN;
@@ -88,7 +88,7 @@ struct leafmap_t
 		return reinterpret_cast<byte *>(&startVert[1]);
 	}
 
-	void SetRLESpans( int startVertIndex, int spanCountIn, byte *pSpans )
+	void SetRLESpans( unsigned short startVertIndex, int spanCountIn, byte *pSpans )
 	{
 		flags = 0;
 		if ( spanCountIn > MaxSpans() )
@@ -132,18 +132,18 @@ class CPhysCollide : public IPhysCollide
 {
 public:
 	static CPhysCollide *UnserializeFromBuffer( const char *pBuffer, unsigned int size, int index, bool swap = false );
-	virtual const IVP_Compact_Surface *GetCompactSurface() const { return NULL; }
-	virtual Vector GetOrthographicAreas() const { return Vector(1,1,1); }
-	virtual float GetSphereRadius() const { return 0; }
-	virtual void ComputeOrthographicAreas( float epsilon ) {}
-	virtual void SetOrthographicAreas( const Vector &areas ) {}
-	virtual const collidemap_t *GetCollideMap() const { return NULL; }
+	virtual const IVP_Compact_Surface *GetCompactSurface() const { return nullptr; }
+	Vector GetOrthographicAreas() const override { return Vector(1,1,1); }
+	float GetSphereRadius() const override { return 0; }
+	virtual void ComputeOrthographicAreas( [[maybe_unused]] float epsilon ) {}
+	void SetOrthographicAreas( [[maybe_unused]] const Vector &areas ) override {}
+	virtual const collidemap_t *GetCollideMap() const { return nullptr; }
 };
 
 class ITraceObject
 {
 public:
-	virtual int SupportMap( const Vector &dir, Vector *pOut ) const = 0;
+	virtual unsigned short SupportMap( const Vector &dir, Vector *pOut ) const = 0;
 	virtual Vector GetVertByIndex( int index ) const = 0;
 	virtual float Radius( void ) const = 0;
 };
@@ -156,8 +156,9 @@ public:
 class CPhysicsTrace
 {
 public:
-	CPhysicsTrace();
-	~CPhysicsTrace();
+	CPhysicsTrace() = default;
+	~CPhysicsTrace() = default;
+
 	// Calculate the intersection of a swept box (mins/maxs) against an IVP object.  All coords are in HL space.
 	void SweepBoxIVP( const Vector &start, const Vector &end, const Vector &mins, const Vector &maxs, const CPhysCollide *pSurface, const Vector &surfaceOrigin, const QAngle &surfaceAngles, trace_t *ptr );
 	void SweepBoxIVP( const Ray_t &raySrc, unsigned int contentsMask, IConvexInfo *pConvexInfo, const CPhysCollide *pSurface, const Vector &surfaceOrigin, const QAngle &surfaceAngles, trace_t *ptr );
@@ -233,7 +234,6 @@ inline void CVisitHash::NewVisit( void )
 	{
 		memset( m_vertVisit, 0, sizeof(m_vertVisit) );
 	}
-
 }
 
 

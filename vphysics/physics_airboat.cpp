@@ -46,17 +46,17 @@
 #define AIRBOAT_RAYCAST_DIST_WATER_HIGH	0.35f		// m (~16in)
 
 // Amplitude of wave noise. Blend from max to min as speed increases.
-#define AIRBOAT_WATER_NOISE_MIN			0.01		// m (~0.4in)
-#define AIRBOAT_WATER_NOISE_MAX			0.03		// m (~1.2in)
+#define AIRBOAT_WATER_NOISE_MIN			0.01f		// m (~0.4in)
+#define AIRBOAT_WATER_NOISE_MAX			0.03f		// m (~1.2in)
 
 // Frequency of wave noise. Blend from min to max as speed increases.
-#define AIRBOAT_WATER_FREQ_MIN			1.5
-#define AIRBOAT_WATER_FREQ_MAX			1.5
+#define AIRBOAT_WATER_FREQ_MIN			1.5f
+#define AIRBOAT_WATER_FREQ_MAX			1.5f
 
 // Phase difference in wave noise between left and right pontoons
 // Blend from max to min as speed increases.
-#define AIRBOAT_WATER_PHASE_MIN			0.0			// s
-#define AIRBOAT_WATER_PHASE_MAX			1.5			// s
+// #define AIRBOAT_WATER_PHASE_MIN			0.0			// s
+#define AIRBOAT_WATER_PHASE_MAX			1.5f			// s
 
 
 #define AIRBOAT_GRAVITY					9.81f		// m/s2
@@ -89,17 +89,17 @@ public:
 		m_vecVelocity.Init( 0, 0, 0 );
 	}
 
-	virtual void GetSurfaceNormal( Vector &out )
+	void GetSurfaceNormal( Vector &out ) override
 	{
 		out = m_vecPoint;
 	}
 
-	virtual void GetContactPoint( Vector &out )
+	void GetContactPoint( Vector &out ) override
 	{
 		out = m_vecNormal;
 	}
 
-	virtual void GetContactSpeed( Vector &out )
+	void GetContactSpeed( Vector &out ) override
 	{
 		out = m_vecVelocity;
 	}
@@ -197,7 +197,7 @@ void CPhysics_Airboat::SetWheelFriction( int iWheel, float flFriction )
 float CPhysics_Airboat::ComputeFrontPontoonWaveNoise( int nPontoonIndex, float flSpeedRatio )
 {
 	// Add in sinusoidal noise cause by undulating water. Reduce the amplitude of the noise at higher speeds.
-	IVP_FLOAT flNoiseScale = RemapValClamped( 1.0 - flSpeedRatio, 0, 1, AIRBOAT_WATER_NOISE_MIN, AIRBOAT_WATER_NOISE_MAX );
+	IVP_FLOAT flNoiseScale = RemapValClamped( 1.0f - flSpeedRatio, 0, 1, AIRBOAT_WATER_NOISE_MIN, AIRBOAT_WATER_NOISE_MAX );
 
 	// Apply a phase shift between left and right pontoons to simulate waves passing under the boat.
 	IVP_FLOAT flPhaseShift = 0;
@@ -228,7 +228,7 @@ void CPhysics_Airboat::pre_raycasts_gameside( int nRaycastCount, IVP_Ray_Solver_
 	IVP_FLOAT flSpeedRatio = clamp( flSpeed / 15.0f, 0.f, 1.0f );
 	if ( !m_flThrust )
 	{
-		flForwardSpeedRatio *= 0.5;
+		flForwardSpeedRatio *= 0.5f;
 	}
 
 	// This is a little weird. We adjust the front pontoon ray lengths based on forward velocity,
@@ -707,7 +707,7 @@ void CPhysics_Airboat::DoSimulationPontoonsWater( IVP_Raycast_Airboat_Wheel *pPo
 	//Msg("depth: %f\n", pImpact->flDepth);
 
 	// Depth is in inches, so multiply by 0.0254 meters/inch
-	IVP_FLOAT flSubmergedVolume = PONTOON_AREA_2D * flDepth * 0.0254;
+	IVP_FLOAT flSubmergedVolume = PONTOON_AREA_2D * flDepth * 0.0254f;
 
 	// Buoyancy forces are equal to the mass of the water displaced, which is 1000 kg/m^3
 	// There are 4 pontoon points, so each one can exert 1/4th of the total buoyancy force.
@@ -912,7 +912,7 @@ void CPhysics_Airboat::DoSimulationTurbine( IVP_Event_Sim *pEventSim )
 	float flThrust = m_flThrust;
 	if ((m_bWeakJump) || (m_bAirborne && (flThrust < 0)))
 	{
-		flThrust *= 0.5;
+		flThrust *= 0.5f;
 	}
 
 	// Get the forward vector in world-space.
@@ -1053,13 +1053,14 @@ void CPhysics_Airboat::DoSimulationGravity( IVP_Event_Sim *pEventSim )
 {
 	return;
 
-	if ( !m_bAirborne || m_bWeakJump )
-	{
-		IVP_U_Float_Point vecGravity;
-		vecGravity.set( 0, AIRBOAT_GRAVITY / 2.0f, 0 );
-		vecGravity.mult( m_pCore->get_mass() * pEventSim->delta_time );
-		m_pCore->center_push_core_multiple_ws( &vecGravity );
-	}
+	// dimhotepus: Comment unreachable code.
+	// if ( !m_bAirborne || m_bWeakJump )
+	// {
+	// 	IVP_U_Float_Point vecGravity;
+	// 	vecGravity.set( 0, AIRBOAT_GRAVITY / 2.0f, 0 );
+	// 	vecGravity.mult( m_pCore->get_mass() * pEventSim->delta_time );
+	// 	m_pCore->center_push_core_multiple_ws( &vecGravity );
+	// }
 }
 
 
@@ -1166,7 +1167,7 @@ void CPhysics_Airboat::DoSimulationKeepUprightPitch( IVP_Raycast_Airboat_Impact 
 	// Apply the rotation.
 	m_pCore->rot_push_core_cs( &vecAngularImpulse );
 
-#if DRAW_AIRBOAT_KEEP_UPRIGHT_PITCH_VECTORS
+#if defined(DRAW_AIRBOAT_KEEP_UPRIGHT_PITCH_VECTORS)
 	CPhysicsEnvironment *pEnv = (CPhysicsEnvironment *)m_pAirboatBody->get_core()->environment->client_data;
 	IVPhysicsDebugOverlay *debugoverlay = pEnv->GetDebugOverlay();
 
@@ -1269,7 +1270,7 @@ void CPhysics_Airboat::DoSimulationKeepUprightRoll( IVP_Raycast_Airboat_Impact *
 	m_pCore->rot_push_core_cs( &vecAngularImpulse );
 
 	// Debugging visualization.
-#if DRAW_AIRBOAT_KEEP_UPRIGHT_ROLL_VECTORS
+#if defined(DRAW_AIRBOAT_KEEP_UPRIGHT_ROLL_VECTORS)
 	CPhysicsEnvironment *pEnv = (CPhysicsEnvironment *)m_pAirboatBody->get_core()->environment->client_data;
 	IVPhysicsDebugOverlay *debugoverlay = pEnv->GetDebugOverlay();
 
@@ -1457,9 +1458,8 @@ void CPhysics_Airboat::change_stabilizer_constant(IVP_POS_AXIS pos, IVP_FLOAT st
 
 //-----------------------------------------------------------------------------
 // Purpose: 
-// Input  : fast_turn_factor_ - 
 //-----------------------------------------------------------------------------
-void CPhysics_Airboat::change_fast_turn_factor( IVP_FLOAT fast_turn_factor_ )
+void CPhysics_Airboat::change_fast_turn_factor( IVP_FLOAT )
 {
 	//fast_turn_factor = fast_turn_factor_;
 }
@@ -1764,7 +1764,7 @@ IVP_U_Vector<IVP_Core> *CPhysics_Airboat::get_associated_controlled_cores( void 
 // Purpose: 
 // Input  : *core - 
 //-----------------------------------------------------------------------------
-void CPhysics_Airboat::core_is_going_to_be_deleted_event( IVP_Core *core )
+void CPhysics_Airboat::core_is_going_to_be_deleted_event( IVP_Core * )
 { 
 	P_DELETE_THIS(this); 
 }

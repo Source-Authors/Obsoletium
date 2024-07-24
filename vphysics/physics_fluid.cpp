@@ -22,7 +22,7 @@
 class CBuoyancyAttacher : public IVP_Attacher_To_Cores_Buoyancy
 {
 public:
-    virtual IVP_Template_Buoyancy *get_parameters_per_core( IVP_Core *pCore );
+    IVP_Template_Buoyancy *get_parameters_per_core( IVP_Core *pCore ) override;
     CBuoyancyAttacher(IVP_Template_Buoyancy &templ, IVP_U_Set_Active<IVP_Core> *set_of_cores_, IVP_Liquid_Surface_Descriptor *liquid_surface_descriptor_);
 
 	float m_density;
@@ -153,10 +153,10 @@ public:
 		m_pFluidObject = pFluidObject;
 	}
 	
-	virtual void calc_liquid_surface( IVP_Environment * /*environment*/,
+	void calc_liquid_surface( IVP_Environment * /*environment*/,
 								IVP_Core * /*core*/,
 								IVP_U_Float_Hesse *surface_normal_out,
-								IVP_U_Float_Point *abs_speed_of_current_out)
+								IVP_U_Float_Point *abs_speed_of_current_out) override
 	{
 		cplane_t worldPlane;
 		matrix3x4_t matObjectToWorld;
@@ -220,12 +220,12 @@ CPhysicsFluidController *CreateFluidController( IVP_Environment *pEnvironment, C
 }
 
 
-bool SavePhysicsFluidController( const physsaveparams_t &params, CPhysicsFluidController *pFluidObject )
+bool SavePhysicsFluidController( const physsaveparams_t &, CPhysicsFluidController * )
 {
 	return false;
 }
 
-bool RestorePhysicsFluidController( const physrestoreparams_t &params, CPhysicsFluidController **ppFluidObject )
+bool RestorePhysicsFluidController( const physrestoreparams_t &, CPhysicsFluidController ** )
 {
 	return false;
 }

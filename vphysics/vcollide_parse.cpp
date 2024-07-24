@@ -21,7 +21,10 @@
 static void ReadVector( const char *pString, Vector& out )
 {
 	float x = 0, y = 0, z = 0;
-	sscanf( pString, "%f %f %f", &x, &y, &z );
+	int read = sscanf( pString, "%f %f %f", &x, &y, &z );
+
+	AssertMsg( read == 3, "Unable to read 3D vector components from '%s'.", pString );
+
 	out[0] = x;
 	out[1] = y;
 	out[2] = z;
@@ -40,14 +43,17 @@ static void ReadVector( const char *pString, Vector& out )
 static void ReadVector4D( const char *pString, Vector4D& out )
 {
 	float x = 0, y = 0, z = 0, w = 0;
-	sscanf( pString, "%f %f %f %f", &x, &y, &z, &w );
+	int read = sscanf( pString, "%f %f %f %f", &x, &y, &z, &w );
+
+	AssertMsg( read == 4, "Unable to read 4D vector components from '%s'.", pString );
+
 	out[0] = x;
 	out[1] = y;
 	out[2] = z;
 	out[3] = w;
 }
 
-class CVPhysicsParse : public IVPhysicsKeyParser
+class CVPhysicsParse final : public IVPhysicsKeyParser
 {
 public:
 				~CVPhysicsParse() {}
@@ -55,16 +61,16 @@ public:
 				CVPhysicsParse( const char *pKeyData );
 	void		NextBlock( void );
 
-	const char *GetCurrentBlockName( void );
-	bool		Finished( void );
-	void		ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKeyHandler );
-	void		ParseFluid( fluid_t *pFluid, IVPhysicsKeyHandler *unknownKeyHandler );
-	void		ParseRagdollConstraint( constraint_ragdollparams_t *pConstraint, IVPhysicsKeyHandler *unknownKeyHandler );
-	void		ParseSurfaceTable( int *table, IVPhysicsKeyHandler *unknownKeyHandler );
+	const char *GetCurrentBlockName( void ) override;
+	bool		Finished( void ) override;
+	void		ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKeyHandler ) override;
+	void		ParseFluid( fluid_t *pFluid, IVPhysicsKeyHandler *unknownKeyHandler ) override;
+	void		ParseRagdollConstraint( constraint_ragdollparams_t *pConstraint, IVPhysicsKeyHandler *unknownKeyHandler ) override;
+	void		ParseSurfaceTable( intp *table, IVPhysicsKeyHandler *unknownKeyHandler ) override;
 	void		ParseSurfaceTablePacked( CUtlVector<char> &out );
-	void		ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandler *unknownKeyHandler );
-	void		ParseCustom( void *pCustom, IVPhysicsKeyHandler *unknownKeyHandler );
-	void		SkipBlock( void ) { ParseCustom(NULL, NULL); }
+	void		ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandler *unknownKeyHandler ) override;
+	void		ParseCustom( void *pCustom, IVPhysicsKeyHandler *unknownKeyHandler ) override;
+	void		SkipBlock( void ) override { ParseCustom(NULL, NULL); }
 
 private:
 	void		ParseVehicleAxle( vehicle_axleparams_t &axle );
@@ -195,6 +201,7 @@ void CVPhysicsParse::ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKe
 		}
 		else if ( !Q_stricmp( key, "rollingdrag" ) )
 		{
+			AssertMsg( false, "Solid '%s' rolling drag is not implemented.", pSolid->name );
 			//pSolid->params.rollingDrag = atof(value);
 		}
 		else
@@ -354,7 +361,7 @@ void CVPhysicsParse::ParseFluid( fluid_t *pFluid, IVPhysicsKeyHandler *unknownKe
 	}
 }
 
-void CVPhysicsParse::ParseSurfaceTable( int *table, IVPhysicsKeyHandler *unknownKeyHandler )
+void CVPhysicsParse::ParseSurfaceTable( intp *table, IVPhysicsKeyHandler *unknownKeyHandler )
 {
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
@@ -368,7 +375,7 @@ void CVPhysicsParse::ParseSurfaceTable( int *table, IVPhysicsKeyHandler *unknown
 			return;
 		}
 
-		int propIndex = physprops->GetSurfaceIndex( key );
+		intp propIndex = physprops->GetSurfaceIndex( key );
 		int tableIndex = atoi(value);
 		if ( tableIndex >= 0 && tableIndex < 128 )
 		{
@@ -392,8 +399,8 @@ void CVPhysicsParse::ParseSurfaceTablePacked( CUtlVector<char> &out )
 			return;
 		}
 
-		int len = Q_strlen( key );
-		int outIndex = out.AddMultipleToTail( len + 1 );
+		intp len = Q_strlen( key );
+		intp outIndex = out.AddMultipleToTail( len + 1 );
 		memcpy( &out[outIndex], key, len+1 );
 		int tableIndex = atoi(value);
 		Assert( tableIndex == lastIndex + 1);
@@ -445,6 +452,10 @@ void CVPhysicsParse::ParseVehicleAxle( vehicle_axleparams_t &axle )
 		{
 			axle.brakeFactor = strtof( value, nullptr );
 		}
+		else
+		{
+			AssertMsg( false, "Unknown key '%s' in vehicle axie parser. ", key );
+		}
 	}
 }
 
@@ -495,6 +506,10 @@ void CVPhysicsParse::ParseVehicleWheel( vehicle_wheelparams_t &wheel )
 		{
 			wheel.brakeMaterialIndex = physprops->GetSurfaceIndex( value );
 		}
+		else
+		{
+			AssertMsg( false, "Unknown key '%s' in vehicle wheel parser. ", key );
+		}
 	}
 }
 
@@ -529,6 +544,10 @@ void CVPhysicsParse::ParseVehicleSuspension( vehicle_suspensionparams_t &suspens
 		else if ( !Q_stricmp( key, "maxbodyforce" ) )
 		{
 			suspension.maxBodyForce = strtof( value, nullptr );
+		}
+		else
+		{
+			AssertMsg( false, "Unknown key '%s' in vehicle suspension parser. ", key );
 		}
 	}
 }
@@ -577,6 +596,10 @@ void CVPhysicsParse::ParseVehicleBody( vehicle_bodyparams_t &body )
 		{
 			body.keepUprightTorque = strtof( value, nullptr );
 		}
+		else
+		{
+			AssertMsg( false, "Unknown key '%s' in vehicle body parser. ", key );
+		}
 	}
 }
 
@@ -591,6 +614,7 @@ void CVPhysicsParse::ParseVehicleEngineBoost( vehicle_engineparams_t &engine )
 		m_pText = ParseKeyvalue( m_pText, key, value );
 		if ( key[0] == '}' )
 			return;
+
 		// parse subchunks
 		if ( !Q_stricmp( key, "force" ) )
 		{
@@ -612,7 +636,10 @@ void CVPhysicsParse::ParseVehicleEngineBoost( vehicle_engineparams_t &engine )
 		{
 			engine.torqueBoost = atoi( value ) != 0 ? true : false;
 		}
-
+		else
+		{
+			AssertMsg( false, "Unknown key '%s' in vehicle engine boost parser. ", key );
+		}
 	}
 }
 
@@ -626,6 +653,7 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 		m_pText = ParseKeyvalue( m_pText, key, value );
 		if ( key[0] == '}' )
 			return;
+
 		// parse subchunks
 		if ( value[0] == '{' )
 		{
@@ -641,7 +669,7 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 		else if ( !Q_stricmp( key, "gear" ) )
 		{
 			// Protect against exploits/overruns
-			if ( engine.gearCount < ARRAYSIZE(engine.gearRatio) )
+			if ( engine.gearCount < ssize(engine.gearRatio) )
 			{
 				engine.gearRatio[engine.gearCount] = strtof( value, nullptr );
 				engine.gearCount++;
@@ -695,6 +723,10 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 		{
 			engine.autobrakeSpeedFactor = strtof( value, nullptr );
 		}
+		else
+		{
+			AssertMsg( false, "Unknown key '%s' in vehicle engine parser. ", key );
+		}
 	}
 }
 
@@ -709,6 +741,7 @@ void CVPhysicsParse::ParseVehicleSteering( vehicle_steeringparams_t &steering )
 		m_pText = ParseKeyvalue( m_pText, key, value );
 		if ( key[0] == '}' )
 			return;
+
 		// parse subchunks
 		if ( !Q_stricmp( key, "degreesSlow" ) )
 		{
@@ -786,6 +819,10 @@ void CVPhysicsParse::ParseVehicleSteering( vehicle_steeringparams_t &steering )
 		{
 			steering.dustCloud = atoi( value ) != 0 ? true : false;
 		}
+		else
+		{
+			AssertMsg( false, "Unknown key '%s' in vehicle steering parser. ", key );
+		}
 	}
 }
 
@@ -818,7 +855,7 @@ void CVPhysicsParse::ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandle
 			if ( !Q_stricmp( key, "axle" ) )
 			{
 				// Protect against exploits/overruns
-				if ( pVehicle->axleCount < ARRAYSIZE(pVehicle->axles) )
+				if ( pVehicle->axleCount < ssize(pVehicle->axles) )
 				{
 					ParseVehicleAxle( pVehicle->axles[pVehicle->axleCount] );
 					pVehicle->axleCount++;
@@ -934,7 +971,6 @@ const char *ParseKeyvalue( const char *pBuffer, OUT_Z_ARRAY char (&key)[MAX_KEYV
 	Q_strlower( key );
 	
 	pBuffer = ParseFile( pBuffer, value, NULL );
-
 	Q_strlower( value );
 
 	return pBuffer;

@@ -1,12 +1,7 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-#include <stdio.h>
+// Copyright Valve Corporation, All rights reserved.
+
 #include "convert.h"
+
 #include "ivp_cache_object.hxx"
 #include "coordsize.h"
 

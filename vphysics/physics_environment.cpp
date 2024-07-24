@@ -76,7 +76,7 @@ class CDeleteProxy : public IDeleteQueueItem
 {
 public:
 	CDeleteProxy(T *pItem) : m_pItem(pItem) {}
-	virtual void Delete() { delete m_pItem; }
+	void Delete() override { delete m_pItem; }
 private:
 	T *m_pItem;
 };
@@ -96,7 +96,7 @@ public:
 	}
 	void DeleteAll()
 	{
-		for ( int i = m_list.Count()-1; i >= 0; --i)
+		for ( intp i = m_list.Count()-1; i >= 0; --i)
 		{
 			m_list[i]->Delete();
 			delete m_list[i];
@@ -113,9 +113,9 @@ class CPhysicsCollisionData : public IPhysicsCollisionData
 public:
 	CPhysicsCollisionData( IVP_Contact_Situation *contact ) : m_pContact(contact) {}
 
-	virtual void GetSurfaceNormal( Vector &out ) { ConvertDirectionToHL( m_pContact->surf_normal, out ); }
-	virtual void GetContactPoint( Vector &out ) { ConvertPositionToHL( m_pContact->contact_point_ws, out ); }
-	virtual void GetContactSpeed( Vector &out ) { ConvertPositionToHL( m_pContact->speed, out ); }
+	void GetSurfaceNormal( Vector &out ) override { ConvertDirectionToHL( m_pContact->surf_normal, out ); }
+	void GetContactPoint( Vector &out ) override { ConvertPositionToHL( m_pContact->contact_point_ws, out ); }
+	void GetContactSpeed( Vector &out ) override { ConvertPositionToHL( m_pContact->speed, out ); }
 
 	const IVP_Contact_Situation *m_pContact;
 };
@@ -135,7 +135,7 @@ public:
 		m_pContact = pEvent->contact_situation;
 	}
 
-	virtual void GetSurfaceNormal( Vector &out ) 
+	void GetSurfaceNormal( Vector &out ) override
 	{ 
 		if ( m_pContact )
 		{
@@ -149,7 +149,7 @@ public:
 			out *= m_sign;
 		}
 	}
-	virtual void GetContactPoint( Vector &out ) 
+	void GetContactPoint( Vector &out ) override
 	{
 		if ( m_pContact )
 		{
@@ -160,7 +160,7 @@ public:
 			ConvertPositionToHL( *m_pPoint->get_contact_point_ws(), out ); 
 		}
 	}
-	virtual void GetContactSpeed( Vector &out ) 
+	void GetContactSpeed( Vector &out ) override
 	{
 		if ( m_pContact )
 		{
@@ -196,7 +196,7 @@ public:
 		m_pCallback = pListener;
 	}
 
-	void Remove( int index )
+	void Remove( intp index )
 	{
 		// fast remove preserves indices except for the last element (moved into the empty spot)
 		m_activeObjects.FastRemove(index);
@@ -223,7 +223,7 @@ public:
 				
 	}
 
-    void event_object_deleted( IVP_Event_Object *pEvent )
+    void event_object_deleted( IVP_Event_Object *pEvent ) override
 	{
 		CPhysicsObject *pObject = static_cast<CPhysicsObject *>(pEvent->real_object->client_data);
 		if ( !pObject )
@@ -232,11 +232,11 @@ public:
 		DeleteObject(pObject);
 	}
 
-    void event_object_created( IVP_Event_Object *pEvent )
+    void event_object_created( IVP_Event_Object * ) override
 	{
 	}
 
-    void event_object_revived( IVP_Event_Object *pEvent )
+    void event_object_revived( IVP_Event_Object *pEvent ) override
 	{
 		CPhysicsObject *pObject = static_cast<CPhysicsObject *>(pEvent->real_object->client_data);
 		if ( !pObject )
@@ -257,7 +257,7 @@ public:
 			if ( pObject->GetActiveIndex()!=0xFFFF)
 				return;
 
-			int index = m_activeObjects.AddToTail( pObject );
+			auto index = m_activeObjects.AddToTail( pObject );
 			pObject->SetActiveIndex( index );
 		}
 		if ( m_pCallback )
@@ -266,7 +266,7 @@ public:
 		}
 	}
 
-    void event_object_frozen( IVP_Event_Object *pEvent )
+    void event_object_frozen( IVP_Event_Object *pEvent ) override
 	{
 		CPhysicsObject *pObject = static_cast<CPhysicsObject *>(pEvent->real_object->client_data);
 		if ( !pObject )
@@ -304,7 +304,7 @@ public:
 		// UNDONE: This only calls friciton for one object in each pair.
 		// UNDONE: Split energy in half and call for both objects?
 		// UNDONE: Don't split/call if one object is static (like the world)?
-		for ( int i = 0; i < m_activeObjects.Count(); i++ )
+		for ( intp i = 0; i < m_activeObjects.Count(); i++ )
 		{
 			CPhysicsObject *pObject = m_activeObjects[i];
 			IVP_Real_Object *ivpObject = pObject->GetObject();
@@ -376,20 +376,20 @@ public:
 			}
 		}
 	}
-	int	GetActiveObjectCount( void ) const
+	intp	GetActiveObjectCount( void ) const
 	{
 		return m_activeObjects.Count();
 	}
 	void GetActiveObjects( IPhysicsObject **pOutputObjectList ) const
 	{
-		for ( int i = 0; i < m_activeObjects.Count(); i++ )
+		for ( intp i = 0; i < m_activeObjects.Count(); i++ )
 		{
 			pOutputObjectList[i] = m_activeObjects[i];
 		}
 	}
 	void UpdateSleepObjects( void )
 	{
-		int i;
+		intp i;
 
 		CUtlVector<CPhysicsObject *> sleepObjects;
 
@@ -422,22 +422,22 @@ private:
 class CEmptyCollisionListener : public IPhysicsCollisionEvent
 {
 public:
-	virtual void PreCollision( vcollisionevent_t *pEvent ) {}
-	virtual void PostCollision( vcollisionevent_t *pEvent ) {}
+	void PreCollision( vcollisionevent_t * ) override {}
+	void PostCollision( vcollisionevent_t * ) override {}
 
 	// This is a scrape event.  The object has scraped across another object consuming the indicated energy
-	virtual void Friction( IPhysicsObject *pObject, float energy, int surfaceProps, int surfacePropsHit, IPhysicsCollisionData *pData ) {}
+	void Friction( IPhysicsObject *, float, int, int, IPhysicsCollisionData * ) override {}
 
-	virtual void StartTouch( IPhysicsObject *pObject1, IPhysicsObject *pObject2, IPhysicsCollisionData *pTouchData ) {}
-	virtual void EndTouch( IPhysicsObject *pObject1, IPhysicsObject *pObject2, IPhysicsCollisionData *pTouchData ) {}
+	void StartTouch( IPhysicsObject *, IPhysicsObject *, IPhysicsCollisionData * ) override {}
+	void EndTouch( IPhysicsObject *, IPhysicsObject *, IPhysicsCollisionData * ) override {}
 
-	virtual void FluidStartTouch( IPhysicsObject *pObject, IPhysicsFluidController *pFluid ) {}
-	virtual void FluidEndTouch( IPhysicsObject *pObject, IPhysicsFluidController *pFluid ) {}
+	void FluidStartTouch( IPhysicsObject *, IPhysicsFluidController * ) override {}
+	void FluidEndTouch( IPhysicsObject *, IPhysicsFluidController * ) override {}
 
-	virtual void ObjectEnterTrigger( IPhysicsObject *pTrigger, IPhysicsObject *pObject ) {}
-	virtual void ObjectLeaveTrigger( IPhysicsObject *pTrigger, IPhysicsObject *pObject ) {}
+	void ObjectEnterTrigger( IPhysicsObject *, IPhysicsObject * ) override {}
+	void ObjectLeaveTrigger( IPhysicsObject *, IPhysicsObject * ) override {}
 
-	virtual void PostSimulationFrame() {}
+	void PostSimulationFrame() override {}
 };
 
 CEmptyCollisionListener g_EmptyCollisionListener;
@@ -457,7 +457,7 @@ public:
 	}
 	IPhysicsCollisionEvent *GetHandler() { return m_pCallback; }
 
-    virtual void event_pre_collision( IVP_Event_Collision *pEvent )
+    void event_pre_collision( IVP_Event_Collision *pEvent ) override
 	{
 		m_event.isCollision = false;
 		m_event.isShadowCollision = false;
@@ -524,7 +524,7 @@ public:
 		m_pCallback->PreCollision( &m_event );
 	}
 
-    virtual void event_post_collision( IVP_Event_Collision *pEvent )
+    void event_post_collision( IVP_Event_Collision *pEvent ) override
 	{
 		// didn't call preCollision, so don't call postCollision
 		if ( !m_event.isCollision && !m_event.isShadowCollision )
@@ -540,12 +540,12 @@ public:
 		m_pCallback->PostCollision( &m_event );
 	}
 
-    virtual void event_collision_object_deleted( class IVP_Real_Object *) 
+    void event_collision_object_deleted( class IVP_Real_Object *) override
 	{
 		// enable this in constructor
 	}
 
-    virtual void event_friction_created( IVP_Event_Friction *pEvent )
+    void event_friction_created( IVP_Event_Friction *pEvent ) override
 	{
 		IVP_Contact_Situation *contact = pEvent->contact_situation;
 		CPhysicsObject *pObject1 = static_cast<CPhysicsObject *>(contact->objects[0]->client_data);
@@ -585,7 +585,7 @@ public:
 	}
 
 
-    virtual void event_friction_deleted( IVP_Event_Friction *pEvent )
+    void event_friction_deleted( IVP_Event_Friction *pEvent ) override
 	{
 		IVP_Contact_Situation *contact = pEvent->contact_situation;
 		CPhysicsObject *pObject1 = static_cast<CPhysicsObject *>(contact->objects[0]->client_data);
@@ -612,12 +612,12 @@ public:
 		m_pCallback->EndTouch( pObject1, pObject2, &data );
 	}
 
-	virtual void event_friction_pair_created( class IVP_Friction_Core_Pair *pair );
-	virtual void event_friction_pair_deleted( class IVP_Friction_Core_Pair *pair );
-	virtual void mindist_entered_volume( class IVP_Controller_Phantom *controller,class IVP_Mindist_Base *mindist ) {}
-	virtual void mindist_left_volume(class IVP_Controller_Phantom *controller, class IVP_Mindist_Base *mindist) {}
+	void event_friction_pair_created( class IVP_Friction_Core_Pair *pair ) override;
+	void event_friction_pair_deleted( class IVP_Friction_Core_Pair *pair ) override;
+	void mindist_entered_volume( class IVP_Controller_Phantom *, class IVP_Mindist_Base * ) override {}
+	void mindist_left_volume( class IVP_Controller_Phantom *, class IVP_Mindist_Base *) override {}
 
-	virtual void core_entered_volume( IVP_Controller_Phantom *controller, IVP_Core *pCore )
+	void core_entered_volume( IVP_Controller_Phantom *controller, IVP_Core *pCore ) override
 	{
 		CPhysicsFluidController *pFluid = static_cast<CPhysicsFluidController *>( controller->client_data );
 		IVP_Real_Object *pivp = pCore->objects.element_at(0);
@@ -645,7 +645,7 @@ public:
 		}
 	}
 
-	virtual void core_left_volume( IVP_Controller_Phantom *controller, IVP_Core *pCore )
+	void core_left_volume( IVP_Controller_Phantom *controller, IVP_Core *pCore ) override
 	{
 		CPhysicsFluidController *pFluid = static_cast<CPhysicsFluidController *>( controller->client_data );
 		IVP_Real_Object *pivp = pCore->objects.element_at(0);
@@ -672,7 +672,7 @@ public:
 			}
 		}
 	}
-	void phantom_is_going_to_be_deleted_event(class IVP_Controller_Phantom *controller) {}
+	void phantom_is_going_to_be_deleted_event(class IVP_Controller_Phantom *) override {}
 
 	void EventPSI( CPhysicsEnvironment *pEnvironment )
 	{
@@ -724,7 +724,7 @@ private:
 	}
 
 	CUtlRBTree<corepair_t>			m_pairList;
-	float							m_pairListOldestTime;
+	//float							m_pairListOldestTime;
 
 
 	IPhysicsCollisionEvent			*m_pCallback;
@@ -735,7 +735,7 @@ private:
 
 CPhysicsListenerCollision::CPhysicsListenerCollision()
 	: IVP_Listener_Collision( ALL_COLLISION_FLAGS ),
-	m_pairListOldestTime(0.0f),
+	//m_pairListOldestTime(0.0f),
 	m_pCallback(&g_EmptyCollisionListener) 
 {
 	m_pairList.SetLessFunc( CorePairLessFunc );
@@ -792,7 +792,7 @@ void CPhysicsListenerCollision::event_friction_pair_deleted( IVP_Friction_Core_P
 }
 
 
-#if IVP_ENABLE_VISUALIZER
+#if defined(IVP_ENABLE_VISUALIZER)
 
 class CCollisionVisualizer : public IVP_Clustering_Visualizer_Shortrange_Callback, public IVP_Clustering_Visualizer_Longrange_Callback
 {
@@ -847,7 +847,7 @@ public:
 	void SetHandler( IPhysicsCollisionSolver *pSolver ) { m_pSolver = pSolver; }
 
 	// IVP_Collision_Filter
-    IVP_BOOL check_objects_for_collision_detection(IVP_Real_Object *ivp0, IVP_Real_Object *ivp1)
+    IVP_BOOL check_objects_for_collision_detection(IVP_Real_Object *ivp0, IVP_Real_Object *ivp1) override
 	{
 		if ( m_pSolver )
 		{
@@ -867,10 +867,10 @@ public:
 		}
 		return IVP_TRUE;
 	}
-	void environment_will_be_deleted(IVP_Environment *) {}
+	void environment_will_be_deleted(IVP_Environment *) override {}
 
 	// IVP_Anomaly_Manager
-	virtual void inter_penetration( IVP_Mindist *mindist,IVP_Real_Object *ivp0, IVP_Real_Object *ivp1, IVP_DOUBLE speedChange)
+	void inter_penetration( IVP_Mindist *mindist,IVP_Real_Object *ivp0, IVP_Real_Object *ivp1, IVP_DOUBLE speedChange) override
 	{
 		if ( m_pSolver )
 		{
@@ -909,7 +909,7 @@ public:
 	}
 
 	// return true if object should be temp. freezed
-    virtual IVP_BOOL max_collisions_exceeded_check_freezing(IVP_Anomaly_Limits *, IVP_Core *pCore)
+    IVP_BOOL max_collisions_exceeded_check_freezing(IVP_Anomaly_Limits *, IVP_Core *pCore) override
 	{
 		if ( m_pSolver )
 		{
@@ -927,7 +927,7 @@ public:
 		}
 		return 0;
 	}
-	void max_velocity_exceeded(IVP_Anomaly_Limits *al, IVP_Core *pCore, IVP_U_Float_Point *velocity_in_out)
+	void max_velocity_exceeded(IVP_Anomaly_Limits *al, IVP_Core *pCore, IVP_U_Float_Point *velocity_in_out) override
 	{
 		CPhysicsObject *pObject = static_cast<CPhysicsObject *>(pCore->objects.element_at(0)->client_data);
 		if ( pObject->GetShadowController() != NULL )
@@ -984,7 +984,7 @@ private:
 	IPhysicsCollisionSolver					*m_pSolver;
 	// UNDONE: Linear search? should be small, but switch to rb tree if this ever gets large
 	CUtlVector<realobjectpair_t>	m_rescue;
-#if IVP_ENABLE_VISUALIZER
+#if defined(IVP_ENABLE_VISUALIZER)
 public:
 	CCollisionVisualizer *pVisualizer;
 #endif
@@ -999,19 +999,22 @@ public:
 	{
 		m_pCallback = NULL;
 	}
+	virtual ~CPhysicsListenerConstraint()
+	{
+	}
 
 	void SetHandler( IPhysicsConstraintEvent *pHandler )
 	{
 		m_pCallback = pHandler;
 	}
 
-    void event_constraint_broken( IVP_Constraint *pConstraint )
+    void event_constraint_broken( IVP_Constraint * ) override
 	{
 		// IVP_Constraint is not allowed, something is broken
 		Assert(0);
 	}
 
-    void event_constraint_broken( hk_Breakable_Constraint *pConstraint )
+    void event_constraint_broken( hk_Breakable_Constraint *pConstraint ) override
 	{
 		if ( m_pCallback )
 		{
@@ -1043,7 +1046,7 @@ public:
 	}
 	virtual ~CDragController( void ) {}
 
-    virtual void do_simulation_controller(IVP_Event_Sim *event,IVP_U_Vector<IVP_Core> *core_list)
+    void do_simulation_controller(IVP_Event_Sim *event,IVP_U_Vector<IVP_Core> *core_list) override
 	{
 		int i;
 		for( i = core_list->len()-1; i >=0; i--) 
@@ -1053,7 +1056,7 @@ public:
 			IVP_Real_Object *pivp = pCore->objects.element_at(0);
 			CPhysicsObject *pPhys = static_cast<CPhysicsObject *>(pivp->client_data);
 			
-			float dragForce = -0.5 * pPhys->GetDragInDirection( pCore->speed ) * m_airDensity * event->delta_time;
+			float dragForce = -0.5f * pPhys->GetDragInDirection( pCore->speed ) * m_airDensity * event->delta_time;
 			if ( dragForce < -1.0f )
 				dragForce = -1.0f;
 			if ( dragForce < 0 )
@@ -1073,9 +1076,9 @@ public:
 			}
 		}
 	}
-	virtual const char *get_controller_name() { return "vphysics:drag"; }
+	const char *get_controller_name() override { return "vphysics:drag"; }
     
-	virtual IVP_CONTROLLER_PRIORITY get_controller_priority() 
+	IVP_CONTROLLER_PRIORITY get_controller_priority() override
 	{ 
 		return IVP_CP_MOTION;
 	}
@@ -1092,15 +1095,15 @@ private:
 class CVPhysicsDebugOverlay : public IVPhysicsDebugOverlay
 {
 public:
-	virtual void AddEntityTextOverlay(int ent_index, int line_offset, float duration, int r, int g, int b, int a, const char *format, ...) {}
-	virtual void AddBoxOverlay(const Vector& origin, const Vector& mins, const Vector& max, QAngle const& orientation, int r, int g, int b, int a, float duration) {}
-	virtual void AddTriangleOverlay(const Vector& p1, const Vector& p2, const Vector& p3, int r, int g, int b, int a, bool noDepthTest, float duration) {}
-	virtual void AddLineOverlay(const Vector& origin, const Vector& dest, int r, int g, int b,bool noDepthTest, float duration) {}
-	virtual void AddTextOverlay(const Vector& origin, float duration, const char *format, ...) {}
-	virtual void AddTextOverlay(const Vector& origin, int line_offset, float duration, const char *format, ...) {}
-	virtual void AddScreenTextOverlay(float flXPos, float flYPos,float flDuration, int r, int g, int b, int a, const char *text) {}
-	virtual void AddSweptBoxOverlay(const Vector& start, const Vector& end, const Vector& mins, const Vector& max, const QAngle & angles, int r, int g, int b, int a, float flDuration) {}
-	virtual void AddTextOverlayRGB(const Vector& origin, int line_offset, float duration, float r, float g, float b, float alpha, const char *format, ...) {}
+	void AddEntityTextOverlay(int, int, float, int, int, int, int, const char *, ...) override {}
+	void AddBoxOverlay(const Vector&, const Vector&, const Vector&, QAngle const&, int, int, int, int, float) override {}
+	void AddTriangleOverlay(const Vector&, const Vector&, const Vector&, int, int, int, int, bool, float) override {}
+	void AddLineOverlay(const Vector&, const Vector&, int, int, int, bool, float) override {}
+	void AddTextOverlay(const Vector&, float, const char *, ...) override {}
+	void AddTextOverlay(const Vector&, int, float, const char *, ...) override {}
+	void AddScreenTextOverlay(float, float,float, int, int, int, int, const char *) override {}
+	void AddSweptBoxOverlay(const Vector&, const Vector&, const Vector&, const Vector&, const QAngle &, int, int, int, int, float) override {}
+	void AddTextOverlayRGB(const Vector&, int, float, float, float, float, float, const char *, ...) override {}
 };
 
 static CVPhysicsDebugOverlay s_DefaultDebugOverlay;
@@ -1184,7 +1187,7 @@ CPhysicsEnvironment::~CPhysicsEnvironment( void )
 	delete m_pConstraintListener;
 
 	// Clean out the list of physics objects
-	for ( int i = m_objects.Count()-1; i >= 0; --i )
+	for ( intp i = m_objects.Count()-1; i >= 0; --i )
 	{
 		CPhysicsObject *pObject = static_cast<CPhysicsObject *>(m_objects[i]);
 		PhantomRemove( pObject );
@@ -1240,7 +1243,7 @@ void CPhysicsEnvironment::SetDebugOverlay( CreateInterfaceFn debugOverlayFactory
 		m_pDebugOverlay = &s_DefaultDebugOverlay;
 	}
 
-#if IVP_ENABLE_VISUALIZER
+#if defined(IVP_ENABLE_VISUALIZER)
 	m_pCollisionSolver->pVisualizer = new CCollisionVisualizer( m_pDebugOverlay );
 	INSTALL_SHORTRANGE_CALLBACK(m_pCollisionSolver->pVisualizer);
 	INSTALL_LONGRANGE_CALLBACK(m_pCollisionSolver->pVisualizer);
@@ -1295,7 +1298,7 @@ IPhysicsObject *CPhysicsEnvironment::CreatePolyObjectStatic( const CPhysCollide 
 	return pObject;
 }
 
-unsigned int CPhysicsEnvironment::GetObjectSerializeSize( IPhysicsObject *pObject ) const
+unsigned int CPhysicsEnvironment::GetObjectSerializeSize( IPhysicsObject * ) const
 {
 	return sizeof(vphysics_save_cphysicsobject_t);
 }
@@ -1320,9 +1323,9 @@ IPhysicsObject *CPhysicsEnvironment::UnserializeObjectFromBuffer( void *pGameDat
 	return pObject;
 }
 
-const IPhysicsObject **CPhysicsEnvironment::GetObjectList( int *pOutputObjectCount ) const
+const IPhysicsObject **CPhysicsEnvironment::GetObjectList( intp *pOutputObjectCount ) const
 {
-	int iCount = m_objects.Count();
+	intp iCount = m_objects.Count();
 	if( pOutputObjectCount ) 
 		*pOutputObjectCount = iCount;
 
@@ -1403,7 +1406,7 @@ bool CPhysicsEnvironment::TransferObject( IPhysicsObject *pObject, IPhysicsEnvir
 	//even if this is going to sleep in a second, put it active right away to fix some object hitching problems
 	pPhysics->Wake();
 	pPhysics->NotifyWake();
-	/*int iActiveIndex = pDest->m_pSleepEvents->m_activeObjects.AddToTail( pPhysics );
+	/*intp iActiveIndex = pDest->m_pSleepEvents->m_activeObjects.AddToTail( pPhysics );
 	pPhysics->SetActiveIndex( iActiveIndex );*/
 	
 	pDest->m_pPhysEnv->force_psi_on_next_simulation(); //avoids an object pause
@@ -1495,7 +1498,7 @@ void CPhysicsEnvironment::Simulate( float deltaTime )
 		return;
 
 	ClearDeadObjects();
-#if DEBUG_CHECK_CONTATCTS_AUTO
+#if defined(DEBUG_CHECK_CONTATCTS_AUTO)
 	m_pSleepEvents->DebugCheckContacts( m_pPhysEnv );
 #endif
 
@@ -1519,7 +1522,7 @@ void CPhysicsEnvironment::Simulate( float deltaTime )
 
 		m_inSimulation = true;
 		BEGIN_IVP_ALLOCATION();
-		if ( !m_fixedTimestep || deltaTime != m_pPhysEnv->get_delta_PSI_time() )
+		if ( !m_fixedTimestep || !hk_Math::almost_equal(deltaTime, m_pPhysEnv->get_delta_PSI_time()) )
 		{
 			m_fixedTimestep = false;
 			m_pPhysEnv->simulate_dtime( deltaTime );
@@ -1597,8 +1600,8 @@ void CPhysicsEnvironment::DestroyObject( IPhysicsObject *pObject )
 	}
 
 	// search from the end because we usually delete the most recent objects during run time
-	int index = -1;
-	for ( int i = m_objects.Count(); --i >= 0; )
+	intp index = -1;
+	for ( intp i = m_objects.Count(); --i >= 0; )
 	{
 		if ( m_objects[i] == pObject )
 		{
@@ -1691,7 +1694,7 @@ void CPhysicsEnvironment::DestroyConstraintGroup( IPhysicsConstraintGroup *pGrou
 	delete pGroup;
 }
 
-void CPhysicsEnvironment::TraceBox( trace_t *ptr, const Vector &mins, const Vector &maxs, const Vector &start, const Vector &end )
+void CPhysicsEnvironment::TraceBox( trace_t *, const Vector &, const Vector &, const Vector &, const Vector & )
 {
 	// UNDONE: Need this?
 }
@@ -1704,7 +1707,7 @@ void CPhysicsEnvironment::SetCollisionSolver( IPhysicsCollisionSolver *pSolver )
 
 void CPhysicsEnvironment::ClearDeadObjects( void )
 {
-	for ( int i = 0; i < m_deadObjects.Count(); i++ )
+	for ( intp i = 0; i < m_deadObjects.Count(); i++ )
 	{
 		CPhysicsObject *pObject = (CPhysicsObject *)m_deadObjects.Element(i);
 
@@ -1732,7 +1735,7 @@ void CPhysicsEnvironment::RemovePlayerController( IPhysicsPlayerController *pCon
 
 IPhysicsPlayerController *CPhysicsEnvironment::FindPlayerController( IPhysicsObject *pPhysicsObject )
 {
-	for ( int i = m_playerControllers.Count()-1; i >= 0; --i )
+	for ( intp i = m_playerControllers.Count()-1; i >= 0; --i )
 	{
 		if ( m_playerControllers[i]->GetObject() == pPhysicsObject )
 			return m_playerControllers[i];
@@ -1838,7 +1841,7 @@ void CPhysicsEnvironment::CleanupDeleteList()
 
 bool CPhysicsEnvironment::IsCollisionModelUsed( CPhysCollide *pCollide ) const
 {
-	int i;
+	intp i;
 
 	for ( i = m_deadObjects.Count()-1; i >= 0; --i )
 	{
@@ -1885,12 +1888,12 @@ IPhysicsObject *CPhysicsEnvironment::CreateSphereObject( float radius, int mater
 	return pObject;
 }
 
-void CPhysicsEnvironment::TraceRay( const Ray_t &ray, unsigned int fMask, IPhysicsTraceFilter *pTraceFilter, trace_t *pTrace )
+void CPhysicsEnvironment::TraceRay( const Ray_t &, unsigned int, IPhysicsTraceFilter *, trace_t * )
 {
 }
 
-void CPhysicsEnvironment::SweepCollideable( const CPhysCollide *pCollide, const Vector &vecAbsStart, const Vector &vecAbsEnd, 
-		const QAngle &vecAngles, unsigned int fMask, IPhysicsTraceFilter *pTraceFilter, trace_t *pTrace )
+void CPhysicsEnvironment::SweepCollideable( const CPhysCollide *, const Vector &, const Vector &, 
+		const QAngle &, unsigned int, IPhysicsTraceFilter *, trace_t * )
 {
 }
 
@@ -2119,7 +2122,7 @@ public:
 	}
 
 	// add a pair (constant time)
-	virtual void AddObjectPair( void *pObject0, void *pObject1 )
+	void AddObjectPair( void *pObject0, void *pObject1 ) override
 	{
 		if ( IsObjectPairInHash(pObject0,pObject1) )
 			return;
@@ -2131,7 +2134,7 @@ public:
 	}
 
 	// remove a pair (linear time x 2)
-	virtual void RemoveObjectPair( void *pObject0, void *pObject1 )
+	void RemoveObjectPair( void *pObject0, void *pObject1 ) override
 	{
 		if ( !IsObjectPairInHash(pObject0,pObject1) )
 			return;
@@ -2143,12 +2146,12 @@ public:
 	}
 	
 	// check for pair presence (fast constant time)
-	virtual bool IsObjectPairInHash( void *pObject0, void *pObject1 )
+	bool IsObjectPairInHash( void *pObject0, void *pObject1 ) override
 	{
 		return m_pairHash.HasPair( pObject0, pObject1 );
 	}
 
-	virtual void RemoveAllPairsForObject( void *pObject )
+	void RemoveAllPairsForObject( void *pObject ) override
 	{
 		unsigned short listIndex = GetListForObject( pObject );
 		if ( !m_objectList.IsValidList( listIndex ) )
@@ -2169,7 +2172,7 @@ public:
 	}
 
 	// Gets the # of dependencies for a particular entity
-	virtual int GetPairCountForObject( void *pObject0 )
+	int GetPairCountForObject( void *pObject0 ) override
 	{
 		unsigned short listIndex = GetListForObject( pObject0 );
 		if ( !m_objectList.IsValidList( listIndex ) )
@@ -2186,7 +2189,7 @@ public:
 	}
 
 	// Gets all dependencies for a particular entity
-	virtual int GetPairListForObject( void *pObject0, int nMaxCount, void **ppObjectList )
+	int GetPairListForObject( void *pObject0, int nMaxCount, void **ppObjectList ) override
 	{
 		unsigned short listIndex = GetListForObject( pObject0 );
 		if ( !m_objectList.IsValidList( listIndex ) )
@@ -2204,7 +2207,7 @@ public:
 		return nCount;
 	}
 
-	virtual bool IsObjectInHash( void *pObject0 )
+	bool IsObjectInHash( void *pObject0 ) override
 	{
 		return m_pObjectHash->find_elem(pObject0) != NULL ? true : false;
 	}

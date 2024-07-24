@@ -48,90 +48,90 @@ public:
 	{
 		memset(m_bboxVertMap, 0, sizeof(m_bboxVertMap));
 	}
-	CPhysConvex	*ConvexFromVerts( Vector **pVerts, int vertCount );
+	CPhysConvex	*ConvexFromVerts( Vector **pVerts, int vertCount ) override;
 	CPhysConvex	*ConvexFromVertsFast( Vector **pVerts, int vertCount );
-	CPhysConvex	*ConvexFromPlanes( float *pPlanes, int planeCount, float mergeDistance );
-	CPhysConvex *ConvexFromConvexPolyhedron( const CPolyhedron &ConvexPolyhedron );
-	void ConvexesFromConvexPolygon( const Vector &vPolyNormal, const Vector *pPoints, int iPointCount, CPhysConvex **pOutput );
+	CPhysConvex	*ConvexFromPlanes( float *pPlanes, int planeCount, float mergeDistance ) override;
+	CPhysConvex *ConvexFromConvexPolyhedron( const CPolyhedron &ConvexPolyhedron ) override;
+	void ConvexesFromConvexPolygon( const Vector &vPolyNormal, const Vector *pPoints, int iPointCount, CPhysConvex **pOutput ) override;
 	CPhysConvex	*RebuildConvexFromPlanes( CPhysConvex *pConvex, float mergeDistance );
-	float ConvexVolume( CPhysConvex *pConvex );
-	float ConvexSurfaceArea( CPhysConvex *pConvex );
-	CPhysCollide *ConvertConvexToCollide( CPhysConvex **pConvex, int convexCount );
-	CPhysCollide *ConvertConvexToCollideParams( CPhysConvex **pConvex, int convexCount, const convertconvexparams_t &convertParams );
+	float ConvexVolume( CPhysConvex *pConvex ) override;
+	float ConvexSurfaceArea( CPhysConvex *pConvex ) override;
+	CPhysCollide *ConvertConvexToCollide( CPhysConvex **pConvex, int convexCount ) override;
+	CPhysCollide *ConvertConvexToCollideParams( CPhysConvex **pConvex, int convexCount, const convertconvexparams_t &convertParams ) override;
 
 	
-	CPolyhedron *PolyhedronFromConvex( CPhysConvex * const pConvex, bool bUseTempPolyhedron );
-	int GetConvexesUsedInCollideable( const CPhysCollide *pCollideable, CPhysConvex **pOutputArray, int iOutputArrayLimit );
+	CPolyhedron *PolyhedronFromConvex( CPhysConvex * const pConvex, bool bUseTempPolyhedron ) override;
+	int GetConvexesUsedInCollideable( const CPhysCollide *pCollideable, CPhysConvex **pOutputArray, int iOutputArrayLimit ) override;
 
 	// store game-specific data in a convex solid
-	void SetConvexGameData( CPhysConvex *pConvex, unsigned int gameData );
-	void ConvexFree( CPhysConvex *pConvex );
+	void SetConvexGameData( CPhysConvex *pConvex, unsigned int gameData ) override;
+	void ConvexFree( CPhysConvex *pConvex ) override;
 	
-	CPhysPolysoup *PolysoupCreate( void );
-	void PolysoupDestroy( CPhysPolysoup *pSoup );
-	void PolysoupAddTriangle( CPhysPolysoup *pSoup, const Vector &a, const Vector &b, const Vector &c, int materialIndex7bits );
-	CPhysCollide *ConvertPolysoupToCollide( CPhysPolysoup *pSoup, bool useMOPP = true );
+	CPhysPolysoup *PolysoupCreate( void ) override;
+	void PolysoupDestroy( CPhysPolysoup *pSoup ) override;
+	void PolysoupAddTriangle( CPhysPolysoup *pSoup, const Vector &a, const Vector &b, const Vector &c, int materialIndex7bits ) override;
+	CPhysCollide *ConvertPolysoupToCollide( CPhysPolysoup *pSoup, bool useMOPP = true ) override;
 
-	int	CollideSize( CPhysCollide *pCollide );
-	int	CollideWrite( char *pDest, CPhysCollide *pCollide, bool bSwap = false );
+	int	CollideSize( CPhysCollide *pCollide ) override;
+	int	CollideWrite( char *pDest, CPhysCollide *pCollide, bool bSwap = false ) override;
 	// Get the AABB of an oriented collide
-	virtual void CollideGetAABB( Vector *pMins, Vector *pMaxs, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles );
-	virtual Vector CollideGetExtent( const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, const Vector &direction );
+	void CollideGetAABB( Vector *pMins, Vector *pMaxs, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles ) override;
+	Vector CollideGetExtent( const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, const Vector &direction ) override;
 	// compute the volume of a collide
-	virtual float			CollideVolume( CPhysCollide *pCollide );
-	virtual float			CollideSurfaceArea( CPhysCollide *pCollide );
+	float			CollideVolume( CPhysCollide *pCollide ) override;
+	float			CollideSurfaceArea( CPhysCollide *pCollide ) override;
 
 	// Free a collide that was created with ConvertConvexToCollide()
 	// UNDONE: Move this up near the other Collide routines when the version is changed
-	virtual void			DestroyCollide( CPhysCollide *pCollide );
+	void			DestroyCollide( CPhysCollide *pCollide ) override;
 
-	CPhysCollide *BBoxToCollide( const Vector &mins, const Vector &maxs );
-	CPhysConvex	*BBoxToConvex( const Vector &mins, const Vector &maxs );
+	CPhysCollide *BBoxToCollide( const Vector &mins, const Vector &maxs ) override;
+	CPhysConvex	*BBoxToConvex( const Vector &mins, const Vector &maxs ) override;
 
 	// loads a set of solids into a vcollide_t
-	virtual void			VCollideLoad( vcollide_t *pOutput, int solidCount, const char *pBuffer, int size, bool swap );
+	void			VCollideLoad( vcollide_t *pOutput, int solidCount, const char *pBuffer, int size, bool swap ) override;
 	// destroyts the set of solids created by VCollideLoad
-	virtual void			VCollideUnload( vcollide_t *pVCollide );
+	void			VCollideUnload( vcollide_t *pVCollide ) override;
 
 	// Trace an AABB against a collide
-	void TraceBox( const Vector &start, const Vector &end, const Vector &mins, const Vector &maxs, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, trace_t *ptr );
-	void TraceBox( const Ray_t &ray, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, trace_t *ptr );
-	void TraceBox( const Ray_t &ray, unsigned int contentsMask, IConvexInfo *pConvexInfo, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, trace_t *ptr );
+	void TraceBox( const Vector &start, const Vector &end, const Vector &mins, const Vector &maxs, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, trace_t *ptr ) override;
+	void TraceBox( const Ray_t &ray, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, trace_t *ptr ) override;
+	void TraceBox( const Ray_t &ray, unsigned int contentsMask, IConvexInfo *pConvexInfo, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, trace_t *ptr ) override;
 	// Trace one collide against another
-	void TraceCollide( const Vector &start, const Vector &end, const CPhysCollide *pSweepCollide, const QAngle &sweepAngles, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, trace_t *ptr );
-	bool IsBoxIntersectingCone( const Vector &boxAbsMins, const Vector &boxAbsMaxs, const truncatedcone_t &cone );
+	void TraceCollide( const Vector &start, const Vector &end, const CPhysCollide *pSweepCollide, const QAngle &sweepAngles, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, trace_t *ptr ) override;
+	bool IsBoxIntersectingCone( const Vector &boxAbsMins, const Vector &boxAbsMaxs, const truncatedcone_t &cone ) override;
 
 	// begins parsing a vcollide.  NOTE: This keeps pointers to the text
 	// If you delete the text and call members of IVPhysicsKeyParser, it will crash
-	virtual IVPhysicsKeyParser	*VPhysicsKeyParserCreate( const char *pKeyData );
+	IVPhysicsKeyParser	*VPhysicsKeyParserCreate( const char *pKeyData ) override;
 	// Free the parser created by VPhysicsKeyParserCreate
-	virtual void			VPhysicsKeyParserDestroy( IVPhysicsKeyParser *pParser );
+	void			VPhysicsKeyParserDestroy( IVPhysicsKeyParser *pParser ) override;
 
 	// creates a list of verts from a collision mesh
-	int	CreateDebugMesh( const CPhysCollide *pCollisionModel, Vector **outVerts );
+	int	CreateDebugMesh( const CPhysCollide *pCollisionModel, Vector **outVerts ) override;
 	// destroy the list of verts created by CreateDebugMesh
-	void DestroyDebugMesh( int vertCount, Vector *outVerts );
+	void DestroyDebugMesh( int vertCount, Vector *outVerts ) override;
 	// create a queryable version of the collision model
-	ICollisionQuery *CreateQueryModel( CPhysCollide *pCollide );
+	ICollisionQuery *CreateQueryModel( CPhysCollide *pCollide ) override;
 	// destroy the queryable version
-	void DestroyQueryModel( ICollisionQuery *pQuery );
+	void DestroyQueryModel( ICollisionQuery *pQuery ) override;
 
-	virtual IPhysicsCollision *ThreadContextCreate( void );
-	virtual void			ThreadContextDestroy( IPhysicsCollision *pThreadContex );
-	virtual unsigned int	ReadStat( int statID ) { return 0; }
-	virtual void			CollideGetMassCenter( CPhysCollide *pCollide, Vector *pOutMassCenter );
-	virtual void			CollideSetMassCenter( CPhysCollide *pCollide, const Vector &massCenter );
+	IPhysicsCollision *ThreadContextCreate( void ) override;
+	void			ThreadContextDestroy( IPhysicsCollision *pThreadContex ) override;
+	unsigned int	ReadStat( int ) override { return 0; }
+	void			CollideGetMassCenter( CPhysCollide *pCollide, Vector *pOutMassCenter ) override;
+	void			CollideSetMassCenter( CPhysCollide *pCollide, const Vector &massCenter ) override;
 
-	virtual int				CollideIndex( const CPhysCollide *pCollide );
-	virtual Vector			CollideGetOrthographicAreas( const CPhysCollide *pCollide );
-	virtual void			OutputDebugInfo( const CPhysCollide *pCollide );
-	virtual CPhysCollide	*CreateVirtualMesh(const virtualmeshparams_t &params) { return ::CreateVirtualMesh(params); }
-	virtual bool			GetBBoxCacheSize( int *pCachedSize, int *pCachedCount );
+	int				CollideIndex( const CPhysCollide *pCollide ) override;
+	Vector			CollideGetOrthographicAreas( const CPhysCollide *pCollide ) override;
+	void			OutputDebugInfo( const CPhysCollide *pCollide ) override;
+	CPhysCollide	*CreateVirtualMesh(const virtualmeshparams_t &params) override { return ::CreateVirtualMesh(params); }
+	bool			GetBBoxCacheSize( unsigned *pCachedSize, intp *pCachedCount ) override;
 
-	virtual bool			SupportsVirtualMesh() { return true; }
+	bool			SupportsVirtualMesh() override { return true; }
 
-	virtual CPhysCollide	*UnserializeCollide( char *pBuffer, int size, int index );
-	virtual void			CollideSetOrthographicAreas( CPhysCollide *pCollide, const Vector &areas );
+	CPhysCollide	*UnserializeCollide( char *pBuffer, int size, int index ) override;
+	void			CollideSetOrthographicAreas( CPhysCollide *pCollide, const Vector &areas ) override;
 
 private:
 	void InitBBoxCache();
@@ -255,20 +255,20 @@ public:
 	void Init( const char *pBuffer, unsigned int size, int index, bool swap = false );
 
 	// IPhysCollide
-	virtual int GetVCollideIndex() const { return m_pCompactSurface->dummy[0]; }
-	virtual IVP_SurfaceManager *CreateSurfaceManager( short & ) const;
-	virtual void GetAllLedges( IVP_U_BigVector<IVP_Compact_Ledge> &ledges ) const;
-	virtual unsigned int GetSerializationSize() const;
-	virtual Vector GetMassCenter() const;
-	virtual void SetMassCenter( const Vector &massCenter );
-	virtual unsigned int SerializeToBuffer( char *pDest, bool bSwap = false ) const;
-	virtual Vector GetOrthographicAreas() const;
-	void SetOrthographicAreas( const Vector &areas );
-	virtual void ComputeOrthographicAreas( float epsilon );
-	virtual void OutputDebugInfo() const;
+	int GetVCollideIndex() const override { return m_pCompactSurface->dummy[0]; }
+	IVP_SurfaceManager *CreateSurfaceManager( short & ) const override;
+	void GetAllLedges( IVP_U_BigVector<IVP_Compact_Ledge> &ledges ) const override;
+	unsigned int GetSerializationSize() const override;
+	Vector GetMassCenter() const override;
+	void SetMassCenter( const Vector &massCenter ) override;
+	unsigned int SerializeToBuffer( char *pDest, bool bSwap = false ) const override;
+	Vector GetOrthographicAreas() const override;
+	void SetOrthographicAreas( const Vector &areas ) override;
+	void ComputeOrthographicAreas( float epsilon ) override;
+	void OutputDebugInfo() const override;
 
-	const IVP_Compact_Surface		*GetCompactSurface() const { return m_pCompactSurface; }
-	virtual const collidemap_t *GetCollideMap() const { return m_pCollideMap; }
+	const IVP_Compact_Surface		*GetCompactSurface() const override { return m_pCompactSurface; }
+	const collidemap_t *GetCollideMap() const override { return m_pCollideMap; }
 
 private:
 
@@ -559,7 +559,6 @@ void CPhysCollideCompactSurface::ComputeOrthographicAreas( float epsilon )
 	float side = sqrt( epsilon );
 	if ( side < 1e-4f )
 		side = 1e-4f;
-	Vector size = maxs-mins;
 
 	m_orthoAreas.Init(1,1,1);
 	trace_t tr;
@@ -569,7 +568,7 @@ void CPhysCollideCompactSurface::ComputeOrthographicAreas( float epsilon )
 		int v = (axis+2)%3;
 		int hits = 0;
 		int total = 0;
-		float halfSide = side * 0.5;
+		float halfSide = side * 0.5f;
 		for ( float u0 = mins[u] + halfSide; u0 < maxs[u]; u0 += side )
 		{
 			for ( float v0 = mins[v] + halfSide; v0 < maxs[v]; v0 += side )
@@ -801,14 +800,14 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	
 	int iHighestPointIndex = 0;
 	const IVP_Compact_Triangle *pTri = pLedge->get_first_triangle();
-	for( int i = 0; i != iTriangles; ++i )
+	for( int i = 0; i < iTriangles; ++i )
 	{
 		//reverse point ordering while creating edges
 		pTriangles[i].Edges[2].iPointIndices[1] = pTriangles[i].Edges[0].iPointIndices[0] = pTri->get_edge( 2 )->get_start_point_index();
 		pTriangles[i].Edges[0].iPointIndices[1] = pTriangles[i].Edges[1].iPointIndices[0] = pTri->get_edge( 1 )->get_start_point_index();
 		pTriangles[i].Edges[1].iPointIndices[1] = pTriangles[i].Edges[2].iPointIndices[0] = pTri->get_edge( 0 )->get_start_point_index();
 
-		for( int j = 0; j != 3; ++j )
+		for( int j = 0; j < 3; ++j )
 		{
 			//get_n_points() has a whole bunch of ifdefs that apparently disable it in this case, detect number of points
 			if( pTriangles[i].Edges[j].iPointIndices[0] > iHighestPointIndex )
@@ -993,7 +992,7 @@ void CPhysicsCollision::ConvexesFromConvexPolygon( const Vector &vPolyNormal, co
 
 	//convert coordinates
 	{
-		for( int i = 0; i != iPointCount; ++i )
+		for( int i = 0; i < iPointCount; ++i )
 			ConvertPositionToIVP( pPoints[i], pIVP_Points[i] );
 	}
 
@@ -1089,7 +1088,7 @@ static float TriangleArea( const Vector &p0, const Vector &p1, const Vector &p2 
 	Vector cross;
 
 	CrossProduct( e0, e1, cross );
-	return 0.5 * cross.Length();
+	return 0.5f * cross.Length();
 }
 
 
@@ -1259,7 +1258,7 @@ void CPhysicsCollision::InitBBoxCache()
 	for ( int i = 0; i < 8; i++ )
 	{
 		int nearest = -1;
-		float minDist = 0.1;
+		float minDist = 0.1f;
 		Vector tmp;
 		ConvertPositionToHL( pPoints[i], tmp );
 		for ( int j = 0; j < 8; j++ )
@@ -1329,7 +1328,7 @@ CPhysCollide *CPhysicsCollision::BBoxToCollide( const Vector &mins, const Vector
 bool CPhysicsCollision::IsBBoxCache( CPhysCollide *pCollide )
 {
 	// UNDONE: Sort the list so it can be searched spatially instead of linearly?
-	for ( int i = m_bboxCache.Count()-1; i >= 0; i-- )
+	for ( intp i = m_bboxCache.Count()-1; i >= 0; i-- )
 	{
 		if ( m_bboxCache[i].pCollide == pCollide )
 			return true;
@@ -1339,7 +1338,7 @@ bool CPhysicsCollision::IsBBoxCache( CPhysCollide *pCollide )
 
 void CPhysicsCollision::AddBBoxCache( CPhysCollideCompactSurface *pCollide, const Vector &mins, const Vector &maxs )
 {
-	int index = m_bboxCache.AddToTail();
+	auto index = m_bboxCache.AddToTail();
 	bboxcache_t *pCache = &m_bboxCache[index];
 	pCache->pCollide = pCollide;
 	pCache->mins = mins;
@@ -1348,7 +1347,7 @@ void CPhysicsCollision::AddBBoxCache( CPhysCollideCompactSurface *pCollide, cons
 
 CPhysCollideCompactSurface *CPhysicsCollision::GetBBoxCache( const Vector &mins, const Vector &maxs )
 {
-	for ( int i = m_bboxCache.Count()-1; i >= 0; i-- )
+	for ( intp i = m_bboxCache.Count()-1; i >= 0; i-- )
 	{
 		if ( m_bboxCache[i].mins == mins && m_bboxCache[i].maxs == maxs )
 			return m_bboxCache[i].pCollide;
@@ -1435,7 +1434,7 @@ void CPhysicsCollision::PolysoupAddTriangle( CPhysPolysoup *pSoup, const Vector 
 	pSoup->m_builderSoup.insert_ledge(pLedge);
 }
 
-CPhysCollide *CPhysicsCollision::ConvertPolysoupToCollide( CPhysPolysoup *pSoup, bool useMOPP )
+CPhysCollide *CPhysicsCollision::ConvertPolysoupToCollide( CPhysPolysoup *pSoup, [[maybe_unused]] bool useMOPP )
 {
 	if ( !pSoup->m_isValid )
 		return NULL;
@@ -1532,7 +1531,7 @@ int CPhysicsCollision::CreateDebugMesh( const CPhysCollide *pCollisionModel, Vec
 }
 
 
-void CPhysicsCollision::DestroyDebugMesh( int vertCount, Vector *outVerts )
+void CPhysicsCollision::DestroyDebugMesh( int, Vector *outVerts )
 {
 	delete[] outVerts;
 }
@@ -1715,7 +1714,7 @@ IPhysicsCollision *CPhysicsCollision::ThreadContextCreate( void )
 	return this;
 }
 
-void CPhysicsCollision::ThreadContextDestroy( IPhysicsCollision *pThreadContext )
+void CPhysicsCollision::ThreadContextDestroy( IPhysicsCollision * )
 {
 }
 
@@ -1756,11 +1755,11 @@ void CPhysicsCollision::OutputDebugInfo( const CPhysCollide *pCollide )
 	pCollide->OutputDebugInfo();
 }
 
-bool CPhysicsCollision::GetBBoxCacheSize( int *pCachedSize, int *pCachedCount )
+bool CPhysicsCollision::GetBBoxCacheSize( unsigned *pCachedSize, intp *pCachedCount )
 {
 	*pCachedSize = 0;
 	*pCachedCount = m_bboxCache.Count();
-	for ( int i = 0; i < *pCachedCount; i++ )
+	for ( intp i = 0; i < *pCachedCount; i++ )
 	{
 		*pCachedSize += m_bboxCache[i].pCollide->GetSerializationSize();
 	}
@@ -1774,23 +1773,23 @@ public:
 	~CCollisionQuery( void ) {}
 
 	// number of convex pieces in the whole solid
-	virtual int		ConvexCount( void );
+	int		ConvexCount( void ) override;
 	// triangle count for this convex piece
-	virtual int		TriangleCount( int convexIndex );
+	int		TriangleCount( int convexIndex ) override;
 	
 	// get the stored game data
-	virtual unsigned int GetGameData( int convexIndex );
+	unsigned int GetGameData( int convexIndex ) override;
 
 	// Gets the triangle's verts to an array
-	virtual void	GetTriangleVerts( int convexIndex, int triangleIndex, Vector *verts );
+	void	GetTriangleVerts( int convexIndex, int triangleIndex, Vector *verts ) override;
 	
 	// UNDONE: This doesn't work!!!
-	virtual void	SetTriangleVerts( int convexIndex, int triangleIndex, const Vector *verts );
+	void	SetTriangleVerts( int convexIndex, int triangleIndex, const Vector *verts ) override;
 	
 	// returns the 7-bit material index
-	virtual int		GetTriangleMaterialIndex( int convexIndex, int triangleIndex );
+	int		GetTriangleMaterialIndex( int convexIndex, int triangleIndex ) override;
 	// sets a 7-bit material index for this triangle
-	virtual void	SetTriangleMaterialIndex( int convexIndex, int triangleIndex, int index7bits );
+	void	SetTriangleMaterialIndex( int convexIndex, int triangleIndex, int index7bits ) override;
 
 private:
 	IVP_Compact_Triangle *Triangle( IVP_Compact_Ledge *pLedge, int triangleIndex );

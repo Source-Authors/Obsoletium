@@ -26,8 +26,16 @@ struct shadowcontrol_params_t
 {
 	shadowcontrol_params_t() 
 	{ 
+		targetPosition.set_to_zero(); 
+		targetRotation.set(0.0, 0.0, 0.0f); 
 		lastPosition.set_to_zero(); 
 		lastImpulse.set_to_zero();
+		maxAngular = FP_NAN;
+		maxDampAngular = FP_NAN;
+		maxSpeed = FP_NAN;
+		maxDampSpeed = FP_NAN;
+		dampFactor = FP_NAN;
+		teleportDistance = FP_NAN;
 	}
 
 	IVP_U_Point			targetPosition;
