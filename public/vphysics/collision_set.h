@@ -11,7 +11,7 @@
 class IPhysicsCollisionSet
 {
 public:
-	~IPhysicsCollisionSet() {}
+	virtual ~IPhysicsCollisionSet() {}
 
 	virtual void EnableCollisions( int index0, int index1 ) = 0;
 	virtual void DisableCollisions( int index0, int index1 ) = 0;

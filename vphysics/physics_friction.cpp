@@ -24,23 +24,23 @@ public:
 	CFrictionSnapshot( IVP_Real_Object *pObject );
 	~CFrictionSnapshot();
 
-	bool IsValid();
+	bool IsValid() override;
 
 	// Object 0 is this object, Object 1 is the other object
-	IPhysicsObject *GetObject( int index );
-	int GetMaterial( int index );
+	IPhysicsObject *GetObject( int index ) override;
+	int GetMaterial( int index ) override;
 
-	void GetContactPoint( Vector &out );
-	void GetSurfaceNormal( Vector &out );
-	float GetNormalForce();
-	float GetEnergyAbsorbed();
-	void RecomputeFriction();
-	void ClearFrictionForce();
+	void GetContactPoint( Vector &out ) override;
+	void GetSurfaceNormal( Vector &out ) override;
+	float GetNormalForce() override;
+	float GetEnergyAbsorbed() override;
+	void RecomputeFriction() override;
+	void ClearFrictionForce() override;
 
-	void MarkContactForDelete();
-	void DeleteAllMarkedContacts( bool wakeObjects );
-	void NextFrictionData();
-	float GetFrictionCoefficient();
+	void MarkContactForDelete() override;
+	void DeleteAllMarkedContacts( bool wakeObjects ) override;
+	void NextFrictionData() override;
+	float GetFrictionCoefficient() override;
 
 
 private:
@@ -68,13 +68,13 @@ void CFrictionSnapshot::DeleteAllMarkedContacts( bool wakeObjects )
 	if ( !m_pDeleteList )
 		return;
 
-	for ( int i = 0; i < m_pDeleteList->Count(); i++ )
+	for ( auto *o : *m_pDeleteList )
 	{
 		if ( wakeObjects )
 		{
-			m_pDeleteList->Element(i)->ensure_in_simulation();
+			o->ensure_in_simulation();
 		}
-		DeleteAllFrictionPairs( m_pObject, m_pDeleteList->Element(i) );
+		DeleteAllFrictionPairs( m_pObject, o );
 	}
 	m_pFriction = NULL;
 }

@@ -37,8 +37,13 @@
 // Torque is applied using impulses (kg*degrees/s)
 // ------------------------------------------------------------------------------------
 
-#define METERS_PER_INCH					(0.0254f)
-#define CUBIC_METERS_PER_CUBIC_INCH		(METERS_PER_INCH*METERS_PER_INCH*METERS_PER_INCH)
+/**
+ * @brief Meters per inch.
+ */
+constexpr inline float METERS_PER_INCH{0.0254f};
+
+constexpr inline float CUBIC_METERS_PER_CUBIC_INCH{METERS_PER_INCH*METERS_PER_INCH*METERS_PER_INCH};
+
 // 2.2 lbs / kg
 #define POUNDS_PER_KG	(2.2f)
 #define KG_PER_POUND	(1.0f/POUNDS_PER_KG)
@@ -289,7 +294,7 @@ public:
 	virtual bool			SupportsVirtualMesh() = 0;
 
 
-	virtual bool			GetBBoxCacheSize( int *pCachedSize, int *pCachedCount ) = 0;
+	virtual bool			GetBBoxCacheSize( unsigned *pCachedSize, intp *pCachedCount ) = 0;
 
 	
 	// extracts a polyhedron that defines a CPhysConvex's shape
@@ -476,7 +481,7 @@ public:
 	virtual void DetachObject( IPhysicsObject *pObject ) = 0;
 
 	// returns the number of objects currently attached to the controller
-	virtual int CountObjects( void ) = 0;
+	virtual intp CountObjects( void ) = 0;
 	// NOTE: pObjectList is an array with at least CountObjects() allocated
 	virtual void GetObjects( IPhysicsObject **pObjectList ) = 0;
 	// detaches all attached objects
@@ -622,7 +627,7 @@ public:
 
 	virtual int				GetActiveObjectCount() const = 0;
 	virtual void			GetActiveObjects( IPhysicsObject **pOutputObjectList ) const = 0;
-	virtual const IPhysicsObject **GetObjectList( int *pOutputObjectCount ) const = 0;
+	virtual const IPhysicsObject **GetObjectList( intp *pOutputObjectCount ) const = 0;
 	virtual bool			TransferObject( IPhysicsObject *pObject, IPhysicsEnvironment *pDestinationEnvironment ) = 0;
 
 	virtual void			CleanupDeleteList( void ) = 0;
@@ -970,7 +975,7 @@ public:
 	virtual ~IPhysicsSurfaceProps( void ) {}
 
 	// parses a text file containing surface prop keys
-	virtual int		ParseSurfaceData( const char *pFilename, const char *pTextfile ) = 0;
+	virtual intp		ParseSurfaceData( const char *pFilename, const char *pTextfile ) = 0;
 	// current number of entries in the database
 	virtual intp		SurfacePropCount( void ) const = 0;
 
@@ -985,7 +990,7 @@ public:
 
 	// sets the global index table for world materials
 	// UNDONE: Make this per-CPhysCollide
-	virtual void	SetWorldMaterialIndexTable( int *pMapArray, int mapSize ) = 0;
+	virtual void	SetWorldMaterialIndexTable( intp *pMapArray, int mapSize ) = 0;
 
 	// NOTE: Same as GetPhysicsProperties, but maybe more convenient
 	virtual void	GetPhysicsParameters( intp surfaceDataIndex, surfacephysicsparams_t *pParamsOut ) const = 0;
@@ -1021,7 +1026,14 @@ struct fluidparams_t
 	bool		useAerodynamics;// true if this controller should calculate surface pressure
 	int			contents;
 
-	fluidparams_t() : pGameData{nullptr} {}
+	fluidparams_t()
+            : currentVelocity{vec3_invalid},
+              damping{FLOAT32_NAN},
+              torqueFactor{FLOAT32_NAN},
+              viscosityFactor{FLOAT32_NAN},
+              pGameData{nullptr},
+              useAerodynamics{true},
+              contents{-1} {}
 	fluidparams_t( fluidparams_t const& src )
 	{
 		Vector4DCopy( src.surfacePlane, surfacePlane );
@@ -1032,6 +1044,21 @@ struct fluidparams_t
 		pGameData = src.pGameData;
 		useAerodynamics = src.useAerodynamics;
 		contents = src.contents;
+	}
+	fluidparams_t& operator=( fluidparams_t const& src )
+	{
+		if ( &src == this ) return *this;
+
+		Vector4DCopy( src.surfacePlane, surfacePlane );
+		VectorCopy( src.currentVelocity, currentVelocity );
+		damping = src.damping;
+		torqueFactor = src.torqueFactor;
+		viscosityFactor = src.viscosityFactor;
+		pGameData = src.pGameData;
+		useAerodynamics = src.useAerodynamics;
+		contents = src.contents;
+
+		return *this;
 	}
 };
 
@@ -1087,7 +1114,7 @@ struct convertconvexparams_t
 		buildOuterConvexHull = false;
 		buildDragAxisAreas = false;
 		buildOptimizedTraceTables = false;
-		pForcedOuterHull = NULL;
+		pForcedOuterHull = nullptr;
 	}
 };
 

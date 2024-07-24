@@ -35,10 +35,10 @@
 // turn this on to get asserts in the low-level collision solver
 #define CHECK_TOI_CALCS 0
 
-#define BRUTE_FORCE_VERT_COUNT 128
+constexpr inline int BRUTE_FORCE_VERT_COUNT{128};
 
 // NOTE: This is in inches (HL units)
-#define TEST_EPSILON	(g_PhysicsUnits.collisionSweepIncrementalEpsilon)
+const float TEST_EPSILON{g_PhysicsUnits.collisionSweepIncrementalEpsilon};
 
 struct simplexvert_t
 {
@@ -67,7 +67,7 @@ struct simplex_t
 	float ClipRayToTriangle( const Vector &dir, float epsilon );
 };
 
-class CTraceCone : public ITraceObject
+class CTraceCone final : public ITraceObject
 {
 public:
 	CTraceCone( const truncatedcone_t &cone, const Vector &translation )
@@ -80,7 +80,7 @@ public:
 		m_centerBase = m_cone.origin + m_cone.h * m_cone.normal;
 	}
 
-	virtual int SupportMap( const Vector &dir, Vector *pOut ) const
+	unsigned short SupportMap( const Vector &dir, Vector *pOut ) const override
 	{
 		Vector unitDir = dir;
 		VectorNormalize(unitDir);
@@ -111,8 +111,8 @@ public:
 	}
 
 	// BUGBUG: Doesn't work!
-	virtual Vector GetVertByIndex( int index ) const { return  m_cone.origin; }
-	virtual float Radius( void ) const { return m_cone.h + m_radius; }
+	Vector GetVertByIndex( int index ) const override { return  m_cone.origin; }
+	float Radius( void ) const override { return m_cone.h + m_radius; }
 
 	truncatedcone_t	m_cone;
 	float			m_radius;
@@ -196,6 +196,7 @@ void InitLeafmap( IVP_Compact_Ledge *pLedge, leafmap_t *pLeafmapOut )
 		if ( triCount <= BRUTE_FORCE_VERT_COUNT*4 )
 		{
 			Assert(triCount>0);
+
 			int minV = MAX_CONVEX_VERTS;
 			int maxV = 0;
 			for ( int i = 0; i < triCount; i++ )
@@ -315,7 +316,7 @@ void FreeVisitHash(CVisitHash *pFree)
 //-----------------------------------------------------------------------------
 // Purpose: Implementation for Trace against an IVP object
 //-----------------------------------------------------------------------------
-class CTraceIVP : public ITraceObject
+class CTraceIVP final : public ITraceObject
 {
 public:
 	CTraceIVP( const CPhysCollide *pCollide, const Vector &origin, const QAngle &angles );
@@ -324,13 +325,13 @@ public:
 		if ( m_pVisitHash )
 			FreeVisitHash(m_pVisitHash);
 	}
-	virtual int SupportMap( const Vector &dir, Vector *pOut ) const;
-	virtual Vector GetVertByIndex( int index ) const;
+	unsigned short SupportMap( const Vector &dir, Vector *pOut ) const override;
+	Vector GetVertByIndex( int index ) const override;
 
 	// UNDONE: Do general ITraceObject center/offset computation and move the ray to account
 	// for this delta like we do in TraceSweepIVP()
 	// Then we can shrink the radius of objects with mass centers NOT at the origin
-	virtual float Radius( void ) const 
+	float Radius( void ) const override
 	{ 
 		return m_radius;
 	}
@@ -440,8 +441,8 @@ private:
 	IVP_U_Matrix				m_matrix;
 	// transform that includes scale from IVP to HL coords, do not VectorITransform or VectorRotate with this
 	float						m_radius;
-	int							m_nPointTest;
-	int							m_nStartPoint;
+	// int							m_nPointTest;
+	// int							m_nStartPoint;
 	bool						m_bHasTranslation;
 #if USE_VERT_CACHE
 	int							m_cacheCount;	// number of FourVectors used
@@ -464,12 +465,14 @@ FORCEINLINE fltx4 XM_CALLCONV ConvertDirectionToIVP( DirectX::FXMVECTOR a )
 }
 
 CTraceIVP::CTraceIVP( const CPhysCollide *pCollide, const Vector &origin, const QAngle &angles )
+    : m_pLeafmap(nullptr), m_cacheCount(0)
 {
 #if USE_COLLIDE_MAP
 	m_pCollideMap = pCollide->GetCollideMap();
 #else
 	m_pCollideMap = NULL;
 #endif
+
 	m_pSurface = pCollide->GetCompactSurface();
 	m_pLedge = NULL;
 	m_pVisitHash = NULL;
@@ -710,7 +713,7 @@ int CTraceIVP::SupportMapCached( const Vector &dir, Vector *pOut ) const
 #endif
 }
 
-int CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
+unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 {
 #if USE_VERT_CACHE
 	if ( m_cacheCount )
@@ -840,13 +843,13 @@ Vector CTraceIVP::GetVertByIndex( int index ) const
 //-----------------------------------------------------------------------------
 // Purpose: Implementation for Trace against an AABB
 //-----------------------------------------------------------------------------
-class CTraceAABB : public ITraceObject
+class CTraceAABB final : public ITraceObject
 {
 public:
 	CTraceAABB( const Vector &hlmins, const Vector &hlmaxs, bool isPoint );
-	virtual int SupportMap( const Vector &dir, Vector *pOut ) const;
-	virtual Vector GetVertByIndex( int index ) const;
-	virtual float Radius( void ) const { return m_radius; }
+	unsigned short SupportMap( const Vector &dir, Vector *pOut ) const override;
+	Vector GetVertByIndex( int index ) const override;
+	float Radius( void ) const override { return m_radius; }
 
 private:
 	float	m_x[2];
@@ -881,7 +884,7 @@ CTraceAABB::CTraceAABB( const Vector &hlmins, const Vector &hlmaxs, bool isPoint
 }
 
 
-int CTraceAABB::SupportMap( const Vector &dir, Vector *pOut ) const
+unsigned short CTraceAABB::SupportMap( const Vector &dir, Vector *pOut ) const
 {
 	if ( m_empty )
 	{
@@ -889,9 +892,9 @@ int CTraceAABB::SupportMap( const Vector &dir, Vector *pOut ) const
 		return 0;
 	}
 	// index is formed by the 3-bit bitfield SzSySx (negative is 1, positive is 0)
-	int x = ((*((unsigned int *)&dir.x)) & 0x80000000UL) >> 31;
-	int y = ((*((unsigned int *)&dir.y)) & 0x80000000UL) >> 31;
-	int z = ((*((unsigned int *)&dir.z)) & 0x80000000UL) >> 31;
+	unsigned short x = ((*((unsigned int *)&dir.x)) & 0x80000000UL) >> 31;
+	unsigned short y = ((*((unsigned int *)&dir.y)) & 0x80000000UL) >> 31;
+	unsigned short z = ((*((unsigned int *)&dir.z)) & 0x80000000UL) >> 31;
 	pOut->x = m_x[x];
 	pOut->y = m_y[y];
 	pOut->z = m_z[z];
@@ -912,7 +915,7 @@ Vector CTraceAABB::GetVertByIndex( int index ) const
 //-----------------------------------------------------------------------------
 // Purpose: Implementation for Trace against an IVP object
 //-----------------------------------------------------------------------------
-class CTraceRay
+class CTraceRay final
 {
 public:
 	CTraceRay( const Vector &hlstart, const Vector &hlend );
@@ -990,8 +993,8 @@ int CTraceRay::SupportMap( const Vector &dir, Vector *pOut ) const
 	return 0;
 }
 
-static char			*map_nullname = "**empty**";
-static csurface_t	nullsurface = { map_nullname, 0 };
+static const char	*map_nullname = "**empty**";
+static csurface_t	nullsurface = { map_nullname, 0, 0 };
 
 static void CM_ClearTrace( trace_t *trace )
 {
@@ -1001,12 +1004,12 @@ static void CM_ClearTrace( trace_t *trace )
 	trace->surface = nullsurface;
 }
 
-class CDefConvexInfo : public IConvexInfo
+class CDefConvexInfo final : public IConvexInfo
 {
 public:
 	IConvexInfo *GetPtr() { return this; }
 
-	virtual unsigned int GetContents( int convexGameData ) { return CONTENTS_SOLID; }
+	unsigned int GetContents( [[maybe_unused]] int convexGameData ) override { return CONTENTS_SOLID; }
 };
 
 class CTraceSolver
@@ -1056,7 +1059,7 @@ private:
 	CTraceSolver( const CTraceSolver & );
 };
 
-class CTraceSolverSweptObject : public CTraceSolver
+class CTraceSolverSweptObject final : public CTraceSolver
 {
 public:
 	CTraceSolverSweptObject( trace_t *ptr, ITraceObject *sweepobject, CTraceRay *ray, CTraceIVP *obstacle, const Vector &axis, unsigned int contentsMask, IConvexInfo *pConvexInfo );
@@ -1064,7 +1067,7 @@ public:
 	void InitOSRay( void );
 	void SweepLedgeTree_r( const IVP_Compact_Ledgetree_Node *node );
 	inline bool SweepHitsSphereOS( const IVP_U_Float_Point *sphereCenter, float radius );
-	virtual void DoSweep( void );
+	void DoSweep( void ) override;
 	inline void SweepAgainstNode( const IVP_Compact_Ledgetree_Node *node );
 
 	CTraceIVP			*m_obstacleIVP;
@@ -1087,8 +1090,13 @@ CTraceSolverSweptObject::CTraceSolverSweptObject( trace_t *ptr, ITraceObject *sw
 : CTraceSolver( ptr, sweepobject, ray, obstacle, axis )
 {
 	m_obstacleIVP = obstacle;
-	m_contentsMask = contentsMask;
 	m_pConvexInfo = (pConvexInfo != NULL) ? pConvexInfo : m_fakeConvexInfo.GetPtr();
+	m_contentsMask = contentsMask;
+
+	m_rayCenterOS.set_to_zero();
+	m_rayStartOS.set_to_zero();
+	m_rayDirOS.set_to_zero();
+	m_rayDeltaOS.set_to_zero();
 	m_rayLengthOS = 0.0f;
 }
 
@@ -1227,7 +1235,7 @@ loop_without_store:
 				if ( node0 )
 				{
 					// can hit, push on stack
-					int index = list.AddToTail();
+					auto index = list.AddToTail();
 					float dist1 = m_rayStartOS.quad_distance_to(&center);
 					if ( lastDist < dist1 )
 					{
@@ -1252,7 +1260,7 @@ loop_without_store:
 				goto loop_without_store;
 			}
 		}
-		int last = list.Count()-1;
+		intp last = list.Count()-1;
 		if ( last < 0 )
 			break;
 		node = list[last];
@@ -2286,9 +2294,12 @@ float CTraceSolver::SolveMeshIntersection( simplex_t &simplex )
 			return Clip( m_ray->m_dir, simplex.verts[0].position, BCD );
 		}
 
+		Assert( simplex.vertCount < ssize(simplex.verts) );
+
 		// add the new vert
 		simplex.verts[simplex.vertCount] = vert;
 		simplex.vertCount++;
+
 		v = simplex.ClipRayToTetrahedron( m_ray->m_dir );
 	}
 
@@ -2363,18 +2374,11 @@ void CPhysicsTrace::GetAABB( Vector *pMins, Vector *pMaxs, const CPhysCollide *p
 	}
 	else
 	{
-		const IVP_Compact_Ledgetree_Node *lt_node_root;
-		lt_node_root = pCollide->GetCompactSurface()->get_compact_ledge_tree_root();
+		const IVP_Compact_Ledgetree_Node *lt_node_root
+			= pCollide->GetCompactSurface()->get_compact_ledge_tree_root();
 		ClearBounds( *pMins, *pMaxs );
 		TraceGetAABB_r( pMins, pMaxs, lt_node_root, ivp );
 	}
-	// JAY: Disable this here, do it in the engine instead.  That way the tools get
-	// accurate bboxes
-#if 0
-	const float radius = g_PhysicsUnits.collisionSweepEpsilon;
-	mins -= Vector(radius,radius,radius);
-	maxs += Vector(radius,radius,radius);
-#endif
 }
 
 void TraceGetExtent_r( const IVP_Compact_Ledgetree_Node *node, CTraceIVP &ivp, const Vector &dir, float &dot, Vector &point )
@@ -2411,8 +2415,8 @@ Vector CPhysicsTrace::GetExtent( const CPhysCollide *pCollide, const Vector &col
 	}
 	else
 	{
-		const IVP_Compact_Ledgetree_Node *lt_node_root;
-		lt_node_root = pCollide->GetCompactSurface()->get_compact_ledge_tree_root();
+		const IVP_Compact_Ledgetree_Node *lt_node_root =
+			pCollide->GetCompactSurface()->get_compact_ledge_tree_root();
 		Vector out = vec3_origin;
 		float tmp = -1e6f;
 		TraceGetExtent_r( lt_node_root, ivp, direction, tmp, out );
@@ -2424,7 +2428,8 @@ bool CPhysicsTrace::IsBoxIntersectingCone( const Vector &boxAbsMins, const Vecto
 {
 	trace_t tr;
 	CM_ClearTrace( &tr );
-	bool bPoint = (boxAbsMins == boxAbsMaxs) ? true : false;
+
+	bool bPoint = boxAbsMins == boxAbsMaxs;
 	CTraceAABB box( boxAbsMins - cone.origin, boxAbsMaxs - cone.origin, bPoint );
 	CTraceCone traceCone( cone, -cone.origin );
 
@@ -2437,15 +2442,6 @@ bool CPhysicsTrace::IsBoxIntersectingCone( const Vector &boxAbsMins, const Vecto
 	return tr.startsolid;
 }
 
-
-
-CPhysicsTrace::CPhysicsTrace()
-{
-}
-
-CPhysicsTrace::~CPhysicsTrace()
-{
-}
 
 CVisitHash::CVisitHash()
 {

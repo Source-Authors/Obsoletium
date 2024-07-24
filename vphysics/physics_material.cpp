@@ -26,22 +26,22 @@ class CSurface : public IVP_Material
 public:
 
 	// IVP_Material
-    virtual IVP_DOUBLE get_friction_factor()
+    IVP_DOUBLE get_friction_factor() override
 	{
 		return data.physics.friction;
 	}
     
-    virtual IVP_DOUBLE get_elasticity()
+    IVP_DOUBLE get_elasticity() override
 	{
 		return data.physics.elasticity;
 	}
-    virtual const char *get_name();
+    const char *get_name() override;
 	// UNDONE: not implemented here.
-	virtual IVP_DOUBLE get_second_friction_factor() 
+	IVP_DOUBLE get_second_friction_factor() override 
 	{ 
 		return 0; 
 	}
-    virtual IVP_DOUBLE get_adhesion()
+    IVP_DOUBLE get_adhesion() override
 	{
 		return 0;
 	}
@@ -68,13 +68,13 @@ class CIVPMaterialManager : public IVP_Material_Manager
 public:
 	CIVPMaterialManager( void );
 	void Init( CPhysicsSurfaceProps *pProps ) { m_props = pProps; }
-	void SetPropMap( int *map, int mapSize );
+	void SetPropMap( intp *map, int mapSize );
 	int RemapIVPMaterialIndex( int ivpMaterialIndex ) const;
 
 	// IVP_Material_Manager
 	virtual IVP_Material *get_material_by_index(IVP_Real_Object *pObject, const IVP_U_Point *world_position, int index);
 
-    virtual IVP_DOUBLE get_friction_factor(IVP_Contact_Situation *situation)	// returns values >0, value of 1.0f means object stands on a 45 degres hill
+    IVP_DOUBLE get_friction_factor(IVP_Contact_Situation *situation) override	// returns values >0, value of 1.0f means object stands on a 45 degres hill
 	{
 		// vehicle wheels get no friction with stuff that isn't ground
 		// helps keep control of the car
@@ -91,7 +91,7 @@ public:
 		return factor;
 	}
 
-    virtual IVP_DOUBLE get_elasticity(IVP_Contact_Situation *situation)		// range [0, 1.0f[, the relative speed after a collision compared to the speed before
+    IVP_DOUBLE get_elasticity(IVP_Contact_Situation *situation) override		// range [0, 1.0f[, the relative speed after a collision compared to the speed before
 	{
 		IVP_DOUBLE flElasticity = BaseClass::get_elasticity( situation );
 		if ( flElasticity > 1.0f )
@@ -120,16 +120,16 @@ public:
 	CPhysicsSurfaceProps( void );
 	~CPhysicsSurfaceProps( void );
 
-	virtual int		ParseSurfaceData( const char *pFilename, const char *pTextfile );
-	virtual intp	SurfacePropCount( void ) const override;
-	virtual intp	GetSurfaceIndex( const char *pPropertyName ) const override;
-	virtual void	GetPhysicsProperties( intp surfaceDataIndex, float *density, float *thickness, float *friction, float *elasticity ) const;
-	virtual void	GetPhysicsParameters( intp surfaceDataIndex, surfacephysicsparams_t *pParamsOut ) const override;
-	virtual surfacedata_t *GetSurfaceData( intp surfaceDataIndex ) override;
-	virtual const char *GetString( unsigned short stringTableIndex ) const;
-	virtual const char *GetPropName( intp surfaceDataIndex ) const override;
-	virtual void SetWorldMaterialIndexTable( int *pMapArray, int mapSize );
-	virtual int RemapIVPMaterialIndex( int ivpMaterialIndex ) const
+	intp	ParseSurfaceData( const char *pFilename, const char *pTextfile ) override;
+	intp	SurfacePropCount( void ) const override;
+	intp	GetSurfaceIndex( const char *pPropertyName ) const override;
+	void	GetPhysicsProperties( intp surfaceDataIndex, float *density, float *thickness, float *friction, float *elasticity ) const override;
+	void	GetPhysicsParameters( intp surfaceDataIndex, surfacephysicsparams_t *pParamsOut ) const override;
+	surfacedata_t *GetSurfaceData( intp surfaceDataIndex ) override;
+	const char *GetString( unsigned short stringTableIndex ) const override;
+	const char *GetPropName( intp surfaceDataIndex ) const override;
+	void SetWorldMaterialIndexTable( intp *pMapArray, int mapSize ) override;
+	int RemapIVPMaterialIndex( int ivpMaterialIndex ) const override
 	{
 		return m_ivpManager.RemapIVPMaterialIndex( ivpMaterialIndex );
 	}
@@ -141,9 +141,9 @@ public:
 
 	// The database is derived from the IVP material class
 	const IVP_Material *GetIVPMaterial( int materialIndex ) const;
-	IVP_Material *GetIVPMaterial( int materialIndex );
-	virtual int GetIVPMaterialIndex( const IVP_Material *pIVP ) const;
-	IVP_Material_Manager *GetIVPManager( void ) { return &m_ivpManager; }
+	IVP_Material *GetIVPMaterial( int materialIndex ) override;
+	int GetIVPMaterialIndex( const IVP_Material *pIVP ) const override;
+	IVP_Material_Manager *GetIVPManager( void ) override { return &m_ivpManager; }
 
 	const char *GetNameString( CUtlSymbol name ) const
 	{
@@ -181,7 +181,7 @@ const char *CSurface::get_name()
 	return g_SurfaceDatabase.GetNameString( m_name );
 }
 
-CPhysicsSurfaceProps::CPhysicsSurfaceProps( void ) : m_fileList(8,8), m_strings( 0, 32, true )
+CPhysicsSurfaceProps::CPhysicsSurfaceProps() : m_strings( 0, 32, true ), m_fileList(8,8)
 {
 	m_ivpManager.Init( this );
 	// Force index 0 to be the empty string.  Allows game code to check for zero, but
@@ -399,7 +399,7 @@ void CPhysicsSurfaceProps::CopyPhysicsProperties( CSurface *pOut, int baseIndex 
 }
 
 
-int CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *pTextfile )
+intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *pTextfile )
 {
 	if ( !AddFileToDatabase( pFileName ) )
 	{
@@ -585,7 +585,7 @@ int CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *p
 }
 
 
-void CPhysicsSurfaceProps::SetWorldMaterialIndexTable( int *pMapArray, int mapSize )
+void CPhysicsSurfaceProps::SetWorldMaterialIndexTable( intp *pMapArray, int mapSize )
 {
 	m_ivpManager.SetPropMap( pMapArray, mapSize );
 }
@@ -593,7 +593,7 @@ void CPhysicsSurfaceProps::SetWorldMaterialIndexTable( int *pMapArray, int mapSi
 CIVPMaterialManager::CIVPMaterialManager( void ) : IVP_Material_Manager( IVP_FALSE ), m_props()
 {
 	// by default every index maps to itself (NULL translation)
-	for ( int i = 0; i < ARRAYSIZE(m_propMap); i++ )
+	for ( unsigned short i = 0; i < std::size(m_propMap); i++ )
 	{
 		m_propMap[i] = i;
 	}
@@ -609,7 +609,7 @@ int CIVPMaterialManager::RemapIVPMaterialIndex( int ivpMaterialIndex ) const
 
 // remap the incoming (from IVP) index and get the appropriate material
 // note that ivp will only supply indices between 1 and 127
-IVP_Material *CIVPMaterialManager::get_material_by_index(IVP_Real_Object *pObject, const IVP_U_Point *world_position, int index)
+IVP_Material *CIVPMaterialManager::get_material_by_index( [[maybe_unused]] IVP_Real_Object *pObject, [[maybe_unused]] const IVP_U_Point *world_position, int index)
 {
 	IVP_Material *tmp = m_props->GetIVPMaterial( RemapIVPMaterialIndex(index) );
 	Assert(tmp);
@@ -628,7 +628,7 @@ IVP_Material *CIVPMaterialManager::get_material_by_index(IVP_Real_Object *pObjec
 // compiled bsp file.  This is then remapped dynamically without touching the
 // per-triangle indices on load.  If we wanted to support multiple LUTs, it would
 // be better to preprocess/remap the triangles in the collision models at load time
-void CIVPMaterialManager::SetPropMap( int *map, int mapSize )
+void CIVPMaterialManager::SetPropMap( intp *map, int mapSize )
 {
 	// ??? just ignore any extra bits
 	if ( mapSize > 128 )

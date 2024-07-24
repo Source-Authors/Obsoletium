@@ -35,105 +35,105 @@ public:
 	CPhysicsEnvironment( void );
 	~CPhysicsEnvironment( void );
 
-	virtual void SetDebugOverlay( CreateInterfaceFn debugOverlayFactory );
-	virtual IVPhysicsDebugOverlay *GetDebugOverlay( void );
+	void SetDebugOverlay( CreateInterfaceFn debugOverlayFactory ) override;
+	IVPhysicsDebugOverlay *GetDebugOverlay( void ) override;
 
-	void			SetGravity( const Vector& gravityVector );
-	IPhysicsObject	*CreatePolyObject( const CPhysCollide *pCollisionModel, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams );
-	IPhysicsObject	*CreatePolyObjectStatic( const CPhysCollide *pCollisionModel, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams );
-	virtual unsigned int	GetObjectSerializeSize( IPhysicsObject *pObject ) const;
-	virtual void			SerializeObjectToBuffer( IPhysicsObject *pObject, unsigned char *pBuffer, unsigned int bufferSize );
-	virtual IPhysicsObject *UnserializeObjectFromBuffer( void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, bool enableCollisions );
+	void			SetGravity( const Vector& gravityVector ) override;
+	IPhysicsObject	*CreatePolyObject( const CPhysCollide *pCollisionModel, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams ) override;
+	IPhysicsObject	*CreatePolyObjectStatic( const CPhysCollide *pCollisionModel, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams ) override;
+	unsigned int	GetObjectSerializeSize( IPhysicsObject *pObject ) const override;
+	void			SerializeObjectToBuffer( IPhysicsObject *pObject, unsigned char *pBuffer, unsigned int bufferSize ) override;
+	IPhysicsObject *UnserializeObjectFromBuffer( void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, bool enableCollisions ) override;
 	
 
 
-	IPhysicsSpring	*CreateSpring( IPhysicsObject *pObjectStart, IPhysicsObject *pObjectEnd, springparams_t *pParams );
-	IPhysicsFluidController	*CreateFluidController( IPhysicsObject *pFluidObject, fluidparams_t *pParams );
-	IPhysicsConstraint *CreateRagdollConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_ragdollparams_t &ragdoll );
+	IPhysicsSpring	*CreateSpring( IPhysicsObject *pObjectStart, IPhysicsObject *pObjectEnd, springparams_t *pParams ) override;
+	IPhysicsFluidController	*CreateFluidController( IPhysicsObject *pFluidObject, fluidparams_t *pParams ) override;
+	IPhysicsConstraint *CreateRagdollConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_ragdollparams_t &ragdoll ) override;
 
-	virtual IPhysicsConstraint *CreateHingeConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_hingeparams_t &hinge );
+	IPhysicsConstraint *CreateHingeConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_hingeparams_t &hinge ) override;
 	virtual IPhysicsConstraint *CreateLimitedHingeConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_limitedhingeparams_t &hinge );
-	virtual IPhysicsConstraint *CreateFixedConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_fixedparams_t &fixed );
-	virtual IPhysicsConstraint *CreateSlidingConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_slidingparams_t &sliding );
-	virtual IPhysicsConstraint *CreateBallsocketConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_ballsocketparams_t &ballsocket );
-	virtual IPhysicsConstraint *CreatePulleyConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_pulleyparams_t &pulley );
-	virtual IPhysicsConstraint *CreateLengthConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_lengthparams_t &length );
+	IPhysicsConstraint *CreateFixedConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_fixedparams_t &fixed ) override;
+	IPhysicsConstraint *CreateSlidingConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_slidingparams_t &sliding ) override;
+	IPhysicsConstraint *CreateBallsocketConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_ballsocketparams_t &ballsocket ) override;
+	IPhysicsConstraint *CreatePulleyConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_pulleyparams_t &pulley ) override;
+	IPhysicsConstraint *CreateLengthConstraint( IPhysicsObject *pReferenceObject, IPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_lengthparams_t &length ) override;
 
-	virtual IPhysicsConstraintGroup *CreateConstraintGroup( const constraint_groupparams_t &group );
-	virtual void DestroyConstraintGroup( IPhysicsConstraintGroup *pGroup );
+	IPhysicsConstraintGroup *CreateConstraintGroup( const constraint_groupparams_t &group ) override;
+	void DestroyConstraintGroup( IPhysicsConstraintGroup *pGroup ) override;
 
-	void			Simulate( float deltaTime );
-	float			GetSimulationTimestep() const;
-	void			SetSimulationTimestep( float timestep );
-	float			GetSimulationTime() const;
-	float			GetNextFrameTime() const;
-	bool			IsInSimulation() const;
+	void			Simulate( float deltaTime ) override;
+	float			GetSimulationTimestep() const override;
+	void			SetSimulationTimestep( float timestep ) override;
+	float			GetSimulationTime() const override;
+	float			GetNextFrameTime() const override;
+	bool			IsInSimulation() const override;
 
-	virtual void DestroyObject( IPhysicsObject * );
-	virtual void DestroySpring( IPhysicsSpring * );
-	virtual void DestroyFluidController( IPhysicsFluidController * );
-	virtual void DestroyConstraint( IPhysicsConstraint * );
+	void DestroyObject( IPhysicsObject * ) override;
+	void DestroySpring( IPhysicsSpring * ) override;
+	void DestroyFluidController( IPhysicsFluidController * ) override;
+	void DestroyConstraint( IPhysicsConstraint * ) override;
 
-	virtual void SetCollisionEventHandler( IPhysicsCollisionEvent *pCollisionEvents );
-	virtual void SetObjectEventHandler( IPhysicsObjectEvent *pObjectEvents );
-	virtual void SetConstraintEventHandler( IPhysicsConstraintEvent *pConstraintEvents );
+	void SetCollisionEventHandler( IPhysicsCollisionEvent *pCollisionEvents ) override;
+	void SetObjectEventHandler( IPhysicsObjectEvent *pObjectEvents ) override;
+	void SetConstraintEventHandler( IPhysicsConstraintEvent *pConstraintEvents ) override;
 
-	virtual IPhysicsShadowController *CreateShadowController( IPhysicsObject *pObject, bool allowTranslation, bool allowRotation );
-	virtual void DestroyShadowController( IPhysicsShadowController * );
-	virtual IPhysicsMotionController *CreateMotionController( IMotionEvent *pHandler );
-	virtual void DestroyMotionController( IPhysicsMotionController *pController );
-	virtual IPhysicsPlayerController *CreatePlayerController( IPhysicsObject *pObject );
-	virtual void DestroyPlayerController( IPhysicsPlayerController *pController );
-	virtual IPhysicsVehicleController *CreateVehicleController( IPhysicsObject *pVehicleBodyObject, const vehicleparams_t &params, unsigned int nVehicleType, IPhysicsGameTrace *pGameTrace );
-	virtual void DestroyVehicleController( IPhysicsVehicleController *pController );
+	IPhysicsShadowController *CreateShadowController( IPhysicsObject *pObject, bool allowTranslation, bool allowRotation ) override;
+	void DestroyShadowController( IPhysicsShadowController * ) override;
+	IPhysicsMotionController *CreateMotionController( IMotionEvent *pHandler ) override;
+	void DestroyMotionController( IPhysicsMotionController *pController ) override;
+	IPhysicsPlayerController *CreatePlayerController( IPhysicsObject *pObject ) override;
+	void DestroyPlayerController( IPhysicsPlayerController *pController ) override;
+	IPhysicsVehicleController *CreateVehicleController( IPhysicsObject *pVehicleBodyObject, const vehicleparams_t &params, unsigned int nVehicleType, IPhysicsGameTrace *pGameTrace ) override;
+	void DestroyVehicleController( IPhysicsVehicleController *pController ) override;
 
-	virtual void SetQuickDelete( bool bQuick )
+	void SetQuickDelete( bool bQuick ) override
 	{
 		m_deleteQuick = bQuick;
 	}
 	virtual bool ShouldQuickDelete() const { return m_deleteQuick; }
 	virtual void TraceBox( trace_t *ptr, const Vector &mins, const Vector &maxs, const Vector &start, const Vector &end );
-	virtual void SetCollisionSolver( IPhysicsCollisionSolver *pCollisionSolver );
-	virtual void GetGravity( Vector *pGravityVector ) const;
-	virtual int	 GetActiveObjectCount() const;
-	virtual void GetActiveObjects( IPhysicsObject **pOutputObjectList ) const;
-	virtual const IPhysicsObject **GetObjectList( int *pOutputObjectCount ) const;
-	virtual bool TransferObject( IPhysicsObject *pObject, IPhysicsEnvironment *pDestinationEnvironment );
+	void SetCollisionSolver( IPhysicsCollisionSolver *pCollisionSolver ) override;
+	void GetGravity( Vector *pGravityVector ) const override;
+	int	 GetActiveObjectCount() const override;
+	void GetActiveObjects( IPhysicsObject **pOutputObjectList ) const override;
+	const IPhysicsObject **GetObjectList( intp *pOutputObjectCount ) const override;
+	bool TransferObject( IPhysicsObject *pObject, IPhysicsEnvironment *pDestinationEnvironment ) override;
 
 	IVP_Environment	*GetIVPEnvironment( void ) { return m_pPhysEnv; }
 	void		ClearDeadObjects( void );
 	IVP_Controller *GetDragController() { return m_pDragController; }
 	const IVP_Controller *GetDragController() const { return m_pDragController; }
-	virtual void SetAirDensity( float density );
-	virtual float GetAirDensity( void ) const;
-	virtual void ResetSimulationClock( void );
-	virtual IPhysicsObject *CreateSphereObject( float radius, int materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic );
-	virtual void CleanupDeleteList();
-	virtual void EnableDeleteQueue( bool enable ) { m_queueDeleteObject = enable; }
+	void SetAirDensity( float density ) override;
+	float GetAirDensity( void ) const override;
+	void ResetSimulationClock( void ) override;
+	IPhysicsObject *CreateSphereObject( float radius, int materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic ) override;
+	void CleanupDeleteList() override;
+	void EnableDeleteQueue( bool enable ) override { m_queueDeleteObject = enable; }
 	// debug
-	virtual bool IsCollisionModelUsed( CPhysCollide *pCollide ) const;
+	bool IsCollisionModelUsed( CPhysCollide *pCollide ) const override;
 
 	// trace against the physics world
-	virtual void TraceRay( const Ray_t &ray, unsigned int fMask, IPhysicsTraceFilter *pTraceFilter, trace_t *pTrace );
-	virtual void SweepCollideable( const CPhysCollide *pCollide, const Vector &vecAbsStart, const Vector &vecAbsEnd, 
-		const QAngle &vecAngles, unsigned int fMask, IPhysicsTraceFilter *pTraceFilter, trace_t *pTrace );
+	void TraceRay( const Ray_t &ray, unsigned int fMask, IPhysicsTraceFilter *pTraceFilter, trace_t *pTrace ) override;
+	void SweepCollideable( const CPhysCollide *pCollide, const Vector &vecAbsStart, const Vector &vecAbsEnd, 
+		const QAngle &vecAngles, unsigned int fMask, IPhysicsTraceFilter *pTraceFilter, trace_t *pTrace ) override;
 
 	// performance tuning
-	virtual void GetPerformanceSettings( physics_performanceparams_t *pOutput ) const;
-	virtual void SetPerformanceSettings( const physics_performanceparams_t *pSettings );
+	void GetPerformanceSettings( physics_performanceparams_t *pOutput ) const override;
+	void SetPerformanceSettings( const physics_performanceparams_t *pSettings ) override;
 
 	// perf/cost statistics
-	virtual void ReadStats( physics_stats_t *pOutput );
-	virtual void ClearStats();
-	virtual void EnableConstraintNotify( bool bEnable );
+	void ReadStats( physics_stats_t *pOutput ) override;
+	void ClearStats() override;
+	void EnableConstraintNotify( bool bEnable ) override;
 	// debug
-	virtual void DebugCheckContacts(void);
+	void DebugCheckContacts(void) override;
 
 	// Save/restore
-	bool Save( const physsaveparams_t &params  );
-	void PreRestore( const physprerestoreparams_t &params );
-	bool Restore( const physrestoreparams_t &params );
-	void PostRestore();
+	bool Save( const physsaveparams_t &params  ) override;
+	void PreRestore( const physprerestoreparams_t &params ) override;
+	bool Restore( const physrestoreparams_t &params ) override;
+	void PostRestore() override;
 	void PhantomAdd( CPhysicsObject *pObject );
 	void PhantomRemove( CPhysicsObject *pObject );
 
@@ -158,7 +158,7 @@ private:
 	CCollisionSolver				*m_pCollisionSolver;
 	CPhysicsListenerConstraint		*m_pConstraintListener;
 	CDeleteQueue					*m_pDeleteQueue;
-	int								m_lastObjectThisTick;
+	intp							m_lastObjectThisTick;
 	bool							m_deleteQuick;
 	bool							m_inSimulation;
 	bool							m_queueDeleteObject;

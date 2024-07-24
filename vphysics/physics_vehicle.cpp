@@ -24,7 +24,7 @@
 #include "tier0/memdbgon.h"
 
 #define THROTTLE_OPPOSING_FORCE_EPSILON		5.0f
-#define VEHICLE_SKID_EPSILON				0.1f
+//#define VEHICLE_SKID_EPSILON				0.1f
 
 // y in/s = x miles/hour * (5280 * 12 (in / mile)) * (1 / 3600 (hour / sec) )
 //#define MPH2INS(x)		( (x) * 5280.0f * 12.0f / 3600.0f )
@@ -271,38 +271,38 @@ public:
 	void InitCarSystem( CPhysicsObject *pBodyObject );
 
 	// IPhysicsVehicleController
-	void Update( float dt, vehicle_controlparams_t &controls );
-	float UpdateBooster( float dt );
-	void SetSpringLength(int wheelIndex, float length);
-	const vehicle_operatingparams_t &GetOperatingParams()	{ return m_currentState; }
-	const vehicleparams_t &GetVehicleParams()				{ return m_vehicleData; }
-	vehicleparams_t &GetVehicleParamsForChange()			{ return m_vehicleData; }
-	int GetWheelCount(void)									{ return m_wheelCount; };
-	IPhysicsObject* GetWheel(int index);
-	virtual bool GetWheelContactPoint( int index, Vector *pContactPoint, int *pSurfaceProps );
-	void SetWheelFriction(int wheelIndex, float friction);
+	void Update( float dt, vehicle_controlparams_t &controls ) override;
+	float UpdateBooster( float dt ) override;
+	void SetSpringLength(int wheelIndex, float length) override;
+	const vehicle_operatingparams_t &GetOperatingParams() override	{ return m_currentState; }
+	const vehicleparams_t &GetVehicleParams() override				{ return m_vehicleData; }
+	vehicleparams_t &GetVehicleParamsForChange() override			{ return m_vehicleData; }
+	int GetWheelCount(void) override									{ return m_wheelCount; }
+	IPhysicsObject* GetWheel(int index) override;
+	bool GetWheelContactPoint( int index, Vector *pContactPoint, int *pSurfaceProps ) override;
+	void SetWheelFriction(int wheelIndex, float friction) override;
 
-	void SetEngineDisabled( bool bDisable )					{ m_bEngineDisable = bDisable; }
-	bool IsEngineDisabled( void )							{ return m_bEngineDisable; }
+	void SetEngineDisabled( bool bDisable ) override				{ m_bEngineDisable = bDisable; }
+	bool IsEngineDisabled( void ) override							{ return m_bEngineDisable; }
 
 	// Save/load
 	void WriteToTemplate( vphysics_save_cvehiclecontroller_t &controllerTemplate );
 	void InitFromTemplate( CPhysicsEnvironment *pEnv, void *pGameData, IPhysicsGameTrace *pGameTrace, const vphysics_save_cvehiclecontroller_t &controllerTemplate );
-	void VehicleDataReload();
+	void VehicleDataReload() override;
 
 	// Debug
-	void GetCarSystemDebugData( vehicle_debugcarsystem_t &debugCarSystem );
+	void GetCarSystemDebugData( vehicle_debugcarsystem_t &debugCarSystem ) override;
 
 	// IVP_Listener_Object
 	// Object listener, only hook delete
-    virtual void event_object_deleted( IVP_Event_Object *);
-    virtual void event_object_created( IVP_Event_Object *) {}
-    virtual void event_object_revived( IVP_Event_Object *) {}
-    virtual void event_object_frozen ( IVP_Event_Object *) {}
+    void event_object_deleted( IVP_Event_Object *) override;
+    void event_object_created( IVP_Event_Object *) override {}
+    void event_object_revived( IVP_Event_Object *) override {}
+    void event_object_frozen ( IVP_Event_Object *) override {}
 
 	// Entry/Exit 
-	void OnVehicleEnter( void );
-	void OnVehicleExit( void );
+	void OnVehicleEnter( void ) override;
+	void OnVehicleExit( void ) override;
 
 protected:
 	void CreateIVPObjects( );
@@ -1207,7 +1207,7 @@ void CVehicleController::CalcEngineTransmission( float flThrottle )
 	float flAvgRotSpeed = 0.0;
 	for( int iWheel = 0; iWheel < m_wheelCount; ++iWheel )
 	{
-		float flRotSpeed = fabs( m_pCarSystem->get_wheel_angular_velocity( IVP_POS_WHEEL( iWheel ) ) );
+		double flRotSpeed = fabs( m_pCarSystem->get_wheel_angular_velocity( IVP_POS_WHEEL( iWheel ) ) );
 		flAvgRotSpeed += flRotSpeed;
 	}
 	flAvgRotSpeed *= 0.5f / ( float )IVP_PI / m_wheelCount;
@@ -1249,11 +1249,9 @@ void CVehicleController::CalcEngine( float throttle, float brake_val, bool handb
     float flAbsSpeed = fabs( m_currentState.speed );
 
 	// Speed governor
-	if ( IsPC() )
-	{
-		float maxSpeed = torqueBoost ? m_vehicleData.engine.boostMaxSpeed : m_vehicleData.engine.maxSpeed;
-		maxSpeed = max(1.f,maxSpeed);	// make sure this is non-zero before the divide
-		if ( (throttle > 0) && (flAbsSpeed > maxSpeed) )
+	float maxSpeed = torqueBoost ? m_vehicleData.engine.boostMaxSpeed : m_vehicleData.engine.maxSpeed;
+	maxSpeed = max(1.f,maxSpeed);	// make sure this is non-zero before the divide
+	if ( (throttle > 0) && (flAbsSpeed > maxSpeed) )
 		{
 			float frac = flAbsSpeed / maxSpeed;
 			if ( frac > m_vehicleData.engine.autobrakeSpeedGain )
@@ -1267,15 +1265,6 @@ void CVehicleController::CalcEngine( float throttle, float brake_val, bool handb
 			}
 			throttle *= 0.1f;
 		}
-	}
-	else	// consoles
-	{
-		if ( ( throttle > 0 ) && ( ( !torqueBoost && flAbsSpeed > (m_vehicleData.engine.maxSpeed * throttle) ) || 
-			( torqueBoost && flAbsSpeed > m_vehicleData.engine.boostMaxSpeed) ) )
-		{
-			throttle *= 0.1f;
-		}
-	}
 
 	// Check for reverse - both of these "governors" or horrible and need to be redone before we ship!
 	if ( ( throttle < 0 ) && ( !torqueBoost && ( flAbsSpeed > m_vehicleData.engine.maxRevSpeed ) ) )
@@ -1293,7 +1282,7 @@ void CVehicleController::CalcEngine( float throttle, float brake_val, bool handb
 		float wheel_force_by_throttle = throttle * 
 			m_vehicleData.engine.horsepower * (watt_per_hp * seconds_per_minute) * 
 			m_vehicleData.engine.gearRatio[m_currentState.gear]  * m_vehicleData.engine.axleRatio / 
-			(m_vehicleData.engine.maxRPM * m_wheelRadius * (2 * IVP_PI));
+			(m_vehicleData.engine.maxRPM * m_wheelRadius * (2 * M_PI_F));
 
 		if ( m_currentState.engineRPM >= m_vehicleData.engine.maxRPM )
 		{
@@ -1339,7 +1328,7 @@ void CVehicleController::CalcEngine( float throttle, float brake_val, bool handb
 		int wheelIndex = 0;
 		for ( int i = 0; i < m_vehicleData.axleCount; i++ )
 		{
-			float torque_val = 0.5 * sign * wheel_force_by_brake * m_vehicleData.axles[i].brakeFactor * ConvertDistanceToIVP( m_vehicleData.axles[i].wheels.radius );
+			float torque_val = 0.5f * sign * wheel_force_by_brake * m_vehicleData.axles[i].brakeFactor * ConvertDistanceToIVP( m_vehicleData.axles[i].wheels.radius );
 			for ( int w = 0; w < m_vehicleData.wheelsPerAxle; w++, wheelIndex++ )
 			{
 				m_pCarSystem->change_wheel_torque( ( IVP_POS_WHEEL )wheelIndex, torque_val );
@@ -1439,7 +1428,7 @@ void CVehicleController::WriteToTemplate( vphysics_save_cvehiclecontroller_t &co
 #define OLD_SAVED_GAME 1
 
 #if OLD_SAVED_GAME
-#define SET_DEFAULT(x,y) { if ( x == 0 ) x = y; }
+#define SET_DEFAULT(x,y) do { if ( x == 0 ) x = y; } while (false)
 #endif
 
 void CVehicleController::InitFromTemplate( CPhysicsEnvironment *pEnv, void *pGameData,
@@ -1466,11 +1455,11 @@ void CVehicleController::InitFromTemplate( CPhysicsEnvironment *pEnv, void *pGam
 	memcpy( &m_flVelocity, controllerTemplate.m_flVelocity, sizeof(m_flVelocity) );
 
 #if OLD_SAVED_GAME
-	SET_DEFAULT( m_torqueScale, 1.0 );
-	SET_DEFAULT( m_vehicleData.steering.steeringRateSlow, 4.5 );
-	SET_DEFAULT( m_vehicleData.steering.steeringRateFast, 0.5 );
-	SET_DEFAULT( m_vehicleData.steering.steeringRestRateSlow, 3.0 );
-	SET_DEFAULT( m_vehicleData.steering.steeringRestRateFast, 1.8 );
+	SET_DEFAULT( m_torqueScale, 1.0f );
+	SET_DEFAULT( m_vehicleData.steering.steeringRateSlow, 4.5f );
+	SET_DEFAULT( m_vehicleData.steering.steeringRateFast, 0.5f );
+	SET_DEFAULT( m_vehicleData.steering.steeringRestRateSlow, 3.0f );
+	SET_DEFAULT( m_vehicleData.steering.steeringRestRateFast, 1.8f );
 	SET_DEFAULT( m_vehicleData.steering.speedSlow, m_vehicleData.engine.maxSpeed*0.25f );
 	SET_DEFAULT( m_vehicleData.steering.speedFast, m_vehicleData.engine.maxSpeed*0.75f );
 	SET_DEFAULT( m_vehicleData.steering.degreesSlow, 50 );
@@ -1478,7 +1467,7 @@ void CVehicleController::InitFromTemplate( CPhysicsEnvironment *pEnv, void *pGam
 	SET_DEFAULT( m_vehicleData.steering.degreesBoost, 10 );
 	
 
-	SET_DEFAULT( m_vehicleData.steering.turnThrottleReduceSlow, 0.3 );
+	SET_DEFAULT( m_vehicleData.steering.turnThrottleReduceSlow, 0.3f );
 	SET_DEFAULT( m_vehicleData.steering.turnThrottleReduceFast, 3 );
 	SET_DEFAULT( m_vehicleData.steering.brakeSteeringRateFactor, 6 );
 	SET_DEFAULT( m_vehicleData.steering.throttleSteeringRestRateFactor, 2 );
@@ -1486,8 +1475,8 @@ void CVehicleController::InitFromTemplate( CPhysicsEnvironment *pEnv, void *pGam
 	SET_DEFAULT( m_vehicleData.steering.boostSteeringRateFactor, 1 );
 	SET_DEFAULT( m_vehicleData.steering.powerSlideAccel, 200 );
 
-	SET_DEFAULT( m_vehicleData.engine.autobrakeSpeedGain, 1.0 );
-	SET_DEFAULT( m_vehicleData.engine.autobrakeSpeedFactor, 2.0 );
+	SET_DEFAULT( m_vehicleData.engine.autobrakeSpeedGain, 1.0f );
+	SET_DEFAULT( m_vehicleData.engine.autobrakeSpeedFactor, 2.0f );
 #endif
 
 	for (int i = 0; i < VEHICLE_MAX_WHEEL_COUNT; ++i )

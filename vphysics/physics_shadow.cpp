@@ -148,16 +148,16 @@ public:
 	~CPlayerController( void );
 
 	// ipion interfaces
-    void do_simulation_controller( IVP_Event_Sim *es,IVP_U_Vector<IVP_Core> *cores);
-    virtual IVP_CONTROLLER_PRIORITY get_controller_priority() { return (IVP_CONTROLLER_PRIORITY) (IVP_CP_MOTION+1); }
-	virtual const char *get_controller_name() { return "vphysics:player"; }
+    void do_simulation_controller( IVP_Event_Sim *es,IVP_U_Vector<IVP_Core> *cores) override;
+    IVP_CONTROLLER_PRIORITY get_controller_priority() override { return (IVP_CONTROLLER_PRIORITY) (IVP_CP_MOTION+1); }
+	const char *get_controller_name() override { return "vphysics:player"; }
 
-	void SetObject( IPhysicsObject *pObject );
-	void SetEventHandler( IPhysicsPlayerControllerEvent *handler );
-	void Update( const Vector& position, const Vector& velocity, float secondsToArrival, bool onground, IPhysicsObject *ground );
-	void MaxSpeed( const Vector &velocity );
-	bool IsInContact( void );
-	virtual bool WasFrozen() 
+	void SetObject( IPhysicsObject *pObject ) override;
+	void SetEventHandler( IPhysicsPlayerControllerEvent *handler ) override;
+	void Update( const Vector& position, const Vector& velocity, float secondsToArrival, bool onground, IPhysicsObject *ground ) override;
+	void MaxSpeed( const Vector &velocity ) override;
+	bool IsInContact( void ) override;
+	bool WasFrozen() override
 	{ 	
 		IVP_Real_Object *pivp = m_pObject->GetObject();
 		IVP_Core *pCore = pivp->get_core();
@@ -169,7 +169,7 @@ public:
 		m_forceTeleport = true;
 	}
 
-	int GetShadowPosition( Vector *position, QAngle *angles )
+	int GetShadowPosition( Vector *position, QAngle *angles ) override
 	{
 		IVP_U_Matrix matrix;
 		
@@ -188,38 +188,38 @@ public:
 
 		return 1;
 	}
-	void GetShadowVelocity( Vector *velocity );
-	virtual void GetLastImpulse( Vector *pOut )
+	void GetShadowVelocity( Vector *velocity ) override;
+	void GetLastImpulse( Vector *pOut ) override
 	{
 		ConvertPositionToHL( m_lastImpulse, *pOut );
 	}
 
-	virtual void StepUp( float height );
-	virtual void Jump();
-	virtual IPhysicsObject *GetObject() { return m_pObject; }
+	void StepUp( float height ) override;
+	void Jump() override;
+	IPhysicsObject *GetObject() override { return m_pObject; }
 
-	virtual void SetPushMassLimit( float maxPushMass )
+	void SetPushMassLimit( float maxPushMass ) override
 	{
 		m_pushableMassLimit = maxPushMass;
 	}
 
-	virtual void SetPushSpeedLimit( float maxPushSpeed )
+	void SetPushSpeedLimit( float maxPushSpeed ) override
 	{
 		m_pushableSpeedLimit = maxPushSpeed;
 	}
 
-	virtual float GetPushMassLimit() { return m_pushableMassLimit; }
-	virtual float GetPushSpeedLimit() { return m_pushableSpeedLimit; }
+	float GetPushMassLimit() override { return m_pushableMassLimit; }
+	float GetPushSpeedLimit() override { return m_pushableSpeedLimit; }
 
 	// Object listener
-	virtual void event_object_deleted( IVP_Event_Object *pEvent)
+	void event_object_deleted( IVP_Event_Object *pEvent) override
 	{
 		Assert( pEvent->real_object == m_pGround->GetObject() );
 		m_pGround = NULL;
 	}
-	virtual void event_object_created( IVP_Event_Object *) {}
-	virtual void event_object_revived( IVP_Event_Object *) {}
-	virtual void event_object_frozen ( IVP_Event_Object *) {}
+	void event_object_created( IVP_Event_Object *) override {}
+	void event_object_revived( IVP_Event_Object *) override {}
+	void event_object_frozen ( IVP_Event_Object *) override {}
 
 private:
 	void AttachObject( void );
@@ -392,7 +392,7 @@ public:
 		if ( IsFull() )
 			return;
 
-		for ( int i = m_Normals.Count(); --i >= 0; )
+		for ( intp i = m_Normals.Count(); --i >= 0; )
 		{
 			if ( DotProduct( m_Normals[i], normal ) > 0.99f )
 				return;
@@ -402,7 +402,7 @@ public:
 
 	bool HasPositiveProjection( const Vector &vec )
 	{
-		for ( int i = m_Normals.Count(); --i >= 0; )
+		for ( intp i = m_Normals.Count(); --i >= 0; )
 		{
 			if ( DotProduct( m_Normals[i], vec ) > 0 )
 				return true;
@@ -417,7 +417,7 @@ public:
 	{
 		if ( m_Normals.Count() > 2 )
 		{
-			for ( int i = 0; i < m_Normals.Count(); i++ )
+			for ( intp i = 0; i < m_Normals.Count(); i++ )
 			{
 				if ( DotProduct(inVector, m_Normals[i]) > 0 )
 				{
@@ -760,10 +760,10 @@ void QuaternionDiff( const IVP_U_Quat &p, const IVP_U_Quat &q, IVP_U_Quat &qt )
 
 void QuaternionAxisAngle( const IVP_U_Quat &q, Vector &axis, float &angle )
 {
-	angle = 2 * acos(q.w);
-	if ( angle > M_PI )
+	angle = 2 * acosf(q.w);
+	if ( angle > M_PI_F )
 	{
-		angle -= 2*M_PI;
+		angle -= 2*M_PI_F;
 	}
 
 	axis.Init( q.x, q.y, q.z );
@@ -928,19 +928,19 @@ public:
 	~CShadowController( void );
 
 	// ipion interfaces
-    void do_simulation_controller( IVP_Event_Sim *es,IVP_U_Vector<IVP_Core> *cores);
-    virtual IVP_CONTROLLER_PRIORITY get_controller_priority() { return IVP_CP_MOTION; }
-	virtual const char *get_controller_name() { return "vphysics:shadow"; }
+    void do_simulation_controller( IVP_Event_Sim *es,IVP_U_Vector<IVP_Core> *cores) override;
+    IVP_CONTROLLER_PRIORITY get_controller_priority() override { return IVP_CP_MOTION; }
+	const char *get_controller_name() override { return "vphysics:shadow"; }
 
 	void SetObject( IPhysicsObject *pObject );
-	void Update( const Vector &position, const QAngle &angles, float secondsToArrival );
-	void MaxSpeed( float maxSpeed, float maxAngularSpeed );
-	virtual void StepUp( float height );
-	virtual void SetTeleportDistance( float teleportDistance );
-	virtual bool AllowsTranslation() { return m_allowsTranslation; }
-	virtual bool AllowsRotation() { return m_allowsRotation; }
+	void Update( const Vector &position, const QAngle &angles, float secondsToArrival ) override;
+	void MaxSpeed( float maxSpeed, float maxAngularSpeed ) override;
+	void StepUp( float height ) override;
+	void SetTeleportDistance( float teleportDistance ) override;
+	bool AllowsTranslation() override { return m_allowsTranslation; }
+	bool AllowsRotation() override { return m_allowsRotation; }
 
-	virtual void GetLastImpulse( Vector *pOut )
+	void GetLastImpulse( Vector *pOut ) override
 	{
 		ConvertPositionToHL( m_shadow.lastImpulse, *pOut );
 	}
@@ -953,10 +953,10 @@ public:
 	void WriteToTemplate( vphysics_save_cshadowcontroller_t &controllerTemplate );
 	void InitFromTemplate( const vphysics_save_cshadowcontroller_t &controllerTemplate );
 	
-	virtual void SetPhysicallyControlled( bool isPhysicallyControlled ) { m_isPhysicallyControlled = isPhysicallyControlled; }
-	virtual bool IsPhysicallyControlled() { return m_isPhysicallyControlled; }
+	void SetPhysicallyControlled( bool isPhysicallyControlled ) override { m_isPhysicallyControlled = isPhysicallyControlled; }
+	bool IsPhysicallyControlled() override { return m_isPhysicallyControlled; }
 
-	virtual void UseShadowMaterial( bool bUseShadowMaterial )
+	void UseShadowMaterial( bool bUseShadowMaterial ) override
 	{
 		if ( !m_pObject )
 			return;
@@ -969,7 +969,7 @@ public:
 		}
 	}
 
-	virtual void ObjectMaterialChanged( int materialIndex )
+	void ObjectMaterialChanged( int materialIndex ) override
 	{
 		if ( !m_pObject )
 			return;
@@ -977,10 +977,10 @@ public:
 	}
 
 	//Basically get the last inputs to IPhysicsShadowController::Update(), returns last input to timeOffset in Update()
-	virtual float GetTargetPosition( Vector *pPositionOut, QAngle *pAnglesOut );
+	float GetTargetPosition( Vector *pPositionOut, QAngle *pAnglesOut ) override;
 
-	virtual float GetTeleportDistance( void );
-	virtual void GetMaxSpeed( float *pMaxSpeedOut, float *pMaxAngularSpeedOut );
+	float GetTeleportDistance( void ) override;
+	void GetMaxSpeed( float *pMaxSpeedOut, float *pMaxAngularSpeedOut ) override;
 
 private:
 	void AttachObject( void );
@@ -1005,6 +1005,17 @@ CShadowController::CShadowController()
 { 
 	m_shadow.targetPosition.set_to_zero(); 
 	m_shadow.targetRotation.init(); 
+	m_saveRot.set_to_zero();
+	m_savedRI.set_to_zero();
+	m_pObject = nullptr;
+	m_secondsToArrival = FP_NAN;
+	m_savedMass = FP_NAN;
+	m_savedFlags = 0;
+	m_savedMaterialIndex = USHRT_MAX;
+	m_enabled = true;
+	m_allowsTranslation = true;
+	m_allowsRotation = true;
+	m_isPhysicallyControlled = true;
 }
 
 CShadowController::CShadowController( CPhysicsObject *pObject, bool allowTranslation, bool allowRotation )
@@ -1362,7 +1373,7 @@ bool SavePhysicsShadowController( const physsaveparams_t &params, IPhysicsShadow
 	return true;
 }
 
-bool RestorePhysicsShadowController( const physrestoreparams_t &params, IPhysicsShadowController **ppShadowController )
+bool RestorePhysicsShadowController( const physrestoreparams_t &, IPhysicsShadowController ** )
 {
 	return false;
 }
@@ -1384,12 +1395,12 @@ bool RestorePhysicsShadowControllerInternal( const physrestoreparams_t &params, 
 	return true;
 }
 
-bool SavePhysicsPlayerController( const physsaveparams_t &params, CPlayerController *pPlayerController )
+bool SavePhysicsPlayerController( const physsaveparams_t &, CPlayerController * )
 {
 	return false;
 }
 
-bool RestorePhysicsPlayerController( const physrestoreparams_t &params, CPlayerController **ppPlayerController )
+bool RestorePhysicsPlayerController( const physrestoreparams_t &, CPlayerController ** )
 {
 	return false;
 }

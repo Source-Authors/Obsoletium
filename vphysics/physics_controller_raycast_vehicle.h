@@ -28,14 +28,14 @@ public:
     CPhysics_Car_System_Raycast_Wheels( IVP_Environment *env, const IVP_Template_Car_System *t );
     virtual ~CPhysics_Car_System_Raycast_Wheels();
 
-    virtual void do_raycasts( IVP_Event_Sim *, int n_wheels, IVP_Ray_Solver_Template *t_in,
-			                  IVP_Ray_Hit *hits_out, IVP_FLOAT *friction_of_object_out );
+    void do_raycasts( IVP_Event_Sim *, int n_wheels, IVP_Ray_Solver_Template *t_in,
+	                  IVP_Ray_Hit *hits_out, IVP_FLOAT *friction_of_object_out ) override;
 
-    void update_wheel_positions( void );
+    void update_wheel_positions( void ) override;
 
 	IPhysicsObject *GetWheel( int index );
 
-	virtual const char *get_controller_name() { return "sys:vehicle"; }
+	const char *get_controller_name() override { return "sys:vehicle"; }
 protected:
 
 	void InitCarSystemWheels( const IVP_Template_Car_System *pCarSystem );

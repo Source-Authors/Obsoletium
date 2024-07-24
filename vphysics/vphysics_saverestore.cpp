@@ -30,7 +30,7 @@ static void AddPtrAssociation( void *pOldValue, void *pNewValue )
 //-----------------------------------------------------------------------------
 // Purpose: Save/load part of CPhysicsEnvironment
 //-----------------------------------------------------------------------------
-static bool NoPhysSaveFunc( const physsaveparams_t &params, void * )
+static bool NoPhysSaveFunc( const physsaveparams_t &, void * )
 {
 	AssertMsg( 0, "Physics cannot save the specified type" );
 	return false;
@@ -55,7 +55,7 @@ bool CPhysicsEnvironment::Save( const physsaveparams_t &params )
 		(PhysSaveFunc_t)SavePhysicsVehicleController,
 	};
 	
-	if ( type >= 0 && type < PIID_NUM_TYPES )
+	if ( type >= PIID_UNKNOWN && type < PIID_NUM_TYPES )
 	{
 		params.pSave->WriteData( (char *)&params.pObject, sizeof(void*) );
 		return (*saveFuncs[type])( params, params.pObject );
@@ -63,7 +63,7 @@ bool CPhysicsEnvironment::Save( const physsaveparams_t &params )
 	return false;
 }
 
-static bool NoPhysRestoreFunc( const physrestoreparams_t &params, void ** )
+static bool NoPhysRestoreFunc( const physrestoreparams_t &, void ** )
 {
 	AssertMsg( 0, "Physics cannot save the specified type" );
 	return false;
@@ -102,7 +102,7 @@ bool CPhysicsEnvironment::Restore( const physrestoreparams_t &params )
 		(PhysRestoreFunc_t)RestorePhysicsVehicleController,
 	};
 	
-	if ( type >= 0 && type < PIID_NUM_TYPES )
+	if ( type >= PIID_UNKNOWN && type < PIID_NUM_TYPES )
 	{
 		void *pOldObject;
 		params.pRestore->ReadData( (char *)&pOldObject, sizeof(void*), 0 );
@@ -158,14 +158,14 @@ void CVPhysPtrSaveRestoreOps::Restore( const SaveRestoreFieldInfo_t &fieldInfo, 
 	{
 		pRestore->ReadData( (char *)ppField, sizeof(void*), 0 );
 
-		int iNewVal = s_VPhysPtrMap.Find( *ppField );
+		auto iNewVal = s_VPhysPtrMap.Find( *ppField );
 		if ( iNewVal != s_VPhysPtrMap.InvalidIndex() )
 		{
 			*ppField = s_VPhysPtrMap[iNewVal];
 		}
 		else
 		{
-			*ppField = NULL;
+			*ppField = nullptr;
 		}
 
 		++ppField;
@@ -188,10 +188,14 @@ void CVPhysPtrUtlVectorSaveRestoreOps::Save( const SaveRestoreFieldInfo_t &field
 	Assert( fieldInfo.pTypeDesc->fieldSize == 1 );
 
 	VPhysPtrVector *pUtlVector = (VPhysPtrVector*)fieldInfo.pField;
-	int nObjects = pUtlVector->Count();
+	intp nObjects = pUtlVector->Count();
 
-	pSave->WriteInt( &nObjects );
-	for ( int i = 0; i < nObjects; i++ )
+	Assert( nObjects <= INT_MAX );
+
+	int objects = static_cast<int>(nObjects);
+
+	pSave->WriteInt( &objects );
+	for ( intp i = 0; i < objects; i++ )
 	{
 		pSave->WriteData( (char*)&pUtlVector->Element(i), sizeof(void*) );
 	}
@@ -211,14 +215,14 @@ void CVPhysPtrUtlVectorSaveRestoreOps::Restore( const SaveRestoreFieldInfo_t &fi
 		void **ppElem = (void**)(&pUtlVector->Element(i));
 		pRestore->ReadData( (char *)ppElem, sizeof(void*), 0 );
 
-		int iNewVal = s_VPhysPtrMap.Find( *ppElem );
+		auto iNewVal = s_VPhysPtrMap.Find( *ppElem );
 		if ( iNewVal != s_VPhysPtrMap.InvalidIndex() )
 		{
 			*ppElem = s_VPhysPtrMap[iNewVal];
 		}
 		else
 		{
-			*ppElem = NULL;
+			*ppElem = nullptr;
 		}
 	}
 }

@@ -35,17 +35,18 @@ class CPhysicsMotionController : public IVP_Controller_Independent, public IPhys
 public:
 	CPhysicsMotionController( IMotionEvent *pHandler, CPhysicsEnvironment *pVEnv );
 	virtual ~CPhysicsMotionController( void );
-    virtual void do_simulation_controller(IVP_Event_Sim *event,IVP_U_Vector<IVP_Core> *core_list);
-    virtual IVP_CONTROLLER_PRIORITY get_controller_priority();
-    virtual void core_is_going_to_be_deleted_event(IVP_Core *core) 
+
+    void do_simulation_controller(IVP_Event_Sim *event,IVP_U_Vector<IVP_Core> *core_list) override;
+    IVP_CONTROLLER_PRIORITY get_controller_priority() override;
+    void core_is_going_to_be_deleted_event(IVP_Core *core) override 
 	{
 		m_coreList.FindAndRemove( core );
 	}
-	virtual const char *get_controller_name() { return "vphysics:motion"; }
+	const char *get_controller_name() override { return "vphysics:motion"; }
 
-	virtual void SetEventHandler( IMotionEvent *handler );
-	virtual void AttachObject( IPhysicsObject *pObject, bool checkIfAlreadyAttached );
-	virtual void DetachObject( IPhysicsObject *pObject );
+	void SetEventHandler( IMotionEvent *handler ) override;
+	void AttachObject( IPhysicsObject *pObject, bool checkIfAlreadyAttached ) override;
+	void DetachObject( IPhysicsObject *pObject ) override;
 
 	void RemoveCore( IVP_Core *pCore );
 
@@ -54,14 +55,14 @@ public:
 	void InitFromTemplate( const vphysics_save_motioncontroller_t &controllerTemplate );
 
 	// returns the number of objects currently attached to the controller
-	virtual int CountObjects( void )
+	intp CountObjects( void ) override
 	{
 		return m_coreList.Count();
 	}
 	// NOTE: pObjectList is an array with at least CountObjects() allocated
-	virtual void GetObjects( IPhysicsObject **pObjectList )
+	void GetObjects( IPhysicsObject **pObjectList ) override
 	{
-		for ( int i = 0; i < m_coreList.Count(); i++ )
+		for ( intp i = 0; i < m_coreList.Count(); i++ )
 		{
 			IVP_Core *pCore = m_coreList[i];
 
@@ -73,26 +74,26 @@ public:
 	}
 
 	// detaches all attached objects
-	virtual void ClearObjects( void )
+	void ClearObjects( void ) override
 	{
 		while ( m_coreList.Count() )
 		{
-			int x = m_coreList.Count()-1;
+			intp x = m_coreList.Count()-1;
 			IVP_Core *pCore = m_coreList[x];
 			RemoveCore( pCore );
 		}
 	}
 
 	// wakes up all attached objects
-	virtual void WakeObjects( void )
+	void WakeObjects( void ) override
 	{
-		for ( int i = 0; i < m_coreList.Count(); i++ )
+		for ( intp i = 0; i < m_coreList.Count(); i++ )
 		{
 			IVP_Core *pCore = m_coreList[i];
 			pCore->ensure_core_to_be_in_simulation();
 		}
 	}
-	virtual void SetPriority( priority_t priority );
+	void SetPriority( priority_t priority ) override;
 
 private:
 	IMotionEvent			*m_handler;
@@ -112,7 +113,7 @@ CPhysicsMotionController::CPhysicsMotionController( IMotionEvent *pHandler, CPhy
 CPhysicsMotionController::~CPhysicsMotionController( void )
 {
 	Assert( !m_pVEnv->IsInSimulation() );
-	for ( int i = 0; i < m_coreList.Count(); i++ )
+	for ( intp i = 0; i < m_coreList.Count(); i++ )
 	{
 		m_coreList[i]->rem_core_controller( (IVP_Controller *)this );
 	}
@@ -202,12 +203,13 @@ void CPhysicsMotionController::SetPriority( priority_t priority )
 	case LOW_PRIORITY:
 		m_priority = IVP_CP_CONSTRAINTS_MIN;
 		break;
-	default:
 	case MEDIUM_PRIORITY:
 		m_priority = IVP_CP_MOTION;
 		break;
 	case HIGH_PRIORITY:
 		m_priority = IVP_CP_FORCEFIELDS+1;
+		break;
+	default:
 		break;
 	}
 }
@@ -286,8 +288,8 @@ void CPhysicsMotionController::InitFromTemplate(  const vphysics_save_motioncont
 {
 	m_priority = controllerTemplate.m_nPriority;
 
-	int nObjectCount = controllerTemplate.m_objectList.Count();
-	for ( int i = 0; i < nObjectCount; ++i )
+	intp nObjectCount = controllerTemplate.m_objectList.Count();
+	for ( intp i = 0; i < nObjectCount; ++i )
 	{
 		AttachObject( controllerTemplate.m_objectList[i], true );
 	}

@@ -48,21 +48,21 @@ public:
 	~CPhysicsSpring();
 
 	// IPhysicsSpring
-	void GetEndpoints( Vector* worldPositionStart, Vector* worldPositionEnd );
-	void SetSpringConstant( float flSpringContant);
-	void SetSpringDamping( float flSpringDamping);
-	void SetSpringLength( float flSpringLength);
-	IPhysicsObject *GetStartObject( void ) { return m_pObjStart; }
-	IPhysicsObject *GetEndObject( void ) { return m_pObjEnd; }
+	void GetEndpoints( Vector* worldPositionStart, Vector* worldPositionEnd ) override;
+	void SetSpringConstant( float flSpringContant) override;
+	void SetSpringDamping( float flSpringDamping) override;
+	void SetSpringLength( float flSpringLength) override;
+	IPhysicsObject *GetStartObject( void ) override { return m_pObjStart; }
+	IPhysicsObject *GetEndObject( void ) override { return m_pObjEnd; }
 
 	void AttachListener();
 	void DetachListener();
 
 	// Object listener
-    virtual void event_object_deleted( IVP_Event_Object *);
-    virtual void event_object_created( IVP_Event_Object *) {}
-    virtual void event_object_revived( IVP_Event_Object *) {}
-    virtual void event_object_frozen ( IVP_Event_Object *) {}
+    void event_object_deleted( IVP_Event_Object *) override;
+    void event_object_created( IVP_Event_Object *) override {}
+    void event_object_revived( IVP_Event_Object *) override {}
+    void event_object_frozen ( IVP_Event_Object *) override {}
 	void WriteToTemplate( vphysics_save_cphysicsspring_t &params );
 
 private:

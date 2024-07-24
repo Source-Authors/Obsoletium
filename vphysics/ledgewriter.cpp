@@ -46,7 +46,7 @@ struct vertmap_t
 static void BuildVertMap( vertmap_t &out, const Vector *pVerts, int vertexCount, const IVP_Compact_Ledge *pLedge )
 {
 	out.map.EnsureCount(MaxLedgeVertIndex(pLedge)+1);
-	for ( int i = 0; i < out.map.Count(); i++ )
+	for ( intp i = 0; i < out.map.Count(); i++ )
 	{
 		out.map[i] = -1;
 	}
@@ -65,7 +65,7 @@ static void BuildVertMap( vertmap_t &out, const Vector *pVerts, int vertexCount,
 				int index = -1;
 				Vector tmp;
 				ConvertPositionToHL( &pVertList[ivpIndex], tmp);
-				float minDist = 1e16;
+				float minDist = 1e16f;
 				for ( int k = 0; k < vertexCount; k++ )
 				{
 					float dist = (tmp-pVerts[k]).Length();
@@ -101,19 +101,19 @@ void PackLedgeIntoBuffer( packedhull_t *pHull, CUtlBuffer &buf, const IVP_Compac
 
 	// The lists store the ivp index of each element to be written out
 	// The maps store the output packed index for each ivp index
-	CUtlVector<int> triangleList, triangleMap;
-	CUtlVector<int> edgeList, edgeMap;
+	CUtlVector<intp> triangleList, triangleMap;
+	CUtlVector<intp> edgeList, edgeMap;
 	vertmap_t vertMap;
 	BuildVertMap( vertMap, list.pVerts, list.vertexCount, pLedge );
 	pHull->baseVert = vertMap.minRef;
 	// clear the maps
 	triangleMap.EnsureCount(pLedge->get_n_triangles());
-	for ( int i = 0; i < triangleMap.Count(); i++ )
+	for ( intp i = 0; i < triangleMap.Count(); i++ )
 	{
 		triangleMap[i] = -1;
 	}
 	edgeMap.EnsureCount(pLedge->get_n_triangles()*4);	// each triangle also occupies an edge index
-	for ( int i = 0; i < edgeMap.Count(); i++ )
+	for ( intp i = 0; i < edgeMap.Count(); i++ )
 	{
 		edgeMap[i] = -1;
 	}

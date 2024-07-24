@@ -30,24 +30,24 @@ CTSPool< CUtlVector<CPhysCollideVirtualMesh *> > g_MeshFrameLocksPool;
 CTHREADLOCALPTR(CUtlVector<CPhysCollideVirtualMesh *>) g_pMeshFrameLocks;
 
 // This is the surfacemanager class for IVP that implements the required functions by layering CPhysCollideVirtualMesh
-class IVP_SurfaceManager_VirtualMesh : public IVP_SurfaceManager
+class IVP_SurfaceManager_VirtualMesh final : public IVP_SurfaceManager
 {
 public:
-	void add_reference_to_ledge(const IVP_Compact_Ledge *ledge);
-	void remove_reference_to_ledge(const IVP_Compact_Ledge *ledge);
-	void insert_all_ledges_hitting_ray(IVP_Ray_Solver *ray_solver, IVP_Real_Object *object);
-	void get_radius_and_radius_dev_to_given_center(const IVP_U_Float_Point *center, IVP_FLOAT *radius, IVP_FLOAT *radius_deviation) const;
-	virtual IVP_SURMAN_TYPE get_type() { return IVP_SURMAN_POLYGON; }
+	void add_reference_to_ledge(const IVP_Compact_Ledge *ledge) override;
+	void remove_reference_to_ledge(const IVP_Compact_Ledge *ledge) override;
+	void insert_all_ledges_hitting_ray(IVP_Ray_Solver *ray_solver, IVP_Real_Object *object) override;
+	void get_radius_and_radius_dev_to_given_center(const IVP_U_Float_Point *center, IVP_FLOAT *radius, IVP_FLOAT *radius_deviation) const override;
+	IVP_SURMAN_TYPE get_type() override { return IVP_SURMAN_POLYGON; }
 	
 	// assume mesh is never a single triangle
-	virtual const IVP_Compact_Ledge *get_single_convex() const;
-	void get_mass_center(IVP_U_Float_Point *mass_center_out) const;
-	void get_rotation_inertia( IVP_U_Float_Point *rotation_inertia_out ) const;
+	const IVP_Compact_Ledge *get_single_convex() const override;
+	void get_mass_center(IVP_U_Float_Point *mass_center_out) const override;
+	void get_rotation_inertia( IVP_U_Float_Point *rotation_inertia_out ) const override;
 	void get_all_ledges_within_radius(const IVP_U_Point *observer_os, IVP_DOUBLE radius,
 		const IVP_Compact_Ledge *root_ledge, IVP_Real_Object *other_object, const IVP_Compact_Ledge *other_reference_ledge,
-		IVP_U_BigVector<IVP_Compact_Ledge> *resulting_ledges);
+		IVP_U_BigVector<IVP_Compact_Ledge> *resulting_ledges) override;
 
-	void get_all_terminal_ledges(IVP_U_BigVector<IVP_Compact_Ledge> *resulting_ledges);
+	void get_all_terminal_ledges(IVP_U_BigVector<IVP_Compact_Ledge> *resulting_ledges) override;
 	IVP_SurfaceManager_VirtualMesh( CPhysCollideVirtualMesh *pMesh );
 	virtual ~IVP_SurfaceManager_VirtualMesh();
 
@@ -85,7 +85,7 @@ public:
 	}
 
 	// locals
-	CMeshInstance() { m_pMemory = 0; }
+	CMeshInstance() { m_memSize = 0; m_pMemory = 0; m_hullOffset = 0; m_hullCount = 0; }
 	~CMeshInstance();
 
 private:
@@ -95,7 +95,7 @@ private:
 	char	*m_pMemory;
 	unsigned short m_hullOffset;
 	byte	m_hullCount;
-	byte	m_pad;
+	[[maybe_unused]] byte	m_pad;
 };
 
 CMeshInstance::~CMeshInstance()
@@ -187,14 +187,14 @@ void CMeshInstance::Init( const virtualmeshlist_t &list )
 
 const int g_MeshSize = (2048 * 1024 * 4); // nillerusr: 2 MiB should be enough, old value causes problems in ep2
 static CDataManager<CMeshInstance, virtualmeshlist_t, CMeshInstance *, CThreadFastMutex> g_MeshManager( g_MeshSize );
-static int numIndices = 0, numTriangles = 0, numBaseTriangles = 0, numSplits = 0;
+
 //-----------------------------------------------------------------------------
 // Purpose: This allows for just-in-time procedural triangle soup data to be 
 //			instanced & cached as IVP collision data (compact ledges)
 //-----------------------------------------------------------------------------
 // NOTE: This is the permanent in-memory representation.  It holds the compressed data
 // and the parameters necessary to request the proxy geometry as needed
-class CPhysCollideVirtualMesh : public CPhysCollide
+class CPhysCollideVirtualMesh final : public CPhysCollide
 {
 public:
 	// UNDONE: Unlike other CPhysCollide objects, operations the virtual mesh are
@@ -203,13 +203,13 @@ public:
 	// hackery to cast away const.
 	
 	// get a surface manager 
-	virtual IVP_SurfaceManager *CreateSurfaceManager( short &collideType ) const
+	IVP_SurfaceManager *CreateSurfaceManager( short &collideType ) const override
 	{
 		collideType = COLLIDE_VIRTUAL;
 		// UNDONE: Figure out how to avoid this const_cast
 		return new IVP_SurfaceManager_VirtualMesh(const_cast<CPhysCollideVirtualMesh *>(this));
 	}
-	virtual void GetAllLedges( IVP_U_BigVector<IVP_Compact_Ledge> &ledges ) const
+	void GetAllLedges( IVP_U_BigVector<IVP_Compact_Ledge> &ledges ) const override
 	{
 		const triangleledge_t *pLedges = const_cast<CPhysCollideVirtualMesh *>(this)->AddRef()->GetLedges();
 		for ( int i = 0; i < m_ledgeCount; i++ )
@@ -218,14 +218,14 @@ public:
 		}
 		const_cast<CPhysCollideVirtualMesh *>(this)->Release();
 	}
-	virtual unsigned int GetSerializationSize() const 
+	unsigned int GetSerializationSize() const override 
 	{ 
 		if ( !m_pHull )
 			return 0; 
 		return m_pHull->TotalSize();
 	}
 
-	virtual unsigned int SerializeToBuffer( char *pDest, bool bSwap = false ) const 
+	unsigned int SerializeToBuffer( char *pDest, bool bSwap = false ) const override 
 	{
 		unsigned int size = GetSerializationSize();
 		if ( size )
@@ -234,14 +234,14 @@ public:
 		}
 		return size;
 	}
-	virtual int GetVCollideIndex() const { return 0; }
-	virtual void SetMassCenter( const Vector &massCenter ) {Assert(0); }
-	virtual Vector GetOrthographicAreas() const { return Vector(1,1,1);}
+	int GetVCollideIndex() const override { return 0; }
+	void SetMassCenter( const Vector & ) override {Assert(0); }
+	Vector GetOrthographicAreas() const override { return Vector(1,1,1);}
 
-	Vector GetMassCenter() const;
-	virtual float GetSphereRadius() const;
+	Vector GetMassCenter() const override;
+	float GetSphereRadius() const override;
 	float GetSphereRadiusIVP() const;
-	void Init( const char *pBuffer, unsigned int size )
+	void Init( const char *, unsigned int )
 	{
 	}
 	void GetAllLedgesWithinRadius( const IVP_U_Point *observer_os, IVP_DOUBLE radius, IVP_U_BigVector<IVP_Compact_Ledge> *resulting_ledges, const IVP_Compact_Ledge *pRootLedge = NULL )
@@ -298,7 +298,7 @@ public:
 		}
 	}
 
-	virtual void OutputDebugInfo() const
+	void OutputDebugInfo() const override
 	{
 		Msg("Virtual mesh!\n");
 	}
@@ -368,7 +368,7 @@ static void FlushFrameLocks()
 	CUtlVector<CPhysCollideVirtualMesh *> *pLocks = g_pMeshFrameLocks;
 	if ( pLocks )
 	{
-		for ( int i = 0; i < pLocks->Count(); i++ )
+		for ( intp i = 0; i < pLocks->Count(); i++ )
 		{
 			Assert( (*pLocks)[i] );
 			(*pLocks)[i]->Release();
@@ -551,11 +551,11 @@ IVP_SurfaceManager_VirtualMesh::~IVP_SurfaceManager_VirtualMesh()
 	FlushFrameLocks();
 }
 
-void IVP_SurfaceManager_VirtualMesh::add_reference_to_ledge(const IVP_Compact_Ledge *ledge)
+void IVP_SurfaceManager_VirtualMesh::add_reference_to_ledge(const IVP_Compact_Ledge *)
 {
 	m_pMesh->AddRef();
 }
-void IVP_SurfaceManager_VirtualMesh::remove_reference_to_ledge(const IVP_Compact_Ledge *ledge)
+void IVP_SurfaceManager_VirtualMesh::remove_reference_to_ledge(const IVP_Compact_Ledge *)
 {
 	m_pMesh->Release();
 }
@@ -610,13 +610,13 @@ void IVP_SurfaceManager_VirtualMesh::get_rotation_inertia( IVP_U_Float_Point *ro
 // Purpose: Query ledges (triangles in this case) in sphere
 //-----------------------------------------------------------------------------
 void IVP_SurfaceManager_VirtualMesh::get_all_ledges_within_radius(const IVP_U_Point *observer_os, IVP_DOUBLE radius,
-	const IVP_Compact_Ledge *root_ledge, IVP_Real_Object *other_object, const IVP_Compact_Ledge *other_reference_ledge,
+	const IVP_Compact_Ledge *root_ledge, IVP_Real_Object *, const IVP_Compact_Ledge *,
 	IVP_U_BigVector<IVP_Compact_Ledge> *resulting_ledges)
 {
 	if ( !root_ledge )
 	{
 		IVP_Compact_Ledge *pLedges[2];
-		int count = m_pMesh->GetRootLedges( pLedges, ARRAYSIZE(pLedges) );
+		int count = m_pMesh->GetRootLedges( pLedges, ssize(pLedges) );
 		if ( count )
 		{
 			for ( int i = 0; i < count; i++ )
