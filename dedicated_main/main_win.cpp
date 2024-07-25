@@ -36,8 +36,8 @@ template <size_t buffer_size>
 
 // Purpose: Shows error box and returns error code.
 [[nodiscard]] int ShowErrorBoxAndExitWithCode(_In_z_ const char *error_message,
-                                              _In_ int exit_code) {
-  const auto system_error = std::system_category().message(exit_code);
+                                              _In_ std::error_code exit_code) {
+  const auto system_error = exit_code.message();
 
   char entire_error_message[2048];
   _snprintf_s(entire_error_message, _TRUNCATE, "%s\n\n%s", error_message,
@@ -45,7 +45,11 @@ template <size_t buffer_size>
 
   MessageBoxA(nullptr, entire_error_message, "Dedicated Server - Error",
               MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
-  return exit_code;
+  return exit_code.value();
+}
+
+[[nodiscard]] std::error_code GetLastErrorCode(DWORD errc = GetLastError()) {
+  return std::error_code{static_cast<int>(errc), std::system_category()};
 }
 
 // Purpose: Apply process mitigation policies.
@@ -56,7 +60,7 @@ template <size_t buffer_size>
     return ShowErrorBoxAndExitWithCode(
         "Please contact publisher, very likely bug is detected.\n\n"
         "Unable to remove current directory from DLL search order.",
-        ::GetLastError());
+        GetLastErrorCode());
   }
 
   // Enable heap corruption detection & app termination.
@@ -65,7 +69,7 @@ template <size_t buffer_size>
     return ShowErrorBoxAndExitWithCode(
         "Please, contact publisher. Failed to enable termination on heap "
         "corruption feature for your environment.",
-        ::GetLastError());
+        GetLastErrorCode());
   }
 
 #if !defined(_WIN64)
@@ -77,7 +81,7 @@ template <size_t buffer_size>
     return ShowErrorBoxAndExitWithCode(
         "Please, contact publisher. Failed to enable DEP policy for your "
         "environment.",
-        ::GetLastError());
+        GetLastErrorCode());
   }
 #endif
 
@@ -93,7 +97,7 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to enable ASLR policy for your "
           "environment.",
-          ::GetLastError());
+          GetLastErrorCode());
     }
   }
 
@@ -109,7 +113,7 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to enable Strict Handle policy "
           "for your environment.",
-          ::GetLastError());
+          GetLastErrorCode());
     }
   }
 
@@ -124,7 +128,7 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to enable Extension Points policy "
           "for your environment.",
-          ::GetLastError());
+          GetLastErrorCode());
     }
   }
 
@@ -142,7 +146,7 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to harden Image Load policy for "
           "your environment.",
-          ::GetLastError());
+          GetLastErrorCode());
     }
   }
 
@@ -161,7 +165,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
     return ShowErrorBoxAndExitWithCode(
         "Unfortunately, your environment is not supported."
         "\n\nApp requires at least Windows 10 to survive.",
-        ERROR_EXE_MACHINE_TYPE_MISMATCH);
+        GetLastErrorCode(ERROR_EXE_MACHINE_TYPE_MISMATCH));
   }
 
   // Do not show fault error boxes, etc.
@@ -192,7 +196,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
         "Please check game installed in the folder with less "
         "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
         "Unable to get module file name from GetModuleFileName.",
-        ::GetLastError());
+        GetLastErrorCode());
   }
 
   // Get the base directory the .exe is in.
@@ -211,28 +215,26 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   const source::ScopedDll dedicated_dll{dedicated_dll_path,
                                         LOAD_WITH_ALTERED_SEARCH_PATH};
   if (!dedicated_dll) {
-    const auto rc = ::GetLastError();
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed in the folder with less "
                 "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
                 "Unable to load the dedicated DLL from %s.",
                 dedicated_dll_path);
 
-    return ShowErrorBoxAndExitWithCode(user_error, rc);
+    return ShowErrorBoxAndExitWithCode(user_error, dedicated_dll.error_code());
   }
 
   using DedicatedMainFunction = int (*)(HINSTANCE, HINSTANCE, LPSTR, int);
 
-  const auto dedicated_main =
+  const auto [dedicated_main, errc] =
       dedicated_dll.GetFunction<DedicatedMainFunction>("DedicatedMain");
   if (!dedicated_main) {
-    const auto rc = ::GetLastError();
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed correctly.\n\nUnable to find "
                 "DedicatedMain entry point in the dedicated DLL %s.",
                 dedicated_dll_path);
 
-    return ShowErrorBoxAndExitWithCode(user_error, rc);
+    return ShowErrorBoxAndExitWithCode(user_error, errc);
   }
 
   const auto rc =

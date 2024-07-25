@@ -19,7 +19,7 @@ __declspec(dllimport) MMRESULT __stdcall timeEndPeriod(_In_ unsigned uPeriod);
 
 }  // extern "C"
 
-namespace src::launcher {
+namespace se::launcher {
 
 // Changes minimum resolution for periodic timers and reverts back when
 // out of scope.
@@ -50,35 +50,35 @@ namespace src::launcher {
 // dimhotepus: Set timer resolution in a single place.
 class ScopedTimerResolution {
  public:
-  // Changes minimum resolution for periodic timers. |resolution_ms| Minimum
+  // Changes minimum resolution for periodic timers.  |resolution_ms| Minimum
   // timers resolution in milliseconds to request.
   explicit ScopedTimerResolution(
       std::chrono::milliseconds resolution_ms) noexcept
-      : m_resolutionMs{resolution_ms},
-        m_errorCode{
+      : new_resolution_{resolution_ms},
+        error_code_{
             ::timeBeginPeriod(static_cast<unsigned>(resolution_ms.count()))} {
-    AssertMsg(!!this, "Unable to set windows timer resolution.");
+    AssertMsg(!operator!(), "Unable to set windows timer resolution.");
   }
 
   // Restores previous minimum timer resolution.
   ~ScopedTimerResolution() noexcept {
-    if (!!this) {
-      [[maybe_unused]] const bool isSucceeded{
-          ::timeEndPeriod(static_cast<unsigned>(m_resolutionMs.count())) == 0};
-      AssertMsg(isSucceeded, "Unable to restore windows timer resolution.");
+    if (!operator!()) {
+      [[maybe_unused]] const bool is_ok{
+          ::timeEndPeriod(static_cast<unsigned>(new_resolution_.count())) == 0};
+      AssertMsg(is_ok, "Unable to restore windows timer resolution.");
     }
   }
 
   // Is set minimum timers resolution succeeded?
-  [[nodiscard]] bool operator!() const noexcept { return m_errorCode != 0; }
+  [[nodiscard]] bool operator!() const noexcept { return error_code_ != 0; }
 
  private:
   // New minimum timer resolution in ms.
-  std::chrono::milliseconds m_resolutionMs;
+  std::chrono::milliseconds new_resolution_;
   // Minimum timer resolution creation error_code.
-  unsigned m_errorCode;
+  unsigned error_code_;
 };
 
-}  // namespace src::launcher
+}  // namespace se::launcher
 
 #endif  // SRC_LAUNCHER_SCOPED_TIMER_RESOLUTION_H

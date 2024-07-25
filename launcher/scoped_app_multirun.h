@@ -37,7 +37,7 @@ constexpr inline unsigned long kWaitAbandoned{0x00000080L};
 #include <fcntl.h>
 #endif
 
-namespace src::launcher {
+namespace se::launcher {
 
 // App multirun.
 class ScopedAppMultiRun {
@@ -185,6 +185,6 @@ class ScopedAppMultiRun {
 #endif
 };
 
-}  // namespace src::launcher
+}  // namespace se::launcher
 
 #endif  // SRC_LAUNCHER_SCOPED_APP_MULTIRUN_H

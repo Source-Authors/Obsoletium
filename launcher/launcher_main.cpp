@@ -9,6 +9,9 @@
 #include <comdef.h>  // _com_error
 #endif
 
+#include <thread>
+
+#include "app_version_config.h"
 #include "scoped_app_locale.h"
 #include "scoped_app_multirun.h"
 #include "scoped_app_relaunch.h"
@@ -35,6 +38,10 @@
 
 #include "include/SDL3/SDL.h"
 
+#ifdef __GLIBC__
+#include <gnu/libc-version.h>
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -53,7 +60,7 @@ SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type, const char *raw) {
 
   group = group && group[0] ? group : engineGroup;
 
-  Q_snprintf(message, std::size(message), "%s: %s", group, raw);
+  Q_snprintf(message, std::size(message), "[%s] %s", group, raw);
 
   Plat_DebugString(message);
 
@@ -64,21 +71,21 @@ SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type, const char *raw) {
 
     case SPEW_WARNING:
       if (!stricmp(GetSpewOutputGroup(), "init")) {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Launcher - Warning",
-                                 message, nullptr);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING,
+                                 "Source Launcher - Warning", message, nullptr);
       }
       return SPEW_CONTINUE;
 
     case SPEW_ASSERT:
       if (!ShouldUseNewAssertDialog()) {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Launcher - Assert",
-                                 message, nullptr);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+                                 "Source Launcher - Assert", message, nullptr);
       }
       return SPEW_DEBUGGER;
 
     case SPEW_ERROR:
     default:
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Launcher - Error",
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Source Launcher - Error",
                                message, nullptr);
       _exit(1);
   }
@@ -116,13 +123,8 @@ void GetBaseDirectory(ICommandLine *command_line,
     }
   }
 
-  if (IsPC()) {
-    const char *override_directory{command_line->CheckParm("-basedir")};
-
-    if (override_directory) {
-      Q_strncpy(base_directory, override_directory, std::size(base_directory));
-    }
-  }
+  const char *override_directory{command_line->CheckParm("-basedir")};
+  if (override_directory) V_strcpy_safe(base_directory, override_directory);
 
 #ifdef WIN32
   Q_strlower(base_directory);
@@ -177,7 +179,7 @@ void TryToLoadSteamOverlayDLL() {
         char rgchSteamPath[MAX_PATH];
         V_ComposeFileName(pchSteamInstallPath,
                           "GameOverlayRenderer" DLL_EXT_STRING, rgchSteamPath,
-                          Q_ARRAYSIZE(rgchSteamPath));
+                          ssize(rgchSteamPath));
         // This could fail, but we can't fix it if it does so just ignore
         // failures
         LoadLibrary(rgchSteamPath);
@@ -259,14 +261,14 @@ int RunApp(ICommandLine *command_line, const char (&base_directory)[MAX_PATH],
   bool need_restart{false};
 
   do {
-    src::launcher::BootAppSystemGroup systems{command_line, base_directory,
-                                              is_text_mode};
+    se::launcher::BootAppSystemGroup systems{command_line, base_directory,
+                                             is_text_mode};
     CSteamApplication app{&systems};
 
     const int rc{app.Run()};
 
     need_restart = (app.GetErrorStage() ==
-                        src::launcher::BootAppSystemGroup::INITIALIZATION &&
+                        se::launcher::BootAppSystemGroup::INITIALIZATION &&
                     rc == INIT_RESTART) ||
                    rc == RUN_RESTART;
 
@@ -281,12 +283,61 @@ int RunApp(ICommandLine *command_line, const char (&base_directory)[MAX_PATH],
   return 0;
 }
 
+void DumpAppInformation(
+#ifdef _WIN32
+    LPSTR cmd_line
+#else
+    int argc, char **argv
+#endif
+) {
+#if defined(POSIX)
+#if defined(__clang__)
+  const std::string kCompilerVersion{"Clang " __clang_version__};
+#elif defined(__GCC__)
+  const std::string kCompilerVersion{std::to_string(__GNUC__) + "." +
+                                     std::to_string(__GNUC_MINOR__) + "." +
+                                     std::to_string(__GNUC_PATCHLEVEL__)};
+#else
+#error "Please, add your compiler build version here."
+#endif  // __GCC__
+
+#ifdef __GLIBCXX__
+  Msg("%s v.%s build with %s on glibc v.%u.%u [compiled], %s [runtime]. "
+      "glibc++ v.%u, ABI v.%u.\n",
+      SRC_PRODUCT_NAME_STRING, SRC_PRODUCT_FILE_VERSION_INFO_STRING,
+      kCompilerVersion.c_str(), __GLIBC__, __GLIBC_MINOR__,
+      gnu_get_libc_version(), _GLIBCXX_RELEASE, __GLIBCXX__);
+#endif
+
+#ifdef _LIBCPP_VERSION
+  Msg("%s v.%s build with %s on libc++ v.%u, ABI v.%u.\n",
+      SRC_PRODUCT_NAME_STRING, SRC_PRODUCT_FILE_VERSION_INFO_STRING,
+      kCompilerVersion.c_str(), _LIBCPP_VERSION, _LIBCPP_ABI_VERSION);
+#endif
+#endif  // POSIX
+
+#ifdef _WIN32
+  Msg("%s v.%s build with MSVC %u.%u\n", SRC_PRODUCT_NAME_STRING,
+      SRC_PRODUCT_FILE_VERSION_INFO_STRING, _MSC_FULL_VER, _MSC_BUILD);
+  Msg("%s started with command line '%s'\n", SRC_PRODUCT_NAME_STRING, cmd_line);
+#else
+  Msg("%s started with command line args:\n", SRC_PRODUCT_NAME_STRING);
+  for (int i{0}; i < argc; ++i) {
+    Msg("  %s\n", argv[i]);
+  }
+#endif
+
+#ifdef __SANITIZE_ADDRESS__
+  Msg("%s running under AddressSanitizer.\n", SRC_PRODUCT_NAME_STRING);
+#endif
+}
+
 }  // namespace
 
 // Entry point for the application.
 #ifdef WIN32
 DLL_EXPORT int LauncherMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
-                            int window_show_flags)
+                            [[maybe_unused]] int window_show_flags)
 #else
 DLL_EXPORT int LauncherMain(int argc, char **argv)
 #endif
@@ -298,6 +349,13 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   // Hook the debug output stuff.
   SpewOutputFunc(LauncherDefaultSpewFunc);
 
+  // Dump compiler / libs / app versions.
+#ifdef WIN32
+  DumpAppInformation(cmd_line);
+#else
+  DumpAppInformation(argc, argv);
+#endif
+
   // Printf/sscanf functions expect en_US UTF8 localization.  Mac OSX also sets
   // LANG to en_US.UTF-8 before starting up (in info.plist I believe).
   //
@@ -308,12 +366,11 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   // slam things to en_US.UTF-8.
   constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-  const src::launcher::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-  if (Q_stricmp(src::launcher::ScopedAppLocale::GetCurrentLocale(),
+  const se::launcher::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (Q_stricmp(se::launcher::ScopedAppLocale::GetCurrentLocale(),
                 kEnUsUtf8Locale)) {
     Warning("setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale,
-            src::launcher::ScopedAppLocale::GetCurrentLocale());
+            kEnUsUtf8Locale, se::launcher::ScopedAppLocale::GetCurrentLocale());
   }
 
 #ifdef POSIX
@@ -335,7 +392,9 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
     //
     // Add a -sleepatstartup command line and sleep for 5 seconds which should
     // allow time to attach a debugger.
-    ThreadSleep(5000);
+    using namespace std::chrono_literals;
+
+    std::this_thread::sleep_for(5000ms);
   }
 
   const CPUInformation *cpu_info{GetCPUInformation()};
@@ -364,7 +423,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 #endif
 
   // Can only run one windowed source app at a time.
-  const src::launcher::ScopedAppMultiRun scoped_app_multi_run;
+  const se::launcher::ScopedAppMultiRun scoped_app_multi_run;
   if (!scoped_app_multi_run.is_single_run()) {
     // Allow the user to explicitly say they want to be able to run multiple
     // instances of the source mutex.  Useful for side-by-side comparisons of
@@ -385,7 +444,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 
 #ifdef WIN32
   // COM is required.
-  const src::launcher::ScopedCom scoped_com{
+  const se::launcher::ScopedCom scoped_com{
       static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE |
                           COINIT_SPEED_OVER_MEMORY)};
   if (FAILED(scoped_com.errc())) {
@@ -395,19 +454,19 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   }
 
   using namespace std::chrono_literals;
-  constexpr std::chrono::milliseconds kSystemTimerResolution{8ms};
+  constexpr std::chrono::milliseconds kSystemTimerResolution{2ms};
 
   // System timer precision affects Sleep & friends performance.
-  const src::launcher::ScopedTimerResolution scoped_timer_resolution{
+  const se::launcher::ScopedTimerResolution scoped_timer_resolution{
       kSystemTimerResolution};
   if (!scoped_timer_resolution) {
     Warning(
         "Unable to set Windows timer resolution to %lld ms. Will use default "
         "one.",
-        (long long)kSystemTimerResolution.count());
+        static_cast<long long>(kSystemTimerResolution.count()));
   }
 
-  const src::launcher::ScopedWinsock scoped_winsock{MAKEWORD(2, 0)};
+  const se::launcher::ScopedWinsock scoped_winsock{MAKEWORD(2, 0)};
   if (scoped_winsock.errc()) {
     Warning("Windows sockets 2.0 unavailable (%d): %s.\n",
             scoped_winsock.errc(),
@@ -457,7 +516,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   // call has no effect on X360
   TryToLoadSteamOverlayDLL();
 
-  auto [vcr_helpers, rc] = src::launcher::CreateVcrHelpers(command_line);
+  auto [vcr_helpers, rc] = se::launcher::CreateVcrHelpers(command_line);
   if (rc != 0) return rc;
 
   // See the function for why we do this.
@@ -470,9 +529,9 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   }
 
   // Relaunch app if needed.
-  const src::launcher::ScopedAppRelaunch scoped_app_relaunch;
+  const se::launcher::ScopedAppRelaunch scoped_app_relaunch;
   // Dump heap leaks if needed.
-  const src::launcher::ScopedHeapLeakDumper scoped_heap_leak_dumper{
+  const se::launcher::ScopedHeapLeakDumper scoped_heap_leak_dumper{
       !!command_line->CheckParm("-leakcheck")};
 
   // Run in text mode (no graphics & sound)?

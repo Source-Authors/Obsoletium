@@ -5,7 +5,7 @@
 #ifndef SE_COMMON_COM_COM_PTR_H_
 #define SE_COMMON_COM_COM_PTR_H_
 
-#include <ObjBase.h>
+#include <objbase.h>
 #include <comip.h>
 
 #include <type_traits>

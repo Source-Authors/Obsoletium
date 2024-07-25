@@ -10,12 +10,12 @@
 
 #include "tier0/dbg.h"
 
-namespace src::launcher {
+namespace se::launcher {
 
 // Scoped Windows sockets initializer.
 class ScopedWinsock {
  public:
-  ScopedWinsock(unsigned short version)
+  explicit ScopedWinsock(unsigned short version)
       : errc_{::WSAStartup(version, &wsa_data_)}, version_{version} {}
 
   [[nodiscard]] int errc() const noexcept { return errc_; }
@@ -29,8 +29,8 @@ class ScopedWinsock {
     if (!errc_) {
       const int rc{::WSACleanup()};
       if (rc) {
-        Warning("Windows sockets shutdown failure (%d): %s.\n", rc,
-                std::system_category().message(rc).c_str());
+        Warning("Windows sockets %u shutdown failure (%d): %s.\n", rc,
+                version_, std::system_category().message(rc).c_str());
       }
     }
   }
@@ -41,6 +41,6 @@ class ScopedWinsock {
   const unsigned short version_;
 };
 
-}  // namespace src::launcher
+}  // namespace se::launcher
 
 #endif  // SRC_LAUNCHER_SCOPED_WINSOCK_H

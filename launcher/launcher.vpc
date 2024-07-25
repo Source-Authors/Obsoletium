@@ -20,7 +20,7 @@ $Configuration
 
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;$SDL3SRCDIR;$SDL3SRCDIR/include"	[!$SDL]
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\out\build;$SDL3SRCDIR;$SDL3SRCDIR/include"	[!$SDL]
 		$PreprocessorDefinitions			"$BASE;LAUNCHERONLY"
 	}
 

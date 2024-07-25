@@ -71,14 +71,18 @@ $Configuration
 	}
 }
 
-$Project "Dedicated_main"
+$Project "dedicated_main"
 {
 	$Folder	"Source Files"
 	{
 		$File	"main_win.cpp" [$WINDOWS]
 		$File	"main_posix.cpp" [$OSXALL || $LINUXALL]
-		$File	"$SRCDIR\common\SteamAppStartup.cpp"
-		$File	"$SRCDIR\common\SteamAppStartup.h"
+	}
+
+	$Folder "Header Files" [$WINDOWS]
+	{
+		$File	"$SRCDIR\common\scoped_dll.h"
+		$File	"$SRCDIR\common\scoped_process_error_mode.h"
 	}
 
 	$Folder	"Resources"

@@ -28,6 +28,11 @@ $Configuration
 		$AdditionalProjectDependencies "$BASE;newdat" [$WINDOWS && !$ANALYZE]
 	}
 
+	$Linker [$WINDOWS]
+	{
+		$AdditionalDependencies				"$BASE User32.lib"
+	}
+
 	$ManifestTool
 	{
 		// Input And Output
@@ -111,6 +116,12 @@ $Project "launcher_main"
 	{
 		$File	"main_win.cpp" [$WINDOWS]
 		$File	"main_posix.cpp" [$OSXALL || $LINUXALL]
+	}
+
+	$Folder "Header Files" [$WINDOWS]
+	{
+		$File	"$SRCDIR\common\scoped_dll.h"
+		$File	"$SRCDIR\common\scoped_process_error_mode.h"
 	}
 
 	$Folder "Resources" [$WINDOWS]

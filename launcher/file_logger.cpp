@@ -25,7 +25,7 @@ bool FilePathLess(CUtlString const &l, CUtlString const &r) {
 
 }  // namespace
 
-namespace src::launcher {
+namespace se::launcher {
 
 FileLogger::FileLogger(ICommandLine *command_line, IFileSystem *file_system,
                        char (&base_directory)[MAX_PATH])
@@ -37,7 +37,7 @@ FileLogger::FileLogger(ICommandLine *command_line, IFileSystem *file_system,
   MEM_ALLOC_CREDIT();
 
   base_dir_[0] = '\0';
-  Q_strcpy(base_dir_, base_directory);
+  V_strcpy_safe(base_dir_, base_directory);
 
   current_dir_[0] = '\0';
   resource_listing_dir_ = "reslists";
@@ -58,7 +58,7 @@ void FileLogger::Init() {
   if (command_line_->CheckParm("-reslistdir", &resource_listing_dir) &&
       resource_listing_dir) {
     char override_dir[MAX_PATH];
-    Q_strncpy(override_dir, resource_listing_dir, sizeof(override_dir));
+    V_strcpy_safe(override_dir, resource_listing_dir);
     Q_StripTrailingSlash(override_dir);
 
 #ifdef WIN32
@@ -103,12 +103,12 @@ void FileLogger::Init() {
 
 #ifdef WIN32
   ::GetCurrentDirectory(sizeof(current_dir_), current_dir_);
-  Q_strncat(current_dir_, "\\", sizeof(current_dir_), 1);
+  V_strcat_safe(current_dir_, "\\");
 
   _strlwr(current_dir_);
 #else
   getcwd(current_dir_, sizeof(current_dir_));
-  Q_strncat(current_dir_, "/", sizeof(current_dir_), 1);
+  V_strcat_safe(current_dir_, "/");
 #endif
 
   // Open for append
@@ -170,7 +170,7 @@ void FileLogger::LogAccess(const char *file_path, const char *options) {
     relative += Q_strlen(base_dir_) + 1;
 
     char rel[MAX_PATH];
-    Q_strncpy(rel, relative, sizeof(rel));
+    V_strcpy_safe(rel, relative);
 
 #ifdef WIN32
     Q_strlower(rel);
@@ -182,4 +182,4 @@ void FileLogger::LogAccess(const char *file_path, const char *options) {
   }
 }
 
-}  // namespace src::launcher
+}  // namespace se::launcher

@@ -17,7 +17,7 @@
 #include <cstdio>
 #endif
 
-namespace src::launcher {
+namespace se::launcher {
 
 // Scoped app relaunch.
 class ScopedAppRelaunch {
@@ -80,7 +80,7 @@ class ScopedAppRelaunch {
       if (RegQueryValueExW(key, L"Relaunch URL", nullptr, nullptr,
                            (unsigned char *)value,
                            &value_size) == ERROR_SUCCESS) {
-        ShellExecuteW(nullptr, L"open", value, 0, 0, SW_SHOW);
+        ShellExecuteW(nullptr, L"open", value, nullptr, nullptr, SW_SHOW);
         RegDeleteValueW(key, L"Relaunch URL");
       }
 
@@ -90,9 +90,11 @@ class ScopedAppRelaunch {
   }
 
  private:
+#ifndef WIN32
   static constexpr char kRelaunchFilePath[18] = {"/tmp/hl2_relaunch"};
+#endif
 };
 
-}  // namespace src::launcher
+}  // namespace se::launcher
 
 #endif  // SRC_LAUNCHER_SCOPED_APP_RELAUNCH_H
