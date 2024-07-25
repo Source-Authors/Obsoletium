@@ -9,6 +9,8 @@
 #include <comdef.h>  // _com_error
 #endif
 
+#include <thread>
+
 #include "scoped_app_locale.h"
 #include "scoped_app_multirun.h"
 #include "scoped_app_relaunch.h"
@@ -116,13 +118,8 @@ void GetBaseDirectory(ICommandLine *command_line,
     }
   }
 
-  if (IsPC()) {
-    const char *override_directory{command_line->CheckParm("-basedir")};
-
-    if (override_directory) {
-      Q_strncpy(base_directory, override_directory, std::size(base_directory));
-    }
-  }
+  const char *override_directory{command_line->CheckParm("-basedir")};
+  if (override_directory) V_strcpy_safe(base_directory, override_directory);
 
 #ifdef WIN32
   Q_strlower(base_directory);
@@ -177,7 +174,7 @@ void TryToLoadSteamOverlayDLL() {
         char rgchSteamPath[MAX_PATH];
         V_ComposeFileName(pchSteamInstallPath,
                           "GameOverlayRenderer" DLL_EXT_STRING, rgchSteamPath,
-                          Q_ARRAYSIZE(rgchSteamPath));
+                          ssize(rgchSteamPath));
         // This could fail, but we can't fix it if it does so just ignore
         // failures
         LoadLibrary(rgchSteamPath);
@@ -286,7 +283,7 @@ int RunApp(ICommandLine *command_line, const char (&base_directory)[MAX_PATH],
 // Entry point for the application.
 #ifdef WIN32
 DLL_EXPORT int LauncherMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
-                            int window_show_flags)
+                            [[maybe_unused]] int window_show_flags)
 #else
 DLL_EXPORT int LauncherMain(int argc, char **argv)
 #endif
@@ -335,7 +332,9 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
     //
     // Add a -sleepatstartup command line and sleep for 5 seconds which should
     // allow time to attach a debugger.
-    ThreadSleep(5000);
+    using namespace std::chrono_literals;
+
+    std::this_thread::sleep_for(5000ms);
   }
 
   const CPUInformation *cpu_info{GetCPUInformation()};
@@ -404,7 +403,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
     Warning(
         "Unable to set Windows timer resolution to %lld ms. Will use default "
         "one.",
-        (long long)kSystemTimerResolution.count());
+        static_cast<long long>(kSystemTimerResolution.count()));
   }
 
   const src::launcher::ScopedWinsock scoped_winsock{MAKEWORD(2, 0)};

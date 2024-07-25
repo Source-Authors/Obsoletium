@@ -11,7 +11,7 @@ namespace src::launcher {
 // Dump heap leaks.
 class ScopedHeapLeakDumper {
  public:
-  ScopedHeapLeakDumper(bool should_check_leaks) noexcept
+  explicit ScopedHeapLeakDumper(bool should_check_leaks) noexcept
       : should_check_leaks_(should_check_leaks) {}
 
   ScopedHeapLeakDumper(const ScopedHeapLeakDumper &) = delete;

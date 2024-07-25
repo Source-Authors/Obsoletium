@@ -113,6 +113,12 @@ $Project "launcher_main"
 		$File	"main_posix.cpp" [$OSXALL || $LINUXALL]
 	}
 
+	$Folder "Header Files" [$WINDOWS]
+	{
+		$File	"$SRCDIR\common\scoped_dll.h"
+		$File	"$SRCDIR\common\scoped_process_error_mode.h"
+	}
+
 	$Folder "Resources" [$WINDOWS]
 	{
 		$File	"resources\app.ico"

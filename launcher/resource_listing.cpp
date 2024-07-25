@@ -46,7 +46,7 @@ bool SaveResourceListing(IFileSystem *file_system,
 void LoadResourceListing(IFileSystem *file_system,
                          CUtlRBTree<CUtlString, int> &list,
                          const char *pchFileName, const char *pchSearchPath) {
-  CUtlBuffer buffer(0, 0, CUtlBuffer::TEXT_BUFFER);
+  CUtlBuffer buffer((intp)0, 0, CUtlBuffer::TEXT_BUFFER);
   if (!file_system->ReadFile(pchFileName, pchSearchPath, buffer)) {
     // does not exist
     return;
@@ -58,7 +58,7 @@ void LoadResourceListing(IFileSystem *file_system,
   // parse reslist
   char szToken[MAX_PATH];
   for (;;) {
-    int nTokenSize = buffer.ParseToken(&breakSet, szToken, sizeof(szToken));
+    intp nTokenSize = buffer.ParseToken(&breakSet, szToken, sizeof(szToken));
     if (nTokenSize <= 0) {
       break;
     }
@@ -197,7 +197,7 @@ void ResourceListing::Init(const char *pchBaseDir, const char *pchGameDir) {
   Q_strlower(path);
   full_game_path_ = path;
 
-  const char *pchCommandFile = NULL;
+  const char *pchCommandFile = nullptr;
   if (command_line_->CheckParm("-makereslists", &pchCommandFile) &&
       pchCommandFile) {
     // base path setup, now can get and parse command file
@@ -241,11 +241,11 @@ void ResourceListing::SetupCommandLine() {
       file_system_->CreateDirHierarchy(szFullWorkingDir, "GAME");
 
       // Preserve startmap
-      const char *pszStartMap = NULL;
+      const char *pszStartMap = nullptr;
       command_line_->CheckParm("-startmap", &pszStartMap);
       char szMap[MAX_PATH] = {0};
       if (pszStartMap) {
-        Q_strncpy(szMap, pszStartMap, sizeof(szMap));
+        V_strcpy_safe(szMap, pszStartMap);
       }
 
       // Prepare stuff
@@ -259,7 +259,7 @@ void ResourceListing::SetupCommandLine() {
 
       command_line_->CreateCmdLine(szCmd);
       // Never rebuild caches by default, inly do it in GeneratingCaches
-      command_line_->AppendParm("-norebuildaudio", NULL);
+      command_line_->AppendParm("-norebuildaudio", nullptr);
       if (szMap[0]) {
         command_line_->AppendParm("-startmap", szMap);
       }
@@ -281,6 +281,8 @@ void ResourceListing::SetupCommandLine() {
 
       current_state_ = State::Done;
     } break;
+    case State::Done:
+      break;
   }
 }
 
@@ -306,9 +308,8 @@ bool ResourceListing::ShouldContinue() {
           return true;
         }
       } break;
-      case State::GeneratingCaches: {
+      case State::GeneratingCaches:
         return true;
-      } break;
     }
   } while (bContinueAdvancing);
 
@@ -322,7 +323,7 @@ void ResourceListing::LoadMapList(const char *pchGameDir,
   Q_snprintf(fullpath, sizeof(fullpath), "%s/%s", pchGameDir, pchMapFile);
 
   // Load them in
-  CUtlBuffer buf(0, 0, CUtlBuffer::TEXT_BUFFER);
+  CUtlBuffer buf((intp)0, 0, CUtlBuffer::TEXT_BUFFER);
 
   if (file_system_->ReadFile(fullpath, "GAME", buf)) {
     char szMap[MAX_PATH];
@@ -373,7 +374,7 @@ bool ResourceListing::InitCommandFile(const char *pchGameDir,
     Error("Maplist file '%s' empty or missing!!!\n", sMapListFile.String());
   }
 
-  const char *pszSolo = NULL;
+  const char *pszSolo = nullptr;
   if (command_line_->CheckParm("+map", &pszSolo) && pszSolo) {
     map_list_.Purge();
 
@@ -384,7 +385,7 @@ bool ResourceListing::InitCommandFile(const char *pchGameDir,
 
   current_wi_ = command_line_->ParmValue("-startstage", 0);
 
-  const char *pszStartMap = NULL;
+  const char *pszStartMap = nullptr;
   command_line_->CheckParm("-startmap", &pszStartMap);
   if (pszStartMap) {
     initial_start_map_ = pszStartMap;

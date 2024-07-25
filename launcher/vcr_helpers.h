@@ -16,7 +16,8 @@ struct VCRHelpers : public IVCRHelpers {
   void *GetMainWindow() override;
 };
 
-std::tuple<VCRHelpers, int> CreateVcrHelpers(ICommandLine *command_line);
+[[nodiscard]] std::tuple<VCRHelpers, int> CreateVcrHelpers(
+    ICommandLine *command_line);
 
 }  // namespace src::launcher
 

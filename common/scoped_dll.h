@@ -52,7 +52,10 @@ class ScopedDll {
 #else
       : dll_{::dlopen(dll_path, load_flags)}
 #endif
-        dll_path_{dll_path} {
+#ifdef _DEBUG
+        dll_path_{dll_path}
+#endif
+  {
   }
 
   ScopedDll(const ScopedDll &) = delete;
@@ -97,7 +100,9 @@ class ScopedDll {
   void *dll_;
 #endif
 
-  const char *dll_path_;
+#ifdef _DEBUG
+  [[maybe_unused]] const char *dll_path_;
+#endif
 };
 
 }  // namespace source

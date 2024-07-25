@@ -57,12 +57,12 @@ class ScopedTimerResolution {
       : m_resolutionMs{resolution_ms},
         m_errorCode{
             ::timeBeginPeriod(static_cast<unsigned>(resolution_ms.count()))} {
-    AssertMsg(!!this, "Unable to set windows timer resolution.");
+    AssertMsg(!operator!(), "Unable to set windows timer resolution.");
   }
 
   // Restores previous minimum timer resolution.
   ~ScopedTimerResolution() noexcept {
-    if (!!this) {
+    if (!operator!()) {
       [[maybe_unused]] const bool isSucceeded{
           ::timeEndPeriod(static_cast<unsigned>(m_resolutionMs.count())) == 0};
       AssertMsg(isSucceeded, "Unable to restore windows timer resolution.");

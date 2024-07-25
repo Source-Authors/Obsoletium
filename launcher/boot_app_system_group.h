@@ -23,12 +23,11 @@ class BootAppSystemGroup : public CSteamAppSystemGroup {
   BootAppSystemGroup(ICommandLine *command_line,
                      const char (&base_directory)[MAX_PATH], bool is_text_mode)
       : command_line_(command_line),
-        file_system_(nullptr),
         engine_api_(nullptr),
         hammer_(nullptr),
         is_edit_mode_(command_line->CheckParm("-edit")),
         is_text_mode_(is_text_mode) {
-    Q_strcpy(base_dir_, base_directory);
+    V_strcpy_safe(base_dir_, base_directory);
   }
 
   bool Create() override;
@@ -48,7 +47,6 @@ class BootAppSystemGroup : public CSteamAppSystemGroup {
 
   char base_dir_[_MAX_PATH];
   ICommandLine *command_line_;
-  IFileSystem *file_system_;
   IEngineAPI *engine_api_;
   IHammer *hammer_;
   std::unique_ptr<IResourceListing> resource_listing_;
