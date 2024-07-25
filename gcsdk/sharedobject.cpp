@@ -310,7 +310,7 @@ void CSharedObjectStats::RegisterSharedObjectType( int nTypeID, const char* pszT
 	}
 
 	//we need to register this type by adding a new record, and updating our index
-	int nNewIndex = m_Stats.AddToTail();
+	intp nNewIndex = m_Stats.AddToTail();
 	m_Stats[ nNewIndex ].m_sName	= pszTypeName;
 	m_Stats[ nNewIndex ].m_nTypeID	= nTypeID;
 	m_vTypeToIndex[ nTypeID ] = nNewIndex;

@@ -247,8 +247,8 @@ void CSharedObjectTypeCache::Validate( CValidator &validator, const char *pchNam
 // Purpose: Constructor
 //----------------------------------------------------------------------------
 CSharedObjectCache::CSharedObjectCache( ) 
-: m_mapObjects( DefLessFunc(int) )
-, m_ulVersion( 0 )
+: m_ulVersion( 0 )
+, m_mapObjects( DefLessFunc(int) )
 {
 
 }

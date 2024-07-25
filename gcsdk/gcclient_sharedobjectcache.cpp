@@ -122,7 +122,7 @@ void CGCClientSharedObjectContext::SOCacheUnsubscribed( const CSteamID & steamID
 // Purpose: Constructor
 //----------------------------------------------------------------------------
 CGCClientSharedObjectTypeCache::CGCClientSharedObjectTypeCache( int nTypeID, const CGCClientSharedObjectContext & context )
-	: m_context( context ), CSharedObjectTypeCache( nTypeID )
+	: CSharedObjectTypeCache( nTypeID ), m_context( context )
 {
 
 }

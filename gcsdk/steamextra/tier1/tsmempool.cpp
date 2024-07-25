@@ -36,7 +36,7 @@ CThreadSafeMemoryPool::CThreadSafeMemoryPool( int blockSize, int numElements, in
 		blockSize += TSLIST_NODE_ALIGNMENT - (blockSize % TSLIST_NODE_ALIGNMENT);
 	}
 	Assert( blockSize % TSLIST_NODE_ALIGNMENT == 0 );
-	Assert( blockSize > sizeof(FreeListItem_t) );
+	Assert( blockSize > static_cast<int>(sizeof(FreeListItem_t)) );
 	m_nGrowMode = growMode;
 	m_cubBlockSize = blockSize;
 	m_nGrowSize = numElements;

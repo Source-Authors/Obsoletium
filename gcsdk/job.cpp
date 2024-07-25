@@ -30,7 +30,7 @@ static const char * const k_prgchJobPauseReason[] =
 	"work item",
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( k_prgchJobPauseReason ) == k_EJobPauseReasonCount );
+COMPILE_TIME_ASSERT( ssize( k_prgchJobPauseReason ) == k_EJobPauseReasonCount );
 
 CJob *g_pJobCur = NULL;
 
@@ -163,7 +163,7 @@ const char *CJob::GetName() const
 const char *CJob::GetPauseReasonDescription()  const
 {
 	static char srgchPauseReason[k_cSmallBuff];
-	if ( GetPauseReason() < Q_ARRAYSIZE( k_prgchJobPauseReason ) )
+	if ( GetPauseReason() < ssize( k_prgchJobPauseReason ) )
 	{
 		switch( GetPauseReason() )
 		{
@@ -1299,13 +1299,13 @@ CLock::CLock( )
 : m_pJob( NULL ), 
 m_pJobToNotifyOnLockRelease( NULL ), 
 m_pJobWaitingQueueTail( NULL ), 
-m_nWaitingCount(0),
 m_nsLockType(0),
 m_nsNameType( k_ENameTypeNone ),
 m_ulID( 0 ),
 m_pchConstStr( NULL ),
-m_unLockSubType ( 0 ),
 m_nRefCount( 0 ),
+m_nWaitingCount(0),
+m_unLockSubType ( 0 ),
 m_pFilename( "unknown" ),
 m_line( 0 )
 { 

@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2010, Valve LLC, All rights reserved. ============
+//========= Copyright 1996-2010, Valve LLC, All rights reserved. ============
 //
 // Purpose: Implementation for CWebAPIResponse objects
 //
@@ -266,14 +266,14 @@ bool Base64Decode( const char *pchData, uint32 cchDataMax, uint8 *pubDecodedData
 		32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
 		47, 48, 49, 50, 51
 	};
-	COMPILE_TIME_ASSERT( Q_ARRAYSIZE(rgchInvBase64) == 0x7A - 0x2B + 1 );
+	static_assert( ssize(rgchInvBase64) == 0x7A - 0x2B + 1 );
 
 	uint32 un24BitsWithSentinel = 1;
 	while ( cchDataMax-- > 0 )
 	{
 		char c = *pchData++;
 
-		if ( (uint8)(c - 0x2B) >= Q_ARRAYSIZE( rgchInvBase64 ) )
+		if ( (uint8)(c - 0x2B) >= std::size( rgchInvBase64 ) )
 		{
 			if ( c == '\0' )
 				break;
@@ -2437,6 +2437,7 @@ bool ProtoBufHelper::RecursiveAddProtoBufToWebAPIValues( CWebAPIValues *pWebAPIR
 			case FieldDescriptor::CPPTYPE_INT32:	pchTypeName = "int32"; break;
 			case FieldDescriptor::CPPTYPE_INT64:	pchTypeName = "int64"; break;
 			case FieldDescriptor::CPPTYPE_UINT32:	pchTypeName = "uint32"; break;
+			case FieldDescriptor::CPPTYPE_UINT64:	pchTypeName = "uint64"; break;
 			case FieldDescriptor::CPPTYPE_DOUBLE:	pchTypeName = "double"; break;
 			case FieldDescriptor::CPPTYPE_FLOAT:	pchTypeName = "float"; break;
 			case FieldDescriptor::CPPTYPE_BOOL:		pchTypeName = "bool"; break;

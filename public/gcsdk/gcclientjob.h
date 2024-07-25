@@ -23,7 +23,7 @@ public:
 	CGCClientJob( CGCClient *pGCClient ) : CJob( pGCClient->GetJobMgr() ), m_pGCClient( pGCClient ), m_cHeartbeatsBeforeTimeout( k_cJobHeartbeatsBeforeTimeoutDefault ) {}
 
 	// all GCClient jobs must implement one of these
-	virtual bool BYieldingRunGCJob( IMsgNetPacket *pNetPacket )	{ return false; }
+	virtual bool BYieldingRunGCJob( IMsgNetPacket * )	{ return false; }
 	virtual bool BYieldingRunGCJob()							{ return false; }
 
 	virtual EServerType GetServerType() { return k_EServerTypeGCClient; }
