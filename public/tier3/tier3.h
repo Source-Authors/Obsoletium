@@ -87,7 +87,7 @@ public:
 	{
 	}
 
-	virtual bool Connect( CreateInterfaceFn factory ) 
+	bool Connect( CreateInterfaceFn factory ) override
 	{
 		if ( !BaseClass::Connect( factory ) )
 			return false;
@@ -99,7 +99,7 @@ public:
 		return true;
 	}
 
-	virtual void Disconnect() 
+	void Disconnect() override
 	{
 		if ( BaseClass::IsPrimaryAppSystem() )
 		{

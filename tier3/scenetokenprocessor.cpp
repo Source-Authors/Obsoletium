@@ -15,15 +15,15 @@
 //-----------------------------------------------------------------------------
 // Purpose: Helper for parsing scene data file
 //-----------------------------------------------------------------------------
-class CSceneTokenProcessor : public ISceneTokenProcessor
+class CSceneTokenProcessor final : public ISceneTokenProcessor
 {
 public:
 	CSceneTokenProcessor();
 
-	const char	*CurrentToken( void );
-	bool		GetToken( bool crossline );
-	bool		TokenAvailable( void );
-	void		Error( const char *fmt, ... );
+	const char	*CurrentToken( void ) override;
+	bool		GetToken( bool crossline ) override;
+	bool		TokenAvailable( void ) override;
+	void		Error( const char *fmt, ... ) override;
 	void		SetBuffer( char *buffer );
 private:
 
@@ -128,7 +128,7 @@ skipwhite:
 // Input  : crossline - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CSceneTokenProcessor::GetToken( bool crossline )
+bool CSceneTokenProcessor::GetToken( [[maybe_unused]] bool crossline )
 {
 	// NOTE: crossline is ignored here, may need to implement if needed
 	m_pBuffer = ParseNextToken( m_pBuffer );
