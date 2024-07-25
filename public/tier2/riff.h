@@ -15,6 +15,7 @@
 #define RIFF_H
 #pragma once
 
+#include <cstddef>
 #include "commonmacros.h"
 
 
@@ -25,12 +26,12 @@
 class IFileReadBinary
 {
 public:
-	virtual int open( const char *pFileName ) = 0;
-	virtual int read( void *pOutput, int size, int file ) = 0;
-	virtual void close( int file ) = 0;
-	virtual void seek( int file, int pos ) = 0;
-	virtual unsigned int tell( int file ) = 0;
-	virtual unsigned int size( int file ) = 0;
+	virtual ptrdiff_t open( const char *pFileName ) = 0;
+	virtual int read( void *pOutput, int size, ptrdiff_t file ) = 0;
+	virtual void close( ptrdiff_t file ) = 0;
+	virtual void seek( ptrdiff_t file, int pos ) = 0;
+	virtual unsigned int tell( ptrdiff_t file ) = 0;
+	virtual unsigned int size( ptrdiff_t file ) = 0;
 };
 
 
@@ -56,7 +57,7 @@ private:
 	const InFileRIFF & operator=( const InFileRIFF & ) = delete;
 
 	IFileReadBinary		&m_io;
-	int					m_file;
+	ptrdiff_t			m_file;
 	unsigned int		m_riffName;
 	unsigned int		m_riffSize;
 };
@@ -99,11 +100,11 @@ private:
 class IFileWriteBinary
 {
 public:
-	virtual int create( const char *pFileName ) = 0;
-	virtual int write( void *pData, int size, int file ) = 0;
-	virtual void close( int file ) = 0;
-	virtual void seek( int file, int pos ) = 0;
-	virtual unsigned int tell( int file ) = 0;
+	virtual ptrdiff_t create( const char *pFileName ) = 0;
+	virtual int write( void *pData, int size, ptrdiff_t file ) = 0;
+	virtual void close( ptrdiff_t file ) = 0;
+	virtual void seek( ptrdiff_t file, int pos ) = 0;
+	virtual unsigned int tell( ptrdiff_t file ) = 0;
 };
 //-----------------------------------------------------------------------------
 // Purpose: Used to write a RIFF format file
@@ -126,7 +127,7 @@ private:
 	const OutFileRIFF & operator=( const OutFileRIFF & ) = delete;
 
 	IFileWriteBinary	&m_io;
-	int					m_file;
+	ptrdiff_t			m_file;
 	unsigned int		m_riffName;
 	unsigned int		m_riffSize;
 	unsigned int		m_nNamePos;

@@ -68,7 +68,7 @@ class CBeamSegDrawArbitrary : public CBeamSegDraw
 {
 public:
 	void			SetNormal( const Vector &normal );
-	void			NextSeg( BeamSeg_t *pSeg );
+	void			NextSeg( BeamSeg_t *pSeg ) override;
 
 protected:
 	void			SpecifySeg( const Vector &vNextPos );

@@ -30,15 +30,15 @@ CP4File::CP4File( char const *szFilename )
 	// the short path name
 
 	TCHAR szShortPathName[ MAX_PATH ] = TEXT( "" );
-	const DWORD shortRetVal = GetShortPathName( szFilename, szShortPathName, ARRAYSIZE( szShortPathName ) );
+	const DWORD shortRetVal = GetShortPathName( szFilename, szShortPathName, std::size( szShortPathName ) );
 
-	if ( shortRetVal > 0 && shortRetVal <= ARRAYSIZE( szShortPathName ) )
+	if ( shortRetVal > 0 && shortRetVal <= std::size( szShortPathName ) )
 	{
 		TCHAR szLongPathName[ MAX_PATH ] = TEXT( "" );
 
-		const DWORD longRetVal = GetLongPathName( szShortPathName, szLongPathName, ARRAYSIZE( szLongPathName ) );
+		const DWORD longRetVal = GetLongPathName( szShortPathName, szLongPathName, std::size( szLongPathName ) );
 
-		if ( longRetVal > 0 && longRetVal <= ARRAYSIZE( szLongPathName ) )
+		if ( longRetVal > 0 && longRetVal <= std::size( szLongPathName ) )
 		{
 			m_sFilename = szLongPathName;
 			return;
@@ -94,7 +94,7 @@ bool CP4File::IsFileInPerforce()
   return false;
 }
 
-bool CP4File::SetFileType(const CUtlString& desiredFileType)
+bool CP4File::SetFileType( [[maybe_unused]] const CUtlString& desiredFileType)
 {
 	// dimhotepus: No perforce
   /*if (!p4)
@@ -127,7 +127,7 @@ bool CP4Factory::SetDummyMode( bool bDummyMode )
 	return bOld;
 }
 
-void CP4Factory::SetOpenFileChangeList( const char *szChangeListName )
+void CP4Factory::SetOpenFileChangeList( [[maybe_unused]] const char *szChangeListName )
 {
   // dimhotepus: No perforce
 	/*if ( !m_bDummyMode && p4 )

@@ -37,7 +37,7 @@ void GetModSubdirectory( const char *pSubDir, char *pBuf, int nBufLen )
 	Q_StripTrailingSlash( pBuf );
 	if ( pSubDir )
 	{
-		int nLen = Q_strlen( pSubDir );
+		intp nLen = Q_strlen( pSubDir );
 		Q_strncat( pBuf, "\\", nBufLen, 1 );
 		Q_strncat( pBuf, pSubDir, nBufLen, nLen );
 	}
@@ -111,7 +111,7 @@ void ComputeModContentFilename( const char *pGameFileName, char *pBuf, size_t nB
 char *CreateX360Filename( const char *pSourceName, char *pTargetName, int targetLen )
 {
 	Q_StripExtension( pSourceName, pTargetName, targetLen );
-	int idx = Q_strlen( pTargetName );
+	intp idx = Q_strlen( pTargetName );
 
 	// restore extension
 	Q_snprintf( pTargetName, targetLen, "%s.360%s", pTargetName, &pSourceName[idx] );
@@ -129,11 +129,11 @@ char *CreateX360Filename( const char *pSourceName, char *pTargetName, int target
 // Returns source if no change needs to occur, othwerwise generates and
 // returns target.
 //-----------------------------------------------------------------------------
-char *RestoreFilename( const char *pSourceName, char *pTargetName, int targetLen )
+char *RestoreFilename( const char *pSourceName, char *pTargetName, intp targetLen )
 {
 	// find extension
 	// scan backward for '.', but not past a seperator
-	int end = V_strlen( pSourceName ) - 1;
+	intp end = V_strlen( pSourceName ) - 1;
 	while ( end > 0 && pSourceName[end] != '.' && !( pSourceName[end] == '\\' || pSourceName[end] == '/' ) )
 	{
 		--end;
@@ -143,7 +143,7 @@ char *RestoreFilename( const char *pSourceName, char *pTargetName, int targetLen
 	{
 		// cull the .360, leave the trailing extension
 		end -= 4;
-		int length = MIN( end + 1, targetLen );
+		intp length = MIN( end + 1, targetLen );
 		V_strncpy( pTargetName, pSourceName, length );
 		V_strncat( pTargetName, pSourceName + end + 4, targetLen );
 
@@ -274,8 +274,8 @@ void AddFilesToList( CUtlVector< CUtlString > &list, const char *pDirectory, con
 
 	g_pFullFileSystem->FindClose( hFind );
 
-	int nCount = subDirs.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = subDirs.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		AddFilesToList( list, subDirs[i], pPathID, pExtension );
 	}
