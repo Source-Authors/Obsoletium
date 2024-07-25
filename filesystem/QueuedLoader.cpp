@@ -111,7 +111,7 @@ struct FileJob_t
 class CDummyProgress : public ILoaderProgress
 {
 	void BeginProgress() {}
-	void UpdateProgress( float progress ) {}
+	void UpdateProgress( float ) {}
 	void EndProgress() {}
 };
 static CDummyProgress s_DummyProgress;
@@ -241,7 +241,7 @@ class CResourcePreloadAnonymous : public IResourcePreload
 	}
 
 	virtual void PurgeUnreferencedResources() {}
-	virtual void OnEndMapLoading( bool bAbort ) {}
+	virtual void OnEndMapLoading( bool ) {}
 	virtual void PurgeAll() {}
 };
 static CResourcePreloadAnonymous s_ResourcePreloadAnonymous;
@@ -738,7 +738,7 @@ int CQueuedLoader::CFileJobsLessFunc::GetLayoutOrderForFilename( const char *pFi
 //-----------------------------------------------------------------------------
 // Sort function, high priority jobs sort first, then offset, then zip
 //-----------------------------------------------------------------------------
-bool CQueuedLoader::CFileJobsLessFunc::Less( FileJob_t* const &pFileJobLHS, FileJob_t* const &pFileJobRHS, void *pCtx )
+bool CQueuedLoader::CFileJobsLessFunc::Less( FileJob_t* const &pFileJobLHS, FileJob_t* const &pFileJobRHS, void * )
 {
 	if ( pFileJobLHS->m_Priority != pFileJobRHS->m_Priority )
 	{
@@ -797,7 +797,7 @@ void CQueuedLoader::SubmitPendingJobs()
 	m_nSubmitCount++;
 
 	// sort entries
-	CUtlSortVector< FileJob_t*, CFileJobsLessFunc > sortedFiles( 0, 128 );
+	CUtlSortVector< FileJob_t*, CFileJobsLessFunc > sortedFiles( (intp)0, 128 );
 	while ( pNode )
 	{
 		FileJob_t *pFileJob = pNode->elem;
@@ -1692,7 +1692,7 @@ bool CQueuedLoader::BeginMapLoading( const char *pMapName, bool bLoadForHDR, boo
 
 	MEM_ALLOC_CREDIT();
 
-	CUtlBuffer resListBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer resListBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( szFilename, "GAME", resListBuffer, 0, 0 ) )
 	{
 		// very bad, a valid reslist is critical
@@ -1705,7 +1705,7 @@ bool CQueuedLoader::BeginMapLoading( const char *pMapName, bool bLoadForHDR, boo
 	{
 		// find optional localized reslist fixup
 		V_snprintf( szFilename, sizeof( szFilename ), "reslists_xbox/%s%s.lst", XBX_GetLanguageString(), GetPlatformExt() );
-		CUtlBuffer localizedBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer localizedBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 		if ( g_pFullFileSystem->ReadFile( szFilename, "GAME", localizedBuffer, 0, 0 ) )
 		{
 			// append it

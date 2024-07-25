@@ -260,7 +260,7 @@ public:
 	CUtlVector< Info_t* > m_Infos;
 
 private:
-	void ProcessNewEntries( int start );
+	void ProcessNewEntries( intp start );
 
 	CFileCacheObject(const CFileCacheObject &) = delete;
 	CFileCacheObject & operator=(const CFileCacheObject& ) = delete;
@@ -391,7 +391,7 @@ InitReturnVal_t CBaseFileSystem::Init()
 			V_ComposeFileName( pRemotePath, "xbox_exclude_paths.txt", szExcludeFile, sizeof( szExcludeFile ) );
 
 			// populate the exclusion list
-			CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			if ( ReadFile( szExcludeFile, NULL, buf, 0, 0 ) )
 			{
 				characterset_t breakSet;
@@ -981,14 +981,14 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 
 	// Add any zip files in the format zip1.zip ... zip0.zip
 	// Add them backwards so zip(N) is higher priority than zip(N-1), etc.
-	int pakcount = pakSizes.Count();
-	int nCount = 0;
-	for ( int i = pakcount-1; i >= 0; i-- )
+	intp pakcount = pakSizes.Count();
+	intp nCount = 0;
+	for ( intp i = pakcount-1; i >= 0; i-- )
 	{
 		char fullpath[MAX_PATH];
 		V_ComposeFileName( pPath, pakNames[i].Get(), fullpath, sizeof( fullpath ) );
 
-		int nIndex;
+		intp nIndex;
 		if ( addType == PATH_ADD_TO_TAIL )
 		{
 			nIndex = m_SearchPaths.AddToTail();
@@ -1006,11 +1006,11 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 		sp->SetPath( g_PathIDTable.AddString( pPath ) );
 
 		CPackFile *pf = NULL;
-		for ( int iPackFile = 0; iPackFile < m_ZipFiles.Count(); iPackFile++ )
+		for ( auto *p : m_ZipFiles )
 		{
-			if ( !Q_stricmp( m_ZipFiles[iPackFile]->m_ZipName.Get(), fullpath ) )
+			if ( !Q_stricmp( p->m_ZipName.Get(), fullpath ) )
 			{
-				pf = m_ZipFiles[iPackFile];
+				pf = p;
 				sp->SetPackFile( pf );
 				pf->AddRef();
 			}
@@ -1178,7 +1178,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 	
 		// Find the LUMP_PAKFILE offset
 		lump_t *packfile = &header.lumps[ LUMP_PAKFILE ];
-		if ( packfile->filelen <= sizeof( lump_t ) )
+		if ( packfile->filelen <= static_cast<int>(sizeof( lump_t )) )
 		{
 			// It's empty or only contains a file header ( so there are no entries ), so don't add to search paths
 			Trace_FClose( fp );
@@ -1198,7 +1198,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 	
 		if ( pf->Prepare( packfile->filelen, packfile->fileofs ) )
 		{
-			int nIndex;
+			intp nIndex;
 			if ( addType == PATH_ADD_TO_TAIL )
 			{
 				nIndex = m_SearchPaths.AddToTail();	
@@ -2105,7 +2105,7 @@ class CFileOpenInfo
 {
 public:
 	CFileOpenInfo( CBaseFileSystem *pFileSystem, const char *pFileName, const CBaseFileSystem::CSearchPath *path, const char *pOptions, int flags, char **ppszResolvedFilename ) : 
-		m_pFileSystem( pFileSystem ), m_pFileName( pFileName ), m_pSearchPath( path ), m_pOptions( pOptions ), m_Flags( flags ), m_ppszResolvedFilename( ppszResolvedFilename )
+		m_pFileSystem( pFileSystem ), m_ppszResolvedFilename( ppszResolvedFilename ), m_pFileName( pFileName ), m_pSearchPath( path ), m_pOptions( pOptions ), m_Flags( flags )
 	{
 		m_pFileHandle = NULL;
 		m_ePureFileClass = ePureServerFileClass_Any;
@@ -5171,7 +5171,7 @@ bool CBaseFileSystem::GetFileTypeForFullPath( char const *pFullPath, wchar_t *bu
 	::MultiByteToWideChar( CP_UTF8, 0, pFullPath, -1, wcharpath, sizeof( wcharpath ) / sizeof(wchar_t) );
 	wcharpath[(sizeof( wcharpath ) / sizeof(wchar_t)) - 1] = L'\0';
 
-	SHFILEINFOW info = { 0 };
+	SHFILEINFOW info = {};
 	DWORD_PTR dwResult = SHGetFileInfoW( 
 		wcharpath,
 		0,
@@ -5251,9 +5251,9 @@ bool CBaseFileSystem::IsFileCacheFileLoaded( FileCacheHandle_t cacheId, const ch
 	bool bFileIsHeldByCache = false;
 	{
 		AUTO_LOCK( pFileCache->m_InfosMutex );
-		for ( int i = 0; i < pFileCache->m_Infos.Count(); ++i )
+		for ( auto *info : pFileCache->m_Infos )
 		{
-			if ( pFileCache->m_Infos[i]->pFileName && Q_strcmp( pFileCache->m_Infos[i]->pFileName, pFileName ) )
+			if ( info->pFileName && Q_strcmp( info->pFileName, pFileName ) )
 			{
 				bFileIsHeldByCache = true;
 				break;
@@ -5659,29 +5659,28 @@ void CBaseFileSystem::CFileCacheObject::AddFiles( const char **ppFileNames, int 
 	}
 
 	AUTO_LOCK( m_InfosMutex );
-	int offset = m_Infos.AddMultipleToTail( nFileNames, infos.Base() );
+	intp offset = m_Infos.AddMultipleToTail( nFileNames, infos.Base() );
 
 	m_nPending += nFileNames;
 	ProcessNewEntries(offset);
 }
 
-void CBaseFileSystem::CFileCacheObject::ProcessNewEntries( int start )
+void CBaseFileSystem::CFileCacheObject::ProcessNewEntries( intp start )
 {
-	for ( int i = start; i < m_Infos.Count(); ++i )
+	for ( auto *info : m_Infos )
 	{
-		Info_t &info = *m_Infos[i];
-		if ( !info.pOwner )
+		if ( !info->pOwner )
 		{
-			info.pOwner = this;
+			info->pOwner = this;
 
 			// NOTE: currently only caching files with GAME pathID
 			FileAsyncRequest_t request;
-			request.pszFilename = info.pFileName;
+			request.pszFilename = info->pFileName;
 			request.pszPathID = "GAME";
 			request.flags = FSASYNC_FLAGS_ALLOCNOFREE;
 			request.pfnCallback = &IOCallback;
 			request.pContext = &info;
-			if ( m_pFS->AsyncRead( request, &info.hIOAsync ) != FSASYNC_OK )
+			if ( m_pFS->AsyncRead( request, &info->hIOAsync ) != FSASYNC_OK )
 			{
 				--m_nPending;
 			}
@@ -5730,27 +5729,26 @@ void CBaseFileSystem::CFileCacheObject::IOCallback( const FileAsyncRequest_t &re
 CBaseFileSystem::CFileCacheObject::~CFileCacheObject()
 {
 	AUTO_LOCK( m_InfosMutex );
-	for ( int i = 0; i < m_Infos.Count(); ++i )
+	for ( auto *info : m_Infos )
 	{
-		Info_t& info = *m_Infos[i];
-		if ( info.hIOAsync )
+		if ( info->hIOAsync )
 		{
 			// job is guaranteed to not be running after abort
-			m_pFS->AsyncAbort( info.hIOAsync );
-			m_pFS->AsyncRelease( info.hIOAsync );
+			m_pFS->AsyncAbort( info->hIOAsync );
+			m_pFS->AsyncRelease( info->hIOAsync );
 		}
 
-		if ( info.pBacking )
+		if ( info->pBacking )
 		{
-			m_pFS->UnregisterMemoryFile( info.pBacking );
-			info.pBacking->Release();
+			m_pFS->UnregisterMemoryFile( info->pBacking );
+			info->pBacking->Release();
 		}
 		else
 		{
-			free( (char*) info.pFileName );
+			free( (char*) info->pFileName );
 		}
 		
-		delete m_Infos[i];
+		delete info;
 	}
 	Assert( m_nPending == 0 );
 }

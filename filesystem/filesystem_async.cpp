@@ -121,7 +121,7 @@ public:
 		Q_strncpy( szFixedName, pszFilename, sizeof( szFixedName ) );
 		Q_FixSlashes( szFixedName );
 
-		Assert( (int)FS_INVALID_ASYNC_FILE == m_map.InvalidIndex() );
+		Assert( (intp)FS_INVALID_ASYNC_FILE == m_map.InvalidIndex() );
 
 		AUTO_LOCK( m_mutex );
 
@@ -163,7 +163,7 @@ public:
 
 		AUTO_LOCK( m_mutex );
 
-		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(int)item;
+		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
 		Assert( m_map.IsValidIndex( iEntry ) );
 		m_map[iEntry]->AddRef();
 		return m_map[iEntry];
@@ -178,7 +178,7 @@ public:
 
 		AUTO_LOCK( m_mutex );
 
-		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(int)item;
+		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
 		Assert( m_map.IsValidIndex( iEntry ) );
 		m_map[iEntry]->AddRef();
 	}
@@ -192,7 +192,7 @@ public:
 
 		AUTO_LOCK( m_mutex );
 
-		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(int)item;
+		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
 		Assert( m_map.IsValidIndex( iEntry ) );
 		if ( m_map[iEntry]->Release() == 0 )
 		{
@@ -263,13 +263,13 @@ public:
 	CFileAsyncReadJob( const FileAsyncRequest_t &fromRequest, CBaseFileSystem *pOwnerFileSystem )
 	  : CFileAsyncJob( ConvertPriority( fromRequest.priority ) ),
 		FileAsyncRequest_t( fromRequest ),
+		m_pCustomFetcher(NULL),
+		m_hCustomFetcherHandle(NULL),
+		m_pOwnerFileSystem(pOwnerFileSystem),
 		m_pResultData( NULL ),
 		m_nResultSize( 0 ),
 		m_pRealContext( fromRequest.pContext ),
-		m_pfnRealCallback( fromRequest.pfnCallback ),
-		m_pCustomFetcher(NULL),
-		m_hCustomFetcherHandle(NULL),
-		m_pOwnerFileSystem(pOwnerFileSystem)
+		m_pfnRealCallback( fromRequest.pfnCallback )
 	{
 #if defined( TRACK_BLOCKING_IO )
 		m_Timer.Start();
@@ -303,7 +303,7 @@ public:
 
 	CFileAsyncReadJob *AsReadJob() { return this; }
 
-	virtual char const	*Describe()
+	char const	*Describe() const override
 	{
 		return pszFilename; 
 	}
@@ -313,7 +313,7 @@ public:
 		return this;
 	}
 
-	virtual JobStatus_t DoExecute()
+	JobStatus_t DoExecute() override
 	{
 		SimulateDelay();
 #if defined( TRACK_BLOCKING_IO )
@@ -360,7 +360,7 @@ public:
 		return retval;
 	}
 
-	virtual JobStatus_t GetResult( void **ppData, int *pSize ) 
+	JobStatus_t GetResult( void **ppData, int *pSize ) override
 	{ 
 		if ( m_pResultData )
 		{
@@ -442,9 +442,9 @@ class CFileAsyncWriteJob : public CFileAsyncJob
 public:
 	CFileAsyncWriteJob( const char *pszFilename, const void *pData, unsigned nBytes, bool bFreeMemory, bool bAppend )
 	  : CFileAsyncJob( FSASYNC_WRITE_PRIORITY ),
+		m_bFreeMemory( bFreeMemory ),
 		m_pData( pData ),
 		m_nBytes( nBytes ),
-		m_bFreeMemory( bFreeMemory ),
 		m_bAppend( bAppend )
 	{
 #if defined( TRACK_BLOCKING_IO )
@@ -462,11 +462,11 @@ public:
 		free( (void *)m_pszFilename );
 	}
 
-	virtual char const *Describe() { return m_pszFilename; }
+	char const *Describe() const override { return m_pszFilename; }
 
-	virtual bool IsWrite() const { return true; }
+	bool IsWrite() const override { return true; }
 
-	virtual JobStatus_t DoExecute()
+	JobStatus_t DoExecute() override
 	{
 		SimulateDelay();
 #if defined( TRACK_BLOCKING_IO )
@@ -483,7 +483,7 @@ public:
 		return retval;
 	}
 
-	virtual void DoCleanup()
+	void DoCleanup() override
 	{
 		if ( m_pData && m_bFreeMemory )
 		{
@@ -550,11 +550,11 @@ public:
 		g_nAsyncWriteJobs--;
 	}
 
-	virtual char const	*Describe() { return m_pszAppendTo; }
+	char const	*Describe() const override { return m_pszAppendTo; }
 
-	virtual bool IsWrite() const { return true; }
+	bool IsWrite() const override { return true; }
 
-	virtual JobStatus_t DoExecute()
+	JobStatus_t DoExecute() override
 	{
 		SimulateDelay();
 #if defined( TRACK_BLOCKING_IO )

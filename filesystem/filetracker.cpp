@@ -352,6 +352,9 @@ struct FileListToUnloadForWhitelistChange : public IFileList
 	}
 
 	CUtlDict<int> m_dictFiles;
+
+ private:
+	virtual ~FileListToUnloadForWhitelistChange() {}
 };
 
 IFileList *CFileTracker2::GetFilesToUnloadForWhitelistChange( IPureServerWhitelist *pNewWhiteList )
