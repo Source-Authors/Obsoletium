@@ -504,7 +504,7 @@ public:
   float16_with_assign() = default;
 	float16_with_assign( float f ) { m_storage.rawWord = ConvertFloatTo16bits(f); }
 
-	float16& operator=(const float16 &other) { m_storage.rawWord = ((float16_with_assign &)other).m_storage.rawWord; return *this; }
+	float16& operator=(const float16 &other) { m_storage.rawWord = ((const float16_with_assign &)other).m_storage.rawWord; return *this; }
 	float16& operator=(const float &other) { m_storage.rawWord = ConvertFloatTo16bits(other); return *this; }
 //	operator unsigned short () const { return m_storage.rawWord; }
 	operator float () const { return Convert16bitFloatTo32bits( m_storage.rawWord ); }
@@ -525,7 +525,7 @@ public:
 	Vector48& operator=(const Vector &vOther);
 	operator Vector ();
 
-	const float operator[]( int i ) const { return (((float16 *)this)[i]).GetFloat(); }
+	float operator[]( int i ) const { return (((const float16 *)this)[i]).GetFloat(); }
 
 	float16 x;
 	float16 y;

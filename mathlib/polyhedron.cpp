@@ -106,7 +106,7 @@ public:
 	int iReferenceCount;
 #endif
 
-	virtual void Release( void )
+	void Release( void ) override
 	{
 #ifdef DBGFLAG_ASSERT
 		--iReferenceCount;
@@ -871,9 +871,6 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 	GeneratePolyhedronFromPlanes_Point *pStartPoint = NULL;
 	GeneratePolyhedronFromPlanes_Point *pWorkPoint = NULL;
 
-	static int iPolyhedronClipCount = 0;
-	++iPolyhedronClipCount;
-	
 	DebugCutHistory.AddToTail( ConvertLinkedGeometryToPolyhedron( pAllPolygons, pAllLines, pAllPoints, false ) );
 #endif
 
@@ -1744,13 +1741,13 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 	StartingPoints_To_Lines_Links[(iPointNum * 3) + 2].iReferenceIndex = iOtherPointIndex3;\
 	StartingBoxLines[lineindex3].pPointLineLinks[1 - iOtherPointIndex3] = &StartingPoints_To_Lines_Links[(iPointNum * 3) + 2];\
 	StartingPoints_To_Lines_Links[(iPointNum * 3) + 2].pPrev = &StartingPoints_To_Lines_Links[(iPointNum * 3) + 1];\
-	StartingPoints_To_Lines_Links[(iPointNum * 3) + 2].pNext = &StartingPoints_To_Lines_Links[(iPointNum * 3) + 0];
+	StartingPoints_To_Lines_Links[(iPointNum * 3) + 2].pNext = &StartingPoints_To_Lines_Links[(iPointNum * 3) + 0]
 
 #define STARTBOXCONNECTION( linenum, point1, point2, poly1, poly2 )\
 	StartingBoxLines[linenum].pPoints[0] = &StartingBoxPoints[point1];\
 	StartingBoxLines[linenum].pPoints[1] = &StartingBoxPoints[point2];\
 	StartingBoxLines[linenum].pPolygons[0] = &StartingBoxPolygons[poly1];\
-	StartingBoxLines[linenum].pPolygons[1] = &StartingBoxPolygons[poly2];
+	StartingBoxLines[linenum].pPolygons[1] = &StartingBoxPolygons[poly2]
 
 #define STARTPOLYGONTOLINELINKS( polynum, lineindex1, iThisPolyIndex1, lineindex2, iThisPolyIndex2, lineindex3, iThisPolyIndex3, lineindex4, iThisPolyIndex4 )\
 	StartingBoxPolygons[polynum].pLines = &StartingPolygon_To_Lines_Links[(polynum * 4) + 0];\
@@ -1773,7 +1770,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 	StartingPolygon_To_Lines_Links[(polynum * 4) + 3].iReferenceIndex = iThisPolyIndex4;\
 	StartingBoxLines[lineindex4].pPolygonLineLinks[iThisPolyIndex4] = &StartingPolygon_To_Lines_Links[(polynum * 4) + 3];\
 	StartingPolygon_To_Lines_Links[(polynum * 4) + 3].pPrev = &StartingPolygon_To_Lines_Links[(polynum * 4) + 2];\
-	StartingPolygon_To_Lines_Links[(polynum * 4) + 3].pNext = &StartingPolygon_To_Lines_Links[(polynum * 4) + 0];
+	StartingPolygon_To_Lines_Links[(polynum * 4) + 3].pNext = &StartingPolygon_To_Lines_Links[(polynum * 4) + 0]
 
 
 CPolyhedron *GeneratePolyhedronFromPlanes( const float *pOutwardFacingPlanes, int iPlaneCount, float fOnPlaneEpsilon, bool bUseTemporaryMemory )

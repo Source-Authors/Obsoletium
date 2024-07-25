@@ -23,7 +23,6 @@
 #include "noisedata.h"
 
 #define N_IMPULSES_PER_CELL 5
-#define NORMALIZING_FACTOR 1.0
 
 //(0.5/N_IMPULSES_PER_CELL)
 
@@ -80,8 +79,8 @@ float XM_CALLCONV FractalNoise( Vector const &pnt, int n_octaves)
 		p1 *= scale;
 		ret+=iscale * SparseConvolutionNoise( p1 );
 		sumscale += iscale;
-		scale *= 2.0;
-		iscale *= 0.5;
+		scale *= 2.0f;
+		iscale *= 0.5f;
 	}
 	return ret * ( 1.0f/sumscale );
 }
@@ -98,8 +97,8 @@ float XM_CALLCONV Turbulence( Vector const &pnt, int n_octaves)
 		p1 *= scale;
 		ret+=iscale * fabsf ( 2.0f*( SparseConvolutionNoise( p1 )-.5f ) );
 		sumscale += iscale;
-		scale *= 2.0;
-		iscale *= 0.5;
+		scale *= 2.0f;
+		iscale *= 0.5f;
 	}
 	return ret * ( 1.0f/sumscale );
 }
@@ -135,7 +134,7 @@ float XM_CALLCONV SparseConvolutionNoise(Vector const &pnt, float (*pNoiseShapeF
 	fmin1=min(sum_out,fmin1);
 	fmax1=max(sum_out,fmax1);
 #endif
-	return RemapValClamped( sum_out, .544487, 9.219176, 0.0, 1.0 );
+	return RemapValClamped( sum_out, .544487f, 9.219176f, 0.0f, 1.0f );
 }
 
 

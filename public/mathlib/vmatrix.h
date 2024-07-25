@@ -194,9 +194,6 @@ public:
 
 // Matrix->matrix operations.
 public:
-
-	VMatrix&	operator=(const VMatrix &mOther);
-	
 	// Multiply two matrices (out = this * vm).
 	void		MatrixMul( const VMatrix &vm, VMatrix &out ) const;
 
@@ -711,7 +708,7 @@ inline VMatrix VMatrix::operator-() const
 	VMatrix ret;
 	for( int i=0; i < 16; i++ )
 	{
-		((float*)ret.m)[i] = ((float*)m)[i];
+		((float*)ret.m)[i] = ((const float*)m)[i];
 	}
 	return ret;
 }
@@ -930,7 +927,7 @@ inline void MatrixSetColumn( VMatrix &src, int nCol, const Vector &column )
 inline void MatrixGetRow( const VMatrix &src, int nRow, Vector *pRow )
 {
 	Assert( (nRow >= 0) && (nRow <= 3) );
-	*pRow = *(Vector*)src[nRow];
+	*pRow = *(const Vector*)src[nRow];
 }
 
 inline void MatrixSetRow( VMatrix &dst, int nRow, const Vector &row )

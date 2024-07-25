@@ -77,7 +77,7 @@ struct alignas(16) intx4 : public CAlignedNewDelete<16>
 		return m_i32;
 	}
 
-	inline const bool operator==(const intx4 &other) const
+	inline bool operator==(const intx4 &other) const
 	{
 		return !DirectX::XMVector4NotEqualInt
 		(
@@ -113,17 +113,17 @@ extern const fltx4 Four_Negative_FLT_MAX;						// -FLT_MAX, -FLT_MAX, -FLT_MAX, 
 extern const fltx4 g_SIMD_0123;									// 0 1 2 3 as float
 
 // external aligned integer constants
-extern const alignas(16) uint32 g_SIMD_clear_signmask[];		// 0x7fffffff x 4
-extern const alignas(16) uint32 g_SIMD_signmask[];				// 0x80000000 x 4
-extern const alignas(16) uint32 g_SIMD_lsbmask[];				// 0xfffffffe x 4
-extern const alignas(16) uint32 g_SIMD_clear_wmask[];			// -1 -1 -1 0
-extern const alignas(16) uint32 g_SIMD_ComponentMask[4][4];		// [0xFFFFFFFF 0 0 0], [0 0xFFFFFFFF 0 0], [0 0 0xFFFFFFFF 0], [0 0 0 0xFFFFFFFF]
-extern const alignas(16) uint32 g_SIMD_AllOnesMask[];			// ~0,~0,~0,~0
-extern const alignas(16) uint32 g_SIMD_Low16BitsMask[];			// 0xffff x 4
+alignas(16) extern const uint32 g_SIMD_clear_signmask[];		// 0x7fffffff x 4
+alignas(16) extern const uint32 g_SIMD_signmask[];				// 0x80000000 x 4
+alignas(16) extern const uint32 g_SIMD_lsbmask[];				// 0xfffffffe x 4
+alignas(16) extern const uint32 g_SIMD_clear_wmask[];			// -1 -1 -1 0
+alignas(16) extern const uint32 g_SIMD_ComponentMask[4][4];		// [0xFFFFFFFF 0 0 0], [0 0xFFFFFFFF 0 0], [0 0 0xFFFFFFFF 0], [0 0 0 0xFFFFFFFF]
+alignas(16) extern const uint32 g_SIMD_AllOnesMask[];			// ~0,~0,~0,~0
+alignas(16) extern const uint32 g_SIMD_Low16BitsMask[];			// 0xffff x 4
 
 // this mask is used for skipping the tail of things. If you have N elements in an array, and wish
 // to mask out the tail, g_SIMD_SkipTailMask[N & 3] what you want to use for the last iteration.
-extern const uint32 alignas(16) g_SIMD_SkipTailMask[4][4];
+alignas(16) extern const uint32 g_SIMD_SkipTailMask[4][4];
 
 // Define prefetch macros.
 // The characteristics of cache and prefetch are completely 
@@ -1069,11 +1069,7 @@ FORCEINLINE float& XM_CALLCONV SubFloat( fltx4 & a, size_t idx )
 {
 	Assert( idx < 4 );
 
-#ifndef POSIX
-	return a.m128_f32[ idx ];
-#else
 	return (reinterpret_cast<float *>(&a))[idx];
-#endif
 }
 
 [[nodiscard]]
@@ -1095,11 +1091,7 @@ FORCEINLINE uint32& XM_CALLCONV SubInt( fltx4 & a, size_t idx )
 {
 	Assert( idx < 4 );
 
-#ifndef POSIX
-	return a.m128_u32[idx];
-#else
 	return (reinterpret_cast<uint32 *>(&a))[idx];
-#endif
 }
 
 [[nodiscard]]
@@ -1122,10 +1114,11 @@ FORCEINLINE fltx4 XM_CALLCONV MaskedAssign( DirectX::FXMVECTOR ReplacementMask, 
 		AndNotSIMD( ReplacementMask, OldValue ) );
 }
 
+// dimhteopus: Comment unused macro.
 // remember, the SSE numbers its words 3 2 1 0
 // The way we want to specify shuffles is backwards from the default
 // MM_SHUFFLE_REV is in array index order (default is reversed)
-#define MM_SHUFFLE_REV(a,b,c,d) _MM_SHUFFLE(d,c,b,a)
+// define MM_SHUFFLE_REV(a,b,c,d) _MM_SHUFFLE(d,c,b,a)
 
 [[nodiscard]]
 FORCEINLINE fltx4 XM_CALLCONV SplatXSIMD( DirectX::FXMVECTOR a )
@@ -1637,10 +1630,11 @@ FORCEINLINE void XM_CALLCONV StoreUnalignedIntSIMD( int32 * RESTRICT pSIMD, Dire
 FORCEINLINE fltx4 XM_CALLCONV UnsignedIntConvertToFltSIMD( const u32x4 vSrcA )
 {
 	fltx4 retval;
-	SubFloat( retval, 0 ) = ( (float) SubInt( retval, 0 ) );
-	SubFloat( retval, 1 ) = ( (float) SubInt( retval, 1 ) );
-	SubFloat( retval, 2 ) = ( (float) SubInt( retval, 2 ) );
-	SubFloat( retval, 3 ) = ( (float) SubInt( retval, 3 ) );
+	// dimhotepus: Fix source, was assigned self to self.
+	SubFloat( retval, 0 ) = ( (float) SubInt( vSrcA, 0 ) );
+	SubFloat( retval, 1 ) = ( (float) SubInt( vSrcA, 1 ) );
+	SubFloat( retval, 2 ) = ( (float) SubInt( vSrcA, 2 ) );
+	SubFloat( retval, 3 ) = ( (float) SubInt( vSrcA, 3 ) );
 	return retval;
 }
 
@@ -1685,22 +1679,21 @@ FORCEINLINE i32x4 XM_CALLCONV IntShiftLeftWordSIMD(const i32x4 vSrcA, const i32x
 // NOTE: Some architectures have means of doing fixed point conversion
 // when the fix depth is specified as an immediate.. but there is no
 // way to guarantee an immediate as a parameter to function like this.
-[[nodiscard]]
 FORCEINLINE void XM_CALLCONV ConvertStoreAsIntsSIMD(intx4 * RESTRICT pDest, DirectX::FXMVECTOR vSrc)
 {
 #if defined( COMPILER_MSVC64 ) || !defined(_XM_SSE_INTRINSICS_)
 
-	(*pDest)[0] = SubFloat( vSrc, 0 );
-	(*pDest)[1] = SubFloat( vSrc, 1 );
-	(*pDest)[2] = SubFloat( vSrc, 2 );
-	(*pDest)[3] = SubFloat( vSrc, 3 );
+	(*pDest)[0] = (int)SubFloat( vSrc, 0 );
+	(*pDest)[1] = (int)SubFloat( vSrc, 1 );
+	(*pDest)[2] = (int)SubFloat( vSrc, 2 );
+	(*pDest)[3] = (int)SubFloat( vSrc, 3 );
 
 #else
 	__m64 bottom = _mm_cvttps_pi32( vSrc );
 	__m64 top    = _mm_cvttps_pi32( _mm_movehl_ps(vSrc,vSrc) );
 
-	*reinterpret_cast<__m64 *>(&(*pDest)[0]) = bottom;
-	*reinterpret_cast<__m64 *>(&(*pDest)[2]) = top;
+	memcpy( &(*pDest)[0], &bottom, sizeof(bottom) );
+	memcpy( &(*pDest)[2], &top, sizeof(top) );
 
 	_mm_empty();
 #endif
@@ -2269,7 +2262,7 @@ inline fltx4 XM_CALLCONV SimpleSpline(DirectX::FXMVECTOR value) {
 // spline using SimpleSpline
 [[nodiscard]]
 inline fltx4 XM_CALLCONV SimpleSplineRemapValWithDeltas( DirectX::FXMVECTOR val,
-											 DirectX::FXMVECTOR A, DirectX::FXMVECTOR BMinusA,
+											 DirectX::FXMVECTOR A, [[maybe_unused]] DirectX::FXMVECTOR BMinusA,
 											 DirectX::GXMVECTOR OneOverBMinusA, DirectX::HXMVECTOR C, 
 											 DirectX::HXMVECTOR DMinusC )
 {
@@ -2281,7 +2274,7 @@ inline fltx4 XM_CALLCONV SimpleSplineRemapValWithDeltas( DirectX::FXMVECTOR val,
 
 [[nodiscard]]
 inline fltx4 XM_CALLCONV SimpleSplineRemapValWithDeltasClamped( DirectX::FXMVECTOR val,
-													DirectX::FXMVECTOR A, DirectX::FXMVECTOR BMinusA,
+													DirectX::FXMVECTOR A, [[maybe_unused]] DirectX::FXMVECTOR BMinusA,
 													DirectX::GXMVECTOR OneOverBMinusA, DirectX::HXMVECTOR C, 
 													DirectX::HXMVECTOR DMinusC )
 {

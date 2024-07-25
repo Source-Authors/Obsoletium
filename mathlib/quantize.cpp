@@ -150,7 +150,7 @@ void PrintQTree(struct QuantizedValue const *p,int idlevel)
 	{
 		for(i=0;i<idlevel;i++)
 			printf(" ");
-		printf("node=%p NSamples=%d value=%d Mean={",p,p->NSamples,p->value);
+		printf("node=%p NSamples=%d value=%d Mean={",static_cast<const void*>(p),p->NSamples,p->value);
 		for(i=0;i<current_ndims;i++)
 			printf("%x,",p->Mean[i]);
 		printf("}\n");
@@ -567,10 +567,10 @@ void *RemoveHeapItem(struct FHeap *h)
 
 struct FHeap TheQueue;
 
-#define PUSHNODE(a) { \
+#define PUSHNODE(a) do { \
   (a)->MinError=MinimumError(a,sample,ndims,weights); \
   if ((a)->MinError < besterror) HeapInsert(&TheQueue,&(a)->MinError); \
- }
+ } while (false)
 
 struct QuantizedValue *FindMatch(uint8 const *sample, int ndims,
 								 uint8 *weights, struct QuantizedValue *q)

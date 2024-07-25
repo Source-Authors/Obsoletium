@@ -789,7 +789,14 @@ int XM_CALLCONV GreatestCommonDivisor (int i1, int i2)
 
 bool XM_CALLCONV IsDenormal( float val )
 {
-	const int x = *reinterpret_cast <const int *> (&val); // needs 32-bit int
+	int x;
+	
+	static_assert(std::numeric_limits<decltype(val)>::is_iec559);
+	static_assert(sizeof(x) == sizeof(val));
+
+	// dimhotepus: Fix UB on reinterpret cast float* -> int*
+	std::memcpy( &x, &val, sizeof(x) );
+
 	const int abs_mantissa = x & 0x007FFFFF;
 	const int biased_exponent = x & 0x7F800000;
 	
@@ -3393,10 +3400,6 @@ bool XM_CALLCONV CalcLineToLineIntersectionSegment(
 
    return true;
 }
-
-#ifndef EXCEPTION_EXECUTE_HANDLER
-#define EXCEPTION_EXECUTE_HANDLER       1
-#endif
 
 static bool s_b3DNowEnabled = false;
 static bool s_bMMXEnabled = false;
