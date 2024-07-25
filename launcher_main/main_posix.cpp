@@ -71,10 +71,18 @@ void WaitForDebuggerConnect(int argc, char *argv[], int time) {
 
 int main(int argc, char *argv[]) {
   const char kLauncherPath[] =
-#ifndef
-      "bin/x64/launcher" DLL_EXT_STRING;
+#ifdef PLATFORM_64BITS
+#ifdef OSX
+      "bin/osx64/launcher" DLL_EXT_STRING;
 #else
-      "bin/launcher" DLL_EXT_STRING;
+      "bin/linux64/launcher" DLL_EXT_STRING;
+#endif
+#else
+#ifdef OSX
+      "bin/osx/launcher" DLL_EXT_STRING;
+#else
+      "bin/linux/launcher" DLL_EXT_STRING;
+#endif
 #endif
   const source::ScopedDll launcher_dll {
      kLauncherPath, RTLD_NOW
@@ -105,9 +113,9 @@ int main(int argc, char *argv[]) {
   // The google tcmalloc allocator gives us this guarantee.
   // Test the current allocator to make sure it gives us the required alignment.
   void *pointers[20];
-  for (int i = 0; i < ARRAYSIZE(pointers); ++i) {
+  for (auto *&pv : pointers) {
     void *p = malloc(16);
-    pointers[i] = p;
+    pv = p;
     if (((size_t)p) & 0xF) {
       fprintf(stderr, "%p is not 16-byte aligned. Aborting.\n", p);
       fprintf(stderr, "Pass /define:CLANG to VPC to correct this.\n");
@@ -115,8 +123,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  for (int i = 0; i < ARRAYSIZE(pointers); ++i) {
-    if (pointers[i]) free(pointers[i]);
+  for (auto *p : pointers) {
+    free(p);
   }
 
   if (__has_feature(address_sanitizer)) {

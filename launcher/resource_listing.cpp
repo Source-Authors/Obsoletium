@@ -46,7 +46,7 @@ bool SaveResourceListing(IFileSystem *file_system,
 void LoadResourceListing(IFileSystem *file_system,
                          CUtlRBTree<CUtlString, int> &list,
                          const char *pchFileName, const char *pchSearchPath) {
-  CUtlBuffer buffer(0, 0, CUtlBuffer::TEXT_BUFFER);
+  CUtlBuffer buffer((intp)0, 0, CUtlBuffer::TEXT_BUFFER);
   if (!file_system->ReadFile(pchFileName, pchSearchPath, buffer)) {
     // does not exist
     return;
@@ -58,7 +58,7 @@ void LoadResourceListing(IFileSystem *file_system,
   // parse reslist
   char szToken[MAX_PATH];
   for (;;) {
-    int nTokenSize = buffer.ParseToken(&breakSet, szToken, sizeof(szToken));
+    intp nTokenSize = buffer.ParseToken(&breakSet, szToken, sizeof(szToken));
     if (nTokenSize <= 0) {
       break;
     }
@@ -86,8 +86,8 @@ void LoadResourceListing(IFileSystem *file_system,
 void MergeResLists(IFileSystem *file_system, CUtlVector<CUtlString> &fileNames,
                    const char *pchOutputFile, const char *pchSearchPath) {
   CUtlRBTree<CUtlString, int> sorted(0, 0, ReslistLogLessFunc);
-  for (int i = 0; i < fileNames.Count(); ++i) {
-    LoadResourceListing(file_system, sorted, fileNames[i].String(),
+  for (auto &fn : fileNames) {
+    LoadResourceListing(file_system, sorted, fn.String(),
                         pchSearchPath);
   }
 
@@ -97,7 +97,7 @@ void MergeResLists(IFileSystem *file_system, CUtlVector<CUtlString> &fileNames,
 
 }  // namespace
 
-namespace src::launcher {
+namespace se::launcher {
 
 enum class State { BuildingListing = 0, GeneratingCaches, Done };
 
@@ -132,7 +132,7 @@ class ResourceListing : public IResourceListing {
   CUtlString original_command_line_;
   CUtlString initial_start_map_;
 
-  int current_wi_;
+  intp current_wi_;
   CUtlVector<WorkItem> work_items_;
 
   CUtlVector<CUtlString> map_list_;
@@ -162,13 +162,14 @@ ResourceListing::ResourceListing(ICommandLine *command_line,
 }
 
 void ResourceListing::CollateFiles(const char *pchResListFilename) {
-  CUtlVector<CUtlString> vecReslists;
+  CUtlVector<CUtlString> vecReslists{(intp)0, work_items_.Count()};
+  char fn[MAX_PATH];
 
-  for (int i = 0; i < work_items_.Count(); ++i) {
-    char fn[MAX_PATH];
+  for (auto &wi : work_items_) {
     Q_snprintf(fn, sizeof(fn), "%s\\%s\\%s\\%s", full_game_path_.String(),
-               working_dir_.String(), work_items_[i].m_sSubDir.String(),
+               working_dir_.String(), wi.m_sSubDir.String(),
                pchResListFilename);
+
     vecReslists.AddToTail(fn);
   }
 
@@ -197,7 +198,7 @@ void ResourceListing::Init(const char *pchBaseDir, const char *pchGameDir) {
   Q_strlower(path);
   full_game_path_ = path;
 
-  const char *pchCommandFile = NULL;
+  const char *pchCommandFile = nullptr;
   if (command_line_->CheckParm("-makereslists", &pchCommandFile) &&
       pchCommandFile) {
     // base path setup, now can get and parse command file
@@ -216,8 +217,8 @@ void ResourceListing::Collate() {
   // Now create the collated/merged data
   CollateFiles("all.lst");
   CollateFiles("engine.lst");
-  for (int i = 0; i < map_list_.Count(); ++i) {
-    CollateFiles(CFmtStr("%s.lst", map_list_[i].String()));
+  for (auto &m : map_list_) {
+    CollateFiles(CFmtStr("%s.lst", m.String()));
   }
 }
 
@@ -241,11 +242,11 @@ void ResourceListing::SetupCommandLine() {
       file_system_->CreateDirHierarchy(szFullWorkingDir, "GAME");
 
       // Preserve startmap
-      const char *pszStartMap = NULL;
+      const char *pszStartMap = nullptr;
       command_line_->CheckParm("-startmap", &pszStartMap);
       char szMap[MAX_PATH] = {0};
       if (pszStartMap) {
-        Q_strncpy(szMap, pszStartMap, sizeof(szMap));
+        V_strcpy_safe(szMap, pszStartMap);
       }
 
       // Prepare stuff
@@ -259,7 +260,7 @@ void ResourceListing::SetupCommandLine() {
 
       command_line_->CreateCmdLine(szCmd);
       // Never rebuild caches by default, inly do it in GeneratingCaches
-      command_line_->AppendParm("-norebuildaudio", NULL);
+      command_line_->AppendParm("-norebuildaudio", nullptr);
       if (szMap[0]) {
         command_line_->AppendParm("-startmap", szMap);
       }
@@ -281,6 +282,8 @@ void ResourceListing::SetupCommandLine() {
 
       current_state_ = State::Done;
     } break;
+    case State::Done:
+      break;
   }
 }
 
@@ -306,9 +309,8 @@ bool ResourceListing::ShouldContinue() {
           return true;
         }
       } break;
-      case State::GeneratingCaches: {
+      case State::GeneratingCaches:
         return true;
-      } break;
     }
   } while (bContinueAdvancing);
 
@@ -322,7 +324,7 @@ void ResourceListing::LoadMapList(const char *pchGameDir,
   Q_snprintf(fullpath, sizeof(fullpath), "%s/%s", pchGameDir, pchMapFile);
 
   // Load them in
-  CUtlBuffer buf(0, 0, CUtlBuffer::TEXT_BUFFER);
+  CUtlBuffer buf((intp)0, 0, CUtlBuffer::TEXT_BUFFER);
 
   if (file_system_->ReadFile(fullpath, "GAME", buf)) {
     char szMap[MAX_PATH];
@@ -331,7 +333,7 @@ void ResourceListing::LoadMapList(const char *pchGameDir,
       if (!szMap[0]) break;
 
       // Strip trailing CR/LF chars
-      int len = Q_strlen(szMap);
+      intp len = Q_strlen(szMap);
       while (len >= 1 && (szMap[len - 1] == '\n' || szMap[len - 1] == '\r')) {
         szMap[len - 1] = 0;
         len = Q_strlen(szMap);
@@ -363,7 +365,7 @@ bool ResourceListing::InitCommandFile(const char *pchGameDir,
   }
 
   KeyValues::AutoDelete kv = KeyValues::AutoDelete("reslists");
-  if (!kv->LoadFromBuffer("reslists", (const char *)buf.Base())) {
+  if (!kv->LoadFromBuffer("reslists", buf.Base<const char>())) {
     Error("Unable to parse keyvalues from '%s'\n", fullpath);
   }
 
@@ -373,7 +375,7 @@ bool ResourceListing::InitCommandFile(const char *pchGameDir,
     Error("Maplist file '%s' empty or missing!!!\n", sMapListFile.String());
   }
 
-  const char *pszSolo = NULL;
+  const char *pszSolo = nullptr;
   if (command_line_->CheckParm("+map", &pszSolo) && pszSolo) {
     map_list_.Purge();
 
@@ -384,7 +386,7 @@ bool ResourceListing::InitCommandFile(const char *pchGameDir,
 
   current_wi_ = command_line_->ParmValue("-startstage", 0);
 
-  const char *pszStartMap = NULL;
+  const char *pszStartMap = nullptr;
   command_line_->CheckParm("-startmap", &pszStartMap);
   if (pszStartMap) {
     initial_start_map_ = pszStartMap;
@@ -430,7 +432,7 @@ bool ResourceListing::InitCommandFile(const char *pchGameDir,
 
   is_active_ = work_items_.Count() > 0;
 
-  current_wi_ = clamp(current_wi_, 0, work_items_.Count() - 1);
+  current_wi_ = Clamp(current_wi_, (intp)0, work_items_.Count() - 1);
 
   bool bCollate = command_line_->CheckParm("-collate") ? true : false;
   if (bCollate) {
@@ -452,4 +454,4 @@ void SortResourceListing(IFileSystem *file_system, const char *file_name,
   SaveResourceListing(file_system, sorted, file_name, search_path);
 }
 
-}  // namespace src::launcher
+}  // namespace se::launcher

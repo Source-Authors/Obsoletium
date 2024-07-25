@@ -7,7 +7,7 @@
 #include "tier0/icommandline.h"
 #include "tier2/tier2.h"
 
-namespace src::launcher {
+namespace se::launcher {
 
 struct IResourceListing {
   virtual ~IResourceListing() = 0;
@@ -26,6 +26,6 @@ std::unique_ptr<IResourceListing> CreateResourceListing(
 void SortResourceListing(IFileSystem *file_system, const char *file_name,
                          const char *search_path);
 
-}  // namespace src::launcher
+}  // namespace se::launcher
 
 #endif  // SRC_LAUNCHER_RESOURCE_LISTING_H

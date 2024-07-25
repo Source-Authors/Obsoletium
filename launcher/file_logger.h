@@ -8,7 +8,7 @@
 #include "tier1/utlstring.h"
 #include "filesystem.h"
 
-namespace src::launcher {
+namespace se::launcher {
 
 // create file to dump out to
 class FileLogger {
@@ -37,6 +37,6 @@ class FileLogger {
   CUtlString full_game_path_;
 };
 
-}  // namespace src::launcher
+}  // namespace se::launcher
 
 #endif  // SRC_LAUNCHER_FILE_LOGGER_H

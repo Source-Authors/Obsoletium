@@ -8,7 +8,7 @@
 
 #include "tier1/strtools.h"
 
-namespace src::launcher {
+namespace se::launcher {
 
 // Scoped app locale.
 class ScopedAppLocale {
@@ -47,6 +47,6 @@ class ScopedAppLocale {
   static constexpr char kEmptyLocale[1]{""};
 };
 
-}  // namespace src::launcher
+}  // namespace se::launcher
 
 #endif  // SRC_LAUNCHER_SCOPED_APP_LOCALE_H

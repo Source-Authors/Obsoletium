@@ -58,16 +58,20 @@ template <size_t buffer_size>
 
 // Purpose: Shows error box and returns error code.
 [[nodiscard]] int ShowErrorBoxAndExitWithCode(_In_z_ const char *error_message,
-                                              _In_ int exit_code) {
-  const auto system_error = std::system_category().message(exit_code);
+                                              std::error_code exit_code) {
+  const auto system_error = exit_code.message();
 
   char entire_error_message[2048];
   _snprintf_s(entire_error_message, _TRUNCATE, "%s\n\n%s", error_message,
               system_error.c_str());
 
-  MessageBoxA(nullptr, entire_error_message, "Launcher - Error",
+  MessageBoxA(nullptr, entire_error_message, "Source Launcher - Error",
               MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
-  return exit_code;
+  return exit_code.value();
+}
+
+[[nodiscard]] std::error_code GetLastErrorCode(DWORD errc = GetLastError()) {
+  return std::error_code{static_cast<int>(errc), std::system_category()};
 }
 
 // Purpose: Apply process mitigation policies.
@@ -78,7 +82,7 @@ template <size_t buffer_size>
     return ShowErrorBoxAndExitWithCode(
         "Please contact publisher, very likely bug is detected.\n\n"
         "Unable to remove current directory from DLL search order.",
-        ::GetLastError());
+        GetLastErrorCode());
   }
 
   // Enable heap corruption detection & app termination.
@@ -87,7 +91,7 @@ template <size_t buffer_size>
     return ShowErrorBoxAndExitWithCode(
         "Please, contact publisher. Failed to enable termination on heap "
         "corruption feature for your environment.",
-        ::GetLastError());
+        GetLastErrorCode());
   }
 
 #if !defined(_WIN64)
@@ -99,7 +103,7 @@ template <size_t buffer_size>
     return ShowErrorBoxAndExitWithCode(
         "Please, contact publisher. Failed to enable DEP policy for your "
         "environment.",
-        ::GetLastError());
+        GetLastErrorCode());
   }
 #endif
 
@@ -115,7 +119,7 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to enable ASLR policy for your "
           "environment.",
-          ::GetLastError());
+          GetLastErrorCode());
     }
   }
 
@@ -131,7 +135,7 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to enable Strict Handle policy "
           "for your environment.",
-          ::GetLastError());
+          GetLastErrorCode());
     }
   }
 
@@ -146,7 +150,7 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to enable Extension Points policy "
           "for your environment.",
-          ::GetLastError());
+          GetLastErrorCode());
     }
   }
 
@@ -164,14 +168,12 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to harden Image Load policy for "
           "your environment.",
-          ::GetLastError());
+          GetLastErrorCode());
     }
   }
 
   return 0;
 }
-
-}  // namespace
 
 #define VALVE_OB_STRINGIFY(x) #x
 #define VALVE_OB_TOSTRING(x) VALVE_OB_STRINGIFY(x)
@@ -183,7 +185,7 @@ int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
     return ShowErrorBoxAndExitWithCode(
         "Unfortunately, your environment is not supported."
         "\n\nApp requires at least Windows 10 to survive.",
-        ERROR_EXE_MACHINE_TYPE_MISMATCH);
+        GetLastErrorCode(ERROR_EXE_MACHINE_TYPE_MISMATCH));
   }
 
   // Do not show fault error boxes, etc.
@@ -196,8 +198,7 @@ int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 #endif
       // The system automatically fixes memory alignment faults and makes them
       // invisible to the application.  It does this for the calling process
-      // and
-      // any descendant processes.
+      // and any descendant processes.
       SEM_NOALIGNMENTFAULTEXCEPT |
       // The system does not display the Windows Error Reporting dialog.
       SEM_NOGPFAULTERRORBOX};
@@ -215,7 +216,7 @@ int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
         "Please check game installed in the folder with less than "
         VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\nUnable to get "
         "module file name from GetModuleFileName.",
-        ::GetLastError());
+        GetLastErrorCode());
   }
 
   // Get the base directory the .exe is in.
@@ -234,33 +235,34 @@ int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   const source::ScopedDll launcher_dll{launcher_dll_path,
                                        LOAD_WITH_ALTERED_SEARCH_PATH};
   if (!launcher_dll) {
-    const auto rc = ::GetLastError();
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed in the folder with less "
                 "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
                 "Unable to load the launcher DLL from %s.",
                 launcher_dll_path);
 
-    return ShowErrorBoxAndExitWithCode(user_error, rc);
+    return ShowErrorBoxAndExitWithCode(user_error, launcher_dll.error_code());
   }
 
   using LauncherMainFunction = int (*)(HINSTANCE, HINSTANCE, LPSTR, int);
   constexpr char launcher_main_function_name[]{"LauncherMain"};
 
-  const auto launcher_main = launcher_dll.GetFunction<LauncherMainFunction>(
-      launcher_main_function_name);
+  const auto [launcher_main, errc] =
+      launcher_dll.GetFunction<LauncherMainFunction>(
+          launcher_main_function_name);
   if (!launcher_main) {
-    const auto rc = ::GetLastError();
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed correctly.\n\nUnable to find %s "
                 "entry point in the launcher DLL %s.",
                 launcher_main_function_name, launcher_dll_path);
 
-    return ShowErrorBoxAndExitWithCode(user_error, rc);
+    return ShowErrorBoxAndExitWithCode(user_error, errc);
   }
 
   return launcher_main(instance, old_instance, cmd_line, window_flags);
 }
+
+}  // namespace
 
 int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
                      _In_ LPSTR cmd_line, _In_ int window_flags) {

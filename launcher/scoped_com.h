@@ -16,7 +16,7 @@ __declspec(dllimport) _Check_return_ HRESULT
 __declspec(dllimport) void __stdcall CoUninitialize();
 }
 
-namespace src::launcher {
+namespace se::launcher {
 
 // Scoped COM.
 class ScopedCom {
@@ -39,6 +39,6 @@ class ScopedCom {
   const HRESULT errc_;
 };
 
-}  // namespace src::launcher
+}  // namespace se::launcher
 
 #endif  // SRC_LAUNCHER_SCOPED_COM_H
