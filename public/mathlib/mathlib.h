@@ -313,7 +313,7 @@ constexpr inline double XM_CALLCONV DEG2RAD(double x) { return x * (M_PI / 180.0
 #define SIDE_CROSS  -2      // necessary for polylib.c
 
 #define ON_VIS_EPSILON  0.01    // necessary for vvis (flow.c) -- again look into moving later!
-#define	EQUAL_EPSILON	0.001   // necessary for vbsp (faces.c) -- should look into moving it there?
+#define	EQUAL_EPSILON	0.001f   // necessary for vbsp (faces.c) -- should look into moving it there?
 
 extern bool s_bMathlibInitialized;
 
@@ -474,7 +474,7 @@ FORCEINLINE void XM_CALLCONV SinCos( float radians, float *sine, float *cosine )
 
 
 template<class T>
-FORCEINLINE T Square( T a )
+FORCEINLINE constexpr T Square( T a )
 {
 	return a * a;
 }
@@ -495,6 +495,53 @@ FORCEINLINE constexpr uint XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( uint x 
 	return x + 1;
 }
 
+// return the smallest power of two >= x.
+// returns 0 if x == 0 or x > 0x80000000 (ie numbers that would be negative if x was signed)
+// NOTE: the old code took an int, and if you pass in an int of 0x80000000 casted to a uint,
+//       you'll get 0x80000000, which is correct for uints, instead of 0, which was correct for ints
+FORCEINLINE constexpr uint XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( int x )
+{
+	x -= 1;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	return x + 1;
+}
+
+// return the smallest power of two >= x.
+// returns 0 if x == 0 or x > 0x8000000000000000 (ie numbers that would be negative if x was signed)
+// NOTE: the old code took an int, and if you pass in an int of 0x8000000000000000 casted to a uint64,
+//       you'll get 0x8000000000000000, which is correct for uints, instead of 0, which was correct for ints
+FORCEINLINE constexpr uint64 XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( uint64 x )
+{
+	x -= 1;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	x |= x >> 32;
+	return x + 1;
+}
+
+// return the smallest power of two >= x.
+// returns 0 if x == 0 or x > 0x8000000000000000 (ie numbers that would be negative if x was signed)
+// NOTE: the old code took an int, and if you pass in an int of 0x8000000000000000 casted to a uint64,
+//       you'll get 0x8000000000000000, which is correct for uints, instead of 0, which was correct for ints
+FORCEINLINE constexpr int64 XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( int64 x )
+{
+	x -= 1;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	x |= x >> 32;
+	return x + 1;
+}
+
 // return the largest power of two <= x. Will return 0 if passed 0
 FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( uint x )
 {
@@ -504,6 +551,32 @@ FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( uint x 
 	return SmallestPowerOfTwoGreaterOrEqual( x + 1 ) >> 1;
 }
 
+// return the largest power of two <= x. Will return 0 if passed 0
+FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( int x )
+{
+	if ( (uint)x >= 0x80000000 )
+		return 0x80000000;
+
+	return SmallestPowerOfTwoGreaterOrEqual( x + 1 ) >> 1;
+}
+
+// return the largest power of two <= x. Will return 0 if passed 0
+FORCEINLINE constexpr uint64 XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( uint64 x )
+{
+	if ( x >= 0x8000000000000000 )
+		return 0x8000000000000000;
+
+	return SmallestPowerOfTwoGreaterOrEqual( x + 1 ) >> 1;
+}
+
+// return the largest power of two <= x. Will return 0 if passed 0
+FORCEINLINE constexpr int64 XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( int64 x )
+{
+	if ( (uint64)x >= 0x8000000000000000 )
+		return 0x8000000000000000;
+
+	return SmallestPowerOfTwoGreaterOrEqual( x + 1 ) >> 1;
+}
 
 // Math routines for optimizing division
 void XM_CALLCONV FloorDivMod (double numer, double denom, int *quotient, int *rem);
@@ -541,7 +614,7 @@ void XM_CALLCONV MatrixCopy( const matrix3x4_t &in, matrix3x4_t &out );
 void XM_CALLCONV MatrixInvert( const matrix3x4_t &in, matrix3x4_t &out );
 
 // Matrix equality test
-bool XM_CALLCONV MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float flTolerance = 1e-5 );
+bool XM_CALLCONV MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float flTolerance = 1e-5f );
 
 void XM_CALLCONV MatrixGetColumn( const matrix3x4_t &in, int column, Vector &out );
 void XM_CALLCONV MatrixSetColumn( const Vector &in, int column, matrix3x4_t &out );
@@ -737,6 +810,7 @@ template <class T> FORCEINLINE T AVG(T a, T b)
 }
 
 // number of elements in an array of static size
+// dimhotepus: Deprecated, use std::size / std::ssize
 #define NELEMS(x) ARRAYSIZE(x)
 
 // XYZ macro, for printf type functions - ex printf("%f %f %f",XYZ(myvector));
@@ -745,7 +819,12 @@ template <class T> FORCEINLINE T AVG(T a, T b)
 
 inline float XM_CALLCONV Sign( float x )
 {
-	return (x <0.0f) ? -1.0f : 1.0f;
+	return (x < 0.0f) ? -1.0f : 1.0f;
+}
+
+inline int XM_CALLCONV Sign( int x )
+{
+	return (x < 0) ? -1 : 1;
 }
 
 //
@@ -1154,7 +1233,7 @@ inline float XM_CALLCONV SimpleSpline( float value )
 	float valueSquared = value * value;
 
 	// Nice little ease-in, ease-out spline-like curve
-	return (3 * valueSquared - 2 * valueSquared * value);
+	return valueSquared * (3 - 2 * value);
 }
 
 // remaps a value in [startInterval, startInterval+rangeInterval] from linear to
@@ -1588,7 +1667,7 @@ float XM_CALLCONV Hermite_Spline(
 	float t );
 
 
-void XM_CALLCONV Hermite_SplineBasis( float t, float basis[] );
+void XM_CALLCONV Hermite_SplineBasis( float t, float basis[4] );
 
 void XM_CALLCONV Hermite_Spline( 
 	const Quaternion &q0, 
@@ -1724,14 +1803,14 @@ inline float XM_CALLCONV CalcDistanceToAABB( const Vector &mins, const Vector &m
 // calculate the shortest distance from P to the line.
 // If you pass in a value for t, it will tell you the t for (A + (B-A)t) to get the closest point.
 // If the closest point lies on the segment between A and B, then 0 <= t <= 1.
-void  XM_CALLCONV CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=0 );
-float XM_CALLCONV CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
-float XM_CALLCONV CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
+void  XM_CALLCONV CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=nullptr );
+float XM_CALLCONV CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
+float XM_CALLCONV CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
 
 // The same three functions as above, except now the line is closed between A and B.
-void  XM_CALLCONV CalcClosestPointOnLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=0 );
-float XM_CALLCONV CalcDistanceToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
-float XM_CALLCONV CalcDistanceSqrToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=0 );
+void  XM_CALLCONV CalcClosestPointOnLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=nullptr );
+float XM_CALLCONV CalcDistanceToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr);
+float XM_CALLCONV CalcDistanceSqrToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
 
 // A function to compute the closes line segment connnection two lines (or false if the lines are parallel, etc.)
 bool XM_CALLCONV CalcLineToLineIntersectionSegment(
@@ -1739,12 +1818,12 @@ bool XM_CALLCONV CalcLineToLineIntersectionSegment(
    float *t1, float *t2 );
 
 // The above functions in 2D
-void  XM_CALLCONV CalcClosestPointOnLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, Vector2D &vClosest, float *t=0 );
-float XM_CALLCONV CalcDistanceToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
-float XM_CALLCONV CalcDistanceSqrToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
-void  XM_CALLCONV CalcClosestPointOnLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, Vector2D &vClosest, float *t=0 );
-float XM_CALLCONV CalcDistanceToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
-float XM_CALLCONV CalcDistanceSqrToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=0 );
+void  XM_CALLCONV CalcClosestPointOnLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, Vector2D &vClosest, float *t=nullptr );
+float XM_CALLCONV CalcDistanceToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
+float XM_CALLCONV CalcDistanceSqrToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
+void  XM_CALLCONV CalcClosestPointOnLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, Vector2D &vClosest, float *t=nullptr );
+float XM_CALLCONV CalcDistanceToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
+float XM_CALLCONV CalcDistanceSqrToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
 
 // Init the mathlib
 void XM_CALLCONV MathLib_Init( float gamma = 2.2f, float texGamma = 2.2f, float brightness = 0.0f, int overbright = 2.0f, bool bAllow3DNow = true, bool bAllowSSE = true, bool bAllowSSE2 = true, bool bAllowMMX = true );
@@ -2141,18 +2220,20 @@ inline bool XM_CALLCONV CloseEnough( float a, float b, float epsilon = EQUAL_EPS
 
 inline bool XM_CALLCONV CloseEnough( const Vector &a, const Vector &b, float epsilon = EQUAL_EPSILON )
 {
-	return fabsf( a.x - b.x ) <= epsilon &&
-		fabsf( a.y - b.y ) <= epsilon &&
-		fabsf( a.z - b.z ) <= epsilon;
+	return
+		CloseEnough( a.x, b.x, epsilon ) &&
+		CloseEnough( a.y, b.y, epsilon ) &&
+		CloseEnough( a.z, b.z, epsilon );
 }
 
-// Fast compare
-// maxUlps is the maximum error in terms of Units in the Last Place. This 
+// Fast compare.
+// 
+// maxUlps is the maximum error in terms of Units in the Last Place.  This
 // specifies how big an error we are willing to accept in terms of the value
-// of the least significant digit of the floating point number s 
-// representation. maxUlps can also be interpreted in terms of how many 
-// representable floats we are willing to accept between A and B. 
-// This function will allow maxUlps-1 floats between A and B.
+// of the least significant digit of the floating point number s representation.
+// maxUlps can also be interpreted in terms of how many representable floats we
+// are willing to accept between A and B.  This function will allow maxUlps-1
+// floats between A and B.
 bool XM_CALLCONV AlmostEqual(float a, float b, int maxUlps = 10);
 
 inline bool XM_CALLCONV AlmostEqual( const Vector &a, const Vector &b, int maxUlps = 10)

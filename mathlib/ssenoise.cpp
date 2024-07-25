@@ -25,7 +25,7 @@
 static fltx4 Four_MagicNumbers = { MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
 
 
-static alignas(16) int32 idx_mask[4]= {0xffff, 0xffff, 0xffff, 0xffff};
+alignas(16) static int32 idx_mask[4] = {0xffff, 0xffff, 0xffff, 0xffff};
 
 #define MASK255 (*((fltx4 *)(& idx_mask )))
 
@@ -58,7 +58,7 @@ fltx4 XM_CALLCONV NoiseSIMD( DirectX::FXMVECTOR x, DirectX::FXMVECTOR y, DirectX
 	//        The noise table could store vectors if we chunked it into 2x2x2 blocks.
 	fltx4 xfrac = Four_Zeros, yfrac = Four_Zeros, zfrac = Four_Zeros;
 #define DOPASS(i)															\
-    {	unsigned int xi = SubInt( x_idx, i );								\
+    do {	unsigned int xi = SubInt( x_idx, i );								\
 		unsigned int yi = SubInt( y_idx, i );								\
 		unsigned int zi = SubInt( z_idx, i );								\
 		SubFloat( xfrac, i ) = (xi & 0xff)*(1.0f/256.0f);						\
@@ -76,7 +76,7 @@ fltx4 XM_CALLCONV NoiseSIMD( DirectX::FXMVECTOR x, DirectX::FXMVECTOR y, DirectX
 		SubFloat( lattice101, i ) = GetLatticePointValue( xi+1,yi,zi+1 );	\
 		SubFloat( lattice110, i ) = GetLatticePointValue( xi+1,yi+1,zi );	\
 		SubFloat( lattice111, i ) = GetLatticePointValue( xi+1,yi+1,zi+1 );	\
-    }
+    } while (false)
 
 	DOPASS( 0 );
 	DOPASS( 1 );

@@ -15,7 +15,6 @@
 
 #include <DirectXMath.h>
 
-#include <cmath>
 #include <cfloat>
 #include <cstdlib>  // rand
 
@@ -187,9 +186,6 @@ public:
 	// Dot product.
 	vec_t XM_CALLCONV Dot(const Vector& vOther) const;
 
-	// assignment
-	Vector& XM_CALLCONV operator=(const Vector &vOther);
-
 	// 2d
 	vec_t XM_CALLCONV Length2D() const;
 	vec_t XM_CALLCONV Length2DSqr() const;
@@ -313,8 +309,9 @@ public:
 	void XM_CALLCONV Init(int ix = 0, int iy = 0, int iz = 0, int iw = 0 );
 
 #ifdef USE_M64S
-	__m64 &AsM64() { return *(__m64*)&x; }
-	const __m64 &AsM64() const { return *(const __m64*)&x; } 
+	// dimhotepus: Dropped as obsolete and x86 specific.
+	// [[deprecated("Use SSE2 stuff")]] __m64 &AsM64() { return *(__m64*)&x; }
+	// [[deprecated("Use SSE2 stuff")]] const __m64 &AsM64() const { return *(const __m64*)&x; } 
 #endif
 
 	// Setter
@@ -377,7 +374,7 @@ public:
 	// Construction/destruction:
 	VectorByValue(void) : Vector() {} 
 	VectorByValue(vec_t X, vec_t Y, vec_t Z) : Vector( X, Y, Z ) {}
-	VectorByValue(const VectorByValue& vOther) { *this = vOther; }
+	VectorByValue(const VectorByValue& vOther) = default;
 };
 
 static_assert(alignof(VectorByValue) == alignof(Vector),
@@ -655,18 +652,6 @@ inline void XM_CALLCONV VectorClear( Vector& a )
 }
 
 //-----------------------------------------------------------------------------
-// assignment
-//-----------------------------------------------------------------------------
-
-inline Vector& Vector::operator=(const Vector &vOther)
-{
-	CHECK_VALID(vOther);
-	x=vOther.x; y=vOther.y; z=vOther.z;
-	return *this; 
-}
-
-
-//-----------------------------------------------------------------------------
 // Array access
 //-----------------------------------------------------------------------------
 inline vec_t& Vector::operator[](int i)
@@ -775,7 +760,7 @@ inline void	Vector::CopyToArray(float* rgfl) const
 { 
 	Assert( rgfl );
 	CHECK_VALID(*this);
-	rgfl[0] = x, rgfl[1] = y, rgfl[2] = z; 
+	rgfl[0] = x; rgfl[1] = y; rgfl[2] = z; 
 }
 
 //-----------------------------------------------------------------------------
@@ -1163,10 +1148,10 @@ FORCEINLINE  IntVector4D& IntVector4D::operator/=(const IntVector4D& v)
 FORCEINLINE void IntVector4DMultiply( const IntVector4D& src, float fl, IntVector4D& res )
 {
 	Assert( IsFinite(fl) );
-	res.x = static_cast<int>(src.x * fl);
-	res.y = static_cast<int>(src.y * fl);
-	res.z = static_cast<int>(src.z * fl);
-	res.w = static_cast<int>(src.w * fl);
+	res.x = static_cast<const int>(src.x * fl);
+	res.y = static_cast<const int>(src.y * fl);
+	res.z = static_cast<const int>(src.z * fl);
+	res.w = static_cast<const int>(src.w * fl);
 }
 
 FORCEINLINE IntVector4D IntVector4D::operator*(float fl) const
@@ -1688,7 +1673,7 @@ inline Vector Vector::Cross(const Vector& vOther) const
 
 inline vec_t Vector::Length2D(void) const
 { 
-	return (vec_t)FastSqrt(x*x + y*y); 
+	return FastSqrt(x*x + y*y); 
 }
 
 inline vec_t Vector::Length2DSqr(void) const
@@ -2149,12 +2134,6 @@ public:
 	vec_t XM_CALLCONV Length() const;
 	vec_t XM_CALLCONV LengthSqr() const;
 
-	// negate the QAngle components
-	//void	Negate(); 
-
-	// No assignment operators either...
-	QAngle& XM_CALLCONV operator=( const QAngle& src );
-
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 	// copy constructors
 
@@ -2185,7 +2164,7 @@ public:
 	// Construction/destruction:
 	QAngleByValue(void) : QAngle() {} 
 	QAngleByValue(vec_t X, vec_t Y, vec_t Z) : QAngle( X, Y, Z ) {}
-	QAngleByValue(const QAngleByValue& vOther) { *this = vOther; }
+	QAngleByValue(const QAngleByValue& vOther) = default;
 };
 
 static_assert(alignof(QAngleByValue) == alignof(QAngle),
@@ -2281,7 +2260,7 @@ inline QAngle XM_CALLCONV RandomAngle( float minVal, float maxVal )
 #endif
 
 
-inline RadianEuler::RadianEuler(QAngle const &angles)
+inline RadianEuler::RadianEuler(QAngle const &angles) //-V730
 {
 	DirectX::XMVECTOR qa = DirectX::XMVectorMultiply
 	(
@@ -2327,17 +2306,6 @@ inline QAngle RadianEuler::ToQAngle() const
 	);
 
 	return qa;
-}
-
-
-//-----------------------------------------------------------------------------
-// assignment
-//-----------------------------------------------------------------------------
-inline QAngle& QAngle::operator=(const QAngle &vOther)	
-{
-	CHECK_VALID(vOther);
-	x=vOther.x; y=vOther.y; z=vOther.z; 
-	return *this; 
 }
 
 

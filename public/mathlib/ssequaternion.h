@@ -97,10 +97,10 @@ FORCEINLINE fltx4 QuaternionNormalizeSIMD( const fltx4 &q )
 //---------------------------------------------------------------------
 FORCEINLINE fltx4 QuaternionBlendNoAlignSIMD( const fltx4 &p, const fltx4 &q, float t )
 {
-	fltx4 sclq = ReplicateX4( t );
-	fltx4 sclp = SubSIMD( Four_Ones, sclq );
-	fltx4 result = MulSIMD( sclp, p );
-	result = MaddSIMD( sclq, q, result );
+	fltx4 sclq = DirectX::XMVectorReplicate( t );
+	fltx4 sclp = DirectX::XMVectorSubtract( Four_Ones, sclq );
+	fltx4 result = DirectX::XMVectorMultiply( sclp, p );
+	result = DirectX::XMVectorMultiplyAdd( sclq, q, result );
 	return QuaternionNormalizeSIMD( result );
 }
 
@@ -140,28 +140,79 @@ FORCEINLINE fltx4 QuaternionScaleSIMD( const fltx4 &p, float t )
 {
 	// FIXME: nick, this isn't overly sensitive to accuracy, and it may be faster to 
 	// use the cos part (w) of the quaternion (sin(omega)*N,cos(omega)) to figure the new scale.
-	float sinom = sqrtf( SubFloat( p, 0 ) * SubFloat( p, 0 ) + SubFloat( p, 1 ) * SubFloat( p, 1 ) + SubFloat( p, 2 ) * SubFloat( p, 2 ) );
-	sinom = min( sinom, 1.f );
+	//float sinom = sqrtf( SubFloat( p, 0 ) * SubFloat( p, 0 ) + SubFloat( p, 1 ) * SubFloat( p, 1 ) + SubFloat( p, 2 ) * SubFloat( p, 2 ) );
+	//sinom = min( sinom, 1.f );
 
-	float sinsom = sinf( asinf( sinom ) * t );
+	//float sinsom = sinf( asinf( sinom ) * t );
 
-	t = sinsom / (sinom + FLT_EPSILON);
+	//t = sinsom / (sinom + FLT_EPSILON);
 
-	fltx4 q;
-	SubFloat( q, 0 ) = t * SubFloat( p, 0 );
-	SubFloat( q, 1 ) = t * SubFloat( p, 1 );
-	SubFloat( q, 2 ) = t * SubFloat( p, 2 );
+	//fltx4 q;
+	//SubFloat( q, 0 ) = t * SubFloat( p, 0 );
+	//SubFloat( q, 1 ) = t * SubFloat( p, 1 );
+	//SubFloat( q, 2 ) = t * SubFloat( p, 2 );
 
+	//// rescale rotation
+	//float r = 1.0f - sinsom * sinsom;
+
+	//// Assert( r >= 0 );
+	//if (r < 0.0f) 
+	//	r = 0.0f;
+	//r = sqrtf( r );
+
+	//// keep sign of rotation
+	//SubFloat( q, 3 ) = fsel( SubFloat( p, 3 ), r, -r );
+	//return q;
+
+	// dimhotepus: More SSE below.
+
+	// FIXME: nick, this isn't overly sensitive to accuracy, and it may be faster to 
+	// use the cos part (w) of the quaternion (sin(omega)*N,cos(omega)) to figure the new scale.
+	fltx4 sinom = DirectX::XMVectorMin( DirectX::XMVectorSqrt( DirectX::XMVector3Dot( p, p ) ), DirectX::g_XMOne );
+	fltx4 sinsom = DirectX::XMVectorSin( DirectX::XMVectorScale( DirectX::XMVectorASin( sinom ), t ) );
+	
+	fltx4 tvec = DirectX::XMVectorDivide( sinsom, DirectX::XMVectorAdd( sinom, DirectX::g_XMEpsilon ) );
+	fltx4 q = DirectX::XMVectorMultiply( tvec, p );
+	
 	// rescale rotation
-	float r = 1.0f - sinsom * sinsom;
-
-	// Assert( r >= 0 );
-	if (r < 0.0f) 
-		r = 0.0f;
-	r = sqrtf( r );
-
+	fltx4 rr = DirectX::XMVectorSubtract( DirectX::g_XMOne, DirectX::XMVectorMultiply( sinsom, sinsom ) );
+	
+	// Assert( rr >= 0 );
+	rr = DirectX::XMVectorSqrt
+	(
+		MaskedAssign
+		(
+			DirectX::XMVectorLess( rr, DirectX::g_XMZero ),
+			DirectX::g_XMZero,
+			rr
+		)
+	);
+	
+	fltx4 sign = DirectX::XMVectorSwizzle
+	<
+		DirectX::XM_SWIZZLE_W,
+		DirectX::XM_SWIZZLE_W,
+		DirectX::XM_SWIZZLE_W,
+		DirectX::XM_SWIZZLE_W
+	>
+	(
+		MaskedAssign
+		(
+			DirectX::XMVectorGreaterOrEqual( p, DirectX::g_XMZero ),
+			rr,
+			DirectX::XMVectorNegate( rr )
+		)
+	);
+	
 	// keep sign of rotation
-	SubFloat( q, 3 ) = fsel( SubFloat( p, 3 ), r, -r );
+	q = DirectX::XMVectorPermute
+	<
+		DirectX::XM_PERMUTE_0X,
+		DirectX::XM_PERMUTE_0Y,
+		DirectX::XM_PERMUTE_0Z,
+		DirectX::XM_PERMUTE_1X
+	>( q, sign );
+	
 	return q;
 }
 
@@ -173,47 +224,98 @@ FORCEINLINE fltx4 QuaternionScaleSIMD( const fltx4 &p, float t )
 // SSE and STDC
 FORCEINLINE fltx4 QuaternionSlerpNoAlignSIMD( const fltx4 &p, const fltx4 &q, float t )
 {
-	float omega, cosom, sinom, sclp, sclq;
+	//float omega, cosom, sinom, sclp, sclq;
 
-	fltx4 result;
+	//fltx4 result;
+
+	//// 0.0 returns p, 1.0 return q.
+	//cosom = SubFloat( p, 0 ) * SubFloat( q, 0 ) + SubFloat( p, 1 ) * SubFloat( q, 1 ) + 
+	//	SubFloat( p, 2 ) * SubFloat( q, 2 ) + SubFloat( p, 3 ) * SubFloat( q, 3 );
+
+	//if ( (1.0f + cosom ) > 0.000001f ) 
+	//{
+	//	if ( (1.0f - cosom ) > 0.000001f ) 
+	//	{
+	//		omega = acosf( cosom );
+	//		sinom = sinf( omega );
+	//		sclp = sinf( (1.0f - t)*omega) / sinom;
+	//		sclq = sinf( t*omega ) / sinom;
+	//	}
+	//	else 
+	//	{
+	//		// TODO: add short circuit for cosom == 1.0f?
+	//		sclp = 1.0f - t;
+	//		sclq = t;
+	//	}
+
+	//	result = DirectX::XMVectorAdd( DirectX::XMVectorScale( p, sclp ), DirectX::XMVectorScale( q, sclq ) );
+	//}
+	//else 
+	//{
+	//	SubFloat( result, 0 ) = -SubFloat( q, 1 );
+	//	SubFloat( result, 1 ) =  SubFloat( q, 0 );
+	//	SubFloat( result, 2 ) = -SubFloat( q, 3 );
+
+	//	sclp = sinf( (1.0f - t) * (0.5f * M_PI_F));
+	//	sclq = sinf( t * (0.5f * M_PI_F));
+
+	//	result = DirectX::XMVectorAdd( DirectX::XMVectorScale( p, sclp ), DirectX::XMVectorScale( result, sclq ) );
+
+	//	SubFloat( result, 3 ) = SubFloat( q, 2 );
+	//}
+
+	//return result;
+
+	// dimhotepus: More SSE below:
 
 	// 0.0 returns p, 1.0 return q.
-	cosom = SubFloat( p, 0 ) * SubFloat( q, 0 ) + SubFloat( p, 1 ) * SubFloat( q, 1 ) + 
-		SubFloat( p, 2 ) * SubFloat( q, 2 ) + SubFloat( p, 3 ) * SubFloat( q, 3 );
+	fltx4 result = DirectX::XMVector4Dot( p, q );
+	float cosom = DirectX::XMVectorGetX( result );
 
-	if ( (1.0f + cosom ) > 0.000001f ) 
+	if ( cosom > -0.099999f )
 	{
-		if ( (1.0f - cosom ) > 0.000001f ) 
+		if ( 0.099999f > cosom )
 		{
-			omega = acosf( cosom );
-			sinom = sinf( omega );
-			sclp = sinf( (1.0f - t)*omega) / sinom;
-			sclq = sinf( t*omega ) / sinom;
+			float omega = acosf( cosom );
+			float sinom = sinf( omega );
+
+			const float tom = t * omega;
+
+			float sclp = sinf( omega - tom ) / sinom;
+			float sclq = sinf( tom ) / sinom;
+
+			result = DirectX::XMVectorAdd( DirectX::XMVectorScale( p, sclp ), DirectX::XMVectorScale( q, sclq ) );
 		}
 		else 
 		{
-			// TODO: add short circuit for cosom == 1.0f?
-			sclp = 1.0f - t;
-			sclq = t;
+			result = DirectX::XMVectorAdd( DirectX::XMVectorScale( p, 1.0f - t ), DirectX::XMVectorScale( q, t ) );
 		}
 
-		result = DirectX::XMVectorAdd( DirectX::XMVectorScale( p, sclp ), DirectX::XMVectorScale( q, sclq ) );
+		return result;
 	}
-	else 
+
 	{
 		SubFloat( result, 0 ) = -SubFloat( q, 1 );
 		SubFloat( result, 1 ) =  SubFloat( q, 0 );
 		SubFloat( result, 2 ) = -SubFloat( q, 3 );
 
-		sclp = sinf( (1.0f - t) * (0.5f * M_PI_F));
-		sclq = sinf( t * (0.5f * M_PI_F));
+		constexpr float halfPi = 0.5f * M_PI_F;
+		const float tt = t * halfPi;
+
+		float sclp = sinf( halfPi - tt );
+		float sclq = sinf( tt );
 
 		result = DirectX::XMVectorAdd( DirectX::XMVectorScale( p, sclp ), DirectX::XMVectorScale( result, sclq ) );
-
-		SubFloat( result, 3 ) = SubFloat( q, 2 );
+		result = DirectX::XMVectorPermute
+		<
+			DirectX::XM_PERMUTE_0X,
+			DirectX::XM_PERMUTE_0Y,
+			DirectX::XM_PERMUTE_0Z,
+			DirectX::XM_PERMUTE_1Z
+		>( result, q );
+		
+		return result;
 	}
-
-	return result;
 }
 
 
