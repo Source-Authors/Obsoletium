@@ -83,7 +83,7 @@ void SetVConfigRegistrySetting( const char *pName, const char *pValue, bool bNot
 	
 	// Set the value to the string passed in
 	int nType = strchr( pValue, '%' ) ? REG_EXPAND_SZ : REG_SZ;
-	RegSetValueEx( hregkey, pName, 0, nType, (const unsigned char *)pValue, (int) strlen(pValue) );
+	RegSetValueEx( hregkey, pName, 0, nType, (const unsigned char *)pValue, (ptrdiff_t) strlen(pValue) );
 
 	// Notify other programs
 	if ( bNotify )

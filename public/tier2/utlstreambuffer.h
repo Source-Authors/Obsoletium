@@ -28,11 +28,11 @@ class CUtlStreamBuffer : public CUtlBuffer
 public:
 	// See CUtlBuffer::BufferFlags_t for flags
 	CUtlStreamBuffer( );
-	CUtlStreamBuffer( const char *pFileName, const char *pPath, int nFlags = 0, bool bDelayOpen = false );
+	CUtlStreamBuffer( const char *pFileName, const char *pPath, unsigned char nFlags = 0, bool bDelayOpen = false );
 	~CUtlStreamBuffer();
 
 	// Open the file. normally done in constructor
-	void Open( const char *pFileName, const char *pPath, int nFlags );
+	void Open( const char *pFileName, const char *pPath, unsigned char nFlags );
 
 	// close the file. normally done in destructor
 	void Close();
@@ -49,14 +49,14 @@ private:
 	};
 
 	// Overflow functions
-	bool StreamPutOverflow( int nSize );
-	bool StreamGetOverflow( int nSize );
+	bool StreamPutOverflow( intp nSize );
+	bool StreamGetOverflow( intp nSize );
 
 	// Grow allocation size to fit requested size
-	void GrowAllocatedSize( int nSize );
+	void GrowAllocatedSize( intp nSize );
 
 	// Reads bytes from the file; fixes up maxput if necessary and null terminates
-	int ReadBytesFromFile( int nBytesToRead, int nReadOffset );
+	intp ReadBytesFromFile( intp nBytesToRead, intp nReadOffset );
 
 	FileHandle_t OpenFile( const char *pFileName, const char *pPath );
 
