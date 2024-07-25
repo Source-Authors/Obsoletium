@@ -2,11 +2,6 @@
 //
 // Purpose: Shared code for parsing / searching for characters in a string
 //			using lookup tables
-//
-// $Workfile:     $
-// $Date:         $
-// $NoKeywords: $
-//===========================================================================//
 
 #ifndef CHARACTERSET_H
 #define CHARACTERSET_H
@@ -15,10 +10,11 @@
 #pragma once
 #endif
 
+#include <climits>
 
 struct characterset_t
 {
-	char set[256];
+	char set[1 << (sizeof(unsigned char) * CHAR_BIT)];
 };
 
 
@@ -37,7 +33,10 @@ extern void CharacterSetBuild( characterset_t *pSetBuffer, const char *pSetStrin
 //			character - character to lookup
 // Output : int - 1 if the character was in the set
 //-----------------------------------------------------------------------------
-#define IN_CHARACTERSET( SetBuffer, character )		((SetBuffer).set[ (unsigned char) (character) ])
+constexpr inline int IN_CHARACTERSET( const characterset_t& SetBuffer, int character )
+{
+  return SetBuffer.set[static_cast<unsigned char>(character)];
+}
 
 
 #endif // CHARACTERSET_H

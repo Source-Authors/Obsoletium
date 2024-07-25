@@ -27,7 +27,7 @@ CDataManagerBase::~CDataManagerBase()
 	Assert( m_listsAreFreed );
 }
 
-void CDataManagerBase::NotifySizeChanged( memhandle_t handle, unsigned int oldSize, unsigned int newSize )
+void CDataManagerBase::NotifySizeChanged( [[maybe_unused]] memhandle_t handle, unsigned int oldSize, unsigned int newSize )
 {
 	Lock();
 	m_memUsed += (int)newSize - (int)oldSize;
@@ -43,7 +43,7 @@ unsigned int CDataManagerBase::FlushAllUnlocked()
 {
 	Lock();
 
-	int nFlush = m_memoryLists.Count( m_lruList );
+	intp nFlush = m_memoryLists.Count( m_lruList );
 	void **pScratch = (void **)_alloca( nFlush * sizeof(void *) );
 	CUtlVector<void *> destroyList( pScratch, nFlush );
 
@@ -60,7 +60,7 @@ unsigned int CDataManagerBase::FlushAllUnlocked()
 
 	Unlock();
 
-	for ( int i = 0; i < nFlush; i++ )
+	for ( intp i = 0; i < nFlush; i++ )
 	{
 		DestroyResourceStorage( destroyList[i] );
 	}
@@ -80,7 +80,7 @@ unsigned int CDataManagerBase::FlushAll()
 {
 	Lock();
 
-	int nFlush = m_memoryLists.Count( m_lruList ) + m_memoryLists.Count( m_lockList );
+	intp nFlush = m_memoryLists.Count( m_lruList ) + m_memoryLists.Count( m_lockList );
 	void **pScratch = (void **)_alloca( nFlush * sizeof(void *) );
 	CUtlVector<void *> destroyList( pScratch, nFlush );
 
@@ -319,7 +319,7 @@ memhandle_t CDataManagerBase::ToHandle( unsigned short index )
 	unsigned int hiword = m_memoryLists.Element(index).serial;
 	hiword <<= 16;
 	index++;
-	return (memhandle_t)( hiword|index );
+	return (memhandle_t)static_cast<uintp>( hiword|index );
 }
 
 unsigned int CDataManagerBase::TargetSize() 

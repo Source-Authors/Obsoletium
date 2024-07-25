@@ -15,7 +15,7 @@
 
 //-----------------------------------------------------------------------------
 
-typedef unsigned MemoryStackMark_t;
+typedef size_t MemoryStackMark_t;
 
 class CMemoryStack
 {
@@ -23,31 +23,28 @@ public:
 	CMemoryStack();
 	~CMemoryStack();
 
-	bool Init( unsigned maxSize = 0, unsigned commitSize = 0, unsigned initialCommit = 0, unsigned alignment = 16 );
-#ifdef _X360
-	bool InitPhysical( unsigned size = 0, unsigned alignment = 16 );
-#endif
+	bool Init( size_t maxSize = 0, size_t commitSize = 0, size_t initialCommit = 0, size_t alignment = 16 );
 	void Term();
 
-	int GetSize();
-	int GetMaxSize();
-	int	GetUsed();
+	intp GetSize() const;
+	intp GetMaxSize() const;
+	intp GetUsed() const;
 	
-	void *Alloc( unsigned bytes, bool bClear = false ) RESTRICT;
+	RESTRICT_FUNC void * Alloc(size_t bytes, bool bClear = false);
 
 	MemoryStackMark_t GetCurrentAllocPoint();
 	void FreeToAllocPoint( MemoryStackMark_t mark, bool bDecommit = true );
 	void FreeAll( bool bDecommit = true );
 	
-	void Access( void **ppRegion, unsigned *pBytes );
+	void Access( void **ppRegion, size_t *pBytes );
 
-	void PrintContents();
+	void PrintContents() const;
 
 	void *GetBase();
 	const void *GetBase() const {  return const_cast<CMemoryStack *>(this)->GetBase(); }
 
 private:
-	bool CommitTo( byte * ) RESTRICT;
+	bool CommitTo( byte * RESTRICT );
 
 	byte *m_pNextAlloc;
 	byte *m_pCommitLimit;
@@ -55,24 +52,21 @@ private:
 	
 	byte *m_pBase;
 
-	unsigned m_maxSize;
-	unsigned m_alignment;
+	size_t m_maxSize;
+	size_t m_alignment;
 #ifdef _WIN32
-	unsigned m_commitSize;
-	unsigned m_minCommit;
-#endif
-#ifdef _X360
-	bool m_bPhysical;
+	size_t m_commitSize;
+	size_t m_minCommit;
 #endif
 };
 
 //-------------------------------------
 
-FORCEINLINE void *CMemoryStack::Alloc( unsigned bytes, bool bClear ) RESTRICT
+FORCEINLINE RESTRICT_FUNC void * CMemoryStack::Alloc( size_t bytes, bool bClear )
 {
 	Assert( m_pBase );
 
-	int alignment = m_alignment;
+	size_t alignment = m_alignment;
 	if ( bytes )
 	{
 		bytes = AlignValue( bytes, alignment );
@@ -84,7 +78,7 @@ FORCEINLINE void *CMemoryStack::Alloc( unsigned bytes, bool bClear ) RESTRICT
 
 
 	void *pResult = m_pNextAlloc;
-	byte *pNextAlloc = m_pNextAlloc + bytes;
+	byte * RESTRICT pNextAlloc = m_pNextAlloc + bytes;
 
 	if ( pNextAlloc > m_pCommitLimit )
 	{
@@ -106,16 +100,16 @@ FORCEINLINE void *CMemoryStack::Alloc( unsigned bytes, bool bClear ) RESTRICT
 
 //-------------------------------------
 
-inline int CMemoryStack::GetMaxSize()
+inline intp CMemoryStack::GetMaxSize() const
 { 
 	return m_maxSize;
 }
 
 //-------------------------------------
 
-inline int CMemoryStack::GetUsed() 
+inline intp CMemoryStack::GetUsed() const
 { 
-	return ( m_pNextAlloc - m_pBase ); 
+	return ( m_pNextAlloc - m_pBase );
 }
 
 //-------------------------------------
@@ -141,10 +135,12 @@ class CUtlMemoryStack
 {
 public:
 	// constructor, destructor
-	CUtlMemoryStack( int nGrowSize = 0, int nInitSize = 0 )	
+	CUtlMemoryStack( intp nGrowSize = 0, intp nInitSize = 0 )
 	{ 
-		m_MemoryStack.Init( MAX_SIZE * sizeof(T), COMMIT_SIZE * sizeof(T), INITIAL_COMMIT * sizeof(T), 4 );
 		static_assert( sizeof(T) % 4 == 0 );
+		m_MemoryStack.Init( MAX_SIZE * sizeof(T), COMMIT_SIZE * sizeof(T), INITIAL_COMMIT * sizeof(T), 4 );
+		// dimhotepus: Add zero init.
+		m_nAllocated = 0;
 	}
 	CUtlMemoryStack( T* pMemory, int numElements ) = delete;
 
@@ -182,17 +178,17 @@ public:
 	const T& Element( I i ) const							{ Assert( IsIdxValid(i) ); return Base()[i];	}
 
 	// Attaches the buffer to external memory....
-	void SetExternalBuffer( T* pMemory, int numElements )	{ Assert( 0 ); }
+	void SetExternalBuffer( T* pMemory, intp numElements )	{ Assert( 0 ); }
 
 	// Size
-	int NumAllocated() const								{ return m_nAllocated; }
-	int Count() const										{ return m_nAllocated; }
+	intp NumAllocated() const								{ return m_nAllocated; }
+	intp Count() const										{ return m_nAllocated; }
 
 	// Grows the memory, so that at least allocated + num elements are allocated
-	void Grow( int num = 1 )								{ Assert( num > 0 ); m_nAllocated += num; m_MemoryStack.Alloc( num * sizeof(T) ); }
+	void Grow( intp num = 1 )								{ Assert( num > 0 ); m_nAllocated += num; m_MemoryStack.Alloc( num * sizeof(T) ); }
 
 	// Makes sure we've got at least this much memory
-	void EnsureCapacity( int num )							{ Assert( num <= MAX_SIZE ); if ( m_nAllocated < num ) Grow( num - m_nAllocated ); }
+	void EnsureCapacity( intp num )							{ Assert( num <= static_cast<intp>(MAX_SIZE) ); if ( m_nAllocated < num ) Grow( num - m_nAllocated ); }
 
 	// Memory deallocation
 	void Purge()											{ m_MemoryStack.FreeAll(); m_nAllocated = 0; }
@@ -201,11 +197,11 @@ public:
 	bool IsExternallyAllocated() const						{ return false; }
 
 	// Set the size by which the memory grows
-	void SetGrowSize( int size )							{}
+	void SetGrowSize( intp size )							{}
 
 private:
 	CMemoryStack m_MemoryStack;
-	int m_nAllocated;
+	intp m_nAllocated;
 };
 
 //-----------------------------------------------------------------------------

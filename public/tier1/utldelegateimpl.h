@@ -1,7 +1,7 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //						FastDelegate.h 
 //	Efficient delegates in C++ that generate only two lines of asm code!
-//  Documentation is found at http://www.codeproject.com/cpp/FastDelegate.asp
+//  Documentation is found at https://www.codeproject.com/Articles/7150/Member-Function-Pointers-and-the-Fastest-Possible
 //
 //						- Don Clugston, Mar 2004.
 //		Major contributions were made by Jody Hagins.
@@ -673,7 +673,7 @@ public:
 		return right.IsLess(*this);
 	}
 	CUtlAbstractDelegate (const CUtlAbstractDelegate &right)  : 
-		m_pFunction(right.m_pFunction), m_pthis(right.m_pthis)
+		m_pthis(right.m_pthis), m_pFunction(right.m_pFunction)
 #if !defined(FASTDELEGATE_USESTATICFUNCTIONHACK)
 		, m_pStaticFunction (right.m_pStaticFunction)
 #endif
@@ -830,7 +830,6 @@ public:
 	template< class DerivedClass >
 	inline void CopyFrom (DerivedClass *pParent, const CUtlAbstractDelegate &right) 
 	{
-		pParent;
 		SetMementoFrom(right);
 	}
 	// For static functions, the 'static_function_invoker' class in the parent 

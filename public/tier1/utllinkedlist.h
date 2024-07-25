@@ -68,7 +68,7 @@ public:
 	static const bool IsUtlLinkedList = true; // Used to match this at compiletime 
 
 	// constructor, destructor
-	CUtlLinkedList( int growSize = 0, int initSize = 0 );
+	CUtlLinkedList( intp growSize = 0, intp initSize = 0 );
 	~CUtlLinkedList();
 
 	// gets particular elements
@@ -78,9 +78,9 @@ public:
 	T const&   operator[]( I i ) const;
 
 	// Make sure we have a particular amount of memory
-	void EnsureCapacity( int num );
+	void EnsureCapacity( intp num );
 
-	void SetGrowSize( int growSize );
+	void SetGrowSize( intp growSize );
 
 	// Memory deallocation
 	void Purge();
@@ -131,7 +131,7 @@ public:
 	inline static size_t ElementSize() { return sizeof( ListElem_t ); }
 
 	// list statistics
-	int	Count() const;
+	intp	Count() const;
 	inline bool IsEmpty( void ) const
 	{
 		return ( Head() == InvalidIndex() );
@@ -388,14 +388,14 @@ private:
 
 // this is kind of ugly, but until C++ gets templatized typedefs in C++0x, it's our only choice
 template < class T >
-class CUtlFixedLinkedList : public CUtlLinkedList< T, int, true, int, CUtlFixedMemory< UtlLinkedListElem_t< T, int > > >
+class CUtlFixedLinkedList : public CUtlLinkedList< T, intp, true, intp, CUtlFixedMemory< UtlLinkedListElem_t< T, intp > > >
 {
 public:
-	CUtlFixedLinkedList( int growSize = 0, int initSize = 0 )
-		: CUtlLinkedList< T, int, true, int, CUtlFixedMemory< UtlLinkedListElem_t< T, int > > >( growSize, initSize ) {}
+	CUtlFixedLinkedList( intp growSize = 0, intp initSize = 0 )
+		: CUtlLinkedList< T, intp, true, intp, CUtlFixedMemory< UtlLinkedListElem_t< T, intp > > >( growSize, initSize ) {}
 
-	typedef CUtlLinkedList< T, int, true, int, CUtlFixedMemory< UtlLinkedListElem_t< T, int > > > BaseClass;
-	bool IsValidIndex( int i ) const
+	typedef CUtlLinkedList< T, intp, true, intp, CUtlFixedMemory< UtlLinkedListElem_t< T, intp > > > BaseClass;
+	bool IsValidIndex( intp i ) const
 	{
 		if ( !BaseClass::Memory().IsIdxValid( i ) )
 			return false;
@@ -412,7 +412,7 @@ public:
 	}
 
 private:
-	int	MaxElementIndex() const { Assert( 0 ); return BaseClass::InvalidIndex(); } // fixedmemory containers don't support iteration from 0..maxelements-1
+	intp	MaxElementIndex() const { Assert( 0 ); return BaseClass::InvalidIndex(); } // fixedmemory containers don't support iteration from 0..maxelements-1
 	void ResetDbgInfo() {}
 };
 
@@ -421,7 +421,7 @@ template < class T, class I = unsigned short >
 class CUtlBlockLinkedList : public CUtlLinkedList< T, I, true, I, CUtlBlockMemory< UtlLinkedListElem_t< T, I >, I > >
 {
 public:
-	CUtlBlockLinkedList( int growSize = 0, int initSize = 0 )
+	CUtlBlockLinkedList( intp growSize = 0, intp initSize = 0 )
 		: CUtlLinkedList< T, I, true, I, CUtlBlockMemory< UtlLinkedListElem_t< T, I >, I > >( growSize, initSize ) {}
 protected:
 	void ResetDbgInfo() {}
@@ -433,11 +433,11 @@ protected:
 //-----------------------------------------------------------------------------
 
 template <class T, class S, bool ML, class I, class M>
-CUtlLinkedList<T,S,ML,I,M>::CUtlLinkedList( int growSize, int initSize ) :
+CUtlLinkedList<T,S,ML,I,M>::CUtlLinkedList( intp growSize, intp initSize ) :
 	m_Memory( growSize, initSize ), m_LastAlloc( m_Memory.InvalidIterator() )
 {
 	// Prevent signed non-int datatypes
-	COMPILE_TIME_ASSERT( sizeof(S) == 4 || ( ( (S)-1 ) > 0 ) );
+	COMPILE_TIME_ASSERT( sizeof(S) <= sizeof(ptrdiff_t) || ( ( (S)-1 ) > 0 ) );
 	ConstructList();
 	ResetDbgInfo();
 }
@@ -492,7 +492,7 @@ inline T const& CUtlLinkedList<T,S,ML,I,M>::operator[]( I i ) const
 //-----------------------------------------------------------------------------
 
 template <class T, class S, bool ML, class I, class M>
-inline int CUtlLinkedList<T,S,ML,I,M>::Count() const      
+inline intp CUtlLinkedList<T,S,ML,I,M>::Count() const      
 { 
 #ifdef MULTILIST_PEDANTIC_ASSERTS
 	AssertMsg( !ML, "CUtlLinkedList::Count() is meaningless for linked lists." );
@@ -590,7 +590,7 @@ inline bool CUtlLinkedList<T,S,ML,I,M>::IsInList( I i ) const
 
 /*
 template <class T>
-inline bool CUtlFixedLinkedList<T>::IsInList( int i ) const
+inline bool CUtlFixedLinkedList<T>::IsInList( intp i ) const
 {
 	return m_Memory.IsIdxValid( i ) && (Previous( i ) != i);
 }
@@ -601,7 +601,7 @@ inline bool CUtlFixedLinkedList<T>::IsInList( int i ) const
 //-----------------------------------------------------------------------------
 
 template< class T, class S, bool ML, class I, class M >
-void CUtlLinkedList<T,S,ML,I,M>::EnsureCapacity( int num )
+void CUtlLinkedList<T,S,ML,I,M>::EnsureCapacity( intp num )
 {
 	MEM_ALLOC_CREDIT_CLASS();
 	m_Memory.EnsureCapacity(num);
@@ -609,7 +609,7 @@ void CUtlLinkedList<T,S,ML,I,M>::EnsureCapacity( int num )
 }
 
 template< class T, class S, bool ML, class I, class M >
-void CUtlLinkedList<T,S,ML,I,M>::SetGrowSize( int growSize )
+void CUtlLinkedList<T,S,ML,I,M>::SetGrowSize( intp growSize )
 {
 	RemoveAll();
 	m_Memory.Init( growSize );
@@ -901,7 +901,7 @@ void  CUtlLinkedList<T,S,ML,I,M>::RemoveAll()
 
 	if ( ML )
 	{
-		for ( typename M::Iterator_t it = m_Memory.First(); it != m_Memory.InvalidIterator(); it = m_Memory.Next( it ) )
+		for ( auto it = m_Memory.First(); it != m_Memory.InvalidIterator(); it = m_Memory.Next( it ) )
 		{
 			I i = m_Memory.GetIndex( it );
 			if ( IsValidIndex( i ) ) // skip elements already in the free list
@@ -1200,7 +1200,7 @@ public:
 		m_nElems = 0;
 	}
 
-	int	Count() const									
+	intp	Count() const									
 	{ 
 		return m_nElems; 
 	}

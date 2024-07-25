@@ -57,16 +57,16 @@
 #define UTLHASHTABLE_H
 #pragma once
 
-#include "utlcommon.h"
-#include "utlmemory.h"
+#include "tier1/utlcommon.h"
+#include "tier1/utlmemory.h"
 #include "mathlib/mathlib.h"
-#include "utllinkedlist.h"
+#include "tier1/utllinkedlist.h"
 
 //-----------------------------------------------------------------------------
 // Henry Goffin (henryg) was here. Questions? Bugs? Go slap him around a bit.
 //-----------------------------------------------------------------------------
 
-typedef unsigned int UtlHashHandle_t;
+typedef uintp UtlHashHandle_t;
 
 #define FOR_EACH_HASHTABLE( table, iter ) \
 	for ( UtlHashHandle_t iter = (table).FirstHandle(); iter != (table).InvalidHandle(); iter = (table).NextHandle( iter ) )
@@ -79,28 +79,68 @@ class CUtlHashtableEntry
 public:
 	typedef CUtlKeyValuePair< KeyT, ValueT > KVPair;
 
-	enum { INT16_STORAGE = ( sizeof( KVPair ) <= 2 ) };
-	typedef typename CTypeSelect< INT16_STORAGE, int16, int32 >::type storage_t;
+	enum
+	{
+		INT16_STORAGE = ( sizeof( KVPair ) <= 2 ),
+//#ifdef PLATFORM_64BITS
+//		INT32_STORAGE = ( sizeof( KVPair ) >= 2 && sizeof( KVPair ) <= 4 )
+//#endif
+	};
+	typedef typename CTypeSelect<
+		INT16_STORAGE,
+		int16,
+//#ifdef PLATFORM_64BITS
+//		typename CTypeSelect< INT32_STORAGE, int32, int64 >::type
+//#else
+		int32
+//#endif
+	>::type storage_t;
 
 	enum
 	{
-		FLAG_FREE = INT16_STORAGE ? 0x8000 : 0x80000000, // must be high bit for IsValid and IdealIndex to work
-		FLAG_LAST = INT16_STORAGE ? 0x4000 : 0x40000000,
-		MASK_HASH = INT16_STORAGE ? 0x3FFF : 0x3FFFFFFF
+		// must be high bit for IsValid and IdealIndex to work
+		FLAG_FREE = INT16_STORAGE
+			? 0x8000
+//#ifdef PLATFORM_64BITS
+//			: (INT32_STORAGE ? 0x80000000 : 0x8000000000000000),
+//#else
+			: 0x80000000,
+//#endif
+		FLAG_LAST = INT16_STORAGE
+			? 0x4000
+//#ifdef PLATFORM_64BITS
+//			: (INT32_STORAGE ? 0x40000000 : 0x4000000000000000),
+//#else
+			: 0x40000000,
+//#endif
+		MASK_HASH = INT16_STORAGE
+			? 0x3FFF
+//#ifdef PLATFORM_64BITS
+//			: (INT32_STORAGE ? 0x3FFFFFFF : 0x3FFFFFFFFFFFFFFF)
+//#else
+			: 0x3FFFFFFF
+//#endif
 	};
 
 	storage_t flags_and_hash;
 	storage_t data[ ( sizeof(KVPair) + sizeof(storage_t) - 1 ) / sizeof(storage_t) ];
 
 	bool IsValid() const { return flags_and_hash >= 0; }
-	void MarkInvalid() { int32 flag = FLAG_FREE; flags_and_hash = (storage_t)flag; }
+	void MarkInvalid() { constexpr auto flag = FLAG_FREE; flags_and_hash = (storage_t)flag; }
 	const KVPair *Raw() const { return reinterpret_cast< const KVPair * >( &data[0] ); }
 	const KVPair *operator->() const { Assert( IsValid() ); return reinterpret_cast< const KVPair * >( &data[0] ); }
 	KVPair *Raw() { return reinterpret_cast< KVPair * >( &data[0] ); }
 	KVPair *operator->() { Assert( IsValid() ); return reinterpret_cast< KVPair * >( &data[0] ); }
 
 	// Returns the ideal index of the data in this slot, or all bits set if invalid
-	uint32 FORCEINLINE IdealIndex( uint32 slotmask ) const { return IdealIndex( flags_and_hash, slotmask ) | ( (int32)flags_and_hash >> 31 ); }
+	size_t FORCEINLINE IdealIndex( size_t slotmask ) const
+	{
+//#ifdef PLATFORM_64BITS
+//		return IdealIndex( flags_and_hash, slotmask ) | ( (int64)flags_and_hash >> 63 );
+//#else
+		return IdealIndex( flags_and_hash, slotmask ) | ( (int32)flags_and_hash >> 31 );
+//#endif
+	}
 
 	// Use template tricks to fully define only one function that takes either 16 or 32 bits
 	// and performs different logic without using "if ( INT16_STORAGE )", because GCC and MSVC
@@ -109,14 +149,26 @@ public:
 	// So we duplicate the hash bits. (Note: h *= MASK_HASH+2 is the same as h += h<<HASH_BITS)
 	typedef typename CTypeSelect< INT16_STORAGE, int16, undefined_t >::type uint32_if16BitStorage;
 	typedef typename CTypeSelect< INT16_STORAGE, undefined_t, int32 >::type uint32_if32BitStorage;
-	static FORCEINLINE uint32 IdealIndex( uint32_if16BitStorage h, uint32 m ) { h &= MASK_HASH; h *= MASK_HASH + 2; return h & m; }
-	static FORCEINLINE uint32 IdealIndex( uint32_if32BitStorage h, uint32 m ) { return h & m; }
+	//typedef typename CTypeSelect< INT32_STORAGE, undefined_t, int64 >::type uint32_if64BitStorage;
+	static FORCEINLINE uint32 IdealIndex( uint32_if16BitStorage h, size_t m )
+	{
+		h &= MASK_HASH; h *= MASK_HASH + 2;
+		return h & m;
+	}
+	static FORCEINLINE uint32 IdealIndex( uint32_if32BitStorage h, size_t m )
+	{
+		return h & m;
+	}
+	/*static FORCEINLINE uint32 IdealIndex( uint32_if64BitStorage h, size_t m )
+	{
+		return h & m;
+	}*/
 
 	// More efficient than memcpy for the small types that are stored in a hashtable
 	void MoveDataFrom( CUtlHashtableEntry &src )
 	{
 		storage_t * RESTRICT srcData = &src.data[0];
-		for ( int i = 0; i < ARRAYSIZE( data ); ++i ) { data[i] = srcData[i]; }
+		for ( size_t i = 0; i < std::size( data ); ++i ) { data[i] = srcData[i]; }
 	}
 };
 
@@ -138,14 +190,14 @@ protected:
 	enum { MASK_HASH = entry_t::MASK_HASH };
 
 	CUtlMemory< entry_t > m_table;
-	int m_nUsed;
-	int m_nMinSize;
+	intp m_nUsed;
+	intp m_nMinSize;
 	bool m_bSizeLocked;
 	KeyIsEqualT m_eq;
 	KeyHashT m_hash;
 
 	// Allocate an empty table and then re-insert all existing entries.
-	void DoRealloc( int size );
+	void DoRealloc( intp size );
 
 	// Move an existing entry to a free slot, leaving a hole behind
 	void BumpEntry( unsigned int idx );
@@ -170,10 +222,10 @@ protected:
 	template < typename K, typename V, typename S, typename H, typename E, typename A > friend class CUtlStableHashtable;
 
 public:
-	explicit CUtlHashtable( int minimumSize = 32 )
+	explicit CUtlHashtable( intp minimumSize = 32 )
 		: m_nUsed(0), m_nMinSize(MAX(8, minimumSize)), m_bSizeLocked(false), m_eq(), m_hash() { }
 
-	CUtlHashtable( int minimumSize, const KeyHashT &hash, KeyIsEqualT const &eq = KeyIsEqualT() )
+	CUtlHashtable( intp minimumSize, const KeyHashT &hash, KeyIsEqualT const &eq = KeyIsEqualT() )
 		: m_nUsed(0), m_nMinSize(MAX(8, minimumSize)), m_bSizeLocked(false), m_eq(eq), m_hash(hash) { }
 
 	CUtlHashtable( entry_t* pMemory, unsigned int nCount, const KeyHashT &hash = KeyHashT(), KeyIsEqualT const &eq = KeyIsEqualT() )
@@ -294,7 +346,7 @@ public:
 #endif
 
 private:
-	CUtlHashtable(const CUtlHashtable& copyConstructorIsNotImplemented);
+	CUtlHashtable(const CUtlHashtable& copyConstructorIsNotImplemented) = delete;
 };
 
 
@@ -326,12 +378,12 @@ void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::SetExternalBuf
 
 // Allocate an empty table and then re-insert all existing entries.
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
-void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoRealloc( int size )
+void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoRealloc( intp size )
 {
 	Assert( !m_bSizeLocked ); 
 
 	size = SmallestPowerOfTwoGreaterOrEqual( MAX( m_nMinSize, size ) );
-	Assert( size > 0 && (uint)size <= entry_t::IdealIndex( ~0, 0x1FFFFFFF ) ); // reasonable power of 2
+	Assert( size > 0 && (size_t)size <= entry_t::IdealIndex( ~0, 0x1FFFFFFF ) ); // reasonable power of 2
 	Assert( size > m_nUsed );
 
 	CUtlMemory<entry_t> oldTable;
@@ -340,16 +392,16 @@ void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoRealloc( int
 
 	m_table.EnsureCapacity( size );
 	entry_t * const pNewBase = m_table.Base();
-	for ( int i = 0; i < size; ++i )
+	for ( intp i = 0; i < size; ++i )
 		pNewBase[i].MarkInvalid();
 
-	int nLeftToMove = m_nUsed;
+	intp nLeftToMove = m_nUsed;
 	m_nUsed = 0;
-	for ( int i = oldTable.Count() - 1; i >= 0; --i )
+	for ( intp i = oldTable.Count() - 1; i >= 0; --i )
 	{
 		if ( pOldBase[i].IsValid() )
 		{
-			int newIdx = DoInsertUnconstructed( pOldBase[i].flags_and_hash, false );
+			intp newIdx = DoInsertUnconstructed( pOldBase[i].flags_and_hash, false );
 			pNewBase[newIdx].MoveDataFrom( pOldBase[i] );
 			if ( --nLeftToMove == 0 )
 				break;
@@ -434,7 +486,7 @@ int CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoInsertUnconst
 	if ( allowGrow && !m_bSizeLocked )
 	{
 		// Keep the load factor between .25 and .75
-		int newSize = m_nUsed + 1;
+		intp newSize = m_nUsed + 1;
 		if ( ( newSize*4 < m_table.Count() && m_table.Count() > m_nMinSize*2 ) || newSize*4 > m_table.Count()*3 )
 		{
 			DoRealloc( newSize * 4 / 3 );
@@ -476,7 +528,7 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoL
 	}
 
 	const entry_t* table = m_table.Base();
-	unsigned int slotmask = m_table.Count()-1;
+	size_t slotmask = m_table.Count()-1;
 	Assert( m_table.Count() > 0 && (slotmask & m_table.Count()) == 0 );
 	unsigned int chainid = entry_t::IdealIndex( h, slotmask );
 
@@ -526,7 +578,7 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoI
 	if ( idx == (handle_t) -1 )
 	{
 		idx = (handle_t) DoInsertUnconstructed( h, true );
-		ConstructOneArg( m_table[ idx ].Raw(), k );
+		Construct( m_table[ idx ].Raw(), k );
 	}
 	return idx;
 }
@@ -540,7 +592,7 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoI
 	if ( idx == (handle_t) -1 )
 	{
 		idx = (handle_t) DoInsertUnconstructed( h, true );
-		ConstructTwoArg( m_table[ idx ].Raw(), k, v );
+		Construct( m_table[ idx ].Raw(), k, v );
 		if ( pDidInsert ) *pDidInsert = true;
 	}
 	else
@@ -557,7 +609,7 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoI
 {
 	Assert( DoLookup<KeyParamT>( k, h, NULL ) == (handle_t) -1 );
 	handle_t idx = (handle_t) DoInsertUnconstructed( h, true );
-	ConstructTwoArg( m_table[ idx ].Raw(), k, v );
+	Construct( m_table[ idx ].Raw(), k, v );
 	return idx;
 }
 
@@ -691,11 +743,11 @@ void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::RemoveByHandle
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
 void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::RemoveAll()
 {
-	int used = m_nUsed;
+	intp used = m_nUsed;
 	if ( used != 0 )
 	{
 		entry_t* table = m_table.Base(); 
-		for ( int i = m_table.Count() - 1; i >= 0; --i )
+		for ( intp i = m_table.Count() - 1; i >= 0; --i )
 		{
 			if ( table[i].IsValid() )
 			{
@@ -866,8 +918,15 @@ public:
 
 protected:
 	// Perform extension of 0xFFFF to 0xFFFFFFFF if necessary. Note: ( a < CONSTANT ) ? 0 : -1 is usually branchless
-	static UtlHashHandle_t ExtendInvalidHandle( uint32 x ) { return x; }
-	static UtlHashHandle_t ExtendInvalidHandle( uint16 x ) { uint32 a = x; return a | ( ( a < 0xFFFFu ) ? 0 : -1 ); }
+	static UtlHashHandle_t ExtendInvalidHandle( uint64 x ) { return x; }
+	static UtlHashHandle_t ExtendInvalidHandle( uint32 x ) {
+#ifdef PLATFORM_64BITS
+		uint64 a = x; return ExtendInvalidHandle( a | ( ( a < 0xFFFFFFFFu ) ? 0 : -1 ) );
+#else
+		return x;
+#endif
+	}
+	static UtlHashHandle_t ExtendInvalidHandle( uint16 x ) { uint32 a = x; return ExtendInvalidHandle( a | ( ( a < 0xFFFFu ) ? 0 : -1 ) ); }
 
 	struct IndirectIndex
 	{
@@ -915,9 +974,9 @@ protected:
 	class CCustomLinkedList : public LinkedList_t
 	{
 	public:
-		int AddToTailUnconstructed()
+		typename LinkedList_t::IndexLocalType_t AddToTailUnconstructed()
 		{
-			IndexStorage_t newNode = this->AllocInternal();
+			typename LinkedList_t::IndexLocalType_t newNode = this->AllocInternal();
 			if ( newNode != this->InvalidIndex() )
 				this->LinkToTail( newNode );
 			return newNode;
@@ -964,8 +1023,8 @@ inline UtlHashHandle_t CUtlStableHashtable<K,V,H,E,S,A>::DoInsert( KeyArgumentT 
 	if ( h != m_table.InvalidHandle() )
 		return m_table[ h ].m_index;
 
-	int idx = m_data.AddToTailUnconstructed();
-	ConstructOneArg( &m_data[idx], k );
+	auto idx = m_data.AddToTailUnconstructed();
+	Construct( &m_data[idx], k );
 	m_table.template DoInsertNoCheck<IndirectIndex>( IndirectIndex( idx ), empty_t(), hash );
 	return idx;
 }
@@ -979,8 +1038,8 @@ inline UtlHashHandle_t CUtlStableHashtable<K,V,H,E,S,A>::DoInsert( KeyArgumentT 
 	if ( h != m_table.InvalidHandle() )
 		return m_table[ h ].m_index;
 
-	int idx = m_data.AddToTailUnconstructed();
-	ConstructTwoArg( &m_data[idx], k, v );
+	auto idx = m_data.AddToTailUnconstructed();
+	Construct( &m_data[idx], k, v );
 	m_table.template DoInsertNoCheck<IndirectIndex>( IndirectIndex( idx ), empty_t(), hash );
 	return idx;
 }

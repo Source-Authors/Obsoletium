@@ -145,11 +145,11 @@ public:
 	// Left at growSize = 0, the memory will first allocate 1 element and double in size
 	// at each increment.
 	// LessFunc_t is required, but may be set after the constructor using SetLessFunc() below
-	CUtlRBTree( int growSize = 0, int initSize = 0, const LessFunc_t &lessfunc = 0 );
+	CUtlRBTree( intp growSize = 0, intp initSize = 0, const LessFunc_t &lessfunc = 0 );
 	CUtlRBTree( const LessFunc_t &lessfunc );
 	~CUtlRBTree( );
 
-	void EnsureCapacity( int num );
+	void EnsureCapacity( intp num );
 
 	void CopyFrom( const CUtlRBTree<T, I, L, M> &other );
 
@@ -163,7 +163,7 @@ public:
 	I  Root() const;
 
 	// Num elements
-	unsigned int Count() const;
+	size_t Count() const;
 
 	// Max "size" of the vector
 	// it's not generally safe to iterate from index 0 to MaxElement()-1
@@ -194,8 +194,8 @@ public:
 	static I InvalidIndex();
 
 	// returns the tree depth (not a very fast operation)
-	int   Depth( I node ) const;
-	int   Depth() const;
+	intp   Depth( I node ) const;
+	intp   Depth() const;
 
 	// Sets the less func
 	void SetLessFunc( const LessFunc_t &func );
@@ -205,7 +205,7 @@ public:
 
 	// Insert method (inserts in order)
 	I  Insert( T const &insert );
-	void Insert( const T *pArray, int nItems );
+	void Insert( const T *pArray, intp nItems );
 	I  InsertIfNotFound( T const &insert );
 
 	// Find method
@@ -318,14 +318,14 @@ protected:
 };
 
 // this is kind of ugly, but until C++ gets templatized typedefs in C++0x, it's our only choice
-template < class T, class I = int, typename L = bool (*)( const T &, const T & )  >
+template < class T, class I = intp, typename L = bool (*)( const T &, const T & )  >
 class CUtlFixedRBTree : public CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNode_t< T, I > > >
 {
 public:
 
 	typedef L LessFunc_t;
 
-	CUtlFixedRBTree( int growSize = 0, int initSize = 0, const LessFunc_t &lessfunc = 0 )
+	CUtlFixedRBTree( intp growSize = 0, intp initSize = 0, const LessFunc_t &lessfunc = 0 )
 		: CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNode_t< T, I > > >( growSize, initSize, lessfunc ) {}
 	CUtlFixedRBTree( const LessFunc_t &lessfunc )
 		: CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNode_t< T, I > > >( lessfunc ) {}
@@ -361,7 +361,7 @@ class CUtlBlockRBTree : public CUtlRBTree< T, I, L, CUtlBlockMemory< UtlRBTreeNo
 {
 public:
 	typedef L LessFunc_t;
-	CUtlBlockRBTree( int growSize = 0, int initSize = 0, const LessFunc_t &lessfunc = 0 )
+	CUtlBlockRBTree( intp growSize = 0, intp initSize = 0, const LessFunc_t &lessfunc = 0 )
 		: CUtlRBTree< T, I, L, CUtlBlockMemory< UtlRBTreeNode_t< T, I >, I > >( growSize, initSize, lessfunc ) {}
 	CUtlBlockRBTree( const LessFunc_t &lessfunc )
 		: CUtlRBTree< T, I, L, CUtlBlockMemory< UtlRBTreeNode_t< T, I >, I > >( lessfunc ) {}
@@ -375,9 +375,9 @@ protected:
 //-----------------------------------------------------------------------------
 
 template < class T, class I, typename L, class M >
-inline CUtlRBTree<T, I, L, M>::CUtlRBTree( int growSize, int initSize, const LessFunc_t &lessfunc ) : 
-m_Elements( growSize, initSize ),
+inline CUtlRBTree<T, I, L, M>::CUtlRBTree( intp growSize, intp initSize, const LessFunc_t &lessfunc ) : 
 m_LessFunc( lessfunc ),
+m_Elements( growSize, initSize ),
 m_Root( InvalidIndex() ),
 m_NumElements( 0 ),
 m_FirstFree( InvalidIndex() ),
@@ -388,8 +388,8 @@ m_LastAlloc( m_Elements.InvalidIterator() )
 
 template < class T, class I, typename L, class M >
 inline CUtlRBTree<T, I, L, M>::CUtlRBTree( const LessFunc_t &lessfunc ) : 
-m_Elements( (intp)0, 0 ),
 m_LessFunc( lessfunc ),
+m_Elements( (intp)0, 0 ),
 m_Root( InvalidIndex() ),
 m_NumElements( 0 ),
 m_FirstFree( InvalidIndex() ),
@@ -405,7 +405,7 @@ inline CUtlRBTree<T, I, L, M>::~CUtlRBTree()
 }
 
 template < class T, class I, typename L, class M >
-inline void CUtlRBTree<T, I, L, M>::EnsureCapacity( int num )        
+inline void CUtlRBTree<T, I, L, M>::EnsureCapacity( intp num )        
 { 
 	m_Elements.EnsureCapacity( num );
 }
@@ -473,9 +473,9 @@ inline	I  CUtlRBTree<T, I, L, M>::Root() const
 //-----------------------------------------------------------------------------
 
 template < class T, class I, typename L, class M >
-inline	unsigned int CUtlRBTree<T, I, L, M>::Count() const          
+inline	size_t CUtlRBTree<T, I, L, M>::Count() const          
 { 
-	return (unsigned int)m_NumElements; 
+	return static_cast<size_t>(m_NumElements); 
 }
 
 //-----------------------------------------------------------------------------
@@ -578,7 +578,7 @@ inline I CUtlRBTree<T, I, L, M>::InvalidIndex()
 //-----------------------------------------------------------------------------
 
 template < class T, class I, typename L, class M >
-inline int CUtlRBTree<T, I, L, M>::Depth() const           
+inline intp CUtlRBTree<T, I, L, M>::Depth() const           
 { 
 	return Depth(Root()); 
 }
@@ -1345,13 +1345,13 @@ void CUtlRBTree<T, I, L, M>::Reinsert( I elem )
 //-----------------------------------------------------------------------------
 
 template < class T, class I, typename L, class M >
-int CUtlRBTree<T, I, L, M>::Depth( I node ) const
+intp CUtlRBTree<T, I, L, M>::Depth( I node ) const
 {
 	if (node == InvalidIndex())
 		return 0;
 
-	int depthright = Depth( RightChild(node) );
-	int depthleft = Depth( LeftChild(node) );
+	intp depthright = Depth( RightChild(node) );
+	intp depthleft = Depth( LeftChild(node) );
 	return Max(depthright, depthleft) + 1;
 }
 
@@ -1381,8 +1381,8 @@ bool CUtlRBTree<T, I, L, M>::IsValid() const
 
 	// First check to see that mNumEntries matches reality.
 	// count items on the free list
-	int numFree = 0;
-	for ( int i = m_FirstFree; i != InvalidIndex(); i = RightChild( i ) )
+	intp numFree = 0;
+	for ( intp i = m_FirstFree; i != InvalidIndex(); i = RightChild( i ) )
 	{
 		++numFree;
 		if ( !m_Elements.IsIdxValid( i ) )
@@ -1391,8 +1391,8 @@ bool CUtlRBTree<T, I, L, M>::IsValid() const
 
 	// iterate over all elements, looking for validity 
 	// based on the self pointers
-	int nElements = 0;
-	int numFree2 = 0;
+	intp nElements = 0;
+	intp numFree2 = 0;
 	for ( M::Iterator_t it = m_Elements.First(); it != m_Elements.InvalidIterator(); it = m_Elements.Next( it ) )
 	{
 		I i = m_Elements.GetIndex( it );
@@ -1404,8 +1404,8 @@ bool CUtlRBTree<T, I, L, M>::IsValid() const
 		{
 			++nElements;
 
-			int right = RightChild( i );
-			int left = LeftChild( i );
+			intp right = RightChild( i );
+			intp left = LeftChild( i );
 			if ( ( right == left ) && ( right != InvalidIndex() ) )
 				return false;
 
@@ -1506,7 +1506,7 @@ I CUtlRBTree<T, I, L, M>::Insert( T const &insert )
 
 
 template < class T, class I, typename L, class M > 
-void CUtlRBTree<T, I, L, M>::Insert( const T *pArray, int nItems )
+void CUtlRBTree<T, I, L, M>::Insert( const T *pArray, intp nItems )
 {
 	while ( nItems-- )
 	{

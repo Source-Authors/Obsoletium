@@ -77,7 +77,7 @@
 //
 
 template <int SIZE_BUF, bool QUIET_TRUNCATION = false >
-class CFmtStrN
+class CFmtStrN final
 {
 public:
 	CFmtStrN()	
@@ -221,7 +221,7 @@ public:
 	void SetQuietTruncation( bool bQuiet ) { m_bQuietTruncation = bQuiet; }
 
 protected:
-	virtual void InitQuietTruncation()
+	void InitQuietTruncation()
 	{
 		m_bQuietTruncation = QUIET_TRUNCATION; 
 	}
@@ -344,7 +344,7 @@ public:
 	void AddQuotes()
 	{
 		Assert( m_szBuf[0] != '"' );
-		const int nLength = Q_strlen( m_szBuf );
+		const ptrdiff_t nLength = Q_strlen( m_szBuf );
 		Q_memmove( m_szBuf + 1, m_szBuf, nLength );
 		m_szBuf[0] = '"';
 		m_szBuf[nLength + 1] = '"';

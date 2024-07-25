@@ -34,8 +34,7 @@
 // UtlVector derives from this so we can do the type check above
 struct base_vector_t
 {
-public:
-	enum { IsUtlVector = true }; // Used to match this at compiletime 		
+	enum { IsUtlVector = true }; // Used to match this at compiletime
 };
 
 //-----------------------------------------------------------------------------
@@ -195,7 +194,7 @@ public:
 
 	void Sort( int (__cdecl *pfnCompare)(const T *, const T *) );
 
-	void Shuffle( IUniformRandomStream* pSteam = NULL );
+	void Shuffle( IUniformRandomStream* pSteam = nullptr );
 	
 	// Call this to quickly sort non-contiguously allocated vectors
 	void InPlaceQuickSort( int (__cdecl *pfnCompare)(const T *, const T *) );
@@ -226,7 +225,6 @@ protected:
 	CAllocator m_Memory;
 	intp m_Size;
 
-#ifndef _X360
 	// For easier access to the elements through the debugger
 	// it's in release builds so this can be used in libraries correctly
 	T *m_pElements;
@@ -235,9 +233,6 @@ protected:
 	{
 		m_pElements = Base();
 	}
-#else
-	inline void ResetDbgInfo() {}
-#endif
 
 private:
 	void InPlaceQuickSort_r( int (__cdecl *pfnCompare)(const T *, const T *), intp nLeft, intp nRight );
@@ -854,13 +849,12 @@ void CUtlVector<T, A>::GrowVector( intp num )
 template< typename T, class A >
 void CUtlVector<T, A>::Sort( int (__cdecl *pfnCompare)(const T *, const T *) )
 {
-	typedef int (__cdecl *QSortCompareFunc_t)(const void *, const void *);
 	if ( Count() <= 1 )
 		return;
 
 	if ( Base() )
 	{
-		qsort( Base(), Count(), sizeof(T), (QSortCompareFunc_t)(pfnCompare) );
+		std::sort( begin(), end(), [=](const T& a, const T&b) { return pfnCompare(&a, &b) < 0; } );
 	}
 	else
 	{
@@ -944,14 +938,14 @@ template< typename T, class A >
 void CUtlVector<T, A>::Sort( void )
 {
 	//STACK STATS TODO: Do we care about allocation tracking precision enough to match element origins across a sort?
-	std::sort( Base(), Base() + Count() );
+	std::sort( begin(), end() );
 }
 
 template< typename T, class A >
 template <class F>
 void CUtlVector<T, A>::SortPredicate( F &&predicate )
 {
-	std::sort( Base(), Base() + Count(), predicate );
+	std::sort( begin(), end(), predicate );
 }
 
 //-----------------------------------------------------------------------------
@@ -1159,11 +1153,9 @@ template< typename T, class A >
 void CUtlVector<T, A>::Swap( CUtlVector< T, A > &vec )
 {
 	m_Memory.Swap( vec.m_Memory );
-	V_swap( m_Size, vec.m_Size );
 
-#ifndef _X360
+	V_swap( m_Size, vec.m_Size );
 	V_swap( m_pElements, vec.m_pElements );
-#endif
 }
 
 template< typename T, class A >
@@ -1467,9 +1459,21 @@ public:
 
 };
 
+// A vector class for storing pointers, so that the elements pointed to by the pointers are deleted
+// on exit.
+template<class T> class CUtlVectorAutoPurgeArray : public CUtlVector< T, CUtlMemory< T, intp> >
+{
+public:
+	~CUtlVectorAutoPurgeArray( void )
+	{
+		this->PurgeAndDeleteElementsArray();
+	}
+
+};
+
 // easy string list class with dynamically allocated strings. For use with V_SplitString, etc.
 // Frees the dynamic strings in destructor.
-class CUtlStringList : public CUtlVectorAutoPurge< char *>
+class CUtlStringList : public CUtlVectorAutoPurgeArray< char *>
 {
 public:
 	void CopyAndAddToTail( char const *pString )			// clone the string and add to the end
@@ -1491,7 +1495,7 @@ public:
 		SplitString( pString, pSeparator );
 	}
 
-	CUtlStringList( char const *pString, const char **pSeparators, int nSeparators )
+	CUtlStringList( char const *pString, const char **pSeparators, intp nSeparators )
 	{
 		SplitString2( pString, pSeparators, nSeparators );
 	}
@@ -1501,7 +1505,7 @@ public:
 		V_SplitString( pString, pSeparator, *this );
 	}
 
-	void SplitString2( char const *pString, const char **pSeparators, int nSeparators )
+	void SplitString2( char const *pString, const char **pSeparators, intp nSeparators )
 	{
 		V_SplitString2( pString, pSeparators, nSeparators, *this );
 	}
@@ -1512,17 +1516,17 @@ private:
 
 
 // <Sergiy> placing it here a few days before Cert to minimize disruption to the rest of codebase
-class CSplitString: public CUtlVector<char*, CUtlMemory<char*, int> >
+class CSplitString: public CUtlVector<char*, CUtlMemory<char*, intp> >
 {
 public:
 	CSplitString(const char *pString, const char *pSeparator);
-	CSplitString(const char *pString, const char **pSeparators, int nSeparators);
+	CSplitString(const char *pString, const char **pSeparators, intp nSeparators);
 	~CSplitString();
 	//
 	// NOTE: If you want to make Construct() public and implement Purge() here, you'll have to free m_szBuffer there
 	//
 private:
-	void Construct(const char *pString, const char **pSeparators, int nSeparators);
+	void Construct(const char *pString, const char **pSeparators, intp nSeparators);
 	void PurgeAndDeleteElements();
 private:
 	char *m_szBuffer; // a copy of original string, with '\0' instead of separators

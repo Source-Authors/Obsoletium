@@ -54,15 +54,6 @@ public:
 	virtual bool RegisterConCommandBase( ConCommandBase *pVar ) = 0;
 };
 
-
-//-----------------------------------------------------------------------------
-// Helper method for console development
-//-----------------------------------------------------------------------------
-#if defined( _X360 ) && !defined( _RETAIL )
-void ConVar_PublishToVXConsole();
-#endif
-
-
 //-----------------------------------------------------------------------------
 // Called when a ConCommand needs to execute
 //-----------------------------------------------------------------------------
@@ -109,7 +100,7 @@ class ConCommandBase
 
 public:
 								ConCommandBase( void );
-								ConCommandBase( const char *pName, const char *pHelpString = 0, 
+								ConCommandBase( const char *pName, const char *pHelpString = nullptr, 
 									int flags = 0 );
 
 	virtual						~ConCommandBase( void );
@@ -137,7 +128,7 @@ public:
 	virtual CVarDLLIdentifier_t	GetDLLIdentifier() const;
 
 protected:
-	virtual void				CreateBase( const char *pName, const char *pHelpString = 0, 
+	virtual void				CreateBase( const char *pName, const char *pHelpString = nullptr, 
 									int flags = 0 );
 
 	// Used internally by OneTimeInit to initialize/shutdown
@@ -183,7 +174,7 @@ class CCommand
 public:
 	CCommand();
 	CCommand( int nArgC, const char **ppArgV );
-	bool Tokenize( const char *pCommand, characterset_t *pBreakSet = NULL );
+	bool Tokenize( const char *pCommand, characterset_t *pBreakSet = nullptr );
 	void Reset();
 
 	int ArgC() const;
@@ -208,7 +199,7 @@ private:
 	};
 
 	int		m_nArgc;
-	int		m_nArgv0Size;
+	ptrdiff_t		m_nArgv0Size;
 	char	m_pArgSBuffer[ COMMAND_MAX_LENGTH ];
 	char	m_pArgvBuffer[ COMMAND_MAX_LENGTH ];
 	const char*	m_ppArgv[ COMMAND_MAX_ARGC ];
@@ -226,7 +217,7 @@ inline int CCommand::ArgC() const
 
 inline const char **CCommand::ArgV() const
 {
-	return m_nArgc ? (const char**)m_ppArgv : NULL;
+	return m_nArgc ? (const char**)m_ppArgv : nullptr;
 }
 
 inline const char *CCommand::ArgS() const
@@ -266,15 +257,15 @@ public:
 	typedef ConCommandBase BaseClass;
 
 	ConCommand( const char *pName, FnCommandCallbackVoid_t callback, 
-		const char *pHelpString = 0, int flags = 0, FnCommandCompletionCallback completionFunc = 0 );
+		const char *pHelpString = nullptr, int flags = 0, FnCommandCompletionCallback completionFunc = nullptr );
 	ConCommand( const char *pName, FnCommandCallback_t callback, 
-		const char *pHelpString = 0, int flags = 0, FnCommandCompletionCallback completionFunc = 0 );
+		const char *pHelpString = nullptr, int flags = 0, FnCommandCompletionCallback completionFunc = nullptr );
 	ConCommand( const char *pName, ICommandCallback *pCallback, 
-		const char *pHelpString = 0, int flags = 0, ICommandCompletionCallback *pCommandCompletionCallback = 0 );
+		const char *pHelpString = nullptr, int flags = 0, ICommandCompletionCallback *pCommandCompletionCallback = nullptr );
 
 	virtual ~ConCommand( void );
 
-	virtual	bool IsCommand( void ) const;
+	bool IsCommand( void ) const override;
 
 	virtual int AutoCompleteSuggest( const char *partial, CUtlVector< CUtlString > &commands );
 
@@ -323,32 +314,32 @@ friend class ConVarRef;
 public:
 	typedef ConCommandBase BaseClass;
 
-								ConVar( const char *pName, const char *pDefaultValue, int flags = 0);
+	ConVar( const char *pName, const char *pDefaultValue, int flags = 0);
 
-								ConVar( const char *pName, const char *pDefaultValue, int flags, 
-									const char *pHelpString );
-								ConVar( const char *pName, const char *pDefaultValue, int flags, 
-									const char *pHelpString, bool bMin, float fMin, bool bMax, float fMax );
-								ConVar( const char *pName, const char *pDefaultValue, int flags, 
-									const char *pHelpString, FnChangeCallback_t callback );
-								ConVar( const char *pName, const char *pDefaultValue, int flags, 
-									const char *pHelpString, bool bMin, float fMin, bool bMax, float fMax,
-									FnChangeCallback_t callback );
-								ConVar( const char *pName, const char *pDefaultValue, int flags,
-									const char *pHelpString, bool bMin, float fMin, bool bMax, float fMax,
-									bool bCompMin, float fCompMin, bool bCompMax, float fCompMax,
-									FnChangeCallback_t callback );
+	ConVar( const char *pName, const char *pDefaultValue, int flags, 
+		const char *pHelpString );
+	ConVar( const char *pName, const char *pDefaultValue, int flags, 
+		const char *pHelpString, bool bMin, float fMin, bool bMax, float fMax );
+	ConVar( const char *pName, const char *pDefaultValue, int flags, 
+		const char *pHelpString, FnChangeCallback_t callback );
+	ConVar( const char *pName, const char *pDefaultValue, int flags, 
+		const char *pHelpString, bool bMin, float fMin, bool bMax, float fMax,
+		FnChangeCallback_t callback );
+	ConVar( const char *pName, const char *pDefaultValue, int flags,
+		const char *pHelpString, bool bMin, float fMin, bool bMax, float fMax,
+		bool bCompMin, float fCompMin, bool bCompMax, float fCompMax,
+		FnChangeCallback_t callback );
 
 
 
 	virtual						~ConVar( void );
 
-	virtual bool				IsFlagSet( int flag ) const;
-	virtual const char*			GetHelpText( void ) const;
-	virtual bool				IsRegistered( void ) const;
-	virtual const char			*GetName( void ) const;
-	virtual void				AddFlags( int flags );
-	virtual	bool				IsCommand( void ) const;
+	bool				IsFlagSet( int flag ) const override;
+	const char*			GetHelpText( void ) const override;
+	bool				IsRegistered( void ) const override;
+	const char			*GetName( void ) const override;
+	void				AddFlags( int flags ) override;
+	bool				IsCommand( void ) const override;
 
 	// Install a change callback (there shouldn't already be one....)
 	void InstallChangeCallback( FnChangeCallback_t callback );
@@ -363,9 +354,9 @@ public:
 	//  from alloc/free across dll/exe boundaries.
 	
 	// These just call into the IConCommandBaseAccessor to check flags and set the var (which ends up calling InternalSetValue).
-	virtual void				SetValue( const char *value );
-	virtual void				SetValue( float value );
-	virtual void				SetValue( int value );
+	void				SetValue( const char *value ) override;
+	void				SetValue( float value ) override;
+	void				SetValue( int value ) override;
 		
 	// Reset to default value
 	void						Revert( void );
@@ -395,15 +386,15 @@ private:
 	virtual void				ChangeStringValue( const char *tempVal, float flOldValue );
 
 	void						Create( const char *pName, const char *pDefaultValue, int flags = 0,
-									const char *pHelpString = 0, bool bMin = false, float fMin = 0.0,
+									const char *pHelpString = nullptr, bool bMin = false, float fMin = 0.0,
 									bool bMax = false, float fMax = 0.0, 
 									bool bCompMin = false, float fCompMin = 0.0, 
 									bool bCompMax = false, float fCompMax = 0.0,
-									FnChangeCallback_t callback = 0 );
+									FnChangeCallback_t callback = nullptr );
 
 
 	// Used internally by OneTimeInit to initialize.
-	virtual void				Init();
+	void Init() override;
 	int GetFlags() { return m_pParent->m_nFlags; }
 private:
 
@@ -418,7 +409,7 @@ private:
 	// Value
 	// Dynamically allocated
 	char						*m_pszString;
-	int							m_StringLength;
+	intp						m_StringLength;
 
 	// Values
 	float						m_fValue;
@@ -616,7 +607,7 @@ FORCEINLINE_CVAR const char *ConVarRef::GetDefault() const
 //-----------------------------------------------------------------------------
 // Called by the framework to register ConCommands with the ICVar
 //-----------------------------------------------------------------------------
-void ConVar_Register( int nCVarFlag = 0, IConCommandBaseAccessor *pAccessor = NULL );
+void ConVar_Register( int nCVarFlag = 0, IConCommandBaseAccessor *pAccessor = nullptr );
 void ConVar_Unregister( );
 
 
@@ -638,9 +629,9 @@ class CConCommandMemberAccessor : public ConCommand, public ICommandCallback, pu
 	typedef int  ( T::*FnMemberCommandCompletionCallback_t )( const char *pPartial, CUtlVector< CUtlString > &commands );
 
 public:
-	CConCommandMemberAccessor( T* pOwner, const char *pName, FnMemberCommandCallback_t callback, const char *pHelpString = 0,
-		int flags = 0, FnMemberCommandCompletionCallback_t completionFunc = 0 ) :
-		BaseClass( pName, this, pHelpString, flags, ( completionFunc != 0 ) ? this : NULL )
+	CConCommandMemberAccessor( T* pOwner, const char *pName, FnMemberCommandCallback_t callback, const char *pHelpString = nullptr,
+		int flags = 0, FnMemberCommandCompletionCallback_t completionFunc = nullptr ) :
+		BaseClass( pName, this, pHelpString, flags, ( completionFunc != 0 ) ? this : nullptr )
 	{
 		m_pOwner = pOwner;
 		m_Func = callback;
@@ -657,13 +648,13 @@ public:
 		m_pOwner = pOwner;
 	}
 
-	virtual void CommandCallback( const CCommand &command )
+	void CommandCallback( const CCommand &command ) override
 	{
 		Assert( m_pOwner && m_Func != nullptr );
 		(m_pOwner->*m_Func)( command );
 	}
 
-	virtual int  CommandCompletionCallback( const char *pPartial, CUtlVector< CUtlString > &commands )
+	int  CommandCompletionCallback( const char *pPartial, CUtlVector< CUtlString > &commands ) override
 	{
 		Assert( m_pOwner && m_CompletionFunc != nullptr );
 		return (m_pOwner->*m_CompletionFunc)( pPartial, commands );
@@ -682,12 +673,12 @@ private:
 #define CON_COMMAND( name, description ) \
    static void name( const CCommand &args ); \
    static ConCommand name##_command( #name, name, description ); \
-   static void name( const CCommand &args )
+   static void name( [[maybe_unused]] const CCommand &args )
 
 #define CON_COMMAND_F( name, description, flags ) \
    static void name( const CCommand &args ); \
    static ConCommand name##_command( #name, name, description, flags ); \
-   static void name( const CCommand &args )
+   static void name( [[maybe_unused]] const CCommand &args )
 
 #define CON_COMMAND_F_COMPLETION( name, description, flags, completion ) \
 	static void name( const CCommand &args ); \
@@ -710,7 +701,7 @@ private:
 	class CCommandMemberInitializer_##_funcname					\
 	{															\
 	public:														\
-		CCommandMemberInitializer_##_funcname() : m_ConCommandAccessor( NULL, name, &_thisclass::_funcname, description, flags )	\
+		CCommandMemberInitializer_##_funcname() : m_ConCommandAccessor( nullptr, name, &_thisclass::_funcname, description, flags )	\
 		{														\
 			m_ConCommandAccessor.SetOwner( GET_OUTER( _thisclass, m_##_funcname##_register ) );	\
 		}														\

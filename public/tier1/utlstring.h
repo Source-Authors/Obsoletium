@@ -10,10 +10,10 @@
 #pragma once
 #endif
 
+#include <string_view>
 
 #include "tier1/utlmemory.h"
 #include "tier1/strtools.h"
-#include "limits.h"
 
 // Matched with the memdbgoff at end of header
 #include "memdbgon.h"
@@ -24,18 +24,16 @@
 // being introduced in POSIX-20008
 inline wchar_t *wcsdup(const wchar_t *pString)
 {
-	wchar_t *pMemory;
-
 	if (!pString)
-		return NULL;
+		return nullptr;
 
 	size_t len = (wcslen(pString) + 1);
-	if ((pMemory = (wchar_t *)malloc(len * sizeof(wchar_t))) != NULL)
+	if ((wchar_t *pMemory = (wchar_t *)malloc(len * sizeof(wchar_t))) != nullptr)
 	{
 		return wcscpy( pMemory, pString );
 	}
 
-	return NULL;
+	return nullptr;
 }
 #endif
 
@@ -54,67 +52,72 @@ inline size_t strnlen(const char *s, size_t n)
 class CUtlString
 {
 public:
-	typedef enum
+	enum TUtlStringPattern
 	{
 		PATTERN_NONE		= 0x00000000,
 		PATTERN_DIRECTORY	= 0x00000001
-	} TUtlStringPattern;
+	};
 
 public:
 	CUtlString();
 	CUtlString( const char *pString );
-	CUtlString( const char *pString, int length );
+	CUtlString( const char *pString, ptrdiff_t length );
 	CUtlString( const CUtlString& string );
 
-#ifdef MOVE_CONSTRUCTOR_SUPPORT
-	// Support moving of CUtlString objects. Long live C++11
+	// Support moving of CUtlString objects.
 	// This move constructor will get called when appropriate, such as when
 	// returning objects from functions, or otherwise copying from temporaries
 	// which are about to be destroyed. It can also be explicitly invoked with
 	// std::move().
-	// Move constructor:
-	CUtlString( CUtlString&& rhs )
+	CUtlString( CUtlString&& rhs ) noexcept
 	{
 		// Move the string pointer from the source to this -- be sure to
 		// zero out the source to avoid double frees.
 		m_pString = rhs.m_pString;
-		rhs.m_pString = 0;
+		rhs.m_pString = nullptr;
 	}
-	// Move assignment operator:
-	CUtlString& operator=( CUtlString&& rhs )
+	CUtlString& operator=( CUtlString&& rhs ) noexcept
 	{
 		// Move the string pointer from the source to this -- be sure to
 		// zero out the source to avoid double frees.
-		m_pString = rhs.m_pString;
-		rhs.m_pString = 0;
+		// dimhotepus: Current string should be disposed when source does.
+		std::swap( m_pString, rhs.m_pString );
 		return *this;
 	}
-#endif
 
 	~CUtlString();
 
-	const char	*Get( ) const;
+	const char	*Get() const;
 	void		Set( const char *pValue );
+
 	operator const char*() const;
+	operator std::string_view() const;
+
+	// STL compatible member functions.  These allow easier use of std::sort
+	// and they are forward compatible with the C++ 11 range-based for loops.
+	char* begin()					{ return GetForModify(); }
+	const char* begin() const		{ return Get(); }
+	char* end()						{ return GetForModify() + Length(); }
+	const char* end() const			{ return Get() + Length(); }
 
 	// Set directly and don't look for a null terminator in pValue.
 	// nChars does not include the nul and this will only copy
 	// at most nChars (even if pValue is longer).  If nChars
 	// is >strlen(pValue) it will copy past the end, don't do it
 	// Does nothing if pValue == String()
-	void		SetDirect( const char *pValue, int nChars );
+	void		SetDirect( const char *pValue, ptrdiff_t nChars );
 
 	// for compatibility switching items from UtlSymbol
-	const char  *String() const { return Get(); }
+	const char  *String() const { return Get(); } //-V524
 
 	// Returns strlen
-	int			Length() const;
+	ptrdiff_t			Length() const;
 	// IsEmpty() is more efficient than Length() == 0
 	bool		IsEmpty() const;
 
 	// Sets the length (used to serialize into the buffer )
 	// Note: If nLen != 0, then this adds an extra byte for a null-terminator.	
-	void		SetLength( int nLen );
+	void		SetLength( ptrdiff_t nLen );
 	char		*GetForModify();
 	void		Clear();
 	void		Purge();
@@ -122,7 +125,7 @@ public:
 	// Case Change
 	void		ToLower();
 	void		ToUpper();
-	void		Append( const char *pAddition, int nChars );
+	void		Append( const char *pAddition, ptrdiff_t nChars );
 
 	void		Append( const char *pchAddition );
 	void		Append( const char chAddition ) { char temp[2] = { chAddition, 0 }; Append( temp ); }
@@ -160,7 +163,7 @@ public:
 
 	bool MatchesPattern( const CUtlString &Pattern, int nFlags = 0 ) const;		// case SENSITIVE, use * for wildcard in pattern string
 
-	char operator[]( int i ) const;
+	char operator[]( ptrdiff_t i ) const;
 
 #if ! defined(SWIG)
 	// Don't let SWIG see the PRINTF_FORMAT_STRING attribute or it will complain.
@@ -178,11 +181,11 @@ public:
 	// Get a copy of part of the string.
 	// If you only specify nStart, it'll go from nStart to the end.
 	// You can use negative numbers and it'll wrap around to the start.
-	CUtlString Slice( int32 nStart=0, int32 nEnd=INT_MAX ) const;
+	CUtlString Slice( ptrdiff_t nStart=0, ptrdiff_t nEnd=PTRDIFF_MAX ) const;
 
 	// Get a substring starting from the left or the right side.
-	CUtlString Left( int32 nChars ) const;
-	CUtlString Right( int32 nChars ) const;
+	CUtlString Left( ptrdiff_t nChars ) const;
+	CUtlString Right( ptrdiff_t nChars ) const;
 
 	// Get a string with all instances of one character replaced with another.
 	CUtlString Replace( char cFrom, char cTo ) const;
@@ -191,7 +194,7 @@ public:
 	CUtlString Replace( const char *pszFrom, const char *pszTo ) const;
 
 	// Get this string as an absolute path (calls right through to V_MakeAbsolutePath).
-	CUtlString AbsPath( const char *pStartingDir=NULL ) const;	
+	CUtlString AbsPath( const char *pStartingDir=nullptr ) const;	
 
 	// Gets the filename (everything except the path.. c:\a\b\c\somefile.txt -> somefile.txt).
 	CUtlString UnqualifiedFilename() const;
@@ -228,7 +231,7 @@ private:
 	// AllocMemory allocates enough space for length characters plus a terminating zero.
 	// Previous characters are preserved, the buffer is null-terminated, but new characters
 	// are not touched.
-	void *AllocMemory( uint32 length );
+	void *AllocMemory( size_t length );
 
 	// If m_pString is not NULL, it points to the start of the string, and the memory allocation.
 	char *m_pString;
@@ -266,24 +269,24 @@ inline bool operator!=( const CUtlString &utlString, const char *pString )
 // Inline methods
 //-----------------------------------------------------------------------------
 inline CUtlString::CUtlString()
-: m_pString( NULL )
+: m_pString( nullptr )
 {
 }
 
 inline CUtlString::CUtlString( const char *pString )
-: m_pString( NULL )
+: m_pString( nullptr )
 {
 	Set( pString );
 }
 
-inline CUtlString::CUtlString( const char *pString, int length )
-: m_pString( NULL )
+inline CUtlString::CUtlString( const char *pString, ptrdiff_t length )
+: m_pString( nullptr )
 {
 	SetDirect( pString, length );
 }
 
 inline CUtlString::CUtlString( const CUtlString& string )
-: m_pString( NULL )
+: m_pString( nullptr )
 {
 	Set( string.Get() );
 }
@@ -293,7 +296,7 @@ inline CUtlString::~CUtlString()
 	Purge();
 }
 
-inline int CUtlString::Length() const
+inline ptrdiff_t CUtlString::Length() const
 {
 	if (m_pString)
 	{
@@ -323,6 +326,10 @@ inline CUtlString::operator const char*() const
 	return Get();
 }
 
+inline CUtlString::operator std::string_view() const
+{
+	return m_pString ? std::string_view{ m_pString, static_cast<size_t>( Length() ) } : std::string_view{};
+}
 
 
 //-----------------------------------------------------------------------------
@@ -335,10 +342,10 @@ class StringFuncs
 public:
 	static T		*Duplicate( const T *pValue );
 	// Note that this function takes a character count, and does not guarantee null-termination.
-	static void		 Copy( T *out_pOut, const T *pIn, int iLengthInChars );
+	static void		 Copy( T *out_pOut, const T *pIn, ptrdiff_t iLengthInChars );
 	static int		 Compare( const T *pLhs, const T *pRhs );
 	static int		 CaselessCompare( const T *pLhs, const T *pRhs );
-	static int		 Length( const T *pValue );
+	static ptrdiff_t		 Length( const T *pValue );
 	static const T  *FindChar( const T *pStr, const T cSearch );
 	static const T	*EmptyString();
 	static const T	*NullDebugString();
@@ -350,10 +357,10 @@ class StringFuncs<char>
 public:
 	static char		  *Duplicate( const char *pValue ) { return strdup( pValue ); }
 	// Note that this function takes a character count, and does not guarantee null-termination.
-	static void		   Copy( OUT_CAP(iLengthInChars) char *out_pOut, const char *pIn, int iLengthInChars ) { strncpy( out_pOut, pIn, iLengthInChars ); }
+	static void		   Copy( OUT_CAP(iLengthInChars) char *out_pOut, const char *pIn, ptrdiff_t iLengthInChars ) { strncpy( out_pOut, pIn, iLengthInChars ); }
 	static int		   Compare( const char *pLhs, const char *pRhs ) { return strcmp( pLhs, pRhs ); }
 	static int		   CaselessCompare( const char *pLhs, const char *pRhs ) { return Q_strcasecmp( pLhs, pRhs ); }
-	static int		   Length( const char *pValue ) { return (int)strlen( pValue ); }
+	static ptrdiff_t		   Length( const char *pValue ) { return strlen( pValue ); }
 	static const char *FindChar( const char *pStr, const char cSearch ) { return strchr( pStr, cSearch ); }
 	static const char *EmptyString() { return ""; }
 	static const char *NullDebugString() { return "(null)"; }
@@ -365,10 +372,10 @@ class StringFuncs<wchar_t>
 public:
 	static wchar_t		 *Duplicate( const wchar_t *pValue ) { return wcsdup( pValue ); }
 	// Note that this function takes a character count, and does not guarantee null-termination.
-	static void			  Copy( OUT_CAP(iLengthInChars) wchar_t *out_pOut, const wchar_t  *pIn, int iLengthInChars ) { wcsncpy( out_pOut, pIn, iLengthInChars ); }
+	static void			  Copy( OUT_CAP(iLengthInChars) wchar_t *out_pOut, const wchar_t  *pIn, ptrdiff_t iLengthInChars ) { wcsncpy( out_pOut, pIn, iLengthInChars ); }
 	static int			  Compare( const wchar_t *pLhs, const wchar_t *pRhs ) { return wcscmp( pLhs, pRhs ); }
 	static int			  CaselessCompare( const wchar_t *pLhs, const wchar_t *pRhs ); // no implementation?
-	static int			  Length( const wchar_t *pValue ) { return (int)wcslen( pValue ); }
+	static ptrdiff_t			  Length( const wchar_t *pValue ) { return wcslen( pValue ); }
 	static const wchar_t *FindChar( const wchar_t *pStr, const wchar_t cSearch ) { return wcschr( pStr, cSearch ); }
 	static const wchar_t *EmptyString() { return L""; }
 	static const wchar_t *NullDebugString() { return L"(null)"; }

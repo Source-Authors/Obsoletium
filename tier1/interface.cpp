@@ -36,10 +36,6 @@
 #include <unistd.h>
 #define _getcwd getcwd
 #endif
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
-
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -71,9 +67,7 @@ InterfaceReg::InterfaceReg( InstantiateInterfaceFn fn, const char *pName ) :
 // ------------------------------------------------------------------------------------ //
 void* CreateInterfaceInternal( const char *pName, int *pReturnCode )
 {
-	InterfaceReg *pCur;
-	
-	for (pCur=InterfaceReg::s_pInterfaceRegs; pCur; pCur=pCur->m_pNext)
+	for (auto *pCur=InterfaceReg::s_pInterfaceRegs; pCur; pCur=pCur->m_pNext)
 	{
 		if (strcmp(pCur->m_pName, pName) == 0)
 		{
@@ -89,7 +83,8 @@ void* CreateInterfaceInternal( const char *pName, int *pReturnCode )
 	{
 		*pReturnCode = IFACE_FAILED;
 	}
-	return NULL;	
+
+	return nullptr;
 }
 
 void* CreateInterface( const char *pName, int *pReturnCode )
@@ -128,8 +123,7 @@ void *GetModuleHandle(const char *name)
 #endif
 
 #if defined( _WIN32 ) && !defined( _X360 )
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
+#include "winlite.h"
 #endif
 
 //-----------------------------------------------------------------------------
@@ -174,15 +168,12 @@ struct ThreadedLoadLibaryContext_t
 // wraps LoadLibraryEx() since 360 doesn't support that
 static HMODULE InternalLoadLibrary( const char *pName, Sys_Flags flags )
 {
-#if defined(_X360)
-	return LoadLibrary( pName );
-#else
 	if ( flags & SYS_NOLOAD )
 		return GetModuleHandle( pName );
 	else
 		return LoadLibraryExA( pName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
-#endif
 }
+
 unsigned ThreadedLoadLibraryFunc( void *pParam )
 {
 	ThreadedLoadLibaryContext_t *pContext = (ThreadedLoadLibaryContext_t*)pParam;
@@ -231,10 +222,6 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
 	context.m_hLibrary = 0;
 
 	ThreadHandle_t h = CreateSimpleThread( ThreadedLoadLibraryFunc, &context );
-
-#ifdef _X360
-	ThreadSetAffinity( h, XBOX_PROCESSOR_3 );
-#endif
 
 	unsigned int nTimeout = 0;
 	while( ThreadWaitForObject( h, true, nTimeout ) == TW_TIMEOUT )
@@ -289,17 +276,8 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 			return nullptr;
 		}
 
-		if ( IsX360() )
-		{
-			int i = CommandLine()->FindParm( "-basedir" );
-			if ( i )
-			{
-				V_strcpy_safe( szCwd, CommandLine()->GetParm( i + 1 ) );
-			}
-		}
-
 		size_t cCwd = strlen( szCwd );
-		if ( cCwd > 0 && szCwd[cCwd - 1] == '/' || szCwd[cCwd - 1] == '\\' )
+		if ( cCwd > 0 && (szCwd[cCwd - 1] == '/' || szCwd[cCwd - 1] == '\\') )
 		{
 			szCwd[cCwd - 1] = '\0';
 		}
@@ -334,8 +312,6 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 #if defined( _WIN32 ) && !defined( _X360 )
 			const auto error = std::system_category().message(::GetLastError());
 			Msg( "Failed to load %s: %s\n", pModuleName, error.c_str() );
-#elif defined( _X360 )
-			Msg( "Error(%d) - Failed to load %s:\n", GetLastError(), pModuleName );
 #else
 			Msg( "Failed to load %s: %s\n", pModuleName, dlerror() );
 #endif // _WIN32
@@ -438,7 +414,7 @@ CreateInterfaceFn Sys_GetFactory( CSysModule *pModule )
 // Purpose: returns the instance of this module
 // Output : interface_instance_t
 //-----------------------------------------------------------------------------
-CreateInterfaceFn Sys_GetFactoryThis( void )
+CreateInterfaceFn Sys_GetFactoryThis()
 {
 	return &CreateInterfaceInternal;
 }
@@ -451,7 +427,7 @@ CreateInterfaceFn Sys_GetFactoryThis( void )
 CreateInterfaceFn Sys_GetFactory( const char *pModuleName )
 {
 #ifdef _WIN32
-	return static_cast<CreateInterfaceFn>( Sys_GetProcAddress( pModuleName, CREATEINTERFACE_PROCNAME ) );
+	return reinterpret_cast<CreateInterfaceFn>( Sys_GetProcAddress( pModuleName, CREATEINTERFACE_PROCNAME ) );
 #elif defined(POSIX)
 	// see Sys_GetFactory( CSysModule *pModule ) for an explanation
 	return (CreateInterfaceFn)( Sys_GetProcAddress( pModuleName, CREATEINTERFACE_PROCNAME ) );

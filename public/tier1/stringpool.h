@@ -26,7 +26,7 @@ public:
 	CStringPool();
 	~CStringPool();
 
-	unsigned int Count() const;
+	size_t Count() const;
 
 	const char * Allocate( const char *pszValue );
 	void FreeAll();

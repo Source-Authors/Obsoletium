@@ -36,7 +36,7 @@ abstract_class ILocalize
 {
 public:
 	// adds the contents of a file to the localization table
-	virtual bool AddFile( const char *fileName, const char *pPathID = NULL, bool bIncludeFallbackSearchPaths = false ) = 0;
+	virtual bool AddFile( const char *fileName, const char *pPathID = nullptr, bool bIncludeFallbackSearchPaths = false ) = 0;
 
 	// Remove all strings from the table
 	virtual void RemoveAll() = 0;

@@ -15,7 +15,7 @@
 #endif
 
 #include "tier0/dbg.h"
-#include <string.h>
+#include <cstring>
 #include "tier0/platform.h"
 #include "mathlib/mathlib.h"
 
@@ -84,6 +84,13 @@ public:
 	// Gets the base address (can change when adding elements!)
 	T* Base();
 	const T* Base() const;
+	
+	// STL compatible member functions. These allow easier use of std::sort
+	// and they are forward compatible with the C++ 11 range-based for loops.
+	T* begin()						{ return Base(); }
+	const T* begin() const			{ return Base(); }
+	T* end()						{ return Base() + Count(); }
+	const T* end() const			{ return Base() + Count(); }
 
 	// Attaches the buffer to external memory....
 	void SetExternalBuffer( T* pMemory, intp numElements );
@@ -237,7 +244,7 @@ public:
 	void Grow( intp num = 1 )								{ Assert( 0 ); }
 
 	// Makes sure we've got at least this much memory
-	void EnsureCapacity( intp num )							{ Assert( num <= SIZE ); }
+	void EnsureCapacity( intp num )							{ Assert( static_cast<size_t>(num) <= SIZE ); }
 
 	// Memory deallocation
 	void Purge()											{}
@@ -408,7 +415,7 @@ private:
 //-----------------------------------------------------------------------------
 
 template< class T, class I >
-CUtlMemory<T,I>::CUtlMemory( intp nGrowSize, intp nInitAllocationCount ) : m_pMemory(0), 
+CUtlMemory<T,I>::CUtlMemory( intp nGrowSize, intp nInitAllocationCount ) : m_pMemory(nullptr), 
 	m_nAllocationCount( nInitAllocationCount ), m_nGrowSize( nGrowSize )
 {
 	ValidateGrowSize();
@@ -548,16 +555,16 @@ inline T& CUtlMemory<T,I>::operator[]( I i )
 {
 	// Avoid function calls in the asserts to improve debug build performance
 	Assert( m_nGrowSize != EXTERNAL_CONST_BUFFER_MARKER ); //Assert( !IsReadOnly() );
-	Assert( (uint32)i < (uint32)m_nAllocationCount );
-	return m_pMemory[(uint32)i];
+	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	return m_pMemory[(uintp)i];
 }
 
 template< class T, class I >
 inline const T& CUtlMemory<T,I>::operator[]( I i ) const
 {
 	// Avoid function calls in the asserts to improve debug build performance
-	Assert( (uint32)i < (uint32)m_nAllocationCount );
-	return m_pMemory[(uint32)i];
+	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	return m_pMemory[(uintp)i];
 }
 
 template< class T, class I >
@@ -565,16 +572,16 @@ inline T& CUtlMemory<T,I>::Element( I i )
 {
 	// Avoid function calls in the asserts to improve debug build performance
 	Assert( m_nGrowSize != EXTERNAL_CONST_BUFFER_MARKER ); //Assert( !IsReadOnly() );
-	Assert( (uint32)i < (uint32)m_nAllocationCount );
-	return m_pMemory[(uint32)i];
+	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	return m_pMemory[(uintp)i];
 }
 
 template< class T, class I >
 inline const T& CUtlMemory<T,I>::Element( I i ) const
 {
 	// Avoid function calls in the asserts to improve debug build performance
-	Assert( (uint32)i < (uint32)m_nAllocationCount );
-	return m_pMemory[(uint32)i];
+	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	return m_pMemory[(uintp)i];
 }
 
 
@@ -795,7 +802,7 @@ void CUtlMemory<T,I>::Purge()
 		{
 			UTLMEMORY_TRACK_FREE();
 			free( (void*)m_pMemory );
-			m_pMemory = 0;
+			m_pMemory = nullptr;
 		}
 		m_nAllocationCount = 0;
 	}

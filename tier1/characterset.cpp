@@ -1,41 +1,27 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-// $Workfile:     $
-// $Date:         $
-//
-//-----------------------------------------------------------------------------
-// $Log: $
-//
-// $NoKeywords: $
-//=============================================================================
 
-#include "characterset.h"
+#include "tier1/characterset.h"
 
-#include <cstring>
+#include <cstring>  // memset.
+
+#include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-//-----------------------------------------------------------------------------
 // Purpose: builds a simple lookup table of a group of important characters
-// Input  : *pParseGroup - pointer to the buffer for the group
-//			*pGroupString - null terminated list of characters to flag
-//-----------------------------------------------------------------------------
-void CharacterSetBuild( characterset_t *pSetBuffer, const char *pszSetString )
-{
-	// Test our pointers
-	if ( !pSetBuffer || !pszSetString )
-		return;
+void CharacterSetBuild(characterset_t *set, const char *source) {
+  if (!set || !source) return;
 
-	memset( pSetBuffer->set, 0, sizeof(pSetBuffer->set) );
-	
-	ptrdiff_t i = 0;
-	while ( pszSetString[i] )
-	{
-		pSetBuffer->set[ (unsigned)pszSetString[i] ] = 1;
-		i++;
-	}
+  memset(set->set, 0, sizeof(set->set));
 
+  ptrdiff_t i{0};
+
+  while (source[i]) {
+    set->set[static_cast<unsigned char>(source[i])] = static_cast<char>(1);
+
+    ++i;
+  }
 }

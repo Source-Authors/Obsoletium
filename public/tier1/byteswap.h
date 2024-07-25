@@ -86,7 +86,7 @@ template<bool isBigEndian = endian::native == endian::big>
 class CByteswap
 {
 public:
-	constexpr CByteswap() : m_bBigEndian(isBigEndian), m_bSwapBytes(false)
+	constexpr CByteswap() : m_bSwapBytes(false), m_bBigEndian(isBigEndian)
 	{
 		// Default behavior sets the target endian to match the machine native endian (no swap).
 	}
@@ -202,10 +202,10 @@ public:
 	// Swaps an input buffer full of type T into the given output buffer.
 	//
 	// Swaps [count] items from the inputBuffer to the outputBuffer.
-	// If inputBuffer is omitted or NULL, then it is assumed to be the same as
+	// If inputBuffer is omitted or nullptr, then it is assumed to be the same as
 	// outputBuffer - effectively swapping the contents of the buffer in place.
 	//-----------------------------------------------------------------------------
-	template<typename T> inline void SwapBuffer( T* outputBuffer, T* inputBuffer = NULL, int count = 1 )
+	template<typename T> inline void SwapBuffer( T* outputBuffer, T* inputBuffer = nullptr, int count = 1 )
 	{
 		Assert( count >= 0 );
 		Assert( outputBuffer );
@@ -215,7 +215,7 @@ public:
 			return;
 
 		// Optimization for the case when we are swapping in place.
-		if( inputBuffer == NULL )
+		if( inputBuffer == nullptr )
 		{
 			inputBuffer = outputBuffer;
 		}
@@ -231,10 +231,10 @@ public:
 	// Swaps an input buffer full of type T into the given output buffer.
 	//
 	// Swaps [count] items from the inputBuffer to the outputBuffer.
-	// If inputBuffer is omitted or NULL, then it is assumed to be the same as
+	// If inputBuffer is omitted or nullptr, then it is assumed to be the same as
 	// outputBuffer - effectively swapping the contents of the buffer in place.
 	//-----------------------------------------------------------------------------
-	template<typename T> inline void SwapBufferToTargetEndian( T* outputBuffer, T* inputBuffer = NULL, int count = 1 )
+	template<typename T> inline void SwapBufferToTargetEndian( T* outputBuffer, T* inputBuffer = nullptr, int count = 1 )
 	{
 		Assert( count >= 0 );
 		Assert( outputBuffer );
@@ -244,7 +244,7 @@ public:
 			return;
 
 		// Optimization for the case when we are swapping in place.
-		if( inputBuffer == NULL )
+		if( inputBuffer == nullptr )
 		{
 			inputBuffer = outputBuffer;
 		}

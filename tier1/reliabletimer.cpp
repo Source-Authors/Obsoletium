@@ -68,7 +68,7 @@ int64 CReliableTimer::GetPerformanceCountNow()
 #ifdef _WIN32
 	if ( sm_bUseQPC )
 	{
-		LARGE_INTEGER li = {0};
+		LARGE_INTEGER li = {};
 		QueryPerformanceCounter( &li );
 		return li.QuadPart;
 	}

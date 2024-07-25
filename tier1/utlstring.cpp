@@ -25,25 +25,25 @@
 // Allocated space for length characters.  It automatically adds space for the 
 // nul and the cached length at the start of the memory block.  Will adjust
 // m_pString and explicitly set the nul at the end before returning.
-void *CUtlString::AllocMemory( uint32 length )
+void *CUtlString::AllocMemory( size_t length )
 {
-	void *pMemoryBlock;
+	char *pMemoryBlock;
 	if ( m_pString )
 	{
-		pMemoryBlock = realloc( m_pString, length + 1 );
+		pMemoryBlock = static_cast<char*>(realloc( m_pString, length + 1 ));
 	}
 	else
 	{
-		pMemoryBlock = malloc( length + 1 );
+		pMemoryBlock = static_cast<char*>(malloc( length + 1 ));
 	}
-	m_pString = (char*)pMemoryBlock;
-	m_pString[ length ] = 0;
+	m_pString = pMemoryBlock;
+	m_pString[ length ] = '\0';
 
 	return pMemoryBlock;
 }
 
 //-----------------------------------------------------------------------------
-void CUtlString::SetDirect( const char *pValue, int nChars )
+void CUtlString::SetDirect( const char *pValue, ptrdiff_t nChars )
 {
 	if ( pValue && nChars > 0 )
 	{
@@ -53,7 +53,7 @@ void CUtlString::SetDirect( const char *pValue, int nChars )
 			return; // Do nothing. Realloc in AllocMemory might move pValue's location resulting in a bad memcpy.
 		}
 
-		Assert( nChars <= Min<int>( strnlen(pValue, nChars) + 1, nChars ) );
+		Assert( nChars <= Min<ptrdiff_t>( strnlen(pValue, nChars) + 1, nChars ) );
 		AllocMemory( nChars );
 		Q_memcpy( m_pString, pValue, nChars );
 	}
@@ -61,23 +61,22 @@ void CUtlString::SetDirect( const char *pValue, int nChars )
 	{
 		Purge();
 	}
-
 }
 
 
 void CUtlString::Set( const char *pValue )
 {
-	int length = pValue ? V_strlen( pValue ) : 0;
+	ptrdiff_t length = pValue ? V_strlen( pValue ) : 0;
 	SetDirect( pValue, length );
 }
 
 // Sets the length (used to serialize into the buffer )
-void CUtlString::SetLength( int nLen )
+void CUtlString::SetLength( ptrdiff_t nLen )
 {
 	if ( nLen > 0 )
 	{
 #ifdef _DEBUG
-		int prevLen = m_pString ? Length() : 0;
+		ptrdiff_t prevLen = m_pString ? Length() : 0;
 #endif
 		AllocMemory( nLen );
 #ifdef _DEBUG
@@ -109,15 +108,15 @@ char *CUtlString::GetForModify()
 		// In general, we optimise away small mallocs for empty strings
 		// but if you ask for the non-const bytes, they must be writable
 		// so we can't return "" here, like we do for the const version - jd
-		void *pMemoryBlock = malloc( 1 );
-		m_pString = (char *)pMemoryBlock;
-		*m_pString = 0;
+		char *pMemoryBlock = static_cast<char*>(malloc( 1 ));
+		m_pString = pMemoryBlock;
+		*m_pString = '\0';
 	}
 
 	return m_pString;
 }
 
-char CUtlString::operator[]( int i ) const
+char CUtlString::operator[]( ptrdiff_t i ) const
 {
 	if ( !m_pString )
 		return '\0';
@@ -138,7 +137,7 @@ void CUtlString::Clear()
 void CUtlString::Purge()
 {
     free( m_pString );
-    m_pString = NULL;
+    m_pString = nullptr;
 }
 
 bool CUtlString::IsEqual_CaseSensitive( const char *src ) const
@@ -216,15 +215,15 @@ bool CUtlString::operator==( const CUtlString &src ) const
 
 CUtlString &CUtlString::operator+=( const CUtlString &rhs )
 {
-	const int lhsLength( Length() );
-	const int rhsLength( rhs.Length() );
+	const ptrdiff_t lhsLength( Length() );
+	const ptrdiff_t rhsLength( rhs.Length() );
 
 	if (!rhsLength)
 	{
 		return *this;
 	}
 
-	const int requestedLength( lhsLength + rhsLength );
+	const ptrdiff_t requestedLength( lhsLength + rhsLength );
 
 	AllocMemory( requestedLength );
 	Q_memcpy( m_pString + lhsLength, rhs.m_pString, rhsLength );
@@ -234,9 +233,9 @@ CUtlString &CUtlString::operator+=( const CUtlString &rhs )
 
 CUtlString &CUtlString::operator+=( const char *rhs )
 {
-	const int lhsLength( Length() );
-	const int rhsLength( V_strlen( rhs ) );
-	const int requestedLength( lhsLength + rhsLength );
+	const ptrdiff_t lhsLength( Length() );
+	const ptrdiff_t rhsLength( V_strlen( rhs ) );
+	const ptrdiff_t requestedLength( lhsLength + rhsLength );
 
 	if (!requestedLength)
 	{
@@ -251,7 +250,7 @@ CUtlString &CUtlString::operator+=( const char *rhs )
 
 CUtlString &CUtlString::operator+=( char c )
 {
-	const int lhsLength( Length() );
+	const ptrdiff_t lhsLength( Length() );
 
 	AllocMemory( lhsLength + 1 );
 	m_pString[ lhsLength ] = c;
@@ -287,16 +286,16 @@ bool CUtlString::MatchesPattern( const CUtlString &Pattern, int nFlags ) const
 
 	while( 1 )
 	{
-		if ( ( *pszPattern ) == 0 )
+		if ( ( *pszPattern ) == '\0' )
 		{
-			return ( (*pszSource ) == 0 );
+			return ( (*pszSource ) == '\0' );
 		}
 
 		if ( ( *pszPattern ) == '*' )
 		{
 			pszPattern++;
 
-			if ( ( *pszPattern ) == 0 )
+			if ( ( *pszPattern ) == '\0' )
 			{
 				return true;
 			}
@@ -305,9 +304,9 @@ bool CUtlString::MatchesPattern( const CUtlString &Pattern, int nFlags ) const
 			continue;
 		}
 
-		int nLength = 0;
+		ptrdiff_t nLength = 0;
 
-		while( ( *pszPattern ) != '*' && ( *pszPattern ) != 0 )
+		while( ( *pszPattern ) != '*' && ( *pszPattern ) != '\0' )
 		{
 			nLength++;
 			pszPattern++;
@@ -318,7 +317,7 @@ bool CUtlString::MatchesPattern( const CUtlString &Pattern, int nFlags ) const
 			const char *pszStartPattern = pszPattern - nLength;
 			const char *pszSearch = pszSource;
 
-			for( int i = 0; i < nLength; i++, pszSearch++, pszStartPattern++ )
+			for( ptrdiff_t i = 0; i < nLength; i++, pszSearch++, pszStartPattern++ )
 			{
 				if ( ( *pszSearch ) == 0 )
 				{
@@ -391,7 +390,7 @@ void CUtlString::StripTrailingSlash()
 	if ( IsEmpty() )
 		return;
 
-	int nLastChar = Length() - 1;
+	ptrdiff_t nLastChar = Length() - 1;
 	char c = m_pString[ nLastChar ];
 	if ( c == '\\' || c == '/' )
 	{
@@ -412,7 +411,7 @@ void CUtlString::FixSlashes( char cSeparator/*=CORRECT_PATH_SEPARATOR*/ )
 //-----------------------------------------------------------------------------
 void CUtlString::TrimLeft( char cTarget )
 {
-	int nIndex = 0;
+	ptrdiff_t nIndex = 0;
 
 	if ( IsEmpty() )
 	{
@@ -435,7 +434,7 @@ void CUtlString::TrimLeft( char cTarget )
 
 void CUtlString::TrimLeft( const char *szTargets )
 {
-	int i;
+	ptrdiff_t i;
 
 	if ( IsEmpty() )
 	{
@@ -472,8 +471,8 @@ void CUtlString::TrimLeft( const char *szTargets )
 
 void CUtlString::TrimRight( char cTarget )
 {
-	const int nLastCharIndex = Length() - 1;
-	int nIndex = nLastCharIndex;
+	const ptrdiff_t nLastCharIndex = Length() - 1;
+	ptrdiff_t nIndex = nLastCharIndex;
 
 	while ( nIndex >= 0 && m_pString[nIndex] == cTarget )
 	{
@@ -491,14 +490,14 @@ void CUtlString::TrimRight( char cTarget )
 
 void CUtlString::TrimRight( const char *szTargets )
 {
-	const int nLastCharIndex = Length() - 1;
-	int i;
+	const ptrdiff_t nLastCharIndex = Length() - 1;
+	ptrdiff_t i;
 
 	for( i = nLastCharIndex; i > 0; i-- )
 	{
 		bool bWhitespace = false;
 
-		for( int j = 0; szTargets[j] != 0; j++ )
+		for( ptrdiff_t j = 0; szTargets[j] != 0; j++ )
 		{
 			if ( m_pString[i] == szTargets[j] )
 			{
@@ -536,9 +535,9 @@ void CUtlString::Trim( const char *szTargets )
 }
 
 
-CUtlString CUtlString::Slice( int32 nStart, int32 nEnd ) const
+CUtlString CUtlString::Slice( ptrdiff_t nStart, ptrdiff_t nEnd ) const
 {
-	int length = Length();
+	ptrdiff_t length = Length();
 	if ( length == 0 )
 	{
 		return CUtlString();
@@ -549,7 +548,7 @@ CUtlString CUtlString::Slice( int32 nStart, int32 nEnd ) const
 	else if ( nStart >= length )
 		nStart = length;
 
-	if ( nEnd == INT32_MAX )
+	if ( nEnd == PTRDIFF_MAX )
 		nEnd = length;
 	else if ( nEnd < 0 )
 		nEnd = length - (-nEnd % length);
@@ -567,12 +566,12 @@ CUtlString CUtlString::Slice( int32 nStart, int32 nEnd ) const
 }
 
 // Grab a substring starting from the left or the right side.
-CUtlString CUtlString::Left( int32 nChars ) const
+CUtlString CUtlString::Left( ptrdiff_t nChars ) const
 {
 	return Slice( 0, nChars );
 }
 
-CUtlString CUtlString::Right( int32 nChars ) const
+CUtlString CUtlString::Right( ptrdiff_t nChars ) const
 {
 	return Slice( -nChars );
 }
@@ -585,8 +584,8 @@ CUtlString CUtlString::Replace( char cFrom, char cTo ) const
 	}
 
 	CUtlString ret = *this;
-	int len = ret.Length();
-	for ( int i=0; i < len; i++ )
+	ptrdiff_t len = ret.Length();
+	for ( ptrdiff_t i=0; i < len; i++ )
 	{
 		if ( ret.m_pString[i] == cFrom )
 			ret.m_pString[i] = cTo;
@@ -610,18 +609,18 @@ CUtlString CUtlString::Replace( const char *pszFrom, const char *pszTo ) const
 	const char *pFirstFound = pos;
 
 	// count number of search string
-	int nSearchCount = 0;
-	int nSearchLength = V_strlen( pszFrom );
+	ptrdiff_t nSearchCount = 0;
+	ptrdiff_t nSearchLength = V_strlen( pszFrom );
 	while ( pos )
 	{
 		nSearchCount++;
-		int nSrcOffset = ( pos - String() ) + nSearchLength;
+		ptrdiff_t nSrcOffset = ( pos - String() ) + nSearchLength;
 		pos = V_strstr( String() + nSrcOffset, pszFrom );
 	}
 
 	// allocate the new string
-	int nReplaceLength = V_strlen( pszTo );
-	int nAllocOffset = nSearchCount * ( nReplaceLength - nSearchLength );
+	ptrdiff_t nReplaceLength = V_strlen( pszTo );
+	ptrdiff_t nAllocOffset = nSearchCount * ( nReplaceLength - nSearchLength );
 	size_t srcLength = Length();
 	CUtlString strDest;
 	size_t destLength = srcLength + nAllocOffset;
@@ -629,13 +628,13 @@ CUtlString CUtlString::Replace( const char *pszFrom, const char *pszTo ) const
 
 	// find and replace the search string
 	pos = pFirstFound;
-	int nDestOffset = 0;
-	int nSrcOffset = 0;
+	ptrdiff_t nDestOffset = 0;
+	ptrdiff_t nSrcOffset = 0;
 	while ( pos )
 	{
 		// Found an instance
-		int nCurrentSearchOffset = pos - String();
-		int nCopyLength = nCurrentSearchOffset - nSrcOffset;
+		ptrdiff_t nCurrentSearchOffset = pos - String();
+		ptrdiff_t nCopyLength = nCurrentSearchOffset - nSrcOffset;
 		V_strncpy( strDest.GetForModify() + nDestOffset, String() + nSrcOffset, nCopyLength + 1 );
 		nDestOffset += nCopyLength;
 		V_strncpy( strDest.GetForModify() + nDestOffset, pszTo, nReplaceLength + 1 );
@@ -671,8 +670,8 @@ CUtlString CUtlString::UnqualifiedFilename() const
 CUtlString CUtlString::DirName() const
 {
 	CUtlString ret( this->String() );
-	V_StripLastDir( (char*)ret.Get(), ret.Length() + 1 );
-	V_StripTrailingSlash( (char*)ret.Get() );
+	V_StripLastDir( ret.GetForModify(), ret.Length() + 1 );
+	V_StripTrailingSlash( ret.GetForModify() );
 	return ret;
 }
 
@@ -686,7 +685,7 @@ CUtlString CUtlString::StripExtension() const
 CUtlString CUtlString::StripFilename() const
 {
 	const char *pFilename = V_UnqualifiedFileName( Get() ); // NOTE: returns 'Get()' on failure, never NULL
-	int nCharsToCopy = pFilename - Get();
+	ptrdiff_t nCharsToCopy = pFilename - Get();
 	CUtlString result;
 	result.SetDirect( Get(), nCharsToCopy );
 	result.StripTrailingSlash();
@@ -744,17 +743,17 @@ void CUtlString::Append( const char *pchAddition )
 	(*this) += pchAddition;
 }
 
-void CUtlString::Append( const char *pchAddition, int nChars )
+void CUtlString::Append( const char *pchAddition, ptrdiff_t nChars )
 {
-	nChars = Min<int>( nChars, V_strlen(	pchAddition ) );
+	nChars = Min( nChars, V_strlen(	pchAddition ) );
 
-	const int lhsLength( Length() );
-	const int rhsLength( nChars );
-	const int requestedLength( lhsLength + rhsLength );
+	const ptrdiff_t lhsLength( Length() );
+	const ptrdiff_t rhsLength( nChars );
+	const ptrdiff_t requestedLength( lhsLength + rhsLength );
 
 	AllocMemory( requestedLength );
-	const int allocatedLength( requestedLength );
-	const int copyLength( allocatedLength - lhsLength < rhsLength ? allocatedLength - lhsLength : rhsLength );
+	const ptrdiff_t allocatedLength( requestedLength );
+	const ptrdiff_t copyLength( allocatedLength - lhsLength < rhsLength ? allocatedLength - lhsLength : rhsLength );
 	memcpy( GetForModify() + lhsLength, pchAddition, copyLength );
 	m_pString[ allocatedLength ] = '\0';
 }
@@ -763,6 +762,5 @@ void CUtlString::Append( const char *pchAddition, int nChars )
 const CUtlString &CUtlString::GetEmptyString()
 {
 	static const CUtlString s_emptyString;
-
 	return s_emptyString;
 }

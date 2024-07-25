@@ -9,17 +9,17 @@
 //-----------------------------------------------------------------------------
 // Base class, containing simple memory management
 //-----------------------------------------------------------------------------
-CUtlBinaryBlock::CUtlBinaryBlock( int growSize, int initSize ) : m_Memory( growSize, initSize )
+CUtlBinaryBlock::CUtlBinaryBlock( intp growSize, intp initSize ) : m_Memory( growSize, initSize )
 {
 	m_nActualLength = 0;
 }
 
-CUtlBinaryBlock::CUtlBinaryBlock( void* pMemory, int nSizeInBytes, int nInitialLength ) : m_Memory( (unsigned char*)pMemory, nSizeInBytes )
+CUtlBinaryBlock::CUtlBinaryBlock( void* pMemory, intp nSizeInBytes, intp nInitialLength ) : m_Memory( (unsigned char*)pMemory, nSizeInBytes )
 {
 	m_nActualLength = nInitialLength;
 }
 
-CUtlBinaryBlock::CUtlBinaryBlock( const void* pMemory, int nSizeInBytes ) : m_Memory( (const unsigned char*)pMemory, nSizeInBytes )
+CUtlBinaryBlock::CUtlBinaryBlock( const void* pMemory, intp nSizeInBytes ) : m_Memory( (const unsigned char*)pMemory, nSizeInBytes )
 {
 	m_nActualLength = nSizeInBytes;
 }
@@ -29,7 +29,7 @@ CUtlBinaryBlock::CUtlBinaryBlock( const CUtlBinaryBlock& src )
 	Set( src.Get(), src.Length() );
 }
 
-void CUtlBinaryBlock::Get( void *pValue, int nLen ) const
+void CUtlBinaryBlock::Get( void *pValue, intp nLen ) const
 {
 	Assert( nLen > 0 );
 	if ( m_nActualLength < nLen )
@@ -43,14 +43,14 @@ void CUtlBinaryBlock::Get( void *pValue, int nLen ) const
 	}
 }
 
-void CUtlBinaryBlock::SetLength( int nLength )
+void CUtlBinaryBlock::SetLength( intp nLength )
 {
 	Assert( !m_Memory.IsReadOnly() );
 
 	m_nActualLength = nLength;
 	if ( nLength > m_Memory.NumAllocated() )
 	{
-		int nOverFlow = nLength - m_Memory.NumAllocated();
+		intp nOverFlow = nLength - m_Memory.NumAllocated();
 		m_Memory.Grow( nOverFlow );
 
 		// If the reallocation failed, clamp length
@@ -69,7 +69,7 @@ void CUtlBinaryBlock::SetLength( int nLength )
 }
 
 
-void CUtlBinaryBlock::Set( const void *pValue, int nLen )
+void CUtlBinaryBlock::Set( const void *pValue, intp nLen )
 {
 	Assert( !m_Memory.IsReadOnly() );
 

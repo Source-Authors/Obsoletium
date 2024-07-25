@@ -13,14 +13,12 @@
 
 #include "tier0/basetypes.h"
 
-#undef min
-#undef max
 #include <fstream>
 #include "valve_minmax_on.h"
 
 
 
-typedef enum
+enum trtoken_t
 {
 	TOKENSTRINGTOOLONG = -4,
 	TOKENERROR = -3,
@@ -30,7 +28,7 @@ typedef enum
 	INTEGER,
 	STRING,
 	IDENT
-} trtoken_t;
+};
 
 
 #define IsToken(s1, s2)	!strcmpi(s1, s2)
@@ -47,7 +45,7 @@ public:
 	TokenReader();
 
 	bool Open(const char *pszFilename);
-	trtoken_t NextToken(char *pszStore, int nSize);
+	trtoken_t NextToken(char *pszStore, ptrdiff_t nSize);
 	trtoken_t NextTokenDynamic(char **ppszStore);
 	void Close();
 
@@ -55,17 +53,17 @@ public:
 	void Stuff(trtoken_t ttype, const char *pszToken);
 	bool Expecting(trtoken_t ttype, const char *pszToken);
 	const char *Error(char *error, ...);
-	trtoken_t PeekTokenType(char* = NULL, int maxlen = 0);
+	trtoken_t PeekTokenType(char* = nullptr, ptrdiff_t maxlen = 0);
 
 	inline int GetErrorCount(void);
 
 private:
 	// compiler can't generate an assignment operator since descended from std::ifstream
-	inline TokenReader(TokenReader const &);
-	inline int operator=(TokenReader const &);
+	inline TokenReader(TokenReader const &) = delete;
+	inline int operator=(TokenReader const &) = delete;
 
-	trtoken_t GetString(char *pszStore, int nSize);
-	bool SkipWhiteSpace(void);
+	trtoken_t GetString(char *pszStore, ptrdiff_t nSize);
+	bool SkipWhiteSpace();
 
 	int m_nLine;
 	int m_nErrorCount;

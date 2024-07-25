@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-TokenReader::TokenReader(void)
+TokenReader::TokenReader()
 {
 	m_nLine = 1;
 	m_nErrorCount = 0;
@@ -75,7 +75,7 @@ const char *TokenReader::Error(char *error, ...)
 //			nSize - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-trtoken_t TokenReader::GetString(char *pszStore, int nSize)
+trtoken_t TokenReader::GetString(char *pszStore, ptrdiff_t nSize)
 {
 	if (nSize <= 0)
 	{
@@ -201,7 +201,7 @@ trtoken_t TokenReader::NextTokenDynamic(char **ppszStore)
 	char szTempBuffer[8192];
 	trtoken_t eType = NextToken(szTempBuffer, sizeof(szTempBuffer));
 
-	int len = Q_strlen(szTempBuffer) + 1;
+	ptrdiff_t len = Q_strlen(szTempBuffer) + 1;
 	*ppszStore = new char [len];
 	Assert( *ppszStore );
 	Q_strncpy(*ppszStore, szTempBuffer, len );
@@ -215,7 +215,7 @@ trtoken_t TokenReader::NextTokenDynamic(char **ppszStore)
 // Input  : pszStore - Pointer to a string that will receive the token.
 // Output : Returns the type of token that was read, or TOKENERROR.
 //-----------------------------------------------------------------------------
-trtoken_t TokenReader::NextToken(char *pszStore, int nSize)
+trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 {
 	char *pStart = pszStore;
 
@@ -407,7 +407,7 @@ bool TokenReader::Expecting(trtoken_t ttype, const char *pszToken)
 // Input  : pszStore - 
 // Output : 
 //-----------------------------------------------------------------------------
-trtoken_t TokenReader::PeekTokenType(char *pszStore, int maxlen )
+trtoken_t TokenReader::PeekTokenType(char *pszStore, ptrdiff_t maxlen )
 {
 	if (!m_bStuffed)
 	{

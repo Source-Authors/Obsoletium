@@ -180,7 +180,7 @@ bool Unserialize( CUtlBuffer &buf, CUtlVector<T> &dest )
 		if ( !buf.IsValid() )
 			break;
 
-		int i = dest.AddToTail( );
+		intp i = dest.AddToTail( );
 		if ( ! ::Unserialize( buf, dest[i] ) )
 			return false;
 	}

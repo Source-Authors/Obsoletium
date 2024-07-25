@@ -43,7 +43,7 @@ ConVar lzma_persistent_buffer( "lzma_persistent_buffer", LZMA_DEFAULT_PERSISTENT
 static void *g_pStaticLZMABuf = NULL;
 static size_t g_unStaticLZMABufSize = 0;
 static uint32 g_unStaticLZMABufRef = 0;
-static void *SzAlloc(void *p, size_t size) {
+static void *SzAlloc( [[maybe_unused]] void *p, size_t size) {
 	// Don't touch static buffer on other threads.
 	if ( ThreadInMainThread() )
 	{
@@ -64,7 +64,7 @@ static void *SzAlloc(void *p, size_t size) {
 	// Not using the persistent buffer
 	return malloc(size);
 }
-static void SzFree(void *p, void *address) {
+static void SzFree( [[maybe_unused]] void *p, void *address) {
 	// Don't touch static buffer on other threads.
 	if ( ThreadInMainThread() )
 	{
