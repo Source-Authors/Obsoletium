@@ -33,7 +33,7 @@ CUtlStreamBuffer::CUtlStreamBuffer( ) : BaseClass( DEFAULT_STREAM_CHUNK_SIZE, DE
 	m_pPath = NULL;
 }
 
-CUtlStreamBuffer::CUtlStreamBuffer( const char *pFileName, const char *pPath, int nFlags, bool bDelayOpen ) :
+CUtlStreamBuffer::CUtlStreamBuffer( const char *pFileName, const char *pPath, unsigned char nFlags, bool bDelayOpen ) :
 	BaseClass( DEFAULT_STREAM_CHUNK_SIZE, DEFAULT_STREAM_CHUNK_SIZE, nFlags )
 {
 	SetUtlBufferOverflowFuncs( &CUtlStreamBuffer::StreamGetOverflow, &CUtlStreamBuffer::StreamPutOverflow );
@@ -44,7 +44,7 @@ CUtlStreamBuffer::CUtlStreamBuffer( const char *pFileName, const char *pPath, in
 
 		if ( pPath )
 		{
-			int nPathLen = Q_strlen( pPath );
+			intp nPathLen = Q_strlen( pPath );
 			m_pPath = new char[ nPathLen + 1 ];
 			Q_strcpy( m_pPath, pPath );
 		}
@@ -76,7 +76,7 @@ CUtlStreamBuffer::CUtlStreamBuffer( const char *pFileName, const char *pPath, in
 		// Read in the first bytes of the file
 		if ( Size() > 0 )
 		{
-			int nSizeToRead = min( Size(), static_cast<intp>(m_nMaxPut) );
+			intp nSizeToRead = min( Size(), m_nMaxPut );
 			ReadBytesFromFile( nSizeToRead, 0 );
 		}
 	}
@@ -88,7 +88,7 @@ void CUtlStreamBuffer::Close()
 	if ( !IsReadOnly() )
 	{
 		// Write the final bytes
-		int nBytesToWrite = TellPut() - m_nOffset;
+		intp nBytesToWrite = TellPut() - m_nOffset;
 		if ( nBytesToWrite > 0 )
 		{
 			if ( ( m_hFileHandle == FILESYSTEM_INVALID_HANDLE ) && m_pFileName )
@@ -103,10 +103,10 @@ void CUtlStreamBuffer::Close()
 			{
 				if ( g_pFullFileSystem )
 				{
-					int nBytesWritten = g_pFullFileSystem->Write( Base(), nBytesToWrite, m_hFileHandle );
+					intp nBytesWritten = g_pFullFileSystem->Write( Base(), nBytesToWrite, m_hFileHandle );
 					if( nBytesWritten != nBytesToWrite )
 					{
-						Error( "CUtlStreamBuffer::Close() Write %s failed %d != %d.\n", m_pFileName, nBytesWritten, nBytesToWrite );
+						Error( "CUtlStreamBuffer::Close() Write %s failed %zd != %zd.\n", m_pFileName, nBytesWritten, nBytesToWrite );
 					}
 				}
 			}
@@ -144,7 +144,7 @@ CUtlStreamBuffer::~CUtlStreamBuffer()
 //-----------------------------------------------------------------------------
 // Open the file. normally done in constructor
 //-----------------------------------------------------------------------------
-void CUtlStreamBuffer::Open( const char *pFileName, const char *pPath, int nFlags )
+void CUtlStreamBuffer::Open( const char *pFileName, const char *pPath, unsigned char nFlags )
 {
 	if ( IsOpen() )
 	{
@@ -169,7 +169,7 @@ void CUtlStreamBuffer::Open( const char *pFileName, const char *pPath, int nFlag
 		// Read in the first bytes of the file
 		if ( Size() > 0 )
 		{
-			int nSizeToRead = min( Size(), static_cast<intp>(m_nMaxPut) );
+			intp nSizeToRead = min( Size(), m_nMaxPut );
 			ReadBytesFromFile( nSizeToRead, 0 );
 		}
 	}
@@ -204,9 +204,9 @@ bool CUtlStreamBuffer::IsOpen() const
 //-----------------------------------------------------------------------------
 // Grow allocation size to fit requested size
 //-----------------------------------------------------------------------------
-void CUtlStreamBuffer::GrowAllocatedSize( int nSize )
+void CUtlStreamBuffer::GrowAllocatedSize( intp nSize )
 {
-	int nNewSize = Size();
+	intp nNewSize = Size();
 	if ( nNewSize < nSize + 1 )
 	{
 		while ( nNewSize < nSize + 1 )
@@ -221,7 +221,7 @@ void CUtlStreamBuffer::GrowAllocatedSize( int nSize )
 //-----------------------------------------------------------------------------
 // Load up more of the stream when we overflow
 //-----------------------------------------------------------------------------
-bool CUtlStreamBuffer::StreamPutOverflow( int nSize )
+bool CUtlStreamBuffer::StreamPutOverflow( intp nSize )
 {
 	if ( !IsValid() || IsReadOnly() )
 		return false;
@@ -233,7 +233,7 @@ bool CUtlStreamBuffer::StreamPutOverflow( int nSize )
 	}
 
 	// Don't write the last byte (for NULL termination logic to work)
-	int nBytesToWrite = TellPut() - m_nOffset - 1;
+	intp nBytesToWrite = TellPut() - m_nOffset - 1;
 	if ( ( nBytesToWrite > 0 ) || ( nSize < 0 ) )
 	{
 		if ( m_hFileHandle == FILESYSTEM_INVALID_HANDLE )
@@ -246,7 +246,7 @@ bool CUtlStreamBuffer::StreamPutOverflow( int nSize )
 
 	if ( nBytesToWrite > 0 )
 	{
-		int nBytesWritten = g_pFullFileSystem->Write( Base(), nBytesToWrite, m_hFileHandle );
+		intp nBytesWritten = g_pFullFileSystem->Write( Base(), nBytesToWrite, m_hFileHandle );
 		if ( nBytesWritten != nBytesToWrite )
 		{
 			m_Error	|= FILE_WRITE_ERROR;
@@ -275,7 +275,7 @@ bool CUtlStreamBuffer::StreamPutOverflow( int nSize )
 //-----------------------------------------------------------------------------
 // Reads bytes from the file; fixes up maxput if necessary and null terminates
 //-----------------------------------------------------------------------------
-int CUtlStreamBuffer::ReadBytesFromFile( int nBytesToRead, int nReadOffset )
+intp CUtlStreamBuffer::ReadBytesFromFile( intp nBytesToRead, intp nReadOffset )
 {
 	if ( m_hFileHandle == FILESYSTEM_INVALID_HANDLE )
 	{
@@ -298,7 +298,7 @@ int CUtlStreamBuffer::ReadBytesFromFile( int nBytesToRead, int nReadOffset )
 	}
 
 	char *pReadPoint = (char*)Base() + nReadOffset;
-	int nBytesRead = g_pFullFileSystem->Read( pReadPoint, nBytesToRead, m_hFileHandle );
+	intp nBytesRead = g_pFullFileSystem->Read( pReadPoint, nBytesToRead, m_hFileHandle );
 	if ( nBytesRead != nBytesToRead )
 	{
 		// Since max put is a guess at the start, 
@@ -322,7 +322,7 @@ int CUtlStreamBuffer::ReadBytesFromFile( int nBytesToRead, int nReadOffset )
 //-----------------------------------------------------------------------------
 // Load up more of the stream when we overflow
 //-----------------------------------------------------------------------------
-bool CUtlStreamBuffer::StreamGetOverflow( int nSize )
+bool CUtlStreamBuffer::StreamGetOverflow( intp nSize )
 {
 	if ( !IsValid() || !IsReadOnly() )
 		return false;
@@ -330,7 +330,7 @@ bool CUtlStreamBuffer::StreamGetOverflow( int nSize )
 	// Shift the unread bytes down
 	// NOTE: Can't use the partial overlap path if we're seeking. We'll 
 	// get negative sizes passed in if we're seeking.
-	int nUnreadBytes;
+	intp nUnreadBytes;
 	bool bHasPartialOverlap = ( nSize >= 0 ) && ( TellGet() >= m_nOffset ) && ( TellGet() <= m_nOffset + Size() );
 	if ( bHasPartialOverlap )
 	{
@@ -353,8 +353,8 @@ bool CUtlStreamBuffer::StreamGetOverflow( int nSize )
 		GrowAllocatedSize( nSize );
 	}
 
-	int nBytesToRead = Size() - nUnreadBytes;
-	int nBytesRead = ReadBytesFromFile( nBytesToRead, nUnreadBytes );
+	intp nBytesToRead = Size() - nUnreadBytes;
+	intp nBytesRead = ReadBytesFromFile( nBytesToRead, nUnreadBytes );
 	if ( nBytesRead == 0 )
 		return false;
 

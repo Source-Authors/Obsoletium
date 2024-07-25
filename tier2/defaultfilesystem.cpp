@@ -11,7 +11,7 @@
 
 static CSysModule *g_pFullFileSystemModule = NULL;
 
-void* DefaultCreateInterfaceFn(const char *pName, int *pReturnCode)
+void* DefaultCreateInterfaceFn(const char *, int *pReturnCode)
 {
 	if ( pReturnCode )
 	{

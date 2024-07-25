@@ -86,7 +86,7 @@ public:
 	{
 	}
 
-	virtual bool Connect( CreateInterfaceFn factory ) 
+	bool Connect( CreateInterfaceFn factory ) override
 	{
 		if ( !BaseClass::Connect( factory ) )
 			return false;
@@ -99,7 +99,7 @@ public:
 		return true;
 	}
 
-	virtual InitReturnVal_t Init()
+	InitReturnVal_t Init() override
 	{
 		InitReturnVal_t nRetVal = BaseClass::Init();
 		if ( nRetVal != INIT_OK )
@@ -108,12 +108,12 @@ public:
 		return INIT_OK;
 	}
 
-	virtual void Shutdown()
+	void Shutdown() override
 	{
 		BaseClass::Shutdown();
 	}
 
-	virtual void Disconnect() 
+	void Disconnect() override
 	{
 		if ( BaseClass::IsPrimaryAppSystem() )
 		{
