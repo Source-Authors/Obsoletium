@@ -35,7 +35,7 @@ byte *studiohdr_t::GetAnimBlock( int i ) const
 	return g_pMDLCache->GetAnimBlock( (MDLHandle_t)((intp)virtualModel&0xffff), i );
 }
 
-int studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
+intp studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 {
 	return g_pMDLCache->GetAutoplayList( (MDLHandle_t)((intp)virtualModel&0xffff), pOut );
 }
