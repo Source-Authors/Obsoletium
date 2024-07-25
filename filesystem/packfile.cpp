@@ -237,7 +237,7 @@ int CZipPackFile::ReadFromPack( int nEntryIndex, void* pBuffer, int nDestBytes, 
 					tempMemory.EnsureCapacity( actualSize );
 					CLZMA::Uncompress( pPreloadData, tempMemory.Base() );
 					// copy only what caller expects
-					V_memcpy( pBuffer, (byte*)tempMemory.Base() + nLocalOffset, nBytes );
+					V_memcpy( pBuffer, tempMemory.Base() + nLocalOffset, nBytes );
 					return nBytes;
 				}
 			}
@@ -616,7 +616,7 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	m_FileLength = fileLen;
 	m_nBaseOffset = nFileOfs;
 
-	ZIP_EndOfCentralDirRecord rec = { 0 };
+	ZIP_EndOfCentralDirRecord rec = {};
 
 	// Find and read the central header directory from its expected position at end of the file
 	bool bCentralDirRecord = false;
@@ -654,7 +654,7 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	MEM_ALLOC_CREDIT();
 
 	// read central directory into memory and parse
-	CUtlBuffer zipDirBuff( 0, rec.centralDirectorySize, 0 );
+	CUtlBuffer zipDirBuff( (intp)0, rec.centralDirectorySize, 0 );
 	zipDirBuff.EnsureCapacity( rec.centralDirectorySize );
 	zipDirBuff.ActivateByteSwapping( IsX360() );
 	ReadFromPack( -1, zipDirBuff.Base(), -1, rec.centralDirectorySize, rec.startOfCentralDirOffset );
@@ -762,7 +762,7 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-CZipPackFile::CZipPackFile( CBaseFileSystem* fs, void *pSection )
+CZipPackFile::CZipPackFile( CBaseFileSystem* fs, [[maybe_unused]] void *pSection )
  : m_PackFiles()
 {
 	m_fs = fs;
@@ -789,7 +789,7 @@ CZipPackFile::~CZipPackFile()
 //			src2 -
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CZipPackFile::CPackFileLessFunc::Less( CZipPackFile::CPackFileEntry const& src1, CZipPackFile::CPackFileEntry const& src2, void *pCtx )
+bool CZipPackFile::CPackFileLessFunc::Less( CZipPackFile::CPackFileEntry const& src1, CZipPackFile::CPackFileEntry const& src2, void * )
 {
 	return ( src1.m_HashName < src2.m_HashName );
 }
@@ -850,8 +850,8 @@ static std::atomic<int> sLZMAPackFileHandles( 0 );
 CLZMAZipPackFileHandle::CLZMAZipPackFileHandle( CZipPackFile* pOwner, int64 nBase, unsigned int nOriginalSize, unsigned int nCompressedSize,
                                                 unsigned int nIndex, unsigned int nFilePointer )
 	: CZipPackFileHandle( pOwner, nBase, nCompressedSize, nIndex, nFilePointer ),
-	  m_BackSeekBuffer( 0, PACKFILE_COMPRESSED_FILEHANDLE_SEEK_BUFFER ),
-	  m_ReadBuffer( 0, PACKFILE_COMPRESSED_FILEHANDLE_READ_BUFFER ),
+	  m_BackSeekBuffer( (intp)0, PACKFILE_COMPRESSED_FILEHANDLE_SEEK_BUFFER ),
+	  m_ReadBuffer( (intp)0, PACKFILE_COMPRESSED_FILEHANDLE_READ_BUFFER ),
 	  m_pLZMAStream( NULL ), m_nSeekPosition( 0 ), m_nOriginalSize( nOriginalSize )
 {
 	Reset();
@@ -946,7 +946,7 @@ int CLZMAZipPackFileHandle::Read( void* pBuffer, int nDestSize, int nBytes )
 	{
 		// Shift the reused chunk to the front
 		V_memmove( m_BackSeekBuffer.Base(),
-		           (unsigned char *)m_BackSeekBuffer.Base() + m_BackSeekBuffer.TellPut() - nReuseBackSeek,
+		           m_BackSeekBuffer.Base<unsigned char>() + m_BackSeekBuffer.TellPut() - nReuseBackSeek,
 		           nReuseBackSeek );
 	}
 

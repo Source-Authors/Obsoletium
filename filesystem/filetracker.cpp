@@ -352,6 +352,9 @@ struct FileListToUnloadForWhitelistChange : public IFileList
 	}
 
 	CUtlDict<int> m_dictFiles;
+
+ private:
+	virtual ~FileListToUnloadForWhitelistChange() {}
 };
 
 IFileList *CFileTracker2::GetFilesToUnloadForWhitelistChange( IPureServerWhitelist *pNewWhiteList )
@@ -539,7 +542,7 @@ void CFileTracker2::NoteFileUnloaded( const char *pFilename, const char *pPathID
 #endif
 }
 
-int CFileTracker2::ListOpenedFiles( bool bAllOpened, const char *pchFilenameFind )
+intp CFileTracker2::ListOpenedFiles( bool bAllOpened, const char *pchFilenameFind )
 {
 	AUTO_LOCK( m_Mutex );
 
@@ -584,7 +587,7 @@ int CFileTracker2::ListOpenedFiles( bool bAllOpened, const char *pchFilenameFind
 	}
 
 	Msg( "cThreadedBlocks:%d cDupMD5s:%d\n", m_cThreadBlocks, m_cDupMD5s );
-	Msg( "TrackedVPKFiles:%d AllOpenedFiles:%d files VPKfiles:%d StringPoolCount:%d\n",
+	Msg( "TrackedVPKFiles:%zd AllOpenedFiles:%zd files VPKfiles:%d StringPoolCount:%d\n",
 		m_treeTrackedVPKFiles.Count(), m_treeAllOpenedFiles.Count(), cPackFiles, m_stringPool.Count() );
 	return m_treeAllOpenedFiles.Count();
 }

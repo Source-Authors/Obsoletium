@@ -111,7 +111,7 @@ struct FileJob_t
 class CDummyProgress : public ILoaderProgress
 {
 	void BeginProgress() {}
-	void UpdateProgress( float progress ) {}
+	void UpdateProgress( float ) {}
 	void EndProgress() {}
 };
 static CDummyProgress s_DummyProgress;
@@ -241,7 +241,7 @@ class CResourcePreloadAnonymous : public IResourcePreload
 	}
 
 	virtual void PurgeUnreferencedResources() {}
-	virtual void OnEndMapLoading( bool bAbort ) {}
+	virtual void OnEndMapLoading( bool ) {}
 	virtual void PurgeAll() {}
 };
 static CResourcePreloadAnonymous s_ResourcePreloadAnonymous;
@@ -308,7 +308,7 @@ CQueuedLoader::CQueuedLoader() : BaseClass( false )
 	// set resource dictionaries sort context
 	for ( int i = 0; i < RESOURCEPRELOAD_COUNT; i++ )
 	{
-		m_ResourceNames[i].SetLessContext( (void *)i );
+		m_ResourceNames[i].SetLessContext( (void *)static_cast<intp>(i) );
 	}
 
 	InstallLoader( RESOURCEPRELOAD_ANONYMOUS, &s_ResourcePreloadAnonymous );
@@ -332,7 +332,7 @@ void CQueuedLoader::BuildResources( IResourcePreload *pLoader, ResourceList_t *p
 	{
 		pList->RedoSort();
 
-		for ( int i = 0; i < pList->Count(); i++ )
+		for ( intp i = 0; i < pList->Count(); i++ )
 		{
 			char szFilename[MAX_PATH];
 			g_QueuedLoader.GetFilename( pList->Element( i ), szFilename, sizeof( szFilename ) );
@@ -366,7 +366,7 @@ void CQueuedLoader::BuildMaterialResources( IResourcePreload *pLoader, ResourceL
 	pList->RedoSort();
 
 	// run a clean operation to cull the non-patched env_cubemap materials, which are not built directly
-	for ( int i = 0; i < pList->Count(); i++ )
+	for ( intp i = 0; i < pList->Count(); i++ )
 	{
 		char szFilename[MAX_PATH];
 		char *pFilename = g_QueuedLoader.GetFilename( pList->Element( i ), szFilename, sizeof( szFilename ) );
@@ -738,7 +738,7 @@ int CQueuedLoader::CFileJobsLessFunc::GetLayoutOrderForFilename( const char *pFi
 //-----------------------------------------------------------------------------
 // Sort function, high priority jobs sort first, then offset, then zip
 //-----------------------------------------------------------------------------
-bool CQueuedLoader::CFileJobsLessFunc::Less( FileJob_t* const &pFileJobLHS, FileJob_t* const &pFileJobRHS, void *pCtx )
+bool CQueuedLoader::CFileJobsLessFunc::Less( FileJob_t* const &pFileJobLHS, FileJob_t* const &pFileJobRHS, void * )
 {
 	if ( pFileJobLHS->m_Priority != pFileJobRHS->m_Priority )
 	{
@@ -797,7 +797,7 @@ void CQueuedLoader::SubmitPendingJobs()
 	m_nSubmitCount++;
 
 	// sort entries
-	CUtlSortVector< FileJob_t*, CFileJobsLessFunc > sortedFiles( 0, 128 );
+	CUtlSortVector< FileJob_t*, CFileJobsLessFunc > sortedFiles( (intp)0, 128 );
 	while ( pNode )
 	{
 		FileJob_t *pFileJob = pNode->elem;
@@ -814,7 +814,7 @@ void CQueuedLoader::SubmitPendingJobs()
 	asyncRequest.pfnCallback = IOAsyncCallback;
 
 	char szFilename[MAX_PATH];
-	for ( int i = 0; i<sortedFiles.Count(); i++ )
+	for ( intp i = 0; i<sortedFiles.Count(); i++ )
 	{
 		FileJob_t *pFileJob = sortedFiles[i];
 		
@@ -1269,7 +1269,7 @@ void CQueuedLoader::SpewInfo()
 			iIndex = m_SubmittedJobs.Next( iIndex );
 		}
 
-		Msg( "%d Total Jobs\n", m_SubmittedJobs.Count() );
+		Msg( "%zd Total Jobs\n", m_SubmittedJobs.Count() );
 	}
 
 	Msg( "%d Queued Jobs\n", (int)g_nQueuedJobs );
@@ -1591,7 +1591,7 @@ void CQueuedLoader::ParseResourceList( CUtlBuffer &resourceList )
 	{
 		for ( int i = RESOURCEPRELOAD_UNKNOWN+1; i < RESOURCEPRELOAD_COUNT; i++ )
 		{
-			Msg( "QueuedLoader: %s: %d Entries\n", g_ResourceLoaderNames[i], m_ResourceNames[i].Count() );
+			Msg( "QueuedLoader: %s: %zd Entries\n", g_ResourceLoaderNames[i], m_ResourceNames[i].Count() );
 		}
 	}
 
@@ -1692,7 +1692,7 @@ bool CQueuedLoader::BeginMapLoading( const char *pMapName, bool bLoadForHDR, boo
 
 	MEM_ALLOC_CREDIT();
 
-	CUtlBuffer resListBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer resListBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( szFilename, "GAME", resListBuffer, 0, 0 ) )
 	{
 		// very bad, a valid reslist is critical
@@ -1705,7 +1705,7 @@ bool CQueuedLoader::BeginMapLoading( const char *pMapName, bool bLoadForHDR, boo
 	{
 		// find optional localized reslist fixup
 		V_snprintf( szFilename, sizeof( szFilename ), "reslists_xbox/%s%s.lst", XBX_GetLanguageString(), GetPlatformExt() );
-		CUtlBuffer localizedBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer localizedBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 		if ( g_pFullFileSystem->ReadFile( szFilename, "GAME", localizedBuffer, 0, 0 ) )
 		{
 			// append it
@@ -1793,7 +1793,7 @@ void CQueuedLoader::EndMapLoading( bool bAbort )
 		}
 
 		// free any unclaimed anonymous buffers
-		int iIndex = m_AnonymousJobs.First();
+		auto iIndex = m_AnonymousJobs.First();
 		while ( iIndex != m_AnonymousJobs.InvalidIndex() )
 		{
 			FileJob_t *pFileJob = m_AnonymousJobs[iIndex];	

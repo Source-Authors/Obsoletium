@@ -25,9 +25,6 @@
 #define SEC_TO_SAMPS(a)		((a)*SOUND_DMA_SPEED)				// convert seconds to # samples in equivalent time
 
 // Suppress the noisy warnings caused by CLIP_DSP
-#if defined(__clang__)
-	#pragma GCC diagnostic ignored "-Wself-assign"
-#endif
 #define CLIP_DSP(x) (x)
 
 extern ConVar das_debug;

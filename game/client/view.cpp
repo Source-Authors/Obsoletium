@@ -914,7 +914,8 @@ void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int widt
 
 			// Allocate output buffer
 			int iMaxVTFSize = 1024 + ( nSrcWidth * nSrcHeight * 3 );
-			void *pVTF = malloc( iMaxVTFSize );
+			// dimhotepus: ASAN catch, AsyncWrite will delete[] it.
+			void *pVTF = new char[iMaxVTFSize];
 			buffer.SetExternalBuffer( pVTF, iMaxVTFSize, 0 );
 
 			// Serialize to the buffer
@@ -932,7 +933,8 @@ void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int widt
 	{
 		// Write TGA format to buffer
 		int iMaxTGASize = 1024 + ( nSrcWidth * nSrcHeight * 4 );
-		void *pTGA = malloc( iMaxTGASize );
+		// dimhotepus: ASAN catch, AsyncWrite will delete[] it.
+		void *pTGA = new char[iMaxTGASize];
 		buffer.SetExternalBuffer( pTGA, iMaxTGASize, 0 );
 
 		bWriteResult = TGAWriter::WriteToBuffer( pSrcImage, buffer, nSrcWidth, nSrcHeight, IMAGE_FORMAT_RGB888, IMAGE_FORMAT_RGB888 );

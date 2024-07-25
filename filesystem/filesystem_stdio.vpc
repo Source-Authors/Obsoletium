@@ -43,7 +43,7 @@ $Configuration
 		$PreprocessorDefinitions	"$BASE;FILESYSTEM_STDIO_EXPORTS;DONT_PROTECT_FILEIO_FUNCTIONS;PROTECTED_THINGS_ENABLE;_USE_32BIT_TIME_T" [!$WIN64]
 
 		// Add VPK support
-		$PreprocessorDefinitions	"$BASE;SUPPORT_PACKED_STORE" [!$WIN64]
+		$PreprocessorDefinitions	"$BASE;SUPPORT_PACKED_STORE" [$WINDOWS]
 		$EnableC++Exceptions		"Yes (/EHsc)"
 	}
 	$Linker

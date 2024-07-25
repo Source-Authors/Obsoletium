@@ -1289,7 +1289,10 @@ public:
 
 				SaveMsg( "DirectoryCopy: AsyncAppend %s, %s\n", szName, pDestFileName );
 				g_pFileSystem->AsyncAppend( pDestFileName, memcpy( new char[MAX_PATH], list[i].szFileName, MAX_PATH), MAX_PATH, true );		// Filename can only be as long as a map name + extension
-				g_pFileSystem->AsyncAppend( pDestFileName, new int(fileSize), sizeof(int), true );
+				// dimhotepus: ASAN catch, AsyncWrite will delete[] it. Also expect char[].
+				char *sizeAsString = new char[sizeof(fileSize)];
+				memcpy( sizeAsString, &fileSize, sizeof(fileSize) );
+				g_pFileSystem->AsyncAppend( pDestFileName, sizeAsString, sizeof(fileSize), true );
 				g_pFileSystem->AsyncAppendFile( pDestFileName, szName );
 			}
 		}

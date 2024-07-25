@@ -63,9 +63,9 @@ int g_iNextSearchPathID = 1;
 // Look for cases like materials\\blah.vmt.
 static bool V_CheckDoubleSlashes( const char *pStr )
 {
-	int len = V_strlen( pStr );
+	intp len = V_strlen( pStr );
 
-	for ( int i=1; i < len-1; i++ )
+	for ( intp i=1; i < len-1; i++ )
 	{
 		if ( (pStr[i] == '/' || pStr[i] == '\\') && (pStr[i+1] == '/' || pStr[i+1] == '\\') )
 		{
@@ -260,7 +260,7 @@ public:
 	CUtlVector< Info_t* > m_Infos;
 
 private:
-	void ProcessNewEntries( int start );
+	void ProcessNewEntries( intp start );
 
 	CFileCacheObject(const CFileCacheObject &) = delete;
 	CFileCacheObject & operator=(const CFileCacheObject& ) = delete;
@@ -391,7 +391,7 @@ InitReturnVal_t CBaseFileSystem::Init()
 			V_ComposeFileName( pRemotePath, "xbox_exclude_paths.txt", szExcludeFile, sizeof( szExcludeFile ) );
 
 			// populate the exclusion list
-			CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			if ( ReadFile( szExcludeFile, NULL, buf, 0, 0 ) )
 			{
 				characterset_t breakSet;
@@ -533,11 +533,11 @@ void CBaseFileSystem::LogAccessToFile( char const *accesstype, char const *fullp
 		Warning( FILESYSTEM_WARNING_REPORTALLACCESSES, "---FS%s:  %s %s (%.3f)\n", ThreadInMainThread() ? "" : "[a]", accesstype, fullpath, Plat_FloatTime() );
 	}
 
-	int c = m_LogFuncs.Count();
+	intp c = m_LogFuncs.Count();
 	if ( !c )
 		return;
 
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		( m_LogFuncs[ i ] )( fullpath, options );
 	}
@@ -642,7 +642,7 @@ void CBaseFileSystem::Trace_FClose( FILE *fp )
 			COpenedFile found = m_OpenedFiles[ result ];
 			if ( m_fwLevel >= FILESYSTEM_WARNING_REPORTALLACCESSES && !V_stristr( found.GetName(), "console.log" ) )
 			{
-				Warning( FILESYSTEM_WARNING_REPORTALLACCESSES, "---FS%s:  close %s %p %i (%.3f)\n", ThreadInMainThread() ? "" : "[a]", found.GetName(), fp, m_OpenedFiles.Count(), Plat_FloatTime() );
+				Warning( FILESYSTEM_WARNING_REPORTALLACCESSES, "---FS%s:  close %s %p %zd (%.3f)\n", ThreadInMainThread() ? "" : "[a]", found.GetName(), fp, m_OpenedFiles.Count(), Plat_FloatTime() );
 			}
 			m_OpenedFiles.Remove( result );
 		}
@@ -719,7 +719,7 @@ void CBaseFileSystem::Trace_DumpUnclosedFiles( void )
 {
 	/*
 	AUTO_LOCK( m_OpenedFilesMutex );
-	for ( int i = 0 ; i < m_OpenedFiles.Count(); i++ )
+	for ( intp i = 0 ; i < m_OpenedFiles.Count(); i++ )
 	{
 		COpenedFile *found = &m_OpenedFiles[ i ];
 
@@ -777,7 +777,7 @@ void CBaseFileSystem::AddVPKFile( char const *pPath, const char *pPathID, Search
 
 	// See if we already have this vpk file as a search path
 	CPackedStoreRefCount *pVPK = NULL;
-	for ( int i = 0; i < m_SearchPaths.Count(); i++ )
+	for ( intp i = 0; i < m_SearchPaths.Count(); i++ )
 	{
 		CPackedStoreRefCount *p = m_SearchPaths[i].GetPackedStore();
 		if ( p && V_stricmp( p->FullPathName(), nameBuf ) == 0 )
@@ -834,7 +834,7 @@ bool CBaseFileSystem::RemoveVPKFile( const char *pPath, const char *pPathID )
 	CUtlSymbol pathIDSym = g_PathIDTable.AddString( pPathID );
 
 	// See if we already have this vpk file as a search path
-	for ( int i = 0; i < m_SearchPaths.Count(); i++ )
+	for ( intp i = 0; i < m_SearchPaths.Count(); i++ )
 	{
 		CPackedStoreRefCount *p = m_SearchPaths[i].GetPackedStore();
 		if ( p && V_stricmp( p->FullPathName(), nameBuf ) == 0 )
@@ -981,14 +981,14 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 
 	// Add any zip files in the format zip1.zip ... zip0.zip
 	// Add them backwards so zip(N) is higher priority than zip(N-1), etc.
-	int pakcount = pakSizes.Count();
-	int nCount = 0;
-	for ( int i = pakcount-1; i >= 0; i-- )
+	intp pakcount = pakSizes.Count();
+	intp nCount = 0;
+	for ( intp i = pakcount-1; i >= 0; i-- )
 	{
 		char fullpath[MAX_PATH];
 		V_ComposeFileName( pPath, pakNames[i].Get(), fullpath, sizeof( fullpath ) );
 
-		int nIndex;
+		intp nIndex;
 		if ( addType == PATH_ADD_TO_TAIL )
 		{
 			nIndex = m_SearchPaths.AddToTail();
@@ -1006,11 +1006,11 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 		sp->SetPath( g_PathIDTable.AddString( pPath ) );
 
 		CPackFile *pf = NULL;
-		for ( int iPackFile = 0; iPackFile < m_ZipFiles.Count(); iPackFile++ )
+		for ( auto *p : m_ZipFiles )
 		{
-			if ( !Q_stricmp( m_ZipFiles[iPackFile]->m_ZipName.Get(), fullpath ) )
+			if ( !Q_stricmp( p->m_ZipName.Get(), fullpath ) )
 			{
-				pf = m_ZipFiles[iPackFile];
+				pf = p;
 				sp->SetPackFile( pf );
 				pf->AddRef();
 			}
@@ -1070,8 +1070,8 @@ void CBaseFileSystem::RemoveAllMapSearchPaths( void )
 {
 	AsyncFinishAll();
 
-	int c = m_SearchPaths.Count();
-	for ( int i = c - 1; i >= 0; i-- )
+	intp c = m_SearchPaths.Count();
+	for ( intp i = c - 1; i >= 0; i-- )
 	{
 		if ( !( m_SearchPaths[i].GetPackFile() && m_SearchPaths[i].GetPackFile()->m_bIsMapPath ) )
 		{
@@ -1118,13 +1118,12 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 		}
 	}
 
-	int c = m_SearchPaths.Count();
-	for ( int i = c - 1; i >= 0; i-- )
+	for ( auto &sp : m_SearchPaths )
 	{
-		if ( !( m_SearchPaths[i].GetPackFile() && m_SearchPaths[i].GetPackFile()->m_bIsMapPath ) )
+		if ( !( sp.GetPackFile() && sp.GetPackFile()->m_bIsMapPath ) )
 			continue;
 		
-		if ( V_stricmp( m_SearchPaths[i].GetPackFile()->m_ZipName.Get(), fullpath ) == 0 )
+		if ( V_stricmp( sp.GetPackFile()->m_ZipName.Get(), fullpath ) == 0 )
 		{
 			// Already set as map path
 			return;
@@ -1178,7 +1177,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 	
 		// Find the LUMP_PAKFILE offset
 		lump_t *packfile = &header.lumps[ LUMP_PAKFILE ];
-		if ( packfile->filelen <= sizeof( lump_t ) )
+		if ( packfile->filelen <= static_cast<int>(sizeof( lump_t )) )
 		{
 			// It's empty or only contains a file header ( so there are no entries ), so don't add to search paths
 			Trace_FClose( fp );
@@ -1198,7 +1197,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 	
 		if ( pf->Prepare( packfile->filelen, packfile->fileofs ) )
 		{
-			int nIndex;
+			intp nIndex;
 			if ( addType == PATH_ADD_TO_TAIL )
 			{
 				nIndex = m_SearchPaths.AddToTail();	
@@ -1237,11 +1236,9 @@ void CBaseFileSystem::BeginMapAccess()
 {
 	if ( m_iMapLoad++ == 0 )
 	{
-		int c = m_SearchPaths.Count();
-		for( int i = 0; i < c; i++ )
+		for( auto &sp : m_SearchPaths )
 		{
-			CSearchPath *pSearchPath = &m_SearchPaths[i];
-			CPackFile *pPackFile = pSearchPath->GetPackFile();
+			CPackFile *pPackFile = sp.GetPackFile();
 
 			if ( pPackFile && pPackFile->m_bIsMapPath )
 			{
@@ -1277,11 +1274,9 @@ void CBaseFileSystem::EndMapAccess()
 {
 	if ( m_iMapLoad-- == 1 )
 	{
-		int c = m_SearchPaths.Count();
-		for( int i = 0; i < c; i++ )
+		for( auto &sp : m_SearchPaths )
 		{
-			CSearchPath *pSearchPath = &m_SearchPaths[i];
-			CPackFile *pPackFile = pSearchPath->GetPackFile();
+			CPackFile *pPackFile = sp.GetPackFile();
 
 			if ( pPackFile && pPackFile->m_bIsMapPath )
 			{
@@ -1308,45 +1303,28 @@ void CBaseFileSystem::PrintSearchPaths( void )
 	Msg( "---------------\n" );
 	Msg( "Paths:\n" );
 
-	int c = m_SearchPaths.Count();
-	for( int i = 0; i < c; i++ )
+	for( auto &sp : m_SearchPaths )
 	{
-		CSearchPath *pSearchPath = &m_SearchPaths[i];
-
 		const char *pszPack = "";
 		const char *pszType = "";
-		if ( pSearchPath->GetPackFile() && pSearchPath->GetPackFile()->m_bIsMapPath )
+		if ( sp.GetPackFile() && sp.GetPackFile()->m_bIsMapPath )
 		{
 			pszType = "(map)";
 		}
-		else if ( pSearchPath->GetPackFile()  )
+		else if ( sp.GetPackFile()  )
 		{
 			pszType = "(pack) ";
-			pszPack = pSearchPath->GetPackFile()->m_ZipName;
+			pszPack = sp.GetPackFile()->m_ZipName;
 		}
 		#ifdef SUPPORT_PACKED_STORE
-			else if ( pSearchPath->GetPackedStore()  )
+			else if ( sp.GetPackedStore()  )
 			{
 				pszType = "(VPK)";
-				pszPack = pSearchPath->GetPackedStore()->FullPathName();
+				pszPack = sp.GetPackedStore()->FullPathName();
 			}
 		#endif
 
-		Msg( "\"%s\" \"%s\" %s%s\n", pSearchPath->GetPathString(), (const char *)pSearchPath->GetPathIDString(), pszType, pszPack );
-	}
-
-	if ( IsX360() && m_ExcludePaths.Count() )
-	{
-		// dump current list
-		Msg( "\nExclude:\n" );
-		char szPath[MAX_PATH];
-		for ( int i = 0; i < m_ExcludePaths.Count(); i++ )
-		{
-			if ( String( m_ExcludePaths[i], szPath, sizeof( szPath ) ) )
-			{
-				Msg( "\"%s\"\n", szPath );
-			}
-		}
+		Msg( "\"%s\" \"%s\" %s%s\n", sp.GetPathString(), sp.GetPathIDString(), pszType, pszPack );
 	}
 }
 
@@ -1403,8 +1381,8 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 	CUtlSymbol pathSym, pathIDSym;
 	pathSym = g_PathIDTable.AddString( newPath );
 	pathIDSym = g_PathIDTable.AddString( pathID );
-	int i;
-	int c = m_SearchPaths.Count();
+	intp i;
+	intp c = m_SearchPaths.Count();
 	int id = 0;
 	for ( i = 0; i < c; i++ )
 	{
@@ -1436,7 +1414,7 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 
 	// Add to list
 	bool bAdded = false;
-	int nIndex = m_SearchPaths.Count();
+	intp nIndex = m_SearchPaths.Count();
 	if ( bAddPackFiles )
 	{
 		// Add pack files for this path next
@@ -1481,30 +1459,9 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::FindSearchPathByStoreId( int stor
 //-----------------------------------------------------------------------------
 void CBaseFileSystem::AddSearchPath( const char *pPath, const char *pathID, SearchPathAdd_t addType )
 {
-	int currCount = m_SearchPaths.Count();
+	intp currCount = m_SearchPaths.Count();
 
 	AddSearchPathInternal( pPath, pathID, addType, true );
-
-	if ( IsX360() && m_DVDMode == DVDMODE_DEV )
-	{
-		// dvd development mode clones a search path based on the remote path for fall through
-		const char *pRemotePath = CommandLine()->ParmValue( "-remote" );
-		const char *pBasePath = CommandLine()->ParmValue( "-basedir" );
-		if ( pRemotePath && pBasePath && !V_stristr( pPath, ".bsp" ) )
-		{
-			// isolate the search path from the base path
-			if ( !V_strnicmp( pPath, pBasePath, strlen( pBasePath ) ) )
-			{
-				// substitue the remote path
-				char szRemotePath[MAX_PATH];
-				V_strncpy( szRemotePath, pRemotePath, sizeof( szRemotePath ) );
-				V_strncat( szRemotePath, pPath + strlen( pBasePath ), sizeof( szRemotePath ) );
-
-				// no pack files are allowed on the fall through remote path
-				AddSearchPathInternal( szRemotePath, pathID, addType, false );
-			}
-		}
-	}
 
 	if ( currCount != m_SearchPaths.Count() )
 	{
@@ -1609,8 +1566,8 @@ bool CBaseFileSystem::RemoveSearchPath( const char *pPath, const char *pathID )
 	bool bret = false;
 
 	// Count backward since we're possibly deleting one or more pack files, too
-	int i;
-	int c = m_SearchPaths.Count();
+	intp i;
+	intp c = m_SearchPaths.Count();
 	for( i = c - 1; i >= 0; i-- )
 	{
 		if ( newPath[0] && m_SearchPaths[i].GetPath() != lookup )
@@ -1634,8 +1591,8 @@ void CBaseFileSystem::RemoveSearchPaths( const char *pathID )
 {
 	AsyncFinishAll();
 
-	int nCount = m_SearchPaths.Count();
-	for (int i = nCount - 1; i >= 0; i--)
+	intp nCount = m_SearchPaths.Count();
+	for (intp i = nCount - 1; i >= 0; i--)
 	{
 		if (!Q_stricmp(m_SearchPaths.Element(i).GetPathIDString(), pathID))
 		{
@@ -1655,39 +1612,14 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::FindWritePath( const char *pFilen
 	AUTO_LOCK( m_SearchPathsMutex );
 
 	// a pathID has been specified, find the first match in the path list
-	int c = m_SearchPaths.Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = m_SearchPaths.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		// pak files are not allowed to be written to...
 		CSearchPath *pSearchPath = &m_SearchPaths[i];
 		if ( pSearchPath->GetPackFile() || pSearchPath->GetPackedStore() )
 		{
 			continue;
-		}
-
-		if ( IsX360() && ( m_DVDMode == DVDMODE_DEV ) && pFilename && !pSearchPath->m_bIsRemotePath )
-		{
-			bool bIgnorePath = false;
-			char szExcludePath[MAX_PATH];
-			char szFilename[MAX_PATH];
-			V_ComposeFileName( pSearchPath->GetPathString(), pFilename, szFilename, sizeof( szFilename ) );
-			for ( int j = 0; j < m_ExcludePaths.Count(); j++ )
-			{
-				if ( g_pFullFileSystem->String( m_ExcludePaths[j], szExcludePath, sizeof( szExcludePath ) ) )
-				{
-					if ( !V_strnicmp( szFilename, szExcludePath, strlen( szExcludePath ) ) )
-					{
-						bIgnorePath = true;
-						break;
-					}
-				}
-			}
-			if ( bIgnorePath )
-			{
-				// filename matches exclusion path, skip it
-				// favoring the next path which should be the path fall through hit
-				continue;
-			}
 		}
 
 		if ( !pathID || ( pSearchPath->GetPathID() == lookup ) )
@@ -1811,7 +1743,7 @@ bool CBaseFileSystem::ReadToBuffer( FileHandle_t fp, CUtlBuffer &buf, int nMaxBy
 		if ( nBytesDestBuffer != nBytesToRead )
 		{
 			// doing optimal read, align target pointer
-			int nAlignedBase = AlignValue( (byte *)buf.Base(), nBufferAlign ) - (byte *)buf.Base();
+			int nAlignedBase = AlignValue( buf.Base<byte>(), nBufferAlign ) - buf.Base<byte>();
 			buf.SeekPut( CUtlBuffer::SEEK_HEAD, nAlignedBase );
 	
 			// the buffer read position is slid forward to ignore the addtional
@@ -1997,7 +1929,7 @@ bool CBaseFileSystem::UnzipFile( const char *pFileName, const char *pPath, const
 		if ( iZipIndex == -1 )
 			break;
 
-		int iFileNameLength = Q_strlen( szFileName );
+		intp iFileNameLength = Q_strlen( szFileName );
 		if ( szFileName[ iFileNameLength - 1 ] == '/' )
 		{
 			// Its a directory, so create it
@@ -2020,7 +1952,7 @@ bool CBaseFileSystem::UnzipFile( const char *pFileName, const char *pPath, const
 		if ( iZipIndex == -1 )
 			break;
 
-		int iFileNameLength = Q_strlen( szFileName );
+		intp iFileNameLength = Q_strlen( szFileName );
 		if ( szFileName[ iFileNameLength - 1 ] != '/' )
 		{
 			// It's not a directory, so write the file
@@ -2105,7 +2037,7 @@ class CFileOpenInfo
 {
 public:
 	CFileOpenInfo( CBaseFileSystem *pFileSystem, const char *pFileName, const CBaseFileSystem::CSearchPath *path, const char *pOptions, int flags, char **ppszResolvedFilename ) : 
-		m_pFileSystem( pFileSystem ), m_pFileName( pFileName ), m_pSearchPath( path ), m_pOptions( pOptions ), m_Flags( flags ), m_ppszResolvedFilename( ppszResolvedFilename )
+		m_pFileSystem( pFileSystem ), m_ppszResolvedFilename( ppszResolvedFilename ), m_pFileName( pFileName ), m_pSearchPath( path ), m_pOptions( pOptions ), m_Flags( flags )
 	{
 		m_pFileHandle = NULL;
 		m_ePureFileClass = ePureServerFileClass_Any;
@@ -2390,7 +2322,7 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 			char *pRelativeFileName = pSlash + 1;
 
 			// Find the zip or VPK in the search paths
-			for ( int i = 0; i < m_SearchPaths.Count(); i++ )
+			for ( intp i = 0; i < m_SearchPaths.Count(); i++ )
 			{
 
 				// In VPK?
@@ -2968,7 +2900,7 @@ bool CBaseFileSystem::LookupKeyValuesRootKeyName( char const *filename, char con
 		Q_strncpy( rootName, pStart, bufsize );
 
 		// And then strip off the \n and the " character at the end, in that order
-		int len = Q_strlen( pStart );
+		intp len = Q_strlen( pStart );
 		while ( len > 0 && rootName[ len - 1 ] == '\n' )
 		{
 			rootName[ len - 1 ] = 0;
@@ -3028,7 +2960,7 @@ bool CBaseFileSystem::ExtractRootKeyName( KeyValuesPreloadType_t type, char *out
 //-----------------------------------------------------------------------------
 void CBaseFileSystem::SetupPreloadData()
 {
-	int i;
+	intp i;
 
 	for ( i = 0; i < m_SearchPaths.Count(); i++ )
 	{
@@ -3065,7 +2997,7 @@ void CBaseFileSystem::SetupPreloadData()
 //-----------------------------------------------------------------------------
 void CBaseFileSystem::DiscardPreloadData()
 {
-	int i;
+	intp i;
 	for( i = 0; i < m_SearchPaths.Count(); i++ )
 	{
 		CPackFile* pf = m_SearchPaths[i].GetPackFile();
@@ -3398,7 +3330,7 @@ void CBaseFileSystem::EnableWhitelistFileTracking( bool bEnable, bool bCacheAllV
 void CBaseFileSystem::CacheAllVPKFileHashes( bool bCacheAllVPKHashes, bool bRecalculateAndCheckHashes )
 {
 #ifdef SUPPORT_PACKED_STORE
-	for ( int i = 0; i < m_SearchPaths.Count(); i++ )
+	for ( intp i = 0; i < m_SearchPaths.Count(); i++ )
 	{
 		CPackedStore *pVPK = m_SearchPaths[i].GetPackedStore();
 		if ( pVPK == NULL )
@@ -3461,7 +3393,7 @@ void CBaseFileSystem::CacheAllVPKFileHashes( bool bCacheAllVPKHashes, bool bReca
 		}
 		if ( bCacheAllVPKHashes )
 		{
-			Msg( "Loaded %d VPK file hashes from %s for pure server operation.\n", vecChunkHash.Count(), pVPK->FullPathName() );
+			Msg( "Loaded %zd VPK file hashes from %s for pure server operation.\n", vecChunkHash.Count(), pVPK->FullPathName() );
 			FOR_EACH_VEC( vecChunkHash, i )
 			{
 				m_FileTracker2.AddFileHashForVPKFile( vecChunkHash[i].m_nPackFileNumber, vecChunkHash[i].m_nFileFraction, vecChunkHash[i].m_cbChunkLen, vecChunkHash[i].m_md5contents, fhandle );
@@ -3470,9 +3402,9 @@ void CBaseFileSystem::CacheAllVPKFileHashes( bool bCacheAllVPKHashes, bool bReca
 		else
 		{
 			if ( cFailures == 0 && vecChunkHash.Count() == vecChunkHashFractionCopy.Count() )
-				Msg( "File hashes checked. %d matches. no failures.\n", vecChunkHash.Count() );
+				Msg( "File hashes checked. %zd matches. no failures.\n", vecChunkHash.Count() );
 			else
-				Msg( "File hashes checked. %d matches. %d failures.\n", vecChunkHash.Count(), cFailures );
+				Msg( "File hashes checked. %zd matches. %d failures.\n", vecChunkHash.Count(), cFailures );
 		}
 	}
 #endif
@@ -3482,9 +3414,9 @@ void CBaseFileSystem::CacheAllVPKFileHashes( bool bCacheAllVPKHashes, bool bReca
 bool CBaseFileSystem::CheckVPKFileHash( int PackFileID, int nPackFileNumber, int nFileFraction, MD5Value_t &md5Value )
 {
 #ifdef SUPPORT_PACKED_STORE
-	for ( int i = 0; i < m_SearchPaths.Count(); i++ )
+	for ( auto &sp : m_SearchPaths )
 	{
-		CPackedStore *pVPK = m_SearchPaths[i].GetPackedStore();
+		CPackedStore *pVPK = sp.GetPackedStore();
 		if ( pVPK == NULL || pVPK->m_PackFileID != PackFileID )
 			continue;
 		ChunkHashFraction_t fileHashFraction;
@@ -3665,7 +3597,7 @@ void CBaseFileSystem::FileTimeToString( char *pString, int maxCharsIncludingTerm
 		V_strncpy( pString, ctime( &time ), maxCharsIncludingTerminator );
 
 		// We see a linefeed at the end of these strings...if there is one, gobble it up
-		int len = V_strlen( pString );
+		intp len = V_strlen( pString );
 		if ( pString[ len - 1 ] == '\n' )
 		{
 			pString[ len - 1 ] = '\0';
@@ -3874,7 +3806,7 @@ void CBaseFileSystem::CreateDirHierarchy( const char *pRelativePathT, const char
 		Q_strncpy( szScratchFileName, pRelativePath, sizeof(szScratchFileName) );
 	}
 
-	int len = strlen( szScratchFileName ) + 1;
+	intp len = V_strlen( szScratchFileName ) + 1;
 	char *end = szScratchFileName + len;
 	char *s = szScratchFileName;
 	while( s < end )
@@ -3932,7 +3864,7 @@ const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char
 
 	FixUpPath ( pWildCardT, pWildCard, sizeof( pWildCard ) );
 
-	int maxlen = strlen( pWildCard ) + 1;
+	intp maxlen = V_strlen( pWildCard ) + 1;
 	pFindData->wildCardString.AddMultipleToTail( maxlen );
 	Q_strncpy( pFindData->wildCardString.Base(), pWildCard, maxlen );
 	pFindData->findHandle = INVALID_HANDLE_VALUE;
@@ -3945,7 +3877,7 @@ const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char
 	}
 	else
 	{
-		int c = m_SearchPaths.Count();
+		intp c = m_SearchPaths.Count();
 		for(	pFindData->currentSearchPathID = 0;
 				pFindData->currentSearchPathID < c;
 				pFindData->currentSearchPathID++ )
@@ -4066,7 +3998,7 @@ bool CBaseFileSystem::FindNextFileHelper( FindData_t *pFindData, int *pFoundStor
 	}
 	pFindData->findHandle = INVALID_HANDLE_VALUE;
 
-	int c = m_SearchPaths.Count();
+	intp c = m_SearchPaths.Count();
 	for( ; pFindData->currentSearchPathID < c; ++pFindData->currentSearchPathID ) 
 	{
 		CSearchPath *pSearchPath = &m_SearchPaths[pFindData->currentSearchPathID];
@@ -4351,8 +4283,8 @@ const char *CBaseFileSystem::RelativePathToFullPath( const char *pFileName, cons
 
 				// form an encoded absolute path that can be decoded by our FS as pak based
 				const char *pszPackName = pPack->m_ZipName.String();
-				int len = V_strlen( pszPackName );
-				int nTotalLen = len + 1 + V_strlen( pFileName );
+				intp len = V_strlen( pszPackName );
+				intp nTotalLen = len + 1 + V_strlen( pFileName );
 				if ( nTotalLen >= maxLenInChars )
 				{
 					::Warning( "File %s was found in %s, but resulting abs filename won't fit in callers buffer of %d bytes\n",
@@ -4382,8 +4314,8 @@ const char *CBaseFileSystem::RelativePathToFullPath( const char *pFileName, cons
 					const char *pszVpkName = vpkHandle.m_pOwner->FullPathName();
 					Assert( V_GetFileExtension( pszVpkName ) != NULL );
 
-					int len = V_strlen( pszVpkName );
-					int nTotalLen = len + 1 + V_strlen( pFileName );
+					intp len = V_strlen( pszVpkName );
+					intp nTotalLen = len + 1 + V_strlen( pFileName );
 					if ( nTotalLen >= maxLenInChars )
 					{
 						::Warning( "File %s was found in %s, but resulting abs filename won't fit in callers buffer of %d bytes\n",
@@ -4435,7 +4367,7 @@ bool CBaseFileSystem::FullPathToRelativePathEx( const char *pFullPath, const cha
 {
 	CHECK_DOUBLE_SLASHES( pFullPath );
 
-	int nInlen = V_strlen( pFullPath );
+	intp nInlen = V_strlen( pFullPath );
 	if ( nInlen <= 0 )
 	{
 		pDest[ 0 ] = 0;
@@ -4457,24 +4389,23 @@ bool CBaseFileSystem::FullPathToRelativePathEx( const char *pFullPath, const cha
 		lookup = g_PathIDTable.AddString( pPathId );
 	}
 
-	int c = m_SearchPaths.Count();
-	for( int i = 0; i < c; i++ )
+	for( auto &sp : m_SearchPaths )
 	{
 		// FIXME: Should this work with embedded pak files?
-		if ( m_SearchPaths[i].GetPackFile() && m_SearchPaths[i].GetPackFile()->m_bIsMapPath )
+		if ( sp.GetPackFile() && sp.GetPackFile()->m_bIsMapPath )
 			continue;
 
 		// Skip paths that are not on the specified search path
-		if ( FilterByPathID( &m_SearchPaths[i], lookup ) )
+		if ( FilterByPathID( &sp, lookup ) )
 			continue;
 
 		char pSearchBase[ MAX_FILEPATH ];
-		V_strncpy( pSearchBase, m_SearchPaths[i].GetPathString(), sizeof( pSearchBase ) );
+		V_strncpy( pSearchBase, sp.GetPathString(), sizeof( pSearchBase ) );
 #ifdef _WIN32
 		V_strlower( pSearchBase );
 #endif
 		V_FixSlashes( pSearchBase );
-		int nSearchLen = V_strlen( pSearchBase );
+		intp nSearchLen = V_strlen( pSearchBase );
 		if ( V_strnicmp( pSearchBase, pInPath, nSearchLen ) )
 			continue;
 
@@ -4673,7 +4604,7 @@ bool CBaseFileSystem::GetCurrentDirectory( char* pDirectory, int maxlen )
 	Q_FixSlashes(pDirectory);
 
 	// Strip the last slash
-	int len = strlen(pDirectory);
+	intp len = strlen(pDirectory);
 	if ( pDirectory[ len-1 ] == CORRECT_PATH_SEPARATOR )
 	{
 		pDirectory[ len-1 ] = 0;
@@ -4768,7 +4699,7 @@ CBaseFileSystem::COpenedFile::COpenedFile( const COpenedFile& src )
 	m_pFile = src.m_pFile;
 	if ( src.m_pName )
 	{
-		int len = strlen( src.m_pName ) + 1;
+		intp len = strlen( src.m_pName ) + 1;
 		m_pName = new char[ len ];
 		Q_strncpy( m_pName, src.m_pName, len );
 	}
@@ -4795,7 +4726,7 @@ bool CBaseFileSystem::COpenedFile::operator==( const CBaseFileSystem::COpenedFil
 void CBaseFileSystem::COpenedFile::SetName( char const *name )
 {
 	delete[] m_pName;
-	int len = strlen( name ) + 1;
+	intp len = strlen( name ) + 1;
 	m_pName = new char[ len ];
 	Q_strncpy( m_pName, name, len );
 }
@@ -4908,9 +4839,9 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::CSearchPathsIterator::GetNext()
 				char szExcludePath[MAX_PATH];
 				char szFilename[MAX_PATH];
 				V_ComposeFileName( pSearchPath->GetPathString(), m_Filename, szFilename, sizeof( szFilename ) );
-				for ( int i = 0; i < m_ExcludePaths.Count(); i++ )
+				for ( auto &ep : m_ExcludePaths )
 				{
-					if ( g_pFullFileSystem->String( m_ExcludePaths[i], szExcludePath, sizeof( szExcludePath ) ) )
+					if ( g_pFullFileSystem->String( ep, szExcludePath, sizeof( szExcludePath ) ) )
 					{
 						if ( !V_strnicmp( szFilename, szExcludePath, strlen( szExcludePath ) ) )
 						{
@@ -4942,15 +4873,15 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::CSearchPathsIterator::GetNext()
 void CBaseFileSystem::CSearchPathsIterator::CopySearchPaths( const CUtlVector<CSearchPath>	&searchPaths )
 {
 	m_SearchPaths = searchPaths;
-	for ( int i = 0; i <  m_SearchPaths.Count(); i++ )
+	for ( auto &sp : m_SearchPaths )
 	{
-		if ( m_SearchPaths[i].GetPackFile() )
+		if ( sp.GetPackFile() )
 		{
-			m_SearchPaths[i].GetPackFile()->AddRef();
+			sp.GetPackFile()->AddRef();
 		}
-		else if ( m_SearchPaths[i].GetPackedStore() )
+		else if ( sp.GetPackedStore() )
 		{
-			m_SearchPaths[i].GetPackedStore()->AddRef();
+			sp.GetPackedStore()->AddRef();
 		}
 	}
 }
@@ -4980,17 +4911,16 @@ CSysModule *CBaseFileSystem::LoadModule( const char *pFileName, const char *pPat
 	CUtlSymbol lookup = g_PathIDTable.AddString( pPathID );
 
 	// a pathID has been specified, find the first match in the path list
-	int c = m_SearchPaths.Count();
-	for ( int i = 0; i < c; i++ )
+	for ( auto &sp : m_SearchPaths )
 	{
 		// pak files don't have modules
-		if ( m_SearchPaths[i].GetPackFile() )
+		if ( sp.GetPackFile() )
 			continue;
 
-		if ( FilterByPathID( &m_SearchPaths[i], lookup ) )
+		if ( FilterByPathID( &sp, lookup ) )
 			continue;
 
-		Q_snprintf( tempPathID, sizeof(tempPathID), "%s%s", m_SearchPaths[i].GetPathString(), pFileName ); // append the path to this dir.
+		Q_snprintf( tempPathID, sizeof(tempPathID), "%s%s", sp.GetPathString(), pFileName ); // append the path to this dir.
 		CSysModule *pModule = Sys_LoadModule( tempPathID );
 		if ( pModule ) 
 		{
@@ -5085,16 +5015,15 @@ int	CBaseFileSystem::GetPathIndex( const FileNameHandle_t &handle )
 
 CBaseFileSystem::CPathIDInfo* CBaseFileSystem::FindOrAddPathIDInfo( const CUtlSymbol &id, int bByRequestOnly )
 {
-	for ( int i=0; i < m_PathIDInfos.Count(); i++ )
+	for ( auto *info : m_PathIDInfos )
 	{
-		CBaseFileSystem::CPathIDInfo *pInfo = m_PathIDInfos[i];
-		if ( pInfo->GetPathID() == id )
+		if ( info->GetPathID() == id )
 		{
 			if ( bByRequestOnly != -1 )
 			{
-				pInfo->m_bByRequestOnly = (bByRequestOnly != 0);
+				info->m_bByRequestOnly = bByRequestOnly != 0;
 			}
-			return pInfo;
+			return info;
 		}
 	}
 
@@ -5171,7 +5100,7 @@ bool CBaseFileSystem::GetFileTypeForFullPath( char const *pFullPath, wchar_t *bu
 	::MultiByteToWideChar( CP_UTF8, 0, pFullPath, -1, wcharpath, sizeof( wcharpath ) / sizeof(wchar_t) );
 	wcharpath[(sizeof( wcharpath ) / sizeof(wchar_t)) - 1] = L'\0';
 
-	SHFILEINFOW info = { 0 };
+	SHFILEINFOW info = {};
 	DWORD_PTR dwResult = SHGetFileInfoW( 
 		wcharpath,
 		0,
@@ -5251,9 +5180,9 @@ bool CBaseFileSystem::IsFileCacheFileLoaded( FileCacheHandle_t cacheId, const ch
 	bool bFileIsHeldByCache = false;
 	{
 		AUTO_LOCK( pFileCache->m_InfosMutex );
-		for ( int i = 0; i < pFileCache->m_Infos.Count(); ++i )
+		for ( auto *info : pFileCache->m_Infos )
 		{
-			if ( pFileCache->m_Infos[i]->pFileName && Q_strcmp( pFileCache->m_Infos[i]->pFileName, pFileName ) )
+			if ( info->pFileName && Q_strcmp( info->pFileName, pFileName ) )
 			{
 				bFileIsHeldByCache = true;
 				break;
@@ -5659,29 +5588,28 @@ void CBaseFileSystem::CFileCacheObject::AddFiles( const char **ppFileNames, int 
 	}
 
 	AUTO_LOCK( m_InfosMutex );
-	int offset = m_Infos.AddMultipleToTail( nFileNames, infos.Base() );
+	intp offset = m_Infos.AddMultipleToTail( nFileNames, infos.Base() );
 
 	m_nPending += nFileNames;
 	ProcessNewEntries(offset);
 }
 
-void CBaseFileSystem::CFileCacheObject::ProcessNewEntries( int start )
+void CBaseFileSystem::CFileCacheObject::ProcessNewEntries( intp start )
 {
-	for ( int i = start; i < m_Infos.Count(); ++i )
+	for ( auto *info : m_Infos )
 	{
-		Info_t &info = *m_Infos[i];
-		if ( !info.pOwner )
+		if ( !info->pOwner )
 		{
-			info.pOwner = this;
+			info->pOwner = this;
 
 			// NOTE: currently only caching files with GAME pathID
 			FileAsyncRequest_t request;
-			request.pszFilename = info.pFileName;
+			request.pszFilename = info->pFileName;
 			request.pszPathID = "GAME";
 			request.flags = FSASYNC_FLAGS_ALLOCNOFREE;
 			request.pfnCallback = &IOCallback;
 			request.pContext = &info;
-			if ( m_pFS->AsyncRead( request, &info.hIOAsync ) != FSASYNC_OK )
+			if ( m_pFS->AsyncRead( request, &info->hIOAsync ) != FSASYNC_OK )
 			{
 				--m_nPending;
 			}
@@ -5730,27 +5658,26 @@ void CBaseFileSystem::CFileCacheObject::IOCallback( const FileAsyncRequest_t &re
 CBaseFileSystem::CFileCacheObject::~CFileCacheObject()
 {
 	AUTO_LOCK( m_InfosMutex );
-	for ( int i = 0; i < m_Infos.Count(); ++i )
+	for ( auto *info : m_Infos )
 	{
-		Info_t& info = *m_Infos[i];
-		if ( info.hIOAsync )
+		if ( info->hIOAsync )
 		{
 			// job is guaranteed to not be running after abort
-			m_pFS->AsyncAbort( info.hIOAsync );
-			m_pFS->AsyncRelease( info.hIOAsync );
+			m_pFS->AsyncAbort( info->hIOAsync );
+			m_pFS->AsyncRelease( info->hIOAsync );
 		}
 
-		if ( info.pBacking )
+		if ( info->pBacking )
 		{
-			m_pFS->UnregisterMemoryFile( info.pBacking );
-			info.pBacking->Release();
+			m_pFS->UnregisterMemoryFile( info->pBacking );
+			info->pBacking->Release();
 		}
 		else
 		{
-			free( (char*) info.pFileName );
+			free( (char*) info->pFileName );
 		}
 		
-		delete m_Infos[i];
+		delete info;
 	}
 	Assert( m_nPending == 0 );
 }
