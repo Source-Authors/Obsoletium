@@ -4,20 +4,6 @@
 //##                                                                        ##
 //##  MSS.H: Miles Sound System main header file                            ##
 //##                                                                        ##
-//##  Version 1.00 of 15-Feb-95: Initial, derived from AIL.H V3.02          ##
-//##          1.01 of 19-Jun-95: Added various functions for V3.03 release  ##
-//##          1.02 of 22-Nov-95: C++ typedef problem fixed, declspecs added ##
-//##          1.03 of 15-Feb-96: Changes for 16 bit callbacks and multiple  ##
-//##                             16 bit DLL loads (JKR)                     ##
-//##          1.04 of  2-Nov-97: Changes made to handle DLS in future       ##
-//##                             versions                                   ##
-//##          1.05 of  1-Jan-98: Massive changes for version 4.0            ##
-//##          1.06 of 17-Sep-98: Massive changes for version 5.0            ##
-//##          1.07 of  2-Feb-99: Changes for new input API                  ##
-//##          1.08 of  8-Feb-99: Changes for new filter helper functions    ##
-//##          1.09 of  8-Feb-03: Changes for xbox and linux                 ##
-//##          1.10 of 15-May-05: Massive changes for version 7.0            ##
-//##                                                                        ##
 //##  Author: John Miles                                                    ##
 //##                                                                        ##
 //############################################################################
@@ -28,28 +14,35 @@
 
 #ifndef MSS_VERSION
 
-#define MSS_VERSION      "7.1a"     // Version string needs to be 4 characters long for benefit of MIDIECHW and SETSOUND 
-#define MSS_MAJOR_VERSION 7
-#define MSS_MINOR_VERSION 1
-#define MSS_SUB_VERSION   0
-#define MSS_VERSION_DATE "25-Jun-07"
 
-#define MSS_COPYRIGHT "Copyright (C) 1991-2007, RAD Game Tools, Inc."
+
+#define MILESVERSION       "8.0b"     // Version string needs to be 4 characters long for benefit of MIDIECHW and SETSOUND
+#define MILESMAJORVERSION  8
+#define MILESMINORVERSION  0
+#define MILESSUBVERSION    1
+#define MILESVERSIONDATE   "04-Mar-10"
+#define MILESCOPYRIGHT     "Copyright (C) 1991-2010, RAD Game Tools, Inc."
+
+
+
+#define MSS_VERSION       MILESVERSION
+#define MSS_MAJOR_VERSION MILESMAJORVERSION
+#define MSS_MINOR_VERSION MILESMINORVERSION
+#define MSS_SUB_VERSION   MILESSUBVERSION
+#define MSS_VERSION_DATE  MILESVERSIONDATE
+#define MSS_COPYRIGHT     MILESCOPYRIGHT
 
 #endif
 
 #ifndef MSS_H
 #define MSS_H
 
-// IS_DOS for DOS
 // IS_WINDOWS for Windows or Win32
 // IS_WIN64 for Win64
 // IS_WIN32 for Win32
-// IS_WIN16 for Windows
 // IS_WIN32API for Windows, Xbox and Xenon
 // IS_64REG when CPU registers are 64-bit - Xenon, PS3, Win64 and PS2
-// IS_32 for 32-bit DOS or Win32
-// IS_16 for 16-bit Windows
+// IS_32 for at least 32-bit pointers
 // IS_LE for little endian (PCs)
 // IS_BE for big endian (Macs, x360, ps3)
 // IS_X86 for Intel
@@ -62,13 +55,10 @@
 // IS_XENON for Xbox 360
 // IS_PS2 for PS/2
 // IS_PS3 for PS/3
+// IS_SPU for PS3 SPU
 // IS_WII for Wii
-// IS_STATIC for static versions (DOS, Xbox, Xbox 360, GameCube, PS2, PS3, Wii)
+// IS_STATIC for static versions (everything but win, mac, linux)
 
-
-#ifdef IS_DOS
-#undef IS_DOS
-#endif
 
 #ifdef IS_WINDOWS
 #undef IS_WINDOWS
@@ -82,16 +72,8 @@
 #undef IS_WIN64
 #endif
 
-#ifdef IS_WIN16
-#undef IS_WIN16
-#endif
-
 #ifdef IS_32
 #undef IS_32
-#endif
-
-#ifdef IS_16
-#undef IS_16
 #endif
 
 #ifdef IS_LE
@@ -134,6 +116,10 @@
 #undef IS_XENON
 #endif
 
+#ifdef IS_PSP
+#undef IS_PSP
+#endif
+
 #undef MSSRESTRICT
 #define MSSRESTRICT
 
@@ -152,7 +138,13 @@
   #define IS_64REGS
   #define IS_STATIC
   #define IS_BE
-  #define IS_PPC
+
+  #ifdef __SPU__
+    #define IS_SPU
+  #else
+    #define IS_PPC
+    #define HOST_SPU_PROCESS
+  #endif
 
   #ifndef __LP32__
   #error "PS3 32bit ABI support only"
@@ -160,8 +152,15 @@
 
   #undef MSSRESTRICT
   #define MSSRESTRICT __restrict__
-  
-#elif defined(HOLLYWOOD_REV) || defined(REVOLUTION) 
+#elif defined(__psp__)
+  #define IS_PSP
+  #define IS_32
+  #define IS_STATIC
+  #define IS_LE
+  #undef MSSRESTRICT
+  #define MSSRESTRICT __restrict
+
+#elif defined(HOLLYWOOD_REV) || defined(REVOLUTION)
 
   #define IS_WII
   #define IS_32
@@ -171,13 +170,7 @@
 
   #undef MSSRESTRICT
   #define MSSRESTRICT
-  
-#elif defined( __DOS__ )
-  #define IS_DOS
-  #define IS_32
-  #define IS_LE
-  #define IS_X86
-  #define IS_STATIC
+
 #else
   #if defined(_XENON) || (_XBOX_VER == 200)
 
@@ -209,6 +202,10 @@
         #define IS_32
         #define IS_LE
         #define IS_X86
+        #ifndef MSS_SPU_PROCESS
+        // #define HOST_SPU_PROCESS // uncomment when building spu emulation (when spu debugging on win32)
+        #endif
+
         #if defined(_WIN64)      // We consider Win64 to be a superset of Win32!
           #define IS_WIN64
           #define IS_64REGS
@@ -220,59 +217,60 @@
         #endif
 
       #else
-        #ifdef _WINDOWS
-          #define IS_WINDOWS
-          #define IS_WIN16
-          #define IS_16
-          #define IS_LE
-          #define IS_X86
-        #else
-          #if defined(_WINDLL) || defined(WINDOWS) || defined(__WINDOWS__) || defined(_Windows)
-            #define IS_WINDOWS
-            #define IS_WIN16
-            #define IS_16
-            #define IS_LE
+        #if (defined(__MWERKS__) && !defined(__INTEL__)) || defined(__MRC__) || defined(THINK_C) || defined(powerc) || defined(macintosh) || defined(__powerc) || defined(__APPLE__) || defined(__MACH__)
+
+          #ifdef __APPLE__
+            #include "TargetConditionals.h"
+          #endif
+
+          #define IS_MAC
+          #if TARGET_API_MAC_CARBON
+            #define IS_CARBON
+          #endif
+          #define IS_32
+
+          #if defined(__MACHO__) || defined(__MACH__)
+            #define IS_MACHO
+          #elif defined(__GNUC__) || defined(__GNUG__)
+            #define IS_MACHO
+          #endif
+
+          #if defined(__powerc) || defined(powerc) || defined(__POWERPC__)
+            #define IS_PPC
+            #define IS_BE
+          #elif defined(__i386__)
             #define IS_X86
+            #define IS_LE
           #else
-            #if (defined(__MWERKS__) && !defined(__INTEL__)) || defined(__MRC__) || defined(THINK_C) || defined(powerc) || defined(macintosh) || defined(__powerc) || defined(__APPLE__) || defined(__MACH__)
-              #define IS_MAC
-              #if TARGET_API_MAC_CARBON
-                #define IS_CARBON
-              #endif
-              #define IS_32
+            #if defined(__MC68K__)
+              #define IS_68K
+              #define IS_BE
+            #endif
+          #endif
 
-              #if defined(__MACHO__) || defined(__MACH__)
-                #define IS_MACHO
-              #elif defined(__GNUC__) || defined(__GNUG__)
-                #define IS_MACHO
-              #endif
+          #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+            #define IS_IPHONE
+            #define IS_STATIC
 
-              #if defined(__powerc) || defined(powerc) || defined(__POWERPC__)
-                #define IS_PPC
-                #define IS_BE
-              #elif defined(__i386__)
-                #define IS_X86
-                #define IS_LE
-              #else
-                #if defined(__MC68K__)
-                  #define IS_68K
-                  #define IS_BE
-                #endif
-              #endif
+            #if TARGET_IPHONE_SIMULATOR
+              #define IS_IPHONESIM
+            #endif
 
-              #ifndef IS_MACHO
-                #define ON_MAC_USE_FSS
-              #endif
-              
-            #else
-              #ifdef linux
-                #define IS_LINUX
-                #define IS_32
-                #define IS_LE
-                #ifdef i386
-                  #define IS_X86
-                #endif
-              #endif
+            #undef IS_X86
+            #undef IS_BE
+            #define IS_LE
+
+            #define IS_CARBON
+            #define IS_MACHO
+          #endif
+
+        #else
+          #ifdef linux
+            #define IS_LINUX
+            #define IS_32
+            #define IS_LE
+            #ifdef i386
+              #define IS_X86
             #endif
           #endif
         #endif
@@ -282,15 +280,15 @@
 #endif
 
 #if (!defined(IS_LE) && !defined(IS_BE))
-  #error MSS.H did not detect your platform.  Define __DOS__, _WINDOWS, WIN32, WIN64, or macintosh.
+  #error MSS.H did not detect your platform.  Define _WINDOWS, WIN32, WIN64, or macintosh.
 #endif
 
-#ifndef IS_PS2
+#if !defined(IS_PS2) && !defined(IS_PS3) && !defined(IS_PSP)
 
 #if defined(_PUSHPOP_SUPPORTED) || PRAGMA_STRUCT_PACKPUSH
- #pragma pack(push,1)
+  #pragma pack(push,1)
 #else
- #pragma pack(1)
+  #pragma pack(1)
 #endif
 
 #endif
@@ -299,21 +297,61 @@
 // Pipeline filters supported on following platforms
 //
 
-#if defined(IS_WIN32API) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_DOS) || defined(IS_PS2) || defined(IS_XENON) || defined(IS_PS3) || defined(IS_WII)
+#if defined(IS_WIN32API) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_PS2) || defined(IS_XENON) || defined(IS_PS3) || defined(IS_WII) | defined(IS_PSP)
    #define MSS_FLT_SUPPORTED 1
    #define EXTRA_BUILD_BUFFERS 1
    #define FLT_A (MAX_SPEAKERS)
 
-   #if defined(IS_WIN32API) 
+   #if defined(IS_WIN32API)
       #define MSS_VFLT_SUPPORTED 1
    #endif
 #else
    #define EXTRA_BUILD_BUFFERS 0
 #endif
 
-#if defined(IS_WIN32) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_PS2) || defined(IS_XENON) || defined(IS_PS3) || defined(IS_WII)
+#if defined(IS_WIN32) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_PS2) || defined(IS_XENON) || defined(IS_PS3) || defined(IS_WII) || defined(IS_PSP)
    #define MSS_REVERB_SUPPORTED 1
 #endif
+
+//================
+// doc system stuff
+#define EXPAPI DXDEC
+#define EXPTYPE
+#define EXPMACRO
+#define EXPCONST
+#define EXPOUT
+#define EXPGROUP(GroupName)
+#define DEFGROUP(GroupName, Info)
+#define EXPTYPEBEGIN
+#define EXPTYPEEND
+
+EXPGROUP(_NullGroup)
+DEFGROUP(CallingConventions, Calling Conventions)
+EXPGROUP(CallingConventions)
+#define AILCALL EXPTAG(AILCALL) 
+/*
+   Internal calling convention that all external Miles functions use.
+
+   Usually cdecl or stdcall on Windows.
+*/
+#define AILCALLBACK EXPTAG(AILCALLBACK docproto) 
+/*
+   Calling convention that user supplied callbacks <b>from</b> Miles use.
+
+   Usually cdecl or stdcall on Windows.
+*/
+#define MSSSOUNDBANK 0 EXPMACRO
+/*
+   Internal structure.
+   
+   Use the handle type.
+*/
+
+EXPGROUP(_RootGroup)
+#undef AILCALL
+#undef AILCALLBACK
+#undef MSSSOUNDBANK
+//================
 
 #ifdef __cplusplus
 extern "C" {
@@ -339,7 +377,7 @@ extern "C" {
 #define DXDEC extern
 #define DXDEF
 #define AILCALL //$__attribute__((cdecl))
-#define FAR
+
 #define HIWORD(ptr) (((U32)ptr)>>16)
 #define LOWORD(ptr) ((U16)((U32)ptr))
 #define WINAPI
@@ -353,36 +391,6 @@ extern "C" {
 #define mmioFOURCC(w,x,y,z) MAKEFOURCC(w,x,y,z)
 
 #define AILLIBCALLBACK //__attribute__((cdecl))
-
-#define MSS_MAIN_DEF
-
-#define MSS_REDIST_DIR_NAME "redist"
-
-#define MSS_DIR_SEP "\\"
-#define MSS_DIR_UP ".." MSS_DIR_SEP
-#define MSS_DIR_UP_TWO MSS_DIR_UP MSS_DIR_UP
-
-
-#elif defined( IS_DOS )
-
-#define AILCALLBACK __pascal
-#define AILEXPORT cdecl
-#define DXDEC extern
-#define DXDEF
-#define AILCALL cdecl
-#define FAR
-#define HIWORD(ptr) (((U32)ptr)>>16)
-#define LOWORD(ptr) ((U16)((U32)ptr))
-
-#define FOURCC U32
-
-#define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
-              ((U32)(U8)(ch0) | ((U32)(U8)(ch1) << 8) |   \
-              ((U32)(U8)(ch2) << 16) | ((U32)(U8)(ch3) << 24 ))
-
-#define mmioFOURCC(w,x,y,z) MAKEFOURCC(w,x,y,z)
-
-#define AILLIBCALLBACK __pascal
 
 #define MSS_MAIN_DEF
 
@@ -437,27 +445,6 @@ typedef struct HWAVEIN__ *HWAVEIN;
 typedef struct HWAVEOUT__ *HWAVEOUT;
 typedef HWAVEIN  *LPHWAVEIN;
 typedef HWAVEOUT  *LPHWAVEOUT;
-typedef struct Mwavehdr_tag {
-    LPSTR       lpData;                 
-    DWORD       dwBufferLength;         
-    DWORD       dwBytesRecorded;        
-    DWORD_PTR   dwUser;                 
-    DWORD       dwFlags;                
-    DWORD       dwLoops;                
-    struct Mwavehdr_tag  *lpNext;     
-    DWORD_PTR   reserved;               
-} MWAVEHDR;
-typedef struct Mwaveformat_tag {
-    WORD    wFormatTag;        
-    WORD    nChannels;         
-    DWORD   nSamplesPerSec;    
-    DWORD   nAvgBytesPerSec;   
-    WORD    nBlockAlign;       
-} MWAVEFORMAT;
-typedef struct Mpcmwaveformat_tag {
-    MWAVEFORMAT  wf;
-    WORD        wBitsPerSample;
-} MPCMWAVEFORMAT;
 
 #ifndef WAVE_MAPPER
 #define WAVE_MAPPER     ((UINT)-1)
@@ -469,9 +456,9 @@ typedef struct HMIDIOUT__ *HMIDIOUT;
 typedef HMIDIOUT  *LPHMIDIOUT;
 typedef struct HWND__ *HWND;
 typedef struct HINSTANCE__ *HINSTANCE;
-typedef HINSTANCE HMODULE;      
+typedef HINSTANCE HMODULE;
 typedef struct wavehdr_tag *LPWAVEHDR;
-typedef DWORD           FOURCC;         /* a four character code */
+typedef DWORD   FOURCC;         /* a four character code */
 
   #ifndef MAKEFOURCC
 
@@ -491,14 +478,8 @@ typedef DWORD           FOURCC;         /* a four character code */
 // If compiling MSS DLL, use __declspec(dllexport) for both
 // declarations and definitions
 //
-// If compiling MSS16 library or application, use "extern" in declarations
-// and nothing in definitions
-//
 
 #ifdef IS_WIN32
-
-  #undef FAR
-  #define FAR
 
   #ifndef FORNONWIN
   #define AILLIBCALLBACK __stdcall
@@ -511,13 +492,13 @@ typedef DWORD           FOURCC;         /* a four character code */
   #define AILCALLBACK    __cdecl
   #define AILEXPORT      __cdecl
   #endif
-  
+
   #ifdef __RADINDLL__
     #define DXDEC __declspec(dllexport)
     #define DXDEF __declspec(dllexport)
   #else
 
-    #ifdef __BORLANDC__
+    #if defined( __BORLANDC__ ) || defined( MSS_SPU_PROCESS )
       #define DXDEC extern
     #else
       #define DXDEC __declspec(dllimport)
@@ -537,23 +518,6 @@ typedef DWORD           FOURCC;         /* a four character code */
   #define MSS_DIR_UP ".." MSS_DIR_SEP
   #define MSS_DIR_UP_TWO MSS_DIR_UP MSS_DIR_UP
 
-#else
-
-  #define AILCALL WINAPI
-  #define AILEXPORT __export WINAPI
-  #define AILCALLBACK AILEXPORT
-  #define AILLIBCALLBACK WINAPI
-
-  #define DXDEC  extern
-  #define DXDEF
-
-  #define MSSDLLNAME "MSS16.DLL"
-  #define MSS_REDIST_DIR_NAME "redist"
-
-  #define MSS_DIR_SEP "\\"
-  #define MSS_DIR_UP ".." MSS_DIR_SEP
-  #define MSS_DIR_UP_TWO MSS_DIR_UP MSS_DIR_UP
-
 #endif
 
 typedef void * LPVOID;
@@ -564,35 +528,29 @@ typedef LPVOID AILLPDIRECTSOUNDBUFFER;
 
 #ifdef IS_MAC
 
-#if !defined(__FILES__)  && defined( ON_MAC_USE_FSS )
-  #define FSSpec void
-#endif
-
-#define FAR
-
   #ifdef IS_X86
     #define AILLIBCALLBACK __attribute__((cdecl))
     #define AILCALL        __attribute__((cdecl))
     #define AILCALLBACK    __attribute__((cdecl))
-    #define AILEXPORT      __attribute__((cdecl)) __attribute__((visibility("default")))
+    #define AILEXPORT      __attribute__((cdecl))
 
     #ifdef __RADINDLL__
       #define DXDEC __attribute__((visibility("default")))
-      #define DXDEF
+      #define DXDEF __attribute__((visibility("default")))
     #else
       #define DXDEC extern
       #define DXDEF
     #endif
 
   #else
-    #define AILLIBCALLBACK 
-    #define AILCALL        
-    #define AILEXPORT      
-    #define AILCALLBACK    
+    #define AILLIBCALLBACK
+    #define AILCALL
+    #define AILEXPORT
+    #define AILCALLBACK
 
     #ifdef __RADINDLL__
-      #define DXDEC __declspec(export)
-      #define DXDEF
+      #define DXDEC __attribute__((visibility("default")))
+      #define DXDEF __attribute__((visibility("default")))
     #else
       #define DXDEC extern
       #define DXDEF
@@ -607,7 +565,7 @@ typedef LPVOID AILLPDIRECTSOUNDBUFFER;
 #else
   #define MSS_REDIST_DIR_NAME "redist/macho"
 #endif
-  
+
 #define MSS_DIR_SEP "/"
 #define MSS_DIR_UP ".." MSS_DIR_SEP
 #define MSS_DIR_UP_TWO MSS_DIR_UP MSS_DIR_UP
@@ -635,7 +593,7 @@ typedef LPVOID AILLPDIRECTSOUNDBUFFER;
 
 #ifndef MAKEFOURCC
 
-#ifdef IS_X86
+#ifdef IS_LE
   #define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
                 ((U32)(U8)(ch0) | ((U32)(U8)(ch1) << 8) |   \
                 ((U32)(U8)(ch2) << 16) | ((U32)(U8)(ch3) << 24 ))
@@ -656,22 +614,21 @@ typedef LPVOID AILLPDIRECTSOUNDBUFFER;
 
 #ifdef IS_LINUX
 
-#define FAR
-
   #ifdef IS_X86
     #define AILLIBCALLBACK __attribute__((cdecl))
     #define AILCALL        __attribute__((cdecl))
     #define AILCALLBACK    __attribute__((cdecl))
     #define AILEXPORT      __attribute__((cdecl))
   #else
-    #define AILLIBCALLBACK 
-    #define AILCALL        
-    #define AILEXPORT      
-    #define AILCALLBACK    
+    #define AILLIBCALLBACK
+    #define AILCALL
+    #define AILEXPORT
+    #define AILCALLBACK
   #endif
 
-#define DXDEC extern
-#define DXDEF
+#define DXDEC __attribute__((visibility("default")))
+#define DXDEF __attribute__((visibility("default")))
+
 
 #define MSS_REDIST_DIR_NAME "redist"
 #define MSSDLLNAME "Miles Shared Library"
@@ -698,42 +655,6 @@ typedef LPVOID AILLPDIRECTSOUNDBUFFER;
 
 #else
 
-#ifdef IS_XBOX
-
-  #define FOURCC U32
-
-  #ifndef MAKEFOURCC
-
-  #define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
-                ((U32)(U8)(ch0) | ((U32)(U8)(ch1) << 8) |   \
-                ((U32)(U8)(ch2) << 16) | ((U32)(U8)(ch3) << 24 ))
-  #endif
-
-  #define mmioFOURCC(w,x,y,z) MAKEFOURCC(w,x,y,z)
-
-  #undef FAR
-  #define FAR
-
-  #define AILLIBCALLBACK __stdcall
-  #define AILCALL        __stdcall
-  #define AILEXPORT      __stdcall
-  #define AILCALLBACK    __stdcall
-
-  #define DXDEC extern
-  #define DXDEF
-
-  #define MSS_REDIST_DIR_NAME "redist"
-
-  #define MSS_DIR_SEP "\\"
-  #define MSS_DIR_UP ".." MSS_DIR_SEP
-  #define MSS_DIR_UP_TWO MSS_DIR_UP MSS_DIR_UP
-
-typedef void * LPVOID;
-typedef LPVOID AILLPDIRECTSOUND;
-typedef LPVOID AILLPDIRECTSOUNDBUFFER;
-
-#else
-
 #ifdef IS_XENON
 
   #define FOURCC U32
@@ -745,9 +666,6 @@ typedef LPVOID AILLPDIRECTSOUNDBUFFER;
               ((U32)(U8)(ch2) <<  8) | ((U32)(U8)(ch3)      ))
 
   #define mmioFOURCC(w,x,y,z) MAKEFOURCC(w,x,y,z)
-
-  #undef FAR
-  #define FAR
 
   #define AILLIBCALLBACK __stdcall
   #define AILCALL        __stdcall
@@ -770,6 +688,9 @@ typedef void * AILLPDIRECTSOUNDBUFFER;
 
 #ifdef IS_PS3
 
+  #undef MSS_STRUCT
+  #define MSS_STRUCT struct __attribute__((__packed__))
+
   #define FOURCC U32
 
   #undef MAKEFOURCC  // refine it - the xtl makes a bad one
@@ -780,16 +701,43 @@ typedef void * AILLPDIRECTSOUNDBUFFER;
 
   #define mmioFOURCC(w,x,y,z) MAKEFOURCC(w,x,y,z)
 
-  #undef FAR
-  #define FAR
-
   #define AILLIBCALLBACK
-  #define AILCALL       
-  #define AILEXPORT     
-  #define AILCALLBACK   
+  #define AILCALL
+  #define AILEXPORT
+  #define AILCALLBACK
 
   #define DXDEC extern
-  #define DXDEF 
+  #define DXDEF
+
+  #define MSS_REDIST_DIR_NAME "redist"
+
+  #define MSS_DIR_SEP "/"
+  #define MSS_DIR_UP ".." MSS_DIR_SEP
+  #define MSS_DIR_UP_TWO MSS_DIR_UP MSS_DIR_UP
+
+#elif defined(IS_PSP)
+
+  #define FOURCC U32
+
+  #undef MSS_STRUCT
+  #define MSS_STRUCT struct __attribute__((__packed__))
+
+  #undef MAKEFOURCC  // refine it - the xtl makes a bad one
+
+  #define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
+              ((U32)(U8)(ch0) | ((U32)(U8)(ch1) << 8) |   \
+              ((U32)(U8)(ch2) << 16) | ((U32)(U8)(ch3) << 24 ))
+
+
+  #define mmioFOURCC(w,x,y,z) MAKEFOURCC(w,x,y,z)
+
+  #define AILLIBCALLBACK
+  #define AILCALL
+  #define AILEXPORT
+  #define AILCALLBACK
+
+  #define DXDEC extern
+  #define DXDEF
 
   #define MSS_REDIST_DIR_NAME "redist"
 
@@ -809,16 +757,13 @@ typedef void * AILLPDIRECTSOUNDBUFFER;
 
   #define mmioFOURCC(w,x,y,z) MAKEFOURCC(w,x,y,z)
 
-  #undef FAR
-  #define FAR
-
   #define AILLIBCALLBACK
-  #define AILCALL       
-  #define AILEXPORT     
-  #define AILCALLBACK   
+  #define AILCALL
+  #define AILEXPORT
+  #define AILCALLBACK
 
   #define DXDEC extern
-  #define DXDEF 
+  #define DXDEF
 
   #define MSS_REDIST_DIR_NAME "redist"
 
@@ -827,8 +772,6 @@ typedef void * AILLPDIRECTSOUNDBUFFER;
   #define MSS_DIR_UP_TWO MSS_DIR_UP MSS_DIR_UP
 
 #endif
-#endif
-
 #endif
 
 #endif
@@ -855,15 +798,15 @@ typedef void * AILLPDIRECTSOUNDBUFFER;
 #define MAX_W_VOICES             16       // Max virtual wave synth voice cnt
 #define MAX_W_ENTRIES            512      // 512 wave library entries max.
 #ifdef IS_WIN32
-#define MAX_SPEAKERS             18       // Up to 18 hardware output channels supported
+#define MAX_SPEAKERS             9        // Up to 9 hardware output channels supported on Win32
 #elif defined(IS_PS3) || defined(IS_PS2) || defined(IS_WII)
 #define MAX_SPEAKERS             8        // Up to 8 hardware output channels on PS3, PS2, Wii
+#elif defined(IS_PSP) || defined(IS_IPHONE)
+#define MAX_SPEAKERS             2        // Up to 2 hardware output channels on PSP
 #else
 #define MAX_SPEAKERS             6        // Up to 6 hardware output channels supported on other platforms
 #endif
 #define MAX_RECEIVER_SPECS       32       // Up to 32 receiver point specifications
-
-#define MAX_SAVED_FILTER_PROPERTIES 48    // Up to 48 filter attributes can be stored in an HSATTRIBS structure
 
 #define MIN_CHAN                 ( 1-1)   // Min channel recognized (0-based)
 #define MAX_CHAN                 (16-1)   // Max channel recognized
@@ -884,7 +827,7 @@ typedef void * AILLPDIRECTSOUNDBUFFER;
 #define DIG_F_MONO_8                     0        // PCM data formats
 #define DIG_F_MONO_16                    (DIG_F_16BITS_MASK)
 #define DIG_F_STEREO_8                   (DIG_F_STEREO_MASK)
-#define DIG_F_MULTICHANNEL_8             (DIG_F_MULTICHANNEL_MASK)
+#define DIG_F_MULTICHANNEL_8             (DIG_F_MULTICHANNEL_MASK)   // (not actually supported)
 #define DIG_F_STEREO_16                  (DIG_F_STEREO_MASK|DIG_F_16BITS_MASK)
 #define DIG_F_MULTICHANNEL_16            (DIG_F_MULTICHANNEL_MASK|DIG_F_16BITS_MASK)
 #define DIG_F_ADPCM_MONO_16              (DIG_F_ADPCM_MASK |DIG_F_16BITS_MASK)
@@ -898,79 +841,55 @@ typedef void * AILLPDIRECTSOUNDBUFFER;
 
 #define DIG_F_USING_ASI          16
 
-#define DIG_PCM_SIGN             0x0001   // (obsolete)
-#define DIG_PCM_ORDER            0x0002
-
 #define DIG_PCM_POLARITY         0x0004   // PCM flags used by driver hardware
 #define DIG_PCM_SPLIT            0x0008
 #define DIG_BUFFER_SERVICE       0x0010
 #define DIG_DUAL_DMA             0x0020
 #define DIG_RECORDING_SUPPORTED  0x8000
 
-#define WAVE_FORMAT_PCM         1
-#define WAVE_FORMAT_IMA_ADPCM   0x0011
-#define WAVE_FORMAT_XBOX_ADPCM  0x0069
+#ifndef WAVE_FORMAT_PCM
+  #define WAVE_FORMAT_PCM          1
+#endif
+#ifndef WAVE_FORMAT_IMA_ADPCM
+  #define WAVE_FORMAT_IMA_ADPCM    0x0011
+#endif
+#ifndef WAVE_FORMAT_XBOX_ADPCM
+  #define WAVE_FORMAT_XBOX_ADPCM   0x0069
+#endif
+#ifndef WAVE_FORMAT_EXTENSIBLE
+  #define WAVE_FORMAT_EXTENSIBLE   0xFFFE
+#endif
 
-#define MSS_SPEAKER_INDEX_FRONT_LEFT            0     // Speaker order indexes correspond to 
-#define MSS_SPEAKER_INDEX_FRONT_RIGHT           1     // bitmasks in PSDK's ksmedia.h
-#define MSS_SPEAKER_INDEX_FRONT_CENTER          2     // Also see microsoft.com/whdc/device/audio/multichaud.mspx
-#define MSS_SPEAKER_INDEX_LOW_FREQUENCY         3
-#define MSS_SPEAKER_INDEX_BACK_LEFT             4
-#define MSS_SPEAKER_INDEX_BACK_RIGHT            5
-#define MSS_SPEAKER_INDEX_FRONT_LEFT_OF_CENTER  6
-#define MSS_SPEAKER_INDEX_FRONT_RIGHT_OF_CENTER 7
-#define MSS_SPEAKER_INDEX_BACK_CENTER           8
-#define MSS_SPEAKER_INDEX_SIDE_LEFT             9
-#define MSS_SPEAKER_INDEX_SIDE_RIGHT            10
-#define MSS_SPEAKER_INDEX_TOP_CENTER            11
-#define MSS_SPEAKER_INDEX_TOP_FRONT_LEFT        12
-#define MSS_SPEAKER_INDEX_TOP_FRONT_CENTER      13
-#define MSS_SPEAKER_INDEX_TOP_FRONT_RIGHT       14
-#define MSS_SPEAKER_INDEX_TOP_BACK_LEFT         15
-#define MSS_SPEAKER_INDEX_TOP_BACK_CENTER       16
-#define MSS_SPEAKER_INDEX_TOP_BACK_RIGHT        17
-
-#ifdef IS_DOS
-
-#define AIL3DIG                  0        // .DIG driver
-#define AIL3MDI                  1        // .MDI driver
-
-#define DIG_DETECT_8_BIT_ONLY    0x0001   // Detect 8-bit DMA only
-#define DIG_DETECT_16_BIT_ONLY   0x0002   // Detect 16-bit DMA only
-#define DIG_DETECT_8_AND_16_BITS 0x0003   // Detect both 8- and 16-bit DMA
-
-#define DRV_INIT          0x300     // Functions common to .MDI and .DIG
-#define DRV_GET_INFO      0x301     // drivers
-#define DRV_SERVE         0x302
-#define DRV_PARSE_ENV     0x303
-#define DRV_VERIFY_IO     0x304
-#define DRV_INIT_DEV      0x305
-#define DRV_SHUTDOWN_DEV  0x306
-
-#define DIG_HW_VOLUME     0x400     // .DIG driver functions
-#define DIG_START_P_CMD   0x401
-#define DIG_STOP_P_REQ    0x402
-#define DIG_START_R_CMD   0x403
-#define DIG_STOP_R_REQ    0x404
-#define DIG_VSE           0x405
-
-#define MDI_HW_VOLUME     0x500     // .MDI driver functions
-#define MDI_INIT_INS_MGR  0x501
-#define MDI_MIDI_XMIT     0x502
-#define MDI_INSTALL_T_SET 0x503
-#define MDI_GET_T_STATUS  0x504
-#define MDI_PROT_UNPROT_T 0x505
-#define MDI_VSE           0x506
-
-#else
+typedef enum
+{
+   MSS_SPEAKER_MONO                  = 0,
+   MSS_SPEAKER_FRONT_LEFT            = 0,     // Speaker order indexes correspond to
+   MSS_SPEAKER_FRONT_RIGHT           = 1,     // bitmasks in PSDK's ksmedia.h
+   MSS_SPEAKER_FRONT_CENTER          = 2,     // Also see microsoft.com/whdc/device/audio/multichaud.mspx
+   MSS_SPEAKER_LOW_FREQUENCY         = 3,
+   MSS_SPEAKER_BACK_LEFT             = 4,
+   MSS_SPEAKER_BACK_RIGHT            = 5,
+   MSS_SPEAKER_FRONT_LEFT_OF_CENTER  = 6,
+   MSS_SPEAKER_FRONT_RIGHT_OF_CENTER = 7,
+   MSS_SPEAKER_BACK_CENTER           = 8,
+   MSS_SPEAKER_SIDE_LEFT             = 9,
+   MSS_SPEAKER_SIDE_RIGHT            = 10,
+   MSS_SPEAKER_TOP_CENTER            = 11,
+   MSS_SPEAKER_TOP_FRONT_LEFT        = 12,
+   MSS_SPEAKER_TOP_FRONT_CENTER      = 13,
+   MSS_SPEAKER_TOP_FRONT_RIGHT       = 14,
+   MSS_SPEAKER_TOP_BACK_LEFT         = 15,
+   MSS_SPEAKER_TOP_BACK_CENTER       = 16,
+   MSS_SPEAKER_TOP_BACK_RIGHT        = 17,
+   MSS_SPEAKER_MAX_INDEX             = 17
+}
+MSS_SPEAKER;
 
 //
 // Pass to AIL_midiOutOpen for NULL MIDI driver
 //
 
 #define MIDI_NULL_DRIVER ((U32)(S32)-2)
-
-#endif
 
 
 //
@@ -1079,42 +998,6 @@ typedef void * AILLPDIRECTSOUNDBUFFER;
 #define SEQ_PLAYINGBUTRELEASED 0x0010 // Sequence is playing, but MIDI handle
                                       // has been temporarily released
 
-#ifdef IS_DOS
-
-//
-// MIDI driver types
-//
-
-#define MDIDRVRTYPE_GM    0         // General MIDI driver (Roland-compatible)
-#define MDIDRVRTYPE_FM_2  1         // 2-operator FM MIDI driver (OPL2)
-#define MDIDRVRTYPE_FM_4  2         // 4-operator FM MIDI driver (OPL3)
-#define MDIDRVRTYPE_SPKR  3         // Tandy or PC speaker "beep" driver
-
-//
-// .INI installation result codes
-//
-
-#define AIL_INIT_SUCCESS  0         // Driver installed successfully
-#define AIL_NO_INI_FILE   1         // No MDI.INI or DIG.INI file exists
-#define AIL_INIT_FAILURE  2         // Driver could not be initialized
-
-#ifdef __BORLANDC__
-
- #ifndef REALPTR
- #define REALPTR(x) ((void *) (U32) ((((U32) (x))>>16<<4) + ((x) & 0xffff) \
-                    - AIL_sel_base(_DS)))
- #endif
-
-#else
-
- #ifndef REALPTR
- #define REALPTR(x) ((void *) (U32) ((((U32) (x))>>16<<4) + ((x) & 0xffff)))
- #endif
-
-#endif
-
-#else
-
 #ifdef IS_WINDOWS
 
 //
@@ -1124,8 +1007,6 @@ typedef void * AILLPDIRECTSOUNDBUFFER;
 #define AILDS_RELINQUISH  0         // App returns control of secondary buffer
 #define AILDS_SEIZE       1         // App takes control of secondary buffer
 #define AILDS_SEIZE_LOOP  2         // App wishes to loop the secondary buffer
-
-#endif
 
 #endif
 
@@ -1213,6 +1094,32 @@ typedef void VOIDFUNC(void);
 #define SINTa signed int
 #endif
 
+#elif defined(IS_PSP)
+
+#ifndef U64
+#define U64 unsigned long long
+#endif
+
+#ifndef S64
+#define S64 signed long long
+#endif
+
+#ifndef U32
+#define U32 unsigned int
+#endif
+
+#ifndef S32
+#define S32 signed int
+#endif
+
+#ifndef UINTa
+#define UINTa unsigned int
+#endif
+
+#ifndef SINTa
+#define SINTa signed int
+#endif
+
 #else
 
 #ifdef IS_16
@@ -1234,7 +1141,7 @@ typedef void VOIDFUNC(void);
 #endif
 #else
 
-#if defined(IS_MAC) || defined(IS_WII)
+#if defined(IS_MAC) || defined(IS_WII) || defined(IS_LINUX)
 
 
 #ifndef U64
@@ -1330,10 +1237,7 @@ typedef __w64 signed long SINTa;
 #define F64 double
 #endif
 
-
-#ifndef REALFAR
-#define REALFAR unsigned int
-#endif
+#ifndef MSS_BASIC
 
 #ifndef FILE_ERRS
 #define FILE_ERRS
@@ -1351,6 +1255,25 @@ typedef __w64 signed long SINTa;
 #define MIN_VAL 0
 #define NOM_VAL 1
 #define MAX_VAL 2
+
+
+EXPGROUP(Basic Types)
+EXPTYPEBEGIN typedef SINTa HMSSENUM;
+#define MSS_FIRST ((HMSSENUM)-1)
+EXPTYPEEND
+/*
+  specifies a type used to enumerate through a list of properties.
+  
+  $:MSS_FIRST use this value to start the enumeration process.
+  
+  HMSSENUM is the Miles enumeration type. 
+  
+The Miles enumeration functions all work similarly - you set a local variable of type $HMSSENUM to $(HMSSENUM::MSS_FIRST)[MSS_FIRST] and then call
+the enumeration function until it returns 0.
+*/
+EXPGROUP(_RootGroup)
+
+
 
 //
 // Preference names and default values
@@ -1386,7 +1309,7 @@ typedef __w64 signed long SINTa;
 #define DIG_3D_MUTE_AT_MAX        46
 #define DEFAULT_D3MAM             NO      // off by default
 
-#if defined(IS_WINDOWS) || defined(IS_DOS)
+#if defined(IS_WINDOWS) 
 
 #define MDI_DOUBLE_NOTE_OFF        9
 #define DEFAULT_MDNO               NO     // For stuck notes on SB daughterboards
@@ -1445,10 +1368,10 @@ typedef __w64 signed long SINTa;
 #define DEFAULT_MSBS               1536   // Default sysex buffer = 1536 bytes
 
 #define DIG_DS_FRAGMENT_SIZE       34
-#define DEFAULT_DDFS               5     // Use 5 millisecond buffer fragments 
+#define DEFAULT_DDFS               5     // Use 5 millisecond buffer fragments
 
 #define DIG_DS_FRAGMENT_CNT        35
-#define DEFAULT_DDFC               32     // Use 32 buffer fragments 
+#define DEFAULT_DDFC               32     // Use 32 buffer fragments
 
 #define DIG_DS_MIX_FRAGMENT_CNT    42
 #define DEFAULT_DDMFC              8      // Mix ahead 8 buffer fragments
@@ -1468,33 +1391,20 @@ typedef __w64 signed long SINTa;
 
 #endif
 
-#ifdef IS_WII
+#if defined(IS_PSP)
 
 #define MDI_SYSEX_BUFFER_SIZE      10
 #define DEFAULT_MSBS               1536   // Default sysex buffer = 1536 bytes
 
 #define DIG_DS_FRAGMENT_SIZE       34
-#define DEFAULT_DDFS               8     // Use 8 millisecond buffer fragments 
+#define DEFAULT_DDFS               8     // Use 10 millisecond buffer fragments
 
 #define DIG_DS_FRAGMENT_CNT        35
-#define DEFAULT_DDFC               16     // Use 16 buffer fragments 
+#define DEFAULT_DDFC               32     // Use 32 buffer fragments
 
 #define DIG_DS_MIX_FRAGMENT_CNT    42
-#define DEFAULT_DDMFC              4      // Mix ahead 4 buffer fragments
+#define DEFAULT_DDMFC              8     // Mix ahead 10 buffer fragments
 
-
-#define AIL_MM_PERIOD              12
-#define DEFAULT_AMP                5      // Default MM timer period = 5 msec.
-
-#define AIL_TIMERS                 13
-#define DEFAULT_AT                 16     // 16 allocatable HTIMER handles
-
-#endif
-
-#ifdef IS_XBOX
-
-#define MDI_SYSEX_BUFFER_SIZE      10
-#define DEFAULT_MSBS               1536   // Default sysex buffer = 1536 bytes
 
 #define AIL_MM_PERIOD              12
 #define DEFAULT_AMP                5      // Default MM timer period = 5 msec.
@@ -1505,14 +1415,53 @@ typedef __w64 signed long SINTa;
 #define AIL_MUTEX_PROTECTION       44
 #define DEFAULT_AMPR               YES    // Lock each call into Miles with a mutex
 
+#define AIL_LOCK_PROTECTION        18
+#define DEFAULT_ALP                NO     // Don't suspend foreground thread by default
+
+#endif
+
+#if defined(IS_IPHONE)
+
+#define MDI_SYSEX_BUFFER_SIZE      10
+#define DEFAULT_MSBS               1536   // Default sysex buffer = 1536 bytes
+
 #define DIG_DS_FRAGMENT_SIZE       34
-#define DEFAULT_DDFS               12     // Use 12 millisecond buffer fragments with DirectSound
+#define DEFAULT_DDFS               8     // Use 10 millisecond buffer fragments
 
 #define DIG_DS_FRAGMENT_CNT        35
-#define DEFAULT_DDFC               32     // Use 32 buffers with DirectSound
+#define DEFAULT_DDFC               32     // Use 32 buffer fragments
+
+#define DIG_DS_MIX_FRAGMENT_CNT    42
+#define DEFAULT_DDMFC              8     // Mix ahead 10 buffer fragments
+
+#define AIL_TIMERS                 13
+#define DEFAULT_AT                 16     // 16 allocatable HTIMER handles
+
+#define AIL_MUTEX_PROTECTION       44
+#define DEFAULT_AMPR               YES    // Lock each call into Miles with a mutex
 
 #define AIL_LOCK_PROTECTION        18
 #define DEFAULT_ALP                NO     // Don't suspend foreground thread by default
+
+#endif
+
+#ifdef IS_WII
+
+#define MDI_SYSEX_BUFFER_SIZE      10
+#define DEFAULT_MSBS               1536   // Default sysex buffer = 1536 bytes
+
+#define DIG_DS_FRAGMENT_CNT        35
+#define DEFAULT_DDFC               96     // Use 96 buffer fragments (of 1 sec buffer)
+
+#define DIG_DS_MIX_FRAGMENT_CNT    42
+#define DEFAULT_DDMFC              3      // Mix ahead 3 buffer fragments
+
+
+#define AIL_MM_PERIOD              12
+#define DEFAULT_AMP                5      // Default MM timer period = 5 msec.
+
+#define AIL_TIMERS                 13
+#define DEFAULT_AT                 16     // 16 allocatable HTIMER handles
 
 #endif
 
@@ -1522,10 +1471,10 @@ typedef __w64 signed long SINTa;
 #define DEFAULT_MSBS               1536   // Default sysex buffer = 1536 bytes
 
 #define DIG_DS_FRAGMENT_SIZE       34
-#define DEFAULT_DDFS               16     // Use 16 millisecond buffer fragments 
+#define DEFAULT_DDFS               16     // Use 16 millisecond buffer fragments
 
 #define DIG_DS_FRAGMENT_CNT        35
-#define DEFAULT_DDFC               48     // Use 48 buffer fragments 
+#define DEFAULT_DDFC               48     // Use 48 buffer fragments
 
 #define DIG_DS_MIX_FRAGMENT_CNT    42
 #define DEFAULT_DDMFC              4      // Mix ahead 4 buffer fragments
@@ -1543,9 +1492,6 @@ typedef __w64 signed long SINTa;
 #define AIL_LOCK_PROTECTION        18
 #define DEFAULT_ALP                NO     // Don't suspend foreground thread by default
 
-#define AIL_CPU_AFFINITY           50
-#define DEFAULT_CPUAF              2      // Use Xenon CPU 2 by default
-
 #endif
 
 #ifdef IS_LINUX
@@ -1556,18 +1502,43 @@ typedef __w64 signed long SINTa;
 #define AIL_MUTEX_PROTECTION       44
 #define DEFAULT_AMPR               YES    // Lock each call into Miles with a mutex
 
+#define DIG_DS_FRAGMENT_SIZE       34
+#define DEFAULT_DDFS               5     // Use 5 millisecond buffer fragments
+
+#define DIG_DS_FRAGMENT_CNT        35
+#define DEFAULT_DDFC               32     // Use 32 buffer fragments
+
+#define DIG_DS_MIX_FRAGMENT_CNT    42
+#define DEFAULT_DDMFC              8      // Mix ahead 8 buffer fragments
+
+#define AIL_LOCK_PROTECTION        18
+#define DEFAULT_ALP                NO     // Don't suspend foreground thread by default
+
 #endif
 
 #ifdef IS_MAC
 
-#define DIG_SM_FRAGMENT_SIZE       34
-#define DEFAULT_DSFS                8     // Use 8 millisecond buffer fragments with Sound Manager
+//
+//#define MDI_SYSEX_BUFFER_SIZE      10
+//#define DEFAULT_MSBS               1536   // Default sysex buffer = 1536 bytes
 
-#define DIG_SM_MIX_FRAGMENT_CNT    42
-#define DEFAULT_DSMFC               8     // Buffer 8 fragments ahead (should be an even number)
+#define DIG_DS_FRAGMENT_SIZE       34
+#define DEFAULT_DDFS               8     // Use 10 millisecond buffer fragments
 
-#define DIG_SM_FRAGMENT_CNT        35
-#define DEFAULT_DSFC               64     // Allow up to 64 buffer fragments with Sound Manager (should be an even number)
+#define DIG_DS_FRAGMENT_CNT        35
+#define DEFAULT_DDFC               32     // Use 32 buffer fragments
+
+#define DIG_DS_MIX_FRAGMENT_CNT    42
+#define DEFAULT_DDMFC              8     // Mix ahead 10 buffer fragments
+
+#define AIL_TIMERS                 13
+#define DEFAULT_AT                 16     // 16 allocatable HTIMER handles
+
+#define AIL_MUTEX_PROTECTION       44
+#define DEFAULT_AMPR               YES    // Lock each call into Miles with a mutex
+
+#define AIL_LOCK_PROTECTION        18
+#define DEFAULT_ALP                NO     // Don't suspend foreground thread by default
 
 #endif
 
@@ -1615,47 +1586,11 @@ typedef __w64 signed long SINTa;
 #define AIL_MUTEX_PROTECTION       44
 #define DEFAULT_AMPR               YES    // Lock each call into Miles with a mutex
 
-#define DIG_PREFERRED_WO_DEVICE    40    
+#define DIG_PREFERRED_WO_DEVICE    40
 #define DEFAULT_DPWOD              WAVE_MAPPER  // Preferred WaveOut device == WAVE_MAPPER
 
 #define DIG_PREFERRED_DS_DEVICE    47
 #define DEFAULT_DPDSD              0            // Preferred DirectSound device == default NULL GUID
-
-#else
-
-#ifdef IS_DOS
-
-#define DIG_SERVICE_RATE          10
-#define DEFAULT_DSR               200     // DMA buffer-polling rate = 200 Hz
-
-#define DIG_HARDWARE_SAMPLE_RATE  11
-#define DEFAULT_DHSR              NOM_VAL // Use nominal sample rate by default
-
-#define DIG_DMA_RESERVE           12
-#define DEFAULT_DDR               32768   // Reserve 32K real-mode mem for DMA
-
-#define DIG_LATENCY               13
-#define DEFAULT_DL                100     // Half-buffer size in ms = 100
-
-#define DIG_USE_STEREO            14
-#define DEFAULT_DUS               NO      // Use mono output only
-
-#define DIG_USE_16_BITS           15
-#define DEFAULT_DU16              NO      // Use 8-bit output by default
-
-#define DIG_ALLOW_16_BIT_DMA      16
-#define DEFAULT_DA16DMA           YES     // OK to use 16-bit DMA if necessary
-
-#define DIG_SS_LOCK               17
-#define DEFAULT_DSL               NO      // Don't disable IRQs while mixing
-
-#define AIL_SCAN_FOR_HARDWARE     18
-#define DEFAULT_ASH               YES     // Scan for I/O settings if necessary
-
-#define AIL_ALLOW_VDM_EXECUTION   19
-#define DEFAULT_AVE               YES     // Allow Windows "DOS box" execution
-
-#endif
 
 #endif
 
@@ -1719,18 +1654,59 @@ typedef __w64 signed long SINTa;
 
 #define N_PREFS 51                      // # of preference types
 
-typedef MSS_STRUCT _AILSOUNDINFO {
+typedef struct Mwavehdr_tag {
+    C8 *       lpData;
+    U32       dwBufferLength;
+    U32       dwBytesRecorded;
+    UINTa   dwUser;
+    U32       dwFlags;
+    U32       dwLoops;
+    struct Mwavehdr_tag  *lpNext;
+    UINTa   reserved;
+} MWAVEHDR;
+typedef MSS_STRUCT Mwaveformat_tag {
+    U16    wFormatTag;
+    U16    nChannels;
+    U32    nSamplesPerSec;
+    U32    nAvgBytesPerSec;
+    U16    nBlockAlign;
+} MWAVEFORMAT;
+typedef MSS_STRUCT Mpcmwaveformat_tag {
+    MWAVEFORMAT  wf;
+    U16        wBitsPerSample;
+} MPCMWAVEFORMAT;
+typedef MSS_STRUCT Mwaveformatex_tag {
+    U16    wFormatTag;
+    U16    nChannels;
+    U32    nSamplesPerSec;
+    U32    nAvgBytesPerSec;
+    U16    nBlockAlign;
+    U16    wBitsPerSample;
+    U16    cbSize;
+} MWAVEFORMATEX;
+typedef MSS_STRUCT Mwaveformatextensible_tag {
+  MWAVEFORMATEX Format;
+  union {
+      U16 wValidBitsPerSample;
+      U16 wSamplesPerBlock;
+      U16 wReserved;
+  } Samples;
+  U32 dwChannelMask;
+  U8 SubFormat[16];
+} MWAVEFORMATEXTENSIBLE;
+
+typedef struct _AILSOUNDINFO {
   S32 format;
-  void const FAR* data_ptr;
+  void const* data_ptr;
   U32 data_len;
   U32 rate;
   S32 bits;
   S32 channels;
+  U32 channel_mask;
   U32 samples;
   U32 block_size;
-  void const FAR* initial_ptr;
+  void const* initial_ptr;
 } AILSOUNDINFO;
-
 
 #ifndef RIB_H        // RIB.H contents included if RIB.H not already included
 
@@ -1752,7 +1728,7 @@ typedef S32 RIBRESULT;
 // Handle to interface provider
 //
 
-typedef U32 HPROVIDER;
+typedef UINTa HPROVIDER;
 
 //
 // Handle representing token used to obtain property data
@@ -1761,26 +1737,6 @@ typedef U32 HPROVIDER;
 //
 
 typedef UINTa HPROPERTY;
-
-//
-// Handle representing an enumerated interface entry
-//
-// RIB_enumerate_interface() returns 1 if valid next entry found, else
-// 0 if end of list reached
-//
-
-typedef U32 HINTENUM;
-#define HINTENUM_FIRST 0
-
-//
-// Handle representing an enumerated provider entry
-//
-// RIB_enumerate_providers() returns 1 if valid next entry found, else
-// 0 if end of list reached
-//
-
-typedef U32 HPROENUM;
-#define HPROENUM_FIRST 0
 
 //
 // Data types for RIB properties
@@ -1816,10 +1772,10 @@ RIB_ENTRY_TYPE;
 // interface
 //
 
-typedef MSS_STRUCT
+typedef struct
 {
    RIB_ENTRY_TYPE   type;        // See list above
-   C8 FAR          *entry_name;  // Name of desired function or property
+   const C8          *entry_name;  // Name of desired function or property
    UINTa            token;       // Function pointer or property token
    RIB_DATA_SUBTYPE subtype;     // Property subtype
 }
@@ -1839,10 +1795,10 @@ RIB_INTERFACE_ENTRY;
 // Each provider of a searchable interface must export this function
 //
 
-typedef S32 (AILCALL FAR *PROVIDER_PROPERTY) (HPROPERTY        index,
-                                              void FAR *       before_value,
-                                              void const FAR * new_value,
-                                              void FAR *       after_value
+typedef S32 (AILCALL *PROVIDER_PROPERTY) (HPROPERTY        index,
+                                              void *       before_value,
+                                              void const * new_value,
+                                              void *       after_value
                                               );
 
 //
@@ -1869,50 +1825,50 @@ typedef S32 (AILCALL FAR *PROVIDER_PROPERTY) (HPROPERTY        index,
 DXDEC  HPROVIDER  AILCALL RIB_alloc_provider_handle   (long           module);
 DXDEC  void       AILCALL RIB_free_provider_handle    (HPROVIDER      provider);
 
-DXDEC  HPROVIDER  AILCALL RIB_load_provider_library   (C8 const FAR *filename);
+DXDEC  HPROVIDER  AILCALL RIB_load_provider_library   (C8 const *filename);
 DXDEC  void       AILCALL RIB_free_provider_library   (HPROVIDER      provider);
 
 DXDEC  RIBRESULT  AILCALL RIB_register_interface      (HPROVIDER                      provider,
-                                                       C8 const FAR                   *interface_name,
+                                                       C8 const                   *interface_name,
                                                        S32                            entry_count,
-                                                       RIB_INTERFACE_ENTRY const FAR *rlist);
+                                                       RIB_INTERFACE_ENTRY const *rlist);
 
 DXDEC  RIBRESULT  AILCALL RIB_unregister_interface    (HPROVIDER                      provider,
-                                                       C8 const FAR                  *interface_name,
+                                                       C8 const                  *interface_name,
                                                        S32                            entry_count,
-                                                       RIB_INTERFACE_ENTRY const FAR *rlist);
+                                                       RIB_INTERFACE_ENTRY const *rlist);
 
 DXDEC  RIBRESULT  AILCALL RIB_request_interface       (HPROVIDER                provider,
-                                                       C8 const FAR            *interface_name,
+                                                       C8 const            *interface_name,
                                                        S32                      entry_count,
-                                                       RIB_INTERFACE_ENTRY FAR *rlist);
+                                                       RIB_INTERFACE_ENTRY *rlist);
 
 DXDEC  RIBRESULT  AILCALL RIB_request_interface_entry (HPROVIDER                provider,
-                                                       C8 const FAR            *interface_name,
+                                                       C8 const            *interface_name,
                                                        RIB_ENTRY_TYPE           entry_type,
-                                                       C8 const FAR            *entry_name,
-                                                       UINTa FAR               *token);
+                                                       C8 const            *entry_name,
+                                                       UINTa               *token);
 
 DXDEC  S32        AILCALL RIB_enumerate_interface     (HPROVIDER                provider,
-                                                       C8 FAR                  *interface_name,
+                                                       C8                  *interface_name,
                                                        RIB_ENTRY_TYPE           type,
-                                                       HINTENUM FAR            *next,
-                                                       RIB_INTERFACE_ENTRY FAR *dest);
+                                                       HMSSENUM            *next,
+                                                       RIB_INTERFACE_ENTRY *dest);
 
-DXDEC  S32        AILCALL RIB_enumerate_providers     (C8 FAR                  *interface_name,
-                                                       HPROENUM FAR            *next,
-                                                       HPROVIDER FAR           *dest);
+DXDEC  S32        AILCALL RIB_enumerate_providers     (C8                  *interface_name,
+                                                       HMSSENUM            *next,
+                                                       HPROVIDER           *dest);
 
-DXDEC  C8 FAR *   AILCALL RIB_type_string             (void const FAR *         data,
+DXDEC  C8 *   AILCALL RIB_type_string             (void const *         data,
                                                        RIB_DATA_SUBTYPE         subtype);
 
-DXDEC  HPROVIDER  AILCALL RIB_find_file_provider      (C8 const FAR            *interface_name,
-                                                       C8 const FAR            *property_name,
-                                                       C8 const FAR            *file_suffix);
+DXDEC  HPROVIDER  AILCALL RIB_find_file_provider      (C8 const            *interface_name,
+                                                       C8 const            *property_name,
+                                                       C8 const            *file_suffix);
 
-DXDEC  HPROVIDER  AILCALL RIB_find_provider           (C8 const FAR            *interface_name,
-                                                       C8 const FAR            *property_name,
-                                                       void const FAR          *property_value);
+DXDEC  HPROVIDER  AILCALL RIB_find_provider           (C8 const            *interface_name,
+                                                       C8 const            *property_name,
+                                                       void const          *property_value);
 
 //
 // Static library definitions
@@ -1926,6 +1882,7 @@ DXDEC  HPROVIDER  AILCALL RIB_find_provider           (C8 const FAR            *
   DXDEC S32 AILCALL RIB_MAIN_NAME(DolbySurround)( HPROVIDER provider_handle, U32 up_down );
   DXDEC S32 AILCALL RIB_MAIN_NAME(MP3Dec)( HPROVIDER provider_handle, U32 up_down );
   DXDEC S32 AILCALL RIB_MAIN_NAME(OggDec)( HPROVIDER provider_handle, U32 up_down );
+  DXDEC S32 AILCALL RIB_MAIN_NAME(BinkADec)( HPROVIDER provider_handle, U32 up_down );
   DXDEC S32 AILCALL RIB_MAIN_NAME(SpxDec)( HPROVIDER provider_handle, U32 up_down );
   DXDEC S32 AILCALL RIB_MAIN_NAME(SpxEnc)( HPROVIDER provider_handle, U32 up_down );
   DXDEC S32 AILCALL RIB_MAIN_NAME(Voice)( HPROVIDER provider_handle, U32 up_down );
@@ -1943,25 +1900,25 @@ DXDEC  HPROVIDER  AILCALL RIB_find_provider           (C8 const FAR            *
   DXDEC S32 AILCALL RIB_Main( HPROVIDER provider_handle, U32 up_down );
 #endif
 
-typedef S32 ( AILCALL FAR * RIB_MAIN_FUNC) ( HPROVIDER provider_handle, U32 up_down );
+typedef S32 ( AILCALL * RIB_MAIN_FUNC) ( HPROVIDER provider_handle, U32 up_down );
 
-DXDEC HPROVIDER AILCALL RIB_load_static_provider_library (RIB_MAIN_FUNC main, char FAR* description);
+DXDEC HPROVIDER AILCALL RIB_load_static_provider_library (RIB_MAIN_FUNC main, char* description);
 
 
-DXDEC  HPROVIDER  AILCALL RIB_find_files_provider     (C8 const FAR *interface_name,
-                                                       C8 const FAR *property_name_1,
-                                                       C8 const FAR *file_suffix_1,
-                                                       C8 const FAR *property_name_2,
-                                                       C8 const FAR *file_suffix_2);
+DXDEC  HPROVIDER  AILCALL RIB_find_files_provider     (C8 const *interface_name,
+                                                       C8 const *property_name_1,
+                                                       C8 const *file_suffix_1,
+                                                       C8 const *property_name_2,
+                                                       C8 const *file_suffix_2);
 
-DXDEC  HPROVIDER  AILCALL RIB_find_file_dec_provider  (C8 const FAR *interface_name,
-                                                       C8 const FAR *property_name_1,
+DXDEC  HPROVIDER  AILCALL RIB_find_file_dec_provider  (C8 const *interface_name,
+                                                       C8 const *property_name_1,
                                                        U32           decimal_property_value_1,
-                                                       C8 const FAR *property_name_2,
-                                                       C8 const FAR *file_suffix_2);
+                                                       C8 const *property_name_2,
+                                                       C8 const *file_suffix_2);
 
 DXDEC  S32        AILCALL RIB_load_application_providers
-                                                      (C8 const FAR  *filespec);
+                                                      (C8 const  *filespec);
 
 DXDEC  void       AILCALL RIB_set_provider_user_data  (HPROVIDER provider,
                                                        U32       index,
@@ -1978,7 +1935,7 @@ DXDEC  void       AILCALL RIB_set_provider_system_data
 DXDEC  SINTa      AILCALL RIB_provider_system_data    (HPROVIDER provider,
                                                        U32       index);
 
-DXDEC  C8 FAR *  AILCALL  RIB_error                   (void);
+DXDEC  C8 *  AILCALL  RIB_error                   (void);
 
 #endif
 
@@ -2029,8 +1986,8 @@ typedef S32 ASIRESULT;
 // the stream is reached).
 //
 
-typedef S32 (AILCALLBACK FAR * AILASIFETCHCB) (UINTa     user,            // User value passed to ASI_open_stream()
-                                               void FAR *dest,            // Location to which stream data should be copied by app
+typedef S32 (AILCALLBACK * AILASIFETCHCB) (UINTa     user,            // User value passed to ASI_open_stream()
+                                               void *dest,            // Location to which stream data should be copied by app
                                                S32       bytes_requested, // # of bytes requested by ASI codec
                                                S32       offset);         // If not -1, application should seek to this point in stream
 
@@ -2045,16 +2002,16 @@ typedef S32 (AILCALLBACK FAR * AILASIFETCHCB) (UINTa     user,            // Use
 //
 // No other ASI functions may be called outside an ASI_startup() /
 // ASI_shutdown() pair, except for the standard RIB function
-// PROVIDER_property() where appropriate. 
+// PROVIDER_property() where appropriate.
 //
 
-typedef ASIRESULT (AILCALL FAR *ASI_STARTUP)(void);
+typedef ASIRESULT (AILCALL *ASI_STARTUP)(void);
 
 //
 // Shut down ASI codec
 //
 
-typedef ASIRESULT (AILCALL FAR * ASI_SHUTDOWN)(void);
+typedef ASIRESULT (AILCALL * ASI_SHUTDOWN)(void);
 
 //
 // Return codec error message, or NULL if no errors have occurred since
@@ -2063,7 +2020,7 @@ typedef ASIRESULT (AILCALL FAR * ASI_SHUTDOWN)(void);
 // The ASI error text state is global to all streams
 //
 
-typedef C8 FAR *  (AILCALL FAR * ASI_ERROR)(void);
+typedef C8 *  (AILCALL * ASI_ERROR)(void);
 
 //############################################################################
 //##                                                                        ##
@@ -2075,7 +2032,7 @@ typedef C8 FAR *  (AILCALL FAR * ASI_ERROR)(void);
 // Open a stream, returning handle to stream
 //
 
-typedef HASISTREAM (AILCALL FAR *ASI_STREAM_OPEN) (UINTa         user,              // User value passed to fetch callback
+typedef HASISTREAM (AILCALL *ASI_STREAM_OPEN) (UINTa         user,              // User value passed to fetch callback
                                                    AILASIFETCHCB fetch_CB,          // Source data fetch handler
                                                    U32           total_size);       // Total size for %-done calculations (0=unknown)
 
@@ -2087,8 +2044,8 @@ typedef HASISTREAM (AILCALL FAR *ASI_STREAM_OPEN) (UINTa         user,          
 // handler to be called to fetch more data from the stream.
 //
 
-typedef S32  (AILCALL FAR *ASI_STREAM_PROCESS) (HASISTREAM  stream,              // Handle of stream
-                                                void FAR   *buffer,              // Destination for processed data
+typedef S32  (AILCALL *ASI_STREAM_PROCESS) (HASISTREAM  stream,              // Handle of stream
+                                                void   *buffer,              // Destination for processed data
                                                 S32         buffer_size);        // # of bytes to return in buffer
 
 //
@@ -2116,25 +2073,25 @@ typedef S32  (AILCALL FAR *ASI_STREAM_PROCESS) (HASISTREAM  stream,             
 // internal buffers and resynchronizing themselves to the data stream.
 //
 
-typedef ASIRESULT (AILCALL FAR *ASI_STREAM_SEEK)    (HASISTREAM stream,
+typedef ASIRESULT (AILCALL *ASI_STREAM_SEEK)   (HASISTREAM stream,
                                                      S32        stream_offset);
 
 //
 // Retrieve or set a property value by index (returns 1 on success)
 //
 
-typedef S32 (AILCALL FAR *ASI_STREAM_PROPERTY) (HASISTREAM stream,
+typedef S32 (AILCALL *ASI_STREAM_PROPERTY) (HASISTREAM stream,
                                                 HPROPERTY  property,
-                                                void FAR * before_value,
-                                                void const FAR * new_value,
-                                                void FAR * after_value
+                                                void * before_value,
+                                                void const * new_value,
+                                                void * after_value
                                                 );
 
 //
 // Close stream, freeing handle and all internally-allocated resources
 //
 
-typedef ASIRESULT (AILCALL FAR *ASI_STREAM_CLOSE) (HASISTREAM stream);
+typedef ASIRESULT (AILCALL *ASI_STREAM_CLOSE) (HASISTREAM stream);
 
 #endif
 
@@ -2152,10 +2109,9 @@ typedef ASIRESULT (AILCALL FAR *ASI_STREAM_CLOSE) (HASISTREAM stream);
 #define M_SRC_16       2       // Set to enable mixing of 16-bit samples
 #define M_FILTER       4       // Set to enable filtering when resampling
 #define M_SRC_STEREO   8       // Set to enable mixing of stereo input samples
-#define M_ORDER        16      // Set to reverse L/R stereo order for sample
-#define M_RESAMPLE     32      // Set to enable playback ratios other than 65536
-#define M_VOL_SCALING  64      // Set to enable volume scalars other than 2048
-#define M_COPY16_NOVOL 128
+#define M_RESAMPLE     16      // Set to enable playback ratios other than 65536
+#define M_VOL_SCALING  32      // Set to enable volume scalars other than 2048
+#define M_COPY16_NOVOL 64
 
 #ifdef IS_32
 
@@ -2167,19 +2123,19 @@ typedef ASIRESULT (AILCALL FAR *ASI_STREAM_CLOSE) (HASISTREAM stream);
 // PROVIDER_property() as appropriate.
 //
 
-typedef void (AILCALL FAR *MIXER_STARTUP)(void);
+typedef void (AILCALL *MIXER_STARTUP)(void);
 
 //
 // Shut down mixer
 //
 
-typedef void (AILCALL FAR *MIXER_SHUTDOWN)(void);
+typedef void (AILCALL *MIXER_SHUTDOWN)(void);
 
 //
 // Flush mixer buffer
 //
 
-typedef void (AILCALL FAR *MIXER_FLUSH)   (S32 FAR *dest,
+typedef void (AILCALL *MIXER_FLUSH)   (S32 *dest,
                                            S32      len
 #ifdef IS_X86
                                            ,U32             MMX_available
@@ -2190,13 +2146,13 @@ typedef void (AILCALL FAR *MIXER_FLUSH)   (S32 FAR *dest,
 // Perform audio mixing operation
 //
 
-typedef void (AILCALL FAR *MIXER_MERGE)   (void const FAR * FAR *src,
-                                           U32        FAR *src_fract,
-                                           void const FAR *src_end,
-                                           S32  FAR * FAR *dest,
-                                           void FAR       *dest_end,
-                                           S32  FAR       *left_val,
-                                           S32  FAR       *right_val,
+typedef void (AILCALL *MIXER_MERGE)   (void const * *src,
+                                           U32        *src_fract,
+                                           void const *src_end,
+                                           S32  * *dest,
+                                           void       *dest_end,
+                                           S32        *left_val,
+                                           S32        *right_val,
                                            S32             playback_ratio,
                                            S32             scale_left,
                                            S32             scale_right,
@@ -2209,17 +2165,17 @@ typedef void (AILCALL FAR *MIXER_MERGE)   (void const FAR * FAR *src,
 //
 // Translate mixer buffer contents to final output format
 //
-// "option" parameter is big_endian_output on Mac, MMX on x86, overwrite flag on PS2 
+// "option" parameter is big_endian_output on Mac, MMX on x86, overwrite flag on PS2
 //
 
-typedef void (AILCALL FAR *MIXER_COPY) (void const FAR  *src,
+typedef void (AILCALL *MIXER_COPY) (void const  *src,
                                         S32       src_len,
-                                        void FAR *dest,
+                                        void *dest,
                                         U32       operation
-#if defined(IS_BE) || defined(IS_X86) || defined(IS_PS2) 
+#if defined(IS_BE) || defined(IS_X86) || defined(IS_PS2)
                                         ,U32       option
 #endif
-                                        );  
+                                        );
 
 #else
 
@@ -2231,19 +2187,19 @@ typedef void (AILCALL FAR *MIXER_COPY) (void const FAR  *src,
 // PROVIDER_property() as appropriate.
 //
 
-typedef void (AILCALL FAR *MIXER_STARTUP)(void);
+typedef void (AILCALL *MIXER_STARTUP)(void);
 
 //
 // Shut down mixer
 //
 
-typedef void (AILCALL FAR *MIXER_SHUTDOWN)(void);
+typedef void (AILCALL *MIXER_SHUTDOWN)(void);
 
 //
 // Flush mixer buffer
 //
 
-typedef void (AILCALL FAR *MIXER_FLUSH)   (S32 FAR *dest,
+typedef void (AILCALL *MIXER_FLUSH)   (S32 *dest,
                                            S32      len,
                                            U32      MMX_available);
 
@@ -2251,15 +2207,15 @@ typedef void (AILCALL FAR *MIXER_FLUSH)   (S32 FAR *dest,
 // Perform audio mixing operation
 //
 
-typedef void (AILCALL FAR *MIXER_MERGE)   (U32             src_sel,
+typedef void (AILCALL *MIXER_MERGE)   (U32             src_sel,
                                            U32             dest_sel,
-                                           U32        FAR *src_fract,
-                                           U32        FAR *src_offset,
-                                           U32        FAR *dest_offset,
+                                           U32        *src_fract,
+                                           U32        *src_offset,
+                                           U32        *dest_offset,
                                            U32             src_end_offset,
                                            U32             dest_end_offset,
-                                           S32  FAR       *left_val,
-                                           S32  FAR       *right_val,
+                                           S32        *left_val,
+                                           S32        *right_val,
                                            S32             playback_ratio,
                                            S32             scale_both,
                                            U32             operation);
@@ -2268,17 +2224,17 @@ typedef void (AILCALL FAR *MIXER_MERGE)   (U32             src_sel,
 // Translate mixer buffer contents to final output format
 //
 
-typedef void (AILCALL FAR *MIXER_COPY) (void const FAR *src,
+typedef void (AILCALL *MIXER_COPY) (void const *src,
                                         S32       src_len,
-                                        void FAR *dest,
+                                        void *dest,
                                         U32       operation,
                                         U32       option);
 #endif
 
 
-typedef MSS_STRUCT _MSS_BB              // Used in both MC and conventional mono/stereo configurations
+typedef struct _MSS_BB              // Used in both MC and conventional mono/stereo configurations
 {
-   S32 FAR *buffer;                 // Build buffer
+   S32 *buffer;                 // Build buffer
    S32      bytes;                  // Size in bytes
    S32      chans;                  // Always mono (1) or stereo (2)
 
@@ -2286,7 +2242,7 @@ typedef MSS_STRUCT _MSS_BB              // Used in both MC and conventional mono
 }
 MSS_BB;
 
-typedef MSS_STRUCT _ADPCMDATATAG
+typedef struct _ADPCMDATATAG
 {
   U32   blocksize;
   U32   extrasamples;
@@ -2301,9 +2257,9 @@ typedef MSS_STRUCT _ADPCMDATATAG
   U16   moresamples[16];
 } ADPCMDATA;
 
-typedef void (AILCALL FAR * MIXER_MC_COPY) ( MSS_BB FAR * build,
+typedef void (AILCALL * MIXER_MC_COPY) ( MSS_BB * build,
                                              S32 n_build_buffers,
-                                             void FAR * lpWaveAddr,
+                                             void * lpWaveAddr,
                                              S32 hw_format,
 #ifdef IS_X86
                                              S32 use_MMX,
@@ -2312,200 +2268,59 @@ typedef void (AILCALL FAR * MIXER_MC_COPY) ( MSS_BB FAR * build,
                                              S32 physical_channels_per_sample );
 
 
-typedef void (AILCALL FAR * MIXER_ADPCM_DECODE ) ( void FAR * dest,
-                                                   void const FAR * in,
+typedef void (AILCALL * MIXER_ADPCM_DECODE ) ( void * dest,
+                                                   void const * in,
                                                    S32 out_len,
                                                    S32 in_len,
                                                    S32 input_format,
-                                                   ADPCMDATA FAR *adpcm_data);
+                                                   ADPCMDATA *adpcm_data);
 
 //
 // Type definitions
 //
 
-MSS_STRUCT _DIG_DRIVER;
+struct _DIG_DRIVER;
 
-MSS_STRUCT _MDI_DRIVER;
+struct _MDI_DRIVER;
 
-typedef MSS_STRUCT _DIG_DRIVER FAR * HDIGDRIVER;    // Handle to digital driver
+typedef struct _DIG_DRIVER * HDIGDRIVER;    // Handle to digital driver
 
-typedef MSS_STRUCT _MDI_DRIVER FAR * HMDIDRIVER;    // Handle to XMIDI driver
+typedef struct _MDI_DRIVER * HMDIDRIVER;    // Handle to XMIDI driver
 
-typedef MSS_STRUCT _SAMPLE FAR * HSAMPLE;           // Handle to sample
+typedef struct _SAMPLE * HSAMPLE;           // Handle to sample
 
-typedef MSS_STRUCT _SMPATTRIBS FAR * HSATTRIBS;     // Handle to sample performance attributes 
-
-typedef MSS_STRUCT _SEQUENCE FAR * HSEQUENCE;       // Handle to sequence
+typedef struct _SEQUENCE * HSEQUENCE;       // Handle to sequence
 
 typedef S32 HTIMER;                             // Handle to timer
 
-
-#ifdef IS_DOS
-
-//
-// Type definitions
-//
-
-typedef MSS_STRUCT                      // I/O parameters structure
-{
-   S16 IO;
-   S16 IRQ;
-   S16 DMA_8_bit;
-   S16 DMA_16_bit;
-   S32 IO_reserved[4];
-}
-IO_PARMS;
-
-typedef MSS_STRUCT                      // Standard MSS 3.X VDI driver header
-{
-   S8     ID[8];                    // "AIL3xxx" ID string, followed by ^Z
-
-   U32    driver_version;
-
-   REALFAR  common_IO_configurations;
-   U16    num_IO_configurations;
-
-   REALFAR  environment_string;
-
-   IO_PARMS IO;
-
-   S16     service_rate;
-
-   U16    busy;
-
-   U16    driver_num;             // Driver number
-
-   U16    this_ISR;               // Offset of INT 66H dispatcher
-   REALFAR  prev_ISR;               // Pointer to previous INT 66H ISR
-
-   S8     scratch[128];           // Shared scratch workspace
-
-   S8     dev_name[80];           // Device name (VDI version >= 1.12 only)
-}
-VDI_HDR;
-
-typedef MSS_STRUCT
-{
-   U16 minimum_physical_sample_rate;
-   U16 nominal_physical_sample_rate;
-   U16 maximum_physical_sample_rate;
-
-   U16 minimum_DMA_half_buffer_size;
-   U16 maximum_DMA_half_buffer_size;
-
-   U32 flags;
-}
-DIG_MODE;
-
-typedef MSS_STRUCT
-{
-   U8    format_supported[16];
-   DIG_MODE format_data[16];
-}
-DIG_DDT;
-
-typedef MSS_STRUCT
-{
-   REALFAR  DMA_buffer_A;
-   REALFAR  DMA_buffer_B;
-   S16     active_buffer;
-}
-DIG_DST;
-
-typedef MSS_STRUCT
-{
-   REALFAR  library_environment;
-   REALFAR  GTL_suffix;
-
-   U16    num_voices;
-
-   U16    max_melodic_channel;
-   U16    min_melodic_channel;
-   U16    percussion_channel;
-}
-MDI_DDT;
-
-typedef MSS_STRUCT
-{
-   S8     library_directory[128];
-   S8     GTL_filename[128];
-
-   S8     MIDI_data[512];
-}
-MDI_DST;
-
-typedef MSS_STRUCT                   // Initialization file structure
-{
-   char     device_name[128];    // Device name
-   char     driver_name[128];    // Driver filename
-   IO_PARMS IO;                  // I/O parameters for driver
-}
-AIL_INI;
-
-typedef MSS_STRUCT                   // Handle to driver
-{
-   REALFAR  seg;                 // Seg:off pointer to driver (off=0)
-   U32    sel;                   // Selector for driver (off=0)
-   void    *buf;                 // Protected-mode pointer to driver
-   U32    size;                  // Size of driver image
-   VDI_HDR *VHDR;                // Pointer to driver header (same as buf)
-   S32     type;                 // AIL3DIG or AIL3MDI (see below)
-
-   S32     initialized;          // 1 if hardware successfully init'd, else 0
-
-   S32     PM_ISR;               // -1 if no PM ISR hooked, else IRQ #
-
-   HTIMER   server;              // DRV_SERVE periodic timer, if requested
-
-                                 // Vector to high-level destructor, if any
-
-   void (AILCALL *destructor)(HDIGDRIVER);
-
-                                 // High-level descriptor (DIG_ or MDI_DRIVER)
-   void        *descriptor;
-}
-AIL_DRIVER;
-
-typedef MSS_STRUCT                     // VDI interface register structure
-{
-   S16 AX;
-   S16 BX;
-   S16 CX;
-   S16 DX;
-   S16 SI;
-   S16 DI;
-}
-VDI_CALL;
-
-#endif
 
 //
 // Function pointer types
 //
 
-typedef void (AILCALLBACK FAR* AILINCB)       (void const FAR *data, S32 len, UINTa user_data);
+typedef void (AILCALLBACK* AILINCB)       (void const *data, S32 len, UINTa user_data);
 
-typedef void (AILCALLBACK FAR* AILTRACECB)    (C8 *text, S32 nest_depth);
+typedef void (AILCALLBACK* AILTRACECB)    (C8 *text, S32 nest_depth);
 
-typedef void (AILCALLBACK FAR* AILTIMERCB)    (UINTa user);
+typedef void (AILCALLBACK* AILTIMERCB)    (UINTa user);
 
-typedef void (AILCALLBACK FAR* AILSAMPLECB)   (HSAMPLE sample);
+typedef void (AILCALLBACK* AILSAMPLECB)   (HSAMPLE sample);
 
-typedef F32  (AILCALLBACK FAR* AILFALLOFFCB)  (HSAMPLE sample, F32 distance, F32 rolloff_factor, F32 min_dist, F32 max_dist);
+typedef F32  (AILCALLBACK* AILFALLOFFCB)  (HSAMPLE sample, F32 distance, F32 rolloff_factor, F32 min_dist, F32 max_dist);
 
-typedef S32  (AILCALLBACK FAR* AILEVENTCB)    (HMDIDRIVER hmi,HSEQUENCE seq,S32 status,S32 data_1,S32 data_2);
+typedef S32  (AILCALLBACK* AILEVENTCB)    (HMDIDRIVER hmi,HSEQUENCE seq,S32 status,S32 data_1,S32 data_2);
 
-typedef S32  (AILCALLBACK FAR* AILTIMBRECB)   (HMDIDRIVER hmi,S32 bank,S32 patch);
+typedef S32  (AILCALLBACK* AILTIMBRECB)   (HMDIDRIVER hmi,S32 bank,S32 patch);
 
-typedef S32  (AILCALLBACK FAR* AILPREFIXCB)   (HSEQUENCE seq,S32 log,S32 data);
+typedef S32  (AILCALLBACK* AILPREFIXCB)   (HSEQUENCE seq,S32 log,S32 data);
 
-typedef void (AILCALLBACK FAR* AILTRIGGERCB)  (HSEQUENCE seq,S32 log,S32 data);
+typedef void (AILCALLBACK* AILTRIGGERCB)  (HSEQUENCE seq,S32 log,S32 data);
 
-typedef void (AILCALLBACK FAR* AILBEATCB)     (HMDIDRIVER hmi,HSEQUENCE seq,S32 beat,S32 measure);
+typedef void (AILCALLBACK* AILBEATCB)     (HMDIDRIVER hmi,HSEQUENCE seq,S32 beat,S32 measure);
 
-typedef void (AILCALLBACK FAR* AILSEQUENCECB) (HSEQUENCE seq);
+typedef void (AILCALLBACK* AILSEQUENCECB) (HSEQUENCE seq);
 
-typedef S32 (AILCALLBACK FAR *SS_STREAM_CB)   (HSAMPLE  S, S16 FAR *dest_mono_sample_buffer, S32 dest_buffer_size);
+typedef S32 (AILCALLBACK *SS_STREAM_CB)   (HSAMPLE  S, S16 *dest_mono_sample_buffer, S32 dest_buffer_size);
 
 //
 // Handle to sample and driver being managed by pipeline filter
@@ -2535,10 +2350,12 @@ typedef enum
    SP_FILTER_7,                 // Must be "MSS pipeline filter" provider
    SP_MERGE,                    // Must be "MSS mixer" provider
    N_SAMPLE_STAGES,             // Placeholder for end of list (= # of valid sample pipeline stages)
-   SP_OUTPUT = N_SAMPLE_STAGES, // Used to set/get prefs/attribs on a driver's output or matrix filter (if present) 
+   SP_OUTPUT = N_SAMPLE_STAGES, // Used to set/get prefs/attribs on a driver's output or matrix filter (if present)
    SAMPLE_ALL_STAGES            // Used to signify all pipeline stages, for shutdown
 }
 SAMPLESTAGE;
+
+#define N_SP_FILTER_STAGES 8    // SP_FILTER_0 ... SP_FILTER_7
 
 typedef enum
 {
@@ -2553,7 +2370,7 @@ typedef enum
 }
 DIGDRVSTAGE;
 
-typedef MSS_STRUCT
+typedef struct
    {
    ASI_STREAM_OPEN           ASI_stream_open;
    ASI_STREAM_PROCESS        ASI_stream_process;
@@ -2569,6 +2386,7 @@ typedef MSS_STRUCT
    HPROPERTY OUTPUT_SAMPLE_RATE;
    HPROPERTY OUTPUT_BITS;
    HPROPERTY OUTPUT_CHANNELS;
+   HPROPERTY OUTPUT_CHANNEL_MASK;
    HPROPERTY OUTPUT_RESERVOIR;
    HPROPERTY POSITION;
    HPROPERTY PERCENT_DONE;
@@ -2587,14 +2405,14 @@ typedef MSS_STRUCT
    }
 ASISTAGE;
 
-typedef MSS_STRUCT
+typedef struct
    {
-   struct _FLTPROVIDER FAR *provider;
-   HSAMPLESTATE             sample_state;
+   struct _FLTPROVIDER *provider;
+   HSAMPLESTATE             sample_state[MAX_SPEAKERS];
    }
 FLTSTAGE;
 
-typedef MSS_STRUCT
+typedef struct
 {
    S32       active;    // Pass-through if 0, active if 1
    HPROVIDER provider;
@@ -2609,7 +2427,7 @@ typedef MSS_STRUCT
 }
 SPINFO;
 
-typedef MSS_STRUCT
+typedef struct
 {
    S32       active;    // Pass-through if 0, active if 1
    HPROVIDER provider;
@@ -2629,7 +2447,7 @@ DPINFO;
 // Other data types
 //
 
-typedef enum 
+typedef enum
 {
    WIN32_TIMER_THREAD,   // Handle to thread used to run mixer and all other background tasks/timers
    WIN32_STREAM_THREAD,  // Handle to thread to do disk IO in the streaming API
@@ -2638,6 +2456,7 @@ typedef enum
    WIN32_LPDS,           // lpDirectSound pointer for HSAMPLE
    WIN32_LPDSB,          // lpDirectSoundBuffer pointer for HSAMPLE
    WIN32_HWND,           // HWND that will be used to open DirectSound driver
+   WIN32_POSITION_ERR,   // Nonzero if DirectSound play cursor stops moving (e.g., headphones removed)
 
    PS3_TIMER_THREAD,     // Handle to thread to run background task/timer
    PS3_STREAM_THREAD,    // Handle to thread to do disk IO in the streaming API
@@ -2646,7 +2465,12 @@ typedef enum
    PS3_AUDIO_LENGTH,     // length of cellaudio sound buffer
    PS3_AUDIO_POSITION,   // current playback position of cellaudio sound buffer
 
-   XB_TIMER_THREAD,      // Handle to thread used to run background tasks/timers 
+   PSP_TIMER_THREAD,     // Handle to thread to run background task/timer
+   PSP_STREAM_THREAD,    // Handle to thread to do disk IO in the streaming API
+   PSP_SUBMIT_THREAD,    // Handle to thread submitting chucks of audio to the hw
+   PSP_AUDIO_PORT,       // Port # Miles is using, -1 for simple audio, >= 0 for libwave
+
+   XB_TIMER_THREAD,      // Handle to thread used to run background tasks/timers
    XB_STREAM_THREAD,     // Handle to thread to do disk IO in the streaming API
    XB_LPDS,              // lpDirectSound pointer for HSAMPLE
    XB_LPDSB,             // lpDirectSoundBuffer pointer for HSAMPLE
@@ -2658,61 +2482,7 @@ typedef enum
 MSS_PLATFORM_PROPERTY;
 
 
-typedef MSS_STRUCT _SMPATTRIBS
-{
-   F32 cone_inner_angle;
-   F32 cone_outer_angle;
-   F32 cone_outer_volume;
-   F32 max_distance;
-   F32 min_distance;
-   S32 auto_3D_wet_atten;
-   S32 is_3D;
-   F32 X_pos;
-   F32 Y_pos;
-   F32 Z_pos;
-   F32 X_face; 
-   F32 Y_face; 
-   F32 Z_face; 
-   F32 X_up;   
-   F32 Y_up;   
-   F32 Z_up;
-   F32 X_meters_per_ms;
-   F32 Y_meters_per_ms;
-   F32 Z_meters_per_ms;
-   F32 channel_levels[MAX_SPEAKERS];
-   S32 n_channel_levels;
-   F32 exclusion;
-   F32 obstruction;
-   F32 occlusion;
-   S32 loop_count;
-   S32 loop_start_offset;
-   S32 loop_end_offset;
-   F32 LPF_cutoff;
-   S32 playback_rate;
-   U32 position;
-   F32 dry_level;
-   F32 wet_level;
-   U32 playback_status;
-
-   F32 FL_51_level;
-   F32 FR_51_level;
-   F32 BL_51_level;
-   F32 BR_51_level;
-   F32 C_51_level; 
-   F32 LFE_51_level;
-
-   F32 left_volume;     // Used in non-5.1 API modes
-   F32 right_volume;
-
-   SAMPLESTAGE filter_stages         [MAX_SAVED_FILTER_PROPERTIES];
-   HPROVIDER   filter_providers      [MAX_SAVED_FILTER_PROPERTIES];
-   UINTa       filter_property_tokens[MAX_SAVED_FILTER_PROPERTIES];
-   U32         filter_property_values[MAX_SAVED_FILTER_PROPERTIES];
-   S32         n_filter_properties;
-}
-SMPATTRIBS;
-
-typedef MSS_STRUCT _AIL_INPUT_INFO        // Input descriptor type
+typedef struct _AIL_INPUT_INFO        // Input descriptor type
 {
    U32        device_ID;       // DS LPGUID or wave device ID
    U32        hardware_format; // e.g., DIG_F_STEREO_16
@@ -2723,7 +2493,7 @@ typedef MSS_STRUCT _AIL_INPUT_INFO        // Input descriptor type
 }
 AIL_INPUT_INFO;
 
-typedef MSS_STRUCT _AILTIMER                 // Timer instance
+typedef struct _AILTIMER                 // Timer instance
 {
    U32      status;
    AILTIMERCB callback;
@@ -2751,26 +2521,15 @@ typedef MSS_STRUCT _AILTIMER                 // Timer instance
 
 #endif
 
-typedef MSS_STRUCT LOWPASS_CONSTANT_INFO
+typedef struct LOWPASS_INFO
 {
-  S32 A;
-  S32 B0, B1;
-} LOWPASS_CONSTANT_INFO;
-
-typedef MSS_STRUCT LOWPASS_UPDATED_INFO
-{
-  S32 XL0, XL1;
-  S32 YL0, YL1;
-  S32 XR0, XR1;
-  S32 YR0, YR1;
-} LOWPASS_UPDATED_INFO;
-
-typedef MSS_STRUCT LOWPASS_INFO
-{
-  LOWPASS_UPDATED_INFO u;
-  LOWPASS_CONSTANT_INFO c;
+  S32 X0, X1;
+  S32 Y0, Y1;
+  S32 A,  B0,  B1;
+  S32 flags;
+  S32 queuedA, queuedB;
+  F32 calculated_cut;
   F32 cutoff;
-  S32 on;
 } LOWPASS_INFO;
 
 typedef union STAGE_BUFFER
@@ -2779,28 +2538,28 @@ typedef union STAGE_BUFFER
   U8 data[ 1 ];
 } STAGE_BUFFER;
 
-typedef MSS_STRUCT _MSSVECTOR3D
+typedef struct _MSSVECTOR3D
 {
   F32 x;
   F32 y;
   F32 z;
 } MSSVECTOR3D;
 
-typedef MSS_STRUCT _S3DSTATE           // Portion of HSAMPLE that deals with 3D positioning
+typedef struct _S3DSTATE           // Portion of HSAMPLE that deals with 3D positioning
 {
    MSSVECTOR3D   position;         // 3D position
    MSSVECTOR3D   face;             // 3D orientation
    MSSVECTOR3D   up;               // 3D up-vector
    MSSVECTOR3D   velocity;         // 3D velocity
-                
+
    S32           doppler_valid;    // TRUE if OK to apply Doppler shift
    F32           doppler_shift;    // Scalar for S->playback rate
-                 
+
    F32           inner_angle;      // Cone attenuation parameters
    F32           outer_angle;      // (Angles divided by two and convered to rads for dot-product comparisons)
    F32           outer_volume;
    S32           cone_enabled;
-                 
+
    F32           max_dist;         // Sample distances
    F32           min_dist;
    S32           dist_changed;     // TRUE if min/max distances have changed and need to be sent to the hardware
@@ -2810,32 +2569,67 @@ typedef MSS_STRUCT _S3DSTATE           // Portion of HSAMPLE that deals with 3D 
 
    HSAMPLE       owner;            // May be NULL if used for temporary/internal calculations
    AILFALLOFFCB  falloff_function; // User function for min/max distance calculations, if desired
-} 
+}
 S3DSTATE;
 
-typedef MSS_STRUCT _SAMPLE           // Sample instance
+typedef struct _SMPBUF
 {
-   char       tag[4];            // HSAM
+   void const *start;          // Sample buffer address (W)
+   U32             len;            // Sample buffer size in bytes (W)
+   U32             pos;            // Index to next byte (R/W)
+   U32             done;           // Nonzero if buffer with len=0 sent by app
+   S32             reset_ASI;      // Reset the ASI decoder at the end of the buffer
+   S32             reset_seek_pos; // New destination offset in stream source data, for ASI codecs that care
+}
+SMPBUF;
 
-   HDIGDRIVER driver;            // Driver for playback
+typedef struct _SAMPLE             // Sample instance
+{
+   char       tag[4];              // HSAM
 
-   S32        index;             // Numeric index of this sample 
+   HDIGDRIVER driver;              // Driver for playback
 
-   void const FAR *start[2];     // Sample buffer address (W)
-   U32       len  [2];           // Sample buffer size in bytes (W)
-   U32       pos  [2];           // Index to next byte (R/W)
-   U32       done [2];           // Nonzero if buffer with len=0 sent by app
-   S32       reset_ASI [2];      // Reset the ASI decoder at the end of the buffer
-   S32       reset_seek_pos[2];  // New destination offset in stream source data, for ASI codecs that care
-   S32       exhaust_ASI;        // Are we prolonging the buffer lifetime until ASI output is exhausted?
+   S32        index;               // Numeric index of this sample
 
-   U32      src_fract;           // Fractional part of source address
-   S32      left_val;            // Mixer source value from end of last buffer
-   S32      right_val;           // Mixer source value from end of last buffer
+   SMPBUF     buf[8];              // Source data buffers
 
-   S32      current_buffer;      // Buffer # active (0/1)
-   S32      last_buffer;         // Last active buffer (for double-buffering)
+   U32        src_fract;           // Fractional part of source address
+
+   U32        mix_delay;           // ms until start mixing (decreased every buffer mix)
+   F32        max_output_mix_volume; // max_volume of any speaker at last mix
+
+   // size of the next dynamic arrays
+   U32      chan_buf_alloced;
+   U32      chan_buf_used;
+   U8*      chan_buf_ptr;
+
+   // these are dynamic arrays sized as n_channels long (so 1 for mono, 2 stereo, 6 for 5.1)
+   S32     *left_val;
+   S32     *right_val;
+   S32     *last_decomp;
+   LOWPASS_INFO *lp;             // low pass info
+
+   // these are dynamic arrays pointing to dynamic arrays, each of the sub arrays are n_channels long or [MAX_SPEAKERS][n_channels]
+   F32    **user_channel_levels; // Channel levels set by AIL_set_sample_channel_levels() [source_channels][driver->logical_channels]
+   S32    **cur_scale;           // Calculated 11-bit volume scale factors for current/previous mixing interval
+   S32    **prev_scale;          // (These are all indexed by build buffer*2, not speaker indexes!)
+   S32    **ramps_left;
+
+   // these are dynamic arrays
+   F32     *auto_3D_channel_levels;         // Channel levels set by 3D positioner (always 1.0 if not 3D-positioned)
+   F32     *speaker_levels;                 // one level per speaker (multiplied after user or 3D)
+   
+   
+   
+   S8       speaker_enum_to_source_chan[20];    // array[MSS_SPEAKER_xx] = -1 if not present, else channel #
+   S32      lp_any_on;                      // are any of the low pass filters on?
+   S32      user_channels_need_deinterlace; // do any of the user channels require a stereo sample to be deinterlaced?
+
+   S32      n_buffers;           // # of buffers (default = 2)
+   S32      head;
+   S32      tail;
    S32      starved;             // Buffer stream has run out of data
+   S32      exhaust_ASI;         // Are we prolonging the buffer lifetime until ASI output is exhausted?
 
    S32      loop_count;          // # of cycles-1 (1=one-shot, 0=indefinite)
    S32      loop_start;          // Starting offset of loop block (0=SOF)
@@ -2844,10 +2638,12 @@ typedef MSS_STRUCT _SAMPLE           // Sample instance
    S32      orig_loop_start;     // alignment constraints
    S32      orig_loop_end;
 
-   S32      format;              // DIG_F format (8/16 bits, mono/stereo)
-   U32      flags;               // DIG_PCM_SIGN / DIG_PCM_ORDER (stereo only)
+   S32      format;              // DIG_F format (8/16 bits, mono/stereo/multichannel)
+   S32      n_channels;          // # of channels (which can be >2 for multichannel formats)
+   U32      channel_mask;        // Same as WAVEFORMATEXTENSIBLE.dwChannelMask
 
-   S32      playback_rate;       // Playback rate in hertz
+   S32      original_playback_rate; // Playback rate in hertz
+   F32      playback_rate_factor;   // Fractional playback rate, normally 1.0
 
    F32      save_volume;         // Sample volume 0-1.0
    F32      save_pan;            // Mono panpot/stereo balance (0=L ... 1.0=R)
@@ -2857,20 +2653,12 @@ typedef MSS_STRUCT _SAMPLE           // Sample instance
 
    F32      wet_level;           // reverb level 0 to 1.0
    F32      dry_level;           // non-reverb level 0 to 1.0
+   F32      sys_level;           // system control
 
    F32      obstruction;
    F32      occlusion;
    F32      exclusion;
 
-   F32      auto_3D_channel_levels[MAX_SPEAKERS]; // Channel levels set by 3D positioner (always 1.0 if not 3D-positioned)
-   F32      user_channel_levels[MAX_SPEAKERS]; // Channel levels set by AIL_set_sample_channel_levels() [driver->logical_channels]
-   S32      cur_scale[MAX_SPEAKERS];           // Calculated 11-bit volume scale factors for current/previous mixing interval
-   S32      prev_scale[MAX_SPEAKERS];          // (These are all indexed by build buffer*2, not speaker indexes!)
-   S32      ramps_left[MAX_SPEAKERS];
-
-   LOWPASS_INFO lp;              // low pass info
-   F32      cutoff_param;         
-   F32      calculated_cut;
    S32      service_type;        // 1 if single-buffered; 2 if streamed
 
    AILSAMPLECB  SOB;             // Start-of-block callback function
@@ -2879,16 +2667,17 @@ typedef MSS_STRUCT _SAMPLE           // Sample instance
 
    SINTa    user_data  [8];      // Miscellaneous user data
    SINTa    system_data[8];      // Miscellaneous system data
+   SINTa    hl_marker_list;
 
    ADPCMDATA adpcm;
-
-   S32      last_decomp_left;    // last sample in an asi or adpcm buffer
-   S32      last_decomp_right;   // last sample in an asi or adpcm buffer
 
    S32      doeob;               // Flags to trigger callbacks
    S32      dosob;
    S32      doeos;
 
+   S32      vol_ramps;
+   S32      resamp_tolerance;
+   S32      enable_resamp_filter;
    //
    // Sample pipeline stages
    //
@@ -2904,53 +2693,7 @@ typedef MSS_STRUCT _SAMPLE           // Sample instance
    S3DSTATE S3D;                 // Software version applies 3D positioning only if is_3D == TRUE, but output filters always use it
 
 #ifdef MSS_VFLT_SUPPORTED
-   void FAR *voice;              // Optional object used by output filter to store per-sample information such as DS3D buffers
-#endif
-
-   //
-   // Platform-specific members
-   //
-
-#ifdef IS_XBOX
-   AILLPDIRECTSOUNDBUFFER pDSB;
-
-   S32 hw_rate;
-   S32 hw_channels;
-   S32 hw_bits;
-   S32 direct_mode;
-
-   STAGE_BUFFER * ds_staging_buffer;
-   S32 waiting_for_which_half;
-   S32 cleared_bufs;
-   S32 cleared_bytes;
-   S32 need_more_zeroes;
-   S32 ds_stage_size;
-
-   F32 shadow_FL;
-   F32 shadow_FR;
-   F32 shadow_FC;
-   F32 shadow_LF;
-   F32 shadow_BL;
-   F32 shadow_BR;
-
-   MSSVECTOR3D shadow_position;         
-   MSSVECTOR3D shadow_face;             
-   MSSVECTOR3D shadow_velocity;         
-   S32         shadow_playback_rate;
-   F32         shadow_volume;
-   F32         shadow_occlusion;
-   F32         shadow_obstruction;
-   F32         shadow_exclusion;
-   F32         shadow_min_dist;
-   F32         shadow_max_dist;
-   F32         shadow_inner_angle;
-   F32         shadow_outer_angle;
-   F32         shadow_outer_volume;
-   F32         shadow_wet_level;
-   F32         shadow_dry_level;
-   S32         shadow_auto_3D_atten;
-   S32         shadow_is_3D;
-
+   void *voice;              // Optional object used by output filter to store per-sample information such as DS3D buffers
 #endif
 
    F32 leftb_volume;         // Left/mono volume 0 to 1.0 (back)
@@ -2960,6 +2703,11 @@ typedef MSS_STRUCT _SAMPLE           // Sample instance
    F32 save_fb_pan;          // Sample volume 0-1.0
    F32 save_center;          // saved center level
    F32 save_low;             // saved sub level
+
+#if defined(HOST_SPU_PROCESS) || defined(MSS_SPU_PROCESS)
+   S32    spu_on;
+   //U32    align[1];
+#endif
 
 #ifdef IS_WINDOWS
 
@@ -2986,7 +2734,7 @@ SAMPLE;
 // used for AIL_process
 //
 
-typedef MSS_STRUCT _AILMIXINFO {
+typedef struct _AILMIXINFO {
   AILSOUNDINFO Info;
   ADPCMDATA mss_adpcm;
   U32 src_fract;
@@ -2995,7 +2743,7 @@ typedef MSS_STRUCT _AILMIXINFO {
 } AILMIXINFO;
 
 
-#if defined(IS_WINDOWS) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_XBOX) || defined(IS_XENON) || defined(IS_PS3) || defined(IS_PS2) || defined(IS_WII)
+#if defined(IS_WINDOWS) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_XENON) || defined(IS_PS3) || defined(IS_PS2) || defined(IS_WII) || defined(IS_PSP)
 
 DXDEC  U32     AILCALL  AIL_get_timer_highest_delay   (void);
 
@@ -3007,12 +2755,12 @@ typedef void * LPSTR;
 
 #define WHDR_DONE 0
 
-typedef MSS_STRUCT _WAVEIN
+typedef struct _WAVEIN
 {
   long temp;
 } * HWAVEIN;
 
-typedef MSS_STRUCT _WAVEHDR
+typedef struct _WAVEHDR
 {
   S32  dwFlags;
   S32  dwBytesRecorded;
@@ -3031,13 +2779,13 @@ typedef MSS_STRUCT _WAVEHDR
 
 #define N_WAVEIN_BUFFERS 8     // Use a ring of 8 buffers by default
 
-typedef MSS_STRUCT _DIG_INPUT_DRIVER FAR *HDIGINPUT; // Handle to digital input driver
+typedef struct _DIG_INPUT_DRIVER *HDIGINPUT; // Handle to digital input driver
 
 #ifdef IS_MAC
 
 #define AIL_DIGITAL_INPUT_DEFAULT 0
 
-typedef MSS_STRUCT _DIG_INPUT_DRIVER    // Handle to digital input driver
+typedef struct _DIG_INPUT_DRIVER    // Handle to digital input driver
 {
    C8  tag[4];                      // HDIN
    S32 input_enabled;               // 1 if enabled, 0 if not
@@ -3057,14 +2805,14 @@ typedef MSS_STRUCT _DIG_INPUT_DRIVER    // Handle to digital input driver
 
 #define AIL_DIGITAL_INPUT_DEFAULT ((U32)WAVE_MAPPER)
 
-typedef MSS_STRUCT _DIG_INPUT_DRIVER    // Handle to digital input driver
+typedef struct _DIG_INPUT_DRIVER    // Handle to digital input driver
 {
    C8     tag[4];                   // HDIN
 
    HTIMER background_timer;         // Background timer handle
 
    AIL_INPUT_INFO info;             // Input device descriptor
-   
+
    S32       input_enabled;         // 1 if enabled, 0 if not
 
    UINTa     callback_user;         // Callback user value
@@ -3074,9 +2822,9 @@ typedef MSS_STRUCT _DIG_INPUT_DRIVER    // Handle to digital input driver
    //
 
    U32       DMA_size;              // Size of each DMA sub-buffer in bytes
-   void FAR *DMA[N_WAVEIN_BUFFERS]; // Simulated DMA buffers
+   void *DMA[N_WAVEIN_BUFFERS]; // Simulated DMA buffers
 
-   U8        silence;               // Silence value for current format (0 or 128)
+   U32       silence;               // Silence value for current format (0 or 128)
 
    S32       device_active;         // 1 if buffers submittable, 0 if not
 
@@ -3095,38 +2843,38 @@ DIG_INPUT_DRIVER;
 
 #endif
 
-typedef MSS_STRUCT REVERB_CONSTANT_INFO
+typedef struct REVERB_CONSTANT_INFO
 {
-  F32 FAR* start0, FAR* start1, FAR* start2, FAR* start3, FAR* start4, FAR* start5;
-  F32 FAR* end0, FAR* end1, FAR* end2, FAR* end3, FAR* end4, FAR* end5;
+  F32* start0,* start1,* start2,* start3,* start4,* start5;
+  F32* end0,* end1,* end2,* end3,* end4,* end5;
   F32 C0, C1, C2, C3, C4, C5;
   F32 A;
   F32 B0, B1;
 } REVERB_CONSTANT_INFO;
 
-typedef MSS_STRUCT REVERB_UPDATED_INFO
+typedef struct REVERB_UPDATED_INFO
 {
-  F32 FAR * address0, FAR * address1, FAR * address2, FAR * address3, FAR * address4, FAR * address5;
+  F32 * address0, * address1, * address2, * address3, * address4, * address5;
   F32 X0, X1, Y0, Y1;
 } REVERB_UPDATED_INFO;
 
-typedef MSS_STRUCT REVERB_INFO
+typedef struct REVERB_INFO
 {
   REVERB_UPDATED_INFO u;
   REVERB_CONSTANT_INFO c;
 } REVERB_INFO;
 
-typedef MSS_STRUCT _MSS_RECEIVER_LIST
+typedef struct _MSS_RECEIVER_LIST
 {
    MSSVECTOR3D direction;                      // Normalized direction vector from listener
 
    S32         speaker_index[MAX_SPEAKERS];    // List of speakers affected by sounds in this direction
    F32         speaker_level[MAX_SPEAKERS];    // Each speaker's degree of effect from this source
-   S32         n_speakers_affected; 
+   S32         n_speakers_affected;
 }
 MSS_RECEIVER_LIST;
 
-typedef MSS_STRUCT _D3DSTATE
+typedef struct _D3DSTATE
 {
    S32         mute_at_max;
 
@@ -3149,25 +2897,26 @@ typedef MSS_STRUCT _D3DSTATE
    S32         n_ambient_channels;
 
    S32         directional_channels[MAX_SPEAKERS+1];    // Channel index, or -1 if virtual
-   MSSVECTOR3D listener_to_speaker [MAX_SPEAKERS+1];  
+   MSSVECTOR3D listener_to_speaker [MAX_SPEAKERS+1];
    S32         n_directional_channels;
 
    MSS_RECEIVER_LIST receiver_specifications[MAX_RECEIVER_SPECS];  // Constellation of receiver vectors
-   S32               n_receiver_specs;         
+   S32               n_receiver_specs;
 
    MSSVECTOR3D speaker_positions           [MAX_SPEAKERS]; // Listener-relative speaker locations
    F32         speaker_wet_reverb_response [MAX_SPEAKERS]; // Reverb sensitivity of each speaker
    F32         speaker_dry_reverb_response [MAX_SPEAKERS];
-} 
+}
 D3DSTATE;
 
-typedef enum 
+typedef enum
 {
+   MSS_MC_INVALID             = 0,       // Used for configuration-function errors
    MSS_MC_MONO                = 1,       // For compatibility with S32 channel param
    MSS_MC_STEREO              = 2,
    MSS_MC_USE_SYSTEM_CONFIG   = 0x10,    // Leave space between entries for new variations
    MSS_MC_HEADPHONES          = 0x20,    // with similar quality levels/speaker counts
-   MSS_MC_DOLBY_SURROUND      = 0x30,    
+   MSS_MC_DOLBY_SURROUND      = 0x30,
    MSS_MC_SRS_CIRCLE_SURROUND = 0x40,
    MSS_MC_40_DTS              = 0x48,
    MSS_MC_40_DISCRETE         = 0x50,
@@ -3183,11 +2932,14 @@ typedef enum
 }
 MSS_MC_SPEC;
 
-typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
+typedef struct _DIG_DRIVER          // Handle to digital audio driver
 {
    char        tag[4];              // HDIG
 
    HTIMER      backgroundtimer;     // Background timer handle
+
+   U32         num_mixes;           // incrementing number of mixes
+   S32         mix_ms;              // rough ms per mix
 
    F32         master_volume;       // Master sample volume 0-1.0
 
@@ -3199,35 +2951,18 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
 
    D3DSTATE    D3D;                 // 3D listener parms for all platforms
 
-#ifdef IS_XBOX
-   HDIGDRIVER          next;        // Pointer to next HDIGDRIVER in use
-   AILLPDIRECTSOUND    pDS;         // DirectSound output driver
-   S32                 use_3d;      // are we using 3D?
-   S32                 use_reverb;
-
-   STAGE_BUFFER * staging_buffer_ring;
-   STAGE_BUFFER * staging_mem_ptr;
-
-   MSSVECTOR3D shadow_listen_position;
-   MSSVECTOR3D shadow_listen_face;
-   MSSVECTOR3D shadow_listen_up;
-   MSSVECTOR3D shadow_listen_velocity;
-   F32         shadow_listen_doppler_factor;
-   F32         shadow_listen_distance_factor;
-   F32         shadow_listen_rolloff_factor;
-   S32         shadow_room_type;
-   F32         shadow_master_wet;     
-   F32         shadow_reverb_decay_time_s;    
-   F32         shadow_reverb_damping; 
-   F32         shadow_reverb_predelay_s;
-
-#else
-   S32         quiet;               // # of consecutive quiet sample periods
-
-   U32         hw_mode_flags;       // DIG_PCM_ flags for mode in use
-
-   S32         playing;             // Playback active if non-zero
+#if defined(IS_PSP) || defined(IS_XENON) || defined(IS_IPHONE) || defined(IS_MAC) || defined(IS_LINUX) // generic dig platforms
+#define IS_GENERICDIG
+   void*       dig_ss;              // Sound system ptr (embed in mss.h?)
+   void*       dig_heap;            // Sound system heap.
 #endif
+
+#ifdef IS_XENON
+   void* x2_voiceptr;           //! \todo get rid of this? Only expose dig_ss?
+#endif
+
+   S32         quiet;               // # of consecutive quiet sample periods
+   S32         playing;             // Playback active if non-zero
 
    S32         bytes_per_channel;            // # of bytes per channel (always 1 or 2 for 8- or 16-bit hardware output)
    S32         samples_per_buffer;           // # of samples per build buffer / half-buffer
@@ -3245,7 +2980,7 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
 #endif
 
    HSAMPLE     samples;             // Pointer to list of SAMPLEs
-   
+
    U32        *sample_status;       // SMP_ flags: _FREE, _DONE, _PLAYING, moved out of SAMPLEs for faster iteration
    S32         n_samples;           // # of SAMPLEs
 
@@ -3254,18 +2989,14 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
    //
    // Build buffers
    //
-   // In multichannel mode, source samples may be mixed into more than one 
+   // In multichannel mode, source samples may be mixed into more than one
    // build buffer
    //
 
    MSS_BB      build[MAX_SPEAKERS+EXTRA_BUILD_BUFFERS];
    S32         n_build_buffers;      // # of build buffers actually used for output processing
 
-   S32         build_size;           // # of bytes in build buffer 0, used for position comparisons
-
-#ifndef IS_XBOX
    S32         hardware_buffer_size; // Size of each output buffer
-#endif
 
 #ifdef IS_WINDOWS
 
@@ -3281,7 +3012,7 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
    LPWAVEHDR   first;               // Pointer to first WAVEHDR in chain
    S32         n_buffers;           // # of output WAVEHDRs in chain
 
-   LPWAVEHDR volatile FAR *return_list; // Circular list of returned WAVEHDRs
+   LPWAVEHDR volatile *return_list; // Circular list of returned WAVEHDRs
    S32       volatile      return_head; // Head of WAVEHDR list (insertion point)
    S32       volatile      return_tail; // Tail of WAVEHDR list (retrieval point)
 
@@ -3300,9 +3031,9 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
 
    UINTa                  dsHwnd;      // HWND used with DirectSound
 
-   AILLPDIRECTSOUNDBUFFER FAR * lpbufflist;   // List of pointers to secondary buffers
-   HSAMPLE         FAR *samp_list;      // HSAMPLE associated with each buffer
-   S32             FAR *sec_format;     // DIG_F_ format for secondary buffer
+   AILLPDIRECTSOUNDBUFFER * lpbufflist;   // List of pointers to secondary buffers
+   HSAMPLE         *samp_list;      // HSAMPLE associated with each buffer
+   S32             *sec_format;     // DIG_F_ format for secondary buffer
    S32                  max_buffs;      // Max. allowable # of secondary buffers
 
    //
@@ -3311,8 +3042,8 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
    // Note: # of "logical" (source) channels per sample = dig->channels_per_sample
    //       # of "physical" (DAC) channels per sample = dig->wformat.wf.nChannels
    //
-   //       These may be different if a matrix format (e.g., Dolby/SRS) 
-   //       is in use! 
+   //       These may be different if a matrix format (e.g., Dolby/SRS)
+   //       is in use!
    //
 
    MPCMWAVEFORMAT wformat;          // format from waveout open
@@ -3323,8 +3054,6 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
    //
 
    S32         released;            // has the sound manager been released?
-
-   U32         foreground_timer;    // Foreground timer handle
 
    HDIGDRIVER  next;                // Pointer to next HDIGDRIVER in use
    S32      callingCT;              // Calling EXE's task number (16 bit only)
@@ -3354,31 +3083,7 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
    U32 last_ds_play;
    U32 last_ds_write;
    U32 last_ds_move;
-#else
-
-   #ifdef IS_DOS
-
-   // must be first in the DOS section
-   void       *DMA[2];              // Protected-mode pointers to half-buffers
-                                    // (note that DMA[0] may != DMA_buf)
-
-
-   REALFAR     DMA_seg;             // Seg:off pointer to DMA buffers (off=0)
-   U32         DMA_sel;             // Selector for DMA buffers (off=0)
-   void       *DMA_buf;             // Protected-mode pointer to DMA buffers
-
-   S16        *buffer_flag;         // Protected-mode pointer to buffer flag
-   S32         last_buffer;         // Last active buffer flag value in driver
-
-   AIL_DRIVER *drvr;                // Base driver descriptor
-
-   DIG_DDT    *DDT;                 // Protected-mode pointer to DDT
-   DIG_DST    *DST;                 // Protected-mode pointer to DST
-
-   HDIGDRIVER  next;                // Pointer to next HDIGDRIVER in use
-
-   #endif
-
+   
 #endif
 
 #ifdef IS_X86
@@ -3390,6 +3095,8 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
    U32 last_ms_polled;
    U32 last_percent;
 
+   void * MC_buffer;
+
    //
    // Digital driver pipeline filter stages
    //
@@ -3397,11 +3104,11 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
    DPINFO pipeline[N_DIGDRV_STAGES];
 
 #ifdef MSS_VFLT_SUPPORTED
-   struct _FLTPROVIDER FAR *voice_filter;
+   struct _FLTPROVIDER *voice_filter;
    SS_STREAM_CB             stream_callback;
 #endif
 
-   struct _FLTPROVIDER FAR *matrix_filter;
+   struct _FLTPROVIDER *matrix_filter;
 
    //
    // Reverb
@@ -3413,7 +3120,7 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
 
    REVERB_INFO ri;
 
-   S32 FAR *reverb_build_buffer;
+   S32 *reverb_build_buffer;
    S32      reverb_total_size;
    S32      reverb_fragment_size;
    S32      reverb_buffer_size;
@@ -3428,24 +3135,6 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
 
    S32      reverb_head;
    S32      reverb_tail;
-
-#ifdef IS_XENON
-   HDIGDRIVER  next;                // Pointer to next HDIGDRIVER in use
-
-   void * hw_buf;
-   U32    hw_datarate;
-   U32    hw_align;
-   void * XA_voice;
-   S32    XA_buffer_size;
-   S32    XA_frag_cnt;
-   S32    XA_frag_size;
-   S32    XA_last_frag;
-   S32    XA_last_write;
-   S32    XA_skip_time;
-   U32    last_xa_play;
-   U32    last_xa_move;
-   S32    XA_last_timer;
-#endif
 
 #ifdef IS_PS3
    HDIGDRIVER  next;                // Pointer to next HDIGDRIVER in use
@@ -3465,6 +3154,9 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
    S32    snd_last_timer;
 #endif
 
+#ifdef IS_GENERICDIG
+   HDIGDRIVER next;
+#endif
 
 #ifdef IS_WII
    HDIGDRIVER  next;                // Pointer to next HDIGDRIVER in use
@@ -3487,7 +3179,7 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
    #ifdef AX_OUTPUT_BUFFER_DOUBLE
    AXVPB* voice[ 2 ];
    #endif
-   
+
 #endif
 
 
@@ -3500,33 +3192,22 @@ typedef MSS_STRUCT _DIG_DRIVER          // Handle to digital audio driver
    XAUDIOPACKET packet;
 #endif
 
-#ifdef IS_MAC
-   U32         n_samples_allocated;
-   U32         n_samples_used;
-   U32         n_samples_played;
-   U32         total_buffer_size;
 
-   HDIGDRIVER  next;                // Pointer to next HDIGDRIVER in use
-   U32         reset_works;         // TRUE if OK to do waveOutReset
-   U32         request_reset;       // If nonzero, do waveOutReset ASAP
-   S32         released;            // has the sound manager been released?
-
-   U32            loaded[2];
-   U32            work_buffer;
-   U32            play_buffer;
-
-   #if defined(__SOUND__)
-   ExtSoundHeader sound_header;
-   SndChannelPtr  sound_channel;
-   SndCallBackUPP global_callback;
-   Ptr            buffers[2];
+#if defined(HOST_SPU_PROCESS) || defined(MSS_SPU_PROCESS)
+   U32    spu_num;
+   S32    spu_on;
+   U32    spu_us_count;
+   U32    spu_ms_count;
+   U32    spu_last_ms_polled;
+   U32    spu_last_percent;
+   #ifdef IS_PS3
+     U32    align[ 3 ];
    #endif
 #endif
-
 }
 DIG_DRIVER;
 
-typedef MSS_STRUCT                      // MIDI status log structure
+typedef struct                      // MIDI status log structure
    {
    S32      program   [NUM_CHANS];  // Program Change
    S32      pitch_l   [NUM_CHANS];  // Pitch Bend LSB
@@ -3557,21 +3238,21 @@ typedef MSS_STRUCT                      // MIDI status log structure
    }
 CTRL_LOG;
 
-typedef MSS_STRUCT _SEQUENCE                  // XMIDI sequence state table
+typedef struct _SEQUENCE                  // XMIDI sequence state table
 {
    char     tag[4];                       // HSEQ
 
    HMDIDRIVER driver;                     // Driver for playback
 
-   U32      status;                       // SEQ_ flags
+   U32      status;                       // SEQ_ flagsstruct
 
-   void const   FAR *TIMB;                // XMIDI IFF chunk pointers
-   void const   FAR *RBRN;
-   void const   FAR *EVNT;
+   void const   *TIMB;                // XMIDI IFF chunk pointers
+   void const   *RBRN;
+   void const   *EVNT;
 
-   U8 const     FAR *EVNT_ptr;            // Current event pointer
+   U8 const     *EVNT_ptr;            // Current event pointer
 
-   U8      FAR *ICA;                      // Indirect Controller Array
+   U8      *ICA;                      // Indirect Controller Array
 
    AILPREFIXCB   prefix_callback;         // XMIDI Callback Prefix handler
    AILTRIGGERCB  trigger_callback;        // XMIDI Callback Trigger handler
@@ -3602,7 +3283,7 @@ typedef MSS_STRUCT _SEQUENCE                  // XMIDI sequence state table
    S32      beat_fraction;
    S32      time_per_beat;
 
-   void const FAR *FOR_ptrs[FOR_NEST];    // Loop stack
+   void const *FOR_ptrs[FOR_NEST];    // Loop stack
    S32      FOR_loop_count [FOR_NEST];
 
    S32      chan_map       [NUM_CHANS];   // Physical channel map for sequence
@@ -3620,16 +3301,16 @@ typedef MSS_STRUCT _SEQUENCE                  // XMIDI sequence state table
 
 } SEQUENCE;
 
-#if defined(IS_MAC) || defined(IS_LINUX) || defined(IS_XBOX) || defined(IS_XENON) || defined(IS_PS2) || defined(IS_PS3) || defined(IS_WII)
+#if defined(IS_MAC) || defined(IS_LINUX) || defined(IS_XENON) || defined(IS_PS2) || defined(IS_PS3) || defined(IS_WII) || defined(IS_PSP)
 
-MSS_STRUCT MIDIHDR;
-MSS_STRUCT MIDIOUT;
-typedef MSS_STRUCT MIDIOUT* HMIDIOUT;
+struct MIDIHDR;
+struct MIDIOUT;
+typedef struct MIDIOUT* HMIDIOUT;
 typedef HMIDIOUT* LPHMIDIOUT;
 
 #endif
 
-typedef MSS_STRUCT _MDI_DRIVER          // Handle to XMIDI driver
+typedef struct _MDI_DRIVER          // Handle to XMIDI driver
 {
    char     tag[4];                 // HMDI
 
@@ -3660,23 +3341,23 @@ typedef MSS_STRUCT _MDI_DRIVER          // Handle to XMIDI driver
 
    S32         released;            // has the hmidiout handle been released
    U32         deviceid;            // ID of the MIDI device
-   U8      FAR *sysdata;            // SysEx buffer
+   U8      *sysdata;            // SysEx buffer
 
 #endif
 
-#if defined(IS_XBOX) || defined(IS_XENON) || defined(IS_WII) || defined(IS_PS2) || defined(IS_PS3)
+#if defined(IS_XENON) || defined(IS_WII) || defined(IS_PS2) || defined(IS_PS3) || defined(IS_PSP)
    HMDIDRIVER  next;                // Pointer to next HMDIDRIVER in use
 #endif
 
 #ifdef IS_LINUX
-   struct MIDIHDR FAR *mhdr;        // SysEx header
+   struct MIDIHDR *mhdr;        // SysEx header
    HMDIDRIVER  next;                // Pointer to next HMDIDRIVER in use
    HMIDIOUT    hMidiOut;            // MIDI output driver
 #endif
 
 #ifdef IS_WINDOWS
 
-   struct midihdr_tag FAR *mhdr;               // SysEx header
+   struct midihdr_tag *mhdr;               // SysEx header
 
    HMDIDRIVER  next;                // Pointer to next HMDIDRIVER in use
    S32      callingCT;              // Calling EXE's task number (16 bit only)
@@ -3686,21 +3367,10 @@ typedef MSS_STRUCT _MDI_DRIVER          // Handle to XMIDI driver
 
 #else
 
-   #ifdef IS_DOS
-
-   S32        message_count;       // MIDI message count
-   S32        offset;              // MIDI buffer offset
-
-   AIL_DRIVER *drvr;               // Base driver descriptor
-
-   MDI_DDT    *DDT;                // Protected-mode pointer to DDT
-   MDI_DST    *DST;                // Protected-mode pointer to DST
-   #else
-     #if defined(IS_MAC)
-       struct MIDIHDR FAR *mhdr;           // SysEx header
-       HMDIDRIVER  next;                // Pointer to next HMDIDRIVER in use
-       HMIDIOUT    hMidiOut;            // MIDI output driver
-     #endif
+   #if defined(IS_MAC)
+     struct MIDIHDR *mhdr;           // SysEx header
+     HMDIDRIVER  next;                // Pointer to next HMDIDRIVER in use
+     HMIDIOUT    hMidiOut;            // MIDI output driver
    #endif
 
 #endif
@@ -3730,7 +3400,7 @@ typedef MSS_STRUCT                      // XMIDI RBRN IFF entry
    }
 RBRN_entry;
 
-typedef MSS_STRUCT                      // Wave library entry
+typedef struct                      // Wave library entry
 {
    S32   bank;                      // XMIDI bank, MIDI patch for sample
    S32   patch;
@@ -3741,24 +3411,23 @@ typedef MSS_STRUCT                      // Wave library entry
    U32   size;                      // Size of wave sample in bytes
 
    S32   format;                    // DIG_F format (8/16 bits, mono/stereo)
-   U32   flags;                     // DIG_PCM_SIGN / DIG_PCM_ORDER (stereo)
    S32   playback_rate;             // Playback rate in hertz
 }
 WAVE_ENTRY;
 
-typedef MSS_STRUCT                      // Virtual "wave synthesizer" descriptor
+typedef struct                      // Virtual "wave synthesizer" descriptor
 {
    HMDIDRIVER mdi;                  // MIDI driver for use with synthesizer
    HDIGDRIVER dig;                  // Digital driver for use with synthesizer
 
-   WAVE_ENTRY FAR *library;         // Pointer to wave library
+   WAVE_ENTRY *library;         // Pointer to wave library
 
    AILEVENTCB  prev_event_fn;       // Previous MIDI event trap function
    AILTIMBRECB prev_timb_fn;        // Previous timbre request trap function
 
    CTRL_LOG    controls;            // MIDI controller states
 
-   WAVE_ENTRY FAR *wave [NUM_CHANS];// Pointer to WAVE_ENTRY for each channel
+   WAVE_ENTRY *wave [NUM_CHANS];// Pointer to WAVE_ENTRY for each channel
 
    HSAMPLE     S    [MAX_W_VOICES]; // List of HSAMPLE voices
    S32         n_voices;            // Actual # of voices allocated to synth
@@ -3774,22 +3443,8 @@ typedef MSS_STRUCT                      // Virtual "wave synthesizer" descriptor
 }
 WAVE_SYNTH;
 
-typedef WAVE_SYNTH FAR * HWAVESYNTH;// Handle to virtual wave synthesizer
+typedef WAVE_SYNTH * HWAVESYNTH;// Handle to virtual wave synthesizer
 
-//
-// Handle to thread which called AIL_startup()
-//
-// This thread is suspended by MSS callback threads, to simulate DOS-style
-// interrupt handler behavior
-//
-
-#ifdef IS_WIN32API
-
-#ifdef NTAPI
-extern HANDLE hAppThread;
-#endif
-
-#endif
 
 //
 // Background flag for timers
@@ -3800,9 +3455,9 @@ extern volatile S32   AIL_bkgnd_flag;
 //
 // Global preference array
 //
-
+#ifndef MSS_SPU_PROCESS
 extern SINTa          AIL_preference   [N_PREFS];
-
+#endif
 //
 // DIG_DRIVER list
 //
@@ -3819,217 +3474,77 @@ extern HMDIDRIVER     MDI_first;
 // Miscellaneous system services
 //
 
-#define FILE_READ_WITH_SIZE ((void FAR*)(S32)-1)
+#define FILE_READ_WITH_SIZE ((void*)(S32)-1)
 
-#ifndef NO_OLD_SYS_FUNCTIONS
-
-#define MEM_alloc_lock AIL_mem_alloc_lock
-#define MEM_free_lock  AIL_mem_free_lock
-#define FILE_error     AIL_file_error
-#define FILE_size      AIL_file_size
-#define FILE_read      AIL_file_read
-#define FILE_write     AIL_file_write
-
-#ifdef IS_DOS
-
-#define MEM_alloc        AIL_mem_alloc
-#define MEM_free         AIL_mem_free
-#define MEM_use_malloc   AIL_mem_use_malloc
-#define MEM_use_free     AIL_mem_use_free
-#define MEM_alloc_DOS    AIL_mem_alloc_DOS
-#define MEM_free_DOS     AIL_mem_free_DOS
-#define VMM_lock_range   AIL_vmm_lock_range
-#define VMM_unlock_range AIL_vmm_unlock_range
-#define VMM_lock         AIL_vmm_lock
-#define VMM_unlock       AIL_vmm_unlock
-
-#endif
-
-#endif
 
 extern S32 AILCALLBACK SP_ASI_DECODER_callback(UINTa     user,
-                                               void FAR *dest,
+                                               void *dest,
                                                S32       bytes_requested,
                                                S32       offset);
 
-DXDEC  void FAR * AILCALL AIL_mem_alloc_lock(UINTa     size);
-DXDEC  void       AILCALL AIL_mem_free_lock (void FAR *ptr);
+DXDEC  void * AILCALL AIL_mem_alloc_lock(UINTa     size);
+DXDEC  void       AILCALL AIL_mem_free_lock (void *ptr);
 
 DXDEC  S32        AILCALL AIL_file_error   (void);
 
-DXDEC  S32        AILCALL AIL_file_size    (char const FAR  *filename);
+DXDEC  S32        AILCALL AIL_file_size    (char const  *filename);
 
-DXDEC  void FAR * AILCALL AIL_file_read    (char const FAR   *filename,
-                                           void FAR *dest);
+DXDEC  void * AILCALL AIL_file_read    (char const   *filename,
+                                           void *dest);
 
-DXDEC  S32        AILCALL AIL_file_write   (char const FAR    *filename,
-                                            void const FAR  *buf,
+DXDEC  S32        AILCALL AIL_file_write   (char const    *filename,
+                                            void const  *buf,
                                             U32       len);
 
 DXDEC  S32        AILCALL AIL_WAV_file_write
-                                           (char const FAR    *filename,
-                                            void const FAR  *buf,
+                                           (char const    *filename,
+                                            void const  *buf,
                                             U32       len,
                                             S32       rate,
                                             S32       format);
 
-DXDEC  S32        AILCALL AIL_file_append  (char const FAR *filename,
-                                            void const FAR *buf, U32 len);
+DXDEC  S32        AILCALL AIL_file_append  (char const *filename,
+                                            void const *buf, U32 len);
 
-#ifndef IS_DOS
-
-typedef void FAR * (AILCALLBACK FAR *AILMEMALLOCCB)(UINTa size);
-typedef void (AILCALLBACK FAR *AILMEMFREECB)(void FAR *);
+typedef void * (AILCALLBACK *AILMEMALLOCCB)(UINTa size);
+typedef void (AILCALLBACK *AILMEMFREECB)(void *);
 
 DXDEC AILMEMALLOCCB AILCALL AIL_mem_use_malloc(AILMEMALLOCCB fn);
 DXDEC AILMEMFREECB AILCALL AIL_mem_use_free  (AILMEMFREECB fn);
 
-#endif
-
-#ifdef ON_MAC_USE_FSS
-
-DXDEC  S32        AILCALL AIL_file_fss_size(FSSpec const FAR  *filename);
-
-DXDEC  void FAR * AILCALL AIL_file_fss_read(FSSpec const FAR   *filename,
-                                            void FAR *dest);
-
-DXDEC  S32        AILCALL AIL_file_fss_write(FSSpec const FAR    *filename,
-                                             void const FAR  *buf,
-                                             U32       len);
-
-DXDEC  S32        AILCALL AIL_file_fss_attrib_write
-                                            (FSSpec const FAR    *filename,
-                                             void const FAR  *buf,
-                                             U32       len,
-                                             U32       type,
-                                             U32       creator );
-
-DXDEC  S32        AILCALL AIL_WAV_file_fss_write
-                                           (FSSpec const FAR    *filename,
-                                            void const FAR  *buf,
-                                            U32       len,
-                                            S32       rate,
-                                            S32       format);
-
-#endif
-
-#ifdef IS_DOS
-
-extern void * AILCALLBACK (*AIL_mem_alloc) (UINTa);
-extern void   AILCALLBACK (*AIL_mem_free)  (void *);
-
-typedef void * (AILCALLBACK *AILMEMALLOCCB)(UINTa size);
-typedef void (AILCALLBACK *AILMEMFREECB)(void *);
-  
-AILMEMALLOCCB cdecl AIL_mem_use_malloc(AILMEMALLOCCB allocf);
-AILMEMFREECB cdecl AIL_mem_use_free  (AILMEMFREECB freef);
-
-//
-// Other memory-management functions
-//
-
-DXDEC  S32   AILCALL AIL_mem_alloc_DOS (U32  n_paras,
-                                        void **protected_ptr,
-                                        U32 *segment_far_ptr,
-                                        U32 *selector);
-
-DXDEC  void  AILCALL AIL_mem_free_DOS (void  *protected_ptr,
-                                       U32  segment_far_ptr,
-                                       U32  selector);
-
-DXDEC  S32   AILCALL AIL_vmm_lock_range   (void  *p1, void *p2);
-DXDEC  S32   AILCALL AIL_vmm_unlock_range (void  *p1, void *p2);
-
-DXDEC  S32   AILCALL AIL_vmm_lock         (void  *start, U32 size);
-DXDEC  S32   AILCALL AIL_vmm_unlock       (void  *start, U32 size);
-
-DXDEC  U32  AILCALL AIL_sel_base         (U32  sel);
-
-DXDEC  void   AILCALL AIL_sel_set_limit  (U32  sel,
-                                          U32  limit);
-//
-// Last IO_PARMS structure used to attempt device detection
-//
-
-extern IO_PARMS       AIL_last_IO_attempt;
-
-//
-// Low-level support services
-//
-
-DXDEC REALFAR AILCALL  AIL_get_real_vect            (U32       vectnum);
-
-DXDEC void    AILCALL  AIL_set_real_vect            (U32       vectnum,
-                                                     REALFAR   real_ptr);
-
-DXDEC void    AILCALL  AIL_set_USE16_ISR            (S32        IRQ,
-                                                     REALFAR    real_base,
-                                                     U32        ISR_offset);
-
-DXDEC void    AILCALL  AIL_restore_USE16_ISR        (S32        IRQ);
-
-DXDEC U32     AILCALL  AIL_disable_interrupts       (void);
-DXDEC void    AILCALL  AIL_restore_interrupts       (U32        FD_register);
-
-DXDEC void    AILCALL  AIL_switch_stack             (void       *stack,
-                                                     U32        size,
-                                                     U32        *SS,
-                                                     void       **ESP,
-                                                     void       **EBP);
-
-DXDEC void    AILCALL  AIL_restore_stack            (U32        SS,
-                                                     void       *ESP,
-                                                     void       *EBP);
-
-DXDEC S32     AILCALL  AIL_call_driver              (AIL_DRIVER *drvr,
-                                                     S32        fn,
-                                                     VDI_CALL   *in,
-                                                     VDI_CALL   *out);
-
-DXDEC S32     AILCALL  AIL_read_INI                 (AIL_INI    *INI,
-                                                     char       *filename);
-
-DXDEC U32     AILCALL  AIL_interrupt_divisor        (void);
-
-#endif
-
 
 #ifdef __WATCOMC__
-
 #pragma warning 14 10      // disable "no reference to symbol" warning on function args
-
 void MSSBreakPoint();
 #pragma aux MSSBreakPoint = "int 3";
-
-#else
-#ifdef IS_PS2
-
+#elif defined(IS_PS2) || defined(IS_PSP)
 #define MSSBreakPoint() __asm__("break 0")
-
-#else
-
-#if defined(IS_XENON) || defined(IS_PS3) || defined(IS_WII)
-
-#define MSSBreakPoint() (*(int *) 0 = 0);
-
-#else
-
-#ifdef IS_WIN64
+#elif defined( IS_XENON )
+void __twi (const unsigned int to, int a, const int b);
+#define MSSBreakPoint() {__twi(31,0,22);}
+#elif defined( IS_SPU )
+#define MSSBreakPoint() __asm volatile ("stopd 0,1,1");
+#elif defined( IS_PS3 )
+#define MSSBreakPoint() __asm__ volatile("trap");
+#elif defined( IS_WII )
+#define MSSBreakPoint() __asm__ volatile("trap");
+#elif defined( IS_SPU )
+#define MSSBreakPoint() __asm volatile ("stopd 0,1,1");
+#elif defined(IS_WIN64)
 #define MSSBreakPoint() __debugbreak();
-#else
+#elif defined(IS_WINDOWS)
 #define MSSBreakPoint() __asm {int 3}
+#else
+#define MSSBreakPoint() *(int*)0=0;
 #endif
 
-#endif
-#endif
-#endif
 
 //
 // Compiler-independent CRTL helper functions for PS2
 // Exported here for use in demo programs as well as MSS itself
 //
 
-#ifdef IS_PS2
+#if defined(IS_PS2) || defined(IS_PSP)
 
 DXDEC F32 AILCALL AIL_sin(F32 x);
 DXDEC F32 AILCALL AIL_cos(F32 x);
@@ -4045,16 +3560,16 @@ DXDEC F32 AILCALL AIL_log( F32 x );
 DXDEC F32 AILCALL AIL_pow( F32 x, F32 p );
 DXDEC F32 AILCALL AIL_frexpf( F32 x, S32 *pw2 );
 DXDEC F32 AILCALL AIL_ldexpf( F32 x, S32 pw2 );
-#define AIL_exp(x) AIL_pow(2.718281828F,(x)) 
+#define AIL_exp(x) AIL_pow(2.718281828F,(x))
 
 #else
-                 
+
 #ifdef IS_WATCOM
 #define AIL_pow   powf
 #define AIL_tan   tanf
 #else
-#define AIL_pow   pow
 #define AIL_tan   tan
+#define AIL_pow   pow
 #endif
 
 #define AIL_sin   sin
@@ -4063,7 +3578,13 @@ DXDEC F32 AILCALL AIL_ldexpf( F32 x, S32 pw2 );
 #define AIL_atan  atan
 #define AIL_ceil  ceil
 #define AIL_floor floor
+
+#if defined(IS_PS3) && !defined(IS_SPU)
+DXDEC F32 AILCALL AIL_fsqrt( F32 val );
+#else
 #define AIL_fsqrt(arg) ((F32) sqrt(arg))
+#endif
+
 #define AIL_fabs  fabs
 #define AIL_log10 log10
 #define AIL_log   log
@@ -4079,46 +3600,28 @@ DXDEC C8 * AILCALL AIL_ftoa(F32 val);
 // High-level support services
 //
 
-#ifdef IS_DOS
-
-#ifdef __SW_3R
-extern S32 AILCALL AIL_startup_reg               (void);
-#define AIL_startup AIL_startup_reg
-#else
-extern S32 AILCALL AIL_startup_stack             (void);
-#define AIL_startup AIL_startup_stack
-#endif
-
-#define AIL_quick_startup(ud,um,opr,opb,ops) AIL_quick_startup_with_start(&AIL_startup,ud,um,opr,opb,ops)
-
-#define AIL_get_preference(number) (AIL_preference[number])
-
-#else
-
 DXDEC  S32     AILCALL  AIL_startup                   (void);
 
 DXDEC  SINTa   AILCALL  AIL_get_preference            (U32         number);
-
-#endif
 
 DXDEC  void    AILCALL  AIL_shutdown                  (void);
 
 DXDEC  SINTa   AILCALL  AIL_set_preference            (U32         number,
                                                        SINTa       value);
 
-DXDEC char FAR *AILCALL  AIL_last_error                (void);
+DXDEC char *AILCALL  AIL_last_error                (void);
 
-DXDEC  void    AILCALL  AIL_set_error                 (char const FAR * error_msg);
+DXDEC  void    AILCALL  AIL_set_error                 (char const * error_msg);
 
 //
 // Low-level support services
 //
 
 DXDEC  void
-#if !defined(IS_MAC) && !defined(IS_LINUX) && !defined(IS_PS2) && !defined(IS_PS3) && !defined(IS_WII)
+#if !defined(IS_MAC) && !defined(IS_LINUX) && !defined(IS_PS2) && !defined(IS_PS3) && !defined(IS_WII) && !defined(IS_PSP)
 __cdecl
 #endif
-AIL_debug_printf              (C8 const FAR *fmt, ...);
+AIL_debug_printf              (C8 const *fmt, ...);
 
 #ifdef IS_X86
 
@@ -4129,7 +3632,7 @@ DXDEC  U32     AILCALL  AIL_MMX_available             (void);
 DXDEC  void    AILCALL  AIL_lock                      (void);
 DXDEC  void    AILCALL  AIL_unlock                    (void);
 
-#if defined(IS_WIN32API) || defined(IS_MAC) || defined(IS_LINUX)
+#if !defined(IS_WII) && !defined(IS_PS2)
 
 DXDEC  void    AILCALL  AIL_lock_mutex                (void);
 DXDEC  void    AILCALL  AIL_unlock_mutex              (void);
@@ -4140,12 +3643,9 @@ DXDEC  void    AILCALL  AIL_delay                     (S32         intervals);
 
 DXDEC  S32     AILCALL  AIL_background                (void);
 
-#ifndef IS_DOS
-
-DXDEC  AILTRACECB AILCALL AIL_register_trace_callback (AILTRACECB cb, 
+DXDEC  AILTRACECB AILCALL AIL_register_trace_callback (AILTRACECB cb,
                                                        S32 level);
 
-#endif
 
 //
 // Process services
@@ -4174,30 +3674,10 @@ DXDEC  void    AILCALL  AIL_stop_all_timers           (void);
 DXDEC  void    AILCALL  AIL_release_timer_handle      (HTIMER      timer);
 DXDEC  void    AILCALL  AIL_release_all_timers        (void);
 
-#ifdef IS_WIN32
-
-/*
-#ifndef __RADINDLL__
-
-// static function that handles shutdown
-int __cdecl MSS_auto_cleanup(void);
-
-#ifdef _MSC_VER
-// on MSVC, automatically register a cleanup function
-#define AIL_startup() (MSS_auto_cleanup(),AIL_startup())
-#endif
-
-#endif
-*/
-
-DXDEC  HWND    AILCALL  AIL_HWND                      (void);
-
-#else
-  #ifdef IS_MAC
-   #if defined(__PROCESSES__)
-    DXDEC ProcessSerialNumber AIL_Process(void);
-   #endif
-  #endif
+#ifdef IS_MAC
+    #if defined(__PROCESSES__)
+        DXDEC ProcessSerialNumber AIL_Process(void);
+    #endif
 #endif
 
 //
@@ -4212,10 +3692,63 @@ DXDEC  HWND    AILCALL  AIL_HWND                      (void);
 #define AIL_OPEN_DIGITAL_NEED_REVERB      32
 #define AIL_OPEN_DIGITAL_USE_IOP_CORE0    64
 
+#define AIL_OPEN_DIGITAL_USE_SPU0        (1<<24)
+#define AIL_OPEN_DIGITAL_USE_SPU1        (2<<24)
+#define AIL_OPEN_DIGITAL_USE_SPU2        (3<<24)
+#define AIL_OPEN_DIGITAL_USE_SPU3        (4<<24)
+#define AIL_OPEN_DIGITAL_USE_SPU4        (5<<24)
+#define AIL_OPEN_DIGITAL_USE_SPU5        (6<<24)
+#define AIL_OPEN_DIGITAL_USE_SPU6        (7<<24)
+
+#define AIL_OPEN_DIGITAL_USE_SPU( num )   ( ( num + 1 ) << 24 )
+
+#ifdef IS_GENERICDIG
+
+    struct _RadSoundSystem;
+    typedef S32 (*RADSS_OPEN_FUNC)(struct _RadSoundSystem* i_SoundSystem, U32 i_MinBufferSizeInMs, U32 i_Frequency, U32 i_ChannelCount, U32 i_MaxLockSize, U32 i_Flags);
+
+    DXDEC HDIGDRIVER AILCALL AIL_open_generic_digital_driver(U32 frequency, S32 bits, S32 channel, U32 flags, RADSS_OPEN_FUNC dig_open);
+
+    #ifdef IS_WIN32
+        DXDEC RADSS_OPEN_FUNC AILCALL RADSS_DSInstallDriver(UINTa, UINTa);
+        DXDEC RADSS_OPEN_FUNC AILCALL RADSS_WOInstallDriver(UINTa, UINTa);
+
+        #define AIL_open_digital_driver(frequency, bits, channel, flags) \
+            AIL_open_generic_digital_driver(frequency, bits, channel, flags, RADSS_DSInstallDriver(0, 0));
+
+    #elif defined(IS_PSP)
+        DXDEC RADSS_OPEN_FUNC AILCALL RADSS_PSPInstallDriver(UINTa, UINTa);
+
+        #define AIL_open_digital_driver(frequency, bits, channel, flags) \
+            AIL_open_generic_digital_driver(frequency, bits, channel, flags, RADSS_PSPInstallDriver(0, 0));
+
+    #elif defined(IS_XENON)
+        DXDEC RADSS_OPEN_FUNC AILCALL RADSS_XAudio2InstallDriver(UINTa, UINTa);
+
+        #define AIL_open_digital_driver(frequency, bits, channel, flags) \
+            AIL_open_generic_digital_driver(frequency, bits, channel, flags, RADSS_XAudio2InstallDriver(0, 0));
+
+    #elif defined(IS_MAC) || defined(IS_IPHONE)
+        DXDEC RADSS_OPEN_FUNC AILCALL RADSS_OalInstallDriver(UINTa, UINTa);
+        DXDEC RADSS_OPEN_FUNC AILCALL RADSS_CAInstallDriver(UINTa, UINTa);
+
+        #define AIL_open_digital_driver(frequency, bits, channel, flags) \
+            AIL_open_generic_digital_driver(frequency, bits, channel, flags, RADSS_CAInstallDriver(0, 0));
+
+    #elif defined(IS_LINUX)
+        DXDEC RADSS_OPEN_FUNC AILCALL RADSS_OalInstallDriver(UINTa, UINTa);
+
+        #define AIL_open_digital_driver(frequency, bits, channel, flags) \
+            AIL_open_generic_digital_driver(frequency, bits, channel, flags, RADSS_OalInstallDriver(0, 0));
+    #endif
+#else // IS_GENERICDIG
+
 DXDEC HDIGDRIVER AILCALL AIL_open_digital_driver( U32 frequency,
                                                   S32 bits,
                                                   S32 channel,
                                                   U32 flags );
+
+#endif // not IS_GENERICDIG
 
 DXDEC void AILCALL AIL_close_digital_driver( HDIGDRIVER dig );
 
@@ -4244,15 +3777,6 @@ DXDEC  S32          AILCALL AIL_digital_handle_reacquire
     FreeLibrary(l);                     \
   }                                     \
 }
-
-#if 0
-DXDEC  S32          AILCALL AIL_waveOutOpen          (HDIGDRIVER   FAR *drvr,
-                                                      LPHWAVEOUT   FAR  *lphWaveOut,
-                                                      S32             wDeviceID,
-                                                      LPWAVEFORMAT      lpFormat);
-
-DXDEC  void         AILCALL AIL_waveOutClose          (HDIGDRIVER drvr);
-#endif
 
 DXDEC  S32          AILCALL AIL_digital_handle_release(HDIGDRIVER drvr);
 
@@ -4325,44 +3849,19 @@ DXDEC  S32          AILCALL AIL_digital_handle_release(HDIGDRIVER drvr);
 DXDEC  S32          AILCALL AIL_digital_handle_reacquire
                                                      (HDIGDRIVER drvr);
 
-#else
-
-#ifdef IS_DOS
-
-//
-// DOS installation services
-//
-
-DXDEC IO_PARMS *   AILCALL AIL_get_IO_environment    (AIL_DRIVER *drvr);
-
-DXDEC AIL_DRIVER*  AILCALL AIL_install_driver        (U8 const     *driver_image,
-                                                      U32       n_bytes);
-
-DXDEC void         AILCALL AIL_uninstall_driver      (AIL_DRIVER *drvr);
-
-DXDEC S32         AILCALL AIL_install_DIG_INI       (HDIGDRIVER *dig);
-
-DXDEC HDIGDRIVER   AILCALL AIL_install_DIG_driver_file
-                                                    (char const *filename,
-                                                     IO_PARMS   *IO);
-
-DXDEC void         AILCALL AIL_uninstall_DIG_driver  (HDIGDRIVER  dig);
-
-
-DXDEC HDIGDRIVER   AILCALL AIL_install_DIG_driver_image
-                                                    (void const    *driver_image,
-                                                     U32     size,
-                                                     IO_PARMS *IO);
-#endif
 #endif
 #endif
 #endif
 
-DXDEC char FAR*     AILCALL AIL_set_redist_directory(char const FAR*dir);
+DXDEC char*     AILCALL AIL_set_redist_directory(char const*dir);
 
 DXDEC  S32          AILCALL AIL_background_CPU_percent (void);
 
 DXDEC  S32          AILCALL AIL_digital_CPU_percent   (HDIGDRIVER dig);
+
+#ifdef HOST_SPU_PROCESS
+DXDEC  S32          AILCALL AIL_digital_SPU_percent   (HDIGDRIVER dig);
+#endif
 
 DXDEC  S32          AILCALL AIL_digital_latency       (HDIGDRIVER dig);
 
@@ -4371,77 +3870,91 @@ DXDEC  HSAMPLE      AILCALL AIL_allocate_sample_handle
 
 DXDEC void          AILCALL AIL_set_speaker_configuration
                                                       (HDIGDRIVER       dig,
-                                                       MSSVECTOR3D FAR *array,
+                                                       MSSVECTOR3D *array,
                                                        S32              n_channels,
                                                        F32              falloff_power);
 
-DXDEC MSSVECTOR3D FAR * 
+DXDEC MSSVECTOR3D *
                     AILCALL AIL_speaker_configuration
                                                       (HDIGDRIVER       dig,
-                                                       S32         FAR *n_physical_channels,
-                                                       S32         FAR *n_logical_channels,
-                                                       F32         FAR *falloff_power,
-                                                       MSS_MC_SPEC FAR *channel_spec);
+                                                       S32         *n_physical_channels,
+                                                       S32         *n_logical_channels,
+                                                       F32         *falloff_power,
+                                                       MSS_MC_SPEC *channel_spec);
 
 DXDEC void          AILCALL AIL_set_listener_relative_receiver_array
                                                       (HDIGDRIVER             dig,
-                                                       MSS_RECEIVER_LIST FAR *array,
+                                                       MSS_RECEIVER_LIST *array,
                                                        S32                    n_receivers);
 
-DXDEC MSS_RECEIVER_LIST FAR * 
+DXDEC MSS_RECEIVER_LIST *
                     AILCALL AIL_listener_relative_receiver_array
                                                       (HDIGDRIVER dig,
-                                                       S32   FAR *n_receivers);
-#ifndef IS_XBOX
-
+                                                       S32   *n_receivers);
 DXDEC void         AILCALL AIL_set_speaker_reverb_levels
-                                                      (HDIGDRIVER dig, 
-                                                       F32 FAR   *wet_array,
-                                                       F32 FAR   *dry_array,
-                                                       S32        n_levels);
+                                                      (HDIGDRIVER   dig,
+                                                       F32     *wet_array,
+                                                       F32     *dry_array,
+                                                       MSS_SPEAKER const *speaker_index_array,
+                                                       S32          n_levels);
 
-DXDEC void         AILCALL AIL_speaker_reverb_levels  (HDIGDRIVER     dig,
-                                                       S32 FAR       *n_levels,
-                                                       F32 FAR * FAR *wet_array,
-                                                       F32 FAR * FAR *dry_array);
+DXDEC S32          AILCALL AIL_speaker_reverb_levels  (HDIGDRIVER                   dig,
+                                                       F32               * *wet_array,
+                                                       F32               * *dry_array,
+                                                       MSS_SPEAKER const * *speaker_index_array);
 
-#endif
 
-DXDEC  
-S32   AILEXPORT AIL_calculate_3D_channel_levels      (HDIGDRIVER       dig, //)
-                                                      F32         FAR *channel_levels,
-                                                      MSSVECTOR3D FAR *src_pos,
-                                                      MSSVECTOR3D FAR *src_face,
-                                                      MSSVECTOR3D FAR *src_up,
-                                                      F32              src_inner_angle,
-                                                      F32              src_outer_angle,
-                                                      F32              src_outer_volume,
-                                                      F32              src_max_dist,
-                                                      F32              src_min_dist,
-                                                      MSSVECTOR3D FAR *listen_pos, 
-                                                      MSSVECTOR3D FAR *listen_face,
-                                                      MSSVECTOR3D FAR *listen_up,  
-                                                      F32              rolloff_factor,
-                                                      MSSVECTOR3D FAR *doppler_velocity,
-                                                      F32         FAR *doppler_shift);
-                                                      
+DXDEC
+void AILCALL AIL_set_sample_speaker_scale_factors (HSAMPLE                 S, //)
+                                                   MSS_SPEAKER const * dest_speaker_indexes,
+                                                   F32         const * levels,
+                                                   S32                     n_levels );
+DXDEC
+void AILCALL AIL_sample_speaker_scale_factors (HSAMPLE                 S, //)
+                                               MSS_SPEAKER const * dest_speaker_indexes,
+                                               F32               * levels,
+                                               S32                     n_levels );
+
+DXDEC
+S32 AILEXPORT AIL_set_sample_is_3D                   (HSAMPLE                S, //)
+                                                      S32                    onoff);
+
+
+DXDEC
+S32   AILEXPORT AIL_calculate_3D_channel_levels      (HDIGDRIVER                   dig, //)
+                                                      F32                     *channel_levels,
+                                                      MSS_SPEAKER const * *speaker_array,
+                                                      MSSVECTOR3D             *src_pos,
+                                                      MSSVECTOR3D             *src_face,
+                                                      MSSVECTOR3D             *src_up,
+                                                      F32                          src_inner_angle,
+                                                      F32                          src_outer_angle,
+                                                      F32                          src_outer_volume,
+                                                      F32                          src_max_dist,
+                                                      F32                          src_min_dist,
+                                                      MSSVECTOR3D             *listen_pos,
+                                                      MSSVECTOR3D             *listen_face,
+                                                      MSSVECTOR3D             *listen_up,
+                                                      F32                          rolloff_factor,
+                                                      MSSVECTOR3D             *doppler_velocity,
+                                                      F32                     *doppler_shift);
+
 
 DXDEC  void         AILCALL AIL_release_sample_handle (HSAMPLE S);
 
-DXDEC  void         AILCALL AIL_init_sample         (HSAMPLE S,
-                                                     S32     format,
-                                                     U32     flags);
+DXDEC  S32          AILCALL AIL_init_sample         (HSAMPLE S,
+                                                     S32     format);
 
 DXDEC  S32          AILCALL AIL_set_sample_file       (HSAMPLE   S,
-                                                       void const FAR *file_image,
+                                                       void const *file_image,
                                                        S32       block);
 
 DXDEC  S32          AILCALL AIL_set_sample_info       (HSAMPLE   S,
-                                                       AILSOUNDINFO const FAR * info);
+                                                       AILSOUNDINFO const * info);
 
 DXDEC  S32          AILCALL AIL_set_named_sample_file (HSAMPLE   S,
-                                                       C8 const   FAR *file_type_suffix,
-                                                       void const FAR *file_image,
+                                                       C8 const   *file_type_suffix,
+                                                       void const *file_image,
                                                        U32       file_size,
                                                        S32       block);
 
@@ -4466,7 +3979,7 @@ DXDEC  void         AILCALL AIL_set_sample_adpcm_block_size
                                                      U32     blocksize);
 
 DXDEC  void         AILCALL AIL_set_sample_address    (HSAMPLE S,
-                                                     void const   FAR *start,
+                                                     void const   *start,
                                                      U32     len);
 
 DXDEC  void         AILCALL AIL_start_sample          (HSAMPLE S);
@@ -4479,7 +3992,15 @@ DXDEC  void         AILCALL AIL_end_sample            (HSAMPLE S);
 
 DXDEC  void         AILCALL AIL_set_sample_playback_rate
                                                      (HSAMPLE S,
-                                                     S32     playback_rate);
+                                                      S32     playback_rate);
+
+DXDEC  void         AILCALL AIL_set_sample_playback_rate_factor
+                                                     (HSAMPLE S,
+                                                      F32     playback_rate_factor);
+
+DXDEC  void         AILCALL AIL_set_sample_playback_delay
+                                                     (HSAMPLE S,
+                                                      S32     playback_delay);
 
 DXDEC  void         AILCALL AIL_set_sample_volume_pan (HSAMPLE S,
                                                        F32     volume,
@@ -4489,16 +4010,19 @@ DXDEC  void         AILCALL AIL_set_sample_volume_levels(HSAMPLE S,
                                                          F32     left_level,
                                                          F32     right_level);
 
-DXDEC  void         AILCALL AIL_set_sample_channel_levels (HSAMPLE  S,
-                                                           F32 FAR *level_array,
-                                                           S32      n_levels);
+DXDEC  void         AILCALL AIL_set_sample_channel_levels (HSAMPLE        S,
+                                                           MSS_SPEAKER const *source_speaker_indexes,
+                                                           MSS_SPEAKER const *dest_speaker_indexes,
+                                                           F32         const *levels,
+                                                           S32                    n_levels);
 
 DXDEC  void         AILCALL AIL_set_sample_reverb_levels(HSAMPLE S,
                                                          F32     dry_level,
                                                          F32     wet_level);
 
 DXDEC  void         AILCALL AIL_set_sample_low_pass_cut_off(HSAMPLE S,
-                                                            F32     cut_off);
+                                                            S32 /*-1 or MSS_SPEAKER*/ channel,
+                                                            F32         cut_off);
 
 DXDEC  void         AILCALL AIL_set_sample_loop_count (HSAMPLE S,
                                                        S32     loop_count);
@@ -4513,22 +4037,37 @@ DXDEC  S32          AILCALL AIL_sample_loop_block     (HSAMPLE S,
 
 DXDEC  U32          AILCALL AIL_sample_status         (HSAMPLE S);
 
-DXDEC  S32          AILCALL AIL_sample_playback_rate  (HSAMPLE S);
+DXDEC  S32          AILCALL AIL_sample_playback_rate   (HSAMPLE S);
 
-DXDEC  void         AILCALL AIL_sample_volume_pan     (HSAMPLE S, F32 FAR* volume, F32 FAR* pan);
+DXDEC  F32          AILCALL AIL_sample_playback_rate_factor (HSAMPLE S);
 
-DXDEC  F32 FAR *    AILCALL AIL_sample_channel_levels (HSAMPLE  S,
-                                                       S32 FAR *n_levels);
+DXDEC  S32          AILCALL AIL_sample_playback_delay (HSAMPLE S);
+
+DXDEC  void         AILCALL AIL_sample_volume_pan     (HSAMPLE S, F32* volume, F32* pan);
+
+DXDEC  S32          AILCALL AIL_sample_channel_count  (HSAMPLE S, U32 *mask);
+
+DXDEC  void         AILCALL AIL_sample_channel_levels (HSAMPLE                S,
+                                                       MSS_SPEAKER const *source_speaker_indexes,
+                                                       MSS_SPEAKER const *dest_speaker_indexes,
+                                                       F32               *levels,
+                                                       S32                    n_levels);
 
 DXDEC  void         AILCALL AIL_sample_volume_levels  (HSAMPLE  S,
-                                                       F32 FAR *left_level,
-                                                       F32 FAR *right_level);
+                                                       F32 *left_level,
+                                                       F32 *right_level);
 
 DXDEC  void         AILCALL AIL_sample_reverb_levels  (HSAMPLE  S,
-                                                       F32 FAR *dry_level,
-                                                       F32 FAR *wet_level);
+                                                       F32 *dry_level,
+                                                       F32 *wet_level);
 
-DXDEC  F32          AILCALL AIL_sample_low_pass_cut_off(HSAMPLE S);
+DXDEC  void         AILCALL AIL_sample_output_levels  (HSAMPLE                S,
+                                                       MSS_SPEAKER const *source_speaker_indexes,
+                                                       MSS_SPEAKER const *dest_speaker_indexes,
+                                                       F32               *levels,
+                                                       S32                    n_levels);
+
+DXDEC  F32          AILCALL AIL_sample_low_pass_cut_off(HSAMPLE S, S32 /*-1 or MSS_SPEAKER*/ channel);
 
 DXDEC  S32          AILCALL AIL_sample_loop_count     (HSAMPLE S);
 
@@ -4546,11 +4085,11 @@ DXDEC  void         AILCALL AIL_set_sample_51_volume_pan( HSAMPLE S,
                                                           F32     sub_level );
 
 DXDEC  void         AILCALL AIL_sample_51_volume_pan    ( HSAMPLE S,
-                                                          F32 FAR* volume,
-                                                          F32 FAR* pan,
-                                                          F32 FAR* fb_pan,
-                                                          F32 FAR* center_level,
-                                                          F32 FAR* sub_level );
+                                                          F32* volume,
+                                                          F32* pan,
+                                                          F32* fb_pan,
+                                                          F32* center_level,
+                                                          F32* sub_level );
 
 DXDEC  void         AILCALL AIL_set_sample_51_volume_levels( HSAMPLE S,
                                                              F32     f_left_level,
@@ -4561,14 +4100,12 @@ DXDEC  void         AILCALL AIL_set_sample_51_volume_levels( HSAMPLE S,
                                                              F32     sub_level );
 
 DXDEC  void         AILCALL AIL_sample_51_volume_levels    ( HSAMPLE S,
-                                                             F32 FAR* f_left_level,
-                                                             F32 FAR* f_right_level,
-                                                             F32 FAR* b_left_level,
-                                                             F32 FAR* b_right_level,
-                                                             F32 FAR* center_level,
-                                                             F32 FAR* sub_level );
-#if !defined(IS_XBOX)
-
+                                                             F32* f_left_level,
+                                                             F32* f_right_level,
+                                                             F32* b_left_level,
+                                                             F32* b_right_level,
+                                                             F32* center_level,
+                                                             F32* sub_level );
 DXDEC  void         AILCALL AIL_set_digital_master_reverb
                                                      (HDIGDRIVER dig,
                                                       F32        reverb_decay_time,
@@ -4577,11 +4114,9 @@ DXDEC  void         AILCALL AIL_set_digital_master_reverb
 
 DXDEC  void         AILCALL AIL_digital_master_reverb
                                                      (HDIGDRIVER dig,
-                                                      F32 FAR*   reverb_time,
-                                                      F32 FAR*   reverb_predelay,
-                                                      F32 FAR*   reverb_damping);
-
-#endif
+                                                      F32*   reverb_time,
+                                                      F32*   reverb_predelay,
+                                                      F32*   reverb_damping);
 
 DXDEC  void         AILCALL AIL_set_digital_master_reverb_levels
                                                      (HDIGDRIVER dig,
@@ -4590,8 +4125,8 @@ DXDEC  void         AILCALL AIL_set_digital_master_reverb_levels
 
 DXDEC  void         AILCALL AIL_digital_master_reverb_levels
                                                      (HDIGDRIVER dig,
-                                                      F32 FAR *  dry_level,
-                                                      F32 FAR *  wet_level);
+                                                      F32 *  dry_level,
+                                                      F32 *  wet_level);
 
 
 //
@@ -4602,11 +4137,16 @@ DXDEC  S32      AILCALL AIL_minimum_sample_buffer_size(HDIGDRIVER dig,
                                                      S32         playback_rate,
                                                      S32         format);
 
-DXDEC  S32      AILCALL AIL_sample_buffer_ready      (HSAMPLE S);
+DXDEC  S32      AILCALL AIL_set_sample_buffer_count  (HSAMPLE S,
+                                                      S32     n_buffers);
 
-DXDEC  void     AILCALL AIL_load_sample_buffer       (HSAMPLE S,
-                                                     U32     buff_num,
-                                                     void const   FAR *buffer,
+DXDEC  S32      AILCALL AIL_sample_buffer_count      (HSAMPLE S);
+
+DXDEC  S32      AILCALL AIL_sample_buffer_available (HSAMPLE S);
+
+DXDEC  S32      AILCALL AIL_load_sample_buffer      (HSAMPLE S,
+                                                     S32     buff_num,
+                                                     void const *buffer,
                                                      U32     len);
 
 DXDEC  void     AILCALL AIL_request_EOB_ASI_reset   (HSAMPLE S,
@@ -4614,10 +4154,11 @@ DXDEC  void     AILCALL AIL_request_EOB_ASI_reset   (HSAMPLE S,
                                                      S32     new_stream_position);
 
 DXDEC  S32      AILCALL AIL_sample_buffer_info      (HSAMPLE S, //)
-                                                    U32     FAR *pos0,
-                                                    U32     FAR *len0,
-                                                    U32     FAR *pos1,
-                                                    U32     FAR *len1);
+                                                     S32     buff_num,
+                                                     U32     *pos,
+                                                     U32     *len,
+                                                     S32     *head,
+                                                     S32     *tail);
 
 DXDEC  U32      AILCALL AIL_sample_granularity      (HSAMPLE S);
 
@@ -4652,49 +4193,35 @@ DXDEC  SINTa    AILCALL AIL_sample_user_data       (HSAMPLE S,
 DXDEC  S32      AILCALL AIL_active_sample_count    (HDIGDRIVER dig);
 
 DXDEC  void     AILCALL AIL_digital_configuration  (HDIGDRIVER dig,
-                                                      S32   FAR *rate,
-                                                      S32   FAR *format,
-                                                      char  FAR *string);
+                                                      S32   *rate,
+                                                      S32   *format,
+                                                      char  *string);
 
 DXDEC S32     AILCALL AIL_platform_property (void                 *object,
                                        MSS_PLATFORM_PROPERTY property,
-                                       void FAR             *before_value,
-                                       void const FAR       *new_value,
-                                       void FAR             *after_value);
+                                       void             *before_value,
+                                       void const       *new_value,
+                                       void             *after_value);
 
-#ifdef IS_WIN32API
-
-DXDEC  S32      AILCALL AIL_set_direct_buffer_control (HSAMPLE S,
-                                                     U32      command);
-
-DXDEC  void     AILCALL AIL_get_DirectSound_info  (HSAMPLE              S,
-                                                   AILLPDIRECTSOUND    *lplpDS,
-                                                   AILLPDIRECTSOUNDBUFFER *lplpDSB);
-
-#ifdef IS_WIN32
-DXDEC  S32      AILCALL AIL_set_DirectSound_HWND(HDIGDRIVER dig, HWND wnd);
-#endif 
-
-#endif
 
 DXDEC  void     AILCALL AIL_set_sample_ms_position (HSAMPLE    S, //)
                                                     S32        milliseconds);
 
 DXDEC  void     AILCALL AIL_sample_ms_position     (HSAMPLE    S, //)
-                                                    S32 FAR *  total_milliseconds,
-                                                    S32 FAR *  current_milliseconds);
+                                                    S32 *  total_milliseconds,
+                                                    S32 *  current_milliseconds);
 
 //
 // Digital input services
 //
 
-#if defined(IS_WINDOWS) || defined (IS_MAC) || defined(IS_LINUX) || defined(IS_XBOX) || defined(IS_XENON)
+#if defined(IS_WINDOWS) || defined (IS_MAC) || defined(IS_LINUX) || defined(IS_XENON)
 
-DXDEC HDIGINPUT AILCALL AIL_open_input             (AIL_INPUT_INFO FAR *info);
+DXDEC HDIGINPUT AILCALL AIL_open_input             (AIL_INPUT_INFO *info);
 
 DXDEC void      AILCALL AIL_close_input            (HDIGINPUT         dig);
 
-DXDEC AIL_INPUT_INFO FAR *
+DXDEC AIL_INPUT_INFO *
                 AILCALL AIL_get_input_info         (HDIGINPUT         dig);
 
 DXDEC S32       AILCALL AIL_set_input_state        (HDIGINPUT         dig,
@@ -4724,8 +4251,8 @@ DXDEC  S32          AILCALL AIL_MIDI_handle_reacquire
 
 #ifdef IS_WINDOWS
 
-DXDEC  S32          AILCALL AIL_midiOutOpen(HMDIDRIVER FAR *drvr,
-                                            LPHMIDIOUT FAR *lphMidiOut,
+DXDEC  S32          AILCALL AIL_midiOutOpen(HMDIDRIVER *drvr,
+                                            LPHMIDIOUT *lphMidiOut,
                                             S32             dwDeviceID);
 
 DXDEC  void         AILCALL AIL_midiOutClose      (HMDIDRIVER mdi);
@@ -4735,46 +4262,6 @@ DXDEC  S32          AILCALL AIL_MIDI_handle_release
 
 DXDEC  S32          AILCALL AIL_MIDI_handle_reacquire
                                                  (HMDIDRIVER mdi);
-
-#else
-
-#ifdef IS_DOS
-
-DXDEC S32         AILCALL AIL_install_MDI_INI       (HMDIDRIVER *mdi);
-
-DXDEC HMDIDRIVER   AILCALL AIL_install_MDI_driver_file
-                                                    (char const *filename,
-                                                     IO_PARMS   *IO);
-
-DXDEC void         AILCALL AIL_uninstall_MDI_driver  (HMDIDRIVER  mdi);
-
-
-DXDEC HMDIDRIVER   AILCALL AIL_install_MDI_driver_image
-                                                    (void const *driver_image,
-                                                     U32       size,
-                                                     IO_PARMS   *IO);
-
-DXDEC S32     AILCALL AIL_MDI_driver_type           (HMDIDRIVER  mdi);
-
-DXDEC void    AILCALL AIL_set_GTL_filename_prefix   (char const*prefix);
-
-DXDEC S32     AILCALL AIL_timbre_status             (HMDIDRIVER  mdi,
-                                                     S32        bank,
-                                                     S32        patch);
-
-DXDEC S32     AILCALL AIL_install_timbre            (HMDIDRIVER  mdi,
-                                                     S32        bank,
-                                                     S32        patch);
-
-DXDEC void    AILCALL AIL_protect_timbre            (HMDIDRIVER  mdi,
-                                                     S32        bank,
-                                                     S32        patch);
-
-DXDEC void    AILCALL AIL_unprotect_timbre          (HMDIDRIVER  mdi,
-                                                     S32        bank,
-                                                     S32        patch);
-
-#endif
 
 #endif
 
@@ -4787,7 +4274,7 @@ DXDEC  void         AILCALL AIL_release_sequence_handle
                                                      (HSEQUENCE S);
 
 DXDEC  S32          AILCALL AIL_init_sequence         (HSEQUENCE S,
-                                                     void const     FAR *start,
+                                                     void const     *start,
                                                      S32       sequence_num);
 
 DXDEC  void         AILCALL AIL_start_sequence        (HSEQUENCE S);
@@ -4839,8 +4326,8 @@ DXDEC  S32      AILCALL AIL_channel_notes             (HSEQUENCE S,
                                                       S32       channel);
 
 DXDEC  void     AILCALL AIL_sequence_position         (HSEQUENCE S,
-                                                      S32      FAR *beat,
-                                                      S32      FAR *measure);
+                                                      S32      *beat,
+                                                      S32      *measure);
 
 DXDEC  void     AILCALL AIL_branch_index              (HSEQUENCE  S,
                                                       U32        marker);
@@ -4875,7 +4362,7 @@ DXDEC  SINTa    AILCALL AIL_sequence_user_data        (HSEQUENCE S,
                                                        U32       index);
 
 DXDEC  void     AILCALL AIL_register_ICA_array        (HSEQUENCE S,
-                                                      U8       FAR *array);
+                                                      U8       *array);
 
 DXDEC  S32      AILCALL AIL_lock_channel              (HMDIDRIVER mdi);
 
@@ -4897,12 +4384,12 @@ DXDEC  void     AILCALL AIL_send_channel_voice_message
                                                       S32         data_2);
 
 DXDEC  void     AILCALL AIL_send_sysex_message        (HMDIDRIVER mdi,
-                                                       void const       FAR *buffer);
+                                                       void const       *buffer);
 
 DXDEC  HWAVESYNTH
                 AILCALL AIL_create_wave_synthesizer   (HDIGDRIVER dig,
                                                     HMDIDRIVER mdi,
-                                                       void const       FAR *wave_lib,
+                                                       void const       *wave_lib,
                                                        S32         polyphony);
 
 DXDEC  void     AILCALL AIL_destroy_wave_synthesizer  (HWAVESYNTH W);
@@ -4911,8 +4398,8 @@ DXDEC  void     AILCALL AIL_set_sequence_ms_position  (HSEQUENCE S, //)
                                                        S32       milliseconds);
 
 DXDEC  void     AILCALL AIL_sequence_ms_position(HSEQUENCE S, //)
-                                                 S32 FAR *total_milliseconds,
-                                                 S32 FAR *current_milliseconds);
+                                                 S32 *total_milliseconds,
+                                                 S32 *current_milliseconds);
 
 
 
@@ -4924,33 +4411,19 @@ DXDEC  void     AILCALL AIL_sequence_ms_position(HSEQUENCE S, //)
 MSS_STRUCT SDL_CD;
 #endif
 
-#if !defined(IS_XBOX) && !defined(IS_XENON) && !defined(IS_PS2) && !defined(IS_PS3)  && !defined(IS_WII)
-
-#ifdef IS_DOS
-typedef MSS_STRUCT _REDBOOKTRACKINFO {
-  U32 tracks;
-  U32 trackstarts[100];
-} REDBOOKTRACKINFO;
-#endif
+#if !defined(IS_XENON) && !defined(IS_PS2) && !defined(IS_PS3)  && !defined(IS_WII) && !defined(IS_PSP) && !defined(IS_IPHONE) && !defined(IS_MAC)
 
 typedef MSS_STRUCT _REDBOOK {
   U32 DeviceID;
   U32 paused;
   U32 pausedsec;
   U32 lastendsec;
-#ifdef IS_DOS
-  U32 readcontents;
-  REDBOOKTRACKINFO info;
-#endif
-#ifdef IS_MAC
-  short vDRefNum;
-#endif
 #ifdef IS_LINUX
   struct SDL_CD *cdrom;
 #endif
 } REDBOOK;
 
-typedef MSS_STRUCT _REDBOOK FAR* HREDBOOK;
+typedef MSS_STRUCT _REDBOOK* HREDBOOK;
 
 #define REDBOOK_ERROR    0
 #define REDBOOK_PLAYING  1
@@ -4960,11 +4433,7 @@ typedef MSS_STRUCT _REDBOOK FAR* HREDBOOK;
 
 DXDEC  HREDBOOK   AILCALL AIL_redbook_open(U32 which);
 
-#ifdef IS_MAC
-DXDEC  HREDBOOK   AILCALL AIL_redbook_open_volume(char const * drive);
-#else
 DXDEC  HREDBOOK   AILCALL AIL_redbook_open_drive(S32 drive);
-#endif
 
 DXDEC  void       AILCALL AIL_redbook_close(HREDBOOK hand);
 
@@ -4979,7 +4448,7 @@ DXDEC  U32        AILCALL AIL_redbook_tracks(HREDBOOK hand);
 DXDEC  U32        AILCALL AIL_redbook_track(HREDBOOK hand);
 
 DXDEC  void       AILCALL AIL_redbook_track_info(HREDBOOK hand,U32 tracknum,
-                                                     U32 FAR* startmsec,U32 FAR* endmsec);
+                                                     U32* startmsec,U32* endmsec);
 
 DXDEC  U32        AILCALL AIL_redbook_id(HREDBOOK hand);
 
@@ -4999,35 +4468,30 @@ DXDEC  F32        AILCALL AIL_redbook_set_volume_level(HREDBOOK hand, F32 volume
 
 #endif
 
-#ifdef IS_WIN16
-  #define AIL_ms_count timeGetTime
-  DXDEC U32 AILCALL AIL_us_count(void);
-#else
-  DXDEC U32 AILCALL AIL_ms_count(void);
-  DXDEC U32 AILCALL AIL_us_count(void);
-#endif
+DXDEC U32 AILCALL AIL_ms_count(void);
+DXDEC U32 AILCALL AIL_us_count(void);
 
 
-typedef MSS_STRUCT _STREAM FAR* HSTREAM;           // Handle to stream
+typedef struct _STREAM* HSTREAM;           // Handle to stream
 
-typedef void (AILCALLBACK FAR* AILSTREAMCB)   (HSTREAM stream);
+typedef void (AILCALLBACK* AILSTREAMCB)   (HSTREAM stream);
 
-typedef MSS_STRUCT _STREAM {
+typedef struct _STREAM {
 
   S32 block_oriented; // 1 if this is an ADPCM or ASI-compressed stream
   S32 using_ASI;      // 1 if using ASI decoder to uncompress stream data
-  ASISTAGE FAR *ASI;  // handy pointer to our ASI coded
+  ASISTAGE *ASI;  // handy pointer to our ASI coded
 
   HSAMPLE samp;       // the sample handle
 
   UINTa fileh;        // the open file handle
 
-  U8 FAR* bufs[3];    // the data buffers
+  U8* bufs[3];    // the data buffers
   U32 bufsizes[3];    // the size of each buffer
   S32 reset_ASI[3];   // should we reset the ASI at the end of the buffer?
   S32 reset_seek_pos[3]; // new stream position after reset
   S32 bufstart[3];    // offset of where this buffer started
-  void FAR* asyncs[3];// async read structures
+  void* asyncs[3];// async read structures
 
   S32 loadedbufstart[2]; // offset of where the loaded buffer started
   S32 loadedorder[2]; // order of the buffers as they were loaded
@@ -5048,7 +4512,7 @@ typedef MSS_STRUCT _STREAM {
   U32 datarate;       // datarate in bytes per second
   S32 filerate;       // original datarate of the file
   S32 filetype;       // file format type
-  U32 fileflags;      // file format flags (signed or unsigned)
+  U32 filemask;       // channel mask for stream file
   S32 totallen;       // total length of the sound data
 
   S32 substart;       // subblock loop start
@@ -5080,9 +4544,9 @@ typedef MSS_STRUCT _STREAM {
   AILSTREAMCB callback;  // end of stream callback
 
   SINTa user_data[8];   // Miscellaneous user data
-  void FAR* next;       // pointer to next stream
+  void* next;       // pointer to next stream
 
-#if defined(IS_WINDOWS) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_XBOX) || defined(IS_XENON) || defined(IS_PS2) || defined(IS_PS3) || defined(IS_WII)
+#if defined(IS_WINDOWS) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_XENON) || defined(IS_PS2) || defined(IS_PS3) || defined(IS_WII) || defined(IS_PSP)
   S32 autostreaming;  // are we autostreaming this stream
 #endif
 
@@ -5090,7 +4554,7 @@ typedef MSS_STRUCT _STREAM {
 } MSTREAM_TYPE;
 
 
-DXDEC HSTREAM AILCALL AIL_open_stream(HDIGDRIVER dig, char const FAR * filename, S32 stream_mem);
+DXDEC HSTREAM AILCALL AIL_open_stream(HDIGDRIVER dig, char const * filename, S32 stream_mem);
 
 DXDEC void AILCALL AIL_close_stream(HSTREAM stream);
 
@@ -5116,7 +4580,7 @@ DXDEC void AILCALL AIL_set_stream_position(HSTREAM stream,S32 offset);
 
 DXDEC S32 AILCALL AIL_stream_position(HSTREAM stream);
 
-DXDEC void AILCALL AIL_stream_info(HSTREAM stream, S32 FAR* datarate, S32 FAR* sndtype, S32 FAR* length, S32 FAR* memory);
+DXDEC void AILCALL AIL_stream_info(HSTREAM stream, S32* datarate, S32* sndtype, S32* length, S32* memory);
 
 DXDEC AILSTREAMCB AILCALL AIL_register_stream_callback(HSTREAM stream, AILSTREAMCB callback);
 
@@ -5133,38 +4597,27 @@ DXDEC  void     AILCALL AIL_set_stream_ms_position   (HSTREAM S,
                                                       S32        milliseconds);
 
 DXDEC  void     AILCALL AIL_stream_ms_position     (HSTREAM    S, //)
-                                                    S32 FAR *  total_milliseconds,
-                                                    S32 FAR *  current_milliseconds);
+                                                    S32 *  total_milliseconds,
+                                                    S32 *  current_milliseconds);
 
-#ifdef ON_MAC_USE_FSS
-
-typedef MSS_STRUCT MSS_FILE
-{
-  S32 file_type; // 0 = char*, 1 = FSSpec*
-  void const FAR* file;
-} MSS_FILE;
-
-#else
-
+//! \todo MSS_FILE not needed anymore?
 typedef char MSS_FILE;
 
-#endif
+typedef U32  (AILCALLBACK*AIL_file_open_callback)  (MSS_FILE const* Filename,
+                                                        UINTa* FileHandle);
 
-typedef U32  (AILCALLBACK FAR*AIL_file_open_callback)  (MSS_FILE const FAR* Filename,
-                                                        UINTa FAR* FileHandle);
-
-typedef void (AILCALLBACK FAR*AIL_file_close_callback) (UINTa FileHandle);
+typedef void (AILCALLBACK*AIL_file_close_callback) (UINTa FileHandle);
 
 #define AIL_FILE_SEEK_BEGIN   0
 #define AIL_FILE_SEEK_CURRENT 1
 #define AIL_FILE_SEEK_END     2
 
-typedef S32  (AILCALLBACK FAR*AIL_file_seek_callback)  (UINTa FileHandle,
+typedef S32  (AILCALLBACK*AIL_file_seek_callback)  (UINTa FileHandle,
                                                         S32 Offset,
                                                         U32 Type);
 
-typedef U32  (AILCALLBACK FAR*AIL_file_read_callback)  (UINTa FileHandle,
-                                                        void FAR* Buffer,
+typedef U32  (AILCALLBACK*AIL_file_read_callback)  (UINTa FileHandle,
+                                                        void* Buffer,
                                                         U32 Bytes);
 
 DXDEC  void  AILCALL AIL_set_file_callbacks  (AIL_file_open_callback opencb,
@@ -5174,13 +4627,13 @@ DXDEC  void  AILCALL AIL_set_file_callbacks  (AIL_file_open_callback opencb,
 
 #ifdef IS_32
 
-typedef void FAR* (AILCALLBACK FAR *AIL_file_async_read_callback) (UINTa FileHandle,
-                                                                   void FAR* Buffer,
+typedef void* (AILCALLBACK *AIL_file_async_read_callback) (UINTa FileHandle,
+                                                                   void* Buffer,
                                                                    U32 Bytes);
 
-typedef S32 (AILCALLBACK FAR*AIL_file_async_status_callback)  (void FAR* async,
+typedef S32 (AILCALLBACK*AIL_file_async_status_callback)  (void* async,
                                                                S32 wait,
-                                                               U32 FAR* BytesRead);
+                                                               U32* BytesRead);
 
 DXDEC  void  AILCALL AIL_set_file_async_callbacks (AIL_file_open_callback opencb,
                                                    AIL_file_close_callback closecb,
@@ -5194,30 +4647,30 @@ DXDEC  void  AILCALL AIL_set_file_async_callbacks (AIL_file_open_callback opencb
 // High-level DLS functions
 //
 
-typedef MSS_STRUCT _DLSFILEID {
+typedef struct _DLSFILEID {
   SINTa id;
-  struct _DLSFILEID FAR* next;
+  struct _DLSFILEID* next;
 } DLSFILEID;
 
-typedef MSS_STRUCT _DLSFILEID FAR* HDLSFILEID;
+typedef struct _DLSFILEID* HDLSFILEID;
 
-typedef MSS_STRUCT _DLSDEVICE {
-  VOIDFUNC FAR* pGetPref;
-  VOIDFUNC FAR* pSetPref;
-  VOIDFUNC FAR* pMSSOpen;
-  VOIDFUNC FAR* pOpen;
-  VOIDFUNC FAR* pClose;
-  VOIDFUNC FAR* pLoadFile;
-  VOIDFUNC FAR* pLoadMem;
-  VOIDFUNC FAR* pUnloadFile;
-  VOIDFUNC FAR* pUnloadAll;
-  VOIDFUNC FAR* pGetInfo;
-  VOIDFUNC FAR* pCompact;
-  VOIDFUNC FAR* pSetAttr;
+typedef struct _DLSDEVICE {
+  VOIDFUNC* pGetPref;
+  VOIDFUNC* pSetPref;
+  VOIDFUNC* pMSSOpen;
+  VOIDFUNC* pOpen;
+  VOIDFUNC* pClose;
+  VOIDFUNC* pLoadFile;
+  VOIDFUNC* pLoadMem;
+  VOIDFUNC* pUnloadFile;
+  VOIDFUNC* pUnloadAll;
+  VOIDFUNC* pGetInfo;
+  VOIDFUNC* pCompact;
+  VOIDFUNC* pSetAttr;
   SINTa DLSHandle;
   U32 format;
   U32 buffer_size;
-  void FAR* buffer[2];
+  void* buffer[2];
   HSAMPLE sample;
   HMDIDRIVER mdi;
   HDIGDRIVER dig;
@@ -5226,14 +4679,14 @@ typedef MSS_STRUCT _DLSDEVICE {
   HMODULE lib;
 #else
   #ifdef IS_STATIC
-  char FAR* DOSname;
+  char* DOSname;
   #endif
 #endif
 } DLSDEVICE;
 
-typedef MSS_STRUCT _DLSDEVICE FAR* HDLSDEVICE;
+typedef struct _DLSDEVICE* HDLSDEVICE;
 
-typedef MSS_STRUCT _AILDLSINFO {
+typedef struct _AILDLSINFO {
   char Description[128];
   S32 MaxDLSMemory;
   S32 CurrentDLSMemory;
@@ -5244,19 +4697,19 @@ typedef MSS_STRUCT _AILDLSINFO {
 
 #ifdef IS_STATIC
 
-typedef MSS_STRUCT _AILSTATICDLS {
-  char FAR* description;
-  VOIDFUNC FAR* pDLSOpen;
-  VOIDFUNC FAR* pMSSOpen;
-  VOIDFUNC FAR* pOpen;
-  VOIDFUNC FAR* pClose;
-  VOIDFUNC FAR* pLoadFile;
-  VOIDFUNC FAR* pLoadMem;
-  VOIDFUNC FAR* pUnloadFile;
-  VOIDFUNC FAR* pUnloadAll;
-  VOIDFUNC FAR* pGetInfo;
-  VOIDFUNC FAR* pCompact;
-  VOIDFUNC FAR* pSetAttr;
+typedef struct _AILSTATICDLS {
+  char* description;
+  VOIDFUNC* pDLSOpen;
+  VOIDFUNC* pMSSOpen;
+  VOIDFUNC* pOpen;
+  VOIDFUNC* pClose;
+  VOIDFUNC* pLoadFile;
+  VOIDFUNC* pLoadMem;
+  VOIDFUNC* pUnloadFile;
+  VOIDFUNC* pUnloadAll;
+  VOIDFUNC* pGetInfo;
+  VOIDFUNC* pCompact;
+  VOIDFUNC* pSetAttr;
 } AILSTATICDLS;
 
 #endif
@@ -5264,9 +4717,9 @@ typedef MSS_STRUCT _AILSTATICDLS {
 
 DXDEC  HDLSDEVICE AILCALL AIL_DLS_open(HMDIDRIVER mdi, HDIGDRIVER dig,
 #ifdef IS_STATIC
-                                          AILSTATICDLS const FAR * staticdls,
+                                          AILSTATICDLS const * staticdls,
 #else
-                                          char const FAR * libname,
+                                          char const * libname,
 #endif
                                           U32 flags, U32 rate, S32 bits, S32 channels);
 
@@ -5281,9 +4734,9 @@ DXDEC  HDLSDEVICE AILCALL AIL_DLS_open(HMDIDRIVER mdi, HDIGDRIVER dig,
 
 DXDEC  void   AILCALL AIL_DLS_close(HDLSDEVICE dls, U32 flags);
 
-DXDEC  HDLSFILEID AILCALL AIL_DLS_load_file(HDLSDEVICE dls, char const FAR* filename, U32 flags);
+DXDEC  HDLSFILEID AILCALL AIL_DLS_load_file(HDLSDEVICE dls, char const* filename, U32 flags);
 
-DXDEC  HDLSFILEID AILCALL AIL_DLS_load_memory(HDLSDEVICE dls, void const FAR* memfile, U32 flags);
+DXDEC  HDLSFILEID AILCALL AIL_DLS_load_memory(HDLSDEVICE dls, void const* memfile, U32 flags);
 
 //
 // other parameters for AIL_DLS_unload
@@ -5296,22 +4749,23 @@ DXDEC  void   AILCALL AIL_DLS_unload(HDLSDEVICE dls, HDLSFILEID dlsid);
 
 DXDEC  void   AILCALL AIL_DLS_compact(HDLSDEVICE dls);
 
-DXDEC  void   AILCALL AIL_DLS_get_info(HDLSDEVICE dls, AILDLSINFO FAR* info, S32 FAR* PercentCPU);
+DXDEC  void   AILCALL AIL_DLS_get_info(HDLSDEVICE dls, AILDLSINFO* info, S32* PercentCPU);
 
 DXDEC HSAMPLE AILCALL AIL_DLS_sample_handle(HDLSDEVICE dls);
+
 
 //
 // Quick-integration service functions and data types
 //
 
-typedef MSS_STRUCT
+typedef struct
 {
-   U32 const FAR *data;
+   U32 const *data;
    S32  size;
    S32  type;
-   void FAR *handle;
+   void *handle;
    S32  status;
-   void FAR* next;
+   void* next;
    S32  speed;
    F32  volume;
    F32  extravol;
@@ -5319,8 +4773,8 @@ typedef MSS_STRUCT
    F32  wet;
    F32  cutoff;
    HDLSFILEID dlsid;
-   void FAR* dlsmem;
-   void FAR* dlsmemunc;
+   void* dlsmem;
+   void* dlsmemunc;
    S32  milliseconds;
    S32  length;
    SINTa userdata;
@@ -5332,7 +4786,7 @@ AUDIO_TYPE;
 #define QSTAT_LOADED        2       // Data has been loaded, but not yet played
 #define QSTAT_PLAYING       3       // Data is currently playing
 
-typedef AUDIO_TYPE FAR * HAUDIO;        // Generic handle to any audio data type
+typedef AUDIO_TYPE * HAUDIO;        // Generic handle to any audio data type
 
 #define AIL_QUICK_USE_WAVEOUT             2
 #define AIL_QUICK_MIDI_AND_DLS            2
@@ -5341,7 +4795,7 @@ typedef AUDIO_TYPE FAR * HAUDIO;        // Generic handle to any audio data type
 #define AIL_QUICK_MIDI_AND_SONICVIBES_DLS 5
 
 DXDEC S32     AILCALL
-#if defined(IS_WINDOWS) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_XBOX) || defined(IS_XENON) || defined(IS_PS2) || defined(IS_PS3) || defined(IS_WII)
+#if defined(IS_WINDOWS) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_XENON) || defined(IS_PS2) || defined(IS_PS3) || defined(IS_WII)
                        AIL_quick_startup           (
 #else
                        AIL_quick_startup_with_start(void*       startup,
@@ -5354,21 +4808,17 @@ DXDEC S32     AILCALL
 
 DXDEC void    AILCALL AIL_quick_shutdown            (void);
 
-DXDEC void    AILCALL AIL_quick_handles             (HDIGDRIVER FAR* pdig,
-                                                     HMDIDRIVER FAR* pmdi,
-                                                     HDLSDEVICE FAR* pdls );
+DXDEC void    AILCALL AIL_quick_handles             (HDIGDRIVER* pdig,
+                                                     HMDIDRIVER* pmdi,
+                                                     HDLSDEVICE* pdls );
 
-DXDEC HAUDIO  AILCALL AIL_quick_load                (char const   FAR *filename);
+DXDEC HAUDIO  AILCALL AIL_quick_load                (char const   *filename);
 
-#ifdef ON_MAC_USE_FSS
-DXDEC HAUDIO  AILCALL AIL_quick_fss_load            (FSSpec const   FAR *filename);
-#endif
-
-DXDEC HAUDIO  AILCALL AIL_quick_load_mem            (void const   FAR *mem,
+DXDEC HAUDIO  AILCALL AIL_quick_load_mem            (void const   *mem,
                                                      U32    size);
 
-DXDEC HAUDIO  AILCALL AIL_quick_load_named_mem      (void const   FAR *mem,
-                                                     char const   FAR *filename,
+DXDEC HAUDIO  AILCALL AIL_quick_load_named_mem      (void const   *mem,
+                                                     char const   *filename,
                                                      U32    size);
 
 DXDEC HAUDIO  AILCALL AIL_quick_copy                (HAUDIO      audio);
@@ -5382,15 +4832,9 @@ DXDEC void    AILCALL AIL_quick_halt                (HAUDIO      audio);
 
 DXDEC S32     AILCALL AIL_quick_status              (HAUDIO      audio);
 
-DXDEC HAUDIO  AILCALL AIL_quick_load_and_play       (char const   FAR *filename,
+DXDEC HAUDIO  AILCALL AIL_quick_load_and_play       (char const   *filename,
                                                     U32         loop_count,
                                                     S32         wait_request);
-
-#ifdef ON_MAC_USE_FSS
-DXDEC HAUDIO  AILCALL AIL_quick_fss_load_and_play  (FSSpec const   FAR *filename,
-                                                    U32         loop_count,
-                                                    S32         wait_request);
-#endif
 
 DXDEC void   AILCALL AIL_quick_set_speed (HAUDIO audio, S32 speed);
 
@@ -5401,6 +4845,7 @@ DXDEC void   AILCALL AIL_quick_set_reverb_levels (HAUDIO audio,
                                                   F32    wet_level);
 
 DXDEC void   AILCALL AIL_quick_set_low_pass_cut_off(HAUDIO S,
+                                                    S32 channel,
                                                     F32 cut_off);
 
 DXDEC void   AILCALL AIL_quick_set_ms_position(HAUDIO audio,S32 milliseconds);
@@ -5422,88 +4867,89 @@ DXDEC S32    AILCALL AIL_quick_ms_length(HAUDIO audio);
 #define AIL_QUICK_S8_VOICE_TYPE     10
 #define AIL_QUICK_S16_VOICE_TYPE    11
 #define AIL_QUICK_S32_VOICE_TYPE    12
+#define AIL_QUICK_BINKA_TYPE        13
 
 DXDEC S32    AILCALL AIL_quick_type(HAUDIO audio);
 
-DXDEC void AILCALL AIL_save_sample_attributes(HSAMPLE   S,
-                                              HSATTRIBS D);
+DXDEC S32 AILCALL AIL_WAV_info(void const* WAV_image, AILSOUNDINFO* info);
 
-DXDEC U32 AILCALL AIL_load_sample_attributes(HSAMPLE   S,
-                                             HSATTRIBS D);
+DXDEC S32 AILCALL AIL_WAV_marker_count(void const *WAV_image);
 
-DXDEC S32 AILCALL AIL_WAV_info(void const FAR* data, AILSOUNDINFO FAR* info);
+DXDEC S32 AILCALL AIL_WAV_marker_by_index(void const *WAV_image, S32 n, C8 const **name);
+
+DXDEC S32 AILCALL AIL_WAV_marker_by_name(void const *WAV_image, C8 *name);
 
 DXDEC S32 AILCALL AIL_size_processed_digital_audio(
                                  U32             dest_rate,
                                  U32             dest_format,
                                  S32             num_srcs,
-                                 AILMIXINFO const FAR * src);
+                                 AILMIXINFO const * src);
 
 DXDEC S32 AILCALL AIL_process_digital_audio(
-                                 void FAR       *dest_buffer,
+                                 void       *dest_buffer,
                                  S32             dest_buffer_size,
                                  U32             dest_rate,
                                  U32             dest_format,
                                  S32             num_srcs,
-                                 AILMIXINFO FAR* src);
+                                 AILMIXINFO* src);
 
 #define AIL_LENGTHY_INIT           0
 #define AIL_LENGTHY_SET_PROPERTY   1
 #define AIL_LENGTHY_UPDATE         2
 #define AIL_LENGTHY_DONE           3
 
-typedef S32 (AILCALLBACK FAR* AILLENGTHYCB)(U32 state,UINTa user);
+typedef S32 (AILCALLBACK* AILLENGTHYCB)(U32 state,UINTa user);
 
-typedef S32 (AILCALLBACK FAR* AILCODECSETPROP)(char const FAR* property,void const FAR * value);
+typedef S32 (AILCALLBACK* AILCODECSETPROP)(char const* property,void const * value);
 
-DXDEC S32 AILCALL AIL_compress_ASI(AILSOUNDINFO const FAR * info, //)
-                                   char const FAR* filename_ext,
-                                   void FAR* FAR* outdata,
-                                   U32 FAR* outsize,
+DXDEC S32 AILCALL AIL_compress_ASI(AILSOUNDINFO const * info, //)
+                                   char const* filename_ext,
+                                   void** outdata,
+                                   U32* outsize,
                                    AILLENGTHYCB callback);
 
-DXDEC S32 AILCALL AIL_decompress_ASI(void const FAR* indata, //)
+DXDEC S32 AILCALL AIL_decompress_ASI(void const* indata, //)
                                      U32 insize,
-                                     char const FAR* filename_ext,
-                                     void FAR* FAR* wav,
-                                     U32 FAR* wavsize,
+                                     char const* filename_ext,
+                                     void** wav,
+                                     U32* wavsize,
                                      AILLENGTHYCB callback);
 
-DXDEC S32 AILCALL AIL_compress_ADPCM(AILSOUNDINFO const FAR * info,
-                                     void FAR* FAR* outdata, U32 FAR* outsize);
+DXDEC S32 AILCALL AIL_compress_ADPCM(AILSOUNDINFO const * info,
+                                     void** outdata, U32* outsize);
 
-DXDEC S32 AILCALL AIL_decompress_ADPCM(AILSOUNDINFO const FAR * info,
-                                       void FAR* FAR* outdata, U32 FAR* outsize);
+DXDEC S32 AILCALL AIL_decompress_ADPCM(AILSOUNDINFO const * info,
+                                       void** outdata, U32* outsize);
 
-DXDEC S32 AILCALL AIL_compress_DLS(void const FAR* dls,
-                                   char const FAR* compression_extension,
-                                   void FAR* FAR* mls, U32 FAR* mlssize,
+DXDEC S32 AILCALL AIL_compress_DLS(void const* dls,
+                                   char const* compression_extension,
+                                   void** mls, U32* mlssize,
                                    AILLENGTHYCB callback);
 
-DXDEC S32 AILCALL AIL_merge_DLS_with_XMI(void const FAR* xmi, void const FAR* dls,
-                                         void FAR* FAR* mss, U32 FAR* msssize);
+DXDEC S32 AILCALL AIL_merge_DLS_with_XMI(void const* xmi, void const* dls,
+                                         void** mss, U32* msssize);
 
-DXDEC  S32 AILCALL AIL_extract_DLS( void const FAR *source_image, //)
+DXDEC  S32 AILCALL AIL_extract_DLS( void const *source_image, //)
                                     U32             source_size,
-                                    void FAR * FAR *XMI_output_data,
-                                    U32  FAR       *XMI_output_size,
-                                    void FAR * FAR *DLS_output_data,
-                                    U32  FAR       *DLS_output_size,
+                                    void * *XMI_output_data,
+                                    U32        *XMI_output_size,
+                                    void * *DLS_output_data,
+                                    U32        *DLS_output_size,
                                     AILLENGTHYCB   callback);
 
 #define AILFILTERDLS_USINGLIST 1
 
-DXDEC S32 AILCALL AIL_filter_DLS_with_XMI(void const FAR* xmi, void const FAR* dls,
-                                         void FAR* FAR* dlsout, U32 FAR* dlssize,
+DXDEC S32 AILCALL AIL_filter_DLS_with_XMI(void const* xmi, void const* dls,
+                                         void** dlsout, U32* dlssize,
                                          S32  flags, AILLENGTHYCB callback);
 
 #define AILMIDITOXMI_USINGLIST 1
 #define AILMIDITOXMI_TOLERANT  2
 
-DXDEC  S32 AILCALL AIL_MIDI_to_XMI       (void const FAR*  MIDI,
+DXDEC  S32 AILCALL AIL_MIDI_to_XMI       (void const*  MIDI,
                                          U32        MIDI_size,
-                                         void FAR*  FAR*XMIDI,
-                                         U32  FAR*  XMIDI_size,
+                                         void* *XMIDI,
+                                         U32 *  XMIDI_size,
                                          S32        flags);
 
 #define AILDLSLIST_ARTICULATION 1
@@ -5511,20 +4957,20 @@ DXDEC  S32 AILCALL AIL_MIDI_to_XMI       (void const FAR*  MIDI,
 
 #if defined(IS_WIN32) || defined(IS_MAC)
 
-DXDEC  S32          AILCALL AIL_list_DLS          (void const FAR* DLS,
-                                                   char FAR* FAR* lst,
-                                                   U32  FAR* lst_size,
+DXDEC  S32          AILCALL AIL_list_DLS          (void const* DLS,
+                                                   char** lst,
+                                                   U32 * lst_size,
                                                    S32       flags,
-                                                   C8   FAR* title);
+                                                   C8  * title);
 
 #define AILMIDILIST_ROLANDSYSEX 1
 #define AILMIDILIST_ROLANDUN    2
 #define AILMIDILIST_ROLANDAB    4
 
-DXDEC  S32          AILCALL AIL_list_MIDI         (void const FAR* MIDI,
+DXDEC  S32          AILCALL AIL_list_MIDI         (void const* MIDI,
                                                   U32       MIDI_size,
-                                                  char FAR* FAR* lst,
-                                                  U32  FAR* lst_size,
+                                                  char** lst,
+                                                  U32 * lst_size,
                                                   S32       flags);
 #endif
 
@@ -5552,15 +4998,16 @@ DXDEC  S32          AILCALL AIL_list_MIDI         (void const FAR* MIDI,
 #define AILFILETYPE_S8_VOICE       21
 #define AILFILETYPE_S16_VOICE      22
 #define AILFILETYPE_S32_VOICE      23
+#define AILFILETYPE_BINKA          24
 
-DXDEC S32 AILCALL AIL_file_type(void const FAR* data, U32 size);
+DXDEC S32 AILCALL AIL_file_type(void const* data, U32 size);
 
-DXDEC S32 AILCALL AIL_file_type_named(void const FAR* data, char const FAR* filename, U32 size);
+DXDEC S32 AILCALL AIL_file_type_named(void const* data, char const* filename, U32 size);
 
-DXDEC S32 AILCALL AIL_find_DLS       (void const FAR*      data, U32 size,
-                                      void FAR* FAR* xmi, U32 FAR* xmisize,
-                                      void FAR* FAR* dls, U32 FAR* dlssize);
-typedef MSS_STRUCT
+DXDEC S32 AILCALL AIL_find_DLS       (void const*      data, U32 size,
+                                      void** xmi, U32* xmisize,
+                                      void** dls, U32* dlssize);
+typedef struct
 {
    //
    // File-level data accessible to app
@@ -5568,19 +5015,19 @@ typedef MSS_STRUCT
    // This is valid after AIL_inspect_MP3() is called (even if the file contains no valid frames)
    //
 
-   U8 FAR *MP3_file_image;       // Original MP3_file_image pointer passed to AIL_inspect_MP3()
+   U8 *MP3_file_image;       // Original MP3_file_image pointer passed to AIL_inspect_MP3()
    S32     MP3_image_size;       // Original MP3_image_size passed to AIL_inspect_MP3()
 
-   U8 FAR *ID3v2;                // ID3v2 tag, if not NULL
+   U8 *ID3v2;                // ID3v2 tag, if not NULL
    S32     ID3v2_size;           // Size of tag in bytes
 
-   U8 FAR *ID3v1;                // ID3v1 tag, if not NULL (always 128 bytes long if present)
+   U8 *ID3v1;                // ID3v1 tag, if not NULL (always 128 bytes long if present)
 
-   U8 FAR *start_MP3_data;       // Pointer to start of data area in file (not necessarily first valid frame)
-   U8 FAR *end_MP3_data;         // Pointer to last valid byte in MP3 data area (before ID3v1 tag, if any)
+   U8 *start_MP3_data;       // Pointer to start of data area in file (not necessarily first valid frame)
+   U8 *end_MP3_data;         // Pointer to last valid byte in MP3 data area (before ID3v1 tag, if any)
 
    //
-   // Information about current frame being inspected, valid if AIL_enumerate_MP3_frames() returns 
+   // Information about current frame being inspected, valid if AIL_enumerate_MP3_frames() returns
    // TRUE
    //
 
@@ -5599,9 +5046,9 @@ typedef MSS_STRUCT
    S32 main_data_begin;          // Always 0 in files with no bit reservoir
    S32 hpos;                     // Current bit position in header/side buffer
 
-   S32 MPEG1;                    // Data copied directly from frame header, see ISO docs for info... 
-   S32 MPEG25;                   
-   S32 layer;                    
+   S32 MPEG1;                    // Data copied directly from frame header, see ISO docs for info...
+   S32 MPEG25;
+   S32 layer;
    S32 protection_bit;
    S32 bitrate_index;
    S32 sampling_frequency;
@@ -5631,7 +5078,7 @@ typedef MSS_STRUCT
    // Private (undocumented) data used during frame enumeration
    //
 
-   U8 FAR *ptr;
+   U8 *ptr;
    S32 bytes_left;
 
    S32 check_valid;
@@ -5646,11 +5093,72 @@ typedef MSS_STRUCT
 }
 MP3_INFO;
 
-DXDEC void AILCALL AIL_inspect_MP3 (MP3_INFO FAR *inspection_state,
-                                    U8       FAR *MP3_file_image,
+DXDEC void AILCALL AIL_inspect_MP3 (MP3_INFO *inspection_state,
+                                    U8       *MP3_file_image,
                                     S32           MP3_image_size);
 
-DXDEC S32 AILCALL AIL_enumerate_MP3_frames (MP3_INFO FAR *inspection_state);
+DXDEC S32 AILCALL AIL_enumerate_MP3_frames (MP3_INFO *inspection_state);
+
+typedef struct
+{
+   //
+   // File-level data accessible to app
+   //
+   // This is valid after AIL_inspect_Ogg() is called (even if the file contains no valid pages)
+   //
+
+   U8 *Ogg_file_image;       // Originally passed to AIL_inspect_Ogg()
+   S32     Ogg_image_size;       // Originally passed to AIL_inspect_Ogg()
+
+   U8 *start_Ogg_data;       // Pointer to start of data area in file
+   U8 *end_Ogg_data;         // Pointer to last valid byte in data area
+
+   //
+   // Information about current page being inspected, valid if AIL_enumerate_Ogg_pages() returns
+   // TRUE
+   //
+
+   S32 page_num;                 // 32-bit page sequence number from OggS header at byte offset 16
+
+   S32 sample_count;             // Total # of samples already generated by encoder at the time the current page was written
+
+   S32 byte_offset;              // Offset of page from start_Ogg_data (i.e., suitable for use as loop point)
+   S32 next_page_expected;       // Anticipated offset of next page to be enumerated, if any
+
+   //
+   // Private (undocumented) data used during page enumeration
+   //
+
+   U8 *ptr;
+   S32     bytes_left;
+}
+OGG_INFO;
+
+DXDEC void AILCALL AIL_inspect_Ogg (OGG_INFO *inspection_state,
+                                    U8       *Ogg_file_image, 
+                                    S32           Ogg_file_size);
+
+DXDEC S32 AILCALL AIL_enumerate_Ogg_pages (OGG_INFO *inspection_state);
+
+typedef struct
+{
+    const char* file_image;
+    S32 image_size;
+
+    S32 channel_count;
+    S32 sample_rate;
+
+    S32 total_samples;
+    S32 samples_per_frame;
+
+    const char* current_frame;
+
+    // output data - byte offset for current frame.
+    S32 byte_offset;
+} BINKA_INFO;
+
+DXDEC U32 AILCALL AIL_inspect_BinkA(BINKA_INFO* state, char const* file_image, S32 file_size);
+DXDEC S32 AILCALL AIL_enumerate_BinkA_frames(BINKA_INFO* state);
 
 //
 // RAD room types - currently the same as EAX
@@ -5730,8 +5238,9 @@ enum
 
 #endif
 
+#define MSS_BUFFER_HEAD (-1)
 
-#if defined(IS_WIN32API) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_DOS) || defined(IS_PS2) || defined(IS_PS3) || defined(IS_WII)
+#if defined(IS_WIN32API) || defined(IS_MAC) || defined(IS_LINUX) || defined(IS_PS2) || defined(IS_PS3) || defined(IS_WII) || defined(IS_PSP)
 
 //
 // Auxiliary 2D interface calls
@@ -5785,9 +5294,9 @@ DXDEC void       AILCALL AIL_set_sample_3D_distances (HSAMPLE S,
 
 
 DXDEC void       AILCALL AIL_sample_3D_distances     (HSAMPLE S,
-                                                      F32 FAR * max_dist,
-                                                      F32 FAR * min_dist,
-                                                      S32 FAR * auto_3D_wet_atten);
+                                                      F32 * max_dist,
+                                                      F32 * min_dist,
+                                                      S32 * auto_3D_wet_atten);
 
 DXDEC void       AILCALL AIL_set_sample_3D_cone        (HSAMPLE S,
                                                         F32     inner_angle,
@@ -5795,9 +5304,9 @@ DXDEC void       AILCALL AIL_set_sample_3D_cone        (HSAMPLE S,
                                                         F32     outer_volume_level);
 
 DXDEC void       AILCALL AIL_sample_3D_cone            (HSAMPLE S,
-                                                        F32 FAR*  inner_angle,
-                                                        F32 FAR*  outer_angle,
-                                                        F32 FAR*  outer_volume_level);
+                                                        F32*  inner_angle,
+                                                        F32*  outer_angle,
+                                                        F32*  outer_volume_level);
 
 DXDEC void       AILCALL AIL_set_sample_3D_position    (HSAMPLE obj,
                                                         F32     X,
@@ -5824,22 +5333,22 @@ DXDEC void       AILCALL AIL_set_sample_3D_orientation      (HSAMPLE obj,
                                                              F32     Z_up);
 
 DXDEC S32        AILCALL AIL_sample_3D_position             (HSAMPLE  obj,
-                                                             F32 FAR *X,
-                                                             F32 FAR *Y,
-                                                             F32 FAR *Z);
+                                                             F32 *X,
+                                                             F32 *Y,
+                                                             F32 *Z);
 
 DXDEC void       AILCALL AIL_sample_3D_velocity             (HSAMPLE  obj,
-                                                             F32 FAR *dX_per_ms,
-                                                             F32 FAR *dY_per_ms,
-                                                             F32 FAR *dZ_per_ms);
+                                                             F32 *dX_per_ms,
+                                                             F32 *dY_per_ms,
+                                                             F32 *dZ_per_ms);
 
 DXDEC void       AILCALL AIL_sample_3D_orientation          (HSAMPLE  obj,
-                                                             F32 FAR *X_face,
-                                                             F32 FAR *Y_face,
-                                                             F32 FAR *Z_face,
-                                                             F32 FAR *X_up,
-                                                             F32 FAR *Y_up,
-                                                             F32 FAR *Z_up);
+                                                             F32 *X_face,
+                                                             F32 *Y_face,
+                                                             F32 *Z_face,
+                                                             F32 *X_up,
+                                                             F32 *Y_up,
+                                                             F32 *Z_up);
 
 DXDEC void       AILCALL AIL_update_sample_3D_position      (HSAMPLE obj,
                                                              F32     dt_milliseconds);
@@ -5867,29 +5376,1387 @@ DXDEC void       AILCALL AIL_set_listener_3D_orientation      (HDIGDRIVER dig,
                                                                F32     X_up,
                                                                F32     Y_up,
                                                                F32     Z_up);
-                                                               
+
 DXDEC void       AILCALL AIL_listener_3D_position             (HDIGDRIVER  dig,
-                                                               F32 FAR *X,
-                                                               F32 FAR *Y,
-                                                               F32 FAR *Z);
+                                                               F32 *X,
+                                                               F32 *Y,
+                                                               F32 *Z);
 
 DXDEC void       AILCALL AIL_listener_3D_velocity             (HDIGDRIVER  dig,
-                                                               F32 FAR *dX_per_ms,
-                                                               F32 FAR *dY_per_ms,
-                                                               F32 FAR *dZ_per_ms);
+                                                               F32 *dX_per_ms,
+                                                               F32 *dY_per_ms,
+                                                               F32 *dZ_per_ms);
 
 DXDEC void       AILCALL AIL_listener_3D_orientation          (HDIGDRIVER  dig,
-                                                               F32 FAR *X_face,
-                                                               F32 FAR *Y_face,
-                                                               F32 FAR *Z_face,
-                                                               F32 FAR *X_up,
-                                                               F32 FAR *Y_up,
-                                                               F32 FAR *Z_up);
+                                                               F32 *X_face,
+                                                               F32 *Y_face,
+                                                               F32 *Z_face,
+                                                               F32 *X_up,
+                                                               F32 *Y_up,
+                                                               F32 *Z_up);
 
 DXDEC void       AILCALL AIL_update_listener_3D_position      (HDIGDRIVER dig,
                                                                F32     dt_milliseconds);
 
 #endif
+
+#if defined( HOST_SPU_PROCESS )
+
+DXDEC S32 AILCALL MilesStartAsyncThread( S32 thread_num, void const * param );
+
+DXDEC S32 AILCALL MilesRequestStopAsyncThread( S32 thread_num );
+
+DXDEC S32 AILCALL MilesWaitStopAsyncThread( S32 thread_num );
+
+#endif
+
+
+//-----------------------------------------------------------------------------
+//
+// MSS 8 Bank API
+//
+//-----------------------------------------------------------------------------
+
+
+// misc character maxes.
+#define MSS_MAX_ASSET_NAME_BYTES 512
+#define MSS_MAX_PATH_BYTES       512
+
+EXPGROUP(highlevel_util)
+
+EXPTYPE typedef struct MSSSOUNDBANK *HMSOUNDBANK;
+/*
+  Describes a handle to an open sound bank.
+  
+  This handle typedef refers to an open soundbank which is usually obtained from the AIL_add_soundbank() function.
+*/
+
+EXPAPI HMSOUNDBANK AILCALL AIL_open_soundbank(char const *filename);
+/*
+    Open a sound bank. If you are using the event execution engine, use the open soundbank function
+    provided there.
+
+    $:return 0 on fail, or a valid HMSOUNDBANK.
+    $:filename The filename of the soundbank to open.
+
+    Opens a sound bank for use with the MSS8 high level functions. The sound bank must be
+    closed with $AIL_close_soundbank. Use $AIL_add_soundbank if the Miles Event system is used.
+*/
+
+EXPAPI void AILCALL AIL_close_soundbank(HMSOUNDBANK bank);
+/*
+    Close a soundbank previously opened with $AIL_open_soundbank.
+
+    $:bank Soundbank to close.
+      
+    Close a soundbank previously opened with $AIL_open_soundbank. Presets/events loaded from
+            this soundbank are no longer valid.
+*/
+
+EXPAPI char const * AILCALL AIL_get_soundbank_filename(HMSOUNDBANK bank );
+/*
+    Return the filename used to open the given soundbank.
+
+    $:bank Soundbank to query.
+
+    $:return A pointer to the filename for the given soundbank, or 0 if bank is invalid.
+
+    Returns a pointer to the filename for a soundbank. This pointer should not be deleted.
+*/
+
+EXPAPI S32 AILCALL AIL_get_soundbank_mem_usage(HMSOUNDBANK bank);
+/*
+    Returns the amount of data used by the soundbank management structures.
+    
+    $:bank Soundbank to query.
+    $:return Total memory allocated.
+
+    Returns the memory used via AIL_mem_alloc_lock during the creation of this structure.
+*/
+
+EXPAPI S32 AILCALL AIL_enumerate_sound_presets(HMSOUNDBANK bank, HMSSENUM* next, char const* list, char const** name);
+/*
+  Enumerate the sound presets stored in a soundbank.
+
+  $:bank Containing soundbank.
+  $:next Enumeration token. Prior to first call, initialize to MSS_FIRST
+  $:list Optional filter. If specified, presets will only enumerate from the given preset sound preset list.
+  $:name The pointer to the currently enumerated preset name. This should not be deleted.
+
+  $:return Returns 0 when enumeration is complete.
+
+   Enumerates the sound presets available inside of a bank file. Example usage:
+     
+   ${
+            HMSSENUM Token = MSS_FIRST;
+            const char* PresetName = 0;
+            while (AIL_enumerate_sound_presets(MyBank, &Token, 0, &PresetName))
+            {
+                printf("Found a preset named %s!", PresetName);
+
+                AIL_apply_sound_preset(MySample, MyBank, PresetName);
+            }
+    $}
+
+    Note that name should NOT be deleted by the caller - this points at memory owned by
+    Miles.
+*/
+
+EXPAPI S32 AILCALL AIL_enumerate_environment_presets(HMSOUNDBANK bank, HMSSENUM* next, char const* list, char const** name);
+/*
+    Enumerate the environment presets stored in a soundbank.
+
+    $:bank Containing soundbank.
+    $:next Enumeration token. Prior to first call, initialize to MSS_FIRST
+    $:list Optional filter. If specified, presets will only enumerate from the given environment preset list.
+    $:name The pointer to the currently enumerated preset name. This should not be deleted.
+    $:return Returns 0 when enumeration is complete.
+
+    Enumerates the environment presets available inside of a bank file. Example usage:
+      
+    ${
+            HMSSENUM Token = MSS_FIRST;
+            const char* PresetName = 0;
+            while (AIL_enumerate_environment_presets(MyBank, &Token, 0, &PresetName))
+            {
+                printf("Found a preset named %s!", PresetName);
+
+                AIL_apply_environment_preset(MyDriver, MyBank, PresetName);
+            }
+    $}
+
+    Note that name should NOT be deleted by the caller - this points at memory owned by
+    Miles.
+*/
+
+
+EXPAPI S32 AILCALL AIL_enumerate_sound_assets(HMSOUNDBANK bank, HMSSENUM* next, char const** name);
+/*
+    Enumerate sounds stored in a soundbank.
+
+    $:bank Containing soundbank.
+    $:next Enumeration token. Prior to first call, initialize to MSS_FIRST
+    $:name The pointer to the currently enumerated sound name. This should not be deleted.
+    $:return Returns 0 when enumeration is complete.
+
+    Enumerates the sounds available inside of a bank file. Example usage:
+    
+    ${
+            HMSSENUM Token = MSS_FIRST;
+            const char* SoundName = 0;
+            while (AIL_enumerate_sound_assets(MyBank, &Token, &SoundName))
+            {
+                char filename[MSS_MAX_PATH_BYTES];
+                AIL_sound_asset_filename(MyBank, SoundName, filename);
+
+                printf("Found a sound named %s!", SoundName);
+
+                S32* pData = (S32*)AIL_file_read(filename, FILE_READ_WITH_SIZE);
+                AIL_mem_free_lock(pData);
+            }
+    $}
+
+    Note that name should NOT be deleted by the caller - this points at memory owned by
+    Miles.
+*/
+    
+EXPAPI S32 AILCALL AIL_enumerate_events(HMSOUNDBANK bank, HMSSENUM* next, char const * list, char const ** name);
+/*
+    Enumerate the events stored in a soundbank.
+
+    $:bank Soundbank to enumerate within.
+    $:next Enumeration token. Prior to first call, initialize to MSS_FIRST
+    $:list Optional filter. If specified, event will only enumerate from the given event list.
+    $:name The pointer to the currently enumerated preset name. This should not be deleted.
+    $:return Returns 0 when enumeration is complete.
+
+    Enumerates the events available inside of a bank file. Example usage:
+      
+    ${
+            HMSSENUM Token = MSS_FIRST;
+            const char* EventName = 0;
+            while (AIL_enumerate_events(MyBank, &Token, 0, &EventName))
+            {
+                printf("Found an event named %s!", EventName);
+
+                const U8* EventContents = 0;
+                AIL_get_event_contents(MyBank, EventName, &EventContents);
+
+                AIL_enqueue_event(EventContents, 0, 0, 0, 0);
+            }
+    $}
+
+    Note that name should NOT be deleted by the caller - this points at memory owned by
+    Miles.
+*/
+
+
+/*!
+    Preset Application Functions
+
+    (Un)Apply presets to the driver or sample. Unapply returns the properties affected by
+    the preset to their default state.
+*/
+    
+EXPAPI S32 AILCALL AIL_apply_sound_preset(HSAMPLE sample, HMSOUNDBANK bank, char const *name);
+/*
+    Apply the sound preset to the given sample.
+
+    $:sample The sample that will have its properties updated by the preset.
+    $:bank The sound bank containing the named preset.
+    $:name The name of the preset to apply.
+    $:return Returns 0 on fail - check for sample/bank validity, and that the preset is in the correct bank.
+
+    This will alter the properties on a given sample, based on the given preset.
+*/    
+
+EXPAPI S32 AILCALL AIL_unapply_sound_preset(HSAMPLE sample, HMSOUNDBANK bank, char const *name);
+/*
+    Restore the properties affected by the given preset to defaults.
+
+    $:sample The sample that will have its properties updated by the preset.
+    $:bank The sound bank containing the named preset.
+    $:name The name of the preset to apply.
+    $:return Returns 0 on fail - check for sample/bank validity, and that the preset is in the correct bank.
+
+    Presets may or may not affect any given property. Only the properties affected by the specified
+    preset will have their values restored to default. 
+*/
+
+EXPAPI S32 AILCALL AIL_apply_environment_preset(HDIGDRIVER dig, HMSOUNDBANK bank, char const *name);
+/*
+    Apply the environment preset to the given driver.
+
+    $:dig The driver that will have its properties updated by the preset.
+    $:bank The sound bank containing the named preset.
+    $:name The name of the preset to apply.
+    $:return Returns 0 on fail - check for sample/bank validity, and that the preset is in the correct bank.
+
+    This will alter properties on a given driver, based on the given preset.
+*/
+
+EXPAPI S32 AILCALL AIL_unapply_environment_preset(HDIGDRIVER dig, HMSOUNDBANK bank, char const *name);
+/*
+    Restore the properties affected by the given preset to defaults.
+
+    $:dig The driver that will have its properties updated by the preset.
+    $:bank The sound bank containing the named preset.
+    $:name The name of the preset to apply.
+    $:return Returns 0 on fail - check for sample/bank validity, and that the preset is in the correct bank.
+
+    Presets may or may not affect any given property. Only the properties affected by the specified
+    preset will have its value restored to default.
+*/
+
+
+
+
+EXPAPI S32 AILCALL AIL_sound_asset_filename(HMSOUNDBANK bank, char const *name, char *out_name);
+/*
+    Return the filename to use for the given sound asset in calls to Miles' file APIs.
+
+    $:bank The soundbank containing the sound asset.
+    $:name The name of the sound asset to find.
+    $:out_name Returns an output pointer to the file name of the sound asset.
+    $:return Returns the file size of the asset on success, or -1 on fail.
+
+    This function must be called in order to resolve the sound asset name to
+    something that can be used by miles. The filename format will represent whether
+    the asset is stored in the soundbank itself, or stored separately.
+*/
+
+EXPAPI SINTa AILCALL AIL_get_marker_list(HMSOUNDBANK bank, char const* sound_name);
+/*
+    Return an opaque value representing the list of markers attached to a given sound name.
+
+    $:bank The bank containing the sound asset.
+    $:sound_name The name of the sound asset.
+
+    $:return on fail/nonexistent list, or a nonzero opaque value to be passed to $AIL_find_marker_in_list.
+
+    Returns the marker list for a given sound asset. This value should just be passed directly to $AIL_find_marker_in_list
+    to retrieve the offset for a marker by name.
+*/
+
+EXPAPI S32 AILCALL AIL_find_marker_in_list(SINTa marker_list, char const * marker_name);
+/*
+   Returns the byte offset into a sample corresponding to the given marker name.
+
+   $:marker_list The marker list returned from $AIL_get_marker_list.
+   $:marker_name The name of the marker to look up.
+
+   $:return -1 if the marker was not found, or the byte offset of the marker.
+
+   Looks up an offset to use in functions such as $AIL_set_sample_position. marker_list can be retrieved with
+   $AIL_get_marker_list.
+*/
+
+// ----------------------------
+// End MSS8 declarations
+// ----------------------------
+
+//
+// Event routines
+//
+typedef struct _MEMDUMP* HMEMDUMP;
+#define HMSSEVENTCONSTRUCT HMEMDUMP
+
+/*!
+    function
+    {
+        ExcludeOn = 1
+
+        Name = "AIL_create_event", "Creates an empty event to be filled with steps."
+
+        ReturnType = "HMSSEVENTCONSTRUCT", "An empty event to be passed to the various step addition functions, or 0 if out of memory."
+
+        Discussion = "Primarily designed for offline use, this function is the first step in 
+            creating an event that can be consumed by the MilesEvent system. Usage is as follows:
+
+            HMSSEVENTCONSTRUCT hEvent = AIL_create_event();
+
+            // misc add functions
+            AIL_add_start_sound_event_step(hEvent, ...);
+            AIL_add_control_sounds_event_step(hEvent, ...);
+            // etc
+
+            char* pEvent = AIL_close_event(hEvent);
+
+            // Do something with the event
+
+            AIL_mem_free_lock(pEvent);
+
+            Note that if immediately passed to AIL_enqueue_event(), the memory must remain valid until the following
+            $AIL_complete_event_queue_processing.
+            
+            Events are generally tailored to the MilesEvent system, even though there is nothing preventing you
+            from writing your own event system, or creation ui.
+            "
+    }
+*/
+DXDEC HMSSEVENTCONSTRUCT AILCALL AIL_create_event(void);
+
+/*!
+    function
+    {
+        ExcludeOn = 1
+
+        Name = "AIL_close_event", "Returns a completed event, ready for enqueueing in to the MilesEvent system."
+
+        In = "HMSSEVENTCONSTRUCT", "i_Event", "The event to complete."
+
+        ReturnType = "char*", "An allocated event string that can be passed to AIL_next_event_step or enqueued in the
+            MilesEvent system via AIL_enqueue_event."
+
+        Discussion = "The returned pointer must be deleted via AIL_mem_free_lock(). Note that if the MilesEvent system
+            is used, the event pointer must remain valid through the following $AIL_complete_event_queue_processing call."
+
+    }
+*/
+DXDEC U8* AILCALL AIL_close_event(HMSSEVENTCONSTRUCT i_Event);
+
+#define MILES_START_STEP_PRIORITY 0
+#define MILES_START_STEP_DISTANCE 1
+#define MILES_START_STEP_VOLUME 2
+#define MILES_START_STEP_OLDEST 3
+
+/*!
+    function
+    {
+        ExcludeOn = 1
+
+        Name = "AIL_add_start_sound_event_step", "Adds a step to a given event to start a sound with the given specifications."
+
+        In = "HMSSEVENTCONSTRUCT", "i_Event", "The event to add the step to."
+        In = "const char*", "i_SoundNames", "The names and associated weights for the event step to choose from. 
+            If there are multiple names listed, the sound will be chosen at random based on the given weights. This 
+            string is of the form 'BankName1/SoundName1:Weight1:BankName2/SoundName2:Weight2:' etc. The string must always
+            terminate in a ':'. Weight must be between 0 and 200. To provide a null sound to randomly choose to not play anything, use 
+            an empty string as an entry."
+
+        In = "const char*", "i_PresetBank", "[optional] The bank containing the preset to use when starting this sound. Required if i_PresetName is not null."
+        In = "const char*", "i_PresetName", "[optional] The name of the preset, of the form 'PresetList/PresetName'"
+        In = "const char*", "i_EventBank", "[optional] The bank containing the event to execute upon completion of the sound. Required if event_name is not null."
+        In = "const char*", "event_name", "[optional] The name of the event to execute upon completion of the sound, of the form 'PresetList/PresetName'"
+        In = "const char*", "i_StartMarker", "[optional] The name of a marker to use as the loop start point."
+        In = "const char*", "i_EndMarker", "[optional] The name of a marker to use as the loop end point."
+        In = "const char*", "i_Labels", "[optional] A comma delimited list of labels to assign to the sound."
+        In = "U32", "i_Streaming", "If nonzero, the sound will be setup and started as a stream."
+        In = "U8", "i_CanLoad", "If nonzero, the sound is allowed to hit the disk instead of only accessing cached sounds. If true, this might cause a hitch."
+        In = "U16", "i_Delay", "The minimum delay in ms to apply to the sound before start."
+        In = "U16", "i_DelayMax", "The maximum delay in ms to apply to the sound before start."
+        In = "U8", "i_Priority", "The priority to assign to the sound. If a sound encounters a limit based on its labels, it will evict any sound 
+            with a priority strictly less than the given priority."
+        In = "U8", "i_LoopCount", "The loop count as per AIL_set_sample_loop_count."
+        In = "const char*", "i_StartOffset", "[optional] The name of the marker to use as the sound's initial offset."
+        In = "U8", "i_EvictionType", "The basis for deciding what sound will get kicked out if a limit is hit when trying to play this sound."
+
+        ReturnType = "S32", "Returns 1 on success."
+
+        Discussion = "Adds an event that can start a sound. If the sound names list contains multiple entries, one will be selected
+            randomly based on the given weights. Weights are effectively ratios for liklihood. A sound with 100 weight will be twice as likely
+            as a sound with 50 weight. Some times you may want to have an event that only *might* play a sound. To do this, add a empty sound name
+            with an associated weight.
+
+            (contrived) Example:
+
+            AIL_add_start_sound_event_step(hEvent,
+                `":50:MyBank.mssbnk/Footstep:100:`",
+                `"MyBank.mssbnk`", `"PlayerEffects/FootEcho`",
+                0, 0,
+                `"WalkStart`", `"WalkEnd`",
+                `"player, footstep`",
+                0,
+                0,
+                0, 100,
+                64);
+
+            This example will play the Footstep sound from MyBank.mssbnk roughly 67% of the time this event step fires.
+            The preset PlayerEffects/FootEcho will be applied upon start, and no event will be executed when the sound completes.
+            The loop endpoints are defined by the markers `"WalkStart`", and `"WalkEnd`". When playing, it can be found by enumerating
+            the labels `"player`" or `"footstep`". It will not stream, it can not hit the disk, and it will randomly delay starting by 
+            some value between 0 and 100 milliseconds. It has a low-ish priority (64 out of 256), so odds are it will get kicked out
+            by another sound if there are too many sounds with the labels `"player`" or `"footstep`" playing.
+            
+            For eviction type, one of the following constants sshould be used:
+            MILES_START_STEP_PRIORITY - Evict a sound less than our priority.
+            MILES_START_STEP_DISTANCE - Evict thethest sound from the listener.
+            MILES_START_STEP_VOLUME - Evict the quietest sound after mixing, using the loudest channel as the qualifier.
+            MILES_START_STEP_OLDEST - Evict the sound that has been playing the longest.
+            "
+    }
+*/
+DXDEC
+S32
+AILCALL
+AIL_add_start_sound_event_step(
+    HMSSEVENTCONSTRUCT i_Event, 
+    const char* i_SoundNames,
+    const char* i_PresetBank, const char* i_PresetName, 
+    const char* i_EventBank, const char* event_name,
+    const char* i_StartMarker, const char* i_EndMarker,
+    const char* i_Labels, U32 i_Streaming, U8 i_CanLoad, 
+    U16 i_Delay, U16 i_DelayMax, U8 i_Priority, U8 i_LoopCount,
+    const char* i_StartOffset,
+    F32 i_VolMin, F32 i_VolMax, F32 i_PitchMin, F32 i_PitchMax,
+    U8 i_EvictionType
+    );
+
+/*!
+    function
+    {
+        ExcludeOn = 1
+
+        Name = "AIL_add_cache_sounds_event_step", "Adds a step to an event to load a list of sounds in to memory for play."
+
+        In = "HMSSEVENTCONSTRUCT", "i_Event", "The event to add on to."
+        In = "const char*", "bankName", "The bank filename containing all of the sounds."
+        In = "const char*", "i_Sounds", "A list of colon separated sounds to load from the bank file."
+
+        ReturnType = "S32", "Returns 1 on success."
+
+        Discussion = "In general events are not allowed to hit the disk in order to prevent unexpected hitching during
+            gameplay. In order to facilitate that, sounds need to be preloaded by this event. Each cache step can only
+            load sounds from a single bank file, so for multiple bank files, multiple steps will be needed.
+
+            In order to release the data loaded by this event, AIL_add_uncache_sounds_event_step() needs to
+            be called with the same parameters.
+            
+            If you are using MilesEvent, the data is refcounted so the sound will not be freed until all
+            samples using it complete."
+    }
+*/
+DXDEC
+S32
+AILCALL
+AIL_add_cache_sounds_event_step(
+    HMSSEVENTCONSTRUCT i_Event, const char* bankName, const char* i_Sounds);
+
+
+/*!
+    function
+    {
+        ExcludeOn = 1
+
+        Name = "AIL_add_uncache_sounds_event_step", "Adds a step to an event to free a list of sounds previously loaded in to memory for play."
+
+        In = "HMSSEVENTCONSTRUCT", "i_Event", "The event to add on to."
+        In = "const char*", "bankName", "The bank filename containing all of the sounds."
+        In = "const char*", "i_Sounds", "A list of colon separated sounds from the bank file to uncache."
+
+        ReturnType = "S32", "Returns 1 on success."
+
+        Discussion = "This event released sounds loaded via AIL_add_cache_sounds_event_step()"
+    }
+*/
+DXDEC
+S32
+AILCALL
+AIL_add_uncache_sounds_event_step(
+    HMSSEVENTCONSTRUCT i_Event, const char* bankName, const char* i_Sounds);
+
+
+
+#define MILES_CONTROL_STEP_STOP 3
+#define MILES_CONTROL_STEP_STOP_NO_EVENTS 4
+#define MILES_CONTROL_STEP_PASS 0
+#define MILES_CONTROL_STEP_PAUSE 1
+#define MILES_CONTROL_STEP_RESUME 2
+
+#define MILES_CONTROL_STEP_IGNORELOOP 255
+
+/*!
+    function
+    {
+        ExcludeOn = 1
+
+        Name = "AIL_add_control_sounds_event_step", "Adds a step to an event to control sample playback by label."
+
+        In = "HMSSEVENTCONSTRUCT", "i_Event", "The event to add on to."
+        In = "const char*", "i_Labels", "[optional] A comma seperated list of labels to control."
+        In = "const char*", "i_MarkerStart", "[optional] If exists, sets the loop start to the marker's offset."
+        In = "const char*", "i_MarkerEnd", "[optional] If exists, sets the loop end to the marker's offset."
+        In = "const char*", "i_Position", "[optional] If exists, sets the current playback position to the marker's offset."
+        In = "const char*", "i_PresetBank", "[optional] The bank containing a preset to apply."
+        In = "const char*", "i_PresetName", "[optional] The name of the preset to apply, of the form PresetList/PresetName."
+        In = "U8", "i_LoopCount", "If the loop count is not to be affected, pass MILES_CONTROL_STEP_IGNORELOOP. Otherwise, the sample's loop count will be set to this value."
+        In = "U8", "i_Type", "The control type requested. See Discussion."
+
+        ReturnType = "S32", "Returns 1 on success."
+
+        Discussion = "Controls playback of current instances. The sounds are matched either on name or label. If
+            i_Labels is null, all sounds will be controlled.
+            
+            The following flags may be used as i_Type:
+                MILES_CONTROL_STEP_STOP
+                MILES_CONTROL_STEP_PASS
+                MILES_CONTROL_STEP_PAUSE
+                MILES_CONTROL_STEP_RESUME
+                MILES_CONTROL_STEP_STOP_NO_EVENTS - if used, completion events on stopped sounds will *not* be queued.
+            "
+    }
+*/
+DXDEC
+S32
+AILCALL
+AIL_add_control_sounds_event_step(
+    HMSSEVENTCONSTRUCT i_Event, 
+    const char* i_Labels, const char* i_MarkerStart, const char* i_MarkerEnd, const char* i_Position,
+    const char* i_PresetBank, const char* i_PresetName,
+    U8 i_LoopCount, U8 i_Type);
+
+
+/*!
+    function
+    {
+        ExcludeOn = 1
+
+        Name = "AIL_add_apply_environment_event_step", "Adds a step to an event to apply an environment preset."
+
+        In = "HMSSEVENTCONSTRUCT", "i_Event", "The event to add on to."
+        In = "const char*", "i_EnvBank", "The bank containing environment preset."
+        In = "const char*", "i_EnvName", "The name of the environment preset to apply, of the form EnvList/EnvName."
+
+        ReturnType = "S32", "Returns 1 on success."
+
+        Discussion = "Applies the specified environment preset to the current HDIGDRIVER."
+    }
+*/
+DXDEC
+S32
+AILCALL
+AIL_add_apply_environment_event_step(HMSSEVENTCONSTRUCT i_Event, const char* i_EnvBank, const char* i_EnvName);
+
+/*!
+    function
+    {
+        ExcludeOn = 1
+
+        Name = "AIL_add_comment_event_step", "Adds a step that represents a comment to the user of the editing tool."
+
+        In = "HMSSEVENTCONSTRUCT", "i_Event", "The event to add on to."
+        In = "const char*", "i_Comment", "A string to display in the editing tool."
+
+        ReturnType = "S32", "Returns 1 on success."
+
+        Discussion = "This event is ignored in the runtime, and only exist for editing convenience."
+    }
+*/
+DXDEC
+S32
+AILCALL
+AIL_add_comment_event_step(HMSSEVENTCONSTRUCT i_Event, const char* i_Comment);
+
+/*!
+    function
+    {
+        ExcludeOn = 1
+
+        Name = "AIL_add_sound_limit_event_step", "Adds a step that defines the maximum number of playing sounds per label."
+
+        In = "HMSSEVENTCONSTRUCT", "i_Event", "The event to add on to."
+        In = "const char*", "i_SoundLimits", "A string of the form `"label count:anotherlabel count`"."
+
+        ReturnType = "S32", "Returns 1 on success."
+
+        Discussion = "Defines limits for instances of sounds on a per label basis. Sounds with multiple labels
+            must fit under the limits for all of their labels. By default sounds are not limited other than the
+            Miles max sample count."
+    }
+*/
+DXDEC
+S32
+AILCALL
+AIL_add_sound_limit_event_step(HMSSEVENTCONSTRUCT i_Event, const char* i_SoundLimits);
+
+/*!
+    function
+    {
+        ExcludeOn = 1
+
+        Name = "AIL_add_persist_preset_event_step", "Adds a preset that applies to current sound instances, and continues to be applied to new sounds as they are started."
+        In = "HMSSEVENTCONSTRUCT", "i_Event", "The event to add on to."
+        In = "const char*", "i_PresetBank", "The bank containing the sound preset."
+        In = "const char*", "i_PresetName", "The name of the preset, of the form PresetList/PresetName. See discussion."
+        In = "const char*", "i_PersistName", "The name of this persisted preset, for future removal."
+        In = "const char*", "i_Labels", "The labels to apply this preset to."
+
+        ReturnType = "S32", "Returns 1 on success."
+
+        Discussion = "Defines a preset by name that remains in the system, testing against all started sounds for label match. If a
+            match occurs, then the preset is applied to the new sound, before the preset specified in the startsound step itself.
+
+            In order to remove a persisted preset, refer to it by name, but leave all other parameters null.
+
+            Example:
+
+            // Persist a preset for players.
+            AIL_add_persist_preset_event_step(hEvent, `"MyBank.mssbnk`", `"PlayerEffects/Underwater`", `"Underwater`", `"player`");
+
+            // Remove the above preset.
+            AIL_add_persist_preset_event_step(hEvent, 0, 0, `"Underwater`", 0);"
+    }
+*/
+DXDEC
+S32
+AILCALL
+AIL_add_persist_preset_event_step(
+    HMSSEVENTCONSTRUCT i_Event, 
+    const char* i_PresetBank, const char* i_PresetName,
+    const char* i_PersistName, const char* i_Labels);
+
+DXDEC
+S32 AILCALL AIL_get_event_contents(HMSOUNDBANK bank, char const * name, U8 const** event);
+/*
+    Return the event data for an event, by name.
+
+    $:bank Soundbank containing the event.
+    $:name Name of the event to retrieve.
+    $:event Returns an output pointer to the event contents. Note that this string isn't null terminated, and
+      thus shouldn't be checked via strlen, etc.
+    $:return Returns 0 on fail.
+
+    Normally, event contents are meant to be handled by the Miles high-level system via $AIL_enqueue_event, 
+    rather than inspected directly.
+*/
+
+
+enum EVENT_STEPTYPE
+{
+    EVENT_STEPTYPE_STARTSOUND = 1,
+    EVENT_STEPTYPE_CONTROLSOUNDS,
+    EVENT_STEPTYPE_APPLYENV,
+    EVENT_STEPTYPE_COMMENT,
+    EVENT_STEPTYPE_CACHESOUNDS,
+    EVENT_STEPTYPE_PURGESOUNDS,
+    EVENT_STEPTYPE_SETLIMITS,
+    EVENT_STEPTYPE_PERSIST,
+    EVENT_STEPTYPE_VERSION,
+};
+
+//! Represents an immutable string that is not null terminated, and shouldn't be deleted.
+struct _MSSSTRINGC
+{
+    const char* str;
+    S32 len;
+};
+typedef struct _MSSSTRINGC MSSSTRINGC;
+
+
+/*!
+    Represents a single step that needs to be executed for an event.
+
+    All of the members in the structures share the same definition as
+    their counterpart params in the functions that added them during
+    event construction.
+*/
+struct EVENT_STEP_INFO
+{
+    //! type controls which struct in the union is accessed.
+    enum EVENT_STEPTYPE type;
+    union
+    {
+        struct
+        {
+            MSSSTRINGC soundname;
+            MSSSTRINGC presetlib;
+            MSSSTRINGC presetname;
+            MSSSTRINGC eventlib;
+            MSSSTRINGC eventname;
+            MSSSTRINGC labels;
+            MSSSTRINGC markerstart;
+            MSSSTRINGC markerend;
+            MSSSTRINGC startoffset;
+            U32 stream;
+            F32 volmin,volmax,pitchmin,pitchmax;
+            U16 delaymin;
+            U16 delaymax;
+            U8 canload;
+            U8 priority;
+            U8 loopcount;
+            U8 evictiontype;
+        } start;
+
+        struct
+        {
+            MSSSTRINGC labels;
+            MSSSTRINGC markerstart;
+            MSSSTRINGC markerend;
+            MSSSTRINGC position;
+            MSSSTRINGC presetlib;
+            MSSSTRINGC presetname;
+            U8 loopcount;
+            U8 type;
+        } control;
+
+        struct
+        {
+            MSSSTRINGC envlib;
+            MSSSTRINGC envname;
+        } env;
+
+        struct
+        {
+            MSSSTRINGC comment;
+        } comment;
+
+        struct
+        {
+            MSSSTRINGC lib;
+            const char** namelist;
+            S32 namecount;
+        } load;
+
+        struct
+        {
+            MSSSTRINGC limits;
+        } limits;
+
+        struct
+        {
+            MSSSTRINGC name;
+            MSSSTRINGC presetlib;
+            MSSSTRINGC presetname;
+            MSSSTRINGC labels;
+        } persist;
+    };
+};
+
+/*!
+    function
+    {
+        ExcludeOn = 1
+
+        Name = "AIL_next_event_step", "Retrieves the next step in the event buffer, parsing it in to a provided buffer."
+
+        In = "const U8*", "i_EventString", "The event returned by $AIL_close_event, or a previous call to $AIL_next_event_step"
+        Out = "const EVENT_STEP_INFO*", "o_Step", "A pointer to the step struct will be stored here."
+        In = "void*", "i_Buffer", "A working buffer for the function to use for parsing."
+        In = "S32", "i_BufferSize", "The size in bytes of the working buffer."
+
+        ReturnType = "U8 char*", "Returns 0 on fail or when the event string has been exhausted of steps. Otherwise, returns
+            the string location of the next event step in the buffer."
+
+        Discussion = "This function parses the event string in to a struct for usage by the user. This function should only be
+            used by the MilesEvent system. It returns the pointer to the next step to be passed to this function to get the 
+            next step. In this manner it can be used in a loop:
+
+            // Create an event to stop all sounds.
+            HMSSEVENTCONSTRUCT hEvent = AIL_create_event();
+            AIL_add_control_sound_event_step(hEvent, 0, 0, 0, 0, 0, 0, 255, 3);
+            char* pEvent = AIL_close_event(hEvent);
+
+            char EventBuffer[4096];
+            EVENT_STEP_INFO* pStep = 0;
+            char* pCurrentStep = pEvent;
+
+            while (pCurrentStep)
+            {
+                pStep = 0;
+                pCurrentStep = AIL_next_event_step(pCurrentStep, &pStep, EventBuffer, 4096);
+                if (pStep == 0)
+                {
+                    // Error!
+                    break;
+                }
+
+                // Handle event step.
+                switch (pStep->type)
+                {
+                    default: break;
+                }
+            }
+
+            AIL_mem_free_lock(pEvent);
+            "
+    }
+*/
+DXDEC const U8* AILCALL AIL_next_event_step(const U8* i_EventString, struct EVENT_STEP_INFO** o_Step, void* i_Buffer, S32 i_BufferSize);
+
+
+// Old style names.
+#define AIL_find_event                      MilesFindEvent
+#define AIL_clear_event_queue               MilesClearEventQueue
+#define AIL_register_random                 MilesRegisterRand
+#define AIL_enumerate_sound_instances       MilesEnumerateSoundInstances
+#define AIL_enumerate_preset_persists       MilesEnumeratePresetPersists
+#define AIL_enqueue_event                   MilesEnqueueEvent
+#define AIL_begin_event_queue_processing    MilesBeginEventQueueProcessing
+#define AIL_complete_event_queue_processing MilesCompleteEventQueueProcessing
+#define AIL_startup_event_system            MilesStartupEventSystem
+#define AIL_shutdown_event_system           MilesShutdownEventSystem
+#define AIL_add_soundbank                   MilesAddSoundBank
+#define AIL_release_soundbank               MilesReleaseSoundBank
+#define AIL_set_sound_label_limits          MilesSetSoundLabelLimits
+#define AIL_text_dump_event_system          MilesTextDumpEventSystem
+#define AIL_event_system_state              MilesGetEventSystemState
+#define AIL_stop_sound_instances            MilesStopSoundInstances
+#define AIL_pause_sound_instances           MilesPauseSoundInstances
+#define AIL_resume_sound_instances          MilesResumeSoundInstances
+#define AIL_start_sound_instance            MilesStartSoundInstance
+
+
+
+EXPGROUP(Miles High Level Event System)
+
+
+EXPAPI S32 AILCALL AIL_startup_event_system(HDIGDRIVER dig, char const* base_path, S32 command_buf_len, EXPOUT char* memory_buf, S32 memory_len);
+/*
+   Initializes the Miles Event system and associates it with an open digital driver.
+   
+   $:dig The digital sound driver that this event system should use.
+   $:base_path The file path from which library names and external sound assets are 
+            loaded from. For example, $AIL_add_soundbank with "filename" will use "base_path/filename"
+            at the file system level.
+            (Also, events that reference soundbanks will look for the files relative to this location.) 
+   $:command_buf_len An optional number of bytes to use for the command buffer. If you pass 0, a reasonable default will be used (currently 5K).
+   $:memory_buf An optional pointer to a memory buffer buffer that the event 
+            system will use for all event allocations. Note that the sound data itself is not stored in this buffer - it is
+            only for internal buffers, the command buffer, and instance data. Use 0 to let Miles to allocate this buffer itself.
+   $:memory_len If memory_buf is non-null, then this parameter provides the length.  If memory_buf is null, the Miles will
+      allocate this much memory for internal buffers. If both memory_buf and memory_len are null, the Miles will allocate reasonable default (currently 64K).
+   $:return Returns 0 on startup failure.
+
+   This function starts up the Miles Event System, which is used to trigger events throughout your game.
+   You usually call it after $AIL_open_digital_driver.
+*/
+
+EXPAPI void AILCALL AIL_shutdown_event_system( void );
+/*
+  Shuts down the Miles event system.
+      
+  This function will closes everything in the event system - it ignores reference counts. It will free
+  all event memory, sound banks, and samples used by the system.
+*/
+
+EXPAPI HMSOUNDBANK AILCALL AIL_add_soundbank(char const * filename);
+/*
+    Open and add a sound bank for use with the event system.
+
+    $:filename Filename of the bank to load (relative to the path specified in $AIL_startup_event_system.
+    $:return The handle to the newly loaded soundbank (zero on failure).
+
+    This function opens the sound bank (if not already open) and makes it available to the event system by incrementing its 
+    internal reference count.  You must call $AIL_release_soundbank for every call to this function.
+    
+    This function will access the disc, so you will usually call it at level load time.
+*/
+
+EXPAPI S32 AILCALL AIL_release_soundbank(HMSOUNDBANK bank);
+/*
+   Releases a sound bank from the event system.
+
+   $:bank   The bank to close.
+   $:return Returns non-zero for success (zero on failure).
+
+    This function decrements the soundbank's file reference count and if 
+    the count drops to zero, then will the soundbank be freed.  Because
+    the soundbanks are referenced counted, you can free it while sounds
+    are still being played, and as soon as the last sound completes, 
+    it will be freed.
+*/
+
+EXPAPI U8 const * AILCALL AIL_find_event(HMSOUNDBANK bank,char const* event_name);
+/*
+    Searches for an event by name in the event system.
+    
+    $:bank The soundbank to search within, or 0 to search all open banks (which is the normal case).
+    $:event_name The name of the event to find.  This name should be of the form "event_list/event_name".
+    $:return A pointer to the event contents (or 0, if the event isn't found).
+    
+    This function is normally used as the event parameter for $AIL_enqueue_event. It
+    searches one or all open soundbanks for a particular event name.
+    
+    This is how you trigger your sound designer's events - you use this function to find them, and then use $AIL_enqueue_event to start them.
+*/
+
+EXPAPI U64 AILCALL AIL_enqueue_event(U8 const * event, void* user_buffer, S32 user_buffer_len, S32 enqueue_flags, U64 apply_to_ID );
+/*
+    Enqueue an event to be processed by the next $AIL_begin_event_queue_processing function.
+    
+    $:event Pointer to the event contents to queue. The contents must be valid until the
+            next call to $AIL_begin_event_queue_processing. Note that the pointer returned by $AIL_find_event
+            satisfies this requirement. 
+    $:user_buffer Pointer to a user buffer. This pointer can be saved directly, or it's contents copied into the sound instance. 
+            This data is then accessible later, when enumerating the instances. 
+    $:user_buffer_len Size of the buffer pointed to by user_buffer.
+    $:enqueue_flags Optional flags that control how to enqueue this event (default is 0).
+    $:apply_to_ID Optional value that is used for events that contain "Apply Sound Preset" or "Control Sound" Event Steps. Normally,
+      when Miles triggers one of these event steps, it matches the name and labels stored with the event step. However, if 
+      you specify an apply_to_ID value, then event step will only run on sounds that matches this QueuedID or InstanceID too.  This is how you
+      execute events only specific sound instances.  QueuedIDs are returned from each call $AIL_enqueue_event, and 
+      InstanceIDs are returned from $AIL_enumerate_sound_instances.
+    $:return  On success, returns a queuedID value that is unique to this queued event for the rest of this 
+              program run (you can use this ID to uniquely identify sounds triggered from this event).
+    
+     This function enqueues an event to be triggered - this is how you begin execution of an event.  First, you
+     queue it, and then later (usually once a game frame), you call $AIL_begin_event_queue_processing to
+     execute an event.
+          
+     This function is very lightweight.  It does nothing more than post the
+        event and data to a command buffer that gets executed via $AIL_begin_event_queue_processing.
+
+            The user_buffer parameter can be used in different ways. If no flags are passed in, then
+            Miles will copy the data from user_buffer (user_buffer_len bytes long) and store the data with
+            the queued sound - you can then free the user_buffer data completely!  This lets Miles keep track
+            of all your sound related memory directly and is the normal way to use the system (it is very 
+            convenient once you get used to it).
+
+            If you instead pass the MILESEVENT_ENQUEUE_BUFFER_PTR flag, then user_buffer pointer will
+            simply be associated with each sound that this event may start. In this case, user_buffer_len
+            is ignored. 
+            
+            In both cases, when you later enumerate the sound instances, you can access your sound data 
+            with the $(MILESEVENTSOUNDINFO::UserBuffer) field.
+            
+     You can call this function from any number threads - it's designed to be called from anywhere in your game.
+*/
+
+#define MILESEVENT_ENQUEUE_BUFFER_PTR 0x1
+#define MILESEVENT_ENQUEUE_FREE_EVENT 0x2
+
+EXPAPI S32 AILCALL AIL_begin_event_queue_processing( void );
+/*
+    Begin execution of all of the enqueued events.
+
+    $:return Return 0 on failure. The only failures are unrecoverable errors in the queued events 
+      (out of memory, bank file not found, bad data, etc).  You can get the specific error by
+      calling AIL_get_error().
+    
+      This function executes all the events currently in the queue. This is where all major
+            processing takes place in the event system.
+            
+            Once you execute this functions, then sound instances will be in one of three states:
+            
+            $(MILESEVENTSOUNDSTATUS::MILESEVENT_SOUND_STATUS_PENDING)[MILESEVENT_SOUND_STATUS_PENDING] - these are new sound instances that were
+            created by events that had a "Start Sound Step". Note that these instances aren't audible yet,
+            so that you have a chance to modify game driven properties (like the 3D position)
+            on the sound before Miles begins to play it.  
+            
+            $(MILESEVENTSOUNDSTATUS::MILESEVENT_SOUND_STATUS_PLAYING)[MILESEVENT_SOUND_STATUS_PLAYING] - these are sound instances that were previously
+            started and are continuing to play (you might update the 3D position for these, for example).
+            
+            $(MILESEVENTSOUNDSTATUS::MILESEVENT_SOUND_STATUS_COMPLETE)[MILESEVENT_SOUND_STATUS_COMPLETE] - these are sound instances that finished playing
+            since the last this frame (you might use this status to free any game related memory, for example).
+
+            You will normally enumerate the active sound instances in-between calls to $AIL_begin_event_queue_processing
+            and $AIL_complete_event_queue_processing with $AIL_enumerate_sound_instances.
+
+            $AIL_complete_event_queue_processing must be called after this function to commit
+            all the changes.
+
+            Example usage:
+${
+            // enqueue an event
+            AIL_enqueue_event( EventThatStartsSounds, game_data_ptr, 0, MILESEVENT_ENQUEUE_BUFFER_PTR, 0 );
+
+            // now process that event
+            AIL_begin_event_queue_processing( );
+
+            // next, enumerate the pending and complete sounds for game processing
+            MILESEVENTSOUNDINFO Info;
+
+            HMSSENUM SoundEnum = MSS_FIRST;
+            while ( AIL_enumerate_sound_instances( &SoundEnum, MILESEVENT_SOUND_STATUS_PENDING | MILESEVENT_SOUND_STATUS_COMPLETE, 0, &Info ) )    
+            {
+                game_type * game_data = (game_type*) Info.UserBuffer; // returns the game_data pointer from the enqueue
+
+                if ( Info.Status == MILESEVENT_SOUND_STATUS_PENDING )
+                {
+                    // setup initial state
+                    AIL_set_sample_3D_position( Info.Sample, game_data->x, game_data->y, game_data->z );
+                }
+                else if ( Info.Status == MILESEVENT_SOUND_STATUS_COMPLETE )
+                {
+                    // Free some state we have associated with the sound now that its done.
+                    game_free( game_data );
+                }
+            }
+
+            AIL_complete_event_queue_processing( ); 
+  $}          
+            
+            Note that if any event step drastically fails, the rest of the command queue is 
+            skipped, and this function returns 0! For this reason, you shouldn't assume
+            that a start sound event will always result in a completed sound later.
+            
+            Therefore, you should allocate memory that you want associated with a sound instance
+            during the enumeration loop, rather than at enqueue time.  Otherwise, you
+            need to detect that the sound didn't start and then free the memory (which can be complicated).
+*/
+
+// Returned by AIL_enumerate_sound_instances()
+EXPTYPE typedef struct _MILESEVENTSOUNDINFO
+{
+    U64 QueuedID;
+    U64 InstanceID;
+    HSAMPLE Sample;
+    HSTREAM Stream;
+    void* UserBuffer;
+    S32 UserBufferLen;
+    S32 Status; 
+    U32 Flags;
+} MILESEVENTSOUNDINFO;
+/*
+  Sound instance data that is associated with each active sound instance.
+  
+  $:QueuedID A unique ID that identifies the queued event that started this sound. Returned from each call to $AIL_enqueue_event.
+  $:InstanceID A unique ID that identified this specific sound instance (note that one QueuedID can trigger multiple InstanceIDs).
+  $:Sample The $HSAMPLE for this playing sound.
+  $:Stream The $HSTREAM for this playing sound (if it is being streamed).
+  $:UserBuffer A pointer to the user data for this sound instance.
+  $:UserBufferLen The length in bytes of the user data (if known by Miles).
+  $:Status One of the $MILESEVENTSOUNDSTATUS status values.
+  $:Flags One of the $MILESEVENTSOUNDFLAG flags.
+  
+  This structure is returned by the $AIL_enumerate_sound_instances function. It
+  returns information about an active sound instance.
+*/
+
+EXPAPI S32 AILCALL AIL_enumerate_sound_instances(HMSSENUM* next, S32 statuses, char const* label_query, U64 search_for_ID, EXPOUT MILESEVENTSOUNDINFO* info);
+/*
+    Enumerated the active sound instances managed by the event system.
+
+    $:next Enumeration token - initialize to MSS_FIRST before the first call. You can pass 0 here, if you just want the first instance that matches.
+    $:statuses Or-ed list of status values to enumerate. Use 0 for all status types.
+    $:label_query A query to match sound instance lables against.  Use 0 to skip label matching.
+    $:search_for_ID Match only instances that have a QueuedID or InstanceID that matches this value. Use 0 to skip ID matching.
+    $:info Returns the data for each sound instance. 
+    $:return  Returns 0 when enumeration is complete.
+
+    Enumerates the sound instances. This will generally be used between
+      calls to $AIL_begin_event_queue_processing and $AIL_complete_event_queue_processing to 
+      manage the sound instances.
+
+    The label_query is a list of labels to match, separated by commas.  By default, comma-separated
+      values only have to match at least one label.  So, if you used "level1, wind", then all sound instances
+      that had either "level1" <i>or</i> "wind" would match.  If you want to match <i>all</i> labels,
+      then use the + sign first (for example, "+level1, +wind" would only match sound instances that
+      had <i>both</i> "level1" and "wind").  You can also use the - sign before a label to <i>not</i>
+      match that label (so, "level1, -wind" would match all "level1" labeled sound instances that didn't have
+      a "wind" label).  Finally, you can also use * and ? to match wildcard style labels (so, "gun*"
+      would match any sound instance with a label that starts with "gun").
+
+      Valid status flags are:
+
+            $(MILESEVENTSOUNDSTATUS::MILESEVENT_SOUND_STATUS_PENDING)[MILESEVENT_SOUND_STATUS_PENDING] - these are new sound instances that were
+            created by events that had a "Start Sound Step". Note that these instances aren't audible yet,
+            so that you have a chance to modify game driven properties (like the 3D position)
+            on the sound before Miles begins to play it.  
+            
+            $(MILESEVENTSOUNDSTATUS::MILESEVENT_SOUND_STATUS_PLAYING)[MILESEVENT_SOUND_STATUS_PLAYING] - these are sound instances that were previously
+            started and are continuing to play (you might update the 3D position for these, for example).
+            
+            $(MILESEVENTSOUNDSTATUS::MILESEVENT_SOUND_STATUS_COMPLETE)[MILESEVENT_SOUND_STATUS_COMPLETE] - these are sound instances that finished playing
+            since the last this frame (you might use this status to free any game related memory, for example).
+
+            Example Usage:
+${
+            HMSSENUM SoundEnum = MSS_FIRST;
+            MILESEVENTSOUNDINFO Info;
+
+            while ( AIL_enumerate_sound_instances( &SoundEnum, 0, 0, &Info ) )    
+            {
+              if ( Info.Status != MILESEVENT_SOUND_STATUS_COMPLETE )
+              {
+                game_SoundState* game_data= (game_SoundState*)( Info.UserBuffer );
+                AIL_set_sample_is_3D( Info.Sample, 1 );
+                AIL_set_sample_3D_position( Info.Sample, game_data->x, game_data->y, game_date->z );
+              }
+            }
+
+$}
+*/
+
+
+
+//! Sound status defines
+EXPTYPEBEGIN typedef S32 MILESEVENTSOUNDSTATUS;
+#define MILESEVENT_SOUND_STATUS_PENDING 0x1
+#define MILESEVENT_SOUND_STATUS_PLAYING 0x2
+#define MILESEVENT_SOUND_STATUS_COMPLETE 0x4
+EXPTYPEEND
+/*
+  specifies the status of a sounnd instance.
+  
+  $:MILESEVENT_SOUND_STATUS_PENDING New sound instances that were
+            created by events that had a "Start Sound Step". Note that these instances aren't audible yet,
+            so that you have a chance to modify game driven properties (like the 3D position)
+            on the sound before Miles begins to play it. 
+                    
+  $:MILESEVENT_SOUND_STATUS_PLAYING Sound instances that were previously
+            started and are continuing to play (you might update the 3D position for these, for example).
+            
+  $:MILESEVENT_SOUND_STATUS_COMPLETE Sound instances that finished playing
+            since the last this frame (you might use this status to free any game related memory, for example).
+  
+These are the status values that each sound instance can have.  Use $AIL_enumerate_sound_instances to retrieve them.
+*/
+
+
+//
+// Sound flags
+//
+
+//! Sound source was not in memory, and no hitching allowed.
+//! Evicted due to sound limit.
+EXPTYPEBEGIN typedef U32 MILESEVENTSOUNDFLAG;
+#define MILESEVENT_SOUND_FLAG_FAILEDLOAD 0x1
+#define MILESEVENT_SOUND_FLAG_EVICTED 0x2
+EXPTYPEEND
+/*
+  specifies the status of a sounnd instance.
+  
+  $:MILESEVENT_SOUND_FLAG_FAILEDLOAD For sound instances with a $(MILESEVENTSOUNDSTATUS::MILESEVENT_SOUND_STATUS_COMPLETE)[MILESEVENT_SOUND_STATUS_COMPLETE] status,
+    this flag means that the sound data wasn't in memory (there was no earlier preload event step, and the 
+    sound designer clicked the "don't allow the disc to be accessed" checkbox.
+                    
+  $:MILESEVENT_SOUND_FLAG_EVICTED For sound instances with a $(MILESEVENTSOUNDSTATUS::MILESEVENT_SOUND_STATUS_COMPLETE)[MILESEVENT_SOUND_STATUS_COMPLETE] status,
+    this flag means that the sound instance was evicted because one of the sound limits was hit (a higher priority sound needed to be played and a limit was
+    in effect).
+  
+These are the flag values that each sound instance can have.  Use $AIL_enumerate_sound_instances to retrieve them.
+*/
+
+EXPAPI S32 AILCALL AIL_complete_event_queue_processing( void );
+/*
+  Completes the queue processing (which is started with $AIL_begin_event_queue_processing)."
+        
+  $:return Returns 0 on failure.
+
+  This function is called in a pair with $AIL_begin_event_queue_processing. 
+  
+  In $AIL_begin_event_queue_processing,
+  all the new sound instances are queued up, but they haven't started playing yet.  Old sound instances that
+  have finished playing are still valid - they haven't been freed yet.  $AIL_complete_event_queue_processing
+  actually starts the sound instances and frees the completed ones - it's the 2nd half of the event processing.
+  
+  Usually you call $AIL_enumerate_sound_instances before this function to manage all the sound
+  instances.
+*/
+
+EXPAPI U64 AILCALL AIL_stop_sound_instances(char const * label_query, U64 apply_to_ID);
+/*
+    Allows the programmer to manually enqueue a stop sound event into the event system.
+    
+    $:label_query A query to match sound instance labels against.  Use 0 to skip label matching.
+    $:apply_to_ID An optional value returned from a previous $AIL_enqueue_event or $AIL_enumerate_sound_instances that
+      tells Miles to stop only those instances who's QueuedID or InstanceID matches this value.
+    $:return Returns a non-zero queue ID on success.
+
+    Enqueues an event to stop all sounds matching the specified label query (see $AIL_enumerate_sound_instances
+    for a description of the label_query format).
+    
+    Usually the programmer should trigger an event that the sound designer has specifically
+    created to stop the appropriate sounds, but this function gives the programmer 
+    manual control, if necessary.
+*/
+
+DXDEC U64 AILCALL AIL_pause_sound_instances(char const * label_query, U64 apply_to_ID);
+/*
+    Allows the programmer to manually enqueue a pause sound event into the event system.
+    
+    $:label_query A query to match sound instance labels against.  Use 0 to skip label matching.
+    $:apply_to_ID An optional value returned from a previous $AIL_enqueue_event or $AIL_enumerate_sound_instances that
+      tells Miles to pause only those instances who's QueuedID or InstanceID matches this value.
+    $:return Returns a non-zero queue ID on success.
+
+    Enqueues an event to pause all sounds matching the specified label query (see $AIL_enumerate_sound_instances
+    for a description of the label_query format).
+    
+    Usually the programmer should trigger an event that the sound designer has specifically
+    created to pause the appropriate sounds, but this function gives the programmer 
+    manual control, if necessary.
+*/
+
+DXDEC U64 AILCALL AIL_resume_sound_instances(char const * label_query, U64 apply_to_ID);
+/*
+    Allows the programmer to manually enqueue a resume sound event into the event system.
+    
+    $:label_query A query to match sound instance labels against.  Use 0 to skip label matching.
+    $:apply_to_ID An optional value returned from a previous $AIL_enqueue_event or $AIL_enumerate_sound_instances that
+      tells Miles to resume only those instances who's QueuedID or InstanceID matches this value.
+    $:return Returns a non-zero enqueue ID on success.
+
+    Enqueues an event to resume all sounds matching the specified label query (see $AIL_enumerate_sound_instances
+    for a description of the label_query format).
+    
+    Usually the programmer should trigger an event that the sound designer has specifically
+    created to resume the appropriate sounds, but this function gives the programmer 
+    manual control, if necessary.
+*/
+
+DXDEC U64 AILCALL AIL_start_sound_instance(HMSOUNDBANK bank, char const * sound, U8 loop_count, S32 should_stream, char const * labels, void* user_buffer, S32 user_buffer_len, S32 enqueue_flags );
+/*
+    Allows the programmer to manually enqueue a start sound event into the event system.
+    
+    $:bank The bank containing the sound to start.
+    $:sound The name of the sound file to start.
+    $:loop_count The loop count to assign to the sound. 0 for infinite, 1 for play once, or just the number of times to loop.
+    $:stream Non-zero if the sound playback should stream off the disk.
+    $:labels An optional comma-delimited list of labels to assign to the sound playback.
+    $:user_buffer See the user_buffer description in $AIL_enqueue_event.
+    $:user_buffer_len See the user_buffer_len description in $AIL_enqueue_event.
+    $:enqueue_flags See the enqueue_flags description in $AIL_enqueue_event.
+    $:return Returns a non-zero enqueue ID on success.
+
+    Enqueues an event to start the specified sound asset. 
+    
+    Usually the programmer should trigger an event that the sound designer has specifically
+    create to start the appropriate sounds, but this function gives the programmer 
+    manual control, if necessary.
+*/
+
+EXPAPI void AILCALL AIL_clear_event_queue( void );
+/*
+   Removes all pending events that you have enqueued.
+
+   This function will clears the list of all events that you have previously enqueued.
+*/
+
+
+EXPAPI S32 AILCALL AIL_set_sound_label_limits(char const* sound_limits);
+/*
+  Sets the maximum number of sounds that matches a particular label.
+
+  $:sound_limits A string that defines one or more limits on a label by label basis.  The string should
+    be of the form "label1name label1count:label2name label2count".
+  $:return Returns 0 on failure (usually a bad limit string).
+
+  Every time an event triggers a sound to be played, the sound limits are checked, and, if exceeded, a sound is dropped (based
+  on the settings in the event step).
+  
+  Usually event limits are set in an event as well, but this lets the programmer override the limits at runtime.
+*/
+
+EXPAPI S32 AILCALL AIL_enumerate_preset_persists(HMSSENUM* next, EXPOUT char const ** name);
+/*
+    Enumerates the current persisted presets that active in the system.
+
+    $:next Enumeration token - initialize to MSS_FIRST before the first call.
+    $:name Pointer to a char* that receives the name of the persist. NOTE
+            that this pointer can change frame to frame and should be immediately copied to a client-allocated
+            buffer if persistence is desired.
+    $:return Returns 0 when enumeration is complete.
+    
+    This function lets you enumerate all the persisting presets that are currently active in the system.  It
+    is mostly a debugging aid.
+*/
+
+EXPAPI char * AILCALL AIL_text_dump_event_system(void);
+/*
+    Returns a big string describing the current state of the event system.
+    
+    $:return String description of current systems state. 
+
+    This function is a debugging aid - it can be used to show all of the active allocations,
+    active sounds, etc.
+    
+    You must delete the pointer returned from this function with $AIL_mem_free_lock.
+*/
+
+EXPTYPE typedef struct _MILESEVENTSTATE
+{
+    S32 CommandBufferSize;
+    S32 HeapSize;
+    S32 HeapRemaining;
+    S32 LoadedSoundCount;
+    S32 PlayingSoundCount;
+    S32 LoadedBankCount;
+    S32 PersistCount;
+
+    S32 SoundBankManagementMemory;
+    S32 SoundDataMemory;
+} MILESEVENTSTATE;
+/*
+  retruns the current state of the Miles Event System.
+  
+  $:CommandBufferSize The size of the command buffer in bytes. See also the $AIL_startup_event_system.
+  $:HeapSize The total size of memory used by the event system for management structures, and is allocated during startup. This does not include loaded file sizes.
+  $:HeapRemaining The number of bytes in HeapSize that is remaining.
+  $:LoadedSoundCount The number of sounds loaded and ready to play via cache event steps.
+  $:PlayingSoundCount The number of sounds currently playing via start sound event steps.
+  $:LoadedBankCount The number of sound banks loaded in the system via cache event steps, or AIL_add_soundbank.
+  $:PersistCount The number of presets persisted via the persist event step.
+  $:SoundBankManagementMemory The number of bytes used for the management of the loaded sound banks.
+  $:SoundDataMemory The number of bytes used in file sizes - remember this is not included in HeapSize. Streaming overhead is not included in this number, only fully loaded sounds.
+
+  This structure returns debugging info about the event system. It is used with $AIL_event_system_state.
+*/
+
+EXPAPI void AILCALL AIL_event_system_state(MILESEVENTSTATE* state);
+/*
+  Returns an information structure about the current state of the Miles Event System.
+  
+  $:state A pointer to a structure to receive the state information.
+
+  This function is a debugging aid - it returns information for the event system. 
+*/
+
+
+
+#undef EXPAPI
+#define EXPAPI
+EXPAPI typedef S32 AILCALLBACK MSS_USER_RAND( void );
+/*
+  The function definition to use when defining your own random function.
+  
+  You can define a function with this prototype and pass it to $AIL_register_random
+  if you want to tie the Miles random calls in with your game's (for logging and such).
+*/
+#undef EXPAPI
+#define EXPAPI DXDEC
+
+EXPAPI void AILCALL AIL_register_random(MSS_USER_RAND * rand);
+/*
+  Sets the function that Miles will call to obtain a random number.
+
+  Use this function to set your own random function that the Miles Event System will call when it needs a random number.
+  This lets you control the determinism of the event system.
+*/
+
+
+
 
 #ifdef MSS_FLT_SUPPORTED
 
@@ -5917,19 +6784,19 @@ typedef SINTa FLTRESULT;
 //##                                                                        ##
 //############################################################################
 
-typedef FLTRESULT (AILCALL FAR *FLT_STARTUP)(void);
+typedef FLTRESULT (AILCALL *FLT_STARTUP)(void);
 
-typedef FLTRESULT (AILCALL FAR *FLT_SHUTDOWN)(void);
+typedef FLTRESULT (AILCALL *FLT_SHUTDOWN)(void);
 
-typedef C8 FAR *  (AILCALL FAR *FLT_ERROR)(void);
+typedef C8 *  (AILCALL *FLT_ERROR)(void);
 
-typedef HDRIVERSTATE (AILCALL FAR *FLT_OPEN_DRIVER) (HDIGDRIVER dig);
+typedef HDRIVERSTATE (AILCALL *FLT_OPEN_DRIVER) (HDIGDRIVER dig, void * memory);
 
-typedef FLTRESULT    (AILCALL FAR *FLT_CLOSE_DRIVER) (HDRIVERSTATE state);
+typedef FLTRESULT    (AILCALL *FLT_CLOSE_DRIVER) (HDRIVERSTATE state);
 
-typedef void         (AILCALL FAR *FLT_PREMIX_PROCESS) (HDRIVERSTATE driver);
+typedef void         (AILCALL *FLT_PREMIX_PROCESS) (HDRIVERSTATE driver);
 
-typedef S32          (AILCALL FAR *FLT_POSTMIX_PROCESS) (HDRIVERSTATE driver, void FAR *output_buffer);
+typedef S32          (AILCALL *FLT_POSTMIX_PROCESS) (HDRIVERSTATE driver, void *output_buffer);
 
 //############################################################################
 //##                                                                        ##
@@ -5937,23 +6804,23 @@ typedef S32          (AILCALL FAR *FLT_POSTMIX_PROCESS) (HDRIVERSTATE driver, vo
 //##                                                                        ##
 //############################################################################
 
-typedef HSAMPLESTATE (AILCALL FAR * FLTSMP_OPEN_SAMPLE) (HDRIVERSTATE driver,
-                                                         HSAMPLE      S);
+typedef HSAMPLESTATE (AILCALL * FLTSMP_OPEN_SAMPLE) (HDRIVERSTATE driver,
+                                                         HSAMPLE      S,
+                                                         void * memory);
 
-typedef FLTRESULT    (AILCALL FAR * FLTSMP_CLOSE_SAMPLE) (HSAMPLESTATE state);
+typedef FLTRESULT    (AILCALL * FLTSMP_CLOSE_SAMPLE) (HSAMPLESTATE state);
 
-typedef void         (AILCALL FAR * FLTSMP_SAMPLE_PROCESS) (HSAMPLESTATE    state,
-                                                            void FAR *      source_buffer,
-                                                            void FAR *      dest_buffer, // may be the same as src
+typedef void         (AILCALL * FLTSMP_SAMPLE_PROCESS) (HSAMPLESTATE    state,
+                                                            void *      source_buffer,
+                                                            void *      dest_buffer, // may be the same as src
                                                             S32             n_samples,
-                                                            S32             playback_rate,
                                                             S32             is_stereo );
 
-typedef S32          (AILCALL FAR * FLTSMP_SAMPLE_PROPERTY) (HSAMPLESTATE    state,
+typedef S32          (AILCALL * FLTSMP_SAMPLE_PROPERTY) (HSAMPLESTATE    state,
                                                              HPROPERTY       property,
-                                                             void FAR*       before_value,
-                                                             void const FAR* new_value,
-                                                             void FAR*       after_value
+                                                             void*       before_value,
+                                                             void const* new_value,
+                                                             void*       after_value
                                                              );
 
 //############################################################################
@@ -5962,13 +6829,13 @@ typedef S32          (AILCALL FAR * FLTSMP_SAMPLE_PROPERTY) (HSAMPLESTATE    sta
 //##                                                                        ##
 //############################################################################
 
-typedef S32 (AILCALL FAR * VFLT_ASSIGN_SAMPLE_VOICE) (HDRIVERSTATE driver,
+typedef S32 (AILCALL * VFLT_ASSIGN_SAMPLE_VOICE) (HDRIVERSTATE driver,
                                                       HSAMPLE      S);
 
-typedef void (AILCALL FAR * VFLT_RELEASE_SAMPLE_VOICE) (HDRIVERSTATE driver,
+typedef void (AILCALL * VFLT_RELEASE_SAMPLE_VOICE) (HDRIVERSTATE driver,
                                                         HSAMPLE      S);
 
-typedef S32 (AILCALL FAR * VFLT_START_SAMPLE_VOICE) (HDRIVERSTATE driver,
+typedef S32 (AILCALL * VFLT_START_SAMPLE_VOICE) (HDRIVERSTATE driver,
                                                      HSAMPLE      S);
 
 //############################################################################
@@ -5977,14 +6844,14 @@ typedef S32 (AILCALL FAR * VFLT_START_SAMPLE_VOICE) (HDRIVERSTATE driver,
 //##                                                                        ##
 //############################################################################
 
-typedef S32          (AILCALL FAR * VDRV_DRIVER_PROPERTY) (HDRIVERSTATE    driver,
+typedef S32          (AILCALL * VDRV_DRIVER_PROPERTY) (HDRIVERSTATE    driver,
                                                            HPROPERTY       property,
-                                                           void FAR*       before_value,
-                                                           void const FAR* new_value,
-                                                           void FAR*       after_value
+                                                           void*       before_value,
+                                                           void const* new_value,
+                                                           void*       after_value
                                                            );
 
-typedef S32          (AILCALL FAR * VDRV_FORCE_UPDATE)     (HDRIVERSTATE driver);
+typedef S32          (AILCALL * VDRV_FORCE_UPDATE)     (HDRIVERSTATE driver);
 
 //############################################################################
 //##                                                                        ##
@@ -5992,11 +6859,11 @@ typedef S32          (AILCALL FAR * VDRV_FORCE_UPDATE)     (HDRIVERSTATE driver)
 //##                                                                        ##
 //############################################################################
 
-typedef S32          (AILCALL FAR * VSMP_SAMPLE_PROPERTY) (HSAMPLE      S,
+typedef S32          (AILCALL * VSMP_SAMPLE_PROPERTY) (HSAMPLE      S,
                                                            HPROPERTY       property,
-                                                           void FAR*       before_value,
-                                                           void const FAR* new_value,
-                                                           void FAR*       after_value
+                                                           void*       before_value,
+                                                           void const* new_value,
+                                                           void*       after_value
                                                            );
 
 //
@@ -6005,72 +6872,77 @@ typedef S32          (AILCALL FAR * VSMP_SAMPLE_PROPERTY) (HSAMPLE      S,
 
 DXDEC HPROVIDER  AILCALL AIL_digital_output_filter (HDIGDRIVER dig);
 
-DXDEC S32        AILCALL AIL_enumerate_filters  (HPROENUM  FAR *next,
-                                                 HPROVIDER FAR *dest,
-                                                 C8  FAR * FAR *name);
+DXDEC S32        AILCALL AIL_enumerate_filters  (HMSSENUM  *next,
+                                                 HPROVIDER *dest,
+                                                 C8  * *name);
 DXDEC HDRIVERSTATE
                  AILCALL AIL_open_filter        (HPROVIDER  lib,
                                                  HDIGDRIVER dig);
 
 DXDEC void       AILCALL AIL_close_filter       (HDRIVERSTATE filter);
 
-DXDEC S32        AILCALL AIL_find_filter        (C8 const  *name, 
+DXDEC S32        AILCALL AIL_find_filter        (C8 const  *name,
                                                  HPROVIDER *ret);
 
 DXDEC S32        AILCALL AIL_enumerate_filter_properties
                                                 (HPROVIDER                  lib,
-                                                 HINTENUM FAR *             next,
-                                                 RIB_INTERFACE_ENTRY FAR *  dest);
+                                                 HMSSENUM *             next,
+                                                 RIB_INTERFACE_ENTRY *  dest);
 
 DXDEC S32        AILCALL AIL_filter_property    (HPROVIDER  lib,
-                                                 C8 const FAR*   name,
-                                                 void FAR*       before_value,
-                                                 void const FAR* new_value,
-                                                 void FAR*       after_value
+                                                 C8 const*   name,
+                                                 void*       before_value,
+                                                 void const* new_value,
+                                                 void*       after_value
                                                  );
 
 DXDEC  S32      AILCALL AIL_enumerate_output_filter_driver_properties
                                                 (HPROVIDER                 lib,
-                                                 HINTENUM FAR *            next,
-                                                 RIB_INTERFACE_ENTRY FAR * dest);
+                                                 HMSSENUM *            next,
+                                                 RIB_INTERFACE_ENTRY * dest);
 
 DXDEC  S32     AILCALL AIL_output_filter_driver_property
                                                 (HDIGDRIVER     dig,
-                                                 C8 const FAR * name,
-                                                 void FAR*       before_value,
-                                                 void const FAR* new_value,
-                                                 void FAR*       after_value
+                                                 C8 const * name,
+                                                 void*       before_value,
+                                                 void const* new_value,
+                                                 void*       after_value
                                                  );
 
 DXDEC  S32      AILCALL AIL_enumerate_output_filter_sample_properties
                                                 (HPROVIDER                 lib,
-                                                 HINTENUM FAR *            next,
-                                                 RIB_INTERFACE_ENTRY FAR * dest);
+                                                 HMSSENUM *            next,
+                                                 RIB_INTERFACE_ENTRY * dest);
 
 DXDEC  S32      AILCALL AIL_enumerate_filter_sample_properties
                                                 (HPROVIDER                 lib,
-                                                 HINTENUM FAR *            next,
-                                                 RIB_INTERFACE_ENTRY FAR * dest);
+                                                 HMSSENUM *            next,
+                                                 RIB_INTERFACE_ENTRY * dest);
 
 DXDEC S32       AILCALL AIL_enumerate_sample_stage_properties
                                                 (HSAMPLE                    S,
                                                  SAMPLESTAGE                stage,
-                                                 HINTENUM FAR *             next,
-                                                 RIB_INTERFACE_ENTRY FAR *  dest);
+                                                 HMSSENUM *             next,
+                                                 RIB_INTERFACE_ENTRY *  dest);
 
 DXDEC  S32      AILCALL AIL_sample_stage_property
                                                 (HSAMPLE        S,
                                                  SAMPLESTAGE    stage,
-                                                 C8 const FAR * name,
-                                                 void FAR*       before_value,
-                                                 void const FAR* new_value,
-                                                 void FAR*       after_value
+                                                 C8 const * name,
+                                                 S32            channel,
+                                                 void*       before_value,
+                                                 void const* new_value,
+                                                 void*       after_value
                                                  );
 
-#define AIL_filter_sample_property(S,name,beforev,newv,afterv) AIL_sample_stage_property((S),SP_FILTER_0,(name),(beforev),(newv),(afterv))
+#define AIL_filter_sample_property(S,name,beforev,newv,afterv) AIL_sample_stage_property((S),SP_FILTER_0,(name),-1,(beforev),(newv),(afterv))
 
-typedef MSS_STRUCT _FLTPROVIDER
+typedef struct _FLTPROVIDER
 {
+   S32          provider_flags;
+   S32          driver_size;
+   S32          sample_size;
+
    PROVIDER_PROPERTY               PROVIDER_property;
 
    FLT_STARTUP                     startup;
@@ -6098,24 +6970,29 @@ typedef MSS_STRUCT _FLTPROVIDER
    HDIGDRIVER   dig;
    HPROVIDER    provider;
    HDRIVERSTATE driver_state;
-   S32          provider_flags;
 
-   struct _FLTPROVIDER FAR *next;
+   struct _FLTPROVIDER *next;
 }
 FLTPROVIDER;
 
 //
-// Values for "Flags" property exported by all MSS Pipeline Filter and MSS Output Filter 
+// Values for "Flags" property exported by all MSS Pipeline Filter and MSS Output Filter
 // providers
-// 
+//
 
 #define FPROV_ON_SAMPLES 0x0001        // Pipeline filter that operates on input samples (and is enumerated by AIL_enumerate_filters)
 #define FPROV_ON_POSTMIX 0x0002        // Pipeline filter that operates on the post mixed output (capture filter)
-#define FPROV_MATRIX     0x0004        // This is a matrix output filter (e.g., SRS/Dolby) 
+#define FPROV_MATRIX     0x0004        // This is a matrix output filter (e.g., SRS/Dolby)
 #define FPROV_VOICE      0x0008        // This is a per-voice output filter (e.g., DirectSound 3D)
 #define FPROV_3D         0x0010        // Output filter uses S3D substructure for positioning
 #define FPROV_OCCLUSION  0x0020        // Output filter supports occlusion (doesn't need per-sample lowpass)
 #define FPROV_EAX        0x0040        // Output filter supports EAX-compatible environmental reverb
+
+#define FPROV_SPU_MASK   0xff0000      // Mask here the SPU INDEX STARTS
+#define FPROV_SPU_INDEX( val ) ( ( val >> 16 ) & 0xff )
+#define FPROV_MAKE_SPU_INDEX( val ) ( val << 16 )
+
+
 
 #ifdef IS_WIN32
 
@@ -6129,10 +7006,10 @@ FLTPROVIDER;
 #define MSS_EAX_FSHIFTER    8
 #define MSS_EAX_VMORPHER    9
 #define MSS_EAX_PSHIFTER   10
-#define MSS_EAX_RMODULATOR 11 
+#define MSS_EAX_RMODULATOR 11
 #define MSS_EAX_REVERB     12
 
-typedef MSS_STRUCT EAX_SAMPLE_SLOT_VOLUME
+typedef struct EAX_SAMPLE_SLOT_VOLUME
 {
   S32 Slot;       // 0, 1, 2, 3
   S32 Send;
@@ -6143,14 +7020,14 @@ typedef MSS_STRUCT EAX_SAMPLE_SLOT_VOLUME
   F32 OcclusionDirectRatio;
 } EAX_SAMPLE_SLOT_VOLUME;
 
-typedef MSS_STRUCT EAX_SAMPLE_SLOT_VOLUMES
+typedef struct EAX_SAMPLE_SLOT_VOLUMES
 {
   U32 NumVolumes;  // 0, 1, or 2
   EAX_SAMPLE_SLOT_VOLUME volumes[ 2 ];
 } EAX_SAMPLE_SLOT_VOLUMES;
 
 // Use this structure for EAX REVERB
-typedef MSS_STRUCT EAX_REVERB
+typedef struct EAX_REVERB
 {
   S32 Effect;                  // set to MSS_EAX_REVERB
   S32 Volume;                  // -10000 to 0
@@ -6159,10 +7036,10 @@ typedef MSS_STRUCT EAX_REVERB
   F32 EnvironmentDiffusion;    // environment diffusion
   S32 Room;                    // room effect level (at mid frequencies)
   S32 RoomHF;                  // relative room effect level at high frequencies
-  S32 RoomLF;                  // relative room effect level at low frequencies  
+  S32 RoomLF;                  // relative room effect level at low frequencies
   F32 DecayTime;               // reverberation decay time at mid frequencies
   F32 DecayHFRatio;            // high-frequency to mid-frequency decay time ratio
-  F32 DecayLFRatio;            // low-frequency to mid-frequency decay time ratio   
+  F32 DecayLFRatio;            // low-frequency to mid-frequency decay time ratio
   S32 Reflections;             // early reflections level relative to room effect
   F32 ReflectionsDelay;        // initial reflection delay time
   F32 ReflectionsPanX;         // early reflections panning vector
@@ -6179,13 +7056,13 @@ typedef MSS_STRUCT EAX_REVERB
   F32 ModulationDepth;         // modulation depth
   F32 AirAbsorptionHF;         // change in level per meter at high frequencies
   F32 HFReference;             // reference high frequency
-  F32 LFReference;             // reference low frequency 
+  F32 LFReference;             // reference low frequency
   F32 RoomRolloffFactor;       // like DS3D flRolloffFactor but for room effect
   U32 Flags;                   // modifies the behavior of properties
 } EAX_REVERB;
 
 // Use this structure for EAX AUTOGAIN
-typedef MSS_STRUCT EAX_AUTOGAIN
+typedef struct EAX_AUTOGAIN
 {
   S32 Effect;      // set to MSS_EAX_AUTO_GAIN
   S32 Volume;      // -10000 to 0
@@ -6193,7 +7070,7 @@ typedef MSS_STRUCT EAX_AUTOGAIN
 } EAX_AUTOGAIN;
 
 // Use this structure for EAX AUTOWAH
-typedef MSS_STRUCT EAX_AUTOWAH
+typedef struct EAX_AUTOWAH
 {
    S32 Effect;        // set to MSS_EAX_AUTOWAH
    S32 Volume;        // -10000 to 0
@@ -6204,7 +7081,7 @@ typedef MSS_STRUCT EAX_AUTOWAH
 } EAX_AUTOWAH;
 
 // Use this structure for EAX CHORUS
-typedef MSS_STRUCT EAX_CHORUS
+typedef struct EAX_CHORUS
 {
   S32 Effect;       // set to MSS_EAX_CHORUS
   S32 Volume;       // -10000 to 0
@@ -6217,7 +7094,7 @@ typedef MSS_STRUCT EAX_CHORUS
 } EAX_CHORUS;
 
 // Use this structure for EAX DISTORTION
-typedef MSS_STRUCT EAX_DISTORTION
+typedef struct EAX_DISTORTION
 {
   S32 Effect;        // set to MSS_EAX_DISTORTION
   S32 Volume;        // -10000 to 0
@@ -6229,7 +7106,7 @@ typedef MSS_STRUCT EAX_DISTORTION
 } EAX_DISTORTION;
 
 // Use this structure for EAX ECHO
-typedef MSS_STRUCT EAX_ECHO
+typedef struct EAX_ECHO
 {
   S32 Effect;        // set to MSS_EAX_ECHO
   S32 Volume;        // -10000 to 0
@@ -6241,7 +7118,7 @@ typedef MSS_STRUCT EAX_ECHO
 } EAX_ECHO;
 
 // Use this structure for EAXEQUALIZER_ALLPARAMETERS
-typedef MSS_STRUCT EAX_EQUALIZER
+typedef struct EAX_EQUALIZER
 {
   S32 Effect;        // set to MSS_EAX_EQUALIZER
   S32 Volume;        // -10000 to 0
@@ -6258,7 +7135,7 @@ typedef MSS_STRUCT EAX_EQUALIZER
 } EAX_EQUALIZER;
 
 // Use this structure for EAX FLANGER
-typedef MSS_STRUCT EAX_FLANGER
+typedef struct EAX_FLANGER
 {
   S32 Effect;       // set to MSS_EAX_FLANGER
   S32 Volume;       // -10000 to 0
@@ -6272,7 +7149,7 @@ typedef MSS_STRUCT EAX_FLANGER
 
 
 // Use this structure for EAX FREQUENCY SHIFTER
-typedef MSS_STRUCT EAX_FSHIFTER
+typedef struct EAX_FSHIFTER
 {
   S32 Effect;         // set to MSS_EAX_FSHIFTER
   S32 Volume;         // -10000 to 0
@@ -6282,7 +7159,7 @@ typedef MSS_STRUCT EAX_FSHIFTER
 } EAX_FSHIFTER;
 
 // Use this structure for EAX VOCAL MORPHER
-typedef MSS_STRUCT EAX_VMORPHER
+typedef struct EAX_VMORPHER
 {
   S32 Effect;                // set to MSS_EAX_VMORPHER
   S32 Volume;                // -10000 to 0
@@ -6296,7 +7173,7 @@ typedef MSS_STRUCT EAX_VMORPHER
 
 
 // Use this structure for EAX PITCH SHIFTER
-typedef MSS_STRUCT EAX_PSHIFTER
+typedef struct EAX_PSHIFTER
 {
   S32 Effect;       // set to MSS_EAX_PSHIFTER
   S32 Volume;       // -10000 to 0
@@ -6305,7 +7182,7 @@ typedef MSS_STRUCT EAX_PSHIFTER
 } EAX_PSHIFTER;
 
 // Use this structure for EAX RING MODULATOR
-typedef MSS_STRUCT EAX_RMODULATOR
+typedef struct EAX_RMODULATOR
 {
   S32 Effect;          // set to MSS_EAX_RMODULATOR
   S32 Volume;          // -10000 to 0
@@ -6318,14 +7195,14 @@ typedef MSS_STRUCT EAX_RMODULATOR
 
 #else
 
-typedef MSS_STRUCT _FLTPROVIDER
+typedef struct _FLTPROVIDER
 {
   U32 junk;
 } FLTPROVIDER;
 
 #endif
 
-#ifndef IS_PS2
+#if !defined(IS_PS2) && !defined(IS_PS3) && !defined(IS_PSP)
 
 #if defined(_PUSHPOP_SUPPORTED) || PRAGMA_STRUCT_PACKPUSH
   #pragma pack(pop)
@@ -6333,7 +7210,9 @@ typedef MSS_STRUCT _FLTPROVIDER
   #pragma pack()
 #endif
 
-#else
+#endif
+
+#ifdef IS_PS2
 
 // round up to multiples of 16 for DMA alignment
 #define SPR_IS_NEEDED  (((2 * 578         * sizeof(S16)) + 15) & ~15)  // 2320
@@ -6366,10 +7245,6 @@ DXDEC MSS_RESOURCE_POLICY AILCALL AIL_scratchpad_policy    (void);
 
 #endif
 
-#ifndef __RADINDLL__
-#ifdef FSSpec
-#undef FSSpec
-#endif
 #endif
 
 #ifdef __cplusplus

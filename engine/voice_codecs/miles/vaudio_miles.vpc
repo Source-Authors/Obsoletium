@@ -8,6 +8,7 @@ $Macro SRCDIR		"..\..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
 
 $Macro MSSSRCDIR $SRCDIR\thirdparty\mss
+$Macro MINIMP3SRCDIR $SRCDIR\thirdparty\minimp3
 $Macro MSSLIBDIR win32   [$WIN32]
 $Macro MSSLIBDIR win64   [$WIN64]
 $Macro MSSLIBDIR linux32 [$LINUX32]
@@ -62,7 +63,8 @@ $Project "vaudio_miles"
 		$File	"$SRCDIR\public\tier1\interface.h"
 		$File	"$SRCDIR\public\vaudio\ivaudio.h"
 		$File	"milesbase.h"
-		$File	"$SRCDIR\thirdparty\mss\include\mss.h"
+		$File	"$MSSSRCDIR\include\mss.h"
+		$File	"$MINIMP3SRCDIR\minimp3_ex.h"
 	}
 
 	$Folder	"Link Libraries"

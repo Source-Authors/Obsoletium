@@ -30,7 +30,7 @@ void IncrementRefMiles()
 		AIL_set_redist_directory( "bin/linux32" );
 #endif
 #else
-		Assert( !"Using default MSS_REDIST_DIR_NAME - this will most likely fail." );
+		AssertMsg( false, "Using default MSS_REDIST_DIR_NAME - this will most likely fail." );
 		AIL_set_redist_directory( MSS_REDIST_DIR_NAME );
 #endif
 

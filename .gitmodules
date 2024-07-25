@@ -42,3 +42,6 @@
 [submodule "thirdparty/mpaheaderinfo"]
 	path = thirdparty/mpaheaderinfo
 	url = git@github.com:Source-Authors/mpaheaderInfo.git
+[submodule "thirdparty/minimp3"]
+	path = thirdparty/minimp3
+	url = git@github.com:Source-Authors/minimp3.git
