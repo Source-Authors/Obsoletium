@@ -15,7 +15,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-void Con_Printf( const char *pMsg, ... )
+void Con_Printf( const char *, ... )
 {
 }
 
@@ -28,11 +28,11 @@ protected:
 public:
 	FrameEncoder_Miles();
 
-	virtual bool	Init(int quality, int &rawFrameSize, int &encodedFrameSize);
-	virtual void	Release();
-	virtual void	EncodeFrame(const char *pUncompressed, char *pCompressed);
-	virtual void	DecodeFrame(const char *pCompressed, char *pDecompressed);
-	virtual bool	ResetState();
+	bool	Init(int quality, int &rawFrameSize, int &encodedFrameSize) override;
+	void	Release() override;
+	void	EncodeFrame(const char *pUncompressed, char *pCompressed) override;
+	void	DecodeFrame(const char *pCompressed, char *pDecompressed) override;
+	bool	ResetState() override;
 
 
 public:
@@ -121,7 +121,6 @@ bool FrameEncoder_Miles::Init(int quality, int &rawFrameSize, int &encodedFrameS
 {
 	Shutdown();
 
-
 	// This tells what protocol we're using.
 	C8 suffix[128] = ".v12"; // (.v12, .v24, .v29, or .raw)
 
@@ -163,7 +162,7 @@ void FrameEncoder_Miles::EncodeFrame(const char *pUncompressedBytes, char *pComp
 {
 	char samples[1024];
 
-	if(!m_Encoder.IsActive() || m_nRawBytes > sizeof(samples))
+	if(!m_Encoder.IsActive() || m_nRawBytes > static_cast<int>(sizeof(samples)))
 		return;
 
 	const short *pUncompressed = (const short*)pUncompressedBytes;
@@ -292,7 +291,7 @@ void FrameEncoder_Miles::FigureOutFrameSizes()
 	char uncompressed[1024];
 	char compressed[1024];
 
-	Assert(m_nRawBytes <= sizeof(uncompressed));
+	Assert(m_nRawBytes <= ssize(uncompressed));
 	
 	m_pSrc = uncompressed;
 	m_SrcLen = m_nRawBytes;
