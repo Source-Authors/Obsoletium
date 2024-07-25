@@ -789,7 +789,14 @@ int XM_CALLCONV GreatestCommonDivisor (int i1, int i2)
 
 bool XM_CALLCONV IsDenormal( float val )
 {
-	const int x = *reinterpret_cast <const int *> (&val); // needs 32-bit int
+	int x;
+	
+	static_assert(std::numeric_limits<decltype(val)>::is_iec559);
+	static_assert(sizeof(x) == sizeof(val));
+
+	// dimhotepus: Fix UB on reinterpret cast float* -> int*
+	std::memcpy( &x, &val, sizeof(x) );
+
 	const int abs_mantissa = x & 0x007FFFFF;
 	const int biased_exponent = x & 0x7F800000;
 	
@@ -1238,10 +1245,10 @@ void XM_CALLCONV VectorAngles( const Vector &forward, const Vector &pseudoup, QA
 
 void XM_CALLCONV SetIdentityMatrix( matrix3x4_t& matrix )
 {
-	memset( matrix.Base(), 0, sizeof(float)*3*4 );
-	matrix[0][0] = 1.0;
-	matrix[1][1] = 1.0;
-	matrix[2][2] = 1.0;
+	memset( matrix.Base(), 0, sizeof(matrix3x4_t) );
+	matrix[0][0] = 1.0f;
+	matrix[1][1] = 1.0f;
+	matrix[2][2] = 1.0f;
 }
 
 
@@ -2104,9 +2111,6 @@ void XM_CALLCONV AxisAngleQuaternion( const Vector &axis, float angle, Quaternio
 //-----------------------------------------------------------------------------
 void XM_CALLCONV AngleQuaternion( const RadianEuler &angles, Quaternion &outQuat )
 {
-	Assert( s_bMathlibInitialized );
-//	Assert( angles.IsValid() );
-
 #ifdef _VPROF_MATHLIB
 	VPROF_BUDGET( "AngleQuaternion", "Mathlib" );
 #endif
@@ -2176,53 +2180,6 @@ void XM_CALLCONV BasisToQuaternion( const Vector &vecForward, const Vector &vecR
 
 	Vector vecLeft;
 	VectorMultiply( vecRight, -1.0f, vecLeft );
-
-	// FIXME: Don't know why, but this doesn't match at all with other result
-	// so we can't use this super-fast way.
-	/*
-	// Find the trace of the matrix:
-	float flTrace = vecForward.x + vecLeft.y + vecUp.z + 1.0f;
-	if ( flTrace > 1e-6 )
-	{
-		float flSqrtTrace = FastSqrt( flTrace );
-		float s = 0.5f / flSqrtTrace;
-		q.x = ( vecUp.y - vecLeft.z ) * s;
-		q.y = ( vecForward.z - vecUp.x ) * s;
-		q.z = ( vecLeft.x - vecForward.y ) * s;
-		q.w = 0.5f * flSqrtTrace;
-	}
-	else
-	{
-		if (( vecForward.x > vecLeft.y ) && ( vecForward.x > vecUp.z ) )
-		{
-			float flSqrtTrace = FastSqrt( 1.0f + vecForward.x - vecLeft.y - vecUp.z );
-			float s = 0.5f / flSqrtTrace;
-			q.x = 0.5f * flSqrtTrace;
-			q.y = ( vecForward.y + vecLeft.x ) * s;
-			q.z = ( vecUp.x + vecForward.z ) * s;
-			q.w = ( vecUp.y - vecLeft.z ) * s;
-		}
-		else if ( vecLeft.y > vecUp.z )
-		{
-			float flSqrtTrace = FastSqrt( 1.0f + vecLeft.y - vecForward.x - vecUp.z );
-			float s = 0.5f / flSqrtTrace;
-			q.x = ( vecForward.y + vecLeft.x ) * s;
-			q.y = 0.5f * flSqrtTrace;
-			q.z = ( vecUp.y + vecLeft.z ) * s;
-			q.w = ( vecForward.z - vecUp.x ) * s;
-		}
-		else
-		{
-			float flSqrtTrace = FastSqrt( 1.0 + vecUp.z - vecForward.x - vecLeft.y );
-			float s = 0.5f / flSqrtTrace;
-			q.x = ( vecUp.x + vecForward.z ) * s;
-			q.y = ( vecUp.y + vecLeft.z ) * s;
-			q.z = 0.5f * flSqrtTrace;
-			q.w = ( vecLeft.x - vecForward.y ) * s;
-		}
-	}
-	QuaternionNormalize2( q );
-	*/
 
 	// Version 2: Go through angles
 
@@ -3393,10 +3350,6 @@ bool XM_CALLCONV CalcLineToLineIntersectionSegment(
 
    return true;
 }
-
-#ifndef EXCEPTION_EXECUTE_HANDLER
-#define EXCEPTION_EXECUTE_HANDLER       1
-#endif
 
 static bool s_b3DNowEnabled = false;
 static bool s_bMMXEnabled = false;

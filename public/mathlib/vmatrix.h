@@ -194,9 +194,6 @@ public:
 
 // Matrix->matrix operations.
 public:
-
-	VMatrix&	operator=(const VMatrix &mOther);
-	
 	// Multiply two matrices (out = this * vm).
 	void		MatrixMul( const VMatrix &vm, VMatrix &out ) const;
 
@@ -365,9 +362,46 @@ inline void MatrixTranslate( VMatrix& dst, const Vector &translation )
 	dst = temp;
 }
 
+inline [[nodiscard]] DirectX::XMMATRIX MatrixBuildTranslation( float x, float y, float z )
+{
+	DirectX::XMMATRIX dst = DirectX::XMMatrixIdentity();
+
+	dst.r[0] = DirectX::XMVectorSetW( dst.r[0], x );
+	dst.r[1] = DirectX::XMVectorSetW( dst.r[1], y );
+	dst.r[2] = DirectX::XMVectorSetW( dst.r[2], z );
+
+	return dst;
+}
+
 
 void MatrixBuildRotationAboutAxis( VMatrix& dst, const Vector& vAxisOfRot, float angleDegrees );
 void MatrixBuildRotateZ( VMatrix& dst, float angleDegrees );
+
+inline [[nodiscard]] DirectX::XMMATRIX MatrixBuildRotateZ( float angleDegrees )
+{
+	float fSin, fCos;
+	DirectX::XMScalarSinCos( &fSin, &fCos, DEG2RAD( angleDegrees ) );
+
+	DirectX::XMMATRIX dst = DirectX::XMMatrixIdentity();
+	DirectX::XMVECTOR sinCos = DirectX::XMVectorSet(fCos, -fSin, fSin, fCos);
+
+	dst.r[0] = DirectX::XMVectorPermute
+	<
+		DirectX::XM_PERMUTE_1X,
+		DirectX::XM_PERMUTE_1Y,
+		DirectX::XM_PERMUTE_0Z,
+		DirectX::XM_PERMUTE_0W
+	>(dst.r[0], sinCos);
+	dst.r[1] = DirectX::XMVectorPermute
+	<
+		DirectX::XM_PERMUTE_1Z,
+		DirectX::XM_PERMUTE_1W,
+		DirectX::XM_PERMUTE_0Z,
+		DirectX::XM_PERMUTE_0W
+	>(dst.r[1], sinCos);
+
+	return dst;
+}
 
 inline void MatrixRotate( VMatrix& dst, const Vector& vAxisOfRot, float angleDegrees )
 {
@@ -657,14 +691,14 @@ inline const matrix3x4_t& VMatrix::As3x4() const
 
 inline void VMatrix::CopyFrom3x4( const matrix3x4_t &m3x4 )
 {
-	memcpy( m, m3x4.Base(), sizeof( matrix3x4_t ) ); //-V512
+	memcpy( m, m3x4.Base(), sizeof( matrix3x4_t ) ); //-V512 //-V1086
 	m[3][0] = m[3][1] = m[3][2] = 0;
 	m[3][3] = 1;
 }
 
 inline void	VMatrix::Set3x4( matrix3x4_t& matrix3x4 ) const
 {
-	memcpy(matrix3x4.Base(), m, sizeof( matrix3x4_t ) ); //-V512
+	memcpy(matrix3x4.Base(), m, sizeof( matrix3x4_t ) ); //-V512 //-V1086
 }
 
 
@@ -711,7 +745,7 @@ inline VMatrix VMatrix::operator-() const
 	VMatrix ret;
 	for( int i=0; i < 16; i++ )
 	{
-		((float*)ret.m)[i] = ((float*)m)[i];
+		((float*)ret.m)[i] = ((const float*)m)[i];
 	}
 	return ret;
 }
@@ -930,7 +964,7 @@ inline void MatrixSetColumn( VMatrix &src, int nCol, const Vector &column )
 inline void MatrixGetRow( const VMatrix &src, int nRow, Vector *pRow )
 {
 	Assert( (nRow >= 0) && (nRow <= 3) );
-	*pRow = *(Vector*)src[nRow];
+	*pRow = *(const Vector*)src[nRow];
 }
 
 inline void MatrixSetRow( VMatrix &dst, int nRow, const Vector &row )

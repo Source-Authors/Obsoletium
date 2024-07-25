@@ -5,15 +5,15 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <cstdio>
-#include <cstring>
-
 #include "quantize.h"
 
-#include <cstdlib>
-#include "minmax.h"
+#include "mathlib.h"
 
+#include <cstring>
+#include <cstdlib>
 #include <cmath>
+
+#include "minmax.h"
 
 static int current_ndims;
 static struct QuantizedValue *current_root;
@@ -24,8 +24,6 @@ static uint8 *current_weights;
 double SquaredError;
 
 #define SPLIT_THEN_SORT 1
-
-#define SQ(x) ((x)*(x))
 
 static struct QuantizedValue *AllocQValue(void)
 {
@@ -150,7 +148,7 @@ void PrintQTree(struct QuantizedValue const *p,int idlevel)
 	{
 		for(i=0;i<idlevel;i++)
 			printf(" ");
-		printf("node=%p NSamples=%d value=%d Mean={",p,p->NSamples,p->value);
+		printf("node=%p NSamples=%d value=%d Mean={",static_cast<const void*>(p),p->NSamples,p->value);
 		for(i=0;i<current_ndims;i++)
 			printf("%x,",p->Mean[i]);
 		printf("}\n");
@@ -205,7 +203,7 @@ static void UpdateStats(struct QuantizedValue *v)
 		double c=s->Count;
 		for(j=0;j<current_ndims;j++)
 		{
-			double diff=SQ(s->Value[j]-v->Mean[j]);
+			double diff=Square(s->Value[j]-v->Mean[j]);
 			Errors[j]+=c*diff; // charles uses abs not sq()
 			if (diff>WorstError[j])
 				WorstError[j]=diff;
@@ -324,7 +322,7 @@ static void SubdivideNode(struct QuantizedValue *n, int whichdim)
 		struct Sample *s=SAMPLE(n->Samples,i);
 		for(int d=0;d<current_ndims;d++)
 			for(int w=0;w<2;w++)
-				dist[w]+=current_weights[d]*SQ(LocalMean[d][w]-s->Value[d]);
+				dist[w]+=current_weights[d]*Square(LocalMean[d][w]-s->Value[d]);
 		s->QNum=(dist[0]<dist[1]);
     }
 
@@ -477,7 +475,7 @@ double MinimumError(struct QuantizedValue const *q, uint8 const *sample,
 		{
 			val1=(val2<=q->Mins[i])?q->Mins[i]:q->Maxs[i];
 		}
-		err+=weights[i]*SQ(val1-val2);
+		err+=weights[i]*Square(val1-val2);
 	}
 	return err;
 }
@@ -492,7 +490,7 @@ double MaximumError(struct QuantizedValue const *q, uint8 const *sample,
 		int val1=(abs(val2-q->Mins[i])>abs(val2-q->Maxs[i]))?
 			q->Mins[i]:
 			q->Maxs[i];
-		err+=weights[i]*SQ(val2-val1);
+		err+=weights[i]*Square(val2-val1);
 	}
 	return err;
 }
@@ -567,10 +565,10 @@ void *RemoveHeapItem(struct FHeap *h)
 
 struct FHeap TheQueue;
 
-#define PUSHNODE(a) { \
+#define PUSHNODE(a) do { \
   (a)->MinError=MinimumError(a,sample,ndims,weights); \
   if ((a)->MinError < besterror) HeapInsert(&TheQueue,&(a)->MinError); \
- }
+ } while (false)
 
 struct QuantizedValue *FindMatch(uint8 const *sample, int ndims,
 								 uint8 *weights, struct QuantizedValue *q)

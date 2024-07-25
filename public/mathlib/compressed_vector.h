@@ -52,11 +52,11 @@ private:
 	unsigned short exp:2;
 };
 
+constexpr float expScale[4] = { 4.0f, 16.0f, 32.f, 64.f };
+
 inline Vector32& Vector32::operator=(const Vector &vOther)	
 {
 	CHECK_VALID(vOther);
-
-	static float expScale[4] = { 4.0f, 16.0f, 32.f, 64.f };
 
 	float fmax = Max( fabsf( vOther.x ), fabsf( vOther.y ) );
 	fmax = Max( fmax, fabsf( vOther.z ) );
@@ -80,8 +80,6 @@ inline Vector32& Vector32::operator=(const Vector &vOther)
 inline Vector32::operator Vector ()
 {
 	Vector tmp;
-
-	static float expScale[4] = { 4.0f, 16.0f, 32.f, 64.f };
 
 	float fexp = expScale[exp] / 512.0f;
 
@@ -504,7 +502,7 @@ public:
   float16_with_assign() = default;
 	float16_with_assign( float f ) { m_storage.rawWord = ConvertFloatTo16bits(f); }
 
-	float16& operator=(const float16 &other) { m_storage.rawWord = ((float16_with_assign &)other).m_storage.rawWord; return *this; }
+	float16& operator=(const float16 &other) { m_storage.rawWord = ((const float16_with_assign &)other).m_storage.rawWord; return *this; }
 	float16& operator=(const float &other) { m_storage.rawWord = ConvertFloatTo16bits(other); return *this; }
 //	operator unsigned short () const { return m_storage.rawWord; }
 	operator float () const { return Convert16bitFloatTo32bits( m_storage.rawWord ); }
@@ -525,7 +523,7 @@ public:
 	Vector48& operator=(const Vector &vOther);
 	operator Vector ();
 
-	const float operator[]( int i ) const { return (((float16 *)this)[i]).GetFloat(); }
+	float operator[]( int i ) const { return (((const float16 *)this)[i]).GetFloat(); }
 
 	float16 x;
 	float16 y;
@@ -562,7 +560,7 @@ class Vector2d32
 {
 public:
 	// Construction/destruction:
-	Vector2d32(void) {}
+	Vector2d32() = default;
 	Vector2d32(vec_t X, vec_t Y) { x.SetFloat( X ); y.SetFloat( Y ); }
 
 	// assignment
@@ -577,7 +575,7 @@ public:
 	float16_with_assign y;
 };
 
-inline Vector2d32& Vector2d32::operator=(const Vector2D &vOther)	
+inline Vector2d32& Vector2d32::operator=(const Vector2D &vOther)
 {
 	x.SetFloat( vOther.x );
 	y.SetFloat( vOther.y );

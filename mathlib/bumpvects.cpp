@@ -63,7 +63,7 @@ void XM_CALLCONV GetBumpNormals( Vector sVect, Vector tVect, const Vector& flatN
 	DirectX::XMStoreFloat4( smoothBasis.XmBase() + 2, vphongNormal );
 	
 	static_assert(std::size(g_localBumpBasis2) == NUM_BUMP_VECTS);
-	static_assert(V_ARRAYSIZE(bumpNormals) == NUM_BUMP_VECTS);
+	static_assert(ARRAYSIZE(bumpNormals) == NUM_BUMP_VECTS);
 
 	// move the g_localBumpBasis2 into world space to create bumpNormals
 	DirectX::XMVECTOR n0 = VectorIRotate( g_localBumpBasis2[0], smoothBasis );

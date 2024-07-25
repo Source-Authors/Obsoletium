@@ -93,7 +93,7 @@ void SeedRandSIMD(uint32 seed)
 
 fltx4 XM_CALLCONV RandSIMD( int nContextIndex )
 {
-	Assert( nContextIndex < (int)std::size(s_nRandContextsInUse) );
+	Assert( nContextIndex < ssize(s_nRandContextsInUse) );
 
 	return s_SIMDRandContexts[nContextIndex].RandSIMD();
 }
@@ -123,7 +123,7 @@ int GetSIMDRandContext()
 
 void ReleaseSIMDRandContext( int nContext )
 {
-	Assert( nContext < (int)std::size(s_nRandContextsInUse) );
+	Assert( nContext < ssize(s_nRandContextsInUse) );
 
 	s_nRandContextsInUse[ nContext ] = 0;
 }
