@@ -266,14 +266,14 @@ struct NodeToVisit {
 };
 
 
-static fltx4 FourEpsilons={1.0e-10,1.0e-10,1.0e-10,1.0e-10};
-static fltx4 FourZeros={1.0e-10,1.0e-10,1.0e-10,1.0e-10};
-static fltx4 FourNegativeEpsilons={-1.0e-10,-1.0e-10,-1.0e-10,-1.0e-10};
+static fltx4 FourEpsilons={1.0e-10f,1.0e-10f,1.0e-10f,1.0e-10f};
+static fltx4 FourZeros={1.0e-10f,1.0e-10f,1.0e-10f,1.0e-10f};
+static fltx4 FourNegativeEpsilons={-1.0e-10f,-1.0e-10f,-1.0e-10f,-1.0e-10f};
 
 static float BoxSurfaceArea(Vector const &boxmin, Vector const &boxmax)
 {
 	Vector boxdim=boxmax-boxmin;
-	return 2.0*((boxdim[0]*boxdim[2])+(boxdim[0]*boxdim[1])+(boxdim[1]*boxdim[2]));
+	return 2.0f*((boxdim[0]*boxdim[2])+(boxdim[0]*boxdim[1])+(boxdim[1]*boxdim[2]));
 }
 
 void RayTracingEnvironment::Trace4Rays(const FourRays &rays, fltx4 TMin, fltx4 TMax,
@@ -352,7 +352,7 @@ void RayTracingEnvironment::Trace4Rays(const FourRays &rays, fltx4 TMin, fltx4 T
 
 	memset(rslt_out->HitIds,0xff,sizeof(rslt_out->HitIds));
 
-	rslt_out->HitDistance=ReplicateX4(1.0e23);
+	rslt_out->HitDistance=ReplicateX4(1.0e23f);
 
 	rslt_out->surface_normal.DuplicateVector(Vector(0.,0.,0.));
 	FourVectors OneOverRayDir=rays.direction;
@@ -614,8 +614,8 @@ int RayTracingEnvironment::MakeLeafNode(int first_tri, int last_tri)
 void RayTracingEnvironment::CalculateTriangleListBounds(int32 const *tris,int ntris,
 														Vector &minout, Vector &maxout)
 {
-	minout = Vector( 1.0e23, 1.0e23, 1.0e23);
-	maxout = Vector( -1.0e23, -1.0e23, -1.0e23);
+	minout = Vector( 1.0e23f, 1.0e23f, 1.0e23f);
+	maxout = Vector( -1.0e23f, -1.0e23f, -1.0e23f);
 	for(int i=0; i<ntris; i++)
 	{
 		CacheOptimizedTriangle const &tri=OptimizedTriangleList[tris[i]];
@@ -670,7 +670,7 @@ float RayTracingEnvironment::CalculateCostsOfSplit(
 	nleft=0;
 	nright=0;
 	nboth=0;
-	float min_coord=1.0e23,max_coord=-1.0e23;
+	float min_coord=1.0e23f,max_coord=-1.0e23f;
 
 	for(int t=0;t<ntris;t++)
 	{
@@ -714,7 +714,7 @@ float RayTracingEnvironment::CalculateCostsOfSplit(
 	RightMins[split_plane]=split_value;
 	float SA_L=BoxSurfaceArea(LeftMins,LeftMaxes);
 	float SA_R=BoxSurfaceArea(RightMins,RightMaxes);
-	float ISA=1.0/BoxSurfaceArea(MinBound,MaxBound);
+	float ISA=1.0f/BoxSurfaceArea(MinBound,MaxBound);
 	float cost_of_split=COST_OF_TRAVERSAL+COST_OF_INTERSECTION*(nboth+
 		(SA_L*ISA*(nleft))+(SA_R*ISA*(nright)));
 	return cost_of_split;
@@ -742,7 +742,7 @@ void RayTracingEnvironment::RefineNode(int node_number,int32 const *tri_list,int
 		return;
 	}
 
-	float best_cost=1.0e23;
+	float best_cost=1.0e23f;
 	int best_nleft=0,best_nright=0,best_nboth=0;
 	float best_splitvalue=0;
 	int split_plane=0;
@@ -758,7 +758,7 @@ void RayTracingEnvironment::RefineNode(int node_number,int32 const *tri_list,int
 				int trial_nleft,trial_nright,trial_nboth;
 				float trial_splitvalue;
 				if (ts==-1)
-					trial_splitvalue=0.5*(MinBound[axis]+MaxBound[axis]);
+					trial_splitvalue=0.5f*(MinBound[axis]+MaxBound[axis]);
 				else
 				{
 					// else, split at the triangle vertex if possible
@@ -880,17 +880,19 @@ void RayTracingEnvironment::SetupAccelerationStructure(void)
 {
 	CacheOptimizedKDNode root;
 	OptimizedKDTree.AddToTail(root);
-	int32 *root_triangle_list=new int32[OptimizedTriangleList.Count()];
-	for(int t=0;t<OptimizedTriangleList.Count();t++)
-		root_triangle_list[t]=t;
+
+	int32 *root_triangle_list = new int32[OptimizedTriangleList.Count()];
+	for(intp t = 0; t < OptimizedTriangleList.Count(); t++)
+		root_triangle_list[t] = t;
+
 	CalculateTriangleListBounds(root_triangle_list,OptimizedTriangleList.Count(),m_MinBound,
 								m_MaxBound);
 	RefineNode(0,root_triangle_list,OptimizedTriangleList.Count(),m_MinBound,m_MaxBound,0);
 	delete[] root_triangle_list;
 
 	// now, convert all triangles to "intersection format"
-	for(int i=0;i<OptimizedTriangleList.Count();i++)
-		OptimizedTriangleList[i].ChangeIntoIntersectionFormat();
+	for(auto &t : OptimizedTriangleList)
+		t.ChangeIntoIntersectionFormat();
 }
 
 

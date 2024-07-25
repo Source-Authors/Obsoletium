@@ -51,7 +51,7 @@ void RayTracingEnvironment::AddBSPFace(int id,dface_t const &face)
 	{
 		
 		AddTriangle(id,VertCoord(face,0),VertCoord(face,(tri+1)%face.numedges),
-					VertCoord(face,(tri+2)%face.numedges),Vector(1,1,1)); //colors[id % NELEMS(colors)]);
+					VertCoord(face,(tri+2)%face.numedges),Vector(1,1,1));
 	}
 }
 
