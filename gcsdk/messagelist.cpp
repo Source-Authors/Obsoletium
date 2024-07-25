@@ -1,4 +1,4 @@
-//====== Copyright , Valve Corporation, All rights reserved. =======
+//====== Copyright Valve Corporation, All rights reserved. =======
 //
 // Purpose: Provides names for GC message types
 //
@@ -122,7 +122,7 @@ bool CMessageList::BInit(  )
 	m_vecMsgInfo.RemoveAll();
 	m_vecMessageInfoBuckets.RemoveAll();
 
-	int nIndex = 0;
+	intp nIndex = 0;
 	for( CMessageListRegistration *pReg = CMessageListRegistration::sm_pFirst; pReg != NULL; pReg = pReg->m_pNext)
 	{
 		for ( int nRegIndex = 0; nRegIndex < pReg->m_cMsgInfo; nRegIndex++ )
@@ -555,8 +555,8 @@ void CMessageList::PrintMultiplexStats( MsgInfo_t::EStatsGroup eGroup, bool bSor
 //-----------------------------------------------------------------------------
 CMessageList::~CMessageList()
 {
-	int nUsedBuckets = 0;
-	for ( int nIndex = 0; nIndex < m_vecMessageInfoBuckets.Count(); nIndex++ )
+	[[maybe_unused]] intp nUsedBuckets = 0;
+	for ( intp nIndex = 0; nIndex < m_vecMessageInfoBuckets.Count(); nIndex++ )
 	{
 		if ( m_vecMessageInfoBuckets[nIndex] != NULL )
 		{

@@ -26,9 +26,9 @@ typedef int (__cdecl *QSortCompareFuncCtx_t)(void *, const void *, const void *)
 CJobMgr::CJobMgr()
 :	m_MapJob( 0, 0, DefLessFunc( GID_t ) ), 
 	m_QueueJobSleeping( (intp)0, 0, &JobSleepingLessFunc ),
-	m_unNextJobID( 0 ),
-	m_mapStatsBucket( 0, 0, DefLessFunc(uint32) ),
 	m_WorkThreadPool( "CJobMgr::m_WorkThreadPool" ),
+	m_unNextJobID( 0 ),
+	m_mapStatsBucket( 0, 0, DefLessFunc(uintp) ),
 	m_bDebugDisallowPause( false )
 {
 	SetDefLessFunc( m_MapJobTimeoutsIndexByJobID );
@@ -173,10 +173,9 @@ void CJobMgr::AccumulateStatsofJob( CJob &job )
 	job.m_FastTimerDelta.End();
 	job.m_cyclecountTotal += job.m_FastTimerDelta.GetDuration();
 
-	uint32 eBucket = 0;
 	// the pointer to the name is a pointer to a constant string
 	// so use this dirty trick to make lookups fast
-	eBucket = (uint32)job.GetName();
+	uintp eBucket = (uintp)job.GetName();
 	int iBucket = m_mapStatsBucket.Find( eBucket );
 	if ( iBucket == m_mapStatsBucket.InvalidIndex() )
 	{
@@ -1144,7 +1143,7 @@ void CJobMgr::PauseJob( CJob &job, EJobPauseReason eJobPauseReason )
 //-----------------------------------------------------------------------------
 int CJobMgr::DumpJobSummary()
 {
-	CUtlMap< uint32, JobStatsBucket_t, int > mapStatsBucket( 0, 0, DefLessFunc( uint32 ) );
+	CUtlMap< uintp, JobStatsBucket_t, int > mapStatsBucket( (intp)0, 0, DefLessFunc( uintp ) );
 
 	FOR_EACH_MAP_FAST( m_MapJob, i )
 	{
@@ -1152,7 +1151,7 @@ int CJobMgr::DumpJobSummary()
 
 		// the pointer to the name is a pointer to a constant string
 		// so use this dirty trick to make lookups fast
-		uint32 eBucket = (uint32)job.GetName();
+		uintp eBucket = (uintp)job.GetName();
 		int iBucket = mapStatsBucket.Find( eBucket );
 		if ( iBucket == mapStatsBucket.InvalidIndex() )
 		{
@@ -1355,7 +1354,7 @@ bool CJobMgr::BLaunchJobFromNetworkMsg( void *pParent, const JobMsgInfo_t &jobMs
 
 	if ( pNetPacket->BHasTargetJobName() && BIsValidSystemMsg( pNetPacket->GetEMsg(), NULL ) )
 	{
-		JobType_t jobSearch = { pNetPacket->GetTargetJobName(), k_EGCMsgInvalid, jobMsgInfo.m_eServerType };
+		JobType_t jobSearch = { pNetPacket->GetTargetJobName(), k_EGCMsgInvalid, jobMsgInfo.m_eServerType, nullptr };
 		int iJobType = GMapJobTypesByName().Find( &jobSearch );
 
 		if ( GMapJobTypesByName().IsValidIndex( iJobType ) )
@@ -1383,7 +1382,7 @@ bool CJobMgr::BLaunchJobFromNetworkMsg( void *pParent, const JobMsgInfo_t &jobMs
 	}
 	else
 	{
-		JobType_t jobSearch = { 0, jobMsgInfo.m_eMsg, jobMsgInfo.m_eServerType };
+		JobType_t jobSearch = { 0, jobMsgInfo.m_eMsg, jobMsgInfo.m_eServerType, nullptr };
 		int iJobType = GMapJobTypesByMsg().Find( &jobSearch );
 
 		if ( GMapJobTypesByMsg().IsValidIndex( iJobType ) )

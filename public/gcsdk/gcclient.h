@@ -64,8 +64,8 @@ public:
 	void OnGCMessageAvailable( GCMessageAvailable_t *pCallback );
 	ISteamGameCoordinator *GetSteamGameCoordinator() { return m_pSteamGameCoordinator; }
 
-	virtual void Test_AddEvent( CTestEvent *pEvent )	{}
-	virtual void Test_CacheSubscribed( const CSteamID & steamID ) {}
+	virtual void Test_AddEvent( CTestEvent * )	{}
+	virtual void Test_CacheSubscribed( const CSteamID & ) {}
 
 	void NotifySOCacheUnsubscribed( const CSteamID & ownerID );
 

@@ -534,7 +534,7 @@ bool CProtoBufSharedObjectBase::SerializeToBuffer( const ::google::protobuf::Mes
 	uint32 unSize = msg.ByteSize();
 	bufOutput.Clear();
 	bufOutput.EnsureCapacity( unSize );
-	msg.SerializeWithCachedSizesToArray( (uint8*)bufOutput.Base() );
+	msg.SerializeWithCachedSizesToArray( bufOutput.Base<uint8>() );
 	bufOutput.SeekPut( CUtlBuffer::SEEK_HEAD, unSize );
 	return true;
 }
@@ -583,35 +583,6 @@ bool CProtoBufSharedObjectBase::BAddToMemcached( CUtlBuffer & bufOutput )  const
 	SerializeToBuffer( msg, bufOutput );
 	return true;
 }
-
-/*
-
-//----------------------------------------------------------------------------
-// Purpose: Adds all the information required for this object on the client
-//----------------------------------------------------------------------------
-bool CProtoBufSharedObjectBase::BAppendToMessage( CUtlBuffer & bufOutput ) const
-{
-	const ::google::protobuf::Message & msg = *GetPObject();
-
-	uint32 unSize = msg.ByteSize();
-	bufOutput.EnsureCapacity( bufOutput.Size() + unSize );
-	msg.SerializeWithCachedSizesToArray( (uint8*)bufOutput.Base() + bufOutput.TellPut() );
-	bufOutput.SeekPut( CUtlBuffer::SEEK_HEAD, bufOutput.TellPut() + unSize );
-	return true;
-}
-
-//----------------------------------------------------------------------------
-// Purpose: Adds all the information required for this object on the client
-//----------------------------------------------------------------------------
-bool CProtoBufSharedObjectBase::BAppendToMessage( std::string *pBuffer ) const
-{
-	const ::google::protobuf::Message & msg = *GetPObject();
-
-	msg.AppendToString( pBuffer );
-	return true;
-}
-*/
-
 
 //----------------------------------------------------------------------------
 ::google::protobuf::Message *CProtoBufSharedObjectBase::BuildDestroyToMessage( const ::google::protobuf::Message & msg )

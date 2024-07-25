@@ -15,7 +15,7 @@
 //-----------------------------------------------------------------------------
 // Maximum length of a sprintf'ed logging message.
 //-----------------------------------------------------------------------------
-const int MAX_LOGGING_MESSAGE_LENGTH = 2048;
+constexpr int MAX_LOGGING_MESSAGE_LENGTH = 2048;
 
 namespace GCSDK
 {
@@ -31,7 +31,7 @@ int g_nMaxLogLevel = 4;
 //			iLevelLog - level for logging
 //			pchMsg - printf format
 //-----------------------------------------------------------------------------
-void EmitBaseMessageV( const char *pchGroupName, SpewType_t spewType, int iSpewLevel, int iLevelLog, const char *pchMsg, va_list vaArgs )
+void EmitBaseMessageV( [[maybe_unused]] const char *pchGroupName, [[maybe_unused]] SpewType_t spewType, [[maybe_unused]] int iSpewLevel, [[maybe_unused]] int iLevelLog, const char *pchMsg, va_list vaArgs )
 {
 	VPROF_BUDGET( "GCHost", VPROF_BUDGETGROUP_STEAM );
 

@@ -206,20 +206,20 @@ CWorkThreadPool::CWorkThreadPool( const char *pszThreadName )
 	m_StatExecutionTime( 100 ),
 #endif
 	m_bThreadsInitialized( false ),
-	m_cThreadsRunning( 0 ),
-	m_cActiveThreads( 0 ),
+	m_bEnsureOutputOrdering( false ),
+	m_ulLastUsedSequenceNumber( 0 ),
+	m_ulLastCompletedSequenceNumber( 0 ),
+	m_ulLastDispatchedSequenceNumber( 0 ),
 	m_bMayHaveJobTimeouts( false ),
+	m_cThreadsRunning( 0 ),
 	m_bExiting( false ),
+	m_cActiveThreads( 0 ),
+	m_bNeverSetOnAdd( false ),
 	m_bAutoCreateThreads( false ),
 	m_cMaxThreads( 0 ),
-	m_cFailures( 0 ),
-	m_cSuccesses( 0 ),
 	m_pWorkThreadConstructor( NULL ),
-	m_ulLastCompletedSequenceNumber( 0 ),
-	m_ulLastUsedSequenceNumber( 0 ),
-	m_ulLastDispatchedSequenceNumber( 0 ),
-	m_bEnsureOutputOrdering( false ),
-	m_bNeverSetOnAdd( false )
+	m_cSuccesses( 0 ),
+	m_cFailures( 0 )
 {
 	Assert( pszThreadName != NULL );
 	Q_strncpy( m_szThreadNamePfx, pszThreadName, sizeof( m_szThreadNamePfx ) );
@@ -295,7 +295,7 @@ uint64 CWorkThreadPool::GetCurrentBacklogTime() const
 #endif
 
 
-int CWorkThreadPool::AddWorkThread( CWorkThread *pThread ) 
+intp CWorkThreadPool::AddWorkThread( CWorkThread *pThread ) 
 {
 	AUTO_LOCK( m_WorkThreadMutex );
 	Assert( pThread );
@@ -569,8 +569,8 @@ bool CWorkThreadPool::BDispatchCompletedWorkItems( const CLimitTimer &limitTimer
 		// is resumed, and we resume here.
 		if ( !pWorkItem->DispatchCompletedWorkItem( pJobMgr ) )
 		{
-			EmitWarning( SPEW_THREADS, 2, "Work Item for Work Pool %s completed but job no longer existed to notify\n", m_szThreadNamePfx == NULL ? "UNKNOWN" :m_szThreadNamePfx );
-			AssertMsg1( m_bMayHaveJobTimeouts, "Work Item for Work Pool %s completed but job no longer existed to notify", m_szThreadNamePfx == NULL ? "UNKNOWN" :m_szThreadNamePfx );
+			EmitWarning( SPEW_THREADS, 2, "Work Item for Work Pool %s completed but job no longer existed to notify\n", !m_szThreadNamePfx[0] ? "UNKNOWN" :m_szThreadNamePfx );
+			AssertMsg1( m_bMayHaveJobTimeouts, "Work Item for Work Pool %s completed but job no longer existed to notify", !m_szThreadNamePfx[0] ? "UNKNOWN" :m_szThreadNamePfx );
 		}
 
 		// pWorkItem was released by DispatchCompletedWorkItem

@@ -19,12 +19,12 @@ namespace GCSDK
 // Purpose: Constructor
 //------------------------------------------------------------------------------
 CGCClient::CGCClient( ISteamGameCoordinator *pSteamGameCoordinator, bool bGameserver )
-: m_pSteamGameCoordinator( NULL ),
+	: m_pSteamGameCoordinator( NULL ),
 	m_memMsg( (intp)0, 1024 ),
-#ifndef STEAM
-	m_callbackGCMessageAvailable( NULL, NULL ),
-#endif
 	m_mapSOCache( DefLessFunc(CSteamID) )
+#ifndef STEAM
+	, m_callbackGCMessageAvailable( NULL, NULL )
+#endif
 {
 #ifndef STEAM
 	if( bGameserver )

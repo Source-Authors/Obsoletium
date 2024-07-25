@@ -1,4 +1,4 @@
-//====== Copyright ©, Valve Corporation, All rights reserved. =======
+//====== Copyright Valve Corporation, All rights reserved. =======
 //
 // Purpose: Holds the CMsgBase_t class
 //
@@ -97,8 +97,8 @@ public:
 	IMsgNetPacket *operator->()	{ return m_pMsgNetPacket; }
 
 protected:
-	void operator=( const CIMsgNetPacketAutoRelease &that ) { AssertMsg( false, "Not safe to copy since releases references on destruction" ); }
-	CIMsgNetPacketAutoRelease( const CIMsgNetPacketAutoRelease &that ) { AssertMsg( false, "Not safe to copy since releases references on destruction" ); }
+	void operator=( const CIMsgNetPacketAutoRelease & ) = delete;
+	CIMsgNetPacketAutoRelease( const CIMsgNetPacketAutoRelease & ) = delete;
 
 	IMsgNetPacket *m_pMsgNetPacket;
 };
@@ -471,7 +471,7 @@ void CMsgBase_t<MSG_HEADER_TYPE>::AddStrData( const char *pchIn )
 		return;
 	}
 
-	int cchIn = Q_strlen( pchIn );
+	intp cchIn = Q_strlen( pchIn );
 
 	EnsurePacketSize( cchIn + 1 );
 

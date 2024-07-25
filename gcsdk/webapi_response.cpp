@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2010, Valve LLC, All rights reserved. ============
+//========= Copyright 1996-2010, Valve LLC, All rights reserved. ============
 //
 // Purpose: Implementation for CWebAPIResponse objects
 //
@@ -266,14 +266,14 @@ bool Base64Decode( const char *pchData, uint32 cchDataMax, uint8 *pubDecodedData
 		32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
 		47, 48, 49, 50, 51
 	};
-	COMPILE_TIME_ASSERT( Q_ARRAYSIZE(rgchInvBase64) == 0x7A - 0x2B + 1 );
+	static_assert( ssize(rgchInvBase64) == 0x7A - 0x2B + 1 );
 
 	uint32 un24BitsWithSentinel = 1;
 	while ( cchDataMax-- > 0 )
 	{
 		char c = *pchData++;
 
-		if ( (uint8)(c - 0x2B) >= Q_ARRAYSIZE( rgchInvBase64 ) )
+		if ( (uint8)(c - 0x2B) >= std::size( rgchInvBase64 ) )
 		{
 			if ( c == '\0' )
 				break;
@@ -925,9 +925,9 @@ int64 CWebAPIValues::GetInt64Value() const
 		else
 		{
 #if defined(_PS3) || defined(POSIX)
-			return strtoll( (const char *)m_pStringBuffer->Base() +  m_nStrValuePos, NULL, 10);
+			return strtoll( m_pStringBuffer->Base<const char>() +  m_nStrValuePos, NULL, 10);
 #else
-			return _strtoi64( (const char *)m_pStringBuffer->Base() +  m_nStrValuePos, NULL, 10);
+			return _strtoi64( m_pStringBuffer->Base<const char>() +  m_nStrValuePos, NULL, 10);
 #endif
 		}
 	default:
@@ -957,9 +957,9 @@ uint64 CWebAPIValues::GetUInt64Value() const
 		else
 		{
 #if defined(_PS3) || defined(POSIX)
-			return strtoull( (const char *)m_pStringBuffer->Base() +  m_nStrValuePos, NULL, 10);
+			return strtoull( m_pStringBuffer->Base<const char>() +  m_nStrValuePos, NULL, 10);
 #else
-			return _strtoui64( (const char *)m_pStringBuffer->Base() +  m_nStrValuePos, NULL, 10);
+			return _strtoui64( m_pStringBuffer->Base<const char>() +  m_nStrValuePos, NULL, 10);
 #endif
 		}
 	default:
@@ -1023,7 +1023,7 @@ void CWebAPIValues::GetStringValue( CUtlString &stringOut ) const
 		}
 		else
 		{
-			stringOut = (const char *)m_pStringBuffer->Base() +  m_nStrValuePos;
+			stringOut = m_pStringBuffer->Base<const char>() +  m_nStrValuePos;
 		}
 
 		return;
@@ -1068,7 +1068,7 @@ void CWebAPIValues::GetBinaryValue( CUtlBuffer &bufferOut ) const
 	bufferOut.Clear();
 	bufferOut.EnsureCapacity( m_BinaryValue.m_unBytes );
 	if ( m_BinaryValue.m_unBytes )
-		bufferOut.Put( (byte*)m_pStringBuffer->Base() + m_BinaryValue.m_nDataPos, m_BinaryValue.m_unBytes );
+		bufferOut.Put( m_pStringBuffer->Base<byte>() + m_BinaryValue.m_nDataPos, m_BinaryValue.m_unBytes );
 
 	return;
 }
@@ -2357,7 +2357,7 @@ void CWebAPIValues::CopyFrom( const CWebAPIValues *pSource )
 			{
 				CUtlBuffer bufValue;
 				pSource->GetBinaryValue( bufValue );
-				SetBinaryValue( (uint8 *)bufValue.Base(), bufValue.TellMaxPut() );
+				SetBinaryValue( bufValue.Base<uint8>(), bufValue.TellMaxPut() );
 			}
 			break;
 			
@@ -2437,6 +2437,7 @@ bool ProtoBufHelper::RecursiveAddProtoBufToWebAPIValues( CWebAPIValues *pWebAPIR
 			case FieldDescriptor::CPPTYPE_INT32:	pchTypeName = "int32"; break;
 			case FieldDescriptor::CPPTYPE_INT64:	pchTypeName = "int64"; break;
 			case FieldDescriptor::CPPTYPE_UINT32:	pchTypeName = "uint32"; break;
+			case FieldDescriptor::CPPTYPE_UINT64:	pchTypeName = "uint64"; break;
 			case FieldDescriptor::CPPTYPE_DOUBLE:	pchTypeName = "double"; break;
 			case FieldDescriptor::CPPTYPE_FLOAT:	pchTypeName = "float"; break;
 			case FieldDescriptor::CPPTYPE_BOOL:		pchTypeName = "bool"; break;

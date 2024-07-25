@@ -33,7 +33,7 @@ namespace GCSDK
 
 		//constructs a group given a static string for the name of the group, and the name for the console variables that control the console and log output levels. Note
 		//that to help with consistency, DECLARE_GC_EMIT_GROUP should be used for declaring these objects over manually providing names for all fields
-		CGCEmitGroup( const char* pszGroupName, const char* pszConsoleVar, const char* pszLogVar, const char* pszDefaultConsole, const char* pszDefaultLog )	
+		CGCEmitGroup( const char* pszGroupName, [[maybe_unused]] const char* pszConsoleVar, [[maybe_unused]] const char* pszLogVar, [[maybe_unused]] const char* pszDefaultConsole, [[maybe_unused]] const char* pszDefaultLog )	
 			: m_pszGroupName( pszGroupName )
 			#ifdef GC
 				, m_LogLevel( pszLogVar, pszDefaultLog, 0, "The output level to log for this system. 1 means log only critical errors, 2 means log errors and warnings, 3 means log errors, warnings and messages, 4 means log everything", true, 0.0f, true, 4.0f )

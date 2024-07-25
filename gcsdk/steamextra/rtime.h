@@ -171,7 +171,7 @@ public:
 
 private:
 	// prevent assignment or copy construction from the server time type
-	const CRTime& operator=( const CSTime &val )  { return *this; }
+	const CRTime& operator=( const CSTime & )  { return *this; }
 	CRTime( const CSTime& ) {}
 
 	RTime32 m_nStartTime; // the time store by this instance (wall clock, in seconds)

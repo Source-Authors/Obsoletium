@@ -66,7 +66,7 @@ public:
 		return pNode;
 	}
 	
-	static void * operator new( size_t size, int nBlockUse, const char *pFileName, int nLine )
+	static void * operator new( size_t size, int, const char *pFileName, int nLine )
 	{
 		CThreadSafeMemoryPool *pNode = (CThreadSafeMemoryPool *)MemAlloc_AllocAligned( size, 8, pFileName, nLine
 #ifdef STEAM
@@ -85,7 +85,7 @@ public:
 			);
 	}
 	
-	static void operator delete( void *p, int nBlockUse, const char *pFileName, int nLine )
+	static void operator delete( void *p, int, const char *, int )
 	{
 		MemAlloc_FreeAligned( p
 #ifdef STEAM

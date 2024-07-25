@@ -102,7 +102,7 @@ enum EJobProfileSortOrder
 struct JobProfileStats_t
 {
 	int m_iJobProfileSort;
-	CUtlMap< uint32, JobStatsBucket_t, int > *pmapStatsBucket;
+	CUtlMap< uintp, JobStatsBucket_t, int > *pmapStatsBucket;
 };
 
 //-----------------------------------------------------------------------------
@@ -305,7 +305,7 @@ private:
 	bool m_bProfiling;
 	bool m_bIsShuttingDown;
 	int m_cErrorsToReport;
-	CUtlMap< uint32, JobStatsBucket_t, int > m_mapStatsBucket;
+	CUtlMap< uintp, JobStatsBucket_t, int > m_mapStatsBucket;
 	CUtlMap<MsgType_t, int, int> m_mapOrphanMessages;
 	CUtlMemory<unsigned char> g_memMainDebugInfo;
 

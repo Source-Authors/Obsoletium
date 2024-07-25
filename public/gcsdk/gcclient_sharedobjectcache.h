@@ -195,7 +195,7 @@ public:
 	bool BIsSubscribed() const { return m_bSubscribed; }
 
 	/// Who owns this cache?
-	virtual const CSteamID & GetOwner() const { return m_context.GetOwner(); }
+	const CSteamID & GetOwner() const override { return m_context.GetOwner(); }
 
 	/// Adds a listener interface to the object.  A call to re-add
 	/// a listener that's already listening is harmlessly ignored.
@@ -230,7 +230,7 @@ public:
 
 protected:
 private:
-	virtual CSharedObjectTypeCache *AllocateTypeCache( int nClassID ) const OVERRIDE { return new CGCClientSharedObjectTypeCache( nClassID, m_context ); }
+	virtual CSharedObjectTypeCache *AllocateTypeCache( int nClassID ) const override { return new CGCClientSharedObjectTypeCache( nClassID, m_context ); }
 	CGCClientSharedObjectTypeCache *GetTypeCacheByIndex( int nIndex ) { return (CGCClientSharedObjectTypeCache *)CSharedObjectCache::GetTypeCacheByIndex( nIndex ); }
 
 	CGCClientSharedObjectContext m_context;
