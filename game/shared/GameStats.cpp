@@ -454,7 +454,8 @@ bool CBaseGameStats::SaveToFileNOW( bool bForceSyncWrite /* = false */ )
 	{
 		// Allocate memory for async system to use (and free afterward!!!)
 		size_t nBufferSize = buf.TellPut();
-		void *pMem = malloc(nBufferSize);
+		// dimhotepus: ASAN catch, AsyncWrite will delete[] it.
+		void *pMem = new char[nBufferSize];
 		CUtlBuffer statsBuffer( pMem, nBufferSize );
 		statsBuffer.Put( buf.Base(), nBufferSize );
 

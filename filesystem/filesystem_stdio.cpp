@@ -145,12 +145,18 @@ public:
 #endif
 private:
 	CStdioFile( FILE *pFile, bool bWriteable )
-		: m_pFile( pFile ), m_bWriteable( bWriteable )
+		: m_pFile( pFile )
+#ifdef POSIX
+		, m_bWriteable( bWriteable )
+#endif
 	{
 	}
 
 	FILE *m_pFile;
+
+#ifdef POSIX
 	bool m_bWriteable;
+#endif
 };
 
 #ifdef POSIX
@@ -183,10 +189,10 @@ public:
 
 private:
 	CWin32ReadOnlyFile( HANDLE hFileUnbuffered, HANDLE hFileBuffered, int sectorSize, int64 fileSize, bool bOverlapped )
-	 :	m_hFileUnbuffered( hFileUnbuffered ),
-		m_hFileBuffered( hFileBuffered ),
-		m_ReadPos( 0 ),
+	 :	m_ReadPos( 0 ),
 		m_Size( fileSize ),
+		m_hFileUnbuffered( hFileUnbuffered ),
+		m_hFileBuffered( hFileBuffered ),
 		m_SectorSize( sectorSize ),
 		m_bOverlapped( bOverlapped )
 	{
@@ -281,7 +287,7 @@ CFileSystem_Stdio::~CFileSystem_Stdio()
 void *CFileSystem_Stdio::QueryInterface( const char *pInterfaceName )
 {
 	// We also implement the IMatSystemSurface interface
-	if (!Q_strncmp(	pInterfaceName, FILESYSTEM_INTERFACE_VERSION, Q_strlen(FILESYSTEM_INTERFACE_VERSION) + 1))
+	if (!Q_strncmp(	pInterfaceName, FILESYSTEM_INTERFACE_VERSION, ssize(FILESYSTEM_INTERFACE_VERSION) ))
 		return (IFileSystem*)this;
 
 	return CBaseFileSystem::QueryInterface( pInterfaceName );
@@ -1037,13 +1043,7 @@ int GetSectorSize( const char *pszFilename )
 		return 0;
 	}
 
-	if ( IsX360() )
-	{
-		// purposely dvd centric, which is also the worst case
-		return XBOX_DVD_SECTORSIZE;
-	}
-
-#if defined( _WIN32 ) && !defined( FILESYSTEM_STEAM ) && !defined( _X360 )
+#if defined( _WIN32 ) && !defined( FILESYSTEM_STEAM )
 	char szAbsoluteFilename[MAX_FILEPATH];
 	if ( pszFilename[1] != ':' )
 	{
@@ -1059,12 +1059,12 @@ int GetSectorSize( const char *pszFilename )
 		DWORD sectorSize;
 	};
 
-	static DriveSectorSize_t cachedSizes[4];
+	static DriveSectorSize_t cachedSizes[8];
 
 	char volume = tolower( *pszFilename );
 
-	int i;
-	for ( i = 0; i < ARRAYSIZE(cachedSizes) && cachedSizes[i].volume; i++ )
+	size_t i;
+	for ( i = 0; i < std::size(cachedSizes) && cachedSizes[i].volume; i++ )
 	{
 		if ( cachedSizes[i].volume == volume )
 		{
@@ -1084,7 +1084,7 @@ int GetSectorSize( const char *pszFilename )
 			sectorSize = 0;
 		}
 
-		if ( i < ARRAYSIZE(cachedSizes) )
+		if ( i < std::size(cachedSizes) )
 		{
 			cachedSizes[i].volume = volume;
 			cachedSizes[i].sectorSize = sectorSize;
@@ -1143,7 +1143,7 @@ CThreadIOEventPool g_ThreadIOEvents;
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-bool CWin32ReadOnlyFile::CanOpen( const char *filename, const char *options )
+bool CWin32ReadOnlyFile::CanOpen( const char *, const char *options )
 {
 	return ( options[0] == 'r' && options[1] == 'b' && options[2] == 0 && filesystem_native.GetBool() );
 }
@@ -1314,7 +1314,7 @@ size_t CWin32ReadOnlyFile::FS_fread( void *dest, size_t destSize, size_t size )
 	if ( m_hFileUnbuffered != INVALID_HANDLE_VALUE )
 	{
 		const int destBaseAlign = ( IsX360() ) ? 4 : m_SectorSize;
-		bool bDestBaseIsAligned = ( (DWORD)dest % destBaseAlign == 0 );
+		bool bDestBaseIsAligned = ( (uintp)dest % destBaseAlign == 0 );
 		bool bCanReadUnbufferedDirect = ( bDestBaseIsAligned && ( destSize % m_SectorSize == 0 ) && ( m_ReadPos % m_SectorSize == 0 ) );
 
 		if ( bCanReadUnbufferedDirect )
@@ -1340,7 +1340,7 @@ size_t CWin32ReadOnlyFile::FS_fread( void *dest, size_t destSize, size_t size )
 		}
 	}
 
-	OVERLAPPED overlapped = { 0 };	
+	OVERLAPPED overlapped = {};
 	if ( m_bOverlapped )
 	{
 		pEvent = g_ThreadIOEvents.GetEvent();

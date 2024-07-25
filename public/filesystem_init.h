@@ -205,7 +205,7 @@ void FileSystem_AddSearchPath_Platform( IFileSystem *pFileSystem, const char *sz
 // See FSErrorMode_t. If you don't specify one here, then the default is FS_ERRORMODE_VCONFIG.
 void FileSystem_SetErrorMode( FSErrorMode_t errorMode = FS_ERRORMODE_VCONFIG );
 
-bool FileSystem_GetExecutableDir( char *exedir, size_t exeDirLen );
+bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen );
 
 template<size_t max_size>
 bool FileSystem_GetExecutableDir( char (&exedir)[max_size] )

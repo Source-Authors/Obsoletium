@@ -121,11 +121,11 @@ public:
 		Q_strncpy( szFixedName, pszFilename, sizeof( szFixedName ) );
 		Q_FixSlashes( szFixedName );
 
-		Assert( (int)FS_INVALID_ASYNC_FILE == m_map.InvalidIndex() );
+		Assert( (intp)FS_INVALID_ASYNC_FILE == m_map.InvalidIndex() );
 
 		AUTO_LOCK( m_mutex );
 
-		int iEntry = m_map.Find( szFixedName );
+		auto iEntry = m_map.Find( szFixedName );
 		if ( iEntry == m_map.InvalidIndex() )
 		{
 			iEntry = m_map.Insert( strdup( szFixedName ), new AsyncOpenedFile_t );
@@ -134,7 +134,7 @@ public:
 		{
 			m_map[iEntry]->AddRef();
 		}
-		return (FSAsyncFile_t)iEntry;
+		return (FSAsyncFile_t)static_cast<uintp>(iEntry);
 	}
 
 	FSAsyncFile_t Find( const char *pszFilename )
@@ -145,13 +145,13 @@ public:
 
 		AUTO_LOCK( m_mutex );
 
-		int iEntry = m_map.Find( szFixedName );
+		auto iEntry = m_map.Find( szFixedName );
 		if ( iEntry != m_map.InvalidIndex() )
 		{
 			m_map[iEntry]->AddRef();
 		}
 
-		return (FSAsyncFile_t)iEntry;
+		return (FSAsyncFile_t)static_cast<uintp>(iEntry);
 	}
 
 	AsyncOpenedFile_t *Get( FSAsyncFile_t item )
@@ -163,7 +163,7 @@ public:
 
 		AUTO_LOCK( m_mutex );
 
-		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(int)item;
+		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
 		Assert( m_map.IsValidIndex( iEntry ) );
 		m_map[iEntry]->AddRef();
 		return m_map[iEntry];
@@ -178,7 +178,7 @@ public:
 
 		AUTO_LOCK( m_mutex );
 
-		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(int)item;
+		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
 		Assert( m_map.IsValidIndex( iEntry ) );
 		m_map[iEntry]->AddRef();
 	}
@@ -192,7 +192,7 @@ public:
 
 		AUTO_LOCK( m_mutex );
 
-		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(int)item;
+		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
 		Assert( m_map.IsValidIndex( iEntry ) );
 		if ( m_map[iEntry]->Release() == 0 )
 		{
@@ -263,13 +263,13 @@ public:
 	CFileAsyncReadJob( const FileAsyncRequest_t &fromRequest, CBaseFileSystem *pOwnerFileSystem )
 	  : CFileAsyncJob( ConvertPriority( fromRequest.priority ) ),
 		FileAsyncRequest_t( fromRequest ),
+		m_pCustomFetcher(NULL),
+		m_hCustomFetcherHandle(NULL),
+		m_pOwnerFileSystem(pOwnerFileSystem),
 		m_pResultData( NULL ),
 		m_nResultSize( 0 ),
 		m_pRealContext( fromRequest.pContext ),
-		m_pfnRealCallback( fromRequest.pfnCallback ),
-		m_pCustomFetcher(NULL),
-		m_hCustomFetcherHandle(NULL),
-		m_pOwnerFileSystem(pOwnerFileSystem)
+		m_pfnRealCallback( fromRequest.pfnCallback )
 	{
 #if defined( TRACK_BLOCKING_IO )
 		m_Timer.Start();
@@ -303,7 +303,7 @@ public:
 
 	CFileAsyncReadJob *AsReadJob() { return this; }
 
-	virtual char const	*Describe()
+	char const	*Describe() const override
 	{
 		return pszFilename; 
 	}
@@ -313,7 +313,7 @@ public:
 		return this;
 	}
 
-	virtual JobStatus_t DoExecute()
+	JobStatus_t DoExecute() override
 	{
 		SimulateDelay();
 #if defined( TRACK_BLOCKING_IO )
@@ -360,7 +360,7 @@ public:
 		return retval;
 	}
 
-	virtual JobStatus_t GetResult( void **ppData, int *pSize ) 
+	JobStatus_t GetResult( void **ppData, int *pSize ) override
 	{ 
 		if ( m_pResultData )
 		{
@@ -442,9 +442,9 @@ class CFileAsyncWriteJob : public CFileAsyncJob
 public:
 	CFileAsyncWriteJob( const char *pszFilename, const void *pData, unsigned nBytes, bool bFreeMemory, bool bAppend )
 	  : CFileAsyncJob( FSASYNC_WRITE_PRIORITY ),
+		m_bFreeMemory( bFreeMemory ),
 		m_pData( pData ),
 		m_nBytes( nBytes ),
-		m_bFreeMemory( bFreeMemory ),
 		m_bAppend( bAppend )
 	{
 #if defined( TRACK_BLOCKING_IO )
@@ -462,11 +462,11 @@ public:
 		free( (void *)m_pszFilename );
 	}
 
-	virtual char const *Describe() { return m_pszFilename; }
+	char const *Describe() const override { return m_pszFilename; }
 
-	virtual bool IsWrite() const { return true; }
+	bool IsWrite() const override { return true; }
 
-	virtual JobStatus_t DoExecute()
+	JobStatus_t DoExecute() override
 	{
 		SimulateDelay();
 #if defined( TRACK_BLOCKING_IO )
@@ -483,11 +483,13 @@ public:
 		return retval;
 	}
 
-	virtual void DoCleanup()
+	void DoCleanup() override
 	{
 		if ( m_pData && m_bFreeMemory )
 		{
-			free( (void*) m_pData );
+			// dimhotepus: ASAN catch, new char[] here.
+			delete[] (char*)m_pData;
+			m_pData = nullptr;
 		}
 	}
 
@@ -550,11 +552,11 @@ public:
 		g_nAsyncWriteJobs--;
 	}
 
-	virtual char const	*Describe() { return m_pszAppendTo; }
+	char const	*Describe() const override { return m_pszAppendTo; }
 
-	virtual bool IsWrite() const { return true; }
+	bool IsWrite() const override { return true; }
 
-	virtual JobStatus_t DoExecute()
+	JobStatus_t DoExecute() override
 	{
 		SimulateDelay();
 #if defined( TRACK_BLOCKING_IO )
@@ -637,24 +639,12 @@ void CBaseFileSystem::InitAsync()
 		m_pThreadPool = CreateThreadPool();
 
 		ThreadPoolStartParams_t params;
+		// maximum # of async I/O thread on PC is 2
+		params.nThreads = 1;
+		// Limit count of IO threads to a maximum of 4.
+		params.nThreadsMax = 4;
 		params.iThreadPriority = 0;
 		params.bIOThreads = true;
-		params.nThreadsMax = 4; // Limit count of IO threads to a maximum of 4.
-		if ( IsX360() )
-		{
-			// override defaults
-			// 360 has a single i/o thread on the farthest proc
-			params.nThreads = 1;
-			params.fDistribute = TRS_TRUE;
-			params.bUseAffinityTable = true;
-			params.iAffinityTable[0] = XBOX_PROCESSOR_3;
-		}
-		else if( IsPC() )
-		{
-			// override defaults
-			// maximum # of async I/O thread on PC is 2
-			params.nThreads = 1;
-		}
 
 		if ( !m_pThreadPool->Start( params, "IOJob" ) )
 		{
@@ -691,7 +681,7 @@ void CBaseFileSystem::AsyncRemoveFetcher( IAsyncFileFetch *pFetcher )
 {
 
 	// Abort any active jobs
-	int i = 0;
+	intp i = 0;
 	while ( i < m_vecAsyncCustomFetchJobs.Count() )
 	{
 		if ( m_vecAsyncCustomFetchJobs[i]->m_pCustomFetcher == pFetcher )
@@ -794,7 +784,7 @@ FSAsyncStatus_t CBaseFileSystem::AsyncReadMultipleCreditAlloc( const FileAsyncRe
 #endif
 
 		// Search list of application custom fetchers and see if any of them want it
-		for ( int j = 0; j < m_vecAsyncFetchers.Count(); j++ )
+		for ( intp j = 0; j < m_vecAsyncFetchers.Count(); j++ )
 		{
 			IAsyncFileFetch::Handle	handle;
 			FSAsyncStatus_t status = m_vecAsyncFetchers[j]->Start( *pJob->GetRequest(), &handle, m_pThreadPool );

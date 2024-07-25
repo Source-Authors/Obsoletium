@@ -806,7 +806,8 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	m_bWaitingForSafeDangerousSave = bIsAutosaveDangerous;
 
 	int iHeaderBufferSize = 64 + tokenSize + pSaveData->GetCurPos();
-	void *pMem = malloc(iHeaderBufferSize);
+	// dimhotepus: ASAN catch, AsyncWrite will delete[] it.
+	void *pMem = new char[iHeaderBufferSize];
 	CUtlBuffer saveHeader( pMem, iHeaderBufferSize );
 
 	// Write the header -- THIS SHOULD NEVER CHANGE STRUCTURE, USE SAVE_HEADER FOR NEW HEADER INFORMATION
@@ -1444,7 +1445,7 @@ bool CSaveRestore::SaveGameState( bool bTransition, CSaveRestoreData **ppReturnS
 		sectionsInfo.nBytesDataHeaders + 
 		sectionsInfo.nBytesData;
 
-	void *pBuffer = new byte[nBytesStateFile];
+	void *pBuffer = new char[nBytesStateFile];
 	CUtlBuffer buffer( pBuffer, nBytesStateFile );
 
 	// Write the header -- THIS SHOULD NEVER CHANGE STRUCTURE, USE SAVE_HEADER FOR NEW HEADER INFORMATION
@@ -2032,7 +2033,7 @@ bool CSaveRestore::SaveClientState( const char *name )
 
 
 
-	void *pBuffer = new byte[nBytes];
+	void *pBuffer = new char[nBytes];
 	CUtlBuffer buffer( pBuffer, nBytes );
 	buffer.Put( &CURRENT_SAVEFILE_HEADER_TAG, sizeof(CURRENT_SAVEFILE_HEADER_TAG) );
 	buffer.Put( &magicnumber, sizeof( magicnumber ) );
@@ -2369,7 +2370,7 @@ void CSaveRestore::EntityPatchWrite( CSaveRestoreData *pSaveData, const char *le
 	}
 
 	int nBytesEntityPatch = sizeof(int) + size * sizeof(int);
-	void *pBuffer = new byte[nBytesEntityPatch];
+	void *pBuffer = new char[nBytesEntityPatch];
 	CUtlBuffer buffer( pBuffer, nBytesEntityPatch );
 
 	// Patch count

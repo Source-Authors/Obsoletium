@@ -161,7 +161,7 @@ public:
 	void NoteFileIgnoredForPureServer( const char *pFilename, const char *pPathID, int iSearchPathStoreId );
 	void NoteFileLoadedFromDisk( const char *pFilename, const char *pPathID, int iSearchPathStoreId, FILE *fp, int64 nLength );
 	void NoteFileUnloaded( const char *pFilename, const char *pPathID );
-	int ListOpenedFiles( bool bAllOpened, const char *pchFilenameFind  );
+	intp ListOpenedFiles( bool bAllOpened, const char *pchFilenameFind  );
 
 	IFileList *GetFilesToUnloadForWhitelistChange( IPureServerWhitelist *pNewWhiteList );
 

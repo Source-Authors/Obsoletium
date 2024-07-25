@@ -46,7 +46,8 @@ static bool SaveTgaAndAddToP4( unsigned char *pImage, ImageFormat imageFormat, i
 
 	// allocate a buffer to write the tga into
 	int iMaxTGASize = 1024 + (Width * Height * 4);
-	void *pTGA = malloc( iMaxTGASize );
+	// dimhotepus: ASAN catch, AsyncWrite will delete[] it.
+	void *pTGA = new char[iMaxTGASize];
 	CUtlBuffer buffer( pTGA, iMaxTGASize );
 
 	if( !TGAWriter::WriteToBuffer( pImage, buffer, Width, Height, imageFormat, IMAGE_FORMAT_BGRA8888 ) )
