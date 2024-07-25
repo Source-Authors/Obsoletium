@@ -54,7 +54,7 @@ public:
 	SRes DoRead( void *buf, size_t *size )
 	{
 		size_t inSize = *size;
-		UInt32 remain = Size - Pos;
+		size_t remain = Size - Pos;
 		if (inSize > remain)
 			inSize = remain;
 
@@ -89,7 +89,7 @@ public:
 
 	size_t DoWrite( const void *buf, size_t size )
 	{
-		UInt32 i;
+		size_t i;
 		for (i = 0; i < size && Pos < Size; i++)
 			Data[Pos++] = ((const Byte *)buf)[i];
 		if (i != size)

@@ -159,7 +159,7 @@ void qprintf( PRINTF_FORMAT_STRING const char *format, ... );
 void ExpandWildcards (int *argc, char ***argv);
 
 void CmdLib_AddBasePath( const char *pBasePath );
-bool CmdLib_HasBasePath( const char *pFileName, int &pathLength );
+bool CmdLib_HasBasePath( const char *pFileName, intp &pathLength );
 int CmdLib_GetNumBasePaths( void );
 const char *CmdLib_GetBasePath( int i );
 // Like ExpandPath but expands the path for each base path like SafeOpenRead

@@ -413,7 +413,7 @@ void CmdLib_Cleanup()
 
 void CmdLib_Exit( int exitCode )
 {
-	TerminateProcess( GetCurrentProcess(), 1 );
+	TerminateProcess( GetCurrentProcess(), exitCode );
 }	
 
 
@@ -432,7 +432,7 @@ ExpandWildcards
 Mimic unix command line expansion
 ===================
 */
-#define	MAX_EX_ARGC	1024
+constexpr int MAX_EX_ARGC{1024};
 int		ex_argc;
 char	*ex_argv[MAX_EX_ARGC];
 #if defined( _WIN32 ) && !defined( _X360 )
@@ -556,7 +556,7 @@ char *copystring(const char *s)
 }
 
 
-void GetHourMinuteSeconds( int nInputSeconds, int &nHours, int &nMinutes, int &nSeconds )
+void GetHourMinuteSeconds( int, int &, int &, int & )
 {
 }
 
@@ -699,7 +699,7 @@ FileHandle_t SafeOpenWrite ( const char *filename )
 	return f;
 }
 
-#define MAX_CMDLIB_BASE_PATHS 10
+constexpr int MAX_CMDLIB_BASE_PATHS{10};
 static char g_pBasePaths[MAX_CMDLIB_BASE_PATHS][MAX_PATH];
 static int g_NumBasePaths = 0;
 
@@ -718,14 +718,13 @@ void CmdLib_AddBasePath( const char *pPath )
 	}
 }
 
-bool CmdLib_HasBasePath( const char *pFileName_, int &pathLength )
+bool CmdLib_HasBasePath( const char *pFileName_, intp &pathLength )
 {
+	pathLength = 0;
 	char *pFileName = ( char * )_alloca( strlen( pFileName_ ) + 1 );
 	strcpy( pFileName, pFileName_ );
 	Q_FixSlashes( pFileName );
-	pathLength = 0;
-	int i;
-	for( i = 0; i < g_NumBasePaths; i++ )
+	for( intp i = 0; i < g_NumBasePaths; i++ )
 	{
 		// see if we can rip the base off of the filename.
 		if( Q_strncasecmp( g_pBasePaths[i], pFileName, strlen( g_pBasePaths[i] ) ) == 0 )
@@ -754,7 +753,7 @@ const char *CmdLib_GetBasePath( int i )
 //-----------------------------------------------------------------------------
 int CmdLib_ExpandWithBasePaths( CUtlVector< CUtlString > &expandedPathList, const char *pszPath )
 {
-	int nPathLength = 0;
+	intp nPathLength = 0;
 
 	pszPath = ExpandPath( const_cast< char * >( pszPath ) );	// Kind of redundant but it's how CmdLib_HasBasePath needs things
 
@@ -778,7 +777,7 @@ int CmdLib_ExpandWithBasePaths( CUtlVector< CUtlString > &expandedPathList, cons
 
 FileHandle_t SafeOpenRead( const char *filename )
 {
-	int pathLength;
+	intp pathLength;
 	FileHandle_t f = 0;
 	if( CmdLib_HasBasePath( filename, pathLength ) )
 	{
