@@ -28,13 +28,13 @@ namespace {
   const nd::ScopedFile f{file_name, "rb"};
   if (!f) {
     err << "Can't open file " << file_name
-        << " to md5: " << strerror(f.open_error()) << '.\n';
+        << " to md5: " << strerror(f.open_error()) << ".\n";
     return false;
   }
 
   if (f.seek(0, SEEK_END)) {
     const auto rc = errno;
-    err << "Can't seek file " << file_name << " end: " << strerror(rc) << '.\n';
+    err << "Can't seek file " << file_name << " end: " << strerror(rc) << ".\n";
     return false;
   }
 
@@ -42,18 +42,18 @@ namespace {
   if (size <= 0) {
     const auto rc = errno;
     err << "Can't read file " << file_name << " size to md5: " << strerror(rc)
-        << '.\n';
+        << ".\n";
     return false;
   }
 
   if (f.seek(0, SEEK_SET)) {
     const auto rc = errno;
     err << "Can't seek file " << file_name << " start: " << strerror(rc)
-        << '.\n';
+        << ".\n ";
     return false;
   }
 
-  MD5Context_t ctx = {0};
+  MD5Context_t ctx = {};
   MD5Init(&ctx);
 
   byte chunk[1024];

@@ -6,35 +6,55 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "cmdlib.h"
-#include "mathlib/mathlib.h"
 #include "bsplib.h"
+
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+
+#include "bspfile.h"
+#include "bspflags.h"
+#include "datamap.h"
+#include "cmdlib.h"
+#include "filesystem.h"
+#include "filesystem_tools.h"
+#include "mathlib/compressed_light_cube.h"
+#include "mathlib/mathlib.h"
+#include "mathlib/vector.h"
+#include "mathlib/vector2d.h"
 #include "zip_utils.h"
 #include "scriplib.h"
-#include "utllinkedlist.h"
 #include "bsptreedata.h"
 #include "cmodel.h"
 #include "gamebspfile.h"
-#include "materialsystem/imaterial.h"
 #include "materialsystem/hardwareverts.h"
-#include "utlbuffer.h"
-#include "utlrbtree.h"
-#include "utlsymbol.h"
-#include "utlstring.h"
-#include "checksum_crc.h"
-#include "physdll.h"
-#include "tier0/dbg.h"
-#include "lumpfiles.h"
-#include "vtf/vtf.h"
-#include "lzma/lzma.h"
+#include "tier1/byteswap.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/strtools.h"
+#include "tier1/utlmemory.h"
 #include "tier1/lzmaDecoder.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlstring.h"
+#include "tier1/checksum_crc.h"
+#include "tier1/interface.h"
+#include "tier0/basetypes.h"
+#include "tier0/commonmacros.h"
+#include "tier0/platform.h"
+#include "tier0/wchartypes.h"
+#include "tier0/dbg.h"
+#include "vphysics_interface.h"
+#include "vcollide.h"
+#include "lumpfiles.h"
+#include "lzma/lzma.h"
 
 #include "tier0/memdbgon.h"
 
 //=============================================================================
 
 // Boundary each lump should be aligned to
-#define LUMP_ALIGNMENT	4
+constexpr int LUMP_ALIGNMENT{4};
 
 // Data descriptions for byte swapping - only needed
 // for structures that are written to file for use by the game.
@@ -530,7 +550,7 @@ static const char *s_LumpNames[] = {
 
 const char *GetLumpName( unsigned int lumpnum )
 {
-	if ( lumpnum >= ARRAYSIZE( s_LumpNames ) )
+	if ( lumpnum >= std::size( s_LumpNames ) )
 	{
 		return "UNKNOWN";
 	}
@@ -560,7 +580,7 @@ int			nummodels;
 dmodel_t	dmodels[MAX_MAP_MODELS];
 
 int			visdatasize;
-byte		dvisdata[MAX_MAP_VISIBILITY];
+alignas(dvis_t) byte dvisdata[MAX_MAP_VISIBILITY];
 dvis_t		*dvis = (dvis_t *)dvisdata;
 
 CUtlVector<byte> dlightdataHDR;
@@ -722,26 +742,18 @@ static IZip *s_pakFile = 0;
 // Keep the file position aligned to an arbitrary boundary.
 // Returns updated file position.
 //-----------------------------------------------------------------------------
-static unsigned int AlignFilePosition( FileHandle_t hFile, int alignment )
+static uintp AlignFilePosition( FileHandle_t hFile, unsigned alignment )
 {
-	unsigned int currPosition = g_pFileSystem->Tell( hFile );
+	uintp currPosition = g_pFileSystem->Tell( hFile );
 
 	if ( alignment >= 2 )
 	{
-		unsigned int newPosition = AlignValue( currPosition, alignment );
-		unsigned int count = newPosition - currPosition;
+		uintp newPosition = AlignValue( currPosition, alignment );
+		uintp count = newPosition - currPosition;
 		if ( count )
 		{
-			char *pBuffer;
 			char smallBuffer[4096];
-			if ( count > sizeof( smallBuffer ) )
-			{
-				pBuffer = (char *)malloc( count );
-			}
-			else
-			{
-				pBuffer = smallBuffer;
-			}
+			char *pBuffer{count > sizeof( smallBuffer ) ? (char *)malloc( count ) : smallBuffer};
 
 			memset( pBuffer, 0, count );
 			SafeWrite( hFile, pBuffer, count );
@@ -794,7 +806,7 @@ void ForceAlignment( IZip *pak, bool bAlign, bool bCompatibleFormat, unsigned in
 //-----------------------------------------------------------------------------
 static void WritePakFileLump( void )
 {
-	CUtlBuffer buf( 0, 0 );
+	CUtlBuffer buf( (intp)0, 0 );
 	GetPakFile()->ActivateByteSwapping( IsX360() );
 	GetPakFile()->SaveToBuffer( buf );
 
@@ -1238,15 +1250,15 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 				g_Swap.SwapFieldsToTargetEndian( &pGameLump[i] );
 			}
 
-			int length = pGameLump[i].filelen;
-			GameLumpHandle_t lump = g_GameLumps.CreateGameLump( pGameLump[i].id, length, pGameLump[i].flags, pGameLump[i].version );
+			int filelen = pGameLump[i].filelen;
+			GameLumpHandle_t lump = g_GameLumps.CreateGameLump( pGameLump[i].id, filelen, pGameLump[i].flags, pGameLump[i].version );
 			if ( g_bSwapOnLoad )
 			{
-				SwapGameLump( pGameLump[i].id, pGameLump[i].version, (byte*)g_GameLumps.GetGameLump(lump), (byte *)pHeader + pGameLump[i].fileofs, length );
+				SwapGameLump( pGameLump[i].id, pGameLump[i].version, (byte*)g_GameLumps.GetGameLump(lump), (byte *)pHeader + pGameLump[i].fileofs, filelen );
 			}
 			else
 			{
-				memcpy( g_GameLumps.GetGameLump(lump), (byte *)pHeader + pGameLump[i].fileofs, length );
+				memcpy( g_GameLumps.GetGameLump(lump), (byte *)pHeader + pGameLump[i].fileofs, filelen );
 			}
 		}
 	}
@@ -1256,16 +1268,15 @@ void CGameLump::ParseGameLump( dheader_t* pHeader )
 //-----------------------------------------------------------------------------
 // String table methods
 //-----------------------------------------------------------------------------
-const char *TexDataStringTable_GetString( int stringID )
+const char *TexDataStringTable_GetString( intp stringID )
 {
 	return &g_TexDataStringData[g_TexDataStringTable[stringID]];
 }
 
-int	TexDataStringTable_AddOrFindString( const char *pString )
+intp	TexDataStringTable_AddOrFindString( const char *pString )
 {
-	int i;
 	// garymcthack: Make this use an RBTree!
-	for( i = 0; i < g_TexDataStringTable.Count(); i++ )
+	for( intp i = 0; i < g_TexDataStringTable.Count(); i++ )
 	{
 		if( stricmp( pString, &g_TexDataStringData[g_TexDataStringTable[i]] ) == 0 )
 		{
@@ -1273,9 +1284,9 @@ int	TexDataStringTable_AddOrFindString( const char *pString )
 		}
 	}
 
-	int len = strlen( pString );
-	int outOffset = g_TexDataStringData.AddMultipleToTail( len+1, pString );
-	int outIndex = g_TexDataStringTable.AddToTail( outOffset );
+	intp len = strlen( pString );
+	intp outOffset = g_TexDataStringData.AddMultipleToTail( len+1, pString );
+	intp outIndex = g_TexDataStringTable.AddToTail( outOffset );
 	return outIndex;
 }
 
@@ -1298,7 +1309,7 @@ static void AddGameLumps( )
 	lump->filelen = size;
 
 	// write header
-	dgamelumpheader_t header;
+	dgamelumpheader_t header = {0};
 	header.lumpCount = clumpCount;
 	WriteData( &header );
 
@@ -1321,7 +1332,7 @@ static void AddGameLumps( )
 	// write lumps..
 	for( h = g_GameLumps.FirstGameLump(); h != g_GameLumps.InvalidGameLump(); h = g_GameLumps.NextGameLump( h ) )
 	{
-		unsigned int lumpsize = g_GameLumps.GameLumpSize(h);
+		int lumpsize = g_GameLumps.GameLumpSize(h);
 		if ( g_bSwapOnWrite )
 		{
 			g_GameLumps.SwapGameLump( g_GameLumps.GetGameLumpId(h), g_GameLumps.GetGameLumpVersion(h), (byte*)g_GameLumps.GetGameLump(h), (byte*)g_GameLumps.GetGameLump(h), lumpsize );
@@ -1330,7 +1341,7 @@ static void AddGameLumps( )
 	}
 
 	// align to doubleword
-	AlignFilePosition( g_hBSPFile, 4 );
+	AlignFilePosition( g_hBSPFile, 4u );
 }
 
 
@@ -1341,11 +1352,11 @@ static void AddOcclusionLump( )
 {
 	g_Lumps.size[LUMP_OCCLUSION] = 0;	// mark it written
 
-	int nOccluderCount = g_OccluderData.Count();
-	int nOccluderPolyDataCount = g_OccluderPolyData.Count();
-	int nOccluderVertexIndices = g_OccluderVertexIndices.Count();
+	intp nOccluderCount = g_OccluderData.Count();
+	intp nOccluderPolyDataCount = g_OccluderPolyData.Count();
+	intp nOccluderVertexIndices = g_OccluderVertexIndices.Count();
 
-	int nLumpLength = nOccluderCount * sizeof(doccluderdata_t) +
+	intp nLumpLength = nOccluderCount * sizeof(doccluderdata_t) +
 		nOccluderPolyDataCount * sizeof(doccluderpolydata_t) +
 		nOccluderVertexIndices * sizeof(int) +
 		3 * sizeof(int);
@@ -1670,7 +1681,7 @@ static void SwapPhyscollideLump( byte *pDestBase, byte *pSrcBase, unsigned int &
 
 		if ( pPhysModel->dataSize > 0 )
 		{		
-			vcollide_t collide = {0};
+			vcollide_t collide = {};
 			int dataSize = pPhysModel->dataSize + pPhysModel->keydataSize;
 
 			if ( g_bSwapOnWrite )
@@ -2551,7 +2562,7 @@ static void AddLumpInternal( int lumpnum, void *data, int len, int version )
 	SafeWrite( g_hBSPFile, data, len );
 
 	// pad out to the next dword
-	AlignFilePosition( g_hBSPFile, 4 );
+	AlignFilePosition( g_hBSPFile, 4u );
 }
 
 template< class T >
@@ -2619,11 +2630,11 @@ WriteBSPFile
 Swaps the bsp file in place, so it should not be referenced again
 =============
 */
-void WriteBSPFile( const char *filename, char *pUnused )
+void WriteBSPFile( const char *filename, char * )
 {		
 	if ( texinfo.Count() > MAX_MAP_TEXINFO )
 	{
-		Error( "Map has too many texinfos (has %d, can have at most %d)\n", texinfo.Count(), MAX_MAP_TEXINFO );
+		Error( "Map has too many texinfos (has %zd, can have at most %d)\n", texinfo.Count(), MAX_MAP_TEXINFO );
 		return;
 	}
 
@@ -2773,7 +2784,7 @@ void WriteLumpToFile( char *filename, int lump )
 	int length = g_pBSPHeader->lumps[lump].filelen;
 
 	// Write the header
-	lumpfileheader_t lumpHeader;
+	lumpfileheader_t lumpHeader = {};
 	lumpHeader.lumpID = lump;
 	lumpHeader.lumpVersion = LumpVersion(lump);
 	lumpHeader.lumpLength = length;
@@ -2803,7 +2814,7 @@ void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer,
 	}
 
 	// Write the header
-	lumpfileheader_t lumpHeader;
+	lumpfileheader_t lumpHeader = {};
 	lumpHeader.lumpID = lump;
 	lumpHeader.lumpVersion = nLumpVersion;
 	lumpHeader.lumpLength = nBufLen;
@@ -2819,12 +2830,12 @@ void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer,
 
 
 //============================================================================
-#define ENTRIES(a)		(sizeof(a)/sizeof(*(a)))
+#define ENTRIES(a)		ssize(a)
 #define ENTRYSIZE(a)	(sizeof(*(a)))
 
 int ArrayUsage( const char *szItem, int items, int maxitems, int itemsize )
 {
-	float	percentage = maxitems ? items * 100.0 / maxitems : 0.0;
+	float	percentage = maxitems ? items * 100.0f / maxitems : 0.0f;
 
     Msg("%-17.17s %8i/%-8i %8i/%-8i (%4.1f%%) ", 
 		   szItem, items, maxitems, items * itemsize, maxitems * itemsize, percentage );
@@ -2841,7 +2852,7 @@ int ArrayUsage( const char *szItem, int items, int maxitems, int itemsize )
 
 int GlobUsage( const char *szItem, int itemstorage, int maxstorage )
 {
-	float	percentage = maxstorage ? itemstorage * 100.0 / maxstorage : 0.0;
+	float	percentage = maxstorage ? itemstorage * 100.0f / maxstorage : 0.0f;
     Msg("%-17.17s     [variable]    %8i/%-8i (%4.1f%%) ", 
 		   szItem, itemstorage, maxstorage, percentage );
 	if ( percentage > 80.0 )
@@ -2864,7 +2875,7 @@ Dumps info about current file
 */
 void PrintBSPFileSizes (void)
 {
-	int	totalmemory = 0;
+	float	totalmemory = 0;
 
 //	if (!num_entities)
 //		ParseEntities ();
@@ -2873,38 +2884,38 @@ void PrintBSPFileSizes (void)
 	Msg( "%-17s %16s %16s %9s \n", "Object names", "Objects/Maxobjs", "Memory / Maxmem", "Fullness" );
 	Msg( "%-17s %16s %16s %9s \n",  "------------", "---------------", "---------------", "--------" );
 
-	totalmemory += ArrayUsage( "models",		nummodels,		ENTRIES(dmodels),		ENTRYSIZE(dmodels) );
-	totalmemory += ArrayUsage( "brushes",		numbrushes,		ENTRIES(dbrushes),		ENTRYSIZE(dbrushes) );
-	totalmemory += ArrayUsage( "brushsides",	numbrushsides,	ENTRIES(dbrushsides),	ENTRYSIZE(dbrushsides) );
-	totalmemory += ArrayUsage( "planes",		numplanes,		ENTRIES(dplanes),		ENTRYSIZE(dplanes) );
-	totalmemory += ArrayUsage( "vertexes",		numvertexes,	ENTRIES(dvertexes),		ENTRYSIZE(dvertexes) );
-	totalmemory += ArrayUsage( "nodes",			numnodes,		ENTRIES(dnodes),		ENTRYSIZE(dnodes) );
+	totalmemory += ArrayUsage( "models",		nummodels,		ssize(dmodels),		ENTRYSIZE(dmodels) );
+	totalmemory += ArrayUsage( "brushes",		numbrushes,		ssize(dbrushes),		ENTRYSIZE(dbrushes) );
+	totalmemory += ArrayUsage( "brushsides",	numbrushsides,	ssize(dbrushsides),	ENTRYSIZE(dbrushsides) );
+	totalmemory += ArrayUsage( "planes",		numplanes,		ssize(dplanes),		ENTRYSIZE(dplanes) );
+	totalmemory += ArrayUsage( "vertexes",		numvertexes,	ssize(dvertexes),		ENTRYSIZE(dvertexes) );
+	totalmemory += ArrayUsage( "nodes",			numnodes,		ssize(dnodes),		ENTRYSIZE(dnodes) );
 	totalmemory += ArrayUsage( "texinfos",		texinfo.Count(),MAX_MAP_TEXINFO,		sizeof(texinfo_t) );
-	totalmemory += ArrayUsage( "texdata",		numtexdata,		ENTRIES(dtexdata),		ENTRYSIZE(dtexdata) );
+	totalmemory += ArrayUsage( "texdata",		numtexdata,		ssize(dtexdata),		ENTRYSIZE(dtexdata) );
     
 	totalmemory += ArrayUsage( "dispinfos",     g_dispinfo.Count(),			0,			sizeof( ddispinfo_t ) );
     totalmemory += ArrayUsage( "disp_verts",	g_DispVerts.Count(),		0,			sizeof( g_DispVerts[0] ) );
     totalmemory += ArrayUsage( "disp_tris",		g_DispTris.Count(),			0,			sizeof( g_DispTris[0] ) );
     totalmemory += ArrayUsage( "disp_lmsamples",g_DispLightmapSamplePositions.Count(),0,sizeof( g_DispLightmapSamplePositions[0] ) );
 	
-	totalmemory += ArrayUsage( "faces",			numfaces,		ENTRIES(dfaces),		ENTRYSIZE(dfaces) );
-	totalmemory += ArrayUsage( "hdr faces",     numfaces_hdr,	ENTRIES(dfaces_hdr),	ENTRYSIZE(dfaces_hdr) );
-    totalmemory += ArrayUsage( "origfaces",     numorigfaces,   ENTRIES(dorigfaces),    ENTRYSIZE(dorigfaces) );    // original faces
-	totalmemory += ArrayUsage( "leaves",		numleafs,		ENTRIES(dleafs),		ENTRYSIZE(dleafs) );
-	totalmemory += ArrayUsage( "leaffaces",		numleaffaces,	ENTRIES(dleaffaces),	ENTRYSIZE(dleaffaces) );
-	totalmemory += ArrayUsage( "leafbrushes",	numleafbrushes,	ENTRIES(dleafbrushes),	ENTRYSIZE(dleafbrushes) );
-	totalmemory += ArrayUsage( "areas",	numareas,	ENTRIES(dareas),	ENTRYSIZE(dareas) );
-	totalmemory += ArrayUsage( "surfedges",		numsurfedges,	ENTRIES(dsurfedges),	ENTRYSIZE(dsurfedges) );
-	totalmemory += ArrayUsage( "edges",			numedges,		ENTRIES(dedges),		ENTRYSIZE(dedges) );
-	totalmemory += ArrayUsage( "LDR worldlights",	numworldlightsLDR,	ENTRIES(dworldlightsLDR),	ENTRYSIZE(dworldlightsLDR) );
-	totalmemory += ArrayUsage( "HDR worldlights",	numworldlightsHDR,	ENTRIES(dworldlightsHDR),	ENTRYSIZE(dworldlightsHDR) );
+	totalmemory += ArrayUsage( "faces",			numfaces,		ssize(dfaces),		ENTRYSIZE(dfaces) );
+	totalmemory += ArrayUsage( "hdr faces",     numfaces_hdr,	ssize(dfaces_hdr),	ENTRYSIZE(dfaces_hdr) );
+    totalmemory += ArrayUsage( "origfaces",     numorigfaces,   ssize(dorigfaces),    ENTRYSIZE(dorigfaces) );    // original faces
+	totalmemory += ArrayUsage( "leaves",		numleafs,		ssize(dleafs),		ENTRYSIZE(dleafs) );
+	totalmemory += ArrayUsage( "leaffaces",		numleaffaces,	ssize(dleaffaces),	ENTRYSIZE(dleaffaces) );
+	totalmemory += ArrayUsage( "leafbrushes",	numleafbrushes,	ssize(dleafbrushes),	ENTRYSIZE(dleafbrushes) );
+	totalmemory += ArrayUsage( "areas",	numareas,	ssize(dareas),	ENTRYSIZE(dareas) );
+	totalmemory += ArrayUsage( "surfedges",		numsurfedges,	ssize(dsurfedges),	ENTRYSIZE(dsurfedges) );
+	totalmemory += ArrayUsage( "edges",			numedges,		ssize(dedges),		ENTRYSIZE(dedges) );
+	totalmemory += ArrayUsage( "LDR worldlights",	numworldlightsLDR,	ssize(dworldlightsLDR),	ENTRYSIZE(dworldlightsLDR) );
+	totalmemory += ArrayUsage( "HDR worldlights",	numworldlightsHDR,	ssize(dworldlightsHDR),	ENTRYSIZE(dworldlightsHDR) );
 
-	totalmemory += ArrayUsage( "leafwaterdata",	numleafwaterdata,ENTRIES(dleafwaterdata),	ENTRYSIZE(dleafwaterdata) );
-	totalmemory += ArrayUsage( "waterstrips",	g_numprimitives,ENTRIES(g_primitives),	ENTRYSIZE(g_primitives) );
-	totalmemory += ArrayUsage( "waterverts",	g_numprimverts,	ENTRIES(g_primverts),	ENTRYSIZE(g_primverts) );
-	totalmemory += ArrayUsage( "waterindices",	g_numprimindices,ENTRIES(g_primindices),ENTRYSIZE(g_primindices) );
-	totalmemory += ArrayUsage( "cubemapsamples", g_nCubemapSamples,ENTRIES(g_CubemapSamples),ENTRYSIZE(g_CubemapSamples) );
-	totalmemory += ArrayUsage( "overlays",      g_nOverlayCount, ENTRIES(g_Overlays),   ENTRYSIZE(g_Overlays) );
+	totalmemory += ArrayUsage( "leafwaterdata",	numleafwaterdata,ssize(dleafwaterdata),	ENTRYSIZE(dleafwaterdata) );
+	totalmemory += ArrayUsage( "waterstrips",	g_numprimitives,ssize(g_primitives),	ENTRYSIZE(g_primitives) );
+	totalmemory += ArrayUsage( "waterverts",	g_numprimverts,	ssize(g_primverts),	ENTRYSIZE(g_primverts) );
+	totalmemory += ArrayUsage( "waterindices",	g_numprimindices,ssize(g_primindices),ENTRYSIZE(g_primindices) );
+	totalmemory += ArrayUsage( "cubemapsamples", g_nCubemapSamples,ssize(g_CubemapSamples),ENTRYSIZE(g_CubemapSamples) );
+	totalmemory += ArrayUsage( "overlays",      g_nOverlayCount, ssize(g_Overlays),   ENTRYSIZE(g_Overlays) );
 	
 	totalmemory += GlobUsage( "LDR lightdata",		dlightdataLDR.Count(),	0 );
 	totalmemory += GlobUsage( "HDR lightdata",	dlightdataHDR.Count(),	0 );
@@ -2940,7 +2951,7 @@ void PrintBSPFileSizes (void)
 
 	Msg( "\nLevel flags = %x\n", g_LevelFlags );
 
-	Msg( "\n" );
+	Msg( "Memory used = %s\n", V_pretifymem( totalmemory, 2, true ) );
 
 	int triangleCount = 0;
 
@@ -3082,7 +3093,7 @@ void UnparseEntities (void)
 	int		i;
 	char	key[1024], value[1024];
 
-	CUtlBuffer buffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	buffer.EnsureCapacity( 256 * 1024 );
 	
 	for (i=0 ; i<num_entities ; i++)
@@ -3142,7 +3153,7 @@ void SetKeyValue(entity_t *ent, const char *key, const char *value)
 	ep->value = copystring(value);
 }
 
-char 	*ValueForKey (entity_t *ent, char *key)
+const char 	*ValueForKey (entity_t *ent, char *key)
 {
 	for (epair_t *ep=ent->epairs ; ep ; ep=ep->next)
 		if (!Q_stricmp (ep->key, key) )
@@ -3152,15 +3163,15 @@ char 	*ValueForKey (entity_t *ent, char *key)
 
 vec_t	FloatForKey (entity_t *ent, char *key)
 {
-	char *k = ValueForKey (ent, key);
-	return atof(k);
+	const char *k = ValueForKey (ent, key);
+	return strtof(k, nullptr);
 }
 
 vec_t	FloatForKeyWithDefault (entity_t *ent, char *key, float default_value)
 {
 	for (epair_t *ep=ent->epairs ; ep ; ep=ep->next)
 		if (!Q_stricmp (ep->key, key) )
-			return atof( ep->value );
+			return strtof( ep->value, nullptr );
 	return default_value;
 }
 
@@ -3168,13 +3179,13 @@ vec_t	FloatForKeyWithDefault (entity_t *ent, char *key, float default_value)
 
 int		IntForKey (entity_t *ent, char *key)
 {
-	char *k = ValueForKey (ent, key);
+	const char *k = ValueForKey (ent, key);
 	return atol(k);
 }
 
 int		IntForKeyWithDefault(entity_t *ent, char *key, int nDefault )
 {
-	char *k = ValueForKey (ent, key);
+	const char *k = ValueForKey (ent, key);
 	if ( !k[0] )
 		return nDefault;
 	return atol(k);
@@ -3312,16 +3323,16 @@ Fills in s->texmins[] and s->texsize[]
 void CalcFaceExtents(dface_t *s, int lightmapTextureMinsInLuxels[2], int lightmapTextureSizeInLuxels[2])
 {
 	vec_t	    mins[2], maxs[2], val=0;
-	int		    i,j, e=0;
+	int		    e=0;
 	dvertex_t	*v=NULL;
 	texinfo_t	*tex=NULL;
 	
-	mins[0] = mins[1] = 1e24;
-	maxs[0] = maxs[1] = -1e24;
+	mins[0] = mins[1] = 1e24f;
+	maxs[0] = maxs[1] = -1e24f;
 
 	tex = &texinfo[s->texinfo];
 	
-	for (i=0 ; i<s->numedges ; i++)
+	for (int i=0 ; i<s->numedges ; i++)
 	{
 		e = dsurfedges[s->firstedge+i];
 		if (e >= 0)
@@ -3329,7 +3340,7 @@ void CalcFaceExtents(dface_t *s, int lightmapTextureMinsInLuxels[2], int lightma
 		else
 			v = dvertexes + dedges[-e].v[1];
 		
-		for (j=0 ; j<2 ; j++)
+		for (int j=0 ; j<2 ; j++)
 		{
 			val = v->point[0] * tex->lightmapVecsLuxelsPerWorldUnits[j][0] + 
 				  v->point[1] * tex->lightmapVecsLuxelsPerWorldUnits[j][1] + 
@@ -3343,7 +3354,7 @@ void CalcFaceExtents(dface_t *s, int lightmapTextureMinsInLuxels[2], int lightma
 	}
 
 	int nMaxLightmapDim = (s->dispinfo == -1) ? MAX_LIGHTMAP_DIM_WITHOUT_BORDER : MAX_DISP_LIGHTMAP_DIM_WITHOUT_BORDER;
-	for (i=0 ; i<2 ; i++)
+	for (int i=0 ; i<2 ; i++)
 	{	
 		mins[i] = ( float )floor( mins[i] );
 		maxs[i] = ( float )ceil( maxs[i] );
@@ -3393,7 +3404,7 @@ void UpdateAllFaceLightmapExtents()
 //
 //-----------------------------------------------------------------------------
 
-#define TEST_EPSILON	(0.03125f)
+constexpr float TEST_EPSILON{0.03125f};
 
 
 class CToolBSPTree : public ISpatialQuery
@@ -3403,10 +3414,10 @@ public:
 	int LeafCount() const;
 
 	// Enumerates the leaves along a ray, box, etc.
-	bool EnumerateLeavesAtPoint( Vector const& pt, ISpatialLeafEnumerator* pEnum, int context );
-	bool EnumerateLeavesInBox( Vector const& mins, Vector const& maxs, ISpatialLeafEnumerator* pEnum, int context );
-	bool EnumerateLeavesInSphere( Vector const& center, float radius, ISpatialLeafEnumerator* pEnum, int context );
-	bool EnumerateLeavesAlongRay( Ray_t const& ray, ISpatialLeafEnumerator* pEnum, int context );
+	bool EnumerateLeavesAtPoint( Vector const& pt, ISpatialLeafEnumerator* pEnum, intp context );
+	bool EnumerateLeavesInBox( Vector const& mins, Vector const& maxs, ISpatialLeafEnumerator* pEnum, intp context );
+	bool EnumerateLeavesInSphere( Vector const& center, float radius, ISpatialLeafEnumerator* pEnum, intp context );
+	bool EnumerateLeavesAlongRay( Ray_t const& ray, ISpatialLeafEnumerator* pEnum, intp context );
 };
 
 
@@ -3425,7 +3436,7 @@ int CToolBSPTree::LeafCount() const
 //-----------------------------------------------------------------------------
 
 bool CToolBSPTree::EnumerateLeavesAtPoint( Vector const& pt, 
-									ISpatialLeafEnumerator* pEnum, int context )
+									ISpatialLeafEnumerator* pEnum, intp context )
 {
 	int node = 0;
 	while( node >= 0 )
@@ -3452,7 +3463,7 @@ bool CToolBSPTree::EnumerateLeavesAtPoint( Vector const& pt,
 //-----------------------------------------------------------------------------
 
 static bool EnumerateLeavesInBox_R( int node, Vector const& mins, 
-				Vector const& maxs, ISpatialLeafEnumerator* pEnum, int context )
+				Vector const& maxs, ISpatialLeafEnumerator* pEnum, intp context )
 {
 	Vector cornermin, cornermax;
 
@@ -3499,7 +3510,7 @@ static bool EnumerateLeavesInBox_R( int node, Vector const& mins,
 }
 
 bool CToolBSPTree::EnumerateLeavesInBox( Vector const& mins, Vector const& maxs, 
-									ISpatialLeafEnumerator* pEnum, int context )
+									ISpatialLeafEnumerator* pEnum, intp context )
 {
 	return EnumerateLeavesInBox_R( 0, mins, maxs, pEnum, context );
 }
@@ -3509,7 +3520,7 @@ bool CToolBSPTree::EnumerateLeavesInBox( Vector const& mins, Vector const& maxs,
 //-----------------------------------------------------------------------------
 
 static bool EnumerateLeavesInSphere_R( int node, Vector const& origin, 
-				float radius, ISpatialLeafEnumerator* pEnum, int context )
+				float radius, ISpatialLeafEnumerator* pEnum, intp context )
 {
 	while( node >= 0 )
 	{
@@ -3540,7 +3551,7 @@ static bool EnumerateLeavesInSphere_R( int node, Vector const& origin,
 	return pEnum->EnumerateLeaf( - node - 1, context );
 }
 
-bool CToolBSPTree::EnumerateLeavesInSphere( Vector const& center, float radius, ISpatialLeafEnumerator* pEnum, int context )
+bool CToolBSPTree::EnumerateLeavesInSphere( Vector const& center, float radius, ISpatialLeafEnumerator* pEnum, intp context )
 {
 	return EnumerateLeavesInSphere_R( 0, center, radius, pEnum, context );
 }
@@ -3551,7 +3562,7 @@ bool CToolBSPTree::EnumerateLeavesInSphere( Vector const& center, float radius, 
 //-----------------------------------------------------------------------------
 
 static bool EnumerateLeavesAlongRay_R( int node, Ray_t const& ray, 
-	Vector const& start, Vector const& end, ISpatialLeafEnumerator* pEnum, int context )
+	Vector const& start, Vector const& end, ISpatialLeafEnumerator* pEnum, intp context )
 {
 	float front,back;
 
@@ -3614,7 +3625,7 @@ static bool EnumerateLeavesAlongRay_R( int node, Ray_t const& ray,
 	return pEnum->EnumerateLeaf( - node - 1, context );
 }
 
-bool CToolBSPTree::EnumerateLeavesAlongRay( Ray_t const& ray, ISpatialLeafEnumerator* pEnum, int context )
+bool CToolBSPTree::EnumerateLeavesAlongRay( Ray_t const& ray, ISpatialLeafEnumerator* pEnum, intp context )
 {
 	if (!ray.m_IsSwept)
 	{
@@ -3653,7 +3664,7 @@ ISpatialQuery* ToolBSPTree()
 // FIXME: Do we want this in the IBSPTree interface?
 
 static bool EnumerateNodesAlongRay_R( int node, Ray_t const& ray, float start, float end,
-	IBSPNodeEnumerator* pEnum, int context )
+	IBSPNodeEnumerator* pEnum, intp context )
 {
 	float front, back;
 	float startDotN, deltaDotN;
@@ -3722,7 +3733,7 @@ static bool EnumerateNodesAlongRay_R( int node, Ray_t const& ray, float start, f
 }
 
 
-bool EnumerateNodesAlongRay( Ray_t const& ray, IBSPNodeEnumerator* pEnum, int context )
+bool EnumerateNodesAlongRay( Ray_t const& ray, IBSPNodeEnumerator* pEnum, intp context )
 {
 	Vector end;
 	VectorAdd( ray.m_Start, ray.m_Delta, end );
@@ -4071,7 +4082,7 @@ void ConvertPakFileContents( const char *pInFilename )
 	s_pakFile = newPakFile;
 }
 
-void SetAlignedLumpPosition( int lumpnum, int alignment = LUMP_ALIGNMENT )
+static void SetAlignedLumpPosition( int lumpnum, unsigned int alignment = LUMP_ALIGNMENT )
 {
 	g_pBSPHeader->lumps[lumpnum].fileofs = AlignFilePosition( g_hBSPFile, alignment );
 }
@@ -4474,7 +4485,7 @@ bool CompressGameLump( dheader_t *pInBSPHeader, dheader_t *pOutBSPHeader, CUtlBu
 	// purposely NOT updating the .filelen to reflect the compressed size, but leaving as original size
 	// callers use the next entry offset to determine compressed size
 	sOutGameLumpHeader.lumpCount++;
-	dgamelump_t dummyLump = { 0 };
+	dgamelump_t dummyLump = {};
 	outputBuffer.Put( &dummyLump, sizeof( dgamelump_t ) );
 
 	for ( int i = 0; i < pInGameLumpHeader->lumpCount; i++ )
@@ -4612,7 +4623,7 @@ bool RepackBSP( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer, CompressFunc_
 	CUtlVector< SortedLump_t > sortedLumps;
 	for ( int i = 0; i < HEADER_LUMPS; i++ )
 	{
-		int iIndex = sortedLumps.AddToTail();
+		intp iIndex = sortedLumps.AddToTail();
 		sortedLumps[iIndex].lumpNum = i;
 		sortedLumps[iIndex].pLump = &pInBSPHeader->lumps[i];
 	}
@@ -4643,7 +4654,7 @@ bool RepackBSP( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer, CompressFunc_
 			if ( pSortedLump->pLump->uncompressedSize )
 			{
 				byte *pCompressedLump = ((byte *)pInBSPHeader) + pSortedLump->pLump->fileofs;
-				if ( CLZMA::IsCompressed( pCompressedLump ) && pSortedLump->pLump->uncompressedSize == CLZMA::GetActualSize( pCompressedLump ) )
+				if ( CLZMA::IsCompressed( pCompressedLump ) && static_cast<unsigned>(pSortedLump->pLump->uncompressedSize) == CLZMA::GetActualSize( pCompressedLump ) )
 				{
 					inputBuffer.EnsureCapacity( CLZMA::GetActualSize( pCompressedLump ) );
 					unsigned int outSize = CLZMA::Uncompress( pCompressedLump, (unsigned char *)inputBuffer.Base() );
@@ -4656,7 +4667,7 @@ bool RepackBSP( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer, CompressFunc_
 				else
 				{
 					Assert( CLZMA::IsCompressed( pCompressedLump ) &&
-					        pSortedLump->pLump->uncompressedSize == CLZMA::GetActualSize( pCompressedLump ) );
+					        static_cast<unsigned>(pSortedLump->pLump->uncompressedSize) == CLZMA::GetActualSize( pCompressedLump ) );
 					Warning( "Unsupported BSP: Unrecognized compressed lump\n" );
 				}
 			}
@@ -4810,7 +4821,7 @@ bool SwapBSPFile( const char *pInFilename, const char *pOutFilename, bool bSwapO
 	BuildStaticPropNameTable();
 
 	// Set the output file pointer after the header
-	dheader_t dummyHeader = { 0 };
+	dheader_t dummyHeader = {};
 	SafeWrite( g_hBSPFile, &dummyHeader, sizeof( dheader_t ) );
 
 	// To allow for alignment fixups, the lumps will be written to the
