@@ -13,7 +13,7 @@
 namespace {
 
 constexpr inline int PROBLEM_SIZE{1000};
-constexpr inline int N_ITERS{100000};
+constexpr inline int N_ITERS{10000};
 
 bool SIMDTest(FourVectors (&xyz)[PROBLEM_SIZE],
               fltx4 (&creation_time)[PROBLEM_SIZE]) {

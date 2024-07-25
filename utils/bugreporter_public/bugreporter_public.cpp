@@ -149,38 +149,38 @@ public:
 	virtual char const	*GetUserName();
 	virtual char const	*GetUserName_Display();
 
-	virtual int			GetNameCount();
-	virtual char const	*GetName( int index );
+	virtual ptrdiff_t			GetNameCount();
+	virtual char const	*GetName( ptrdiff_t index );
 
-	virtual int			GetDisplayNameCount();
-	virtual char const  *GetDisplayName( int index );
+	virtual ptrdiff_t			GetDisplayNameCount();
+	virtual char const  *GetDisplayName( ptrdiff_t index );
 
 	virtual char const	*GetDisplayNameForUserName( char const *username );
 	virtual char const  *GetUserNameForDisplayName( char const *display );
 
-	virtual int			GetSeverityCount();
-	virtual char const	*GetSeverity( int index );
+	virtual ptrdiff_t			GetSeverityCount();
+	virtual char const	*GetSeverity( ptrdiff_t index );
 
-	virtual int			GetPriorityCount();
-	virtual char const	*GetPriority( int index );
+	virtual ptrdiff_t			GetPriorityCount();
+	virtual char const	*GetPriority( ptrdiff_t index );
 
-	virtual int			GetAreaCount();
-	virtual char const	*GetArea( int index );
+	virtual ptrdiff_t			GetAreaCount();
+	virtual char const	*GetArea( ptrdiff_t index );
 
-	virtual int			GetAreaMapCount();
-	virtual char const	*GetAreaMap( int index );
+	virtual ptrdiff_t			GetAreaMapCount();
+	virtual char const	*GetAreaMap( ptrdiff_t );
 
-	virtual int			GetMapNumberCount();
-	virtual char const	*GetMapNumber( int index );
+	virtual ptrdiff_t			GetMapNumberCount();
+	virtual char const	*GetMapNumber( ptrdiff_t );
 
-	virtual int			GetReportTypeCount();
-	virtual char const	*GetReportType( int index );
+	virtual ptrdiff_t			GetReportTypeCount();
+	virtual char const	*GetReportType( ptrdiff_t );
 
 	virtual char const *GetRepositoryURL( void ) { return NULL; }
 	virtual char const *GetSubmissionURL( void ) { return NULL; }
 
-	virtual int			GetLevelCount(int area) { return 0; }
-	virtual char const	*GetLevel(int area, int index ) { return ""; }
+	virtual ptrdiff_t			GetLevelCount(ptrdiff_t) { return 0; }
+	virtual char const	*GetLevel(ptrdiff_t, ptrdiff_t ) { return ""; }
 
 // Submission API
 	virtual void		StartNewBugReport();
@@ -309,12 +309,12 @@ char const *CBugReporter::GetUserName_Display()
 	return GetUserName();
 }
 
-int CBugReporter::GetNameCount()
+ptrdiff_t CBugReporter::GetNameCount()
 {
 	return 1;
 }
 
-char const *CBugReporter::GetName( int index )
+char const *CBugReporter::GetName( ptrdiff_t index )
 {
 	if ( index < 0 || index >= 1 )
 		return "<<Invalid>>";
@@ -322,12 +322,12 @@ char const *CBugReporter::GetName( int index )
 	return GetUserName();
 }
 
-int CBugReporter::GetDisplayNameCount()
+ptrdiff_t CBugReporter::GetDisplayNameCount()
 {
 	return 1;
 }
 
-char const *CBugReporter::GetDisplayName( int index )
+char const *CBugReporter::GetDisplayName( ptrdiff_t index )
 {
 	if ( index < 0 || index >= 1 )
 		return "<<Invalid>>";
@@ -345,12 +345,12 @@ char const *CBugReporter::GetUserNameForDisplayName( char const *display )
 	return display;
 }
 
-int CBugReporter::GetSeverityCount()
+ptrdiff_t CBugReporter::GetSeverityCount()
 {
-	return m_Severity.Count() ;
+	return m_Severity.Count();
 }
 
-char const *CBugReporter::GetSeverity( int index )
+char const *CBugReporter::GetSeverity( ptrdiff_t index )
 {
 	if ( index < 0 || index >= m_Severity.Count() )
 		return "<<Invalid>>";
@@ -358,52 +358,52 @@ char const *CBugReporter::GetSeverity( int index )
 	return m_BugStrings.String( m_Severity[ index ] );
 }
 
-int CBugReporter::GetPriorityCount()
+ptrdiff_t CBugReporter::GetPriorityCount()
 {
 	return 0;
 }
 
-char const *CBugReporter::GetPriority( int index )
+char const *CBugReporter::GetPriority( ptrdiff_t )
 {
 	return "<<Invalid>>";
 }
 
-int CBugReporter::GetAreaCount()
+ptrdiff_t CBugReporter::GetAreaCount()
 {
 	return 0;
 }
 
-char const *CBugReporter::GetArea( int index )
+char const *CBugReporter::GetArea( ptrdiff_t )
 {
 	return "<<Invalid>>";
 }
 
-int CBugReporter::GetAreaMapCount()
+ptrdiff_t CBugReporter::GetAreaMapCount()
 {
 	return 0;
 }
 
-char const *CBugReporter::GetAreaMap( int index )
+char const *CBugReporter::GetAreaMap( ptrdiff_t )
 {
 	return "<<Invalid>>";
 }
 
-int CBugReporter::GetMapNumberCount()
+ptrdiff_t CBugReporter::GetMapNumberCount()
 {
 	return 0;
 }
 
-char const *CBugReporter::GetMapNumber( int index )
+char const *CBugReporter::GetMapNumber( ptrdiff_t )
 {
 	return "<<Invalid>>";
 }
 
-int CBugReporter::GetReportTypeCount()
+ptrdiff_t CBugReporter::GetReportTypeCount()
 {
 	return m_ReportType.Count();
 }
 
-char const *CBugReporter::GetReportType( int index )
+char const *CBugReporter::GetReportType( ptrdiff_t index )
 {
 	if ( index < 0 || index >= m_ReportType.Count() )
 		return "<<Invalid>>";
@@ -440,9 +440,9 @@ void CBugReporter::SubstituteBugId( int bugid, char *out, int outlen, CUtlBuffer
 	src.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
 
 	char const *replace = "\\BugId\\";
-	int replace_len = Q_strlen( replace );
+	intp replace_len = Q_strlen( replace );
 
-	for ( int pos = 0; pos <= src.TellPut() && ( ( dest - out ) < outlen ); )
+	for ( intp pos = 0; pos <= src.TellPut() && ( ( dest - out ) < outlen ); )
 	{
 		char const *str = ( char const * )src.PeekGet( pos );
 		if ( !Q_strnicmp( str, replace, replace_len ) )
@@ -475,7 +475,7 @@ bool CBugReporter::CommitBugReport( int& bugSubmissionId )
 	if ( !m_pBug )
 		return false;
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	buf.Printf( "%s\n\n", m_pBug->desc );
 
@@ -593,19 +593,19 @@ void CBugReporter::SetOwner( char const *username )
 	Q_strncpy( m_pBug->owner, username, sizeof( m_pBug->owner ) );
 }
 
-void CBugReporter::SetSeverity( char const *severity )
+void CBugReporter::SetSeverity( char const * )
 {
 }
 
-void CBugReporter::SetPriority( char const *priority )
+void CBugReporter::SetPriority( char const * )
 {
 }
 
-void CBugReporter::SetArea( char const *area )
+void CBugReporter::SetArea( char const * )
 {
 }
 
-void CBugReporter::SetMapNumber( char const *mapnumber )
+void CBugReporter::SetMapNumber( char const * )
 {
 }
 
@@ -669,15 +669,15 @@ void CBugReporter::SetSaveGame( char const *savegame_unc_address )
 	Q_strncpy( m_pBug->savegame_unc, savegame_unc_address, sizeof( m_pBug->savegame_unc ) );
 }
 
-void CBugReporter::SetBSPName( char const *bsp_unc_address )
+void CBugReporter::SetBSPName( char const * )
 {
 }
 
-void CBugReporter::SetVMFName( char const *vmf_unc_address )
+void CBugReporter::SetVMFName( char const * )
 {
 }
 
-void CBugReporter::AddIncludedFile( char const *filename )
+void CBugReporter::AddIncludedFile( char const * )
 {
 }
 

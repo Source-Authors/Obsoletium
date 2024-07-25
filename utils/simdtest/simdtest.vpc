@@ -32,7 +32,7 @@ $Configuration	"Release"
 	}
 }
 
-$Project "Simdtest"
+$Project "SIMDtest"
 {
 	$Folder "Source Files"
 	{

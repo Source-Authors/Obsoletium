@@ -10,20 +10,20 @@
 #include "cmdlib.h"
 #include "zip_utils.h"
 
-class CBSPPack : public IBSPPack 
+class CBSPPack final : public IBSPPack 
 {
 public:
-	void LoadBSPFile( IFileSystem *pFileSystem, char *filename );
-	void WriteBSPFile( char *filename );
-	void ClearPackFile( void );
-	void AddFileToPack( const char *relativename, const char *fullpath );
-	void AddBufferToPack( const char *relativename, void *data, int length, bool bTextMode );
-	void SetHDRMode( bool bHDR );
-	bool SwapBSPFile( IFileSystem *pFileSystem, const char *filename, const char *swapFilename, bool bSwapOnLoad, VTFConvertFunc_t pVTFConvertFunc, VHVFixupFunc_t pVHVFixupFunc, CompressFunc_t pCompressFunc );
-	bool RepackBSP( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer, eRepackBSPFlags repackFlags );
-	bool GetPakFileLump( IFileSystem *pFileSystem, const char *pBSPFilename, void **pPakData, int *pPakSize );
-	bool SetPakFileLump( IFileSystem *pFileSystem, const char *pBSPFilename, const char *pNewFilename, void *pPakData, int pakSize );
-	bool GetBSPDependants( IFileSystem *pFileSystem, const char *pBSPFilename, CUtlVector< CUtlString > *pList );
+	void LoadBSPFile( IFileSystem *pFileSystem, char *filename ) override;
+	void WriteBSPFile( char *filename ) override;
+	void ClearPackFile( void ) override;
+	void AddFileToPack( const char *relativename, const char *fullpath ) override;
+	void AddBufferToPack( const char *relativename, void *data, int length, bool bTextMode ) override;
+	void SetHDRMode( bool bHDR ) override;
+	bool SwapBSPFile( IFileSystem *pFileSystem, const char *filename, const char *swapFilename, bool bSwapOnLoad, VTFConvertFunc_t pVTFConvertFunc, VHVFixupFunc_t pVHVFixupFunc, CompressFunc_t pCompressFunc ) override;
+	bool RepackBSP( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer, eRepackBSPFlags repackFlags ) override;
+	bool GetPakFileLump( IFileSystem *pFileSystem, const char *pBSPFilename, void **pPakData, int *pPakSize ) override;
+	bool SetPakFileLump( IFileSystem *pFileSystem, const char *pBSPFilename, const char *pNewFilename, void *pPakData, int pakSize ) override;
+	bool GetBSPDependants( IFileSystem *pFileSystem, const char *pBSPFilename, CUtlVector< CUtlString > *pList ) override;
 };
 
 void CBSPPack::LoadBSPFile( IFileSystem *pFileSystem, char *filename )

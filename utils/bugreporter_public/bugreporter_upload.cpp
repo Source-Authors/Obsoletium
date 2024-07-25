@@ -99,38 +99,38 @@ typedef	u32		NetworkMessageLengthPrefix_t;
 typedef u16		StringLengthPrefix_t;
 
 
-const ProtocolAcceptanceFlag_t	cuProtocolIsNotAcceptable
+[[maybe_unused]] constexpr ProtocolAcceptanceFlag_t	cuProtocolIsNotAcceptable
 								= static_cast<ProtocolAcceptanceFlag_t>( 0 );
 
-const ProtocolAcceptanceFlag_t	cuProtocolIsAcceptable
+[[maybe_unused]] constexpr ProtocolAcceptanceFlag_t cuProtocolIsAcceptable
 								= static_cast<ProtocolAcceptanceFlag_t>( 1 );
 
-const Command_t					cuMaxCommand
+constexpr Command_t cuMaxCommand
 								= static_cast<Command_t>(255);
 
-const CommandResponse_t			cuMaxCommandResponse
+[[maybe_unused]] constexpr CommandResponse_t cuMaxCommandResponse
 								= static_cast<CommandResponse_t>(255);
 
 // This is for mapping requests back to error ids for placing into the database appropriately.
 typedef u32								ContextID_t;
 
 // This is the version of the protocol used by latest-build clients.
-const ProtocolVersion_t			cuCurrentProtocolVersion		= 1;
+constexpr ProtocolVersion_t cuCurrentProtocolVersion = 1;
 
 // This is the minimum protocol version number that the client must 
 // be able to speak in order to communicate with the server.
 // The client sends its protocol version this before every command, and if we 
 // don't support that version anymore then we tell it nicely.  The client 
 // should respond by doing an auto-update.
-const ProtocolVersion_t			cuRequiredProtocolVersion		= 1;
+[[maybe_unused]] constexpr ProtocolVersion_t cuRequiredProtocolVersion = 1;
 
 
 namespace Commands
 {
-	const Command_t				cuGracefulClose					= 0;
-	const Command_t				cuSendBugReport					= 1;
-	const Command_t				cuNumCommands					= 2;
-	const Command_t				cuNoCommandReceivedYet			= cuMaxCommand;
+	constexpr Command_t				cuGracefulClose					= 0;
+	constexpr Command_t				cuSendBugReport					= 1;
+	[[maybe_unused]] constexpr Command_t cuNumCommands          = 2;
+	[[maybe_unused]] constexpr Command_t cuNoCommandReceivedYet = cuMaxCommand;
 }
 
 
@@ -147,12 +147,12 @@ namespace HarvestFileCommand
 	// Legal values defined by ESendMethod
 	typedef u32							SendMethod_t;
 
-	const CommandResponse_t		cuOkToSendFile					= 0;
-	const CommandResponse_t		cuFileTooBig					= 1;
-	const CommandResponse_t		cuInvalidSendMethod				= 2;
-	const CommandResponse_t		cuInvalidMaxCompressedChunkSize	= 3;
-	const CommandResponse_t		cuInvalidBugReportContext		= 4;
-	const uint							cuNumCommandResponses			= 5;
+	constexpr CommandResponse_t		cuOkToSendFile					= 0;
+	constexpr CommandResponse_t		cuFileTooBig					= 1;
+	constexpr CommandResponse_t		cuInvalidSendMethod				= 2;
+	constexpr CommandResponse_t		cuInvalidMaxCompressedChunkSize	= 3;
+	constexpr CommandResponse_t		cuInvalidBugReportContext		= 4;
+	[[maybe_unused]] constexpr uint cuNumCommandResponses			= 5;
 }
 
 //#############################################################################
@@ -197,7 +197,7 @@ struct TBugReportProgress
 
 typedef void ( *BUGREPORTREPORTPROGRESSFUNC )( u32 uContext, const TBugReportProgress & rBugReportProgress );
 
-static void BugUploadProgress( u32 uContext, const TBugReportProgress & rBugReportProgress )
+static void BugUploadProgress( u32, const TBugReportProgress & )
 {
 	// DevMsg( "%s\n", rBugReportProgress.m_sStatus );
 }

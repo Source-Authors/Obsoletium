@@ -24,38 +24,38 @@ public:
 	virtual char const	*GetUserName() = 0;
 	virtual char const	*GetUserName_Display() = 0;
 
-	virtual int			GetNameCount() = 0;
-	virtual char const	*GetName( int index ) = 0;
+	virtual ptrdiff_t			GetNameCount() = 0;
+	virtual char const	*GetName( ptrdiff_t index ) = 0;
 
-	virtual int			GetDisplayNameCount() = 0;
-	virtual char const  *GetDisplayName( int index ) = 0;
+	virtual ptrdiff_t			GetDisplayNameCount() = 0;
+	virtual char const  *GetDisplayName( ptrdiff_t index ) = 0;
 
 	virtual char const	*GetDisplayNameForUserName( char const *username ) = 0;
 	virtual char const  *GetUserNameForDisplayName( char const *display ) = 0;
 
-	virtual int			GetSeverityCount() = 0;
-	virtual char const	*GetSeverity( int index ) = 0;
+	virtual ptrdiff_t			GetSeverityCount() = 0;
+	virtual char const	*GetSeverity( ptrdiff_t index ) = 0;
 
-	virtual int			GetPriorityCount() = 0;
-	virtual char const	*GetPriority( int index ) = 0;
+	virtual ptrdiff_t			GetPriorityCount() = 0;
+	virtual char const	*GetPriority( ptrdiff_t index ) = 0;
 
-	virtual int			GetAreaCount() = 0;
-	virtual char const	*GetArea( int index ) = 0;
+	virtual ptrdiff_t			GetAreaCount() = 0;
+	virtual char const	*GetArea( ptrdiff_t index ) = 0;
 
-	virtual int			GetAreaMapCount() = 0;
-	virtual char const	*GetAreaMap( int index ) = 0;
+	virtual ptrdiff_t			GetAreaMapCount() = 0;
+	virtual char const	*GetAreaMap( ptrdiff_t index ) = 0;
 
-	virtual int			GetMapNumberCount() = 0;
-	virtual char const	*GetMapNumber( int index ) = 0;
+	virtual ptrdiff_t			GetMapNumberCount() = 0;
+	virtual char const	*GetMapNumber( ptrdiff_t index ) = 0;
 
-	virtual int			GetReportTypeCount() = 0;
-	virtual char const	*GetReportType( int index ) = 0;
+	virtual ptrdiff_t			GetReportTypeCount() = 0;
+	virtual char const	*GetReportType( ptrdiff_t index ) = 0;
 
 	virtual char const *GetRepositoryURL( void ) = 0;
 	virtual char const *GetSubmissionURL( void ) = 0;
 
-	virtual int			GetLevelCount(int area) = 0;
-	virtual char const	*GetLevel(int area, int index ) = 0;
+	virtual ptrdiff_t			GetLevelCount(ptrdiff_t area) = 0;
+	virtual char const	*GetLevel(ptrdiff_t area, ptrdiff_t index ) = 0;
 
 // Submission API
 	virtual void		StartNewBugReport() = 0;

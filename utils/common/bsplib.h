@@ -281,8 +281,8 @@ void ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName );
 //-----------------------------------------------------------------------------
 // String table methods
 //-----------------------------------------------------------------------------
-const char *		TexDataStringTable_GetString( int stringID );
-int					TexDataStringTable_AddOrFindString( const char *pString );
+const char *		TexDataStringTable_GetString( intp stringID );
+intp					TexDataStringTable_AddOrFindString( const char *pString );
 
 void	DecompressVis (byte *in, byte *decompressed);
 int		CompressVis (byte *vis, byte *dest);
@@ -313,7 +313,7 @@ void	UnparseEntities (void);
 void	PrintEntity (entity_t *ent);
 
 void 	SetKeyValue (entity_t *ent, const char *key, const char *value);
-char 	*ValueForKey (entity_t *ent, char *key);
+const char 	*ValueForKey (entity_t *ent, char *key);
 // will return "" if not present
 int		IntForKey (entity_t *ent, char *key);
 int		IntForKeyWithDefault(entity_t *ent, char *key, int nDefault );
@@ -361,16 +361,16 @@ class IBSPNodeEnumerator
 {
 public:
 	// call back with a node and a context
-	virtual bool EnumerateNode( int node, Ray_t const& ray, float f, int context ) = 0;
+	virtual bool EnumerateNode( int node, Ray_t const& ray, float f, intp context ) = 0;
 
 	// call back with a leaf and a context
-	virtual bool EnumerateLeaf( int leaf, Ray_t const& ray, float start, float end, int context ) = 0;
+	virtual bool EnumerateLeaf( int leaf, Ray_t const& ray, float start, float end, intp context ) = 0;
 };
 
 //-----------------------------------------------------------------------------
 // Enumerates nodes + leafs in front to back order...
 //-----------------------------------------------------------------------------
-bool EnumerateNodesAlongRay( Ray_t const& ray, IBSPNodeEnumerator* pEnum, int context );
+bool EnumerateNodesAlongRay( Ray_t const& ray, IBSPNodeEnumerator* pEnum, intp context );
 
 
 //-----------------------------------------------------------------------------

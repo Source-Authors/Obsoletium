@@ -40,7 +40,8 @@ typedef struct
 
 } script_t;
 
-#define	MAX_INCLUDES	64
+constexpr int MAX_INCLUDES{64};
+
 script_t	scriptstack[MAX_INCLUDES];
 script_t	*script = NULL;
 int			scriptline;
@@ -61,9 +62,8 @@ CUtlVector<variable_t> g_definevariable;
 Callback stuff
 */
 
-void DefaultScriptLoadedCallback( char const *pFilenameLoaded, char const *pIncludedFromFileName, int nIncludeLineNumber )
+void DefaultScriptLoadedCallback( char const *, char const *, int )
 {
-	NULL;
 }
 
 SCRIPT_LOADED_CALLBACK g_pfnCallback = DefaultScriptLoadedCallback;
@@ -303,7 +303,7 @@ bool ExpandMacroToken( char *&token_p )
 
 		// get token pointer
 		char *tp = script->script_p + 1;
-		int len = (cp - tp);
+		intp len = (cp - tp);
 		*(tp + len) = '\0';
 
 		// lookup macro parameter
@@ -360,7 +360,7 @@ bool ExpandVariableToken( char *&token_p )
 
 		// get token pointer
 		char *tp = script->script_p + 1;
-		int len = (cp - tp);
+		intp len = (cp - tp);
 		*(tp + len) = '\0';
 
 		// lookup macro parameter
@@ -950,16 +950,16 @@ qboolean GetTokenizerStatus( char **pFilename, int *pLine )
 #include <sys/types.h>
 #include "tier1/utlbuffer.h"
 
-class CScriptLib : public IScriptLib
+class CScriptLib final : public IScriptLib
 {
 public:
-	virtual bool ReadFileToBuffer( const char *pSourceName, CUtlBuffer &buffer, bool bText = false, bool bNoOpenFailureWarning = false );
-	virtual bool WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer, DiskWriteMode_t writeMode );
-	virtual int	FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList );
-	virtual char *MakeTemporaryFilename( char const *pchModPath, char *pPath, int pathSize );
-	virtual void DeleteTemporaryFiles( const char *pFileMask );
-	virtual int CompareFileTime( const char *pFilenameA, const char *pFilenameB );
-	virtual bool DoesFileExist( const char *pFilename );
+	bool ReadFileToBuffer( const char *pSourceName, CUtlBuffer &buffer, bool bText = false, bool bNoOpenFailureWarning = false ) override;
+	bool WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer, DiskWriteMode_t writeMode ) override;
+	int	FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList ) override;
+	char *MakeTemporaryFilename( char const *pchModPath, char *pPath, int pathSize ) override;
+	void DeleteTemporaryFiles( const char *pFileMask ) override;
+	int CompareFileTime( const char *pFilenameA, const char *pFilenameB ) override;
+	bool DoesFileExist( const char *pFilename ) override;
 
 private:
 
@@ -1208,7 +1208,7 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 		strcpy( fileName, sourcePath );
 		strcat( fileName, findData.name );
 
-		int j = fileList.AddToTail();
+		intp j = fileList.AddToTail();
 		fileList[j].fileName.Set( fileName );
 		fileList[j].timeWrite = findData.time_write;
 	}
@@ -1250,7 +1250,7 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 		strcpy( fileName, sourcePath );
 		strcat( fileName, findData.cFileName );
 
-		int j = fileList.AddToTail();
+		intp j = fileList.AddToTail();
 		fileList[j].fileName.Set( fileName );
 		struct stat statbuf;
 		if ( stat( fileName, &statbuf ) )
@@ -1285,7 +1285,7 @@ void CScriptLib::RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector<
 	if ( !dirCount )
 	{
 		// add directory name to search tree
-		int j = dirList.AddToTail();
+		intp j = dirList.AddToTail();
 		dirList[j].Set( pDirPath );
 		return;
 	}
@@ -1296,7 +1296,7 @@ void CScriptLib::RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector<
 		RecurseFileTree_r( fileList[i].fileName.String(), depth+1, dirList );
 	}
 
-	int j = dirList.AddToTail();
+	intp j = dirList.AddToTail();
 	dirList[j].Set( pDirPath );
 }
 

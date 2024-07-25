@@ -1350,7 +1350,7 @@ static UInt32 GetOptimum(CLzmaEnc *p, UInt32 position, UInt32 *backRes)
         startLen = lenTest + 1;
         
       /* if (_maxMode) */
-        {
+      {
           UInt32 lenTest2 = lenTest + 1;
           UInt32 limit = lenTest2 + p->numFastBytes;
           UInt32 nextRepMatchPrice;
@@ -1394,7 +1394,7 @@ static UInt32 GetOptimum(CLzmaEnc *p, UInt32 position, UInt32 *backRes)
               }
             }
           }
-        }
+      }
     }
     }
     /* for (UInt32 lenTest = 2; lenTest <= newLen; lenTest++) */
