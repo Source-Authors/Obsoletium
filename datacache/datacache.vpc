@@ -47,7 +47,7 @@ $Project "datacache"
 		$File	"$SRCDIR\public\datacache\imdlcache.h"
 	}
 
-	$folder	"Link Libraries"
+	$Folder	"Link Libraries"
 	{
 		$Lib	tier2
 		$Lib	tier3

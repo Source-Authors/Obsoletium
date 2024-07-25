@@ -55,7 +55,7 @@ public:
 	~CModelLookupContext();
 
 private:
-	int		m_lookupIndex;
+	intp		m_lookupIndex;
 };
 
 CModelLookupContext::CModelLookupContext(int group, const studiohdr_t *pStudioHdr)
@@ -111,7 +111,7 @@ void virtualmodel_t::AppendModels( int group, const studiohdr_t *pStudioHdr )
 		const studiohdr_t *pTmpHdr = pStudioHdr->FindModel( &tmp, pStudioHdr->pModelGroup( j )->pszName() );
 		if ( pTmpHdr )
 		{
-			if ( nValidIncludes >= ARRAYSIZE( list ) )
+			if ( nValidIncludes >= ssize( list ) )
 			{
 				// would cause stack overflow
 				Assert( 0 );
@@ -130,9 +130,9 @@ void virtualmodel_t::AppendModels( int group, const studiohdr_t *pStudioHdr )
 		for (j = 0; j < nValidIncludes; j++)
 		{
 			MEM_ALLOC_CREDIT();
-			int group = m_group.AddToTail();
-			m_group[group].cache = list[j].handle;
-			AppendModels( group, list[j].pHdr );
+			intp groupi = m_group.AddToTail();
+			m_group[groupi].cache = list[j].handle;
+			AppendModels( groupi, list[j].pHdr );
 		}
 	}
 
@@ -142,9 +142,9 @@ void virtualmodel_t::AppendModels( int group, const studiohdr_t *pStudioHdr )
 void virtualmodel_t::AppendSequences( int group, const studiohdr_t *pStudioHdr )
 {
 	AUTO_LOCK( m_Lock );
-	int numCheck = m_seq.Count();
+	intp numCheck = m_seq.Count();
 
-	int j, k;
+	intp j, k;
 
 	MEM_ALLOC_CREDIT();
 
@@ -157,7 +157,7 @@ void virtualmodel_t::AppendSequences( int group, const studiohdr_t *pStudioHdr )
 	for (j = 0; j < pStudioHdr->numlocalseq; j++)
 	{
 		const mstudioseqdesc_t *seqdesc = pStudioHdr->pLocalSeqdesc( j );
-		char *s1 = seqdesc->pszLabel();
+		const char *s1 = seqdesc->pszLabel();
 
 		if ( HasLookupTable() )
 		{
@@ -173,7 +173,7 @@ void virtualmodel_t::AppendSequences( int group, const studiohdr_t *pStudioHdr )
 			for (k = 0; k < numCheck; k++)
 			{
 				const studiohdr_t *hdr = m_group[ seq[k].group ].GetStudioHdr();
-				char *s2 = hdr->pLocalSeqdesc( seq[k].index )->pszLabel();
+				const char *s2 = hdr->pLocalSeqdesc( seq[k].index )->pszLabel();
 				if ( !stricmp( s1, s2 ) )
 				{
 					break;
@@ -213,7 +213,7 @@ void virtualmodel_t::AppendSequences( int group, const studiohdr_t *pStudioHdr )
 		}
 	}
 
-	m_seq = seq;
+	m_seq.Swap(seq);
 }
 
 
@@ -245,7 +245,7 @@ void virtualmodel_t::AppendAnimations( int group, const studiohdr_t *pStudioHdr 
 
 	for (j = 0; j < pStudioHdr->numlocalanim; j++)
 	{
-		char *s1 = pStudioHdr->pLocalAnimdesc( j )->pszName();
+		const char *s1 = pStudioHdr->pLocalAnimdesc( j )->pszName();
 		if ( HasLookupTable() )
 		{
 			k = numCheck;
@@ -259,7 +259,7 @@ void virtualmodel_t::AppendAnimations( int group, const studiohdr_t *pStudioHdr 
 		{
 			for (k = 0; k < numCheck; k++)
 			{
-				char *s2 = m_group[ anim[k].group ].GetStudioHdr()->pLocalAnimdesc( anim[k].index )->pszName();
+				const char *s2 = m_group[ anim[k].group ].GetStudioHdr()->pLocalAnimdesc( anim[k].index )->pszName();
 				if (stricmp( s1, s2 ) == 0)
 				{
 					break;
@@ -287,7 +287,7 @@ void virtualmodel_t::AppendAnimations( int group, const studiohdr_t *pStudioHdr 
 		}
 	}
 
-	m_anim = anim;
+	m_anim.Swap(anim);
 }
 
 
@@ -388,10 +388,10 @@ void virtualmodel_t::AppendAttachments( int group, const studiohdr_t *pStudioHdr
 		}
 		
 		
-		char *s1 = pStudioHdr->pLocalAttachment( j )->pszName();
+		const char *s1 = pStudioHdr->pLocalAttachment( j )->pszName();
 		for (k = 0; k < numCheck; k++)
 		{
-			char *s2 = m_group[ attachment[k].group ].GetStudioHdr()->pLocalAttachment( attachment[k].index )->pszName();
+			const char *s2 = m_group[ attachment[k].group ].GetStudioHdr()->pLocalAttachment( attachment[k].index )->pszName();
 
 			if (stricmp( s1, s2 ) == 0)
 			{
@@ -427,7 +427,7 @@ void virtualmodel_t::AppendAttachments( int group, const studiohdr_t *pStudioHdr
 		m_group[ group ].masterAttachment[ j ] = k;
 	}
 
-	m_attachment = attachment;
+	m_attachment.Swap(attachment);
 }
 
 
@@ -451,10 +451,10 @@ void virtualmodel_t::AppendPoseParameters( int group, const studiohdr_t *pStudio
 
 	for (j = 0; j < pStudioHdr->numlocalposeparameters; j++)
 	{
-		char *s1 = pStudioHdr->pLocalPoseParameter( j )->pszName();
+		const char *s1 = pStudioHdr->pLocalPoseParameter( j )->pszName();
 		for (k = 0; k < numCheck; k++)
 		{
-			char *s2 = m_group[ pose[k].group ].GetStudioHdr()->pLocalPoseParameter( pose[k].index )->pszName();
+			const char *s2 = m_group[ pose[k].group ].GetStudioHdr()->pLocalPoseParameter( pose[k].index )->pszName();
 
 			if (stricmp( s1, s2 ) == 0)
 			{
@@ -483,7 +483,7 @@ void virtualmodel_t::AppendPoseParameters( int group, const studiohdr_t *pStudio
 		m_group[ group ].masterPose[ j ] = k;
 	}
 
-	m_pose = pose;
+	m_pose.Swap(pose);
 }
 
 
@@ -529,7 +529,7 @@ void virtualmodel_t::AppendNodes( int group, const studiohdr_t *pStudioHdr )
 		m_group[ group ].masterNode[ j ] = k;
 	}
 
-	m_node = node;
+	m_node.Swap(node);
 }
 
 //-----------------------------------------------------------------------------
@@ -571,7 +571,7 @@ void virtualmodel_t::AppendIKLocks( int group, const studiohdr_t *pStudioHdr )
 		}
 	}
 
-	m_iklock = iklock;
+	m_iklock.Swap(iklock);
 
 	// copy knee directions for uninitialized knees
 	if ( group != 0 )

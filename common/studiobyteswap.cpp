@@ -14,12 +14,7 @@
 #include "vphysics_interface.h"
 
 #undef ALIGN4
-#undef ALIGN16
-#undef ALIGN32
-#define ALIGN4( a ) a = (byte *)((intp)((byte *)a + 3) & ~ 3)
-#define ALIGN16( a ) a = (byte *)((intp)((byte *)a + 15) & ~ 15)
-#define ALIGN32( a ) a = (byte *)((intp)((byte *)a + 31) & ~ 31)
-#define ALIGN64( a ) a = (byte *)((intp)((byte *)a + 63) & ~ 63)
+#define ALIGN4( a ) a = AlignValue( a, 4 )
 
 namespace StudioByteSwap
 {
@@ -33,7 +28,7 @@ static CompressFunc_t		g_pCompressFunc;
 void ActivateByteSwapping( bool activate )
 {
 	g_Swap.ActivateByteSwapping( activate );
-	SourceIsNative( IsPC() );
+	SourceIsNative( true );
 }
 
 void SourceIsNative( bool bNative )
@@ -54,10 +49,10 @@ void SetVerbose( bool bVerbose )
 //----------------------------------------------------------------------
 // Helper to write a chunk of objects of the same type, and increment the buffer pointers.
 //----------------------------------------------------------------------
-template<class T> inline void WriteObjects( byte **pOutputBuffer, byte **pBaseData, int objectCount = 1 )
+template<class T> inline void WriteObjects( byte **pOutputBuffer, byte **pBaseData, intp objectCount = 1 )
 {
 	T tempObject;
-	for ( int i = 0; i < objectCount; ++i )
+	for ( intp i = 0; i < objectCount; ++i )
 	{
 		Q_memcpy( &tempObject, *pBaseData, sizeof(T) );
 		g_Swap.SwapFieldsToTargetEndian( &tempObject, &tempObject );
@@ -70,10 +65,10 @@ template<class T> inline void WriteObjects( byte **pOutputBuffer, byte **pBaseDa
 //----------------------------------------------------------------------
 // Helper to write a chunk of objects of the same type, and increment the buffer pointers.
 //----------------------------------------------------------------------
-template<class T> inline void WriteObjects( T **pOutputBuffer, T **pBaseData, int objectCount = 1 )
+template<class T> inline void WriteObjects( T **pOutputBuffer, T **pBaseData, intp objectCount = 1 )
 {
 	T tempObject;
-	for ( int i = 0; i < objectCount; ++i )
+	for ( intp i = 0; i < objectCount; ++i )
 	{
 		Q_memcpy( &tempObject, *pBaseData, sizeof(T) );
 		g_Swap.SwapFieldsToTargetEndian( &tempObject, &tempObject );
@@ -86,10 +81,10 @@ template<class T> inline void WriteObjects( T **pOutputBuffer, T **pBaseData, in
 //----------------------------------------------------------------------
 // Helper to write a chunk of objects of the same type.
 //----------------------------------------------------------------------
-template<class T> inline void WriteObjects( byte *pOutputBuffer, byte *pBaseData, int objectCount = 1 )
+template<class T> inline void WriteObjects( byte *pOutputBuffer, const byte *pBaseData, intp objectCount = 1 )
 {
 	T tempObject;
-	for ( int i = 0; i < objectCount; ++i )
+	for ( intp i = 0; i < objectCount; ++i )
 	{
 		Q_memcpy( &tempObject, pBaseData, sizeof(T) );
 		g_Swap.SwapFieldsToTargetEndian( &tempObject, &tempObject );
@@ -102,10 +97,10 @@ template<class T> inline void WriteObjects( byte *pOutputBuffer, byte *pBaseData
 //----------------------------------------------------------------------
 // Helper to write a chunk of objects of the same type.
 //----------------------------------------------------------------------
-template<class T> inline void WriteObjects( T *pOutputBuffer, T *pBaseData, int objectCount = 1 )
+template<class T> inline void WriteObjects( T *pOutputBuffer, const T *pBaseData, intp objectCount = 1 )
 {
 	T tempObject;
-	for ( int i = 0; i < objectCount; ++i )
+	for ( intp i = 0; i < objectCount; ++i )
 	{
 		Q_memcpy( &tempObject, pBaseData, sizeof(T) );
 		g_Swap.SwapFieldsToTargetEndian( &tempObject, &tempObject );
@@ -118,10 +113,10 @@ template<class T> inline void WriteObjects( T *pOutputBuffer, T *pBaseData, int 
 //----------------------------------------------------------------------
 // Helper to write a buffer of some integral type, and increment the buffer pointers.
 //----------------------------------------------------------------------
-template<class T> inline void WriteBuffer( byte **pOutputBuffer, byte **pBaseData, int objectCount = 1 )
+template<class T> inline void WriteBuffer( byte **pOutputBuffer, byte **pBaseData, intp objectCount = 1 )
 {
 	T tempObject;
-	for ( int i = 0; i < objectCount; ++i )
+	for ( intp i = 0; i < objectCount; ++i )
 	{
 		Q_memcpy( &tempObject, *pBaseData, sizeof(T) );
 		g_Swap.SwapBufferToTargetEndian( &tempObject, &tempObject );
@@ -134,10 +129,10 @@ template<class T> inline void WriteBuffer( byte **pOutputBuffer, byte **pBaseDat
 //----------------------------------------------------------------------
 // Helper to write a buffer of some integral type
 //----------------------------------------------------------------------
-template<class T> inline void WriteBuffer( byte *pOutputBuffer, byte *pBaseData, int objectCount = 1 )
+template<class T> inline void WriteBuffer( byte *pOutputBuffer, const byte *pBaseData, intp objectCount = 1 )
 {
 	T tempObject;
-	for ( int i = 0; i < objectCount; ++i )
+	for ( intp i = 0; i < objectCount; ++i )
 	{
 		Q_memcpy( &tempObject, pBaseData, sizeof(T) );
 		g_Swap.SwapBufferToTargetEndian( &tempObject, &tempObject );
@@ -236,10 +231,10 @@ T DestNative( T *idx )
 		ALIGN4( ptr##Fixup ); \
 		if ( ptr##Fixup != ptr##Src ) \
 		{ \
-			int nShiftBytes = ptr##Fixup - ptr##Src; \
+			intp nShiftBytes = ptr##Fixup - ptr##Src; \
 			if ( g_bVerbose ) \
-				Warning( "Shifting misaligned data block by %d bytes at " #base "->" #index "\n", nShiftBytes ); \
-			int prevBytes = (byte*)ptr##Src - (byte*)g_pDataSrcBase; \
+				Warning( "Shifting misaligned data block by %zd bytes at " #base "->" #index "\n", nShiftBytes ); \
+			intp prevBytes = (byte*)ptr##Src - (byte*)g_pDataSrcBase; \
 			Q_memmove( (byte*)ptr##Src + nShiftBytes, ptr##Src, fixedFileSize - prevBytes ); \
 			g_pFixPoint = ptr##Src; \
 			g_nFixupBytes = nShiftBytes; \
@@ -264,7 +259,7 @@ static pfnFixupFunc_t	g_pfnFileProcessFunc;
 static studiohdr_t		*g_pHdr;
 static const void		*g_pDataSrcBase;
 static void				*g_pFixPoint;
-static int				g_nFixupBytes;
+static intp				g_nFixupBytes;
 
 //-----------------------------------------------------------------------------
 // 
@@ -302,7 +297,7 @@ bool UpdateIndex( void *pBase, int *indexMember )
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-int GetIntegerFromField( void *pData, int fieldType )
+int GetIntegerFromField( void *pData, fieldtype_t fieldType )
 {
 	if ( fieldType == FIELD_INTEGER )
 	{
@@ -319,7 +314,7 @@ int GetIntegerFromField( void *pData, int fieldType )
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-void PutIntegerInField( void *pData, int index, int fieldType )
+void PutIntegerInField( void *pData, int index, fieldtype_t fieldType )
 {
 	if ( fieldType == FIELD_INTEGER )
 	{
@@ -448,9 +443,6 @@ BEGIN_BYTESWAP_DATADESC( swapcompactsurfaceheader_t )
 END_BYTESWAP_DATADESC()
 
 // Fake header declaration for old style phy format
-#if defined( _X360 )
-#pragma bitfield_order( push, lsb_to_msb )
-#endif
 struct legacysurfaceheader_t
 {
 	DECLARE_BYTESWAP_DATADESC();
@@ -461,13 +453,10 @@ struct legacysurfaceheader_t
 	BEGIN_BITFIELD( bf )
 	int		max_deviation : 8;
 	int		byte_size : 24;
-	END_BITFIELD()
+	END_BITFIELD();
 	int		offset_ledgetree_root;
 	int		dummy[3];
 };
-#if defined( _X360 )
-#pragma bitfield_order( pop )
-#endif
 
 BEGIN_BYTESWAP_DATADESC( legacysurfaceheader_t )
 	DEFINE_FIELD( size, FIELD_INTEGER ),
@@ -483,7 +472,7 @@ END_BYTESWAP_DATADESC()
 // Swap a .phy file
 // Fixes alignment errors
 //----------------------------------------------------------------------
-int ByteswapPHY( void *pDestBase, const void *pSrcBase, const int fileSize )
+intp ByteswapPHY( void *pDestBase, const void *pSrcBase, intp fileSize )
 {
 	Assert( pCollision );
 	if ( !pCollision )
@@ -493,7 +482,7 @@ int ByteswapPHY( void *pDestBase, const void *pSrcBase, const int fileSize )
 
 	byte *pSrc = (byte*)pSrcBase;
 	byte *pDest = (byte*)pDestBase;
-	vcollide_t collide = {0};
+	vcollide_t collide = {};
 
 	// file header
 	phyheader_t *pHdr = (phyheader_t*)( g_bNativeSrc ? pSrc : pDest );
@@ -505,7 +494,7 @@ int ByteswapPHY( void *pDestBase, const void *pSrcBase, const int fileSize )
 		pSrc = (byte*)pSrcBase + pHdr->size;
 		pDest = (byte*)pDestBase + pHdr->size;
 
-		int bufSize = fileSize - pHdr->size;
+		intp bufSize = fileSize - pHdr->size;
 		pCollision->VCollideLoad( &collide, pHdr->solidCount, (const char *)pSrc, bufSize, false );
 	}
 
@@ -539,7 +528,7 @@ int ByteswapPHY( void *pDestBase, const void *pSrcBase, const int fileSize )
 			else
 			{
 				// Not recognized
-				Assert(0);
+				AssertMsg( false, "Physics file format not recognized" );
 				return 0;
 			}
 		}
@@ -555,15 +544,15 @@ int ByteswapPHY( void *pDestBase, const void *pSrcBase, const int fileSize )
 	}
 
 	// the rest of the file is text
-	int currPos = pSrc - (byte*)pSrcBase;
-	int remainingBytes = fileSize - currPos;
+	intp currPos = pSrc - (byte*)pSrcBase;
+	intp remainingBytes = fileSize - currPos;
 	WriteBuffer<char>( &pDest, &pSrc, remainingBytes );
 
 	if ( !g_bNativeSrc )
 	{
 		// let ivp swap the ledge tree
 		pSrc = (byte*)pSrcBase + pHdr->size;
-		int bufSize = fileSize - pHdr->size;
+		intp bufSize = fileSize - pHdr->size;
 		pCollision->VCollideLoad( &collide, pHdr->solidCount, (const char *)pSrc, bufSize, true );
 	}
 
@@ -582,13 +571,13 @@ int ByteswapPHY( void *pDestBase, const void *pSrcBase, const int fileSize )
 	// Free the memory
 	pCollision->VCollideUnload( &collide );
 
-	int newFileSize = pDest - (byte*)pDestBase + remainingBytes;
+	intp newFileSize = pDest - (byte*)pDestBase + remainingBytes;
 
 	if ( g_pCompressFunc )
 	{
 		// compress entire swapped PHY
 		void *pInput = pDestBase;
-		int inputSize = newFileSize;
+		intp inputSize = newFileSize;
 		void *pOutput;
 		int outputSize;
 		if ( g_pCompressFunc( pInput, inputSize, &pOutput, &outputSize ) )
@@ -607,7 +596,7 @@ int ByteswapPHY( void *pDestBase, const void *pSrcBase, const int fileSize )
 // Swap a .vvd file
 // Doesn't do any alignment fixups
 //----------------------------------------------------------------------
-int ByteswapVVD( void *pDestBase, const void *pSrcBase, const int fileSize )
+intp ByteswapVVD( void *pDestBase, const void *pSrcBase, const intp fileSize )
 {
 	Q_memset( pDestBase, 0, fileSize );
 
@@ -637,12 +626,12 @@ int ByteswapVVD( void *pDestBase, const void *pSrcBase, const int fileSize )
 		WriteBuffer<float>( &pDataDest, &pDataSrc, 4 * SrcNative( &pHdr->numLODVertexes[0] ) );
 	}
 
-	int newFileSize = pDataDest - (byte*)pDestBase;
+	intp newFileSize = pDataDest - (byte*)pDestBase;
 
 	if ( g_pCompressFunc )
 	{
 		void *pInput = (byte*)pDestBase + sizeof( vertexFileHeader_t );
-		int inputSize = newFileSize - sizeof( vertexFileHeader_t );
+		intp inputSize = newFileSize - sizeof( vertexFileHeader_t );
 		void *pOutput;
 		int outputSize;
 		if ( g_pCompressFunc( pInput, inputSize, &pOutput, &outputSize ) )
@@ -662,7 +651,7 @@ int ByteswapVVD( void *pDestBase, const void *pSrcBase, const int fileSize )
 // Swap a .vtx file
 // Doesn't do any alignment fixups
 //----------------------------------------------------------------------
-int ByteswapVTX( void *pDestBase, const void *pSrcBase, const int fileSize )
+intp ByteswapVTX( void *pDestBase, const void *pSrcBase, const intp fileSize )
 {
 	Q_memset( pDestBase, 0, fileSize );
 
@@ -768,12 +757,12 @@ int ByteswapVTX( void *pDestBase, const void *pSrcBase, const int fileSize )
 		WriteObjects<OptimizedModel::MaterialReplacementHeader_t>( &pDataDest, &pDataSrc, SrcNative( &pMatRepListHeader->numReplacements ) );
 	}
 
-	int newFileSize = fileSize;
+	intp newFileSize = fileSize;
 
 	if ( g_pCompressFunc )
 	{
 		void *pInput = (byte*)pDestBase + sizeof( OptimizedModel::FileHeader_t );
-		int inputSize = fileSize - sizeof( OptimizedModel::FileHeader_t );
+		intp inputSize = fileSize - sizeof( OptimizedModel::FileHeader_t );
 		void *pOutput;
 		int outputSize;
 		if ( g_pCompressFunc( pInput, inputSize, &pOutput, &outputSize ) )
@@ -810,7 +799,7 @@ void ByteswapAnimData( mstudioanimdesc_t *pAnimDesc, int section, byte *&pDataSr
 		{
 			if ( pAnimation->flags & STUDIO_ANIM_RAWROT )
 			{
-				int offset = (byte*)pAnimation->pQuat48() - (byte*)pAnimation;
+				intp offset = (byte*)pAnimation->pQuat48() - (byte*)pAnimation;
 				pDataSrc = (byte*)pAnimationSrc + offset;
 				pDataDest = (byte*)pAnimationDest + offset;
 
@@ -820,7 +809,7 @@ void ByteswapAnimData( mstudioanimdesc_t *pAnimDesc, int section, byte *&pDataSr
 
 			if ( pAnimation->flags & STUDIO_ANIM_RAWROT2 )
 			{
-				int offset = (byte*)pAnimation->pQuat64() - (byte*)pAnimation;
+				intp offset = (byte*)pAnimation->pQuat64() - (byte*)pAnimation;
 				pDataSrc = (byte*)pAnimationSrc + offset;
 				pDataDest = (byte*)pAnimationDest + offset;
 
@@ -830,7 +819,7 @@ void ByteswapAnimData( mstudioanimdesc_t *pAnimDesc, int section, byte *&pDataSr
 
 			if ( pAnimation->flags & STUDIO_ANIM_RAWPOS )
 			{
-				int offset = (byte*)pAnimation->pPos() - (byte*)pAnimation;
+				intp offset = (byte*)pAnimation->pPos() - (byte*)pAnimation;
 				pDataSrc = (byte*)pAnimationSrc + offset;
 				pDataDest = (byte*)pAnimationDest + offset;
 
@@ -840,7 +829,7 @@ void ByteswapAnimData( mstudioanimdesc_t *pAnimDesc, int section, byte *&pDataSr
 		}
 		else
 		{
-			int offset = (byte*)pAnimation->pRotV() - (byte*)pAnimation;
+			intp offset = (byte*)pAnimation->pRotV() - (byte*)pAnimation;
 			pDataSrc = (byte*)pAnimationSrc + offset;
 			pDataDest = (byte*)pAnimationDest + offset;
 
@@ -855,7 +844,7 @@ void ByteswapAnimData( mstudioanimdesc_t *pAnimDesc, int section, byte *&pDataSr
 
 			if ( pAnimation->flags & STUDIO_ANIM_ANIMPOS )
 			{
-				int offsetAnim = (byte*)pAnimation->pPosV() - (byte*)pAnimation;
+				intp offsetAnim = (byte*)pAnimation->pPosV() - (byte*)pAnimation;
 				pDataSrc = (byte*)pAnimationSrc + offsetAnim;
 				pDataDest = (byte*)pAnimationDest + offsetAnim;
 
@@ -930,7 +919,7 @@ void ByteswapAnimData( mstudioanimdesc_t *pAnimDesc, int section, byte *&pDataSr
 }
 
 
-int ByteswapIKRules( studiohdr_t *&pHdrSrc, int numikrules, int numFrames, byte *&pDataSrc, byte *&pDataDest, int &fixedFileSize, const int fileSize )
+intp ByteswapIKRules( studiohdr_t *&pHdrSrc, int numikrules, int numFrames, byte *&pDataSrc, byte *&pDataDest, intp &fixedFileSize, const intp fileSize )
 {
 	DECLARE_OBJECT_POINTERS( pIKRule, pData, mstudioikrule_t )
 
@@ -989,7 +978,7 @@ int ByteswapIKRules( studiohdr_t *&pHdrSrc, int numikrules, int numFrames, byte 
 			if ( pIKRule->szattachmentindex )
 			{
 				SET_INDEX_POINTERS( pData, pIKRule, szattachmentindex )
-				int size = strlen( (char*)pDataSrc ) + 1;
+				intp size = V_strlen( (char*)pDataSrc ) + 1;
 				WriteBuffer<char>( pDataDest, pDataSrc, size );
 			}
 		}
@@ -1003,13 +992,13 @@ int ByteswapIKRules( studiohdr_t *&pHdrSrc, int numikrules, int numFrames, byte 
 // Swap an .ani file
 // Fixes alignment errors
 //----------------------------------------------------------------------
-int ByteswapANIFile( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, const int fileSize )
+intp ByteswapANIFile( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, const intp fileSize )
 {
 	// Note, pHdr came from a native .mdl - 
 	// so the header, animdescs and animblocks are already in native format.
 	Assert( pHdr );
 	if ( !pHdr )
-		return false;
+		return 0;
 
 	Q_memset( pDestBase, 0, fileSize );
 
@@ -1022,7 +1011,7 @@ int ByteswapANIFile( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, c
 	}
 
 	// for fixup functions
-	int fixedFileSize = fileSize;
+	intp fixedFileSize = fileSize;
 	g_pfnFileProcessFunc = ProcessANIFields;
 	g_pDataSrcBase = pSrcBase;
 	g_pHdr = pHdr;
@@ -1119,7 +1108,7 @@ int ByteswapANIFile( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, c
 			FIXUP_OFFSETS( pData, pAnimDesc, animblockikruleindex )
 
 			int numikrules = SrcNative( &pAnimDesc->numikrules );
-			ByteswapIKRules( pHdrSrc, pAnimDesc->numikrules, pAnimDesc->numframes, pDataSrc, pDataDest, fixedFileSize, fileSize );
+			ByteswapIKRules( pHdrSrc, numikrules, pAnimDesc->numframes, pDataSrc, pDataDest, fixedFileSize, fileSize );
 		}
 
 		/** LOCAL HIERARCHY **/
@@ -1187,16 +1176,16 @@ int ByteswapANIFile( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, c
 	return fixedFileSize;
 }
 
-int ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, const int fileSize )
+intp ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, const intp fileSize )
 {
 	// Make a working copy of the source to allow for alignment fixups
 	void *pNewSrcBase = malloc( fileSize + BYTESWAP_ALIGNMENT_PADDING );
 	Q_memcpy( pNewSrcBase, pSrcBase, fileSize );
 
-	int fixedFileSize = ByteswapANIFile( pHdr, pDestBase, pNewSrcBase, fileSize );
+	intp fixedFileSize = ByteswapANIFile( pHdr, pDestBase, pNewSrcBase, fileSize );
 	if ( fixedFileSize != fileSize )
 	{
-		int finalSize = ByteswapANIFile( pHdr, pDestBase, pNewSrcBase, fixedFileSize );
+		intp finalSize = ByteswapANIFile( pHdr, pDestBase, pNewSrcBase, fixedFileSize );
 		if ( finalSize != fixedFileSize )
 		{
 			if ( g_bVerbose )
@@ -1214,6 +1203,9 @@ int ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, const
 		// start with original size, with room for alignment padding
 		fixedFileSize += (pHdr->numanimblocks + 1) * 2048;
 		byte *pNewDestBase = (byte *)malloc( fixedFileSize );
+		if (!pNewDestBase)
+			Error("Out of memory in byteswap ANI (%zd bytes)", fixedFileSize );
+
 		Q_memset( pNewDestBase, 0, fixedFileSize );
 		byte *pNewDest = pNewDestBase;
 
@@ -1223,8 +1215,8 @@ int ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, const
 		V_memcpy( pNewDest, pDestBase, pAnimBlock->datastart );
 		pNewDest += pAnimBlock->datastart;
 
-		int padding = AlignValue( (uintp)pNewDest - (uintp)pNewDestBase, 2048 );
-		padding -= (uintp)pNewDest - (uintp)pNewDestBase;
+		intp padding = AlignValue( (intp)pNewDest - (intp)pNewDestBase, 2048 );
+		padding -= (intp)pNewDest - (intp)pNewDestBase;
 		pNewDest += padding;
 
 		// iterate and compress anim blocks
@@ -1270,12 +1262,12 @@ int ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, const
 //----------------------------------------------------------------------
 // Write a .mdl file in big-endian format
 //----------------------------------------------------------------------
-int ByteswapMDLFile( void *pDestBase, void *pSrcBase, const int fileSize )
+intp ByteswapMDLFile( void *pDestBase, void *pSrcBase, const intp fileSize )
 {
 	// Needed by fixup functions
 	g_pDataSrcBase = pSrcBase;
 	g_pfnFileProcessFunc = ProcessMDLFields;
-	int fixedFileSize = fileSize;
+	intp fixedFileSize = fileSize;
 
 	Q_memset( pDestBase, 0, fileSize );
 
@@ -1575,7 +1567,7 @@ int ByteswapMDLFile( void *pDestBase, void *pSrcBase, const int fileSize )
 					if ( pIKRule->szattachmentindex )
 					{
 						SET_INDEX_POINTERS( pData, pIKRule, szattachmentindex )
-						int size = strlen( (char*)pDataSrc ) + 1;
+						intp size = V_strlen( (char*)pDataSrc ) + 1;
 						WriteBuffer<char>( pDataDest, pDataSrc, size );
 					}
 				}
@@ -1593,7 +1585,7 @@ int ByteswapMDLFile( void *pDestBase, void *pSrcBase, const int fileSize )
 	{
 		if ( pAnimDesc->pZeroFrameData( ) != NULL )
 		{
-			int offset = pAnimDesc->pZeroFrameData( ) - (byte *)pAnimDesc;
+			intp offset = pAnimDesc->pZeroFrameData( ) - (byte *)pAnimDesc;
 
 			// Base address of the animation in the animblock
 			byte *pZeroFrameSrc = (byte *)pAnimDescSrc + offset;
@@ -1825,18 +1817,8 @@ int ByteswapMDLFile( void *pDestBase, void *pSrcBase, const int fileSize )
 		int destnameindex = SrcNative( &pTexture->sznameindex ) + nameOffset;
 		pTextureDest->sznameindex = DestNative( &destnameindex );
 		[[maybe_unused]] char *pName = (char*)pTexture + SrcNative( &pTexture->sznameindex );
-#if 0 // Undone: Killing textures here can cause crashes at runtime.
-		// Don't need pupil textures 
- 		if ( Q_stristr( pName, "pupil_" ) || !Q_stricmp( pName, "pupil" ) )
- 		{
- 			--textureCt;
- 			nameOffset += sizeof(mstudiotexture_t);
- 		}
- 		else
-#endif
-		{
-			++pTextureDest;
-		}
+
+		++pTextureDest;
 	}
 	pHdrDest->numtextures = DestNative( &textureCt );
 
@@ -1939,8 +1921,8 @@ int ByteswapMDLFile( void *pDestBase, void *pSrcBase, const int fileSize )
 	// NOTE: The block of data (above) swapped immediately before the string table MUST update the 
 	// pDataSrc pointer position, in order for this string table offset calculation to work correctly.
 	// To update the pointer position, pass the pointer address to WriteObjects().
-	int offset = pDataSrc - (byte*)pSrcBase;
-	int stringTableBytes = fixedFileSize - offset;
+	intp offset = pDataSrc - (byte*)pSrcBase;
+	intp stringTableBytes = fixedFileSize - offset;
 	WriteBuffer<char>( pDataDest, pDataSrc, stringTableBytes );
 
 	pHdrDest->length = DestNative( &fixedFileSize );
@@ -1952,7 +1934,7 @@ int ByteswapMDLFile( void *pDestBase, void *pSrcBase, const int fileSize )
 	for ( int i = 0; i < numCdTextures; ++i )
 	{
 		char *pPath = (char*)pHdrDest + SrcNative( &((int *)pDataSrc)[i] );
-		int len = strlen( pPath );
+		intp len = V_strlen( pPath );
 		if ( len >= 2 && ( pPath[len-1] == '\\' || pPath[len-1] == '/' ) && ( pPath[len-2] == '\\' || pPath[len-2] == '/' ) )
 		{
 			pPath[len-1] = '\0';
@@ -1966,16 +1948,16 @@ int ByteswapMDLFile( void *pDestBase, void *pSrcBase, const int fileSize )
 // Swap a .mdl in two passes - first pass fixes alignment errors by shifting
 // the data and updating offsets, then the second pass does the final swap.
 //----------------------------------------------------------------------
-int ByteswapMDL( void *pDestBase, const void *pSrcBase, const int fileSize )
+intp ByteswapMDL( void *pDestBase, const void *pSrcBase, const intp fileSize )
 {
 	// Make a working copy of the source to allow for alignment fixups
 	void *pNewSrcBase = malloc( fileSize + BYTESWAP_ALIGNMENT_PADDING );
 	Q_memcpy( pNewSrcBase, pSrcBase, fileSize );
 
-	int fixedFileSize = ByteswapMDLFile( pDestBase, pNewSrcBase, fileSize );
+	intp fixedFileSize = ByteswapMDLFile( pDestBase, pNewSrcBase, fileSize );
 	if ( fixedFileSize != fileSize )
 	{
-		int finalSize = ByteswapMDLFile( pDestBase, pNewSrcBase, fixedFileSize );
+		intp finalSize = ByteswapMDLFile( pDestBase, pNewSrcBase, fixedFileSize );
 		if ( finalSize != fixedFileSize )
 		{
 			Warning( "Alignment fixups failed on MDL swap!\n" );
@@ -1989,7 +1971,7 @@ int ByteswapMDL( void *pDestBase, const void *pSrcBase, const int fileSize )
 	if ( g_pCompressFunc && fixedFileSize )
 	{
 		void *pInput = pDestBase;
-		int inputSize = fixedFileSize;
+		intp inputSize = fixedFileSize;
 		void *pOutput;
 		int outputSize;
 		if ( g_pCompressFunc( pInput, inputSize, &pOutput, &outputSize ) )
@@ -2006,14 +1988,14 @@ int ByteswapMDL( void *pDestBase, const void *pSrcBase, const int fileSize )
 //----------------------------------------------------------------------
 // Determines what kind of file this is and calls the correct swap function
 //----------------------------------------------------------------------
-int ByteswapStudioFile( const char *pFilename, void *pOutBase, const void *pFileBase, int fileSize, studiohdr_t *pHdr, CompressFunc_t pCompressFunc )
+intp ByteswapStudioFile( const char *pFilename, void *pOutBase, const void *pFileBase, intp fileSize, studiohdr_t *pHdr, CompressFunc_t pCompressFunc )
 {
 	Assert( pFilename );
 	Assert( pOutBase != pFileBase );
 	
 	g_pCompressFunc = pCompressFunc;
 
-	int retVal = 0;
+	intp retVal = 0;
 
 	if ( Q_stristr( pFilename, ".mdl" ) )
 	{
@@ -2974,12 +2956,20 @@ BEGIN_BYTESWAP_DATADESC( mstudiomesh_t )
 	DEFINE_FIELD( meshid, FIELD_INTEGER ),
 	DEFINE_FIELD( center, FIELD_VECTOR ),
 	DEFINE_EMBEDDED( vertexdata ),
+#ifdef PLATFORM_64BITS
+	DEFINE_ARRAY( unused, FIELD_INTEGER, 6 ),	// vertexdata has additional 8 bytes (2 pointers upped by 4 bytes)
+#else
 	DEFINE_ARRAY( unused, FIELD_INTEGER, 8 ),
+#endif
 END_BYTESWAP_DATADESC()
 
 BEGIN_BYTESWAP_DATADESC( mstudio_meshvertexdata_t )
-	DEFINE_FIELD( modelvertexdata, FIELD_INTEGER ),	// mstudio_modelvertexdata_t*
-	DEFINE_ARRAY( numLODVertexes, FIELD_INTEGER, MAX_NUM_LODS ),
+#ifdef PLATFORM_64BITS
+	DEFINE_FIELD( index_modelvertexdata, FIELD_INTEGER ),		// mstudio_modelvertexdata_t*
+#else
+	DEFINE_FIELD( modelvertexdata, FIELD_INTEGER ),		// mstudio_modelvertexdata_t*
+#endif
+	DEFINE_ARRAY(numLODVertexes, FIELD_INTEGER, MAX_NUM_LODS),
 END_BYTESWAP_DATADESC()
 
 BEGIN_BYTESWAP_DATADESC( mstudioeyeball_t )
@@ -3045,7 +3035,11 @@ BEGIN_BYTESWAP_DATADESC( mstudiotexture_t )
 	DEFINE_FIELD( unused1, FIELD_INTEGER ),
 	DEFINE_FIELD( material, FIELD_INTEGER ),		// IMaterial*
 	DEFINE_FIELD( clientmaterial, FIELD_INTEGER ),	// void*
+#ifdef PLATFORM_64BITS
+	DEFINE_ARRAY( unused, FIELD_INTEGER, 8 ),		// -(sizeof(IMaterial*) + sizeof(void*))
+#else
 	DEFINE_ARRAY( unused, FIELD_INTEGER, 10 ),
+#endif
 END_BYTESWAP_DATADESC()
 
 BEGIN_BYTESWAP_DATADESC( vertexFileHeader_t )

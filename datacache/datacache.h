@@ -32,14 +32,14 @@ class CDataCacheSection;
 struct DataCacheItemData_t
 {
 	const void *		pItemData;
-	unsigned			size;
+	size_t				size;
 	DataCacheClientID_t	clientId;
 	CDataCacheSection *	pSection;
 };
 
 //-------------------------------------
 
-#define DC_NO_NEXT_LOCKED ((DataCacheItem_t *)0xffffffff)
+#define DC_NO_NEXT_LOCKED ((DataCacheItem_t *)(ptrdiff_t)-1)
 #define DC_MAX_THREADS_FRAMELOCKED 4
 
 struct DataCacheItem_t : DataCacheItemData_t
@@ -52,10 +52,10 @@ struct DataCacheItem_t : DataCacheItemData_t
 	}
 
 	static DataCacheItem_t *CreateResource( const DataCacheItemData_t &data )	{ return new DataCacheItem_t(data); }
-	static unsigned int EstimatedSize( const DataCacheItemData_t &data )		{ return data.size; }
+	static size_t EstimatedSize( const DataCacheItemData_t &data )		{ return data.size; }
 	void DestroyResource();
 	DataCacheItem_t *GetData()													{ return this; }
-	unsigned int Size()															{ return size; }
+	size_t Size() const															{ return size; }
 
 	memhandle_t		 hLRU;
 	DataCacheItem_t *pNextFrameLocked[DC_MAX_THREADS_FRAMELOCKED];
@@ -78,88 +78,88 @@ class CDataCacheSection : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT, IDataC
 {
 public:
 	CDataCacheSection( CDataCache *pSharedCache, IDataCacheClient *pClient, const char *pszName );
-	~CDataCacheSection();
+	virtual ~CDataCacheSection();
 
-	IDataCache *GetSharedCache();
+	IDataCache *GetSharedCache() override;
 	IDataCacheClient *GetClient()	{ return m_pClient; }
-	const char *GetName()			{ return szName;	}
+	const char *GetName() override			{ return szName;	}
 
 	//--------------------------------------------------------
 	// IDataCacheSection methods
 	//--------------------------------------------------------
-	virtual void SetLimits( const DataCacheLimits_t &limits );
+	void SetLimits( const DataCacheLimits_t &limits ) override;
 	const DataCacheLimits_t &GetLimits();
-	virtual void SetOptions( unsigned options );
-	virtual void GetStatus( DataCacheStatus_t *pStatus, DataCacheLimits_t *pLimits = NULL );
+	void SetOptions( unsigned options ) override;
+	void GetStatus( DataCacheStatus_t *pStatus, DataCacheLimits_t *pLimits = NULL ) override;
 
-	inline unsigned GetNumBytes()			{ return m_status.nBytes; }
-	inline unsigned GetNumItems()			{ return m_status.nItems; }
+	inline size_t GetNumBytes() const			{ return m_status.nBytes; }
+	inline size_t GetNumItems() const			{ return m_status.nItems; }
 
-	inline unsigned GetNumBytesLocked()		{ return m_status.nBytesLocked; }
-	inline unsigned GetNumItemsLocked()		{ return m_status.nItemsLocked; }
+	inline size_t GetNumBytesLocked() const		{ return m_status.nBytesLocked; }
+	inline size_t GetNumItemsLocked() const		{ return m_status.nItemsLocked; }
 
-	inline unsigned GetNumBytesUnlocked()	{ return m_status.nBytes - m_status.nBytesLocked; }
-	inline unsigned GetNumItemsUnlocked()	{ return m_status.nItems - m_status.nItemsLocked; }
+	inline size_t GetNumBytesUnlocked() const	{ return m_status.nBytes - m_status.nBytesLocked; }
+	inline size_t GetNumItemsUnlocked() const	{ return m_status.nItems - m_status.nItemsLocked; }
 
-	virtual void EnsureCapacity( unsigned nBytes, unsigned nItems = 1 );
-
-	//--------------------------------------------------------
-
-	virtual bool Add( DataCacheClientID_t clientId, const void *pItemData, unsigned size, DataCacheHandle_t *pHandle );
-	virtual bool AddEx( DataCacheClientID_t clientId, const void *pItemData, unsigned size, unsigned flags, DataCacheHandle_t *pHandle );
-	virtual DataCacheHandle_t Find( DataCacheClientID_t clientId );
-	virtual DataCacheRemoveResult_t Remove( DataCacheHandle_t handle, const void **ppItemData = NULL, unsigned *pItemSize = NULL, bool bNotify = false );
-	virtual bool IsPresent( DataCacheHandle_t handle );
+	void EnsureCapacity( size_t nBytes, size_t nItems = 1 ) override;
 
 	//--------------------------------------------------------
 
-	virtual void *Lock( DataCacheHandle_t handle );
-	virtual int Unlock( DataCacheHandle_t handle );
-	virtual void *Get( DataCacheHandle_t handle, bool bFrameLock = false );
-	virtual void *GetNoTouch( DataCacheHandle_t handle, bool bFrameLock = false );
-	virtual void LockMutex();
-	virtual void UnlockMutex();
+	bool Add( DataCacheClientID_t clientId, const void *pItemData, size_t size, DataCacheHandle_t *pHandle ) override;
+	bool AddEx( DataCacheClientID_t clientId, const void *pItemData, size_t size, unsigned flags, DataCacheHandle_t *pHandle ) override;
+	DataCacheHandle_t Find( DataCacheClientID_t clientId ) override;
+	DataCacheRemoveResult_t Remove( DataCacheHandle_t handle, const void **ppItemData = NULL, size_t *pItemSize = NULL, bool bNotify = false ) override;
+	bool IsPresent( DataCacheHandle_t handle ) override;
 
 	//--------------------------------------------------------
 
-	virtual int BeginFrameLocking();
-	virtual bool IsFrameLocking();
-	virtual void *FrameLock( DataCacheHandle_t handle );
-	virtual int EndFrameLocking();
+	void *Lock( DataCacheHandle_t handle ) override;
+	int Unlock( DataCacheHandle_t handle ) override;
+	void *Get( DataCacheHandle_t handle, bool bFrameLock = false ) override;
+	void *GetNoTouch( DataCacheHandle_t handle, bool bFrameLock = false ) override;
+	void LockMutex() override;
+	void UnlockMutex() override;
 
 	//--------------------------------------------------------
 
-	virtual int GetLockCount( DataCacheHandle_t handle );
-	virtual int BreakLock( DataCacheHandle_t handle );
+	int BeginFrameLocking() override;
+	bool IsFrameLocking() override;
+	void *FrameLock( DataCacheHandle_t handle ) override;
+	int EndFrameLocking() override;
 
 	//--------------------------------------------------------
 
-	virtual int *GetFrameUnlockCounterPtr();
+	int GetLockCount( DataCacheHandle_t handle ) override;
+	int BreakLock( DataCacheHandle_t handle ) override;
+
+	//--------------------------------------------------------
+
+	int *GetFrameUnlockCounterPtr() override;
 	int			m_nFrameUnlockCounter;
 
 	//--------------------------------------------------------
 
-	virtual bool Touch( DataCacheHandle_t handle );
-	virtual bool Age( DataCacheHandle_t handle );
+	bool Touch( DataCacheHandle_t handle ) override;
+	bool Age( DataCacheHandle_t handle ) override;
 
 	//--------------------------------------------------------
 
-	virtual unsigned Flush( bool bUnlockedOnly = true, bool bNotify = true );
-	virtual unsigned Purge( unsigned nBytes );
-	unsigned PurgeItems( unsigned nItems );
+	size_t Flush(bool bUnlockedOnly = true, bool bNotify = true) override;
+	size_t Purge( size_t nBytes ) override;
+	size_t PurgeItems( size_t nItems );
 
 	//--------------------------------------------------------
 
-	virtual void OutputReport( DataCacheReportType_t reportType = DC_SUMMARY_REPORT );
+	void OutputReport( DataCacheReportType_t reportType = DC_SUMMARY_REPORT ) override;
 
-	virtual void UpdateSize( DataCacheHandle_t handle, unsigned int nNewSize );
+	void UpdateSize( DataCacheHandle_t handle, size_t nNewSize ) override;
 
 private:
 	friend void DataCacheItem_t::DestroyResource();
 
-	virtual void OnAdd( DataCacheClientID_t clientId, DataCacheHandle_t hCacheItem ) {}
+	virtual void OnAdd( DataCacheClientID_t, DataCacheHandle_t ) {}
 	virtual DataCacheHandle_t DoFind( DataCacheClientID_t clientId );
-	virtual void OnRemove( DataCacheClientID_t clientId ) {}
+	virtual void OnRemove( DataCacheClientID_t ) {}
 
 	memhandle_t GetFirstUnlockedItem();
 	memhandle_t GetFirstLockedItem();
@@ -167,11 +167,11 @@ private:
 	DataCacheItem_t *AccessItem( memhandle_t hCurrent );
 	bool DiscardItem( memhandle_t hItem, DataCacheNotificationType_t type );
 	bool DiscardItemData( DataCacheItem_t *pItem, DataCacheNotificationType_t type );
-	void NoteAdd( int size );
-	void NoteRemove( int size );
-	void NoteLock( int size );
-	void NoteUnlock( int size );
-	void NoteSizeChanged( int oldSize, int newSize );
+	void NoteAdd( size_t size );
+	void NoteRemove( size_t size );
+	void NoteLock( size_t size );
+	void NoteUnlock( size_t size );
+	void NoteSizeChanged( size_t oldSize, size_t newSize );
 
 	struct TSLIST_NODE_ALIGN FrameLock_t : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT>
 	{
@@ -330,9 +330,9 @@ inline DataCacheItem_t *CDataCacheSection::AccessItem( memhandle_t hCurrent )
 
 // Note: if status updates are moved out of a mutexed section, will need to change these to use interlocked instructions
 
-inline void CDataCacheSection::NoteSizeChanged( int oldSize, int newSize )
+inline void CDataCacheSection::NoteSizeChanged( size_t oldSize, size_t newSize )
 {
-	int nBytes = ( newSize - oldSize );
+	intp nBytes = ( newSize - oldSize );
 
 	m_status.nBytes += nBytes;
 	m_status.nBytesLocked += nBytes;
@@ -340,7 +340,7 @@ inline void CDataCacheSection::NoteSizeChanged( int oldSize, int newSize )
 	ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytesLocked, nBytes );
 }
 
-inline void CDataCacheSection::NoteAdd( int size )
+inline void CDataCacheSection::NoteAdd( size_t size )
 {
 	m_status.nBytes += size;
 	m_status.nItems++;
@@ -349,16 +349,16 @@ inline void CDataCacheSection::NoteAdd( int size )
 	ThreadInterlockedIncrement( &m_pSharedCache->m_status.nItems );
 }
 
-inline void CDataCacheSection::NoteRemove( int size )
+inline void CDataCacheSection::NoteRemove( size_t size )
 {
 	m_status.nBytes -= size;
 	m_status.nItems--;
 
-	ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytes, -size );
+	ThreadInterlockedExchangeAdd( (intp*)&m_pSharedCache->m_status.nBytes, -static_cast<intp>(size) );
 	ThreadInterlockedDecrement( &m_pSharedCache->m_status.nItems );
 }
 
-inline void CDataCacheSection::NoteLock( int size )
+inline void CDataCacheSection::NoteLock( size_t size )
 {
 	m_status.nBytesLocked += size;
 	m_status.nItemsLocked++;
@@ -367,12 +367,12 @@ inline void CDataCacheSection::NoteLock( int size )
 	ThreadInterlockedIncrement( &m_pSharedCache->m_status.nItemsLocked );
 }
 
-inline void CDataCacheSection::NoteUnlock( int size )
+inline void CDataCacheSection::NoteUnlock( size_t size )
 {
 	m_status.nBytesLocked -= size;
 	m_status.nItemsLocked--;
 
-	ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytesLocked, -size );
+	ThreadInterlockedExchangeAdd( (intp*)&m_pSharedCache->m_status.nBytesLocked, -static_cast<intp>(size) );
 	ThreadInterlockedDecrement( &m_pSharedCache->m_status.nItemsLocked );
 
 	// something has been unlocked, assume cached pointers are now invalid

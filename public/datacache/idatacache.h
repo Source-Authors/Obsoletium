@@ -35,7 +35,7 @@ class IDataCache;
 //---------------------------------------------------------
 // Unique (per section) identifier for a cache item defined by client
 //---------------------------------------------------------
-typedef uint32 DataCacheClientID_t;
+typedef uintp DataCacheClientID_t;
 
 
 //---------------------------------------------------------
@@ -50,7 +50,7 @@ typedef memhandle_t DataCacheHandle_t;
 //---------------------------------------------------------
 struct DataCacheLimits_t
 {
-	DataCacheLimits_t( unsigned _nMaxBytes = (unsigned)-1, unsigned _nMaxItems = (unsigned)-1, unsigned _nMinBytes = 0, unsigned _nMinItems = 0 )
+	DataCacheLimits_t( size_t _nMaxBytes = (size_t)-1, size_t _nMaxItems = (size_t)-1, size_t _nMinBytes = 0, size_t _nMinItems = 0 )
 		: nMaxBytes(_nMaxBytes), 
 		nMaxItems(_nMaxItems), 
 		nMinBytes(_nMinBytes),
@@ -59,12 +59,12 @@ struct DataCacheLimits_t
 	}
 
 	// Maximum levels permitted
-	unsigned nMaxBytes;
-	unsigned nMaxItems;
+	size_t nMaxBytes;
+	size_t nMaxItems;
 
 	// Minimum levels permitted
-	unsigned nMinBytes;
-	unsigned nMinItems;
+	size_t nMinBytes;
+	size_t nMinItems;
 };
 
 //---------------------------------------------------------
@@ -73,15 +73,15 @@ struct DataCacheLimits_t
 struct DataCacheStatus_t
 {
 	// Current state of the cache
-	unsigned nBytes;
-	unsigned nItems;
+	size_t nBytes;
+	size_t nItems;
 
-	unsigned nBytesLocked;
-	unsigned nItemsLocked;
+	size_t nBytesLocked;
+	size_t nItemsLocked;
 
 	// Diagnostics
-	unsigned nFindRequests;
-	unsigned nFindHits;
+	size_t nFindRequests;
+	size_t nFindHits;
 };
 
 //---------------------------------------------------------
@@ -139,7 +139,7 @@ struct DataCacheNotification_t
 	const char *				pszSectionName;
 	DataCacheClientID_t			clientId;
 	const void *				pItemData;
-	unsigned					nItemSize;
+	size_t						nItemSize;
 };
 
 //---------------------------------------------------------
@@ -193,22 +193,22 @@ public:
 	//--------------------------------------------------------
 	// Purpose: Get the current state of the section
 	//--------------------------------------------------------
-	virtual void GetStatus( DataCacheStatus_t *pStatus, DataCacheLimits_t *pLimits = NULL ) = 0;
+	virtual void GetStatus( DataCacheStatus_t *pStatus, DataCacheLimits_t *pLimits = nullptr ) = 0;
 
 
 	//--------------------------------------------------------
 	// Purpose: Add an item to the cache.  Purges old items if over budget, returns false if item was already in cache.
 	//--------------------------------------------------------
-	virtual void EnsureCapacity( unsigned nBytes, unsigned nItems = 1 ) = 0;
+	virtual void EnsureCapacity( size_t nBytes, size_t nItems = 1 ) = 0;
 
 
 	//--------------------------------------------------------
 	// Purpose: Add an item to the cache.  Purges old items if over budget, returns false if item was already in cache.
 	//--------------------------------------------------------
-	virtual bool Add( DataCacheClientID_t clientId, const void *pItemData, unsigned size, DataCacheHandle_t *pHandle ) = 0;
+	virtual bool Add( DataCacheClientID_t clientId, const void *pItemData, size_t size, DataCacheHandle_t *pHandle ) = 0;
 
 	//--------------------------------------------------------
-	// Purpose: Finds an item in the cache, returns NULL if item is not in cache. Not a cheap operation if section not configured for fast find.
+	// Purpose: Finds an item in the cache, returns nullptr if item is not in cache. Not a cheap operation if section not configured for fast find.
 	//--------------------------------------------------------
 	virtual DataCacheHandle_t Find( DataCacheClientID_t clientId ) = 0;
 
@@ -216,8 +216,8 @@ public:
 	//--------------------------------------------------------
 	// Purpose: Get an item out of the cache and remove it. No callbacks are executed unless explicity specified.
 	//--------------------------------------------------------
-	virtual DataCacheRemoveResult_t Remove( DataCacheHandle_t handle, const void **ppItemData, unsigned *pItemSize = NULL, bool bNotify = false ) = 0;
-	DataCacheRemoveResult_t Remove( DataCacheHandle_t handle, bool bNotify = false )	{ return Remove( handle, NULL, NULL, bNotify ); }
+	virtual DataCacheRemoveResult_t Remove( DataCacheHandle_t handle, const void **ppItemData, size_t *pItemSize = nullptr, bool bNotify = false ) = 0;
+	DataCacheRemoveResult_t Remove( DataCacheHandle_t handle, bool bNotify = false )	{ return Remove( handle, nullptr, nullptr, bNotify ); }
 
 
 	//--------------------------------------------------------
@@ -227,7 +227,7 @@ public:
 
 
 	//--------------------------------------------------------
-	// Purpose: Lock an item in the cache, returns NULL if item is not in the cache.
+	// Purpose: Lock an item in the cache, returns nullptr if item is not in the cache.
 	//--------------------------------------------------------
 	virtual void *Lock( DataCacheHandle_t handle ) = 0;
 
@@ -239,7 +239,7 @@ public:
 
 
 	//--------------------------------------------------------
-	// Purpose: Get an item without locking it, returns NULL if item is not in the cache. Use with care!
+	// Purpose: Get an item without locking it, returns nullptr if item is not in the cache. Use with care!
 	//--------------------------------------------------------
 	virtual void *Get( DataCacheHandle_t handle, bool bFrameLock = false ) = 0;
 	virtual void *GetNoTouch( DataCacheHandle_t handle, bool bFrameLock = false ) = 0;
@@ -277,13 +277,13 @@ public:
 	//--------------------------------------------------------
 	// Purpose: Empty the cache. Returns bytes released, will remove locked items if force specified
 	//--------------------------------------------------------
-	virtual unsigned Flush( bool bUnlockedOnly = true, bool bNotify = true ) = 0;
+	virtual size_t Flush( bool bUnlockedOnly = true, bool bNotify = true ) = 0;
 
 
 	//--------------------------------------------------------
 	// Purpose: Dump the oldest items to free the specified amount of memory. Returns amount actually freed
 	//--------------------------------------------------------
-	virtual unsigned Purge( unsigned nBytes ) = 0;
+	virtual size_t Purge( size_t nBytes ) = 0;
 
 
 	//--------------------------------------------------------
@@ -295,7 +295,7 @@ public:
 	// Purpose: Updates the size used by a specific item (locks the item, kicks
 	//  other items out to make room as necessary, unlocks the item).
 	//--------------------------------------------------------
-	virtual void UpdateSize( DataCacheHandle_t handle, unsigned int nNewSize ) = 0;
+	virtual void UpdateSize( DataCacheHandle_t handle, size_t nNewSize ) = 0;
 
 
 	//--------------------------------------------------------
@@ -308,7 +308,7 @@ public:
 	//--------------------------------------------------------
 	// Purpose: Add an item to the cache.  Purges old items if over budget, returns false if item was already in cache.
 	//--------------------------------------------------------
-	virtual bool AddEx( DataCacheClientID_t clientId, const void *pItemData, unsigned size, unsigned flags, DataCacheHandle_t *pHandle ) = 0;
+	virtual bool AddEx( DataCacheClientID_t clientId, const void *pItemData, size_t size, unsigned flags, DataCacheHandle_t *pHandle ) = 0;
 };
 
 
@@ -338,7 +338,7 @@ public:
 class CDefaultDataCacheClient : public IDataCacheClient
 {
 public:
-	virtual bool HandleCacheNotification( const DataCacheNotification_t &notification  )
+	bool HandleCacheNotification( const DataCacheNotification_t &notification ) override
 	{
 		switch ( notification.type )
 		{
@@ -351,7 +351,7 @@ public:
 		}
 	}
 
-	virtual bool GetItemName( DataCacheClientID_t , const void *, char *, unsigned )
+	bool GetItemName( DataCacheClientID_t , const void *, char *, unsigned ) override
 	{
 		return false;
 	}
@@ -378,7 +378,7 @@ public:
 	//--------------------------------------------------------
 	// Purpose: Get the current state of the cache
 	//--------------------------------------------------------
-	virtual void GetStatus( DataCacheStatus_t *pStatus, DataCacheLimits_t *pLimits = NULL ) = 0;
+	virtual void GetStatus( DataCacheStatus_t *pStatus, DataCacheLimits_t *pLimits = nullptr ) = 0;
 
 
 	//--------------------------------------------------------
@@ -391,7 +391,7 @@ public:
 	// Purpose: Remove a section from the cache
 	//--------------------------------------------------------
 	virtual void RemoveSection( const char *pszClientName, bool bCallFlush = true ) = 0;
-	void RemoveSection( IDataCacheSection *pSection, bool bCallFlush = true )	{ if ( pSection) RemoveSection( pSection->GetName() ); }
+	void RemoveSection( IDataCacheSection *pSection, bool bCallFlush = true )	{ if ( pSection) RemoveSection( pSection->GetName(), bCallFlush ); }
 
 
 	//--------------------------------------------------------
@@ -415,7 +415,7 @@ public:
 	//--------------------------------------------------------
 	// Purpose: Output the state of the cache
 	//--------------------------------------------------------
-	virtual void OutputReport( DataCacheReportType_t reportType = DC_SUMMARY_REPORT, const char *pszSection = NULL ) = 0;
+	virtual void OutputReport( DataCacheReportType_t reportType = DC_SUMMARY_REPORT, const char *pszSection = nullptr ) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -429,7 +429,7 @@ public:
 	typedef CManagedDataCacheClient<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE> CCacheClientBaseClass;
 
 	CManagedDataCacheClient()
-		: m_pCache( NULL )
+		: m_pCache( nullptr )
 	{
 	}
 
@@ -446,7 +446,7 @@ public:
 		if ( m_pCache )
 		{
 			m_pCache->GetSharedCache()->RemoveSection( m_pCache );
-			m_pCache = NULL;
+			m_pCache = nullptr;
 		}
 	}
 
