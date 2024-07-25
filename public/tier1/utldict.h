@@ -36,7 +36,7 @@ enum EDictCompareType
 
 // faster iteration, but in an unspecified order
 #define FOR_EACH_DICT_FAST( dictName, iteratorName ) \
-	for ( intp iteratorName = 0; iteratorName < dictName.MaxElement(); ++iteratorName ) if ( !dictName.IsValidIndex( iteratorName ) ) continue; else
+	for ( typename decltype(dictName)::IndexType_t iteratorName = 0; iteratorName < dictName.MaxElement(); ++iteratorName ) if ( !dictName.IsValidIndex( iteratorName ) ) continue; else
 
 //-----------------------------------------------------------------------------
 // A dictionary mapping from symbol to structure

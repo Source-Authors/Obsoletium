@@ -54,7 +54,7 @@ void ConstructStringVArgsInternal_Impl(T *unicodeOutput, int unicodeBufferSizeIn
 		return;
 	}
 
-	int unicodeBufferSize = unicodeBufferSizeInBytes / sizeof(T);
+	intp unicodeBufferSize = unicodeBufferSizeInBytes / sizeof(T);
 	const T *searchPos = formatString;
 	T *outputPos = unicodeOutput;
 
@@ -66,7 +66,7 @@ void ConstructStringVArgsInternal_Impl(T *unicodeOutput, int unicodeBufferSizeIn
 
 	//assumes we can't have %s10
 	//assume both are 0 terminated?
-	int formatLength = StringFuncs<T>::Length( formatString );
+	intp formatLength = StringFuncs<T>::Length( formatString );
 
 	while ( searchPos[0] != '\0' && unicodeBufferSize > 1 )
 	{
@@ -90,7 +90,7 @@ void ConstructStringVArgsInternal_Impl(T *unicodeOutput, int unicodeBufferSizeIn
 				if ( param == NULL )
 					param = StringFuncs<T>::NullDebugString();
 
-				int paramSize = StringFuncs<T>::Length(param);
+				intp paramSize = StringFuncs<T>::Length(param);
 				if (paramSize >= unicodeBufferSize)
 				{
 					paramSize = unicodeBufferSize - 1;
@@ -211,7 +211,7 @@ void ConstructStringKeyValuesInternal_Impl( T *unicodeOutput, int unicodeBufferS
 					// look up the variable name
 					const T *value = GetTypedKeyValuesString<T>( localizationVariables, variableName );
 					
-					int paramSize = StringFuncs<T>::Length( value );
+					intp paramSize = StringFuncs<T>::Length( value );
 					if (paramSize >= unicodeBufferSize)
 					{
 						paramSize = MAX( 0, unicodeBufferSize - 1 );

@@ -6,27 +6,26 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "utlsymbol.h"
+#include "tier1/utlsymbol.h"
 
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
 #include "tier0/threadtools.h"
-#include "tier0/memdbgon.h"
-#include "stringpool.h"
-#include "utlhashtable.h"
-#include "utlstring.h"
+#include "tier1/stringpool.h"
+#include "tier1/utlhashtable.h"
+#include "tier1/utlstring.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 #define INVALID_STRING_INDEX CStringPoolIndex( 0xFFFF, 0xFFFF )
 
-#define MIN_STRING_POOL_SIZE	2048
+#define MIN_STRING_POOL_SIZE	(intp)2048
 
 //-----------------------------------------------------------------------------
 // globals
 //-----------------------------------------------------------------------------
 
-CUtlSymbolTableMT* CUtlSymbol::s_pSymbolTable = 0; 
+CUtlSymbolTableMT* CUtlSymbol::s_pSymbolTable = nullptr; 
 bool CUtlSymbol::s_bAllowStaticSymbolTable = true;
 
 
@@ -112,8 +111,8 @@ inline const char* CUtlSymbolTable::StringFromIndex( const CStringPoolIndex &ind
 {
 	Assert( index.m_iPool < m_StringPools.Count() );
 
-  const auto &pool = m_StringPools[index.m_iPool];
-  Assert( index.m_iOffset < pool->m_TotalLen );
+	const auto &pool = m_StringPools[index.m_iPool];
+	Assert( index.m_iOffset < pool->m_TotalLen );
 
 	return &pool->m_Data[index.m_iOffset];
 }
@@ -147,7 +146,7 @@ bool CUtlSymbolTable::CLess::operator()( const CStringPoolIndex &i1, const CStri
 //-----------------------------------------------------------------------------
 // constructor, destructor
 //-----------------------------------------------------------------------------
-CUtlSymbolTable::CUtlSymbolTable( int growSize, int initSize, bool caseInsensitive )
+CUtlSymbolTable::CUtlSymbolTable( intp growSize, intp initSize, bool caseInsensitive )
 	: m_Lookup( growSize, initSize ), m_bInsensitive( caseInsensitive ),
 	m_pUserSearchString{nullptr}, m_StringPools( 8 )
 {
@@ -180,9 +179,9 @@ CUtlSymbol CUtlSymbolTable::Find( const char* pString ) const
 }
 
 
-int CUtlSymbolTable::FindPoolWithSpace( int len )	const
+intp CUtlSymbolTable::FindPoolWithSpace( intp len )	const
 {
-	for ( int i=0; i < m_StringPools.Count(); i++ )
+	for ( intp i=0; i < m_StringPools.Count(); i++ )
 	{
 		StringPool_t *pPool = m_StringPools[i];
 
@@ -210,14 +209,14 @@ CUtlSymbol CUtlSymbolTable::AddString( const char* pString )
 	if (id.IsValid())
 		return id;
 
-	int len = V_strlen(pString) + 1;
+	intp len = V_strlen(pString) + 1;
 
 	// Find a pool with space for this string, or allocate a new one.
-	int iPool = FindPoolWithSpace( len );
+	intp iPool = FindPoolWithSpace( len );
 	if ( iPool == -1 )
 	{
 		// Add a new pool.
-		int newPoolSize = max( len, MIN_STRING_POOL_SIZE );
+		intp newPoolSize = max( len, MIN_STRING_POOL_SIZE );
 		StringPool_t *pPool = (StringPool_t*)malloc( sizeof( StringPool_t ) + newPoolSize - 1 );
 		pPool->m_TotalLen = newPoolSize;
 		pPool->m_SpaceUsed = 0;
@@ -229,7 +228,7 @@ CUtlSymbol CUtlSymbolTable::AddString( const char* pString )
 	Assert( pPool->m_SpaceUsed < 0xFFFF );	// This should never happen, because if we had a string > 64k, it
 											// would have been given its entire own pool.
 	
-	unsigned short iStringOffset = pPool->m_SpaceUsed;
+	intp iStringOffset = pPool->m_SpaceUsed;
 
 	memcpy( &pPool->m_Data[pPool->m_SpaceUsed], pString, len );
 	pPool->m_SpaceUsed += len;
@@ -266,7 +265,7 @@ void CUtlSymbolTable::RemoveAll()
 {
 	m_Lookup.Purge();
 	
-	for ( int i=0; i < m_StringPools.Count(); i++ )
+	for ( intp i=0; i < m_StringPools.Count(); i++ )
 		free( m_StringPools[i] );
 
 	m_StringPools.RemoveAll();
@@ -298,7 +297,7 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindOrAddFileName( const char *pFileNa
 {
 	if ( !pFileName )
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	// find first
@@ -373,11 +372,13 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 // Input  : handle - 
 // Output : const char
 //-----------------------------------------------------------------------------
-bool CUtlFilenameSymbolTable::String( const FileNameHandle_t& handle, char *buf, int buflen )
+bool CUtlFilenameSymbolTable::String( const FileNameHandle_t& handle, char *buf, intp buflen )
 {
-	buf[ 0 ] = '\0';
+	buf[0] = '\0';
 
-	FileNameHandleInternal_t *internal = ( FileNameHandleInternal_t * )&handle;
+	static_assert(alignof(FileNameHandle_t*) == alignof(FileNameHandleInternal_t*));
+
+	auto *internal = reinterpret_cast<const FileNameHandleInternal_t *>(&handle);
 	if ( !internal->file || !internal->path )
 	{
 		return false;

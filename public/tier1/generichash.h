@@ -28,7 +28,7 @@ unsigned FASTCALL HashBlock( const void *pKey, unsigned size );
 unsigned FASTCALL HashInt( const int key );
 
 // hash a uint32 into a uint32
-FORCEINLINE uint32 HashIntAlternate( uint32 n)
+constexpr FORCEINLINE uint32 HashIntAlternate( uint32 n)
 {
 	n = ( n + 0x7ed55d16 ) + ( n << 12 );
 	n = ( n ^ 0xc761c23c ) ^ ( n >> 19 );
@@ -39,7 +39,7 @@ FORCEINLINE uint32 HashIntAlternate( uint32 n)
 	return n;
 }
 
-inline unsigned HashIntConventional( const int n ) // faster but less effective
+constexpr inline unsigned HashIntConventional( const int n ) // faster but less effective
 {
 	// first byte
 	unsigned hash = 0xAAAAAAAA + (n & 0xFF);
@@ -51,16 +51,28 @@ inline unsigned HashIntConventional( const int n ) // faster but less effective
 	hash = ( hash << 5 ) + hash + ( (n >> 24) & 0xFF );
 
 	return hash;
+}
 
-	/* this is the old version, which would cause a load-hit-store on every
-	   line on a PowerPC, and therefore took hundreds of clocks to execute!
-	  
-	byte *p = (byte *)&n;
-	unsigned hash = 0xAAAAAAAA + *p++;
-	hash = ( ( hash << 5 ) + hash ) + *p++;
-	hash = ( ( hash << 5 ) + hash ) + *p++;
-	return ( ( hash << 5 ) + hash ) + *p;
-	*/
+constexpr inline unsigned HashInt64Conventional( const int64 n ) // faster but less effective
+{
+	// first byte
+	unsigned hash = 0xAAAAAAAA + static_cast<unsigned char>(n & 0xFF);
+	// second byte
+	hash = ( hash << 5 ) + hash + static_cast<unsigned char>( (n >> 8) & 0xFF );
+	// third byte
+	hash = ( hash << 5 ) + hash + static_cast<unsigned char>( (n >> 16) & 0xFF );
+	// fourth byte
+	hash = ( hash << 5 ) + hash + static_cast<unsigned char>( (n >> 24) & 0xFF );
+	// fifth byte
+	hash = ( hash << 5 ) + hash + static_cast<unsigned char>( (n >> 32) & 0xFF );
+	// sixth byte
+	hash = ( hash << 5 ) + hash + static_cast<unsigned char>( (n >> 40) & 0xFF );
+	// seventh byte
+	hash = ( hash << 5 ) + hash + static_cast<unsigned char>( (n >> 48) & 0xFF );
+	// eighth byte
+	hash = ( hash << 5 ) + hash + static_cast<unsigned char>( (n >> 56) & 0xFF );
+
+	return hash;
 }
 
 //-----------------------------------------------------------------------------
@@ -68,17 +80,16 @@ inline unsigned HashIntConventional( const int n ) // faster but less effective
 template <typename T>
 inline unsigned HashItem( const T &item )
 {
-	// TODO: Confirm comiler optimizes out unused paths
-	if ( sizeof(item) == 4 )
+	if constexpr ( sizeof(item) == 4 )
 		return Hash4( &item );
-	else if ( sizeof(item) == 8 )
+	if constexpr ( sizeof(item) == 8 )
 		return Hash8( &item );
-	else if ( sizeof(item) == 12 )
+	if constexpr ( sizeof(item) == 12 )
 		return Hash12( &item );
-	else if ( sizeof(item) == 16 )
+	if constexpr ( sizeof(item) == 16 )
 		return Hash16( &item );
-	else
-		return HashBlock( &item, sizeof(item) );
+
+	return HashBlock( &item, sizeof(item) );
 }
 
 template <> inline unsigned HashItem<int>(const int &key )
@@ -89,6 +100,11 @@ template <> inline unsigned HashItem<int>(const int &key )
 template <> inline unsigned HashItem<unsigned>(const unsigned &key )
 {
 	return HashInt( (int)key );
+}
+
+template <> inline unsigned HashItem<uint64>(const uint64 &key )
+{
+	return Hash8( &key );
 }
 
 template<> inline unsigned HashItem<const char *>(const char * const &pszKey )

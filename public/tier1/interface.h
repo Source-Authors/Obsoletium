@@ -58,15 +58,13 @@ public:
 	virtual	~IBaseInterface() {}
 };
 
-#if !defined( _X360 )
-#define CREATEINTERFACE_PROCNAME	"CreateInterface"
-#else
-// x360 only allows ordinal exports, .def files export "CreateInterface" at 1
-#define CREATEINTERFACE_PROCNAME	((const char*)1)
-#endif
+constexpr inline char CREATEINTERFACE_PROCNAME[]{"CreateInterface"};
 
-typedef void* (*CreateInterfaceFn)(const char *pName, int *pReturnCode);
-typedef void* (*InstantiateInterfaceFn)();
+using CreateInterfaceFn = void* (*)(const char *pName, int *pReturnCode);
+template<typename T>
+using CreateInterfaceFnT = T *(*)(const char *pName, int *pReturnCode);
+
+using InstantiateInterfaceFn = void* (*)();
 
 // Used internally to register classes.
 class InterfaceReg
@@ -166,16 +164,30 @@ enum
 //-----------------------------------------------------------------------------
 DLL_EXPORT void* CreateInterface(const char *pName, int *pReturnCode);
 
-#if defined( _X360 )
-DLL_EXPORT void *CreateInterfaceThunk( const char *pName, int *pReturnCode );
-#endif
-
 //-----------------------------------------------------------------------------
 // UNDONE: This is obsolete, use the module load/unload/get instead!!!
 //-----------------------------------------------------------------------------
 extern CreateInterfaceFn	Sys_GetFactory( CSysModule *pModule );
+// dimhotepus: Strongly-typed version.
+template<typename TInterface>
+CreateInterfaceFnT<TInterface> Sys_GetFactory( CSysModule* pModule )
+{
+	return reinterpret_cast<CreateInterfaceFnT<TInterface>>(Sys_GetFactory(pModule));
+}
 extern CreateInterfaceFn	Sys_GetFactory( const char *pModuleName );
-extern CreateInterfaceFn	Sys_GetFactoryThis( void );
+// dimhotepus: Strongly-typed version.
+template<typename TInterface>
+CreateInterfaceFnT<TInterface> Sys_GetFactory( const char *pModuleName )
+{
+	return reinterpret_cast<CreateInterfaceFnT<TInterface>>(Sys_GetFactory(pModuleName));
+}
+extern CreateInterfaceFn	Sys_GetFactoryThis();
+// dimhotepus: Strongly-typed version.
+template<typename TInterface>
+CreateInterfaceFnT<TInterface> Sys_GetFactoryThis()
+{
+	return reinterpret_cast<CreateInterfaceFnT<TInterface>>(Sys_GetFactoryThis());
+}
 
 enum Sys_Flags
 {

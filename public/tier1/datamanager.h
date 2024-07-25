@@ -16,7 +16,7 @@
 
 FORWARD_DECLARE_HANDLE( memhandle_t );
 
-#define INVALID_MEMHANDLE ((memhandle_t)0xffffffff)
+#define INVALID_MEMHANDLE ((memhandle_t)-1)
 
 class CDataManagerBase
 {
@@ -224,9 +224,9 @@ public:
 	}
 
 	MUTEX_TYPE &AccessMutex()	{ return m_mutex; }
-	virtual void Lock() { m_mutex.Lock(); }
-	virtual bool TryLock() { return m_mutex.TryLock(); }
-	virtual void Unlock() { m_mutex.Unlock(); }
+	void Lock() override { m_mutex.Lock(); }
+	bool TryLock() override { return m_mutex.TryLock(); }
+	void Unlock() override { m_mutex.Unlock(); }
 
 private:
 	STORAGE_TYPE *StoragePointer( void *pMem )
@@ -234,12 +234,12 @@ private:
 		return static_cast<STORAGE_TYPE *>(pMem);
 	}
 
-	virtual void DestroyResourceStorage( void *pStore )
+	void DestroyResourceStorage( void *pStore ) override
 	{
 		StoragePointer(pStore)->DestroyResource();
 	}
 	
-	virtual unsigned int GetRealSize( void *pStore )
+	unsigned int GetRealSize( void *pStore ) override
 	{
 		return StoragePointer(pStore)->Size();
 	}
@@ -251,7 +251,7 @@ private:
 
 inline unsigned short CDataManagerBase::FromHandle( memhandle_t handle )
 {
-	unsigned int fullWord = (unsigned int)handle;
+	unsigned int fullWord = (unsigned int)(size_t)handle;
 	unsigned short serial = fullWord>>16;
 	unsigned short index = fullWord & 0xFFFF;
 	index--;

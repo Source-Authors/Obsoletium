@@ -180,7 +180,7 @@ public:
 	operator bool() const									{ return !BaseClass::operator!(); }
 	operator bool()											{ return !BaseClass::operator!(); }
 
-	void SafeRelease()										{ if ( BaseClass::m_pObject ) BaseClass::m_pObject->Release(); BaseClass::m_pObject = 0; }
+	void SafeRelease()										{ if ( BaseClass::m_pObject ) BaseClass::m_pObject->Release(); BaseClass::m_pObject = nullptr; }
 	void AssignAddRef( T *pFrom )							{ SafeRelease(); if (pFrom) pFrom->AddRef(); BaseClass::m_pObject = pFrom; }
 	void AddRefAssignTo( T *&pTo )							{ ::SafeRelease( pTo ); if ( BaseClass::m_pObject ) BaseClass::m_pObject->AddRef(); pTo = BaseClass::m_pObject; }
 };
@@ -193,8 +193,8 @@ public:
 class CRefMT
 {
 public:
-	static int Increment( int *p) { return ThreadInterlockedIncrement( (long *)p ); }
-	static int Decrement( int *p) { return ThreadInterlockedDecrement( (long *)p ); }
+	static int Increment( int *p) { return ThreadInterlockedIncrement( (volatile long *)p ); }
+	static int Decrement( int *p) { return ThreadInterlockedDecrement( (volatile long *)p ); }
 };
 
 class CRefST
@@ -321,7 +321,7 @@ class NO_VTABLE CRefCounted1 : public BASE1,
 							   public REFCOUNT_SERVICE
 {
 public:
-  virtual ~CRefCounted1() = default;
+	virtual ~CRefCounted1() = default;
 	int AddRef() 			{ return REFCOUNT_SERVICE::DoAddRef(); }
 	int Release()			{ return REFCOUNT_SERVICE::DoRelease(); }
 };

@@ -29,17 +29,17 @@ public:
 
 	// constructor: lessfunc is required, but may be set after the constructor with
 	// SetLessFunc
-	CUtlPriorityQueue( int growSize = 0, int initSize = 0, LessFunc_t lessfunc = 0 );
-	CUtlPriorityQueue( T *pMemory, int numElements, LessFunc_t lessfunc = 0 );
+	CUtlPriorityQueue( intp growSize = 0, intp initSize = 0, LessFunc_t lessfunc = 0 );
+	CUtlPriorityQueue( T *pMemory, intp numElements, LessFunc_t lessfunc = 0 );
 
 	// gets particular elements
 	inline T const&	ElementAtHead() const { return m_heap.Element(0); }
 
-	inline bool IsValidIndex(int index) { return m_heap.IsValidIndex(index); }
+	inline bool IsValidIndex(intp index) { return m_heap.IsValidIndex(index); }
 
 	// O(lgn) to rebalance the heap
 	void		RemoveAtHead();
-	void		RemoveAt( int index );
+	void		RemoveAt( intp index );
 
 	// O(lgn) to rebalance heap
 	void		Insert( T const &element );
@@ -47,7 +47,7 @@ public:
 	void		SetLessFunc( LessFunc_t func );
 
 	// Returns the count of elements in the queue
-	inline int	Count() const { return m_heap.Count(); }
+	inline intp	Count() const { return m_heap.Count(); }
 	
 	// doesn't deallocate memory
 	void		RemoveAll() { m_heap.RemoveAll(); }
@@ -55,25 +55,25 @@ public:
 	// Memory deallocation
 	void		Purge() { m_heap.Purge(); }
 
-	inline const T &	Element( int index ) const { return m_heap.Element(index); }
+	inline const T &	Element( intp index ) const { return m_heap.Element(index); }
 
 protected:
 	CUtlVector<T>	m_heap;
 
-	void		Swap( int index1, int index2 );
+	void		Swap( intp index1, intp index2 );
 
 	// Used for sorting.
 	LessFunc_t m_LessFunc;
 };
 
 template< class T >
-inline CUtlPriorityQueue<T>::CUtlPriorityQueue( int growSize, int initSize, LessFunc_t lessfunc ) :
+inline CUtlPriorityQueue<T>::CUtlPriorityQueue( intp growSize, intp initSize, LessFunc_t lessfunc ) :
 	m_heap(growSize, initSize), m_LessFunc(lessfunc)
 {
 }
 
 template< class T >
-inline CUtlPriorityQueue<T>::CUtlPriorityQueue( T *pMemory, int numElements, LessFunc_t lessfunc )	: 
+inline CUtlPriorityQueue<T>::CUtlPriorityQueue( T *pMemory, intp numElements, LessFunc_t lessfunc )	: 
 	m_heap(pMemory, numElements), m_LessFunc(lessfunc)
 {
 }
@@ -82,17 +82,17 @@ template <class T>
 void CUtlPriorityQueue<T>::RemoveAtHead()
 {
 	m_heap.FastRemove( 0 );
-	int index = 0;
+	intp index = 0;
 
-	int count = Count();
+	intp count = Count();
 	if ( !count )
 		return;
 
-	int half = count/2;
-	int larger = index;
+	intp half = count/2;
+	intp larger = index;
 	while ( index < half )
 	{
-		int child = ((index+1) * 2) - 1;	// if we wasted an element, this math would be more compact (1 based array)
+		intp child = ((index+1) * 2) - 1;	// if we wasted an element, this math would be more compact (1 based array)
 		if ( child < count )
 		{
 			// Item has been filtered down to its proper place, terminate.
@@ -122,20 +122,20 @@ void CUtlPriorityQueue<T>::RemoveAtHead()
 
 
 template <class T>
-void CUtlPriorityQueue<T>::RemoveAt( int index )
+void CUtlPriorityQueue<T>::RemoveAt( intp index )
 {
 	Assert(m_heap.IsValidIndex(index));
 	m_heap.FastRemove( index );
 
-	int count = Count();
+	intp count = Count();
 	if ( !count )
 		return;
 
-	int half = count/2;
-	int larger = index;
+	intp half = count/2;
+	intp larger = index;
 	while ( index < half )
 	{
-		int child = ((index+1) * 2) - 1;	// if we wasted an element, this math would be more compact (1 based array)
+		intp child = ((index+1) * 2) - 1;	// if we wasted an element, this math would be more compact (1 based array)
 		if ( child < count )
 		{
 			// Item has been filtered down to its proper place, terminate.
@@ -166,12 +166,12 @@ void CUtlPriorityQueue<T>::RemoveAt( int index )
 template <class T>
 void CUtlPriorityQueue<T>::Insert( T const &element )
 {
-	int index = m_heap.AddToTail();
+	intp index = m_heap.AddToTail();
 	m_heap[index] = element;
 
 	while ( index != 0 )
 	{
-		int parent = ((index+1) / 2) - 1;
+		intp parent = ((index+1) / 2) - 1;
 		if ( m_LessFunc( m_heap[index], m_heap[parent] ) )
 			break;
 
@@ -182,7 +182,7 @@ void CUtlPriorityQueue<T>::Insert( T const &element )
 }
 
 template <class T>
-void CUtlPriorityQueue<T>::Swap( int index1, int index2 )
+void CUtlPriorityQueue<T>::Swap( intp index1, intp index2 )
 {
 	T tmp = m_heap[index1];
 	m_heap[index1] = m_heap[index2];

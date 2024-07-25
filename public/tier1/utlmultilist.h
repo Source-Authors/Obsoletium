@@ -50,8 +50,8 @@ public:
 	typedef I ListHandle_t;
 
 	// constructor, destructor
-	CUtlMultiList( int growSize = 0, int initSize = 0 );
-	CUtlMultiList( void *pMemory, int memsize );
+	CUtlMultiList( intp growSize = 0, intp initSize = 0 );
+	CUtlMultiList( void *pMemory, intp memsize );
 	~CUtlMultiList( );
 
 	// gets particular elements
@@ -61,7 +61,7 @@ public:
 	T const&   operator[]( I i ) const;
 
 	// Make sure we have a particular amount of memory
-	void EnsureCapacity( int num );
+	void EnsureCapacity( intp num );
 
 	// Memory deallocation
 	void Purge();
@@ -105,13 +105,13 @@ public:
 	void	LinkToTail( ListHandle_t list, I elem );
 
 	// invalid index
-	static I	InvalidIndex()		{ return (I)~0; }
-	static bool	IndexInRange( int index );
+	static constexpr I	InvalidIndex()		{ return (I)~0; }
+	static bool	IndexInRange( intp index );
 	static size_t ElementSize()		{ return sizeof(ListElem_t); }
 
 	// list statistics
-	int	Count( ListHandle_t list ) const;
-	int	TotalCount( ) const;
+	intp	Count( ListHandle_t list ) const;
+	intp	TotalCount( ) const;
 	I	MaxElementIndex() const;
 
 	// Traversing the list
@@ -144,7 +144,7 @@ protected:
 
 	I	m_FirstFree;
 	I	m_TotalElements;	
-	int	m_MaxElementIndex;	// The number allocated (use int so we can catch overflow)
+	intp	m_MaxElementIndex;	// The number allocated (use int so we can catch overflow)
 
 	void ResetDbgInfo()
 	{
@@ -177,14 +177,14 @@ protected:
 //-----------------------------------------------------------------------------
 
 template <class T, class I>
-CUtlMultiList<T,I>::CUtlMultiList( int growSize, int initSize ) :
+CUtlMultiList<T,I>::CUtlMultiList( intp growSize, intp initSize ) :
 	m_Memory(growSize, initSize), m_pElementList(0)
 {
 	ConstructList();
 }
 
 template <class T, class I>
-CUtlMultiList<T,I>::CUtlMultiList( void* pMemory, int memsize ) : 
+CUtlMultiList<T,I>::CUtlMultiList( void* pMemory, intp memsize ) : 
 	m_Memory((ListElem_t *)pMemory, memsize/sizeof(ListElem_t)), m_pElementList(0)
 {
 	ConstructList();
@@ -267,13 +267,13 @@ bool CUtlMultiList<T,I>::IsValidList( ListHandle_t list ) const
 // list statistics
 //-----------------------------------------------------------------------------
 template <class T, class I>
-inline int CUtlMultiList<T,I>::TotalCount() const      
+inline intp CUtlMultiList<T,I>::TotalCount() const      
 { 
 	return m_TotalElements; 
 }
 
 template <class T, class I>
-inline int CUtlMultiList<T,I>::Count( ListHandle_t list ) const
+inline intp CUtlMultiList<T,I>::Count( ListHandle_t list ) const
 {
 	Assert( IsValidList(list) );
 	return m_List[list].m_Count;
@@ -323,7 +323,7 @@ inline I  CUtlMultiList<T,I>::Next( I i ) const
 //-----------------------------------------------------------------------------
 
 template <class T, class I>
-inline bool CUtlMultiList<T,I>::IndexInRange( int index ) // Static method
+inline bool CUtlMultiList<T,I>::IndexInRange( intp index ) // Static method
 {
 	// Since I is not necessarily the type returned by M (int), we need to check that M returns
 	// indices which are representable by I. A common case is 'I === unsigned short', in which case
@@ -363,7 +363,7 @@ inline bool CUtlMultiList<T,I>::IsInList( I i ) const
 // Makes sure we have enough memory allocated to store a requested # of elements
 //-----------------------------------------------------------------------------
 template< class T, class I >
-void CUtlMultiList<T, I>::EnsureCapacity( int num )
+void CUtlMultiList<T, I>::EnsureCapacity( intp num )
 {
 	m_Memory.EnsureCapacity(num);
 	ResetDbgInfo();
@@ -735,7 +735,7 @@ void  CUtlMultiList<T,I>::RemoveAll()
 
 	// Put everything into the free list
 	I prev = InvalidIndex();
-	for (int i = (int)m_MaxElementIndex; --i >= 0; )
+	for (intp i = (intp)m_MaxElementIndex; --i >= 0; )
 	{
 		// Invoke the destructor
 		if (IsValidIndex((I)i))

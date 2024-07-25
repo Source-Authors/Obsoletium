@@ -15,7 +15,6 @@
 #include "tier0/memdbgon.h"
 
 #define	MAX_ALIAS_NAME	32
-#define MAX_COMMAND_LENGTH 1024
 
 struct cmdalias_t
 {
@@ -56,7 +55,7 @@ void CCommandBuffer::SetWaitDelayTime( int nTickDelay )
 //-----------------------------------------------------------------------------
 // Specifies a max limit of the args buffer. For unittesting. Size == 0 means use default
 //-----------------------------------------------------------------------------
-void CCommandBuffer::LimitArgumentBufferSize( int nSize )
+void CCommandBuffer::LimitArgumentBufferSize( intp nSize )
 {
 	if ( nSize > ARGS_BUFFER_LENGTH )
 	{
@@ -70,7 +69,7 @@ void CCommandBuffer::LimitArgumentBufferSize( int nSize )
 //-----------------------------------------------------------------------------
 // Parses argv0 out of the buffer
 //-----------------------------------------------------------------------------
-bool CCommandBuffer::ParseArgV0( CUtlBuffer &buf, char *pArgV0, int nMaxLen, const char **pArgS )
+bool CCommandBuffer::ParseArgV0( CUtlBuffer &buf, char *pArgV0, intp nMaxLen, const char **pArgS )
 {
 	pArgV0[0] = 0;
 	*pArgS = NULL;
@@ -78,11 +77,11 @@ bool CCommandBuffer::ParseArgV0( CUtlBuffer &buf, char *pArgV0, int nMaxLen, con
 	if ( !buf.IsValid() )
 		return false;
 
-	int	nSize = buf.ParseToken( CCommand::DefaultBreakSet(), pArgV0, nMaxLen );
+	intp	nSize = buf.ParseToken( CCommand::DefaultBreakSet(), pArgV0, nMaxLen );
 	if ( ( nSize <= 0 ) || ( nMaxLen == nSize ) )
 		return false;
 
-	int nArgSLen = buf.TellMaxPut() - buf.TellGet();
+	intp nArgSLen = buf.TellMaxPut() - buf.TellGet();
 	*pArgS = (nArgSLen > 0) ? (const char*)buf.PeekGet() : NULL;
 	return true;
 }
@@ -91,9 +90,9 @@ bool CCommandBuffer::ParseArgV0( CUtlBuffer &buf, char *pArgV0, int nMaxLen, con
 //-----------------------------------------------------------------------------
 // Insert a command into the command queue
 //-----------------------------------------------------------------------------
-void CCommandBuffer::InsertCommandAtAppropriateTime( int hCommand )
+void CCommandBuffer::InsertCommandAtAppropriateTime( CommandHandle_t hCommand )
 {
-	int i;
+	CommandHandle_t i;
 	Command_t &command = m_Commands[hCommand];
 	for ( i = m_Commands.Head(); i != m_Commands.InvalidIndex(); i = m_Commands.Next(i) )
 	{
@@ -107,7 +106,7 @@ void CCommandBuffer::InsertCommandAtAppropriateTime( int hCommand )
 //-----------------------------------------------------------------------------
 // Insert a command into the command queue at the appropriate time
 //-----------------------------------------------------------------------------
-void CCommandBuffer::InsertImmediateCommand( int hCommand )
+void CCommandBuffer::InsertImmediateCommand( CommandHandle_t hCommand )
 {
 	m_Commands.LinkBefore( m_hNextCommand, hCommand );
 }
@@ -116,7 +115,7 @@ void CCommandBuffer::InsertImmediateCommand( int hCommand )
 //-----------------------------------------------------------------------------
 // Insert a command into the command queue
 //-----------------------------------------------------------------------------
-bool CCommandBuffer::InsertCommand( const char *pArgS, int nCommandSize, int nTick )
+bool CCommandBuffer::InsertCommand( const char *pArgS, intp nCommandSize, int nTick )
 {
 	if ( nCommandSize >= CCommand::MaxCommandLength() )
 	{
@@ -136,7 +135,7 @@ bool CCommandBuffer::InsertCommand( const char *pArgS, int nCommandSize, int nTi
 	m_pArgSBuffer[m_nArgSBufferSize + nCommandSize] = 0;
 	++nCommandSize;
 
-	int hCommand = m_Commands.Alloc();
+	CommandHandle_t hCommand = m_Commands.Alloc();
 	Command_t &command = m_Commands[hCommand];
 	command.m_nTick = nTick;
 	command.m_nFirstArgS = m_nArgSBufferSize;
@@ -155,14 +154,14 @@ bool CCommandBuffer::InsertCommand( const char *pArgS, int nCommandSize, int nTi
 	return true;
 }
 
-		
+
 //-----------------------------------------------------------------------------
 // Returns the length of the next command
 //-----------------------------------------------------------------------------
-void CCommandBuffer::GetNextCommandLength( const char *pText, int nMaxLen, int *pCommandLength, int *pNextCommandOffset )
+void CCommandBuffer::GetNextCommandLength( const char *pText, intp nMaxLen, intp *pCommandLength, intp *pNextCommandOffset )
 {
-	int nCommandLength = 0;
-	int nNextCommandOffset;
+	intp nCommandLength = 0;
+	intp nNextCommandOffset;
 	bool bIsQuoted = false;
 	bool bIsCommented = false;
 	for ( nNextCommandOffset=0; nNextCommandOffset < nMaxLen; ++nNextCommandOffset, nCommandLength += bIsCommented ? 0 : 1 )
@@ -209,16 +208,16 @@ bool CCommandBuffer::AddText( const char *pText, int nTickDelay )
 {
 	Assert( nTickDelay >= 0 );
 
-	int	nLen = Q_strlen( pText );
+	intp nLen = Q_strlen( pText );
 	int nTick = m_nCurrentTick + nTickDelay;
 
 	// Parse the text into distinct commands
 	const char *pCurrentCommand = pText;
-	int nOffsetToNextCommand;
+	intp nOffsetToNextCommand = 0;
 	for( ; nLen > 0; nLen -= nOffsetToNextCommand+1, pCurrentCommand += nOffsetToNextCommand+1 )
 	{
 		// find a \n or ; line break
-		int nCommandLength;
+		intp nCommandLength;
 		GetNextCommandLength( pCurrentCommand, nLen, &nCommandLength, &nOffsetToNextCommand );
 		if ( nCommandLength <= 0 )
 			continue;
@@ -249,7 +248,7 @@ bool CCommandBuffer::AddText( const char *pText, int nTickDelay )
 //-----------------------------------------------------------------------------
 // Are we in the middle of processing commands?
 //-----------------------------------------------------------------------------
-bool CCommandBuffer::IsProcessingCommands()
+bool CCommandBuffer::IsProcessingCommands() const
 {
 	return m_bIsProcessingCommands;
 }
@@ -263,9 +262,9 @@ void CCommandBuffer::DelayAllQueuedCommands( int nDelay )
 	if ( nDelay <= 0 )
 		return;
 
-	for ( int i = m_Commands.Head(); i != m_Commands.InvalidIndex(); i = m_Commands.Next(i) )
+	for ( CommandHandle_t i = m_Commands.Head(); i != m_Commands.InvalidIndex(); i = m_Commands.Next(i) )
 	{
-		m_Commands[i].m_nTick += nDelay;			
+		m_Commands[i].m_nTick += nDelay;
 	}
 }
 
@@ -298,7 +297,7 @@ bool CCommandBuffer::DequeueNextCommand( )
 	if ( m_Commands.Count() == 0 )
 		return false;
 
-	int nHead = m_Commands.Head();
+	CommandHandle_t nHead = m_Commands.Head();
 	Command_t &command = m_Commands[ nHead ];
 	if ( command.m_nTick > m_nLastTickToProcess )
 		return false;
@@ -331,7 +330,7 @@ bool CCommandBuffer::DequeueNextCommand( )
 //-----------------------------------------------------------------------------
 // Returns the next command
 //-----------------------------------------------------------------------------
-int CCommandBuffer::DequeueNextCommand( const char **& ppArgv )
+intp CCommandBuffer::DequeueNextCommand( const char **& ppArgv )
 {
 	DequeueNextCommand();
 	ppArgv = ArgV();
@@ -353,7 +352,7 @@ void CCommandBuffer::Compact()
 	m_nArgSBufferSize = 0;
 
 	char pTempBuffer[ ARGS_BUFFER_LENGTH ];
-	for ( int i = m_Commands.Head(); i != m_Commands.InvalidIndex(); i = m_Commands.Next(i) )
+	for ( CommandHandle_t i = m_Commands.Head(); i != m_Commands.InvalidIndex(); i = m_Commands.Next(i) )
 	{
 		Command_t &command = m_Commands[ i ];
 
@@ -381,7 +380,7 @@ void CCommandBuffer::EndProcessingCommands()
 
 	// Extract commands that are before the end time
 	// NOTE: This is a bug for this to 
-	int i = m_Commands.Head();
+	CommandHandle_t i = m_Commands.Head();
 	if ( i == m_Commands.InvalidIndex() )
 	{
 		m_nArgSBufferSize = 0;
@@ -394,7 +393,7 @@ void CCommandBuffer::EndProcessingCommands()
 			break;
 
 		AssertMsgOnce( false, "CCommandBuffer::EndProcessingCommands() called before all appropriate commands were dequeued.\n" );
-		int nNext = i;
+		CommandHandle_t nNext = i;
 		Msg( "Warning: Skipping command %s\n", &m_pArgSBuffer[ m_Commands[i].m_nFirstArgS ] );
 		m_Commands.Remove( i );
 		i = nNext;
@@ -412,224 +411,3 @@ CommandHandle_t CCommandBuffer::GetNextCommandHandle()
 	Assert( m_bIsProcessingCommands );
 	return m_Commands.Head();
 }
-
-
-#if 0
-/*
-===============
-Cmd_Alias_f
-
-Creates a new command that executes a command string (possibly ; seperated)
-===============
-*/
-void Cmd_Alias_f (void)
-{
-	cmdalias_t	*a;
-	char		cmd[MAX_COMMAND_LENGTH];
-	int			i, c;
-	char		*s;
-
-	if (Cmd_Argc() == 1)
-	{
-		Con_Printf ("Current alias commands:\n");
-		for (a = cmd_alias ; a ; a=a->next)
-			Con_Printf ("%s : %s\n", a->name, a->value);
-		return;
-	}
-
-	s = Cmd_Argv(1);
-	if (strlen(s) >= MAX_ALIAS_NAME)
-	{
-		Con_Printf ("Alias name is too long\n");
-		return;
-	}
-
-// copy the rest of the command line
-	cmd[0] = 0;		// start out with a null string
-	c = Cmd_Argc();
-	for (i=2 ; i< c ; i++)
-	{
-		Q_strncat(cmd, Cmd_Argv(i), sizeof( cmd ), COPY_ALL_CHARACTERS);
-		if (i != c)
-		{
-			Q_strncat (cmd, " ", sizeof( cmd ), COPY_ALL_CHARACTERS );
-		}
-	}
-	Q_strncat (cmd, "\n", sizeof( cmd ), COPY_ALL_CHARACTERS);
-
-	// if the alias already exists, reuse it
-	for (a = cmd_alias ; a ; a=a->next)
-	{
-		if (!strcmp(s, a->name))
-		{
-			if ( !strcmp( a->value, cmd ) )		// Re-alias the same thing
-				return;
-
-			delete[] a->value;
-			break;
-		}
-	}
-
-	if (!a)
-	{
-		a = (cmdalias_t *)new cmdalias_t;
-		a->next = cmd_alias;
-		cmd_alias = a;
-	}
-	Q_strncpy (a->name, s, sizeof( a->name ) );	
-
-	a->value = COM_StringCopy(cmd);
-}
-
-
-	
-/*
-=============================================================================
-
-					COMMAND EXECUTION
-
-=============================================================================
-*/
-
-#define	MAX_ARGS		80
-
-static	int			cmd_argc;
-static	char		*cmd_argv[MAX_ARGS];
-static	char		*cmd_null_string = "";
-static	const char	*cmd_args = NULL;
-
-cmd_source_t	cmd_source;
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : void Cmd_Init
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void Cmd_Shutdown( void )
-{
-	// TODO, cleanup
-	while ( cmd_alias )
-	{
-		cmdalias_t *next = cmd_alias->next;
-		delete cmd_alias->value;	// created by StringCopy()
-		delete cmd_alias;
-		cmd_alias = next;
-	}
-}
-
-
-
-/*
-============
-Cmd_ExecuteString
-
-A complete command line has been parsed, so try to execute it
-FIXME: lookupnoadd the token to speed search?
-============
-*/
-const ConCommandBase *Cmd_ExecuteString (const char *text, cmd_source_t src)
-{	
-	cmdalias_t		*a;
-
-	cmd_source = src;
-	Cmd_TokenizeString (text);
-			
-// execute the command line
-	if (!Cmd_Argc())
-		return NULL;		// no tokens
-
-// check alias
-	for (a=cmd_alias ; a ; a=a->next)
-	{
-		if (!Q_strcasecmp (cmd_argv[0], a->name))
-		{
-			Cbuf_InsertText (a->value);
-			return NULL;
-		}
-	}
-	
-// check ConCommands
-	ConCommandBase const *pCommand = ConCommandBase::FindCommand( cmd_argv[ 0 ] );
-	if ( pCommand && pCommand->IsCommand() )
-	{
-		bool isServerCommand = ( pCommand->IsBitSet( FCVAR_GAMEDLL ) && 
-								// Typed at console
-								cmd_source == src_command &&
-								// Not HLDS
-								!sv.IsDedicated() );
-
-		// Hook to allow game .dll to figure out who type the message on a listen server
-		if ( serverGameClients )
-		{
-			// We're actually the server, so set it up locally
-			if ( sv.IsActive() )
-			{
-				g_pServerPluginHandler->SetCommandClient( -1 );
-						
-#ifndef SWDS
-				// Special processing for listen server player
-				if ( isServerCommand )
-				{
-					g_pServerPluginHandler->SetCommandClient( cl.m_nPlayerSlot );
-				}
-#endif
-			}
-			// We're not the server, but we've been a listen server (game .dll loaded)
-			//  forward this command tot he server instead of running it locally if we're still
-			//  connected
-			// Otherwise, things like "say" won't work unless you quit and restart
-			else if ( isServerCommand )
-			{
-				if ( cl.IsConnected() )
-				{
-					Cmd_ForwardToServer();
-					return NULL;
-				}
-				else
-				{
-					// It's a server command, but we're not connected to a server.  Don't try to execute it.
-					return NULL;
-				}
-			}
-		}
-
-		// Allow cheat commands in singleplayer, debug, or multiplayer with sv_cheats on
-#ifndef _DEBUG
-		if ( pCommand->IsBitSet( FCVAR_CHEAT ) )
-		{
-			if ( !Host_IsSinglePlayerGame() && sv_cheats.GetInt() == 0 )
-			{
-				Msg( "Can't use cheat command %s in multiplayer, unless the server has sv_cheats set to 1.\n", pCommand->GetName() );
-				return NULL;
-			}
-		}
-#endif
-
-		(( ConCommand * )pCommand )->Dispatch();
-		return pCommand;
-	}
-
-	// check cvars
-	if ( cv->IsCommand() )
-	{
-		return pCommand;
-	}
-
-	// forward the command line to the server, so the entity DLL can parse it
-	if ( cmd_source == src_command )
-	{
-		if ( cl.IsConnected() )
-		{
-			Cmd_ForwardToServer();
-			return NULL;
-		}
-	}
-	
-	Msg("Unknown command \"%s\"\n", Cmd_Argv(0));
-
-	return NULL;
-}
-#endif

@@ -46,7 +46,7 @@ static bool s_bRegistered = false;
 class CDefaultAccessor : public IConCommandBaseAccessor
 {
 public:
-	virtual bool RegisterConCommandBase( ConCommandBase *pVar )
+	bool RegisterConCommandBase( ConCommandBase *pVar ) override
 	{
 		// Link to engine's list instead
 		g_pCVar->RegisterConCommand( pVar );
@@ -266,7 +266,7 @@ ConCommandBase *ConCommandBase::GetNext( void )
 //-----------------------------------------------------------------------------
 char *ConCommandBase::CopyString( const char *from )
 {
-	int		len;
+	ptrdiff_t	len;
 	char	*to;
 
 	len = V_strlen( from );
@@ -348,7 +348,7 @@ CCommand::CCommand( int nArgC, const char **ppArgV )
 	for ( int i = 0; i < nArgC; ++i )
 	{
 		m_ppArgv[i] = pBuf;
-		int nLen = Q_strlen( ppArgV[i] );
+		intp nLen = Q_strlen( ppArgV[i] );
 		memcpy( pBuf, ppArgV[i], nLen+1 );
 		if ( i == 0 )
 		{
@@ -402,7 +402,7 @@ bool CCommand::Tokenize( const char *pCommand, characterset_t *pBreakSet )
 	// Copy the current command into a temp buffer
 	// NOTE: This is here to avoid the pointers returned by DequeueNextCommand
 	// to become invalid by calling AddText. Is there a way we can avoid the memcpy?
-	int nLen = Q_strlen( pCommand );
+	intp nLen = Q_strlen( pCommand );
 	if ( nLen >= COMMAND_MAX_LENGTH - 1 )
 	{
 		Warning( "CCommand::Tokenize: Encountered command which overflows the tokenizer buffer.. Skipping!\n" );
@@ -413,13 +413,13 @@ bool CCommand::Tokenize( const char *pCommand, characterset_t *pBreakSet )
 
 	// Parse the current command into the current command buffer
 	CUtlBuffer bufParse( m_pArgSBuffer, nLen, CUtlBuffer::TEXT_BUFFER | CUtlBuffer::READ_ONLY ); 
-	int nArgvBufferSize = 0;
+	intp nArgvBufferSize = 0;
 	while ( bufParse.IsValid() && ( m_nArgc < COMMAND_MAX_ARGC ) )
 	{
 		char *pArgvBuf = &m_pArgvBuffer[nArgvBufferSize];
-		int nMaxLen = COMMAND_MAX_LENGTH - nArgvBufferSize;
-		int nStartGet = bufParse.TellGet();
-		int	nSize = bufParse.ParseToken( pBreakSet, pArgvBuf, nMaxLen );
+		intp nMaxLen = COMMAND_MAX_LENGTH - nArgvBufferSize;
+		intp nStartGet = bufParse.TellGet();
+		intp	nSize = bufParse.ParseToken( pBreakSet, pArgvBuf, nMaxLen );
 		if ( nSize < 0 )
 			break;
 
@@ -493,7 +493,7 @@ int CCommand::FindArgInt( const char *pName, int nDefaultVal ) const
 //-----------------------------------------------------------------------------
 // Default console command autocompletion function 
 //-----------------------------------------------------------------------------
-int DefaultCompletionFunc( const char *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
+int DefaultCompletionFunc( [[maybe_unused]] const char *partial, [[maybe_unused]] char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
 {
 	return 0;
 }
@@ -777,7 +777,8 @@ void ConVar::InternalSetValue( const char *value )
 	if ( !value )
 		fNewValue = 0.0f;
 	else
-		fNewValue = ( float )atof( value );
+		// dimhotepus: atof -> strtof.
+		fNewValue = strtof( value, nullptr );
 
 	if ( ClampValue( fNewValue ) )
 	{
@@ -808,7 +809,7 @@ void ConVar::ChangeStringValue( const char *tempVal, float flOldValue )
 	
 	if ( tempVal )
 	{
-		int len = Q_strlen(tempVal) + 1;
+		intp len = Q_strlen(tempVal) + 1;
 
 		if ( len > m_StringLength)
 		{
@@ -977,8 +978,8 @@ void ConVar::InternalSetIntValue( int nValue )
 //-----------------------------------------------------------------------------
 void ConVar::Create( const char *pName, const char *pDefaultValue, int flags /*= 0*/,
 	const char *pHelpString /*= NULL*/, bool bMin /*= false*/, float fMin /*= 0.0*/,
-	bool bMax /*= false*/, float fMax /*= false*/, bool bCompMin /*= false */, 
-	float fCompMin /*= 0.0*/, bool bCompMax /*= false*/, float fCompMax /*= 0.0*/,
+	bool bMax /*= false*/, float fMax /*= false*/, [[maybe_unused]] bool bCompMin /*= false */, 
+	[[maybe_unused]] float fCompMin /*= 0.0*/, [[maybe_unused]] bool bCompMax /*= false*/, [[maybe_unused]] float fCompMax /*= 0.0*/,
 	FnChangeCallback_t callback /*= NULL*/ )
 {
 	m_pParent = this;
@@ -1005,7 +1006,8 @@ void ConVar::Create( const char *pName, const char *pDefaultValue, int flags /*=
 	
 	m_fnChangeCallback = callback;
 
-	m_fValue = ( float )atof( m_pszString );
+	// dimhotepus: atof -> strtof.
+	m_fValue = strtof( m_pszString, nullptr );
 	m_nValue = atoi( m_pszString ); // dont convert from float to int and lose bits
 
 	// Bounds Check, should never happen, if it does, no big deal
@@ -1161,11 +1163,11 @@ class CEmptyConVar : public ConVar
 public:
 	CEmptyConVar() : ConVar( "", "0" ) {}
 	// Used for optimal read access
-	virtual void SetValue( const char *pValue ) {}
-	virtual void SetValue( float flValue ) {}
-	virtual void SetValue( int nValue ) {}
-	virtual const char *GetName( void ) const { return ""; }
-	virtual bool IsFlagSet( int nFlags ) const { return false; }
+	void SetValue( const char * ) override {}
+	void SetValue( float ) override {}
+	void SetValue( int ) override {}
+	const char *GetName( void ) const override { return ""; }
+	bool IsFlagSet( int ) const override { return false; }
 };
 
 static CEmptyConVar s_EmptyConVar;

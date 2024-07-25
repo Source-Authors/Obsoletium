@@ -27,7 +27,7 @@ public:
 
 
 template< class T >
-inline void RangeCheck( const T &value, int minValue, int maxValue )
+inline void RangeCheck( const T &value, int, int )
 {
 #ifdef _DEBUG
 	extern bool g_bDoRangeChecks;

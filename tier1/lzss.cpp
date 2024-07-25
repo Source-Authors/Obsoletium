@@ -55,7 +55,7 @@ void CLZSS::BuildHash( const unsigned char *pData )
 	lzss_list_t *pList;
 	lzss_node_t *pTarget;
 
-	int targetindex = (size_t)pData & ( m_nWindowSize - 1 );
+	intp targetindex = (intp)pData & ( m_nWindowSize - 1 );
 	pTarget = &m_pHashTarget[targetindex];
 	if ( pTarget->pData )
 	{
@@ -89,7 +89,7 @@ void CLZSS::BuildHash( const unsigned char *pData )
 
 unsigned char *CLZSS::CompressNoAlloc( const unsigned char *pInput, int inputLength, unsigned char *pOutputBuf, unsigned int *pOutputSize )
 {
-	if ( inputLength <= sizeof( lzss_header_t ) + 8 )
+	if ( inputLength <= static_cast<int>(sizeof( lzss_header_t )) + 8 )
 	{
 		return NULL;
 	}
@@ -229,71 +229,6 @@ unsigned char* CLZSS::Compress( const unsigned char *pInput, int inputLength, un
 
 	return pStart;
 }
-
-/*
-// BUG BUG:  This code is flaky, don't use until it's debugged!!!
-unsigned int CLZSS::Uncompress( unsigned char *pInput, CUtlBuffer &buf )
-{
-	int cmdByte = 0;
-	int getCmdByte = 0;
-
-	unsigned int actualSize = GetActualSize( pInput );
-	if ( !actualSize )
-	{
-		// unrecognized
-		return 0;
-	}
-
-	unsigned char *pBase = ( unsigned char * )buf.Base();
-
-	pInput += sizeof( lzss_header_t );
-
-	while ( !buf.IsValid() )
-	{
-		if ( !getCmdByte ) 
-		{
-			cmdByte = *pInput++;
-		}
-		getCmdByte = ( getCmdByte + 1 ) & 0x07;
-
-		if ( cmdByte & 0x01 )
-		{
-			int position = *pInput++ << LZSS_LOOKSHIFT;
-			position |= ( *pInput >> LZSS_LOOKSHIFT );
-			int count = ( *pInput++ & 0x0F ) + 1;
-			if ( count == 1 ) 
-			{
-				break;
-			}
-			unsigned int pos = buf.TellPut();
-			unsigned char *pSource = ( pBase + pos ) - position - 1;
-
-			// BUGBUG:
-			// This is failing!!!
-			// buf.WriteBytes( pSource, count );
-			// So have to iterate them manually
-			for ( int i =0; i < count; ++i )
-			{
-				buf.PutUnsignedChar( *pSource++ );
-			}
-		} 
-		else 
-		{
-			buf.PutUnsignedChar( *pInput++ );
-		}
-		cmdByte = cmdByte >> 1;
-	}
-
-	if ( buf.TellPut() != (int)actualSize )
-	{
-		// unexpected failure
-		Assert( 0 );
-		return 0;
-	}
-
-	return buf.TellPut();
-}
-*/
 
 unsigned int CLZSS::SafeUncompress( const unsigned char *pInput, unsigned char *pOutput, unsigned int unBufSize )
 {

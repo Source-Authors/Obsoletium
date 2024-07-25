@@ -36,20 +36,20 @@
 // The CUtlBlockMemory class:
 // A growable memory class that allocates non-sequential blocks, but is indexed sequentially
 //-----------------------------------------------------------------------------
-template< class T, class I >
+template< typename T, typename I >
 class CUtlBlockMemory
 {
 public:
 	// constructor, destructor
-	CUtlBlockMemory( int nGrowSize = 0, int nInitSize = 0 );
+	CUtlBlockMemory( intp nGrowSize = 0, intp nInitSize = 0 );
 	~CUtlBlockMemory();
 
 	// Set the size by which the memory grows - round up to the next power of 2
-	void Init( int nGrowSize = 0, int nInitSize = 0 );
+	void Init( intp nGrowSize = 0, intp nInitSize = 0 );
 
 	// here to match CUtlMemory, but only used by ResetDbgInfo, so it can just return NULL
-	T* Base() { return NULL; }
-	const T* Base() const { return NULL; }
+	T* Base() { return nullptr; }
+	const T* Base() const { return nullptr; }
 
 	class Iterator_t
 	{
@@ -80,32 +80,38 @@ public:
 	void Swap( CUtlBlockMemory< T, I > &mem );
 
 	// Size
-	int NumAllocated() const;
-	int Count() const { return NumAllocated(); }
+	intp NumAllocated() const;
+	intp Count() const { return NumAllocated(); }
 
 	// Grows memory by max(num,growsize) rounded up to the next power of 2, and returns the allocation index/ptr
-	void Grow( int num = 1 );
+	void Grow( intp num = 1 );
 
 	// Makes sure we've got at least this much memory
-	void EnsureCapacity( int num );
+	void EnsureCapacity( intp num );
 
 	// Memory deallocation
 	void Purge();
 
 	// Purge all but the given number of elements
-	void Purge( int numElements );
+	void Purge( intp numElements );
 
 protected:
-	int Index( int major, int minor ) const { return ( major << m_nIndexShift ) | minor; }
-	int MajorIndex( int i ) const { return i >> m_nIndexShift; }
-	int MinorIndex( int i ) const { return i & m_nIndexMask; }
-	void ChangeSize( int nBlocks );
-	int NumElementsInBlock() const { return m_nIndexMask + 1; }
+	intp Index( intp major, intp minor ) const { return ( major << m_nIndexShift ) | minor; }
+	intp MajorIndex( intp i ) const { return i >> m_nIndexShift; }
+	intp MinorIndex( intp i ) const { return i & m_nIndexMask; }
+	void ChangeSize( intp nBlocks );
+	intp NumElementsInBlock() const { return m_nIndexMask + 1; }
 
 	T** m_pMemory;
-	int m_nBlocks;
+	intp m_nBlocks;
+
+#ifdef PLATFORM_64BITS
+	intp m_nIndexMask : 58;
+	intp m_nIndexShift : 6;
+#else
 	int m_nIndexMask : 27;
 	int m_nIndexShift : 5;
+#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -113,7 +119,7 @@ protected:
 //-----------------------------------------------------------------------------
 
 template< class T, class I >
-CUtlBlockMemory<T,I>::CUtlBlockMemory( int nGrowSize, int nInitAllocationCount )
+CUtlBlockMemory<T,I>::CUtlBlockMemory( intp nGrowSize, intp nInitAllocationCount )
 : m_pMemory( 0 ), m_nBlocks( 0 ), m_nIndexMask( 0 ), m_nIndexShift( 0 )
 {
 	Init( nGrowSize, nInitAllocationCount );
@@ -143,7 +149,7 @@ void CUtlBlockMemory<T,I>::Swap( CUtlBlockMemory< T, I > &mem )
 // Set the size by which the memory grows - round up to the next power of 2
 //-----------------------------------------------------------------------------
 template< class T, class I >
-void CUtlBlockMemory<T,I>::Init( int nGrowSize /* = 0 */, int nInitSize /* = 0 */ )
+void CUtlBlockMemory<T,I>::Init( intp nGrowSize /* = 0 */, intp nInitSize /* = 0 */ )
 {
 	Purge();
 
@@ -152,7 +158,7 @@ void CUtlBlockMemory<T,I>::Init( int nGrowSize /* = 0 */, int nInitSize /* = 0 *
 		// default grow size is smallest size s.t. c++ allocation overhead is ~6% of block size
 		nGrowSize = ( 127 + sizeof( T ) ) / sizeof( T );
 	}
-	nGrowSize = SmallestPowerOfTwoGreaterOrEqual( nGrowSize );
+	nGrowSize = SmallestPowerOfTwoGreaterOrEqual( (uintp)nGrowSize );
 	m_nIndexMask = nGrowSize - 1;
 
 	m_nIndexShift = 0;
@@ -161,7 +167,7 @@ void CUtlBlockMemory<T,I>::Init( int nGrowSize /* = 0 */, int nInitSize /* = 0 *
 		nGrowSize >>= 1;
 		++m_nIndexShift;
 	}
-	Assert( m_nIndexMask + 1 == ( 1 << m_nIndexShift ) );
+	Assert( m_nIndexMask + 1 == ( (intp)1 << m_nIndexShift ) );
 
 	Grow( nInitSize );
 }
@@ -207,7 +213,7 @@ inline const T& CUtlBlockMemory<T,I>::Element( I i ) const
 // Size
 //-----------------------------------------------------------------------------
 template< class T, class I >
-inline int CUtlBlockMemory<T,I>::NumAllocated() const
+inline intp CUtlBlockMemory<T,I>::NumAllocated() const
 {
 	return m_nBlocks * NumElementsInBlock();
 }
@@ -223,23 +229,23 @@ inline bool CUtlBlockMemory<T,I>::IsIdxValid( I i ) const
 }
 
 template< class T, class I >
-void CUtlBlockMemory<T,I>::Grow( int num )
+void CUtlBlockMemory<T,I>::Grow( intp num )
 {
 	if ( num <= 0 )
 		return;
 
-	int nBlockSize = NumElementsInBlock();
-	int nBlocks = ( num + nBlockSize - 1 ) / nBlockSize;
+	intp nBlockSize = NumElementsInBlock();
+	intp nBlocks = ( num + nBlockSize - 1 ) / nBlockSize;
 
 	ChangeSize( m_nBlocks + nBlocks );
 }
 
 template< class T, class I >
-void CUtlBlockMemory<T,I>::ChangeSize( int nBlocks )
+void CUtlBlockMemory<T,I>::ChangeSize( intp nBlocks )
 {
 	UTLBLOCKMEMORY_TRACK_FREE(); // this must stay before the recalculation of m_nBlocks, since it implicitly uses the old value
 
-	int nBlocksOld = m_nBlocks;
+	intp nBlocksOld = m_nBlocks;
 	m_nBlocks = nBlocks;
 
 	UTLBLOCKMEMORY_TRACK_ALLOC(); // this must stay after the recalculation of m_nBlocks, since it implicitly uses the new value
@@ -248,7 +254,7 @@ void CUtlBlockMemory<T,I>::ChangeSize( int nBlocks )
 	{
 		// free old blocks if shrinking
 		// Only possible if m_pMemory is non-NULL (and avoids PVS-Studio warning)
-		for ( int i = m_nBlocks; i < nBlocksOld; ++i )
+		for ( intp i = m_nBlocks; i < nBlocksOld; ++i )
 		{
 			UTLBLOCKMEMORY_TRACK_FREE();
 			free( (void*)m_pMemory[ i ] );
@@ -271,8 +277,8 @@ void CUtlBlockMemory<T,I>::ChangeSize( int nBlocks )
 	}
 
 	// allocate new blocks if growing
-	int nBlockSize = NumElementsInBlock();
-	for ( int i = nBlocksOld; i < m_nBlocks; ++i )
+	intp nBlockSize = NumElementsInBlock();
+	for ( intp i = nBlocksOld; i < m_nBlocks; ++i )
 	{
 		MEM_ALLOC_CREDIT_CLASS();
 		m_pMemory[ i ] = (T*)malloc( nBlockSize * sizeof( T ) );
@@ -285,7 +291,7 @@ void CUtlBlockMemory<T,I>::ChangeSize( int nBlocks )
 // Makes sure we've got at least this much memory
 //-----------------------------------------------------------------------------
 template< class T, class I >
-inline void CUtlBlockMemory<T,I>::EnsureCapacity( int num )
+inline void CUtlBlockMemory<T,I>::EnsureCapacity( intp num )
 {
 	Grow( num - NumAllocated() );
 }
@@ -300,7 +306,7 @@ void CUtlBlockMemory<T,I>::Purge()
 	if ( !m_pMemory )
 		return;
 
-	for ( int i = 0; i < m_nBlocks; ++i )
+	for ( intp i = 0; i < m_nBlocks; ++i )
 	{
 		UTLBLOCKMEMORY_TRACK_FREE();
 		free( (void*)m_pMemory[ i ] );
@@ -313,11 +319,11 @@ void CUtlBlockMemory<T,I>::Purge()
 }
 
 template< class T, class I >
-void CUtlBlockMemory<T,I>::Purge( int numElements )
+void CUtlBlockMemory<T,I>::Purge( intp numElements )
 {
 	Assert( numElements >= 0 );
 
-	int nAllocated = NumAllocated();
+	intp nAllocated = NumAllocated();
 	if ( numElements > nAllocated )
 	{
 		// Ensure this isn't a grow request in disguise.
@@ -331,9 +337,9 @@ void CUtlBlockMemory<T,I>::Purge( int numElements )
 		return;
 	}
 
-	int nBlockSize = NumElementsInBlock();
-	int nBlocksOld = m_nBlocks;
-	int nBlocks = ( numElements + nBlockSize - 1 ) / nBlockSize;
+	intp nBlockSize = NumElementsInBlock();
+	intp nBlocksOld = m_nBlocks;
+	intp nBlocks = ( numElements + nBlockSize - 1 ) / nBlockSize;
 
 	// If the number of blocks is the same as the allocated number of blocks, we are done.
 	if ( nBlocks == m_nBlocks )

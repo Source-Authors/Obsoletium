@@ -337,8 +337,8 @@ private:
 class CFuncMemPolicyNone
 {
 public:
-	static void OnAcquire(void *pObject)	{}
-	static void OnRelease(void *pObject)	{}
+	static void OnAcquire(void *)	{}
+	static void OnRelease(void *)	{}
 };
 
 template <class OBJECT_TYPE_PTR = IRefCounted *>
@@ -362,8 +362,8 @@ class CMemberFuncProxyBase
 {
 protected:
 	CMemberFuncProxyBase( OBJECT_TYPE_PTR pObject, FUNCTION_TYPE pfnProxied )
-	  : m_pObject( pObject ),
-		m_pfnProxied( pfnProxied )
+	  : m_pfnProxied( pfnProxied ),
+		m_pObject( pObject )
 	{
 		MEM_POLICY::OnAcquire(m_pObject);
 	}
