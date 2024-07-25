@@ -47,11 +47,11 @@ template<class T,class V> static inline void AddToHead(T * & head, V * node)
 
 void Fail(char const *msg)
 {
-	Assert(0);
+	AssertMsg(0, "%s", msg);
 }
 
 void ApplyDiffs(uint8 const *OldBlock, uint8 const *DiffList,
-                int OldSize, int DiffListSize, int &ResultListSize,uint8 *Output,uint32 OutSize)
+                int, int DiffListSize, intp &ResultListSize,uint8 *Output,uint32)
 {
   uint8 const *copy_src=OldBlock;
   uint8 const *end_of_diff_list=DiffList+DiffListSize;
@@ -169,7 +169,7 @@ static uint32 hasher(uint8 const *mdata)
 }
 
 int FindDiffsForLargeFiles(uint8 const *NewBlock, uint8 const *OldBlock,
-                            int NewSize, int OldSize, int &DiffListSize,uint8 *Output,
+                            int NewSize, int OldSize, intp &DiffListSize,uint8 *Output,
                             uint32 OutSize,
                             int hashsize)
 {
@@ -217,7 +217,7 @@ int FindDiffsForLargeFiles(uint8 const *NewBlock, uint8 const *OldBlock,
       for(BlockPtr *b=HashedMatches[hash1];b;b=b->Next)
       {
         // find the match length
-        int match_of=b->dataptr-lastmatchend;
+        intp match_of=b->dataptr-lastmatchend;
         if ((match_of>-32768) && (match_of<32767))
         {
           int max_mlength=min(65535,(int)((ptrdiff_t)OldBlock+OldSize-(ptrdiff_t)b->dataptr));
@@ -246,8 +246,8 @@ int FindDiffsForLargeFiles(uint8 const *NewBlock, uint8 const *OldBlock,
         pending_raw_len=0;
       }
       // now, output copy block
-      int match_of=longest_block->dataptr-lastmatchend;
-      int nremaining=OutSize-(outbuf-Output);
+      intp match_of=longest_block->dataptr-lastmatchend;
+      intp nremaining=OutSize-(outbuf-Output);
       
       if (match_of)
         ret=1;
@@ -308,7 +308,7 @@ int FindDiffsForLargeFiles(uint8 const *NewBlock, uint8 const *OldBlock,
 
 
 int FindDiffs(uint8 const *NewBlock, uint8 const *OldBlock,
-               int NewSize, int OldSize, int &DiffListSize,uint8 *Output,uint32 OutSize)
+               int NewSize, int OldSize, intp &DiffListSize,uint8 *Output,uint32 OutSize)
 {
   
   int ret=0;
@@ -352,7 +352,7 @@ int FindDiffs(uint8 const *NewBlock, uint8 const *OldBlock,
       for(BlockPtr *b=HashedMatches[hash1];b;b=b->Next)
       {
         // find the match length
-        int match_of=b->dataptr-lastmatchend;
+        intp match_of=b->dataptr-lastmatchend;
         if ((match_of>-32768) && (match_of<32767))
         {
           int max_mlength=min(65535,(int)((ptrdiff_t)OldBlock+OldSize-(ptrdiff_t)b->dataptr));
@@ -379,8 +379,8 @@ int FindDiffs(uint8 const *NewBlock, uint8 const *OldBlock,
         pending_raw_len=0;
       }
       // now, output copy block
-      int match_of=longest_block->dataptr-lastmatchend;
-      int nremaining=OutSize-(outbuf-Output);
+      intp match_of=longest_block->dataptr-lastmatchend;
+      intp nremaining=OutSize-(outbuf-Output);
       if (match_of)
         ret=1;
       if (longest>127)
@@ -437,7 +437,7 @@ int FindDiffs(uint8 const *NewBlock, uint8 const *OldBlock,
 
 
 int FindDiffsLowMemory(uint8 const *NewBlock, uint8 const *OldBlock,
-                        int NewSize, int OldSize, int &DiffListSize,uint8 *Output,uint32 OutSize)
+                        int NewSize, int OldSize, intp &DiffListSize,uint8 *Output,uint32 OutSize)
 {
   
   int ret=0;
@@ -454,7 +454,7 @@ int FindDiffsLowMemory(uint8 const *NewBlock, uint8 const *OldBlock,
   {
     while( (oldptr-OldBlock<walk-NewBlock+40) && (oldptr-OldBlock<OldSize-MIN_MATCH_LEN))
     {
-      uint16 hash1=(oldptr[0]+oldptr[1]+oldptr[2]+oldptr[3]) & (NELEMS(old_data_hash)-1);
+      uint16 hash1=(oldptr[0]+oldptr[1]+oldptr[2]+oldptr[3]) & (std::size(old_data_hash)-1);
       old_data_hash[hash1]=oldptr;
       oldptr++;
     }
@@ -463,10 +463,10 @@ int FindDiffsLowMemory(uint8 const *NewBlock, uint8 const *OldBlock,
     if (walk<NewBlock+NewSize-MIN_MATCH_LEN)
     {
       // check for a match
-      uint16 hash1=(walk[0]+walk[1]+walk[2]+walk[3]) & (NELEMS(old_data_hash)-1);
+      uint16 hash1=(walk[0]+walk[1]+walk[2]+walk[3]) & (std::size(old_data_hash)-1);
       if (old_data_hash[hash1])
       {
-        int max_bytes_to_compare=min(NewBlock+NewSize-walk,OldBlock+OldSize-old_data_hash[hash1]);
+        intp max_bytes_to_compare=min(NewBlock+NewSize-walk,OldBlock+OldSize-old_data_hash[hash1]);
         int nmatches;
 		for(nmatches=0;nmatches<max_bytes_to_compare;nmatches++)
           if (walk[nmatches]!=old_data_hash[hash1][nmatches])
@@ -488,8 +488,8 @@ int FindDiffsLowMemory(uint8 const *NewBlock, uint8 const *OldBlock,
         pending_raw_len=0;
       }
       // now, output copy block
-      int match_of=longest_block-lastmatchend;
-      int nremaining=OutSize-(outbuf-Output);
+      intp match_of=longest_block-lastmatchend;
+      intp nremaining=OutSize-(outbuf-Output);
       if (match_of)
         ret=1;
       if (longest>127)

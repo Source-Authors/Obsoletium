@@ -65,7 +65,7 @@ template < typename T >
 class CPlainAutoPtr
 {
 public:
-	explicit CPlainAutoPtr( T *p = NULL )		: m_p( p ) {}
+	explicit CPlainAutoPtr( T *p = nullptr )		: m_p( p ) {}
 	~CPlainAutoPtr( void )						{ Delete(); }
 
 public:
@@ -77,10 +77,10 @@ private:	// Disallow copying, use Detach() instead to avoid ambiguity
 
 public:
 	void Attach( T *p )							{ m_p = p; }
-	T * Detach( void )							{ T * p( m_p ); m_p = NULL; return p; }
+	T * Detach( void )							{ T * p( m_p ); m_p = nullptr; return p; }
 
 public:
-	bool IsValid( void ) const					{ return m_p != NULL; }
+	bool IsValid( void ) const					{ return m_p != nullptr; }
 	T * Get( void ) const						{ return m_p; }
 	T * operator -> ( void ) const				{ return Get(); }
 	T & operator *  ( void ) const				{ return *Get(); }

@@ -55,7 +55,7 @@ void CLZSS::BuildHash( const unsigned char *pData )
 	lzss_list_t *pList;
 	lzss_node_t *pTarget;
 
-	int targetindex = (size_t)pData & ( m_nWindowSize - 1 );
+	intp targetindex = (intp)pData & ( m_nWindowSize - 1 );
 	pTarget = &m_pHashTarget[targetindex];
 	if ( pTarget->pData )
 	{
@@ -89,7 +89,7 @@ void CLZSS::BuildHash( const unsigned char *pData )
 
 unsigned char *CLZSS::CompressNoAlloc( const unsigned char *pInput, int inputLength, unsigned char *pOutputBuf, unsigned int *pOutputSize )
 {
-	if ( inputLength <= sizeof( lzss_header_t ) + 8 )
+	if ( inputLength <= static_cast<int>(sizeof( lzss_header_t )) + 8 )
 	{
 		return NULL;
 	}

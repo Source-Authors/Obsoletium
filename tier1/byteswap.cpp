@@ -96,11 +96,11 @@ void CByteswap<isBigEndian>::SwapFieldsToTargetEndian( void *pOutputBuffer, void
 
 void InstantiateTemplates()
 {
-	CByteswap<false> falseObj;
+	[[maybe_unused]] CByteswap<false> falseObj;
 	falseObj.SwapFieldToTargetEndian(nullptr, nullptr, static_cast<typedescription_t*>(nullptr));
 	falseObj.SwapFieldsToTargetEndian(nullptr, nullptr, static_cast<datamap_t*>(nullptr));
 
-	CByteswap<true> trueObj;
+	[[maybe_unused]] CByteswap<true> trueObj;
 	falseObj.SwapFieldToTargetEndian(nullptr, nullptr, static_cast<typedescription_t*>(nullptr));
 	falseObj.SwapFieldsToTargetEndian(nullptr, nullptr, static_cast<datamap_t*>(nullptr));
 }

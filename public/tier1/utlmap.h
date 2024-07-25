@@ -60,7 +60,7 @@ public:
 	// Left at growSize = 0, the memory will first allocate 1 element and double in size
 	// at each increment.
 	// LessFunc_t is required, but may be set after the constructor using SetLessFunc() below
-	CUtlMap( int growSize = 0, int initSize = 0, LessFunc_t lessfunc = 0 )
+	CUtlMap( intp growSize = 0, intp initSize = 0, LessFunc_t lessfunc = 0 )
 	 : m_Tree( growSize, initSize, CKeyLess( lessfunc ) )
 	{
 	}
@@ -70,7 +70,7 @@ public:
 	{
 	}
 	
-	void EnsureCapacity( int num )							{ m_Tree.EnsureCapacity( num ); }
+	void EnsureCapacity( intp num )							{ m_Tree.EnsureCapacity( num ); }
 
 	// gets particular elements
 	ElemType_t &		Element( IndexType_t i )			{ return m_Tree.Element( i ).elem; }
@@ -82,7 +82,7 @@ public:
 
 	
 	// Num elements
-	unsigned int Count() const								{ return m_Tree.Count(); }
+	size_t Count() const								{ return m_Tree.Count(); }
 	
 	// Max "size" of the vector
 	IndexType_t  MaxElement() const							{ return m_Tree.MaxElement(); }

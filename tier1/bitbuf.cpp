@@ -25,17 +25,7 @@
 
 #if _WIN32
 #define FAST_BIT_SCAN 1
-#if _X360
-#define CountLeadingZeros(x) _CountLeadingZeros(x)
-inline unsigned int CountTrailingZeros( unsigned int elem )
-{
-	// this implements CountTrailingZeros() / BitScanForward()
-	unsigned int mask = elem-1;
-	unsigned int comp = ~elem;
-	elem = mask & comp;
-	return (32 - _CountLeadingZeros(elem));
-}
-#else
+
 #include <intrin.h>
 #pragma intrinsic(_BitScanReverse)
 #pragma intrinsic(_BitScanForward)
@@ -55,7 +45,6 @@ inline unsigned int CountTrailingZeros(unsigned int elem)
 	return 32;
 }
 
-#endif
 #else
 #define FAST_BIT_SCAN 0
 #endif
@@ -134,25 +123,25 @@ bf_write::bf_write()
 	m_pDebugName = NULL;
 }
 
-bf_write::bf_write( const char *pDebugName, void *pData, int nBytes, int nBits )
+bf_write::bf_write( const char *pDebugName, void *pData, intp nBytes, intp nBits )
 {
 	m_bAssertOnOverflow = true;
 	m_pDebugName = pDebugName;
 	StartWriting( pData, nBytes, 0, nBits );
 }
 
-bf_write::bf_write( void *pData, int nBytes, int nBits )
+bf_write::bf_write( void *pData, intp nBytes, intp nBits )
 {
 	m_bAssertOnOverflow = true;
 	m_pDebugName = NULL;
 	StartWriting( pData, nBytes, 0, nBits );
 }
 
-void bf_write::StartWriting( void *pData, int nBytes, int iStartBit, int nBits )
+void bf_write::StartWriting( void *pData, intp nBytes, intp iStartBit, intp nBits )
 {
 	// Make sure it's dword aligned and padded.
 	Assert( (nBytes % 4) == 0 );
-	Assert(((uintp)pData & 3) == 0);
+	Assert( ((uintp)pData & 3) == 0);
 
 	// The writing code will overrun the end of the buffer if it isn't dword aligned, so truncate to force alignment
 	nBytes &= ~3;
@@ -199,7 +188,7 @@ void bf_write::SetDebugName( const char *pDebugName )
 }
 
 
-void bf_write::SeekToBit( int bitPos )
+void bf_write::SeekToBit( intp bitPos )
 {
 	m_iCurBit = bitPos;
 }
@@ -223,7 +212,7 @@ void bf_write::WriteSBitLong( int data, int numbits )
 void bf_write::WriteVarInt32( uint32 data )
 {
 	// Check if align and we have room, slow path if not
-	if ( (m_iCurBit & 7) == 0 && (m_iCurBit + bitbuf::kMaxVarint32Bytes * 8 ) <= m_nDataBits)
+	if ( (m_iCurBit & 7) == 0 && (m_iCurBit + (intp)bitbuf::kMaxVarint32Bytes * 8 ) <= m_nDataBits)
 	{
 		uint8 *target = ((uint8*)m_pData) + (m_iCurBit>>3);
 
@@ -798,23 +787,23 @@ bf_read::bf_read()
 	m_pDebugName = NULL;
 }
 
-bf_read::bf_read( const void *pData, int nBytes, int nBits )
+bf_read::bf_read( const void *pData, intp nBytes, intp nBits )
 {
 	m_bAssertOnOverflow = true;
 	StartReading( pData, nBytes, 0, nBits );
 }
 
-bf_read::bf_read( const char *pDebugName, const void *pData, int nBytes, int nBits )
+bf_read::bf_read( const char *pDebugName, const void *pData, intp nBytes, intp nBits )
 {
 	m_bAssertOnOverflow = true;
 	m_pDebugName = pDebugName;
 	StartReading( pData, nBytes, 0, nBits );
 }
 
-void bf_read::StartReading( const void *pData, int nBytes, int iStartBit, int nBits )
+void bf_read::StartReading( const void *pData, intp nBytes, intp iStartBit, intp nBits )
 {
 	// Make sure we're dword aligned.
-	Assert(((size_t)pData & 3) == 0);
+	Assert(((uintp)pData & 3) == 0);
 
 	m_pData = (unsigned char*)pData;
 	m_nDataBytes = nBytes;
@@ -1425,10 +1414,10 @@ char* bf_read::ReadAndAllocateString( bool *pOverflow )
 	return pRet;
 }
 
-void bf_read::ExciseBits( int startbit, int bitstoremove )
+void bf_read::ExciseBits( intp startbit, intp bitstoremove )
 {
-	int endbit = startbit + bitstoremove;
-	int remaining_to_end = m_nDataBits - endbit;
+	intp endbit = startbit + bitstoremove;
+	intp remaining_to_end = m_nDataBits - endbit;
 
 	bf_write temp;
 	temp.StartWriting( (void *)m_pData, m_nDataBits << 3, startbit );

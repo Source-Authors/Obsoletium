@@ -351,7 +351,7 @@ uint32 MurmurHash2( const void * key, int len, uint32 seed )
 	case 2: h ^= data[1] << 8;
 	case 1: h ^= data[0];
 		h *= m;
-	};
+	}
 
 	// Do a few final mixes of the hash to ensure the last few
 	// bytes are well-incorporated.
@@ -423,7 +423,7 @@ uint64 MurmurHash64( const void * key, int len, uint32 seed )
 	case 2: h2 ^= ((uint8*)data)[1] << 8;
 	case 1: h2 ^= ((uint8*)data)[0];
 			h2 *= m;
-	};
+	}
 
 	h1 ^= h2 >> 18; h1 *= m;
 	h2 ^= h1 >> 22; h2 *= m;

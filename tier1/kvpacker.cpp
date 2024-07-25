@@ -109,9 +109,9 @@ bool KVPacker::WriteAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 			}
 		case KeyValues::TYPE_WSTRING:
 			{
-				int nLength = dat->GetWString() ? Q_wcslen( dat->GetWString() ) : 0;
+				size_t nLength = dat->GetWString() ? wcslen( dat->GetWString() ) : 0;
 				buffer.PutShort( nLength );
-				for( int k = 0; k < nLength; ++ k )
+				for( size_t k = 0; k < nLength; ++ k )
 				{
 					buffer.PutShort( ( unsigned short ) dat->GetWString()[k] );
 				}
@@ -120,7 +120,7 @@ bool KVPacker::WriteAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 
 		case KeyValues::TYPE_INT:
 			{
-				buffer.PutInt( dat->GetInt() );				
+				buffer.PutInt( dat->GetInt() );
 				break;
 			}
 
@@ -146,7 +146,11 @@ bool KVPacker::WriteAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 			}
 		case KeyValues::TYPE_PTR:
 			{
-				buffer.PutUnsignedInt( (int)dat->GetPtr() );
+#ifdef PLATFORM_64BITS
+				buffer.PutUint64( (uint64)dat->GetPtr() );
+#else
+				buffer.PutUnsignedInt( (unsigned)dat->GetPtr() );
+#endif
 				break;
 			}
 
@@ -259,7 +263,11 @@ bool KVPacker::ReadAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 			}
 		case PACKTYPE_PTR:
 			{
+#ifdef PLATFORM_64BITS
+				dat->SetPtr( NULL, (void*)buffer.GetUint64() );
+#else
 				dat->SetPtr( NULL, (void*)buffer.GetUnsignedInt() );
+#endif
 				break;
 			}
 

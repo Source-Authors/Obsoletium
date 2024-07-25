@@ -20,7 +20,7 @@ KeyValuesJSONParser::KeyValuesJSONParser( const char *pszText, int cbSize )
 	Init( pszText, cbSize >= 0 ? cbSize : V_strlen(pszText) );
 }
 
-void KeyValuesJSONParser::Init( const char *pszText, int cbSize )
+void KeyValuesJSONParser::Init( const char *pszText, intp cbSize )
 {
 	m_szErrMsg[0] = '\0';
 	m_nLine = 1;

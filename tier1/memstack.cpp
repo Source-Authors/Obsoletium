@@ -10,9 +10,6 @@
 #include "winlite.h"
 #define VA_COMMIT_FLAGS MEM_COMMIT
 #define VA_RESERVE_FLAGS MEM_RESERVE
-#elif defined( _X360 )
-#define VA_COMMIT_FLAGS (MEM_COMMIT|MEM_NOZERO|MEM_LARGE_PAGES)
-#define VA_RESERVE_FLAGS (MEM_RESERVE|MEM_LARGE_PAGES)
 #endif
 
 #include "tier0/dbg.h"
@@ -31,16 +28,16 @@ MEMALLOC_DEFINE_EXTERNAL_TRACKING(CMemoryStack);
 //-----------------------------------------------------------------------------
 
 CMemoryStack::CMemoryStack()
- : 	m_pBase( NULL ),
-	m_pNextAlloc( NULL ),
-	m_pAllocLimit( NULL ),
+ : 	m_pNextAlloc( NULL ),
 	m_pCommitLimit( NULL ),
-	m_alignment( 16 ),
+	m_pAllocLimit( NULL ),
+	m_pBase( NULL ),
+ 	m_maxSize( 0 ),
+	m_alignment( 16 )
 #if defined(_WIN32)
- 	m_commitSize( 0 ),
-	m_minCommit( 0 ),
+ 	, m_commitSize( 0 )
+	, m_minCommit( 0 )
 #endif
- 	m_maxSize( 0 )
 {
 }
 	
@@ -54,13 +51,9 @@ CMemoryStack::~CMemoryStack()
 
 //-------------------------------------
 
-bool CMemoryStack::Init( unsigned maxSize, unsigned commitSize, unsigned initialCommit, unsigned alignment )
+bool CMemoryStack::Init( size_t maxSize, size_t commitSize, size_t initialCommit, size_t alignment )
 {
 	Assert( !m_pBase );
-
-#ifdef _X360
-	m_bPhysical = false;
-#endif
 
 	m_maxSize = maxSize;
 	m_alignment = AlignValue( alignment, 4 );
@@ -76,14 +69,10 @@ bool CMemoryStack::Init( unsigned maxSize, unsigned commitSize, unsigned initial
 
 	unsigned pageSize;
 
-#ifndef _X360
 	SYSTEM_INFO sysInfo;
 	GetNativeSystemInfo( &sysInfo );
 	Assert( !( sysInfo.dwPageSize & (sysInfo.dwPageSize-1)) );
 	pageSize = sysInfo.dwPageSize;
-#else
-	pageSize = 64*1024;
-#endif
 
 	if ( m_commitSize == 0 )
 	{
@@ -126,36 +115,6 @@ bool CMemoryStack::Init( unsigned maxSize, unsigned commitSize, unsigned initial
 
 //-------------------------------------
 
-#ifdef _X360
-bool CMemoryStack::InitPhysical( unsigned size, unsigned alignment )
-{
-	m_bPhysical = true;
-
-	m_maxSize = m_commitSize = size;
-	m_alignment = AlignValue( alignment, 4 );
-
-	int flags = PAGE_READWRITE;
-	if ( size >= 16*1024*1024 )
-	{
-		flags |= MEM_16MB_PAGES;
-	}
-	else
-	{
-		flags |= MEM_LARGE_PAGES;
-	}
-	m_pBase = (unsigned char *)XPhysicalAlloc( m_maxSize, MAXULONG_PTR, 4096, flags );
-	Assert( m_pBase );
-	m_pNextAlloc = m_pBase;
-	m_pCommitLimit = m_pBase + m_maxSize;
-	m_pAllocLimit = m_pBase + m_maxSize;
-
-	MemAlloc_RegisterExternalAllocation( CMemoryStack, GetBase(), GetSize() );
-	return ( m_pBase != NULL );
-}
-#endif
-
-//-------------------------------------
-
 void CMemoryStack::Term()
 {
 	FreeAll();
@@ -172,7 +131,7 @@ void CMemoryStack::Term()
 
 //-------------------------------------
 
-int CMemoryStack::GetSize()
+intp CMemoryStack::GetSize() const
 { 
 #ifdef _WIN32
 	return m_pCommitLimit - m_pBase; 
@@ -184,20 +143,16 @@ int CMemoryStack::GetSize()
 
 //-------------------------------------
 
-bool CMemoryStack::CommitTo( byte *pNextAlloc ) RESTRICT
+bool CMemoryStack::CommitTo( byte * RESTRICT pNextAlloc )
 {
-#ifdef _X360
-	if ( m_bPhysical )
-	{
-		return NULL;
-	}
-#endif
 #if defined(_WIN32)
 	unsigned char *	pNewCommitLimit = AlignValue( pNextAlloc, m_commitSize );
-	unsigned 		commitSize 		= pNewCommitLimit - m_pCommitLimit;
+	size_t 		commitSize 		= pNewCommitLimit - m_pCommitLimit;
 	
 	if ( GetSize() )
+	{
 		MemAlloc_RegisterExternalDeallocation( CMemoryStack, GetBase(), GetSize() );
+	}
 
 	if( m_pCommitLimit + commitSize > m_pAllocLimit )
 	{
@@ -212,7 +167,9 @@ bool CMemoryStack::CommitTo( byte *pNextAlloc ) RESTRICT
 	m_pCommitLimit = pNewCommitLimit;
 
 	if ( GetSize() )
+	{
 		MemAlloc_RegisterExternalAllocation( CMemoryStack, GetBase(), GetSize() );
+	}
 	return true;
 #else
 	Assert( 0 );
@@ -239,7 +196,7 @@ void CMemoryStack::FreeToAllocPoint( MemoryStackMark_t mark, bool bDecommit )
 				pDecommitPoint = m_pBase + m_minCommit;
 			}
 
-			unsigned decommitSize = m_pCommitLimit - pDecommitPoint;
+			size_t decommitSize = m_pCommitLimit - pDecommitPoint;
 
 			if ( decommitSize > 0 )
 			{
@@ -280,7 +237,7 @@ void CMemoryStack::FreeAll( bool bDecommit )
 
 //-------------------------------------
 
-void CMemoryStack::Access( void **ppRegion, unsigned *pBytes )
+void CMemoryStack::Access( void **ppRegion, size_t *pBytes )
 {
 	*ppRegion = m_pBase;
 	*pBytes = ( m_pNextAlloc - m_pBase);
@@ -288,10 +245,10 @@ void CMemoryStack::Access( void **ppRegion, unsigned *pBytes )
 
 //-------------------------------------
 
-void CMemoryStack::PrintContents()
+void CMemoryStack::PrintContents() const
 {
-	Msg( "Total used memory:      %d\n", GetUsed() );
-	Msg( "Total committed memory: %d\n", GetSize() );
+	Msg( "Total used memory:      %zd\n", GetUsed() );
+	Msg( "Total committed memory: %zd\n", GetSize() );
 }
 
 //-----------------------------------------------------------------------------

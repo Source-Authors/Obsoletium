@@ -24,7 +24,7 @@ public:
 	T& operator[]( const char *pString )
 	{
 		CUtlSymbol symbol = m_SymbolTable.AddString( pString );
-		int index = ( int )( UtlSymId_t )symbol;
+		intp index = ( intp )( UtlSymId_t )symbol;
 		if( m_Vector.Count() <= index )
 		{
 			m_Vector.EnsureCount( index + 1 );
@@ -60,7 +60,7 @@ public:
 		return UTL_INVAL_SYMBOL;
 	}
 
-	int GetNumStrings( void ) const
+	intp GetNumStrings( void ) const
 	{
 		return m_SymbolTable.GetNumStrings();
 	}

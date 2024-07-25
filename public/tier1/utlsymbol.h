@@ -91,7 +91,7 @@ class CUtlSymbolTable
 {
 public:
 	// constructor, destructor
-	CUtlSymbolTable( int growSize = 0, int initSize = 32, bool caseInsensitive = false );
+	CUtlSymbolTable( intp growSize = 0, intp initSize = 32, bool caseInsensitive = false );
 	~CUtlSymbolTable();
 	
 	// Finds and/or creates a symbol based on the string
@@ -106,7 +106,7 @@ public:
 	// Remove all symbols in the table.
 	void  RemoveAll();
 
-	int GetNumStrings( void ) const
+	intp GetNumStrings( void ) const
 	{
 		return m_Lookup.Count();
 	}
@@ -144,14 +144,14 @@ protected:
 	class CTree : public CUtlRBTree<CStringPoolIndex, unsigned short, CLess>
 	{
 	public:
-		CTree(  int growSize, int initSize ) : CUtlRBTree<CStringPoolIndex, unsigned short, CLess>( growSize, initSize ) {}
+		CTree(  intp growSize, intp initSize ) : CUtlRBTree<CStringPoolIndex, unsigned short, CLess>( growSize, initSize ) {}
 		friend class CUtlSymbolTable::CLess; // Needed to allow CLess to calculate pointer to symbol table
 	};
 
 	struct StringPool_t
 	{	
-		int m_TotalLen;		// How large is 
-		int m_SpaceUsed;
+		intp m_TotalLen;		// How large is 
+		intp m_SpaceUsed;
 		char m_Data[1];
 	};
 
@@ -163,7 +163,7 @@ protected:
 	CUtlVector<StringPool_t*> m_StringPools;
 
 private:
-	int FindPoolWithSpace( int len ) const;
+	intp FindPoolWithSpace( intp len ) const;
 	const char* StringFromIndex( const CStringPoolIndex &index ) const;
 
 	friend class CLess;
@@ -172,7 +172,7 @@ private:
 class CUtlSymbolTableMT : private CUtlSymbolTable
 {
 public:
-	CUtlSymbolTableMT( int growSize = 0, int initSize = 32, bool caseInsensitive = false )
+	CUtlSymbolTableMT( intp growSize = 0, intp initSize = 32, bool caseInsensitive = false )
 		: CUtlSymbolTable( growSize, initSize, caseInsensitive )
 	{
 	}
@@ -223,7 +223,7 @@ private:
 // The handle is a CUtlSymbol for the dirname and the same for the filename, the accessor
 //  copies them into a static char buffer for return.
 typedef void* FileNameHandle_t;
-#define FILENAMEHANDLE_INVALID 0
+#define FILENAMEHANDLE_INVALID nullptr
 
 // Symbol table for more efficiently storing filenames by breaking paths and filenames apart.
 // Refactored from BaseFileSystem.h
@@ -236,14 +236,23 @@ class CUtlFilenameSymbolTable
 	{
 		FileNameHandleInternal_t()
 		{
+			static_assert(sizeof(*this) == sizeof(void*));
+
 			path = 0;
 			file = 0;
 		}
 
+#ifdef PLATFORM_64BITS
+		// Part before the final '/' character
+		unsigned path;
+		// Part after the final '/', including extension
+		unsigned file;
+#else
 		// Part before the final '/' character
 		unsigned short path;
 		// Part after the final '/', including extension
 		unsigned short file;
+#endif
 	};
 
 	class HashTable;
@@ -253,8 +262,8 @@ public:
 	~CUtlFilenameSymbolTable();
 	FileNameHandle_t	FindOrAddFileName( const char *pFileName );
 	FileNameHandle_t	FindFileName( const char *pFileName );
-	int					PathIndex(const FileNameHandle_t &handle) { return (( const FileNameHandleInternal_t * )&handle)->path; }
-	bool				String( const FileNameHandle_t& handle, char *buf, int buflen );
+	intp					PathIndex(const FileNameHandle_t &handle) { return (( const FileNameHandleInternal_t * )&handle)->path; }
+	bool				String( const FileNameHandle_t& handle, char *buf, intp buflen );
 	void				RemoveAll();
 
 private:
