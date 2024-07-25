@@ -75,20 +75,20 @@ static char* _strptime(const char *s, const char *format, struct tm *tm) {
 		}
 
 		++format;
-		int len = 0;
+		intp len = 0;
 		switch (*format) {
 			// weekday name.
 	  case 'a':
 	  case 'A':
 		  tm->tm_wday = -1;
 		  for (int i = 0; i < 7; ++i) {
-			  len = static_cast<int>(strlen(kWeekAbbr[i]));
+			  len = V_strlen(kWeekAbbr[i]);
 			  if (V_strnicmp(kWeekAbbr[i], s, len) == 0) {
 				  tm->tm_wday = i;
 				  break;
 			  }
 
-			  len = static_cast<int>(strlen(kWeekFull[i]));
+			  len = V_strlen(kWeekFull[i]);
 			  if ( V_strnicmp(kWeekFull[i], s, len) == 0) {
 				  tm->tm_wday = i;
 				  break;
@@ -104,13 +104,13 @@ static char* _strptime(const char *s, const char *format, struct tm *tm) {
 	  case 'h':
 		  tm->tm_mon = -1;
 		  for (int i = 0; i < 12; ++i) {
-			  len = static_cast<int>(strlen(kMonthAbbr[i]));
+			  len = V_strlen(kMonthAbbr[i]);
 			  if ( V_strnicmp(kMonthAbbr[i], s, len) == 0) {
 				  tm->tm_mon = i;
 				  break;
 			  }
 
-			  len = static_cast<int>(strlen(kMonthFull[i]));
+			  len = V_strlen(kMonthFull[i]);
 			  if ( V_strnicmp(kMonthFull[i], s, len) == 0) {
 				  tm->tm_mon = i;
 				  break;
@@ -261,15 +261,15 @@ void CRTime::UpdateRealTime()
 		// frequently for logs.
 		SYSTEMTIME systemTimeLocal;
 		GetLocalTime( &systemTimeLocal );
-		GetTimeFormat( LOCALE_USER_DEFAULT, 0, &systemTimeLocal, "HH:mm:ss", sm_rgchLocalTimeCur, Q_ARRAYSIZE( sm_rgchLocalTimeCur ) );
-		GetDateFormat( LOCALE_USER_DEFAULT, 0, &systemTimeLocal, "MM/dd/yy", sm_rgchLocalDateCur, Q_ARRAYSIZE( sm_rgchLocalDateCur ) );
+		GetTimeFormat( LOCALE_USER_DEFAULT, 0, &systemTimeLocal, "HH:mm:ss", sm_rgchLocalTimeCur, ssize( sm_rgchLocalTimeCur ) );
+		GetDateFormat( LOCALE_USER_DEFAULT, 0, &systemTimeLocal, "MM/dd/yy", sm_rgchLocalDateCur, ssize( sm_rgchLocalDateCur ) );
 #elif defined(POSIX)
 		time_t now; 
 		time( &now );
 		struct tm tmStruct;
 		struct tm *localTime = Plat_gmtime( &now, &tmStruct );
-		strftime( sm_rgchLocalTimeCur, Q_ARRAYSIZE( sm_rgchLocalTimeCur ), "%H:%M:%S", localTime );
-		strftime( sm_rgchLocalDateCur, Q_ARRAYSIZE( sm_rgchLocalDateCur ), "%m/%d/%y", localTime );
+		strftime( sm_rgchLocalTimeCur, std::size( sm_rgchLocalTimeCur ), "%H:%M:%S", localTime );
+		strftime( sm_rgchLocalDateCur, std::size( sm_rgchLocalDateCur ), "%m/%d/%y", localTime );
 #else
 #error "Implement me"
 #endif
@@ -286,7 +286,7 @@ void CRTime::SetSystemClock( RTime32 rTime32Current )
 {
 #ifdef _WIN32
 	FILETIME fileTime;
-	SYSTEMTIME systemTime = {0};
+	SYSTEMTIME systemTime = {};
 	// convert from seconds since 1/1/1970 to filetime (100 nanoseconds since 1/1/1601) with this magic formula courtesy of MSDN
     uint64 ulTmp = ( ( (uint64) rTime32Current ) * 10 * k_nMillion ) + 116444736000000000;
 	fileTime.dwLowDateTime = (DWORD) ulTmp;
@@ -305,7 +305,7 @@ void CRTime::SetSystemClock( RTime32 rTime32Current )
 	// update our cached time
 	sm_nTimeCur = rTime32Current;
 #else
-	Assert( !"Not implemented" );
+	AssertMsg( false, "Not implemented" );
 #endif // _WIN32
 }
 
@@ -335,7 +335,7 @@ const char* CRTime::Render( const RTime32 rTime32, char (&buf)[k_RTimeRenderBuff
 	// The return value string contains exactly 26 characters and has the form:	Wed Jan 02 02:03:55 1980\n\0
 	time_t tTime = rTime32;
 	char pchTime[32];
-	if ( !Plat_ctime( &tTime, pchTime, Q_ARRAYSIZE( pchTime ) ) )
+	if ( !Plat_ctime( &tTime, pchTime, std::size( pchTime ) ) )
 		return 0;
 
 	// Remove '\n'
@@ -496,8 +496,8 @@ RTime32 CRTime::RTime32FromFmtString( const char *pchFmt, const char* pchValue )
 	Q_memset( &tm, 0x0, sizeof( tm ) );
 	Q_strncpy( rgchValue, pchValue, sizeof( rgchValue) );
 
-	int cchFmt = Q_strlen( pchFmt );		
-	int cchValue = Q_strlen( rgchValue );
+	intp cchFmt = Q_strlen( pchFmt );		
+	intp cchValue = Q_strlen( rgchValue );
 	if ( cchFmt != cchValue || cchFmt < 4 )
 	{
 		Assert( false );

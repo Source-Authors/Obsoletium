@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2004, Valve Corporation, All rights reserved. =======
+//====== Copyright 1996-2004, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -42,24 +42,24 @@ public:
 
 	//IMsgNetPacket
 
-	virtual EMsgFormatType GetEMsgFormatType() const OVERRIDE { return k_EMsgFormatTypeProtocolBuffer; }
-	virtual CNetPacket *GetCNetPacket() const OVERRIDE { return m_pNetPacket; }
-	virtual uint8 *PubData() const OVERRIDE { return m_pNetPacket->PubData(); }
-	virtual uint CubData() const OVERRIDE { return m_pNetPacket->CubData(); }
+	virtual EMsgFormatType GetEMsgFormatType() const override { return k_EMsgFormatTypeProtocolBuffer; }
+	virtual CNetPacket *GetCNetPacket() const override { return m_pNetPacket; }
+	virtual uint8 *PubData() const override { return m_pNetPacket->PubData(); }
+	virtual uint CubData() const override { return m_pNetPacket->CubData(); }
 
-	virtual MsgType_t GetEMsg() const OVERRIDE { return m_msgType; }
-	virtual JobID_t GetSourceJobID() const OVERRIDE { return m_pHeader->job_id_source(); }
-	virtual JobID_t GetTargetJobID() const OVERRIDE { return m_pHeader->job_id_target(); }
-	virtual void SetTargetJobID( JobID_t ulJobID ) OVERRIDE { m_pHeader->set_job_id_target( ulJobID ); }
+	virtual MsgType_t GetEMsg() const override { return m_msgType; }
+	virtual JobID_t GetSourceJobID() const override { return m_pHeader->job_id_source(); }
+	virtual JobID_t GetTargetJobID() const override { return m_pHeader->job_id_target(); }
+	virtual void SetTargetJobID( JobID_t ulJobID ) override { m_pHeader->set_job_id_target( ulJobID ); }
 
-	virtual CSteamID GetSteamID() const OVERRIDE { return m_steamID; }
-	virtual void SetSteamID( CSteamID steamID ) OVERRIDE { m_steamID = steamID; }
+	virtual CSteamID GetSteamID() const override { return m_steamID; }
+	virtual void SetSteamID( CSteamID steamID ) override { m_steamID = steamID; }
 
-	virtual AppId_t GetSourceAppID() const OVERRIDE { return m_pHeader->source_app_id(); };
-	virtual void SetSourceAppID( AppId_t appId ) OVERRIDE { m_pHeader->set_source_app_id( appId ); }
+	virtual AppId_t GetSourceAppID() const override { return m_pHeader->source_app_id(); };
+	virtual void SetSourceAppID( AppId_t appId ) override { m_pHeader->set_source_app_id( appId ); }
 
-	virtual bool BHasTargetJobName() const OVERRIDE { return m_pHeader->has_target_job_name(); }
-	virtual const char *GetTargetJobName() const OVERRIDE { return m_pHeader->target_job_name().c_str(); }
+	virtual bool BHasTargetJobName() const override { return m_pHeader->has_target_job_name(); }
+	virtual const char *GetTargetJobName() const override { return m_pHeader->target_job_name().c_str(); }
 
 
 	bool IsValid() const { return m_bIsValid; }
@@ -238,20 +238,20 @@ public:
 		}
 	}
 
-	virtual CUtlString GetName() OVERRIDE
+	virtual CUtlString GetName() override
 	{ 
 		return PB_OBJECT_TYPE::default_instance().GetTypeName().c_str(); 
 	}
 
 private:
-	virtual ::google::protobuf::Message *InternalAlloc()
+	::google::protobuf::Message *InternalAlloc() override
 	{
 		PB_OBJECT_TYPE *pObject = (PB_OBJECT_TYPE *)malloc( sizeof( PB_OBJECT_TYPE ) );
 		Construct( pObject );
 		return pObject;
 	}
 
-	virtual void InternalFree( google::protobuf::Message *pMsg )
+	void InternalFree( google::protobuf::Message *pMsg ) override
 	{
 		if ( NULL == pMsg )
 		{
@@ -303,7 +303,7 @@ public:
 	CProtoBufPtrMsg( google::protobuf::Message *pProto ) : m_pProtoBufBody( pProto )	{}
 
 private:
-	virtual google::protobuf::Message *GetGenericBody() const OVERRIDE { return m_pProtoBufBody; }
+	virtual google::protobuf::Message *GetGenericBody() const override { return m_pProtoBufBody; }
 
 	// Protobuf object for the message body
 	google::protobuf::Message *m_pProtoBufBody;
@@ -425,7 +425,7 @@ public:
 	const PB_OBJECT_TYPE &Body() const { return *m_pProtoBufBody; }
 
 private:
-	virtual google::protobuf::Message *GetGenericBody() const OVERRIDE { return m_pProtoBufBody; }
+	virtual google::protobuf::Message *GetGenericBody() const override { return m_pProtoBufBody; }
 
 	// Protobuf object for the message body
 	PB_OBJECT_TYPE *m_pProtoBufBody;

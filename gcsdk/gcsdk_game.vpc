@@ -18,7 +18,8 @@ $Configuration
 	{
 		//$PreprocessorDefinitions				"$BASE;STEAM"
 		$AdditionalIncludeDirectories			"$BASE;$SRCDIR\gcsdk\steamextra;..;..\public;..\public\gcsdk;$SRCDIR\thirdparty\JSON_parser;."
-		$PreprocessorDefinitions		"$BASE;TF" // Some steamextra files have tweaks unfortunately
+		$PreprocessorDefinitions		"$BASE;TF;HAVE_LONG_LONG=1" // Some steamextra files have tweaks unfortunately
+		$PreprocessorDefinitions		"$BASE;_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING=1" [$VS2015]
 		$Create/UsePrecompiledHeader			"Use Precompiled Header (/Yu)"
 		$AdditionalOptions				"$BASE /YlGCSDK_PCH_Symbol"
 	}
@@ -132,7 +133,7 @@ $Project "gcsdk"
 		$File "steamextra\gamecoordinator\igamecoordinatorhost.h"
 		$File "steamextra\gamecoordinator\igcsqlquery.h"
 		$File "steamextra\gamecoordinator\igcsqlresultsetlist.h"
-		$File "steamextra\steam\isteamgamecoordinator.h"
+		$File "$SRCDIR\public\steam\isteamgamecoordinator.h"
 		$File "steamextra\tier0\t0constants.h"
 		$File "steamextra\tier1\pearsonshash.h"
 		$File "steamextra\tier1\tsmempool.h"

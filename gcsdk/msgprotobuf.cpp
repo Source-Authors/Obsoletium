@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2004, Valve Corporation, All rights reserved. =======
+//====== Copyright 1996-2004, Valve Corporation, All rights reserved. =======
 //
 // Purpose:
 //
@@ -37,7 +37,7 @@ CThreadMutex CProtoBufMsgBase::s_PoolRegMutex;
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
 CProtoBufNetPacket::CProtoBufNetPacket( CNetPacket *pNetPacket, GCProtoBufMsgSrc eMsgSrc, const CSteamID steamID, uint32 nGCDirIndex, MsgType_t msgType )
-	: m_msgType( msgType ), m_steamID( steamID ), m_bIsValid( false )
+	: m_steamID( steamID ), m_msgType( msgType ), m_bIsValid( false )
 {
 #ifdef VALVE_BIG_ENDIAN
 	ProtoBufMsgHeader_t * pHdr = (ProtoBufMsgHeader_t *)pNetPacket->PubData();
@@ -300,8 +300,8 @@ void CProtoBufMsgMemoryPoolMgr::DumpPoolInfo()
 //-----------------------------------------------------------------------------
 CProtoBufMsgBase::CProtoBufMsgBase()
 	: m_pNetPacket( NULL )
-	, m_eMsg( 0 )
 	, m_pProtoBufHdr( NULL )
+	, m_eMsg( 0 )
 { 
 }
 
@@ -311,8 +311,8 @@ CProtoBufMsgBase::CProtoBufMsgBase()
 //-----------------------------------------------------------------------------
 CProtoBufMsgBase::CProtoBufMsgBase( MsgType_t eMsg )
 	: m_pNetPacket( NULL )
-	, m_eMsg( eMsg )
 	, m_pProtoBufHdr( NULL )
+	, m_eMsg( eMsg )
 { 
 	m_pProtoBufHdr = GProtoBufMsgMemoryPoolMgr()->AllocProtoBufHdr();
 }

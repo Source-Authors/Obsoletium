@@ -455,7 +455,6 @@ public:
 
 private:
 	CLock *m_pLock;
-	CJob *m_pJob;
 };
 
 } // namespace GCSDK

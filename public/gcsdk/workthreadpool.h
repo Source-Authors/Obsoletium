@@ -50,33 +50,33 @@ class CWorkItem : public CRefCount
 {
 public:
 	CWorkItem()
-	:	m_JobID( k_GIDNil ),
-		m_bRunning( false ),
+	:	m_ulSequenceNumber( 0 ),
 		m_bResubmit( false ),
+		m_bRunning( false ),
 		m_bCanceled( false ),
-		m_ulSequenceNumber( 0 )
+		m_JobID( k_GIDNil )
 	{
 		m_jobtimeTimeout.SetLTime( 0 );
 		m_jobtimeQueued.SetToJobTime();
 	}
 	
-	CWorkItem( JobID_t jobID )	
-	:	m_JobID( jobID ),
-		m_bRunning( false ),
+	CWorkItem( JobID_t jobID )
+	:	m_ulSequenceNumber( 0 ),
 		m_bResubmit( false ),
+		m_bRunning( false ),
 		m_bCanceled( false ),
-		m_ulSequenceNumber( 0 )
+		m_JobID( jobID )
 	{
 		m_jobtimeTimeout.SetLTime( 0 );
 		m_jobtimeQueued.SetToJobTime();
 	}
 
 	CWorkItem( JobID_t jobID, int64 cTimeoutMicroseconds )
-	:	m_JobID( jobID ),
-		m_bRunning( false ),
+	:	m_ulSequenceNumber( 0 ),
 		m_bResubmit( false ),
+		m_bRunning( false ),
 		m_bCanceled( false ),
-		m_ulSequenceNumber( 0 )
+		m_JobID( jobID )
 	{
 		SetPreExecuteTimeout( cTimeoutMicroseconds );
 		m_jobtimeQueued.SetToJobTime();
@@ -243,7 +243,7 @@ public:
 
 	void AllowTimeouts( bool bMayHaveJobTimeouts ) { m_bMayHaveJobTimeouts = bMayHaveJobTimeouts; }
 
-	int AddWorkThread( CWorkThread *pThread );
+	intp AddWorkThread( CWorkThread *pThread );
 	void StartWorkThreads();										// gentlemen, start your engines
 	void StopWorkThreads();											// stop work threads
 	bool HasWorkItemsToProcess() const;

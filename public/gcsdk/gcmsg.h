@@ -95,7 +95,7 @@ public:
 	void SetSteamID( CSteamID steamID )  { m_pHeader->m_ulSteamID = steamID.ConvertToUint64(); }
 
 	AppId_t GetSourceAppID() const { return k_uAppIdInvalid; }
-	void SetSourceAppID( AppId_t appId ) {}
+	void SetSourceAppID( AppId_t ) {}
 
 	// Routing to a job name is not permitted with the old packet format
 	virtual bool BHasTargetJobName() const { return false; }

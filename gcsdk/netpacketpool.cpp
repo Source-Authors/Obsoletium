@@ -29,7 +29,7 @@ static const CThreadSafeMultiMemoryPool::MemPoolConfig_t s_MemPoolConfigAllocSiz
 	{ 16384, 4 },
 	{ 64*1024, 4 }
 };
-CThreadSafeMultiMemoryPool g_MemPoolMsg( s_MemPoolConfigAllocSize, Q_ARRAYSIZE(s_MemPoolConfigAllocSize), UTLMEMORYPOOL_GROW_FAST );
+CThreadSafeMultiMemoryPool g_MemPoolMsg( s_MemPoolConfigAllocSize, ssize(s_MemPoolConfigAllocSize), UTLMEMORYPOOL_GROW_FAST );
 
 // hacky global
 int g_cNetPacket = 0;

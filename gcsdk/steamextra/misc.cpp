@@ -16,9 +16,9 @@
 //-----------------------------------------------------------------------------
 bool IsVTTAccountName( const char *szAccountName )
 {
-	const static char *k_szCafe = "valvecafepc";
+	const char k_szCafe[]{"valvecafepc"};
 
-	if ( 0 == Q_strncmp( szAccountName, k_szCafe, Q_strlen( k_szCafe ) ) )
+	if ( 0 == Q_strncmp( szAccountName, k_szCafe, ssize( k_szCafe ) - 1 ) )
 		return true;
 	return false;
 }
