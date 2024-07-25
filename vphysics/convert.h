@@ -128,7 +128,7 @@ inline void ConvertAngularImpulseToIVP( const AngularImpulse &in, IVP_U_Float_Po
 }
 
 
-constexpr inline float ConvertDistanceToIVP( float distance )
+const inline float ConvertDistanceToIVP( float distance )
 {
 	return HL2IVP( distance );
 }

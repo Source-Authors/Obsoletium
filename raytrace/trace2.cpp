@@ -3,22 +3,12 @@
 #include "raytrace.h"
 #include <mathlib/halton.h>
 
-static uint32 MapDistanceToPixel(float t)
-{
-	if (t<0) return 0xffff0000;
-	if (t>100) return 0xff000000;
-	int a=t*1000; a&=0xff;
-	int b=t*10; b &=0xff;
-	int c=t*.01; c &=0xff;
-	return 0xff000000+(a<<16)+(b<<8)+c;
-}
-
-#define IGAMMA (1.0/2.2)
+#define IGAMMA (1.0f/2.2f)
 
 #define MAGIC_NUMBER (1<<23)
 
 static fltx4 Four_MagicNumbers={ MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
-static alignas(16) int32 Four_255s[4] = { 0xff,0xff,0xff,0xff };
+alignas(16) static int32 Four_255s[4] = { 0xff,0xff,0xff,0xff };
 #define PIXMASK ( * ( reinterpret_cast< fltx4 *>( &Four_255s ) ) )
 
 void MapLinearIntensities(FourVectors const &intens,uint32 *p1, uint32 *p2, uint32 *p3, uint32 *p4)
@@ -43,10 +33,11 @@ void MapLinearIntensities(FourVectors const &intens,uint32 *p1, uint32 *p2, uint
 	*(p4)=(SubInt(r, 3))|(SubInt(g, 3)<<8)|(SubInt(b, 3)<<16);
 }
 
-static alignas(16) uint32 signmask[4]={0x80000000,0x80000000,0x80000000,0x80000000};
-static alignas(16) int32 all_ones[4]={-1,-1,-1,-1};
+alignas(16) static uint32 signmask[4]={0x80000000,0x80000000,0x80000000,0x80000000};
+// dimhtotepus: Comment unused
+// alignas(16) static int32 all_ones[4]={-1,-1,-1,-1};
 static fltx4 all_zeros={0,0,0,0};
-static fltx4 TraceLimit={1.0e20,1.0e20,1.0e20,1.0e20};
+static fltx4 TraceLimit={1.0e20f,1.0e20f,1.0e20f,1.0e20f};
 
 void RayTracingEnvironment::RenderScene(
 	int width, int height,								   // width and height of desired rendering
@@ -67,8 +58,9 @@ void RayTracingEnvironment::RenderScene(
 	Vector dxvectortimes2=dxvector;
 	dxvectortimes2+=dxvector;
 
-	Vector dyvector=LLCorner;
-	dyvector-=ULCorner;
+	// dimhotepus: Fix y delta computation.
+	Vector dyvector=LRCorner;
+	dyvector-=LLCorner;
 	dyvector*=(1.0f/height);
 
 
@@ -137,7 +129,7 @@ void RayTracingEnvironment::RenderScene(
 					case DIRECT_LIGHTING:
 					{
 						// light all points
-						for(int l=0;l<LightList.Count();l++)
+						for(intp l=0;l<LightList.Count();l++)
 						{
 							LightList[l].ComputeLightAtPoints(surface_pos,rslt.surface_normal,
 															  intens);
@@ -148,7 +140,7 @@ void RayTracingEnvironment::RenderScene(
 					case DIRECT_LIGHTING_WITH_SHADOWS:
 					{
 						// light all points
-						for(int l=0;l<LightList.Count();l++)
+						for(intp l=0;l<LightList.Count();l++)
 						{
 							FourVectors ldir;
 							ldir.DuplicateVector(LightList[l].m_Position);
@@ -159,7 +151,7 @@ void RayTracingEnvironment::RenderScene(
 							//FourRays myrays;
 							myrays.origin=surface_pos;
 							FourVectors epsilon=ldir;
-							epsilon*=0.01;
+							epsilon*=0.01f;
 							myrays.origin+=epsilon;
 							myrays.direction=ldir;
 							RayTracingResult shadowtest;
@@ -203,13 +195,13 @@ void RayTracingEnvironment::RenderScene(
 
 void RayTracingEnvironment::ComputeVirtualLightSources(void)
 {
-	int start_pos=0;
+	intp start_pos=0;
 	for(int b=0;b<3;b++)
 	{
-		int nl=LightList.Count();
-		int where_to_start=start_pos;
+		intp nl=LightList.Count();
+		intp where_to_start=start_pos;
 		start_pos=nl;
-		for(int l=where_to_start;l<nl;l++)
+		for(intp l=where_to_start;l<nl;l++)
 		{
 			DirectionalSampler_t sample_generator;
 			int n_desired=1*LightList[l].m_Color.Length();
@@ -225,7 +217,7 @@ void RayTracingEnvironment::ComputeVirtualLightSources(void)
 				if (li.IsDirectionWithinLightCone(trial_dir))
 				{
 					myrays.direction.DuplicateVector(trial_dir);
-					Trace4Rays(myrays,all_zeros,ReplicateX4(1000.0), &rslt);
+					Trace4Rays(myrays,all_zeros,ReplicateX4(1000.0f), &rslt);
 					if ((rslt.HitIds[0]!=-1))
 					{
 						// make sure normal points back towards ray origin
@@ -244,7 +236,7 @@ void RayTracingEnvironment::ComputeVirtualLightSources(void)
 						// and its radius scaled by the amount of the solid angle this probe
 						// represents.
 						float area_of_virtual_light=
-							4.0f*M_PI_F*Square( SubFloat( rslt.HitDistance, 0 ) )*(1.0/n_desired);
+							4.0f*M_PI_F*Square( SubFloat( rslt.HitDistance, 0 ) )*(1.0f/n_desired);
 
 						FourVectors intens;
 						intens.DuplicateVector(Vector(0,0,0));
@@ -253,7 +245,7 @@ void RayTracingEnvironment::ComputeVirtualLightSources(void)
 						surface_pos*=rslt.HitDistance;
 						surface_pos+=myrays.origin;
 						FourVectors delta=rslt.surface_normal;
-						delta*=0.1;
+						delta*=0.1f;
 						surface_pos+=delta;
 						LightList[l].ComputeLightAtPoints(surface_pos,rslt.surface_normal,
 														  intens);
@@ -269,14 +261,14 @@ void RayTracingEnvironment::ComputeVirtualLightSources(void)
 						l1.m_Color=Vector(intens.X(0),intens.Y(0),intens.Z(0));
 						if (l1.m_Color.Length()>0)
 						{
-							l1.m_Color*=area_of_virtual_light/M_PI;
-							l1.m_Range=0.0;
-							l1.m_Falloff=1.0;
-							l1.m_Attenuation0=1.0;
-							l1.m_Attenuation1=0.0;
-							l1.m_Attenuation2=1.0;			// intens falls off as 1/r^2
+							l1.m_Color*=area_of_virtual_light/M_PI_F;
+							l1.m_Range=0.0f;
+							l1.m_Falloff=1.0f;
+							l1.m_Attenuation0=1.0f;
+							l1.m_Attenuation1=0.0f;
+							l1.m_Attenuation2=1.0f;			// intens falls off as 1/r^2
 							l1.m_Theta=0;
-							l1.m_Phi=M_PI;
+							l1.m_Phi=M_PI_F;
 							l1.RecalculateDerivedValues();
 							LightList.AddToTail(l1);
 						}

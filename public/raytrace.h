@@ -241,6 +241,7 @@ public:
 	{
 		memset(PendingStreamOutputs,0,sizeof(PendingStreamOutputs));
 		memset(n_in_stream,0,sizeof(n_in_stream));
+		memset(PendingRays,0,sizeof(PendingRays));
 	}
 };
 
@@ -274,6 +275,8 @@ public:
 	{
 		BackgroundColor.DuplicateVector(Vector(1,0,0));		// red
 		Flags=0;
+		m_MinBound = vec3_invalid;
+		m_MaxBound = vec3_invalid;
 	}
 
 
