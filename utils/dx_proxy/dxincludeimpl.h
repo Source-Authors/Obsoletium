@@ -1,52 +1,46 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-// $NoKeywords: $
-//
-//=============================================================================//
 
-#ifndef DXINCLUDEIMPL_H
-#define DXINCLUDEIMPL_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SRC_UTILS_DX_PROXY_DXINCLUDEIMPL_H_
+#define SRC_UTILS_DX_PROXY_DXINCLUDEIMPL_H_
 
-FileCache s_incFileCache;
+#include <d3dcompiler.h>
 
-struct DxIncludeImpl : public ID3DXInclude
-{
-	STDMETHOD(Open)(THIS_ D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
-	{
-		CachedFileData *pFileData = s_incFileCache.Get( pFileName );
-		if ( !pFileData || !pFileData->IsValid() )
-			return E_FAIL;
-		
-		*ppData = pFileData->GetDataPtr();
-		*pBytes = pFileData->GetDataLen();
+#include "filememcache.h"
 
-		pFileData->UpdateRefCount( +1 );
+namespace se::dx_proxy {
 
-		return S_OK;
-	}
+class D3DIncludeImpl : public ID3DInclude {
+ public:
+  STDMETHOD(Open)
+  (THIS_ D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData,
+   LPCVOID *ppData, UINT *pBytes) override {
+    CachedFileData *data = file_cache_.Get(pFileName);
+    if (data && data->IsValid()) {
+      *ppData = data->GetDataPtr();
+      *pBytes = data->GetDataLen();
 
-	STDMETHOD(Open)(THIS_ D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData,
-		LPCVOID *ppData, UINT *pBytes,
-		/* OUT */ LPSTR pFullPath, DWORD cbFullPath)
-	{
-		if ( pFullPath && cbFullPath ) strncpy( pFullPath, pFileName, cbFullPath );
-		return Open( IncludeType, pFileName, pParentData, ppData, pBytes );
-	}
-	
-	STDMETHOD(Close)(THIS_ LPCVOID pData)
-	{
-		if ( CachedFileData *pFileData = CachedFileData::GetByDataPtr( pData ) )
-			pFileData->UpdateRefCount( -1 );
+      data->AddRef();
 
-		return S_OK;
-	}
+      return S_OK;
+    }
+
+    return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
+  }
+
+  STDMETHOD(Close)(THIS_ LPCVOID pData) override {
+    if (CachedFileData *data = CachedFileData::GetByDataPtr(pData)) {
+      data->Release();
+    }
+
+    return S_OK;
+  }
+
+ private:
+  FileCache file_cache_;
 };
 
-DxIncludeImpl s_incDxImpl;
+}  // namespace se::dx_proxy
 
-#endif // #ifndef DXINCLUDEIMPL_H
+#endif  // !SRC_UTILS_DX_PROXY_DXINCLUDEIMPL_H_

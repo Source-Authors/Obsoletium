@@ -291,7 +291,7 @@ void	OpenBSPFile( const char *filename );
 void	CloseBSPFile(void);
 void	LoadBSPFile( const char *filename );
 void	LoadBSPFile_FileSystemOnly( const char *filename );
-void	LoadBSPFileTexinfo( const char *filename );
+bool	LoadBSPFileTexinfo( const char *filename );
 void	WriteBSPFile( const char *filename, char *pUnused = NULL );
 void	PrintBSPFileSizes(void);
 void	PrintBSPPackDirectory(void);

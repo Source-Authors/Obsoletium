@@ -4,24 +4,25 @@
 //
 //=============================================================================//
 
-#include <windows.h>
+#include "winlite.h"
+
 #include <conio.h>
 #include <io.h>
+#include "posix_file_stream.h"
 #include "vmpi.h"
 #include "vmpi_distribute_work.h"
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
-#include "utlvector.h"
-#include "utllinkedlist.h"
+#include "tier1/utlvector.h"
+#include "tier1/utllinkedlist.h"
 
 
 #define EVENT_TYPE_SEND_WORK_UNIT	0
 #define EVENT_TYPE_WU_STARTED		1
 #define EVENT_TYPE_WU_COMPLETED		2
 
-class CWorkUnitEvent
+struct CWorkUnitEvent
 {
-public:
 	int m_iEventType;	// EVENT_TYPE_ define.
 	int m_iWorker;
 	double m_flTime;
@@ -99,7 +100,7 @@ public:
 								// 1 = sent, 2 = sent recently
 								// 3 = done, 4 = done recently
 								// 5 = started, 6 = started recently
-	float m_flTransitionTime;
+	double m_flTransitionTime;
 };
 CUtlVector<CWUStatus> g_WUStatus;
 int g_nChanges = 0;
@@ -157,14 +158,14 @@ static LRESULT CALLBACK TrackerWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, 
 			g_LastSizeY = height;
 			
 			// Figure out the rectangles for everything.
-			int nWorkUnits = g_WUStatus.Count();
+			ptrdiff_t nWorkUnits = g_WUStatus.Count();
 			
 			// What is the max width of the grid elements so they will fit in the width and height.
 			int testSize;
 			for ( testSize=20; testSize > 1; testSize-- )
 			{
-				int nX = width / testSize;
-				int nY = height / testSize;
+				ptrdiff_t nX = width / testSize;
+				ptrdiff_t nY = height / testSize;
 				if ( nX * nY >= nWorkUnits )
 					break;
 			}
@@ -200,10 +201,8 @@ static void CheckFlashTimers()
 	EnterCriticalSection( &g_CS );
 
 	// Check timers for the events that just happened (we show them in a brighter color if they just occurred).
-	for ( int iWU=0; iWU < g_WUStatus.Count(); iWU++ )
+	for ( auto &s : g_WUStatus )
 	{
-		CWUStatus &s = g_WUStatus[iWU];
-		
 		if ( s.m_iState == 2 || s.m_iState == 4 || s.m_iState == 6 )
 		{
 			if ( flCurTime > s.m_flTransitionTime )
@@ -276,7 +275,7 @@ static DWORD WINAPI ThreadProc( LPVOID lpParameter )
 
 static void Graphical_Start()
 {
-	g_bUseGraphics = VMPI_IsParamUsed( mpi_Graphics );
+	g_bUseGraphics = VMPI_IsParamUsed( EVMPICmdLineParam::mpi_Graphics );
 	if ( !g_bUseGraphics )
 		return;
 	
@@ -313,7 +312,7 @@ static void Graphical_WorkUnitSentToWorker( int iWorkUnit )
 	if ( s.m_iState != 3 && s.m_iState != 4 && s.m_iState != 5 && s.m_iState != 6 )
 	{
 		s.m_iState = 2;
-		s.m_flTransitionTime = Plat_FloatTime() + 0.1f;
+		s.m_flTransitionTime = Plat_FloatTime() + 0.1;
 		++g_nChanges;
 	}
 	
@@ -330,7 +329,7 @@ static void Graphical_WorkUnitStarted( int iWorkUnit )
 	if ( g_WUStatus[iWorkUnit].m_iState != 3 && g_WUStatus[iWorkUnit].m_iState != 4 )
 	{
 		g_WUStatus[iWorkUnit].m_iState = 6;
-		g_WUStatus[iWorkUnit].m_flTransitionTime = Plat_FloatTime() + 0.1f;
+		g_WUStatus[iWorkUnit].m_flTransitionTime = Plat_FloatTime() + 0.1;
 		++g_nChanges;
 	}
 	
@@ -344,7 +343,7 @@ static void Graphical_WorkUnitCompleted( int iWorkUnit )
 		
 	EnterCriticalSection( &g_CS );
 	g_WUStatus[iWorkUnit].m_iState = 4;
-	g_WUStatus[iWorkUnit].m_flTransitionTime = Plat_FloatTime() + 0.1f;
+	g_WUStatus[iWorkUnit].m_flTransitionTime = Plat_FloatTime() + 0.1;
 	++g_nChanges;
 	LeaveCriticalSection( &g_CS );
 }
@@ -365,7 +364,7 @@ static void Graphical_End()
 
 void VMPITracker_Start( int nWorkUnits )
 {
-	g_bTrackWorkUnitEvents = (VMPI_IsParamUsed( mpi_TrackEvents ) || VMPI_IsParamUsed( mpi_Graphics ));
+	g_bTrackWorkUnitEvents = (VMPI_IsParamUsed( EVMPICmdLineParam::mpi_TrackEvents ) || VMPI_IsParamUsed( EVMPICmdLineParam::mpi_Graphics ));
 	g_flJobStartTime = Plat_FloatTime();
 	g_WorkUnits.Purge();
 
@@ -433,61 +432,57 @@ void VMPITracker_End()
 
 bool VMPITracker_WriteDebugFile( const char *pFilename )
 {
-	FILE *fp = fopen( pFilename, "wt" );
-	if ( fp )
+	auto [fp, errc] = se::posix::posix_file_stream_factory::open( pFilename, "wt" );
+	if ( !errc )
 	{
-		fprintf( fp, "# work units: %d\n", g_WorkUnits.Count() );
-		fprintf( fp, "# active work units: %d\n", CountActiveWorkUnits() );
+		fp.print( "# work units: %zd\n", g_WorkUnits.Count() );
+		fp.print( "# active work units: %d\n", CountActiveWorkUnits() );
 		
-		fprintf( fp, "\n" );
-		fprintf( fp, "--- Events ---" );
-		fprintf( fp, "\n" );
-		fprintf( fp, "\n" );
+		fp.print( "\n" );
+		fp.print( "--- Events ---" );
+		fp.print( "\n" );
+		fp.print( "\n" );
 		
-		for ( int i=0; i < g_WorkUnits.Count(); i++ )
+		ptrdiff_t i{0};
+		for ( auto &wu : g_WorkUnits )
 		{
-			CWorkUnit *wu = &g_WorkUnits[i];
-			
-			if ( wu->m_iWorkerCompleted != -1 )
+			if ( wu.m_iWorkerCompleted != -1 )
 				continue;
 
-			fprintf( fp, "  work unit %d\n", i );
-			fprintf( fp, "\n" );
+			fp.print( "  work unit %d\n", i++ );
+			fp.print( "\n" );
 						
-			if ( wu->m_Events.Count() == 0 )
+			if ( wu.m_Events.Count() == 0 )
 			{
-				fprintf( fp, "    *no events*\n" );
+				fp.print( "    *no events*\n" );
 			}
 			else
 			{
-				for ( int iEvent=0; iEvent < wu->m_Events.Count(); iEvent++ )
+				for ( auto &event : wu.m_Events )
 				{
-					CWorkUnitEvent *pEvent = &wu->m_Events[iEvent];
-					
-					if ( pEvent->m_iEventType == EVENT_TYPE_WU_STARTED )
+					if ( event.m_iEventType == EVENT_TYPE_WU_STARTED )
 					{
-						fprintf( fp, "   started (by worker %s) %.1f seconds ago\n", 
-							VMPI_GetMachineName( wu->m_Events[iEvent].m_iWorker ),
-							Plat_FloatTime() - wu->m_Events[iEvent].m_flTime );
+						fp.print( "   started (by worker %s) %.1f seconds ago\n", 
+							VMPI_GetMachineName( event.m_iWorker ),
+							Plat_FloatTime() - event.m_flTime );
 					}
-					else if ( pEvent->m_iEventType == EVENT_TYPE_SEND_WORK_UNIT )
+					else if ( event.m_iEventType == EVENT_TYPE_SEND_WORK_UNIT )
 					{
-						fprintf( fp, "      sent (to worker %s) %.1f seconds ago\n", 
-							VMPI_GetMachineName( wu->m_Events[iEvent].m_iWorker ),
-							Plat_FloatTime() - wu->m_Events[iEvent].m_flTime );
+						fp.print( "      sent (to worker %s) %.1f seconds ago\n", 
+							VMPI_GetMachineName( event.m_iWorker ),
+							Plat_FloatTime() - event.m_flTime );
 					}
-					else if ( pEvent->m_iEventType == EVENT_TYPE_WU_COMPLETED )
+					else if ( event.m_iEventType == EVENT_TYPE_WU_COMPLETED )
 					{
-						fprintf( fp, " completed (by worker %s) %.1f seconds ago\n", 
-							VMPI_GetMachineName( wu->m_Events[iEvent].m_iWorker ),
-							Plat_FloatTime() - wu->m_Events[iEvent].m_flTime );
+						fp.print( " completed (by worker %s) %.1f seconds ago\n", 
+							VMPI_GetMachineName( event.m_iWorker ),
+							Plat_FloatTime() - event.m_flTime );
 					}
 				}
 			}
-			fprintf( fp, "\n" );
+			fp.print( "\n" );
 		}
 		
-		fclose( fp );
 		return true;
 	}
 	else

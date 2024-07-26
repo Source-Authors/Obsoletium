@@ -1,117 +1,100 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
 // Purpose: Command sink interface implementation.
 //
-// $NoKeywords: $
-//
-//=============================================================================//
 
-#ifndef CMDSINK_H
-#define CMDSINK_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SRC_UTILS_SHADERCOMPILE_CMDSINK_H_
+#define SRC_UTILS_SHADERCOMPILE_CMDSINK_H_
 
-#include <stdio.h>
-#include <tier1/utlbuffer.h>
+#include <cstdio>
+#include "tier1/utlbuffer.h"
 
+namespace se::shader_compile::command_sink {
 
-namespace CmdSink
-{
+/**
+ * @brief Interface to give back command execution results.
+ */
+struct IResponse {
+  virtual ~IResponse() = default;
+  virtual void Release() { delete this; }
 
-/*
+  // Returns whether the command succeeded
+  virtual bool Succeeded() const = 0;
 
-struct IResponse
+  // If the command succeeded returns the result buffer length, otherwise zero
+  virtual size_t GetResultBufferLen() = 0;
 
-Interface to give back command execution results.
+  // If the command succeeded returns the result buffer base pointer, otherwise
+  // NULL
+  virtual const void *GetResultBuffer() = 0;
 
-*/
-struct IResponse
-{
-	virtual ~IResponse( void ) {}
-	virtual void Release( void ) { delete this; }
-
-	// Returns whether the command succeeded
-	virtual bool Succeeded( void ) = 0;
-
-	// If the command succeeded returns the result buffer length, otherwise zero
-	virtual size_t GetResultBufferLen( void ) = 0;
-	// If the command succeeded returns the result buffer base pointer, otherwise NULL
-	virtual const void * GetResultBuffer( void ) = 0;
-
-	// Returns a zero-terminated string of messages reported during command execution, or NULL if nothing was reported
-	virtual const char * GetListing( void ) = 0;
+  // Returns a zero-terminated string of messages reported during command
+  // execution, or NULL if nothing was reported
+  virtual const char *GetListing() = 0;
 };
 
+/**
+ * @brief Response implementation when the result should appear in one file and
+ * the listing should appear in another file.
+ */
+class CResponseFiles final : public IResponse {
+ public:
+  CResponseFiles(char const *szFileResult, char const *szFileListing);
+  virtual ~CResponseFiles();
 
+  // Returns whether the command succeeded
+  bool Succeeded() const override;
 
+  // If the command succeeded returns the result buffer length, otherwise zero
+  size_t GetResultBufferLen() override;
 
-/*
+  // If the command succeeded returns the result buffer base pointer, otherwise
+  // NULL
+  const void *GetResultBuffer() override;
 
-Response implementation when the result should appear in
-one file and the listing should appear in another file.
+  // Returns a zero-terminated string of messages reported during command
+  // execution
+  const char *GetListing() override;
 
-*/
-class CResponseFiles : public IResponse
-{
-public:
-	explicit CResponseFiles( char const *szFileResult, char const *szFileListing );
-	~CResponseFiles( void );
+ protected:
+  void OpenResultFile() const;  //!< Opens the result file if not open yet
+  void ReadResultFile();        //!< Reads the result buffer if not read yet
+  void ReadListingFile();       //!< Reads the listing buffer if not read yet
 
-public:
-	// Returns whether the command succeeded
-	virtual bool Succeeded( void );
+ protected:
+  char m_szFileResult[MAX_PATH];   //!< Name of the result file
+  char m_szFileListing[MAX_PATH];  //!< Name of the listing file
 
-	// If the command succeeded returns the result buffer length, otherwise zero
-	virtual size_t GetResultBufferLen( void );
-	// If the command succeeded returns the result buffer base pointer, otherwise NULL
-	virtual const void * GetResultBuffer( void );
+  mutable FILE *m_fResult;  //!< Result file (NULL if not open)
+  FILE *m_fListing;         //!< Listing file (NULL if not open)
 
-	// Returns a zero-terminated string of messages reported during command execution
-	virtual const char * GetListing( void );
+  CUtlBuffer m_bufResult;  //!< Buffer holding the result data
+  size_t m_lenResult;      //!< Result data length (0 if result not read yet)
 
-protected:
-	void OpenResultFile( void );		//!< Opens the result file if not open yet
-	void ReadResultFile( void );		//!< Reads the result buffer if not read yet
-	void ReadListingFile( void );		//!< Reads the listing buffer if not read yet
+  //!< Data buffer pointer (NULL if result not read yet)
+  const void *m_dataResult;
 
-protected:
-	char m_szFileResult[MAX_PATH];		//!< Name of the result file
-	char m_szFileListing[MAX_PATH];		//!< Name of the listing file
+  CUtlBuffer m_bufListing;  //!< Buffer holding the listing
 
-	FILE *m_fResult;					//!< Result file (NULL if not open)
-	FILE *m_fListing;					//!< Listing file (NULL if not open)
-
-	CUtlBuffer m_bufResult;				//!< Buffer holding the result data
-	size_t m_lenResult;					//!< Result data length (0 if result not read yet)
-	const void *m_dataResult;			//!< Data buffer pointer (NULL if result not read yet)
-
-	CUtlBuffer m_bufListing;			//!< Buffer holding the listing
-	const char *m_dataListing;			//!< Listing buffer pointer (NULL if listing not read yet)
+  //!< Listing buffer pointer (NULL if listing not read yet)
+  const char *m_dataListing;
 };
 
-/*
+/**
+ * @brief Response implementation when the result is a generic error.
+ */
+struct CResponseError : public IResponse {
+  explicit CResponseError() = default;
+  ~CResponseError() = default;
 
-Response implementation when the result is a generic error.
+  bool Succeeded() const override { return false; }
 
-*/
-class CResponseError : public IResponse
-{
-public:
-	explicit CResponseError( void ) {}
-	~CResponseError( void ) {}
+  size_t GetResultBufferLen() override { return 0; }
+  const void *GetResultBuffer() override { return nullptr; }
 
-public:
-	virtual bool Succeeded( void ) { return false; }
-
-	virtual size_t GetResultBufferLen( void ) { return 0; }
-	virtual const void * GetResultBuffer( void ) { return NULL; }
-
-	virtual const char * GetListing( void ) { return NULL; }
+  const char *GetListing() override { return nullptr; }
 };
 
+};  // namespace se::shader_compile::command_sink
 
-}; // namespace CmdSink
-
-
-#endif // #ifndef CMDSINK_H
+#endif  // !SRC_UTILS_SHADERCOMPILE_CMDSINK_H_

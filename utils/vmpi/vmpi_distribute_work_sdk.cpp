@@ -4,22 +4,23 @@
 //
 //=============================================================================
 
-#include "vmpi.h"
 #include "vmpi_distribute_work.h"
-#include "tier0/platform.h"
+
+#include "vmpi.h"
 #include "tier0/dbg.h"
-#include "utlvector.h"
-#include "utllinkedlist.h"
+#include "tier0/icommandline.h"
+#include "tier0/platform.h"
+#include "tier1/utlvector.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/strtools.h"
+#include "tier1/utlmap.h"
+#include "tier1/smartptr.h"
 #include "vmpi_dispatch.h"
 #include "pacifier.h"
 #include "vstdlib/random.h"
 #include "mathlib/mathlib.h"
 #include "threadhelpers.h"
 #include "threads.h"
-#include "tier1/strtools.h"
-#include "tier1/utlmap.h"
-#include "tier1/smartptr.h"
-#include "tier0/icommandline.h"
 #include "cmdlib.h"
 #include "vmpi_distribute_tracker.h"
 #include "vmpi_distribute_work_internal.h"
@@ -278,7 +279,7 @@ public:
 #ifdef _DEBUG
 		static bool bCalcShuffleCRC = true;
 #else
-		static bool bCalcShuffleCRC = VMPI_IsParamUsed( mpi_CalcShuffleCRC );
+		static bool bCalcShuffleCRC = VMPI_IsParamUsed( EVMPICmdLineParam::mpi_CalcShuffleCRC );
 #endif
 		if ( bCalcShuffleCRC )
 		{
@@ -374,16 +375,16 @@ public:
 		
 		// Spawn idle-priority worker threads right here.
 		m_bUsingMasterLocalThreads = (pInfo->m_WorkerInfo.m_pProcessFn != 0);
-		if ( VMPI_IsParamUsed( mpi_NoMasterWorkerThreads ) )
+		if ( VMPI_IsParamUsed( EVMPICmdLineParam::mpi_NoMasterWorkerThreads ) )
 		{
-			Msg( "%s found. No worker threads will be created.\n", VMPI_GetParamString( mpi_NoMasterWorkerThreads ) );
+			Msg( "%s found. No worker threads will be created.\n", VMPI_GetParamString(EVMPICmdLineParam::mpi_NoMasterWorkerThreads ) );
 			m_bUsingMasterLocalThreads = false;
 		}
 		m_WorkUnitWalker.Init( pInfo->m_nWorkUnits, this );
 		Shuffle();
 
 		if ( m_bUsingMasterLocalThreads )
-			RunThreads_Start( Master_WorkerThread_Static, this, k_eRunThreadsPriority_Idle );
+			RunThreads_Start( Master_WorkerThread_Static, this, ERunThreadsPriority::k_eRunThreadsPriority_Idle );
 
 		uint64 lastShuffleTime = Plat_MSTime();
 		while ( m_WorkUnitWalker.Thread_NumWorkUnitsRemaining() > 0 )

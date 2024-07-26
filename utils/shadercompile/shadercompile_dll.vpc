@@ -7,6 +7,10 @@
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
 
+$Macro ZLIBSRCDIR		"$SRCDIR\thirdparty\zlib"
+$Macro ZLIBSRC2DIR		"$ZLIBSRCDIR\out"
+$Macro ZLIBOUTDIR		"$ZLIBSRCDIR\out\Release"
+
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
 $Configuration
@@ -14,41 +18,50 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories		"$BASE,..\common;..\vmpi;$SRCDIR\dx9sdk\include"
+		$AdditionalIncludeDirectories		"$BASE;$ZLIBSRCDIR;$ZLIBSRC2DIR;$ZLIBOUTDIR"
+		
 		$PreprocessorDefinitions			"$BASE;SHADERCOMPILE_EXPORTS;MPI"
+		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE ws2_32.lib odbc32.lib odbccp32.lib"
+		$AdditionalDependencies				"$BASE comsuppw.lib ws2_32.lib user32.lib gdi32.lib"
 	}
 }
 
-$Project "Shadercompile_dll"
+$Project "shader-compiler-core"
 {
 	$Folder	"Source Files"
 	{
 		$File	"..\common\cmdlib.cpp"
-		$File	"cmdsink.cpp"
-		$File	"d3dxfxc.cpp"
-		$File	"$SRCDIR\public\filesystem_helpers.cpp"
-		$File	"..\common\pacifier.cpp"
-		$File	"shadercompile.cpp"
-		$File	"subprocess.cpp"
-		$File	"cfgprocessor.cpp"
 		$File	"..\common\threads.cpp"
 		$File	"..\common\vmpi_tools_shared.cpp"
 		$File	"..\common\tools_minidump.cpp"
+		$File	"..\common\pacifier.cpp"
+		$File	"$SRCDIR\public\filesystem_helpers.cpp"
+		$File	"cmdsink.cpp"
+		$File	"d3dxfxc.cpp"
+		$File	"shadercompile.cpp"
+		$File	"subprocess.cpp"
+		$File	"cfgprocessor.cpp"
 	}
 
 	$Folder	"Header Files"
 	{
+		$File	"..\common\cmdlib.h"
+		$File	"..\common\threads.h"
+		$File	"..\common\vmpi_tools_shared.h"
+		$File	"..\common\tools_minidump.h"
+		$File	"..\common\pacifier.h"
+		$File	"$SRCDIR\public\ishadercompiledll.h"
 		$File	"cmdsink.h"
 		$File	"d3dxfxc.h"
-		$File	"$SRCDIR\public\ishadercompiledll.h"
 		$File	"shadercompile.h"
-		$File	"utlnodehash.h"
 		$File	"cfgprocessor.h"
-		$File	"$SRCDIR\public\tier1\UtlStringMap.h"
+		$File	"subprocess.h"
+		$File	"utlnodehash.h"
+		$File	"resource.h"
 	}
 
 	$Folder	"Link Libraries"
@@ -56,5 +69,6 @@ $Project "Shadercompile_dll"
 		$Lib tier2
 		$Lib vmpi
 		$Lib $LIBCOMMON\lzma
+		$Libexternal "$ZLIBOUTDIR/zlibstatic"
 	}
 }

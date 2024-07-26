@@ -1,257 +1,209 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-// $Workfile:     $
-// $Date:         $
-//
-//-----------------------------------------------------------------------------
-// $Log: $
-//
-// $NoKeywords: $
-//=============================================================================//
 
-#define	USED
-
-#include <windows.h>
-#include "cmdlib.h"
 #define NO_THREAD_NAMES
 #include "threads.h"
+
+#include "cmdlib.h"
 #include "pacifier.h"
+#include "winlite.h"
 
-#define	MAX_THREADS	16
+#include "vstdlib/jobthread.h"
 
+namespace {
 
-class CRunThreadsData
-{
-public:
-	int m_iThread;
-	void *m_pUserData;
-	RunThreadsFn m_Fn;
+struct RunThreadArgs {
+  int thread_no;
+  void *user_data;
+  RunThreadsFn run_func;
 };
 
-CRunThreadsData g_RunThreadsData[MAX_THREADS];
+RunThreadArgs g_RunThreadArgs[MAX_THREADS];
 
+int dispatch;
+int workcount;
+bool pacifier;
 
-int		dispatch;
-int		workcount;
-qboolean		pacifier;
-
-qboolean	threaded;
+bool enable_threads;
 bool g_bLowPriorityThreads = false;
 
 HANDLE g_ThreadHandles[MAX_THREADS];
 
+class ScopedCriticalSectionLock {
+ public:
+  explicit ScopedCriticalSectionLock(CRITICAL_SECTION &csi) noexcept
+      : cs_{csi} {
+    EnterCriticalSection(&csi);
+  }
+  ~ScopedCriticalSectionLock() noexcept { LeaveCriticalSection(&cs_); }
 
+  ScopedCriticalSectionLock(ScopedCriticalSectionLock &) = delete;
+  ScopedCriticalSectionLock &operator=(ScopedCriticalSectionLock &) = delete;
 
-/*
-=============
-GetThreadWork
+ private:
+  CRITICAL_SECTION &cs_;
+};
 
-=============
-*/
-int	GetThreadWork (void)
-{
-	int	r;
+class ScopedCriticalSection {
+ public:
+  explicit ScopedCriticalSection(unsigned int spin_count) noexcept {
+    // Starting with Windows Vista, the InitializeCriticalSectionAndSpinCount
+    // function always succeeds, even in low memory situations.
+    (void)InitializeCriticalSectionAndSpinCount(&cs_, spin_count);
+  }
+  ~ScopedCriticalSection() noexcept { DeleteCriticalSection(&cs_); }
 
-	ThreadLock ();
+  [[nodiscard]] ScopedCriticalSectionLock Lock() noexcept {
+    return ScopedCriticalSectionLock{cs_};
+  }
 
-	if (dispatch == workcount)
-	{
-		ThreadUnlock ();
-		return -1;
-	}
+  ScopedCriticalSection(ScopedCriticalSection &) = delete;
+  ScopedCriticalSection &operator=(ScopedCriticalSection &) = delete;
 
-	UpdatePacifier( (float)dispatch / workcount );
+ private:
+  CRITICAL_SECTION cs_;
+};
 
-	r = dispatch;
-	dispatch++;
-	ThreadUnlock ();
+ScopedCriticalSection g_threads_critical_section{2000};
 
-	return r;
+ThreadWorkerFn worker;
+
+int GetThreadWork() {
+  const ScopedCriticalSectionLock lock{g_threads_critical_section.Lock()};
+
+  if (dispatch == workcount) return -1;
+
+  UpdatePacifier((float)dispatch / workcount);
+
+  int r = dispatch;
+  ++dispatch;
+
+  return r;
 }
 
+void ThreadWorker(int iThread, void *pUserData) {
+  while (true) {
+    int work = GetThreadWork();
 
-ThreadWorkerFn workfunction;
+    if (work == -1) break;
 
-void ThreadWorkerFunction( int iThread, void *pUserData )
-{
-	int		work;
-
-	while (1)
-	{
-		work = GetThreadWork ();
-		if (work == -1)
-			break;
-		 
-		workfunction( iThread, work );
-	}
+    worker(iThread, work);
+  }
 }
 
-void RunThreadsOnIndividual (int workcnt, qboolean showpacifier, ThreadWorkerFn func)
-{
-	if (numthreads == -1)
-		ThreadSetDefault ();
-	
-	workfunction = func;
-	RunThreadsOn (workcnt, showpacifier, ThreadWorkerFunction);
+}  // namespace
+
+void RunThreadsOnIndividual(int workcnt, qboolean showpacifier,
+                            ThreadWorkerFn func) {
+  if (numthreads == -1) ThreadSetDefault();
+
+  worker = func;
+
+  RunThreadsOn(workcnt, showpacifier, ThreadWorker);
 }
 
+int numthreads = -1;
 
-/*
-===================================================================
-
-WIN32
-
-===================================================================
-*/
-
-int		numthreads = -1;
-CRITICAL_SECTION		crit;
-static int enter;
-
-
-class CCritInit
-{
-public:
-	CCritInit()
-	{
-		InitializeCriticalSection (&crit);
-	}
-} g_CritInit;
-
-
-
-void SetLowPriority()
-{
-	SetPriorityClass( GetCurrentProcess(), IDLE_PRIORITY_CLASS );
+void SetLowPriority() {
+  SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
 }
 
+void ThreadSetDefault() {
+  // not set manually
+  if (numthreads == -1) {
+    SYSTEM_INFO info;
+    GetNativeSystemInfo(&info);
 
-void ThreadSetDefault (void)
-{
-	SYSTEM_INFO info;
+    numthreads = info.dwNumberOfProcessors;
 
-	if (numthreads == -1)	// not set manually
-	{
-		GetSystemInfo (&info);
-		numthreads = info.dwNumberOfProcessors;
-		if (numthreads < 1 || numthreads > 32)
-			numthreads = 1;
-	}
+    if (numthreads < 1 || numthreads > MAX_THREADS) numthreads = 1;
+  }
 
-	Msg ("%i threads\n", numthreads);
+  Msg("%i threads\n", numthreads);
 }
-
-
-void ThreadLock (void)
-{
-	if (!threaded)
-		return;
-	EnterCriticalSection (&crit);
-	if (enter)
-		Error ("Recursive ThreadLock\n");
-	enter = 1;
-}
-
-void ThreadUnlock (void)
-{
-	if (!threaded)
-		return;
-	if (!enter)
-		Error ("ThreadUnlock without lock\n");
-	enter = 0;
-	LeaveCriticalSection (&crit);
-}
-
 
 // This runs in the thread and dispatches a RunThreadsFn call.
-DWORD WINAPI InternalRunThreadsFn( LPVOID pParameter )
-{
-	CRunThreadsData *pData = (CRunThreadsData*)pParameter;
-	pData->m_Fn( pData->m_iThread, pData->m_pUserData );
-	return 0;
+static DWORD WINAPI InternalRunThreadsFn(void *arg) {
+  auto *args = static_cast<RunThreadArgs *>(arg);
+
+  args->run_func(args->thread_no, args->user_data);
+
+  return 0;
 }
 
+void RunThreads_Start(RunThreadsFn fn, void *pUserData,
+                      ERunThreadsPriority ePriority) {
+  Assert(numthreads > 0);
 
-void RunThreads_Start( RunThreadsFn fn, void *pUserData, ERunThreadsPriority ePriority )
-{
-	Assert( numthreads > 0 );
-	threaded = true;
+  enable_threads = true;
 
-	if ( numthreads > MAX_TOOL_THREADS )
-		numthreads = MAX_TOOL_THREADS;
+  if (numthreads > MAX_TOOL_THREADS) numthreads = MAX_TOOL_THREADS;
 
-	for ( int i=0; i < numthreads ;i++ )
-	{
-		g_RunThreadsData[i].m_iThread = i;
-		g_RunThreadsData[i].m_pUserData = pUserData;
-		g_RunThreadsData[i].m_Fn = fn;
+  for (int i = 0; i < numthreads; i++) {
+    RunThreadArgs &args = g_RunThreadArgs[i];
+    args.thread_no = i;
+    args.user_data = pUserData;
+    args.run_func = fn;
 
-		DWORD dwDummy;
-		g_ThreadHandles[i] = CreateThread(
-		   NULL,	// LPSECURITY_ATTRIBUTES lpsa,
-		   0,		// DWORD cbStack,
-		   InternalRunThreadsFn,	// LPTHREAD_START_ROUTINE lpStartAddr,
-		   &g_RunThreadsData[i],	// LPVOID lpvThreadParm,
-		   0,			// DWORD fdwCreate,
-		   &dwDummy );
+    DWORD dwDummy;
+    HANDLE thread{
+        CreateThread(NULL, 0, InternalRunThreadsFn, &args, 0, &dwDummy)};
+    if (!thread) continue;
 
-		if ( ePriority == k_eRunThreadsPriority_UseGlobalState )
-		{
-			if( g_bLowPriorityThreads )
-				SetThreadPriority( g_ThreadHandles[i], THREAD_PRIORITY_LOWEST );
-		}
-		else if ( ePriority == k_eRunThreadsPriority_Idle )
-		{
-			SetThreadPriority( g_ThreadHandles[i], THREAD_PRIORITY_IDLE );
-		}
-	}
+    switch (ePriority) {
+      case ERunThreadsPriority::k_eRunThreadsPriority_UseGlobalState:
+        if (g_bLowPriorityThreads)
+          SetThreadPriority(thread, THREAD_PRIORITY_LOWEST);
+        break;
+
+      case ERunThreadsPriority::k_eRunThreadsPriority_Normal:
+        break;
+
+      case ERunThreadsPriority::k_eRunThreadsPriority_Idle:
+        SetThreadPriority(thread, THREAD_PRIORITY_IDLE);
+        break;
+
+      default:
+        break;
+    }
+
+    g_ThreadHandles[i] = thread;
+  }
 }
 
+void RunThreads_End() {
+  WaitForMultipleObjects(numthreads, g_ThreadHandles, TRUE, INFINITE);
 
-void RunThreads_End()
-{
-	WaitForMultipleObjects( numthreads, g_ThreadHandles, TRUE, INFINITE );
-	for ( int i=0; i < numthreads; i++ )
-		CloseHandle( g_ThreadHandles[i] );
+  for (int i = 0; i < numthreads; i++) {
+    if (g_ThreadHandles[i]) CloseHandle(g_ThreadHandles[i]);
+  }
 
-	threaded = false;
+  enable_threads = false;
 }
-	
 
-/*
-=============
-RunThreadsOn
-=============
-*/
-void RunThreadsOn( int workcnt, qboolean showpacifier, RunThreadsFn fn, void *pUserData )
-{
-	int		start, end;
+void RunThreadsOn(int workcnt, qboolean showpacifier, RunThreadsFn fn,
+                  void *user_data) {
+  const double start{Plat_FloatTime()};
 
-	start = Plat_FloatTime();
-	dispatch = 0;
-	workcount = workcnt;
-	StartPacifier("");
-	pacifier = showpacifier;
+  dispatch = 0;
+  workcount = workcnt;
+  StartPacifier("");
+  pacifier = showpacifier;
 
 #ifdef _PROFILE
-	threaded = false;
-	(*func)( 0 );
-	return;
+  threaded = false;
+  (*func)(0);
+  return;
 #endif
 
-	
-	RunThreads_Start( fn, pUserData );
-	RunThreads_End();
+  RunThreads_Start(fn, user_data);
+  RunThreads_End();
 
+  const double end{Plat_FloatTime()};
 
-	end = Plat_FloatTime();
-	if (pacifier)
-	{
-		EndPacifier(false);
-		printf (" (%i)\n", end-start);
-	}
+  if (pacifier) {
+    EndPacifier(false);
+    printf(" (%.2f)\n", end - start);
+  }
 }
-
-

@@ -815,7 +815,7 @@ static void WritePakFileLump( void )
 	AlignFilePosition( g_hBSPFile, GetPakFile()->GetAlignment() );
 	
 	// Now store final buffers out to file
-	AddLump( LUMP_PAKFILE, (byte*)buf.Base(), buf.TellPut() );
+	AddLump( LUMP_PAKFILE, buf.Base<byte>(), buf.TellPut() );
 }
 
 //-----------------------------------------------------------------------------
@@ -1370,11 +1370,11 @@ static void AddOcclusionLump( )
 
 	// Data is swapped in place, so the 'Count' variables aren't safe to use after they're written
 	WriteData( FIELD_INTEGER, &nOccluderCount );
-	WriteData( (doccluderdata_t*)g_OccluderData.Base(), g_OccluderData.Count() );
+	WriteData( g_OccluderData.Base(), g_OccluderData.Count() );
 	WriteData( FIELD_INTEGER, &nOccluderPolyDataCount );
-	WriteData( (doccluderpolydata_t*)g_OccluderPolyData.Base(), g_OccluderPolyData.Count() );
+	WriteData( g_OccluderPolyData.Base(), g_OccluderPolyData.Count() );
 	WriteData( FIELD_INTEGER, &nOccluderVertexIndices );
-	WriteData( FIELD_INTEGER, (int*)g_OccluderVertexIndices.Base(), g_OccluderVertexIndices.Count() );
+	WriteData( FIELD_INTEGER, g_OccluderVertexIndices.Base(), g_OccluderVertexIndices.Count() );
 }
 
 
@@ -1568,10 +1568,10 @@ static void SwapPhyscollideLump( byte *pDestBase, byte *pSrcBase, unsigned int &
 	CSysModule *pPhysicsModule = g_pFullFileSystem->LoadModule( "vphysics.dll" );
 	if ( pPhysicsModule )
 	{
-		CreateInterfaceFn physicsFactory = Sys_GetFactory( pPhysicsModule );
+		CreateInterfaceFnT<IPhysicsCollision> physicsFactory = Sys_GetFactory<IPhysicsCollision>( pPhysicsModule );
 		if ( physicsFactory )
 		{
-			physcollision = (IPhysicsCollision *)physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
+			physcollision = physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
 		}
 	}
 
@@ -2517,14 +2517,15 @@ LoadBSPFileTexinfo
 Only loads the texinfo lump, so qdata can scan for textures
 =============
 */
-void LoadBSPFileTexinfo( const char *filename )
+bool LoadBSPFileTexinfo( const char *filename )
 {
-	FILE		*f;
 	int		length, ofs;
 
 	g_pBSPHeader = (dheader_t*)malloc( sizeof(dheader_t) );
 
-	f = fopen( filename, "rb" );
+	FILE *f = fopen( filename, "rb" );
+	if (!f) return false;
+
 	fread( g_pBSPHeader, sizeof(dheader_t), 1, f);
 
 	ValidateHeader( filename, g_pBSPHeader );
@@ -2544,6 +2545,8 @@ void LoadBSPFileTexinfo( const char *filename )
 	// everything has been copied out
 	free( g_pBSPHeader );
 	g_pBSPHeader = NULL;
+
+	return true;
 }
 
 static void AddLumpInternal( int lumpnum, void *data, int len, int version )
@@ -3407,9 +3410,8 @@ void UpdateAllFaceLightmapExtents()
 constexpr float TEST_EPSILON{0.03125f};
 
 
-class CToolBSPTree : public ISpatialQuery
+struct CToolBSPTree final : public ISpatialQuery
 {
-public:
 	// Returns the number of leaves
 	int LeafCount() const;
 
@@ -4458,17 +4460,8 @@ int SortLumpsByOffset( const SortedLump_t *pSortedLumpA, const SortedLump_t *pSo
 
 bool CompressGameLump( dheader_t *pInBSPHeader, dheader_t *pOutBSPHeader, CUtlBuffer &outputBuffer, CompressFunc_t pCompressFunc )
 {
-	CByteswap	byteSwap;
-
 	dgamelumpheader_t* pInGameLumpHeader = (dgamelumpheader_t*)(((byte *)pInBSPHeader) + pInBSPHeader->lumps[LUMP_GAME_LUMP].fileofs);
 	dgamelump_t* pInGameLump = (dgamelump_t*)(pInGameLumpHeader + 1);
-
-	if ( IsX360() )
-	{
-		byteSwap.ActivateByteSwapping( true );
-		byteSwap.SwapFieldsToTargetEndian( pInGameLumpHeader );
-		byteSwap.SwapFieldsToTargetEndian( pInGameLump, pInGameLumpHeader->lumpCount );
-	}
 
 	unsigned int newOffset = outputBuffer.TellPut();
 	// Make room for gamelump header and gamelump structs, which we'll write at the end
@@ -4479,7 +4472,7 @@ bool CompressGameLump( dheader_t *pInBSPHeader, dheader_t *pOutBSPHeader, CUtlBu
 	dgamelumpheader_t sOutGameLumpHeader = *pInGameLumpHeader;
 	CUtlBuffer sOutGameLumpBuf;
 	sOutGameLumpBuf.Put( pInGameLump, pInGameLumpHeader->lumpCount * sizeof( dgamelump_t ) );
-	dgamelump_t *sOutGameLump = (dgamelump_t *)sOutGameLumpBuf.Base();
+	dgamelump_t *sOutGameLump = sOutGameLumpBuf.Base<dgamelump_t>();
 
 	// add a dummy terminal gamelump
 	// purposely NOT updating the .filelen to reflect the compressed size, but leaving as original size
@@ -4503,7 +4496,7 @@ bool CompressGameLump( dheader_t *pInBSPHeader, dheader_t *pOutBSPHeader, CUtlBu
 				if ( CLZMA::IsCompressed( pCompressedLump ) )
 				{
 					inputBuffer.EnsureCapacity( CLZMA::GetActualSize( pCompressedLump ) );
-					unsigned int outSize = CLZMA::Uncompress( pCompressedLump, (unsigned char *)inputBuffer.Base() );
+					unsigned int outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
 					inputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, outSize );
 					if ( outSize != CLZMA::GetActualSize( pCompressedLump ) )
 					{
@@ -4544,13 +4537,6 @@ bool CompressGameLump( dheader_t *pInBSPHeader, dheader_t *pOutBSPHeader, CUtlBu
 	int lastLump = sOutGameLumpHeader.lumpCount-1;
 	sOutGameLump[lastLump].fileofs = outputBuffer.TellPut();
 
-	if ( IsX360() )
-	{
-		// fix the output for 360, swapping it back
-		byteSwap.SwapFieldsToTargetEndian( sOutGameLump, sOutGameLumpHeader.lumpCount );
-		byteSwap.SwapFieldsToTargetEndian( &sOutGameLumpHeader );
-	}
-
 	pOutBSPHeader->lumps[LUMP_GAME_LUMP].fileofs = newOffset;
 	pOutBSPHeader->lumps[LUMP_GAME_LUMP].filelen = outputBuffer.TellPut() - newOffset;
 	// We set GAMELUMPFLAG_COMPRESSED and handle compression at the sub-lump level, this whole lump is not
@@ -4580,7 +4566,7 @@ bool RepackBSPCallback_LZMA( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer )
 
 	unsigned int originalSize = inputBuffer.TellPut() - inputBuffer.TellGet();
 	unsigned int compressedSize = 0;
-	unsigned char *pCompressedOutput = LZMA_Compress( (unsigned char *)inputBuffer.Base() + inputBuffer.TellGet(),
+	unsigned char *pCompressedOutput = LZMA_Compress( inputBuffer.Base<unsigned char>() + inputBuffer.TellGet(),
 													  originalSize, &compressedSize );
 	if ( pCompressedOutput )
 	{
@@ -4594,22 +4580,13 @@ bool RepackBSPCallback_LZMA( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer )
 }
 
 
-bool RepackBSP( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer, CompressFunc_t pCompressFunc, IZip::eCompressionType packfileCompression )
+bool RepackBSP( CUtlBuffer &inputBufferIn, CUtlBuffer &outputBuffer, CompressFunc_t pCompressFunc, IZip::eCompressionType packfileCompression )
 {
-	dheader_t *pInBSPHeader = (dheader_t *)inputBuffer.Base();
-	// The 360 swaps this header to disk. For some reason.
-	if ( pInBSPHeader->ident != ( IsX360() ? BigLong( IDBSPHEADER ) : IDBSPHEADER ) )
+	dheader_t *pInBSPHeader = inputBufferIn.Base<dheader_t>();
+	if ( pInBSPHeader->ident != IDBSPHEADER )
 	{
 		Warning( "RepackBSP given invalid input data\n" );
 		return false;
-	}
-
-	CByteswap	byteSwap;
-	if ( IsX360() )
-	{
-		// bsp is 360, swap the header back
-		byteSwap.ActivateByteSwapping( true );
-		byteSwap.SwapFieldsToTargetEndian( pInBSPHeader );
 	}
 
 	unsigned int headerOffset = outputBuffer.TellPut();
@@ -4657,9 +4634,9 @@ bool RepackBSP( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer, CompressFunc_
 				if ( CLZMA::IsCompressed( pCompressedLump ) && static_cast<unsigned>(pSortedLump->pLump->uncompressedSize) == CLZMA::GetActualSize( pCompressedLump ) )
 				{
 					inputBuffer.EnsureCapacity( CLZMA::GetActualSize( pCompressedLump ) );
-					unsigned int outSize = CLZMA::Uncompress( pCompressedLump, (unsigned char *)inputBuffer.Base() );
+					unsigned int outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
 					inputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, outSize );
-					if ( outSize != pSortedLump->pLump->uncompressedSize )
+					if ( outSize != static_cast<unsigned>(pSortedLump->pLump->uncompressedSize) )
 					{
 						Warning( "Decompressed size differs from header, BSP may be corrupt\n" );
 					}
@@ -4746,15 +4723,8 @@ bool RepackBSP( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer, CompressFunc_
 		}
 	}
 
-	if ( IsX360() )
-	{
-		// fix the output for 360, swapping it back
-		byteSwap.SetTargetBigEndian( true );
-		byteSwap.SwapFieldsToTargetEndian( &sOutBSPHeader );
-	}
-
 	// Write out header
-	unsigned int endOffset = outputBuffer.TellPut();
+	intp endOffset = outputBuffer.TellPut();
 	outputBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, headerOffset );
 	outputBuffer.Put( &sOutBSPHeader, sizeof( sOutBSPHeader ) );
 	outputBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, endOffset );

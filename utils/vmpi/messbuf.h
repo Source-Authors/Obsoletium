@@ -1,52 +1,49 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-// $NoKeywords: $
-//
-//=============================================================================//
-//
-// MessageBuffer - handy for packing and upacking
-// structures to be sent as messages  
-//
-#ifndef _MESSAGEBUFFER
-#define _MESSAGEBUFFER
+// MessageBuffer - handy for packing and upacking structures to be sent as
+// messages.
 
-#include <stdio.h>
-#define DEFAULT_MESSAGE_BUFFER_SIZE 2048
+#ifndef SRC_UTILS_VMPI_MESSAGEBUFFER_H_
+#define SRC_UTILS_VMPI_MESSAGEBUFFER_H_
+
+#include <cstdio>
+
+constexpr inline ptrdiff_t DEFAULT_MESSAGE_BUFFER_SIZE{2048};
 
 class MessageBuffer {
-	public:
-		char * data;
+ public:
+  char *data;
 
-		MessageBuffer();
-		MessageBuffer(int size);
-		~MessageBuffer();
+  MessageBuffer();
+  MessageBuffer(ptrdiff_t size);
+  ~MessageBuffer();
 
-		int		getSize();
-		int		getLen();
-		int		setLen(int len);
-		int		getOffset();
-		int		setOffset(int offset);
-		
-		int		write(void const * p, int bytes);
-		int		update(int loc, void const * p, int bytes);
-		int		extract(int loc, void * p, int bytes);
-		int		read(void * p, int bytes);
+  ptrdiff_t getSize() const { return size; }
+  ptrdiff_t getLen() const { return len; }
+  ptrdiff_t setLen(ptrdiff_t len);
+  ptrdiff_t getOffset() const { return offset; }
+  ptrdiff_t setOffset(ptrdiff_t offset);
 
-		int		WriteString( const char *pString );
-		int		ReadString( char *pOut, int bufferLength );
+  ptrdiff_t write(void const *p, ptrdiff_t bytes);
+  ptrdiff_t update(ptrdiff_t loc, void const *p, ptrdiff_t bytes);
+  ptrdiff_t extract(ptrdiff_t loc, void *p, ptrdiff_t bytes);
+  ptrdiff_t read(void *p, ptrdiff_t bytes);
 
-		void	clear();
-		void	clear(int minsize);
-		void	reset(int minsize);
-		void	print(FILE * ofile, int num);	
+  ptrdiff_t WriteString(const char *pString);
+  ptrdiff_t ReadString(char *pOut, ptrdiff_t bufferLength);
 
-	private:
-		void	resize(int minsize);
-		int		size;
-		int		offset;
-		int		len;
+  void clear();
+  void clear(ptrdiff_t minsize);
+  void reset(ptrdiff_t minsize);
+  void print(FILE *ofile, ptrdiff_t num) const;
+
+ private:
+  void resize(ptrdiff_t minsize);
+
+  ptrdiff_t size;
+  ptrdiff_t offset;
+  ptrdiff_t len;
 };
 
-#endif
+#endif  // !SRC_UTILS_VMPI_MESSAGEBUFFER_H_

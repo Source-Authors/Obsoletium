@@ -4,6 +4,8 @@
 //
 //===========================================================================//
 
+#include "filesystem_tools.h"
+
 #if defined( _WIN32 ) && !defined( _X360 )
 #include <direct.h>
 #include <io.h> // _chmod
@@ -11,10 +13,9 @@
 #include <unistd.h>
 #endif
 
-#include <stdio.h>
+#include <cstdio>
 #include <sys/stat.h>
 #include "tier1/strtools.h"
-#include "filesystem_tools.h"
 #include "tier0/icommandline.h"
 #include "KeyValues.h"
 #include "tier2/tier2.h"

@@ -10,8 +10,13 @@ $Macro OUTBINNAME	"shadercompile"
 
 $Include "$SRCDIR\vpc_scripts\source_exe_con_base.vpc"
 
-$Project "Shadercompile_launcher"
+$Project "shader-compiler"
 {
+	$Folder "Header Files"
+	{
+		$File	"resource.h"
+	}
+
 	$Folder	"Source Files"
 	{
 		-$File	"$SRCDIR\public\tier0\memoverride.cpp"

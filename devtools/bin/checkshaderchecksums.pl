@@ -76,7 +76,6 @@ sub GetShaderBase
 	}
 }
 
-$g_x360			= 0;
 $g_vcsext		= ".vcs";
 
 while( 1 )
@@ -85,8 +84,6 @@ while( 1 )
 
 	if( $inputbase =~ m/-x360/ )
 	{
-		$g_x360 = 1;
-		$g_vcsext = ".360.vcs";
 	}
 	else
 	{
@@ -106,11 +103,6 @@ foreach $srcfile ( @srcfiles )
 	my $shadersrc = &GetShaderSrc( $srcfile );
 	my $vcsFileName = "..\\..\\..\\game\\hl2\\shaders\\$shadertype\\$shaderbase" . $g_vcsext;
 #	print "shadersrc: $shadersrc vcsFileName: $vcsFileName\n";
-
-	if( $g_x360 && ( $shaderbase =~ m/_ps20$/i ) )
-	{
-		next; # skip _ps20 files for 360
-	}
 
 	&CheckCRCAgainstTarget( $shadersrc, $vcsFileName, 1 );
 }

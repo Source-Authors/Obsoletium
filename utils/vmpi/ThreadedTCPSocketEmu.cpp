@@ -5,10 +5,11 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <windows.h>
+#include "ThreadedTCPSocketEmu.h"
+
+#include "winlite.h"
 #include "tcpsocket.h"
 #include "IThreadedTCPSocket.h"
-#include "ThreadedTCPSocketEmu.h"
 #include "ThreadHelpers.h"
 
 
@@ -106,7 +107,7 @@ public:
 		return true;
 	}
 
-	virtual bool	BeginConnect( const CIPAddr &addr )
+	virtual bool	BeginConnect( const IpV4 &addr )
 	{
 		// They should have "bound" to a port before trying to connect.
 		Assert( m_LocalPort != 0xFFFF );
@@ -116,7 +117,7 @@ public:
 
 		m_pConnectSocket = ThreadedTCP_CreateConnector( 
 			addr,
-			CIPAddr( 0, 0, 0, 0, m_LocalPort ),
+			IpV4( 0, 0, 0, 0, m_LocalPort ),
 			this );
 
 		return m_pConnectSocket != 0;			
@@ -172,7 +173,7 @@ public:
 		reason = m_ErrorString;
 	}
 
-	virtual bool	Send( const void *pData, int size )
+	virtual bool	Send( const void *pData, ptrdiff_t size ) override
 	{
 		Assert( m_pSocket );
 		if ( !m_pSocket )
@@ -181,7 +182,7 @@ public:
 		return m_pSocket->Send( pData, size );
 	}
 
-	virtual bool	SendChunks( void const * const *pChunks, const int *pChunkLengths, int nChunks )
+	virtual bool	SendChunks( void const * const *pChunks, const ptrdiff_t *pChunkLengths, ptrdiff_t nChunks )
 	{
 		Assert( m_pSocket );
 		if ( !m_pSocket || !m_pSocket->IsValid() )
@@ -289,7 +290,7 @@ private:
 		delete this;
 	}
 
-	virtual ITCPSocket*	UpdateListen( CIPAddr *pAddr )
+	virtual ITCPSocket*	UpdateListen( IpV4 *pAddr )
 	{
 		if ( !m_pListener )
 			return NULL;

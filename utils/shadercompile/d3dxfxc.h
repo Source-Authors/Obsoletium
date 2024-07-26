@@ -1,24 +1,18 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: D3DX command implementation.
-//
-// $NoKeywords: $
-//
-//=============================================================================//
+// D3DX command implementation.
 
-#ifndef D3DXFXC_H
-#define D3DXFXC_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SRC_UTILS_SHADERCOMPILE_D3DXFXC_H_
+#define SRC_UTILS_SHADERCOMPILE_D3DXFXC_H_
 
 #include "cmdsink.h"
 
-namespace InterceptFxc
-{
+namespace se::shader_compile::fxc_intercept {
 
-	bool TryExecuteCommand( const char *pCommand, CmdSink::IResponse **ppResponse );
+bool TryExecuteCommand(
+    const char *pCommand,
+    se::shader_compile::command_sink::IResponse **ppResponse);
 
-}; // namespace InterceptFxc
+};  // namespace se::shader_compile::fxc_intercept
 
-#endif // #ifndef D3DXFXC_H
+#endif  // !SRC_UTILS_SHADERCOMPILE_D3DXFXC_H_

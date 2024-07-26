@@ -6,15 +6,10 @@
 //
 //===========================================================================//
 
-// scriplib.c
-
 #include "tier1/strtools.h"
 #include "tier2/tier2.h"
 #include "cmdlib.h"
 #include "scriplib.h"
-#if defined( _X360 )
-#include "xbox\xbox_win32stubs.h"
-#endif
 #if defined(POSIX)
 #include "../../filesystem/linux_support.h"
 #include <sys/stat.h>
@@ -27,7 +22,7 @@
 =============================================================================
 */
 
-typedef struct
+struct script_t
 {
 	char	filename[1024];
 	char    *buffer,*script_p,*end_p;
@@ -38,7 +33,7 @@ typedef struct
 	char	*macrovalue[64];
 	int		nummacroparams;
 
-} script_t;
+};
 
 constexpr int MAX_INCLUDES{64};
 
@@ -82,8 +77,6 @@ AddScriptToStack
 */
 void AddScriptToStack (char *filename, ScriptPathMode_t pathMode = SCRIPT_USE_ABSOLUTE_PATH)
 {
-	int            size;
-
 	script++;
 	if (script == &scriptstack[MAX_INCLUDES])
 		Error ("script file exceeded MAX_INCLUDES");
@@ -93,7 +86,7 @@ void AddScriptToStack (char *filename, ScriptPathMode_t pathMode = SCRIPT_USE_AB
 	else
 		Q_strncpy (script->filename, ExpandPath (filename), sizeof( script->filename ) );
 
-	size = LoadFile (script->filename, (void **)&script->buffer);
+	int size = LoadFile (script->filename, (void **)&script->buffer);
 
 	// printf ("entering %s\n", script->filename);
 	if ( g_pfnCallback )
@@ -105,7 +98,6 @@ void AddScriptToStack (char *filename, ScriptPathMode_t pathMode = SCRIPT_USE_AB
 	}
 
 	script->line = 1;
-
 	script->script_p = script->buffer;
 	script->end_p = script->buffer + size;
 }
@@ -1149,7 +1141,7 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 	fileList.Purge();
 
 	strcpy( sourcePath, pDirPath );
-	int len = (int)strlen( sourcePath );
+	intp len = V_strlen( sourcePath );
 	if ( !len )
 	{
 		strcpy( sourcePath, ".\\" );
@@ -1332,7 +1324,7 @@ int CScriptLib::FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t
 		CUtlVector< fileList_t > tempList;
 		CUtlVector< CUtlString > dirList;
 		RecurseFileTree_r( dirPath, 0, dirList );
-		for ( int i=0; i<dirList.Count(); i++ )
+		for ( intp i=0; i<dirList.Count(); i++ )
 		{
 			// iterate each directory found
 			tempList.Purge();
@@ -1340,8 +1332,8 @@ int CScriptLib::FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t
 
 			GetFileList( dirList[i].String(), pattern, tempList );
 
-			int start = fileList.AddMultipleToTail( tempList.Count() );
-			for ( int j=0; j<tempList.Count(); j++ )
+			intp start = fileList.AddMultipleToTail( tempList.Count() );
+			for ( intp j=0; j<tempList.Count(); j++ )
 			{
 				fileList[start+j] = tempList[j];
 			}

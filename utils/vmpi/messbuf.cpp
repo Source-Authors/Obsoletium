@@ -1,18 +1,12 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-// $NoKeywords: $
-//
-//=============================================================================//
-//
-// MessageBuffer - handy for serializing/unserializing
-// structures to be sent as messages  
-// dal - 9/2002
-//
-#include <stdlib.h>
-#include <string.h>
+
 #include "messbuf.h"
+
+#include <cstdlib>
+#include <cstring>
+
 #include "tier1/strtools.h"
 
 
@@ -32,7 +26,7 @@ MessageBuffer::MessageBuffer()
 //
 //
 //
-MessageBuffer::MessageBuffer(int minsize)
+MessageBuffer::MessageBuffer(ptrdiff_t minsize)
 {
 	size = minsize;
 	data = (char *) malloc(size);
@@ -49,67 +43,31 @@ MessageBuffer::~MessageBuffer()
 	free(data);
 }
 
-
 ///////////////////////////
 //
 //
 //
-int
-MessageBuffer::getSize()
-{
-	return size;
-}
-
-///////////////////////////
-//
-//
-//
-int
-MessageBuffer::getLen()
-{
-	return len;
-}
-
-///////////////////////////
-//
-//
-//
-int
-MessageBuffer::setLen(int nlen)
+ptrdiff_t
+MessageBuffer::setLen(ptrdiff_t nlen)
 {
 	if (nlen < 0) return -1;
 	if (nlen > size) {
 		resize(nlen);
 	}
 
-	int res = len;
-	len = nlen;
-
-	return res;
+	return std::exchange(len, nlen);
 }
 
 ///////////////////////////
 //
 //
 //
-int
-MessageBuffer::getOffset()
-{
-	return offset;
-}
-
-///////////////////////////
-//
-//
-//
-int
-MessageBuffer::setOffset(int noffset)
+ptrdiff_t
+MessageBuffer::setOffset(ptrdiff_t noffset)
 {
 	if (noffset < 0 || noffset > len) return -1;
-	int res = offset;
-	offset = noffset;
 
-	return res;
+	return std::exchange(offset, noffset);
 }
 
 
@@ -117,14 +75,15 @@ MessageBuffer::setOffset(int noffset)
 //
 //
 //
-int
-MessageBuffer::write(void const * p, int bytes)
+ptrdiff_t
+MessageBuffer::write(void const * p, ptrdiff_t bytes)
 {
 	if (bytes + len > size) {
 		resize(bytes + len);
 	}
 	memcpy(data + len, p, bytes);
-	int res = len;
+
+	ptrdiff_t res = len;
 	len += bytes;
 
 	return res;
@@ -134,8 +93,8 @@ MessageBuffer::write(void const * p, int bytes)
 //
 //
 //
-int
-MessageBuffer::update(int loc, void const * p, int bytes)
+ptrdiff_t
+MessageBuffer::update(ptrdiff_t loc, void const * p, ptrdiff_t bytes)
 {
 	if (loc + bytes > size) {
 		resize(loc + bytes);
@@ -153,8 +112,8 @@ MessageBuffer::update(int loc, void const * p, int bytes)
 //
 //
 //
-int
-MessageBuffer::extract(int loc, void * p, int bytes)
+ptrdiff_t
+MessageBuffer::extract(ptrdiff_t loc, void * p, ptrdiff_t bytes)
 {
 	if (loc + bytes > len) return -1;
 	memcpy(p, data + loc, bytes);
@@ -166,8 +125,8 @@ MessageBuffer::extract(int loc, void * p, int bytes)
 //
 //
 //
-int
-MessageBuffer::read(void * p, int bytes)
+ptrdiff_t
+MessageBuffer::read(void * p, ptrdiff_t bytes)
 {
 	if (offset + bytes > len) return -1;
 	memcpy(p, data + offset, bytes);
@@ -176,14 +135,14 @@ MessageBuffer::read(void * p, int bytes)
 	return offset;
 }
 
-int MessageBuffer::WriteString( const char *pString )
+ptrdiff_t MessageBuffer::WriteString( const char *pString )
 {
 	return write( pString, V_strlen( pString ) + 1 );
 }
 
-int MessageBuffer::ReadString( char *pOut, int bufferLength )
+ptrdiff_t MessageBuffer::ReadString( char *pOut, ptrdiff_t bufferLength )
 {
-	int nChars = 0;
+	ptrdiff_t nChars = 0;
 	while ( 1 )
 	{
 		char ch;
@@ -221,7 +180,7 @@ MessageBuffer::clear()
 //
 //
 void
-MessageBuffer::clear(int minsize)
+MessageBuffer::clear(ptrdiff_t minsize)
 {
 	if (minsize > size) {
 		resize(minsize);
@@ -236,7 +195,7 @@ MessageBuffer::clear(int minsize)
 //
 //
 void
-MessageBuffer::reset(int minsize)
+MessageBuffer::reset(ptrdiff_t minsize)
 {
 	if (minsize > size) {
 		resize(minsize);
@@ -250,7 +209,7 @@ MessageBuffer::reset(int minsize)
 //
 //
 void
-MessageBuffer::resize(int minsize)
+MessageBuffer::resize(ptrdiff_t minsize)
 {
 	if (minsize < size) return;
 
@@ -268,11 +227,11 @@ MessageBuffer::resize(int minsize)
 //
 //
 void
-MessageBuffer::print(FILE * ofile, int num)
+MessageBuffer::print(FILE * ofile, ptrdiff_t num) const
 {
-	fprintf(ofile, "Len: %d Offset: %d Size: %d\n", len, offset, size);
+	fprintf(ofile, "Len: %zd Offset: %zd Size: %zd\n", len, offset, size);
     if (num > size) num = size;
-	for (int i=0; i<num; ++i) {
+	for (ptrdiff_t i=0; i<num; ++i) {
 		fprintf(ofile, "%02x ", (unsigned char) data[i]);
 	}
 	fprintf(ofile, "\n");

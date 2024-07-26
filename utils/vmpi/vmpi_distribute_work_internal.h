@@ -114,7 +114,7 @@ public:
 	void ShrinkWindow( uint64 idxDrop ) {
 		Assert( idxDrop >= m_uiBase && idxDrop <= m_uiBase + BaseClass::Count() );
 		if ( idxDrop >= m_uiBase && idxDrop <= m_uiBase + BaseClass::Count() ) {
-			int iDropElements = int( idxDrop - m_uiBase ) + 1;
+			intp iDropElements = intp( idxDrop - m_uiBase ) + 1;
 			m_uiBase += iDropElements;
 			BaseClass::RemoveMultiple( 0, min( iDropElements, BaseClass::Count() ) );
 		}
