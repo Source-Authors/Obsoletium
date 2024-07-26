@@ -1,20 +1,18 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
 //
-// $NoKeywords: $
-//
-//=============================================================================//
-// ThreadedTCPSocket.cpp : Defines the entry point for the console application.
-//
+
+#include "IThreadedTCPSocket.h"
 
 #include <winsock2.h>
 #include <mswsock.h>
-#include "IThreadedTCPSocket.h"
-#include "utllinkedlist.h"
+#include <system_error>
+
+#include "tier1/utllinkedlist.h"
+#include "tier1/strtools.h"
+
 #include "threadhelpers.h"
 #include "iphelpers.h"
-#include "tier1/strtools.h"
 
 
 #define SEND_KEEPALIVE_INTERVAL	3000
@@ -45,10 +43,10 @@ bool g_bSetTCPSocketThreadPriorities = true;
 // ------------------------------------------------------------------------------------------------ //
 // Static helpers.
 // ------------------------------------------------------------------------------------------------ //
-static SOCKET TCPBind( const CIPAddr *pAddr )
+static SOCKET TCPBind( const IpV4 *pAddr )
 {
 	// Create a socket to send and receive through.
-	SOCKET sock = WSASocket( AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED );
+	SOCKET sock = WSASocketW( AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED );
 	if ( sock == INVALID_SOCKET )
 	{
 		Assert( false );
@@ -100,7 +98,7 @@ class CThreadedTCPSocket : public IThreadedTCPSocket
 {
 public:
 	
-	static IThreadedTCPSocket* Create( SOCKET iSocket, CIPAddr remoteAddr, ITCPSocketHandler *pHandler )
+	static IThreadedTCPSocket* Create( SOCKET iSocket, IpV4 remoteAddr, ITCPSocketHandler *pHandler )
 	{
 		CThreadedTCPSocket *pRet = new CThreadedTCPSocket;
 		if ( pRet->Init( iSocket, remoteAddr, pHandler ) )
@@ -123,7 +121,7 @@ public:
 		delete this;
 	}
 
-	virtual CIPAddr GetRemoteAddr() const
+	virtual IpV4 GetRemoteAddr() const
 	{
 		return m_RemoteAddr;
 	}
@@ -133,13 +131,13 @@ public:
 		return !CheckErrorSignal();
 	}
 
-	virtual bool Send( const void *pData, int len )
+	virtual bool Send( const void *pData, ptrdiff_t len )
 	{
 		const void *pChunks[1] = { pData };
 		return SendChunks( pChunks, &len, 1 );
 	}
 
-	virtual bool SendChunks( void const * const *pChunks, const int *pChunkLengths, int nChunks )
+	virtual bool SendChunks( void const * const *pChunks, const ptrdiff_t *pChunkLengths, ptrdiff_t nChunks )
 	{
 		if ( CheckErrorSignal() )
 			return false;
@@ -169,7 +167,7 @@ private:
 		Term();
 	}
 
-	bool Init( SOCKET iSocket, CIPAddr remoteAddr, ITCPSocketHandler *pHandler )
+	bool Init( SOCKET iSocket, IpV4 remoteAddr, ITCPSocketHandler *pHandler )
 	{
 		m_Socket = iSocket;
 		m_RemoteAddr = remoteAddr;
@@ -241,14 +239,14 @@ private:
 	}
 
 	// Set the initial socket options that we want.
-	void SetInitialSocketOptions()
+	void SetInitialSocketOptions() const
 	{
 		// Set nodelay to improve latency.
 		BOOL val = TRUE;
 		setsockopt( m_Socket, IPPROTO_TCP, TCP_NODELAY, (const char FAR *)&val, sizeof(BOOL) );
 
 		// Make it linger for 3 seconds when it exits.
-		LINGER linger;
+		LINGER linger = {};
 		linger.l_onoff = 1;
 		linger.l_linger = 3;
 		setsockopt( m_Socket, SOL_SOCKET, SO_LINGER, (char*)&linger, sizeof( linger ) );
@@ -260,10 +258,10 @@ private:
 
 	// This function copies off the payload and adds a SendChunk_t to the list of chunks to be sent.
 	// It also fires the ReadyToSend event so the thread will pick it up.
-	bool InternalSend( void const * const *pChunks, const int *pChunkLengths, int nChunks, bool bPrependLength )
+	bool InternalSend( void const * const *pChunks, const ptrdiff_t *pChunkLengths, ptrdiff_t nChunks, bool bPrependLength )
 	{
-		int totalLength = 0;
-		for ( int i=0; i < nChunks; i++ )
+		ptrdiff_t totalLength = 0;
+		for ( ptrdiff_t i=0; i < nChunks; i++ )
 			totalLength += pChunkLengths[i];
 
 		if ( bPrependLength )
@@ -276,6 +274,8 @@ private:
 
 		// Copy all the data into a SendData_t.
 		SendData_t *pSendData = (SendData_t*)malloc( sizeof( SendData_t ) - 1 + totalLength );
+		if (!pSendData) return false;
+
 		pSendData->m_Len = totalLength;
 
 		char *pOut = pSendData->m_Payload;
@@ -284,7 +284,7 @@ private:
 			*((int*)pOut) = totalLength - 4;	// The length we prepend is the size of the data, not data size + integer for length.
 			pOut += 4;
 		}
-		for ( int i=0; i < nChunks; i++ )
+		for ( ptrdiff_t i=0; i < nChunks; i++ )
 		{
 			memcpy( pOut, pChunks[i], pChunkLengths[i] );
 			pOut += pChunkLengths[i];
@@ -292,9 +292,9 @@ private:
 
 		CCriticalSectionLock csLock( &m_SendCS );
 		csLock.Lock();
-			
-			m_SendDatas.AddToTail( pSendData );
-			m_hReadyToSendEvent.SetEvent(); // Notify the thread that there is data to send.
+
+		m_SendDatas.AddToTail( pSendData );
+		m_hReadyToSendEvent.SetEvent(); // Notify the thread that there is data to send.
 		
 		csLock.Unlock();
 
@@ -307,13 +307,13 @@ private:
 		// But only if we're not already sending something.
 		CCriticalSectionLock csLock( &m_SendCS );
 		csLock.Lock();
-			int count = m_SendDatas.Count();
+		intp count = m_SendDatas.Count();
 		csLock.Unlock();
 
 		if ( count == 0 )
 		{
 			void *pBuf[1] = { &g_KeepaliveSentinel };
-			int len[1] = { sizeof( g_KeepaliveSentinel ) };
+			ptrdiff_t len[1] = { sizeof( g_KeepaliveSentinel ) };
 			InternalSend( pBuf, len, 1, false );
 		}
 	}
@@ -523,6 +523,13 @@ private:
 				{
 					Assert( !m_pRecvBuffer );
 					m_pRecvBuffer = (CTCPPacket*)malloc( sizeof( CTCPPacket ) - 1 + m_NextPacketLen );
+					
+					{
+						char str[512];
+						Q_snprintf( str, sizeof( str ), "Unable to allocate TCP packet (size = %zu)", sizeof( CTCPPacket ) - 1 + m_NextPacketLen );
+						HandleError( ITCPSocketHandler::SocketError, str );
+					}
+
 					m_pRecvBuffer->m_UserData = 0;
 					m_pRecvBuffer->m_Len = m_NextPacketLen;
 
@@ -655,7 +662,7 @@ private:
 private:
 
 	// This checks to see if either thread has signaled an error. If so, it shuts down the socket and returns true.
-	bool CheckErrorSignal()
+	bool CheckErrorSignal() const
 	{
 		return m_bErrorSignal;
 	}
@@ -664,31 +671,7 @@ private:
 	// and makes it return false from all of its functions.
 	void HandleError( DWORD errorValue )
 	{
-		char *lpMsgBuf;
-		
-		FormatMessage( 
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-			FORMAT_MESSAGE_FROM_SYSTEM | 
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			GetLastError(),
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-			(char*)&lpMsgBuf,
-			0,
-			NULL 
-		);
-		
-		// Windows likes to stick a carriage return in there and we don't want it so get rid of it.
-		int len = strlen( lpMsgBuf );
-		while ( len > 0 && ( lpMsgBuf[len-1] == '\n' || lpMsgBuf[len-1] == '\r' ) )
-		{
-			--len;
-			lpMsgBuf[len] = 0;
-		}
-
-		HandleError( ITCPSocketHandler::SocketError, lpMsgBuf );
-
-		LocalFree( lpMsgBuf );	
+		HandleError( ITCPSocketHandler::SocketError, std::system_category().message(errorValue).c_str() );
 	}
 
 
@@ -713,7 +696,7 @@ private:
 	typedef struct
 	{
 		//WSAOVERLAPPED m_Overlapped;
-		int m_Len;
+		ptrdiff_t m_Len;
 		char m_Payload[1];
 	} SendData_t;
 
@@ -751,7 +734,7 @@ private:
 	ITCPSocketHandler *m_pHandler;
 
 	SOCKET m_Socket;
-	CIPAddr m_RemoteAddr;
+	IpV4 m_RemoteAddr;
 };
 
 
@@ -793,7 +776,7 @@ public:
 		}
 
 		// Bind it to a socket and start listening.
-		CIPAddr addr( 0, 0, 0, 0, port ); // INADDR_ANY
+		IpV4 addr( 0, 0, 0, 0, port ); // INADDR_ANY
 		pRet->m_Socket = TCPBind( &addr );
 		if ( pRet->m_Socket == INVALID_SOCKET || 
 			listen( pRet->m_Socket, nQueueLength == -1 ? SOMAXCONN : nQueueLength ) != 0 )
@@ -822,7 +805,7 @@ public:
 			return false;
 
 		// We're still ok.. just wait until the socket becomes writable (is connected) or we timeout.
-		fd_set readSet;
+		fd_set readSet = {};
 		readSet.fd_count = 1;
 		readSet.fd_array[0] = m_Socket;
 		TIMEVAL timeVal = {0, milliseconds*1000};
@@ -831,7 +814,7 @@ public:
 		int status = select( 0, &readSet, NULL, NULL, &timeVal );
 		if ( status > 0 )
 		{
-			sockaddr_in addr;
+			sockaddr_in addr = {};
 			int addrSize = sizeof( addr );
 
 			// Now accept the final connection.
@@ -843,7 +826,7 @@ public:
 			}
 			else
 			{
-				CIPAddr connectedAddr;
+				IpV4 connectedAddr;
 				SockAddrToIPAddr( &addr, &connectedAddr );
 
 				IThreadedTCPSocket *pRet = CThreadedTCPSocket::Create( newSock, connectedAddr, m_pHandler->CreateNewHandler() );
@@ -914,8 +897,8 @@ public:
 	}
 
 	static ITCPConnectSocket* Create(
-		const CIPAddr &connectAddr,
-		const CIPAddr &localAddr,
+		const IpV4 &connectAddr,
+		const IpV4 &localAddr,
 		IHandlerCreator *pHandlerCreator
 		)
 	{
@@ -989,7 +972,7 @@ public:
 		{
 			TIMEVAL timeVal = { 0, milliseconds*1000 };
 			
-			fd_set writeSet;
+			fd_set writeSet = {};
 			writeSet.fd_count = 1;
 			writeSet.fd_array[0] = m_Socket;
 
@@ -1056,15 +1039,15 @@ private:
 	bool m_bConnected;
 
 	SOCKET m_Socket;
-	CIPAddr m_RemoteAddr;
+	IpV4 m_RemoteAddr;
 
 	IHandlerCreator *m_pHandlerCreator;
 };
 
 
 ITCPConnectSocket* ThreadedTCP_CreateConnector( 
-	const CIPAddr &addr,
-	const CIPAddr &localAddr,
+	const IpV4 &addr,
+	const IpV4 &localAddr,
 	IHandlerCreator *pHandlerCreator
 	)
 {

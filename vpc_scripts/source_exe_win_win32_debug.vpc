@@ -76,7 +76,7 @@ $Configuration "Debug"
 
 		// Preprocessor
 		$PreprocessorDefinitions			"$BASE;WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_LIB;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)"
-		$PreprocessorDefinitions			"$BASE;_HAS_ITERATOR_DEBUGGING=0;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_MSC_VER_MISMATCH;" [!$WIN64&&!$VS2015]
+		$PreprocessorDefinitions			"$BASE;_HAS_ITERATOR_DEBUGGING=0;" [!$WIN64&&!$VS2015]
 		$IgnoreStandardIncludePath
 		$GeneratePreprocessedFile
 		$KeepComments

@@ -1,17 +1,17 @@
 
 $Project "dx_proxy_dx9_v00_pc"
 {
-	"utils\dx_proxy\dx_proxy_dx9_v00_pc.vpc" [$WIN32]
+	"utils\dx_proxy\dx_proxy_dx9_v00_pc.vpc" [$WINDOWS]
 }
 
 $Project "dx_proxy_dx9_v30_pc"
 {
-	"utils\dx_proxy\dx_proxy_dx9_v30_pc.vpc" [$WIN32]
+	"utils\dx_proxy\dx_proxy_dx9_v30_pc.vpc" [$WINDOWS]
 }
 
 $Project "dx_proxy_dx10_v00_pc"
 {
-	"utils\dx_proxy\dx_proxy_dx10_v00_pc.vpc" [$WIN32]
+	"utils\dx_proxy\dx_proxy_dx10_v00_pc.vpc" [$WINDOWS]
 }
 
 

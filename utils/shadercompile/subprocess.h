@@ -1,104 +1,106 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-// $NoKeywords: $
-//
-//=============================================================================//
 
-#ifndef SUBPROCESS_H
-#define SUBPROCESS_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SRC_UTILS_SHADERCOMPILE_SUBPROCESS_H_
+#define SRC_UTILS_SHADERCOMPILE_SUBPROCESS_H_
 
-class SubProcessKernelObjects
-{
-	friend class SubProcessKernelObjects_Memory;
+#include "cmdsink.h"
 
-public:
-	SubProcessKernelObjects( void );
-	~SubProcessKernelObjects( void );
+using BOOL = int;
+using HANDLE = void*;
+using DWORD = unsigned long;
 
-private:
-	SubProcessKernelObjects( SubProcessKernelObjects const & );
-	SubProcessKernelObjects & operator =( SubProcessKernelObjects const & );
+class SubProcessKernelObjects {
+  friend class SubProcessKernelObjects_Memory;
 
-protected:
-	BOOL Create( char const *szBaseName );
-	BOOL Open( char const *szBaseName );
+ public:
+  SubProcessKernelObjects();
+  ~SubProcessKernelObjects();
 
-public:
-	BOOL IsValid( void ) const;
-	void Close( void );
+  SubProcessKernelObjects(SubProcessKernelObjects const &) = delete;
+  SubProcessKernelObjects &operator=(SubProcessKernelObjects const &) = delete;
 
-protected:
-	HANDLE m_hMemorySection;
-	HANDLE m_hMutex;
-	HANDLE m_hEvent[2];
-	DWORD m_dwCookie;
+ protected:
+  BOOL Create(char const *szBaseName);
+  BOOL Open(char const *szBaseName);
+
+ public:
+  BOOL IsValid() const;
+  void Close();
+
+ protected:
+  HANDLE m_hMemorySection;
+  HANDLE m_hMutex;
+  HANDLE m_hEvent[2];
+  DWORD m_dwCookie;
 };
 
-class SubProcessKernelObjects_Create : public SubProcessKernelObjects
-{
-public:
-	SubProcessKernelObjects_Create( char const *szBaseName ) { Create( szBaseName ), m_dwCookie = 1; }
+class SubProcessKernelObjects_Create : public SubProcessKernelObjects {
+ public:
+  SubProcessKernelObjects_Create(char const *szBaseName) {
+    Create(szBaseName), m_dwCookie = 1;
+  }
 };
 
-class SubProcessKernelObjects_Open : public SubProcessKernelObjects
-{
-public:
-	SubProcessKernelObjects_Open( char const *szBaseName ) { Open( szBaseName ), m_dwCookie = 0; }
+class SubProcessKernelObjects_Open : public SubProcessKernelObjects {
+ public:
+  SubProcessKernelObjects_Open(char const *szBaseName) {
+    Open(szBaseName), m_dwCookie = 0;
+  }
 };
 
-class SubProcessKernelObjects_Memory
-{
-public:
-	SubProcessKernelObjects_Memory( SubProcessKernelObjects *p ) : m_pObjs( p ), m_pLockData( NULL ), m_pMemory( NULL ) {  }
-	~SubProcessKernelObjects_Memory() { Unlock(); }
+class SubProcessKernelObjects_Memory {
+ public:
+  SubProcessKernelObjects_Memory(SubProcessKernelObjects *p)
+      : m_pObjs(p), m_pLockData(nullptr), m_pMemory(nullptr) {}
+  ~SubProcessKernelObjects_Memory() { Unlock(); }
 
-public:
-	void * Lock( void );
-	BOOL Unlock( void );
+ public:
+  void *Lock();
+  BOOL Unlock();
 
-public:
-	BOOL IsValid( void ) const { return m_pLockData != NULL; }
-	void * GetMemory( void ) const { return m_pMemory; }
+ public:
+  BOOL IsValid() const { return m_pLockData != nullptr; }
+  void *GetMemory() const { return m_pMemory; }
 
-protected:
-	void *m_pMemory;
+ protected:
+  void *m_pMemory;
 
-private:
-	SubProcessKernelObjects *m_pObjs;
-	void *m_pLockData;
+ private:
+  SubProcessKernelObjects *m_pObjs;
+  void *m_pLockData;
 };
-
 
 //
 // Response implementation
 //
-class CSubProcessResponse : public CmdSink::IResponse
-{
-public:
-	explicit CSubProcessResponse( void const *pvMemory );
-	~CSubProcessResponse( void ) { }
+class CSubProcessResponse : public se::shader_compile::command_sink::IResponse {
+ public:
+  explicit CSubProcessResponse(void const *pvMemory);
+  ~CSubProcessResponse() = default;
 
-public:
-	virtual bool Succeeded( void ) { return ( 1 == m_dwResult ); }
-	virtual size_t GetResultBufferLen( void ) { return ( Succeeded() ? m_dwResultBufferLength : 0 ); }
-	virtual const void * GetResultBuffer( void ) { return ( Succeeded() ? m_pvResultBuffer : NULL ); }
-	virtual const char * GetListing( void ) { return (const char *) ( ( m_szListing && * m_szListing ) ? m_szListing : NULL ); }
+  bool Succeeded() const override { return 1 == m_dwResult; }
 
-protected:
-	void const *m_pvMemory;
-	DWORD m_dwResult;
-	DWORD m_dwResultBufferLength;
-	void const *m_pvResultBuffer;
-	char const *m_szListing;
+  size_t GetResultBufferLen() override {
+    return Succeeded() ? m_dwResultBufferLength : 0;
+  }
+  const void *GetResultBuffer() override {
+    return Succeeded() ? m_pvResultBuffer : nullptr;
+  }
+  const char *GetListing() override {
+    return m_szListing && *m_szListing ? static_cast<const char *>(m_szListing)
+                                       : nullptr;
+  }
+
+ protected:
+  void const *m_pvMemory;
+  DWORD m_dwResult;
+  DWORD m_dwResultBufferLength;
+  void const *m_pvResultBuffer;
+  char const *m_szListing;
 };
 
+int ShaderCompile_Subprocess_Main(char const *szSubProcessData);
 
-int ShaderCompile_Subprocess_Main( char const *szSubProcessData );
-
-
-#endif // #ifndef SUBPROCESS_H
+#endif  // !SRC_UTILS_SHADERCOMPILE_SUBPROCESS_H_

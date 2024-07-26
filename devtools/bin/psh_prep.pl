@@ -48,8 +48,6 @@ sub CalcNumDynamicCombos
 	return $numCombos;
 }
 
-$g_dx9 = 1;
-
 while( 1 )
 {
 	$psh_filename = shift;
@@ -57,10 +55,6 @@ while( 1 )
 	if( $psh_filename =~ m/-source/ )
 	{
 		$g_SourceDir = shift;
-	}
-	elsif( $psh_filename =~ m/-x360/ )
-	{
-		$g_x360 = 1;
 	}
 	else
 	{
@@ -112,8 +106,7 @@ while( <PSH> )
 		if (/\[(.*)\]/)
 		{
 			$platforms=$1;
-			next if ( ($g_x360) && (!($platforms=~/XBOX/i)) );
-			next if ( (!$g_x360) && (!($platforms=~/PC/i)) );
+			next if ( (!($platforms=~/PC/i)) );
 		}
 		push @staticDefineNames, $name;
 		push @staticDefineMin, $min;
@@ -129,8 +122,7 @@ while( <PSH> )
 		if (/\[(.*)\]/)
 		{
 			$platforms=$1;
-			next if ( ($g_x360) && (!($platforms=~/XBOX/i)) );
-			next if ( (!$g_x360) && (!($platforms=~/PC/i)) );
+			next if ( (!($platforms=~/PC/i)) );
 		}
 		push @dynamicDefineNames, $name;
 		push @dynamicDefineMin, $min;
@@ -145,18 +137,8 @@ print "$psh_filename\n";
 #print "$numCombos combos\n";
 #print "$numDynamicCombos dynamic combos\n";
 
-if( $g_x360 )
-{
-	$pshtmp = "pshtmp9_360";
-}
-elsif( $g_dx9 )
-{
-	$pshtmp = "pshtmp9";
-}
-else
-{
-	$pshtmp = "pshtmp8";
-}
+$pshtmp = "pshtmp9";
+
 $basename = $psh_filename;
 $basename =~ s/\.psh$//i;
 
@@ -165,14 +147,7 @@ for( $shaderCombo = 0; $shaderCombo < $numCombos; $shaderCombo++ )
 	my $tempFilename = "shader$shaderCombo.o";
 	unlink $tempFilename;
 	
-	if( $g_x360 )
-	{
-		$cmd = "$g_SourceDir\\x360xdk\\bin\\win32\\psa /D_X360=1 /Foshader$shaderCombo.o /nologo " . &BuildDefineOptions( $shaderCombo ) . "$psh_filename > NIL";
-	}
-	else
-	{
-		$cmd = "$g_SourceDir\\dx9sdk\\utilities\\psa /Foshader$shaderCombo.o /nologo " . &BuildDefineOptions( $shaderCombo ) . "$psh_filename > NIL";
-	}
+	$cmd = "$g_SourceDir\\dx9sdk\\utilities\\psa /Foshader$shaderCombo.o /nologo " . &BuildDefineOptions( $shaderCombo ) . "$psh_filename > NIL";
 
 	if( !stat $pshtmp )
 	{
@@ -234,15 +209,7 @@ push @outputHeader, "static $basename" . "PixelShader_t $basename" . "_PixelShad
 
 &MakeDirHier( "shaders/psh" );
 
-my $vcsName = "";
-if( $g_x360 )
-{
-	$vcsName = $basename . ".360.vcs";
-}
-else
-{
-	$vcsName = $basename . ".vcs";
-}
+my $vcsName = $basename . ".vcs";
 
 open COMPILEDSHADER, ">shaders/psh/$vcsName" || die;
 binmode( COMPILEDSHADER );
@@ -256,12 +223,6 @@ binmode( COMPILEDSHADER );
 # Pack arguments
 my $sInt = "i";
 my $uInt = "I";
-if ( $g_x360 )
-{
-	# Change arguments to "big endian long"
-	$sInt = "N";
-	$uInt = "N";
-}
 
 open PSH, "<$psh_filename";
 my $crc = crc32( *PSH );

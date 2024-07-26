@@ -1,23 +1,21 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================//
-
-#ifndef PACIFIER_H
-#define PACIFIER_H
-#ifdef _WIN32
-#pragma once
-#endif
-
-
-// Use these to display a pacifier like:
+// Display a pacifier like:
 // ProcessBlock_Thread: 0...1...2...3...4...5...6...7...8...9... (0)
-void StartPacifier( char const *pPrefix );			// Prints the prefix and resets the pacifier
-void UpdatePacifier( float flPercent );				// percent value between 0 and 1.
-void EndPacifier( bool bCarriageReturn = true );	// Completes pacifier as if 100% was done
-void SuppressPacifier( bool bSuppress = true );		// Suppresses pacifier updates if another thread might still be firing them
 
+#ifndef SRC_UTILS_COMMON_PACIFIER_H_
+#define SRC_UTILS_COMMON_PACIFIER_H_
 
-#endif // PACIFIER_H
+// Prints the prefix and resets the pacifier
+void StartPacifier(char const *prefix);
+
+// percent value between 0 and 1.
+void UpdatePacifier(float percent);
+
+// Completes pacifier as if 100% was done
+void EndPacifier(bool should_add_new_line = true);
+
+// Suppresses pacifier updates if another thread might still be firing them.
+void SuppressPacifier(bool enable = true);
+
+#endif  // SRC_UTILS_COMMON_PACIFIER_H_

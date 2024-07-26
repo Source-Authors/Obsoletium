@@ -1,168 +1,106 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: Make dynamic loading of dx_proxy.dll and methods acquisition easier.
-//
-// $NoKeywords: $
-//
-//=============================================================================//
+// Make dynamic loading of dx_proxy.dll and methods acquisition easier.
 
-#ifndef DX_PROXY_H
-#define DX_PROXY_H
+#ifndef SRC_COMMON_DX_PROXY_H_
+#define SRC_COMMON_DX_PROXY_H_
 
-#ifdef _WIN32
-#pragma once
-#endif
+namespace se::dx_proxy {
 
+/**
+ * @brief Uses a lazy-load technique to load the dx_proxy.dll module and acquire
+ * the function pointers.  The dx_proxy.dll module is automatically unloaded
+ * during destruction.
+ */
+class DxProxyModule {
+ public:
+  /// Construction
+  DxProxyModule();
+  /// Destruction
+  ~DxProxyModule();
 
-/*
+  DxProxyModule(const DxProxyModule&) = delete;
+  DxProxyModule& operator=(const DxProxyModule&) = delete;
 
-class DxProxyModule
+  /// Loads the module and acquires function pointers, returns if the module was
+  /// loaded successfully.  If the module was already loaded the call has no
+  /// effect and returns TRUE.
+  BOOL Load();
+  /// Frees the loaded module.
+  void Free();
 
-Uses a lazy-load technique to load the dx_proxy.dll module and acquire the
-function pointers.
+ private:
+  enum class Function { D3DCompileFromFile = 0, Total };
 
-The dx_proxy.dll module is automatically unloaded during desctruction.
+  //!< The handle of the loaded dx_proxy.dll
+  HMODULE m_hModule;
 
-*/
-class DxProxyModule
-{
-public:
-	/// Construction
-	DxProxyModule( void );
-	/// Destruction
-	~DxProxyModule( void );
+  //!< The array of loaded function pointers
+  FARPROC m_arrFuncs[to_underlying(Function::Total)];
 
-private: // Prevent copying via copy constructor or assignment
-	DxProxyModule( const DxProxyModule & );
-	DxProxyModule & operator = ( const DxProxyModule & );
+  // Requested function names array
+  static inline const char* arrFuncNames[to_underlying(Function::Total)] = {
+      "Proxy_D3DCompileFromFile"};
 
-public:
-	/// Loads the module and acquires function pointers, returns if the module was
-	/// loaded successfully.
-	/// If the module was already loaded the call has no effect and returns TRUE.
-	BOOL Load( void );
-	/// Frees the loaded module.
-	void Free( void );
-
-private:
-	enum Func {
-		fnD3DXCompileShaderFromFile = 0,
-		fnTotal
-	};
-	HMODULE m_hModule;				//!< The handle of the loaded dx_proxy.dll
-	FARPROC m_arrFuncs[fnTotal];	//!< The array of loaded function pointers
-
-
-	///
-	/// Interface functions calling into DirectX proxy
-	///
-public:
-	HRESULT D3DXCompileShaderFromFile(
-		LPCSTR                          pSrcFile,
-		CONST D3DXMACRO*                pDefines,
-		LPD3DXINCLUDE                   pInclude,
-		LPCSTR                          pFunctionName,
-		LPCSTR                          pProfile,
-		DWORD                           Flags,
-		LPD3DXBUFFER*                   ppShader,
-		LPD3DXBUFFER*                   ppErrorMsgs,
-		LPD3DXCONSTANTTABLE*            ppConstantTable );
+  /// Interface functions calling into DirectX proxy
+ public:
+  HRESULT D3DCompileFromFile(LPCSTR pFileName, const D3D_SHADER_MACRO* pDefines,
+                             ID3DInclude* pInclude, LPCSTR pEntrypoint,
+                             LPCSTR pTarget, UINT Flags1, UINT Flags2,
+                             ID3DBlob** ppCode, ID3DBlob** ppErrorMsgs);
 };
 
-
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-//
-//     IMPLEMENTATION
-//
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-
-
-inline DxProxyModule::DxProxyModule( void )
-{
-	m_hModule = NULL;
-	ZeroMemory( m_arrFuncs, sizeof( m_arrFuncs ) );
+inline DxProxyModule::DxProxyModule() {
+  m_hModule = nullptr;
+  memset(m_arrFuncs, 0, sizeof(m_arrFuncs));
 }
 
-inline DxProxyModule::~DxProxyModule( void )
-{
-	Free();
+inline DxProxyModule::~DxProxyModule() { Free(); }
+
+inline BOOL DxProxyModule::Load() {
+  if (m_hModule == nullptr &&
+      (m_hModule = ::LoadLibrary("dx_proxy.dll")) != nullptr) {
+    // Acquire the functions
+    for (ptrdiff_t k{0}; k < ssize(m_arrFuncs); ++k) {
+      m_arrFuncs[k] = ::GetProcAddress(m_hModule, arrFuncNames[k]);
+    }
+  }
+
+  return !!m_hModule;
 }
 
-inline BOOL DxProxyModule::Load( void )
-{
-	if ( (m_hModule == NULL) &&
-		( m_hModule = ::LoadLibrary( "dx_proxy.dll" ) ) != NULL )
-	{
-		// Requested function names array
-		LPCSTR const arrFuncNames[fnTotal] = {
-			"Proxy_D3DXCompileShaderFromFile"
-		};
+inline void DxProxyModule::Free() {
+  if (m_hModule) {
+    ::FreeLibrary(m_hModule);
 
-		// Acquire the functions
-		for ( int k = 0; k < fnTotal; ++ k )
-		{
-			m_arrFuncs[k] = ::GetProcAddress( m_hModule, arrFuncNames[k] );
-		}
-	}
+    m_hModule = nullptr;
 
-	return !!m_hModule;
+    memset(m_arrFuncs, 0, sizeof(m_arrFuncs));
+  }
 }
 
-inline void DxProxyModule::Free( void )
-{
-	if ( m_hModule )
-	{
-		::FreeLibrary( m_hModule );
-		m_hModule = NULL;
-		ZeroMemory( m_arrFuncs, sizeof( m_arrFuncs ) );
-	}
+inline HRESULT DxProxyModule::D3DCompileFromFile(
+    LPCSTR pFileName, const D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude,
+    LPCSTR pEntrypoint, LPCSTR pTarget, UINT Flags1, UINT Flags2,
+    ID3DBlob** ppCode, ID3DBlob** ppErrorMsgs) {
+  if (!Load()) return MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, 1);
+
+  if (!m_arrFuncs[to_underlying(Function::D3DCompileFromFile)])
+    return MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, 2);
+
+  HRESULT WINAPI D3DCompileFromFileProxy(
+      LPCSTR pFileName, CONST D3D_SHADER_MACRO * pDefines,
+      ID3DInclude * pInclude, LPCSTR pEntrypoint, LPCSTR pTarget, UINT Flags1,
+      UINT Flags2, ID3DBlob * *ppCode, ID3DBlob * *ppErrorMsgs);
+
+  using D3DCompileFromFileProxyFunction = decltype(&D3DCompileFromFileProxy);
+  const auto proxy = reinterpret_cast<D3DCompileFromFileProxyFunction>(
+      m_arrFuncs[to_underlying(Function::D3DCompileFromFile)]);
+
+  return proxy(pFileName, pDefines, pInclude, pEntrypoint, pTarget, Flags1,
+               Flags2, ppCode, ppErrorMsgs);
 }
 
+}  // namespace se::dx_proxy
 
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-//
-//     INTERFACE FUNCTIONS IMPLEMENTATION
-//
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-
-
-
-inline HRESULT DxProxyModule::D3DXCompileShaderFromFile(
-								  LPCSTR                          pSrcFile,
-								  CONST D3DXMACRO*                pDefines,
-								  LPD3DXINCLUDE                   pInclude,
-								  LPCSTR                          pFunctionName,
-								  LPCSTR                          pProfile,
-								  DWORD                           Flags,
-								  LPD3DXBUFFER*                   ppShader,
-								  LPD3DXBUFFER*                   ppErrorMsgs,
-								  LPD3DXCONSTANTTABLE*            ppConstantTable )
-{
-	if ( !Load() )
-		return MAKE_HRESULT( SEVERITY_ERROR, FACILITY_ITF, 1 );
-	if ( !m_arrFuncs[fnD3DXCompileShaderFromFile] )
-		return MAKE_HRESULT( SEVERITY_ERROR, FACILITY_ITF, 2 );
-
-	return
-		( *
-			( HRESULT (WINAPI *)
-				( LPCSTR, CONST D3DXMACRO*, LPD3DXINCLUDE,
-				  LPCSTR, LPCSTR, DWORD, LPD3DXBUFFER*,
-				  LPD3DXBUFFER*, LPD3DXCONSTANTTABLE* )
-			)
-			m_arrFuncs[fnD3DXCompileShaderFromFile]
-		)
-		( pSrcFile, pDefines, pInclude, pFunctionName, pProfile, Flags, ppShader, ppErrorMsgs, ppConstantTable );
-}
-
-
-#endif // #ifndef DX_PROXY_H
+#endif  // !SRC_COMMON_DX_PROXY_H_

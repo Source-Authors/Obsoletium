@@ -1,11 +1,12 @@
 
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: Module prototypes.
-//
-// $NoKeywords: $
-//
-//=============================================================================//
+// Module prototypes.
 
-void DebugOut( const char *pMsg, ... );
-void DebugSafeWaitPoint( bool bForceWait = false );
+#ifndef SRC_UTILS_SHADERCOMPILE_SHADERCOMPILE_H_
+#define SRC_UTILS_SHADERCOMPILE_SHADERCOMPILE_H_
+
+void DebugOut(const char *format, ...);
+void DebugSafeWaitPoint(bool force_wait = false);
+
+#endif  // !SRC_UTILS_SHADERCOMPILE_SHADERCOMPILE_H_

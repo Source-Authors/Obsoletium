@@ -53,9 +53,20 @@ $Configuration
 		$PreprocessorDefinitions	"$BASE;DX_PROXY_EXPORTS;$DX_SDK_VER"
 		$EnableC++Exceptions		"Yes (/EHsc)"
 	}
+
+	$Linker
+	{
+		$AdditionalDependencies				"$BASE D3DCompiler.lib"
+	}
+
+	$Resources
+	{
+		// General
+		$PreprocessorDefinitions			"$BASE;$DX_SDK_VER"
+	}
 }
 
-$Project "DX_Proxy ($DX_SDK_VER)"
+$Project "dx_proxy ($DX_SDK_VER)"
 {
 	$Folder	"Source Files"
 	{
@@ -70,5 +81,6 @@ $Project "DX_Proxy ($DX_SDK_VER)"
 		$File	"$SRCDIR\common\dx_proxy\dx_proxy.h"
 		$File	"dxincludeimpl.h"
 		$File	"filememcache.h"
+		$File	"resource.h"
 	}
 }

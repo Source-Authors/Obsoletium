@@ -81,7 +81,7 @@ $Configuration "Release"
 		$WholeProgramOptimization
 
 		// Preprocessor
-		$PreprocessorDefinitions			"$BASE;WIN32;_WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_MSC_VER_MISMATCH;%(PreprocessorDefinitions)"
+		$PreprocessorDefinitions			"$BASE;WIN32;_WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)"
 		$PreprocessorDefinitions			"$BASE;RELEASEASSERTS" [$RELEASEASSERTS]
 		$IgnoreStandardIncludePath
 		$GeneratePreprocessedFile

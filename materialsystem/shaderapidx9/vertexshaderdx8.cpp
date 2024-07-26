@@ -105,7 +105,9 @@ int BZ2_bzBuffToBuffDecompress(
 
 #endif
 
-static ConVar mat_remoteshadercompile( "mat_remoteshadercompile", "127.0.0.1", FCVAR_CHEAT );
+static ConVar mat_remoteshadercompile( "mat_remoteshadercompile", "127.0.0.1", FCVAR_CHEAT, "Remote shader compiler server IP address" );
+// dimhotepus: Allow to select remote shader compiler port.
+static ConVar mat_remoteshadercompile_port( "mat_remoteshadercompile_port", "20000", FCVAR_CHEAT, "Remote shader compiler server port", true, 1024, true, 65535 );
 
 //#define PROFILE_SHADER_CREATE
 
@@ -115,11 +117,7 @@ static ConVar mat_remoteshadercompile( "mat_remoteshadercompile", "127.0.0.1", F
 // debugging aid
 #define MAX_SHADER_HISTORY	16
 
-#if !defined( _X360 )
 #define SHADER_FNAME_EXTENSION	".vcs"
-#else
-#define SHADER_FNAME_EXTENSION	".360.vcs"
-#endif
 
 #ifdef DYNAMIC_SHADER_COMPILE
 volatile static char s_ShaderCompileString[]="dynamic_shader_compile_is_on";
@@ -650,20 +648,19 @@ private:
 		int GetNumDynamicCombos( void ) const
 		{
 			int combos = 1;
-			int i;
-			for( i = 0; i < m_DynamicCombos.Count(); i++ )
+			for( auto &combo : m_DynamicCombos )
 			{
-				combos *= ( m_DynamicCombos[i].m_nMax - m_DynamicCombos[i].m_nMin + 1 );
+				combos *= ( combo.m_nMax - combo.m_nMin + 1 );
 			}
 			return combos;
 		}
+
 		int GetNumStaticCombos( void ) const
 		{
 			int combos = 1;
-			int i;
-			for( i = 0; i < m_StaticCombos.Count(); i++ )
+			for( auto &combo : m_StaticCombos )
 			{
-				combos *= ( m_StaticCombos[i].m_nMax - m_StaticCombos[i].m_nMin + 1 );
+				combos *= ( combo.m_nMax - combo.m_nMin + 1 );
 			}
 			return combos;
 		}
@@ -719,11 +716,7 @@ private:
 	CUtlSymbolTable m_ShaderSymbolTable;
 
 #ifdef DYNAMIC_SHADER_COMPILE	
-	using ShaderCompileFromFileFunc_t = decltype(&D3DCompileFromFile);
-
 	CUtlStringMap<ShaderCombos_t>	 m_ShaderNameToCombos;
-	CSysModule						*m_pShaderCompiler;
-	ShaderCompileFromFileFunc_t		m_ShaderCompileFileFunc;
 #endif
 	
 	// The current vertex and pixel shader
@@ -773,8 +766,6 @@ CShaderManager::CShaderManager() :
 	m_bCreateShadersOnDemand = false;
 
 #ifdef DYNAMIC_SHADER_COMPILE
-	m_pShaderCompiler = 0;
-	m_ShaderCompileFileFunc = 0;
 #ifdef REMOTE_DYNAMIC_SHADER_COMPILE
 	m_RemoteShaderCompileSocket = INVALID_SOCKET;
 #endif
@@ -800,55 +791,46 @@ void CShaderManager::InitRemoteShaderCompile()
 {
 	DeinitRemoteShaderCompile();
 	
-	int nResult = 0;
-	#ifdef _WIN32	
-		WSADATA wsaData;
-		nResult = WSAStartup( MAKEWORD(2,0), &wsaData );
-		if ( nResult != 0 )
-		{
-			Warning( "CShaderManager::Init - Could not init socket for remote dynamic shader compilation: Network library winsock 2.0 unavailable: %s (0x%x).\n",
-				std::system_category().message(nResult).c_str(),
-				nResult );
-		}
-	#endif
-
-	struct addrinfo hints;
-	ZeroMemory( &hints, sizeof(hints) );
+	addrinfo hints = {};
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 
 	// Resolve the server address and port
-	struct addrinfo *result = NULL;
-	nResult = getaddrinfo( mat_remoteshadercompile.GetString(), REMOTE_SHADER_COMPILE_PORT, &hints, &result );
-	if ( nResult != 0 )
+	addrinfo *result = nullptr;
+	int rc = getaddrinfo( mat_remoteshadercompile.GetString(),
+		mat_remoteshadercompile_port.GetString(), &hints, &result );
+	if ( rc != 0 )
 	{
-		Warning( "getaddrinfo failed: %d\n", nResult );
-		#ifdef _WIN32
-			WSACleanup();
-		#endif
+		DWarning( "remote shader compiler", 0,
+			"getaddrinfo %s:%s failed: %s.\n",
+			mat_remoteshadercompile.GetString(),
+			mat_remoteshadercompile_port.GetString(),
+			std::system_category().message(::WSAGetLastError()).c_str() );
 		Assert( 0 );
 	}
 
 	// Attempt to connect to an address until one succeeds
-	for( struct addrinfo *ptr = result; ptr != NULL; ptr = ptr->ai_next )
+	for( addrinfo *ptr = result; ptr; ptr = ptr->ai_next )
 	{
 		// Create a SOCKET for connecting to remote shader compilation server
 		m_RemoteShaderCompileSocket = socket( ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol );
 		if ( m_RemoteShaderCompileSocket == INVALID_SOCKET )
 		{
-			Warning( "Error at socket(): %ld\n", WSAGetLastError() );
+			DWarning( "remote shader compiler", 0,
+				"socket(%d, %d, %d) failed: %s.\n",
+				ptr->ai_family,
+				ptr->ai_socktype,
+				ptr->ai_protocol,
+				std::system_category().message(::WSAGetLastError()).c_str() );
 			freeaddrinfo( result );
-			#ifdef _WIN32
-				WSACleanup();
-			#endif
 			Assert( 0 );
 			continue;
 		}
 
 		// Connect to server.
-		nResult = connect( m_RemoteShaderCompileSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
-		if ( nResult == SOCKET_ERROR )
+		rc = connect( m_RemoteShaderCompileSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+		if ( rc == SOCKET_ERROR )
 		{
 			closesocket( m_RemoteShaderCompileSocket );
 			m_RemoteShaderCompileSocket = INVALID_SOCKET;
@@ -861,10 +843,10 @@ void CShaderManager::InitRemoteShaderCompile()
 
 	if ( m_RemoteShaderCompileSocket == INVALID_SOCKET )
 	{
-		Warning( "Unable to connect to remote shader compilation server!\n" );
-		#ifdef _WIN32
-			WSACleanup();
-		#endif
+		DWarning( "remote shader compiler", 0,
+			"Unable to connect to remote shader compilation server %s:%s!\n",
+			mat_remoteshadercompile.GetString(),
+			mat_remoteshadercompile_port.GetString() );
 		Assert ( 0 );
 	}
 }
@@ -875,9 +857,22 @@ void CShaderManager::DeinitRemoteShaderCompile()
 	{
 		if ( shutdown( m_RemoteShaderCompileSocket, SD_SEND ) == SOCKET_ERROR )
 		{
-			Warning( "Remote shader compilation shutdown failed: %d\n", WSAGetLastError() );
+			DWarning( "remote shader compiler", 0,
+				"shutdown(%s:%s, SD_SEND) failed: %s.\n",
+				mat_remoteshadercompile.GetString(),
+				mat_remoteshadercompile_port.GetString(),
+				std::system_category().message(::WSAGetLastError()).c_str() );
 		}
-		closesocket( m_RemoteShaderCompileSocket );
+
+		if ( closesocket( m_RemoteShaderCompileSocket ) == SOCKET_ERROR )
+		{
+			DWarning( "remote shader compiler", 0,
+				"closesocket(%s:%s) failed: %s.\n",
+				mat_remoteshadercompile.GetString(),
+				mat_remoteshadercompile_port.GetString(),
+				std::system_category().message(::WSAGetLastError()).c_str() );
+		}
+
 		m_RemoteShaderCompileSocket = INVALID_SOCKET;
 	}
 }
@@ -888,26 +883,13 @@ void CShaderManager::DeinitRemoteShaderCompile()
 //-----------------------------------------------------------------------------
 void CShaderManager::Init()
 {
-	// incompatible with the 360, violates loading system
 	// only used by PC to help tools reduce d3d footprint
-	m_bCreateShadersOnDemand = IsPC() && ( ShaderUtil()->InEditorMode() || CommandLine()->CheckParm( "-shadersondemand" ) );
+	m_bCreateShadersOnDemand = ShaderUtil()->InEditorMode() || CommandLine()->CheckParm( "-shadersondemand" );
 
 #ifdef DYNAMIC_SHADER_COMPILE
-	if( !IsX360() )
-	{
-
 #ifdef REMOTE_DYNAMIC_SHADER_COMPILE
 	InitRemoteShaderCompile();
-#else // REMOTE_DYNAMIC_SHADER_COMPILE
-
-	m_pShaderCompiler = Sys_LoadModule( "D3DCompiler_47.dll" );
-	if ( m_pShaderCompiler )
-	{
-		m_ShaderCompileFileFunc = (ShaderCompileFromFileFunc_t)GetProcAddress( (HMODULE)m_pShaderCompiler, "D3DCompileFromFile" );
-	}
 #endif
-
-	}
 #endif // DYNAMIC_SHADER_COMPILE
 
 	CreateStaticShaders();
@@ -920,7 +902,6 @@ void CShaderManager::Shutdown()
 	{
 		Sys_UnloadModule( m_pShaderCompiler );
 		m_pShaderCompiler = 0;
-		m_ShaderCompileFileFunc = 0;
 	}
 #endif
 
@@ -1147,7 +1128,9 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 	{
 		return &m_ShaderNameToCombos[pShaderName];
 	}
+
 	ShaderCombos_t &combos = m_ShaderNameToCombos[pShaderName];
+
 	char filename[MAX_PATH];
 	// try the vsh dir first.
 	Q_strncpy( filename, GetShaderSourcePath(), MAX_PATH );
@@ -1263,11 +1246,31 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 		if ( Q_stristr( pShaderName, "_ps30" ) &&
 			Q_stristr( line, "[ps" ) &&	 !Q_stristr( line, "[ps30]" ) )
 			continue;
+		// dimhotepus: Shader model 4, 4.1, 5 support.
+		if ( Q_stristr( pShaderName, "_ps40" ) &&
+			Q_stristr( line, "[ps" ) &&	 !Q_stristr( line, "[ps40]" ) )
+			continue;
+		if ( Q_stristr( pShaderName, "_ps41" ) &&
+			Q_stristr( line, "[ps" ) &&	 !Q_stristr( line, "[ps41]" ) )
+			continue;
+		if ( Q_stristr( pShaderName, "_ps50" ) &&
+			Q_stristr( line, "[ps" ) &&	 !Q_stristr( line, "[ps50]" ) )
+			continue;
 		if ( Q_stristr( pShaderName, "_vs20" ) &&
 			Q_stristr( line, "[vs" ) &&	 !Q_stristr( line, "[vs20]" ) )
 			continue;
 		if ( Q_stristr( pShaderName, "_vs30" ) &&
 			Q_stristr( line, "[vs" ) &&	 !Q_stristr( line, "[vs30]" ) )
+			continue;
+		// dimhotepus: Shader model 4, 4.1, 5 support.
+		if ( Q_stristr( pShaderName, "_vs40" ) &&
+			Q_stristr( line, "[vs" ) &&	 !Q_stristr( line, "[vs40]" ) )
+			continue;
+		if ( Q_stristr( pShaderName, "_vs41" ) &&
+			Q_stristr( line, "[vs" ) &&	 !Q_stristr( line, "[vs41]" ) )
+			continue;
+		if ( Q_stristr( pShaderName, "_vs50" ) &&
+			Q_stristr( line, "[vs" ) &&	 !Q_stristr( line, "[vs50]" ) )
 			continue;
 
 		char *pScan = &line[2];
@@ -1491,103 +1494,126 @@ HRESULT CDxInclude::Close( LPCVOID pData )
 }
 #endif // not DX_TO_GL_ABSTRACTION
 
-static const char *FileNameToShaderModel( const char *pShaderName, bool bVertexShader )
+static const char *FileNameToShaderProfile( const char *pShaderName, bool bVertexShader )
 {
-	// Figure out the shader model
-	const char *pShaderModel = NULL;
+	// Figure out the shader profile
+	const char *pShaderProfile = nullptr;
 	if( bVertexShader )
 	{
 		if( Q_stristr( pShaderName, "vs20" ) )
 		{
-			pShaderModel = "vs_2_0";
+			pShaderProfile = "vs_2_0";
 			bVertexShader = true;
 		}
 		else if( Q_stristr( pShaderName, "vs11" ) )
 		{
-			pShaderModel = "vs_1_1";
+			pShaderProfile = "vs_1_1";
 			bVertexShader = true;
 		}
 		else if( Q_stristr( pShaderName, "vs14" ) )
 		{
-			pShaderModel = "vs_1_1";
+			pShaderProfile = "vs_1_1";
 			bVertexShader = true;
 		}
 		else if( Q_stristr( pShaderName, "vs30" ) )
 		{
-			pShaderModel = "vs_3_0";
+			pShaderProfile = "vs_3_0";
+			bVertexShader = true;
+		}
+		// dimhotepus: Shader Model 4 support.
+		else if( Q_stristr( pShaderName, "vs40" ) )
+		{
+			pShaderProfile = "vs_4_0";
+			bVertexShader = true;
+		}
+		// dimhotepus: Shader Model 4.1 support.
+		else if( Q_stristr( pShaderName, "vs41" ) )
+		{
+			pShaderProfile = "vs_4_1";
+			bVertexShader = true;
+		}
+		// dimhotepus: Shader Model 5.0 support.
+		else if( Q_stristr( pShaderName, "vs50" ) )
+		{
+			pShaderProfile = "vs_5_0";
 			bVertexShader = true;
 		}
 		else
 		{
-#ifdef _DEBUG
-			Error( "Failed dynamic shader compiled\nBuild shaderapidx9.dll in debug to find problem\n" );
-#else
-			Assert( 0 );
-#endif
+			Error( "Unable to get shader profile for vertex shader %s.\n", pShaderName );
 		}
 	}
 	else
 	{
 		if( Q_stristr( pShaderName, "ps20b" ) )
 		{
-			pShaderModel = "ps_2_b";
+			pShaderProfile = "ps_2_b";
 		}
 		else if( Q_stristr( pShaderName, "ps20" ) )
 		{
-			pShaderModel = "ps_2_0";
+			pShaderProfile = "ps_2_0";
 		}
 		else if( Q_stristr( pShaderName, "ps11" ) )
 		{
-			pShaderModel = "ps_1_1";
+			pShaderProfile = "ps_1_1";
 		}
 		else if( Q_stristr( pShaderName, "ps14" ) )
 		{
-			pShaderModel = "ps_1_4";
+			pShaderProfile = "ps_1_4";
 		}
 		else if( Q_stristr( pShaderName, "ps30" ) )
 		{
-			pShaderModel = "ps_3_0";
+			pShaderProfile = "ps_3_0";
+		}
+		// dimhotepus: Shader Model 4 support.
+		else if( Q_stristr( pShaderName, "ps40" ) )
+		{
+			pShaderProfile = "ps_4_0";
+		}
+		// dimhotepus: Shader Model 4.1 support.
+		else if( Q_stristr( pShaderName, "ps41" ) )
+		{
+			pShaderProfile = "ps_4_1";
+		}
+		// dimhotepus: Shader Model 5.0 support.
+		else if( Q_stristr( pShaderName, "ps50" ) )
+		{
+			pShaderProfile = "ps_5_0";
 		}
 		else
 		{
-#ifdef _DEBUG
-			Error( "Failed dynamic shader compiled\nBuild shaderapidx9.dll in debug to find problem\n" );
-#else
-			Assert( 0 );
-#endif
+			Error( "Unable to get shader profile for pixel shader %s.\n", pShaderName );
 		}
 	}
-	return pShaderModel;
+	return pShaderProfile;
 }
 #endif
 
 #ifdef DYNAMIC_SHADER_COMPILE
 
-#if defined( _X360 )
-static ConVar mat_flushshaders_generate_updbs( "mat_flushshaders_generate_updbs", "0", 0, "Generates UPDBs whenever you flush shaders." );
-#endif
-
 HardwareShader_t CShaderManager::CompileShader( const char *pShaderName, 
 												int nStaticIndex, int nDynamicIndex, bool bVertexShader )
 {
 	VPROF_BUDGET( "CompileShader", "CompileShader" );
+
 	Assert( m_ShaderNameToCombos.Defined( pShaderName ) );
 	if( !m_ShaderNameToCombos.Defined( pShaderName ) )
 	{
 		return INVALID_HARDWARE_SHADER;
 	}
+
 	const ShaderCombos_t &combos = m_ShaderNameToCombos[pShaderName];
 #ifdef _DEBUG
 	int numStaticCombos = combos.GetNumStaticCombos();
 	int numDynamicCombos = combos.GetNumDynamicCombos();
 #endif
 	Assert( nStaticIndex % numDynamicCombos == 0 );
-	Assert( ( nStaticIndex % numDynamicCombos ) >= 0 && ( nStaticIndex % numDynamicCombos ) < numStaticCombos );
+	Assert( ( nStaticIndex % numDynamicCombos ) >= 0 &&
+			( nStaticIndex % numDynamicCombos ) < numStaticCombos );
 	Assert( nDynamicIndex >= 0 && nDynamicIndex < numDynamicCombos );
 
 #	ifdef DYNAMIC_SHADER_COMPILE_VERBOSE
 
-	//Warning( "Compiling %s %s\n\tdynamic:", bVertexShader ? "vsh" : "psh", pShaderName );
 	Warning( "Compiling " );
 	if ( bVertexShader )
 		ConColorMsg( Color( 0, 255, 0, 255 ), "vsh - %s ", pShaderName );
@@ -1598,44 +1624,52 @@ HardwareShader_t CShaderManager::CompileShader( const char *pShaderName,
 #	endif
 
 	CUtlVector<D3D_SHADER_MACRO> macros;
-	// plus 1 for null termination, plus 1 for #define SHADER_MODEL_*, and plus 1 for #define _X360 on 360
-	macros.SetCount( combos.m_DynamicCombos.Count() + combos.m_StaticCombos.Count() + 2 + ( IsX360() ? 1 : 0 ) );
+	// plus 1 for null termination, plus 1 for #define SHADER_MODEL_*
+	macros.SetCount( combos.m_DynamicCombos.Count() + combos.m_StaticCombos.Count() + 2 );
 
 	int nCombo = nStaticIndex + nDynamicIndex;
 	int macroIndex = 0;
-	int i;
-	for( i = 0; i < combos.m_DynamicCombos.Count(); i++ )
+	for( auto &combo : combos.m_DynamicCombos )
 	{
-		int countForCombo = combos.m_DynamicCombos[i].m_nMax - combos.m_DynamicCombos[i].m_nMin + 1;
-		int val = nCombo % countForCombo + combos.m_DynamicCombos[i].m_nMin;
+		const int countForCombo = combo.m_nMax - combo.m_nMin + 1;
+		const int val = nCombo % countForCombo + combo.m_nMin;
+
 		nCombo /= countForCombo;
-		macros[macroIndex].Name = m_ShaderSymbolTable.String( combos.m_DynamicCombos[i].m_ComboName );
+		macros[macroIndex].Name = m_ShaderSymbolTable.String( combo.m_ComboName );
+
 		char buf[16];
 		sprintf( buf, "%d", val );
 		CUtlSymbol valSymbol( buf );
 		macros[macroIndex].Definition = valSymbol.String();
+
 #	ifdef DYNAMIC_SHADER_COMPILE_VERBOSE
 		Warning( " %s=%s", macros[macroIndex].Name, macros[macroIndex].Definition );
 #	endif
+
 		macroIndex++;
 	}
 
 #	ifdef DYNAMIC_SHADER_COMPILE_VERBOSE
 	Warning( "\n\tstatic:" );
 #	endif
-	for( i = 0; i < combos.m_StaticCombos.Count(); i++ )
+
+	for( auto &combo : combos.m_StaticCombos )
 	{
-		int countForCombo = combos.m_StaticCombos[i].m_nMax - combos.m_StaticCombos[i].m_nMin + 1;
-		int val = nCombo % countForCombo + combos.m_StaticCombos[i].m_nMin;
+		const int countForCombo = combo.m_nMax - combo.m_nMin + 1;
+		const int val = nCombo % countForCombo + combo.m_nMin;
+
 		nCombo /= countForCombo;
-		macros[macroIndex].Name = m_ShaderSymbolTable.String( combos.m_StaticCombos[i].m_ComboName );
+		macros[macroIndex].Name = m_ShaderSymbolTable.String( combo.m_ComboName );
+
 		char buf[16];
 		sprintf( buf, "%d", val );
 		CUtlSymbol valSymbol( buf );
 		macros[macroIndex].Definition = valSymbol.String();
+
 #	ifdef DYNAMIC_SHADER_COMPILE_VERBOSE
 		Warning( " %s=%s", macros[macroIndex].Name, macros[macroIndex].Definition );
 #	endif
+
 		macroIndex++;
 	}
 
@@ -1644,30 +1678,22 @@ HardwareShader_t CShaderManager::CompileShader( const char *pShaderName,
 #	endif
 
 	char filename[MAX_PATH];
-	Q_strncpy( filename, GetShaderSourcePath(), MAX_PATH );
-	Q_strncat( filename, "\\", MAX_PATH, COPY_ALL_CHARACTERS );
-	Q_strncat( filename, pShaderName, MAX_PATH, COPY_ALL_CHARACTERS );
-	Q_strncat( filename, ".fxc", MAX_PATH, COPY_ALL_CHARACTERS );
+	V_strcpy_safe( filename, GetShaderSourcePath() );
+	V_strcat_safe( filename, "\\" );
+	V_strcat_safe( filename, pShaderName );
+	V_strcat_safe( filename, ".fxc" );
 	
-	const char *pShaderModel = FileNameToShaderModel( pShaderName, bVertexShader );
+	const char *pShaderProfile = FileNameToShaderProfile( pShaderName, bVertexShader );
 	
-	// define the shader model
+	// define the shader model (actually profile, but name for backward compat).
 	char shaderModelDefineString[1024];
-	Q_snprintf( shaderModelDefineString, 1024, "SHADER_MODEL_%s", pShaderModel );
+	V_sprintf_safe( shaderModelDefineString, "SHADER_MODEL_%s", pShaderProfile );
 	Q_strupr( shaderModelDefineString );
+
 	macros[macroIndex].Name = shaderModelDefineString;
 	macros[macroIndex].Definition = "1";
-	macroIndex++;
 
-	char x360DefineString[1024];
-	if( IsX360() )
-	{
-		Q_snprintf( x360DefineString, 1024, "_X360", pShaderModel );
-		Q_strupr( x360DefineString );
-		macros[macroIndex].Name = x360DefineString;
-		macros[macroIndex].Definition = "1";
-		macroIndex++;
-	}
+	macroIndex++;
 
 	// NULL terminate.
 	macros[macroIndex].Name = NULL;
@@ -1698,6 +1724,7 @@ retry_compile:
 					strcpy( pszEndFilename - 6, "2x.fxc" );
 					fp = g_pFullFileSystem->Open( filename, "r" );
 				}
+
 				if ( fp == FILESYSTEM_INVALID_HANDLE )
 				{
 					strcpy( pszEndFilename - 6, "20.fxc" );
@@ -1740,9 +1767,6 @@ retry_compile:
 	}
 
 #ifdef REMOTE_DYNAMIC_SHADER_COMPILE
-	#define SEND_BUF_SIZE 40000
-	#define RECV_BUF_SIZE 40000
-
 	// Remotely-compiled shader code
 	uint32 *pRemotelyCompiledShader = NULL;
 	uint32 nRemotelyCompiledShaderLength = 0;
@@ -1756,59 +1780,69 @@ retry_compile:
 	if ( m_RemoteShaderCompileSocket != INVALID_SOCKET )
 	{
 		// Build up command list for remote shader compiler
-		char pSendbuf[SEND_BUF_SIZE], pRecvbuf[RECV_BUF_SIZE], pFixedFilename[MAX_PATH], buf[MAX_PATH];
+		char pFixedFilename[MAX_PATH], buf[MAX_PATH];
 		V_FixupPathName( pFixedFilename, MAX_PATH, filename );
 		V_FileBase( pFixedFilename, buf, MAX_PATH ); // Just find base filename
-		V_strncat( buf, ".fxc", MAX_PATH );
-		V_snprintf( pSendbuf, SEND_BUF_SIZE, "%s\n", buf );
-		V_strncat( pSendbuf, pShaderModel, SEND_BUF_SIZE );
-		V_strncat( pSendbuf, "\n", SEND_BUF_SIZE );
-		V_snprintf( buf, MAX_PATH, "%d\n", macros.Count() );
-		V_strncat( pSendbuf, buf, SEND_BUF_SIZE );
-		for ( int i=0; i < macros.Count(); i++ )
+		V_strcat_safe( buf, ".fxc" );
+		
+		char pSendbuf[40000];
+		V_sprintf_safe( pSendbuf, "%s\n", buf );
+		V_strcat_safe( pSendbuf, pShaderProfile );
+		V_strcat_safe( pSendbuf, "\n" );
+		V_sprintf_safe( buf, "%zd\n", macros.Count() );
+		V_strcat_safe( pSendbuf, buf );
+
+		for ( auto &m : macros )
 		{
-			V_snprintf( buf, MAX_PATH, "%s\n%s\n", macros[i].Name, macros[i].Definition );
-			V_strncat( pSendbuf, buf, SEND_BUF_SIZE );
+			V_sprintf_safe( buf, "%s\n%s\n", m.Name, m.Definition );
+			V_strcat_safe( pSendbuf, buf );
 		}
-		V_strncat( pSendbuf, "", SEND_BUF_SIZE );
+
+		V_strcat_safe( pSendbuf, "" );
 
 		// Send commands to remote shader compiler
-		int nResult = send( m_RemoteShaderCompileSocket, pSendbuf, (int)strlen( pSendbuf ), 0 );
-		if ( nResult == SOCKET_ERROR )
+		if ( int rc =
+				send( m_RemoteShaderCompileSocket, pSendbuf, V_strlen( pSendbuf ), 0 );
+			 rc == SOCKET_ERROR )
 		{
-			Warning( "send failed: %d\n", WSAGetLastError() );
+			Warning( "send(%s) failed: %s\n",
+				pSendbuf,
+				std::system_category().message(WSAGetLastError()).c_str() );
 			DeinitRemoteShaderCompile();
 		}
 
 		if ( m_RemoteShaderCompileSocket != INVALID_SOCKET )
 		{
+			alignas(uint32) char pRecvbuf[40000];
+
 			// Block here until we get a result back from the server
-			nResult = recv( m_RemoteShaderCompileSocket, pRecvbuf, RECV_BUF_SIZE, 0 );
-			if ( nResult == 0 )
+			int rc = recv( m_RemoteShaderCompileSocket, pRecvbuf, ssize(pRecvbuf), 0 );
+			if ( rc == 0 )
 			{
-				Warning( "Connection closed\n" );
+				Warning( "Connection closed.\n" );
 				DeinitRemoteShaderCompile();
 			}
-			else if ( nResult < 0 )
+			else if ( rc < 0 )
 			{
-				Warning( "recv failed: %d\n", WSAGetLastError() );
+				Warning( "recv failed: %s\n",
+					std::system_category().message(WSAGetLastError()).c_str() );
 				DeinitRemoteShaderCompile();
 			}
 
 			if ( m_RemoteShaderCompileSocket != INVALID_SOCKET )
 			{
 				// Grab the first 32 bits, which tell us what the rest of the data is
-				uint32 nCompileResultCode;
-				memcpy( &nCompileResultCode, pRecvbuf, sizeof( nCompileResultCode ) );
+				uint32 compile_rc;
+				memcpy( &compile_rc, pRecvbuf, sizeof( compile_rc ) );
 
 				// If is zero, we have an error, so the rest of the data is a text string from the compiler
-				if ( nCompileResultCode == 0x00000000 )
+				if ( compile_rc == 0x00000000u )
 				{
-					Warning( "Remote shader compile error: %s\n", pRecvbuf+4 );
+					Warning( "Remote shader compile error: %s.\n", pRecvbuf+4 );
 				}
 				else // we have an actual binary shader blob coming back
 				{
-					nRemotelyCompiledShaderLength = nCompileResultCode;
+					nRemotelyCompiledShaderLength = compile_rc;
 					pRemotelyCompiledShader = (uint32 *) pRecvbuf;
 					pRemotelyCompiledShader++;
 				}
@@ -1817,110 +1851,76 @@ retry_compile:
 	} // End using remote compile service
 #endif // REMOTE_DYNAMIC_SHADER_COMPILE
 
-#if defined( DYNAMIC_SHADER_COMPILE )
+#if defined( DYNAMIC_SHADER_COMPILE ) && !defined( REMOTE_DYNAMIC_SHADER_COMPILE )
 	bool bShadersNeedFlush = false;
 #endif
 
-#if defined( DYNAMIC_SHADER_COMPILE ) && !defined( REMOTE_DYNAMIC_SHADER_COMPILE )
+#if defined( DYNAMIC_SHADER_COMPILE )
 	se::win::com::com_ptr<ID3DBlob> pShader;
 	se::win::com::com_ptr<ID3DBlob> pErrorMessages;
-	HRESULT hr = S_OK;
-	bool b30Shader = !Q_stricmp( pShaderModel, "vs_3_0" ) || !Q_stricmp( pShaderModel, "ps_3_0" );
+
+	const bool b30Shader = !Q_stricmp( pShaderProfile, "vs_3_0" ) || !Q_stricmp( pShaderProfile, "ps_3_0" );
+	// dimhotepus: Shader model 4, 4.1, 5 support.
+	const bool b40Shader = !Q_stricmp( pShaderProfile, "vs_4_0" ) || !Q_stricmp( pShaderProfile, "ps_4_0" );
+	const bool b41Shader = !Q_stricmp( pShaderProfile, "vs_4_1" ) || !Q_stricmp( pShaderProfile, "ps_4_1" );
+	const bool b50Shader = !Q_stricmp( pShaderProfile, "vs_5_0" ) || !Q_stricmp( pShaderProfile, "ps_5_0" );
 
 	wchar_t wfilename[MAX_PATH];
 	V_UTF8ToUnicode( filename, wfilename, sizeof(wfilename) );
-
-	if ( m_ShaderCompileFileFunc && b30Shader )
+	
+	HRESULT hr = S_OK;
+	if ( b30Shader || b40Shader || b41Shader || b50Shader )
 	{
 		CDxInclude dxInclude( filename );
 
-		hr = m_ShaderCompileFileFunc( wfilename, macros.Base(), &dxInclude,
-			"main",	pShaderModel, 0, 0, &pShader, &pErrorMessages );
+		hr = D3DCompileFromFile( wfilename, macros.Base(), &dxInclude,
+			"main",	pShaderProfile, 0, 0, &pShader, &pErrorMessages );
 	}
 	else
 	{
-#		if ( !defined( _X360 ) )
-		{
-			hr = D3DCompileFromFile( wfilename, macros.Base(), NULL,
-				"main",	pShaderModel, 0, 0,	&pShader, &pErrorMessages );
-
-
-#ifdef REMOTE_DYNAMIC_SHADER_COMPILE
-			// If we're using the remote compiling service, let's double-check against a local compile
-			if ( ( m_RemoteShaderCompileSocket != INVALID_SOCKET ) && pRemotelyCompiledShader )
-			{
-				if ( ( memcmp( pRemotelyCompiledShader, pShader->GetBufferPointer(), pShader->GetBufferSize() ) != 0 ) ||
-					( pShader->GetBufferSize() != nRemotelyCompiledShaderLength) )
-				{
-					Warning( "Remote and local shaders don't match!\n" );
-					return INVALID_HARDWARE_SHADER;
-				}
-			}
-#endif // REMOTE_DYNAMIC_SHADER_COMPILE
-
-		}
-#		else
-		{
-			D3DXSHADER_COMPILE_PARAMETERS compileParams;
-			memset( &compileParams, 0, sizeof( compileParams ) );
-			
-			char pUPDBOutputFile[MAX_PATH] = ""; //where we write the file
-			char pUPDBPIXLookup[MAX_PATH] = ""; //where PIX (on a pc) looks for the file
-
-			compileParams.Flags |= D3DXSHADEREX_OPTIMIZE_UCODE;
-
-			if( mat_flushshaders_generate_updbs.GetBool() )
-			{
-				//UPDB generation for PIX debugging
-				compileParams.Flags |= D3DXSHADEREX_GENERATE_UPDB;
-				compileParams.UPDBPath = pUPDBPIXLookup;
-
-				Q_snprintf( pUPDBOutputFile, MAX_PATH, "%s\\UPDB_X360\\%s_S%d_D%d.updb", GetShaderSourcePath(), pShaderName, nStaticIndex, nDynamicIndex );
-			
-				//replace "net:\smb" with another "\" turning the xbox network address format into the pc network address format
-				V_strcpy_safe( pUPDBPIXLookup, &pUPDBOutputFile[7] );
-				pUPDBPIXLookup[0] = '\\';
-			}
-
-			hr = D3DXCompileShaderFromFileEx( filename, macros.Base(), NULL,
-				"main",	pShaderModel, 0, &pShader, &pErrorMessages, NULL, &compileParams );
-		
-			if( (pUPDBOutputFile[0] != '\0') && compileParams.pUPDBBuffer ) //Did we generate a updb?
-			{
-				CUtlBuffer outbuffer;
-				DWORD dataSize = compileParams.pUPDBBuffer->GetBufferSize();
-				outbuffer.EnsureCapacity( dataSize );
-				memcpy( outbuffer.Base(), compileParams.pUPDBBuffer->GetBufferPointer(), dataSize );
-				outbuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, dataSize );				
-				g_pFullFileSystem->WriteFile( pUPDBOutputFile, NULL, outbuffer );
-
-				compileParams.pUPDBBuffer->Release();
-			}
-		}
-#		endif		
+		hr = D3DCompileFromFile( wfilename, macros.Base(), NULL,
+			"main",	pShaderProfile, 0, 0, &pShader, &pErrorMessages );
 	}
 
-	if ( hr != D3D_OK )
+#ifdef REMOTE_DYNAMIC_SHADER_COMPILE
+	// If we're using the remote compiling service, let's double-check against a local compile
+	if ( SUCCEEDED(hr) &&
+		 m_RemoteShaderCompileSocket != INVALID_SOCKET &&
+		 pRemotelyCompiledShader )
+	{
+		if ( pShader->GetBufferSize() != nRemotelyCompiledShaderLength ||
+				memcmp( pRemotelyCompiledShader, pShader->GetBufferPointer(), pShader->GetBufferSize() ) != 0 )
+		{
+			Warning( "Remote and local shaders '%S' (profile '%s') don't match!\n",
+				wfilename, pShaderProfile );
+			return INVALID_HARDWARE_SHADER;
+		}
+	}
+#endif // REMOTE_DYNAMIC_SHADER_COMPILE
+
+	if ( FAILED( hr ) )
 	{
 		const char *pErrorMessageString = ( const char * )pErrorMessages->GetBufferPointer();
+
 		Plat_DebugString( pErrorMessageString );
 		Plat_DebugString( "\n" );
 
 #ifndef _DEBUG
 		if ( retriesLeft-- > 0 )
 		{
-			DevMsg( 0, "Failed dynamic shader compiled - fix the shader while the debugger is at the breakpoint, then continue\n" );
+			DevMsg( 0, "Failed dynamic shader '%S' compile. Fix the shader while the debugger is at the breakpoint, then continue\n", wfilename );
 			DebuggerBreakIfDebugging();
+
 #if defined( DYNAMIC_SHADER_COMPILE )
 			bShadersNeedFlush = true;
 #endif
+
 			goto retry_compile;
 		}
-		if( !IsX360() ) //errors make the 360 puke and die. We have a better solution for this particular error
-			Error( "Failed dynamic shader compile\nBuild shaderapidx9.dll in debug to find problem\n" );
+
+		Error( "Failed dynamic shader '%S' compile.\n", wfilename );
 #else
 		Assert( 0 );
-
 #endif // _DEBUG
 
 		return INVALID_HARDWARE_SHADER;
@@ -1929,40 +1929,53 @@ retry_compile:
 #endif // #if defined( DYNAMIC_SHADER_COMPILE ) && !defined( REMOTE_DYNAMIC_SHADER_COMPILE )
 		
 	{
-#ifdef DYNAMIC_SHADER_COMPILE_WRITE_ASSEMBLY
+#if defined( DYNAMIC_SHADER_COMPILE_WRITE_ASSEMBLY )
 		// enable to dump the disassembly for shader validation
 		char exampleCommandLine[2048];
-		Q_strncpy( exampleCommandLine, "// Run from stdshaders\n// ..\\..\\dx9sdk\\utilities\\fxc.exe ", sizeof( exampleCommandLine ) );
-		int i;
-		for( i = 0; macros[i].Name; i++ )
+		V_strcpy_safe( exampleCommandLine, "// Run from stdshaders\n// ..\\..\\dx9sdk\\utilities\\fxc.exe " );
+		for( auto &m : macros )
 		{
-			Q_strncat( exampleCommandLine, "/D", sizeof( exampleCommandLine ) );
-			Q_strncat( exampleCommandLine, macros[i].Name, sizeof( exampleCommandLine ) );
-			Q_strncat( exampleCommandLine, "=", sizeof( exampleCommandLine ) );
-			Q_strncat( exampleCommandLine, macros[i].Definition, sizeof( exampleCommandLine ) );
-			Q_strncat( exampleCommandLine, " ", sizeof( exampleCommandLine ) );
+			V_strcat_safe( exampleCommandLine, "/D" );
+			V_strcat_safe( exampleCommandLine, m.Name );
+			V_strcat_safe( exampleCommandLine, "=" );
+			V_strcat_safe( exampleCommandLine, m.Definition );
+			V_strcat_safe( exampleCommandLine, " " );
 		}
 
-		Q_strncat( exampleCommandLine, "/T", sizeof( exampleCommandLine ) );
-		Q_strncat( exampleCommandLine, pShaderModel, sizeof( exampleCommandLine ) );
-		Q_strncat( exampleCommandLine, " ", sizeof( exampleCommandLine ) );
-		Q_strncat( exampleCommandLine, filename, sizeof( exampleCommandLine ) );
-		Q_strncat( exampleCommandLine, "\n", sizeof( exampleCommandLine ) );
+		V_strcat_safe( exampleCommandLine, "/T" );
+		V_strcat_safe( exampleCommandLine, pShaderProfile );
+		V_strcat_safe( exampleCommandLine, " " );
+		V_strcat_safe( exampleCommandLine, filename );
+		V_strcat_safe( exampleCommandLine, "\n" );
 
 		se::win::com::com_ptr<ID3DBlob> d3dblob;
-		HRESULT hr = D3DDisassemble( pShader->GetBufferPointer(), pShader->GetBufferSize(), 0, NULL, &d3dblob );
+
+#if defined( REMOTE_DYNAMIC_SHADER_COMPILE )
+		hr = D3DDisassemble( pRemotelyCompiledShader, nRemotelyCompiledShaderLength, 0, NULL, &d3dblob );
+#elif defined( DYNAMIC_SHADER_COMPILE )
+		hr = D3DDisassemble( pShader->GetBufferPointer(), pShader->GetBufferSize(), 0, NULL, &d3dblob );
+#endif
 		Assert( hr == D3D_OK );
 		CUtlBuffer tempBuffer;
 		tempBuffer.SetBufferType( true, false );
 		int exampleCommandLineLength = strlen( exampleCommandLine );
 		tempBuffer.EnsureCapacity( d3dblob->GetBufferSize() + exampleCommandLineLength );
 		memcpy( tempBuffer.Base(), exampleCommandLine, exampleCommandLineLength );
-		memcpy( ( char * )tempBuffer.Base() + exampleCommandLineLength, d3dblob->GetBufferPointer(), d3dblob->GetBufferSize() );
+		memcpy( tempBuffer.Base<char>() + exampleCommandLineLength, d3dblob->GetBufferPointer(), d3dblob->GetBufferSize() );
 		tempBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, d3dblob->GetBufferSize() + exampleCommandLineLength );
 
-		char filename[MAX_PATH];
-		sprintf( filename, "%s_%d_%d.asm", pShaderName, nStaticIndex, nDynamicIndex );
-		g_pFullFileSystem->WriteFile( filename, "DEFAULT_WRITE_PATH", tempBuffer );
+		char filename_asm[MAX_PATH];
+		V_sprintf_safe( filename_asm, "%s_%d_%d.asm", pShaderName, nStaticIndex, nDynamicIndex );
+		g_pFullFileSystem->WriteFile( filename_asm, "DEFAULT_WRITE_PATH", tempBuffer );
+#endif  // #if defined( DYNAMIC_SHADER_COMPILE_WRITE_ASSEMBLY ) && !defined( REMOTE_DYNAMIC_SHADER_COMPILE )
+
+#if defined( DYNAMIC_SHADER_COMPILE ) && !defined( REMOTE_DYNAMIC_SHADER_COMPILE )
+		// We keep up with whether we hit a compile error above.
+		// If we did, then we likely need to recompile everything again since we could have changed global code.
+		if ( bShadersNeedFlush )
+		{
+			MatFlushShaders();
+		}
 #endif
 
 #ifdef REMOTE_DYNAMIC_SHADER_COMPILE
@@ -1984,15 +1997,7 @@ retry_compile:
 			return CreateD3DPixelShader( ( DWORD * )pShader->GetBufferPointer(), 0, pShader->GetBufferSize(), pShaderName ); // hack hack hack!  need to get centroid info from the source
 		}
 #endif
-
-#if defined( DYNAMIC_SHADER_COMPILE )
-		// We keep up with whether we hit a compile error above.  If we did, then we likely need to recompile everything again since we could have changed global code.
-		if ( bShadersNeedFlush )
-		{
-			MatFlushShaders();
-		}
-#endif
-	}	
+	}
 }
 #endif
 
@@ -2011,8 +2016,7 @@ bool CShaderManager::LoadAndCreateShaders_Dynamic( ShaderLookup_t &lookup, bool 
 	lookup.m_ShaderStaticCombos.m_nCount = numDynamicCombos;
 	lookup.m_ShaderStaticCombos.m_pCreationData = new ShaderStaticCombos_t::ShaderCreationData_t[numDynamicCombos];
 
-	int i;
-	for( i = 0; i < numDynamicCombos; i++ )
+	for( int i = 0; i < numDynamicCombos; i++ )
 	{
 		lookup.m_ShaderStaticCombos.m_pHardwareShaders[i] = INVALID_HARDWARE_SHADER;
 	}
@@ -2519,21 +2523,14 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 
 		// try the vsh/psh dir first
 		char filename[MAX_PATH];
-		Q_snprintf( filename, MAX_PATH, "shaders\\%s\\%s" SHADER_FNAME_EXTENSION, bVertexShader ? "vsh" : "psh", pName );
+		V_sprintf_safe( filename, "shaders\\%s\\%s" SHADER_FNAME_EXTENSION, bVertexShader ? "vsh" : "psh", pName );
 		hFile = OpenFileAndLoadHeader( filename, pHeader );
 		if ( hFile == FILESYSTEM_INVALID_HANDLE )
 		{
 #ifdef DYNAMIC_SHADER_COMPILE
 			// Dynamically compile if it's HLSL.
-			if ( LoadAndCreateShaders_Dynamic( lookup, bVertexShader ) )
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-#endif
+			return LoadAndCreateShaders_Dynamic( lookup, bVertexShader );
+#else
 			// next, try the fxc dir
 			Q_snprintf( filename, MAX_PATH, "shaders\\fxc\\%s" SHADER_FNAME_EXTENSION, pName );
 			hFile = OpenFileAndLoadHeader( filename, pHeader );
@@ -2543,6 +2540,7 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 				Warning( "Couldn't load %s shader %s\n", bVertexShader ? "vertex" : "pixel", pName );
 				return false;
 			}
+#endif
 		}
 
 		lookup.m_Flags = pHeader->m_nFlags;
@@ -2585,7 +2583,7 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 	int i;
 	lookup.m_ShaderStaticCombos.m_nCount = pHeader->m_nDynamicCombos;
 	lookup.m_ShaderStaticCombos.m_pHardwareShaders = new HardwareShader_t[pHeader->m_nDynamicCombos];
-	if ( IsPC() && m_bCreateShadersOnDemand )
+	if ( m_bCreateShadersOnDemand )
 	{
 		lookup.m_ShaderStaticCombos.m_pCreationData = new ShaderStaticCombos_t::ShaderCreationData_t[pHeader->m_nDynamicCombos];
 	}
@@ -2657,20 +2655,6 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 	lookup.m_nDataOffset = nStartingOffset - nAlignedOffset;
 
 	bool bOK = true;
-	if ( IsX360() && g_pQueuedLoader->IsMapLoading() )
-	{
-		LoaderJob_t loaderJob;
-		loaderJob.m_pFilename = m_ShaderSymbolTable.String( pFileCache->m_Filename );
-		loaderJob.m_pPathID = "GAME";
-		loaderJob.m_pCallback = QueuedLoaderCallback;
-		loaderJob.m_pContext = (void *)&lookup;
-		loaderJob.m_pContext2 = (void *)pFileCache->IsOldVersion();
-		loaderJob.m_Priority = LOADERPRIORITY_DURINGPRELOAD;
-		loaderJob.m_nBytesToRead = nAlignedBytesToRead;
-		loaderJob.m_nStartOffset = nAlignedOffset;
-		g_pQueuedLoader->AddJob( &loaderJob );
-	}
-	else
 	{
 		//printf("\n CShaderManager::LoadAndCreateShaders - reading %d bytes from file offset %d", nAlignedBytesToRead, nAlignedOffset);
 		// single optimal read of all dynamic combos into monolithic buffer
@@ -3643,9 +3627,8 @@ void CShaderManager::FlushShaders( void )
 	     shader != m_VertexShaderDict.InvalidIndex(); 
 		 shader = m_VertexShaderDict.Next( shader ) )
 	{
-		int i;
 		ShaderStaticCombos_t &combos = m_VertexShaderDict[shader].m_ShaderStaticCombos;
-		for( i = 0; i < combos.m_nCount; i++ )
+		for( int i = 0; i < combos.m_nCount; i++ )
 		{
 			if( combos.m_pHardwareShaders[i] != INVALID_HARDWARE_SHADER )
 			{
@@ -3663,9 +3646,8 @@ void CShaderManager::FlushShaders( void )
 	     shader != m_PixelShaderDict.InvalidIndex(); 
 		 shader = m_PixelShaderDict.Next( shader ) )
 	{
-		int i;
 		ShaderStaticCombos_t &combos = m_PixelShaderDict[shader].m_ShaderStaticCombos;
-		for( i = 0; i < combos.m_nCount; i++ )
+		for( int i = 0; i < combos.m_nCount; i++ )
 		{
 			if( combos.m_pHardwareShaders[i] != INVALID_HARDWARE_SHADER )
 			{
@@ -3687,9 +3669,6 @@ void CShaderManager::FlushShaders( void )
 #ifdef DYNAMIC_SHADER_COMPILE
 static void MatFlushShaders( void )
 {
-#if defined( _X360 )
-	XBX_rSyncShaderCache();
-#endif
 	( ( CShaderManager * )ShaderManager() )->FlushShaders();
 }
 #endif

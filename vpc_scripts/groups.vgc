@@ -57,6 +57,8 @@ $Group "ShaderCompile"
 	"vmpi"
 	"vstdlib"
 	"coroutine_osx"
+	"lzma"
+	"vpklib"
 }
 
 $Group "physics"

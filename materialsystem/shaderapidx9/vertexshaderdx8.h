@@ -28,10 +28,6 @@
 // uncomment to get spew about what combos are being compiled.
 //#define DYNAMIC_SHADER_COMPILE_VERBOSE
 
-// Uncomment to use remoteshadercompiler.exe as a shader compile server
-// Must also set mat_remoteshadercompile to remote shader compile machine name
-//#define REMOTE_DYNAMIC_SHADER_COMPILE
-
 // uncomment and fill in with a path to use a specific set of shader source files. Meant for network use.
 //		PC path format is of style "\\\\somemachine\\sourcetreeshare\\materialsystem\\stdshaders"
 //		Xbox path format is of style "net:\\smb\\somemachine\\sourcetreeshare\\materialsystem\\stdshaders"

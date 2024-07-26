@@ -31,7 +31,7 @@ $Configuration
 		$SystemLibraries                    "iconv" [$OSXALL]
 		$GCC_ExtraLinkerFlags                   		"-L/usr/lib32" [$LINUXALL]
 		$SystemFrameworks					"Carbon;OpenGL;Quartz;Cocoa;IOKit" [$OSXALL]
-		$AdditionalDependencies				"$BASE d3d9.lib d3dcompiler.lib" [$WINDOWS]
+		$AdditionalDependencies				"$BASE d3d9.lib d3dcompiler.lib wsock32.lib Ws2_32.lib" [$WINDOWS]
 	}
 }
 

@@ -15,11 +15,11 @@
 #include "winsockx.h"
 #endif
 #include "msgbuffer.h"
-#include "socket.h"
+#include "Socket.h"
 #include "inetapi.h"
 #include "tier0/vcrmode.h"
 
-#include <VGUI/IVGui.h>
+#include "vgui/IVGui.h"
 
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"
@@ -181,8 +181,6 @@ static DWORD WINAPI SocketThreadFunc( LPVOID threadobject )
 
 		// no need to sleep here, much better let it sleep in the select
 	}
-
-	ExitThread( 0 );
 
 	return 0;
 }
@@ -363,7 +361,7 @@ void CSocketThread::AddSocketToThread( CSocket *socket )
 	// create the thread if it isn't there
 	if (!m_hThread)
 	{
-		m_hThread = VCRHook_CreateThread( NULL, 0, SocketThreadFunc, (void *)this, 0, &m_nThreadId );
+		m_hThread = VCRHook_CreateThread( NULL, 0, reinterpret_cast<void*>(SocketThreadFunc), this, 0, &m_nThreadId );
 		Assert( m_hThread );
 	}
 
@@ -802,13 +800,13 @@ CMsgBuffer *CSocket::GetSendBuffer( void )
 void CSocket::Frame( void )
 {
 	// No data waiting
-	if (!m_MsgBuffers.Size())
+	if (!m_MsgBuffers.Count())
 		return;
 
 	VCRHook_EnterCriticalSection( (CRITICAL_SECTION *)m_pBufferCS );
 
 	// pass up all the receive buffers
-	for (int i = 0; i < m_MsgBuffers.Size(); i++)
+	for (intp i = 0; i < m_MsgBuffers.Count(); i++)
 	{
 		// See if there's a handler for this message
 		CMsgHandler *handler = m_pMessageHandlers;
@@ -869,7 +867,7 @@ const netadr_t *CSocket::GetAddress( void )
 // Purpose: Let the user store/retrieve a 32 bit value
 // Input  : userData - 
 //-----------------------------------------------------------------------------
-void CSocket::SetUserData( unsigned int userData )
+void CSocket::SetUserData( uintp userData )
 {
 	m_nUserData = userData;
 }
@@ -878,7 +876,7 @@ void CSocket::SetUserData( unsigned int userData )
 // Purpose: Let the user store/retrieve a 32 bit value
 // Output : unsigned int
 //-----------------------------------------------------------------------------
-unsigned int CSocket::GetUserData(void ) const
+uintp CSocket::GetUserData(void ) const
 {
 	return m_nUserData;
 }
@@ -979,7 +977,7 @@ bool CSocket::ReceiveData( void )
 			net->SockAddrToNetAdr( &from, &addr );
 			
 			// append to the receive buffer
-			int idx = m_MsgBuffers.AddToTail();
+			intp idx = m_MsgBuffers.AddToTail();
 			CMsgBuffer &msgBuffer = m_MsgBuffers[idx];
 			
 			msgBuffer.Clear();
@@ -1018,7 +1016,7 @@ bool CSocket::ReceiveData( void )
 		net->SockAddrToNetAdr( &from, &addr );
 		
 		// append to the receive buffer
-		int idx = m_MsgBuffers.AddToTail();
+		intp idx = m_MsgBuffers.AddToTail();
 		CMsgBuffer &msgBuffer = m_MsgBuffers[idx];
 		
 		// Copy payload minus the -1 tag

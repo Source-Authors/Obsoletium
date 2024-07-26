@@ -4,22 +4,23 @@
 //
 //=============================================================================
 
-#include "vmpi.h"
 #include "vmpi_distribute_work.h"
-#include "tier0/platform.h"
+
+#include "vmpi.h"
 #include "tier0/dbg.h"
-#include "utlvector.h"
-#include "utllinkedlist.h"
+#include "tier0/icommandline.h"
+#include "tier0/platform.h"
+#include "tier1/strtools.h"
+#include "tier1/utlmap.h"
+#include "tier1/smartptr.h"
+#include "tier1/utlvector.h"
+#include "tier1/utllinkedlist.h"
 #include "vmpi_dispatch.h"
 #include "pacifier.h"
 #include "vstdlib/random.h"
 #include "mathlib/mathlib.h"
 #include "threadhelpers.h"
 #include "threads.h"
-#include "tier1/strtools.h"
-#include "tier1/utlmap.h"
-#include "tier1/smartptr.h"
-#include "tier0/icommandline.h"
 #include "cmdlib.h"
 #include "vmpi_distribute_tracker.h"
 #include "vmpi_distribute_work_internal.h"
@@ -564,8 +565,8 @@ public:
 
 				m_WorkUnits.Purge();
 
-				int nIndices = (pBuf->getLen() - pBuf->getOffset()) / sizeof( WUIndexType );
-				for ( int i=0; i < nIndices; i++ )
+				ptrdiff_t nIndices = (pBuf->getLen() - pBuf->getOffset()) / static_cast<ptrdiff_t>(sizeof( WUIndexType ));
+				for ( ptrdiff_t i=0; i < nIndices; i++ )
 				{
 					WUIndexType iWU;
 					pBuf->read( &iWU, sizeof( iWU ) );

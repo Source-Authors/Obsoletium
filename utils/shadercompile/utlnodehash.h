@@ -1,93 +1,72 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: hashed intrusive linked list.
-//
-// $NoKeywords: $
-//
-// Serialization/unserialization buffer
-//=============================================================================//
+// Hashed intrusive linked list.
 
-#ifndef UTLNODEHASH_H
-#define UTLNODEHASH_H
-
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SRC_UTILS_SHADERCOMPILE_UTLNODEHASH_H_
+#define SRC_UTILS_SHADERCOMPILE_UTLNODEHASH_H_
 
 #include "tier1/utlmemory.h"
-#include "tier1/byteswap.h"
 #include "tier1/utlintrusivelist.h"
 
-#include <stdarg.h>
+// To use this class, your list node class must have a Key() function defined
+// which returns an integer type.  May add this class to main utl tier when i'm
+// happy with it.
+template <typename T, int HASHSIZE = 7907, typename K = int>
+class CUtlNodeHash {
+ public:
+  CUtlIntrusiveDList<T> m_HashChains[HASHSIZE];
 
-// to use this class, your list node class must have a Key() function defined which returns an
-// integer type. May add this class to main utl tier when i'm happy w/ it.
-template<class T, int HASHSIZE = 7907, class K = int > class CUtlNodeHash
-{
+  CUtlNodeHash() { m_nNumNodes = 0; }
 
-	int m_nNumNodes;
+  T *FindByKey(K key, int *found_chain = nullptr) {
+    unsigned int chain = (unsigned int)key;
 
-public:
+    chain %= HASHSIZE;
 
-	CUtlIntrusiveDList<T> m_HashChains[HASHSIZE];
+    if (found_chain) *found_chain = chain;
 
-	CUtlNodeHash( void )
-	{
-		m_nNumNodes = 0;
-	}
+    for (auto *node = m_HashChains[chain].m_pHead; node; node = node->m_pNext)
+      if (node->Key() == key) return node;
 
+    return nullptr;
+  }
 
-	T *FindByKey(K nMatchKey, int *pChainNumber = NULL)
-	{
-		unsigned int nChain=(unsigned int) nMatchKey ;
-		nChain %= HASHSIZE;
-		if ( pChainNumber )
-			*( pChainNumber ) = nChain;
-		for( T * pNode = m_HashChains[ nChain ].m_pHead; pNode; pNode = pNode->m_pNext )
-			if ( pNode->Key() == nMatchKey )
-				return pNode;
-		return NULL;
-	}
+  void Add(T *pNode) {
+    unsigned int nChain = (unsigned int)pNode->Key();
 
-	void Add( T * pNode )
-	{
-		unsigned int nChain=(unsigned int) pNode->Key();
-		nChain %= HASHSIZE;
-		m_HashChains[ nChain ].AddToHead( pNode );
-		m_nNumNodes++;
-	}
+    nChain %= HASHSIZE;
 
+    m_HashChains[nChain].AddToHead(pNode);
+    ++m_nNumNodes;
+  }
 
-	void Purge( void )
-	{
-		m_nNumNodes = 0;
-		// delete all nodes
-		for( int i=0; i < HASHSIZE; i++)
-			m_HashChains[i].Purge();
-	}
+  void Purge() {
+    m_nNumNodes = 0;
 
-	int Count( void ) const
-	{
-		return m_nNumNodes;
-	}
+    // delete all nodes
+    for (int i = 0; i < HASHSIZE; i++) {
+      m_HashChains[i].Purge();
+    }
+  }
 
-	void DeleteByKey( K nMatchKey )
-	{
-		int nChain;
-		T *pSearch = FindByKey( nMatchKey, &nChain );
-		if ( pSearch )
-		{
-			m_HashChains[ nChain ].RemoveNode( pSearch );
-			m_nNumNodes--;
-		}
-	}
+  int Count() const { return m_nNumNodes; }
 
-	~CUtlNodeHash( void )
-	{
-		// delete all lists
-		Purge();
-	}
+  void DeleteByKey(K nMatchKey) {
+    int chain;
+    T *value = FindByKey(nMatchKey, &chain);
+
+    if (value) {
+      m_HashChains[chain].RemoveNode(value);
+
+      m_nNumNodes--;
+    }
+  }
+
+  // delete all lists
+  ~CUtlNodeHash() { Purge(); }
+
+ private:
+  int m_nNumNodes;
 };
 
-
-#endif
+#endif  // !SRC_UTILS_SHADERCOMPILE_UTLNODEHASH_H_
