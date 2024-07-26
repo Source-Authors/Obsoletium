@@ -69,31 +69,34 @@ static float AngDragIntegral( float invInertia, float l, float w, float h )
 
 
 CPhysicsObject::CPhysicsObject( void )
+	: m_pGameData{nullptr},
+	m_pObject{nullptr},
+	m_pCollide{nullptr},
+	m_pShadow{nullptr},
+	m_dragBasis{},
+	m_angDragBasis{},
+	m_shadowTempGravityDisable{false},
+	m_hasTouchedDynamic{false},
+	m_asleepSinceCreation{false},
+	m_forceSilentDelete{false},
+	m_sleepState{0},
+	m_hingedAxis{0},
+	m_collideType{0},
+	m_gameIndex{0},
+	m_materialIndex{0},
+	m_activeIndex{0},
+	m_callbacks{0},
+	m_gameFlags{0},
+	m_contentsMask{0},
+	m_volume{0.0f},
+	m_buoyancyRatio{0.0f},
+	m_dragCoefficient{0.0f},
+	m_angDragCoefficient{0.0f}
 {
-#ifdef _WIN32
-	void *pData = ((char *)this) + sizeof(void *); // offset beyond vtable
-	int dataSize = sizeof(*this) - sizeof(void *);
-
-	Assert( pData == &m_pGameData );
-
-	memset( pData, 0, dataSize );
-#elif POSIX
-
-	//!!HACK HACK - rework this if we ever change compiler versions (from gcc 3.2!!!)
-	void *pData = ((char *)this) + sizeof(void *); // offset beyond vtable
-	int dataSize = sizeof(*this) - sizeof(void *);
-
-	Assert( pData == &m_pGameData );
-
-	memset( pData, 0, dataSize );	
-#else
-#error
-#endif
-
 	// HACKHACK: init this as a sphere until someone attaches a surfacemanager
 	m_collideType = COLLIDE_BALL;
 	m_contentsMask = CONTENTS_SOLID;
-	m_hasTouchedDynamic = 0;
+	m_hasTouchedDynamic = false;
 }
 
 void CPhysicsObject::Init( const CPhysCollide *pCollisionModel, IVP_Real_Object *pObject, int materialIndex, float volume, float drag, float angDrag )

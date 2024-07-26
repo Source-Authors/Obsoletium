@@ -230,7 +230,6 @@ private:
 
 	void			ClampVelocity();
 
-	// NOTE: If m_pGameData is not the first member, the constructor debug code must be modified
 	void			*m_pGameData;
 	IVP_Real_Object	*m_pObject;
 	const CPhysCollide *m_pCollide;
