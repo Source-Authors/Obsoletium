@@ -60,7 +60,7 @@
 >>>> is the story there?
 */
 #if 0 // !defined( DO_IME ) && !defined( _X360 )
-#define ASSERT_IF_IME_NYI()	Assert( !"IME Support NYI" )
+#define ASSERT_IF_IME_NYI()	AssertMsg( false, "IME Support NYI" )
 #else
 #define ASSERT_IF_IME_NYI()
 #endif
@@ -78,57 +78,57 @@ public:
 	CInputSystem();
 	~CInputSystem();
 
-	virtual void RunFrame();
+	virtual void RunFrame() override;
 
-	virtual void PanelDeleted(VPANEL panel);
+	virtual void PanelDeleted(VPANEL panel) override;
 
-	virtual void UpdateMouseFocus(int x, int y);
-	virtual void SetMouseFocus(VPANEL newMouseFocus);
+	virtual void UpdateMouseFocus(int x, int y) override;
+	virtual void SetMouseFocus(VPANEL newMouseFocus) override;
 
-	virtual void SetCursorPos(int x, int y);
-	virtual void UpdateCursorPosInternal( int x, int y );
-	virtual void GetCursorPos(int &x, int &y);
-	virtual void SetCursorOveride(HCursor cursor);
-	virtual HCursor GetCursorOveride();
+	virtual void SetCursorPos(int x, int y) override;
+	virtual void UpdateCursorPosInternal( int x, int y ) override;
+	virtual void GetCursorPos(int &x, int &y) override;
+	virtual void SetCursorOveride(HCursor cursor) override;
+	virtual HCursor GetCursorOveride() override;
 
 
-	virtual void SetMouseCapture(VPANEL panel);
+	virtual void SetMouseCapture(VPANEL panel) override;
 
-	virtual VPANEL GetFocus();
-	virtual VPANEL GetCalculatedFocus();
-	virtual VPANEL GetMouseOver();
+	virtual VPANEL GetFocus() override;
+	virtual VPANEL GetCalculatedFocus() override;
+	virtual VPANEL GetMouseOver() override;
 
-	virtual bool WasMousePressed(MouseCode code);
-	virtual bool WasMouseDoublePressed(MouseCode code);
-	virtual bool IsMouseDown(MouseCode code);
-	virtual bool WasMouseReleased(MouseCode code);
-	virtual bool WasKeyPressed(KeyCode code);
-	virtual bool IsKeyDown(KeyCode code);
-	virtual bool WasKeyTyped(KeyCode code);
-	virtual bool WasKeyReleased(KeyCode code);
+	virtual bool WasMousePressed(MouseCode code) override;
+	virtual bool WasMouseDoublePressed(MouseCode code) override;
+	virtual bool IsMouseDown(MouseCode code) override;
+	virtual bool WasMouseReleased(MouseCode code) override;
+	virtual bool WasKeyPressed(KeyCode code) override;
+	virtual bool IsKeyDown(KeyCode code) override;
+	virtual bool WasKeyTyped(KeyCode code) override;
+	virtual bool WasKeyReleased(KeyCode code) override;
 
-	virtual void GetKeyCodeText(KeyCode code, char *buf, int buflen);
+	virtual void GetKeyCodeText(KeyCode code, char *buf, int buflen) override;
 
-	virtual bool InternalCursorMoved(int x,int y); //expects input in surface space
-	virtual bool InternalMousePressed(MouseCode code);
-	virtual bool InternalMouseDoublePressed(MouseCode code);
-	virtual bool InternalMouseReleased(MouseCode code);
-	virtual bool InternalMouseWheeled(int delta);
-	virtual bool InternalKeyCodePressed(KeyCode code);
-	virtual void InternalKeyCodeTyped(KeyCode code);
-	virtual void InternalKeyTyped(wchar_t unichar);
-	virtual bool InternalKeyCodeReleased(KeyCode code);
-	virtual void SetKeyCodeState( KeyCode code, bool bPressed );
-	virtual void SetMouseCodeState( MouseCode code, MouseCodeState_t state );
-	virtual void UpdateButtonState( const InputEvent_t &event );
+	virtual bool InternalCursorMoved(int x,int y) override; //expects input in surface space
+	virtual bool InternalMousePressed(MouseCode code) override;
+	virtual bool InternalMouseDoublePressed(MouseCode code) override;
+	virtual bool InternalMouseReleased(MouseCode code) override;
+	virtual bool InternalMouseWheeled(int delta) override;
+	virtual bool InternalKeyCodePressed(KeyCode code) override;
+	virtual void InternalKeyCodeTyped(KeyCode code) override;
+	virtual void InternalKeyTyped(wchar_t unichar) override;
+	virtual bool InternalKeyCodeReleased(KeyCode code) override;
+	virtual void SetKeyCodeState( KeyCode code, bool bPressed ) override;
+	virtual void SetMouseCodeState( MouseCode code, MouseCodeState_t state ) override;
+	virtual void UpdateButtonState( const InputEvent_t &event ) override;
 
-	virtual VPANEL GetAppModalSurface();
+	virtual VPANEL GetAppModalSurface() override;
 	// set the modal dialog panel.
 	// all events will go only to this panel and its children.
-	virtual void SetAppModalSurface(VPANEL panel);
+	virtual void SetAppModalSurface(VPANEL panel) override;
 	// release the modal dialog panel
 	// do this when your modal dialog finishes.
-	virtual void ReleaseAppModalSurface();
+	virtual void ReleaseAppModalSurface() override;
 
 	// returns true if the specified panel is a child of the current modal panel
 	// if no modal panel is set, then this always returns TRUE
@@ -136,76 +136,76 @@ public:
 
 	// Creates/ destroys "input" contexts, which contains information
 	// about which controls have mouse + key focus, for example.
-	virtual HInputContext CreateInputContext();
-	virtual void DestroyInputContext( HInputContext context ); 
+	virtual HInputContext CreateInputContext() override;
+	virtual void DestroyInputContext( HInputContext context ) override; 
 
 	// Associates a particular panel with an input context
 	// Associating NULL is valid; it disconnects the panel from the context
-	virtual void AssociatePanelWithInputContext( HInputContext context, VPANEL pRoot );
+	void AssociatePanelWithInputContext( HInputContext context, VPANEL pRoot ) override;
 
 	// Activates a particular input context, use DEFAULT_INPUT_CONTEXT
 	// to get the one normally used by VGUI
-	virtual void ActivateInputContext( HInputContext context );
-	virtual void PostCursorMessage( );
-	virtual void HandleExplicitSetCursor( );
+	void ActivateInputContext( HInputContext context ) override;
+	virtual void PostCursorMessage( ) override;
+	virtual void HandleExplicitSetCursor( ) override;
 
 	virtual void ResetInputContext( HInputContext context );
 
-	virtual void GetCursorPosition( int &x, int &y );
+	virtual void GetCursorPosition( int &x, int &y ) override;
 
-	virtual void SetIMEWindow( void *hwnd );
-	virtual void *GetIMEWindow();
+	virtual void SetIMEWindow( void *hwnd ) override;
+	virtual void *GetIMEWindow() override;
 
 	// Change keyboard layout type
-	virtual void OnChangeIME( bool forward );
-	virtual int  GetCurrentIMEHandle();
-	virtual int  GetEnglishIMEHandle();
+	virtual void OnChangeIME( bool forward ) override;
+	virtual intp  GetCurrentIMEHandle() override;
+	virtual intp  GetEnglishIMEHandle() override;
 
 	// Returns the Language Bar label (Chinese, Korean, Japanese, Russion, Thai, etc.)
-	virtual void GetIMELanguageName( wchar_t *buf, int unicodeBufferSizeInBytes );
+	virtual void GetIMELanguageName( wchar_t *buf, int unicodeBufferSizeInBytes ) override;
 	// Returns the short code for the language (EN, CH, KO, JP, RU, TH, etc. ).
-	virtual void GetIMELanguageShortCode( wchar_t *buf, int unicodeBufferSizeInBytes );
+	virtual void GetIMELanguageShortCode( wchar_t *buf, int unicodeBufferSizeInBytes ) override;
 
 	// Call with NULL dest to get item count
-	virtual int	 GetIMELanguageList( LanguageItem *dest, int destcount );
-	virtual int	 GetIMEConversionModes( ConversionModeItem *dest, int destcount );
-	virtual int	 GetIMESentenceModes( SentenceModeItem *dest, int destcount );
+	virtual int	 GetIMELanguageList( LanguageItem *dest, int destcount ) override;
+	virtual int	 GetIMEConversionModes( ConversionModeItem *dest, int destcount ) override;
+	virtual int	 GetIMESentenceModes( SentenceModeItem *dest, int destcount ) override;
 
-	virtual void OnChangeIMEByHandle( int handleValue );
-	virtual void OnChangeIMEConversionModeByHandle( int handleValue );
-	virtual void OnChangeIMESentenceModeByHandle( int handleValue );
+	virtual void OnChangeIMEByHandle( intp handleValue ) override;
+	virtual void OnChangeIMEConversionModeByHandle( intp handleValue ) override;
+	virtual void OnChangeIMESentenceModeByHandle( intp handleValue ) override;
 
-	virtual void OnInputLanguageChanged();
-	virtual void OnIMEStartComposition();
-	virtual void OnIMEComposition( int flags );
-	virtual void OnIMEEndComposition();
+	virtual void OnInputLanguageChanged() override;
+	virtual void OnIMEStartComposition() override;
+	virtual void OnIMEComposition( int flags ) override;
+	virtual void OnIMEEndComposition() override;
 
-	virtual void OnIMEShowCandidates();
-	virtual void OnIMEChangeCandidates();
-	virtual void OnIMECloseCandidates();
+	virtual void OnIMEShowCandidates() override;
+	virtual void OnIMEChangeCandidates() override;
+	virtual void OnIMECloseCandidates() override;
 
-	virtual void OnIMERecomputeModes();
+	virtual void OnIMERecomputeModes() override;
 
-	virtual int  GetCandidateListCount();
-	virtual void GetCandidate( int num, wchar_t *dest, int destSizeBytes );
-	virtual int  GetCandidateListSelectedItem();
-	virtual int  GetCandidateListPageSize();
-	virtual int  GetCandidateListPageStart();
+	virtual int  GetCandidateListCount() override;
+	virtual void GetCandidate( int num, wchar_t *dest, int destSizeBytes ) override;
+	virtual int  GetCandidateListSelectedItem() override;
+	virtual int  GetCandidateListPageSize() override;
+	virtual int  GetCandidateListPageStart() override;
 
-	virtual void SetCandidateWindowPos( int x, int y );
-	virtual bool GetShouldInvertCompositionString();
-	virtual bool CandidateListStartsAtOne();
+	virtual void SetCandidateWindowPos( int x, int y ) override;
+	virtual bool GetShouldInvertCompositionString() override;
+	virtual bool CandidateListStartsAtOne() override;
 
-	virtual void SetCandidateListPageStart( int start );
+	virtual void SetCandidateListPageStart( int start ) override;
 
 	// Passes in a keycode which allows hitting other mouse buttons w/o cancelling capture mode
-	virtual void SetMouseCaptureEx(VPANEL panel, MouseCode captureStartMouseCode );
+	virtual void SetMouseCaptureEx(VPANEL panel, MouseCode captureStartMouseCode ) override;
 
-	virtual void RegisterKeyCodeUnhandledListener( VPANEL panel );
-	virtual void UnregisterKeyCodeUnhandledListener( VPANEL panel );
+	virtual void RegisterKeyCodeUnhandledListener( VPANEL panel ) override;
+	virtual void UnregisterKeyCodeUnhandledListener( VPANEL panel ) override;
 
 	// Posts unhandled message to all interested panels
-	virtual void OnKeyCodeUnhandled( int keyCode );
+	virtual void OnKeyCodeUnhandled( int keyCode ) override;
 
 	// Assumes subTree is a child panel of the root panel for the vgui contect
 	//  if restrictMessagesToSubTree is true, then mouse and kb messages are only routed to the subTree and it's children and mouse/kb focus
@@ -214,15 +214,15 @@ public:
 	//  if restrictMessagesToSubTree is false, then mouse and kb messages are routed as normal except that they are not routed down into the subtree
 	//   however, if a mouse click occurs outside of the subtree, and "UnhandleMouseClick" message is sent to unhandledMouseClickListener panel
 	//   if it's set
-	virtual void	SetModalSubTree( VPANEL subTree, VPANEL unhandledMouseClickListener, bool restrictMessagesToSubTree = true );
-	virtual void	ReleaseModalSubTree();
-	virtual VPANEL	GetModalSubTree();
+	virtual void	SetModalSubTree( VPANEL subTree, VPANEL unhandledMouseClickListener, bool restrictMessagesToSubTree = true ) override;
+	virtual void	ReleaseModalSubTree() override;
+	virtual VPANEL	GetModalSubTree() override;
 
 	// These toggle whether the modal subtree is exclusively receiving messages or conversely whether it's being excluded from receiving messages
-	virtual void	SetModalSubTreeReceiveMessages( bool state );
-	virtual bool	ShouldModalSubTreeReceiveMessages() const;
+	virtual void	SetModalSubTreeReceiveMessages( bool state ) override;
+	virtual bool	ShouldModalSubTreeReceiveMessages() const override;
 
-	virtual VPANEL 	GetMouseCapture();
+	virtual VPANEL 	GetMouseCapture() override;
 
 	virtual VPANEL	GetMouseFocus();
 private:
@@ -1374,7 +1374,7 @@ void CInputSystem::SurfaceSetCursorPos(int x, int y)
 		// should be dormant (this isn't true for Steam however).
 		//
 		// If we ever do need to implement this, look at SDL_GetMouseState(), etc.
-		Assert( !"CInputSystem::SurfaceSetCursorPos NYI" );
+		AssertMsg( false, "CInputSystem::SurfaceSetCursorPos NYI" );
 #endif
 	}
 }
@@ -1404,7 +1404,7 @@ void CInputSystem::SurfaceGetCursorPos( int &x, int &y )
 		// From Alfred on 8/15/2012.
 		//   For l4d2, the vguimatsurface/cursor.cpp functions fire in the engine, the vgui2 ones
 		// should be dormant (this isn't true for Steam however).
-		Assert( !"CInputSystem::SurfaceGetCursorPos NYI" );
+		AssertMsg( false, "CInputSystem::SurfaceGetCursorPos NYI" );
 		x = 0;
 		y = 0;
 #endif
@@ -1856,184 +1856,183 @@ struct LanguageIds
 
 LanguageIds g_LanguageIds[] =
 {
-	{ 0x0000, UNKNOWN, L"",		L"Neutral" }, 
-	{ 0x007f, UNKNOWN, L"",		L"Invariant" }, 
-	{ 0x0400, UNKNOWN, L"",		L"User Default Language" },  
-	{ 0x0800, UNKNOWN, L"",		L"System Default Language" },  
-	{ 0x0436, UNKNOWN, L"AF",	L"Afrikaans" },  
-	{ 0x041c, UNKNOWN, L"SQ",	L"Albanian" },  
-	{ 0x0401, UNKNOWN, L"AR",	L"Arabic (Saudi Arabia)" },  
-	{ 0x0801, UNKNOWN, L"AR",	L"Arabic (Iraq)" },  
-	{ 0x0c01, UNKNOWN, L"AR",	L"Arabic (Egypt)" },  
-	{ 0x1001, UNKNOWN, L"AR",	L"Arabic (Libya)" },  
-	{ 0x1401, UNKNOWN, L"AR",	L"Arabic (Algeria)" },  
-	{ 0x1801, UNKNOWN, L"AR",	L"Arabic (Morocco)" },  
-	{ 0x1c01, UNKNOWN, L"AR",	L"Arabic (Tunisia)" },  
-	{ 0x2001, UNKNOWN, L"AR",	L"Arabic (Oman)" },  
-	{ 0x2401, UNKNOWN, L"AR",	L"Arabic (Yemen)" },  
-	{ 0x2801, UNKNOWN, L"AR",	L"Arabic (Syria)" },  
-	{ 0x2c01, UNKNOWN, L"AR",	L"Arabic (Jordan)" },  
-	{ 0x3001, UNKNOWN, L"AR",	L"Arabic (Lebanon)" },  
-	{ 0x3401, UNKNOWN, L"AR",	L"Arabic (Kuwait)" },  
-	{ 0x3801, UNKNOWN, L"AR",	L"Arabic (U.A.E.)" },  
-	{ 0x3c01, UNKNOWN, L"AR",	L"Arabic (Bahrain)" },  
-	{ 0x4001, UNKNOWN, L"AR",	L"Arabic (Qatar)" },  
-	{ 0x042b, UNKNOWN, L"HY",	L"Armenian" },  
-	{ 0x042c, UNKNOWN, L"AZ",	L"Azeri (Latin)" },  
-	{ 0x082c, UNKNOWN, L"AZ",	L"Azeri (Cyrillic)" },  
-	{ 0x042d, UNKNOWN, L"ES",	L"Basque" },  
-	{ 0x0423, UNKNOWN, L"BE",	L"Belarusian" },  
-	{ 0x0445, UNKNOWN, L"",		L"Bengali (India)" },  
-	{ 0x141a, UNKNOWN, L"",		L"Bosnian (Bosnia and Herzegovina)" },  
-	{ 0x0402, UNKNOWN, L"BG",	L"Bulgarian" },  
-	{ 0x0455, UNKNOWN, L"",		L"Burmese" },  
-	{ 0x0403, UNKNOWN, L"CA",	L"Catalan" },  
+	{ 0x0000, UNKNOWN, L"",		L"Neutral", false }, 
+	{ 0x007f, UNKNOWN, L"",		L"Invariant", false }, 
+	{ 0x0400, UNKNOWN, L"",		L"User Default Language", false },  
+	{ 0x0800, UNKNOWN, L"",		L"System Default Language", false },  
+	{ 0x0436, UNKNOWN, L"AF",	L"Afrikaans", false },  
+	{ 0x041c, UNKNOWN, L"SQ",	L"Albanian", false },  
+	{ 0x0401, UNKNOWN, L"AR",	L"Arabic (Saudi Arabia)", false },  
+	{ 0x0801, UNKNOWN, L"AR",	L"Arabic (Iraq)", false },  
+	{ 0x0c01, UNKNOWN, L"AR",	L"Arabic (Egypt)", false },  
+	{ 0x1001, UNKNOWN, L"AR",	L"Arabic (Libya)", false },  
+	{ 0x1401, UNKNOWN, L"AR",	L"Arabic (Algeria)", false },  
+	{ 0x1801, UNKNOWN, L"AR",	L"Arabic (Morocco)", false },  
+	{ 0x1c01, UNKNOWN, L"AR",	L"Arabic (Tunisia)", false },  
+	{ 0x2001, UNKNOWN, L"AR",	L"Arabic (Oman)", false },  
+	{ 0x2401, UNKNOWN, L"AR",	L"Arabic (Yemen)", false },  
+	{ 0x2801, UNKNOWN, L"AR",	L"Arabic (Syria)", false },  
+	{ 0x2c01, UNKNOWN, L"AR",	L"Arabic (Jordan)", false },  
+	{ 0x3001, UNKNOWN, L"AR",	L"Arabic (Lebanon)", false},  
+	{ 0x3401, UNKNOWN, L"AR",	L"Arabic (Kuwait)", false},  
+	{ 0x3801, UNKNOWN, L"AR",	L"Arabic (U.A.E.)", false},  
+	{ 0x3c01, UNKNOWN, L"AR",	L"Arabic (Bahrain)", false},  
+	{ 0x4001, UNKNOWN, L"AR",	L"Arabic (Qatar)", false},  
+	{ 0x042b, UNKNOWN, L"HY",	L"Armenian", false},  
+	{ 0x042c, UNKNOWN, L"AZ",	L"Azeri (Latin)", false},  
+	{ 0x082c, UNKNOWN, L"AZ",	L"Azeri (Cyrillic)", false},  
+	{ 0x042d, UNKNOWN, L"ES",	L"Basque", false},  
+	{ 0x0423, UNKNOWN, L"BE",	L"Belarusian", false},  
+	{ 0x0445, UNKNOWN, L"",		L"Bengali (India)", false},  
+	{ 0x141a, UNKNOWN, L"",		L"Bosnian (Bosnia and Herzegovina)", false},  
+	{ 0x0402, UNKNOWN, L"BG",	L"Bulgarian", false},  
+	{ 0x0455, UNKNOWN, L"",		L"Burmese", false},  
+	{ 0x0403, UNKNOWN, L"CA",	L"Catalan", false},  
 	{ 0x0404, TRADITIONAL_CHINESE, L"CHT", L"#IME_0404", true },  
 	{ 0x0804, SIMPLIFIED_CHINESE, L"CHS", L"#IME_0804", true },  
-	{ 0x0c04, UNKNOWN, L"CH",	L"Chinese (Hong Kong SAR, PRC)" },  
-	{ 0x1004, UNKNOWN, L"CH",	L"Chinese (Singapore)" },  
-	{ 0x1404, UNKNOWN, L"CH",	L"Chinese (Macao SAR)" },  
-	{ 0x041a, UNKNOWN, L"HR",	L"Croatian" },  
-	{ 0x101a, UNKNOWN, L"HR",	L"Croatian (Bosnia and Herzegovina)" },  
-	{ 0x0405, UNKNOWN, L"CZ",	L"Czech" },  
-	{ 0x0406, UNKNOWN, L"DK",	L"Danish" },  
-	{ 0x0465, UNKNOWN, L"MV",	L"Divehi" },  
-	{ 0x0413, UNKNOWN, L"NL",	L"Dutch (Netherlands)" },  
-	{ 0x0813, UNKNOWN, L"BE",	L"Dutch (Belgium)" },  
-	{ 0x0409, ENGLISH, L"EN",	L"#IME_0409" },  
-	{ 0x0809, ENGLISH, L"EN",	L"English (United Kingdom)" },  
-	{ 0x0c09, ENGLISH, L"EN",	L"English (Australian)" },  
-	{ 0x1009, ENGLISH, L"EN",	L"English (Canadian)" },  
-	{ 0x1409, ENGLISH, L"EN",	L"English (New Zealand)" },  
-	{ 0x1809, ENGLISH, L"EN",	L"English (Ireland)" },  
-	{ 0x1c09, ENGLISH, L"EN",	L"English (South Africa)" },  
-	{ 0x2009, ENGLISH, L"EN",	L"English (Jamaica)" },  
-	{ 0x2409, ENGLISH, L"EN",	L"English (Caribbean)" },  
-	{ 0x2809, ENGLISH, L"EN",	L"English (Belize)" },  
-	{ 0x2c09, ENGLISH, L"EN",	L"English (Trinidad)" },  
-	{ 0x3009, ENGLISH, L"EN",	L"English (Zimbabwe)" },  
-	{ 0x3409, ENGLISH, L"EN",	L"English (Philippines)" },  
-	{ 0x0425, UNKNOWN, L"ET",	L"Estonian" },  
-	{ 0x0438, UNKNOWN, L"FO",	L"Faeroese" },  
-	{ 0x0429, UNKNOWN, L"FA",	L"Farsi" },  
-	{ 0x040b, UNKNOWN, L"FI",	L"Finnish" },  
-	{ 0x040c, UNKNOWN, L"FR",	L"#IME_040c" },  
-	{ 0x080c, UNKNOWN, L"FR",	L"French (Belgian)" },  
-	{ 0x0c0c, UNKNOWN, L"FR",	L"French (Canadian)" },  
-	{ 0x100c, UNKNOWN, L"FR",	L"French (Switzerland)" },  
-	{ 0x140c, UNKNOWN, L"FR",	L"French (Luxembourg)" },  
-	{ 0x180c, UNKNOWN, L"FR",	L"French (Monaco)" },  
-	{ 0x0456, UNKNOWN, L"GL",	L"Galician" },  
-	{ 0x0437, UNKNOWN, L"KA",	L"Georgian" },  
-	{ 0x0407, UNKNOWN, L"DE",	L"#IME_0407" },  
-	{ 0x0807, UNKNOWN, L"DE",	L"German (Switzerland)" },  
-	{ 0x0c07, UNKNOWN, L"DE",	L"German (Austria)" },  
-	{ 0x1007, UNKNOWN, L"DE",	L"German (Luxembourg)" },  
-	{ 0x1407, UNKNOWN, L"DE",	L"German (Liechtenstein)" },  
-	{ 0x0408, UNKNOWN, L"GR",	L"Greek" },  
-	{ 0x0447, UNKNOWN, L"IN",	L"Gujarati" },  
-	{ 0x040d, UNKNOWN, L"HE",	L"Hebrew" },  
-	{ 0x0439, UNKNOWN, L"HI",	L"Hindi" },  
-	{ 0x040e, UNKNOWN, L"HU",	L"Hungarian" },  
-	{ 0x040f, UNKNOWN, L"IS",	L"Icelandic" },  
-	{ 0x0421, UNKNOWN, L"ID",	L"Indonesian" },  
-	{ 0x0434, UNKNOWN, L"",		L"isiXhosa/Xhosa (South Africa)" },  
-	{ 0x0435, UNKNOWN, L"",		L"isiZulu/Zulu (South Africa)" },  
-	{ 0x0410, UNKNOWN, L"IT",	L"#IME_0410" },  
-	{ 0x0810, UNKNOWN, L"IT",	L"Italian (Switzerland)" },  
-	{ 0x0411, JAPANESE, L"JP",	L"#IME_0411" },  
-	{ 0x044b, UNKNOWN, L"IN",	L"Kannada" },  
-	{ 0x0457, UNKNOWN, L"IN",	L"Konkani" },  
-	{ 0x0412, KOREAN, L"KR",	L"#IME_0412" },  
-	{ 0x0812, UNKNOWN, L"KR",	L"Korean (Johab)" },  
-	{ 0x0440, UNKNOWN, L"KZ",	L"Kyrgyz." },  
-	{ 0x0426, UNKNOWN, L"LV",	L"Latvian" },  
-	{ 0x0427, UNKNOWN, L"LT",	L"Lithuanian" },  
-	{ 0x0827, UNKNOWN, L"LT",	L"Lithuanian (Classic)" },  
-	{ 0x042f, UNKNOWN, L"MK",	L"FYRO Macedonian" },  
-	{ 0x043e, UNKNOWN, L"MY",	L"Malay (Malaysian)" },  
-	{ 0x083e, UNKNOWN, L"MY",	L"Malay (Brunei Darussalam)" },  
-	{ 0x044c, UNKNOWN, L"IN",	L"Malayalam (India)" },  
-	{ 0x0481, UNKNOWN, L"",		L"Maori (New Zealand)" },  
-	{ 0x043a, UNKNOWN, L"",		L"Maltese (Malta)" },  
-	{ 0x044e, UNKNOWN, L"IN",	L"Marathi" },  
-	{ 0x0450, UNKNOWN, L"MN",	L"Mongolian" },  
-	{ 0x0414, UNKNOWN, L"NO",	L"Norwegian (Bokmal)" },  
-	{ 0x0814, UNKNOWN, L"NO",	L"Norwegian (Nynorsk)" },  
-	{ 0x0415, UNKNOWN, L"PL",	L"Polish" },  
-	{ 0x0416, UNKNOWN, L"PT",	L"Portuguese (Brazil)" },  
-	{ 0x0816, UNKNOWN, L"PT",	L"Portuguese (Portugal)" },  
-	{ 0x0446, UNKNOWN, L"IN",	L"Punjabi" },  
-	{ 0x046b, UNKNOWN, L"",		L"Quechua (Bolivia)" },  
-	{ 0x086b, UNKNOWN, L"",		L"Quechua (Ecuador)" },  
-	{ 0x0c6b, UNKNOWN, L"",		L"Quechua (Peru)" },  
-	{ 0x0418, UNKNOWN, L"RO",	L"Romanian" },  
-	{ 0x0419, UNKNOWN, L"RU",	L"#IME_0419" },  
-	{ 0x044f, UNKNOWN, L"IN",	L"Sanskrit" },  
-	{ 0x043b, UNKNOWN, L"",		L"Sami, Northern (Norway)" },  
-	{ 0x083b, UNKNOWN, L"",		L"Sami, Northern (Sweden)" },  
-	{ 0x0c3b, UNKNOWN, L"",		L"Sami, Northern (Finland)" },  
-	{ 0x103b, UNKNOWN, L"",		L"Sami, Lule (Norway)" },  
-	{ 0x143b, UNKNOWN, L"",		L"Sami, Lule (Sweden)" },  
-	{ 0x183b, UNKNOWN, L"",		L"Sami, Southern (Norway)" },  
-	{ 0x1c3b, UNKNOWN, L"",		L"Sami, Southern (Sweden)" },  
-	{ 0x203b, UNKNOWN, L"",		L"Sami, Skolt (Finland)" },  
-	{ 0x243b, UNKNOWN, L"",		L"Sami, Inari (Finland)" },  
-	{ 0x0c1a, UNKNOWN, L"SR",	L"Serbian (Cyrillic)" },  
-	{ 0x1c1a, UNKNOWN, L"SR",	L"Serbian (Cyrillic, Bosnia, and Herzegovina)" },  
-	{ 0x081a, UNKNOWN, L"SR",	L"Serbian (Latin)" },  
-	{ 0x181a, UNKNOWN, L"SR",	L"Serbian (Latin, Bosnia, and Herzegovina)" }, 
-	{ 0x046c, UNKNOWN, L"",		L"Sesotho sa Leboa/Northern Sotho (South Africa)" },  
-	{ 0x0432, UNKNOWN, L"",		L"Setswana/Tswana (South Africa)" },  
-	{ 0x041b, UNKNOWN, L"SK",	L"Slovak" },  
-	{ 0x0424, UNKNOWN, L"SI",	L"Slovenian" },  
-	{ 0x040a, UNKNOWN, L"ES",	L"#IME_040a" },  
-	{ 0x080a, UNKNOWN, L"ES",	L"Spanish (Mexican)" },  
-	{ 0x0c0a, UNKNOWN, L"ES",	L"Spanish (Spain, Modern Sort)" },  
-	{ 0x100a, UNKNOWN, L"ES",	L"Spanish (Guatemala)" },  
-	{ 0x140a, UNKNOWN, L"ES",	L"Spanish (Costa Rica)" },  
-	{ 0x180a, UNKNOWN, L"ES",	L"Spanish (Panama)" },  
-	{ 0x1c0a, UNKNOWN, L"ES",	L"Spanish (Dominican Republic)" },  
-	{ 0x200a, UNKNOWN, L"ES",	L"Spanish (Venezuela)" },  
-	{ 0x240a, UNKNOWN, L"ES",	L"Spanish (Colombia)" },  
-	{ 0x280a, UNKNOWN, L"ES",	L"Spanish (Peru)" },  
-	{ 0x2c0a, UNKNOWN, L"ES",	L"Spanish (Argentina)" },  
-	{ 0x300a, UNKNOWN, L"ES",	L"Spanish (Ecuador)" },  
-	{ 0x340a, UNKNOWN, L"ES",	L"Spanish (Chile)" },  
-	{ 0x380a, UNKNOWN, L"ES",	L"Spanish (Uruguay)" },  
-	{ 0x3c0a, UNKNOWN, L"ES",	L"Spanish (Paraguay)" },  
-	{ 0x400a, UNKNOWN, L"ES",	L"Spanish (Bolivia)" },  
-	{ 0x440a, UNKNOWN, L"ES",	L"Spanish (El Salvador)" },  
-	{ 0x480a, UNKNOWN, L"ES",	L"Spanish (Honduras)" },  
-	{ 0x4c0a, UNKNOWN, L"ES",	L"Spanish (Nicaragua)" },  
-	{ 0x500a, UNKNOWN, L"ES",	L"Spanish (Puerto Rico)" },  
-	{ 0x0430, UNKNOWN, L"",		L"Sutu" },  
-	{ 0x0441, UNKNOWN, L"KE",	L"Swahili (Kenya)" },  
-	{ 0x041d, UNKNOWN, L"SV",	L"Swedish" },  
-	{ 0x081d, UNKNOWN, L"SV",	L"Swedish (Finland)" },  
-	{ 0x045a, UNKNOWN, L"SY",	L"Syriac" },  
-	{ 0x0449, UNKNOWN, L"IN",	L"Tamil" },  
-	{ 0x0444, UNKNOWN, L"RU",	L"Tatar (Tatarstan)" },  
-	{ 0x044a, UNKNOWN, L"IN",	L"Telugu" },  
-	{ 0x041e, UNKNOWN, L"TH",	L"#IME_041e" },  
-	{ 0x041f, UNKNOWN, L"TR",	L"Turkish" },  
-	{ 0x0422, UNKNOWN, L"UA",	L"Ukrainian" },  
-	{ 0x0420, UNKNOWN, L"PK",	L"Urdu (Pakistan)" },  
-	{ 0x0820, UNKNOWN, L"IN",	L"Urdu (India)" },  
-	{ 0x0443, UNKNOWN, L"UZ",	L"Uzbek (Latin)" },  
-	{ 0x0843, UNKNOWN, L"UZ",	L"Uzbek (Cyrillic)" },  
-	{ 0x042a, UNKNOWN, L"VN",	L"Vietnamese" },  
-	{ 0x0452, UNKNOWN, L"",		L"Welsh (United Kingdom)" }, 
+	{ 0x0c04, UNKNOWN, L"CH",	L"Chinese (Hong Kong SAR, PRC)", false},  
+	{ 0x1004, UNKNOWN, L"CH",	L"Chinese (Singapore)", false},  
+	{ 0x1404, UNKNOWN, L"CH",	L"Chinese (Macao SAR)", false},  
+	{ 0x041a, UNKNOWN, L"HR",	L"Croatian", false},  
+	{ 0x101a, UNKNOWN, L"HR",	L"Croatian (Bosnia and Herzegovina)", false},  
+	{ 0x0405, UNKNOWN, L"CZ",	L"Czech", false},  
+	{ 0x0406, UNKNOWN, L"DK",	L"Danish", false},  
+	{ 0x0465, UNKNOWN, L"MV",	L"Divehi", false},  
+	{ 0x0413, UNKNOWN, L"NL",	L"Dutch (Netherlands)", false},  
+	{ 0x0813, UNKNOWN, L"BE",	L"Dutch (Belgium)", false},  
+	{ 0x0409, ENGLISH, L"EN",	L"#IME_0409", false},  
+	{ 0x0809, ENGLISH, L"EN",	L"English (United Kingdom)", false},  
+	{ 0x0c09, ENGLISH, L"EN",	L"English (Australian)", false},  
+	{ 0x1009, ENGLISH, L"EN",	L"English (Canadian)", false},  
+	{ 0x1409, ENGLISH, L"EN",	L"English (New Zealand)", false},  
+	{ 0x1809, ENGLISH, L"EN",	L"English (Ireland)", false},  
+	{ 0x1c09, ENGLISH, L"EN",	L"English (South Africa)", false},  
+	{ 0x2009, ENGLISH, L"EN",	L"English (Jamaica)", false},  
+	{ 0x2409, ENGLISH, L"EN",	L"English (Caribbean)", false},  
+	{ 0x2809, ENGLISH, L"EN",	L"English (Belize)", false},  
+	{ 0x2c09, ENGLISH, L"EN",	L"English (Trinidad)", false},  
+	{ 0x3009, ENGLISH, L"EN",	L"English (Zimbabwe)", false},  
+	{ 0x3409, ENGLISH, L"EN",	L"English (Philippines)", false},  
+	{ 0x0425, UNKNOWN, L"ET",	L"Estonian", false},  
+	{ 0x0438, UNKNOWN, L"FO",	L"Faeroese", false},  
+	{ 0x0429, UNKNOWN, L"FA",	L"Farsi", false},  
+	{ 0x040b, UNKNOWN, L"FI",	L"Finnish", false},  
+	{ 0x040c, UNKNOWN, L"FR",	L"#IME_040c", false},  
+	{ 0x080c, UNKNOWN, L"FR",	L"French (Belgian)", false},  
+	{ 0x0c0c, UNKNOWN, L"FR",	L"French (Canadian)", false},  
+	{ 0x100c, UNKNOWN, L"FR",	L"French (Switzerland)", false},  
+	{ 0x140c, UNKNOWN, L"FR",	L"French (Luxembourg)", false},  
+	{ 0x180c, UNKNOWN, L"FR",	L"French (Monaco)", false},  
+	{ 0x0456, UNKNOWN, L"GL",	L"Galician", false},  
+	{ 0x0437, UNKNOWN, L"KA",	L"Georgian", false},  
+	{ 0x0407, UNKNOWN, L"DE",	L"#IME_0407", false},  
+	{ 0x0807, UNKNOWN, L"DE",	L"German (Switzerland)", false},  
+	{ 0x0c07, UNKNOWN, L"DE",	L"German (Austria)", false},  
+	{ 0x1007, UNKNOWN, L"DE",	L"German (Luxembourg)", false},  
+	{ 0x1407, UNKNOWN, L"DE",	L"German (Liechtenstein)", false},  
+	{ 0x0408, UNKNOWN, L"GR",	L"Greek", false},  
+	{ 0x0447, UNKNOWN, L"IN",	L"Gujarati", false},  
+	{ 0x040d, UNKNOWN, L"HE",	L"Hebrew", false},  
+	{ 0x0439, UNKNOWN, L"HI",	L"Hindi", false},  
+	{ 0x040e, UNKNOWN, L"HU",	L"Hungarian", false},  
+	{ 0x040f, UNKNOWN, L"IS",	L"Icelandic", false},  
+	{ 0x0421, UNKNOWN, L"ID",	L"Indonesian", false},  
+	{ 0x0434, UNKNOWN, L"",		L"isiXhosa/Xhosa (South Africa)", false},  
+	{ 0x0435, UNKNOWN, L"",		L"isiZulu/Zulu (South Africa)", false},  
+	{ 0x0410, UNKNOWN, L"IT",	L"#IME_0410", false},  
+	{ 0x0810, UNKNOWN, L"IT",	L"Italian (Switzerland)", false},  
+	{ 0x0411, JAPANESE, L"JP",	L"#IME_0411", false},  
+	{ 0x044b, UNKNOWN, L"IN",	L"Kannada", false},  
+	{ 0x0457, UNKNOWN, L"IN",	L"Konkani", false},  
+	{ 0x0412, KOREAN, L"KR",	L"#IME_0412", false},  
+	{ 0x0812, UNKNOWN, L"KR",	L"Korean (Johab)", false},  
+	{ 0x0440, UNKNOWN, L"KZ",	L"Kyrgyz.", false},  
+	{ 0x0426, UNKNOWN, L"LV",	L"Latvian", false},  
+	{ 0x0427, UNKNOWN, L"LT",	L"Lithuanian", false},  
+	{ 0x0827, UNKNOWN, L"LT",	L"Lithuanian (Classic)", false},  
+	{ 0x042f, UNKNOWN, L"MK",	L"FYRO Macedonian", false},  
+	{ 0x043e, UNKNOWN, L"MY",	L"Malay (Malaysian)", false},  
+	{ 0x083e, UNKNOWN, L"MY",	L"Malay (Brunei Darussalam)", false},  
+	{ 0x044c, UNKNOWN, L"IN",	L"Malayalam (India)", false},  
+	{ 0x0481, UNKNOWN, L"",		L"Maori (New Zealand)", false},  
+	{ 0x043a, UNKNOWN, L"",		L"Maltese (Malta)", false},  
+	{ 0x044e, UNKNOWN, L"IN",	L"Marathi", false},  
+	{ 0x0450, UNKNOWN, L"MN",	L"Mongolian", false},  
+	{ 0x0414, UNKNOWN, L"NO",	L"Norwegian (Bokmal)", false},  
+	{ 0x0814, UNKNOWN, L"NO",	L"Norwegian (Nynorsk)", false},  
+	{ 0x0415, UNKNOWN, L"PL",	L"Polish", false},  
+	{ 0x0416, UNKNOWN, L"PT",	L"Portuguese (Brazil)", false},  
+	{ 0x0816, UNKNOWN, L"PT",	L"Portuguese (Portugal)", false},  
+	{ 0x0446, UNKNOWN, L"IN",	L"Punjabi", false},  
+	{ 0x046b, UNKNOWN, L"",		L"Quechua (Bolivia)", false},  
+	{ 0x086b, UNKNOWN, L"",		L"Quechua (Ecuador)", false},  
+	{ 0x0c6b, UNKNOWN, L"",		L"Quechua (Peru)", false},  
+	{ 0x0418, UNKNOWN, L"RO",	L"Romanian", false},  
+	{ 0x0419, UNKNOWN, L"RU",	L"#IME_0419", false},  
+	{ 0x044f, UNKNOWN, L"IN",	L"Sanskrit", false},  
+	{ 0x043b, UNKNOWN, L"",		L"Sami, Northern (Norway)", false},  
+	{ 0x083b, UNKNOWN, L"",		L"Sami, Northern (Sweden)", false},  
+	{ 0x0c3b, UNKNOWN, L"",		L"Sami, Northern (Finland)", false},  
+	{ 0x103b, UNKNOWN, L"",		L"Sami, Lule (Norway)", false},  
+	{ 0x143b, UNKNOWN, L"",		L"Sami, Lule (Sweden)", false},  
+	{ 0x183b, UNKNOWN, L"",		L"Sami, Southern (Norway)", false},  
+	{ 0x1c3b, UNKNOWN, L"",		L"Sami, Southern (Sweden)", false},  
+	{ 0x203b, UNKNOWN, L"",		L"Sami, Skolt (Finland)", false},  
+	{ 0x243b, UNKNOWN, L"",		L"Sami, Inari (Finland)", false},  
+	{ 0x0c1a, UNKNOWN, L"SR",	L"Serbian (Cyrillic)", false},  
+	{ 0x1c1a, UNKNOWN, L"SR",	L"Serbian (Cyrillic, Bosnia, and Herzegovina)", false},  
+	{ 0x081a, UNKNOWN, L"SR",	L"Serbian (Latin)", false},  
+	{ 0x181a, UNKNOWN, L"SR",	L"Serbian (Latin, Bosnia, and Herzegovina)", false}, 
+	{ 0x046c, UNKNOWN, L"",		L"Sesotho sa Leboa/Northern Sotho (South Africa)", false},  
+	{ 0x0432, UNKNOWN, L"",		L"Setswana/Tswana (South Africa)", false},  
+	{ 0x041b, UNKNOWN, L"SK",	L"Slovak", false},  
+	{ 0x0424, UNKNOWN, L"SI",	L"Slovenian", false},  
+	{ 0x040a, UNKNOWN, L"ES",	L"#IME_040a", false},  
+	{ 0x080a, UNKNOWN, L"ES",	L"Spanish (Mexican)", false},  
+	{ 0x0c0a, UNKNOWN, L"ES",	L"Spanish (Spain, Modern Sort)", false},  
+	{ 0x100a, UNKNOWN, L"ES",	L"Spanish (Guatemala)", false},  
+	{ 0x140a, UNKNOWN, L"ES",	L"Spanish (Costa Rica)", false},  
+	{ 0x180a, UNKNOWN, L"ES",	L"Spanish (Panama)", false},  
+	{ 0x1c0a, UNKNOWN, L"ES",	L"Spanish (Dominican Republic)", false},  
+	{ 0x200a, UNKNOWN, L"ES",	L"Spanish (Venezuela)", false},  
+	{ 0x240a, UNKNOWN, L"ES",	L"Spanish (Colombia)", false},  
+	{ 0x280a, UNKNOWN, L"ES",	L"Spanish (Peru)", false},  
+	{ 0x2c0a, UNKNOWN, L"ES",	L"Spanish (Argentina)", false},  
+	{ 0x300a, UNKNOWN, L"ES",	L"Spanish (Ecuador)", false},  
+	{ 0x340a, UNKNOWN, L"ES",	L"Spanish (Chile)", false},  
+	{ 0x380a, UNKNOWN, L"ES",	L"Spanish (Uruguay)", false},  
+	{ 0x3c0a, UNKNOWN, L"ES",	L"Spanish (Paraguay)", false},  
+	{ 0x400a, UNKNOWN, L"ES",	L"Spanish (Bolivia)", false},  
+	{ 0x440a, UNKNOWN, L"ES",	L"Spanish (El Salvador)", false},  
+	{ 0x480a, UNKNOWN, L"ES",	L"Spanish (Honduras)", false},  
+	{ 0x4c0a, UNKNOWN, L"ES",	L"Spanish (Nicaragua)", false},  
+	{ 0x500a, UNKNOWN, L"ES",	L"Spanish (Puerto Rico)", false},  
+	{ 0x0430, UNKNOWN, L"",		L"Sutu", false},  
+	{ 0x0441, UNKNOWN, L"KE",	L"Swahili (Kenya)", false},  
+	{ 0x041d, UNKNOWN, L"SV",	L"Swedish", false},  
+	{ 0x081d, UNKNOWN, L"SV",	L"Swedish (Finland)", false},  
+	{ 0x045a, UNKNOWN, L"SY",	L"Syriac", false},  
+	{ 0x0449, UNKNOWN, L"IN",	L"Tamil", false},  
+	{ 0x0444, UNKNOWN, L"RU",	L"Tatar (Tatarstan)", false},  
+	{ 0x044a, UNKNOWN, L"IN",	L"Telugu", false},  
+	{ 0x041e, UNKNOWN, L"TH",	L"#IME_041e", false},  
+	{ 0x041f, UNKNOWN, L"TR",	L"Turkish", false},  
+	{ 0x0422, UNKNOWN, L"UA",	L"Ukrainian", false},  
+	{ 0x0420, UNKNOWN, L"PK",	L"Urdu (Pakistan)", false},  
+	{ 0x0820, UNKNOWN, L"IN",	L"Urdu (India)", false},  
+	{ 0x0443, UNKNOWN, L"UZ",	L"Uzbek (Latin)", false},  
+	{ 0x0843, UNKNOWN, L"UZ",	L"Uzbek (Cyrillic)", false},  
+	{ 0x042a, UNKNOWN, L"VN",	L"Vietnamese", false},  
+	{ 0x0452, UNKNOWN, L"",		L"Welsh (United Kingdom)", false}, 
 };
 
 static LanguageIds *GetLanguageInfo( unsigned short id )
 {
-	for ( int j = 0; j < sizeof( g_LanguageIds ) / sizeof( g_LanguageIds[ 0 ] ); ++j )
+	for ( auto &lid: g_LanguageIds )
 	{
-		if ( g_LanguageIds[ j ].id == id )
+		if ( lid.id == id )
 		{
-			return &g_LanguageIds[ j ];
-			break;
+			return &lid;
 		}
 	}
 	return NULL;
@@ -2056,11 +2055,11 @@ static bool IsIDInList( unsigned short id, int count, HKL *list )
 static const wchar_t *GetLanguageName( unsigned short id )
 {
 	wchar_t const *name = L"???";
-	for ( int j = 0; j < sizeof( g_LanguageIds ) / sizeof( g_LanguageIds[ 0 ] ); ++j )
+	for ( auto &lid : g_LanguageIds )
 	{
-		if ( g_LanguageIds[ j ].id == id )
+		if ( lid.id == id )
 		{
-			name = g_LanguageIds[ j ].displayname;
+			name = lid.displayname;
 			break;
 		}
 	}
@@ -2159,29 +2158,29 @@ void CInputSystem::OnChangeIME( bool forward )
 #endif
 }
 
-int CInputSystem::GetCurrentIMEHandle()
+intp CInputSystem::GetCurrentIMEHandle()
 {
 	ASSERT_IF_IME_NYI();
 
 #ifdef DO_IME
-	HKL hkl = (HKL)GetKeyboardLayout( 0 );
-	return (int)hkl;
+	HKL hkl = GetKeyboardLayout( 0 );
+	return (intp)hkl;
 #else
 	return 0;
 #endif
 }
 
-int CInputSystem::GetEnglishIMEHandle()
+intp CInputSystem::GetEnglishIMEHandle()
 {
 #ifdef DO_IME
 	HKL hkl = (HKL)0x04090409;
-	return (int)hkl;
+	return (intp)hkl;
 #else
 	return 0;
 #endif
 }
 
-void CInputSystem::OnChangeIMEByHandle( int handleValue )
+void CInputSystem::OnChangeIMEByHandle( intp handleValue )
 {
 	ASSERT_IF_IME_NYI();
 
@@ -2274,7 +2273,7 @@ int CInputSystem::GetIMELanguageList( LanguageItem *dest, int destcount )
 				wcsncpy( p->menuname, info->displayname, sizeof( p->menuname ) / sizeof( wchar_t ) );
 				p->menuname[ sizeof( p->menuname ) / sizeof( wchar_t ) - 1 ] = L'\0';
 
-				p->handleValue = (int)hkl;
+				p->handleValue = (intp)hkl;
 				p->active = ( hkl == GetKeyboardLayout( 0 ) ) ? true : false;
 			}
 		}
@@ -2502,12 +2501,12 @@ int CInputSystem::GetIMEConversionModes( ConversionModeItem *dest, int destcount
 			int i = 0;
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_Chinese", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_CHT_ToChinese;
+			item->handleValue = (intp)&g_ConversionMode_CHT_ToChinese;
 			item->active = g_ConversionMode_CHT_ToChinese.ConvMatches( dwConvMode );
 
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_English", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_CHT_ToEnglish;
+			item->handleValue = (intp)&g_ConversionMode_CHT_ToEnglish;
 			item->active = g_ConversionMode_CHT_ToEnglish.ConvMatches( dwConvMode );
 		}
 		return 2;
@@ -2520,32 +2519,32 @@ int CInputSystem::GetIMEConversionModes( ConversionModeItem *dest, int destcount
 			int i = 0;
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_Hiragana", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_JP_Hiragana;
+			item->handleValue = (intp)&g_ConversionMode_JP_Hiragana;
 			item->active = g_ConversionMode_JP_Hiragana.ConvMatches( dwConvMode );
 			
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_FullWidthKatakana", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_JP_FullwidthKatakana;
+			item->handleValue = (intp)&g_ConversionMode_JP_FullwidthKatakana;
 			item->active = g_ConversionMode_JP_FullwidthKatakana.ConvMatches( dwConvMode );
 			
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_FullWidthAlphanumeric", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_JP_FullwidthAlphanumeric;
+			item->handleValue = (intp)&g_ConversionMode_JP_FullwidthAlphanumeric;
 			item->active = g_ConversionMode_JP_FullwidthAlphanumeric.ConvMatches( dwConvMode );
 			
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_HalfWidthKatakana", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_JP_HalfwidthKatakana;
+			item->handleValue = (intp)&g_ConversionMode_JP_HalfwidthKatakana;
 			item->active = g_ConversionMode_JP_HalfwidthKatakana.ConvMatches( dwConvMode );
 			
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_HalfWidthAlphanumeric", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_JP_HalfwidthAlphanumeric;
+			item->handleValue = (intp)&g_ConversionMode_JP_HalfwidthAlphanumeric;
 			item->active = g_ConversionMode_JP_HalfwidthAlphanumeric.ConvMatches( dwConvMode );
 			
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_English", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_JP_DirectInput;
+			item->handleValue = (intp)&g_ConversionMode_JP_DirectInput;
 			item->active = g_ConversionMode_JP_DirectInput.ConvMatches( dwConvMode );
 			
 		}
@@ -2558,12 +2557,12 @@ int CInputSystem::GetIMEConversionModes( ConversionModeItem *dest, int destcount
 			int i = 0;
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_Korean", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_KO_ToKorean;
+			item->handleValue = (intp)&g_ConversionMode_KO_ToKorean;
 			item->active = g_ConversionMode_KO_ToKorean.ConvMatches( dwConvMode );
 
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_English", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_KO_ToEnglish;
+			item->handleValue = (intp)&g_ConversionMode_KO_ToEnglish;
 			item->active = g_ConversionMode_KO_ToEnglish.ConvMatches( dwConvMode );
 		}
 		return 2;
@@ -2575,19 +2574,19 @@ int CInputSystem::GetIMEConversionModes( ConversionModeItem *dest, int destcount
 			int i = 0;
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_Chinese", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_CHS_ToChinese;
+			item->handleValue = (intp)&g_ConversionMode_CHS_ToChinese;
 			item->active = g_ConversionMode_CHS_ToChinese.ConvMatches( dwConvMode );
 
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_English", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_ConversionMode_CHS_ToChinese;
+			item->handleValue = (intp)&g_ConversionMode_CHS_ToChinese;
 			item->active = g_ConversionMode_CHS_ToChinese.ConvMatches( dwConvMode );
 		}
 		return 2;
 	}
-#endif
-
+#else
 	return 0;
+#endif
 }
 
 #ifdef DO_IME
@@ -2656,32 +2655,32 @@ int CInputSystem::GetIMESentenceModes( SentenceModeItem *dest, int destcount )
 			int i = 0;
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_General", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_SentenceMode_JP_General;
+			item->handleValue = (intp)&g_SentenceMode_JP_General;
 			item->active = g_SentenceMode_JP_General.SentMatches( dwSentMode );
 			
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_BiasNames", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_SentenceMode_JP_BiasNames;
+			item->handleValue = (intp)&g_SentenceMode_JP_BiasNames;
 			item->active = g_SentenceMode_JP_BiasNames.SentMatches( dwSentMode );
 			
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_BiasSpeech", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_SentenceMode_JP_BiasSpeech;
+			item->handleValue = (intp)&g_SentenceMode_JP_BiasSpeech;
 			item->active = g_SentenceMode_JP_BiasSpeech.SentMatches( dwSentMode );
 
 			item = &dest[ i++ ];
 			wcsncpy( item->menuname, L"#IME_NoConversion", sizeof( item->menuname ) / sizeof( wchar_t ) );
-			item->handleValue = (int)&g_SentenceMode_JP_None;
+			item->handleValue = (intp)&g_SentenceMode_JP_None;
 			item->active = g_SentenceMode_JP_None.SentMatches( dwSentMode );
 		}
 		return 4;
 	}
-#endif
-
+#else
 	return 0;
+#endif
 }
 
-void CInputSystem::OnChangeIMEConversionModeByHandle( int handleValue )
+void CInputSystem::OnChangeIMEConversionModeByHandle( intp handleValue )
 {
 	ASSERT_IF_IME_NYI();
 
@@ -2694,7 +2693,7 @@ void CInputSystem::OnChangeIMEConversionModeByHandle( int handleValue )
 #endif
 }
 
-void CInputSystem::OnChangeIMESentenceModeByHandle( int handleValue )
+void CInputSystem::OnChangeIMESentenceModeByHandle( intp )
 {
 }
 

@@ -54,22 +54,22 @@ public:
 	~CLocalizedStringTable();
 
 	// adds the contents of a file to the localization table
-	virtual bool AddFile( const char *fileName, const char *pPathID, bool bIncludeFallbackSearchPaths );
+	bool AddFile( const char *fileName, const char *pPathID, bool bIncludeFallbackSearchPaths ) override;
 
 	// saves the entire contents of the token tree to the file
-	bool SaveToFile( const char *fileName );
+	bool SaveToFile( const char *fileName ) override;
 
 	// adds a single name/unicode string pair to the table
-	void AddString(const char *tokenName, wchar_t *unicodeString, const char *fileName);
+	void AddString(const char *tokenName, wchar_t *unicodeString, const char *fileName) override;
 
 	// Finds the localized text for pName
-	wchar_t *Find(const char *pName);
+	wchar_t *Find(const char *pName) override;
 
 	// finds the index of a token by token name
-	StringIndex_t FindIndex(const char *pName);
+	StringIndex_t FindIndex(const char *pName) override;
 	
 	// Remove all strings in the table.
-	void RemoveAll();
+	void RemoveAll() override;
 
 	// iteration functions
 	StringIndex_t GetFirstStringIndex();
@@ -106,7 +106,7 @@ private:
 
 	void BuildFastValueLookup();
 	void DiscardFastValueLookup();
-	int FindExistingValueIndex( const wchar_t *value );
+	StringIndex_t FindExistingValueIndex( const wchar_t *value );
 
 	char m_szLanguage[64];
 	bool m_bUseOnlyLongestLanguageString;
@@ -154,13 +154,13 @@ private:
 
 	struct fastvalue_t
 	{
-		int				valueindex;
+		StringIndex_t	valueindex;
 		const wchar_t	*search;
 
 		static CLocalizedStringTable	*s_pTable;
 	};
 
-	CUtlRBTree< fastvalue_t, int >	m_FastValueLookup;
+	CUtlRBTree< fastvalue_t, StringIndex_t >	m_FastValueLookup;
 
 	static CLocalizedStringTable *s_pTable;
 
@@ -204,12 +204,12 @@ CLocalizedStringTable::~CLocalizedStringTable()
 bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID, bool bIncludeFallbackSearchPaths )
 {
 	// use the correct file based on the chosen language
-	static const char *const LANGUAGE_STRING = "%language%";
-	static const char *const ENGLISH_STRING = "english";
-	static const int MAX_LANGUAGE_NAME_LENGTH = 64;
+	const char LANGUAGE_STRING[] = "%language%";
+	const char ENGLISH_STRING[] = "english";
+	constexpr int MAX_LANGUAGE_NAME_LENGTH = 64;
 	char language[MAX_LANGUAGE_NAME_LENGTH];
 	char fileName[MAX_PATH];
-	int offs = 0;
+	intp offs = 0;
 	bool success = false;
 
 	memset( language, 0, sizeof(language) );
@@ -241,7 +241,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 		Q_strncat(fileName, ENGLISH_STRING, sizeof( fileName ), COPY_ALL_CHARACTERS );
 
 		// append the end of the initial string
-		offs += strlen(LANGUAGE_STRING);
+		offs += ssize(LANGUAGE_STRING) - 1;
 		Q_strncat(fileName, szFileName + offs, sizeof( fileName ), COPY_ALL_CHARACTERS);
 
 		success = AddFile( fileName, pPathID, bIncludeFallbackSearchPaths );
@@ -271,7 +271,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 				Q_strncat(fileName, language, sizeof( fileName ), COPY_ALL_CHARACTERS);
 
 				// append the end of the initial string
-				offs += strlen(LANGUAGE_STRING);
+				offs += ssize(LANGUAGE_STRING) - 1;
 				Q_strncat(fileName, szFileName + offs, sizeof( fileName ), COPY_ALL_CHARACTERS );
 
 				success &= AddFile( fileName, pPathID, bIncludeFallbackSearchPaths );
@@ -305,15 +305,13 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 	// We do this manually instead of just asking for the first match to support bIncludeFallbackSearchPaths
 	char searchPaths[ MAX_PATH*50 ] = { 0 }; // allow for 50 search paths
 
-	Verify( g_pFullFileSystem->GetSearchPath( pPathID, true, searchPaths, sizeof( searchPaths ) ) < sizeof(searchPaths) );
+	Verify( g_pFullFileSystem->GetSearchPath( pPathID, true, searchPaths, sizeof( searchPaths ) ) < static_cast<int>(sizeof(searchPaths)) );
 
 	CUtlSymbolTable				pathStrings;
 	CUtlVector< CUtlSymbol >	searchList;
 
-	bool bIsFullPath = false;
 	if ( V_IsAbsolutePath( fileName ) )
 	{
-		bIsFullPath = true;
 		CUtlSymbol sym = pathStrings.AddString( fileName );
 		searchList.AddToHead( sym );
 	}
@@ -430,7 +428,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 		{
 			// read the key and the value
 			ucs2 keytoken[128];
-			ucs2 *pchNewdata = ReadUnicodeToken(data, keytoken, ARRAYSIZE(keytoken), bQuoted);
+			ucs2 *pchNewdata = ReadUnicodeToken(data, keytoken, ssize(keytoken), bQuoted);
 			if (!keytoken[0])
 				break;	// we've hit the null terminator
 
@@ -787,12 +785,13 @@ void CLocalizedStringTable::AddString(const char *pString, wchar_t *pValue, cons
 	MEM_ALLOC_CREDIT();
 
 	// see if the value is already in our string table
-	int valueIndex = FindExistingValueIndex( pValue );
+	StringIndex_t valueIndex = FindExistingValueIndex( pValue );
 	if ( valueIndex == INVALID_LOCALIZE_STRING_INDEX )
 	{
-		int len = wcslen( pValue ) + 1;
-		valueIndex = m_Values.AddMultipleToTail( len );
-		memcpy( &m_Values[valueIndex], pValue, len * sizeof(wchar_t) );
+		intp len = wcslen( pValue ) + 1;
+		intp idx = m_Values.AddMultipleToTail( len );
+		valueIndex = idx;
+		memcpy( &m_Values[idx], pValue, len * sizeof(wchar_t) );
 	}
 
 	// see if the key is already in the table
@@ -803,7 +802,7 @@ void CLocalizedStringTable::AddString(const char *pString, wchar_t *pValue, cons
 	if ( stridx == INVALID_LOCALIZE_STRING_INDEX )
 	{
 		// didn't find, insert the string into the vector.
-		int len = strlen(pString) + 1;
+		intp len = strlen(pString) + 1;
 		stridx = m_Names.AddMultipleToTail( len );
 		memcpy( &m_Names[stridx], pString, len * sizeof(char) );
 
@@ -931,16 +930,16 @@ void CLocalizedStringTable::DiscardFastValueLookup()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CLocalizedStringTable::FindExistingValueIndex( const wchar_t *value )
+StringIndex_t CLocalizedStringTable::FindExistingValueIndex( const wchar_t *value )
 {
 	if ( !s_pTable )
 		return INVALID_LOCALIZE_STRING_INDEX;
 
 	fastvalue_t val;
-	val.valueindex = -1;
+	val.valueindex = INVALID_LOCALIZE_STRING_INDEX;
 	val.search = value;
 
-	int idx = m_FastValueLookup.Find( val );
+	StringIndex_t idx = m_FastValueLookup.Find(val);
 	if ( idx != m_FastValueLookup.InvalidIndex() )
 	{
 		return m_FastValueLookup[ idx ].valueindex;
@@ -967,8 +966,8 @@ void CLocalizedStringTable::SetValueByIndex(StringIndex_t index, wchar_t *newVal
 	wchar_t *wstr = &m_Values[lstr.valueIndex];
 
 	// see if the new string will fit within the old memory
-	int newLen = wcslen(newValue);
-	int oldLen = wcslen(wstr);
+	intp newLen = wcslen(newValue);
+	intp oldLen = wcslen(wstr);
 
 	if (newLen > oldLen)
 	{

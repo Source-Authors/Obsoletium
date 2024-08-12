@@ -25,10 +25,10 @@ namespace vgui
 class CMessageListener : public IMessageListener
 {
 public:
-	virtual void Message( VPanel* pSender, VPanel* pReceiver, KeyValues* pKeyValues, MessageSendType_t type );
+	void Message( VPanel* pSender, VPanel* pReceiver, KeyValues* pKeyValues, MessageSendType_t type ) override;
 };
 
-void CMessageListener::Message( VPanel* pSender, VPanel* pReceiver, KeyValues* pKeyValues, MessageSendType_t type )
+void CMessageListener::Message( VPanel* pSender, VPanel* pReceiver, KeyValues* pKeyValues, [[maybe_unused]] MessageSendType_t type )
 {
 	char const *pSenderName = "NULL";
 	if (pSender)

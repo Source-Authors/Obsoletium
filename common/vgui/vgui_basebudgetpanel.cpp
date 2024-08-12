@@ -45,7 +45,7 @@ float CBaseBudgetPanel::GetBudgetGroupPercent( float value )
 }
 
 
-const double *CBaseBudgetPanel::GetBudgetGroupData( int &nGroups, int &nSamplesPerGroup, int &nSampleOffset ) const
+const double *CBaseBudgetPanel::GetBudgetGroupData( intp &nGroups, int &nSamplesPerGroup, int &nSampleOffset ) const
 {
 	nGroups = m_ConfigData.m_BudgetGroupInfo.Count();
 	nSamplesPerGroup = BUDGET_HISTORY_COUNT;
@@ -63,7 +63,7 @@ const double *CBaseBudgetPanel::GetBudgetGroupData( int &nGroups, int &nSamplesP
 
 void CBaseBudgetPanel::ClearTimesForAllGroupsForThisFrame( void )
 {
-	int i;
+	intp i;
 	for( i = 0; i < m_ConfigData.m_BudgetGroupInfo.Count(); i++ )
 	{
 		m_BudgetGroupTimes[i].m_Time[m_BudgetHistoryOffset] = 0.0;
@@ -72,7 +72,7 @@ void CBaseBudgetPanel::ClearTimesForAllGroupsForThisFrame( void )
 
 void CBaseBudgetPanel::ClearAllTimesForGroup( int groupID )
 {
-	int i;
+	intp i;
 	for( i = 0; i < BUDGET_HISTORY_COUNT; i++ )
 	{
 		m_BudgetGroupTimes[groupID].m_Time[i] = 0.0;
@@ -82,7 +82,7 @@ void CBaseBudgetPanel::ClearAllTimesForGroup( int groupID )
 
 void CBaseBudgetPanel::OnConfigDataChanged( const CBudgetPanelConfigData &data )
 {
-	int oldNumGroups = m_ConfigData.m_BudgetGroupInfo.Count();
+	intp oldNumGroups = m_ConfigData.m_BudgetGroupInfo.Count();
 
 	// Copy in the config data and rebuild everything.
 	Rebuild( data );
@@ -90,7 +90,7 @@ void CBaseBudgetPanel::OnConfigDataChanged( const CBudgetPanelConfigData &data )
 	if ( m_ConfigData.m_BudgetGroupInfo.Count() > m_BudgetGroupTimes.Count() )
 	{
 		m_BudgetGroupTimes.EnsureCount( m_ConfigData.m_BudgetGroupInfo.Count() );
-		for ( int i = oldNumGroups; i < m_ConfigData.m_BudgetGroupInfo.Count(); i++ )
+		for ( intp i = oldNumGroups; i < m_ConfigData.m_BudgetGroupInfo.Count(); i++ )
 		{
 			ClearAllTimesForGroup( i );
 		}
@@ -98,7 +98,7 @@ void CBaseBudgetPanel::OnConfigDataChanged( const CBudgetPanelConfigData &data )
 	else
 	{
 		m_BudgetGroupTimes.SetSize( m_ConfigData.m_BudgetGroupInfo.Count() );
-		for ( int i = 0; i < m_BudgetGroupTimes.Count(); i++ )
+		for ( intp i = 0; i < m_BudgetGroupTimes.Count(); i++ )
 		{
 			ClearAllTimesForGroup( i );
 		}
@@ -112,22 +112,22 @@ void CBaseBudgetPanel::ResetAll()
 {
 	m_ConfigData.m_BudgetGroupInfo.Purge();
 	
-	for ( int i=0; i < m_GraphLabels.Count(); i++ )
-		m_GraphLabels[i]->MarkForDeletion();
+	for ( auto *l : m_GraphLabels )
+		l->MarkForDeletion();
 	m_GraphLabels.Purge();
 
-	for ( int i=0; i < m_TimeLabels.Count(); i++ )
-		m_TimeLabels[i]->MarkForDeletion();
+	for ( auto *l : m_TimeLabels )
+		l->MarkForDeletion();
 	m_TimeLabels.Purge();
 }
 
 
 void CBaseBudgetPanel::Rebuild( const CBudgetPanelConfigData &data )
 {
-	int oldNumBudgetGroups = m_ConfigData.m_BudgetGroupInfo.Count();
-	int oldNumHistoryLabels = m_ConfigData.m_HistoryLabelValues.Count();
+	intp oldNumBudgetGroups = m_ConfigData.m_BudgetGroupInfo.Count();
+	intp oldNumHistoryLabels = m_ConfigData.m_HistoryLabelValues.Count();
 	
-	int oldNumTimeLabels = m_TimeLabels.Count();
+	intp oldNumTimeLabels = m_TimeLabels.Count();
 
 	// Copy the new config in.
 	m_ConfigData = data;
@@ -165,7 +165,7 @@ void CBaseBudgetPanel::Rebuild( const CBudgetPanelConfigData &data )
 	m_pBudgetBarGraphPanel = new CBudgetBarGraphPanel( this, "BudgetBarGraph" );
 
 	// Create any new labels we need.
-	int i;
+	intp i;
 
 	if ( m_ConfigData.m_BudgetGroupInfo.Count() > m_GraphLabels.Count() )
 	{
@@ -221,7 +221,7 @@ void CBaseBudgetPanel::Rebuild( const CBudgetPanelConfigData &data )
 		for( i = oldNumTimeLabels; i < m_TimeLabels.Count(); i++ )
 		{
 			char name[1024];
-			Q_snprintf( name, sizeof( name ), "time_label_%d", i );
+			Q_snprintf( name, sizeof( name ), "time_label_%zd", i );
 			m_TimeLabels[i] = new vgui::Label( this, name, "TEXT NOT SET YET" );
 		}
 	}
@@ -255,11 +255,11 @@ void CBaseBudgetPanel::PerformLayout()
 
 
 	int maxFPSLabelWidth = 0;
-	int i;
-	for( i = 0; i < m_HistoryLabels.Count(); i++ )
+	intp i;
+	for( auto *l : m_HistoryLabels )
 	{
 		int labelWidth, labelHeight;
-		m_HistoryLabels[i]->GetContentSize( labelWidth, labelHeight );
+		l->GetContentSize( labelWidth, labelHeight );
 		if( labelWidth > maxFPSLabelWidth )
 		{
 			maxFPSLabelWidth = labelWidth;
@@ -277,10 +277,10 @@ void CBaseBudgetPanel::PerformLayout()
 	GetSize( totalWidth, totalHeight );
 
 	int maxTimeLabelHeight = 0;
-	for( i = 0; i < m_TimeLabels.Count(); i++ )
+	for( auto *l : m_TimeLabels )
 	{
 		int labelWidth, labelHeight;
-		m_TimeLabels[i]->GetContentSize( labelWidth, labelHeight );
+		l->GetContentSize( labelWidth, labelHeight );
 		maxTimeLabelHeight = max( maxTimeLabelHeight, labelHeight );
 	}
 
@@ -292,10 +292,10 @@ void CBaseBudgetPanel::PerformLayout()
 		budgetHistoryHeight );
 
 	int maxLabelWidth = 0;
-	for( i = 0; i < m_GraphLabels.Count(); i++ )
+	for( auto *l : m_GraphLabels )
 	{
 		int width, height;
-		m_GraphLabels[i]->GetContentSize( width, height );
+		l->GetContentSize( width, height );
 		if( maxLabelWidth < width )
 		{
 			maxLabelWidth = width;
@@ -352,8 +352,7 @@ void CBaseBudgetPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	int i;
-	for( i = 0; i < m_ConfigData.m_BudgetGroupInfo.Count(); i++ )
+	for( intp i = 0; i < m_ConfigData.m_BudgetGroupInfo.Count(); i++ )
 	{
 		m_GraphLabels[i]->SetFgColor( m_ConfigData.m_BudgetGroupInfo[i].m_Color );
 		m_GraphLabels[i]->SetBgColor( Color( 0, 0, 0, 255 ) );
@@ -365,31 +364,31 @@ void CBaseBudgetPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 		}
 	}
 
-	for( i = 0; i < m_TimeLabels.Count(); i++ )
+	for( auto *l : m_TimeLabels )
 	{
 		int red, green, blue, alpha;
 		red = green = blue = alpha = 255;
-		m_TimeLabels[i]->SetFgColor( Color( red, green, blue, alpha ) );
-		m_TimeLabels[i]->SetBgColor( Color( 0, 0, 0, 255 ) );
-		m_TimeLabels[i]->SetPaintBackgroundEnabled( false );
-		m_TimeLabels[i]->SetFont( pScheme->GetFont( "BudgetLabel", IsProportional() ) );
+		l->SetFgColor( Color( red, green, blue, alpha ) );
+		l->SetBgColor( Color( 0, 0, 0, 255 ) );
+		l->SetPaintBackgroundEnabled( false );
+		l->SetFont( pScheme->GetFont( "BudgetLabel", IsProportional() ) );
 		if ( m_bDedicated )
 		{
-			m_TimeLabels[i]->SetBgColor( pScheme->GetColor( "ControlBG", Color( 0, 0, 0, 255 ) ) );
+			l->SetBgColor( pScheme->GetColor( "ControlBG", Color( 0, 0, 0, 255 ) ) );
 		}
 	}
 
-	for( i = 0; i < m_HistoryLabels.Count(); i++ )
+	for( auto *l : m_HistoryLabels )
 	{
 		int red, green, blue, alpha;
 		red = green = blue = alpha = 255;
-		m_HistoryLabels[i]->SetFgColor( Color( red, green, blue, alpha ) );
-		m_HistoryLabels[i]->SetBgColor( Color( 0, 0, 0, 255 ) );
-		m_HistoryLabels[i]->SetPaintBackgroundEnabled( false );
-		m_HistoryLabels[i]->SetFont( pScheme->GetFont( "BudgetLabel", IsProportional() ) );
+		l->SetFgColor( Color( red, green, blue, alpha ) );
+		l->SetBgColor( Color( 0, 0, 0, 255 ) );
+		l->SetPaintBackgroundEnabled( false );
+		l->SetFont( pScheme->GetFont( "BudgetLabel", IsProportional() ) );
 		if ( m_bDedicated )
 		{
-			m_HistoryLabels[i]->SetBgColor( pScheme->GetColor( "ControlBG", Color( 0, 0, 0, 255 ) ) );
+			l->SetBgColor( pScheme->GetColor( "ControlBG", Color( 0, 0, 0, 255 ) ) );
 		}
 	}
 

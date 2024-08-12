@@ -273,7 +273,7 @@ void CSystem::ShellExecute(const char *command, const char *file)
 	if ( V_strcmp( command, "open" ) != 0 )
 	{
 		// Nope
-		Assert( !"This legacy command is only supported in the form of open <foo>" );
+		AssertMsg( false, "This legacy command is only supported in the form of open <foo>" );
 		return;
 	}
 
@@ -307,7 +307,7 @@ void CSystem::ShellExecute(const char *command, const char *file)
 		}
 #endif
 		execlp( szCommand, szCommand, file, (char *)0 );
-		Assert( !"execlp failed" );
+		AssertMsg( false, "execlp failed" );
 	}
 }
 

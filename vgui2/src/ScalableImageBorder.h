@@ -29,19 +29,19 @@ public:
 	ScalableImageBorder();
 	~ScalableImageBorder();
 
-	virtual void Paint(vgui::VPANEL panel);
-	virtual void Paint(int x0, int y0, int x1, int y1);
-	virtual void Paint(int x0, int y0, int x1, int y1, int breakSide, int breakStart, int breakStop);
-	virtual void SetInset(int left, int top, int right, int bottom);
-	virtual void GetInset(int &left, int &top, int &right, int &bottom);
+	void Paint(vgui::VPANEL panel) override;
+	void Paint(int x0, int y0, int x1, int y1) override;
+	void Paint(int x0, int y0, int x1, int y1, int breakSide, int breakStart, int breakStop) override;
+	void SetInset(int left, int top, int right, int bottom) override;
+	void GetInset(int &left, int &top, int &right, int &bottom) override;
 
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme, KeyValues *inResourceData);
+	void ApplySchemeSettings(vgui::IScheme *pScheme, KeyValues *inResourceData) override;
 
-	virtual const char *GetName();
-	virtual void SetName(const char *name);
-	virtual backgroundtype_e GetBackgroundType();
+	const char *GetName() override;
+	void SetName(const char *name) override;
+	backgroundtype_e GetBackgroundType() override;
 
-	virtual bool PaintFirst( void ) { return m_bPaintFirst; }
+	bool PaintFirst( void ) { return m_bPaintFirst; }
 
 protected:
 	void		 SetImage(const char *imageName);

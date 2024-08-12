@@ -70,7 +70,7 @@ void MemoryBitmap::GetContentSize(int &wide, int &tall)
 //-----------------------------------------------------------------------------
 // Purpose: ignored
 //-----------------------------------------------------------------------------
-void MemoryBitmap::SetSize(int x, int y)
+void MemoryBitmap::SetSize(int, int)
 {
 }
 

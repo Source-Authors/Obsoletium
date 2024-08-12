@@ -112,7 +112,7 @@ VPanel::~VPanel()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void VPanel::TraverseLevel( int val )
+void VPanel::TraverseLevel( int )
 {
 	// Bump up our traverse level.
 	m_nThinkTraverseLevel += m_nThinkTraverseLevel;
@@ -125,6 +125,7 @@ void VPanel::TraverseLevel( int val )
 		{
 			// This is really bad - we have a Client() pointer that is invalid.
 			Warning( "Panel '%s/%s' has invalid client: %p.\n", GetName(), GetClassName(), Client() );
+
 #ifdef STAGING_ONLY
 			DebuggerBreak();
 #endif
@@ -136,20 +137,6 @@ void VPanel::TraverseLevel( int val )
 			vpanel->m_nThinkTraverseLevel += vpanel->m_nThinkTraverseLevel;
 		}
 	}
-
-	// This doesn't work. It appears we add all kinds of children to various panels in the
-	//  InternalThinkTraverse functions, and that means the refcount is 0 when added, and
-	//  then drops to -1 when we decrement the traverse level.
-#if 0
-	// Bump up our children traverse levels.
-	CUtlVector< VPanel * > &children = GetChildren();
-	for ( int i = 0; i < children.Count(); ++i )
-	{
-		VPanel *child = children[ i ];
-		if ( child )
-			child->m_nThinkTraverseLevel = Max( child->m_nThinkTraverseLevel + val, 0 );
-	}
-#endif
 }
 
 //-----------------------------------------------------------------------------

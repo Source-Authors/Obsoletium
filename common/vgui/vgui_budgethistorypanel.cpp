@@ -70,7 +70,7 @@ void CBudgetHistoryPanel::Paint()
 	s_Rects.EnsureCount( ( endID - startID ) );
 	s_CurrentHeight.EnsureCount( endID - startID );
 	memset( &s_CurrentHeight[0], 0, sizeof( float ) * ( endID - startID ) );
-	int j;
+	intp j;
 	float ooRangeMaxMinusMin = 1.0f / ( m_fRangeMax - m_fRangeMin );
 	for( j = 0; j < m_nGroups; j++ )
 	{
@@ -100,9 +100,9 @@ void CBudgetHistoryPanel::Paint()
 		vgui::surface()->DrawFilledRectArray( &s_Rects[0], endID - startID );
 	}
 
-	for ( int i=0; i < m_pBudgetPanel->GetConfigData().m_HistoryLabelValues.Count(); i++ )
+	for ( auto v : m_pBudgetPanel->GetConfigData().m_HistoryLabelValues )
 	{
-		DrawBudgetLine( m_pBudgetPanel->GetConfigData().m_HistoryLabelValues[i] );
+		DrawBudgetLine( v );
 	}
 }
 
@@ -121,7 +121,7 @@ void CBudgetHistoryPanel::DrawBudgetLine( float val )
 }
 
 
-void CBudgetHistoryPanel::SetData( double *pData, int nGroups, int nSamplesPerGroup, int nSampleOffset )
+void CBudgetHistoryPanel::SetData( double *pData, intp nGroups, int nSamplesPerGroup, int nSampleOffset )
 {
 	m_pData = pData;
 	m_nGroups = nGroups;

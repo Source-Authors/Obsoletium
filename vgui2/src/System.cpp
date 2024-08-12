@@ -10,8 +10,8 @@
 #define OEMRESOURCE
 #include "winlite.h"
 #include <shellapi.h>
-#include <shlwapi.h>
-#include <shlobj.h>
+#include <Shlwapi.h>
+#include <ShlObj.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,16 +69,16 @@ static BOOL CALLBACK GetMainApplicationWindowHWND_EnumProc( HWND hWnd, LPARAM lP
 	// Return TRUE to continue enumeration or FALSE to stop
 
 	// Given window thread/process id
-	DWORD dwProcessId, dwThreadId;
-	dwThreadId = GetWindowThreadProcessId( hWnd, &dwProcessId );
+	DWORD dwProcessId;
+	[[maybe_unused]] DWORD dwThreadId = GetWindowThreadProcessId( hWnd, &dwProcessId );
 
 	// Our thread/process id
-	DWORD dwOurProcessId;
-	dwOurProcessId = GetCurrentProcessId();
+	DWORD dwOurProcessId = GetCurrentProcessId();
 
 	// Foreign process
 	if ( dwOurProcessId != dwProcessId )
 		return TRUE;
+
 	// Service window
 	if ( !IsWindowVisible( hWnd ) || !IsWindowEnabled( hWnd ) )
 		return TRUE;
@@ -546,21 +546,21 @@ int CSystem::GetClipboardText(int offset, wchar_t *buf, int bufLen)
 #endif
 }
 
-static bool staticSplitRegistryKey(const char *key, char *key0, int key0Len, char *key1, int key1Len)
+static bool staticSplitRegistryKey(const char *key, char *key0, char *key1)
 {
 	if(key==null)
 	{
 		return false;
 	}
 	
-	int len=strlen(key);
+	intp len=V_strlen(key);
 	if(len<=0)
 	{
 		return false;
 	}
 
-	int Start=-1;
-	for(int i=len-1;i>=0;i--)
+	intp Start=-1;
+	for(intp i=len-1;i>=0;i--)
 	{
 		if(key[i]=='\\')
 		{
@@ -601,7 +601,7 @@ bool CSystem::SetRegistryString(const char *key, const char *value)
 	}
 
 	char key0[256], key1[256];
-	if (!staticSplitRegistryKey(key, key0, sizeof(key0), key1, sizeof(key1)))
+	if (!staticSplitRegistryKey(key, key0, key1))
 	{
 		return false;
 	}
@@ -645,7 +645,7 @@ bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 	}
 
 	char key0[256],key1[256];
-	if(!staticSplitRegistryKey(key,key0,256,key1,256))
+	if(!staticSplitRegistryKey(key,key0,key1))
 	{
 		return false;
 	}
@@ -685,7 +685,7 @@ bool CSystem::SetRegistryInteger(const char *key, int value)
 	}
 
 	char key0[256],key1[256];
-	if(!staticSplitRegistryKey(key,key0,256,key1,256))
+	if(!staticSplitRegistryKey(key,key0,key1))
 	{
 		return false;
 	}
@@ -723,7 +723,7 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 	}
 
 	char key0[256],key1[256];
-	if(!staticSplitRegistryKey(key,key0,256,key1,256))
+	if(!staticSplitRegistryKey(key,key0,key1))
 	{
 		return false;
 	}

@@ -43,26 +43,26 @@ public:
 	CScheme();
 
 	// gets a string from the default settings section
-	virtual const char *GetResourceString(const char *stringName);
+	const char *GetResourceString(const char *stringName) override;
 
 	// returns a pointer to an existing border
-	virtual IBorder *GetBorder(const char *borderName);
+	IBorder *GetBorder(const char *borderName) override;
 
 	// returns a pointer to an existing font
-	virtual HFont GetFont(const char *fontName, bool proportional);
+	HFont GetFont(const char *fontName, bool proportional) override;
 
 	// m_pkvColors
-	virtual Color GetColor( const char *colorName, Color defaultColor);
+	Color GetColor( const char *colorName, Color defaultColor) override;
 
 
 	void Shutdown( bool full );
 	void LoadFromFile( VPANEL sizingPanel, const char *filename, const char *tag, KeyValues *inKeys );
 
 	// Gets at the scheme's name
-	const char *GetName() { return tag; }
-	const char *GetFileName() { return fileName; }
+	const char *GetName() const { return tag; }
+	const char *GetFileName() const { return fileName; }
 
-	char const *GetFontName( const HFont& font );
+	char const *GetFontName( const HFont& font ) override;
 
 	void ReloadFontGlyphs();
 
@@ -74,19 +74,19 @@ public:
 	void SetFontRange( const char *fontname, int nMin, int nMax );
 	
 	// Get the number of borders
-	virtual int GetBorderCount() const;
+	int GetBorderCount() const override;
 
 	// Get the border at the given index
-	virtual IBorder *GetBorderAtIndex( int iIndex );
+	IBorder *GetBorderAtIndex( int iIndex ) override;
 
 	// Get the number of fonts
-	virtual int GetFontCount() const;
+	int GetFontCount() const override;
 
 	// Get the font at the given index
-	virtual HFont GetFontAtIndex( int iIndex );
+	HFont GetFontAtIndex( int iIndex ) override;
 	
 	// Get color data
-	virtual const KeyValues *GetColorData() const;
+	const KeyValues *GetColorData() const override;
 
 private:
 	const char *LookupSchemeSetting(const char *pchSetting);
@@ -107,7 +107,7 @@ private:
 	struct SchemeBorder_t
 	{
 		IBorder *border;
-		int borderSymbol;
+		HKeySymbol borderSymbol;
 		bool bSharedBorder;
 	};
 	CUtlVector<SchemeBorder_t> m_BorderList;
@@ -117,7 +117,7 @@ private:
 	struct fontalias_t
 	{
 		CUtlSymbol _trueFontName;
-		unsigned short _font : 15;
+		HFont _font : 15;
 		unsigned short m_bProportional : 1;
 	};
 #pragma pack()
@@ -260,14 +260,13 @@ CSchemeManager::CSchemeManager()
 //-----------------------------------------------------------------------------
 CSchemeManager::~CSchemeManager()
 {
-	int i;
-	for ( i = 0; i < m_Schemes.Count(); i++ )
+	for ( auto *scheme : m_Schemes )
 	{
-		delete m_Schemes[i];
+		delete scheme;
 	}
 	m_Schemes.RemoveAll();
 
-	for ( i = 0; i < m_Bitmaps.MaxElement(); i++ )
+	for ( int i = 0; i < m_Bitmaps.MaxElement(); i++ )
 	{
 		if (m_Bitmaps.IsValidIndex(i))
 		{
@@ -295,15 +294,13 @@ void CSchemeManager::ReloadFonts()
 //-----------------------------------------------------------------------------
 IScheme *CSchemeManager::GetIScheme( HScheme scheme )
 {
-	if ( scheme >= (unsigned long)m_Schemes.Count() )
-	{
-		AssertOnce( !"Invalid scheme requested." );
-		return NULL;
-	}
-	else
+	if ( scheme < (unsigned long)m_Schemes.Count() )
 	{
 		return m_Schemes[scheme];
 	}
+
+	AssertMsg( false, "Invalid scheme requested." );
+	return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -312,7 +309,7 @@ IScheme *CSchemeManager::GetIScheme( HScheme scheme )
 void CSchemeManager::Shutdown( bool full )
 {
 	// Full shutdown kills the null scheme
-	for( int i = full ? 0 : 1; i < m_Schemes.Count(); i++ )
+	for( intp i = full ? 0 : 1; i < m_Schemes.Count(); i++ )
 	{
 		m_Schemes[i]->Shutdown( full );
 	}
@@ -329,7 +326,7 @@ void CSchemeManager::Shutdown( bool full )
 HScheme CSchemeManager::FindLoadedScheme(const char *fileName)
 {
 	// Find the scheme in the list of already loaded schemes
-	for (int i = 1; i < m_Schemes.Count(); i++)
+	for (intp i = 1; i < m_Schemes.Count(); i++)
 	{
 		char const *schemeFileName = m_Schemes[i]->GetFileName();
 		if (!stricmp(schemeFileName, fileName))
@@ -367,7 +364,7 @@ HScheme  CSchemeManager::LoadSchemeFromFileEx( VPANEL sizingPanel, const char *f
 	if (hScheme != 0)
 	{
 		CScheme *pScheme = static_cast< CScheme * >( GetIScheme( hScheme ) );
-		if ( IsPC() && pScheme )
+		if ( pScheme )
 		{
 			pScheme->ReloadFontGlyphs();
 		}
@@ -393,19 +390,13 @@ HScheme  CSchemeManager::LoadSchemeFromFileEx( VPANEL sizingPanel, const char *f
 		return 0;
 	}
 	
-	if ( IsX360() )
+	ConVarRef cl_hud_minmode( "cl_hud_minmode", true );
+	if ( cl_hud_minmode.IsValid() && cl_hud_minmode.GetBool() )
 	{
-		data->ProcessResolutionKeys( g_pSurface->GetResolutionKey() );
+		data->ProcessResolutionKeys( "_minmode" );
 	}
-	if ( IsPC() )
-	{
-		ConVarRef cl_hud_minmode( "cl_hud_minmode", true );
-		if ( cl_hud_minmode.IsValid() && cl_hud_minmode.GetBool() )
-		{
-			data->ProcessResolutionKeys( "_minmode" );
-		}
-	}
-	if( g_pIVgui->GetVRMode() )
+
+	if ( g_pIVgui->GetVRMode() )
 	{
 		data->ProcessResolutionKeys( "_vrmode" );
 	}
@@ -435,146 +426,150 @@ struct SchemeEntryTranslation_t
 };
 SchemeEntryTranslation_t g_SchemeTranslation[] =
 {
-	{ "Border.Bright",					"BorderBright",		"200 200 200 196" },	// the lit side of a control
-	{ "Border.Dark"						"BorderDark",		"40 40 40 196" },		// the dark/unlit side of a control
-	{ "Border.Selection"				"BorderSelection",	"0 0 0 196" },			// the additional border color for displaying the default/selected button
+	// dimhotepus: Fixed translation for BorderDark and BorderSelection.
+    // the lit side of a control
+	{ "Border.Bright",					"BorderBright",		"200 200 200 196" },
+    // the dark/unlit side of a control
+	{ "Border.Dark",					"BorderDark",		"40 40 40 196" },
+    // the additional border color for displaying the default/selected button
+	{ "Border.Selection",				"BorderSelection",	"0 0 0 196" },
 
 	{ "Button.TextColor",				"ControlFG",		"White" },
 	{ "Button.BgColor",					"ControlBG",		"Blank" },
-	{ "Button.ArmedTextColor",			"ControlFG" },
-	{ "Button.ArmedBgColor",			"ControlBG" },
-	{ "Button.DepressedTextColor",		"ControlFG" },
-	{ "Button.DepressedBgColor",		"ControlBG" },
-	{ "Button.FocusBorderColor",		"0 0 0 255" },
+	{ "Button.ArmedTextColor",			"ControlFG",		nullptr },
+	{ "Button.ArmedBgColor",			"ControlBG",		nullptr },
+	{ "Button.DepressedTextColor",		"ControlFG",		nullptr },
+	{ "Button.DepressedBgColor",		"ControlBG",		nullptr },
+	{ "Button.FocusBorderColor",		"0 0 0 255",		nullptr },
 
-	{ "CheckButton.TextColor",			"BaseText" },
-	{ "CheckButton.SelectedTextColor",	"BrightControlText" },
-	{ "CheckButton.BgColor",			"CheckBgColor" },
-	{ "CheckButton.Border1",  			"CheckButtonBorder1" },
-	{ "CheckButton.Border2",  			"CheckButtonBorder2" },
-	{ "CheckButton.Check",				"CheckButtonCheck" },
+	{ "CheckButton.TextColor",			"BaseText",				nullptr },
+	{ "CheckButton.SelectedTextColor",	"BrightControlText",	nullptr },
+	{ "CheckButton.BgColor",			"CheckBgColor",			nullptr },
+	{ "CheckButton.Border1",  			"CheckButtonBorder1",	nullptr },
+	{ "CheckButton.Border2",  			"CheckButtonBorder2",	nullptr },
+	{ "CheckButton.Check",				"CheckButtonCheck",		nullptr },
 
-	{ "ComboBoxButton.ArrowColor",		"LabelDimText" },
-	{ "ComboBoxButton.ArmedArrowColor",	"MenuButton/ArmedArrowColor" },
-	{ "ComboBoxButton.BgColor",			"MenuButton/ButtonBgColor" },
-	{ "ComboBoxButton.DisabledBgColor",	"ControlBG" },
+	{ "ComboBoxButton.ArrowColor",		"LabelDimText",					nullptr },
+	{ "ComboBoxButton.ArmedArrowColor",	"MenuButton/ArmedArrowColor",	nullptr },
+	{ "ComboBoxButton.BgColor",			"MenuButton/ButtonBgColor",		nullptr },
+	{ "ComboBoxButton.DisabledBgColor",	"ControlBG",					nullptr },
 
-	{ "Frame.TitleTextInsetX",			NULL,		"32" },
-	{ "Frame.ClientInsetX",				NULL,		"8" },
-	{ "Frame.ClientInsetY",				NULL,		"6" },
-	{ "Frame.BgColor",					"BgColor" },
-	{ "Frame.OutOfFocusBgColor",		"BgColor" },
-	{ "Frame.FocusTransitionEffectTime",NULL,		"0" },
-	{ "Frame.TransitionEffectTime",		NULL,		"0" },
-	{ "Frame.AutoSnapRange",			NULL,		"8" },
-	{ "FrameGrip.Color1",				"BorderBright" },
-	{ "FrameGrip.Color2",				"BorderSelection" },
-	{ "FrameTitleButton.FgColor",		"TitleButtonFgColor" },
-	{ "FrameTitleButton.BgColor",		"TitleButtonBgColor" },
-	{ "FrameTitleButton.DisabledFgColor",	"TitleButtonDisabledFgColor" },
-	{ "FrameTitleButton.DisabledBgColor",	"TitleButtonDisabledBgColor" },
-	{ "FrameSystemButton.FgColor",		"TitleBarBgColor" },
-	{ "FrameSystemButton.BgColor",		"TitleBarBgColor" },
-	{ "FrameSystemButton.Icon",			"TitleBarIcon" },
-	{ "FrameSystemButton.DisabledIcon",	"TitleBarDisabledIcon" },
-	{ "FrameTitleBar.Font",				NULL,		"Default" },
-	{ "FrameTitleBar.TextColor",		"TitleBarFgColor" },
-	{ "FrameTitleBar.BgColor",			"TitleBarBgColor" },
-	{ "FrameTitleBar.DisabledTextColor","TitleBarDisabledFgColor" },
-	{ "FrameTitleBar.DisabledBgColor",	"TitleBarDisabledBgColor" },
+	{ "Frame.TitleTextInsetX",			NULL,								"32" },
+	{ "Frame.ClientInsetX",				NULL,								"8" },
+	{ "Frame.ClientInsetY",				NULL,								"6" },
+	{ "Frame.BgColor",					"BgColor",							nullptr },
+	{ "Frame.OutOfFocusBgColor",		"BgColor",							nullptr },
+	{ "Frame.FocusTransitionEffectTime",NULL,								"0" },
+	{ "Frame.TransitionEffectTime",		NULL,								"0" },
+	{ "Frame.AutoSnapRange",			NULL,								"8" },
+	{ "FrameGrip.Color1",				"BorderBright",						nullptr },
+	{ "FrameGrip.Color2",				"BorderSelection",					nullptr },
+	{ "FrameTitleButton.FgColor",		"TitleButtonFgColor",				nullptr },
+	{ "FrameTitleButton.BgColor",		"TitleButtonBgColor",				nullptr },
+	{ "FrameTitleButton.DisabledFgColor",	"TitleButtonDisabledFgColor",	nullptr },
+	{ "FrameTitleButton.DisabledBgColor",	"TitleButtonDisabledBgColor",	nullptr },
+	{ "FrameSystemButton.FgColor",		"TitleBarBgColor",					nullptr },
+	{ "FrameSystemButton.BgColor",		"TitleBarBgColor",					nullptr },
+	{ "FrameSystemButton.Icon",			"TitleBarIcon",						nullptr },
+	{ "FrameSystemButton.DisabledIcon",	"TitleBarDisabledIcon",				nullptr },
+	{ "FrameTitleBar.Font",				NULL,								"Default" },
+	{ "FrameTitleBar.TextColor",		"TitleBarFgColor",					nullptr },
+	{ "FrameTitleBar.BgColor",			"TitleBarBgColor",					nullptr },
+	{ "FrameTitleBar.DisabledTextColor","TitleBarDisabledFgColor",			nullptr },
+	{ "FrameTitleBar.DisabledBgColor",	"TitleBarDisabledBgColor",			nullptr },
 
-	{ "GraphPanel.FgColor",				"BrightControlText" },
-	{ "GraphPanel.BgColor",				"WindowBgColor" },
+	{ "GraphPanel.FgColor",				"BrightControlText",				nullptr },
+	{ "GraphPanel.BgColor",				"WindowBgColor",					nullptr },
 
-	{ "Label.TextDullColor",			"LabelDimText" },
-	{ "Label.TextColor",				"BaseText" },
-	{ "Label.TextBrightColor",			"BrightControlText" },
-	{ "Label.SelectedTextColor",		"BrightControlText" },
-	{ "Label.BgColor",					"LabelBgColor" },
-	{ "Label.DisabledFgColor1",			"DisabledFgColor1" },
-	{ "Label.DisabledFgColor2",			"DisabledFgColor2" },
+	{ "Label.TextDullColor",			"LabelDimText",						nullptr },
+	{ "Label.TextColor",				"BaseText",							nullptr },
+	{ "Label.TextBrightColor",			"BrightControlText",				nullptr },
+	{ "Label.SelectedTextColor",		"BrightControlText",				nullptr },
+	{ "Label.BgColor",					"LabelBgColor",						nullptr },
+	{ "Label.DisabledFgColor1",			"DisabledFgColor1",					nullptr },
+	{ "Label.DisabledFgColor2",			"DisabledFgColor2",					nullptr },
 
-	{ "ListPanel.TextColor",				"WindowFgColor" },
-	{ "ListPanel.TextBgColor",				"Menu/ArmedBgColor" },
-	{ "ListPanel.BgColor",					"ListBgColor" },
-	{ "ListPanel.SelectedTextColor",		"ListSelectionFgColor" },
-	{ "ListPanel.SelectedBgColor",			"Menu/ArmedBgColor" },
-	{ "ListPanel.SelectedOutOfFocusBgColor","SelectionBG2" },
-	{ "ListPanel.EmptyListInfoTextColor",	"LabelDimText" },
-	{ "ListPanel.DisabledTextColor",		"LabelDimText" },
-	{ "ListPanel.DisabledSelectedTextColor","ListBgColor" },
+	{ "ListPanel.TextColor",				"WindowFgColor",     nullptr },
+	{ "ListPanel.TextBgColor",				"Menu/ArmedBgColor",     nullptr },
+	{ "ListPanel.BgColor",					"ListBgColor",     nullptr },
+	{ "ListPanel.SelectedTextColor",		"ListSelectionFgColor",     nullptr },
+	{ "ListPanel.SelectedBgColor",			"Menu/ArmedBgColor",     nullptr },
+	{ "ListPanel.SelectedOutOfFocusBgColor","SelectionBG2",     nullptr },
+	{ "ListPanel.EmptyListInfoTextColor",	"LabelDimText",     nullptr },
+	{ "ListPanel.DisabledTextColor",		"LabelDimText",     nullptr },
+	{ "ListPanel.DisabledSelectedTextColor","ListBgColor",     nullptr },
 
-	{ "Menu.TextColor",					"Menu/FgColor" },
-	{ "Menu.BgColor",					"Menu/BgColor" },
-	{ "Menu.ArmedTextColor",			"Menu/ArmedFgColor" },
-	{ "Menu.ArmedBgColor",				"Menu/ArmedBgColor" },
+	{ "Menu.TextColor",					"Menu/FgColor",     nullptr },
+	{ "Menu.BgColor",					"Menu/BgColor",     nullptr },
+	{ "Menu.ArmedTextColor",			"Menu/ArmedFgColor",     nullptr },
+	{ "Menu.ArmedBgColor",				"Menu/ArmedBgColor",     nullptr },
 	{ "Menu.TextInset",					NULL,		"6" },
 
-	{ "Panel.FgColor",					"FgColor" },
-	{ "Panel.BgColor",					"BgColor" },
+	{ "Panel.FgColor",					"FgColor",     nullptr },
+	{ "Panel.BgColor",					"BgColor",     nullptr },
 
-	{ "ProgressBar.FgColor",				"BrightControlText" },
-	{ "ProgressBar.BgColor",				"WindowBgColor" },
+	{ "ProgressBar.FgColor",				"BrightControlText",     nullptr },
+	{ "ProgressBar.BgColor",				"WindowBgColor",     nullptr },
 
-	{ "PropertySheet.TextColor",			"FgColorDim" },
-	{ "PropertySheet.SelectedTextColor",	"BrightControlText" },
+	{ "PropertySheet.TextColor",			"FgColorDim",     nullptr },
+	{ "PropertySheet.SelectedTextColor",	"BrightControlText",     nullptr },
 	{ "PropertySheet.TransitionEffectTime",	NULL,		"0" },
 
-	{ "RadioButton.TextColor",			"FgColor" },
-	{ "RadioButton.SelectedTextColor",	"BrightControlText" },
+	{ "RadioButton.TextColor",			"FgColor",     nullptr },
+	{ "RadioButton.SelectedTextColor",	"BrightControlText",     nullptr },
 
-	{ "RichText.TextColor",				"WindowFgColor" },
-	{ "RichText.BgColor",				"WindowBgColor" },
-	{ "RichText.SelectedTextColor",		"SelectionFgColor" },
-	{ "RichText.SelectedBgColor",		"SelectionBgColor" },
+	{ "RichText.TextColor",				"WindowFgColor",     nullptr },
+	{ "RichText.BgColor",				"WindowBgColor",     nullptr },
+	{ "RichText.SelectedTextColor",		"SelectionFgColor",     nullptr },
+	{ "RichText.SelectedBgColor",		"SelectionBgColor",     nullptr },
 
 	{ "ScrollBar.Wide",					NULL,		"19" },
 
-	{ "ScrollBarButton.FgColor",			"DimBaseText" },
-	{ "ScrollBarButton.BgColor",			"ControlBG" },
-	{ "ScrollBarButton.ArmedFgColor",		"BaseText" },
-	{ "ScrollBarButton.ArmedBgColor",		"ControlBG" },
-	{ "ScrollBarButton.DepressedFgColor",	"BaseText" },
-	{ "ScrollBarButton.DepressedBgColor",	"ControlBG" },
+	{ "ScrollBarButton.FgColor",			"DimBaseText",     nullptr },
+	{ "ScrollBarButton.BgColor",			"ControlBG",     nullptr },
+	{ "ScrollBarButton.ArmedFgColor",		"BaseText",     nullptr },
+	{ "ScrollBarButton.ArmedBgColor",		"ControlBG",     nullptr },
+	{ "ScrollBarButton.DepressedFgColor",	"BaseText",     nullptr },
+	{ "ScrollBarButton.DepressedBgColor",	"ControlBG",     nullptr },
 
-	{ "ScrollBarSlider.FgColor",				"ScrollBarSlider/ScrollBarSliderFgColor" },
-	{ "ScrollBarSlider.BgColor",				"ScrollBarSlider/ScrollBarSliderBgColor" },
+	{ "ScrollBarSlider.FgColor",				"ScrollBarSlider/ScrollBarSliderFgColor",     nullptr },
+	{ "ScrollBarSlider.BgColor",				"ScrollBarSlider/ScrollBarSliderBgColor",     nullptr },
 
-	{ "SectionedListPanel.HeaderTextColor",	"SectionTextColor" },
-	{ "SectionedListPanel.HeaderBgColor",	"BuddyListBgColor" },
-	{ "SectionedListPanel.DividerColor",	"SectionDividerColor" },
-	{ "SectionedListPanel.TextColor",		"BuddyButton/FgColor1" },
-	{ "SectionedListPanel.BrightTextColor",	"BuddyButton/ArmedFgColor1" },
-	{ "SectionedListPanel.BgColor",			"BuddyListBgColor" },
-	{ "SectionedListPanel.SelectedTextColor",			"BuddyButton/ArmedFgColor1" },
-	{ "SectionedListPanel.SelectedBgColor",				"BuddyButton/ArmedBgColor" },
-	{ "SectionedListPanel.OutOfFocusSelectedTextColor",	"BuddyButton/ArmedFgColor2" },
-	{ "SectionedListPanel.OutOfFocusSelectedBgColor",	"SelectionBG2" },
+	{ "SectionedListPanel.HeaderTextColor",	"SectionTextColor",     nullptr },
+	{ "SectionedListPanel.HeaderBgColor",	"BuddyListBgColor",     nullptr },
+	{ "SectionedListPanel.DividerColor",	"SectionDividerColor",     nullptr },
+	{ "SectionedListPanel.TextColor",		"BuddyButton/FgColor1",     nullptr },
+	{ "SectionedListPanel.BrightTextColor",	"BuddyButton/ArmedFgColor1",     nullptr },
+	{ "SectionedListPanel.BgColor",			"BuddyListBgColor",     nullptr },
+	{ "SectionedListPanel.SelectedTextColor",			"BuddyButton/ArmedFgColor1",     nullptr },
+	{ "SectionedListPanel.SelectedBgColor",				"BuddyButton/ArmedBgColor",     nullptr },
+	{ "SectionedListPanel.OutOfFocusSelectedTextColor",	"BuddyButton/ArmedFgColor2",     nullptr },
+	{ "SectionedListPanel.OutOfFocusSelectedBgColor",	"SelectionBG2",     nullptr },
 
-	{ "Slider.NobColor",			"SliderTickColor" },
-	{ "Slider.TextColor",			"Slider/SliderFgColor" },
-	{ "Slider.TrackColor",			"SliderTrackColor"},
-	{ "Slider.DisabledTextColor1",	"DisabledFgColor1" },
-	{ "Slider.DisabledTextColor2",	"DisabledFgColor2" },
+	{ "Slider.NobColor",			"SliderTickColor",     nullptr },
+	{ "Slider.TextColor",			"Slider/SliderFgColor",     nullptr },
+	{ "Slider.TrackColor",			"SliderTrackColor",     nullptr },
+	{ "Slider.DisabledTextColor1",	"DisabledFgColor1",     nullptr },
+	{ "Slider.DisabledTextColor2",	"DisabledFgColor2",     nullptr },
 
-	{ "TextEntry.TextColor",		"WindowFgColor" },
-	{ "TextEntry.BgColor",			"WindowBgColor" },
-	{ "TextEntry.CursorColor",		"TextCursorColor" },
-	{ "TextEntry.DisabledTextColor","WindowDisabledFgColor" },
-	{ "TextEntry.DisabledBgColor",	"ControlBG" },
-	{ "TextEntry.SelectedTextColor","SelectionFgColor" },
-	{ "TextEntry.SelectedBgColor",	"SelectionBgColor" },
-	{ "TextEntry.OutOfFocusSelectedBgColor",	"SelectionBG2" },
-	{ "TextEntry.FocusEdgeColor",	"BorderSelection" },
+	{ "TextEntry.TextColor",		"WindowFgColor",     nullptr },
+	{ "TextEntry.BgColor",			"WindowBgColor",     nullptr },
+	{ "TextEntry.CursorColor",		"TextCursorColor",     nullptr },
+	{ "TextEntry.DisabledTextColor","WindowDisabledFgColor",     nullptr },
+	{ "TextEntry.DisabledBgColor",	"ControlBG",     nullptr },
+	{ "TextEntry.SelectedTextColor","SelectionFgColor",     nullptr },
+	{ "TextEntry.SelectedBgColor",	"SelectionBgColor",     nullptr },
+	{ "TextEntry.OutOfFocusSelectedBgColor",	"SelectionBG2",     nullptr },
+	{ "TextEntry.FocusEdgeColor",	"BorderSelection",              nullptr },
 
-	{ "ToggleButton.SelectedTextColor",	"BrightControlText" },
+	{ "ToggleButton.SelectedTextColor",	"BrightControlText",     nullptr },
 
-	{ "Tooltip.TextColor",			"BorderSelection" },
-	{ "Tooltip.BgColor",			"SelectionBG" },
+	{ "Tooltip.TextColor",			"BorderSelection",     nullptr },
+	{ "Tooltip.BgColor",			"SelectionBG",         nullptr },
 
-	{ "TreeView.BgColor",			"ListBgColor" },
+	{ "TreeView.BgColor",			"ListBgColor",         nullptr },
 
-	{ "WizardSubPanel.BgColor",		"SubPanelBgColor" },
+	{ "WizardSubPanel.BgColor",		"SubPanelBgColor",     nullptr },
 };
 
 //-----------------------------------------------------------------------------
@@ -602,7 +597,7 @@ void CScheme::LoadFromFile( VPANEL sizingPanel, const char *inFilename, const ch
 	}
 	else
 	{
-		Assert( "You need to name the scheme!" );
+		AssertMsg( false, "You need to name the scheme!" );
 		Q_strncpy( tag, "default", sizeof( tag ) );
 	}
 
@@ -638,7 +633,7 @@ void CScheme::LoadFromFile( VPANEL sizingPanel, const char *inFilename, const ch
 //-----------------------------------------------------------------------------
 bool CScheme::GetFontRange( const char *fontname, int &nMin, int &nMax )
 {
-	int i = m_FontRanges.Find( fontname );
+	auto i = m_FontRanges.Find( fontname );
 	if ( i != m_FontRanges.InvalidIndex() )
 	{
 		nMin = m_FontRanges[i]._min;
@@ -654,7 +649,7 @@ bool CScheme::GetFontRange( const char *fontname, int &nMin, int &nMax )
 //-----------------------------------------------------------------------------
 void CScheme::SetFontRange( const char *fontname, int nMin, int nMax )
 {
-	int i = m_FontRanges.Find( fontname );
+	auto i = m_FontRanges.Find( fontname );
 	if ( i != m_FontRanges.InvalidIndex() )
 	{
 		m_FontRanges[i]._min = nMin;
@@ -663,7 +658,7 @@ void CScheme::SetFontRange( const char *fontname, int nMin, int nMax )
 	}
 
 	// not already in our list
-	int iNew = m_FontRanges.Insert( fontname );
+	auto iNew = m_FontRanges.Insert( fontname );
 	
 	m_FontRanges[iNew]._min = nMin;
 	m_FontRanges[iNew]._max = nMax;
@@ -674,21 +669,11 @@ void CScheme::SetFontRange( const char *fontname, int nMin, int nMax )
 //-----------------------------------------------------------------------------
 void CScheme::LoadFonts()
 {
-	bool bValid = false;
 	char language[64];
 	memset( language, 0, sizeof( language ) );
 
 	// get our language
-	if ( IsPC() )
-	{
-		bValid = vgui::g_pSystem->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof( language ) - 1 );
-	}
-	else
-	{
-		Q_strncpy( language, XBX_GetLanguageString(), sizeof( language ) );
-		bValid = true;
-	}
-
+	bool bValid = vgui::g_pSystem->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof( language ) - 1 );
 	if ( !bValid )
 	{
 		Q_strncpy( language, "english", sizeof( language ) );
@@ -778,7 +763,7 @@ void CScheme::LoadFonts()
 			const char *fontName = GetMungedFontName( kv->GetName(), tag, proportionalFont ); // first time it adds a normal font, and then a proportional one
 			HFont font = g_pSurface->CreateFont();
 
-			int j = m_FontAliases.Insert( fontName );
+			auto j = m_FontAliases.Insert( fontName );
 			m_FontAliases[j]._trueFontName = kv->GetName();
 			m_FontAliases[j]._font = font;
 			m_FontAliases[j].m_bProportional = proportionalFont;
@@ -974,7 +959,7 @@ void CScheme::LoadBorders()
 		}
 		else
 		{
-			int i = m_BorderList.AddToTail();
+			auto i = m_BorderList.AddToTail();
 
 			IBorder *border = NULL;
 			const char *pszBorderType = kv->GetString( "bordertype", NULL );
@@ -1021,7 +1006,7 @@ void CScheme::LoadBorders()
 			Assert(border);
 
 			// add an entry that just references the existing border
-			int i = m_BorderList.AddToTail();
+			auto i = m_BorderList.AddToTail();
 			m_BorderList[i].border = border;
 			m_BorderList[i].bSharedBorder = true;
 			m_BorderList[i].borderSymbol = kv->GetNameSymbol();
@@ -1037,7 +1022,7 @@ void CScheme::SpewFonts( void )
 	FOR_EACH_DICT_FAST( m_FontAliases, i )
 	{
 		const fontalias_t& FontAlias = m_FontAliases[ i ];
-		uint32 Font = FontAlias._font;
+		HFont Font = FontAlias._font;
 		const char *szFontName = g_pSurface->GetFontName( Font );
 		const char *szFontFamilyName = g_pSurface->GetFontFamilyName( Font );
 		const char *szTrueFontName = FontAlias._trueFontName.String();
@@ -1060,11 +1045,11 @@ void CScheme::SpewFonts( void )
 //-----------------------------------------------------------------------------
 void CSchemeManager::ReloadSchemes()
 {
-	int count = m_Schemes.Count();
+	intp count = m_Schemes.Count();
 	Shutdown( false );
 	
 	// reload the scheme
-	for (int i = 1; i < count; i++)
+	for (intp i = 1; i < count; i++)
 	{
 		LoadSchemeFromFile(m_Schemes[i]->GetFileName(), m_Schemes[i]->GetName());
 	}
@@ -1075,12 +1060,12 @@ void CSchemeManager::ReloadSchemes()
 //-----------------------------------------------------------------------------
 void CScheme::Shutdown( bool full )
 {
-	for (int i = 0; i < m_BorderList.Count(); i++)
+	for ( auto &b : m_BorderList )
 	{
 		// delete if it's not shared
-		if (!m_BorderList[i].bSharedBorder)
+		if (!b.bSharedBorder)
 		{
-			IBorder *border = m_BorderList[i].border;
+			IBorder *border = b.border;
 			delete border;
 		}
 	}
@@ -1089,7 +1074,7 @@ void CScheme::Shutdown( bool full )
 	m_BorderList.RemoveAll();
 	m_pkvBorders = NULL;
 
-	if (full && m_pData)
+ 	if (full && m_pData)
 	{
 		m_pData->deleteThis();
 		m_pData = NULL;
@@ -1110,7 +1095,7 @@ HScheme CSchemeManager::GetDefaultScheme()
 //-----------------------------------------------------------------------------
 HScheme CSchemeManager::GetScheme(const char *tag)
 {
-	for (int i=1;i<m_Schemes.Count();i++)
+	for (intp i=1;i<m_Schemes.Count();i++)
 	{
 		if ( !stricmp(tag,m_Schemes[i]->GetName()) )
 		{
@@ -1120,16 +1105,16 @@ HScheme CSchemeManager::GetScheme(const char *tag)
 	return 1; // default scheme
 }
 
-int CSchemeManager::GetProportionalScaledValue_( int rootWide, int rootTall, int normalizedValue )
+int CSchemeManager::GetProportionalScaledValue_( int, int rootTall, int normalizedValue )
 {
 	int proH, proW;
 	g_pSurface->GetProportionalBase( proW, proH );
-	double scale = (double)rootTall / (double)proH;
+	float scale = (float)rootTall / (float)proH;
 
 	return (int)( normalizedValue * scale );
 }
 
-int CSchemeManager::GetProportionalNormalizedValue_( int rootWide, int rootTall, int scaledValue )
+int CSchemeManager::GetProportionalNormalizedValue_( int, int rootTall, int scaledValue )
 {
 	int proH, proW;
 	g_pSurface->GetProportionalBase( proW, proH );
@@ -1214,9 +1199,9 @@ int CSchemeManager::GetProportionalNormalizedValueEx( HScheme scheme, int scaled
 
 void CSchemeManager::SpewFonts( void )
 {
-	for ( int i = 1; i < m_Schemes.Count(); i++ )
+	for ( auto *s : m_Schemes )
 	{
-		m_Schemes[i]->SpewFonts();
+		s->SpewFonts();
 	}
 }
 
@@ -1247,24 +1232,17 @@ IImage *CSchemeManager::GetImage(const char *imageName, bool hardwareFiltered)
 	// filename with 'vgui/' already added.
 	char szFileName[MAX_PATH];
 
-	//if ( Q_IsAbsolutePath(imageName) )
-	//{
-	//	Q_strncpy( szFileName, imageName, sizeof(szFileName) );
-	//}
-	//else
+	if ( Q_stristr( imageName, ".pic" ) )
 	{
-		if ( Q_stristr( imageName, ".pic" ) )
-		{
-			Q_snprintf( szFileName, sizeof(szFileName), "%s", imageName );
-		}
-		else
-		{
-			Q_snprintf( szFileName, sizeof(szFileName), "vgui/%s", imageName );
-		}
+		Q_snprintf( szFileName, sizeof(szFileName), "%s", imageName );
+	}
+	else
+	{
+		Q_snprintf( szFileName, sizeof(szFileName), "vgui/%s", imageName );
 	}
 
 	s_pszSearchString = szFileName;
-	int i = m_Bitmaps.Find( searchBitmap );
+	auto i = m_Bitmaps.Find( searchBitmap );
 	if (m_Bitmaps.IsValidIndex( i ) )
 	{
 		return m_Bitmaps[i].pBitmap;
@@ -1314,7 +1292,7 @@ bool CSchemeManager::DeleteImage( const char *pImageName )
 	}
 	s_pszSearchString = szFileName;
 
-	int i = m_Bitmaps.Find( searchBitmap );
+	auto i = m_Bitmaps.Find( searchBitmap );
 	if ( !m_Bitmaps.IsValidIndex( i ) )
 	{
 		// not found
@@ -1334,12 +1312,12 @@ bool CSchemeManager::DeleteImage( const char *pImageName )
 //-----------------------------------------------------------------------------
 IBorder *CScheme::GetBorder(const char *borderName)
 {
-	int symbol = KeyValuesSystem()->GetSymbolForString(borderName);
-	for (int i = 0; i < m_BorderList.Count(); i++)
+	auto symbol = KeyValuesSystem()->GetSymbolForString(borderName);
+	for ( auto &b : m_BorderList )
 	{
-		if (m_BorderList[i].borderSymbol == symbol)
+		if (b.borderSymbol == symbol)
 		{
-			return m_BorderList[i].border;
+			return b.border;
 		}
 	}
 
@@ -1370,7 +1348,7 @@ IBorder *CScheme::GetBorderAtIndex( int iIndex )
 //-----------------------------------------------------------------------------
 HFont CScheme::FindFontInAliasList( const char *fontName )
 {
-	int i = m_FontAliases.Find( fontName );
+	auto i = m_FontAliases.Find( fontName );
 	if ( i != m_FontAliases.InvalidIndex() )
 	{
 		return m_FontAliases[i]._font;
@@ -1389,7 +1367,7 @@ char const *CScheme::GetFontName( const HFont& font )
 {
 	for (int i = m_FontAliases.Count(); --i >= 0; )
 	{
-		HFont fnt = (HFont)m_FontAliases[i]._font;
+		HFont fnt = m_FontAliases[i]._font;
 		if ( fnt == font )
 			return m_FontAliases[i]._trueFontName.String();
 	}
@@ -1500,17 +1478,7 @@ const char *CScheme::LookupSchemeSetting(const char *pchSetting)
 int CScheme::GetMinimumFontHeightForCurrentLanguage()
 {
 	char language[64];
-	bool bValid;
-	if ( IsPC() )
-	{
-		bValid = vgui::g_pSystem->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof(language)-1 );
-	}
-	else
-	{
-		Q_strncpy( language, XBX_GetLanguageString(), sizeof( language ) );
-		bValid = true;
-	}
-
+	bool bValid = vgui::g_pSystem->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof(language)-1 );
 	if ( bValid )
 	{
 		if (!stricmp(language, "korean")

@@ -69,7 +69,7 @@ void ImageBorder::SetImage(const char *imageName)
 
 	if (*imageName)
 	{
-		int len = Q_strlen(imageName) + 1 + 5;	// 5 for "vgui/"
+		intp len = Q_strlen(imageName) + 1 + 5;	// 5 for "vgui/"
 		delete [] m_pszImageName;
 		m_pszImageName = new char[ len ];
 		Q_snprintf( m_pszImageName, len, "vgui/%s", imageName );
@@ -212,7 +212,7 @@ void ImageBorder::SetName(const char *name)
 		delete [] _name;
 	}
 
-	int len = Q_strlen(name) + 1;
+	intp len = Q_strlen(name) + 1;
 	_name = new char[ len ];
 	Q_strncpy( _name, name, len );
 }

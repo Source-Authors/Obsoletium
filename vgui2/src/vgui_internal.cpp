@@ -43,7 +43,7 @@ static void *InitializeInterface( char const *interfaceName, CreateInterfaceFn *
 	}
 
 	// No provider for requested interface!!!
-	// Assert( !"No provider for requested interface!!!" );
+	// AssertMsg( false, "No provider for requested interface!!!" );
 
 	return NULL;
 }

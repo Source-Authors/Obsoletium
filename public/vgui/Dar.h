@@ -31,21 +31,21 @@ template<class ELEMTYPE> class Dar : public CUtlVector< ELEMTYPE >
 	
 public:
 	Dar() = default;
-	Dar(int initialCapacity) :
+	Dar(intp initialCapacity) :
 		BaseClass( 0, initialCapacity )
 	{
 	}
 
 public:
-	void SetCount(int count)
+	void SetCount(intp count)
 	{
 		this->EnsureCount( count );
 	}
-	int GetCount()
+	intp GetCount()
 	{
 		return this->Count();
 	}
-	int AddElement(ELEMTYPE elem)
+	intp AddElement(ELEMTYPE elem)
 	{
 		return this->AddToTail( elem );
 	}
@@ -58,7 +58,7 @@ public:
 		if ( this->Element( this->Count() - 1 ) == elem )
 			return;
 
-		int idx = this->Find( elem );
+		intp idx = this->Find( elem );
 		if ( idx == this->InvalidIndex() )
 			return;
 
@@ -66,7 +66,7 @@ public:
 		this->AddToTail( elem );
 	}
 	// returns the index of the element in the array, -1 if not found
-	int FindElement(ELEMTYPE elem)
+	intp FindElement(ELEMTYPE elem)
 	{
 		return this->Find( elem );
 	}
@@ -78,9 +78,9 @@ public:
 		}
 		return false;
 	}
-	int PutElement(ELEMTYPE elem)
+	intp PutElement(ELEMTYPE elem)
 	{
-		int index = this->FindElement(elem);
+		intp index = this->FindElement(elem);
 		if (index >= 0)
 		{
 			return index;
@@ -88,21 +88,21 @@ public:
 		return this->AddElement(elem);
 	}
 	// insert element at index and move all the others down 1
-	void InsertElementAt(ELEMTYPE elem,int index)
+	void InsertElementAt(ELEMTYPE elem,intp index)
 	{
 		this->InsertBefore( index, elem );
 	}
-	void SetElementAt(ELEMTYPE elem,int index)
+	void SetElementAt(ELEMTYPE elem,intp index)
 	{
 		this->EnsureCount( index + 1 );
 		this->Element( index ) = elem;
 	}
-	void RemoveElementAt(int index)
+	void RemoveElementAt(intp index)
 	{
 		this->Remove( index );
 	} 
 
-	void RemoveElementsBefore(int index)
+	void RemoveElementsBefore(intp index)
 	{
 		if ( index <= 0 )
 			return;
