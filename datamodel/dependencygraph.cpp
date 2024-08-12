@@ -65,9 +65,9 @@ bool HashEntryCompareFunc( CAttributeNode *const& lhs, CAttributeNode *const& rh
 	return lhs->m_attribute == rhs->m_attribute;
 }
 
-uint HashEntryKeyFunc( CAttributeNode *const& keyinfo )
+uintp HashEntryKeyFunc( CAttributeNode *const& keyinfo )
 {
-	uint i = (uint)keyinfo->m_attribute;
+	uintp i = (uintp)keyinfo->m_attribute;
 	return i >> 2; // since memory is allocated on a 4-byte (at least!) boundary
 }
 
@@ -86,15 +86,15 @@ void CDependencyGraph::Reset( const CUtlVector< IDmeOperator * > &operators )
 	Cleanup();
 
 	CUtlVector< CDmAttribute * > attrs; // moved outside the loop to function as a temporary memory pool for performance
-	int on = operators.Count();
+	intp on = operators.Count();
 	CUtlRBTree< IDmeOperator * > operatorDict( 0, on * 2, DefLessFunc(IDmeOperator *) );
-	for ( int i = 0; i < on; ++i )
+	for ( intp i = 0; i < on; ++i )
 	{
 		operatorDict.Insert( operators[i] );
 	}
 
 	m_opNodes.EnsureCapacity( on );
-	for ( int oi = 0; oi < on; ++oi )
+	for ( intp oi = 0; oi < on; ++oi )
 	{
 		IDmeOperator *pOp = operators[ oi ];
 		Assert( pOp );
@@ -106,8 +106,8 @@ void CDependencyGraph::Reset( const CUtlVector< IDmeOperator * > &operators )
 
 		attrs.RemoveAll();
 		pOp->GetInputAttributes( attrs );
-		int an = attrs.Count();
-		for ( int ai = 0; ai < an; ++ai )
+		intp an = attrs.Count();
+		for ( intp ai = 0; ai < an; ++ai )
 		{
 			CAttributeNode *pAttrNode = FindAttrNode( attrs[ ai ] );
 			pAttrNode->m_InputDependentOperators.AddToTail( pOpNode );
@@ -116,9 +116,9 @@ void CDependencyGraph::Reset( const CUtlVector< IDmeOperator * > &operators )
 		attrs.RemoveAll();
 		pOp->GetOutputAttributes( attrs );
 		an = attrs.Count();
-		for ( int ai = 0; ai < an; ++ai )
+		for ( intp ai = 0; ai < an; ++ai )
 		{
-            CAttributeNode *pAttrNode = FindAttrNode( attrs[ ai ] );
+			CAttributeNode *pAttrNode = FindAttrNode( attrs[ ai ] );
 			pAttrNode->m_bIsOutputToOperator = true;
 			pOpNode->m_OutputAttributes.AddToTail( pAttrNode );
 
@@ -134,7 +134,9 @@ void CDependencyGraph::Reset( const CUtlVector< IDmeOperator * > &operators )
 				{
 					CDmElement *pOp1 = dynamic_cast< CDmElement* >( pOperator );
 					CDmElement *pOp2 = dynamic_cast< CDmElement* >( pOp );
-					Warning( "Found dependent operator '%s' referenced by operator '%s' that wasn't in the scene or trackgroups!\n", pOp1->GetName(), pOp2->GetName() );
+
+					if (pOp1 && pOp2)
+						Warning( "Found dependent operator '%s' referenced by operator '%s' that wasn't in the scene or trackgroups!\n", pOp1->GetName(), pOp2->GetName() );
 				}
 			}
 #endif
@@ -156,8 +158,8 @@ void CDependencyGraph::Cleanup()
 {
 	VPROF_BUDGET( "CDependencyGraph::Cleanup", VPROF_BUDGETGROUP_TOOLS );
 
-	int on = m_opNodes.Count();
-	for ( int oi = 0; oi < on; ++oi )
+	intp on = m_opNodes.Count();
+	for ( intp oi = 0; oi < on; ++oi )
 	{
 		g_OperatorNodePool.Free( m_opNodes[ oi ] );
 	}
@@ -182,8 +184,8 @@ void CDependencyGraph::FindRoots()
 {
 	m_opRoots.RemoveAll();
 
-	uint oi;
-	uint on = m_opNodes.Count();
+	intp oi;
+	intp on = m_opNodes.Count();
 
 	for ( oi = 0; oi < on; ++oi )
 	{
@@ -238,9 +240,9 @@ bool CDependencyGraph::CullAndSortOperators()
 
 	bool cycle = GetOperatorOrdering( m_opRoots, m_operators ); // leaves to roots (outputs to inputs)
 
-	int on = m_operators.Count();
-	int oh = on / 2;
-	for ( int oi = 0; oi < oh; ++oi )
+	intp on = m_operators.Count();
+	intp oh = on / 2;
+	for ( intp oi = 0; oi < oh; ++oi )
 	{
 		V_swap( m_operators[ oi ], m_operators[ on - oi - 1 ] );
 	}
@@ -259,8 +261,8 @@ bool CDependencyGraph::GetOperatorOrdering( CUtlVector< COperatorNode * > &pOpNo
 {
 	bool cycle = false;
 
-	uint on = pOpNodes.Count();
-	for ( uint oi = 0; oi < on; ++oi )
+	intp on = pOpNodes.Count();
+	for ( intp oi = 0; oi < on; ++oi )
 	{
 		COperatorNode *pOpNode = pOpNodes[ oi ];
 		if ( pOpNode->m_state != TS_NOT_VISITED )
@@ -276,8 +278,8 @@ bool CDependencyGraph::GetOperatorOrdering( CUtlVector< COperatorNode * > &pOpNo
 		// DBG_PrintOperator( pIndent, pOpNode->m_operator );
 
 		// leaves to roots (outputs to inputs)
-		uint an = pOpNode->m_OutputAttributes.Count();
-		for ( uint ai = 0; ai < an; ++ai )
+		intp an = pOpNode->m_OutputAttributes.Count();
+		for ( intp ai = 0; ai < an; ++ai )
 		{
 			CAttributeNode *pAttrNode = pOpNode->m_OutputAttributes[ ai ];
 			if ( GetOperatorOrdering( pAttrNode->m_InputDependentOperators, operators ) )
@@ -327,5 +329,6 @@ CAttributeNode *CDependencyGraph::FindAttrNode( CDmAttribute *pAttr )
 void CDependencyGraph::DBG_PrintOperator( const char *pIndent, IDmeOperator *pOp )
 {
 	CDmElement *pElement = dynamic_cast< CDmElement* >( pOp );
-	Msg( "%s%s <%s> {\n", pIndent, pElement->GetName(), pElement->GetTypeString() );
+	if (pElement)
+		Msg( "%s%s <%s> {\n", pIndent, pElement->GetName(), pElement->GetTypeString() );
 }

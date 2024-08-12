@@ -70,6 +70,6 @@ DmAttributeType_t AttributeType( const char *pAttributeType );
 //-----------------------------------------------------------------------------
 // returns the number of attributes currently allocated
 //-----------------------------------------------------------------------------
-int GetAllocatedAttributeCount();
+intp GetAllocatedAttributeCount();
 
 #endif // DMATTRIBUTEINTERNAL_H

@@ -13,26 +13,24 @@ CUtlSymbolTableMT CUndoManager::s_UndoSymbolTable;
 
 
 CUndoManager::CUndoManager( ) :
-	m_bEnabled( true ),
-	m_bDiscarded( false ),
 	m_nMaxUndoDepth( 4096 ),
 	m_nNesting( 0 ),
 	m_nNotifyNesting( 0 ),
-	m_bStreamStart( false ),
-	m_bTrace( false ),
-	m_bSuppressingNotify( false ),
-	m_nItemsAddedSinceStartOfStream( 0 ),
 	m_nNotifySource( 0 ),
 	m_nNotifyFlags( 0 ),
 	m_pNotifyReason( 0 ),
+	m_nItemsAddedSinceStartOfStream( 0 ),
+	m_bStreamStart( false ),
+	m_bTrace( false ),
+	m_bDiscarded( false ),
+	m_bEnabled( true ),
+	m_bSuppressingNotify( false ),
 	m_nChainingID( 0 ),
 	m_PreviousChainingID( 0 )
 {
 }
 
-CUndoManager::~CUndoManager()
-{
-}
+CUndoManager::~CUndoManager() = default;
 
 void CUndoManager::Shutdown()
 {
@@ -128,7 +126,7 @@ void CUndoManager::PushNotificationScope( const char *pReason, int nNotifySource
 	}
 }
 
-void CUndoManager::PopNotificationScope( bool bAbort )
+void CUndoManager::PopNotificationScope( bool )
 {
 	--m_nNotifyNesting;
 	Assert( m_nNotifyNesting >= 0 );
@@ -136,10 +134,9 @@ void CUndoManager::PopNotificationScope( bool bAbort )
 	{
 		if ( !m_bSuppressingNotify && ( ( m_nNotifyFlags & NOTIFY_CHANGE_MASK ) != 0 ) )
 		{
-			int nNotifyCount = m_Notifiers.Count();
-			for( int i = 0; i < nNotifyCount; ++i )
+			for( auto *n : m_Notifiers )
 			{
-				m_Notifiers[i]->NotifyDataChanged( m_pNotifyReason, m_nNotifySource, m_nNotifyFlags );
+				n->NotifyDataChanged( m_pNotifyReason, m_nNotifySource, m_nNotifyFlags );
 			}
 		}
 		m_nNotifySource = 0;
@@ -240,7 +237,7 @@ void CUndoManager::WipeUndo()
 
 void CUndoManager::WipeRedo()
 {
-	int c = m_RedoStack.Count();
+	intp c = m_RedoStack.Count();
 	if ( c == 0 )
 		return;
 
@@ -250,10 +247,9 @@ void CUndoManager::WipeRedo()
 
 	CDisableUndoScopeGuard sg;
 
-	for ( int i = 0; i < c ; ++i )
+	for ( intp i = 0; i < c ; ++i )
 	{
-		IUndoElement *elem;
-		elem = m_RedoStack[ i ];
+		IUndoElement *elem = m_RedoStack[ i ];
 		
 		Trace( "WipeRedo '%s'\n", elem->GetDesc() );
 
@@ -306,7 +302,7 @@ void CUndoManager::Undo()
 	bool bEndOfStream = false;
 	while ( !bEndOfStream && m_UndoList.Count() > 0 )
 	{
-		int i = m_UndoList.Tail();
+		auto i = m_UndoList.Tail();
 		IUndoElement *action = m_UndoList[ i ];
 		Assert( action );
 

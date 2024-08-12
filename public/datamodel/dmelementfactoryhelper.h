@@ -119,12 +119,12 @@ public:
 	CDmAbstractElementFactory() = default;
 
 	// Creation, destruction
-	virtual CDmElement* Create( DmElementHandle_t handle, const char *pElementType, const char *pElementName, DmFileId_t fileid, const DmObjectId_t &id )
+	virtual CDmElement* Create( DmElementHandle_t, const char *, const char *, DmFileId_t, const DmObjectId_t & )
 	{
 		return NULL;
 	}
 
-	virtual void Destroy( DmElementHandle_t hElement )
+	virtual void Destroy( DmElementHandle_t )
 	{
 	}
 
@@ -147,6 +147,12 @@ private:
 
 #define IMPLEMENT_ELEMENT_FACTORY( lookupName, className )	\
 	IMPLEMENT_ELEMENT( className )							\
+	CDmElementFactory< className > g_##className##_Factory( #lookupName );							\
+	CDmElementFactoryHelper g_##className##_Helper( #lookupName, &g_##className##_Factory, true );	\
+	className *g_##className##LinkerHack = NULL;
+
+#define IMPLEMENT_ELEMENT_FACTORY_SPECIALIZATION( lookupName, className )	\
+	IMPLEMENT_ELEMENT_SPECIALIZATION( className )							\
 	CDmElementFactory< className > g_##className##_Factory( #lookupName );							\
 	CDmElementFactoryHelper g_##className##_Helper( #lookupName, &g_##className##_Factory, true );	\
 	className *g_##className##LinkerHack = NULL;

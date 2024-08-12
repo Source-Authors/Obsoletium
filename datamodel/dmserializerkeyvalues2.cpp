@@ -76,7 +76,7 @@ static CKeyValues2ErrorStack g_KeyValues2ErrorStack;
 // Constructor
 //-----------------------------------------------------------------------------
 CKeyValues2ErrorStack::CKeyValues2ErrorStack() : 
-	m_pFilename("NULL"), m_errorIndex(0), m_maxErrorIndex(0), m_nFileLine(1) 
+	m_pFilename("NULL"), m_nFileLine(1), m_errorIndex(0), m_maxErrorIndex(0) 
 {
 }
 
@@ -220,10 +220,14 @@ private:
 //-----------------------------------------------------------------------------
 // Serialization class for Key Values 2
 //-----------------------------------------------------------------------------
-class CDmSerializerKeyValues2 : public IDmSerializer
+class CDmSerializerKeyValues2 final : public IDmSerializer
 {
 public:
-	CDmSerializerKeyValues2( bool bFlatMode ) : m_bFlatMode( bFlatMode ) {}
+	explicit CDmSerializerKeyValues2( bool bFlatMode )
+		: m_hRoot(ELEMENT_DICT_HANDLE_INVALID),
+		m_bFlatMode( bFlatMode ),
+		m_idConflictResolution( CR_DELETE_NEW ),
+		m_fileid( DMFILEID_INVALID ) {}
 
 	// Inherited from IDMSerializer
 	virtual const char *GetName() const { return m_bFlatMode ? "keyvalues2_flat" : "keyvalues2"; }
@@ -327,8 +331,8 @@ void CDmSerializerKeyValues2::SerializeElementArrayAttribute( CUtlBuffer& buf, C
 	buf.Printf( "\n[\n" );
 	buf.PushTab();
 
-	int nCount = array.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = array.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmElement *pElement = array[i];
 		if ( dict.ShouldInlineElement( pElement ) )
@@ -366,12 +370,12 @@ void CDmSerializerKeyValues2::SerializeElementArrayAttribute( CUtlBuffer& buf, C
 void CDmSerializerKeyValues2::SerializeArrayAttribute( CUtlBuffer& buf, CDmAttribute *pAttribute )
 {
 	CDmrGenericArray array( pAttribute );
-	int nCount = array.Count();
+	intp nCount = array.Count();
 
 	buf.PutString( "\n[\n" );
 	buf.PushTab();
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pAttribute->GetType() != AT_STRING_ARRAY )
 		{
@@ -530,11 +534,11 @@ void CDmSerializerKeyValues2::EatWhitespacesAndComments( CUtlBuffer &buf )
 	// eating white spaces and remarks loop
 	int nMaxPut = buf.TellMaxPut() - buf.TellGet();
 	int nOffset = 0;
-	while ( nOffset < nMaxPut )	
+	while ( nOffset < nMaxPut )
 	{
 		// Eat whitespaces, keep track of line count
 		const char *pPeek = NULL;
-		while ( pPeek = (const char *)buf.PeekGet( sizeof(char), nOffset ) )
+		while ( (pPeek = (const char *)buf.PeekGet( sizeof(char), nOffset )) )
 		{
 			if ( !V_isspace( *pPeek ) )
 				break;
@@ -556,7 +560,7 @@ void CDmSerializerKeyValues2::EatWhitespacesAndComments( CUtlBuffer &buf )
 		nOffset += 2;
 
 		// read complete line
-		while ( pPeek = (const char *)buf.PeekGet( sizeof(char), nOffset ) )
+		while ( (pPeek = (const char *)buf.PeekGet( sizeof(char), nOffset )) )
 		{
 			if ( *pPeek == '\n' )
 				break;
@@ -639,7 +643,7 @@ CDmSerializerKeyValues2::TokenType_t CDmSerializerKeyValues2::ReadToken( CUtlBuf
 	token.SeekPut( CUtlBuffer::SEEK_HEAD, nLength );
 
 	// Count the number of crs in the token + update the current line
-	const char *pMem = (const char *)token.Base();
+	const char *pMem = token.Base<const char>();
 	for ( int i = 0; i < nLength; ++i )
 	{
 		if ( pMem[i] == '\n' )
@@ -710,7 +714,7 @@ bool CDmSerializerKeyValues2::UnserializeElementArrayAttribute( CUtlBuffer &buf,
 
 	// Arrays first must have a '[' specified
 	TokenType_t token;
-	CUtlBuffer tokenBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer tokenBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	CUtlCharConversion *pConv;
 	token = ReadToken( buf, tokenBuf );
 	if ( token != TOKEN_OPEN_BRACKET )
@@ -814,7 +818,7 @@ bool CDmSerializerKeyValues2::UnserializeAttributeValueFromToken( CDmAttribute *
 	// NOTE: This code is necessary because the attribute code is using Scanf
 	// which is not really friendly toward delimiters, so we must pass in
 	// non-delimited buffers. Sucky. There must be a better way of doing this
-	const char *pBuf = (const char*)tokenBuf.Base();
+	const char *pBuf = tokenBuf.Base<const char>();
 	int nLength = tokenBuf.TellMaxPut();
 	char *pTemp = (char*)stackalloc( nLength + 1 );
 
@@ -866,7 +870,7 @@ bool CDmSerializerKeyValues2::UnserializeArrayAttribute( CUtlBuffer &buf, DmElem
 
 	// Arrays first must have a '[' specified
 	TokenType_t token;
-	CUtlBuffer tokenBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer tokenBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	token = ReadToken( buf, tokenBuf );
 	if ( token != TOKEN_OPEN_BRACKET )
 	{
@@ -931,7 +935,7 @@ bool CDmSerializerKeyValues2::UnserializeAttribute( CUtlBuffer &buf,
 	DmElementDictHandle_t hElement, const char *pAttributeName, DmAttributeType_t nAttrType )
 {
 	// Read the attribute value
-	CUtlBuffer tokenBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer tokenBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	TokenType_t token = ReadToken( buf, tokenBuf );
 	if ( token != TOKEN_DELIMITED_STRING )
 	{
@@ -1010,8 +1014,8 @@ bool CDmSerializerKeyValues2::UnserializeAttribute( CUtlBuffer &buf,
 void KeyValues::AppendIncludedKeys( CUtlVector< KeyValues * >& includedKeys )
 {
 	// Append any included keys, too...
-	int includeCount = includedKeys.Count();
-	int i;
+	intp includeCount = includedKeys.Count();
+	intp i;
 	for ( i = 0; i < includeCount; i++ )
 	{
 		KeyValues *kv = includedKeys[ i ];
@@ -1046,7 +1050,7 @@ void KeyValues::ParseIncludedKeys( char const *resourceName, const char *filetoi
 
 	// Strip off characters back to start or first /
 	bool done = false;
-	int len = Q_strlen( fullpath );
+	intp len = Q_strlen( fullpath );
 	while ( !done )
 	{
 		if ( len <= 0 )
@@ -1183,7 +1187,7 @@ bool CDmSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, const char *p
 	CKeyValues2ErrorContext errorReport( pElementType );
 
 	TokenType_t token;
-	CUtlBuffer tokenBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer tokenBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	CUtlCharConversion *pConv;
 	int nLength;
 
@@ -1276,7 +1280,7 @@ bool CDmSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, DmElementDict
 	*pHandle = ELEMENT_DICT_HANDLE_INVALID;
 
 	// First, read the type name
-	CUtlBuffer tokenBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer tokenBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	CUtlCharConversion* pConv;
 
 	TokenType_t token = ReadToken( buf, tokenBuf );

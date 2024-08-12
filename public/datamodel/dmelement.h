@@ -128,10 +128,10 @@ class CDmElement
 {
 public:
 	// Can be overridden by derived classes
-	virtual	void		OnAttributeChanged( CDmAttribute *pAttribute ) {}
-	virtual void		PreAttributeChanged( CDmAttribute *pAttribute ) {}
-	virtual void		OnAttributeArrayElementAdded( CDmAttribute *pAttribute, int nFirstElem, int nLastElem ) {}
-	virtual void		OnAttributeArrayElementRemoved( CDmAttribute *pAttribute, int nFirstElem, int nLastElem ) {}
+	virtual	void		OnAttributeChanged( CDmAttribute * ) {}
+	virtual void		PreAttributeChanged( CDmAttribute * ) {}
+	virtual void		OnAttributeArrayElementAdded( CDmAttribute *, int, int ) {}
+	virtual void		OnAttributeArrayElementRemoved( CDmAttribute *, int, int ) {}
 	virtual void		Resolve() {}
 	virtual	bool		IsA( UtlSymId_t typeSymbol ) const;
 	virtual int			GetInheritanceDepth( UtlSymId_t typeSymbol ) const;
@@ -491,7 +491,7 @@ inline void CDmElement::DeleteAttributeVarElementArray( T &array )
 // Default size computation
 //-----------------------------------------------------------------------------
 template< class T >
-int DmeEstimateMemorySize( T* pElement )
+int DmeEstimateMemorySize( T* )
 {
 	return sizeof( T );
 }
@@ -543,9 +543,9 @@ int DmeEstimateMemorySize( T* pElement )
 			return IsA( typeSymbol );				\
 		}											\
 													\
-		template< class T > bool IsA() const		\
+		template< class Y > bool IsA() const		\
 		{											\
-			return IsA( T::GetStaticTypeSymbol() ); \
+			return IsA( Y::GetStaticTypeSymbol() ); \
 		}											\
 													\
 		virtual int GetInheritanceDepth( UtlSymId_t typeSymbol ) const	\
@@ -604,12 +604,14 @@ int DmeEstimateMemorySize( T* pElement )
 																								\
 	private:																					\
 		typedef baseClassName BaseClass; 														\
-		template <class T> friend class CDmElementFactory;										\
-		template <class T> friend class CDmAbstractElementFactory;										\
+		template <class Y> friend class CDmElementFactory;										\
+		template <class Y> friend class CDmAbstractElementFactory;										\
 		static CUtlSymbol m_classType
 
 #define IMPLEMENT_ELEMENT( className ) \
 	CUtlSymbol className::m_classType = UTL_INVAL_SYMBOL;
 
+#define IMPLEMENT_ELEMENT_SPECIALIZATION( className ) \
+	template<> CUtlSymbol className::m_classType = UTL_INVAL_SYMBOL;
 
 #endif // DMELEMENT_H

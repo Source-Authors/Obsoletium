@@ -22,7 +22,7 @@ IDmElementFramework *g_pDmElementFramework = &g_DmElementFramework;
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CDmElementFramework::CDmElementFramework() : m_phase( PH_EDIT ), m_dirtyElements( 128, 256 ) 
+CDmElementFramework::CDmElementFramework() : m_dirtyElements( 128, 256 ), m_phase( PH_EDIT ) 
 {
 }
 
@@ -30,7 +30,7 @@ CDmElementFramework::CDmElementFramework() : m_phase( PH_EDIT ), m_dirtyElements
 //-----------------------------------------------------------------------------
 // Methods of IAppSystem
 //-----------------------------------------------------------------------------
-bool CDmElementFramework::Connect( CreateInterfaceFn factory )
+bool CDmElementFramework::Connect( CreateInterfaceFn )
 {
 	return true;
 }
@@ -68,8 +68,8 @@ void CDmElementFramework::EditApply()
 
 void CDmElementFramework::Resolve( bool clearDirtyFlags )
 {
-	int nCount = m_dirtyElements.Count();
-	for ( int ei = 0; ei < nCount; ++ei )
+	intp nCount = m_dirtyElements.Count();
+	for ( intp ei = 0; ei < nCount; ++ei )
 	{
 		DmElementHandle_t h = m_dirtyElements[ ei ];
 		CDmElement *pElement = g_pDataModel->GetElement( h );
@@ -157,8 +157,8 @@ void CDmElementFramework::Operate( bool bResolve )
 		VPROF( "CDmElementFramework::PH_OPERATE" );
 		m_phase = PH_OPERATE;
 		const CUtlVector< IDmeOperator* > &operatorsToRun = m_dependencyGraph.GetSortedOperators();
-		uint on = operatorsToRun.Count();
-		for ( uint oi = 0; oi < on; ++oi )
+		intp on = operatorsToRun.Count();
+		for ( intp oi = 0; oi < on; ++oi )
 		{
 			operatorsToRun[ oi ]->Operate();
 		}
@@ -193,7 +193,7 @@ void CDmElementFramework::AddElementToDirtyList( DmElementHandle_t hElement )
 
 void CDmElementFramework::RemoveCleanElementsFromDirtyList()
 {
-	int nCount = m_dirtyElements.Count();
+	intp nCount = m_dirtyElements.Count();
 	while ( --nCount >= 0 )
 	{
 		DmElementHandle_t h = m_dirtyElements[ nCount ];

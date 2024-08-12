@@ -141,13 +141,13 @@ public:
 	CDmrGenericArrayConst( const CDmElement *pElement, const char *pAttributeName );
 
 	// Array count
-	int			Count() const;
+	intp			Count() const;
 
 	// Gets 
-	const void*	GetUntyped( int i ) const;
+	const void*	GetUntyped( intp i ) const;
 
 	// String conversion
-	const char* GetAsString( int i, char *pBuffer, size_t nBufLen ) const;
+	const char* GetAsString( intp i, char *pBuffer, size_t nBufLen ) const;
 
 	const CDmAttribute *GetAttribute() const;
 	bool IsValid() const;
@@ -166,17 +166,17 @@ public:
 	CDmrGenericArray( CDmAttribute* pAttribute );
 	CDmrGenericArray( CDmElement *pElement, const char *pAttributeName );
 
-	void	EnsureCount( int num );
+	void	EnsureCount( intp num );
 
 	// Sets multiple elements at the same time
-	int		AddToTail();
-	void	Remove( int elem );		// preserves order, shifts elements
+	intp		AddToTail();
+	void	Remove( intp elem );		// preserves order, shifts elements
 	void	RemoveAll();				// doesn't deallocate memory
-	void	SetMultiple( int i, int nCount, DmAttributeType_t valueType, const void *pValue );
-	void	Set( int i, DmAttributeType_t valueType, const void *pValue );
+	void	SetMultiple( intp i, intp nCount, DmAttributeType_t valueType, const void *pValue );
+	void	Set( intp i, DmAttributeType_t valueType, const void *pValue );
 
 	// String conversion
-	void SetFromString( int i, const char *pValue );
+	void SetFromString( intp i, const char *pValue );
 
 	CDmAttribute *GetAttribute();
 	const CDmAttribute *GetAttribute() const;
@@ -202,16 +202,16 @@ public:
 	const T *Base() const;
 
 	// Iteration
-	int		Count() const;
-	const T& operator[]( int i ) const;
-	const T& Element( int i ) const;
-	const T& Get( int i ) const;
+	intp		Count() const;
+	const T& operator[]( intp i ) const;
+	const T& Element( intp i ) const;
+	const T& Get( intp i ) const;
 	const void*	GetUntyped( int i ) const;
-	bool	IsValidIndex( int i ) const;
-	int		InvalidIndex( void ) const;
+	bool	IsValidIndex( intp i ) const;
+	intp		InvalidIndex( void ) const;
 
 	// Search
-	int		Find( const T &value ) const;
+	intp		Find( const T &value ) const;
 
 	// Attribute-related methods
 	const CDmAttribute *GetAttribute() const;
@@ -229,34 +229,34 @@ class CDmaArrayBase : public CDmaArrayConstBase< T, B >
 {
 public:	
 	// Insertion
-	int		AddToTail();
-	int		InsertBefore( int elem );
-	int		AddToTail( const T& src );
-	int		InsertBefore( int elem, const T& src );
-	int		AddMultipleToTail( int num );
-	int		InsertMultipleBefore( int elem, int num );
-	void	EnsureCount( int num );
+	intp		AddToTail();
+	intp		InsertBefore( intp elem );
+	intp		AddToTail( const T& src );
+	intp		InsertBefore( intp elem, const T& src );
+	intp		AddMultipleToTail( intp num );
+	intp		InsertMultipleBefore( intp elem, intp num );
+	void	EnsureCount( intp num );
 
 	// Element Modification
-	void	Set( int i, const T& value );
-	void	SetMultiple( int i, int nCount, const T* pValue );
-	void	Swap( int i, int j );
+	void	Set( intp i, const T& value );
+	void	SetMultiple( intp i, intp nCount, const T* pValue );
+	void	Swap( intp i, intp j );
 
 	// Copy related methods
-	void	CopyArray( const T *pArray, int size );
+	void	CopyArray( const T *pArray, intp size );
 
 	// this is basically just a faster version of CopyArray which uses pointer swap
 	// NOTE: This doesn't work for element arrays
 	void	SwapArray( CUtlVector< T > &array );
 
 	// Removal
-	void	FastRemove( int elem );
-	void	Remove( int elem );
-	void	RemoveMultiple( int elem, int num );
+	void	FastRemove( intp elem );
+	void	Remove( intp elem );
+	void	RemoveMultiple( intp elem, intp num );
 	void	RemoveAll();
 
 	// Memory management
-	void	EnsureCapacity( int num );
+	void	EnsureCapacity( intp num );
 	void	Purge();
 
 	// Attribute-related methods
@@ -292,11 +292,11 @@ class CDmaStringArrayBase : public CDmaStringArrayConstBase< CDmaArrayBase< CUtl
 
 public:
 	// Sets an element in the array
-	void Set( int i, const char * pValue );
+	void Set( intp i, const char * pValue );
 
 	// Adds an element, uses copy constructor
-	int	AddToTail( const char *pValue );
-	int	InsertBefore( int elem, const char *pValue );
+	intp	AddToTail( const char *pValue );
+	intp	InsertBefore( intp elem, const char *pValue );
 };
 
 
@@ -315,15 +315,15 @@ public:
 	UtlSymId_t GetElementType() const;
 
 	// Array access
-	E *operator[]( int i ) const;
-	E *Element( int i ) const;
-	E *Get( int i ) const;
-	const DmElementHandle_t& GetHandle( int i ) const;
+	E *operator[]( intp i ) const;
+	E *Element( intp i ) const;
+	E *Get( intp i ) const;
+	const DmElementHandle_t& GetHandle( intp i ) const;
 	const CUtlVector< DmElementHandle_t > &Get() const;
 
 	// Search
-	int	Find( const E *pValue ) const;
-	int	Find( DmElementHandle_t h ) const;
+	intp	Find( const E *pValue ) const;
+	intp	Find( DmElementHandle_t h ) const;
 };
 
 template < class E, class B >
@@ -332,23 +332,23 @@ class CDmaElementArrayBase : public CDmaElementArrayConstBase< E, CDmaArrayBase<
 	typedef CDmaElementArrayConstBase< E, CDmaArrayBase< DmElementHandle_t, B > > BaseClass;
 
 public:
-	void SetHandle( int i, DmElementHandle_t h );
-	void Set( int i, E *pElement );
+	void SetHandle( intp i, DmElementHandle_t h );
+	void Set( intp i, E *pElement );
 
 	// Insertion
-	int	AddToTail( );
-	int	AddToTail( DmElementHandle_t src );
-	int	AddToTail( E *pValue );
-	int InsertBefore( int elem );
-	int	InsertBefore( int elem, DmElementHandle_t src );
-	int	InsertBefore( int elem, E *pValue );
+	intp	AddToTail( );
+	intp	AddToTail( DmElementHandle_t src );
+	intp	AddToTail( E *pValue );
+	intp	InsertBefore( intp elem );
+	intp	InsertBefore( intp elem, DmElementHandle_t src );
+	intp	InsertBefore( intp elem, E *pValue );
 
-	template< class C, bool D > int AddToTail( const CDmeHandle<C,D>& value )
+	template< class C, bool D > intp AddToTail( const CDmeHandle<C,D>& value )
 	{
 		return BaseClass::AddToTail( value.GetHandle() );
 	}
 
-	template< class C, bool D > int InsertBefore( int elem, const CDmeHandle<C,D>& value )
+	template< class C, bool D > intp InsertBefore( intp elem, const CDmeHandle<C,D>& value )
 	{
 		return BaseClass::InsertBefore( elem, value.GetHandle() );
 	}
@@ -427,11 +427,11 @@ public:
 
 #define DECLARE_ATTRIBUTE_ARRAY_VARIABLE( _className, _elementType )	\
 	public:																\
-		_className() {}
+		_className() = default
 
 #define DECLARE_ATTRIBUTE_ARRAY_REFERENCE( _className, _elementType )	\
 	public:																\
-		_className() {}													\
+		_className() = default;											\
 		_className( CDmAttribute* pAttribute ) { BaseClass::Init( pAttribute ); }	\
 		_className( CDmElement *pElement, const char *pAttributeName, bool bAddAttribute = false ) { BaseClass::Init( pElement, pAttributeName, bAddAttribute ); } \
 		_className( CDmaArray<_className>& var ) { BaseClass::Init( var.GetAttribute() ); } \
@@ -439,7 +439,7 @@ public:
 
 #define DECLARE_ATTRIBUTE_ARRAY_CONST_REFERENCE( _className, _elementType )	\
 	public:																	\
-		_className() {}														\
+		_className() = default;												\
 		_className( const CDmAttribute* pAttribute ) { BaseClass::Init( pAttribute ); } \
 		_className( const CDmElement *pElement, const char *pAttributeName ) { BaseClass::Init( pElement, pAttributeName ); } \
 		_className( const CDmaArray<_className>& var ) { BaseClass::Init( var.GetAttribute() ); } \
@@ -461,13 +461,13 @@ class CDmaArray : public CDmaDecorator< T, CDmaArrayBase< T, CDmaDataInternal< C
 public:
 	const CDmaArray<T>& operator=( const CDmaArray<T> &val ) 
 	{ 
-		CopyArray( val.Base(), val.Count() ); 
+		this->CopyArray( val.Base(), val.Count() ); 
 		return *this; 
 	}
 
 	template< class C > const CDmaArray<T>& operator=( const C &val ) 
 	{ 
-		CopyArray( val.Base(), val.Count() ); 
+		this->CopyArray( val.Base(), val.Count() ); 
 		return *this; 
 	}
 
@@ -524,7 +524,7 @@ public:
 	}
 
 private:
-	CDmaStringArray( const CDmaStringArray& array ) {}
+	CDmaStringArray( const CDmaStringArray& ) = delete;
 };
 
 class CDmrStringArray : public CDmrDecorator< CUtlString, CDmaStringArrayBase< CDmaDataExternal< CUtlVector< CUtlString > > > >
@@ -1207,19 +1207,19 @@ inline const T *CDmaArrayConstBase<T,B>::Base() const
 }
 
 template< class T, class B >
-inline const T& CDmaArrayConstBase<T,B>::operator[]( int i ) const
+inline const T& CDmaArrayConstBase<T,B>::operator[]( intp i ) const
 {
 	return this->Value()[ i ];
 }
 
 template< class T, class B >
-const T& CDmaArrayConstBase<T,B>::Element( int i ) const
+const T& CDmaArrayConstBase<T,B>::Element( intp i ) const
 {
 	return this->Value()[ i ];
 }
 
 template< class T, class B >
-inline const T& CDmaArrayConstBase<T,B>::Get( int i ) const
+inline const T& CDmaArrayConstBase<T,B>::Get( intp i ) const //-V524
 {
 	return this->Value()[ i ];
 }
@@ -1231,19 +1231,19 @@ const void* CDmaArrayConstBase<T,B>::GetUntyped( int i ) const
 }
 
 template< class T, class B >
-inline int CDmaArrayConstBase<T,B>::Count() const
+inline intp CDmaArrayConstBase<T,B>::Count() const
 {
 	return this->Value().Count();
 }
 
 template< class T, class B >
-inline bool CDmaArrayConstBase<T,B>::IsValidIndex( int i ) const
+inline bool CDmaArrayConstBase<T,B>::IsValidIndex( intp i ) const
 {
 	return this->Value().IsValidIndex( i );
 }
 
 template< class T, class B >
-inline int CDmaArrayConstBase<T,B>::InvalidIndex( void ) const
+inline intp CDmaArrayConstBase<T,B>::InvalidIndex( void ) const
 {
 	return this->Value().InvalidIndex();
 }
@@ -1301,7 +1301,7 @@ inline const char *CDmaStringArrayConstBase<B>::Element( int i ) const
 }
 
 template< class B >
-inline const char *CDmaStringArrayConstBase<B>::Get( int i ) const
+inline const char *CDmaStringArrayConstBase<B>::Get( int i ) const //-V524
 {
 	return this->Value()[ i ].Get();
 }
@@ -1320,7 +1320,7 @@ inline int CDmaStringArrayConstBase<B>::Length( int i ) const
 }
 
 template< class B >
-inline void CDmaStringArrayBase<B>::Set( int i, const char * pValue )
+inline void CDmaStringArrayBase<B>::Set( intp i, const char * pValue )
 {
 	CUtlString str( pValue, Q_strlen( pValue ) + 1 );
 	BaseClass::Set( i, str );
@@ -1328,14 +1328,14 @@ inline void CDmaStringArrayBase<B>::Set( int i, const char * pValue )
 
 // Adds an element, uses copy constructor
 template< class B >
-inline int CDmaStringArrayBase<B>::AddToTail( const char *pValue )
+inline intp CDmaStringArrayBase<B>::AddToTail( const char *pValue )
 {
 	CUtlString str( pValue, Q_strlen( pValue ) + 1 );
 	return BaseClass::AddToTail( str );
 }
 
 template< class B >
-inline int CDmaStringArrayBase<B>::InsertBefore( int elem, const char *pValue )
+inline intp CDmaStringArrayBase<B>::InsertBefore( intp elem, const char *pValue )
 {
 	CUtlString str( pValue, Q_strlen( pValue ) + 1 );
 	return BaseClass::InsertBefore( elem, str );
@@ -1354,25 +1354,25 @@ inline UtlSymId_t CDmaElementArrayConstBase<E,B>::GetElementType() const
 }
 
 template< class E, class B >
-inline E *CDmaElementArrayConstBase<E,B>::operator[]( int i ) const
+inline E *CDmaElementArrayConstBase<E,B>::operator[]( intp i ) const
 {
 	return GetElement<E>( this->Value()[i] );
 }
 
 template< class E, class B >
-inline E *CDmaElementArrayConstBase<E,B>::Element( int i ) const
+inline E *CDmaElementArrayConstBase<E,B>::Element( intp i ) const
 {
 	return GetElement<E>( this->Value()[i] );
 }
 
 template< class E, class B >
-inline E *CDmaElementArrayConstBase<E,B>::Get( int i ) const
+inline E *CDmaElementArrayConstBase<E,B>::Get( intp i ) const //-V524
 {
 	return GetElement<E>( this->Value()[i] );
 }
 
 template< class E, class B >
-inline const DmElementHandle_t& CDmaElementArrayConstBase<E,B>::GetHandle( int i ) const
+inline const DmElementHandle_t& CDmaElementArrayConstBase<E,B>::GetHandle( intp i ) const
 {
 	return this->Value()[i];
 }
@@ -1385,7 +1385,7 @@ inline const CUtlVector< DmElementHandle_t > &CDmaElementArrayConstBase<E,B>::Ge
 
 // Search
 template< class E, class B >
-inline int CDmaElementArrayConstBase<E,B>::Find( const E *pValue ) const
+inline intp CDmaElementArrayConstBase<E,B>::Find( const E *pValue ) const
 {
 	if ( !pValue )
 		return -1;
@@ -1393,56 +1393,56 @@ inline int CDmaElementArrayConstBase<E,B>::Find( const E *pValue ) const
 }
 
 template< class E, class B >
-inline int CDmaElementArrayConstBase<E,B>::Find( DmElementHandle_t h ) const
+inline intp CDmaElementArrayConstBase<E,B>::Find( DmElementHandle_t h ) const
 {
 	return B::Find( h );
 }
 
 template< class E, class B >
-inline void CDmaElementArrayBase<E,B>::SetHandle( int i, DmElementHandle_t h )
+inline void CDmaElementArrayBase<E,B>::SetHandle( intp i, DmElementHandle_t h )
 {
 	BaseClass::Set( i, h );
 }
 
 template< class E, class B >
-inline void CDmaElementArrayBase<E,B>::Set( int i, E *pElement )
+inline void CDmaElementArrayBase<E,B>::Set( intp i, E *pElement )
 {
 	BaseClass::Set( i, pElement ? pElement->GetHandle() : DMELEMENT_HANDLE_INVALID );
 }
 
 // Adds an element, uses copy constructor
 template< class E, class B >
-inline int CDmaElementArrayBase<E,B>::AddToTail( )
+inline intp CDmaElementArrayBase<E,B>::AddToTail( )
 {
 	return BaseClass::AddToTail( );
 }
 
 template< class E, class B >
-inline int CDmaElementArrayBase<E,B>::AddToTail( E *pValue )
+inline intp CDmaElementArrayBase<E,B>::AddToTail( E *pValue )
 {
 	return BaseClass::AddToTail( pValue ? pValue->GetHandle() : DMELEMENT_HANDLE_INVALID );
 }
 
 template< class E, class B >
-inline int CDmaElementArrayBase<E,B>::AddToTail( DmElementHandle_t src )
+inline intp CDmaElementArrayBase<E,B>::AddToTail( DmElementHandle_t src )
 {
 	return BaseClass::AddToTail( src );
 }
 
 template< class E, class B >
-inline int CDmaElementArrayBase<E,B>::InsertBefore( int elem )
+inline intp CDmaElementArrayBase<E,B>::InsertBefore( intp elem )
 {
 	return BaseClass::InsertBefore( elem );
 }
 
 template< class E, class B >
-inline int CDmaElementArrayBase<E,B>::InsertBefore( int elem, E *pValue )
+inline intp CDmaElementArrayBase<E,B>::InsertBefore( intp elem, E *pValue )
 {
 	return BaseClass::InsertBefore( elem, pValue ? pValue->GetHandle() : DMELEMENT_HANDLE_INVALID );
 }
 
 template< class E, class B >
-inline int CDmaElementArrayBase<E,B>::InsertBefore( int elem, DmElementHandle_t src )
+inline intp CDmaElementArrayBase<E,B>::InsertBefore( intp elem, DmElementHandle_t src )
 {
 	return BaseClass::InsertBefore( elem, src );
 }

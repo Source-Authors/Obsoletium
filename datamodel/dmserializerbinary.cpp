@@ -142,9 +142,9 @@ void CDmSerializerBinary::SerializeElementArrayAttribute( CUtlBuffer& buf, CDmEl
 	DmFileId_t fileid = pAttribute->GetOwner()->GetFileId();
 	CDmrElementArray<> vec( pAttribute );
 
-	int nCount = vec.Count();
+	intp nCount = vec.Count();
 	buf.PutInt( nCount );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		SerializeElementIndex( buf, list, vec.GetHandle(i), fileid );
 	}
@@ -406,15 +406,23 @@ struct DmIdPair_t
 {
 	DmObjectId_t m_oldId;
 	DmObjectId_t m_newId;
+
+	DmIdPair_t() = default;
+	DmIdPair_t( const DmIdPair_t &that )
+	{
+		CopyUniqueId( that.m_oldId, &m_oldId );
+		CopyUniqueId( that.m_newId, &m_newId );
+	}
 	DmIdPair_t &operator=( const DmIdPair_t &that )
 	{
 		CopyUniqueId( that.m_oldId, &m_oldId );
 		CopyUniqueId( that.m_newId, &m_newId );
 		return *this;
 	}
-	static unsigned int HashKey( const DmIdPair_t& that )
+	static uintp HashKey( const DmIdPair_t& that )
 	{
-		return *( unsigned int* )&that.m_oldId.m_Value;
+		static_assert( sizeof(uintp) <= sizeof(that.m_oldId.m_Value) );
+		return *( uintp* )&that.m_oldId.m_Value;
 	}
 	static bool Compare( const DmIdPair_t& a, const DmIdPair_t& b )
 	{
