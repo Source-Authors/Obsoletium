@@ -28,7 +28,7 @@ Bitmap::Bitmap(const char *filename, bool hardwareFiltered)
 {
 	_filtered = hardwareFiltered;
 
-	int size = strlen(filename) + 1;
+	intp size = V_strlen(filename) + 1;
 	_filename = (char *)malloc( size );
 	Assert( _filename );
 

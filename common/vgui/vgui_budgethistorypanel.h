@@ -21,7 +21,7 @@ class CBudgetHistoryPanel : public vgui::Panel
 public:
 	CBudgetHistoryPanel( CBaseBudgetPanel *pParent, const char *pPanelName );
 	~CBudgetHistoryPanel();
-	void SetData( double *pData, int numCategories, int numItems, int offsetIntoData );
+	void SetData( double *pData, intp numCategories, int numItems, int offsetIntoData );
 	void SetRange( float fMin, float fMax );
 
 
@@ -38,7 +38,7 @@ private:
 	CBaseBudgetPanel *m_pBudgetPanel;
 	
 	double *m_pData;
-	int m_nGroups;
+	intp m_nGroups;
 	int m_nSamplesPerGroup;
 	int m_nSampleOffset;
 	float m_fRangeMin;

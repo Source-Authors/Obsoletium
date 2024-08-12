@@ -78,7 +78,7 @@ void ScalableImageBorder::SetImage(const char *imageName)
 
 	if (*imageName)
 	{
-		int len = Q_strlen(imageName) + 1 + 5;	// 5 for "vgui/"
+		intp len = Q_strlen(imageName) + 1 + 5;	// 5 for "vgui/"
 		delete [] m_pszImageName;
 		m_pszImageName = new char[ len ];
 		Q_snprintf( m_pszImageName, len, "vgui/%s", imageName );
@@ -127,7 +127,7 @@ void ScalableImageBorder::Paint(int x, int y, int wide, int tall)
 //-----------------------------------------------------------------------------
 // Purpose: Draws the border with the specified size
 //-----------------------------------------------------------------------------
-void ScalableImageBorder::Paint(int x, int y, int wide, int tall, int breakSide, int breakStart, int breakEnd)
+void ScalableImageBorder::Paint(int x, int y, int wide, int tall, int, int, int)
 {
 	if ( !m_pszImageName || !m_pszImageName[0] )
 		return;
@@ -262,7 +262,7 @@ void ScalableImageBorder::SetName(const char *name)
 		delete [] _name;
 	}
 
-	int len = Q_strlen(name) + 1;
+	intp len = Q_strlen(name) + 1;
 	_name = new char[ len ];
 	Q_strncpy( _name, name, len );
 }

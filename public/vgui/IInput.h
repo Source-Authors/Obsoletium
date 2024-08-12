@@ -89,8 +89,8 @@ public:
 	virtual void *GetIMEWindow() = 0;
 
 	virtual void OnChangeIME( bool forward ) = 0;
-	virtual int  GetCurrentIMEHandle() = 0;
-	virtual int  GetEnglishIMEHandle() = 0;
+	virtual intp GetCurrentIMEHandle() = 0;
+	virtual intp GetEnglishIMEHandle() = 0;
 
 	// Returns the Language Bar label (Chinese, Korean, Japanese, Russion, Thai, etc.)
 	virtual void GetIMELanguageName( OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *buf, int unicodeBufferSizeInBytes ) = 0;
@@ -101,21 +101,21 @@ public:
 	{
 		wchar_t		shortname[ 4 ];
 		wchar_t		menuname[ 128 ];
-		int			handleValue;
+		intp		handleValue;
 		bool		active; // true if this is the active language
 	};
 
 	struct ConversionModeItem
 	{
 		wchar_t		menuname[ 128 ];
-		int			handleValue;
+		intp		handleValue;
 		bool		active; // true if this is the active conversion mode
 	};
 
 	struct SentenceModeItem
 	{
 		wchar_t		menuname[ 128 ];
-		int			handleValue;
+		intp		handleValue;
 		bool		active; // true if this is the active sentence mode
 	};
 
@@ -124,9 +124,9 @@ public:
 	virtual int	 GetIMEConversionModes( ConversionModeItem *dest, int destcount ) = 0;
 	virtual int	 GetIMESentenceModes( SentenceModeItem *dest, int destcount ) = 0;
 
-	virtual void OnChangeIMEByHandle( int handleValue ) = 0;
-	virtual void OnChangeIMEConversionModeByHandle( int handleValue ) = 0;
-	virtual void OnChangeIMESentenceModeByHandle( int handleValue ) = 0;
+	virtual void OnChangeIMEByHandle( intp handleValue ) = 0;
+	virtual void OnChangeIMEConversionModeByHandle( intp handleValue ) = 0;
+	virtual void OnChangeIMESentenceModeByHandle( intp handleValue ) = 0;
 
 	virtual void OnInputLanguageChanged() = 0;
 	virtual void OnIMEStartComposition() = 0;

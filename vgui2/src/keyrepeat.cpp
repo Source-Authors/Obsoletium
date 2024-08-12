@@ -44,19 +44,19 @@ static int GetIndexForCode( vgui::KeyCode code )
 	case KEY_XBUTTON_DOWN: 
 	case KEY_XSTICK1_DOWN:
 	case KEY_XSTICK2_DOWN:
-		return KR_ALIAS_DOWN; break;
+		return KR_ALIAS_DOWN;
 	case KEY_XBUTTON_UP: 
 	case KEY_XSTICK1_UP:
 	case KEY_XSTICK2_UP:
-		return KR_ALIAS_UP; break;
+		return KR_ALIAS_UP;
 	case KEY_XBUTTON_LEFT: 
 	case KEY_XSTICK1_LEFT:
 	case KEY_XSTICK2_LEFT:
-		return KR_ALIAS_LEFT; break;
+		return KR_ALIAS_LEFT;
 	case KEY_XBUTTON_RIGHT: 
 	case KEY_XSTICK1_RIGHT:
 	case KEY_XSTICK2_RIGHT:
-		return KR_ALIAS_RIGHT; break;
+		return KR_ALIAS_RIGHT;
 	default:
 		break;
 	}
@@ -69,7 +69,7 @@ CKeyRepeatHandler::CKeyRepeatHandler()
 	Reset();
 	for ( int i = 0; i < FM_NUM_KEYREPEAT_ALIASES; i++ )
 	{
-		m_flRepeatTimes[i] = 0.16;
+		m_flRepeatTimes[i] = 0.16f;
 	}
 }
 

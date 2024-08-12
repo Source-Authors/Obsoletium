@@ -120,214 +120,215 @@ public:
 
 	CWin32Surface();
 	~CWin32Surface();
-	virtual void Shutdown();
-	virtual void RunFrame();
-	virtual VPANEL GetEmbeddedPanel();
-	virtual void SetEmbeddedPanel( VPANEL panel);
+
+	void Shutdown() override;
+	void RunFrame() override;
+	VPANEL GetEmbeddedPanel() override;
+	void SetEmbeddedPanel( VPANEL panel) override;
 
 	// initializes the surface with the current window state
 	virtual void SetCurrentContextPanel(VPANEL panel);
-	virtual void PushMakeCurrent(VPANEL panel,bool useInsets);
-	virtual void PopMakeCurrent(VPANEL panel);
+	void PushMakeCurrent(VPANEL panel,bool useInsets) override;
+	void PopMakeCurrent(VPANEL panel) override;
 
-	virtual void DrawSetColor(int r, int g, int b, int a);
-	virtual void DrawSetColor(Color col);
-	virtual void DrawFilledRect(int x0, int y0, int x1, int y1);
-	virtual void DrawFilledRectFastFade( int x0, int y0, int x1, int y1, int fadeStartPt, int fadeEndPt, unsigned int alpha0, unsigned int alpha1, bool bHorizontal );
-	virtual void DrawFilledRectFade( int x0, int y0, int x1, int y1, unsigned int alpha0, unsigned int alpha1, bool bHorizontal );
-	virtual void DrawFilledRectArray( IntRect *pRects, int numRects );
-	virtual void DrawOutlinedRect(int x0, int y0, int x1, int y1);
-	virtual void DrawLine(int x0, int y0, int x1, int y1);
-	virtual void DrawPolyLine(int *px, int *py, int numPoints);
-	virtual void DrawSetTextFont(HFont font);
-	virtual void DrawSetTextColor(int r, int g, int b, int a);
-	virtual void DrawSetTextColor(Color col);
-	virtual void DrawSetTextPos(int x, int y);
-	virtual void DrawSetTextScale(float sx, float sy);
-	virtual void DrawPrintText(const wchar_t *, int textLen, FontDrawType_t drawType = FONT_DRAW_DEFAULT);
-	virtual void DrawUnicodeChar(wchar_t wch, FontDrawType_t drawType = FONT_DRAW_DEFAULT );
-	virtual void DrawUnicodeString( const wchar_t *pwString, FontDrawType_t drawType = FONT_DRAW_DEFAULT );
-	virtual void DrawGetTextPos(int& x,int& y);
+	void DrawSetColor(int r, int g, int b, int a) override;
+	void DrawSetColor(Color col) override;
+	void DrawFilledRect(int x0, int y0, int x1, int y1) override;
+	void DrawFilledRectFastFade( int x0, int y0, int x1, int y1, int fadeStartPt, int fadeEndPt, unsigned int alpha0, unsigned int alpha1, bool bHorizontal ) override;
+	void DrawFilledRectFade( int x0, int y0, int x1, int y1, unsigned int alpha0, unsigned int alpha1, bool bHorizontal ) override;
+	void DrawFilledRectArray( IntRect *pRects, int numRects ) override;
+	void DrawOutlinedRect(int x0, int y0, int x1, int y1) override;
+	void DrawLine(int x0, int y0, int x1, int y1) override;
+	void DrawPolyLine(int *px, int *py, int numPoints) override;
+	void DrawSetTextFont(HFont font) override;
+	void DrawSetTextColor(int r, int g, int b, int a) override;
+	void DrawSetTextColor(Color col) override;
+	void DrawSetTextPos(int x, int y) override;
+	void DrawSetTextScale(float sx, float sy) override;
+	void DrawPrintText(const wchar_t *, int textLen, FontDrawType_t drawType = FONT_DRAW_DEFAULT) override;
+	void DrawUnicodeChar(wchar_t wch, FontDrawType_t drawType = FONT_DRAW_DEFAULT ) override;
+	void DrawUnicodeString( const wchar_t *pwString, FontDrawType_t drawType = FONT_DRAW_DEFAULT ) override;
+	void DrawGetTextPos(int& x,int& y) override;
 
-	virtual bool DrawGetTextureFile(int id, char *filename, int maxlen );
-	virtual int	 DrawGetTextureId( char const *filename );
-	virtual void DrawSetTextureFile(int id, const char *filename, int hardwareFilter, bool forceReload = false);
-	virtual void DrawSetTexture(int id);	
-	virtual void DrawSetTextureRGBA(int id, const unsigned char *rgba, int wide, int tall, int hardwareFilter, bool forceReload = false);
-	virtual void DrawSetTextureRGBAEx(int id, const unsigned char *rgba, int wide, int tall, ImageFormat imageFormat );
-	virtual void DrawGetTextureSize(int id, int &wide, int &tall);
-	virtual IVguiMatInfo *DrawGetTextureMatInfoFactory( int id ) { return NULL; }
-	virtual void DrawTexturedRect(int x0, int y0, int x1, int y1);
-	virtual int CreateNewTextureID( bool procedural );
-	virtual bool IsTextureIDValid(int id);
+	bool DrawGetTextureFile(int id, char *filename, int maxlen ) override;
+	int	 DrawGetTextureId( char const *filename ) override;
+	void DrawSetTextureFile(int id, const char *filename, int hardwareFilter, bool forceReload = false) override;
+	void DrawSetTexture(int id) override;	
+	void DrawSetTextureRGBA(int id, const unsigned char *rgba, int wide, int tall, int hardwareFilter, bool forceReload = false) override;
+	void DrawSetTextureRGBAEx(int id, const unsigned char *rgba, int wide, int tall, ImageFormat imageFormat ) override;
+	void DrawGetTextureSize(int id, int &wide, int &tall) override;
+	IVguiMatInfo *DrawGetTextureMatInfoFactory( int ) override { return NULL; }
+	void DrawTexturedRect(int x0, int y0, int x1, int y1) override;
+	int CreateNewTextureID( bool procedural ) override;
+	bool IsTextureIDValid(int id) override;
 	virtual void FreeTextureData( Texture *pTexture );
-	virtual bool DeleteTextureByID(int id);
-	virtual void DrawFlushText();
-	virtual IHTML *CreateHTMLWindow(vgui::IHTMLEvents *events, VPANEL context);
-	virtual void PaintHTMLWindow(IHTML *htmlwin);
-	virtual void DeleteHTMLWindow(IHTML *htmlwin);
+	bool DeleteTextureByID(int id) override;
+	void DrawFlushText() override;
+	IHTML *CreateHTMLWindow(vgui::IHTMLEvents *events, VPANEL context) override;
+	void PaintHTMLWindow(IHTML *htmlwin) override;
+	void DeleteHTMLWindow(IHTML *htmlwin) override;
 
-	virtual VPANEL GetNotifyPanel();
-	virtual void SetNotifyIcon(VPANEL context, HTexture icon, VPANEL panelToReceiveMessages, const char *text);
-	virtual void SetPanelForInput( VPANEL vpanel );
+	VPANEL GetNotifyPanel() override;
+	void SetNotifyIcon(VPANEL context, HTexture icon, VPANEL panelToReceiveMessages, const char *text) override;
+	void SetPanelForInput( VPANEL vpanel ) override;
 
-	virtual void GetScreenSize(int &wide, int &tall);
+	void GetScreenSize(int &wide, int &tall) override;
 
-	virtual void SetAsTopMost(VPANEL panel, bool state);
-	virtual void BringToFront(VPANEL panel);
-	virtual void SetForegroundWindow(VPANEL panel);
-	virtual void SetPanelVisible(VPANEL panel, bool visible);
-	virtual void SetMinimized(VPANEL panel, bool state);
-	virtual bool IsMinimized(VPANEL panel);
-	virtual void FlashWindow(VPANEL panel, bool state);
-	virtual void SetTitle(VPANEL panel, const wchar_t *title);
-	virtual void SetAsToolBar(VPANEL panel, bool state);
-	virtual bool SupportsFeature(SurfaceFeature_e feature);
-	virtual void SetTopLevelFocus(VPANEL panel);
+	void SetAsTopMost(VPANEL panel, bool state) override;
+	void BringToFront(VPANEL panel) override;
+	void SetForegroundWindow(VPANEL panel) override;
+	void SetPanelVisible(VPANEL panel, bool visible) override;
+	void SetMinimized(VPANEL panel, bool state) override;
+	bool IsMinimized(VPANEL panel) override;
+	void FlashWindow(VPANEL panel, bool state) override;
+	void SetTitle(VPANEL panel, const wchar_t *title) override;
+	void SetAsToolBar(VPANEL panel, bool state) override;
+	bool SupportsFeature(SurfaceFeature_e feature) override;
+	void SetTopLevelFocus(VPANEL panel) override;
 
-	virtual int GetPopupCount();
-	virtual VPANEL GetPopup(int index);
-	virtual void AddPanel(VPANEL panel);
-	virtual void ReleasePanel(VPANEL panel);
-	virtual void CreatePopup(VPANEL panel, bool minimised, bool showTaskbarIcon, bool disabled, bool mouseInput, bool kbInput );
-	virtual bool RecreateContext(VPANEL panel);
-	virtual void EnableMouseCapture(VPANEL panel, bool state);
-	virtual bool ShouldPaintChildPanel(VPANEL childPanel);
-	virtual void MovePopupToFront(VPANEL panel);
-	virtual void MovePopupToBack(VPANEL panel);
-	virtual void SwapBuffers(VPANEL panel);
-	virtual void Invalidate(VPANEL panel);
-	virtual void SetCursor(HCursor cursor);
-	virtual void SetCursorAlwaysVisible( bool visible ) {}
-	virtual void ApplyChanges();
-	virtual bool IsWithin(int x, int y);
-	virtual bool HasFocus();
-	virtual void GetWorkspaceBounds(int &x, int &y, int &wide, int &tall);
-	virtual void SolveTraverse(VPANEL panel, bool forceApplySchemeSettings);
-	virtual void PaintTraverse(VPANEL panel);
+	intp GetPopupCount() override;
+	VPANEL GetPopup(int index) override;
+	void AddPanel(VPANEL panel) override;
+	void ReleasePanel(VPANEL panel) override;
+	void CreatePopup(VPANEL panel, bool minimised, bool showTaskbarIcon, bool disabled, bool mouseInput, bool kbInput ) override;
+	bool RecreateContext(VPANEL panel) override;
+	void EnableMouseCapture(VPANEL panel, bool state) override;
+	bool ShouldPaintChildPanel(VPANEL childPanel) override;
+	void MovePopupToFront(VPANEL panel) override;
+	void MovePopupToBack(VPANEL panel) override;
+	void SwapBuffers(VPANEL panel) override;
+	void Invalidate(VPANEL panel) override;
+	void SetCursor(HCursor cursor) override;
+	void SetCursorAlwaysVisible( bool ) override {}
+	void ApplyChanges() override;
+	bool IsWithin(int x, int y) override;
+	bool HasFocus() override;
+	void GetWorkspaceBounds(int &x, int &y, int &wide, int &tall) override;
+	void SolveTraverse(VPANEL panel, bool forceApplySchemeSettings) override;
+	void PaintTraverse(VPANEL panel) override;
 
 
-	virtual void RestrictPaintToSinglePanel(VPANEL panel);
-	virtual void SetModalPanel(VPANEL );
-	virtual VPANEL GetModalPanel();
-	virtual void UnlockCursor();
-	virtual void LockCursor();
-	virtual void SetTranslateExtendedKeys(bool state);
-	virtual VPANEL GetTopmostPopup();
+	void RestrictPaintToSinglePanel(VPANEL panel) override;
+	void SetModalPanel(VPANEL ) override;
+	VPANEL GetModalPanel() override;
+	void UnlockCursor() override;
+	void LockCursor() override;
+	void SetTranslateExtendedKeys(bool state) override;
+	VPANEL GetTopmostPopup() override;
 
 
 	// sound
-	virtual void PlaySound(const char *fileName);
+	void PlaySound(const char *fileName) override;
 
 	// fonts
-	virtual HFont CreateFont();
-	virtual bool SetFontGlyphSet(HFont font, const char *windowsFontName, int tall, int weight, int blur, int scanlines, int flags, int nRangeMin = 0, int nRangeMax = 0);
-	virtual int GetFontTall(HFont font);
-	virtual int GetFontTallRequested(HFont font);
-	virtual int GetFontAscent(HFont font, wchar_t wch);
-	virtual void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c);
-	virtual int GetCharacterWidth(HFont font, int ch);
-	virtual void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall);
-	virtual bool AddCustomFontFile(const char *fontName, const char *fontFileName);
-	virtual bool AddBitmapFontFile(const char *fontFileName);
-	virtual void SetBitmapFontName( const char *pName, const char *pFontFilename );
-	virtual const char *GetBitmapFontName( const char *pName );
-	virtual bool SetBitmapFontGlyphSet(HFont font, const char *windowsFontName, float scalex, float scaley, int flags);
-	virtual bool IsFontAdditive(HFont font);
-	virtual void PrecacheFontCharacters(HFont font, const wchar_t *pCharacters);
-	virtual void ClearTemporaryFontCache( void );
-	virtual const char *GetFontName( HFont font );
-	virtual const char *GetFontFamilyName( HFont font );
+	HFont CreateFont() override;
+	bool SetFontGlyphSet(HFont font, const char *windowsFontName, int tall, int weight, int blur, int scanlines, int flags, int nRangeMin = 0, int nRangeMax = 0) override;
+	int GetFontTall(HFont font) override;
+	int GetFontTallRequested(HFont font) override;
+	int GetFontAscent(HFont font, wchar_t wch) override;
+	void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c) override;
+	int GetCharacterWidth(HFont font, int ch) override;
+	void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall) override;
+	bool AddCustomFontFile(const char *fontName, const char *fontFileName) override;
+	bool AddBitmapFontFile(const char *fontFileName) override;
+	void SetBitmapFontName( const char *pName, const char *pFontFilename ) override;
+	const char *GetBitmapFontName( const char *pName ) override;
+	bool SetBitmapFontGlyphSet(HFont font, const char *windowsFontName, float scalex, float scaley, int flags) override;
+	bool IsFontAdditive(HFont font) override;
+	void PrecacheFontCharacters(HFont font, const wchar_t *pCharacters) override;
+	void ClearTemporaryFontCache( void ) override;
+	const char *GetFontName( HFont font ) override;
+	const char *GetFontFamilyName( HFont font ) override;
 
-	virtual bool IsCursorVisible() { return true; }
+	bool IsCursorVisible() override { return true; }
 	
 	// gets the absolute coordinates of the screen (in screen space)
-	void GetAbsoluteWindowBounds(int &x, int &y, int &wide, int &tall);
+	void GetAbsoluteWindowBounds(int &x, int &y, int &wide, int &tall) override;
 
 	// methods
 	void setFocus(VPANEL panel);
 
-	void GetProportionalBase( int &width, int &height ) { width = BASE_WIDTH; height = BASE_HEIGHT; }
+	void GetProportionalBase( int &width, int &height ) override { width = BASE_WIDTH; height = BASE_HEIGHT; }
 
-	virtual void CalculateMouseVisible();
-	virtual bool NeedKBInput();
+	void CalculateMouseVisible() override;
+	bool NeedKBInput() override;
 
 	// we use the default IInput cursor functions
-	virtual bool HasCursorPosFunctions() { return false; }
-	virtual void SurfaceGetCursorPos(int &x, int &y) {}
-	virtual void SurfaceSetCursorPos(int x, int y){}
+	bool HasCursorPosFunctions() override { return false; }
+	void SurfaceGetCursorPos(int &, int &) override {}
+	void SurfaceSetCursorPos(int, int) override {}
 
-	virtual void SetAllowHTMLJavaScript( bool state );
+	void SetAllowHTMLJavaScript( bool state ) override;
 		// SRC specific interfaces
-	virtual void DrawTexturedLine( const Vertex_t &a, const Vertex_t &b );
-	virtual void DrawOutlinedCircle(int x, int y, int radius, int segments) ;
-	virtual void DrawTexturedPolyLine( const Vertex_t *p,int n ) ; // (Note: this connects the first and last points).
-	virtual void DrawTexturedSubRect( int x0, int y0, int x1, int y1, float texs0, float text0, float texs1, float text1 );
-	virtual void DrawTexturedPolygon(int n, Vertex_t *pVertices, bool bClipVertices = true);
-	virtual const wchar_t *GetTitle(VPANEL panel);
+	void DrawTexturedLine( const Vertex_t &a, const Vertex_t &b ) override;
+	void DrawOutlinedCircle(int x, int y, int radius, int segments) override;
+	void DrawTexturedPolyLine( const Vertex_t *p, int n ) override; // (Note: this connects the first and last points).
+	void DrawTexturedSubRect( int x0, int y0, int x1, int y1, float texs0, float text0, float texs1, float text1 ) override;
+	void DrawTexturedPolygon(int n, Vertex_t *pVertices, bool bClipVertices = true) override;
+	const wchar_t *GetTitle(VPANEL panel) override;
 	virtual void LockCursor( bool state );
-	virtual bool IsCursorLocked( void ) const;
-	virtual void SetWorkspaceInsets( int left, int top, int right, int bottom );
+	bool IsCursorLocked( void ) const override;
+	void SetWorkspaceInsets( int left, int top, int right, int bottom ) override;
 	// Lower level char drawing code, call DrawGet then pass in info to DrawRender (NOT SUPPORTED BY DEFAULT SURFACE )!!!
-	virtual bool DrawGetUnicodeCharRenderInfo( wchar_t ch, CharRenderInfo& info );
-	virtual void DrawRenderCharFromInfo( const CharRenderInfo& info );
+	bool DrawGetUnicodeCharRenderInfo( wchar_t ch, CharRenderInfo& info ) override;
+	void DrawRenderCharFromInfo( const CharRenderInfo& info ) override;
 
 	// alpha multipliers not yet implemented
-	virtual void DrawSetAlphaMultiplier( float alpha /* [0..1] */ ) {}
-	virtual float DrawGetAlphaMultiplier() { return 1.0f; }
+	void DrawSetAlphaMultiplier( float /* [0..1] */ ) override {}
+	float DrawGetAlphaMultiplier() override { return 1.0f; }
 
 	// Here's where the app systems get to learn about each other 
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
 
 	// Here's where systems can access other interfaces implemented by this object
 	// Returns NULL if it doesn't implement the requested interface
-	virtual void *QueryInterface( const char *pInterfaceName );
+	void *QueryInterface( const char *pInterfaceName ) override;
 
 	// Init, shutdown
-	virtual InitReturnVal_t Init();
+	InitReturnVal_t Init() override;
 	//virtual void Shutdown();
 
 	// screen size changing
-	void OnScreenSizeChanged( int nOldWidth, int nOldHeight )
+	void OnScreenSizeChanged( int, int ) override
 	{
 	}
 
 	// We don't support this for non material system surfaces (we could)
-	virtual vgui::HCursor CreateCursorFromFile( char const *curOrAniFile, char const *pPathID )
+	vgui::HCursor CreateCursorFromFile( char const *, char const * ) override
 	{
 		Assert( 0 );
 		return dc_arrow;
 	}
 
-	virtual void PaintTraverseEx(VPANEL panel, bool paintPopups = false )
+	void PaintTraverseEx(VPANEL panel, [[maybe_unused]] bool paintPopups = false ) override
 	{
 		PaintTraverse( panel );
 	}
 
-	virtual float GetZPos() const 
+	float GetZPos() const  override
 	{
 		return 0.0f;
 	}
 
-	virtual IImage *GetIconImageForFullPath( char const *pFullPath );
+	IImage *GetIconImageForFullPath( char const *pFullPath ) override;
 
-	virtual const char *GetResolutionKey( void ) const
+	const char *GetResolutionKey( void ) const override
 	{
 		Assert( 0 );
 		return NULL;
 	}
 
-	virtual bool ForceScreenSizeOverride( bool bState, int wide, int tall );
+	bool ForceScreenSizeOverride( bool bState, int wide, int tall ) override;
 	// LocalToScreen, ParentLocalToScreen fixups for explicit PaintTraverse calls on Panels not at 0, 0 position
-	virtual bool ForceScreenPosOffset( bool bState, int x, int y );
+	bool ForceScreenPosOffset( bool bState, int x, int y ) override;
 
-	virtual void OffsetAbsPos( int &x, int &y );
+	void OffsetAbsPos( int &x, int &y ) override;
 
-	virtual bool IsScreenSizeOverrideActive( void );
-	virtual bool IsScreenPosOverrideActive( void );
+	bool IsScreenSizeOverrideActive( void ) override;
+	bool IsScreenPosOverrideActive( void ) override;
 
-	void GetKernedCharWidth( HFont font, wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &flabcA )
+	void GetKernedCharWidth( HFont, wchar_t, wchar_t, wchar_t, float &wide, float &flabcA ) override
 	{
 		Assert( 0 );
 		wide = 0.0f;
@@ -335,30 +336,30 @@ public:
 	}
 
 	// split screen state changed, etc.
-	void ResetFontCaches()
+	void ResetFontCaches() override
 	{
 	}
 
-	virtual void DestroyTextureID( int id );
+	void DestroyTextureID( int id ) override;
 
-	virtual int GetTextureNumFrames( int id );
-	virtual void DrawSetTextureFrame( int id, int nFrame, unsigned int *pFrameCache );
+	int GetTextureNumFrames( int id ) override;
+	void DrawSetTextureFrame( int id, int nFrame, unsigned int *pFrameCache ) override;
 
 
-	virtual void DrawUpdateRegionTextureRGBA( int nTextureID, int x, int y, const unsigned char *pchData, int wide, int tall, ImageFormat imageFormat ) 
+	void DrawUpdateRegionTextureRGBA( int, int, int, const unsigned char *, int, int, ImageFormat ) override
 	{
 	}
-	virtual bool BHTMLWindowNeedsPaint(IHTML *htmlwin)
+	bool BHTMLWindowNeedsPaint(IHTML *) override
 	{
 		return false;
 	}
 
 
-	virtual const char *GetWebkitHTMLUserAgentString();
+	const char *GetWebkitHTMLUserAgentString() override;
 
-	virtual void *Deprecated_AccessChromeHTMLController() { return NULL; }
+	void *Deprecated_AccessChromeHTMLController() override { return NULL; }
 
-	virtual void SetFullscreenViewport( int x, int y, int w, int h ) OVERRIDE 
+	void SetFullscreenViewport( int x, int y, int w, int h ) override 
 	{
 		m_nFullscreenViewportX = x; 
 		m_nFullscreenViewportY = y; 
@@ -367,19 +368,19 @@ public:
 		m_pFullscreenRenderTarget = NULL; 
 	}
 
-	virtual void GetFullscreenViewport( int & x, int & y, int & w, int & h ) OVERRIDE 
+	void GetFullscreenViewport( int & x, int & y, int & w, int & h ) override 
 	{ 
 		x = m_nFullscreenViewportX; 
 		y = m_nFullscreenViewportY; 
 		w = m_nFullscreenViewportWidth; 
 		h = m_nFullscreenViewportHeight;  
 	}
-	virtual void PushFullscreenViewport();
-	virtual void PopFullscreenViewport();
+	void PushFullscreenViewport() override;
+	void PopFullscreenViewport() override;
 
 	// software cursors aren't available in tools
-	virtual void SetSoftwareCursor( bool bUseSoftwareCursor ) OVERRIDE {}
-	virtual void PaintSoftwareCursor()  OVERRIDE {}
+	void SetSoftwareCursor( bool ) override {}
+	void PaintSoftwareCursor() override {}
 
 private:
 
@@ -458,9 +459,8 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CWin32Surface, ISurface, VGUI_SURFACE_INTERFAC
 
 static UINT staticShutdownMsg = 0;
 static HICON staticDefaultCursor[20];
-static WNDCLASS staticWndclass = { NULL };
+static WNDCLASS staticWndclass = {};
 static ATOM staticWndclassAtom = 0;
-static bool staticStaticDataInitialized = false;
 static bool staticSurfaceAvailable;
 
 // these functions defined below
@@ -527,12 +527,12 @@ private:
 		return E_NOINTERFACE;
 	}
     
-    virtual ULONG STDMETHODCALLTYPE AddRef( void)
+    ULONG STDMETHODCALLTYPE AddRef( void) override
 	{
 		return ++_refCount;
 	}
     
-    virtual ULONG STDMETHODCALLTYPE Release( void)
+    ULONG STDMETHODCALLTYPE Release( void) override
 	{
 		return --_refCount;
 	}
@@ -547,7 +547,7 @@ private:
 		return DragOver(grfKeyState, pt, pdwEffect);
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+	virtual HRESULT STDMETHODCALLTYPE DragOver(DWORD, POINTL, DWORD *pdwEffect)
 	{
 		*pdwEffect = DROPEFFECT_NONE;
 
@@ -573,7 +573,7 @@ private:
 		return S_OK;
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE Drop(IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD * pdwEffect)
+	virtual HRESULT STDMETHODCALLTYPE Drop(IDataObject *, DWORD, POINTL, DWORD * pdwEffect)
 	{
 		*pdwEffect = DROPEFFECT_NONE;
 
@@ -663,7 +663,7 @@ bool CWin32Surface::TextureLessFunc(const Texture &lhs, const Texture &rhs)
 
 Texture *CWin32Surface::GetTextureById(int id)
 {
-	Texture findTex = { id };
+	Texture findTex = {id, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int index = m_VGuiSurfaceTextures.Find(findTex);
 	if (m_VGuiSurfaceTextures.IsValidIndex(index))
 	{
@@ -675,7 +675,7 @@ Texture *CWin32Surface::GetTextureById(int id)
 
 Texture *CWin32Surface::AllocTextureForId(int id)
 {
-	Texture newTex = { id };
+	Texture newTex = {id, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int index = m_VGuiSurfaceTextures.Insert(newTex);
 	return &m_VGuiSurfaceTextures[index];
 }
@@ -814,7 +814,7 @@ CWin32Surface::~CWin32Surface()
 //-----------------------------------------------------------------------------
 void CWin32Surface::Shutdown()
 {
-	for ( int i = m_FileTypeImages.First(); i != m_FileTypeImages.InvalidIndex(); i = m_FileTypeImages.Next( i ) )
+	for ( auto i = m_FileTypeImages.First(); i != m_FileTypeImages.InvalidIndex(); i = m_FileTypeImages.Next( i ) )
 	{
 		delete m_FileTypeImages[ i ];
 	}
@@ -854,18 +854,18 @@ VPANEL CWin32Surface::GetEmbeddedPanel()
 }
 
 	// SRC specific interfaces
- void CWin32Surface::DrawTexturedLine( const Vertex_t &a, const Vertex_t &b )
+ void CWin32Surface::DrawTexturedLine( const Vertex_t &, const Vertex_t & )
  {
 
  }
- void CWin32Surface::DrawOutlinedCircle(int x, int y, int radius, int segments) 
+ void CWin32Surface::DrawOutlinedCircle(int, int, int, int) 
  {
 
  }
- void CWin32Surface::DrawTexturedPolyLine( const Vertex_t *p,int n )
+ void CWin32Surface::DrawTexturedPolyLine( const Vertex_t *, int )
  {
  }
- void CWin32Surface::DrawTexturedSubRect( int x0, int y0, int x1, int y1, float texs0, float text0, float texs1, float text1 )
+ void CWin32Surface::DrawTexturedSubRect( int, int, int, int, float, float, float, float )
  {
  }
  void CWin32Surface::DrawTexturedPolygon(int n, Vertex_t *pVertices, bool bClipVertices /*= true*/)
@@ -905,24 +905,24 @@ VPANEL CWin32Surface::GetEmbeddedPanel()
 	}
  }
 
- const wchar_t *CWin32Surface::GetTitle(VPANEL panel)
+ const wchar_t *CWin32Surface::GetTitle(VPANEL)
  {
 	return L"";
  }
- void CWin32Surface::LockCursor( bool state )
+ void CWin32Surface::LockCursor( bool )
  {
  }
  bool CWin32Surface::IsCursorLocked( void ) const
  {
 	 return false;
  }
- void CWin32Surface::SetWorkspaceInsets( int left, int top, int right, int bottom )
+ void CWin32Surface::SetWorkspaceInsets( int, int, int, int )
  {
  }
  //-----------------------------------------------------------------------------
 // Connect, disconnect...
 //-----------------------------------------------------------------------------
-bool CWin32Surface::Connect( CreateInterfaceFn factory )
+bool CWin32Surface::Connect( CreateInterfaceFn )
 {	
 return true;
 }
@@ -935,7 +935,7 @@ void CWin32Surface::Disconnect()
 //-----------------------------------------------------------------------------
 // Access to other interfaces...
 //-----------------------------------------------------------------------------
-void *CWin32Surface::QueryInterface( const char *pInterfaceName )
+void *CWin32Surface::QueryInterface( const char * )
 {
 	return NULL;
 }
@@ -980,7 +980,7 @@ void CWin32Surface::SetEmbeddedPanel( VPANEL panel )
 }
 
 // Lower level char drawing code, call DrawGet then pass in info to DrawRender
-bool CWin32Surface::DrawGetUnicodeCharRenderInfo( wchar_t ch, CharRenderInfo& info )
+bool CWin32Surface::DrawGetUnicodeCharRenderInfo( wchar_t, CharRenderInfo& info )
 {
 	// Only supported in engine renderer!
 	Assert( 0 );
@@ -988,7 +988,7 @@ bool CWin32Surface::DrawGetUnicodeCharRenderInfo( wchar_t ch, CharRenderInfo& in
 	return false;
 }
 
-void CWin32Surface::DrawRenderCharFromInfo( const CharRenderInfo& info )
+void CWin32Surface::DrawRenderCharFromInfo( const CharRenderInfo& )
 {
 	Assert( 0 );
 }
@@ -1014,9 +1014,6 @@ VPANEL CWin32Surface::GetContextPanelForChildPanel(VPANEL childPanel)
 	}
 	return contextPanel;
 }
-
-// static currently used win32 Paint info
-static ::PAINTSTRUCT s_CurrentPaintStruct;
 
 void CWin32Surface::PushMakeCurrent(VPANEL panel, bool useInsets)
 {
@@ -1155,18 +1152,18 @@ bool CWin32Surface::IsScreenPosOverrideActive( void )
 	return ( m_ScreenPosOverride.m_bActive );
 }
 
-void CWin32Surface::DestroyTextureID( int id )
+void CWin32Surface::DestroyTextureID( int )
 {
 	// not implemented
 }
 
-int CWin32Surface::GetTextureNumFrames( int id )
+int CWin32Surface::GetTextureNumFrames( int )
 {
 	// not implemented
 	return 0;
 }
 
-void CWin32Surface::DrawSetTextureFrame( int id, int nFrame, unsigned int *pFrameCache )
+void CWin32Surface::DrawSetTextureFrame( int, int, unsigned int * )
 {
 	// not implemented
 }
@@ -1206,6 +1203,12 @@ void CWin32Surface::SetNotifyIcon(VPANEL context, HTexture iconID, VPANEL panelT
 			WM_MY_TRAY_NOTIFICATION,			// callback message
 			PLAT(context)->notifyIcon,  // icon handle
 			"",									// tooltip text
+			0,
+			0,
+			{},
+			{},
+			{},
+			0
 		};
 
 		strncpy(iconData.szTip, text, 63);
@@ -1256,6 +1259,12 @@ void CWin32Surface::SetNotifyIcon(VPANEL context, HTexture iconID, VPANEL panelT
 		WM_MY_TRAY_NOTIFICATION,			// callback message
 		PLAT(context)->notifyIcon,  // icon handle
 		"",									// tooltip text
+		0,
+		0,
+		{},
+		{},
+		{},
+		0
 	};
 
 	strncpy(iconData.szTip, text, 63);
@@ -1393,7 +1402,7 @@ void CWin32Surface::SetLineColor(Color col)
 }
 
 
-void CWin32Surface::DrawPrintText(const wchar_t *text, int textLen, FontDrawType_t drawType /*= FONT_DRAW_DEFAULT*/)
+void CWin32Surface::DrawPrintText(const wchar_t *text, int textLen, FontDrawType_t /*= FONT_DRAW_DEFAULT*/)
 {
 	Assert(text);
 	if (!text)
@@ -1410,7 +1419,7 @@ void CWin32Surface::DrawPrintText(const wchar_t *text, int textLen, FontDrawType
 //	ExtTextOut(_currentContextPanel->Plat()->hdc, 0, 0, 0, NULL, text, textLen, NULL);
 }
 
-void CWin32Surface::DrawUnicodeString( const wchar_t *pwString, FontDrawType_t drawType /*= FONT_DRAW_DEFAULT*/)
+void CWin32Surface::DrawUnicodeString( const wchar_t *pwString, FontDrawType_t /*= FONT_DRAW_DEFAULT*/)
 {
 	Assert( pwString );
 	if ( !pwString )
@@ -1426,7 +1435,7 @@ void CWin32Surface::DrawUnicodeString( const wchar_t *pwString, FontDrawType_t d
 // Purpose: draws single unicode character at the current position with the
 //			current font & color
 //-----------------------------------------------------------------------------
-void CWin32Surface::DrawUnicodeChar(wchar_t wch, FontDrawType_t drawType /*= FONT_DRAW_DEFAULT*/)
+void CWin32Surface::DrawUnicodeChar(wchar_t wch, FontDrawType_t /*= FONT_DRAW_DEFAULT*/)
 {
 	// set the current font
 	CWin32Font *winFont = FontManager().GetFontForChar(m_hCurrentFont, wch);
@@ -1446,7 +1455,7 @@ void CWin32Surface::DrawUnicodeChar(wchar_t wch, FontDrawType_t drawType /*= FON
 //-----------------------------------------------------------------------------
 // Purpose: allocates a new texture id
 //-----------------------------------------------------------------------------
-int CWin32Surface::CreateNewTextureID( bool procedural )
+int CWin32Surface::CreateNewTextureID( bool )
 {
 	//!! hack, arbitrary base
 	static int staticBindIndex = 2700;
@@ -1499,7 +1508,7 @@ bool CWin32Surface::DeleteTextureByID(int id)
 	AUTO_LOCK( m_MutexTextureData );
 #endif
 
-	Texture findTex = { id };
+	Texture findTex = {id, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int index = m_VGuiSurfaceTextures.Find(findTex);
 	if (m_VGuiSurfaceTextures.IsValidIndex(index))
 	{
@@ -1526,7 +1535,7 @@ void CWin32Surface::DrawFlushText()
 //-----------------------------------------------------------------------------
 // Purpose: create a html helper object
 //-----------------------------------------------------------------------------
-IHTML *CWin32Surface::CreateHTMLWindow(vgui::IHTMLEvents *events, VPANEL context )
+IHTML *CWin32Surface::CreateHTMLWindow(vgui::IHTMLEvents *, VPANEL )
 {
 	return NULL;
 }
@@ -1535,7 +1544,7 @@ IHTML *CWin32Surface::CreateHTMLWindow(vgui::IHTMLEvents *events, VPANEL context
 //-----------------------------------------------------------------------------
 // Purpose: delete an html helper object
 //-----------------------------------------------------------------------------
-void CWin32Surface::DeleteHTMLWindow(IHTML *htmlwin)
+void CWin32Surface::DeleteHTMLWindow(IHTML *)
 {
 }
 
@@ -1543,13 +1552,13 @@ void CWin32Surface::DeleteHTMLWindow(IHTML *htmlwin)
 //-----------------------------------------------------------------------------
 // Purpose: tell a html window to update its backing texture
 //-----------------------------------------------------------------------------
-void CWin32Surface::PaintHTMLWindow(IHTML *htmlwin)
+void CWin32Surface::PaintHTMLWindow(IHTML *)
 {
 }
 
 
 //-----------------------------------------------------------------------------
-void CWin32Surface::SetAllowHTMLJavaScript( bool state ) 
+void CWin32Surface::SetAllowHTMLJavaScript( bool ) 
 { 
 }
 
@@ -1566,7 +1575,7 @@ HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, int bpp, void **di
 //-----------------------------------------------------------------------------
 // Purpose: maps a texture from memory to an id, and uploads it into the engine
 //-----------------------------------------------------------------------------
-void CWin32Surface::DrawSetTextureRGBA(int id,const unsigned char* rgba,int wide,int tall, int hardwareFilter, bool forceReload)
+void CWin32Surface::DrawSetTextureRGBA(int id,const unsigned char* rgba,int wide,int tall, int, bool)
 {
 	DrawSetTextureRGBAEx( id, rgba, wide, tall, IMAGE_FORMAT_RGBA8888 );
 }
@@ -1574,7 +1583,7 @@ void CWin32Surface::DrawSetTextureRGBA(int id,const unsigned char* rgba,int wide
 //-----------------------------------------------------------------------------
 // Purpose: maps a texture from memory to an id, and uploads it into the engine
 //-----------------------------------------------------------------------------
-void CWin32Surface::DrawSetTextureRGBAEx(int id,const unsigned char* rgba,int wide,int tall, ImageFormat imageFormat )
+void CWin32Surface::DrawSetTextureRGBAEx(int id,const unsigned char* rgba,int wide,int tall, ImageFormat )
 {
 	Texture *texture = GetTextureById(id);
 
@@ -1653,7 +1662,7 @@ int	  CWin32Surface::DrawGetTextureId( char const *filename )
 // Purpose: Maps a texture file to an id, and makes it the current drawing texture
 //			tries to load as a .tga first, and if not found as a .bmp
 //-----------------------------------------------------------------------------
-void CWin32Surface::DrawSetTextureFile(int id, const char *filename, int hardwareFilter, bool forceReload /*= false*/)
+void CWin32Surface::DrawSetTextureFile(int id, const char *filename, int, bool forceReload /*= false*/)
 {
 	Texture *texture = GetTextureById(id);
 	
@@ -1689,7 +1698,7 @@ void CWin32Surface::DrawSetTextureFile(int id, const char *filename, int hardwar
 			const char *psz = Q_stristr(filename, "vgui/");
 			if (psz)
 			{
-				success = LoadTGA(texture, filename + strlen("vgui/"));
+				success = LoadTGA(texture, filename + ssize("vgui/") - 1);
 			}
 		}
 
@@ -2149,7 +2158,7 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 				if (src[3])
 				{
 					// mask will be & with background, so it needs to be 0xFF
-					maskDst[0] = maskDst[1] = maskDst[2] = maskDst[3] = -1;;
+					maskDst[0] = maskDst[1] = maskDst[2] = maskDst[3] = -1;
 
 					// clear the art in the bitmap because it's not going to display and will be | with background
 					dst[0] = dst[1] = dst[2] = dst[3] = 0;
@@ -2220,7 +2229,7 @@ void CWin32Surface::MovePopupToFront(VPANEL panel)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CWin32Surface::MovePopupToBack(VPANEL panel)
+void CWin32Surface::MovePopupToBack(VPANEL)
 {
 }
 
@@ -2289,7 +2298,7 @@ void CWin32Surface::FlashWindow(VPANEL panel, bool state)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CWin32Surface::SetTopLevelFocus(VPANEL panel)
+void CWin32Surface::SetTopLevelFocus(VPANEL)
 {
 	// this is handled by WM_FOCUS messages instead of directly
 }
@@ -2359,7 +2368,7 @@ void CWin32Surface::SetAsToolBar(VPANEL panel, bool state)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CWin32Surface::GetPopupCount()
+intp CWin32Surface::GetPopupCount()
 {
 	return _popupList.GetCount();
 }
@@ -2502,7 +2511,7 @@ void CWin32Surface::CreatePopup(VPANEL panel, bool minimised, bool showTaskbarIc
 //-----------------------------------------------------------------------------
 // Purpose: Called when a panel is created
 //-----------------------------------------------------------------------------
-void CWin32Surface::AddPanel(VPANEL panel)
+void CWin32Surface::AddPanel(VPANEL)
 {
 }
 
@@ -2833,7 +2842,7 @@ void CWin32Surface::PaintTraverse(VPANEL panel)
 }
 
 // FIXME: write these functions!
-void CWin32Surface::RestrictPaintToSinglePanel(VPANEL panel)
+void CWin32Surface::RestrictPaintToSinglePanel(VPANEL)
 {
 }
 
@@ -2854,7 +2863,7 @@ void CWin32Surface::LockCursor()
 {
 }
 
-void CWin32Surface::SetTranslateExtendedKeys(bool state)
+void CWin32Surface::SetTranslateExtendedKeys(bool)
 {
 }
 
@@ -3214,7 +3223,7 @@ void CWin32Surface::GetTextSize(HFont font, const wchar_t *text, int &wide, int 
 //-----------------------------------------------------------------------------
 // Purpose: adds a custom font file (only supports true type font files (.ttf) for now)
 //-----------------------------------------------------------------------------
-bool CWin32Surface::AddCustomFontFile(const char *fontName, const char *fontFileName)
+bool CWin32Surface::AddCustomFontFile(const char *, const char *fontFileName)
 {
 	char fullPath[ MAX_PATH ];
 	g_pFullFileSystem->GetLocalPath(fontFileName, fullPath, sizeof( fullPath ));
@@ -3225,27 +3234,27 @@ bool CWin32Surface::AddCustomFontFile(const char *fontName, const char *fontFile
 //-----------------------------------------------------------------------------
 // Purpose: Pre-compiled bitmap font support for game engine - not implemented for GDI
 //-----------------------------------------------------------------------------
-bool CWin32Surface::AddBitmapFontFile(const char *fontFileName)
+bool CWin32Surface::AddBitmapFontFile(const char *)
 {
 	Assert( 0 );
 	return false;
 }
-void CWin32Surface::SetBitmapFontName( const char *pName, const char *pFontFilename )
+void CWin32Surface::SetBitmapFontName( const char *, const char * )
 {
 	Assert( 0 );
 }
-const char *CWin32Surface::GetBitmapFontName( const char *pName )
+const char *CWin32Surface::GetBitmapFontName( const char * )
 {
 	Assert( 0 );
 	return NULL;
 }
-bool CWin32Surface::SetBitmapFontGlyphSet(HFont font, const char *windowsFontName, float scalex, float scaley, int flags)
+bool CWin32Surface::SetBitmapFontGlyphSet(HFont, const char *, float, float, int)
 {
 	Assert( 0 );
 	return false;
 }
 
-void CWin32Surface::PrecacheFontCharacters(HFont font, const wchar_t *pCharacters)
+void CWin32Surface::PrecacheFontCharacters(HFont, const wchar_t *)
 {
 	Assert( 0 );
 }
@@ -3265,21 +3274,21 @@ const char *CWin32Surface::GetFontFamilyName( HFont font )
 	return FontManager().GetFontFamilyName( font );
 }
 
-void CWin32Surface::DrawSetTextScale(float sx, float sy)
+void CWin32Surface::DrawSetTextScale(float, float)
 {
 	Assert( 0 );
 }
-void CWin32Surface::SetPanelForInput( VPANEL vpanel )
-{
-	Assert( 0 );
-}
-
-void CWin32Surface::DrawFilledRectFastFade( int x0, int y0, int x1, int y1, int fadeStartPt, int fadeEndPt, unsigned int alpha0, unsigned int alpha1, bool bHorizontal )
+void CWin32Surface::SetPanelForInput( VPANEL )
 {
 	Assert( 0 );
 }
 
-void CWin32Surface::DrawFilledRectFade( int x0, int y0, int x1, int y1, unsigned int alpha0, unsigned int alpha1, bool bHorizontal )
+void CWin32Surface::DrawFilledRectFastFade( int, int, int, int, int, int, unsigned int, unsigned int, bool )
+{
+	Assert( 0 );
+}
+
+void CWin32Surface::DrawFilledRectFade( int, int, int, int, unsigned int, unsigned int, bool )
 {
 	Assert( 0 );
 }
@@ -3418,13 +3427,13 @@ public:
 	}
 
 	// Sets the size of the image
-	virtual void SetSize(int wide, int tall)
+	virtual void SetSize(int, int)
 	{
 		// Nothing
 	}
 
 	// Set the draw color 
-	virtual void SetColor(Color col)
+	virtual void SetColor(Color)
 	{
 		// Nothing
 	}
@@ -3432,10 +3441,10 @@ public:
 	virtual bool Evict() { return false; }
 
 	virtual int GetNumFrames() { return 0; }
-	virtual void SetFrame( int nFrame ) {}
+	virtual void SetFrame( int ) {}
 	
 	virtual HTexture GetID() { return 0; }
-	virtual void SetRotation( int iRotation ) { return; };
+	virtual void SetRotation( int ) { return; };
 
 private:
 
@@ -3457,7 +3466,7 @@ IImage *CWin32Surface::GetIconImageForFullPath( char const *pFullPath )
 {
 	IImage *newIcon = NULL;
 
-	SHFILEINFO info = { 0 };
+	SHFILEINFO info = {};
 	DWORD_PTR dwResult = SHGetFileInfo( 
 		pFullPath,
 		0,
@@ -3545,7 +3554,7 @@ bool CWin32Surface::SupportsFeature(SurfaceFeature_e feature)
 	case ISurface::OUTLINE_FONTS:
 	default:
 		return false;
-	};
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -3582,7 +3591,7 @@ void CWin32Surface::initStaticData()
 	const char *sIconResourceID = getenv(szSteamBootStrapperIconIdEnvVar);
 	if ( sIconResourceID )
 	{
-		DWORD wTmpIconID = 0;
+		unsigned wTmpIconID = 0;
 		if ( sscanf(sIconResourceID, "%u", &wTmpIconID) == 1 && wTmpIconID > 101 )
 		{
 			wIconID = wTmpIconID;
@@ -3918,7 +3927,7 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 					default: case VK_CAPITAL: toggleCode = KEY_CAPSLOCKTOGGLE; break;
 					case VK_SCROLL: toggleCode = KEY_SCROLLLOCKTOGGLE; break;
 					case VK_NUMLOCK: toggleCode = KEY_NUMLOCKTOGGLE; break;
-					};
+					}
 
 					SHORT wState = GetKeyState( code );
 					bool bToggleState = ( wState & 0x1 ) != 0;

@@ -255,7 +255,7 @@ void Border::SetName(const char *name)
 		delete [] _name;
 	}
 
-	int len = Q_strlen(name) + 1;
+	intp len = Q_strlen(name) + 1;
 	_name = new char[ len ];
 	Q_strncpy( _name, name, len );
 }

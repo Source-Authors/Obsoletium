@@ -31,18 +31,18 @@ public:
 	~MemoryBitmap();
 
 	// IImage implementation
-	virtual void Paint();
-	virtual void GetSize(int &wide, int &tall);
-	virtual void GetContentSize(int &wide, int &tall);
-	virtual void SetPos(int x, int y);
-	virtual void SetSize(int x, int y);
-	virtual void SetColor(Color col);
+	void Paint() override;
+	void GetSize(int &wide, int &tall) override;
+	void GetContentSize(int &wide, int &tall) override;
+	void SetPos(int x, int y) override;
+	void SetSize(int x, int y) override;
+	void SetColor(Color col) override;
 
-	virtual bool Evict() { return false; }
-	virtual int GetNumFrames() { return 0; }
-	virtual void SetFrame( int nFrame ) {}
-	virtual HTexture GetID();		// returns the texture id
-	virtual void SetRotation( int iRotation ) { return; };
+	bool Evict() override { return false; }
+	int GetNumFrames() override { return 0; }
+	void SetFrame( int ) override {}
+	HTexture GetID() override;		// returns the texture id
+	void SetRotation( int ) override { return; };
 
 	// methods
 	void ForceUpload(unsigned char *texture,int wide, int tall);	// ensures the bitmap has been uploaded

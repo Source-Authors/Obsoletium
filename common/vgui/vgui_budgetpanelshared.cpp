@@ -226,8 +226,12 @@ void CBudgetPanelShared::SnapshotVProfHistory( float filteredtime  )
 		float times[IVProfExport::MAX_BUDGETGROUP_TIMES];
 		g_pVProfExport->GetBudgetGroupTimes( times );
 
-		for ( int groupID=0; groupID < GetNumCachedBudgetGroups(); groupID++ )
+		for ( intp groupID=0; groupID < GetNumCachedBudgetGroups(); groupID++ )
 		{
+			Assert( groupID < ssize(times) );
+			if ( groupID >= ssize(times) )
+				break;
+
 			float dt = times[groupID];
 			// Hack:  add filtered time into unnaccounted group...
 			if ( groupID == VPROF_BUDGET_GROUP_ID_UNACCOUNTED )
@@ -242,7 +246,7 @@ void CBudgetPanelShared::SnapshotVProfHistory( float filteredtime  )
 
 void CBudgetPanelShared::SetTimeLabelText()
 {
-	for ( int i=0; i < m_TimeLabels.Count(); i++ )
+	for ( intp i=0; i < m_TimeLabels.Count(); i++ )
 	{
 		char text[512];
 		Q_snprintf( text, sizeof( text ), "%dms", (int)( i * GetConfigData().m_flTimeLabelInterval ) );

@@ -276,7 +276,7 @@ public:
 
 	//!! these functions should not be accessed directly, but only through other vgui items
 	//!! need to move these to seperate interface
-	virtual int GetPopupCount() = 0;
+	virtual ptrdiff_t GetPopupCount() = 0;
 	virtual VPANEL GetPopup(int index) = 0;
 	virtual bool ShouldPaintChildPanel(VPANEL childPanel) = 0;
 	virtual bool RecreateContext(VPANEL panel) = 0;
@@ -331,7 +331,7 @@ public:
 	// video mode changing
 	virtual void OnScreenSizeChanged( int nOldWidth, int nOldHeight ) = 0;
 
-	virtual vgui::HCursor CreateCursorFromFile( char const *curOrAniFile, char const *pPathID = 0 ) = 0;
+	virtual vgui::HCursor CreateCursorFromFile( char const *curOrAniFile, char const *pPathID = nullptr ) = 0;
 
 	// create IVguiMatInfo object ( IMaterial wrapper in VguiMatSurface, NULL in CWin32Surface )
 	virtual IVguiMatInfo *DrawGetTextureMatInfoFactory( int id ) = 0;

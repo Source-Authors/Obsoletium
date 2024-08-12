@@ -84,7 +84,7 @@ public:
 	void MarkAsDedicatedServer() { m_bDedicated = true; } // plays nicer as part of a vgui window setup
 	bool IsDedicated() const { return m_bDedicated; }
 
-	const double *GetBudgetGroupData( int &nGroups, int &nSamplesPerGroup, int &nSampleOffset ) const;
+	const double *GetBudgetGroupData( intp &nGroups, int &nSamplesPerGroup, int &nSampleOffset ) const;
 	
 	void GetGraphLabelScreenSpaceTopAndBottom( int id, int &top, int &bottom );
 
@@ -95,7 +95,7 @@ public:
 	const CBudgetPanelConfigData& GetConfigData() const;
 
 	// Returns the number of budget groups in the last OnConfigDataChanged call.
-	int GetNumCachedBudgetGroups() const;
+	intp GetNumCachedBudgetGroups() const;
 
 	// (Used by dedicated server, mark everything for a repaint).
 	void MarkForFullRepaint();
@@ -136,7 +136,7 @@ inline const CBudgetPanelConfigData& CBaseBudgetPanel::GetConfigData() const
 	return m_ConfigData;
 }
 
-inline int CBaseBudgetPanel::GetNumCachedBudgetGroups() const
+inline intp CBaseBudgetPanel::GetNumCachedBudgetGroups() const
 {
 	return m_ConfigData.m_BudgetGroupInfo.Count();
 }

@@ -156,14 +156,15 @@ void CBudgetBarGraphPanel::DrawTimeLines( void )
 
 void CBudgetBarGraphPanel::DrawInstantaneous()
 {
-	int nGroups, nSamplesPerGroup, nSampleOffset;
+	intp nGroups;
+	int nSamplesPerGroup, nSampleOffset;
 	const double *pBudgetGroupTimes = m_pBudgetPanel->GetBudgetGroupData( nGroups, nSamplesPerGroup, nSampleOffset );
 	if( !pBudgetGroupTimes )
 	{
 		return;
 	}
 
-	int i;
+	intp i;
 	for( i = 0; i < nGroups; i++ )
 	{
 		float percent = m_pBudgetPanel->GetBudgetGroupPercent( pBudgetGroupTimes[nSamplesPerGroup * i + nSampleOffset] );
@@ -173,14 +174,15 @@ void CBudgetBarGraphPanel::DrawInstantaneous()
 
 void CBudgetBarGraphPanel::DrawPeaks()
 {
-	int nGroups, nSamplesPerGroup, nSampleOffset;
+	intp nGroups;
+	int nSamplesPerGroup, nSampleOffset;
 	const double *pBudgetGroupTimes = m_pBudgetPanel->GetBudgetGroupData( nGroups, nSamplesPerGroup, nSampleOffset );
 	if( !pBudgetGroupTimes )
 	{
 		return;
 	}
 	int numSamples = budget_peaks_window.GetInt();
-	int i;
+	intp i;
 	for( i = 0; i < nGroups; i++ )
 	{
 		double max = 0;
@@ -202,14 +204,15 @@ void CBudgetBarGraphPanel::DrawPeaks()
 
 void CBudgetBarGraphPanel::DrawAverages()
 {
-	int nGroups, nSamplesPerGroup, nSampleOffset;
+	intp nGroups;
+	int nSamplesPerGroup, nSampleOffset;
 	const double *pBudgetGroupTimes = m_pBudgetPanel->GetBudgetGroupData( nGroups, nSamplesPerGroup, nSampleOffset );
 	if( !pBudgetGroupTimes )
 	{
 		return;
 	}
 	int numSamples = budget_averages_window.GetInt();
-	int i;
+	intp i;
 	for( i = 0; i < nGroups; i++ )
 	{
 		int red, green, blue, alpha;
