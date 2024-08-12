@@ -34,7 +34,7 @@ typedef UniqueId_t DmObjectId_t;
 //-----------------------------------------------------------------------------
 struct DmUnknownAttribute_t
 {
-	bool operator==( const DmUnknownAttribute_t& src ) const { return true; }
+	bool operator==( const DmUnknownAttribute_t& ) const { return true; }
 };
 
 
@@ -233,7 +233,7 @@ template <typename T>
 class CDmAttributeInfo
 {
 public:
-	enum { ATTRIBUTE_TYPE = AT_UNKNOWN };
+	static constexpr DmAttributeType_t ATTRIBUTE_TYPE = AT_UNKNOWN;
 
 	typedef T StorageType_t;
 
@@ -258,7 +258,7 @@ public:
 	template< > class CDmAttributeInfo< _className >						\
 	{																		\
 	public:																	\
-		enum { ATTRIBUTE_TYPE = _attributeType };							\
+		static constexpr DmAttributeType_t ATTRIBUTE_TYPE = _attributeType;	\
 		typedef _storageType StorageType_t;									\
 		static DmAttributeType_t AttributeType() { return _attributeType; }	\
 		static const char *AttributeTypeName() { return _attributeName; }	\
@@ -269,7 +269,7 @@ public:
 	template< > class CDmAttributeInfo< CUtlVector<_className> >				\
 	{																			\
 	public:																		\
-		enum { ATTRIBUTE_TYPE = _attributeType };								\
+		static constexpr DmAttributeType_t ATTRIBUTE_TYPE = _attributeType;		\
 		typedef _storageType StorageType_t;										\
 		static DmAttributeType_t AttributeType() { return _attributeType; }		\
 		static const char *AttributeTypeName() { return _attributeName; }		\

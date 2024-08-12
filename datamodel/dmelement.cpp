@@ -100,8 +100,13 @@ CDmElementFactoryHelper g_CDmeElement_Helper( "DmeElement", &g_CDmeElement_Facto
 // Constructor, destructor 
 //-----------------------------------------------------------------------------
 CDmElement::CDmElement( DmElementHandle_t handle, const char *pElementType, const DmObjectId_t &id, const char *pElementName, DmFileId_t fileid ) : 
-	m_ref( handle ), m_Type( g_pDataModel->GetSymbol( pElementType ) ), m_fileId( fileid ),
-	m_pAttributes( NULL ), m_bDirty( false ), m_bBeingUnserialized( false ), m_bIsAcessible( true )
+	m_pAttributes( NULL ),
+	m_ref( handle ),
+	m_Type( g_pDataModel->GetSymbol( pElementType ) ),
+	m_bDirty( false ),
+	m_bBeingUnserialized( false ),
+	m_bIsAcessible( true ),
+	m_fileId( fileid )	
 {
 	MEM_ALLOC_CREDIT();
 	g_pDataModelImp->AddElementToFile( m_ref.m_hElement, m_fileId );
@@ -346,8 +351,8 @@ void CDmElement::MarkAccessible( TraversalDepth_t depth /* = TD_ALL */ )
 		else if ( pAttr->GetType() == AT_ELEMENT_ARRAY )
 		{
 			const CDmrElementArrayConst<> elementArrayAttr( pAttr );
-			int nChildren = elementArrayAttr.Count();
-			for ( int i = 0; i < nChildren; ++i )
+			intp nChildren = elementArrayAttr.Count();
+			for ( intp i = 0; i < nChildren; ++i )
 			{
 				CDmElement *pChild = elementArrayAttr[ i ];
 				if ( !pChild )
@@ -374,7 +379,7 @@ bool CDmElement::FindElement( const CDmElement *pElement, CUtlVector< ElementPat
 	if ( elementPath.Find( search ) != elementPath.InvalidIndex() )
 		return false;
 
-	int idx = elementPath.AddToTail( search );
+	auto idx = elementPath.AddToTail( search );
 	ElementPathItem_t &pathItem = elementPath[ idx ];
 
 	for ( const CDmAttribute *pAttr = FirstAttribute(); pAttr != NULL; pAttr = pAttr->NextAttribute() )
@@ -396,8 +401,8 @@ bool CDmElement::FindElement( const CDmElement *pElement, CUtlVector< ElementPat
 			pathItem.hAttribute = const_cast< CDmAttribute* >( pAttr )->GetHandle();
 
 			CDmrElementArrayConst<> elementArrayAttr( pAttr );
-			int nChildren = elementArrayAttr.Count();
-			for ( int i = 0; i < nChildren; ++i )
+			intp nChildren = elementArrayAttr.Count();
+			for ( intp i = 0; i < nChildren; ++i )
 			{
 				pathItem.nIndex = i;
 
@@ -430,7 +435,7 @@ bool CDmElement::FindReferer( DmElementHandle_t hElement, CUtlVector< ElementPat
 		if ( elementPath.Find( ElementPathItem_t( hOwner ) ) != elementPath.InvalidIndex() )
 			return false;
 
-		int i = elementPath.AddToTail();
+		auto i = elementPath.AddToTail();
 		ElementPathItem_t &item = elementPath[ i ];
 		item.hElement = hOwner;
 		item.hAttribute = pAttr->GetHandle();
@@ -469,8 +474,8 @@ void CDmElement::RemoveAllReferencesToElement( CDmElement *pElement )
 		else if ( pAttr->GetType() == AT_ELEMENT_ARRAY )
 		{
 			CDmrElementArray<> elementArrayAttr( pAttr );
-			int nChildren = elementArrayAttr.Count();
-			for ( int i = nChildren - 1; i >= 0; --i )
+			intp nChildren = elementArrayAttr.Count();
+			for ( intp i = nChildren - 1; i >= 0; --i )
 			{
 				CDmElement *pChild = elementArrayAttr[ i ];
 				if ( pChild == pElement )
@@ -515,12 +520,12 @@ void CDmElement::CopyAttributesTo( CDmElement *pCopy, TraversalDepth_t depth ) c
 	CopyAttributesTo( pCopy, refmap, depth );
 
 	CUtlHashFast< DmElementHandle_t > visited;
-	uint nPow2Size = 1;
+	size_t nPow2Size = 1;
 	while( nPow2Size < refmap.Count() )
 	{
-		nPow2Size <<= 1;
+		nPow2Size <<= 1U;
 	}
-	visited.Init( nPow2Size );
+	visited.Init( static_cast<intp>(nPow2Size) );
 	pCopy->FixupReferences( visited, refmap, depth );
 }
 
@@ -581,10 +586,10 @@ void CDmElement::CopyElementArrayAttribute( const CDmAttribute *pAttr, CDmAttrib
 
 	bool bCopy = ShouldTraverse( pAttr, depth );
 
-	int n = srcAttr.Count();
+	intp n = srcAttr.Count();
 	destAttr.EnsureCapacity( n );
 
-	for ( int i = 0; i < n; ++i )
+	for ( intp i = 0; i < n; ++i )
 	{
 		DmElementHandle_t hSrc = srcAttr.GetHandle( i );
 		CDmElement *pSrc = srcAttr[i];
@@ -601,7 +606,7 @@ void CDmElement::CopyElementArrayAttribute( const CDmAttribute *pAttr, CDmAttrib
 			continue;
 		}
 
-		int idx = refmap.Find( hSrc );
+		auto idx = refmap.Find( hSrc );
 		if ( idx != refmap.InvalidIndex() )
 		{
 			destAttr.AddToTail( refmap[ idx ] );
@@ -717,11 +722,11 @@ void CDmElement::FixupReferences( CUtlHashFast< DmElementHandle_t > &visited, co
 		else if ( type == AT_ELEMENT_ARRAY )
 		{
 			CDmrElementArray<> attrArray( pAttr );
-			int nElements = attrArray.Count();
-			for ( int i = 0; i < nElements; ++i )
+			intp nElements = attrArray.Count();
+			for ( intp i = 0; i < nElements; ++i )
 			{
 				DmElementHandle_t handle = attrArray.GetHandle( i );
-				int idx = refmap.Find( handle );
+				auto idx = refmap.Find( handle );
 				if ( idx == refmap.InvalidIndex() )
 				{
 					CDmElement *pElement = GetElement< CDmElement >( handle );
@@ -812,8 +817,8 @@ void CDmElement::SetFileId_R( CUtlHashFast< DmElementHandle_t > &visited, DmFile
 		else if ( type == AT_ELEMENT_ARRAY )
 		{
 			CDmrElementArray<> attrArray( pAttr );
-			int nElements = attrArray.Count();
-			for ( int i = 0; i < nElements; ++i )
+			intp nElements = attrArray.Count();
+			for ( intp i = 0; i < nElements; ++i )
 			{
 				CDmElement *pElement = attrArray[ i ];
 				if ( pElement )
@@ -881,9 +886,9 @@ public:
 	CUndoAttributeRemove( CDmElement *pElement, CDmAttribute *pOldAttribute, const char *attributeName, DmAttributeType_t type )
 		: BaseClass( "CUndoAttributeRemove" ),
 		m_pElement( pElement ),
-		m_pOldAttribute( pOldAttribute ),
 		m_symAttribute( attributeName ),
-		m_Type( type )
+		m_Type( type ),
+		m_pOldAttribute( pOldAttribute )
 	{
 		Assert( pElement && pElement->GetFileId() != DMFILEID_INVALID );
 	}
@@ -1080,7 +1085,7 @@ public:
 		m_bHoldingPtr = false;
 	}
 
-	virtual const char	*GetDesc()
+	virtual const char	*GetDesc() const
 	{
 		static char buf[ 128 ];
 
@@ -1271,8 +1276,8 @@ void DestroyElement( CDmElement *pElement, TraversalDepth_t depth )
 		case AT_ELEMENT_ARRAY:
 			{
 				CDmrElementArray<> array( pAttribute );
-				int nElements = array.Count();
-				for ( int i = 0; i < nElements; ++i )
+				intp nElements = array.Count();
+				for ( intp i = 0; i < nElements; ++i )
 				{
 					CDmElement *pChild = array[ i ];
 					DestroyElement( pChild, depth );
@@ -1293,11 +1298,10 @@ void CopyElements( const CUtlVector< CDmElement* > &from, CUtlVector< CDmElement
 	CDisableUndoScopeGuard sg;
 
 	CUtlMap< DmElementHandle_t, DmElementHandle_t, int > refmap( DefLessFunc( DmElementHandle_t ) );
-
-	int c = from.Count();
-	for ( int i = 0; i < c; ++i )
+	
+	intp c = from.Count();
+	for ( auto *pFrom : from )
 	{
-		CDmElement *pFrom = from[ i ];
 		CDmElement *pCopy = GetElement< CDmElement >( g_pDataModel->CreateElement( pFrom->GetType(), pFrom->GetName(), pFrom->GetFileId() ) );
 		if ( pCopy )
 		{
@@ -1307,14 +1311,14 @@ void CopyElements( const CUtlVector< CDmElement* > &from, CUtlVector< CDmElement
 	}
 
 	CUtlHashFast< DmElementHandle_t > visited;
-	uint nPow2Size = 1;
+	size_t nPow2Size = 1;
 	while( nPow2Size < refmap.Count() )
 	{
 		nPow2Size <<= 1;
 	}
-	visited.Init( nPow2Size );
+	visited.Init( static_cast<intp>(nPow2Size) );
 
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		to[ i ]->FixupReferences( visited, refmap, depth );
 	}
@@ -1330,11 +1334,11 @@ void CopyElements( const CUtlVector< CDmElement* > &from, CUtlVector< CDmElement
 struct ElementArrayNameAccessor
 {
 	ElementArrayNameAccessor( const CUtlVector< DmElementHandle_t > &array ) : m_array( array ) {}
-	int Count() const
+	intp Count() const
 	{
 		return m_array.Count();
 	}
-	const char *operator[]( int i ) const
+	const char *operator[]( intp i ) const
 	{
 		CDmElement *pElement = GetElement< CDmElement >( m_array[ i ] );
 		return pElement ? pElement->GetName() : NULL;
@@ -1370,8 +1374,8 @@ void MakeElementNameUnique( CDmElement *pElement, const char *prefix, const CUtl
 		i = 1; // 1 means that no names of "prefix*" were found, but we want to generate a 1-based index
 	}
 
-	int prefixLength = Q_strlen( prefix );
-	int newlen = prefixLength + ( int )log10( ( float )i ) + 1;
+	intp prefixLength = Q_strlen( prefix );
+	intp newlen = prefixLength + ( int )log10( ( float )i ) + 1;
 	if ( newlen < 256 )
 	{
 		char name[256];

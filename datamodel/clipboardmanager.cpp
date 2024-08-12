@@ -33,10 +33,9 @@ void CClipboardManager::EmptyClipboard( bool bClearWindowsClipboard )
 	{
 		m_pfnCleanup->ReleaseClipboardData( m_Data );
 	}
-	int c = m_Data.Count();
-	for ( int i = 0; i < c; ++i )
+	for ( auto *d : m_Data )
 	{
-		m_Data[ i ]->deleteThis();
+		d->deleteThis();
 	}
 	m_Data.RemoveAll();
 	m_pfnCleanup = NULL;
@@ -66,7 +65,7 @@ void CClipboardManager::SetClipboardData( CUtlVector< KeyValues * >& data, IClip
 		char const *text = m_Data[ 0 ]->GetString( "text", "" );
 		if ( text && text[ 0 ] )
 		{
-			int textLen = Q_strlen( text );
+			intp textLen = Q_strlen( text );
 
 			if ( ::OpenClipboard( ::GetDesktopWindow() ) )
 			{
@@ -100,8 +99,7 @@ void CClipboardManager::AddToClipboardData( KeyValues *add )
 		char const *text = m_Data[ 0 ]->GetString( "text", "" );
 		if ( text && text[ 0 ] )
 		{
-			int textLen = Q_strlen( text );
-
+			intp textLen = Q_strlen( text );
 
 			if ( ::OpenClipboard( ::GetDesktopWindow() ) )
 			{

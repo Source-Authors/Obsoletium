@@ -67,7 +67,7 @@ enum
 class CElementIdHash : public CUtlHash< DmElementHandle_t >
 {
 public:
-	CElementIdHash( int nBucketCount = 0, int nGrowCount = 0, int nInitCount = 0 )
+	CElementIdHash( intp nBucketCount = 0, intp nGrowCount = 0, intp nInitCount = 0 )
 		: CUtlHash< DmElementHandle_t >( nBucketCount, nGrowCount, nInitCount, CompareFunc, KeyFunc )
 	{
 	}
@@ -86,41 +86,49 @@ protected:
 		return IsUniqueIdEqual( id, pElement->GetId() );
 	}
 
-	static unsigned int KeyFunc( DmElementHandle_t const& hElement )
+	static uintp KeyFunc( DmElementHandle_t const& hElement )
 	{
 		CDmElement *pElement = g_pDataModel->GetElement( hElement );
 		Assert( pElement );
 		if ( !pElement )
 			return 0;
+		
+		static_assert(sizeof(uintp) <= sizeof(decltype(pElement->GetId())));
 
-		return *( unsigned int* )&pElement->GetId();
+		uintp key;
+		std::memcpy( &key, &pElement->GetId(), sizeof(key) );
+		return key;
 	}
-	static unsigned int IdKeyFunc( DmObjectId_t const &src )
+	static uintp IdKeyFunc( DmObjectId_t const &src )
 	{
-		return *(unsigned int*)&src;
+		static_assert(sizeof(uintp) <= sizeof(decltype(src)));
+
+		uintp key;
+		std::memcpy( &key, &src, sizeof(key) );
+		return key;
 	}
 
 protected:
-	bool DoFind( DmObjectId_t const &src, unsigned int *pBucket, int *pIndex )
+	bool DoFind( DmObjectId_t const &src, uintp *pBucket, intp *pIndex )
 	{
 		// generate the data "key"
-		unsigned int key = IdKeyFunc( src );
+		uintp key = IdKeyFunc( src );
 
 		// hash the "key" - get the correct hash table "bucket"
-		unsigned int ndxBucket;
+		uintp ndxBucket;
 		if( m_bPowerOfTwo )
 		{
 			*pBucket = ndxBucket = ( key & m_ModMask );
 		}
 		else
 		{
-			int bucketCount = m_Buckets.Count();
+			intp bucketCount = m_Buckets.Count();
 			*pBucket = ndxBucket = key % bucketCount;
 		}
 
-		int ndxKeyData;
+		intp ndxKeyData;
 		CUtlVector< DmElementHandle_t > &bucket = m_Buckets[ndxBucket];
-		int keyDataCount = bucket.Count();
+		intp keyDataCount = bucket.Count();
 		for( ndxKeyData = 0; ndxKeyData < keyDataCount; ndxKeyData++ )
 		{
 			if( IdCompareFunc( bucket.Element( ndxKeyData ), src ) )
@@ -138,8 +146,8 @@ public:
 	UtlHashHandle_t Find( DmElementHandle_t const &src ) { return BaseClass::Find( src ); }
 	UtlHashHandle_t Find( DmObjectId_t const &src )
 	{
-		unsigned int ndxBucket;
-		int ndxKeyData;
+		uintp ndxBucket;
+		intp ndxKeyData;
 
 		if ( DoFind( src, &ndxBucket, &ndxKeyData ) )
 			return BuildHandle( ndxBucket, ndxKeyData );
@@ -161,11 +169,32 @@ struct FileElementSet_t
 		m_nElements( 0 )
 	{
 	}
-	FileElementSet_t( const FileElementSet_t& that ) : m_filename( that.m_filename ), m_format( that.m_format ), m_hRoot( DMELEMENT_HANDLE_INVALID ), m_bLoaded( that.m_bLoaded ), m_nElements( that.m_nElements )
+	FileElementSet_t( const FileElementSet_t& that )
+		: m_filename( that.m_filename ),
+		m_format( that.m_format ),
+		m_hRoot( DMELEMENT_HANDLE_INVALID ),
+		m_bLoaded( that.m_bLoaded ),
+		m_nElements( that.m_nElements )
 	{
 		// the only time this should be copy constructed is when passing in an empty set to the parent array
 		// otherwise it could get prohibitively expensive time and memory wise
 		Assert( that.m_nElements == 0 );
+	}
+	FileElementSet_t& operator=( const FileElementSet_t& that )
+	{
+		if (&that == this) return *this;
+
+		m_filename = that.m_filename;
+		m_format = that.m_format;
+		m_hRoot = DMELEMENT_HANDLE_INVALID;
+		m_bLoaded = that.m_bLoaded;
+		m_nElements = that.m_nElements;
+
+		// the only time this should be copy constructed is when passing in an empty set to the parent array
+		// otherwise it could get prohibitively expensive time and memory wise
+		Assert( that.m_nElements == 0 );
+
+		return *this;
 	}
 
 	UtlSymId_t m_filename;
@@ -190,13 +219,13 @@ public:
 // External interface
 public:
 	// Methods of IAppSystem
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void *QueryInterface( const char *pInterfaceName );
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void *QueryInterface( const char *pInterfaceName ) override;
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 	// Methods of IDataModel
-	virtual void				AddElementFactory( const char *pClassName, IDmElementFactory *pFactory );
+	void				AddElementFactory( const char *pClassName, IDmElementFactory *pFactory ) override;
 	virtual bool				HasElementFactory( const char *pElementType ) const;
 	virtual void				SetDefaultElementFactory( IDmElementFactory *pFactory );
 	virtual int					GetFirstFactory() const;
@@ -218,10 +247,10 @@ public:
 	virtual void				AddFormatUpdater( IDmFormatUpdater *pUpdater );
 	virtual const char*			GetFormatExtension( const char *pFormatName );
 	virtual const char*			GetFormatDescription( const char *pFormatName );
-	virtual int					GetFormatCount() const;
+	virtual intp				GetFormatCount() const;
 	virtual const char *		GetFormatName( int i ) const;
 	virtual const char *		GetDefaultEncoding( const char *pFormatName );
-	virtual int					GetEncodingCount() const;
+	virtual intp				GetEncodingCount() const;
 	virtual const char *		GetEncodingName( int i ) const;
 	virtual bool				IsEncodingBinary( const char *pEncodingName ) const;
 	virtual bool				DoesEncodingStoreVersionInFile( const char *pEncodingName ) const;
@@ -259,7 +288,7 @@ public:
 	virtual bool				CanRedo() const;
 	virtual void				StartUndo( const char *undodesc, const char *redodesc, int nChainingID = 0 );
 	virtual void				FinishUndo();
-	virtual void				AbortUndoableOperation();
+	void				AbortUndoableOperation() override;
 	virtual void				ClearRedo();
 	virtual const char			*GetUndoDesc();
 	virtual const char			*GetRedoDesc();
@@ -361,7 +390,13 @@ public:
 
 	void NotifyState( int nNotifyFlags );
 
-	int EstimateMemoryOverhead() const;
+	// estimate memory overhead
+	constexpr int EstimateMemoryOverhead() const
+	{
+		int nHandlesOverhead = sizeof( int ) + sizeof( CDmElement* ); // m_Handles
+		int nElementIdsOverhead = sizeof( DmElementHandle_t ); // this also has a 80k static overhead, since hash tables can't grow
+		return nHandlesOverhead + nElementIdsOverhead;
+	}
 
 	bool IsCreatingUntypedElements() const { return m_bOnlyCreateUntypedElements; }
 
@@ -396,9 +431,10 @@ private:
 			m_ref = that.m_ref;
 			return *this;
 		}
-		static unsigned int HashKey( const ElementIdHandlePair_t& that )
+		static uintp HashKey( const ElementIdHandlePair_t& that )
 		{
-			return *( unsigned int* )&that.m_id.m_Value;
+			static_assert( sizeof(uintp) <= sizeof(decltype(that.m_id.m_Value)) );
+			return *( uintp* )&that.m_id.m_Value;
 		}
 		static bool Compare( const ElementIdHandlePair_t& a, const ElementIdHandlePair_t& b )
 		{

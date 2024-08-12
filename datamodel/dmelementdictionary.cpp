@@ -63,7 +63,7 @@ void CDmElementDictionary::AddAttribute( CDmAttribute *pAttribute, const DmObjec
 	if ( m_elementsToDelete.Find( pAttribute->GetOwner()->GetHandle() ) != m_elementsToDelete.InvalidIndex() )
 		return; // don't add attributes if their element is being deleted
 
-	int i = m_Attributes.AddToTail();
+	auto i = m_Attributes.AddToTail();
 	m_Attributes[i].m_nType = AT_OBJECTID;
 	m_Attributes[i].m_pAttribute = pAttribute;
 	CopyUniqueId( objectId, &m_Attributes[i].m_ObjectId );
@@ -78,7 +78,7 @@ void CDmElementDictionary::AddArrayAttribute( CDmAttribute *pAttribute, DmElemen
 	if ( m_elementsToDelete.Find( pAttribute->GetOwner()->GetHandle() ) != m_elementsToDelete.InvalidIndex() )
 		return; // don't add attributes if their element is being deleted
 
-	int i = m_ArrayAttributes.AddToTail();
+	auto i = m_ArrayAttributes.AddToTail();
 	m_ArrayAttributes[i].m_nType = AT_ELEMENT;
 	m_ArrayAttributes[i].m_pAttribute = pAttribute;
 	m_ArrayAttributes[i].m_hElement = hElement;
@@ -89,7 +89,7 @@ void CDmElementDictionary::AddArrayAttribute( CDmAttribute *pAttribute, const Dm
 	if ( m_elementsToDelete.Find( pAttribute->GetOwner()->GetHandle() ) != m_elementsToDelete.InvalidIndex() )
 		return; // don't add attributes if their element is being deleted
 
-	int i = m_ArrayAttributes.AddToTail();
+	auto i = m_ArrayAttributes.AddToTail();
 	m_ArrayAttributes[i].m_nType = AT_OBJECTID;
 	m_ArrayAttributes[i].m_pAttribute = pAttribute;
 	CopyUniqueId( objectId, &m_ArrayAttributes[i].m_ObjectId );
@@ -142,7 +142,7 @@ DmElementHandle_t CDmElementDictionary::SetElementId( DmElementDictHandle_t hDic
 	{
 		DmElementHandle_t hExistingElement = g_pDataModel->FindElement( newId );
 
-		int i = m_elementsToDelete.AddToTail( );
+		auto i = m_elementsToDelete.AddToTail();
 		m_elementsToDelete[i].m_hDictHandle = hDictHandle;
 		m_elementsToDelete[i].m_hElementToDelete = hElement;
 		m_elementsToDelete[i].m_hReplacementElement = hExistingElement;
@@ -199,8 +199,8 @@ DmElementDictHandle_t CDmElementDictionary::FindElement( CDmElement *pElement )
 //-----------------------------------------------------------------------------
 void CDmElementDictionary::HookUpElementAttributes()
 {
-	int n = m_Attributes.Count();
-	for ( int i = 0; i < n; ++i )
+	intp n = m_Attributes.Count();
+	for ( intp i = 0; i < n; ++i )
 	{
 		Assert( m_Attributes[i].m_pAttribute->GetType() == AT_ELEMENT );
 		Assert( m_Attributes[i].m_nType == AT_OBJECTID );
@@ -222,15 +222,15 @@ void CDmElementDictionary::HookUpElementArrayAttributes()
 {
 	// Find unique array attributes; we need to clear them all before adding stuff.
 	// This clears them of stuff added during their construction phase.
-	int n = m_ArrayAttributes.Count();
+	intp n = m_ArrayAttributes.Count();
 	CUtlRBTree< CDmAttribute*, unsigned short >	lookup( 0, n, DefLessFunc(CDmAttribute*) );
-	for ( int i = 0; i < n; ++i )
+	for ( intp i = 0; i < n; ++i )
 	{
 		Assert( m_ArrayAttributes[i].m_pAttribute->GetType() == AT_ELEMENT_ARRAY );
 		CDmAttribute *pElementArray = m_ArrayAttributes[i].m_pAttribute;
-		CDmrElementArray<> array( pElementArray );
 		if ( lookup.Find( pElementArray ) == lookup.InvalidIndex() )
 		{
+			CDmrElementArray<> array( pElementArray );
 			array.RemoveAll();
 			lookup.Insert( pElementArray );
 		}
@@ -254,7 +254,7 @@ void CDmElementDictionary::HookUpElementArrayAttributes()
 
 			// search id->handle table (both loaded and unloaded) for id, and if not found, create a new handle, map it to the id and return it
 			DmElementHandle_t hElement = g_pDataModelImp->FindOrCreateElementHandle( id );
-			int nIndex = array.AddToTail();
+			intp nIndex = array.AddToTail();
 			array.SetHandle( nIndex, hElement );
 		}
 	}
@@ -266,8 +266,8 @@ void CDmElementDictionary::HookUpElementArrayAttributes()
 //-----------------------------------------------------------------------------
 void CDmElementDictionary::HookUpElementReferences()
 {
-	int nElementsToDelete = m_elementsToDelete.Count();
-	for ( int i = 0; i < nElementsToDelete; ++i )
+	intp nElementsToDelete = m_elementsToDelete.Count();
+	for ( intp i = 0; i < nElementsToDelete; ++i )
 	{
 		DmElementDictHandle_t hDictIndex = m_elementsToDelete[i].m_hDictHandle;
 		DmElementHandle_t hElement = m_Dict[ hDictIndex ];
@@ -357,8 +357,8 @@ void CDmElementSerializationDictionary::BuildElementList_R( CDmElement *pElement
 		case AT_ELEMENT_ARRAY:
 			{
 				CDmrElementArray<> array( pAttribute );
-				int nCount = array.Count();
-				for ( int i = 0; i < nCount; ++i )
+				intp nCount = array.Count();
+				for ( intp i = 0; i < nCount; ++i )
 				{
 					CDmElement *pChild = array[i];
 					if ( !pChild || pChild->GetFileId() != pElement->GetFileId() )
@@ -433,7 +433,7 @@ DmElementDictHandle_t CDmElementSerializationDictionary::FirstRootElement() cons
 	// NOTE: I don't have to use First/NextInorder here because there
 	// are guaranteed to be no removals from the dictionary.
 	// Also, using inorder traversal won't get my actual root element to be first in the file
-	int nCount = m_Dict.Count();
+	intp nCount = m_Dict.Count();
 	for ( DmElementDictHandle_t h = 0; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )
@@ -450,7 +450,7 @@ DmElementDictHandle_t CDmElementSerializationDictionary::NextRootElement( DmElem
 	// are guaranteed to be no removals from the dictionary.
 	// Also, using inorder traversal won't get my actual root element to be first in the file
 	++h;
-	int nCount = m_Dict.Count();
+	intp nCount = m_Dict.Count();
 	for ( ; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )

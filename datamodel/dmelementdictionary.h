@@ -29,7 +29,7 @@ class CDmAttribute;
 //-----------------------------------------------------------------------------
 // Element dictionary used in unserialization
 //-----------------------------------------------------------------------------
-typedef int DmElementDictHandle_t;
+typedef intp DmElementDictHandle_t;
 enum
 {
 	ELEMENT_DICT_HANDLE_INVALID = (DmElementDictHandle_t)~0
@@ -90,11 +90,17 @@ private:
 		DmIdPair_t( const DmObjectId_t &id )
 		{
 			CopyUniqueId( id, &m_oldId );
+			std::memset( &m_newId, 0, sizeof(m_newId) );
 		}
 		DmIdPair_t( const DmObjectId_t &oldId, const DmObjectId_t &newId )
 		{
 			CopyUniqueId( oldId, &m_oldId );
 			CopyUniqueId( newId, &m_newId );
+		}
+		DmIdPair_t( const DmIdPair_t &that )
+		{
+			CopyUniqueId( that.m_oldId, &m_oldId );
+			CopyUniqueId( that.m_newId, &m_newId );
 		}
 		DmIdPair_t &operator=( const DmIdPair_t &that )
 		{
@@ -102,9 +108,10 @@ private:
 			CopyUniqueId( that.m_newId, &m_newId );
 			return *this;
 		}
-		static unsigned int HashKey( const DmIdPair_t& that )
+		static uintp HashKey( const DmIdPair_t& that )
 		{
-			return *( unsigned int* )&that.m_oldId.m_Value;
+			static_assert( sizeof(uintp) <= sizeof(that.m_oldId.m_Value) );
+			return *( uintp* )&that.m_oldId.m_Value;
 		}
 		static bool Compare( const DmIdPair_t& a, const DmIdPair_t& b )
 		{
@@ -115,7 +122,7 @@ private:
 	struct DeletionInfo_t
 	{
 		DeletionInfo_t() = default;
-		DeletionInfo_t( DmElementHandle_t hElement ) : m_hElementToDelete( hElement ) {}
+		DeletionInfo_t( DmElementHandle_t hElement ) : m_hDictHandle(ELEMENT_DICT_HANDLE_INVALID), m_hElementToDelete( hElement ), m_hReplacementElement(DMELEMENT_HANDLE_INVALID) {}
 		bool operator==( const DeletionInfo_t& src ) const { return m_hElementToDelete == src.m_hElementToDelete; }
 
 		DmElementDictHandle_t m_hDictHandle;

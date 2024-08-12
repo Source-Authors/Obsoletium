@@ -98,7 +98,8 @@ enum DmAttributeHandle_t
 //-----------------------------------------------------------------------------
 // Handle to an DmAttributeList_t
 //-----------------------------------------------------------------------------
-enum DmAttributeReferenceIterator_t
+// dimhotepus: x86-64 int -> intp
+enum DmAttributeReferenceIterator_t : intp
 {  
 	DMATTRIBUTE_REFERENCE_ITERATOR_INVALID = 0
 };
@@ -262,7 +263,7 @@ enum DmNotifyFlags_t
 	NOTIFY_SETDIRTYFLAG					= (1<<NOTIFY_SOURCE_BITS),
 
 	// Type of change (note NOTIFY_CHANGE_TOPOLOGICAL/NOTIFY_CHANGE_ATTRIBUTE_VALUE/NOTIFY_CHANGE_ATTRIBUTE_ARRAY_SIZE
-	// are set by the Datamodel itself)
+	// are set by the datamodel itself)
 	NOTIFY_CHANGE_TOPOLOGICAL			= (1<<(NOTIFY_SOURCE_BITS+4)),	// Element created, destroyed, element attribute or element array attribute value changed
 	NOTIFY_CHANGE_ATTRIBUTE_VALUE		= (1<<(NOTIFY_SOURCE_BITS+5)),	// Non-element attribute value changed
 	NOTIFY_CHANGE_ATTRIBUTE_ARRAY_SIZE	= (1<<(NOTIFY_SOURCE_BITS+6)),	// Non-element array attribute added or removed
@@ -366,12 +367,12 @@ public:
 	// file format methods
 	virtual const char*		GetFormatExtension( const char *pFormatName ) = 0;
 	virtual const char*		GetFormatDescription( const char *pFormatName ) = 0;
-	virtual int				GetFormatCount() const = 0;
+	virtual intp			GetFormatCount() const = 0;
 	virtual const char *	GetFormatName( int i ) const = 0;
 	virtual const char *	GetDefaultEncoding( const char *pFormatName ) = 0;
 
 	// file encoding methods
-	virtual int				GetEncodingCount() const = 0;
+	virtual intp			GetEncodingCount() const = 0;
 	virtual const char *	GetEncodingName( int i ) const = 0;
 	virtual bool			IsEncodingBinary( const char *pEncodingName ) const = 0;
 	virtual bool			DoesEncodingStoreVersionInFile( const char *pEncodingName ) const = 0;
@@ -544,33 +545,33 @@ public:
 		m_bEndOfStream = false;
 	}
 
-	virtual void Release()
+	void Release() override
 	{
 		delete this;
 	}
 
-	virtual const char *UndoDesc() const
+	const char *UndoDesc() const override
 	{
 		return g_pDataModel->GetUndoString( m_UndoDesc );
 	}
 
-	virtual const char *RedoDesc() const
+	const char *RedoDesc() const override
 	{
 		return g_pDataModel->GetUndoString( m_RedoDesc );
 	}
 
-	virtual const char *GetDesc() const
+	const char *GetDesc() const override
 	{
 		return m_pDesc;
 	}
 
 protected:
-	virtual bool IsEndOfStream() const 
+	bool IsEndOfStream() const override
 	{ 
 		return m_bEndOfStream; 
 	}
 
-	virtual void SetEndOfStream( bool end )
+	void SetEndOfStream( bool end ) override
 	{ 
 		m_bEndOfStream = end; 
 	}

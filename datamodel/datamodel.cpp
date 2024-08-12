@@ -151,7 +151,7 @@ InitReturnVal_t CDataModel::Init( )
 //#define _ELEMENT_HISTOGRAM_
 #ifdef _ELEMENT_HISTOGRAM_
 CUtlMap< UtlSymId_t, int > g_typeHistogram( 0, 100, DefLessFunc( UtlSymId_t ) );
-#endif _ELEMENT_HISTOGRAM_
+#endif  // _ELEMENT_HISTOGRAM_
 
 
 //-----------------------------------------------------------------------------
@@ -166,7 +166,7 @@ void CDataModel::Shutdown()
 		Msg( "%d\t%s\n", g_typeHistogram.Element( i ), GetString( g_typeHistogram.Key( i ) ) );
 	}
 	Msg( "\n" );
-#endif _ELEMENT_HISTOGRAM_
+#endif  // _ELEMENT_HISTOGRAM_
 
 	int c = GetAllocatedElementCount();
 	if ( c > 0 )
@@ -253,25 +253,14 @@ DmElementHandle_t CDataModel::NextAllocatedElement( DmElementHandle_t hElement )
 	return DMELEMENT_HANDLE_INVALID;
 }
 
-
-//-----------------------------------------------------------------------------
-// estimate memory overhead
-//-----------------------------------------------------------------------------
-int CDataModel::EstimateMemoryOverhead() const
-{
-	int nHandlesOverhead = sizeof( int ) + sizeof( CDmElement* ); // m_Handles
-	int nElementIdsOverhead = sizeof( DmElementHandle_t ); // this also has a 80k static overhead, since hash tables can't grow
-	return nHandlesOverhead + nElementIdsOverhead;
-}
-
 static bool HandleCompare( const DmElementHandle_t & a, const DmElementHandle_t &b )
 {
 	return a == b;
 }
 
-static unsigned int HandleHash( const DmElementHandle_t &h )
+static uintp HandleHash( const DmElementHandle_t &h )
 {
-	return (unsigned int)h;
+	return (uintp)h;
 }
 
 int CDataModel::EstimateMemoryUsage( DmElementHandle_t hElement, TraversalDepth_t depth )
@@ -434,7 +423,7 @@ const char* CDataModel::GetFormatDescription( const char *pFormatName )
 	return pUpdater->GetDescription();
 }
 
-int CDataModel::GetFormatCount() const
+intp CDataModel::GetFormatCount() const
 {
 	return m_FormatUpdaters.Count();
 }
@@ -502,7 +491,7 @@ void CDataModel::AddFormatUpdater( IDmFormatUpdater *pUpdater )
 //-----------------------------------------------------------------------------
 // encoding-related methods
 //-----------------------------------------------------------------------------
-int CDataModel::GetEncodingCount() const
+intp CDataModel::GetEncodingCount() const
 {
 	return m_Serializers.Count();
 }
@@ -537,53 +526,47 @@ bool CDataModel::DoesEncodingStoreVersionInFile( const char *pEncodingName ) con
 
 IDmSerializer* CDataModel::FindSerializer( const char *pEncodingName ) const
 {
-	int nSerializers = m_Serializers.Count();
-	for ( int i = 0; i < nSerializers; ++i )
+	for ( auto *s : m_Serializers )
 	{
-		IDmSerializer *pSerializer = m_Serializers[ i ];
-		Assert( pSerializer );
-		if ( !pSerializer )
+		Assert( s );
+		if ( !s )
 			continue;
 
-		if ( !V_strcmp( pEncodingName, pSerializer->GetName() ) )
-			return pSerializer;
+		if ( !V_strcmp( pEncodingName, s->GetName() ) )
+			return s;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 IDmLegacyUpdater* CDataModel::FindLegacyUpdater( const char *pLegacyFormatName ) const
 {
-	int nUpdaters = m_LegacyUpdaters.Count();
-	for ( int i = 0; i < nUpdaters; ++i )
+	for ( auto *u : m_LegacyUpdaters )
 	{
-		IDmLegacyUpdater *pUpdater = m_LegacyUpdaters[ i ];
-		Assert( pUpdater );
-		if ( !pUpdater )
+		Assert( u );
+		if ( !u )
 			continue;
 
-		if ( !V_strcmp( pLegacyFormatName, pUpdater->GetName() ) )
-			return pUpdater;
+		if ( !V_strcmp( pLegacyFormatName, u->GetName() ) )
+			return u;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 IDmFormatUpdater* CDataModel::FindFormatUpdater( const char *pFormatName ) const
 {
-	int nUpdaters = m_FormatUpdaters.Count();
-	for ( int i = 0; i < nUpdaters; ++i )
+	for ( auto *u : m_FormatUpdaters )
 	{
-		IDmFormatUpdater *pUpdater = m_FormatUpdaters[ i ];
-		Assert( pUpdater );
-		if ( !pUpdater )
+		Assert( u );
+		if ( !u )
 			continue;
 
-		if ( !V_strcmp( pFormatName, pUpdater->GetName() ) )
-			return pUpdater;
+		if ( !V_strcmp( pFormatName, u->GetName() ) )
+			return u;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -724,7 +707,7 @@ bool CDataModel::Serialize( CUtlBuffer &outBuf, const char *pEncodingName, const
 	bool bIsText = outBuf.IsText();
 	bool bIsCRLF = outBuf.ContainsCRLF();
 
-	CUtlBuffer outTextBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer outTextBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	CUtlBuffer *pActualOutBuf = &outBuf;
 
 	if ( pSerializer->IsBinaryFormat() )
@@ -957,15 +940,16 @@ bool CDataModel::Unserialize( CUtlBuffer &inBuf, const char *pEncodingName, cons
 		if ( g_pProcessUtils )
 		{
 			hProcess = g_pProcessUtils->StartProcess( cmdline, false );
-		}
-		if ( hProcess == PROCESS_HANDLE_INVALID )
-		{
-			Warning( "Unserialize: Unable to run conversion process \"%s\"\n", cmdline );
-			return false;
-		}
 
-		g_pProcessUtils->WaitUntilProcessCompletes( hProcess );
-		g_pProcessUtils->CloseProcess( hProcess );
+			if ( hProcess == PROCESS_HANDLE_INVALID )
+			{
+				Warning( "Unserialize: Unable to run conversion process \"%s\"\n", cmdline );
+				return false;
+			}
+
+			g_pProcessUtils->WaitUntilProcessCompletes( hProcess );
+			g_pProcessUtils->CloseProcess( hProcess );
+		}
 
 		bool bSuccess;
 		{
@@ -1435,7 +1419,7 @@ void CDataModel::OnElementReferenceRemoved( DmElementHandle_t hElement, CDmAttri
 		{
 			if ( !pRef->IsWeaklyReferenced() )
 			{
-				int i = m_unreferencedElementIds.AddToTail();
+				auto i = m_unreferencedElementIds.AddToTail();
 				CopyUniqueId( *pId, &m_unreferencedElementIds[ i ] );
 			}
 		}
@@ -1480,7 +1464,7 @@ void CDataModel::OnElementReferenceRemoved( DmElementHandle_t hElement, bool bRe
 		{
 			if ( !pRef->IsWeaklyReferenced() )
 			{
-				int i = m_unreferencedElementIds.AddToTail();
+				auto i = m_unreferencedElementIds.AddToTail();
 				CopyUniqueId( *pId, &m_unreferencedElementIds[ i ] );
 			}
 		}
@@ -1500,10 +1484,9 @@ void CDataModel::RemoveUnreferencedElements()
 {
 	CDisableUndoScopeGuard sg;
 
-	int nElementIds = m_unreferencedElementIds.Count();
-	for ( int i = 0; i < nElementIds; ++i )
+	for ( auto &id : m_unreferencedElementIds )
 	{
-		UtlHashHandle_t h = m_unloadedIdElementMap.Find( ElementIdHandlePair_t( m_unreferencedElementIds[ i ] ) );
+		UtlHashHandle_t h = m_unloadedIdElementMap.Find( ElementIdHandlePair_t( id ) );
 		if ( h == m_unloadedIdElementMap.InvalidHandle() )
 			continue;
 
@@ -1517,11 +1500,9 @@ void CDataModel::RemoveUnreferencedElements()
 	m_unreferencedElementIds.RemoveAll();
 
 	// this is intentionally calling Count() every time through, since DestroyElement may cause more elements to be added to the list
-	for ( int i = 0; i < m_unreferencedElementHandles.Count(); ++i )
+	for ( auto &h : m_unreferencedElementHandles )
 	{
-		DmElementHandle_t hElement = m_unreferencedElementHandles[ i ];
-
-		CDmElement *pElement = GetElement( hElement );
+		CDmElement *pElement = GetElement( h );
 //		Assert( pElement );
 		if ( !pElement )
 			continue;
@@ -1533,7 +1514,7 @@ void CDataModel::RemoveUnreferencedElements()
 
 //		Msg( " -deleted\n" );
 
-		DeleteElement( hElement );
+		DeleteElement( h );
 	}
 	m_unreferencedElementHandles.RemoveAll();
 
@@ -1656,7 +1637,7 @@ DmAttributeReferenceIterator_t CDataModel::FirstAttributeReferencingElement( DmE
 	if ( !pRef || pRef->m_attributes.m_hAttribute == DMATTRIBUTE_HANDLE_INVALID )
 		return DMATTRIBUTE_REFERENCE_ITERATOR_INVALID;
 
-	return ( DmAttributeReferenceIterator_t )( int )&pRef->m_attributes;
+	return ( DmAttributeReferenceIterator_t )( intp )&pRef->m_attributes;
 }
 
 DmAttributeReferenceIterator_t CDataModel::NextAttributeReferencingElement( DmAttributeReferenceIterator_t hAttrIter )
@@ -1665,7 +1646,7 @@ DmAttributeReferenceIterator_t CDataModel::NextAttributeReferencingElement( DmAt
 	if ( !pList )
 		return DMATTRIBUTE_REFERENCE_ITERATOR_INVALID;
 
-	return ( DmAttributeReferenceIterator_t )( int )pList->m_pNext;
+	return ( DmAttributeReferenceIterator_t )( intp )pList->m_pNext;
 }
 
 CDmAttribute *CDataModel::GetAttribute( DmAttributeReferenceIterator_t hAttrIter )
@@ -1683,7 +1664,7 @@ CDmAttribute *CDataModel::GetAttribute( DmAttributeReferenceIterator_t hAttrIter
 // Input  : buf - 
 // Output : IDmElementInternal
 //-----------------------------------------------------------------------------
-CDmElement *CDataModel::Unserialize( CUtlBuffer& buf )
+CDmElement *CDataModel::Unserialize( CUtlBuffer& )
 {
 	return NULL;
 }
@@ -1693,7 +1674,7 @@ CDmElement *CDataModel::Unserialize( CUtlBuffer& buf )
 // Input  : *element - 
 //			buf - 
 //-----------------------------------------------------------------------------
-void CDataModel::Serialize( CDmElement *element, CUtlBuffer& buf )
+void CDataModel::Serialize( CDmElement *, CUtlBuffer& )
 {
 }
 
@@ -1801,8 +1782,8 @@ class CUndoCreateElement : public CUndoElement
 public:
 	CUndoCreateElement() : 
 		BaseClass( "CUndoCreateElement" ),
-		m_bKill( false ),
-		m_hElement()
+		m_hElement(),
+		m_bKill( false )
 	{
 	}
 
@@ -1932,7 +1913,7 @@ CDmElement* CDataModel::CreateElement( const DmElementReference_t &ref, const ch
 		{
 			g_typeHistogram.Insert( typeSym, 1 );
 		}
-#endif _ELEMENT_HISTOGRAM_
+#endif  // _ELEMENT_HISTOGRAM_
 	}
 
 	return pElement;
@@ -1945,8 +1926,8 @@ class CUndoDestroyElement : public CUndoElement
 public:
 	CUndoDestroyElement( DmElementHandle_t hElement ) : 
 		BaseClass( "CUndoDestroyElement" ),
-		m_bKill( true ),
-		m_hElement( hElement )
+		m_hElement( hElement ),
+		m_bKill( true )
 	{
 		Assert( GetElement<CDmElement>( hElement ) && GetElement<CDmElement>( hElement )->GetFileId() != DMFILEID_INVALID );
 		g_pDataModelImp->MarkHandleInvalid( m_hElement );
@@ -2119,19 +2100,17 @@ void CDataModel::GetInvalidHandles( CUtlVector< DmElementHandle_t > &handles )
 
 void CDataModel::MarkHandlesValid( CUtlVector< DmElementHandle_t > &handles )
 {
-	int nHandles = handles.Count();
-	for ( int i = 0; i < nHandles; ++i )
+	for ( auto &h : handles )
 	{
-		m_Handles.MarkHandleValid( handles[ i ] );
+		m_Handles.MarkHandleValid( h );
 	}
 }
 
 void CDataModel::MarkHandlesInvalid( CUtlVector< DmElementHandle_t > &handles )
 {
-	int nHandles = handles.Count();
-	for ( int i = 0; i < nHandles; ++i )
+	for ( auto &h : handles )
 	{
-		m_Handles.MarkHandleInvalid( handles[ i ] );
+		m_Handles.MarkHandleInvalid( h );
 	}
 }
 
@@ -2208,7 +2187,7 @@ bool CDataModel::RemoveElementFromMailingList( DmMailingList_t list, DmElementHa
 {
 	// Make sure we find it!
 	MailingList_t &mailingList = m_MailingLists[list];
-	int i = mailingList.m_Elements.Find( h );
+	intp i = mailingList.m_Elements.Find( h );
 	Assert( i >= 0 );
 	mailingList.m_Elements.FastRemove( i );
 	return ( mailingList.m_Elements.Count() != 0 );
@@ -2217,8 +2196,8 @@ bool CDataModel::RemoveElementFromMailingList( DmMailingList_t list, DmElementHa
 bool CDataModel::PostAttributeChanged( DmMailingList_t list, CDmAttribute *pAttribute )
 {
 	MailingList_t &mailingList = m_MailingLists[list];
-	int nCount = mailingList.m_Elements.Count();
-	for ( int i = nCount; --i >= 0; )
+	intp nCount = mailingList.m_Elements.Count();
+	for ( intp i = nCount; --i >= 0; )
 	{
 		DmElementHandle_t hElement = mailingList.m_Elements[i];
 		CDmElement *pElement = GetElement( hElement );

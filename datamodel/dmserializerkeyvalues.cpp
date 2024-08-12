@@ -101,8 +101,8 @@ void InstallKeyValuesSerializer( IDataModel *pFactory )
 void CDmSerializerKeyValues::SerializeSubKeys( CUtlBuffer& buf, CDmAttribute *pSubKeys )
 {
 	CDmrElementArray<> array( pSubKeys );
-	int c = array.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = array.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmElement *pChild = array[i];
 		if ( pChild )
@@ -264,7 +264,7 @@ DmAttributeType_t CDmSerializerKeyValues::DetermineAttributeType( KeyValues *pKe
 			if ( sscanf( pKeyValues->GetString(), "%f %f", &f1, &f2 ) == 2 )
 				return AT_VECTOR2;
 
-			int i = pKeyValues->GetInt( NULL, INT_MAX );
+			int i = pKeyValues->GetInt( nullptr, INT_MAX );
 			if ( ( sscanf( pKeyValues->GetString(), "%d", &i ) == 1 ) && 
 				 ( !strchr( pKeyValues->GetString(), '.' ) ) )
 				return AT_INT;
@@ -344,7 +344,7 @@ void CDmSerializerKeyValues::UnserializeAttribute( CDmElement *pElement, KeyValu
 	
 	default:
 		{
-			int nLen = Q_strlen( pAttributeValue );
+			intp nLen = Q_strlen( pAttributeValue );
 			CUtlBuffer buf( pAttributeValue, nLen, CUtlBuffer::TEXT_BUFFER | CUtlBuffer::READ_ONLY ); 
 			pAttribute->Unserialize( buf );
 		}
@@ -421,8 +421,8 @@ CDmElement* CDmSerializerKeyValues::UnserializeFromKeyValues( KeyValues *pKeyVal
 	}
 
 	// mark all unserialized elements as done unserializing, and call Resolve()
-	int c = m_ElementList.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_ElementList.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmElement *pElement = g_pDataModel->GetElement( m_ElementList[i] );
 		CDmeElementAccessor::MarkBeingUnserialized( pElement, false );
