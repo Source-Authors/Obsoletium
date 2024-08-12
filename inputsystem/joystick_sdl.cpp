@@ -86,7 +86,7 @@ void SearchForDevice()
 //---------------------------------------------------------------------------------------
 // Switch our active joystick to another device
 //---------------------------------------------------------------------------------------
-void joy_active_changed_f( IConVar *var, const char *pOldValue, float flOldValue )
+void joy_active_changed_f( IConVar *, const char *, float )
 {
 	SearchForDevice();
 }
@@ -94,7 +94,7 @@ void joy_active_changed_f( IConVar *var, const char *pOldValue, float flOldValue
 //---------------------------------------------------------------------------------------
 // Reinitialize the game controller layer when the joy_gamecontroller_config is updated.
 //---------------------------------------------------------------------------------------
-void joy_gamecontroller_config_changed_f( IConVar *var, const char *pOldValue, float flOldValue )
+void joy_gamecontroller_config_changed_f( IConVar *var, const char *pOldValue, float )
 {
 	CInputSystem *pInputSystem = (CInputSystem *)g_pInputSystem;
 	if ( pInputSystem && SDL_WasInit(SDL_INIT_GAMEPAD) )
@@ -452,7 +452,7 @@ void CInputSystem::JoystickAxisMotion( unsigned joystickId, uint8 axis, int16 va
 	{
 		int pressThreshold = static_cast<int>(joy_axisbutton_threshold.GetFloat() * 32767);
 		int keyIndex = buttonCode - KEY_XBUTTON_LTRIGGER;
-		Assert( keyIndex < ARRAYSIZE( m_appXKeys[0] ) && keyIndex >= 0 );
+		Assert( keyIndex < ssize( m_appXKeys[0] ) && keyIndex >= 0 );
 
 		appKey_t &key = m_appXKeys[0][keyIndex];
 		if ( value > pressThreshold )
@@ -488,7 +488,7 @@ void CInputSystem::JoystickAxisMotion( unsigned joystickId, uint8 axis, int16 va
 //-----------------------------------------------------------------------------
 //	Process the event
 //-----------------------------------------------------------------------------
-void CInputSystem::JoystickButtonEvent( ButtonCode_t button, int sample )
+void CInputSystem::JoystickButtonEvent( ButtonCode_t, int )
 {
 	// Not used - we post button events from JoystickButtonPress/Release.
 }
@@ -497,7 +497,7 @@ void CInputSystem::JoystickButtonEvent( ButtonCode_t button, int sample )
 //-----------------------------------------------------------------------------
 // Update the joystick button state
 //-----------------------------------------------------------------------------
-void CInputSystem::UpdateJoystickButtonState( int nJoystick )
+void CInputSystem::UpdateJoystickButtonState( int )
 {
 	// We don't sample - we get events posted by SDL_Gamepad in JoystickSDLWatcher
 }
@@ -506,7 +506,7 @@ void CInputSystem::UpdateJoystickButtonState( int nJoystick )
 //-----------------------------------------------------------------------------
 // Update the joystick POV control
 //-----------------------------------------------------------------------------
-void CInputSystem::UpdateJoystickPOVControl( int nJoystick )
+void CInputSystem::UpdateJoystickPOVControl( int )
 {
 	// SDL GameController does not support joystick POV. Should we poll?
 }

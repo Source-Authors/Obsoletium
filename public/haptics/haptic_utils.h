@@ -25,16 +25,16 @@ class CHapticsStubbed : public IHaptics
 {
 public:
 public: // Initialization.
-	virtual bool Initialize(IVEngineClient* newengine, 
-		IViewRender *newview, 
-		vgui::IInputInternal* newinput, 
-		CGlobalVarsBase* newgpGlobals,
-		CreateInterfaceFn newengineFactory, 
-		void *IMEWindow,
-		IFileSystem* filesystem, 
-		IEngineVGui* newvgui,
-		ActivityList_IndexForName_t actIndexForName,
-		ActivityList_NameForIndex_t actNameForIndex)
+	virtual bool Initialize(IVEngineClient*, 
+		IViewRender *, 
+		vgui::IInputInternal*, 
+		CGlobalVarsBase*,
+		CreateInterfaceFn, 
+		void *,
+		IFileSystem*, 
+		IEngineVGui*,
+		ActivityList_IndexForName_t,
+		ActivityList_NameForIndex_t)
 		{return false;};
 
 public: // Device methods
@@ -42,32 +42,32 @@ public: // Device methods
 	virtual void ShutdownHaptics(){};
 
 public: // Game input handling
-	virtual void CalculateMove(float &forward_move, float &side_move, float delta){};
+	virtual void CalculateMove(float &, float &, float ){};
 	virtual void OnPlayerChanged(){}
-	virtual void SetNavigationClass(const char *defaultNavigationName){};
+	virtual void SetNavigationClass(const char *){};
 	virtual const char *GetNavigationClass(){ return 0; };
 	virtual void GameProcess(){}
 	virtual void MenuProcess(){}
 
 public: // Effect methods
-	virtual void ProcessHapticEvent(int numArgs, ...){}
-	virtual void ProcessHapticWeaponActivity(const char *weapon, int activity){}
-	virtual void HapticsPunch(float strength, const QAngle &angle){}
-	virtual void ApplyDamageEffect(float damage, int damagetype, const Vector &angle){}
+	virtual void ProcessHapticEvent(int, ...){}
+	virtual void ProcessHapticWeaponActivity(const char *, int ){}
+	virtual void HapticsPunch(float, const QAngle &){}
+	virtual void ApplyDamageEffect(float, int, const Vector &){}
 	virtual void UpdateAvatarVelocity(const Vector &vel){}
 	virtual void RemoveAvatarEffect(){}
-	virtual void SetConstantForce(const Vector &force){}
+	virtual void SetConstantForce(const Vector &){}
 	virtual Vector GetConstantForce(){return Vector(0,0,0);}
-	virtual void SetDrag(float amount){}
-	virtual void SetShake(float scalar, float currentamount){}
-	virtual void SetHeld(float amount){}
-	virtual void SetMoveSurface(HapticSurfaceType_t surface){}
+	virtual void SetDrag(float){}
+	virtual void SetShake(float, float){}
+	virtual void SetHeld(float){}
+	virtual void SetMoveSurface(HapticSurfaceType_t){}
 	virtual HapticSurfaceType_t GetMoveSurface(){ return HST_NONE; }
-	virtual void SetDangling(float amount){};
+	virtual void SetDangling(float){};
 
 public: // Notify methods
 	virtual void LocalPlayerReset(){};
-	virtual void UpdatePlayerFOV(float fov){};
+	virtual void UpdatePlayerFOV(float){};
 	virtual void WorldPrecache() {};
 };
 #else

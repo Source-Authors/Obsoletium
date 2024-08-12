@@ -107,10 +107,10 @@ void ConnectHaptics(CreateInterfaceFn appFactory)
 	pFalconModule = Sys_LoadModule( HAPTICS_TEST_PREFIX HAPTICS_DLL_NAME );
 	if(pFalconModule)
 	{
-		CreateInterfaceFn factory = Sys_GetFactory( pFalconModule );
+		CreateInterfaceFnT<IHaptics> factory = Sys_GetFactory<IHaptics>( pFalconModule );
 		if(factory)
 		{
-			haptics = reinterpret_cast< IHaptics* >( factory( HAPTICS_INTERFACE_VERSION, NULL ) );
+			haptics = factory( HAPTICS_INTERFACE_VERSION, NULL );
 			if(haptics && 
 				haptics->Initialize(engine,
 					view,
@@ -196,11 +196,15 @@ void HapticsHandleMsg_HapDmg( float pitch, float yaw, float damage, int damageTy
 
 	if(pPlayer)
 	{
-		Vector damageDirection;
+		float pitchRad = DEG2RAD(pitch);
+		float yawRad = DEG2RAD(yaw);
 
-		damageDirection.x = cos(pitch*M_PI/180.0)*sin(yaw*M_PI/180.0);
-		damageDirection.y = -sin(pitch*M_PI/180.0);
-		damageDirection.z = -(cos(pitch*M_PI/180.0)*cos(yaw*M_PI/180.0));
+		Vector damageDirection
+		{
+			cos(pitchRad) * sin(yawRad),
+			-sin(pitchRad),
+			-(cos(pitchRad) * cos(yawRad))
+		};
 #ifdef TERROR
 		if(pPlayer->GetTeamNumber()==TEAM_ZOMBIE)
 		{
@@ -225,7 +229,6 @@ void UpdateAvatarEffect(void)
 
 	Vector vel;
 	Vector vvel;
-	Vector evel;
 	QAngle eye;
 	C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
 	if(!pPlayer)

@@ -226,7 +226,7 @@ bool CInputSystem::InitializeSteamControllerActionSets()
 
 	bool bGotHandles = true;
 
-	for ( int i = 0; i != ARRAYSIZE( g_DigitalMenuActions ); ++i )
+	for ( int i = 0; i != ssize( g_DigitalMenuActions ); ++i )
 	{
 		g_DigitalMenuActions[i].handle = psteamcontroller->GetDigitalActionHandle( g_DigitalMenuActions[i].strName );
 		bGotHandles = bGotHandles && ( g_DigitalMenuActions[i].handle != 0 );
@@ -238,7 +238,7 @@ bool CInputSystem::InitializeSteamControllerActionSets()
 		}
 	}
 
-	for ( int i = 0; i != ARRAYSIZE( g_GameActionSets ); ++i )
+	for ( int i = 0; i != ssize( g_GameActionSets ); ++i )
 	{
 		g_GameActionSets[i].handle = psteamcontroller->GetActionSetHandle( g_GameActionSets[i].strName );
 		bGotHandles = bGotHandles &&  g_GameActionSets[i].handle;
@@ -278,7 +278,7 @@ void CInputSystem::PollSteamControllers( void )
 			m_bSteamControllerActive = true;
 
 			// For each digital action
-			for ( int i = 0; i != ARRAYSIZE( g_DigitalMenuActions ); ++i )
+			for ( int i = 0; i != ssize( g_DigitalMenuActions ); ++i )
 			{
 				SDigitalMenuAction& action = g_DigitalMenuActions[i];
 
@@ -421,7 +421,8 @@ void CInputSystem::ActivateSteamControllerActionSetForSlot( uint64 nSlot, GameAc
 		else
 		{
 			uint64 nControllerHandles[STEAM_CONTROLLER_MAX_COUNT];
-			int unNumConnected = steamcontroller->GetConnectedControllers( nControllerHandles );
+			// dimhotepus: int -> uint64.
+			uint64 unNumConnected = steamcontroller->GetConnectedControllers( nControllerHandles );
 
 			if( nSlot < unNumConnected )
 			{
@@ -441,7 +442,7 @@ void CInputSystem::ActivateSteamControllerActionSetForSlot( uint64 nSlot, GameAc
 		// If we changed action set, then flag everything for a debounce (meaning we demand to see an unpressed state before we'll register a pressed one)
 		for ( int i = 0; i < STEAM_CONTROLLER_MAX_COUNT; i++ )
 		{
-			for ( int j = 0; j != ARRAYSIZE( g_DigitalMenuActions ); ++j )
+			for ( int j = 0; j != ssize( g_DigitalMenuActions ); ++j )
 			{
 				g_DigitalMenuActions[j].bAwaitingDebounce[i] = true;
 			}
@@ -449,7 +450,7 @@ void CInputSystem::ActivateSteamControllerActionSetForSlot( uint64 nSlot, GameAc
 	}
 }
 
-const int CInputSystem::GetSteamPadDeadZone( ESteamPadAxis axis )
+int CInputSystem::GetSteamPadDeadZone( ESteamPadAxis axis )
 {
   int nDeadzone = s_nSteamPadDeadZoneTable[ axis ];
 
@@ -461,7 +462,7 @@ const int CInputSystem::GetSteamPadDeadZone( ESteamPadAxis axis )
 //-----------------------------------------------------------------------------
 // Purpose: Processes data for controller
 //-----------------------------------------------------------------------------
-void CInputSystem::ReadSteamController( int iIndex )
+void CInputSystem::ReadSteamController( int )
 {
 }
 
@@ -480,18 +481,18 @@ void CInputSystem::ReadSteamController( int iIndex )
 //-----------------------------------------------------------------------------
 //	Purpose: Returns the controller State for a particular joystick slot
 //-----------------------------------------------------------------------------
-bool CInputSystem::GetControllerStateForSlot( int nSlot )
+bool CInputSystem::GetControllerStateForSlot( int )
 {
 	return false;
 }
 
 int CInputSystem::GetSteamControllerIndexForSlot( int nSlot )
 {
-	for ( int i = 0; i < Q_ARRAYSIZE( m_Device ); i++ )
+	for ( auto &d : m_Device )
 	{
-		if ( m_Device[i].active && (int)m_Device[i].m_nJoystickIndex == nSlot )
+		if ( d.active && d.m_nJoystickIndex == nSlot )
 		{
-			return m_Device[i].m_nHardwareIndex;
+			return d.m_nHardwareIndex;
 		}
 	}
 	return -1;
@@ -611,7 +612,7 @@ EControllerActionOrigin CInputSystem::GetSteamControllerActionOrigin( const char
 		}
 
 		SGameActionSet* pActionSet = nullptr;
-		for ( int i = 0; i < ARRAYSIZE( g_GameActionSets ); i++ )
+		for ( unsigned i = 0; i < std::size( g_GameActionSets ); i++ )
 		{
 			if ( g_GameActionSets[i].eGameActionSet == action_set )
 			{
@@ -663,7 +664,7 @@ EControllerActionOrigin CInputSystem::GetSteamControllerActionOrigin( const char
 // Maps a Steam Controller action origin to a string (consisting of a single character) in our SC icon font
 const wchar_t*	CInputSystem::GetSteamControllerFontCharacterForActionOrigin( EControllerActionOrigin origin )
 {
-	if ( origin >= 0 && origin < ARRAYSIZE( g_MapSteamControllerOriginToIconFont ) )
+	if ( origin >= 0 && origin < ssize( g_MapSteamControllerOriginToIconFont ) )
 	{
 		return g_MapSteamControllerOriginToIconFont[origin];
 	}
@@ -677,7 +678,7 @@ const wchar_t*	CInputSystem::GetSteamControllerFontCharacterForActionOrigin( ECo
 // Prefer to actually use the icon font wherever possible.
 const wchar_t* CInputSystem::GetSteamControllerDescriptionForActionOrigin( EControllerActionOrigin origin )
 {
-	if ( origin >= 0 && origin < ARRAYSIZE( g_MapSteamControllerOriginToDescription ) )
+	if ( origin >= 0 && origin < ssize( g_MapSteamControllerOriginToDescription ) )
 	{
 		return g_MapSteamControllerOriginToDescription[origin];
 	}
