@@ -71,7 +71,7 @@ public:
 	virtual int GetButtonReleasedTick( ButtonCode_t code ) const;
 	virtual int GetAnalogValue( AnalogCode_t code ) const;
 	virtual int GetAnalogDelta( AnalogCode_t code ) const;
-	virtual int GetEventCount() const;
+	virtual intp GetEventCount() const;
 	virtual const InputEvent_t* GetEventData() const;
 	virtual void PostUserEvent( const InputEvent_t &event );
 	virtual int GetJoystickCount() const;
@@ -326,7 +326,7 @@ public:
 	// Steam Controller
 	void ReadSteamController( int iIndex );
 	void PostKeyEvent( int iIndex, sKey_t sKey, int nSample );
-	const int GetSteamPadDeadZone( ESteamPadAxis axis );
+	int GetSteamPadDeadZone( ESteamPadAxis axis );
 	bool IsSteamControllerConnected( void ) { return m_bSteamController; }
 	bool IsSteamControllerActive( void );
 	void ActivateSteamControllerActionSetForSlot( uint64 nSlot, GameActionSet_t eActionSet );

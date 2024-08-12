@@ -62,7 +62,7 @@ public:
 	virtual int GetAnalogDelta( AnalogCode_t code ) const = 0;
 
 	// Returns the input events since the last poll
-	virtual int GetEventCount() const = 0;
+	virtual intp GetEventCount() const = 0;
 	virtual const InputEvent_t* GetEventData( ) const = 0;
 
 	// Posts a user-defined event into the event queue; this is expected

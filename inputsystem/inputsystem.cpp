@@ -96,7 +96,7 @@ CInputSystem::CInputSystem()
 	m_bConsoleTextMode = false;
 	m_bSkipControllerInitialization = CommandLine()->CheckParm( "-nosteamcontroller" );
 
-	static_assert( (MAX_JOYSTICKS + 7) >> 3 << sizeof(unsigned short) );
+	static_assert( (MAX_JOYSTICKS + 7) >> 3 < sizeof(unsigned short) );
 }
 
 CInputSystem::~CInputSystem()
@@ -291,7 +291,7 @@ void CInputSystem::AttachToWindow( void* hWnd )
 	Rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
 	Rid[0].dwFlags = RIDEV_INPUTSINK;
 	Rid[0].hwndTarget = g_InputSystem.m_hAttachedHWnd;
-	m_bRawInputSupported = !!RegisterRawInputDevices(Rid, ARRAYSIZE(Rid), sizeof(Rid[0]));
+	m_bRawInputSupported = !!RegisterRawInputDevices(Rid, std::size(Rid), sizeof(Rid[0]));
 #endif
 
 	// New window, clear input state
@@ -317,7 +317,7 @@ void CInputSystem::DetachFromWindow( )
 	Rid[0].dwFlags = RIDEV_REMOVE;
 	// RegisterRawInputDevices requires nullptr window when RIDEV_REMOVE.
 	Rid[0].hwndTarget = nullptr;
-	[[maybe_unused]] const bool is_succeeded{!!RegisterRawInputDevices(Rid, ARRAYSIZE(Rid), sizeof(Rid[0]))};
+	[[maybe_unused]] const bool is_succeeded{!!RegisterRawInputDevices(Rid, std::size(Rid), sizeof(Rid[0]))};
 	Assert(is_succeeded);
 
 	// NVNT inform novint devices loss of window
@@ -668,7 +668,7 @@ void CInputSystem::PollInputState_Platform()
 	CCocoaEvent events[32];
 	while ( 1 )
 	{
-		int nEvents = m_pLauncherMgr->GetEvents( events, ARRAYSIZE( events ) );
+		int nEvents = m_pLauncherMgr->GetEvents( events, ssize( events ) );
 		if ( nEvents == 0 )
 			break;
 
@@ -1029,7 +1029,7 @@ int CInputSystem::GetButtonReleasedTick( ButtonCode_t code ) const
 //-----------------------------------------------------------------------------
 // Returns the input events since the last poll
 //-----------------------------------------------------------------------------
-int CInputSystem::GetEventCount() const
+intp CInputSystem::GetEventCount() const
 {
 	return m_InputState[INPUT_STATE_CURRENT].m_Events.Count();
 }

@@ -23,10 +23,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#if defined(__clang__)
-	#pragma GCC diagnostic ignored "-Wchar-subscripts"
-#endif
-
 static ButtonCode_t s_pVirtualKeyToButtonCode[256];
 
 static ButtonCode_t s_pSKeytoButtonCode[SK_MAX_KEYS];
@@ -600,7 +596,7 @@ void ButtonCode_InitKeyTranslationTable()
 #endif // PLATFORM_POSIX
 
 	// create reverse table engine to virtual
-	for ( int i = 0; i < ARRAYSIZE( s_pVirtualKeyToButtonCode ); i++ )
+	for ( int i = 0; i < ssize( s_pVirtualKeyToButtonCode ); i++ )
 	{
 		s_pButtonCodeToVirtual[ s_pVirtualKeyToButtonCode[i] ] = i;
 	}
@@ -657,7 +653,7 @@ void ButtonCode_InitKeyTranslationTable()
 
 ButtonCode_t ButtonCode_VirtualKeyToButtonCode( int keyCode )
 {
-	if ( keyCode < 0 || keyCode >= sizeof( s_pVirtualKeyToButtonCode ) / sizeof( s_pVirtualKeyToButtonCode[0] ) )
+	if ( keyCode < 0 || keyCode >= ssize( s_pVirtualKeyToButtonCode ) )
 	{
 		Assert( false );
 		return KEY_NONE;
@@ -673,7 +669,7 @@ int ButtonCode_ButtonCodeToVirtualKey( ButtonCode_t code )
 ButtonCode_t ButtonCode_XKeyToButtonCode( int nPort, int keyCode )
 {
 #if !defined( POSIX )
-	if ( keyCode < 0 || keyCode >= sizeof( s_pXKeyTrans ) / sizeof( s_pXKeyTrans[0] ) )
+	if ( keyCode < 0 || keyCode >= ssize( s_pXKeyTrans ) )
 	{
 		Assert( false );
 		return KEY_NONE;
@@ -745,7 +741,7 @@ ButtonCode_t ButtonCode_StringToButtonCode( const char *pString, bool bXControll
 #if !defined ( _X360 )
 	if ( bXController )
 	{
-		for ( int i = 0; i < ARRAYSIZE(s_pXControllerButtonCodeNames); ++i )
+		for ( int i = 0; i < ssize(s_pXControllerButtonCodeNames); ++i )
 		{
 			if ( !Q_stricmp( s_pXControllerButtonCodeNames[i], pString ) )
 				return (ButtonCode_t)(JOYSTICK_FIRST_BUTTON + i);
@@ -759,7 +755,7 @@ ButtonCode_t ButtonCode_StringToButtonCode( const char *pString, bool bXControll
 ButtonCode_t ButtonCode_SKeyToButtonCode( int nPort, int keyCode )
 {
 #if !defined( _GAMECONSOLE )
-	if ( keyCode < 0 || keyCode >= sizeof( s_pSKeytoButtonCode ) / sizeof( s_pSKeytoButtonCode[0] ) )
+	if ( keyCode < 0 || keyCode >= ssize( s_pSKeytoButtonCode ) )
 	{
 		Assert( false );
 		return KEY_NONE;
@@ -877,7 +873,7 @@ void ButtonCode_UpdateScanCodeLayout( )
 
 	if (englishKb && englishKb != currentKb)
 	{
-		for ( int i = 0; i < ARRAYSIZE(s_pScanToButtonCode); i++ )
+		for ( unsigned i = 0; i < std::size(s_pScanToButtonCode); i++ )
 		{
 			// take the english/QWERTY
 			ButtonCode_t code = s_pScanToButtonCode_QWERTY[ i ];
