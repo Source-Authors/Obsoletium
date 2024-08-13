@@ -68,8 +68,8 @@ private:
 
 private:
 	bool			m_bAliasDown[FM_NUM_KEYREPEAT_ALIASES];
-	float			m_flRepeatTimes[FM_NUM_KEYREPEAT_ALIASES];
-	float			m_flNextKeyRepeat;
+	double			m_flRepeatTimes[FM_NUM_KEYREPEAT_ALIASES];
+	double			m_flNextKeyRepeat;
 	bool			m_bHaveKeyDown;
 };
 

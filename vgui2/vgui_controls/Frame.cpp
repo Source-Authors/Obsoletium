@@ -194,7 +194,7 @@ namespace
 			GetParent()->OnMouseDoublePressed(code);
 		}
 
-		void Paint()
+		void Paint() override
 		{
 			// draw the grab handle in the bottom right of the frame
 			surface()->DrawSetTextFont(_marlettFont);
@@ -205,7 +205,7 @@ namespace
 			surface()->DrawUnicodeChar('p'); 
 		}
 
-		void PaintBackground()
+		void PaintBackground() override
 		{
 			// draw the grab handle in the bottom right of the frame
 			surface()->DrawSetTextFont(_marlettFont);
@@ -216,19 +216,19 @@ namespace
 			surface()->DrawUnicodeChar('o'); 
 		}
 		
-		void OnMouseReleased(MouseCode code)
+		void OnMouseReleased(MouseCode code) override
 		{
 			_dragging = false;
 			input()->SetMouseCapture(NULL);
 		}
 
-		void OnMouseCaptureLost()
+		void OnMouseCaptureLost() override
 		{
 			Panel::OnMouseCaptureLost();
 			_dragging = false;
 		}
 
-		void ApplySchemeSettings(IScheme *pScheme)
+		void ApplySchemeSettings(IScheme *pScheme) override
 		{
 			Panel::ApplySchemeSettings(pScheme);
 			bool isSmall = ((Frame *)GetParent())->IsSmallCaption();
@@ -524,7 +524,7 @@ namespace vgui
 			SetBlockDragChaining( true );
 		}
 		
-		virtual void ApplySchemeSettings(IScheme *pScheme)
+		void ApplySchemeSettings(IScheme *pScheme) override
 		{
 			Button::ApplySchemeSettings(pScheme);
 			
@@ -541,7 +541,7 @@ namespace vgui
 			SetDisabledLook(_disabledLook);
 		}
 		
-		virtual IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus)
+		IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus) override
 		{
 			if (_disabledLook)
 			{
@@ -574,7 +574,7 @@ namespace vgui
 			}
 		}
 
-        virtual void PerformLayout()
+        void PerformLayout() override
         {
             Button::PerformLayout();
             Repaint();
@@ -582,7 +582,7 @@ namespace vgui
 		
 		// Don't request focus.
 		// This will keep items in the listpanel selected.
-		virtual void OnMousePressed(MouseCode code)
+		void OnMousePressed(MouseCode code) override
 		{
 			if (!IsEnabled())
 				return;
@@ -609,7 +609,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class FrameSystemButton : public MenuButton
 {
-	DECLARE_CLASS_SIMPLE( FrameSystemButton, MenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( FrameSystemButton, MenuButton );
 
 private:
 	IImage *_enabled, *_disabled;
@@ -658,7 +658,7 @@ public:
 		}
 	}
 
-	virtual void ApplySchemeSettings(IScheme *pScheme)
+	void ApplySchemeSettings(IScheme *pScheme) override
 	{
 		BaseClass::ApplySchemeSettings(pScheme);
 
@@ -678,12 +678,12 @@ public:
 		SetEnabled(IsEnabled());
 	}
 	
-	virtual IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus)
+	IBorder *GetBorder(bool, bool, bool, bool) override
 	{
 		return NULL;
 	}
 
-	virtual void SetEnabled(bool state)
+	void SetEnabled(bool state) override
 	{
 		Button::SetEnabled(state);
 		
@@ -716,7 +716,7 @@ public:
 		_respond = state;
 	}
 
-	virtual void OnMousePressed(MouseCode code)
+	void OnMousePressed(MouseCode code) override
 	{
 		// button may look enabled but not be responsive
 		if (!_respond)
@@ -725,7 +725,7 @@ public:
 		BaseClass::OnMousePressed(code);
 	}
 
-	virtual void OnMouseDoublePressed(MouseCode code)
+	void OnMouseDoublePressed(MouseCode code) override
 	{
 		// button may look enabled but not be responsive
 		if (!_respond)

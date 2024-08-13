@@ -90,33 +90,6 @@ static int ListBaseStringSortFunc(ListPanel *pPanel, const ListPanelItem &item1,
 	return cval;
 }
 
-static int ListBaseIntegerSortFunc(ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2, char const *fieldName )
-{
-	bool dir1 = item1.kv->GetInt("directory") == 1;
-	bool dir2 = item2.kv->GetInt("directory") == 1;
-
-	// if they're both not directories of files, return if dir1 is a directory (before files)
-	if (dir1 != dir2)
-	{
-		return -1;
-	}
-
-	int i1 = item1.kv->GetInt(fieldName);
-	int i2 = item2.kv->GetInt(fieldName);
-	if ( i1 == i2 )
-	{
-		// Use filename to break ties
-		return ListFileNameSortFunc( pPanel, item1, item2 );
-	}
-
-	return ( i1 < i2 ) ? -1 : 1;
-}
-
-static int ListFileSizeSortFunc(ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
-{
-	return ListBaseIntegerSortFunc( pPanel, item1, item2, "filesizeint" );
-}
-
 static int ListFileAttributesSortFunc(ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
 {
 	return ListBaseStringSortFunc( pPanel, item1, item2, "attributes" );
@@ -164,7 +137,7 @@ PerforceFileList::PerforceFileList( Panel *pParent, const char *pPanelName ) :
 	m_bShowDeletedFiles = false;
 
 	// list panel
-	for ( int i = 0; i < ARRAYSIZE( g_ColInfo ); ++i )
+	for ( intp i = 0; i < static_cast<intp>(std::size( g_ColInfo )); ++i )
 	{
 		const ColumnInfo_t& info = g_ColInfo[ i ];
 
@@ -370,7 +343,7 @@ int PerforceFileList::AddFile( const char *pFullPath, int nFileExists, int nIsDi
 		}
 		else
 		{
-			int nLen = Q_strlen( pFixedPath );
+			intp nLen = Q_strlen( pFixedPath );
 			bIsDirectory = ( pFixedPath[nLen-1] == CORRECT_PATH_SEPARATOR );
 		}
 	}

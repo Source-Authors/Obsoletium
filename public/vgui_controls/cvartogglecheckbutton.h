@@ -21,21 +21,21 @@ namespace vgui
 template< class T >
 class CvarToggleCheckButton : public CheckButton
 {
-	DECLARE_CLASS_SIMPLE( CvarToggleCheckButton, CheckButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CvarToggleCheckButton, CheckButton );
 
 public:
 	CvarToggleCheckButton( Panel *parent, const char *panelName, const char *text = "", 
 		char const *cvarname = NULL, bool ignoreMissingCvar = false );
 	~CvarToggleCheckButton();
 
-	virtual void	SetSelected( bool state );
+	void	SetSelected( bool state ) override;
 
-	virtual void	Paint();
+	void	Paint() override;
 
-	void			Reset();
-	void			ApplyChanges();
-	bool			HasBeenModified();
-	virtual void	ApplySettings( KeyValues *inResourceData );
+	void	Reset();
+	void	ApplyChanges();
+	bool	HasBeenModified();
+	void	ApplySettings( KeyValues *inResourceData ) override;
 
 private:
 	// Called when the OK / Apply button is pressed.  Changed data should be written into cvar.

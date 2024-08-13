@@ -24,15 +24,15 @@ public:
 	CSubRectImage( const char *filename, bool hardwareFiltered, int subx, int suby, int subw, int subh );
 	virtual ~CSubRectImage();
 
-	void GetSize( int &wide, int &tall );
-	void GetContentSize( int &wide, int &tall );
-	void SetSize( int x, int y );
-	void SetPos( int x, int y );
-	void SetColor( Color col );
+	void GetSize( int &wide, int &tall ) override;
+	void GetContentSize( int &wide, int &tall ) override;
+	void SetSize( int x, int y ) override;
+	void SetPos( int x, int y ) override;
+	void SetColor( Color col ) override;
 	const char *GetName();
-	void Paint();
+	void Paint() override;
 	void ForceUpload();
-	vgui::HTexture GetID();
+	vgui::HTexture GetID() override;
 	bool IsValid();
 
 private:

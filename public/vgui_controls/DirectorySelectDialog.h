@@ -24,7 +24,7 @@ class DirectoryTreeView : public TreeView
 {
 public:
 	DirectoryTreeView(DirectorySelectDialog *parent, const char *name);
-	virtual void GenerateChildrenOfNode(int itemIndex);
+	void GenerateChildrenOfNode(int itemIndex) override;
 
 private:
 	DirectorySelectDialog *m_pParent;
@@ -35,7 +35,7 @@ private:
 //-----------------------------------------------------------------------------
 class DirectorySelectDialog : public Frame
 {
-	DECLARE_CLASS_SIMPLE( DirectorySelectDialog, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( DirectorySelectDialog, Frame );
 
 public:
 	DirectorySelectDialog(vgui::Panel *parent, const char *title);
@@ -47,7 +47,7 @@ public:
 	void SetDefaultCreateDirectoryName(const char *defaultCreateDirName);
 
 	// opens the dialog
-	void DoModal();
+	void DoModal() override;
 
 	/* action signals
 
@@ -60,12 +60,12 @@ public:
 	void ExpandTreeToPath( const char *lpszPath, bool bSelectFinalDirectory = true );
 
 protected:
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void OnClose();
+	void PerformLayout() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void OnClose() override;
 
 	// command buttons
-	virtual void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 
 private:
 	MESSAGE_FUNC( OnTextChanged, "TextChanged" );

@@ -39,7 +39,7 @@ CKeyBoardEditorPage::SaveMapping_t::SaveMapping_t( const SaveMapping_t& src )
 //-----------------------------------------------------------------------------
 class VControlsListPanel : public ListPanel
 {
-	DECLARE_CLASS_SIMPLE( VControlsListPanel, ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( VControlsListPanel, ListPanel );
 
 public:
 	// Construction
@@ -55,13 +55,13 @@ public:
 	virtual void	SetItemOfInterest(int itemID);
 	virtual int		GetItemOfInterest();
 
-	virtual void	OnMousePressed(vgui::MouseCode code);
-	virtual void	OnMouseDoublePressed(vgui::MouseCode code);
+	void	OnMousePressed(vgui::MouseCode code) override;
+	void	OnMouseDoublePressed(vgui::MouseCode code) override;
 	
 	KEYBINDING_FUNC( clearbinding, KEY_DELETE, 0, OnClearBinding, 0, 0 );
 
 private:
-	void ApplySchemeSettings(vgui::IScheme *pScheme );
+	void ApplySchemeSettings(vgui::IScheme *pScheme ) override;
 
 	// Are we showing the prompt?
 	bool			m_bCaptureMode;
@@ -79,14 +79,14 @@ private:
 //-----------------------------------------------------------------------------
 class CInlineEditPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CInlineEditPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CInlineEditPanel, vgui::Panel );
 
 public:
 	CInlineEditPanel() : vgui::Panel(NULL, "InlineEditPanel")
 	{
 	}
 
-	virtual void Paint()
+	void Paint() override
 	{
 		int wide, tall;
 		GetSize(wide, tall);
@@ -99,7 +99,7 @@ public:
 		vgui::surface()->DrawOutlinedRect( 0, 0, wide, tall );
 	}
 
-	virtual void OnKeyCodeTyped(KeyCode code)
+	void OnKeyCodeTyped(KeyCode code) override
 	{
 		// forward up
 		if (GetParent())
@@ -108,13 +108,13 @@ public:
 		}
 	}
 
-	virtual void ApplySchemeSettings(IScheme *pScheme)
+	void ApplySchemeSettings(IScheme *pScheme) override
 	{
 		Panel::ApplySchemeSettings(pScheme);
 		SetBorder(pScheme->GetBorder("DepressedButtonBorder"));
 	}
 
-	void OnMousePressed(vgui::MouseCode code)
+	void OnMousePressed(vgui::MouseCode code) override
 	{
 		// forward up mouse pressed messages to be handled by the key options
 		if (GetParent())
@@ -484,7 +484,6 @@ void CKeyBoardEditorPage::OnKeyCodeTyped(vgui::KeyCode code)
 			// Swallow these
 			break;
 		}
-		break;
 	default:
 		{
 			if ( m_pList->IsCapturing() )
@@ -686,8 +685,8 @@ void CKeyBoardEditorPage::OnClearBinding( int item )
 
 CKeyBoardEditorSheet::CKeyBoardEditorSheet( Panel *parent, Panel *panelToEdit, KeyBindingContextHandle_t handle )
 	: BaseClass( parent, "KeyBoardEditorSheet" ),
-	m_bSaveToExternalFile( false ),
 	m_Handle( handle ),
+	m_bSaveToExternalFile( false ),
 	m_SaveFileName( UTL_INVAL_SYMBOL ),
 	m_SaveFilePathID( UTL_INVAL_SYMBOL )
 {

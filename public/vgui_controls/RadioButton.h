@@ -32,9 +32,9 @@ public:
 		SetSize(20, 13);
 	}
 
-	virtual void Paint();
+	void Paint() override;
 
-	virtual void SetColor(Color color)
+	void SetColor(Color color) override
 	{
 		_borderColor1 = color;
 		_borderColor2 = color;
@@ -57,7 +57,7 @@ private:
 //-----------------------------------------------------------------------------
 class RadioButton : public ToggleButton
 {
-	DECLARE_CLASS_SIMPLE( RadioButton, ToggleButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( RadioButton, ToggleButton );
 
 public:
 	RadioButton(Panel *parent, const char *panelName, const char *text);
@@ -66,7 +66,7 @@ public:
 	// Set the radio button checked. When a radio button is checked, a 
 	// message is sent to all other radio buttons in the same group so
 	// they will become unchecked.
-	virtual void SetSelected(bool state);
+	void SetSelected(bool state) override;
 
 	// Get the tab position of the radio button with the set of radio buttons
 	// A group of RadioButtons must have the same TabPosition, with [1, n] subtabpositions
@@ -81,19 +81,19 @@ public:
 	virtual void SilentSetSelected(bool state);
 
 protected:
-	virtual void DoClick();
+	void DoClick() override;
 
-	virtual void Paint();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void Paint() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 	MESSAGE_FUNC_INT( OnRadioButtonChecked, "RadioButtonChecked", tabposition);
-	virtual void OnKeyCodeTyped(KeyCode code);
+	void OnKeyCodeTyped(KeyCode code) override;
 
-	virtual IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus);
+	IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus) override;
 
-	virtual void ApplySettings(KeyValues *inResourceData);
-	virtual void GetSettings(KeyValues *outResourceData);
-	virtual const char *GetDescription();
-	virtual void PerformLayout();
+	void ApplySettings(KeyValues *inResourceData) override;
+	void GetSettings(KeyValues *outResourceData) override;
+	const char *GetDescription() override;
+	void PerformLayout() override;
 
 	RadioButton *FindBestRadioButton(int direction);
 

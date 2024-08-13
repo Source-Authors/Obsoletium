@@ -6,29 +6,29 @@
 //=============================================================================//
 
 
-#include <stdio.h>
-#include <utlvector.h>
-#include <vstdlib/IKeyValuesSystem.h>
-#include <ctype.h>	// isdigit()
+#include <cstdio>
+#include <cctype>	// isdigit()
+#include "tier1/utlvector.h"
+#include "vstdlib/IKeyValuesSystem.h"
 
-#include <materialsystem/imaterial.h>
+#include "materialsystem/imaterial.h"
 
-#include <vgui/IBorder.h>
-#include <vgui/IInput.h>
-#include <vgui/IPanel.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IVGui.h>
-#include <KeyValues.h>
-#include <vgui/MouseCode.h>
+#include "vgui/IBorder.h"
+#include "vgui/IInput.h"
+#include "vgui/IPanel.h"
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
+#include "vgui/ILocalize.h"
+#include "vgui/IVGui.h"
+#include "tier1/KeyValues.h"
+#include "vgui/MouseCode.h"
 
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/BuildGroup.h>
-#include <vgui_controls/Tooltip.h>
-#include <vgui_controls/PHandle.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/BuildGroup.h"
+#include "vgui_controls/Tooltip.h"
+#include "vgui_controls/PHandle.h"
+#include "vgui_controls/Controls.h"
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/MenuItem.h"
 
@@ -36,7 +36,7 @@
 
 #include "tier1/utldict.h"
 #include "tier1/utlbuffer.h"
-#include "mempool.h"
+#include "tier1/mempool.h"
 #include "filesystem.h"
 #include "tier0/icommandline.h"
 #include "tier0/minidump.h"
@@ -44,7 +44,7 @@
 #include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 using namespace vgui;
 
@@ -63,7 +63,7 @@ const char *g_PinCornerStrings [] =
 	"PIN_CENTER_LEFT",
 };
 
-COMPILE_TIME_ASSERT( Panel::PIN_LAST == ARRAYSIZE( g_PinCornerStrings ) );
+COMPILE_TIME_ASSERT( Panel::PIN_LAST == ssize( g_PinCornerStrings ) );
 
 extern int GetBuildModeDialogCount();
 
@@ -72,7 +72,7 @@ static char *CopyString( const char *in )
 	if ( !in )
 		return NULL;
 
-	int len = strlen( in );
+	intp len = V_strlen( in );
 	char *n = new char[ len + 1 ];
 	Q_strncpy( n, in, len  + 1 );
 	return n;
@@ -94,11 +94,11 @@ struct vgui::DragDrop_t
 	DragDrop_t() :
 		m_bDragEnabled( false ),
 		m_bShowDragHelper( true ),
-		m_bDropEnabled( false ),
-		m_flHoverContextTime( -1 ),
+		m_bDragging( false ),
 		m_bDragStarted( false ),
 		m_nDragStartTolerance( 8 ),
-		m_bDragging( false ),
+		m_bDropEnabled( false ),
+		m_flHoverContextTime( -1 ),
 		m_lDropHoverTime( 0 ),
 		m_bDropMenuShown( false ),
 		m_bPreventChaining( false )
@@ -139,12 +139,12 @@ struct vgui::DragDrop_t
 //-----------------------------------------------------------------------------
 class CDragDropHelperPanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( CDragDropHelperPanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDragDropHelperPanel, Panel );
 public:
 	CDragDropHelperPanel();
 
-	virtual VPANEL IsWithinTraverse(int x, int y, bool traversePopups);
-	virtual void PostChildPaint();
+	VPANEL IsWithinTraverse(int x, int y, bool traversePopups) override;
+	void PostChildPaint() override;
 
 	void AddPanel( Panel *current );
 
@@ -243,8 +243,8 @@ public:
 			m_Handle = src.m_Handle;
 			m_KeyBindingsFile = src.m_KeyBindingsFile;
 			m_KeyBindingsPathID = src.m_KeyBindingsPathID;
-			int c = src.m_Panels.Count();
-			for ( int i = 0; i < c; ++i )
+			intp c = src.m_Panels.Count();
+			for ( intp i = 0; i < c; ++i )
 			{
 				m_Panels.AddToTail( src.m_Panels[ i ] );
 			}
@@ -293,7 +293,7 @@ public:
 		Assert( entry );
 		if ( entry )
 		{
-			int idx = entry->m_Panels.Find( panel );
+			intp idx = entry->m_Panels.Find( panel );
 			if ( idx == entry->m_Panels.InvalidIndex() )
 			{
 				entry->m_Panels.AddToTail( panel );
@@ -417,7 +417,7 @@ Panel *Panel::GetPanelWithKeyBindings( KeyBindingContextHandle_t handle, int ind
 //-----------------------------------------------------------------------------
 int Panel::GetKeyMappingCount( )
 {
-	int nCount = 0;
+	intp nCount = 0;
 	PanelKeyBindingMap *map = GetKBMap();
 	while ( map )
 	{
@@ -478,7 +478,7 @@ void Panel::SaveKeyBindings( KeyBindingContextHandle_t handle )
 //-----------------------------------------------------------------------------
 void Panel::SaveKeyBindingsToFile( KeyBindingContextHandle_t handle, char const *filename, char const *pathID /*= 0*/ )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	BufPrint( buf, 0, "keybindings\n" );
 	BufPrint( buf, 0, "{\n" );
@@ -842,7 +842,7 @@ void Panel::SetName( const char *panelName )
 
 	if (panelName)
 	{
-		int len = Q_strlen(panelName) + 1;
+		intp len = Q_strlen(panelName) + 1;
 		_panelName = new char[ len ];
 		Q_strncpy( _panelName, panelName, len );
 	}
@@ -1207,8 +1207,8 @@ void Panel::PaintTraverse( bool repaint, bool allowForce )
 
 	// traverse and paint all our children
 	CUtlVector< VPANEL > &children = ipanel()->GetChildren( vpanel );
-	int childCount = children.Count();
-	for (int i = 0; i < childCount; i++)
+	intp childCount = children.Count();
+	for (intp i = 0; i < childCount; i++)
 	{
 		VPANEL child = children[ i ];
 		bool bVisible = ipanel()->IsVisible( child );
@@ -2175,8 +2175,8 @@ KeyBindingMap_t *Panel::LookupBinding( char const *bindingName )
 	PanelKeyBindingMap *map = GetKBMap();
 	while( map )
 	{
-		int c = map->entries.Count();
-		for( int i = 0; i < c ; ++i )
+		intp c = map->entries.Count();
+		for( intp i = 0; i < c ; ++i )
 		{
 			KeyBindingMap_t *binding = &map->entries[ i ];
 			if ( !Q_stricmp( binding->bindingname, bindingName ) )
@@ -2194,8 +2194,8 @@ PanelKeyBindingMap *Panel::LookupMapForBinding( char const *bindingName )
 	PanelKeyBindingMap *map = GetKBMap();
 	while( map )
 	{
-		int c = map->entries.Count();
-		for( int i = 0; i < c ; ++i )
+		intp c = map->entries.Count();
+		for( intp i = 0; i < c ; ++i )
 		{
 			KeyBindingMap_t *binding = &map->entries[ i ];
 			if ( !Q_stricmp( binding->bindingname, bindingName ) )
@@ -2213,8 +2213,8 @@ KeyBindingMap_t *Panel::LookupBindingByKeyCode( KeyCode code, int modifiers )
 	PanelKeyBindingMap *map = GetKBMap();
 	while( map )
 	{
-		int c = map->boundkeys.Count();
-		for( int i = 0; i < c ; ++i )
+		intp c = map->boundkeys.Count();
+		for( intp i = 0; i < c ; ++i )
 		{
 			BoundKey_t *kb = &map->boundkeys[ i ];
 			if ( kb->keycode == code && kb->modifiers == modifiers )
@@ -2239,8 +2239,8 @@ BoundKey_t *Panel::LookupDefaultKey( char const *bindingName )
 	PanelKeyBindingMap *map = GetKBMap();
 	while( map )
 	{
-		int c = map->defaultkeys.Count();
-		for( int i = 0; i < c ; ++i )
+		intp c = map->defaultkeys.Count();
+		for( intp i = 0; i < c ; ++i )
 		{
 			BoundKey_t *kb = &map->defaultkeys[ i ];
 			if ( !Q_stricmp( kb->bindingname, bindingName ) )
@@ -2259,8 +2259,8 @@ void Panel::LookupBoundKeys( char const *bindingName, CUtlVector< BoundKey_t * >
 	PanelKeyBindingMap *map = GetKBMap();
 	while( map )
 	{
-		int c = map->boundkeys.Count();
-		for( int i = 0; i < c ; ++i )
+		intp c = map->boundkeys.Count();
+		for( intp i = 0; i < c ; ++i )
 		{
 			BoundKey_t *kb = &map->boundkeys[ i ];
 			if ( !Q_stricmp( kb->bindingname, bindingName ) )
@@ -2545,8 +2545,8 @@ void Panel::SaveKeyBindingsToBuffer( int level, CUtlBuffer& buf  )
 	PanelKeyBindingMap *map = GetKBMap();
 	while( map )
 	{
-		int c = map->boundkeys.Count();
-		for( int i = 0; i < c ; ++i )
+		intp c = map->boundkeys.Count();
+		for( intp i = 0; i < c ; ++i )
 		{
 			const BoundKey_t& binding = map->boundkeys[ i ];
 
@@ -2622,8 +2622,8 @@ bool Panel::ParseKeyBindings( KeyValues *kv )
 	PanelKeyBindingMap *map = GetKBMap();
 	while( map )
 	{
-		int c = map->entries.Count();
-		for( int i = 0; i < c ; ++i )
+		intp c = map->entries.Count();
+		for( intp i = 0; i < c ; ++i )
 		{
 			KeyBindingMap_t *binding = &map->entries[ i ];
 			
@@ -3307,9 +3307,9 @@ VPANEL Panel::IsWithinTraverse(int x, int y, bool traversePopups)
 	if (traversePopups)
 	{
 		// check popups first
-		int i;
+		intp i;
 		CUtlVector< VPANEL > &children = ipanel()->GetChildren( GetVPanel() );
-		int childCount = children.Count();
+		intp childCount = children.Count();
 		for (i = childCount - 1; i >= 0; i--)
 		{
 			VPANEL panel = children[ i ];
@@ -3355,8 +3355,8 @@ VPANEL Panel::IsWithinTraverse(int x, int y, bool traversePopups)
 			// this checks in backwards order so the last child drawn for this panel is chosen which
 			// coincides to how it would be visibly displayed
 			CUtlVector< VPANEL > &children = ipanel()->GetChildren( GetVPanel() );
-			int childCount = children.Count();
-			for (int i = childCount - 1; i >= 0; i--)
+			intp childCount = children.Count();
+			for (intp i = childCount - 1; i >= 0; i--)
 			{
 				VPANEL panel = children[ i ];
 				// ignore popups
@@ -3564,7 +3564,7 @@ void Panel::RequestFocus(int direction)
 //-----------------------------------------------------------------------------
 void Panel::OnRequestFocus(VPANEL subFocus, VPANEL defaultPanel)
 {
-	CallParentFunction(new KeyValues("OnRequestFocus", "subFocus", subFocus, "defaultPanel", defaultPanel));
+	CallParentFunction(new KeyValues("OnRequestFocus", "subFocus", ivgui()->PanelToHandle(subFocus), "defaultPanel", ivgui()->PanelToHandle(defaultPanel)));
 }
 
 //-----------------------------------------------------------------------------
@@ -3669,7 +3669,7 @@ void Panel::PostActionSignal( KeyValues *message )
 	{	
 		// add who it was from the message
 		message->SetPtr("panel", this);
-		int i;
+		intp i;
 		for (i = _actionSignalTargetDar.GetCount() - 1; i > 0; i--)
 		{
 			VPANEL panel = ivgui()->HandleToPanel(_actionSignalTargetDar[i]);
@@ -3789,13 +3789,23 @@ void Panel::SetTall(int tall)
 
 void Panel::SetBuildGroup(BuildGroup* buildGroup)
 {
-	//TODO: remove from old group
-
 	Assert(buildGroup != NULL);
-	
+
+	if ( _buildGroup == buildGroup )
+		return;
+
+	// dimhotepus: Not implemented already, and has problems with load game / achievements.
+	/*if ( _buildGroup.Get() )
+	{
+		_buildGroup->PanelRemoved( this );
+	}*/
+
 	_buildGroup = buildGroup;
 
-	_buildGroup->PanelAdded(this);
+	if ( _buildGroup.Get() )
+	{
+		_buildGroup->PanelAdded( this );
+	}
 }
 
 bool Panel::IsBuildGroupEnabled()
@@ -4058,7 +4068,7 @@ void Panel::PinToSibling( const char *pszSibling, PinCorner_e pinOurCorner, PinC
 
 	if (pszSibling)
 	{
-		int len = Q_strlen(pszSibling) + 1;
+		intp len = Q_strlen(pszSibling) + 1;
 		_pinToSibling = new char[ len ];
 		Q_strncpy( _pinToSibling, pszSibling, len );
 	}
@@ -4272,7 +4282,7 @@ Panel::PinCorner_e GetPinCornerFromString( const char* pszCornerName )
 		return (Panel::PinCorner_e)atoi( pszCornerName );
 	}
 
-	for( int i=0; i<ARRAYSIZE( g_PinCornerStrings ); ++i )
+	for( size_t i=0; i<std::size( g_PinCornerStrings ); ++i )
 	{
 		if ( !Q_stricmp( g_PinCornerStrings[i], pszCornerName ) )
 		{
@@ -4601,14 +4611,14 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s: Color overrides", __FUNCTION__, GetName() );
 	// Allow overriding of colors. Used mostly by HUD elements, where scheme color usage is often undesired.
 	IScheme *pScheme = vgui::scheme()->GetIScheme( GetScheme() );
-	for ( int i = 0; i < m_OverridableColorEntries.Count(); i++ )
+	for ( auto &e : m_OverridableColorEntries )
 	{
 		// Need to ensure the key exists, so we don't overwrite existing colors when it's not set.
-		if ( inResourceData->FindKey( m_OverridableColorEntries[i].m_pszScriptName, false ) )
+		if ( inResourceData->FindKey( e.m_pszScriptName, false ) )
 		{
 			// Get the color as a string - test whether it is an actual color or a reference to a scheme color
-			const char *pColorStr = inResourceData->GetString( m_OverridableColorEntries[i].m_pszScriptName );
-			Color &clrDest = m_OverridableColorEntries[i].m_colFromScript;
+			const char *pColorStr = inResourceData->GetString( e.m_pszScriptName );
+			Color &clrDest = e.m_colFromScript;
 			if ( pColorStr[0] == '.' || isdigit( pColorStr[0] ) )
 			{
 				float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
@@ -4624,8 +4634,8 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 				clrDest = pScheme->GetColor( pColorStr, Color( 255, 255, 255, 255 ) );
 			}
 
-			(*m_OverridableColorEntries[i].m_pColor) = m_OverridableColorEntries[i].m_colFromScript;
-			m_OverridableColorEntries[i].m_bOverridden = true;
+			*e.m_pColor = e.m_colFromScript;
+			e.m_bOverridden = true;
 		}
 	}
 
@@ -4755,11 +4765,11 @@ void Panel::GetSettings( KeyValues *outResourceData )
 
 	outResourceData->SetInt( "tabPosition", GetTabPosition() );
 
-	for ( int i = 0; i < m_OverridableColorEntries.Count(); i++ )
+	for ( auto &e : m_OverridableColorEntries )
 	{
-		if ( m_OverridableColorEntries[i].m_bOverridden )
+		if ( e.m_bOverridden )
 		{
-			outResourceData->SetColor( m_OverridableColorEntries[i].m_pszScriptName, m_OverridableColorEntries[i].m_colFromScript );
+			outResourceData->SetColor( e.m_pszScriptName, e.m_colFromScript );
 		}
 	}
 }
@@ -4771,11 +4781,11 @@ void Panel::GetSettings( KeyValues *outResourceData )
 //-----------------------------------------------------------------------------
 void Panel::ApplyOverridableColors( void )
 {
-	for ( int i = 0; i < m_OverridableColorEntries.Count(); i++ )
+	for ( auto &e : m_OverridableColorEntries )
 	{
-		if ( m_OverridableColorEntries[i].m_bOverridden )
+		if ( e.m_bOverridden )
 		{
-			(*m_OverridableColorEntries[i].m_pColor) = m_OverridableColorEntries[i].m_colFromScript;
+			*e.m_pColor = e.m_colFromScript;
 		}
 	}
 }
@@ -4785,11 +4795,11 @@ void Panel::ApplyOverridableColors( void )
 //-----------------------------------------------------------------------------
 void Panel::SetOverridableColor( Color *pColor, const Color &newColor )
 {
-	for ( int i = 0; i < m_OverridableColorEntries.Count(); i++ )
+	for ( auto &e : m_OverridableColorEntries )
 	{
-		if ( m_OverridableColorEntries[i].m_bOverridden )
+		if ( e.m_bOverridden )
 		{
-			if ( m_OverridableColorEntries[i].m_pColor == pColor )
+			if ( e.m_pColor == pColor )
 				return;
 		}
 	}
@@ -4906,7 +4916,7 @@ MessageMapItem_t Panel::m_MessageMap[] =
 };
 
 // IMPLEMENT_PANELMAP( Panel, NULL )
-PanelMap_t Panel::m_PanelMap = { Panel::m_MessageMap, ARRAYSIZE(Panel::m_MessageMap), "Panel", NULL };
+PanelMap_t Panel::m_PanelMap = { Panel::m_MessageMap, ssize(Panel::m_MessageMap), "Panel", NULL, 0 };
 PanelMap_t *Panel::GetPanelMap( void ) { return &m_PanelMap; }
 
 //-----------------------------------------------------------------------------
@@ -4963,7 +4973,7 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 {
 	PanelMessageMap *panelMap = GetMessageMap();
 	bool bFound = false;
-	int iMessageName = params->GetNameSymbol();
+	HKeySymbol iMessageName = params->GetNameSymbol();
 
 	if ( !panelMap->processed )
 	{
@@ -4979,7 +4989,7 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 #endif
 
 		// iterate all the entries in the panel map
-		for ( int i = 0; i < panelMap->entries.Count(); i++ )
+		for ( intp i = 0; i < panelMap->entries.Count(); i++ )
 		{
 			MessageMapItem_t *pMap = &panelMap->entries[i];
 
@@ -5057,7 +5067,7 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 							break;
 
 						default:
-							Assert(!("No handler for vgui message function"));
+							AssertMsg( false, "No handler for vgui message function" );
 							break;
 					}
 					break;
@@ -5108,8 +5118,8 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 					}
 					else if ( (DATATYPE_PTR == pMap->firstParamType) && (DATATYPE_CONSTWCHARPTR == pMap->secondParamType) )
 					{
-						typedef void (Panel::*MessageFunc_PtrConstCharPtr_t)(void *, const wchar_t *);
-						(this->*((MessageFunc_PtrConstCharPtr_t)pMap->func))( param1->GetPtr(), param2->GetWString() );
+						typedef void (Panel::*MessageFunc_PtrConstWCharPtr_t)(void *, const wchar_t *);
+						(this->*((MessageFunc_PtrConstWCharPtr_t)pMap->func))( param1->GetPtr(), param2->GetWString() );
 					}
 					else if ( (DATATYPE_HANDLE == pMap->firstParamType) && (DATATYPE_CONSTCHARPTR == pMap->secondParamType) )
 					{
@@ -5119,9 +5129,16 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 					}
 					else if ( (DATATYPE_HANDLE == pMap->firstParamType) && (DATATYPE_CONSTWCHARPTR == pMap->secondParamType) )
 					{
-						typedef void (Panel::*MessageFunc_HandleConstCharPtr_t)(VPANEL, const wchar_t *);
+						typedef void (Panel::*MessageFunc_HandleConstWCharPtr_t)(VPANEL, const wchar_t *);
 						VPANEL vp = ivgui()->HandleToPanel( param1->GetInt() );
-						(this->*((MessageFunc_HandleConstCharPtr_t)pMap->func))( vp, param2->GetWString() );
+						(this->*((MessageFunc_HandleConstWCharPtr_t)pMap->func))( vp, param2->GetWString() );
+					}
+					else if ( (DATATYPE_HANDLE == pMap->firstParamType) && (DATATYPE_HANDLE == pMap->secondParamType) )
+					{
+						typedef void (Panel::*MessageFunc_HandleHandle_t)(VPANEL, VPANEL);
+						VPANEL vp1 = ivgui()->HandleToPanel( param1->GetInt() );
+						VPANEL vp2 = ivgui()->HandleToPanel( param2->GetInt() );
+						(this->*((MessageFunc_HandleHandle_t)pMap->func))( vp1, vp2 );
 					}
 					else
 					{
@@ -5132,7 +5149,7 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 				}
 
 				default:
-					Assert(!("Invalid number of parameters"));
+					AssertMsg( false, "Invalid number of parameters" );
 					break;
 				}
 
@@ -5153,7 +5170,7 @@ void Panel::OnOldMessage(KeyValues *params, VPANEL ifromPanel)
 {
 	bool bFound = false;
 	// message map dispatch
-	int iMessageName = params->GetNameSymbol();
+	HKeySymbol iMessageName = params->GetNameSymbol();
 
 	PanelMap_t *panelMap = GetPanelMap();
 	if ( !panelMap->processed )
@@ -5257,8 +5274,10 @@ void Panel::OnOldMessage(KeyValues *params, VPANEL ifromPanel)
 						break;
 
 					case DATATYPE_PTR:
-						typedef void (Panel::*MessageFunc_Ptr_t)(void *);
-						(this->*((MessageFunc_Ptr_t)pMessageMap[i].func))( (void *)params->GetPtr(pMessageMap[i].firstParamName) );
+						{
+							typedef void (Panel::*MessageFunc_Ptr_t)(void *);
+							(this->*((MessageFunc_Ptr_t)pMessageMap[i].func))( (void *)params->GetPtr(pMessageMap[i].firstParamName) );
+						}
 						break;
 					
 					case DATATYPE_HANDLE:
@@ -5352,8 +5371,8 @@ void Panel::PostMessageToAllSiblings( KeyValues *msg, float delaySeconds /*= 0.0
 		VPANEL vpanel = GetVPanel();
 
 		CUtlVector< VPANEL > &children = ipanel()->GetChildren( parent );
-		int nChildCount = children.Count();
-		for ( int i = 0; i < nChildCount; ++i )
+		intp nChildCount = children.Count();
+		for ( intp i = 0; i < nChildCount; ++i )
 		{
 			VPANEL sibling = children[ i ];
 			if ( sibling == vpanel )
@@ -5504,7 +5523,7 @@ void Panel::OnDelete()
 // Purpose: Panel handle implementation
 //			Returns a pointer to a valid panel, NULL if the panel has been deleted
 //-----------------------------------------------------------------------------
-Panel *PHandle::Get() 
+Panel *PHandle::Get() const
 {
 	if (m_iPanelID != INVALID_PANEL)
 	{
@@ -5613,7 +5632,7 @@ void Panel::SetTooltip( BaseTooltip *pToolTip, const char *pszText )
 
 	if ( pszText )
 	{
-		int len = Q_strlen(pszText) + 1;
+		intp len = Q_strlen(pszText) + 1;
 		_tooltipText = new char[ len ];
 		Q_strncpy( _tooltipText, pszText, len );
 	}
@@ -5708,19 +5727,19 @@ bool Panel::IsMouseInputEnabled()
 class CFloatProperty : public vgui::IPanelAnimationPropertyConverter
 {
 public:
-	virtual void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		kv->SetFloat( entry->name(), *(float *)data );
 	}
 	
-	virtual void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		*(float *)data = kv->GetFloat( entry->name() );
 	}
 
-	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry )
+	void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		*(float *)data = strtof( entry->defaultvalue(), nullptr );
@@ -5730,7 +5749,7 @@ public:
 class CProportionalFloatProperty : public vgui::IPanelAnimationPropertyConverter
 {
 public:
-	virtual void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		float f = *(float *)data;
@@ -5738,7 +5757,7 @@ public:
 		kv->SetFloat( entry->name(), f );
 	}
 	
-	virtual void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		float f = kv->GetFloat( entry->name() );
@@ -5746,10 +5765,11 @@ public:
 		*(float *)data = f;
 	}
 
-	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry )
+	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
-		float f = atof( entry->defaultvalue() );
+		// dimhotepus: atof -> strtof.
+		float f = strtof( entry->defaultvalue(), nullptr );
 		f = scheme()->GetProportionalScaledValueEx( panel->GetScheme(), f );
 		*(float *)data = f;
 	}
@@ -5758,19 +5778,19 @@ public:
 class CIntProperty : public vgui::IPanelAnimationPropertyConverter
 {
 public:
-	virtual void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		kv->SetInt( entry->name(), *(int *)data );
 	}
 	
-	virtual void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		*(int *)data = kv->GetInt( entry->name() );
 	}
 
-	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry )
+	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		*(int *)data = atoi( entry->defaultvalue() );
@@ -5780,7 +5800,7 @@ public:
 class CProportionalIntProperty : public vgui::IPanelAnimationPropertyConverter
 {
 public:
-	virtual void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		int i = *(int *)data;
@@ -5788,14 +5808,14 @@ public:
 		kv->SetInt( entry->name(), i );
 	}
 	
-	virtual void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		int i = kv->GetInt( entry->name() );
 		i = scheme()->GetProportionalScaledValueEx( panel->GetScheme(), i );
 		*(int *)data = i;
 	}
-	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry )
+	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		int i = atoi( entry->defaultvalue() );
@@ -5835,18 +5855,18 @@ public:
 		return pPanel->GetWide();
 	}
 
-	virtual void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	virtual void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		// Won't work with this, don't use it.
 		Assert(0);
 	}
 
-	virtual void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	virtual void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		*(int *)data = ExtractValue( panel, kv->GetString( entry->name() ) );
 	}
-	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry )
+	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		*(int *)data = ExtractValue( panel, entry->defaultvalue() );
@@ -5856,7 +5876,7 @@ public:
 class CProportionalIntWithScreenspacePropertyY : public CProportionalIntWithScreenspacePropertyX
 {
 public:
-	virtual int GetScreenSize( Panel *pPanel ) const OVERRIDE
+	virtual int GetScreenSize( Panel *pPanel ) const override
 	{
 		int nParentWide, nParentTall;
 		if (pPanel->IsProportional() && pPanel->GetParent())
@@ -5872,7 +5892,7 @@ public:
 		return nParentTall;
 	}
 
-	virtual int GetPanelDimension(Panel *pPanel) const OVERRIDE
+	virtual int GetPanelDimension(Panel *pPanel) const override
 	{
 		return pPanel->GetTall();
 	}
@@ -5905,18 +5925,18 @@ public:
 		return Compute( pPanel, nBuildFlags, pszKey, nParentWide, nParentTall, false );
 	}
 
-	virtual void GetData(Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry)
+	virtual void GetData(Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry) override
 	{
 		// Won't work with this, don't use it.
 		Assert(0);
 	}
 
-	virtual void SetData(Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry)
+	virtual void SetData(Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry) override
 	{
 		void *data = (void *)((*entry->m_pfnLookup)(panel));
 		*(int *)data = ExtractValue(panel, kv->GetString(entry->name()));
 	}
-	virtual void InitFromDefault(Panel *panel, PanelAnimationMapEntry *entry)
+	virtual void InitFromDefault(Panel *panel, PanelAnimationMapEntry *entry) override
 	{
 		void *data = (void *)((*entry->m_pfnLookup)(panel));
 		*(int *)data = ExtractValue(panel, entry->defaultvalue());
@@ -5936,7 +5956,7 @@ private:
 class CProportionalHeightProperty : public CProportionalWidthProperty
 {
 private:
-	virtual int Compute(Panel* pPanel, unsigned int& nBuildFlags, const char *pszKey, int nParentWide, int nParentTall, bool bComputingOther) OVERRIDE
+	virtual int Compute(Panel* pPanel, unsigned int& nBuildFlags, const char *pszKey, int nParentWide, int nParentTall, bool bComputingOther) override
 	{
 		KeyValuesAD kv( "temp" );
 		kv->SetString( "tall", pszKey );
@@ -5949,13 +5969,13 @@ private:
 class CColorProperty : public vgui::IPanelAnimationPropertyConverter
 {
 public:
-	virtual void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		kv->SetColor( entry->name(), *(Color *)data );
 	}
 	
-	virtual void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		vgui::IScheme *scheme = vgui::scheme()->GetIScheme( panel->GetScheme() );
 		Assert( scheme );
@@ -5975,7 +5995,7 @@ public:
 		}
 	}
 
-	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry )
+	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
 		vgui::IScheme *scheme = vgui::scheme()->GetIScheme( panel->GetScheme() );
 		Assert( scheme );
@@ -5990,19 +6010,19 @@ public:
 class CBoolProperty : public vgui::IPanelAnimationPropertyConverter
 {
 public:
-	virtual void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		kv->SetInt( entry->name(), *(bool *)data ? 1 : 0 );
 	}
 	
-	virtual void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		*(bool *)data = kv->GetInt( entry->name() ) ? true : false;
 	}
 
-	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry )
+	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		bool b = false;
@@ -6019,19 +6039,19 @@ public:
 class CStringProperty : public vgui::IPanelAnimationPropertyConverter
 {
 public:
-	virtual void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		kv->SetString( entry->name(), (char *)data );
 	}
 	
-	virtual void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		strcpy( (char *)data, kv->GetString( entry->name() ) );
 	}
 
-	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry )
+	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		strcpy( ( char * )data, entry->defaultvalue() );
@@ -6041,7 +6061,7 @@ public:
 class CHFontProperty : public vgui::IPanelAnimationPropertyConverter
 {
 public:
-	virtual void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		vgui::IScheme *scheme = vgui::scheme()->GetIScheme( panel->GetScheme() );
 		Assert( scheme );
@@ -6053,7 +6073,7 @@ public:
 		}
 	}
 	
-	virtual void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		vgui::IScheme *scheme = vgui::scheme()->GetIScheme( panel->GetScheme() );
 		Assert( scheme );
@@ -6065,7 +6085,7 @@ public:
 		}
 	}
 
-	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry )
+	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
 		vgui::IScheme *scheme = vgui::scheme()->GetIScheme( panel->GetScheme() );
 		Assert( scheme );
@@ -6080,7 +6100,7 @@ public:
 class CTextureIdProperty : public vgui::IPanelAnimationPropertyConverter
 {
 public:
-	virtual void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		int currentId = *(int *)data;
@@ -6098,7 +6118,7 @@ public:
 		}
 	}
 	
-	virtual void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry )
+	void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 
@@ -6118,7 +6138,7 @@ public:
 		*(int *)data = currentId;
 	}
 
-	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry )
+	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 
@@ -6266,8 +6286,8 @@ PanelAnimationMapEntry *Panel::FindPanelAnimationEntry( char const *scriptname, 
 	Assert( scriptname );
 
 	// Look through mapping for entry
-	int c = map->entries.Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = map->entries.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		PanelAnimationMapEntry *e = &map->entries[ i ];
 
@@ -6319,8 +6339,8 @@ void  Panel::InternalInitDefaultValues( PanelAnimationMap *map )
 	_flags.ClearFlag( NEEDS_DEFAULT_SETTINGS_APPLIED );
 
 	// Look through mapping for entry
-	int c = map->entries.Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = map->entries.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		PanelAnimationMapEntry *e = &map->entries[ i ];
 		Assert( e );
@@ -6638,8 +6658,9 @@ bool Panel::IsDragEnabled() const
 {
 #if defined( VGUI_USEDRAGDROP )
 	return m_pDragDrop->m_bDragEnabled;
-#endif
+#else
 	return false;
+#endif
 }
 
 void Panel::SetShowDragHelper( bool enabled )
@@ -6667,8 +6688,9 @@ bool Panel::IsBlockingDragChaining() const
 {
 #if defined( VGUI_USEDRAGDROP )
 	return m_pDragDrop->m_bPreventChaining;
-#endif
+#else
 	return true;
+#endif
 }
 
 
@@ -6679,8 +6701,9 @@ int Panel::GetDragStartTolerance() const
 {
 #if defined( VGUI_USEDRAGDROP )
 	return m_pDragDrop->m_nDragStartTolerance;
-#endif
+#else
 	return 0;
+#endif
 }
 
 void Panel::SetDragSTartTolerance( int nTolerance )
@@ -6712,8 +6735,9 @@ bool Panel::IsDropEnabled() const
 {
 #if defined( VGUI_USEDRAGDROP )
 	return m_pDragDrop->m_bDropEnabled;
-#endif
+#else
 	return false;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -6837,7 +6861,7 @@ void Panel::OnFinishDragging( bool mousereleased, MouseCode code, bool abort /*=
 	m_pDragDrop->m_bDragging = false;
 
 	CUtlVector< KeyValues * >& data = m_pDragDrop->m_DragData;
-	int nData = data.Count();
+	intp nData = data.Count();
 
 	Panel *target = NULL;
 	bool shouldDrop = false;
@@ -6885,7 +6909,7 @@ void Panel::OnFinishDragging( bool mousereleased, MouseCode code, bool abort /*=
 			m_pDragDrop->m_hDropContextMenu = NULL;
 		}
 
-		for ( int i = 0 ; i < nData; ++i )
+		for ( intp i = 0 ; i < nData; ++i )
 		{
 			KeyValues *msg = data[ i ];
 
@@ -6902,7 +6926,7 @@ void Panel::OnFinishDragging( bool mousereleased, MouseCode code, bool abort /*=
 			// Convert screen space coordintes to coordinates relative to drop window
 			target->ScreenToLocal( localmousex, localmousey );
 
-			for ( int i = 0 ; i < nData; ++i )
+			for ( intp i = 0 ; i < nData; ++i )
 			{
 				KeyValues *msg = data[ i ];
 
@@ -6926,7 +6950,7 @@ void Panel::OnFinishDragging( bool mousereleased, MouseCode code, bool abort /*=
 	// Copy data ptrs out of data because OnPanelDropped might cause this panel to be deleted
 	// and our this ptr will be hosed...
 	CUtlVector< KeyValues * > temp;
-	for ( int i = 0 ; i < nData; ++i )
+	for ( intp i = 0 ; i < nData; ++i )
 	{
 		temp.AddToTail( data[ i ] );
 	}
@@ -6936,7 +6960,7 @@ void Panel::OnFinishDragging( bool mousereleased, MouseCode code, bool abort /*=
 	{
 		target->OnPanelDropped( temp );
 	}
-	for ( int i = 0 ; i < nData; ++i )
+	for ( intp i = 0 ; i < nData; ++i )
 	{
         temp[ i ]->deleteThis();
 	}
@@ -7178,7 +7202,7 @@ bool Panel::GetDropContextMenu( Menu *menu, CUtlVector< KeyValues * >& msglist )
 void Panel::CreateDragData()
 {
 #if defined( VGUI_USEDRAGDROP )
-	int i, c;
+	intp i, c;
 
 	if ( m_pDragDrop->m_DragData.Count() )
 	{
@@ -7225,7 +7249,7 @@ void Panel::CreateDragData()
 void Panel::GetDragData( CUtlVector< KeyValues * >& list )
 {
 #if defined( VGUI_USEDRAGDROP )
-	int i, c;
+	intp i, c;
 
 	list.RemoveAll();
 
@@ -7263,8 +7287,8 @@ VPANEL CDragDropHelperPanel::IsWithinTraverse(int x, int y, bool traversePopups)
 
 void CDragDropHelperPanel::PostChildPaint()
 {
-	int c = m_PaintList.Count();
-	for ( int i = c - 1; i >= 0 ; --i )
+	intp c = m_PaintList.Count();
+	for ( intp i = c - 1; i >= 0 ; --i )
 	{
 		DragHelperPanel_t& data = m_PaintList[ i ];
 
@@ -7288,9 +7312,9 @@ void CDragDropHelperPanel::PostChildPaint()
 				CUtlVector< Panel * > temp;
 				CUtlVector< PHandle >& dragData = dragDrop->m_DragPanels;
 				CUtlVector< KeyValues * >& msglist = dragDrop->m_DragData;
-				for ( auto &data : dragData )
+				for ( auto &d : dragData )
 				{
-					Panel *pPanel = data.Get();
+					Panel *pPanel = d.Get();
 					if ( pPanel )
 					{
 						temp.AddToTail( pPanel );
@@ -7321,8 +7345,8 @@ void CDragDropHelperPanel::AddPanel( Panel *current )
 		surface()->MovePopupToFront( hover->GetVPanel() );
 	}
 
-	int c = m_PaintList.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_PaintList.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		if ( m_PaintList[ i ].m_hPanel.Get() == current )
 			return;
@@ -7339,8 +7363,8 @@ void CDragDropHelperPanel::AddPanel( Panel *current )
 //-----------------------------------------------------------------------------
 void CDragDropHelperPanel::RemovePanel( Panel *search )
 {
-	int c = m_PaintList.Count();
-	for ( int i = c - 1 ; i >= 0; --i )
+	intp c = m_PaintList.Count();
+	for ( intp i = c - 1 ; i >= 0; --i )
 	{
 		if ( m_PaintList[ i ].m_hPanel.Get() == search )
 		{
@@ -7369,8 +7393,8 @@ void Panel::FindDropTargetPanel_R( CUtlVector< VPANEL >& panelList, int x, int y
 	}
 
 	CUtlVector< VPANEL > &children = ipanel()->GetChildren( check );
-	int childCount = children.Count();
-	for ( int i = 0; i < childCount; i++ )
+	intp childCount = children.Count();
+	for ( intp i = 0; i < childCount; i++ )
 	{
 		VPANEL child = children[ i ];
 		FindDropTargetPanel_R( panelList, x, y, child );
@@ -7401,8 +7425,8 @@ Panel *Panel::FindDropTargetPanel()
 	{
 		// faster version of code below
 		// checks through each popup in order, top to bottom windows
-		int c = surface()->GetPopupCount();
-		for (int i = c - 1; i >= 0 && hits.Count() == 0; i--)
+		intp c = surface()->GetPopupCount();
+		for (intp i = c - 1; i >= 0 && hits.Count() == 0; i--)
 		{
 			VPANEL popup = surface()->GetPopup(i);
 			if ( popup == embedded )
@@ -7431,7 +7455,7 @@ Panel *Panel::FindDropTargetPanel()
 
 	// Return topmost panel under mouse, if it's visible to this .dll
 	Panel *panel = NULL;
-	int nCount = hits.Count();
+	intp nCount = hits.Count();
 	while ( --nCount >= 0 )
 	{
 		panel = ipanel()->GetPanel( hits[ nCount ], GetModuleName() );
@@ -7471,9 +7495,9 @@ void Panel::OnDraggablePanelPaint()
 		surface()->DrawSetTextPos( x + 5, y + 2 );
 
 		wchar_t sz[ 64 ];
-		V_swprintf_safe( sz, L"[ %i ]", m_pDragDrop->m_DragPanels.Count() );
+		V_swprintf_safe( sz, L"[ %zi ]", m_pDragDrop->m_DragPanels.Count() );
 
-		surface()->DrawPrintText( sz, wcslen( sz ) );
+		surface()->DrawPrintText( sz, V_wcslen( sz ) );
 	}
 #endif
 }
@@ -7512,8 +7536,9 @@ Color Panel::GetDropFrameColor()
 {
 #if defined( VGUI_USEDRAGDROP )
 	return m_clrDropFrame;
-#endif
+#else
 	return Color(0, 0, 0, 0);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -7525,8 +7550,9 @@ Color Panel::GetDragFrameColor()
 {
 #if defined( VGUI_USEDRAGDROP )
 	return m_clrDragFrame;
-#endif
+#else
 	return Color(0, 0, 0, 0);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -8542,7 +8568,7 @@ void VguiPanelGetSortedChildPanelList( Panel *pParentPanel, void *pSortedPanels 
 	}
 }
 
-void VguiPanelGetSortedChildButtonList( Panel *pParentPanel, void *pSortedPanels, char *pchFilter /*= NULL*/, int nFilterType /*= 0*/ )
+void VguiPanelGetSortedChildButtonList( Panel *pParentPanel, void *pSortedPanels, const char *pchFilter /*= NULL*/, int nFilterType /*= 0*/ )
 {
 	CUtlSortVector< SortedPanel_t, CSortedPanelYLess > *pList = reinterpret_cast< CUtlSortVector< SortedPanel_t, CSortedPanelYLess >* >( pSortedPanels );
 
@@ -8589,8 +8615,8 @@ int VguiPanelNavigateSortedChildButtonList( void *pSortedPanels, int nDir )
 
 	if ( nDir != 0 )
 	{
-		int nArmed = -1;
-		for ( int i = 0; i < pList->Count(); i++ )
+		intp nArmed = -1;
+		for ( intp i = 0; i < pList->Count(); i++ )
 		{
 			if ( (*pList)[ i ].pButton->IsArmed() )
 			{
@@ -8606,7 +8632,7 @@ int VguiPanelNavigateSortedChildButtonList( void *pSortedPanels, int nDir )
 		}
 		else
 		{
-			int nNewArmed = clamp( nArmed + nDir, 0, pList->Count() - 1 );
+			intp nNewArmed = clamp( nArmed + nDir, (intp)0, pList->Count() - 1 );
 			if ( nNewArmed != nArmed )
 			{
 				(*pList)[ nArmed ].pButton->SetArmed( false );
@@ -8666,7 +8692,8 @@ int ComputeWide(Panel* pPanel, unsigned int& nBuildFlags, KeyValues *inResourceD
 			}
 		}
 
-		float flWide = atof(wstr);
+		// dimhotepus: atof -> strtof.
+		float flWide = strtof(wstr, nullptr);
 		if (!(nBuildFlags & Panel::BUILDMODE_SAVE_WIDE_PROPORTIONAL_TALL))
 		{
 			wide = atoi(wstr);
@@ -8748,7 +8775,8 @@ int ComputeTall(Panel* pPanel, unsigned int& nBuildFlags, KeyValues *inResourceD
 			}
 		}
 
-		float flTall = atof(tstr);
+		// dimhotepus: atof -> strtof.
+		float flTall = strtof(tstr, nullptr);
 		if (!(nBuildFlags & Panel::BUILDMODE_SAVE_TALL_PROPORTIONAL_WIDE))
 		{
 			tall = atoi(tstr);
@@ -8824,9 +8852,10 @@ int ComputePos( Panel* pPanel, const char *pszInput, int &nPos, const int& nSize
 
 		// get the value
 		int nNewPos = atoi(pszInput);
-		float flPos = atof(pszInput);
+		// dimhotepus: atof -> strtof.
+		float flPos = strtof(pszInput, nullptr);
 
-		float flProportion = 1.f;
+		[[maybe_unused]] float flProportion = 1.f;
 		// scale the x up to our screen co-ords
 		if ( pPanel->IsProportional() )
 		{

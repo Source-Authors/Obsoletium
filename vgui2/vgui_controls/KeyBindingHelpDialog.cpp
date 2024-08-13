@@ -249,7 +249,7 @@ void CKeyBindingHelpDialog::PopulateList()
 			}
 			if ( k == c )
 			{
-				int iMap = maps.AddToTail( );
+				intp iMap = maps.AddToTail( );
 				maps[iMap].m_pMap = map;
 				maps[iMap].m_pPanel = pPanel;
 			}

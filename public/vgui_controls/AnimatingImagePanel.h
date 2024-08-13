@@ -23,7 +23,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class AnimatingImagePanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( AnimatingImagePanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( AnimatingImagePanel, Panel );
 
 public:
 	AnimatingImagePanel(Panel *parent, const char *name);
@@ -42,13 +42,13 @@ public:
 	virtual void ResetAnimation(int frame = 0);
 
 protected:
-	virtual void OnTick();
-	virtual void PerformLayout();
-	virtual void PaintBackground();
+	void OnTick() override;
+	void PerformLayout() override;
+	void PaintBackground() override;
 
-	virtual void GetSettings(KeyValues *outResourceData);
-	virtual void ApplySettings(KeyValues *inResourceData);
-	virtual const char *GetDescription();
+	void GetSettings(KeyValues *outResourceData) override;
+	void ApplySettings(KeyValues *inResourceData) override;
+	const char *GetDescription() override;
 
 private:
 	int m_iCurrentImage;

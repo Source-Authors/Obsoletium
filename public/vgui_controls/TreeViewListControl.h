@@ -29,7 +29,7 @@ namespace vgui
 
 class CTreeViewListControl : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CTreeViewListControl, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CTreeViewListControl, Panel );
 
 public:
 
@@ -51,8 +51,8 @@ public:
 	virtual void SetColumnInfo( int iColumn, const char *pTitle, int width, int ciFlags=0 );
 
 	// Use this to render your stuff. Iterate over the rows in the tree view and 
-	virtual int GetNumRows();
-	virtual int GetTreeItemAtRow( int iRow ); // You can use m_pTree->GetItemData to get at the data for the row.
+	virtual intp GetNumRows();
+	virtual int GetTreeItemAtRow( intp iRow ); // You can use m_pTree->GetItemData to get at the data for the row.
 
 	// Use this to find out the client area to render in for each grid element.
 	// The returned box is inclusive.
@@ -69,12 +69,12 @@ public:
 public:
 
 	// This is where it recalculates the row infos.
-	virtual void PerformLayout();
+	void PerformLayout() override;
 	
 	// Usually, you'll want to override paint. After calling the base, use GetNumRows() to 
 	// iterate over the data in the tree control and fill in the other columns.
-	virtual void Paint();
-	virtual void PostChildPaint();
+	void Paint() override;
+	void PostChildPaint() override;
 
 	// You can override this to change the way the title bars are drawn.
 	virtual void DrawTitleBars();

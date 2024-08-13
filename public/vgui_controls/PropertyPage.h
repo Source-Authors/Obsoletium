@@ -23,7 +23,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class PropertyPage : public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( PropertyPage, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( PropertyPage, EditablePanel );
 
 public:
 	PropertyPage(Panel *parent, const char *panelName);
@@ -39,10 +39,10 @@ public:
 	MESSAGE_FUNC( OnPageShow, "PageShow" );
 	MESSAGE_FUNC( OnPageHide, "PageHide" );
 
-	virtual void OnKeyCodeTyped(KeyCode code);
-	virtual bool HasUserConfigSettings() { return true; }
+	void OnKeyCodeTyped(KeyCode code) override;
+	bool HasUserConfigSettings() override { return true; }
 
-	virtual void SetVisible(bool state);
+	void SetVisible(bool state) override;
 
 protected:
 	// called to be notified of the tab button used to Activate this page

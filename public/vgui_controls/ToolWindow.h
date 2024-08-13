@@ -30,7 +30,7 @@ public:
 //-----------------------------------------------------------------------------
 class ToolWindow : public Frame
 {
-	DECLARE_CLASS_SIMPLE( ToolWindow, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ToolWindow, Frame );
 
 public:
 	ToolWindow(Panel *parent, bool contextLabel, IToolWindowFactory *factory = 0, Panel *page = NULL, char const *title = NULL, bool contextMenu = false, bool inGlobalList = true );
@@ -61,11 +61,11 @@ public:
 
 protected:
 	// vgui overrides
-	virtual void PerformLayout();
-	virtual void ActivateBuildMode();
-	virtual void RequestFocus(int direction = 0);
-	virtual void OnMousePressed(MouseCode code);
-	virtual void OnMouseDoublePressed(MouseCode code);
+	void PerformLayout() override;
+	void ActivateBuildMode() override;
+	void RequestFocus(int direction = 0) override;
+	void OnMousePressed(MouseCode code) override;
+	void OnMouseDoublePressed(MouseCode code) override;
 
 private:
 	PropertySheet		*m_pPropertySheet;

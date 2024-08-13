@@ -22,7 +22,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class WizardSubPanel : public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( WizardSubPanel, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( WizardSubPanel, EditablePanel );
 
 public:
 	// constructor
@@ -75,10 +75,10 @@ public:
 	virtual bool GetDesiredSize(int &wide, int &tall);
 
 protected:
-	virtual void ApplySettings(KeyValues *inResourceData);
-	virtual void GetSettings( KeyValues *outResourceData );
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual const char *GetDescription();
+	void ApplySettings(KeyValues *inResourceData) override;
+	void GetSettings( KeyValues *outResourceData ) override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	const char *GetDescription() override;
 
 private:
 	WizardPanel *_wizardPanel;

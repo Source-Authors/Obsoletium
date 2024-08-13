@@ -228,9 +228,9 @@ void GraphPanel::Paint()
 		x -= (m_iGraphBarWidth + m_iGraphBarGapWidth);
 
 		// collect the samples
-		float value = 0.0f;
+		[[maybe_unused]] float value = 0.0f;
 		float maxValue = 0.0f;
-		int samplesTouched = 0;
+		[[maybe_unused]] int samplesTouched = 0;
 		int prevSampleIndex = m_Samples.Previous(sampleIndex);
 		while (m_Samples.IsInList(prevSampleIndex))
 		{

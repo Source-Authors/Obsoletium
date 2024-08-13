@@ -28,7 +28,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class ProgressBox : public Frame
 {
-	DECLARE_CLASS_SIMPLE( ProgressBox, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ProgressBox, Frame );
 
 public:
 	// title - Text to be displayed in the title bar of the window
@@ -64,13 +64,13 @@ public:
 	*/
 
 protected:
-	virtual void PerformLayout();
-	virtual void OnClose();
-	virtual void OnCloseFrameButtonPressed();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void OnThink();
-	virtual void OnCommand(const char *command);
-	virtual void OnTick();
+	void PerformLayout() override;
+	void OnClose() override;
+	void OnCloseFrameButtonPressed() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void OnThink() override;
+	void OnCommand(const char *command) override;
+	void OnTick() override;
 
 	// called when the update has been cancelled
 	virtual void OnCancel();

@@ -34,9 +34,9 @@ public:
 		SetSize(20, 13);
 	}
 
-	virtual void Paint();
+	void Paint() override;
 
-	virtual void SetColor(Color color)
+	void SetColor(Color color) override
 	{
 		_borderColor1 = color;
 		_borderColor2 = color;
@@ -58,14 +58,14 @@ private:
 //-----------------------------------------------------------------------------
 class CheckButton : public ToggleButton
 {
-	DECLARE_CLASS_SIMPLE( CheckButton, ToggleButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CheckButton, ToggleButton );
 
 public:
 	CheckButton(Panel *parent, const char *panelName, const char *text);
 	~CheckButton();
 
 	// Check the button
-	virtual void SetSelected(bool state );
+	void SetSelected(bool state ) override;
 
 	// sets whether or not the state of the check can be changed
 	// if this is set to false, then no input in the code or by the user can change it's state
@@ -78,14 +78,14 @@ public:
 	CheckImage *GetCheckImage() { return _checkBoxImage; }
 
 	virtual void SetHighlightColor(Color fgColor);
-	virtual void ApplySettings( KeyValues *inResourceData ) OVERRIDE;
+	virtual void ApplySettings( KeyValues *inResourceData ) override;
 
 protected:
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void ApplySchemeSettings(IScheme *pScheme) override;
 	MESSAGE_FUNC_PTR( OnCheckButtonChecked, "CheckButtonChecked", panel );
-	virtual Color GetButtonFgColor();
+	Color GetButtonFgColor() override;
 
-	virtual IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus);
+	IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus) override;
 
 	/* MESSAGES SENT
 		"CheckButtonChecked" - sent when the check button state is changed

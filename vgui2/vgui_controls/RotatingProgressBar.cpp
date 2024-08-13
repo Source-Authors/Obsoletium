@@ -121,9 +121,9 @@ void RotatingProgressBar::SetImage(const char *imageName)
 		m_pszImageName = NULL;
 	}
 
-	const char *pszDir = "vgui/";
-	int len = Q_strlen(imageName) + 1;
-	len += strlen(pszDir);
+	const char pszDir[] = "vgui/";
+	intp len = Q_strlen(imageName) + 1;
+	len += ssize(pszDir) - 1;
 	m_pszImageName = new char[ len ];
 	Q_snprintf( m_pszImageName, len, "%s%s", pszDir, imageName );
 	InvalidateLayout(false, true); // force applyschemesettings to run

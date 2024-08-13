@@ -817,9 +817,9 @@ void Label::OnSetText(KeyValues *params)
 // Purpose: Add an image to the list
 //			returns the index the image was placed in
 //-----------------------------------------------------------------------------
-int Label::AddImage(IImage *image, int offset)
+intp Label::AddImage(IImage *image, int offset)
 {
-	int newImage = _imageDar.AddToTail();
+	intp newImage = _imageDar.AddToTail();
 	_imageDar[newImage].image = image;
 	_imageDar[newImage].offset = (short)offset;
 	_imageDar[newImage].xpos = -1;
@@ -1197,7 +1197,7 @@ void Label::ApplySettings( KeyValues *inResourceData )
 	const char *associateName = inResourceData->GetString("associate", "");
 	if (associateName[0] != 0)
 	{
-		int len = Q_strlen(associateName) + 1;
+		intp len = Q_strlen(associateName) + 1;
 		_associateName = new char[ len ];
 		Q_strncpy( _associateName, associateName, len );
 	}
@@ -1222,7 +1222,7 @@ void Label::ApplySettings( KeyValues *inResourceData )
 	if (*overrideFont)
 	{
 		delete [] _fontOverrideName;
-		int len = Q_strlen(overrideFont) + 1;
+		intp len = Q_strlen(overrideFont) + 1;
 		_fontOverrideName = new char[ len ];
 		Q_strncpy(_fontOverrideName, overrideFont, len );
 		SetFont(pScheme->GetFont(_fontOverrideName, IsProportional()));

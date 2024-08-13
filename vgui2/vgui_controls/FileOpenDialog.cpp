@@ -214,7 +214,7 @@ public:
 	}
 
 	// override it so it doesn't request focus
-	virtual void SetVisible(bool state)
+	void SetVisible(bool state) override
 	{
 		Panel::SetVisible(state);
 	}
@@ -227,7 +227,7 @@ public:
 //-----------------------------------------------------------------------------
 class FileCompletionEdit : public TextEntry
 {
-	DECLARE_CLASS_SIMPLE( FileCompletionEdit, TextEntry );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( FileCompletionEdit, TextEntry );
 
 public:
 	FileCompletionEdit(Panel *parent);
@@ -239,12 +239,12 @@ public:
 	int GetItemCount();
 	int GetItemIDFromRow(int row);
 	int GetRowFromItemID(int itemID);
-	virtual void PerformLayout();
-	void OnSetText(const wchar_t *newtext);
-	virtual void OnKillFocus();
+	void PerformLayout() override;
+	void OnSetText(const wchar_t *newtext) override;
+	void OnKillFocus() override;
 	void HideMenu(void);
 	void ShowMenu(void);
-	virtual void OnKeyCodeTyped(KeyCode code);
+	void OnKeyCodeTyped(KeyCode code) override;
 	MESSAGE_FUNC_INT( OnMenuItemHighlight, "MenuItemHighlight", itemID );
 
 private:
@@ -524,7 +524,7 @@ void FileOpenDialog::Init( const char *title, KeyValues *pContextKeyValues )
 
 	// list panel
 	m_pFileList = new ListPanel(this, "FileList");
-	for ( int i = 0; i < ARRAYSIZE( g_ColInfo ); ++i )
+	for ( intp i = 0; i < static_cast<intp>( std::size( g_ColInfo ) ); ++i )
 	{
 		const ColumnInfo_t& info = g_ColInfo[ i ];
 
@@ -1498,7 +1498,7 @@ void FileOpenDialog::OnOpen()
 	char pFileName[MAX_PATH];
 	GetSelectedFileName( pFileName, sizeof( pFileName ) );
 
-	int nLen = Q_strlen( pFileName );
+	intp nLen = Q_strlen( pFileName );
 	bool bSpecifiedDirectory = ( pFileName[nLen-1] == '/' || pFileName[nLen-1] == '\\' ) && (!IsOSX() || ( !Q_stristr( pFileName, ".app" ) ) );
 	Q_StripTrailingSlash( pFileName );
 
@@ -1543,7 +1543,7 @@ void FileOpenDialog::OnOpen()
 #ifdef _WIN32
 	if ( Q_strlen( pFullPath ) == 2 )
 	{
-		Q_AppendSlash( pFullPath, Q_ARRAYSIZE( pFullPath ) );
+		Q_AppendSlash( pFullPath, ssize( pFullPath ) );
 	}
 #endif
 
@@ -1555,7 +1555,7 @@ void FileOpenDialog::OnOpen()
 		// it's a directory; change to the specified directory
 		if ( !bSpecifiedDirectory )
 		{
-			Q_AppendSlash( pFullPath, Q_ARRAYSIZE( pFullPath ) );
+			Q_AppendSlash( pFullPath, ssize( pFullPath ) );
 		}
 		SetStartDirectory( pFullPath );
 

@@ -32,17 +32,17 @@ namespace vgui
 
 class SplitterHandle : public Panel
 {
-	DECLARE_CLASS_SIMPLE( SplitterHandle, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( SplitterHandle, Panel );
 
 public:
 	SplitterHandle( Splitter *parent, const char *name, SplitterMode_t mode, int nIndex );
 	~SplitterHandle();
 
-	virtual void ApplySchemeSettings( IScheme *pScheme );
-	virtual void OnMousePressed( MouseCode code );
-	virtual void OnMouseReleased( MouseCode code );
-	virtual void OnCursorMoved( int x, int y );
-	virtual void OnMouseDoublePressed( MouseCode code );
+	void ApplySchemeSettings( IScheme *pScheme ) override;
+	void OnMousePressed( MouseCode code ) override;
+	void OnMouseReleased( MouseCode code ) override;
+	void OnCursorMoved( int x, int y ) override;
+	void OnMouseDoublePressed( MouseCode code ) override;
 
 private:
 	SplitterMode_t m_nMode;
@@ -162,7 +162,7 @@ namespace vgui
 
 class SplitterChildPanel : public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( SplitterChildPanel, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( SplitterChildPanel, EditablePanel );
 
 public:
 	SplitterChildPanel( Panel *parent, const char *panelName ) : BaseClass( parent, panelName )
@@ -175,7 +175,7 @@ public:
 	virtual ~SplitterChildPanel() {}
 
 	// Children may have user config settings
-	bool HasUserConfigSettings()
+	bool HasUserConfigSettings() override
 	{
 		return true;
 	}
@@ -240,7 +240,7 @@ void Splitter::RecreateSplitters( int nCount )
 		char pBuffer[512];
 		Q_snprintf( pBuffer, sizeof(pBuffer), "child%d", i );
 
-		int nIndex = m_Splitters.AddToTail( );
+		intp nIndex = m_Splitters.AddToTail( );
 		SplitterChildPanel *pEditablePanel = new SplitterChildPanel( this, pBuffer );
 		m_Splitters[nIndex].m_pPanel = pEditablePanel;
 		m_Splitters[nIndex].m_bLocked = false;

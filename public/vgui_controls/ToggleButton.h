@@ -23,12 +23,12 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class ToggleButton : public Button
 {
-	DECLARE_CLASS_SIMPLE( ToggleButton, Button );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ToggleButton, Button );
 
 public:
 	ToggleButton(Panel *parent, const char *panelName, const char *text);
 
-	virtual void DoClick();
+	void DoClick() override;
 
 	/* messages sent (get via AddActionSignalTarget()):
 		"ButtonToggled"
@@ -37,13 +37,13 @@ public:
 
 protected:
 	// overrides
-	virtual void OnMouseDoublePressed(MouseCode code);
+	void OnMouseDoublePressed(MouseCode code) override;
 
-	virtual Color GetButtonFgColor();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	Color GetButtonFgColor() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 
-    virtual bool CanBeDefaultButton(void);
-    virtual void OnKeyCodePressed(KeyCode code);
+	bool CanBeDefaultButton(void) override;
+	void OnKeyCodePressed(KeyCode code) override;
 
 private:
 	Color _selectedColor;

@@ -36,7 +36,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class PerforceFileList : public vgui::ListPanel
 {
-	DECLARE_CLASS_SIMPLE( PerforceFileList, ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( PerforceFileList, ListPanel );
 
 public:
 	// The context keyvalues are added to all messages sent by this dialog if they are specified
@@ -77,8 +77,8 @@ public:
 	void ShowDeletedFiles( bool bShowDeletedFiles );
 
 	// Inherited from vgui::EditablePanel
-	virtual void ApplySchemeSettings( IScheme *pScheme );
-	virtual void OnMouseDoublePressed( MouseCode code );
+	void ApplySchemeSettings( IScheme *pScheme ) override;
+	void OnMouseDoublePressed( MouseCode code ) override;
 
 	/*
 		messages sent:

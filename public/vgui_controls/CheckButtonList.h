@@ -21,14 +21,14 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CheckButtonList : public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CheckButtonList, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CheckButtonList, EditablePanel );
 
 public:
 	CheckButtonList(Panel *parent, const char *name);
 	~CheckButtonList();
 
 	// adds a check button to the list
-	int AddItem(const char *itemText, bool startsSelected, KeyValues *userData);
+	intp AddItem(const char *itemText, bool startsSelected, KeyValues *userData);
 
 	// clears the list
 	void RemoveAll();
@@ -52,9 +52,9 @@ public:
 	*/
 
 protected:
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void OnMouseWheeled(int delta);
+	void PerformLayout() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void OnMouseWheeled(int delta) override;
 
 private:
 	MESSAGE_FUNC_PARAMS( OnCheckButtonChecked, "CheckButtonChecked", pParams );

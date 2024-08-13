@@ -20,7 +20,7 @@ namespace vgui
 
 class URLLabel : public Label
 {
-	DECLARE_CLASS_SIMPLE( URLLabel, Label );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( URLLabel, Label );
 
 public:	
 	URLLabel(Panel *parent, const char *panelName, const char *text, const char *pszURL);
@@ -30,11 +30,11 @@ public:
     void SetURL(const char *pszURL);
 
 protected:
-	virtual void OnMousePressed(MouseCode code);
-	virtual void ApplySettings( KeyValues *inResourceData );
-	virtual void GetSettings( KeyValues *outResourceData );
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual const char *GetDescription( void );
+	void OnMousePressed(MouseCode code) override;
+	void ApplySettings( KeyValues *inResourceData ) override;
+	void GetSettings( KeyValues *outResourceData ) override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	const char *GetDescription() override;
 
 	const char *GetURL( void ) { return m_pszURL; }
 

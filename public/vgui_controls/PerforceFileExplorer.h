@@ -33,7 +33,7 @@ class Button;
 //-----------------------------------------------------------------------------
 class PerforceFileExplorer : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( PerforceFileExplorer, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( PerforceFileExplorer, Frame );
 
 public:
 	// The context keyvalues are added to all messages sent by this dialog if they are specified
@@ -41,8 +41,8 @@ public:
 	~PerforceFileExplorer();
 
 	// Inherited from Frame
-	virtual void ApplySchemeSettings( IScheme *pScheme );
-	virtual void PerformLayout();
+	void ApplySchemeSettings( IScheme *pScheme ) override;
+	void PerformLayout() override;
 
 protected:
 	MESSAGE_FUNC_PARAMS( OnTextChanged, "TextChanged", kv );

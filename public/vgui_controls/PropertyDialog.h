@@ -23,7 +23,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class PropertyDialog : public Frame
 {
-	DECLARE_CLASS_SIMPLE( PropertyDialog, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( PropertyDialog, Frame );
 
 public:
 	PropertyDialog(Panel *parent, const char *panelName);
@@ -61,11 +61,11 @@ protected:
 	virtual void OnCancel();
 
 	// vgui overrides
-	virtual void PerformLayout();
-	virtual void OnCommand(const char *command);
-	virtual void ActivateBuildMode();
-	virtual void OnKeyCodeTyped(KeyCode code);
-	virtual void RequestFocus(int direction = 0);
+	void PerformLayout() override;
+	void OnCommand(const char *command) override;
+	void ActivateBuildMode() override;
+	void OnKeyCodeTyped(KeyCode code) override;
+	void RequestFocus(int direction = 0) override;
 
 	MESSAGE_FUNC( OnApplyButtonEnable, "ApplyButtonEnable" );
 	void EnableApplyButton(bool bEnable);

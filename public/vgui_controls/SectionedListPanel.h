@@ -34,7 +34,7 @@ typedef bool (*SectionSortFunc_t)(SectionedListPanel *list, int itemID1, int ite
 //-----------------------------------------------------------------------------
 class SectionedListPanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( SectionedListPanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( SectionedListPanel, Panel );
 
 public:
 	SectionedListPanel(vgui::Panel *parent, const char *name);
@@ -201,7 +201,7 @@ public:
 
     virtual void ScrollToItem(int iItem);
 
-	virtual void SetProportional(bool state);
+	void SetProportional(bool state) override;
 
 	HFont GetHeaderFont( void ) const;
 	void SetHeaderFont( HFont hFont );
@@ -215,15 +215,15 @@ public:
 	void SetColumnWidthBySection(int sectionID, const char *columnName, int iWidth);
 
 protected:
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void ApplySettings(KeyValues *inResourceData);
-	virtual void OnSizeChanged(int wide, int tall);
-	virtual void OnMouseWheeled(int delta);
-	virtual void OnMousePressed( MouseCode code);
-	virtual void NavigateTo( void );
-	virtual void OnKeyCodePressed( KeyCode code );
-	virtual void OnSetFocus();						// called after the panel receives the keyboard focus
+	void PerformLayout() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void ApplySettings(KeyValues *inResourceData) override;
+	void OnSizeChanged(int wide, int tall) override;
+	void OnMouseWheeled(int delta) override;
+	void OnMousePressed( MouseCode code) override;
+	void NavigateTo( void ) override;
+	void OnKeyCodePressed( KeyCode code ) override;
+	void OnSetFocus() override;						// called after the panel receives the keyboard focus
 
 public:
 	virtual void SetFontSection(int sectionID, HFont font);
@@ -298,7 +298,7 @@ private:
 	int m_iLineGap;		// gap between rows
 	int m_iSectionGap;
 
-	int FindSectionIndexByID(int sectionID);
+	intp FindSectionIndexByID(int sectionID);
     void ReSortList();
 
 	ScrollBar *m_pScrollBar;
@@ -325,15 +325,15 @@ private:
 
 class SectionedListPanelHeader : public Label
 {
-	DECLARE_CLASS_SIMPLE( SectionedListPanelHeader, Label );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( SectionedListPanelHeader, Label );
 
 public:
 	SectionedListPanelHeader(SectionedListPanel *parent, const char *name, int sectionID);
 	SectionedListPanelHeader(SectionedListPanel *parent, const wchar_t *name, int sectionID);
 
-	virtual void ApplySchemeSettings(IScheme *pScheme) OVERRIDE;
-	virtual void Paint() OVERRIDE;
-	virtual void PerformLayout() OVERRIDE;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void Paint() override;
+	void PerformLayout() override;
 
 	void SetColor(Color col);
 	void SetDividerColor(Color col );

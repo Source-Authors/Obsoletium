@@ -24,7 +24,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CKeyBoardEditorPage : public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CKeyBoardEditorPage, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CKeyBoardEditorPage, EditablePanel );
 
 public:
 	CKeyBoardEditorPage( Panel *parent, Panel *panelToEdit, KeyBindingContextHandle_t handle );
@@ -32,9 +32,9 @@ public:
 
 	void	SetKeybindingsSaveFile( char const *filename, char const *pathID = 0 );
 
-	virtual void	OnKeyCodeTyped(vgui::KeyCode code);
+	void	OnKeyCodeTyped(vgui::KeyCode code) override;
 
-	virtual void	ApplySchemeSettings( IScheme *scheme );
+	void	ApplySchemeSettings( IScheme *scheme ) override;
 
 	void			OnSaveChanges();
 	void			OnRevert();
@@ -44,7 +44,7 @@ protected:
 
 	virtual void	OnPageHide();
 
-	virtual void	OnCommand( char const *cmd );
+	void	OnCommand( char const *cmd ) override;
 
 	void			PopulateList();
 
@@ -89,7 +89,7 @@ protected:
 //-----------------------------------------------------------------------------
 class CKeyBoardEditorSheet : public PropertySheet
 {
-	DECLARE_CLASS_SIMPLE( CKeyBoardEditorSheet, PropertySheet );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CKeyBoardEditorSheet, PropertySheet );
 
 public:
 	CKeyBoardEditorSheet( Panel *parent, Panel *panelToEdit, KeyBindingContextHandle_t handle );
@@ -115,14 +115,14 @@ protected:
 //-----------------------------------------------------------------------------
 class CKeyBoardEditorDialog : public Frame
 {
-	DECLARE_CLASS_SIMPLE( CKeyBoardEditorDialog, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CKeyBoardEditorDialog, Frame );
 
 public:
 	CKeyBoardEditorDialog( Panel *parent, Panel *panelToEdit, KeyBindingContextHandle_t handle );
 
 	void			SetKeybindingsSaveFile( char const *filename, char const *pathID = 0 );
 
-	virtual void	OnCommand( char const *cmd );
+	void	OnCommand( char const *cmd ) override;
 
 private:
 	CKeyBoardEditorSheet		*m_pKBEditor;

@@ -33,7 +33,7 @@ CheckButtonList::~CheckButtonList()
 //-----------------------------------------------------------------------------
 // Purpose: adds a check button to the list
 //-----------------------------------------------------------------------------
-int CheckButtonList::AddItem(const char *itemText, bool startsSelected, KeyValues *userData)
+intp CheckButtonList::AddItem(const char *itemText, bool startsSelected, KeyValues *userData)
 {
 	CheckItem_t newItem;
 	newItem.checkButton = new vgui::CheckButton(this, NULL, itemText);

@@ -23,7 +23,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class Slider : public Panel
 {
-	DECLARE_CLASS_SIMPLE( Slider, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( Slider, Panel );
 public:
 	Slider(Panel *parent, const char *panelName);
 
@@ -34,10 +34,10 @@ public:
 	virtual void GetRange(int &min, int &max);
 	virtual void GetNobPos(int &min, int &max);	// get current Slider position
 	virtual void SetButtonOffset(int buttonOffset);
-	virtual void OnCursorMoved(int x, int y);
-	virtual void OnMousePressed(MouseCode code);
-	virtual void OnMouseDoublePressed(MouseCode code);
-	virtual void OnMouseReleased(MouseCode code);
+	virtual void OnCursorMoved(int x, int y) override;
+	virtual void OnMousePressed(MouseCode code) override;
+	virtual void OnMouseDoublePressed(MouseCode code) override;
+	virtual void OnMouseReleased(MouseCode code) override;
 	virtual void SetTickCaptions(const wchar_t *left, const wchar_t *right);
 	virtual void SetTickCaptions(const char *left, const char *right);
 	virtual void SetNumTicks(int ticks);
@@ -60,18 +60,18 @@ public:
 	virtual void SetSliderThumbSubRange( bool bEnable, int nMin = 0, int nMax = 100 );
 
 protected:
-	virtual void OnSizeChanged(int wide, int tall);
-	virtual void Paint();
-	virtual void PaintBackground();
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void GetSettings(KeyValues *outResourceData);
-	virtual void ApplySettings(KeyValues *inResourceData);
-	virtual const char *GetDescription();
+	void OnSizeChanged(int wide, int tall) override;
+	void Paint() override;
+	void PaintBackground() override;
+	void PerformLayout() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void GetSettings(KeyValues *outResourceData) override;
+	void ApplySettings(KeyValues *inResourceData) override;
+	const char *GetDescription() override;
 #ifdef _X360
-	virtual void OnKeyCodePressed(KeyCode code);
+	void OnKeyCodePressed(KeyCode code) override;
 #endif
-	virtual void OnKeyCodeTyped(KeyCode code);
+	void OnKeyCodeTyped(KeyCode code) override;
 
 	virtual void DrawNob();
 	virtual void DrawTicks();

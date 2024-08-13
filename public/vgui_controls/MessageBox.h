@@ -28,7 +28,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class MessageBox : public Frame
 {
-	DECLARE_CLASS_SIMPLE( MessageBox, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( MessageBox, Frame );
 
 public:
 	// title - Text to be displayed in the title bar of the window
@@ -66,14 +66,14 @@ public:
 	// Toggles visibility of the close box.
 	virtual void DisableCloseButton(bool state);
 
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 	// Shows the message box over the cursor
 	void ShowMessageBoxOverCursor( bool bEnable );
 
 protected:
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void PerformLayout() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 
 protected:
 	Button				*m_pOkButton;

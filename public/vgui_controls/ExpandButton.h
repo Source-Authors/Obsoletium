@@ -24,26 +24,27 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class ExpandButton : public ToggleButton
 {
-	DECLARE_CLASS_SIMPLE( ExpandButton, ToggleButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ExpandButton, ToggleButton );
 
 public:
 	ExpandButton( Panel *parent, const char *panelName );
 	~ExpandButton();
 
 	// Expand the button (selected == expanded)
-	virtual void SetSelected( bool bExpand );
+	void SetSelected( bool bExpand ) override;
 
 	// sets whether or not the state of the check can be changed
 	// if this is set to false, then no input in the code or by the user can change it's state
 	void SetExpandable(bool state);
 
-	virtual void Paint();
+	void Paint() override;
 
 protected:
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void ApplySchemeSettings(IScheme *pScheme) override;
+
 	MESSAGE_FUNC_PTR( OnExpanded, "Expanded", panel );
 
-	virtual IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus);
+	IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus) override;
 
 	/* MESSAGES SENT
 		"Expanded" - sent when the expand button state is changed

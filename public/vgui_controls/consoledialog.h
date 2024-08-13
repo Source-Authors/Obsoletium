@@ -48,16 +48,16 @@ private:
 //-----------------------------------------------------------------------------
 class CConsolePanel : public vgui::EditablePanel, public IConsoleDisplayFunc
 {
-	DECLARE_CLASS_SIMPLE( CConsolePanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CConsolePanel, vgui::EditablePanel );
 
 public:
 	CConsolePanel( Panel *pParent, const char *pName, bool bStatusVersion );
 	~CConsolePanel();
 
 	// Inherited from IConsoleDisplayFunc
-	virtual void ColorPrint( const Color& clr, const char *pMessage );
-	virtual void Print( const char *pMessage );
-	virtual void DPrint( const char *pMessage );
+	void ColorPrint( const Color& clr, const char *pMessage ) override;
+	void Print( const char *pMessage ) override;
+	void DPrint( const char *pMessage ) override;
 	virtual void GetConsoleText( char *pchText, size_t bufSize ) const;
 
 	// clears the console
@@ -108,11 +108,11 @@ protected:
 	void AddToHistory( const char *commandText, const char *extraText );
 
 	// vgui overrides
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
-	virtual void OnCommand(const char *command);
-	virtual void OnKeyCodeTyped(vgui::KeyCode code);
-	virtual void OnThink();
+	void PerformLayout() override;
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
+	void OnCommand(const char *command) override;
+	void OnKeyCodeTyped(vgui::KeyCode code) override;
+	void OnThink() override;
 
 	vgui::RichText *m_pHistory;
 	vgui::TextEntry *m_pEntry;
@@ -137,17 +137,17 @@ protected:
 
 class CConsoleDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CConsoleDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CConsoleDialog, vgui::Frame );
 
 public:
 	CConsoleDialog( vgui::Panel *pParent, const char *pName, bool bStatusVersion );
 
-	virtual void OnScreenSizeChanged( int iOldWide, int iOldTall );
-	virtual void Close();
-	virtual void PerformLayout();
+	void OnScreenSizeChanged( int iOldWide, int iOldTall ) override;
+	void Close() override;
+	void PerformLayout() override;
 
 	// brings dialog to the fore
-	MESSAGE_FUNC( Activate, "Activate" );
+	MESSAGE_FUNC_OVERRIDE( Activate, "Activate" );
 	MESSAGE_FUNC_CHARPTR( OnCommandSubmitted, "CommandSubmitted", command );
 
 	// hides the console
@@ -160,7 +160,7 @@ public:
 	void Clear();
 	void DumpConsoleTextToFile();
 
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 protected:
 	CConsolePanel *m_pConsolePanel;

@@ -30,7 +30,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class ClickPanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( ClickPanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ClickPanel, Panel );
 
 public:
 	ClickPanel(Panel *parent)
@@ -75,7 +75,7 @@ public:
 		return _viewIndex;
 	}
 	
-	void OnMousePressed(MouseCode code)
+	void OnMousePressed(MouseCode code) override
 	{
 		if (code == MOUSE_LEFT)
 		{
@@ -98,7 +98,7 @@ private:
 //-----------------------------------------------------------------------------
 class RichTextInterior : public Panel
 {
-	DECLARE_CLASS_SIMPLE( RichTextInterior, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( RichTextInterior, Panel );
 
 public:
 	RichTextInterior( RichText *pParent, const char *pchName ) : BaseClass( pParent, pchName )  
@@ -118,7 +118,7 @@ public:
 		return BaseClass::GetAppearance();
 	}*/
 
-	virtual void ApplySchemeSettings( IScheme *pScheme )
+	void ApplySchemeSettings( IScheme *pScheme ) override
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
 //		m_pAppearanceScrollbar = FindSchemeAppearance( pScheme, "scrollbar_visible" );
@@ -441,9 +441,9 @@ void RichText::SetText(const wchar_t *text)
 	m_TextStream.RemoveAll();
 	if ( text && *text )
 	{
-		int textLen = wcslen(text) + 1;
+		intp textLen = V_wcslen(text) + 1;
 		m_TextStream.EnsureCapacity(textLen);
-		for(int i = 0; i < textLen; i++)
+		for(intp i = 0; i < textLen; i++)
 		{
 			m_TextStream.AddToTail(text[i]);
 		}
@@ -1156,7 +1156,7 @@ void RichText::InsertClickableTextStart( const char *pchClickAction )
 	{
 		// add to text stream, based off existing item
 		TFormatStream formatStreamCopy = prevItem;
-		int iFormatStream = m_FormatStream.AddToTail( formatStreamCopy );
+		intp iFormatStream = m_FormatStream.AddToTail( formatStreamCopy );
 		
 		// set the new params
 		pFormatStream = &m_FormatStream[iFormatStream];
@@ -1234,7 +1234,6 @@ void RichText::RecalculateLineBreaks()
 	
 	int x = _drawOffsetX, y = _drawOffsetY;
 	
-	HFont fontWordStart = INVALID_FONT;
 	int wordStartIndex = 0;
 	int lineStartIndex = 0;
 	bool hasWord = false;
@@ -1323,7 +1322,6 @@ void RichText::RecalculateLineBreaks()
 				wordStartIndex = i;
 				hasWord = true;
 				wordStartedOnNewLine = justStartedNewLine;
-				fontWordStart = font;
 			}
 			// else append to the current word
 		}
@@ -1572,7 +1570,7 @@ void RichText::OnCursorExited()
 //-----------------------------------------------------------------------------
 // Purpose: Handle selection of text by mouse
 //-----------------------------------------------------------------------------
-void RichText::OnCursorMoved(int ignX, int ignY)
+void RichText::OnCursorMoved(int, int)
 {
 	if (_mouseSelection)
 	{
@@ -1640,7 +1638,7 @@ void RichText::OnMousePressed(MouseCode code)
 //-----------------------------------------------------------------------------
 // Purpose: Handle mouse button up events
 //-----------------------------------------------------------------------------
-void RichText::OnMouseReleased(MouseCode code)
+void RichText::OnMouseReleased(MouseCode)
 {
 	_mouseSelection = false;
 	input()->SetMouseCapture(NULL);
@@ -2036,7 +2034,7 @@ void RichText::InsertString(const char *text)
 	}
 
 	// upgrade the ansi text to unicode to display it
-	int len = strlen(text);
+	intp len = V_strlen(text);
 	wchar_t *unicode = (wchar_t *)_alloca((len + 1) * sizeof(wchar_t));
 	Q_UTF8ToUnicode(text, unicode, ((len + 1) * sizeof(wchar_t)));
 	InsertString(unicode);
@@ -2256,7 +2254,7 @@ void RichText::GetText(int offset, wchar_t *buf, int bufLenInBytes)
 	if (!buf)
 		return;
 	
-	Assert( bufLenInBytes >= sizeof(buf[0]) );
+	Assert( bufLenInBytes >= static_cast<int>(sizeof(buf[0])) );
 	int bufLen = bufLenInBytes / sizeof(wchar_t);
 	int i;
 	for (i = offset; i < (offset + bufLen - 1); i++)
@@ -2336,7 +2334,7 @@ void RichText::OnClickPanel(int index)
 	_currentTextClickable = true;
 	TRenderState renderState;
 	GenerateRenderStateForTextStreamIndex(index, renderState);
-	for (int i = index; i < (sizeof(wBuf) - 1) && i < m_TextStream.Count(); i++)
+	for (int i = index; i < static_cast<int>(sizeof(wBuf) - 1) && i < m_TextStream.Count(); i++)
 	{
 		// stop getting characters when text is no longer clickable
 		UpdateRenderState(i, renderState);
@@ -2373,7 +2371,7 @@ void RichText::ApplySettings(KeyValues *inResourceData)
 	if (*text)
 	{
 		delete [] m_pszInitialText;
-		int len = Q_strlen(text) + 1;
+		intp len = Q_strlen(text) + 1;
 		m_pszInitialText = new char[ len ];
 		Q_strncpy( m_pszInitialText, text, len );
 		SetText(text);
@@ -2498,7 +2496,7 @@ void RichText::InsertPossibleURLString(const char* text, Color URLTextColor, Col
 	InsertColorChange(normalTextColor);
 
 	// parse out the string for URL's
-	int len = Q_strlen(text), pos = 0;
+	intp len = Q_strlen(text), pos = 0;
 	bool clickable = false;
 	char *pchURLText = (char *)stackalloc( len + 1 );
 	char *pchURL = (char *)stackalloc( len + 1 );
@@ -2529,7 +2527,7 @@ void RichText::InsertPossibleURLString(const char* text, Color URLTextColor, Col
 int RichText::ParseTextStringForUrls( const char *text, int startPos, char *pchURLText, int cchURLText, char *pchURL, int cchURL, bool &clickable )
 {
 	// scan for text that looks like a URL
-	int i = startPos;
+	intp i = startPos;
 	while (text[i] != 0)
 	{
 		bool bURLFound = false;
@@ -2543,7 +2541,7 @@ int RichText::ParseTextStringForUrls( const char *text, int startPos, char *pchU
 			bURLFound = true;
 			clickable = true;
 			// get the url
-			i += Q_strlen( "<a href=" );
+			i += ssize( "<a href=" ) - 1;
 			const char *pchURLEnd = Q_strstr( text + i, ">" );
 			Q_strncpy( pchURL, text + i, min( pchURLEnd - text - i + 1, static_cast<intp>(cchURL) ) ); 
 			i += ( pchURLEnd - text - i + 1 );
@@ -2552,7 +2550,7 @@ int RichText::ParseTextStringForUrls( const char *text, int startPos, char *pchU
 			pchURLEnd = Q_strstr( text, "</a>" );
 			Q_strncpy( pchURLText, text + i, min( pchURLEnd - text - i + 1, static_cast<intp>(cchURLText) ) ); 
 			i += ( pchURLEnd - text - i );
-			i += Q_strlen( "</a>" );
+			i += ssize( "</a>" ) - 1;
 
 			// we're done
 			return i;

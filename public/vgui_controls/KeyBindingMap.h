@@ -62,7 +62,7 @@ struct KeyBindingMap_t
 	bool					passive; // dispatch command, but still chain
 };
 
-#define DECLARE_KEYBINDINGMAP( className )												\
+#define DECLARE_KEYBINDINGMAP_BASE( className )											\
 	static void KB_AddToMap																\
 	(																					\
 		char const			*bindingname,												\
@@ -138,9 +138,21 @@ struct KeyBindingMap_t
 			className::KB_ChainToMap();													\
 		}																				\
 	};																					\
-	className##_RegisterKBMap m_RegisterClassKB;										\
+	className##_RegisterKBMap m_RegisterClassKB;
+
+#define DECLARE_KEYBINDINGMAP( className )												\
+	DECLARE_KEYBINDINGMAP_BASE(className)												\
 																						\
 	virtual vgui::PanelKeyBindingMap *GetKBMap()										\
+	{																					\
+		static vgui::PanelKeyBindingMap *s_pMap = vgui::FindOrAddPanelKeyBindingMap( GetPanelClassName() );	\
+		return s_pMap;																	\
+	}
+
+#define DECLARE_KEYBINDINGMAP_OVERRIDE( className )										\
+	DECLARE_KEYBINDINGMAP_BASE(className)												\
+																						\
+	vgui::PanelKeyBindingMap *GetKBMap() override										\
 	{																					\
 		static vgui::PanelKeyBindingMap *s_pMap = vgui::FindOrAddPanelKeyBindingMap( GetPanelClassName() );	\
 		return s_pMap;																	\

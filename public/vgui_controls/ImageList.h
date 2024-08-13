@@ -30,7 +30,7 @@ public:
 	~ImageList();
 
 	// adds a new image to the list, returning the index it was placed at
-	int AddImage(vgui::IImage *image);
+	intp AddImage(vgui::IImage *image);
 
 	// returns the number of images
 	int GetImageCount();

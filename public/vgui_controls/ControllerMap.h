@@ -17,14 +17,14 @@
 
 class CControllerMap : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CControllerMap, vgui::Panel )
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CControllerMap, vgui::Panel )
 
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
 
 public:
 	CControllerMap( vgui::Panel *parent, const char *name );
 
-	virtual void ApplySettings( KeyValues *inResourceData );
+	void ApplySettings( KeyValues *inResourceData ) override;
 
 	int NumButtons( void )
 	{

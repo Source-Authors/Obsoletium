@@ -31,7 +31,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class HTMLInterior : public Panel
 {
-	DECLARE_CLASS_SIMPLE( HTMLInterior, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( HTMLInterior, Panel );
 public:
 	HTMLInterior( HTML *parent ) : BaseClass( parent, "HTMLInterior" ) 
 	{ 	
@@ -50,14 +50,14 @@ private:
 //-----------------------------------------------------------------------------
 class HTMLPopup : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( HTMLPopup, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( HTMLPopup, vgui::Frame );
 	class PopupHTML : public vgui::HTML
 	{
-		DECLARE_CLASS_SIMPLE( PopupHTML, vgui::HTML );
+		DECLARE_CLASS_SIMPLE_OVERRIDE( PopupHTML, vgui::HTML );
 	public:
 		PopupHTML( Frame *parent, const char *pchName, bool allowJavaScript , bool bPopupWindow  ) : HTML( parent, pchName, allowJavaScript, bPopupWindow ) { m_pParent = parent; }
 
-		virtual void OnSetHTMLTitle( const char *pchTitle )
+		void OnSetHTMLTitle( const char *pchTitle ) override
 		{
 			BaseClass::OnSetHTMLTitle( pchTitle );
 			m_pParent->SetTitle( pchTitle, true );
@@ -84,7 +84,7 @@ public:
 		horiz_inset = 6
 	};
 
-	void PerformLayout()
+	void PerformLayout() override
 	{
 		BaseClass::PerformLayout();
 		int wide, tall;
@@ -521,13 +521,10 @@ ISteamHTMLSurface::EHTMLMouseButton ConvertMouseCodeToCEFCode( MouseCode code )
 	default:
 	case MOUSE_LEFT:
 		return ISteamHTMLSurface::eHTMLMouseButton_Left;
-		break;
 	case MOUSE_RIGHT:
 		return ISteamHTMLSurface::eHTMLMouseButton_Right;
-		break;
 	case MOUSE_MIDDLE:
 		return ISteamHTMLSurface::eHTMLMouseButton_Middle;
-		break;
 	}
 }
 
@@ -817,6 +814,7 @@ void HTML::OnKeyCodeTyped(KeyCode code)
 				HideFindDialog();
 				break;
 			}
+			break;
 		}
 	case KEY_TAB:
 		{
@@ -853,12 +851,12 @@ void HTML::OnMouseWheeled(int delta)
 	if (_vbar )
 	{
 		int val = _vbar->GetValue();
-		val -= (delta * 100.0/3.0 ); // 100 for every 3 lines matches chromes code
+		val -= (delta * 100.0f/3.0f ); // 100 for every 3 lines matches chromes code
 		_vbar->SetValue(val);
 	}
 
 	if (m_SteamAPIContext.SteamHTMLSurface())
-		m_SteamAPIContext.SteamHTMLSurface()->MouseWheel( m_unBrowserHandle, delta* 100.0/3.0 );
+		m_SteamAPIContext.SteamHTMLSurface()->MouseWheel( m_unBrowserHandle, delta* 100.0f/3.0f );
 }
 
 
@@ -867,7 +865,7 @@ void HTML::OnMouseWheeled(int delta)
 //-----------------------------------------------------------------------------
 void HTML::AddCustomURLHandler(const char *customProtocolName, vgui::Panel *target)
 {
-	int index = m_CustomURLHandlers.AddToTail();
+	intp index = m_CustomURLHandlers.AddToTail();
 	m_CustomURLHandlers[index].hPanel = target;
 	Q_strncpy(m_CustomURLHandlers[index].url, customProtocolName, sizeof(m_CustomURLHandlers[index].url));
 }

@@ -30,30 +30,30 @@ class Image;
 //-----------------------------------------------------------------------------
 class MenuItem : public Button
 {
-	DECLARE_CLASS_SIMPLE( MenuItem, Button );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( MenuItem, Button );
 
 public:
 	MenuItem(Menu *parent, const char *panelName, const char *text, Menu *cascadeMenu = NULL, bool checkable = false);
 	MenuItem(Menu *parent, const char *panelName, const wchar_t *wszText, Menu *cascadeMenu = NULL, bool checkable = false);
 	~MenuItem();
 
-	virtual void Paint();
+	void Paint() override;
 
 	// Activate the menu item as if it had been selected by the user
-	virtual void FireActionSignal();
+	void FireActionSignal() override;
 
-    virtual bool CanBeDefaultButton(void);
+    bool CanBeDefaultButton(void) override;
 
 	// Handle mouse cursor entering a MenuItem.
-	void OnCursorEntered();
+	void OnCursorEntered() override;
 	// Handle mouse cursor exiting a MenuItem. 
-	void OnCursorExited();
+	void OnCursorExited() override;
 
 	// Close the cascading menu if we have one.
 	void CloseCascadeMenu();
 
 	// Pass kill focus events up to parent on loss of focus
-	MESSAGE_FUNC( OnKillFocus, "MenuClose" );
+	MESSAGE_FUNC_OVERRIDE( OnKillFocus, "MenuClose" );
 
 	// Return true if this item triggers a cascading menu
 	bool HasMenu();
@@ -73,10 +73,10 @@ public:
 	// Return the menu that this menuItem contains
 	Menu *GetMenu();
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	// Respond to cursor movement
-	void OnCursorMoved(int x, int y);
+	void OnCursorMoved(int x, int y) override;
 
 	// Highlight item
 	MESSAGE_FUNC( ArmItem, "ArmItem" );
@@ -104,17 +104,17 @@ public:
 
 	void SetCurrentKeyBinding( char const *keyName );
 
-	virtual void GetContentSize( int& cw, int &ch );
+	void GetContentSize( int& cw, int &ch ) override;
 
 protected:
-	void OnKeyCodeReleased(KeyCode code);
+	void OnKeyCodeReleased(KeyCode code) override;
 	void OnMenuClose();
 	MESSAGE_FUNC( OnKeyModeSet, "KeyModeSet" );
 
 	// vgui overrides
-	virtual void Init( void );
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus);
+	void Init( void ) override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus) override;
 
 private:
 	enum { CHECK_INSET = 6 };

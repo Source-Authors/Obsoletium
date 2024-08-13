@@ -118,9 +118,9 @@ void CircularProgressBar::ApplySchemeSettings(IScheme *pScheme)
 //-----------------------------------------------------------------------------
 void CircularProgressBar::SetImage(const char *imageName, progress_textures_t iPos)
 {
-	const char *pszDir = "vgui/";
-	int len = Q_strlen(imageName) + 1;
-	len += strlen(pszDir);
+	const char pszDir[] = "vgui/";
+	intp len = Q_strlen(imageName) + 1;
+	len += ssize(pszDir) - 1;
 	
 	if ( m_pszImageName[iPos] && ( m_lenImageName[iPos] < len ) )
 	{
@@ -189,14 +189,14 @@ namespace vgui
 // in the circular progress bar.
 circular_progress_segment_t Segments[8] = 
 {
-	{ 0.0,			0.5, 0.0, 1.0, 0.0, 1, 0 },
-	{ M_PI * 0.25,	1.0, 0.0, 1.0, 0.5, 0, 1 },
-	{ M_PI * 0.5,	1.0, 0.5, 1.0, 1.0, 0, 1 },
-	{ M_PI * 0.75,	1.0, 1.0, 0.5, 1.0, -1, 0 },
-	{ M_PI,			0.5, 1.0, 0.0, 1.0, -1, 0 },
-	{ M_PI * 1.25,	0.0, 1.0, 0.0, 0.5, 0, -1 },
-	{ M_PI * 1.5,	0.0, 0.5, 0.0, 0.0, 0, -1 },
-	{ M_PI * 1.75,	0.0, 0.0, 0.5, 0.0, 1, 0 },
+	{ 0.0f,				0.5f, 0.0f, 1.0f, 0.0f, 1, 0 },
+	{ M_PI_F * 0.25f,	1.0f, 0.0f, 1.0f, 0.5f, 0, 1 },
+	{ M_PI_F * 0.5f,	1.0f, 0.5f, 1.0f, 1.0f, 0, 1 },
+	{ M_PI_F * 0.75f,	1.0f, 1.0f, 0.5f, 1.0f, -1, 0 },
+	{ M_PI_F,			0.5f, 1.0f, 0.0f, 1.0f, -1, 0 },
+	{ M_PI_F * 1.25f,	0.0f, 1.0f, 0.0f, 0.5f, 0, -1 },
+	{ M_PI_F * 1.5f,	0.0f, 0.5f, 0.0f, 0.0f, 0, -1 },
+	{ M_PI_F * 1.75f,	0.0f, 0.0f, 0.5f, 0.0f, 1, 0 },
 };
 
 };

@@ -24,7 +24,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class ProgressBar : public Panel
 {
-	DECLARE_CLASS_SIMPLE( ProgressBar, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ProgressBar, Panel );
 
 public:
 	ProgressBar(Panel *parent, const char *panelName);
@@ -43,9 +43,9 @@ public:
 	void SetMargin( int pixels );
 	int GetMargin();
 	
-	virtual void ApplySettings(KeyValues *inResourceData);
-	virtual void GetSettings(KeyValues *outResourceData);
-	virtual const char *GetDescription();
+	void ApplySettings(KeyValues *inResourceData) override;
+	void GetSettings(KeyValues *outResourceData) override;
+	const char *GetDescription() override;
 
 	// returns the number of segment blocks drawn
 	int GetDrawnSegmentCount();
@@ -62,10 +62,10 @@ public:
 	void SetProgressDirection( int val ) { m_iProgressDirection = val; }
 
 protected:
-	virtual void Paint();
+	void Paint() override;
 	void PaintSegment( int &x, int &y, int tall, int wide );
-	virtual void PaintBackground();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void PaintBackground() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 	MESSAGE_FUNC_PARAMS( OnDialogVariablesChanged, "DialogVariables", dialogVariables );
 	/* CUSTOM MESSAGE HANDLING
 		"SetProgress"
@@ -77,7 +77,6 @@ protected:
 	float _progress;
 
 private:
-	int   _segmentCount;
 	int _segmentGap;
 	int _segmentWide;
 	int m_iBarInset;
@@ -90,7 +89,7 @@ private:
 //-----------------------------------------------------------------------------
 class ContinuousProgressBar : public ProgressBar
 {
-	DECLARE_CLASS_SIMPLE( ContinuousProgressBar, ProgressBar );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ContinuousProgressBar, ProgressBar );
 
 public:
 	ContinuousProgressBar(Panel *parent, const char *panelName);
@@ -99,7 +98,7 @@ public:
 	void SetGainColor( Color color ) { m_colorGain = color; }
 	void SetLossColor( Color color ) { m_colorLoss = color; }
 
-	virtual void Paint();
+	void Paint() override;
 
 protected:
 	float _prevProgress;

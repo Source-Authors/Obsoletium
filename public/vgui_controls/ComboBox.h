@@ -25,11 +25,11 @@ class ComboBoxButton : public vgui::Button
 {
 public:
 	ComboBoxButton(ComboBox *parent, const char *panelName, const char *text);
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus);
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus) override;
 	virtual void OnCursorExited();
 
-	virtual Color GetButtonBgColor()
+	Color GetButtonBgColor() override
 	{
 		if (IsEnabled())
 			return  Button::GetButtonBgColor();
@@ -46,15 +46,15 @@ private:
 //-----------------------------------------------------------------------------
 class ComboBox : public TextEntry
 {
-	DECLARE_CLASS_SIMPLE( ComboBox, TextEntry );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ComboBox, TextEntry );
 
 public:
 	ComboBox(Panel *parent, const char *panelName, int numLines, bool allowEdit);
 	~ComboBox();
 
 	// functions designed to be overriden
-	virtual void OnShowMenu(Menu *menu) {}
-	virtual void OnHideMenu(Menu *menu) {}
+	virtual void OnShowMenu(Menu *) {}
+	virtual void OnHideMenu(Menu *) {}
 
 	// Set the number of items in the drop down menu.
 	virtual void SetNumberOfEditLines( int numLines );
@@ -111,7 +111,7 @@ public:
 	virtual Menu *GetMenu() { return m_pDropDown; }
 
 	// Layout the format of the combo box for drawing on screen
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	/* action signals
 		"TextChanged" - signals that the text has changed in the combo box
@@ -120,14 +120,14 @@ public:
 
 	virtual void ShowMenu();
 	virtual void HideMenu();
-	virtual void OnKillFocus();
+	void OnKillFocus() override;
 	MESSAGE_FUNC( OnMenuClose, "MenuClose" );
 	virtual void DoClick();
-	virtual void OnSizeChanged(int wide, int tall);
+	void OnSizeChanged(int wide, int tall) override;
 
 	virtual void SetOpenDirection(Menu::MenuDirection_e direction);
 
-	virtual void SetFont( HFont font );
+	void SetFont( HFont font ) override;
 
 	virtual void SetUseFallbackFont( bool bState, HFont hFallback );
 
@@ -135,23 +135,23 @@ public:
 
 protected:
 	// overrides
-	virtual void OnMousePressed(MouseCode code);
-	virtual void OnMouseDoublePressed(MouseCode code);
+	void OnMousePressed(MouseCode code) override;
+	void OnMouseDoublePressed(MouseCode code) override;
 	MESSAGE_FUNC( OnMenuItemSelected, "MenuItemSelected" );
-	virtual void OnCommand( const char *command );
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void ApplySettings( KeyValues *pInResourceData );
-	virtual void OnCursorEntered();
-	virtual void OnCursorExited();
+	void OnCommand( const char *command ) override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void ApplySettings( KeyValues *pInResourceData ) override;
+	void OnCursorEntered() override;
+	void OnCursorExited() override;
 
 	// custom message handlers
-	MESSAGE_FUNC_WCHARPTR( OnSetText, "SetText", text );
-	virtual void OnSetFocus();						// called after the panel receives the keyboard focus
+	MESSAGE_FUNC_WCHARPTR_OVERRIDE( OnSetText, "SetText", text );
+	void OnSetFocus() override;						// called after the panel receives the keyboard focus
 #ifdef _X360
 	virtual void OnKeyCodePressed(KeyCode code);
 #endif
-    virtual void OnKeyCodeTyped(KeyCode code);
-	virtual void OnKeyTyped(wchar_t unichar);
+    void OnKeyCodeTyped(KeyCode code) override;
+	void OnKeyTyped(wchar_t unichar) override;
 
 	void SelectMenuItem(int itemToSelect);
     void MoveAlongMenuItemList(int direction);

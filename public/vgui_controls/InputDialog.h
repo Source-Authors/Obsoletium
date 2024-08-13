@@ -26,7 +26,7 @@ class TextEntry;
 //-----------------------------------------------------------------------------
 class BaseInputDialog : public Frame
 {
-	DECLARE_CLASS_SIMPLE( BaseInputDialog, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( BaseInputDialog, Frame );
 
 public:
 	BaseInputDialog( vgui::Panel *parent, const char *title );
@@ -35,11 +35,11 @@ public:
 	void DoModal( KeyValues *pContextKeyValues = NULL );
 
 protected:
-	virtual void PerformLayout();
-	virtual void PerformLayout( int x, int y, int w, int h ) {}
+	void PerformLayout() override;
+	virtual void PerformLayout( int, int, int, int ) {}
 
 	// command buttons
-	virtual void OnCommand( const char *command );
+	void OnCommand( const char *command ) override;
 
 	void CleanUpContextKeyValues();
 	KeyValues		*m_pContextKeyValues;
@@ -54,14 +54,14 @@ private:
 //-----------------------------------------------------------------------------
 class InputMessageBox : public BaseInputDialog
 {
-	DECLARE_CLASS_SIMPLE( InputMessageBox, BaseInputDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( InputMessageBox, BaseInputDialog );
 
 public:
 	InputMessageBox( vgui::Panel *parent, const char *title, char const *prompt );
 	~InputMessageBox();
 
 protected:
-	virtual void PerformLayout( int x, int y, int w, int h );
+	void PerformLayout( int x, int y, int w, int h ) override;
 
 private:
 	vgui::Label			*m_pPrompt;
@@ -72,7 +72,7 @@ private:
 //-----------------------------------------------------------------------------
 class InputDialog : public BaseInputDialog
 {
-	DECLARE_CLASS_SIMPLE( InputDialog, BaseInputDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( InputDialog, BaseInputDialog );
 
 public:
 	InputDialog( vgui::Panel *parent, const char *title, char const *prompt, char const *defaultValue = "" );
@@ -90,10 +90,10 @@ public:
 	void AllowNumericInputOnly( bool bOnlyNumeric );
 
 protected:
-	virtual void PerformLayout( int x, int y, int w, int h );
+	void PerformLayout( int x, int y, int w, int h ) override;
 
 	// command buttons
-	virtual void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 
 private:
 	vgui::Label			*m_pPrompt;
