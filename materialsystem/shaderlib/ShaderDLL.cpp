@@ -30,13 +30,13 @@ public:
 	// methods of IShaderDLL
 	virtual bool Connect( CreateInterfaceFn factory );
 	virtual void Disconnect();
-	virtual int ShaderCount() const;
-	virtual IShader *GetShader( int nShader );
+	int ShaderCount() const override;
+	IShader *GetShader( int nShader ) override;
 
 	// methods of IShaderDLLInternal
-	virtual bool Connect( CreateInterfaceFn factory, bool bIsMaterialSystem );
-	virtual void Disconnect( bool bIsMaterialSystem );
-	virtual void InsertShader( IShader *pShader );
+	bool Connect( CreateInterfaceFn factory, bool bIsMaterialSystem ) override;
+	void Disconnect( bool bIsMaterialSystem ) override;
+	void InsertShader( IShader *pShader ) override;
 
 private:
 	CUtlVector< IShader * >	m_ShaderList;

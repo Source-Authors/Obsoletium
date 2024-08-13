@@ -54,10 +54,10 @@ bool IsUsingGraphics();
 	m_SoftwareVertexShader = SoftwareVertexShader_ ## name
 
 #define SHADER_INIT_PARAMS()			\
-	virtual void OnInitShaderParams( IMaterialVar **params, const char *pMaterialName )
+	virtual void OnInitShaderParams( [[maybe_unused]] IMaterialVar **params, [[maybe_unused]] const char *pMaterialName )
 
 #define SHADER_FALLBACK			\
-	virtual char const* GetFallbackShader( IMaterialVar** params ) const
+	virtual char const* GetFallbackShader( [[maybe_unused]] IMaterialVar** params ) const
 
 // Typesafe flag setting
 inline void CShader_SetFlags( IMaterialVar **params, MaterialVarFlags_t _flag )
@@ -121,7 +121,7 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	namespace name \
 	{\
 		typedef _baseclass CBaseClass;\
-		static const char *s_HelpString = help; \
+		[[maybe_unused]] static const char *s_HelpString = help; \
 		static const char *s_Name = #name; \
 		static int s_nFlags = flags; \
 		class CShaderParam;\
@@ -282,10 +282,10 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 		else													\
 			return s_ShaderParams[param - nBaseClassParamCount]->GetFlags(); \
 	}\
-	void OnInitShaderInstance( IMaterialVar **params, IShaderInit *pShaderInit, const char *pMaterialName )
+	void OnInitShaderInstance( [[maybe_unused]] IMaterialVar **params, [[maybe_unused]] IShaderInit *pShaderInit, [[maybe_unused]] const char *pMaterialName )
 
 #define SHADER_DRAW \
-	void OnDrawElements( IMaterialVar **params, IShaderShadow* pShaderShadow, IShaderDynamicAPI* pShaderAPI, VertexCompressionType_t vertexCompression, CBasePerMaterialContextData **pContextDataPtr )
+	void OnDrawElements( [[maybe_unused]] IMaterialVar **params, [[maybe_unused]] IShaderShadow* pShaderShadow, [[maybe_unused]] IShaderDynamicAPI* pShaderAPI, [[maybe_unused]] VertexCompressionType_t vertexCompression, [[maybe_unused]] CBasePerMaterialContextData **pContextDataPtr )
 
 #define SHADOW_STATE if (pShaderShadow)
 #define DYNAMIC_STATE if (pShaderAPI)
@@ -334,7 +334,7 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 		namespace _name\
 		{\
 			static const char *s_Name = #_name; \
-			static const char *s_HelpString = _help;\
+			[[maybe_unused]] static const char *s_HelpString = _help;\
 			static int s_nFlags = _flags;\
 			class CShader : public _base::CShader\
 			{\
@@ -388,7 +388,7 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	int dynpixshadercombo_ ## var ## _missingcurlybraces = 0; \
 	NOTE_UNUSED( dynpixshadercombo_ ## var ## _missingcurlybraces ); \
 	_pshIndex.Set ## var( ( val ) );  if(g_shaderConfigDumpEnable){printf("\n   PS dyn  var %s = %d (%s)", #var, (int) val, #val );}; \
-	int psh_forgot_to_set_dynamic_ ## var = 0
+	[[maybe_unused]] int psh_forgot_to_set_dynamic_ ## var = 0
 
 // vsh_forgot_to_set_dynamic_ ## var is used to make sure that you set all
 // all combos.  If you don't, you will get an undefined variable used error 
@@ -397,7 +397,7 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	int dynvertshadercombo_ ## var ## _missingcurlybraces = 0; \
 	NOTE_UNUSED( dynvertshadercombo_ ## var ## _missingcurlybraces ); \
 	_vshIndex.Set ## var( ( val ) );  if(g_shaderConfigDumpEnable){printf("\n   VS dyn  var %s = %d (%s)", #var, (int) val, #val );}; \
-	int vsh_forgot_to_set_dynamic_ ## var = 0
+	[[maybe_unused]] int vsh_forgot_to_set_dynamic_ ## var = 0
 
 
 // psh_forgot_to_set_static_ ## var is used to make sure that you set all
@@ -407,7 +407,7 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	int staticpixshadercombo_ ## var ## _missingcurlybraces = 0; \
 	NOTE_UNUSED( staticpixshadercombo_ ## var ## _missingcurlybraces ); \
 	_pshIndex.Set ## var( ( val ) ); if(g_shaderConfigDumpEnable){printf("\n   PS stat var %s = %d (%s)", #var, (int) val, #val );}; \
-	int psh_forgot_to_set_static_ ## var = 0
+	[[maybe_unused]] int psh_forgot_to_set_static_ ## var = 0
 
 // vsh_forgot_to_set_static_ ## var is used to make sure that you set all
 // all combos.  If you don't, you will get an undefined variable used error 
@@ -416,7 +416,7 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	int staticvertshadercombo_ ## var ## _missingcurlybraces = 0; \
 	NOTE_UNUSED( staticvertshadercombo_ ## var ## _missingcurlybraces ); \
 	_vshIndex.Set ## var( ( val ) ); if(g_shaderConfigDumpEnable){printf("\n   VS stat var %s = %d (%s)", #var, (int) val, #val );}; \
-	int vsh_forgot_to_set_static_ ## var = 0
+	[[maybe_unused]] int vsh_forgot_to_set_static_##var = 0
 
 
 // psh_testAllCombos adds up all of the psh_forgot_to_set_dynamic_ ## var's from 

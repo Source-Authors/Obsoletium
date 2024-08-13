@@ -16,7 +16,7 @@
 class CShaderLibConVarAccessor : public IConCommandBaseAccessor
 {
 public:
-	virtual bool	RegisterConCommandBase( ConCommandBase *pCommand )
+	bool RegisterConCommandBase( ConCommandBase *pCommand ) override
 	{
 		// Link to engine's list instead
 		g_pCVar->RegisterConCommand( pCommand );
@@ -33,7 +33,7 @@ public:
 CShaderLibConVarAccessor g_ConVarAccessor;
 
 
-void InitShaderLibCVars( CreateInterfaceFn cvarFactory )
+void InitShaderLibCVars( CreateInterfaceFn )
 {
 	if ( g_pCVar )
 	{
