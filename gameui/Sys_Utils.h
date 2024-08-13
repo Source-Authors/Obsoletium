@@ -11,7 +11,10 @@
 #pragma once
 #endif
 
-typedef int WHANDLE;
+#include "tier0/platform.h"
+
+// dimhotepus: x86-64 port. int -> intp
+typedef intp WHANDLE;
 
 // ERROR HANDLING
 extern const unsigned int SYS_NO_ERROR;

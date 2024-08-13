@@ -17,18 +17,18 @@
 //-----------------------------------------------------------------------------
 class CSessionLobbyDialog : public CBaseDialog
 {
-	DECLARE_CLASS_SIMPLE( CSessionLobbyDialog, CBaseDialog ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSessionLobbyDialog, CBaseDialog ); 
 
 public:
 	CSessionLobbyDialog( vgui::Panel *parent );
 	~CSessionLobbyDialog();
 
-	virtual void	OnCommand( const char *pCommand );
-	virtual void	OnKeyCodePressed( vgui::KeyCode code );
+	void	OnCommand( const char *pCommand ) override;
+	void	OnKeyCodePressed( vgui::KeyCode code ) override;
 
-	virtual void	PerformLayout();
-	virtual void	ApplySettings( KeyValues *inResourceData );
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
+	void	PerformLayout() override;
+	void	ApplySettings( KeyValues *inResourceData ) override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	void			SetDialogKeys( KeyValues *pKeys );
 	void			UpdatePlayerInfo( uint64 nPlayerId, const char *pName, int nTeam, byte cVoiceState, int nPlayersNeeded, bool bHost );

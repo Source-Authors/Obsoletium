@@ -22,13 +22,13 @@
 //-----------------------------------------------------------------------------
 class CLoadGameDialog : public CBaseSaveGameDialog
 {
-	DECLARE_CLASS_SIMPLE( CLoadGameDialog, CBaseSaveGameDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CLoadGameDialog, CBaseSaveGameDialog );
 
 public:
 	CLoadGameDialog(vgui::Panel *parent);
 	~CLoadGameDialog();
 
-	virtual void OnCommand( const char *command );
+	void OnCommand( const char *command ) override;
 };
 
 //
@@ -37,15 +37,15 @@ public:
 
 class CLoadGameDialogXbox : public CSaveGameBrowserDialog
 {
-	DECLARE_CLASS_SIMPLE( CLoadGameDialogXbox, CSaveGameBrowserDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CLoadGameDialogXbox, CSaveGameBrowserDialog );
 
 public:
 					CLoadGameDialogXbox( vgui::Panel *parent );
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void	OnCommand(const char *command);
-	virtual void	PerformSelectedAction( void );
-	virtual void	PerformDeletion( void );
-	virtual void	UpdateFooterOptions( void );
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void	OnCommand(const char *command) override;
+	void	PerformSelectedAction( void ) override;
+	void	PerformDeletion( void ) override;
+	void	UpdateFooterOptions( void ) override;
 
 private:
 	void			DeleteSaveGame( const SaveGameDescription_t *pSaveDesc );

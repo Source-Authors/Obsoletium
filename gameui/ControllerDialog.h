@@ -14,12 +14,12 @@
 
 class CControllerDialog : public COptionsDialogXbox
 {
-	DECLARE_CLASS_SIMPLE( CControllerDialog, COptionsDialogXbox );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CControllerDialog, COptionsDialogXbox );
 
 public:
 	CControllerDialog(vgui::Panel *parent);
 
-	virtual void		ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 };
 

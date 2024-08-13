@@ -18,7 +18,7 @@
 
 class CLabeledCommandComboBox : public vgui::ComboBox
 {
-	DECLARE_CLASS_SIMPLE( CLabeledCommandComboBox, vgui::ComboBox );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CLabeledCommandComboBox, vgui::ComboBox );
 
 public:
 	CLabeledCommandComboBox(vgui::Panel *parent, const char *panelName);
@@ -26,7 +26,7 @@ public:
 
 	virtual void DeleteAllItems();
 	virtual void AddItem(char const *text, char const *engineCommand);
-	virtual void ActivateItem(int itemIndex);
+	void ActivateItem(int itemIndex) override;
 	const char *GetActiveItemCommand();
 
 	void SetInitialItem(int itemIndex);

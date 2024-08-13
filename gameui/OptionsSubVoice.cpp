@@ -91,8 +91,8 @@ void COptionsSubVoice::OnResetData()
     if (!m_pVoiceTweak)
         return;
 
-	float micVolume = m_pVoiceTweak->GetControlFloat( MicrophoneVolume );
-	m_pMicrophoneVolume->SetValue( (int)( 100.0f * micVolume ) );
+    float micVolume = m_pVoiceTweak->GetControlFloat( MicrophoneVolume );
+    m_pMicrophoneVolume->SetValue( (int)( 100.0f * micVolume ) );
     m_nMicVolumeValue = m_pMicrophoneVolume->GetValue();
 
 	float fMicBoost = m_pVoiceTweak->GetControlFloat( MicBoost );
@@ -234,10 +234,10 @@ void COptionsSubVoice::EndTestMicrophone()
     if (!m_pVoiceTweak || !m_bVoiceOn)
         return;
 
-	if ( m_pVoiceTweak->IsStillTweaking() )
-	{
-		m_pVoiceTweak->EndVoiceTweakMode();
-	}
+    if ( m_pVoiceTweak->IsStillTweaking() )
+    {
+        m_pVoiceTweak->EndVoiceTweakMode();
+    }
     ResetVoiceParameters();
     m_pTestMicrophoneButton->SetText("#GameUI_TestMicrophone");
     m_bVoiceOn = false;

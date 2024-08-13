@@ -177,16 +177,16 @@ void CGameSavePanel::SetDescription( SaveGameDescription_t *pDesc )
 //-----------------------------------------------------------------------------
 CSaveGameBrowserDialog::CSaveGameBrowserDialog( vgui::Panel *parent ) 
 :	BaseClass( parent, "SaveGameDialog" ),
+	m_ScrollDirection( SCROLL_NONE ),
 	m_bFilterAutosaves( false ),
 	m_iSelectedSave( -1 ),
-	m_bScrolling( false ),
-	m_ScrollCt( 0 ),
-	m_ScrollSpeed( 0.0f ),
-	m_ButtonPressed( SCROLL_NONE ),
-	m_ScrollDirection( SCROLL_NONE ),
 	m_nDeletedPanel( INVALID_INDEX ),
 	m_nAddedPanel( INVALID_INDEX ),
 	m_nUsedStorageSpace( 0 ),
+	m_ScrollSpeed( 0.0f ),
+	m_ButtonPressed( SCROLL_NONE ),
+	m_ScrollCt( 0 ),
+	m_bScrolling( false ),
 	m_bControlDisabled( false )
 {
 	// Setup basic attributes
@@ -641,7 +641,7 @@ void CSaveGameBrowserDialog::AnimateOverwriteActivePanel( const SaveGameDescript
 //-----------------------------------------------------------------------------
 void CSaveGameBrowserDialog::PreScroll( EScrollDirection dir )
 {
-	int hideIdx = INVALID_INDEX;
+	intp hideIdx = INVALID_INDEX;
 	if ( m_nDeletedPanel != INVALID_INDEX )
 	{
 		hideIdx = m_nDeletedPanel;
@@ -803,7 +803,7 @@ void CSaveGameBrowserDialog::ShiftPanelIndices( int offset )
 		
 		if ( m_PanelIndex[lastSlot] != INVALID_INDEX )
 		{
-			int num = m_PanelIndex[ lastSlot ] + 1;
+			intp num = m_PanelIndex[ lastSlot ] + 1;
 			if ( IsValidPanel( num ) )
 			{
 				m_PanelIndex[lastSlot] = num;
@@ -827,7 +827,7 @@ void CSaveGameBrowserDialog::ShiftPanelIndices( int offset )
 		Q_memmove( &m_PanelIndex[0], &m_PanelIndex[1], lastSlot * sizeof( m_PanelIndex[0] ) );
 		if ( m_PanelIndex[lastSlot] != INVALID_INDEX )
 		{
-			int num = m_PanelIndex[ lastSlot ] + 1;
+			intp num = m_PanelIndex[ lastSlot ] + 1;
 			if ( IsValidPanel( num ) )
 			{
 				m_PanelIndex[lastSlot] = num;
@@ -851,7 +851,7 @@ void CSaveGameBrowserDialog::ShiftPanelIndices( int offset )
 		Q_memmove( &m_PanelIndex[1], &m_PanelIndex[0], lastSlot * sizeof( m_PanelIndex[0] ) );
 		if ( m_PanelIndex[0] != INVALID_INDEX )
 		{
-			int num = m_PanelIndex[0] - 1;
+			intp num = m_PanelIndex[0] - 1;
 			if ( IsValidPanel( num ) )
 			{
 				m_PanelIndex[0] = num;
@@ -868,7 +868,7 @@ void CSaveGameBrowserDialog::ShiftPanelIndices( int offset )
 //-----------------------------------------------------------------------------
 // Purpose: Validates an index into the selection panels vector
 //-----------------------------------------------------------------------------
-bool CSaveGameBrowserDialog::IsValidPanel( const int idx )
+bool CSaveGameBrowserDialog::IsValidPanel( const intp idx )
 {
 	if ( idx < 0 || idx >= m_SavePanels.Count() )
 		return false;
@@ -1198,8 +1198,7 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 	Q_strncpy( save->szMapName, szMapName, sizeof(save->szMapName) );
 
 	// Elapsed time is the last 6 characters in comment. (mmm:ss)
-	int i;
-	i = strlen( szComment );
+	intp i = V_strlen( szComment );
 	Q_strncpy( szElapsedTime, "??", sizeof( szElapsedTime ) );
 	if (i >= 6)
 	{
@@ -1216,9 +1215,9 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 		wchar_t wzMins[4];	
 		wchar_t wzSecs[4];
 
-		_snwprintf( wzHours, ARRAYSIZE(wzHours), L"%d", hours );
-		_snwprintf( wzMins, ARRAYSIZE(wzMins), L"%d", minutes );
-		_snwprintf( wzSecs, ARRAYSIZE(wzSecs), L"%d", seconds );
+		_snwprintf( wzHours, std::size(wzHours), L"%d", hours );
+		_snwprintf( wzMins, std::size(wzMins), L"%d", minutes );
+		_snwprintf( wzSecs, std::size(wzSecs), L"%d", seconds );
 
 		wchar_t buf[20];
 
@@ -1288,7 +1287,7 @@ void CSaveGameBrowserDialog::UpdateFooterOptions( void )
 //-----------------------------------------------------------------------------
 void CSaveGameBrowserDialog::SortSaveGames( SaveGameDescription_t *pSaves, unsigned int nNumSaves )
 {
-	qsort( pSaves, nNumSaves, sizeof(SaveGameDescription_t), &CBaseSaveGameDialog::SaveGameSortFunc );
+	std::sort( pSaves, pSaves + nNumSaves, CBaseSaveGameDialog::SaveGameSortFunc );
 }
 
 //-----------------------------------------------------------------------------
@@ -1314,18 +1313,14 @@ void CSaveGameBrowserDialog::ScanSavedGames( bool bIgnoreAutosave )
 
 	// Get the search path
 	char szDirectory[_MAX_PATH];
+	Q_snprintf( szDirectory, sizeof( szDirectory ), "%s/*", SAVE_DIR );
 
-	if ( IsX360() )
-		Q_snprintf( szDirectory, sizeof( szDirectory ), "%s:/*", COM_GetModDirectory() );
-	else
-		Q_snprintf( szDirectory, sizeof( szDirectory ), "save/*" );
-
-	Q_DefaultExtension( szDirectory, IsX360() ? ".360.sav" : ".sav", sizeof( szDirectory ) );
+	Q_DefaultExtension( szDirectory, ".sav", sizeof( szDirectory ) );
 	Q_FixSlashes( szDirectory );
 
 	// iterate the saved files
 	FileFindHandle_t handle;
-	const char *pFileName = g_pFullFileSystem->FindFirst( szDirectory, &handle );
+	const char *pFileName = g_pFullFileSystem->FindFirstEx( szDirectory, MOD_DIR, &handle );
 	while (pFileName)
 	{
 		if ( !Q_strnicmp(pFileName, "HLSave", std::size( "HLSave" ) - 1 ) )
@@ -1335,16 +1330,12 @@ void CSaveGameBrowserDialog::ScanSavedGames( bool bIgnoreAutosave )
 		}
 
 		char szFileName[_MAX_PATH];
-
-		if ( IsX360() )
-			Q_snprintf(szFileName, sizeof( szFileName ), "%s:/%s", COM_GetModDirectory(), pFileName );
-		else
-			Q_snprintf(szFileName, sizeof( szFileName ), "save/%s", pFileName);
+		Q_snprintf(szFileName, sizeof( szFileName ), "%s/%s", SAVE_DIR, pFileName);
 
 		Q_FixSlashes( szFileName );
 
 		// Only load save games from the current mod's save dir
-		if( !g_pFullFileSystem->FileExists( szFileName, "MOD" ) )
+		if( !g_pFullFileSystem->FileExists( szFileName, MOD_DIR ) )
 		{
 			pFileName = g_pFullFileSystem->FindNext( handle );
 			continue;
@@ -1385,7 +1376,7 @@ void CSaveGameBrowserDialog::ScanSavedGames( bool bIgnoreAutosave )
 	SortSaveGames( saveGames.Base(), saveGames.Count() );
 
 	// Now add them in order
-	for ( int i = 0; i < saveGames.Count(); i++ )
+	for ( intp i = 0; i < saveGames.Count(); i++ )
 	{
 		CGameSavePanel *savePanel = SETUP_PANEL( new CGameSavePanel( this, &saveGames[i] ) );
 

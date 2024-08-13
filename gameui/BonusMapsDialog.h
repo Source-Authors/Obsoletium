@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 class CBonusMapsDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CBonusMapsDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBonusMapsDialog, vgui::Frame );
 
 public:
 	CBonusMapsDialog(vgui::Panel *parent);
@@ -32,11 +32,11 @@ public:
 
 	int GetSelectedChallenge( void );
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void OnCommand( const char *command );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void OnCommand( const char *command ) override;
 
-	void OnKeyCodeTyped( vgui::KeyCode code );
-	void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 private:
 	bool ImportZippedBonusMaps( const char *pchZippedFileName );

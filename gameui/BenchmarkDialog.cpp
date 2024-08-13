@@ -54,7 +54,7 @@ void CBenchmarkDialog::RunBenchmark()
 //-----------------------------------------------------------------------------
 class CBenchmarkResultsDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CBenchmarkResultsDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBenchmarkResultsDialog, vgui::Frame );
 public:
 	CBenchmarkResultsDialog( vgui::Panel *parent, const char *name ) : BaseClass( parent, name )
 	{
@@ -70,7 +70,7 @@ public:
 		MoveToCenterOfScreen();
 	}
 
-	virtual void Activate()
+	void Activate() override
 	{
 		BaseClass::Activate();
 
@@ -88,7 +88,7 @@ public:
 		}
 	}
 
-	void OnKeyCodePressed( KeyCode code )
+	void OnKeyCodePressed( KeyCode code ) override
 	{
 		if ( code == KEY_XBUTTON_B )
 		{
@@ -101,7 +101,7 @@ public:
 	}
 
 private:
-	virtual void OnClose()
+	void OnClose() override
 	{
 		if ( m_pUploadCheck->IsSelected() )
 		{

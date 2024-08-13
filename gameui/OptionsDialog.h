@@ -19,16 +19,16 @@
 //-----------------------------------------------------------------------------
 class COptionsDialog : public vgui::PropertyDialog
 {
-	DECLARE_CLASS_SIMPLE( COptionsDialog, vgui::PropertyDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsDialog, vgui::PropertyDialog );
 
 public:
 	COptionsDialog(vgui::Panel *parent);
 	~COptionsDialog();
 
 	void Run();
-	virtual void Activate();
+	void Activate() override;
 
-	void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 	vgui::PropertyPage* GetOptionsSubMultiplayer( void ) { return m_pOptionsSubMultiplayer; }
 
@@ -50,20 +50,20 @@ struct OptionData_t;
 //-----------------------------------------------------------------------------
 class COptionsDialogXbox : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( COptionsDialogXbox, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsDialogXbox, vgui::Frame );
 
 public:
 	COptionsDialogXbox( vgui::Panel *parent, bool bControllerOptions = false );
 	~COptionsDialogXbox();
 
-	virtual void		ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void		ApplySettings( KeyValues *inResourceData );
-	virtual void		OnClose();
-	virtual void		OnKeyCodePressed( vgui::KeyCode code );
-	virtual void		OnCommand(const char *command);
+	void		ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void		ApplySettings( KeyValues *inResourceData ) override;
+	void		OnClose() override;
+	void		OnKeyCodePressed( vgui::KeyCode code ) override;
+	void		OnCommand(const char *command) override;
 
-	virtual void		OnKeyCodeReleased( vgui::KeyCode code);
-	virtual void		OnThink();
+	void		OnKeyCodeReleased( vgui::KeyCode code) override;
+	void		OnThink() override;
 
 private:
 	void	HandleInactiveKeyCodePressed( vgui::KeyCode code );

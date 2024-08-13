@@ -22,15 +22,15 @@ class CCreateMultiplayerGameBotPage;
 //-----------------------------------------------------------------------------
 class CCreateMultiplayerGameDialog : public vgui::PropertyDialog
 {
-	DECLARE_CLASS_SIMPLE( CCreateMultiplayerGameDialog,  vgui::PropertyDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCreateMultiplayerGameDialog,  vgui::PropertyDialog );
 
 public:
 	CCreateMultiplayerGameDialog(vgui::Panel *parent);
 	~CCreateMultiplayerGameDialog();
 
 protected:
-	virtual bool OnOK(bool applyOnly);
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	bool OnOK(bool applyOnly) override;
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 private:
 	CCreateMultiplayerGameServerPage *m_pServerPage;

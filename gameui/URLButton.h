@@ -26,7 +26,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class URLButton : public Label
 {
-	DECLARE_CLASS_SIMPLE( URLButton, Label );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( URLButton, Label );
 
 public:
 	// You can optionally pass in the panel to send the click message to and the name of the command to send to that panel.
@@ -34,7 +34,7 @@ public:
 	URLButton(Panel *parent, const char *panelName, const wchar_t *text, Panel *pActionSignalTarget=NULL, const char *pCmd=NULL);
 	~URLButton();
 private:
-	void Init();
+	void Init() override;
 public:
 	// Set armed state.
 	virtual void SetArmed(bool state);
@@ -80,14 +80,14 @@ public:
 	// Message targets that the button has been pressed
 	virtual void FireActionSignal( void );
 	// Perform graphical layout of button
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
-	virtual bool RequestInfo(KeyValues *data);
+	bool RequestInfo(KeyValues *data) override;
 
 	// Respond when key focus is received
-	virtual void OnSetFocus();
+	void OnSetFocus() override;
 	// Respond when focus is killed
-	virtual void OnKillFocus();
+	void OnKillFocus() override;
 
 	// Set button border attribute enabled, controls display of button.
 	virtual void SetButtonBorderEnabled( bool state );
@@ -108,9 +108,9 @@ public:
 			input: none		
 	*/
 
-	virtual void OnCursorEntered();
-	virtual void OnCursorExited();
-	virtual void SizeToContents();
+	void OnCursorEntered() override;
+	void OnCursorExited() override;
+	void SizeToContents() override;
 
 	virtual KeyValues *GetCommand();
 
@@ -120,22 +120,22 @@ public:
 protected:
 
 	// Paint button on screen
-	virtual void Paint(void);
+	void Paint(void) override;
 	// Get button border attributes.
 
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	MESSAGE_FUNC_INT( OnSetState, "SetState", state );		
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	MESSAGE_FUNC_INT( OnSetState, "SetState", state );
 	
-	virtual void OnMousePressed(MouseCode code);
-	virtual void OnMouseDoublePressed(MouseCode code);
-	virtual void OnMouseReleased(MouseCode code);
-	virtual void OnKeyCodePressed(KeyCode code);
-	virtual void OnKeyCodeReleased(KeyCode code);
+	void OnMousePressed(MouseCode code) override;
+	void OnMouseDoublePressed(MouseCode code) override;
+	void OnMouseReleased(MouseCode code) override;
+	void OnKeyCodePressed(KeyCode code) override;
+	void OnKeyCodeReleased(KeyCode code) override;
 
 	// Get control settings for editing
-	virtual void GetSettings( KeyValues *outResourceData );
-	virtual void ApplySettings( KeyValues *inResourceData );
-	virtual const char *GetDescription( void );
+	void GetSettings( KeyValues *outResourceData ) override;
+	void ApplySettings( KeyValues *inResourceData ) override;
+	const char *GetDescription( void ) override;
 
 	KeyValues *GetActionMessage();
 

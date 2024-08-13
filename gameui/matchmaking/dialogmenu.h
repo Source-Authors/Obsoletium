@@ -38,19 +38,19 @@ struct sessionProperty_t
 //-----------------------------------------------------------------------
 class CMenuItem : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CMenuItem, vgui::EditablePanel ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMenuItem, vgui::EditablePanel ); 
 
 public:
 	CMenuItem( CDialogMenu *pParent, const char *pTitle, const char *pDescription );
 	virtual ~CMenuItem();
 
-	virtual void PerformLayout();
-	virtual void ApplySettings( KeyValues *pSettings );
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void PerformLayout() override;
+	void ApplySettings( KeyValues *pSettings ) override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	virtual void SetFocus( const bool bActive );
-	virtual void SetEnabled( bool bEnabled );
+	void SetEnabled( bool bEnabled ) override;
 	virtual void SetActiveColumn( int col );
-	virtual bool IsEnabled();
+	bool IsEnabled() override;
 	virtual void OnClick();
 
 protected:
@@ -76,14 +76,14 @@ protected:
 //-----------------------------------------------------------------------
 class CCommandItem : public CMenuItem
 {
-	DECLARE_CLASS_SIMPLE( CCommandItem, CMenuItem ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCommandItem, CMenuItem ); 
 
 public:
 	CCommandItem( CDialogMenu *pParent, const char *pTitle, const char *pDescription, const char *pCommand );
 	virtual ~CCommandItem();
 
-	virtual void OnClick();
-	virtual void SetFocus( const bool bActive );
+	void OnClick() override;
+	void SetFocus( const bool bActive ) override;
 
 	bool m_bHasFocus;
 
@@ -97,16 +97,16 @@ public:
 //-----------------------------------------------------------------------
 class CPlayerItem : public CCommandItem
 {
-	DECLARE_CLASS_SIMPLE( CMenuItem, CCommandItem ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMenuItem, CCommandItem ); 
 
 public:
 	CPlayerItem( CDialogMenu *pParent, const char *pTitle, int64 nId, byte bVoice, bool bReady );
 	virtual ~CPlayerItem();
 
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void PerformLayout() override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
-	virtual void OnClick();
+	void OnClick() override;
 
 	vgui::Label	*m_pVoiceIcon;
 	vgui::Label *m_pReadyIcon;
@@ -123,15 +123,15 @@ public:
 //-----------------------------------------------------------------------
 class CBrowserItem : public CCommandItem
 {
-	DECLARE_CLASS_SIMPLE( CBrowserItem, CCommandItem ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBrowserItem, CCommandItem ); 
 
 public:
 	CBrowserItem( CDialogMenu *pParent, const char *pHost, const char *pPlayers, const char *pScenario, const char *pPing );
 	virtual ~CBrowserItem();
 
-	virtual void	PerformLayout();
-	virtual void	ApplySettings( KeyValues *pSettings );
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
+	void	PerformLayout() override;
+	void	ApplySettings( KeyValues *pSettings ) override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	
 private:
 	vgui::Label	*m_pPlayers;
@@ -147,16 +147,16 @@ private:
 //-----------------------------------------------------------------------
 class COptionsItem : public CMenuItem
 {
-	DECLARE_CLASS_SIMPLE( COptionsItem, CMenuItem );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsItem, CMenuItem );
 
 public:
 	COptionsItem( CDialogMenu *pParent, const char *pLabel );
 	virtual ~COptionsItem();
 
-	virtual void	PerformLayout();
-	virtual void	ApplySettings( KeyValues *pSettings );
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void	SetFocus( const bool bActive );
+	void	PerformLayout() override;
+	void	ApplySettings( KeyValues *pSettings ) override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void	SetFocus( const bool bActive ) override;
 
 	void			SetOptionFocus( unsigned int idx );
 	void			SetOptionFocusNext();
@@ -199,14 +199,14 @@ private:
 //-----------------------------------------------------------------------
 class CAchievementItem : public CMenuItem
 {
-	DECLARE_CLASS_SIMPLE( CAchievementItem, CMenuItem );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAchievementItem, CMenuItem );
 
 public:
 	CAchievementItem( CDialogMenu *pParent, const wchar_t *pName, const wchar_t *pDesc, uint points, bool bUnlocked, IAchievement* pSourceAchievement );
 	virtual ~CAchievementItem();
 
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void PerformLayout() override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 private:
 	vgui::Label			*m_pPoints;
@@ -235,17 +235,17 @@ private:
 //-----------------------------------------------------------------------
 class CSectionedItem : public CCommandItem
 {
-	DECLARE_CLASS_SIMPLE( CSectionedItem, CCommandItem );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSectionedItem, CCommandItem );
 
 public:
 	CSectionedItem( CDialogMenu *pParent, const char **ppEntries, int ct );
 	virtual ~CSectionedItem();
 
-	virtual void	PerformLayout();
-	virtual void	ApplySettings( KeyValues *pSettings );
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
+	void	PerformLayout() override;
+	void	ApplySettings( KeyValues *pSettings ) override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
-	virtual void	SetActiveColumn( int col );
+	void	SetActiveColumn( int col ) override;
 
 	void			ClearSections();
 	void			AddSection( const char *pText, int wide );
@@ -267,16 +267,16 @@ public:
 //--------------------------------------------------------------------------------------
 class CDialogMenu : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CDialogMenu, vgui::Panel ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDialogMenu, vgui::Panel ); 
 
 public:
 	CDialogMenu();
 	~CDialogMenu();
 
-	virtual void		OnCommand( const char *pCommand );
-	virtual void		ApplySettings( KeyValues *inResourceData );
-	virtual void		ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void		PerformLayout();
+	void		OnCommand( const char *pCommand ) override;
+	void		ApplySettings( KeyValues *inResourceData ) override;
+	void		ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void		PerformLayout() override;
 	void				SetFilter( const char *pFilter );
 	virtual bool		HandleKeyCode( vgui::KeyCode code );
 	void				SetMaxVisibleItems( uint nMaxVisibleItems );

@@ -48,11 +48,11 @@ int SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) char *name, int 
 //-----------------------------------------------------------------------------
 class CBaseSaveGameDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CBaseSaveGameDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseSaveGameDialog, vgui::Frame );
 
 public:
 	CBaseSaveGameDialog( vgui::Panel *parent, const char *name );
-	static int __cdecl SaveGameSortFunc( const void *lhs, const void *rhs );
+	static bool SaveGameSortFunc( const SaveGameDescription_t &lhs, const SaveGameDescription_t &rhs );
 
 protected:
 	CUtlVector<SaveGameDescription_t> m_SaveGames;
@@ -64,12 +64,12 @@ protected:
 	void ScanSavedGames();
 	void CreateSavedGamesList();
 	int GetSelectedItemSaveIndex();
-	void AddSaveGameItemToList( int saveIndex );
+	void AddSaveGameItemToList( intp saveIndex );
 
 	bool ParseSaveData( char const *pszFileName, char const *pszShortName, SaveGameDescription_t &save );
 
-	void OnKeyCodeTyped( vgui::KeyCode code );
-	void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 private:
 	MESSAGE_FUNC( OnPanelSelected, "PanelSelected" );
@@ -77,5 +77,16 @@ private:
 	vgui::Button *m_pLoadButton;
 };
 
+constexpr inline char MOD_DIR[]{"MOD"};
+
+constexpr inline char SAVE_DIR[]
+{
+  // dimhotepus: Dropped / at the end to unify all places.
+#ifdef PLATFORM_64BITS
+  "save/x64"
+#else
+  "save"
+#endif
+};
 
 #endif // BASESAVEGAMEDIALOG_H

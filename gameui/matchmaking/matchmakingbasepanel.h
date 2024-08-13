@@ -26,15 +26,15 @@ enum EGameType
 //----------------------------
 class CMatchmakingBasePanel : public CBaseDialog
 {
-	DECLARE_CLASS_SIMPLE( CMatchmakingBasePanel, CBaseDialog ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMatchmakingBasePanel, CBaseDialog ); 
 
 public:
 	CMatchmakingBasePanel(vgui::Panel *parent);
 	~CMatchmakingBasePanel();
 
-	virtual void	OnCommand( const char *pCommand );
-	virtual void	OnKeyCodePressed( vgui::KeyCode code );
-	virtual void	Activate();
+	void	OnCommand( const char *pCommand ) override;
+	void	OnKeyCodePressed( vgui::KeyCode code ) override;
+	void	Activate() override;
 
 	void			SessionNotification( const int notification, const int param = 0 );
 	void			SystemNotification( const int notification );

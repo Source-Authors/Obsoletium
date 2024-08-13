@@ -33,7 +33,7 @@ void StripFloatTrailingZeros(char *str)
 
 	// start at the end and scan back to the period
 	char *end = 0;
-	for ( end = str + strlen(str) - 1; end > period; --end )
+	for ( end = str + V_strlen(str) - 1; end > period; --end )
 	{
 		if (*end == '0')
 		{
@@ -278,7 +278,7 @@ void CScriptObject::WriteToScriptFile( FileHandle_t fp )
 	{
 	case O_BOOL:
 		g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", prompt );
-		if ( tooltip && tooltip[0] )
+		if ( tooltip[0] )
 		{
 			g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", tooltip );
 		}
@@ -287,7 +287,7 @@ void CScriptObject::WriteToScriptFile( FileHandle_t fp )
 		break;
 	case O_NUMBER:
 		g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", prompt );
-		if ( tooltip && tooltip[0] )
+		if ( tooltip[0] )
 		{
 			g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", tooltip );
 		}
@@ -296,7 +296,7 @@ void CScriptObject::WriteToScriptFile( FileHandle_t fp )
 		break;
 	case O_STRING:
 		g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", prompt );
-		if ( tooltip && tooltip[0] )
+		if ( tooltip[0] )
 		{
 			g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", tooltip );
 		}
@@ -306,7 +306,7 @@ void CScriptObject::WriteToScriptFile( FileHandle_t fp )
 		break;
 	case O_LIST:
 		g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", prompt );
-		if ( tooltip && tooltip[0] )
+		if ( tooltip[0] )
 		{
 			g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", tooltip );
 		}
@@ -328,7 +328,7 @@ void CScriptObject::WriteToScriptFile( FileHandle_t fp )
 		break;
 	case O_SLIDER:
 		g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", prompt );
-		if ( tooltip && tooltip[0] )
+		if ( tooltip[0] )
 		{
 			g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", tooltip );
 		}
@@ -337,7 +337,7 @@ void CScriptObject::WriteToScriptFile( FileHandle_t fp )
 		break;
 	case O_CATEGORY:
 		g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", prompt );
-		if ( tooltip && tooltip[0] )
+		if ( tooltip[0] )
 		{
 			g_pFullFileSystem->FPrintf( fp, "\t\t\"%s\"\r\n", tooltip );
 		}

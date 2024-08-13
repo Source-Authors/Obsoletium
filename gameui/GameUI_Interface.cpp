@@ -176,8 +176,8 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	ConVarRef var( "gameui_xbox" );
 	m_bIsConsoleUI = var.IsValid() && var.GetBool();
 
-	vgui::VGui_InitInterfacesList( "GameUI", &factory, 1 );
-	vgui::VGui_InitMatSysInterfacesList( "GameUI", &factory, 1 );
+	vgui::VGui_InitInterfacesList( "gameui", &factory, 1 );
+	vgui::VGui_InitMatSysInterfacesList( "gameui", &factory, 1 );
 
 	// load localization file
 	g_pVGuiLocalize->AddFile( "Resource/gameui_%language%.txt", "GAME", true );
@@ -491,7 +491,7 @@ void CGameUI::PlayGameStartupSound()
 			if ( pGameDir )
 			{
 				// Is the game TF?
-				const int nStrLen = V_strlen( pGameDir );
+				const intp nStrLen = V_strlen( pGameDir );
 				bIsTF = nStrLen
 					&& nStrLen >= 2 &&
 					pGameDir[nStrLen-2] == 't' &&
@@ -582,7 +582,7 @@ void CGameUI::Start()
 #ifdef WIN32
 				if (waitResult == SYS_WAIT_OBJECT_0 || waitResult == SYS_WAIT_ABANDONED)
 				{
-					Sys_EnumWindows(SendShutdownMsgFunc, 1);
+					Sys_EnumWindows(reinterpret_cast<void*>(SendShutdownMsgFunc), 1);
 				}
 #endif
 			}
@@ -602,19 +602,6 @@ void CGameUI::Start()
 //-----------------------------------------------------------------------------
 void CGameUI::ValidateCDKey()
 {
-	// this check is disabled, since we have no plans for an offline version of hl2
-#if 0
-	//!! hack, write out a regkey for now so developers don't have to type it in
-	//!! undo this before release
-	vgui::system()->SetRegistryString("HKEY_CURRENT_USER\\Software\\Valve\\Source\\Settings\\EncryptedCDKey", "QOgi:JXrJj<Eb8abkESf4Pg;OfofJwDzRsyH>AdjtyPnV[FB");
-
-	// see what's in the registry
-	if (!CCDKeyEntryDialog::IsValidWeakCDKeyInRegistry())
-	{
-		m_hCDKeyEntryDialog = new CCDKeyEntryDialog(NULL, false);
-		m_hCDKeyEntryDialog->Activate();
-	}
-#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -216,8 +216,9 @@ void COptionsSubMouse::OnTextChanged(Panel *panel)
 	{
 		char buf[64];
 		m_pMouseAccelExponentLabel->GetText(buf, 64);
-
-		float fValue = (float) atof(buf);
+		
+		// dimhotepus: atof -> strtof
+		float fValue = strtof(buf, nullptr);
 		if (fValue >= 1.0)
 		{
 			m_pMouseAccelExponentSlider->SetSliderValue(fValue);

@@ -29,17 +29,17 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class COptionsSubMouse : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubMouse, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubMouse, vgui::PropertyPage );
 
 public:
 	COptionsSubMouse(vgui::Panel *parent);
 	~COptionsSubMouse();
 
-	virtual void OnResetData();
-	virtual void OnApplyChanges();
+	void OnResetData() override;
+	void OnApplyChanges() override;
 
 protected:
-    virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+    void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 
 	MESSAGE_FUNC_PTR( OnControlModified, "ControlModified", panel );
 	MESSAGE_FUNC_PTR( OnTextChanged, "TextChanged", panel );

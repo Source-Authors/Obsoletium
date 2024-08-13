@@ -17,21 +17,21 @@
 //-----------------------------------------------------------------------------
 class CSessionOptionsDialog : public CBaseDialog
 {
-	DECLARE_CLASS_SIMPLE( CSessionOptionsDialog, CBaseDialog ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSessionOptionsDialog, CBaseDialog ); 
 
 public:
 	CSessionOptionsDialog( vgui::Panel *parent );
 	~CSessionOptionsDialog();
 
-	virtual void	OnCommand( const char *pCommand );
-	virtual void	OnKeyCodePressed( vgui::KeyCode code );
-	virtual void	OnThink();
+	void	OnCommand( const char *pCommand ) override;
+	void	OnKeyCodePressed( vgui::KeyCode code ) override;
+	void	OnThink() override;
 
-	virtual void	PerformLayout( void );
-	virtual void	ApplySettings( KeyValues *pResourceData );
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
+	void	PerformLayout( void ) override;
+	void	ApplySettings( KeyValues *pResourceData ) override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
-	virtual void	OverrideMenuItem( KeyValues *pKeys );
+	void	OverrideMenuItem( KeyValues *pKeys ) override;
 
 	void			SetGameType( const char *pGametype );
 	void			SetDialogKeys( KeyValues *pKeys );

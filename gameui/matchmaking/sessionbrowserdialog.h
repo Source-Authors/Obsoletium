@@ -14,20 +14,20 @@
 
 class CSessionBrowserDialog : public CBaseDialog
 {
-	DECLARE_CLASS_SIMPLE( CSessionBrowserDialog, CBaseDialog ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSessionBrowserDialog, CBaseDialog ); 
 
 public:
 	CSessionBrowserDialog( vgui::Panel *parent, KeyValues *pDialogKeys );
 	~CSessionBrowserDialog();
 
-	virtual void	PerformLayout();
-	virtual void	ApplySettings( KeyValues *inResourceData );
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void	OnKeyCodePressed( vgui::KeyCode code );
-	virtual void	OnCommand( const char *pCommand );
-	virtual void	OnThink();
+	void	PerformLayout() override;
+	void	ApplySettings( KeyValues *inResourceData ) override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void	OnKeyCodePressed( vgui::KeyCode code ) override;
+	void	OnCommand( const char *pCommand ) override;
+	void	OnThink() override;
 
-	virtual void	SwapMenuItems( int iOne, int iTwo );
+	void	SwapMenuItems( int iOne, int iTwo ) override;
 
 	void			UpdateScenarioDisplay( void );
 	void			SessionSearchResult( int searchIdx, void *pHostData, XSESSION_SEARCHRESULT *pResult, int ping );

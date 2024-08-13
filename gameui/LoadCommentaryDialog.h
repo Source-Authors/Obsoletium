@@ -35,7 +35,7 @@ struct CommentaryItem_t
 //-----------------------------------------------------------------------------
 class CLoadCommentaryDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CLoadCommentaryDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CLoadCommentaryDialog, vgui::Frame );
 
 public:
 	CLoadCommentaryDialog( vgui::Panel *parent );
@@ -44,8 +44,8 @@ protected:
 	CUtlVector<CommentaryItem_t> m_CommentaryItems;
 	vgui::PanelListPanel *m_pGameList;
 
-	virtual void OnCommand( const char *command );
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void OnCommand( const char *command ) override;
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 	void ScanCommentaryFiles();
 	void CreateCommentaryItemList();

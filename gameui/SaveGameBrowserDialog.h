@@ -30,14 +30,14 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CGameSavePanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CGameSavePanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CGameSavePanel, vgui::EditablePanel );
 
 public:
 	
 					CGameSavePanel( CSaveGameBrowserDialog *parent, SaveGameDescription_t *pSaveDesc, bool bCommandPanel = false );
 					~CGameSavePanel( void );
 
-	virtual	void	ApplySchemeSettings( IScheme *pScheme );
+	void	ApplySchemeSettings( IScheme *pScheme ) override;
 	
 	bool IsAutoSaveType( void ) { return ( Q_stristr( m_SaveInfo.szType, "autosave" ) != 0 ); }
 
@@ -78,7 +78,7 @@ protected:
 //-----------------------------------------------------------------------------
 class CSaveGameBrowserDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CSaveGameBrowserDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSaveGameBrowserDialog, vgui::Frame );
 
 public:
 	MESSAGE_FUNC( FinishScroll,	"FinishScroll" );
@@ -90,19 +90,19 @@ public:
 	CSaveGameBrowserDialog(vgui::Panel *parent );
 	~CSaveGameBrowserDialog();
 
-	virtual void	OnKeyCodePressed( vgui::KeyCode code );
+	void	OnKeyCodePressed( vgui::KeyCode code ) override;
 
-	virtual void	Activate( void );
-	virtual void	ApplySettings( KeyValues *inResourceData );
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void	OnClose( void );
-	virtual void	PaintBackground();
+	void	Activate( void ) override;
+	void	ApplySettings( KeyValues *inResourceData ) override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void	OnClose( void ) override;
+	void	PaintBackground() override;
 	virtual void	PerformSelectedAction( void );
 	virtual void	PerformDeletion( void );
 	virtual void	UpdateFooterOptions( void );
 	virtual void	SortSaveGames( SaveGameDescription_t *pSaves, unsigned int nNumSaves );
-	virtual void	OnThink( void );
-	virtual void	OnKeyCodeReleased( vgui::KeyCode code );
+	void	OnThink( void ) override;
+	void	OnKeyCodeReleased( vgui::KeyCode code ) override;
 	virtual void	OnDoneScanningSaveGames( void ) {}
 	virtual void	RefreshSaveGames( void );
 	
@@ -148,8 +148,8 @@ private:
 	int								m_iSelectedSave;
 	float							m_ScrollSpeedSlow;
 	float							m_ScrollSpeedFast;
-	int								m_nDeletedPanel;	// Panel being subtracted
-	int								m_nAddedPanel;		// Panel being added
+	intp							m_nDeletedPanel;	// Panel being subtracted
+	intp							m_nAddedPanel;		// Panel being added
 	SaveGameDescription_t			m_NewSaveGameDesc;	// Held for panel animations
 	uint							m_nUsedStorageSpace;	// Amount of disk space used by save games 
 	
@@ -164,7 +164,7 @@ private:
 	void	ContinueScrolling( void );
 	void	AnimateSelectionPanels( void );
 	void	ShiftPanelIndices( int offset );
-	bool	IsValidPanel( const int idx );
+	bool	IsValidPanel( const intp idx );
 	void	InitPanelIndexForDisplay( const int idx );
 	void	UpdateMenuComponents( EScrollDirection dir );
 	void	ScanSavedGames( bool bIgnoreAutosave );
@@ -180,7 +180,7 @@ private:
 	int		m_PanelXPos[ NUM_SLOTS ];
 	int		m_PanelYPos[ NUM_SLOTS ];
 	float	m_PanelAlpha[ NUM_SLOTS ];
-	int		m_PanelIndex[ NUM_SLOTS ];
+	intp	m_PanelIndex[ NUM_SLOTS ];
 	float	m_ScrollSpeed;
 	int		m_ButtonPressed;
 	int		m_ScrollCt;

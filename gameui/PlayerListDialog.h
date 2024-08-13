@@ -19,22 +19,22 @@
 //-----------------------------------------------------------------------------
 class CPlayerListDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CPlayerListDialog, vgui::Frame ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPlayerListDialog, vgui::Frame ); 
 
 public:
 	CPlayerListDialog(vgui::Panel *parent);
 	~CPlayerListDialog();
 
-	virtual void Activate();
+	void Activate() override;
 
 private:
   	MESSAGE_FUNC( OnItemSelected, "ItemSelected" );
-	virtual void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 
 	void ToggleMuteStateOfSelectedUser();
 	void RefreshPlayerProperties();
 
-	void OnKeyCodePressed( vgui::KeyCode code )
+	void OnKeyCodePressed( vgui::KeyCode code ) override
 	{
 		if ( code == KEY_XBUTTON_B )
 		{

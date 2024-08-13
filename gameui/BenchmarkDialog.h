@@ -17,11 +17,11 @@
 //-----------------------------------------------------------------------------
 class CBenchmarkDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CBenchmarkDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBenchmarkDialog, vgui::Frame );
 public:
 	CBenchmarkDialog(vgui::Panel *parent, const char *name);
 
-	void OnKeyCodePressed( vgui::KeyCode code )
+	void OnKeyCodePressed( vgui::KeyCode code ) override
 	{
 		if ( code == KEY_XBUTTON_B || code == STEAMCONTROLLER_B )
 		{

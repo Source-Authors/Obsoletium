@@ -5,12 +5,14 @@
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/Panel.h>
 #include "cvarslider.h"
+
 class ControlBoxVisual : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE(ControlBoxVisual,vgui::Panel);
+	DECLARE_CLASS_SIMPLE_OVERRIDE(ControlBoxVisual,vgui::Panel);
 public:
 	ControlBoxVisual(vgui::Panel *parent, const char *panelName, CCvarSlider *near, CCvarSlider *right, CCvarSlider *up, CCvarSlider *far, CCvarSlider *left, CCvarSlider *down);
-	virtual void Paint();
+	void Paint() override;
+
 	MESSAGE_FUNC_PARAMS(OnSlideEnter, "CursorEnteredSlider", data);
 	MESSAGE_FUNC_PARAMS(OnSlideExit, "CursorExitedSlider", data);
 protected:

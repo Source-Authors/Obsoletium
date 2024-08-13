@@ -123,8 +123,8 @@ void CLeaderboardDialog::PerformLayout( void )
 	{
 		iActive = 0;
 	}
-	V_snwprintf( wzActiveItem, ARRAYSIZE( wzActiveItem ), L"%d", iActive );
-	V_snwprintf( wzTotal, ARRAYSIZE( wzTotal ), L"%d", m_iMaxRank );
+	V_snwprintf( wzActiveItem, ssize( wzActiveItem ), L"%d", iActive );
+	V_snwprintf( wzTotal, ssize( wzTotal ), L"%d", m_iMaxRank );
 	g_pVGuiLocalize->ConstructString( wszNumbering, sizeof( wszNumbering ), wzNumberingFmt, 2, wzActiveItem, wzTotal );
 	m_pNumbering->SetText( wszNumbering );
 	m_pNumbering->SetWide( GetWide() );

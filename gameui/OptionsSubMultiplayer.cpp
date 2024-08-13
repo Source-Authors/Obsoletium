@@ -98,18 +98,18 @@ static ColorItem_t s_crosshairColors[] =
 	{ "#Valve_Yellow",	250,	250,	50 },
 	{ "#Valve_Ltblue",	50,		250,	250 },
 };
-static const int NumCrosshairColors = ARRAYSIZE(s_crosshairColors);
+static constexpr int NumCrosshairColors = ssize(s_crosshairColors);
 
 
 //-----------------------------------------------------------------------------
 class CrosshairImagePanelSimple : public CrosshairImagePanelBase
 {
-	DECLARE_CLASS_SIMPLE( CrosshairImagePanelSimple, CrosshairImagePanelBase );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CrosshairImagePanelSimple, CrosshairImagePanelBase );
 public:
 	CrosshairImagePanelSimple( Panel *parent, const char *name, COptionsSubMultiplayer* pOptionsPanel );
-	virtual void Paint();
-	virtual void ResetData();
-	virtual void ApplyChanges();
+	void Paint() override;
+	void ResetData() override;
+	void ApplyChanges() override;
 	static void DrawCrosshairRect( int x, int y, int w, int h, bool bAdditive );
 
 protected:
@@ -399,19 +399,19 @@ void CrosshairImagePanelSimple::ApplyChanges()
 //-----------------------------------------------------------------------------
 class CrosshairImagePanelCS : public CrosshairImagePanelBase
 {
-	DECLARE_CLASS_SIMPLE( CrosshairImagePanelCS, CrosshairImagePanelBase );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CrosshairImagePanelCS, CrosshairImagePanelBase );
 
 public:
 	CrosshairImagePanelCS( Panel *parent, const char *name, COptionsSubMultiplayer* pOptionsPanel );
-	virtual void ResetData();
-	virtual void ApplyChanges();
+	void ResetData() override;
+	void ApplyChanges() override;
 
 protected:
 	MESSAGE_FUNC_PARAMS( OnSliderMoved, "SliderMoved", data );
 	MESSAGE_FUNC_PTR( OnTextChanged, "TextChanged", panel );
 	MESSAGE_FUNC( OnCheckButtonChecked, "CheckButtonChecked" );
 
-	virtual void Paint();
+	void Paint() override;
 	static void DrawCrosshairRect( int x, int y, int w, int h, bool bAdditive );
 	void InitCrosshairColorEntries();
 	void UpdateCrosshair();
@@ -706,20 +706,20 @@ void CrosshairImagePanelCS::ApplyChanges()
 //-----------------------------------------------------------------------------
 class CrosshairImagePanelAdvanced : public CrosshairImagePanelBase
 {
-	DECLARE_CLASS_SIMPLE( CrosshairImagePanelAdvanced, CrosshairImagePanelBase );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CrosshairImagePanelAdvanced, CrosshairImagePanelBase );
 public:
 	CrosshairImagePanelAdvanced( Panel *parent, const char *name, COptionsSubMultiplayer* pOptionsPanel );
 	virtual ~CrosshairImagePanelAdvanced();
 
-	virtual void ResetData();
-	virtual void ApplyChanges();
-	virtual void UpdateVisibility();
+	void ResetData() override;
+	void ApplyChanges() override;
+	void UpdateVisibility() override;
 
 protected:
 	MESSAGE_FUNC_PTR( OnTextChanged, "TextChanged", panel );
 	MESSAGE_FUNC_PARAMS( OnSliderMoved, "SliderMoved", data );
 
-	virtual void Paint();
+	void Paint() override;
 	static void DrawCrosshairRect( int x, int y, int w, int h, bool bAdditive );
 	void InitAdvCrosshairStyleList();
 	void SetCrosshairTexture( const char *crosshairname );
@@ -1429,12 +1429,12 @@ void COptionsSubMultiplayer::SelectLogo(const char *logoName)
 
 void StripStringOutOfString( const char *pPattern, const char *pIn, char *pOut )
 {
-	int iLengthBase = strlen( pPattern );
-	int iLengthString = strlen( pIn );
+	intp iLengthBase = strlen( pPattern );
+	intp iLengthString = strlen( pIn );
 
-	int k = 0;
+	intp k = 0;
 
-	for ( int j = iLengthBase; j < iLengthString; j++ )
+	for ( intp j = iLengthBase; j < iLengthString; j++ )
 	{
 		pOut[k] = pIn[j];
 		k++;

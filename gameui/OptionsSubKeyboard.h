@@ -22,16 +22,16 @@ class VControlsListPanel;
 //-----------------------------------------------------------------------------
 class COptionsSubKeyboard : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubKeyboard, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubKeyboard, vgui::PropertyPage );
 
 public:
 	COptionsSubKeyboard(vgui::Panel *parent);
 	~COptionsSubKeyboard();
 
-	virtual void	OnResetData();
-	virtual void	OnApplyChanges();
-	virtual void	OnKeyCodePressed( vgui::KeyCode code );
-	virtual void	OnThink();
+	void	OnResetData() override;
+	void	OnApplyChanges() override;
+	void	OnKeyCodePressed( vgui::KeyCode code ) override;
+	void	OnThink() override;
 
 	// Trap row selection message
 	MESSAGE_FUNC_INT( ItemSelected, "ItemSelected", itemID );
@@ -50,7 +50,7 @@ private:
 	// Create the key binding list control
 	void			CreateKeyBindingList( void );
 
-	virtual void	OnCommand( const char *command );
+	void			OnCommand( const char *command ) override;
 
 	// Tell engine to bind/unbind a key
 	void			BindKey( const char *key, const char *binding );
@@ -84,7 +84,8 @@ private:
 private:
 	void OpenKeyboardAdvancedDialog();
 	vgui::DHANDLE<class COptionsSubKeyboardAdvancedDlg> m_OptionsSubKeyboardAdvancedDlg;
-	virtual void OnKeyCodeTyped(vgui::KeyCode code);
+
+	void OnKeyCodeTyped(vgui::KeyCode code) override;
 
 	VControlsListPanel	*m_pKeyBindList;
 

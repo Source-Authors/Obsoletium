@@ -17,14 +17,14 @@
 //-----------------------------------------------------------------------------
 class CWelcomeDialog : public CBaseDialog
 {
-	DECLARE_CLASS_SIMPLE( CWelcomeDialog, CBaseDialog ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CWelcomeDialog, CBaseDialog ); 
 
 public:
 	CWelcomeDialog(vgui::Panel *parent);
 
-	virtual void	PerformLayout( void );
-	virtual void	OnCommand( const char *pCommand );
-	virtual void	OnKeyCodePressed( vgui::KeyCode code );
+	void	PerformLayout( void ) override;
+	void	OnCommand( const char *pCommand ) override;
+	void	OnKeyCodePressed( vgui::KeyCode code ) override;
 
 private:
 	bool	m_bOnlineEnabled;

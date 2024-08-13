@@ -211,7 +211,7 @@ void UpdateLogoWAD( void *phdib, int r, int g, int b )
 
 	unsigned char *buf = (unsigned char *)_alloca( 16384 );
 
-	CUtlBuffer buffer( 0, 16384 );
+	CUtlBuffer buffer( (intp)0, 16384 );
 
 	int width, height;
 	

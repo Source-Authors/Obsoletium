@@ -15,7 +15,7 @@
 
 class CCvarSlider : public vgui::Slider
 {
-	DECLARE_CLASS_SIMPLE( CCvarSlider, vgui::Slider );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCvarSlider, vgui::Slider );
 
 public:
 
@@ -30,10 +30,10 @@ public:
 	void			SetMinMaxValues( float minValue, float maxValue, bool bSetTickdisplay = true );
 	void			SetTickColor( Color color );
 
-	virtual void	Paint();
+	void	Paint() override;
 
-	virtual void	ApplySettings( KeyValues *inResourceData );
-	virtual void	GetSettings( KeyValues *outResourceData );
+	void	ApplySettings( KeyValues *inResourceData ) override;
+	void	GetSettings( KeyValues *outResourceData ) override;
 
 	void			ApplyChanges();
 	float			GetSliderValue();

@@ -18,14 +18,14 @@
 //-----------------------------------------------------------------------------
 class COptionsSubGame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubGame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubGame, vgui::Frame );
 
 public:
 	COptionsSubGame( vgui::Panel *parent, const char *name );
 	~COptionsSubGame( void );
 
-	virtual void OnCommand( const char *command );
-	virtual void OnClose( void );
+	void OnCommand( const char *command ) override;
+	void OnClose( void ) override;
 
 private:
 };

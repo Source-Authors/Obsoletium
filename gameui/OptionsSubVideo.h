@@ -25,15 +25,15 @@ class CCvarSlider;
 //-----------------------------------------------------------------------------
 class COptionsSubVideo : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubVideo, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubVideo, vgui::PropertyPage );
 
 public:
 	COptionsSubVideo(vgui::Panel *parent);
 	~COptionsSubVideo();
 
-	virtual void OnResetData();
-	virtual void OnApplyChanges();
-	virtual void PerformLayout();
+	void OnResetData() override;
+	void OnApplyChanges() override;
+	void PerformLayout() override;
 
 	virtual bool RequiresRestart();
 

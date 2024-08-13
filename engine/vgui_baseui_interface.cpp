@@ -115,7 +115,7 @@ void VGui_ActivateMouse();
 
 extern CreateInterfaceFn g_AppSystemFactory;
 
-// functions to reference GameUI and GameConsole functions, from GameUI.dll
+// functions to reference GameUI and GameConsole functions, from gameui.dll
 IGameUI *staticGameUIFuncs = NULL;
 IGameConsole *staticGameConsole = NULL;
 
@@ -564,7 +564,7 @@ void CEngineVGui::Init()
 	COM_TimestampedLog( "Loading gameui.dll" );
 
 	// load the GameUI dll
-	constexpr char szDllName[]{"GameUI"};
+	constexpr char szDllName[]{"gameui"};
 	m_hStaticGameUIModule = g_pFileSystem->LoadModule(szDllName, "EXECUTABLE_PATH", true); // LoadModule() does a GetLocalCopy() call
 	m_GameUIFactory = Sys_GetFactory(m_hStaticGameUIModule);
 	if ( !m_GameUIFactory )

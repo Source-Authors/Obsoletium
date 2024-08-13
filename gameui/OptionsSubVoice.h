@@ -22,22 +22,22 @@ class CCvarToggleCheckButton;
 //-----------------------------------------------------------------------------
 class COptionsSubVoice : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubVoice, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubVoice, vgui::PropertyPage );
 
 public:
 	COptionsSubVoice(vgui::Panel *parent);
 	~COptionsSubVoice();
 
-	virtual void OnResetData();
-	virtual void OnApplyChanges();
+	void OnResetData() override;
+	void OnApplyChanges() override;
 
 protected:
-	virtual void OnThink();							// called every frame before painting, but only if panel is visible
+	void OnThink() override;							// called every frame before painting, but only if panel is visible
 
 private:
-    virtual void    OnCommand( const char *command );
+    void    OnCommand( const char *command ) override;
 
-	MESSAGE_FUNC( OnPageHide, "PageHide" );
+	MESSAGE_FUNC_OVERRIDE( OnPageHide, "PageHide" );
     MESSAGE_FUNC_INT( OnSliderMoved, "SliderMoved", position );
     MESSAGE_FUNC_INT( OnCheckButtonChecked, "CheckButtonChecked", state );
     MESSAGE_FUNC( OnControlModified, "ControlModified" );

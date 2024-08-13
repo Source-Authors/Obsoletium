@@ -18,13 +18,13 @@
 //-----------------------------------------------------------------------------
 class COptionsSubDifficulty : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubDifficulty, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubDifficulty, vgui::PropertyPage );
 
 public:
 	COptionsSubDifficulty(vgui::Panel *parent);
 
-	virtual void OnResetData();
-	virtual void OnApplyChanges();
+	void OnResetData() override;
+	void OnApplyChanges() override;
 
 	MESSAGE_FUNC( OnRadioButtonChecked, "RadioButtonChecked" );
 

@@ -34,7 +34,7 @@ void CLabeledCommandComboBox::DeleteAllItems()
 
 void CLabeledCommandComboBox::AddItem( char const *text, char const *engineCommand )
 {
-	int idx = m_Items.AddToTail();
+	intp idx = m_Items.AddToTail();
 	COMMANDITEM *item = &m_Items[ idx ];
 
 	item->comboBoxID = BaseClass::AddItem( text, NULL );
@@ -77,7 +77,7 @@ void CLabeledCommandComboBox::SetInitialItem(int index)
 void CLabeledCommandComboBox::OnTextChanged( char const *text )
 {
 	int i;
-	for ( i = 0; i < m_Items.Size(); i++ )
+	for ( i = 0; i < m_Items.Count(); i++ )
 	{
 		COMMANDITEM *item = &m_Items[ i ];
 		if ( !stricmp( item->name, text ) )
@@ -108,10 +108,10 @@ void CLabeledCommandComboBox::ApplyChanges()
 {
 	if (m_iCurrentSelection == -1)
 		return;
-	if (m_Items.Size() < 1)
+	if (m_Items.Count() < 1)
 		return;
 
-	Assert( m_iCurrentSelection < m_Items.Size() );
+	Assert( m_iCurrentSelection < m_Items.Count() );
 	COMMANDITEM *item = &m_Items[ m_iCurrentSelection ];
 	engine->ClientCmd_Unrestricted( item->command );
 	m_iStartSelection = m_iCurrentSelection;

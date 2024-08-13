@@ -35,20 +35,20 @@ void UpdateProgressBar( vgui::EditablePanel* pPanel, IAchievement *pAchievement,
 //-----------------------------------------------------------------------------
 class CAchievementsDialog_XBox : public CBaseDialog
 {
-	DECLARE_CLASS_SIMPLE( CAchievementsDialog_XBox, CBaseDialog ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAchievementsDialog_XBox, CBaseDialog ); 
 
 public:
 	CAchievementsDialog_XBox(vgui::Panel *parent);
 	~CAchievementsDialog_XBox();
 
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void	ApplySettings( KeyValues *pResourceData );
-	virtual void	PerformLayout();
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void	ApplySettings( KeyValues *pResourceData ) override;
+	void	PerformLayout() override;
 
-	virtual void	OnKeyCodePressed( vgui::KeyCode code );
-	virtual void	HandleKeyRepeated( vgui::KeyCode code );
+	void	OnKeyCodePressed( vgui::KeyCode code ) override;
+	void	HandleKeyRepeated( vgui::KeyCode code ) override;
 
-	virtual void	OnClose();
+	void	OnClose() override;
 
 
 private:
@@ -79,20 +79,20 @@ private:
 //////////////////////////////////////////////////////////////////////////
 class CAchievementsDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE ( CAchievementsDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAchievementsDialog, vgui::Frame );
 
 public:
 	CAchievementsDialog( vgui::Panel *parent );
 	~CAchievementsDialog();
 
-	virtual void ApplySchemeSettings( IScheme *pScheme );
+	void ApplySchemeSettings( IScheme *pScheme ) override;
 	void ScrollToItem( int nDirection );
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 	virtual void UpdateAchievementDialogInfo( void );
-	virtual void OnCommand( const char* command );
+	void OnCommand( const char* command ) override;
 
-	virtual void ApplySettings( KeyValues *pResourceData );
-	virtual void OnSizeChanged( int newWide, int newTall );
+	void ApplySettings( KeyValues *pResourceData ) override;
+	void OnSizeChanged( int newWide, int newTall ) override;
 
 	MESSAGE_FUNC_PTR( OnCheckButtonChecked, "CheckButtonChecked", panel );
 	MESSAGE_FUNC_PARAMS( OnTextChanged, "TextChanged", data );
@@ -138,7 +138,7 @@ public:
 // Individual item panel, displaying stats for one achievement
 class CAchievementDialogItemPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CAchievementDialogItemPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAchievementDialogItemPanel, vgui::EditablePanel );
 
 public:
 	CAchievementDialogItemPanel( vgui::PanelListPanel *parent, const char* name, int iListItemID );
@@ -147,7 +147,7 @@ public:
 	void SetAchievementInfo ( IAchievement* pAchievement );
 	IAchievement* GetAchievementInfo( void ) { return m_pSourceAchievement; }
 	void UpdateAchievementInfo( IScheme *pScheme );
-	virtual void ApplySchemeSettings( IScheme *pScheme );
+	void ApplySchemeSettings( IScheme *pScheme ) override;
 	void ToggleShowOnHUD( void );
 
 	MESSAGE_FUNC_PTR( OnCheckButtonChecked, "CheckButtonChecked", panel );

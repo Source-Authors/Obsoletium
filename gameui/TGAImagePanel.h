@@ -19,7 +19,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CTGAImagePanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CTGAImagePanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CTGAImagePanel, vgui::Panel );
 
 public:
 	CTGAImagePanel( vgui::Panel *parent, const char *name );
@@ -29,7 +29,7 @@ public:
 	void SetTGA( const char *filename );
 	void SetTGANonMod( const char *filename );
 
-	virtual void Paint( void );
+	void Paint( void ) override;
 
 private:
 	int m_iTextureID;

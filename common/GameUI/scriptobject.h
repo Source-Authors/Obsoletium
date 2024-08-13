@@ -131,7 +131,7 @@ class mpcontrol_t : public vgui::Panel
 public:
 	mpcontrol_t( vgui::Panel *parent, char const *panelName );
 
-	virtual	void	OnSizeChanged( int wide, int tall ) OVERRIDE;
+	virtual	void	OnSizeChanged( int wide, int tall ) override;
 
 	objtype_t		type;
 	vgui::Panel		*pControl;
@@ -146,8 +146,8 @@ class CInfoDescription : public CDescription
 public:
 	CInfoDescription( void );
 
-	virtual void WriteScriptHeader( FileHandle_t fp ) OVERRIDE;
-	virtual void WriteFileHeader( FileHandle_t fp ) OVERRIDE; 
+	virtual void WriteScriptHeader( FileHandle_t fp ) override;
+	virtual void WriteFileHeader( FileHandle_t fp ) override; 
 };
 
 void UTIL_StripInvalidCharacters( char *pszInput, int maxlen );

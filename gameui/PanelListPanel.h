@@ -21,7 +21,7 @@ class KeyValues;
 //-----------------------------------------------------------------------------
 class CPanelListPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CPanelListPanel, vgui::Panel ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPanelListPanel, vgui::Panel ); 
 
 public:
 	typedef struct dataitem_s
@@ -50,7 +50,7 @@ public:
 
 	MESSAGE_FUNC_INT( OnSliderMoved, "ScrollBarSliderMoved", position );
 
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 
 	vgui::Panel *GetEmbedded()
 	{
@@ -61,9 +61,9 @@ protected:
 
 	DATAITEM	*GetDataItem( int itemIndex );
 
-	virtual void PerformLayout();
-	virtual void PaintBackground();
-	virtual void OnMouseWheeled(int delta);
+	void PerformLayout() override;
+	void PaintBackground() override;
+	void OnMouseWheeled(int delta) override;
 
 private:
 	// list of the column headers
@@ -71,8 +71,6 @@ private:
 	vgui::ScrollBar		*_vbar;
 	vgui::Panel			*_embedded;
 
-	int					_tableStartX;
-	int					_tableStartY;
 	int					_sliderYOffset;
 };
 

@@ -15,21 +15,21 @@
 
 class CCvarToggleCheckButton : public vgui::CheckButton
 {
-	DECLARE_CLASS_SIMPLE( CCvarToggleCheckButton, vgui::CheckButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCvarToggleCheckButton, vgui::CheckButton );
 
 public:
 	CCvarToggleCheckButton( vgui::Panel *parent, const char *panelName, const char *text, 
 		char const *cvarname );
 	~CCvarToggleCheckButton();
 
-	virtual void	SetSelected( bool state );
+	void	SetSelected( bool state ) override;
 
-	virtual void	Paint();
+	void	Paint() override;
 
 	void			Reset();
 	void			ApplyChanges();
 	bool			HasBeenModified();
-	virtual void	ApplySettings( KeyValues *inResourceData );
+	void			ApplySettings( KeyValues *inResourceData ) override;
 
 private:
 	MESSAGE_FUNC( OnButtonChecked, "CheckButtonChecked" );

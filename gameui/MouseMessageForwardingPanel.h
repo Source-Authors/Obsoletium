@@ -17,13 +17,13 @@
 //-----------------------------------------------------------------------------
 class CMouseMessageForwardingPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CMouseMessageForwardingPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMouseMessageForwardingPanel, vgui::Panel );
 public:
 	CMouseMessageForwardingPanel( Panel *parent, const char *name );
 
-	virtual void PerformLayout( void );
-	virtual void OnMousePressed( vgui::MouseCode code );
-	virtual void OnMouseDoublePressed( vgui::MouseCode code );
+	void PerformLayout( void ) override;
+	void OnMousePressed( vgui::MouseCode code ) override;
+	void OnMouseDoublePressed( vgui::MouseCode code ) override;
 };
 
 #endif //MOUSEMESSAGEFORWARDINGPANEL_H

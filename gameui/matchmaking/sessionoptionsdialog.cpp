@@ -173,7 +173,7 @@ int CSessionOptionsDialog::GetMaxPlayersRecommendedOption( void )
 	// Determine the option that suits our B/W bests
 	int options[] = { 8, 12, 16 };
 
-	for ( int k = 1; k < ARRAYSIZE( options ); ++ k )
+	for ( int k = 1; k < ssize( options ); ++ k )
 	{
 		if ( options[k] > numPlayersCanService )
 		{
@@ -183,7 +183,7 @@ int CSessionOptionsDialog::GetMaxPlayersRecommendedOption( void )
 		}
 	}
 
-	return ARRAYSIZE( options ) - 1;
+	return ssize( options ) - 1;
 }
 
 //---------------------------------------------------------------------

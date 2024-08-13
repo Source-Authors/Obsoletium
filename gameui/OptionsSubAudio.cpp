@@ -383,7 +383,7 @@ void COptionsSubAudio::RunTestSpeakers()
 //-----------------------------------------------------------------------------
 class COptionsSubAudioThirdPartyCreditsDlg : public vgui::Frame
 {
-   DECLARE_CLASS_SIMPLE( COptionsSubAudioThirdPartyCreditsDlg, vgui::Frame );
+   DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubAudioThirdPartyCreditsDlg, vgui::Frame );
 public:
    COptionsSubAudioThirdPartyCreditsDlg( vgui::VPANEL hParent ) : BaseClass( NULL, NULL )
    {
@@ -397,14 +397,14 @@ public:
       SetDeleteSelfOnClose( true );
    }
 
-   virtual void Activate()
+   void Activate() override
    {
       BaseClass::Activate();
 
       input()->SetAppModalSurface(GetVPanel());
    }
 
-   void OnKeyCodeTyped(KeyCode code)
+   void OnKeyCodeTyped(KeyCode code) override
    {
       // force ourselves to be closed if the escape key it pressed
       if (code == KEY_ESCAPE)

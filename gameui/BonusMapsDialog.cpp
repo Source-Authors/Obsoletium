@@ -65,7 +65,7 @@ bool ConstructFullImagePath( const char *pCurrentPath, const char *pchImageName,
 //-----------------------------------------------------------------------------
 class CBonusMapPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CBonusMapPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBonusMapPanel, vgui::EditablePanel );
 public:
 	CBonusMapPanel( PanelListPanel *parent, const char *name, int bonusMapListItemID ) : BaseClass( parent, name )
 	{
@@ -178,12 +178,12 @@ public:
 		PostMessage( m_pParent->GetVParent(), new KeyValues("PanelSelected") );
 	}
 
-	virtual void OnMousePressed( vgui::MouseCode code )
+	void OnMousePressed( vgui::MouseCode code ) override
 	{
 		m_pParent->SetSelectedPanel( this );
 	}
 
-	virtual void ApplySchemeSettings( IScheme *pScheme )
+	void ApplySchemeSettings( IScheme *pScheme ) override
 	{
 		m_TextColor = pScheme->GetColor( "NewGame.TextColor", Color(255, 255, 255, 255) );
 		m_SelectedColor = pScheme->GetColor( "NewGame.SelectionColor", Color(255, 255, 255, 255) );
@@ -191,7 +191,7 @@ public:
 		BaseClass::ApplySchemeSettings( pScheme );
 	}
 
-	virtual void OnMouseDoublePressed( vgui::MouseCode code )
+	void OnMouseDoublePressed( vgui::MouseCode code ) override
 	{
 		// call the panel
 		OnMousePressed( code );
@@ -287,8 +287,8 @@ bool CBonusMapsDialog::ImportZippedBonusMaps( const char *pchZippedFileName )
 	Q_StripExtension( szOutFilename, szOutFilename, sizeof( szOutFilename ) );
 
 	// If there's already a folder by the same name we're going to tack a number onto the end
-	int iOutFilenameLength = Q_strlen( szOutFilename );
-	int iSameFolderCount = 1;
+	intp iOutFilenameLength = Q_strlen( szOutFilename );
+	intp iSameFolderCount = 1;
 
 	while ( g_pFullFileSystem->FileExists( szOutFilename, "MOD" ) )
 	{
@@ -946,7 +946,7 @@ void CBonusMapsDialog::OnPanelSelected()
 
 		int iFoundSimilar = 0;
 
-		for ( iNumChallenges; iNumChallenges < pMap->m_pChallenges->Count(); ++iNumChallenges )
+		for ( ; iNumChallenges < pMap->m_pChallenges->Count(); ++iNumChallenges )
 		{
 			ChallengeDescription_t *pChallenge = &(*pMap->m_pChallenges)[ iNumChallenges ];
 			int iType = iNumChallenges;

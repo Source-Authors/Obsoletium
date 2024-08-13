@@ -285,7 +285,7 @@ void COptionsDialogXbox::InitializeSliderDefaults( void )
 			continue;
 
 		const char *pszConvarName = pOption->szConvar;
-		if ( pOption->szConvarDef && pOption->szConvarDef[0] )
+		if ( pOption->szConvarDef[0] )
 		{
 			// They've specified a different convar to use as the default 
 			pszConvarName = pOption->szConvarDef;
@@ -1372,7 +1372,7 @@ void COptionsDialogXbox::UpdateAllBinds( ButtonCode_t code )
 //-----------------------------------------------------------------------------
 void COptionsDialogXbox::FillInDefaultBindings( void )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( "cfg/config.360.cfg", NULL, buf ) )
 		return;
 
@@ -1380,7 +1380,7 @@ void COptionsDialogXbox::FillInDefaultBindings( void )
 	for ( int iOption = 0; iOption < m_pOptions->Count(); ++iOption )
 		UnbindOption( (*m_pOptions)[ iOption ], iOption - m_iScroll );
 
-	const char *data = (const char*)buf.Base();
+	const char *data = buf.Base<const char>();
 
 	// loop through all the binding
 	while ( data != NULL )
@@ -1457,7 +1457,7 @@ void COptionsDialogXbox::FillInDefaultBindings( void )
 
 		OptionData_t *pOption = (*m_pOptions)[ iOption ];
 
-		if ( pOption->szConvarDef && pOption->szConvarDef[0] )
+		if ( pOption->szConvarDef[0] )
 		{
 			ConVarRef varDefault( pOption->szConvarDef );
 			ConVarRef varOption( pOption->szConvar );
@@ -1537,7 +1537,7 @@ void COptionsDialogXbox::ReadOptionsFromFile( const char *pchFileName )
 		if ( pKey->GetInt( "disable", 0 ) != 0 )
 		{
 			// Remember disabled options so we don't create another with the same name
-			int iDisabledOption = s_DisabledOptions.AddToTail();
+			intp iDisabledOption = s_DisabledOptions.AddToTail();
 			OptionChoiceData_t *pDisabledOption = &(s_DisabledOptions[ iDisabledOption ]);
 			Q_strncpy( pDisabledOption->szName, pKey->GetName(), sizeof( pDisabledOption->szName ) );
 
@@ -1547,7 +1547,7 @@ void COptionsDialogXbox::ReadOptionsFromFile( const char *pchFileName )
 		if ( ShouldSkipOption( pKey ) )
 			continue;
 
-		int iOption = m_pOptions->AddToTail();
+		intp iOption = m_pOptions->AddToTail();
 		OptionData_t **pNewOption = &((*m_pOptions)[ iOption ]);
 		*pNewOption = new OptionData_t;
 
@@ -1629,7 +1629,7 @@ void COptionsDialogXbox::ReadOptionsFromFile( const char *pchFileName )
 				if ( (*pNewOption)->bVocalsLanguage )
 				{
 					(*pNewOption)->iCurrentChoice = -1;
-					int iChoice = (*pNewOption)->m_Choices.AddToTail();
+					intp iChoice = (*pNewOption)->m_Choices.AddToTail();
 					OptionChoiceData_t *pNewOptionChoice = &((*pNewOption)->m_Choices[ iChoice ]);
 
 					Q_strncpy( pNewOptionChoice->szName, "#GameUI_Language_English", sizeof( pNewOptionChoice->szName ) );
@@ -1653,7 +1653,7 @@ void COptionsDialogXbox::ReadOptionsFromFile( const char *pchFileName )
 						KeyValues *pSubKey = NULL;
 						for ( pSubKey = pChoicesKey->GetFirstSubKey(); pSubKey; pSubKey = pSubKey->GetNextKey() )
 						{
-							int iChoice = (*pNewOption)->m_Choices.AddToTail();
+							intp iChoice = (*pNewOption)->m_Choices.AddToTail();
 							OptionChoiceData_t *pNewOptionChoice = &((*pNewOption)->m_Choices[ iChoice ]);
 
 							Q_strncpy( pNewOptionChoice->szName, pSubKey->GetName(), sizeof( pNewOptionChoice->szName ) );

@@ -202,9 +202,9 @@ void CAchievementsDialog_XBox::PerformLayout( void )
 
 		wchar_t wszProgressText[64];
 #ifdef WIN32
-		V_snwprintf( wszProgressText, ARRAYSIZE(wszProgressText), L"%d%% %s", (m_nUnlocked * 100) / m_nTotalAchievements, g_pVGuiLocalize->Find( "#GameUI_Achievement_Unlocked" ) );
+		V_snwprintf( wszProgressText, ssize(wszProgressText), L"%d%% %s", (m_nUnlocked * 100) / m_nTotalAchievements, g_pVGuiLocalize->Find( "#GameUI_Achievement_Unlocked" ) );
 #else
-		V_snwprintf( wszProgressText, ARRAYSIZE(wszProgressText), L"%d%% %S", (m_nUnlocked * 100) / m_nTotalAchievements, g_pVGuiLocalize->Find( "#GameUI_Achievement_Unlocked" ) );		
+		V_snwprintf( wszProgressText, ssize(wszProgressText), L"%d%% %S", (m_nUnlocked * 100) / m_nTotalAchievements, g_pVGuiLocalize->Find( "#GameUI_Achievement_Unlocked" ) );		
 #endif
 		m_pProgressPercent->SetText( wszProgressText );
 		m_pProgressPercent->SizeToContents();
@@ -230,8 +230,8 @@ void CAchievementsDialog_XBox::PerformLayout( void )
 		wchar_t *wzNumberingFmt = g_pVGuiLocalize->Find( "#GameUI_Achievement_Menu_Range" );
 		wchar_t wzActiveItem[8];
 		wchar_t wzTotal[8];
-		V_snwprintf( wzActiveItem, ARRAYSIZE( wzActiveItem ), L"%d", m_Menu.GetActiveItemIndex()+1 );
-		V_snwprintf( wzTotal, ARRAYSIZE( wzTotal ), L"%d", m_nTotalAchievements );
+		V_snwprintf( wzActiveItem, ssize( wzActiveItem ), L"%d", m_Menu.GetActiveItemIndex()+1 );
+		V_snwprintf( wzTotal, ssize( wzTotal ), L"%d", m_nTotalAchievements );
 		g_pVGuiLocalize->ConstructString( wszNumbering, sizeof( wszNumbering ), wzNumberingFmt, 2, wzActiveItem, wzTotal );
 		m_pNumbering->SetText( wszNumbering );
 		m_pNumbering->SetWide( GetWide() );
@@ -271,7 +271,7 @@ void CAchievementsDialog_XBox::ApplySettings( KeyValues *pResourceData )
 
 	if ( !achievementmgr )
 	{
-		AssertOnce( 0 && "No achievement manager interface in GameUI.dll" );
+		AssertOnce( 0 && "No achievement manager interface in gameui.dll" );
 		return;
 	}
 
@@ -637,7 +637,7 @@ void CAchievementsDialog::ApplySchemeSettings( IScheme *pScheme )
 
 	if ( !achievementmgr )
 	{
-		AssertOnce( 0 && "No achievement manager interface in GameUI.dll" );
+		AssertOnce( 0 && "No achievement manager interface in gameui.dll" );
 		return;
 	}
 
@@ -880,10 +880,10 @@ void CAchievementsDialog::CreateOrUpdateComboItems( bool bCreate )
 		if ( wzGroupName )
 		{
 			wchar_t wzNumUnlocked[8];
-			V_snwprintf( wzNumUnlocked, ARRAYSIZE( wzNumUnlocked ), L"%d", m_AchievementGroups[i].m_iNumUnlocked );
+			V_snwprintf( wzNumUnlocked, ssize( wzNumUnlocked ), L"%d", m_AchievementGroups[i].m_iNumUnlocked );
 
 			wchar_t wzNumAchievements[8];
-			V_snwprintf( wzNumAchievements, ARRAYSIZE( wzNumAchievements ), L"%d", m_AchievementGroups[i].m_iNumAchievements );
+			V_snwprintf( wzNumAchievements, ssize( wzNumAchievements ), L"%d", m_AchievementGroups[i].m_iNumAchievements );
 
 			g_pVGuiLocalize->ConstructString( wzGroupTitle, sizeof( wzGroupTitle ), wzGroupName, 2, wzNumUnlocked, wzNumAchievements );
 		}

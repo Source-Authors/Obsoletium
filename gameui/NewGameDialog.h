@@ -30,7 +30,7 @@ class CSkillSelectionDialog;
 
 class CNewGamePlayButton : public vgui::Button
 {
-	DECLARE_CLASS_SIMPLE( CNewGamePlayButton, vgui::Button );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CNewGamePlayButton, vgui::Button );
 
 public:
 
@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	void OnKeyCodePressed( vgui::KeyCode code )
+	void OnKeyCodePressed( vgui::KeyCode code ) override
 	{
 		if ( code == KEY_XBUTTON_A || code == STEAMCONTROLLER_A )
 		{
@@ -67,7 +67,7 @@ public:
 //-----------------------------------------------------------------------------
 class CNewGameDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CNewGameDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CNewGameDialog, vgui::Frame );
 
 public:
 	MESSAGE_FUNC( FinishScroll,	"FinishScroll" );
@@ -76,22 +76,22 @@ public:
 	CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode );
 	~CNewGameDialog();
 
-	virtual void	Activate( void );
+	void	Activate( void ) override;
 
-	virtual void	ApplySettings( KeyValues *inResourceData );
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void	OnCommand( const char *command );
-	virtual void	OnClose( void );
-	virtual void	PaintBackground();
+	void	ApplySettings( KeyValues *inResourceData ) override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void	OnCommand( const char *command ) override;
+	void	OnClose( void ) override;
+	void	PaintBackground() override;
 	void			SetSelectedChapterIndex( int index );
 	void			SetSelectedChapter( const char *chapter );
 	void			UpdatePanelLockedStatus( int iUnlockedChapter, int i, CGameChapterPanel *pChapterPanel );
 
 	void			SetCommentaryMode( bool bCommentary ) { m_bCommentaryMode = bCommentary; }
 
-	virtual void	OnKeyCodePressed( vgui::KeyCode code );
-	virtual void	OnKeyCodeReleased( vgui::KeyCode code );
-	virtual void	OnThink();
+	void	OnKeyCodePressed( vgui::KeyCode code ) override;
+	void	OnKeyCodeReleased( vgui::KeyCode code ) override;
+	void	OnThink() override;
 
 	// Xbox: Defined values are also used to shift the slot indices
 	enum EScrollDirection

@@ -23,17 +23,17 @@ class CCvarToggleCheckButton;
 //-----------------------------------------------------------------------------
 class COptionsSubAudio : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubAudio, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubAudio, vgui::PropertyPage );
 
 public:
 	COptionsSubAudio(vgui::Panel *parent);
 	~COptionsSubAudio();
 
-	virtual void OnResetData();
-	virtual void OnApplyChanges();
-	virtual void OnCommand( const char *command );
+	void OnResetData() override;
+	void OnApplyChanges() override;
+	void OnCommand( const char *command ) override;
 	bool RequiresRestart();
-   static char* GetUpdatedAudioLanguage() { return m_pchUpdatedAudioLanguage; }
+	static char* GetUpdatedAudioLanguage() { return m_pchUpdatedAudioLanguage; }
 
 private:
 	MESSAGE_FUNC( OnControlModified, "ControlModified" );

@@ -115,7 +115,7 @@ void CSessionBrowserDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 //---------------------------------------------------------------------
 void CSessionBrowserDialog::SessionSearchResult( int searchIdx, void *pHostData, XSESSION_SEARCHRESULT *pResult, int ping )
 {
-	char *pPing;
+	const char *pPing;
 	switch ( ping )
 	{
 	case 0:

@@ -15,7 +15,7 @@
 
 class CCvarTextEntry : public vgui::TextEntry
 {
-	DECLARE_CLASS_SIMPLE( CCvarTextEntry, vgui::TextEntry );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCvarTextEntry, vgui::TextEntry );
 
 public:
 	CCvarTextEntry( vgui::Panel *parent, const char *panelName, char const *cvarname );
@@ -23,7 +23,7 @@ public:
 
 	MESSAGE_FUNC( OnTextChanged, "TextChanged" );
 	void			ApplyChanges(  bool immediate = false );
-	virtual void	ApplySchemeSettings(vgui::IScheme *pScheme);
+	void			ApplySchemeSettings(vgui::IScheme *pScheme) override;
     void            Reset();
     bool            HasBeenModified();
 

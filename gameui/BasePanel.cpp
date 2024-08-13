@@ -207,7 +207,7 @@ void CGameMenuItem::SetRightAlignedText(bool state)
 class CGameMenu : public vgui::Menu
 {
 public:
-	DECLARE_CLASS_SIMPLE( CGameMenu, vgui::Menu );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CGameMenu, vgui::Menu );
 
 	CGameMenu(vgui::Panel *parent, const char *name) : BaseClass(parent, name) 
 	{
@@ -217,21 +217,6 @@ public:
 			m_pConsoleFooter = new CFooterPanel( parent, "MainMenuFooter" );
 
 			int iFixedWidth = 245;
-
-#ifdef _X360
-			// In low def we need a smaller highlight
-			XVIDEO_MODE videoMode;
-			XGetVideoMode( &videoMode );
-			if ( !videoMode.fIsHiDef )
-			{
-				iFixedWidth = 240;
-			}
-			else
-			{
-				iFixedWidth = 350;
-			}
-#endif
-
 			SetFixedWidth( iFixedWidth );
 		}
 		else
@@ -242,7 +227,7 @@ public:
 		m_hMainMenuOverridePanel = NULL;
 	}
 
-	virtual void ApplySchemeSettings(IScheme *pScheme)
+	void ApplySchemeSettings(IScheme *pScheme) override
 	{
 		BaseClass::ApplySchemeSettings(pScheme);
 
@@ -252,7 +237,7 @@ public:
 		SetBorder(NULL);
 	}
 
-	virtual void LayoutMenuBorder()
+	void LayoutMenuBorder() override
 	{
 	}
 
@@ -267,7 +252,7 @@ public:
 		}
 	}
 
-	virtual void SetVisible(bool state)
+	void SetVisible(bool state) override
 	{
 		if ( m_hMainMenuOverridePanel )
 		{
@@ -329,7 +314,7 @@ public:
 		InvalidateLayout();
 	}
 
-	virtual void OnSetFocus()
+	void OnSetFocus() override
 	{
 		if ( m_hMainMenuOverridePanel )
 		{
@@ -343,7 +328,7 @@ public:
 		BaseClass::OnSetFocus();
 	}
 
-	virtual void OnCommand(const char *command)
+	void OnCommand(const char *command) override
 	{
 		m_KeyRepeat.Reset();
 
@@ -368,29 +353,8 @@ public:
 		}
 	}
 
-	virtual void OnKeyCodePressed( KeyCode code )
+	void OnKeyCodePressed( KeyCode code ) override
 	{
-		if ( IsX360() )
-		{
-			if ( GetAlpha() != 255 )
-			{
-				SetEnabled( false );
-				// inhibit key activity during transitions
-				return;
-			}
-
-			SetEnabled( true );
-
-			if ( code == KEY_XBUTTON_B || code == KEY_XBUTTON_START )
-			{
-				if ( GameUI().IsInLevel() )
-				{
-					GetParent()->OnCommand( "ResumeGame" );
-				}
-				return;
-			}
-		}
-
 		m_KeyRepeat.KeyDown( code );
 
 		int nDir = 0;
@@ -457,14 +421,14 @@ public:
 		}
 	}
 
-	void OnKeyCodeReleased( vgui::KeyCode code )
+	void OnKeyCodeReleased( vgui::KeyCode code ) override
 	{
 		m_KeyRepeat.KeyUp( code );
 
 		BaseClass::OnKeyCodeReleased( code );
 	}
 
-	void OnThink()
+	void OnThink() override
 	{
 		vgui::KeyCode code = m_KeyRepeat.KeyRepeated();
 		if ( code )
@@ -475,7 +439,7 @@ public:
 		BaseClass::OnThink();
 	}
 
-	virtual void OnKillFocus()
+	void OnKillFocus() override
 	{
 		BaseClass::OnKillFocus();
 
@@ -620,7 +584,7 @@ public:
 		}
 	}
 
-	MESSAGE_FUNC_INT( OnCursorEnteredMenuItem, "CursorEnteredMenuItem", VPanel);
+	MESSAGE_FUNC_HANDLE_OVERRIDE( OnCursorEnteredMenuItem, "CursorEnteredMenuItem", VPanel);
 
 private:
 	CFooterPanel *m_pConsoleFooter;
@@ -631,9 +595,8 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Respond to cursor entering a menuItem.
 //-----------------------------------------------------------------------------
-void CGameMenu::OnCursorEnteredMenuItem(int VPanel)
+void CGameMenu::OnCursorEnteredMenuItem(VPANEL menuItem)
 {
-	VPANEL menuItem = (VPANEL)VPanel;
 	MenuItem *item = static_cast<MenuItem *>(ipanel()->GetPanel(menuItem, GetModuleName()));
 	KeyValues *pCommand = item->GetCommand();
 	if ( !pCommand->GetFirstSubKey() )
@@ -642,7 +605,7 @@ void CGameMenu::OnCursorEnteredMenuItem(int VPanel)
 	if ( !pszCmd || !pszCmd[0] )
 		return;
 
-	BaseClass::OnCursorEnteredMenuItem( VPanel );
+	BaseClass::OnCursorEnteredMenuItem( menuItem );
 }
 
 static CBackgroundMenuButton* CreateMenuButton( CBasePanel *parent, const char *panelName, const wchar_t *panelText )
@@ -916,7 +879,7 @@ static int CC_GameMenuCompletionFunc( char const *partial, char commands[ COMMAN
 		substring = (char *)partial + strlen( cmdname ) + 1;
 	}
 
-	int checklen = Q_strlen( substring );
+	intp checklen = Q_strlen( substring );
 
 	CUtlRBTree< CUtlString > symbols( 0, 0, UtlStringLessFunc );
 
@@ -997,12 +960,7 @@ void CBasePanel::UpdateBackgroundState()
 	}
 	else if ( GameUI().IsInBackgroundLevel() && !m_bLevelLoading )
 	{
-		// 360 guarantees a progress bar
-		// level loading is truly completed when the progress bar is gone, then transition to main menu
-		if ( IsPC() || ( IsX360() && !g_hLoadingDialog.Get() ) )
-		{
-			SetBackgroundRenderState( BACKGROUND_MAINMENU );
-		}
+		SetBackgroundRenderState( BACKGROUND_MAINMENU );
 	}
 	else if ( m_bLevelLoading )
 	{
@@ -1386,7 +1344,7 @@ void CBasePanel::DrawBackgroundImage()
 void CBasePanel::CreateGameMenu()
 {
 	// load settings from config file
-	KeyValues *datafile = new KeyValues("GameMenu");
+	KeyValues::AutoDelete datafile = KeyValues::AutoDelete("GameMenu");
 	datafile->UsesEscapeSequences( true );	// VGUI uses escape sequences
 	if (datafile->LoadFromFile( g_pFullFileSystem, "Resource/GameMenu.res" ) )
 	{
@@ -1403,8 +1361,6 @@ void CBasePanel::CreateGameMenu()
 		SETUP_PANEL( m_pGameMenu );
 		m_pGameMenu->SetAlpha( 0 );
 	}
-
-	datafile->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -1508,32 +1464,6 @@ void CBasePanel::RunFrame()
 	{
 		// run the console ui animations
 		m_pConsoleAnimationController->UpdateAnimations( engine->Time() );
-
-		if ( IsX360() && m_ExitingFrameCount && engine->Time() >= m_flTransitionEndTime )
-		{
-			if ( m_ExitingFrameCount > 1 )
-			{
-				m_ExitingFrameCount--;
-				if ( m_ExitingFrameCount == 1 )
-				{
-					// enough frames have transpired, send the single shot quit command
-					// If we kicked off this event from an invite, we need to properly setup the restart to account for that
-					if ( m_bRestartFromInvite )
-					{
-						engine->ClientCmd_Unrestricted( "quit_x360 invite" );
-					}
-					else if ( m_bRestartSameGame )
-					{
-						engine->ClientCmd_Unrestricted( "quit_x360 restart" );
-					}
-					else
-					{
-						// quits to appchooser
-						engine->ClientCmd_Unrestricted( "quit_x360\n" );
-					}
-				}
-			}
-		}
 	}
 
 	UpdateBackgroundState();
@@ -1561,44 +1491,6 @@ void CBasePanel::RunFrame()
 //-----------------------------------------------------------------------------
 void CBasePanel::UpdateRichPresenceInfo()
 {
-#if defined( _X360 )
-	// For all other users logged into this console (not primary), set to idle to satisfy cert
-	for( uint i = 0; i < XUSER_MAX_COUNT; ++i )
-	{
-		XUSER_SIGNIN_STATE State = XUserGetSigninState( i );
-
-		if( State != eXUserSigninState_NotSignedIn )
-		{
-			if ( i != XBX_GetPrimaryUserId() )
-			{
-				// Set rich presence as 'idle' for users logged in that can't participate in orange box.
-				if ( !xboxsystem->UserSetContext( i, X_CONTEXT_PRESENCE, CONTEXT_PRESENCE_IDLE, true ) )
-				{
-					Warning( "BasePanel: UserSetContext failed.\n" );
-				}
-			}
-		}
-	}
-
-	if ( !GameUI().IsInLevel() )
-	{
-		if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), CONTEXT_GAME, m_iGameID, true ) )
-		{
-			Warning( "BasePanel: UserSetContext failed.\n" );
-		}
-		if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), X_CONTEXT_PRESENCE, CONTEXT_PRESENCE_MENU, true ) )
-		{
-			Warning( "BasePanel: UserSetContext failed.\n" );
-		}
-		if ( m_bSinglePlayer )
-		{
-			if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), X_CONTEXT_GAME_MODE, CONTEXT_GAME_MODE_SINGLEPLAYER, true ) )
-			{
-				Warning( "BasePanel: UserSetContext failed.\n" );
-			}
-		}
-	}
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1812,34 +1704,6 @@ void CBasePanel::OnGameUIActivated()
 		UpdateGameMenus();
 		m_bEverActivated = true;
 
-#if defined( _X360 )
-		
-		// Open all active containers if we have a valid storage device
-		if ( XBX_GetPrimaryUserId() != XBX_INVALID_USER_ID && XBX_GetStorageDeviceId() != XBX_INVALID_STORAGE_ID && XBX_GetStorageDeviceId() != XBX_STORAGE_DECLINED )
-		{
-			// Open user settings and save game container here
-			uint nRet = engine->OnStorageDeviceAttached();
-			if ( nRet != ERROR_SUCCESS )
-			{
-				// Invalidate the device
-				XBX_SetStorageDeviceId( XBX_INVALID_STORAGE_ID );
-
-				// FIXME: We don't know which device failed!
-				// Pop a dialog explaining that the user's data is corrupt
-				BasePanel()->ShowMessageDialog( MD_STORAGE_DEVICES_CORRUPT );
-			}
-		}
-
-		// determine if we're starting up because of a cross-game invite
-		int fLaunchFlags = XboxLaunch()->GetLaunchFlags();
-		if ( fLaunchFlags & LF_INVITERESTART )
-		{
-			XNKID nSessionID;
-			XboxLaunch()->GetInviteSessionID( &nSessionID );
-			matchmaking->JoinInviteSessionByID( nSessionID );
-		}
-#endif
-
 		// Brute force check to open tf matchmaking ui.
 		if ( GameUI().IsConsoleUI() )
 		{
@@ -1871,13 +1735,6 @@ void CBasePanel::OnGameUIActivated()
 		{
 			// Achievement dialog refreshes it's data if the player looks at the pause menu
 			m_hAchievementsDialog->OnCommand( "OnGameUIActivated" );
-		}
-	}
-	else // not the pause menu, update presence
-	{
-		if ( IsX360() )
-		{
-			UpdateRichPresenceInfo();
 		}
 	}
 }
@@ -1996,10 +1853,6 @@ void CBasePanel::RunMenuCommand(const char *command)
 #endif
 			OnOpenAchievementsDialog();
 		}
-		else
-		{
-			OnOpenAchievementsDialog_Xbox();
-		}
 	}
     //=============================================================================
     // HPE_BEGIN:
@@ -2117,7 +1970,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( Q_stristr( command, "engine " ) )
 	{
-		const char *engineCMD = strstr( command, "engine " ) + strlen( "engine " );
+		const char *engineCMD = strstr( command, "engine " ) + std::size( "engine " ) - 1;
 		if ( engineCMD && engineCMD[0] )
 		{
 			engine->ClientCmd_Unrestricted( const_cast<char *>( engineCMD ) );
@@ -2661,8 +2514,6 @@ bool CBasePanel::HandleStorageDeviceRequest( const char *command )
 		m_bUserRefusedStorageDevice = false;
 		return false;
 	}
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -2764,7 +2615,7 @@ void CBasePanel::RunAnimationWithCallback( vgui::Panel *parent, const char *anim
 //-----------------------------------------------------------------------------
 class CSaveBeforeQuitQueryDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CSaveBeforeQuitQueryDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSaveBeforeQuitQueryDialog, vgui::Frame );
 public:
 	CSaveBeforeQuitQueryDialog(vgui::Panel *parent, const char *name) : BaseClass(parent, name)
 	{
@@ -2773,7 +2624,7 @@ public:
 		SetSizeable(false);
 	}
 
-	void DoModal()
+	void DoModal() override
 	{
 		BaseClass::Activate();
 		input()->SetAppModalSurface(GetVPanel());
@@ -2783,7 +2634,7 @@ public:
 		GameUI().PreventEngineHideGameUI();
 	}
 
-	void OnKeyCodeTyped(KeyCode code)
+	void OnKeyCodeTyped(KeyCode code) override
 	{
 		// ESC cancels
 		if ( code == KEY_ESCAPE )
@@ -2796,7 +2647,7 @@ public:
 		}
 	}
 
-	void OnKeyCodePressed(KeyCode code)
+	void OnKeyCodePressed(KeyCode code) override
 	{
 		// ESC cancels
 		if ( code == KEY_XBUTTON_B || code == STEAMCONTROLLER_B || code == STEAMCONTROLLER_START )
@@ -2817,7 +2668,7 @@ public:
 		}
 	}
 
-	virtual void OnCommand(const char *command)
+	void OnCommand(const char *command) override
 	{
 		if (!Q_stricmp(command, "Quit"))
 		{
@@ -2849,7 +2700,7 @@ public:
 		}
 	}
 
-	virtual void OnClose()
+	void OnClose() override
 	{
 		BaseClass::OnClose();
 		vgui::surface()->RestrictPaintToSinglePanel(NULL);
@@ -2862,20 +2713,20 @@ public:
 //-----------------------------------------------------------------------------
 class CQuitQueryBox : public vgui::QueryBox
 {
-	DECLARE_CLASS_SIMPLE( CQuitQueryBox, vgui::QueryBox );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CQuitQueryBox, vgui::QueryBox );
 public:
 	CQuitQueryBox(const char *title, const char *info, Panel *parent) : BaseClass( title, info, parent )
 	{
 	}
 
-	void DoModal( Frame* pFrameOver )
+	void DoModal( Frame* pFrameOver ) override
 	{
 		BaseClass::DoModal( pFrameOver );
 		vgui::surface()->RestrictPaintToSinglePanel(GetVPanel());
 		GameUI().PreventEngineHideGameUI();
 	}
 
-	void OnKeyCodeTyped(KeyCode code)
+	void OnKeyCodeTyped(KeyCode code) override
 	{
 		// ESC cancels
 		if (code == KEY_ESCAPE)
@@ -2888,7 +2739,7 @@ public:
 		}
 	}
 
-	void OnKeyCodePressed(KeyCode code)
+	void OnKeyCodePressed(KeyCode code) override
 	{
 		// ESC cancels
 		if (code == KEY_XBUTTON_B || code == STEAMCONTROLLER_B)
@@ -2901,7 +2752,7 @@ public:
 		}
 	}
 
-	virtual void OnClose()
+	void OnClose() override
 	{
 		BaseClass::OnClose();
 		vgui::surface()->RestrictPaintToSinglePanel(NULL);
@@ -3277,16 +3128,6 @@ void CBasePanel::OnOpenCSAchievementsDialog()
 //=============================================================================
 // HPE_END
 //=============================================================================
-
-void CBasePanel::OnOpenAchievementsDialog_Xbox()
-{
-	if (!m_hAchievementsDialog.Get())
-	{
-		m_hAchievementsDialog = new CAchievementsDialog_XBox( this );
-		PositionDialog(m_hAchievementsDialog);
-	}
-	m_hAchievementsDialog->Activate();
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -4676,7 +4517,7 @@ void CMessageDialogHandler::ActivateMessageDialog( int nStackIdx )
 
 	// Make sure the topmost item on the stack still has focus
 	int idx = MAX_MESSAGE_DIALOGS - 1;
-	for ( idx; idx >= nStackIdx; --idx )
+	for ( ; idx >= nStackIdx; --idx )
 	{
 		CMessageDialog *pDialog = m_hMessageDialogs[idx];
 		if ( pDialog )

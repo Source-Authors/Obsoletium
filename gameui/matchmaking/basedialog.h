@@ -27,14 +27,14 @@ class CFooterPanel;
 //-----------------------------------------------------------------------------
 class CPropertyLabel : public vgui::Label
 {
-	DECLARE_CLASS_SIMPLE( CPropertyLabel, vgui::Label );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPropertyLabel, vgui::Label );
 
 public:
 	CPropertyLabel( Panel *parent, const char *panelName, const char *text ) : BaseClass( parent, panelName, text ) 
 	{
 	}
 
-	virtual void ApplySettings( KeyValues *pResourceData )
+	void ApplySettings( KeyValues *pResourceData ) override
 	{
 		BaseClass::ApplySettings( pResourceData );
 
@@ -54,23 +54,23 @@ public:
 //--------------------------------
 class CBaseDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CBaseDialog, vgui::Frame ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseDialog, vgui::Frame ); 
 
 public:
 	CBaseDialog( vgui::Panel *parent, const char *pName );
 	~CBaseDialog();
 
 	// IPanel interface
-	virtual void		ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void		ApplySettings( KeyValues *pResourceData );
-	virtual void		PerformLayout();
-	virtual void		Activate();
+	void		ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void		ApplySettings( KeyValues *pResourceData ) override;
+	void		PerformLayout() override;
+	void		Activate() override;
 
-	virtual void		OnKeyCodePressed( vgui::KeyCode code );
-	virtual void		OnKeyCodeReleased( vgui::KeyCode code);
-	virtual void		OnCommand( const char *pCommand );
-	virtual void		OnClose();
-	virtual void		OnThink();
+	void		OnKeyCodePressed( vgui::KeyCode code ) override;
+	void		OnKeyCodeReleased( vgui::KeyCode code) override;
+	void		OnCommand( const char *pCommand ) override;
+	void		OnClose() override;
+	void		OnThink() override;
 
 	virtual void		OverrideMenuItem( KeyValues *pKeys );
 	virtual void		SwapMenuItems( int iOne, int iTwo );
@@ -97,15 +97,15 @@ protected:
 //---------------------------------------------------------------------
 class CScenarioInfoPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CScenarioInfoPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CScenarioInfoPanel, vgui::EditablePanel );
 
 public:
 	CScenarioInfoPanel( vgui::Panel *parent, const char *pName );
 	~CScenarioInfoPanel();
 
-	virtual void	PerformLayout();
-	virtual void	ApplySettings( KeyValues *pResourceData );
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
+	void	PerformLayout() override;
+	void	ApplySettings( KeyValues *pResourceData ) override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	vgui::ImagePanel	*m_pMapImage;
 	CPropertyLabel		*m_pTitle;

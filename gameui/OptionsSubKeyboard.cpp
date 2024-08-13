@@ -158,14 +158,14 @@ const char *UTIL_Parse( const char *data, char *token, int sizeofToken )
 }
 static char *UTIL_CopyString( const char *in )
 {
-	int len = strlen( in ) + 1;
+	intp len = strlen( in ) + 1;
 	char *out = new char[ len ];
 	Q_strncpy( out, in, len );
 	return out;
 }
 
 #ifndef _XBOX
-char *UTIL_va(char *format, ...)
+char *UTIL_va(const char *format, ...)
 {
 	va_list		argptr;
 	static char	string[4][1024];
@@ -192,11 +192,11 @@ void COptionsSubKeyboard::ParseActionDescriptions( void )
 	KeyValues *item;
 
 	// Load the default keys list
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( "scripts/kb_act.lst", NULL, buf ) )
 		return;
 
-	const char *data = (const char*)buf.Base();
+	const char *data = buf.Base<const char>();
 
 	int sectionIndex = 0;
 	char token[512];
@@ -339,7 +339,7 @@ void COptionsSubKeyboard::RemoveKeyFromBindItems( KeyValues *org_item, const cha
 	if ( !key || !key[ 0 ] )
 		return;
 
-	int len = Q_strlen( key );
+	intp len = Q_strlen( key );
 	char *pszKey = new char[len + 1];
 
 	if ( !pszKey )
@@ -565,14 +565,14 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
 //-----------------------------------------------------------------------------
 void COptionsSubKeyboard::FillInDefaultBindings( void )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( "cfg/config_default.cfg", NULL, buf ) )
 		return;
 
 	// Clear out all current bindings
 	ClearBindItems();
 
-	const char *data = (const char*)buf.Base();
+	const char *data = buf.Base<const char>();
 
 	// loop through all the binding
 	while ( data != NULL )
@@ -754,7 +754,7 @@ void COptionsSubKeyboard::OnKeyCodePressed(vgui::KeyCode code)
 //-----------------------------------------------------------------------------
 class COptionsSubKeyboardAdvancedDlg : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubKeyboardAdvancedDlg, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubKeyboardAdvancedDlg, vgui::Frame );
 public:
 	COptionsSubKeyboardAdvancedDlg( vgui::VPANEL hParent ) : BaseClass( NULL, NULL )
 	{
@@ -768,7 +768,7 @@ public:
 		SetDeleteSelfOnClose( true );
 	}
 
-	virtual void Activate()
+	void Activate() override
 	{
 		BaseClass::Activate();
 
@@ -798,7 +798,7 @@ public:
 		hud_fastswitch.SetValue( GetControlInt( "FastSwitchCheck", 0 ) );
 	}
 
-	virtual void OnCommand( const char *command )
+	void OnCommand( const char *command ) override
 	{
 		if ( !stricmp(command, "OK") )
 		{
@@ -812,7 +812,7 @@ public:
 		}
 	}
 
-	void OnKeyCodeTyped(KeyCode code)
+	void OnKeyCodeTyped(KeyCode code) override
 	{
 		// force ourselves to be closed if the escape key it pressed
 		if (code == KEY_ESCAPE)

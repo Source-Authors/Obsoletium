@@ -19,12 +19,10 @@
 #include "BasePanel.h"
 #include "GameUI_Interface.h"
 #include "BonusMapsDialog.h"
+#include "BaseSaveGameDialog.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-
-#define MOD_DIR ( IsXbox() ? "DEFAULT_WRITE_PATH" : "MOD" )
 
 
 const char g_pszMedalNames[4][8] =
@@ -44,16 +42,12 @@ bool WriteBonusMapSavedData( KeyValues *data )
 	if ( IsX360() && ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED ) )
 		return false;
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	data->RecursiveSaveToFile( buf, 0 );
 
 	char	szFilename[_MAX_PATH];
-
-	if ( IsX360() )
-		Q_snprintf( szFilename, sizeof( szFilename ), "cfg:/bonus_maps_data.bmd" );
-	else
-		Q_snprintf( szFilename, sizeof( szFilename ), "save/bonus_maps_data.bmd" );
+	Q_snprintf( szFilename, sizeof( szFilename ), "%s/bonus_maps_data.bmd", SAVE_DIR );
 
 	bool bWriteSuccess = g_pFullFileSystem->WriteFile( szFilename, MOD_DIR, buf );
 
@@ -333,20 +327,11 @@ bool CBonusMapsDatabase::ReadBonusMapSaveData( void )
 		return false;
 	}
 
-#ifdef _X360
-	// Nothing to read
-	if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED )
-		return false;
-#endif
-
 	char	szFilename[_MAX_PATH];
+	Q_snprintf( szFilename, sizeof( szFilename ), "%s/bonus_maps_data.bmd", SAVE_DIR );
 
-	if ( IsX360() )
-		Q_snprintf( szFilename, sizeof( szFilename ), "cfg:/bonus_maps_data.bmd" );
-	else
-		Q_snprintf( szFilename, sizeof( szFilename ), "save/bonus_maps_data.bmd" );
-
-	m_pBonusMapSavedData->LoadFromFile( g_pFullFileSystem, szFilename, NULL );
+	// dimhotepus: Support bonus maps in mods.
+	m_pBonusMapSavedData->LoadFromFile( g_pFullFileSystem, szFilename, MOD_DIR );
 
 	m_bSavedDataChanged = false;
 	m_bHasLoadedSaveData = true;
@@ -813,7 +798,7 @@ void CBonusMapsDatabase::ParseBonusMapData( char const *pszFileName, char const 
 
 	while ( kv )
 	{
-		int iMap = m_BonusMaps.AddToTail();
+		intp iMap = m_BonusMaps.AddToTail();
 
 		BonusMapDescription_t *pMap = &m_BonusMaps[ iMap ];
 
@@ -842,7 +827,7 @@ void CBonusMapsDatabase::ParseBonusMapData( char const *pszFileName, char const 
 				if ( !pMap->m_pChallenges )
 					pMap->m_pChallenges = new CUtlVector<ChallengeDescription_t>;
 
-				int iChallenge = pMap->m_pChallenges->AddToTail();
+				intp iChallenge = pMap->m_pChallenges->AddToTail();
 
 				ChallengeDescription_t *pChallenge = &(*pMap->m_pChallenges)[ iChallenge ];
 				V_strcpy_safe( pChallenge->szName, pChallengeKey->GetName() );
