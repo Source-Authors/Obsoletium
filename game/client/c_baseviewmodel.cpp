@@ -50,8 +50,8 @@ void FormatViewModelAttachment( Vector &vOrigin, bool bInverse )
 	// Presumably, SetUpView has been called so we know our FOV and render origin.
 	const CViewSetup *pViewSetup = view->GetPlayerViewSetup();
 	
-	float worldx = tan( pViewSetup->fov * M_PI/360.0 );
-	float viewx = tan( pViewSetup->fovViewmodel * M_PI/360.0 );
+	float worldx = tan( DEG2RAD( pViewSetup->fov ) * 0.5f );
+	float viewx = tan( DEG2RAD( pViewSetup->fovViewmodel ) * 0.5f );
 
 	// aspect ratio cancels out, so only need one factor
 	// the difference between the screen coordinates of the 2 systems is the ratio
@@ -232,18 +232,11 @@ void C_BaseViewModel::ApplyBoneMatrixTransform( matrix3x4_t& transform )
 		MatrixInvert( viewMatrixInverse, viewMatrix );
 
 		// Transform into view space.
-		matrix3x4_t temp, temp2;
+		matrix3x4_t temp;
 		ConcatTransforms( viewMatrix, transform, temp );
 		
 		// Flip it along X.
 		
-		// (This is the slower way to do it, and it equates to negating the top row).
-		//matrix3x4_t mScale;
-		//SetIdentityMatrix( mScale );
-		//mScale[0][0] = 1;
-		//mScale[1][1] = -1;
-		//mScale[2][2] = 1;
-		//ConcatTransforms( mScale, temp, temp2 );
 		temp[1][0] = -temp[1][0];
 		temp[1][1] = -temp[1][1];
 		temp[1][2] = -temp[1][2];

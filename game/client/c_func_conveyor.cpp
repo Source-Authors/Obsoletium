@@ -116,8 +116,8 @@ void CConveyorMaterialProxy::OnBind( void *pC_BaseEntity )
 	float flRate			= abs( flConveyorSpeed ) / 128.0;
 	float flAngle			= (flConveyorSpeed >= 0) ? 180 : 0;
 
-	float sOffset = gpGlobals->curtime * cos( flAngle * ( M_PI / 180.0f ) ) * flRate;
-	float tOffset = gpGlobals->curtime * sin( flAngle * ( M_PI / 180.0f ) ) * flRate;
+	float sOffset = gpGlobals->curtime * cos( flAngle * ( M_PI_F / 180.0f ) ) * flRate;
+	float tOffset = gpGlobals->curtime * sin( flAngle * ( M_PI_F / 180.0f ) ) * flRate;
 	
 	// make sure that we are positive
 	if( sOffset < 0.0f )

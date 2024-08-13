@@ -75,19 +75,19 @@ inline T Derivative_Hermite( float t, const T& p0, const T& p1, const T& p2 )
 }
 
 
-inline void Lerp_Clamp( int val )
+inline void Lerp_Clamp( [[maybe_unused]] int val )
 {
 }
 
-inline void Lerp_Clamp( float val )
+inline void Lerp_Clamp( [[maybe_unused]] float val )
 {
 }
 
-inline void Lerp_Clamp( const Vector &val )
+inline void Lerp_Clamp( [[maybe_unused]] const Vector &val )
 {
 }
 
-inline void Lerp_Clamp( const QAngle &val )
+inline void Lerp_Clamp( [[maybe_unused]] const QAngle &val )
 {
 }
 

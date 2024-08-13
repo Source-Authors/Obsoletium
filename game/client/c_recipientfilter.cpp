@@ -67,7 +67,7 @@ bool C_RecipientFilter::IsReliable( void ) const
 
 int C_RecipientFilter::GetRecipientCount( void ) const
 {
-	return m_Recipients.Size();
+	return m_Recipients.Count();
 }
 
 int	C_RecipientFilter::GetRecipientIndex( int slot ) const

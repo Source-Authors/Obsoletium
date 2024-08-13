@@ -812,7 +812,7 @@ AshDebrisEffect* AshDebrisEffect::Create( const char *pDebugName )
 //-----------------------------------------------------------------------------
 float AshDebrisEffect::UpdateAlpha( const SimpleParticle *pParticle )
 {
-	return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
+	return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI_F * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
 }
 
 #define ASH_PARTICLE_NOISE 0x4
@@ -861,8 +861,6 @@ void CClient_Precipitation::CreateAshParticle( void )
 		vForward.z = 0.0f;
 
 		float curTime = gpGlobals->frametime;
-
-		Vector vPushOrigin;
 
 		Vector absmins = WorldAlignMins();
 		Vector absmaxs = WorldAlignMaxs();
@@ -989,7 +987,7 @@ void CClient_Precipitation::CreateAshParticle( void )
 				pParticle->m_vecVelocity = Vector( RandomFloat( -20.0f, 20.0f ), RandomFloat( -20.0f, 20.0f ), RandomFloat( -10, -15 ) );
 			}
 
-			float color = random->RandomInt( 125, 225 );
+			int color = random->RandomInt( 125, 225 );
 			pParticle->m_uchColor[0] = color;
 			pParticle->m_uchColor[1] = color;
 			pParticle->m_uchColor[2] = color;
@@ -1038,19 +1036,19 @@ void CClient_Precipitation::EmitParticles( float fTimeDelta )
 
 		C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 		if ( !pPlayer )
-		return;
+			return;
 		Vector vPlayerCenter = pPlayer->WorldSpaceCenter();
 
 		// Compute where to emit
-	if (!ComputeEmissionArea( org, size ))
-		return;
+		if (!ComputeEmissionArea( org, size ))
+			return;
 
 		// clamp this to prevent creating a bunch of rain or snow at one time.
 		if( fTimeDelta > 0.075f )
 			fTimeDelta = 0.075f;
 
 		// FIXME: Compute the precipitation density based on computational power
-	float density = m_flDensity;
+		float density = m_flDensity;
 
 		if (density > 0.01f) 
 			density = 0.01f;
@@ -1749,8 +1747,8 @@ void CSnowFallManager::AddSnowFallEntity( CClient_Precipitation *pSnowEntity )
 	if ( !pSnowEntity )
 		return;
 
-	int nSnowCount = m_aSnow.Count();
-	int iSnow = 0;
+	intp nSnowCount = m_aSnow.Count();
+	intp iSnow = 0;
 	for ( iSnow = 0; iSnow < nSnowCount; ++iSnow )
 	{
 		if ( m_aSnow[iSnow].m_pEntity == pSnowEntity )
@@ -2046,8 +2044,6 @@ void CSnowFallManager::CreateOutsideVolumeSnowParticles( float flCurrentTime, fl
 //-----------------------------------------------------------------------------
 void CSnowFallManager::CreateInsideVolumeSnowParticles( float flCurrentTime, float flRadius, const Vector &vecEyePos, const Vector &vecForward, float flZoomScale )
 {
-	Vector vecParticleSpawn;
-
 	// Check/Setup for zoom.
 	bool bZoomed = ( flZoomScale > 1.0f );
 	float flZoomRadius = 0.0f;

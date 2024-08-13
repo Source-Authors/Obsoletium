@@ -44,12 +44,12 @@ struct VoteIssue_t
 
 class VoteBarPanel : public vgui::Panel, public CGameEventListener
 {
-	DECLARE_CLASS_SIMPLE( VoteBarPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( VoteBarPanel, vgui::Panel );
 
 	VoteBarPanel( vgui::Panel *parent, const char *panelName );
 
-	virtual void Paint( void );
-	virtual void FireGameEvent( IGameEvent *event );
+	void Paint( void ) override;
+	void FireGameEvent( IGameEvent *event ) override;
 
 private:
 	int m_nVoteOptionCount[MAX_VOTE_OPTIONS];	// Vote options counter
@@ -68,16 +68,16 @@ private:
 
 class CVoteSetupDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CVoteSetupDialog, vgui::Frame ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CVoteSetupDialog, vgui::Frame ); 
 
 public:
 	CVoteSetupDialog( vgui::Panel *parent );
 	~CVoteSetupDialog();
 
-	virtual void	Activate();
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
+	void	Activate() override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	virtual void	PostApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void	ApplySettings(KeyValues *inResourceData);
+	void	ApplySettings(KeyValues *inResourceData) override;
 
 	void			InitializeIssueList( void );
 	void			UpdateCurrentMap( void );
@@ -92,8 +92,8 @@ private:
 	//MESSAGE_FUNC( OnItemSelected, "ItemSelected" );
 	MESSAGE_FUNC_PTR( OnItemSelected, "ItemSelected", panel );
 
-	virtual void	OnCommand( const char *command );
-	virtual void	OnClose( void );
+	void	OnCommand( const char *command ) override;
+	void	OnClose( void ) override;
 
 	void			RefreshIssueParameters( void );
 	void			ResetData( void );
@@ -128,16 +128,16 @@ private:
 
 class CHudVote : public vgui::EditablePanel, public CHudElement
 {
-	DECLARE_CLASS_SIMPLE( CHudVote, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudVote, vgui::EditablePanel );
 
 	CHudVote( const char *pElementName );
 
-	virtual void	LevelInit( void );
-	virtual void	Init( void );
-	virtual bool	ShouldDraw( void );
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void	FireGameEvent( IGameEvent *event );
-	virtual void	OnThink();
+	void	LevelInit( void ) override;
+	void	Init( void ) override;
+	bool	ShouldDraw( void ) override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void	FireGameEvent( IGameEvent *event ) override;
+	void	OnThink() override;
 	virtual int		KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
 
 	// NOTE: Any MsgFunc_*() methods added here need to check IsPlayingDemo().
@@ -155,7 +155,7 @@ class CHudVote : public vgui::EditablePanel, public CHudElement
 	bool			IsShowingVoteSetupDialog();
 	bool			IsShowingVotingUI();
 
-	virtual GameActionSet_t GetPreferredActionSet() { return IsShowingVoteSetupDialog() ? GAME_ACTION_SET_MENUCONTROLS : CHudElement::GetPreferredActionSet(); }
+	GameActionSet_t GetPreferredActionSet() override { return IsShowingVoteSetupDialog() ? GAME_ACTION_SET_MENUCONTROLS : CHudElement::GetPreferredActionSet(); }
 
 private:
 	bool			IsPlayingDemo() const;

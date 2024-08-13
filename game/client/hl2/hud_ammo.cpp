@@ -26,20 +26,20 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CHudAmmo : public CHudNumericDisplay, public CHudElement
 {
-	DECLARE_CLASS_SIMPLE( CHudAmmo, CHudNumericDisplay );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudAmmo, CHudNumericDisplay );
 
 public:
 	CHudAmmo( const char *pElementName );
-	void Init( void );
-	void VidInit( void );
-	void Reset();
+	void Init( void ) override;
+	void VidInit( void ) override;
+	void Reset() override;
 
 	void SetAmmo(int ammo, bool playAnimation);
 	void SetAmmo2(int ammo2, bool playAnimation);
-	virtual void Paint( void );
+	void Paint( void ) override;
 
 protected:
-	virtual void OnThink();
+	void OnThink() override;
 
 	void UpdateAmmoDisplays();
 	void UpdatePlayerAmmo( C_BasePlayer *player );
@@ -356,7 +356,7 @@ void CHudAmmo::Paint( void )
 //-----------------------------------------------------------------------------
 class CHudSecondaryAmmo : public CHudNumericDisplay, public CHudElement
 {
-	DECLARE_CLASS_SIMPLE( CHudSecondaryAmmo, CHudNumericDisplay );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudSecondaryAmmo, CHudNumericDisplay );
 
 public:
 	CHudSecondaryAmmo( const char *pElementName ) : BaseClass( NULL, "HudAmmoSecondary" ), CHudElement( pElementName )
@@ -366,7 +366,7 @@ public:
 		SetHiddenBits( HIDEHUD_HEALTH | HIDEHUD_WEAPONSELECTION | HIDEHUD_PLAYERDEAD | HIDEHUD_NEEDSUIT );
 	}
 
-	void Init( void )
+	void Init( void ) override
 	{
 #ifndef HL2MP
 		wchar_t *tempString = g_pVGuiLocalize->Find("#Valve_Hud_AMMO_ALT");
@@ -381,7 +381,7 @@ public:
 #endif // HL2MP
 	}
 
-	void VidInit( void )
+	void VidInit( void ) override
 	{
 	}
 
@@ -409,7 +409,7 @@ public:
 		SetDisplayValue( ammo );
 	}
 
-	void Reset()
+	void Reset() override
 	{
 		// hud reset, update ammo state
 		BaseClass::Reset();
@@ -419,7 +419,7 @@ public:
 		UpdateAmmoState();
 	}
 
-	virtual void Paint( void )
+	void Paint( void ) override
 	{
 		BaseClass::Paint();
 
@@ -441,7 +441,7 @@ public:
 
 protected:
 
-	virtual void OnThink()
+	void OnThink() override
 	{
 		// set whether or not the panel draws based on if we have a weapon that supports secondary ammo
 		C_BaseCombatWeapon *wpn = GetActiveWeapon();

@@ -16,7 +16,7 @@
 class FX_Cube : public CClientSideEffect
 {
 public:
-						FX_Cube(IMaterial *pMaterial) : CClientSideEffect("FX_Cube")
+						explicit FX_Cube(IMaterial *pMaterial) : CClientSideEffect("FX_Cube")
 						{
 							m_pMaterial = pMaterial;
 							if(m_pMaterial)
@@ -79,7 +79,7 @@ public:
 		pMesh->Draw();
 	}
 
-	virtual void		Draw( double frametime )
+	void		Draw( double frametime ) override
 	{
 		CMatRenderContextPtr pRenderContext( materials );
 		// Draw it.
@@ -110,7 +110,7 @@ public:
 	Vector		m_mins;
 	Vector		m_maxs;
 	Vector		m_vColor;
-	float		m_Life;
+	double		m_Life;
 	IMaterial	*m_pMaterial;
 };
 

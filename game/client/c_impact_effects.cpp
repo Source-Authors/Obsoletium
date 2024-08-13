@@ -184,7 +184,7 @@ static void CreateFleckParticles( const Vector& origin, const Vector &color, tra
 		break;
 	}
 
-	Vector	dir, end;
+	Vector	dir;
 
 	float	colorRamp;
 
@@ -443,7 +443,7 @@ void FX_DebrisFlecks( const Vector& origin, trace_t *tr, char materialType, int 
 	dir[2] = tr->plane.normal[2] + random->RandomFloat( -0.8f, 0.8f );
 
 	newParticle.m_uchStartSize	= random->RandomInt( 4, 8 );
-	newParticle.m_uchEndSize		= newParticle.m_uchStartSize * 4.0f;
+	newParticle.m_uchEndSize		= newParticle.m_uchStartSize * 4;
 
 	newParticle.m_vecVelocity = dir * random->RandomFloat( 2.0f, 24.0f );
 	newParticle.m_vecVelocity[2] = random->RandomFloat( -2.0f, 2.0f );
@@ -586,7 +586,7 @@ void FX_GlassImpact( const Vector &pos, const Vector &normal )
 	dir[2] = normal[2] + random->RandomFloat( -0.8f, 0.8f );
 
 	newParticle.m_uchStartSize	= random->RandomInt( 4, 8 );
-	newParticle.m_uchEndSize		= newParticle.m_uchStartSize * 4.0f;
+	newParticle.m_uchEndSize		= newParticle.m_uchStartSize * 4;
 
 	newParticle.m_vecVelocity = dir * random->RandomFloat( 2.0f, 8.0f );
 	newParticle.m_vecVelocity[2] = random->RandomFloat( -2.0f, 2.0f );
@@ -661,7 +661,7 @@ void FX_AntlionImpact( const Vector &pos, trace_t *trace )
 	// Setup our collision information
 	fleckEmitter->m_ParticleCollision.Setup( spawnOffset, &shotDir, flAngularSpray, 8.0f, flMaxSpeed, FLECK_GRAVITY, FLECK_DAMPEN );
 
-	Vector	dir, end;
+	Vector	dir;
 	Vector	color = Vector( 1, 0.9, 0.75 );
 	float	colorRamp;
 
@@ -728,7 +728,7 @@ void FX_AntlionImpact( const Vector &pos, trace_t *trace )
 		dir[2] = shotDir[2] + random->RandomFloat( -0.8f, 0.8f );
 
 		pParticle->m_uchStartSize	= random->RandomInt( 8, 16 );
-		pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 4.0f;
+		pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 4;
 
 		pParticle->m_vecVelocity = dir * random->RandomFloat( 4.0f, 64.0f );
 
@@ -755,15 +755,10 @@ void FX_AntlionImpact( const Vector &pos, trace_t *trace )
 // Input  : &pos - 
 //			&dir - 
 //-----------------------------------------------------------------------------
-#if defined( _XBOX )
-#define NUM_BUG_BLOOD	16
-#define NUM_BUG_BLOOD2	8
-#define NUM_BUG_SPLATS	8
-#else
 #define NUM_BUG_BLOOD	32
 #define NUM_BUG_BLOOD2	16
 #define NUM_BUG_SPLATS	16
-#endif
+
 void FX_BugBlood( Vector &pos, Vector &dir, Vector &vWorldMins, Vector &vWorldMaxs )
 {
 	VPROF_BUDGET( "FX_BugBlood", VPROF_BUDGETGROUP_PARTICLE_RENDERING );

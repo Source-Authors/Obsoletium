@@ -43,7 +43,8 @@ class Point;
 // handles
 typedef unsigned long HCursor;
 typedef unsigned long HTexture;
-typedef unsigned long HFont;
+// dimhotepus: x86-64 port. unsigned long -> uintp
+typedef uintp HFont;
 
 
 //SRC only defines

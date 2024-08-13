@@ -29,9 +29,9 @@ public:
 	CFXStaticLine( const char *name, const Vector& start, const Vector& end, float scale, float life, const char *shader, unsigned int flags );
 	~CFXStaticLine( void );
 
-	virtual void	Draw( double frametime );
-	virtual bool	IsActive( void );
-	virtual void	Destroy( void );
+	void	Draw( double frametime ) override;
+	bool	IsActive( void ) override;
+	void	Destroy( void ) override;
 	virtual	void	Update( double frametime );
 
 protected:
@@ -39,7 +39,7 @@ protected:
 	IMaterial		*m_pMaterial;
 	Vector			m_vecStart, m_vecEnd;
 	unsigned int	m_uiFlags;
-	float			m_fLife;
+	double			m_fLife;
 	float			m_fScale;
 };
 

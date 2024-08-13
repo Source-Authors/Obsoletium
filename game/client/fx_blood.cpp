@@ -209,7 +209,7 @@ void FX_BloodSpray( const Vector &origin, const Vector &normal, float scale, uns
 			for ( i = 0; i < 6; i++ )
 			{
 				// Originate from within a circle 'scale' inches in diameter.
-				offset = origin + ( 0.5 * scale * normal );
+				offset = origin + ( 0.5f * scale * normal );
 				offset += right * random->RandomFloat( -0.5f, 0.5f ) * scale;
 				offset += up * random->RandomFloat( -0.5f, 0.5f ) * scale;
 
@@ -231,7 +231,7 @@ void FX_BloodSpray( const Vector &origin, const Vector &normal, float scale, uns
 					pParticle->m_uchColor[1]	= MIN( 1.0f, color[1] * colorRamp ) * 255.0f;
 					pParticle->m_uchColor[2]	= MIN( 1.0f, color[2] * colorRamp ) * 255.0f;
 					
-					pParticle->m_uchStartSize	= random->RandomFloat( scale * 0.25, scale );
+					pParticle->m_uchStartSize	= random->RandomFloat( scale * 0.25f, scale );
 					pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 2;
 					
 					pParticle->m_uchStartAlpha	= random->RandomInt( 200, 255 );
@@ -546,9 +546,7 @@ void HunterDamageCallback( const CEffectData &data )
 	// Setup our collision information
 	pGlassEmitter->m_ParticleCollision.Setup( data.m_vOrigin, &data.m_vNormal, flAngularSpray, flMinSpeed, flMaxSpeed, 600.0f, 0.2f );
 
-	Vector	dir, end;
-
-	int	numFlecks = 32;
+	constexpr int	numFlecks = 32;
 
 	Particle3D *pFleckParticle;
 	Vector spawnOffset;
@@ -564,6 +562,7 @@ void HunterDamageCallback( const CEffectData &data )
 
 		pFleckParticle->m_flLifeRemaining	= random->RandomFloat( 2.0f, 3.0f );
 
+		Vector dir;
 		dir[0] = data.m_vNormal[0] + random->RandomFloat( -flAngularSpray, flAngularSpray );
 		dir[1] = data.m_vNormal[1] + random->RandomFloat( -flAngularSpray, flAngularSpray );
 		dir[2] = data.m_vNormal[2] + random->RandomFloat( -flAngularSpray, flAngularSpray );

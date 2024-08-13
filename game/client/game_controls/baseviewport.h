@@ -27,26 +27,26 @@ class IGameEventManager;
 //==============================================================================
 class CBaseViewport : public vgui::EditablePanel, public IViewPort, public IGameEventListener2
 {
-	DECLARE_CLASS_SIMPLE( CBaseViewport, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseViewport, vgui::EditablePanel );
 
 public: 
 	CBaseViewport();
 	virtual ~CBaseViewport();
 
 	virtual IViewPortPanel* CreatePanelByName(const char *szPanelName);
-	virtual IViewPortPanel* FindPanelByName(const char *szPanelName);
-	virtual IViewPortPanel* GetActivePanel( void );
+	IViewPortPanel* FindPanelByName(const char *szPanelName) override;
+	IViewPortPanel* GetActivePanel( void ) override;
 	virtual void RemoveAllPanels( void);
 
-	virtual void ShowPanel( const char *pName, bool state );
-	virtual void ShowPanel( IViewPortPanel* pPanel, bool state );
+	void ShowPanel( const char *pName, bool state ) override;
+	void ShowPanel( IViewPortPanel* pPanel, bool state ) override;
 	virtual bool AddNewPanel( IViewPortPanel* pPanel, char const *pchDebugName );
 	virtual void CreateDefaultPanels( void );
-	virtual void UpdateAllPanels( void );
-	virtual void PostMessageToPanel( const char *pName, KeyValues *pKeyValues );
+	void UpdateAllPanels( void ) override;
+	void PostMessageToPanel( const char *pName, KeyValues *pKeyValues ) override;
 
 	virtual void Start( IGameUIFuncs *pGameUIFuncs, IGameEventManager2 *pGameEventManager );
-	virtual void SetParent(vgui::VPANEL parent);
+	void SetParent(vgui::VPANEL parent) override;
 
 	virtual void ReloadScheme(const char *fromFile);
 	virtual void ActivateClientUI();
@@ -59,7 +59,7 @@ public:
 #endif
 	virtual AnimationController *GetAnimationController() { return m_pAnimController; }
 
-	virtual void ShowBackGround(bool bShow) 
+	void ShowBackGround(bool bShow) override
 	{ 
 #ifndef _XBOX
 		m_pBackGround->SetVisible( bShow ); 
@@ -86,7 +86,7 @@ public:
 	virtual bool IsPanelVisible( const char* panel );
 	
 public: // IGameEventListener:
-	virtual void FireGameEvent( IGameEvent * event);
+	void FireGameEvent( IGameEvent * event) override;
 
 
 protected:
@@ -110,13 +110,13 @@ protected:
 		}
 	private:
 
-		virtual void ApplySchemeSettings(IScheme *pScheme)
+		void ApplySchemeSettings(IScheme *pScheme) override
 		{
 			BaseClass::ApplySchemeSettings(pScheme);
 			SetBgColor(pScheme->GetColor("ViewportBG", Color( 0,0,0,0 ) )); 
 		}
 
-		virtual void PerformLayout() 
+		void PerformLayout() override
 		{
 			int w,h;
 			GetHudSize(w, h);
@@ -127,8 +127,8 @@ protected:
 			BaseClass::PerformLayout();
 		}
 
-		virtual void OnMousePressed(MouseCode code) { }// don't respond to mouse clicks
-		virtual vgui::VPANEL IsWithinTraverse( int x, int y, bool traversePopups )
+		void OnMousePressed(MouseCode code) override { }// don't respond to mouse clicks
+		vgui::VPANEL IsWithinTraverse( int x, int y, bool traversePopups ) override
 		{
 			return ( vgui::VPANEL )0;
 		}
@@ -137,9 +137,9 @@ protected:
 #endif
 protected:
 
-	virtual void Paint();
-	virtual void OnThink(); 
-	virtual void OnScreenSizeChanged(int iOldWide, int iOldTall);
+	void Paint() override;
+	void OnThink() override; 
+	void OnScreenSizeChanged(int iOldWide, int iOldTall) override;
 	void PostMessageToPanel( IViewPortPanel* pPanel, KeyValues *pKeyValues );
 
 protected:

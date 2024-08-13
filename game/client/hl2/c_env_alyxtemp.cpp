@@ -214,7 +214,7 @@ void C_AlyxEmpEffect::UpdateCharging( float percentage )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		float alpha = 255 * percentage;
+		int alpha = 255 * percentage;
 
 		sParticle->m_uchColor[0]	= alpha;
 		sParticle->m_uchColor[1]	= alpha;
@@ -223,7 +223,7 @@ void C_AlyxEmpEffect::UpdateCharging( float percentage )
 		sParticle->m_uchEndAlpha	= 0;
 
 		sParticle->m_uchStartSize	= flScale;
-		sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2.0f;
+		sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2;
 	}
 
 #if 0
@@ -316,7 +316,7 @@ void C_AlyxEmpEffect::UpdateDischarging( void )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		float alpha = 64;
+		unsigned char alpha = 64;
 
 		sParticle->m_uchColor[0]	= alpha;
 		sParticle->m_uchColor[1]	= alpha;
@@ -325,7 +325,7 @@ void C_AlyxEmpEffect::UpdateDischarging( void )
 		sParticle->m_uchEndAlpha	= 0;
 
 		sParticle->m_uchStartSize	= flScale * 4.0f;
-		sParticle->m_uchEndSize		= 0.0f;
+		sParticle->m_uchEndSize		= 0;
 
 		// Base of the core effect
 		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( EMP_PARTICLES ), GetAbsOrigin() );
@@ -348,7 +348,7 @@ void C_AlyxEmpEffect::UpdateDischarging( void )
 		sParticle->m_uchStartAlpha	= alpha;
 		sParticle->m_uchEndAlpha	= 0;
 
-		sParticle->m_uchStartSize	= 0.0f;
+		sParticle->m_uchStartSize	= 0;
 		sParticle->m_uchEndSize		= flScale * 2.0f;
 
 		// Make sure we encompass the complete particle here!
@@ -376,7 +376,7 @@ void C_AlyxEmpEffect::UpdateDischarging( void )
 		sParticle->m_uchEndAlpha	= 0;
 
 		sParticle->m_uchStartSize	= flScale;
-		sParticle->m_uchEndSize		= 0.0f;
+		sParticle->m_uchEndSize		= 0;
 	}
 
 #if 0

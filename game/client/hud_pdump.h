@@ -20,7 +20,7 @@ namespace vgui
 
 class CPDumpPanel : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CPDumpPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPDumpPanel, vgui::Panel );
 
 public:
 	enum
@@ -34,12 +34,12 @@ public:
 
 	DECLARE_MULTIPLY_INHERITED();
 
-	virtual void ApplySettings( KeyValues *inResourceData );
+	void ApplySettings( KeyValues *inResourceData ) override;
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void Paint( void );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void Paint( void ) override;
 
-	virtual bool ShouldDraw();
+	bool ShouldDraw() override;
 
 	// Remove dump info
 	void		Clear();

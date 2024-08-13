@@ -186,7 +186,7 @@ bool CInput::InitializeSteamControllerGameActionSets()
 
 	bool bGotHandle = true;
 
-	for ( int i = 0; i < ARRAYSIZE( g_ControllerDigitalGameActions ); ++i )
+	for ( int i = 0; i < ssize( g_ControllerDigitalGameActions ); ++i )
 	{
 		const char* action = g_ControllerDigitalGameActions[i].action;
 		const char* cmd = g_ControllerDigitalGameActions[i].cmd;
@@ -253,7 +253,7 @@ void CInput::SteamControllerMove( float flFrametime, CUserCmd *cmd )
 
 	uint64 controller = nControllerHandles[0];
 	bool bReceivedInput = false;
-	for ( int i = 0; i < ARRAYSIZE( g_ControllerDigitalActionState ); ++i )
+	for ( int i = 0; i < ssize( g_ControllerDigitalActionState ); ++i )
 	{
 		ControllerDigitalActionToCommand& cmdmap = g_ControllerDigitalGameActions[ i ];
 		ControllerDigitalActionState& state = g_ControllerDigitalActionState[ i ];
@@ -339,7 +339,7 @@ void CInput::SetPreferredGameActionSet( GameActionSet_t action_set )
 	if ( m_PreferredGameActionSet != action_set )
 	{
 		// Debounce. Flag some actions as needing debounce (i.e. must see a "released" state before we'll register another "pressed" input).
-		for ( int i = 0; i < ARRAYSIZE( g_ControllerDigitalActionState ); i++ )
+		for ( int i = 0; i < ssize( g_ControllerDigitalActionState ); i++ )
 		{
 			if ( g_ControllerDigitalGameActions[i].flags & CONTROLLER_ACTION_FLAGS_NEEDS_DEBOUNCE )
 			{
@@ -442,7 +442,7 @@ CON_COMMAND( sc_status, "Show Steam Controller status information" )
 			auto action_set = ::input->GetPreferredGameActionSet();
 			Msg( "Current action set = %d\n", action_set );
 
-			for ( int i = 0; i < ARRAYSIZE( g_ControllerDigitalActionState ); ++i )
+			for ( int i = 0; i < ssize( g_ControllerDigitalActionState ); ++i )
 			{
 				ControllerDigitalActionToCommand& cmdmap = g_ControllerDigitalGameActions[i];
 				ControllerDigitalActionState& state = g_ControllerDigitalActionState[i];

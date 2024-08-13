@@ -36,15 +36,15 @@ public:
 	Beam_t();
 
 	// Methods of IClientRenderable
-	virtual const Vector&	GetRenderOrigin( void );
-	virtual const QAngle&	GetRenderAngles( void );
-	virtual const matrix3x4_t &RenderableToWorldTransform();
-	virtual void			GetRenderBounds( Vector& mins, Vector& maxs );
-	virtual bool			ShouldDraw( void );
-	virtual bool			IsTransparent( void );
-	virtual int				DrawModel( int flags );
-	virtual void			ComputeFxBlend( );
-	virtual int				GetFxBlend( );
+	const Vector&	GetRenderOrigin( void ) override;
+	const QAngle&	GetRenderAngles( void ) override;
+	const matrix3x4_t &RenderableToWorldTransform() override;
+	void			GetRenderBounds( Vector& mins, Vector& maxs ) override;
+	bool			ShouldDraw( void ) override;
+	bool			IsTransparent( void ) override;
+	int				DrawModel( int flags ) override;
+	void			ComputeFxBlend( ) override;
+	int				GetFxBlend( ) override;
 
 	// Resets the beam state
 	void			Reset();

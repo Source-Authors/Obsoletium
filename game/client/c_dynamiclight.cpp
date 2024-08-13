@@ -75,7 +75,7 @@ END_RECV_TABLE()
 //------------------------------------------------------------------------------
 // Purpose :
 //------------------------------------------------------------------------------
-C_DynamicLight::C_DynamicLight(void) : m_pSpotlightEnd(0), m_pDynamicLight(0)
+C_DynamicLight::C_DynamicLight(void) : m_pDynamicLight(0), m_pSpotlightEnd(0)
 {
 }
 
@@ -87,7 +87,7 @@ void C_DynamicLight::OnDataChanged(DataUpdateType_t updateType)
 {
 	if ( updateType == DATA_UPDATE_CREATED )
 	{
-		SetNextClientThink(gpGlobals->curtime + 0.05);
+		SetNextClientThink(gpGlobals->curtime + 0.05f);
 	}
 
 	BaseClass::OnDataChanged( updateType );
@@ -203,7 +203,7 @@ void C_DynamicLight::ClientThink(void)
 		}
 		else
 		{
-			float falloff = 1.0 - pm.fraction;
+			float falloff = 1.0f - pm.fraction;
 			falloff *= falloff;
 
 			m_pSpotlightEnd->style = m_LightStyle;
@@ -232,6 +232,6 @@ void C_DynamicLight::ClientThink(void)
 		}
 	}
 
-	SetNextClientThink(gpGlobals->curtime + 0.001);
+	SetNextClientThink(gpGlobals->curtime + 0.001f);
 }
 

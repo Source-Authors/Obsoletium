@@ -32,7 +32,6 @@ CParticleAttractor *CParticleAttractor::Create( const Vector &center, const char
 void CParticleAttractor::UpdateVelocity( SimpleParticle *pParticle, float timeDelta )
 {
 	float	speed = VectorNormalize( pParticle->m_vecVelocity );
-	Vector	offset;
 
 	Vector dir = ( m_vecAttractorOrigin - pParticle->m_Pos );
 	VectorNormalize( dir );
@@ -49,7 +48,7 @@ void CParticleAttractor::UpdateVelocity( SimpleParticle *pParticle, float timeDe
 //-----------------------------------------------------------------------------
 float CParticleAttractor::UpdateScale( const SimpleParticle *pParticle )
 {
-	return ( ((float)pParticle->m_uchStartSize) * sin( M_PI * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
+	return ( ((float)pParticle->m_uchStartSize) * sin( M_PI_F * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -60,7 +59,7 @@ float CParticleAttractor::UpdateScale( const SimpleParticle *pParticle )
 //-----------------------------------------------------------------------------
 float CParticleAttractor::UpdateAlpha( const SimpleParticle *pParticle )
 {
-	return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
+	return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI_F * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
 }
 
 //-----------------------------------------------------------------------------

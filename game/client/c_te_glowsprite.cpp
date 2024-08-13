@@ -111,7 +111,7 @@ void C_TEGlowSprite::PostDataUpdate( DataUpdateType_t updateType )
 {
 	VPROF( "C_TEGlowSprite::PostDataUpdate" );
 
-	float a = ( 1.0 / 255.0 ) * m_nBrightness;
+	float a = ( 1.0f / 255.0f ) * m_nBrightness;
 	C_LocalTempEntity *ent = tempents->TempSprite( m_vecOrigin, vec3_origin, m_fScale, m_nModelIndex, kRenderTransAdd, 0, a, m_fLife, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP );
 	if ( ent )
 	{
@@ -123,7 +123,7 @@ void C_TEGlowSprite::PostDataUpdate( DataUpdateType_t updateType )
 void TE_GlowSprite( IRecipientFilter& filter, float delay,
 	const Vector* pos, int modelindex, float life, float size, int brightness )
 {
-	float a = ( 1.0 / 255.0 ) * brightness;
+	float a = ( 1.0f / 255.0f ) * brightness;
 	C_LocalTempEntity *ent = tempents->TempSprite( *pos, vec3_origin, size, modelindex, kRenderTransAdd, 0, a, life, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP );
 	if ( ent )
 	{

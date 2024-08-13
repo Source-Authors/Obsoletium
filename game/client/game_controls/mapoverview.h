@@ -46,7 +46,7 @@ typedef bool ( *FnCustomMapOverviewObjectPaint )( int textureID, Vector pos, flo
 
 class CMapOverview : public CHudElement, public vgui::Panel, public IMapOverviewPanel
 {
-	DECLARE_CLASS_SIMPLE( CMapOverview, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMapOverview, vgui::Panel );
 
 public:	
 
@@ -61,11 +61,11 @@ public:
 	CMapOverview( const char *pElementName );
 	virtual ~CMapOverview();
 
-	virtual bool ShouldDraw( void );
-	vgui::Panel *GetAsPanel(){ return this; }
-	virtual bool AllowConCommandsWhileAlive(){return true;}
-	virtual void SetPlayerPreferredMode( int mode ){}
-	virtual void SetPlayerPreferredViewSize( float viewSize ){};
+	bool ShouldDraw( void ) override;
+	vgui::Panel *GetAsPanel() override { return this; }
+	bool AllowConCommandsWhileAlive() override {return true;}
+	void SetPlayerPreferredMode( int mode ) override {}
+	void SetPlayerPreferredViewSize( float ) override {};
 
 protected:	// private structures & types
 
@@ -111,50 +111,50 @@ protected:	// private structures & types
 
 public: // IViewPortPanel interface:
 
-	virtual const char *GetName( void ) { return PANEL_OVERVIEW; }
+	const char *GetName( void ) override { return PANEL_OVERVIEW; }
 	virtual void SetData(KeyValues *data);
-	virtual void Reset();
-	virtual void OnThink();
+	void Reset() override;
+	void OnThink() override;
 	virtual void Update();
 	virtual bool NeedsUpdate( void );
 	virtual bool HasInputElements( void ) { return false; }
 	virtual void ShowPanel( bool bShow );
-	virtual void Init( void );
+	void Init( void ) override;
 
 	// both vgui::Frame and IViewPortPanel define these, so explicitly define them here as passthroughs to vgui
-	vgui::VPANEL GetVPanel( void ) { return BaseClass::GetVPanel(); }
-	virtual bool IsVisible() { return BaseClass::IsVisible(); }
-	virtual void GetBounds(int &x, int &y, int &wide, int &tall) { BaseClass::GetBounds(x, y, wide, tall); }
-	virtual void SetParent(vgui::VPANEL parent) { BaseClass::SetParent(parent); }
+	vgui::VPANEL GetVPanel( void ) override { return BaseClass::GetVPanel(); }
+	bool IsVisible() override { return BaseClass::IsVisible(); }
+	void GetBounds(int &x, int &y, int &wide, int &tall) override { BaseClass::GetBounds(x, y, wide, tall); }
+	void SetParent(vgui::VPANEL parent) override { BaseClass::SetParent(parent); }
 
 public: // IGameEventListener
 
-	virtual void FireGameEvent( IGameEvent *event);
+	void FireGameEvent( IGameEvent *event) override;
 
 public:	// VGUI overrides
 
-	virtual void Paint();
-	virtual void OnMousePressed( vgui::MouseCode code );
-	virtual void ApplySchemeSettings(vgui::IScheme *scheme);
-	virtual void SetVisible(bool state){BaseClass::SetVisible(state);}
+	void Paint() override;
+	void OnMousePressed( vgui::MouseCode code ) override;
+	void ApplySchemeSettings(vgui::IScheme *scheme) override;
+	void SetVisible(bool state) override {BaseClass::SetVisible(state);}
 
 public:
 
-	virtual float GetZoom( void );
-	virtual int GetMode( void );
-	virtual float GetFullZoom( void ){ return m_fFullZoom; }
-	virtual float GetMapScale( void ){ return m_fMapScale; }
+	float GetZoom( void ) override;
+	int GetMode( void ) override;
+	float GetFullZoom( void ) override{ return m_fFullZoom; }
+	float GetMapScale( void ) override{ return m_fMapScale; }
 
 	// Player settings:
 	virtual void ShowPlayerNames(bool state);
 	virtual void ShowPlayerHealth(bool state);
 	virtual void ShowPlayerTracks(float seconds); 
-	virtual void SetPlayerPositions(int index, const Vector &position, const QAngle &angle);
+	void SetPlayerPositions(int index, const Vector &position, const QAngle &angle) override;
 
 	// general settings:
 	virtual void SetMap(const char * map);
 	virtual void SetTime( float time );
-	virtual void SetMode( int mode );
+	void SetMode( int mode ) override;
 	virtual bool SetTeamColor(int team, Color color);
 	virtual void SetFollowAngle(bool state);
 	virtual void SetFollowEntity(int entindex); // 0 = off
@@ -172,7 +172,7 @@ public:
 	virtual void 	SetObjectFlags( int objectID, int flags );
 	virtual void	RemoveObject( int objectID );
 	virtual void	RemoveObjectByIndex( int index );
-	virtual void	FlashEntity( int entityID ){}
+	void	FlashEntity( int entityID ) override{}
 
 	// rules that define if you can see a player on the overview or not
 	virtual bool CanPlayerBeSeen(MapPlayer_t *player);

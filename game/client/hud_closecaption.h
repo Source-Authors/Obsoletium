@@ -28,8 +28,8 @@ struct AsyncCaptionData_t;
 struct AsyncCaption_t
 {
 	AsyncCaption_t() : 
-		m_DataBaseFile( UTL_INVAL_SYMBOL ),
-		m_RequestedBlocks( 0, 0, BlockInfo_t::Less )
+		m_RequestedBlocks( 0, 0, BlockInfo_t::Less ),
+		m_DataBaseFile( UTL_INVAL_SYMBOL )
 	{
 		Q_memset( &m_Header, 0, sizeof( m_Header ) );
 	}
@@ -58,7 +58,7 @@ struct AsyncCaption_t
 		m_Header = rhs.m_Header;
 		m_DataBaseFile = rhs.m_DataBaseFile;
 
-		for ( int i = rhs.m_RequestedBlocks.FirstInorder(); i != rhs.m_RequestedBlocks.InvalidIndex(); i = rhs.m_RequestedBlocks.NextInorder( i ) )
+		for ( auto i = rhs.m_RequestedBlocks.FirstInorder(); i != rhs.m_RequestedBlocks.InvalidIndex(); i = rhs.m_RequestedBlocks.NextInorder( i ) )
 		{
 			m_RequestedBlocks.Insert( rhs.m_RequestedBlocks[ i ] );
 		}
@@ -78,7 +78,7 @@ struct AsyncCaption_t
 //-----------------------------------------------------------------------------
 class CHudCloseCaption : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudCloseCaption, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudCloseCaption, vgui::Panel );
 public:
 	DECLARE_MULTIPLY_INHERITED();
 
@@ -86,22 +86,22 @@ public:
 	virtual 		~CHudCloseCaption();
 
 	// Expire lingering items
-	virtual void	OnTick( void );
+	void	OnTick( void ) override;
 
-	virtual void	LevelInit( void );
+	void	LevelInit( void ) override;
 
-	virtual void	LevelShutdown( void )
+	void	LevelShutdown( void ) override
 	{
 		Reset();
 	}
 
 	// Painting methods
-	virtual void	Paint();
+	void	Paint() override;
 
 	void MsgFunc_CloseCaption(bf_read &msg);
 
 	// Clear all CC data
-	void			Reset( void );
+	void			Reset( void ) override;
 	void			Process( const wchar_t *stream, float duration, char const *tokenstream, bool fromplayer, bool direct = false );
 	
 	bool			ProcessCaption( char const *tokenname, float duration, bool fromplayer = false, bool direct = false );
@@ -139,9 +139,9 @@ public:
 	{
 		CaptionRepeat() :
 			m_nTokenIndex( 0 ),
+			m_nLastEmitTick( 0 ),
 			m_flLastEmitTime( 0 ),
-			m_flInterval( 0 ),
-			m_nLastEmitTick( 0 )
+			m_flInterval( 0 )
 		{
 		}
 		int		m_nTokenIndex;

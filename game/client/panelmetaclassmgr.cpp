@@ -100,8 +100,8 @@ bool ParseCoord( KeyValues *pValues, const char* pFieldName, int& x, int& y )
 	}
 
 	// coords are within 640x480 screen space
-	x = ( x * ( ( float )ScreenWidth() / 640.0 ) );
-	y = ( y * ( ( float )ScreenHeight() / 480.0 ) );
+	x = XRES( x );
+	y = YRES( y );
 
 	return true;
 }
@@ -114,8 +114,7 @@ bool ParseRect( KeyValues *pValues, const char* pFieldName, int& x, int& y, int&
 		return false;
 
 	// Try and scan them in
-	int scanned;
-	scanned = sscanf( pRectString, "%i %i %i %i", &x, &y, &w, &h );
+	int scanned = sscanf( pRectString, "%i %i %i %i", &x, &y, &w, &h );
 	if ( scanned != 4 )
 	{
 		Warning( "Couldn't scan rectangle values from %s\n", pRectString );
@@ -123,10 +122,10 @@ bool ParseRect( KeyValues *pValues, const char* pFieldName, int& x, int& y, int&
 	}
 
 	// coords are within 640x480 screen space
-	x = ( x * ( ( float )ScreenWidth() / 640.0 ) );
-	y = ( y * ( ( float )ScreenHeight() / 480.0 ) );
-	w = ( w * ( ( float )ScreenWidth() / 640.0 ) );
-	h = ( h * ( ( float )ScreenHeight() / 480.0 ) );
+	x = XRES( x );
+	y = YRES( y );
+	w = XRES ( w );
+	h = YRES( h );
 
 	return true;
 }
@@ -245,7 +244,7 @@ void CPanelMetaClassMgrImp::InstallPanelType( const char* pPanelName, IPanelFact
 	Assert( pPanelName && pFactory );
 	
 	// convert to lowercase
-	int len = Q_strlen(pPanelName) + 1;
+	intp len = Q_strlen(pPanelName) + 1;
 	char* pTemp = (char*)stackalloc( len );
 	Q_strncpy( pTemp, pPanelName, len );
 	Q_strnlwr( pTemp, len );
@@ -326,11 +325,11 @@ void CPanelMetaClassMgrImp::LoadMetaClassDefinitionFile( const char *pFileName )
 	MEM_ALLOC_CREDIT();
 
 	// Blat out previous metaclass definitions read in from this file...
-	int i = m_MetaClassKeyValues.Find( pFileName );
+	auto i = m_MetaClassKeyValues.Find( pFileName );
 	if (i != m_MetaClassKeyValues.InvalidIndex() )
 	{
 		// Blow away the previous keyvalues	from that file
-		unsigned short j = m_MetaClassDict.First();
+		auto j = m_MetaClassDict.First();
 		while ( j != m_MetaClassDict.InvalidIndex() )
 		{
 			unsigned short next = m_MetaClassDict.Next(j);

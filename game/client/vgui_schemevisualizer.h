@@ -14,17 +14,17 @@
 
 class CSchemeVisualizer : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CSchemeVisualizer, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSchemeVisualizer, vgui::Frame );
 
 public:
 	CSchemeVisualizer( vgui::Panel *pParent, vgui::IScheme *pViewScheme, const char *pSchemeName );
 	virtual ~CSchemeVisualizer();
 
 private:
-	virtual void	PerformLayout();
+	void	PerformLayout() override;
 
 private:
-	virtual void OnTick();
+	void OnTick() override;
 
 	enum ListDataType_t
 	{

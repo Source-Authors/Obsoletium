@@ -571,8 +571,6 @@ char const *CInput::DescribeAxis( int index )
 	default:
 		return "Unknown";
 	}
-
-	return "Unknown";
 }
 
 

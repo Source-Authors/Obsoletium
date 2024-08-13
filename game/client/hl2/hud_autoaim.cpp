@@ -42,17 +42,17 @@ using namespace vgui;
 
 class CHUDAutoAim : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHUDAutoAim, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHUDAutoAim, vgui::Panel );
 public:
 	CHUDAutoAim( const char *pElementName );
 	virtual ~CHUDAutoAim( void );
 
-	void ApplySchemeSettings( IScheme *scheme );
-	void Init( void );
-	void VidInit( void );
-	bool ShouldDraw( void );
-	virtual void OnThink();
-	virtual void Paint();
+	void ApplySchemeSettings( IScheme *scheme ) override;
+	void Init( void ) override;
+	void VidInit( void ) override;
+	bool ShouldDraw( void ) override;
+	void OnThink() override;
+	void Paint() override;
 
 private:
 	void ResetAlpha() { m_alpha = 0; }

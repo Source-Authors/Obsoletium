@@ -56,9 +56,9 @@ void CSimpleKeyInterp::Interp( Vector &out, float t, const CSimpleKeyInterp &sta
 // Input  : &key - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CSimpleKeyList::Insert( const CSimpleKeyInterp &key )
+intp CSimpleKeyList::Insert( const CSimpleKeyInterp &key )
 {
-	for ( int i = 0; i < m_list.Count(); i++ )
+	for ( intp i = 0; i < m_list.Count(); i++ )
 	{
 		if ( key.GetTime() < m_list[i].GetTime() )
 			return m_list.InsertBefore( i, key );

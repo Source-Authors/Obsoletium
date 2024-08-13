@@ -23,13 +23,13 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CHudWeapon : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudWeapon, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudWeapon, vgui::Panel );
 public:
 	CHudWeapon( const char *pElementName );
 
-	virtual void	ApplySchemeSettings( vgui::IScheme *scheme );
-	virtual void	Paint( void );
-	virtual void	PerformLayout();
+	void	ApplySchemeSettings( vgui::IScheme *scheme ) override;
+	void	Paint( void ) override;
+	void	PerformLayout() override;
 
 private:
 	CHudCrosshair *m_pCrosshair;

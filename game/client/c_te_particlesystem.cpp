@@ -164,9 +164,9 @@ void CTEParticleRenderer::SimulateParticles( CParticleSimulateIterator *pIterato
 		else
 		{
 			float	ft = pIterator->GetTimeDelta();
-			float	time3 = 15.0 * ft;
-			float	time2 = 10.0 * ft;
-			float	time1 = 5.0 * ft;
+			float	time3 = 15.0f * ft;
+			float	time2 = 10.0f * ft;
+			float	time1 = 5.0f * ft;
 			float	dvel = 4* ft ;
 
 			float grav = ft * GetCurrentGravity() * 0.05f;

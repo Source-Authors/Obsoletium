@@ -107,8 +107,8 @@ void C_World::OnDataChanged( DataUpdateType_t updateType )
 			sf.r = 0;
 			sf.g = 0;
 			sf.b = 0;
-			sf.duration = (float)(1<<SCREENFADE_FRACBITS) * 5.0f;
-			sf.holdTime = (float)(1<<SCREENFADE_FRACBITS) * 1.0f;
+			sf.duration = (1<<SCREENFADE_FRACBITS) * 5;
+			sf.holdTime = (1<<SCREENFADE_FRACBITS);
 			sf.fadeFlags = FFADE_IN | FFADE_PURGE;
 			vieweffects->Fade( sf );
 		}

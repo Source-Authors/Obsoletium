@@ -98,7 +98,8 @@ private:
 	void			AddEntityToFrameThinkList( ThinkEntry_t *pEntry, bool bAlwaysChain, int &nCount, ThinkEntry_t **ppFrameThinkList );
 
 private:
-	CUtlLinkedList<ThinkEntry_t, unsigned short>	m_ThinkEntries;
+	// dimhotepus: x86-64 unsigned short -> uintp
+	CUtlLinkedList<ThinkEntry_t, uintp>	m_ThinkEntries;
 
 	CUtlVector<ClientEntityHandle_t>	m_aDeleteList;
 	CUtlVector<ThinkListChanges_t>		m_aChangeList;
@@ -121,7 +122,7 @@ inline ClientThinkHandle_t CClientThinkList::GetInvalidThinkHandle()
 
 inline CClientThinkList::ThinkEntry_t* CClientThinkList::GetThinkEntry( ClientThinkHandle_t hThink )
 {
-	return &m_ThinkEntries[ (unsigned long)hThink ];
+	return &m_ThinkEntries[ (unsigned short)(uintp)hThink ];
 }
 
 

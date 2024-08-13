@@ -266,7 +266,11 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 
 	state.m_fQuadraticAtten = r_flashlightquadratic.GetFloat();
 
+#ifndef HL2_EPISODIC
+	constexpr bool bFlicker = false;
+#else
 	bool bFlicker = false;
+#endif
 
 #ifdef HL2_EPISODIC
 	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)C_BasePlayer::GetLocalPlayer();
@@ -316,7 +320,11 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	}
 #endif // HL2_EPISODIC
 
+#ifndef HL2_EPISODIC
+	if constexpr ( bFlicker == false )
+#else
 	if ( bFlicker == false )
+#endif
 	{
 		state.m_fLinearAtten = r_flashlightlinear.GetFloat();
 		state.m_fHorizontalFOVDegrees = r_flashlightfov.GetFloat();

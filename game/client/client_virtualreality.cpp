@@ -152,7 +152,7 @@ CON_COMMAND( vr_toggle, "Toggles VR mode" )
 // --------------------------------------------------------------------
 // Purpose: Returns true if the matrix is orthonormal
 // --------------------------------------------------------------------
-bool IsOrthonormal ( VMatrix Mat, float fTolerance )
+bool IsOrthonormal ( const VMatrix& Mat, float fTolerance )
 {
 	float LenFwd = Mat.GetForward().Length();
 	float LenUp = Mat.GetUp().Length();
@@ -300,8 +300,7 @@ void			CClientVirtualReality::Disconnect()
 // --------------------------------------------------------------------
 void *			CClientVirtualReality::QueryInterface( const char *pInterfaceName )
 {
-	CreateInterfaceFn factory = Sys_GetFactoryThis();	// This silly construction is necessary
-	return factory( pInterfaceName, NULL );				// to prevent the LTCG compiler from crashing.
+	return Sys_GetFactoryThis()( pInterfaceName, nullptr );
 }
 
 

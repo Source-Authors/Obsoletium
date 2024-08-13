@@ -90,7 +90,7 @@ public:
 		free( pMem );								
 	}
 
-	void operator delete( void *pMem, int nBlockUse, const char *pFileName, int nLine )				
+	void operator delete( void *pMem, int , const char *, int )				
 	{
 		operator delete( pMem );
 	}

@@ -60,23 +60,23 @@ void CSimple3DEmitter::SimulateParticles( CParticleSimulateIterator *pIterator )
 				pParticle->m_vAngles.x = anglemod(pParticle->m_vAngles.x);
 				if (pParticle->m_vAngles.x < 180)
 				{
-					if (fabs(pParticle->m_vAngles.x - 90) > 0.5)
+					if (fabs(pParticle->m_vAngles.x - 90) > 0.5f)
 					{
-						pParticle->m_vAngles.x = 0.5*pParticle->m_vAngles.x + 46;
+						pParticle->m_vAngles.x = 0.5f*pParticle->m_vAngles.x + 46;
 					}
 				}
 				else
 				{
-					if (fabs(pParticle->m_vAngles.x - 270) > 0.5)
+					if (fabs(pParticle->m_vAngles.x - 270) > 0.5f)
 					{
-						pParticle->m_vAngles.x = 0.5*pParticle->m_vAngles.x + 135;
+						pParticle->m_vAngles.x = 0.5f*pParticle->m_vAngles.x + 135;
 					}
 				}
 
 				pParticle->m_vAngles.y = anglemod(pParticle->m_vAngles.y);
-				if (fabs(pParticle->m_vAngles.y) > 0.5)
+				if (fabs(pParticle->m_vAngles.y) > 0.5f)
 				{
-					pParticle->m_vAngles.y = 0.5*pParticle->m_vAngles.z;
+					pParticle->m_vAngles.y = 0.5f*pParticle->m_vAngles.z;
 				}
 			}
 		}

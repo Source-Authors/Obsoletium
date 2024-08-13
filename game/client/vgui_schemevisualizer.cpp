@@ -20,12 +20,12 @@ using namespace vgui;
 
 class CBorderVisualizerPanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( CBorderVisualizerPanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBorderVisualizerPanel, Panel );
 public:
 	CBorderVisualizerPanel( Panel *pParent, const char *pName, IBorder *pBorder );
 
 private:
-	virtual void Paint();
+	void Paint() override;
 
 	IBorder *m_pBorder;
 };
@@ -52,12 +52,12 @@ void CBorderVisualizerPanel::Paint()
 
 class CColorVisualizerPanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( CColorVisualizerPanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorVisualizerPanel, Panel );
 public:
 	CColorVisualizerPanel( Panel *pParent, const char *pName, const Color &color );
 
 private:
-	virtual void Paint();
+	void Paint() override;
 
 	Color m_Color;
 };
@@ -85,9 +85,9 @@ void CColorVisualizerPanel::Paint()
 
 CSchemeVisualizer::CSchemeVisualizer( vgui::Panel *pParent, IScheme *pViewScheme, const char *pSchemeName )
 :	vgui::Frame( pParent, "SchemeVisualizer" ),
-	m_pViewScheme( pViewScheme ),
 	m_pList( NULL ),
-	m_nListDataType( LISTDATATYPE_INVALID )
+	m_nListDataType( LISTDATATYPE_INVALID ),
+	m_pViewScheme( pViewScheme )
 {
 	CFmtStr fmtTitle( "Scheme Visualizer - scheme: \"%s\"", pSchemeName );
 	SetTitle( fmtTitle.Access(), true );

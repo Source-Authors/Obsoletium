@@ -25,14 +25,15 @@ using namespace vgui;
 
 class CHudTrain: public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudTrain, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudTrain, vgui::Panel );
 public:
 	CHudTrain( const char *pElementName );
-	void Init( void );
-	void VidInit( void );
-	bool ShouldDraw( void );
-	virtual void	ApplySchemeSettings( vgui::IScheme *scheme );
-	virtual void	Paint( void );
+
+	void Init( void ) override;
+	void VidInit( void ) override;
+	bool ShouldDraw( void ) override;
+	void ApplySchemeSettings( vgui::IScheme *scheme ) override;
+	void Paint( void ) override;
 	void MsgFunc_Train(bf_read &msg);
 
 private:

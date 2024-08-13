@@ -25,19 +25,19 @@ ConVar player_squad_transient_commands( "player_squad_transient_commands", "1", 
 //-----------------------------------------------------------------------------
 class CHudSquadStatus : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudSquadStatus, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudSquadStatus, vgui::Panel );
 
 public:
 	CHudSquadStatus( const char *pElementName );
-	virtual void Init( void );
-	virtual void Reset( void );
-	virtual void OnThink( void );
-	bool ShouldDraw();
+	void Init( void ) override;
+	void Reset( void ) override;
+	void OnThink( void ) override;
+	bool ShouldDraw() override;
 
 	void MsgFunc_SquadMemberDied(bf_read &msg);
 
 protected:
-	virtual void Paint();
+	void Paint() override;
 
 private:
 	CPanelAnimationVar( vgui::HFont, m_hTextFont, "TextFont", "Default" );
@@ -244,7 +244,7 @@ void CHudSquadStatus::Paint()
 	}
 
 	// draw our squad status
-	wchar_t *text = NULL;
+	const wchar_t *text = NULL;
 	if (m_bSquadMembersFollowing)
 	{
 		text = g_pVGuiLocalize->Find("#Valve_Hud_SQUAD_FOLLOWING");

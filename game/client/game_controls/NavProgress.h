@@ -18,31 +18,31 @@
 class CNavProgress : public vgui::Frame, public IViewPortPanel
 {
 private:
-	DECLARE_CLASS_SIMPLE( CNavProgress, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CNavProgress, vgui::Frame );
 
 public:
 	CNavProgress(IViewPort *pViewPort);
 	virtual ~CNavProgress();
 
-	virtual const char *GetName( void ) { return PANEL_NAV_PROGRESS; }
-	virtual void SetData(KeyValues *data);
-	virtual void Reset();
-	virtual void Update();
-	virtual bool NeedsUpdate( void ) { return false; }
-	virtual bool HasInputElements( void ) { return true; }
-	virtual void ShowPanel( bool bShow );
+	const char *GetName( void ) override { return PANEL_NAV_PROGRESS; }
+	void SetData(KeyValues *data) override;
+	void Reset() override;
+	void Update() override;
+	bool NeedsUpdate( void ) override { return false; }
+	bool HasInputElements( void ) override { return true; }
+	void ShowPanel( bool bShow ) override;
 
 	// both vgui::Frame and IViewPortPanel define these, so explicitly define them here as passthroughs to vgui
-	vgui::VPANEL GetVPanel( void ) { return BaseClass::GetVPanel(); }
-  	virtual bool IsVisible() { return BaseClass::IsVisible(); }
-  	virtual void SetParent( vgui::VPANEL parent ) { BaseClass::SetParent( parent ); }
+	vgui::VPANEL GetVPanel( void ) override { return BaseClass::GetVPanel(); }
+  	bool IsVisible() override { return BaseClass::IsVisible(); }
+  	void SetParent( vgui::VPANEL parent ) override { BaseClass::SetParent( parent ); }
 
-	virtual GameActionSet_t GetPreferredActionSet() { return GAME_ACTION_SET_NONE; }
+	GameActionSet_t GetPreferredActionSet() override { return GAME_ACTION_SET_NONE; }
 
 public:
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void PerformLayout();
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void PerformLayout() override;
 	void Init( const char *title, int numTicks, int currentTick );
 
 protected:

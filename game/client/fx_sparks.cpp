@@ -329,7 +329,7 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 	// Big sparks.
 	//
 	Vector	dir;
-	int		numSparks = nMagnitude * nMagnitude * random->RandomFloat( 2, 4 );
+	int		numSparks = nMagnitude * nMagnitude * random->RandomInt( 2, 4 );
 
 	int i;
 	TrailParticle	*pParticle;
@@ -436,7 +436,7 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 	//
 	// Caps
 	//
-	CSmartPtr<CSimpleGlowEmitter> pSimple = CSimpleGlowEmitter::Create( "FX_ElectricSpark 3", pos, gpGlobals->curtime + 0.2 );
+	CSmartPtr<CSimpleGlowEmitter> pSimple = CSimpleGlowEmitter::Create( "FX_ElectricSpark 3", pos, gpGlobals->curtime + 0.2f );
 
 	// NOTE: None of these will render unless the effect is visible!
 	//
@@ -461,7 +461,7 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 	sParticle->m_uchEndAlpha	= 255;
 	sParticle->m_uchStartSize	= nMagnitude * random->RandomInt( 4, 8 );
 	sParticle->m_uchEndSize		= 0;
-	sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	sParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 	sParticle->m_flRollDelta	= 0.0f;
 	
 	sParticle = (SimpleParticle *) pSimple->AddParticle( sizeof( SimpleParticle ), pSimple->GetPMaterial( "effects/yellowflare_noz" ), pos );
@@ -474,7 +474,7 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 	
 	sParticle->m_vecVelocity.Init();
 
-	float	fColor = random->RandomInt( 32, 64 );
+	int	fColor = random->RandomInt( 32, 64 );
 	sParticle->m_uchColor[0]	= fColor;
 	sParticle->m_uchColor[1]	= fColor;
 	sParticle->m_uchColor[2]	= fColor;
@@ -515,7 +515,7 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 	sParticle->m_uchStartAlpha	= random->RandomInt( 16, 32 );
 	sParticle->m_uchEndAlpha	= 0;
 	sParticle->m_uchStartSize	= random->RandomInt( 4, 8 );
-	sParticle->m_uchEndSize		= sParticle->m_uchStartSize*4.0f;
+	sParticle->m_uchEndSize		= sParticle->m_uchStartSize*4;
 	sParticle->m_flRoll			= random->RandomInt( 0, 360 );
 	sParticle->m_flRollDelta	= random->RandomFloat( -2.0f, 2.0f );
 
@@ -917,7 +917,7 @@ void FX_EnergySplash( const Vector &pos, const Vector &normal, int nFlags )
 
 		sParticle->m_vecVelocity = Vector( Helper_RandomFloat( -4.0f, 4.0f ), Helper_RandomFloat( -4.0f, 4.0f ), Helper_RandomFloat( 16.0f, 64.0f ) );
 		
-		sParticle->m_uchStartSize	= random->RandomFloat( 2, 4 );
+		sParticle->m_uchStartSize	= random->RandomInt( 2, 4 );
 
 		sParticle->m_flDieTime = random->RandomFloat( 0.4f, 0.6f );
 		
@@ -980,7 +980,7 @@ void FX_MicroExplosion( Vector &position, Vector &normal )
 	}
 
 	TrailParticle	*pParticle;
-	Vector	dir, vOfs;
+	Vector	dir;
 	float	length = 0.2f;
 
 	//Fast lines
@@ -1170,10 +1170,10 @@ void FX_Explosion( Vector& origin, Vector& normal, char materialType )
 	{
 		pSphereParticle->m_flLifetime		= 0.0f;
 		pSphereParticle->m_flDieTime		= 0.3f;
-		pSphereParticle->m_uchStartAlpha	= 150.0;
-		pSphereParticle->m_uchEndAlpha		= 64.0;
-		pSphereParticle->m_uchStartSize		= 0.0;
-		pSphereParticle->m_uchEndSize		= 255.0;
+		pSphereParticle->m_uchStartAlpha	= 150;
+		pSphereParticle->m_uchEndAlpha		= 64;
+		pSphereParticle->m_uchStartSize		= 0;
+		pSphereParticle->m_uchEndSize		= 255;
 		pSphereParticle->m_vecVelocity		= Vector(0,0,0);
 
 		float colorRamp = random->RandomFloat( 0.75f, 1.5f );
@@ -1184,7 +1184,7 @@ void FX_Explosion( Vector& origin, Vector& normal, char materialType )
 
 	// Throw some smoke balls out around the normal
 	int numBalls = 12;
-	Vector vecRight, vecForward, vecUp;
+	Vector vecRight, vecUp;
 	QAngle vecAngles;
 	VectorAngles( normal, vecAngles );
 	AngleVectors( vecAngles, NULL, &vecRight, &vecUp );
@@ -1195,10 +1195,10 @@ void FX_Explosion( Vector& origin, Vector& normal, char materialType )
 		{
 			pParticle->m_flLifetime		= 0.0f;
 			pParticle->m_flDieTime		= 0.25f;
-			pParticle->m_uchStartAlpha	= 128.0;
-			pParticle->m_uchEndAlpha	= 64.0;
-			pParticle->m_uchStartSize	= 16.0;
-			pParticle->m_uchEndSize		= 64.0;
+			pParticle->m_uchStartAlpha	= 128;
+			pParticle->m_uchEndAlpha	= 64;
+			pParticle->m_uchStartSize	= 16;
+			pParticle->m_uchEndSize		= 64;
 
 			float flAngle = ((float)i * M_PI * 2) / numBalls;
 			float x = cos( flAngle );
@@ -1312,7 +1312,7 @@ void FX_ConcussiveExplosion( Vector &origin, Vector &normal )
 		pParticle->m_flRoll			= random->RandomFloat( 180, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -1, 1 );
 
-		int colorRamp = random->RandomFloat( 235, 255 );
+		int colorRamp = random->RandomInt( 235, 255 );
 		pParticle->m_uchColor[0] = colorRamp;
 		pParticle->m_uchColor[1] = colorRamp;
 		pParticle->m_uchColor[2] = colorRamp;

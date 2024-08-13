@@ -35,7 +35,7 @@ class C_BaseCombatWeapon;
 //-----------------------------------------------------------------------------
 class CHudHistoryResource : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudHistoryResource, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudHistoryResource, vgui::Panel );
 private:
 	struct HIST_ITEM 
 	{
@@ -61,12 +61,12 @@ public:
 	CHudHistoryResource( const char *pElementName );
 
 	// CHudElement overrides
-	virtual void Init( void );
-	virtual void Reset( void );
-	virtual bool ShouldDraw( void );
-	virtual void Paint( void );
+	void Init( void ) override;
+	void Reset( void ) override;
+	bool ShouldDraw( void ) override;
+	void Paint( void ) override;
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	void	AddToHistory( int iType, int iId, int iCount = 0 );
 	void	AddToHistory( int iType, const char *szName, int iCount = 0 );

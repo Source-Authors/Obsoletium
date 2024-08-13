@@ -141,7 +141,7 @@ void C_TestTraceline::DrawCube( Vector& center, unsigned char* pColor )
 int C_TestTraceline::DrawModel( int flags )
 {
 	trace_t tr;
-	Vector forward, right, up, endpos, hitpos;
+	Vector forward, right, up, endpos;
 	AngleVectors (GetAbsAngles(), &forward, &right, &up);
 	endpos = GetAbsOrigin() + forward * MAX_TRACE_LENGTH;
 

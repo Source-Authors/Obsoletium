@@ -30,14 +30,15 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CHudGeiger: public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudGeiger, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudGeiger, vgui::Panel );
 public:
 	CHudGeiger( const char *pElementName );
-	void Init( void );
-	void VidInit( void );
-	bool ShouldDraw( void );
-	virtual void	ApplySchemeSettings( vgui::IScheme *scheme );
-	virtual void	Paint( void );
+
+	void Init( void ) override;
+	void VidInit( void ) override;
+	bool ShouldDraw( void ) override;
+	void	ApplySchemeSettings( vgui::IScheme *scheme ) override;
+	void	Paint( void ) override;
 	void MsgFunc_Geiger(bf_read &msg);
 	
 private:

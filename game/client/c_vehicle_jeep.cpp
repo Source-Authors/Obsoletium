@@ -257,7 +257,7 @@ void C_PropJeep::DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicleEye
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_PropJeep::OnEnteredVehicle( C_BasePlayer *pPlayer )
+void C_PropJeep::OnEnteredVehicle( C_BaseCombatCharacter *pPlayer )
 {
 	int eyeAttachmentIndex = LookupAttachment( "vehicle_driver_eyes" );
 	Vector vehicleEyeOrigin;
@@ -267,6 +267,9 @@ void C_PropJeep::OnEnteredVehicle( C_BasePlayer *pPlayer )
 	m_vecLastEyeTarget = vehicleEyeOrigin;
 	m_vecLastEyePos = vehicleEyeOrigin;
 	m_vecEyeSpeed = vec3_origin;
+
+	// dimhotepus: Notify base.
+	BaseClass::OnEnteredVehicle(pPlayer);
 }
 
 //-----------------------------------------------------------------------------

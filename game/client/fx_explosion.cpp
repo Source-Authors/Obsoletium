@@ -366,7 +366,7 @@ void C_BaseExplosionEffect::CreateCore( void )
 				pParticle->m_uchStartSize	= random->RandomInt( 32, 64 );
 				pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 2;
 
-				pParticle->m_uchStartAlpha	= random->RandomFloat( 128, 255 );
+				pParticle->m_uchStartAlpha	= random->RandomInt( 128, 255 );
 				pParticle->m_uchEndAlpha	= 0;
 				
 				pParticle->m_flRoll			= random->RandomInt( 0, 360 );
@@ -392,7 +392,7 @@ void C_BaseExplosionEffect::CreateCore( void )
 		int	numRingSprites = 8;
 #endif
 
-		float flIncr = (2*M_PI) / (float) numRingSprites; // Radians
+		float flIncr = (2*M_PI_F) / (float) numRingSprites; // Radians
 		float flYaw = 0.0f;
 
 		for ( i = 0; i < numRingSprites; i++ )
@@ -434,7 +434,7 @@ void C_BaseExplosionEffect::CreateCore( void )
 				pParticle->m_uchStartSize	= random->RandomInt( 16, 32 );
 				pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 4;
 
-				pParticle->m_uchStartAlpha	= random->RandomFloat( 16, 32 );
+				pParticle->m_uchStartAlpha	= random->RandomInt( 16, 32 );
 				pParticle->m_uchEndAlpha	= 0;
 				
 				pParticle->m_flRoll			= random->RandomInt( 0, 360 );
@@ -1192,7 +1192,6 @@ void C_WaterExplosionEffect::CreateMisc( void )
 
 	int		numDrops = 32;
 	float	length = 0.1f;
-	Vector	vForward, vRight, vUp;
 	Vector	offDir;
 
 	TrailParticle	*tParticle;

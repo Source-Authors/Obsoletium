@@ -371,7 +371,7 @@ void CClientTools::DetachFromEntity( EntitySearchResult entityToDetach )
 		return;
 	}
 
-	int idx = m_Handles.Find( HToolEntry_t( handle ) );
+	auto idx = m_Handles.Find( HToolEntry_t( handle ) );
 	if ( idx == m_Handles.InvalidIndex() )
 	{
 		Assert( 0 );
@@ -390,7 +390,7 @@ void CClientTools::DetachFromEntity( EntitySearchResult entityToDetach )
 //-----------------------------------------------------------------------------
 C_BaseEntity *CClientTools::LookupEntity( HTOOLHANDLE handle )
 {
-	int idx = m_Handles.Find( HToolEntry_t( handle ) );
+	auto idx = m_Handles.Find( HToolEntry_t( handle ) );
 	if ( idx == m_Handles.InvalidIndex() )
 		return NULL;
 
@@ -437,7 +437,7 @@ EntitySearchResult CClientTools::NextEntity( EntitySearchResult currentEnt )
 //-----------------------------------------------------------------------------
 void CClientTools::SetEnabled( HTOOLHANDLE handle, bool enabled )
 {
-	int idx = m_Handles.Find( HToolEntry_t( handle ) );
+	auto idx = m_Handles.Find( HToolEntry_t( handle ) );
 	if ( idx == m_Handles.InvalidIndex() )
 		return;
 
@@ -459,7 +459,7 @@ void CClientTools::SetEnabled( HTOOLHANDLE handle, bool enabled )
 //-----------------------------------------------------------------------------
 void CClientTools::SetRecording( HTOOLHANDLE handle, bool recording )
 {
-	int idx = m_Handles.Find( HToolEntry_t( handle ) );
+	auto idx = m_Handles.Find( HToolEntry_t( handle ) );
 	if ( idx == m_Handles.InvalidIndex() )
 		return;
 
@@ -472,7 +472,7 @@ void CClientTools::SetRecording( HTOOLHANDLE handle, bool recording )
 
 bool CClientTools::ShouldRecord( HTOOLHANDLE handle )
 {
-	int idx = m_Handles.Find( HToolEntry_t( handle ) );
+	auto idx = m_Handles.Find( HToolEntry_t( handle ) );
 	if ( idx == m_Handles.InvalidIndex() )
 		return false;
 
@@ -486,7 +486,7 @@ bool CClientTools::ShouldRecord( HTOOLHANDLE handle )
 //-----------------------------------------------------------------------------
 int CClientTools::GetModelIndex( HTOOLHANDLE handle )
 {
-	int idx = m_Handles.Find( HToolEntry_t( handle ) );
+	auto idx = m_Handles.Find( HToolEntry_t( handle ) );
 	if ( idx == m_Handles.InvalidIndex() )
 		return NULL;
 
@@ -505,7 +505,7 @@ int CClientTools::GetModelIndex( HTOOLHANDLE handle )
 //-----------------------------------------------------------------------------
 const char* CClientTools::GetModelName( HTOOLHANDLE handle )
 {
-	int idx = m_Handles.Find( HToolEntry_t( handle ) );
+	auto idx = m_Handles.Find( HToolEntry_t( handle ) );
 	if ( idx == m_Handles.InvalidIndex() )
 		return NULL;
 
@@ -524,9 +524,9 @@ const char* CClientTools::GetModelName( HTOOLHANDLE handle )
 //-----------------------------------------------------------------------------
 const char* CClientTools::GetClassname( HTOOLHANDLE handle )
 {
-	int idx = m_Handles.Find( HToolEntry_t( handle ) );
+	auto idx = m_Handles.Find( HToolEntry_t( handle ) );
 	if ( idx == m_Handles.InvalidIndex() )
-		return NULL;
+		return nullptr;
 
 	HToolEntry_t &entry = m_Handles[ idx ];
 	if ( entry.m_hEntity )
@@ -534,7 +534,7 @@ const char* CClientTools::GetClassname( HTOOLHANDLE handle )
 		return STRING( entry.m_hEntity->GetClassname() );
 	}
 	Assert( 0 );
-	return NULL;
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -687,7 +687,7 @@ bool CClientTools::IsNPC( EntitySearchResult currentEnt )
 
 Vector CClientTools::GetAbsOrigin( HTOOLHANDLE handle )
 {
-	int idx = m_Handles.Find( HToolEntry_t( handle ) );
+	auto idx = m_Handles.Find( HToolEntry_t( handle ) );
 	if ( idx == m_Handles.InvalidIndex() )
 		return vec3_origin;
 
@@ -702,7 +702,7 @@ Vector CClientTools::GetAbsOrigin( HTOOLHANDLE handle )
 
 QAngle CClientTools::GetAbsAngles( HTOOLHANDLE handle )
 {
-	int idx = m_Handles.Find( HToolEntry_t( handle ) );
+	auto idx = m_Handles.Find( HToolEntry_t( handle ) );
 	if ( idx == m_Handles.InvalidIndex() )
 		return vec3_angle;
 

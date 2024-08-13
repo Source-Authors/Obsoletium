@@ -266,9 +266,9 @@ protected:
 	int						AddFileToDirectoryTree( SoundDirectory_t *dir, char const *relative );
 	void					RecursiveFindMP3Files( SoundDirectory_t *root, char const *current, char const *pathID );
 
-	int						AddSong( char const *relative, int dirnum );
+	intp					AddSong( char const *relative, int dirnum );
 	void					RemoveFSSongs(); // Remove all non-built-in .mp3s
-	int						FindSong( char const *relative );
+	intp					FindSong( char const *relative );
 
 	void					PlaySong( int songIndex, float skipTime = 0.0f );
 	void					GetLocalCopyOfSong( const MP3File_t &mp3, char *outsong, size_t outlen );
@@ -282,7 +282,7 @@ protected:
 
 	void					AddGameSounds( bool recurse );
 	SoundDirectory_t		*AddSoundDirectory( char const *fullpath, bool recurse );
-	int						FindSoundDirectory( char const *fullpath );
+	intp					FindSoundDirectory( char const *fullpath );
 
 	bool					RestoreDb( char const *filename );
 	void					SaveDb( char const *filename );

@@ -37,11 +37,12 @@ public:
 
 public:
 
-	void UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd );
-	void DampenEyePosition( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeAngles );
+	void UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd ) override;
+	void DampenEyePosition( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeAngles ) override;
 
-	void OnEnteredVehicle( C_BasePlayer *pPlayer );
-	void Simulate( void );
+	// dimhotepus: Override base one to notify haptic device.
+	void OnEnteredVehicle( C_BaseCombatCharacter *pPlayer ) override;
+	void Simulate( void ) override;
 
 private:
 

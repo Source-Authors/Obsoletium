@@ -33,26 +33,26 @@ class TeamFortressViewport;
 class CTeamMenu : public vgui::Frame, public IViewPortPanel
 {
 private:
-	DECLARE_CLASS_SIMPLE( CTeamMenu, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CTeamMenu, vgui::Frame );
 
 public:
 	CTeamMenu(IViewPort *pViewPort);
 	virtual ~CTeamMenu();
 
-	virtual const char *GetName( void ) { return PANEL_TEAM; }
-	virtual void SetData(KeyValues *data) {};
-	virtual void Reset() {};
-	virtual void Update();
-	virtual bool NeedsUpdate( void ) { return false; }
-	virtual bool HasInputElements( void ) { return true; }
-	virtual void ShowPanel( bool bShow );
+	const char *GetName( void ) override { return PANEL_TEAM; }
+	void SetData(KeyValues *) override {};
+	void Reset() override {};
+	void Update() override;
+	bool NeedsUpdate( void ) override { return false; }
+	bool HasInputElements( void ) override { return true; }
+	void ShowPanel( bool bShow ) override;
 
 	// both vgui::Frame and IViewPortPanel define these, so explicitly define them here as passthroughs to vgui
-	vgui::VPANEL GetVPanel( void ) { return BaseClass::GetVPanel(); }
-  	virtual bool IsVisible() { return BaseClass::IsVisible(); }
-	virtual void SetParent( vgui::VPANEL parent ) { BaseClass::SetParent( parent ); }
+	vgui::VPANEL GetVPanel( void ) override { return BaseClass::GetVPanel(); }
+  	bool IsVisible() override { return BaseClass::IsVisible(); }
+	void SetParent( vgui::VPANEL parent ) override { BaseClass::SetParent( parent ); }
 
-	virtual GameActionSet_t GetPreferredActionSet() { return GAME_ACTION_SET_IN_GAME_HUD; }
+	GameActionSet_t GetPreferredActionSet() override { return GAME_ACTION_SET_IN_GAME_HUD; }
 
 public:
 	
@@ -63,8 +63,8 @@ protected:
 	// int GetNumTeams() { return m_iNumTeams; }
 	
 	// VGUI2 overrides
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
-	virtual void OnKeyCodePressed(vgui::KeyCode code);
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
+	void OnKeyCodePressed(vgui::KeyCode code) override;
 
 	// helper functions
 	virtual void SetLabelText(const char *textEntryName, const char *text);

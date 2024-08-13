@@ -42,22 +42,22 @@ static bool g_bTracingVsCommentaryNodes = false;
 //-----------------------------------------------------------------------------
 class CHudCommentary : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudCommentary, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudCommentary, vgui::Panel );
 public:
 	CHudCommentary( const char *name );
 
-	virtual void Init( void );
-	virtual void VidInit( void );
-	virtual void LevelInit( void ) { g_CommentaryNodes.Purge(); }
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void Init( void ) override;
+	void VidInit( void ) override;
+	void LevelInit( void ) override { g_CommentaryNodes.Purge(); }
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	void StartCommentary( C_PointCommentaryNode *pNode, char *pszSpeakers, int iNode, int iNodeMax, float flStartTime, float flEndTime );
 	void StopCommentary( void );
 	bool IsTheActiveNode( C_PointCommentaryNode *pNode ) { return (pNode == m_hActiveNode); }
 
 	// vgui overrides
-	virtual void Paint( void );
-	virtual bool ShouldDraw( void );
+	void Paint( void ) override;
+	bool ShouldDraw( void ) override;
 
 private:
 	CHandle<C_PointCommentaryNode> m_hActiveNode;
@@ -364,7 +364,7 @@ DECLARE_HUDELEMENT( CHudCommentary );
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CHudCommentary::CHudCommentary( const char *name ) : vgui::Panel( NULL, "HudCommentary" ), CHudElement( name )
+CHudCommentary::CHudCommentary( const char *name ) : CHudElement( name ), vgui::Panel( NULL, "HudCommentary" )
 {
 	vgui::Panel *pParent = g_pClientMode->GetViewport();
 	SetParent( pParent );

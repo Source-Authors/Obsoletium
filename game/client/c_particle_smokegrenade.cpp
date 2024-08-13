@@ -244,31 +244,12 @@ static inline int GetWorldPointContents(const Vector &vPos)
 	#endif
 }
 
-static inline void WorldTraceLine( const Vector &start, const Vector &end, int contentsMask, trace_t *trace )
-{
-	#if defined(PARTICLEPROTOTYPE_APP)
-		trace->fraction = 1;
-	#else
-		UTIL_TraceLine(start, end, contentsMask, NULL, COLLISION_GROUP_NONE, trace);
-	#endif
-}
-
 static inline Vector EngineGetLightForPoint(const Vector &vPos)
 {
 	#if defined(PARTICLEPROTOTYPE_APP)
 		return Vector(1,1,1);
 	#else
 		return engine->GetLightForPoint(vPos, true);
-	#endif
-}
-
-static inline const Vector& EngineGetVecRenderOrigin()
-{
-	#if defined(PARTICLEPROTOTYPE_APP)
-		static Vector dummy(0,0,0);
-		return dummy;
-	#else
-		return CurrentViewOrigin();
 	#endif
 }
 
@@ -888,27 +869,6 @@ void C_ParticleSmokeGrenade::FillVolume()
 
 						// Cast some rays and if it's too close to anything, fade its alpha down.
 						pInfo->m_FadeAlpha = 1;
-
-						/*for(int i=0; i < NUM_FADE_PLANES; i++)
-						{
-							trace_t trace;
-							WorldTraceLine(vPos, vPos + s_FadePlaneDirections[i] * 100, MASK_SOLID_BRUSHONLY, &trace);
-							if(trace.fraction < 1.0f)
-							{
-								float dist = DotProduct(trace.plane.normal, vPos) - trace.plane.dist;
-								if(dist < 0)
-								{
-									pInfo->m_FadeAlpha = 0;
-								}
-								else if(dist < SMOKEPARTICLE_SIZE)
-								{
-									float alphaScale = dist / SMOKEPARTICLE_SIZE;
-									alphaScale *= alphaScale * alphaScale;
-									pInfo->m_FadeAlpha *= alphaScale;
-								}
-							}
-						}*/
-
 						pInfo->m_pParticle = pParticle;
 						pInfo->m_TradeIndex = -1;
 					}
@@ -969,7 +929,8 @@ void C_ParticleSmokeGrenade::CleanupToolRecordingState( KeyValues *msg )
  		pLifetime->SetFloat( "maxLifetime", m_FadeEndTime );
 
 		KeyValues *pVelocity = pInitializers->FindKey( "DmeAttachmentVelocityInitializer", true );
-		pVelocity->SetPtr( "entindex", (void*)entindex() );
+		// dimhotepus: SetPtr -> SetInt
+		pVelocity->SetInt( "entindex", entindex() );
  		pVelocity->SetFloat( "minRandomSpeed", 10 );
  		pVelocity->SetFloat( "maxRandomSpeed", 20 );
 

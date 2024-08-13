@@ -240,7 +240,7 @@ ModelPoseDebugInfo::InfoText * ModelPoseDebugInfo::LookupInfoText( InfoText *x )
 
 void ModelPoseDebugInfo::PrintPendingInfoText( int &rnPosPrint )
 {
-	con_nprint_s nxPrn = { 0 };
+	con_nprint_s nxPrn = {};
 	nxPrn.time_to_live = -1;
 	nxPrn.color[0] = 1.0f, nxPrn.color[1] = 1.0f, nxPrn.color[2] = 1.0f;
 	nxPrn.fixed_width_font = true;
@@ -447,7 +447,7 @@ void CPoseDebuggerImpl::StartBlending( IClientNetworkable *pEntity, const CStudi
 	mpi.m_iEntNum = iEntNum;
 	m_mapModel.Insert( pStudioHdr, mpi );
 
-	con_nprint_s nxPrn = { 0 };
+	con_nprint_s nxPrn = {};
 	nxPrn.index = m_nPosPrint;
 	nxPrn.time_to_live = -1;
 	nxPrn.color[0] = 0.9f, nxPrn.color[1] = 1.0f, nxPrn.color[2] = 0.9f;

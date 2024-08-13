@@ -56,7 +56,7 @@ public:
 	//Alpha
 	virtual float UpdateAlpha( const SimpleParticle *pParticle )
 	{
-		return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
+		return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI_F * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
 	}
 
 private:
@@ -82,7 +82,7 @@ public:
 	//Alpha
 	virtual float UpdateAlpha( const SimpleParticle *pParticle )
 	{
-		return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
+		return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI_F * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
 	}
 
 	//Color
@@ -418,7 +418,8 @@ void C_SmokeTrail::CleanupToolRecordingState( KeyValues *msg )
 
 		// FIXME: Until we can interpolate ent logs during emission, this can't work
 		KeyValues *pPosition = pInitializers->FindKey( "DmePositionPointToEntityInitializer", true );
-		pPosition->SetPtr( "entindex", (void*)pEnt->entindex() );
+		// dimhotepus: SetPtr -> SetInt
+		pPosition->SetInt( "entindex", pEnt->entindex() );
 		pPosition->SetInt( "attachmentIndex", m_nAttachment );
 		pPosition->SetFloat( "randomDist", m_SpawnRadius );
 		pPosition->SetFloat( "startx", pEnt->GetAbsOrigin().x );
@@ -430,7 +431,8 @@ void C_SmokeTrail::CleanupToolRecordingState( KeyValues *msg )
  		pLifetime->SetFloat( "maxLifetime", m_ParticleLifetime );
 
 		KeyValues *pVelocity = pInitializers->FindKey( "DmeAttachmentVelocityInitializer", true );
-		pVelocity->SetPtr( "entindex", (void*)entindex() );
+		// dimhotepus: SetPtr -> SetInt
+		pVelocity->SetInt( "entindex", entindex() );
 		pVelocity->SetFloat( "minAttachmentSpeed", m_MinDirectedSpeed );
  		pVelocity->SetFloat( "maxAttachmentSpeed", m_MaxDirectedSpeed );
  		pVelocity->SetFloat( "minRandomSpeed", m_MinSpeed );
@@ -804,8 +806,8 @@ void C_RocketTrail::Update( float fTimeDelta )
 				pParticle->m_uchColor[1]	= offsetColor[1]*255.0f;
 				pParticle->m_uchColor[2]	= offsetColor[2]*255.0f;
 				
-				pParticle->m_uchStartSize	= 8.0f;
-				pParticle->m_uchEndSize		= 32.0f;
+				pParticle->m_uchStartSize	= 8;
+				pParticle->m_uchEndSize		= 32;
 				
 				pParticle->m_uchStartAlpha	= 255;
 				pParticle->m_uchEndAlpha	= 0;
@@ -883,7 +885,7 @@ Vector SporeEffect::UpdateColor( const SimpleParticle *pParticle )
 //-----------------------------------------------------------------------------
 float SporeEffect::UpdateAlpha( const SimpleParticle *pParticle )
 {
-	return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
+	return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI_F * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
 }
 
 //==================================================
@@ -1298,8 +1300,8 @@ void C_SporeTrail::AddParticles( void )
 	sParticle->m_uchStartAlpha	= Helper_RandomInt( 64, 128 );
 	sParticle->m_uchEndAlpha	= 0;
 
-	sParticle->m_uchStartSize	= 1.0f;
-	sParticle->m_uchEndSize		= 1.0f;
+	sParticle->m_uchStartSize	= 1;
+	sParticle->m_uchEndSize		= 1;
 	
 	sParticle->m_vecVelocity	= RandomVector( -8.0f, 8.0f );
 }
@@ -1507,7 +1509,6 @@ void C_FireTrail::Update( float fTimeDelta )
 		numPuffs = clamp( numPuffs, 1, 32 );
 
 		SimpleParticle	*pParticle;
-		Vector			offsetColor;
 		float			step = moveLength / numPuffs;
 
 		//Fill in the gaps
@@ -1528,12 +1529,12 @@ void C_FireTrail::Update( float fTimeDelta )
 				pParticle->m_vecVelocity *= random->RandomFloat( MIN_SPEED, MAX_SPEED );
 				pParticle->m_vecVelocity[2] += 50;//random->RandomFloat( 32, 64 );
 				
-				pParticle->m_uchColor[0]	= 255.0f;
-				pParticle->m_uchColor[1]	= 255.0f;
-				pParticle->m_uchColor[2]	= 255.0f;
+				pParticle->m_uchColor[0]	= 255;
+				pParticle->m_uchColor[1]	= 255;
+				pParticle->m_uchColor[2]	= 255;
 				
-				pParticle->m_uchStartSize	= STARTSIZE * 2.0f;
-				pParticle->m_uchEndSize		= STARTSIZE * 0.5f;
+				pParticle->m_uchStartSize	= STARTSIZE * 2;
+				pParticle->m_uchEndSize		= STARTSIZE / 2;
 				
 				pParticle->m_uchStartAlpha	= 255; 
 				pParticle->m_uchEndAlpha	= 0;
@@ -1560,12 +1561,12 @@ void C_FireTrail::Update( float fTimeDelta )
 			pParticle->m_vecVelocity *= random->RandomFloat( MIN_SPEED, MAX_SPEED );
 			pParticle->m_vecVelocity[2] += random->RandomFloat( 50, 100 );
 			
-			pParticle->m_uchColor[0]	= 255.0f * 0.5f;
-			pParticle->m_uchColor[1]	= 245.0f * 0.5f;
-			pParticle->m_uchColor[2]	= 205.0f * 0.5f;
+			pParticle->m_uchColor[0]	= 255 / 2;
+			pParticle->m_uchColor[1]	= 245 / 2;
+			pParticle->m_uchColor[2]	= 205 / 2;
 			
 			pParticle->m_uchStartSize	= 16 * random->RandomFloat( 0.75f, 1.25f );
-			pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 2.5f;
+			pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 5 / 2;
 			
 			pParticle->m_uchStartAlpha	= 64; 
 			pParticle->m_uchEndAlpha	= 0;
@@ -1599,12 +1600,12 @@ public:
 	//Alpha
 	virtual float UpdateAlpha( const SimpleParticle *pParticle )
 	{
-		return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
+		return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI_F * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
 	}
 
 	virtual	void	UpdateVelocity( SimpleParticle *pParticle, float timeDelta )
 	{
-		pParticle->m_vecVelocity = pParticle->m_vecVelocity * ExponentialDecay( 0.3, timeDelta );
+		pParticle->m_vecVelocity = pParticle->m_vecVelocity * ExponentialDecay( 0.3f, timeDelta );
 	}
 
 	//Roll
@@ -1869,7 +1870,7 @@ void C_DustTrail::Update( float fTimeDelta )
 		pParticle->m_uchStartAlpha	= alpha * 255; 
 		pParticle->m_uchEndAlpha	= 0;
 			
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= random->RandomFloat( -1.0f, 1.0f );
     }
 }
@@ -1930,7 +1931,8 @@ void C_DustTrail::CleanupToolRecordingState( KeyValues *msg )
 
 		// FIXME: Until we can interpolate ent logs during emission, this can't work
 		KeyValues *pPosition = pInitializers->FindKey( "DmePositionPointToEntityInitializer", true );
-		pPosition->SetPtr( "entindex", (void*)pEnt->entindex() );
+		// dimhotepus: SetPtr -> SetInt
+		pPosition->SetInt( "entindex", pEnt->entindex() );
 		pPosition->SetInt( "attachmentIndex", GetParentAttachment() );
 		pPosition->SetFloat( "randomDist", m_SpawnRadius );
 		pPosition->SetFloat( "startx", pEnt->GetAbsOrigin().x );

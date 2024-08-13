@@ -37,7 +37,7 @@ public:
 public:
 
 	virtual void SetRefEHandle( const CBaseHandle &handle )	{ Assert( false ); }
-	virtual const CBaseHandle& GetRefEHandle() const		{ return *((CBaseHandle*)0); }
+	virtual const CBaseHandle& GetRefEHandle() const		{ DebuggerBreak(); exit(1); }
 
 	virtual IClientUnknown*		GetIClientUnknown()		{ return this; }
 	virtual ICollideable*		GetCollideable()		{ return 0; }
@@ -69,7 +69,7 @@ public:
 
 	// Dummy for CNetworkVars.
 	void NetworkStateChanged() {}
-	void NetworkStateChanged( void *pVar ) {}
+	void NetworkStateChanged( [[maybe_unused]] void *pVar ) {}
 
 	virtual bool					Init(int entnum, int iSerialNum);
 

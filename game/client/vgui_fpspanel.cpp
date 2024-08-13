@@ -36,20 +36,20 @@ int GetParticlePerformance();
 //-----------------------------------------------------------------------------
 class CFPSPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CFPSPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CFPSPanel, vgui::Panel );
 
 public:
 	CFPSPanel( vgui::VPANEL parent );
 	virtual			~CFPSPanel( void );
 
-	virtual void	ApplySchemeSettings(vgui::IScheme *pScheme);
-	virtual void	Paint();
-	virtual void	OnTick( void );
+	void	ApplySchemeSettings(vgui::IScheme *pScheme) override;
+	void	Paint() override;
+	void	OnTick( void ) override;
 
 	virtual bool	ShouldDraw( void );
 
 protected:
-	MESSAGE_FUNC_INT_INT( OnScreenSizeChanged, "OnScreenSizeChanged", oldwide, oldtall );
+	MESSAGE_FUNC_INT_INT_OVERRIDE( OnScreenSizeChanged, "OnScreenSizeChanged", oldwide, oldtall );
 
 private:
 	void ComputeSize( void );
@@ -122,11 +122,7 @@ void CFPSPanel::ComputeSize( void )
 
 	int x = wide - FPS_PANEL_WIDTH;
 	int y = 0;
-	if ( IsX360() )
-	{
-		x -= XBOX_MINBORDERSAFE * wide;
-		y += XBOX_MINBORDERSAFE * tall;
-	}
+
 	SetPos( x, y );
 	SetSize( FPS_PANEL_WIDTH, 4 * vgui::surface()->GetFontTall( m_hFont ) + 8 );
 }
@@ -162,6 +158,7 @@ bool CFPSPanel::ShouldDraw( void )
 {
 	if ( g_bDisplayParticlePerformance )
 		return true;
+
 	if ( ( !cl_showfps.GetInt() || ( gpGlobals->absoluteframetime <= 0 ) ) &&
 		 ( !cl_showpos.GetInt() ) )
 	{
@@ -187,12 +184,12 @@ void GetFPSColor( int nFps, unsigned char ucColor[3] )
 	int nFPSThreshold1 = 20;
 	int nFPSThreshold2 = 15;
 	
-	if ( IsPC() && g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 95 )
+	if ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 95 )
 	{
 		nFPSThreshold1 = 60;
 		nFPSThreshold2 = 50;
 	}
-	else if ( IsX360() || g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 90 )
+	else if ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 90 )
 	{
 		nFPSThreshold1 = 30;
 		nFPSThreshold2 = 25;
@@ -249,12 +246,12 @@ void CFPSPanel::Paint()
 			g_pMatSystemSurface->DrawColoredText(
 				m_hFont, x, 42,
 				ucColor[0], ucColor[1], ucColor[2],
-				255, "Particle Performance Metric : %d", (nPerf+50)/100 );
+				255, "Particle Performance Metric : %d", (nPerf + 50) / 100 );
 		}
 	}
 	float realFrameTime = gpGlobals->realtime - m_lastRealTime;
 
-	if ( cl_showfps.GetInt() && realFrameTime > 0.0 )
+	if ( cl_showfps.GetInt() && realFrameTime > 0.0f )
 	{
 		if ( m_lastRealTime != -1.0f )
 		{
@@ -298,7 +295,7 @@ void CFPSPanel::Paint()
 
 			const CPUFrequencyResults frequency = GetCPUFrequencyResults();
 			double currentTime = Plat_FloatTime();
-			const double displayTime = 5.0f; // Display frequency results for this long.
+			const double displayTime = 5.0; // Display frequency results for this long.
 			if ( frequency.m_GHz > 0 && frequency.m_timeStamp + displayTime > currentTime )
 			{
 				int lineHeight = vgui::surface()->GetFontTall( m_hFont );
@@ -309,6 +306,8 @@ void CFPSPanel::Paint()
 		}
 	}
 	m_lastRealTime = gpGlobals->realtime;
+
+	const int fontTall = vgui::surface()->GetFontTall(m_hFont);
 
 	int nShowPosMode = cl_showpos.GetInt();
 	if ( nShowPosMode > 0 )
@@ -325,26 +324,26 @@ void CFPSPanel::Paint()
 			}
 		}
 
-		g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2+ i * ( vgui::surface()->GetFontTall( m_hFont ) + 2 ), 
+		g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2 + i * ( fontTall + 2 ), 
 											  255, 255, 255, 255, 
 											  "pos:  %.02f %.02f %.02f", 
 											  vecOrigin.x, vecOrigin.y, vecOrigin.z );
 		i++;
 
-		g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2 + i * ( vgui::surface()->GetFontTall( m_hFont ) + 2 ), 
+		g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2 + i * ( fontTall + 2 ), 
 											  255, 255, 255, 255, 
 											  "ang:  %.02f %.02f %.02f", 
 											  angles.x, angles.y, angles.z );
 		i++;
 
-		Vector vel( 0, 0, 0 );
+		Vector vel = vec3_origin;
 		C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
 		if ( player )
 		{
 			vel = player->GetLocalVelocity();
 		}
 
-		g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2 + i * ( vgui::surface()->GetFontTall( m_hFont ) + 2 ), 
+		g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2 + i * ( fontTall + 2 ), 
 											  255, 255, 255, 255, 
 											  "vel:  %.2f", 
 											  vel.Length() );
@@ -363,12 +362,12 @@ void CFPSPanel::Paint()
 		{
 			if ( m_BatteryPercent == 255 )
 			{
-				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2+ i * ( vgui::surface()->GetFontTall( m_hFont ) + 2 ), 
-													 255, 255, 255, 255,  "battery: On AC" );	
+				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2+ i * ( fontTall + 2 ),
+													 255, 255, 255, 255,  "battery: On AC" );
 			}
 			else
 			{
-				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2+ i * ( vgui::surface()->GetFontTall( m_hFont ) + 2 ), 
+				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2+ i * ( fontTall + 2 ), 
 											 255, 255, 255, 255,  "battery:  %d%%",m_BatteryPercent );	
 			}
 		}
@@ -402,7 +401,7 @@ public:
 };
 
 static CFPS g_FPSPanel;
-IFPSPanel *fps = ( IFPSPanel * )&g_FPSPanel;
+IFPSPanel *fps = &g_FPSPanel;
 
 #if defined( TRACK_BLOCKING_IO ) && !defined( _RETAIL )
 

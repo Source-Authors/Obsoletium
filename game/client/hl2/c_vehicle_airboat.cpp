@@ -72,7 +72,7 @@ public:
 
 	DECLARE_CLIENTCLASS();
 	DECLARE_INTERPOLATION();
- 	DECLARE_DATADESC();
+ 	DECLARE_DATADESC_OVERRIDE();
 
 	C_PropAirboat();
 	~C_PropAirboat();
@@ -80,21 +80,22 @@ public:
 public:
 
 	// C_BaseEntity
-	virtual void Simulate();
+	void Simulate() override;
 
 	// IClientVehicle
-	virtual void UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd );
-	virtual void OnEnteredVehicle( C_BasePlayer *pPlayer );
-	virtual int GetPrimaryAmmoType() const;
-	virtual int GetPrimaryAmmoClip() const;
-	virtual bool PrimaryAmmoUsesClips() const;
-	virtual int GetPrimaryAmmoCount() const;
-	virtual int GetJoystickResponseCurve() const;
+	void UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd ) override;
+	// dimhotepus: Override base one to notify haptic device.
+	void OnEnteredVehicle( C_BaseCombatCharacter *pPlayer ) override;
+	int GetPrimaryAmmoType() const override;
+	int GetPrimaryAmmoClip() const override;
+	bool PrimaryAmmoUsesClips() const override;
+	int GetPrimaryAmmoCount() const override;
+	int GetJoystickResponseCurve() const override;
 
-	int		DrawModel( int flags );
+	int		DrawModel( int flags ) override;
 
 	// Draws crosshair in the forward direction of the boat
-	void DrawHudElements( );
+	void DrawHudElements( ) override;
 
 private:
 
@@ -102,7 +103,7 @@ private:
 	void DrawPontoonSplash( Vector position, Vector direction, float speed );
 	void DrawPontoonWake( Vector startPos, Vector wakeDir, float wakeLength, float speed);
 
-	void DampenEyePosition( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeAngles );
+	void DampenEyePosition( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeAngles ) override;
 	void DampenForwardMotion( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeAngles, float flFrameTime );
 	void DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeAngles, float flFrameTime );
 	void ComputePDControllerCoefficients( float *pCoefficientsOut, float flFrequency, float flDampening, float flDeltaTime );
@@ -463,7 +464,7 @@ void C_PropAirboat::DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicle
 	// Get up vector.
 	Vector vecUp;
 	AngleVectors( vecVehicleEyeAngles, NULL, NULL, &vecUp );
-	vecUp.z = clamp( vecUp.z, 0.0f, vecUp.z );
+	vecUp.z = max( vecUp.z, 0.0f );
 	vecVehicleEyePos.z += r_AirboatViewZHeight.GetFloat() * vecUp.z;
 
 	// NOTE: Should probably use some damped equation here.
@@ -473,7 +474,7 @@ void C_PropAirboat::DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicle
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_PropAirboat::OnEnteredVehicle( C_BasePlayer *pPlayer )
+void C_PropAirboat::OnEnteredVehicle( CBaseCombatCharacter *pPlayer )
 {
 	int eyeAttachmentIndex = LookupAttachment( "vehicle_driver_eyes" );
 	Vector vehicleEyeOrigin;
@@ -483,6 +484,9 @@ void C_PropAirboat::OnEnteredVehicle( C_BasePlayer *pPlayer )
 	m_vecLastEyeTarget = vehicleEyeOrigin;
 	m_vecLastEyePos = vehicleEyeOrigin;
 	m_vecEyeSpeed = vec3_origin;
+	
+	// dimhotepus: Notify base.
+	BaseClass::OnEnteredVehicle(pPlayer);
 }
 
 

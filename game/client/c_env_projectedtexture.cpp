@@ -156,15 +156,10 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 			vForward = m_hTargetEntity->GetAbsOrigin() - GetAbsOrigin();
 			VectorNormalize( vForward );
 
-			// JasonM - unimplemented
+			// TODO: JasonM - unimplemented
 			Assert (0);
 
 			//Quaternion q = DirectionToOrientation( dir );
-
-
-			//
-			// JasonM - set up vRight, vUp
-			//
 
 //			VectorNormalize( vRight );
 //			VectorNormalize( vUp );

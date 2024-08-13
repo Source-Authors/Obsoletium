@@ -247,7 +247,7 @@ void FX_MuzzleEffect(
 
 		pParticle->m_uchStartSize	= (random->RandomFloat( 6.0f, 9.0f ) * (12-(i))/9) * flScale;
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -369,7 +369,7 @@ void FX_MuzzleEffectAttached(
 
 		pParticle->m_uchStartSize	= (random->RandomFloat( 6.0f, 9.0f ) * (12-(i))/9) * flScale;
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -403,7 +403,8 @@ void FX_MuzzleEffectAttached(
 	KeyValues *pInitializers = pEmitter->FindKey( "initializers", true );
 
 	KeyValues *pPosition = pInitializers->FindKey( "DmeLinearAttachedPositionInitializer", true );
-	pPosition->SetPtr( "entindex", (void*)pEnt->entindex() );
+	// dimhotepus: SetPtr -> SetInt
+	pPosition->SetInt( "entindex", pEnt->entindex() );
 	pPosition->SetInt( "attachmentIndex", attachmentIndex );
 	pPosition->SetFloat( "linearOffsetX", 2.0f * scale );
 
@@ -582,7 +583,7 @@ void FX_Smoke( const Vector &origin, const QAngle &angles, float scale, int numP
 		int iSize = random->RandomInt( 4, 8 ) * scale;
 
 		// Roll
-		float flRoll = random->RandomInt( 0, 360 );
+		float flRoll = random->RandomFloat( 0.0f, 360.0f );
 		float flRollDelta = random->RandomFloat( -4.0f, 4.0f );
 
 		//pParticle->m_uchEndSize		= pParticle->m_uchStartSize*2;
@@ -842,10 +843,10 @@ void FX_GunshipMuzzleEffect( const Vector &origin, const QAngle &angles, float s
 
 	pParticle->m_vecVelocity.Init();
 
-	pParticle->m_uchStartSize	= random->RandomFloat( 40.0, 50.0 );
+	pParticle->m_uchStartSize	= random->RandomInt( 40, 50 );
 	pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
 
-	pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 	pParticle->m_flRollDelta	= 0.15f;
 
 	pParticle->m_uchColor[0]	= 255;
@@ -866,7 +867,7 @@ void FX_GunshipMuzzleEffect( const Vector &origin, const QAngle &angles, float s
 void FX_GunshipTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 {
 	VPROF_BUDGET( "FX_GunshipTracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-	Vector	vNear, dStart, dEnd, shotDir;
+	Vector	shotDir;
 	float	totalDist;
 
 	//Get out shot direction and length
@@ -916,7 +917,7 @@ void FX_StriderMuzzleEffect( const Vector &origin, const QAngle &angles, float s
 void FX_StriderTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 {
 	VPROF_BUDGET( "FX_StriderTracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-	Vector	vNear, dStart, dEnd, shotDir;
+	Vector	shotDir;
 	float	totalDist;
 
 	//Get out shot direction and length
@@ -950,12 +951,11 @@ void FX_StriderTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 void FX_HunterTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 {
 	VPROF_BUDGET( "FX_HunterTracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-	Vector	vNear, dStart, dEnd, shotDir;
-	float	totalDist;
+	Vector	shotDir;
 
 	// Get out shot direction and length
 	VectorSubtract( end, start, shotDir );
-	totalDist = VectorNormalize( shotDir );
+	float totalDist = VectorNormalize( shotDir );
 
 	// Make short tracers in close quarters
 	// float flMinLength = MIN( totalDist, 128.0f );
@@ -984,7 +984,7 @@ void FX_HunterTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 void FX_GaussTracer( Vector& start, Vector& end, int velocity, bool makeWhiz )
 {
 	VPROF_BUDGET( "FX_GaussTracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
-	Vector	vNear, dStart, dEnd, shotDir;
+	Vector	shotDir;
 	float	totalDist;
 
 	//Get out shot direction and length
@@ -1029,7 +1029,7 @@ void FX_BuildTesla(
 	beamInfo.m_flAmplitude = 16;
 	beamInfo.m_flBrightness = 200.0;
 	beamInfo.m_flSpeed = 0.0;
-	beamInfo.m_nStartFrame = 0.0;
+	beamInfo.m_nStartFrame = 0;
 	beamInfo.m_flFrameRate = 1.0;
 	beamInfo.m_flRed = vColor.x * 255.0f;
 	beamInfo.m_flGreen = vColor.y * 255.0f;
@@ -1108,7 +1108,7 @@ void FX_Tesla( const CTeslaInfo &teslaInfo )
 					pParticle->m_uchColor[0]	= MIN( 1.0f, color[0] * colorRamp ) * 255.0f;
 					pParticle->m_uchColor[1]	= MIN( 1.0f, color[1] * colorRamp ) * 255.0f;
 					pParticle->m_uchColor[2]	= MIN( 1.0f, color[2] * colorRamp ) * 255.0f;
-					pParticle->m_uchStartSize	= RandomFloat( 6,13 );
+					pParticle->m_uchStartSize	= RandomInt( 6,13 );
 					pParticle->m_uchEndSize		= pParticle->m_uchStartSize - 2;
 					pParticle->m_uchStartAlpha	= 255;
 					pParticle->m_uchEndAlpha	= 10;
@@ -1170,10 +1170,10 @@ void FX_BuildTeslaHitbox(
 	beamInfo.m_flWidth = random->RandomFloat( 3.0f, 6.0f );
 	beamInfo.m_flEndWidth = 0.0f;
 	beamInfo.m_flFadeLength = 0.0f;
-	beamInfo.m_flAmplitude = random->RandomInt( 16, 32 );
+	beamInfo.m_flAmplitude = random->RandomFloat( 16.0f, 32.0f );
 	beamInfo.m_flBrightness = 255.0f;
 	beamInfo.m_flSpeed = 32.0;
-	beamInfo.m_nStartFrame = 0.0;
+	beamInfo.m_nStartFrame = 0;
 	beamInfo.m_flFrameRate = 30.0;
 	beamInfo.m_flRed = vColor.x * 255.0f;
 	beamInfo.m_flGreen = vColor.y * 255.0f;
@@ -1211,10 +1211,10 @@ void FX_BuildTeslaHitbox(
 		beamInfo.m_flWidth = random->RandomFloat( 2.0f, 6.0f );
 		beamInfo.m_flEndWidth = 0.0f;
 		beamInfo.m_flFadeLength = 0.0f;
-		beamInfo.m_flAmplitude = random->RandomInt( 16, 32 );
+		beamInfo.m_flAmplitude = random->RandomFloat( 16.0f, 32.0f );
 		beamInfo.m_flBrightness = 255.0f;
 		beamInfo.m_flSpeed = 32.0;
-		beamInfo.m_nStartFrame = 0.0;
+		beamInfo.m_nStartFrame = 0;
 		beamInfo.m_flFrameRate = 30.0;
 		beamInfo.m_flRed = vColor.x * 255.0f;
 		beamInfo.m_flGreen = vColor.y * 255.0f;
@@ -1242,7 +1242,7 @@ void FX_BuildTeslaHitbox(
 		el->color.b = 255;
 		el->color.exponent = 4;
 
-		el->radius	= random->RandomInt( 32, 128 );
+		el->radius	= random->RandomFloat( 32.0f, 128.0f );
 		el->decay	= el->radius / 0.1f;
 		el->die		= gpGlobals->curtime + 0.1f;
 	}
@@ -1312,7 +1312,7 @@ void FX_BuildTeslaZap( const CEffectData &data )
 	beamInfo.m_flAmplitude = 16;
 	beamInfo.m_flBrightness = 200.0;
 	beamInfo.m_flSpeed = 0.0;
-	beamInfo.m_nStartFrame = 0.0;
+	beamInfo.m_nStartFrame = 0;
 	beamInfo.m_flFrameRate = 1.0;
 	beamInfo.m_flRed = vColor.x * 255.0f;
 	beamInfo.m_flGreen = vColor.y * 255.0f;

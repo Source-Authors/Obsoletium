@@ -426,7 +426,7 @@ void C_HLTVCamera::CalcRoamingView(Vector& eyeOrigin, QAngle& eyeAngles, float& 
 			{
 				// Bleed off some speed, but if we have less than the bleed
 				//  threshold, bleed the threshold amount.
-				float control = (spd < maxspeed/4.0) ? maxspeed/4.0 : spd;
+				float control = (spd < maxspeed/4.0f) ? maxspeed/4.0f : spd;
 
 				float friction = sv_friction.GetFloat();
 

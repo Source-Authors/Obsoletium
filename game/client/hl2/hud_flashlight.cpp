@@ -24,18 +24,18 @@
 //-----------------------------------------------------------------------------
 class CHudFlashlight : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudFlashlight, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudFlashlight, vgui::Panel );
 
 public:
 	CHudFlashlight( const char *pElementName );
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 protected:
-	virtual void Paint();
+	void Paint() override;
 
 private:
 	void SetFlashlightState( bool flashlightOn );
-	void Reset( void );
+	void Reset( void ) override;
 	
 	bool	m_bFlashlightOn;
 	CPanelAnimationVar( vgui::HFont, m_hFont, "Font", "WeaponIconsSmall" );

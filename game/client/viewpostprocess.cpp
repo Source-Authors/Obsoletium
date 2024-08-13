@@ -104,23 +104,23 @@ struct PostProcessingPass {
 };
 
 #define PPP_PROCESS_PARTIAL_SRC(srcmatname,dest_rt_name,src_tname,scale) \
-{PPP_ALWAYS,0,srcmatname,dest_rt_name,src_tname,1,1,scale,scale}
+{PPP_ALWAYS,0,srcmatname,dest_rt_name,src_tname,1,1,scale,scale,{}}
 #define PPP_PROCESS_PARTIAL_DEST(srcmatname,dest_rt_name,src_tname,scale) \
-{PPP_ALWAYS,0,srcmatname,dest_rt_name,src_tname,scale,scale,1,1}
+{PPP_ALWAYS,0,srcmatname,dest_rt_name,src_tname,scale,scale,1,1,{}}
 #define PPP_PROCESS_PARTIAL_SRC_PARTIAL_DEST(srcmatname,dest_rt_name,src_tname,srcscale,destscale) \
-{PPP_ALWAYS,0,srcmatname,dest_rt_name,src_tname,destscale,destscale,srcscale,srcscale}
-#define PPP_END 	{PPP_ALWAYS,0,NULL,NULL,0,0,0,0,0}
-#define PPP_PROCESS(srcmatname,dest_rt_name) {PPP_ALWAYS,0,srcmatname,dest_rt_name,0,1,1,1,1}
+{PPP_ALWAYS,0,srcmatname,dest_rt_name,src_tname,destscale,destscale,srcscale,srcscale,{}}
+#define PPP_END 	{PPP_ALWAYS,0,NULL,NULL,0,0,0,0,0,{}}
+#define PPP_PROCESS(srcmatname,dest_rt_name) {PPP_ALWAYS,0,srcmatname,dest_rt_name,0,1,1,1,1,{}}
 #define PPP_PROCESS_IF_CVAR(cvarptr,srcmatname,dest_rt_name) \
-{PPP_IF_COND_VAR,cvarptr,srcmatname,dest_rt_name,0,1,1,1,1}
+{PPP_IF_COND_VAR,cvarptr,srcmatname,dest_rt_name,0,1,1,1,1,{}}
 #define PPP_PROCESS_IF_NOT_CVAR(cvarptr,srcmatname,dest_rt_name) \
-{PPP_IF_NOT_COND_VAR,cvarptr,srcmatname,dest_rt_name,0,1,1,1,1}
+{PPP_IF_NOT_COND_VAR,cvarptr,srcmatname,dest_rt_name,0,1,1,1,1,{}}
 #define PPP_PROCESS_IF_NOT_CVAR_SRCTEXTURE(cvarptr,srcmatname,src_tname,dest_rt_name) \
-{PPP_IF_NOT_COND_VAR,cvarptr,srcmatname,dest_rt_name,src_tname,1,1,1,1}
+{PPP_IF_NOT_COND_VAR,cvarptr,srcmatname,dest_rt_name,src_tname,1,1,1,1,{}}
 #define PPP_PROCESS_IF_CVAR_SRCTEXTURE(cvarptr,srcmatname,src_txtrname,dest_rt_name) \
-{PPP_IF_COND_VAR,cvarptr,srcmatname,dest_rt_name,src_txtrname,1,1,1,1}
+{PPP_IF_COND_VAR,cvarptr,srcmatname,dest_rt_name,src_txtrname,1,1,1,1,{}}
 #define PPP_PROCESS_SRCTEXTURE(srcmatname,src_tname,dest_rt_name) \
-{PPP_ALWAYS,0,srcmatname,dest_rt_name,src_tname,1,1,1,1}
+{PPP_ALWAYS,0,srcmatname,dest_rt_name,src_tname,1,1,1,1,{}}
 
 struct ClipBox
 {
@@ -338,45 +338,6 @@ static void SetRenderTargetAndViewPort(ITexture *rt)
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->SetRenderTarget(rt);
 	pRenderContext->Viewport(0,0,rt->GetActualWidth(),rt->GetActualHeight());
-}
-
-#define FILTER_KERNEL_SLOP 20
-
-// Note carefully about the downsampling: the first downsampling samples from the full rendertarget
-// down to a temp. When doing this sampling, the texture source clamping will take care of the out
-// of bounds sampling done because of the filter kernels's width. However, on any of the subsequent
-// sampling operations, we will be sampling from a partially filled render target. So, texture
-// coordinate clamping cannot help us here. So, we need to always render a few more pixels to the
-// destination than we actually intend to, so as to replicate the border pixels so that garbage
-// pixels do not get sucked into the sampling. To deal with this, we always add FILTER_KERNEL_SLOP
-// to our widths/heights if there is room for them in the destination.
-static void DrawScreenSpaceRectangleWithSlop( 
-	ITexture *dest_rt,
-	IMaterial *pMaterial,
-	int destx, int desty,
-	int width, int height,
-	float src_texture_x0, float src_texture_y0,			// which texel you want to appear at
-	// destx/y
-	float src_texture_x1, float src_texture_y1,			// which texel you want to appear at
-	// destx+width-1, desty+height-1
-	int src_texture_width, int src_texture_height		// needed for fixup
-	)
-{
-	// add slop
-	int slopwidth = width + FILTER_KERNEL_SLOP; //min(dest_rt->GetActualWidth()-destx,width+FILTER_KERNEL_SLOP);
-	int slopheight = height + FILTER_KERNEL_SLOP; //min(dest_rt->GetActualHeight()-desty,height+FILTER_KERNEL_SLOP);
-
-	// adjust coordinates for slop
-	src_texture_x1 = FLerp( src_texture_x0, src_texture_x1, destx, destx + width - 1, destx + slopwidth - 1 );
-	src_texture_y1 = FLerp( src_texture_y0, src_texture_y1, desty, desty + height - 1, desty + slopheight - 1 );
-	width = slopwidth;
-	height = slopheight;
-
-	CMatRenderContextPtr pRenderContext( materials );
-	pRenderContext->DrawScreenSpaceRectangle( pMaterial, destx, desty, width, height,
-											  src_texture_x0, src_texture_y0,
-											  src_texture_x1, src_texture_y1,
-											  src_texture_width, src_texture_height );
 }
 
 enum Histogram_entry_state_t
@@ -898,20 +859,7 @@ void CLuminanceHistogramSystem::UpdateLuminanceRanges( void )
 
 void CLuminanceHistogramSystem::DisplayHistogram( void )
 {
-	bool bDrawTextThisFrame = true;
-	if ( IsX360() )
-	{
-		static float s_flLastTimeUpdate = 0.0f;
-		if ( int( gpGlobals->curtime ) - int( s_flLastTimeUpdate ) >= 2 )
-		{
-			s_flLastTimeUpdate = gpGlobals->curtime;
-			bDrawTextThisFrame = true;
-		}
-		else
-		{
-			bDrawTextThisFrame = false;
-		}
-	}
+	constexpr bool bDrawTextThisFrame = true;
 
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->PushRenderTargetAndViewport();
@@ -942,7 +890,7 @@ void CLuminanceHistogramSystem::DisplayHistogram( void )
 	int xl, yl, dest_width, dest_height;
 	pRenderContext->GetViewport( xl, yl, dest_width, dest_height );
 
-	if ( bDrawTextThisFrame == true )
+	if constexpr ( bDrawTextThisFrame == true )
 	{
 		engine->Con_NPrintf( 17, "(All values in linear space)" );
 
@@ -1150,27 +1098,27 @@ static void SetToneMapScale(IMatRenderContext *pRenderContext, float newvalue, f
 	mat_hdr_tonemapscale.SetValue( newvalue );
 	pRenderContext->SetGoalToneMappingScale( newvalue );
 
-	if ( s_nInAverage < ARRAYSIZE( s_MovingAverageToneMapScale ))
+	if ( s_nInAverage < ssize( s_MovingAverageToneMapScale ))
 	{
 		s_MovingAverageToneMapScale[s_nInAverage ++]= newvalue;
 	}
 	else
 	{
 		// scroll, losing oldest
-		for( int i = 0;i < ARRAYSIZE( s_MovingAverageToneMapScale ) - 1;i ++ )
-			s_MovingAverageToneMapScale[i]= s_MovingAverageToneMapScale[i + 1];
-		s_MovingAverageToneMapScale[ARRAYSIZE( s_MovingAverageToneMapScale ) - 1]= newvalue;
+		for( ptrdiff_t i = 0;i < ssize( s_MovingAverageToneMapScale ) - 1;i ++ )
+			s_MovingAverageToneMapScale[i] = s_MovingAverageToneMapScale[i + 1];
+		s_MovingAverageToneMapScale[std::size( s_MovingAverageToneMapScale ) - 1]= newvalue;
 	}
 
 	// now, use the average of the last tonemap calculations as our goal scale
-	if ( s_nInAverage == ARRAYSIZE( s_MovingAverageToneMapScale ))	// got full buffer yet?
+	if ( s_nInAverage == ssize( s_MovingAverageToneMapScale ))	// got full buffer yet?
 	{
 		float avg = 0.;
 		float sumweights = 0;
-		int sample_pt = ARRAYSIZE( s_MovingAverageToneMapScale ) / 2;
-		for( int i = 0;i < ARRAYSIZE( s_MovingAverageToneMapScale );i ++ )
+		int sample_pt = ssize( s_MovingAverageToneMapScale ) / 2;
+		for( int i = 0;i < ssize( s_MovingAverageToneMapScale );i ++ )
 		{
-			float weight = abs( i - sample_pt ) * ( 1.0 / ( ARRAYSIZE( s_MovingAverageToneMapScale ) / 2 ));
+			float weight = abs( i - sample_pt ) * ( 1.0 / ( ssize( s_MovingAverageToneMapScale ) / 2 ));
 			sumweights += weight;
 			avg += weight * s_MovingAverageToneMapScale[i];
 		}
@@ -2380,10 +2328,10 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 				{
 					// Restrict the post effects to the centre quarter of the screen
 					// (we only use a portion of the bloom texture, so this *does* affect bloom texture UVs)
-					partialViewportPostDestRect.x		+= 0.25f*fullViewportPostDestRect.width;
-					partialViewportPostDestRect.y		+= 0.25f*fullViewportPostDestRect.height;
-					partialViewportPostDestRect.width	-= 0.50f*fullViewportPostDestRect.width;
-					partialViewportPostDestRect.height	-= 0.50f*fullViewportPostDestRect.height;
+					partialViewportPostDestRect.x		+= fullViewportPostDestRect.width / 4;
+					partialViewportPostDestRect.y		+= fullViewportPostDestRect.height / 4;
+					partialViewportPostDestRect.width	-= fullViewportPostDestRect.width / 2;
+					partialViewportPostDestRect.height	-= fullViewportPostDestRect.height / 2;
 
 					// This math interprets texel coords as being at corner pixel centers (*not* at corner vertices):
 					Vector2D uvScalePost(	1.0f - ( (w / 2) / (float)(w - 1) ),

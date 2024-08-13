@@ -882,7 +882,6 @@ bool CLessOrEqualProxy::Init( IMaterial *pMaterial, KeyValues *pKeyValues )
 	if( !pGreaterVar )
 		return false;
 
-	foundVar;
 	m_pGreaterVar = pMaterial->FindVar( pGreaterVar, &foundVar, true );
 	if( !foundVar )
 		return false;

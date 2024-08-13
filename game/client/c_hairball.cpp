@@ -207,8 +207,8 @@ void C_Hairball::ClientThink()
 		{
 			static float flXSpeed = 3;
 			static float flYSpeed = flXSpeed * 0.1f;
-			m_flSpinRateX = RandomFloat( -M_PI*flXSpeed, M_PI*flXSpeed );
-			m_flSpinRateY = RandomFloat( -M_PI*flYSpeed, M_PI*flYSpeed );
+			m_flSpinRateX = RandomFloat( -M_PI_F*flXSpeed, M_PI_F*flXSpeed );
+			m_flSpinRateY = RandomFloat( -M_PI_F*flYSpeed, M_PI_F*flYSpeed );
 
 			m_flSpinDuration = RandomFloat( 1, 4 );
 		}

@@ -199,13 +199,13 @@ inline void C_AnimationLayer::BlendWeight()
 	// blend out?
 	if ( m_flBlendOut != 0.0f )
 	{
-		if (m_flCycle > 1.0 - m_flBlendOut)
+		if (m_flCycle > 1.0f - m_flBlendOut)
 		{
-			m_flWeight = (1.0 - m_flCycle) / m_flBlendOut;
+			m_flWeight = (1.0f - static_cast<float>(m_flCycle)) / m_flBlendOut;
 		}
 	}
 
-	m_flWeight = 3.0 * m_flWeight * m_flWeight - 2.0 * m_flWeight * m_flWeight * m_flWeight;
+	m_flWeight = 3.0f * static_cast<float>(m_flWeight) * static_cast<float>(m_flWeight) * ( 3.0f - 2.0f * static_cast<float>(m_flWeight) );
 	if (m_nSequence == 0)
 		m_flWeight = 0;
 }

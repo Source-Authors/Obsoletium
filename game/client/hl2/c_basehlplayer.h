@@ -25,28 +25,28 @@ public:
 
 						C_BaseHLPlayer();
 
-	virtual void		OnDataChanged( DataUpdateType_t updateType );
+	void		OnDataChanged( DataUpdateType_t updateType ) override;
 
-	void				Weapon_DropPrimary( void );
+	void				Weapon_DropPrimary( void ) override;
 		
-	float				GetFOV();
+	float				GetFOV() override;
 	void				Zoom( float FOVOffset, float time );
 	float				GetZoom( void );
-	bool				IsZoomed( void )	{ return m_HL2Local.m_bZooming; }
+	bool				IsZoomed( void ) override	{ return m_HL2Local.m_bZooming; }
 
 	bool				IsSprinting( void ) { return m_HL2Local.m_bitsActiveDevices & bits_SUIT_DEVICE_SPRINT; }
 	bool				IsFlashlightActive( void ) { return m_HL2Local.m_bitsActiveDevices & bits_SUIT_DEVICE_FLASHLIGHT; }
 	bool				IsBreatherActive( void ) { return m_HL2Local.m_bitsActiveDevices & bits_SUIT_DEVICE_BREATHER; }
 
-	virtual int			DrawModel( int flags );
-	virtual	void		BuildTransformations( CStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
+	int			DrawModel( int flags ) override;
+	void		BuildTransformations( CStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed ) override;
 
 	LadderMove_t		*GetLadderMove() { return &m_HL2Local.m_LadderMove; }
-	virtual void		ExitLadder();
+	void		ExitLadder() override;
 	bool				IsSprinting() const { return m_fIsSprinting; }
 	
 	// Input handling
-	virtual bool	CreateMove( float flInputSampleTime, CUserCmd *pCmd );
+	bool	CreateMove( float flInputSampleTime, CUserCmd *pCmd ) override;
 	void			PerformClientSideObstacleAvoidance( float flFrameTime, CUserCmd *pCmd );
 	void			PerformClientSideNPCSpeedModifiers( float flFrameTime, CUserCmd *pCmd );
 

@@ -620,7 +620,7 @@ IterationRetval_t CVGuiScreenEnumerator::EnumElement( IHandleEntity *pHandleEnti
 	C_VGuiScreen *pScreen = dynamic_cast<C_VGuiScreen*>(pEnt); 
 	if ( pScreen )
 	{
-		int i = m_VguiScreens.AddToTail( );
+		intp i = m_VguiScreens.AddToTail( );
 		m_VguiScreens[i].Set( pScreen );
 	}
 

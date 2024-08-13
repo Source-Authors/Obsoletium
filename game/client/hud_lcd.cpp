@@ -146,9 +146,9 @@ CLCD::CLCD( void )
 	:	m_lcd( NULL ),
 	m_nCurrentPage( 0 ),
 	m_nSubPage( 0 ),
+	m_nMaxChatHistory( G15_DEFAULT_MAX_CHAT_HISTORY ),
 	m_bHadPlayer( false ),
 	m_dwNextUpdateTime( 0u ),
-	m_nMaxChatHistory( G15_DEFAULT_MAX_CHAT_HISTORY ),
 	m_pG15Module( 0 ),
 	m_G15Factory( 0 )
 {
@@ -186,14 +186,14 @@ void CLCD::Init( void )
 		return;
 	}
 
-    m_G15Factory = Sys_GetFactory( m_pG15Module );
+    m_G15Factory = Sys_GetFactory<IG15>( m_pG15Module );
 	if ( !m_G15Factory )
 	{
 		Shutdown();
 		return;
 	}
 
-	m_lcd = reinterpret_cast< IG15 * >( m_G15Factory( G15_INTERFACE_VERSION, NULL ) );
+	m_lcd = m_G15Factory( G15_INTERFACE_VERSION, NULL );
 	if ( !m_lcd )
 	{
 		Shutdown();
@@ -539,8 +539,7 @@ void CLCD::ShowItems_R( CLCDPage *page, unsigned int dwCurTime, CUtlVector< CLCD
 							case LCDITEM_TEXT:
 								{
 									CLCDItemText *text = static_cast< CLCDItemText * >(itemDefn);
-									CUtlString s;
-									s = text->m_OriginalText;
+									CUtlString s = text->m_OriginalText;
 									Replace( s, prefix, s1 );
 									Replace( s, altprefix, s2 );
 									char itemNumber[ 32 ];
@@ -556,7 +555,7 @@ void CLCD::ShowItems_R( CLCDPage *page, unsigned int dwCurTime, CUtlVector< CLCD
 									CLCDItemText *copy = static_cast< CLCDItemText * >( page->Alloc( itemDefn->m_Type ) );
 									*copy = *text;
 									copy->m_bActive = true;
-									copy->m_OriginalText = s;
+									copy->m_OriginalText = std::move(s);
 									copy->Create( m_lcd );
 
 									m_lcd->SetOrigin( copy->m_Handle, curx + copy->x, cury + copy->y );
@@ -1214,7 +1213,7 @@ void CLCD::DumpPlayer()
 	Msg( "Other replacements:\n\n" );
 
 	// Global replacements
-	for( int i = m_GlobalStats.First() ; i != m_GlobalStats.InvalidIndex(); i = m_GlobalStats.Next( i ) )
+	for( auto i = m_GlobalStats.First() ; i != m_GlobalStats.InvalidIndex(); i = m_GlobalStats.Next( i ) )
 	{
 		CUtlString& r = m_GlobalStats[ i ];
 
@@ -1454,7 +1453,7 @@ bool CLCD::Replace( CUtlString& str, char const *search, char const *replace )
 	char s[ 2048 ];
 	Q_strncpy( s, str.String(), sizeof( s ) );
 
-	int searchlen = Q_strlen( search );
+	intp searchlen = Q_strlen( search );
 	while ( true )
 	{
 		char *pos = Q_strstr( s, search );
@@ -1463,11 +1462,11 @@ bool CLCD::Replace( CUtlString& str, char const *search, char const *replace )
 
 		char temp[ 4096 ];
 		// Found an instance
-		int left = pos - s + 1;
-		Assert( left < sizeof( temp ) );
+		intp left = pos - s + 1;
+		Assert( left < ssize( temp ) );
 		Q_strncpy( temp, s, left );
 		Q_strncat( temp, replace, sizeof( temp ), COPY_ALL_CHARACTERS );
-		int rightofs = left + searchlen - 1;
+		intp rightofs = left + searchlen - 1;
 		Q_strncat( temp, &s[ rightofs ], sizeof( temp ), COPY_ALL_CHARACTERS );
 
 		// Replace entire string
@@ -1529,7 +1528,7 @@ void CLCD::DoGlobalReplacements( CUtlString& str )
 	do
 	{
 		changed = false;
-		for ( int i = m_GlobalStats.First(); i != m_GlobalStats.InvalidIndex(); i = m_GlobalStats.Next( i ) )
+		for ( auto i = m_GlobalStats.First(); i != m_GlobalStats.InvalidIndex(); i = m_GlobalStats.Next( i ) )
 		{
 			CUtlString &r = m_GlobalStats[ i ];
 
@@ -1573,7 +1572,7 @@ void CLCD::ReduceParentheses( CUtlString& str )
 		char temp[ 4096 ];
 		// Found an instance
 		int left = pos - s + 1;
-		Assert( left < sizeof( temp ) );
+		Assert( left < static_cast<int>(sizeof( temp )) );
 		Q_strncpy( temp, s, left );
 		int rightofs = end - s + 1;
 		Q_strncat( temp, &s[ rightofs ], sizeof( temp ), COPY_ALL_CHARACTERS );

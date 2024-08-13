@@ -340,7 +340,7 @@ void C_Flare::Update( float timeDelta )
 			sParticle->m_uchStartAlpha	= random->RandomInt( 64, 90 );
 			sParticle->m_uchEndAlpha	= 0;
 			sParticle->m_uchStartSize	= random->RandomInt( 2, 4 );
-			sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 8.0f;
+			sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 8;
 			sParticle->m_flRoll			= random->RandomInt( 0, 2*M_PI );
 			sParticle->m_flRollDelta	= random->RandomFloat( -(M_PI/6.0f), M_PI/6.0f );
 		}
@@ -367,7 +367,7 @@ void C_Flare::Update( float timeDelta )
 		
 		m_pParticle[0]->m_vecVelocity.Init();
 
-		fColor = random->RandomInt( 100.0f, 128.0f ) * visible;
+		fColor = random->RandomFloat( 100.0f, 128.0f ) * visible;
 
 		m_pParticle[0]->m_uchColor[0]	= fColor;
 		m_pParticle[0]->m_uchColor[1]	= fColor;

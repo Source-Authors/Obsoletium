@@ -45,36 +45,36 @@ ConVar hud_showemptyweaponslots( "hud_showemptyweaponslots", "1", FCVAR_ARCHIVE,
 //-----------------------------------------------------------------------------
 class CHudWeaponSelection : public CBaseHudWeaponSelection, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudWeaponSelection, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudWeaponSelection, vgui::Panel );
 
 public:
 	CHudWeaponSelection(const char *pElementName );
 
-	virtual bool ShouldDraw();
-	virtual void OnWeaponPickup( C_BaseCombatWeapon *pWeapon );
+	bool ShouldDraw() override;
+	void OnWeaponPickup( C_BaseCombatWeapon *pWeapon ) override;
 
-	virtual void CycleToNextWeapon( void );
-	virtual void CycleToPrevWeapon( void );
+	void CycleToNextWeapon( void ) override;
+	void CycleToPrevWeapon( void ) override;
 
-	virtual C_BaseCombatWeapon *GetWeaponInSlot( int iSlot, int iSlotPos );
-	virtual void SelectWeaponSlot( int iSlot );
+	C_BaseCombatWeapon *GetWeaponInSlot( int iSlot, int iSlotPos ) override;
+	void SelectWeaponSlot( int iSlot ) override;
 
-	virtual C_BaseCombatWeapon	*GetSelectedWeapon( void )
+	C_BaseCombatWeapon	*GetSelectedWeapon( void ) override
 	{ 
 		return m_hSelectedWeapon;
 	}
 
-	virtual void OpenSelection( void );
-	virtual void HideSelection( void );
+	void OpenSelection( void ) override;
+	void HideSelection( void ) override;
 
-	virtual void LevelInit();
+	void LevelInit() override;
 
 protected:
-	virtual void OnThink();
-	virtual void Paint();
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void OnThink() override;
+	void Paint() override;
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 
-	virtual bool IsWeaponSelectable()
+	bool IsWeaponSelectable() override
 	{ 
 		if (IsInSelectionMode())
 			return true;
@@ -82,7 +82,7 @@ protected:
 		return false;
 	}
 
-	virtual void SetWeaponSelected()
+	void SetWeaponSelected() override
 	{
 		CBaseHudWeaponSelection::SetWeaponSelected();
 

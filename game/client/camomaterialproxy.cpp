@@ -362,14 +362,11 @@ void CCamoMaterialProxy::GenerateCamoTexture( ITexture* pTexture, IVTFTexture *p
 	mins = m_pEnt->WorldAlignMins();
 	maxs = m_pEnt->WorldAlignMaxs();
 	
-	Vector traceDirection;
-	Vector traceEnd;
 	trace_t	traceResult;
 	
 	Vector forward, right, up;
 	AngleVectors( entityAngles, &forward, &right, &up );
 	
-	Vector position, transformedPosition;
 	Vector maxsMinusMins = maxs - mins;
 
 	Vector diffuseColor[256];
@@ -472,7 +469,7 @@ void CCamoMaterialProxy::LoadCamoPattern( void )
 #endif
 	
 	enum ImageFormat indexImageFormat;
-	int indexImageSize;
+	intp indexImageSize;
 #ifndef _XBOX
 	float dummyGamma;
 	if( !TGALoader::GetInfo( m_pCamoPatternTextureVar->GetStringValue(), 
@@ -524,7 +521,7 @@ void CCamoMaterialProxy::LoadCamoPattern( void )
 	bool colorUsed[256];
 	int colorRemap[256];
 	// count the number of colors used in the image.
-	int i;
+	intp i;
 	for( i = 0; i < 256; i++ )
 	{
 		colorUsed[i] = false;

@@ -191,7 +191,7 @@ private:
 class CAvatarImagePanel : public vgui::Panel
 {
 public:
-	DECLARE_CLASS_SIMPLE( CAvatarImagePanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAvatarImagePanel, vgui::Panel );
 
 	CAvatarImagePanel( vgui::Panel *parent, const char *name );
 
@@ -228,22 +228,22 @@ public:
 	// specify a fallback image to use
 	void SetDefaultAvatar(vgui::IImage* pDefaultAvatar);
 
-	virtual void OnSizeChanged(int newWide, int newTall);
+	void OnSizeChanged(int newWide, int newTall) override;
 
 	//=============================================================================
 	// HPE_END
 	//=============================================================================
 
-	virtual void OnMousePressed(vgui::MouseCode code);
+	void OnMousePressed(vgui::MouseCode code) override;
 
-	virtual void PaintBackground();
+	void PaintBackground() override;
 	bool	IsValid() { return (m_pImage->IsValid()); }
 
 	void SetClickable( bool bClickable ) { m_bClickable = bClickable; }
 
 protected:
 	CPanelAnimationVar( Color, m_clrOutline, "color_outline", "Black" );
-	virtual void ApplySettings(KeyValues *inResourceData);
+	void ApplySettings(KeyValues *inResourceData) override;
 
 	void UpdateSize();
 

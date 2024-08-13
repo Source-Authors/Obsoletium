@@ -38,7 +38,8 @@ typedef CGameTrace trace_t;
 
 namespace vgui
 {
-	typedef unsigned long HFont;
+	// dimhotepus: x86-64 port. unsigned long -> uintp
+	typedef uintp HFont;
 };
 
 

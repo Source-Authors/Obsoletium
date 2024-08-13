@@ -1154,7 +1154,7 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 						char relative[ 512 ];
 						if ( root->m_bGameSound )
 						{
-							Q_snprintf( relative, sizeof( relative ), "%s/%s", current + Q_strlen( SOUND_ROOT"/" ), fn );
+							Q_snprintf( relative, sizeof( relative ), "%s/%s", current + ssize( SOUND_ROOT"/" ) - 1, fn );
 						}
 						else
 						{
@@ -1184,13 +1184,13 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 	}
 }
 
-int CMP3Player::FindSong( char const *relative )
+intp CMP3Player::FindSong( char const *relative )
 {
 	Assert( !Q_stristr( relative, "/" ) );
 
 	FileNameHandle_t handle = g_pFullFileSystem->FindOrAddFileName( relative );
-	int c = m_Files.Count();
-	for ( int i = 0 ; i < c ; ++i )
+	intp c = m_Files.Count();
+	for ( intp i = 0 ; i < c ; ++i )
 	{
 		const MP3File_t& mp3 = m_Files[ i ];
 		if ( mp3.filename == handle )
@@ -1201,9 +1201,9 @@ int CMP3Player::FindSong( char const *relative )
 	return -1;
 }
 
-int CMP3Player::AddSong( char const *relative, int dirnum )
+intp CMP3Player::AddSong( char const *relative, int dirnum )
 {
-	int songIndex = FindSong( relative );
+	intp songIndex = FindSong( relative );
 	
 	if ( songIndex == -1 )
 	{
@@ -1487,7 +1487,7 @@ void CMP3Player::SelectedSongs( SongListSource_t from, CUtlVector< int >& songIn
 	m_SelectedSongs.RemoveAll();
 	m_SelectionFrom = from;
 
-	int i, c;
+	intp i, c;
 	c = songIndexList.Count();
 	for ( i = 0; i < c; ++i )
 	{
@@ -1689,11 +1689,11 @@ void CMP3Player::RemoveFSSongs()
 	}
 }
 
-int CMP3Player::FindSoundDirectory( char const *fullpath )
+intp CMP3Player::FindSoundDirectory( char const *fullpath )
 {
 	CUtlSymbol sym = fullpath;
-	int c = m_SoundDirectories.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_SoundDirectories.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		if ( sym == m_SoundDirectories[ i ]->m_Root )
 			return i;
@@ -1709,7 +1709,7 @@ SoundDirectory_t *CMP3Player::AddSoundDirectory( char const *fullpath, bool recu
 	m_bSettingsDirty = true;
 
 	CUtlSymbol sym = fullpath;
-	int sdi = FindSoundDirectory( fullpath );
+	intp sdi = FindSoundDirectory( fullpath );
 	if ( sdi == m_SoundDirectories.InvalidIndex() )
 	{
 		SoundDirectory_t *sounddir = new SoundDirectory_t( m_SoundDirectories.Count() );

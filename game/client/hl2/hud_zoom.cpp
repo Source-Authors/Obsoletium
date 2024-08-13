@@ -30,18 +30,18 @@
 //-----------------------------------------------------------------------------
 class CHudZoom : public vgui::Panel, public CHudElement
 {
-	DECLARE_CLASS_SIMPLE( CHudZoom, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudZoom, vgui::Panel );
 
 public:
 	CHudZoom( const char *pElementName );
 	
-	bool	ShouldDraw( void );
-	void	Init( void );
-	void	LevelInit( void );
+	bool	ShouldDraw( void ) override;
+	void	Init( void ) override;
+	void	LevelInit( void ) override;
 
 protected:
-	virtual void ApplySchemeSettings(vgui::IScheme *scheme);
-	virtual void Paint( void );
+	void ApplySchemeSettings(vgui::IScheme *scheme) override;
+	void Paint( void ) override;
 
 private:
 	bool	m_bZoomOn;
@@ -63,7 +63,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CHudZoom::CHudZoom( const char *pElementName ) : CHudElement(pElementName), BaseClass(NULL, "HudZoom")
+CHudZoom::CHudZoom( const char *pElementName ) : BaseClass(NULL, "HudZoom"), CHudElement(pElementName)
 {
 	vgui::Panel *pParent = g_pClientMode->GetViewport();
 	SetParent( pParent );

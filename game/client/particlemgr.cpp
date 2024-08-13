@@ -144,6 +144,8 @@ CParticleEffectBinding::CParticleEffectBinding()
 	m_LastMin = m_Min;
 	m_LastMax = m_Max;
 
+	// dimhotepus: Init to 0 as SetParticleCullRadius gets nan and behaves incorrectly.
+	m_flParticleCullRadius = 0.0f;
 	SetParticleCullRadius( 0.0f );
 	m_nActiveParticles = 0;
 
@@ -963,7 +965,6 @@ void CParticleEffectBinding::RemoveParticle( Particle *pParticle )
 {
 	UnlinkParticle( pParticle );
 	
-	Assert( m_nActiveParticles >= 0 );
 	// Important that this is updated BEFORE NotifyDestroyParticle is called.
 	--m_nActiveParticles;
 
@@ -1015,7 +1016,7 @@ bool CParticleEffectBinding::RecalculateBoundingBox()
 CEffectMaterial* CParticleEffectBinding::GetEffectMaterial( CParticleSubTexture *pSubTexture )
 {
 	// Hash the IMaterial pointer.
-	unsigned long index = (((unsigned long)pSubTexture->m_pGroup) >> 6) % EFFECT_MATERIAL_HASH_SIZE;
+	uintp index = (((uintp)pSubTexture->m_pGroup) >> 6) % EFFECT_MATERIAL_HASH_SIZE;
 	for ( CEffectMaterial *pCur=m_EffectMaterialHash[index]; pCur; pCur = pCur->m_pHashedNext )
 	{
 		if ( pCur->m_pGroup == pSubTexture->m_pGroup )
@@ -1040,9 +1041,7 @@ CParticleMgr::CParticleMgr()
 	m_nToolParticleEffectId = 0;
 	m_bUpdatingEffects = false;
 	m_bRenderParticleEffects = true;
-	m_pMaterialSystem = NULL;
-	m_pThreadPool[0] = 0;
-	m_pThreadPool[1] = 0;
+	m_pMaterialSystem = nullptr;
 	memset( &m_DirectionalLight, 0, sizeof( m_DirectionalLight ) );
 
 	m_FrameCode = 1;
@@ -1084,36 +1083,14 @@ bool CParticleMgr::Init(unsigned long count, IMaterialSystem *pMaterials)
 	// Send true to load the sheets
 	ParseParticleEffects( true, false );
 
-#ifdef TF_CLIENT_DLL
-	if ( IsX360() )
-	{
-		//m_pThreadPool[0] = CreateThreadPool();
-		m_pThreadPool[1] = CreateThreadPool();
-
-		ThreadPoolStartParams_t startParams;
-		startParams.nThreads = 3;
-		startParams.nStackSize = 128*1024;
-		startParams.fDistribute = TRS_TRUE;
-		startParams.bUseAffinityTable = true;    
-		startParams.iAffinityTable[0] = XBOX_PROCESSOR_1;
-		startParams.iAffinityTable[1] = XBOX_PROCESSOR_3;
-		startParams.iAffinityTable[2] = XBOX_PROCESSOR_5;
-		//m_pThreadPool[0]->Start( startParams );
-
-		startParams.nThreads = 2;
-		startParams.iAffinityTable[1] = CommandLine()->FindParm( "-swapcores" ) ? XBOX_PROCESSOR_5 : XBOX_PROCESSOR_3;
-		m_pThreadPool[1]->Start( startParams );
-	}
-#endif
-
 	return true;
 }
 
 void CParticleMgr::Term()
 {
 	// Free all the effects.
-	int iNext;
-	for ( int i = m_Effects.Head(); i != m_Effects.InvalidIndex(); i = iNext )
+	unsigned short iNext;
+	for ( auto i = m_Effects.Head(); i != m_Effects.InvalidIndex(); i = iNext )
 	{
 		iNext = m_Effects.Next( i );
 		m_Effects[i]->m_pSim->NotifyRemove();
@@ -1121,7 +1098,7 @@ void CParticleMgr::Term()
 	m_Effects.Purge();
 	m_NewEffects.Purge();
 
-	for( int i = m_SubTextures.First(); i != m_SubTextures.InvalidIndex(); i = m_SubTextures.Next( i ) )
+	for( auto i = m_SubTextures.First(); i != m_SubTextures.InvalidIndex(); i = m_SubTextures.Next( i ) )
 	{	
 		IMaterial *pMaterial = m_SubTextures[i]->m_pMaterial;
 		if ( pMaterial )
@@ -1129,7 +1106,7 @@ void CParticleMgr::Term()
 	}
 	m_SubTextures.PurgeAndDeleteElements();
 
-	for( int i = m_SubTextureGroups.Count(); --i >= 0; )
+	for( intp i = m_SubTextureGroups.Count(); --i >= 0; )
 	{	
 		IMaterial *pMaterial = m_SubTextureGroups[i]->m_pPageMaterial;
 		if ( pMaterial )
@@ -1144,19 +1121,6 @@ void CParticleMgr::Term()
 	}
 	m_pMaterialSystem = NULL;
 	
-	if ( m_pThreadPool[0] )
-	{
-		m_pThreadPool[0]->Stop();
-		DestroyThreadPool( m_pThreadPool[0] );
-		m_pThreadPool[0] = NULL;
-	}
-	if ( m_pThreadPool[1] )
-	{
-		m_pThreadPool[1]->Stop();
-		DestroyThreadPool( m_pThreadPool[1] );
-		m_pThreadPool[1] = NULL;
-	}
-
 	Assert( m_nCurrentParticlesAllocated == 0 );
 }
 
@@ -1285,7 +1249,7 @@ bool CParticleMgr::AddEffect( CParticleEffectBinding *pEffect, IParticleEffect *
 	{
 		if( m_Effects[i]->m_pSim == pSim )
 		{
-			Assert( !"CParticleMgr::AddEffect: added same effect twice" );
+			AssertMsg( false, "CParticleMgr::AddEffect: added same effect twice" );
 			return false;
 		}
 	}
@@ -1389,8 +1353,8 @@ void CParticleMgr::RemoveAllNewEffects()
 
 void CParticleMgr::RemoveAllEffects()
 {
-	int iNext;
-	for ( int i = m_Effects.Head(); i != m_Effects.InvalidIndex(); i = iNext )
+	unsigned short iNext;
+	for ( unsigned short i{m_Effects.Head()}; i != m_Effects.InvalidIndex(); i = iNext )
 	{
 		iNext = m_Effects.Next( i );
 		RemoveEffect( m_Effects[i] );
@@ -1399,7 +1363,7 @@ void CParticleMgr::RemoveAllEffects()
 
 	RemoveAllNewEffects();
 
-	for( int i = m_SubTextures.First(); i != m_SubTextures.InvalidIndex(); i = m_SubTextures.Next( i ) )
+	for( auto i = m_SubTextures.First(); i != m_SubTextures.InvalidIndex(); i = m_SubTextures.Next( i ) )
 	{	
 		IMaterial *pMaterial = m_SubTextures[i]->m_pMaterial;
 		if ( pMaterial )
@@ -1410,7 +1374,7 @@ void CParticleMgr::RemoveAllEffects()
 	//HACKHACK: commented out because we need to keep leaking handles until every piece of code that grabs one ditches it at level end
 	//m_SubTextures.PurgeAndDeleteElements();
 
-	for( int i = m_SubTextureGroups.Count(); --i >= 0; )
+	for( auto i = m_SubTextureGroups.Count(); --i >= 0; )
 	{	
 		IMaterial *pMaterial = m_SubTextureGroups[i]->m_pPageMaterial;
 		if ( pMaterial )
@@ -1528,7 +1492,7 @@ static ConVar r_particle_sim_spike_threshold_ms( "r_particle_sim_spike_threshold
 
 void EndSimulateParticles( void )
 {
-	float flETime = Plat_FloatTime() - g_flStartSimTime;
+	double flETime = Plat_FloatTime() - g_flStartSimTime;
 	if ( g_bMeasureParticlePerformance )
 	{
 		g_nNumUSSpentSimulatingParticles += 1.0e6 * flETime;
@@ -1611,7 +1575,7 @@ int CParticleMgr::ComputeParticleDefScreenArea( int nInfoCount, RetireInfo_t *pI
 		pInfo[nCollection].m_pCollection = pCollection;
 		pInfo[nCollection].m_bFirstFrame = false;
 
-		Vector vecCenter, vecScreenCenter, vecCenterCam;
+		Vector vecCenter, vecScreenCenter;
 		vecCenter = pCollection->GetControlPointAtCurrentTime( pDef->GetCullControlPoint() );
 
 		Vector3DMultiplyPositionProjective( worldToPixels, vecCenter, vecScreenCenter );
@@ -1729,7 +1693,6 @@ bool CParticleMgr::EarlyRetireParticleSystems( int nCount, ParticleSimListEntry_
 		ppEffects[i].m_pNewParticleEffect->MarkShouldPerformCullCheck( true );
 	}
 
-	Vector vecCameraForward;
 	VMatrix worldToView, viewToProjection, worldToProjection, worldToScreen;
 	render->GetMatricesForView( *pViewSetup, &worldToView, &viewToProjection, &worldToProjection, &worldToScreen );
 	float flFocalDist = tan( DEG2RAD( pViewSetup->fov * 0.5f ) );
@@ -1797,6 +1760,7 @@ void CParticleMgr::BuildParticleSimList( CUtlVector< ParticleSimListEntry_t > &l
 
 static ConVar r_particle_timescale( "r_particle_timescale", "1.0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY );
 
+#ifdef STAGING_ONLY
 static int CountChildParticleSystems( CParticleCollection *p )
 {
 	int nCount = 1;
@@ -1806,6 +1770,7 @@ static int CountChildParticleSystems( CParticleCollection *p )
 	}
 	return nCount;
 }
+#endif
 
 static int CountParticleSystemActiveParticles( CParticleCollection *p )
 {
@@ -1853,7 +1818,6 @@ void CParticleMgr::UpdateNewEffects( float flTimeDelta )
 	BuildParticleSimList(particlesToSimulate);
 	int nCount = particlesToSimulate.Count();
 
-
 	// See if there are new particle systems that need early retirement
 	// This has to happen after the first update
 	if ( EarlyRetireParticleSystems( nCount, particlesToSimulate.Base() ) )
@@ -1875,21 +1839,7 @@ void CParticleMgr::UpdateNewEffects( float flTimeDelta )
 		}
 		else
 		{
-			int nAltCore = IsX360() && particle_sim_alt_cores.GetInt();
-			if ( !m_pThreadPool[1] || nAltCore == 0 )
-			{
-				ParallelProcess( "CParticleMgr::UpdateNewEffects", particlesToSimulate.Base(), nCount, ProcessPSystem );
-			}
-			else
-			{
-				if ( nAltCore > 2 )
-				{
-					nAltCore = 2;
-				}
-				CParallelProcessor<ParticleSimListEntry_t, CFuncJobItemProcessor<ParticleSimListEntry_t> > processor( "CParticleMgr::UpdateNewEffects" );
-				processor.m_ItemProcessor.Init( ProcessPSystem, NULL, NULL );
-				processor.Run( particlesToSimulate.Base(), nCount, INT_MAX, m_pThreadPool[nAltCore-1] );
-			}
+			ParallelProcess( "CParticleMgr::UpdateNewEffects", particlesToSimulate.Base(), nCount, ProcessPSystem );
 		}
 	}
 
@@ -2063,7 +2013,7 @@ PMaterialHandle CParticleMgr::GetPMaterial( const char *pMaterialName )
 			pSubTexture->m_pMaterial = pIMaterial;
 
 #ifdef _DEBUG
-			int iNameLength = V_strlen( pMaterialName ) + 1;
+			intp iNameLength = V_strlen( pMaterialName ) + 1;
 			pSubTexture->m_szDebugName = new char [iNameLength];
 			memcpy( pSubTexture->m_szDebugName, pMaterialName, iNameLength );
 #endif
@@ -2126,7 +2076,7 @@ void CParticleMgr::RepairPMaterial( PMaterialHandle hMaterial )
 		return;
 
 	const char *pMaterialName = NULL;
-	for( int i = m_SubTextures.First(); i != m_SubTextures.InvalidIndex(); i = m_SubTextures.Next( i ) )
+	for( auto i = m_SubTextures.First(); i != m_SubTextures.InvalidIndex(); i = m_SubTextures.Next( i ) )
 	{
 		if( m_SubTextures[i] == hMaterial )
 		{

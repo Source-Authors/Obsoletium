@@ -20,16 +20,16 @@ class C_AI_BaseNPC : public C_BaseCombatCharacter
 	DECLARE_CLASS( C_AI_BaseNPC, C_BaseCombatCharacter );
 
 public:
-	DECLARE_CLIENTCLASS();
+	DECLARE_CLIENTCLASS_OVERRIDE();
 
 	C_AI_BaseNPC();
-	virtual unsigned int	PhysicsSolidMaskForEntity( void ) const;
-	virtual bool			IsNPC( void ) { return true; }
+	unsigned int	PhysicsSolidMaskForEntity( void ) const override;
+	bool			IsNPC( void ) override { return true; }
 	bool					IsMoving( void ){ return m_bIsMoving; }
 	bool					ShouldAvoidObstacle( void ){ return m_bPerformAvoidance; }
-	virtual bool			AddRagdollToFadeQueue( void ) { return m_bFadeCorpse; }
+	bool			AddRagdollToFadeQueue( void ) override { return m_bFadeCorpse; }
 
-	virtual bool			GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt ) OVERRIDE;
+	virtual bool			GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt ) override;
 
 	int						GetDeathPose( void ) { return m_iDeathPose; }
 
@@ -37,8 +37,8 @@ public:
 	int						GetSpeedModifyRadius( void ) { return m_iSpeedModRadius; }
 	int						GetSpeedModifySpeed( void ) { return m_iSpeedModSpeed;	}
 
-	void					ClientThink( void );
-	void					OnDataChanged( DataUpdateType_t type );
+	void					ClientThink( void ) override;
+	void					OnDataChanged( DataUpdateType_t type ) override;
 	bool					ImportantRagdoll( void ) { return m_bImportanRagdoll;	}
 
 private:

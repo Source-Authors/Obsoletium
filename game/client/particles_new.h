@@ -103,10 +103,10 @@ public:
 // IParticleEffect overrides
 public:
 
-	virtual void	SimulateParticles( CParticleSimulateIterator *pIterator )
+	virtual void	SimulateParticles( CParticleSimulateIterator * )
 	{
 	}
-	virtual void	RenderParticles( CParticleRenderIterator *pIterator )
+	virtual void	RenderParticles( CParticleRenderIterator * )
 	{
 	}		
 
@@ -226,14 +226,14 @@ inline Vector const &CNewParticleEffect::GetRenderOrigin( void )
 	return m_vSortOrigin;
 }
 
-inline PMaterialHandle CNewParticleEffect::GetPMaterial(const char *name)
+inline PMaterialHandle CNewParticleEffect::GetPMaterial(const char *)
 {
 	//!!
 	Assert( 0 );
 	return NULL;
 }
 
-inline Particle* CNewParticleEffect::AddParticle( unsigned int particleSize, PMaterialHandle material, const Vector &origin )
+inline Particle* CNewParticleEffect::AddParticle( unsigned int, PMaterialHandle, const Vector & )
 {
 	//!!
 	Assert( 0 );

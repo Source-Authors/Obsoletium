@@ -120,11 +120,11 @@ bool GetHWMExpressionFileName( const char *pFilename, char *pHWMFilename )
 C_BaseFlex::C_BaseFlex() : 
 	m_iv_viewtarget( "C_BaseFlex::m_iv_viewtarget" ), 
 	m_iv_flexWeight("C_BaseFlex:m_iv_flexWeight" ),
+	m_LocalToGlobal( 0, 0, FlexSettingLessFunc ),
 #ifdef HL2_CLIENT_DLL
 	m_iv_vecLean("C_BaseFlex:m_iv_vecLean" ),
-	m_iv_vecShift("C_BaseFlex:m_iv_vecShift" ),
+	m_iv_vecShift("C_BaseFlex:m_iv_vecShift" )
 #endif
-	m_LocalToGlobal( 0, 0, FlexSettingLessFunc )
 {
 #ifdef _DEBUG
 	((Vector&)m_viewtarget).Init();

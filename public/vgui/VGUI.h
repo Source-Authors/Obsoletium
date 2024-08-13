@@ -58,7 +58,8 @@ using HPanel = unsigned long;
 
 constexpr inline HPanel INVALID_PANEL{std::numeric_limits<HPanel>::max()};
 
-using HFont = unsigned long;
+// dimhotepus: x86-64 port. unsigned long -> uintp
+using HFont = uintp;
 constexpr HFont INVALID_FONT{0};  // the value of an invalid font handle
 }
 

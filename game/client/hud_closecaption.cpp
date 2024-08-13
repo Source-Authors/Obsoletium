@@ -116,12 +116,12 @@ private:
 CCloseCaptionWorkUnit::CCloseCaptionWorkUnit() :
 	m_nWidth(0),
 	m_nHeight(0),
+	m_flFadeStartTime(0),
 	m_bBold(false),
 	m_bItalic(false),
 	m_pszStream(0),
-	m_Color( Color( 255, 255, 255, 255 ) ),
 	m_hFont( 0 ),
-	m_flFadeStartTime(0)
+	m_Color( Color( 255, 255, 255, 255 ) )
 {
 }
 
@@ -547,7 +547,7 @@ struct AsyncCaptionData_t
 		return data;
 	}
 
-	static unsigned int EstimatedSize( const asynccaptionparams_t &params )
+	static size_t EstimatedSize( const asynccaptionparams_t &params )
 	{
 		// The block size is assumed to be 4K
 		return ( sizeof( AsyncCaptionData_t ) + params.blocksize );
@@ -814,8 +814,8 @@ CHudCloseCaption::CHudCloseCaption( const char *pElementName )
 	: CHudElement( pElementName ), 
 	vgui::Panel( NULL, "HudCloseCaption" ),
 	m_CloseCaptionRepeats( 0, 0, CaptionTokenLessFunc ),
-	m_CurrentLanguage( UTL_INVAL_SYMBOL ),
-	m_bPaintDebugInfo( false )
+	m_bPaintDebugInfo( false ),
+	m_CurrentLanguage( UTL_INVAL_SYMBOL )
 {
 	vgui::Panel *pParent = g_pClientMode->GetViewport();
 	SetParent( pParent );
@@ -1427,6 +1427,20 @@ bool CHudCloseCaption::StreamHasCommand( const wchar_t *stream, const wchar_t *s
 	return false;
 }
 
+static bool CaptionTrace( const char *token )
+{
+	static CUtlSymbolTable s_MissingCloseCaptions;
+
+	// Make sure we only show the message once
+	if ( UTL_INVAL_SYMBOL == s_MissingCloseCaptions.Find( token ) )
+	{
+		s_MissingCloseCaptions.AddString( token );
+		return true;
+	}
+
+	return false;
+}
+
 void CHudCloseCaption::Process( const wchar_t *stream, float duration, const char *tokenstream, bool fromplayer, bool direct )
 {
 	if ( !direct )
@@ -1468,7 +1482,7 @@ void CHudCloseCaption::Process( const wchar_t *stream, float duration, const cha
 
 		if ( cc_captiontrace.GetInt() < 2 )
 		{
-			if ( cc_captiontrace.GetInt() == 1 )
+			if ( cc_captiontrace.GetInt() == 1 && CaptionTrace( tokenstream ) )
 			{
 				Msg( "Missing caption for '%s'\n", tokenstream );
 			}
@@ -1948,25 +1962,11 @@ bool CHudCloseCaption::CaptionTokenLessFunc( const CaptionRepeat &lhs, const Cap
 	return ( lhs.m_nTokenIndex < rhs.m_nTokenIndex );	
 }
 
-static bool CaptionTrace( const char *token )
-{
-	static CUtlSymbolTable s_MissingCloseCaptions;
-
-	// Make sure we only show the message once
-	if ( UTL_INVAL_SYMBOL == s_MissingCloseCaptions.Find( token ) )
-	{
-		s_MissingCloseCaptions.AddString( token );
-		return true;
-	}
-
-	return false;
-}
-
 static ConVar cc_sentencecaptionnorepeat( "cc_sentencecaptionnorepeat", "4", 0, "How often a sentence can repeat." );
 
 int CRCString( const char *str )
 {
-	int len = Q_strlen( str );
+	intp len = Q_strlen( str );
 	CRC32_t crc;
 	CRC32_Init( &crc );
 	CRC32_ProcessBuffer( &crc, str, len );
@@ -2056,7 +2056,7 @@ public:
 
 	bool GetStream( OUT_Z_BYTECAP(bufSizeInBytes) wchar_t *buf, int bufSizeInBytes )
 	{
-		Assert( bufSizeInBytes >= sizeof(buf[0]) );
+		Assert( bufSizeInBytes >= static_cast<int>(sizeof(buf[0])) );
 		buf[ 0 ] = L'\0';
 
 		int c = m_Tokens.Count();
@@ -2656,11 +2656,11 @@ static int EmitCaptionCompletion( const char *partial, char commands[ COMMAND_CO
 
 	const char *cmdname = "cc_emit";
 	char *substring = NULL;
-	int substringLen = 0;
+	intp substringLen = 0;
 	if ( Q_strstr( partial, cmdname ) && strlen(partial) > strlen(cmdname) + 1 )
 	{
 		substring = (char *)partial + strlen( cmdname ) + 1;
-		substringLen = strlen(substring);
+		substringLen = V_strlen(substring);
 	}
 	
 	StringIndex_t i = g_pVGuiLocalize->GetFirstStringIndex();
@@ -2888,18 +2888,15 @@ void CHudCloseCaption::FindSound( char const *pchANSI )
 					}
 				}
 
-				if ( IsPC() )
+				for ( StringIndex_t r = g_pVGuiLocalize->GetFirstStringIndex(); r != INVALID_LOCALIZE_STRING_INDEX; r = g_pVGuiLocalize->GetNextStringIndex( r ) )
 				{
-					for ( int r = g_pVGuiLocalize->GetFirstStringIndex(); r != INVALID_LOCALIZE_STRING_INDEX; r = g_pVGuiLocalize->GetNextStringIndex( r ) )
+					const char *strName = g_pVGuiLocalize->GetNameByIndex( r );
+
+					search.SetHash( strName );
+
+					if ( search.hash == lu.hash )
 					{
-						const char *strName = g_pVGuiLocalize->GetNameByIndex( r );
-
-						search.SetHash( strName );
-
-						if ( search.hash == lu.hash )
-						{
-							Msg( "    '%s' localization matches\n", strName );
-						}
+						Msg( "    '%s' localization matches\n", strName );
 					}
 				}
 			}

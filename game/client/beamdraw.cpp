@@ -383,7 +383,7 @@ void DrawSegs( int noise_divisions, float *prgNoise, const model_t* spritemodel,
 			if ( flags & FBEAM_SINENOISE )
 			{
 				float	s, c;
-				SinCos( fraction*M_PI*length + freq, &s, &c );
+				SinCos( fraction*M_PI_F*length + freq, &s, &c );
 				VectorMA( curSeg.m_vPos, factor * s, CurrentViewUp(), curSeg.m_vPos );
 				// Rotate the noise along the perpendicluar axis a bit to keep the bolt from looking diagonal
 				VectorMA( curSeg.m_vPos, factor * c, CurrentViewRight(), curSeg.m_vPos );
@@ -425,8 +425,8 @@ void CalcSegOrigin( Vector *vecOut, int iPoint, int noise_divisions, float *prgN
 	Assert( segments > 1 );
 
 	float factor;
-	float length = VectorLength( delta ) * 0.01;
-	float div = 1.0 / (segments-1);
+	float length = VectorLength( delta ) * 0.01f;
+	float div = 1.0f / (segments-1);
 
 	// Iterator to resample noise waveform (it needs to be generated in powers of 2)
 	int noiseStep = (int)((float)(noise_divisions-1) * div * 65536.0f);
@@ -449,7 +449,7 @@ void CalcSegOrigin( Vector *vecOut, int iPoint, int noise_divisions, float *prgN
 		if ( flags & FBEAM_SINENOISE )
 		{
 			float	s, c;
-			SinCos( fraction*M_PI*length + freq, &s, &c );
+			SinCos( fraction*M_PI_F*length + freq, &s, &c );
 			VectorMA( *vecOut, factor * s, MainViewUp(), *vecOut );
 			// Rotate the noise along the perpendicular axis a bit to keep the bolt from looking diagonal
 			VectorMA( *vecOut, factor * c, MainViewRight(), *vecOut );
@@ -883,7 +883,7 @@ void DrawSplineSegs( int noise_divisions, float *prgNoise,
 				if ( flags & FBEAM_SINENOISE )
 				{
 					float	s, c;
-					SinCos( fraction*M_PI*length + freq, &s, &c );
+					SinCos( fraction*M_PI_F*length + freq, &s, &c );
 					VectorMA( seg.m_vPos, factor * s, CurrentViewUp(), seg.m_vPos );
 					// Rotate the noise along the perpendicluar axis a bit to keep the bolt from looking diagonal
 					VectorMA( seg.m_vPos, factor * c, CurrentViewRight(), seg.m_vPos );
@@ -943,7 +943,7 @@ void DrawSplineSegs( int noise_divisions, float *prgNoise,
 			}
 			if (fBestFraction > 0)
 			{
-				float	fade	= pow(bestDot,60);
+				float	fade	= powf(bestDot,60.0f);
 				if (fade > 1.0) fade = 1.0;
 				float haloColor[3];
 				VectorScale( color, fade, haloColor );
@@ -1067,7 +1067,7 @@ void DrawDisk( int noise_divisions, float *prgNoise, const model_t* spritemodel,
 		meshBuilder.Position3fv( point.Base() );
 		meshBuilder.AdvanceVertex();
 
-		SinCos( fraction * 2 * M_PI, &s, &c );
+		SinCos( fraction * 2 * M_PI_F, &s, &c );
 		point[0] = s * w + source[0];
 		point[1] = c * w + source[1];
 		point[2] = source[2];
@@ -1153,7 +1153,7 @@ void DrawCylinder( int noise_divisions, float *prgNoise, const model_t* spritemo
 	{
 		float	s, c;
 		fraction = i * div;
-		SinCos( fraction * 2 * M_PI, &s, &c );
+		SinCos( fraction * 2 * M_PI_F, &s, &c );
 
 		point[0] = s * freq * radius + source[0];
 		point[1] = c * freq * radius + source[1];
@@ -1499,8 +1499,8 @@ void DrawBeamQuadratic( const Vector &start, const Vector &control, const Vector
 	seg.m_flWidth = width;
 	
 	float t = 0;
-	float u = fmod( scrollOffset, 1 );
-	float dt = 1.0 / (float)subdivisions;
+	float u = fmod( scrollOffset, 1.0f );
+	float dt = 1.0f / (float)subdivisions;
 	for( int i = 0; i <= subdivisions; i++, t += dt )
 	{
 		float omt = (1-t);

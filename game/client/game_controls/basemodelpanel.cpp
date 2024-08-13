@@ -235,7 +235,7 @@ void CModelPanel::SwapModel( const char *pszName, const char *pszAttached )
 	if ( !m_pModelInfo || !pszName || !pszName[0] )
 		return;
 
-	int len = Q_strlen( pszName ) + 1;
+	intp len = Q_strlen( pszName ) + 1;
 	char *pAlloced = new char[ len ];
 	Assert( pAlloced );
 	Q_strncpy( pAlloced, pszName, len );

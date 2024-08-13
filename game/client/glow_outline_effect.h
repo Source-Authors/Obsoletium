@@ -32,7 +32,7 @@ public:
 
 	int RegisterGlowObject( C_BaseEntity *pEntity, const Vector &vGlowColor, float flGlowAlpha, bool bRenderWhenOccluded, bool bRenderWhenUnoccluded, int nSplitScreenSlot )
 	{
-		int nIndex;
+		intp nIndex;
 		if ( m_nFirstFreeSlot == GlowObjectDefinition_t::END_OF_FREE_LIST )
 		{
 			nIndex = m_GlowObjectDefinitions.AddToTail();

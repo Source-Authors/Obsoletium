@@ -42,13 +42,13 @@ class CLCDItem
 public:
 	CLCDItem() : 
 		m_bActive( true ),
-		m_nSubPage( 0 ),
 		m_Type( LCDITEM_UNKNOWN ),
 		m_Handle( 0 ),
 		x( 0 ),
 		y( 0 ),
 		w( 0 ),
-		h( 0 )
+		h( 0 ),
+		m_nSubPage( 0 )
 	{
 	}
 
@@ -110,8 +110,8 @@ class CLCDItemAggregate : public CLCDItem
 
 public:
 	CLCDItemAggregate() : 
-		m_AggType( AGGTYPE_UNKNOWN ),
 		m_dwNextUpdateTime( 0 ),
+		m_AggType( AGGTYPE_UNKNOWN ),
 		m_yincrement( 0 )
 	{
 		m_Type = LCDITEM_AGGREGATE;
@@ -265,7 +265,7 @@ private:
 
 	unsigned int			m_dwNextUpdateTime;
 	CSysModule				*m_pG15Module;
-	CreateInterfaceFn		m_G15Factory;
+	CreateInterfaceFnT<IG15>		m_G15Factory;
 };
 
 extern CLCD gLCD;

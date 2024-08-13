@@ -559,7 +559,7 @@ void CCollisionEvent::AddTouchEvent( C_BaseEntity *pEntity0, C_BaseEntity *pEnti
 	if ( !pEntity0 || !pEntity1 )
 		return;
 
-	int index = m_touchEvents.AddToTail();
+	intp index = m_touchEvents.AddToTail();
 	touchevent_t &event = m_touchEvents[index];
 	event.pEntity0 = pEntity0;
 	event.pEntity1 = pEntity1;
@@ -919,7 +919,7 @@ float CCollisionEvent::DeltaTimeSinceLastFluid( CBaseEntity *pEntity )
 		}
 	}
 
-	int index = m_fluidEvents.AddToTail();
+	intp index = m_fluidEvents.AddToTail();
 	m_fluidEvents[index].hEntity = pEntity;
 	m_fluidEvents[index].impactTime = gpGlobals->curtime;
 	return FLUID_TIME_MAX;

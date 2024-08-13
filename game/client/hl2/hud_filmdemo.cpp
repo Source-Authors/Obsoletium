@@ -24,14 +24,14 @@
 //-----------------------------------------------------------------------------
 class CHudFilmDemo : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudFilmDemo, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudFilmDemo, vgui::Panel );
 public:
 	CHudFilmDemo( const char *name );
 
 	// vgui overrides
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme );
-	virtual void Paint( void );
-	virtual bool ShouldDraw( void );
+	void ApplySchemeSettings(vgui::IScheme *pScheme ) override;
+	void Paint( void ) override;
+	bool ShouldDraw( void ) override;
 
 	void SetFilmDemoActive( bool bActive );
 
@@ -63,7 +63,7 @@ DECLARE_HUDELEMENT( CHudFilmDemo );
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CHudFilmDemo::CHudFilmDemo( const char *name ) : vgui::Panel( NULL, "HudHDRDemo" ), CHudElement( name )
+CHudFilmDemo::CHudFilmDemo( const char *name ) : CHudElement( name ), vgui::Panel( NULL, "HudHDRDemo" )
 {
 	vgui::Panel *pParent = g_pClientMode->GetViewport();
 	SetParent( pParent );

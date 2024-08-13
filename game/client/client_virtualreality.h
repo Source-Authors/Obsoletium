@@ -56,13 +56,13 @@ public:
 	//
 	// IAppSystem
 	//
-	virtual bool							Connect( CreateInterfaceFn factory );
-	virtual void							Disconnect();
-	virtual void *							QueryInterface( const char *pInterfaceName );
+	bool							Connect( CreateInterfaceFn factory ) override;
+	void							Disconnect() override;
+	void *							QueryInterface( const char *pInterfaceName ) override;
 
 	// these will come from the engine
-	virtual InitReturnVal_t					Init();
-	virtual void							Shutdown();
+	InitReturnVal_t					Init() override;
+	void							Shutdown() override;
 
 	// Called when startup is complete
 	void StartupComplete();
@@ -70,7 +70,7 @@ public:
 	//---------------------------------------------------------
 	// IClientVirtualReality implementation
 	//---------------------------------------------------------
-	virtual void DrawMainMenu() OVERRIDE;
+	virtual void DrawMainMenu() override;
 
 
 	//---------------------------------------------------------
@@ -157,7 +157,10 @@ private:
 #if defined( USE_SDL )
     int m_nNonVRSDLDisplayIndex;
 #endif
+
+#if defined(POSIX)
     bool m_bNonVRRawInput;
+#endif
 };
 
 extern CClientVirtualReality g_ClientVirtualReality;

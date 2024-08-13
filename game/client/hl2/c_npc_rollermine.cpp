@@ -94,7 +94,7 @@ int C_RollerMine::DrawModel( int flags )
 			beamInfo.m_flAmplitude = random->RandomFloat( 16, 32 );
 			beamInfo.m_flBrightness = 255.0;
 			beamInfo.m_flSpeed = 0.0;
-			beamInfo.m_nStartFrame = 0.0;
+			beamInfo.m_nStartFrame = 0;
 			beamInfo.m_flFrameRate = 1.0f;
 
 			if ( m_bPowerDown )

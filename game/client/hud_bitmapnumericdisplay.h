@@ -14,7 +14,7 @@
 
 class CHudBitmapNumericDisplay : public vgui::Panel
 {	
-	DECLARE_CLASS_SIMPLE( CHudBitmapNumericDisplay, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudBitmapNumericDisplay, vgui::Panel );
 
 public:
 	CHudBitmapNumericDisplay(vgui::Panel *parent, const char *name);
@@ -24,8 +24,8 @@ public:
 
 protected:
 	// vgui overrides
-	virtual void PaintBackground( void );
-	virtual void Paint();
+	void PaintBackground( void ) override;
+	void Paint() override;
 	void PaintNumbers(int xpos, int ypos, int value, Color col, int numSigDigits);
 	virtual void PaintNumbers(int xpos, int ypos, int value, Color col)
 	{

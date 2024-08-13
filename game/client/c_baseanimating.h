@@ -92,8 +92,8 @@ class C_BaseAnimating : public C_BaseEntity, private IModelLoadCallback
 {
 public:
 	DECLARE_CLASS( C_BaseAnimating, C_BaseEntity );
-	DECLARE_CLIENTCLASS();
-	DECLARE_PREDICTABLE();
+	DECLARE_CLIENTCLASS_OVERRIDE();
+	DECLARE_PREDICTABLE_OVERRIDE();
 	DECLARE_INTERPOLATION();
 
 	enum
@@ -105,17 +105,17 @@ public:
 	C_BaseAnimating();
 	~C_BaseAnimating();
 
-	virtual C_BaseAnimating*		GetBaseAnimating() { return this; }
+	C_BaseAnimating*		GetBaseAnimating() override { return this; }
 
-	bool UsesPowerOfTwoFrameBufferTexture( void );
+	bool UsesPowerOfTwoFrameBufferTexture( void ) override;
 
-	virtual bool	Interpolate( float currentTime );
-	virtual void	Simulate();	
-	virtual void	Release();	
+	bool	Interpolate( float currentTime ) override;
+	void	Simulate() override;	
+	void	Release() override;	
 
 	float	GetAnimTimeInterval( void ) const;
 
-	virtual unsigned char	GetClientSideFade( void );
+	unsigned char	GetClientSideFade( void ) override;
 
 	// Get bone controller values.
 	virtual void	GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS]);
@@ -126,7 +126,7 @@ public:
 	const char *GetFlexControllerName( LocalFlexController_t iFlexController );
 	const char *GetFlexControllerType( LocalFlexController_t iFlexController );
 
-	virtual void	GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles );
+	void	GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles ) override;
 
 	// Computes a box that surrounds all hitboxes
 	bool ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs );
@@ -140,15 +140,15 @@ public:
 	virtual void GetPoseParameters( CStudioHdr *pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM] );
 	virtual void BuildTransformations( CStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
 	virtual void ApplyBoneMatrixTransform( matrix3x4_t& transform );
- 	virtual int	VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
+ 	int	VPhysicsGetObjectList( IPhysicsObject **pList, int listMax ) override;
 
 	// model specific
-	virtual bool SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime );
+	bool SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime ) override;
 	virtual void UpdateIKLocks( float currentTime );
 	virtual void CalculateIKLocks( float currentTime );
-	virtual bool ShouldDraw();
-	virtual void UpdateVisibility() OVERRIDE;
-	virtual int DrawModel( int flags );
+	bool ShouldDraw() override;
+	void UpdateVisibility() override;
+	int DrawModel( int flags ) override;
 	virtual int	InternalDrawModel( int flags );
 	virtual bool OnInternalDrawModel( ClientModelRenderInfo_t *pInfo );
 	virtual bool OnPostInternalDrawModel( ClientModelRenderInfo_t *pInfo );
@@ -157,7 +157,7 @@ public:
 	virtual IMaterial* GetEconWeaponMaterialOverride( int iTeam ) { return NULL; }
 
 	//
-	virtual CMouthInfo *GetMouth();
+	CMouthInfo *GetMouth() override;
 	virtual void	ControlMouth( CStudioHdr *pStudioHdr );
 	
 	// override in sub-classes
@@ -172,12 +172,12 @@ public:
 	// virtual	void AllocateMaterials( void );
 	// virtual	void FreeMaterials( void );
 
-	virtual void ValidateModelIndex( void );
-	virtual CStudioHdr *OnNewModel( void );
+	void ValidateModelIndex( void ) override;
+	CStudioHdr *OnNewModel( void ) override;
 	CStudioHdr	*GetModelPtr() const;
 	void InvalidateMdlCache();
 	
-	virtual void SetPredictable( bool state );
+	void SetPredictable( bool state ) override;
 	void UseClientSideAnimation();
 
 	// C_BaseClientShader **p_ClientShaders;
@@ -191,7 +191,7 @@ public:
 	virtual void ChildLayerBlend( Vector pos[], Quaternion q[], float currentTime, int boneMask );
 
 	// Attachments
-	int		LookupAttachment( const char *pAttachmentName );
+	int		LookupAttachment( const char *pAttachmentName ) override;
 	int		LookupRandomAttachment( const char *pAttachmentNameSubstring );
 
 	int		LookupPoseParameter( CStudioHdr *pStudioHdr, const char *szName );
@@ -236,14 +236,14 @@ public:
 	//bool solveIK(float a, float b, const Vector &Foot, const Vector &Knee1, Vector &Knee2);
 	//void DebugIK( mstudioikchain_t *pikchain );
 
-	virtual void					PreDataUpdate( DataUpdateType_t updateType );
-	virtual void					PostDataUpdate( DataUpdateType_t updateType );
-	virtual int						RestoreData( const char *context, int slot, int type );
+	void					PreDataUpdate( DataUpdateType_t updateType ) override;
+	void					PostDataUpdate( DataUpdateType_t updateType ) override;
+	int						RestoreData( const char *context, int slot, int type ) override;
 
-	virtual void					NotifyShouldTransmit( ShouldTransmitState_t state );
-	virtual void					OnPreDataChanged( DataUpdateType_t updateType );
-	virtual void					OnDataChanged( DataUpdateType_t updateType );
-	virtual void					AddEntity( void );
+	void					NotifyShouldTransmit( ShouldTransmitState_t state ) override;
+	void					OnPreDataChanged( DataUpdateType_t updateType ) override;
+	void					OnDataChanged( DataUpdateType_t updateType ) override;
+	void					AddEntity( void ) override;
 
 	// This can be used to force client side animation to be on. Only use if you know what you're doing!
 	// Normally, the server entity should set this.
@@ -252,25 +252,25 @@ public:
 	void							AddToClientSideAnimationList();
 	void							RemoveFromClientSideAnimationList( bool bBeingDestroyed = false );
 
-	virtual bool					IsSelfAnimating();
-	virtual void					ResetLatched();
+	bool					IsSelfAnimating() override;
+	void					ResetLatched() override;
 
 	// implements these so ragdolls can handle frustum culling & leaf visibility
-	virtual void					GetRenderBounds( Vector& theMins, Vector& theMaxs );
-	virtual const Vector&			GetRenderOrigin( void );
-	virtual const QAngle&			GetRenderAngles( void );
+	void					GetRenderBounds( Vector& theMins, Vector& theMaxs ) override;
+	const Vector&			GetRenderOrigin( void ) override;
+	const QAngle&			GetRenderAngles( void ) override;
 
-	virtual bool					GetSoundSpatialization( SpatializationInfo_t& info );
+	bool					GetSoundSpatialization( SpatializationInfo_t& info ) override;
 
 	// Attachments.
 	bool							GetAttachment( const char *szName, Vector &absOrigin );
 	bool							GetAttachment( const char *szName, Vector &absOrigin, QAngle &absAngles );
 
 	// Inherited from C_BaseEntity
-	virtual bool					GetAttachment( int number, Vector &origin );
-	virtual bool					GetAttachment( int number, Vector &origin, QAngle &angles );
-	virtual bool					GetAttachment( int number, matrix3x4_t &matrix );
-	virtual bool					GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel );
+	bool					GetAttachment( int number, Vector &origin ) override;
+	bool					GetAttachment( int number, Vector &origin, QAngle &angles ) override;
+	bool					GetAttachment( int number, matrix3x4_t &matrix ) override;
+	bool					GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel ) override;
 	
 	// Returns the attachment in local space
 	bool							GetAttachmentLocal( int iAttachment, matrix3x4_t &attachmentToLocal );
@@ -280,13 +280,13 @@ public:
 	bool							GetRootBone( matrix3x4_t &rootBone );
 
 	// Should this object cast render-to-texture shadows?
-	virtual ShadowType_t			ShadowCastType();
+	ShadowType_t			ShadowCastType() override;
 
 	// Should we collide?
-	virtual CollideType_t			GetCollideType( void );
+	CollideType_t			GetCollideType( void ) override;
 
-	virtual bool					TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
-	virtual bool					TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
+	bool					TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr ) override;
+	bool					TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr ) override;
 
 	// returns true if we're currently being ragdolled
 	bool							IsRagdoll() const;
@@ -298,15 +298,15 @@ public:
 	void							TransferDissolveFrom( C_BaseAnimating *pSource );
 	virtual void					SaveRagdollInfo( int numbones, const matrix3x4_t &cameraTransform, CBoneAccessor &pBoneToWorld );
 	virtual bool					RetrieveRagdollInfo( Vector *pos, Quaternion *q );
-	virtual void					Clear( void );
+	void					Clear( void ) override;
 	void							ClearRagdoll();
 	void							CreateUnragdollInfo( C_BaseAnimating *pRagdoll );
 	bool							ForceSetupBonesAtTime( matrix3x4_t *pBonesOut, float flTime );
 	virtual bool					GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt );
 
 	// For shadows rendering the correct body + sequence...
-	virtual int GetBody()			{ return m_nBody; }
-	virtual int GetSkin()			{ return m_nSkin; }
+	int GetBody() override			{ return m_nBody; }
+	int GetSkin() override			{ return m_nSkin; }
 
 	bool IsOnFire() { return ( (GetFlags() & FL_ONFIRE) != 0 ); }
 
@@ -410,7 +410,7 @@ public:
 	static void						InvalidateBoneCaches();
 
 	// Purpose: My physics object has been updated, react or extract data
-	virtual void					VPhysicsUpdate( IPhysicsObject *pPhysics );
+	void					VPhysicsUpdate( IPhysicsObject *pPhysics ) override;
 
 	void DisableMuzzleFlash();		// Turn off the muzzle flash (ie: signal that we handled the server's event).
 	virtual void DoMuzzleFlash();	// Force a muzzle flash event. Note: this only QUEUES an event, so
@@ -441,14 +441,14 @@ public:
 
 	void							RagdollMoved( void );
 
-	virtual void					GetToolRecordingState( KeyValues *msg );
-	virtual void					CleanupToolRecordingState( KeyValues *msg );
+	void					GetToolRecordingState( KeyValues *msg ) override;
+	void					CleanupToolRecordingState( KeyValues *msg ) override;
 
 	void							SetReceivedSequence( void );
 	virtual bool					ShouldResetSequenceOnNewModel( void );
 
 	virtual bool					IsViewModel() const;
-	virtual void					UpdateOnRemove( void );
+	void					UpdateOnRemove( void ) override;
 
 protected:
 	// View models scale their attachment positions to account for FOV. To get the unmodified
@@ -464,7 +464,7 @@ protected:
 	virtual bool					IsMenuModel() const;
 
 	// Allow studio models to tell C_BaseEntity what their m_nBody value is
-	virtual int						GetStudioBody( void ) { return m_nBody; }
+	int						GetStudioBody( void ) override { return m_nBody; }
 
 	virtual bool					CalcAttachments();
 
@@ -631,7 +631,7 @@ public:
 	void							EnableDynamicModels() { m_bDynamicModelAllowed = true; }
 	bool							IsDynamicModelLoading() const { return m_bDynamicModelPending; }
 private:
-	virtual void					OnModelLoadComplete( const model_t* pModel );
+	void					OnModelLoadComplete( const model_t* pModel ) override;
 
 private:
 	void							LockStudioHdr();

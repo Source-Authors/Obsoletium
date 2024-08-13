@@ -110,7 +110,7 @@ CON_COMMAND( overview_mode, "Sets overview map mode off,small,large: <0|1|2>" )
 
 using namespace vgui;
 
-CMapOverview::CMapOverview( const char *pElementName ) : BaseClass( NULL, pElementName ), CHudElement( pElementName )
+CMapOverview::CMapOverview( const char *pElementName ) : CHudElement( pElementName ), BaseClass( NULL, pElementName )
 {
 	SetParent( g_pClientMode->GetViewport()->GetVPanel() );
 

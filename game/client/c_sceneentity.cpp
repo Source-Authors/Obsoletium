@@ -83,9 +83,10 @@ char const *C_SceneEntity::GetSceneFileName()
 ConVar mp_usehwmvcds( "mp_usehwmvcds", "0", NULL, "Enable the use of the hw morph vcd(s). (-1 = never, 1 = always, 0 = based upon GPU)" ); // -1 = never, 0 = if hasfastvertextextures, 1 = always
 bool UseHWMorphVCDs()
 {
-// 	if ( mp_usehwmvcds.GetInt() == 0 )
-// 		return g_pMaterialSystemHardwareConfig->HasFastVertexTextures();
-// 	return mp_usehwmvcds.GetInt() > 0;
+	// dimhotepus: HWMORPH
+ 	/*if ( mp_usehwmvcds.GetInt() == 0 )
+ 		return g_pMaterialSystemHardwareConfig->HasFastVertexTextures();
+ 	return mp_usehwmvcds.GetInt() > 0;*/
 	return false;
 }
 
@@ -498,7 +499,7 @@ C_BaseFlex *C_SceneEntity::FindNamedActor( CChoreoActor *pChoreoActor )
 		return m_hOwner.Get();
 	}
 
-	int idx = m_pScene->FindActorIndex( pChoreoActor );
+	intp idx = m_pScene->FindActorIndex( pChoreoActor );
 	if ( idx < 0 || idx >= m_hActorList.Count() )
 		return NULL;
 
@@ -627,7 +628,8 @@ void C_SceneEntity::DispatchProcessLoop( CChoreoScene *scene, CChoreoEvent *even
 {
 	Assert( event->GetType() == CChoreoEvent::LOOP );
 
-	float backtime = (float)atof( event->GetParameters() );
+	// dimhotepus: atof -> strtof.
+	float backtime = strtof( event->GetParameters(), nullptr );
 
 	bool process = true;
 	int counter = event->GetLoopCount();

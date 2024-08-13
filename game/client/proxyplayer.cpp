@@ -101,7 +101,7 @@ void CPlayerTeamMatchProxy::OnBind( void *pC_BaseEntity )
 		return;
 
 	Assert( m_pResult );
-	SetFloatResult( (pEntity->GetTeamNumber() == pPlayer->GetTeamNumber()) ? 1.0 : 0.0 );
+	SetFloatResult( (pEntity->GetTeamNumber() == pPlayer->GetTeamNumber()) ? 1.0f : 0.0f );
 
 	if ( ToolsEnabled() )
 	{

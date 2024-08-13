@@ -163,11 +163,11 @@ CON_COMMAND_F( crash, "Crash the client. Optional parameter -- type of crash:\n 
 	switch (crashtype)
 	{
 		case 0:
-			dummy = *((int *) NULL);
+			dummy = *((volatile int *) NULL);
 			Msg("Crashed! %d\n", dummy); // keeps dummy from optimizing out
 			break;
 		case 1:
-			*((int *)NULL) = 42;
+			*((volatile int *)NULL) = 42;
 			break;
 #if defined( _X360 )
 		case 2:
@@ -253,7 +253,7 @@ static void __MsgFunc_VGUIMenu( bf_read &msg )
 	{
 		if ( hud_takesshots.GetBool() == true )
 		{
-			gHUD.SetScreenShotTime( gpGlobals->curtime + 1.0 ); // take a screenshot in 1 second
+			gHUD.SetScreenShotTime( gpGlobals->curtime + 1.0f ); // take a screenshot in 1 second
 		}
 
 		IGameEvent *event = gameeventmanager->CreateEvent( "ds_screenshot" );
@@ -1152,7 +1152,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			}
 		}
 
-		if ( team == 0 && GetLocalTeam() > 0 )
+		if ( team == 0 && GetLocalTeam() != nullptr )
 		{
 			bValidTeam = false;
 		}

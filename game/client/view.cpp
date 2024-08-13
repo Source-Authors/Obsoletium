@@ -823,7 +823,6 @@ void CViewRender::SetUpViews()
 void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int width, int height, bool bCreatePowerOf2Padded/*=false*/,
 												 bool bWriteVTF/*=false*/ )
 {
-#ifndef _X360
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->MatrixMode( MATERIAL_PROJECTION );
 	pRenderContext->PushMatrix();
@@ -964,7 +963,6 @@ void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int widt
 	pRenderContext->PopMatrix();
 
 	g_bRenderingScreenshot = false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -996,6 +994,7 @@ void CViewRender::UpdateReplayScreenshotCache()
 //-----------------------------------------------------------------------------
 void CViewRender::WriteSaveGameScreenshot( const char *pFilename )
 {
+	// dimhotepus: Need dynamic size to scale well.
 	WriteSaveGameScreenshotOfSize( pFilename, SAVEGAME_SCREENSHOT_WIDTH, SAVEGAME_SCREENSHOT_HEIGHT );
 }
 

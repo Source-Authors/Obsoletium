@@ -130,9 +130,9 @@ static void RecordEffect( const char *pEffectName, const CEffectData &data )
 
 		// FIXME: Need to write the attachment name here
  		msg->SetInt( "attachmentindex", data.m_nAttachmentIndex );
-
-		// NOTE: Ptrs are our way of indicating it's an entindex
-		msg->SetPtr( "entindex", (void*)data.entindex() );
+		
+		// dimhotepus: SetPtr -> SetInt
+		msg->SetInt( "entindex", data.entindex() );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
 		msg->deleteThis();
@@ -186,7 +186,8 @@ void DispatchEffect( const char *pName, const CEffectData &data )
 void TE_DispatchEffect( IRecipientFilter& filter, float delay, KeyValues *pKeyValues )
 {
 	CEffectData data;
-	data.m_nMaterial = 0;
+	// dimhotepus: Comment unused m_nMaterial.
+	// data.m_nMaterial = 0;
 		  
 	data.m_vOrigin.x = pKeyValues->GetFloat( "originx" );
 	data.m_vOrigin.y = pKeyValues->GetFloat( "originy" );
@@ -213,7 +214,8 @@ void TE_DispatchEffect( IRecipientFilter& filter, float delay, KeyValues *pKeyVa
 
 	// NOTE: Ptrs are our way of indicating it's an entindex
 	ClientEntityHandle_t hWorld = ClientEntityList().EntIndexToHandle( 0 );
-	data.m_hEntity = (intp)pKeyValues->GetPtr( "entindex", (void*)hWorld.ToInt() );
+	// dimhotepus: GetPtr -> GetInt
+	data.m_hEntity = (intp)pKeyValues->GetInt( "entindex", hWorld.ToInt() );
 
 	const char *pEffectName = pKeyValues->GetString( "effectname" );
 

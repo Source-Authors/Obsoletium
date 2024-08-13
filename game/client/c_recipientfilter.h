@@ -126,32 +126,32 @@ public:
 class CPASAttenuationFilter : public CPASFilter
 {
 public:
-	CPASAttenuationFilter( C_BaseEntity *entity, float attenuation = ATTN_NORM ) :
+	CPASAttenuationFilter( C_BaseEntity *entity, [[maybe_unused]] float attenuation = ATTN_NORM ) :
 		CPASFilter( entity->GetAbsOrigin() )
 	{
 	}
 
-	CPASAttenuationFilter( const Vector& origin, float attenuation = ATTN_NORM ) :
+	CPASAttenuationFilter( const Vector& origin, [[maybe_unused]] float attenuation = ATTN_NORM ) :
 		CPASFilter( origin )
 	{
 	}
 
-	CPASAttenuationFilter( C_BaseEntity *entity, const char *lookupSound ) :
+	CPASAttenuationFilter( C_BaseEntity *entity, const char * ) :
 		CPASFilter( entity->GetAbsOrigin() )
 	{
 	}
 
-	CPASAttenuationFilter( const Vector& origin, const char *lookupSound ) :
+	CPASAttenuationFilter( const Vector& origin, const char * ) :
 		CPASFilter( origin )
 	{
 	}
 
-	CPASAttenuationFilter( C_BaseEntity *entity, const char *lookupSound, HSOUNDSCRIPTHANDLE& handle ) :
+	CPASAttenuationFilter( C_BaseEntity *entity, const char *, HSOUNDSCRIPTHANDLE& ) :
 		CPASFilter( entity->GetAbsOrigin() )
 	{
 	}
 
-	CPASAttenuationFilter( const Vector& origin, const char *lookupSound, HSOUNDSCRIPTHANDLE& handle ) :
+	CPASAttenuationFilter( const Vector& origin, const char *, HSOUNDSCRIPTHANDLE& ) :
 		CPASFilter( origin )
 	{
 	}

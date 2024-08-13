@@ -1093,7 +1093,7 @@ void CVisibleShadowList::EnumShadow( unsigned short clientShadowHandle )
 	if (engine->CullBox( vecAbsMins, vecAbsMaxs ))
 		return;
 
-	int i = m_ShadowsInView.AddToTail( );
+	intp i = m_ShadowsInView.AddToTail( );
 	VisibleShadowInfo_t &info = m_ShadowsInView[i];
 	info.m_hShadow = clientShadowHandle;
 	m_ShadowsInView[i].m_flArea = ComputeScreenArea( vecAbsCenter, flRadius );
@@ -1163,9 +1163,10 @@ int CVisibleShadowList::FindShadows( const CViewSetup *pView, int nLeafCount, Le
 // Constructor
 //-----------------------------------------------------------------------------
 CClientShadowMgr::CClientShadowMgr() :
-	m_DirtyShadows( 0, 0, ShadowHandleCompareFunc ),
 	m_RenderToTextureActive( false ),
+	m_DirtyShadows( 0, 0, ShadowHandleCompareFunc ),
 	m_bDepthTextureActive( false )
+	
 {
 	m_nDepthTextureResolution = r_flashlightdepthres.GetInt();
 	m_bThreaded = false;
@@ -1187,9 +1188,9 @@ CON_COMMAND_F( r_shadowdir, "Set shadow direction", FCVAR_CHEAT )
 	if ( args.ArgC() == 4 )
 	{
 		Vector dir;
-		dir.x = atof( args[1] );
-		dir.y = atof( args[2] );
-		dir.z = atof( args[3] );
+		dir.x = strtof( args[1], nullptr );
+		dir.y = strtof( args[2], nullptr );
+		dir.z = strtof( args[3], nullptr );
 		s_ClientShadowMgr.SetShadowDirection(dir);
 	}
 }
@@ -1209,9 +1210,9 @@ CON_COMMAND_F( r_shadowangles, "Set shadow angles", FCVAR_CHEAT )
 	{
 		Vector dir;
 		QAngle angles;
-		angles.x = atof( args[1] );
-		angles.y = atof( args[2] );
-		angles.z = atof( args[3] );
+		angles.x = strtof( args[1], nullptr );
+		angles.y = strtof( args[2], nullptr );
+		angles.z = strtof( args[3], nullptr );
 		AngleVectors( angles, &dir );
 		s_ClientShadowMgr.SetShadowDirection(dir);
 	}
@@ -1247,7 +1248,7 @@ CON_COMMAND_F( r_shadowdist, "Set shadow distance", FCVAR_CHEAT )
 
 	if (args.ArgC() == 2)
 	{
-		float flDistance = atof( args[1] );
+		float flDistance = strtof( args[1], nullptr );
 		s_ClientShadowMgr.SetShadowDistance( flDistance );
 	}
 }
@@ -1263,7 +1264,7 @@ CON_COMMAND_F( r_shadowblobbycutoff, "some shadow stuff", FCVAR_CHEAT )
 
 	if (args.ArgC() == 2)
 	{
-		float flArea = atof( args[1] );
+		float flArea = strtof( args[1], nullptr );
 		s_ClientShadowMgr.SetShadowBlobbyCutoffArea( flArea );
 	}
 }
@@ -2234,7 +2235,8 @@ inline ShadowType_t CClientShadowMgr::GetActualShadowCastType( ClientShadowHandl
 
 inline ShadowType_t CClientShadowMgr::GetActualShadowCastType( IClientRenderable *pEnt ) const
 {
-	return GetActualShadowCastType( pEnt->GetShadowHandle() );
+	// dimhotepus: Check for nullptr.
+	return GetActualShadowCastType( pEnt ? pEnt->GetShadowHandle() : CLIENTSHADOW_INVALID_HANDLE );
 }
 
 
@@ -2244,7 +2246,7 @@ inline ShadowType_t CClientShadowMgr::GetActualShadowCastType( IClientRenderable
 class CShadowLeafEnum : public ISpatialLeafEnumerator
 {
 public:
-	bool EnumerateLeaf( int leaf, int context )
+	bool EnumerateLeaf( int leaf, intp context )
 	{
 		m_LeafList.AddToTail( leaf );
 		return true;
@@ -2349,7 +2351,7 @@ void CClientShadowMgr::BuildOrthoShadow( IClientRenderable* pRenderable,
 	worldOrigin.z = (int)(worldOrigin.z / dx) * dx;
 
 	// NOTE: We gotta use the general matrix because xvec and yvec aren't perp
-	VMatrix matWorldToShadow, matWorldToTexture;
+	VMatrix matWorldToTexture;
 	BuildGeneralWorldToShadowMatrix( m_Shadows[handle].m_WorldToShadow, worldOrigin, vecShadowDir, xvec, yvec );
 	BuildWorldToTextureMatrix( m_Shadows[handle].m_WorldToShadow, size, matWorldToTexture );
 	Vector2DCopy( size, m_Shadows[handle].m_WorldSize );
@@ -3547,7 +3549,7 @@ void CClientShadowMgr::RemoveAllShadowsFromReceiver(
 		break;
 
 	case SHADOW_RECEIVER_STUDIO_MODEL:
-		if( pRenderable && pRenderable->GetModelInstance() != MODEL_INSTANCE_INVALID )
+		if( pRenderable->GetModelInstance() != MODEL_INSTANCE_INVALID )
 		{
 			shadowmgr->RemoveAllShadowsFromModel( pRenderable->GetModelInstance() );
 		}
@@ -4037,7 +4039,7 @@ void CClientShadowMgr::ComputeShadowTextures( const CViewSetup &viewShadow, int 
 
 	pRenderContext->PushRenderTargetAndViewport( m_ShadowAllocator.GetTexture() );
 
-	if ( !IsX360() && m_bRenderTargetNeedsClear )
+	if ( m_bRenderTargetNeedsClear )
 	{
 		// don't need to clear absent depth buffer
 		pRenderContext->ClearBuffers( true, false );
