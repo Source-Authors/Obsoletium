@@ -30,7 +30,7 @@
 //-----------------------------------------------------------------------------
 class CVTFPreviewPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CVTFPreviewPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CVTFPreviewPanel, vgui::Panel );
 
 public:
 	// constructor
@@ -41,7 +41,7 @@ public:
 	const char *GetVTF() const;
 
 	// Paints the texture
-	virtual void Paint( void );
+	void Paint( void ) override;
 
 private:
 	void PaintNormalMapTexture( void );

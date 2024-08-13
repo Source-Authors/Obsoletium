@@ -804,7 +804,7 @@ void CMDLPanel::SetMergeMDL( MDLHandle_t handle, void *pProxyData, int nSkin /*=
 	if ( m_RootMDL.m_MDL.GetMDL() == MDLHANDLE_INVALID )
 		return;
 
-	int iIndex = m_aMergeMDLs.AddToTail();
+	intp iIndex = m_aMergeMDLs.AddToTail();
 	if ( !m_aMergeMDLs.IsValidIndex( iIndex ) )
 		return;
 

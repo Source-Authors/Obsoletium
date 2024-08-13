@@ -34,7 +34,7 @@ const int MAX_SELECTED_MODELS = 2;
 //-----------------------------------------------------------------------------
 class CMDLPicker : public CBaseAssetPicker
 {
-	DECLARE_CLASS_SIMPLE( CMDLPicker, CBaseAssetPicker );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMDLPicker, CBaseAssetPicker );
 
 public:
 
@@ -54,8 +54,8 @@ public:
 	~CMDLPicker();
 
 	// overridden frame functions
-	virtual void PerformLayout();
-	virtual void OnCommand( const char *pCommand );
+	void PerformLayout() override;
+	void OnCommand( const char *pCommand ) override;
 
 	// Get current model
 	void		GetSelectedMDLName( char *pBuffer, int nMaxLen );
@@ -80,7 +80,7 @@ public:
 private:
 	MESSAGE_FUNC_PARAMS( OnAssetSelected, "AssetSelected", params );
 
-	virtual void OnSelectedAssetPicked( const char *pMDLName );
+	void OnSelectedAssetPicked( const char *pMDLName ) override;
 
 	void RefreshActivitiesAndSequencesList();
 	void RefreshRenderSettings();
@@ -103,8 +103,8 @@ private:
 	void GenerateBackpackIcons( void );
 	CUtlString GetOutputFileSuffix();
 
-	MESSAGE_FUNC_PARAMS( OnCheckButtonChecked, "CheckButtonChecked", kv );
-	MESSAGE_FUNC_PARAMS( OnItemSelected, "ItemSelected", kv );
+	MESSAGE_FUNC_PARAMS_OVERRIDE( OnCheckButtonChecked, "CheckButtonChecked", kv );
+	MESSAGE_FUNC_PARAMS_OVERRIDE( OnItemSelected, "ItemSelected", kv );
 	MESSAGE_FUNC( OnPageChanged, "PageChanged" );	
 	MESSAGE_FUNC_CHARPTR( OnDirectorySelected, "DirectorySelected", dir );
 
@@ -141,7 +141,7 @@ private:
 //-----------------------------------------------------------------------------
 class CMDLPickerFrame : public CBaseAssetPickerFrame
 {
-	DECLARE_CLASS_SIMPLE( CMDLPickerFrame, CBaseAssetPickerFrame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMDLPickerFrame, CBaseAssetPickerFrame );
 
 public:
 	CMDLPickerFrame( vgui::Panel *pParent, const char *pTitle, int nFlags = CMDLPicker::PAGE_ALL );

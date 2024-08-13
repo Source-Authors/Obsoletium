@@ -881,7 +881,7 @@ void CMDLPicker::GenerateBackpackIcons( void )
 
 	char pLargeAssetName[ MAX_PATH ];
 	V_strcpy_safe( pLargeAssetName, pSelectedAsset );
-	V_StripExtension( pLargeAssetName, pLargeAssetName, ARRAYSIZE( pLargeAssetName ) );
+	V_StripExtension( pLargeAssetName, pLargeAssetName, ssize( pLargeAssetName ) );
 
 	CUtlString strExtention = GetOutputFileSuffix();
 	strExtention += "_large.mdl";
@@ -932,12 +932,12 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	// run vtex on the TGA and .txt file to create .VTF and add it to our Perforce changelist
 	char *vTexArgv[64];
 	int vTexArgc = 0;
-	vTexArgv[ vTexArgc++ ] = "";
-	vTexArgv[ vTexArgc++ ] = "-quiet";
-	vTexArgv[ vTexArgc++ ] = "-UseStandardError";
-	vTexArgv[ vTexArgc++ ] = "-WarningsAsErrors";
-	vTexArgv[ vTexArgc++ ] = "-p4skip";
-	vTexArgv[ vTexArgc++ ] = "-outdir";
+	vTexArgv[ vTexArgc++ ] = (char*)"";
+	vTexArgv[ vTexArgc++ ] = (char*)"-quiet";
+	vTexArgv[ vTexArgc++ ] = (char*)"-UseStandardError";
+	vTexArgv[ vTexArgc++ ] = (char*)"-WarningsAsErrors";
+	vTexArgv[ vTexArgc++ ] = (char*)"-p4skip";
+	vTexArgv[ vTexArgc++ ] = (char*)"-outdir";
 	vTexArgv[ vTexArgc++ ] = pOutputPathGame;
 	vTexArgv[ vTexArgc++ ] = (char *)pLargeTGAName;
 
@@ -986,12 +986,12 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	resampleInfo.m_nSrcWidth = width;
 	resampleInfo.m_nSrcHeight = height;
 	resampleInfo.m_flSrcGamma = gamma;
-	resampleInfo.m_pSrc = (unsigned char *)largeTGAImageData.Base();
+	resampleInfo.m_pSrc = largeTGAImageData.Base();
 
 	resampleInfo.m_nDestWidth = kSmallSize;
 	resampleInfo.m_nDestHeight = kSmallSize;
 	resampleInfo.m_flDestGamma = gamma;
-	resampleInfo.m_pDest = (unsigned char *)smallTGAImageData.Base();
+	resampleInfo.m_pDest = smallTGAImageData.Base();
 
 	resampleInfo.m_nFlags = ImageLoader::RESAMPLE_CLAMPS | ImageLoader::RESAMPLE_CLAMPT;
 	//resampleInfo.m_nFlags |= ImageLoader::RESAMPLE_NICE_FILTER; // Turn this off.  It has some sort of edge enhancement or something.  Causes edges to ring.
@@ -1029,12 +1029,12 @@ void CMDLPicker::GenerateBackpackIcons( void )
 
 	// run vtex on the TGA and .txt file to create .VTF and add it to our Perforce changelist
 	vTexArgc = 0;
-	vTexArgv[ vTexArgc++ ] = "";
-	vTexArgv[ vTexArgc++ ] = "-quiet";
-	vTexArgv[ vTexArgc++ ] = "-UseStandardError";
-	vTexArgv[ vTexArgc++ ] = "-WarningsAsErrors";
-	vTexArgv[ vTexArgc++ ] = "-p4skip";
-	vTexArgv[ vTexArgc++ ] = "-outdir";
+	vTexArgv[ vTexArgc++ ] = (char*)"";
+	vTexArgv[ vTexArgc++ ] = (char*)"-quiet";
+	vTexArgv[ vTexArgc++ ] = (char*)"-UseStandardError";
+	vTexArgv[ vTexArgc++ ] = (char*)"-WarningsAsErrors";
+	vTexArgv[ vTexArgc++ ] = (char*)"-p4skip";
+	vTexArgv[ vTexArgc++ ] = (char*)"-outdir";
 	vTexArgv[ vTexArgc++ ] = pOutputPathGame;
 	vTexArgv[ vTexArgc++ ] = (char *)pSmallTGAName;
 	g_pVTex->VTex( MdlPickerFSFactory, pOutputPathGame, vTexArgc, vTexArgv );

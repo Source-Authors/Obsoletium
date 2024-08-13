@@ -224,14 +224,14 @@ void CRotationManipulator::UpdateFromMatrix( void )
 //-----------------------------------------------------------------------------
 CPotteryWheelPanel::CPotteryWheelPanel( vgui::Panel *pParent, const char *pName ) :
 	BaseClass( pParent, pName ), 
+	m_pCurrentManip( NULL ),
+	m_bRenderToTexture( true ),
 	m_pCameraRotate( NULL ), 
 	m_pCameraTranslate( NULL ),
 	m_pCameraZoom( NULL ),
 	m_pLightManip( NULL ),
-	m_pCurrentManip( NULL ),
 	m_nCaptureMouseCode( vgui::MouseCode( -1 ) ),
-	m_xoffset( 0 ), m_yoffset( 0 ),
-	m_bRenderToTexture( true )
+	m_xoffset( 0 ), m_yoffset( 0 )
 {
 	m_bHasLightProbe = false;
 

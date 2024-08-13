@@ -255,7 +255,7 @@ void CGameFileTreeView::GenerateChildrenOfNode(int itemIndex)
 //-----------------------------------------------------------------------------
 // setup a context menu whenever a directory is clicked on
 //-----------------------------------------------------------------------------
-void CGameFileTreeView::GenerateContextMenu( int itemIndex, int x, int y ) 
+void CGameFileTreeView::GenerateContextMenu( [[maybe_unused]] int itemIndex, [[maybe_unused]] int x, [[maybe_unused]] int y ) 
 {
 	return;
 

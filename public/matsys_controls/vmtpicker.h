@@ -29,7 +29,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CVMTPicker : public CBaseAssetPicker
 {
-	DECLARE_CLASS_SIMPLE( CVMTPicker, CBaseAssetPicker );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CVMTPicker, CBaseAssetPicker );
 
 public:
 	CVMTPicker( vgui::Panel *pParent, bool bAllowMultiselect = false );
@@ -37,7 +37,7 @@ public:
 
 private:
 	// Derived classes have this called when the previewed asset changes
-	virtual void OnSelectedAssetPicked( const char *pAssetName );
+	void OnSelectedAssetPicked( const char *pAssetName ) override;
 
 	CVMTPreviewPanel *m_pVMTPreview2D;
 	CVMTPreviewPanel *m_pVMTPreview3D;
@@ -51,7 +51,7 @@ private:
 //-----------------------------------------------------------------------------
 class CVMTPickerFrame : public CBaseAssetPickerFrame
 {
-	DECLARE_CLASS_SIMPLE( CVMTPickerFrame, CBaseAssetPickerFrame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CVMTPickerFrame, CBaseAssetPickerFrame );
 
 public:
 	CVMTPickerFrame( vgui::Panel *pParent, const char *pTitle, bool bAllowMultiselect = false );

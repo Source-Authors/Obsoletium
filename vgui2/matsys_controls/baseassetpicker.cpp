@@ -48,14 +48,14 @@ bool AssetTreeViewSortFunc( KeyValues *node1, KeyValues *node2 )
 //-----------------------------------------------------------------------------
 class CAssetTreeView : public vgui::TreeView
 {
-	DECLARE_CLASS_SIMPLE( CAssetTreeView, vgui::TreeView );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAssetTreeView, vgui::TreeView );
 
 public:
 	CAssetTreeView( vgui::Panel *parent, const char *name, const char *pRootFolderName, const char *pRootDir );
 
 	// Inherited from base classes
-	virtual void GenerateChildrenOfNode( int itemIndex );
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void GenerateChildrenOfNode( int itemIndex ) override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	// Opens and selects the root folder
 	void OpenRoot();
@@ -539,7 +539,7 @@ void CAssetCache::BuildModList()
 //		Q_snprintf( pAssetPath, MAX_PATH, "%s\\%s", pPath, m_pAssetSubDir );
 //		Q_FixSlashes( pPath );
 
-		int i = m_ModList.AddToTail( );
+		intp i = m_ModList.AddToTail( );
 		m_ModList[i].m_ModName.Set( pModName );
 		m_ModList[i].m_Path.Set( pPath );
 
@@ -553,7 +553,7 @@ void CAssetCache::BuildModList()
 //-----------------------------------------------------------------------------
 void CAssetCache::AddAssetToList( CachedAssetList_t& list, const char *pAssetName, int nModIndex )
 {
-	int i = list.m_AssetList.AddToTail( );
+	intp i = list.m_AssetList.AddToTail( );
 	CachedAssetInfo_t& info = list.m_AssetList[i];
 	info.m_AssetName.Set( pAssetName );
 	info.m_nModIndex = nModIndex;
@@ -591,8 +591,8 @@ bool CAssetCache::AddFilesInDirectory( CachedAssetList_t& list, const char *pSta
 
 	// generate children
 	// add all the items
-	int nModCount = m_ModList.Count();
-	int nSubDirLen = list.m_pSubDir ? Q_strlen(list.m_pSubDir) : 0;
+	intp nModCount = m_ModList.Count();
+	intp nSubDirLen = list.m_pSubDir ? Q_strlen(list.m_pSubDir) : 0;
 	const char *pszFileName	= pStartingFile;
 	while ( pszFileName )
 	{
@@ -671,7 +671,7 @@ bool CAssetCache::AddFilesInDirectory( CachedAssetList_t& list, const char *pSta
 //-----------------------------------------------------------------------------
 bool CAssetCache::ContinueSearchForAssets( AssetList_t hList, float flDuration )
 {
-	CachedAssetList_t& list = m_CachedAssets[ (int)hList ];
+	CachedAssetList_t& list = m_CachedAssets[ (intp)hList ];
 
 	float flStartTime = Plat_FloatTime();
 	while ( list.m_DirectoriesToCheck.Count() )
@@ -710,7 +710,7 @@ bool CAssetCache::ContinueSearchForAssets( AssetList_t hList, float flDuration )
 //-----------------------------------------------------------------------------
 bool CAssetCache::BeginAssetScan( AssetList_t hList, bool bForceRescan )
 {
-	CachedAssetList_t& list = m_CachedAssets[ (int)hList ];
+	CachedAssetList_t& list = m_CachedAssets[ (intp)hList ];
 	if ( bForceRescan )
 	{
 		list.m_bAssetScanComplete = false;
@@ -746,7 +746,7 @@ bool CAssetCache::BeginAssetScan( AssetList_t hList, bool bForceRescan )
 AssetList_t CAssetCache::FindAssetList( const char *pAssetType, const char *pSubDir, int nExtCount, const char **ppExt )
 {
 	CachedAssetList_t search( pSubDir, nExtCount, ppExt );
-	int nIndex = m_CachedAssets.Find( search );
+	auto nIndex = m_CachedAssets.Find( search );
 	if ( nIndex == m_CachedAssets.InvalidIndex() )
 	{
 		nIndex = m_CachedAssets.Insert( search );
@@ -758,27 +758,27 @@ AssetList_t CAssetCache::FindAssetList( const char *pAssetType, const char *pSub
 		list.m_pFileTree = new CAssetTreeView( NULL, "FolderFilter", pAssetType, pSubDir );
 	}
 
-	return (AssetList_t)nIndex;
+	return (AssetList_t)static_cast<size_t>(nIndex);
 }
 
 CAssetTreeView* CAssetCache::GetFileTree( AssetList_t hList )
 {
 	if ( hList == ASSET_LIST_INVALID )
 		return NULL;
-	return m_CachedAssets[ (int)hList ].m_pFileTree;
+	return m_CachedAssets[ (intp)hList ].m_pFileTree;
 }
 
 int CAssetCache::GetAssetCount( AssetList_t hList ) const
 {
 	if ( hList == ASSET_LIST_INVALID )
 		return 0;
-	return m_CachedAssets[ (int)hList ].m_AssetList.Count();
+	return m_CachedAssets[ (intp)hList ].m_AssetList.Count();
 }
 
 const CAssetCache::CachedAssetInfo_t& CAssetCache::GetAsset( AssetList_t hList, int nIndex ) const
 {
 	Assert( nIndex < GetAssetCount(hList) );
-	return m_CachedAssets[ (int)hList ].m_AssetList[ nIndex ];
+	return m_CachedAssets[ (intp)hList ].m_AssetList[ nIndex ];
 }
 
 
@@ -964,7 +964,7 @@ void CBaseAssetPicker::GetUserConfigSettings( KeyValues *pUserConfig )
 	pUserConfig->SetString( "filter", m_Filter );
 	pUserConfig->SetString( "folderfilter", m_FolderFilter );
 	pUserConfig->SetString( "mod", ( m_nCurrentModFilter >= 0 ) ? 
-		s_AssetCache.ModInfo( m_nCurrentModFilter ).m_ModName : "" );
+		s_AssetCache.ModInfo( m_nCurrentModFilter ).m_ModName.Get() : "" );
 }
 
 
@@ -1131,7 +1131,7 @@ void CBaseAssetPicker::AddAssetToList( int nAssetIndex )
 	}
 	m_pAssetBrowser->SetItemDragData( nItemID, pDrag );
 
-	int i = m_AssetList.AddToTail( );
+	intp i = m_AssetList.AddToTail( );
 	m_AssetList[i].m_nAssetIndex = nAssetIndex;
 	m_AssetList[i].m_nItemId = nItemID;
 
@@ -1361,7 +1361,7 @@ void CBaseAssetPicker::OnFileSelected()
 
 	if ( Q_stricmp( pFolderFilter, m_FolderFilter.Get() ) )
 	{
-		int nLen = Q_strlen( pFolderFilter );
+		intp nLen = Q_strlen( pFolderFilter );
 		m_FolderFilter = pFolderFilter;
 		if ( nLen > 0 )
 		{

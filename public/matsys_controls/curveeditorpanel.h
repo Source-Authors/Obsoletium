@@ -28,20 +28,20 @@ struct BGRA8888_t;
 //-----------------------------------------------------------------------------
 class CCurveEditorPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CCurveEditorPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCurveEditorPanel, vgui::Panel );
 
 public:
 	// constructor
 	CCurveEditorPanel( vgui::Panel *pParent, const char *pName );
 	~CCurveEditorPanel();
 
-	virtual void Paint( void );
-	virtual void PaintBackground( void );
+	void Paint( void ) override;
+	void PaintBackground( void ) override;
 
-	virtual void OnCursorMoved( int x,int y );
-	virtual void OnMousePressed( vgui::MouseCode code );
-	virtual void OnMouseReleased( vgui::MouseCode code );
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void OnCursorMoved( int x,int y ) override;
+	void OnMousePressed( vgui::MouseCode code ) override;
+	void OnMouseReleased( vgui::MouseCode code ) override;
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 protected:
 	// Control points + values...

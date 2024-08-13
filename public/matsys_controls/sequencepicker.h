@@ -32,7 +32,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CSequencePicker : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CSequencePicker, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSequencePicker, vgui::EditablePanel );
 
 public:
 	enum PickType_t
@@ -48,7 +48,7 @@ public:
 	~CSequencePicker();
 
 	// overridden frame functions
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	// Sets the MDL to preview sequences for
 	void SetMDL( const char *pMDLName );
@@ -88,13 +88,13 @@ private:
 //-----------------------------------------------------------------------------
 class CSequencePickerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CSequencePickerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSequencePickerFrame, vgui::Frame );
 
 public:
 	CSequencePickerFrame( vgui::Panel *pParent, int nFlags );
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 	// Purpose: Activate the dialog
 	void DoModal( const char *pMDLName );

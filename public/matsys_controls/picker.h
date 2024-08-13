@@ -46,12 +46,12 @@ struct PickerInfo_t
 struct PickerList_t
 {
 	PickerList_t() : m_Type( PICKER_CHOICE_STRING ) {}
-	PickerList_t( int nGrowSize, int nInitSize ) : m_Choices( nGrowSize, nInitSize ), m_Type( PICKER_CHOICE_STRING ) {}
+	PickerList_t( int nGrowSize, int nInitSize ) : m_Type( PICKER_CHOICE_STRING ), m_Choices( nGrowSize, nInitSize ) {}
 
-	int Count() const { return m_Choices.Count(); }
-	PickerInfo_t& operator[]( int i ) { return m_Choices[i]; }
-	const PickerInfo_t& operator[]( int i ) const { return m_Choices[i]; }
-	int AddToTail() { return m_Choices.AddToTail(); }
+	intp Count() const { return m_Choices.Count(); }
+	PickerInfo_t& operator[]( intp i ) { return m_Choices[i]; }
+	const PickerInfo_t& operator[]( intp i ) const { return m_Choices[i]; }
+	intp AddToTail() { return m_Choices.AddToTail(); }
 	void RemoveAll() { return m_Choices.RemoveAll(); }
 
 	PickerChoiceType_t m_Type;
@@ -64,7 +64,7 @@ struct PickerList_t
 //-----------------------------------------------------------------------------
 class CPicker : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CPicker, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPicker, vgui::EditablePanel );
 
 public:
 	CPicker( vgui::Panel *pParent, const char *pColumnHeader, const char *pTextType );
@@ -74,7 +74,7 @@ public:
 	void SetStringList( const PickerList_t &list ); 
 
 	// Purpose: 
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 	// Returns the selected string
 	PickerChoiceType_t GetSelectionType() const;
@@ -93,8 +93,6 @@ private:
 	CUtlString m_Filter;
 	const char *m_pPickerType;
 	const char *m_pPickerTextType;
-	const char *m_pPickerExt;
-	const char *m_pPickerSubDir;
 	PickerChoiceType_t m_Type;
 
 	friend class CPickerFrame;
@@ -106,14 +104,14 @@ private:
 //-----------------------------------------------------------------------------
 class CPickerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CPickerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPickerFrame, vgui::Frame );
 
 public:
 	CPickerFrame( vgui::Panel *pParent, const char *pTitle, const char *pColumnHeader, const char *pTextType );
 	~CPickerFrame();
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 	// Purpose: Activate the dialog
 	// The message "Picked" will be sent if something is picked.

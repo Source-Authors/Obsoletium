@@ -30,7 +30,7 @@ struct BGRA8888_t;
 //-----------------------------------------------------------------------------
 class CProceduralTexturePanel : public vgui::EditablePanel, public ITextureRegenerator
 {
-	DECLARE_CLASS_SIMPLE( CProceduralTexturePanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CProceduralTexturePanel, vgui::EditablePanel );
 
 public:
 	// constructor
@@ -38,8 +38,8 @@ public:
 	~CProceduralTexturePanel();
 
 	// Methods of ITextureRegenerator
-	virtual void Release() {}
-	virtual void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pRect );
+	void Release()  override {}
+	void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pRect ) override;
 
 	// initialization, shutdown
 	virtual bool Init( int nWidth, int nHeight, bool bAllocateImageBuffer );
@@ -62,8 +62,8 @@ public:
 	// Maintain proportions when drawing
 	void MaintainProportions( bool bEnable );
 
-	virtual void Paint( void );
-	virtual void PaintBackground( void ) {}
+	void Paint( void ) override;
+	void PaintBackground( void ) override {}
 
 private:
 	void CleanUp();

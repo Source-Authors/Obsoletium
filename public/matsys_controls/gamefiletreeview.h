@@ -31,15 +31,15 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CGameFileTreeView : public vgui::TreeView
 {
-	DECLARE_CLASS_SIMPLE( CGameFileTreeView, vgui::TreeView );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CGameFileTreeView, vgui::TreeView );
 
 public:
 	CGameFileTreeView( vgui::Panel *parent, const char *name, const char *pRootFolderName, const char *pRootDir, const char *pExtension = NULL );
 
 	// Inherited from base classes
-	virtual void GenerateChildrenOfNode( int itemIndex );
-	virtual void GenerateContextMenu( int itemIndex, int x, int y ); 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void GenerateChildrenOfNode( int itemIndex ) override;
+	void GenerateContextMenu( int itemIndex, int x, int y ) override; 
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	// Purpose: Refreshes the active file list
 	void RefreshFileList();

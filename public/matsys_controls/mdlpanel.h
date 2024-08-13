@@ -39,7 +39,7 @@ struct MDLAnimEventState_t
 //-----------------------------------------------------------------------------
 class CMDLPanel : public CPotteryWheelPanel
 {
-	DECLARE_CLASS_SIMPLE( CMDLPanel, CPotteryWheelPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMDLPanel, CPotteryWheelPanel );
 
 public:
 	// constructor, destructor
@@ -47,11 +47,11 @@ public:
 	virtual ~CMDLPanel();
 
 	// Overriden methods of vgui::Panel
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
-	virtual void OnTick();
+	void OnTick() override;
 
-	virtual void Paint();
+	void Paint() override;
 
 	// Sets the current mdl
 	virtual void SetMDL( MDLHandle_t handle, void *pProxyData = NULL );
@@ -106,7 +106,7 @@ public:
 
 protected:
 
-	virtual void SetupRenderState( int nDisplayWidth, int nDisplayHeight ) OVERRIDE;
+	virtual void SetupRenderState( int nDisplayWidth, int nDisplayHeight ) override;
 
 	struct MDLData_t
 	{
@@ -128,14 +128,14 @@ protected:
 
 private:
 	// paint it!
-	virtual void OnPaint3D();
+	void OnPaint3D() override;
 	virtual void PrePaint3D( IMatRenderContext *pRenderContext ) { };
 	virtual void PostPaint3D( IMatRenderContext *pRenderContext ) { };
 	virtual void RenderingRootModel( IMatRenderContext *pRenderContext, CStudioHdr *pStudioHdr, MDLHandle_t mdlHandle, matrix3x4_t *pWorldMatrix ) { };
 	virtual void RenderingMergedModel( IMatRenderContext *pRenderContext, CStudioHdr *pStudioHdr, MDLHandle_t mdlHandle, matrix3x4_t *pWorldMatrix ) { };
 	virtual IMaterial* GetOverrideMaterial( MDLHandle_t mdlHandle ) { return NULL; }
 
-	void OnMouseDoublePressed( vgui::MouseCode code );
+	void OnMouseDoublePressed( vgui::MouseCode code ) override;
 
 	void DrawCollisionModel();
 	void UpdateStudioRenderConfig( void );
