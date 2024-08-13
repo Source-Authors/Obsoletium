@@ -1,8 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #ifdef _WIN32
 #include "SteamAppStartup.h"
@@ -11,6 +7,7 @@
 #include <direct.h>
 #include <sys/stat.h>
 #include <cstdio>
+
 #include "winlite.h"
 
 #define STEAM_PARM "-steam"
@@ -29,9 +26,7 @@ bool FileExists(const char *fileName)
 	return (_stat(fileName, &statbuf) == 0);
 }
 
-//-----------------------------------------------------------------------------
 // Purpose: Launches steam if necessary
-//-----------------------------------------------------------------------------
 bool ShouldLaunchAppViaSteam(const char *lpCmdLine, const char *steamFilesystemDllName, const char *stdioFilesystemDllName)
 {
 	// see if steam is on the command line
@@ -67,9 +62,7 @@ bool ShouldLaunchAppViaSteam(const char *lpCmdLine, const char *steamFilesystemD
 	return true;
 }
 
-//-----------------------------------------------------------------------------
 // Purpose: Handles launching the game indirectly via steam
-//-----------------------------------------------------------------------------
 void LaunchSelfViaSteam(const char *params)
 {
 	// calculate the details of our launch
@@ -115,7 +108,7 @@ void LaunchSelfViaSteam(const char *params)
 		char dir[MAX_PATH];
 		if (::GetCurrentDirectoryA(sizeof(dir), dir))
 		{
-			char *slash = strrchr(dir, '\\');
+			slash = strrchr(dir, '\\');
 			while (slash)
 			{
 				// see if steam_dev.exe is in the directory first
@@ -166,7 +159,7 @@ void LaunchSelfViaSteam(const char *params)
 		if (!steamExe[0])
 		{
 			// still no path, error
-			::MessageBox(NULL, "Error running game: could not find steam.exe to launch", "Fatal Error", MB_OK | MB_ICONERROR);
+			::MessageBox(NULL, "Error running game: could not find steam.exe to launch", "Source - Fatal Error", MB_OK | MB_ICONERROR);
 			return;
 		}
 
@@ -189,7 +182,7 @@ void LaunchSelfViaSteam(const char *params)
 		}
 
 		// exec steam.exe, in silent mode, with the launch app param
-		char *args[4] = { steamExe, "-silent", "-applaunch", NULL };
+		const char *args[4] = { steamExe, "-silent", "-applaunch", NULL };
 		_spawnv(_P_NOWAIT, steamExe, args);
 	}
 }
