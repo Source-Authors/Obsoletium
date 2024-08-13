@@ -148,7 +148,7 @@ public:
 	virtual void							ReleaseRenderData();
 	virtual bool							IsRenderData( const void *pData ) const;
 	void									MarkRenderDataUnused( bool bFrameEnd );
-	int										RenderDataSizeUsed() const;
+	intp									RenderDataSizeUsed() const;
 
 	// debugging
 	virtual void							PrintfVA( char *fmt, va_list vargs );
@@ -375,7 +375,7 @@ public:
 	void									ReadPixelsAndStretch( Rect_t *pSrcRect, Rect_t *pDstRect, unsigned char *pBuffer, ImageFormat dstFormat, int nDstStride ) { g_pShaderAPI->ReadPixels( pSrcRect, pDstRect, pBuffer, dstFormat, nDstStride ); }
 
 	// Gets/sets viewport
-	void									Viewport( int x, int y, int width, int height );
+	void									Viewport( int x, int y, int width, int height ) override;
 	void									GetViewport( int& x, int& y, int& width, int& height ) const;
 	virtual void							DepthRange( float zNear, float zFar );
 
@@ -538,16 +538,16 @@ public:
 
 	virtual void							AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, const char* pDstName, ImageFormat dstFmt, bool bGenMips, int nAdditionalCreationFlags, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs );
 
-	virtual void							AsyncMap( ITextureInternal* pTexToMap, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) OVERRIDE;
-	virtual void							AsyncUnmap( ITextureInternal* pTexToUnmap ) OVERRIDE;
-	virtual void							AsyncCopyRenderTargetToStagingTexture( ITexture* pDst, ITexture* pSrc, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) OVERRIDE;
+	virtual void							AsyncMap( ITextureInternal* pTexToMap, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) override;
+	virtual void							AsyncUnmap( ITextureInternal* pTexToUnmap ) override;
+	virtual void							AsyncCopyRenderTargetToStagingTexture( ITexture* pDst, ITexture* pSrc, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) override;
 
 
 
-	virtual void							BeginMorphAccumulation();
-	virtual void							EndMorphAccumulation();
-	virtual void							AccumulateMorph( IMorph* pMorph, int nMorphCount, const MorphWeight_t* pWeights );
-	virtual bool							GetMorphAccumulatorTexCoord( Vector2D *pTexCoord, IMorph *pMorph, int nVertex );
+	void							BeginMorphAccumulation() override;
+	void							EndMorphAccumulation() override;
+	void							AccumulateMorph( IMorph* pMorph, int nMorphCount, const MorphWeight_t* pWeights ) override;
+	bool							GetMorphAccumulatorTexCoord( Vector2D *pTexCoord, IMorph *pMorph, int nVertex ) override;
 
 	DELEGATE_TO_OBJECT_1V(                  PushDeformation, const DeformationBase_t *, g_pShaderAPI );
 	DELEGATE_TO_OBJECT_0V(                  PopDeformation, g_pShaderAPI );

@@ -357,10 +357,11 @@ int ParseVectorFromKeyValueString( const char *pParamName, const char* pScan, co
 
 	if( divideBy255 )
 	{
-		vecVal[0] *= ( 1.0f / 255.0f );
-		vecVal[1] *= ( 1.0f / 255.0f );
-		vecVal[2] *= ( 1.0f / 255.0f );
-		vecVal[3] *= ( 1.0f / 255.0f );
+		constexpr float div = 1.0f / 255.0f;
+		vecVal[0] *= div;
+		vecVal[1] *= div;
+		vecVal[2] *= div;
+		vecVal[3] *= div;
 	}
 
 	return i;

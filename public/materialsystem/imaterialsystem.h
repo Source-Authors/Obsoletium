@@ -13,7 +13,7 @@
 #pragma once
 #endif
 
-#define OVERBRIGHT 2.0f
+#define OVERBRIGHT 2
 #define OO_OVERBRIGHT ( 1.0f / 2.0f )
 #define GAMMA 2.2f
 #define TEXGAMMA 2.2f
@@ -601,7 +601,7 @@ public:
 	virtual CreateInterfaceFn	Init( char const* pShaderAPIDLL, 
 		IMaterialProxyFactory *pMaterialProxyFactory,
 		CreateInterfaceFn fileSystemFactory,
-		CreateInterfaceFn cvarFactory=NULL ) = 0;
+		CreateInterfaceFn cvarFactory=nullptr ) = 0;
 
 	// Call this to set an explicit shader version to use 
 	// Must be called before Init().
@@ -836,7 +836,7 @@ public:
 	virtual void				ReloadTextures( ) = 0;
 
 	// Reloads materials
-	virtual void				ReloadMaterials( const char *pSubString = NULL ) = 0;
+	virtual void				ReloadMaterials( const char *pSubString = nullptr ) = 0;
 
 	// Create a procedural material. The keyvalues looks like a VMT file
 	virtual IMaterial *			CreateMaterial( const char *pMaterialName, KeyValues *pVMTKeyValues ) = 0;
@@ -853,7 +853,7 @@ public:
 	// Note: if the material can't be found, this returns a checkerboard material. You can 
 	// find out if you have that material by calling IMaterial::IsErrorMaterial().
 	// (Or use the global IsErrorMaterial function, which checks if it's null too).
-	virtual IMaterial *			FindMaterial( char const* pMaterialName, const char *pTextureGroupName, bool complain = true, const char *pComplainPrefix = NULL ) = 0;
+	virtual IMaterial *			FindMaterial( char const* pMaterialName, const char *pTextureGroupName, bool complain = true, const char *pComplainPrefix = nullptr ) = 0;
 
 	// Query whether a material is loaded (eg, whether FindMaterial will be nonblocking)
 	virtual bool				IsMaterialLoaded( char const* pMaterialName ) = 0;
@@ -869,7 +869,7 @@ public:
 	virtual MaterialHandle_t	FirstMaterial() const = 0;
 
 	// returns InvalidMaterial if there isn't another material.
-	// WARNING: you must call GetNextMaterial until it returns NULL, 
+	// WARNING: you must call GetNextMaterial until it returns nullptr, 
 	// otherwise there will be a memory leak.
 	virtual MaterialHandle_t	NextMaterial( MaterialHandle_t h ) const = 0;
 
@@ -916,7 +916,7 @@ public:
 		ImageFormat	format, 
 		MaterialRenderTargetDepth_t depth = MATERIAL_RT_DEPTH_SHARED ) = 0;
 
-	virtual ITexture *			CreateNamedRenderTargetTextureEx(  const char *pRTName,				// Pass in NULL here for an unnamed render target.
+	virtual ITexture *			CreateNamedRenderTargetTextureEx(  const char *pRTName,				// Pass in nullptr here for an unnamed render target.
 		int w, 
 		int h, 
 		RenderTargetSizeMode_t sizeMode,	// Controls how size is generated (and regenerated on video mode change).
@@ -935,7 +935,7 @@ public:
 		bool bAutoMipMap = false ) = 0;
 
 	// Must be called between the above Begin-End calls!
-	virtual ITexture *			CreateNamedRenderTargetTextureEx2( const char *pRTName,				// Pass in NULL here for an unnamed render target.
+	virtual ITexture *			CreateNamedRenderTargetTextureEx2( const char *pRTName,				// Pass in nullptr here for an unnamed render target.
 		int w, 
 		int h, 
 		RenderTargetSizeMode_t sizeMode,	// Controls how size is generated (and regenerated on video mode change).
@@ -1061,7 +1061,7 @@ public:
 
 	// Extended version of FindMaterial().
 	// Contains context in so it can make decisions (i.e. if it's a model, ignore certain cheat parameters)
-	virtual IMaterial *			FindMaterialEx( char const* pMaterialName, const char *pTextureGroupName, int nContext, bool complain = true, const char *pComplainPrefix = NULL ) = 0;
+	virtual IMaterial *			FindMaterialEx( char const* pMaterialName, const char *pTextureGroupName, int nContext, bool complain = true, const char *pComplainPrefix = nullptr ) = 0;
 
 #ifdef DX_TO_GL_ABSTRACTION
 	virtual void				DoStartupShaderPreloading( void ) = 0;
@@ -1075,7 +1075,7 @@ public:
 	virtual void				GetRenderTargetFrameBufferDimensions( int & nWidth, int & nHeight ) = 0;
 
 	// returns the display device name that matches the adapter index we were started with
-	virtual char *GetDisplayDeviceName() const = 0;
+	virtual const char *GetDisplayDeviceName() const = 0;
 
 	// creates a texture suitable for use with materials from a raw stream of bits.
 	// The bits will be retained by the material system and can be freed upon return.
@@ -1122,14 +1122,14 @@ public:
 	virtual void				BindLocalCubemap( ITexture *pTexture ) = 0;
 
 	// pass in an ITexture (that is build with "rendertarget" "1") or
-	// pass in NULL for the regular backbuffer.
+	// pass in nullptr for the regular backbuffer.
 	virtual void				SetRenderTarget( ITexture *pTexture ) = 0;
 	virtual ITexture *			GetRenderTarget( void ) = 0;
 
 	virtual void				GetRenderTargetDimensions( int &width, int &height) const = 0;
 
 	// Bind a material is current for rendering.
-	virtual void				Bind( IMaterial *material, void *proxyData = 0 ) = 0;
+	virtual void				Bind( IMaterial *material, void *proxyData = nullptr ) = 0;
 	// Bind a lightmap page current for rendering.  You only have to 
 	// do this for materials that require lightmaps.
 	virtual void				BindLightmapPage( int lightmapPageID ) = 0;
@@ -1213,7 +1213,7 @@ public:
 	virtual void				SetNumBoneWeights( int numBones ) = 0;
 
 	// Creates/destroys Mesh
-	virtual IMesh* CreateStaticMesh( VertexFormat_t fmt, const char *pTextureBudgetGroup, IMaterial * pMaterial = NULL ) = 0;
+	virtual IMesh* CreateStaticMesh( VertexFormat_t fmt, const char *pTextureBudgetGroup, IMaterial * pMaterial = nullptr ) = 0;
 	virtual void DestroyStaticMesh( IMesh* mesh ) = 0;
 
 	// Gets the dynamic mesh associated with the currently bound material
@@ -1238,9 +1238,9 @@ public:
 	// going to use BEFORE calling GetDynamicMesh.
 	virtual IMesh* GetDynamicMesh( 
 		bool buffered = true, 
-		IMesh* pVertexOverride = 0,	
-		IMesh* pIndexOverride = 0, 
-		IMaterial *pAutoBind = 0 ) = 0;
+		IMesh* pVertexOverride = nullptr,	
+		IMesh* pIndexOverride = nullptr, 
+		IMaterial *pAutoBind = nullptr ) = 0;
 
 	// ------------ New Vertex/Index Buffer interface ----------------------------
 	// Do we need support for bForceTempMesh and bSoftwareVertexShader?
@@ -1339,11 +1339,11 @@ public:
 	virtual void SetFlexWeights( int nFirstWeight, int nCount, const MorphWeight_t* pWeights ) = 0;
 
 	// FIXME: Remove
-	virtual void Unused4() {};
-	virtual void Unused5() {};
-	virtual void Unused6() {};
-	virtual void Unused7() {};
-	virtual void Unused8() {};
+	virtual void Unused4() {}
+	virtual void Unused5() {}
+	virtual void Unused6() {}
+	virtual void Unused7() {}
+	virtual void Unused8() {}
 
 	// Read w/ stretch to a host-memory buffer
 	virtual void ReadPixelsAndStretch( Rect_t *pSrcRect, Rect_t *pDstRect, unsigned char *pBuffer, ImageFormat dstFormat, int nDstStride ) = 0;
@@ -1364,7 +1364,7 @@ public:
 		float src_texture_x1, float src_texture_y1,			// which texel you want to appear at
 		// destx+width-1, desty+height-1
 		int src_texture_width, int src_texture_height,		// needed for fixup
-		void *pClientRenderable = NULL,
+		void *pClientRenderable = nullptr,
 		int nXDice = 1,
 		int nYDice = 1 )=0;
 
@@ -1389,8 +1389,8 @@ public:
 	virtual void BindLightmapTexture( ITexture *pLightmapTexture ) = 0;
 
 	// Blit a subrect of the current render target to another texture
-	virtual void CopyRenderTargetToTextureEx( ITexture *pTexture, int nRenderTargetID, Rect_t *pSrcRect, Rect_t *pDstRect = NULL ) = 0;
-	virtual void CopyTextureToRenderTargetEx( int nRenderTargetID, ITexture *pTexture, Rect_t *pSrcRect, Rect_t *pDstRect = NULL ) = 0;
+	virtual void CopyRenderTargetToTextureEx( ITexture *pTexture, int nRenderTargetID, Rect_t *pSrcRect, Rect_t *pDstRect = nullptr ) = 0;
+	virtual void CopyTextureToRenderTargetEx( int nRenderTargetID, ITexture *pTexture, Rect_t *pSrcRect, Rect_t *pDstRect = nullptr ) = 0;
 
 	// Special off-center perspective matrix for DoF, MSAA jitter and poster rendering
 	virtual void PerspectiveOffCenterX( double fovx, double aspect, double zNear, double zFar, double bottom, double top, double left, double right ) = 0;
@@ -1458,11 +1458,11 @@ public:
 	// from changelist 166623:
 	// - replaced obtuse material system batch usage with an explicit and easier to thread API
 	virtual void BeginBatch( IMesh* pIndices ) = 0;
-	virtual void BindBatch( IMesh* pVertices, IMaterial *pAutoBind = NULL ) = 0;
+	virtual void BindBatch( IMesh* pVertices, IMaterial *pAutoBind = nullptr ) = 0;
 	virtual void DrawBatch(int firstIndex, int numIndices ) = 0;
 	virtual void EndBatch() = 0;
 
-	// Raw access to the call queue, which can be NULL if not in a queued mode
+	// Raw access to the call queue, which can be nullptr if not in a queued mode
 	virtual ICallQueue *GetCallQueue() = 0;
 
 	// Returns the world-space camera position
@@ -1506,7 +1506,7 @@ public:
 
 	// Version of get dynamic mesh that specifies a specific vertex format
 	virtual IMesh*				GetDynamicMeshEx( VertexFormat_t vertexFormat, bool bBuffered = true, 
-		IMesh* pVertexOverride = 0,	IMesh* pIndexOverride = 0, IMaterial *pAutoBind = 0 ) = 0;
+		IMesh* pVertexOverride = nullptr,	IMesh* pIndexOverride = nullptr, IMaterial *pAutoBind = nullptr ) = 0;
 
 	virtual void				FogMaxDensity( float flMaxDensity ) = 0;
 
@@ -1549,18 +1549,18 @@ public:
 	virtual void			UnlockRenderData( void *pData ) = 0;
 
 	// Typed version. If specified, pSrcData is copied into the locked memory.
-	template< class E > E*  LockRenderDataTyped( int nCount, const E* pSrcData = NULL );
+	template< class E > E*  LockRenderDataTyped( int nCount, const E* pSrcData = nullptr );
 
 	// Temp render data gets immediately freed after it's all unlocked in single core.
 	// This prevents it from being freed
 	virtual void			AddRefRenderData() = 0;	
 	virtual void			ReleaseRenderData() = 0;
 
-	// Returns whether a pointer is render data. NOTE: passing NULL returns true
+	// Returns whether a pointer is render data. NOTE: passing nullptr returns true
 	virtual bool			IsRenderData( const void *pData ) const = 0;
 	virtual void			PrintfVA( char *fmt, va_list vargs ) = 0;
 	virtual void			Printf( PRINTF_FORMAT_STRING const char *fmt, ... ) = 0;
-	virtual float			Knob( char *knobname, float *setvalue = NULL ) = 0;
+	virtual float			Knob( char *knobname, float *setvalue = nullptr ) = 0;
 	// Allows us to override the alpha write setting of a material
 	virtual void OverrideAlphaWriteEnable( bool bEnable, bool bAlphaWriteEnable ) = 0;
 	virtual void OverrideColorWriteEnable( bool bOverrideEnable, bool bColorWriteEnable ) = 0;
@@ -1604,12 +1604,12 @@ private:
 
 inline CMatRenderDataReference::CMatRenderDataReference()
 {
-	m_pRenderContext = NULL;
+	m_pRenderContext = nullptr;
 }
 
 inline CMatRenderDataReference::CMatRenderDataReference( IMatRenderContext* pRenderContext )
 {
-	m_pRenderContext = NULL;
+	m_pRenderContext = nullptr;
 	Lock( pRenderContext );
 }
 
@@ -1632,7 +1632,7 @@ inline void CMatRenderDataReference::Release()
 	if ( m_pRenderContext )
 	{
 		m_pRenderContext->ReleaseRenderData( );
-		m_pRenderContext = NULL;
+		m_pRenderContext = nullptr;
 	}
 }
 
@@ -1645,9 +1645,9 @@ class CMatRenderData
 {
 public:
 	CMatRenderData( IMatRenderContext* pRenderContext );
-	CMatRenderData( IMatRenderContext* pRenderContext, int nCount, const E *pSrcData = NULL );
+	CMatRenderData( IMatRenderContext* pRenderContext, int nCount, const E *pSrcData = nullptr );
 	~CMatRenderData();
-	E* Lock( int nCount, const E* pSrcData = NULL ); 
+	E* Lock( int nCount, const E* pSrcData = nullptr ); 
 	void Release();
 	bool IsValid() const;
 	const E* Base() const;
@@ -1690,7 +1690,7 @@ inline CMatRenderData<E>::~CMatRenderData()
 template< typename E >
 inline bool CMatRenderData<E>::IsValid() const
 {
-	return m_pRenderData != NULL;
+	return m_pRenderData != nullptr;
 }
 
 template< typename E >
@@ -1725,7 +1725,7 @@ inline void CMatRenderData<E>::Release()
 			m_pRenderContext->ReleaseRenderData();
 		}
 	}
-	m_pRenderData = NULL;
+	m_pRenderData = nullptr;
 	m_nCount = 0;
 	m_bNeedsUnlock = false;
 }
@@ -1809,10 +1809,10 @@ private:
 // Also be sure to enable PIX_INSTRUMENTATION in shaderdevicedx8.h
 //#define PIX_ENABLE 1		// set this to 1 and build engine/studiorender to enable pix events in the engine
 
-#if PIX_ENABLE
+#if defined(PIX_ENABLE) && PIX_ENABLE
 #	define PIXEVENT PIXEvent _pixEvent
 #else
-#	define PIXEVENT 
+#	define PIXEVENT(ctx, description)
 #endif
 
 //-----------------------------------------------------------------------------

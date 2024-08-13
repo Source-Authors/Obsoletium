@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "Color.h"
 #include "tier1/interface.h"
 #include "bitmap/imageformat.h"
 

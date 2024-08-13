@@ -68,12 +68,12 @@ struct FileHeader_t
 	inline MeshHeader_t *pMesh( int nMesh ) const 
 	{
 		return (MeshHeader_t *)(((byte *)this) + sizeof(FileHeader_t)) + nMesh;
-	};
+	}
 
 	inline void *pVertexBase( int nMesh ) const 
 	{
 		return (void *)((byte *)this + pMesh( nMesh )->m_nOffset);
-	};
+	}
 
 	unsigned int m_nUnused[4];
 };

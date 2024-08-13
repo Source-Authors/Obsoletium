@@ -12,6 +12,7 @@
 #include "generichash.h"
 #include "filesystem.h"
 #include "filesystem/IQueuedLoader.h"
+#include "Color.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -74,7 +75,7 @@ ColorCorrectionLookup_t::~ColorCorrectionLookup_t( )
 void ColorCorrectionLookup_t::AllocTexture()
 {
 	char name[64];
-	sprintf( name, "ColorCorrection - %u", m_Handle );
+	sprintf( name, "ColorCorrection - %zu", m_Handle );
 
 	m_pColorCorrectionTexture = ITextureInternal::CreateProceduralTexture( name, TEXTURE_GROUP_OTHER,
 		COLOR_CORRECTION_TEXTURE_SIZE, COLOR_CORRECTION_TEXTURE_SIZE, COLOR_CORRECTION_TEXTURE_SIZE, IMAGE_FORMAT_BGRX8888,
@@ -186,7 +187,7 @@ void ReleaseColorCorrection()
 	g_pColorCorrectionSystem->ReleaseTextures();
 }
 
-void RestoreColorCorrection( int changeFlags )
+void RestoreColorCorrection( int )
 {
 	g_pColorCorrectionSystem->RestoreTextures();
 }
@@ -594,7 +595,7 @@ void CColorCorrectionSystem::LoadLookup( ColorCorrectionHandle_t handle, const c
 		return;
 	}
 
-	color24 *pColors = (color24 *)colorBuff.Base();
+	color24 *pColors = colorBuff.Base<color24>();
 	int colorIndex = 0;
 	RGBX5551_t inColor;
 

@@ -134,7 +134,7 @@ public:
 	bool				IsTwoSided()									{ return m_pMaterialPage->IsTwoSided(); }
 
 	int					GetNumPasses( void )							{ return m_pMaterialPage->GetNumPasses(); }
-	int					GetTextureMemoryBytes( void )					{ return m_pMaterialPage->GetTextureMemoryBytes(); }
+	intp				GetTextureMemoryBytes( void )					{ return m_pMaterialPage->GetTextureMemoryBytes(); }
 
 	// IMaterialInternal Interface.
 	void				DrawMesh( VertexCompressionType_t vertexCompression )	{ m_pMaterialPage->DrawMesh( vertexCompression ); }
@@ -324,7 +324,7 @@ CMaterialSubRect::CMaterialSubRect( const char *pMaterialName, const char *pText
 	m_QueueFriendlyVersion.SetRealTimeVersion( this );
 
 	// Name with extension stripped off.
-	int len = Q_strlen( pMaterialName );
+	intp len = Q_strlen( pMaterialName );
 	char* pTemp = ( char* )_alloca( len + 1 );
 	Q_strncpy( pTemp, pMaterialName, len + 1 );
 	Q_strlower( pTemp );
@@ -967,10 +967,11 @@ static IMaterialVar* CreateVectorMaterialVarFromKeyValue( IMaterial* pMaterial, 
 
 	if( divideBy255 )
 	{
-		vecVal[0] *= ( 1.0f / 255.0f );
-		vecVal[1] *= ( 1.0f / 255.0f );
-		vecVal[2] *= ( 1.0f / 255.0f );
-		vecVal[3] *= ( 1.0f / 255.0f );
+		constexpr float div = 1.0f / 255.0f;
+		vecVal[0] *= div;
+		vecVal[1] *= div;
+		vecVal[2] *= div;
+		vecVal[3] *= div;
 	}
 	
 	// Create the variable!

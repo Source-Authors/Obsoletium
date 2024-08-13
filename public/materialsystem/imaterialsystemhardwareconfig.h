@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 FORCEINLINE bool IsEmulatingGL()
 {
-	static bool bIsEmulatingGL = ( Plat_GetCommandLineA() ) ? ( strstr( Plat_GetCommandLineA(), "-r_emulate_gl" ) != NULL ) : false;
+	static bool bIsEmulatingGL = ( Plat_GetCommandLineA() ) ? ( strstr( Plat_GetCommandLineA(), "-r_emulate_gl" ) != nullptr ) : false;
 	return bIsEmulatingGL;
 }
 
@@ -78,7 +78,7 @@ FORCEINLINE ret_type method const 									\
 
 #else
 #define DEFCONFIGMETHOD( ret_type, method, xbox_return_value )	\
-virtual ret_type method const = 0;
+virtual ret_type method const = 0
 #endif
 
 

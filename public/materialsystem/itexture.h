@@ -85,7 +85,7 @@ public:
 	virtual void Download( Rect_t *pRect = 0, int nAdditionalCreationFlags = 0 ) = 0;
 
 	// Uses for stats. . .get the approximate size of the texture in it's current format.
-	virtual int GetApproximateVidMemBytes( void ) const = 0;
+	virtual intp GetApproximateVidMemBytes( void ) const = 0;
 
 	// Returns true if the texture data couldn't be loaded.
 	virtual bool IsError() const = 0;

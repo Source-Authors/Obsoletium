@@ -108,7 +108,7 @@ public:
 	bool	IsTwoSided();
 
 	int		GetNumPasses( void );
-	int		GetTextureMemoryBytes( void );
+	intp		GetTextureMemoryBytes( void );
 
 	void	SetUseFixedFunctionBakedLighting( bool bEnable );
 
@@ -455,7 +455,7 @@ void IMaterialInternal::DestroyMaterial( IMaterialInternal* pMaterial )
 CMaterial::CMaterial( char const* materialName, const char *pTextureGroupName, KeyValues *pKeyValues )
 {
 	m_Reflectivity.Init( 0.2f, 0.2f, 0.2f );
-	int len = Q_strlen(materialName);
+	intp len = Q_strlen(materialName);
 	char* pTemp = (char*)_alloca( len + 1 );
 
 	// Strip off the extension
@@ -855,7 +855,7 @@ static int FindMaterialVar( IShader* pShader, char const* pVarName )
 			continue;
 
 		// Strip spaces at the end
-		int nLen = Q_strlen( pParamName );
+		intp nLen = Q_strlen( pParamName );
 		pFound += nLen;
 		while ( true )
 		{
@@ -934,10 +934,11 @@ int ParseVectorFromKeyValueString( KeyValues *pKeyValue, const char *pMaterialNa
 
 	if( divideBy255 )
 	{
-		vecVal[0] *= ( 1.0f / 255.0f );
-		vecVal[1] *= ( 1.0f / 255.0f );
-		vecVal[2] *= ( 1.0f / 255.0f );
-		vecVal[3] *= ( 1.0f / 255.0f );
+		constexpr float div = 1.0f / 255.0f;
+		vecVal[0] *= div;
+		vecVal[1] *= div;
+		vecVal[2] *= div;
+		vecVal[3] *= div;
 	}
 
 	return i;
@@ -1065,7 +1066,7 @@ int CMaterial::FindMaterialVarFlag( char const* pFlagName ) const
 			continue;
 
 		// Strip spaces at the end
-		int nLen = Q_strlen( pStateString );
+		intp nLen = Q_strlen( pStateString );
 		pFound += nLen;
 		while ( true )
 		{
@@ -1800,14 +1801,8 @@ inline void CMaterial::SetMaterialVarFlags( int flags, bool on )
 		return;
 	}
 
-	if (on)
-	{
-		m_pShaderParams[FLAGS]->SetIntValue( GetMaterialVarFlags() | flags );
-	}
-	else
-	{
-		m_pShaderParams[FLAGS]->SetIntValue( GetMaterialVarFlags() & (~flags) );
-	}
+	int val = on ? (GetMaterialVarFlags() | flags) : (GetMaterialVarFlags() & (~flags));
+	m_pShaderParams[FLAGS]->SetIntValue( val );
 
 	// Mark it as being defined...
 	m_pShaderParams[FLAGS_DEFINED]->SetIntValue( m_pShaderParams[FLAGS_DEFINED]->GetIntValueFast() | flags );
@@ -1815,31 +1810,31 @@ inline void CMaterial::SetMaterialVarFlags( int flags, bool on )
 
 inline int CMaterial::GetMaterialVarFlags2() const
 {
-	if ( m_pShaderParams && m_VarCount > FLAGS2 && m_pShaderParams[FLAGS2] )
+	if ( m_pShaderParams && m_VarCount > FLAGS2 )
 	{
-		return m_pShaderParams[FLAGS2]->GetIntValueFast();
+		IMaterialVar *var = m_pShaderParams[FLAGS2];
+		return var->GetIntValueFast();
 	}
-	else
-	{
-		return 0;
-	}
+
+	return 0;
 }
 
 inline void CMaterial::SetMaterialVarFlags2( int flags, bool on )
 {
-	if ( m_pShaderParams && m_VarCount > FLAGS2 && m_pShaderParams[FLAGS2] )
+	if (m_pShaderParams)
 	{
-		if (on)
-			m_pShaderParams[FLAGS2]->SetIntValue( GetMaterialVarFlags2() | flags );
-		else
-			m_pShaderParams[FLAGS2]->SetIntValue( GetMaterialVarFlags2() & (~flags) );
-	}
+		if ( m_VarCount > FLAGS2 && m_pShaderParams[FLAGS2] )
+		{
+			int val = on ? (GetMaterialVarFlags2() | flags) : (GetMaterialVarFlags2() & (~flags));
+			m_pShaderParams[FLAGS2]->SetIntValue( val );
+		}
 
-	if ( m_pShaderParams && m_VarCount > FLAGS_DEFINED2 && m_pShaderParams[FLAGS_DEFINED2] )
-	{
-		// Mark it as being defined...
-		m_pShaderParams[FLAGS_DEFINED2]->SetIntValue( 
-			m_pShaderParams[FLAGS_DEFINED2]->GetIntValueFast() | flags );
+		if ( m_VarCount > FLAGS_DEFINED2 && m_pShaderParams[FLAGS_DEFINED2] )
+		{
+			IMaterialVar *var = m_pShaderParams[FLAGS_DEFINED2];
+			// Mark it as being defined...
+			var->SetIntValue(var->GetIntValueFast() | flags);
+		}
 	}
 }
 
@@ -2681,7 +2676,7 @@ PreviewImageRetVal_t CMaterial::GetPreviewImageProperties( int *width, int *heig
 		return MATERIAL_NO_PREVIEW_IMAGE;
 	}
 
-	int nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
+	unsigned short nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 	unsigned char *pMem = (unsigned char *)stackalloc( nHeaderSize );
 	CUtlBuffer buf( pMem, nHeaderSize );
 	if( !g_pFullFileSystem->ReadFile( pFileName, NULL, buf, nHeaderSize ) )
@@ -2710,14 +2705,16 @@ PreviewImageRetVal_t CMaterial::GetPreviewImage( unsigned char *pData, int width
 					             ImageFormat imageFormat ) const
 {
 	CUtlBuffer buf;
-	int nHeaderSize;
-	int nImageOffset, nImageSize;
+	unsigned short nHeaderSize;
+	intp nImageOffset, nImageSize;
 
 	char const* pFileName = GetPreviewImageFileName();
 	if ( IsX360() || !pFileName )
 	{
 		return MATERIAL_NO_PREVIEW_IMAGE;
 	}
+
+	int nBytesRead = 0;
 
 	IVTFTexture *pVTFTexture = CreateVTFTexture();
 	FileHandle_t fileHandle = g_pFullFileSystem->Open( pFileName, "rb" );
@@ -2731,7 +2728,6 @@ PreviewImageRetVal_t CMaterial::GetPreviewImage( unsigned char *pData, int width
 	buf.EnsureCapacity( nHeaderSize );
 	
 	// read the header first.. it's faster!!
-	int nBytesRead; // GCC won't let this be initialized right away
 	nBytesRead = g_pFullFileSystem->Read( buf.Base(), nHeaderSize, fileHandle );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
 		
@@ -2765,7 +2761,7 @@ PreviewImageRetVal_t CMaterial::GetPreviewImage( unsigned char *pData, int width
 	g_pFullFileSystem->Close( fileHandle );
 		
 	// Convert from the format read in to the requested format
-	ImageLoader::ConvertImageFormat( (unsigned char*)buf.Base(), pVTFTexture->Format(), 
+	ImageLoader::ConvertImageFormat( buf.Base<unsigned char>(), pVTFTexture->Format(), 
 		pData, imageFormat, width, height );
 
 	DestroyVTFTexture( pVTFTexture );
@@ -2776,7 +2772,7 @@ fail:
 	{
 		g_pFullFileSystem->Close( fileHandle );
 	}
-	int nSize = ImageLoader::GetMemRequired( width, height, 1, imageFormat, false );
+	intp nSize = ImageLoader::GetMemRequired( width, height, 1, imageFormat, false );
 	memset( pData, 0xff, nSize );
 	DestroyVTFTexture( pVTFTexture );
 	return MATERIAL_PREVIEW_IMAGE_BAD;
@@ -2910,7 +2906,7 @@ bool CMaterial::IsTranslucent()
 {
 	Precache();
 	if ( m_VarCount > ALPHA )
-		return IsTranslucentInternal( m_pShaderParams? m_pShaderParams[ALPHA]->GetFloatValue() : 0.0  );
+		return IsTranslucentInternal( m_pShaderParams? m_pShaderParams[ALPHA]->GetFloatValue() : 0.0f  );
 	return false;
 }
 
@@ -2991,9 +2987,9 @@ void CMaterial::CallBindProxy( void *proxyData )
 				{
 					EnableThreadedMaterialVarAccess( true, m_pShaderParams, m_VarCount );
 				}
-				for( int i = 0; i < m_ProxyInfo.Count(); ++i )
+				for( auto *proxy : m_ProxyInfo )
 				{
-					m_ProxyInfo[i]->OnBind( proxyData );
+					proxy->OnBind( proxyData );
 				}
 				if ( bIsThreaded )
 				{
@@ -3006,7 +3002,7 @@ void CMaterial::CallBindProxy( void *proxyData )
 	case 2:
 		// alpha mod all....
 		{
-			float value = ( sin( 2.0f * M_PI * Plat_FloatTime() / 10.0f ) * 0.5f ) + 0.5f;
+			float value = ( sin( 2.0f * M_PI_F * Plat_FloatTime() / 10.0f ) * 0.5f ) + 0.5f;
 			m_pShaderParams[ALPHA]->SetFloatValue( value );
 		}
 		break;
@@ -3014,7 +3010,7 @@ void CMaterial::CallBindProxy( void *proxyData )
 	case 3:
 		// color mod all...
 		{
-			float value = ( sin( 2.0f * M_PI * Plat_FloatTime() / 10.0f ) * 0.5f ) + 0.5f;
+			float value = ( sin( 2.0f * M_PI_F * Plat_FloatTime() / 10.0f ) * 0.5f ) + 0.5f;
 			m_pShaderParams[COLOR]->SetVecValue( value, 1.0f, 1.0f );
 		}
 		break;
@@ -3548,10 +3544,10 @@ int CMaterial::GetNumPasses( void )
 	return m_ShaderRenderState.m_pSnapshots[mod].m_nPassCount;
 }
 
-int CMaterial::GetTextureMemoryBytes( void )
+intp CMaterial::GetTextureMemoryBytes( void )
 {
 	Precache();
-	int bytes = 0;
+	intp bytes = 0;
 	int i;
 	for( i = 0; i < m_VarCount; i++ )
 	{
@@ -3559,7 +3555,7 @@ int CMaterial::GetTextureMemoryBytes( void )
 		if( pVar->GetType() == MATERIAL_VAR_TYPE_TEXTURE )
 		{
 			ITexture *pTexture = pVar->GetTextureValue();
-			if( pTexture && pTexture != ( ITexture * )0xffffffff )
+			if( pTexture && pTexture != ( ITexture * )-1 )
 			{
 				bytes += pTexture->GetApproximateVidMemBytes();
 			}

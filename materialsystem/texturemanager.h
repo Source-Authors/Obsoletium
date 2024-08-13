@@ -119,8 +119,8 @@ public:
 
 	virtual void RemoveTexture( ITextureInternal *pTexture ) = 0;
 
-	// start with -1, list terminates with -1
-	virtual int	FindNext( int iIndex, ITextureInternal **ppTexture ) = 0;
+	// start with USHRT_MAX, list terminates with USHRT_MAX
+	virtual unsigned short	FindNext( unsigned short iIndex, ITextureInternal **ppTexture ) = 0;
 
 	virtual void AddTextureAlias( const char *pAlias, const char *pRealName ) = 0;
 	virtual void RemoveTextureAlias( const char *pAlias ) = 0;

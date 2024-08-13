@@ -186,7 +186,7 @@ public:
 	void									Scale( float, float, float);
 	// end matrix api
 
-	void									Viewport( int x, int y, int width, int height );
+	void									Viewport( int x, int y, int width, int height ) override;
 
 	DEFINE_QUEUED_CALL_1(					CullMode, MaterialCullMode_t, IMatRenderContext, m_pHardwareContext );
 
@@ -267,7 +267,7 @@ public:
 
 	DEFINE_QUEUED_CALL_1(					EnableUserClipTransformOverride, bool, IMatRenderContext, m_pHardwareContext );
 
-	void									UserClipTransform( const VMatrix &m );
+	void									UserClipTransform( const VMatrix &m ) override;
 
 	IMorph *CreateMorph( MorphFormat_t format, const char *pDebugName )
 	{
@@ -403,28 +403,28 @@ public:
 	DEFINE_QUEUED_CALL_3(					ClearBuffersObeyStencilEx, bool, bool, bool, IMatRenderContext, m_pHardwareContext );
 	DEFINE_QUEUED_CALL_0(					PerformFullScreenStencilOperation, IMatRenderContext, m_pHardwareContext );
 
-	virtual void AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, const char* pDstName, ImageFormat dstFmt, bool bGenMips, int nAdditionalCreationFlags, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) OVERRIDE
+	virtual void AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, const char* pDstName, ImageFormat dstFmt, bool bGenMips, int nAdditionalCreationFlags, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) override
 	{
 		OnAsyncCreateTextureFromRenderTarget( pSrcRt, &pDstName, pRecipient );
 
 		m_queue.QueueCall( m_pHardwareContext, &IMatRenderContext::AsyncCreateTextureFromRenderTarget, pSrcRt, pDstName, dstFmt, bGenMips, nAdditionalCreationFlags, pRecipient, pExtraArgs );
 	}
 
-	virtual void							AsyncMap( ITextureInternal* pTexToMap, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) OVERRIDE
+	virtual void							AsyncMap( ITextureInternal* pTexToMap, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) override
 	{
 		OnAsyncMap( pTexToMap, pRecipient, pExtraArgs );
 
 		m_queue.QueueCall( m_pHardwareContext, &IMatRenderContextInternal::AsyncMap, pTexToMap, pRecipient, pExtraArgs );
 	}
 
-	virtual void							AsyncUnmap( ITextureInternal* pTexToUnmap ) OVERRIDE
+	virtual void							AsyncUnmap( ITextureInternal* pTexToUnmap ) override
 	{
 		OnAsyncUnmap( pTexToUnmap );
 
 		m_queue.QueueCall( m_pHardwareContext, &IMatRenderContextInternal::AsyncUnmap, pTexToUnmap );	
 	}
 
-	virtual void AsyncCopyRenderTargetToStagingTexture( ITexture* pDst, ITexture* pSrc, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) OVERRIDE
+	virtual void AsyncCopyRenderTargetToStagingTexture( ITexture* pDst, ITexture* pSrc, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) override
 	{
 		OnAsyncCopyRenderTargetToStagingTexture( pDst, pSrc, pRecipient );
 

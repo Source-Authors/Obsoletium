@@ -112,8 +112,8 @@ private:
 	void		BumpedLightmapBitsToPixelWriter_HDRF( float* pFloatImage, float *pFloatImageBump1, float *pFloatImageBump2, 
 		float *pFloatImageBump3, int pLightmapSize[2], int pOffsetIntoLightmapPage[2], FloatBitMap_t *pfmOut );
 
-	void		BumpedLightmapBitsToPixelWriter_HDRI( float* pFloatImage, float *pFloatImageBump1, float *pFloatImageBump2, 
-		float *pFloatImageBump3, int pLightmapSize[2], int pOffsetIntoLightmapPage[2], FloatBitMap_t *pfmOut );
+	void		BumpedLightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloatImage, float* RESTRICT pFloatImageBump1, float* RESTRICT pFloatImageBump2, 
+		float* RESTRICT pFloatImageBump3, int pLightmapSize[2], int pOffsetIntoLightmapPage[2], FloatBitMap_t *pfmOut );
 
 	void		LightmapBitsToPixelWriter_LDR( float* pFloatImage, int pLightmapSize[2], int pOffsetIntoLightmapPage[2], FloatBitMap_t *pfmOut );
 	void		LightmapBitsToPixelWriter_HDRF( float* pFloatImage, int pLightmapSize[2], int pOffsetIntoLightmapPage[2], FloatBitMap_t *pfmOut );

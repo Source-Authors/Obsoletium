@@ -166,7 +166,7 @@ inline bool IsTextureInternalEnvCubemap( const ITextureInternal *pTexture )
 inline char *NormalizeTextureName( const char *pName, char *pOutName, int nOutNameSize )
 {
 	// hdr textures have an ldr version and need to resolve correctly
-	int nLen = Q_strlen( pName ) + 1;
+	intp nLen = Q_strlen( pName ) + 1;
 	if ( nLen <= 5 || Q_stricmp( pName + nLen - 5, ".hdr" ) )
 	{
 		// strip any non .hdr extension

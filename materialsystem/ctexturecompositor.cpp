@@ -89,13 +89,13 @@ protected:
 
 public:
 	// IAsyncTextureOperationReceiver
-	virtual int AddRef() OVERRIDE;
-	virtual int Release() OVERRIDE;
-	virtual int GetRefCount() const OVERRIDE { return m_nReferenceCount; }
-	virtual void OnAsyncCreateComplete( ITexture* pTex, void* pExtraArgs ) OVERRIDE { } 
-	virtual void OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs ) OVERRIDE { }
-	virtual void OnAsyncMapComplete( ITexture* pTex, void* pExtraArgs, void* pMemory, int pPitch ) OVERRIDE { }
-	virtual void OnAsyncReadbackBegin( ITexture* pDst, ITexture* pSrc, void* pExtraArgs ) OVERRIDE { }
+	virtual int AddRef() override;
+	virtual int Release() override;
+	virtual int GetRefCount() const override { return m_nReferenceCount; }
+	virtual void OnAsyncCreateComplete( ITexture* pTex, void* pExtraArgs ) override { } 
+	virtual void OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs ) override { }
+	virtual void OnAsyncMapComplete( ITexture* pTex, void* pExtraArgs, void* pMemory, int pPitch ) override { }
+	virtual void OnAsyncReadbackBegin( ITexture* pDst, ITexture* pSrc, void* pExtraArgs ) override { }
 
 
 	// Our stuff.
@@ -425,7 +425,7 @@ const ParseTableEntry cTextureStageParametersParseTable[] =
 	{ "flip_v",				ParseBoolFromKV,				offsetof( TextureStageParameters, m_AllowFlipV ) },
 	{ "evaluate?", 			ParseBoolFromKV,				offsetof( TextureStageParameters, m_Evaluate ) },
 
-	{ 0, 0 }
+	{ 0,					0,								0 }
 };
 
  // ------------------------------------------------------------------------------------------------
@@ -467,7 +467,7 @@ public:
 			SafeAssign( &m_pTexBlue, pTex );
 			break;
 		default:
-			Assert( !"Unexpected value passed to OnAsyncFindComplete" );
+			AssertMsg( false, "Unexpected value passed to OnAsyncFindComplete" );
 			break;
 		};
 	}
@@ -570,12 +570,12 @@ protected:
 		tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE, "Completed: %s", __FUNCTION__ );
 	}
 
-	virtual bool HasTeamSpecificsThis() const OVERRIDE
+	virtual bool HasTeamSpecificsThis() const override
 	{
 		return !m_Parameters.m_pTexBlueFilename.IsEmpty();
 	}
 
-	virtual bool ComputeRandomValuesThis( CUniformRandomStream* pRNG ) OVERRIDE
+	virtual bool ComputeRandomValuesThis( CUniformRandomStream* pRNG ) override
 	{
 		// If you change the order of these random numbers being generated, or add new ones, you will
 		// change the look of existing players' weapons! Don't do that.
@@ -648,7 +648,7 @@ const char* cCombineMaterialName[] =
 	NULL
 };
 
-static_assert( ARRAYSIZE( cCombineMaterialName ) == ECO_COUNT + 1, "cCombineMaterialName and ECombineOperation are out of sync." );
+static_assert( ssize( cCombineMaterialName ) == ECO_COUNT + 1, "cCombineMaterialName and ECombineOperation are out of sync." );
 
 // ------------------------------------------------------------------------------------------------
 struct CombineStageParameters
@@ -713,7 +713,7 @@ const ParseTableEntry cCombineStageParametersParseTable[] =
 	{ "flip_v",			ParseBoolFromKV,				offsetof( CombineStageParameters, m_AllowFlipV ) },
 	{ "evaluate?", 		ParseBoolFromKV,				offsetof( CombineStageParameters, m_Evaluate ) },
 
-	{ 0, 0 }
+	{ 0,				0,								0 }
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -796,9 +796,9 @@ protected:
 		tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE, "Completed: %s", __FUNCTION__ );
 	}
 
-	virtual bool HasTeamSpecificsThis() const OVERRIDE{ return false; }
+	virtual bool HasTeamSpecificsThis() const override{ return false; }
 
-	virtual bool ComputeRandomValuesThis( CUniformRandomStream* pRNG ) OVERRIDE
+	virtual bool ComputeRandomValuesThis( CUniformRandomStream* pRNG ) override
 	{
 		const float adjustBlack = pRNG->RandomFloat( m_Parameters.m_AdjustBlack.low, m_Parameters.m_AdjustBlack.high );
 		const float adjustOffset = pRNG->RandomFloat( m_Parameters.m_AdjustOffset.low, m_Parameters.m_AdjustOffset.high );
@@ -841,7 +841,7 @@ const ParseTableEntry cSelectStageParametersParseTable[] =
 	{ "select",		ParseVectorFromKV< int, cMaxSelectors >,	offsetof( SelectStageParameters, m_Select ) },
 	{ "evaluate?", 	ParseBoolFromKV,							offsetof( SelectStageParameters, m_Evaluate ) },
 
-	{ 0, 0 }
+	{ 0,			0,											0 }
 };
 
  // ------------------------------------------------------------------------------------------------
@@ -909,7 +909,7 @@ protected:
 		{
 			bool bFound = false;
 
-			V_snprintf( buffer, ARRAYSIZE( buffer ), "$selector%d", i );
+			V_snprintf( buffer, ssize( buffer ), "$selector%d", i );
 			IMaterialVar* pVar = m_pMaterial->FindVar( buffer, &bFound );
 			Assert(bFound);
 			if ( i < m_Parameters.m_Select.Count() )
@@ -932,9 +932,9 @@ protected:
 		tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE, "Completed: %s", __FUNCTION__ );
 	}
 
-	virtual bool HasTeamSpecificsThis() const OVERRIDE { return false; }
+	virtual bool HasTeamSpecificsThis() const override { return false; }
 
-	virtual bool ComputeRandomValuesThis( CUniformRandomStream* pRNG ) OVERRIDE
+	virtual bool ComputeRandomValuesThis( CUniformRandomStream* pRNG ) override
 	{
 		// No RNG here.
 		return false;
@@ -1050,7 +1050,7 @@ const ParseTableEntry cApplyStickerStageParametersParseTable[] =
 	{ "adjust_gamma",		ParseInverseRangeFromKV,		offsetof( ApplyStickerStageParameters, m_AdjustGamma ) },
 	{ "evaluate?", 			ParseBoolFromKV,				offsetof( ApplyStickerStageParameters, m_Evaluate ) },
 
-	{ 0, 0 }
+	{ 0,					0,								0 }
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -1171,9 +1171,9 @@ protected:
 		tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE, "Completed: %s", __FUNCTION__ );
 	}
 
-	virtual bool HasTeamSpecificsThis() const OVERRIDE{ return false; }
+	virtual bool HasTeamSpecificsThis() const override{ return false; }
 
-	virtual bool ComputeRandomValuesThis( CUniformRandomStream* pRNG ) OVERRIDE
+	virtual bool ComputeRandomValuesThis( CUniformRandomStream* pRNG ) override
 	{
 		float m_fTotalWeight = 0;
 		FOR_EACH_VEC( m_Parameters.m_possibleStickers, i )
@@ -1225,7 +1225,7 @@ protected:
 			SafeAssign( &m_pTexSpecular, pTex );
 			break;
 		default:
-			Assert( !"Unexpected value passed to OnAsyncFindComplete" );
+			AssertMsg( false, "Unexpected value passed to OnAsyncFindComplete" );
 			break;
 		};
 	}
@@ -1308,7 +1308,7 @@ private:
 			if ( r_texcomp_dump.GetInt() == 2 )
 			{
 				char buffer[128];
-				V_snprintf( buffer, ARRAYSIZE(buffer), "composite_%s_result_%02d.tga", _comp->GetName().Get(), s_nDumpCount++ );
+				V_snprintf( buffer, ssize(buffer), "composite_%s_result_%02d.tga", _comp->GetName().Get(), s_nDumpCount++ );
 				GetFirstChild()->GetResult().m_pRenderTarget->SaveToFile( buffer );
 			}
 #endif
@@ -1329,7 +1329,7 @@ private:
 
 		// We want to do this once only.
 		char buffer[_MAX_PATH];
-		_comp->GetTextureName( buffer, ARRAYSIZE( buffer ) );
+		_comp->GetTextureName( buffer, ssize( buffer ) );
 
 		int nCreateFlags = TEXTUREFLAGS_IMMEDIATE_CLEANUP 
 					     | TEXTUREFLAGS_TRILINEAR
@@ -1350,9 +1350,9 @@ private:
 		tmMessage( TELEMETRY_LEVEL0, TMMF_ICON_NOTE, "Begun: %s", __FUNCTION__ );
 	}
 
-	virtual bool HasTeamSpecificsThis() const OVERRIDE { return false; }
+	virtual bool HasTeamSpecificsThis() const override { return false; }
 
-	virtual bool ComputeRandomValuesThis( CUniformRandomStream* pRNG ) OVERRIDE
+	virtual bool ComputeRandomValuesThis( CUniformRandomStream* pRNG ) override
 	{
 		// No RNG here.
 		return false;
@@ -1376,10 +1376,9 @@ CTextureCompositor::CTextureCompositor( int _width, int _height, int nTeam, cons
 , m_bError( false )
 , m_bFatal( false )
 , m_nRenderTargetsAllocated( 0 )
+, m_nCompositePaintKitId( 0 )
 , m_CompositeName( pCompositeName )
 , m_nTexCompositeCreateFlags( nTexCompositeCreateFlags )
-, m_bHasTeamSpecifics( false )
-, m_nCompositePaintKitId( 0 )
 {
 
 }
@@ -1488,7 +1487,7 @@ void CTextureCompositor::Update()
 
 #ifdef RAD_TELEMETRY_ENABLED
 		char buffer[ 256 ];
-		GetTextureName( buffer, ARRAYSIZE( buffer ) );
+		GetTextureName( buffer, ssize( buffer ) );
 		tmEndTimeSpan( TELEMETRY_LEVEL0, m_nCompositePaintKitId, 0, "Composite: %s", tmDynamicString( TELEMETRY_LEVEL0, buffer ) );
 #endif
 	}
@@ -1520,7 +1519,7 @@ void CTextureCompositor::ScheduleResolve( )
 		if ( ( GetCreateFlags() & TEX_COMPOSITE_CREATE_FLAGS_FORCE ) == 0)
 		{
 			char buffer[ _MAX_PATH ];
-			GetTextureName( buffer, ARRAYSIZE( buffer ) );
+			GetTextureName( buffer, ssize( buffer ) );
 
 			// I think there's a race condition here, add a flag to FindTexture that says only if loaded, and bumps ref?
 			if ( materials->IsTextureLoaded( buffer ) )
@@ -1543,7 +1542,7 @@ void CTextureCompositor::ScheduleResolve( )
 	#ifdef RAD_TELEMETRY_ENABLED
 		m_nCompositePaintKitId = ++s_nCompositeCount;
 		char buffer[256];
-		GetTextureName( buffer, ARRAYSIZE( buffer ) );
+		GetTextureName( buffer, ssize( buffer ) );
 		tmBeginTimeSpan( TELEMETRY_LEVEL0, m_nCompositePaintKitId, 0, "Composite: %s", tmDynamicString( TELEMETRY_LEVEL0, buffer ) );
 	#endif
 
@@ -1598,7 +1597,7 @@ void CTextureCompositor::SetRootStage( CTCStage* rootStage )
 	
 	int currentIndex = 0;
 
-	m_pRootStage->ComputeRandomValues( &currentIndex, streams, ARRAYSIZE( streams ) );
+	m_pRootStage->ComputeRandomValues( &currentIndex, streams, ssize( streams ) );
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -1791,7 +1790,7 @@ void CTCStage::Render( ITexture* _destRT, IMaterial* _mat, const CUtlVector<CTCS
 			            ? stageParams.m_pTexture 
 						: stageParams.m_pRenderTarget;
 
-		V_snprintf( buffer, ARRAYSIZE( buffer ), "$srctexture%d", i );
+		V_snprintf( buffer, ssize( buffer ), "$srctexture%d", i );
 
 		// Set the texture
 		IMaterialVar* var = _mat->FindVar( buffer, &bFound );
@@ -1800,13 +1799,13 @@ void CTCStage::Render( ITexture* _destRT, IMaterial* _mat, const CUtlVector<CTCS
 		varsToClean.AddToTail( var );
 
 		// And the levels parameters
-		V_snprintf( buffer, ARRAYSIZE(buffer), "$texadjustlevels%d", i );
+		V_snprintf( buffer, ssize(buffer), "$texadjustlevels%d", i );
 		var = _mat->FindVar( buffer, &bFound );
 		Assert(bFound);
 		var->SetVecValue( stageParams.m_fAdjustBlackPoint, stageParams.m_fAdjustWhitePoint, stageParams.m_fAdjustGamma );
 
 		// And the expected transform
-		V_snprintf( buffer, ARRAYSIZE(buffer), "$textransform%d", i );
+		V_snprintf( buffer, ssize(buffer), "$textransform%d", i );
 		var = _mat->FindVar( buffer, &bFound );
 		Assert(bFound);
 		var->SetMatrixValue( stageParams.m_mUvAdjust );
@@ -1839,12 +1838,12 @@ void CTCStage::Render( ITexture* _destRT, IMaterial* _mat, const CUtlVector<CTCS
 		{
 			if (_inputs[i].m_pTexture)
 			{
-				V_snprintf(buffer, ARRAYSIZE(buffer), "composite_%s_input_%02d_in%01d_%16x.tga", _comp->GetName().Get(), s_nDumpCount, i, (intp) this);
+				V_snprintf(buffer, ssize(buffer), "composite_%s_input_%02d_in%01d_%16x.tga", _comp->GetName().Get(), s_nDumpCount, i, (intp) this);
 				_inputs[i].m_pTexture->SaveToFile(buffer);
 			}
 		}
 
-		V_snprintf(buffer, ARRAYSIZE(buffer), "composite_%s_result_%02d_%16x.tga", _comp->GetName().Get(), s_nDumpCount++, (intp) this);
+		V_snprintf(buffer, ssize(buffer), "composite_%s_result_%02d_%16x.tga", _comp->GetName().Get(), s_nDumpCount++, (intp) this);
 		_destRT->SaveToFile(buffer);
 	}
 #endif
@@ -1908,8 +1907,9 @@ void ParseIntoStruct( S* _outStruct, CUtlVector< KeyValues *>* _leftovers, KeyVa
 {
 	Assert( _leftovers );
 
-	const char* keyName = _kv->GetName();
-	keyName;
+#ifdef _DEBUG
+	[[maybe_unused]] const char* keyName = _kv->GetName();
+#endif
 
 	FOR_EACH_SUBKEY( _kv, thisKey )
 	{
@@ -2201,15 +2201,15 @@ CUtlString GetErrorTrail( CUtlVector< const char* >& errorStack )
 	if ( errorStack.Count() == 0 )
 		return CUtlString( "" );
 
-	const int stackLength = errorStack.Count();
-	const int stackLengthMinusOne = stackLength - 1;
+	const intp stackLength = errorStack.Count();
+	const intp stackLengthMinusOne = stackLength - 1;
 
 	const char* cStageSep = " -> ";
-	const int cStageSepStrLen = V_strlen( cStageSep );
+	const intp cStageSepStrLen = V_strlen( cStageSep );
 
-	int totalStrLength = 0;
+	intp totalStrLength = 0;
 
-	for ( int i = 0; i < stackLength; ++i ) 
+	for ( intp i = 0; i < stackLength; ++i ) 
 	{
 		totalStrLength += V_strlen( errorStack[ i ] );
 	}
@@ -2219,11 +2219,10 @@ CUtlString GetErrorTrail( CUtlVector< const char* >& errorStack )
 	CUtlString retStr;
 	retStr.SetLength( totalStrLength );
 
-	char* pDstOrig = retStr.GetForModify(); pDstOrig;
 	char* pDst = retStr.GetForModify();
 
-	int destPos = 0;
-	for ( int i = 0; i < stackLength; ++i )
+	intp destPos = 0;
+	for ( intp i = 0; i < stackLength; ++i )
 	{
 		// Copy the string
 		const char* pSrc = errorStack[ i ];
@@ -2742,7 +2741,7 @@ void ComputeTextureMatrixFromRectangle( VMatrix* pOutMat, const Vector2D& bl, co
 	float magLeftEdge = leftEdge.Length();
 	float magTopEdge = topEdge.Length();
 
-	float xScalar = ( topEdgePerpLeft.Dot( leftEdge ) > 0 ) ? 1 : -1;
+	float xScalar = ( topEdgePerpLeft.Dot( leftEdge ) > 0 ) ? 1.0f : -1.0f;
 
 
 	// Simplification of acos( ( A . L ) / ( mag( A ) * mag( L ) )

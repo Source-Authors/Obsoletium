@@ -209,8 +209,6 @@ namespace ColorSpace
 
 	inline void ClampToHDR( const Vector &in, unsigned short out[3] )
 	{
-		Vector tmp = in;
-		
 		out[0] = LinearFloatToCorrectedShort( in.x );
 		out[1] = LinearFloatToCorrectedShort( in.y );
 		out[2] = LinearFloatToCorrectedShort( in.z );

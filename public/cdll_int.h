@@ -14,6 +14,7 @@
 #include "interface.h"
 #include "mathlib/mathlib.h"
 #include "const.h"
+#include "Color.h"
 #include "checksum_crc.h"
 #include "datamap.h"
 #include "tier1/bitbuf.h"

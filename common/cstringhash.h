@@ -68,7 +68,7 @@ public:
 			newEntry->next = m_HashTable[hashID];
 			m_HashTable[hashID] = newEntry;
 		}
-		int len = strlen( string ) + 1;
+		intp len = V_strlen( string ) + 1;
 		newEntry->string = new char[len];
 		Q_strncpy( newEntry->string, string, len );
 		newEntry->data = val;

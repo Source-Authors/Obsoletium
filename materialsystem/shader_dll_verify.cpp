@@ -15,16 +15,20 @@ static HANDLE g_hDLLInst = 0;
 extern "C"
 {
 	void __declspec( dllexport ) _ftol3( char *pData );
-	BOOL WINAPI DllMain (HANDLE hInst, ULONG ulInit, LPVOID lpReserved);
 };
 
 
-BOOL WINAPI DllMain (HANDLE hInst, ULONG ulInit, LPVOID lpReserved)
+extern "C" BOOL WINAPI DllMain (HANDLE hInst, ULONG ulInit, LPVOID)
 {
-	lpReserved = lpReserved;
-	ulInit = ulInit;
+	if (ulInit == DLL_PROCESS_ATTACH)
+	{
+		g_hDLLInst = hInst;
+	}
+	else if (ulInit == DLL_PROCESS_DETACH)
+	{
+		g_hDLLInst = nullptr;
+	}
 
-	g_hDLLInst = hInst;
 	return true;
 }
 
@@ -70,23 +74,20 @@ CRC32_t CShaderDLLVerification::Function1( unsigned char *pData )
 	return testCRC;
 }
 
-void CShaderDLLVerification::Function2( int a, int b, int c )
+void CShaderDLLVerification::Function2( int, int, int )
 {
-	a=b=c;
 	MD5Context_t md5Context;
 	MD5Init( &md5Context );
 	MD5Update( &md5Context, g_pLastInputData + SHADER_DLL_VERIFY_DATA_PTR_OFFSET, SHADER_DLL_VERIFY_DATA_LEN1 - SHADER_DLL_VERIFY_DATA_PTR_OFFSET );
 	MD5Final( g_pLastInputData, &md5Context );
 }
 
-void CShaderDLLVerification::Function3( int a, int b, int c )
+void CShaderDLLVerification::Function3( int, int, int )
 {
-	a=b=c;
 }
 
-void CShaderDLLVerification::Function4( int a, int b, int c )
+void CShaderDLLVerification::Function4( int, int, int )
 {
-	a=b=c;
 }
 
 

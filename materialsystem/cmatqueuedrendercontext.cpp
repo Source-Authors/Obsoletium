@@ -48,10 +48,14 @@ class CMatQueuedMesh : public IMesh
 {
 public:
 	CMatQueuedMesh( CMatQueuedRenderContext *pOwner, IMatRenderContextInternal *pHardwareContext )
-	 :	m_pLateBoundMesh( &m_pActualMesh ),
+	 :	m_pActualMesh( NULL ),
+		m_nActualVertexOffsetInBytes( 0 ),
+		m_pLateBoundMesh( &m_pActualMesh ),
 		m_pOwner( pOwner ), 
 		m_pCallQueue( pOwner->GetCallQueueInternal() ),
 		m_pHardwareContext( pHardwareContext ),
+		m_VertexFormat( 0 ),
+		m_MorphFormat( 0 ),
 		m_pVertexData( NULL ),
 		m_pIndexData( NULL ),
 		m_nVerts( 0 ),
@@ -59,11 +63,7 @@ public:
 		m_VertexSize( 0 ),
 		m_Type(MATERIAL_TRIANGLES),
 		m_pVertexOverride( NULL ),
-		m_pIndexOverride ( NULL ),
-		m_pActualMesh( NULL ),
-		m_nActualVertexOffsetInBytes( 0 ),
-		m_VertexFormat( 0 ),
-		m_MorphFormat( 0 )
+		m_pIndexOverride ( NULL )
 	{
 	}
 
@@ -104,7 +104,7 @@ public:
 			CannotSupport();
 			if ( IsDebug() )
 			{
-				Assert( !"Getting a dynamic mesh without resolving the previous one" );
+				AssertMsg( false, "Getting a dynamic mesh without resolving the previous one" );
 			}
 			else
 			{
@@ -277,7 +277,7 @@ public:
 			Assert( m_VertexSize );
 			Assert( !m_pVertexData );
 			m_pVertexData = (byte *)m_pOwner->AllocVertices( numVerts, m_VertexSize );
-			Assert( (unsigned)m_pVertexData % 16 == 0 );
+			Assert( (uintp)m_pVertexData % 16 == 0 );
 
 			// Compute the vertex index..
 			desc.m_nFirstVertex = 0;
@@ -353,7 +353,7 @@ public:
 			{
 				#define FindMin( desc, pCurrent, tag )	( ( desc.m_VertexSize_##tag != 0 ) ? min( pCurrent, (void *)desc.m_p##tag )  : pCurrent )
 
-				pDest = (void *)(((byte *)0) - 1);
+				pDest = (void *)MAXSIZE_T;
 
 				pDest = FindMin( desc, pDest, BoneWeight );
 				pDest = FindMin( desc, pDest, BoneMatrixIndex );
@@ -401,7 +401,7 @@ public:
 				}
 				while ( i < nIndices )
 				{
-					int nToCopy = min( (int)ARRAYSIZE(tempIndices), nIndices - i );
+					int nToCopy = min( ssize(tempIndices), (ptrdiff_t)nIndices - i );
 					for ( int j = 0; j < nToCopy; j++ )
 					{
 						tempIndices[j] = pIndexData[i+j] + desc.m_nFirstVertex;
@@ -647,7 +647,7 @@ bool CMatQueuedRenderContext::Init( CMaterialSystem *pMaterialSystem, CMatRender
 	int nSize = 16 * 1024 * 1024;
 	int nCommitSize = 128 * 1024;
 #if defined(DEDICATED)
-	Assert( !"CMatQueuedRenderContext shouldn't be initialized on dedicated servers..." );
+	AssertMsg( false, "CMatQueuedRenderContext shouldn't be initialized on dedicated servers..." );
 	nSize = nCommitSize = 1024;
 #endif
 
@@ -829,7 +829,8 @@ void CMatQueuedRenderContext::CallQueued( bool bTermAfterCall )
 {
 	if ( mat_report_queue_status.GetBool() )
 	{
-		Msg( "%d calls queued for %llu bytes in parameters and overhead, %d bytes verts, %d bytes indices, %d bytes other\n", m_queue.Count(), (uint64)(m_queue.GetMemoryUsed()), m_Vertices.GetUsed(), m_Indices.GetUsed(), RenderDataSizeUsed() );
+		Msg( "%d calls queued for %zu bytes in parameters and overhead, %zd bytes verts, %zd bytes indices, %zd bytes other\n",
+			m_queue.Count(), m_queue.GetMemoryUsed(), m_Vertices.GetUsed(), m_Indices.GetUsed(), RenderDataSizeUsed() );
 	}
 
 	m_queue.CallQueued();
@@ -1525,7 +1526,7 @@ byte *CMatQueuedRenderContext::AllocVertices( int nVerts, int nVertexSize )
 
 		// Print some information to the console so that it's picked up in the minidump comment.
 		Msg( "AllocVertices( %d, %d ) on %p failed. m_Vertices is based at %p with a size of 0x%x.\n", nVerts, nVertexSize, this, m_Vertices.GetBase(), m_Vertices.GetSize() );
-		Msg( "%d vertices used.\n", m_Vertices.GetUsed() );
+		Msg( "%zd vertices used.\n", m_Vertices.GetUsed() );
 		if ( pNextAlloc > pCommitLimit )
 		{
 			Msg( "VirtualAlloc would have been called. %p > %p.\n", pNextAlloc, pCommitLimit );
@@ -1568,12 +1569,12 @@ uint16 *CMatQueuedRenderContext::AllocIndices( int nIndices )
 
 		// Print some information to the console so that it's picked up in the minidump comment.
 		Msg( "AllocIndices( %d ) on %p failed. m_Indices is based at %p with a size of 0x%x.\n", nIndices, this, m_Indices.GetBase(), m_Indices.GetSize() );
-		Msg( "%d indices used.\n", m_Indices.GetUsed() );
+		Msg( "%zd indices used.\n", m_Indices.GetUsed() );
 		if ( pNextAlloc > pCommitLimit )
 		{
 			Msg( "VirtualAlloc would have been called. %p > %p.\n", pNextAlloc, pCommitLimit );
 
-			const byte *pNewCommitLimit = AlignValue( pNextAlloc, 128 * 1024 );
+			const byte *pNewCommitLimit = AlignValue( pNextAlloc, 128u * 1024 );
 			const uint32 commitSize = pNewCommitLimit - pCommitLimit;
 			const void *pRet = VirtualAlloc( (void *)pCommitLimit, commitSize, MEM_COMMIT, PAGE_READWRITE );
 			if ( !pRet )

@@ -68,16 +68,16 @@ public:
 	//
 	// IAppSystem
 	//
-	virtual bool							Connect( CreateInterfaceFn factory );
-	virtual void							Disconnect();
-	virtual void *							QueryInterface( const char *pInterfaceName );
-	virtual InitReturnVal_t					Init();
-	virtual void							Shutdown();
+	bool							Connect( CreateInterfaceFn factory ) override;
+	void							Disconnect() override;
+	void *							QueryInterface( const char *pInterfaceName ) override;
+	InitReturnVal_t					Init() override;
+	void							Shutdown() override;
 
 	CreateInterfaceFn						Init( const char* pShaderDLL,
 													IMaterialProxyFactory* pMaterialProxyFactory,
 													CreateInterfaceFn fileSystemFactory,
-													CreateInterfaceFn cvarFactory );
+													CreateInterfaceFn cvarFactory ) override;
 
 	// Call this to set an explicit shader version to use 
 	// Must be called before Init().
@@ -172,7 +172,7 @@ public:
 	// -----------------------------------------------------------
 	unsigned										GetDisplayAdapterCount() const;
 	unsigned										GetCurrentAdapter() const;
-	char									*GetDisplayDeviceName() const OVERRIDE;
+	const char									*GetDisplayDeviceName() const override;
 	void									GetDisplayAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const;
 	unsigned										GetModeCount( unsigned adapter ) const;
 	void									GetModeInfo( unsigned adapter, unsigned mode, MaterialVideoMode_t& info ) const;
@@ -296,7 +296,7 @@ public:
 	// -----------------------------------------------------------
 	// Editor mode
 	// -----------------------------------------------------------
-	bool									InEditorMode() const;
+	bool									InEditorMode() const override;
 
 	// Used to enable editor materials. Must be called before Init.
 	void									EnableEditorMaterials();
@@ -317,7 +317,7 @@ public:
 	//---------------------------------------------------------
 	ImageFormatInfo_t const&				ImageFormatInfo( ImageFormat fmt) const;
 	
-	int										GetMemRequired( int width, int height, int depth, ImageFormat format, bool mipmap );
+	intp										GetMemRequired( int width, int height, int depth, ImageFormat format, bool mipmap );
 
 	bool									ConvertImageFormat( unsigned char *src, enum ImageFormat srcImageFormat,
 																unsigned char *dst, enum ImageFormat dstImageFormat, 
@@ -349,7 +349,7 @@ public:
 	//---------------------------------------------------------
 
 	//returns whether fast clipping is being used or not - needed to be exposed for better per-object clip behavior
-	bool									UsingFastClipping();
+	bool									UsingFastClipping() override;
 
 	int										StencilBufferBits();
 
@@ -413,15 +413,15 @@ public:
 
 	//---------------------------------
 
-	ITexture *								FindTexture( char const* pTextureName, const char *pTextureGroupName, bool complain = true, int nAdditionalCreationFlags = 0 );
+	ITexture *								FindTexture( char const* pTextureName, const char *pTextureGroupName, bool complain = true, int nAdditionalCreationFlags = 0 ) override;
 
-	bool									IsTextureLoaded( const char* pTextureName ) const;
+	bool									IsTextureLoaded( const char* pTextureName ) const override;
 
-	void									AddTextureAlias( const char *pAlias, const char *pRealName );
-	void									RemoveTextureAlias( const char *pAlias );
+	void									AddTextureAlias( const char *pAlias, const char *pRealName ) override;
+	void									RemoveTextureAlias( const char *pAlias ) override;
 
-	void									SetExcludedTextures( const char *pScriptName );
-	void									UpdateExcludedTextures( void );
+	void									SetExcludedTextures( const char *pScriptName ) override;
+	void									UpdateExcludedTextures( void ) override;
 
 	// Creates a procedural texture
 	ITexture *								CreateProceduralTexture( const char	*pTextureName, 
@@ -475,18 +475,18 @@ public:
 
 	virtual void				OverrideRenderTargetAllocation( bool rtAlloc );
 
-	virtual ITextureCompositor*	NewTextureCompositor( int w, int h, const char* pCompositeName, int nTeamNum, uint64 randomSeed, KeyValues* stageDesc, uint32 texCompositeCreateFlags ) OVERRIDE;
+	virtual ITextureCompositor*	NewTextureCompositor( int w, int h, const char* pCompositeName, int nTeamNum, uint64 randomSeed, KeyValues* stageDesc, uint32 texCompositeCreateFlags ) override;
 	void						ScheduleTextureComposite( CTextureCompositor* _texCompositor );
 
 
-	virtual void				SetRenderTargetFrameBufferSizeOverrides( int nWidth, int nHeight ) OVERRIDE;
-	virtual void				GetRenderTargetFrameBufferDimensions( int & nWidth, int & nHeight ) OVERRIDE;
+	virtual void				SetRenderTargetFrameBufferSizeOverrides( int nWidth, int nHeight ) override;
+	virtual void				GetRenderTargetFrameBufferDimensions( int & nWidth, int & nHeight ) override;
 
-	virtual void				AsyncFindTexture( const char* pFilename, const char *pTextureGroupName, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs, bool bComplain = true, int nAdditionalCreationFlags = 0 ) OVERRIDE;
-	virtual ITexture*			CreateNamedTextureFromBitsEx( const char* pName, const char *pTextureGroupName, int w, int h, int mips, ImageFormat fmt, int srcBufferSize, byte* srcBits, int nFlags ) OVERRIDE;
+	virtual void				AsyncFindTexture( const char* pFilename, const char *pTextureGroupName, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs, bool bComplain = true, int nAdditionalCreationFlags = 0 ) override;
+	virtual ITexture*			CreateNamedTextureFromBitsEx( const char* pName, const char *pTextureGroupName, int w, int h, int mips, ImageFormat fmt, int srcBufferSize, byte* srcBits, int nFlags ) override;
 
-	virtual bool				AddTextureCompositorTemplate( const char* pName, KeyValues* pTmplDesc, int nTexCompositeTemplateFlags = 0 ) OVERRIDE;
-	virtual bool				VerifyTextureCompositorTemplates() OVERRIDE;
+	virtual bool				AddTextureCompositorTemplate( const char* pName, KeyValues* pTmplDesc, int nTexCompositeTemplateFlags = 0 ) override;
+	virtual bool				VerifyTextureCompositorTemplates() override;
 
 
 
@@ -520,7 +520,7 @@ public:
 	DELEGATE_TO_OBJECT_4( int,				AllocateLightmap, int, int, LightmapOffset_t, IMaterial *, &m_Lightmaps );
 	DELEGATE_TO_OBJECT_1( int,				AllocateWhiteLightmap, IMaterial *, &m_Lightmaps );
 	DELEGATE_TO_OBJECT_3( int,				AllocateDynamicLightmap, LightmapOffset_t, int *, int, &m_Lightmaps );
-	void									UpdateLightmap( int, LightmapOffset_t, LightmapOffset_t, float *, float *, float *, float * );
+	void									UpdateLightmap( int, LightmapOffset_t, LightmapOffset_t, float *, float *, float *, float * ) override;
 	DELEGATE_TO_OBJECT_0( int,				GetNumSortIDs, &m_Lightmaps );
 	DELEGATE_TO_OBJECT_1V(					GetSortInfo, MaterialSystem_SortInfo_t *, &m_Lightmaps );
 	DELEGATE_TO_OBJECT_3VC(					GetLightmapPageSize, int, int *, int *, &m_Lightmaps );

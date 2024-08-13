@@ -200,7 +200,7 @@ class CMorph : public IMorphInternal, public ITextureRegenerator
 public:
 	// Constructor, destructor
 	CMorph();
-	~CMorph();
+	virtual ~CMorph();
 
 	// Inherited from IMorph
 	virtual void Lock( float flFloatToFixedScale );
@@ -1037,7 +1037,7 @@ void CMorph::BuildSegmentList( CUtlVector< MorphSegmentList_t > &morphSegments )
 		int nMorphTargetId = m_MorphDict.GetMorphTargetId( i );
 		m_MorphTargetIdToQuadIndex[nMorphTargetId] = i;
 
-		int nSegmentIndex = morphSegments.AddToTail();
+		intp nSegmentIndex = morphSegments.AddToTail();
 		MorphSegmentList_t &list = morphSegments[nSegmentIndex];
 		Assert( nSegmentIndex == i );
 
@@ -1096,16 +1096,16 @@ void CMorph::BuildQuadList( const CUtlVector< MorphSegmentList_t > &morphSegment
 {
 	m_MorphQuads.RemoveAll();
 
-	int nQuadIndex = 0;
-	int nMorphCount = morphSegments.Count();
-	for ( int i = 0; i < nMorphCount; ++i )
+	intp nQuadIndex = 0;
+	intp nMorphCount = morphSegments.Count();
+	for ( intp i = 0; i < nMorphCount; ++i )
 	{
-		int k = m_MorphQuads.AddToTail();
+		intp k = m_MorphQuads.AddToTail();
 		MorphQuadList_t &quadList = m_MorphQuads[k];
 
 		const MorphSegmentList_t& segmentList = morphSegments[i];
 		int nSegmentCount = segmentList.Count();
-		for ( int j = 0; j < nSegmentCount; ++j )
+		for ( intp j = 0; j < nSegmentCount; ++j )
 		{
 			const MorphSegment_t &segment = segmentList[j];
 
@@ -1122,7 +1122,7 @@ void CMorph::BuildQuadList( const CUtlVector< MorphSegmentList_t > &morphSegment
 				int nCount = min( nMaxCount, nTotalCount );
 				nTotalCount -= nCount;
 
-				int l = quadList.AddToTail();
+				intp l = quadList.AddToTail();
 				MorphQuad_t &quad = quadList[l];
 				quad.m_nQuadIndex = nQuadIndex++;
 				quad.m_nCount = nCount;
