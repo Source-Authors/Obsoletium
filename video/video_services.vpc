@@ -27,6 +27,7 @@ $Configuration
 {
 	$Linker
 	{
+		$AdditionalDependencies				"$BASE User32.lib" [$WINDOWS]
 		$SystemLibraries                    "iconv" [$OSXALL]
 		$SystemFrameworks					"Carbon" [$OSXALL]
 	}

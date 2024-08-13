@@ -65,7 +65,7 @@ void CBinkMaterialRGBTextureRegenerator::SetSourceImage( uint8_t *SrcImage, int 
 	m_nSourceHeight = nHeight;
 }
 
-void CBinkMaterialRGBTextureRegenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pRect )
+void CBinkMaterialRGBTextureRegenerator::RegenerateTextureBits( ITexture *, IVTFTexture *pVTFTexture, Rect_t * )
 {
 	AssertExit( pVTFTexture != nullptr );
 
@@ -93,7 +93,7 @@ void CBinkMaterialRGBTextureRegenerator::RegenerateTextureBits( ITexture *pTextu
 
 	// Copy directly from the Bink GWorld
 	unsigned char   *pImageData	= pVTFTexture->ImageData();
-	int dstStride = pVTFTexture->RowSizeInBytes( 0 );
+	intp dstStride = pVTFTexture->RowSizeInBytes( 0 );
 
 	unsigned char *pSrcData = m_SrcImage;
 
@@ -284,7 +284,7 @@ bool CBinkMaterial::IsMuted()
 }
 
 
-VideoResult_t CBinkMaterial::SoundDeviceCommand( VideoSoundDeviceOperation_t operation, void *pDevice, void *pData )
+VideoResult_t CBinkMaterial::SoundDeviceCommand( VideoSoundDeviceOperation_t operation, void *pDevice, void * )
 {
 	AssertExitV( m_bMovieInitialized || m_bMoviePlaying, VideoResult::OPERATION_OUT_OF_SEQUENCE );
 
@@ -714,8 +714,8 @@ void CBinkMaterial::CreateProceduralTexture( const char *pTextureName )
 	// or choose power-of-two textures which are at least as big as the video
 	bool actualSizeTexture = BITFLAGS_SET( m_PlaybackFlags, VideoPlaybackFlags::TEXTURES_ACTUAL_SIZE );
 
-	int nWidth  = ( actualSizeTexture ) ? ALIGN_VALUE( m_VideoFrameWidth, TEXTURE_SIZE_ALIGNMENT ) : ComputeGreaterPowerOfTwo( m_VideoFrameWidth ); 
-	int nHeight = ( actualSizeTexture ) ? ALIGN_VALUE( m_VideoFrameHeight, TEXTURE_SIZE_ALIGNMENT ) : ComputeGreaterPowerOfTwo( m_VideoFrameHeight ); 
+	int nWidth  = ( actualSizeTexture ) ? AlignValue( m_VideoFrameWidth, TEXTURE_SIZE_ALIGNMENT ) : ComputeGreaterPowerOfTwo( m_VideoFrameWidth ); 
+	int nHeight = ( actualSizeTexture ) ? AlignValue( m_VideoFrameHeight, TEXTURE_SIZE_ALIGNMENT ) : ComputeGreaterPowerOfTwo( m_VideoFrameHeight ); 
 
 	// initialize the procedural texture as 32-it RGBA, w/o mipmaps
 	m_Texture.InitProceduralTexture( pTextureName, "VideoCacheTextures", nWidth, nHeight, 
