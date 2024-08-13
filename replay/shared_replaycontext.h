@@ -57,8 +57,6 @@ public:
 private:
 	bool								InitThreadPool();
 	void								EnsureDirHierarchy();
-
-	IReplayContext						*m_pOwnerContext;
 };
 
 //----------------------------------------------------------------------------------------

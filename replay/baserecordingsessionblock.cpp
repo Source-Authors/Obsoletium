@@ -17,15 +17,15 @@
 //----------------------------------------------------------------------------------------
 
 CBaseRecordingSessionBlock::CBaseRecordingSessionBlock( IReplayContext *pContext )
-:	m_pContext( pContext ),
-	m_nRemoteStatus( STATUS_INVALID ),
+:	m_nRemoteStatus( STATUS_INVALID ),
 	m_nHttpError( ERROR_NONE ),
-	m_hSession( REPLAY_HANDLE_INVALID ),
-	m_bHashValid( false ),
 	m_iReconstruction( -1 ),
+	m_hSession( REPLAY_HANDLE_INVALID ),
 	m_uFileSize( 0 ),
 	m_uUncompressedSize( 0 ),
-	m_nCompressorType( COMPRESSORTYPE_INVALID )
+	m_nCompressorType( COMPRESSORTYPE_INVALID ),
+	m_bHashValid( false ),
+	m_pContext( pContext )
 {
 	m_szFullFilename[ 0 ] = '\0';
 	V_memset( m_aHash, 0, sizeof( m_aHash ) );

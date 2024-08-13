@@ -133,7 +133,7 @@ void CReplayTime::Write( KeyValues *pOut )
 {
 	char szTime[16];	// Convert time to wide
 	static wchar_t s_wTime[16];
-	V_snprintf( szTime, sizeof( szTime ), "%i:%02i %s", nHour % 12, nMin, nHour < 12 ? "AM" : "PM" );
+	V_snprintf( szTime, sizeof( szTime ), "%i:%02i:%02i %s", nHour % 12, nMin, nSec, nHour < 12 ? "AM" : "PM" );
 	pLocalize->ConvertANSIToUnicode( szTime, s_wTime, sizeof( s_wTime ) );
 
 	return s_wTime;

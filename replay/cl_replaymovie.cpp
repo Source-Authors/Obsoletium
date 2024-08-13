@@ -18,10 +18,10 @@
 CReplayMovie::CReplayMovie()
 :	m_hReplay( REPLAY_HANDLE_INVALID ),
 	m_bRendered( false ),
+	m_pUserData( NULL ),
 	m_bUploaded( false ),
 	m_flRenderTime( 0.0f ),
-	m_flLength( 0.0f ),
-	m_pUserData( NULL )
+	m_flLength( 0.0f )
 {
 	V_wcsncpy( m_wszTitle, L"Untitled", sizeof( m_wszTitle ) );
 }

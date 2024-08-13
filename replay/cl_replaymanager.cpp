@@ -37,9 +37,9 @@ extern ConVar replay_postdeathrecordtime;
 //----------------------------------------------------------------------------------------
 
 CReplayManager::CReplayManager()
-:	m_pPendingReplay( NULL ),
+:	m_pReplayThisLife( NULL ),
+	m_pPendingReplay( NULL ),
 	m_pReplayLastLife( NULL ),
-	m_pReplayThisLife( NULL ),
 	m_flPlayerSpawnCreateReplayFailTime( 0.0f )
 {
 }

@@ -34,11 +34,11 @@ IFileserverCleanerJob *SV_CastJobToIFileserverCleanerJob( CBaseJob *pJob )
 //----------------------------------------------------------------------------------------
 
 CFileserverCleaner::CFileserverCleaner()
-:	m_bRunning( false ),
+:	m_pCleanerJob( NULL ),
+	m_bRunning( false ),
 	m_bPrintResult( false ),
-	m_pCleanerJob( NULL ),
-	m_pSpewer( NULL ),
-	m_nNumFilesDeleted( 0 )
+	m_nNumFilesDeleted( 0 ),
+	m_pSpewer( NULL )
 {
 }
 

@@ -25,8 +25,8 @@
 //----------------------------------------------------------------------------------------
 
 CScreenshotManager::CScreenshotManager()
-:	m_flLastScreenshotTime( 0.0f ),
-	m_hScreenshotReplay( REPLAY_HANDLE_INVALID )
+:	m_hScreenshotReplay( REPLAY_HANDLE_INVALID ),
+	m_flLastScreenshotTime( 0.0f )	
 {
 }
 
@@ -133,7 +133,7 @@ void CScreenshotManager::DoCaptureScreenshot()
 
 	// Max # of screenshots already taken?
 	extern ConVar replay_maxscreenshotsperreplay;
-	int nScreenshotLimit = replay_maxscreenshotsperreplay.GetInt();
+	intp nScreenshotLimit = replay_maxscreenshotsperreplay.GetInt();
 	if ( nScreenshotLimit && pReplay->GetScreenshotCount() >= nScreenshotLimit )
 		return;
 
@@ -154,7 +154,7 @@ void CScreenshotManager::DoCaptureScreenshot()
 		"materials\\vgui\\replay\\thumbnails", pReplay->GetScreenshotCount() );
 
 	// Remove extension
-	int i = V_strlen( szBaseFilename ) - 1;
+	intp i = V_strlen( szBaseFilename ) - 1;
 	while ( i >= 0 )
 	{
 		if ( szBaseFilename[ i ] == '.' )
@@ -236,7 +236,7 @@ void CScreenshotManager::DoCaptureScreenshot()
 void CScreenshotManager::DeleteScreenshotsForReplay( CReplay *pReplay )
 {
 	char szFilename[ MAX_OSPATH ];
-	for ( int i = 0; i < pReplay->GetScreenshotCount(); ++i )
+	for ( intp i = 0; i < pReplay->GetScreenshotCount(); ++i )
 	{
 		const CReplayScreenshot *pScreenshot = pReplay->GetScreenshot( i );
 

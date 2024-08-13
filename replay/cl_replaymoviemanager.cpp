@@ -185,7 +185,7 @@ void CReplayMovieManager::CacheMovieTitle( const wchar_t *pTitle )
 
 void CReplayMovieManager::GetCachedMovieTitleAndClear( wchar_t *pOut, int nOutBufLength )
 {
-	const int nLength = wcslen( m_wszCachedMovieTitle );
+	const size_t nLength = wcslen( m_wszCachedMovieTitle );
 	wcsncpy( pOut, m_wszCachedMovieTitle, nOutBufLength );
 	pOut[ nLength ] = L'\0';
 	m_wszCachedMovieTitle[0] = L'\0';

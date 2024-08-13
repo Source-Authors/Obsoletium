@@ -26,12 +26,12 @@ extern IEngineReplay *g_pEngine;
 //----------------------------------------------------------------------------------------
 
 CSessionInfoDownloader::CSessionInfoDownloader()
-:	m_pDownloader( NULL ),
-	m_pSession( NULL ),
-	m_flLastDownloadTime( 0.0f ),
-	m_nError( ERROR_NONE ),
+:	m_nError( ERROR_NONE ),
 	m_nHttpError( HTTP_ERROR_NONE ),
-	m_bDone( false )
+	m_pSession( NULL ),
+	m_pDownloader( NULL ),
+	m_bDone( false ),
+	m_flLastDownloadTime( 0.0f )
 {
 }
 

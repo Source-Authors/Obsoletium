@@ -85,7 +85,7 @@ protected:
 	CBaseRecordingSession	*m_pRecordingSession;	// Currently recording session, or NULL if not recording
 	bool					m_bLastSessionDitched;
 
-	virtual bool			CanDeleteSession( ReplayHandle_t hSession ) const	{ return true; }
+	virtual bool			CanDeleteSession( ReplayHandle_t ) const	{ return true; }
 	virtual bool			ShouldUnloadSessions() const { return false; }
 
 	virtual void			OnAllSessionsDeleted() {}

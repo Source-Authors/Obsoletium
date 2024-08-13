@@ -30,8 +30,8 @@
 //----------------------------------------------------------------------------------------
 
 CSessionRecorder::CSessionRecorder()
-:	m_bRecordingAborted( false ),
-	m_nCurrentRecordingStartTick( -1 )
+:	m_nCurrentRecordingStartTick( -1 ),
+	m_bRecordingAborted(false)
 {
 }
 

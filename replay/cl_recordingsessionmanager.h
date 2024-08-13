@@ -84,8 +84,6 @@ private:
 
 	float					m_flNextBlockUpdateTime;
 	float					m_flNextPossibleDownloadTime;
-
-	int						m_nNumSessionBlockDownloaders;	// TODO: Manage the number of session block downloaders
 };
 
 //----------------------------------------------------------------------------------------

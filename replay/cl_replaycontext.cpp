@@ -34,8 +34,8 @@ CClientReplayContext::CClientReplayContext()
 	m_pMovieManager( NULL ),
 	m_pPerformanceManager( NULL ),
 	m_pPerformanceController( NULL ),
-	m_pTestDownloader( NULL ),
 	m_pRenderQueue( NULL ),
+	m_pTestDownloader( NULL ),
 	m_bClientSideReplayDisabled( false )
 {
 }
@@ -389,9 +389,9 @@ void CClientReplayContext::ReportErrorsToUser( wchar_t *pErrorText )
 	if ( !pErrorText || pErrorText[0] == L'\0' )
 		return;
 
-	const int nErrorLen = wcslen( pErrorText );
+	const size_t nErrorLen = wcslen( pErrorText );
 	static char s_szError[1024];
-	wcstombs( s_szError, pErrorText, MIN( 1024, nErrorLen ) );
+	wcstombs( s_szError, pErrorText, MIN( 1024U, nErrorLen ) );
 	Warning( "Replay error system: %s\n", s_szError );
 }
 

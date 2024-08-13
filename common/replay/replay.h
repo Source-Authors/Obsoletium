@@ -81,14 +81,14 @@ public:
 	void AddPerformance( CReplayPerformance *pPerformance );
 
 	// Accessors:
-	inline int GetScreenshotCount() const			{ return m_vecScreenshots.Count(); }
-	inline const CReplayScreenshot *GetScreenshot( int i ) const { return m_vecScreenshots[ i ]; }
+	inline intp GetScreenshotCount() const			{ return m_vecScreenshots.Count(); }
+	inline const CReplayScreenshot *GetScreenshot( intp i ) const { return m_vecScreenshots[ i ]; }
 	bool IsDownloaded() const;
-	inline int GetPerformanceCount() const			{ return m_vecPerformances.Count(); }
-	CReplayPerformance *GetPerformance( int i );
-	const CReplayPerformance *GetPerformance( int i ) const;
+	inline intp GetPerformanceCount() const			{ return m_vecPerformances.Count(); }
+	CReplayPerformance *GetPerformance( intp i );
+	const CReplayPerformance *GetPerformance( intp i ) const;
 	inline bool HasPerformance( CReplayPerformance *pPerformance )	{ return m_vecPerformances.Find( pPerformance ) != m_vecPerformances.InvalidIndex(); }
-	bool FindPerformance( CReplayPerformance *pPerformance, int &iResult );
+	bool FindPerformance( CReplayPerformance *pPerformance, intp &iResult );
 	CReplayPerformance *GetPerformanceWithTitle( const wchar_t *pTitle );
 	inline const char *GetMapName() const { return m_szMapName; }
 	inline int GetSpawnTick() const { return m_nSpawnTick; }

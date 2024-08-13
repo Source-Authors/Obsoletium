@@ -47,7 +47,7 @@ protected:
 	//
 	virtual CBaseRecordingSession	*Create();
 	virtual int				GetVersion() const;
-	virtual bool			ShouldSerializeIndexWithFullPath() { return false; } // On the server, write one file per session
+	virtual bool			ShouldSerializeIndexWithFullPath() const { return false; } // On the server, write one file per session
 	virtual IReplayContext	*GetReplayContext() const;
 
 	virtual bool			CanDeleteSession( ReplayHandle_t hSession ) const;

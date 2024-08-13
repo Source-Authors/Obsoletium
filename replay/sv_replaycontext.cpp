@@ -27,8 +27,8 @@
 CServerReplayContext::CServerReplayContext()
 :	m_pSessionRecorder( NULL ),
 	m_pFileserverCleaner( NULL ),
-	m_bShouldAbortRecording( false ),
-	m_flConVarSanityCheckTime( 0.0f )
+	m_flConVarSanityCheckTime( 0.0f ),
+	m_bShouldAbortRecording( false )
 {
 }
 

@@ -11,10 +11,10 @@
 
 CClientRecordingSessionBlock::CClientRecordingSessionBlock( IReplayContext *pContext )
 :	CBaseRecordingSessionBlock( pContext ),
-	m_uBytesDownloaded( 0 ),
 	m_nDownloadStatus( DOWNLOADSTATUS_WAITING ),
-	m_nHttpError( HTTP_ERROR_NONE ),
+	m_uBytesDownloaded( 0 ),
 	m_bDataInvalid( false ),
+	m_nHttpError( HTTP_ERROR_NONE ),
 	m_nDownloadAttempts( 0 )
 {
 }

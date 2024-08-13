@@ -26,11 +26,11 @@ extern IEngineReplay *g_pEngine;
 
 CClientRecordingSession::CClientRecordingSession( IReplayContext *pContext )
 :	CBaseRecordingSession( pContext ),
+	m_flLastUpdateTime( -1.0f ),
 	m_iLastBlockToDownload( -1 ),
 	m_iGreatestConsecutiveBlockDownloaded( -1 ),
-	m_nSessionInfoDownloadAttempts( 0 ),
-	m_flLastUpdateTime( -1.0f ),
 	m_pSessionInfoDownloader( NULL ),
+	m_nSessionInfoDownloadAttempts( 0 ),
 	m_bTimedOut( false ),
 	m_bAllBlocksDownloaded( false )
 {

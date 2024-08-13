@@ -65,8 +65,8 @@ private:
 	//
 	// IDownloadHandler
 	//
-	virtual void			OnConnecting( CHttpDownloader *pDownloader ) {}
-	virtual void			OnFetch( CHttpDownloader *pDownloader ) {}
+	virtual void			OnConnecting( CHttpDownloader * ) {}
+	virtual void			OnFetch( CHttpDownloader * ) {}
 	virtual void			OnDownloadComplete( CHttpDownloader *pDownloader, const unsigned char *pData );
 
 	const char				*GetErrorString( int nError, HTTPError_t nHttpError ) const;

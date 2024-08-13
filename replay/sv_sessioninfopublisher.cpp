@@ -13,10 +13,10 @@
 //----------------------------------------------------------------------------------------
 
 CSessionInfoPublisher::CSessionInfoPublisher( CServerRecordingSession *pSession )
-:	m_pSession( pSession ),
+:	m_pFilePublisher( NULL ),
 	m_flSessionInfoPublishTime( 0.0f ),
 	m_itLastCompletedBlockWrittenToBuffer( ~0 ),
-	m_pFilePublisher( NULL ),
+	m_pSession( pSession ),
 	m_bShouldPublish( false )
 {
 }
@@ -35,7 +35,7 @@ bool CSessionInfoPublisher::IsDone() const
 	return !m_bShouldPublish && m_pFilePublisher == NULL;
 }
 
-void CSessionInfoPublisher::OnStopRecord( bool bAborting )
+void CSessionInfoPublisher::OnStopRecord( bool )
 {
 }
 
@@ -125,7 +125,7 @@ void CSessionInfoPublisher::Think()
 	// Publish the file now (asynchronous)
 	PublishFileParams_t params;
 	params.m_pOutFilename = fmtTmpSessionInfoFile.Access(),
-	params.m_pSrcData = (uint8 *)m_bufSessionInfo.Base();
+	params.m_pSrcData = m_bufSessionInfo.Base<uint8>();
 	params.m_nSrcSize = nPayloadSize;
 	params.m_pCallbackHandler = this;
 	params.m_nCompressorType = COMPRESSORTYPE_LZSS;

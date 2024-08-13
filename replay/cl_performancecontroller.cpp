@@ -72,23 +72,23 @@ private:
 //----------------------------------------------------------------------------------------
 
 CPerformanceController::CPerformanceController()
-:	m_pRoot( NULL ),
-	m_pCurEvent( NULL ),
-	m_pDbgRoot( NULL ),
-	m_pPlaybackHandler( NULL ),
-	m_pSetViewEvent( NULL ),
-	m_pSaveJob( NULL ),
-	m_bViewOverrideMode( false ),
-	m_bDirty( false ),
-	m_bLastSaveStatus( false ),
-	m_bRewinding( false ),
+:	m_nState( STATE_DORMANT ),
+	m_hReplay( REPLAY_HANDLE_INVALID ),
 	m_pSavedPerformance( NULL ),
 	m_pScratchPerformance( NULL ),
-	m_hReplay( REPLAY_HANDLE_INVALID ),
-	m_nState( STATE_DORMANT ),
+	m_bRewinding( false ),
 	m_pEditor( NULL ),
+	m_pRoot( NULL ),
+	m_pCurEvent( NULL ),
+	m_pDbgRoot( NULL ),
+	m_pSetViewEvent( NULL ),
+	m_bViewOverrideMode( false ),
+	m_bDirty( false ),
 	m_flLastCamSetViewTime( 0.0f ),
-	m_flTimeScale( 1.0f )
+	m_flTimeScale( 1.0f ),
+	m_pSaveJob( NULL ),
+	m_bLastSaveStatus( false ),
+	m_pPlaybackHandler( NULL )
 {
 }
 
@@ -154,7 +154,8 @@ void CPerformanceController::CleanupDbgStream()
 float CPerformanceController::GetTime() const
 {
 	Assert( m_pCurEvent );
-	return atof( m_pCurEvent->GetName() );
+	// dimhotepus: atof -> strtof.
+	return strtof( m_pCurEvent->GetName(), nullptr );
 }
 
 void CPerformanceController::SetEditor( IReplayPerformanceEditor *pEditor )
@@ -519,7 +520,8 @@ void CPerformanceController::Snip()
 		// Get next first, in case we delete
 		KeyValues *pNext = pCurEvent->GetNextTrueSubKey();
 
-		const float flCurEventTime = atof( pCurEvent->GetName() );
+		// dimhotepus: atof -> strtof.
+		const float flCurEventTime = strtof( pCurEvent->GetName(), nullptr );
 		if ( flCurEventTime >= flTime )
 		{
 			// Delete the key
@@ -629,7 +631,7 @@ void CPerformanceController::RemoveDuplicateEventsFromQueue()
 #if _DEBUG
 			CUtlBuffer buf;
 			pCurEvent->RecursiveSaveToFile( buf, 1 );
-			IF_REPLAY_DBG( Warning( "Ditching event of type %s\n...", ( const char * )buf.Base() ) );
+			IF_REPLAY_DBG( Warning( "Ditching event of type %s\n...", buf.Base<const char>() ) );
 #endif
 
 			// Free the event
@@ -646,7 +648,7 @@ void CPerformanceController::AddEvent( KeyValues *pEvent )
 	IF_REPLAY_DBG2(
 		CUtlBuffer buf;
 	pEvent->RecursiveSaveToFile( buf, 1 );
-	Warning( "Recording event:\n%s\n", ( const char * )buf.Base() );
+	Warning( "Recording event:\n%s\n", buf.Base<const char>() );
 	);
 	m_pRoot->AddSubKey( pEvent );
 }
@@ -839,7 +841,7 @@ void CPerformanceController::PlaybackThink()
 		IF_REPLAY_DBG2(
 			CUtlBuffer buf;
 			m_pCurEvent->RecursiveSaveToFile( buf, 1 );
-			Warning( "%s\n", ( const char * )buf.Base() );
+			Warning( "%s\n", buf.Base<const char>() );
 		);
 
 		switch ( m_pCurEvent->GetInt( "type", EVENTTYPE_INVALID ) )
@@ -920,8 +922,9 @@ void CPerformanceController::PlaybackThink()
 			pSearch = m_pSetViewEvent->GetNextTrueSubKey();
 			while ( pSearch )
 			{
+				// dimhotepus: atof -> strtof
 				// Another sample not available
-				float flSearchTime = atof( pSearch->GetName() );
+				float flSearchTime = strtof( pSearch->GetName(), nullptr );
 				if ( flSearchTime > m_flLastCamSetViewTime + 0.5f )
 					break;
 

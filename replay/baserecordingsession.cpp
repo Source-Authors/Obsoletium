@@ -22,11 +22,11 @@
 //----------------------------------------------------------------------------------------
 
 CBaseRecordingSession::CBaseRecordingSession( IReplayContext *pContext )
-:	m_pContext( pContext ),
-	m_bRecording( false ),
+:	m_bRecording( false ),
+	m_flStartTime( 0.0f ),
+	m_pContext( pContext ),
 	m_bAutoDelete( false ),
-	m_bBlocksLoaded( false ),
-	m_flStartTime( 0.0f )
+	m_bBlocksLoaded( false )
 {
 }
 
@@ -50,7 +50,7 @@ bool CBaseRecordingSession::Read( KeyValues *pIn )
 	{
 		CUtlBuffer buf;
 		pIn->RecursiveSaveToFile( buf, 0 );
-		IF_REPLAY_DBG( Warning( "Session with no session name found - aborting load for this session.  Data:\n---\n%s\n---\n", (const char *)buf.Base() ) );
+		IF_REPLAY_DBG( Warning( "Session with no session name found - aborting load for this session.  Data:\n---\n%s\n---\n", buf.Base<const char>() ) );
 		return false;
 	}
 

@@ -213,27 +213,27 @@ CON_COMMAND_F( replay_printclientreplays, "Prints out all client replay info", F
 			Msg( "     last block to download: %i\n", pSession->GetLastBlockToDownload() );
 		}
 
-		int nScreenshotCount = pReplay->GetScreenshotCount();
+		intp nScreenshotCount = pReplay->GetScreenshotCount();
 		Msg( "\n" );
-		Msg( "  # screenshots: %i\n", nScreenshotCount );
+		Msg( "  # screenshots: %zd\n", nScreenshotCount );
 		Msg( "  session handle: %i\n", (int)pReplay->m_hSession );
 
-		for ( int i = 0; i < nScreenshotCount; ++i )
+		for ( intp i = 0; i < nScreenshotCount; ++i )
 		{
 			const CReplayScreenshot *pScreenshot = pReplay->GetScreenshot( i );
-			Msg( "    screenshot %i:\n", i );
+			Msg( "    screenshot %zd:\n", i );
 			Msg( "      dimensions: w=%i, h=%i\n", pScreenshot->m_nWidth, pScreenshot->m_nHeight );
 			Msg( "      base filename: %s\n", pScreenshot->m_szBaseFilename );
 		}
 
-		int nPerfCount = pReplay->GetPerformanceCount();
+		intp nPerfCount = pReplay->GetPerformanceCount();
 		Msg( "\n" );
-		Msg( "# performances: %i\n", nPerfCount );
-		for ( int i = 0; i < nPerfCount; ++i )
+		Msg( "# performances: %zd\n", nPerfCount );
+		for ( intp i = 0; i < nPerfCount; ++i )
 		{
 			const CReplayPerformance *pCurPerformance = pReplay->GetPerformance( i );
 			g_pVGuiLocalize->ConvertUnicodeToANSI( pCurPerformance->m_wszTitle, szTitle, sizeof( szTitle ) );
-			Msg( "    performance %i:\n", i );
+			Msg( "    performance %zd:\n", i );
 			Msg( "      title: %s\n", szTitle );
 			Msg( "      ticks: in=%i  out=%i\n", pCurPerformance->m_nTickIn, pCurPerformance->m_nTickOut );
 			Msg( "      filename: %s\n", pCurPerformance->m_szBaseFilename );
