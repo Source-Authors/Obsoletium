@@ -342,8 +342,6 @@ void CStudioRender::R_StudioFlexVerts( mstudiomesh_t *pmesh, int lod )
 //static void R_StudioEyeballNormals( const mstudioeyeball_t *peyeball, int count, const Vector *psrcverts, Vector *pdestnorms )
 
 #define KERNEL_DIAMETER 2
-#define KERNEL_TEXELS (KERNEL_DIAMETER)
-#define KERNEL_TEXEL_RADIUS (KERNEL_TEXELS / 2)
 
 inline float GlintGaussSpotCoefficient( float dx, float dy /*, float *table */ )
 {
@@ -352,7 +350,7 @@ inline float GlintGaussSpotCoefficient( float dx, float dy /*, float *table */ )
 	float r2 = (dx * dx + dy * dy) * rsq;
 	if (r2 <= 1.0f)
 	{
-		return exp( -25.0 * r2 );
+		return exp( -25.0f * r2 );
 		// NOTE: This optimization doesn't make much of a difference
 		//int index = r2 * (GLINT_TABLE_ENTRIES-1);
 		//return table[index];
@@ -470,7 +468,7 @@ public:
 
 		CStudioRender::GlintRenderData_t pRenderData[16];
 		int nGlintCount = m_pStudioRender->BuildGlintRenderData( pRenderData, 
-			ARRAYSIZE(pRenderData),	m_pState, *m_pVRight, *m_pVUp, *m_pROrigin );
+			ssize(pRenderData),	m_pState, *m_pVRight, *m_pVUp, *m_pROrigin );
 
 		// setup glint texture
 		unsigned char *pTextureData = pVTFTexture->ImageData( 0, 0, 0 );
@@ -561,8 +559,8 @@ int CStudioRender::BuildGlintRenderData( GlintRenderData_t *pData, int nMaxGlint
 	VectorNormalize( viewdelta );
 
 	// hack cornea position
-	float iris_radius = pState->peyeball->radius * (6.0 / 12.0);
-	float cornea_radius = pState->peyeball->radius * (8.0 / 12.0);
+	float iris_radius = pState->peyeball->radius * (6.0f / 12.0f);
+	float cornea_radius = pState->peyeball->radius * (8.0f / 12.0f);
 
 	Vector cornea;
 	// position on eyeball that matches iris radius
@@ -585,7 +583,7 @@ int CStudioRender::BuildGlintRenderData( GlintRenderData_t *pData, int nMaxGlint
 	VectorAdd( cornea, pState->org, cornea );
 
 	Vector delta, intensity;
-	Vector reflection, coord;
+	Vector reflection;
 
 	// Put in glints due to the lights in the scene
 	int nGlintCount = 0;
@@ -628,7 +626,7 @@ ITexture* CStudioRender::RenderGlintTexture( const eyeballstate_t *pState,
 	const Vector& vright, const Vector& vup, const Vector& r_origin )
 {
 	GlintRenderData_t pRenderData[16];
-	int nGlintCount = BuildGlintRenderData( pRenderData, ARRAYSIZE(pRenderData),
+	int nGlintCount = BuildGlintRenderData( pRenderData, ssize(pRenderData),
 		pState, vright, vup, r_origin );
 
 	if ( nGlintCount == 0 )

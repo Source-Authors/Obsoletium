@@ -22,7 +22,7 @@ $Configuration
 	}
 }
 
-$Project "StudioRender"
+$Project "studiorender"
 {
 	$Folder	"Source Files"
 	{

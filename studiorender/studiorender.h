@@ -274,7 +274,7 @@ private:
 
 	struct Decal_t
 	{
-		int m_IndexCount;
+		intp m_IndexCount;
 		int m_VertexCount;
 		float m_FadeStartTime;
 		float m_FadeDuration;

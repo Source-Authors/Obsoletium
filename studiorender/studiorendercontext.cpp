@@ -115,8 +115,7 @@ void CStudioRenderContext::Disconnect()
 void *CStudioRenderContext::QueryInterface( const char *pInterfaceName )
 {
 	// Loading the studiorender DLL mounts *all* interfaces
-	CreateInterfaceFn factory = Sys_GetFactoryThis();	// This silly construction is necessary
-	return factory( pInterfaceName, NULL );				// to prevent the LTCG compiler from crashing.
+	return Sys_GetFactoryThis()( pInterfaceName, nullptr );
 }
 
 
@@ -1552,14 +1551,14 @@ void CStudioRenderContext::UnloadModel( studiohwdata_t *pHardwareData )
 //-----------------------------------------------------------------------------
 // Refresh the studiohdr since it was lost...
 //-----------------------------------------------------------------------------
-void CStudioRenderContext::RefreshStudioHdr( studiohdr_t* pStudioHdr, studiohwdata_t* pHardwareData )
+void CStudioRenderContext::RefreshStudioHdr( studiohdr_t*, studiohwdata_t* )
 {
 }
 
 //-----------------------------------------------------------------------------
 // Set the eye view target
 //-----------------------------------------------------------------------------
-void CStudioRenderContext::SetEyeViewTarget( const studiohdr_t *pStudioHdr, int nBodyIndex, const Vector& viewtarget )
+void CStudioRenderContext::SetEyeViewTarget( const studiohdr_t *, int, const Vector& viewtarget )
 {
 	VectorCopy( viewtarget, m_RC.m_ViewTarget );
 }
