@@ -332,7 +332,8 @@ private:
 	// Sets up the default state
 	StateSnapshot_t m_DefaultStateSnapshot;
 	TransitionList_t m_DefaultTransition;
-	ShadowState_t m_DefaultShadowState;
+	// dimhotepus: Unused.
+	//ShadowState_t m_DefaultShadowState;
 	
 	// The current snapshot id
 	ShadowStateId_t m_CurrentShadowId;

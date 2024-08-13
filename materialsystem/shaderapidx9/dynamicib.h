@@ -162,13 +162,12 @@ public:
 
 private :
 	void Create( IDirect3DDevice9 *pD3D );
-	inline void ReallyUnlock( int unlockBytes )
+	inline void ReallyUnlock( [[maybe_unused]] int unlockBytes )
 	{
 		#if DX_TO_GL_ABSTRACTION
 			// Knowing how much data was actually written is critical for performance under OpenGL.
 			m_pIB->UnlockActualSize( unlockBytes );
 		#else
-			unlockBytes; // Unused here
 			m_pIB->Unlock();
 		#endif
 	}
@@ -262,24 +261,23 @@ inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9 *pD3D, int count,
 	bool bSoftwareVertexProcessing, bool dynamic ) :
 		m_pIB(0), 
 		m_Position(0), 
-		m_bFlush(true), 
 		m_bLocked(false),
-		m_bExternalMemory(false),
+		m_bFlush(true), 
 		m_bDynamic(dynamic),
+		m_bExternalMemory(false),
 		m_bSoftwareVertexProcessing( bSoftwareVertexProcessing ),
 		m_bLateCreateShouldDiscard( false )
-#ifdef _X360
-		,m_pAllocatedMemory(NULL)
-		,m_iNextBlockingPosition(0)
-		,m_iAllocationCount(0)
-#endif
 #ifdef VPROF_ENABLED
-		,m_Frame( -1 )
+		, m_Frame( -1 )
 #endif
 		, m_nReferenceCount( 0 ) 
 {
+	m_nSysmemBufferStartBytes = 0;
+	m_LockedStartIndex = 0;
+	m_LockedNumIndices = 0;
+
 	// For write-combining, ensure we always have locked memory aligned to 4-byte boundaries
-	count = ALIGN_VALUE( count, 2 );
+	count = AlignValue( count, 2 );
 	m_IndexCount = count; 
 
 	MEM_ALLOC_CREDIT_( m_bDynamic ? ( "D3D: " TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER ) : ( "D3D: " TEXTURE_GROUP_STATIC_INDEX_BUFFER ) );
@@ -303,7 +301,6 @@ inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9 *pD3D, int count,
 	m_NumIndices = m_IndexCount;
 #endif
 
-
 	if ( g_pShaderUtil->GetThreadMode() != MATERIAL_SINGLE_THREADED || !ThreadInMainThread() )
 	{
 		m_pSysmemBuffer = ( byte * )malloc( count * IndexSize() );
@@ -321,7 +318,7 @@ inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9 *pD3D, int count,
 	{
 		m_iAllocationCount = count * X360_INDEX_BUFFER_SIZE_MULTIPLIER;
 		Assert( m_iAllocationCount >= count );
-		m_iAllocationCount = ALIGN_VALUE( m_iAllocationCount, 2 );
+		m_iAllocationCount = AlignValue( m_iAllocationCount, 2 );
 		m_pAllocatedMemory = (unsigned char*)XPhysicalAlloc( m_iAllocationCount * IndexSize(), MAXULONG_PTR, 0, PAGE_READWRITE | MEM_LARGE_PAGES | PAGE_WRITECOMBINE );
 	}
 	else if ( MeshMgr()->AllocatePooledIB( this, nBufferSize, TEXTURE_GROUP_STATIC_INDEX_BUFFER ) )
@@ -731,13 +728,12 @@ inline unsigned short* CIndexBuffer::Lock( bool bReadOnly, int numIndices, int& 
 
 	// For write-combining, ensure we always have locked memory aligned to 4-byte boundaries
 	if( m_bDynamic )
-		numIndices = ALIGN_VALUE( numIndices, 2 );
+		numIndices = AlignValue( numIndices, 2 );
 
 	// Ensure there is enough space in the IB for this data
 	if ( numIndices > m_IndexCount ) 
 	{ 
 		Error( "too many indices for index buffer. . tell a programmer (%d>%d)\n", numIndices, m_IndexCount );
-		Assert( false ); 
 		return 0; 
 	}
 	
@@ -907,7 +903,7 @@ inline void CIndexBuffer::Unlock( int numIndices )
 
 	// For write-combining, ensure we always have locked memory aligned to 4-byte boundaries
 //	if( m_bDynamic )
-//		numIndices = ALIGN_VALUE( numIndices, 2 );
+//		numIndices = AlignValue( numIndices, 2 );
 
 	if ( !IsX360() && !m_pIB && !m_pSysmemBuffer )
 		return;
@@ -1007,14 +1003,14 @@ inline void CIndexBuffer::HandleLateCreation( )
 	m_bLateCreateShouldDiscard = false;
 	
 	// Don't use the Lock function, it does a bunch of stuff we don't want.
-	HRESULT hr = m_pIB->Lock( m_nSysmemBufferStartBytes, 
+	[[maybe_unused]] HRESULT hr = m_pIB->Lock( m_nSysmemBufferStartBytes, 
 	                         dataToWriteBytes,
 				             &pWritePtr,
 				             dwFlags);
 
 	// If this fails we're about to crash. Consider skipping the update and leaving 
 	// m_pSysmemBuffer around to try again later. (For example in case of device loss)
-	Assert( SUCCEEDED( hr ) ); hr; 
+	Assert( SUCCEEDED( hr ) ); 
 	memcpy( pWritePtr, m_pSysmemBuffer + m_nSysmemBufferStartBytes, dataToWriteBytes );
 	ReallyUnlock( dataToWriteBytes );
 

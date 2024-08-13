@@ -56,7 +56,7 @@ public:
 									 int width, int height, int srcStride = 0, int dstStride = 0 ) = 0;
 
 	// Figures out the amount of memory needed by a bitmap
-	virtual int GetMemRequired( int width, int height, int depth, ImageFormat format, bool mipmap ) = 0;
+	virtual intp GetMemRequired( int width, int height, int depth, ImageFormat format, bool mipmap ) = 0;
 
 	// Gets image format info
 	virtual const ImageFormatInfo_t& ImageFormatInfo( ImageFormat fmt ) const = 0;

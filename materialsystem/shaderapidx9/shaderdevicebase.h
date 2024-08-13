@@ -55,14 +55,14 @@ public:
 	virtual ~CShaderDeviceMgrBase();
 
 	// Methods of IAppSystem
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
-	virtual void *QueryInterface( const char *pInterfaceName );
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
+	void *QueryInterface( const char *pInterfaceName ) override;
 
 	// Methods of IShaderDeviceMgr
-	virtual bool GetRecommendedConfigurationInfo( unsigned nAdapter, int nDXLevel, KeyValues *pCongifuration );
-	virtual void AddModeChangeCallback( ShaderModeChangeCallbackFunc_t func );
-	virtual void RemoveModeChangeCallback( ShaderModeChangeCallbackFunc_t func );
+	bool GetRecommendedConfigurationInfo( unsigned nAdapter, int nDXLevel, KeyValues *pCongifuration ) override;
+	void AddModeChangeCallback( ShaderModeChangeCallbackFunc_t func ) override;
+	void RemoveModeChangeCallback( ShaderModeChangeCallbackFunc_t func ) override;
 
 	// Reads in the hardware caps from the dxsupport.cfg file
 	void ReadHardwareCaps( HardwareCaps_t &caps, int nDxLevel );
@@ -138,13 +138,13 @@ public:
 
 	// Methods of IShaderDevice
 public:
-	virtual ImageFormat GetBackBufferFormat() const;
-	virtual int StencilBufferBits() const;
-	virtual bool IsAAEnabled() const;
-	virtual bool AddView( void* hWnd );
-	virtual void RemoveView( void* hWnd );
-	virtual void SetView( void* hWnd );
-	virtual void GetWindowSize( int& nWidth, int& nHeight ) const;
+	ImageFormat GetBackBufferFormat() const override;
+	int StencilBufferBits() const override;
+	bool IsAAEnabled() const override;
+	bool AddView( void* hWnd ) override;
+	void RemoveView( void* hWnd ) override;
+	void SetView( void* hWnd ) override;
+	void GetWindowSize( int& nWidth, int& nHeight ) const override;
 
 	// Methods exposed to the rest of shader api
 	virtual bool InitDevice( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode ) = 0;
@@ -156,7 +156,7 @@ public:
 	CShaderDeviceBase();
 	virtual ~CShaderDeviceBase();
 
-	virtual void OtherAppInitializing( bool initializing ) {}
+	virtual void OtherAppInitializing( bool ) {}
 	virtual void EvictManagedResourcesInternal() {}
 
 	void* GetIPCHWnd();
@@ -205,6 +205,7 @@ class CShaderBuffer : public IShaderBuffer
 {
 public:
 	CShaderBuffer( T *pBlob ) : m_pBlob( pBlob ) {}
+	virtual ~CShaderBuffer() = default;
 
 	virtual size_t GetSize() const
 	{

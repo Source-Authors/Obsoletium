@@ -15,7 +15,7 @@
 #endif
 
 #include "meshbase.h"
-#include "shaderapi/ishaderdevice.h"
+#include "shaderapi/IShaderDevice.h"
 
 
 //-----------------------------------------------------------------------------
@@ -254,7 +254,7 @@ public:
 		return MATERIAL_INDEX_FORMAT_UNKNOWN;
 	}
 
-	virtual void SetFlexMesh( IMesh *pMesh, int nVertexOffset ) {}
+	virtual void SetFlexMesh( IMesh *, int ) {}
 
 	virtual void DisableFlexMesh() {}
 

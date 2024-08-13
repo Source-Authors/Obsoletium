@@ -102,43 +102,43 @@ public:
 
 public:
 	// Methods of IShaderDevice
-	virtual bool IsUsingGraphics() const;
-	virtual unsigned GetCurrentAdapter() const;
-	virtual ImageFormat GetBackBufferFormat() const;
-	virtual void GetBackBufferDimensions( int& width, int& height ) const;
-	virtual void SpewDriverInfo() const;
-	virtual void Present();
-	virtual IShaderBuffer* CompileShader( const char *pProgram, size_t nBufLen, const char *pShaderVersion );
-	virtual VertexShaderHandle_t CreateVertexShader( IShaderBuffer *pShader );
-	virtual void DestroyVertexShader( VertexShaderHandle_t hShader );
-	virtual GeometryShaderHandle_t CreateGeometryShader( IShaderBuffer* pShaderBuffer );
-	virtual void DestroyGeometryShader( GeometryShaderHandle_t hShader );
-	virtual PixelShaderHandle_t CreatePixelShader( IShaderBuffer* pShaderBuffer );
-	virtual void DestroyPixelShader( PixelShaderHandle_t hShader );
-	virtual void ReleaseResources() {}
-	virtual void ReacquireResources() {}
-	virtual IMesh* CreateStaticMesh( VertexFormat_t format, const char *pTextureBudgetGroup, IMaterial * pMaterial );
-	virtual void DestroyStaticMesh( IMesh* mesh );
-	virtual IVertexBuffer *CreateVertexBuffer( ShaderBufferType_t type, VertexFormat_t fmt, int nVertexCount, const char *pTextureBudgetGroup );
-	virtual void DestroyVertexBuffer( IVertexBuffer *pVertexBuffer );
-	virtual IIndexBuffer *CreateIndexBuffer( ShaderBufferType_t type, MaterialIndexFormat_t fmt, int nIndexCount, const char *pTextureBudgetGroup );
-	virtual void DestroyIndexBuffer( IIndexBuffer *pIndexBuffer );
-	virtual IVertexBuffer *GetDynamicVertexBuffer( int nStreamID, VertexFormat_t vertexFormat, bool bBuffered = true );
-	virtual IIndexBuffer *GetDynamicIndexBuffer( MaterialIndexFormat_t fmt, bool bBuffered = true );
-	virtual void SetHardwareGammaRamp( float fGamma, float fGammaTVRangeMin, float fGammaTVRangeMax, float fGammaTVExponent, bool bTVEnabled );
+	bool IsUsingGraphics() const override;
+	unsigned GetCurrentAdapter() const override;
+	ImageFormat GetBackBufferFormat() const override;
+	void GetBackBufferDimensions( int& width, int& height ) const override;
+	void SpewDriverInfo() const override;
+	void Present() override;
+	IShaderBuffer* CompileShader( const char *pProgram, size_t nBufLen, const char *pShaderVersion ) override;
+	VertexShaderHandle_t CreateVertexShader( IShaderBuffer *pShader ) override;
+	void DestroyVertexShader( VertexShaderHandle_t hShader ) override;
+	GeometryShaderHandle_t CreateGeometryShader( IShaderBuffer* pShaderBuffer ) override;
+	void DestroyGeometryShader( GeometryShaderHandle_t hShader ) override;
+	PixelShaderHandle_t CreatePixelShader( IShaderBuffer* pShaderBuffer ) override;
+	void DestroyPixelShader( PixelShaderHandle_t hShader ) override;
+	void ReleaseResources() override {}
+	void ReacquireResources() override {}
+	IMesh* CreateStaticMesh( VertexFormat_t format, const char *pTextureBudgetGroup, IMaterial * pMaterial ) override;
+	void DestroyStaticMesh( IMesh* mesh ) override;
+	IVertexBuffer *CreateVertexBuffer( ShaderBufferType_t type, VertexFormat_t fmt, int nVertexCount, const char *pTextureBudgetGroup ) override;
+	void DestroyVertexBuffer( IVertexBuffer *pVertexBuffer ) override;
+	IIndexBuffer *CreateIndexBuffer( ShaderBufferType_t type, MaterialIndexFormat_t fmt, int nIndexCount, const char *pTextureBudgetGroup ) override;
+	void DestroyIndexBuffer( IIndexBuffer *pIndexBuffer ) override;
+	IVertexBuffer *GetDynamicVertexBuffer( int nStreamID, VertexFormat_t vertexFormat, bool bBuffered = true ) override;
+	IIndexBuffer *GetDynamicIndexBuffer( MaterialIndexFormat_t fmt, bool bBuffered = true ) override;
+	void SetHardwareGammaRamp( float fGamma, float fGammaTVRangeMin, float fGammaTVRangeMax, float fGammaTVExponent, bool bTVEnabled ) override;
 
 	// A special path used to tick the front buffer while loading on the 360
-	virtual void EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode, ShaderNonInteractiveInfo_t *pInfo ) {}
-	virtual void RefreshFrontBufferNonInteractive( ) {}
-	virtual void HandleThreadEvent( uint32 threadEvent ) {}
+	void EnableNonInteractiveMode( MaterialNonInteractiveMode_t, ShaderNonInteractiveInfo_t * ) override {}
+	void RefreshFrontBufferNonInteractive( ) override {}
+	void HandleThreadEvent( uint32 ) override {}
 
-	virtual char *GetDisplayDeviceName() override;
+	virtual const char *GetDisplayDeviceName() override;
 
 public:
 	// Methods of CShaderDeviceBase
-	virtual bool InitDevice( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode );
-	virtual void ShutdownDevice();
-	virtual bool IsDeactivated() const { return false; }
+	bool InitDevice( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode ) override;
+	void ShutdownDevice() override;
+	bool IsDeactivated() const override { return false; }
 	virtual bool DetermineHardwareCaps();
 
 	// Other public methods
@@ -170,7 +170,7 @@ private:
 	{
 		ID3D10VertexShader *m_pShader;
 		ID3D10ShaderReflection *m_pInfo;
-		void *m_pByteCode;
+		unsigned char *m_pByteCode;
 		size_t m_nByteCodeLen;
 		InputLayoutDict_t m_InputLayouts;
 

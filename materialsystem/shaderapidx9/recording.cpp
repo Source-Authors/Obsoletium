@@ -25,7 +25,7 @@
 
 static CUtlVector<unsigned char> g_pRecordingBuffer;
 static int g_ArgsRemaining = 0;
-static int g_CommandStartIdx = 0;
+static intp g_CommandStartIdx = 0;
 
 //-----------------------------------------------------------------------------
 // Opens the recording file

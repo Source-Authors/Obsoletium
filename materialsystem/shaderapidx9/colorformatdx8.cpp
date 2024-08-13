@@ -126,6 +126,8 @@ D3DFORMAT GetNearestD3DColorFormat( ImageFormat fmt,
 		if (TestTextureFormat(D3DFMT_X8R8G8B8, isRenderTarget, bIsVertexTexture, bIsFilterableRequired))
 			return D3DFMT_X8R8G8B8;
 
+		[[fallthrough]];
+
 		// fall through. . . .
 	case IMAGE_FORMAT_RGB888:
 	case IMAGE_FORMAT_BGR888:

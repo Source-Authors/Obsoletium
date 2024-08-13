@@ -300,7 +300,7 @@ IShaderShadowDX8* ShaderShadow()
 // Constructor, destructor
 //-----------------------------------------------------------------------------
 CShaderShadowDX8::CShaderShadowDX8( ) :
-	m_DrawFlags(0), m_pHardwareConfig(0), m_HasConstantColor(false)
+	m_pHardwareConfig(0), m_HasConstantColor(false), m_DrawFlags(0)
 {	
 	memset( &m_ShadowState, 0, sizeof(m_ShadowState) );
 	memset( &m_TextureStage, 0, sizeof(m_TextureStage) );
@@ -1484,8 +1484,7 @@ void CShaderShadowDX8::ConfigureFVFVertexShader( unsigned int flags )
 	{
 		++lastUsedTextureStage;
 
-		if (isUsingConstantColor &&
-			(lastUsedTextureStage >= m_pHardwareConfig->GetTextureStageCount()))
+		if (lastUsedTextureStage >= m_pHardwareConfig->GetTextureStageCount())
 		{
 			// This is the case where we'd want to modulate in a particular texture
 			// stage, but we can't because there aren't enough. In this case, we're gonna
@@ -1721,10 +1720,7 @@ void CShaderShadowDX8::ComputeAggregateShadowState( )
 
 		// We need to take lighting into account..
 		if ( m_ShadowState.m_Lighting )
-			flags |= SHADER_DRAW_NORMAL;
-
-		if (m_ShadowState.m_Lighting)
-			flags |= SHADER_DRAW_COLOR;
+			flags |= SHADER_DRAW_NORMAL | SHADER_DRAW_COLOR;
 
 		// Look for inconsistency in the shadow state (can't have texgen &
 		// SHADER_DRAW_TEXCOORD or SHADER_DRAW_SECONDARY_TEXCOORD0 on the same stage)

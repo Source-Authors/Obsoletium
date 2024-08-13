@@ -6,7 +6,7 @@
 //
 //===========================================================================//
 
-#include "shadershadowdx10.h"
+#include "ShaderShadowDx10.h"
 #include "utlvector.h"
 #include "materialsystem/imaterialsystem.h"
 #include "IHardwareConfigInternal.h"

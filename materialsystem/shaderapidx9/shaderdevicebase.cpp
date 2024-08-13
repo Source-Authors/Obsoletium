@@ -151,7 +151,7 @@ bool CShaderDeviceMgrBase::Connect( CreateInterfaceFn factory )
 
 	s_TempFactory = NULL;
 
-	if ( !g_pShaderUtil || !g_pFullFileSystem || !g_pShaderDeviceMgr )
+	if ( !g_pShaderUtil || !g_pFullFileSystem )
 	{
 		Warning( "ShaderAPIDx10 was unable to access the required interfaces!\n" );
 		return false;
@@ -533,17 +533,12 @@ KeyValues *CShaderDeviceMgrBase::ReadDXSupportKeyValues()
 	KeyValues *pCfg = new KeyValues( "dxsupport" );
 
 	const char *pPathID = "EXECUTABLE_PATH";
-	if ( IsX360() && g_pFullFileSystem->GetDVDMode() == DVDMODE_STRICT )
-	{
-		// 360 dvd optimzation, expect it inside the platform zip
-		pPathID = "PLATFORM";
-	}
 
 	// First try to read a game-specific config, if it exists
 	if ( !pCfg->LoadFromFile( g_pFullFileSystem, SUPPORT_CFG_FILE, pPathID ) )
 	{
 		pCfg->deleteThis();
-		return NULL;
+		return NULL; //-V773
 	}
 
 	char pTempPath[1024];
@@ -682,7 +677,7 @@ void CShaderDeviceMgrBase::LoadConfig( KeyValues *pKeyValues, KeyValues *pConfig
 	{
 		CUtlBuffer tmpBuf;
 		pKeyValues->RecursiveSaveToFile( tmpBuf, 0 );
-		Warning( "%s\n", ( const char * )tmpBuf.Base() );
+		Warning( "%s\n", tmpBuf.Base<const char>() );
 	}
 	for( KeyValues *pGroup = pKeyValues->GetFirstSubKey(); pGroup; pGroup = pGroup->GetNextKey() )
 	{
@@ -775,7 +770,7 @@ bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( unsigned nAdapter, i
 		{
 			CUtlBuffer tmpBuf;
 			pVidMemKeyValues->RecursiveSaveToFile( tmpBuf, 0 );
-			Warning( "pVidMemKeyValues\n%s\n", ( const char * )tmpBuf.Base() );
+			Warning( "pVidMemKeyValues\n%s\n", tmpBuf.Base<const char>() );
 		}
 		KeyValues *pMatPicmipKeyValue = pVidMemKeyValues->FindKey( "ConVar.mat_picmip", false );
 
@@ -796,7 +791,7 @@ bool CShaderDeviceMgrBase::GetRecommendedConfigurationInfo( unsigned nAdapter, i
 	{
 		CUtlBuffer tmpBuf;
 		pConfiguration->RecursiveSaveToFile( tmpBuf, 0 );
-		Warning( "final config:\n%s\n", ( const char * )tmpBuf.Base() );
+		Warning( "final config:\n%s\n", tmpBuf.Base<const char>() );
 	}
 
 	return true;
@@ -825,6 +820,7 @@ int CShaderDeviceMgrBase::GetClosestActualDXLevel( int nDxLevel ) const
 
 	if ( nDxLevel == 80 )
 		return 80;
+
 	if ( nDxLevel <= 89 )
 		return 81;
 
@@ -836,11 +832,13 @@ int CShaderDeviceMgrBase::GetClosestActualDXLevel( int nDxLevel ) const
 	if ( nDxLevel <= 94 )
 		return 90;
 
-	if ( IsX360() && nDxLevel <= 98 )
-		return 98;
 	if ( nDxLevel <= 99 )
 		return 95;
-	return 100;
+
+	if ( nDxLevel <= 100)
+		return 100;
+
+	return 110;
 }
 
 
@@ -907,9 +905,13 @@ void* CShaderDeviceMgrBase::ShaderInterfaceFactory( const char *pInterfaceName, 
 CShaderDeviceBase::CShaderDeviceBase()
 {
 	m_bInitialized = false;
+	m_bIsMinimized = false;
+	m_ViewHWnd = nullptr;
 	m_nAdapter = UINT_MAX;
-	m_hWnd = NULL;
-	m_hWndCookie = NULL;
+	m_hWnd = nullptr;
+	m_hWndCookie = nullptr;
+	m_nWindowWidth = 0;
+	m_nWindowHeight = 0;
 	m_dwThreadId = ThreadGetCurrentId();
 }
 
@@ -973,10 +975,10 @@ static VD3DHWND GetTopmostParentWindow( VD3DHWND hWnd )
 
 static BOOL CALLBACK EnumChildWindowsProc( VD3DHWND hWnd, LPARAM lParam )
 {
-	int windowId = GetWindowLongPtr( hWnd, GWLP_USERDATA );
-	if (windowId == MATERIAL_SYSTEM_WINDOW_ID)
+	long windowId = GetWindowLongPtr( hWnd, GWLP_USERDATA );
+	if (static_cast<unsigned>(windowId) == MATERIAL_SYSTEM_WINDOW_ID)
 	{
-		COPYDATASTRUCT copyData;
+		COPYDATASTRUCT copyData = {};
 		copyData.dwData = lParam;
 		copyData.cbData = 0;
 		copyData.lpData = 0;
@@ -1163,7 +1165,7 @@ bool CShaderDeviceBase::AddView( void* hWnd )
 	// In this case, we need to create the device; this is our
 	// default swap chain. This here says we're gonna use a part of the
 	// existing buffer and just grab that.
-	int view = m_Views.AddToTail();
+	intp view = m_Views.AddToTail();
 	m_Views[view].m_HWnd = (VD3DHWND)hwnd;
 	//	memcpy( &m_Views[view].m_PresentParamters, m_PresentParameters, sizeof(m_PresentParamters) );
 

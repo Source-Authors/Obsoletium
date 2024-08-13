@@ -107,9 +107,9 @@ public:
 inline void ComputeVertexDesc( unsigned char * pBuffer, VertexFormat_t vertexFormat, VertexDesc_t & desc )
 {
 	int i;
-	int *pVertexSizesToSet[64];
+	int *pVertexSizesToSet[32];
 	int nVertexSizesToSet = 0;
-	static ALIGN32 ModelVertexDX8_t temp[4];
+	static alignas(float) ModelVertexDX8_t temp[4];
 	float *dummyData = (float*)&temp; // should be larger than any CMeshBuilder command can set.
 
 	// Determine which vertex compression type this format specifies (affects element sizes/decls):
@@ -299,7 +299,7 @@ inline void ComputeVertexDesc( unsigned char * pBuffer, VertexFormat_t vertexFor
 	desc.m_ActualVertexSize = offset;
 
 	// Now set the m_VertexSize for all the members that were actually valid.
-	Assert( nVertexSizesToSet < sizeof(pVertexSizesToSet)/sizeof(pVertexSizesToSet[0]) );
+	Assert( nVertexSizesToSet < ssize(pVertexSizesToSet) );
 	for ( int iElement=0; iElement < nVertexSizesToSet; iElement++ )
 	{
 		*pVertexSizesToSet[iElement] = offset;

@@ -162,42 +162,42 @@ class CShaderDeviceDx8 : public CShaderDeviceBase
 {
 	// Methods of IShaderDevice
 public:
-	virtual bool IsUsingGraphics() const;
-	virtual ImageFormat GetBackBufferFormat() const;
-	virtual void GetBackBufferDimensions( int& width, int& height ) const;
-	virtual void Present();
-	virtual IShaderBuffer* CompileShader( const char *pProgram, size_t nBufLen, const char *pShaderVersion );
-	virtual VertexShaderHandle_t CreateVertexShader( IShaderBuffer *pBuffer );
-	virtual void DestroyVertexShader( VertexShaderHandle_t hShader );
-	virtual GeometryShaderHandle_t CreateGeometryShader( IShaderBuffer* pShaderBuffer );
-	virtual void DestroyGeometryShader( GeometryShaderHandle_t hShader );
-	virtual PixelShaderHandle_t CreatePixelShader( IShaderBuffer* pShaderBuffer );
-	virtual void DestroyPixelShader( PixelShaderHandle_t hShader );
-	virtual void ReleaseResources();
-	virtual void ReacquireResources();
-	virtual IMesh* CreateStaticMesh( VertexFormat_t format, const char *pBudgetGroup, IMaterial * pMaterial = NULL );
-	virtual void DestroyStaticMesh( IMesh* mesh );
-	virtual IVertexBuffer *CreateVertexBuffer( ShaderBufferType_t type, VertexFormat_t fmt, int nVertexCount, const char *pBudgetGroup );
-	virtual void DestroyVertexBuffer( IVertexBuffer *pVertexBuffer );
-	virtual IIndexBuffer *CreateIndexBuffer( ShaderBufferType_t bufferType, MaterialIndexFormat_t fmt, int nIndexCount, const char *pBudgetGroup );
-	virtual void DestroyIndexBuffer( IIndexBuffer *pIndexBuffer );
-	virtual IVertexBuffer *GetDynamicVertexBuffer( int nStreamID, VertexFormat_t vertexFormat, bool bBuffered = true );
-	virtual IIndexBuffer *GetDynamicIndexBuffer( MaterialIndexFormat_t fmt, bool bBuffered = true );
-	virtual void SetHardwareGammaRamp( float fGamma, float fGammaTVRangeMin, float fGammaTVRangeMax, float fGammaTVExponent, bool bTVEnabled );
-	virtual void SpewDriverInfo() const;
-	virtual unsigned GetCurrentAdapter() const;
-	virtual void EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode, ShaderNonInteractiveInfo_t *pInfo = NULL );
-	virtual void RefreshFrontBufferNonInteractive();
-	virtual char *GetDisplayDeviceName() OVERRIDE; 
+	bool IsUsingGraphics() const override;
+	ImageFormat GetBackBufferFormat() const override;
+	void GetBackBufferDimensions( int& width, int& height ) const override;
+	void Present() override;
+	IShaderBuffer* CompileShader( const char *pProgram, size_t nBufLen, const char *pShaderVersion ) override;
+	VertexShaderHandle_t CreateVertexShader( IShaderBuffer *pBuffer ) override;
+	void DestroyVertexShader( VertexShaderHandle_t hShader ) override;
+	GeometryShaderHandle_t CreateGeometryShader( IShaderBuffer* pShaderBuffer ) override;
+	void DestroyGeometryShader( GeometryShaderHandle_t hShader ) override;
+	PixelShaderHandle_t CreatePixelShader( IShaderBuffer* pShaderBuffer ) override;
+	void DestroyPixelShader( PixelShaderHandle_t hShader ) override;
+	void ReleaseResources() override;
+	void ReacquireResources() override;
+	IMesh* CreateStaticMesh( VertexFormat_t format, const char *pBudgetGroup, IMaterial * pMaterial = NULL ) override;
+	void DestroyStaticMesh( IMesh* mesh ) override;
+	IVertexBuffer *CreateVertexBuffer( ShaderBufferType_t type, VertexFormat_t fmt, int nVertexCount, const char *pBudgetGroup ) override;
+	void DestroyVertexBuffer( IVertexBuffer *pVertexBuffer ) override;
+	IIndexBuffer *CreateIndexBuffer( ShaderBufferType_t bufferType, MaterialIndexFormat_t fmt, int nIndexCount, const char *pBudgetGroup ) override;
+	void DestroyIndexBuffer( IIndexBuffer *pIndexBuffer ) override;
+	IVertexBuffer *GetDynamicVertexBuffer( int nStreamID, VertexFormat_t vertexFormat, bool bBuffered = true ) override;
+	IIndexBuffer *GetDynamicIndexBuffer( MaterialIndexFormat_t fmt, bool bBuffered = true ) override;
+	void SetHardwareGammaRamp( float fGamma, float fGammaTVRangeMin, float fGammaTVRangeMax, float fGammaTVExponent, bool bTVEnabled ) override;
+	void SpewDriverInfo() const override;
+	unsigned GetCurrentAdapter() const override;
+	void EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode, ShaderNonInteractiveInfo_t *pInfo = NULL ) override;
+	void RefreshFrontBufferNonInteractive() override;
+	const char *GetDisplayDeviceName() override; 
 
 	// Alternative method for ib/vs
 	// NOTE: If this works, remove GetDynamicVertexBuffer/IndexBuffer
 
 	// Methods of CShaderDeviceBase
 public:
-	virtual bool InitDevice( void* hWnd, unsigned nAdapter, const ShaderDeviceInfo_t &info );
-	virtual void ShutdownDevice();
-	virtual bool IsDeactivated() const;
+	bool InitDevice( void* hWnd, unsigned nAdapter, const ShaderDeviceInfo_t &info ) override;
+	void ShutdownDevice() override;
+	bool IsDeactivated() const override;
 
 	// Other public methods
 public:
@@ -206,10 +206,10 @@ public:
 	virtual ~CShaderDeviceDx8();
 
 	// Call this when another app is initializing or finished initializing
-	virtual void OtherAppInitializing( bool initializing );
+	void OtherAppInitializing( bool initializing ) override;
 	
 	// This handles any events queued because they were called outside of the owning thread
-	virtual void HandleThreadEvent( uint32 threadEvent );
+	void HandleThreadEvent( uint32 threadEvent ) override;
 
 	// FIXME: Make private
 	// Which device are we using?
@@ -234,13 +234,13 @@ protected:
 		IDirect3DVertexDeclaration9 *m_pVertexDecl;
 		ShaderNonInteractiveInfo_t m_Info;
 		MaterialNonInteractiveMode_t m_Mode;
-		float m_flLastPacifierTime;
+		double m_flLastPacifierTime;
 		int m_nPacifierFrame;
 
-		float m_flStartTime;
-		float m_flLastPresentTime;
-		float m_flPeakDt;
-		float m_flTotalDt;
+		double m_flStartTime;
+		double m_flLastPresentTime;
+		double m_flPeakDt;
+		double m_flTotalDt;
 		int m_nSamples;
 		int m_nCountAbove66;
 	};
@@ -324,19 +324,11 @@ protected:
 	// amount of stencil variation we have available
 	int					m_iStencilBufferBits;
 
-#ifdef _X360
-	CON_COMMAND_MEMBER_F( CShaderDeviceDx8, "360vidinfo", SpewVideoInfo360, "Get information on the video mode on the 360", 0 );
-#endif
-
 	// Frame sync objects
 	IDirect3DQuery9		*m_pFrameSyncQueryObject[NUM_FRAME_SYNC_QUERIES];
 	bool				m_bQueryIssued[NUM_FRAME_SYNC_QUERIES];
 	int					m_currentSyncQuery;
 	IDirect3DTexture9	*m_pFrameSyncTexture;
-
-#if defined( _X360 )
-	HXUIDC m_hDC;
-#endif
 
 	CUtlString			m_sDisplayDeviceName;
 

@@ -81,10 +81,6 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CShaderDeviceMgrDx8, IShaderDeviceMgr,
 
 #endif
 
-#if defined( _X360 )
-IDirect3D9 *m_pD3D;
-#endif
-
 IDirect3DDevice *g_pD3DDevice = NULL;
 
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
@@ -315,7 +311,7 @@ void CShaderDeviceMgrDx8::InitAdapterInfo()
 	unsigned nCount = m_pD3D->GetAdapterCount( );
 	for( unsigned i = 0; i < nCount; ++i )
 	{
-		int j = m_Adapters.AddToTail();
+		intp j = m_Adapters.AddToTail();
 		AdapterInfo_t &info = m_Adapters[j];
 
 #ifdef _DEBUG
@@ -348,15 +344,16 @@ void CShaderDeviceMgrDx8::InitAdapterInfo()
 void CShaderDeviceMgrDx8::CheckBorderColorSupport( HardwareCaps_t *pCaps, unsigned nAdapter )
 {
 #ifdef DX_TO_GL_ABSTRACTION
-	if( true )
+	pCaps->m_bSupportsBorderColor = true;
 #else
 	if( IsX360() )
 #endif
 	{
 		pCaps->m_bSupportsBorderColor = true;
 	}
-	else // Most PC parts do this, but let's not deal with that yet (JasonM)
+	else
 	{
+		// TODO: Most PC parts do this, but let's not deal with that yet (JasonM)
 		pCaps->m_bSupportsBorderColor = false;
 	}
 }
@@ -528,12 +525,12 @@ void CShaderDeviceMgrDx8::CheckVendorDependentAlphaToCoverage( HardwareCaps_t *p
 		}
 
 		// nVidia pitches SSAA but we prefer ATOC
-		if ( bNVIDIA_MSAA )//  || bNVIDIA_SSAA )
+		if ( bNVIDIA_MSAA || bNVIDIA_SSAA )
 		{
-			//			if ( bNVIDIA_SSAA )
-			//				m_AlphaToCoverageEnableValue  = MAKEFOURCC('S', 'S', 'A', 'A');
-			//			else
-			pCaps->m_AlphaToCoverageEnableValue	= MAKEFOURCC('A', 'T', 'O', 'C');
+			if ( bNVIDIA_MSAA )
+				pCaps->m_AlphaToCoverageEnableValue = MAKEFOURCC('A', 'T', 'O', 'C');
+			else
+				pCaps->m_AlphaToCoverageEnableValue	= MAKEFOURCC('S', 'S', 'A', 'A');
 
 			pCaps->m_AlphaToCoverageState = D3DRS_ADAPTIVETESS_Y;
 			pCaps->m_AlphaToCoverageDisableValue = (DWORD)D3DFMT_UNKNOWN;
@@ -612,7 +609,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		if ( pVendorID )
 		{
 			int nVendorID = V_atoi( pVendorID );	// use V_atoi for hex support
-			if ( pVendorID > 0 )
+			if ( nVendorID > 0 )
 			{
 				ident.VendorId = nVendorID;
 			}
@@ -700,10 +697,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 	if ( pCaps->m_bSoftwareVertexProcessing )
 	{
 		mat_forcedynamic.SetValue( 1 );
-	}
 
-	if ( pCaps->m_bSoftwareVertexProcessing )
-	{
 		pCaps->m_SupportsVertexShaders = true;
 		pCaps->m_SupportsVertexShaders_2_0 = true;
 	}
@@ -1339,26 +1333,9 @@ void CShaderDeviceMgrDx8::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsign
 	LOCK_SHADERAPI();
 	Assert( D3D() );
 
-	HRESULT hr;
-	D3DDISPLAYMODE mode = { 0 };
-#if !defined( _X360 )
-	hr = D3D()->GetAdapterDisplayMode( nAdapter, &mode );
+	D3DDISPLAYMODE mode = {};
+	HRESULT hr = D3D()->GetAdapterDisplayMode(nAdapter, &mode);
 	Assert( !FAILED(hr) );
-#else
-	if ( !g_pD3DDevice )
-	{
-		// the console has no prior display or mode until its created
-		mode.Width  = GetSystemMetrics( SM_CXSCREEN );
-		mode.Height = GetSystemMetrics( SM_CYSCREEN );
-		mode.RefreshRate = 60;
-		mode.Format = D3DFMT_X8R8G8B8;
-	}
-	else
-	{
-		hr = g_pD3DDevice->GetDisplayMode( 0, &mode );
-		Assert( !FAILED(hr) );
-	}
-#endif
 
 	pInfo->m_nWidth = mode.Width;
 	pInfo->m_nHeight = mode.Height;
@@ -1502,12 +1479,20 @@ CShaderDeviceDx8* g_pShaderDeviceDx8 = &s_ShaderDeviceDX8;
 //-----------------------------------------------------------------------------
 CShaderDeviceDx8::CShaderDeviceDx8()
 {
+	m_DisplayAdapter = UINT_MAX;
+	m_DeviceType = D3DDEVTYPE_FORCE_DWORD;
+
+	memset( &m_PresentParameters, 0, sizeof(m_PresentParameters) );
+	m_AdapterFormat = IMAGE_FORMAT_UNKNOWN;
+
 	g_pD3DDevice = NULL;
-	for ( int i = 0; i < ARRAYSIZE(m_pFrameSyncQueryObject); i++ )
+	for ( size_t i = 0; i < std::size(m_pFrameSyncQueryObject); i++ )
 	{
 		m_pFrameSyncQueryObject[i] = NULL;
 		m_bQueryIssued[i] = false;
 	}
+	m_currentSyncQuery = 0;
+
 	m_pFrameSyncTexture = NULL;
 	m_bQueuedDeviceLost = false;
 	m_DeviceState = DEVICE_STATE_OK;
@@ -1861,7 +1846,7 @@ unsigned CShaderDeviceDx8::GetCurrentAdapter() const
 //-----------------------------------------------------------------------------
 // Returns the current adapter in use
 //-----------------------------------------------------------------------------
-char *CShaderDeviceDx8::GetDisplayDeviceName() 
+const char *CShaderDeviceDx8::GetDisplayDeviceName() 
 {
 	if( m_sDisplayDeviceName.IsEmpty() )
 	{
@@ -1877,7 +1862,7 @@ char *CShaderDeviceDx8::GetDisplayDeviceName()
 		}
 		m_sDisplayDeviceName = ident.DeviceName;
 	}
-	return m_sDisplayDeviceName.GetForModify();
+	return m_sDisplayDeviceName.Get();
 }
 
 
@@ -1887,7 +1872,6 @@ char *CShaderDeviceDx8::GetDisplayDeviceName()
 void CShaderDeviceDx8::SpewDriverInfo() const
 {
 	LOCK_SHADERAPI();
-	HRESULT hr;
 	D3DCAPS caps;
 	D3DADAPTER_IDENTIFIER9 ident;
 
@@ -1897,8 +1881,10 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 	RECORD_INT( m_nAdapter );
 	RECORD_INT( 0 );
 
-	Dx9Device()->GetDeviceCaps( &caps );
+	HRESULT hr = Dx9Device()->GetDeviceCaps(&caps);
+	Assert(SUCCEEDED(hr));
 	hr = D3D()->GetAdapterIdentifier( m_nAdapter, D3DENUM_WHQL_LEVEL, &ident );
+	Assert(SUCCEEDED(hr));
 
 	Warning("Shader API Driver Info:\n\nDriver : %s Version : %lld\n", 
 		ident.Driver, ident.DriverVersion.QuadPart );
@@ -2400,7 +2386,7 @@ void CShaderDeviceDx8::AllocFrameSyncObjects( void )
 
 	if ( m_DeviceSupportsCreateQuery == 0 )
 	{
-		for ( int i = 0; i < ARRAYSIZE(m_pFrameSyncQueryObject); i++ )
+		for ( size_t i = 0; i < std::size(m_pFrameSyncQueryObject); i++ )
 		{
 			m_pFrameSyncQueryObject[i] = NULL;
 			m_bQueryIssued[i] = false;
@@ -2409,7 +2395,7 @@ void CShaderDeviceDx8::AllocFrameSyncObjects( void )
 	}
 
 	// FIXME FIXME FIXME!!!!!  Need to record this.
-	for ( int i = 0; i < ARRAYSIZE(m_pFrameSyncQueryObject); i++ )
+	for ( size_t i = 0; i < std::size(m_pFrameSyncQueryObject); i++ )
 	{
 		HRESULT hr = Dx9Device()->CreateQuery( D3DQUERYTYPE_EVENT, &m_pFrameSyncQueryObject[i] );
 		if( hr == D3DERR_NOTAVAILABLE )
@@ -2440,7 +2426,7 @@ void CShaderDeviceDx8::FreeFrameSyncObjects( void )
 	FreeFrameSyncTextureObject();
 
 	// FIXME FIXME FIXME!!!!!  Need to record this.
-	for ( int i = 0; i < ARRAYSIZE(m_pFrameSyncQueryObject); i++ )
+	for ( size_t i = 0; i < std::size(m_pFrameSyncQueryObject); i++ )
 	{
 		if ( m_pFrameSyncQueryObject[i] )
 		{
@@ -2534,7 +2520,6 @@ void CShaderDeviceDx8::HandleThreadEvent( uint32 threadEvent )
 	case SHADER_THREAD_OTHER_APP_END:
 		OtherAppInitializing(false);
 		break;
-
 	}
 }
 
@@ -2543,9 +2528,6 @@ void CShaderDeviceDx8::HandleThreadEvent( uint32 threadEvent )
 //-----------------------------------------------------------------------------
 bool CShaderDeviceDx8::TryDeviceReset()
 {
-	if ( IsX360() )
-		return true;
-
 	// Don't try to reset the device until we're sure our resources have been released
 	if ( !m_bResourcesReleased )
 	{
@@ -2570,6 +2552,7 @@ bool CShaderDeviceDx8::TryDeviceReset()
 
 	if ( bResetSuccess )
 		m_bResourcesReleased = false;
+
 	return bResetSuccess;
 }
 
@@ -2688,9 +2671,6 @@ void CShaderDeviceDx8::ReacquireResourcesInternal( bool bResetState, bool bForce
 //-----------------------------------------------------------------------------
 bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info ) 
 {
-	if ( IsX360() )
-		return false;
-
 	m_bPendingVideoModeChange = false;
 
 	// We don't need to do crap if the window was set up to set up
@@ -2701,20 +2681,17 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 	g_pShaderDeviceMgr->InvokeModeChangeCallbacks();
 
 	ReleaseResources();
+	SetPresentParameters( m_hWnd, m_DisplayAdapter, info );
 
-	SetPresentParameters( (VD3DHWND)m_hWnd, m_DisplayAdapter, info );
-	HRESULT hr = Dx9Device()->Reset( &m_PresentParameters );
-	if ( FAILED( hr ) )
-	{
-		Warning( "ResizeWindow: Reset failed, hr = 0x%08lX.\n", hr );
-		return false;
-	}
-	else
+	const HRESULT hr{ Dx9Device()->Reset( &m_PresentParameters ) };
+	if ( SUCCEEDED( hr ) )
 	{
 		ReacquireResourcesInternal( true, true, "ResizeWindow" );
+		return true;
 	}
 
-	return true;
+	Warning( "ResizeWindow: GPU reset failed, hr = 0x%08lX.\n", hr );
+	return false;
 }
 
 
@@ -2733,22 +2710,20 @@ void CShaderDeviceDx8::MarkDeviceLost( )
 //-----------------------------------------------------------------------------
 // Checks if the device was lost
 //-----------------------------------------------------------------------------
-#if defined( _DEBUG ) && !defined( _X360 )
 ConVar mat_forcelostdevice( "mat_forcelostdevice", "0" );
-#endif
 
 void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 {
-#if !defined( _X360 )
 	// FIXME: We could also queue up if WM_SIZE changes and look at that
 	// but that seems to only make sense if we have resizable windows where 
 	// we do *not* allocate buffers as large as the entire current video mode
 	// which we're not doing
 #ifdef _WIN32
-	m_bIsMinimized = ( static_cast<BOOL>(IsIconic( ( HWND )m_hWnd )) == (BOOL)TRUE );
+	m_bIsMinimized = IsIconic( ( HWND )m_hWnd ) == TRUE;
 #else
 	m_bIsMinimized = ( IsIconic( (VD3DHWND)m_hWnd ) == TRUE );
 #endif
+
 	m_bOtherAppInitializing = bOtherAppInitializing;
 
 #ifdef _DEBUG
@@ -2760,12 +2735,13 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 #endif
 	
 	HRESULT hr = D3D_OK;
+
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
 	if ( g_ShaderDeviceUsingD3D9Ex && m_DeviceState == DEVICE_STATE_OK )
 	{
 		// Steady state - PresentEx return value will mark us lost if necessary.
 		// We do not care if we are minimized in this state.
-		m_bIsMinimized = false; 
+		m_bIsMinimized = false;
 	}
 	else
 #endif
@@ -2777,7 +2753,7 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 	// If some other call returned device lost previously in the frame, spoof the return value from TCL
 	if ( m_bQueuedDeviceLost )
 	{
-		hr = (hr != D3D_OK) ? hr : D3DERR_DEVICENOTRESET;
+		hr = hr != D3D_OK ? hr : D3DERR_DEVICENOTRESET;
 		m_bQueuedDeviceLost = false;
 	}
 
@@ -2862,14 +2838,21 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 	if ( m_bPendingVideoModeChange && !IsDeactivated() )
 	{
 #ifdef _DEBUG
-		Warning( "mode change!\n" );
+		const ShaderDisplayMode_t &newMode = m_PendingVideoModeChangeConfig.m_DisplayMode;
+		Warning
+		(
+			"Video mode change detected [dx level %d, %d x %d, %s]\n",
+			m_PendingVideoModeChangeConfig.m_nDXLevel,
+			newMode.m_nWidth,
+			newMode.m_nHeight,
+			m_PendingVideoModeChangeConfig.m_bWindowed ? "window" : "fullscreen"
+		);
 #endif
 		// now purge unreferenced materials
 		g_pShaderUtil->UncacheUnusedMaterials( true );
 
 		ResizeWindow( m_PendingVideoModeChangeConfig );
 	}
-#endif
 }
 
 
@@ -2945,34 +2928,21 @@ void CShaderDeviceDx8::EnableNonInteractiveMode( MaterialNonInteractiveMode_t mo
 			mat_monitorgamma_tv_exp.GetFloat(), mat_monitorgamma_tv_enabled.GetBool() );
 	}
 
-#ifdef _X360
-	if ( mode != MATERIAL_NON_INTERACTIVE_MODE_NONE )
-	{
-		// HACK: VSync off (prevents us wasting time blocking on VSync due to our irregular present intervals)
-		Dx9Device()->SetRenderState( D3DRS_PRESENTINTERVAL, D3DPRESENT_INTERVAL_IMMEDIATE );
-	}
-	else
-	{
-		// HACK: VSync on (defaulting to on on 360 is fine, but really should save+restore this state)
-		Dx9Device()->SetRenderState( D3DRS_PRESENTINTERVAL, D3DPRESENT_INTERVAL_ONE );
-	}
-#endif
-
 //	Msg( "Time elapsed: %.3f Peak %.3f Ave %.5f Count %d Count Above %d\n", Plat_FloatTime() - m_NonInteractiveRefresh.m_flStartTime,
 //		m_NonInteractiveRefresh.m_flPeakDt, m_NonInteractiveRefresh.m_flTotalDt / m_NonInteractiveRefresh.m_nSamples, m_NonInteractiveRefresh.m_nSamples, m_NonInteractiveRefresh.m_nCountAbove66 );
 
 	m_NonInteractiveRefresh.m_flStartTime = m_NonInteractiveRefresh.m_flLastPresentTime = 
 		m_NonInteractiveRefresh.m_flLastPacifierTime = Plat_FloatTime();
-	m_NonInteractiveRefresh.m_flPeakDt = 0.0f;
-	m_NonInteractiveRefresh.m_flTotalDt = 0.0f;
+	m_NonInteractiveRefresh.m_flPeakDt = 0.0;
+	m_NonInteractiveRefresh.m_flTotalDt = 0.0;
 	m_NonInteractiveRefresh.m_nSamples = 0;
 	m_NonInteractiveRefresh.m_nCountAbove66 = 0;
 }
 
 void CShaderDeviceDx8::UpdatePresentStats()
 {
-	float t = Plat_FloatTime();
-	float flActualDt = t - m_NonInteractiveRefresh.m_flLastPresentTime;
+	double t = Plat_FloatTime();
+	double flActualDt = t - m_NonInteractiveRefresh.m_flLastPresentTime;
 	if ( flActualDt > m_NonInteractiveRefresh.m_flPeakDt )
 	{
 		m_NonInteractiveRefresh.m_flPeakDt = flActualDt;
@@ -2991,130 +2961,8 @@ void CShaderDeviceDx8::UpdatePresentStats()
 
 void CShaderDeviceDx8::RefreshFrontBufferNonInteractive()
 {
-	if ( !IsX360() || !InNonInteractiveMode() )
-		return;
-
 	// Other code should not be talking to D3D at the same time as this
 	AUTO_LOCK( m_nonInteractiveModeMutex );
-
-#ifdef _X360
-	g_pShaderAPI->OwnGPUResources( false );
-	IDirect3DBaseTexture *pTexture = g_pShaderAPI->GetD3DTexture( m_NonInteractiveRefresh.m_Info.m_hTempFullscreenTexture );
-
-	int w, h;
-	g_pShaderAPI->GetBackBufferDimensions( w, h );
-	XMMATRIX matWVP = XMMatrixOrthographicOffCenterLH( 0, (FLOAT)w, (FLOAT)h, 0, 0, 1 );
-
-	// Structure to hold vertex data.
-	struct TEXVERTEX
-	{
-		FLOAT       Position[3];
-		FLOAT       TexCoord[2];
-	};
-	TEXVERTEX Vertices[4];
-
-	Vertices[0].Position[0] = -0.5f;
-	Vertices[0].Position[1] = -0.5f;
-	Vertices[0].Position[2] = 0;
-	Vertices[0].TexCoord[0] = 0;
-	Vertices[0].TexCoord[1] = 0;
-
-	Vertices[1].Position[0] = w-0.5f;
-	Vertices[1].Position[1] = -0.5f;
-	Vertices[1].Position[2] = 0;
-	Vertices[1].TexCoord[0] = 1;
-	Vertices[1].TexCoord[1] = 0;
-
-	Vertices[2].Position[0] = w-0.5f;
-	Vertices[2].Position[1] = h-0.5f;
-	Vertices[2].Position[2] = 0;
-	Vertices[2].TexCoord[0] = 1;
-	Vertices[2].TexCoord[1] = 1;
-
-	Vertices[3].Position[0] = -0.5f;
-	Vertices[3].Position[1] = h-0.5f;
-	Vertices[3].Position[2] = 0;
-	Vertices[3].TexCoord[0] = 0;
-	Vertices[3].TexCoord[1] = 1;
-
-	D3DVIEWPORT9 viewport;
-	viewport.X = viewport.Y = 0;
-	viewport.Width = w; viewport.Height = h;
-	viewport.MinZ = ReverseDepthOnX360() ? 1.0f : 0.0f;
-	viewport.MaxZ = 1.0f - viewport.MinZ;
-
-	bool bInStartupMode = ( m_NonInteractiveRefresh.m_Mode == MATERIAL_NON_INTERACTIVE_MODE_STARTUP );
-
-	float flDepth = (ShaderUtil()->GetConfig().bReverseDepth ^ ReverseDepthOnX360()) ? 0.0f : 1.0f;
-	Dx9Device()->Clear( 0, NULL, D3DCLEAR_ZBUFFER, 0, flDepth, 0L );
-
-	Dx9Device()->SetViewport( &viewport );
-	Dx9Device()->SetTexture( 0, pTexture );
-	Dx9Device()->SetVertexShader( m_NonInteractiveRefresh.m_pVertexShader );
-	Dx9Device()->SetPixelShader( bInStartupMode ? m_NonInteractiveRefresh.m_pPixelShaderStartup : m_NonInteractiveRefresh.m_pPixelShader );
-	Dx9Device()->SetVertexShaderConstantF( 0, (FLOAT*)&matWVP, 4 );
-	Dx9Device()->SetVertexDeclaration( m_NonInteractiveRefresh.m_pVertexDecl );
-	Dx9Device()->SetSamplerState( 0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP );
-	Dx9Device()->SetSamplerState( 0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP );
-	Dx9Device()->SetSamplerState( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-	Dx9Device()->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "%s", __FUNCTION__ );
-
-	Dx9Device()->DrawPrimitiveUP( D3DPT_QUADLIST, 1, Vertices, sizeof( TEXVERTEX ) );
-
-	if ( bInStartupMode )
-	{
-		float flXPos = m_NonInteractiveRefresh.m_Info.m_flNormalizedX;
-		float flYPos = m_NonInteractiveRefresh.m_Info.m_flNormalizedY;
-		float flHeight = m_NonInteractiveRefresh.m_Info.m_flNormalizedSize;
-		int nSize = h * flHeight;
-		int x = w * flXPos - nSize * 0.5f;
-		int y = h * flYPos - nSize * 0.5f;
-		w = h = nSize;
-
-		Vertices[0].Position[0] = x - 0.5f;
-		Vertices[0].Position[1] = y - 0.5f;
-		Vertices[1].Position[0] = x+w-0.5f;
-		Vertices[1].Position[1] = y - 0.5f;
-		Vertices[2].Position[0] = x+w-0.5f;
-		Vertices[2].Position[1] = y+h-0.5f;
-		Vertices[3].Position[0] = x - 0.5f;
-		Vertices[3].Position[1] = y+h-0.5f;
-
-		float t = Plat_FloatTime();
-		float flDt = t - m_NonInteractiveRefresh.m_flLastPacifierTime;
-		if ( flDt > 0.030f )
-		{
-			if ( ++m_NonInteractiveRefresh.m_nPacifierFrame >= m_NonInteractiveRefresh.m_Info.m_nPacifierCount )
-			{
-				m_NonInteractiveRefresh.m_nPacifierFrame = 0;
-			}
-			m_NonInteractiveRefresh.m_flLastPacifierTime = t;
-		}
-
-		pTexture = g_pShaderAPI->GetD3DTexture( m_NonInteractiveRefresh.m_Info.m_pPacifierTextures[ m_NonInteractiveRefresh.m_nPacifierFrame ] );
-		Dx9Device()->SetRenderState( D3DRS_ALPHABLENDENABLE, 1 );
-		Dx9Device()->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
-		Dx9Device()->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
-		Dx9Device()->SetTexture( 0, pTexture );
-		Dx9Device()->SetPixelShader( m_NonInteractiveRefresh.m_pPixelShaderStartupPass2 );
-		Dx9Device()->DrawPrimitiveUP( D3DPT_QUADLIST, 1, Vertices, sizeof( TEXVERTEX ) );
-	}
-
-	Dx9Device()->SetVertexShader( NULL );
-	Dx9Device()->SetPixelShader( NULL );
-	Dx9Device()->SetTexture( 0, NULL );
-	Dx9Device()->SetVertexDeclaration( NULL );
-
-	tmZone( TELEMETRY_LEVEL1, TMZF_NONE, "D3DPresent" );
-
-	Dx9Device()->Present( 0, 0, 0, 0 );
-	g_pShaderAPI->QueueResetRenderState();
-	g_pShaderAPI->OwnGPUResources( true );
-
-	UpdatePresentStats();
-#endif
 }
 
 
@@ -3280,28 +3128,10 @@ void CShaderDeviceDx8::SetHardwareGammaRamp( float fGamma, float fGammaTVRangeMi
 	D3DGAMMARAMP gammaRamp;
 	for ( int i = 0; i < 256; i++ )
 	{
-		float flInputValue = float( i ) / 255.0f;
-
-		// Since the 360's sRGB read/write is a piecewise linear approximation, we need to correct for the difference in gamma space here
-		float flSrgbGammaValue;
-		if ( IsX360() ) // Should we also do this for the PS3?
-		{
-			// First undo the 360 broken sRGB curve by bringing the value back into linear space
-			float flLinearValue = X360GammaToLinear( flInputValue );
-			flLinearValue = clamp( flLinearValue, 0.0f, 1.0f );
-
-			// Now apply a true sRGB curve to mimic PC hardware
-			flSrgbGammaValue = SrgbLinearToGamma( flLinearValue ); // ( flLinearValue <= 0.0031308f ) ? ( flLinearValue * 12.92f ) : ( 1.055f * powf( flLinearValue, ( 1.0f / 2.4f ) ) ) - 0.055f;
-			flSrgbGammaValue = clamp( flSrgbGammaValue, 0.0f, 1.0f );
-		}
-		else
-		{
-			flSrgbGammaValue = flInputValue;
-		}
+		float flSrgbGammaValue = float( i ) / 255.0f;
 
 		// Apply the user controlled exponent curve
-		float flCorrection = powf( flSrgbGammaValue, ( fGamma / 2.2f ) );
-		flCorrection = clamp( flCorrection, 0.0f, 1.0f );
+		float flCorrection = clamp( powf( flSrgbGammaValue, fGamma / 2.2f ), 0.0f, 1.0f );
 
 		// TV adjustment - Apply an exp and a scale and bias
 		if ( bTVEnabled )
@@ -3316,7 +3146,8 @@ void CShaderDeviceDx8::SetHardwareGammaRamp( float fGamma, float fGammaTVRangeMi
 		}
 
 		// Generate final int value
-		unsigned int val = ( int )( flCorrection * 65535.0f );
+		const auto val = static_cast<unsigned short>( flCorrection * 65535.0f );
+
 		gammaRamp.red[i] = val;
 		gammaRamp.green[i] = val;
 		gammaRamp.blue[i] = val;

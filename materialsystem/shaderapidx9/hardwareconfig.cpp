@@ -401,7 +401,6 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		//		pCaps->m_PreferDynamicTextures = false;
 		//		pCaps->m_HasProjectedBumpEnv = false;
 		//		pCaps->m_MaxUserClipPlanes = 0;
-		pCaps->m_bSupportsGLMixedSizeTargets = false;
 		pCaps->m_HDRType = HDR_TYPE_NONE;
 		//		pCaps->m_bSupportsSpheremapping = true;
 		//		pCaps->m_UseFastClipping = true;
@@ -424,7 +423,6 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_FakeSRGBWrite = false;
 		pCaps->m_CanDoSRGBReadFromRTs = true;
 		pCaps->m_bSupportsGLMixedSizeTargets = false;
-		pCaps->m_bSupportsFetch4 = false;
 		pCaps->m_bSupportsBorderColor = false;
 		pCaps->m_bSupportsFloat32RenderTargets = false;
 		// ImageFormat m_ShadowDepthTextureFormat;
@@ -847,7 +845,6 @@ bool CHardwareConfig::SupportsShaderModel_3_0() const
 
 int CHardwareConfig::GetShadowFilterMode() const
 {
-
 #ifdef DX_TO_GL_ABSTRACTION
 	if ( !m_Caps.m_bSupportsShadowDepthTextures )
 		return 0;
@@ -871,18 +868,9 @@ int CHardwareConfig::GetShadowFilterMode() const
 
 			return ATI_NOPCF;									// ATI vanilla depth texture sampling
 
-#if defined( _X360 )
-		case IMAGE_FORMAT_X360_DST16:
-		case IMAGE_FORMAT_X360_DST24:
-		case IMAGE_FORMAT_X360_DST24F:
-			return 0;
-#endif
-
 		default:
 			return 0;
 	}
-
-	return 0;
 }
 
 static ConVar r_shader_srgb( "r_shader_srgb", "0", FCVAR_ALLOWED_IN_COMPETITIVE, "-1 = use hardware caps. 0 = use hardware srgb. 1 = use shader srgb(software lookup)" );		// -1=use caps 0=off 1=on
@@ -930,10 +918,11 @@ bool CHardwareConfig::HasFastVertexTextures() const
 		bDisableHWMorph = ( mat_disablehwmorph.GetInt() != 0 );
 	}
 
-	// JasonM - turned this off for Orange Box release...
+	// TODO: JasonM - turned this off for Orange Box release...
 	return false;
-
-//	return m_Caps.m_bDX10Card && ( GetDXSupportLevel() >= 95 ) && ( bEnableFastVertexTextures != 0 ) && ( !bDisableHWMorph );
+	
+	// dimhotepus: HWMORPH
+	// return m_Caps.m_bDX10Card && ( GetDXSupportLevel() >= 95 ) && ( bEnableFastVertexTextures != 0 ) && ( !bDisableHWMorph );
 }
 
 int CHardwareConfig::MaxHWMorphBatchCount() const
@@ -1104,7 +1093,7 @@ int CHardwareConfig::GetDXSupportLevel() const
 
 const char *CHardwareConfig::GetShaderDLLName() const
 {
-	return ( m_Caps.m_pShaderDLL && m_Caps.m_pShaderDLL[0] ) ? m_Caps.m_pShaderDLL : "DEFAULT";
+	return ( m_Caps.m_pShaderDLL[0] ) ? m_Caps.m_pShaderDLL : "DEFAULT";
 }
 
 bool CHardwareConfig::ReadPixelsFromFrontBuffer() const
@@ -1299,7 +1288,7 @@ int CHardwareConfig::GetActualTextureStageCount() const
 
 const char *CHardwareConfig::GetHWSpecificShaderDLLName()	const
 {
-	return m_Caps.m_pShaderDLL && m_Caps.m_pShaderDLL[0] ? m_Caps.m_pShaderDLL : NULL;
+	return m_Caps.m_pShaderDLL[0] ? m_Caps.m_pShaderDLL : NULL;
 }
 
 bool CHardwareConfig::SupportsMipmapping() const

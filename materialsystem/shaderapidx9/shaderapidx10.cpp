@@ -12,7 +12,7 @@
 #include "materialsystem/idebugtextureinfo.h"
 #include "materialsystem/materialsystem_config.h"
 #include "meshdx10.h"
-#include "shadershadowdx10.h"
+#include "ShaderShadowDx10.h"
 #include "shaderdevicedx10.h"
 #include "shaderapidx10_global.h"
 #include "imaterialinternal.h"
@@ -98,19 +98,19 @@ void CFunctionCommit::CallCommitFuncs( ID3D10Device *pDevice, const ShaderStateD
 	}
 
 #define ADD_RENDERSTATE_FUNC( _func_name, _state, _val )					\
-	if ( m_bResettingRenderState || ( m_DesiredState. ## _state != _val ) )	\
+	if ( m_bResettingRenderState || ( m_DesiredState._state != _val ) )		\
 	{																		\
-		m_DesiredState. ## _state = _val;									\
+		m_DesiredState._state = _val;										\
 		ADD_COMMIT_FUNC( _func_name )										\
 	}
 
 #define IMPLEMENT_RENDERSTATE_FUNC( _func_name, _state, _d3dFunc )			\
 	static void _func_name( ID3D10Device *pDevice, const ShaderStateDx10_t &desiredState, ShaderStateDx10_t &currentState, bool bForce )	\
 	{																			\
-		if ( bForce || ( desiredState. ## _state != currentState. ## _state ) )	\
+		if ( bForce || ( desiredState._state != currentState._state ) )	\
 		{																		\
-			pDevice->_d3dFunc( desiredState. ## _state );						\
-			currentState. ## _state	= desiredState. ## _state;					\
+			pDevice->_d3dFunc( desiredState._state );						\
+			currentState._state	= desiredState._state;					\
 		}																		\
 	}
 

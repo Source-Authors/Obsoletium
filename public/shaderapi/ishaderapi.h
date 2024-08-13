@@ -593,7 +593,7 @@ public:
 	virtual void AcquireThreadOwnership() = 0;
 	virtual void ReleaseThreadOwnership() = 0;
 
-	virtual bool SupportsNormalMapCompression() const { Assert( !"This has all been removed." ); return false; }
+	virtual bool SupportsNormalMapCompression() const { AssertMsg( false, "This has all been removed." ); return false; }
 
 	// Only does anything on XBox360. This is useful to eliminate stalls
 	virtual void EnableBuffer2FramesAhead( bool bEnable ) = 0;

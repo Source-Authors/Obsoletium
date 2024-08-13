@@ -7,6 +7,7 @@
 //===========================================================================//
 
 #undef PROTECTED_THINGS_ENABLE
+#define NOMINMAX
 #include "vertexdecl.h" // this includes <windows.h> inside the dx headers
 #define PROTECTED_THINGS_ENABLE
 #include "materialsystem/imaterialsystemhardwareconfig.h"
