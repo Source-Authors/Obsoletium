@@ -42,16 +42,16 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CBaseAttributePanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CBaseAttributePanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseAttributePanel, vgui::Panel );
 
 public:
 	CBaseAttributePanel( vgui::Panel *pParent, const AttributeWidgetInfo_t &info );
 
 	virtual void	PostConstructor();
-	virtual void	PerformLayout();
+	void	PerformLayout() override;
 	virtual void	SetFont( HFont font );
-	virtual void	ApplySchemeSettings( IScheme *pScheme );
-	virtual void	OnCreateDragData( KeyValues *msg );
+	void	ApplySchemeSettings( IScheme *pScheme ) override;
+	void	OnCreateDragData( KeyValues *msg ) override;
 
 	void			SetDirty( bool dirty );
 	bool			GetDirty() const;

@@ -51,16 +51,16 @@ public:
 //-----------------------------------------------------------------------------
 class CAttributeStringChoicePanel : public CBaseAttributeChoicePanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeStringChoicePanel, CBaseAttributeChoicePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeStringChoicePanel, CBaseAttributeChoicePanel );
 
 public:
 	CAttributeStringChoicePanel( vgui::Panel *parent,	const AttributeWidgetInfo_t &info );
 
 private:
 	// Derived classes can re-implement this to fill the combo box however they like
-	virtual void PopulateComboBox( vgui::ComboBox *pComboBox );
-	virtual void SetAttributeFromComboBox( vgui::ComboBox *pComboBox, KeyValues *pKeyValues );
-	virtual void SetComboBoxFromAttribute( vgui::ComboBox *pComboBox );
+	void PopulateComboBox( vgui::ComboBox *pComboBox ) override;
+	void SetAttributeFromComboBox( vgui::ComboBox *pComboBox, KeyValues *pKeyValues ) override;
+	void SetComboBoxFromAttribute( vgui::ComboBox *pComboBox ) override;
 };
 
 
