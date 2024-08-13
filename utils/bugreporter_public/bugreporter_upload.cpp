@@ -5,7 +5,8 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include "basetypes.h"
+#include "tier0/basetypes.h"
+
 #ifdef WIN32
 #include <winsock.h>
 #elif defined(POSIX)
@@ -18,19 +19,24 @@
 #else
 #error
 #endif
-#include "netadr.h"
+
+#include "tier1/netadr.h"
 #include "tier1/strtools.h"
-#include <stdio.h>
-#include <stdarg.h>
-#include "utlbuffer.h"
-#include "utlvector.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utlvector.h"
+#include "tier1/bitbuf.h"
+
+#include <cstdio>
+#include <cstdarg>
+
 #include "filesystem_tools.h"
 #include "cserserverprotocol_engine.h"
 #include "mathlib/IceKey.H"
-#include "bitbuf.h"
 #include "blockingudpsocket.h"
 #include "steamcommon.h"
 #include "steam/steamclientpublic.h"
+
+#include "tier0/memdbgon.h"
 
 typedef unsigned int u32;
 typedef unsigned char u8;
@@ -423,7 +429,7 @@ private:
 	CUtlVector< FSMState_t >		m_States;
 	uint							m_uCurrentState;
 	struct sockaddr_in				m_HarvesterSockAddr;
-	uint							m_SocketTCP;
+	uintp							m_SocketTCP;
 	const TBugReportParameters	&m_rBugReportParameters; //lint !e1725
 	u32								m_ContextID;
 };
@@ -480,7 +486,7 @@ bool CWin32UploadBugReport::DoBlockingReceive( uint bytesExpected, CUtlBuffer& b
 		if ( bytesReceived <= 0 )
 			return false;
 
-		buf.Put( ( const void * )temp, (u32)bytesReceived );
+		buf.Put( temp, bytesReceived );
 		totalReceived = buf.TellPut();
 		if ( totalReceived >= bytesExpected )
 			break;
@@ -560,7 +566,7 @@ bool CWin32UploadBugReport::SendProtocolVersion( EBugReportUploadStatus& status,
 	buf.Purge();
 	buf.PutInt( cuCurrentProtocolVersion );
 
-	if ( send( m_SocketTCP, (const char *)buf.Base(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
+	if ( send( m_SocketTCP, buf.Base<const char>(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
 	{
 		UpdateProgress( m_rBugReportParameters, "Send failed." );
 
@@ -626,7 +632,7 @@ bool CWin32UploadBugReport::SendUploadCommand( EBugReportUploadStatus& status, C
 	buf.PutInt( static_cast<HarvestFileCommand::FileSize_t>( 0 ) );
 
 	// Send command to server
-	if ( send( m_SocketTCP, (const char *)buf.Base(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
+	if ( send( m_SocketTCP, buf.Base<const char>(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
 	{
 		UpdateProgress( m_rBugReportParameters, "Send failed." );
 
@@ -688,28 +694,21 @@ bool CWin32UploadBugReport::SendWholeFile( EBugReportUploadStatus& status, CUtlB
 	if ( sizeactual > 0 )
 	{
 		filebuf = new char[ sizeactual + 1 ];
-		if ( filebuf )
-		{
-			FileHandle_t fh;
-			fh = g_pFileSystem->Open(  m_rBugReportParameters.m_sAttachmentFile, "rb" );
-			if ( FILESYSTEM_INVALID_HANDLE != fh )
-			{		
-				g_pFileSystem->Read( (void *)filebuf, sizeactual, fh );
+		FileHandle_t fh = g_pFileSystem->Open(  m_rBugReportParameters.m_sAttachmentFile, "rb" );
+		if ( FILESYSTEM_INVALID_HANDLE != fh )
+		{		
+			g_pFileSystem->Read( filebuf, sizeactual, fh );
 
-				g_pFileSystem->Close( fh );
-			}
-			filebuf[ sizeactual ] = 0;
+			g_pFileSystem->Close( fh );
 		}
+		filebuf[ sizeactual ] = 0;
 	}
 	if ( !sizeactual || !filebuf )
 	{
 		UpdateProgress( m_rBugReportParameters, "bug .zip file size zero or unable to allocate memory for file." );
 
 		status = eBugReportUploadFailed;
-		if ( filebuf )
-		{
-			delete[] filebuf;
-		}
+		delete[] filebuf;
 		return false;
 	}
 
@@ -772,7 +771,7 @@ bool CWin32UploadBugReport::SendGracefulClose( EBugReportUploadStatus& status, C
 	buf.PutInt( (int)messageSize );
 	buf.PutChar( Commands::cuGracefulClose );
 
-	if ( send( m_SocketTCP, (const char *)buf.Base(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
+	if ( send( m_SocketTCP, buf.Base<const char>(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
 	{
 		UpdateProgress( m_rBugReportParameters, "Send failed." );
 
@@ -862,7 +861,7 @@ EBugReportUploadStatus Win32UploadBugReportBlocking
 
 	encrypted.PutString( rBugReportParameters.m_sTitle );
 
-	int bodylen = Q_strlen( rBugReportParameters.m_sBody ) + 1;
+	intp bodylen = Q_strlen( rBugReportParameters.m_sBody ) + 1;
 
 	encrypted.PutInt( bodylen );
 	encrypted.Put( rBugReportParameters.m_sBody, bodylen );
@@ -872,10 +871,10 @@ EBugReportUploadStatus Win32UploadBugReportBlocking
 		encrypted.PutChar( 0 );
 	}
 
-	EncryptBuffer( cipher, (unsigned char *)encrypted.Base(), encrypted.TellPut() );
+	EncryptBuffer( cipher, encrypted.Base<unsigned char>(), encrypted.TellPut() );
 
 	buf.PutShort( (int)encrypted.TellPut() );
-	buf.Put( (unsigned char *)encrypted.Base(), encrypted.TellPut() );
+	buf.Put( encrypted.Base<unsigned char>(), encrypted.TellPut() );
 
 	CBlockingUDPSocket bcs;
 	if ( !bcs.IsValid() )
@@ -888,7 +887,7 @@ EBugReportUploadStatus Win32UploadBugReportBlocking
 
 	UpdateProgress( rBugReportParameters, "Sending bug report to server." );
 
-	bcs.SendSocketMessage( sa, (const u8 *)buf.Base(), buf.TellPut() ); //lint !e534
+	bcs.SendSocketMessage( sa, buf.Base<const u8>(), buf.TellPut() ); //lint !e534
 
 	UpdateProgress( rBugReportParameters, "Waiting for response." );
 
@@ -899,7 +898,7 @@ EBugReportUploadStatus Win32UploadBugReportBlocking
 		struct sockaddr_in replyaddress;
 		buf.EnsureCapacity( 2048 );
 
-		uint bytesReceived = bcs.ReceiveSocketMessage( &replyaddress, (u8 *)buf.Base(), 2048 );
+		uint bytesReceived = bcs.ReceiveSocketMessage( &replyaddress, buf.Base<u8>(), 2048 );
 		if ( bytesReceived > 0 )
 		{
 			// Fixup actual size
