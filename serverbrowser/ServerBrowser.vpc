@@ -24,7 +24,7 @@ $Configuration
 	}
 }
 
-$Project "ServerBrowser"
+$Project "serverbrowser"
 {
 	$Folder	"Source Files"
 	{

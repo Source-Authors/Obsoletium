@@ -129,7 +129,7 @@ void CFavoriteGames::OnRemoveFromFavorites()
 	for ( int iGame = 0; iGame < m_pGameList->GetSelectedItemsCount(); iGame++ )
 	{
 		int itemID = m_pGameList->GetSelectedItem( iGame );
-		int serverID = m_pGameList->GetItemData(itemID)->userData;
+		intp serverID = m_pGameList->GetItemData(itemID)->userData;
 		
 		gameserveritem_t *pServer = steamapicontext->SteamMatchmakingServers()->GetServerDetails( m_hRequest, serverID );
 		
@@ -171,7 +171,7 @@ void CFavoriteGames::OnAddCurrentServer()
 		{
 			// send command to propagate to the client so the client can send it on to the GC
 			char command[ 256 ];
-			Q_snprintf( command, Q_ARRAYSIZE( command ), "rfgc %s\n", pConnected->m_NetAdr.GetConnectionAddressString() );
+			Q_snprintf( command, ssize( command ), "rfgc %s\n", pConnected->m_NetAdr.GetConnectionAddressString() );
 			g_pRunGameEngine->AddTextCommand( command );
 		}
 	}

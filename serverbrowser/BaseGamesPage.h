@@ -22,11 +22,11 @@ class CBaseGamesPage;
 class CGameListPanel : public vgui::ListPanel
 {
 public:
-	DECLARE_CLASS_SIMPLE( CGameListPanel, vgui::ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CGameListPanel, vgui::ListPanel );
 	
 	CGameListPanel( CBaseGamesPage *pOuter, const char *pName );
 	
-	virtual void OnKeyCodePressed(vgui::KeyCode code);
+	void OnKeyCodePressed(vgui::KeyCode code) override;
 
 private:
 	CBaseGamesPage *m_pOuter;
@@ -55,14 +55,14 @@ public:
 class CCheckBoxWithStatus : public vgui::CheckButton
 {
 public:
-	DECLARE_CLASS_SIMPLE( CCheckBoxWithStatus, vgui::CheckButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCheckBoxWithStatus, vgui::CheckButton );
 
 	CCheckBoxWithStatus(Panel *parent, const char *panelName, const char *text) : vgui::CheckButton( parent, panelName, text )
 	{
 	}
 
-	virtual void OnCursorEntered();
-	virtual void OnCursorExited();
+	void OnCursorEntered() override;
+	void OnCursorExited() override;
 };
 
 struct servermaps_t
@@ -84,7 +84,7 @@ struct gametypes_t
 //-----------------------------------------------------------------------------
 class CBaseGamesPage : public vgui::PropertyPage, public IGameList, public ISteamMatchmakingServerListResponse, public ISteamMatchmakingPingResponse
 {
-	DECLARE_CLASS_SIMPLE( CBaseGamesPage, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseGamesPage, vgui::PropertyPage );
 
 public:
 	enum EPageType
@@ -115,12 +115,12 @@ public:
 	CBaseGamesPage( vgui::Panel *parent, const char *name, EPageType eType, const char *pCustomResFilename=NULL);
 	~CBaseGamesPage();
 
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void PerformLayout() override;
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 
 	// gets information about specified server
-	virtual gameserveritem_t *GetServer(unsigned int serverID);
-	virtual const char *GetConnectCode();
+	gameserveritem_t *GetServer(uintp serverID) override;
+	const char *GetConnectCode() override;
 
 	uint32 GetServerFilters( MatchMakingKeyValuePair_t **pFilters );
 
@@ -140,7 +140,7 @@ public:
 	MESSAGE_FUNC( OnAddToFavorites, "AddToFavorites" );
 	MESSAGE_FUNC( OnAddToBlacklist, "AddToBlacklist" );
 
-	virtual void StartRefresh();
+	void StartRefresh() override;
 
 	virtual void UpdateDerivedLayouts( void );
 	
@@ -166,8 +166,8 @@ public:
 	}
 
 protected:
-	virtual void OnCommand(const char *command);
-	virtual void OnKeyCodePressed(vgui::KeyCode code);
+	void OnCommand(const char *command) override;
+	void OnKeyCodePressed(vgui::KeyCode code) override;
 	virtual int GetRegionCodeToFilter() { return 255; }
 
 	MESSAGE_FUNC( OnItemSelected, "ItemSelected" );
@@ -176,14 +176,14 @@ protected:
 	void UpdateStatus();
 
 	// ISteamMatchmakingServerListResponse callbacks
-	virtual void ServerResponded( HServerListRequest hReq, int iServer );
+	void ServerResponded( HServerListRequest hReq, int iServer ) override;
 	virtual void ServerResponded( int iServer, gameserveritem_t *pServerItem );
-	virtual void ServerFailedToRespond( HServerListRequest hReq, int iServer );
-	virtual void RefreshComplete( HServerListRequest hReq, EMatchMakingServerResponse response ) = 0;
+	void ServerFailedToRespond( HServerListRequest hReq, int iServer ) override;
+	void RefreshComplete( HServerListRequest hReq, EMatchMakingServerResponse response ) override;
 
 	// ISteamMatchmakingPingResponse callbacks
-	virtual void ServerResponded( gameserveritem_t &server );
-	virtual void ServerFailedToRespond() {}
+	void ServerResponded( gameserveritem_t &server ) override;
+	void ServerFailedToRespond() override {}
 
 	// Removes server from list
 	void RemoveServer( serverdisplay_t &server );
@@ -197,7 +197,7 @@ protected:
 	virtual bool CheckSecondaryFilters( gameserveritem_t &server );
 	virtual bool CheckTagFilter( gameserveritem_t &server ) { return true; }
 	virtual bool CheckWorkshopFilter( gameserveritem_t &server ) { return true; }
-	virtual int GetInvalidServerListID();
+	int GetInvalidServerListID() override;
 
 	virtual void OnSaveFilter(KeyValues *filter);
 	virtual void OnLoadFilter(KeyValues *filter);
@@ -206,14 +206,14 @@ protected:
 	// whether filter settings limit which master server to query
 	CGameID &GetFilterAppID() { return m_iLimitToAppID; }
 	
-	virtual void GetNewServerList();
-	virtual void StopRefresh();
-	virtual bool IsRefreshing();
-	virtual void OnPageShow();
-	virtual void OnPageHide();
+	void GetNewServerList() override;
+	void StopRefresh() override;
+	bool IsRefreshing() override;
+	void OnPageShow() override;
+	void OnPageHide() override;
 
 	// called when Connect button is pressed
-	MESSAGE_FUNC( OnBeginConnect, "ConnectToServer" );
+	MESSAGE_FUNC_OVERRIDE( OnBeginConnect, "ConnectToServer" );
 	// called to look at game info
 	MESSAGE_FUNC( OnViewGameInfo, "ViewGameInfo" );
 	// refreshes a single server
@@ -305,10 +305,10 @@ private:
 	bool m_bFiltersVisible;	// true if filter section is currently visible
 	vgui::HFont m_hFont;
 
-	int m_nImageIndexPassword;
-	int m_nImageIndexSecure;
-	int m_nImageIndexSecureVacBanned;
-	int m_nImageIndexReplay;
+	intp m_nImageIndexPassword;
+	intp m_nImageIndexSecure;
+	intp m_nImageIndexSecureVacBanned;
+	intp m_nImageIndexReplay;
 
 	// filter data
 	char m_szGameFilter[32];

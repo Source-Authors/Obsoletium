@@ -34,7 +34,7 @@ void TagMenuButton::OnShowMenu( vgui::Menu *menu )
 //-----------------------------------------------------------------------------
 class CCustomServerInfoURLQuery : public vgui::QueryBox
 {
-	DECLARE_CLASS_SIMPLE( CCustomServerInfoURLQuery, vgui::QueryBox );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCustomServerInfoURLQuery, vgui::QueryBox );
 public:
 	CCustomServerInfoURLQuery(const char *title, const char *queryText,vgui::Panel *parent) : BaseClass( title, queryText, parent )
 	{
@@ -204,14 +204,14 @@ bool CCustomGames::CheckTagFilter( gameserveritem_t &server )
 	bool bRetVal = true;
 
 	// Custom games substring matches tags with the server's tags
-	int count = Q_strlen( m_szTagFilter );
+	intp count = Q_strlen( m_szTagFilter );
 	if ( count )
 	{
 		CUtlVector<char*> TagList;
 		V_SplitString( m_szTagFilter, ",", TagList );
-		for ( int i = 0; i < TagList.Count(); i++ )
+		for ( const auto *tag : TagList )
 		{
-			if ( ( Q_strnistr( server.m_szGameTags, TagList[i], MAX_TAG_CHARACTERS ) > 0 ) == TagsExclude() )
+			if ( ( Q_strnistr( server.m_szGameTags, tag, MAX_TAG_CHARACTERS ) != nullptr ) == TagsExclude() )
 			{
 				bRetVal = false;
 				break;
@@ -325,18 +325,18 @@ void CCustomGames::RecalculateCommonTags( void )
 	int iCount = m_pGameList->GetItemCount();
 	for ( int i = 0; i < iCount; i++ )
 	{
-		int serverID = m_pGameList->GetItemUserData( i );
+		uintp serverID = m_pGameList->GetItemUserData( i );
 		gameserveritem_t *pServer = GetServer( serverID ); 
-		if ( pServer && pServer->m_szGameTags && pServer->m_szGameTags[0] )
+		if ( pServer && pServer->m_szGameTags[0] )
 		{
 			CUtlVector<char*> TagList;
 			V_SplitString( pServer->m_szGameTags, ",", TagList );
 
-			for ( int iTag = 0; iTag < TagList.Count(); iTag++ )
+			for ( intp iTag = 0; iTag < TagList.Count(); iTag++ )
 			{
 				// First make sure it's not already in our list
 				bool bFound = false;
-				for ( int iCheck = 0; iCheck < aTagsInUse.Count(); iCheck++ )
+				for ( intp iCheck = 0; iCheck < aTagsInUse.Count(); iCheck++ )
 				{
 					if ( !Q_strnicmp(TagList[iTag], aTagsInUse[iCheck].pszTag, MAX_TAG_CHARACTERS ) )
 					{
@@ -347,7 +347,7 @@ void CCustomGames::RecalculateCommonTags( void )
 
 				if ( !bFound )
 				{
-					int iIdx = aTagsInUse.AddToTail();
+					intp iIdx = aTagsInUse.AddToTail();
 					aTagsInUse[iIdx].pszTag = TagList[iTag];
 					aTagsInUse[iIdx].iCount = 0;
 				}

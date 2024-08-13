@@ -64,7 +64,7 @@ int CBlacklistedServerManager::LoadServersFromFile( const char *pszFilename, boo
 		const char *pszNetAddr = pData->GetString( "addr" );
 		if ( pszNetAddr && pszNetAddr[0] && pszName && pszName[0] )
 		{
-			int iIdx = m_Blacklist.AddToTail();
+			auto iIdx = m_Blacklist.AddToTail();
 
 			m_Blacklist[iIdx].m_nServerID = m_iNextServerID++;
 			V_strncpy( m_Blacklist[iIdx].m_szServerName, pszName, sizeof( m_Blacklist[iIdx].m_szServerName ) );
@@ -88,12 +88,12 @@ void CBlacklistedServerManager::SaveToFile( const char *pszFilename )
 {
 	KeyValues *pKV = new KeyValues( "serverblacklist" );
 
-	for ( int i = 0; i < m_Blacklist.Count(); i++ )
+	for ( auto &bl : m_Blacklist )
 	{
 		KeyValues *pSubKey = new KeyValues( "server" );
-		pSubKey->SetString( "name", m_Blacklist[i].m_szServerName );
-		pSubKey->SetInt( "date", m_Blacklist[i].m_ulTimeBlacklistedAt );
-		pSubKey->SetString( "addr", m_Blacklist[i].m_NetAdr.ToString() );
+		pSubKey->SetString( "name", bl.m_szServerName );
+		pSubKey->SetInt( "date", bl.m_ulTimeBlacklistedAt );
+		pSubKey->SetString( "addr", bl.m_NetAdr.ToString() );
 		pKV->AddSubKey( pSubKey );
 	}
 
@@ -115,7 +115,7 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( gameserveritem_t &se
  	if ( netAdr.IsReservedAdr() )
  		return NULL;
 
-	int iIdx = m_Blacklist.AddToTail();
+	auto iIdx = m_Blacklist.AddToTail();
 	V_strncpy( m_Blacklist[iIdx].m_szServerName, server.GetName(), sizeof( m_Blacklist[iIdx].m_szServerName ) );
 
 	time_t today;
@@ -139,7 +139,7 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverNa
  	if ( netAdr.IsReservedAdr() )
  		return NULL;
 
-	int iIdx = m_Blacklist.AddToTail();
+	auto iIdx = m_Blacklist.AddToTail();
 
 	V_strncpy( m_Blacklist[iIdx].m_szServerName, serverName, sizeof( m_Blacklist[iIdx].m_szServerName ) );
 
@@ -165,7 +165,7 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverNa
 	if ( netAdr.IsReservedAdr() )
 		return NULL;
 
-	int iIdx = m_Blacklist.AddToTail();
+	auto iIdx = m_Blacklist.AddToTail();
 
 	V_strncpy( m_Blacklist[iIdx].m_szServerName, serverName, sizeof( m_Blacklist[iIdx].m_szServerName ) );
 	m_Blacklist[iIdx].m_ulTimeBlacklistedAt = timestamp;
@@ -179,9 +179,9 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverNa
 //-----------------------------------------------------------------------------
 // Purpose: Remove server with matching 'server id' from list
 //-----------------------------------------------------------------------------
-void CBlacklistedServerManager::RemoveServer( int iServerID )
+void CBlacklistedServerManager::RemoveServer( intp iServerID )
 {
-	for ( int i = 0; i < m_Blacklist.Count(); i++ )
+	for ( intp i = 0; i < m_Blacklist.Count(); i++ )
 	{
 		if ( m_Blacklist[i].m_nServerID == iServerID )
 		{
@@ -195,12 +195,12 @@ void CBlacklistedServerManager::RemoveServer( int iServerID )
 //-----------------------------------------------------------------------------
 // Purpose: Given a serverID, return its blacklist entry
 //-----------------------------------------------------------------------------
-blacklisted_server_t *CBlacklistedServerManager::GetServer( int iServerID )
+blacklisted_server_t *CBlacklistedServerManager::GetServer( intp iServerID )
 {
-	for ( int i = 0; i < m_Blacklist.Count(); i++ )
+	for ( auto &bl : m_Blacklist )
 	{
-		if ( m_Blacklist[i].m_nServerID == iServerID )
-			return &m_Blacklist[i];
+		if ( bl.m_nServerID == iServerID )
+			return &bl;
 	}
 
 	return NULL;
@@ -225,26 +225,26 @@ bool CBlacklistedServerManager::IsServerBlacklisted( uint32 serverIP, int server
 
 	ConVarRef sb_showblacklists( "sb_showblacklists" );
 
-	for ( int i = 0; i < m_Blacklist.Count(); i++ )
+	for ( auto &bl : m_Blacklist )
 	{
-		if ( m_Blacklist[i].m_NetAdr.ip[3] == 0 )
+		if ( bl.m_NetAdr.ip[3] == 0 )
 		{
-			if ( m_Blacklist[i].m_NetAdr.CompareClassCAdr( netAdr ) )
+			if ( bl.m_NetAdr.CompareClassCAdr( netAdr ) )
 			{
 				if ( sb_showblacklists.IsValid() && sb_showblacklists.GetBool() )
 				{
-					Msg( "Blacklisted '%s' (%s), due to rule '%s' (Class C).\n", serverName, netAdr.ToString(), m_Blacklist[i].m_NetAdr.ToString() );
+					Msg( "Blacklisted '%s' (%s), due to rule '%s' (Class C).\n", serverName, netAdr.ToString(), bl.m_NetAdr.ToString() );
 				}
 				return true;
 			}
 		}
 		else
 		{
-			if ( m_Blacklist[i].m_NetAdr.CompareAdr( netAdr, (m_Blacklist[i].m_NetAdr.GetPort() == 0) ) )
+			if ( bl.m_NetAdr.CompareAdr( netAdr, (bl.m_NetAdr.GetPort() == 0) ) )
 			{
 				if ( sb_showblacklists.IsValid() && sb_showblacklists.GetBool() )
 				{
-					Msg( "Blacklisted '%s' (%s), due to rule '%s'.\n", serverName, netAdr.ToString(), m_Blacklist[i].m_NetAdr.ToString() );
+					Msg( "Blacklisted '%s' (%s), due to rule '%s'.\n", serverName, netAdr.ToString(), bl.m_NetAdr.ToString() );
 				}
 				return true;
 			}

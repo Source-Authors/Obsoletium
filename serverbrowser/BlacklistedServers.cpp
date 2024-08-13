@@ -203,7 +203,7 @@ void CBlacklistedServers::AddServer( gameserveritem_t &server )
 	{
 		// send command to propagate to the client so the client can send it on to the GC
 		char command[ 256 ];
-		Q_snprintf( command, Q_ARRAYSIZE( command ), "rbgc %s\n", blackServer->m_NetAdr.ToString() );
+		Q_snprintf( command, ssize( command ), "rbgc %s\n", blackServer->m_NetAdr.ToString() );
 		g_pRunGameEngine->AddTextCommand( command );
 	}
 }
@@ -211,7 +211,7 @@ void CBlacklistedServers::AddServer( gameserveritem_t &server )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-blacklisted_server_t *CBlacklistedServers::GetBlacklistedServer( int iServerID )
+blacklisted_server_t *CBlacklistedServers::GetBlacklistedServer( intp iServerID )
 {
 	return m_blackList.GetServer( iServerID );
 }
@@ -371,7 +371,7 @@ void CBlacklistedServers::OnRemoveFromBlacklist()
 	for ( int iGame = (m_pGameList->GetSelectedItemsCount() - 1); iGame >= 0; iGame-- )
 	{
 		int itemID = m_pGameList->GetSelectedItem( iGame );
-		int serverID = m_pGameList->GetItemData( itemID )->userData;
+		intp serverID = m_pGameList->GetItemData( itemID )->userData;
 
 		m_pGameList->RemoveItem( itemID );
 		m_blackList.RemoveServer( serverID );
@@ -421,7 +421,7 @@ void CBlacklistedServers::OnAddCurrentServer()
 		{
 			// send command to propagate to the client so the client can send it on to the GC
 			char command[ 256 ];
-			Q_snprintf( command, Q_ARRAYSIZE( command ), "rbgc %s\n", pConnected->m_NetAdr.GetConnectionAddressString() );
+			Q_snprintf( command, ssize( command ), "rbgc %s\n", pConnected->m_NetAdr.GetConnectionAddressString() );
 			g_pRunGameEngine->AddTextCommand( command );
 		}
 	}

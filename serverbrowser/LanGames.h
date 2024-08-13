@@ -18,18 +18,18 @@ class CLanBroadcastMsgHandler;
 //-----------------------------------------------------------------------------
 class CLanGames : public CBaseGamesPage
 {
-	DECLARE_CLASS_SIMPLE( CLanGames, CBaseGamesPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CLanGames, CBaseGamesPage );
 
 public:
 	CLanGames(vgui::Panel *parent, bool bAutoRefresh=true, const char *pCustomResFilename=NULL);
 	~CLanGames();
 
 	// property page handlers
-	virtual void OnPageShow();
+	void OnPageShow() override;
 
 	// IGameList handlers
 	// returns true if the game list supports the specified ui elements
-	virtual bool SupportsItem(InterfaceItem_e item);
+	bool SupportsItem(InterfaceItem_e item) override;
 
 	// Control which button are visible.
 	void ManualShowButtons( bool bShowConnect, bool bShowRefreshAll, bool bShowFilter );
@@ -38,25 +38,25 @@ public:
 	// If you pass a non-null value, then it will send info queries directly to those ports.
 	void InternalGetNewServerList( CUtlVector<netadr_t> *pSpecificAddresses );
  
-	virtual void StartRefresh();
+	void StartRefresh() override;
 
 	// stops current refresh/GetNewServerList()
-	virtual void StopRefresh();
+	void StopRefresh() override;
 
 
 	// IServerRefreshResponse handlers
 	// called when a server response has timed out
-	virtual void ServerFailedToRespond( HServerListRequest hReq, int iServer );
+	void ServerFailedToRespond( HServerListRequest hReq, int iServer ) override;
 
 	// called when the current refresh list is complete
-	virtual void RefreshComplete( HServerListRequest hReq, EMatchMakingServerResponse response );
+	void RefreshComplete( HServerListRequest hReq, EMatchMakingServerResponse response ) override;
 
 	// Tell the game list what to put in there when there are no games found.
 	virtual void SetEmptyListText();
 
 private:
 	// vgui message handlers
-	virtual void OnTick();
+	void OnTick() override;
 
 	// lan timeout checking
 	virtual void CheckRetryRequest();

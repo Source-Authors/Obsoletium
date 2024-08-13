@@ -147,7 +147,7 @@ void CDialogAddServer::OnCommand(const char *command)
 		if ( m_pDiscoveredGames->GetSelectedItemsCount() )
 		{
 			// get the server
-			int serverID = m_pDiscoveredGames->GetItemUserData( m_pDiscoveredGames->GetSelectedItem(0) );
+			uintp serverID = m_pDiscoveredGames->GetItemUserData( m_pDiscoveredGames->GetSelectedItem(0) );
 			FinishAddServer( m_Servers[ serverID ] );
 			m_pDiscoveredGames->RemoveItem( m_pDiscoveredGames->GetSelectedItem(0) ); // as we add to favs remove from the list
 			m_pDiscoveredGames->SetEmptyListText( "" );
@@ -225,7 +225,7 @@ void CDialogAddServer::TestServers()
 		CUtlVector<uint16> portsToTry;
 		GetMostCommonQueryPorts( portsToTry );
 		
-		for ( int i=0; i < portsToTry.Count(); i++ )
+		for ( intp i=0; i < portsToTry.Count(); i++ )
 		{
 			netadr_t newAddr = netaddr;
 			newAddr.SetPort( portsToTry[i] );
@@ -302,7 +302,7 @@ void CDialogAddServer::ServerResponded( gameserveritem_t &server )
 	kv->SetInt("Ping", server.m_nPing);
 
 	// new server, add to list
-	int iServer = m_Servers.AddToTail( server );
+	intp iServer = m_Servers.AddToTail( server );
 	int iListID = m_pDiscoveredGames->AddItem(kv, iServer, false, false);
 	if ( m_pDiscoveredGames->GetItemCount() == 1 )
 	{
@@ -329,10 +329,10 @@ void CDialogAddServer::ApplySchemeSettings( IScheme *pScheme )
 	imageList->AddImage(scheme()->GetImage("servers/icon_secure_deny", false));
 	imageList->AddImage(scheme()->GetImage("servers/icon_replay", false));
 
-	int passwordColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_password_column", false));
-	int botColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_bots_column", false));
-	int secureColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_robotron_column", false));
-	int replayColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_replay_column", false));
+	intp passwordColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_password_column", false));
+	intp botColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_bots_column", false));
+	intp secureColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_robotron_column", false));
+	intp replayColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_replay_column", false));
 
 	m_pDiscoveredGames->SetImageList(imageList, true);
 	vgui::HFont hFont = pScheme->GetFont( "ListSmall", IsProportional() );

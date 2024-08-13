@@ -16,7 +16,7 @@
 //-----------------------------------------------------------------------------
 class CVACBannedConnRefusedDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CVACBannedConnRefusedDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CVACBannedConnRefusedDialog, vgui::Frame );
 
 public:
 	CVACBannedConnRefusedDialog( vgui::VPANEL hVParent, const char *name );
