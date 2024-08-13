@@ -83,7 +83,7 @@ InitReturnVal_t CSceneFileCache::Init()
 
 		if ( filesystem->ReadFile( pSceneImageName, "GAME", m_SceneImageFile ) )
 		{
-			SceneImageHeader_t *pHeader = (SceneImageHeader_t *)m_SceneImageFile.Base();
+			SceneImageHeader_t *pHeader = m_SceneImageFile.Base<SceneImageHeader_t>();
 			if ( pHeader->nId != SCENE_IMAGE_ID || 
 				pHeader->nVersion != SCENE_IMAGE_VERSION )
 			{
@@ -157,7 +157,7 @@ bool CSceneFileCache::GetSceneData( char const *pFilename, byte *buf, size_t buf
 bool CSceneFileCache::GetSceneCachedData( char const *pFilename, SceneCachedData_t *pData )
 {
 	int iScene = FindSceneInImage( pFilename );
-	SceneImageHeader_t *pHeader = (SceneImageHeader_t *)m_SceneImageFile.Base();
+	SceneImageHeader_t *pHeader = m_SceneImageFile.Base<SceneImageHeader_t>();
 	if ( !pHeader || iScene < 0 || iScene >= pHeader->nNumScenes )
 	{
 		// not available
@@ -180,7 +180,7 @@ bool CSceneFileCache::GetSceneCachedData( char const *pFilename, SceneCachedData
 
 short CSceneFileCache::GetSceneCachedSound( int iScene, int iSound )
 {
-	SceneImageHeader_t *pHeader = (SceneImageHeader_t *)m_SceneImageFile.Base();
+	SceneImageHeader_t *pHeader = m_SceneImageFile.Base<SceneImageHeader_t>();
 	if ( !pHeader || iScene < 0 || iScene >= pHeader->nNumScenes )
 	{
 		// huh?, image file not present or bad index
@@ -201,7 +201,7 @@ short CSceneFileCache::GetSceneCachedSound( int iScene, int iSound )
 
 const char *CSceneFileCache::GetSceneString( short stringId )
 {
-	SceneImageHeader_t *pHeader = (SceneImageHeader_t *)m_SceneImageFile.Base();
+	SceneImageHeader_t *pHeader = m_SceneImageFile.Base<SceneImageHeader_t>();
 	if ( !pHeader || stringId < 0 || stringId >= pHeader->nNumStrings )
 	{
 		// huh?, image file not present, or index bad
@@ -216,7 +216,7 @@ const char *CSceneFileCache::GetSceneString( short stringId )
 //-----------------------------------------------------------------------------
 int CSceneFileCache::FindSceneInImage( const char *pSceneName )
 {
-	SceneImageHeader_t *pHeader = (SceneImageHeader_t *)m_SceneImageFile.Base();
+	SceneImageHeader_t *pHeader = m_SceneImageFile.Base<SceneImageHeader_t>();
 	if ( !pHeader )
 	{
 		return -1;
@@ -234,7 +234,7 @@ int CSceneFileCache::FindSceneInImage( const char *pSceneName )
 #endif
 	V_SetExtension( szCleanName, ".vcd", sizeof( szCleanName ) );
 
-	CRC32_t crcFilename = CRC32_ProcessSingleBuffer( szCleanName, strlen( szCleanName ) );
+	CRC32_t crcFilename = CRC32_ProcessSingleBuffer( szCleanName, V_strlen( szCleanName ) );
 
 	// use binary search, entries are sorted by ascending crc
 	int nLowerIdx = 1;
@@ -245,7 +245,7 @@ int CSceneFileCache::FindSceneInImage( const char *pSceneName )
 		{
 			return -1;
 		}
-		else
+
 		{
 			int nMiddleIndex = ( nLowerIdx + nUpperIdx )/2;
 			CRC32_t nProbe = pEntries[nMiddleIndex-1].crcFilename;
@@ -266,8 +266,6 @@ int CSceneFileCache::FindSceneInImage( const char *pSceneName )
 			}
 		}
 	}
-
-	return -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -275,7 +273,7 @@ int CSceneFileCache::FindSceneInImage( const char *pSceneName )
 //-----------------------------------------------------------------------------
 bool CSceneFileCache::GetSceneDataFromImage( const char *pFileName, int iScene, byte *pSceneData, size_t *pSceneLength )
 {
-	SceneImageHeader_t *pHeader = (SceneImageHeader_t *)m_SceneImageFile.Base();
+	SceneImageHeader_t *pHeader = m_SceneImageFile.Base<SceneImageHeader_t>();
 	if ( !pHeader || iScene < 0 || iScene >= pHeader->nNumScenes )
 	{
 		if ( pSceneData )
