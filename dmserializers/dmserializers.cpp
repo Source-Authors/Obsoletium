@@ -14,7 +14,7 @@
 
 #include "dmserializers.h"
 #include "dmserializers/idmserializers.h"
-#include "appframework/iappsystem.h"
+#include "appframework/IAppSystem.h"
 #include "filesystem.h"
 #include "datamodel/idatamodel.h"
 #include "datamodel/dmelementfactoryhelper.h"
@@ -35,7 +35,7 @@
 		virtual const char *GetExtension() const { return _extension; } \
 		virtual const char *GetDefaultEncoding() const { return _encoding; } \
 		virtual int GetCurrentVersion() const { return _version; } \
-		virtual bool Update( CDmElement **pRoot, int nSourceVersion ) { return true; } \
+		virtual bool Update( CDmElement **, int ) { return true; } \
 	}; \
 	static CDmFormatUpdater_ ## _name s_FormatUpdater ## _name; \
 	void InstallFormatUpdater_ ## _name( IDataModel *pFactory ) \
