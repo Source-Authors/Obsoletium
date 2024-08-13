@@ -4371,17 +4371,17 @@ class C_OP_MovementRotateParticleAroundAxis : public CParticleOperatorInstance
 	int m_nCP;
 	bool m_bLocalSpace;
 
-	uint32 GetWrittenAttributes( void ) const
+	uint32 GetWrittenAttributes( void ) const override
 	{
 		return PARTICLE_ATTRIBUTE_XYZ_MASK | PARTICLE_ATTRIBUTE_PREV_XYZ_MASK ;
 	}
 
-	uint32 GetReadAttributes( void ) const
+	uint32 GetReadAttributes( void ) const override
 	{
 		return PARTICLE_ATTRIBUTE_XYZ_MASK | PARTICLE_ATTRIBUTE_PREV_XYZ_MASK ;
 	}
 
-	virtual uint64 GetReadControlPointMask() const
+	uint64 GetReadControlPointMask() const override
 	{
 		return 1ULL << m_nCP;
 	}
@@ -4392,7 +4392,7 @@ class C_OP_MovementRotateParticleAroundAxis : public CParticleOperatorInstance
 		VectorNormalize( m_vecRotAxis );
 	}
 
-	virtual void Operate( CParticleCollection *pParticles, float flStrength, void *pContext ) const;
+	void Operate( CParticleCollection *pParticles, float flStrength, void *pContext ) const override;
 
 };
 
@@ -4465,22 +4465,22 @@ class C_OP_RemapSpeedtoCP : public CParticleOperatorInstance
 {
 	DECLARE_PARTICLE_OPERATOR( C_OP_RemapSpeedtoCP );
 
-	uint32 GetWrittenAttributes( void ) const
+	uint32 GetWrittenAttributes( void ) const override
 	{
 		return 0;
 	}
 
-	uint32 GetReadAttributes( void ) const
+	uint32 GetReadAttributes( void ) const override
 	{
 		return 0;
 	}
 
-	virtual uint64 GetReadControlPointMask() const
+	virtual uint64 GetReadControlPointMask() const override
 	{
 		return ( 1ULL << m_nInControlPointNumber ) | ( 1ULL << m_nOutControlPointNumber );
 	}
 
-	bool ShouldRunBeforeEmitters( void ) const
+	bool ShouldRunBeforeEmitters( void ) const override
 	{
 		return true;
 	}
@@ -4493,7 +4493,7 @@ class C_OP_RemapSpeedtoCP : public CParticleOperatorInstance
 			m_nOutControlPointNumber = -1;
 	}
 
-	virtual void Operate( CParticleCollection *pParticles, float flStrength,  void *pContext ) const;
+	void Operate( CParticleCollection *pParticles, float flStrength,  void *pContext ) const override;
 
 	int		m_nInControlPointNumber;
 	int		m_nOutControlPointNumber;

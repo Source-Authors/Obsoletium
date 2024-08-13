@@ -140,7 +140,7 @@ CSheet::CSheet( CUtlBuffer &buf )
 
 CSheet::~CSheet( void )
 {
-	for( int i=0; i<NELEMS(m_pSamples); i++ )
+	for( size_t i=0; i<std::size(m_pSamples); i++ )
 	{
 		if ( m_pSamples[i] && ( ! m_bSequenceIsCopyOfAnotherSequence[i] ) )
 		{

@@ -1676,18 +1676,18 @@ class C_OP_RenderRope : public CParticleOperatorInstance
 {
 	DECLARE_PARTICLE_OPERATOR( C_OP_RenderRope );
 
-	uint32 GetWrittenAttributes( void ) const
+	uint32 GetWrittenAttributes( void ) const override
 	{
 		return 0;
 	}
 
-	uint32 GetReadAttributes( void ) const
+	uint32 GetReadAttributes( void ) const override
 	{
 		return PARTICLE_ATTRIBUTE_XYZ_MASK | PARTICLE_ATTRIBUTE_RADIUS_MASK | 
 			PARTICLE_ATTRIBUTE_TINT_RGB_MASK | PARTICLE_ATTRIBUTE_ALPHA_MASK;
 	}
 
-	virtual void InitializeContextData( CParticleCollection *pParticles, void *pContext ) const
+	void InitializeContextData( CParticleCollection *pParticles, void *pContext ) const override
 	{
 		RenderRopeContext_t *pCtx = reinterpret_cast<RenderRopeContext_t *>( pContext );
 		pCtx->m_flRenderedRopeLength = 0.0f;
@@ -1701,12 +1701,12 @@ class C_OP_RenderRope : public CParticleOperatorInstance
 		const_cast<C_OP_RenderRope*>( this )->m_flTextureScale = 1.0f / ( pParticles->m_pDef->GetMaterial()->GetMappingHeight() * m_flTexelSizeInUnits );
 	}
 
-	size_t GetRequiredContextBytes( void ) const
+	size_t GetRequiredContextBytes( void ) const override
 	{
 		return sizeof( RenderRopeContext_t ) + m_nSubdivCount * sizeof(float);
 	}
 
-	virtual void InitParams( CParticleSystemDefinition *pDef, CDmxElement *pElement )
+	void InitParams( CParticleSystemDefinition *pDef, CDmxElement *pElement ) override
 	{
 		if ( m_nSubdivCount <= 0 )
 		{
@@ -1719,14 +1719,14 @@ class C_OP_RenderRope : public CParticleOperatorInstance
 		m_flTStep = 1.0f / m_nSubdivCount;
 	}
 
-	virtual int GetParticlesToRender( CParticleCollection *pParticles, void *pContext, int nFirstParticle, int nRemainingVertices, int nRemainingIndices, int *pVertsUsed, int *pIndicesUsed ) const;
-	virtual void Render( IMatRenderContext *pRenderContext, CParticleCollection *pParticles, void *pContext ) const;
+	int GetParticlesToRender( CParticleCollection *pParticles, void *pContext, int nFirstParticle, int nRemainingVertices, int nRemainingIndices, int *pVertsUsed, int *pIndicesUsed ) const override;
+	void Render( IMatRenderContext *pRenderContext, CParticleCollection *pParticles, void *pContext ) const override;
 	virtual void RenderSpriteCard( CParticleCollection *pParticles, void *pContext, IMaterial *pMaterial ) const;
-	virtual void RenderUnsorted( CParticleCollection *pParticles, void *pContext, IMatRenderContext *pRenderContext, CMeshBuilder &meshBuilder, int nVertexOffset, int nFirstParticle, int nParticleCount ) const;
+	void RenderUnsorted( CParticleCollection *pParticles, void *pContext, IMatRenderContext *pRenderContext, CMeshBuilder &meshBuilder, int nVertexOffset, int nFirstParticle, int nParticleCount ) const override;
 
 	// We connect neighboring particle instances to each other, so if the order isn't maintained we will have a particle that jumps
 	// back to the wrong place and look terrible.
-	virtual bool RequiresOrderInvariance( void ) const OVERRIDE
+	virtual bool RequiresOrderInvariance( void ) const override
 	{
 		return true;
 	}
