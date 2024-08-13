@@ -91,7 +91,7 @@
 // Auto generated inc files
 #include "emissive_scroll_blended_pass_dx8_vs11.inc"
 
-void InitParamsEmissiveScrollBlendedPass( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, EmissiveScrollBlendedPassVars_t &info )
+void InitParamsEmissiveScrollBlendedPass( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, EmissiveScrollBlendedPassVars_t &info )
 {
 	SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_HW_SKINNING );
 
@@ -113,7 +113,7 @@ void InitParamsEmissiveScrollBlendedPass( CBaseVSShader *pShader, IMaterialVar**
 	SET_PARAM_FLOAT_IF_NOT_DEFINED( info.m_nTime, 0.0f );
 }
 
-void InitEmissiveScrollBlendedPass( CBaseVSShader *pShader, IMaterialVar** params, EmissiveScrollBlendedPassVars_t &info )
+void InitEmissiveScrollBlendedPass( CBaseVSShader *pShader,  [[maybe_unused]] IMaterialVar** params, EmissiveScrollBlendedPassVars_t &info )
 {
 	// Load textures
 	pShader->LoadTexture( info.m_nBaseTexture );

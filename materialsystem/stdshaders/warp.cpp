@@ -53,9 +53,6 @@ public:
 };
 
 
-static const float kAllZeros[ 4 ] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-
 BEGIN_VS_SHADER( warp, "Help for warp" )
 	BEGIN_SHADER_PARAMS
 	

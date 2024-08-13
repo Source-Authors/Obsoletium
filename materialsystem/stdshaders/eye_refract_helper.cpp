@@ -22,7 +22,7 @@
 
 static ConVar r_lightwarpidentity( "r_lightwarpidentity","0", FCVAR_CHEAT );
 
-void InitParams_Eyes_Refract( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, Eye_Refract_Vars_t &info )
+void InitParams_Eyes_Refract( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, Eye_Refract_Vars_t &info )
 {
 	// FLASHLIGHTFIXME
 
@@ -274,7 +274,7 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 		if ( bDrawFlashlightAdditivePass == true )
 			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_4, flashlightState.m_vecLightOrigin.Base(), 1 );
 
-		LightState_t lightState = { 0, false, false };
+		LightState_t lightState = {};
 		if ( bDrawFlashlightAdditivePass == false )
 		{
 			pShaderAPI->GetDX9LightState( &lightState );

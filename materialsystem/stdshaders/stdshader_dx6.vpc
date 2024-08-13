@@ -48,7 +48,7 @@ $Configuration
 	}
 }
 
-$Project "Stdshader_dx6"
+$Project "stdshader_dx6"
 {
 	$Folder	"Source Files"
 	{

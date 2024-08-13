@@ -296,7 +296,7 @@ BEGIN_VS_SHADER_FLAGS( screenspace_general_dx9, "Help for screenspace_general", 
 			};
 
 			// c0-c3
-			pShaderAPI->SetPixelShaderConstant( 0, c0, ARRAYSIZE(c0)/4 );
+			pShaderAPI->SetPixelShaderConstant( 0, c0, ssize(c0)/4 );
 
 			float eyePos[4];
 			pShaderAPI->GetWorldSpaceCameraPosition( eyePos );

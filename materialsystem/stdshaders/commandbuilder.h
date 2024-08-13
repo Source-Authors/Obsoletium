@@ -49,7 +49,8 @@ public:
 	template<class T> FORCEINLINE void Put( T const &nValue )
 	{
 		EnsureCapacity( sizeof( T ) );
-		*( reinterpret_cast<T *>( m_pDataOut ) ) = nValue;
+		// dimhotepus: Fix UB when reinterepret_cast value to out.
+		memcpy( m_pDataOut, &nValue, sizeof(T) );
 		m_pDataOut += sizeof( nValue );
 #ifdef DBGFLAG_ASSERT
 		m_nNumBytesRemaining -= sizeof( nValue );
@@ -57,6 +58,11 @@ public:
 	}
 
 	FORCEINLINE void PutInt( int nValue )
+	{
+		Put( nValue );
+	}
+
+	FORCEINLINE void PutIntPtr( intp nValue )
 	{
 		Put( nValue );
 	}
@@ -335,7 +341,7 @@ public:
 		{
 			m_Storage.PutInt( CBCMD_BIND_SHADERAPI_TEXTURE_HANDLE );
 			m_Storage.PutInt( nSampler );
-			m_Storage.PutInt( hTexture );
+			m_Storage.PutIntPtr( hTexture );
 		}
 	}
 

@@ -184,7 +184,7 @@ BEGIN_VS_SHADER_FLAGS( screenspace_general_dx8, "Help for screenspace_general", 
 				params[C3_W]->GetFloatValue()
 			};
 
-			pShaderAPI->SetPixelShaderConstant( 0, c0, ARRAYSIZE(c0)/4 );
+			pShaderAPI->SetPixelShaderConstant( 0, c0, ssize(c0)/4 );
 			pShaderAPI->SetVertexShaderIndex( 0 );
 			pShaderAPI->SetPixelShaderIndex( 0 );
 

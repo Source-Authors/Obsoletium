@@ -8,7 +8,7 @@
 
 #include "BaseVSShader.h"
 
-#include "cable.inc"
+#include "Cable.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

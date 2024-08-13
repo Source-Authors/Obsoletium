@@ -46,8 +46,6 @@ BEGIN_VS_SHADER( ParticleLitGeneric_DX9,
 			return "ParticleLitGeneric_DX7";
 
 		return "ParticleLitGeneric_DX8";
-
-		return 0;
 	}
 
 	SHADER_INIT

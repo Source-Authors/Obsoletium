@@ -419,7 +419,7 @@ SHADER_DRAW
 			float flZScale=1.0/(params[ZOOMANIMATESEQ2]->GetFloatValue());
 			float C0[4]={ (float)(0.5*(1.0+flZScale)), flZScale, 0, 0 };
 			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, C0,
-				ARRAYSIZE(C0)/4 );
+				ssize(C0)/4 );
 		}
 
 		// set fade constants in vsconsts 8 and 9
@@ -431,7 +431,7 @@ SHADER_DRAW
 			flStartFade, (float)(1.0/(flMaxDistance-flStartFade)),
 			0,0 };
 
-		pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_8, VC0, ARRAYSIZE(VC0)/4 );
+		pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_8, VC0, ssize(VC0)/4 );
 
 		pShaderAPI->SetDepthFeatheringPixelShaderConstant( 2, params[DEPTHBLENDSCALE]->GetFloatValue() );
 
@@ -446,7 +446,7 @@ SHADER_DRAW
 			C0[1] *= 0.25;
 		}
 
-		pShaderAPI->SetPixelShaderConstant( 0, C0, ARRAYSIZE(C0)/4 );
+		pShaderAPI->SetPixelShaderConstant( 0, C0, ssize(C0)/4 );
 
 		if ( g_pHardwareConfig->GetDXSupportLevel() < 90 )
 		{

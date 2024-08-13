@@ -535,7 +535,7 @@ void CBaseVSShader::LoadProjectionMatrixIntoVertexShaderConstant( int vertexReg 
 //-----------------------------------------------------------------------------
 void CBaseVSShader::LoadModelViewMatrixIntoVertexShaderConstant( int vertexReg )
 {
-	VMatrix view, model, modelView, transpose;
+	VMatrix view, model, modelView;
 	s_pShaderAPI->GetMatrix( MATERIAL_MODEL, model.m[0] );
 	MatrixTranspose( model, model );
 	s_pShaderAPI->GetMatrix( MATERIAL_VIEW, view.m[0] );
@@ -729,14 +729,14 @@ void CBaseVSShader::SetEnvMapTintPixelShaderDynamicState( int pixelReg, int tint
 	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	if( g_pConfig->bShowSpecular && mat_fullbright.GetInt() != 2 )
 	{
-		IMaterialVar* pAlphaVar = NULL;
+		IMaterialVar* pAlphaVar = nullptr;
 		if( alphaVar >= 0 )
 		{
 			pAlphaVar = s_ppParams[alphaVar];
-		}
-		if( pAlphaVar )
-		{
-			color[3] = pAlphaVar->GetFloatValue();
+			if( pAlphaVar )
+			{
+				color[3] = pAlphaVar->GetFloatValue();
+			}
 		}
 
 		IMaterialVar* pTintVar = s_ppParams[tintVar];
@@ -825,10 +825,10 @@ const char *CBaseVSShader::UnlitGeneric_ComputePixelShaderName( bool bMask,
 	};
 
 	// handle hud elements
-	if ( bDetail & bDetailMultiplyMode )
+	if ( bDetail && bDetailMultiplyMode )
 		return "alphadist_ps11";
 
-	if ( bDetail & bMaskBaseByDetailAlpha )
+	if ( bDetail && bMaskBaseByDetailAlpha )
 		return "UnlitGeneric_MaskBaseByDetailAlpha_ps11";
 
 	if (!bMask && bEnvmap && bBaseTexture && bBaseAlphaEnvmapMask)
@@ -1133,7 +1133,8 @@ void CBaseVSShader::DrawWorldBumpedDiffuseLighting( int bumpmapVar, int bumpFram
 			s_pShaderShadow->SetPixelShader( "LightmappedGeneric_SSBumpmappedLightmap" );
 		else
 			s_pShaderShadow->SetPixelShader( "LightmappedGeneric_BumpmappedLightmap" );
-			FogToFogColor();
+
+		FogToFogColor();
 	}
 	else
 	{

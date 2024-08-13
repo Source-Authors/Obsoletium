@@ -84,7 +84,7 @@ BEGIN_VS_SHADER_FLAGS( ColorCorrection, "Help for ColorCorrection", SHADER_NOT_E
 
 			if ( IsOpenGL() )
 			{
-				// JasonM...do we use this shader?  If so, it needs some sRGB adapter love
+				// TODO: JasonM...do we use this shader?  If so, it needs some sRGB adapter love
 				Assert(0);
 			}
 

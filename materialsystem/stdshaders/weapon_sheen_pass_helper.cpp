@@ -19,7 +19,7 @@
 #include "weapon_sheen_pass_ps30.inc"
 #endif
 
-void InitParamsWeaponSheenPass( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, WeaponSheenPassVars_t &info )
+void InitParamsWeaponSheenPass( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, WeaponSheenPassVars_t &info )
 {
 	// Set material flags
 	SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_HW_SKINNING );

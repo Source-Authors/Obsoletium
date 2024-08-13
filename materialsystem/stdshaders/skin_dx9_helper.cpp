@@ -45,7 +45,7 @@ static ConVar r_rimlight( "r_rimlight", "1", FCVAR_NONE );
 //-----------------------------------------------------------------------------
 // Initialize shader parameters
 //-----------------------------------------------------------------------------
-void InitParamsSkin_DX9( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, VertexLitGeneric_DX9_Vars_t &info )
+void InitParamsSkin_DX9( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, VertexLitGeneric_DX9_Vars_t &info )
 {	
 	// FLASHLIGHTFIXME: Do ShaderAPI::BindFlashlightTexture
 	Assert( info.m_nFlashlightTexture >= 0 );
@@ -614,7 +614,7 @@ void DrawSkin_DX9_Internal( CBaseVSShader *pShader, IMaterialVar** params, IShad
 			}
 		}
 
-		LightState_t lightState = { 0, false, false };
+		LightState_t lightState = {};
 		bool bFlashlightShadows = false;
 		if( bHasFlashlight )
 		{

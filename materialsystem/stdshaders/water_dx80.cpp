@@ -9,9 +9,9 @@
 #include "BaseVSShader.h"
 #include "mathlib/vmatrix.h"
 
-#include "water_vs11.inc"
-#include "watercheappervertexfresnel_vs11.inc"
-#include "watercheap_vs11.inc"
+#include "Water_vs11.inc"
+#include "WaterCheapPerVertexFresnel_vs11.inc"
+#include "WaterCheap_vs11.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

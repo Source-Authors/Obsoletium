@@ -8,7 +8,7 @@
 #include "portal_refract_vs11.inc"
 #include "portal_refract_ps11.inc"
 
-void InitParamsPortalRefract_DX8( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, PortalRefractVarsDX8_t &info )
+void InitParamsPortalRefract_DX8( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, PortalRefractVarsDX8_t &info )
 {
 	// Set material flags
 	SET_FLAGS( MATERIAL_VAR_MODEL );

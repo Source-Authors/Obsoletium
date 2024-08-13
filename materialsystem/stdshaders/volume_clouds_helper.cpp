@@ -11,7 +11,7 @@
 #include "volume_clouds_ps20b.inc"
 
 
-void InitParamsVolumeClouds( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, VolumeCloudsVars_t &info )
+void InitParamsVolumeClouds( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, VolumeCloudsVars_t &info )
 {
 	// Set material flags
 	SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_HW_SKINNING );

@@ -6,7 +6,7 @@
 
 #include "BaseVSShader.h"
 #include "lightmappedgeneric_vs11.inc"
-#include "lightmappedgeneric_decal.inc"
+#include "LightmappedGeneric_Decal.inc"
 #include "mathlib/bumpvects.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -47,7 +47,7 @@ BEGIN_VS_SHADER( DecalBaseTimesLightmapAlphaBlendSelfIllum_DX8, "" )
 		LoadTexture( SELFILLUMTEXTURE );
 	}
 
-	void DrawDecal( IMaterialVar **params, IShaderDynamicAPI *pShaderAPI, IShaderShadow *pShaderShadow )
+	void DrawDecal( [[maybe_unused]] IMaterialVar **params, IShaderDynamicAPI *pShaderAPI, IShaderShadow *pShaderShadow )
 	{
 		if( IsSnapshotting() )
 		{

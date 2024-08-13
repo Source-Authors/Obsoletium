@@ -7,8 +7,8 @@
 
 #include "BaseVSShader.h"
 
-#include "ScreenSpaceEffect_vs11.inc"
-#include "IntroScreenSpaceEffect_ps11.inc"
+#include "screenspaceeffect_vs11.inc"
+#include "introscreenspaceeffect_ps11.inc"
 
 DEFINE_FALLBACK_SHADER( IntroScreenSpaceEffect, IntroScreenSpaceEffect_dx80 )
 

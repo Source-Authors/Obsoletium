@@ -8,7 +8,7 @@
 
 #include "BaseVSShader.h"
 
-#include "unlittwotexture.inc"
+#include "UnlitTwoTexture.inc"
 #include "cloak_blended_pass_helper.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
