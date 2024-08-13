@@ -14,14 +14,14 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CMouseMessageForwardingPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CMouseMessageForwardingPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMouseMessageForwardingPanel, vgui::Panel );
 public:
 	CMouseMessageForwardingPanel( Panel *parent, const char *name );
 
-	virtual void PerformLayout( void );
-	virtual void OnMousePressed( vgui::MouseCode code );
-	virtual void OnMouseDoublePressed( vgui::MouseCode code );
-	virtual void OnMouseWheeled(int delta);
+	void PerformLayout( void ) override;
+	void OnMousePressed( vgui::MouseCode code ) override;
+	void OnMouseDoublePressed( vgui::MouseCode code ) override;
+	void OnMouseWheeled(int delta) override;
 };
 
 CMouseMessageForwardingPanel::CMouseMessageForwardingPanel( Panel *parent, const char *name ) : BaseClass( parent, name )
@@ -226,7 +226,7 @@ void CQuickListPanel::SetServerInfo ( KeyValues *pKV, int iListID, int iTotalSer
 
 	g_pVGuiLocalize->ConvertANSIToUnicode( pKV->GetString( "players", " " ), playercount,  sizeof( playercount ) );
 
-	_snwprintf( players, ARRAYSIZE( players ), L"%ls %ls",  playercount, pwszPlayers );
+	_snwprintf( players, std::size( players ), L"%ls %ls",  playercount, pwszPlayers );
 	
 	m_pPlayerCountLabel->SetText( players );
 	m_pPlayerCountLabel->SetVisible( true );
@@ -241,7 +241,7 @@ void CQuickListPanel::SetServerInfo ( KeyValues *pKV, int iListID, int iTotalSer
 	else if ( iTotalServers > 2 )
 	{
 		wchar_t *pwszServers = g_pVGuiLocalize->Find("#ServerBrowser_QuickListOtherServers");
-		_snwprintf( playercount, Q_ARRAYSIZE(playercount), L"%d", (iTotalServers-1) );
+		_snwprintf( playercount, std::size(playercount), L"%d", (iTotalServers-1) );
 		g_pVGuiLocalize->ConstructString( players, sizeof( players ), pwszServers, 1, playercount );
 		m_pOtherServersLabel->SetText( players );
 		m_pOtherServersLabel->SetVisible( true );

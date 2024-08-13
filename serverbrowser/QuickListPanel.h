@@ -16,20 +16,20 @@
 //-----------------------------------------------------------------------------
 class CQuickListPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CQuickListPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CQuickListPanel, vgui::EditablePanel );
 
 public:
 	CQuickListPanel( vgui::Panel *parent, const char *panelName );
 
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 	void SetMapName( const char *pMapName );
 	void SetImage( const char *pMapName );
 	void SetGameType( const char *pGameType );
 	const char *GetMapName( void ) { return m_szMapName; }
 	void	SetRefreshing( void );
 
-	virtual void OnMousePressed( vgui::MouseCode code );
-	virtual void OnMouseDoublePressed( vgui::MouseCode code );
+	void OnMousePressed( vgui::MouseCode code ) override;
+	void OnMouseDoublePressed( vgui::MouseCode code ) override;
 	void	SetServerInfo ( KeyValues *pKV, int iListID, int iTotalServers );
 	int		GetListID( void ) { return m_iListID; }
 

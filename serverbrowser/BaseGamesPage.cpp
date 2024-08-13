@@ -52,7 +52,7 @@ bool IsReplayServer( gameserveritem_t &server )
 
 	if ( GameSupportsReplay() )
 	{
-		if ( server.m_szGameTags && server.m_szGameTags[0] )
+		if ( server.m_szGameTags[0] )
 		{
 			CUtlVector<char*> TagList;
 			V_SplitString( server.m_szGameTags, ",", TagList );
@@ -88,7 +88,7 @@ const char *COM_GetModDirectory()
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
 			Q_StripLastDir( modDir, sizeof(modDir) );
-			int dirlen = Q_strlen( modDir );
+			intp dirlen = Q_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
 	}
@@ -355,10 +355,10 @@ void CBaseGamesPage::ApplySchemeSettings(IScheme *pScheme)
 	m_nImageIndexSecure = imageList->AddImage(scheme()->GetImage("servers/icon_robotron", false));
 	m_nImageIndexSecureVacBanned = imageList->AddImage(scheme()->GetImage("servers/icon_secure_deny", false));
 	m_nImageIndexReplay = imageList->AddImage(scheme()->GetImage("servers/icon_replay", false));
-	int passwordColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_password_column", false));
-	//int botColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_bots_column", false));
-	int secureColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_robotron_column", false));
-	int replayColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_replay_column", false));
+	intp passwordColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_password_column", false));
+	//intp botColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_bots_column", false));
+	intp secureColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_robotron_column", false));
+	intp replayColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_replay_column", false));
 
 	m_pGameList->SetImageList(imageList, true);
 	m_hFont = pScheme->GetFont( "ListSmall", IsProportional() );
@@ -561,7 +561,7 @@ void CBaseGamesPage::PrepareQuickListMap( const char *pMapName, int iListID )
 //-----------------------------------------------------------------------------
 // Purpose: gets information about specified server
 //-----------------------------------------------------------------------------
-gameserveritem_t *CBaseGamesPage::GetServer( unsigned int serverID )
+gameserveritem_t *CBaseGamesPage::GetServer( uintp serverID )
 {
 	if ( !steamapicontext->SteamMatchmakingServers() )
 		return NULL;
@@ -573,7 +573,7 @@ gameserveritem_t *CBaseGamesPage::GetServer( unsigned int serverID )
 	}
 	//else
 	//{
-	//	Assert( !"Unable to return a useful entry" );
+	//	AssertMsg( false, "Unable to return a useful entry" );
 	//	return NULL; // bugbug Alfred: temp Favorites/History objects won't return a good value here...
 	//}
 }
@@ -818,7 +818,7 @@ void CBaseGamesPage::ServerResponded( HServerListRequest hReq, int iServer )
 	gameserveritem_t *pServerItem = steamapicontext->SteamMatchmakingServers()->GetServerDetails( hReq, iServer );
 	if ( !pServerItem )
 	{
-		Assert( !"Missing server response" );
+		AssertMsg( false, "Missing server response" );
 		return;
 	}
 
@@ -1232,8 +1232,8 @@ void CBaseGamesPage::UpdateStatus()
 		wchar_t count[128];
 		wchar_t blacklistcount[128];
 
-		_snwprintf( count, Q_ARRAYSIZE(count), L"%d", m_pGameList->GetItemCount() );
-		_snwprintf( blacklistcount, Q_ARRAYSIZE(blacklistcount), L"%d", m_iServersBlacklisted );
+		_snwprintf( count, std::size(count), L"%d", m_pGameList->GetItemCount() );
+		_snwprintf( blacklistcount, std::size(blacklistcount), L"%d", m_iServersBlacklisted );
 		g_pVGuiLocalize->ConstructString( header, sizeof( header ), g_pVGuiLocalize->Find( "#ServerBrowser_ServersCountWithBlacklist"), 2, count, blacklistcount );
 		m_pGameList->SetColumnHeaderText( k_nColumn_Name, header);
 	}
@@ -1617,7 +1617,7 @@ bool CBaseGamesPage::CheckSecondaryFilters( gameserveritem_t &server )
 	if ( m_pQuickList->IsVisible() == false )
 	{
 		// compare the first few characters of the filter name
-		int count = Q_strlen( m_szMapFilter );
+		intp count = Q_strlen( m_szMapFilter );
 		if ( count && Q_strnicmp( server.m_szMap, m_szMapFilter, count ) )
 		{
 			return false;
@@ -1780,7 +1780,7 @@ void CBaseGamesPage::OnAddToFavorites()
 	// loop through all the selected favorites
 	for (int i = 0; i < m_pGameList->GetSelectedItemsCount(); i++)
 	{
-		int serverID = m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i));
+		intp serverID = m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i));
 
 		gameserveritem_t *pServer = steamapicontext->SteamMatchmakingServers()->GetServerDetails( m_hRequest, serverID );
 		if ( pServer )
@@ -1802,7 +1802,7 @@ void CBaseGamesPage::OnAddToBlacklist()
 	// loop through all the selected favorites
 	for (int i = 0; i < m_pGameList->GetSelectedItemsCount(); i++)
 	{
-		int serverID = m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i));
+		intp serverID = m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i));
 
 		gameserveritem_t *pServer = steamapicontext->SteamMatchmakingServers()->GetServerDetails( m_hRequest, serverID );
 		if ( pServer )
@@ -1853,7 +1853,7 @@ void CBaseGamesPage::OnRefreshServer( int serverID )
 	// walk the list of selected servers refreshing them
 	for (int i = 0; i < m_pGameList->GetSelectedItemsCount(); i++)
 	{
-		int serverID = m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i));
+		intp serverID = m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i));
 
 		// refresh this server
 		steamapicontext->SteamMatchmakingServers()->RefreshServer( m_hRequest, serverID );
@@ -1901,7 +1901,7 @@ void CBaseGamesPage::StartRefresh()
 		m_hRequest = steamapicontext->SteamMatchmakingServers()->RequestLANServerList( GetFilterAppID().AppID(), this );
 		break;
 	default:
-		Assert( !"Unknown server type" );
+		AssertMsg( false, "Unknown server type" );
 		break;
 	}
 
@@ -1918,7 +1918,7 @@ void CBaseGamesPage::ClearQuickList( void )
 	m_pQuickList->DeleteAllItems();
 	m_vecMapNamesFound.RemoveAll();
 
-	int iIndex = m_quicklistserverlist.First();
+	auto iIndex = m_quicklistserverlist.First();
 
 	while ( iIndex != m_quicklistserverlist.InvalidIndex() )
 	{
@@ -2069,12 +2069,12 @@ int CBaseGamesPage::GetSelectedServerID( KeyValues **pKV )
 //-----------------------------------------------------------------------------
 class CDialogServerWarning : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CDialogServerWarning, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDialogServerWarning, vgui::Frame );
 public:
 	CDialogServerWarning(vgui::Panel *parent, IGameList *gameList, int serverID );
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void OnCommand(const char *command);
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void OnCommand(const char *command) override;
 
 	MESSAGE_FUNC_PTR_INT( OnButtonToggled, "ButtonToggled", panel, state );
 
@@ -2172,9 +2172,9 @@ void CBaseGamesPage::OnBeginConnect()
 				wchar_t wszServerMaxPlayers[12];
 				wchar_t wszDesignedMaxPlayers[12];
 				wchar_t wszGameName[256];
-				_snwprintf( wszServerMaxPlayers, Q_ARRAYSIZE(wszServerMaxPlayers), L"%d", iMaxCount );
-				_snwprintf( wszDesignedMaxPlayers, Q_ARRAYSIZE(wszDesignedMaxPlayers), L"%d", iMaxP );
-				Q_UTF8ToUnicode( ModList().GetModNameForModDir( m_iLimitToAppID ), wszGameName, Q_ARRAYSIZE(wszGameName) );
+				_snwprintf( wszServerMaxPlayers, std::size(wszServerMaxPlayers), L"%d", iMaxCount );
+				_snwprintf( wszDesignedMaxPlayers, std::size(wszDesignedMaxPlayers), L"%d", iMaxP );
+				Q_UTF8ToUnicode( ModList().GetModNameForModDir( m_iLimitToAppID ), wszGameName, ssize(wszGameName) );
 				g_pVGuiLocalize->ConstructString( wszWarning, sizeof( wszWarning ), g_pVGuiLocalize->Find( "#ServerBrowser_ServerWarning_MaxPlayers"), 4, wszServerMaxPlayers, wszGameName, wszDesignedMaxPlayers, wszDesignedMaxPlayers );
 				dlg->SetDialogVariable( "warning", wszWarning );
 
@@ -2271,7 +2271,7 @@ void CBaseGamesPage::OnFavoritesMsg( FavoritesListChanged_t *pFavListChanged )
 			}
 			return;
 		default:
-			Assert( !"unknown matchmaking type" );
+			AssertMsg( false, "unknown matchmaking type" );
 		}
 		return;
 	}
@@ -2313,7 +2313,7 @@ void CBaseGamesPage::OnFavoritesMsg( FavoritesListChanged_t *pFavListChanged )
 		}
 		break;
 	default:
-		Assert( !"unknown matchmaking type" );
+		AssertMsg( false, "unknown matchmaking type" );
 	};
 }
 #endif

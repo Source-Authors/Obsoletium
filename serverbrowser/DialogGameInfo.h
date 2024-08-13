@@ -22,7 +22,7 @@ struct challenge_s
 //-----------------------------------------------------------------------------
 class CDialogGameInfo : public vgui::Frame, public ISteamMatchmakingPlayersResponse, public ISteamMatchmakingPingResponse
 {
-	DECLARE_CLASS_SIMPLE( CDialogGameInfo, vgui::Frame ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDialogGameInfo, vgui::Frame ); 
 
 public:
 	CDialogGameInfo(vgui::Panel *parent, int serverIP, int queryPort, unsigned short connectionPort, const char *pszConnectCode );
@@ -38,15 +38,15 @@ public:
 
 	// implementation of IServerRefreshResponse interface
 	// called when the server has successfully responded
-	virtual void ServerResponded( gameserveritem_t &server );
+	void ServerResponded( gameserveritem_t &server ) override;
 
 	// called when a server response has timed out
-	virtual void ServerFailedToRespond();
+	void ServerFailedToRespond() override;
 
 	// on individual player added
-	virtual void AddPlayerToList(const char *playerName, int score, float timePlayedSeconds);
-	virtual void PlayersFailedToRespond() {}
-	virtual void PlayersRefreshComplete() { m_hPlayersQuery = HSERVERQUERY_INVALID; }
+	void AddPlayerToList(const char *playerName, int score, float timePlayedSeconds) override;
+	void PlayersFailedToRespond() override {}
+	void PlayersRefreshComplete() override { m_hPlayersQuery = HSERVERQUERY_INVALID; }
 
 	// called when the current refresh list is complete
 	virtual void RefreshComplete( EMatchMakingServerResponse response );
@@ -74,10 +74,10 @@ protected:
 	MESSAGE_FUNC_INT_INT( OnConnectToGame, "ConnectedToGame", ip, port );
 
 	// vgui overrides
-	virtual void OnTick();
-	virtual void PerformLayout();
+	void OnTick() override;
+	void PerformLayout() override;
 
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 private:
   // dimhotepus: NO_STEAM

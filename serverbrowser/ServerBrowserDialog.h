@@ -18,7 +18,7 @@ extern class IRunGameEngine *g_pRunGameEngine;
 //-----------------------------------------------------------------------------
 class CServerBrowserDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CServerBrowserDialog, vgui::Frame ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CServerBrowserDialog, vgui::Frame ); 
 
 public:
 	// Construction/destruction
@@ -31,9 +31,9 @@ public:
 	void		Open( void );
 
 	// gets server info
-	gameserveritem_t *GetServer(unsigned int serverID);
+	gameserveritem_t *GetServer(uintp serverID);
 	// called every frame
-	virtual void OnTick();
+	void OnTick() override;
 
 	// updates status text at bottom of window
 	void UpdateStatusText(PRINTF_FORMAT_STRING const char *format, ...);
@@ -108,10 +108,10 @@ private:
 	MESSAGE_FUNC( OnDisconnectFromGame, "DisconnectedFromGame" );
 	MESSAGE_FUNC( OnLoadingStarted, "LoadingStarted" );
 
-	virtual bool GetDefaultScreenPosition(int &x, int &y, int &wide, int &tall);
-	virtual void ActivateBuildMode();
+	bool GetDefaultScreenPosition(int &x, int &y, int &wide, int &tall) override;
+	void ActivateBuildMode() override;
 
-	void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 private:
 	// list of all open game info dialogs

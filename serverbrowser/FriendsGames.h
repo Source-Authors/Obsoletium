@@ -16,7 +16,7 @@
 //-----------------------------------------------------------------------------
 class CFriendsGames : public CBaseGamesPage
 {
-	DECLARE_CLASS_SIMPLE( CFriendsGames, CBaseGamesPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CFriendsGames, CBaseGamesPage );
 
 public:
 	CFriendsGames(vgui::Panel *parent);
@@ -24,10 +24,10 @@ public:
 
 	// IGameList handlers
 	// returns true if the game list supports the specified ui elements
-	virtual bool SupportsItem(InterfaceItem_e item);
+	bool SupportsItem(InterfaceItem_e item) override;
 
 	// called when the current refresh list is complete
-	virtual void RefreshComplete( HServerListRequest hReq, EMatchMakingServerResponse response );
+	void RefreshComplete( HServerListRequest hReq, EMatchMakingServerResponse response ) override;
 
 private:
 	// context menu message handlers

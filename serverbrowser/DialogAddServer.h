@@ -19,21 +19,21 @@ class IGameList;
 //-----------------------------------------------------------------------------
 class CDialogAddServer : public vgui::Frame, public ISteamMatchmakingPingResponse
 {
-	DECLARE_CLASS_SIMPLE( CDialogAddServer, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDialogAddServer, vgui::Frame );
 	friend class CAddServerGameList;
 
 public:
 	CDialogAddServer(vgui::Panel *parent, IGameList *gameList);
 	~CDialogAddServer();
 
-	void ServerResponded( gameserveritem_t &server );
-	void ServerFailedToRespond();
+	void ServerResponded( gameserveritem_t &server ) override;
+	void ServerFailedToRespond() override;
 
-	void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	MESSAGE_FUNC( OnItemSelected, "ItemSelected" );
 private:
-	virtual void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 
 	void OnOK();
 
@@ -60,16 +60,16 @@ protected:
 
 class CDialogAddBlacklistedServer : public CDialogAddServer 
 {
-	DECLARE_CLASS_SIMPLE( CDialogAddBlacklistedServer, CDialogAddServer );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDialogAddBlacklistedServer, CDialogAddServer );
 public:
 	CDialogAddBlacklistedServer( vgui::Panel *parent, IGameList *gameList) :
 		CDialogAddServer( parent, gameList )
 	{
 	}
 
-	virtual void FinishAddServer( gameserveritem_t &pServer );
-	void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual bool AllowInvalidIPs( void ) { return true; }
+	void FinishAddServer( gameserveritem_t &pServer ) override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	bool AllowInvalidIPs( void ) override { return true; }
 };
 
 #endif // DIALOGADDSERVER_H

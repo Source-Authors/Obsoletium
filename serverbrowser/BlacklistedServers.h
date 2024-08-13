@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------
 class CBlacklistedServers : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( CBlacklistedServers, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBlacklistedServers, vgui::PropertyPage );
 
 public:
 	CBlacklistedServers(vgui::Panel *parent);
@@ -29,18 +29,18 @@ public:
 	void SaveBlacklistedList();
 	void AddServer(gameserveritem_t &server);
 
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 	
 	// passed from main server browser window instead of messages
 	void OnConnectToGame();
 	void OnDisconnectFromGame( void );
 
-	blacklisted_server_t *GetBlacklistedServer( int iServerID );
+	blacklisted_server_t *GetBlacklistedServer( intp iServerID );
 	bool IsServerBlacklisted(gameserveritem_t &server); 
 
 private:
 	// context menu message handlers
-	MESSAGE_FUNC( OnPageShow, "PageShow" );
+	MESSAGE_FUNC_OVERRIDE( OnPageShow, "PageShow" );
 	MESSAGE_FUNC_INT( OnOpenContextMenu, "OpenContextMenu", itemID );
 	MESSAGE_FUNC( OnAddServerByName, "AddServerByName" );
 	MESSAGE_FUNC( OnRemoveFromBlacklist, "RemoveFromBlacklist" );
@@ -49,7 +49,7 @@ private:
 	void ClearServerList( void );
 	void OnAddCurrentServer( void );
 	void OnImportBlacklist( void );
-	void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 	void UpdateBlacklistUI( blacklisted_server_t *blackServer );
 	int  GetSelectedServerID( void );
 	bool AddServersFromFile( const char *pszFilename, bool bResetTimes );

@@ -10,7 +10,6 @@
 using namespace vgui;
 
 static const long RETRY_TIME = 10000;		// refresh server every 10 seconds
-static const long CHALLENGE_ENTRIES = 1024;
 
 extern "C"
 {
@@ -605,11 +604,11 @@ void CDialogGameInfo::ApplyConnectCommand( const gameserveritem_t &server )
 	// set the server password, if any
 	if ( m_szPassword[0] )
 	{
-		Q_snprintf( command, Q_ARRAYSIZE( command ), "password \"%s\"\n", m_szPassword );
+		Q_snprintf( command, ssize( command ), "password \"%s\"\n", m_szPassword );
 		g_pRunGameEngine->AddTextCommand( command );
 	}
 	// send engine command to change servers
-	Q_snprintf( command, Q_ARRAYSIZE( command ), "connect %s %s\n", server.m_NetAdr.GetConnectionAddressString(), m_sConnectCode.String() );
+	Q_snprintf( command, ssize( command ), "connect %s %s\n", server.m_NetAdr.GetConnectionAddressString(), m_sConnectCode.String() );
 	g_pRunGameEngine->AddTextCommand( command );
 }
 
@@ -676,7 +675,7 @@ void CDialogGameInfo::ConnectToServer()
 	else
 	{
 		char connectArgs[256];
-		ConstructConnectArgs( connectArgs, Q_ARRAYSIZE( connectArgs ), m_Server );
+		ConstructConnectArgs( connectArgs, ssize( connectArgs ), m_Server );
 		
 		if ( ( m_Server.m_bSecure && JoiningSecureServerCall() )|| !m_Server.m_bSecure )
 		{

@@ -19,34 +19,34 @@
 class CInternetGames : public CBaseGamesPage
 {
 
-	DECLARE_CLASS_SIMPLE( CInternetGames, CBaseGamesPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CInternetGames, CBaseGamesPage );
 
 public:
 	CInternetGames( vgui::Panel *parent, const char *panelName = "InternetGames", EPageType eType = eInternetServer );
 	~CInternetGames();
 
 	// property page handlers
-	virtual void OnPageShow();
+	void OnPageShow() override;
 
 	// returns true if the game list supports the specified ui elements
-	virtual bool SupportsItem(IGameList::InterfaceItem_e item);
+	bool SupportsItem(IGameList::InterfaceItem_e item) override;
 
 	// gets a new server list
-	MESSAGE_FUNC( GetNewServerList, "GetNewServerList" );
+	MESSAGE_FUNC_OVERRIDE( GetNewServerList, "GetNewServerList" );
 
 	// serverlist refresh responses
-	virtual void ServerResponded( HServerListRequest hReq, int iServer );
-	virtual void ServerFailedToRespond( HServerListRequest hReq, int iServer );
-	virtual void RefreshComplete( HServerListRequest hReq, EMatchMakingServerResponse response );
-	MESSAGE_FUNC_INT( OnRefreshServer, "RefreshServer", serverID );
+	void ServerResponded( HServerListRequest hReq, int iServer ) override;
+	void ServerFailedToRespond( HServerListRequest hReq, int iServer ) override;
+	void RefreshComplete( HServerListRequest hReq, EMatchMakingServerResponse response ) override;
+	MESSAGE_FUNC_INT_OVERRIDE( OnRefreshServer, "RefreshServer", serverID );
 
-	virtual int GetRegionCodeToFilter();
-	virtual bool CheckTagFilter( gameserveritem_t &server );
+	int GetRegionCodeToFilter() override;
+	bool CheckTagFilter( gameserveritem_t &server ) override;
 
 protected:
 	// vgui overrides
-	virtual void PerformLayout();
-	virtual void OnTick();
+	void PerformLayout() override;
+	void OnTick() override;
 
 	virtual const char *GetStringNoUnfilteredServers() { return "#ServerBrowser_NoInternetGames"; }
 	virtual const char *GetStringNoUnfilteredServersOnMaster() { return "#ServerBrowser_MasterServerHasNoServersListed"; }

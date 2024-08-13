@@ -311,7 +311,7 @@ int CInternetGames::GetRegionCodeToFilter()
 bool CInternetGames::CheckTagFilter( gameserveritem_t &server )
 {
 	// Servers without tags go in the official games, servers with tags go in custom games
-	bool bOfficialServer = !( server.m_szGameTags && server.m_szGameTags[0] );
+	bool bOfficialServer = !server.m_szGameTags[0];
 	if ( !bOfficialServer )
 		return false;
 

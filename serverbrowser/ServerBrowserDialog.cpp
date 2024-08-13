@@ -173,7 +173,7 @@ void CServerBrowserDialog::Initialize()
 //-----------------------------------------------------------------------------
 // Purpose: returns a server in the list
 //-----------------------------------------------------------------------------
-gameserveritem_t *CServerBrowserDialog::GetServer( unsigned int serverID )
+gameserveritem_t *CServerBrowserDialog::GetServer( uintp serverID )
 {
 	if (m_pGameList)
 		return m_pGameList->GetServer( serverID );
@@ -413,7 +413,7 @@ void CServerBrowserDialog::AddServerToFavorites(gameserveritem_t &server)
 		{
 			// send command to propagate to the client so the client can send it on to the GC
 			char command[ 256 ];
-			Q_snprintf( command, Q_ARRAYSIZE( command ), "rfgc %s\n", server.m_NetAdr.GetConnectionAddressString() );
+			Q_snprintf( command, ssize( command ), "rfgc %s\n", server.m_NetAdr.GetConnectionAddressString() );
 			g_pRunGameEngine->AddTextCommand( command );
 		}
 	}
@@ -506,7 +506,7 @@ CDialogGameInfo *CServerBrowserDialog::OpenGameInfoDialog( IGameList *gameList, 
 	gameDialog->SetParent(GetVParent());
 	gameDialog->AddActionSignalTarget(this);
 	gameDialog->Run( pServer->GetName() );
-	int i = m_GameInfoDialogs.AddToTail();
+	intp i = m_GameInfoDialogs.AddToTail();
 	m_GameInfoDialogs[i] = gameDialog;
 	return gameDialog;
 }
@@ -520,7 +520,7 @@ CDialogGameInfo *CServerBrowserDialog::OpenGameInfoDialog( int serverIP, uint16 
 	gameDialog->AddActionSignalTarget(this);
 	gameDialog->SetParent(GetVParent());
 	gameDialog->Run("");
-	int i = m_GameInfoDialogs.AddToTail();
+	intp i = m_GameInfoDialogs.AddToTail();
 	m_GameInfoDialogs[i] = gameDialog;
 	return gameDialog;
 }
@@ -530,7 +530,7 @@ CDialogGameInfo *CServerBrowserDialog::OpenGameInfoDialog( int serverIP, uint16 
 //-----------------------------------------------------------------------------
 void CServerBrowserDialog::CloseAllGameInfoDialogs()
 {
-	for (int i = 0; i < m_GameInfoDialogs.Count(); i++)
+	for (intp i = 0; i < m_GameInfoDialogs.Count(); i++)
 	{
 		vgui::Panel *dlg = m_GameInfoDialogs[i];
 		if (dlg)
@@ -645,7 +645,7 @@ void CServerBrowserDialog::OnConnectToGame( KeyValues *pMessageValues )
 
 	// tell the game info dialogs, so they can cancel if we have connected
 	// to a server they were auto-retrying
-	for (int i = 0; i < m_GameInfoDialogs.Count(); i++)
+	for (intp i = 0; i < m_GameInfoDialogs.Count(); i++)
 	{
 		vgui::Panel *dlg = m_GameInfoDialogs[i];
 		if (dlg)

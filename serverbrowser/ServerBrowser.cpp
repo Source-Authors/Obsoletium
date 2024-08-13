@@ -101,9 +101,9 @@ bool CServerBrowser::Initialize(CreateInterfaceFn *factorylist, int factoryCount
 
 	// load the vgui interfaces
 #if defined( STEAM ) || defined( HL1 )
-	if ( !vgui::VGuiControls_Init("ServerBrowser", factorylist, factoryCount) )
+	if ( !vgui::VGuiControls_Init("serverbrowser", factorylist, factoryCount) )
 #else
-	if ( !vgui::VGui_InitInterfacesList("ServerBrowser", factorylist, factoryCount) )
+	if ( !vgui::VGui_InitInterfacesList("serverbrowser", factorylist, factoryCount) )
 #endif
 		return false;
 
@@ -422,13 +422,13 @@ void LoadGameTypes( void )
 const char *GetGameTypeName( const char *pMapName )
 {
 	LoadGameTypes();
-	for ( int i = 0; i < g_GameTypes.Count(); i++ )
+	for ( auto &gt : g_GameTypes )
 	{
-		int iLength = strlen( g_GameTypes[i].pPrefix );
+		intp iLength = V_strlen( gt.pPrefix );
 
-		if ( !Q_strncmp( pMapName, g_GameTypes[i].pPrefix, iLength ) )
+		if ( !Q_strncmp( pMapName, gt.pPrefix, iLength ) )
 		{
-			return g_GameTypes[i].pGametypeName;
+			return gt.pGametypeName;
 		}
 	}
 
@@ -445,14 +445,14 @@ const char *CServerBrowser::GetMapFriendlyNameAndGameType( const char *pszMapNam
 
 	// Scan list
 	const char *pszFriendlyGameTypeName = "";
-	for ( int i = 0; i < g_GameTypes.Count(); i++ )
+	for ( auto &gt : g_GameTypes )
 	{
-		int iLength = strlen( g_GameTypes[i].pPrefix );
+		intp iLength = V_strlen( gt.pPrefix );
 
-		if ( !Q_strnicmp( pszMapName, g_GameTypes[i].pPrefix, iLength ) )
+		if ( !Q_strnicmp( pszMapName, gt.pPrefix, iLength ) )
 		{
 			pszMapName += iLength;
-			pszFriendlyGameTypeName = g_GameTypes[i].pGametypeName;
+			pszFriendlyGameTypeName = gt.pGametypeName;
 			break;
 		}
 	}
@@ -460,12 +460,12 @@ const char *CServerBrowser::GetMapFriendlyNameAndGameType( const char *pszMapNam
 	// See how many characters from the name to copy.
 	// Start by assuming we'll copy the whole thing.
 	// (After any prefix we just skipped)
-	int l = V_strlen( pszMapName );
+	intp l = V_strlen( pszMapName );
 	const char *pszFinal = Q_stristr( pszMapName, "_final" );
 	if ( pszFinal )
 	{
 		// truncate the _final (or _final1) part of the filename if it's at the end of the name
-		const char *pszNextChar = pszFinal + Q_strlen( "_final" );
+		const char *pszNextChar = pszFinal + ssize( "_final" ) - 1;
 		if ( ( *pszNextChar == '\0' ) ||
 			( ( *pszNextChar == '1' ) && ( *(pszNextChar+1) == '\0' ) ) )
 		{
@@ -476,7 +476,7 @@ const char *CServerBrowser::GetMapFriendlyNameAndGameType( const char *pszMapNam
 	// Safety check against buffer size
 	if ( l >= cchFriendlyName )
 	{
-		Assert( !"Map name too long for buffer!" );
+		AssertMsg( false, "Map name too long for buffer!" );
 		l = cchFriendlyName-1;
 	}
 
