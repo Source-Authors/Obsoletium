@@ -180,7 +180,7 @@ void EnableThreadedMaterialVarAccess( bool bEnable, IMaterialVar **ppParams, int
 	if ( !s_bEnableThreadedAccess )
 	{
 		// Necessary to free up reference counts
-		Assert( s_nTempVarsUsed <= Q_ARRAYSIZE(s_pTempMaterialVar) );
+		Assert( s_nTempVarsUsed <= ssize(s_pTempMaterialVar) );
 		for ( int i = 0; i < s_nTempVarsUsed; ++i )
 		{
 			s_pTempMaterialVar[i].SetUndefined();
@@ -205,7 +205,7 @@ CMaterialVar *CMaterialVar::AllocThreadVar()
 	{
 		if ( m_nTempIndex == 0xFFU )
 		{
-			if ( s_nTempVarsUsed >= (int)std::size(s_pTempMaterialVar) )
+			if ( s_nTempVarsUsed >= ssize(s_pTempMaterialVar) )
 			{
 				s_nOverflowTempVars++;
 				return NULL;
@@ -349,13 +349,13 @@ CMaterialVar::CMaterialVar( IMaterial* pMaterial, const char *pKey, const char *
 	m_pMaterial = static_cast<IMaterialInternal*>(pMaterial);
 	m_Name = GetSymbol( pKey );
 	Assert( m_Name != UTL_INVAL_SYMBOL );
-	int len = Q_strlen( pVal ) + 1;
+	intp len = Q_strlen( pVal ) + 1;
 	m_pStringVal = new char[ len ];
 	Q_strncpy( m_pStringVal, pVal, len );
 	m_Type = MATERIAL_VAR_TYPE_STRING;
 	// dimhotepus: atof -> strtof.
 	m_VecVal[0] = m_VecVal[1] = m_VecVal[2] = m_VecVal[3] = strtof( m_pStringVal, nullptr );
-	m_intVal = int( atof( m_pStringVal ) );
+	m_intVal = int( m_VecVal[0] );
 }
 
 CMaterialVar::CMaterialVar( IMaterial* pMaterial, const char *pKey, float* pVal, int numComps )
@@ -689,16 +689,16 @@ const char *CMaterialVar::GetStringValue( void ) const
 		{
 			s_CharBuf[0] = '[';
 			s_CharBuf[1] = ' ';
-			int len = 2;
+			intp len = 2;
 			for (int i = 0; i < m_nNumVectorComps; ++i)
 			{
-				if (len < sizeof( s_CharBuf ))
+				if (len < static_cast<int>(sizeof( s_CharBuf )))
 				{
 					Q_snprintf( s_CharBuf + len, sizeof( s_CharBuf ) - len, "%f ", m_VecVal[i] );
-					len += strlen( s_CharBuf + len );
+					len += V_strlen( s_CharBuf + len );
 				}
 			}
-			if (len < sizeof( s_CharBuf ) - 1)
+			if (len < ssize( s_CharBuf ) - 1)
 			{
 				s_CharBuf[len] = ']';
 				s_CharBuf[len+1] = '\0';
@@ -719,11 +719,11 @@ const char *CMaterialVar::GetStringValue( void ) const
 			{
 				for (int j = 0; j < 4; ++j)
 				{
-					if (len < sizeof( s_CharBuf ))
+					if (len < static_cast<int>(sizeof( s_CharBuf )))
 						len += Q_snprintf( s_CharBuf + len, sizeof( s_CharBuf ) - len, "%.3f ", m_pMatrix->m_Matrix[j][i] );
 				}
 			}
-			if (len < sizeof( s_CharBuf ) - 1)
+			if (len < static_cast<int>(sizeof( s_CharBuf )) - 1)
 			{
 				s_CharBuf[len] = ']';
 				s_CharBuf[len+1] = '\0';
@@ -779,7 +779,7 @@ void CMaterialVar::SetStringValue( const char *val )
 		g_pShaderAPI->FlushBufferedPrimitives();
 
 	CleanUpData();
-	int len = Q_strlen( val ) + 1;
+	intp len = Q_strlen( val ) + 1;
 	m_pStringVal = new char[len];
 	Q_strncpy( m_pStringVal, val, len );
 	m_Type = MATERIAL_VAR_TYPE_STRING;
@@ -1547,10 +1547,11 @@ static int ParseVectorFromKeyValueString( const char *pString, float vecVal[4] )
 
 	if( divideBy255 )
 	{
-		vecVal[0] *= ( 1.0f / 255.0f );
-		vecVal[1] *= ( 1.0f / 255.0f );
-		vecVal[2] *= ( 1.0f / 255.0f );
-		vecVal[3] *= ( 1.0f / 255.0f );
+		constexpr float div = 1.0f / 255.0f;
+		vecVal[0] *= div;
+		vecVal[1] *= div;
+		vecVal[2] *= div;
+		vecVal[3] *= div;
 	}
 
 	return i;
@@ -1559,7 +1560,7 @@ static int ParseVectorFromKeyValueString( const char *pString, float vecVal[4] )
 void CMaterialVar::SetValueAutodetectType( const char *val )
 {
 	ASSERT_NOT_DUMMY_VAR();
-	int len = Q_strlen( val );
+	intp len = Q_strlen( val );
 
 	// Here, let's determine if we got a float or an int....
 	char* pIEnd;	// pos where int scan ended

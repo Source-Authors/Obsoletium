@@ -230,7 +230,7 @@ const char *CShaderSystem::s_pDebugShaderName[MATERIAL_DEBUG_COUNT]	=
 //-----------------------------------------------------------------------------
 CShaderSystem::CShaderSystem()
 	: m_SaveSpewOutput( nullptr ),
-		m_StoredSpew( 0, 512, 0 ),
+		m_StoredSpew( (intp)0, 512, 0 ),
 		m_pRenderState( nullptr ),
 		m_hShaderDLL( USHRT_MAX ),
 		m_nModulation( UCHAR_MAX ),
@@ -286,7 +286,7 @@ void CShaderSystem::ModInit()
 void CShaderSystem::ModShutdown()
 {
 	// Unload only MOD dlls
-	for ( int i = m_ShaderDLLs.Count(); --i >= 0; )
+	for ( intp i = m_ShaderDLLs.Count(); --i >= 0; )
 	{
 		if ( m_ShaderDLLs[i].m_bModShaderDLL )
 		{
@@ -308,35 +308,30 @@ void CShaderSystem::LoadAllShaderDLLs( )
 	GetShaderDLLInternal()->Connect( Sys_GetFactoryThis(), true );
 
 	// Loads local defined or statically linked shaders
-	int i = m_ShaderDLLs.AddToHead();
+	intp i = m_ShaderDLLs.AddToHead();
 
 	m_ShaderDLLs[i].m_pFileName     = new char[1];
 	m_ShaderDLLs[i].m_pFileName[0]  = 0;
-	m_ShaderDLLs[i].m_hInstance     = NULL;
+	m_ShaderDLLs[i].m_hInstance     = nullptr;
 	m_ShaderDLLs[i].m_pShaderDLL    = GetShaderDLLInternal();
 	m_ShaderDLLs[i].m_bModShaderDLL = false;
 
 	// Add the shaders to the dictionary of shaders...
 	SetupShaderDictionary( i );
 
-	// 360 has the the debug shaders in its dx9 dll
-	if ( IsPC() || !IsX360() )
-	{
-		// Always need the debug shaders
-		LoadShaderDLL( "stdshader_dbg" DLL_EXT_STRING );
-	}
-
+	// Always need the debug shaders
+	LoadShaderDLL( "stdshader_dbg" DLL_EXT_STRING );
+	
 	// Load up standard shader DLLs...
 	int dxSupportLevel = HardwareConfig()->GetMaxDXSupportLevel();
 	Assert( dxSupportLevel >= 60 );
 	dxSupportLevel /= 10;
 
-	// 360 only supports its dx9 dll
-	int dxStart = IsX360() ? 9 : 6;
+	int dxStart = 6;
 	char buf[32];
 	for ( i = dxStart; i <= dxSupportLevel; ++i )
 	{
-		Q_snprintf( buf, sizeof( buf ), "stdshader_dx%d%s", i, DLL_EXT_STRING );
+		Q_snprintf( buf, sizeof( buf ), "stdshader_dx%zd%s", i, DLL_EXT_STRING );
 		LoadShaderDLL( buf );
 	}
 
@@ -372,7 +367,7 @@ const char *COM_GetModDirectory()
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
 			Q_StripLastDir( modDir, sizeof(modDir) );
-			int dirlen = Q_strlen( modDir );
+			intp dirlen = Q_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
 	}
@@ -428,7 +423,7 @@ void CShaderSystem::UnloadAllShaderDLLs()
 	if ( m_ShaderDLLs.Count() == 0 )
 		return;
 
-	for ( int i = m_ShaderDLLs.Count(); --i >= 0; )
+	for ( intp i = m_ShaderDLLs.Count(); --i >= 0; )
 	{
 		UnloadShaderDLL(i);
 		delete[] m_ShaderDLLs[i].m_pFileName;
@@ -511,14 +506,14 @@ bool CShaderSystem::LoadShaderDLL( const char *pFullPath, const char *pPathID, b
 		return false;
 
 	// Get at the shader DLL interface
-	CreateInterfaceFn factory = Sys_GetFactory( hInstance );
+	CreateInterfaceFnT<IShaderDLLInternal> factory = Sys_GetFactory<IShaderDLLInternal>( hInstance );
 	if (!factory)
 	{
 		g_pFullFileSystem->UnloadModule( hInstance );
 		return false;
 	}
 
-	IShaderDLLInternal *pShaderDLL = (IShaderDLLInternal*)factory( SHADER_DLL_INTERFACE_VERSION, NULL );
+	IShaderDLLInternal *pShaderDLL = factory( SHADER_DLL_INTERFACE_VERSION, NULL );
 	if ( !pShaderDLL )
 	{
 		g_pFullFileSystem->UnloadModule( hInstance );
@@ -550,7 +545,7 @@ bool CShaderSystem::LoadShaderDLL( const char *pFullPath, const char *pPathID, b
 	else
 	{
 		nShaderDLLIndex = m_ShaderDLLs.AddToTail();
-		int nLen = Q_strlen(pFullPath) + 1;
+		intp nLen = Q_strlen(pFullPath) + 1;
 		m_ShaderDLLs[nShaderDLLIndex].m_pFileName = new char[ nLen ];
 		Q_strncpy( m_ShaderDLLs[nShaderDLLIndex].m_pFileName, pFullPath, nLen );
 	}
@@ -763,7 +758,7 @@ int CShaderSystem::GetShaders( int nFirstShader, int nMaxCount, IShader **ppShad
 	for ( intp i = m_ShaderDLLs.Count(); --i >= 0; )
 	{
 		const ShaderDLLInfo_t &info = m_ShaderDLLs[i];
-		for ( unsigned short j = info.m_ShaderDict.First(); 
+		for ( auto j = info.m_ShaderDict.First(); 
 			j != info.m_ShaderDict.InvalidIndex();
 			j = info.m_ShaderDict.Next( j ) )
 		{
@@ -896,7 +891,7 @@ void CShaderSystem::PrintBufferedSpew( void )
 
 		Color c( r, g, b, a );
 		
-		int nLen = m_StoredSpew.PeekStringLength();
+		intp nLen = m_StoredSpew.PeekStringLength();
 		if ( nLen )
 		{
 			char *pBuf = (char*)_alloca( nLen );
@@ -940,15 +935,10 @@ void CShaderSystem::PrepForShaderDraw( IShader *pShader,
 	IMaterialVar** ppParams, ShaderRenderState_t* pRenderState, int nModulation )
 {
 	Assert( !m_pRenderState );
+	Assert( !m_SaveSpewOutput );
 
-	// 360 runs the console remotely, spew cannot cause the matsys to be reentrant
-	// 360 sidesteps the other negative affect that *all* buffered spew redirects as warning text
-	if ( IsPC() || !IsX360() )
-	{
-		Assert( !m_SaveSpewOutput );
-		m_SaveSpewOutput = GetSpewOutputFunc();
-		SpewOutputFunc( MySpewOutputFunc );
-	}
+	m_SaveSpewOutput = GetSpewOutputFunc();
+	SpewOutputFunc( MySpewOutputFunc );
 
 	m_pRenderState = pRenderState;
 	m_nModulation = nModulation;
@@ -957,12 +947,9 @@ void CShaderSystem::PrepForShaderDraw( IShader *pShader,
 
 void CShaderSystem::DoneWithShaderDraw()
 {
-	if ( IsPC() || !IsX360() )
-	{
-		SpewOutputFunc( m_SaveSpewOutput );
-		PrintBufferedSpew();
-		m_SaveSpewOutput = NULL;
-	}
+	SpewOutputFunc( m_SaveSpewOutput );
+	PrintBufferedSpew();
+	m_SaveSpewOutput = NULL;
 
 	m_pRenderState = NULL;
 }
@@ -1081,35 +1068,6 @@ void CShaderSystem::InitRenderStateFlags( ShaderRenderState_t* pRenderState, int
 
 	// If we are in release mode, just go ahead and clear in case the above is screwed up.
 	pRenderState->m_Flags &= ~SHADER_OPACITY_MASK;
-
-/*
-	// HACK: Also kind of gross; turn off bump lightmapping for low-end
-	if (g_config.bUseGraphics && !HardwareConfig()->SupportsVertexAndPixelShaders())
-	{
-		pRenderState->m_Flags &= ~SHADER_NEEDS_BUMPED_LIGHTMAPS;
-	}
-*/
-/*
-	// HACK: more grossness!!!  turn off bump lightmapping if we don't have a bumpmap
-	// Shaders should specify SHADER_NEEDS_BUMPED_LIGHTMAPS if they might need a bumpmap,
-	// and this'll take care of getting rid of it if it isn't there.
-	if( pRenderState->m_Flags & SHADER_NEEDS_BUMPED_LIGHTMAPS )
-	{
-		pRenderState->m_Flags &= ~SHADER_NEEDS_BUMPED_LIGHTMAPS;
-		for( int i = 0; i < numParams; i++ )
-		{
-			if( stricmp( params[i]->GetName(), "$bumpmap" ) == 0 )
-			{
-				if( params[i]->IsDefined() )
-				{
-					const char *blah = params[i]->GetStringValue();
-					pRenderState->m_Flags |= SHADER_NEEDS_BUMPED_LIGHTMAPS;
-					break;
-				}
-			}
-		}
-	}
-*/
 }
 
 
@@ -1309,73 +1267,6 @@ void CShaderSystem::InitStateSnapshots( IShader *pShader, IMaterialVar **params,
 		CLEAR_FLAGS2( MATERIAL_VAR2_USE_FLASHLIGHT );
 	}
 }
-
-//-----------------------------------------------------------------------------
-// Helper to count texture coordinates
-//-----------------------------------------------------------------------------
-static int NumTextureCoordinates( VertexFormat_t vertexFormat )
-{
-	// FIXME: this is a duplicate of the function in meshdx8.cpp
-	int nTexCoordCount = 0;
-	for ( int i = 0; i < VERTEX_MAX_TEXTURE_COORDINATES; ++i )
-	{
-		if ( TexCoordSize( i, vertexFormat ) == 0 )
-			continue;
-		++nTexCoordCount;
-	}
-	return nTexCoordCount;
-}
-
-//-----------------------------------------------------------------------------
-// Displays the vertex format
-//-----------------------------------------------------------------------------
-static void OutputVertexFormat( VertexFormat_t format )
-{
-	// FIXME: this is a duplicate of the function in meshdx8.cpp
-	VertexCompressionType_t compressionType = CompressionType( format );
-
-	if( format & VERTEX_POSITION )
-	{
-		Warning( "VERTEX_POSITION|" );
-	}
-	if( format & VERTEX_NORMAL )
-	{
-		if ( compressionType == VERTEX_COMPRESSION_ON )
-			Warning( "VERTEX_NORMAL[COMPRESSED]|" );
-		else
-			Warning( "VERTEX_NORMAL|" );
-	}
-	if( format & VERTEX_COLOR )
-	{
-		Warning( "VERTEX_COLOR|" );
-	}
-	if( format & VERTEX_SPECULAR )
-	{
-		Warning( "VERTEX_SPECULAR|" );
-	}
-	if( format & VERTEX_TANGENT_S )
-	{
-		Warning( "VERTEX_TANGENT_S|" );
-	}
-	if( format & VERTEX_TANGENT_T )
-	{
-		Warning( "VERTEX_TANGENT_T|" );
-	}
-	if( format & VERTEX_BONE_INDEX )
-	{
-		Warning( "VERTEX_BONE_INDEX|" );
-	}
-	if( format & VERTEX_FORMAT_VERTEX_SHADER )
-	{
-		Warning( "VERTEX_FORMAT_VERTEX_SHADER|" );
-	}
-	Warning( "\nBone weights: %d\n", NumBoneWeights( format ) );
-	Warning( "user data size: %d (%s)\n", UserDataSize( format ),
-		( CompressionType( format ) == VERTEX_COMPRESSION_ON ? "compressed" : "uncompressed" ) );
-	Warning( "num tex coords: %d\n", NumTextureCoordinates( format ) );
-	// NOTE: This doesn't print texcoord sizes.
-}
-
 
 #ifdef _DEBUG
 static bool IsVertexFormatSubsetOfVertexformat( VertexFormat_t subset, VertexFormat_t superset )

@@ -27,14 +27,14 @@ class CTextureCompositor : public ITextureCompositor
 public:
 	CTextureCompositor( int _width, int _height, int nTeam, const char* pCompositeName, uint64 nRandomSeed, uint32 nTexCompositeCreateFlags );
 
-	virtual int AddRef() OVERRIDE;
-	virtual int Release() OVERRIDE;
-	virtual int GetRefCount() const OVERRIDE { return m_nReferenceCount; }
+	virtual int AddRef() override;
+	virtual int Release() override;
+	virtual int GetRefCount() const override { return m_nReferenceCount; }
 
-	virtual void Update() OVERRIDE;
-	virtual ITexture* GetResultTexture() const OVERRIDE;
-	virtual ECompositeResolveStatus GetResolveStatus() const OVERRIDE;
-	virtual void ScheduleResolve() OVERRIDE;
+	virtual void Update() override;
+	virtual ITexture* GetResultTexture() const override;
+	virtual ECompositeResolveStatus GetResolveStatus() const override;
+	virtual void ScheduleResolve() override;
 
 	void Resolve();
 
@@ -83,7 +83,6 @@ private:
 	CUtlString m_CompositeName;
 	CUtlString m_TemplateName;
 	uint32 m_nTexCompositeCreateFlags;
-	bool m_bHasTeamSpecifics;
 };
 
 // ------------------------------------------------------------------------------------------------

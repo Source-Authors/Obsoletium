@@ -122,7 +122,7 @@ int	CMatRenderContextBase::sm_nInitializeCount = 0;
 // Constructor
 //-----------------------------------------------------------------------------
 CMatRenderContextBase::CMatRenderContextBase() :
-	m_pMaterialSystem( NULL ), m_RenderTargetStack( 16, 32 ), m_MatrixMode( NUM_MATRIX_MODES )
+	m_RenderTargetStack( 16, 32 ), m_MatrixMode( NUM_MATRIX_MODES ), m_pMaterialSystem( NULL )
 {
 	// Put a special element at the top of the RT stack (indicating back buffer is current top of stack)
 	// NULL indicates back buffer, -1 indicates full-size viewport
@@ -258,7 +258,7 @@ void CMatRenderContextBase::MarkRenderDataUnused( bool bFrameBegin )
 
 }
 
-int CMatRenderContextBase::RenderDataSizeUsed() const
+intp CMatRenderContextBase::RenderDataSizeUsed() const
 {
 	return sm_RenderData[sm_nRenderStack].GetUsed();
 }
@@ -675,7 +675,7 @@ void *CMatRenderContextBase::LockRenderData( int nSizeInBytes )
 	void *pDest = sm_RenderData[ sm_nRenderStack ].Alloc( nSizeInBytes, false );
 	if ( !pDest )
 	{
-		ExecuteNTimes( 10, Warning("MaterialSystem: Out of memory in render data!\n") );
+		ExecuteNTimes( 10, Warning( "MaterialSystem: Out of memory in render data!\n" ) );
 	}
 	AddRefRenderData();
 	return pDest;
@@ -851,7 +851,7 @@ void CMatRenderContextBase::PopRenderTargetAndViewport( void )
 	// Check for underflow
 	if ( m_RenderTargetStack.Count() == 0 )
 	{
-		Assert( !"CMatRenderContext::PopRenderTargetAndViewport:  Stack is empty!!!" );
+		AssertMsg( false, "CMatRenderContext::PopRenderTargetAndViewport:  Stack is empty!!!" );
 		return;
 	}
 
@@ -1788,7 +1788,7 @@ void CMatRenderContext::CommitRenderTargetAndViewport( void )
 
 	const RenderTargetStackElement_t &element = m_RenderTargetStack.Top( );
 
-	for( int rt=0; rt<NELEMS(element.m_pRenderTargets); rt++ )
+	for( int rt=0; rt<ssize(element.m_pRenderTargets); rt++ )
 	{
 		// If we're dealing with the back buffer
 		if ( element.m_pRenderTargets[rt] == NULL )
@@ -2073,7 +2073,7 @@ void CMatRenderContext::DrawScreenSpaceQuad( IMaterial* pMaterial )
 		{  3.0f - 1.0f * flOffsetW,  1.0f + 1.0f * flOffsetH,  2.0f,  0.0f }, // TR
 	};
 
-	static_assert( ARRAYSIZE( coords ) == COORDS_COUNT, "Unexpected number of coords in triangle, should match enum." );
+	static_assert( ssize( coords ) == COORDS_COUNT, "Unexpected number of coords in triangle, should match enum." );
 
 	MatrixMode( MATERIAL_VIEW );
 	PushMatrix();
@@ -2891,19 +2891,16 @@ void CMatRenderContext::GetStandardTextureDimensions( int *pWidth, int *pHeight,
 
 void CMatRenderContext::FogColor3f( float r, float g, float b )
 {
-	unsigned char fogColor[3];
-	fogColor[0] = clamp( (int)(r * 255.0f), 0, 255 );
-	fogColor[1] = clamp( (int)(g * 255.0f), 0, 255 );
-	fogColor[2] = clamp( (int)(b * 255.0f), 0, 255 );
-	g_pShaderAPI->SceneFogColor3ub( fogColor[0], fogColor[1], fogColor[2] );
+	float rgb[] = {r, g, b};
+	FogColor3fv( rgb );
 }
 
 void CMatRenderContext::FogColor3fv( const float* rgb )
 {
 	unsigned char fogColor[3];
-	fogColor[0] = clamp( (int)(rgb[0] * 255.0f), 0, 255 );
-	fogColor[1] = clamp( (int)(rgb[1] * 255.0f), 0, 255 );
-	fogColor[2] = clamp( (int)(rgb[2] * 255.0f), 0, 255 );
+	fogColor[0] = static_cast<unsigned char>(clamp( (int)(rgb[0] * 255.0f), 0, 255 ));
+	fogColor[1] = static_cast<unsigned char>(clamp( (int)(rgb[1] * 255.0f), 0, 255 ));
+	fogColor[2] = static_cast<unsigned char>(clamp( (int)(rgb[2] * 255.0f), 0, 255 ));
 	g_pShaderAPI->SceneFogColor3ub( fogColor[0], fogColor[1], fogColor[2] );
 }
 

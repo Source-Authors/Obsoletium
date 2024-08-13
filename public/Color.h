@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef SRC_COLOR_H_
+#define SRC_COLOR_H_
 
 #include <utility>
 #include "tier0/dbg.h"
@@ -107,4 +107,31 @@ private:
 	component _color[4]; //-V112
 };
 
-#endif // COLOR_H
+struct color24
+{
+	byte r, g, b;
+};
+
+struct color32_s
+{
+	[[nodiscard]] constexpr bool operator!=( color32_s other ) const
+	{
+		return !(*this == other);
+	}
+
+	[[nodiscard]] constexpr bool operator==( color32_s other ) const
+	{
+		return r == other.r && g == other.g && b == other.b && a == other.a;
+	}
+
+	byte r, g, b, a;
+};
+
+using color32 = color32_s;
+
+struct colorVec
+{
+	unsigned r, g, b, a;
+};
+
+#endif  // !SRC_COLOR_H_

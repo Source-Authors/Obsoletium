@@ -13,6 +13,7 @@
 
 #include "tier0/dbg.h"
 #include "convar.h"
+#include "Color.h"
 
 #if defined( CLIENT_DLL ) || defined( GAME_DLL )
 	#include "basehandle.h"

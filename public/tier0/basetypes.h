@@ -271,35 +271,6 @@ constexpr inline float FLOAT32_NAN{std::numeric_limits<float>::quiet_NaN()};
 
 constexpr inline vec_t VEC_T_NAN{std::numeric_limits<vec_t>::quiet_NaN()};
 
-
-
-// FIXME: why are these here?  Hardly anyone actually needs them.
-struct color24
-{
-	byte r, g, b;
-};
-
-typedef struct color32_s
-{
-	[[nodiscard]] constexpr bool operator!=( color32_s other ) const
-	{
-		return !(*this == other);
-	}
-
-	[[nodiscard]] constexpr bool operator==( color32_s other ) const
-	{
-		return r == other.r && g == other.g && b == other.b && a == other.a;
-	}
-
-	byte r, g, b, a;
-} color32;
-
-struct colorVec
-{
-	unsigned r, g, b, a;
-};
-
-
 #ifndef NOTE_UNUSED
 #define NOTE_UNUSED(x)	(void)(x)	// for pesky compiler / lint warnings
 #endif

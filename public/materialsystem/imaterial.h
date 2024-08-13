@@ -343,7 +343,7 @@ inline unsigned short GetVertexElementSize( VertexElement_t element, VertexCompr
 		default:
 			Assert(0);
 			return 0;
-	};
+	}
 }
 
 
@@ -553,7 +553,7 @@ public:
 	virtual int				GetNumPasses( void ) = 0; 
 
 	// Can't be const because the material might have to precache itself.
-	virtual int				GetTextureMemoryBytes( void ) = 0; 
+	virtual intp				GetTextureMemoryBytes( void ) = 0; 
 
 	// Meant to be used with materials created using CreateMaterial
 	// It updates the materials to reflect the current values stored in the material vars

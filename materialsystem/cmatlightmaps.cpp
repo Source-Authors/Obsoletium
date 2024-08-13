@@ -275,7 +275,7 @@ void CMatLightmaps::BeginLightmapAllocation()
 	CleanupLightmaps();
 
 	m_ImagePackers.RemoveAll();
-	int i = m_ImagePackers.AddToTail();
+	intp i = m_ImagePackers.AddToTail();
 	m_ImagePackers[i].Reset( 0, GetMaxLightmapPageWidth(), GetMaxLightmapPageHeight() );
 
 	SetCurrentMaterialInternal(0);
@@ -306,8 +306,8 @@ int CMatLightmaps::AllocateLightmap( int width, int height,
 	pMaterial = pMaterial->GetRealTimeVersion(); //always work with the real time versions of materials internally
 	
 	// material change
-	int i;
-	int nPackCount = m_ImagePackers.Count();
+	intp i;
+	intp nPackCount = m_ImagePackers.Count();
 	if ( GetCurrentMaterialInternal() != pMaterial )
 	{
 		// If this happens, then we need to close out all image packers other than
@@ -491,7 +491,7 @@ void CMatLightmaps::AllocateLightmapTexture( int lightmap )
 	default:
 		// Not assigned m_LightmapPageTextureHandles[lightmap];
 		Warning( "AllocateLightmapTexture(%d) in unknown lightmap state (%d), skipped.\n", lightmap, m_eLightmapsState );
-		Assert( !"AllocateLightmapTexture(?) in unknown lightmap state (?)" );
+		AssertMsg( false, "AllocateLightmapTexture(?) in unknown lightmap state (?)" );
 		return;
 	}
 }
@@ -546,7 +546,7 @@ void CMatLightmaps::ReleaseLightmapPages()
 	
 	default:
 		Warning( "ReleaseLightmapPages is expected in STATE_DEFAULT, current state = %d, discarded.\n", m_eLightmapsState );
-		Assert( !"ReleaseLightmapPages is expected in STATE_DEFAULT" );
+		AssertMsg( false, "ReleaseLightmapPages is expected in STATE_DEFAULT" );
 		return;
 	}
 
@@ -569,7 +569,7 @@ void CMatLightmaps::RestoreLightmapPages()
 
 	default:
 		Warning( "RestoreLightmapPages is expected in STATE_RELEASED, current state = %d, discarded.\n", m_eLightmapsState );
-		Assert( !"RestoreLightmapPages is expected in STATE_RELEASED" );
+		AssertMsg( false, "RestoreLightmapPages is expected in STATE_RELEASED" );
 		return;
 	}
 
@@ -772,7 +772,7 @@ void CMatLightmaps::BumpedLightmapBitsToPixelWriter_HDRF( float* pFloatImage, fl
 
 // write bumped lightmap update to HDR integer lightmap
 void CMatLightmaps::BumpedLightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloatImage, float * RESTRICT pFloatImageBump1, float * RESTRICT pFloatImageBump2, 
-												 float * RESTRICT pFloatImageBump3, int pLightmapSize[2], int pOffsetIntoLightmapPage[2], FloatBitMap_t *pfmOut ) RESTRICT
+												 float * RESTRICT pFloatImageBump3, int pLightmapSize[2], int pOffsetIntoLightmapPage[2], FloatBitMap_t *pfmOut )
 {
 	const int nLightmapSize0 = pLightmapSize[0];
 	const int nLightmap0WriterSizeBytes = nLightmapSize0 * m_LightmapPixelWriter.GetPixelSize();

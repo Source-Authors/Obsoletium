@@ -920,7 +920,7 @@ inline void CVertexBuilder::AttachEnd()
 #endif
 }
 
-inline void CVertexBuilder::AttachBeginModify( IMesh* pMesh, int nFirstVertex, int nVertexCount, const MeshDesc_t &desc )
+inline void CVertexBuilder::AttachBeginModify( IMesh* pMesh, [[maybe_unused]] int nFirstVertex, int nVertexCount, const MeshDesc_t &desc )
 {
 	Assert( pMesh && (!m_pVertexBuffer) );
 
@@ -976,7 +976,7 @@ inline void CVertexBuilder::Reset()
 
 	m_pCurrPosition = m_pPosition;
 	m_pCurrNormal = m_pNormal;
-	for ( int i = 0; i < NELEMS( m_pCurrTexCoord ); i++ )
+	for ( size_t i = 0; i < std::size( m_pCurrTexCoord ); i++ )
 	{
 		m_pCurrTexCoord[i] = m_pTexCoord[i];
 	}
@@ -1967,7 +1967,7 @@ inline void CVertexBuilder::BoneWeight( int idx, float weight )
 	Assert( m_pBoneWeight );
 	Assert( IsFinite( weight ) );
 	Assert( idx >= 0 );
-	AssertOnce( m_NumBoneWeights == 2 );
+	Assert( m_NumBoneWeights == 2 || m_NumBoneWeights == 0 );
 
 	// This test is here because we store N-1 bone weights (the Nth is computed in
 	// the vertex shader as "1 - C", where C is the sum of the (N-1) other weights)
@@ -2267,8 +2267,8 @@ private:
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-inline CIndexBuilder::CIndexBuilder() : m_pIndexBuffer(0), m_nIndexCount(0), 
-	m_nIndexOffset{0}, m_nCurrentIndex(0),	m_nMaxIndexCount(0)
+inline CIndexBuilder::CIndexBuilder() : m_pIndexBuffer(0), m_nMaxIndexCount(0),
+	m_nIndexCount(0), m_nIndexOffset{0}, m_nCurrentIndex(0)
 {
 	m_nTotalIndexCount = 0;
 	m_nBufferOffset = INVALID_BUFFER_OFFSET;
@@ -2516,7 +2516,7 @@ inline void CIndexBuilder::AttachEnd()
 #endif
 }
 
-inline void CIndexBuilder::AttachBeginModify( IMesh* pMesh, int nFirstIndex, int nIndexCount, const MeshDesc_t &desc )
+inline void CIndexBuilder::AttachBeginModify( IMesh* pMesh, [[maybe_unused]] int nFirstIndex, int nIndexCount, const MeshDesc_t &desc )
 {
 	m_pIndexBuffer = pMesh;
 	m_nIndexCount = nIndexCount;
@@ -3024,19 +3024,19 @@ private:
 //-----------------------------------------------------------------------------
 // Forward compat
 //-----------------------------------------------------------------------------
-inline void CMeshBuilder::Begin( IVertexBuffer* pVertexBuffer, MaterialPrimitiveType_t type, int numPrimitives )
+inline void CMeshBuilder::Begin( IVertexBuffer* , MaterialPrimitiveType_t, int )
 {
 	Assert( 0 );
 	//	Begin( pVertexBuffer->GetMesh(), type, numPrimitives );
 }
 
-inline void CMeshBuilder::Begin( IVertexBuffer* pVertexBuffer, IIndexBuffer *pIndexBuffer, MaterialPrimitiveType_t type, int nVertexCount, int nIndexCount, int *nFirstVertex )
+inline void CMeshBuilder::Begin( IVertexBuffer*, IIndexBuffer *, MaterialPrimitiveType_t, int, int, int * )
 {
 	Assert( 0 );
 	//	Begin( pVertexBuffer->GetMesh(), type, nVertexCount, nIndexCount, nFirstVertex );
 }
 
-inline void CMeshBuilder::Begin( IVertexBuffer* pVertexBuffer, IIndexBuffer *pIndexBuffer, MaterialPrimitiveType_t type, int nVertexCount, int nIndexCount )
+inline void CMeshBuilder::Begin( IVertexBuffer*, IIndexBuffer *, MaterialPrimitiveType_t, int, int )
 {
 	Assert( 0 );
 	//	Begin( pVertexBuffer->GetMesh(), type, nVertexCount, nIndexCount );

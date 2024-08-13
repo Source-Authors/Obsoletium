@@ -177,182 +177,6 @@ void *ShaderFactory( const char *pName, int *pReturnCode )
 }
 
 //-----------------------------------------------------------------------------
-// Resource preloading for materials.
-//-----------------------------------------------------------------------------
-class CResourcePreloadMaterial : public CResourcePreload
-{
-	virtual bool CreateResource( const char *pName )
-	{
-		IMaterial *pMaterial = g_MaterialSystem.FindMaterial( pName, TEXTURE_GROUP_WORLD, false );
-		IMaterialInternal *pMatInternal = static_cast< IMaterialInternal * >( pMaterial );
-		if ( pMatInternal )
-		{
-			// always work with the realtime material internally
-			pMatInternal = pMatInternal->GetRealTimeVersion();
-
-			// tag these for later identification (prevents an unwanted purge)
-			pMatInternal->MarkAsPreloaded( true );
-			if ( !pMatInternal->IsErrorMaterial() )
-			{
-				// force material's textures to create now
-				pMatInternal->Precache();
-				return true;
-			}
-			else
-			{
-				if ( IsPosix() )
-				{
-					fprintf( stderr, "\n ##### CResourcePreloadMaterial::CreateResource can't find material %s\n", pName);
-				}
-			}
-		}
-
-		return false;
-	}
-
-	//-----------------------------------------------------------------------------
-	// Called before queued loader i/o jobs are actually performed. Must free up memory
-	// to ensure i/o requests have enough memory to succeed.  The materials that were
-	// touched by the CreateResource() are inhibited from purging (as is their textures,
-	// by virtue of ref counts), all others are candidates.  The preloaded materials
-	// are by definition zero ref'd until owned by the normal loading process. Any material
-	// that stays zero ref'd is a candidate for the post load purge.
-	//-----------------------------------------------------------------------------
-	virtual void PurgeUnreferencedResources()
-	{
-		bool bSpew = ( g_pQueuedLoader->GetSpewDetail() & LOADER_DETAIL_PURGES ) != 0;
-
-		bool bDidUncacheMaterial = false;
-		MaterialHandle_t hNext;
-		for ( MaterialHandle_t hMaterial = g_MaterialSystem.FirstMaterial(); hMaterial != g_MaterialSystem.InvalidMaterial(); hMaterial = hNext )
-		{
-			hNext = g_MaterialSystem.NextMaterial( hMaterial );
-
-			IMaterialInternal *pMatInternal = g_MaterialSystem.GetMaterialInternal( hMaterial );
-			Assert( pMatInternal->GetReferenceCount() >= 0 );
-
-			// preloaded materials are safe from this pre-purge
-			if ( !pMatInternal->IsPreloaded() )
-			{
-				// undo any possible artifical ref count
-				pMatInternal->ArtificialRelease();
-				if ( pMatInternal->GetReferenceCount() <= 0 )
-				{
-					if ( bSpew )
-					{
-						Msg( "CResourcePreloadMaterial: Purging: %s (%d)\n", pMatInternal->GetName(), pMatInternal->GetReferenceCount() );
-					}
-					bDidUncacheMaterial = true;
-					pMatInternal->Uncache();
-					pMatInternal->DeleteIfUnreferenced();
-				}
-			}
-			else
-			{
-				// clear the bit
-				pMatInternal->MarkAsPreloaded( false );
-			}
-		}
-
-		// purged materials unreference their textures
-		// purge any zero ref'd textures
-		TextureManager()->RemoveUnusedTextures();
-
-		// fixup any excluded textures, may cause some new batch requests
-		MaterialSystem()->UpdateExcludedTextures();
-	}
-
-	virtual void PurgeAll()
-	{
-		bool bSpew = ( g_pQueuedLoader->GetSpewDetail() & LOADER_DETAIL_PURGES ) != 0;
-
-		bool bDidUncacheMaterial = false;
-		MaterialHandle_t hNext;
-		for ( MaterialHandle_t hMaterial = g_MaterialSystem.FirstMaterial(); hMaterial != g_MaterialSystem.InvalidMaterial(); hMaterial = hNext )
-		{
-			hNext = g_MaterialSystem.NextMaterial( hMaterial );
-
-			IMaterialInternal *pMatInternal = g_MaterialSystem.GetMaterialInternal( hMaterial );
-			Assert( pMatInternal->GetReferenceCount() >= 0 );
-
-			pMatInternal->MarkAsPreloaded( false );
-			// undo any possible artifical ref count
-			pMatInternal->ArtificialRelease();
-			if ( pMatInternal->GetReferenceCount() <= 0 )
-			{
-				if ( bSpew )
-				{
-					Msg( "CResourcePreloadMaterial: Purging: %s (%d)\n", pMatInternal->GetName(), pMatInternal->GetReferenceCount() );
-				}
-				bDidUncacheMaterial = true;
-				pMatInternal->Uncache();
-				pMatInternal->DeleteIfUnreferenced();
-			}
-		}
-
-		// purged materials unreference their textures
-		// purge any zero ref'd textures
-		TextureManager()->RemoveUnusedTextures();
-	}
-};
-
-static CResourcePreloadMaterial s_ResourcePreloadMaterial;
-
-//-----------------------------------------------------------------------------
-// Resource preloading for cubemaps.
-//-----------------------------------------------------------------------------
-class CResourcePreloadCubemap : public CResourcePreload
-{
-	virtual bool CreateResource( const char *pName )
-	{
-		ITexture *pTexture = g_MaterialSystem.FindTexture( pName, TEXTURE_GROUP_CUBE_MAP, true );
-		ITextureInternal *pTexInternal = static_cast< ITextureInternal * >( pTexture );
-		if ( pTexInternal )
-		{
-			// There can be cubemaps that are unbound by materials. To prevent an unwanted purge,
-			// mark and increase the ref count. Otherwise the pre-purge discards these zero
-			// ref'd textures, and then the normal loading process hitches on the miss.
-			// The zombie cubemaps DO get discarded after the normal loading process completes
-			// if no material references them.
-			pTexInternal->MarkAsPreloaded( true );
-			pTexInternal->IncrementReferenceCount();
-			if ( !IsErrorTexture( pTexInternal ) )
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	//-----------------------------------------------------------------------------
-	// All valid cubemaps should have been owned by their materials.  Undo the preloaded
-	// cubemap locks. Any zero ref'd cubemaps will be purged by the normal loading path conclusion.
-	//-----------------------------------------------------------------------------
-	virtual void OnEndMapLoading( bool bAbort )
-	{
-		int iIndex = -1;
-		for ( ;; )
-		{
-			ITextureInternal *pTexInternal;
-			iIndex = TextureManager()->FindNext( iIndex, &pTexInternal );
-			if ( iIndex == -1 || !pTexInternal )
-			{
-				// end of list
-				break;
-			}
-
-			if ( pTexInternal->IsPreloaded() )
-			{
-				// undo the artificial increase
-				pTexInternal->MarkAsPreloaded( false );
-				pTexInternal->DecrementReferenceCount();
-			}
-		}	
-	}
-};
-static CResourcePreloadCubemap s_ResourcePreloadCubemap;
-
-//-----------------------------------------------------------------------------
 // Creates the debugging materials
 //-----------------------------------------------------------------------------
 void CMaterialSystem::CreateDebugMaterials()
@@ -636,7 +460,7 @@ void CMaterialSystem::SetShaderAPI( char const *pShaderAPIDLL )
 
 	// m_pShaderDLL is needed to spew driver info
 	Assert( pShaderAPIDLL );
-	int len = Q_strlen( pShaderAPIDLL ) + 1;
+	intp len = Q_strlen( pShaderAPIDLL ) + 1;
 	m_pShaderDLL = new char[len];
 	memcpy( m_pShaderDLL, pShaderAPIDLL, len );
 
@@ -774,8 +598,7 @@ void *CMaterialSystem::QueryInterface( const char *pInterfaceName )
 	if ( pInterface )
 		return pInterface;
 
-	CreateInterfaceFn factory = Sys_GetFactoryThis();	// This silly construction is necessary
-	return factory( pInterfaceName, NULL );				// to prevent the LTCG compiler from crashing.
+	return Sys_GetFactoryThis()( pInterfaceName, nullptr );
 }
 
 
@@ -809,10 +632,14 @@ InitReturnVal_t CMaterialSystem::Init()
 	if ( nRetVal != INIT_OK )
 		return nRetVal;
 
-	// NOTE! : Overbright is 1.0 so that Hammer will work properly with the white bumped and unbumped lightmaps.
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
+	MathLib_Init( 2.2f, 2.2f, 0.0f, OVERBRIGHT );
 
-	g_pShaderDeviceMgr->SetAdapter( m_nAdapter, m_nAdapterFlags );
+	if ( !g_pShaderDeviceMgr->SetAdapter( m_nAdapter, m_nAdapterFlags ) )
+	{
+		Warning( "Unable to init material system. GPU #%u with flags 0x%x not set.", m_nAdapter, m_nAdapterFlags );
+		return INIT_FAILED;
+	}
+
 	if ( g_pShaderDeviceMgr->Init( ) != INIT_OK )
 	{
 		DestroyShaderAPI();
@@ -825,13 +652,13 @@ InitReturnVal_t CMaterialSystem::Init()
 	// Shader system!
 	ShaderSystem()->Init();
 
-#if defined( WIN32 ) && !defined( _X360 )
+#if defined( WIN32 )
 	// HACKHACK: <sigh> This horrible hack is possibly the only way to reliably detect an old
 	// version of hammer initializing the material system. We need to know this so that we set
 	// up the editor materials properly. If we don't do this, we never allocate the white lightmap,
 	// for example. We can remove this when we update the SDK!!
 	char szExeName[_MAX_PATH];
-    if ( ::GetModuleFileName( ( HINSTANCE )GetModuleHandle( NULL ), szExeName, sizeof( szExeName ) ) )
+    if ( ::GetModuleFileName( GetModuleHandle( NULL ), szExeName, sizeof( szExeName ) ) )
     {
 		char szRight[20];
 		Q_StrRight( szExeName, 11, szRight, sizeof( szRight ) );
@@ -852,12 +679,6 @@ InitReturnVal_t CMaterialSystem::Init()
 #if !defined(DEDICATED)
 	CreateCompositorMaterials();
 #endif
-
-	if ( IsX360() )
-	{
-		g_pQueuedLoader->InstallLoader( RESOURCEPRELOAD_MATERIAL, &s_ResourcePreloadMaterial );
-		g_pQueuedLoader->InstallLoader( RESOURCEPRELOAD_CUBEMAP, &s_ResourcePreloadCubemap );
-	}
 
 	// Set up a default material system config
 //	GenerateConfigFromConfigKeyValues( &g_config, false );
@@ -1015,7 +836,7 @@ unsigned CMaterialSystem::GetCurrentAdapter() const
 //-----------------------------------------------------------------------------
 // Returns the device name for the current adapter
 //-----------------------------------------------------------------------------
-char *CMaterialSystem::GetDisplayDeviceName() const 
+const char *CMaterialSystem::GetDisplayDeviceName() const 
 {
 	return g_pShaderDevice->GetDisplayDeviceName();
 }
@@ -1513,7 +1334,7 @@ bool CMaterialSystem::ConvertImageFormat( unsigned char *src, enum ImageFormat s
 //-----------------------------------------------------------------------------
 // Figures out the amount of memory needed by a bitmap
 //-----------------------------------------------------------------------------
-int CMaterialSystem::GetMemRequired( int width, int height, int depth, ImageFormat format, bool mipmap )
+intp CMaterialSystem::GetMemRequired( int width, int height, int depth, ImageFormat format, bool mipmap )
 {
 	return ImageLoader::GetMemRequired( width, height, depth, format, mipmap );
 }
@@ -2060,9 +1881,9 @@ void CMaterialSystem::WriteConfigurationInfoToConVars( bool bOverwriteCommandLin
 		pConfigName += 7;
 		// check if legal
 		bool bLegalVar = false;
-		for(int i=0; i< NELEMS( pConvarsAllowedInDXSupport ) ; i++)
+		for( auto *convar : pConvarsAllowedInDXSupport )
 		{
-			if (! stricmp( pConvarsAllowedInDXSupport[i], pConfigName ) )
+			if (! stricmp( convar, pConfigName ) )
 			{
 				bLegalVar = true;
 				break;
@@ -2084,12 +1905,12 @@ void CMaterialSystem::WriteConfigurationInfoToConVars( bool bOverwriteCommandLin
 				// or the materialsystem itself
 				
 				// Yes, this causes a memory leak. Too bad!
-				int nLen = Q_strlen( pConfigName ) + 1;
+				intp nLen = Q_strlen( pConfigName ) + 1;
 				char *pString = new char[nLen];
 				Q_strncpy( pString, pConfigName, nLen );
 
 				// Actually, we need two memory leaks, or we lose the default string.
-				int nDefaultLen = Q_strlen( pKey->GetString() ) + 1;
+				intp nDefaultLen = Q_strlen( pKey->GetString() ) + 1;
 				char *pDefaultString = new char[nDefaultLen];
 				Q_strncpy( pDefaultString, pKey->GetString(), nDefaultLen );
 
@@ -2737,7 +2558,7 @@ IMaterial *CMaterialSystem::CreateMaterial( const char *pMaterialName, KeyValues
 IMaterial *CMaterialSystem::FindProceduralMaterial( const char *pMaterialName, const char *pTextureGroupName, KeyValues *pVMTKeyValues )
 {
 	// We need lower-case symbols for this to work
-	int nLen = Q_strlen( pMaterialName ) + 1;
+	intp nLen = Q_strlen( pMaterialName ) + 1;
 	char *pTemp = (char*)stackalloc( nLen );
 	Q_strncpy( pTemp, pMaterialName, nLen );
 	Q_strlower( pTemp );
@@ -2765,7 +2586,7 @@ IMaterial *CMaterialSystem::FindProceduralMaterial( const char *pMaterialName, c
 bool CMaterialSystem::IsMaterialLoaded( char const *pMaterialName )
 {
 	// We need lower-case symbols for this to work
-	int nLen = Q_strlen( pMaterialName ) + 1;
+	intp nLen = Q_strlen( pMaterialName ) + 1;
 	char *pFixedNameTemp = (char*)stackalloc( nLen );
 	char *pTemp = (char*)stackalloc( nLen );
 	Q_strncpy( pFixedNameTemp, pMaterialName, nLen );
@@ -2798,7 +2619,7 @@ IMaterial* CMaterialSystem::FindMaterial( char const *pMaterialName, const char 
 IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const char *pTextureGroupName, int nContext, bool bComplain, const char *pComplainPrefix )
 {
 	// We need lower-case symbols for this to work
-	int nLen = Q_strlen( pMaterialName ) + 1;
+	intp nLen = Q_strlen( pMaterialName ) + 1;
 	char *pFixedNameTemp = (char*)stackalloc( nLen );
 	char *pTemp = (char*)stackalloc( nLen );
 	Q_strncpy( pFixedNameTemp, pMaterialName, nLen );
@@ -2820,7 +2641,7 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 		return pExistingMaterial->GetQueueFriendlyVersion();
 
 	// It hasn't been seen yet, so let's check to see if it's in the filesystem.
-	nLen = Q_strlen( "materials/" ) + Q_strlen( pTemp ) + Q_strlen( ".vmt" ) + 1;
+	nLen = ssize( "materials/" ) - 1 + Q_strlen( pTemp ) + ssize( ".vmt" );
 	char *vmtName = (char *)stackalloc( nLen );
 
 	// Check to see if this is a UNC-specified material name
@@ -2838,7 +2659,7 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 	}
 
 	//Q_strncat( vmtName, ".vmt", nLen, COPY_ALL_CHARACTERS );
-	Assert( nLen >= (int)Q_strlen( vmtName ) + 1 );
+	Assert( nLen >= Q_strlen( vmtName ) + 1 );
 
 	CUtlVector<FileNameHandle_t> includes;
 	KeyValues *pKeyValues = new KeyValues("vmt");
@@ -2853,7 +2674,7 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 	else
 	{
 		char *matNameWithExtension;
-		nLen = Q_strlen( pTemp ) + Q_strlen( ".vmt" ) + 1;
+		nLen = Q_strlen( pTemp ) + ssize( ".vmt" );
 		matNameWithExtension = (char *)stackalloc( nLen );
 		Q_strncpy( matNameWithExtension, pTemp, nLen );
 		Q_strncat( matNameWithExtension, ".vmt", nLen, COPY_ALL_CHARACTERS );
@@ -2943,7 +2764,7 @@ ITexture *CMaterialSystem::FindTexture( char const *pTextureName, const char *pT
 	{
 		if ( IsPC() )
 		{
-			for ( int i=0; i<NELEMS( TextureAliases ); i+=2 )
+			for ( intp i=0; i<ssize( TextureAliases ); i+=2 )
 			{
 				if ( !Q_stricmp( pTextureName, TextureAliases[i] ) )
 				{
@@ -3733,7 +3554,7 @@ void CMaterialSystem::EndFrame( void )
 
 			CMatQueuedRenderContext *pPrevContext = &m_QueuedRenderContexts[m_iCurQueuedContext];
 
-			m_iCurQueuedContext = ( ( m_iCurQueuedContext + 1 ) % ARRAYSIZE( m_QueuedRenderContexts) );
+			m_iCurQueuedContext = ( ( m_iCurQueuedContext + 1 ) % ssize( m_QueuedRenderContexts) );
 			m_QueuedRenderContexts[m_iCurQueuedContext].BeginQueue( pPrevContext );
 			m_pRenderContext.Set( &m_QueuedRenderContexts[m_iCurQueuedContext] );
 
@@ -4524,7 +4345,7 @@ ITexture *CMaterialSystem::CreateNamedRenderTargetTextureEx2(
 class CTextureBitsRegenerator : public ITextureRegenerator
 {
 public:
-	CTextureBitsRegenerator( int w, int h, int mips, ImageFormat fmt, int srcBufferSize, byte* srcBits )
+	CTextureBitsRegenerator( int w, int h, int mips, ImageFormat fmt, intp srcBufferSize, byte* srcBits )
 		: m_nWidth( w )
 		, m_nHeight( h )
 		, m_nMipmaps( mips )
@@ -4542,6 +4363,7 @@ public:
 		m_ImageData.EnsureCapacity( srcBufferSize );
 		Q_memcpy( m_ImageData.Base(), srcBits, srcBufferSize );
 	}
+	virtual ~CTextureBitsRegenerator() {}
 
 	virtual void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pRect )
 	{
@@ -4564,8 +4386,8 @@ public:
 		{
 			int srcResX = m_nWidth;
 			int srcResY = m_nHeight;
-			int srcOffset = 0;
-			int dstOffset = 0;
+			intp srcOffset = 0;
+			intp dstOffset = 0;
 			int mip = 0;
 
 			// Skip the mips we're not including.
@@ -4736,134 +4558,6 @@ void CMaterialSystem::UpdateLightmap( int lightmapPageID, int lightmapSize[2],
 		ExecuteOnce( DebuggerBreakIfDebugging() );
 	}
 }
-
-//-----------------------------------------------------------------------------------------------------
-// 360 TTF Font Support
-//-----------------------------------------------------------------------------------------------------
-#if defined( _X360 )
-HXUIFONT CMaterialSystem::OpenTrueTypeFont( const char *pFontname, int tall, int style )
-{
-	MaterialLock_t hLock = Lock();
-	HXUIFONT result = g_pShaderAPI->OpenTrueTypeFont( pFontname, tall, style );
-	Unlock( hLock );
-	return result;
-}
-void CMaterialSystem::CloseTrueTypeFont( HXUIFONT hFont )
-{
-	MaterialLock_t hLock = Lock();
-	g_pShaderAPI->CloseTrueTypeFont( hFont );
-	Unlock( hLock );
-}
-bool CMaterialSystem::GetTrueTypeFontMetrics( HXUIFONT hFont, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] )
-{
-	MaterialLock_t hLock = Lock();
-	bool result = g_pShaderAPI->GetTrueTypeFontMetrics( hFont, pFontMetrics, charMetrics );
-	Unlock( hLock );
-	return result;
-}
-bool CMaterialSystem::GetTrueTypeGlyphs( HXUIFONT hFont, int numChars, wchar_t *pWch, int *pOffsetX, int *pOffsetY, int *pWidth, int *pHeight, unsigned char *pRGBA, int *pRGBAOffset )
-{
-	MaterialLock_t hLock = Lock();
-	bool result = g_pShaderAPI->GetTrueTypeGlyphs( hFont, numChars, pWch, pOffsetX, pOffsetY, pWidth, pHeight, pRGBA, pRGBAOffset );
-	Unlock( hLock );
-	return result;
-}
-#endif
-
-//-----------------------------------------------------------------------------------------------------
-// 360 Back Buffer access. Due to hardware, RT data must be blitted from EDRAM
-// and converted.
-//-----------------------------------------------------------------------------------------------------
-#if defined( _X360 )
-void CMaterialSystem::ReadBackBuffer( Rect_t *pSrcRect, Rect_t *pDstRect, unsigned char *pDstData, ImageFormat dstFormat, int dstStride ) 
-{
-	Assert( pSrcRect && pDstRect && pDstData );
-
-	int fbWidth, fbHeight;
-	g_pShaderAPI->GetBackBufferDimensions( fbWidth, fbHeight ); 
-
-	if ( pDstRect->width > fbWidth || pDstRect->height > fbHeight )
-	{
-		Assert( 0 );
-		return;
-	}
-
-	// intermediate results will be placed at (0,0)
-	Rect_t	rect;
-	rect.x = 0;
-	rect.y = 0;
-	rect.width = pDstRect->width;
-	rect.height = pDstRect->height;
-
-	ITexture *pTempRT;
-	bool bStretch = ( pSrcRect->width != pDstRect->width || pSrcRect->height != pDstRect->height );
-	if ( !bStretch )
-	{
-		// hijack an unused RT (no surface required) for 1:1 resolve work, fastest path
-		pTempRT = FindTexture( "_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET );
-	}
-	else
-	{
-		// hijack an unused RT (with surface abilities) for stretch work, slower path
-		pTempRT = FindTexture( "_rt_WaterReflection", TEXTURE_GROUP_RENDER_TARGET );
-	}
-
-	Assert( !pTempRT->IsError() && pDstRect->width <= pTempRT->GetActualWidth() && pDstRect->height <= pTempRT->GetActualHeight() );
-	GetRenderContextInternal()->CopyRenderTargetToTextureEx( pTempRT, 0, pSrcRect, &rect );
-
-	// access the RT bits
-	CPixelWriter writer;
-	g_pShaderAPI->ModifyTexture( ((ITextureInternal*)pTempRT)->GetTextureHandle( 0 ) );
-	if ( !g_pShaderAPI->TexLock( 0, 0, 0, 0, pTempRT->GetActualWidth(), pTempRT->GetActualHeight(), writer ) )
-		return;
-
-	// this will be adequate for non-block formats
-	int srcStride = pTempRT->GetActualWidth() * ImageLoader::SizeInBytes( pTempRT->GetImageFormat() );
-
-	// untile intermediate RT in place to achieve linear access
-	XGUntileTextureLevel(
-		pTempRT->GetActualWidth(),
-		pTempRT->GetActualHeight(),
-		0,
-		XGGetGpuFormat( ImageLoader::ImageFormatToD3DFormat( pTempRT->GetImageFormat() ) ),
-		0,
-		(char*)writer.GetPixelMemory(),
-		srcStride,
-		NULL,
-		writer.GetPixelMemory(),
-		NULL );
-
-	// swap back to x86 order as expected by image conversion
-	ImageLoader::ByteSwapImageData( (unsigned char*)writer.GetPixelMemory(), srcStride*pTempRT->GetActualHeight(), pTempRT->GetImageFormat() );
-
-	// convert to callers format
-	Assert( dstFormat == IMAGE_FORMAT_RGB888 );
-	ImageLoader::ConvertImageFormat( (unsigned char*)writer.GetPixelMemory(), pTempRT->GetImageFormat(), pDstData, dstFormat, pDstRect->width, pDstRect->height, srcStride, dstStride );
-
-	g_pShaderAPI->TexUnlock();
-}
-#endif
-
-#if defined( _X360 )
-void CMaterialSystem::PersistDisplay() 
-{
-	g_pShaderAPI->PersistDisplay();
-}
-#endif
-
-#if defined( _X360 )
-void *CMaterialSystem::GetD3DDevice() 
-{
-	return g_pShaderAPI->GetD3DDevice();
-}
-#endif
-
-#if defined( _X360 )
-bool CMaterialSystem::OwnGPUResources( bool bEnable ) 
-{
-	return g_pShaderAPI->OwnGPUResources( bEnable );
-}
-#endif
 
 //-----------------------------------------------------------------------------------------------------
 //
@@ -5272,7 +4966,7 @@ void CMaterialSystem::InitReplacementsFromFile( const char *pszPathName )
 
 void CMaterialSystem::PreloadReplacements( )
 {
-	int nIndex = m_Replacements.First();
+	auto nIndex = m_Replacements.First();
 	while( m_Replacements.IsValidIndex( nIndex ) )
 	{
 		m_Replacements.Element( nIndex )->deleteThis();
@@ -5309,7 +5003,7 @@ IMaterialProxy *CMaterialSystem::DetermineProxyReplacements( IMaterial *pMateria
 	const char *pszShadername = pFallbackKeyValues->GetName();
 
 	V_strcpy_safe( szLastPath, pszMaterialName );
-	int	nLength = strlen( szLastPath ) - strlen( REPLACEMENT_NAME );
+	intp nLength = V_strlen( szLastPath ) - V_strlen( REPLACEMENT_NAME );
 	if ( nLength > 0 && strcmpi( &szLastPath[ nLength ], REPLACEMENT_NAME  ) == 0 )
 	{
 		return NULL;
@@ -5559,7 +5253,7 @@ static int ReadListFromFile(CUtlVector<char*>* outReplacementMaterials, const ch
 		return 0;
 
 	const char* seps[] = { "\r", "\r\n", "\n" };
-	V_SplitString2( (char*)fileContents.Base(), seps, ARRAYSIZE(seps), *outReplacementMaterials );
+	V_SplitString2( fileContents.Base<char>(), seps, ssize(seps), *outReplacementMaterials );
 
 
 	return outReplacementMaterials->Count();

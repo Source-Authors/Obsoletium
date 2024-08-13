@@ -98,7 +98,7 @@ struct TexDimensions_t
 	uint16 m_nMipCount;
 	uint16 m_nDepth;
 
-	TexDimensions_t( uint16 nWidth = 0, uint nHeight = 0, uint nMipCount = 0, uint16 nDepth = 1 )
+	TexDimensions_t( uint16 nWidth = 0, uint16 nHeight = 0, uint16 nMipCount = 0, uint16 nDepth = 1 )
 	: m_nWidth( nWidth )
 	, m_nHeight( nHeight )
 	, m_nMipCount( nMipCount )
@@ -291,7 +291,7 @@ public:
 	// the texture goes away - you want to copy this data!
 	virtual void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const;
 
-	virtual int GetApproximateVidMemBytes( void ) const;
+	virtual intp GetApproximateVidMemBytes( void ) const;
 
 	// Stretch blit the framebuffer into this texture.
 	virtual void CopyFrameBufferToMe( int nRenderTargetID = 0, Rect_t *pSrcRect = NULL, Rect_t *pDstRect = NULL );
@@ -569,14 +569,14 @@ public:
 	CTextureStreamingJob( CTexture* pTex ) : m_referenceCount( 0 ), m_pOwner( pTex ) { Assert( m_pOwner != NULL ); m_pOwner->AddRef(); } 
 	virtual ~CTextureStreamingJob() { SafeRelease( &m_pOwner ); }
 
-	virtual int AddRef() OVERRIDE { return ++m_referenceCount; }
-	virtual int Release() OVERRIDE { int retVal = --m_referenceCount; Assert( retVal >= 0 ); if ( retVal == 0 ) { delete this; } return retVal; }
-	virtual int GetRefCount() const OVERRIDE { return m_referenceCount; }
+	virtual int AddRef() override { return ++m_referenceCount; }
+	virtual int Release() override { int retVal = --m_referenceCount; Assert( retVal >= 0 ); if ( retVal == 0 ) { delete this; } return retVal; }
+	virtual int GetRefCount() const override { return m_referenceCount; }
 
-	virtual void OnAsyncCreateComplete( ITexture* pTex, void* pExtraArgs ) OVERRIDE { Assert( !"unimpl" ); }
-	virtual void OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs ) OVERRIDE;
-	virtual void OnAsyncMapComplete( ITexture* pTex, void* pExtraArgs, void* pMemory, int nPitch ) { Assert( !"unimpl" ); }
-	virtual void OnAsyncReadbackBegin( ITexture* pDst, ITexture* pSrc, void* pExtraArgs ) OVERRIDE { Assert( !"unimpl" ); }
+	virtual void OnAsyncCreateComplete( ITexture* pTex, void* pExtraArgs ) override { AssertMsg( false, "unimpl" ); }
+	virtual void OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs ) override;
+	virtual void OnAsyncMapComplete( ITexture* pTex, void* pExtraArgs, void* pMemory, int nPitch ) { AssertMsg( false, "unimpl" ); }
+	virtual void OnAsyncReadbackBegin( ITexture* pDst, ITexture* pSrc, void* pExtraArgs ) override { AssertMsg( false, "unimpl" ); }
 
 	void ForgetOwner( ITextureInternal* pTex ) { Assert( pTex == m_pOwner ); SafeRelease( &m_pOwner ); }
 
@@ -659,7 +659,7 @@ public:
 	// the texture goes away - you want to copy this data!
 	virtual void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const { return NULL; }
 
-	virtual int GetApproximateVidMemBytes( void ) const { return 32; }
+	virtual intp GetApproximateVidMemBytes( void ) const { return 32; }
 
 	// Stretch blit the framebuffer into this texture.
 	virtual void CopyFrameBufferToMe( int nRenderTargetID = 0, Rect_t *pSrcRect = NULL, Rect_t *pDstRect = NULL ) { NULL; }
@@ -697,10 +697,10 @@ public:
 	// Save texture to a file.
 	virtual bool SaveToFile( const char *fileName ) { return false; }
 
-	virtual bool AsyncReadTextureFromFile( IVTFTexture* pVTFTexture, unsigned int nAdditionalCreationFlags ) { Assert( !"Should never get here." ); return false; }
-	virtual void AsyncCancelReadTexture() { Assert( !"Should never get here." ); }
+	virtual bool AsyncReadTextureFromFile( IVTFTexture* pVTFTexture, unsigned int nAdditionalCreationFlags ) { AssertMsg( false, "Should never get here." ); return false; }
+	virtual void AsyncCancelReadTexture() { AssertMsg( false, "Should never get here." ); }
 
-	virtual void CopyToStagingTexture( ITexture* pDstTex ) { Assert( !"Should never get here." ); };
+	virtual void CopyToStagingTexture( ITexture* pDstTex ) { AssertMsg( false, "Should never get here." ); };
 
 	// Map and unmap. These can fail. And can cause a very significant perf penalty. Be very careful with them.
 	virtual void Map( void** pOutBits, int* pOutPitch ) { }
@@ -708,7 +708,7 @@ public:
 
 	virtual ResidencyType_t GetCurrentResidence() const { return RESIDENT_FULL; }
 	virtual ResidencyType_t GetTargetResidence() const { return RESIDENT_FULL; }
-	virtual bool MakeResident( ResidencyType_t newResidence ) { Assert( !"Unimpl" ); return true; }
+	virtual bool MakeResident( ResidencyType_t newResidence ) { AssertMsg( false, "Unimpl" ); return true; }
 	virtual void UpdateLodBias() {}
 
 	virtual void SetErrorTexture( bool isErrorTexture ) { }
@@ -746,10 +746,10 @@ public:
 };
 
 CReferenceToHandleTexture::CReferenceToHandleTexture() :
-	m_hTexture( INVALID_SHADERAPI_TEXTURE_HANDLE ),
 #ifdef _DEBUG
 	m_pDebugName( NULL ),
 #endif
+	m_hTexture( INVALID_SHADERAPI_TEXTURE_HANDLE ),
 	m_nRefCount( 0 )
 {
 }
@@ -779,7 +779,7 @@ void CReferenceToHandleTexture::SetName( char const *szName )
 	{
 		delete [] m_pDebugName;
 	}
-	int nLen = V_strlen( szCleanName ) + 1;
+	intp nLen = V_strlen( szCleanName ) + 1;
 	m_pDebugName = new char[nLen];
 	V_memcpy( m_pDebugName, szCleanName, nLen );
 #endif
@@ -929,7 +929,7 @@ void ITextureInternal::Destroy( ITextureInternal *pTex, bool bSkipTexMgrCheck )
 		}
 	#endif
 
-	int iIndex = g_pTextureRefList->Find( static_cast<ITexture*>( pTex ) );
+	auto iIndex = g_pTextureRefList->Find( static_cast<ITexture*>( pTex ) );
 	if ( iIndex != g_pTextureRefList->InvalidIndex () )
 	{
 		if ( g_pTextureRefList->Element(iIndex) != 0 )
@@ -1015,9 +1015,16 @@ CTexture::~CTexture()
 	}
 #endif
 
+	// dimhotepus: Allow UB only in DEBUG.
+#ifdef _DEBUG
 	// Deliberately stomp our VTable so that we can detect cases where code tries to access freed materials.
-	int *p = (int *)this;
-	*p = 0xdeadbeef;
+	uintp *p = (uintp *)this;
+#ifdef PLATFORM_64BITS
+	*p = 0xdeadbeefdeadbeefU;
+#else
+	*p = 0xdeadbeefU;
+#endif
+#endif
 }
 
 
@@ -1120,7 +1127,7 @@ void CTexture::ReleaseMemory()
 
 IVTFTexture *CTexture::GetScratchVTFTexture( )
 {
-	const bool cbThreadInMatQueue = ( MaterialSystem()->GetRenderThreadId() == ThreadGetCurrentId() ); cbThreadInMatQueue;
+	[[maybe_unused]] const bool cbThreadInMatQueue = ( MaterialSystem()->GetRenderThreadId() == ThreadGetCurrentId() );
 	Assert( cbThreadInMatQueue || ThreadInMainThread() );
 
 	const int ti = GetThreadId();
@@ -1134,7 +1141,7 @@ void CTexture::ReleaseScratchVTFTexture( IVTFTexture* tex )
 {
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
-	const bool cbThreadInMatQueue = ( MaterialSystem()->GetRenderThreadId() == ThreadGetCurrentId() ); cbThreadInMatQueue;
+	[[maybe_unused]] const bool cbThreadInMatQueue = ( MaterialSystem()->GetRenderThreadId() == ThreadGetCurrentId() );
 	Assert( cbThreadInMatQueue || ThreadInMainThread() );
 	Assert( m_pStreamingVTF == NULL || ThreadInMainThread() );	// Can only manipulate m_pStreamingVTF to release safely in main thread.
 
@@ -1342,7 +1349,7 @@ void CTexture::CopyToStagingTexture( ITexture* pDstTex )
 	// Then do the copy if everything is on the up and up.
 	if ( ( m_pTextureHandles == NULL || m_nFrameCount == 0 ) || ( pDstTexActual->m_pTextureHandles == NULL || pDstTexActual->m_nFrameCount == 0 ) ) 
 	{
-		Assert( !"Can't copy to a non-existent texture, may need to generate or something." );
+		AssertMsg( false, "Can't copy to a non-existent texture, may need to generate or something." );
 		return;
 	}
 
@@ -1362,7 +1369,7 @@ void CTexture::Map( void** pOutBits, int* pOutPitch )
 
 	if ( m_pTextureHandles == NULL || m_nFrameCount == 0 )
 	{
-		Assert( !"Can't map a non-existent texture, may need to generate or something." );
+		AssertMsg( false, "Can't map a non-existent texture, may need to generate or something." );
 		return;
 	}
 
@@ -1373,7 +1380,7 @@ void CTexture::Unmap()
 {
 	if ( m_pTextureHandles == NULL || m_nFrameCount == 0 )
 	{
-		Assert( !"Can't unmap a non-existent texture, may need to generate or something." );
+		AssertMsg( false, "Can't unmap a non-existent texture, may need to generate or something." );
 		return;
 	}
 
@@ -1405,7 +1412,7 @@ bool CTexture::MakeResident( ResidencyType_t newResidence )
 		return MakeFullyResident();
 
 	default:
-		Assert( !"Missing switch statement" );
+		AssertMsg( false, "Missing switch statement" );
 	};
 
 	return false;
@@ -1910,7 +1917,7 @@ bool CTexture::AllocateShaderAPITextures()
 		Assert( nCount == 1 );
 
 		char debugName[128];
-		Q_snprintf( debugName, ARRAYSIZE( debugName ), "%s_ZBuffer", GetName() );
+		Q_snprintf( debugName, ssize( debugName ), "%s_ZBuffer", GetName() );
 		Assert( m_nFrameCount >= 2 );
 		m_pTextureHandles[1] = g_pShaderAPI->CreateDepthTexture( 
 				m_ImageFormat, 
@@ -2583,7 +2590,7 @@ void CTexture::SetName( const char* pName )
 	{
 		delete [] m_pDebugName;
 	}
-	int nLen = V_strlen( szCleanName ) + 1;
+	intp nLen = V_strlen( szCleanName ) + 1;
 	m_pDebugName = new char[nLen];
 	V_memcpy( m_pDebugName, szCleanName, nLen );
 #endif
@@ -3262,7 +3269,7 @@ IVTFTexture *CTexture::LoadTextureBitsFromFile( char *pCacheFileName, char **ppR
 	LoadLowResTexture( pVTFTexture );
 
 	// Load the resources
-	if ( unsigned int uiRsrcCount = pVTFTexture->GetResourceTypes( NULL, 0 ) )
+	if ( uintp uiRsrcCount = pVTFTexture->GetResourceTypes( NULL, 0 ) )
 	{
 		uint32 *arrRsrcTypes = ( uint32 * )_alloca( uiRsrcCount * sizeof( unsigned int ) );
 		pVTFTexture->GetResourceTypes( arrRsrcTypes, uiRsrcCount );
@@ -3396,7 +3403,7 @@ void CTexture::GetDownloadFaceCount( int &nFirstFace, int &nFaceCount )
 //-----------------------------------------------------------------------------
 // Fixup a queue loaded texture with the delayed hi-res data
 //-----------------------------------------------------------------------------
-void CTexture::FixupTexture( const void *pData, int nSize, LoaderError_t loaderError )
+void CTexture::FixupTexture( const void *pData, [[maybe_unused]] int nSize, LoaderError_t loaderError )
 {
 	if ( loaderError != LOADERERROR_NONE )
 	{
@@ -3488,7 +3495,7 @@ void CTexture::ReconstructPartialTexture( const Rect_t *pRect )
 	GetDownloadFaceCount( nFirstFace, nFaceCount );
 	
 	// Blit down portions of the various VTF frames into the board memory
-	int nStride;
+	intp nStride;
 	Rect_t mipRect;
 	for ( int iFrame = 0; iFrame < m_nFrameCount; ++iFrame )
 	{
@@ -3655,7 +3662,7 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 			NotifyUnloadedFile();
 
 			char pCacheFileName[ MATERIAL_MAX_PATH ] = { 0 };
-			GetCacheFilename( pCacheFileName, ARRAYSIZE( pCacheFileName ) );
+			GetCacheFilename( pCacheFileName, ssize( pCacheFileName ) );
 		
 			// Get the data from disk...
 			// NOTE: Reloading the texture bits can cause the texture size, frames, format, pretty much *anything* can change.
@@ -3724,7 +3731,7 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 	} 
 	else if ( bCopyFromCurrent )
 	{
-		Assert( !"We're about to crash, last chance to examine this texture." );
+		AssertMsg( false, "We're about to crash, last chance to examine this texture." );
 	}
 
 
@@ -3928,7 +3935,7 @@ void CTexture::GetLowResColorSample( float s, float t, float *color ) const
 	color[2] = sColor[0][2] * ( 1.0f - fracT ) + sColor[1][2] * fracT;
 }
 
-int CTexture::GetApproximateVidMemBytes( void ) const
+intp CTexture::GetApproximateVidMemBytes( void ) const
 {
 	ImageFormat format = GetImageFormat();
 	int width = GetActualWidth();
@@ -4138,9 +4145,9 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 		// restrict read to the header only!
 		// header provides info to avoid reading the entire file
 		int nBytesOptimalRead = GetOptimalReadBuffer( &buf, hFile, nHeaderSize );
-		int nBytesRead = g_pFullFileSystem->ReadEx( buf.Base(), nBytesOptimalRead, Min( nHeaderSize, ( int ) g_pFullFileSystem->Size( hFile ) ), hFile ); // only read as much as the file has
+		int nBytesRead = g_pFullFileSystem->ReadEx( buf.Base(), nBytesOptimalRead, Min( nHeaderSize, ( unsigned ) g_pFullFileSystem->Size( hFile ) ), hFile ); // only read as much as the file has
 		buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
-		nBytesRead = nHeaderSize = ( ( VTFFileBaseHeader_t * ) buf.Base() )->headerSize;
+		nBytesRead = nHeaderSize = ( buf.Base<VTFFileBaseHeader_t>() )->headerSize;
 		g_pFullFileSystem->Seek( hFile, nHeaderSize, FILESYSTEM_SEEK_HEAD );
 	}
 
@@ -4169,12 +4176,12 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - ReadDataFromFile", __FUNCTION__ );
 
 	// Determine how much of the file to read in
-	int nFileSize = ( *ppOutVtfTexture )->FileSize( nMipSkipCount );
-	int nActualFileSize = (int)g_pFullFileSystem->Size( hFile );
+	intp nFileSize = ( *ppOutVtfTexture )->FileSize( nMipSkipCount );
+	intp nActualFileSize = (intp)g_pFullFileSystem->Size( hFile );
 	if ( nActualFileSize < nFileSize )
 	{
 		if ( mat_spew_on_texture_size.GetInt() )
-			DevMsg( "Bad VTF data for %s, expected file size:%d actual file size:%d \n", pCacheFileName, nFileSize, nActualFileSize );
+			DevMsg( "Bad VTF data for %s, expected file size:%zd actual file size:%zd \n", pCacheFileName, nFileSize, nActualFileSize );
 		nFileSize = nActualFileSize;
 	}
 
@@ -4656,11 +4663,10 @@ CP4Requirement::CP4Requirement() :
 		
 	if ( m_pP4Module )
 	{
-		CreateInterfaceFn factory = Sys_GetFactory( m_pP4Module );
+		CreateInterfaceFnT<IP4> factory = Sys_GetFactory<IP4>( m_pP4Module );
 		if ( factory )
 		{
-			p4 = ( IP4 * )factory( P4_INTERFACE_VERSION, NULL );
-
+			p4 = factory( P4_INTERFACE_VERSION, NULL );
 			if ( p4 )
 			{
 				extern CreateInterfaceFn g_fnMatSystemConnectCreateInterface;
@@ -4702,10 +4708,12 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 {
 	using namespace TextureLodOverride;
 
+	const char *szCmd = nullptr;
+
 	if ( args.ArgC() != 2 )
 		goto usage;
 
-	char const *szCmd = args.Arg( 1 );
+	szCmd = args.Arg( 1 );
 	Msg( "mat_texture_list_txlod_sync %s...\n", szCmd );
 
 	if ( !stricmp( szCmd, "reset" ) )
@@ -4797,14 +4805,14 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 				// Have tga - pump in the txt file
 				sprintf( pExtPut, ".txt" );
 				
-				CUtlBuffer bufTxtFileBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+				CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 				g_pFullFileSystem->ReadFile( szTextureContentPath, 0, bufTxtFileBuffer );
 				for ( int kCh = 0; kCh < 1024; ++kCh ) bufTxtFileBuffer.PutChar( 0 );
 
 				// Now fix maxwidth/maxheight settings
-				SetBufferValue( ( char * ) bufTxtFileBuffer.Base(), "maxwidth", chMaxWidth );
-				SetBufferValue( ( char * ) bufTxtFileBuffer.Base(), "maxheight", chMaxHeight );
-				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( ( char * ) bufTxtFileBuffer.Base() ) );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxwidth", chMaxWidth );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxheight", chMaxHeight );
+				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 				// Check out or add the file
 				g_p4factory->SetOpenFileChangeList( "Texture LOD Autocheckout" );
@@ -4836,14 +4844,14 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 				ShellExecute( NULL, NULL, "cmd.exe", chCommand, NULL, SW_HIDE );
 				ThreadSleep( 200 );
 
-				CUtlBuffer bufTxtFileBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+				CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 				g_pFullFileSystem->ReadFile( szTxtFileName, 0, bufTxtFileBuffer );
 				for ( int kCh = 0; kCh < 1024; ++ kCh ) bufTxtFileBuffer.PutChar( 0 );
 
 				// Now fix maxwidth/maxheight settings
-				SetBufferValue( ( char * ) bufTxtFileBuffer.Base(), "maxwidth", chMaxWidth );
-				SetBufferValue( ( char * ) bufTxtFileBuffer.Base(), "maxheight", chMaxHeight );
-				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( ( char * ) bufTxtFileBuffer.Base() ) );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxwidth", chMaxWidth );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxheight", chMaxHeight );
+				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 				// Check out or add the file
 				// Save the file contents

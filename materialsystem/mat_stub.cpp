@@ -269,7 +269,7 @@ public:
 	virtual void Download( Rect_t *pRect = 0, int nAdditionalCreationFlags = 0 ) {}
 
 	// Uses for stats. . .get the approximate size of the texture in it's current format.
-	virtual int GetApproximateVidMemBytes( void ) const { return 64; }
+	virtual intp GetApproximateVidMemBytes( void ) const { return 64; }
 
 	virtual bool IsError() const { return false; }
 
@@ -744,7 +744,7 @@ public:
 	}
 
 	// Can't be const because the material might have to precache itself.
-	virtual int				GetTextureMemoryBytes( void )
+	virtual intp				GetTextureMemoryBytes( void )
 	{
 		return 64;
 	}
@@ -845,7 +845,7 @@ public:
 		m_pRealMaterialSystem = 0;
 	}
 
-	virtual void	SetRealMaterialSystem( IMaterialSystem *pSys )
+	void	SetRealMaterialSystem( IMaterialSystem *pSys ) override
 	{
 		m_pRealMaterialSystem = pSys;
 	}
@@ -853,19 +853,19 @@ public:
 	
 	// Call this to initialize the material system
 	// returns a method to create interfaces in the shader dll
-	virtual CreateInterfaceFn	Init( char const* pShaderDLL, 
+	CreateInterfaceFn	Init( char const* pShaderDLL, 
 									  IMaterialProxyFactory *pMaterialProxyFactory,
 									  CreateInterfaceFn fileSystemFactory,
-									  CreateInterfaceFn cvarFactory )
+									  CreateInterfaceFn cvarFactory ) override
 	{
 		return DummyMaterialSystemFactory;
 	}
 
-	virtual void				Shutdown( )
+	void				Shutdown( ) override
 	{
 	}
 
-	virtual IMaterialSystemHardwareConfig *GetHardwareConfig( const char *pVersion, int *returnCode )
+	IMaterialSystemHardwareConfig *GetHardwareConfig( const char *pVersion, int *returnCode ) override
 	{
 		if ( returnCode )
 			*returnCode = 1;
@@ -950,7 +950,7 @@ public:
 	// returns InvalidMaterial if there isn't another material.
 	// WARNING: you must call GetNextMaterial until it returns NULL, 
 	// otherwise there will be a memory leak.
-	virtual MaterialHandle_t	NextMaterial( MaterialHandle_t h ) const
+	MaterialHandle_t	NextMaterial( MaterialHandle_t h ) const override
 	{
 		return 0;
 	}
@@ -1139,7 +1139,7 @@ public:
 	}
 
 	// returns the sorting id for this surface
-	virtual int					AllocateWhiteLightmap( IMaterial *pMaterial )
+	int					AllocateWhiteLightmap( IMaterial *pMaterial ) override
 	{
 		return 0;
 	}
@@ -1352,7 +1352,7 @@ public:
 	// end matrix api
 
 	// Sets/gets the viewport
-	virtual void				Viewport( int x, int y, int width, int height )
+	void				Viewport( int x, int y, int width, int height ) override
 	{
 	}
 	virtual void				GetViewport( int& x, int& y, int& width, int& height ) const
@@ -1528,7 +1528,7 @@ public:
 	}
 	
 	// Installs a function to be called when we need to release vertex buffers + textures
-	virtual void AddReleaseFunc( MaterialBufferReleaseFunc_t func )
+	void AddReleaseFunc( MaterialBufferReleaseFunc_t func ) override
 	{
 	}
 	virtual void RemoveReleaseFunc( MaterialBufferReleaseFunc_t func )
@@ -1753,10 +1753,10 @@ public:
 		static MaterialSystemHardwareIdentifier_t dummy;
 		return dummy;
 	}
-	virtual void AddModeChangeCallBack( ModeChangeCallbackFunc_t func )
+	void AddModeChangeCallBack( ModeChangeCallbackFunc_t func ) override
 	{
 	}
-	virtual void RemoveModeChangeCallBack( ModeChangeCallbackFunc_t func )
+	void RemoveModeChangeCallBack( ModeChangeCallbackFunc_t func ) override
 	{
 	}
 	virtual bool GetRecommendedConfigurationInfo( int nDxLevel, KeyValues *pKeyValues )
@@ -1794,7 +1794,7 @@ public:
 		return 0;
 	}
 
-	virtual char *GetDisplayDeviceName() const OVERRIDE
+	const char *GetDisplayDeviceName() const override
 	{
 		return "";
 	}
@@ -2049,7 +2049,7 @@ public:
 	}
 
 	virtual void EnableColorCorrection( bool bEnable ) {}
-	virtual ColorCorrectionHandle_t AddLookup( const char *pName ) { return 0; }
+	ColorCorrectionHandle_t AddLookup( const char *pName ) override { return 0; }
 	virtual bool RemoveLookup( ColorCorrectionHandle_t handle ) { return true; }
 	virtual void LockLookup( ColorCorrectionHandle_t handle ) {}
 	virtual void LoadLookup( ColorCorrectionHandle_t handle, const char *pLookupName ) {}
@@ -2086,7 +2086,7 @@ public:
 		max_dxlevel=recommended_dxlevel=90;
 	}
 
-	virtual bool UsingFastClipping( void )
+	bool UsingFastClipping( void ) override
 	{
 		return true; //true for "crappier" hardware, so true is safer than false
 	}
@@ -2224,16 +2224,16 @@ public:
 	virtual void Draw( MaterialPrimitiveType_t primitiveType, int nFirstIndex, int nIndexCount )
 	{
 	}
-	virtual void BeginMorphAccumulation()
+	void BeginMorphAccumulation() override
 	{
 	}
-	virtual void EndMorphAccumulation()
+	void EndMorphAccumulation() override
 	{
 	}
-	virtual void AccumulateMorph( IMorph* pMorph, int nMorphCount, const MorphWeight_t* pWeights )
+	void AccumulateMorph( IMorph* pMorph, int nMorphCount, const MorphWeight_t* pWeights ) override
 	{
 	}
-	virtual bool GetMorphAccumulatorTexCoord( Vector2D *pTexCoord, IMorph *pMorph, int nVertex )
+	bool GetMorphAccumulatorTexCoord( Vector2D *pTexCoord, IMorph *pMorph, int nVertex ) override
 	{
 		pTexCoord->Init();
 		return false;
@@ -2267,39 +2267,8 @@ public:
 	virtual void *			LockRenderData( int nSizeInBytes ) { return NULL; }
 	virtual void			UnlockRenderData( void *pData ) {}
 	virtual bool			IsRenderData( const void *pData ) const { return false; }
-	virtual void			AddRefRenderData() {}
-	virtual void			ReleaseRenderData() {}
-#if defined( _X360 )
-	virtual void				ListUsedMaterials( void ) {}
-	virtual HXUIFONT			OpenTrueTypeFont( const char *pFontname, int tall, int style )
-	{
-		return (HXUIFONT)0;
-	}
-	virtual void				CloseTrueTypeFont( HXUIFONT hFont ) {}
-	virtual bool				GetTrueTypeFontMetrics( HXUIFONT hFont, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] ) 
-	{
-		pFontMetrics->fLineHeight = 0.0f;
-		pFontMetrics->fMaxAscent = 0.0f;
-		pFontMetrics->fMaxDescent = 0.0f;
-		pFontMetrics->fMaxWidth = 0.0f;
-		pFontMetrics->fMaxHeight = 0.0f;
-		pFontMetrics->fMaxAdvance = 0.0f;
-		return true;
-	}
-
-	virtual bool				GetTrueTypeGlyphs( HXUIFONT hFont, int numChars, wchar_t *pWch, int *pOffsetX, int *pOffsetY, int *pWidth, int *pHeight, unsigned char *pRGBA, int *pRGBAOffset )
-	{
-		return false;
-	}
-
-	virtual void				PersistDisplay() {}
-	virtual void				*GetD3DDevice() { return NULL; }
-
-	virtual void				PushVertexShaderGPRAllocation( int iVertexShaderCount = 64 ) { };
-	virtual void				PopVertexShaderGPRAllocation( void ) { };
-
-	virtual bool				OwnGPUResources( bool bEnable ) { return false; }
-#endif
+	virtual void			AddRefRenderData() override {}
+	virtual void			ReleaseRenderData() override {}
 
 	virtual void				CompactMemory() {}
 
@@ -2312,11 +2281,11 @@ public:
 	virtual void				Printf( const char *fmt, ... ) {}
 	virtual float				Knob( char *knobname, float *setvalue=NULL ) { return 0.0f; }
 
-	virtual void				SetRenderTargetFrameBufferSizeOverrides( int nWidth, int nHeight ) OVERRIDE
+	virtual void				SetRenderTargetFrameBufferSizeOverrides( int nWidth, int nHeight ) override
 	{
 		// Nope.
 	}
-	virtual void				GetRenderTargetFrameBufferDimensions( int & nWidth, int & nHeight ) OVERRIDE
+	virtual void				GetRenderTargetFrameBufferDimensions( int & nWidth, int & nHeight ) override
 	{
 		GetBackBufferDimensions( nWidth, nHeight );
 	}
@@ -2332,7 +2301,7 @@ public:
 	
 	}
 
-	virtual ITextureCompositor*	NewTextureCompositor( int w, int h, const char* pCompositeName, int nTeamNum, uint64 randomSeed, KeyValues* stageDesc, uint texCompositeCreateFlags ) OVERRIDE
+	virtual ITextureCompositor*	NewTextureCompositor( int w, int h, const char* pCompositeName, int nTeamNum, uint64 randomSeed, KeyValues* stageDesc, uint texCompositeCreateFlags ) override
 	{
 		return NULL;	
 	}
@@ -2352,17 +2321,17 @@ public:
 		return NULL;
 	}
 
-	virtual bool				AddTextureCompositorTemplate( const char* pName, KeyValues* pTmplDesc, int nTexCompositeTemplateFlags ) OVERRIDE
+	virtual bool				AddTextureCompositorTemplate( const char* pName, KeyValues* pTmplDesc, int nTexCompositeTemplateFlags ) override
 	{
 		return false;
 	}
 
-	virtual bool VerifyTextureCompositorTemplates() OVERRIDE
+	virtual bool VerifyTextureCompositorTemplates() override
 	{
 		return false;	
 	}
 
-	virtual bool HasShaderAPI() const OVERRIDE
+	virtual bool HasShaderAPI() const override
 	{
 		return true;
 	}

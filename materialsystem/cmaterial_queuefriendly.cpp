@@ -176,7 +176,7 @@ int CMaterial_QueueFriendly::GetNumPasses( void )
 	return m_pRealTimeVersion->GetNumPasses();
 }
 
-int CMaterial_QueueFriendly::GetTextureMemoryBytes( void )
+intp CMaterial_QueueFriendly::GetTextureMemoryBytes( void )
 {
 	return m_pRealTimeVersion->GetTextureMemoryBytes();
 }

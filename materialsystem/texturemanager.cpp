@@ -4,10 +4,7 @@
 //
 //===========================================================================//
 
-#include <stdlib.h>
-#include <malloc.h>
 #include "materialsystem_global.h"
-#include "string.h"
 #include "shaderapi/ishaderapi.h"
 #include "materialsystem/materialsystem_config.h"
 #include "IHardwareConfigInternal.h"
@@ -29,10 +26,10 @@
 #include "imorphinternal.h"
 #include "tier1/utlrbtree.h"
 #include "tier1/utlpair.h"
-#include "ctype.h"
 #include "utlqueue.h"
 #include "tier0/icommandline.h"
 #include "ctexturecompositor.h"
+#include "Color.h"
 
 #include "vprof_telemetry.h"
 
@@ -255,7 +252,6 @@ public:
 		// So we won't construct a spheremap out of this
 		CPixelWriter pixelWriter;
 
-		Vector direction;
 		for (int iFace = 0; iFace < 6; ++iFace)
 		{
 			pixelWriter.SetPixelMemory( pVTFTexture->Format(), 
@@ -329,7 +325,6 @@ public:
 		// So we won't construct a spheremap out of this
 		CPixelWriter pixelWriter;
 
-		Vector direction;
 		for (int iFace = 0; iFace < 6; ++iFace)
 		{
 			pixelWriter.SetPixelMemory( pVTFTexture->Format(), 
@@ -589,63 +584,63 @@ public:
 	CTextureManager( void );
 
 	// Initialization + shutdown
-	virtual void Init( int nFlags ) OVERRIDE;
-	virtual void Shutdown();
+	void Init( int nFlags ) override;
+	void Shutdown() override;
 
-	virtual void AllocateStandardRenderTargets( );
-	virtual void FreeStandardRenderTargets();
+	void AllocateStandardRenderTargets( ) override;
+	void FreeStandardRenderTargets() override;
 
-	virtual void CacheExternalStandardRenderTargets();
+	void CacheExternalStandardRenderTargets() override;
 
-	virtual ITextureInternal *CreateProceduralTexture( const char *pTextureName, const char *pTextureGroupName, int w, int h, int d, ImageFormat fmt, int nFlags, ITextureRegenerator* generator = NULL );
-	virtual ITextureInternal *FindOrLoadTexture( const char *textureName, const char *pTextureGroupName, int nAdditionalCreationFlags = 0 );
- 	virtual bool IsTextureLoaded( const char *pTextureName );
+	ITextureInternal *CreateProceduralTexture( const char *pTextureName, const char *pTextureGroupName, int w, int h, int d, ImageFormat fmt, int nFlags, ITextureRegenerator* generator = NULL ) override;
+	ITextureInternal *FindOrLoadTexture( const char *textureName, const char *pTextureGroupName, int nAdditionalCreationFlags = 0 ) override;
+ 	bool IsTextureLoaded( const char *pTextureName ) override;
 
-	virtual void AddTextureAlias( const char *pAlias, const char *pRealName );
-	virtual void RemoveTextureAlias( const char *pAlias );
+	void AddTextureAlias( const char *pAlias, const char *pRealName ) override;
+	void RemoveTextureAlias( const char *pAlias ) override;
 
-	virtual void SetExcludedTextures( const char *pScriptName );
-	virtual void UpdateExcludedTextures();
+	void SetExcludedTextures( const char *pScriptName ) override;
+	void UpdateExcludedTextures() override;
 
-	virtual void ResetTextureFilteringState();
-	void ReloadTextures( void );
+	void ResetTextureFilteringState() override;
+	void ReloadTextures( void ) override;
 
 	// These are used when we lose our video memory due to a mode switch etc
-	void ReleaseTextures( void );
-	void RestoreNonRenderTargetTextures( void );
-	void RestoreRenderTargets( void );
+	void ReleaseTextures( void ) override;
+	void RestoreNonRenderTargetTextures( void ) override;
+	void RestoreRenderTargets( void ) override;
 
 	// Suspend or resume texture streaming requests
-	void SuspendTextureStreaming( void );
-	void ResumeTextureStreaming( void );
+	void SuspendTextureStreaming( void ) override;
+	void ResumeTextureStreaming( void ) override;
 
 	// delete any texture that has a refcount <= 0
-	void RemoveUnusedTextures( void );
-	void DebugPrintUsedTextures( void );
+	void RemoveUnusedTextures( void ) override;
+	void DebugPrintUsedTextures( void ) override;
 
 	// Request a texture ID
-	virtual int	RequestNextTextureID();
+	virtual int	RequestNextTextureID() override;
 
 	// Get at a couple standard textures
-	virtual ITextureInternal *ErrorTexture();
-	virtual ITextureInternal *NormalizationCubemap();
-	virtual ITextureInternal *SignedNormalizationCubemap();
-	virtual ITextureInternal *ShadowNoise2D();
-	virtual ITextureInternal *IdentityLightWarp();
-	virtual ITextureInternal *ColorCorrectionTexture( int i );
-	virtual ITextureInternal *FullFrameDepthTexture();
-	virtual ITextureInternal *DebugLuxels2D();
+	ITextureInternal *ErrorTexture() override;
+	ITextureInternal *NormalizationCubemap() override;
+	ITextureInternal *SignedNormalizationCubemap() override;
+	ITextureInternal *ShadowNoise2D() override;
+	ITextureInternal *IdentityLightWarp() override;
+	ITextureInternal *ColorCorrectionTexture( int i ) override;
+	ITextureInternal *FullFrameDepthTexture() override;
+	ITextureInternal *DebugLuxels2D() override;
 
 
 	// Generates an error texture pattern
-	virtual void GenerateErrorTexture( ITexture *pTexture, IVTFTexture *pVTFTexture );
+	void GenerateErrorTexture( ITexture *pTexture, IVTFTexture *pVTFTexture ) override;
 
 	// Updates the color correction state
-	virtual void SetColorCorrectionTexture( int i, ITextureInternal *pTexture );
+	void SetColorCorrectionTexture( int i, ITextureInternal *pTexture ) override;
 
-	virtual void ForceAllTexturesIntoHardware( void );
+	void ForceAllTexturesIntoHardware( void ) override;
 
-	virtual ITextureInternal *CreateRenderTargetTexture( 
+	ITextureInternal *CreateRenderTargetTexture( 
 		const char *pRTName,	// NULL for auto-generated name
 		int w, 
 		int h, 
@@ -653,47 +648,47 @@ public:
 		ImageFormat fmt, 
 		RenderTargetType_t type, 
 		unsigned int textureFlags, 
-		unsigned int renderTargetFlags );
+		unsigned int renderTargetFlags ) override;
 
-	virtual bool HasPendingTextureDestroys() const;
-	virtual void MarkUnreferencedTextureForCleanup( ITextureInternal *pTexture );
-	virtual void RemoveTexture( ITextureInternal *pTexture );
-	virtual void ReloadFilesInList( IFileList *pFilesToReload );
+	bool HasPendingTextureDestroys() const override;
+	void MarkUnreferencedTextureForCleanup( ITextureInternal *pTexture ) override;
+	void RemoveTexture( ITextureInternal *pTexture ) override;
+	void ReloadFilesInList( IFileList *pFilesToReload ) override;
 
-	// start with -1, list terminates with -1
-	virtual int FindNext( int iIndex, ITextureInternal **ppTexture );
+	// start with USHRT_MAX, list terminates with USHRT_MAX
+	unsigned short FindNext( unsigned short iIndex, ITextureInternal **ppTexture ) override;
 
-	virtual void ReleaseTempRenderTargetBits( void );
+	void ReleaseTempRenderTargetBits( void ) override;
 
 	// Called once per frame by material system "somewhere."
-	virtual void Update();
+	void Update() override;
 
 	// Load a texture asynchronously and then call the provided callback.
-	virtual void AsyncFindOrLoadTexture( const char *pTextureName, const char *pTextureGroupName, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs, bool bComplain, int nAdditionalCreationFlags );
+	void AsyncFindOrLoadTexture( const char *pTextureName, const char *pTextureGroupName, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs, bool bComplain, int nAdditionalCreationFlags ) override;
 	void CompleteAsyncLoad( AsyncLoadJob_t* pJob );
 
-	virtual void AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, const char* pDstName, ImageFormat dstFmt, bool bGenMips, int nAdditionalCreationFlags, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs );
+	void AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, const char* pDstName, ImageFormat dstFmt, bool bGenMips, int nAdditionalCreationFlags, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) override;
 	void CompleteAsyncRead( AsyncReadJob_t* pJob );
 
 	ITextureInternal* AcquireReadbackTexture( int w, int h, ImageFormat fmt );
 	void ReleaseReadbackTexture( ITextureInternal* pTex );
 
-	void WarmTextureCache();
-	void CoolTextureCache();
+	void WarmTextureCache() override;
+	void CoolTextureCache() override;
 
-	virtual void RequestAllMipmaps( ITextureInternal* pTex );
-	virtual void EvictAllTextures();
-	virtual void UpdatePostAsync();
+	void RequestAllMipmaps( ITextureInternal* pTex ) override;
+	void EvictAllTextures() override;
+	void UpdatePostAsync() override;
 
-	virtual void ReleaseAsyncScratchVTF( IVTFTexture* pScratchVTF );
+	void ReleaseAsyncScratchVTF( IVTFTexture* pScratchVTF ) override;
 
-	virtual bool ThreadInAsyncLoadThread() const;
-	virtual bool ThreadInAsyncReadThread() const;
+	bool ThreadInAsyncLoadThread() const override;
+	bool ThreadInAsyncReadThread() const override;
 
-	virtual bool AddTextureCompositorTemplate( const char* pName, KeyValues* pTmplDesc ) OVERRIDE;
-	virtual bool VerifyTextureCompositorTemplates() OVERRIDE;
+	bool AddTextureCompositorTemplate( const char* pName, KeyValues* pTmplDesc ) override;
+	bool VerifyTextureCompositorTemplates() override;
 
-	virtual CTextureCompositorTemplate* FindTextureCompositorTemplate( const char* pName ) OVERRIDE;
+	CTextureCompositorTemplate* FindTextureCompositorTemplate( const char* pName ) override;
 
 protected:
 	ITextureInternal *FindTexture( const char *textureName );
@@ -808,8 +803,8 @@ public:
 
 	virtual ~CAsyncCopyRequest() { }
 
-	virtual int AddRef() OVERRIDE{ return ++m_nReferenceCount; }
-	virtual int Release() OVERRIDE
+	virtual int AddRef() override{ return ++m_nReferenceCount; }
+	virtual int Release() override
 	{
 		int retVal = --m_nReferenceCount;
 		if ( retVal == 0 )
@@ -818,12 +813,12 @@ public:
 		return retVal;
 	}
 
-	virtual int GetRefCount() const OVERRIDE{ return m_nReferenceCount; }
+	virtual int GetRefCount() const override{ return m_nReferenceCount; }
 
-	virtual void OnAsyncCreateComplete( ITexture* pTex, void* pExtraArgs ) OVERRIDE { }
-	virtual void OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs ) OVERRIDE { }
-	virtual void OnAsyncMapComplete( ITexture* pTex, void* pExtraArgs, void* pMemory, int nPitch ) OVERRIDE { }
-	virtual void OnAsyncReadbackBegin( ITexture* pDst, ITexture* pSrc, void* pExtraArgs ) OVERRIDE
+	virtual void OnAsyncCreateComplete( ITexture* pTex, void* pExtraArgs ) override { }
+	virtual void OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs ) override { }
+	virtual void OnAsyncMapComplete( ITexture* pTex, void* pExtraArgs, void* pMemory, int nPitch ) override { }
+	virtual void OnAsyncReadbackBegin( ITexture* pDst, ITexture* pSrc, void* pExtraArgs ) override
 	{
 		m_bSignalled = true;
 	}
@@ -848,8 +843,8 @@ public:
 
 	virtual ~CAsyncMapResult() { }
 
-	virtual int AddRef() OVERRIDE { return ++m_nReferenceCount; }
-	virtual int Release() OVERRIDE
+	virtual int AddRef() override { return ++m_nReferenceCount; }
+	virtual int Release() override
 	{
 		int retVal = --m_nReferenceCount;
 		if ( retVal == 0 )
@@ -858,11 +853,11 @@ public:
 		return retVal;	
 	}
 
-	virtual int GetRefCount() const OVERRIDE{ return m_nReferenceCount; }
+	virtual int GetRefCount() const override{ return m_nReferenceCount; }
 
-	virtual void OnAsyncCreateComplete( ITexture* pTex, void* pExtraArgs ) OVERRIDE { }
-	virtual void OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs ) OVERRIDE { }
-	virtual void OnAsyncMapComplete( ITexture* pTex, void* pExtraArgs, void* pMemory, int nPitch ) OVERRIDE
+	virtual void OnAsyncCreateComplete( ITexture* pTex, void* pExtraArgs ) override { }
+	virtual void OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs ) override { }
+	virtual void OnAsyncMapComplete( ITexture* pTex, void* pExtraArgs, void* pMemory, int nPitch ) override
 	{
 		Assert( pTex == m_pTexToMap );
 		m_pMemory = pMemory;
@@ -870,7 +865,7 @@ public:
 		m_bSignalled = true;
 	}
 
-	virtual void OnAsyncReadbackBegin( ITexture* pDst, ITexture* pSrc, void* pExtraArgs ) OVERRIDE { }
+	virtual void OnAsyncReadbackBegin( ITexture* pDst, ITexture* pSrc, void* pExtraArgs ) override { }
 
 
 	bool IsSignalled() const { return m_bSignalled; }
@@ -1170,7 +1165,7 @@ public:
 					}
 					else
 					{
-						Assert( !"Failed to perform a map that shouldn't fail, need to deal with this if it ever happens." );
+						AssertMsg( false, "Failed to perform a map that shouldn't fail, need to deal with this if it ever happens." );
 						DevWarning( "Failed to perform a map that shouldn't fail, need to deal with this if it ever happens." );
 					}
 					
@@ -1301,13 +1296,13 @@ private:
 		// Convert the data
 		CUtlMemory< unsigned char > srcBufferFinestMip;
 		CUtlMemory< unsigned char > srcBufferAllMips;
-		const int srcFinestMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, false );
-		const int srcAllMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, pJob->m_bGenMips );
-		const int srcPitch = ImageLoader::GetMemRequired( w, 1, 1, srcFmt, false );
+		const intp srcFinestMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, false );
+		const intp srcAllMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, pJob->m_bGenMips );
+		const intp srcPitch = ImageLoader::GetMemRequired( w, 1, 1, srcFmt, false );
 
 		const ImageFormat dstFmt = pJob->m_dstFmt;
 		CUtlMemory< unsigned char > dstBufferAllMips;
-		const int dstMemRequried = ImageLoader::GetMemRequired( w, h, 1, dstFmt, pJob->m_bGenMips );
+		const intp dstMemRequried = ImageLoader::GetMemRequired( w, h, 1, dstFmt, pJob->m_bGenMips );
 		
 		{
 			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s-Allocations", __FUNCTION__ );
@@ -1329,8 +1324,7 @@ private:
 
 		// If this fires, you will get data corruption below. We can fix this case, it just doesn't seem
 		// to be needed right now.
-		Assert( pJob->m_pAsyncMap->m_nPitch == srcPitch );
-		srcPitch; // Hush compiler.
+		Assert( pJob->m_pAsyncMap->m_nPitch.operator int() == srcPitch );
 
 		{
 			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s-ByteSwapInPlace", __FUNCTION__ );
@@ -1517,7 +1511,7 @@ void CTextureManager::Init( int nFlags )
 		int nTextureFlags = TEXTUREFLAGS_ENVMAP | TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD | TEXTUREFLAGS_SINGLECOPY | TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_CLAMPU;
 
 #ifdef OSX
-		// JasonM - ridiculous hack around R500 lameness...we never use this texture on OSX anyways (right?)
+		// TODO: JasonM - ridiculous hack around R500 lameness...we never use this texture on OSX anyways (right?)
 		// Now assuming this was an OSX specific workaround.
 		nTextureFlags |= TEXTUREFLAGS_POINTSAMPLE;
 #endif
@@ -1641,13 +1635,13 @@ void CTextureManager::Shutdown()
 		m_pErrorRegen = NULL;
 	}
 
-	for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
 	{
 		ITextureInternal::Destroy( m_TextureList[i], true );
 	}
 	m_TextureList.RemoveAll();
 
-	for( int i = m_TextureAliases.First(); i != m_TextureAliases.InvalidIndex(); i = m_TextureAliases.Next( i ) )
+	for( auto i = m_TextureAliases.First(); i != m_TextureAliases.InvalidIndex(); i = m_TextureAliases.Next( i ) )
 	{
 		delete []m_TextureAliases[i];
 	}
@@ -1747,7 +1741,7 @@ void CTextureManager::ReleaseTextures( void )
 {
 	g_pShaderAPI->SetFullScreenTextureHandle( INVALID_SHADERAPI_TEXTURE_HANDLE );
 
-	for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
 	{
 		// Release the texture...
 		m_TextureList[i]->ReleaseMemory();
@@ -1788,7 +1782,7 @@ void CTextureManager::CleanupPossiblyUnreferencedTextures()
 {
 	if ( !ThreadInMainThread() || MaterialSystem()->GetRenderThreadId() != 0xFFFFFFFF )
 	{
-		Assert( !"CTextureManager::CleanupPossiblyUnreferencedTextures should never be called here" );
+		AssertMsg( false, "CTextureManager::CleanupPossiblyUnreferencedTextures should never be called here" );
 		// This is catastrophically bad, don't do this. Someone needs to fix this. See JohnS or McJohn
 		DebuggerBreakIfDebugging_StagingOnly();
 		return;
@@ -1822,7 +1816,7 @@ void CTextureManager::RestoreNonRenderTargetTextures( )
 	// 360 should not have gotten here
 	Assert( !IsX360() );
 
-	for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
 	{
 		if ( !m_TextureList[i]->IsRenderTarget() )
 		{
@@ -1839,7 +1833,7 @@ void CTextureManager::RestoreRenderTargets()
 	// 360 should not have gotten here
 	Assert( !IsX360() );
 
-	for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
 	{
 		if ( m_TextureList[i]->IsRenderTarget() )
 		{
@@ -1861,7 +1855,7 @@ void CTextureManager::RestoreRenderTargets()
 //-----------------------------------------------------------------------------
 void CTextureManager::ReloadTextures()
 {
-	for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
 	{
 		// Put the texture back onto the board
 		m_TextureList[i]->Download();
@@ -1925,7 +1919,7 @@ void CTextureManager::ForceAllTexturesIntoHardware( void )
 		return;
 	}
 
-	for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
 	{
 		// Put the texture back onto the board
 		ForceTextureIntoHardware( m_TextureList[i], pMaterial, pBaseTextureVar );
@@ -2009,11 +2003,11 @@ ITextureInternal *CTextureManager::LoadTexture( const char *pTextureName, const 
 	ITextureInternal *pNewTexture = ITextureInternal::CreateFileTexture( pTextureName, pTextureGroupName );
 	if ( pNewTexture )
 	{
-		int iIndex = m_TextureExcludes.Find( pNewTexture->GetName() );
+		auto iIndex = m_TextureExcludes.Find( pNewTexture->GetName() );
 		if ( m_TextureExcludes.IsValidIndex( iIndex ) )
 		{
 			// mark the new texture as excluded
-			int nDimensionsLimit = m_TextureExcludes[iIndex];
+			auto nDimensionsLimit = m_TextureExcludes[iIndex];
 			pNewTexture->MarkAsExcluded( ( nDimensionsLimit == 0 ), nDimensionsLimit );
 		}
 
@@ -2035,7 +2029,7 @@ ITextureInternal *CTextureManager::FindTexture( const char *pTextureName )
 	char szCleanName[MAX_PATH];
 	NormalizeTextureName( pTextureName, szCleanName, sizeof( szCleanName ) );
 
-	int i = m_TextureList.Find( szCleanName );
+	auto i = m_TextureList.Find( szCleanName );
 	if ( i != m_TextureList.InvalidIndex() )
 	{
 		return m_TextureList[i];
@@ -2076,7 +2070,7 @@ void CTextureManager::AddTextureAlias( const char *pAlias, const char *pRealName
 		return; //invalid alias
 
 	char szCleanName[MAX_PATH];
-	int index = m_TextureAliases.Find( NormalizeTextureName( pAlias, szCleanName, sizeof( szCleanName ) ) );
+	auto index = m_TextureAliases.Find( NormalizeTextureName( pAlias, szCleanName, sizeof( szCleanName ) ) );
 
 	if	( index != m_TextureAliases.InvalidIndex() )
 	{
@@ -2097,7 +2091,7 @@ void CTextureManager::RemoveTextureAlias( const char *pAlias )
 		return;
 
 	char szCleanName[MAX_PATH];
-	int index = m_TextureAliases.Find( NormalizeTextureName( pAlias, szCleanName, sizeof( szCleanName ) ) );
+	auto index = m_TextureAliases.Find( NormalizeTextureName( pAlias, szCleanName, sizeof( szCleanName ) ) );
 	if ( index == m_TextureAliases.InvalidIndex() )
 		return; //not found
 
@@ -2108,7 +2102,7 @@ void CTextureManager::RemoveTextureAlias( const char *pAlias )
 void CTextureManager::SetExcludedTextures( const char *pScriptName )
 {
 	// clear all exisiting texture's exclusion
-	for ( int i = m_TextureExcludes.First(); i != m_TextureExcludes.InvalidIndex(); i = m_TextureExcludes.Next( i ) )
+	for ( auto i = m_TextureExcludes.First(); i != m_TextureExcludes.InvalidIndex(); i = m_TextureExcludes.Next( i ) )
 	{
 		ITextureInternal *pTexture = FindTexture( m_TextureExcludes.GetElementName( i ) );
 		if ( pTexture )
@@ -2121,7 +2115,7 @@ void CTextureManager::SetExcludedTextures( const char *pScriptName )
 	MEM_ALLOC_CREDIT();
 
 	// get optional script
-	CUtlBuffer excludeBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer excludeBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( g_pFullFileSystem->ReadFile( pScriptName, NULL, excludeBuffer ) )
 	{
 		char szToken[MAX_PATH];
@@ -2139,7 +2133,7 @@ void CTextureManager::SetExcludedTextures( const char *pScriptName )
 				}
 			}
 			excludeBuffer.GetLine( szToken, sizeof( szToken ) );
-			int tokenLength = strlen( szToken );
+			intp tokenLength = V_strlen( szToken );
 			if ( !tokenLength )
 			{
 				// end of list
@@ -2200,7 +2194,7 @@ void CTextureManager::SetExcludedTextures( const char *pScriptName )
 
 void CTextureManager::UpdateExcludedTextures( void )
 {
-	for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
 	{
 		m_TextureList[i]->UpdateExcludedState();
 	}
@@ -2279,7 +2273,7 @@ ITextureInternal *CTextureManager::CreateRenderTargetTexture(
 
 void CTextureManager::ResetTextureFilteringState( )
 {
-	for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
 	{
 		m_TextureList[i]->SetFilteringAndClampingMode();
 	}
@@ -2304,8 +2298,8 @@ void CTextureManager::RemoveUnusedTextures( void )
 	// First, need to flush all of our textures that are pending cleanup.
 	CleanupPossiblyUnreferencedTextures();
 
-	int iNext;
-	for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = iNext )
+	unsigned short iNext;
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = iNext )
 	{
 		iNext = m_TextureList.Next( i );
 
@@ -2337,7 +2331,7 @@ void CTextureManager::RemoveTexture( ITextureInternal *pTexture )
 
 	if ( !ThreadInMainThread() || MaterialSystem()->GetRenderThreadId() != 0xFFFFFFFF )
 	{
-		Assert( !"CTextureManager::RemoveTexture should never be called here");
+		AssertMsg( false, "CTextureManager::RemoveTexture should never be called here");
 		// This is catastrophically bad, don't do this. Someone needs to fix this. 
 		DebuggerBreakIfDebugging_StagingOnly();
 		return;
@@ -2351,7 +2345,7 @@ void CTextureManager::RemoveTexture( ITextureInternal *pTexture )
 	int nUnreferencedQueue = m_PossiblyUnreferencedTextures.Count();
 	if ( nUnreferencedQueue )
 	{
-		Assert( !"RemoveTexture() being called while textures sitting in possibly unreferenced queue" );
+		AssertMsg( false, "RemoveTexture() being called while textures sitting in possibly unreferenced queue" );
 		// Assuming that this is all a wholesome main-thread misunderstanding, we can try to continue after filtering
 		// this texture from the queue.
 		ITextureInternal *pPossiblyUnreferenced = NULL;
@@ -2369,13 +2363,13 @@ void CTextureManager::RemoveTexture( ITextureInternal *pTexture )
 
 	if ( bTextureFound ) 
 	{
-		Assert( !"CTextureManager::RemoveTexture has been called for a texture that has already requested cleanup. That's a paddlin'." );
+		AssertMsg( false, "CTextureManager::RemoveTexture has been called for a texture that has already requested cleanup. That's a paddlin'." );
 		// This is catastrophically bad, don't do this. Someone needs to fix this. 
 		DebuggerBreakIfDebugging_StagingOnly();
 		return;
 	}
 
-	for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
 	{
 		// search by object
 		if ( m_TextureList[i] == pTexture )
@@ -2394,7 +2388,7 @@ void CTextureManager::ReloadFilesInList( IFileList *pFilesToReload )
 	if ( !IsPC() )
 		return;
 
-	for ( int i=m_TextureList.First(); i != m_TextureList.InvalidIndex(); i=m_TextureList.Next( i ) )
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i=m_TextureList.Next( i ) )
 	{
 		ITextureInternal *pTex = m_TextureList[i];
 
@@ -2404,24 +2398,11 @@ void CTextureManager::ReloadFilesInList( IFileList *pFilesToReload )
 
 void CTextureManager::ReleaseTempRenderTargetBits( void )
 {
-	if( IsX360() ) //only sane on 360
-	{
-		int iNext;
-		for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = iNext )
-		{
-			iNext = m_TextureList.Next( i );
-
-			if ( m_TextureList[i]->IsTempRenderTarget() )
-			{
-				m_TextureList[i]->ReleaseMemory();
-			}
-		}
-	}
 }
 
 void CTextureManager::DebugPrintUsedTextures( void )
 {
-	for ( int i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
+	for ( auto i = m_TextureList.First(); i != m_TextureList.InvalidIndex(); i = m_TextureList.Next( i ) )
 	{
 		ITextureInternal *pTexture = m_TextureList[i];
 		Msg( "Texture: '%s' RefCount: %d\n", pTexture->GetName(), pTexture->GetReferenceCount() );
@@ -2429,8 +2410,8 @@ void CTextureManager::DebugPrintUsedTextures( void )
 
 	if ( m_TextureExcludes.Count() )
 	{
-		Msg( "\nExcluded Textures: (%d)\n", m_TextureExcludes.Count() );
-		for ( int i = m_TextureExcludes.First(); i != m_TextureExcludes.InvalidIndex(); i = m_TextureExcludes.Next( i ) )
+		Msg( "\nExcluded Textures: (%zd)\n", m_TextureExcludes.Count() );
+		for ( auto i = m_TextureExcludes.First(); i != m_TextureExcludes.InvalidIndex(); i = m_TextureExcludes.Next( i ) )
 		{
 			char buff[256];
 			const char *pName = m_TextureExcludes.GetElementName( i );
@@ -2450,16 +2431,16 @@ void CTextureManager::DebugPrintUsedTextures( void )
 	}
 }
 
-int CTextureManager::FindNext( int iIndex, ITextureInternal **pTexInternal )
+unsigned short CTextureManager::FindNext( unsigned short iIndex, ITextureInternal **pTexInternal )
 {
-	if ( iIndex == -1 && m_TextureList.Count() )
+	if ( iIndex == USHRT_MAX && m_TextureList.Count() )
 	{
 		iIndex = m_TextureList.First();
 	}
 	else if ( !m_TextureList.Count() || !m_TextureList.IsValidIndex( iIndex ) )
 	{
-		*pTexInternal = NULL;
-		return -1;
+		*pTexInternal = nullptr;
+		return USHRT_MAX;
 	}
 
 	*pTexInternal = m_TextureList[iIndex];
@@ -2468,7 +2449,7 @@ int CTextureManager::FindNext( int iIndex, ITextureInternal **pTexInternal )
 	if ( iIndex == m_TextureList.InvalidIndex() )
 	{
 		// end of list
-		iIndex = -1;
+		iIndex = USHRT_MAX;
 	}
 
 	return iIndex;
@@ -2516,7 +2497,7 @@ void CTextureManager::AsyncFindOrLoadTexture( const char *pTextureName, const ch
 	AsyncLoadJob_t asyncLoad( pTextureName, pTextureGroupName, pRecipient, pExtraArgs, bComplain, nAdditionalCreationFlags );
 
 	// If this is the first person asking to load this, then remember so we don't load the same thing over and over again.
-	int pendingIndex = m_PendingAsyncLoads.Find( pTextureName );
+	auto pendingIndex = m_PendingAsyncLoads.Find( pTextureName );
 	if ( pendingIndex == m_PendingAsyncLoads.InvalidIndex() )
 	{
 		// Create the texture here, we'll load the data in the async thread. Load is a misnomer, because it doesn't actually
@@ -2553,7 +2534,7 @@ void CTextureManager::CompleteAsyncLoad( AsyncLoadJob_t* pJob )
 	pJob->m_pRecipient->OnAsyncFindComplete( pJob->m_pResultData, pJob->m_pExtraArgs );
 	
 	// Finally, deal with any other stragglers that asked for the same surface we did.
-	int pendingIndex = m_PendingAsyncLoads.Find( pJob->m_TextureName.Get() );
+	auto pendingIndex = m_PendingAsyncLoads.Find( pJob->m_TextureName.Get() );
 	Assert( pendingIndex != m_PendingAsyncLoads.InvalidIndex() );
 
 	FOR_EACH_VEC( m_PendingAsyncLoads[ pendingIndex ], i )
@@ -2659,7 +2640,7 @@ void CTextureManager::AsyncReadTexture( AsyncReadJob_t* pJob )
 
 	if ( !pJob->m_pSysmemTex )
 	{
-		Assert( !"Need to deal with this error case" ); // TODOERROR
+		AssertMsg( false, "Need to deal with this error case" ); // TODOERROR
 		return;
 	}
 
@@ -2872,7 +2853,7 @@ void CTextureManager::ReadFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 	if ( !fh )
 		return;
 
-	CUtlBuffer fileContents( 0, 0, CUtlBuffer::TEXT_BUFFER ); 
+	CUtlBuffer fileContents( (intp)0, 0, CUtlBuffer::TEXT_BUFFER ); 
 	if ( !g_pFullFileSystem->ReadToBuffer( fh, fileContents ) )
 		goto cleanup;
 
@@ -2981,7 +2962,7 @@ bool CTextureManager::AddTextureCompositorTemplate( const char* pName, KeyValues
 {
 	Assert( pName && pTmplDesc );
 
-	int ndx = m_TexCompTemplates.Find( pName );
+	auto ndx = m_TexCompTemplates.Find( pName );
 	if ( ndx != m_TexCompTemplates.InvalidIndex() )
 	{
 		// Later definitions stomp earlier ones. This lets the GC win.
@@ -3096,7 +3077,7 @@ static ImageFormat GetImageFormatRawReadback( ImageFormat fmt )
 	case IMAGE_FORMAT_BGRA8888:
 		return IMAGE_FORMAT_BGRA8888;
 	default:
-		Assert( !"Unsupported format in GetImageFormatRawReadback, this will likely result in color-swapped textures" );
+		AssertMsg( false, "Unsupported format in GetImageFormatRawReadback, this will likely result in color-swapped textures" );
 	};
 
 	return fmt;
