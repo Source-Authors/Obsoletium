@@ -676,12 +676,14 @@ bool CBaseCombatCharacter::IsLineOfSightClear( CBaseEntity *entity, LineOfSightC
 /**
 	Strictly checks Line of Sight only.
 */
+#if defined(GAME_DLL) && defined(TERROR)
 static bool TraceFilterNoCombatCharacters( IHandleEntity *pServerEntity, int contentsMask )
 {
 	// Honor BlockLOS also to allow seeing through partially-broken doors
 	CBaseEntity *entity = EntityFromEntityHandle( pServerEntity );
 	return ( entity->MyCombatCharacterPointer() == NULL && !entity->MyCombatWeaponPointer() && entity->BlocksLOS() );
 }
+#endif
 
 bool CBaseCombatCharacter::IsLineOfSightClear( const Vector &pos, LineOfSightCheckType checkType, CBaseEntity *entityToIgnore ) const
 {

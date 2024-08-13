@@ -318,8 +318,6 @@ void CVoiceStatus::UpdateSpeakerStatus(int entindex, bool bTalking)
 	else if(entindex > 0 && entindex <= VOICE_MAX_PLAYERS)
 	{
 		int iClient = entindex - 1;
-		if(iClient < 0)
-			return;
 
 		if(bTalking)
 		{

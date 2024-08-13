@@ -51,8 +51,9 @@
 		RecvPropInt( RECVINFO( m_nAttachmentIndex ) ),
 		RecvPropIntWithMinusOneFlag( RECVINFO( m_nSurfaceProp ), RecvProxy_ShortSubOne ),
 		RecvPropInt( RECVINFO( m_iEffectName ) ),
-
-		RecvPropInt( RECVINFO( m_nMaterial ) ),
+		
+		// dimhotepus: Comment unused m_nMaterial.
+		// RecvPropInt( RECVINFO( m_nMaterial ) ),
 		RecvPropInt( RECVINFO( m_nDamageType ) ),
 		RecvPropInt( RECVINFO( m_nHitBox ) ),
 
@@ -114,7 +115,8 @@
 		SendPropIntWithMinusOneFlag( SENDINFO_NOCHECK( m_nSurfaceProp ), 8, SendProxy_ShortAddOne ),
 		SendPropInt( SENDINFO_NOCHECK( m_iEffectName ), MAX_EFFECT_DISPATCH_STRING_BITS, SPROP_UNSIGNED ),
 
-		SendPropInt( SENDINFO_NOCHECK( m_nMaterial ), MAX_MODEL_INDEX_BITS, SPROP_UNSIGNED ),
+		// dimhotepus: Comment unused.
+		// SendPropInt( SENDINFO_NOCHECK( m_nMaterial ), MAX_MODEL_INDEX_BITS, SPROP_UNSIGNED ),
 		SendPropInt( SENDINFO_NOCHECK( m_nDamageType ), 32, SPROP_UNSIGNED ),
 		SendPropInt( SENDINFO_NOCHECK( m_nHitBox ), 12, SPROP_UNSIGNED ),
 

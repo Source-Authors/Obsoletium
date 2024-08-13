@@ -107,23 +107,6 @@ static QueryCacheEntry_t *FindOrAllocateCacheEntry( QueryCacheKey_t const &entry
 	return pFound;
 }
 
-static QueryCacheEntry_t *FindOrAllocateCacheEntry( EQueryType_t nType,
-													CBaseEntity *pEntity1, CBaseEntity *pEntity2,
-													EEntityOffsetMode_t nMode1, EEntityOffsetMode_t nMode2,
-													unsigned int nTraceMask )
-{
-	QueryCacheKey_t entry;
-	entry.m_Type = nType;
-	entry.m_pEntities[0] = pEntity1;
-	entry.m_pEntities[1] = pEntity2;
-	entry.m_nOffsetMode[0] = nMode1;
-	entry.m_nOffsetMode[1] = nMode2;
-	entry.m_nTraceMask = nTraceMask;
-	entry.m_nNumValidPoints = 2;
-	entry.ComputeHashIndex();
-	return FindOrAllocateCacheEntry( entry );
-}
-
 bool QueryCacheKey_t::Matches( QueryCacheKey_t const *pNode ) const
 {
 	if (
@@ -236,18 +219,20 @@ void UpdateQueryCache( void )
 	for( int i =0 ; i < N_WAYS_TO_SPLIT_CACHE_UPDATE; i++ )
 	{
 		workList[i].m_nStartHashChain = nCurEntry;
+
 		if ( i != N_WAYS_TO_SPLIT_CACHE_UPDATE -1 )
-			workList[i].m_nNumHashChainsToUpdate = ARRAYSIZE( s_HashChains ) / N_WAYS_TO_SPLIT_CACHE_UPDATE;
+			workList[i].m_nNumHashChainsToUpdate = ssize( s_HashChains ) / N_WAYS_TO_SPLIT_CACHE_UPDATE;
 		else
-			workList[i].m_nNumHashChainsToUpdate = ARRAYSIZE( s_HashChains ) - nCurEntry;
-		nCurEntry += ARRAYSIZE( s_HashChains ) / N_WAYS_TO_SPLIT_CACHE_UPDATE;
+			workList[i].m_nNumHashChainsToUpdate = ssize( s_HashChains ) - nCurEntry;
+
+		nCurEntry += ssize( s_HashChains ) / N_WAYS_TO_SPLIT_CACHE_UPDATE;
 	}
 	ParallelProcess( "ProcessQueryCacheUpdate", workList, N_WAYS_TO_SPLIT_CACHE_UPDATE, ProcessQueryCacheUpdate, PreUpdateQueryCache, PostUpdateQueryCache, ( sv_disable_querycache.GetBool() ) ? 0 : INT_MAX );
 	// now, we need to take all of the obsolete cache entries each thread generated and add them to
 	// the victim cache
-	for( int i = 0 ; i < N_WAYS_TO_SPLIT_CACHE_UPDATE; i++ )
+	for( auto &w : workList )
 	{
-		PrependDListWithTailToDList( workList[i].m_KilledList, s_VictimList );
+		PrependDListWithTailToDList( w.m_KilledList, s_VictimList );
 	}
 }
 
@@ -257,7 +242,7 @@ void InvalidateQueryCache( void )
 	for( auto &&c : s_HashChains )
 		c.RemoveAll();
 	// now, invalidate all cache entries and add them to the victims
-	for( int i = 0; i < ARRAYSIZE( s_QCache ); i++ )
+	for( intp i = 0; i < ssize( s_QCache ); i++ )
 	{
 		s_QCache[i].m_QueryParams.m_Type = EQUERY_INVALID;
 		s_VictimList.AddToHead( s_QCache + i );

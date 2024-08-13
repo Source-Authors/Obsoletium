@@ -4605,7 +4605,7 @@ void DoAxisInterpBone(
 
 	mstudioaxisinterpbone_t *pProc = (mstudioaxisinterpbone_t *)pbones[ibone].pProcedure( );
 	const matrix3x4_t &controlBone = bonetoworld.GetBone( pProc->control );
-	if (pProc && pbones[pProc->control].parent != -1)
+	if (pbones[pProc->control].parent != -1)
 	{
 		Vector tmp;
 		// pull out the control column

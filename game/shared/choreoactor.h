@@ -27,8 +27,9 @@ class CChoreoActor
 public:
 
 	// Construction
-					CChoreoActor( void );
+					CChoreoActor();
 					CChoreoActor( const char *name );
+					CChoreoActor( const CChoreoActor& src );
 	// Assignment
 	CChoreoActor&	operator = ( const CChoreoActor& src );
 
@@ -38,10 +39,10 @@ public:
 
 	// Accessors
 	void			SetName( const char *name );
-	const char		*GetName( void );
+	const char		*GetName() const;
 
 	// Iteration
-	intp				GetNumChannels( void );
+	intp				GetNumChannels() const;
 	CChoreoChannel	*GetChannel( intp channel );
 
 	CChoreoChannel	*FindChannel( const char *name );
@@ -49,15 +50,15 @@ public:
 	// Manipulate children
 	void			AddChannel( CChoreoChannel *channel );
 	void			RemoveChannel( CChoreoChannel *channel );
-	int				FindChannelIndex( CChoreoChannel *channel );
+	ptrdiff_t				FindChannelIndex( CChoreoChannel *channel );
 	void			SwapChannels( int c1, int c2 );
 	void			RemoveAllChannels();
 
 	void			SetFacePoserModelName( const char *name );
-	char const		*GetFacePoserModelName( void ) const;
+	char const		*GetFacePoserModelName() const;
 
 	void						SetActive( bool active );
-	bool						GetActive( void ) const;
+	bool						GetActive() const;
 
 	bool			IsMarkedForSave() const { return m_bMarkedForSave; }
 	void			SetMarkedForSave( bool mark ) { m_bMarkedForSave = mark; }
@@ -66,7 +67,7 @@ public:
 
 private:
 	// Clear structure out
-	void			Init( void );
+	void			Init();
 
 	enum
 	{

@@ -1112,7 +1112,7 @@ CBasePlayer* UTIL_PlayerByCommandArg( const char *arg )
 
 	// Legacy SteamID?
 	const char szPrefix[] = "STEAM_";
-	if ( nLength >= V_ARRAYSIZE( szPrefix ) && V_strncmp( szPrefix, arg, V_ARRAYSIZE( szPrefix ) - 1 ) == 0 )
+	if ( nLength >= std::size( szPrefix ) && V_strncmp( szPrefix, arg, ssize( szPrefix ) - 1 ) == 0 )
 	{
 		CSteamID steamID;
 		bool bMatch = steamID.SetFromSteam2String( arg, GetUniverse() );
@@ -1222,6 +1222,9 @@ CBasePlayer* UTIL_PlayerByUserId( int userID )
 	return NULL;
 }
 
+// dimhotepus: Small leak.
+static char *empty = new char[1]{'\0'};
+
 char* ReadAndAllocStringValue( KeyValues *pSub, const char *pName, const char *pFilename )
 {
 	const char *pValue = pSub->GetString( pName, NULL );
@@ -1231,10 +1234,10 @@ char* ReadAndAllocStringValue( KeyValues *pSub, const char *pName, const char *p
 		{
 			DevWarning( "Can't get key value	'%s' from file '%s'.\n", pName, pFilename );
 		}
-		return "";
+		return empty;
 	}
 
-	int len = Q_strlen( pValue ) + 1;
+	intp len = Q_strlen( pValue ) + 1;
 	char *pAlloced = new char[ len ];
 	Assert( pAlloced );
 	Q_strncpy( pAlloced, pValue, len );

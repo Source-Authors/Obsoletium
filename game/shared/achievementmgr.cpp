@@ -107,7 +107,7 @@ static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamClo
 
 	// Never call pKV->SaveToFile!!!!
 	// Save to a buffer instead.
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	pKV->RecursiveSaveToFile( buf, 0 );
 	filesystem->WriteFile( szFilename, NULL, buf );
 	pKV->deleteThis();
@@ -706,7 +706,7 @@ const char *COM_GetModDirectory()
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
 			Q_StripLastDir( modDir, sizeof(modDir) );
-			int dirlen = Q_strlen( modDir );
+			intp dirlen = Q_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
 	}
@@ -1846,7 +1846,7 @@ void CAchievementMgr::SetAchievementThink( CBaseAchievement *pAchievement, float
 		return;
 
 	// Otherwise, add it to the list
-	int iIdx = m_vecThinkListeners.AddToTail();
+	intp iIdx = m_vecThinkListeners.AddToTail();
 	m_vecThinkListeners[iIdx].pAchievement = pAchievement;
 	m_vecThinkListeners[iIdx].m_flThinkTime = gpGlobals->curtime + flThinkTime;
 }

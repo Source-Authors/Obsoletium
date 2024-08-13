@@ -334,6 +334,8 @@ void CSave::Log( const char *pName, fieldtype_t fieldType, void *value, int coun
 				byte *pColor = &pValue[iCount*4];
 				Q_snprintf( szTempBuf, sizeof( szTempBuf ), "(%d %d %d %d)", ( int )pColor[0], ( int )pColor[1], ( int )pColor[2], ( int )pColor[3] );
 				Q_strncat( szBuf, szTempBuf, sizeof( szTempBuf ), COPY_ALL_CHARACTERS );
+				// dimhotepus: Add missed break.
+				break;
 			}
 		case FIELD_EMBEDDED:
 		case FIELD_CUSTOM:
@@ -356,7 +358,7 @@ void CSave::Log( const char *pName, fieldtype_t fieldType, void *value, int coun
 		}
 	}
 
-	int nLength = strlen( szBuf ) + 1;
+	intp nLength = V_strlen( szBuf ) + 1;
 	filesystem->Write( szBuf, nLength, m_hLogFile );
 }
 
@@ -509,11 +511,11 @@ void CSave::WriteString( const char *pname, const char *pdata )
 
 void CSave::WriteString( const char *pname, const string_t *stringId, int count )
 {
-	int i, size;
+	intp i, size;
 
 	size = 0;
 	for ( i = 0; i < count; i++ )
-		size += strlen( STRING( stringId[i] ) ) + 1;
+		size += V_strlen( STRING( stringId[i] ) ) + 1;
 
 	WriteHeader( pname, size );
 	WriteString( stringId, count );
@@ -687,7 +689,7 @@ bool CSave::ShouldSaveField( const void *pData, typedescription_t *pField )
 			int *pEHandle = (int *)pData;
 			for ( int i = 0; i < pField->fieldSize; ++i, ++pEHandle )
 			{
-				if ( (*pEHandle) != 0xFFFFFFFF )
+				if ( (*pEHandle) != -1 )
 					return true;
 			}
 		}
@@ -968,7 +970,7 @@ int	CSave::EntityIndex( const edict_t *pentLookup )
 		return -1;
 	return EntityIndex( CBaseEntity::Instance(pentLookup) );
 #else
-	Assert( !"CSave::EntityIndex( edict_t * ) not valid on client!" );
+	AssertMsg( false, "CSave::EntityIndex( edict_t * ) not valid on client!" );
 	return -1;
 #endif
 }
@@ -1602,7 +1604,7 @@ void CRestore::StartBlock( SaveRestoreRecordHeader_t *pHeader )
 
 //-------------------------------------
 
-void CRestore::StartBlock( char szBlockName[] )
+void CRestore::StartBlock( char szBlockName[SIZE_BLOCK_NAME_BUF] )
 {
 	SaveRestoreRecordHeader_t header;
 	StartBlock( &header );
@@ -1804,7 +1806,7 @@ void CRestore::ReadString( char *pDest, int nSizeDest, int nBytesAvailable )
 {
 	const char *pString = BufferPointer();
 	if ( !nBytesAvailable )
-		nBytesAvailable = strlen( pString ) + 1;
+		nBytesAvailable = V_strlen( pString ) + 1;
 	BufferSkipBytes( nBytesAvailable );
 
 	Q_strncpy(pDest, pString, nSizeDest );
@@ -2129,7 +2131,7 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 #if !defined( CLIENT_DLL )
 			ReadEdictPtr( (edict_t **)pDest, pField->fieldSize, header.size );
 #else
-			Assert( !"FIELD_EDICT not valid for client .dll" );
+			AssertMsg( false, "FIELD_EDICT not valid for client .dll" );
 #endif
 			break;
 		case FIELD_EHANDLE:
@@ -2680,7 +2682,7 @@ void CEntitySaveRestoreBlockHandler::Restore( IRestore *pRestore, bool createPla
 
 		bool bRestoredCorrectly = false;
 		// FIXME, need to translate save spot to real index here using lookup table transmitted from server
-		//Assert( !"Need translation still" );
+		//AssertMsg( false, "Need translation still" );
 		if ( pEntInfo->restoreentityindex >= 0 )
 		{
 			if ( pEntInfo->restoreentityindex == 0 )
@@ -2707,7 +2709,11 @@ void CEntitySaveRestoreBlockHandler::Restore( IRestore *pRestore, bool createPla
 			if ( pEntInfo->classname != NULL_STRING )
 			{
 				pent = CreateEntityByName( STRING(pEntInfo->classname) );
-				pent->InitializeAsClientEntity( NULL, RENDER_GROUP_OPAQUE_ENTITY );
+
+				if ( pent ) 
+				{
+					pent->InitializeAsClientEntity( NULL, RENDER_GROUP_OPAQUE_ENTITY );
+				}
 				
 				pRestore->SetReadPos( pEntInfo->location );
 
@@ -2746,11 +2752,13 @@ void SaveEntityOnTable( CBaseEntity *pEntity, CSaveRestoreData *pSaveData, int &
 {
 	entitytable_t *pEntInfo = pSaveData->GetEntityInfo( iSlot );
 	pEntInfo->id = iSlot;
+
 #if !defined( CLIENT_DLL )
 	pEntInfo->edictindex = pEntity->RequiredEdictIndex();
 #else
 	pEntInfo->edictindex = -1;
 #endif
+
 	pEntInfo->modelname = pEntity->GetModelName();
 	pEntInfo->restoreentityindex = -1;
 	pEntInfo->saveentityindex = pEntity ? pEntity->entindex() : -1;

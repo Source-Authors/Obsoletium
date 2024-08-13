@@ -205,10 +205,6 @@ void ClearMultiDamage( void )
 //-----------------------------------------------------------------------------
 void ApplyMultiDamage( void )
 {
-	Vector		vecSpot1;//where blood comes from
-	Vector		vecDir;//direction blood should go
-	trace_t		tr;
-
 	if ( !g_MultiDamage.GetTarget() )
 		return;
 

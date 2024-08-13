@@ -229,7 +229,7 @@ void CBaseViewModel::SpawnControlPanels()
 		pScreen->SetOverlayMaterial( SCREEN_OVERLAY_MATERIAL );
 #endif
 		pScreen->SetAttachedToViewModel( true );
-		int nScreen = m_hScreens.AddToTail( );
+		intp nScreen = m_hScreens.AddToTail( );
 		m_hScreens[nScreen].Set( pScreen );
 	}
 #endif

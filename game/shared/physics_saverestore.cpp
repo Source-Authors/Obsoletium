@@ -42,8 +42,13 @@ struct PhysBlockHeader_t
 };
 BEGIN_SIMPLE_DATADESC( PhysBlockHeader_t )
 	DEFINE_FIELD( nSaved,	FIELD_INTEGER ),
+#ifndef PLATFORM_64BITS
 	// NOTE: We want to save the actual address here for remapping, so use an integer
-	DEFINE_FIELD( pWorldObject, FIELD_INTEGER ),	
+	DEFINE_FIELD( pWorldObject, FIELD_INTEGER ),
+#else
+	// NOTE: We want to save the actual address here for remapping
+	DEFINE_FIELD( pWorldObject, FIELD_CLASSPTR ),
+#endif
 END_DATADESC()
 
 #if defined(_STATIC_LINKED) && defined(CLIENT_DLL)
@@ -624,7 +629,7 @@ private:
 	public:
 		int Add( CBaseEntity *pOwner, typedescription_t *pTypeDesc, void **ppPhysObj, PhysInterfaceId_t type )
 		{
-			int i = AddToTail();
+			intp i = AddToTail();
 			
 			Assert( ppPhysObj );
 			Assert( *ppPhysObj == NULL ); // expected field to have been cleared

@@ -33,7 +33,7 @@ struct TrailPoint_t
 class CSpriteTrail : public CSprite
 {
 	DECLARE_CLASS( CSpriteTrail, CSprite );
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 	DECLARE_NETWORKCLASS();
 	DECLARE_PREDICTABLE();
 
@@ -51,21 +51,21 @@ public:
 
 	// Is the trail in the skybox?
 	bool IsInSkybox() const;
-	void Spawn( void );
-	void Precache( void );
+	void Spawn( void ) override;
+	void Precache( void ) override;
 	void SetTransmit( bool bTransmit = true ) { m_bDrawForMoveParent = bTransmit; }
 
 #if defined( CLIENT_DLL ) 
 	// Client only code
-	virtual int DrawModel( int flags );
-	virtual const Vector &GetRenderOrigin( void );
-	virtual const QAngle &GetRenderAngles( void );
+	int DrawModel( int flags ) override;
+	const Vector &GetRenderOrigin( void ) override;
+	const QAngle &GetRenderAngles( void ) override;
 
 	// On data update
-	virtual void OnPreDataChanged( DataUpdateType_t updateType );
-	virtual void OnDataChanged( DataUpdateType_t updateType );
-	virtual void GetRenderBounds( Vector& mins, Vector& maxs );
-	virtual void ClientThink();
+	void OnPreDataChanged( DataUpdateType_t updateType ) override;
+	void OnDataChanged( DataUpdateType_t updateType ) override;
+	void GetRenderBounds( Vector& mins, Vector& maxs ) override;
+	void ClientThink() override;
 
 	virtual bool ValidateEntityAttachedToPlayer( bool &bShouldRetry );
 

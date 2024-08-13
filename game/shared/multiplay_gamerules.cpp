@@ -1120,7 +1120,8 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//=========================================================
 	bool CMultiplayRules::FAllowNPCs( void )
 	{
-		return true; // E3 hack
+		// dimhotepus: Disable E3 hack.
+		// return true; // E3 hack
 		return ( allowNPCs.GetInt() != 0 );
 	}
 
@@ -1288,7 +1289,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		if ( !filesystem->ReadFile( pszMapCycleFile, "GAME", buf ) )
 			return;
 		buf.PutChar( 0 );
-		V_SplitString( (char*)buf.Base(), "\n", mapList );
+		V_SplitString( buf.Base<char>(), "\n", mapList );
 
 		for ( int i = 0; i < mapList.Count(); i++ )
 		{
@@ -1520,9 +1521,9 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		{
 			for ( KeyValues *menu = pKV->GetFirstSubKey(); menu != NULL; menu = menu->GetNextKey() )
 			{
-				int iMenuIndex = m_VoiceCommandMenus.AddToTail();
+				intp iMenuIndex = m_VoiceCommandMenus.AddToTail();
 
-				int iNumItems = 0;
+				intp iNumItems = 0;
 
 				// for each subkey of this menu, add a menu item
 				for ( KeyValues *menuitem = menu->GetFirstSubKey(); menuitem != NULL; menuitem = menuitem->GetNextKey() )

@@ -245,7 +245,7 @@ void IGameSystem::LevelInitPreEntityAllSystems( char const* pMapName )
 	// Store off the map name
 	delete[] s_pMapName;
 
-	int len = Q_strlen(pMapName) + 1;
+	intp len = Q_strlen(pMapName) + 1;
 	s_pMapName = new char [ len ];
 	Q_strncpy( s_pMapName, pMapName, len );
 

@@ -292,7 +292,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info )
+	bool CSingleplayRules::AllowDamage( CBaseEntity *, const CTakeDamageInfo & )
 	{
 		return true;
 	}

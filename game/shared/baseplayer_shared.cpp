@@ -93,14 +93,15 @@ ConVar mp_usehwmmodels( "mp_usehwmmodels", "0", NULL, "Enable the use of the hw 
 
 bool UseHWMorphModels()
 {
-// #ifdef CLIENT_DLL 
-// 	if ( mp_usehwmmodels.GetInt() == 0 )
-// 		return g_pMaterialSystemHardwareConfig->HasFastVertexTextures();
-// 
-// 	return mp_usehwmmodels.GetInt() > 0;
-// #else
-// 	return false;
-// #endif
+	// dimhotepus: HWMORPH
+//#ifdef CLIENT_DLL 
+//	if ( mp_usehwmmodels.GetInt() == 0 )
+//		return g_pMaterialSystemHardwareConfig->HasFastVertexTextures();
+//
+//	return mp_usehwmmodels.GetInt() > 0;
+//#else
+//	return false;
+//#endif
 	return false;
 }
 
@@ -1498,17 +1499,6 @@ void CBasePlayer::SmoothViewOnStairs( Vector& eyeOrigin )
 	}
 }
 
-static bool IsWaterContents( int contents )
-{
-	if ( contents & MASK_WATER )
-		return true;
-
-//	if ( contents & CONTENTS_TESTFOGVOLUME )
-//		return true;
-
-	return false;
-}
-
 void CBasePlayer::ResetObserverMode()
 {
 
@@ -1737,7 +1727,7 @@ float CBasePlayer::CalcRoll (const QAngle& angles, const Vector& velocity, float
 	// Get amount of lateral movement
     side = DotProduct( velocity, right );
 	// Right or left side?
-    sign = side < 0 ? -1 : 1;
+    sign = side < 0 ? -1.0f : 1.0f;
     side = fabs(side);
     
 	value = rollangle;

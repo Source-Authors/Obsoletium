@@ -42,12 +42,18 @@ class SendTable;
 #define DECLARE_NETWORKCLASS()											\
 		DECLARE_CLIENTCLASS()
 
+#define DECLARE_NETWORKCLASS_OVERRIDE()											\
+		DECLARE_CLIENTCLASS_OVERRIDE()
+
 #define DECLARE_NETWORKCLASS_NOBASE()									\
 		DECLARE_CLIENTCLASS_NOBASE()							
 
 #else
 
 #define DECLARE_NETWORKCLASS()											\
+		DECLARE_SERVERCLASS()
+
+#define DECLARE_NETWORKCLASS_OVERRIDE()											\
 		DECLARE_SERVERCLASS()
 
 #define DECLARE_NETWORKCLASS_NOBASE()									\
@@ -64,18 +70,25 @@ class SendTable;
 		static datamap_t m_PredMap;										\
 		virtual datamap_t *GetPredDescMap( void );						\
 		template <typename T> friend datamap_t *PredMapInit(T *)
+#define DECLARE_PREDICTABLE_OVERRIDE()											\
+	public:																\
+		static typedescription_t m_PredDesc[];							\
+		static datamap_t m_PredMap;										\
+		datamap_t *GetPredDescMap( void ) override;						\
+		template <typename T> friend datamap_t *PredMapInit(T *)
 #else
 #define DECLARE_PREDICTABLE()	template <typename T> friend datamap_t *PredMapInit(T *)
+#define DECLARE_PREDICTABLE_OVERRIDE()	template <typename T> friend datamap_t *PredMapInit(T *)
 #endif
 
 #ifndef NO_ENTITY_PREDICTION
 #define BEGIN_PREDICTION_DATA( className ) \
-	datamap_t className::m_PredMap = { 0, 0, #className, &BaseClass::m_PredMap }; \
+	datamap_t className::m_PredMap = { 0, 0, #className, &BaseClass::m_PredMap, false, false, 0 }; \
 	datamap_t *className::GetPredDescMap( void ) { return &m_PredMap; } \
 	BEGIN_PREDICTION_DATA_GUTS( className )
 
 #define BEGIN_PREDICTION_DATA_NO_BASE( className ) \
-	datamap_t className::m_PredMap = { 0, 0, #className, NULL }; \
+	datamap_t className::m_PredMap = { 0, 0, #className, NULL, false, false, 0 }; \
 	datamap_t *className::GetPredDescMap( void ) { return &m_PredMap; } \
 	BEGIN_PREDICTION_DATA_GUTS( className )
 
@@ -92,7 +105,7 @@ class SendTable;
 		typedef className classNameTypedef; \
 		static typedescription_t predDesc[] = \
 		{ \
-		{ FIELD_VOID,0, {0,0},0,0,0,0,0,0}, /* so you can define "empty" tables */
+		{ FIELD_VOID,nullptr, {0,0},0,0,nullptr,nullptr,nullptr,nullptr,0,nullptr,0,0.0f}, /* so you can define "empty" tables */
 
 #define END_PREDICTION_DATA() \
 		}; \
@@ -118,7 +131,7 @@ class SendTable;
 			typedef className classNameTypedef; \
 			typedescription_t predDesc[] = \
 			{ \
-				{ FIELD_VOID,0, {0,0},0,0,0,0,0,0},
+				{ FIELD_VOID,0, {0,0},0,0,nullptr,nullptr,nullptr,nullptr,0,nullptr,0,0.0f},
 
 #define BEGIN_PREDICTION_DATA_NO_BASE( className ) BEGIN_PREDICTION_DATA( className )
 
@@ -132,7 +145,8 @@ class SendTable;
 #else
 
 	// nothing, only client has a prediction system
-	#define DECLARE_PREDICTABLE()	
+	#define DECLARE_PREDICTABLE() 
+	#define DECLARE_PREDICTABLE_OVERRIDE() 
 	#define BEGIN_PREDICTION_DATA( className ) 
 	#define END_PREDICTION_DATA() 
 

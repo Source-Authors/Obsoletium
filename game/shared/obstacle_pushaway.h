@@ -37,6 +37,7 @@ public:
 		m_AlreadyHit = ents;
 		m_nMaxHits = nMaxEnts;
 	}
+	virtual ~CPushAwayEnumerator() {}
 	
 	// Actual work code
 	virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
@@ -76,6 +77,7 @@ public:
 	CBotBreakableEnumerator(CBaseEntity **ents, int nMaxEnts) : CPushAwayEnumerator(ents, nMaxEnts)
 	{
 	}
+	virtual ~CBotBreakableEnumerator() {}
 
 	virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
 	{
@@ -111,6 +113,7 @@ public:
 	CBotDoorEnumerator(CBaseEntity **ents, int nMaxEnts) : CPushAwayEnumerator(ents, nMaxEnts)
 	{
 	}
+	virtual ~CBotDoorEnumerator() {}
 
 	virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
 	{

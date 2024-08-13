@@ -79,7 +79,7 @@ void CSheetSimulator::Init( int w, int h, int fixedPointCount )
 
 void CSheetSimulator::AddSpring( int p1, int p2, float restLength )
 {
-	int spring = m_Springs.AddToTail();
+	intp spring = m_Springs.AddToTail();
 	m_Springs[spring].m_Particle1 = p1;
 	m_Springs[spring].m_Particle2 = p2;
 	m_Springs[spring].m_RestLength = restLength;
@@ -88,7 +88,7 @@ void CSheetSimulator::AddSpring( int p1, int p2, float restLength )
 void CSheetSimulator::AddFixedPointSpring( int fixedPoint, int p, float restLength )
 {
 	Assert( fixedPoint < m_FixedPointCount );
-	int spring = m_Springs.AddToTail();
+	intp spring = m_Springs.AddToTail();
 	m_Springs[spring].m_Particle1 = p;
 	m_Springs[spring].m_Particle2 = -(fixedPoint+1);
 	m_Springs[spring].m_RestLength = restLength;
@@ -275,10 +275,8 @@ void CSheetSimulator::ClearForces()
 
 void CSheetSimulator::ComputeForces()
 {
-
 	float springConstant;
-	int i;
-	for ( i = 0; i < m_Springs.Size(); ++i )
+	for ( auto &&s : m_Springs )
 	{
 		// Hook's law for a damped spring:
 		// got two particles, a and b with positions xa and xb and velocities va and vb
@@ -286,22 +284,22 @@ void CSheetSimulator::ComputeForces()
 		// fa = -( ks * (|l| - r) + kd * (va - vb) dot (l) / |l|) * l/|l|
 
 		Vector dx, dv, force;
-		if (m_Springs[i].m_Particle2 < 0)
+		if (s.m_Particle2 < 0)
 		{
 			// Case where we're connected to a control point
-			dx = m_Particle[m_Springs[i].m_Particle1].m_Position - 
-				m_ControlPoints[- m_Springs[i].m_Particle2 - 1];
-			dv = m_Particle[m_Springs[i].m_Particle1].m_Velocity;
+			dx = m_Particle[s.m_Particle1].m_Position - 
+				m_ControlPoints[- s.m_Particle2 - 1];
+			dv = m_Particle[s.m_Particle1].m_Velocity;
 
 			springConstant = m_FixedSpringConstant;
 		}
 		else
 		{
 			// Case where we're connected to another part of the shield
-			dx = m_Particle[m_Springs[i].m_Particle1].m_Position - 
-				m_Particle[m_Springs[i].m_Particle2].m_Position;
-			dv = m_Particle[m_Springs[i].m_Particle1].m_Velocity - 
-				m_Particle[m_Springs[i].m_Particle2].m_Velocity;
+			dx = m_Particle[s.m_Particle1].m_Position - 
+				m_Particle[s.m_Particle2].m_Position;
+			dv = m_Particle[s.m_Particle1].m_Velocity - 
+				m_Particle[s.m_Particle2].m_Velocity;
 
 			springConstant = m_PointSpringConstant;
 		}
@@ -312,27 +310,27 @@ void CSheetSimulator::ComputeForces()
 
 		dx /= length;
 
-		float springfactor = springConstant * ( length - m_Springs[i].m_RestLength);
+		float springfactor = springConstant * ( length - s.m_RestLength);
 		float dampfactor = m_DampConstant * DotProduct( dv, dx );
 		force = dx * -( springfactor + dampfactor );
 
-		m_Particle[m_Springs[i].m_Particle1].m_Force += force;
-		if (m_Springs[i].m_Particle2 >= 0)
-			m_Particle[m_Springs[i].m_Particle2].m_Force -= force;
+		m_Particle[s.m_Particle1].m_Force += force;
+		if (s.m_Particle2 >= 0)
+			m_Particle[s.m_Particle2].m_Force -= force;
 
-		Assert( IsFinite( m_Particle[m_Springs[i].m_Particle1].m_Force.x ) &&
-			IsFinite( m_Particle[m_Springs[i].m_Particle1].m_Force.y) &&
-			IsFinite( m_Particle[m_Springs[i].m_Particle1].m_Force.z) );
+		Assert( IsFinite( m_Particle[s.m_Particle1].m_Force.x ) &&
+			IsFinite( m_Particle[s.m_Particle1].m_Force.y) &&
+			IsFinite( m_Particle[s.m_Particle1].m_Force.z) );
 	}
 
 	// gravity term
-	for (i = 0; i < m_Gravity.Count(); ++i)
+	for (auto &&g : m_Gravity)
 	{
-		m_Particle[m_Gravity[i]].m_Force.z -= m_Particle[m_Gravity[i]].m_Mass * m_GravityConstant;
+		m_Particle[g].m_Force.z -= m_Particle[g].m_Mass * m_GravityConstant;
 	}
 
 	// viscous drag term
-	for (i = 0; i < NumParticles(); ++i)
+	for (intp i = 0; i < NumParticles(); ++i)
 	{
 		// Factor out bad forces for surface contact 
 		// Do this before the drag term otherwise the drag will be too large
@@ -541,7 +539,7 @@ void CSheetSimulator::EulerStep( float dt )
 		float lensq = m_Particle[i].m_Velocity.LengthSqr();
 		if (lensq > 1e6)
 		{
-			m_Particle[i].m_Velocity *= 1e3 / sqrt(lensq);
+			m_Particle[i].m_Velocity *= 1e3f / sqrt(lensq);
 		}
 	}
 	SatisfyCollisionConstraints();

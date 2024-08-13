@@ -6,9 +6,6 @@
 //=============================================================================//
 
 #include "tier0/dbg.h"
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
 #include "choreoevent.h"
 #include "choreoactor.h"
 #include "choreochannel.h"
@@ -40,17 +37,6 @@ CEventRelativeTag::CEventRelativeTag( CChoreoEvent *owner, const char *name, flo
 
 	m_flPercentage = percentage;
 	m_pOwner = owner;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : src - 
-//-----------------------------------------------------------------------------
-CEventRelativeTag::CEventRelativeTag( const CEventRelativeTag& src )
-{
-	m_Name			= src.m_Name;
-	m_flPercentage	= src.m_flPercentage;
-	m_pOwner		= src.m_pOwner;
 }
 	
 //-----------------------------------------------------------------------------
@@ -130,16 +116,6 @@ CFlexTimingTag::CFlexTimingTag( CChoreoEvent *owner, const char *name, float per
 
 //-----------------------------------------------------------------------------
 // Purpose: 
-// Input  : src - 
-//-----------------------------------------------------------------------------
-CFlexTimingTag::CFlexTimingTag( const CFlexTimingTag& src )
-: BaseClass( src )
-{
-	m_bLocked = src.m_bLocked;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
 bool CFlexTimingTag::GetLocked( void )
@@ -178,21 +154,6 @@ CEventAbsoluteTag::CEventAbsoluteTag( CChoreoEvent *owner, const char *name, flo
 
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : src - 
-//-----------------------------------------------------------------------------
-CEventAbsoluteTag::CEventAbsoluteTag( const CEventAbsoluteTag& src )
-{
-	m_Name			= src.m_Name;
-	m_flPercentage	= src.m_flPercentage;
-	m_pOwner		= src.m_pOwner;
-	m_bLocked		= src.m_bLocked;
-	m_bLinear		= src.m_bLinear;
-	m_bEntry		= src.m_bEntry;
-	m_bExit			= src.m_bExit;
-}
-	
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Output : const char
@@ -456,6 +417,7 @@ CFlexAnimationTrack::CFlexAnimationTrack( const CFlexAnimationTrack* src )
 	m_EdgeInfo[ 1 ] = src->m_EdgeInfo[ 1 ];
 
 	m_pEvent = NULL;
+	m_bInverted = src->m_bInverted;
 }
 
 //-----------------------------------------------------------------------------
@@ -465,9 +427,9 @@ CFlexAnimationTrack::~CFlexAnimationTrack( void )
 {
 	delete[] m_pControllerName;
 
-	for ( int t = 0; t < 2; t++ )
+	for ( auto &s : m_Samples )
 	{
-		m_Samples[ t ].Purge();
+		s.Purge();
 	}
 }
 
@@ -509,7 +471,7 @@ void CFlexAnimationTrack::RemoveSample( int index, int type /*=0*/ )
 void CFlexAnimationTrack::SetFlexControllerName( const char *name )
 {
 	delete[] m_pControllerName;
-	int len = Q_strlen( name ) + 1;
+	intp len = Q_strlen( name ) + 1;
 	m_pControllerName = new char[ len ];
 	Q_strncpy( m_pControllerName, name, len );
 }
@@ -527,7 +489,7 @@ const char *CFlexAnimationTrack::GetFlexControllerName( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CFlexAnimationTrack::GetNumSamples( int type /*=0*/ )
+intp CFlexAnimationTrack::GetNumSamples( int type /*=0*/ ) const
 {
 	Assert( type == 0 || type == 1 );
 
@@ -539,7 +501,7 @@ int CFlexAnimationTrack::GetNumSamples( int type /*=0*/ )
 // Input  : index - 
 // Output : CExpressionSample
 //-----------------------------------------------------------------------------
-CExpressionSample *CFlexAnimationTrack::GetSample( int index, int type /*=0*/ )
+CExpressionSample *CFlexAnimationTrack::GetSample( intp index, int type /*=0*/ )
 {
 	Assert( type == 0 || type == 1 );
 
@@ -566,14 +528,14 @@ void CFlexAnimationTrack::SetTrackActive( bool active )
 	m_bActive = active;
 }
 
-void CFlexAnimationTrack::SetEdgeInfo( bool leftEdge, int curveType, float zero )
+void CFlexAnimationTrack::SetEdgeInfo( bool leftEdge, short curveType, float zero )
 {
 	int idx = leftEdge ? 0 : 1;
 	m_EdgeInfo[ idx ].m_CurveType = curveType;
 	m_EdgeInfo[ idx ].m_flZeroPos = zero;
 }
 
-void CFlexAnimationTrack::GetEdgeInfo( bool leftEdge, int& curveType, float& zero ) const
+void CFlexAnimationTrack::GetEdgeInfo( bool leftEdge, short& curveType, float& zero ) const
 {
 	int idx = leftEdge ? 0 : 1;
 	curveType = m_EdgeInfo[ idx ].m_CurveType;
@@ -592,7 +554,7 @@ bool CFlexAnimationTrack::IsEdgeActive( bool leftEdge ) const
 	return m_EdgeInfo[ idx ].m_bActive;
 }
 
-int CFlexAnimationTrack::GetEdgeCurveType( bool leftEdge ) const
+short CFlexAnimationTrack::GetEdgeCurveType( bool leftEdge ) const
 {
 	if ( !IsEdgeActive( leftEdge ) )
 	{
@@ -648,7 +610,7 @@ float CFlexAnimationTrack::GetZeroValue( int type, bool leftSide )
 // Input  : number - 
 // Output : CExpressionSample
 //-----------------------------------------------------------------------------
-CExpressionSample *CFlexAnimationTrack::GetBoundedSample( int number, bool& bClamped, int type /*=0*/ )
+CExpressionSample *CFlexAnimationTrack::GetBoundedSample( intp number, bool& bClamped, int type /*=0*/ )
 {
 	Assert( type == 0 || type == 1 );
 
@@ -705,11 +667,11 @@ float CFlexAnimationTrack::GetIntensityInternal( float time, int type )
 	// find samples that span the time
 	if ( !m_pEvent || !m_pEvent->HasEndTime() || time < m_pEvent->GetStartTime() )
 	{
-		retval = GetZeroValue( type, true );;
+		retval = GetZeroValue( type, true );
 	}
 	else if ( time > m_pEvent->GetEndTime() )
 	{
-		retval = GetZeroValue( type, false );;
+		retval = GetZeroValue( type, false );
 	}
 	else
 	{
@@ -741,7 +703,7 @@ float CFlexAnimationTrack::GetFracIntensity( float time, int type )
 	if ( !m_pEvent || !m_pEvent->HasEndTime() )
 		return zeroValueLeft;
 
-	int rampCount = GetNumSamples( type );
+	intp rampCount = GetNumSamples( type );
 	if ( rampCount < 1 )
 	{
 		return zeroValueLeft;
@@ -751,8 +713,8 @@ float CFlexAnimationTrack::GetFracIntensity( float time, int type )
 	CExpressionSample *esEnd = NULL;
 
 	// do binary search for sample in time period
-	int j = MAX( rampCount / 2, 1 );
-	int i = j;
+	intp j = MAX( rampCount / 2, 1 );
+	intp i = j;
 	while ( i > -2 && i < rampCount + 1 )
 	{
 		bool dummy;
@@ -785,8 +747,8 @@ float CFlexAnimationTrack::GetFracIntensity( float time, int type )
 		return zeroValueLeft;
 	}
 
-	int prev = i - 1;
-	int next = i + 2;
+	intp prev = i - 1;
+	intp next = i + 2;
 
 	prev = MAX( -1, prev );
 	next = MIN( next, rampCount );
@@ -922,7 +884,7 @@ CExpressionSample *CFlexAnimationTrack::AddSample( float time, float value, int 
 	sample.value = value;
 	sample.selected = false;
 
-	int idx = m_Samples[ type ].AddToTail( sample );
+	intp idx = m_Samples[ type ].AddToTail( sample );
 	
 	// Resort( type );
 	return &m_Samples[ type ][ idx ];
@@ -1138,6 +1100,10 @@ void CFlexAnimationTrack::RemoveOutOfRangeSamples( int type )
 CChoreoEvent::CChoreoEvent( CChoreoScene *scene )
 {
 	Init( scene );
+
+	m_flPrevCycle = 0.0f;
+	m_flPrevTime = 0.0f;
+	m_bMarkedForSave = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1191,6 +1157,8 @@ CChoreoEvent::~CChoreoEvent( void )
 //-----------------------------------------------------------------------------
 CChoreoEvent& CChoreoEvent::operator=( const CChoreoEvent& src )
 {
+	if ( &src == this ) return *this;
+
 	MEM_ALLOC_CREDIT();
 
 	// Copy global id when copying entity
@@ -1354,7 +1322,7 @@ void CChoreoEvent::Init( CChoreoScene *scene )
 //-----------------------------------------------------------------------------
 CChoreoEvent::EVENTTYPE CChoreoEvent::GetType( void )
 {
-	return (EVENTTYPE)m_fType;
+	return m_fType;
 }
 
 //-----------------------------------------------------------------------------
@@ -1418,7 +1386,7 @@ const char *CChoreoEvent::GetParameters( void )
 //-----------------------------------------------------------------------------
 void CChoreoEvent::SetParameters2( const char *param )
 {
-	int iLength = Q_strlen( param );
+	intp iLength = Q_strlen( param );
 	m_Parameters2 = param;
 
 	// HACK: Remove trailing " " until faceposer is fixed
@@ -1449,7 +1417,7 @@ const char *CChoreoEvent::GetParameters2( void )
 //-----------------------------------------------------------------------------
 void CChoreoEvent::SetParameters3( const char *param )
 {
-	int iLength = Q_strlen( param );
+	intp iLength = Q_strlen( param );
 	m_Parameters3 = param;
 
 	// HACK: Remove trailing " " until faceposer is fixed
@@ -1511,7 +1479,7 @@ const char *CChoreoEvent::GetDescription( void )
 void CChoreoEvent::SetStartTime( float starttime )
 {
 	m_flStartTime = starttime;
-	if ( m_flEndTime != -1.0f )
+	if ( m_flEndTime != -1.0f ) //-V1051
 	{
 		if ( m_flEndTime < m_flStartTime )
 		{
@@ -1617,7 +1585,7 @@ float CCurveData::GetIntensity( ICurveDataAccessor *data, float time )
 		return zeroValue;
 	}
 
-	int rampCount = GetCount();
+	intp rampCount = GetCount();
 	if ( rampCount < 1 )
 	{
 		// Full intensity
@@ -1628,8 +1596,8 @@ float CCurveData::GetIntensity( ICurveDataAccessor *data, float time )
 	CExpressionSample *esEnd = NULL;
 
 	// do binary search for sample in time period
-	int j = MAX( rampCount / 2, 1 );
-	int i = j;
+	intp j = MAX( rampCount / 2, 1 );
+	intp i = j;
 	while ( i > -2 && i < rampCount + 1 )
 	{
 		bool dummy;
@@ -1656,8 +1624,8 @@ float CCurveData::GetIntensity( ICurveDataAccessor *data, float time )
 		return 1.0f;
 	}
 
-	int prev = i - 1;
-	int next = i + 2;
+	intp prev = i - 1;
+	intp next = i + 2;
 
 	prev = MAX( -1, prev );
 	next = MIN( next, rampCount );
@@ -1799,7 +1767,7 @@ float CCurveData::GetIntensityArea( ICurveDataAccessor *data, float time )
 		return zeroValue;
 	}
 
-	int rampCount = GetCount();
+	intp rampCount = GetCount();
 	if ( rampCount < 1 )
 	{
 		// Full intensity
@@ -1810,8 +1778,8 @@ float CCurveData::GetIntensityArea( ICurveDataAccessor *data, float time )
 	CExpressionSample *esEnd = NULL;
 
 	// do binary search for sample in time period
-	int j = MAX( rampCount / 2, 1 );
-	int i = j;
+	intp j = MAX( rampCount / 2, 1 );
+	intp i = j;
 	while ( i > -2 && i < rampCount + 1 )
 	{
 		bool dummy;
@@ -1838,8 +1806,8 @@ float CCurveData::GetIntensityArea( ICurveDataAccessor *data, float time )
 	float flTotal = 0.0f;
 	flTotal = m_RampAccumulator[i+1];
 
-	int prev = i - 1;
-	int next = i + 2;
+	intp prev = i - 1;
+	intp next = i + 2;
 
 	prev = MAX( -1, prev );
 	next = MIN( next, rampCount );
@@ -1909,7 +1877,7 @@ float CCurveData::GetIntensityArea( ICurveDataAccessor *data, float time )
 
 void CCurveData::UpdateIntensityArea( ICurveDataAccessor *data )
 {
-	int rampCount = GetCount();;
+	intp rampCount = GetCount();
 	if ( rampCount < 1 )
 	{
 		return;
@@ -1922,7 +1890,7 @@ void CCurveData::UpdateIntensityArea( ICurveDataAccessor *data )
 
 	m_RampAccumulator.SetCount( rampCount + 2 );
 
-	int i = -1;
+	intp i = -1;
 
 	bool dummy;
 	CExpressionSample *esPre = GetBoundedSample( data, i - 1, dummy );
@@ -2081,11 +2049,7 @@ class CCheckEventNames
 public:
 	CCheckEventNames()
 	{
-		if ( ARRAYSIZE( g_NameMap ) != CChoreoEvent::NUM_TYPES )
-		{
-			Error( "g_NameMap contains %llu entries, CChoreoEvent::NUM_TYPES == %i!",
-				(uint64)(ARRAYSIZE( g_NameMap )), CChoreoEvent::NUM_TYPES );
-		}
+		static_assert( ssize( g_NameMap ) == CChoreoEvent::NUM_TYPES );
 		for ( int i = 0; i < CChoreoEvent::NUM_TYPES; ++i )
 		{
 			if ( !g_NameMap[ i ].name )
@@ -2117,7 +2081,7 @@ CChoreoEvent::EVENTTYPE CChoreoEvent::TypeForName( const char *name )
 			return slot->type;
 	}
 	
-	Assert( !"CChoreoEvent::TypeForName failed!!!" );
+	AssertMsg( false, "CChoreoEvent::TypeForName failed!!!" );
 	return UNSPECIFIED;
 }
 
@@ -2131,7 +2095,7 @@ const char *CChoreoEvent::NameForType( EVENTTYPE type )
 	int i = (int)type;
 	if ( i < 0 || i >= NUM_TYPES )
 	{
-		Assert( "!CChoreoEvent::NameForType:  bogus type!" );
+		AssertMsg( false, "!CChoreoEvent::NameForType:  bogus type!" );
 		// returns "unspecified!!!";
 		return g_NameMap[ 0 ].name;
 	}
@@ -2163,11 +2127,7 @@ class CCheckCCNames
 public:
 	CCheckCCNames()
 	{
-		if ( ARRAYSIZE( g_CCNameMap ) != CChoreoEvent::NUM_CC_TYPES )
-		{
-			Error( "g_CCNameMap contains %llu entries, CChoreoEvent::NUM_CC_TYPES == %i!",
-				(uint64)(ARRAYSIZE( g_CCNameMap )), CChoreoEvent::NUM_CC_TYPES );
-		}
+		static_assert ( ssize( g_CCNameMap ) == CChoreoEvent::NUM_CC_TYPES );
 		for ( int i = 0; i < CChoreoEvent::NUM_CC_TYPES; ++i )
 		{
 			if ( !g_CCNameMap[ i ].name )
@@ -2199,7 +2159,7 @@ CChoreoEvent::CLOSECAPTION CChoreoEvent::CCTypeForName( const char *name )
 			return slot->type;
 	}
 	
-	Assert( !"CChoreoEvent::TypeForName failed!!!" );
+	AssertMsg( false, "CChoreoEvent::TypeForName failed!!!" );
 	return CC_MASTER;
 }
 
@@ -2213,7 +2173,7 @@ const char *CChoreoEvent::NameForCCType( CLOSECAPTION type )
 	int i = (int)type;
 	if ( i < 0 || i >= NUM_CC_TYPES )
 	{
-		Assert( "!CChoreoEvent::NameForType:  bogus type!" );
+		AssertMsg( false, "!CChoreoEvent::NameForType:  bogus type!" );
 		// returns "unspecified!!!";
 		return g_CCNameMap[ 0 ].name;
 	}
@@ -2601,8 +2561,8 @@ CFlexTimingTag * CChoreoEvent::FindTimingTag( const char *tagname )
 //-----------------------------------------------------------------------------
 void CChoreoEvent::OnEndTimeChanged( void )
 {
-	int c = GetNumFlexAnimationTracks();
-	for ( int i = 0; i < c; i++ )
+	intp c = GetNumFlexAnimationTracks();
+	for ( intp i = 0; i < c; i++ )
 	{
 		CFlexAnimationTrack *track = GetFlexAnimationTrack( i );
 		Assert( track );
@@ -2902,7 +2862,8 @@ CChoreoEvent::AbsTagType CChoreoEvent::TypeForAbsoluteTagName( const char *name 
 		return ORIGINAL;
 	}
 
-	return (AbsTagType)-1;
+	// dimhotepus: Use enum instead of not portable -1.
+	return NUM_ABS_TAG_TYPES;
 }
 
 //-----------------------------------------------------------------------------
@@ -3045,7 +3006,7 @@ bool CChoreoEvent::VerifyTagOrder( )
 //			*tagname - 
 //-----------------------------------------------------------------------------
 
-float CChoreoEvent::GetBoundedAbsoluteTagPercentage( AbsTagType type, int tagnum )
+float CChoreoEvent::GetBoundedAbsoluteTagPercentage( AbsTagType type, intp tagnum )
 {
 	if ( tagnum <= -2 )
 	{
@@ -3110,7 +3071,7 @@ float CChoreoEvent::GetOriginalPercentageFromPlaybackPercentage( float t )
 	if ( GetType() != GESTURE )
 		return t;
 
-	int count = GetNumAbsoluteTags( PLAYBACK );
+	intp count = GetNumAbsoluteTags( PLAYBACK );
 
 	if ( count != GetNumAbsoluteTags( ORIGINAL ) )
 	{
@@ -3128,7 +3089,7 @@ float CChoreoEvent::GetOriginalPercentageFromPlaybackPercentage( float t )
 	float s = 0.0f, n = 0.0f;
 
 	// find what tags this is between
-	int i;
+	intp i;
 	for ( i = -1 ; i < count; i++ )
 	{
 		s = GetBoundedAbsoluteTagPercentage( PLAYBACK, i );
@@ -3140,10 +3101,10 @@ float CChoreoEvent::GetOriginalPercentageFromPlaybackPercentage( float t )
 		}
 	}
 
-	int prev = i - 1;
-	int start = i;
-	int end = i + 1;
-	int next = i + 2;
+	intp prev = i - 1;
+	intp start = i;
+	intp end = i + 1;
+	intp next = i + 2;
 
 	prev = MAX( -2, prev );
 	start = MAX( -1, start );
@@ -3236,7 +3197,7 @@ float CChoreoEvent::GetPlaybackPercentageFromOriginalPercentage( float t )
 	if ( GetType() != GESTURE )
 		return t;
 
-	int count = GetNumAbsoluteTags( PLAYBACK );
+	intp count = GetNumAbsoluteTags( PLAYBACK );
 
 	if ( count != GetNumAbsoluteTags( ORIGINAL ) )
 	{
@@ -3254,7 +3215,7 @@ float CChoreoEvent::GetPlaybackPercentageFromOriginalPercentage( float t )
 	float s = 0.0f, n = 0.0f;
 
 	// find what tags this is between
-	int i;
+	intp i;
 	for ( i = -1 ; i < count; i++ )
 	{
 		s = GetBoundedAbsoluteTagPercentage( PLAYBACK, i );
@@ -3266,10 +3227,10 @@ float CChoreoEvent::GetPlaybackPercentageFromOriginalPercentage( float t )
 		}
 	}
 
-	int prev = i - 1;
-	int start = i;
-	int end = i + 1;
-	int next = i + 2;
+	intp prev = i - 1;
+	intp start = i;
+	intp end = i + 1;
+	intp next = i + 2;
 
 	prev = MAX( -2, prev );
 	start = MAX( -1, start );
@@ -3465,12 +3426,12 @@ EdgeInfo_t *CCurveData::GetEdgeInfo( int idx )
 	return &m_RampEdgeInfo[ idx ];
 }
 
-int	 CCurveData::GetCount( void )
+intp	 CCurveData::GetCount( void ) const
 {
 	return m_Ramp.Count();
 }
 
-CExpressionSample *CCurveData::Get( int index )
+CExpressionSample *CCurveData::Get( intp index )
 {
 	if ( index < 0 || index >= GetCount() )
 		return NULL;
@@ -3486,7 +3447,7 @@ CExpressionSample *CCurveData::Add( float time, float value, bool selected )
 	sample.value = value;
 	sample.selected = selected;
 
-	int idx = m_Ramp.AddToTail( sample );
+	intp idx = m_Ramp.AddToTail( sample );
 	return &m_Ramp[ idx ];
 }
 
@@ -3533,7 +3494,7 @@ void CCurveData::Resort( ICurveDataAccessor *data )
 // Input  : number - 
 // Output : CExpressionSample
 //-----------------------------------------------------------------------------
-CExpressionSample *CCurveData::GetBoundedSample( ICurveDataAccessor *data, int number, bool& bClamped )
+CExpressionSample *CCurveData::GetBoundedSample( ICurveDataAccessor *data, intp number, bool& bClamped )
 {
 	// Search for two samples which span time f
 	if ( number < 0 )
@@ -3566,8 +3527,8 @@ void CCurveData::RemoveOutOfRangeSamples( ICurveDataAccessor *data )
 {
 	float duration = data->GetDuration();
 
-	int c = GetCount();
-	for ( int i = c-1; i >= 0; i-- )
+	intp c = GetCount();
+	for ( intp i = c-1; i >= 0; i-- )
 	{
 		CExpressionSample src = m_Ramp[ i ];
 		if ( src.time < 0 ||
@@ -3607,8 +3568,8 @@ void CChoreoEvent::RescaleGestureTimes( float newstart, float newend, bool bMain
 
 	if ( bMaintainAbsoluteTagPositions )
 	{
-		int i;
-		int count = GetNumAbsoluteTags( CChoreoEvent::PLAYBACK );
+		intp i;
+		intp count = GetNumAbsoluteTags( CChoreoEvent::PLAYBACK );
 		for ( i = 0; i < count; i++ )
 		{
 			CEventAbsoluteTag *tag = GetAbsoluteTag( CChoreoEvent::PLAYBACK, i );
@@ -3636,8 +3597,8 @@ bool CChoreoEvent::PreventTagOverlap( void )
 
 	float minP = 1.00;
 
-	int count = GetNumAbsoluteTags( CChoreoEvent::PLAYBACK );
-	for ( int i = count - 1; i >= 0; i-- )
+	intp count = GetNumAbsoluteTags( CChoreoEvent::PLAYBACK );
+	for ( intp i = count - 1; i >= 0; i-- )
 	{
 		CEventAbsoluteTag *tag = GetAbsoluteTag( CChoreoEvent::PLAYBACK, i );
 		
@@ -3756,7 +3717,7 @@ void CChoreoEvent::SetCloseCaptionType( CLOSECAPTION type )
 CChoreoEvent::CLOSECAPTION CChoreoEvent::GetCloseCaptionType() const
 {
 	Assert( m_fType == SPEAK );
-	return (CLOSECAPTION)m_ccType;
+	return m_ccType;
 }
 
 void CChoreoEvent::SetCloseCaptionToken( char const *token )
@@ -3818,8 +3779,6 @@ bool CChoreoEvent::GetPlaybackCloseCaptionToken( char *dest, int destlen )
 			return true;
 		}
 	}
-
-	return false;
 }
 
 
@@ -3948,7 +3907,7 @@ bool CChoreoEvent::ComputeCombinedBaseFileName( char *dest, int destlen, bool cr
 		}
 	}
 
-	int len = Q_strlen( pvcd );
+	size_t len = strlen( pvcd );
 
 	if ( len > 0 && ( len + 1 ) < ( sizeof( vcdpath ) - 1 ) )
 	{
@@ -4022,21 +3981,21 @@ void CChoreoEvent::AddEventDependency( CChoreoEvent *other )
 //-----------------------------------------------------------------------------
 void CChoreoEvent::GetEventDependencies( CUtlVector< CChoreoEvent * >& list )
 {
-	int c = m_Dependencies.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Dependencies.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		list.AddToTail( m_Dependencies[ i ] );
 	}
 }
 
-void CCurveData::SetEdgeInfo( bool leftEdge, int curveType, float zero )
+void CCurveData::SetEdgeInfo( bool leftEdge, short curveType, float zero )
 {
 	int idx = leftEdge ? 0 : 1;
 	m_RampEdgeInfo[ idx ].m_CurveType = curveType;
 	m_RampEdgeInfo[ idx ].m_flZeroPos = zero;
 }
 
-void CCurveData::GetEdgeInfo( bool leftEdge, int& curveType, float& zero ) const
+void CCurveData::GetEdgeInfo( bool leftEdge, short& curveType, float& zero ) const
 {
 	int idx = leftEdge ? 0 : 1;
 	curveType = m_RampEdgeInfo[ idx ].m_CurveType;
@@ -4055,7 +4014,7 @@ bool CCurveData::IsEdgeActive( bool leftEdge ) const
 	return m_RampEdgeInfo[ idx ].m_bActive;
 }
 
-int CCurveData::GetEdgeCurveType( bool leftEdge ) const
+short CCurveData::GetEdgeCurveType( bool leftEdge ) const
 {
 	if ( !IsEdgeActive( leftEdge ) )
 	{
@@ -4078,7 +4037,7 @@ float CCurveData::GetEdgeZeroValue( bool leftEdge ) const
 }
 
 
-void CChoreoEvent::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoStringPool *pStringPool )
+void CChoreoEvent::SaveToBuffer( CUtlBuffer& buf, [[maybe_unused]] CChoreoScene *pScene, IChoreoStringPool *pStringPool )
 {
 	buf.PutChar( GetType() );
 	buf.PutShort( pStringPool->FindOrAddString( GetName() ) );
@@ -4095,7 +4054,7 @@ void CChoreoEvent::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoS
 
 	m_Ramp.SaveToBuffer( buf, pStringPool );  
 
-	int flags = 0;
+	unsigned char flags = 0;
 	flags |= IsResumeCondition() ? 1<<0 : 0;
 	flags |= IsLockBodyFacing() ? 1<<1 : 0;
 	flags |= IsFixedLength() ? 1<<2 : 0;
@@ -4107,11 +4066,11 @@ void CChoreoEvent::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoS
 
 	buf.PutFloat( GetDistanceToTarget() );
 
-	int numRelativeTags = GetNumRelativeTags();
+	intp numRelativeTags = GetNumRelativeTags();
 	Assert( numRelativeTags <= 255 );
 	buf.PutUnsignedChar( numRelativeTags );
 
-	for ( int t = 0; t < numRelativeTags; t++ )
+	for ( intp t = 0; t < numRelativeTags; t++ )
 	{
 		CEventRelativeTag *rt = GetRelativeTag( t );
 		Assert( rt );
@@ -4122,11 +4081,11 @@ void CChoreoEvent::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoS
 		buf.PutUnsignedChar( p );
 	}
 
-	int numTimingTags = GetNumTimingTags(); 
+	intp numTimingTags = GetNumTimingTags(); 
 	Assert( numTimingTags <= 255 );
 	buf.PutUnsignedChar( numTimingTags );
 
-	for ( int t = 0; t < numTimingTags; t++ )
+	for ( intp t = 0; t < numTimingTags; t++ )
 	{
 		CFlexTimingTag *tt = GetTimingTag( t );
 		Assert( tt );
@@ -4143,11 +4102,11 @@ void CChoreoEvent::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoS
 	int tagtype;
 	for ( tagtype = 0; tagtype < CChoreoEvent::NUM_ABS_TAG_TYPES; tagtype++ )
 	{
-		int num = GetNumAbsoluteTags( (CChoreoEvent::AbsTagType)tagtype );
+		intp num = GetNumAbsoluteTags( (CChoreoEvent::AbsTagType)tagtype );
 		Assert( num <= 255 );
 		buf.PutUnsignedChar( num );
 
-		for ( int i = 0; i < num ; ++i )
+		for ( intp i = 0; i < num ; ++i )
 		{
 			CEventAbsoluteTag *abstag = GetAbsoluteTag( (CChoreoEvent::AbsTagType)tagtype, i );
 			Assert( abstag );
@@ -4211,7 +4170,7 @@ void CChoreoEvent::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoS
 	}
 }
 
-bool CChoreoEvent::RestoreFromBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoStringPool *pStringPool )
+bool CChoreoEvent::RestoreFromBuffer( CUtlBuffer& buf, [[maybe_unused]] CChoreoScene *pScene, IChoreoStringPool *pStringPool )
 {
 	MEM_ALLOC_CREDIT();
 
@@ -4329,13 +4288,13 @@ bool CChoreoEvent::RestoreFromBuffer( CUtlBuffer& buf, CChoreoScene *pScene, ICh
 	return true;
 }
 
-void CCurveData::SaveToBuffer( CUtlBuffer& buf, IChoreoStringPool *pStringPool )
+void CCurveData::SaveToBuffer( CUtlBuffer& buf, IChoreoStringPool * )
 {
-	int c = GetCount();
+	intp c = GetCount();
 	Assert( c <= 255 );
 	buf.PutUnsignedChar( c );
 
-	for ( int i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		CExpressionSample *sample = Get( i );
 		buf.PutFloat( sample->time );
@@ -4346,7 +4305,7 @@ void CCurveData::SaveToBuffer( CUtlBuffer& buf, IChoreoStringPool *pStringPool )
 	}	
 }
 
-bool CCurveData::RestoreFromBuffer( CUtlBuffer& buf, IChoreoStringPool *pStringPool )
+bool CCurveData::RestoreFromBuffer( CUtlBuffer& buf, IChoreoStringPool * )
 {
 	int c = buf.GetUnsignedChar();
 	for ( int i = 0; i < c; i++ )
@@ -4363,17 +4322,17 @@ bool CCurveData::RestoreFromBuffer( CUtlBuffer& buf, IChoreoStringPool *pStringP
 
 void CChoreoEvent::SaveFlexAnimationsToBuffer( CUtlBuffer& buf, IChoreoStringPool *pStringPool )
 {
-	int numFlexAnimationTracks = GetNumFlexAnimationTracks();
+	intp numFlexAnimationTracks = GetNumFlexAnimationTracks();
 	Assert( numFlexAnimationTracks <= 255 );
 	buf.PutUnsignedChar( numFlexAnimationTracks );
 
-	for ( int i = 0; i < numFlexAnimationTracks; i++ )
+	for ( intp i = 0; i < numFlexAnimationTracks; i++ )
 	{
 		CFlexAnimationTrack *track = GetFlexAnimationTrack( i );
 
 		buf.PutShort( pStringPool->FindOrAddString( track->GetFlexControllerName() ) );
 
-		int flags = 0;
+		unsigned char flags = 0;
 		flags |= track->IsTrackActive() ? 1<<0 : 0;
 		flags |= track->IsComboType() ? 1<<1 : 0;
 		buf.PutUnsignedChar( flags );
@@ -4382,7 +4341,7 @@ void CChoreoEvent::SaveFlexAnimationsToBuffer( CUtlBuffer& buf, IChoreoStringPoo
 		buf.PutFloat( track->GetMax() );
 
 		buf.PutShort( track->GetNumSamples( 0 ) );
-        for ( int j = 0 ; j < track->GetNumSamples( 0 ) ; j++ )
+        for ( intp j = 0 ; j < track->GetNumSamples( 0 ) ; j++ )
 		{
 			CExpressionSample *s = track->GetSample( j, 0 );
 			if ( !s )
@@ -4400,11 +4359,11 @@ void CChoreoEvent::SaveFlexAnimationsToBuffer( CUtlBuffer& buf, IChoreoStringPoo
 		// Write out combo samples
 		if ( track->IsComboType() )
 		{
-			int numSamples = track->GetNumSamples( 1 );
+			intp numSamples = track->GetNumSamples( 1 );
 			Assert( numSamples <= 32767 );
 			buf.PutUnsignedShort( numSamples );
 
-			for ( int j = 0; j < numSamples; j++ )
+			for ( intp j = 0; j < numSamples; j++ )
 			{
 				CExpressionSample *s = track->GetSample( j, 1 );
 				if ( !s )

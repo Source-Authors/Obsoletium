@@ -87,7 +87,7 @@ public:
 	virtual void OnMapEvent( const char *pEventName );
 	virtual void PrintAdditionalStatus() {}		// for debugging, achievements may report additional status in achievement_status concmd
 	virtual void OnSteamUserStatsStored() {}
-	virtual void UpdateAchievement( int nData ) {}
+	virtual void UpdateAchievement( int ) {}
 	virtual bool ShouldShowOnHUD() { return m_bShowOnHUD; }
 	virtual void SetShowOnHUD( bool bShow );
 
@@ -110,7 +110,7 @@ public:
 
 protected:
 	virtual void FireGameEvent( IGameEvent *event );
-	virtual void FireGameEvent_Internal( IGameEvent *event ) {};
+	virtual void FireGameEvent_Internal( IGameEvent * ) {};
 	void SetVictimFilter( const char *pClassName );
 	void SetAttackerFilter( const char *pClassName );
 	void SetInflictorFilter( const char *pClassName );
@@ -147,7 +147,7 @@ protected:
 	const char **m_pszComponentNames;			
 	int			m_iNumComponents;
 	const char *m_pszComponentPrefix;
-	int			m_iComponentPrefixLen;
+	intp		m_iComponentPrefixLen;
 	bool		m_bAchieved;							// is this achievement achieved
 	uint32		m_uUnlockTime;							// time_t that this achievement was unlocked (0 if before Steamworks unlock time support)
 	int			m_iCount;								// # of steps satisfied toward this achievement (only valid if not achieved)

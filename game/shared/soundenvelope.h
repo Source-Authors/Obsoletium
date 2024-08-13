@@ -85,7 +85,7 @@ class ISaveRestoreOps;
 ISaveRestoreOps *GetSoundSaveRestoreOps( );
 
 #define DEFINE_SOUNDPATCH(name) \
-	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, GetSoundSaveRestoreOps( ), NULL }
+	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, GetSoundSaveRestoreOps( ), nullptr, nullptr, 0, nullptr, 0, 0.0f }
 
 
 #endif // SOUNDENVELOPE_H

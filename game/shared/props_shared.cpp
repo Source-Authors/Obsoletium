@@ -22,7 +22,8 @@
 #include "tier0/memdbgon.h"
 
 ConVar sv_pushaway_clientside_size( "sv_pushaway_clientside_size", "15", FCVAR_REPLICATED | FCVAR_DEVELOPMENTONLY, "Minimum size of pushback objects" );
-ConVar props_break_max_pieces( "props_break_max_pieces", "-1", 0, "Maximum prop breakable piece count (-1 = model default)" );
+// dimhotepus: Replicate so client and server can reuse.
+ConVar props_break_max_pieces( "props_break_max_pieces", "-1", FCVAR_REPLICATED, "Maximum prop breakable piece count (-1 = model default)" );
 ConVar props_break_max_pieces_perframe( "props_break_max_pieces_perframe", "-1", FCVAR_REPLICATED, "Maximum prop breakable piece count per frame (-1 = model default)" );
 #ifdef GAME_DLL
 extern ConVar breakable_multiplayer;
@@ -231,7 +232,7 @@ void CPropData::ParsePropDataFile( void )
 		while ( pChunkSection )
 		{
 			// Create a new chunk section and add it to our list
-			int index = m_BreakableChunks.AddToTail();
+			intp index = m_BreakableChunks.AddToTail();
 			propdata_breakablechunk_t *pBreakableChunk = &m_BreakableChunks[index];
 			pBreakableChunk->iszChunkType = AllocPooledString( pChunkSection->GetName() );
 
@@ -385,7 +386,7 @@ int CPropData::ParsePropFromKV( CBaseEntity *pProp, KeyValues *pSection, KeyValu
 	int iSmallest = SmallestAxis(vecSize);
 	vecSize[iSmallest] = 1;
 	float flVolume = vecSize.x * vecSize.y * vecSize.z;
-	int iMaxSize = floor( flVolume / (32.0*32.0) );
+	int iMaxSize = floor( flVolume / (32.0f*32.0f) );
 	pBreakableInterface->SetMaxBreakableSize( iMaxSize );
 
 	// Now parse our interactions
@@ -464,9 +465,9 @@ const char *CPropData::GetRandomChunkModel( const char *pszBreakableSection, int
 		return NULL;
 
 	// Find the right section
-	int iCount = m_BreakableChunks.Count();
-	int i;
-	int iSectionLength = strlen(pszBreakableSection);
+	intp iCount = m_BreakableChunks.Count();
+	intp i;
+	intp iSectionLength = V_strlen(pszBreakableSection);
 	for ( i = 0; i < iCount; i++ )
 	{
 		if ( !Q_strncmp( STRING(m_BreakableChunks[i].iszChunkType), pszBreakableSection, iSectionLength ) )
@@ -505,7 +506,7 @@ static const char *FixupModelName( char *pOut, int sizeOut, const char *pModelNa
 	{
 		Q_strncpy( pOut, tmp, sizeOut);
 	}
-	int len = Q_strlen(pOut);
+	intp len = Q_strlen(pOut);
 	if ( len < 4 || Q_stricmp( pOut + (len-4), ".mdl" ) )
 	{
 		Q_strncat( pOut, ".mdl", sizeOut, COPY_ALL_CHARACTERS );
@@ -525,7 +526,7 @@ class CBreakParser : public IVPhysicsKeyHandler
 {
 public:
 	CBreakParser( float defaultBurstScale, int defaultCollisionGroup ) 
-		: m_defaultBurstScale(defaultBurstScale), m_defaultCollisionGroup(defaultCollisionGroup) {}
+		: m_defaultCollisionGroup(defaultCollisionGroup), m_defaultBurstScale(defaultBurstScale) {}
 
 	void ParseModelName( breakmodel_t *pModel, const char *pValue )
 	{
@@ -646,7 +647,7 @@ void BuildPropList( const char *pszBlockName, CUtlVector<breakmodel_t> &list, in
 		const char *pBlock = pParse->GetCurrentBlockName();
 		if ( !strcmpi( pBlock, pszBlockName ) )
 		{
-			int index = list.AddToTail();
+			intp index = list.AddToTail();
 			breakmodel_t &breakModel = list[index];
 			pParse->ParseCustom( &breakModel, &breakParser );
 		}
@@ -723,7 +724,7 @@ const char *GetMassEquivalent(float flMass)
 		{ 7e24,		"really freaking heavy" },
 	};
 
-	for (int i = 0; i < sizeof(masstext) / sizeof(masstext[0]) - 1; i++)
+	for (size_t i = 0; i < std::size(masstext) - 1; i++)
 	{
 		if (flMass < masstext[i].flMass)
 		{
@@ -731,7 +732,7 @@ const char *GetMassEquivalent(float flMass)
 		}
 	}
 
-	return masstext[ sizeof(masstext) / sizeof(masstext[0]) - 1 ].sz;
+	return masstext[ std::size(masstext) - 1 ].sz;
 }
 #else
 extern const char *GetMassEquivalent(float flMass);
@@ -892,14 +893,14 @@ CGameGibManager *GetGibManager( void )
 {
 #ifndef HL2_EPISODIC
 	return NULL;
-#endif
-
+#else
 	if ( g_hGameGibManager == NULL )
 	{
 		g_hGameGibManager = (CGameGibManager *)gEntList.FindEntityByClassname( NULL, "game_gib_manager" );
 	}
 
 	return (CGameGibManager *)g_hGameGibManager.Get();
+#endif
 }
 
 #endif

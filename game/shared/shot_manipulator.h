@@ -72,7 +72,7 @@ inline const Vector &CShotManipulator::ApplySpread( const Vector &vecSpread, flo
 	// 1.0 gaussian, 0.0 is flat, -1.0 is inverse gaussian
 	float shotBias = ( ( shotBiasMax - shotBiasMin ) * bias ) + shotBiasMin;
 
-	float flatness = ( fabsf(shotBias) * 0.5 );
+	float flatness = ( fabsf(shotBias) * 0.5f );
 
 	do
 	{

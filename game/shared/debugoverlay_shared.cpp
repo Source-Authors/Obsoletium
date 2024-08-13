@@ -423,7 +423,7 @@ void NDebugOverlay::HorzArrow( const Vector &startPos, const Vector &endPos, flo
 	VectorNormalize( lineDir );
 	Vector  upVec		= Vector( 0, 0, 1 );
 	Vector	sideDir;
-	float   radius		= width / 2.0;
+	float   radius		= width / 2.0f;
 
 	CrossProduct(lineDir, upVec, sideDir);
 
@@ -476,7 +476,7 @@ void NDebugOverlay::VertArrow( const Vector &startPos, const Vector &endPos, flo
 	VectorNormalize( lineDir );
 	Vector  upVec;
 	Vector	sideDir;
-	float   radius		= width / 2.0;
+	float   radius		= width / 2.0f;
 
 	VectorVectors( lineDir, sideDir, upVec );
 
@@ -543,9 +543,9 @@ void NDebugOverlay::Sphere( const Vector &center, float radius, int r, int g, in
 	float angle;
 	for( angle=0.0f; angle <= 360.0f; angle += 22.5f )
 	{
-		edge.x = radius * cosf( angle / 180.0f * M_PI ) + center.x;
+		edge.x = radius * cosf( angle / 180.0f * M_PI_F ) + center.x;
 		edge.y = center.y;
-		edge.z = radius * sinf( angle / 180.0f * M_PI ) + center.z;
+		edge.z = radius * sinf( angle / 180.0f * M_PI_F ) + center.z;
 
 		Line( edge, lastEdge, r, g, b, noDepthTest, flDuration );
 
@@ -556,8 +556,8 @@ void NDebugOverlay::Sphere( const Vector &center, float radius, int r, int g, in
 	for( angle=0.0f; angle <= 360.0f; angle += 22.5f )
 	{
 		edge.x = center.x;
-		edge.y = radius * cosf( angle / 180.0f * M_PI ) + center.y;
-		edge.z = radius * sinf( angle / 180.0f * M_PI ) + center.z;
+		edge.y = radius * cosf( angle / 180.0f * M_PI_F ) + center.y;
+		edge.z = radius * sinf( angle / 180.0f * M_PI_F ) + center.z;
 
 		Line( edge, lastEdge, r, g, b, noDepthTest, flDuration );
 
@@ -567,8 +567,8 @@ void NDebugOverlay::Sphere( const Vector &center, float radius, int r, int g, in
 	lastEdge = Vector( center.x, radius + center.y, center.z );
 	for( angle=0.0f; angle <= 360.0f; angle += 22.5f )
 	{
-		edge.x = radius * cosf( angle / 180.0f * M_PI ) + center.x;
-		edge.y = radius * sinf( angle / 180.0f * M_PI ) + center.y;
+		edge.x = radius * cosf( angle / 180.0f * M_PI_F ) + center.x;
+		edge.y = radius * sinf( angle / 180.0f * M_PI_F ) + center.y;
 		edge.z = center.z;
 
 		Line( edge, lastEdge, r, g, b, noDepthTest, flDuration );
@@ -613,8 +613,8 @@ void NDebugOverlay::Circle( const Vector &position, const QAngle &angles, float 
 
 void NDebugOverlay::Circle( const Vector &position, const Vector &xAxis, const Vector &yAxis, float radius, int r, int g, int b, int a, bool bNoDepthTest, float flDuration )
 {
-	const unsigned int nSegments = 16;
-	const float flRadStep = (M_PI*2.0f) / (float) nSegments;
+	constexpr unsigned int nSegments = 16;
+	constexpr float flRadStep = (M_PI*2.0f) / (float) nSegments;
 
 	Vector vecLastPosition;
 	
@@ -624,7 +624,7 @@ void NDebugOverlay::Circle( const Vector &position, const Vector &xAxis, const V
 	Vector vecPosition = vecStart;
 
 	// Draw out each segment (fanning triangles if we have an alpha amount)
-	for ( int i = 1; i <= nSegments; i++ )
+	for ( unsigned i = 1; i <= nSegments; i++ )
 	{
 		// Store off our last position
 		vecLastPosition = vecPosition;

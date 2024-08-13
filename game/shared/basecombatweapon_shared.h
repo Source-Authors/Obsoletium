@@ -55,7 +55,7 @@ class CUserCmd;
 // Put this in your derived class definition to declare it's activity table
 // UNDONE: Cascade these?
 #define DECLARE_ACTTABLE()		static acttable_t m_acttable[];\
-	virtual acttable_t *ActivityList( int &iActivityCount ) OVERRIDE;
+	virtual acttable_t *ActivityList( int &iActivityCount ) override;
 
 // You also need to include the activity table itself in your class' implementation:
 // e.g.
@@ -124,18 +124,18 @@ namespace vgui2
 
 // NOTE: The way these are calculated is that each component == sin (degrees/2)
 #define VECTOR_CONE_PRECALCULATED	vec3_origin
-#define VECTOR_CONE_1DEGREES		Vector( 0.00873, 0.00873, 0.00873 )
-#define VECTOR_CONE_2DEGREES		Vector( 0.01745, 0.01745, 0.01745 )
-#define VECTOR_CONE_3DEGREES		Vector( 0.02618, 0.02618, 0.02618 )
-#define VECTOR_CONE_4DEGREES		Vector( 0.03490, 0.03490, 0.03490 )
-#define VECTOR_CONE_5DEGREES		Vector( 0.04362, 0.04362, 0.04362 )
-#define VECTOR_CONE_6DEGREES		Vector( 0.05234, 0.05234, 0.05234 )
-#define VECTOR_CONE_7DEGREES		Vector( 0.06105, 0.06105, 0.06105 )
-#define VECTOR_CONE_8DEGREES		Vector( 0.06976, 0.06976, 0.06976 )
-#define VECTOR_CONE_9DEGREES		Vector( 0.07846, 0.07846, 0.07846 )
-#define VECTOR_CONE_10DEGREES		Vector( 0.08716, 0.08716, 0.08716 )
-#define VECTOR_CONE_15DEGREES		Vector( 0.13053, 0.13053, 0.13053 )
-#define VECTOR_CONE_20DEGREES		Vector( 0.17365, 0.17365, 0.17365 )
+#define VECTOR_CONE_1DEGREES		Vector( 0.00873f, 0.00873f, 0.00873f )
+#define VECTOR_CONE_2DEGREES		Vector( 0.01745f, 0.01745f, 0.01745f )
+#define VECTOR_CONE_3DEGREES		Vector( 0.02618f, 0.02618f, 0.02618f )
+#define VECTOR_CONE_4DEGREES		Vector( 0.03490f, 0.03490f, 0.03490f )
+#define VECTOR_CONE_5DEGREES		Vector( 0.04362f, 0.04362f, 0.04362f )
+#define VECTOR_CONE_6DEGREES		Vector( 0.05234f, 0.05234f, 0.05234f )
+#define VECTOR_CONE_7DEGREES		Vector( 0.06105f, 0.06105f, 0.06105f )
+#define VECTOR_CONE_8DEGREES		Vector( 0.06976f, 0.06976f, 0.06976f )
+#define VECTOR_CONE_9DEGREES		Vector( 0.07846f, 0.07846f, 0.07846f )
+#define VECTOR_CONE_10DEGREES		Vector( 0.08716f, 0.08716f, 0.08716f )
+#define VECTOR_CONE_15DEGREES		Vector( 0.13053f, 0.13053f, 0.13053f )
+#define VECTOR_CONE_20DEGREES		Vector( 0.17365f, 0.17365f, 0.17365f )
 
 //-----------------------------------------------------------------------------
 // Purpose: Base weapon class, shared on client and server
@@ -179,23 +179,23 @@ class CBaseCombatWeapon : public BASECOMBATWEAPON_DERIVED_FROM
 {
 public:
 	DECLARE_CLASS( CBaseCombatWeapon, BASECOMBATWEAPON_DERIVED_FROM );
-	DECLARE_NETWORKCLASS();
-	DECLARE_PREDICTABLE();
+	DECLARE_NETWORKCLASS_OVERRIDE();
+	DECLARE_PREDICTABLE_OVERRIDE();
 
 							CBaseCombatWeapon();
 	virtual 				~CBaseCombatWeapon();
 
-	virtual bool			IsBaseCombatWeapon( void ) const { return true; }
-	virtual CBaseCombatWeapon *MyCombatWeaponPointer( void ) { return this; }
+	bool			IsBaseCombatWeapon( void ) const override { return true; }
+	CBaseCombatWeapon *MyCombatWeaponPointer( void ) override { return this; }
 
 	// A derived weapon class should return true here so that weapon sounds, etc, can
 	//  apply the proper filter
 	virtual bool			IsPredicted( void ) const { return false; }
 
-	virtual void			Spawn( void );
-	virtual void			Precache( void );
+	void			Spawn( void ) override;
+	void			Precache( void ) override;
 
-	void					MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType );
+	void					MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType ) override;
 
 	// Subtypes are used to manage multiple weapons of the same type on the player.
 	virtual int				GetSubType( void ) { return m_iSubType; }
@@ -255,7 +255,7 @@ public:
 	virtual void			SetWeaponVisible( bool visible );
 	virtual bool			IsWeaponVisible( void );
 	virtual bool			ReloadOrSwitchWeapons( void );
-	virtual void			OnActiveStateChanged( int iOldState ) { return; }
+	virtual void			OnActiveStateChanged( int ) {}
 	virtual bool			HolsterOnDetach() { return false; }
 	virtual bool			IsHolstered(){ return false; }
 	virtual void			Detach() {}
@@ -274,8 +274,8 @@ public:
 	virtual bool			ShouldBlockPrimaryFire() { return false; }
 
 #ifdef CLIENT_DLL
-	virtual void			CreateMove( float flInputSampleTime, CUserCmd *pCmd, const QAngle &vecOldViewAngles ) {}
-	virtual int				CalcOverrideModelIndex() OVERRIDE;
+	virtual void			CreateMove( [[maybe_unused]] float flInputSampleTime, [[maybe_unused]] CUserCmd *pCmd, [[maybe_unused]] const QAngle &vecOldViewAngles ) {}
+	int				CalcOverrideModelIndex() override;
 #endif
 
 	virtual bool			IsWeaponZoomed() { return false; }		// Is this weapon in its 'zoomed in' mode?
@@ -304,13 +304,13 @@ public:
 	// Bullet launch information
 	virtual int				GetBulletType( void );
 	virtual const Vector&	GetBulletSpread( void );
-	virtual Vector			GetBulletSpread( WeaponProficiency_t proficiency )		{ return GetBulletSpread(); }
-	virtual float			GetSpreadBias( WeaponProficiency_t proficiency )			{ return 1.0; }
+	virtual Vector			GetBulletSpread( WeaponProficiency_t )		{ return GetBulletSpread(); }
+	virtual float			GetSpreadBias( WeaponProficiency_t )			{ return 1.0f; }
 	virtual float			GetFireRate( void );
 	virtual int				GetMinBurst() { return 1; }
 	virtual int				GetMaxBurst() { return 1; }
-	virtual float			GetMinRestTime() { return 0.3; }
-	virtual float			GetMaxRestTime() { return 0.6; }
+	virtual float			GetMinRestTime() { return 0.3f; }
+	virtual float			GetMaxRestTime() { return 0.6f; }
 	virtual int				GetRandomBurst() { return random->RandomInt( GetMinBurst(), GetMaxBurst() ); }
 	virtual void			WeaponSound( WeaponSound_t sound_type, float soundtime = 0.0f );
 	virtual void			StopWeaponSound( WeaponSound_t sound_type );
@@ -325,7 +325,7 @@ public:
 	virtual bool			StopSprinting( void ) { return false; };
 
 	// TF Injury functions
-	virtual float			GetDamage( float flDistance, int iLocation ) { return 0.0; };
+	virtual float			GetDamage( float, int ) { return 0.0; };
 
 	virtual void			SetActivity( Activity act, float duration );
 	inline void				SetActivity( Activity eActivity ) { m_Activity = eActivity; }
@@ -333,13 +333,13 @@ public:
 
 	virtual void			AddViewKick( void );	// Add in the view kick for the weapon
 
-	virtual char			*GetDeathNoticeName( void );	// Get the string to print death notices with
+	virtual const char		*GetDeathNoticeName( void );	// Get the string to print death notices with
 
 	CBaseCombatCharacter	*GetOwner() const;
 	void					SetOwner( CBaseCombatCharacter *owner );
 	virtual void			OnPickedUp( CBaseCombatCharacter *pNewOwner );
 
-	virtual void			AddViewmodelBob( CBaseViewModel *viewmodel, Vector &origin, QAngle &angles ) {};
+	virtual void			AddViewmodelBob( CBaseViewModel *, Vector &, QAngle & ) {};
 	virtual float			CalcViewmodelBob( void ) { return 0.0f; };
 
 	// Returns information about the various control panels
@@ -409,19 +409,19 @@ public:
 	virtual CHudTexture const	*GetSpriteZoomedAutoaim( void ) const;
 
 	virtual Activity		ActivityOverride( Activity baseAct, bool *pRequired );
-	virtual	acttable_t*		ActivityList( int &iActivityCount ) { return NULL; }
+	virtual	acttable_t*		ActivityList( int & ) { return NULL; }
 
 	virtual void			PoseParameterOverride( bool bReset );
-	virtual poseparamtable_t* PoseParamList( int &iPoseParamCount ) { return NULL; }
+	virtual poseparamtable_t* PoseParamList( int & ) { return NULL; }
 
-	virtual void			Activate( void );
+	void			Activate( void ) override;
 
 	virtual bool ShouldUseLargeViewModelVROverride() { return false; }
 public:
 // Server Only Methods
 #if !defined( CLIENT_DLL )
 
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 	virtual void			FallInit( void );						// prepare to fall to the ground
 	virtual void			FallThink( void );						// make the weapon fall to the ground after spawning
 
@@ -432,7 +432,7 @@ public:
 	virtual void			Materialize( void );					// make a weapon visible and tangible
 	void					AttemptToMaterialize( void );			// see if the game rules will let the weapon become visible and tangible
 	virtual void			CheckRespawn( void );					// see if this weapon should respawn after being picked up
-	CBaseEntity				*Respawn ( void );						// copy a weapon
+	CBaseEntity				*Respawn ( void ) override;						// copy a weapon
 
 	static int				GetAvailableWeaponsInBox( CBaseCombatWeapon **pList, int listMax, const Vector &mins, const Vector &maxs );
 
@@ -442,7 +442,7 @@ public:
 	virtual void			Kill( void );
 
 	virtual int				CapabilitiesGet( void ) { return 0; }
-	virtual	int				ObjectCaps( void );
+	int				ObjectCaps( void ) override;
 
 	bool					IsRemoveable() { return m_bRemoveable; }
 	void					SetRemoveable( bool bRemoveable ) { m_bRemoveable = bRemoveable; }
@@ -454,17 +454,17 @@ public:
 	virtual	int				WeaponMeleeAttack1Condition( float flDot, float flDist );
 	virtual	int				WeaponMeleeAttack2Condition( float flDot, float flDist );
 
-	virtual void			Operator_FrameUpdate( CBaseCombatCharacter  *pOperator );
+	virtual void			Operator_FrameUpdate( CBaseCombatCharacter *pOperator );
 	virtual void			Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
-	virtual void			Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary ) { return; }
+	virtual void			Operator_ForceNPCFire( CBaseCombatCharacter *, bool ) {}
 	// NOTE: This should never be called when a character is operating the weapon.  Animation events should be
 	// routed through the character, and then back into CharacterAnimEvent() 
-	void					HandleAnimEvent( animevent_t *pEvent );
+	void					HandleAnimEvent( animevent_t *pEvent ) override;
 
-	virtual int				UpdateTransmitState( void );
+	int				UpdateTransmitState( void ) override;
 
 	void					InputHideWeapon( inputdata_t &inputdata );
-	void					Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void					Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value ) override;
 
 	virtual CDmgAccumulator	*GetDmgAccumulator( void ) { return NULL; }
 
@@ -473,9 +473,9 @@ public:
 // Client only methods
 #else
 
-	virtual void			BoneMergeFastCullBloat( Vector &localMins, Vector &localMaxs, const Vector &thisEntityMins, const Vector &thisEntityMaxs  ) const;
+	void			BoneMergeFastCullBloat( Vector &localMins, Vector &localMaxs, const Vector &thisEntityMins, const Vector &thisEntityMaxs  ) const override;
 
-	virtual bool			OnFireEvent( C_BaseViewModel *pViewModel, const Vector& origin, const QAngle& angles, int event, const char *options ) 
+	virtual bool			OnFireEvent( [[maybe_unused]] C_BaseViewModel *pViewModel, [[maybe_unused]] const Vector& origin, [[maybe_unused]] const QAngle& angles, [[maybe_unused]] int event, [[maybe_unused]] const char *options ) 
 	{ 
 #if defined USES_ECON_ITEMS
 		return BaseClass::OnFireEvent( pViewModel, origin, angles, event, options );
@@ -485,10 +485,10 @@ public:
 	}
 
 	// Should this object cast shadows?
-	virtual ShadowType_t	ShadowCastType();
-	virtual void			SetDormant( bool bDormant );
-	virtual void			OnDataChanged( DataUpdateType_t updateType );
-	virtual void			OnRestore();
+	ShadowType_t	ShadowCastType() override;
+	void			SetDormant( bool bDormant ) override;
+	void			OnDataChanged( DataUpdateType_t updateType ) override;
+	void			OnRestore() override;
 
 	virtual void			RestartParticleEffect( void ) {}
 
@@ -511,22 +511,22 @@ public:
 	bool					IsCarrierAlive() const;
 
 	// Returns the aiment render origin + angles
-	virtual int				DrawModel( int flags );
-	virtual bool			ShouldDraw( void );
+	int				DrawModel( int flags ) override;
+	bool			ShouldDraw( void ) override;
 	virtual bool			ShouldDrawPickup( void );
-	virtual void			HandleInput( void ) { return; };
-	virtual void			OverrideMouseInput( float *x, float *y ) { return; };
-	virtual int				KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding ) { return 1; }
-	virtual bool			AddLookShift( void ) { return true; };
+	virtual void			HandleInput( void ) {}
+	virtual void			OverrideMouseInput( [[maybe_unused]] float *x, [[maybe_unused]] float *y ) {}
+	virtual int				KeyInput( [[maybe_unused]] int down, [[maybe_unused]] ButtonCode_t keynum, [[maybe_unused]] const char *pszurrentBinding ) { return 1; }
+	virtual bool			AddLookShift( void ) { return true; }
 
-	virtual void			GetViewmodelBoneControllers(C_BaseViewModel *pViewModel, float controllers[MAXSTUDIOBONECTRLS]) { return; }
+	virtual void			GetViewmodelBoneControllers(C_BaseViewModel *, [[maybe_unused]] float controllers[MAXSTUDIOBONECTRLS]) { return; }
 
-	virtual void			NotifyShouldTransmit( ShouldTransmitState_t state );
+	void			NotifyShouldTransmit( ShouldTransmitState_t state ) override;
 	WEAPON_FILE_INFO_HANDLE	GetWeaponFileInfoHandle() { return m_hWeaponFileInfo; }
 
 	virtual int				GetWorldModelIndex( void );
 
-	virtual void			GetToolRecordingState( KeyValues *msg );
+	void			GetToolRecordingState( KeyValues *msg ) override;
 
 	virtual void			GetWeaponCrosshairScale( float &flScale ) { flScale = 1.f; }
 
@@ -535,7 +535,7 @@ public:
 	virtual bool			ViewModel_IsTransparent( void ) { return IsTransparent(); }
 	virtual bool			ViewModel_IsUsingFBTexture( void ) { return UsesPowerOfTwoFrameBufferTexture(); }
 	virtual bool			IsOverridingViewmodel( void ) { return false; };
-	virtual int				DrawOverriddenViewmodel( C_BaseViewModel *pViewmodel, int flags ) { return 0; };
+	virtual int				DrawOverriddenViewmodel( C_BaseViewModel *, int ) { return 0; };
 	bool					WantsToOverrideViewmodelAttachments( void ) { return false; }
 #endif
 

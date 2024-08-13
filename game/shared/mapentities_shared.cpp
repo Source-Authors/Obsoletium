@@ -245,7 +245,7 @@ bool CEntityMapData::GetNextKey( char *keyName, char *value )
 	Q_strncpy( keyName, token, MAPKEY_MAXLENGTH );
 
 	// fix up keynames with trailing spaces
-	int n = strlen(keyName);
+	intp n = V_strlen(keyName);
 	while (n && keyName[n-1] == ' ')
 	{
 		keyName[n-1] = 0;
@@ -302,7 +302,7 @@ bool CEntityMapData::SetValue( const char *keyName, char *NewValue, int nKeyInst
 			if ( nCurrKeyInstance > nKeyInstance )
 			{
 				// Find the start & end of the token we're going to replace
-				int entLen = strlen(m_pEntData);
+				intp entLen = V_strlen(m_pEntData);
 				char *postData = new char[entLen];
 				prevData = inputData;
 				inputData = (char*)MapEntity_ParseToken( inputData, token );	// get keyname
@@ -318,8 +318,8 @@ bool CEntityMapData::SetValue( const char *keyName, char *NewValue, int nKeyInst
 					Q_strncpy( newvaluebuf, NewValue, sizeof( newvaluebuf ) );
 				}
 
-				int iNewValueLen = Q_strlen(newvaluebuf);
-				int iPadding = iNewValueLen - Q_strlen( token ) - 2;	// -2 for the quotes (token doesn't have them)
+				intp iNewValueLen = Q_strlen(newvaluebuf);
+				intp iPadding = iNewValueLen - Q_strlen( token ) - 2;	// -2 for the quotes (token doesn't have them)
 
 				// prevData has a space at the start, seperating the value from the key.
 				// Add 1 to prevData when pasting in the new Value, to account for the space.

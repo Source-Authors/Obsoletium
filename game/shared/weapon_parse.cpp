@@ -84,7 +84,7 @@ struct UsedWeaponSlot_t
 };
 
 // used to track whether or not two weapons have been mistakenly assigned the wrong slot
-UsedWeaponSlot_t g_bUsedWeaponSlots[MAX_WEAPON_SLOTS][MAX_WEAPON_POSITIONS] = { { '\0', false } };
+UsedWeaponSlot_t g_bUsedWeaponSlots[MAX_WEAPON_SLOTS][MAX_WEAPON_POSITIONS] = {};
 
 #endif
 

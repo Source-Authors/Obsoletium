@@ -23,15 +23,15 @@
 
 //-------------------------------------------------- Constants
 
-#define CAM_MIN_DIST 30.0
-#define CAM_ANGLE_MOVE .5
-#define MAX_ANGLE_DIFF 10.0
-#define PITCH_MAX 90.0
+#define CAM_MIN_DIST 30.0f
+#define CAM_ANGLE_MOVE .5f
+#define MAX_ANGLE_DIFF 10.0f
+#define PITCH_MAX 90.0f
 #define PITCH_MIN 0
-#define YAW_MAX  135.0
-#define YAW_MIN	 -135.0
+#define YAW_MAX  135.0f
+#define YAW_MIN	 -135.0f
 #define	DIST	 2
-#define CAM_HULL_OFFSET		14.0    // the size of the bounding hull used for collision checking
+#define CAM_HULL_OFFSET		14.0f    // the size of the bounding hull used for collision checking
 
 #define CAMERA_UP_OFFSET	25.0f
 #define CAMERA_OFFSET_LERP_TIME 0.5f

@@ -196,7 +196,7 @@ public:
 
 		// Msg( "%s Startcommand %d\n", bServer ? "sv" : "cl", nCommandNumber );
 
-		diffcheck.SetValue( reinterpret_cast< int >( this ) );
+		diffcheck.SetValue( reinterpret_cast< intp >( this ) );
 
 		Assert( CBaseEntity::IsServer() );
 
@@ -497,10 +497,12 @@ void CGameMovement::DiffPrint( char const *fmt, ... )
 }
 
 #else
+#if PREDICTION_ERROR_CHECK_LEVEL > 0
 static void DiffPrint( bool bServer, int nCommandNumber, char const *fmt, ... )
 {
 	// Nothing
 }
+
 static void StartCommand( bool bServer, int nCommandNumber )
 {
 }
@@ -508,6 +510,7 @@ static void StartCommand( bool bServer, int nCommandNumber )
 static void Validate( bool bServer, int nCommandNumber )
 {
 }
+#endif
 
 #define CheckV( tick, ctx, vel )
 
@@ -2149,7 +2152,7 @@ void CGameMovement::FullObserverMove( void )
 
 	Vector wishvel;
 	Vector forward, right, up;
-	Vector wishdir, wishend;
+	Vector wishdir;
 	float wishspeed;
 
 	AngleVectors (mv->m_vecViewAngles, &forward, &right, &up);  // Determine movement angles
@@ -2262,7 +2265,7 @@ void CGameMovement::FullNoClipMove( float factor, float maxacceleration )
 		wishspeed = maxspeed;
 	}
 
-	if ( maxacceleration > 0.0 )
+	if ( maxacceleration > 0.0f )
 	{
 		// Set pmove velocity
 		Accelerate ( wishdir, wishspeed, maxacceleration );
@@ -2274,9 +2277,10 @@ void CGameMovement::FullNoClipMove( float factor, float maxacceleration )
 			return;
 		}
 		
+		float onequadspeed = maxspeed/4.0f;
 		// Bleed off some speed, but if we have less than the bleed
 		//  threshhold, bleed the theshold amount.
-		float control = (spd < maxspeed/4.0) ? maxspeed/4.0 : spd;
+		float control = (spd < onequadspeed) ? onequadspeed : spd;
 		
 		float friction = sv_friction.GetFloat() * player->m_surfaceFriction;
 				
@@ -2692,7 +2696,7 @@ int CGameMovement::TryPlayerMove( Vector *pFirstDest, trace_t *pFirstTrace )
 		{
 			for ( i = 0; i < numplanes; i++ )
 			{
-				if ( planes[i][2] > 0.7  )
+				if ( planes[i][2] > 0.7f  )
 				{
 					// floor or slope
 					ClipVelocity( original_velocity, planes[i], new_velocity, 1 );
@@ -2700,7 +2704,7 @@ int CGameMovement::TryPlayerMove( Vector *pFirstDest, trace_t *pFirstTrace )
 				}
 				else
 				{
-					ClipVelocity( original_velocity, planes[i], new_velocity, 1.0 + sv_bounce.GetFloat() * (1 - player->m_surfaceFriction) );
+					ClipVelocity( original_velocity, planes[i], new_velocity, 1.0f + sv_bounce.GetFloat() * (1 - player->m_surfaceFriction) );
 				}
 			}
 
@@ -3306,7 +3310,7 @@ void CreateStuckTable( void )
 			}
 		}
 	}
-	Assert( idx < sizeof(rgv3tStuckTable)/sizeof(rgv3tStuckTable[0]));
+	Assert( idx < ssize(rgv3tStuckTable) );
 }
 #else
 extern void CreateStuckTable( void );
@@ -3545,7 +3549,7 @@ bool CGameMovement::CheckWater( void )
 			// BUGBUG -- this depends on the value of an unspecified enumerated type
 			// The deeper we are, the stronger the current.
 			Vector temp;
-			VectorMA( player->GetBaseVelocity(), 50.0*player->GetWaterLevel(), v, temp );
+			VectorMA( player->GetBaseVelocity(), 50.0f*player->GetWaterLevel(), v, temp );
 			player->SetBaseVelocity( temp );
 		}
 	}
@@ -3949,7 +3953,7 @@ void CGameMovement::PlayerRoughLandingEffects( float fvol )
 		//
 		// Knock the screen around a little bit, temporary effect.
 		//
-		player->m_Local.m_vecPunchAngle.Set( ROLL, player->m_Local.m_flFallVelocity * 0.013 );
+		player->m_Local.m_vecPunchAngle.Set( ROLL, player->m_Local.m_flFallVelocity * 0.013f );
 
 		if ( player->m_Local.m_vecPunchAngle[PITCH] > 8 )
 		{
@@ -4715,7 +4719,7 @@ void CGameMovement::PerformFlyCollisionResolution( trace_t &pm, Vector &move )
 		}
 		else
 		{
-			VectorScale (mv->m_vecVelocity, (1.0 - pm.fraction) * gpGlobals->frametime * 0.9, move);
+			VectorScale (mv->m_vecVelocity, (1.0f - pm.fraction) * gpGlobals->frametime * 0.9f, move);
 			PushEntity( move, &pm );
 		}
 		VectorSubtract( mv->m_vecVelocity, base, mv->m_vecVelocity );

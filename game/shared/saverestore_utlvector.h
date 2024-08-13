@@ -42,6 +42,9 @@ public:
 			NULL,
 			pArrayTypeDatamap,
 			-1,
+			nullptr,
+			0,
+			0.0f
 		};
 		
 		datamap_t dataMap = 
@@ -95,6 +98,9 @@ public:
 			NULL,
 			pArrayTypeDatamap,
 			-1,
+			nullptr,
+			0,
+			0.0f
 		};
 		
 		datamap_t dataMap = 
@@ -173,10 +179,10 @@ public:
 //-------------------------------------
 
 #define DEFINE_UTLVECTOR(name,fieldtype) \
-	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, CUtlVectorDataopsInstantiator<fieldtype>::GetDataOps(&(((classNameTypedef *)0)->name)), NULL }
+	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, CUtlVectorDataopsInstantiator<fieldtype>::GetDataOps(&(((classNameTypedef *)0)->name)), NULL, nullptr, 0, nullptr, 0, 0.0f }
 
 #define DEFINE_GLOBAL_UTLVECTOR(name,fieldtype) \
-{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE|FTYPEDESC_GLOBAL, NULL, CUtlVectorDataopsInstantiator<fieldtype>::GetDataOps(&(((classNameTypedef *)0)->name)), NULL }
+{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE|FTYPEDESC_GLOBAL, NULL, CUtlVectorDataopsInstantiator<fieldtype>::GetDataOps(&(((classNameTypedef *)0)->name)), NULL, nullptr, 0, nullptr, 0, 0.0f }
 
 
 #endif // SAVERESTORE_UTLVECTOR_H

@@ -625,7 +625,7 @@ private:
 
 class RealTimeCountdownTimer : public CountdownTimer
 {
-	virtual float Now( void ) const OVERRIDE
+	virtual float Now( void ) const override
 	{
 		return Plat_FloatTime();
 	}

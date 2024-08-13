@@ -62,14 +62,12 @@ private:
 
 	struct DecalEntry
 	{
-		DecalEntry()
-		{
-		}
+		DecalEntry() = default;
 
 		DecalEntry( const DecalEntry& src )
 		{
-			int c = src.indices.Count();
-			for ( int i = 0; i < c; i++ )
+			intp c = src.indices.Count();
+			for ( intp i = 0; i < c; i++ )
 			{
 				indices.AddToTail( src.indices[ i ] );
 			}
@@ -80,8 +78,8 @@ private:
 			if ( this == &src )
 				return *this;
 
-			int c = src.indices.Count();
-			for ( int i = 0; i < c; i++ )
+			intp c = src.indices.Count();
+			for ( intp i = 0; i < c; i++ )
 			{
 				indices.AddToTail( src.indices[ i ] );
 			}
@@ -89,7 +87,7 @@ private:
 			return *this;
 		}
 
-		CUtlVector< int >	indices;
+		CUtlVector< intp >	indices;
 	};
 
 	CUtlVector< DecalListEntry >	m_AllDecals;
@@ -229,7 +227,7 @@ void CDecalEmitterSystem::LoadDecalsFromScript( char const *filename )
 							decal.weight = sub->GetFloat();
 
 							// Add to global list
-							int idx = m_AllDecals.AddToTail( decal );
+							intp idx = m_AllDecals.AddToTail( decal );
 
 							// Add index only to local list
 							entry.indices.AddToTail( idx );

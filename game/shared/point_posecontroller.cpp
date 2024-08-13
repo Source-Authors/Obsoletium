@@ -83,7 +83,7 @@ void CPoseController::Spawn( void )
 
 	// Think to refresh the list of models
 	SetThink( &CPoseController::Think );
-	SetNextThink( gpGlobals->curtime + 1.0 );
+	SetNextThink( gpGlobals->curtime + 1.0f );
 }
 
 void CPoseController::Think( void )
@@ -97,7 +97,7 @@ void CPoseController::Think( void )
 
 		m_bDisablePropLookup = true;
 
-		SetNextThink( gpGlobals->curtime + 1.0 );
+		SetNextThink( gpGlobals->curtime + 1.0f );
 	}
 }
 
@@ -140,7 +140,7 @@ void CPoseController::BuildPropList( void )
 		++iPropNum;
 	}
 
-	SetNextThink( gpGlobals->curtime + 1.0 );
+	SetNextThink( gpGlobals->curtime + 1.0f );
 }
 
 void CPoseController::BuildPoseIndexList( void )
@@ -424,7 +424,7 @@ void C_PoseController::UpdateModulation( void )
 		{
 			float fCycleTime = m_fFModRate * ( gpGlobals->curtime + m_fFModTimeOffset );
 
-			m_fCurrentFMod = m_fFModAmplitude * sinf( fCycleTime * ( 2.0f * M_PI ) );
+			m_fCurrentFMod = m_fFModAmplitude * sinf( fCycleTime * ( 2.0f * M_PI_F ) );
 			break;
 		}
 

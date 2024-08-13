@@ -673,7 +673,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 		}
 		else if ( !strcmpi( pBlock, "materialtable" ) )
 		{
-			int surfaceTable[128];
+			intp surfaceTable[128];
 			memset( surfaceTable, 0, sizeof(surfaceTable) );
 
 			pParse->ParseSurfaceTable( surfaceTable, NULL );
@@ -827,7 +827,6 @@ void PhysComputeSlideDirection( IPhysicsObject *pPhysics, const Vector &inputVel
 {
 	Vector velocity = inputVelocity;
 	AngularImpulse angVel = inputAngularVelocity;
-	Vector pos;
 
 	IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
 	while ( pSnapshot->IsValid() )

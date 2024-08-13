@@ -97,9 +97,9 @@ struct BasicGameStats_t
 public:
 	BasicGameStats_t() :
 		  m_nSecondsToCompleteGame( 0 ),
-		  m_nHL2ChaptureUnlocked( 0 ),
 		  m_bSteam( true ),
 		  m_bCyberCafe( false ),
+		  m_nHL2ChaptureUnlocked( 0 ),
 		  m_nDXLevel( 0 )
 	  {
 	  }
@@ -141,7 +141,7 @@ public:
 
 	// Implement this if you support new format gamestats.
 	// Return true if you added data to KeyValues, false if you have no data to report
-	virtual bool AddDataForSend( KeyValues *pKV, StatSendType_t sendType ) { return false; }
+	virtual bool AddDataForSend( KeyValues *, StatSendType_t ) { return false; }
 
 	// These methods used for new format gamestats only and control when data gets sent.
 	virtual bool ShouldSendDataOnLevelShutdown()
@@ -177,7 +177,7 @@ public:
 	void StatsLog( PRINTF_FORMAT_STRING char const *fmt, ... );
 	
 	// This is the first call made, so that we can "subclass" the CBaseGameStats based on gamedir as needed (e.g., ep2 vs. episodic)
-	virtual CBaseGameStats *OnInit( CBaseGameStats *pCurrentGameStats, char const *gamedir ) { return pCurrentGameStats; }
+	virtual CBaseGameStats *OnInit( CBaseGameStats *pCurrentGameStats, char const * ) { return pCurrentGameStats; }
 
 	// Frees up data from gamestats and resets it to a clean state.
 	virtual void Clear( void );
@@ -196,7 +196,7 @@ public:
 	virtual bool UserPlayedAllTheMaps( void ) { return false; } //be sure to override this to determine user completion time
 
 #ifdef CLIENT_DLL
-	virtual void Event_AchievementProgress( int achievementID, const char* achievementName ) {}
+	virtual void Event_AchievementProgress( int, const char* ) {}
 #endif
 
 #ifdef GAME_DLL
@@ -205,7 +205,7 @@ public:
 	virtual void Event_PlayerDisconnected( CBasePlayer *pBasePlayer );
 	virtual void Event_PlayerDamage( CBasePlayer *pBasePlayer, const CTakeDamageInfo &info );
 	virtual void Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity *pVictim, const CTakeDamageInfo &info );
-	virtual void Event_PlayerSuicide( CBasePlayer* pPlayer ) {}
+	virtual void Event_PlayerSuicide( CBasePlayer* ) {}
 	virtual void Event_Credits();
 	virtual void Event_Commentary();
 	virtual void Event_CrateSmashed();
@@ -230,8 +230,8 @@ public:
     //=============================================================================
 
 	//custom data to tack onto existing stats if you're not doing a complete overhaul
-	virtual void AppendCustomDataToSaveBuffer( CUtlBuffer &SaveBuffer ) { } //custom data you want thrown into the default save and upload path
-	virtual void LoadCustomDataFromBuffer( CUtlBuffer &LoadBuffer ) { }; //when loading the saved stats file, this will point to where you started saving data to the save buffer
+	virtual void AppendCustomDataToSaveBuffer( CUtlBuffer & ) { } //custom data you want thrown into the default save and upload path
+	virtual void LoadCustomDataFromBuffer( CUtlBuffer & ) { }; //when loading the saved stats file, this will point to where you started saving data to the save buffer
 
 	virtual void LoadingEvent_PlayerIDDifferentThanLoadedStats( void ); //Only called if you use the base SaveToFileNOW() and LoadFromFile() functions. Used in case you want to keep/invalidate data that was just loaded. 
 
