@@ -21,8 +21,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define TEXTURE_ID_UNKNOWN	-1
-
 class CMatSystemTexture;
 
 // Case-sensitive string checksum
@@ -31,7 +29,7 @@ static CRC32_t Texture_CRCName( const char *string )
 	CRC32_t crc;
 	
 	CRC32_Init( &crc );
-	CRC32_ProcessBuffer( &crc, (void *)string, strlen( string ) );
+	CRC32_ProcessBuffer( &crc, (void *)string, Q_strlen( string ) );
 	CRC32_Final( &crc );
 
 	return crc;
@@ -115,31 +113,31 @@ public:
 	CTextureDictionary( void );
 
 	// Create, destroy textures
-	int	CreateTexture( bool procedural = false );
-	int CreateTextureByTexture( ITexture *pTexture, bool procedural = true ) OVERRIDE;
-	void DestroyTexture( int id );
-	void DestroyAllTextures();
+	int	CreateTexture( bool procedural = false ) override;
+	int CreateTextureByTexture( ITexture *pTexture, bool procedural = true ) override;
+	void DestroyTexture( int id ) override;
+	void DestroyAllTextures() override;
 
 	// Is this a valid id?
-	bool IsValidId( int id ) const;
+	bool IsValidId( int id ) const override;
 
 	// Binds a material to a texture
-	virtual void BindTextureToFile( int id, const char *pFileName );
-	virtual void BindTextureToMaterial( int id, IMaterial *pMaterial );
-	virtual void BindTextureToMaterialReference( int id, int referenceId, IMaterial *pMaterial );
+	void BindTextureToFile( int id, const char *pFileName ) override;
+	void BindTextureToMaterial( int id, IMaterial *pMaterial ) override;
+	void BindTextureToMaterialReference( int id, int referenceId, IMaterial *pMaterial ) override;
 
 	// Texture info
-	IMaterial *GetTextureMaterial( int id );
-	void GetTextureSize(int id, int& iWide, int& iTall );
-	void GetTextureTexCoords( int id, float &s0, float &t0, float &s1, float &t1 );
+	IMaterial *GetTextureMaterial( int id ) override;
+	void GetTextureSize(int id, int& iWide, int& iTall ) override;
+	void GetTextureTexCoords( int id, float &s0, float &t0, float &s1, float &t1 ) override;
 
-	void SetTextureRGBA( int id, const char* rgba, int wide, int tall );
-	void SetTextureRGBAEx( int id, const char* rgba, int wide, int tall, ImageFormat format, bool bFixupTextCoordsForDimensions );
-	void SetSubTextureRGBA( int id, int drawX, int drawY, unsigned const char *rgba, int subTextureWide, int subTextureTall );
-	void SetSubTextureRGBAEx( int id, int drawX, int drawY, unsigned const char *rgba, int subTextureWide, int subTextureTall, ImageFormat imageFormat );
-	void UpdateSubTextureRGBA( int id, int drawX, int drawY, unsigned const char *rgba, int subTextureWide, int subTextureTall, ImageFormat imageFormat );
+	void SetTextureRGBA( int id, const char* rgba, int wide, int tall ) override;
+	void SetTextureRGBAEx( int id, const char* rgba, int wide, int tall, ImageFormat format, bool bFixupTextCoordsForDimensions ) override;
+	void SetSubTextureRGBA( int id, int drawX, int drawY, unsigned const char *rgba, int subTextureWide, int subTextureTall ) override;
+	void SetSubTextureRGBAEx( int id, int drawX, int drawY, unsigned const char *rgba, int subTextureWide, int subTextureTall, ImageFormat imageFormat ) override;
+	void UpdateSubTextureRGBA( int id, int drawX, int drawY, unsigned const char *rgba, int subTextureWide, int subTextureTall, ImageFormat imageFormat ) override;
 
-	int	FindTextureIdForTextureFile( char const *pFileName );
+	int	FindTextureIdForTextureFile( char const *pFileName ) override;
 
 public:
 	CMatSystemTexture	*GetTexture( int id );
@@ -165,7 +163,7 @@ public:
 
 		if ( IsPC() )
 		{
-			int size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
+			intp size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
 			m_pTextureBits = new unsigned char[size];
 			memset( m_pTextureBits, 0, size );
 		}
@@ -176,14 +174,14 @@ public:
 		}
 	}
 
-	~CFontTextureRegen( void )
+	virtual ~CFontTextureRegen( void )
 	{
 		DeleteTextureBits();
 	}
 
 	void UpdateBackingBits( Rect_t &subRect, const unsigned char *pBits, Rect_t &uploadRect, ImageFormat format )
 	{
-		int size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
+		intp size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
 		if ( IsPC() )
 		{
 			if ( !m_pTextureBits )
@@ -225,7 +223,7 @@ public:
 		}
 	}
 
-	virtual void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pSubRect )
+	void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pSubRect ) override
 	{
 		if ( !m_pTextureBits )
 			return;
@@ -242,7 +240,7 @@ public:
 				{
 					// copy each row across for the update
 					char *pchData = (char *)pVTFTexture->ImageData( 0, 0, 0, 0, y ) + pSubRect->x *nFormatBytes;
-					int size = ImageLoader::GetMemRequired( pSubRect->width, 1, 1, m_nFormat, false );
+					intp size = ImageLoader::GetMemRequired( pSubRect->width, 1, 1, m_nFormat, false );
 					V_memcpy( pchData, m_pTextureBits + (y * m_nWidth + pSubRect->x) * nFormatBytes, size );
 				}
 			}
@@ -281,12 +279,12 @@ public:
 				Assert( 0 );
 				return;
 			}
-			int size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
+			intp size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
 			Q_memcpy( pVTFTexture->ImageData( 0, 0, 0 ), m_pTextureBits, size );
 		}
 	}
 
-	virtual void Release()
+	void Release() override
 	{
 		// Called by the material system when this needs to go away
 		DeleteTextureBits();
@@ -753,7 +751,7 @@ CTextureDictionary::CTextureDictionary( void )
 //-----------------------------------------------------------------------------
 int	CTextureDictionary::CreateTexture( bool procedural /*=false*/ )
 {
-	int idx = m_Textures.AddToTail();
+	auto idx = m_Textures.AddToTail();
 	CMatSystemTexture &texture = m_Textures[idx];
 	texture.SetProcedural( procedural );
 	texture.SetId( idx );
@@ -763,7 +761,7 @@ int	CTextureDictionary::CreateTexture( bool procedural /*=false*/ )
 
 int CTextureDictionary::CreateTextureByTexture( ITexture *pTexture, bool procedural /*= true*/ )
 {
-	int idx = m_Textures.AddToTail();
+	auto idx = m_Textures.AddToTail();
 	CMatSystemTexture &texture = m_Textures[idx];
 	texture.SetProcedural( procedural );
 	texture.SetId( idx );

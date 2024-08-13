@@ -42,9 +42,9 @@ class CMatEmbeddedPanel : public vgui::Panel
 	typedef vgui::Panel BaseClass;
 public:
 	CMatEmbeddedPanel();
-	virtual void OnThink();
+	void OnThink() override;
 
-	VPANEL IsWithinTraverse(int x, int y, bool traversePopups);
+	VPANEL IsWithinTraverse(int x, int y, bool traversePopups) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -61,301 +61,301 @@ public:
 	virtual ~CMatSystemSurface();
 
 	// Methods of IAppSystem
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
-	virtual void *QueryInterface( const char *pInterfaceName );
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
+	void *QueryInterface( const char *pInterfaceName ) override;
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 	// initialization
-	virtual void SetEmbeddedPanel(vgui::VPANEL pEmbeddedPanel);
+	void SetEmbeddedPanel(vgui::VPANEL pEmbeddedPanel) override;
 
 	// returns true if a panel is minimzed
-	bool IsMinimized(vgui::VPANEL panel);
+	bool IsMinimized(vgui::VPANEL panel) override;
 
 	// Sets the only panel to draw.  Set to NULL to clear.
-	void RestrictPaintToSinglePanel(vgui::VPANEL panel);
+	void RestrictPaintToSinglePanel(vgui::VPANEL panel) override;
 
 	// frame
-	virtual void RunFrame();
+	void RunFrame() override;
 
 	// implementation of vgui::ISurface
-	virtual vgui::VPANEL GetEmbeddedPanel();
+	vgui::VPANEL GetEmbeddedPanel() override;
 	
 	// drawing context
-	virtual void PushMakeCurrent(vgui::VPANEL panel,bool useInSets);
-	virtual void PopMakeCurrent(vgui::VPANEL panel);
+	void PushMakeCurrent(vgui::VPANEL panel, bool useInSets) override;
+	void PopMakeCurrent(vgui::VPANEL panel) override;
 
 	// rendering functions
-	virtual void DrawSetColor(int r,int g,int b,int a);
-	virtual void DrawSetColor(Color col);
+	void DrawSetColor(int r,int g,int b,int a) override;
+	void DrawSetColor(Color col) override;
 	
-	virtual void DrawLine( int x0, int y0, int x1, int y1 );
-	virtual void DrawTexturedLine( const vgui::Vertex_t &a, const vgui::Vertex_t &b );
-	virtual void DrawPolyLine(int *px, int *py, int numPoints);
-	virtual void DrawTexturedPolyLine( const vgui::Vertex_t *p, int n );
+	void DrawLine( int x0, int y0, int x1, int y1 ) override;
+	void DrawTexturedLine( const vgui::Vertex_t &a, const vgui::Vertex_t &b ) override;
+	void DrawPolyLine(int *px, int *py, int numPoints) override;
+	void DrawTexturedPolyLine( const vgui::Vertex_t *p, int n ) override;
 
-	virtual void DrawFilledRect(int x0, int y0, int x1, int y1);
-	virtual void DrawFilledRectArray( IntRect *pRects, int numRects );
-	virtual void DrawFilledRectFastFade( int x0, int y0, int x1, int y1, int fadeStartPt, int fadeEndPt, unsigned int alpha0, unsigned int alpha1, bool bHorizontal );
-	virtual void DrawFilledRectFade( int x0, int y0, int x1, int y1, unsigned int alpha0, unsigned int alpha1, bool bHorizontal );
-	virtual void DrawOutlinedRect(int x0, int y0, int x1, int y1);
-	virtual void DrawOutlinedCircle(int x, int y, int radius, int segments);
+	void DrawFilledRect(int x0, int y0, int x1, int y1) override;
+	void DrawFilledRectArray( IntRect *pRects, int numRects ) override;
+	void DrawFilledRectFastFade( int x0, int y0, int x1, int y1, int fadeStartPt, int fadeEndPt, unsigned int alpha0, unsigned int alpha1, bool bHorizontal ) override;
+	void DrawFilledRectFade( int x0, int y0, int x1, int y1, unsigned int alpha0, unsigned int alpha1, bool bHorizontal ) override;
+	void DrawOutlinedRect(int x0, int y0, int x1, int y1) override;
+	void DrawOutlinedCircle(int x, int y, int radius, int segments) override;
 
 	// textured rendering functions
-	virtual int  CreateNewTextureID( bool procedural = false );
-	virtual bool IsTextureIDValid(int id);
+	int  CreateNewTextureID( bool procedural = false ) override;
+	bool IsTextureIDValid(int id) override;
 
-	virtual bool DrawGetTextureFile(int id, char *filename, int maxlen );
-	virtual int	 DrawGetTextureId( char const *filename );
-	virtual int  DrawGetTextureId( ITexture *pTexture );
-	virtual void DrawSetTextureFile(int id, const char *filename, int hardwareFilter, bool forceReload);
-	virtual void DrawSetTexture(int id);
-	virtual void DrawGetTextureSize(int id, int &wide, int &tall);
-	virtual bool DeleteTextureByID(int id);
+	bool DrawGetTextureFile(int id, char *filename, int maxlen ) override;
+	int	 DrawGetTextureId( char const *filename ) override;
+	int  DrawGetTextureId( ITexture *pTexture ) override;
+	void DrawSetTextureFile(int id, const char *filename, int hardwareFilter, bool forceReload) override;
+	void DrawSetTexture(int id) override;
+	void DrawGetTextureSize(int id, int &wide, int &tall) override;
+	bool DeleteTextureByID(int id) override;
 
-	virtual IVguiMatInfo *DrawGetTextureMatInfoFactory(int id);
+	IVguiMatInfo *DrawGetTextureMatInfoFactory(int id) override;
 
-	virtual void DrawSetTextureRGBA(int id, const unsigned char *rgba, int wide, int tall, int hardwareFilter, bool forceReload);
+	void DrawSetTextureRGBA(int id, const unsigned char *rgba, int wide, int tall, int hardwareFilter, bool forceReload) override;
 
-	virtual void DrawTexturedRect(int x0, int y0, int x1, int y1);
-	virtual void DrawTexturedSubRect( int x0, int y0, int x1, int y1, float texs0, float text0, float texs1, float text1 );
+	void DrawTexturedRect(int x0, int y0, int x1, int y1) override;
+	void DrawTexturedSubRect( int x0, int y0, int x1, int y1, float texs0, float text0, float texs1, float text1 ) override;
 
-	virtual void DrawTexturedPolygon(int n, vgui::Vertex_t *pVertices, bool bClipVertices = true );
+	void DrawTexturedPolygon(int n, vgui::Vertex_t *pVertices, bool bClipVertices = true ) override;
 
-	virtual void DrawPrintText(const wchar_t *text, int textLen, FontDrawType_t drawType = FONT_DRAW_DEFAULT);
-	virtual void DrawUnicodeChar(wchar_t wch, FontDrawType_t drawType = FONT_DRAW_DEFAULT );
-	virtual void DrawUnicodeString( const wchar_t *pwString, FontDrawType_t drawType = FONT_DRAW_DEFAULT );
-	virtual void DrawSetTextFont(vgui::HFont font);
-	virtual void DrawFlushText();
+	void DrawPrintText(const wchar_t *text, int textLen, FontDrawType_t drawType = FONT_DRAW_DEFAULT)override;
+	void DrawUnicodeChar(wchar_t wch, FontDrawType_t drawType = FONT_DRAW_DEFAULT ) override;
+	void DrawUnicodeString( const wchar_t *pwString, FontDrawType_t drawType = FONT_DRAW_DEFAULT ) override;
+	void DrawSetTextFont(vgui::HFont font) override;
+	void DrawFlushText() override;
 
-	virtual void DrawSetTextColor(int r, int g, int b, int a);
-	virtual void DrawSetTextColor(Color col);
-	virtual void DrawSetTextScale(float sx, float sy);
-	virtual void DrawSetTextPos(int x, int y);
-	virtual void DrawGetTextPos(int& x,int& y);
+	void DrawSetTextColor(int r, int g, int b, int a) override;
+	void DrawSetTextColor(Color col) override;
+	void DrawSetTextScale(float sx, float sy) override;
+	void DrawSetTextPos(int x, int y) override;
+	void DrawGetTextPos(int& x,int& y) override;
 
-	virtual vgui::IHTML *CreateHTMLWindow(vgui::IHTMLEvents *events,vgui::VPANEL context);
-	virtual void PaintHTMLWindow(vgui::IHTML *htmlwin);
-	virtual void DeleteHTMLWindow(vgui::IHTML *htmlwin);
-	virtual bool BHTMLWindowNeedsPaint(IHTML *htmlwin);
+	vgui::IHTML *CreateHTMLWindow(vgui::IHTMLEvents *events,vgui::VPANEL context) override;
+	void PaintHTMLWindow(vgui::IHTML *htmlwin) override;
+	void DeleteHTMLWindow(vgui::IHTML *htmlwin) override;
+	bool BHTMLWindowNeedsPaint(IHTML *htmlwin) override;
 
-	virtual void GetScreenSize(int &wide, int &tall);
-	virtual void SetAsTopMost(vgui::VPANEL panel, bool state);
-	virtual void BringToFront(vgui::VPANEL panel);
-	virtual void SetForegroundWindow (vgui::VPANEL panel);
-	virtual void SetPanelVisible(vgui::VPANEL panel, bool state);
-	virtual void SetMinimized(vgui::VPANEL panel, bool state);
-	virtual void FlashWindow(vgui::VPANEL panel, bool state);
-	virtual void SetTitle(vgui::VPANEL panel, const wchar_t *title);
-	virtual const wchar_t *GetTitle( vgui::VPANEL panel );
+	void GetScreenSize(int &wide, int &tall) override;
+	void SetAsTopMost(vgui::VPANEL panel, bool state) override;
+	void BringToFront(vgui::VPANEL panel) override;
+	void SetForegroundWindow (vgui::VPANEL panel) override;
+	void SetPanelVisible(vgui::VPANEL panel, bool state) override;
+	void SetMinimized(vgui::VPANEL panel, bool state) override;
+	void FlashWindow(vgui::VPANEL panel, bool state) override;
+	void SetTitle(vgui::VPANEL panel, const wchar_t *title) override;
+	const wchar_t *GetTitle( vgui::VPANEL panel ) override;
 
-	virtual void SetAsToolBar(vgui::VPANEL panel, bool state);		// removes the window's task bar entry (for context menu's, etc.)
+	void SetAsToolBar(vgui::VPANEL panel, bool state) override;		// removes the window's task bar entry (for context menu's, etc.)
 
 	// windows stuff
-	virtual void CreatePopup(VPANEL panel, bool minimized, bool showTaskbarIcon = true, bool disabled = false, bool mouseInput = true , bool kbInput = true);
+	void CreatePopup(VPANEL panel, bool minimized, bool showTaskbarIcon = true, bool disabled = false, bool mouseInput = true , bool kbInput = true) override;
 
-	virtual void SwapBuffers(vgui::VPANEL panel);
-	virtual void Invalidate(vgui::VPANEL panel);
+	void SwapBuffers(vgui::VPANEL panel) override;
+	void Invalidate(vgui::VPANEL panel) override;
 
-	virtual void SetCursor(vgui::HCursor cursor);
-	virtual bool IsCursorVisible();
-	virtual void SetCursorAlwaysVisible(bool visible);
+	void SetCursor(vgui::HCursor cursor) override;
+	bool IsCursorVisible() override;
+	void SetCursorAlwaysVisible(bool visible) override;
 
-	virtual void ApplyChanges();
-	virtual bool IsWithin(int x, int y);
-	virtual bool HasFocus();
+	void ApplyChanges() override;
+	bool IsWithin(int x, int y) override;
+	bool HasFocus() override;
 
-	virtual bool SupportsFeature(SurfaceFeature_e feature);
+	bool SupportsFeature(SurfaceFeature_e feature) override;
 
 	// engine-only focus handling (replacing WM_FOCUS windows handling)
-	virtual void SetTopLevelFocus(vgui::VPANEL panel);
+	void SetTopLevelFocus(vgui::VPANEL panel) override;
 
 	// fonts
-	virtual vgui::HFont CreateFont();
-	virtual bool SetFontGlyphSet(vgui::HFont font, const char *windowsFontName, int tall, int weight, int blur, int scanlines, int flags, int nRangeMin = 0, int nRangeMax = 0);
-	virtual bool SetBitmapFontGlyphSet(vgui::HFont font, const char *windowsFontName, float scalex, float scaley, int flags);
-	virtual int GetFontTall(HFont font);
-	virtual int GetFontTallRequested(HFont font);
-	virtual int GetFontAscent(HFont font, wchar_t wch);
-	virtual bool IsFontAdditive(HFont font);
-	virtual void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c);
-	virtual void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall);
-	virtual int GetCharacterWidth(vgui::HFont font, int ch);
-	virtual bool AddCustomFontFile(const char *fontName, const char *fontFileName);
-	virtual bool AddBitmapFontFile(const char *fontFileName);
-	virtual void SetBitmapFontName( const char *pName, const char *pFontFilename );
-	virtual const char *GetBitmapFontName( const char *pName );
-	virtual void PrecacheFontCharacters(HFont font, const wchar_t *pCharacters);
-	virtual void ClearTemporaryFontCache( void );
-	virtual const char *GetFontName( HFont font );
-	virtual const char *GetFontFamilyName( HFont font );
+	vgui::HFont CreateFont() override;
+	bool SetFontGlyphSet(vgui::HFont font, const char *windowsFontName, int tall, int weight, int blur, int scanlines, int flags, int nRangeMin = 0, int nRangeMax = 0) override;
+	bool SetBitmapFontGlyphSet(vgui::HFont font, const char *windowsFontName, float scalex, float scaley, int flags) override;
+	int GetFontTall(HFont font) override;
+	int GetFontTallRequested(HFont font) override;
+	int GetFontAscent(HFont font, wchar_t wch) override;
+	bool IsFontAdditive(HFont font)  override;
+	void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c) override;
+	void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall) override;
+	int GetCharacterWidth(vgui::HFont font, int ch) override;
+	bool AddCustomFontFile(const char *fontName, const char *fontFileName) override;
+	bool AddBitmapFontFile(const char *fontFileName) override;
+	void SetBitmapFontName( const char *pName, const char *pFontFilename ) override;
+	const char *GetBitmapFontName( const char *pName ) override;
+	void PrecacheFontCharacters(HFont font, const wchar_t *pCharacters) override;
+	void ClearTemporaryFontCache( void ) override;
+	const char *GetFontName( HFont font ) override;
+	const char *GetFontFamilyName( HFont font ) override;
 
 	// GameUI-only accessed functions
 	// uploads a part of a texture, used for font rendering
 	void DrawSetSubTextureRGBA(int textureID, int drawX, int drawY, unsigned const char *rgba, int subTextureWide, int subTextureTall);
-	void DrawUpdateRegionTextureRGBA( int nTextureID, int x, int y, const unsigned char *pchData, int wide, int tall, ImageFormat imageFormat );
+	void DrawUpdateRegionTextureRGBA( int nTextureID, int x, int y, const unsigned char *pchData, int wide, int tall, ImageFormat imageFormat ) override;
 
 	// notify icons?!?
-	virtual vgui::VPANEL GetNotifyPanel();
-	virtual void SetNotifyIcon(vgui::VPANEL context, vgui::HTexture icon, vgui::VPANEL panelToReceiveMessages, const char *text);
+	vgui::VPANEL GetNotifyPanel() override;
+	void SetNotifyIcon(vgui::VPANEL context, vgui::HTexture icon, vgui::VPANEL panelToReceiveMessages, const char *text) override;
 
 	// plays a sound
-	virtual void PlaySound(const char *fileName);
+	void PlaySound(const char *fileName) override;
 
 	//!! these functions Should not be accessed directly, but only through other vgui items
 	//!! need to move these to seperate interface
-	virtual int GetPopupCount();
-	virtual vgui::VPANEL GetPopup( int index );
-	virtual bool ShouldPaintChildPanel(vgui::VPANEL childPanel);
-	virtual bool RecreateContext(vgui::VPANEL panel);
-	virtual void AddPanel(vgui::VPANEL panel);
-	virtual void ReleasePanel(vgui::VPANEL panel);
-	virtual void MovePopupToFront(vgui::VPANEL panel);
+	intp GetPopupCount() override;
+	vgui::VPANEL GetPopup( int index ) override;
+	bool ShouldPaintChildPanel(vgui::VPANEL childPanel) override;
+	bool RecreateContext(vgui::VPANEL panel) override;
+	void AddPanel(vgui::VPANEL panel) override;
+	void ReleasePanel(vgui::VPANEL panel) override;
+	void MovePopupToFront(vgui::VPANEL panel) override;
 
-	virtual void SolveTraverse(vgui::VPANEL panel, bool forceApplySchemeSettings);
-	virtual void PaintTraverse(vgui::VPANEL panel);
+	void SolveTraverse(vgui::VPANEL panel, bool forceApplySchemeSettings) override;
+	void PaintTraverse(vgui::VPANEL panel) override;
 
-	virtual void EnableMouseCapture(vgui::VPANEL panel, bool state);
+	void EnableMouseCapture(vgui::VPANEL panel, bool state) override;
 
-	virtual void SetWorkspaceInsets( int left, int top, int right, int bottom );
-	virtual void GetWorkspaceBounds(int &x, int &y, int &wide, int &tall);
+	void SetWorkspaceInsets( int left, int top, int right, int bottom ) override;
+	void GetWorkspaceBounds(int &x, int &y, int &wide, int &tall) override;
 
 	// Hook needed to Get input to work
-	virtual void AttachToWindow( void *hwnd, bool bLetAppDriveInput );
-	virtual bool HandleInputEvent( const InputEvent_t &event );
+	void AttachToWindow( void *hwnd, bool bLetAppDriveInput ) override;
+	bool HandleInputEvent( const InputEvent_t &event ) override;
 
-	void		 InitFullScreenBuffer( const char *pszRenderTargetName );
-	virtual void Set3DPaintTempRenderTarget( const char *pRenderTargetName );
-	virtual void Reset3DPaintTempRenderTarget( void );
+	void InitFullScreenBuffer( const char *pszRenderTargetName );
+	void Set3DPaintTempRenderTarget( const char *pRenderTargetName ) override;
+	void Reset3DPaintTempRenderTarget( void ) override;
 
 	// Begins, ends 3D painting
-	virtual void Begin3DPaint( int iLeft, int iTop, int iRight, int iBottom, bool bRenderToTexture = true );
-	virtual void End3DPaint();
+	void Begin3DPaint( int iLeft, int iTop, int iRight, int iBottom, bool bRenderToTexture = true ) override;
+	void End3DPaint() override;
 
-	virtual void BeginSkinCompositionPainting() OVERRIDE;
-	virtual void EndSkinCompositionPainting() OVERRIDE;
+	virtual void BeginSkinCompositionPainting() override;
+	virtual void EndSkinCompositionPainting() override;
 
 	// Disable clipping during rendering
-	virtual void DisableClipping( bool bDisable ) OVERRIDE;
-	virtual void GetClippingRect( int &left, int &top, int &right, int &bottom, bool &bClippingDisabled ) OVERRIDE;
-	virtual void SetClippingRect( int left, int top, int right, int bottom ) OVERRIDE;
+	virtual void DisableClipping( bool bDisable ) override;
+	virtual void GetClippingRect( int &left, int &top, int &right, int &bottom, bool &bClippingDisabled ) override;
+	virtual void SetClippingRect( int left, int top, int right, int bottom ) override;
 
 	// Prevents vgui from changing the cursor
-	virtual bool IsCursorLocked() const;
+	bool IsCursorLocked() const override;
 
 	// Sets the mouse Get + Set callbacks
-	virtual void SetMouseCallbacks( GetMouseCallback_t GetFunc, SetMouseCallback_t SetFunc );
+	void SetMouseCallbacks( GetMouseCallback_t GetFunc, SetMouseCallback_t SetFunc ) override;
 
 	// Tells the surface to ignore windows messages
-	virtual void EnableWindowsMessages( bool bEnable );
+	void EnableWindowsMessages( bool bEnable ) override;
 
 	// Installs a function to play sounds
-	virtual void InstallPlaySoundFunc( PlaySoundFunc_t soundFunc );
+	void InstallPlaySoundFunc( PlaySoundFunc_t soundFunc ) override;
 
 	// Some drawing methods that cannot be accomplished under Win32
-	virtual void DrawColoredCircle( int centerx, int centery, float radius, int r, int g, int b, int a );
-	virtual int	DrawColoredText( vgui::HFont font, int x, int y, int r, int g, int b, int a, PRINTF_FORMAT_STRING const char *fmt, ... );
-	virtual void DrawColoredTextRect( vgui::HFont font, int x, int y, int w, int h, int r, int g, int b, int a, PRINTF_FORMAT_STRING const char *fmt, ... );
-	virtual void DrawTextHeight( vgui::HFont font, int w, int& h, PRINTF_FORMAT_STRING const char *fmt, ... );
+	void DrawColoredCircle( int centerx, int centery, float radius, int r, int g, int b, int a ) override;
+	int	DrawColoredText( vgui::HFont font, int x, int y, int r, int g, int b, int a, PRINTF_FORMAT_STRING const char *fmt, ... ) override;
+	void DrawColoredTextRect( vgui::HFont font, int x, int y, int w, int h, int r, int g, int b, int a, PRINTF_FORMAT_STRING const char *fmt, ... ) override;
+	void DrawTextHeight( vgui::HFont font, int w, int& h, PRINTF_FORMAT_STRING const char *fmt, ... ) override;
 
 	// Returns the length in pixels of the text
-	virtual int	DrawTextLen( vgui::HFont font, PRINTF_FORMAT_STRING const char *fmt, ... );
+	int	DrawTextLen( vgui::HFont font, PRINTF_FORMAT_STRING const char *fmt, ... ) override;
 
 	// Draws a panel in 3D space. 
-	virtual void DrawPanelIn3DSpace( vgui::VPANEL pRootPanel, const VMatrix &panelCenterToWorld, int pw, int ph, float sw, float sh ); 
+	void DrawPanelIn3DSpace( vgui::VPANEL pRootPanel, const VMatrix &panelCenterToWorld, int pw, int ph, float sw, float sh ) override;
 
 	// Only visible within vguimatsurface
-	void DrawSetTextureMaterial(int id, IMaterial *pMaterial);
+	void DrawSetTextureMaterial(int id, IMaterial *pMaterial) override;
 	void ReferenceProceduralMaterial( int id, int referenceId, IMaterial *pMaterial );
 
 	// new stuff for Alfreds VGUI2 port!!
 	virtual bool InEngine() { return true; }
-	void GetProportionalBase( int &width, int &height ) { width = BASE_WIDTH; height = BASE_HEIGHT; }
-	virtual bool HasCursorPosFunctions() { return true; }
+	void GetProportionalBase( int &width, int &height ) override { width = BASE_WIDTH; height = BASE_HEIGHT; }
+	bool HasCursorPosFunctions() override { return true; }
 
-	virtual void SetModalPanel(VPANEL );
-	virtual VPANEL GetModalPanel();
-	virtual void UnlockCursor();
-	virtual void LockCursor();
-	virtual void SetTranslateExtendedKeys(bool state);
-	virtual VPANEL GetTopmostPopup();
-	virtual void GetAbsoluteWindowBounds(int &x, int &y, int &wide, int &tall);
-	virtual void CalculateMouseVisible();
-	virtual bool NeedKBInput();
-	virtual void SurfaceGetCursorPos(int &x, int &y);
-	virtual void SurfaceSetCursorPos(int x, int y);
-	virtual void MovePopupToBack(VPANEL panel);
+	void SetModalPanel(VPANEL ) override;
+	VPANEL GetModalPanel() override;
+	void UnlockCursor() override;
+	void LockCursor() override;
+	void SetTranslateExtendedKeys(bool state) override;
+	VPANEL GetTopmostPopup() override;
+	void GetAbsoluteWindowBounds(int &x, int &y, int &wide, int &tall) override;
+	void CalculateMouseVisible() override;
+	bool NeedKBInput() override;
+	void SurfaceGetCursorPos(int &x, int &y) override;
+	void SurfaceSetCursorPos(int x, int y) override;
+	void MovePopupToBack(VPANEL panel) override;
 
 	virtual bool IsInThink( VPANEL panel); 
 
-	virtual bool DrawGetUnicodeCharRenderInfo( wchar_t ch, CharRenderInfo& info );
-	virtual void DrawRenderCharFromInfo( const CharRenderInfo& info );
+	bool DrawGetUnicodeCharRenderInfo( wchar_t ch, CharRenderInfo& info ) override;
+	void DrawRenderCharFromInfo( const CharRenderInfo& info ) override;
 
 	// global alpha setting functions
 	// affect all subsequent draw calls - shouldn't normally be used directly, only in Panel::PaintTraverse()
-	virtual void DrawSetAlphaMultiplier( float alpha /* [0..1] */ );
-	virtual float DrawGetAlphaMultiplier();
+	void DrawSetAlphaMultiplier( float alpha /* [0..1] */ ) override;
+	float DrawGetAlphaMultiplier() override;
 
 	// web browser
-	virtual void SetAllowHTMLJavaScript( bool state );
+	void SetAllowHTMLJavaScript( bool state ) override;
 
 	// video mode changing
-	virtual void OnScreenSizeChanged( int nOldWidth, int nOldHeight );
+	void OnScreenSizeChanged( int nOldWidth, int nOldHeight ) override;
 
-	virtual vgui::HCursor CreateCursorFromFile( char const *curOrAniFile, char const *pPathID );
+	vgui::HCursor CreateCursorFromFile( char const *curOrAniFile, char const *pPathID ) override;
 
-	virtual void PaintTraverseEx(VPANEL panel, bool paintPopups = false );
+	void PaintTraverseEx(VPANEL panel, bool paintPopups = false ) override;
 
-	virtual float GetZPos() const;
+	float GetZPos() const override;
 
-	virtual void SetPanelForInput( VPANEL vpanel );
+	void SetPanelForInput( VPANEL vpanel ) override;
 
-	virtual vgui::IImage *GetIconImageForFullPath( char const *pFullPath );
+	vgui::IImage *GetIconImageForFullPath( char const *pFullPath ) override;
 
-	virtual void DestroyTextureID( int id );
+	void DestroyTextureID( int id ) override;
 
 
-	virtual const char *GetResolutionKey( void ) const;
+	const char *GetResolutionKey( void ) const override;
 
-	virtual bool ForceScreenSizeOverride( bool bState, int wide, int tall );
+	bool ForceScreenSizeOverride( bool bState, int wide, int tall ) override;
 	// LocalToScreen, ParentLocalToScreen fixups for explicit PaintTraverse calls on Panels not at 0, 0 position
-	virtual bool ForceScreenPosOffset( bool bState, int x, int y );
+	bool ForceScreenPosOffset( bool bState, int x, int y ) override;
 
-	virtual void OffsetAbsPos( int &x, int &y );
+	void OffsetAbsPos( int &x, int &y ) override;
 
-	virtual void GetKernedCharWidth( HFont font, wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &flabcA );
+	void GetKernedCharWidth( HFont font, wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &flabcA ) override;
 	
 
-	virtual const char *GetWebkitHTMLUserAgentString() { return "Valve Client"; }
+	const char *GetWebkitHTMLUserAgentString() override { return "Valve Client"; }
 
-	virtual void *Deprecated_AccessChromeHTMLController() { return NULL; }
+	void *Deprecated_AccessChromeHTMLController() override { return NULL; }
 
-	virtual void SetFullscreenViewport( int x, int y, int w, int h ) OVERRIDE;
-	virtual void SetFullscreenViewportAndRenderTarget( int x, int y, int w, int h, ITexture *pRenderTarget ) OVERRIDE;
-	virtual void GetFullscreenViewportAndRenderTarget( int & x, int & y, int & w, int & h, ITexture **ppRenderTarget ) OVERRIDE;
-	virtual void GetFullscreenViewport( int & x, int & y, int & w, int & h ) OVERRIDE;
-	virtual void PushFullscreenViewport() OVERRIDE;
-	virtual void PopFullscreenViewport() OVERRIDE;
+	virtual void SetFullscreenViewport( int x, int y, int w, int h ) override;
+	virtual void SetFullscreenViewportAndRenderTarget( int x, int y, int w, int h, ITexture *pRenderTarget ) override;
+	virtual void GetFullscreenViewportAndRenderTarget( int & x, int & y, int & w, int & h, ITexture **ppRenderTarget ) override;
+	virtual void GetFullscreenViewport( int & x, int & y, int & w, int & h ) override;
+	virtual void PushFullscreenViewport() override;
+	virtual void PopFullscreenViewport() override;
 
 	// support for software cursors
-	virtual void SetSoftwareCursor( bool bUseSoftwareCursor ) OVERRIDE;
-	virtual void PaintSoftwareCursor()  OVERRIDE;
+	virtual void SetSoftwareCursor( bool bUseSoftwareCursor ) override;
+	virtual void PaintSoftwareCursor()  override;
 
 	// Methods of ILocalizeTextQuery
 public:
 	//virtual int ComputeTextWidth( const wchar_t *pString );
 
 	// Causes fonts to get reloaded, etc.
-	virtual void ResetFontCaches();
+	void ResetFontCaches() override;
 
-	virtual bool IsScreenSizeOverrideActive( void );
-	virtual bool IsScreenPosOverrideActive( void );
+	bool IsScreenSizeOverrideActive( void ) override;
+	bool IsScreenPosOverrideActive( void ) override;
 
-	virtual IMaterial *DrawGetTextureMaterial( int id );
+	IMaterial *DrawGetTextureMaterial( int id ) override;
 
-	virtual int GetTextureNumFrames( int id );
-	virtual void DrawSetTextureFrame( int id, int nFrame, unsigned int *pFrameCache );
+	int GetTextureNumFrames( int id ) override;
+	void DrawSetTextureFrame( int id, int nFrame, unsigned int *pFrameCache ) override;
 
 private:
 	//void DrawRenderCharInternal( const FontCharRenderInfo& info );
@@ -533,9 +533,9 @@ private:
 	float	m_flZPos;
 	CUtlDict< vgui::IImage *, unsigned short >	m_FileTypeImages;
 
-	int		GetTitleEntry( vgui::VPANEL panel );
+	intp		GetTitleEntry( vgui::VPANEL panel );
 
-	virtual void DrawSetTextureRGBAEx(int id, const unsigned char *rgba, int wide, int tall, ImageFormat format );
+	void DrawSetTextureRGBAEx(int id, const unsigned char *rgba, int wide, int tall, ImageFormat format ) override;
 
 	struct ScreenOverride_t
 	{

@@ -129,7 +129,7 @@ private:
 
 void CUserCursorManager::Shutdown()
 {
-	for ( int i = m_UserCursors.First() ; i != m_UserCursors.InvalidIndex(); i = m_UserCursors.Next( i ) )
+	for ( auto i = m_UserCursors.First() ; i != m_UserCursors.InvalidIndex(); i = m_UserCursors.Next( i ) )
 	{
 		::DestroyCursor( m_UserCursors[ i ] );
 	}
@@ -239,32 +239,32 @@ void InitSoftwareCursors()
 	s_rnSoftwareCursorID[dc_hand]     =InitSoftwareCursorTexture( "vgui/cursors/hand" );
 
 	// handle the cursor hotspots not being at their origin
-	s_rfSoftwareCursorOffset[dc_arrow][0] = -0.1;
-	s_rfSoftwareCursorOffset[dc_arrow][1] = -0.1;
-	s_rfSoftwareCursorOffset[dc_ibeam][0] = -0.5;
-	s_rfSoftwareCursorOffset[dc_ibeam][1] = -0.8;
-	s_rfSoftwareCursorOffset[dc_hourglass][0] = -0.5;
-	s_rfSoftwareCursorOffset[dc_hourglass][1] = -0.5;
-	s_rfSoftwareCursorOffset[dc_crosshair][0] = -0.5;
-	s_rfSoftwareCursorOffset[dc_crosshair][1] = -0.5;
-	s_rfSoftwareCursorOffset[dc_waitarrow][0] = -0.1;
-	s_rfSoftwareCursorOffset[dc_waitarrow][1] = -0.1;
-	s_rfSoftwareCursorOffset[dc_up][0] = -0.5;
-	s_rfSoftwareCursorOffset[dc_up][1] = -0.5;
-	s_rfSoftwareCursorOffset[dc_sizenwse][0] = -0.5;
-	s_rfSoftwareCursorOffset[dc_sizenwse][1] = -0.5;
-	s_rfSoftwareCursorOffset[dc_sizenesw][0] = -0.5;
-	s_rfSoftwareCursorOffset[dc_sizenesw][1] = -0.5;
-	s_rfSoftwareCursorOffset[dc_sizewe][0] = -0.5;
-	s_rfSoftwareCursorOffset[dc_sizewe][1] = -0.5;
-	s_rfSoftwareCursorOffset[dc_sizens][0] = -0.5;
-	s_rfSoftwareCursorOffset[dc_sizens][1] = -0.5;
-	s_rfSoftwareCursorOffset[dc_sizeall][0] = -0.5;
-	s_rfSoftwareCursorOffset[dc_sizeall][1] = -0.5;
-	s_rfSoftwareCursorOffset[dc_no][0] = -0.5;
-	s_rfSoftwareCursorOffset[dc_no][1] = -0.5;
-	s_rfSoftwareCursorOffset[dc_hand][0] = -0.5;
-	s_rfSoftwareCursorOffset[dc_hand][1] = -0.5;
+	s_rfSoftwareCursorOffset[dc_arrow][0] = -0.1f;
+	s_rfSoftwareCursorOffset[dc_arrow][1] = -0.1f;
+	s_rfSoftwareCursorOffset[dc_ibeam][0] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_ibeam][1] = -0.8f;
+	s_rfSoftwareCursorOffset[dc_hourglass][0] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_hourglass][1] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_crosshair][0] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_crosshair][1] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_waitarrow][0] = -0.1f;
+	s_rfSoftwareCursorOffset[dc_waitarrow][1] = -0.1f;
+	s_rfSoftwareCursorOffset[dc_up][0] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_up][1] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_sizenwse][0] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_sizenwse][1] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_sizenesw][0] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_sizenesw][1] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_sizewe][0] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_sizewe][1] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_sizens][0] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_sizens][1] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_sizeall][0] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_sizeall][1] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_no][0] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_no][1] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_hand][0] = -0.5f;
+	s_rfSoftwareCursorOffset[dc_hand][1] = -0.5f;
 
 	s_bSoftwareCursorsInitialized = true;
 }
@@ -475,7 +475,7 @@ bool IsCursorLocked()
 //-----------------------------------------------------------------------------
 // handles mouse movement
 //-----------------------------------------------------------------------------
-void CursorSetPos( void *hwnd, int x, int y )
+void CursorSetPos( void *, int x, int y )
 {
 #if defined( USE_SDL )
 	if ( s_bCursorVisible )

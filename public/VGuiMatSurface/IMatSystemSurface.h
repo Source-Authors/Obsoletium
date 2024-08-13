@@ -109,8 +109,11 @@ public:
 	virtual void GetFullscreenViewportAndRenderTarget( int & x, int & y, int & w, int & h, ITexture **ppRenderTarget ) = 0;
 	virtual void SetFullscreenViewportAndRenderTarget( int x, int y, int w, int h, ITexture *pRenderTarget ) = 0;
 
+SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+SRC_GCC_DISABLE_OVERLOADED_VIRTUAL_WARNING()
 	// get texture id for a texture
 	virtual int  DrawGetTextureId( ITexture *pTexture ) = 0;
+SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 
 	// begin and end skin composition painting
 	virtual void BeginSkinCompositionPainting() = 0;

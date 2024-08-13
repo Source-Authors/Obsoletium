@@ -96,7 +96,10 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 	{
 		s_hLastHWnd = hwnd;
 		event.m_nType = IE_IMESetWindow;
-		event.m_nData = (int)s_hLastHWnd;
+#ifdef PLATFORM_64BITS
+		event.m_nData = static_cast<int>((reinterpret_cast<ptrdiff_t>(s_hLastHWnd) >> 32) & 0xFFFFFFFF);
+#endif
+		event.m_nData2 = static_cast<int>((reinterpret_cast<ptrdiff_t>(s_hLastHWnd)) & 0xFFFFFFFF);
 		g_pInputSystem->PostUserEvent( event );
 	}
 
@@ -144,25 +147,6 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 		break;
 
 	case WM_XCONTROLLER_KEY:
-		if ( IsX360() )
-		{	
-			// First have to insert the edge case event
-			int nRetVal = 0;
-			if ( s_ChainedWindowProc )
-			{
-				nRetVal = CallWindowProcW( s_ChainedWindowProc, hwnd, uMsg, wParam, lParam );
-			}
-
-			// xboxissue - as yet HL2 input hasn't been made aware of analog inputs or ports
-			// so just digital step on the sample range
-			int sample = LOWORD( lParam );
-			if ( sample )
-			{
-				event.m_nType = IE_KeyCodeTyped;
-				event.m_nData = (vgui::KeyCode)wParam;
-				g_pInputSystem->PostUserEvent( event );
-			}
-		}
 		break;
 
 	// Need to deal with key repeat for keydown since inputsystem doesn't
@@ -170,7 +154,7 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 	case WM_SYSKEYDOWN:
 		{
 			// First have to insert the edge case event
-			int nRetVal = 0;
+			LRESULT nRetVal = 0;
 			if ( s_ChainedWindowProc )
 			{
 				nRetVal = CallWindowProcW( s_ChainedWindowProc, hwnd, uMsg, wParam, lParam );
@@ -337,7 +321,7 @@ void InputAttachToWindow(void *hwnd)
 	{
 		// under OSX we use the Cocoa mgr to route events rather than hooking winprocs
 		// and under Linux we use SDL
-		Assert( !"Implement me" );
+		AssertMsg( false, "Implement me" );
 	}
 #endif
 }
@@ -349,7 +333,7 @@ void InputDetachFromWindow(void *hwnd)
 	{
 		// under OSX we use the Cocoa mgr to route events rather than hooking winprocs
 		// and under Linux we use SDL
-		Assert( !"Implement me" );
+		AssertMsg( false, "Implement me" );
 	}
 #endif
 }
@@ -480,8 +464,16 @@ bool InputHandleInputEvent( const InputEvent_t &event )
 		return true;
 
 	case IE_IMESetWindow:
-		g_pIInput->SetIMEWindow( (void *)event.m_nData );
+	{
+#ifdef PLATFORM_64BITS
+		ptrdiff_t hi = static_cast<ptrdiff_t>(event.m_nData) << 32;
+#else
+		ptrdiff_t hi = 0;
+#endif
+		ptrdiff_t low  = static_cast<ptrdiff_t>(static_cast<ptrdiff_t>(event.m_nData2) & 0xFFFFFFFF);
+		g_pIInput->SetIMEWindow( (void *)(hi | low) );
 		return true;
+	}
 
 	case IE_LocateMouseClick:
 		g_pIInput->InternalCursorMoved( event.m_nData, event.m_nData2 );

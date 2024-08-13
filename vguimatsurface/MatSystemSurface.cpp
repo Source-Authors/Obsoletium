@@ -86,12 +86,12 @@ public:
 	}
 
 	// from IVguiMatInfoVar
-	virtual int GetIntValue ( void ) const
+	int GetIntValue ( void ) const override
 	{
 		return m_pMaterialVar->GetIntValue();
 	}
 
-	virtual void SetIntValue ( int val )
+	void SetIntValue ( int val ) override
 	{
 		m_pMaterialVar->SetIntValue( val );
 	}
@@ -109,7 +109,7 @@ public:
 	}
 
 	// from IVguiMatInfo
-	virtual IVguiMatInfoVar* FindVarFactory( const char *varName, bool *found )
+	IVguiMatInfoVar* FindVarFactory( const char *varName, bool *found ) override
 	{
 		IMaterialVar *pMaterialVar = m_pMaterial->FindVar( varName, found );
 
@@ -118,7 +118,7 @@ public:
 		return new CVguiMatInfoVar( pMaterialVar );
 	}
 
-	virtual int GetNumAnimationFrames( void )
+	int GetNumAnimationFrames( void ) override
 	{
 		return m_pMaterial->GetNumAnimationFrames();
 	}
@@ -181,7 +181,7 @@ VPANEL CMatEmbeddedPanel::IsWithinTraverse(int x, int y, bool traversePopups)
 //-----------------------------------------------------------------------------
 // Constructor, destructor
 //-----------------------------------------------------------------------------
-CMatSystemSurface::CMatSystemSurface() : m_pEmbeddedPanel(NULL), m_pWhite(NULL)
+CMatSystemSurface::CMatSystemSurface() : m_pWhite(NULL), m_pEmbeddedPanel(NULL)
 {
 	m_nTranslateX = m_nTranslateY = 0;
 	m_flAlphaMultiplier = -1;
@@ -299,11 +299,11 @@ void CMatSystemSurface::Disconnect()
 void *CMatSystemSurface::QueryInterface( const char *pInterfaceName )
 {
 	// We also implement the IMatSystemSurface interface
-	if (!Q_strncmp(	pInterfaceName, MAT_SYSTEM_SURFACE_INTERFACE_VERSION, Q_strlen(MAT_SYSTEM_SURFACE_INTERFACE_VERSION) + 1))
+	if (!Q_strncmp(	pInterfaceName, MAT_SYSTEM_SURFACE_INTERFACE_VERSION, ssize(MAT_SYSTEM_SURFACE_INTERFACE_VERSION) ))
 		return (IMatSystemSurface*)this;
 
 	// We also implement the IMatSystemSurface interface
-	if (!Q_strncmp(	pInterfaceName, VGUI_SURFACE_INTERFACE_VERSION, Q_strlen(VGUI_SURFACE_INTERFACE_VERSION) + 1))
+	if (!Q_strncmp(	pInterfaceName, VGUI_SURFACE_INTERFACE_VERSION, ssize(VGUI_SURFACE_INTERFACE_VERSION) ))
 		return (vgui::ISurface*)this;
 
 	return BaseClass::QueryInterface( pInterfaceName );
@@ -433,7 +433,7 @@ InitReturnVal_t CMatSystemSurface::Init( void )
 //-----------------------------------------------------------------------------
 void CMatSystemSurface::Shutdown( void )
 {
-	for ( int i = m_FileTypeImages.First(); i != m_FileTypeImages.InvalidIndex(); i = m_FileTypeImages.Next( i ) )
+	for ( auto i = m_FileTypeImages.First(); i != m_FileTypeImages.InvalidIndex(); i = m_FileTypeImages.Next( i ) )
 	{
 		delete m_FileTypeImages[ i ];
 	}
@@ -452,7 +452,7 @@ void CMatSystemSurface::Shutdown( void )
 	m_PaintStateStack.Purge();
 
 #if defined( WIN32 ) && !defined( _X360 )
-	for (int i = 0; i < m_CustomFontFileNames.Count(); i++)
+	for (intp i = 0; i < m_CustomFontFileNames.Count(); i++)
  	{
 		// dvs: Keep removing the font until we get an error back. After consulting with Microsoft, it appears
 		// that RemoveFontResourceEx must sometimes be called multiple times to work. Doing this insures that
@@ -763,9 +763,9 @@ void CMatSystemSurface::RunFrame()
 		return;
 
 	// Generate all input messages
-	int nEventCount = g_pInputSystem->GetEventCount();
+	intp nEventCount = g_pInputSystem->GetEventCount();
 	const InputEvent_t* pEvents = g_pInputSystem->GetEventData( );
-	for ( int i = 0; i < nEventCount; ++i )
+	for ( intp i = 0; i < nEventCount; ++i )
 	{
 		HandleInputEvent( pEvents[i] );
 	}
@@ -805,7 +805,7 @@ void CMatSystemSurface::PushMakeCurrent(VPANEL pPanel, bool useInSets)
 
 	g_pVGuiPanel->GetClipRect(pPanel, clipRect[0], clipRect[1], clipRect[2], clipRect[3]);
 
-	int i = m_PaintStateStack.AddToTail();
+	intp i = m_PaintStateStack.AddToTail();
 	PaintState_t &paintState = m_PaintStateStack[i];
 	paintState.m_pPanel = pPanel;
 
@@ -832,7 +832,7 @@ void CMatSystemSurface::PopMakeCurrent(VPANEL pPanel)
 		DrawFlushText();
 	}
 
-	int top = m_PaintStateStack.Count() - 1;
+	intp top = m_PaintStateStack.Count() - 1;
 
 	// More pops that pushes?
 	Assert( top >= 0 );
@@ -1529,7 +1529,7 @@ int CMatSystemSurface::DrawGetTextureId( ITexture *pTexture )
 //-----------------------------------------------------------------------------
 // Associates a texture with a material file (also binds it)
 //-----------------------------------------------------------------------------
-void CMatSystemSurface::DrawSetTextureFile(int id, const char *pFileName, int hardwareFilter, bool forceReload /*= false*/)
+void CMatSystemSurface::DrawSetTextureFile(int id, const char *pFileName, int, bool /*= false*/)
 {
 	TextureDictionary()->BindTextureToFile( id, pFileName );
 	DrawSetTexture( id );
@@ -1823,28 +1823,21 @@ void CMatSystemSurface::GetTextSize(HFont font, const wchar_t *text, int &wide, 
 //-----------------------------------------------------------------------------
 bool CMatSystemSurface::AddCustomFontFile( const char *fontName, const char *fontFileName )
 {
-	if ( IsX360() )
-	{
-		// custom fonts are not supported (not needed) on xbox, all .vfonts are offline converted to ttfs
-		// ttfs are mounted/handled elsewhere
-		return true;
-	}
 	MAT_FUNC;
 
 	char fullPath[MAX_PATH];
-	bool bFound = false;
 	// windows needs an absolute path for ttf
-	bFound = g_pFullFileSystem->GetLocalPath( fontFileName, fullPath, sizeof( fullPath ) );
+	bool bFound = g_pFullFileSystem->GetLocalPath( fontFileName, fullPath, sizeof( fullPath ) );
 	if ( !bFound )
 	{
-		Warning( "Couldn't find custom font file '%s'\n", fontFileName );
+		Warning( "Couldn't find custom font file '%s' for font '%s'\n", fontFileName, fontName ? fontName : "" );
 		return false;
 	}
 
 	// only add if it's not already in the list
 	Q_strlower( fullPath );
 	CUtlSymbol sym(fullPath);
-	int i;
+	intp i;
 	for ( i = 0; i < m_CustomFontFileNames.Count(); i++ )
 	{
 		if ( m_CustomFontFileNames[i] == sym )
@@ -1930,7 +1923,7 @@ void *CMatSystemSurface::FontDataHelper( const char *pchFontName, int &size, con
 		}
 
 		FT_Face face;
-		const FT_Error error = FT_New_Memory_Face( FontManager().GetFontLibraryHandle(), (FT_Byte *)buf.Base(), buf.TellPut(), 0, &face );
+		const FT_Error error = FT_New_Memory_Face( FontManager().GetFontLibraryHandle(), buf.Base<FT_Byte>(), buf.TellPut(), 0, &face );
 
 		if ( error  ) 
 		{
@@ -2003,7 +1996,7 @@ bool CMatSystemSurface::AddBitmapFontFile( const char *fontFileName )
 	// only add if it's not already in the list
 	Q_strlower( path );
 	CUtlSymbol sym( path );
-	int i;
+	intp i;
 	for ( i = 0; i < m_BitmapFontFileNames.Count(); i++ )
 	{
 		if ( m_BitmapFontFileNames[i] == sym )
@@ -2035,7 +2028,7 @@ void CMatSystemSurface::SetBitmapFontName( const char *pName, const char *pFontF
 	Q_strlower( fontPath );
 
 	CUtlSymbol sym( fontPath );
-	int i;
+	intp i;
 	for (i = 0; i < m_BitmapFontFileNames.Count(); i++)
 	{
 		if ( m_BitmapFontFileNames[i] == sym )
@@ -2077,7 +2070,7 @@ void CMatSystemSurface::ClearTemporaryFontCache( void )
 //-----------------------------------------------------------------------------
 void CMatSystemSurface::PrecacheFontCharacters( HFont font, const wchar_t *pCharacterString )
 {
-	wchar_t *pCommonChars = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.!:-/%";
+	const wchar_t pCommonChars[]{L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.!:-/%"};
 	MAT_FUNC;
 
 	if ( !pCharacterString || !pCharacterString[0] )
@@ -2200,7 +2193,7 @@ void CMatSystemSurface::DrawGetTextPos(int& x,int& y)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CMatSystemSurface::DrawUnicodeString( const wchar_t *pString, FontDrawType_t drawType /*= FONT_DRAW_DEFAULT */ )
+void CMatSystemSurface::DrawUnicodeString( const wchar_t *pString, [[maybe_unused]] FontDrawType_t drawType /*= FONT_DRAW_DEFAULT */ )
 {
 	// skip fully transparent characters
 	if ( m_DrawTextColor[3] == 0 )
@@ -2634,11 +2627,11 @@ void CMatSystemSurface::SetWorkspaceInsets( int left, int top, int right, int bo
 //-----------------------------------------------------------------------------
 // A bunch of methods needed for the windows version only
 //-----------------------------------------------------------------------------
-void CMatSystemSurface::SetAsTopMost(VPANEL panel, bool state)
+void CMatSystemSurface::SetAsTopMost(VPANEL, bool)
 {
 }
 
-void CMatSystemSurface::SetAsToolBar(VPANEL panel, bool state)		// removes the window's task bar entry (for context menu's, etc.)
+void CMatSystemSurface::SetAsToolBar(VPANEL, bool)		// removes the window's task bar entry (for context menu's, etc.)
 {
 }
 
@@ -2647,7 +2640,7 @@ void CMatSystemSurface::SetForegroundWindow (VPANEL panel)
 	BringToFront(panel);
 }
 
-void CMatSystemSurface::SetPanelVisible(VPANEL panel, bool state)
+void CMatSystemSurface::SetPanelVisible(VPANEL, bool)
 {
 }
 
@@ -2670,7 +2663,7 @@ bool CMatSystemSurface::IsMinimized(vgui::VPANEL panel)
 
 }
 
-void CMatSystemSurface::FlashWindow(VPANEL panel, bool state)
+void CMatSystemSurface::FlashWindow(VPANEL, bool)
 {
 }
 
@@ -2680,7 +2673,7 @@ void CMatSystemSurface::FlashWindow(VPANEL panel, bool state)
 //-----------------------------------------------------------------------------
 void CMatSystemSurface::SetTitle(VPANEL panel, const wchar_t *title)
 {
-	int entry = GetTitleEntry( panel );
+	intp entry = GetTitleEntry( panel );
 	if ( entry == -1 )
 	{
 		entry = m_Titles.AddToTail();
@@ -2697,7 +2690,7 @@ void CMatSystemSurface::SetTitle(VPANEL panel, const wchar_t *title)
 //-----------------------------------------------------------------------------
 wchar_t const *CMatSystemSurface::GetTitle( VPANEL panel )
 {
-	int entry = GetTitleEntry( panel );
+	intp entry = GetTitleEntry( panel );
 	if ( entry != -1 )
 	{
 		TitleEntry *e = &m_Titles[ entry ];
@@ -2712,9 +2705,9 @@ wchar_t const *CMatSystemSurface::GetTitle( VPANEL panel )
 // Input  : *panel - 
 // Output : TitleEntry
 //-----------------------------------------------------------------------------
-int CMatSystemSurface::GetTitleEntry( vgui::VPANEL panel )
+intp CMatSystemSurface::GetTitleEntry( vgui::VPANEL panel )
 {
-	for ( int i = 0; i < m_Titles.Count(); i++ )
+	for ( intp i = 0; i < m_Titles.Count(); i++ )
 	{
 		TitleEntry* entry = &m_Titles[ i ];
 		if ( entry->panel == panel )
@@ -2723,11 +2716,11 @@ int CMatSystemSurface::GetTitleEntry( vgui::VPANEL panel )
 	return -1;
 }
 
-void CMatSystemSurface::SwapBuffers(VPANEL panel)
+void CMatSystemSurface::SwapBuffers(VPANEL)
 {
 }
 
-void CMatSystemSurface::Invalidate(VPANEL panel)
+void CMatSystemSurface::Invalidate(VPANEL)
 {
 }
 
@@ -2741,11 +2734,11 @@ VPANEL CMatSystemSurface::GetNotifyPanel()
 	return NULL;
 }
 
-void CMatSystemSurface::SetNotifyIcon(VPANEL context, HTexture icon, VPANEL panelToReceiveMessages, const char *text)
+void CMatSystemSurface::SetNotifyIcon(VPANEL, HTexture, VPANEL, const char *)
 {
 }
 
-bool CMatSystemSurface::IsWithin(int x, int y)
+bool CMatSystemSurface::IsWithin(int, int)
 {
 	return true;
 }
@@ -2762,7 +2755,7 @@ bool CMatSystemSurface::ShouldPaintChildPanel(VPANEL childPanel)
 	return !isPopup;
 }
 
-bool CMatSystemSurface::RecreateContext(VPANEL panel)
+bool CMatSystemSurface::RecreateContext(VPANEL)
 {
 	return false;
 }
@@ -2849,7 +2842,7 @@ void CMatSystemSurface::SetCursor(HCursor hCursor)
 	}
 }
 
-void CMatSystemSurface::EnableMouseCapture( VPANEL panel, bool state )
+void CMatSystemSurface::EnableMouseCapture( VPANEL, bool state )
 {
 #ifdef WIN32
 	if ( state )
@@ -2918,7 +2911,7 @@ void CMatSystemSurface::ReleasePanel(VPANEL panel)
 	// Remove from popup list if needed and remove any dead popups while we're at it
 	RemovePopup( panel );
 
-	int entry = GetTitleEntry( panel );
+	intp entry = GetTitleEntry( panel );
 	if ( entry != -1 )
 	{
 		m_Titles.Remove( entry );
@@ -2929,7 +2922,7 @@ void CMatSystemSurface::ReleasePanel(VPANEL panel)
 //-----------------------------------------------------------------------------
 // Popup accessors used by VGUI
 //-----------------------------------------------------------------------------
-int CMatSystemSurface::GetPopupCount(  )
+intp CMatSystemSurface::GetPopupCount(  )
 {
 	return m_PopupList.Count();
 }
@@ -2960,9 +2953,9 @@ void CMatSystemSurface::AddPopup( VPANEL panel )
 void CMatSystemSurface::RemovePopup( vgui::VPANEL panel )
 {
 	// Remove from popup list if needed and remove any dead popups while we're at it
-	int c = GetPopupCount();
+	intp c = GetPopupCount();
 
-	for ( int i = c -  1; i >= 0 ; i-- )
+	for ( intp i = c -  1; i >= 0 ; i-- )
 	{
 		VPANEL popup = GetPopup(i );
 		if ( popup && ( popup != panel ) )
@@ -3015,7 +3008,7 @@ void CMatSystemSurface::InternalSolveTraverse(VPANEL panel)
 
 	// WARNING: Some of the think functions add/remove children, so make sure we
 	//  explicitly check for children.Count().
-	for ( int i = 0; i < children.Count(); ++i )
+	for ( intp i = 0; i < children.Count(); ++i )
 	{
 		VPanel *child = children[ i ];
 		if (child->IsVisible())
@@ -3046,7 +3039,7 @@ void CMatSystemSurface::InternalThinkTraverse(VPANEL panel)
 
 	// WARNING: Some of the think functions add/remove children, so make sure we
 	//  explicitly check for children.Count().
-	for ( int i = 0; i < children.Count(); ++i )
+	for ( intp i = 0; i < children.Count(); ++i )
 	{
 		VPanel *child = children[ i ];
 		if ( child->IsVisible() )
@@ -3071,7 +3064,7 @@ void CMatSystemSurface::InternalSchemeSettingsTraverse(VPANEL panel, bool forceA
 	CUtlVector< VPanel * > &children = vp->GetChildren();
 
 	// apply to the children...
-	for ( int i = 0; i < children.Count(); ++i )
+	for ( intp i = 0; i < children.Count(); ++i )
 	{
 		VPanel *child = children[ i ];
 		if ( forceApplySchemeSettings || child->IsVisible() )
@@ -3219,7 +3212,7 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 		// since depth-test and depth-write are on, the front panels will occlude the underlying ones
 		{
 			VPROF( "CMatSystemSurface::PaintTraverse popups loop" );
-			int popups = GetPopupCount();
+			intp popups = GetPopupCount();
 			if ( popups > 254 )
 			{
 				Warning( "Too many popups! Rendering will be bad!\n" );
@@ -3227,7 +3220,7 @@ void CMatSystemSurface::PaintTraverseEx(VPANEL panel, bool paintPopups /*= false
 
 			// HACK! Using stencil ref 254 so drag/drop helper can use 255.
 			int nStencilRef = 254;
-			for ( int i = popups - 1; i >= 0; --i )
+			for ( intp i = popups - 1; i >= 0; --i )
 			{
 				VPANEL popupPanel = GetPopup( i );
 
@@ -3548,19 +3541,18 @@ int CMatSystemSurface::DrawColoredText( vgui::HFont font, int x, int y, int r, i
 {
 	MAT_FUNC;
 	Assert( g_bInDrawing );
-	int len;
 	char data[1024];
 
 	DrawSetTextPos( x, y );
 	DrawSetTextColor( r, g, b, a );
 
-	len = Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+	Q_vsnprintf(data, sizeof( data ), fmt, argptr);
 
 	DrawSetTextFont( font );
 
 	wchar_t szconverted[ 1024 ];
 	g_pVGuiLocalize->ConvertANSIToUnicode( data, szconverted, 1024 );
-	DrawPrintText( szconverted, wcslen(szconverted ) );
+	DrawPrintText( szconverted, Q_wcslen(szconverted ) );
 
 	int totalLength = DrawTextLen( font, data );
 
@@ -3743,7 +3735,7 @@ void CMatSystemSurface::DrawColoredTextRect( vgui::HFont font, int x, int y, int
 
 		wchar_t szconverted[ 1024 ];
 		g_pVGuiLocalize->ConvertANSIToUnicode( word, szconverted, 1024 );
-		DrawPrintText( szconverted, wcslen(szconverted ) );
+		DrawPrintText( szconverted, Q_wcslen(szconverted ) );
 
 		// Leave room for space, too
 		x += DrawTextLen( font, word );
@@ -3824,7 +3816,7 @@ bool CMatSystemSurface::IsCursorLocked() const
 //-----------------------------------------------------------------------------
 // Sets the mouse Get + Set callbacks
 //-----------------------------------------------------------------------------
-void CMatSystemSurface::SetMouseCallbacks( GetMouseCallback_t GetFunc, SetMouseCallback_t SetFunc )
+void CMatSystemSurface::SetMouseCallbacks( GetMouseCallback_t, SetMouseCallback_t )
 {
 	// FIXME: Remove! This is obsolete
 	Assert(0);
@@ -3843,7 +3835,7 @@ void CMatSystemSurface::MovePopupToFront(VPANEL panel)
 {
 	HPanel p = ivgui()->PanelToHandle( panel );
 
-	int index = m_PopupList.Find( p );
+	intp index = m_PopupList.Find( p );
 	if ( index == m_PopupList.InvalidIndex() )
 		return;
 
@@ -3878,7 +3870,7 @@ void CMatSystemSurface::MovePopupToBack(VPANEL panel)
 {
 	HPanel p = ivgui()->PanelToHandle( panel );
 
-	int index = m_PopupList.Find( p );
+	intp index = m_PopupList.Find( p );
 	if ( index == m_PopupList.InvalidIndex() )
 	{
 		return;
@@ -3918,7 +3910,7 @@ void CMatSystemSurface::SetCursorAlwaysVisible( bool visible )
 	CursorSelect( visible ? dc_alwaysvisible_push : dc_alwaysvisible_pop );
 }
 
-bool CMatSystemSurface::IsTextureIDValid(int id)
+bool CMatSystemSurface::IsTextureIDValid(int)
 {
 	// FIXME:
 	return true;
@@ -3929,24 +3921,24 @@ void CMatSystemSurface::SetAllowHTMLJavaScript( bool state )
 	m_bAllowJavaScript = state; 
 }
 
-IHTML *CMatSystemSurface::CreateHTMLWindow(vgui::IHTMLEvents *events,VPANEL context)
+IHTML *CMatSystemSurface::CreateHTMLWindow(vgui::IHTMLEvents *, VPANEL)
 {
-	Assert( !"CMatSystemSurface::CreateHTMLWindow" );
+	AssertMsg( false, "CMatSystemSurface::CreateHTMLWindow" );
 	return NULL;
 }
 
 
-void CMatSystemSurface::DeleteHTMLWindow(IHTML *htmlwin)
+void CMatSystemSurface::DeleteHTMLWindow(IHTML *)
 {
 }
 
 
 
-void CMatSystemSurface::PaintHTMLWindow(IHTML *htmlwin)
+void CMatSystemSurface::PaintHTMLWindow(IHTML *)
 {
 }
 
-bool CMatSystemSurface::BHTMLWindowNeedsPaint(IHTML *htmlwin)
+bool CMatSystemSurface::BHTMLWindowNeedsPaint(IHTML *)
 {
 	return false;
 }
@@ -3957,7 +3949,7 @@ bool CMatSystemSurface::BHTMLWindowNeedsPaint(IHTML *htmlwin)
 	TextureDictionary()->SetTextureRGBAEx( id, (const char *)rgba, wide, tall, IMAGE_FORMAT_RGBA8888 );
 }*/
 
-void CMatSystemSurface::DrawSetTextureRGBA(int id, const unsigned char* rgba, int wide, int tall, int hardwareFilter, bool forceUpload)
+void CMatSystemSurface::DrawSetTextureRGBA(int id, const unsigned char* rgba, int wide, int tall, int, bool)
 {
 	TextureDictionary()->SetTextureRGBAEx( id, (const char *)rgba, wide, tall, IMAGE_FORMAT_RGBA8888, false );
 }
@@ -3996,7 +3988,7 @@ void CMatSystemSurface::LockCursor()
 	::LockCursor( true );
 }
 
-void CMatSystemSurface::SetTranslateExtendedKeys(bool state)
+void CMatSystemSurface::SetTranslateExtendedKeys(bool)
 {
 }
 
@@ -4047,14 +4039,14 @@ static bool IsChildOfModalSubTree(VPANEL panel)
 
 void CMatSystemSurface::CalculateMouseVisible()
 {
-	int i;
+	intp i;
 	m_bNeedsMouse = false;
 	m_bNeedsKeyboard = false;
 
 	if ( input()->GetMouseCapture() != 0 )
 		return;
 
-	int c = surface()->GetPopupCount();
+	intp c = surface()->GetPopupCount();
 
 	VPANEL modalSubTree = input()->GetModalSubTree();
 	if ( modalSubTree )
@@ -4299,7 +4291,7 @@ vgui::IImage *CMatSystemSurface::GetIconImageForFullPath( char const *pFullPath 
 	vgui::IImage *newIcon = NULL;
 
 #if defined( WIN32 ) && !defined( _X360 )
-	SHFILEINFO info = { 0 };
+	SHFILEINFO info = {};
 	DWORD_PTR dwResult = SHGetFileInfo( 
 		pFullPath,
 		0,
