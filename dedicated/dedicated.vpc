@@ -16,7 +16,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;.\;$SRCDIR\engine"
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\out\build;.\;$SRCDIR\engine"
 		$AdditionalIncludeDirectories		"$BASE;$SDL3SRCDIR;$SDL3SRCDIR/include" [$SDL]
 		$PreprocessorDefinitions			"$BASE;DEDICATED;LAUNCHERONLY;SUPPORT_PACKED_STORE"
 		// dimhotepus: Enable exceptions + SEH as we use them in a single place
