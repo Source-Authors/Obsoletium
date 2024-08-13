@@ -79,13 +79,13 @@ CFontManager::~CFontManager()
 void CFontManager::ClearAllFonts()
 {
 	// free the fonts
-	for (int i = 0; i < m_Win32Fonts.Count(); i++)
+	for (intp i = 0; i < m_Win32Fonts.Count(); i++)
 	{
 		delete m_Win32Fonts[i];
 	}
 	m_Win32Fonts.RemoveAll();
 
-	for (int i = 0; i < m_FontAmalgams.Count(); i++)
+	for (intp i = 0; i < m_FontAmalgams.Count(); i++)
 	{
 		m_FontAmalgams[i].RemoveAll();
 	}
@@ -96,7 +96,7 @@ void CFontManager::ClearAllFonts()
 //-----------------------------------------------------------------------------
 vgui::HFont CFontManager::CreateFont()
 {
-	int i = m_FontAmalgams.AddToTail();
+	intp i = m_FontAmalgams.AddToTail();
 	return i;
 }
 
@@ -255,7 +255,7 @@ font_t *CFontManager::CreateOrFindWin32Font(const char *windowsFontName, int tal
 {
 	// see if we already have the win32 font
 	font_t *winFont = NULL;
-	int i;
+	intp i;
 	for (i = 0; i < m_Win32Fonts.Count(); i++)
 	{
 		if (m_Win32Fonts[i]->IsEqualTo(windowsFontName, tall, weight, blur, scanlines, flags))
@@ -336,7 +336,7 @@ CBitmapFont *CFontManager::CreateOrFindBitmapFont(const char *windowsFontName, f
 {
 	// see if we already have the font
 	CBitmapFont *winFont = NULL;
-	int i;
+	intp i;
 	for ( i = 0; i < m_Win32Fonts.Count(); i++ )
 	{
 		font_t *font = m_Win32Fonts[i];
@@ -709,13 +709,13 @@ void CFontManager::Validate( CValidator &validator, char *pchName )
 	validator.Push( "CFontManager", this, pchName );
 
 	ValidateObj( m_FontAmalgams );
-	for ( int iFont = 0; iFont < m_FontAmalgams.Count(); iFont++ )
+	for ( intp iFont = 0; iFont < m_FontAmalgams.Count(); iFont++ )
 	{
 		ValidateObj( m_FontAmalgams[iFont] );
 	}
 
 	ValidateObj( m_Win32Fonts );
-	for ( int iWin32Font = 0; iWin32Font < m_Win32Fonts.Count(); iWin32Font++ )
+	for ( intp iWin32Font = 0; iWin32Font < m_Win32Fonts.Count(); iWin32Font++ )
 	{
 		ValidatePtr( m_Win32Fonts[ iWin32Font ] );
 	}

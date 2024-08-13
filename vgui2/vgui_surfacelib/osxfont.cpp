@@ -152,7 +152,7 @@ bool COSXFont::CreateStyle( float flFontSize, bool bBold )
 	    sizeof( color ),
 	};
 
-	err = ATSUSetAttributes( m_ATSUStyle, Q_ARRAYSIZE( styleTags ), styleTags, styleSizes, styleValues );
+	err = ATSUSetAttributes( m_ATSUStyle, ssize( styleTags ), styleTags, styleSizes, styleValues );
 	if (err != noErr )
 	{
 		CHECK_ATSU_ERR( err );
@@ -197,7 +197,7 @@ bool COSXFont::CreateTextLayout()
 	    &layoutOptions,
 	};
 
-	err = ATSUSetLayoutControls( m_ATSUTextLayout, Q_ARRAYSIZE( theTags ), theTags, theSizes, theValues );
+	err = ATSUSetLayoutControls( m_ATSUTextLayout, ssize( theTags ), theTags, theSizes, theValues );
 	if ( err != noErr )
 	{
 		CHECK_ATSU_ERR( err );
@@ -258,7 +258,7 @@ bool COSXFont::Create( const char *windowsFontName, int tall, int weight, int bl
 	}
 
 	MetricsTweaks_t metricTweaks = g_defaultMetricTweaks;
-	for ( int i = 0; i < Q_ARRAYSIZE( g_FontMetricTweaks ); i++ )
+	for ( int i = 0; i < ssize( g_FontMetricTweaks ); i++ )
 	{
 		if ( !Q_stricmp( windowsFontName, g_FontMetricTweaks[ i ].m_windowsFontName ) )
 		{
@@ -385,9 +385,9 @@ void COSXFont::GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAfter
 		return;
 
 	CFIndex usedBufLen = 0;
-	char chUTF16Text[ Q_ARRAYSIZE( wchString ) * 2 ];
+	char chUTF16Text[ std::size( wchString ) * 2 ];
 
-	CFStringGetBytes( convertedKey, CFRangeMake( 0, (int)i ), kCFStringEncodingUnicode, 0, false, (UInt8 *)chUTF16Text, Q_ARRAYSIZE( chUTF16Text ), &usedBufLen );
+	CFStringGetBytes( convertedKey, CFRangeMake( 0, (int)i ), kCFStringEncodingUnicode, 0, false, (UInt8 *)chUTF16Text, std::size( chUTF16Text ), &usedBufLen );
 	CFRelease( convertedKey );
 
 	OSStatus err = ATSUSetTextPointerLocation( m_ATSUTextLayout, (ConstUniCharArrayPtr)chUTF16Text, kATSUFromTextBeginning, kATSUToTextEnd, i );
@@ -414,7 +414,7 @@ void COSXFont::GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAfter
 	CHECK_ATSU_ERR( err );
 	if( err == noErr )
 	{
-		ATSGlyphIdealMetrics ScreenMetricts[ Q_ARRAYSIZE( wchString ) ];
+		ATSGlyphIdealMetrics ScreenMetricts[ std::size( wchString ) ];
 		err = ATSUGlyphGetIdealMetrics( m_ATSUStyle, i, &layoutRecords[ 0 ].glyphID, sizeof( ATSLayoutRecord ), ScreenMetricts );
 		CHECK_ATSU_ERR( err );
 		if( err == noErr )
@@ -470,7 +470,7 @@ void COSXFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned cha
 {
 	if ( !m_ContextRef )
 	{
-		Assert( !"Context ref not setup to allow GetCharRGBA" );
+		AssertMsg( false, "Context ref not setup to allow GetCharRGBA" );
 		return;
 	}
 

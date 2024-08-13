@@ -75,12 +75,12 @@ CWin32Font::~CWin32Font()
 //			used to determine whether or not a font exists on the system
 //-----------------------------------------------------------------------------
 int CALLBACK FontEnumProc( 
-	const LOGFONT *lpelfe,		// logical-font data
-	const TEXTMETRIC *lpntme,	// physical-font data
-	DWORD FontType,				// type of font
+	const LOGFONT *,		// logical-font data
+	const TEXTMETRIC *,	// physical-font data
+	DWORD,				// type of font
 	LPARAM lParam )				// application-defined data
 {
-  auto *p = (bool *)lParam;
+	auto *p = (bool *)lParam;
 	*p = true;
 	return 0;
 }
@@ -173,7 +173,7 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	m_rgiBitmapSize[0] = tm.tmMaxCharWidth + m_iOutlineSize * 2;
 	m_rgiBitmapSize[1] = tm.tmHeight + m_iDropShadowOffset + m_iOutlineSize * 2;
 
-	::BITMAPINFOHEADER header{ sizeof(header) };
+	::BITMAPINFOHEADER header{ sizeof(header), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	header.biWidth = m_rgiBitmapSize[0];
 	header.biHeight = -m_rgiBitmapSize[1];
 	header.biPlanes = 1;
@@ -192,16 +192,16 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 //-----------------------------------------------------------------------------
 void CWin32Font::GetCharRGBA(wchar_t ch, int rgbaWide, int rgbaTall, unsigned char *rgba)
 {
-	int a, b, c;
-	GetCharABCWidths(ch, a, b, c);
+	int wa, wb, wc;
+	GetCharABCWidths(ch, wa, wb, wc);
 
 	// set us up to render into our dib
 	::SelectObject(m_hDC, m_hFont);
 
-	int wide = b;
+	int wide = wb;
 	if ( m_bUnderlined )
 	{
-		wide += ( a + c );
+		wide += ( wa + wc );
 	}
 
 	int tall = m_iHeight;
@@ -245,9 +245,9 @@ void CWin32Font::GetCharRGBA(wchar_t ch, int rgbaWide, int rgbaTall, unsigned ch
 		int xstart = 0;
 
 		// don't copy the first set of pixels if the antialiased bmp is bigger than the char width
-		if ((int)glyphMetrics.gmBlackBoxX >= b + 2)
+		if ((int)glyphMetrics.gmBlackBoxX >= wb + 2)
 		{
-			xstart = (glyphMetrics.gmBlackBoxX - b) / 2;
+			xstart = (glyphMetrics.gmBlackBoxX - wb) / 2;
 		}
 
 		// iterate through copying the generated dib into the texture
@@ -300,7 +300,7 @@ void CWin32Font::GetCharRGBA(wchar_t ch, int rgbaWide, int rgbaTall, unsigned ch
 		}
 		else
 		{
-			::MoveToEx(m_hDC, -a, 0, NULL);
+			::MoveToEx(m_hDC, -wa, 0, NULL);
 		}
 
 		// render the character
@@ -391,6 +391,8 @@ bool CWin32Font::IsEqualTo(const char *windowsFontName, int tall, int weight, in
 		&& m_iTall == tall
 		&& m_iWeight == weight
 		&& m_iBlur == blur
+		// dimhotepus: Search by scanlines, too.
+		&& m_iScanLines == scanlines
 		&& m_iFlags == flags)
 		return true;
 
@@ -425,7 +427,7 @@ void CWin32Font::GetCharABCWidths(int ch, int &a, int &b, int &c)
 	Assert( IsValid() );
 	{
 		// look for it in the cache
-		abc_cache_t finder = { (wchar_t)ch };
+		abc_cache_t finder = { (wchar_t)ch, {} };
 
 		unsigned short i = m_ExtendedABCWidthsCache.Find(finder);
 		if (m_ExtendedABCWidthsCache.IsValidIndex(i))
@@ -452,7 +454,7 @@ void CWin32Font::GetCharABCWidths(int ch, int &a, int &b, int &c)
 			char mbcs[6] = { 0 };
 			wchar_t wch = ch;
 			::WideCharToMultiByte(CP_ACP, 0, &wch, 1, mbcs, sizeof(mbcs), NULL, NULL);
-			if (::GetTextExtentPoint32(m_hDC, mbcs, strlen(mbcs), &size))
+			if (::GetTextExtentPoint32(m_hDC, mbcs, V_strlen(mbcs), &size))
 			{
 				a = c = 0;
 				b = size.cx;
@@ -528,7 +530,7 @@ bool CWin32Font::ExtendedABCWidthsCacheLessFunc(const abc_cache_t &lhs, const ab
 //-----------------------------------------------------------------------------
 // Purpose: Get the kerned size of a char, for win32 just pass thru for now
 //-----------------------------------------------------------------------------
-void CWin32Font::GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &abcA )
+void CWin32Font::GetKernedCharWidth( wchar_t ch, wchar_t, wchar_t, float &wide, float &abcA )
 {
 	int a,b,c;
 	GetCharABCWidths(ch, a, b, c );
