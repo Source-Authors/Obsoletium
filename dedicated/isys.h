@@ -4,12 +4,13 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#if !defined( ISYS_H )
+#ifndef ISYS_H
 #define ISYS_H
 #ifdef _WIN32
 #pragma once
 #endif
 
+#include "tier0/platform.h"
 #include "interface.h"
 
 class CDedicatedAppSystemGroup;
@@ -29,8 +30,8 @@ public:
 	virtual void		WriteStatusText( char *szText ) = 0;
 	virtual void		UpdateStatus( int force ) = 0;
 
-	virtual long		LoadLibrary( char *lib ) = 0;
-	virtual void		FreeLibrary( long library ) = 0;
+	virtual intp		LoadLibrary( char *lib ) = 0;
+	virtual void		FreeLibrary( intp library ) = 0;
 
 	virtual bool		CreateConsoleWindow( void ) = 0;
 	virtual void		DestroyConsoleWindow( void ) = 0;

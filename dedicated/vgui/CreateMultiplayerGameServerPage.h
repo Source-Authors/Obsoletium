@@ -56,7 +56,7 @@ struct serveritem_t
 //-----------------------------------------------------------------------------
 class CCreateMultiplayerGameServerPage : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CCreateMultiplayerGameServerPage, vgui::Frame ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCreateMultiplayerGameServerPage, vgui::Frame ); 
 public:
 	CCreateMultiplayerGameServerPage(vgui::Panel *parent, const char *name);
 	~CCreateMultiplayerGameServerPage();
@@ -71,7 +71,7 @@ public:
 	void LoadMapList();
 	int LoadMaps( const char *pszMod );
 
-	virtual void OnCommand(const char *cmd);
+	void OnCommand(const char *cmd) override;
 	
 	virtual void OnResetData(); 
 
@@ -113,7 +113,6 @@ private:
 	char m_szMapName[DATA_STR_LENGTH];
 	char m_szMod[DATA_STR_LENGTH];
 	char m_szGameName[DATA_STR_LENGTH];
-	char m_szExtra[DATA_STR_LENGTH*2];
 	int m_iMaxPlayers;
 	int m_iPort;
 

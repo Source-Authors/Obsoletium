@@ -278,7 +278,7 @@ RequestProc
 
 ==============
 */
-unsigned _stdcall RequestProc (void *arg)
+unsigned _stdcall RequestProc (void *)
 {
 	int		*pBuffer;
 	DWORD	dwRet;
@@ -372,17 +372,20 @@ void InitConProc ( void )
 	// give external front ends a chance to hook into the console
 	if ( CommandLine()->CheckParm ( "-HFILE", &p ) && p )
 	{
-		hFile = (HANDLE)atoi ( p );
+		// dimhotepus: x86-64 port
+		hFile = (HANDLE)static_cast<uintp>( strtoull ( p, nullptr, 10 ) );
 	}
 
 	if ( CommandLine()->CheckParm ( "-HPARENT", &p ) && p )
 	{
-		heventParent = (HANDLE)atoi ( p );
+		// dimhotepus: x86-64 port
+		heventParent = (HANDLE)static_cast<uintp>( strtoull ( p, nullptr, 10 ) );
 	}
 
 	if ( CommandLine()->CheckParm ( "-HCHILD", &p ) && p )
 	{
-		heventChild = (HANDLE)atoi ( p );
+		// dimhotepus: x86-64 port
+		heventChild = (HANDLE)static_cast<uintp>( strtoull ( p, nullptr, 10 ) );
 	}
 
 	// ignore if we don't have all the events.

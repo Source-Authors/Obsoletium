@@ -71,6 +71,12 @@ public:
 	{
 		return CSteamAppSystemGroup::FindSystem( pInterfaceName );
 	}
+
+	template<typename TSystem>
+	TSystem* FindSystem( const char* pInterfaceName )
+	{
+		return CSteamAppSystemGroup::FindSystem<TSystem>( pInterfaceName );
+	}
 };
 
 

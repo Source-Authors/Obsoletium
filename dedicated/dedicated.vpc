@@ -41,7 +41,7 @@ $Configuration
 	}
 }
 
-$Project "Dedicated"
+$Project "dedicated"
 {
 	$Folder	"Source Files"
 	{

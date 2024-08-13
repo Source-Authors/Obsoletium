@@ -18,10 +18,10 @@ public:
 
 	virtual bool		Init ();
 	virtual void		ShutDown() = 0;
-	virtual void		Print( char * pszMsg ) = 0;
+	virtual void		Print( const char * pszMsg ) = 0;
 
-	virtual void		SetTitle( char * pszTitle ) = 0;
-	virtual void		SetStatusLine( char * pszStatus ) = 0;
+	virtual void		SetTitle( const char * pszTitle ) = 0;
+	virtual void		SetStatusLine( const char * pszStatus ) = 0;
 	virtual void		UpdateStatus() = 0;
 
 	// Must be provided by children

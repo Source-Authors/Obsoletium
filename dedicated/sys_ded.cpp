@@ -227,7 +227,7 @@ bool CDedicatedAppSystemGroup::Create( )
 		// Find the input system and tell it to skip Steam Controller initialization (we have to set this flag before Init gets called on the
 		// input system). Dedicated server should skip controller initialization to avoid initializing Steam, because we don't want the user to be
 		// flagged as "playing" the game.
-		auto inputsystem = ( IInputSystem* )FindSystem( INPUTSYSTEM_INTERFACE_VERSION );
+		auto inputsystem = FindSystem<IInputSystem>( INPUTSYSTEM_INTERFACE_VERSION );
 		if ( inputsystem )
 		{
 			inputsystem->SetSkipControllerInitialization( true );
@@ -369,7 +369,7 @@ bool GetExecutableName( char *out, int nMaxLen )
 //-----------------------------------------------------------------------------
 void UTIL_ComputeBaseDir( char *pBaseDir, int nMaxLen )
 {
-	int j;
+	size_t j;
 	char *pBuffer = NULL;
 
 	pBaseDir[ 0 ] = 0;
@@ -443,7 +443,7 @@ bool CDedicatedSteamApplication::Create( )
 	AddSystem( cvarModule, CVAR_INTERFACE_VERSION );
 
 	AppModule_t fileSystemModule = LoadModule( FileSystemFactory );
-	m_pFileSystem = (IFileSystem*)AddSystem( fileSystemModule, FILESYSTEM_INTERFACE_VERSION );
+	m_pFileSystem = AddSystem<IFileSystem>( fileSystemModule, FILESYSTEM_INTERFACE_VERSION );
 
 	if ( !m_pFileSystem )
 	{
@@ -473,15 +473,15 @@ int main(int argc, char **argv)
 	SetupFPUControlWord();
 
 #ifdef POSIX
-	Q_strncpy( g_szEXEName, *argv, ARRAYSIZE( g_szEXEName ) );
+	Q_strncpy( g_szEXEName, *argv, ssize( g_szEXEName ) );
 	// Store off command line for argument searching
 	BuildCmdLine( argc, argv );
 #endif
 
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 1.0f );
+	MathLib_Init( 2.2f, 2.2f, 0.0f, 1 );
 
 	// Store off command line for argument searching
-	CommandLine()->CreateCmdLine( VCRHook_GetCommandLine() );
+	CommandLine()->CreateCmdLine( argc, argv );
 #ifndef _WIN32
 	Plat_SetCommandLine( CommandLine()->GetCmdLine() );
 #endif

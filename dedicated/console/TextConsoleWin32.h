@@ -15,7 +15,8 @@
 
 #ifdef _WIN32
 
-#include "TextConsole.h"
+#include <cstddef>
+#include "textconsole.h"
 
 #define MAX_CONSOLE_TEXTLEN 256
 #define MAX_BUFFER_LINES	30
@@ -32,10 +33,10 @@ public:
 	// CTextConsole
 	bool		Init();
 	void		ShutDown( void );
-	void		Print( char *pszMsg );
+	void		Print( const char *pszMsg );
 
-	void		SetTitle( char * pszTitle );
-	void		SetStatusLine( char * pszStatus );
+	void		SetTitle( const char * pszTitle );
+	void		SetStatusLine( const char * pszStatus );
 	void		UpdateStatus( void );
 
 	char *		GetLine( int index, char *buf, int buflen );
@@ -50,7 +51,7 @@ protected:
 
 private:
 	char	m_szConsoleText[ MAX_CONSOLE_TEXTLEN ];						// console text buffer
-	int		m_nConsoleTextLen;											// console textbuffer length
+	ptrdiff_t	m_nConsoleTextLen;											// console textbuffer length
 	int		m_nCursorPosition;											// position in the current input line
 
 	// Saved input data when scrolling back through command history
