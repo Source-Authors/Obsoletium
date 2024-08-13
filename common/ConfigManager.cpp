@@ -17,9 +17,12 @@
 #include <stdio.h>
 #include "ConfigManager.h"
 #include "SourceAppInfo.h"
+// dimhotepus: Optional steam.
+#ifndef NO_STEAM
 #include "steam/steam_api.h"
 
 extern CSteamAPIContext *steamapicontext;
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -261,7 +264,7 @@ bool CGameConfigManager::LoadConfigsInternal( const char *baseDir, bool bRecursi
 
 	bool bLoaded = false;
 
-	CUtlBuffer buffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( ReadUtlBufferFromFile( buffer, szPath ) )
 	{
 		bLoaded = m_pData->LoadFromBuffer( szPath, buffer, NULL, NULL );
@@ -552,6 +555,8 @@ bool CGameConfigManager::IsAppSubscribed( int nAppID )
 {
 	bool bIsSubscribed = false;
 
+	// dimhotepus: Optional steam.
+#ifndef NO_STEAM
 	if ( steamapicontext && steamapicontext->SteamApps() )
 	{
 		// See if specified app is installed
@@ -559,9 +564,13 @@ bool CGameConfigManager::IsAppSubscribed( int nAppID )
 	}
 	else
 	{
+#endif
 		// If we aren't running FileSystem Steam then we must be doing internal development. Give everything.
 		bIsSubscribed = true;
+	// dimhotepus: Optional steam.
+#ifndef NO_STEAM
 	}
+#endif
 
 	return bIsSubscribed;
 }
@@ -733,7 +742,11 @@ bool CGameConfigManager::ConvertGameConfigsINI( void )
 	char newFilePath[MAX_PATH];
 	Q_snprintf( newFilePath, sizeof( newFilePath ), "%s.OLD", iniFilePath );
 
-	rename( iniFilePath, newFilePath );
+	if ( rename( iniFilePath, newFilePath ) )
+	{
+		Warning( "Unable to rename '%s' to '%s': %s.\n",
+			iniFilePath, newFilePath, std::generic_category().message(errno).c_str() );
+	}
 
 	// Notify that we were converted
 	m_LoadStatus = LOADSTATUS_CONVERTED;

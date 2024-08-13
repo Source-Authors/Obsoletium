@@ -18,10 +18,10 @@ class CUtlBuffer;
 abstract_class IZip
 {
 public:
-	enum eCompressionType
+	enum eCompressionType : unsigned short
 	{
 		// Type of compression used for this file in the zip
-		eCompressionType_Unknown = -1,
+		eCompressionType_Unknown = USHRT_MAX,
 		eCompressionType_None    = 0,
 		eCompressionType_LZMA    = 14
 	};
@@ -47,7 +47,7 @@ public:
 	virtual void			PrintDirectory		( void ) = 0;
 
 	// Estimate the size of the Zip (including header, padding, etc.)
-	virtual unsigned int	EstimateSize		( void ) = 0;
+	virtual uintp	EstimateSize		( void ) = 0;
 
 	// Add buffer to zip as a file with given name - uses current alignment size, default 0 (no alignment)
 	virtual void			AddBufferToZip		( const char *relativename, void *data, int length, bool bTextMode, eCompressionType compressionType = eCompressionType_None ) = 0;

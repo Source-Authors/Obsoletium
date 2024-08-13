@@ -91,15 +91,15 @@ abstract_class CDefSaveRestoreBlockHandler : public ISaveRestoreBlockHandler
 {
 	virtual const char *GetBlockName() = 0;
 
-	virtual void PreSave( CSaveRestoreData * ) {}
-	virtual void Save( ISave * ) {}
-	virtual void WriteSaveHeaders( ISave * ) {}
-	virtual void PostSave() {}
+	void PreSave( CSaveRestoreData * ) override {}
+	void Save( ISave * ) override {}
+	void WriteSaveHeaders( ISave * ) override {}
+	void PostSave() override {}
 	
-	virtual void PreRestore() {}
-	virtual void ReadRestoreHeaders( IRestore * ) {}
-	virtual void Restore( IRestore *, bool fCreatePlayers ) {}
-	virtual void PostRestore() {}
+	void PreRestore() override {}
+	void ReadRestoreHeaders( IRestore * ) override {}
+	void Restore( IRestore *, [[maybe_unused]] bool fCreatePlayers ) override {}
+	void PostRestore() override {}
 };
 
 //-----------------------------------------------------------------------------
@@ -208,7 +208,7 @@ public:
 	virtual CGameSaveRestoreInfo *GetGameSaveRestoreInfo() = 0;
 
 protected:
-	virtual ~ISave() {};
+	virtual ~ISave() {}
 };
 
 //-----------------------------------------------------------------------------
@@ -303,7 +303,7 @@ public:
 	virtual CGameSaveRestoreInfo *GetGameSaveRestoreInfo() = 0;
 
 protected:
-	virtual ~IRestore() {};
+	virtual ~IRestore() {}
 };
 
 //-----------------------------------------------------------------------------
@@ -348,12 +348,12 @@ class CDefSaveRestoreOps : public ISaveRestoreOps
 {
 public:
 	// save data type interface
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) {}
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) {}
+	void Save( const SaveRestoreFieldInfo_t &, ISave * ) override {}
+	void Restore( const SaveRestoreFieldInfo_t &, IRestore * ) override {}
 
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) { return false; }
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) {}
-	virtual bool Parse( const SaveRestoreFieldInfo_t &fieldInfo, char const* szValue ) { return false; }
+	bool IsEmpty( const SaveRestoreFieldInfo_t & ) override { return false; }
+	void MakeEmpty( const SaveRestoreFieldInfo_t & ) override {}
+	bool Parse( const SaveRestoreFieldInfo_t &, char const* ) override { return false; }
 };
 
 
@@ -363,7 +363,7 @@ public:
 class CClassPtrSaveRestoreOps : public CDefSaveRestoreOps
 {
 public:
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
 		void **ppClassPtr = (void **)fieldInfo.pField;
 		int nObjects = fieldInfo.pTypeDesc->fieldSize;
@@ -375,7 +375,7 @@ public:
 		return true;
 	}
 
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
 		memset( fieldInfo.pField, 0, fieldInfo.pTypeDesc->fieldSize * sizeof( void * ) );
 	}

@@ -48,17 +48,17 @@ int Interpolator_InterpolatorForName( char const *name )
 			return slot->type;
 	}
 	
-	Assert( !"Interpolator_InterpolatorForName failed!!!" );
+	AssertMsg( false, "Interpolator_InterpolatorForName failed!!!" );
 	return INTERPOLATE_DEFAULT;
 }
 
 char const *Interpolator_NameForInterpolator( int type, bool printname )
 {
 	int i = (int)type;
-	int c = ARRAYSIZE( g_InterpolatorNameMap );
+	int c = ssize( g_InterpolatorNameMap );
 	if ( i < 0 || i >= c )
 	{
-		Assert( "!Interpolator_NameForInterpolator:  bogus type!" );
+		AssertMsg( false, "!Interpolator_NameForInterpolator:  bogus type!" );
 		// returns "unspecified!!!";
 		return printname ? g_InterpolatorNameMap[ 0 ].printname : g_InterpolatorNameMap[ 0 ].name;
 	}
@@ -99,7 +99,7 @@ int Interpolator_CurveTypeForName( const char *name )
 	int leftcurve = 0;
 	int rightcurve = 0;
 
-	int skip = Q_strlen( "curve_" );
+	intp skip = ssize( "curve_" ) - 1;
 
 	if ( !Q_strnicmp( sz, "curve_", skip ) )
 	{
@@ -113,7 +113,7 @@ int Interpolator_CurveTypeForName( const char *name )
 
 		*second = save;
 
-		p = second + Q_strlen( "_to_curve_" );
+		p = second + ssize( "_to_curve_" ) - 1;
 
 		rightcurve = Interpolator_InterpolatorForName( p );
 	}
@@ -152,7 +152,7 @@ void Interpolator_CurveInterpolatorsForType( int type, int& inbound, int& outbou
 
 int Interpolator_CurveTypeForHotkey( int key )
 {
-	int c = ARRAYSIZE( g_CurveNameMap );
+	int c = ssize( g_CurveNameMap );
 	for ( int i = 0; i < c; ++i )
 	{
 		CurveNameMap_t *slot = &g_CurveNameMap[ i ];
@@ -478,7 +478,7 @@ void Interpolator_CurveInterpolate_NonNormalized( int interpolationType,
 		break;
 	case INTERPOLATE_EASE_OUT:
 		{
-			f = 1.0f - sin( M_PI_F * f * 0.5f + 0.5f * M_PI );
+			f = 1.0f - sin( M_PI_F * f * 0.5f + 0.5f * M_PI_F );
 			// Fixme, since this ignores vPre and vNext we could omit computing them aove
 			QuaternionSlerp( vStart, vEnd, f, vOut );
 		}

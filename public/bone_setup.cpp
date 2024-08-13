@@ -684,7 +684,7 @@ static void CalcLocalHierarchyAnimation(
 	Quaternion localQ;
 
 	// make fake root transform
-	static alignas(16) matrix3x4_t rootXform ( 1.0f, 0, 0, 0,   0, 1.0f, 0, 0,  0, 0, 1.0f, 0 );
+	alignas(16) static matrix3x4_t rootXform ( 1.0f, 0, 0, 0,   0, 1.0f, 0, 0,  0, 0, 1.0f, 0 );
 
 	// FIXME: missing check to see if seq has a weight for this bone
 	float weight = 1.0f;
@@ -1438,11 +1438,12 @@ void SlerpBones(
 	float s,
 	int boneMask )
 {
-	if (s <= 0.0f) 
+	if (s <= 0.0f)
 		return;
+
 	if (s > 1.0f)
 	{
-		s = 1.0f;		
+		s = 1.0f;
 	}
 
 	if (seqdesc.flags & STUDIO_WORLD)
@@ -1453,11 +1454,7 @@ void SlerpBones(
 
 	int			i, j;
 	virtualmodel_t *pVModel = pStudioHdr->GetVirtualModel();
-	const virtualgroup_t *pSeqGroup = NULL;
-	if (pVModel)
-	{
-		pSeqGroup = pVModel->pSeqGroup( sequence );
-	}
+	const virtualgroup_t *pSeqGroup = pVModel ? pVModel->pSeqGroup( sequence ) : nullptr;
 
 	// Build weightlist for all bones
 	int nBoneCount = pStudioHdr->numbones();
@@ -1484,7 +1481,7 @@ void SlerpBones(
 		}
 		else
 		{
-			pS2[i] = 0.0;
+			pS2[i] = 0.0f;
 		}
 	}
 
@@ -1494,6 +1491,7 @@ void SlerpBones(
 		for ( i = 0; i < nBoneCount; i++ )
 		{
 			s2 = pS2[i];
+
 			if ( s2 <= 0.0f )
 				continue;
 
@@ -1515,45 +1513,22 @@ void SlerpBones(
 		return;
 	}
 
-	QuaternionAligned q3;
 	for (i = 0; i < nBoneCount; i++)
 	{
 		s2 = pS2[i];
+
 		if ( s2 <= 0.0f )
 			continue;
 
 		s1 = 1.0f - s2;
 
-#ifdef _X360
-		fltx4  q1simd, q2simd, result;
-		q1simd = DirectX::XMLoadFloat4( q1[i].XmBase() );
-		q2simd = DirectX::XMLoadFloat4A( q2[i].XmBase() );
-#endif
-		if ( pStudioHdr->boneFlags(i) & BONE_FIXED_ALIGNMENT )
-		{
-#ifndef _X360
-			QuaternionSlerpNoAlign( q2[i], q1[i], s1, q3 );
-#else
-			result = QuaternionSlerpNoAlignSIMD( q2simd, q1simd, s1 );
-#endif
-		}
-		else
-		{
-#ifndef _X360
-			QuaternionSlerp( q2[i], q1[i], s1, q3 );
-#else
-			result = QuaternionSlerpSIMD( q2simd, q1simd, s1 );
-#endif
-		}
+		fltx4 q1simd = DirectX::XMLoadFloat4( q1[i].XmBase() );
+		fltx4 q2simd = DirectX::XMLoadFloat4A( q2[i].XmBase() );
+		fltx4 result = pStudioHdr->boneFlags(i) & BONE_FIXED_ALIGNMENT
+			? QuaternionSlerpNoAlignSIMD( q2simd, q1simd, s1 )
+			: QuaternionSlerpSIMD( q2simd, q1simd, s1 );
 
-#ifndef _X360
-		q1[i][0] = q3[0];
-		q1[i][1] = q3[1];
-		q1[i][2] = q3[2];
-		q1[i][3] = q3[3];
-#else
 		DirectX::XMStoreFloat4( q1[i].XmBase(), result );
-#endif
 
 		pos1[i][0] = pos1[i][0] * s1 + pos2[i][0] * s2;
 		pos1[i][1] = pos1[i][1] * s1 + pos2[i][1] * s2;
@@ -2661,14 +2636,14 @@ public:
          X[i] = P[i];
       normalize(X);
 
-// Its y axis is perpendicular to P, so Y = unit( E - X(E�X) ).
+// Its y axis is perpendicular to P, so Y = unit( E - X(E X) ).
 
       float dDOTx = dot(D,X);
       for (i = 0 ; i < 3 ; i++)
          Y[i] = D[i] - dDOTx * X[i];
       normalize(Y);
 
-// Its z axis is perpendicular to both X and Y, so Z = X�Y.
+// Its z axis is perpendicular to both X and Y, so Z = X Y.
 
       cross(X,Y,Z);
 
@@ -3366,7 +3341,7 @@ void CIKContext::AddDependencies( mstudioseqdesc_t &seqdesc, int iSequence, floa
 			}
 		}
 
- 		int nIndex = m_ikChainRule.Element( ikrule.chain ).AddToTail( );
+ 		intp nIndex = m_ikChainRule.Element( ikrule.chain ).AddToTail( );
   		m_ikChainRule.Element( ikrule.chain ).Element( nIndex ) = ikrule;
 	}
 }
@@ -3388,7 +3363,7 @@ void CIKContext::AddAutoplayLocks( Vector pos[], Quaternion q[] )
 	matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
 	CBoneBitList boneComputed;
 
-	int ikOffset = m_ikLock.AddMultipleToTail( m_pStudioHdr->GetNumIKAutoplayLocks() );
+	intp ikOffset = m_ikLock.AddMultipleToTail( m_pStudioHdr->GetNumIKAutoplayLocks() );
 	memset( &m_ikLock[ikOffset], 0, sizeof(ikcontextikrule_t)*m_pStudioHdr->GetNumIKAutoplayLocks() );
 
 	for (int i = 0; i < m_pStudioHdr->GetNumIKAutoplayLocks(); i++)
@@ -3447,7 +3422,7 @@ void CIKContext::AddSequenceLocks( mstudioseqdesc_t &seqdesc, Vector pos[], Quat
 	matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
 	CBoneBitList boneComputed;
 
-	int ikOffset = m_ikLock.AddMultipleToTail( seqdesc.numiklocks );
+	intp ikOffset = m_ikLock.AddMultipleToTail( seqdesc.numiklocks );
 	memset( &m_ikLock[ikOffset], 0, sizeof(ikcontextikrule_t) * seqdesc.numiklocks );
 
 	for (int i = 0; i < seqdesc.numiklocks; i++)
@@ -4046,7 +4021,7 @@ void CIKContext::AutoIKRelease( void )
 								Plat_DebugString( buf );
 								*/
 
-								int nIndex = m_ikChainRule.Element( ikrule.chain ).AddToTail( );
+								intp nIndex = m_ikChainRule.Element( ikrule.chain ).AddToTail( );
   								m_ikChainRule.Element( ikrule.chain ).Element( nIndex ) = ikrule;
 							}
 							else
@@ -4363,7 +4338,7 @@ void CIKContext::AddAllLocks( Vector pos[], Quaternion q[] )
 	matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
 	CBoneBitList boneComputed;
 
-	int ikOffset = m_ikLock.AddMultipleToTail( m_pStudioHdr->GetNumIKChains() );
+	intp ikOffset = m_ikLock.AddMultipleToTail( m_pStudioHdr->GetNumIKChains() );
 	memset( &m_ikLock[ikOffset], 0, sizeof(ikcontextikrule_t)*m_pStudioHdr->GetNumIKChains() );
 
 	for (int i = 0; i < m_pStudioHdr->GetNumIKChains(); i++)
@@ -4500,15 +4475,14 @@ void CBoneSetup::CalcAutoplaySequences(
 {
 	//	ASSERT_NO_REENTRY();
 
-	int			i;
 	if ( pIKContext )
 	{
 		pIKContext->AddAutoplayLocks( pos, q );
 	}
 
 	unsigned short *pList = NULL;
-	int count = m_pStudioHdr->GetAutoplayList( &pList );
-	for (i = 0; i < count; i++)
+	intp count = m_pStudioHdr->GetAutoplayList( &pList );
+	for (intp i = 0; i < count; i++)
 	{
 		int sequenceIndex = pList[i];
 		mstudioseqdesc_t &seqdesc = ((CStudioHdr *)m_pStudioHdr)->pSeqdesc( sequenceIndex );
@@ -5104,7 +5078,7 @@ float Studio_GetController( const CStudioHdr *pStudioHdr, int iController, float
 // Output: 	fills in an array
 //-----------------------------------------------------------------------------
 
-void Studio_CalcDefaultPoseParameters( const CStudioHdr *pStudioHdr, float flPoseParameter[], int nCount )
+void Studio_CalcDefaultPoseParameters( const CStudioHdr *pStudioHdr, float flPoseParameter[24], int nCount )
 {
 	int nPoseCount = pStudioHdr->GetNumPoseParameters();
 	int nNumParams = MIN( nCount, MAXSTUDIOPOSEPARAM );
@@ -5516,18 +5490,17 @@ int Studio_MaxFrame( const CStudioHdr *pStudioHdr, int iSequence, const float po
 	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
 	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
 
-	float maxFrame = 0;
+	float maxFrame = 0.0f;
 	for (int i = 0; i < 4; i++)
 	{
-		if (weight[i] > 0)
+		if (weight[i] > 0.0f)
 		{
 			maxFrame += panim[i]->numframes * weight[i];
 		}
 	}
 
-	if ( maxFrame > 1 )
-		maxFrame -= 1;
-	
+	if ( maxFrame > 1.0f )
+		maxFrame -= 1.0f;
 
 	// FIXME: why does the weights sometimes not exactly add it 1.0 and this sometimes rounds down?
 	return (maxFrame + 0.01F);
@@ -5546,8 +5519,7 @@ float Studio_FPS( const CStudioHdr *pStudioHdr, int iSequence, const float poseP
 	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
 	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
 
-	float t = 0;
-
+	float t = 0.0f;
 	for (int i = 0; i < 4; i++)
 	{
 		if (weight[i] > 0)
@@ -5555,6 +5527,7 @@ float Studio_FPS( const CStudioHdr *pStudioHdr, int iSequence, const float poseP
 			t += panim[i]->fps * weight[i];
 		}
 	}
+
 	return t;
 }
 
@@ -5579,6 +5552,7 @@ float Studio_CPS( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, int i
 			t += (panim[i]->fps / (panim[i]->numframes - 1)) * weight[i];
 		}
 	}
+
 	return t;
 }
 
@@ -5628,7 +5602,7 @@ bool Studio_AnimPosition( mstudioanimdesc_t *panim, float flCycle, Vector &vecPo
 
 	for (int i = 0; i < panim->nummovements; i++)
 	{
-		mstudiomovement_t *pmove = panim->pMovement( i );
+		const mstudiomovement_t *pmove = panim->pMovement( i );
 
 		if (pmove->endframe >= flFrame)
 		{
@@ -5640,7 +5614,7 @@ bool Studio_AnimPosition( mstudioanimdesc_t *panim, float flCycle, Vector &vecPo
 			vecAngle.y = vecAngle.y * (1 - f) + pmove->angle * f;
 			if (iLoops != 0)
 			{
-				mstudiomovement_t *pmoveAnim = panim->pMovement( panim->nummovements - 1 );
+				const mstudiomovement_t *pmoveAnim = panim->pMovement( panim->nummovements - 1 );
 				vecPos = vecPos + iLoops * pmoveAnim->position;
 				vecAngle.y = vecAngle.y + iLoops * pmoveAnim->angle;
 			}
@@ -5674,7 +5648,7 @@ bool Studio_AnimVelocity( mstudioanimdesc_t *panim, float flCycle, Vector &vecVe
 
 	for (int i = 0; i < panim->nummovements; i++)
 	{
-		mstudiomovement_t *pmove = panim->pMovement( i );
+		const mstudiomovement_t *pmove = panim->pMovement( i );
 
 		if (pmove->endframe >= flFrame)
 		{
@@ -5729,15 +5703,13 @@ bool Studio_AnimMovement( mstudioanimdesc_t *panim, float flCycleFrom, float flC
 
 float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist )
 {
-	float	prevframe = 0;
-
 	if (flDist <= 0)
-		return 0.0;
+		return 0.0f;
 
+	float prevframe = 0;
 	for (int i = 0; i < panim->nummovements; i++)
 	{
-		mstudiomovement_t *pmove = panim->pMovement( i );
-
+		const mstudiomovement_t *pmove = panim->pMovement( i );
 		float flMove = (pmove->v0 + pmove->v1) * 0.5F;
 
 		if (flMove >= flDist)
@@ -5751,7 +5723,8 @@ float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist )
 
 				return (prevframe + root1 * (pmove->endframe - prevframe)) * cpf;
 			}
-			return 0.0;
+
+			return 0.0f;
 		}
 		else
 		{
@@ -5759,7 +5732,8 @@ float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist )
 			prevframe = pmove->endframe;
 		}
 	}
-	return 1.0;
+
+	return 1.0f;
 }
 
 

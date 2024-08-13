@@ -1,4 +1,4 @@
-//========= Copyright � 1996-2008, Valve LLC, All rights reserved. ============
+//========= Copyright 1996-2008, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
@@ -89,12 +89,19 @@ public:
 	const char *GetQueryAddressString() const;
 
 	// Comparison operators and functions.
-	bool	operator<(const servernetadr_t &netadr) const;
-	void operator=( const servernetadr_t &that )
+	bool operator<(const servernetadr_t &netadr) const;
+	servernetadr_t( const servernetadr_t &that )
 	{
 		m_usConnectionPort = that.m_usConnectionPort;
 		m_usQueryPort = that.m_usQueryPort;
 		m_unIP = that.m_unIP;
+	}
+	servernetadr_t& operator=( const servernetadr_t &that )
+	{
+		m_usConnectionPort = that.m_usConnectionPort;
+		m_usQueryPort = that.m_usQueryPort;
+		m_unIP = that.m_unIP;
+		return *this;
 	}
 
 	

@@ -242,8 +242,8 @@ public:
 	CCustomHexEncoder( const char *pchEncodingTable );
 	~CCustomHexEncoder() = default;
 
-	bool Encode( const uint8 *pubData, const uint32 cubData, char *pchEncodedData, uint32 cchEncodedData );
-	bool Decode( const char *pchData, uint8 *pubDecodedData, uint32 *pcubDecodedData );
+	bool Encode( const uint8 *pubData, const size_t cubData, char *pchEncodedData, size_t cchEncodedData );
+	bool Decode( const char *pchData, uint8 *pubDecodedData, size_t *pcubDecodedData );
 
 private:
 	bool m_bValidEncoding;
@@ -263,10 +263,10 @@ public:
 	CCustomBase32Encoder( const char *pchEncodingTable );
 	~CCustomBase32Encoder() = default;
 
-	bool Encode( const uint8 *pubData, const uint32 cubData, char *pchEncodedData, uint32 cchEncodedData );
-	bool Decode( const char *pchData, uint8 *pubDecodedData, uint32 *pcubDecodedData );
+	bool Encode( const uint8 *pubData, const size_t cubData, char *pchEncodedData, size_t cchEncodedData );
+	bool Decode( const char *pchData, uint8 *pubDecodedData, size_t *pcubDecodedData );
 
-	bool Encode( CSimpleBitString *pBitStringData, char *pchEncodedData, uint32 cchEncodedData );
+	bool Encode( CSimpleBitString *pBitStringData, char *pchEncodedData, size_t cchEncodedData );
 	bool Decode( const char *pchData, CSimpleBitString *pBitStringDecodedData );
 
 private:

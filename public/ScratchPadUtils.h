@@ -20,7 +20,7 @@ class CScratchPadGraph
 {
 public:
 
-	typedef int LineID;
+	typedef intp LineID;
 
 	CScratchPadGraph();
 

@@ -2521,8 +2521,13 @@ BEGIN_BYTESWAP_DATADESC( studiohdr_t )
 	DEFINE_INDEX( animblockindex, FIELD_INTEGER ),
 	DEFINE_FIELD( animblockModel, FIELD_INTEGER ),				// void*
 	DEFINE_INDEX( bonetablebynameindex, FIELD_INTEGER ),
+#ifdef PLATFORM_64BITS
+	DEFINE_FIELD( pVertexBase_index, FIELD_INTEGER ),					// int
+	DEFINE_FIELD( pIndexBase_index, FIELD_INTEGER ),					// int
+#else
 	DEFINE_FIELD( pVertexBase, FIELD_INTEGER ),					// void*
 	DEFINE_FIELD( pIndexBase, FIELD_INTEGER ),					// void*
+#endif
 	DEFINE_FIELD( constdirectionallightdot, FIELD_CHARACTER ),	// byte
 	DEFINE_FIELD( rootLOD, FIELD_CHARACTER ),					// byte
 	DEFINE_FIELD( numAllowedRootLODs, FIELD_CHARACTER ),		// byte

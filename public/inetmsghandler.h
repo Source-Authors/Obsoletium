@@ -44,16 +44,16 @@ public:
 };
 
 #define PROCESS_NET_MESSAGE( name )	\
-	virtual bool Process##name( NET_##name *msg )
+	virtual bool Process##name( [[maybe_unused]] NET_##name *msg )
 
 #define PROCESS_SVC_MESSAGE( name )	\
 	virtual bool Process##name( SVC_##name *msg )
 
 #define PROCESS_CLC_MESSAGE( name )	\
-	virtual bool Process##name( CLC_##name *msg )
+	virtual bool Process##name( [[maybe_unused]] CLC_##name *msg )
 
 #define PROCESS_MM_MESSAGE( name )	\
-	virtual bool Process##name( MM_##name *msg )
+	virtual bool Process##name( [[maybe_unused]] MM_##name *msg )
 
 
 #define REGISTER_NET_MSG( name )				\

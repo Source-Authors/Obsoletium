@@ -90,6 +90,13 @@ class CBaseNetworkable;
 		template <typename T> friend int ServerClassInit(T *);	\
 		virtual int YouForgotToImplementOrDeclareServerClass();	\
 
+#define DECLARE_SERVERCLASS_OVERRIDE()							\
+	public:														\
+		ServerClass* GetServerClass() override;					\
+		static SendTable *m_pClassSendTable;					\
+		template <typename T> friend int ServerClassInit(T *);	\
+		int YouForgotToImplementOrDeclareServerClass() override;	\
+
 #define DECLARE_SERVERCLASS_NOBASE()							\
 	public:														\
 		template <typename T> friend int ServerClassInit(T *);	\

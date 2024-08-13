@@ -94,7 +94,8 @@ inline int CGlobalVarsBase::GetNetworkBase( int nTick, int nEntity )
 	return nBaseTick;
 }
 
-inline CGlobalVarsBase::CGlobalVarsBase( bool bIsClient ) :
+inline CGlobalVarsBase::CGlobalVarsBase( bool bIsClient )
+	: pSaveData( nullptr ),
 	m_bClient( bIsClient ),
 	nTimestampNetworkingBase( 100 ),
 	nTimestampRandomizeWindow( 32 )

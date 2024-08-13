@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include "netadr.h"
+#include "tier1/netadr.h"
 
 class CBlockingUDPSocket
 {
@@ -31,7 +31,7 @@ protected:
 	CImpl				*m_pImpl;
 
 	netadr_t			m_cserIP;
-	unsigned int		m_Socket;
+	uintp				m_Socket;
 
 
 };

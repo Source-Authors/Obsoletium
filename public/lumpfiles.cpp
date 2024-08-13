@@ -5,7 +5,7 @@
 //=============================================================================
 
 #include "bspfile.h"
-#include "strtools.h"
+#include "tier1/strtools.h"
 #include "filesystem.h"
 #include "lumpfiles.h"
 

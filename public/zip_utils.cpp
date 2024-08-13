@@ -11,17 +11,17 @@
 #ifdef IS_WINDOWS_PC
 #include "winlite.h"
 #else
-#define INVALID_HANDLE_VALUE (void *)0
+#define INVALID_HANDLE_VALUE (void *)nullptr
 #define FILE_BEGIN SEEK_SET
 #define FILE_END SEEK_END
 #endif
-#include "utlbuffer.h"
-#include "utllinkedlist.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utllinkedlist.h"
 #include "zip_utils.h"
 #include "zip_uncompressed.h"
-#include "checksum_crc.h"
-#include "byteswap.h"
-#include "utlstring.h"
+#include "tier1/checksum_crc.h"
+#include "tier1/byteswap.h"
+#include "tier1/utlstring.h"
 
 #include "tier1/lzmaDecoder.h"
 
@@ -244,23 +244,23 @@ public:
 abstract_class IWriteStream
 {
 public:
-	virtual void Put( const void* pMem, int size ) = 0;
-	virtual unsigned int Tell( void ) = 0;
+	virtual void Put( const void* pMem, unsigned size ) = 0;
+	virtual unsigned Tell( void ) = 0;
 };
 
 //-----------------------------------------------------------------------------
 // Purpose: Wrapper for CUtlBuffer methods
 //-----------------------------------------------------------------------------
-class CBufferStream : public IWriteStream
+class CBufferStream final : public IWriteStream
 {
 public:
 	CBufferStream( CUtlBuffer& buff ) : IWriteStream(), m_buff( &buff ) {}
 
 	// Implementing IWriteStream method
-	virtual void Put( const void* pMem, int size ) {m_buff->Put( pMem, size );}
+	void Put( const void* pMem, unsigned size ) override {m_buff->Put( pMem, size );}
 
 	// Implementing IWriteStream method
-	virtual unsigned int Tell( void ) { return m_buff->TellPut(); }
+	unsigned Tell() override { return m_buff->TellPut(); }
 
 private:
 	CUtlBuffer *m_buff;
@@ -269,14 +269,14 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Wrapper for file I/O methods
 //-----------------------------------------------------------------------------
-class CFileStream : public IWriteStream
+class CFileStream final : public IWriteStream
 {
 public:
 	CFileStream( FILE *fout ) : IWriteStream(), m_file( fout ), m_hFile( INVALID_HANDLE_VALUE ) {}
 	CFileStream( HANDLE hOutFile ) : IWriteStream(), m_file( NULL ), m_hFile( hOutFile ) {}
 
 	// Implementing IWriteStream method
-	virtual void Put( const void* pMem, int size ) 
+	void Put( const void* pMem, unsigned size ) override
 	{ 
 		if ( m_file )
 		{
@@ -292,20 +292,18 @@ public:
 	}
 
 	// Implementing IWriteStream method
-	virtual unsigned int Tell( void ) 
+	unsigned Tell( void ) override
 	{ 
 		if ( m_file )
 		{
 			return ftell( m_file );
 		}
-		else
-		{
+
 #ifdef WIN32
-			return CWin32File::FileTell( m_hFile );
+		return CWin32File::FileTell( m_hFile );
 #else
-			return 0;
+		return 0;
 #endif
-		} 
 	}
 
 private:
@@ -350,7 +348,7 @@ public:
 	HANDLE			ParseFromDisk( const char *pFilename );
 
 	// Estimate the size of the zip file (including header, padding, etc.)
-	unsigned int	EstimateSize();
+	uintp	EstimateSize();
 
 	// Print out a directory of files in the zip.
 	void			PrintDirectory( void );
@@ -365,7 +363,7 @@ public:
 	void			SaveToDisk( FILE *fout );
 	void			SaveToDisk( HANDLE hOutFile );
 
-	unsigned int	CalculateSize( void );
+	uintp	CalculateSize( void );
 
 	void			ForceAlignment( bool aligned, bool bCompatibleFormat, unsigned int alignmentSize );
 
@@ -397,7 +395,7 @@ private:
 
 	unsigned short	CalculatePadding( unsigned int filenameLen, unsigned int pos );
 	void			SaveDirectory( IWriteStream& stream );
-	int				MakeXZipCommentString( char *pComment );
+	unsigned short	MakeXZipCommentString( char *pComment );
 	void			ParseXZipCommentString( const char *pComment );
 	
 	// Internal entry for faster searching, etc.
@@ -623,7 +621,7 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 	Reset();
 
 	// Initialize a buffer
-	CUtlBuffer buf( 0, bufferlength +1  );					// +1 for null termination
+	CUtlBuffer buf( (intp)0, bufferlength +1  );					// +1 for null termination
 
 	// need to swap bytes, so set the buffer opposite the machine's endian
 	buf.ActivateByteSwapping( m_Swap.IsSwappingBytes() );
@@ -631,21 +629,21 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 	buf.Put( buffer, bufferlength );
 
 	buf.SeekGet( CUtlBuffer::SEEK_TAIL, 0 );
-	unsigned int fileLen = buf.TellGet();
+	uintp fileLen = buf.TellGet();
 
 	// Start from beginning
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
 
-	ZIP_EndOfCentralDirRecord rec = { 0 };
+	ZIP_EndOfCentralDirRecord rec = {};
 
 #ifdef DBGFLAG_ASSERT
 	bool bFoundEndOfCentralDirRecord = false;
 #endif
-	unsigned int offset = fileLen - sizeof( ZIP_EndOfCentralDirRecord );
+	uintp offset = fileLen - sizeof( ZIP_EndOfCentralDirRecord );
 	// If offset is ever greater than startOffset then it means that it has
 	// wrapped. This used to be a tautological >= 0 test.
 	ANALYZE_SUPPRESS( 6293 ); // warning C6293: Ill-defined for-loop: counts down from minimum
-	for ( unsigned int startOffset = offset; offset <= startOffset; offset-- )
+	for ( uintp startOffset = offset; offset <= startOffset; offset-- )
 	{
 		buf.SeekGet( CUtlBuffer::SEEK_HEAD, offset );
 		buf.GetObjects( &rec );
@@ -798,7 +796,7 @@ HANDLE CZipFile::ParseFromDisk( const char *pFilename )
 	}
 
 	// need to get the central dir
-	ZIP_EndOfCentralDirRecord rec = { 0 };
+	ZIP_EndOfCentralDirRecord rec = {};
 	unsigned int offset = fileLen - sizeof( ZIP_EndOfCentralDirRecord );
 	// If offset is ever greater than startOffset then it means that it has
 	// wrapped. This used to be a tautological >= 0 test.
@@ -848,7 +846,7 @@ HANDLE CZipFile::ParseFromDisk( const char *pFilename )
 	CWin32File::FileSeek( hFile, rec.startOfCentralDirOffset, FILE_BEGIN );
 
 	// read entire central dir into memory
-	CUtlBuffer zipDirBuff( 0, rec.centralDirectorySize, 0 );
+	CUtlBuffer zipDirBuff( (intp)0, rec.centralDirectorySize, 0 );
 	zipDirBuff.ActivateByteSwapping( m_Swap.IsSwappingBytes() );
 	CWin32File::FileRead( hFile, zipDirBuff.Base(), rec.centralDirectorySize );
 	zipDirBuff.SeekPut( CUtlBuffer::SEEK_HEAD, rec.centralDirectorySize );
@@ -1009,9 +1007,9 @@ void CZipFile::AddBufferToZip( const char *relativename, void *data, int length,
 	{
 		int textLen = GetLengthOfBinStringAsText( ( const char * )outData, outLength );
 		textTransform.EnsureCapacity( textLen );
-		CopyTextData( (char *)textTransform.Base(), (char *)outData, textLen, outLength );
+		CopyTextData( textTransform.Base<char>(), (char *)outData, textLen, outLength );
 
-		outData = (void *)textTransform.Base();
+		outData = textTransform.Base();
 		outLength = textLen;
 		uncompressedLength = textLen;
 	}
@@ -1059,7 +1057,7 @@ void CZipFile::AddBufferToZip( const char *relativename, void *data, int length,
 		free( pCompressedOutput );
 		pCompressedOutput = NULL;
 
-		outData = (void *)compressionTransform.Base();
+		outData = compressionTransform.Base();
 		outLength = finalCompressedSize;
 		// (Not updating uncompressedLength)
 	}
@@ -1187,7 +1185,7 @@ bool CZipFile::ReadFileFromZip( HANDLE hZipFile, const char *pRelativeName, bool
 			unsigned int nCompressedBytesRead = 0;
 			unsigned int nOutputBytesWritten = 0;
 			bool bSuccess = decompressStream.Read( (unsigned char *)pData, pEntry->m_nCompressedSize,
-												   (unsigned char *)decompressTransform.Base(), decompressTransform.Size(),
+												   decompressTransform.Base<unsigned char>(), decompressTransform.Size(),
 												   nCompressedBytesRead, nOutputBytesWritten );
 			if ( !bSuccess ||
 			     (int)nCompressedBytesRead != pEntry->m_nCompressedSize ||
@@ -1302,7 +1300,7 @@ unsigned short CZipFile::CalculatePadding( unsigned int filenameLen, unsigned in
 // Purpose: Create the XZIP identifying comment string
 // Output : Length
 //-----------------------------------------------------------------------------
-int CZipFile::MakeXZipCommentString( char *pCommentString )
+unsigned short CZipFile::MakeXZipCommentString( char *pCommentString )
 {
 	char tempString[XZIP_COMMENT_LENGTH];
 
@@ -1346,11 +1344,11 @@ void CZipFile::ParseXZipCommentString( const char *pCommentString )
 // Purpose: Calculate the exact size of zip file, with headers and padding
 // Output : int
 //-----------------------------------------------------------------------------
-unsigned int CZipFile::CalculateSize( void )
+uintp CZipFile::CalculateSize( void )
 {
-	unsigned int size = 0;
-	unsigned int dirHeaders = 0;
-	for ( int i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
+	uintp size = 0;
+	uintp dirHeaders = 0;
+	for ( auto i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
 	{
 		CZipEntry *e = &m_Files[ i ];
 
@@ -1368,7 +1366,7 @@ unsigned int CZipFile::CalculateSize( void )
 		if ( m_AlignmentSize != 0 )
 		{
 			// round up to next boundary
-			unsigned int nextBoundary = ( size + m_AlignmentSize ) & ~( m_AlignmentSize - 1 );
+			uintp nextBoundary = ( size + m_AlignmentSize ) & ~( static_cast<uintp>(m_AlignmentSize) - 1 );
 
 			// the directory header also duplicates the padding
 			dirHeaders += nextBoundary - size;
@@ -1393,7 +1391,7 @@ unsigned int CZipFile::CalculateSize( void )
 //-----------------------------------------------------------------------------
 void CZipFile::PrintDirectory( void )
 {
-	for ( int i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
+	for ( auto i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
 	{
 		CZipEntry *e = &m_Files[ i ];
 
@@ -1450,13 +1448,13 @@ void CZipFile::SaveToBuffer( CUtlBuffer& buf )
 {
 	// Estimate size for buffer, since the linear growth of CUtlBuffer is a virtual memory steamroller. This is
 	// best-effort. Ideally CUtlBuffer's growth strategy would be sane and this would be unnecessary.
-	int sizeEstimate = 0;
+	intp sizeEstimate = 0;
 	for ( int i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
 	{
 		CZipEntry *e = &m_Files[i];
 		Assert( e );
 
-		int nameLen = V_strlen( e->m_Name.String() );
+		intp nameLen = V_strlen( e->m_Name.String() );
 		// Both the per-file header and central directory have these
 		sizeEstimate += 2 * sizeof( ZIP_LocalFileHeader );
 		sizeEstimate += 2 * nameLen;
@@ -1469,20 +1467,20 @@ void CZipFile::SaveToBuffer( CUtlBuffer& buf )
 		sizeEstimate += m_AlignmentSize * 2;
 	}
 
-	int start = buf.TellPut();
+	intp start = buf.TellPut();
 	buf.EnsureCapacity( start + sizeEstimate );
 	CBufferStream stream( buf );
 
 	SaveDirectory( stream );
 
-	int end = buf.TellPut();
+	intp end = buf.TellPut();
 	if ( start + sizeEstimate < end )
 	{
-		Warning( "ZIP Output overshot buffer estimate: Estimated %i, actual %i\n", sizeEstimate, end - start );
+		Warning( "ZIP Output overshot buffer estimate: Estimated %zd, actual %zd\n", sizeEstimate, end - start );
 	}
 	else
 	{
-		DevMsg( "Wrote ZIP buffer, estimated size %i, actual size %i\n", sizeEstimate, end - start );
+		DevMsg( "Wrote ZIP buffer, estimated size %zd, actual size %zd\n", sizeEstimate, end - start );
 	}
 }
 
@@ -1509,7 +1507,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 	}
 
 	// Might be writing a zip into a larger stream
-	unsigned int zipOffsetInStream = stream.Tell();
+	uintp zipOffsetInStream = stream.Tell();
 
 	int i;
 	for ( i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
@@ -1533,7 +1531,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 
 		if ( e->m_nCompressedSize > 0 && e->m_pData != NULL )
 		{
-			ZIP_LocalFileHeader hdr = { 0 };
+			ZIP_LocalFileHeader hdr = {};
 			hdr.signature = PKID( 3, 4 );
 			hdr.versionNeededToExtract = 10;  // No special features or even compression here, set to 1.0
 #ifdef ZIP_SUPPORT_LZMA_ENCODE
@@ -1570,7 +1568,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 				free( e->m_pData );
 
 				// temp hackery for the logic below to succeed
-				e->m_pData = (void*)0xFFFFFFFF;
+				e->m_pData = (void*)-1;
 			}
 		}
 	}
@@ -1580,12 +1578,12 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 		CWin32File::FileSeek( m_hDiskCacheWriteFile, 0, FILE_END );
 	}
 
-	unsigned int centralDirStart = stream.Tell() - zipOffsetInStream;
+	uintp centralDirStart = stream.Tell() - zipOffsetInStream;
 	if ( m_AlignmentSize )
 	{
 		// align the central directory starting position
-		unsigned int newDirStart = AlignValue( centralDirStart, m_AlignmentSize );
-		int padLength = newDirStart - centralDirStart;
+		uintp newDirStart = AlignValue( centralDirStart, m_AlignmentSize );
+		unsigned padLength = newDirStart - centralDirStart;
 		if ( padLength )
 		{
 			stream.Put( pPaddingBuffer, padLength );
@@ -1601,7 +1599,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 
 		if ( e->m_nCompressedSize > 0 && e->m_pData != NULL )
 		{
-			ZIP_FileHeader hdr = { 0 };
+			ZIP_FileHeader hdr = {};
 			hdr.signature = PKID( 1, 2 );
 			hdr.versionMadeBy = 20;				// This is the version that the winzip that I have writes.
 			hdr.versionNeededToExtract = 10;  // No special features or even compression here, set to 1.0
@@ -1650,12 +1648,12 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 		}
 	}
 
-	unsigned int centralDirEnd = stream.Tell() - zipOffsetInStream;
+	uintp centralDirEnd = stream.Tell() - zipOffsetInStream;
 	if ( m_AlignmentSize )
 	{
 		// align the central directory starting position
-		unsigned int newDirEnd = AlignValue( centralDirEnd, m_AlignmentSize );
-		int padLength = newDirEnd - centralDirEnd;
+		uintp newDirEnd = AlignValue( centralDirEnd, m_AlignmentSize );
+		unsigned padLength = newDirEnd - centralDirEnd;
 		if ( padLength )
 		{
 			stream.Put( pPaddingBuffer, padLength );
@@ -1663,7 +1661,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 		}
 	}
 
-	ZIP_EndOfCentralDirRecord rec = { 0 };
+	ZIP_EndOfCentralDirRecord rec = {};
 	rec.signature = PKID( 5, 6 );
 	rec.numberOfThisDisk = 0;
 	rec.numberOfTheDiskWithStartOfCentralDirectory = 0;
@@ -1673,7 +1671,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 	rec.startOfCentralDirOffset = centralDirStart;
 
 	char commentString[128];
-	int commentLength = MakeXZipCommentString( commentString );
+	unsigned short commentLength = MakeXZipCommentString( commentString );
 	rec.commentLength = commentLength;
 
 	// Swap the header in place
@@ -1687,63 +1685,63 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 	}
 }
 
-class CZip : public IZip
+class CZip final : public IZip
 {
 public:
 	CZip( const char *pDiskCacheWritePath, bool bSortByName );
-	virtual ~CZip();
+	~CZip() = default;
 
-	virtual void			Reset() OVERRIDE;
+	void			Reset() override;
 
 	// Add a single file to a zip - maintains the zip's previous alignment state
-	virtual void			AddFileToZip( const char *relativename, const char *fullpath, eCompressionType compressionType ) OVERRIDE;
+	void			AddFileToZip( const char *relativename, const char *fullpath, eCompressionType compressionType ) override;
 
 	// Whether a file is contained in a zip - maintains alignment
-	virtual bool			FileExistsInZip( const char *pRelativeName ) OVERRIDE;
+	bool			FileExistsInZip( const char *pRelativeName ) override;
 
 	// Reads a file from the zip - maintains alignement
-	virtual bool			ReadFileFromZip( const char *pRelativeName, bool bTextMode, CUtlBuffer &buf ) OVERRIDE;
-	virtual bool			ReadFileFromZip( HANDLE hZipFile, const char *relativename, bool bTextMode, CUtlBuffer &buf ) OVERRIDE;
+	bool			ReadFileFromZip( const char *pRelativeName, bool bTextMode, CUtlBuffer &buf ) override;
+	bool			ReadFileFromZip( HANDLE hZipFile, const char *relativename, bool bTextMode, CUtlBuffer &buf ) override;
 
 	// Removes a single file from the zip - maintains alignment
-	virtual void			RemoveFileFromZip( const char *relativename ) OVERRIDE;
+	void			RemoveFileFromZip( const char *relativename ) override;
 
 	// Gets next filename in zip, for walking the directory - maintains alignment
-	virtual int				GetNextFilename( int id, char *pBuffer, int bufferSize, int &fileSize ) OVERRIDE;
+	int				GetNextFilename( int id, char *pBuffer, int bufferSize, int &fileSize ) override;
 
 	// Prints the zip's contents - maintains alignment
-	virtual void			PrintDirectory( void ) OVERRIDE;
+	void			PrintDirectory( void ) override;
 
 	// Estimate the size of the Zip (including header, padding, etc.)
-	virtual unsigned int	EstimateSize( void ) OVERRIDE;
+	uintp	EstimateSize( void ) override;
 
 	// Add buffer to zip as a file with given name - uses current alignment size, default 0 (no alignment)
-	virtual void			AddBufferToZip( const char *relativename, void *data, int length,
-											bool bTextMode, eCompressionType compressionType ) OVERRIDE;
+	void			AddBufferToZip( const char *relativename, void *data, int length,
+											bool bTextMode, eCompressionType compressionType ) override;
 
 	// Writes out zip file to a buffer - uses current alignment size
 	// (set by file's previous alignment, or a call to ForceAlignment)
-	virtual void			SaveToBuffer( CUtlBuffer& outbuf ) OVERRIDE;
+	void			SaveToBuffer( CUtlBuffer& outbuf ) override;
 
 	// Writes out zip file to a filestream - uses current alignment size
 	// (set by file's previous alignment, or a call to ForceAlignment)
-	virtual void			SaveToDisk( FILE *fout ) OVERRIDE;
-	virtual void			SaveToDisk( HANDLE hOutFile ) OVERRIDE;
+	void			SaveToDisk( FILE *fout ) override;
+	void			SaveToDisk( HANDLE hOutFile ) override;
 
 	// Reads a zip file from a buffer into memory - sets current alignment size to
 	// the file's alignment size, unless overridden by a ForceAlignment call)
-	virtual void			ParseFromBuffer( void *buffer, int bufferlength ) OVERRIDE;
-	virtual HANDLE			ParseFromDisk( const char *pFilename ) OVERRIDE;
+	void			ParseFromBuffer( void *buffer, int bufferlength ) override;
+	HANDLE			ParseFromDisk( const char *pFilename ) override;
 
 	// Forces a specific alignment size for all subsequent file operations, overriding files' previous alignment size.
 	// Return to using files' individual alignment sizes by passing FALSE.
-	virtual void			ForceAlignment( bool aligned, bool bCompatibleFormat, unsigned int alignmentSize ) OVERRIDE;
+	void			ForceAlignment( bool aligned, bool bCompatibleFormat, unsigned int alignmentSize ) override;
 
 	// Sets the endianess of the zip
-	virtual void			SetBigEndian( bool bigEndian ) OVERRIDE;
-	virtual void			ActivateByteSwapping( bool bActivate ) OVERRIDE;
+	void			SetBigEndian( bool bigEndian ) override;
+	void			ActivateByteSwapping( bool bActivate ) override;
 
-	virtual unsigned int	GetAlignment() OVERRIDE;
+	unsigned int	GetAlignment() override;
 
 private:
 	CZipFile				m_ZipFile;
@@ -1769,10 +1767,6 @@ void IZip::ReleaseZip( IZip *pZip )
 CZip::CZip( const char *pDiskCacheWritePath, bool bSortByName ) : m_ZipFile( pDiskCacheWritePath, bSortByName )
 {
 	m_ZipFile.Reset();
-}
-
-CZip::~CZip()
-{
 }
 
 void CZip::SetBigEndian( bool bigEndian )
@@ -1825,7 +1819,7 @@ void CZip::Reset()
 	m_ZipFile.Reset();
 }
 
-unsigned int CZip::EstimateSize( void )
+uintp CZip::EstimateSize( void )
 {
 	return m_ZipFile.CalculateSize();
 }

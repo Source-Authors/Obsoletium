@@ -309,7 +309,7 @@ public:
 	
 	// Allocates flex weights for use in rendering
 	// NOTE: Pass in a non-null second parameter to lock delayed flex weights
-	virtual void LockFlexWeights( int nWeightCount, float **ppFlexWeights, float **ppFlexDelayedWeights = NULL ) = 0;
+	virtual void LockFlexWeights( int nWeightCount, float **ppFlexWeights, float **ppFlexDelayedWeights = nullptr ) = 0;
 	virtual void UnlockFlexWeights() = 0;
 	
 	// Used to allocate bone matrices to be used to pass into DrawModel
@@ -356,19 +356,19 @@ public:
 		LightDesc_t* pLights, const Vector& pt, const Vector& normal, Vector& lighting, float flDirectionalAmount ) = 0;
 
 	// Shadow state (affects the models as they are rendered)
-	virtual void AddShadow( IMaterial* pMaterial, void* pProxyData, FlashlightState_t *m_pFlashlightState = NULL, VMatrix *pWorldToTexture = NULL, ITexture *pFlashlightDepthTexture = NULL ) = 0;
+	virtual void AddShadow( IMaterial* pMaterial, void* pProxyData, FlashlightState_t *m_pFlashlightState = nullptr, VMatrix *pWorldToTexture = nullptr, ITexture *pFlashlightDepthTexture = nullptr ) = 0;
 	virtual void ClearAllShadows() = 0;
 
 	// Gets the model LOD; pass in the screen size in pixels of a sphere 
 	// of radius 1 that has the same origin as the model to get the LOD out...
-	virtual int ComputeModelLod( studiohwdata_t* pHardwareData, float unitSphereSize, float *pMetric = NULL ) = 0;
+	virtual int ComputeModelLod( studiohwdata_t* pHardwareData, float unitSphereSize, float *pMetric = nullptr ) = 0;
 
 	// Return a number that is usable for budgets, etc.
 	// Things that we care about:
 	// 1) effective triangle count (factors in batch sizes, state changes, etc)
 	// 2) texture memory usage
 	// Get Triangles returns the LOD used
-	virtual void GetPerfStats( DrawModelResults_t *pResults, const DrawModelInfo_t &info, CUtlBuffer *pSpewBuf = NULL ) const = 0;
+	virtual void GetPerfStats( DrawModelResults_t *pResults, const DrawModelInfo_t &info, CUtlBuffer *pSpewBuf = nullptr ) const = 0;
 	virtual void GetTriangles( const DrawModelInfo_t& info, matrix3x4_t *pBoneToWorld, GetTriangles_Output_t &out ) = 0;
 
 	// Returns materials used by a particular model

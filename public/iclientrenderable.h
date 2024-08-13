@@ -208,12 +208,12 @@ public:
 	virtual bool					UsesFlexDelayedWeights() { return false; }
 
 	virtual const model_t*			GetModel( ) const		{ return NULL; }
-	virtual int						DrawModel( int flags )	{ return 0; }
+	virtual int						DrawModel( int )	{ return 0; }
 	virtual void					ComputeFxBlend( )		{ return; }
 	virtual int						GetFxBlend( )			{ return 255; }
 	virtual bool					LODTest()				{ return true; }
-	virtual bool					SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )	{ return true; }
-	virtual void					SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights ) {}
+	virtual bool					SetupBones( matrix3x4_t *, int, int, float )	{ return true; }
+	virtual void					SetupWeights( const matrix3x4_t *, int, float *, float * ) {}
 	virtual void					DoAnimationEvents( void )						{}
 	virtual IPVSNotify*				GetPVSNotifyInterface() { return NULL; }
 	virtual void					GetRenderBoundsWorldspace( Vector& absMins, Vector& absMaxs ) { DefaultRenderBoundsWorldspace( this, absMins, absMaxs ); }
@@ -226,22 +226,22 @@ public:
 	}
 
 	// Should this object be able to have shadows cast onto it?
-	virtual bool	ShouldReceiveProjectedTextures( int flags ) 
+	virtual bool	ShouldReceiveProjectedTextures( int ) 
 	{
 		return false;
 	}
 
 	// These methods return true if we want a per-renderable shadow cast direction + distance
-	virtual bool	GetShadowCastDistance( float *pDist, ShadowType_t shadowType ) const			{ return false; }
-	virtual bool	GetShadowCastDirection( Vector *pDirection, ShadowType_t shadowType ) const	{ return false; }
+	virtual bool	GetShadowCastDistance( float *, ShadowType_t ) const			{ return false; }
+	virtual bool	GetShadowCastDirection( Vector *, ShadowType_t ) const	{ return false; }
 
-	virtual void	GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType_t shadowType )
+	virtual void	GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType_t )
 	{
 		GetRenderBounds( mins, maxs );
 	}
 
 	virtual bool IsShadowDirty( )			     { return false; }
-	virtual void MarkShadowDirty( bool bDirty )  {}
+	virtual void MarkShadowDirty( bool )  {}
 	virtual IClientRenderable *GetShadowParent() { return NULL; }
 	virtual IClientRenderable *FirstShadowChild(){ return NULL; }
 	virtual IClientRenderable *NextShadowPeer()  { return NULL; }
@@ -250,9 +250,9 @@ public:
 	virtual ModelInstanceHandle_t GetModelInstance() { return MODEL_INSTANCE_INVALID; }
 
 	// Attachments
-	virtual int LookupAttachment( const char *pAttachmentName ) { return -1; }
-	virtual	bool GetAttachment( int number, Vector &origin, QAngle &angles ) { return false; }
-	virtual bool GetAttachment( int number, matrix3x4_t &matrix ) {	return false; }
+	virtual int LookupAttachment( const char * ) { return -1; }
+	virtual	bool GetAttachment( int, Vector &, QAngle & ) { return false; }
+	virtual bool GetAttachment( int, matrix3x4_t & ) {	return false; }
 
 	// Rendering clip plane, should be 4 floats, return value of NULL indicates a disabled render clip plane
 	virtual float *GetRenderClipPlane() { return NULL; }
@@ -262,8 +262,8 @@ public:
 
 // IClientUnknown implementation.
 public:
-	virtual void SetRefEHandle( const CBaseHandle &handle )	{ Assert( false ); }
-	virtual const CBaseHandle& GetRefEHandle() const		{ Assert( false ); return *((CBaseHandle*)0); }
+	virtual void SetRefEHandle( const CBaseHandle & )	{ Assert( false ); }
+	virtual const CBaseHandle& GetRefEHandle() const		{ DebuggerBreak(); exit(-1); }
 
 	virtual IClientUnknown*		GetIClientUnknown()		{ return this; }
 	virtual ICollideable*		GetCollideable()		{ return 0; }

@@ -1813,8 +1813,8 @@ QuadBarycentricRetval_t QuadWithParallelEdges( const Vector &vecOrigin,
 	const Vector &vecU, float lengthU, const Vector &vecV, float lengthV,
 	const Vector &pt, Vector2D &vecUV )
 {
-	Ray_t rayAxis;
-	Ray_t rayPt;
+	Ray_t rayAxis = {};
+	Ray_t rayPt = {};
 
 	//
 	// handle the u axis
@@ -2209,15 +2209,15 @@ static void ComputeCenterIMatrix( const Vector& origin, const QAngle& angles,
 //-----------------------------------------------------------------------------
 static inline void ComputeAbsMatrix( const matrix3x4_t& in, matrix3x4_t& out )
 {
-	FloatBits(out[0][0]) = FloatAbsBits(in[0][0]);
-	FloatBits(out[0][1]) = FloatAbsBits(in[0][1]);
-	FloatBits(out[0][2]) = FloatAbsBits(in[0][2]);
-	FloatBits(out[1][0]) = FloatAbsBits(in[1][0]);
-	FloatBits(out[1][1]) = FloatAbsBits(in[1][1]);
-	FloatBits(out[1][2]) = FloatAbsBits(in[1][2]);
-	FloatBits(out[2][0]) = FloatAbsBits(in[2][0]);
-	FloatBits(out[2][1]) = FloatAbsBits(in[2][1]);
-	FloatBits(out[2][2]) = FloatAbsBits(in[2][2]);
+	out[0][0] = std::fabs(in[0][0]);
+	out[0][1] = std::fabs(in[0][1]);
+	out[0][2] = std::fabs(in[0][2]);
+	out[1][0] = std::fabs(in[1][0]);
+	out[1][1] = std::fabs(in[1][1]);
+	out[1][2] = std::fabs(in[1][2]);
+	out[2][0] = std::fabs(in[2][0]);
+	out[2][1] = std::fabs(in[2][1]);
+	out[2][2] = std::fabs(in[2][2]);
 }
 
 

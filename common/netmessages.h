@@ -67,8 +67,7 @@ class IClientMessageHandler;
 class CNetMessage : public INetMessage
 {
 public:
-	CNetMessage() {	m_bReliable = true;
-					m_NetChannel = NULL; }
+	CNetMessage() : m_NetChannel{nullptr}, m_bReliable{true} {}
 
 	virtual ~CNetMessage() {};
 
@@ -77,12 +76,13 @@ public:
 		
 	virtual void	SetReliable( bool state) {m_bReliable = state;};
 	virtual bool	IsReliable() const { return m_bReliable; };
-	virtual void    SetNetChannel(INetChannel * netchan) { m_NetChannel = netchan; }	
+	virtual void    SetNetChannel(INetChannel * netchan) { m_NetChannel = netchan; }
 	virtual bool	Process() { Assert( 0 ); return false; };	// no handler set
 
 protected:
-	bool				m_bReliable;	// true if message should be send reliable
+	// dimhotepus: Reorder message to reduce size.
 	INetChannel			*m_NetChannel;	// netchannel this message is from/for
+	bool				m_bReliable;	// true if message should be send reliable
 };
 
 
@@ -97,8 +97,8 @@ class NET_SetConVar : public CNetMessage
 
 	int	GetGroup() const { return INetChannelInfo::STRINGCMD; }
 
-	NET_SetConVar() {}
-	NET_SetConVar( const char * name, const char * value)
+	NET_SetConVar() : m_pMessageHandler{nullptr} {}
+	NET_SetConVar( const char * name, const char * value) : NET_SetConVar{}
 	{
 		cvar_t localCvar;
 		Q_strncpy( localCvar.name, name, MAX_OSPATH );
@@ -123,8 +123,8 @@ class NET_StringCmd : public CNetMessage
 
 	int	GetGroup() const { return INetChannelInfo::STRINGCMD; }
 
-	NET_StringCmd() { m_szCommand = NULL; };
-	NET_StringCmd(const char *cmd) { m_szCommand = cmd; };
+	NET_StringCmd() : NET_StringCmd{nullptr} {};
+	NET_StringCmd(const char *cmd) : m_pMessageHandler{nullptr} { m_szCommand = cmd; m_szCommandBuffer[0] = '\0'; };
 
 public:	
 	const char	*m_szCommand;	// execute this command
@@ -138,16 +138,11 @@ class NET_Tick : public CNetMessage
 {
 	DECLARE_NET_MESSAGE( Tick );
 
-	NET_Tick() 
+	NET_Tick() : NET_Tick{ -1, 0.0f, 0.0f }
 	{ 
-		m_bReliable = false; 
-#if PROTOCOL_VERSION > 10
-		m_flHostFrameTime				= 0;
-		m_flHostFrameTimeStdDeviation	= 0;
-#endif
 	};
 
-	NET_Tick( int tick, float hostFrametime, float hostFrametime_stddeviation ) 
+	NET_Tick( int tick, float hostFrametime, float hostFrametime_stddeviation ) : m_pMessageHandler{nullptr}
 	{ 
 		m_bReliable = false; 
 		m_nTick = tick; 
@@ -174,8 +169,8 @@ class NET_SignonState : public CNetMessage
 
 	int	GetGroup() const { return INetChannelInfo::SIGNON; }
 
-	NET_SignonState() {};
-	NET_SignonState( int state, int spawncount ) { m_nSignonState = state; m_nSpawnCount = spawncount; };
+	NET_SignonState() : NET_SignonState{ -1, -1 } {};
+	NET_SignonState( int state, int spawncount ) : m_pMessageHandler{nullptr} { m_nSignonState = state; m_nSpawnCount = spawncount; };
 
 public:
 	int			m_nSignonState;			// See SIGNONSTATE_ defines
@@ -211,7 +206,7 @@ class CLC_Move : public CNetMessage
 
 	int	GetGroup() const { return INetChannelInfo::MOVE; }
 
-	CLC_Move() { m_bReliable = false; }
+	CLC_Move() : m_pMessageHandler{nullptr} { m_bReliable = false; }
 
 public:
 	int				m_nBackupCommands;
@@ -227,7 +222,7 @@ class CLC_VoiceData : public CNetMessage
 
 	int	GetGroup() const { return INetChannelInfo::VOICE; }
 
-	CLC_VoiceData() { m_bReliable = false; };
+	CLC_VoiceData() : m_pMessageHandler{nullptr} { m_bReliable = false; };
 
 public:
 	int				m_nLength;
@@ -240,8 +235,8 @@ class CLC_BaselineAck : public CNetMessage
 {
 	DECLARE_CLC_MESSAGE( BaselineAck );
 
-	CLC_BaselineAck() {};
-	CLC_BaselineAck(int tick, int baseline ) { m_nBaselineTick = tick; m_nBaselineNr = baseline; }
+	CLC_BaselineAck() : CLC_BaselineAck{ -1, -1, } {};
+	CLC_BaselineAck(int tick, int baseline ) : m_pMessageHandler{nullptr} { m_nBaselineTick = tick; m_nBaselineNr = baseline; }
 
 	int	GetGroup() const { return INetChannelInfo::ENTITIES; }
 
@@ -265,7 +260,7 @@ class CLC_SaveReplay : public CNetMessage
 {
 	DECLARE_CLC_MESSAGE( SaveReplay );
 
-	CLC_SaveReplay() {}
+	CLC_SaveReplay() : m_pMessageHandler{nullptr} {}
 
 	int		m_nStartSendByte;
 	char	m_szFilename[ MAX_OSPATH ];
@@ -440,7 +435,7 @@ public:
 
 	bool					m_bCreateOnClient;	// if true, client creates own SendTables & classinfos from game.dll
 	CUtlVector<class_t>		m_Classes;			
-	int						m_nNumServerClasses;
+	intp					m_nNumServerClasses;
 };
 	
 
@@ -449,7 +444,7 @@ class SVC_SetPause : public CNetMessage
 	DECLARE_SVC_MESSAGE( SetPause );
 	
 	SVC_SetPause() {}
-	SVC_SetPause( bool state, float end = -1.f ) { m_bPaused = state; }
+	SVC_SetPause( bool state, [[maybe_unused]] float end = -1.f ) { m_bPaused = state; }
 	
 public:
 	bool		m_bPaused;		// true or false, what else
@@ -691,7 +686,7 @@ class SVC_EntityMessage : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( EntityMessage );
 
-	SVC_EntityMessage() { m_bReliable = false; }
+	SVC_EntityMessage() : m_pMessageHandler{nullptr} { m_bReliable = false; }
 
 	int	GetGroup() const { return INetChannelInfo::ENTMESSAGES	; }
 
@@ -741,7 +736,7 @@ class SVC_TempEntities: public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( TempEntities );
 
-	SVC_TempEntities() { m_bReliable = false; }
+	SVC_TempEntities() : m_pMessageHandler{nullptr} { m_bReliable = false; }
 
 	int	GetGroup() const { return INetChannelInfo::EVENTS; }
 
@@ -756,7 +751,7 @@ class SVC_Menu : public CNetMessage
 public:
 	DECLARE_SVC_MESSAGE( Menu );
 
-	SVC_Menu() { m_bReliable = true; m_Type = DIALOG_MENU; m_MenuKeyValues = NULL; };
+	SVC_Menu() : m_pMessageHandler{nullptr} { m_bReliable = true; m_Type = DIALOG_MENU; m_MenuKeyValues = NULL; m_iLength = 0; };
 	SVC_Menu( DIALOG_TYPE type, KeyValues *data ); 
 	~SVC_Menu();
 
@@ -849,7 +844,7 @@ class MM_JoinResponse : public CNetMessage
 public:
 	DECLARE_MM_MESSAGE( JoinResponse );
 
-	MM_JoinResponse()
+	MM_JoinResponse() : m_pMessageHandler{nullptr}
 	{
 		m_ContextCount = 0;
 		m_PropertyCount = 0;

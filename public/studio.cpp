@@ -516,14 +516,14 @@ void studiohdr_t::SetAttachmentBone( int iAttachment, int iBone )
 // Purpose:
 //-----------------------------------------------------------------------------
 
-char *studiohdr_t::pszNodeName( int iNode )
+const char *studiohdr_t::pszNodeName( int iNode )
 {
 	if (numincludemodels == 0)
 	{
 		return pszLocalNodeName( iNode );
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	virtualmodel_t *pVModel = GetVirtualModel();
 	Assert( pVModel );
 
 	if ( pVModel->m_node.Count() <= iNode-1 )
@@ -712,6 +712,13 @@ CStudioHdr::CStudioHdr( void )
 	// set pointer to bogus value
 	m_nFrameUnlockCounter = 0;
 	m_pFrameUnlockCounter = &m_nFrameUnlockCounter;
+
+#ifdef STUDIO_ENABLE_PERF_COUNTERS
+	m_nPerfAnimatedBones = 0;
+	m_nPerfUsedBones = 0;
+	m_nPerfAnimationLayers = 0;
+#endif
+
 	Init( NULL );
 }
 
@@ -720,6 +727,13 @@ CStudioHdr::CStudioHdr( const studiohdr_t *pStudioHdr, IMDLCache *mdlcache )
 	// preset pointer to bogus value (it may be overwritten with legitimate data later)
 	m_nFrameUnlockCounter = 0;
 	m_pFrameUnlockCounter = &m_nFrameUnlockCounter;
+
+#ifdef STUDIO_ENABLE_PERF_COUNTERS
+	m_nPerfAnimatedBones = 0;
+	m_nPerfUsedBones = 0;
+	m_nPerfAnimationLayers = 0;
+#endif
+
 	Init( pStudioHdr, mdlcache );
 }
 
@@ -833,7 +847,7 @@ const studiohdr_t *CStudioHdr::GroupStudioHdr( int i )
 	if ( !m_pStudioHdrCache.IsValidIndex( i ) )
 	{
 		const char *pszName = ( m_pStudioHdr ) ? m_pStudioHdr->pszName() : "<<null>>";
-		ExecuteNTimes( 5, Warning( "Invalid index passed to CStudioHdr(%s)::GroupStudioHdr(): %d, but max is %d\n", pszName, i, m_pStudioHdrCache.Count() ) );
+		ExecuteNTimes( 5, Warning( "Invalid index passed to CStudioHdr(%s)::GroupStudioHdr(): %d, but max is %zi\n", pszName, i, m_pStudioHdrCache.Count() ) );
 		DebuggerBreakIfDebugging();
 		return m_pStudioHdr; // return something known to probably exist, certainly things will be messed up, but hopefully not crash before the warning is noticed
 	}
@@ -1158,7 +1172,7 @@ void CStudioHdr::SetAttachmentBone( int iAttachment, int iBone )
 // Purpose:
 //-----------------------------------------------------------------------------
 
-char *CStudioHdr::pszNodeName( int iNode )
+const char *CStudioHdr::pszNodeName( int iNode )
 {
 	if (m_pVModel == NULL)
 	{
@@ -1365,10 +1379,6 @@ int	CStudioHdr::RemapAnimBone( int iAnim, int iLocalBone ) const
 	return iLocalBone;
 }
 
-// JasonM hack
-//ConVar	flex_maxrule( "flex_maxrule", "0" );
-
-
 //-----------------------------------------------------------------------------
 // Purpose: run the interpreted FAC's expressions, converting flex_controller 
 //			values into FAC weights
@@ -1389,23 +1399,14 @@ void CStudioHdr::RunFlexRules( const float *src, float *dest )
 		mstudioflexrule_t *prule = pFlexRule( i );
 
 		mstudioflexop_t *pops = prule->iFlexOp( 0 );
-/*
-		// JasonM hack for flex perf testing...
-		int nFlexRulesToRun = 0;								// 0 means run them all
-		const char *pszExpression = flex_maxrule.GetString();
-		if ( pszExpression )
-		{
-			nFlexRulesToRun = atoi(pszExpression);				// 0 will be returned if not a numeric string
-		}
-		// end JasonM hack
-//*/
+
 		// debugoverlay->AddTextOverlay( GetAbsOrigin() + Vector( 0, 0, 64 ), i + 1, 0, "%2d:%d\n", i, prule->flex );
 
 		for (int j = 0; j < prule->numops; j++)
 		{
-			if (k >= (int)std::size(stack)) 
+			if (k >= ssize(stack)) 
 			{
-				Error("Out of bounds operations count (%d) >= (%d)", k, (int)std::size(stack));
+				Error("Out of bounds operations count (%d) >= (%zi)", k, ssize(stack));
 			}
 
 			switch (pops->op)
@@ -1585,24 +1586,6 @@ void CStudioHdr::RunFlexRules( const float *src, float *dest )
 		}
 
 		dest[prule->flex] = stack[0];
-/*
-		// JasonM hack
-		if ( nFlexRulesToRun == 0)					// 0 means run all rules correctly
-		{
-			dest[prule->flex] = stack[0];
-		}
-		else // run only up to nFlexRulesToRun correctly...zero out the rest
-		{
-			if ( j < nFlexRulesToRun )
-				dest[prule->flex] = stack[0];
-			else
-				dest[prule->flex] = 0.0f;
-		}
-
-		dest[prule->flex] = 1.0f;
-//*/
-		// end JasonM hack
-
 	}
 }
 
@@ -1687,7 +1670,7 @@ void CStudioHdr::CActivityToSequenceMapping::Initialize( CStudioHdr * __restrict
 
 	// Now, create starting indices for each activity. For an activity n, 
 	// the starting index is of course the sum of counts [0..n-1]. 
-	int sequenceCount = 0;
+	intp sequenceCount = 0;
 	int topActivity = 0; // this will store the highest seen activity number (used later to make an ad hoc map on the stack)
 	for ( UtlHashHandle_t handle = m_ActToSeqHash.GetFirstHandle() ; 
 		  m_ActToSeqHash.IsValidHandle(handle) ;
@@ -1715,7 +1698,7 @@ void CStudioHdr::CActivityToSequenceMapping::Initialize( CStudioHdr * __restrict
 	// This stack may potentially grow very large; so if you have problems with it, 
 	// go to a utlmap or similar structure.
 	unsigned int allocsize = (topActivity + 1) * sizeof(int);
-	allocsize = ALIGN_VALUE(allocsize,16);
+	allocsize = AlignValue(allocsize,16);
 	int * __restrict seqsPerAct = static_cast<int *>(stackalloc(allocsize));
 	memset(seqsPerAct, 0, allocsize);
 

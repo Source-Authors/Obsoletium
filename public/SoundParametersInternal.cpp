@@ -106,15 +106,10 @@ static SoundLevelLookup g_pSoundLevels[] =
 
 static const char *_SoundLevelToString( soundlevel_t level )
 {
-	int c = ARRAYSIZE( g_pSoundLevels );
-
-	int i;
-
-	for ( i = 0 ; i < c; i++ )
+	for ( auto &entry : g_pSoundLevels )
 	{
-		SoundLevelLookup *entry = &g_pSoundLevels[ i ];
-		if ( entry->level == level )
-			return entry->name;
+		if ( entry.level == level )
+			return entry.name;
 	}
 
 	static char sz[ 32 ];
@@ -137,15 +132,10 @@ static const char *_ChannelToString( int channel )
 
 static const char *_VolumeToString( float volume )
 {
-	int c = ARRAYSIZE( g_pVolumeLevels );
-
-	int i;
-
-	for ( i = 0 ; i < c; i++ )
+	for ( auto &entry : g_pVolumeLevels )
 	{
-		VolumeLevel *entry = &g_pVolumeLevels[ i ];
-		if ( entry->volume == volume )
-			return entry->name;
+		if ( entry.volume == volume )
+			return entry.name;
 	}
 
 	static char sz[ 32 ];
@@ -155,15 +145,10 @@ static const char *_VolumeToString( float volume )
 
 static const char *_PitchToString( float pitch )
 {
-	int c = ARRAYSIZE( g_pPitchLookup );
-
-	int i;
-
-	for ( i = 0 ; i < c; i++ )
+	for ( auto &entry : g_pPitchLookup )
 	{
-		PitchLookup *entry = &g_pPitchLookup[ i ];
-		if ( entry->pitch == pitch )
-			return entry->name;
+		if ( entry.pitch == pitch )
+			return entry.name;
 	}
 
 	static char sz[ 32 ];
@@ -181,15 +166,10 @@ soundlevel_t TextToSoundLevel( const char *key )
 		return SNDLVL_NORM;
 	}
 
-	int c = ARRAYSIZE( g_pSoundLevels );
-
-	int i;
-
-	for ( i = 0 ; i < c; i++ )
+	for ( auto &entry : g_pSoundLevels )
 	{
-		SoundLevelLookup *entry = &g_pSoundLevels[ i ];
-		if ( !Q_strcasecmp( key, entry->name ) )
-			return entry->level;
+		if ( !Q_strcasecmp( key, entry.name ) )
+			return entry.level;
 	}
 
 	if ( !Q_strnicmp( key, SNDLVL_PREFIX, Q_strlen( SNDLVL_PREFIX ) ) )
@@ -221,7 +201,7 @@ int TextToChannel( const char *name )
 		return CHAN_AUTO;
 	}
 
-	if ( Q_strncasecmp( name, "chan_", strlen( "chan_" ) ) )
+	if ( Q_strncasecmp( name, "chan_", ssize( "chan_" ) - 1 ) )
 	{
 		return atoi( name );
 	}
@@ -243,15 +223,10 @@ int TextToChannel( const char *name )
 
 const char *SoundLevelToString( soundlevel_t level )
 {
-	int c = ARRAYSIZE( g_pSoundLevels );
-
-	int i;
-
-	for ( i = 0 ; i < c; i++ )
+	for ( auto &entry : g_pSoundLevels )
 	{
-		SoundLevelLookup *entry = &g_pSoundLevels[ i ];
-		if ( entry->level == level )
-			return entry->name;
+		if ( entry.level == level )
+			return entry.name;
 	}
 
 	static char sz[ 32 ];
@@ -274,15 +249,10 @@ const char *ChannelToString( int channel )
 
 const char *VolumeToString( float volume )
 {
-	int c = ARRAYSIZE( g_pVolumeLevels );
-
-	int i;
-
-	for ( i = 0 ; i < c; i++ )
+	for ( auto &entry : g_pVolumeLevels )
 	{
-		VolumeLevel *entry = &g_pVolumeLevels[ i ];
-		if ( entry->volume == volume )
-			return entry->name;
+		if ( entry.volume == volume )
+			return entry.name;
 	}
 
 	static char sz[ 32 ];
@@ -292,15 +262,10 @@ const char *VolumeToString( float volume )
 
 const char *PitchToString( float pitch )
 {
-	int c = ARRAYSIZE( g_pPitchLookup );
-
-	int i;
-
-	for ( i = 0 ; i < c; i++ )
+	for ( auto &entry : g_pPitchLookup )
 	{
-		PitchLookup *entry = &g_pPitchLookup[ i ];
-		if ( entry->pitch == pitch )
-			return entry->name;
+		if ( entry.pitch == pitch )
+			return entry.name;
 	}
 
 	static char sz[ 32 ];
@@ -525,7 +490,7 @@ void CSoundParametersInternal::PitchFromString( const char *sz )
 
 void CSoundParametersInternal::SoundLevelFromString( const char *sz )
 {
-	if ( !Q_strncasecmp( sz, "SNDLVL_", strlen( "SNDLVL_" ) ) )
+	if ( !Q_strncasecmp( sz, "SNDLVL_", ssize( "SNDLVL_" ) - 1 ) )
 	{
 		soundlevel.start = TextToSoundLevel( sz );
 		soundlevel.range = 0;

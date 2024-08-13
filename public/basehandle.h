@@ -30,6 +30,7 @@ public:
 
 	CBaseHandle();
 	CBaseHandle( const CBaseHandle &other );
+	CBaseHandle& operator=( const CBaseHandle &other );
 	CBaseHandle( unsigned long value );
 	CBaseHandle( int iEntry, int iSerialNumber );
 
@@ -78,6 +79,12 @@ inline CBaseHandle::CBaseHandle()
 inline CBaseHandle::CBaseHandle( const CBaseHandle &other )
 {
 	m_Index = other.m_Index;
+}
+
+inline CBaseHandle& CBaseHandle::operator=(const CBaseHandle& other)
+{
+	m_Index = other.m_Index;
+	return *this;
 }
 
 inline CBaseHandle::CBaseHandle( unsigned long value )

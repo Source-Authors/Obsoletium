@@ -106,7 +106,7 @@ ELanguage PchLanguageICUCodeToELanguage( const char *pchICUCode, ELanguage eDefa
 
 	// Match to no more than the param length so either a short 'en' or
 	// full 'zh-Hant' can match
-	int nLen = Q_strlen( pchICUCode );
+	intp nLen = Q_strlen( pchICUCode );
 
 	// we only have 5 character ICU codes so this should be enough room
 	char rchCleanedCode[ 6 ];

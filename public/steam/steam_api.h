@@ -239,8 +239,8 @@ public:
 	CCallResult()
 	{
 		m_hAPICall = k_uAPICallInvalid;
-		m_pObj = NULL;
-		m_Func = NULL;
+		m_pObj = nullptr;
+		m_Func = nullptr;
 		m_iCallback = P::k_iCallback;
 	}
 
@@ -317,7 +317,7 @@ public:
 
 	// NOTE: If you can't provide the correct parameters at construction time, you should
 	// use the CCallbackManual callback object (STEAM_CALLBACK_MANUAL macro) instead.
-	CCallback( T *pObj, func_t func ) : m_pObj( NULL ), m_Func( NULL )
+	CCallback( T *pObj, func_t func ) : m_pObj( nullptr ), m_Func( nullptr )
 	{
 		if ( bGameserver )
 		{
@@ -366,7 +366,7 @@ template< class T, class P, bool bGameServer = false >
 class CCallbackManual : public CCallback< T, P, bGameServer >
 {
 public:
-	CCallbackManual() : CCallback< T, P, bGameServer >( NULL, NULL ) {}
+	CCallbackManual() : CCallback< T, P, bGameServer >( nullptr, nullptr ) {}
 
 	// Inherits public Register and Unregister functions from base class
 };
@@ -497,28 +497,28 @@ inline CSteamAPIContext::CSteamAPIContext()
 
 inline void CSteamAPIContext::Clear()
 {
-	m_pSteamUser = NULL;
-	m_pSteamFriends = NULL;
-	m_pSteamUtils = NULL;
-	m_pSteamMatchmaking = NULL;
-	m_pSteamUserStats = NULL;
-	m_pSteamApps = NULL;
-	m_pSteamMatchmakingServers = NULL;
-	m_pSteamNetworking = NULL;
-	m_pSteamRemoteStorage = NULL;
-	m_pSteamHTTP = NULL;
-	m_pSteamScreenshots = NULL;
-	m_pSteamUnifiedMessages = NULL;
-	m_pController = NULL;
-	m_pSteamUGC = NULL;
-	m_pSteamAppList = NULL;
-	m_pSteamMusic = NULL;
-	m_pSteamMusicRemote= NULL;
-	m_pSteamHTMLSurface = NULL;
-	m_pSteamInventory = NULL;
-	m_pSteamVideo = NULL;
+	m_pSteamUser = nullptr;
+	m_pSteamFriends = nullptr;
+	m_pSteamUtils = nullptr;
+	m_pSteamMatchmaking = nullptr;
+	m_pSteamUserStats = nullptr;
+	m_pSteamApps = nullptr;
+	m_pSteamMatchmakingServers = nullptr;
+	m_pSteamNetworking = nullptr;
+	m_pSteamRemoteStorage = nullptr;
+	m_pSteamHTTP = nullptr;
+	m_pSteamScreenshots = nullptr;
+	m_pSteamUnifiedMessages = nullptr;
+	m_pController = nullptr;
+	m_pSteamUGC = nullptr;
+	m_pSteamAppList = nullptr;
+	m_pSteamMusic = nullptr;
+	m_pSteamMusicRemote= nullptr;
+	m_pSteamHTMLSurface = nullptr;
+	m_pSteamInventory = nullptr;
+	m_pSteamVideo = nullptr;
 #ifdef _PS3
-	m_pSteamPS3OverlayRender = NULL;
+	m_pSteamPS3OverlayRender = nullptr;
 #endif
 }
 
@@ -635,7 +635,7 @@ inline bool CSteamAPIContext::Init()
 // pchDate should be of the format "Mmm dd yyyy" (such as from the __DATE__ macro )
 // pchTime should be of the format "hh:mm:ss" (such as from the __TIME__ macro )
 // bFullMemoryDumps (Win32 only) -- writes out a uuid-full.dmp in the client/dumps folder
-// pvContext-- can be NULL, will be the void * context passed into m_pfnPreMinidumpCallback
+// pvContext-- can be nullptr, will be the void * context passed into m_pfnPreMinidumpCallback
 // PFNPreMinidumpCallback m_pfnPreMinidumpCallback   -- optional callback which occurs just before a .dmp file is written during a crash.  Applications can hook this to allow adding additional information into the .dmp comment stream.
 S_API void S_CALLTYPE SteamAPI_UseBreakpadCrashHandler( char const *pchVersion, char const *pchDate, char const *pchTime, bool bFullMemoryDumps, void *pvContext, PFNPreMinidumpCallback m_pfnPreMinidumpCallback );
 S_API void S_CALLTYPE SteamAPI_SetBreakpadAppID( uint32 unAppID );
