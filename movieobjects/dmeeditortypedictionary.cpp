@@ -269,7 +269,7 @@ void CDmeEditorTypeDictionary::AddEditorType( CDmeEditorType *pEditorType )
 	SetValue( pEditorTypeName, pEditorType->GetHandle() );
 }
 
-void CDmeEditorTypeDictionary::AddEditorTypesFromFile( const char *pFileName, const char *pPathID )
+void CDmeEditorTypeDictionary::AddEditorTypesFromFile( const char *, const char * )
 {
 }
 

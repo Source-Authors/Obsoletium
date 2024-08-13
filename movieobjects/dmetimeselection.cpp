@@ -32,14 +32,6 @@ void CDmeTimeSelection::OnDestruction()
 {
 }
 
-static int g_InterpolatorTypes[] = 
-{
-	INTERPOLATE_LINEAR_INTERP,
-	INTERPOLATE_EASE_IN,
-	INTERPOLATE_EASE_OUT,								
-	INTERPOLATE_EASE_INOUT,		
-};
-
 float CDmeTimeSelection::AdjustFactorForInterpolatorType( float factor, int side )
 {
 	Vector points[ 4 ];

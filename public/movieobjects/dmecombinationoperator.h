@@ -316,7 +316,7 @@ public:
 	void Purge();
 
 protected:
-	void ComputeCombinationInfo( int nIndex );
+	void ComputeCombinationInfo( intp nIndex );
 
 private:
 	typedef int RawControlIndex_t;

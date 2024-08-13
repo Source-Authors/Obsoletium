@@ -93,8 +93,8 @@ private:
 	struct DeltaInfo_t
 	{
 		DeltaInfo_t()
-		: m_pComboOp( NULL )
-		, m_pMesh( NULL )
+		: m_pMesh( NULL )
+		, m_pComboOp(NULL)
 		, m_pDeltaData( NULL )
 		{}
 

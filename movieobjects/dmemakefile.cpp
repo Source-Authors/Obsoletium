@@ -372,13 +372,13 @@ void CDmeMakefile::GetSourceFullPath( CDmeSource *pSource, char *pFullPath, int 
 //-----------------------------------------------------------------------------
 void CDmeMakefile::GetSources( const char *pSourceType, CUtlVector< CDmeHandle< CDmeSource > > &sources )
 {
-	int nCount = m_Sources.Count();
+	intp nCount = m_Sources.Count();
 	sources.EnsureCapacity( nCount );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( m_Sources[i]->IsA( pSourceType ) )
 		{
-			int j = sources.AddToTail();
+			intp j = sources.AddToTail();
 			sources[j] = m_Sources[i];
 		}
 	}

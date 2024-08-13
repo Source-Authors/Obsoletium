@@ -46,9 +46,9 @@ void CDmeModel::OnDestruction()
 //-----------------------------------------------------------------------------
 // Add joint
 //-----------------------------------------------------------------------------
-int CDmeModel::AddJoint( CDmeDag *pJoint )
+intp CDmeModel::AddJoint( CDmeDag *pJoint )
 {
-	int nIndex = GetJointTransformIndex( pJoint->GetTransform() );
+	intp nIndex = GetJointTransformIndex( pJoint->GetTransform() );
 	if ( nIndex >= 0 )
 		return nIndex;
 
@@ -87,10 +87,10 @@ int CDmeModel::GetJointTransformCount() const
 //-----------------------------------------------------------------------------
 // Determines joint transform index	given a joint transform
 //-----------------------------------------------------------------------------
-int CDmeModel::GetJointTransformIndex( CDmeTransform *pTransform ) const
+intp CDmeModel::GetJointTransformIndex( CDmeTransform *pTransform ) const
 {
-	int nCount = m_JointTransforms.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_JointTransforms.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pTransform == m_JointTransforms[i] )
 			return i;

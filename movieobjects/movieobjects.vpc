@@ -16,7 +16,7 @@ $Configuration
 	}
 }
 
-$Project "Movieobjects"
+$Project "movieobjects"
 {
 	$Folder	"Header Files"
 	{

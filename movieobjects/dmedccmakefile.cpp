@@ -182,7 +182,7 @@ CDmElement *CDmeDCCMakefile::CreateOutputElement( )
 	return FindReferringElement< CDmElement >( this, "makefile" );
 }
 
-void CDmeDCCMakefile::DestroyOutputElement( CDmElement *pOutput )
+void CDmeDCCMakefile::DestroyOutputElement( CDmElement * )
 {
 	m_bFlushFile = true;
 }

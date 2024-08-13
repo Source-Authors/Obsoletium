@@ -130,7 +130,7 @@ public:
 	virtual DmeMakefileType_t* GetSourceTypes() { Assert(0); return NULL; }
 
 	// FIXME: Should we have output types? Not sure...
-	virtual void GetOutputs( CUtlVector<CUtlString> &fullPaths ) { Assert(0); }
+	virtual void GetOutputs( CUtlVector<CUtlString> & ) { Assert(0); }
 
 	// Converts the m_pDefaultDirectoryID field of the DmeMakefileType_t to a full path
 	bool GetDefaultDirectory( const char *pDefaultDirectoryID, char *pFullPath, int nBufLen );
@@ -160,7 +160,7 @@ protected:
 private:
 	// Inherited classes should re-implement these methods
 	virtual CDmElement *CreateOutputElement( ) { return NULL; }
-	virtual void DestroyOutputElement( CDmElement *pOutput ) { }
+	virtual void DestroyOutputElement( CDmElement * ) { }
 	virtual ProcessHandle_t PerformCompilation() { Assert(0); return PROCESS_HANDLE_INVALID; }
 	virtual const char *GetOutputDirectoryID() { return "makefilegamedir:"; }
 
@@ -201,13 +201,13 @@ inline void CDmeMakefile::SetDirty( bool bDirty )
 template< class T >
 void CDmeMakefile::GetSources( CUtlVector< CDmeHandle<T> > &sources )
 {
-	int nCount = m_Sources.Count();
+	intp nCount = m_Sources.Count();
 	sources.EnsureCapacity( nCount );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( m_Sources[i]->IsA( T::GetStaticTypeSymbol() ) )
 		{
-			int j = sources.AddToTail();
+			intp j = sources.AddToTail();
 			sources[j] = CastElement<T>( m_Sources[i] );
 		}
 	}

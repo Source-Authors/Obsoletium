@@ -61,7 +61,7 @@ bool CDmSmdSerializer::Unserialize(
 	if ( pszFilename )
 	{
 		char szFilename[ MAX_PATH ];
-		V_strncpy( szFilename, pszFilename, ARRAYSIZE( szFilename ) );
+		V_strncpy( szFilename, pszFilename, ssize( szFilename ) );
 		V_FixSlashes( szFilename );
 
 		*ppDmRoot = ReadSMD( utlBuf, nDmFileId, szFilename, NULL );
@@ -83,10 +83,10 @@ CDmElement *CDmSmdSerializer::ReadSMD(
 	CDmeMesh **ppDmeMeshCreated /* = NULL */ )
 {
 	char szFilename[ MAX_PATH ];
-	V_strncpy( szFilename, pszFilename, ARRAYSIZE( szFilename ) );
+	V_strncpy( szFilename, pszFilename, ssize( szFilename ) );
 	V_FixSlashes( szFilename );
 
-	CUtlBuffer utlBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer utlBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	if ( !g_pFullFileSystem->ReadFile( szFilename, NULL, utlBuf ) )
 		return NULL;
@@ -303,8 +303,8 @@ static bool HandleQcHints(
 		}
 	}
 
-	key[ ARRAYSIZE(key) - 1 ] = '\0';
-	val[ ARRAYSIZE(val) - 1 ] = '\0';
+	key[ std::size(key) - 1 ] = '\0';
+	val[ std::size(val) - 1 ] = '\0';
 	
 	return true;
 }
@@ -429,7 +429,7 @@ bool CQcData::ParseQc(
 		// If m_cdmaterials is empty, then put the relative smd path onto the cdmaterials path
 
 		char szBuf0[MAX_PATH];
-		V_strncpy( szBuf0, smdPath.Get(), ARRAYSIZE( szBuf0 ) );
+		V_strncpy( szBuf0, smdPath.Get(), ssize( szBuf0 ) );
 		V_StripFilename( szBuf0 );
 		V_FixSlashes( szBuf0, '/' );
 
@@ -472,8 +472,8 @@ bool CQcData::GetQcData(
 		char szBuf0[MAX_PATH];
 		char szBuf1[MAX_PATH];
 
-		V_strncpy( szBuf0, smdPath.Get(), ARRAYSIZE( szBuf0 ) );
-		V_SetExtension( szBuf0, ".qc", ARRAYSIZE( szBuf0 ) );
+		V_strncpy( szBuf0, smdPath.Get(), ssize( szBuf0 ) );
+		V_SetExtension( szBuf0, ".qc", ssize( szBuf0 ) );
 		if ( _access( szBuf0, 04 ) == 0 )
 			return ParseQc( smdPath, szBuf0 );
 
@@ -483,7 +483,7 @@ bool CQcData::GetQcData(
 		{
 			*pszRef = '\0';
 
-			V_SetExtension( szBuf0, ".qc", ARRAYSIZE( szBuf0 ) );
+			V_SetExtension( szBuf0, ".qc", ssize( szBuf0 ) );
 			if ( _access( szBuf0, 04 ) == 0 )
 				return ParseQc( smdPath, szBuf0 );
 		}
@@ -491,28 +491,28 @@ bool CQcData::GetQcData(
 		{
 			// Add _reference
 
-			V_SetExtension( szBuf0, "", ARRAYSIZE( szBuf0 ) );
-			V_strcat( szBuf0, "_reference", ARRAYSIZE( szBuf0 ) );
-			V_SetExtension( szBuf0, ".qc", ARRAYSIZE( szBuf0 ) );
+			V_SetExtension( szBuf0, "", ssize( szBuf0 ) );
+			V_strcat( szBuf0, "_reference", ssize( szBuf0 ) );
+			V_SetExtension( szBuf0, ".qc", ssize( szBuf0 ) );
 			if ( _access( szBuf0, 04 ) == 0 )
 				return ParseQc( smdPath, szBuf0 );
 		}
 
 		// Look for any *.qc file in the same directory as the smd that contains the smd pathname
-		V_strncpy( szBuf0, smdPath.Get(), ARRAYSIZE( szBuf0 ) );
+		V_strncpy( szBuf0, smdPath.Get(), ssize( szBuf0 ) );
 		V_FixSlashes( szBuf0 );
 
-		V_FileBase( szBuf0, szBuf1, ARRAYSIZE( szBuf1 ) );
+		V_FileBase( szBuf0, szBuf1, ssize( szBuf1 ) );
 		CUtlString sFileBase0( "\"" );
 		sFileBase0 += szBuf1;
 		sFileBase0 += "\"";
 
-		V_SetExtension( szBuf1, ".smd", ARRAYSIZE( szBuf1 ) );
+		V_SetExtension( szBuf1, ".smd", ssize( szBuf1 ) );
 		CUtlString sFileBase1( "\"" );
 		sFileBase1 += szBuf1;
 		sFileBase1 += "\"";
 
-		V_ExtractFilePath( szBuf0, szBuf1, ARRAYSIZE( szBuf1 ) );
+		V_ExtractFilePath( szBuf0, szBuf1, ssize( szBuf1 ) );
 		CUtlString sFilePath = szBuf1;
 
 		if ( sFileBase0.Length() > 0 && sFilePath.Length() > 0 )
@@ -1069,13 +1069,13 @@ static void HandleVertexWeights(
 		// Sort vertex weights inversely by weight
 		qsort( tmpVertexWeights.Base(), tmpVertexWeights.Count(), sizeof( CVertexWeight ), VertexWeightLessFunc );
 
-		// Take at most the top ARRAYSIZE( vertex.m_vertexWeights ) from tmpVertexWeights
+		// Take at most the top ssize( vertex.m_vertexWeights ) from tmpVertexWeights
 		// Figure out actual weight count and total weight
 
 		float flTotalWeight = 0.0f;
 		vertex.m_nWeights = 0;
 
-		for ( int i = 0; i < tmpVertexWeights.Count() && i < ARRAYSIZE( vertex.m_vertexWeights ); ++i )
+		for ( size_t i = 0; static_cast<intp>(i) < tmpVertexWeights.Count() && i < std::size( vertex.m_vertexWeights ); ++i )
 		{
 			CVertexWeight &vertexWeight( vertex.m_vertexWeights[ i ] );
 			vertexWeight = tmpVertexWeights[i];
@@ -1137,7 +1137,7 @@ static CDmeMesh *CreateDmeMesh(
 
 	if ( pszFilename )
 	{
-		V_FileBase( pszFilename, szFileBase, ARRAYSIZE( szFileBase ) );
+		V_FileBase( pszFilename, szFileBase, ssize( szFileBase ) );
 
 		if ( !Q_isempty( szFileBase ) )
 		{
@@ -1204,7 +1204,7 @@ static CDmeFaceSet *FindOrCreateFaceSet(
 	}
 
 	char szFaceSetName[ MAX_PATH ];
-	V_FileBase( sMaterial.Get(), szFaceSetName, ARRAYSIZE( szFaceSetName ) );
+	V_FileBase( sMaterial.Get(), szFaceSetName, ssize( szFaceSetName ) );
 
 	CDmeFaceSet *pDmeFaceSet = CreateElement< CDmeFaceSet >( szFaceSetName, pDmeMesh->GetFileId() );
 	Assert( pDmeFaceSet );
@@ -1273,10 +1273,10 @@ static void CreatePolygon(
 			{
 				nPositionIndex = positionData.AddToTail( cVertex.m_vPosition );
 
-				for ( int j = 0; j < ARRAYSIZE( cVertex.m_vertexWeights ); ++j )
+				for ( auto &w : cVertex.m_vertexWeights )
 				{
-					jointWeightData.AddToTail( cVertex.m_vertexWeights[j].m_flWeight );
-					jointIndexData.AddToTail( cVertex.m_vertexWeights[j].m_nBoneIndex );
+					jointWeightData.AddToTail( w.m_flWeight );
+					jointIndexData.AddToTail( w.m_nBoneIndex );
 				}
 			}
 
@@ -1360,7 +1360,7 @@ CDmElement *CDmSmdSerializer::ReadSMD(
 
 	if ( pszFilename )
 	{
-		V_FileBase( pszFilename, szAnimationName, ARRAYSIZE( szAnimationName ) );
+		V_FileBase( pszFilename, szAnimationName, ssize( szAnimationName ) );
 	}
 	else
 	{
@@ -1412,7 +1412,7 @@ CDmElement *CDmSmdSerializer::ReadSMD(
 
 	while ( utlBuf.IsValid() )
 	{
-		GetLine( utlBuf, szLine, ARRAYSIZE( szLine ) );
+		GetLine( utlBuf, szLine, ssize( szLine ) );
 		++nLineNumber;
 
 		const char *pszLine = ParserSkipSpace( szLine );
@@ -1526,7 +1526,7 @@ CDmElement *CDmSmdSerializer::ReadSMD(
 			Vector vPosition;
 			Vector vNormal;
 			Vector2D vUV;
-			char szShadingGroup[ ARRAYSIZE( szLine ) ];
+			char szShadingGroup[ std::size( szLine ) ];
 
 			if ( sscanf( pszLine, "%d %f %f %f %f %f %f %f %f",
 				&nFallbackSkinJoint,
@@ -1574,8 +1574,8 @@ CDmElement *CDmSmdSerializer::ReadSMD(
 			}
 			else if ( sscanf( pszLine, "%1024s", szShadingGroup ) == 1 )
 			{
-				char pszMaterialPath[ ARRAYSIZE( szShadingGroup ) ];
-				V_StripExtension( szShadingGroup, pszMaterialPath, ARRAYSIZE( pszMaterialPath ) );
+				char pszMaterialPath[ std::size( szShadingGroup ) ];
+				V_StripExtension( szShadingGroup, pszMaterialPath, ssize( pszMaterialPath ) );
 
 				sMaterial = pszMaterialPath;
 
@@ -1631,7 +1631,7 @@ void CDmSmdSerializer::FixNodeName( CUtlString &sName ) const
 	char szTmpBuf0[ MAX_PATH ];
 	char szTmpBuf1[ MAX_PATH ];
 
-	V_strncpy( szTmpBuf0, sName.Get(), ARRAYSIZE( szTmpBuf0 ) );
+	V_strncpy( szTmpBuf0, sName.Get(), ssize( szTmpBuf0 ) );
 
 	// Strip trailing quotes
 	char *pszName = szTmpBuf0 + sName.Length() - 1;
@@ -1651,8 +1651,8 @@ void CDmSmdSerializer::FixNodeName( CUtlString &sName ) const
 	if ( m_bOptAutoStripPrefix )
 	{
 		// Get the string before the '.'
-		V_FileBase( pszName, szTmpBuf1, ARRAYSIZE( szTmpBuf1 ) );
-		V_strncpy( szTmpBuf0, szTmpBuf1, ARRAYSIZE( szTmpBuf0 ) );
+		V_FileBase( pszName, szTmpBuf1, ssize( szTmpBuf1 ) );
+		V_strncpy( szTmpBuf0, szTmpBuf1, ssize( szTmpBuf0 ) );
 		pszName = szTmpBuf0;
 	}
 

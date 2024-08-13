@@ -44,13 +44,13 @@ class DmeLog_TimeSelection_t
 {
 public:
 	DmeLog_TimeSelection_t() :
-		m_flIntensity( 1.0f ),
-		m_bAttachedMode( true ),
-		m_bTimeAdvancing( false ),
-		m_bResampleMode( true ),
 		m_nResampleInterval( DmeTime_t( .05f ) ),// 50 msec sampling interval by default
+		m_flIntensity( 1.0f ),
 		m_flThreshold( DMELOG_DEFAULT_THRESHHOLD ),
 		m_pPresetValue( 0 ),
+		m_bAttachedMode( true ),
+		m_bResampleMode( true ),
+		m_bTimeAdvancing( false ),
 		m_RecordingMode( RECORD_PRESET )
 	{
 		m_nTimes[ TS_LEFT_FALLOFF ] = m_nTimes[ TS_LEFT_HOLD ] = 
@@ -157,7 +157,7 @@ public:
 
 	DmeTime_t GetBeginTime() const;
 	DmeTime_t GetEndTime() const;
-	int GetKeyCount() const;
+	intp GetKeyCount() const;
 
 	// Returns the index of a key closest to this time, within tolerance
 	// NOTE: Insertion or removal may change this index!
@@ -171,7 +171,7 @@ public:
 	virtual void SetKey( DmeTime_t time, const CDmAttribute *pAttr, uint index = 0, int curveType = CURVE_DEFAULT ) = 0;
 	virtual bool SetDuplicateKeyAtTime( DmeTime_t time ) = 0;
 	// This inserts a key using the current values to construct the proper value for the time
-	virtual int InsertKeyAtTime( DmeTime_t nTime, int curveType = CURVE_DEFAULT ) = 0;
+	virtual intp InsertKeyAtTime( DmeTime_t nTime, int curveType = CURVE_DEFAULT ) = 0;
 
 	// Sets the interpolated value of the log at the specified time into the attribute
 	virtual void GetValue( DmeTime_t time, CDmAttribute *pAttr, uint index = 0 ) const = 0;
@@ -292,7 +292,7 @@ public:
 
 	DmeTime_t GetBeginTime() const;
 	DmeTime_t GetEndTime() const;
-	int GetKeyCount() const;
+	intp GetKeyCount() const;
 
 	bool	IsEmpty() const;
 
@@ -456,12 +456,12 @@ public:
 	virtual void InsertKeyFromLayer( DmeTime_t keyTime, const CDmeLogLayer *src, DmeTime_t srcKeyTime );
 
 	// Finds a key within tolerance, or adds one. Unlike SetKey, this will *not* delete keys after the specified time
-	int FindOrAddKey( DmeTime_t nTime, DmeTime_t nTolerance, const T& value, int curveType = CURVE_DEFAULT );
+	intp FindOrAddKey( DmeTime_t nTime, DmeTime_t nTolerance, const T& value, int curveType = CURVE_DEFAULT );
 
 	// Sets a key, removes all keys after this time
 	void SetKey( DmeTime_t time, const T& value, int curveType = CURVE_DEFAULT );
 	// This inserts a key using the current values to construct the proper value for the time
-	virtual int InsertKeyAtTime( DmeTime_t nTime, int curveType = CURVE_DEFAULT );
+	virtual intp InsertKeyAtTime( DmeTime_t nTime, int curveType = CURVE_DEFAULT );
 
 	void SetKeyValue( int nKey, const T& value );
 
@@ -471,7 +471,7 @@ public:
 	const T& GetValueSkippingKey( int nKeyToSkip ) const;
 
 	// This inserts a key. Unlike SetKey, this will *not* delete keys after the specified time
-	int InsertKey( DmeTime_t nTime, const T& value, int curveType = CURVE_DEFAULT );
+	intp InsertKey( DmeTime_t nTime, const T& value, int curveType = CURVE_DEFAULT );
 
 	// inherited from CDmeLog
 	virtual void ClearKeys();
@@ -836,7 +836,76 @@ template<> void CDmeTypedLogLayer< Vector >::GetValueUsingCurveInfoSkippingKey( 
 template<> void CDmeTypedLogLayer< Quaternion >::GetValueUsingCurveInfo( DmeTime_t time, Quaternion& out ) const;
 template<> void CDmeTypedLogLayer< Quaternion >::GetValueUsingCurveInfoSkippingKey( int nKeyToSkip, Quaternion& out ) const;
 
-template<class T> void CDmeTypedLogLayer< T >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< T > *output );
+template< class T >
+float LengthOf( const T& value );
+template<>
+float LengthOf( const bool& value );
+template<>
+float LengthOf( const Color& value );
+template<>
+float LengthOf( const Vector4D& value );
+template<>
+float LengthOf( const Quaternion& value );
+template<>
+float LengthOf( const VMatrix& value );
+template<>
+float LengthOf( const CUtlString& value );
+template<>
+float LengthOf( const Vector2D& value );
+template<>
+float LengthOf( const Vector& value );
+template<>
+float LengthOf( const QAngle& value );
+
+template< class T >
+T Subtract( const T& v1, const T& v2 );
+template<>
+bool Subtract( const bool& v1, const bool& v2 );
+template<>
+CUtlString Subtract( const CUtlString& v1, const CUtlString& v2 );
+template<>
+Color Subtract( const Color& v1, const Color& v2 );
+template<>
+Vector4D Subtract( const Vector4D& v1, const Vector4D& v2 );
+template<>
+Quaternion Subtract( const Quaternion& v1, const Quaternion& v2 );
+
+// Implementation of Douglas-Peucker curve simplification routine (hacked to only care about error against original curve (sort of 1D)
+template< class T >
+void CDmeTypedLogLayer< T >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< T > *output )
+{
+	if ( endPoint <= startPoint + 1 )
+	{
+		return;
+	}
+
+	int maxPoint = startPoint;
+	float maxDistanceSqr = 0.0f;
+
+	for ( int i = startPoint + 1 ; i < endPoint; ++i )
+	{
+		DmeTime_t keyTime = GetKeyTime( i );
+        T check = GetKeyValue( i );
+		T check2 = output->GetValue( keyTime );
+		T dist = Subtract( check, check2 );
+		float distSqr = LengthOf( dist ) * LengthOf( dist );
+
+		if ( distSqr < maxDistanceSqr )
+			continue;
+
+		maxPoint = i;
+		maxDistanceSqr = distSqr;
+	}
+
+	if ( maxDistanceSqr > thresholdSqr )
+	{
+		output->InsertKey( GetKeyTime( maxPoint ), GetKeyValue( maxPoint ) );
+		CurveSimplify_R( thresholdSqr, startPoint, maxPoint, output );
+		CurveSimplify_R( thresholdSqr, maxPoint, endPoint, output );
+	}
+}
+
+
 template<> void CDmeTypedLogLayer< bool >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< bool > *output );
 template<> void CDmeTypedLogLayer< int >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< int > *output );
 template<> void CDmeTypedLogLayer< Color >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< Color > *output );

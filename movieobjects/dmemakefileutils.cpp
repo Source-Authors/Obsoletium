@@ -163,7 +163,7 @@ void CDmeMakefileUtils::AddCompilationTask( CDmElement* pElement, CCompileFuncAd
 	Assert( m_CompilationStep == BUILDING_STANDARD_DEPENDENCIES || m_CompilationStep == BUILDING_ALL_DEPENDENCIES );
 
 	// Queue up the compilation task
-	int j = m_CompileTasks.AddToTail();
+	intp j = m_CompileTasks.AddToTail();
 	m_CompileTasks[j].m_hElement = pElement;
 	m_CompileTasks[j].m_pAdapter = pAdapter;
 }
@@ -216,11 +216,11 @@ bool CDmeMakefileUtils::AddCompileDependencies( CDmeMakefile *pMakefile, bool bB
 		bool bShouldBuildFile = bBuildAllDependencies;
 
 		// Does the output files exist?
-		int j = 0;
+		intp j = 0;
 		if ( !bBuildAllDependencies )
 		{
 			pDependentMakefile->GetOutputs( outputs );
-			int nOutputCount = outputs.Count();
+			intp nOutputCount = outputs.Count();
 			for ( j = 0; j < nOutputCount; ++j )
 			{
 				// If the file doesn't exist, we have to build it
@@ -253,7 +253,7 @@ bool CDmeMakefileUtils::AddCompileDependencies( CDmeMakefile *pMakefile, bool bB
 //-----------------------------------------------------------------------------
 // Default implementatations for precompilation step
 //-----------------------------------------------------------------------------
-bool CDmeMakefileUtils::PerformCompilationStep( CDmElement *pElement, CompilationStep_t step )
+bool CDmeMakefileUtils::PerformCompilationStep( CDmElement *, CompilationStep_t )
 {
 	// Do nothing
 	return true;
@@ -416,7 +416,7 @@ int CDmeMakefileUtils::GetExitCode()
 //-----------------------------------------------------------------------------
 // Returns output from the compilation
 //-----------------------------------------------------------------------------
-int CDmeMakefileUtils::GetCompileOutputSize()
+intp CDmeMakefileUtils::GetCompileOutputSize()
 {
 	if ( m_hCompileProcess == PROCESS_HANDLE_INVALID )
 		return 0;

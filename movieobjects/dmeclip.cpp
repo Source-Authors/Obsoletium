@@ -545,7 +545,7 @@ static int BuildReferringClipList( CDmeClip *pClip, CDmeClip** ppParents, int nM
 		it = g_pDataModel->NextAttributeReferencingElement( it ) )
 	{
 		CDmAttribute *pAttribute = g_pDataModel->GetAttribute( it );
-		const char *pName = pAttribute->GetName();
+		[[maybe_unused]] const char *pName = pAttribute->GetName();
 		CDmElement *pElement = pAttribute->GetOwner();
 		CDmeTrack *pTrack = CastElement< CDmeTrack >( pElement );
 		if ( !pTrack )
@@ -590,7 +590,7 @@ static int BuildReferringClipList( CDmeClip *pClip, CDmeClip** ppParents, int nM
 static bool BuildClipStack_R( DmeClipStack_t* pStack, CDmeClip *pMovie, CDmeClip *pShot, CDmeClip *pCurrent )
 {
 	// Add this clip to the stack
-	int nIndex = pStack->AddToHead( CDmeHandle< CDmeClip >( pCurrent ) );
+	intp nIndex = pStack->AddToHead( CDmeHandle< CDmeClip >( pCurrent ) );
 
 	// Is this clip the shot? We don't need to look for it any more.
 	if ( pCurrent == pShot )
@@ -1026,11 +1026,21 @@ void CDmeFilmClip::OnElementUnserialized( )
 		// If this is an older file with an overlay attribute, strip it out into materialoverlay
 		CDmAttribute *pOverlayAttribute = GetAttribute( "overlay" );
 		if ( !pOverlayAttribute )
-			goto cleanUp;
+		{
+			// Always strip out the old overlay attribute
+			RemoveAttribute( "overlay" );
+			RemoveAttribute( "overlayalpha" );
+			return;
+		}
 
 		const char *pName = pOverlayAttribute->GetValueString();
 		if ( !pName || !pName[0] )
-			goto cleanUp;
+		{
+			// Always strip out the old overlay attribute
+			RemoveAttribute( "overlay" );
+			RemoveAttribute( "overlayalpha" );
+			return;
+		}
 
 		// If we don't yet have a material overlay, create one
 		if ( m_MaterialOverlayEffect.GetElement() == NULL )
@@ -1048,9 +1058,8 @@ void CDmeFilmClip::OnElementUnserialized( )
 			m_MaterialOverlayEffect->SetAlpha( alpha );
 		}
 
-cleanUp:
 		// Always strip out the old overlay attribute
-		RemoveAttribute( "overlay" );							
+		RemoveAttribute( "overlay" );
 		RemoveAttribute( "overlayalpha" );
 	}
 }
@@ -1509,7 +1518,7 @@ void CDmeFilmClip::BuildClipAssociations( CUtlVector< ClipAssociation_t > &assoc
 				CDmeClip *pClip = pTrack->GetClip( k );
 				CDmeClip *pFilmClip = pFilmTrack->FindFilmClipAtTime( pClip->GetStartTime() );
 				
-				int nIndex = association.AddToTail();
+				intp nIndex = association.AddToTail();
 				association[nIndex].m_hClip = pClip;
 				association[nIndex].m_hAssociation = pFilmClip;
 				if ( pFilmClip )

@@ -29,7 +29,7 @@ class Color;
 //-----------------------------------------------------------------------------
 // Used to represent fields
 //-----------------------------------------------------------------------------
-typedef int FieldIndex_t;
+typedef intp FieldIndex_t;
 
 
 class CDmeVertexDataBase : public CDmElement

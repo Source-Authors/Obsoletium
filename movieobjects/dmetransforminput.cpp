@@ -71,7 +71,7 @@ void CDmeRotationInput::Operate()
 {
 }
 
-void CDmeRotationInput::GetInputAttributes( CUtlVector< CDmAttribute * > &attrs )
+void CDmeRotationInput::GetInputAttributes( CUtlVector< CDmAttribute * > & )
 {
 }
 

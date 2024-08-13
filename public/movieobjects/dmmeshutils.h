@@ -13,12 +13,12 @@
 #endif
 
 #include "movieobjects/dmevertexdata.h"
+#include "movieobjects/dmmeshcomp.h"
 #include "tier1/utlstring.h"
 #include "tier1/UtlStringMap.h"
 #include "tier1/utlvector.h"
 
 class CDmeMesh;
-class CDmMeshComp::CEdge;
 
 
 //-----------------------------------------------------------------------------

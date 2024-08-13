@@ -103,7 +103,7 @@ void CDmeChannelRecordingMgr::AddChannelToRecordingLayer( CDmeChannel *pChannel,
 	if ( !pLog )
 		return;
 
-	int nRecordLayerIndex = m_LayerChannels.AddToTail();
+	intp nRecordLayerIndex = m_LayerChannels.AddToTail();
 	LayerChannelInfo_t& info = m_LayerChannels[nRecordLayerIndex];
 	info.m_Channel = pChannel;
 	if ( pRoot )
@@ -555,10 +555,6 @@ CDmeLog *CDmeChannel::CreateLog( DmAttributeType_t type )
 	m_log.Set( log );
 	return log;
 }
-
-// HACK:  This is an evil hack since the element and attribute change sequentially, but they really need to change in lockstep or else you're looking
-//  up an attribute from some other element or vice versa.
-
 
 void CDmeChannel::SetInput( CDmElement* pElement, const char* pAttribute, int index )
 {
