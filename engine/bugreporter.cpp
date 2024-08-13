@@ -602,7 +602,7 @@ protected:
 
 	char const					*GetSubmitter();
 
-	void						OnFinishBugReport();
+	bool						OnFinishBugReport();
 
 	bool						m_bCanSubmit;
 	bool						m_bLoggedIn;
@@ -984,11 +984,12 @@ void CBugUIPanel::OnTick()
 			}
 			m_pProgressDialog = NULL;
 
-			OnFinishBugReport();
+			bool success = OnFinishBugReport();
 
 			m_bWaitForFinish = true;
 
-			if ( !m_hFinishedDialog.Get() )
+			// dimhotepus: Show success message only if bug uploaded.
+			if ( success && !m_hFinishedDialog.Get() )
 			{
 				m_hFinishedDialog = new CBugReportFinishedDialog(NULL, "FinishDialog", "#Steam_FinishedBug_WorkingTitle", "#Steam_FinishedBug_Text"  );
 				m_hFinishedDialog->Activate();
@@ -2134,7 +2135,7 @@ void CBugUIPanel::OnSubmit()
 	}
 }
 
-void CBugUIPanel::OnFinishBugReport()
+bool CBugUIPanel::OnFinishBugReport()
 {
 	int bugId = -1;
 
@@ -2173,6 +2174,8 @@ void CBugUIPanel::OnFinishBugReport()
 			Close();
 		}
 	}
+
+	return success;
 }
 
 void NonFileSystem_CreatePath (const char *path)

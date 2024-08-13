@@ -327,7 +327,7 @@ ptrdiff_t CBugReporter::GetDisplayNameCount()
 	return 1;
 }
 
-char const *CBugReporter::GetDisplayName( ptrdiff_t index )
+char const *CBugReporter::GetDisplayName( ptrdiff_t index ) //-V524
 {
 	if ( index < 0 || index >= 1 )
 		return "<<Invalid>>";
@@ -535,7 +535,7 @@ bool CBugReporter::CommitBugReport( int& bugSubmissionId )
 			m_SteamID,
 			atoi( m_pBug->build ),
 			m_pBug->title,
-			(char const *)buf.Base(),
+			buf.Base<const char>(),
 			m_pBug->exename,
 			m_pBug->gamedir,
 			m_pBug->level,
@@ -554,11 +554,14 @@ bool CBugReporter::CommitBugReport( int& bugSubmissionId )
 			attachedfilesize
 		) )
 	{
-		Msg( "Unable to upload bug...\n" );
+		Warning( "Unable to upload bug...\n" );
+		m_pBug->Clear();
+
+		// dimhotepus: Signal bug upload failure.
+		return false;
 	}
 
 	m_pBug->Clear();
-
 	return true;
 }
 
