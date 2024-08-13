@@ -71,7 +71,7 @@ class CSoundEmitterUniformRandomStream : public IUniformRandomStream
 {
 public:
 	// Sets the seed of the random number generator
-	void	SetSeed( int iSeed )
+	void	SetSeed( int )
 	{
 		// Never call this from the client or game!
 		Assert(0);
@@ -133,8 +133,7 @@ void CSoundEmitterSystemBase::Disconnect()
 void *CSoundEmitterSystemBase::QueryInterface( const char *pInterfaceName )
 {
 	// Loading the engine DLL mounts *all* soundemitter interfaces
-	CreateInterfaceFn factory = Sys_GetFactoryThis();	// This silly construction is necessary
-	return factory( pInterfaceName, NULL );				// to prevent the LTCG compiler from crashing.
+	return Sys_GetFactoryThis()( pInterfaceName, nullptr );
 }
 
 
@@ -453,7 +452,7 @@ CSoundParametersInternal *CSoundEmitterSystemBase::InternalGetParametersForSound
 {
 	if ( !m_Sounds.IsValidHandle( index ) )
 	{
-		Assert( !"CSoundEmitterSystemBase::InternalGetParametersForSound:  Bogus index" );
+		AssertMsg( false, "CSoundEmitterSystemBase::InternalGetParametersForSound:  Bogus index" );
 		return NULL;
 	}
 
@@ -591,7 +590,7 @@ void CSoundEmitterSystemBase::GenderExpandString( gender_t gender, char const *i
 	default:
 	case GENDER_NONE:
 		{
-			Assert( !"CSoundEmitterSystemBase::GenderExpandString:  expecting MALE or FEMALE!" );
+			AssertMsg( false, "CSoundEmitterSystemBase::GenderExpandString:  expecting MALE or FEMALE!" );
 		}
 		break;
 	case GENDER_MALE:
@@ -716,13 +715,13 @@ bool CSoundEmitterSystemBase::InitSoundInternalParameters( const char *soundname
 		}
 		else if ( !Q_strcasecmp( pKey->GetName(), "attenuation" ) || !Q_strcasecmp( pKey->GetName(), "CompatibilityAttenuation" ) )
 		{
-			if ( !Q_strncasecmp( pKey->GetString(), "SNDLVL_", strlen( "SNDLVL_" ) ) )
+			if ( !Q_strncasecmp( pKey->GetString(), "SNDLVL_", ssize( "SNDLVL_" ) - 1 ) )
 			{
 				DevMsg( "CSoundEmitterSystemBase::GetParametersForSound:  sound %s has \"attenuation\" with %s value!\n",
 					soundname, pKey->GetString() );
 			}
 
-			if ( !Q_strncasecmp( pKey->GetString(), "ATTN_", strlen( "ATTN_" ) ) )
+			if ( !Q_strncasecmp( pKey->GetString(), "ATTN_", ssize( "ATTN_" ) - 1 ) )
 			{
 				params.SetSoundLevel( ATTN_TO_SNDLVL( TranslateAttenuation( pKey->GetString() ) ) );
 			}
@@ -753,7 +752,7 @@ bool CSoundEmitterSystemBase::InitSoundInternalParameters( const char *soundname
 		}
 		else if ( !Q_strcasecmp( pKey->GetName(), "soundlevel" ) )
 		{
-			if ( !Q_strncasecmp( pKey->GetString(), "ATTN_", strlen( "ATTN_" ) ) )
+			if ( !Q_strncasecmp( pKey->GetString(), "ATTN_", ssize( "ATTN_" ) - 1 ) )
 			{
 				DevMsg( "CSoundEmitterSystemBase::GetParametersForSound:  sound %s has \"soundlevel\" with %s value!\n",
 					soundname, pKey->GetString() );
@@ -833,7 +832,7 @@ void CSoundEmitterSystemBase::AddSoundsFromFile( const char *filename, bool bPre
 	sf.hFilename = filesystem->FindOrAddFileName( filename );
 	sf.dirty = false;
 
-	int scriptindex = m_SoundKeyValues.AddToTail( sf );
+	intp scriptindex = m_SoundKeyValues.AddToTail( sf );
 
 	int replaceCount = 0;
 	int newOverrideCount = 0;
@@ -1292,7 +1291,7 @@ void CSoundEmitterSystemBase::SaveChangesToSoundScript( int scriptindex )
 		return;
 	}
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	// FIXME:  Write sound script header
 	if ( filesystem->FileExists( GAME_SOUNDS_HEADER_BLOCK ) )
@@ -1623,8 +1622,7 @@ void CSoundEmitterSystemBase::AddSoundOverrides( char const *scriptfile, bool bP
 // Called by either client or server in LevelShutdown to clear out custom overrides
 void CSoundEmitterSystemBase::ClearSoundOverrides()
 {
-	int i;
-	int removed = 0;
+	ptrdiff_t removed = 0;
 
 	for ( UtlHashHandle_t i = m_Sounds.FirstHandle(); i != m_Sounds.InvalidHandle(); )
 	{
@@ -1642,13 +1640,13 @@ void CSoundEmitterSystemBase::ClearSoundOverrides()
 
 	if (removed > 0 || m_SavedOverrides.Count() > 0 )
 	{
-		Warning( "SoundEmitter:  removing map sound overrides [%i to remove, %i to restore]\n", 
+		Warning( "SoundEmitter:  removing map sound overrides [%zd to remove, %zd to restore]\n", 
 			removed,
 			m_SavedOverrides.Count() );
 	}
 
 	// Now restore the original entries into the main dictionary.
-	for ( i = 0; i < m_SavedOverrides.Count(); ++i )
+	for ( intp i = 0; i < m_SavedOverrides.Count(); ++i )
 	{
 		CSoundEntry *entry = m_SavedOverrides[ i ];
 		m_Sounds.Insert( entry );
