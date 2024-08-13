@@ -185,11 +185,11 @@ bool CValveVideoServices::ConnectVideoLibraries( CreateInterfaceFn factory )
 			CSysModule *pModule = Sys_LoadModule(s_VideoAppSystems[n].m_pModuleName );
 			if( pModule != nullptr )
 			{
-				CreateInterfaceFn fn = Sys_GetFactory( pModule );
+				CreateInterfaceFnT<IVideoSubSystem> fn = Sys_GetFactory<IVideoSubSystem>( pModule );
 				if ( fn != nullptr )
 				{
 				
-					IVideoSubSystem *pVideoSystem = (IVideoSubSystem*) fn( s_VideoAppSystems[n].m_pInterfaceName, NULL );
+					IVideoSubSystem *pVideoSystem = fn( s_VideoAppSystems[n].m_pInterfaceName, NULL );
 					if ( pVideoSystem != nullptr && pVideoSystem->Connect( factory ) )
 					{
 						if ( pVideoSystem->InitializeVideoSystem( &g_VALVEVIDEOCommon ) )
@@ -234,13 +234,13 @@ bool CValveVideoServices::ConnectVideoLibraries( CreateInterfaceFn factory )
 			int eCount = pSubSystem->GetSupportedFileExtensionCount();
 			Assert( eCount > 0 );
 			
-			for ( int n = 0; n < eCount; n++ )
+			for ( int nv = 0; nv < eCount; nv++ )
 			{
 				VideoFileExtensionInfo_t	extInfoRec;
 				
-				extInfoRec.m_FileExtension = pSubSystem->GetSupportedFileExtension( n );
+				extInfoRec.m_FileExtension = pSubSystem->GetSupportedFileExtension( nv );
 				extInfoRec.m_VideoSubSystem = pSubSystem->GetSystemID();
-				extInfoRec.m_VideoFeatures = pSubSystem->GetSupportedFileExtensionFeatures( n );
+				extInfoRec.m_VideoFeatures = pSubSystem->GetSupportedFileExtensionFeatures( nv );
 				
 				AssertPtr( extInfoRec.m_FileExtension );
 				
@@ -290,16 +290,16 @@ bool CValveVideoServices::DisconnectVideoLibraries()
 }
 
 
-int CValveVideoServices::DestroyAllVideoInterfaces()
+ptrdiff_t CValveVideoServices::DestroyAllVideoInterfaces()
 {
-	int n = m_RecorderList.Count() + m_MaterialList.Count();
+	ptrdiff_t n = m_RecorderList.Count() + m_MaterialList.Count();
 
-	for ( int i = m_RecorderList.Count() -1; i >= 0; i-- )
+	for ( ptrdiff_t i = m_RecorderList.Count() -1; i >= 0; i-- )
 	{
 		DestroyVideoRecorder( (IVideoRecorder*) m_RecorderList[i].m_pObject );
 	}
 
-	for ( int i = m_MaterialList.Count() -1; i >= 0; i-- )
+	for ( ptrdiff_t i = m_MaterialList.Count() -1; i >= 0; i-- )
 	{
 		DestroyVideoMaterial( (IVideoMaterial*) m_MaterialList[i].m_pObject );
 	}
@@ -506,7 +506,7 @@ const char *CValveVideoServices::GetSupportedFileExtension( VideoSystem_t videoS
 {
 	int n = GetIndexForSystem( videoSystem ); 
 
-	int c = ( n == SYSTEM_NOT_FOUND ) ? 0 : m_VideoSystems[n]->GetSupportedFileExtensionCount();;
+	int c = ( n == SYSTEM_NOT_FOUND ) ? 0 : m_VideoSystems[n]->GetSupportedFileExtensionCount();
 	
 	return ( extNum < 0 || extNum >= c ) ? nullptr : m_VideoSystems[n]->GetSupportedFileExtension( extNum );
 	
@@ -603,7 +603,7 @@ VideoResult_t CValveVideoServices::DestroyVideoMaterial( IVideoMaterial* pVideoM
 {
 	AssertPtrExitV( pVideoMaterial, SetResult( VideoResult::BAD_INPUT_PARAMETERS ) );
 
-	for ( int i = 0; i < m_MaterialList.Count(); i++ )
+	for ( intp i = 0; i < m_MaterialList.Count(); i++ )
 	{
 		if ( m_MaterialList[i].m_pObject == pVideoMaterial )
 		{
@@ -615,9 +615,6 @@ VideoResult_t CValveVideoServices::DestroyVideoMaterial( IVideoMaterial* pVideoM
 	}
 
 	return SetResult( VideoResult::RECORDER_NOT_FOUND );
-
-
-	return VideoResult::SUCCESS;
 }
 
 
@@ -683,7 +680,7 @@ VideoResult_t CValveVideoServices::DestroyVideoRecorder( IVideoRecorder *pVideoR
 {
 	AssertPtrExitV( pVideoRecorder, SetResult( VideoResult::BAD_INPUT_PARAMETERS ) );
 
-	for ( int i = 0; i < m_RecorderList.Count(); i++ )
+	for ( intp i = 0; i < m_RecorderList.Count(); i++ )
 	{
 		if ( m_RecorderList[i].m_pObject == pVideoRecorder )
 		{
@@ -788,7 +785,7 @@ const wchar_t *CValveVideoServices::GetCodecName( VideoEncodeCodec_t nCodec )
 		"#Codec_WEBM",
 	};
 
-	if ( nCodec < 0 || nCodec >= VideoEncodeCodec::CODEC_COUNT )
+	if ( nCodec < VideoEncodeCodec::MPEG2_CODEC || nCodec >= VideoEncodeCodec::CODEC_COUNT )
 	{
 		AssertMsg( 0, "Invalid codec in CValveVideoServices::GetCodecName()" );
 		return NULL;
@@ -914,7 +911,7 @@ search_for_video:
 		if ( pExt != nullptr )
 		{
 			// compare file extensions
-			for ( int i = 0; i < m_ExtInfo.Count(); i++ )
+			for ( intp i = 0; i < m_ExtInfo.Count(); i++ )
 			{
 				// do we match a known extension?
 				if ( stricmp( pExt, m_ExtInfo[i].m_FileExtension ) == STRINGS_MATCH )
@@ -992,7 +989,7 @@ VideoSystem_t CValveVideoServices::LocateSystemAndFeaturesForFileName( const cha
 	V_strncpy( fileExt, pExt, sizeof(fileExt) );
 	V_strlower( fileExt );
 	
-	for ( int i = 0; i < m_ExtInfo.Count(); i++ )
+	for ( intp i = 0; i < m_ExtInfo.Count(); i++ )
 	{
 		if ( V_stricmp( fileExt, m_ExtInfo[i].m_FileExtension ) == STRINGS_MATCH )
 		{
@@ -1334,7 +1331,7 @@ bool CVideoCommonServices::ProcessFullScreenInput( bool &bAbortEvent, bool &bPau
 		// did we get a quit message?
 		if ( msg.message == WM_QUIT )
 		{
-			::PostQuitMessage( msg.wParam );
+			::PostQuitMessage( static_cast<int>(msg.wParam) );
 			return true;			
 		}
 	

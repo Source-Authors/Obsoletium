@@ -39,7 +39,7 @@ struct CActiveVideoObjectRecord_t
 // Main VIDEO_SERVICES interface
 //-----------------------------------------------------------------------------
 
-class CValveVideoServices : public CTier3AppSystem< IVideoServices >
+class CValveVideoServices final : public CTier3AppSystem< IVideoServices >
 {
 	typedef CTier3AppSystem< IVideoServices > BaseClass;
 
@@ -48,60 +48,60 @@ class CValveVideoServices : public CTier3AppSystem< IVideoServices >
 		~CValveVideoServices();
 	
 		// Inherited from IAppSystem 
-		virtual bool					Connect( CreateInterfaceFn factory );
-		virtual void					Disconnect();
-		virtual void				   *QueryInterface( const char *pInterfaceName );
-		virtual InitReturnVal_t			Init();
-		virtual void					Shutdown();
+		bool					Connect( CreateInterfaceFn factory ) override;
+		void					Disconnect() override;
+		void				   *QueryInterface( const char *pInterfaceName ) override;
+		InitReturnVal_t			Init() override;
+		void					Shutdown() override;
 		
 		// Inherited from IVideoServices
 	
 		// Query the available video systems
-		virtual int						GetAvailableVideoSystemCount();
-		virtual VideoSystem_t			GetAvailableVideoSystem( int n );
+		int						GetAvailableVideoSystemCount() override;
+		VideoSystem_t			GetAvailableVideoSystem( int n ) override;
 		
-		virtual bool					IsVideoSystemAvailable( VideoSystem_t videoSystem );
-		virtual VideoSystemStatus_t		GetVideoSystemStatus( VideoSystem_t videoSystem );
-		virtual VideoSystemFeature_t	GetVideoSystemFeatures( VideoSystem_t videoSystem );
-		virtual const char			   *GetVideoSystemName( VideoSystem_t videoSystem );
+		bool					IsVideoSystemAvailable( VideoSystem_t videoSystem ) override;
+		VideoSystemStatus_t		GetVideoSystemStatus( VideoSystem_t videoSystem ) override;
+		VideoSystemFeature_t	GetVideoSystemFeatures( VideoSystem_t videoSystem ) override;
+		const char			   *GetVideoSystemName( VideoSystem_t videoSystem ) override;
 
-		virtual VideoSystem_t			FindNextSystemWithFeature( VideoSystemFeature_t features, VideoSystem_t startAfter = VideoSystem::NONE );
+		VideoSystem_t			FindNextSystemWithFeature( VideoSystemFeature_t features, VideoSystem_t startAfter = VideoSystem::NONE ) override;
 		
-		virtual VideoResult_t			GetLastResult();
+		VideoResult_t			GetLastResult() override;
 		
 		// deal with video file extensions and video system mappings
-		virtual	int						GetSupportedFileExtensionCount( VideoSystem_t videoSystem );		
-		virtual const char             *GetSupportedFileExtension( VideoSystem_t videoSystem, int extNum = 0 );
-		virtual VideoSystemFeature_t    GetSupportedFileExtensionFeatures( VideoSystem_t videoSystem, int extNum = 0 );
+		int						GetSupportedFileExtensionCount( VideoSystem_t videoSystem ) override;		
+		const char             *GetSupportedFileExtension( VideoSystem_t videoSystem, int extNum = 0 ) override;
+		VideoSystemFeature_t    GetSupportedFileExtensionFeatures( VideoSystem_t videoSystem, int extNum = 0 ) override;
 
 
-		virtual	VideoSystem_t			LocateVideoSystemForPlayingFile( const char *pFileName, VideoSystemFeature_t playMode = VideoSystemFeature::PLAY_VIDEO_FILE_IN_MATERIAL );
-		virtual VideoResult_t			LocatePlayableVideoFile( const char *pSearchFileName, const char *pPathID, VideoSystem_t *pPlaybackSystem, char *pPlaybackFileName, int fileNameMaxLen, VideoSystemFeature_t playMode = VideoSystemFeature::FULL_PLAYBACK );
+		VideoSystem_t			LocateVideoSystemForPlayingFile( const char *pFileName, VideoSystemFeature_t playMode = VideoSystemFeature::PLAY_VIDEO_FILE_IN_MATERIAL ) override;
+		VideoResult_t			LocatePlayableVideoFile( const char *pSearchFileName, const char *pPathID, VideoSystem_t *pPlaybackSystem, char *pPlaybackFileName, int fileNameMaxLen, VideoSystemFeature_t playMode = VideoSystemFeature::FULL_PLAYBACK ) override;
 
 		// Create/destroy a video material
-		virtual IVideoMaterial		   *CreateVideoMaterial( const char *pMaterialName, const char *pVideoFileName, const char *pPathID = nullptr, 
-															 VideoPlaybackFlags_t playbackFlags = VideoPlaybackFlags::DEFAULT_MATERIAL_OPTIONS, 
-															 VideoSystem_t videoSystem = VideoSystem::DETERMINE_FROM_FILE_EXTENSION, bool PlayAlternateIfNotAvailable = true );
-															 
-		virtual VideoResult_t			DestroyVideoMaterial( IVideoMaterial* pVideoMaterial );
-		virtual int						GetUniqueMaterialID();
+		IVideoMaterial		   *CreateVideoMaterial( const char *pMaterialName, const char *pVideoFileName, const char *pPathID = nullptr, 
+													 VideoPlaybackFlags_t playbackFlags = VideoPlaybackFlags::DEFAULT_MATERIAL_OPTIONS, 
+													 VideoSystem_t videoSystem = VideoSystem::DETERMINE_FROM_FILE_EXTENSION, bool PlayAlternateIfNotAvailable = true ) override;
+													 
+		VideoResult_t			DestroyVideoMaterial( IVideoMaterial* pVideoMaterial ) override;
+		int						GetUniqueMaterialID() override;
 
 		// Create/destroy a video encoder
-		virtual VideoResult_t			IsRecordCodecAvailable( VideoSystem_t videoSystem, VideoEncodeCodec_t codec );
+		VideoResult_t			IsRecordCodecAvailable( VideoSystem_t videoSystem, VideoEncodeCodec_t codec ) override;
 		
-		virtual IVideoRecorder		   *CreateVideoRecorder( VideoSystem_t videoSystem );
-		virtual VideoResult_t			DestroyVideoRecorder( IVideoRecorder *pVideoRecorder );
+		IVideoRecorder		   *CreateVideoRecorder( VideoSystem_t videoSystem ) override;
+		VideoResult_t			DestroyVideoRecorder( IVideoRecorder *pVideoRecorder ) override;
 
 		// Plays a given video file until it completes or the user presses ESC, SPACE, or ENTER
-		virtual VideoResult_t			PlayVideoFileFullScreen( const char *pFileName, const char *pPathID, void *mainWindow, int windowWidth, int windowHeight, int desktopWidth, int desktopHeight, bool windowed, float forcedMinTime, 
+		VideoResult_t			PlayVideoFileFullScreen( const char *pFileName, const char *pPathID, void *mainWindow, int windowWidth, int windowHeight, int desktopWidth, int desktopHeight, bool windowed, float forcedMinTime, 
 																 VideoPlaybackFlags_t playbackFlags = VideoPlaybackFlags::DEFAULT_FULLSCREEN_OPTIONS, 
-																 VideoSystem_t videoSystem = VideoSystem::DETERMINE_FROM_FILE_EXTENSION, bool PlayAlternateIfNotAvailable = true );
+																 VideoSystem_t videoSystem = VideoSystem::DETERMINE_FROM_FILE_EXTENSION, bool PlayAlternateIfNotAvailable = true ) override;
 
 		// Sets the sound devices that the video will decode to
-		virtual VideoResult_t			SoundDeviceCommand( VideoSoundDeviceOperation_t operation, void *pDevice = nullptr, void *pData = nullptr, VideoSystem_t videoSystem = VideoSystem::ALL_VIDEO_SYSTEMS );
+		VideoResult_t			SoundDeviceCommand( VideoSoundDeviceOperation_t operation, void *pDevice = nullptr, void *pData = nullptr, VideoSystem_t videoSystem = VideoSystem::ALL_VIDEO_SYSTEMS ) override;
 
 		// Get the name of a codec as a string
-		const wchar_t					*GetCodecName( VideoEncodeCodec_t nCodec );
+		const wchar_t					*GetCodecName( VideoEncodeCodec_t nCodec ) override;
 
 	private:
 	
@@ -116,7 +116,7 @@ class CValveVideoServices : public CTier3AppSystem< IVideoServices >
 		bool							ConnectVideoLibraries( CreateInterfaceFn factory );
 		bool							DisconnectVideoLibraries();
 		
-		int								DestroyAllVideoInterfaces();
+		ptrdiff_t								DestroyAllVideoInterfaces();
 
 		int								GetIndexForSystem( VideoSystem_t n );
 		VideoSystem_t					GetSystemForIndex( int n );
@@ -148,24 +148,24 @@ class CValveVideoServices : public CTier3AppSystem< IVideoServices >
 };
 
 
-class CVideoCommonServices : public IVideoCommonServices
+class CVideoCommonServices final : public IVideoCommonServices
 {
 	public:
 	
 		CVideoCommonServices();
-		~CVideoCommonServices();
+		virtual ~CVideoCommonServices();
 	
 	
-		virtual bool			CalculateVideoDimensions( int videoWidth, int videoHeight, int displayWidth, int displayHeight, VideoPlaybackFlags_t playbackFlags, 
-													  int *pOutputWidth, int *pOutputHeight, int *pXOffset, int *pYOffset );
+		bool			CalculateVideoDimensions( int videoWidth, int videoHeight, int displayWidth, int displayHeight, VideoPlaybackFlags_t playbackFlags, 
+											  int *pOutputWidth, int *pOutputHeight, int *pXOffset, int *pYOffset ) override;
 
-		virtual	float			GetSystemVolume();
-													  
-		virtual VideoResult_t	InitFullScreenPlaybackInputHandler( VideoPlaybackFlags_t playbackFlags, float forcedMinTime, bool windowed );
+		float			GetSystemVolume() override;
+											  
+		VideoResult_t	InitFullScreenPlaybackInputHandler( VideoPlaybackFlags_t playbackFlags, float forcedMinTime, bool windowed ) override;
 		
-		virtual bool			ProcessFullScreenInput( bool &bAbortEvent, bool &bPauseEvent, bool &bQuitEvent );
+		bool			ProcessFullScreenInput( bool &bAbortEvent, bool &bPauseEvent, bool &bQuitEvent ) override;
 		
-		virtual VideoResult_t	TerminateFullScreenPlaybackInputHandler();
+		VideoResult_t	TerminateFullScreenPlaybackInputHandler() override;
 
 
 	private:

@@ -344,13 +344,13 @@ typedef AudioEncodeOptions::EAudioEncodeOptions_t AudioEncodeOptions_t;
 class VideoFrameRate_t
 {
 	public:
-		inline						VideoFrameRate_t() : m_TimeUnitsPerSecond( 0 ), m_TimeUnitsPerFrame( 1000 ) {};
+		inline						VideoFrameRate_t() : m_TimeUnitsPerSecond( 0 ), m_TimeUnitsPerFrame( 1000 ) {}
 		
 		inline						VideoFrameRate_t( int FPS, bool NTSC )		{ SetFPS( FPS, NTSC); } 
-		inline	explicit			VideoFrameRate_t( float FPS )				{ SetFPS( FPS); };
+		inline	explicit			VideoFrameRate_t( float FPS )				{ SetFPS( FPS); }
 
 		inline VideoFrameRate_t&	operator=( const VideoFrameRate_t& rhs ) { m_TimeUnitsPerSecond = rhs.m_TimeUnitsPerSecond; m_TimeUnitsPerFrame = rhs.m_TimeUnitsPerFrame; return *this; }
-		inline						VideoFrameRate_t( const VideoFrameRate_t &rhs ) { *this = rhs; };
+		inline						VideoFrameRate_t( const VideoFrameRate_t &rhs ) { *this = rhs; }
 
 		inline void					SetRaw( int timeUnitsPerSecond, int TimeUnitsPerFrame )		{ m_TimeUnitsPerSecond = timeUnitsPerSecond; m_TimeUnitsPerFrame = TimeUnitsPerFrame; }
 		

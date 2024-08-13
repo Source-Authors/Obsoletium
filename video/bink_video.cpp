@@ -46,8 +46,8 @@ VideoFileExtensionInfo_t s_BinkExtensions[] =
 	{ ".bik", VideoSystem::BINK,  VideoSystemFeature::PLAY_VIDEO_FILE_IN_MATERIAL | VideoSystemFeature::PLAY_VIDEO_FILE_FULL_SCREEN },
 };
 
-const int s_BinkExtensionCount = ARRAYSIZE( s_BinkExtensions );
-const VideoSystemFeature_t	CBinkVideoSubSystem::DEFAULT_FEATURE_SET = VideoSystemFeature::PLAY_VIDEO_FILE_IN_MATERIAL;
+constexpr ptrdiff_t s_BinkExtensionCount = ssize( s_BinkExtensions );
+constexpr VideoSystemFeature_t	CBinkVideoSubSystem::DEFAULT_FEATURE_SET = VideoSystemFeature::PLAY_VIDEO_FILE_IN_MATERIAL;
 
 // ===========================================================================
 // CBinkVideoSubSystem class
@@ -95,7 +95,7 @@ void* CBinkVideoSubSystem::QueryInterface( const char *pInterfaceName )
 
 	if ( IS_NOT_EMPTY( pInterfaceName ) )
 	{
-		if ( V_strncmp(	pInterfaceName, VIDEO_SUBSYSTEM_INTERFACE_VERSION, Q_strlen( VIDEO_SUBSYSTEM_INTERFACE_VERSION ) + 1) == STRINGS_MATCH )
+		if ( V_strncmp(	pInterfaceName, VIDEO_SUBSYSTEM_INTERFACE_VERSION, ssize( VIDEO_SUBSYSTEM_INTERFACE_VERSION ) ) == STRINGS_MATCH )
 		{
 			return (IVideoSubSystem*) this;
 		}
@@ -173,7 +173,7 @@ bool CBinkVideoSubSystem::ShutdownVideoSystem()
 }
 
 
-VideoResult_t CBinkVideoSubSystem::VideoSoundDeviceCMD( VideoSoundDeviceOperation_t operation, void *pDevice, void *pData )
+VideoResult_t CBinkVideoSubSystem::VideoSoundDeviceCMD( VideoSoundDeviceOperation_t operation, void *pDevice, void * )
 {
 	switch ( operation ) 
 	{
@@ -490,7 +490,7 @@ IVideoRecorder* CBinkVideoSubSystem::CreateVideoRecorder()
 }
 
 
-VideoResult_t CBinkVideoSubSystem::DestroyVideoRecorder( IVideoRecorder *pRecorder )
+VideoResult_t CBinkVideoSubSystem::DestroyVideoRecorder( IVideoRecorder * )
 {
 	return SetResult( VideoResult::FEATURE_NOT_AVAILABLE );
 }
