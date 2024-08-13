@@ -28,7 +28,7 @@ class ImagePanel;
 //-----------------------------------------------------------------------------
 class PropertySheet : public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( PropertySheet, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( PropertySheet, EditablePanel );
 
 public:
 	PropertySheet(Panel *parent, const char *panelName, bool draggableTabs = false );
@@ -63,9 +63,9 @@ public:
 	virtual void ApplyChanges();
 
 	// focus handling - passed on to current active page
-	virtual void RequestFocus(int direction = 0);
-	virtual bool RequestFocusPrev(VPANEL panel = NULL);
-	virtual bool RequestFocusNext(VPANEL panel = NULL);
+	void RequestFocus(int direction = 0) override;
+	bool RequestFocusPrev(VPANEL panel = NULL) override;
+	bool RequestFocusNext(VPANEL panel = NULL) override;
 
 	// returns the ith panel 
 	virtual Panel *GetPage(int i);
@@ -109,10 +109,10 @@ public:
 		"ApplyChanges" - sent when data should be written to doc
 	*/
 
-	virtual void OnPanelDropped( CUtlVector< KeyValues * >& msglist );
-	virtual bool IsDroppable( CUtlVector< KeyValues * >& msglist );
+	void OnPanelDropped( CUtlVector< KeyValues * >& msglist ) override;
+	bool IsDroppable( CUtlVector< KeyValues * >& msglist ) override;
 	// Mouse is now over a droppable panel
-	virtual void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels );
+	void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels ) override;
 	
 	void		ShowContextButtons( bool state );
 	bool		ShouldShowContextButtons() const;
@@ -124,17 +124,17 @@ public:
 	void		SetKBNavigationEnabled( bool state );
 	bool		IsKBNavigationEnabled() const;
 
-	virtual bool HasUserConfigSettings() { return true; }
+	bool HasUserConfigSettings() override { return true; }
 
 protected:
-	virtual void PaintBorder();
-	virtual void PerformLayout();
-	virtual Panel *HasHotkey(wchar_t key);
-	virtual void ChangeActiveTab(int index);
-	virtual void OnKeyCodePressed(KeyCode code);
-	virtual void OnCommand(const char *command);
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void ApplySettings(KeyValues *inResourceData);
+	void PaintBorder() override;
+	void PerformLayout() override;
+	virtual Panel *HasHotkey(wchar_t key) override;
+	void ChangeActiveTab(int index);
+	void OnKeyCodePressed(KeyCode code) override;
+	void OnCommand(const char *command) override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void ApplySettings(KeyValues *inResourceData) override;
 
 	// internal message handlers
 	MESSAGE_FUNC_PTR( OnTabPressed, "TabPressed", panel );
@@ -142,10 +142,10 @@ protected:
 	MESSAGE_FUNC_PARAMS( OnOpenContextMenu, "OpenContextMenu", params );
 	MESSAGE_FUNC( OnApplyButtonEnable, "ApplyButtonEnable" );
 	// called when default button has been set
-	MESSAGE_FUNC_HANDLE( OnDefaultButtonSet, "DefaultButtonSet", button );
+	MESSAGE_FUNC_HANDLE_OVERRIDE( OnDefaultButtonSet, "DefaultButtonSet", button );
 	// called when the current default button has been set
-	MESSAGE_FUNC_HANDLE( OnCurrentDefaultButtonSet, "CurrentDefaultButtonSet", button);
-    MESSAGE_FUNC( OnFindDefaultButton, "FindDefaultButton" );
+	MESSAGE_FUNC_HANDLE_OVERRIDE( OnCurrentDefaultButtonSet, "CurrentDefaultButtonSet", button);
+    MESSAGE_FUNC_OVERRIDE( OnFindDefaultButton, "FindDefaultButton" );
 
 private:
 	

@@ -50,7 +50,7 @@ struct PanelItem_t
 
 class CSmallTextEntry : public TextEntry
 {
-	DECLARE_CLASS_SIMPLE( CSmallTextEntry, TextEntry );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSmallTextEntry, TextEntry );
 public:
 
 	CSmallTextEntry( Panel *parent, char const *panelName ) :
@@ -58,7 +58,7 @@ public:
 	{
 	}
 
-	virtual void ApplySchemeSettings( IScheme *scheme )
+	void ApplySchemeSettings( IScheme *scheme ) override
 	{
 		BaseClass::ApplySchemeSettings( scheme );
 
@@ -110,7 +110,7 @@ public:
 //-----------------------------------------------------------------------------
 class BuildModeLocalizedStringEditDialog : public Frame
 {
-	DECLARE_CLASS_SIMPLE(BuildModeLocalizedStringEditDialog, Frame);
+	DECLARE_CLASS_SIMPLE_OVERRIDE(BuildModeLocalizedStringEditDialog, Frame);
 
 public:
 
@@ -155,18 +155,18 @@ public:
 	}
 
 private:
-	virtual void PerformLayout()
+	void PerformLayout() override
 	{
 	}
 
-	virtual void OnClose()
+	void OnClose() override
 	{
 		input()->SetAppModalSurface(NULL);
 		BaseClass::OnClose();
 		//PostActionSignal(new KeyValues("Command"
 	}
 
-	virtual void OnCommand(const char *command)
+	void OnCommand(const char *command) override
 	{
 		if (!stricmp(command, "OK"))
 		{
@@ -281,7 +281,7 @@ void BuildModeDialog::OnClose()
 
 class CBuildModeNavCombo : public ComboBox
 {
-	DECLARE_CLASS_SIMPLE( CBuildModeNavCombo, ComboBox );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBuildModeNavCombo, ComboBox );
 public:
 
 	CBuildModeNavCombo(Panel *parent, const char *panelName, int numLines, bool allowEdit, bool getParents, Panel *context ) : 
@@ -291,7 +291,7 @@ public:
 		m_hContext = context;
 	}
 	
-	virtual void OnShowMenu(Menu *menu)
+	void OnShowMenu(Menu *menu) override
 	{
 		menu->DeleteAllItems();
 		if ( !m_hContext.Get() )
@@ -980,20 +980,20 @@ void BuildModeDialog::ApplyDataToControls()
 	KeyValues *dat = new KeyValues( m_pCurrentPanel->GetName() );
 
 	// loop through the textedit filling in settings
-	for ( const auto &panel : m_pPanelList->m_PanelList )
+	for ( const auto &p : m_pPanelList->m_PanelList )
 	{
-		const char *name = panel.m_szName;
+		const char *name = p.m_szName;
 		char buf[512];
-		if (panel.m_EditPanel)
+		if (p.m_EditPanel)
 		{
-			panel.m_EditPanel->GetText(buf, sizeof(buf));
+			p.m_EditPanel->GetText(buf, sizeof(buf));
 		}
 		else
 		{
-			panel.m_EditButton->GetText(buf, sizeof(buf));
+			p.m_EditButton->GetText(buf, sizeof(buf));
 		}
 
-		switch (panel.m_iType)
+		switch (p.m_iType)
 		{
 		case TYPE_CORNER:
 		case TYPE_AUTORESIZE:

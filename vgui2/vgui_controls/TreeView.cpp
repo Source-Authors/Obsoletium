@@ -48,7 +48,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class TreeNodeText : public TextEntry
 {
-	DECLARE_CLASS_SIMPLE( TreeNodeText, TextEntry );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( TreeNodeText, TextEntry );
 
 public:
     TreeNodeText(Panel *parent, const char *panelName, TreeView *tree) : BaseClass(parent, panelName), m_pTree( tree )
@@ -69,7 +69,7 @@ public:
 		GetParent()->InvalidateLayout();
 	}
 
-	bool IsKeyRebound( KeyCode code, int modifiers )
+	bool IsKeyRebound( KeyCode code, int modifiers ) override
 	{
 		// If in editing mode, don't try and chain keypresses
 		if ( m_bEditingInPlace )
@@ -80,7 +80,7 @@ public:
 		return BaseClass::IsKeyRebound( code, modifiers );
 	}
 
-	virtual void PaintBackground()
+	void PaintBackground() override
 	{
 		BaseClass::PaintBackground();
 
@@ -96,14 +96,14 @@ public:
 		surface()->DrawOutlinedRect( 0, 0, w, h );
 	}
 
-	virtual void ApplySchemeSettings(IScheme *pScheme)
+	void ApplySchemeSettings(IScheme *pScheme) override
     {
         TextEntry::ApplySchemeSettings(pScheme);
         SetBorder(NULL);
         SetCursor(dc_arrow);
     }
 
-    virtual void OnKeyCodeTyped(KeyCode code)
+    void OnKeyCodeTyped(KeyCode code) override
     {
 		if ( m_bEditingInPlace )
 		{
@@ -134,7 +134,7 @@ public:
 
 #define CLICK_TO_EDIT_DELAY_MSEC 500
 
-	virtual void OnTick()
+	void OnTick() override
 	{
 		BaseClass::OnTick();
 		if ( m_bArmForEditing )
@@ -151,7 +151,7 @@ public:
 		}
 	}
 
-	virtual void OnMouseReleased( MouseCode code )
+	void OnMouseReleased( MouseCode code ) override
 	{
 		if ( m_bEditingInPlace )
 		{
@@ -177,13 +177,13 @@ public:
 		CallParentFunction(new KeyValues("MouseReleased", "code", code));
 	}
 
-	virtual void OnCursorMoved( int x, int y )
+	void OnCursorMoved( int x, int y ) override
 	{
 		 // let parent deal with it
 		CallParentFunction(new KeyValues("OnCursorMoved", "x", x, "y", y));
 	}
 
-	virtual void OnMousePressed(MouseCode code)
+	void OnMousePressed(MouseCode code) override
     {
 		if ( m_bEditingInPlace )
 		{
@@ -227,7 +227,7 @@ public:
 		return m_bLabelEditingAllowed;
 	}
 
-    virtual void OnMouseDoublePressed(MouseCode code)
+    void OnMouseDoublePressed(MouseCode code) override
  	{
 		// Once we are editing, double pressing shouldn't chain up
 		if ( m_bEditingInPlace )
@@ -292,14 +292,14 @@ public:
 		}
 	}
 
-	virtual void OnKillFocus()
+	void OnKillFocus() override
 	{
 		BaseClass::OnKillFocus();
 
 		FinishEditingInPlace();
 	}
 
-	virtual void OnMouseWheeled(int delta)
+	void OnMouseWheeled(int delta) override
     {
 		if ( m_bEditingInPlace )
 		{
@@ -340,25 +340,25 @@ public:
 	}
 
  	//!! this could possibly be changed to just disallow mouse input on the image panel
-    virtual void OnMousePressed(MouseCode code)
+    void OnMousePressed(MouseCode code) override
     {
         // let parent deal with it
 		CallParentFunction(new KeyValues("MousePressed", "code", code));
     }
 	
-    virtual void OnMouseDoublePressed(MouseCode code)
+    void OnMouseDoublePressed(MouseCode code) override
     {
         // let parent deal with it
 		CallParentFunction(new KeyValues("MouseDoublePressed", "code", code));
     }
 
-    virtual void OnMouseWheeled(int delta)
+    void OnMouseWheeled(int delta) override
     {
         // let parent deal with it
 		CallParentFunction(new KeyValues("MouseWheeled", "delta", delta));
     }
 
-	virtual void OnCursorMoved( int x, int y )
+	void OnCursorMoved( int x, int y ) override
 	{
 		 // let parent deal with it
 		CallParentFunction(new KeyValues("OnCursorMoved", "x", x, "y", y));
@@ -373,30 +373,30 @@ class TreeViewSubPanel : public Panel
 public:
     TreeViewSubPanel(Panel *parent) : Panel(parent) {}
 
-    virtual void ApplySchemeSettings(IScheme *pScheme)
+    void ApplySchemeSettings(IScheme *pScheme) override
     {
     	Panel::ApplySchemeSettings(pScheme);
     
     	SetBorder(NULL);
-   }
+    }
 
-	virtual void OnMouseWheeled(int delta)
+	void OnMouseWheeled(int delta) override
     {
         // let parent deal with it
 		CallParentFunction(new KeyValues("MouseWheeled", "delta", delta));
     }
-	virtual void OnMousePressed(MouseCode code)
+	void OnMousePressed(MouseCode code) override
     {
         // let parent deal with it
 		CallParentFunction(new KeyValues("MousePressed", "code", code));
     }
-    virtual void OnMouseDoublePressed(MouseCode code)
+    void OnMouseDoublePressed(MouseCode code) override
     {
         // let parent deal with it
 		CallParentFunction(new KeyValues("MouseDoublePressed", "code", code));
     }
 
-	virtual void OnCursorMoved( int x, int y )
+	void OnCursorMoved( int x, int y ) override
 	{
 		 // let parent deal with it
 		CallParentFunction(new KeyValues("OnCursorMoved", "x", x, "y", y));
@@ -408,7 +408,7 @@ public:
 //-----------------------------------------------------------------------------
 class TreeNode : public Panel
 {
-	DECLARE_CLASS_SIMPLE( TreeNode, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( TreeNode, Panel );
 
 public:
     TreeNode(Panel *parent, TreeView *pTreeView);
@@ -419,8 +419,8 @@ public:
     bool IsSelected();
 	// currently unused, could be re-used if necessary
 //	bool IsInFocus();
-	virtual void PaintBackground();
-    virtual void PerformLayout();
+	void PaintBackground() override;
+    void PerformLayout() override;
 	TreeNode *GetParentNode();
     int GetChildrenCount();
 	void ClearChildren();
@@ -437,12 +437,13 @@ public:
     int GetDepth();
     bool HasParent(TreeNode *pTreeNode);
     bool IsBeingDisplayed();
-	virtual void SetVisible(bool state);
-    virtual void Paint();
-    virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void SetBgColor( Color color );
-	virtual void SetFgColor( Color color );
-    virtual void OnSetFocus();
+
+	void SetVisible(bool state) override;
+    void Paint() override;
+    void ApplySchemeSettings(IScheme *pScheme) override;
+	void SetBgColor( Color color ) override;
+	void SetFgColor( Color color ) override;
+    void OnSetFocus() override;
     void SelectPrevChild(TreeNode *pCurrentChild);
     void SelectNextChild(TreeNode *pCurrentChild);
 
@@ -453,31 +454,31 @@ public:
 	virtual void StepInto( bool bClosePrevious=true );
 	virtual void StepOut( bool bClosePrevious=true );
 	virtual void StepOver( bool bClosePrevious=true );
-    virtual void OnKeyCodeTyped(KeyCode code);
- 	virtual void OnMouseWheeled(int delta);
-    virtual void OnMousePressed( MouseCode code);
-	virtual void OnMouseReleased( MouseCode code);
-	virtual void OnCursorMoved( int x, int y );
-	virtual bool IsDragEnabled() const;
+    void OnKeyCodeTyped(KeyCode code) override;
+ 	void OnMouseWheeled(int delta) override;
+    void OnMousePressed(MouseCode code) override;
+	void OnMouseReleased( MouseCode code) override;
+	void OnCursorMoved( int x, int y ) override;
+	bool IsDragEnabled() const override;
     void PositionAndSetVisibleNodes(int &nStart, int &nCount, int x, int &y);
 
     // counts items above this item including itself
     int CountVisibleIndex();
 
-	virtual void OnCreateDragData( KeyValues *msg );
+	void OnCreateDragData( KeyValues *msg ) override;
 	// For handling multiple selections...
-	virtual void OnGetAdditionalDragPanels( CUtlVector< Panel * >& dragabbles );
-	virtual void OnMouseDoublePressed( MouseCode code );
+	void OnGetAdditionalDragPanels( CUtlVector< Panel * >& dragabbles ) override;
+	void OnMouseDoublePressed( MouseCode code ) override;
 	TreeNode *FindItemUnderMouse( int &nStart, int& nCount, int x, int &y, int mx, int my );
 	MESSAGE_FUNC_PARAMS( OnLabelChanged, "LabelChanged", data );
 	void EditLabel();
 	void	SetLabelEditingAllowed( bool state );
 	bool	IsLabelEditingAllowed() const;
 
-	virtual bool IsDroppable( CUtlVector< KeyValues * >& msglist );
-	virtual void OnPanelDropped( CUtlVector< KeyValues * >& msglist );
-	virtual HCursor GetDropCursor( CUtlVector< KeyValues * >& msglist );
-	virtual bool GetDropContextMenu( Menu *menu, CUtlVector< KeyValues * >& msglist );
+	bool IsDroppable( CUtlVector< KeyValues * >& msglist ) override;
+	void OnPanelDropped( CUtlVector< KeyValues * >& msglist ) override;
+	HCursor GetDropCursor( CUtlVector< KeyValues * >& msglist ) override;
+	bool GetDropContextMenu( Menu *menu, CUtlVector< KeyValues * >& msglist ) override;
 
 	void				FindNodesInRange( CUtlVector< TreeNode * >& list, int startIndex, int endIndex );
 
@@ -2454,13 +2455,13 @@ void TreeView::SetBgColor( Color color )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void TreeView::OnSliderMoved( int position )
+void TreeView::OnSliderMoved( int )
 {
 	InvalidateLayout();
 	Repaint();
 }
 
-void TreeView::GenerateDragDataForItem( int itemIndex, KeyValues *msg )
+void TreeView::GenerateDragDataForItem( int, KeyValues * )
 {
 	// Implemented by subclassed TreeView
 }
@@ -2470,7 +2471,7 @@ void TreeView::SetDragEnabledItems( bool state )
 	m_bDragEnabledItems = state;
 }
 
-void TreeView::OnLabelChanged( int itemIndex, char const *oldString, char const *newString )
+void TreeView::OnLabelChanged( int, char const *, char const * )
 {
 }
 
@@ -2783,22 +2784,22 @@ int TreeView::GetNextChildItemIndex( int itemIndex )
 	return parent->GetNextChildItemIndex( sel );
 }
 
-bool TreeView::IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& msglist )
+bool TreeView::IsItemDroppable( int, CUtlVector< KeyValues * >& )
 {
 	// Derived classes should implement
 	return false;
 }
 
-void TreeView::OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& msglist )
+void TreeView::OnItemDropped( int, CUtlVector< KeyValues * >& )
 {
 }
 
-bool TreeView::GetItemDropContextMenu( int itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist )
+bool TreeView::GetItemDropContextMenu( int, Menu *, CUtlVector< KeyValues * >& )
 {
 	return false;
 }
 
-HCursor TreeView::GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist )
+HCursor TreeView::GetItemDropCursor( int, CUtlVector< KeyValues * >& )
 {
 	return dc_arrow;
 }

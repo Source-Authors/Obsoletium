@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //
 //=============================================================================//
- //========= Copyright © 1996-2003, Valve LLC, All rights reserved. ============
+ //========= Copyright ?1996-2003, Valve LLC, All rights reserved. ============
 //
 // The copyright to the contents herein is the property of Valve, L.L.C.
 // The contents may be used and/or copied only with the written permission of
@@ -858,15 +858,26 @@ void BuildGroup::PanelAdded(Panel *panel)
 
 	PHandle temp;
 	temp = panel;
-	int c = _panelDar.Count();
-	for ( int i = 0; i < c; ++i )
+	for ( auto &&handle : _panelDar )
 	{
-		if ( _panelDar[ i ] == temp )
+		if ( handle == temp )
 		{
 			return;
 		}
 	}
 	_panelDar.AddToTail(temp);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Remove panel the list of panels that are in the build group
+//-----------------------------------------------------------------------------
+void BuildGroup::PanelRemoved(Panel *panel)
+{
+    Assert(panel);
+
+    PHandle temp;
+    temp = panel;
+    _panelDar.FindAndRemove(temp);
 }
 
 //-----------------------------------------------------------------------------
@@ -1547,7 +1558,7 @@ bool BuildGroup::PrecacheResFile( const char* pszResFileName )
 
 void BuildGroup::ClearResFileCache()
 {
-	int nIndex = m_dictCachedResFiles.First();
+	auto nIndex = m_dictCachedResFiles.First();
 	while( m_dictCachedResFiles.IsValidIndex( nIndex ) )
 	{
 		m_dictCachedResFiles[ nIndex ]->deleteThis();

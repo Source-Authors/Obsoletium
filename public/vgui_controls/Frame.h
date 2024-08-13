@@ -29,7 +29,7 @@ class FrameSystemButton;
 //-----------------------------------------------------------------------------
 class Frame : public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( Frame, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( Frame, EditablePanel );
 
 public:
 	Frame(Panel *parent, const char *panelName, bool showTaskbarIcon = true, bool bPopup = true );
@@ -85,7 +85,7 @@ public:
 	// Stops any window flashing
 	virtual void FlashWindowStop();
 	// command handling
-	virtual void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 
 	// Get the system menu 
 	virtual Menu *GetSysMenu();
@@ -117,7 +117,7 @@ public:
 	*/
 
 	// Load the control settings 
-	virtual void LoadControlSettings( const char *dialogResourceName, const char *pathID = NULL, KeyValues *pPreloadedKeyValues = NULL, KeyValues *pConditions = NULL );
+	void LoadControlSettings( const char *dialogResourceName, const char *pathID = NULL, KeyValues *pPreloadedKeyValues = NULL, KeyValues *pConditions = NULL ) override;
 
 	void SetChainKeysToParent( bool state );
 	bool CanChainKeysToParent() const;
@@ -135,19 +135,19 @@ public:
 
 protected:
 	// Respond to mouse presses
-	virtual void OnMousePressed(MouseCode code);
+	void OnMousePressed(MouseCode code) override;
 	// Respond to Key typing
-	virtual void OnKeyCodeTyped(KeyCode code);
-	virtual void OnKeyTyped(wchar_t unichar);
+	void OnKeyCodeTyped(KeyCode code) override;
+	void OnKeyTyped(wchar_t unichar) override;
 	// Respond to Key releases
-	virtual void OnKeyCodeReleased(KeyCode code);
+	void OnKeyCodeReleased(KeyCode code) override;
 	// Respond to Key focus ticks
-	virtual void OnKeyFocusTicked();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void OnKeyFocusTicked() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 	// Recalculate the position of all items
-	virtual void PerformLayout();
+	void PerformLayout() override;
 	// Respond when a close message is recieved.  Can be called directly to close a frame.
-	virtual void OnClose();
+	void OnClose() override;
 	// Respond to a window finishing its closure. i.e. when a fading window has fully finished its fadeout.
 	virtual void OnFinishedClose();
 	// Minimize the window on the taskbar.
@@ -157,24 +157,24 @@ protected:
 	// the frame close button was pressed
 	MESSAGE_FUNC( OnCloseFrameButtonPressed, "CloseFrameButtonPressed" );
 	// Add the child to the focus nav group
-	virtual void OnChildAdded(VPANEL child);
+	void OnChildAdded(VPANEL child) override;
 	// settings
-	virtual void ApplySettings(KeyValues *inResourceData);
+	void ApplySettings(KeyValues *inResourceData) override;
 	// records the settings into the resource data
-	virtual void GetSettings(KeyValues *outResourceData);
-	virtual const char *GetDescription( void );
+	void GetSettings(KeyValues *outResourceData) override;
+	const char *GetDescription( void ) override;
 
 	// gets the default position and size on the screen to appear the first time (defaults to centered)
 	virtual bool GetDefaultScreenPosition(int &x, int &y, int &wide, int &tall);
 
 	// painting
-	virtual void PaintBackground();
+	void PaintBackground() override;
 
 	// per-frame thinking, used for transition effects
-	virtual void OnThink();
+	void OnThink() override;
 
 	// screen size
-	virtual void OnScreenSizeChanged(int iOldWide, int iOldTall);
+	void OnScreenSizeChanged(int iOldWide, int iOldTall) override;
 
 	// Get the size of the panel inside the frame edges.
 	virtual void GetClientArea(int &x, int &y, int &wide, int &tall);
@@ -182,13 +182,13 @@ protected:
 	// user configuration settings
 	// this is used for any control details the user wants saved between sessions
 	// eg. dialog positions, last directory opened, list column width
-	virtual void ApplyUserConfigSettings(KeyValues *userConfig);
+	void ApplyUserConfigSettings(KeyValues *userConfig) override;
 
 	// returns user config settings for this control
-	virtual void GetUserConfigSettings(KeyValues *userConfig);
+	void GetUserConfigSettings(KeyValues *userConfig) override;
 
 	// optimization, return true if this control has any user config settings
-	virtual bool HasUserConfigSettings();
+	bool HasUserConfigSettings() override;
 
 private:
 	MESSAGE_FUNC_CHARPTR( InternalSetTitle, "SetTitle", text );
@@ -231,7 +231,6 @@ private:
 	int		m_iClientInsetX;
 	int		m_iClientInsetY;
 	int		m_iTitleTextInsetX;
-	int		m_nGripperWidth;
 	VPANEL	m_hPreviousModal;
 	HFont	m_hCustomTitleFont;
 

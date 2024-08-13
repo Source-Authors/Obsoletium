@@ -47,7 +47,7 @@ void DirectoryTreeView::GenerateChildrenOfNode(int itemIndex)
 //-----------------------------------------------------------------------------
 class CreateDirectoryDialog : public Frame
 {
-	DECLARE_CLASS_SIMPLE(CreateDirectoryDialog, Frame);
+	DECLARE_CLASS_SIMPLE_OVERRIDE(CreateDirectoryDialog, Frame);
 
 public:
 	CreateDirectoryDialog(Panel *parent, const char *defaultCreateDirName) : BaseClass(parent, NULL)
@@ -79,7 +79,7 @@ public:
 			vgui::input()->SetAppModalSurface( m_PrevAppFocusPanel );
 	}
 
-	virtual void PerformLayout()
+	void PerformLayout() override
 	{
 		BaseClass::PerformLayout();
 
@@ -88,7 +88,7 @@ public:
 		m_pCancelButton->SetBounds(GetWide() - 94, 64, 72, 24);
 	}
 
-	virtual void OnCommand(const char *command)
+	void OnCommand(const char *command) override
 	{
 		if (!stricmp(command, "OK"))
 		{
@@ -101,7 +101,7 @@ public:
 		}
 	}
 
-	virtual void OnClose()
+	void OnClose() override
 	{
 		BaseClass::OnClose();
 		MarkForDeletion();

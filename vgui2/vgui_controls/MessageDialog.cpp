@@ -57,14 +57,14 @@ CMessageDialog::CMessageDialog( vgui::Panel *pParent, const uint nType, const ch
 
 	if ( pCmdA )
 	{
-		const int len = Q_strlen( pCmdA ) + 1;
+		const intp len = Q_strlen( pCmdA ) + 1;
 		m_pCommands[BTN_A] = (char*)malloc( len );
 		Q_strncpy( m_pCommands[BTN_A], pCmdA, len );
 	}
 
 	if ( pCmdB )
 	{
-		const int len = Q_strlen( pCmdB ) + 1;
+		const intp len = Q_strlen( pCmdB ) + 1;
 		m_pCommands[BTN_B] = (char*)malloc( len );
 		Q_strncpy( m_pCommands[BTN_B], pCmdB, len );
 	}

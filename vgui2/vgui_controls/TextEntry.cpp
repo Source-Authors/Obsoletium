@@ -287,12 +287,12 @@ void TextEntry::SetText(const wchar_t *wszText)
 	{
 		wszText = L"";
 	}
-	int textLen = wcslen(wszText);
+	intp textLen = wcslen(wszText);
 	m_TextStream.RemoveAll();
 	m_TextStream.EnsureCapacity(textLen);
 
-	int missed_count = 0;
-	for (int i = 0; i < textLen; i++)
+	intp missed_count = 0;
+	for (intp i = 0; i < textLen; i++)
 	{
 		if(wszText[i]=='\r') // don't insert \r characters
 		{
@@ -320,7 +320,7 @@ void TextEntry::SetText(const wchar_t *wszText)
 //-----------------------------------------------------------------------------
 // Purpose: Sets the value of char at index position.
 //-----------------------------------------------------------------------------
-void TextEntry::SetCharAt(wchar_t ch, int index)
+void TextEntry::SetCharAt(wchar_t ch, intp index)
 {
 	if ((ch == '\n') || (ch == '\0')) 
 	{
@@ -988,7 +988,6 @@ void TextEntry::RecalculateLineBreaks()
 	int x = DRAW_OFFSET_X, y = DRAW_OFFSET_Y;
 		
 	int wordStartIndex = 0;
-	int wordLength = 0;
 	bool hasWord = false;
 	bool justStartedNewLine = true;
 	bool wordStartedOnNewLine = true;
@@ -1036,7 +1035,6 @@ void TextEntry::RecalculateLineBreaks()
 				wordStartIndex = i;
 				hasWord = true;
 				wordStartedOnNewLine = justStartedNewLine;
-				wordLength = 0;
 			}
 		}
 		else
@@ -1080,14 +1078,10 @@ void TextEntry::RecalculateLineBreaks()
 				// just back to reparse the next line of text
 				i = wordStartIndex;
 			}
-			
-			// reset word length
-			wordLength = 0;
 		}
 		
 		// add to the size
 		x += charWidth;
-		wordLength += charWidth;
 	}
 	
 	_charCount = i-1;
@@ -2120,7 +2114,7 @@ void TextEntry::OnCreateDragData( KeyValues *msg )
 	{
 		int len = r1 - r0;
 		// dimhotepus: Prevent out of txt range read.
-		if ( len > 0 && r0 < (int)std::size(txt) )
+		if ( len > 0 && r0 < ssize(txt) )
 		{
 			char selection[ 512 ];
 			Q_strncpy( selection, &txt[ r0 ], len + 1 );
@@ -3606,11 +3600,11 @@ int TextEntry::GetValueAsInt()
 //-----------------------------------------------------------------------------
 void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) char *buf, int bufLenInBytes)
 {
-	Assert(bufLenInBytes >= sizeof(buf[0]));
+	Assert(bufLenInBytes >= static_cast<int>(sizeof(buf[0])));
 	if (m_TextStream.Count())
 	{
 		// temporarily null terminate the text stream so we can use the conversion function
-		int nullTerminatorIndex = m_TextStream.AddToTail((wchar_t)0);
+		intp nullTerminatorIndex = m_TextStream.AddToTail((wchar_t)0);
 		g_pVGuiLocalize->ConvertUnicodeToANSI(m_TextStream.Base(), buf, bufLenInBytes);
 		m_TextStream.FastRemove(nullTerminatorIndex);
 	}
@@ -3628,7 +3622,7 @@ void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) char *buf, int bufLenInByte
 //-----------------------------------------------------------------------------
 void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *wbuf, int bufLenInBytes)
 {
-	Assert(bufLenInBytes >= sizeof(wbuf[0]));
+	Assert(bufLenInBytes >= static_cast<int>(sizeof(wbuf[0])));
 	int len = m_TextStream.Count();
 	if (m_TextStream.Count())
 	{
@@ -3938,6 +3932,36 @@ void TextEntry::OnChangeIME( bool forward )
 	}
 }
 
+#ifdef PLATFORM_64BITS
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : handleValue - 
+//-----------------------------------------------------------------------------
+void TextEntry::LanguageChanged( uint64 handleValue )
+{
+	input()->OnChangeIMEByHandle( handleValue );
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : handleValue - 
+//-----------------------------------------------------------------------------
+void TextEntry::ConversionModeChanged( uint64 handleValue )
+{
+	input()->OnChangeIMEConversionModeByHandle( handleValue );
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : handleValue - 
+//-----------------------------------------------------------------------------
+void TextEntry::SentenceModeChanged( uint64 handleValue )
+{
+	input()->OnChangeIMESentenceModeByHandle( handleValue );
+}
+#else
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : handleValue - 
@@ -3966,6 +3990,7 @@ void TextEntry::SentenceModeChanged( int handleValue )
 {
 	input()->OnChangeIMESentenceModeByHandle( handleValue );
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -4157,8 +4182,8 @@ void TextEntry::UpdateIMECandidates()
 //-----------------------------------------------------------------------------
 void TextEntry::FlipToLastIME()
 {
-	int hCurrentIME = input()->GetCurrentIMEHandle();
-	int hEnglishIME = input()->GetEnglishIMEHandle();
+	intp hCurrentIME = input()->GetCurrentIMEHandle();
+	intp hEnglishIME = input()->GetEnglishIMEHandle();
 
 	bool isEnglish = ( hCurrentIME == hEnglishIME ) ? true : false;
 
@@ -4180,7 +4205,7 @@ void TextEntry::SetDrawLanguageIDAtLeft( bool state )
 	m_bDrawLanguageIDAtLeft = state;
 }
 
-bool TextEntry::GetDropContextMenu( Menu *menu, CUtlVector< KeyValues * >& msglist )
+bool TextEntry::GetDropContextMenu( Menu *menu, CUtlVector< KeyValues * >& )
 {
 	menu->AddMenuItem( "replace", "#TextEntry_ReplaceText", "replace", this );
 	menu->AddMenuItem( "append", "#TextEntry_AppendText", "append", this );
@@ -4226,8 +4251,8 @@ void TextEntry::OnPanelDropped( CUtlVector< KeyValues * >& msglist )
 	}
 	else if ( !Q_stricmp( cmd, "append" ) )
 	{
-		int newLen = wcslen( newText );
-		int curLen = m_TextStream.Count();
+		intp newLen = V_wcslen( newText );
+		intp curLen = m_TextStream.Count();
 
 		size_t outsize = sizeof( wchar_t ) * ( newLen + curLen + 1 );
 		wchar_t *out = (wchar_t *)_alloca( outsize );
@@ -4241,8 +4266,8 @@ void TextEntry::OnPanelDropped( CUtlVector< KeyValues * >& msglist )
 	}
 	else if ( !Q_stricmp( cmd, "prepend" ) )
 	{
-		int newLen = wcslen( newText );
-		int curLen = m_TextStream.Count();
+		intp newLen = V_wcslen( newText );
+		intp curLen = m_TextStream.Count();
 
 		size_t outsize = sizeof( wchar_t ) * ( newLen + curLen + 1 );
 		wchar_t *out = (wchar_t *)_alloca( outsize );

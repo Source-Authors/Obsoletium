@@ -354,7 +354,7 @@ void Button::Paint(void)
 		int x0, y0, x1, y1;
 		int wide, tall;
 		GetSize(wide, tall);
-		x0 = 3, y0 = 3, x1 = wide - 4 , y1 = tall - 2;
+		x0 = 3; y0 = 3; x1 = wide - 4; y1 = tall - 2;
 		DrawFocusBorder(x0, y0, x1, y1);
 	}
 }
@@ -760,7 +760,7 @@ void Button::FireActionSignal()
 	{
 		// see if it's a url
 		if (!stricmp(_actionMessage->GetName(), "command")
-			&& !strnicmp(_actionMessage->GetString("command", ""), "url ", strlen("url "))
+			&& !strnicmp(_actionMessage->GetString("command", ""), "url ", ssize("url ") - 1)
 			&& strstr(_actionMessage->GetString("command", ""), "://"))
 		{
 			// it's a command to launch a url, run it

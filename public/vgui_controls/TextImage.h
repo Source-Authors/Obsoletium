@@ -34,7 +34,7 @@ struct label_colorchange_t
 class CColorChangeListLess
 {
 public:
-	bool Less( const label_colorchange_t &src1, const label_colorchange_t &src2, void *pCtx )
+	bool Less( const label_colorchange_t &src1, const label_colorchange_t &src2, void * )
 	{
 		if ( src1.textStreamIndex < src2.textStreamIndex )
 			return true;
@@ -81,10 +81,10 @@ public:
 	void ResizeImageToContentMaxWidth( int nMaxWidth );
 
 	// set the size of the image
-	virtual void SetSize(int wide,int tall);
+	void SetSize(int wide,int tall) override;
 
 	// get the full size of a text string
-	virtual void GetContentSize(int &wide, int &tall);
+	void GetContentSize(int &wide, int &tall) override;
 
 	// draws the text
 	virtual void Paint();

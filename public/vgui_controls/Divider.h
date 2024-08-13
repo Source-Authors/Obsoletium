@@ -22,13 +22,13 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class Divider : public Panel
 {
-	DECLARE_CLASS_SIMPLE( Divider, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( Divider, Panel );
 
 public:
 	Divider(Panel *parent, const char *name);
 	~Divider();
 
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void ApplySchemeSettings(IScheme *pScheme) override;
 };
 
 

@@ -24,7 +24,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class BuildModeDialog : public Frame
 {
-	DECLARE_CLASS_SIMPLE( BuildModeDialog, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( BuildModeDialog, Frame );
 
 public:
 	BuildModeDialog( BuildGroup *buildGroup );
@@ -50,16 +50,16 @@ public:
 	MESSAGE_FUNC( OnShowNewControlMenu, "ShowNewControlMenu" );
 
 protected:
-	virtual void PerformLayout();
-	virtual void OnClose();
-	virtual void OnCommand( const char *command );
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual bool IsBuildGroupEnabled();
+	void PerformLayout() override;
+	void OnClose() override;
+	void OnCommand( const char *command ) override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	bool IsBuildGroupEnabled() override;
 
 private:
 	void CreateControls();
 	
-	void OnKeyCodeTyped(KeyCode code);
+	void OnKeyCodeTyped(KeyCode code) override;
 	MESSAGE_FUNC( ApplyDataToControls, "ApplyDataToControls" );
 	MESSAGE_FUNC_PTR( OnTextChanged, "TextChanged", panel );
 	MESSAGE_FUNC( OnDeletePanel, "DeletePanel" );

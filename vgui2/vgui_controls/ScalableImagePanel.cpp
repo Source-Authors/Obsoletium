@@ -68,9 +68,9 @@ void ScalableImagePanel::SetImage(const char *imageName)
 	{
 		char szImage[MAX_PATH];
 
-		const char *pszDir = "vgui/";
-		int len = Q_strlen(imageName) + 1;
-		len += strlen(pszDir);
+		const char pszDir[] = "vgui/";
+		intp len = Q_strlen(imageName) + 1;
+		len += ssize(pszDir) - 1;
 		Q_snprintf( szImage, len, "%s%s", pszDir, imageName );
 
 		if ( m_pszImageName && V_stricmp( szImage, m_pszImageName ) == 0 )
@@ -205,7 +205,7 @@ void ScalableImagePanel::ApplySettings(KeyValues *inResourceData)
 	if (*pszDrawColor)
 	{
 		int r = 0, g = 0, b = 0, a = 255;
-		int len = Q_strlen(pszDrawColor) + 1;
+		intp len = Q_strlen(pszDrawColor) + 1;
 		m_pszDrawColorName = new char[ len ];
 		Q_strncpy( m_pszDrawColorName, pszDrawColor, len );
 

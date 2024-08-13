@@ -160,7 +160,7 @@ void AnimatingImagePanel::ApplySettings(KeyValues *inResourceData)
 		m_bScaleImage = ( inResourceData->GetInt( "scaleImage", 0 ) == 1 );
 
 		delete [] m_pImageName;
-		int len = Q_strlen(imageName) + 1;
+		intp len = Q_strlen(imageName) + 1;
 		m_pImageName = new char[len];
 		Q_strncpy(m_pImageName, imageName, len);
 

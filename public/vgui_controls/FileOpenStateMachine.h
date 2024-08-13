@@ -51,7 +51,7 @@ enum FileOpenStateMachineFlags_t
 
 class FileOpenStateMachine : public Panel
 {
-	DECLARE_CLASS_SIMPLE( FileOpenStateMachine, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( FileOpenStateMachine, Panel );
 
 public:
 	enum CompletionState_t

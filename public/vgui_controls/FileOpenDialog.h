@@ -33,7 +33,7 @@ enum FileOpenDialogType_t
 
 class FileOpenDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( FileOpenDialog, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( FileOpenDialog, Frame );
 
 public:
 	// NOTE: Backward compat constructor
@@ -75,10 +75,10 @@ public:
 	*/
 
 protected:
-	virtual void OnCommand( const char *command );
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void OnClose();
-	virtual void OnKeyCodeTyped(KeyCode code);
+	void OnCommand( const char *command ) override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void OnClose() override;
+	void OnKeyCodeTyped(KeyCode code) override;
 
 	// handles the open button being pressed
 	// checks on what has changed and acts accordingly
@@ -142,7 +142,6 @@ private:
 	vgui::Button		*m_pNewFolderButton;
 	vgui::Button		*m_pOpenInExplorerButton;
 	vgui::ImagePanel 	*m_pFolderIcon;
-	vgui::Label			*m_pFileTypeLabel;
 
 	KeyValues			*m_pContextKeyValues;
 

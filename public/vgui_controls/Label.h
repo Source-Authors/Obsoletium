@@ -26,7 +26,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class Label : public Panel
 {
-	DECLARE_CLASS_SIMPLE( Label, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( Label, Panel );
 
 public:
 	// Constructors
@@ -65,14 +65,14 @@ public:
 	};
 
 	virtual void SetContentAlignment(Alignment alignment);
-	virtual void SetEnabled(bool state);
+	void SetEnabled(bool state) override;
 	// Additional offset at the Start of the text (from whichever sides it is aligned)
 	virtual void SetTextInset(int xInset, int yInset);		
 	virtual void GetTextInset(int *xInset, int *yInset );
 
 	// Text colors
-	virtual void SetFgColor(Color color);
-	virtual Color GetFgColor();
+	void SetFgColor(Color color) override;
+	Color GetFgColor() override;
 
 	// colors to use when the label is disabled
 	virtual void SetDisabledFgColor1(Color color);
@@ -94,7 +94,7 @@ public:
 	virtual HFont GetFont();
 
 	// Hotkey
-	virtual Panel *HasHotkey(wchar_t key);
+	Panel *HasHotkey(wchar_t key) override;
 	virtual void SetHotkey(wchar_t key);
 	virtual wchar_t GetHotKey();
 
@@ -107,7 +107,7 @@ public:
 	// Multiple image handling
 	// Images are drawn from left to right across the label, ordered by index
 	// By default there is a TextImage in position 0 (see GetTextImage()/SetTextImageIndex())
-	virtual int AddImage(IImage *image, int preOffset);  // Return the index the image was placed in
+	virtual intp AddImage(IImage *image, int preOffset);  // Return the index the image was placed in
 	virtual void SetImageAtIndex(int index, IImage *image, int preOffset);	
 	virtual void SetImagePreOffset(int index, int preOffset);  // Set the offset in pixels before the image
 	virtual IImage *GetImageAtIndex(int index);
@@ -129,7 +129,7 @@ public:
 	// outputData - keyName is the name of the attribute requested.
 	// for Labels "text" is an option that returns the default text image text
 	// returns true on success in finding the requested value. false on failure.
-	virtual bool RequestInfo(KeyValues *outputData);
+	bool RequestInfo(KeyValues *outputData) override;
 	/* INFO HANDLING
 		"GetText"
 			returns:
@@ -157,33 +157,33 @@ public:
 	void SetAllCaps( bool bAllCaps );
 
 protected:
-	virtual void PerformLayout();
+	void PerformLayout() override;
 	virtual wchar_t CalculateHotkey(const char *text);
 	virtual wchar_t CalculateHotkey(const wchar_t *text);
 	virtual void ComputeAlignment(int &tx0, int &ty0, int &tx1, int &ty1);
-	virtual void Paint();
+	void Paint() override;
 	MESSAGE_FUNC_PARAMS( OnSetText, "SetText", params );
 	virtual void DrawDashedLine(int x0, int y0, int x1, int y1, int dashLen, int gapLen);
-	virtual void OnRequestFocus(VPANEL subFocus, VPANEL defaultPanel);
+	void OnRequestFocus(VPANEL subFocus, VPANEL defaultPanel) override;
 	MESSAGE_FUNC( OnHotkeyPressed, "Hotkey" );
-	virtual void OnMousePressed(MouseCode code);
-	virtual void OnSizeChanged(int wide, int tall);
+	void OnMousePressed(MouseCode code) override;
+	void OnSizeChanged(int wide, int tall) override;
 
 	// makes sure that the maxIndex will be a valid index
 	virtual void EnsureImageCapacity(int maxIndex);
 
 	// editing
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void GetSettings( KeyValues *outResourceData );
-	virtual void ApplySettings( KeyValues *inResourceData );
-	virtual const char *GetDescription( void );
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void GetSettings( KeyValues *outResourceData ) override;
+	void ApplySettings( KeyValues *inResourceData ) override;
+	const char *GetDescription( void ) override;
 
 	MESSAGE_FUNC_PARAMS( OnDialogVariablesChanged, "DialogVariables", dialogVariables );
 
 	void HandleAutoSizing( void );
 
 private:
-	void Init();
+	virtual void Init();
 
 	Alignment  _contentAlignment;
 	TextImage *_textImage; // this is the textImage, if the full text will not
@@ -201,7 +201,7 @@ private:
 	Color      _disabledFgColor1;
 	Color      _disabledFgColor2;
 	Color	   _associateColor;
-	int		   _textImageIndex;	// index in the image array that the default _textimage resides
+	intp		   _textImageIndex;	// index in the image array that the default _textimage resides
 	EColorState _textColorState;
 
 	PHandle		_associate;

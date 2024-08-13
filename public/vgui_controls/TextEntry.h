@@ -84,7 +84,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class TextEntry : public Panel
 {
-	DECLARE_CLASS_SIMPLE( TextEntry, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( TextEntry, Panel );
 
 public:
 	TextEntry(Panel *parent, const char *panelName);
@@ -120,9 +120,15 @@ public:
 	MESSAGE_FUNC( CopySelected, "DoCopySelected" );
 	MESSAGE_FUNC( Paste, "DoPaste" );
 
+#ifndef PLATFORM_64BITS
 	MESSAGE_FUNC_INT( LanguageChanged, "DoLanguageChanged", handle );
 	MESSAGE_FUNC_INT( ConversionModeChanged, "DoConversionModeChanged", handle );
 	MESSAGE_FUNC_INT( SentenceModeChanged, "DoSentenceModeChanged", handle );
+#else
+	MESSAGE_FUNC_UINT64( LanguageChanged, "DoLanguageChanged", handle );
+	MESSAGE_FUNC_UINT64( ConversionModeChanged, "DoConversionModeChanged", handle );
+	MESSAGE_FUNC_UINT64( SentenceModeChanged, "DoSentenceModeChanged", handle );
+#endif
 
 	MESSAGE_FUNC_WCHARPTR( CompositionString, "DoCompositionString", string );
 
@@ -137,9 +143,9 @@ public:
 	virtual void SetTextHidden(bool bHideText);
 	virtual void SetEditable(bool state);
 	virtual bool IsEditable();
-	virtual void SetEnabled(bool state);
+	void SetEnabled(bool state) override;
 	// move the cursor to line 'line', given how many pixels are in a line
-	virtual void MoveCursor(int line, int pixelsAcross);	
+	virtual void MoveCursor(int line, int pixelsAcross);
 
 	// sets the color of the background when the control is disabled
 	virtual void SetDisabledBgColor(Color col);
@@ -169,7 +175,7 @@ public:
 	virtual void RecalculateLineBreaks();
 	virtual void LayoutVerticalScrollBarSlider();
 
-	virtual bool RequestInfo(KeyValues *outputData);
+	bool RequestInfo(KeyValues *outputData) override;
 
 	// sets the height of the window so all text is visible.
 	// used by tooltips
@@ -217,11 +223,11 @@ public:
 	// By default, we draw the language shortname on the right hand side of the control
 	void SetDrawLanguageIDAtLeft( bool state );
 
-	virtual bool GetDropContextMenu( Menu *menu, CUtlVector< KeyValues * >& data );
-	virtual bool IsDroppable( CUtlVector< KeyValues * >& data );
-	virtual void OnPanelDropped( CUtlVector< KeyValues * >& data );
-	virtual Panel *GetDragPanel();
-	virtual void OnCreateDragData( KeyValues *msg );
+	bool GetDropContextMenu( Menu *menu, CUtlVector< KeyValues * >& data ) override;
+	bool IsDroppable( CUtlVector< KeyValues * >& data ) override;
+	void OnPanelDropped( CUtlVector< KeyValues * >& data ) override;
+	Panel *GetDragPanel() override;
+	void OnCreateDragData( KeyValues *msg ) override;
 
 	void SelectAllOnFocusAlways( bool status );
 	void SetSelectionTextColor( const Color& clr );
@@ -232,16 +238,16 @@ public:
 
 protected:
 	virtual void ResetCursorBlink();
-	virtual void PerformLayout();  // layout the text in the window
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void PaintBackground();
+	void PerformLayout() override;  // layout the text in the window
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void PaintBackground() override;
 	virtual int  DrawChar(wchar_t ch, HFont font, int index, int x, int y);
 	virtual bool DrawCursor(int x, int y);
 
-	virtual void SetCharAt(wchar_t ch, int index); // set the value of a char in the text buffer
-	virtual void ApplySettings( KeyValues *inResourceData );
-	virtual void GetSettings( KeyValues *outResourceData );
-	virtual const char *GetDescription( void );
+	virtual void SetCharAt(wchar_t ch, intp index); // set the value of a char in the text buffer
+	void ApplySettings( KeyValues *inResourceData ) override;
+	void GetSettings( KeyValues *outResourceData ) override;
+	const char *GetDescription( void ) override;
 	virtual void FireActionSignal();
 	virtual bool GetSelectedRange(int& cx0,int& cx1);
 	virtual void CursorToPixelSpace(int cursorPos, int &cx, int &cy);
@@ -252,25 +258,25 @@ protected:
 	virtual bool SelectCheck( bool fromMouse = false );	 // check if we are in text selection mode
 	MESSAGE_FUNC_WCHARPTR( OnSetText, "SetText", text );
 	MESSAGE_FUNC( OnSliderMoved, "ScrollBarSliderMoved" ); // respond to scroll bar events
-	virtual void OnKillFocus();
-	virtual void OnMouseWheeled(int delta);	// respond to mouse wheel events
-	virtual void OnKeyCodePressed(KeyCode code); //respond to keyboard events
-	virtual void OnKeyCodeTyped(KeyCode code);	//respond to keyboard events
-	virtual	void OnKeyTyped(wchar_t unichar);	//respond to keyboard events
+	void OnKillFocus() override;
+	void OnMouseWheeled(int delta) override;	// respond to mouse wheel events
+	void OnKeyCodePressed(KeyCode code) override; //respond to keyboard events
+	void OnKeyCodeTyped(KeyCode code) override;	//respond to keyboard events
+	void OnKeyTyped(wchar_t unichar) override;	//respond to keyboard events
 
-	virtual void OnCursorMoved(int x, int y);  // respond to moving the cursor with mouse button down
-	virtual void OnMousePressed(MouseCode code); // respond to mouse down events
-	virtual void OnMouseDoublePressed( MouseCode code );
-	virtual void OnMouseTriplePressed( MouseCode code );
-	virtual void OnMouseReleased( MouseCode code );	// respond to mouse up events
+	void OnCursorMoved(int x, int y) override;  // respond to moving the cursor with mouse button down
+	void OnMousePressed(MouseCode code) override; // respond to mouse down events
+	void OnMouseDoublePressed( MouseCode code ) override;
+	void OnMouseTriplePressed( MouseCode code ) override;
+	void OnMouseReleased( MouseCode code ) override;	// respond to mouse up events
 
-	virtual void OnKeyFocusTicked(); // do while window has keyboard focus
-	virtual void OnMouseFocusTicked(); // do while window has mouse focus
-	virtual void OnCursorEntered();	 // handle cursor entering window
-	virtual void OnCursorExited();	 // handle cursor exiting window
+	void OnKeyFocusTicked() override; // do while window has keyboard focus
+	void OnMouseFocusTicked() override; // do while window has mouse focus
+	void OnCursorEntered() override;	 // handle cursor entering window
+	void OnCursorExited() override;	 // handle cursor exiting window
 
-	virtual void OnMouseCaptureLost(); 
-	virtual void OnSizeChanged(int newWide, int newTall);
+	void OnMouseCaptureLost() override; 
+	void OnSizeChanged(int newWide, int newTall) override;
 
 	// Returns the character index the drawing should Start at
 	virtual int GetStartDrawIndex(int &lineBreakIndexIndex);
@@ -287,7 +293,7 @@ protected:
 	bool IsCursorOffLeftSideOfWindow(int cursorPos); // check if cursor is off left side of window
     void ScrollLeftForResize();
 	
-	void OnSetFocus();
+	void OnSetFocus() override;
 	// Change keyboard layout type
 	void OnChangeIME( bool forward );
 
@@ -330,7 +336,6 @@ private:
 	bool			   _editable;		// whether text is editable or not
 	bool			   _mouseSelection;	// whether we are highlighting text or not (selecting text)
 	bool			   _mouseDragSelection; // tells weather mouse is outside window and button is down so we select text
-	int				   _mouseSelectCursorStart;	// where mouse button was pressed down in text window
 	long               _cursorNextBlinkTime;  // time of next cursor blink
 	int                _cursorBlinkRate;	  // speed of cursor blinking
 	int                _select[2];	// select[1] is the offset in the text to where the cursor is currently
@@ -362,10 +367,9 @@ private:
 	// selection data
 	Menu				*m_pEditMenu; ///cut/copy/paste popup
 
-	int				   _recalculateBreaksIndex; // tells next linebreakindex index to Start recalculating line breaks	
-	bool			   _selectAllOnFirstFocus : 1; // highlights all text in window when focus is gained.
+	int					_recalculateBreaksIndex; // tells next linebreakindex index to Start recalculating line breaks	
+	bool				_selectAllOnFirstFocus : 1; // highlights all text in window when focus is gained.
 	bool				_selectAllOnFocusAlways : 1;
-	bool			   _firstFocusStatus; // keep track if we've had that first focus or not
 	bool				m_bAllowNumericInputOnly;
 	bool				m_bAllowNonAsciiCharacters;
 	bool				m_bAutoProgressOnHittingCharLimit;

@@ -49,7 +49,7 @@ public:
 	}
 
 	KeyValues		*kv;
-	unsigned int 	userData;
+	uintp 			userData;
 	KeyValues		*m_pDragData;
 	bool			m_bImage;
 	int				m_nImageIndex;
@@ -67,7 +67,7 @@ typedef int __cdecl SortFunc(
 //-----------------------------------------------------------------------------
 class ListPanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( ListPanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ListPanel, Panel );
 
 public:
 	ListPanel(Panel *parent, const char *panelName);
@@ -94,7 +94,7 @@ public:
 	virtual void SetColumnHeaderHeight( int height );
 	virtual void SetColumnHeaderText(int column, const char *text);
 	virtual void SetColumnHeaderText(int column, wchar_t *text);
-	virtual void SetColumnHeaderImage(int column, int imageListIndex);
+	virtual void SetColumnHeaderImage(int column, intp imageListIndex);
 	virtual void SetColumnHeaderTooltip(int column, const char *tooltipText);
 	virtual void SetColumnTextAlignment( int column, int align );
 
@@ -115,17 +115,17 @@ public:
 	// DATA HANDLING
 	// data->GetName() is used to uniquely identify an item
 	// data sub items are matched against column header name to be used in the table
-	virtual int AddItem(const KeyValues *data, unsigned int userData, bool bScrollToItem, bool bSortOnAdd); // Takes a copy of the data for use in the table. Returns the index the item is at.
+	virtual int AddItem(const KeyValues *data, uintp userData, bool bScrollToItem, bool bSortOnAdd); // Takes a copy of the data for use in the table. Returns the index the item is at.
 	void SetItemDragData( int itemID, const KeyValues *data ); // Makes a copy of the keyvalues to store in the table. Used when dragging from the table. Only used if the caller enables drag support
 	virtual int	GetItemCount( void );			// returns the number of VISIBLE items
 	virtual int GetItem(const char *itemName);	// gets the row index of an item by name (data->GetName())
 	virtual KeyValues *GetItem(int itemID); // returns pointer to data the row holds
 	virtual int GetItemCurrentRow(int itemID);		// returns -1 if invalid index or item not visible
 	virtual int GetItemIDFromRow(int currentRow);			// returns -1 if invalid row
-	virtual unsigned int GetItemUserData(int itemID);
+	virtual uintp GetItemUserData(int itemID);
 	virtual ListPanelItem *GetItemData(int itemID);
-	virtual void SetUserData( int itemID, unsigned int userData );
-	virtual int GetItemIDFromUserData( unsigned int userData );
+	virtual void SetUserData( int itemID, uintp userData );
+	virtual int GetItemIDFromUserData( uintp userData );
 	virtual void ApplyItemChanges(int itemID); // applies any changes to the data, performed by modifying the return of GetItem() above
 	virtual void RemoveItem(int itemID); // removes an item from the table (changing the indices of all following items)
 	virtual void RereadAllItems(); // updates the view with the new data
@@ -199,7 +199,7 @@ public:
 	void ResetScrollBar();
 
 	// Attaches drag data to a particular item
-	virtual void OnCreateDragData( KeyValues *msg );
+	void OnCreateDragData( KeyValues *msg ) override;
 
 	void		SetIgnoreDoubleClick( bool state );
 
@@ -227,18 +227,18 @@ protected:
 	virtual Panel *GetCellRenderer(int row, int column);
 
 	// overrides
-	virtual void OnMouseWheeled(int delta);
-	virtual void OnSizeChanged(int wide, int tall); 
-	virtual void PerformLayout();
-	virtual void Paint();
-	virtual void PaintBackground();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void OnMousePressed( MouseCode code );
-	virtual void OnMouseDoublePressed( MouseCode code );
+	void OnMouseWheeled(int delta) override;
+	void OnSizeChanged(int wide, int tall) override; 
+	void PerformLayout() override;
+	void Paint() override;
+	void PaintBackground() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void OnMousePressed( MouseCode code ) override;
+	void OnMouseDoublePressed( MouseCode code ) override;
 #ifdef _X360
-	virtual void OnKeyCodePressed(KeyCode code);
+	void OnKeyCodePressed(KeyCode code) override;
 #else
-	virtual void OnKeyCodePressed( KeyCode code );
+	void OnKeyCodePressed( KeyCode code ) override;
 #endif
 	MESSAGE_FUNC( OnSliderMoved, "ScrollBarSliderMoved" );
 	MESSAGE_FUNC_INT_INT( OnColumnResized, "ColumnResized", column, delta );
@@ -249,9 +249,9 @@ protected:
 	virtual int GetStartItem();
 
 	// user configuration
-	virtual void ApplyUserConfigSettings(KeyValues *userConfig);
-	virtual void GetUserConfigSettings(KeyValues *userConfig);
-	virtual bool HasUserConfigSettings();
+	void ApplyUserConfigSettings(KeyValues *userConfig) override;
+	void GetUserConfigSettings(KeyValues *userConfig) override;
+	bool HasUserConfigSettings() override;
 
 	/* MESSAGES SENT
 		"ItemSelected" - query which items are selected
@@ -297,7 +297,7 @@ private:
 		bool m_bTypeIsText;
 		bool m_bHidden;
 		bool m_bUnhidable;
-		IndexRBTree_t m_SortedTree;		
+		IndexRBTree_t m_SortedTree;
 		int m_nContentAlignment;
 	};
 
@@ -335,7 +335,6 @@ private:
 	bool 			m_bSortAscending : 1;
 	bool 			m_bSortAscendingSecondary : 1;
 	bool			m_bCanSelectIndividualCells : 1;
-	bool			m_bShiftHeldDown : 1;
 	bool			m_bMultiselectEnabled : 1;
 	bool			m_bAllowUserAddDeleteColumns : 1;
 	bool 			m_bDeleteImageListWhenDone : 1;

@@ -53,8 +53,8 @@ public:
 	ColumnButton(vgui::Panel *parent, const char *name, const char *text);
 
 	// Inherited from Button
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void OnMousePressed(MouseCode code);
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void OnMousePressed(MouseCode code) override;
 
 	void OpenColumnChoiceMenu();
 };
@@ -571,7 +571,7 @@ void ListPanel::AddColumnHeader(int index, const char *columnName, const char *c
 	Assert (maxWidth >= width);
 
 	// get our permanent index
-	unsigned char columnDataIndex = m_ColumnsData.AddToTail();
+	auto columnDataIndex = m_ColumnsData.AddToTail();
 
 	// put this index on the tail, so all item's m_SortedTreeIndexes have a consistent mapping
 	m_ColumnsHistory.AddToTail(columnDataIndex);
@@ -714,7 +714,7 @@ void ListPanel::SetColumnTextAlignment( int col, int align )
 //-----------------------------------------------------------------------------
 // Purpose: Sets the column header to have an image instead of text
 //-----------------------------------------------------------------------------
-void ListPanel::SetColumnHeaderImage(int column, int imageListIndex)
+void ListPanel::SetColumnHeaderImage(int column, intp imageListIndex)
 {
 	Assert(m_pImageList);
 	m_ColumnsData[m_CurrentColumns[column]].m_pHeader->SetTextImageIndex(-1);
@@ -850,7 +850,7 @@ int ListPanel::FindColumn(const char *columnName)
 //			data->GetName() is used to uniquely identify an item
 //			data sub items are matched against column header name to be used in the table
 //-----------------------------------------------------------------------------
-int ListPanel::AddItem( const KeyValues *item, unsigned int userData, bool bScrollToItem, bool bSortOnAdd)
+int ListPanel::AddItem( const KeyValues *item, uintp userData, bool bScrollToItem, bool bSortOnAdd)
 {
 	FastSortListPanelItem *newitem = new FastSortListPanelItem;
 	newitem->kv = item->MakeCopy();
@@ -861,8 +861,8 @@ int ListPanel::AddItem( const KeyValues *item, unsigned int userData, bool bScro
 	newitem->m_nImageIndexSelected = newitem->kv->GetInt( "imageSelected" );
 	newitem->m_pIcon = reinterpret_cast< IImage * >( newitem->kv->GetPtr( "iconImage" ) );
 
-	int itemID = m_DataItems.AddToTail(newitem);
-	int displayRow = m_VisibleItems.AddToTail(itemID);
+	auto itemID = m_DataItems.AddToTail(newitem);
+	intp displayRow = m_VisibleItems.AddToTail(itemID);
 	newitem->visible = true;
 
 	// put the item in each column's sorted Tree Index
@@ -886,7 +886,7 @@ int ListPanel::AddItem( const KeyValues *item, unsigned int userData, bool bScro
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void ListPanel::SetUserData( int itemID, unsigned int userData )
+void ListPanel::SetUserData( int itemID, uintp userData )
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return;
@@ -897,7 +897,7 @@ void ListPanel::SetUserData( int itemID, unsigned int userData )
 //-----------------------------------------------------------------------------
 // Purpose: Finds the first itemID with a matching userData
 //-----------------------------------------------------------------------------
-int ListPanel::GetItemIDFromUserData( unsigned int userData )
+int ListPanel::GetItemIDFromUserData( uintp userData )
 {
 	FOR_EACH_LL( m_DataItems, itemID )
 	{
@@ -1052,7 +1052,7 @@ ListPanelItem *ListPanel::GetItemData( int itemID )
 //-----------------------------------------------------------------------------
 // Purpose: returns user data for itemID
 //-----------------------------------------------------------------------------
-unsigned int ListPanel::GetItemUserData(int itemID)
+uintp ListPanel::GetItemUserData(int itemID)
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return 0;
@@ -2459,6 +2459,7 @@ void ListPanel::OnKeyCodePressed(KeyCode code)
 			break;
 		}
 		// fall through
+		[[fallthrough]];
 
 	case KEY_DOWN:
 	case KEY_XBUTTON_DOWN:
@@ -2471,6 +2472,7 @@ void ListPanel::OnKeyCodePressed(KeyCode code)
 			break;
 		}
 		// fall through
+		[[fallthrough]];
 
 	case KEY_LEFT:
 	case KEY_XBUTTON_LEFT:
@@ -2486,6 +2488,7 @@ void ListPanel::OnKeyCodePressed(KeyCode code)
 			break;
 		}
 		// fall through
+		[[fallthrough]];
 
 	case KEY_RIGHT:
 	case KEY_XBUTTON_RIGHT:
@@ -2501,6 +2504,7 @@ void ListPanel::OnKeyCodePressed(KeyCode code)
 			break;
 		}
 		// fall through
+		[[fallthrough]];
 
 	default:
 		// chain back

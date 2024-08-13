@@ -23,7 +23,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class MenuBar : public Panel
 {
-	DECLARE_CLASS_SIMPLE( MenuBar, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( MenuBar, Panel );
 
 public:
 	MenuBar(Panel *parent, const char *panelName);
@@ -35,11 +35,11 @@ public:
 	virtual void GetContentSize( int& w, int&h );
 
 protected:
-	virtual void OnKeyCodeTyped(KeyCode code);
-	virtual void OnKeyTyped(wchar_t unichar);
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void PerformLayout();
-	virtual void Paint();
+	void OnKeyCodeTyped(KeyCode code) override;
+	void OnKeyTyped(wchar_t unichar) override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void PerformLayout() override;
+	void Paint() override;
 	MESSAGE_FUNC( OnMenuClose, "MenuClose" );
 	MESSAGE_FUNC_INT( OnCursorEnteredMenuButton, "CursorEnteredMenuButton", VPanel);
 

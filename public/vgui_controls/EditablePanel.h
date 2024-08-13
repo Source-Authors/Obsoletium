@@ -23,7 +23,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class EditablePanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( EditablePanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( EditablePanel, Panel );
 
 public:
 	EditablePanel(Panel *parent, const char *panelName);
@@ -35,7 +35,7 @@ public:
 	// If you pass in pPreloadedKeyValues, it won't actually load the file. That way, you can cache
 	// the keyvalues outside of here if you want to prevent file accesses in the middle of the game.
 	virtual void LoadControlSettings(const char *dialogResourceName, const char *pathID = NULL, KeyValues *pPreloadedKeyValues = NULL, KeyValues *pConditions = NULL);
-	virtual void ApplySettings(KeyValues *inResourceData);
+	void ApplySettings(KeyValues *inResourceData) override;
 
 	// sets the name of this dialog so it can be saved in the user config area
 	// use dialogID to differentiate multiple instances of the same dialog
@@ -81,22 +81,22 @@ public:
 
 	// Focus handling
 	// Delegate focus to a sub panel
-	virtual void RequestFocus(int direction = 0);
-	virtual bool RequestFocusNext(VPANEL panel);
-	virtual bool RequestFocusPrev(VPANEL panel);
+	void RequestFocus(int direction = 0) override;
+	bool RequestFocusNext(VPANEL panel) override;
+	bool RequestFocusPrev(VPANEL panel) override;
 	// Pass the focus down onto the last used panel
-	virtual void OnSetFocus();
+	void OnSetFocus() override;
 	// Update focus info for navigation
-	virtual void OnRequestFocus(VPANEL subFocus, VPANEL defaultPanel);
+	void OnRequestFocus(VPANEL subFocus, VPANEL defaultPanel) override;
 	// Get the panel that currently has keyfocus
-	virtual VPANEL GetCurrentKeyFocus();
+	VPANEL GetCurrentKeyFocus() override;
 	// Get the panel with the specified hotkey
-	virtual Panel *HasHotkey(wchar_t key);
+	Panel *HasHotkey(wchar_t key) override;
 
-	virtual void OnKeyCodePressed( KeyCode code );
+	void OnKeyCodePressed( KeyCode code ) override;
 
 	// Handle information requests
-	virtual bool RequestInfo(KeyValues *data);
+	bool RequestInfo(KeyValues *data) override;
 	/* INFO HANDLING
 		"BuildDialog"
 			input:
@@ -118,7 +118,7 @@ public:
 
 	bool ShouldSkipAutoResize() const { return m_bShouldSkipAutoResize; }
 protected:
-	virtual void PaintBackground();
+	void PaintBackground() override;
 
 	// nav group access
 	virtual FocusNavGroup &GetFocusNavGroup();
@@ -130,17 +130,17 @@ protected:
     MESSAGE_FUNC( OnFindDefaultButton, "FindDefaultButton" );
 
 	// overrides
-	virtual void OnChildAdded(VPANEL child);
-	virtual void OnSizeChanged(int wide, int tall);
+    void OnChildAdded(VPANEL child) override;
+	void OnSizeChanged(int wide, int tall) override;
 	virtual void OnClose();
 
 	// user configuration settings
 	// this is used for any control details the user wants saved between sessions
 	// eg. dialog positions, last directory opened, list column width
-	virtual void ApplyUserConfigSettings(KeyValues *userConfig);
+	void ApplyUserConfigSettings(KeyValues *userConfig) override;
 
 	// returns user config settings for this control
-	virtual void GetUserConfigSettings(KeyValues *userConfig);
+	void GetUserConfigSettings(KeyValues *userConfig) override;
 
 	// optimization for text rendering, returns true if text should be rendered immediately after Paint()
 	// disabled for now

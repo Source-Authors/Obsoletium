@@ -83,7 +83,7 @@ class MenuSeparator;
 //-----------------------------------------------------------------------------
 class Menu : public Panel
 {
-	DECLARE_CLASS_SIMPLE( Menu, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( Menu, Panel );
 	friend class MenuItem;
 public:
 	enum MenuDirection_e
@@ -140,7 +140,7 @@ public:
 	virtual int AddCascadingMenuItem( const char *itemText, Panel *target, Menu *cascadeMenu, const KeyValues *userData = NULL );
 
 	// Add a custom panel to the menu
-	virtual int AddMenuItem( MenuItem *panel );
+	virtual intp AddMenuItem( MenuItem *panel );
 
 	virtual void AddSeparator();
 	virtual void AddSeparatorAfterItem( int itemID );
@@ -186,10 +186,10 @@ public:
 	void EnableUseMenuManager( bool bUseMenuManager );
 
 	// Set up the menu items layout
-	virtual void PerformLayout( void );
+	void PerformLayout( void ) override;
 
-	virtual void SetBorder(class IBorder *border);
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void SetBorder(class IBorder *border) override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 
 	// Set type ahead behaviour
 	enum MenuTypeAheadMode
@@ -202,12 +202,12 @@ public:
 	virtual int GetTypeAheadMode();
 
 	// Hotkey handling
-	virtual void OnKeyTyped(wchar_t unichar);
+	void OnKeyTyped(wchar_t unichar) override;
 	// Menu nagivation etc.
-	virtual void OnKeyCodeTyped( KeyCode code );
+	void OnKeyCodeTyped( KeyCode code ) override;
 
 	// Visibility
-	virtual void SetVisible(bool state);
+	void SetVisible(bool state) override;
 
 	// Activates item in the menu list, as if that menu item had been selected by the user
 	virtual void ActivateItem(int itemID);
@@ -226,7 +226,7 @@ public:
 	
 	MenuItem *GetMenuItem(int itemID);
 	void CloseOtherMenus(MenuItem *item);
-	virtual void OnKillFocus();
+	void OnKillFocus() override;
 
 	int GetMenuMode();
 	enum MenuMode
@@ -248,8 +248,8 @@ public:
 	int  GetMinimumWidth();
 
 	// baseclass overrides to chain colors through to cascade menus
-	virtual void SetFgColor( Color newColor );
-	virtual void SetBgColor( Color newColor );
+	void SetFgColor( Color newColor ) override;
+	void SetBgColor( Color newColor ) override;
 
 	virtual void SetFont( HFont font );
 
@@ -266,15 +266,15 @@ protected:
 	int AddMenuItemKeyValuesCommand(MenuItem *item, KeyValues *message, Panel *target, const KeyValues *userData);
 
 	// vgui result reporting
-	virtual void OnCommand( const char *command );
+	void OnCommand( const char *command ) override;
 	MESSAGE_FUNC_PTR( OnMenuItemSelected, "MenuItemSelected", panel );
 	virtual void AddScrollBar();
 	virtual void RemoveScrollBar();
 	MESSAGE_FUNC( OnSliderMoved, "ScrollBarSliderMoved" );
-	virtual void Paint();
+	void Paint() override;
 	virtual void LayoutMenuBorder();
 	virtual void MakeItemsVisibleInScrollRange( int maxVisibleItems, int nNumPixelsAvailable );
-	virtual void OnMouseWheeled(int delta);
+	void OnMouseWheeled(int delta) override;
 	// Alternate OnKeyTyped behaviors
 	virtual void OnHotKey(wchar_t unichar);
 	virtual void OnTypeAhead(wchar_t unichar);
@@ -288,15 +288,15 @@ protected:
 	void LayoutScrollBar();
 	void PositionCascadingMenu();
 	void SizeMenuItems();
-	void OnCursorMoved(int x, int y);
-	void OnKeyCodePressed(KeyCode code);
+	void OnCursorMoved(int x, int y) override;
+	void OnKeyCodePressed(KeyCode code) override;
 	void OnMenuClose();
 	MESSAGE_FUNC( OnKeyModeSet, "KeyModeSet" );
 
 	void SetCurrentlySelectedItem(MenuItem *item);
 	void SetCurrentlySelectedItem(int itemID);
-	MESSAGE_FUNC_INT( OnCursorEnteredMenuItem, "CursorEnteredMenuItem", VPanel);
-	MESSAGE_FUNC_INT( OnCursorExitedMenuItem, "CursorExitedMenuItem", VPanel);
+	MESSAGE_FUNC_HANDLE( OnCursorEnteredMenuItem, "CursorEnteredMenuItem", VPanel);
+	MESSAGE_FUNC_HANDLE( OnCursorExitedMenuItem, "CursorExitedMenuItem", VPanel);
 
 	void MoveAlongMenuItemList(int direction, int loopCount); 
 

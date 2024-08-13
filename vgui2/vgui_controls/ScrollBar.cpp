@@ -52,7 +52,7 @@ public:
 		CallParentFunction(new KeyValues("MouseFocusTicked"));
 	}
  
-	virtual void ApplySchemeSettings(IScheme *pScheme)
+	void ApplySchemeSettings(IScheme *pScheme) override
 	{
 		Button::ApplySchemeSettings(pScheme);
 

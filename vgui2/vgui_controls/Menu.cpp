@@ -19,7 +19,7 @@ using namespace vgui;
 class vgui::MenuSeparator : public Panel
 {
 public:
-	DECLARE_CLASS_SIMPLE( MenuSeparator, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( MenuSeparator, Panel );
 
 	MenuSeparator( Panel *parent, char const *panelName ) :
 		BaseClass( parent, panelName )
@@ -29,7 +29,7 @@ public:
 		SetPaintBorderEnabled( false );
 	}
 
-	virtual void Paint()
+	void Paint() override
 	{
 		int w, h;
 		GetSize( w, h );
@@ -38,7 +38,7 @@ public:
 		surface()->DrawFilledRect( 4, 1, w-1, 2 );
 	}
 
-	virtual void ApplySchemeSettings( IScheme *pScheme )
+	void ApplySchemeSettings( IScheme *pScheme ) override
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
 
@@ -127,11 +127,11 @@ void Menu::DeleteAllItems()
 //-----------------------------------------------------------------------------
 // Purpose: Add a menu item to the menu.
 //-----------------------------------------------------------------------------
-int Menu::AddMenuItem( MenuItem *panel )
+intp Menu::AddMenuItem( MenuItem *panel )
 {
 	panel->SetParent( this );
 	MEM_ALLOC_CREDIT();
-	int itemID = m_MenuItems.AddToTail( panel );
+	auto itemID = m_MenuItems.AddToTail( panel );
 	m_SortedItems.AddToTail(itemID);
 	InvalidateLayout(false);
 	_recalculateWidth = true;
@@ -594,7 +594,7 @@ void Menu::PositionRelativeToPanel( Panel *relative, MenuDirection_e direction, 
 	}
 	else if ( direction == ALIGN_WITH_PARENT && relative->GetVParent() )
 	{
-	   rx = 0, ry = 0;
+	   rx = 0; ry = 0;
 	   relative->ParentLocalToScreen(rx, ry);
 	   rx -= 1; // take border into account
 	   ry += rh + nAdditionalYOffset;
@@ -602,7 +602,7 @@ void Menu::PositionRelativeToPanel( Panel *relative, MenuDirection_e direction, 
 	}
 	else
 	{
-		rx = 0, ry = 0;
+		rx = 0; ry = 0;
 		relative->LocalToScreen(rx, ry);
 	}
 
@@ -1005,7 +1005,7 @@ void Menu::PositionCascadingMenu()
 	ipanel()->GetSize(GetVParent(), parentWide, parentTall);
 	ipanel()->GetPos(GetVParent(), parentX, parentY);
 	
-	parentX += parentWide, parentY = 0;
+	parentX += parentWide; parentY = 0;
 
 	ParentLocalToScreen(parentX, parentY);
 
@@ -1692,7 +1692,7 @@ public:
 		}
 	}
 
-	void OnInternalMousePressed( Panel *other, MouseCode code )
+	void OnInternalMousePressed( Panel *, MouseCode )
 	{
 		int c = m_Menus.Count();
 		if ( !c )
@@ -1821,7 +1821,7 @@ private:
 // Singleton helper class
 static CMenuManager g_MenuMgr;
 
-void ValidateMenuGlobals( CValidator &validator )
+void ValidateMenuGlobals( [[maybe_unused]] CValidator &validator )
 {
 #ifdef DBGFLAG_VALIDATE
 	g_MenuMgr.Validate( validator, "g_MenuMgr" );
@@ -2365,9 +2365,8 @@ int Menu::GetCurrentlyHighlightedItem()
 //-----------------------------------------------------------------------------
 // Purpose: Respond to cursor entering a menuItem.
 //-----------------------------------------------------------------------------
-void Menu::OnCursorEnteredMenuItem(int VPanel)
+void Menu::OnCursorEnteredMenuItem(	VPANEL menuItem )
 {
-	VPANEL menuItem = (VPANEL)VPanel;
 	// if we are in mouse mode
 	if (m_iInputMode == MOUSE)
 	{
@@ -2389,9 +2388,8 @@ void Menu::OnCursorEnteredMenuItem(int VPanel)
 //-----------------------------------------------------------------------------
 // Purpose: Respond to cursor exiting a menuItem
 //-----------------------------------------------------------------------------
-void Menu::OnCursorExitedMenuItem(int VPanel)
+void Menu::OnCursorExitedMenuItem(VPANEL menuItem)
 {
-	VPANEL menuItem = (VPANEL)VPanel;
 	// only care if we are in mouse mode
 	if (m_iInputMode == MOUSE)
 	{

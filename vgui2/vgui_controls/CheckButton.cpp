@@ -135,7 +135,7 @@ void CheckButton::ApplySchemeSettings(IScheme *pScheme)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-IBorder *CheckButton::GetBorder(bool depressed, bool armed, bool selected, bool keyfocus)
+IBorder *CheckButton::GetBorder(bool, bool, bool, bool)
 {
 	return NULL;
 }
@@ -197,7 +197,7 @@ Color CheckButton::GetButtonFgColor()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CheckButton::OnCheckButtonChecked(Panel *panel)
+void CheckButton::OnCheckButtonChecked(Panel *)
 {
 }
 

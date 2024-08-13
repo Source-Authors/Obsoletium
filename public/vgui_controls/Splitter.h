@@ -32,7 +32,7 @@ class SplitterChildPanel;
 //-----------------------------------------------------------------------------
 class Splitter : public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( Splitter, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( Splitter, EditablePanel );
 
 public:
 	// nCount is the number of splitters to create.
@@ -48,13 +48,13 @@ public:
 	void RespaceSplitters( float *flFractions );
 
 	// Inherited from Panel
-	virtual void ApplySettings(KeyValues *inResourceData);
-	virtual void GetSettings( KeyValues *outResourceData );
-	virtual void PerformLayout();
-	virtual void OnSizeChanged(int newWide, int newTall);
-	virtual void ApplyUserConfigSettings(KeyValues *userConfig);
-	virtual void GetUserConfigSettings(KeyValues *userConfig);
-	virtual bool HasUserConfigSettings() { return true; }
+	void ApplySettings(KeyValues *inResourceData) override;
+	void GetSettings( KeyValues *outResourceData ) override;
+	void PerformLayout() override;
+	void OnSizeChanged(int newWide, int newTall) override;
+	void ApplyUserConfigSettings(KeyValues *userConfig) override;
+	void GetUserConfigSettings(KeyValues *userConfig) override;
+	bool HasUserConfigSettings() override { return true; }
 
 	// Sets the splitter color
 	void SetSplitterColor( Color c );

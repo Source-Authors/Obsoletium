@@ -25,7 +25,7 @@ class WizardSubPanel;
 //-----------------------------------------------------------------------------
 class WizardPanel : public Frame
 {
-	DECLARE_CLASS_SIMPLE( WizardPanel, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( WizardPanel, Frame );
 
 public:
 	WizardPanel(Panel *parent, const char *panelName);
@@ -79,7 +79,7 @@ public:
 	virtual WizardSubPanel *GetSubPanelByName(const char *pageName);
 	
 	virtual void ShowButtons(bool state);
-	virtual void GetClientArea(int &x, int &y, int &wide, int &tall);
+	void GetClientArea(int &x, int &y, int &wide, int &tall) override;
 
 protected:
 	MESSAGE_FUNC_PTR( InternalActivateNextSubPanel, "ActivateNextSubPanel", panel )
@@ -94,16 +94,16 @@ protected:
 	virtual vgui::WizardSubPanel *GetCurrentSubPanel()	{ return _currentSubPanel; }
 
 	// overrides
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void PerformLayout() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 
 	// reroute build messages to the currently active sub panel
-	virtual void ActivateBuildMode();
+	void ActivateBuildMode() override;
 
 	// close maps to the cancel button
-	virtual void OnClose();
-	virtual void OnCommand(const char *command);
-	virtual void OnCloseFrameButtonPressed();
+	void OnClose() override;
+	void OnCommand(const char *command) override;
+	void OnCloseFrameButtonPressed() override;
 
 private:
 	WizardSubPanel *FindNextValidSubPanel(WizardSubPanel *currentPanel);

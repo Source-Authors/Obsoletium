@@ -22,7 +22,7 @@ namespace vgui
 	//-----------------------------------------------------------------------------
 	class ScalableImagePanel : public Panel
 	{
-		DECLARE_CLASS_SIMPLE( ScalableImagePanel, Panel );
+		DECLARE_CLASS_SIMPLE_OVERRIDE( ScalableImagePanel, Panel );
 	public:
 		ScalableImagePanel(Panel *parent, const char *name);
 		~ScalableImagePanel();
@@ -31,11 +31,11 @@ namespace vgui
 		void		 SetDrawColor( Color color ) { m_DrawColor = color; }
 
 	protected:
-		virtual void PaintBackground();
-		virtual void GetSettings(KeyValues *outResourceData);
-		virtual void ApplySettings(KeyValues *inResourceData);
-		virtual void PerformLayout( void );
-		virtual const char *GetDescription();
+		void PaintBackground() override;
+		void GetSettings(KeyValues *outResourceData) override;
+		void ApplySettings(KeyValues *inResourceData) override;
+		void PerformLayout( void ) override;
+		const char *GetDescription() override;
 
 	private:
 		int m_iSrcCornerHeight;	// in pixels, how tall is the corner inside the image

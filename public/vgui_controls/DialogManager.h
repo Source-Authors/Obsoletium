@@ -89,7 +89,7 @@ inline TDialog *DialogManager<TDialog, I>::FindDialog(I dialogID, bool bCreate)
 
 	if (bCreate)
 	{
-		int newIndex = m_Dialogs.AddToTail();
+		intp newIndex = m_Dialogs.AddToTail();
 		if (m_CreateFunc)
 		{
 			m_Dialogs[newIndex].dlg = m_CreateFunc(dialogID);

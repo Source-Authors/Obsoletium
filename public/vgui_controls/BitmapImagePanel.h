@@ -21,7 +21,7 @@ public:
 	CBitmapImagePanel( vgui::Panel *parent, char const *panelName, char const *filename = NULL );
 	~CBitmapImagePanel();
 
-	virtual void	PaintBackground();
+	void	PaintBackground() override;
 
 	virtual void	setTexture( char const *filename, bool hardwareFiltered = true );
 
@@ -31,11 +31,11 @@ public:
 	virtual void SetContentAlignment(Label::Alignment alignment);
 
 protected:
-	virtual void GetSettings(KeyValues *outResourceData);
-	virtual void ApplySettings(KeyValues *inResourceData);
-	virtual const char *GetDescription();
-	virtual void ApplySchemeSettings( IScheme *pScheme );
-	virtual void PaintBorder();
+	void GetSettings(KeyValues *outResourceData) override;
+	void ApplySettings(KeyValues *inResourceData) override;
+	const char *GetDescription() override;
+	void ApplySchemeSettings( IScheme *pScheme ) override;
+	void PaintBorder() override;
 
 private:
 	typedef vgui::Panel BaseClass;

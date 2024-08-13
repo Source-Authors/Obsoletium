@@ -449,7 +449,7 @@ void CPerforceFileListFrame::AddFile( const char *pRelativePath, const char *pPa
 	// Deal with submit, revert
 
 	// First, handle the case where the file exists on the drive
-	char pFullPath[MAX_PATH];
+	//char pFullPath[MAX_PATH];
 	if ( g_pFullFileSystem->FileExists( pRelativePath, pPathId ) )
 	{
 		/*g_pFullFileSystem->RelativePathToFullPath( pRelativePath, pPathId, pFullPath, sizeof( pFullPath ) );
@@ -469,7 +469,7 @@ void CPerforceFileListFrame::AddFile( const char *pRelativePath, const char *pPa
 	// Using the client spec of the path, we need to piece together 
 	// the full path; the full path unfortunately is usually ambiguous: 
 	// you can never exactly know which mod it came from.
-	char pTemp[MAX_PATH];
+	//char pTemp[MAX_PATH];
 	char pSearchString[MAX_PATH];
 	Q_strncpy( pSearchString, pRelativePath, sizeof(pSearchString) );
 	Q_FixSlashes( pSearchString );

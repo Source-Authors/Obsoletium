@@ -32,14 +32,14 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CircularProgressBar : public ProgressBar
 {
-	DECLARE_CLASS_SIMPLE( CircularProgressBar, ProgressBar );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CircularProgressBar, ProgressBar );
 
 public:
 	CircularProgressBar(Panel *parent, const char *panelName);
 	~CircularProgressBar();
 
-	virtual void ApplySettings(KeyValues *inResourceData);
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void ApplySettings(KeyValues *inResourceData) override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 
 	void SetFgImage(const char *imageName) { SetImage( imageName, PROGRESS_TEXTURE_FG ); }
 	void SetBgImage(const char *imageName) { SetImage( imageName, PROGRESS_TEXTURE_BG ); }
@@ -55,8 +55,8 @@ public:
 	void SetReverseProgress( bool bReverse ) { m_bReverseProgress = bReverse; }
 
 protected:
-	virtual void Paint();
-	virtual void PaintBackground();
+	void Paint() override;
+	void PaintBackground() override;
 	
 	void DrawCircleSegment( Color c, float flEndDegrees, bool clockwise /* = true */ );
 	void SetImage(const char *imageName, progress_textures_t iPos);

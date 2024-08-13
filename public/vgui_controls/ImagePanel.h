@@ -25,7 +25,7 @@ class IImage;
 //-----------------------------------------------------------------------------
 class ImagePanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( ImagePanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ImagePanel, Panel );
 public:
 	ImagePanel(Panel *parent, const char *name);
 	~ImagePanel();
@@ -53,7 +53,7 @@ public:
 	virtual Color GetDrawColor( void );
 	virtual void SetDrawColor( Color drawColor );
 
-	virtual void ApplySettings(KeyValues *inResourceData);
+	void ApplySettings(KeyValues *inResourceData) override;
 
 	// unhooks and evicts image if possible, caller must re-establish
 	bool EvictImage();
@@ -64,11 +64,11 @@ public:
 	void SetRotation( int iRotation ) { m_iRotation = iRotation; }
 
 protected:
-	virtual void PaintBackground();
-	virtual void GetSettings(KeyValues *outResourceData);
-	virtual const char *GetDescription();
-	virtual void OnSizeChanged(int newWide, int newTall);
-	virtual void ApplySchemeSettings( IScheme *pScheme );
+	void PaintBackground() override;
+	void GetSettings(KeyValues *outResourceData) override;
+	const char *GetDescription() override;
+	void OnSizeChanged(int newWide, int newTall) override;
+	void ApplySchemeSettings( IScheme *pScheme ) override;
 
 private:
 	IImage *m_pImage;

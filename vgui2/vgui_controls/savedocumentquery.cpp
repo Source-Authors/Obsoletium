@@ -24,7 +24,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CSaveDocumentQuery : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CSaveDocumentQuery, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSaveDocumentQuery, vgui::Frame );
 
 public:
 	CSaveDocumentQuery(	vgui::Panel *pParent, const char *filename, const char *pFileType, int nContext, 
@@ -32,11 +32,11 @@ public:
 	~CSaveDocumentQuery();
 
 	// Inherited from vgui::Frame
-	virtual void		OnCommand( char const *cmd );
-	virtual void		ApplySchemeSettings( vgui::IScheme *pScheme );
+	void		OnCommand( char const *cmd ) override;
+	void		ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	// Put the message box into a modal state
-	void				DoModal();
+	void				DoModal() override;
 
 private:
 	// Posts commands to the action signal target
@@ -71,8 +71,8 @@ void ShowSaveDocumentQuery( vgui::Panel *pParent, const char *pFileName, const c
 //-----------------------------------------------------------------------------
 CSaveDocumentQuery::CSaveDocumentQuery( vgui::Panel *pParent, char const *pFileName, const char *pFileType, int nContext, vgui::Panel *pActionSignalTarget, KeyValues *pPostSaveCommand ) :
 	BaseClass( pParent, "SaveDocumentQuery" ),
-	m_nContext( nContext ), 
-	m_pActionSignalTarget( pActionSignalTarget )
+	m_pActionSignalTarget( pActionSignalTarget ),
+	m_nContext( nContext )
 {
 	if ( !pFileName || !pFileName[0] )
 	{

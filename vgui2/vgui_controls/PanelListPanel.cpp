@@ -148,7 +148,7 @@ int PanelListPanel::AddItem( Panel *labelPanel, Panel *panel )
 
 	panel->SetParent( m_pPanelEmbedded );
 
-	int itemID = m_DataItems.AddToTail();
+	auto itemID = m_DataItems.AddToTail();
 	DATAITEM &newitem = m_DataItems[itemID];
 	newitem.labelPanel = labelPanel;
 	newitem.panel = panel;
@@ -315,7 +315,7 @@ void PanelListPanel::PerformLayout()
 	// Now lay out the controls on the embedded panel
 	int y = 0;
 	int h = 0;
-	int totalh = 0;
+	[[maybe_unused]] int totalh = 0;
 
 	int xpos = m_iFirstColumnWidth + m_iPanelBuffer;
 	int iColumnWidth = ( wide - xpos - m_vbar->GetWide() - 12 ) / m_iNumColumns;

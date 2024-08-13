@@ -40,7 +40,7 @@ enum
 //-----------------------------------------------------------------------------
 class COperationFileListFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( COperationFileListFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COperationFileListFrame, vgui::Frame );
 
 public:
 	// NOTE: The dialog ID is used to allow dialogs to have different configurations saved 
@@ -48,8 +48,8 @@ public:
 	virtual ~COperationFileListFrame();
 
 	// Command handler
-	virtual void OnCommand( const char *pCommand );
-	virtual void PerformLayout();
+	void OnCommand( const char *pCommand ) override;
+	void PerformLayout() override;
 
 	// Adds files to the frame
 	void ClearAllOperations();
@@ -71,7 +71,7 @@ public:
 	const char *GetOperation( int i );
 
 	// Retreives the description (only if it was shown)
-	const char *GetDescription();
+	const char *GetDescription() override;
 
 private:
 	virtual bool PerformOperation() { return true; }
@@ -108,7 +108,7 @@ enum PerforceAction_t
 //-----------------------------------------------------------------------------
 class CPerforceFileListFrame : public COperationFileListFrame
 {
-	DECLARE_CLASS_SIMPLE( CPerforceFileListFrame, COperationFileListFrame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPerforceFileListFrame, COperationFileListFrame );
 
 public:
 	CPerforceFileListFrame( vgui::Panel *pParent, const char *pTitle, const char *pColumnHeader, PerforceAction_t action );
@@ -122,7 +122,7 @@ public:
 	void DoModal( KeyValues *pContextKeys = NULL, const char *pMessage = NULL );
 
 private:
-	virtual bool PerformOperation();
+	bool PerformOperation() override;
 
 	// Adds files for open, submit
 	void AddFileForOpen( const char *pFullPath );

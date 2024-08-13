@@ -24,7 +24,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class QueryBox : public MessageBox
 {
-	DECLARE_CLASS_SIMPLE( QueryBox, MessageBox );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( QueryBox, MessageBox );
 
 public:
 	QueryBox(const char *title, const char *queryText,vgui::Panel *parent = NULL );
@@ -32,7 +32,7 @@ public:
 	~QueryBox();
 
 	// Layout the window for drawing 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	// Set the keyvalues to send when ok button is hit
 	void SetOKCommand(KeyValues *keyValues);
@@ -48,9 +48,9 @@ public:
 	void SetOKCommandValue(const char *keyName, int value);
 
 protected:
-	virtual void OnKeyCodeTyped( KeyCode code );
-	virtual void OnKeyCodePressed( KeyCode code );
-	virtual void OnCommand(const char *command);
+	void OnKeyCodeTyped( KeyCode code ) override;
+	void OnKeyCodePressed( KeyCode code ) override;
+	void OnCommand(const char *command) override;
 	Button		*m_pCancelButton;
 
 private:

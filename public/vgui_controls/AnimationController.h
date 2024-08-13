@@ -25,7 +25,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class AnimationController : public Panel
 {
-	DECLARE_CLASS_SIMPLE( AnimationController, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( AnimationController, Panel );
 
 public:
 	AnimationController(Panel *parent);

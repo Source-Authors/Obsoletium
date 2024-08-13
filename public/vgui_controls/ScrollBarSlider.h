@@ -25,7 +25,7 @@ class IBorder;
 //-----------------------------------------------------------------------------
 class ScrollBarSlider : public Panel
 {
-	DECLARE_CLASS_SIMPLE( ScrollBarSlider, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ScrollBarSlider, Panel );
 
 public:
 	ScrollBarSlider(Panel *parent, const char *panelName, bool vertical);
@@ -56,21 +56,21 @@ public:
 
 	virtual bool HasFullRange();
 	virtual void SetButtonOffset(int buttonOffset);
-	virtual void OnCursorMoved(int x, int y);
-	virtual void OnMousePressed(MouseCode code);
-	virtual void OnMouseDoublePressed(MouseCode code);
-	virtual void OnMouseReleased(MouseCode code);
+	void OnCursorMoved(int x, int y) override;
+	void OnMousePressed(MouseCode code) override;
+	void OnMouseDoublePressed(MouseCode code) override;
+	void OnMouseReleased(MouseCode code) override;
 
 	// Return true if this slider is actually drawing itself
 	virtual bool IsSliderVisible( void );
 
-	virtual void ApplySettings( KeyValues *pInResourceData );
+	void ApplySettings( KeyValues *pInResourceData ) override;
 
 protected:
-	virtual void Paint();
-	virtual void PaintBackground();
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void Paint() override;
+	void PaintBackground() override;
+	void PerformLayout() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 
 private:
 	virtual void RecomputeNobPosFromValue();

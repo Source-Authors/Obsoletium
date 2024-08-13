@@ -37,7 +37,7 @@ namespace vgui
 
 class ContextLabel : public Label
 {
-	DECLARE_CLASS_SIMPLE( ContextLabel, Label );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ContextLabel, Label );
 public:
 
 	ContextLabel( Button *parent, char const *panelName, char const *text ):
@@ -47,7 +47,7 @@ public:
 		SetBlockDragChaining( true );
 	}
 
-	virtual void OnMousePressed( MouseCode code )
+	void OnMousePressed( MouseCode code ) override
 	{
 		if ( m_pTabButton )
 		{
@@ -55,7 +55,7 @@ public:
 		}
 	}
 
-	virtual void OnMouseReleased( MouseCode code )
+	void OnMouseReleased( MouseCode code ) override
 	{
 		BaseClass::OnMouseReleased( code );
 
@@ -65,7 +65,7 @@ public:
 		}
 	}
 
-	virtual void ApplySchemeSettings( IScheme *pScheme )
+	void ApplySchemeSettings( IScheme *pScheme ) override
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
 
@@ -108,7 +108,7 @@ static PropertySheet *IsDroppingSheet( CUtlVector< KeyValues * >& msglist )
 //-----------------------------------------------------------------------------
 class PageTab : public Button
 {
-	DECLARE_CLASS_SIMPLE( PageTab, Button );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( PageTab, Button );
 
 private:
 	bool _active;
@@ -147,7 +147,7 @@ public:
 		if ( imageName )
 		{
 			m_pImage = new ImagePanel( this, text );
-			int buflen = Q_strlen( imageName ) + 1;
+			intp buflen = Q_strlen( imageName ) + 1;
 			m_pszImageName = new char[ buflen ];
 			Q_strncpy( m_pszImageName, imageName, buflen );
 
@@ -164,22 +164,22 @@ public:
 		delete[] m_pszImageName;
 	}
 
-	virtual void Paint()
+	void Paint() override
 	{
 		BaseClass::Paint();
 	}
 
-	virtual void OnCursorEntered()
+	void OnCursorEntered() override
 	{
 		m_dropHoverTime = system()->GetTimeMillis();
 	}
 
-	virtual void OnCursorExited()
+	void OnCursorExited() override
 	{
 		m_dropHoverTime = -1;
 	}
 
-	virtual void OnThink()
+	void OnThink() override
 	{
 		if ( m_bAttemptingDrop && m_hoverActivatePageTime >= 0 && m_dropHoverTime >= 0 )
 		{
@@ -196,7 +196,7 @@ public:
 		BaseClass::OnThink();
 	}
 
-	virtual bool IsDroppable( CUtlVector< KeyValues * >&msglist )
+	bool IsDroppable( CUtlVector< KeyValues * >&msglist ) override
 	{
 		m_bAttemptingDrop = true;
 
@@ -210,7 +210,7 @@ public:
 		return BaseClass::IsDroppable( msglist );
 	}
 
-	virtual void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels )
+	void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels ) override
 	{
 		PropertySheet *sheet = IsDroppingSheet( msglist );
 		if ( sheet )
@@ -228,7 +228,7 @@ public:
 		BaseClass::OnDroppablePanelPaint( msglist, dragPanels );
 	}
 
-	virtual void OnPanelDropped( CUtlVector< KeyValues * >& msglist )
+	void OnPanelDropped( CUtlVector< KeyValues * >& msglist ) override
 	{
 		PropertySheet *sheet = IsDroppingSheet( msglist );
 		if ( sheet )
@@ -249,7 +249,7 @@ public:
 		active->OnPanelDropped( msglist );
 	}
 
-	virtual void OnDragFailed( CUtlVector< KeyValues * >& msglist )
+	void OnDragFailed( CUtlVector< KeyValues * >& msglist ) override
 	{
 		PropertySheet *sheet = IsDroppingSheet( msglist );
 		if ( !sheet )
@@ -295,7 +295,7 @@ public:
 		}
 	}
 
-	virtual void OnCreateDragData( KeyValues *msg )
+	void OnCreateDragData( KeyValues *msg ) override
 	{
 		Assert( m_pParent->IsDraggableTab() );
 
@@ -307,7 +307,7 @@ public:
 		msg->SetString( "text", sz );
 	}
 
-	virtual void ApplySchemeSettings(IScheme *pScheme)
+	void ApplySchemeSettings(IScheme *pScheme) override
 	{
 		// set up the scheme settings
 		Button::ApplySchemeSettings(pScheme);
@@ -349,7 +349,7 @@ public:
 		}
 	}
 
-	virtual void ApplySettings( KeyValues *inResourceData )
+	void ApplySettings( KeyValues *inResourceData ) override
 	{
 		const char *pBorder = inResourceData->GetString("activeborder_override", "");
 		if (*pBorder)
@@ -364,7 +364,7 @@ public:
 		BaseClass::ApplySettings(inResourceData);
 	}
 
-	virtual void OnCommand( char const *cmd )
+	void OnCommand( char const *cmd ) override
 	{
 		if ( !Q_stricmp( cmd, "ShowContextMenu" ) )
 		{
@@ -374,10 +374,10 @@ public:
 			PostActionSignal( kv );
 			return;
 		}
-		BaseClass::OnCommand( cmd );		
+		BaseClass::OnCommand( cmd );
 	}
 
-	IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus)
+	IBorder *GetBorder(bool , bool , bool , bool ) override
 	{
 		if (_active)
 		{
@@ -386,7 +386,7 @@ public:
 		return m_pNormalBorder;
 	}
 
-	virtual Color GetButtonFgColor()
+	Color GetButtonFgColor() override
 	{
 		if (_active)
 		{
@@ -412,13 +412,13 @@ public:
 		InvalidateLayout();
 	}
 
-    virtual bool CanBeDefaultButton(void)
+    bool CanBeDefaultButton() override
     {
         return false;
     }
 
 	//Fire action signal when mouse is pressed down instead  of on release.
-	virtual void OnMousePressed(MouseCode code) 
+	void OnMousePressed(MouseCode code) override
 	{
 		// check for context menu open
 		if (!IsEnabled())
@@ -441,7 +441,7 @@ public:
 		}
 	}
 
-	virtual void OnMouseReleased(MouseCode code)
+	void OnMouseReleased(MouseCode code) override
 	{
 		// ensure mouse capture gets released
 		if (IsUseCaptureMouseEnabled())
@@ -462,7 +462,7 @@ public:
 		}
 	}
 
-	virtual void PerformLayout()
+	void PerformLayout() override
 	{
 		BaseClass::PerformLayout();
 

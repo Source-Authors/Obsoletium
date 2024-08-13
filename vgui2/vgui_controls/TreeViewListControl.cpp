@@ -106,12 +106,12 @@ void CTreeViewListControl::SetColumnInfo( int iColumn, const char *pTitle, int w
 	InvalidateLayout();
 }
 
-int CTreeViewListControl::GetNumRows()
+intp CTreeViewListControl::GetNumRows()
 {
 	return m_Rows.Count();
 }
 
-int CTreeViewListControl::GetTreeItemAtRow( int iRow )
+int CTreeViewListControl::GetTreeItemAtRow( intp iRow )
 {
 	if ( iRow < 0 || iRow >= m_Rows.Count() )
 		return -1;
@@ -209,8 +209,8 @@ void CTreeViewListControl::RecalculateColumns()
 	int rightEdge = GetWide()-1 - GetScrollBarSize();
 
 	int x = 0;
-	int c = m_Columns.Count();
-	for ( int i=0; i < c; i++ )
+	intp c = m_Columns.Count();
+	for ( intp i=0; i < c; i++ )
 	{
 		m_Columns[i].m_Left = x + 1;
 		int cw = m_Columns[i].m_Width;
@@ -238,7 +238,7 @@ void CTreeViewListControl::PostChildPaint()
 	endX = m_Columns[m_Columns.Count()-1].m_Right + 1;
 
 	int bottomY = 0;
-	for ( int i=0; i < m_Rows.Count(); i++ )
+	for ( intp i=0; i < m_Rows.Count(); i++ )
 	{
 		int left, top, right, bottom;
 		GetGridElementBounds( 0, i, left, top, right, bottom );
@@ -249,7 +249,7 @@ void CTreeViewListControl::PostChildPaint()
 
 	// Draw the vertical lines.
 	int curX = 0;
-	for ( int i=0; i < m_Columns.Count(); i++ )
+	for ( intp i=0; i < m_Columns.Count(); i++ )
 	{
 		vgui::surface()->DrawLine( curX, 0, curX, bottomY );
 		curX += m_Columns[i].m_Width;
@@ -269,7 +269,7 @@ void CTreeViewListControl::DrawTitleBars()
 {
 	int rightEdge = GetWide();
 
-	for ( int i=0; i < m_Columns.Count(); i++ )
+	for ( intp i=0; i < m_Columns.Count(); i++ )
 	{
 		int left, top, right, bottom;
 		GetGridElementBounds( i, -1, left, top, right, bottom );
@@ -307,7 +307,7 @@ void CTreeViewListControl::DrawTitleBars()
 			surface()->DrawSetTextPos( midx - wide/2, midy - tall/2 );
 		}
 		
-		surface()->DrawPrintText( unicodeString, strlen( pTitleString ) );
+		surface()->DrawPrintText( unicodeString, V_strlen( pTitleString ) );
 	}
 }
 

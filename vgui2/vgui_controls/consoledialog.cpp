@@ -24,11 +24,7 @@
 #include "icvar.h"
 #include "filesystem.h"
 
-#include <stdlib.h>
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
+#include <cstdlib>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -41,7 +37,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CNonFocusableMenu : public Menu
 {
-	DECLARE_CLASS_SIMPLE( CNonFocusableMenu, Menu );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CNonFocusableMenu, Menu );
 
 public:
 	CNonFocusableMenu( Panel *parent, const char *panelName )
@@ -55,7 +51,7 @@ public:
 		m_pFocus = panel;
 	}
 
-	VPANEL GetCurrentKeyFocus()
+	VPANEL GetCurrentKeyFocus() override
 	{
 		if ( !m_pFocus )
 			return GetVPanel();
@@ -169,7 +165,7 @@ const char *CHistoryItem::GetExtra() const
 void CHistoryItem::SetText( const char *text, const char *extra )
 {
 	delete[] m_text;
-	int len = strlen( text ) + 1;
+	intp len = strlen( text ) + 1;
 
 	m_text = new char[ len ];
 	Q_memset( m_text, 0x0, len );
@@ -179,7 +175,7 @@ void CHistoryItem::SetText( const char *text, const char *extra )
 	{
 		m_bHasExtra = true;
 		delete[] m_extraText;
-		int elen = strlen( extra ) + 1;
+		intp elen = strlen( extra ) + 1;
 		m_extraText = new char[ elen ];
 		Q_memset( m_extraText, 0x0, elen);
 		Q_strncpy( m_extraText, extra, elen );
@@ -209,7 +205,7 @@ CConsolePanel::CompletionItem::CompletionItem( const CompletionItem& src )
 	m_pCommand = src.m_pCommand;
 	if ( src.m_pText )
 	{
-		m_pText = new CHistoryItem( (const CHistoryItem& )src.m_pText );
+		m_pText = new CHistoryItem( *src.m_pText );
 	}
 	else
 	{
@@ -226,7 +222,7 @@ CConsolePanel::CompletionItem& CConsolePanel::CompletionItem::operator =( const 
 	m_pCommand = src.m_pCommand;
 	if ( src.m_pText )
 	{
-		m_pText = new CHistoryItem( (const CHistoryItem& )*src.m_pText );
+		m_pText = new CHistoryItem( *src.m_pText );
 	}
 	else
 	{
@@ -317,7 +313,7 @@ CConsolePanel::CConsolePanel( vgui::Panel *pParent, const char *pName, bool bSta
 	m_pSubmit->SetCommand("submit");
 	m_pSubmit->SetVisible( !m_bStatusVersion );
 
-	CNonFocusableMenu *pCompletionList = new CNonFocusableMenu( this, "CompletionList" );
+	auto *pCompletionList = new CNonFocusableMenu( this, "CompletionList" );
 	m_pCompletionList = pCompletionList;
 	m_pCompletionList->SetVisible(false);
 
@@ -454,18 +450,18 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 	ClearCompletionList();
 
 	// we need the length of the text for the partial string compares
-	int len = Q_strlen(text);
+	intp len = Q_strlen(text);
 	if ( len < 1 )
 	{
 		// Fill the completion list with history instead
-		for ( int i = 0 ; i < m_CommandHistory.Count(); i++ )
+		for ( const auto &item : m_CommandHistory )
 		{
-			CHistoryItem *item = &m_CommandHistory[ i ];
-			CompletionItem *comp = new CompletionItem();
+			auto *comp = new CompletionItem();
 			m_CompletionList.AddToTail( comp );
+
 			comp->m_bIsCommand = false;
-			comp->m_pCommand = NULL;
-			comp->m_pText = new CHistoryItem( *item );
+			comp->m_pCommand = nullptr;
+			comp->m_pText = new CHistoryItem( item );
 		}
 		return;
 	}
@@ -490,18 +486,18 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 		for ( i = 0; i < count; i++ )
 		{
 			// match found, add to list
-			CompletionItem *item = new CompletionItem();
+			auto *item = new CompletionItem();
 			m_CompletionList.AddToTail( item );
 			item->m_bIsCommand = false;
-			item->m_pCommand = NULL;
+			item->m_pCommand = nullptr;
 			item->m_pText = new CHistoryItem( commands[ i ].String() );
 		}
 	}
-				 
+
 	if ( bNormalBuild )
 	{
 		// look through the command list for all matches
-		ConCommandBase const *cmd = (ConCommandBase const *)cvar->GetCommands();
+		ConCommandBase const *cmd = cvar->GetCommands();
 		while (cmd)
 		{
 			if ( cmd->IsFlagSet( FCVAR_DEVELOPMENTONLY ) || cmd->IsFlagSet( FCVAR_HIDDEN ) )
@@ -513,15 +509,15 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 			if ( !strnicmp(text, cmd->GetName(), len))
 			{
 				// match found, add to list
-				CompletionItem *item = new CompletionItem();
+				auto *item = new CompletionItem();
 				m_CompletionList.AddToTail( item );
 				item->m_pCommand = (ConCommandBase *)cmd;
 				const char *tst = cmd->GetName();
 				if ( !cmd->IsCommand() )
 				{
 					item->m_bIsCommand = false;
-					ConVar *var = ( ConVar * )cmd;
-					ConVar_ServerBounded *pBounded = dynamic_cast<ConVar_ServerBounded*>( var );
+					auto *var = ( ConVar * )cmd;
+					auto *pBounded = dynamic_cast<ConVar_ServerBounded*>( var );
 					if ( pBounded || var->IsFlagSet( FCVAR_NEVER_AS_STRING ) )
 					{
 						char strValue[512];
@@ -554,25 +550,17 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 		// Now sort the list by command name
 		if ( m_CompletionList.Count() >= 2 )
 		{
-			for ( int i = 0 ; i < m_CompletionList.Count(); i++ )
-			{
-				for ( int j = i + 1; j < m_CompletionList.Count(); j++ )
+			std::sort
+			(
+				std::begin(m_CompletionList),
+				std::end(m_CompletionList),
+				[]( const CompletionItem *i1, const CompletionItem *i2 )
 				{
-					const CompletionItem *i1, *i2;
-					i1 = m_CompletionList[ i ];
-					i2 = m_CompletionList[ j ];
-
-					if ( Q_stricmp( i1->GetName(), i2->GetName() ) > 0 )
-					{
-						CompletionItem *temp = m_CompletionList[ i ];
-						m_CompletionList[ i ] = m_CompletionList[ j ];
-						m_CompletionList[ j ] = temp;
-					}
+					return Q_stricmp( i1->GetName(), i2->GetName() ) < 0;
 				}
-			}
+			);
 		}
 	}
-
 }
 
 //-----------------------------------------------------------------------------
@@ -650,7 +638,7 @@ void CConsolePanel::OnTextChanged(Panel *panel)
 	m_pEntry->GetText(m_szPartialText, sizeof(m_szPartialText));
 
 	// see if they've hit the tilde key (which opens & closes the console)
-	int len = Q_strlen(m_szPartialText);
+	intp len = Q_strlen(m_szPartialText);
 
 	bool hitTilde = ( m_szPartialText[len - 1] == '~' || m_szPartialText[len - 1] == '`' ) ? true : false;
 
@@ -965,26 +953,27 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 		m_CommandHistory.Remove( 0 );
 	}
 
+	const size_t commandTextLen = strlen( commandText );
+
 	// strip the space off the end of the command before adding it to the history
 	// If this code gets cleaned up then we should remove the redundant calls to strlen,
 	// the check for whether _alloca succeeded, and should use V_strncpy instead of the
 	// error prone memset/strncpy sequence.
-	char *command = static_cast<char *>( _alloca( (strlen( commandText ) + 1 ) * sizeof( char ) ));
+	char *command = static_cast<char *>( _alloca( (commandTextLen + 1 ) * sizeof( char ) ));
 	if ( command )
 	{
-		memset( command, 0x0, strlen( commandText ) + 1 );
-		strncpy( command, commandText, strlen( commandText ));
-		// There is no actual bug here, just some sloppy/odd code.
-		// src\vgui2\vgui_controls\consoledialog.cpp(974): warning C6053: The prior call to 'strncpy' might not zero-terminate string 'command'
-		ANALYZE_SUPPRESS( 6053 )
-		if ( command[ strlen( command ) -1 ] == ' ' )
+		memset( command, 0x0, commandTextLen + 1 );
+		strncpy( command, commandText, commandTextLen );
+
+		const size_t len = strlen(command) - 1;
+		if ( command[ len ] == ' ' )
 		{
-			 command[ strlen( command ) -1 ] = '\0';
+			 command[ len ] = '\0';
 		}
 	}
 
 	// strip the quotes off the extra text
-	char *extra = NULL;
+	char *extra = nullptr;
 
 	if ( extraText )
 	{
@@ -995,7 +984,7 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 			strncpy( extra, extraText, strlen( extraText )); // +1 to dodge the starting quote
 			
 			// Strip trailing spaces
-			int i = strlen( extra ) - 1; 
+			intp i = strlen( extra ) - 1; 
 			while ( i >= 0 &&  // Check I before referencing i == -1 into the extra array!
 				extra[ i ] == ' ' )
 			{
@@ -1006,10 +995,9 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 	}
 
 	// If it's already there, then remove since we'll add it to the end instead
-	CHistoryItem *item = NULL;
-	for ( int i = m_CommandHistory.Count() - 1; i >= 0; i-- )
+	for ( intp i = m_CommandHistory.Count() - 1; i >= 0; i-- )
 	{
-		item = &m_CommandHistory[ i ];
+		CHistoryItem *item = &m_CommandHistory[ i ];
 		if ( !item )
 			continue;
 
@@ -1025,10 +1013,11 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 			if ( stricmp( item->GetExtra(), extra ) )	
 				continue;
 		}
+
 		m_CommandHistory.Remove( i );
 	}
 
-	item = &m_CommandHistory[ m_CommandHistory.AddToTail() ];
+	CHistoryItem *item = &m_CommandHistory[ m_CommandHistory.AddToTail() ];
 	Assert( item );
 	item->SetText( command, extra );
 
@@ -1051,9 +1040,8 @@ void CConsolePanel::GetConsoleText( char *pchText, size_t bufSize ) const
 //-----------------------------------------------------------------------------
 void CConsolePanel::DumpConsoleTextToFile()
 {
-	const int CONDUMP_FILES_MAX_NUM = 1000;
+	constexpr int CONDUMP_FILES_MAX_NUM = 1000;
 
-	FileHandle_t handle;
 	bool found = false;
 	char szfile[ 512 ];
 
@@ -1074,7 +1062,7 @@ void CConsolePanel::DumpConsoleTextToFile()
 		return;
 	}
 
-	handle = g_pFullFileSystem->Open( szfile, "wb" );
+	FileHandle_t handle = g_pFullFileSystem->Open(szfile, "wb");
 	if ( handle != FILESYSTEM_INVALID_HANDLE )
 	{
 		int pos = 0;
@@ -1093,8 +1081,8 @@ void CConsolePanel::DumpConsoleTextToFile()
 			g_pVGuiLocalize->ConvertUnicodeToANSI(buf, ansi, sizeof(ansi));
 
 			// write to disk
-			int len = strlen(ansi);
-			for (int i = 0; i < len; i++)
+			intp len = strlen(ansi);
+			for (intp i = 0; i < len; i++)
 			{
 				// preceed newlines with a return
 				if (ansi[i] == '\n')
@@ -1143,7 +1131,7 @@ void CConsoleDialog::OnScreenSizeChanged( int iOldWide, int iOldTall )
 
 	int sx, sy;
 	surface()->GetScreenSize( sx, sy );
-									 
+
 	int w, h;
 	GetSize( w, h );
 	if ( w > sx || h > sy  )

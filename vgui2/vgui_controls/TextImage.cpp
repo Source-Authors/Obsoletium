@@ -59,7 +59,7 @@ TextImage::TextImage(const char *text) : Image()
 TextImage::TextImage(const wchar_t *wszText) : Image()
 {
 	_utext = NULL;
-  _textBufferLen = 0;
+	_textBufferLen = 0;
 	_textLen = 0;
 	_font = INVALID_FONT;
 	_fallbackFont = INVALID_FONT;
@@ -231,7 +231,7 @@ void TextImage::GetText(char *buffer, int bufferSize)
 	if ( m_bAllCaps )
 	{
 		// Uppercase all the letters
-		for ( int i = Q_strlen( buffer ); i >= 0; --i )
+		for ( intp i = Q_strlen( buffer ); i >= 0; --i )
 		{
 			buffer[ i ] = toupper( buffer[ i ] );
 		}
@@ -497,8 +497,8 @@ void TextImage::GetTextSize(int &wide, int &tall)
 	int fontHeight = surface()->GetFontTall(GetFont());
 	tall = fontHeight;
 
-	int textLen = wcslen(text);
-	for (int i = 0; i < textLen; i++)
+	intp textLen = wcslen(text);
+	for (intp i = 0; i < textLen; i++)
 	{
 		wchar_t ch = text[i];
 
@@ -543,7 +543,7 @@ void TextImage::GetTextSize(int &wide, int &tall)
 
 		if ( m_bWrap || m_bWrapCenter )
 		{
-			for(int j=0; j<m_LineBreaks.Count(); j++)
+			for(intp j=0; j<m_LineBreaks.Count(); j++)
 			{
 				if ( &text[i] == m_LineBreaks[j] )
 				{
@@ -600,7 +600,7 @@ void TextImage::RecalculateNewLinePositions()
 	
 	//int wordStartIndex = 0;
 	wchar_t *wordStartIndex = _utext;
-	int wordLength = 0;
+	[[maybe_unused]] int wordLength = 0;
 	bool hasWord = false;
 	bool justStartedNewLine = true;
 	bool wordStartedOnNewLine = true;
@@ -913,8 +913,8 @@ void TextImage::RecalculateCenterWrapIndents()
 		}
 		else if (ch == '\n')
 		{
-			int iIdx = m_LineXIndent.AddToTail();
-			m_LineXIndent[iIdx] = (_drawWidth - iCurLineW) * 0.5;
+			intp iIdx = m_LineXIndent.AddToTail();
+			m_LineXIndent[iIdx] = (_drawWidth - iCurLineW) * 0.5f;
 
 			iCurLineW = 0;
 			continue;
@@ -940,8 +940,8 @@ void TextImage::RecalculateCenterWrapIndents()
 		{
 			if (wsz == m_LineBreaks[currentLineBreak])
 			{
-				int iIdx = m_LineXIndent.AddToTail();
-				m_LineXIndent[iIdx] = (_drawWidth - iCurLineW) * 0.5;
+				intp iIdx = m_LineXIndent.AddToTail();
+				m_LineXIndent[iIdx] = (_drawWidth - iCurLineW) * 0.5f;
 
 				iCurLineW = 0;
 				currentLineBreak++;
@@ -963,8 +963,8 @@ void TextImage::RecalculateCenterWrapIndents()
 	}	
 
 	// Add the final line
-	int iIdx = m_LineXIndent.AddToTail();
-	m_LineXIndent[iIdx] = (_drawWidth - iCurLineW) * 0.5;
+	intp iIdx = m_LineXIndent.AddToTail();
+	m_LineXIndent[iIdx] = (_drawWidth - iCurLineW) / 2;
 }
 
 void TextImage::AddColorChange( Color col, int iTextStreamIndex )

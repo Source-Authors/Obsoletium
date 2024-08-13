@@ -22,7 +22,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class GraphPanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( GraphPanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( GraphPanel, Panel );
 
 public:
 	GraphPanel(Panel *parent, const char *name);
@@ -47,9 +47,9 @@ public:
 	void AddItem(float sampleEnd, float sampleValue);
 
 protected:
-	virtual void Paint();
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void Paint() override;
+	void PerformLayout() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 
 private:
 	int GetVisibleItemCount();

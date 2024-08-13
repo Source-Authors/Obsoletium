@@ -29,7 +29,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class PanelListPanel : public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( PanelListPanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( PanelListPanel, Panel );
 
 public:
 	PanelListPanel( vgui::Panel *parent, char const *panelName );
@@ -87,11 +87,11 @@ public:
 
 protected:
 	// overrides
-	virtual void OnSizeChanged(int wide, int tall);
+	void OnSizeChanged(int wide, int tall) override;
 	MESSAGE_FUNC_INT( OnSliderMoved, "ScrollBarSliderMoved", position );
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
-	virtual void OnMouseWheeled(int delta);
+	void PerformLayout() override;
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
+	void OnMouseWheeled(int delta) override;
 
 private:
 	

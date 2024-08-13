@@ -13,7 +13,7 @@
 #include "tier1/utlvector.h"
 #include <vgui_controls/Panel.h>
 
-#define DECLARE_PANELANIMATION( className )												\
+#define DECLARE_PANELANIMATION_BASE( className )												\
 	static void AddToAnimationMap( char const *scriptname, char const *type, char const *var,	\
 		char const *defaultvalue, bool array, PANELLOOKUPFUNC func )					\
 	{																					\
@@ -30,7 +30,7 @@
 		map->entries.AddToTail( entry );												\
 	}																					\
 																						\
-	static void ChainToAnimationMap( void )														\
+	static void ChainToAnimationMap( void )												\
 	{																					\
 		static bool chained = false;													\
 		if ( chained )																	\
@@ -51,12 +51,23 @@
 	public:																				\
 		className##_Register()															\
 		{																				\
-			className::ChainToAnimationMap();													\
+			className::ChainToAnimationMap();											\
 		}																				\
 	};																					\
-	className##_Register m_RegisterAnimationClass;												\
+	className##_Register m_RegisterAnimationClass;
+
+#define DECLARE_PANELANIMATION(className)												\
+	DECLARE_PANELANIMATION_BASE(className)												\
 																						\
 	virtual PanelAnimationMap *GetAnimMap()												\
+	{																					\
+		return FindOrAddPanelAnimationMap( GetPanelClassName() );						\
+	}
+
+#define DECLARE_PANELANIMATION_OVERRIDE(className)										\
+	DECLARE_PANELANIMATION_BASE(className)												\
+																						\
+	PanelAnimationMap *GetAnimMap() override											\
 	{																					\
 		return FindOrAddPanelAnimationMap( GetPanelClassName() );						\
 	}

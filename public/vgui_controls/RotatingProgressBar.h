@@ -24,21 +24,21 @@ namespace vgui
 	//-----------------------------------------------------------------------------
 	class RotatingProgressBar : public ProgressBar
 	{
-		DECLARE_CLASS_SIMPLE( RotatingProgressBar, ProgressBar );
+		DECLARE_CLASS_SIMPLE_OVERRIDE( RotatingProgressBar, ProgressBar );
 
 	public:
 		RotatingProgressBar(Panel *parent, const char *panelName);
 		~RotatingProgressBar();
 
-		virtual void ApplySettings(KeyValues *inResourceData);
-		virtual void ApplySchemeSettings(IScheme *pScheme);
+		void ApplySettings(KeyValues *inResourceData) override;
+		void ApplySchemeSettings(IScheme *pScheme) override;
 
 		void SetImage( const char *imageName );
 
 	protected:
-		virtual void Paint();
-		virtual void PaintBackground();
-		virtual void OnTick();
+		void Paint() override;
+		void PaintBackground() override;
+		void OnTick() override;
 
 	private:
 		int m_nTextureId;

@@ -89,7 +89,7 @@ enum EDialogType
 //-----------------------------------------------------------------------------
 class CMessageDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CMessageDialog, vgui::Frame ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMessageDialog, vgui::Frame ); 
 
 public:
 	CMessageDialog( vgui::Panel *parent, const uint nType, const char *pTitle, const char *pMsg, const char *pCmdA, const char *pCmdB, vgui::Panel *pParent, bool bShowActivity );
@@ -111,10 +111,10 @@ public:
 		bool		bCreated;
 	};
 
-	virtual void		OnKeyCodePressed( vgui::KeyCode code );
-	virtual void		ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void		ApplySettings( KeyValues *inResourceData );
-	virtual void		PaintBackground();
+	void		OnKeyCodePressed( vgui::KeyCode code ) override;
+	void		ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void		ApplySettings( KeyValues *inResourceData ) override;
+	void		PaintBackground() override;
 	uint				GetType( void );
 	void				SetControlSettingsKeys( KeyValues *pKeys );
 

@@ -28,7 +28,7 @@ class ListViewItem;
 //-----------------------------------------------------------------------------
 class ListViewPanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( ListViewPanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ListViewPanel, Panel );
 
 public:
 	ListViewPanel(Panel *parent, const char *panelName);
@@ -72,15 +72,15 @@ public:
 
 protected:
 	// overrides
-	virtual void OnMouseWheeled(int delta);
-	virtual void OnSizeChanged(int wide, int tall); 
-	virtual void PerformLayout();
-	virtual void Paint();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void OnMousePressed( MouseCode code);
-	virtual void OnMouseDoublePressed( MouseCode code);
-	virtual void OnKeyCodeTyped( KeyCode code);
-	virtual void OnKeyTyped(wchar_t unichar);
+	void OnMouseWheeled(int delta) override;
+	void OnSizeChanged(int wide, int tall) override; 
+	void PerformLayout() override;
+	void Paint() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void OnMousePressed( MouseCode code) override;
+	void OnMouseDoublePressed( MouseCode code) override;
+	void OnKeyCodeTyped( KeyCode code) override;
+	void OnKeyTyped(wchar_t unichar) override;
 	MESSAGE_FUNC( OnSliderMoved, "ScrollBarSliderMoved" );
 	virtual int GetItemsPerColumn();
 

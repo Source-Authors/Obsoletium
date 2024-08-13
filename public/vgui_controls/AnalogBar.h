@@ -24,7 +24,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class AnalogBar : public Panel
 {
-	DECLARE_CLASS_SIMPLE( AnalogBar, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( AnalogBar, Panel );
 
 public:
 	AnalogBar(Panel *parent, const char *panelName);
@@ -41,9 +41,9 @@ public:
 	void SetBarInset( int pixels );
 	int GetBarInset( void );
 	
-	virtual void ApplySettings(KeyValues *inResourceData);
-	virtual void GetSettings(KeyValues *outResourceData);
-	virtual const char *GetDescription();
+	void ApplySettings(KeyValues *inResourceData) override;
+	void GetSettings(KeyValues *outResourceData) override;
+	const char *GetDescription() override;
 
 	// returns the number of segment blocks drawn
 	int GetDrawnSegmentCount();
@@ -66,10 +66,10 @@ public:
 	void SetHomeColor( const Color &color ) { m_HomeColor = color; }
 
 protected:
-	virtual void Paint();
+	void Paint() override;
 	void PaintSegment( int &x, int &y, int tall, int wide, Color color, bool bHome );
-	virtual void PaintBackground();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void PaintBackground() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 	MESSAGE_FUNC_PARAMS( OnDialogVariablesChanged, "DialogVariables", dialogVariables );
 	/* CUSTOM MESSAGE HANDLING
 		"SetAnalogValue"
@@ -81,7 +81,6 @@ protected:
 	float _analogValue;
 
 private:
-	int   _segmentCount;
 	int _segmentGap;
 	int _segmentWide;
 	int m_iBarInset;
@@ -96,12 +95,12 @@ private:
 //-----------------------------------------------------------------------------
 class ContinuousAnalogBar : public AnalogBar
 {
-	DECLARE_CLASS_SIMPLE( ContinuousAnalogBar, AnalogBar );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ContinuousAnalogBar, AnalogBar );
 
 public:
 	ContinuousAnalogBar(Panel *parent, const char *panelName);
 
-	virtual void Paint();
+	void Paint() override;
 };
 
 } // namespace vgui

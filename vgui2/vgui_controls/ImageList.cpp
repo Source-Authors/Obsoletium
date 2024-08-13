@@ -21,17 +21,17 @@ using namespace vgui;
 class BlankImage : public IImage
 {
 public:
-	virtual void Paint() {}
-	virtual void SetPos(int x, int y) {}
-	virtual void GetContentSize(int &wide, int &tall) { wide = 0; tall = 0; }
-	virtual void GetSize(int &wide, int &tall) { wide = 0; tall = 0; }
-	virtual void SetSize(int wide, int tall) {}
-	virtual void SetColor(Color col) {}
-	virtual bool Evict() { return false; }
-	virtual int GetNumFrames() { return 0; }
-	virtual void SetFrame( int nFrame ) {}
-	virtual HTexture GetID() { return 0; }
-	virtual void SetRotation( int iRotation ) { return; };
+	void Paint() override {}
+	void SetPos(int x, int y) override {}
+	void GetContentSize(int &wide, int &tall) override { wide = 0; tall = 0; }
+	void GetSize(int &wide, int &tall) override { wide = 0; tall = 0; }
+	void SetSize(int wide, int tall) override {}
+	void SetColor(Color col) override {}
+	bool Evict() override { return false; }
+	int GetNumFrames() override { return 0; }
+	void SetFrame( int nFrame ) override {}
+	HTexture GetID() override { return 0; }
+	void SetRotation( int iRotation ) override { return; };
 };
 
 //-----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ ImageList::~ImageList()
 //-----------------------------------------------------------------------------
 // Purpose: adds a new image to the list, returning the index it was placed at
 //-----------------------------------------------------------------------------
-int ImageList::AddImage(vgui::IImage *image)
+intp ImageList::AddImage(vgui::IImage *image)
 {
 	return m_Images.AddToTail(image);
 }

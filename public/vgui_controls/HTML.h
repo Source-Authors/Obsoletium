@@ -35,7 +35,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class HTML: public Panel
 {
-	DECLARE_CLASS_SIMPLE( HTML, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( HTML, Panel );
 	// TODO::STYLE
 	//DECLARE_STYLE_BASE( "HTML" );
 public:
@@ -47,7 +47,7 @@ public:
 	virtual void OpenURL( const char *URL, const char *pchPostData, bool bForce = false );
 	virtual bool StopLoading();
 	virtual bool Refresh();
-	virtual void OnMove();
+	void OnMove() override;
 	virtual void RunJavascript( const char *pchScript );
 	virtual void GoBack();
 	virtual void GoForward();
@@ -56,12 +56,12 @@ public:
 
 	// event functions you can override and specialize behavior of
 	virtual bool OnStartRequest( const char *url, const char *target, const char *pchPostData, bool bIsRedirect );
-	virtual void OnFinishRequest(const char *url, const char *pageTitle, const CUtlMap < CUtlString, CUtlString > &headers ) {}
-	virtual void OnSetHTMLTitle( const char *pchTitle ) {}
-	virtual void OnLinkAtPosition( const char *pchURL ) {}
-	virtual void OnURLChanged( const char *url, const char *pchPostData, bool bIsRedirect ) {}
+	virtual void OnFinishRequest(const char *, const char *, const CUtlMap < CUtlString, CUtlString > & ) {}
+	virtual void OnSetHTMLTitle( const char * ) {}
+	virtual void OnLinkAtPosition( const char * ) {}
+	virtual void OnURLChanged( const char *, const char *, bool ) {}
 
-	virtual bool OnOpenNewTab( const char *pchURL, bool bForeground ) { return false; }
+	virtual bool OnOpenNewTab( const char *, bool ) { return false; }
 
 	// configuration
 	virtual void SetScrollbarsEnabled(bool state);
@@ -78,22 +78,22 @@ public:
 	virtual void AddCustomURLHandler(const char *customProtocolName, vgui::Panel *target);
 
 	// overridden to paint our special web browser texture
-	virtual void Paint();
+	void Paint() override;
 
 	// pass messages to the texture component to tell it about resizes
-	virtual void OnSizeChanged(int wide,int tall);
+	void OnSizeChanged(int wide,int tall) override;
 
 	// pass mouse clicks through
-	virtual void OnMousePressed(MouseCode code);
-	virtual void OnMouseReleased(MouseCode code);
-	virtual void OnCursorMoved(int x,int y);
-	virtual void OnMouseDoublePressed(MouseCode code);
-	virtual void OnKeyTyped(wchar_t unichar);
-	virtual void OnKeyCodeTyped(KeyCode code);
-	virtual void OnKeyCodeReleased(KeyCode code);
-	virtual void PerformLayout();
-	virtual void OnMouseWheeled(int delta);
-	virtual void PostChildPaint();
+	void OnMousePressed(MouseCode code) override;
+	void OnMouseReleased(MouseCode code) override;
+	void OnCursorMoved(int x,int y) override;
+	void OnMouseDoublePressed(MouseCode code) override;
+	void OnKeyTyped(wchar_t unichar) override;
+	void OnKeyCodeTyped(KeyCode code) override;
+	void OnKeyCodeReleased(KeyCode code) override;
+	void PerformLayout() override;
+	void OnMouseWheeled(int delta) override;
+	void PostChildPaint() override;
 
 	/* message posting:
 
@@ -118,11 +118,11 @@ public:
 
 	MESSAGE_FUNC_INT( OnSetCursorVGUI, "SetCursor", cursor );
 
-	virtual void OnCommand( const char *pchCommand );
+	void OnCommand( const char *pchCommand ) override;
 
 	void AddHeader( const char *pchHeader, const char *pchValue );
-	void OnKillFocus();
-	void OnSetFocus();
+	void OnKillFocus() override;
+	void OnSetFocus() override;
 
 	void Find( const char *pchSubStr );
 	void StopFind();
@@ -155,7 +155,7 @@ public:
 	}
 
 protected:
-	virtual void ApplySchemeSettings( IScheme *pScheme );
+	void ApplySchemeSettings( IScheme *pScheme ) override;
 
 	vgui::Menu *m_pContextMenu;
 
@@ -202,12 +202,12 @@ private:
 	vgui::DHANDLE<vgui::FileOpenDialog> m_hFileOpenDialog;
 	class CHTMLFindBar : public vgui::EditablePanel
 	{
-		DECLARE_CLASS_SIMPLE( CHTMLFindBar, EditablePanel );
+		DECLARE_CLASS_SIMPLE_OVERRIDE( CHTMLFindBar, EditablePanel );
 	public:
 		CHTMLFindBar( HTML *parent );
 		void SetText( const char *pchText ) { m_pFindBar->SetText( pchText ); }
 		void GetText( char *pText, int ccText ) { m_pFindBar->GetText( pText, ccText ); }
-		void OnCommand( const char *pchCmd );
+		void OnCommand( const char *pchCmd ) override;
 		void ShowCountLabel() { m_pFindCountLabel->SetVisible( true ); }
 		void HideCountLabel() { m_pFindCountLabel->SetVisible( false ); }
 		void SetHidden( bool bState  ) { m_bHidden = bState; }

@@ -27,7 +27,7 @@ class ScrollBarSlider;
 //-----------------------------------------------------------------------------
 class ScrollBar : public Panel
 {
-	DECLARE_CLASS_SIMPLE( ScrollBar, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ScrollBar, Panel );
 
 public:
 	ScrollBar(Panel *parent, const char *panelName, bool vertical);
@@ -73,14 +73,14 @@ public:
 	virtual void    Validate();
 	
 	// Update and look for clicks when mouse is in the scroll bar window.
-	virtual void	OnMouseFocusTicked();
+	void	OnMouseFocusTicked() override;
 
 	// Set the slider's Paint border enabled.
-	virtual void   SetPaintBorderEnabled(bool state);
+	void   SetPaintBorderEnabled(bool state) override;
 	// Set the slider's Paint background enabled.
-	virtual void   SetPaintBackgroundEnabled(bool state);
+	void   SetPaintBackgroundEnabled(bool state) override;
 	// Set the slider's Paint enabled.
-	virtual void   SetPaintEnabled(bool state);
+	void   SetPaintEnabled(bool state) override;
 
 	// Sets the scrollbar buttons visible or not
 	virtual void    SetScrollbarButtonsVisible(bool visible);
@@ -96,14 +96,14 @@ public:
 
 	void			SetOverriddenButtons( Button *pB1, Button *pB2 ) { m_pOverriddenButtons[0] = pB1; m_pOverriddenButtons[1] = pB2; }
 
-	virtual void	ApplySettings( KeyValues *pInResourceData );
+	void	ApplySettings( KeyValues *pInResourceData ) override;
 
 protected:
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 	virtual void SendSliderMoveMessage(int value);
-	virtual void ApplySchemeSettings(IScheme *pScheme);
-	virtual void OnSizeChanged(int wide, int tall);
+	void ApplySchemeSettings(IScheme *pScheme) override;
+	void OnSizeChanged(int wide, int tall) override;
 
 	MESSAGE_FUNC_INT( OnSliderMoved, "ScrollBarSliderMoved", position );
 	virtual void RespondToScrollArrow(int const direction);

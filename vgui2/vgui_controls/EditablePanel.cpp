@@ -594,7 +594,7 @@ void EditablePanel::LoadUserConfig(const char *configName, int dialogID)
 	KeyValues *data = system()->GetUserConfigFileData(configName, dialogID);
 
 	delete [] m_pszConfigName;
-	int len = Q_strlen(configName) + 1;
+	intp len = Q_strlen(configName) + 1;
 	m_pszConfigName = new char[ len ];
 	Q_strncpy(m_pszConfigName, configName, len );
 	m_iConfigID = dialogID;

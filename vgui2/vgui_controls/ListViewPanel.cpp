@@ -38,7 +38,7 @@ namespace vgui
 {
 class ListViewItem : public Label
 {
-	DECLARE_CLASS_SIMPLE( ListViewItem, Label );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( ListViewItem, Label );
 
 public:
 	ListViewItem(Panel *parent) : Label(parent, NULL, "")
@@ -67,12 +67,12 @@ public:
 		m_pData = data->MakeCopy();
 	}
 
-	virtual void OnMousePressed( MouseCode code)
+	void OnMousePressed( MouseCode code ) override
 	{
 		m_pListViewPanel->OnItemMousePressed(this, code);
 	}
 
-	virtual void OnMouseDoublePressed( MouseCode code)
+	void OnMouseDoublePressed( MouseCode code) override
 	{
 		// double press should only select the item
 		m_pListViewPanel->OnItemMouseDoublePressed(this, code);
@@ -99,7 +99,7 @@ public:
 		Repaint();
 	}
 
-	virtual void PerformLayout()
+	void PerformLayout() override
 	{
 		TextImage *textImage = GetTextImage();
 		if (m_bSelected)
@@ -117,13 +117,13 @@ public:
 		}
 		else
 		{
-			textImage->SetColor(GetFgColor());					
+			textImage->SetColor(GetFgColor());
 		}
 		BaseClass::PerformLayout();
 		Repaint();
 	}
 
-	virtual void PaintBackground()	
+	void PaintBackground() override
 	{
 		int wide, tall;
 		GetSize(wide, tall);
@@ -148,7 +148,7 @@ public:
 		surface()->DrawFilledRect(0, 0, wide, tall);
 	}
 
-	virtual void ApplySchemeSettings(IScheme *pScheme)
+	void ApplySchemeSettings(IScheme *pScheme) override
 	{
 		BaseClass::ApplySchemeSettings(pScheme);
 
@@ -265,7 +265,7 @@ int ListViewPanel::AddItem(const KeyValues *data, bool bScrollToItem, bool bSort
 	{
 		pNewItem->SetFont(m_hFont);
 	}
-	int itemID = m_DataItems.AddToTail(pNewItem);
+	auto itemID = m_DataItems.AddToTail(pNewItem);
 	ApplyItemChanges(itemID);
 	m_SortedItems.AddToTail(itemID);
 

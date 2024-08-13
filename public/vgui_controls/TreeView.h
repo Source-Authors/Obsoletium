@@ -31,7 +31,7 @@ typedef bool (*TreeViewSortFunc_t)(KeyValues *node1, KeyValues *node2);
 
 class TreeView : public Panel
 {
-	DECLARE_CLASS_SIMPLE( TreeView, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( TreeView, Panel );
 
 public:
     TreeView(Panel *parent, const char *panelName);
@@ -116,7 +116,7 @@ public:
 	*/
     int GetRowHeight();
 	int GetVisibleMaxWidth();
-	virtual void OnMousePressed(MouseCode code);
+	void OnMousePressed(MouseCode code) override;
 
 	// By default, the tree view expands nodes on left-click. This enables/disables that feature
 	void EnableExpandTreeOnLeftClick( bool bEnable );
@@ -132,7 +132,7 @@ public:
 	virtual int		GetPrevChildItemIndex( int itemIndex );
 	virtual int		GetNextChildItemIndex( int itemIndex );
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	// Makes the scrollbar parented to some other panel...
 	ScrollBar	*SetScrollBarExternal( bool vertical, Panel *newParent );
@@ -146,17 +146,17 @@ public:
 protected:
 	// functions to override
 	// called when a node, marked as "Expand", needs to generate it's child nodes when expanded
-	virtual void GenerateChildrenOfNode(int itemIndex) {}
+	virtual void GenerateChildrenOfNode(int) {}
 
 	// override to open a custom context menu on a node being selected and right-clicked
-	virtual void GenerateContextMenu( int itemIndex, int x, int y ) {}
+	virtual void GenerateContextMenu( int, int, int ) {}
 
 	// overrides
-	virtual void OnMouseWheeled(int delta);
-	virtual void OnSizeChanged(int wide, int tall); 
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void OnMouseWheeled(int delta) override;
+	void OnSizeChanged(int wide, int tall) override; 
+	void ApplySchemeSettings(IScheme *pScheme) override;
 	MESSAGE_FUNC_INT( OnSliderMoved, "ScrollBarSliderMoved", position );
-	virtual void SetBgColor( Color color );
+	void SetBgColor( Color color ) override;
 
 private:
     friend class TreeNode;

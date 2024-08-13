@@ -24,20 +24,20 @@ class CKeyBoardEditorDialog;
 //-----------------------------------------------------------------------------
 class CKeyBindingHelpDialog : public Frame
 {
-	DECLARE_CLASS_SIMPLE( CKeyBindingHelpDialog, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CKeyBindingHelpDialog, Frame );
 
 public:
 	CKeyBindingHelpDialog( Panel *parent, Panel *panelToView, KeyBindingContextHandle_t handle, KeyCode code, int modifiers );
 	~CKeyBindingHelpDialog();
 
-	virtual void			OnCommand( char const *cmd );
-	virtual void			OnKeyCodeTyped(vgui::KeyCode code);
+	void			OnCommand( char const *cmd ) override;
+	void			OnKeyCodeTyped(vgui::KeyCode code) override;
 
 	// The key originally bound to help was pressed
 	void					HelpKeyPressed();
 private:
 
-	virtual void			OnTick();
+	void					OnTick() override;
 
 	bool					IsHelpKeyStillBeingHeld();
 

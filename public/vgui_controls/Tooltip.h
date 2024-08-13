@@ -47,7 +47,7 @@ public:
 
 private:
 	Panel *m_pParent;
-	virtual void ApplySchemeSettings(IScheme *pScheme) {};
+	virtual void ApplySchemeSettings(IScheme *) {};
 protected:
 	CUtlVector<char> m_Text;
 	int _delay;			// delay that counts down
@@ -64,12 +64,12 @@ public:
 	TextTooltip(Panel *parent, const char *text = NULL);
 	~TextTooltip();
 
-	virtual void SetText(const char *text);
-	virtual void ShowTooltip(Panel *currentPanel);
-	virtual void HideTooltip();
+	void SetText(const char *text) override;
+	void ShowTooltip(Panel *currentPanel) override;
+	void HideTooltip() override;
 	virtual void SizeTextWindow();
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(IScheme *pScheme);
+	void PerformLayout() override;
+	void ApplySchemeSettings(IScheme *pScheme) override;
 };
 
 };
