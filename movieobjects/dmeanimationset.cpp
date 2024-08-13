@@ -10,7 +10,7 @@
 #include "datamodel/dmelementfactoryhelper.h"
 #include "datamodel/dmehandle.h"
 #include "phonemeconverter.h"
-#include "tier1/utlstringmap.h"
+#include "tier1/UtlStringMap.h"
 #include "tier2/tier2.h"
 #include "filesystem.h"
 #include "studio.h"
@@ -413,7 +413,7 @@ static int BuildExportedControlList( CDmeAnimationSet *pAnimationSet, const CDme
 				if ( !pControl )
 					continue;
 
-				int j = uniqueControls.AddToTail();
+				intp j = uniqueControls.AddToTail();
 				ExportedControl_t &control = uniqueControls[j];
 				control.m_Name = pControlName;
 				control.m_bIsStereo = pControl->GetValue<bool>( "combo" );
@@ -423,7 +423,7 @@ static int BuildExportedControlList( CDmeAnimationSet *pAnimationSet, const CDme
 			}
 			else
 			{
-				int j = uniqueControls.AddToTail();
+				intp j = uniqueControls.AddToTail();
 				ExportedControl_t &control = uniqueControls[j];
 				control.m_Name = pControlName;
 				// this isn't quite as reliable as querying the animation set but if we don't have one...
@@ -451,7 +451,7 @@ bool CDmePresetGroup::ExportToTXT( const char *pFileName, CDmeAnimationSet *pAni
 	CUtlVector< ExportedControl_t > exportedControls;
 	BuildExportedControlList( pAnimationSet, pPresetGroup, exportedControls );
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	// Output the unique keys
 	buf.Printf( "$keys " );
@@ -1331,7 +1331,7 @@ void CModelPresetGroupManager::LoadModelPresets( const char *pModelName, PresetG
 
 	char pPresetNameBuf[MAX_PATH];
 	Q_StripExtension( pModelName, pPresetNameBuf, sizeof(pPresetNameBuf) );
-	int nLen = Q_strlen( pPresetNameBuf );
+	intp nLen = Q_strlen( pPresetNameBuf );
 	Q_snprintf( &pPresetNameBuf[nLen], MAX_PATH - nLen, "*.pre" );
 
 	CDisableUndoScopeGuard sg;
@@ -1364,7 +1364,7 @@ void CModelPresetGroupManager::LoadModelPresets( const char *pModelName, PresetG
 		pPresetGroup->m_bIsReadOnly = true;
 		pPresetGroup->SetShared( true );
 
-		int i = list.AddToTail();
+		intp i = list.AddToTail();
 		list[i] = pPresetGroup;
 	}
 	g_pFullFileSystem->FindClose( fh );
@@ -1378,7 +1378,7 @@ void CModelPresetGroupManager::ApplyModelPresets( const char *pModelName, CDmeAn
 {
 	if ( m_FileId == DMFILEID_INVALID )
 	{
-		int i = m_QueuedPresetRequest.AddToTail();
+		intp i = m_QueuedPresetRequest.AddToTail();
 		m_QueuedPresetRequest[i].m_ModelName = pModelName;
 		m_QueuedPresetRequest[i].m_hAnimationSet = pAnimationSet;
 		return;

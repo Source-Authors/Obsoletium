@@ -11,6 +11,7 @@
 #endif
 
 #include "datamodel/dmelement.h"
+#include "datamodel/dmelementfactoryhelper.h"
 #include "datamodel/dmattribute.h"
 #include "datamodel/dmattributevar.h"
 #include "datamodel/dmehandle.h"
@@ -44,7 +45,7 @@ class DmeLog_TimeSelection_t;
 struct Rect_t;
 
 
-enum DmeClipSkipFlag_t
+enum DmeClipSkipFlag_t : int
 {
 	DMESKIP_NONE = 0,
 	DMESKIP_MUTED = 1,
@@ -56,7 +57,7 @@ DEFINE_ENUM_BITWISE_OPERATORS( DmeClipSkipFlag_t )
 //-----------------------------------------------------------------------------
 // Clip types
 //-----------------------------------------------------------------------------
-enum DmeClipType_t
+enum DmeClipType_t : int
 {
 	DMECLIP_UNKNOWN = -1,
 
@@ -295,7 +296,7 @@ public:
 	};
 
 	// All effects must be able to apply their effect
-	virtual void ApplyEffect( DmeTime_t time, Rect_t &currentRect, Rect_t &totalRect, ITexture *pTextures[MAX_FX_INPUT_TEXTURES] ) {}
+	virtual void ApplyEffect( DmeTime_t, Rect_t &, Rect_t &, ITexture *[MAX_FX_INPUT_TEXTURES] ) {}
 
 	// Global list of FX clip types
 	static void InstallFXClipType( const char *pElementType, const char *pDescription );

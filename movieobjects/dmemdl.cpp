@@ -114,7 +114,7 @@ float CDmeMDL::GetRadius() const
 //-----------------------------------------------------------------------------
 // Returns a more accurate bounding sphere
 //-----------------------------------------------------------------------------
-void CDmeMDL::GetBoundingSphere( Vector &vecCenter, float &flRadius )
+void CDmeMDL::GetBoundingSphere( Vector &vecCenter, float &flRadius ) const
 {
 	Vector vecEngineCenter;
 	GetMDLBoundingSphere( &vecEngineCenter, &flRadius, m_MDL.GetMDL(), m_nSequence );

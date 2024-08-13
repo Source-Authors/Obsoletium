@@ -33,9 +33,9 @@ public:
 	int GetAnimationCount() const;
 	CDmeChannelsClip *GetAnimation( int nIndex );
 	int FindAnimation( const char *pAnimName );
-	void SetAnimation( int nIndex, CDmeChannelsClip *pAnimation );
-	int AddAnimation( CDmeChannelsClip *pAnimation );
-	void RemoveAnimation( int nIndex );
+	void SetAnimation( intp nIndex, CDmeChannelsClip *pAnimation );
+	intp AddAnimation( CDmeChannelsClip *pAnimation );
+	void RemoveAnimation( intp nIndex );
 
 private:
 	CDmaElementArray<CDmeChannelsClip> m_Animations;

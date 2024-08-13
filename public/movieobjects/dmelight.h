@@ -34,7 +34,7 @@ public:
 
 	// Sets up render state in the material system for rendering
 	virtual void SetupRenderState( int nLightIndex );
-	virtual bool GetLightDesc( LightDesc_t *pDesc ) { return false; }
+	virtual bool GetLightDesc( LightDesc_t * ) { return false; }
 
 protected:
 	// Sets up render state in the material system for rendering

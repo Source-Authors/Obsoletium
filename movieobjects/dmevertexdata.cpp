@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------
 // Standard vertex fields
 //-----------------------------------------------------------------------------
-static char *g_pStandardFieldNames[] =
+static const char *g_pStandardFieldNames[] =
 {
 	"positions",
 	"normals",
@@ -79,8 +79,8 @@ void CDmeVertexDataBase::OnDestruction()
 //-----------------------------------------------------------------------------
 void CDmeVertexDataBase::UpdateStandardFieldInfo( int nFieldIndex, const char *pFieldName, DmAttributeType_t attrType )
 {
-	COMPILE_TIME_ASSERT( ARRAYSIZE(g_pStandardFieldNames) == STANDARD_FIELD_COUNT );
-	COMPILE_TIME_ASSERT( ARRAYSIZE(g_pStandardFieldTypes) == STANDARD_FIELD_COUNT );
+	COMPILE_TIME_ASSERT( ssize(g_pStandardFieldNames) == STANDARD_FIELD_COUNT );
+	COMPILE_TIME_ASSERT( ssize(g_pStandardFieldTypes) == STANDARD_FIELD_COUNT );
 
 	for ( int i = 0; i < STANDARD_FIELD_COUNT; ++i )
 	{
@@ -117,7 +117,7 @@ void CDmeVertexDataBase::ComputeFieldInfo()
 	for ( int i = 0; i < nFieldCount; ++i )
 	{
 		const char *pFieldName = m_VertexFormat[i];
-		int nLen = Q_strlen( pFieldName ) + 21;
+		intp nLen = Q_strlen( pFieldName ) + 21;
 		char *pIndicesName = (char*)_alloca( nLen );
 		Q_snprintf( pIndicesName, nLen, "%sIndices", pFieldName );
 
@@ -462,7 +462,7 @@ FieldIndex_t CDmeVertexDataBase::CreateField( const char *pFieldName, DmAttribut
 
 	AddAttribute( pFieldName, type );
 
-	int nLen = Q_strlen( pFieldName ) + 21;
+	intp nLen = Q_strlen( pFieldName ) + 21;
 	char *pIndicesName = (char*)_alloca( nLen );
 	Q_snprintf( pIndicesName, nLen, "%sIndices", pFieldName );
 	AddAttribute( pIndicesName, AT_INT_ARRAY );
@@ -573,8 +573,8 @@ void CDmeVertexDataBase::RemoveAllVertexData( FieldIndex_t nFieldIndex )
 //-----------------------------------------------------------------------------
 FieldIndex_t CDmeVertexDataBase::FindFieldIndex( const char *pFieldName ) const
 {
-	int nCount = m_FieldInfo.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_FieldInfo.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( m_FieldInfo[i].m_Name, pFieldName ) )
 			return i;

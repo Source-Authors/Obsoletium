@@ -19,7 +19,7 @@
 #include "tier1/utlstack.h"
 #include "tier2/p4helpers.h"
 #include "tier1/utlstring.h"
-#include "tier1/utlstringmap.h"
+#include "tier1/UtlStringMap.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/fmtstr.h"
 #include "filesystem.h"
@@ -606,7 +606,7 @@ void RemoveUnusedVerticesFromBaseState(
 		CDmrGenericArray data = pVertexData->GetVertexData( i );
 
 		// This will also update pNewVertexIndices
-		RemoveUnusedData( pMesh, pVertexData, bBind, pFieldName, pNewVertexIndices, nNewToOldIndexMapCount, CDmrGenericArray( pVertexData->GetVertexData( i ) ) );
+		RemoveUnusedData( pMesh, pVertexData, bBind, pFieldName, pNewVertexIndices, nNewToOldIndexMapCount, data );
 
 		// Shrink the indices array
 		indices.RemoveMultiple( nNewToOldIndexMapCount, indices.Count() - nNewToOldIndexMapCount );
@@ -681,7 +681,7 @@ bool CDmMeshUtils::Mirror( CDmeMesh *pMesh, int axis /*= kXAxis */ )
 
 		CDmeMaterial *pSrcMaterial = pSrcFaceSet->GetMaterial();
 		const char *pSrcMaterialName = pSrcMaterial->GetMaterialName();
-		const int nNameLen = Q_strlen( pSrcMaterialName );
+		const intp nNameLen = Q_strlen( pSrcMaterialName );
 		if ( nNameLen >= 2 )
 		{
 			CUtlString materialName;
@@ -1540,33 +1540,51 @@ int MergeBaseState(
 			switch ( pSrcData->GetType() )
 			{
 			case AT_FLOAT_ARRAY:
-				AppendData( CDmrArrayConst< float >( pSrcData ), CDmrArray< float >( pDstData ) );
+				{
+					auto a = CDmrArray< float >( pDstData );
+					AppendData( CDmrArrayConst< float >( pSrcData ), a );
+				}
 				break;
 			case AT_VECTOR2_ARRAY:
-				AppendData( CDmrArrayConst< Vector2D >( pSrcData ), CDmrArray< Vector2D >( pDstData ) );
+				{
+					auto a = CDmrArray< Vector2D >( pDstData );
+					AppendData( CDmrArrayConst< Vector2D >( pSrcData ), a );
+				}
 				break;
 			case AT_VECTOR3_ARRAY:
-				if ( i == nSrcPositionIndex )
 				{
-					AppendData( CDmrArrayConst< Vector >( pSrcData ), CDmrArray< Vector >( pDstData ), &pMat );
-				}
-				else if ( i == nSrcNormalIndex )
-				{
-					AppendData( CDmrArrayConst< Vector >( pSrcData ), CDmrArray< Vector >( pDstData ), &nMat );
-				}
-				else
-				{
-					AppendData( CDmrArrayConst< Vector >( pSrcData ), CDmrArray< Vector >( pDstData ) );
+					auto a = CDmrArray< Vector >( pDstData );
+					if ( i == nSrcPositionIndex )
+					{
+						AppendData( CDmrArrayConst< Vector >( pSrcData ), a, &pMat );
+					}
+					else if ( i == nSrcNormalIndex )
+					{
+						AppendData( CDmrArrayConst< Vector >( pSrcData ), a, &nMat );
+					}
+					else
+					{
+						AppendData( CDmrArrayConst< Vector >( pSrcData ), a );
+					}
 				}
 				break;
 			case AT_VECTOR4_ARRAY:
-				AppendData( CDmrArrayConst< Vector4D >( pSrcData ), CDmrArray< Vector4D >( pDstData ) );
+				{
+					auto a = CDmrArray< Vector4D >( pDstData );
+					AppendData( CDmrArrayConst< Vector4D >( pSrcData ), a );
+				}
 				break;
 			case AT_QUATERNION_ARRAY:
-				AppendData( CDmrArrayConst< Quaternion >( pSrcData ), CDmrArray< Quaternion >( pDstData ) );
+				{
+					auto a = CDmrArray< Quaternion >( pDstData );
+					AppendData( CDmrArrayConst< Quaternion >( pSrcData ), a );
+				}
 				break;
 			case AT_COLOR_ARRAY:
-				AppendData( CDmrArrayConst< Color >( pSrcData ), CDmrArray< Color >( pDstData ) );
+				{
+					auto a = CDmrArray< Color >( pDstData );
+					AppendData( CDmrArrayConst< Color >( pSrcData ), a );
+				}
 				break;
 			default:
 				Assert( 0 );
@@ -1638,7 +1656,7 @@ int MergeBaseState(
 
 		if ( !bFound )
 		{
-			int nDstIndex = -1;
+			intp nDstIndex = -1;
 
 			if ( i == nDstSpeedIndex )
 			{
@@ -1653,10 +1671,10 @@ int MergeBaseState(
 
 			// Pad data indices with index to that extra data value
 			CDmrArray< int > dstIndices( pDstBase->GetIndexData( i ) );
-			const int nStart = dstIndices.Count();
-			const int nEnd = dstIndices.Count() + nIndexPadCount;
+			const intp nStart = dstIndices.Count();
+			const intp nEnd = dstIndices.Count() + nIndexPadCount;
 			dstIndices.AddMultipleToTail( nIndexPadCount );
-			for ( int k = nStart; k < nEnd; ++k )
+			for ( intp k = nStart; k < nEnd; ++k )
 			{
 				dstIndices.Set( k, nDstIndex );
 			}
@@ -1740,22 +1758,40 @@ void MergeDeltaState( CDmeMesh *pDmeMesh, CDmeVertexDeltaData *pSrcDelta, CDmeVe
 			switch ( pSrcData->GetType() )
 			{
 			case AT_FLOAT_ARRAY:
-				AppendData( CDmrArrayConst< float >( pSrcData ), CDmrArray< float >( pDstData ) );
+				{
+					auto a = CDmrArray< float >( pDstData );
+					AppendData( CDmrArrayConst< float >( pSrcData ), a );
+				}
 				break;
 			case AT_VECTOR2_ARRAY:
-				AppendData( CDmrArrayConst< Vector2D >( pSrcData ), CDmrArray< Vector2D >( pDstData ) );
+				{
+					auto a = CDmrArray< Vector2D >( pDstData );
+					AppendData( CDmrArrayConst< Vector2D >( pSrcData ), a );
+				}
 				break;
 			case AT_VECTOR3_ARRAY:
-				AppendData( CDmrArrayConst< Vector >( pSrcData ), CDmrArray< Vector >( pDstData ) );
+				{
+					auto a = CDmrArray< Vector >( pDstData );
+					AppendData( CDmrArrayConst< Vector >( pSrcData ), a );
+				}
 				break;
 			case AT_VECTOR4_ARRAY:
-				AppendData( CDmrArrayConst< Vector4D >( pSrcData ), CDmrArray< Vector4D >( pDstData ) );
+				{
+					auto a = CDmrArray< Vector4D >( pDstData );
+					AppendData( CDmrArrayConst< Vector4D >( pSrcData ), a );
+				}
 				break;
 			case AT_QUATERNION_ARRAY:
-				AppendData( CDmrArrayConst< Quaternion >( pSrcData ), CDmrArray< Quaternion >( pDstData ) );
+				{
+					auto a = CDmrArray< Quaternion >( pDstData );
+					AppendData( CDmrArrayConst< Quaternion >( pSrcData ), a );
+				}
 				break;
 			case AT_COLOR_ARRAY:
-				AppendData( CDmrArrayConst< Color >( pSrcData ), CDmrArray< Color >( pDstData ) );
+				{
+					auto a = CDmrArray< Color >( pDstData );
+					AppendData( CDmrArrayConst< Color >( pSrcData ), a );
+				}
 				break;
 			default:
 				Assert( 0 );

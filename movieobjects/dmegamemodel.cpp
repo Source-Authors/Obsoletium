@@ -211,7 +211,7 @@ void CDmeGameModel::OnDestruction()
 
 CDmeGlobalFlexControllerOperator *CDmeGameModel::AddGlobalFlexController( const char *controllerName, int globalIndex )
 {
-	int i, c;
+	intp i, c;
 	c = m_globalFlexControllers.Count();
 	for ( i = 0; i < c; ++i )
 	{

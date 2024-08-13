@@ -26,8 +26,8 @@ public:
 	virtual bool IsDirty(); // ie needs to operate
 	virtual void Operate() {}
 
-	virtual void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs ) {}
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) {}
+	virtual void GetInputAttributes ( CUtlVector< CDmAttribute * > & ) {}
+	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > & ) {}
 };
 
 

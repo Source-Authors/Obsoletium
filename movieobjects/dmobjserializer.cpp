@@ -337,7 +337,7 @@ CDmElement *CDmObjSerializer::ReadOBJ(
 	Q_strncpy( filename, pFilename, sizeof( filename ) );
 	Q_FixSlashes( filename );
 
-	CUtlBuffer utlBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer utlBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( filename, NULL, utlBuf ) )
 		return NULL;
 
@@ -475,7 +475,7 @@ CDmElement *CDmObjSerializer::ReadOBJ( CUtlBuffer &buf,
 	m_mtlLib.RemoveAll();
 
 	char tmpBuf0[ 4096 ];
-	char tmpBuf1[ 4096 ];
+	char tmpBuf1[ 4097 ];
 
 	characterset_t breakSet;
 	CharacterSetBuild( &breakSet, "/\\" );
@@ -542,7 +542,7 @@ CDmElement *CDmObjSerializer::ReadOBJ( CUtlBuffer &buf,
 				char mtlLibPath[ MAX_PATH ];
 
 				Q_ComposeFileName( tmpBuf0, tmpBuf1, mtlLibPath, sizeof( mtlLibPath ) );
-				CUtlBuffer utlBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+				CUtlBuffer utlBuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 				if ( g_pFullFileSystem->ReadFile( mtlLibPath, NULL, utlBuf ) )
 				{
@@ -555,7 +555,7 @@ CDmElement *CDmObjSerializer::ReadOBJ( CUtlBuffer &buf,
 			if ( sscanf( pBuf, "usemtl %4096s", tmpBuf1 ) == 1 )
 			{
 				// Remove any 'SG' suffix from the material
-				const uint sLen = Q_strlen( tmpBuf1 );
+				const size_t sLen = Q_strlen( tmpBuf1 );
 				if ( sLen && !Q_strcmp( tmpBuf1 + sLen - 2, "SG" ) )
 				{
 					tmpBuf1[ sLen - 2 ] = '\0';
@@ -613,7 +613,7 @@ CDmElement *CDmObjSerializer::ReadOBJ( CUtlBuffer &buf,
 				int n;
 
 				pBuf = SkipSpace( pBuf + 1 );
-				int nLen = Q_strlen( pBuf );
+				intp nLen = Q_strlen( pBuf );
 
 				CUtlBuffer bufParse( pBuf, nLen, CUtlBuffer::TEXT_BUFFER | CUtlBuffer::READ_ONLY );
 
@@ -1033,7 +1033,7 @@ bool CDmObjSerializer::WriteOBJ( const char *pFilename, CDmElement *pRoot, bool 
 
 	if ( !pDeltaName )
 	{
-		CUtlBuffer b( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer b( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 		b << "# OBJ\n";
 		b << "#\n";
@@ -1090,7 +1090,7 @@ bool CDmObjSerializer::WriteOBJ( const char *pFilename, CDmElement *pRoot, bool 
 
 				if ( !pDeltaName || !Q_strcmp( pDeltaName, pDelta->GetName() ) )
 				{
-					CUtlBuffer b( 0, 0, CUtlBuffer::TEXT_BUFFER );
+					CUtlBuffer b( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 					b << "# Delta OBJ: " << pDelta->GetName() << "\n";
 					b << "#\n";
@@ -1147,7 +1147,7 @@ void CDmObjSerializer::ParseMtlLib( CUtlBuffer &buf )
 			if ( sscanf( tmpBuf0, "newmtl %s", mtlName ) == 1 )
 			{
 				// Remove any 'SG' suffix from the material
-				const uint sLen = Q_strlen( mtlName );
+				const size_t sLen = Q_strlen( mtlName );
 				if ( sLen > 2 && !Q_strcmp( mtlName + sLen - 2, "SG" ) )
 				{
 					mtlName[ sLen - 2 ] = '\0';
@@ -1175,7 +1175,7 @@ void CDmObjSerializer::ParseMtlLib( CUtlBuffer &buf )
 				const char *pMaterialSrc = Q_strstr( tmpBuf0, "/materialsrc/" );
 				if ( pMaterialSrc )
 				{
-					pMaterialSrc += Q_strlen( "/materialsrc/" );
+					pMaterialSrc += ssize( "/materialsrc/" ) - 1;
 					Q_StripExtension( pMaterialSrc, tgaName, sizeof( tgaName) );
 					m_mtlLib[ nCurrentMtl ].m_TgaName = tgaName;
 				}
@@ -1369,14 +1369,14 @@ void CDmObjSerializer::ComputeDeltaStateComputationList( CUtlVector< CUtlVector<
 	{
 		if ( pInfo[nCurrentDelta].m_nDimensionality != 1 )
 			break;
-		int j = atomicControls.AddToTail( GetDeltaState( pInfo[nCurrentDelta].m_nDeltaIndex )->GetName() );
+		intp j = atomicControls.AddToTail( GetDeltaState( pInfo[nCurrentDelta].m_nDeltaIndex )->GetName() );
 		deltaStateUsage[ nCurrentDelta ].AddToTail( j );
 	}
 
 	for ( ; nCurrentDelta < nCount; ++nCurrentDelta )
 	{
 		CDmeVertexDeltaData *pDeltaState = GetDeltaState( pInfo[nCurrentDelta].m_nDeltaIndex );
-		int nLen = Q_strlen( pDeltaState->GetName() );
+		intp nLen = Q_strlen( pDeltaState->GetName() );
 		char *pTempBuf = (char*)_alloca( nLen + 1 );
 		memcpy( pTempBuf, pDeltaState->GetName(), nLen+1 );
 		char *pNext;
@@ -1390,8 +1390,8 @@ void CDmObjSerializer::ComputeDeltaStateComputationList( CUtlVector< CUtlVector<
 			}
 
 			// Find this name in the list of strings
-			int j;
-			int nControlCount = atomicControls.Count();
+			intp j;
+			intp nControlCount = atomicControls.Count();
 			for ( j = 0; j < nControlCount; ++j )
 			{
 				if ( !Q_stricmp( pUnderBar, atomicControls[j] ) )

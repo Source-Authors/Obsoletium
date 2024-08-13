@@ -12,9 +12,9 @@
 #include "tier1/utlbuffer.h"
 #include "tier1/convar.h"
 #include "particles/particles.h"
-#include "dme_controls/attributeintchoicepanel.h"
-#include "dme_controls/attributeboolchoicepanel.h"
-#include "dme_controls/attributestringchoicepanel.h"
+#include "dme_controls/AttributeIntChoicePanel.h"
+#include "dme_controls/AttributeBoolChoicePanel.h"
+#include "dme_controls/AttributeStringChoicePanel.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -133,7 +133,7 @@ void CDmeParticleFunction::AddMissingFields( const DmxElementUnpackStructure_t *
 		CDmAttribute *pAttribute = AddAttribute( pUnpack->m_pAttributeName, pUnpack->m_AttributeType );
 		if ( pUnpack->m_pDefaultString )
 		{
-			int nLen = Q_strlen( pUnpack->m_pDefaultString );
+			intp nLen = Q_strlen( pUnpack->m_pDefaultString );
 			CUtlBuffer bufParse( pUnpack->m_pDefaultString, nLen, CUtlBuffer::TEXT_BUFFER | CUtlBuffer::READ_ONLY );
 			pAttribute->Unserialize( bufParse );
 		}
@@ -337,7 +337,7 @@ void CDmeParticleSystemDefinition::OnConstruction()
 		CDmAttribute *pAttribute = AddAttribute( pUnpack->m_pAttributeName, pUnpack->m_AttributeType );
 		if ( pUnpack->m_pDefaultString )
 		{
-			int nLen = Q_strlen( pUnpack->m_pDefaultString );
+			intp nLen = Q_strlen( pUnpack->m_pDefaultString );
 			CUtlBuffer bufParse( pUnpack->m_pDefaultString, nLen, CUtlBuffer::TEXT_BUFFER | CUtlBuffer::READ_ONLY );
 			pAttribute->Unserialize( bufParse );
 		}
@@ -588,7 +588,7 @@ void CDmeParticleSystemDefinition::RecompileParticleSystem()
 	const char *pFileFormat = "pcf";
 	const char *pEncoding = g_pDataModel->GetDefaultEncoding( pFileFormat );
 	int nFlags = g_pDataModel->IsEncodingBinary( pEncoding ) ? 0 : CUtlBuffer::TEXT_BUFFER;
-	CUtlBuffer buf( 0, 0, nFlags );
+	CUtlBuffer buf( (intp)0, 0, nFlags );
 	if ( g_pDataModel->Serialize( buf, pEncoding, pFileFormat, GetHandle() ) )
 	{
 		g_pParticleSystemMgr->ReadParticleConfigFile( buf, true, NULL );

@@ -24,8 +24,8 @@
 class CDmeClip;
 class CDmeFilmClip;
 class CDmeTrack;
-enum DmeClipType_t;
-enum DmeClipSkipFlag_t;
+enum DmeClipType_t : int;
+enum DmeClipSkipFlag_t : int;
 
 
 //-----------------------------------------------------------------------------

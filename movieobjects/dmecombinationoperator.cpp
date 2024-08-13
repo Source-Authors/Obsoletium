@@ -478,7 +478,7 @@ ControlIndex_t CDmeCombinationOperator::FindOrCreateControl( const char *pContro
 	// NOTE: the y coordinate of the control value is -1 if it's not a stereo control
 	CDmeCombinationInputControl *pInputControl = CreateElement< CDmeCombinationInputControl >( pControlName, GetFileId() );
 	pInputControl->SetStereo( bStereo );
-	int nIndex = m_InputControls.AddToTail( pInputControl );
+	intp nIndex = m_InputControls.AddToTail( pInputControl );
 	m_ControlValues[COMBO_CONTROL_NORMAL].AddToTail( Vector( 0.0f, 0.5f, 0.5f ) );
 	m_ControlValues[COMBO_CONTROL_LAGGED].AddToTail( Vector( 0.0f, 0.5f, 0.5f ) );
 	m_IsDefaultValue.AddToTail( true );
@@ -1096,7 +1096,7 @@ void CDmeCombinationOperator::RebuildRawControlList()
 		float flStep = ( nRemapCount > 2 ) ? 1.0f / ( nRemapCount - 1 ) : 0.0f;
 		for ( int j = 0; j < nRemapCount; ++j )
 		{
-			int k = m_RawControlInfo.AddToTail( );
+			intp k = m_RawControlInfo.AddToTail( );
 			RawControlInfo_t &info = m_RawControlInfo[k];
 			
 			info.m_Name = pInputControl->RawControlName( j );
@@ -1203,7 +1203,7 @@ void CDmeCombinationOperator::RebuildDominatorInfo()
 		if ( !bRuleOk )
 			continue;
 
-		int k = m_DominatorInfo.AddToTail();
+		intp k = m_DominatorInfo.AddToTail();
 		m_DominatorInfo[k].m_DominantIndices.AddMultipleToTail( nDominatorCount, pDominators );
 		m_DominatorInfo[k].m_SuppressedIndices.AddMultipleToTail( nSuppressedCount, pSuppressed );
 	}
@@ -1440,14 +1440,14 @@ void CDmeCombinationOperator::FindDominators( CombinationOperation_t& op )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CDmeCombinationOperator::ComputeCombinationInfo( int nIndex )
+void CDmeCombinationOperator::ComputeCombinationInfo( intp nIndex )
 {
 	CleanUpCombinationInfo( nIndex );
 
-	int nCurrentCount = m_CombinationInfo.Count();
+	intp nCurrentCount = m_CombinationInfo.Count();
 	while ( nIndex >= nCurrentCount )
 	{
-		int j = m_CombinationInfo.AddToTail();
+		intp j = m_CombinationInfo.AddToTail();
 		CombinationInfo_t &info = m_CombinationInfo[j];
 		for ( int k = 0; k < COMBO_CONTROL_TYPE_COUNT; ++k )
 		{
@@ -1495,7 +1495,7 @@ void CDmeCombinationOperator::ComputeCombinationInfo( int nIndex )
 		if ( nControlCount == 0 )
 			continue;
 
-		int j = info.m_Outputs.AddToTail();
+		intp j = info.m_Outputs.AddToTail();
 		CombinationOperation_t &op = info.m_Outputs[j];
 		op.m_nDeltaStateIndex = i;
 		op.m_ControlIndices.AddMultipleToTail( nControlCount, pTemp );
@@ -1570,7 +1570,7 @@ void CDmeCombinationOperator::AddTarget( CDmElement *pElement )
 	if ( !pElement )
 		return;
 
-	int i = m_Targets.AddToTail( pElement );
+	intp i = m_Targets.AddToTail( pElement );
 	ComputeCombinationInfo( i );
 }
 
@@ -2048,7 +2048,7 @@ void CDmeCombinationOperator::Purge()
 //-----------------------------------------------------------------------------
 // Creates lagged log data from an input log
 //-----------------------------------------------------------------------------
-static void CreateLaggedLog( CDmeVector2Log *pLog, CDmeVector2Log *pLaggedLog, int nSamplesPerSec )
+static void CreateLaggedLog( CDmeVector2Log *, CDmeVector2Log *, int )
 {
 }
 
@@ -2082,7 +2082,7 @@ void CreateLaggedVertexAnimation( CDmeChannelsClip *pClip, int nSamplesPerSec )
 		if ( !pLaggedAttr || pLaggedAttr->GetType() != AT_VECTOR2_ARRAY )
 			continue;
 
-		int nLen = Q_strlen( pChannel->GetName() );
+		intp nLen = Q_strlen( pChannel->GetName() );
 		char *pNewChannelName = (char*)_alloca( nLen + 10 );
 		memcpy( pNewChannelName, pChannel->GetName(), nLen+1 );
 		Q_strncpy( &pNewChannelName[nLen], "_lagged", 10 );

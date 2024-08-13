@@ -150,7 +150,7 @@ float WeightForPhoneme( char *text )
 
 int NumPhonemes()
 {
-	return ARRAYSIZE( g_Phonemes );
+	return ssize( g_Phonemes );
 }
 
 const char *NameForPhonemeByIndex( int index )
@@ -166,7 +166,7 @@ const char *NameForPhonemeByIndex( int index )
 //-----------------------------------------------------------------------------
 int TextToPhonemeIndex( const char *text )
 {
-	for ( int i = 0; i < ARRAYSIZE( g_Phonemes ); ++i )
+	for ( size_t i = 0; i < std::size( g_Phonemes ); ++i )
 	{
 		PhonemeMap_t *test = &g_Phonemes[ i ];
 		if ( !stricmp( test->string, text ) )

@@ -44,8 +44,8 @@ public:
 	};
 
 	CDmSmdSerializer()
-	: m_bOptAutoStripPrefix( false )
-	, m_bOptImportSkeleton( true )
+	: m_bOptImportSkeleton( true )
+	, m_bOptAutoStripPrefix(false)
 	, m_bOptAnimation( false )
 	, m_flFrameRate( 30.0f )
 	{
@@ -58,7 +58,7 @@ public:
 	virtual bool IsBinaryFormat() const { return false; }
 	virtual bool StoresVersionInFile() const { return true; }
 	virtual int GetCurrentVersion() const { return 1; }
-	virtual bool Serialize( CUtlBuffer &buf, CDmElement *pRoot ) { return false; }	// No DMX -> SMD support
+	virtual bool Serialize( CUtlBuffer &, CDmElement * ) { return false; }	// No DMX -> SMD support
 
 	virtual bool Unserialize(
 		CUtlBuffer &utlBuf,
@@ -123,7 +123,7 @@ protected:
 		int &nId,
 		int &nParentId ) const;
 
-	CDmElement *CDmSmdSerializer::ReadSMD(
+	CDmElement *ReadSMD(
 		CUtlBuffer &inUtlBuf,
 		DmFileId_t nDmFileId,
 		const char *pszFilename,

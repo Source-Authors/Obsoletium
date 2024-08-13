@@ -861,7 +861,7 @@ void CDmeExpressionOperator::OnConstruction()
 
 #ifdef _DEBUG
 	TestCalculator();
-#endif _DEBUG
+#endif
 }
 
 void CDmeExpressionOperator::OnDestruction()

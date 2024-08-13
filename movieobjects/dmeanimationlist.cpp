@@ -33,12 +33,12 @@ void CDmeAnimationList::OnDestruction()
 //-----------------------------------------------------------------------------
 // Adds, removes animations
 //-----------------------------------------------------------------------------
-int CDmeAnimationList::AddAnimation( CDmeChannelsClip *pAnimation )
+intp CDmeAnimationList::AddAnimation( CDmeChannelsClip *pAnimation )
 {
 	return m_Animations.AddToTail( pAnimation );
 }
 
-void CDmeAnimationList::RemoveAnimation( int nIndex )
+void CDmeAnimationList::RemoveAnimation( intp nIndex )
 {
 	m_Animations.Remove( nIndex );
 }
@@ -47,7 +47,7 @@ void CDmeAnimationList::RemoveAnimation( int nIndex )
 //-----------------------------------------------------------------------------
 // Sets the transform
 //-----------------------------------------------------------------------------
-void CDmeAnimationList::SetAnimation( int nIndex, CDmeChannelsClip *pAnimation )
+void CDmeAnimationList::SetAnimation( intp nIndex, CDmeChannelsClip *pAnimation )
 {
 	m_Animations.Set( nIndex, pAnimation );
 }

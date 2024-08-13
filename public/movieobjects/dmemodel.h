@@ -28,13 +28,13 @@ class CDmeModel : public CDmeDag
 public:
 	// Add joint
 	CDmeJoint *AddJoint( const char *pJointName, CDmeDag *pParent = NULL );
-	int AddJoint( CDmeDag *pJoint );
+	intp AddJoint( CDmeDag *pJoint );
 
 	// Returns the number of joint transforms we know about
 	int GetJointTransformCount() const;
 
 	// Determines joint transform index	given a joint name
-	int GetJointTransformIndex( CDmeTransform *pTransform ) const;
+	intp GetJointTransformIndex( CDmeTransform *pTransform ) const;
 
 	// Determines joint transform index	given a joint
 	int GetJointTransformIndex( CDmeDag *pJoint ) const;
