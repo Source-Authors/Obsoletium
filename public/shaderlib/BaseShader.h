@@ -99,29 +99,29 @@ public:
 	CBaseShader();
 
 	// Methods inherited from IShader
-	virtual char const* GetFallbackShader( IMaterialVar** params ) const { return 0; }
-	virtual int GetNumParams( ) const;
-	virtual char const* GetParamName( int paramIndex ) const;
-	virtual char const* GetParamHelp( int paramIndex ) const;
-	virtual ShaderParamType_t GetParamType( int paramIndex ) const;
-	virtual char const* GetParamDefault( int paramIndex ) const;
-	virtual int GetParamFlags( int nParamIndex ) const;
+	char const* GetFallbackShader( IMaterialVar** ) const override { return 0; }
+	int GetNumParams( ) const override;
+	char const* GetParamName( int paramIndex ) const override;
+	char const* GetParamHelp( int paramIndex ) const override;
+	ShaderParamType_t GetParamType( int paramIndex ) const override;
+	char const* GetParamDefault( int paramIndex ) const override;
+	int GetParamFlags( int nParamIndex ) const override;
 
-	virtual void InitShaderParams( IMaterialVar** ppParams, const char *pMaterialName );
-	virtual void InitShaderInstance( IMaterialVar** ppParams, IShaderInit *pShaderInit, const char *pMaterialName, const char *pTextureGroupName );
-	virtual void DrawElements( IMaterialVar **params, int nModulationFlags, IShaderShadow* pShaderShadow, IShaderDynamicAPI* pShaderAPI,
-								VertexCompressionType_t vertexCompression, CBasePerMaterialContextData **pContext );
+	void InitShaderParams( IMaterialVar** ppParams, const char *pMaterialName ) override;
+	void InitShaderInstance( IMaterialVar** ppParams, IShaderInit *pShaderInit, const char *pMaterialName, const char *pTextureGroupName ) override;
+	void DrawElements( IMaterialVar **params, int nModulationFlags, IShaderShadow* pShaderShadow, IShaderDynamicAPI* pShaderAPI,
+								VertexCompressionType_t vertexCompression, CBasePerMaterialContextData **pContext ) override;
 
-	virtual	const SoftwareVertexShader_t GetSoftwareVertexShader() const { return m_SoftwareVertexShader; }
+	virtual	SoftwareVertexShader_t GetSoftwareVertexShader() const { return m_SoftwareVertexShader; }
 
-	virtual int ComputeModulationFlags( IMaterialVar** params, IShaderDynamicAPI* pShaderAPI );
-	virtual bool NeedsPowerOfTwoFrameBufferTexture( IMaterialVar **params, bool bCheckSpecificToThisFrame = true ) const;
-	virtual bool NeedsFullFrameBufferTexture( IMaterialVar **params, bool bCheckSpecificToThisFrame = true ) const;
-	virtual bool IsTranslucent( IMaterialVar **params ) const;
+	int ComputeModulationFlags( IMaterialVar** params, IShaderDynamicAPI* pShaderAPI ) override;
+	bool NeedsPowerOfTwoFrameBufferTexture( IMaterialVar **params, bool bCheckSpecificToThisFrame = true ) const override;
+	bool NeedsFullFrameBufferTexture( IMaterialVar **params, bool bCheckSpecificToThisFrame = true ) const override;
+	bool IsTranslucent( IMaterialVar **params ) const override;
 
 public:
 	// These functions must be implemented by the shader
-	virtual void OnInitShaderParams( IMaterialVar** ppParams, const char *pMaterialName ) {}
+	virtual void OnInitShaderParams( IMaterialVar**, const char * ) {}
 	virtual void OnInitShaderInstance( IMaterialVar** ppParams, IShaderInit *pShaderInit, const char *pMaterialName ) = 0;
 	virtual void OnDrawElements( IMaterialVar **params, IShaderShadow* pShaderShadow, IShaderDynamicAPI* pShaderAPI, VertexCompressionType_t vertexCompression, CBasePerMaterialContextData **pContextDataPtr ) = 0;
 

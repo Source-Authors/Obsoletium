@@ -539,7 +539,7 @@ int CBaseShader::ComputeModulationFlags( IMaterialVar** params, IShaderDynamicAP
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-bool CBaseShader::NeedsPowerOfTwoFrameBufferTexture( IMaterialVar **params, bool bCheckSpecificToThisFrame ) const 
+bool CBaseShader::NeedsPowerOfTwoFrameBufferTexture( IMaterialVar **params, [[maybe_unused]] bool bCheckSpecificToThisFrame ) const 
 { 
 	return CShader_IsFlag2Set( params, MATERIAL_VAR2_NEEDS_POWER_OF_TWO_FRAME_BUFFER_TEXTURE ); 
 }
@@ -547,7 +547,7 @@ bool CBaseShader::NeedsPowerOfTwoFrameBufferTexture( IMaterialVar **params, bool
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-bool CBaseShader::NeedsFullFrameBufferTexture( IMaterialVar **params, bool bCheckSpecificToThisFrame ) const 
+bool CBaseShader::NeedsFullFrameBufferTexture( IMaterialVar **params, [[maybe_unused]] bool bCheckSpecificToThisFrame ) const 
 { 
 	return CShader_IsFlag2Set( params, MATERIAL_VAR2_NEEDS_FULL_FRAME_BUFFER_TEXTURE ); 
 }
