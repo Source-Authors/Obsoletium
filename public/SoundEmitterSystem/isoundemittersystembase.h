@@ -71,7 +71,8 @@ soundlevel_t TextToSoundLevel( const char *key );
 int TextToChannel( const char *name );
 
 
-enum gender_t
+// dimhotepus: int -> char.
+enum gender_t : signed char
 {
 	GENDER_NONE = 0,
 	GENDER_MALE,
@@ -91,7 +92,7 @@ struct SoundFile
 	}
 
 	CUtlSymbol	symbol;
-	byte		gender;
+	gender_t	gender;
 	byte		available;
 };
 

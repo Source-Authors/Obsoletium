@@ -23,7 +23,7 @@ $Configuration
 	}
 }
 
-$Project "SoundEmitterSystem"
+$Project "soundemittersystem"
 {
 	$Folder	"Source Files"
 	{
