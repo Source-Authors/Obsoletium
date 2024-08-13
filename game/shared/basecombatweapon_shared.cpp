@@ -1929,7 +1929,7 @@ void CBaseCombatWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /
 #if !defined( CLIENT_DLL )
 			if( sound_type == EMPTY )
 			{
-				CSoundEnt::InsertSound( SOUND_COMBAT, GetOwner()->GetAbsOrigin(), SOUNDENT_VOLUME_EMPTY, 0.2, GetOwner() );
+				CSoundEnt::InsertSound( SOUND_COMBAT, GetOwner()->GetAbsOrigin(), SOUNDENT_VOLUME_EMPTY, 0.2f, GetOwner() );
 			}
 #endif
 		}
@@ -2110,7 +2110,7 @@ void CBaseCombatWeapon::AddViewKick( void )
 //-----------------------------------------------------------------------------
 // Purpose: Get the string to print death notices with
 //-----------------------------------------------------------------------------
-char *CBaseCombatWeapon::GetDeathNoticeName( void )
+const char *CBaseCombatWeapon::GetDeathNoticeName( void )
 {
 #if !defined( CLIENT_DLL )
 	return (char*)STRING( m_iszName );

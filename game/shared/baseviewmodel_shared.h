@@ -55,7 +55,7 @@ public:
 	virtual void			CalcViewModelLag( Vector& origin, QAngle& angles, QAngle& original_angles );
 	virtual void			CalcViewModelView( CBasePlayer *owner, const Vector& eyePosition, 
 								const QAngle& eyeAngles );
-	virtual void			AddViewModelBob( CBasePlayer *owner, Vector& eyePosition, QAngle& eyeAngles ) {};
+	virtual void			AddViewModelBob( CBasePlayer *, Vector&, QAngle& ) {};
 
 	// Initializes the viewmodel for use							
 	void					SetOwner( CBaseEntity *pEntity );
@@ -143,7 +143,7 @@ public:
 	virtual ShadowType_t	ShadowCastType() { return SHADOWS_NONE; }
 
 	// Should this object receive shadows?
-	virtual bool			ShouldReceiveProjectedTextures( int flags )
+	virtual bool			ShouldReceiveProjectedTextures( [[maybe_unused]] int flags )
 	{
 		return false;
 	}

@@ -436,7 +436,7 @@ bool CHL2GameMovement::ExitLadderViaDismountNode( CFuncLadder *ladder, bool stri
 		CInfoLadderDismount *spot = nearbyDismounts[ i ].dismount;
 		if ( !spot )
 		{
-			Assert( !"What happened to the spot!!!" );
+			AssertMsg( false, "What happened to the spot!!!" );
 			continue;
 		}
 
@@ -776,7 +776,7 @@ bool CHL2GameMovement::CheckLadderAutoMountCone( CFuncLadder *ladder, const Vect
 		VectorNormalize( flatForward );
 
 		float facingDot = flatForward.Dot( flatLadder );
-		float angle = acos( facingDot ) * 180 / M_PI;
+		float angle = acos( facingDot ) * 180.0f / M_PI_F;
 
 		bool closetoladder = ( dist != 0.0f && dist < maxDistToLadder ) ? true : false;
 		bool reallyclosetoladder = ( dist != 0.0f && dist < 4.0f ) ? true : false;
@@ -852,7 +852,7 @@ bool CHL2GameMovement::LookingAtLadder( CFuncLadder *ladder )
 	// Compute dot product to see if forward is in same direction as vec to ladder
 	float facingDot = flatForward.Dot( flatLadder );
 
-	float requiredDot = ( sv_ladder_useonly.GetBool() ) ? -0.99 : 0.0;
+	float requiredDot = ( sv_ladder_useonly.GetBool() ) ? -0.99f : 0.0f;
 
 	// Facing same direction if dot > = requiredDot...
 	bool facingladder = ( facingDot >= requiredDot );

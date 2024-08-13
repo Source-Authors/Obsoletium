@@ -162,7 +162,7 @@ public:
 	{
 		if ( !IsValidType( type ) )
 		{
-			Assert( !"Bogus type" );
+			AssertMsg( false, "Bogus type" );
 			return NULL;
 		}
 		return m_Accessors[ type ]->GetDataObject( instance );
@@ -172,7 +172,7 @@ public:
 	{
 		if ( !IsValidType( type ) )
 		{
-			Assert( !"Bogus type" );
+			AssertMsg( false, "Bogus type" );
 			return NULL;
 		}
 
@@ -183,7 +183,7 @@ public:
 	{
 		if ( !IsValidType( type ) )
 		{
-			Assert( !"Bogus type" );
+			AssertMsg( false, "Bogus type" );
 			return;
 		}
 
@@ -206,7 +206,7 @@ private:
 	{
 		if ( type < 0 || type >= MAX_ACCESSORS )
 		{
-			Assert( !"AddDataAccessor with out of range type!!!\n" );
+			AssertMsg( false, "AddDataAccessor with out of range type!!!\n" );
 			return;
 		}
 
@@ -214,7 +214,7 @@ private:
 
 		if ( m_Accessors[ type ] != NULL )
 		{
-			Assert( !"AddDataAccessor, duplicate adds!!!\n" );
+			AssertMsg( false, "AddDataAccessor, duplicate adds!!!\n" );
 			return;
 		}
 
@@ -1226,7 +1226,7 @@ bool CBaseEntity::PhysicsCheckWater( void )
 
 	// The deeper we are, the stronger the current.
 	Vector newBaseVelocity;
-	VectorMA (GetBaseVelocity(), 50.0*GetWaterLevel(), v, newBaseVelocity);
+	VectorMA (GetBaseVelocity(), 50.0f*GetWaterLevel(), v, newBaseVelocity);
 	SetBaseVelocity( newBaseVelocity );
 	
 	return GetWaterLevel() > 1;
@@ -1828,7 +1828,7 @@ void CBaseEntity::PhysicsSimulate( void )
 			// Apply momentum (add in half of the previous frame of velocity first)
 			// BUGBUG: This will break with PhysicsStep() because of the timestep difference
 			Vector vecAbsVelocity;
-			VectorMA( GetAbsVelocity(), 1.0 + (gpGlobals->frametime*0.5), GetBaseVelocity(), vecAbsVelocity );
+			VectorMA( GetAbsVelocity(), 1.0f + (gpGlobals->frametime*0.5f), GetBaseVelocity(), vecAbsVelocity );
 			SetAbsVelocity( vecAbsVelocity );
 			SetBaseVelocity( vec3_origin );
 		}

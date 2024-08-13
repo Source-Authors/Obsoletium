@@ -93,9 +93,9 @@ public:
 	CSprite();
 	virtual void SetModel( const char *szModelName );
 
-	void Spawn( void );
-	void Precache( void );
-	virtual void ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs );
+	void Spawn( void ) override;
+	void Precache( void ) override;
+	void ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs ) override;
 
 	void SetGlowProxySize( float flSize ) { m_flGlowProxySize = flSize; }
 
@@ -222,11 +222,11 @@ public:
 	virtual float	GetRenderScale( void );
 	virtual int		GetRenderBrightness( void );
 
-	virtual int		DrawModel( int flags );
-	virtual const	Vector& GetRenderOrigin();
-	virtual void	GetRenderBounds( Vector &vecMins, Vector &vecMaxs );
-	virtual float	GlowBlend( CEngineSprite *psprite, const Vector& entorigin, int rendermode, int renderfx, int alpha, float *scale );
-	virtual void	GetToolRecordingState( KeyValues *msg );
+	int		DrawModel( int flags ) override;
+	const	Vector& GetRenderOrigin() override;
+	void	GetRenderBounds( Vector &vecMins, Vector &vecMaxs ) override;
+	float	GlowBlend( CEngineSprite *psprite, const Vector& entorigin, int rendermode, int renderfx, int alpha, float *scale ) override;
+	void	GetToolRecordingState( KeyValues *msg ) override;
 
 // Only supported in TF2 right now
 #if defined( INVASION_CLIENT_DLL )
@@ -236,8 +236,8 @@ public:
 	}
 #endif
 
-	virtual void	ClientThink( void );
-	virtual void	OnDataChanged( DataUpdateType_t updateType );
+	void	ClientThink( void ) override;
+	void	OnDataChanged( DataUpdateType_t updateType ) override;
 
 #endif
 public:
@@ -284,7 +284,7 @@ public:
 	void Spawn( void );
 #else
 	DECLARE_CLIENTCLASS();
-	virtual bool IsTransparent( void );
+	bool IsTransparent( void ) override;
 #endif
 };
 

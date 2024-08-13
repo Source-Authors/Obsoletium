@@ -159,7 +159,7 @@ private:
 	virtual void PreRender() {}
 
 	// Gets called each frame
-	virtual void Update( float frametime ) {}
+	virtual void Update( float ) {}
 
 	// Called after rendering
 	virtual void PostRender() {}
@@ -203,7 +203,7 @@ public:
 	virtual void PreRender () { }
 
 	// Gets called each frame
-	virtual void Update( float frametime ) { }
+	virtual void Update( float ) { }
 
 	// Called after rendering
 	virtual void PostRender () { }

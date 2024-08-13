@@ -58,7 +58,8 @@ public:
 	short	m_nSurfaceProp;
 
 	// Some TF2 specific things
-	int		m_nMaterial;
+	// dimhotepus: Comment unused.
+	// intp		m_nMaterial;
 	int		m_nDamageType;
 	int		m_nHitBox;
 	
@@ -92,8 +93,9 @@ public:
 
 		m_flMagnitude = 0.0f;
 		m_flRadius = 0.0f;
-
-		m_nMaterial = 0;
+		
+		// dimhotepus: Comment unused m_nMaterial.
+		// m_nMaterial = 0;
 		m_nDamageType = 0;
 		m_nHitBox = 0;
 

@@ -150,7 +150,7 @@ CNewParticleEffect *CParticleProperty::Create( const char *pszParticleName, Part
 		return NULL;
 	}
 
-	int iIndex = m_ParticleEffects.AddToTail();
+	intp iIndex = m_ParticleEffects.AddToTail();
 	ParticleEffectList_t *newEffect = &m_ParticleEffects[iIndex];
 	newEffect->pParticleEffect = CNewParticleEffect::Create( m_pOuter, pDef );
 
@@ -202,7 +202,7 @@ void CParticleProperty::AddControlPoint( int iEffectIndex, int iPoint, C_BaseEnt
 
 	// If the control point is already used, override it
 	ParticleControlPoint_t *pNewPoint = NULL;
-	int iIndex = iPoint;
+	intp iIndex = iPoint;
 	FOR_EACH_VEC( pEffect->pControlPoints, i )
 	{
 		if ( pEffect->pControlPoints[i].iControlPoint == iPoint )

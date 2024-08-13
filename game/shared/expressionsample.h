@@ -82,8 +82,8 @@ public:
 class CCurveData
 {
 public:
-	int				GetCount( void );
-	CExpressionSample *Get( int index );
+	intp				GetCount( void ) const;
+	CExpressionSample *Get( intp index );
 	CExpressionSample *Add( float time, float value, bool selected );
 	void			Delete( int index );
 	void			Clear( void );
@@ -91,11 +91,11 @@ public:
 
 	EdgeInfo_t			*GetEdgeInfo( int idx );
 
-	void				SetEdgeInfo( bool leftEdge, int curveType, float zero );
-	void				GetEdgeInfo( bool leftEdge, int& curveType, float& zero ) const;
+	void				SetEdgeInfo( bool leftEdge, short curveType, float zero );
+	void				GetEdgeInfo( bool leftEdge, short& curveType, float& zero ) const;
 	void				SetEdgeActive( bool leftEdge, bool state );
 	bool				IsEdgeActive( bool leftEdge ) const;
-	int					GetEdgeCurveType( bool leftEdge ) const;
+	short				GetEdgeCurveType( bool leftEdge ) const;
 	float				GetEdgeZeroValue( bool leftEdge ) const;
 	void				RemoveOutOfRangeSamples( ICurveDataAccessor *data );
 
@@ -106,25 +106,37 @@ public:
 	void				FileSave( CUtlBuffer& buf, int level, const char *name );
 
 	float	GetIntensity( ICurveDataAccessor *data, float time );
-	CExpressionSample *GetBoundedSample( ICurveDataAccessor *data, int number, bool& bClamped );
+	CExpressionSample *GetBoundedSample( ICurveDataAccessor *data, intp number, bool& bClamped );
 
-	CCurveData & operator = (const CCurveData &src) 
+	CCurveData() = default;
+	CCurveData(const CCurveData &src) 
 	{
 		// Copy ramp over
 		m_Ramp.RemoveAll();
-		int i;
-		for ( i = 0; i < src.m_Ramp.Count(); i++ )
+		for ( auto &s : src.m_Ramp )
 		{
-			CExpressionSample sample = src.m_Ramp[ i ];
-			CExpressionSample *newSample = Add( sample.time, sample.value, sample.selected );
-			newSample->SetCurveType( sample.GetCurveType() );
+			CExpressionSample *newSample = Add( s.time, s.value, s.selected );
+			newSample->SetCurveType( s.GetCurveType() );
+		}
+		m_RampEdgeInfo[ 0 ] = src.m_RampEdgeInfo[ 0 ];
+		m_RampEdgeInfo[ 1 ] = src.m_RampEdgeInfo[ 1 ];
+	}
+	CCurveData& operator = (const CCurveData &src) 
+	{
+		if ( &src == this ) return *this;
+
+		// Copy ramp over
+		m_Ramp.RemoveAll();
+		for ( auto &s : src.m_Ramp )
+		{
+			CExpressionSample *newSample = Add( s.time, s.value, s.selected );
+			newSample->SetCurveType( s.GetCurveType() );
 		}
 		m_RampEdgeInfo[ 0 ] = src.m_RampEdgeInfo[ 0 ];
 		m_RampEdgeInfo[ 1 ] = src.m_RampEdgeInfo[ 1 ];
 
 		return *this;
-
-	};
+	}
 
 private:
 	CUtlVector< CExpressionSample > m_Ramp;

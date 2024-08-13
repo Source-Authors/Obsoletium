@@ -58,9 +58,6 @@ extern int g_nEventListVersion;
 
 void SetEventIndexForSequence( mstudioseqdesc_t &seqdesc )
 {
-	if ( &seqdesc == NULL )
-		 return;
-
 	seqdesc.flags |= STUDIO_EVENT;
 
 	if ( seqdesc.numevents == 0 )
@@ -281,7 +278,7 @@ int CStudioHdr::CActivityToSequenceMapping::SelectWeightedSequence( CStudioHdr *
 	if (!ValidateAgainst(pstudiohdr))
 	{
 		AssertMsg1(false, "CStudioHdr %s has changed its vmodel pointer without reinitializing its activity mapping! Now performing emergency reinitialization.", pstudiohdr->pszName());
-		ExecuteOnce(DebuggerBreakIfDebugging());
+		ExecuteOnce( DebuggerBreakIfDebugging() );
 		Reinitialize(pstudiohdr);
 	}
 
@@ -312,11 +309,13 @@ int CStudioHdr::CActivityToSequenceMapping::SelectWeightedSequence( CStudioHdr *
 	int randomValue;
 	if ( IsInPrediction() )
 	{
-		randomValue = SharedRandomInt( "SelectWeightedSequence", 0, weighttotal - 1 );
+		// dimhotepus: At least vortigaunt model has weighttotal equal to 0.
+		randomValue = weighttotal == 0 ? 0 : SharedRandomInt( "SelectWeightedSequence", 0, weighttotal - 1 );
 	}
 	else
 	{
-		randomValue = RandomInt( 0, weighttotal - 1 );
+		// dimhotepus: At least vortigaunt model has weighttotal equal to 0.
+		randomValue = weighttotal == 0 ? 0 : RandomInt( 0, weighttotal - 1 );
 	}
 
 	// chug through the entries in the list (they are sequential therefore cache-coherent)
@@ -355,7 +354,7 @@ int CStudioHdr::CActivityToSequenceMapping::SelectWeightedSequenceFromModifiers(
 	if (!ValidateAgainst(pstudiohdr))
 	{
 		AssertMsg1(false, "CStudioHdr %s has changed its vmodel pointer without reinitializing its activity mapping! Now performing emergency reinitialization.", pstudiohdr->pszName());
-		ExecuteOnce(DebuggerBreakIfDebugging());
+		ExecuteOnce( DebuggerBreakIfDebugging() );
 		Reinitialize(pstudiohdr);
 	}
 
@@ -599,9 +598,6 @@ bool HasAnimationEventOfType( CStudioHdr *pstudiohdr, int sequence, int type )
 		return false;
 
 	mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( sequence );
-	if ( !&seqdesc )
-		return false;
-
 	mstudioevent_t *pevent = GetEventIndexForSequence( seqdesc );
 	if ( !pevent )
 		return false;

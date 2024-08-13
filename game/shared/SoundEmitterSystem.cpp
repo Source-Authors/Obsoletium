@@ -99,7 +99,7 @@ EmitSound_t::EmitSound_t( const CSoundParameters &src )
 
 void Hack_FixEscapeChars( char *str )
 {
-	int len = Q_strlen( str ) + 1;
+	intp len = Q_strlen( str ) + 1;
 	char *i = str;
 	char *o = (char *)_alloca( len );
 	char *osave = o;
@@ -1096,7 +1096,7 @@ void Playgamesound_f( const CCommand &args )
 			Vector position = pPlayer->EyePosition();
 			Vector forward;
 			pPlayer->GetVectors( &forward, NULL, NULL );
-			position += atof( args[2] ) * forward;
+			position += strtof( args[2], nullptr ) * forward;
 			CPASAttenuationFilter filter( pPlayer );
 			EmitSound_t params;
 			params.m_pSoundName = args[1];
@@ -1125,7 +1125,7 @@ static int GamesoundCompletion( const char *partial, char commands[ COMMAND_COMP
 
 	const char *cmdname = "playgamesound";
 	char *substring = NULL;
-	int substringLen = 0;
+	intp substringLen = 0;
 	if ( Q_strstr( partial, cmdname ) && strlen(partial) > strlen(cmdname) + 1 )
 	{
 		substring = (char *)partial + strlen( cmdname ) + 1;
@@ -1509,7 +1509,7 @@ bool CBaseEntity::PrecacheSound( const char *name )
 	{
 		if ( !enginesound->IsSoundPrecached( name ) )
 		{
-			Assert( !"CBaseEntity::PrecacheSound:  too late" );
+			AssertMsg( false, "CBaseEntity::PrecacheSound:  too late" );
 
 			Warning( "Late precache of %s\n", name );
 		}

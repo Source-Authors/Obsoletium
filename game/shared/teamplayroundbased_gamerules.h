@@ -179,22 +179,22 @@ public:
 	// Data accessors
 	inline gamerules_roundstate_t State_Get( void ) { return m_iRoundState; }
 	bool	IsInWaitingForPlayers( void ) { return m_bInWaitingForPlayers; }
-	virtual bool InRoundRestart( void ) { return State_Get() == GR_STATE_PREROUND; }
+	bool InRoundRestart( void ) override { return State_Get() == GR_STATE_PREROUND; }
 	bool	InStalemate( void ) { return State_Get() == GR_STATE_STALEMATE; }
 	bool	RoundHasBeenWon( void ) { return State_Get() == GR_STATE_TEAM_WIN; }
 
 	virtual float GetNextRespawnWave( int iTeam, CBasePlayer *pPlayer );
 	virtual bool HasPassedMinRespawnTime( CBasePlayer *pPlayer );
-	virtual void	LevelInitPostEntity( void );
+	void	LevelInitPostEntity( void ) override;
 	virtual float	GetRespawnTimeScalar( int iTeam );
 	virtual float	GetRespawnWaveMaxLength( int iTeam, bool bScaleWithNumPlayers = true );
 	virtual bool	ShouldRespawnQuickly( CBasePlayer *pPlayer ) { return false; }
 	float	GetMinTimeWhenPlayerMaySpawn( CBasePlayer *pPlayer );
 
 	// Return false if players aren't allowed to cap points at this time (i.e. in WaitingForPlayers)
-	virtual bool PointsMayBeCaptured( void ) { return ((State_Get() == GR_STATE_RND_RUNNING || State_Get() == GR_STATE_STALEMATE) && !IsInWaitingForPlayers()); }
-	virtual void SetLastCapPointChanged( int iIndex ) { m_iLastCapPointChanged = iIndex; }
-	int			 GetLastCapPointChanged( void ) { return m_iLastCapPointChanged; }
+	bool PointsMayBeCaptured( void ) override { return ((State_Get() == GR_STATE_RND_RUNNING || State_Get() == GR_STATE_STALEMATE) && !IsInWaitingForPlayers()); }
+	void SetLastCapPointChanged( int iIndex ) override { m_iLastCapPointChanged = iIndex; }
+	int	GetLastCapPointChanged( void ) { return m_iLastCapPointChanged; }
 
 	virtual int GetWinningTeam( void )
 	{
@@ -260,13 +260,13 @@ public:
 	float GetStateTransitionTime( void ){ return m_flStateTransitionTime; }
 
 #ifdef CLIENT_DLL
-	virtual void Update( float frametime ) OVERRIDE;
+	virtual void Update( float frametime ) override;
 #endif
 
 	void SetAllowBetweenRounds( bool bValue ) { m_bAllowBetweenRounds = bValue; }
 
 public: // IGameEventListener Interface
-	virtual void FireGameEvent( IGameEvent * event );
+	void FireGameEvent( IGameEvent * event ) override;
 
 	//----------------------------------------------------------------------------------
 	// Server specific
@@ -339,7 +339,7 @@ public:
 	bool IsPreviouslyPlayedRound ( string_t strName );
 	string_t GetLastPlayedRound( void );
 
-	virtual void SetWinningTeam( int team, int iWinReason, bool bForceMapReset = true, bool bSwitchTeams = false, bool bDontAddScore = false, bool bFinal = false ) OVERRIDE;
+	virtual void SetWinningTeam( int team, int iWinReason, bool bForceMapReset = true, bool bSwitchTeams = false, bool bDontAddScore = false, bool bFinal = false ) override;
 	virtual void SetStalemate( int iReason, bool bForceMapReset = true, bool bSwitchTeams = false );
 
 	virtual void SetRoundOverlayDetails( void ){ return; }
@@ -486,7 +486,7 @@ protected:
 	bool MapHasActiveTimer( void );
 	void CreateTimeLimitTimer( void );
 
-	virtual float GetLastMajorEventTime( void ) OVERRIDE { return m_flLastTeamWin; }
+	virtual float GetLastMajorEventTime( void ) override { return m_flLastTeamWin; }
 
 protected:
 	CGameRulesRoundStateInfo	*m_pCurStateInfo;			// Per-state data 

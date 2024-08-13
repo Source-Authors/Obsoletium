@@ -63,7 +63,7 @@ void ActivityList_Free( void )
 activitylist_t *ActivityList_AddActivityEntry( const char *pName, int iActivityIndex, bool isPrivate )
 {
 	MEM_ALLOC_CREDIT();
-	int index = g_ActivityList.AddToTail();
+	intp index = g_ActivityList.AddToTail();
 	activitylist_t *pList = &g_ActivityList[index];
 	pList->activityIndex = iActivityIndex;
 	pList->stringKey = g_ActivityStrings.AddString( pName, index );
@@ -2385,7 +2385,7 @@ public:
 			AssertOnce( activityIndex == -1 ); // FIXME: whatever activity this was, it's now being saved out as ACT_RESET
 			pActivityName = ActivityList_NameForIndex( 0 );
 		}
-		int len = strlen(pActivityName) + 1;
+		int len = V_strlen(pActivityName) + 1;
 		
 		// Use the high 16-bits of this int to signify this file format
 		// this makes this backwards compatible.

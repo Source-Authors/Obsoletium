@@ -40,7 +40,10 @@ public:
 				NULL, 
 				NULL,
 				pKeyDatamap,
-				sizeof(KEY_TYPE),
+				CDatamapFieldSizeDeducer<KEY_TYPE>::FieldSize(),
+				nullptr,
+				0,
+				0.0f
 			},
 			
 			{
@@ -53,7 +56,10 @@ public:
 				NULL, 
 				NULL,
 				pFieldDatamap,
-				sizeof(FIELD_TYPE),
+				CDatamapFieldSizeDeducer<FIELD_TYPE>::FieldSize(),
+				nullptr,
+				0,
+				0.0f
 			}
 		};
 		
@@ -106,7 +112,10 @@ public:
 				NULL, 
 				NULL,
 				pKeyDatamap,
-				sizeof(KEY_TYPE),
+				CDatamapFieldSizeDeducer<KEY_TYPE>::FieldSize(),
+				nullptr,
+				0,
+				0.0f
 			},
 			
 			{
@@ -119,7 +128,10 @@ public:
 				NULL, 
 				NULL,
 				pFieldDatamap,
-				sizeof(FIELD_TYPE),
+				CDatamapFieldSizeDeducer<FIELD_TYPE>::FieldSize(),
+				nullptr,
+				0,
+				0.0f
 			}
 		};
 		
@@ -192,7 +204,7 @@ public:
 //-------------------------------------
 
 #define DEFINE_UTLMAP(name,keyType,fieldtype) \
-	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, CUtlMapDataopsInstantiator<keyType, fieldtype>::GetDataOps(&(((classNameTypedef *)0)->name)), NULL }
+	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, CUtlMapDataopsInstantiator<keyType, fieldtype>::GetDataOps(&(((classNameTypedef *)0)->name)), nullptr, nullptr, 0, nullptr, 0, 0.0f }
 
 
 #endif // SAVERESTORE_UTLMAP_H

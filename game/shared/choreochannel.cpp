@@ -36,6 +36,22 @@ CChoreoChannel::CChoreoChannel(const char *name )
 	SetName( name );
 }
 
+CChoreoChannel::CChoreoChannel( const CChoreoChannel& src )
+{
+	m_bActive = src.m_bActive;
+
+	V_strcpy_safe( m_szName, src.m_szName );
+
+	for ( auto *e : src.m_Events )
+	{
+		auto *newEvent = new CChoreoEvent( e->GetScene() );
+		*newEvent = *e;
+		AddEvent( newEvent );
+		newEvent->SetChannel( this );
+		newEvent->SetActor( m_pActor );
+	}
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Assignment
@@ -43,8 +59,12 @@ CChoreoChannel::CChoreoChannel(const char *name )
 //-----------------------------------------------------------------------------
 CChoreoChannel&	CChoreoChannel::operator=( const CChoreoChannel& src )
 {
+	if ( &src == this ) return *this;
+
 	m_bActive = src.m_bActive;
-	Q_strncpy( m_szName, src.m_szName, sizeof( m_szName ) );
+
+	V_strcpy_safe( m_szName, src.m_szName );
+
 	for ( auto *e : src.m_Events )
 	{
 		auto *newEvent = new CChoreoEvent( e->GetScene() );
@@ -71,7 +91,7 @@ void CChoreoChannel::SetName( const char *name )
 // Purpose: 
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *CChoreoChannel::GetName( void )
+const char *CChoreoChannel::GetName() const
 {
 	return m_szName;
 }
@@ -80,7 +100,7 @@ const char *CChoreoChannel::GetName( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-intp CChoreoChannel::GetNumEvents( void )
+intp CChoreoChannel::GetNumEvents() const
 {
 	return m_Events.Count();
 }
@@ -115,7 +135,7 @@ void CChoreoChannel::AddEvent( CChoreoEvent *event )
 //-----------------------------------------------------------------------------
 void CChoreoChannel::RemoveEvent( CChoreoEvent *event )
 {
-	int idx = FindEventIndex( event );
+	intp idx = FindEventIndex( event );
 	if ( idx == -1 )
 		return;
 
@@ -135,7 +155,7 @@ void CChoreoChannel::RemoveAllEvents()
 // Input  : *event - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoChannel::FindEventIndex( CChoreoEvent *event )
+intp CChoreoChannel::FindEventIndex( CChoreoEvent *event ) const
 {
 	for ( intp i = 0; i < m_Events.Count(); i++ )
 	{
@@ -201,7 +221,7 @@ static bool ChoreEventStartTimeLessFunc( CChoreoEvent * const &p1, CChoreoEvent 
 void CChoreoChannel::ReconcileGestureTimes()
 {
 	// Sort items
-	int c = GetNumEvents();
+	intp c = GetNumEvents();
 	// Sort gesture events within channel by starting time
 	CUtlRBTree< CChoreoEvent * >  sortedGestures( 0, c, ChoreEventStartTimeLessFunc );
 	for ( auto *e : m_Events )
@@ -366,11 +386,11 @@ struct EventGroup
 void CChoreoChannel::ReconcileCloseCaption()
 {
 	// Create a dictionary based on the combined token name
-	CUtlDict< EventGroup, int > validSpeakEventsGroupedByName;
+	CUtlDict< EventGroup, intp > validSpeakEventsGroupedByName;
 
-	int i;
+	intp i;
 	// Sort items
-	int c = GetNumEvents();
+	intp c = GetNumEvents();
 	for ( i = 0; i < c; i++ )
 	{
 		CChoreoEvent *e = GetEvent( i );
@@ -405,7 +425,7 @@ void CChoreoChannel::ReconcileCloseCaption()
 			continue;
 		}
 	
-		int idx = validSpeakEventsGroupedByName.Find( name );
+		auto idx = validSpeakEventsGroupedByName.Find( name );
 		if ( idx == validSpeakEventsGroupedByName.InvalidIndex() )
 		{
 			EventGroup eg;
@@ -429,7 +449,7 @@ void CChoreoChannel::ReconcileCloseCaption()
 	for ( i = 0; i < c; ++i )
 	{
 		EventGroup & eg = validSpeakEventsGroupedByName[ i ];
-		int sortedEventInGroup = eg.timeSortedEvents.Count();
+		intp sortedEventInGroup = eg.timeSortedEvents.Count();
 		// If there's only one, just mark it valid
 		if ( sortedEventInGroup <= 1 )
 		{
@@ -479,9 +499,9 @@ bool CChoreoChannel::GetSortedCombinedEventList( char const *cctoken, CUtlRBTree
 {
 	events.RemoveAll();
 
-	int i;
+	intp i;
 	// Sort items
-	int c = GetNumEvents();
+	intp c = GetNumEvents();
 	for ( i = 0; i < c; i++ )
 	{
 		CChoreoEvent *e = GetEvent( i );
@@ -511,11 +531,11 @@ void CChoreoChannel::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChore
 {
 	buf.PutShort( pStringPool->FindOrAddString( GetName() ) );
 
-	int c = GetNumEvents();
+	intp c = GetNumEvents();
 	Assert( c <= 255 );
-	buf.PutUnsignedChar( c );
+	buf.PutUnsignedChar( static_cast<unsigned char>(c) );
 
-	for ( int i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		CChoreoEvent *e = GetEvent( i );
 		Assert( e );
@@ -531,8 +551,8 @@ bool CChoreoChannel::RestoreFromBuffer( CUtlBuffer& buf, CChoreoScene *pScene, C
 	pStringPool->GetString( buf.GetShort(), sz, sizeof( sz ) );
 	SetName( sz );
 
-	int numEvents = (int)buf.GetUnsignedChar();
-	for ( int i = 0 ; i < numEvents; ++i )
+	intp numEvents = buf.GetUnsignedChar();
+	for ( intp i = 0 ; i < numEvents; ++i )
 	{
 		CChoreoEvent *e = pScene->AllocEvent();
 		if ( e->RestoreFromBuffer( buf, pScene, pStringPool ) )

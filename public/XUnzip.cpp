@@ -1505,7 +1505,7 @@ int inflate_blocks(inflate_blocks_statef *s, z_streamp z, int r)
       q += t;  m -= t;
       if ((s->sub.left -= t) != 0)
         break;
-      Tracev((stderr, "inflate:       stored end, %lu total out\n",
+      Tracev((stderr, "inflate:       stored end, %zi total out\n",
               z->total_out + (q >= s->read ? q - s->read :
               (s->end - s->read) + (q - s->window))));
       s->mode = s->last ? IBM_DRY : IBM_TYPE;
@@ -1634,7 +1634,7 @@ int inflate_blocks(inflate_blocks_statef *s, z_streamp z, int r)
       r = Z_OK;
       inflate_codes_free(s->sub.decode.codes, z);
       LOAD
-      Tracev((stderr, "inflate:       codes end, %lu total out\n",
+      Tracev((stderr, "inflate:       codes end, %zi total out\n",
               z->total_out + (q >= s->read ? q - s->read :
               (s->end - s->read) + (q - s->window))));
       if (!s->last)

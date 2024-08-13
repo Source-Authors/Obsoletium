@@ -39,14 +39,14 @@ class IChoreoStringPool;
 //-----------------------------------------------------------------------------
 class CChoreoScene : public ICurveDataAccessor
 {
-	typedef enum 
+	enum PROCESSING_TYPE
 	{
 		PROCESSING_TYPE_IGNORE = 0,
 		PROCESSING_TYPE_START,
 		PROCESSING_TYPE_START_RESUMECONDITION,
 		PROCESSING_TYPE_CONTINUE,
 		PROCESSING_TYPE_STOP,
-	} PROCESSING_TYPE;
+	};
 
 	struct ActiveList
 	{
@@ -57,15 +57,16 @@ class CChoreoScene : public ICurveDataAccessor
 public:
 	// Construction
 					CChoreoScene( IChoreoEventCallback *callback );
-					~CChoreoScene( void );
+					CChoreoScene( const CChoreoScene& src );
+					~CChoreoScene();
 
 	// Assignment
-	CChoreoScene&	operator=(const CChoreoScene& src );
+	CChoreoScene&	operator=( const CChoreoScene& src );
 
 	// ICurveDataAccessor methods
-	virtual float	GetDuration() { return FindStopTime(); };
-	virtual bool	CurveHasEndTime();
-	virtual int		GetDefaultCurveType();
+	float	GetDuration() override { return FindStopTime(); };
+	bool	CurveHasEndTime() override;
+	int		GetDefaultCurveType() override;
 
 	// Binary serialization
 	bool			SaveBinary( char const *pszBinaryFileName, char const *pPathID, unsigned int nTextVersionCRC, IChoreoStringPool *pStringPool );
@@ -145,20 +146,20 @@ public:
 	// Remove actor from scene
 	void			RemoveActor( CChoreoActor *actor );
 	// Find index for actor
-	int				FindActorIndex( CChoreoActor *actor );
+	intp			FindActorIndex( CChoreoActor *actor );
 
 	// Swap actors in the data
 	void			SwapActors( int a1, int a2 );
 
 	// General data access
-	int				GetNumEvents( void );
-	CChoreoEvent	*GetEvent( int event );
+	intp			GetNumEvents() const;
+	CChoreoEvent	*GetEvent( intp event );
 
-	int				GetNumActors( void );
-	CChoreoActor	*GetActor( int actor );
+	intp			GetNumActors() const;
+	CChoreoActor	*GetActor( intp actor );
 	
-	int				GetNumChannels( void );
-	CChoreoChannel	*GetChannel( int channel );
+	intp			GetNumChannels() const;
+	CChoreoChannel	*GetChannel( intp channel );
 
 	// Object allocation/destruction
 	void			DeleteReferencedObjects( CChoreoActor *actor );
@@ -200,7 +201,7 @@ public:
 
 	float			SnapTime( float t );
 
-	int				GetSceneRampCount( void ) { return m_SceneRamp.GetCount(); };
+	intp				GetSceneRampCount( void ) const { return m_SceneRamp.GetCount(); };
 	CExpressionSample *GetSceneRamp( int index ) { return m_SceneRamp.Get( index ); };
 	CExpressionSample *AddSceneRamp( float time, float value, bool selected ) { return m_SceneRamp.Add( time, value, selected ); };
 	void			DeleteSceneRamp( int index ) { m_SceneRamp.Delete( index ); };
@@ -333,7 +334,7 @@ private:
 
 	float			m_flEarliestTime;
 	float			m_flLatestTime;
-	int				m_nActiveEvents;
+	intp			m_nActiveEvents;
 
 	// Wave file playback needs to issue play commands a bit ahead of time
 	//  in order to hit exact marks
@@ -372,7 +373,7 @@ private:
 	bool			m_bUseFrameSnap : 1;
 	bool			m_bRestoring : 1;
 
-	int				m_nLastPauseEvent;
+	intp			m_nLastPauseEvent;
 	// This only gets updated if it's loaded from a buffer which means we're not in an editor
 	float			m_flPrecomputedStopTime;
 };

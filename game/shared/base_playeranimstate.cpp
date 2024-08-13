@@ -908,9 +908,6 @@ Activity CBasePlayerAnimState::BodyYawTranslateActivity( Activity activity )
 	case TURN_LEFT:
 		return mp_ik.GetBool() ? ACT_TURN : activity;
 	}
-
-	Assert( 0 );
-	return activity;
 }
 
 const QAngle& CBasePlayerAnimState::GetRenderAngles()

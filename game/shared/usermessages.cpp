@@ -130,7 +130,7 @@ void CUserMessages::HookMessage( const char *name, pfnUserMsgHook hook )
 		return;
 	}
 
-	int i = m_UserMessages[ idx ]->clienthooks.AddToTail();
+	intp i = m_UserMessages[ idx ]->clienthooks.AddToTail();
 	m_UserMessages[ idx ]->clienthooks[i] = hook;
 
 #else
@@ -150,7 +150,7 @@ bool CUserMessages::DispatchUserMessage( int msg_type, bf_read &msg_data )
 #if defined( CLIENT_DLL )
 	if ( msg_type < 0 || msg_type >= (int)m_UserMessages.Count() )
 	{
-		DevMsg( "CUserMessages::DispatchUserMessage:  Bogus msg type %i (max == %i)\n", msg_type, m_UserMessages.Count() );
+		DevMsg( "CUserMessages::DispatchUserMessage:  Bogus msg type %i (max == %zu)\n", msg_type, m_UserMessages.Count() );
 		Assert( 0 );
 		return false;
 	}
@@ -171,13 +171,13 @@ bool CUserMessages::DispatchUserMessage( int msg_type, bf_read &msg_data )
 		return false;
 	}
 
-	for (int i = 0; i < entry->clienthooks.Count(); i++  )
+	for (pfnUserMsgHook hook : entry->clienthooks)
 	{
 		bf_read msg_copy = msg_data;
 
-		pfnUserMsgHook hook = entry->clienthooks[i];
 		(*hook)( msg_copy );
 	}
+
 	return true;
 #else
 	Error( "CUserMessages::DispatchUserMessage called from server code!!!\n" );

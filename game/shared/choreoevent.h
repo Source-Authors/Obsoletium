@@ -44,7 +44,8 @@ public:
 	};
 
 					CEventRelativeTag( CChoreoEvent *owner, const char *name, float percentage );
-					CEventRelativeTag( const CEventRelativeTag& src );
+					CEventRelativeTag( const CEventRelativeTag& src ) = default;
+					CEventRelativeTag& operator=( const CEventRelativeTag& src ) = default;
 	
 	const char		*GetName( void );
 	float			GetPercentage( void );
@@ -75,7 +76,8 @@ public:
 	};
 
 					CEventAbsoluteTag( CChoreoEvent *owner, const char *name, float percentage );
-					CEventAbsoluteTag( const CEventAbsoluteTag& src );
+					CEventAbsoluteTag( const CEventAbsoluteTag& src ) = default;
+					CEventAbsoluteTag& operator=( const CEventAbsoluteTag& src ) = default;
 	
 	const char		*GetName( void );
 
@@ -124,7 +126,8 @@ class CFlexTimingTag : public CEventRelativeTag
 
 public:
 					CFlexTimingTag( CChoreoEvent *owner, const char *name, float percentage, bool locked );
-					CFlexTimingTag( const CFlexTimingTag& src );
+					CFlexTimingTag( const CFlexTimingTag& src ) = default;
+					CFlexTimingTag& operator=( const CFlexTimingTag& src ) = default;
 	
 	bool			GetLocked( void );
 	void			SetLocked( bool locked );
@@ -165,8 +168,8 @@ public:
 	bool				IsInverted( void );
 	void				SetInverted( bool isInverted );
 
-	int					GetNumSamples( int type = 0 );
-	CExpressionSample	*GetSample( int index, int type = 0 );
+	intp				GetNumSamples( int type = 0 ) const;
+	CExpressionSample	*GetSample( intp index, int type = 0 );
 
 	bool				IsTrackActive( void );
 	void				SetTrackActive( bool active );
@@ -182,7 +185,7 @@ public:
 
 	// Puts in dummy start/end samples to spline to zero ( or 0.5 for
 	//  left/right data) at the origins
-	CExpressionSample	*GetBoundedSample( int number, bool& bClamped, int type = 0 );
+	CExpressionSample	*GetBoundedSample( intp number, bool& bClamped, int type = 0 );
 
 	int					GetFlexControllerIndex( int side = 0 );
 	LocalFlexController_t	GetRawFlexControllerIndex( int side = 0 );
@@ -195,11 +198,11 @@ public:
 	float				GetSampleIntensity( float time );
 	float				GetBalanceIntensity( float time );
 
-	void				SetEdgeInfo( bool leftEdge, int curveType, float zero );
-	void				GetEdgeInfo( bool leftEdge, int& curveType, float& zero ) const;
+	void				SetEdgeInfo( bool leftEdge, short curveType, float zero );
+	void				GetEdgeInfo( bool leftEdge, short& curveType, float& zero ) const;
 	void				SetEdgeActive( bool leftEdge, bool state );
 	bool				IsEdgeActive( bool leftEdge ) const;
-	int					GetEdgeCurveType( bool leftEdge ) const;
+	short				GetEdgeCurveType( bool leftEdge ) const;
 	float				GetEdgeZeroValue( bool leftEdge ) const;
 
 	float				GetDefaultEdgeZeroPos() const;
@@ -254,7 +257,7 @@ class CChoreoEvent : public ICurveDataAccessor
 {
 public:
 	// Type of event this object represents
-	typedef enum
+	enum EVENTTYPE : char
 	{
 		// Don't know yet
 		UNSPECIFIED = 0,
@@ -309,7 +312,7 @@ public:
 
 		// THIS MUST BE LAST!!!
 		NUM_TYPES,
-	} EVENTTYPE;
+	};
 
 	enum
 	{
@@ -317,21 +320,21 @@ public:
 		MAX_CCTOKEN_STRING		= 64,
 	};
 
-	typedef enum
+	enum TIMETYPE
 	{
 		DEFAULT = 0,
 		SIMULATION,
 		DISPLAY,
-	} TIMETYPE;
+	};
 
-	typedef enum
+	enum CLOSECAPTION : char
 	{
 		CC_MASTER = 0,  // default, implied
 		CC_SLAVE,
 		CC_DISABLED,
 
 		NUM_CC_TYPES,
-	} CLOSECAPTION;
+	};
 
 	static int	s_nGlobalID;
 
@@ -346,8 +349,8 @@ public:
 	~CChoreoEvent( void );
 
 	// ICurveDataAccessor methods
-	virtual bool	CurveHasEndTime();
-	virtual int		GetDefaultCurveType();
+	bool	CurveHasEndTime() override;
+	int		GetDefaultCurveType() override;
 
 	// Binary serialization
 	void			SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoStringPool *pStringPool );
@@ -373,7 +376,7 @@ public:
 	void			SetEndTime( float endtime );
 	float			GetEndTime( void );
 
-	float			GetDuration( void );
+	float			GetDuration( void ) override;
 
 	void			SetResumeCondition( bool resumecondition );
 	bool			IsResumeCondition( void );
@@ -393,10 +396,10 @@ public:
 	void			SetPlayOverScript( bool bPlayOverScript );
 	bool			GetPlayOverScript( void );
 
-	int				GetRampCount( void ) { return m_Ramp.GetCount(); };
-	CExpressionSample *GetRamp( int index ) { return m_Ramp.Get( index ); };
-	CExpressionSample *AddRamp( float time, float value, bool selected ) { return m_Ramp.Add( time, value, selected ); };
-	void			DeleteRamp( int index ) { m_Ramp.Delete( index ); };
+	intp				GetRampCount( void ) const { return m_Ramp.GetCount(); }
+	CExpressionSample *GetRamp( int index ) { return m_Ramp.Get( index ); }
+	CExpressionSample *AddRamp( float time, float value, bool selected ) { return m_Ramp.Add( time, value, selected ); }
+	void			DeleteRamp( int index ) { m_Ramp.Delete( index ); }
 	void			ClearRamp( void ) { m_Ramp.Clear(); };
 	void			ResortRamp( void ) { m_Ramp.Resort( this ); };
 	CCurveData		*GetRamp( void ) { return &m_Ramp; };
@@ -592,7 +595,7 @@ private:
 	void SaveFlexAnimationsToBuffer( CUtlBuffer& buf, IChoreoStringPool *pStringPool );
 	bool RestoreFlexAnimationsFromBuffer( CUtlBuffer& buf, IChoreoStringPool *pStringPool );
 
-	float			GetBoundedAbsoluteTagPercentage( AbsTagType type, int tagnum );
+	float			GetBoundedAbsoluteTagPercentage( AbsTagType type, intp tagnum );
 
 	float			_GetIntensity( float time );
 
@@ -607,10 +610,10 @@ private:
 	void			Init( CChoreoScene *scene );
 
 	// Type of event
-	byte			m_fType;
+	EVENTTYPE			m_fType;
 
 	// Close caption type
-	byte			m_ccType;
+	CLOSECAPTION			m_ccType;
 
 	// Name of event
 	ChoreoStr_t		m_Name;

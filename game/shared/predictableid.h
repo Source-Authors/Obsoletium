@@ -71,7 +71,7 @@ private:
 };
 
 // This can be empty, the class has a proper constructor
-FORCEINLINE void NetworkVarConstruct( CPredictableId &x ) {}
+FORCEINLINE void NetworkVarConstruct( CPredictableId & ) {}
 
 #endif
 

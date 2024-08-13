@@ -87,7 +87,7 @@ ISaveRestoreOps *GetBitstringDataOps(BITSTRING *)
 //-------------------------------------
 
 #define DEFINE_BITSTRING(name) \
-	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, GetBitstringDataOps(&(((classNameTypedef *)0)->name)), NULL }
+	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, GetBitstringDataOps(&(((classNameTypedef *)0)->name)), nullptr, nullptr, 0, nullptr, 0, 0.0f }
 
 #endif // SAVERESTORE_BITSTRING_H
 

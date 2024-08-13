@@ -483,7 +483,6 @@ void RagdollApplyAnimationAsVelocity( ragdoll_t &ragdoll, const matrix3x4_t *pBo
 		MatrixAngles( inverse, q, pos );
 
 		Vector velocity;
-		AngularImpulse angVel;
 		float flSpin;
 
 		Vector localVelocity;
@@ -626,7 +625,7 @@ void RagdollSolveSeparation( ragdoll_t &ragdoll, CBaseEntity *pEntity )
 {
 	byte needsFix[256];
 	int fixCount = 0;
-	Assert(ragdoll.listCount<=ARRAYSIZE(needsFix));
+	Assert(ragdoll.listCount<=ssize(needsFix));
 	for ( int i = 0; i < ragdoll.listCount; i++ )
 	{
 		needsFix[i] = 0;
@@ -1103,28 +1102,25 @@ C_EntityDissolve *DissolveEffect( C_BaseEntity *pTarget, float flTime )
 		return NULL;
 	}
 
-	if ( pDissolve != NULL )
-	{
-		pTarget->AddFlag( FL_DISSOLVING );
-		pDissolve->SetParent( pTarget );
-		pDissolve->OnDataChanged( DATA_UPDATE_CREATED );
-		pDissolve->SetAbsOrigin( pTarget->GetAbsOrigin() );
+	pTarget->AddFlag( FL_DISSOLVING );
+	pDissolve->SetParent( pTarget );
+	pDissolve->OnDataChanged( DATA_UPDATE_CREATED );
+	pDissolve->SetAbsOrigin( pTarget->GetAbsOrigin() );
 
-		pDissolve->m_flStartTime = flTime;
-		pDissolve->m_flFadeOutStart = DEFAULT_FADE_START;
-		pDissolve->m_flFadeOutModelStart = DEFAULT_MODEL_FADE_START;
-		pDissolve->m_flFadeOutModelLength = DEFAULT_MODEL_FADE_LENGTH;
-		pDissolve->m_flFadeInLength = DEFAULT_FADEIN_LENGTH;
+	pDissolve->m_flStartTime = flTime;
+	pDissolve->m_flFadeOutStart = DEFAULT_FADE_START;
+	pDissolve->m_flFadeOutModelStart = DEFAULT_MODEL_FADE_START;
+	pDissolve->m_flFadeOutModelLength = DEFAULT_MODEL_FADE_LENGTH;
+	pDissolve->m_flFadeInLength = DEFAULT_FADEIN_LENGTH;
 		
-		pDissolve->m_nDissolveType = 0;
-		pDissolve->m_flNextSparkTime = 0.0f;
-		pDissolve->m_flFadeOutLength = 0.0f;
-		pDissolve->m_flFadeInStart = 0.0f;
+	pDissolve->m_nDissolveType = 0;
+	pDissolve->m_flNextSparkTime = 0.0f;
+	pDissolve->m_flFadeOutLength = 0.0f;
+	pDissolve->m_flFadeInStart = 0.0f;
 
-		// Let this entity know it needs to delete itself when it's done
-		pDissolve->SetServerLinkState( false );
-		pTarget->SetEffectEntity( pDissolve );
-	}
+	// Let this entity know it needs to delete itself when it's done
+	pDissolve->SetServerLinkState( false );
+	pTarget->SetEffectEntity( pDissolve );
 
 	return pDissolve;
 
@@ -1140,37 +1136,34 @@ C_EntityFlame *FireEffect( C_BaseAnimating *pTarget, C_BaseEntity *pServerFire, 
 		return NULL;
 	}
 
-	if ( pFire != NULL )
-	{
-		pFire->RemoveFromLeafSystem();
+	pFire->RemoveFromLeafSystem();
 		
-		pTarget->AddFlag( FL_ONFIRE );
-		pFire->SetParent( pTarget );
-		pFire->m_hEntAttached = (C_BaseEntity *) pTarget;
+	pTarget->AddFlag( FL_ONFIRE );
+	pFire->SetParent( pTarget );
+	pFire->m_hEntAttached = (C_BaseEntity *) pTarget;
 
-		pFire->OnDataChanged( DATA_UPDATE_CREATED );
-		pFire->SetAbsOrigin( pTarget->GetAbsOrigin() );
+	pFire->OnDataChanged( DATA_UPDATE_CREATED );
+	pFire->SetAbsOrigin( pTarget->GetAbsOrigin() );
 
 #ifdef HL2_EPISODIC
-		if ( pServerFire )
+	if ( pServerFire )
+	{
+		if ( pServerFire->IsEffectActive(EF_DIMLIGHT) )
 		{
-			if ( pServerFire->IsEffectActive(EF_DIMLIGHT) )
-			{
-				pFire->AddEffects( EF_DIMLIGHT );
-			}
-			if ( pServerFire->IsEffectActive(EF_BRIGHTLIGHT) )
-			{
-				pFire->AddEffects( EF_BRIGHTLIGHT );
-			}
+			pFire->AddEffects( EF_DIMLIGHT );
 		}
+		if ( pServerFire->IsEffectActive(EF_BRIGHTLIGHT) )
+		{
+			pFire->AddEffects( EF_BRIGHTLIGHT );
+		}
+	}
 #endif
 
-		//Play a sound
-		CPASAttenuationFilter filter( pTarget );
-		pTarget->EmitSound( filter, pTarget->GetSoundSourceIndex(), "General.BurningFlesh" );
+	//Play a sound
+	CPASAttenuationFilter filter( pTarget );
+	pTarget->EmitSound( filter, pTarget->GetSoundSourceIndex(), "General.BurningFlesh" );
 
-		pFire->SetNextClientThink( gpGlobals->curtime + 7.0f );
-	}
+	pFire->SetNextClientThink( gpGlobals->curtime + 7.0f );
 
 	return pFire;
 }

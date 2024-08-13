@@ -131,9 +131,9 @@ bool CBaseHLCombatWeapon::Deploy( void )
 					m_bLowered = true;
 
 					// Stomp the next attack time to fix the fact that the lower idles are long
-					pPlayer->SetNextAttack( gpGlobals->curtime + 1.0 );
-					m_flNextPrimaryAttack = gpGlobals->curtime + 1.0;
-					m_flNextSecondaryAttack	= gpGlobals->curtime + 1.0;
+					pPlayer->SetNextAttack( gpGlobals->curtime + 1.0f );
+					m_flNextPrimaryAttack = gpGlobals->curtime + 1.0f;
+					m_flNextSecondaryAttack	= gpGlobals->curtime + 1.0f;
 					return true;
 				}
 			}

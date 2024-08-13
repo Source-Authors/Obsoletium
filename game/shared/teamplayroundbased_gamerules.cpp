@@ -612,7 +612,7 @@ float CTeamplayRoundBasedRules::GetMinTimeWhenPlayerMaySpawn( CBasePlayer *pPlay
 	//		and
 	// b) death anim length + freeze panel length
 
-	float flDeathAnimLength = 2.0 + spec_freeze_traveltime.GetFloat() + spec_freeze_time.GetFloat();
+	float flDeathAnimLength = 2.0f + spec_freeze_traveltime.GetFloat() + spec_freeze_time.GetFloat();
 
 	float fMinDelay = flDeathAnimLength;
 
@@ -2315,7 +2315,7 @@ void CTeamplayRoundBasedRules::SetWinningTeam( int team, int iWinReason, bool bF
 
 	if ( ( team != TEAM_UNASSIGNED ) && ( team <= LAST_SHARED_TEAM || team >= GetNumberOfTeams() ) )
 	{
-		Assert( !"SetWinningTeam() called with invalid team." );
+		AssertMsg( false, "SetWinningTeam() called with invalid team." );
 		return;
 	}
 

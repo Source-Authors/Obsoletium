@@ -128,6 +128,13 @@ void UpdatePerfStats( void )
 
 CBaseGameStats_Driver::CBaseGameStats_Driver( void ) :
 	BaseClass( "CGameStats" ),
+	m_bBufferFull( false ),
+	m_nWriteIndex( 0 ),
+	m_flLastRealTime( -1 ),
+	m_flLastSampleTime( -1 ),
+	m_flTotalTimeInLevels( 0 ),
+	m_iNumLevels( 0 ),
+	m_bDidVoiceChat( false ),
 	m_iLoadedVersion( -1 ),
 	m_bEnabled( false ),
 	m_bShuttingDown( false ),
@@ -137,15 +144,7 @@ CBaseGameStats_Driver::CBaseGameStats_Driver( void ) :
 	m_bStationary( false ),
 	m_flLastMovementTime( 0.0f ),
 	m_bGamePaused( false ),
-	m_pGamestatsData( NULL ),
-	m_bBufferFull( false ),
-	m_nWriteIndex( 0 ),
-	m_flLastRealTime( -1 ),
-	m_flLastSampleTime( -1 ),
-	m_flTotalTimeInLevels( 0 ),
-	m_iNumLevels( 0 ),
-	m_bDidVoiceChat( false )
-
+	m_pGamestatsData( NULL )
 {
 	m_szLoadedUserID[0] = 0;
 	m_tLastUpload = 0;
@@ -422,7 +421,7 @@ bool CBaseGameStats::SaveToFileNOW( bool bForceSyncWrite /* = false */ )
 	if( ShouldTrackStandardStats() )
 		m_BasicStats.SaveToBuffer( buf ); 
 	else
-		buf.PutInt( GAMESTATS_STANDARD_NOT_SAVED );
+		buf.PutUnsignedInt( GAMESTATS_STANDARD_NOT_SAVED );
 
 	gamestats->AppendCustomDataToSaveBuffer( buf );
 
@@ -538,7 +537,7 @@ bool CBaseGameStats::UploadStatsFileNOW( void )
 		return false;
 	}
 
-	int curtime = Plat_FloatTime();
+	double curtime = Plat_FloatTime();
 
 	CBGSDriver.m_tLastUpload = curtime;
 
@@ -558,7 +557,7 @@ bool CBaseGameStats::UploadStatsFileNOW( void )
 		return false;
 	}
 
-	const void *pvBlobData = ( const void * )buf.Base();
+	const void *pvBlobData = buf.Base<const void>();
 
 	if( gamestatsuploader )
 	{
@@ -625,7 +624,7 @@ bool CBaseGameStats::LoadFromFile( void )
 			else
 			{
 				// Peek ahead in buffer to see if we have the "no default stats" secret flag set.
-				int iCheckForStandardStatsInFile = *( int * )buf.PeekGet();
+				unsigned iCheckForStandardStatsInFile = *( unsigned * )buf.PeekGet();
 				bool bValid = true;
 
 				if ( iCheckForStandardStatsInFile != GAMESTATS_STANDARD_NOT_SAVED )
@@ -1049,7 +1048,7 @@ void CBaseGameStats_Driver::SendData()
 		return;
 
 	// save the data to a buffer
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	m_pGamestatsData->m_pKVData->RecursiveSaveToFile( buf, 0 );
 
 	if ( CommandLine()->FindParm( "-gamestatsfileoutputonly" ) )
@@ -1228,7 +1227,7 @@ void CBaseGameStats_Driver::ResetData()
 
 	pKV->SetString( "CPUName", cpu.m_szProcessorBrand );
 
-	pKV->SetFloat( "CPUGhz", cpu.m_Speed * ( 1.0 / 1.0e9 ) );
+	pKV->SetFloat( "CPUGhz", cpu.m_Speed * ( 1.0f / 1.0e9f ) );
 	pKV->SetUint64( "CPUModel", cpu.m_nModel );
 	pKV->SetUint64( "CPUFeatures0", cpu.m_nFeatures[ 0 ] );
 	pKV->SetUint64( "CPUFeatures1", cpu.m_nFeatures[ 1 ] );

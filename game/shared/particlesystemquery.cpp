@@ -177,11 +177,13 @@ bool CParticleSystemQuery::MovePointInsideControllingObject(
 #endif
 }
 
+#ifndef GAME_DLL
 static float GetSurfaceCoord( float flRand, float flMinX, float flMaxX )
 {
 	return Lerp( flRand, flMinX, flMaxX );
 
 }
+#endif
 
 
 void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox( 
@@ -484,7 +486,6 @@ bool CParticleSystemQuery::IsPointInControllingObjectHitBox(
 		bool bInBBox = false;
 		Vector vecBBoxMin;
 		Vector vecBBoxMax;
-		Vector vecOrigin;
 
 		vecBBoxMin = pMoveParent->CollisionProp()->OBBMins();
 		vecBBoxMax = pMoveParent->CollisionProp()->OBBMaxs();

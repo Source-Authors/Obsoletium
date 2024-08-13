@@ -58,7 +58,7 @@ public:
 #endif // GAME_DLL
 
 	virtual bool IsDestroyable( void ) { return false; }
-	virtual void Destroy( bool bBlinkOut = true, bool bBreakRocket = false ) {}
+	virtual void Destroy( [[maybe_unused]] bool bBlinkOut = true, [[maybe_unused]] bool bBreakRocket = false ) {}
 	virtual void SetLauncher( CBaseEntity *pLauncher );
 	CBaseEntity *GetOriginalLauncher() const { return m_hOriginalLauncher; }
 

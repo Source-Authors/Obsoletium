@@ -53,7 +53,7 @@ void EventList_Free( void )
 eventlist_t *EventList_AddEventEntry( const char *pName, int iEventIndex, bool isPrivate, int iType )
 {
 	MEM_ALLOC_CREDIT();
-	int index = g_EventList.AddToTail();
+	intp index = g_EventList.AddToTail();
 	eventlist_t *pList = &g_EventList[index];
 	pList->eventIndex = iEventIndex;
 	pList->stringKey = g_EventStrings.AddString( pName, index );
@@ -85,11 +85,11 @@ static eventlist_t *ListFromString( const char *pString )
 static eventlist_t *ListFromEvent( int eventIndex )
 {
 	// ugly linear search
-	for ( int i = 0; i < g_EventList.Size(); i++ )
+	for ( auto &e : g_EventList )
 	{
-		if ( g_EventList[i].eventIndex == eventIndex )
+		if ( e.eventIndex == eventIndex )
 		{
-			return &g_EventList[i];
+			return &e;
 		}
 	}
 
