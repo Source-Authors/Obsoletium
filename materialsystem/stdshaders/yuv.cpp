@@ -7,7 +7,7 @@
 
 #include "BaseVSShader.h"
 
-#include "screenspaceeffect.inc"
+#include "ScreenSpaceEffect.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

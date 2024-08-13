@@ -15,7 +15,7 @@
 #include "tier0/memdbgon.h"
 
 
-void InitParamsWorldVertexTransitionEditor_DX8( IMaterialVar** params, WorldVertexTransitionEditor_DX8_Vars_t &info )
+void InitParamsWorldVertexTransitionEditor_DX8( IMaterialVar** params, [[maybe_unused]] WorldVertexTransitionEditor_DX8_Vars_t &info )
 {
 	SET_FLAGS2( MATERIAL_VAR2_LIGHTING_LIGHTMAP );
 }
@@ -33,7 +33,7 @@ void InitWorldVertexTransitionEditor_DX8( CBaseVSShader *pShader, IMaterialVar**
 	}
 }
 
-void DrawWorldVertexTransitionEditor_DX8( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynamicAPI *pShaderAPI, IShaderShadow* pShaderShadow, WorldVertexTransitionEditor_DX8_Vars_t &info )
+void DrawWorldVertexTransitionEditor_DX8( CBaseVSShader *pShader, [[maybe_unused]] IMaterialVar** params, IShaderDynamicAPI *pShaderAPI, IShaderShadow* pShaderShadow, WorldVertexTransitionEditor_DX8_Vars_t &info )
 {
 	SHADOW_STATE
 	{
@@ -61,7 +61,7 @@ void DrawWorldVertexTransitionEditor_DX8( CBaseVSShader *pShader, IMaterialVar**
 		
 		pShader->EnablePixelShaderOverbright( 0, true, true );
 		
-		// JasonM - Gnarly hack since we're calling this legacy shader from DX9
+		// TODO: JasonM - Gnarly hack since we're calling this legacy shader from DX9
 		int nTextureTransformConst  = VERTEX_SHADER_SHADER_SPECIFIC_CONST_0;
 		int nTextureTransformConst2 = VERTEX_SHADER_SHADER_SPECIFIC_CONST_2;
 		if ( g_pHardwareConfig->GetDXSupportLevel() >= 90)

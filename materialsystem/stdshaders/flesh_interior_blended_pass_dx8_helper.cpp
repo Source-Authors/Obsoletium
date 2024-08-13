@@ -126,7 +126,7 @@
 // Auto generated inc files
 #include "flesh_interior_blended_pass_dx8_vs11.inc"
 
-void InitParamsFleshInteriorBlendedPass( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, FleshInteriorBlendedPassVars_t &info )
+void InitParamsFleshInteriorBlendedPass( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, FleshInteriorBlendedPassVars_t &info )
 {
 	SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_HW_SKINNING );
 
@@ -147,7 +147,7 @@ void InitParamsFleshInteriorBlendedPass( CBaseVSShader *pShader, IMaterialVar** 
 	SET_PARAM_FLOAT_IF_NOT_DEFINED( info.m_nTime, 0.0f );
 }
 
-void InitFleshInteriorBlendedPass( CBaseVSShader *pShader, IMaterialVar** params, FleshInteriorBlendedPassVars_t &info )
+void InitFleshInteriorBlendedPass( CBaseVSShader *pShader, [[maybe_unused]] IMaterialVar** params, FleshInteriorBlendedPassVars_t &info )
 {
 	// Load textures
 	pShader->LoadTexture( info.m_nFleshTexture );

@@ -9,7 +9,7 @@
 #include "portal_refract_ps20.inc"
 #include "portal_refract_ps20b.inc"
 
-void InitParamsPortalRefract( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, PortalRefractVars_t &info )
+void InitParamsPortalRefract( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, PortalRefractVars_t &info )
 {
 	// Set material flags
 	SET_FLAGS( MATERIAL_VAR_MODEL );

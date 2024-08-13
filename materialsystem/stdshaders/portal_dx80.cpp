@@ -274,7 +274,7 @@ void MultiPass_CutoutPass( IShaderShadow *pShaderShadow, IShaderDynamicAPI *pSha
 }
 
 
-void MultiPass_StaticPass( IShaderShadow *pShaderShadow, IShaderDynamicAPI *pShaderAPI, IMaterialVar **params, bool bAlphaMaskTexture )
+void MultiPass_StaticPass( IShaderShadow *pShaderShadow, IShaderDynamicAPI *pShaderAPI,  [[maybe_unused]] IMaterialVar **params, bool bAlphaMaskTexture )
 {
 	SHADOW_STATE
 	{

@@ -29,7 +29,7 @@ BEGIN_VS_SHADER( PortalRefract_dx8, "PortalRefract_dx8" )
 		info.m_nPortalColorScale = PORTALCOLORSCALE;
 	}
 
-	bool NeedsPowerOfTwoFrameBufferTexture( IMaterialVar **params, bool bCheckSpecificToThisFrame ) const 
+	bool NeedsPowerOfTwoFrameBufferTexture( [[maybe_unused]] IMaterialVar **params, [[maybe_unused]] bool bCheckSpecificToThisFrame ) const 
 	{
 		return false;
 	}

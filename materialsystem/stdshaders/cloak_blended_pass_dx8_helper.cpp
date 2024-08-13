@@ -127,7 +127,7 @@
 // Auto generated inc files
 #include "cloak_blended_pass_dx8_vs11.inc"
 
-void InitParamsCloakBlendedPass( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, CloakBlendedPassVars_t &info )
+void InitParamsCloakBlendedPass( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, CloakBlendedPassVars_t &info )
 {
 	// Set material flags
 	SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_HW_SKINNING );
@@ -151,7 +151,7 @@ void InitParamsCloakBlendedPass( CBaseVSShader *pShader, IMaterialVar** params, 
 	}
 }
 
-void InitCloakBlendedPass( CBaseVSShader *pShader, IMaterialVar** params, CloakBlendedPassVars_t &info )
+void InitCloakBlendedPass( [[maybe_unused]] CBaseVSShader *pShader, [[maybe_unused]] IMaterialVar** params, [[maybe_unused]] CloakBlendedPassVars_t &info )
 {
 	// No textures
 }

@@ -16,7 +16,7 @@
 #define MAXBLUR 1
 
 // FIXME: doesn't support fresnel!
-void InitParamsRefract_DX9( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, Refract_DX9_Vars_t &info )
+void InitParamsRefract_DX9( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, Refract_DX9_Vars_t &info )
 {
 	SET_FLAGS2( MATERIAL_VAR2_NEEDS_TANGENT_SPACES );
 	SET_FLAGS( MATERIAL_VAR_TRANSLUCENT );

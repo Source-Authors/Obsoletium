@@ -196,7 +196,7 @@ static void DrawCompositorStage_common( CBaseVSShader *pShader, IMaterialVar **p
 		int textureCountThisPass = Min( textureCount, info.m_nTexturesPerPass );
 
 		float f4TextureCountThisPass[] = { ( float ) textureCountThisPass, 0.0f, 0.0f, 0.0f };
-		Assert( ARRAYSIZE( f4TextureCountThisPass ) == 4 );
+		static_assert( std::size( f4TextureCountThisPass ) == 4 );
 
 		pShaderAPI->SetPixelShaderConstant( 6, f4TextureCountThisPass );
 
@@ -280,7 +280,7 @@ static void DrawCompositorStage_ps20_muladdblend( CBaseVSShader *pShader, IMater
 		Assert( textureCountThisPass <= info.m_nTexturesPerPass );
 
 		float f4TextureCountThisPass[] = { (float)textureCountThisPass, 0.0f, 0.0f, 0.0f };
-		Assert( ARRAYSIZE( f4TextureCountThisPass ) == 4 );
+		static_assert( std::size( f4TextureCountThisPass ) == 4 );
 
 		pShaderAPI->SetPixelShaderConstant( 6, f4TextureCountThisPass );
 
@@ -394,7 +394,7 @@ static void DrawCompositorStage_ps20( CBaseVSShader *pShader, IMaterialVar **par
 		DrawCompositorStage_ps20_select( pShader, params, pShaderShadow, pShaderAPI, vertexCompression, info );
 		return;
 	default:
-		Assert( !"Need to update DrawCompositoreStage_ps20 with how to draw this mode." );
+		AssertMsg( false, "Need to update DrawCompositoreStage_ps20 with how to draw this mode." );
 		break;
 	}
 }

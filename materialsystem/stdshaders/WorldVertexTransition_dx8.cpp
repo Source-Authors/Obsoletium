@@ -9,7 +9,7 @@
 #include "BaseVSShader.h"
 #include "convar.h"
 
-#include "worldvertextransition.inc"
+#include "WorldVertexTransition.inc"
 #include "worldvertextransition_vs14.inc"
 #include "worldvertextransition_seamless.inc"
 #include "lightmappedgeneric_vs11.inc"
@@ -244,7 +244,7 @@ BEGIN_VS_SHADER( WorldVertexTransition_DX8,
 		}
 	}
 
-	void WriteVertexAlphaToDestAlpha( IMaterialVar** params, IShaderDynamicAPI *pShaderAPI, IShaderShadow* pShaderShadow )
+	void WriteVertexAlphaToDestAlpha( [[maybe_unused]] IMaterialVar** params, IShaderDynamicAPI *pShaderAPI, IShaderShadow* pShaderShadow )
 	{
 		if( pShaderShadow )
 		{

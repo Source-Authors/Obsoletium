@@ -8,8 +8,8 @@
 
 #include "BaseVSShader.h"
 
-#include "refract_model_vs11.inc"
-#include "refract_world_vs11.inc"
+#include "Refract_model_vs11.inc"
+#include "Refract_world_vs11.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

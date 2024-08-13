@@ -144,7 +144,7 @@
 #include "cloak_blended_pass_ps30.inc"
 #endif
 
-void InitParamsCloakBlendedPass( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, CloakBlendedPassVars_t &info )
+void InitParamsCloakBlendedPass( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, CloakBlendedPassVars_t &info )
 {
 	// Set material flags
 	SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_HW_SKINNING );

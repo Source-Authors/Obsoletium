@@ -21,7 +21,7 @@
 static ConVar r_lightwarpidentity( "r_lightwarpidentity", "0", FCVAR_CHEAT );
 
 // FIXME: doesn't support fresnel!
-void InitParamsCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, Cloak_DX9_Vars_t &info )
+void InitParamsCloak_DX9( [[maybe_unused]] CBaseVSShader *pShader, IMaterialVar** params, [[maybe_unused]] const char *pMaterialName, Cloak_DX9_Vars_t &info )
 {
 	SET_FLAGS2( MATERIAL_VAR2_NEEDS_TANGENT_SPACES );
 	SET_FLAGS( MATERIAL_VAR_TRANSLUCENT );
@@ -205,7 +205,7 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			}
 			else
 			{
-				// JasonM Hack
+				// TODO: JasonM Hack
 				//
 				// In general, cloaking on ps_2_0 needs re-working for multipass...yuck...
 				//

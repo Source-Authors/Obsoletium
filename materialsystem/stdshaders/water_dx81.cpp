@@ -8,8 +8,8 @@
 #include "BaseVSShader.h"
 #include "mathlib/vmatrix.h"
 
-#include "water_ps14.inc"
-#include "watercheap_vs14.inc"
+#include "Water_ps14.inc"
+#include "WaterCheap_vs14.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
