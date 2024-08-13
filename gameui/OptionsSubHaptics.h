@@ -31,19 +31,19 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class COptionsSubHaptics : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubHaptics, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubHaptics, vgui::PropertyPage );
 
 public:
 	COptionsSubHaptics(vgui::Panel *parent);
 	~COptionsSubHaptics();
 
-	virtual void OnResetData();
-	virtual void OnApplyChanges();
-	virtual void OnCommand(const char *command);
+	void OnResetData() override;
+	void OnApplyChanges() override;
+	void OnCommand(const char *command) override;
 	virtual void UpdateVehicleEnabled(void);
 
 protected:
-    virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+    void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 
 private:
 	MESSAGE_FUNC_PTR( OnControlModified, "ControlModified", panel );

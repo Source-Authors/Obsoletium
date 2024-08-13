@@ -13,7 +13,7 @@
 
 #include "vgui_controls/consoledialog.h"
 #include <Color.h>
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 #include "EngineInterface.h"
 #include "vgui_controls/Frame.h"
 
@@ -23,17 +23,17 @@
 //-----------------------------------------------------------------------------
 class CGameConsoleDialog : public vgui::CConsoleDialog
 {
-	DECLARE_CLASS_SIMPLE( CGameConsoleDialog, vgui::CConsoleDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CGameConsoleDialog, vgui::CConsoleDialog );
 
 public:
 	CGameConsoleDialog();
 
 private:
 	MESSAGE_FUNC( OnClosedByHittingTilde, "ClosedByHittingTilde" );
-	MESSAGE_FUNC_CHARPTR( OnCommandSubmitted, "CommandSubmitted", command );
+	MESSAGE_FUNC_CHARPTR_OVERRIDE( OnCommandSubmitted, "CommandSubmitted", command );
 
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
-	virtual void OnCommand( const char *command );
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
+	void OnCommand( const char *command ) override;
 };
 
 

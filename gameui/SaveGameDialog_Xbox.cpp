@@ -176,7 +176,7 @@ void CSaveGameDialogXbox::InitiateSaving()
 		time_t currentTime = time( NULL );
 		Q_snprintf( szFilename, maxFilenameLen, "%s_%u", COM_GetModDirectory(), (unsigned)currentTime );
 #endif
-		Q_snprintf( szCmd, sizeof( szCmd ), "xsave %s", szFilename );
+		Q_snprintf( szCmd, sizeof( szCmd ), "save %s", szFilename );
 		engine->ExecuteClientCmd( szCmd );
 		Q_strncat( szFilename, ".360.sav", maxFilenameLen );
 	}
@@ -184,7 +184,7 @@ void CSaveGameDialogXbox::InitiateSaving()
 	{
 		const SaveGameDescription_t *pDesc = GetActivePanelSaveDescription();
 		Q_strncpy( szFilename, pDesc->szShortName, maxFilenameLen );
-		Q_snprintf( szCmd, sizeof( szCmd ), "xsave %s", szFilename );
+		Q_snprintf( szCmd, sizeof( szCmd ), "save %s", szFilename );
 		engine->ExecuteClientCmd( szCmd );
 	}
 

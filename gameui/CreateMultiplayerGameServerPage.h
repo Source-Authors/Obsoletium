@@ -19,13 +19,13 @@
 //-----------------------------------------------------------------------------
 class CCreateMultiplayerGameServerPage : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( CCreateMultiplayerGameServerPage, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCreateMultiplayerGameServerPage, vgui::PropertyPage );
 
 public:
 	CCreateMultiplayerGameServerPage(vgui::Panel *parent, const char *name);
 	~CCreateMultiplayerGameServerPage();
 
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 	// returns currently entered information about the server
 	void SetMap(const char *name);
@@ -40,7 +40,7 @@ public:
 	bool GetBotsEnabled( void );
 
 protected:
-	virtual void OnApplyChanges();
+	void OnApplyChanges() override;
 	MESSAGE_FUNC( OnCheckButtonChecked, "CheckButtonChecked" );
 
 private:

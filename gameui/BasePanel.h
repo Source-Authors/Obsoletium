@@ -61,16 +61,16 @@ private:
 //-----------------------------------------------------------------------------
 class CFooterPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CFooterPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CFooterPanel, vgui::EditablePanel );
 
 public:
 	CFooterPanel( Panel *parent, const char *panelName );
 	virtual ~CFooterPanel();
 
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void	ApplySettings( KeyValues *pResourceData );
-	virtual void	Paint( void );
-	virtual void	PaintBackground( void );
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void	ApplySettings( KeyValues *pResourceData ) override;
+	void	Paint( void ) override;
+	void	PaintBackground( void ) override;
 
 	// caller tags the current hint, used to assist in ownership
 	void			SetHelpNameAndReset( const char *pName );
@@ -123,12 +123,12 @@ private:
 //-----------------------------------------------------------------------------
 class CMainMenuGameLogo : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CMainMenuGameLogo, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMainMenuGameLogo, vgui::EditablePanel );
 public:
 	CMainMenuGameLogo( vgui::Panel *parent, const char *name );
 
-	virtual void ApplySettings( KeyValues *inResourceData );
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySettings( KeyValues *inResourceData ) override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	int GetOffsetX(){ return m_nOffsetX; }
 	int GetOffsetY(){ return m_nOffsetY; }
@@ -143,12 +143,12 @@ private:
 //-----------------------------------------------------------------------------
 class CGameMenuItem : public vgui::MenuItem
 {
-	DECLARE_CLASS_SIMPLE( CGameMenuItem, vgui::MenuItem );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CGameMenuItem, vgui::MenuItem );
 public:
 	CGameMenuItem(vgui::Menu *parent, const char *name);
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void PaintBackground( void );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void PaintBackground( void ) override;
 	void SetRightAlignedText( bool state );
 
 private:
@@ -161,7 +161,7 @@ private:
 //-----------------------------------------------------------------------------
 class CBasePanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CBasePanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBasePanel, vgui::Panel );
 
 public:
 	CBasePanel();
@@ -178,7 +178,7 @@ public:
 	class CAsyncJobContext
 	{
 	public:
-		CAsyncJobContext( float flLeastExecuteTime = 0.0f ) : m_flLeastExecuteTime( flLeastExecuteTime ), m_hThreadHandle( NULL )  {}
+		CAsyncJobContext( float flLeastExecuteTime = 0.0f ) : m_hThreadHandle( NULL ), m_flLeastExecuteTime( flLeastExecuteTime ) {}
 		virtual ~CAsyncJobContext() {}
 
 		virtual void ExecuteAsync() = 0;		// Executed on the secondary thread
@@ -244,7 +244,6 @@ public:
     // HPE_END
     //=============================================================================
 
-    void OnOpenAchievementsDialog_Xbox();
 	void OnOpenControllerDialog();
 
 	// Xbox 360
@@ -271,7 +270,7 @@ public:
 	void RunAnimationWithCallback( vgui::Panel *parent, const char *animName, KeyValues *msgFunc );
 	void PositionDialog( vgui::PHandle dlg );
 
-	virtual void OnSizeChanged( int newWide, int newTall );
+	void OnSizeChanged( int newWide, int newTall ) override;
 
 	void ArmFirstMenuItem( void );
 
@@ -291,8 +290,8 @@ public:
 
 
 protected:
-	virtual void PaintBackground();
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void PaintBackground() override;
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 
 public:
 	// FIXME: This should probably become a friend relationship between the classes
@@ -342,8 +341,8 @@ private:
 	void RunQueuedCommands();
 	void ClearQueuedCommands();
 
-	virtual void OnCommand(const char *command);
-	virtual void PerformLayout();
+	void OnCommand(const char *command) override;
+	void PerformLayout() override;
 	MESSAGE_FUNC_INT( OnActivateModule, "ActivateModule", moduleIndex);
 
 	void UpdateRichPresenceInfo();

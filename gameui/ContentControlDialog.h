@@ -18,15 +18,15 @@
 //-----------------------------------------------------------------------------
 class CContentControlDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CContentControlDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CContentControlDialog, vgui::Frame );
 
 public:
 	CContentControlDialog(vgui::Panel *parent);
 	~CContentControlDialog();
 
-	virtual void OnCommand( const char *command );
-	virtual void OnClose();
-	virtual void Activate();
+	void OnCommand( const char *command ) override;
+	void OnClose() override;
+	void Activate() override;
 
     void        ResetPassword();
     void        ApplyPassword();

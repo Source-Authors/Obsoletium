@@ -23,7 +23,7 @@ class CCvarToggleCheckButton;
 //-----------------------------------------------------------------------------
 class CCreateMultiplayerGameBotPage : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( CCreateMultiplayerGameBotPage, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCreateMultiplayerGameBotPage, vgui::PropertyPage );
 
 public:
 	CCreateMultiplayerGameBotPage( vgui::Panel *parent, const char *name, KeyValues *botKeys );
@@ -31,7 +31,7 @@ public:
 
 protected:
 	virtual void OnResetChanges();
-	virtual void OnApplyChanges();
+	void OnApplyChanges() override;
 
 private:
 	CCvarToggleCheckButton *m_joinAfterPlayer;

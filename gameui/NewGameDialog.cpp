@@ -51,7 +51,7 @@ static int __cdecl ChapterSortFunc(const void *elem1, const void *elem2)
 	chapter_t *c2 = (chapter_t *)elem2;
 
 	// compare chapter number first
-	static int chapterlen = strlen("chapter");
+	static intp chapterlen = ssize("chapter") - 1;
 	if (atoi(c1->filename + chapterlen) > atoi(c2->filename + chapterlen))
 		return 1;
 	else if (atoi(c1->filename + chapterlen) < atoi(c2->filename + chapterlen))
@@ -72,7 +72,7 @@ static int __cdecl ChapterSortFunc(const void *elem1, const void *elem2)
 //-----------------------------------------------------------------------------
 class CSelectionOverlayPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CSelectionOverlayPanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSelectionOverlayPanel, Panel );
 	int m_iChapterIndex;
 	CNewGameDialog *m_pSelectionTarget;
 public:
@@ -84,7 +84,7 @@ public:
 		SetPaintBackgroundEnabled(false);
 	}
 
-	virtual void OnMousePressed( vgui::MouseCode code )
+	void OnMousePressed( vgui::MouseCode code ) override 
 	{
 		if (GetParent()->IsEnabled())
 		{
@@ -92,7 +92,7 @@ public:
 		}
 	}
 
-	virtual void OnMouseDoublePressed( vgui::MouseCode code )
+	void OnMouseDoublePressed( vgui::MouseCode code ) override
 	{
 		// call the panel
 		OnMousePressed( code );
@@ -108,7 +108,7 @@ public:
 //-----------------------------------------------------------------------------
 class CGameChapterPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CGameChapterPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CGameChapterPanel, vgui::EditablePanel );
 
 	ImagePanel *m_pLevelPicBorder;
 	ImagePanel *m_pLevelPic;
@@ -146,7 +146,7 @@ public:
 		wchar_t num[32];
 		wchar_t *chapter = g_pVGuiLocalize->Find("#GameUI_Chapter");
 		g_pVGuiLocalize->ConvertANSIToUnicode( chapterNumber, num, sizeof(num) );
-		_snwprintf( text, ARRAYSIZE(text), L"%ls %ls", chapter ? chapter : L"CHAPTER", num );
+		_snwprintf( text, std::size(text), L"%ls %ls", chapter ? chapter : L"CHAPTER", num );
 
 		if ( ModInfo().IsSinglePlayerOnly() )
 		{
@@ -194,7 +194,7 @@ public:
 		m_bHasBonus = false;
 	}
 
-	virtual void ApplySchemeSettings( IScheme *pScheme )
+	void ApplySchemeSettings( IScheme *pScheme ) override
 	{
 		m_TextColor = pScheme->GetColor( "NewGame.TextColor", Color(255, 255, 255, 255) );
 		m_FillColor = pScheme->GetColor( "NewGame.FillColor", Color(255, 255, 255, 255) );
@@ -290,7 +290,7 @@ const char *COM_GetModDirectory()
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
 			Q_StripLastDir( modDir, sizeof(modDir) );
-			int dirlen = Q_strlen( modDir );
+			intp dirlen = Q_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
 	}

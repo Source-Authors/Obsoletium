@@ -65,7 +65,7 @@ static ConCommand commentary_testfirstrun("loadcommentary", CC_LoadCommentary_Te
 //-----------------------------------------------------------------------------
 class CCommentaryItemPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CCommentaryItemPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCommentaryItemPanel, vgui::EditablePanel );
 public:
 	CCommentaryItemPanel( PanelListPanel *parent, const char *name, int iListItemID ) : BaseClass( parent, name )
 	{
@@ -126,12 +126,12 @@ public:
 		PostMessage( m_pParent->GetVParent(), new KeyValues("PanelSelected") );
 	}
 
-	virtual void OnMousePressed( vgui::MouseCode code )
+	void OnMousePressed( vgui::MouseCode code ) override
 	{
 		m_pParent->SetSelectedPanel( this );
 	}
 
-	virtual void ApplySchemeSettings( IScheme *pScheme )
+	void ApplySchemeSettings( IScheme *pScheme ) override
 	{
 		m_TextColor = pScheme->GetColor( "NewGame.TextColor", Color(255, 255, 255, 255) );
 		m_SelectedColor = pScheme->GetColor( "NewGame.SelectionColor", Color(255, 255, 255, 255) );
@@ -139,7 +139,7 @@ public:
 		BaseClass::ApplySchemeSettings( pScheme );
 	}
 
-	virtual void OnMouseDoublePressed( vgui::MouseCode code )
+	void OnMouseDoublePressed( vgui::MouseCode code ) override
 	{
 		// call the panel
 		OnMousePressed( code );

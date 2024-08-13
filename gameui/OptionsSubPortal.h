@@ -27,17 +27,17 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class COptionsSubPortal : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubPortal, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubPortal, vgui::PropertyPage );
 
 public:
 	COptionsSubPortal(vgui::Panel *parent);
 	~COptionsSubPortal();
 
-	virtual void OnResetData();
-	virtual void OnApplyChanges();
+	void OnResetData() override;
+	void OnApplyChanges() override;
 
 protected:
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 
 private:
 	MESSAGE_FUNC( OnCheckButtonChecked, "CheckButtonChecked" )

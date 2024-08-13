@@ -28,7 +28,7 @@ class COptionsSubMultiplayer;
  
 class CrosshairImagePanelBase : public vgui::ImagePanel
 {
-	DECLARE_CLASS_SIMPLE( CrosshairImagePanelBase, vgui::ImagePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CrosshairImagePanelBase, vgui::ImagePanel );
 public:
 	CrosshairImagePanelBase( Panel *parent, const char *name ) : BaseClass(parent, name) {}
 	virtual void ResetData() {}
@@ -41,23 +41,23 @@ public:
 //-----------------------------------------------------------------------------
 class COptionsSubMultiplayer : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubMultiplayer, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubMultiplayer, vgui::PropertyPage );
 
 public:
 	COptionsSubMultiplayer(vgui::Panel *parent);
 	~COptionsSubMultiplayer();
 
-	virtual vgui::Panel *CreateControlByName(const char *controlName);
+	vgui::Panel *CreateControlByName(const char *controlName) override;
 
 	MESSAGE_FUNC( OnControlModified, "ControlModified" );
 
 protected:
 	// Called when page is loaded.  Data should be reloaded from document into controls.
-	virtual void OnResetData();
+	void OnResetData() override;
 	// Called when the OK / Apply button is pressed.  Changed data should be written into document.
-	virtual void OnApplyChanges();
+	void OnApplyChanges() override;
 
-	virtual void OnCommand( const char *command );
+	void OnCommand( const char *command ) override;
 
 private:
 	void InitModelList(CLabeledCommandComboBox *cb);

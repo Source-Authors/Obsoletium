@@ -20,16 +20,16 @@
 //-----------------------------------------------------------------------------
 class CCustomTabExplanationDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CCustomTabExplanationDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCustomTabExplanationDialog, vgui::Frame );
 
 public:
 	CCustomTabExplanationDialog(vgui::Panel *parent);
 	~CCustomTabExplanationDialog();
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void OnKeyCodePressed(vgui::KeyCode code);
-	virtual void OnCommand( const char *command );
-	virtual void OnClose( void );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void OnKeyCodePressed(vgui::KeyCode code) override;
+	void OnCommand( const char *command ) override;
+	void OnClose( void ) override;
 };
 
 #endif // CUSTOMTABEXPLANATIONDIALOG_H

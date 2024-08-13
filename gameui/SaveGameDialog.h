@@ -20,18 +20,18 @@
 //-----------------------------------------------------------------------------
 class CSaveGameDialog : public CBaseSaveGameDialog
 {
-	DECLARE_CLASS_SIMPLE( CSaveGameDialog, CBaseSaveGameDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSaveGameDialog, CBaseSaveGameDialog );
 
 public:
 	CSaveGameDialog( vgui::Panel *parent );
 	~CSaveGameDialog();
 
-	virtual void Activate();
+	void Activate() override;
 	static void FindSaveSlot( char *buffer, int bufsize );
 
 protected:
-	virtual void OnCommand( const char *command );
-	virtual void OnScanningSaveGames();
+	void OnCommand( const char *command ) override;
+	void OnScanningSaveGames() override;
 };
 
 #define SAVE_NUM_ITEMS 4
@@ -43,14 +43,14 @@ class CAsyncCtxSaveGame;
 
 class CSaveGameDialogXbox : public CSaveGameBrowserDialog
 {
-	DECLARE_CLASS_SIMPLE( CSaveGameDialogXbox, CSaveGameBrowserDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSaveGameDialogXbox, CSaveGameBrowserDialog );
 
 public:
 					CSaveGameDialogXbox( vgui::Panel *parent );
-	virtual void	PerformSelectedAction( void );
-	virtual void	UpdateFooterOptions( void );
-	virtual void	OnCommand( const char *command );
-	virtual void	OnDoneScanningSaveGames( void );
+	void	PerformSelectedAction( void ) override;
+	void	UpdateFooterOptions( void ) override;
+	void	OnCommand( const char *command ) override;
+	void	OnDoneScanningSaveGames( void ) override;
 
 private:
 	friend class CAsyncCtxSaveGame;

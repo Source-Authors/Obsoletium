@@ -22,15 +22,15 @@ class CSkillSelectionDialog;
 //-----------------------------------------------------------------------------
 class CCommentaryDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CCommentaryDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCommentaryDialog, vgui::Frame );
 
 public:
 	CCommentaryDialog(vgui::Panel *parent);
 	~CCommentaryDialog();
 
-	virtual void OnClose( void );
-	virtual void OnCommand( const char *command );
-	virtual void OnKeyCodePressed(vgui::KeyCode code);
+	void OnClose( void ) override;
+	void OnCommand( const char *command ) override;
+	void OnKeyCodePressed(vgui::KeyCode code) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -38,15 +38,15 @@ public:
 //-----------------------------------------------------------------------------
 class CPostCommentaryDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CPostCommentaryDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPostCommentaryDialog, vgui::Frame );
 
 public:
 	CPostCommentaryDialog(vgui::Panel *parent);
 	~CPostCommentaryDialog();
 
-	virtual void OnFinishedClose( void );
-	virtual void OnKeyCodeTyped(vgui::KeyCode code);
-	virtual void OnKeyCodePressed(vgui::KeyCode code);
+	void OnFinishedClose( void ) override;
+	void OnKeyCodeTyped(vgui::KeyCode code) override;
+	void OnKeyCodePressed(vgui::KeyCode code) override;
 
 private:
 	bool m_bResetPaintRestrict;

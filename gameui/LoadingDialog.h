@@ -19,7 +19,7 @@
 //-----------------------------------------------------------------------------
 class CLoadingDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CLoadingDialog, vgui::Frame ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CLoadingDialog, vgui::Frame ); 
 public:
 	CLoadingDialog( vgui::Panel *parent );
 	~CLoadingDialog();
@@ -37,13 +37,13 @@ public:
 	void DisplayLoggedInElsewhereError();
 
 protected:
-	virtual void OnCommand(const char *command);
-	virtual void PerformLayout();
-	virtual void OnThink();
-	virtual void OnClose();
-	virtual void OnKeyCodeTyped(vgui::KeyCode code);
-	virtual void OnKeyCodePressed(vgui::KeyCode code);
-	virtual void PaintBackground( void );
+	void OnCommand(const char *command) override;
+	void PerformLayout() override;
+	void OnThink() override;
+	void OnClose() override;
+	void OnKeyCodeTyped(vgui::KeyCode code) override;
+	void OnKeyCodePressed(vgui::KeyCode code) override;
+	void PaintBackground( void ) override;
 	
 private:
 	void SetupControlSettings( bool bForceShowProgressText );

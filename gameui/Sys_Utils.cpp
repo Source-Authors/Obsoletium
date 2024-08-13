@@ -89,32 +89,11 @@ void Sys_SetCursorPos(int x, int y)
 
 #ifndef _XBOX
 static ATOM staticWndclassAtom = 0;
-static WNDCLASS staticWndclass = { NULL };
+static WNDCLASS staticWndclass = {};
 #endif
-
-static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lparam)
-{
-	return DefWindowProc(hwnd,msg,wparam,lparam);
-}
 
 WHANDLE Sys_CreateWindowEx(const char *windowName)
 {
-	/*
-	if (!staticWndclassAtom)
-	{
-		memset( &staticWndclass,0,sizeof(staticWndclass) );
-		staticWndclass.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-		staticWndclass.lpfnWndProc = staticProc;
-		staticWndclass.hInstance = GetModuleHandle(NULL);
-		staticWndclass.hIcon = 0;
-		staticWndclass.lpszClassName = windowName;
-		staticWndclassAtom = ::RegisterClass( &staticWndclass );
-
-		DWORD error = ::GetLastError();
-	}
-
-	return (WHANDLE)::CreateWindow(windowName, windowName, 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), 0);
-	*/
 	return (WHANDLE)1;
 }
 
@@ -143,23 +122,23 @@ unsigned long Sys_GetLastError()
 
 WHANDLE Sys_CreateMutex(const char *mutexName)
 {
-	Assert( !"Implement me" );
+	AssertMsg( false, "Implement me" );
 	return 0;
 }
 
 void Sys_ReleaseMutex(WHANDLE mutexHandle)
 {
-	Assert( !"Implement me" );
+	AssertMsg( false, "Implement me" );
 }
 
 void Sys_PostMessage(WHANDLE wnd, unsigned int msg, unsigned int wParam, unsigned int lParam)
 {
-	Assert( !"Implement me" );
+	AssertMsg( false, "Implement me" );
 }
 
 unsigned int Sys_RegisterWindowMessage(const char *msgName)
 {
-	Assert( !"Implement me" );
+	AssertMsg( false, "Implement me" );
 	return 0;
 }
 
@@ -170,7 +149,7 @@ unsigned int Sys_WaitForSingleObject(WHANDLE mutexHandle, int milliseconds)
 
 void Sys_EnumWindows(void *callbackFunction, int lparam)
 {
-	Assert( !"Implement me" );
+	AssertMsg( false, "Implement me" );
 }
 
 

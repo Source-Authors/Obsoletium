@@ -12,10 +12,10 @@
 #include "vgui_controls/Label.h"
 #include "vgui_controls/ImagePanel.h"
 #include "vgui_controls/Button.h"
+#include "tier1/strtools.h"
 #include "tier1/utlbuffer.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include "filesystem.h"
+#include "qlimits.h"
 
 #include "MouseMessageForwardingPanel.h"
 #include "TGAImagePanel.h"
@@ -35,7 +35,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CSaveGamePanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CSaveGamePanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSaveGamePanel, vgui::EditablePanel );
 public:
 	CSaveGamePanel( PanelListPanel *parent, const char *name, int saveGameListItemID ) : BaseClass( parent, name )
 	{
@@ -115,12 +115,12 @@ public:
 		PostMessage( m_pParent->GetVParent(), new KeyValues("PanelSelected") );
 	}
 
-	virtual void OnMousePressed( vgui::MouseCode code )
+	void OnMousePressed( vgui::MouseCode code ) override
 	{
 		m_pParent->SetSelectedPanel( this );
 	}
 
-	virtual void ApplySchemeSettings( IScheme *pScheme )
+	void ApplySchemeSettings( IScheme *pScheme ) override
 	{
 		m_TextColor = pScheme->GetColor( "NewGame.TextColor", Color(255, 255, 255, 255) );
 		m_SelectedColor = pScheme->GetColor( "NewGame.SelectionColor", Color(255, 255, 255, 255) );
@@ -128,7 +128,7 @@ public:
 		BaseClass::ApplySchemeSettings( pScheme );
 	}
 
-	virtual void OnMouseDoublePressed( vgui::MouseCode code )
+	void OnMouseDoublePressed( vgui::MouseCode code ) override
 	{
 		// call the panel
 		OnMousePressed( code );
@@ -205,7 +205,7 @@ void CBaseSaveGameDialog::ScanSavedGames()
 {
 	// populate list box with all saved games on record:
 	char	szDirectory[_MAX_PATH];
-	Q_snprintf( szDirectory, sizeof( szDirectory ), "save/*.sav" );
+	Q_snprintf( szDirectory, sizeof( szDirectory ), "%s/*.sav", SAVE_DIR );
 
 	// clear the current list
 	m_pGameList->DeleteAllItems();
@@ -213,7 +213,7 @@ void CBaseSaveGameDialog::ScanSavedGames()
 	
 	// iterate the saved files
 	FileFindHandle_t handle;
-	const char *pFileName = g_pFullFileSystem->FindFirst( szDirectory, &handle );
+	const char *pFileName = g_pFullFileSystem->FindFirstEx( szDirectory, MOD_DIR, &handle );
 	while (pFileName)
 	{
 		if ( !Q_strnicmp(pFileName, "HLSave", std::size( "HLSave" ) - 1 ) )
@@ -223,10 +223,10 @@ void CBaseSaveGameDialog::ScanSavedGames()
 		}
 
 		char szFileName[_MAX_PATH];
-		Q_snprintf(szFileName, sizeof( szFileName ), "save/%s", pFileName);
+		Q_snprintf(szFileName, sizeof( szFileName ), "%s/%s", SAVE_DIR, pFileName);
 
 		// Only load save games from the current mod's save dir
-		if( !g_pFullFileSystem->FileExists( szFileName, "MOD" ) )
+		if( !g_pFullFileSystem->FileExists( szFileName, MOD_DIR ) )
 		{
 			pFileName = g_pFullFileSystem->FindNext( handle );
 			continue;
@@ -247,10 +247,10 @@ void CBaseSaveGameDialog::ScanSavedGames()
 	OnScanningSaveGames();
 
 	// sort the save list
-	qsort( m_SaveGames.Base(), m_SaveGames.Count(), sizeof(SaveGameDescription_t), &SaveGameSortFunc );
+	std::sort( m_SaveGames.begin(), m_SaveGames.end(), SaveGameSortFunc );
 
 	// add to the list
-	for ( int saveIndex = 0; saveIndex < m_SaveGames.Count() && saveIndex < MAX_LISTED_SAVE_GAMES; saveIndex++ )
+	for ( intp saveIndex = 0; saveIndex < m_SaveGames.Count() && saveIndex < MAX_LISTED_SAVE_GAMES; saveIndex++ )
 	{
 		// add the item to the panel
 		AddSaveGameItemToList( saveIndex );
@@ -271,7 +271,7 @@ void CBaseSaveGameDialog::ScanSavedGames()
 //-----------------------------------------------------------------------------
 // Purpose: Adds an item to the list
 //-----------------------------------------------------------------------------
-void CBaseSaveGameDialog::AddSaveGameItemToList( int saveIndex )
+void CBaseSaveGameDialog::AddSaveGameItemToList( intp saveIndex )
 {
 	// create the new panel and add to the list
 	CSaveGamePanel *saveGamePanel = new CSaveGamePanel( m_pGameList, "SaveGamePanel", saveIndex );
@@ -298,7 +298,7 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 	if (fh == FILESYSTEM_INVALID_HANDLE)
 		return false;
 
-	int readok = SaveReadNameAndComment( fh, szMapName, ARRAYSIZE(szMapName), szComment, ARRAYSIZE(szComment) );
+	int readok = SaveReadNameAndComment( fh, szMapName, ssize(szMapName), szComment, ssize(szComment) );
 	g_pFullFileSystem->Close(fh);
 
 	if ( !readok )
@@ -309,8 +309,7 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 	Q_strncpy( save.szMapName, szMapName, sizeof(save.szMapName) );
 
 	// Elapsed time is the last 6 characters in comment. (mmm:ss)
-	int i;
-	i = strlen( szComment );
+	intp i = strlen( szComment );
 	Q_strncpy( szElapsedTime, "??", sizeof( szElapsedTime ) );
 	if (i >= 6)
 	{
@@ -332,9 +331,7 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 		}
 
 		// Chop elapsed out of comment.
-		int n;
-
-		n = i - 6;
+		int n = i - 6;
 		szComment[n] = '\0';
 	
 		n--;
@@ -501,18 +498,16 @@ void CBaseSaveGameDialog::OnKeyCodePressed( vgui::KeyCode code )
 //-----------------------------------------------------------------------------
 // Purpose: timestamp sort function for savegames
 //-----------------------------------------------------------------------------
-int CBaseSaveGameDialog::SaveGameSortFunc( const void *lhs, const void *rhs )
+bool CBaseSaveGameDialog::SaveGameSortFunc( const SaveGameDescription_t &s1, const SaveGameDescription_t &s2 )
 {
-	const SaveGameDescription_t *s1 = (const SaveGameDescription_t *)lhs;
-	const SaveGameDescription_t *s2 = (const SaveGameDescription_t *)rhs;
+	if (s1.iTimestamp < s2.iTimestamp)
+		return false;
 
-	if (s1->iTimestamp < s2->iTimestamp)
-		return 1;
-	else if (s1->iTimestamp > s2->iTimestamp)
-		return -1;
+	if (s1.iTimestamp > s2.iTimestamp)
+		return true;
 
 	// timestamps are equal, so just sort by filename
-	return strcmp(s1->szFileName, s2->szFileName);
+	return strcmp(s1.szFileName, s2.szFileName) == -1;
 }
 
 int SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) char *name, int nameSize, OUT_Z_CAP(commentSize) char *comment, int commentSize )
@@ -659,5 +654,3 @@ void CBaseSaveGameDialog::OnPanelSelected()
 	SetControlEnabled( "loadsave", true );
 	SetControlEnabled( "delete", true );
 }
-
-

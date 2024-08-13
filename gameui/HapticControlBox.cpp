@@ -170,7 +170,7 @@ void ControlBoxVisual::DrawCube(float n, float r, float u, float f, float l, flo
 		break;
 	}
 
-	Vector pos = Vector(0,0.25 + sin(m_flTime),0.5);
+	Vector pos = Vector(0,0.25f + sin(m_flTime),0.5f);
 	VMatrix Project = SetupMatrixProjection(pos,VPlane(Vector(1,0,0),-3));
 	Vector vdrawsize = Vector(1,(float)GetWide()/10.0f,(float)GetTall()/10.0f);
 	for(int i=0;i!=4;i++)

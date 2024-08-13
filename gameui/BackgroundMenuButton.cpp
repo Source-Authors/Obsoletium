@@ -23,8 +23,9 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CBackgroundMenuButton::CBackgroundMenuButton(vgui::Panel *parent, const char *name) : BaseClass(parent, name, "")
 {
-	m_pImage = NULL;
-	m_pMouseOverImage = NULL;
+	m_pMenu = nullptr;
+	m_pImage = nullptr;
+	m_pMouseOverImage = nullptr;
 }
 
 //-----------------------------------------------------------------------------

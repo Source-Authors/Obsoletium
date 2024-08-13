@@ -296,7 +296,7 @@ void CSessionLobbyDialog::UpdatePlayerCountDisplay( int iTeam )
 	wchar_t wszString[32];
 	wchar_t *wzPlayersFmt = g_pVGuiLocalize->Find( ct != 1 ? "#TF_ScoreBoard_Players" : "#TF_ScoreBoard_Player" );
 	wchar_t wzPlayerCt[8];
-	V_snwprintf( wzPlayerCt, ARRAYSIZE( wzPlayerCt ), L"%d", ct );
+	V_snwprintf( wzPlayerCt, ssize( wzPlayerCt ), L"%d", ct );
 	g_pVGuiLocalize->ConstructString( wszString, sizeof( wszString ), wzPlayersFmt, 1, wzPlayerCt );
 
 	m_pTeamInfos[iTeam]->m_pSubtitle->SetText( wszString );
@@ -420,7 +420,7 @@ void CSessionLobbyDialog::UpdatePlayerInfo( uint64 nPlayerId, const char *pName,
 		wchar_t *wzHostFmt = g_pVGuiLocalize->Find( "#TF_Lobby_Host" );
 		g_pVGuiLocalize->ConvertANSIToUnicode( pName, wszHostname, sizeof( wszHostname ) );
 
-		V_snwprintf( wszString, ARRAYSIZE(wszString), L"%s\n%s", wzHostFmt, wszHostname );
+		V_snwprintf( wszString, ssize(wszString), L"%s\n%s", wzHostFmt, wszHostname );
 
 		m_pHostLabel->SetText( wszString );
 		m_nHostId = nPlayerId;
@@ -464,7 +464,7 @@ void CSessionLobbyDialog::SetLobbyReadyState( int nPlayersNeeded )
 			wzWaitingFmt = g_pVGuiLocalize->Find( "#TF_WaitingForPlayersFmt" );
 		}
 		wchar_t wzPlayers[8];
-		V_snwprintf( wzPlayers, ARRAYSIZE( wzPlayers ), L"%d", nPlayersNeeded );
+		V_snwprintf( wzPlayers, ssize( wzPlayers ), L"%d", nPlayersNeeded );
 		g_pVGuiLocalize->ConstructString( wszWaiting, sizeof( wszWaiting ), wzWaitingFmt, 1, wzPlayers );
 		m_pLobbyStateLabel->SetText( wszWaiting );
 		m_pLobbyStateIcon->SetText( "#TF_Icon_Alert" );
@@ -495,7 +495,7 @@ void CSessionLobbyDialog::UpdateCountdown( int seconds )
 	{
 		wzCountdownFmt = g_pVGuiLocalize->Find( "#TF_StartingInSec" );
 	}
-	V_snwprintf( wszSeconds, ARRAYSIZE( wszSeconds ), L"%d", seconds );
+	V_snwprintf( wszSeconds, ssize( wszSeconds ), L"%d", seconds );
 	g_pVGuiLocalize->ConstructString( wszCountdown, sizeof( wszCountdown ), wzCountdownFmt, 1, wszSeconds );
 
 	m_pLobbyStateLabel->SetText( wszCountdown );

@@ -491,8 +491,8 @@ void CLoadingDialog::PerformLayout()
 		else
 		{
 			// Move farther in so we're title safe
-			x = screenWide - wide - (screenWide * 0.05);
-			y = screenTall - tall - (screenTall * 0.05);
+			x = screenWide - wide - (screenWide * 5 / 100);
+			y = screenTall - tall - (screenTall * 5 / 100);
 		}
 
 		x -= m_iAdditionalIndentX;

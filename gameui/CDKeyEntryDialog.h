@@ -18,22 +18,22 @@
 //-----------------------------------------------------------------------------
 class CCDKeyEntryDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CCDKeyEntryDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCDKeyEntryDialog, vgui::Frame );
 
 public:
 	CCDKeyEntryDialog(vgui::Panel *parent, bool inConnect = false);
 	~CCDKeyEntryDialog();
 
-	virtual void Activate();
+	void Activate() override;
 
 	static bool IsValidWeakCDKeyInRegistry();
 
 private:
 	enum { MAX_CDKEY_ERRORS = 5 };
 
-	virtual void OnCommand(const char *command);
-	virtual void OnClose();
-	virtual void OnThink();
+	void OnCommand(const char *command) override;
+	void OnClose() override;
+	void OnThink() override;
 
 	MESSAGE_FUNC_PTR( OnTextChanged, "TextChanged", panel );
 	bool IsEnteredKeyValid();

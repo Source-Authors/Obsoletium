@@ -22,13 +22,13 @@ class CPanelListPanel;
 //-----------------------------------------------------------------------------
 class CMultiplayerAdvancedDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CMultiplayerAdvancedDialog, vgui::Frame ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMultiplayerAdvancedDialog, vgui::Frame ); 
 
 public:
 	CMultiplayerAdvancedDialog(vgui::Panel *parent);
 	~CMultiplayerAdvancedDialog();
 
-	virtual void Activate();
+	void Activate() override;
 
 private:
 
@@ -43,9 +43,9 @@ private:
 
 	CPanelListPanel *m_pListPanel;
 
-	virtual void OnCommand( const char *command );
-	virtual void OnClose();
-	virtual void OnKeyCodeTyped(vgui::KeyCode code);
+	void OnCommand( const char *command ) override;
+	void OnClose() override;
+	void OnKeyCodeTyped(vgui::KeyCode code) override;
 };
 
 

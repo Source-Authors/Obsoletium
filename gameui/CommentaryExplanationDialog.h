@@ -19,16 +19,16 @@
 //-----------------------------------------------------------------------------
 class CCommentaryExplanationDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CCommentaryExplanationDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCommentaryExplanationDialog, vgui::Frame );
 
 public:
 	CCommentaryExplanationDialog(vgui::Panel *parent, char *pszFinishCommand);
 	~CCommentaryExplanationDialog();
 
-	virtual void OnKeyCodeTyped(vgui::KeyCode code);
-	virtual void OnKeyCodePressed(vgui::KeyCode code);
-	virtual void OnCommand( const char *command );
-	virtual void OnClose( void );
+	void OnKeyCodeTyped(vgui::KeyCode code) override;
+	void OnKeyCodePressed(vgui::KeyCode code) override;
+	void OnCommand( const char *command ) override;
+	void OnClose( void ) override;
 
 private:
 	char m_pszFinishCommand[ 512 ];

@@ -129,7 +129,7 @@ void CSaveGameDialog::Activate()
 void CSaveGameDialog::OnScanningSaveGames()
 {
 	// create dummy item for current saved game
-	SaveGameDescription_t save = { "NewSavedGame", "", "", "#GameUI_NewSaveGame", "", "", "Current", NEW_SAVE_GAME_TIMESTAMP };
+	SaveGameDescription_t save = { "NewSavedGame", "", "", "#GameUI_NewSaveGame", "", "", "Current", NEW_SAVE_GAME_TIMESTAMP, 0 };
 	m_SaveGames.AddToTail(save);
 }
 
@@ -139,16 +139,16 @@ void CSaveGameDialog::OnScanningSaveGames()
 void CSaveGameDialog::FindSaveSlot( char *buffer, int bufsize )
 {
 	buffer[0] = 0;
-	char szFileName[512];
+	char szFileName[MAX_PATH];
 	for (int i = 0; i < 1000; i++)
 	{
-		Q_snprintf(szFileName, sizeof( szFileName ), "save/half-life-%03i.sav", i );
+		Q_snprintf(szFileName, sizeof( szFileName ), "%s/half-life-%03i.sav", SAVE_DIR, i );
 
-		FileHandle_t fp = g_pFullFileSystem->Open( szFileName, "rb" );
+		FileHandle_t fp = g_pFullFileSystem->Open( szFileName, "rb", MOD_DIR );
 		if (!fp)
 		{
 			// clean up name
-			Q_strncpy( buffer, szFileName + 5, bufsize );
+			Q_strncpy( buffer, szFileName + std::size(SAVE_DIR), bufsize );
 			char *ext = strstr( buffer, ".sav" );
 			if ( ext )
 			{

@@ -131,7 +131,7 @@ static void GetResolutionName( vmode_t *mode, char *sz, int sizeofsz, int deskto
 //-----------------------------------------------------------------------------
 class CGammaDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CGammaDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CGammaDialog, vgui::Frame );
 public:
 	CGammaDialog( vgui::VPANEL hParent ) : BaseClass( NULL, "OptionsSubVideoGammaDlg" )
 	{
@@ -162,7 +162,7 @@ public:
 		}
 	}
 
-	virtual void Activate()
+	void Activate() override
 	{
 		BaseClass::Activate();
 		m_flOriginalGamma = m_pGammaSlider->GetValue();
@@ -176,7 +176,7 @@ public:
 		Close();
 	}
 
-	virtual void OnClose()
+	void OnClose() override
 	{
 		// reset to the original gamma
 		m_pGammaSlider->SetValue( m_flOriginalGamma );
@@ -184,7 +184,7 @@ public:
 		BaseClass::OnClose();
 	}
 
-	void OnKeyCodeTyped(KeyCode code)
+	void OnKeyCodeTyped(KeyCode code) override
 	{
 		// force ourselves to be closed if the escape key it pressed
 		if (code == KEY_ESCAPE)
@@ -215,7 +215,8 @@ public:
 			char buf[64];
 			m_pGammaEntry->GetText(buf, 64);
 
-			float fValue = (float) atof(buf);
+			// dimhotepus: atof -> strtof
+			float fValue = strtof(buf, nullptr);
 			if (fValue >= 1.0)
 			{
 				m_pGammaSlider->SetSliderValue(fValue);
@@ -245,7 +246,7 @@ private:
 //-----------------------------------------------------------------------------
 class COptionsSubVideoAdvancedDlg : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubVideoAdvancedDlg, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubVideoAdvancedDlg, vgui::Frame );
 public:
 	COptionsSubVideoAdvancedDlg( vgui::Panel *parent ) : BaseClass( parent , "OptionsSubVideoAdvancedDlg" )
 	{
@@ -455,7 +456,7 @@ public:
 		m_bUseChanges = false;
 	}
 
-	virtual void Activate()
+	void Activate() override
 	{
 		BaseClass::Activate();
 
@@ -907,7 +908,7 @@ public:
 		SetControlString("dxinstalledlabel", dxVer);
 	}
 
-	virtual void OnCommand( const char *command )
+	void OnCommand( const char *command ) override
 	{
 		if ( !stricmp(command, "OK") )
 		{
@@ -932,7 +933,7 @@ public:
 		}
 	}
 
-	void OnKeyCodeTyped(KeyCode code)
+	void OnKeyCodeTyped(KeyCode code) override
 	{
 		// force ourselves to be closed if the escape key it pressed
 		if (code == KEY_ESCAPE)
@@ -1274,7 +1275,7 @@ void COptionsSubVideo::PrepareResolutionList()
 		}
 #endif
 
-		Q_snprintf( sz, ARRAYSIZE( sz ), "%d x %d", Width, Height );
+		Q_snprintf( sz, ssize( sz ), "%d x %d", Width, Height );
 		m_pMode->SetText( sz );
 	}
 }
@@ -1715,7 +1716,7 @@ void COptionsSubVideo::LaunchBenchmark()
 //-----------------------------------------------------------------------------
 class COptionsSubVideoThirdPartyCreditsDlg : public vgui::Frame
 {
-   DECLARE_CLASS_SIMPLE( COptionsSubVideoThirdPartyCreditsDlg, vgui::Frame );
+   DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubVideoThirdPartyCreditsDlg, vgui::Frame );
 public:
    COptionsSubVideoThirdPartyCreditsDlg( vgui::VPANEL hParent ) : BaseClass( NULL, NULL )
    {
@@ -1729,14 +1730,14 @@ public:
       SetDeleteSelfOnClose( true );
    }
 
-   virtual void Activate()
+   void Activate() override
    {
       BaseClass::Activate();
 
       input()->SetAppModalSurface(GetVPanel());
    }
 
-   void OnKeyCodeTyped(KeyCode code)
+   void OnKeyCodeTyped(KeyCode code) override
    {
       // force ourselves to be closed if the escape key it pressed
       if (code == KEY_ESCAPE)

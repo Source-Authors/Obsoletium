@@ -17,18 +17,18 @@
 //-----------------------------------------------------------------------------
 class CLeaderboardDialog : public CBaseDialog
 {
-	DECLARE_CLASS_SIMPLE( CLeaderboardDialog, CBaseDialog ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CLeaderboardDialog, CBaseDialog ); 
 
 public:
 	CLeaderboardDialog(vgui::Panel *parent);
 	~CLeaderboardDialog();
 
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void	ApplySettings( KeyValues *pResourceData );
-	virtual void	PerformLayout( void );
-	virtual void	OnCommand( const char *pCommand );
-	virtual void	OnKeyCodePressed( vgui::KeyCode code );
-	virtual void	HandleKeyRepeated( vgui::KeyCode code );
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void	ApplySettings( KeyValues *pResourceData ) override;
+	void	PerformLayout( void ) override;
+	void	OnCommand( const char *pCommand ) override;
+	void	OnKeyCodePressed( vgui::KeyCode code ) override;
+	void	HandleKeyRepeated( vgui::KeyCode code ) override;
 
 	bool			GetPlayerStats( int rank, bool bFriends = false );
 	void			UpdateLeaderboard( int iNewRank );

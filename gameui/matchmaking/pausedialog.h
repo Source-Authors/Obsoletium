@@ -17,13 +17,13 @@
 //-----------------------------------------------------------------------------
 class CPauseDialog : public CBaseDialog
 {
-	DECLARE_CLASS_SIMPLE( CPauseDialog, CBaseDialog ); 
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPauseDialog, CBaseDialog ); 
 
 public:
 	CPauseDialog( vgui::Panel *parent );
 
-	virtual void Activate( void );
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void Activate( void ) override;
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 };
 
 

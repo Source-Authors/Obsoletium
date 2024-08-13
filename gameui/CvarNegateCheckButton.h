@@ -15,15 +15,15 @@
 
 class CCvarNegateCheckButton : public vgui::CheckButton
 {
-	DECLARE_CLASS_SIMPLE( CCvarNegateCheckButton, vgui::CheckButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCvarNegateCheckButton, vgui::CheckButton );
 
 public:
 	CCvarNegateCheckButton( vgui::Panel *parent, const char *panelName, const char *text, 
 		char const *cvarname );
 	~CCvarNegateCheckButton();
 
-	virtual void	SetSelected( bool state );
-	virtual void	Paint();
+	void			SetSelected( bool state ) override;
+	void			Paint() override;
 
 	void			Reset();
 	void			ApplyChanges();

@@ -133,7 +133,7 @@ void CLoadGameDialogXbox::OnCommand( const char *command )
 
 		// Load the saved game
 		char szCmd[ 256 ];
-		Q_snprintf( szCmd, sizeof( szCmd ), "xload %s", pSave->szShortName );
+		Q_snprintf( szCmd, sizeof( szCmd ), "load %s", pSave->szShortName );
 		engine->ClientCmd_Unrestricted( szCmd );
 
 		// Ignore all other input while we're open

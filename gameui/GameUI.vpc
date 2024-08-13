@@ -55,7 +55,7 @@ $Configuration
 	}
 }
 
-$Project "GameUI"
+$Project "gameui"
 {
 	$Folder	"Source Files"
 	{

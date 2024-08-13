@@ -428,7 +428,7 @@ void COptionsItem::AddOption( const char *pLabelText, const sessionProperty_t& o
 	// Add a new option to this item's list of options
 	m_Options.AddToTail( option );
 
-	int idx = m_OptionLabels.AddToTail( new vgui::Label( this, "Option Value", pLabelText ) );
+	intp idx = m_OptionLabels.AddToTail( new vgui::Label( this, "Option Value", pLabelText ) );
 	vgui::Label *pOption = m_OptionLabels[idx];
 
 	// Check for a format string
@@ -595,17 +595,6 @@ CAchievementItem::CAchievementItem( CDialogMenu *pParent, const wchar_t *pName, 
 	// Set the status icons
 	m_pLockedIcon = SETUP_PANEL( new vgui::ImagePanel( this, "lockedicon" ) );
 	m_pUnlockedIcon = SETUP_PANEL( new vgui::ImagePanel( this, "unlockedicon" ) );
-
-	// Gamerscore number
-	if ( IsX360() )
-	{
-		wchar_t *wzFormat = g_pVGuiLocalize->Find( "#GameUI_Achievement_Points" );	// "%s1G"
-		wchar_t wzPoints[10];
-		V_snwprintf( wzPoints, ARRAYSIZE( wzPoints ), L"%d", points );
-		wchar_t wzPointsLayout[10];
-		g_pVGuiLocalize->ConstructString( wzPointsLayout, sizeof( wzPointsLayout ), wzFormat, 1, wzPoints );
-		m_pPoints = new vgui::Label( this, "Points", wzPointsLayout );
-	}
 
 	// Achievement image
 	m_pImage = new vgui::ImagePanel( this, "icon" );
@@ -810,7 +799,7 @@ void CDialogMenu::SetFilter( const char *pFilter )
 //--------------------------------------------------------------------------------------
 CMenuItem *CDialogMenu::AddItemInternal( CMenuItem *pItem )
 {
-	int idx = m_MenuItems.AddToTail( pItem );
+	intp idx = m_MenuItems.AddToTail( pItem );
 
  	SETUP_PANEL( pItem );
 
