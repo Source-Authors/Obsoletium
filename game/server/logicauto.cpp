@@ -16,8 +16,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-const int SF_AUTO_FIREONCE		= 0x01;
-const int SF_AUTO_FIREONRELOAD	= 0x02;
+constexpr int SF_AUTO_FIREONCE		= 0x01;
+// constexpr int SF_AUTO_FIREONRELOAD	= 0x02;
 
 
 class CLogicAuto : public CBaseEntity
@@ -73,7 +73,7 @@ END_DATADESC()
 void CLogicAuto::Activate(void)
 {
 	BaseClass::Activate();
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	SetNextThink( gpGlobals->curtime + 0.2f );
 }
 
 

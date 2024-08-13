@@ -602,9 +602,9 @@ void CNPC_CraneDriver::DriveVehicle( void )
 
 	// Start slowing if we're going to hit the point soon
 	float flTurnInDeg = RAD2DEG( acosf(flDotForward) );
-	float flSpeed = m_hCrane->GetMaxTurnRate() * (flTurnInDeg / 15.0);
+	float flSpeed = m_hCrane->GetMaxTurnRate() * (flTurnInDeg / 15.0f);
 	flSpeed = MIN( m_hCrane->GetMaxTurnRate(), flSpeed );
-	if ( fabs(flSpeed) < 0.05 )
+	if ( fabs(flSpeed) < 0.05f )
 	{
 		// We're approaching the target, so stop turning
 		m_pVehicleInterface->NPC_TurnCenter();

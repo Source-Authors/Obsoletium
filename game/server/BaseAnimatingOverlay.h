@@ -182,7 +182,7 @@ public:
 
 	int		FindGestureLayer( Activity activity );
 
-	void	RemoveLayer( int iLayer, float flKillRate = 0.2, float flKillDelay = 0.0 );
+	void	RemoveLayer( int iLayer, float flKillRate = 0.2f, float flKillDelay = 0.0f );
 	void	FastRemoveLayer( int iLayer );
 
 	CAnimationLayer *GetAnimOverlay( int iIndex );
@@ -223,7 +223,7 @@ inline void CAnimationLayer::NetworkStateChanged()
 		m_pOwnerEntity->NetworkStateChanged();
 }
 
-inline void CAnimationLayer::NetworkStateChanged( void *pVar )
+inline void CAnimationLayer::NetworkStateChanged( void * )
 {
 	if ( m_pOwnerEntity )
 		m_pOwnerEntity->NetworkStateChanged();

@@ -371,7 +371,8 @@ void CScriptIntro::InputSetFadeColor( inputdata_t &inputdata )
 		Warning("%s (%s) received SetFadeColor input without correct parameters. Syntax: <Red> <Green> <Blue>>\n", GetClassname(), GetDebugName() );
 		return;
 	}
-	float flR = atof( pszParam );
+	// dimhotepus: atof -> strtof
+	float flR = strtof( pszParam, nullptr );
 
 	pszParam = strtok(NULL," ");
 	if ( !pszParam || !pszParam[0] )
@@ -379,7 +380,8 @@ void CScriptIntro::InputSetFadeColor( inputdata_t &inputdata )
 		Warning("%s (%s) received SetFadeColor input without correct parameters. Syntax: <Red> <Green> <Blue>>\n", GetClassname(), GetDebugName() );
 		return;
 	}
-	float flG = atof( pszParam );
+	// dimhotepus: atof -> strtof
+	float flG = strtof( pszParam, nullptr );
 
 	pszParam = strtok(NULL," ");
 	if ( !pszParam || !pszParam[0] )
@@ -387,7 +389,8 @@ void CScriptIntro::InputSetFadeColor( inputdata_t &inputdata )
 		Warning("%s (%s) received SetFadeColor input without correct parameters. Syntax: <Red> <Green> <Blue>>\n", GetClassname(), GetDebugName() );
 		return;
 	}
-	float flB = atof( pszParam );
+	// dimhotepus: atof -> strtof
+	float flB = strtof( pszParam, nullptr );
 
 	// Use the colors
 	m_flFadeColor.Set( 0, flR );

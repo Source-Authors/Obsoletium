@@ -88,7 +88,7 @@ class CAI_Network : public IPartitionEnumerator
 {
 public:
 	CAI_Network();
-	~CAI_Network();
+	virtual ~CAI_Network();
 
 	CAI_Node *		AddNode( const Vector &origin, float yaw );						// Returns a new node in the network
 	CAI_Link *		CreateLink( int srcID, int destID, CAI_DynamicLink *pDynamicLink = NULL );

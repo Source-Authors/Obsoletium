@@ -50,21 +50,21 @@ class CBaseDoor : public CBaseToggle
 public:
 	DECLARE_CLASS( CBaseDoor, CBaseToggle );
 
-	DECLARE_SERVERCLASS();
+	DECLARE_SERVERCLASS_OVERRIDE();
 
-	void Spawn( void );
-	void Precache( void );
-	bool CreateVPhysics();
-	bool KeyValue( const char *szKeyName, const char *szValue );
-	virtual void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void Spawn( void ) override;
+	void Precache( void ) override;
+	bool CreateVPhysics() override;
+	bool KeyValue( const char *szKeyName, const char *szValue ) override;
+	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value ) override;
 
-	virtual void StartBlocked( CBaseEntity *pOther );
-	virtual void Blocked( CBaseEntity *pOther );
-	virtual void EndBlocked( void );
+	void StartBlocked( CBaseEntity *pOther ) override;
+	void Blocked( CBaseEntity *pOther ) override;
+	void EndBlocked( void ) override;
 
-	void Activate( void );
+	void Activate( void ) override;
 
-	virtual int	ObjectCaps( void ) 
+	int	ObjectCaps( void ) override
 	{
 		int flags = BaseClass::ObjectCaps();
 		if ( HasSpawnFlags( SF_DOOR_PUSE ) )
@@ -73,14 +73,14 @@ public:
 		return flags;
 	};
 
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 
 	// This is ONLY used by the node graph to test movement through a door
 	void InputSetToggleState( inputdata_t &inputdata );
 	virtual void SetToggleState( int state );
 
 	virtual bool IsRotatingDoor() { return false; }
-	virtual bool ShouldSavePhysics();
+	bool ShouldSavePhysics() override;
 	// used to selectivly override defaults
 	void DoorTouch( CBaseEntity *pOther );
 
@@ -150,7 +150,7 @@ public:
 	bool		ShouldLoopMoveSound( void ) { return m_bLoopMoveSound; }
 	bool		m_bLoopMoveSound;			// Move sound loops until stopped
 
-	virtual bool ShouldBlockNav() const OVERRIDE { return false; }
+	virtual bool ShouldBlockNav() const override { return false; }
 
 private:
 	void ChainUse( void );	///< Chains +use on through to m_ChainTarget

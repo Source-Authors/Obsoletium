@@ -219,11 +219,11 @@ static bool IsRoller( CBaseEntity *pRoller )
 // Purpose: 
 //-----------------------------------------------------------------------------
 CNPC_Vortigaunt::CNPC_Vortigaunt( void ) : 
-m_bPlayerRequestedHeal( false ),
 m_flNextHealTime( 3.0f ), // Let the player settle before we decide to do this
+m_bPlayerRequestedHeal( false ),
+m_eHealState( HEAL_STATE_NONE ),
 m_nNumTokensToSpawn( 0 ),
-m_flAimDelay( 0.0f ),
-m_eHealState( HEAL_STATE_NONE )
+m_flAimDelay( 0.0f )
 {
 }
 
@@ -241,11 +241,11 @@ bool CNPC_Vortigaunt::PlayerBelowHealthPercentage( CBasePlayer *pPlayer, float f
 	if ( pPlayer->ArmorValue() )
 		return false;
 
-	float flMaxHealth = pPlayer->GetMaxHealth();
-	if ( flMaxHealth == 0.0f )
+	int maxHealth = pPlayer->GetMaxHealth();
+	if ( maxHealth == 0 )
 		return false;
 
-	float flHealthPerc = (flMaxHealth != 0 ) ? (float) pPlayer->GetHealth() / flMaxHealth : 0.0f;
+	float flHealthPerc = (maxHealth != 0 ) ? (float) pPlayer->GetHealth() / maxHealth : 0.0f;
 	return ( flHealthPerc <= flPerc );
 }
 
@@ -336,7 +336,7 @@ void CNPC_Vortigaunt::StartTask( const Task_t *pTask )
 	{
 		// Start the layer up and give it a higher priority than normal
 		int nLayer = AddGesture( (Activity) ACT_VORTIGAUNT_HEAL );
-		SetLayerPriority( nLayer, 1.0f );
+		SetLayerPriority( nLayer, 1 );
 
 		m_eHealState = HEAL_STATE_WARMUP;
 		
@@ -1086,7 +1086,7 @@ void CNPC_Vortigaunt::Spawn( void )
 #endif // HL2_EPISODIC
 
 	// Allow multiple models (for slaves), but default to vortigaunt.mdl
-	char *szModel = (char *)STRING( GetModelName() );
+	const char *szModel = (const char *)STRING( GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = "models/vortigaunt.mdl";
@@ -1949,7 +1949,7 @@ void CNPC_Vortigaunt::StartHandGlow( int beamType, int nHand )
 	case VORTIGAUNT_BEAM_ZAP:
 		{
 			// Validate the hand's range
-			if ( nHand >= ARRAYSIZE( m_hHandEffect ) )
+			if ( nHand >= static_cast<int>(ARRAYSIZE( m_hHandEffect )) )
 				return;
 
 			// Start up

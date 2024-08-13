@@ -305,8 +305,8 @@ void CPhysicsHook::LevelShutdownPostEntity()
 bool CPhysicsHook::FindOrAddVehicleScript( const char *pScriptName, vehicleparams_t *pVehicle, vehiclesounds_t *pSounds )
 {
 	bool bLoadedSounds = false;
-	int index = -1;
-	for ( int i = 0; i < m_vehicleScripts.Count(); i++ )
+	intp index = -1;
+	for ( intp i = 0; i < m_vehicleScripts.Count(); i++ )
 	{
 		if ( !Q_stricmp(m_vehicleScripts[i].scriptName.ToCStr(), pScriptName) )
 		{
@@ -672,46 +672,47 @@ bool CCollisionEvent::ShouldFreezeObject( IPhysicsObject *pObject )
 		// props very hitchy
 		if (pEntity->GetServerVehicle() && !(pObject->GetCallbackFlags() & CALLBACK_IS_VEHICLE_WHEEL))
 			return false;
-	}
 
-	// if we're freezing a debris object, then it's probably due to some kind of solver issue
-	// usually this is a large object resting on the debris object in question which is not
-	// very stable.
-	// After doing the experiment of constraining the dynamic range of mass while solving friction
-	// contacts, I like the results of this tradeoff better.  So damage or remove the debris object
-	// wherever possible once we hit this case:
-	if ( IsDebris( pEntity->GetCollisionGroup()) && !pEntity->IsNPC() )
-	{
-		IPhysicsObject *pOtherObject = NULL;
-		Vector contactPos;
-		Vector force;
-		// find the contact with the moveable object applying the most contact force
-		if ( FindMaxContact( pObject, pObject->GetMass() * 10, &pOtherObject, &contactPos, &force ) )
+		// if we're freezing a debris object, then it's probably due to some kind of solver issue
+		// usually this is a large object resting on the debris object in question which is not
+		// very stable.
+		// After doing the experiment of constraining the dynamic range of mass while solving friction
+		// contacts, I like the results of this tradeoff better.  So damage or remove the debris object
+		// wherever possible once we hit this case:
+		if ( IsDebris( pEntity->GetCollisionGroup()) && !pEntity->IsNPC() )
 		{
-			CBaseEntity *pOther = static_cast<CBaseEntity *>(pOtherObject->GetGameData());
-			// this object can take damage, crush it
-			if ( pEntity->m_takedamage > DAMAGE_EVENTS_ONLY )
+			IPhysicsObject *pOtherObject = NULL;
+			Vector contactPos;
+			Vector force;
+			// find the contact with the moveable object applying the most contact force
+			if ( FindMaxContact( pObject, pObject->GetMass() * 10, &pOtherObject, &contactPos, &force ) )
 			{
-				CTakeDamageInfo dmgInfo( pOther, pOther, force, contactPos, force.Length() * 0.1f, DMG_CRUSH );
-				PhysCallbackDamage( pEntity, dmgInfo );
-			}
-			else
-			{
-				// can't be damaged, so do something else:
-				if ( PropIsGib(pEntity) )
+				CBaseEntity *pOther = static_cast<CBaseEntity *>(pOtherObject->GetGameData());
+				// this object can take damage, crush it
+				if ( pEntity->m_takedamage > DAMAGE_EVENTS_ONLY )
 				{
-					// it's always safe to delete gibs, so kill this one to avoid simulation problems
-					PhysCallbackRemove( pEntity->NetworkProp() );
+					CTakeDamageInfo dmgInfo( pOther, pOther, force, contactPos, force.Length() * 0.1f, DMG_CRUSH );
+					PhysCallbackDamage( pEntity, dmgInfo );
 				}
 				else
 				{
-					// not a gib, create a solver:
-					// UNDONE: Add a property to override this in gameplay critical scenarios?
-					g_PostSimulationQueue.QueueCall( EntityPhysics_CreateSolver, pOther, pEntity, true, 1.0f );
+					// can't be damaged, so do something else:
+					if ( PropIsGib(pEntity) )
+					{
+						// it's always safe to delete gibs, so kill this one to avoid simulation problems
+						PhysCallbackRemove( pEntity->NetworkProp() );
+					}
+					else
+					{
+						// not a gib, create a solver:
+						// UNDONE: Add a property to override this in gameplay critical scenarios?
+						g_PostSimulationQueue.QueueCall( EntityPhysics_CreateSolver, pOther, pEntity, true, 1.0f );
+					}
 				}
 			}
 		}
 	}
+
 	return true;
 }
 
@@ -821,7 +822,7 @@ static void UpdateEntityPenetrationFlag( CBaseEntity *pEntity, bool isPenetratin
 
 void CCollisionEvent::GetListOfPenetratingEntities( CBaseEntity *pSearch, CUtlVector<CBaseEntity *> &list )
 {
-	for ( int i = m_penetrateEvents.Count()-1; i >= 0; --i )
+	for ( intp i = m_penetrateEvents.Count()-1; i >= 0; --i )
 	{
 		if ( m_penetrateEvents[i].hEntity0 == pSearch && m_penetrateEvents[i].hEntity1.Get() != NULL )
 		{
@@ -836,7 +837,7 @@ void CCollisionEvent::GetListOfPenetratingEntities( CBaseEntity *pSearch, CUtlVe
 
 void CCollisionEvent::UpdatePenetrateEvents( void )
 {
-	for ( int i = m_penetrateEvents.Count()-1; i >= 0; --i )
+	for ( intp i = m_penetrateEvents.Count()-1; i >= 0; --i )
 	{
 		CBaseEntity *pEntity0 = m_penetrateEvents[i].hEntity0;
 		CBaseEntity *pEntity1 = m_penetrateEvents[i].hEntity1;
@@ -921,8 +922,8 @@ void CCollisionEvent::UpdatePenetrateEvents( void )
 
 penetrateevent_t &CCollisionEvent::FindOrAddPenetrateEvent( CBaseEntity *pEntity0, CBaseEntity *pEntity1 )
 {
-	int index = -1;
-	for ( int i = m_penetrateEvents.Count()-1; i >= 0; --i )
+	intp index = -1;
+	for ( intp i = m_penetrateEvents.Count()-1; i >= 0; --i )
 	{
 		if ( m_penetrateEvents[i].hEntity0.Get() == pEntity0 && m_penetrateEvents[i].hEntity1.Get() == pEntity1 )
 		{
@@ -1068,7 +1069,7 @@ void CCollisionEvent::FluidStartTouch( IPhysicsObject *pObject, IPhysicsFluidCon
 		return;
 
 	pEntity->AddEFlags( EFL_TOUCHING_FLUID );
-	pEntity->OnEntityEvent( ENTITY_EVENT_WATER_TOUCH, (void*)pFluid->GetContents() );
+	pEntity->OnEntityEvent( ENTITY_EVENT_WATER_TOUCH, (void*)static_cast<intp>(pFluid->GetContents()) );
 
 	float timeSinceLastCollision = DeltaTimeSinceLastFluid( pEntity );
 	if ( timeSinceLastCollision < 0.5f )
@@ -1124,7 +1125,7 @@ void CCollisionEvent::FluidEndTouch( IPhysicsObject *pObject, IPhysicsFluidContr
 	}
 
 	pEntity->RemoveEFlags( EFL_TOUCHING_FLUID );
-	pEntity->OnEntityEvent( ENTITY_EVENT_WATER_UNTOUCH, (void*)pFluid->GetContents() );
+	pEntity->OnEntityEvent( ENTITY_EVENT_WATER_UNTOUCH, (void*)static_cast<intp>(pFluid->GetContents()) );
 }
 
 class CSkipKeys : public IVPhysicsKeyHandler
@@ -1326,10 +1327,10 @@ CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR
 		
 		// Calculate distance to surface that was hit
 		Vector vecVelocity = tr.startpos - tr.endpos;
-		int length = vecVelocity.Length();
+		float length = vecVelocity.Length();
 
 		Msg("Hit surface \"%s\" (entity %s, model \"%s\" %s), texture \"%s\"\n", physprops->GetPropName( tr.surface.surfaceProps ), tr.m_pEnt->GetClassname(), pModelName, modelStuff.Access(), tr.surface.name);
-		Msg("Distance to surface: %d\n", length );
+		Msg("Distance to surface: %2.f\n", length );
 	}
 }
 
@@ -1399,7 +1400,7 @@ public:
 		int listIndex = m_list.Find(pEntity);
 		if ( listIndex == m_list.InvalidIndex() )
 		{
-			int entryIndex = m_entryList.AddToTail();
+			intp entryIndex = m_entryList.AddToTail();
 			m_entryList[entryIndex].isConstraint = bIsConstraint;
 			listIndex = m_list.Insert( pEntity, entryIndex );
 		}
@@ -1427,7 +1428,7 @@ public:
 					constraintList.AddToTail( pEntity );
 				}
 				entry.isMarked = true;
-				for ( int i = 0; i < entry.linkList.Count(); i++ )
+				for ( intp i = 0; i < entry.linkList.Count(); i++ )
 				{
 					// now recursively traverse the graph from here
 					BuildGraphFromEntity( entry.linkList[i], constraintList );
@@ -2074,7 +2075,7 @@ float CCollisionEvent::DeltaTimeSinceLastFluid( CBaseEntity *pEntity )
 		}
 	}
 
-	int index = m_fluidEvents.AddToTail();
+	intp index = m_fluidEvents.AddToTail();
 	m_fluidEvents[index].hEntity = pEntity;
 	m_fluidEvents[index].impactTime = gpGlobals->curtime;
 	return FLUID_TIME_MAX;
@@ -2277,7 +2278,7 @@ void CCollisionEvent::AddTouchEvent( CBaseEntity *pEntity0, CBaseEntity *pEntity
 	if ( !pEntity0 || !pEntity1 )
 		return;
 
-	int index = m_touchEvents.AddToTail();
+	intp index = m_touchEvents.AddToTail();
 	touchevent_t &event = m_touchEvents[index];
 	event.pEntity0 = pEntity0;
 	event.pEntity1 = pEntity1;
@@ -2297,7 +2298,7 @@ void CCollisionEvent::AddDamageEvent( CBaseEntity *pEntity, const CTakeDamageInf
 		Assert( info.GetDamageForce() != vec3_origin && info.GetDamagePosition() != vec3_origin );
 	}
 
-	int index = m_damageEvents.AddToTail();
+	intp index = m_damageEvents.AddToTail();
 	damageevent_t &event = m_damageEvents[index];
 	event.pEntity = pEntity;
 	event.info = info;
@@ -2372,7 +2373,7 @@ int CCollisionEvent::AddDamageInflictor( IPhysicsObject *pInflictorPhysics, floa
 	// UNDONE: Should we absorb some energy here?
 	// NOTE: we can't save a delta because there could be subsequent post-fatal collisions
 
-	int addIndex = m_damageInflictors.AddToTail();
+	intp addIndex = m_damageInflictors.AddToTail();
 	{
 		inflictorstate_t &state = m_damageInflictors[addIndex];
 		state.pInflictorPhysics = pInflictorPhysics;
@@ -2512,7 +2513,7 @@ void CCollisionEvent::ObjectEnterTrigger( IPhysicsObject *pTrigger, IPhysicsObje
 		// UNDONE: Don't buffer these until we can solve generating touches at object creation time
 		if ( 0 && m_bBufferTouchEvents )
 		{
-			int index = m_triggerEvents.AddToTail();
+			intp index = m_triggerEvents.AddToTail();
 			m_triggerEvents[index].Init( pTriggerEntity, pTrigger, pEntity, pObject, true );
 		}
 		else
@@ -2534,7 +2535,7 @@ void CCollisionEvent::ObjectLeaveTrigger( IPhysicsObject *pTrigger, IPhysicsObje
 		// UNDONE: Don't buffer these until we can solve generating touches at object creation time
 		if ( 0 && m_bBufferTouchEvents )
 		{
-			int index = m_triggerEvents.AddToTail();
+			intp index = m_triggerEvents.AddToTail();
 			m_triggerEvents[index].Init( pTriggerEntity, pTrigger, pEntity, pObject, false );
 		}
 		else

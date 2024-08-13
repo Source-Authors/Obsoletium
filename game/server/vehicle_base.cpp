@@ -473,9 +473,7 @@ int CPropVehicleDriveable::Restore( IRestore &restore )
 	DestroyServerVehicle();
 	CreateServerVehicle();
 
-	int nRetVal = BaseClass::Restore( restore );
-	 
-	return nRetVal;
+	return BaseClass::Restore( restore );
 }
 
 //-----------------------------------------------------------------------------

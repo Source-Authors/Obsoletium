@@ -60,7 +60,7 @@ public:
 
 	void AddToList( CBaseEntity *pEntity, float massScale )
 	{
-		int index = m_list.AddToTail();
+		intp index = m_list.AddToTail();
 		constraint_anchor_t *pAnchor = &m_list[index];
 
 		pAnchor->hEntity = pEntity->GetParent();
@@ -768,7 +768,7 @@ public:
 		}
 		
 		float loadscale = m_systemLoadScale != 0 ? m_systemLoadScale : 1;
-		m_pConstraint->SetAngularMotor( speed, speed * loadscale * massLoad * loadscale * (1.0/TICK_INTERVAL) );
+		m_pConstraint->SetAngularMotor( speed, speed * loadscale * massLoad * loadscale * (1.0f/TICK_INTERVAL) );
 	}
 
 	void InputSetHingeFriction( inputdata_t &inputdata )
@@ -1080,7 +1080,7 @@ public:
 			massLoad /= (float)numMasses;
 		}
 		float loadscale = m_systemLoadScale != 0 ? m_systemLoadScale : 1;
-		m_pConstraint->SetLinearMotor( speed, speed * loadscale * massLoad * (1.0/TICK_INTERVAL) );
+		m_pConstraint->SetLinearMotor( speed, speed * loadscale * massLoad * (1.0f/TICK_INTERVAL) );
 	}
 
 	void DrawDebugGeometryOverlays()

@@ -92,19 +92,19 @@ public:
 	void			Precache( void );
 	void			Spawn( void );
 	virtual void	OnRestore();
-	virtual void	Activate();
+	void	Activate() override;
 	virtual void	UpdateOnRemove();
 	virtual int		ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_USE_IN_RADIUS; };
 	virtual void	DoMuzzleFlash( void );
 	virtual void	StopLoopingSounds();
 
 	// position to shoot at
-	virtual Vector	BodyTarget( const Vector &posSrc, bool bNoisy );
+	Vector	BodyTarget( const Vector &posSrc, bool bNoisy ) override;
 	virtual Vector	GetSmoothedVelocity( void );
 
 	virtual void	EnterVehicle( CBaseCombatCharacter *pPlayer );
 
-	virtual bool	AllowBlockedExit( CBaseCombatCharacter *pPlayer, int nRole ) { return false; }
+	bool	AllowBlockedExit( CBaseCombatCharacter *pPlayer, int nRole ) override { return false; }
 	virtual void	PreExitVehicle( CBaseCombatCharacter *pPlayer, int nRole );
 	virtual void	ExitVehicle( int nRole );
 
@@ -546,10 +546,6 @@ void CPropAirboat::EnablePlayerBlocker( bool bEnable )
 //-----------------------------------------------------------------------------
 // Update the weapon sounds
 //-----------------------------------------------------------------------------
-#define MIN_CHARGE_SOUND 0.4f
-#define MIN_PITCH_CHANGE ( MIN_CHARGE_SOUND + ( ( 1.0f - MIN_CHARGE_SOUND ) / 3.0f ) )
-#define VOLUME_CHANGE_TIME 0.5f
-
 void CPropAirboat::UpdateWeaponSound()
 {
 	if ( HasGun() )
@@ -740,12 +736,12 @@ void CPropAirboat::ExitVehicle( int nRole )
 	m_VehiclePhysics.TurnOff();
 
 	// Shut off the airboat sounds.
-	controller.SoundChangeVolume( m_pEngineSound, 0.0, 0.0 );
-	controller.SoundChangeVolume( m_pFanSound, 0.0, 0.0 );
-	controller.SoundChangeVolume( m_pFanMaxSpeedSound, 0.0, 0.0 );
-	controller.SoundChangeVolume( m_pWaterStoppedSound, 0.0, 0.0 );
-	controller.SoundChangeVolume( m_pWaterFastSound, 0.0, 0.0 );
-	controller.SoundChangeVolume( m_pGunFiringSound, 0.0, 0.0 );
+	controller.SoundChangeVolume( m_pEngineSound, 0.0f, 0.0f );
+	controller.SoundChangeVolume( m_pFanSound, 0.0f, 0.0f );
+	controller.SoundChangeVolume( m_pFanMaxSpeedSound, 0.0f, 0.0f );
+	controller.SoundChangeVolume( m_pWaterStoppedSound, 0.0f, 0.0f );
+	controller.SoundChangeVolume( m_pWaterFastSound, 0.0f, 0.0f );
+	controller.SoundChangeVolume( m_pGunFiringSound, 0.0f, 0.0f );
 }
 
 
@@ -826,7 +822,7 @@ void CPropAirboat::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &
 	{
 		if ( inputInfo.GetDamageType() & DMG_BULLET )
 		{
-			info.ScaleDamage( 0.0001 );
+			info.ScaleDamage( 0.0001f );
 		}
 	}
 
@@ -1197,7 +1193,7 @@ void CPropAirboat::UpdatePropeller()
 	if ((flTargetSpinRate == 0) && (m_hPlayer))
 	{
 		// Always keep the fan moving a little when we have a driver.
-		flTargetSpinRate = 0.2;
+		flTargetSpinRate = 0.2f;
 	}
 
 	// Save the current spin rate to determine state transitions.
@@ -1393,18 +1389,18 @@ void CPropAirboat::UpdateEngineSound( CSoundEnvelopeController &controller, floa
 //-----------------------------------------------------------------------------
 void CPropAirboat::UpdateFanSound( CSoundEnvelopeController &controller, float speedRatio )
 {
-	#define FAN_MIN_VOLUME	0.0
-	#define FAN_MAX_VOLUME	0.82
-	#define FAN_DUCK_VOLUME	0.22
-	#define FAN_CHANGE_VOLUME_TIME	1.0		// seconds over which to change the volume
-	#define FAN_DUCK_TIME 2.0				// seconds over which to duck the fan sound
+	#define FAN_MIN_VOLUME	0.0f
+	#define FAN_MAX_VOLUME	0.82f
+	#define FAN_DUCK_VOLUME	0.22f
+	#define FAN_CHANGE_VOLUME_TIME	1.0f		// seconds over which to change the volume
+	#define FAN_DUCK_TIME 2.0f				// seconds over which to duck the fan sound
 
 	// Manage the state of the fan sound.
 	if (speedRatio >= 0.8)
 	{
 		// Crossfade between a 'max speed' fan sound and the normal fan sound.
-		controller.SoundChangeVolume( m_pFanSound, RemapValClamped( speedRatio, 0.8, 1.0, FAN_MAX_VOLUME, FAN_MIN_VOLUME ), FAN_CHANGE_VOLUME_TIME );
-		controller.SoundChangeVolume( m_pFanMaxSpeedSound, RemapValClamped( speedRatio, 0.8, 1.0, FAN_MIN_VOLUME, FAN_MAX_VOLUME ), FAN_CHANGE_VOLUME_TIME );
+		controller.SoundChangeVolume( m_pFanSound, RemapValClamped( speedRatio, 0.8f, 1.0f, FAN_MAX_VOLUME, FAN_MIN_VOLUME ), FAN_CHANGE_VOLUME_TIME );
+		controller.SoundChangeVolume( m_pFanMaxSpeedSound, RemapValClamped( speedRatio, 0.8f, 1.0f, FAN_MIN_VOLUME, FAN_MAX_VOLUME ), FAN_CHANGE_VOLUME_TIME );
 
 		if (!m_bFadeOutFan)
 		{
@@ -1415,11 +1411,11 @@ void CPropAirboat::UpdateFanSound( CSoundEnvelopeController &controller, float s
 	else
 	{
 		m_bFadeOutFan = false;
-		controller.SoundChangeVolume( m_pFanSound, RemapValClamped( fabs(m_flThrottle), 0, 1.0, FAN_MIN_VOLUME, FAN_MAX_VOLUME ), 0.25 );
+		controller.SoundChangeVolume( m_pFanSound, RemapValClamped( fabs(m_flThrottle), 0, 1.0f, FAN_MIN_VOLUME, FAN_MAX_VOLUME ), 0.25f );
 		controller.SoundChangeVolume( m_pFanMaxSpeedSound, 0.0, 0.0 );
 	}
 
-	controller.SoundChangePitch( m_pFanSound, 100 * (fabs(m_flThrottle) + 0.2), 0.25 );
+	controller.SoundChangePitch( m_pFanSound, 100 * (fabs(m_flThrottle) + 0.2f), 0.25f );
 }
 
 
@@ -1465,9 +1461,9 @@ void CPropAirboat::UpdateWaterSound( CSoundEnvelopeController &controller, float
 			}
 			else if (gpGlobals->curtime > m_flWaterStoppedPitchTime)
 			{
-				controller.SoundChangeVolume(m_pWaterStoppedSound, random->RandomFloat(0.2, 1.0), random->RandomFloat(1.0, 3.0));
-				controller.SoundChangePitch(m_pWaterStoppedSound, random->RandomFloat(90, 110), random->RandomFloat(1.0, 3.0));
-				m_flWaterStoppedPitchTime = gpGlobals->curtime + random->RandomFloat(2.0, 4.0);
+				controller.SoundChangeVolume(m_pWaterStoppedSound, random->RandomFloat(0.2f, 1.0f), random->RandomFloat(1.0f, 3.0f));
+				controller.SoundChangePitch(m_pWaterStoppedSound, random->RandomFloat(90, 110), random->RandomFloat(1.0f, 3.0f));
+				m_flWaterStoppedPitchTime = gpGlobals->curtime + random->RandomFloat(2.0f, 4.0f);
 			}
 		}
 		else
@@ -1559,8 +1555,6 @@ void CPropAirboat::DoMuzzleFlash( void )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-#define GUN_WINDUP_TIME 1.5f
-
 // NVNT Convar for airboat gun magnitude
 ConVar hap_airboat_gun_mag("hap_airboat_gun_mag", "3", 0);
 
@@ -1645,7 +1639,7 @@ void CPropAirboat::FireGun( )
 
 	if ( gpGlobals->curtime >= m_flNextGunShakeTime )
 	{
-		UTIL_ScreenShakeObject( this, WorldSpaceCenter(), 0.2, 250.0, CANNON_SHAKE_INTERVAL, 250, SHAKE_START );
+		UTIL_ScreenShakeObject( this, WorldSpaceCenter(), 0.2f, 250.0f, CANNON_SHAKE_INTERVAL, 250, SHAKE_START );
 		m_flNextGunShakeTime = gpGlobals->curtime + 0.5f * CANNON_SHAKE_INTERVAL; 
 	}
 
@@ -1768,7 +1762,7 @@ void CPropAirboat::UpdateGunState( CUserCmd *ucmd )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPropAirboat::DriveVehicle( float flFrameTime, CUserCmd *ucmd, int iButtonsDown, int iButtonsReleased )
+void CPropAirboat::DriveVehicle( float, CUserCmd *ucmd, int, int )
 {
 	if ( ucmd->impulse == 100 )
 	{
@@ -1854,16 +1848,16 @@ void CPropAirboat::CreateDangerSounds( void )
 		{
 			if ( speed > 0 )
 			{
-				vecDir += vecRight * steering * 0.5;
+				vecDir += vecRight * steering * 0.5f;
 			}
 			else
 			{
-				vecDir -= vecRight * steering * 0.5;
+				vecDir -= vecRight * steering * 0.5f;
 			}
 			VectorNormalize(vecDir);
 		}
 
-		const float radius = speed * 0.4;
+		const float radius = speed * 0.4f;
 
 		// 0.7 seconds ahead
 		vecSpot = vecStart + vecDir * (speed * 0.7f);
@@ -1982,7 +1976,7 @@ void CPropAirboat::DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicleE
 	// Get up vector.
 	Vector vecUp;
 	AngleVectors( vecVehicleEyeAngles, NULL, NULL, &vecUp );
-	vecUp.z = clamp( vecUp.z, 0.0f, vecUp.z );
+	vecUp.z = max( vecUp.z, 0.0f );
 	vecVehicleEyePos.z += r_AirboatViewZHeight.GetFloat() * vecUp.z;
 
 	// NOTE: Should probably use some damped equation here.
@@ -2020,16 +2014,16 @@ void CPropAirboat::CreateSplash( int nSplashType )
 			data.m_flScale = 10.0f + random->RandomFloat( 0, 10.0f * 0.25 );
 			//DispatchEffect( "waterripple", data );
 			DispatchEffect( "watersplash", data );
+			break;
 		}
 		case AIRBOAT_SPLASH_RIPPLE:
 		{
-			/*
 			Vector vecSplashDir;
 			vecSplashDir = vecUp;
 			data.m_vNormal = vecSplashDir;
 			data.m_flScale = AIRBOAT_SPLASH_RIPPLE_SIZE + random->RandomFloat( 0, AIRBOAT_SPLASH_RIPPLE_SIZE * 0.25 );
 			DispatchEffect( "waterripple", data );
-			*/
+			break;
 		}
 		default:
 		{

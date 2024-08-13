@@ -65,7 +65,7 @@ void CBoneFollowerManager::AddBoneFollower( CBaseAnimating *pParentEntity, const
 {
 	m_iNumBones++;
 
-	int iIndex = m_physBones.AddToTail();
+	intp iIndex = m_physBones.AddToTail();
 	CreatePhysicsFollower( pParentEntity, m_physBones[iIndex], pFollowerBoneName, pSolid );
 }
 

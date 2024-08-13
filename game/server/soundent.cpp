@@ -266,7 +266,7 @@ void CSoundEnt::Think ( void )
 	int iSound;
 	int iPreviousSound;
 
-	SetNextThink( gpGlobals->curtime + 0.1 );// how often to check the sound list.
+	SetNextThink( gpGlobals->curtime + 0.1f );// how often to check the sound list.
 
 	iPreviousSound = SOUNDLIST_EMPTY;
 	iSound = m_iActiveSound; 
@@ -517,7 +517,7 @@ void CSoundEnt::Initialize ( void )
   	int i;
 	int iSound;
 
-	m_cLastActiveSounds;
+	m_cLastActiveSounds = 0;
 	m_iFreeSound = 0;
 	m_iActiveSound = SOUNDLIST_EMPTY;
 

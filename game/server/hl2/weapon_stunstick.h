@@ -18,37 +18,38 @@
 class CWeaponStunStick : public CBaseHLBludgeonWeapon
 {
 	DECLARE_CLASS( CWeaponStunStick, CBaseHLBludgeonWeapon );
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 
 public:
 
 	CWeaponStunStick();
 
-	DECLARE_SERVERCLASS();
+	DECLARE_SERVERCLASS_OVERRIDE();
 	DECLARE_ACTTABLE();
 
-	virtual void Precache();
+	void		Precache() override;
 
-	void		Spawn();
+	void		Spawn() override;
 
-	float		GetRange( void )		{ return STUNSTICK_RANGE; }
-	float		GetFireRate( void )		{ return STUNSTICK_REFIRE; }
+	float		GetRange( void ) override		{ return STUNSTICK_RANGE; }
+	float		GetFireRate( void ) override		{ return STUNSTICK_REFIRE; }
 
-	int			WeaponMeleeAttack1Condition( float flDot, float flDist );
+	int			WeaponMeleeAttack1Condition( float flDot, float flDist ) override;
 
-	bool		Deploy( void );
-	bool		Holster( CBaseCombatWeapon *pSwitchingTo = NULL );
+	bool		Deploy( void ) override;
+	bool		Holster( CBaseCombatWeapon *pSwitchingTo = NULL ) override;
 	
-	void		Drop( const Vector &vecVelocity );
-	void		ImpactEffect( trace_t &traceHit );
-	void		SecondaryAttack( void )	{}
+	void		Drop( const Vector &vecVelocity ) override;
+	void		ImpactEffect( trace_t &traceHit ) override;
+	void		SecondaryAttack( void ) override {}
 	void		SetStunState( bool state );
 	bool		GetStunState( void );
-	void		Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+	void		Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator ) override
+		;
 	
-	float		GetDamageForActivity( Activity hitActivity );
+	float		GetDamageForActivity( Activity hitActivity ) override;
 
-	bool		CanBePickedUpByNPCs( void ) { return false;	}		
+	bool		CanBePickedUpByNPCs( void ) override { return false;	}
 
 private:
 

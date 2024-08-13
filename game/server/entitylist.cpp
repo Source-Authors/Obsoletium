@@ -170,7 +170,7 @@ public:
 
 	void RemoveEntinfoIndex( int index )
 	{
-		int listHandle = m_entinfoIndex[index];
+		unsigned short listHandle = m_entinfoIndex[index];
 		// If this guy is in the active list, remove him
 		if ( listHandle != 0xFFFF )
 		{
@@ -410,9 +410,9 @@ CBaseEntity *CGlobalEntityList::NextEnt( CBaseEntity *pCurrentEnt )
 	if ( pList )
 		pList = NextEntInfo(pList);
 
+#if 0
 	while ( pList )
 	{
-#if 0
 		if ( pList->m_pEntity )
 		{
 			IServerUnknown *pUnk = static_cast<IServerUnknown*>(const_cast<IHandleEntity*>(pList->m_pEntity));
@@ -420,14 +420,13 @@ CBaseEntity *CGlobalEntityList::NextEnt( CBaseEntity *pCurrentEnt )
 			if ( pRet )
 				return pRet;
 		}
-#else
-		return (CBaseEntity *)pList->m_pEntity;
-#endif
 		pList = pList->m_pNext;
 	}
-	
-	return NULL; 
 
+	return nullptr;
+#else
+	return pList ? (CBaseEntity *)pList->m_pEntity : nullptr;
+#endif
 }
 
 
@@ -1203,7 +1202,7 @@ void CNotifyList::AddEntity( CBaseEntity *pNotify, CBaseEntity *pWatched )
 {
 	// OPTIMIZE: Also flag pNotify for faster "RemoveAllNotify" ?
 	pWatched->AddEFlags( EFL_NOTIFY );
-	int index = m_notifyList.AddToTail();
+	intp index = m_notifyList.AddToTail();
 	entitynotify_t &notify = m_notifyList[index];
 	notify.pNotify = pNotify;
 	notify.pWatched = pWatched;
@@ -1212,7 +1211,7 @@ void CNotifyList::AddEntity( CBaseEntity *pNotify, CBaseEntity *pWatched )
 // Remove noitfication for an entity
 void CNotifyList::RemoveEntity( CBaseEntity *pNotify, CBaseEntity *pWatched )
 {
-	for ( int i = m_notifyList.Count(); --i >= 0; )
+	for ( intp i = m_notifyList.Count(); --i >= 0; )
 	{
 		if ( m_notifyList[i].pNotify == pNotify && m_notifyList[i].pWatched == pWatched)
 		{
@@ -1229,7 +1228,7 @@ void CNotifyList::ReportNamedEvent( CBaseEntity *pEntity, const char *pInputName
 	if ( !pEntity->IsEFlagSet(EFL_NOTIFY) )
 		return;
 
-	for ( int i = 0; i < m_notifyList.Count(); i++ )
+	for ( intp i = 0; i < m_notifyList.Count(); i++ )
 	{
 		if ( m_notifyList[i].pWatched == pEntity )
 		{
@@ -1263,7 +1262,7 @@ void CNotifyList::OnEntityDeleted( CBaseEntity *pEntity )
 // UNDONE: Slow linear search?
 void CNotifyList::ClearEntity( CBaseEntity *pNotify )
 {
-	for ( int i = m_notifyList.Count(); --i >= 0; )
+	for ( intp i = m_notifyList.Count(); --i >= 0; )
 	{
 		if ( m_notifyList[i].pNotify == pNotify || m_notifyList[i].pWatched == pNotify)
 		{
@@ -1277,7 +1276,7 @@ void CNotifyList::ReportSystemEvent( CBaseEntity *pEntity, notify_system_event_t
 	if ( !pEntity->IsEFlagSet(EFL_NOTIFY) )
 		return;
 
-	for ( int i = 0; i < m_notifyList.Count(); i++ )
+	for ( intp i = 0; i < m_notifyList.Count(); i++ )
 	{
 		if ( m_notifyList[i].pWatched == pEntity )
 		{
@@ -1316,7 +1315,7 @@ public:
 	{
 		if ( !pEntity->GetCheckUntouch() )
 			return;
-		int index = m_updateList.Find( pEntity );
+		intp index = m_updateList.Find( pEntity );
 		if ( m_updateList.IsValidIndex(index) )
 		{
 			m_updateList.FastRemove( index );
@@ -1346,7 +1345,7 @@ void CEntityTouchManager::FrameUpdatePostEntityThink()
 	VPROF( "CEntityTouchManager::FrameUpdatePostEntityThink" );
 	// Loop through all entities again, checking their untouch if flagged to do so
 	
-	int count = m_updateList.Count();
+	intp count = m_updateList.Count();
 	if ( count )
 	{
 		// copy off the list
@@ -1356,7 +1355,7 @@ void CEntityTouchManager::FrameUpdatePostEntityThink()
 		m_updateList.RemoveAll();
 		
 		// now update those ents
-		for ( int i = 0; i < count; i++ )
+		for ( intp i = 0; i < count; i++ )
 		{
 			//Assert( ents[i]->GetCheckUntouch() );
 			if ( ents[i]->GetCheckUntouch() )

@@ -300,7 +300,7 @@ void CVoteController::ResetData( void )
 	m_iOnlyTeamToVote = TEAM_UNASSIGNED;
 	m_bIsYesNoVote = true;
 
-	for( int voteIndex = 0; voteIndex < ARRAYSIZE( m_nVotesCast ); ++voteIndex )
+	for( size_t voteIndex = 0; voteIndex < ARRAYSIZE( m_nVotesCast ); ++voteIndex )
 	{
 		m_nVotesCast[voteIndex] = VOTE_UNCAST;
 	}
@@ -601,7 +601,7 @@ CVoteController::TryCastVoteResult CVoteController::TryCastVote( int iEntIndex, 
 	if ( !IsVoteSystemEnabled() )
 		return CAST_FAIL_SERVER_DISABLE;
 
-	if ( iEntIndex >= ARRAYSIZE( m_nVotesCast ) )
+	if ( iEntIndex >= static_cast<int>(ARRAYSIZE( m_nVotesCast )) )
 		return CAST_FAIL_SYSTEM_ERROR;
 
 	if ( !IsVoteActive() )
@@ -1172,7 +1172,7 @@ void CBaseIssue::OnVoteFailed( int iEntityHoldingVote )
 
 		// Need to create a new one
 		FailedVote *pNewFailedVote = new FailedVote;
-		int iIndex = m_FailedVotes.AddToTail( pNewFailedVote );
+		intp iIndex = m_FailedVotes.AddToTail( pNewFailedVote );
 		V_strcpy_safe( m_FailedVotes[iIndex]->szFailedVoteParameter, GetDetailsString() );
 		m_FailedVotes[iIndex]->flLockoutTime = gpGlobals->curtime + sv_vote_failure_timer.GetFloat();
 	}

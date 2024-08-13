@@ -82,8 +82,7 @@ static const char *s_pBogusFogMaps[] =
 	"d3_c17_04",
 	"d3_c17_11",
 	"d3_c17_12",
-	"d3_citadel_01",
-	NULL
+	"d3_citadel_01"
 };
 
 //-----------------------------------------------------------------------------
@@ -129,11 +128,11 @@ void CSkyCamera::Activate( )
 	// the maps look the same as before the bug fix without having to download new maps,
 	// I have to cheat here and slam the primary and secondary colors to be the average of 
 	// the primary and secondary colors.
-	if ( m_skyboxData.fog.blend )
+	/*if ( m_skyboxData.fog.blend )
 	{
-		for ( int i = 0; s_pBogusFogMaps[i]; ++i )
+		for ( const auto *map : s_pBogusFogMaps )
 		{
-			if ( !Q_stricmp( s_pBogusFogMaps[i], STRING(gpGlobals->mapname) ) )
+			if ( !Q_stricmp( map, STRING(gpGlobals->mapname) ) )
 			{
 				m_skyboxData.fog.colorPrimary.SetR( ( m_skyboxData.fog.colorPrimary.GetR() + m_skyboxData.fog.colorSecondary.GetR() ) * 0.5f );
 				m_skyboxData.fog.colorPrimary.SetG( ( m_skyboxData.fog.colorPrimary.GetG() + m_skyboxData.fog.colorSecondary.GetG() ) * 0.5f );
@@ -142,6 +141,6 @@ void CSkyCamera::Activate( )
 				m_skyboxData.fog.colorSecondary = m_skyboxData.fog.colorPrimary;
 			}
 		}
-	}
+	}*/
 #endif
 }

@@ -380,7 +380,7 @@ void CWreckage::Precache( )
 void CWreckage::Think( void )
 {
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	SetNextThink( gpGlobals->curtime + 0.2f );
 
 	if (m_flDieTime)
 	{
@@ -400,7 +400,7 @@ void CWreckage::Think( void )
 	CPVSFilter filter( vecSrc );
 	te->Smoke( filter, 0.0, 
 		&vecSrc, g_sModelIndexSmoke,
-		random->RandomFloat(0,4.9) + 5.0,
+		random->RandomFloat(0,4.9f) + 5.0f,
 		random->RandomInt(0, 3) + 8 );
 }
 

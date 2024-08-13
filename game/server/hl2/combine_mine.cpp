@@ -39,7 +39,7 @@ enum
 #define MINE_CITIZEN_SKIN_MIN 1
 #define MINE_CITIZEN_SKIN_MAX 2
 
-char *pszMineStateNames[] =
+const char *pszMineStateNames[] =
 {
 	"Dormant",
 	"Deploy",
@@ -347,12 +347,12 @@ void CBounceBomb::SetMineState( int iState )
 			if (m_iModification == MINE_MODIFICATION_CAVERN)
 			{
 				SetThink ( &CBounceBomb::CavernBounceThink );
-				SetNextThink( gpGlobals->curtime + 0.15 );
+				SetNextThink( gpGlobals->curtime + 0.15f );
 			}
 			else
 			{
 				SetThink( &CBounceBomb::BounceThink );
-				SetNextThink( gpGlobals->curtime + 0.5 );
+				SetNextThink( gpGlobals->curtime + 0.5f );
 			}
 		}
 		break;
@@ -361,7 +361,7 @@ void CBounceBomb::SetMineState( int iState )
 		{
 			UpdateLight( true, 255, 0, 0, 190 );
 			SetThink( NULL );
-			SetNextThink( gpGlobals->curtime + 0.5 );
+			SetNextThink( gpGlobals->curtime + 0.5f );
 
 			SetTouch( &CBounceBomb::ExplodeTouch );
 			unsigned int flags = VPhysicsGetObject()->GetCallbackFlags();
@@ -463,7 +463,7 @@ bool CBounceBomb::IsValidLocation()
 //---------------------------------------------------------
 void CBounceBomb::BounceThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 	StudioFrameAdvance();
 
 	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
@@ -491,7 +491,7 @@ void CBounceBomb::BounceThink()
 				height = 0.1;
 		}
 
-		float time = sqrt( height / (0.5 * GetCurrentGravity()) );
+		float time = sqrt( height / (0.5f * GetCurrentGravity()) );
 		float velocity = GetCurrentGravity() * time;
 
 		// or you can just AddVelocity to the object instead of ApplyForce
@@ -525,7 +525,7 @@ void CBounceBomb::BounceThink()
 //---------------------------------------------------------
 void CBounceBomb::CavernBounceThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 	StudioFrameAdvance();
 
 	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
@@ -553,7 +553,7 @@ void CBounceBomb::CavernBounceThink()
 				height = 0.1;
 		}
 
-		float time = sqrt( height / (0.5 * GetCurrentGravity()) );
+		float time = sqrt( height / (0.5f * GetCurrentGravity()) );
 		float velocity = GetCurrentGravity() * time;
 
 		// or you can just AddVelocity to the object instead of ApplyForce
@@ -585,7 +585,7 @@ void CBounceBomb::CavernBounceThink()
 //---------------------------------------------------------
 void CBounceBomb::CaptiveThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	SetNextThink( gpGlobals->curtime + 0.05f );
 	StudioFrameAdvance();
 
 	float phase = fabs( sin( gpGlobals->curtime * 4.0f ) );
@@ -598,7 +598,7 @@ void CBounceBomb::CaptiveThink()
 //---------------------------------------------------------
 void CBounceBomb::SettleThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	SetNextThink( gpGlobals->curtime + 0.05f );
 	StudioFrameAdvance();
 
 	if( GetParent() )
@@ -956,7 +956,7 @@ void CBounceBomb::SearchThink()
 	if( !UTIL_FindClientInPVS(edict()) )
 	{
 		// Sleep!
-		SetNextThink( gpGlobals->curtime + 0.5 );
+		SetNextThink( gpGlobals->curtime + 0.5f );
 		return;
 	}
 
@@ -967,11 +967,11 @@ void CBounceBomb::SearchThink()
 			Wake(false);
 		}
 
-		SetNextThink( gpGlobals->curtime + 0.5 );
+		SetNextThink( gpGlobals->curtime + 0.5f );
 		return;
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 	StudioFrameAdvance();
 
 	if( m_pConstraint && gpGlobals->curtime - m_flTimeGrabbed >= 1.0f )

@@ -1208,8 +1208,8 @@ void CNPC_MetroPolice::OnUpdateShotRegulator( )
 				
 				float factor = (dist - MIN_PISTOL_MODIFY_DIST) / (MAX_PISTOL_MODIFY_DIST - MIN_PISTOL_MODIFY_DIST);
 				
-				int		nMinBurst			= MIN_MIN_PISTOL_BURST + ( MAX_MIN_PISTOL_BURST - MIN_MIN_PISTOL_BURST ) * (1.0 - factor);
-				int		nMaxBurst			= MIN_MAX_PISTOL_BURST + ( MAX_MAX_PISTOL_BURST - MIN_MAX_PISTOL_BURST ) * (1.0 - factor);
+				int		nMinBurst			= MIN_MIN_PISTOL_BURST + ( MAX_MIN_PISTOL_BURST - MIN_MIN_PISTOL_BURST ) * (1.0f - factor);
+				int		nMaxBurst			= MIN_MAX_PISTOL_BURST + ( MAX_MAX_PISTOL_BURST - MIN_MAX_PISTOL_BURST ) * (1.0f - factor);
 				float	flMinRestInterval	= MIN_MIN_PISTOL_REST_INTERVAL + ( MAX_MIN_PISTOL_REST_INTERVAL - MIN_MIN_PISTOL_REST_INTERVAL ) * factor;
 				float	flMaxRestInterval	= MIN_MAX_PISTOL_REST_INTERVAL + ( MAX_MAX_PISTOL_REST_INTERVAL - MIN_MAX_PISTOL_REST_INTERVAL ) * factor;
 				
@@ -1996,7 +1996,7 @@ void CNPC_MetroPolice::AimBurstAlongSideOfEnemy( float flFollowTime )
 
 	vecShootAtVel.z = 0.0f;
 	float flTargetSpeed = VectorNormalize( vecShootAtVel );
-	float flStitchLength = MAX( AIM_IN_FRONT_OF_DEFAULT_STITCH_LENGTH, flTargetSpeed * flFollowTime * 0.9 );
+	float flStitchLength = MAX( AIM_IN_FRONT_OF_DEFAULT_STITCH_LENGTH, flTargetSpeed * flFollowTime * 0.9f );
 
 	// This defines the line of death, which, when crossed, results in damage
 	m_vecBurstLineOfDeathOrigin = vecSidePoint;
@@ -2262,7 +2262,7 @@ Vector CNPC_MetroPolice::AimCloseToTargetButMiss( CBaseEntity *pTarget, const Ve
 	pTarget->CollisionProp()->WorldToNormalizedSpace( shootOrigin, &vecNormalizedSpace );
 	vecNormalizedSpace -= Vector( 0.5f, 0.5f, 0.5f );
 	float flDist = VectorNormalize( vecNormalizedSpace );
-	float flMinRadius = flDist * sqrt(3.0) / sqrt( flDist * flDist - 3 );
+	float flMinRadius = flDist * sqrt(3.0f) / sqrt( flDist * flDist - 3 );
 
 	// Choose random points in a plane perpendicular to the shoot origin.
 	Vector vecRandomDir;
@@ -2358,6 +2358,7 @@ Vector CNPC_MetroPolice::GetActualShootTrajectory( const Vector &shootOrigin )
 			}
 		}
 		// NOTE: Fall through to BURST_ACTIVE!
+		[[fallthrough]];
 
 	case BURST_ACTIVE:
 		// Stitch toward the target, we haven't hit it yet
@@ -2610,7 +2611,7 @@ void CNPC_MetroPolice::IdleSound( void )
 
 			if ( m_Sentences.Speak( pQuestion[bIsCriminal][nQuestionType] ) >= 0 )
 			{
-				GetSquad()->BroadcastInteraction( g_interactionMetrocopIdleChatter, (void*)(METROPOLICE_CHATTER_RESPONSE + nQuestionType), this );
+				GetSquad()->BroadcastInteraction( g_interactionMetrocopIdleChatter, (void*)static_cast<intp>(METROPOLICE_CHATTER_RESPONSE + nQuestionType), this );
 				m_nIdleChatterType = METROPOLICE_CHATTER_WAIT_FOR_RESPONSE;
 			}
 		}
@@ -2628,7 +2629,7 @@ void CNPC_MetroPolice::IdleSound( void )
 
 			if ( m_Sentences.Speak( pResponse[bIsCriminal][nResponseType] ) >= 0 )
 			{
-				GetSquad()->BroadcastInteraction( g_interactionMetrocopIdleChatter, (void*)(METROPOLICE_CHATTER_ASK_QUESTION), this );
+				GetSquad()->BroadcastInteraction( g_interactionMetrocopIdleChatter, (void*)static_cast<intp>(METROPOLICE_CHATTER_ASK_QUESTION), this );
 				m_nIdleChatterType = METROPOLICE_CHATTER_ASK_QUESTION;
 			}
 		}
@@ -2981,7 +2982,7 @@ bool CNPC_MetroPolice::HandleInteraction(int interactionType, void *data, CBaseC
 
 	if ( interactionType == g_interactionMetrocopIdleChatter )
 	{
-		m_nIdleChatterType = (int)data;
+		m_nIdleChatterType = reinterpret_cast<intp>(data);
 		return true;
 	}
 
@@ -3494,7 +3495,8 @@ float CNPC_MetroPolice::StitchAtWeight( float flDist, float flSpeed, float flDot
 
 float CNPC_MetroPolice::StitchAcrossWeight( float flDist, float flSpeed, float flDot, float flReactionTime )
 {
-	return 0.0f;
+	// dimhotepus: Honor stitch accross weight.
+	// return 0.0f;
 
 	// Can't do an 'attacking' stitch if it's too soon
 	if ( m_flValidStitchTime > gpGlobals->curtime )
@@ -3555,7 +3557,8 @@ float CNPC_MetroPolice::StitchAlongSideWeight( float flDist, float flSpeed, floa
 
 float CNPC_MetroPolice::StitchBehindWeight( float flDist, float flSpeed, float flDot )
 {
-	return 0.0f;
+	// dimhotepus: Honor stitch behind weight.
+	// return 0.0f;
 
 	// No squad slots? no way.
 	if( IsStrategySlotRangeOccupied( SQUAD_SLOT_ATTACK1, SQUAD_SLOT_ATTACK2 ) &&
@@ -3874,7 +3877,7 @@ void CNPC_MetroPolice::PlayFlinchGesture( void )
 	BaseClass::PlayFlinchGesture();
 
 	// To ensure old playtested difficulty stays the same, stop cops shooting for a bit after gesture flinches
-	GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + 0.5 );
+	GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + 0.5f );
 }
 
 //-----------------------------------------------------------------------------
@@ -4696,7 +4699,6 @@ void CNPC_MetroPolice::RunTask( const Task_t *pTask )
 		{
 			AutoMovement( );
 
-			Vector vecAimPoint;
 			GetMotor()->SetIdealYawToTargetAndUpdate( m_vecBurstTargetPos, AI_KEEP_YAW_SPEED );
 
 			if ( IsActivityFinished() )

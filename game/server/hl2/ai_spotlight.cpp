@@ -370,7 +370,7 @@ void CAI_Spotlight::UpdateSpotlightEndpoint( void )
 	}
 	else
 	{
-		m_hSpotlightTarget->SetRenderColorA( 1.0 );
+		m_hSpotlightTarget->SetRenderColorA( 1 );
 		m_hSpotlight->SetFadeLength(m_flSpotlightCurLength);
 	}
 

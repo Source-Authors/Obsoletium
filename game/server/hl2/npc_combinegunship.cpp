@@ -943,7 +943,7 @@ void CNPC_CombineGunship::StartGroundAttack( void )
 //-----------------------------------------------------------------------------
 void CNPC_CombineGunship::ManageWarningBeam( void )
 {
-	Vector vecSrc, vecShootDir;
+	Vector vecSrc;
 	GetAttachment( "BellyGun", vecSrc, NULL, NULL, NULL );
 
 	trace_t	tr;
@@ -1409,7 +1409,6 @@ void CNPC_CombineGunship::MoveHead( void )
 			float	flDot;
 
 			Vector vTargetPos, vGunPosition;
-			Vector vecTargetOffset;
 			QAngle vGunAngles;
 
 			GetAttachment( "muzzle", vGunPosition, vGunAngles );
@@ -1442,8 +1441,8 @@ void CNPC_CombineGunship::MoveHead( void )
  
 		// Look where going!
 #if 1 // old way- look according to rotational velocity
-		flYaw = UTIL_Approach( GetLocalAngularVelocity().y, flYaw, 2.0 * 10 * m_flDeltaT );	
-		flPitch = UTIL_Approach( GetLocalAngularVelocity().x, flPitch, 2.0 * 10 * m_flDeltaT );	
+		flYaw = UTIL_Approach( GetLocalAngularVelocity().y, flYaw, 2.0f * 10 * m_flDeltaT );	
+		flPitch = UTIL_Approach( GetLocalAngularVelocity().x, flPitch, 2.0f * 10 * m_flDeltaT );	
 #else // new way- look towards the next waypoint?
 		// !!!UNDONE
 #endif
@@ -1630,7 +1629,6 @@ bool CNPC_CombineGunship::FireGun( void )
 //------------------------------------------------------------------------------
 void CNPC_CombineGunship::FireCannonRound( void )
 {
-	Vector vecPenetrate;
 	trace_t tr;
 
 	Vector vecToEnemy, vecEnemyTarget;
@@ -2804,10 +2802,7 @@ void CNPC_CombineGunship::MakeTracer( const Vector &vecTracerSrc, const trace_t 
 	case TRACER_LINE:
 		{
 			float flTracerDist;
-			Vector vecDir;
-			Vector vecEndPos;
-
-			vecDir = tr.endpos - vecTracerSrc;
+			Vector vecDir = tr.endpos - vecTracerSrc;
 
 			flTracerDist = VectorNormalize( vecDir );
 
@@ -2948,11 +2943,11 @@ int	CNPC_CombineGunship::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 		int iHealthIncrements = sk_gunship_health_increments.GetInt();
 		if ( g_pGameRules->IsSkillLevel( SKILL_EASY ) )
 		{
-			iHealthIncrements = ceil( iHealthIncrements * 0.5 );
+			iHealthIncrements = ceil( iHealthIncrements * 0.5f );
 		}
 		else if ( g_pGameRules->IsSkillLevel( SKILL_HARD ) )
 		{
-			iHealthIncrements = floor( iHealthIncrements * 1.5 );
+			iHealthIncrements = floor( iHealthIncrements * 1.5f );
 		}
 		info.SetDamage( ( GetMaxHealth() / (float)iHealthIncrements ) + 1 );
 		

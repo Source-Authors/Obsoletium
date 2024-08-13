@@ -79,7 +79,7 @@ void CEnvSpark::Spawn(void)
 		SetThink( &CEnvSpark::SparkThink );	// start sparking
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1 + random->RandomFloat( 0, 1.5 ) );
+	SetNextThink( gpGlobals->curtime + 0.1f + random->RandomFloat( 0, 1.5f ) );
 
 	// Negative delays are not allowed
 	if ( m_flDelay < 0 )
@@ -116,7 +116,7 @@ extern ConVar phys_pushscale;
 //-----------------------------------------------------------------------------
 void CEnvSpark::SparkThink(void)
 {
-	SetNextThink( gpGlobals->curtime + 0.1 + random->RandomFloat(0, m_flDelay) );
+	SetNextThink( gpGlobals->curtime + 0.1f + random->RandomFloat(0, m_flDelay) );
 
 	Vector vecDir = vec3_origin;
 	if ( FBitSet( m_spawnflags, SF_SPARK_DIRECTIONAL ) )

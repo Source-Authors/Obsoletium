@@ -23,7 +23,7 @@ public:
 					CTEGaussExplosion( const char *name );
 	virtual			~CTEGaussExplosion( void );
 
-	virtual void	Test( const Vector& current_origin, const QAngle& current_angles ) { };
+	virtual void	Test( const Vector&, const QAngle& ) { };
 
 	CNetworkVar( int, m_nType );
 	CNetworkVector( m_vecDirection );

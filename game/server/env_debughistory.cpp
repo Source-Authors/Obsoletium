@@ -89,7 +89,7 @@ void CDebugHistory::AddDebugHistoryLine( int iCategory, const char *szLine )
 		return;
 
 	const char *pszRemaining = szLine;
-	int iCharsToWrite = strlen( pszRemaining ) + 1;	// Add 1 so that we copy the null terminator
+	intp iCharsToWrite = V_strlen( pszRemaining ) + 1;	// Add 1 so that we copy the null terminator
 
 	// Clip the line if it's too long. Wasteful doing it this way, but keeps code below nice & simple.
 	char szTmpBuffer[MAX_DEBUG_HISTORY_LINE_LENGTH];
@@ -134,7 +134,7 @@ void CDebugHistory::DumpDebugHistory( int iCategory )
 
 	// Find the start of the oldest whole debug line.
 	const char *pszLine = m_DebugLineEnd[iCategory] + 1;
-	if ( (pszLine - m_DebugLines[iCategory]) >= sizeof(m_DebugLines[iCategory]) )
+	if ( (pszLine - m_DebugLines[iCategory]) >= static_cast<int>(sizeof(m_DebugLines[iCategory])) )
 	{
 		pszLine = m_DebugLines[iCategory];
 	}
@@ -147,7 +147,7 @@ void CDebugHistory::DumpDebugHistory( int iCategory )
 		pszLine++;
 
 		// Have we looped?
-		if ( (pszLine - m_DebugLines[iCategory]) >= sizeof(m_DebugLines[iCategory]) )
+		if ( (pszLine - m_DebugLines[iCategory]) >= static_cast<int>(sizeof(m_DebugLines[iCategory])) )
 		{
 			pszLine = m_DebugLines[iCategory];
 		}
@@ -187,7 +187,7 @@ void CDebugHistory::DumpDebugHistory( int iCategory )
 		pszLine++;
 
 		// Have we looped?
-		if ( (pszLine - m_DebugLines[iCategory]) >= sizeof(m_DebugLines[iCategory]) )
+		if ( (pszLine - m_DebugLines[iCategory]) >= static_cast<int>(sizeof(m_DebugLines[iCategory])) )
 		{
 			pszLine = m_DebugLines[iCategory];
 		}
@@ -267,8 +267,7 @@ CDebugHistory *GetDebugHistory()
 {
 #ifdef DISABLE_DEBUG_HISTORY
 	return NULL;
-#endif
-
+#else
 	if ( g_pGameRules && g_pGameRules->IsMultiplayer() )
 		return NULL;
 
@@ -291,6 +290,7 @@ CDebugHistory *GetDebugHistory()
 
 	Assert( s_DebugHistory );
 	return s_DebugHistory;
+#endif
 }
 
 //-----------------------------------------------------------------------------

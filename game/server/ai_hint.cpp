@@ -183,7 +183,7 @@ void CHintCriteria::SetGroup( string_t group )
 //-----------------------------------------------------------------------------
 void CHintCriteria::AddZone( zoneList_t &list, const Vector &position, float radius )
 {
-	int id = list.AddToTail();
+	intp id = list.AddToTail();
 	list[id].position	= position;
 	list[id].radiussqr	= radius*radius;
 }
@@ -676,7 +676,7 @@ void CAI_HintManager::RemoveHint( CAI_Hint *pHintToRemove )
 //-----------------------------------------------------------------------------
 int CAI_HintManager::GetFlags( const char *token )
 {
-	int len = strlen( token );
+	intp len = V_strlen( token );
 	if ( len <= 0 )
 	{
 		return bits_HINT_NODE_NONE;
@@ -741,9 +741,9 @@ CAI_Hint *CAI_HintManager::GetFirstHint( AIHintIter_t *pIter )
 //-----------------------------------------------------------------------------
 CAI_Hint *CAI_HintManager::GetNextHint(  AIHintIter_t *pIter )
 {
-	if ( (int)*pIter != gm_AllHints.InvalidIndex() )
+	if ( (intp)*pIter != gm_AllHints.InvalidIndex() )
 	{
-		int i = ( (int)*pIter ) + 1;
+		intp i = ( (intp)*pIter ) + 1;
 		if ( gm_AllHints.Count() <= i )
 		{
 			*pIter = (AIHintIter_t)gm_AllHints.InvalidIndex();

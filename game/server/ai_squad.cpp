@@ -418,7 +418,7 @@ CAI_BaseNPC *CAI_Squad::GetLeader( void )
 //-----------------------------------------------------------------------------
 CAI_BaseNPC *CAI_Squad::GetFirstMember( AISquadIter_t *pIter, bool bIgnoreSilentMembers )
 {
-	int i = 0;
+	intp i = 0;
 	if ( bIgnoreSilentMembers )
 	{
 		for ( ; i < m_SquadMembers.Count(); i++ )
@@ -440,7 +440,7 @@ CAI_BaseNPC *CAI_Squad::GetFirstMember( AISquadIter_t *pIter, bool bIgnoreSilent
 
 CAI_BaseNPC *CAI_Squad::GetNextMember( AISquadIter_t *pIter, bool bIgnoreSilentMembers )
 {
-	int &i = (int &)*pIter;
+	intp &i = (intp &)*pIter;
 	i++;
 	if ( bIgnoreSilentMembers )
 	{
@@ -668,7 +668,7 @@ void CAI_Squad::UpdateEnemyMemory( CAI_BaseNPC *pUpdater, CBaseEntity *pEnemy, c
 
 AISquadEnemyInfo_t *CAI_Squad::FindEnemyInfo( CBaseEntity *pEnemy )
 {
-	int i;
+	intp i;
 	if ( gpGlobals->curtime > m_flEnemyInfoCleanupTime )
 	{
 		if ( m_EnemyInfos.Count() )

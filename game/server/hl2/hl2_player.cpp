@@ -69,7 +69,7 @@ extern ConVar autoaim_max_dist;
 // preventing headshots and other such things. Also, game difficulty will
 // not change if the model changes. This is the value by which to scale
 // the X/Y of the player's hull to get the volume to trace bullets against.
-#define PLAYER_HULL_REDUCTION	0.70
+#define PLAYER_HULL_REDUCTION	0.70f
 
 // This switches between the single primary weapon, and multiple weapons with buckets approach (jdw)
 #define	HL2_SINGLE_PRIMARY_WEAPON_MODE	0
@@ -401,7 +401,7 @@ CHL2_Player::CHL2_Player()
 //
 // SUIT POWER DEVICES
 //
-#define SUITPOWER_CHARGE_RATE	12.5											// 100 units in 8 seconds
+#define SUITPOWER_CHARGE_RATE	12.5f											// 100 units in 8 seconds
 
 #ifdef HL2MP
 	CSuitPowerDevice SuitDeviceSprint( bits_SUIT_DEVICE_SPRINT, 25.0f );				// 100 units in 4 seconds
@@ -2272,8 +2272,8 @@ void CHL2_Player::NotifyFriendsOfDamage( CBaseEntity *pAttackerEntity )
 		const Vector &origin = GetAbsOrigin();
 		for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
-			const float NEAR_Z = 12*12;
-			const float NEAR_XY_SQ = Square( 50*12 );
+			constexpr float NEAR_Z = 12*12;
+			constexpr float NEAR_XY_SQ = Square( 50.0f*12 );
 			CAI_BaseNPC *pNpc = g_AI_Manager.AccessAIs()[i];
 			if ( pNpc->IsPlayerAlly() )
 			{
@@ -3396,7 +3396,7 @@ bool LineCircleIntersection(
 	// Ok, two solutions.
 	sqr = (float)FastSqrt(insideSqr);
 
-	float denom = 1.0 / (2.0f * a);
+	float denom = 1.0f / (2.0f * a);
 	
 	*fIntersection1 = (-b - sqr) * denom;
 	*fIntersection2 = (-b + sqr) * denom;
@@ -3423,7 +3423,7 @@ bool IntersectRayWithAACylinder( const Ray_t &ray,
 	Collision_ClearTrace( ray.m_Start, ray.m_Delta, pTrace );
 
 	// First intersect the ray with the top + bottom planes
-	float halfHeight = height * 0.5;
+	float halfHeight = height * 0.5f;
 
 	// Handle parallel case
 	Vector vStart = ray.m_Start - center;

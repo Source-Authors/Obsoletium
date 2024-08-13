@@ -411,10 +411,11 @@ int CBaseCombatWeapon::WeaponRangeAttack2Condition( float flDot, float flDist )
 		{
 			return COND_TOO_FAR_TO_ATTACK;
 		}
-		else if (flDot < 0.5) 
+		else if (flDot < 0.5f) 
 		{
 			return COND_NOT_FACING_ATTACK;
 		}
+
 		return COND_CAN_RANGE_ATTACK2;
 	}
 

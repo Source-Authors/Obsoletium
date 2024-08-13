@@ -317,6 +317,8 @@ protected:
 	{
 	public:
 		explicit Handler( CBaseEntity *pEntity ) : m_pEntity(pEntity) { }
+		virtual ~Handler() {}
+
 		virtual void OnModelLoadComplete( const model_t *pModel );
 		CBaseEntity* m_pEntity;
 	};
@@ -329,8 +331,8 @@ public:
 	operator CBaseEntity * () const { return m_pHandler->m_pEntity; }
 
 private:
-	CBaseEntityModelLoadProxy( const CBaseEntityModelLoadProxy& );
-	CBaseEntityModelLoadProxy& operator=( const CBaseEntityModelLoadProxy& );
+	CBaseEntityModelLoadProxy( const CBaseEntityModelLoadProxy& ) = delete;
+	CBaseEntityModelLoadProxy& operator=( const CBaseEntityModelLoadProxy& ) = delete;
 };
 
 static CUtlHashtable< CBaseEntityModelLoadProxy, empty_t, PointerHashFunctor, PointerEqualFunctor, CBaseEntity * > sg_DynamicLoadHandlers;
@@ -563,11 +565,12 @@ void CBaseEntity::ValidateDataDescription(void)
 	KeyValueNameList_t	names(128);
 	AddDataMapFieldNamesToList( names, pDataMap );
 
-	for (int i = names.Count(); --i > 0; )
+	for (intp i = names.Count(); --i > 0; )
 	{
-		for (int j = i - 1; --j >= 0; )
+		for (intp j = i - 1; --j >= 0; )
 		{
-			if (!Q_stricmp(names[i], names[j]))
+			// dimhotepus: Case-sensitive compare as we have fields which differ by case only.
+			if (!Q_strcmp(names[i], names[j]))
 			{
 				DevMsg( "%s has multiple data description entries for \"%s\"\n", STRING(m_iClassname), names[i]);
 				break;
@@ -706,7 +709,7 @@ struct TimedOverlay_t
 void CBaseEntity::AddTimedOverlay( const char *msg, int endTime )
 {
 	TimedOverlay_t *pNewTO = new TimedOverlay_t;
-	int len = strlen(msg);
+	intp len = Q_strlen(msg);
 	pNewTO->msg = new char[len + 1];
 	Q_strncpy(pNewTO->msg,msg, len+1);
 	pNewTO->msgEndTime = gpGlobals->curtime + endTime;
@@ -1317,7 +1320,7 @@ void CBaseEntity::Activate( void )
 
 	if ( g_bCheckForChainedActivate && g_bReceivedChainedActivate )
 	{
-		Assert( !"Multiple calls to base class Activate()\n" );
+		AssertMsg( false, "Multiple calls to base class Activate()\n" );
 	}
 	g_bReceivedChainedActivate = true;
 #endif
@@ -1416,10 +1419,10 @@ int CBaseEntity::OnTakeDamage( const CTakeDamageInfo &info )
 				vecDir -= vecInflictorCentroid;
 				VectorNormalize( vecDir );
 
-				float flForce = info.GetDamage() * ((32 * 32 * 72.0) / (WorldAlignSize().x * WorldAlignSize().y * WorldAlignSize().z)) * 5;
+				float flForce = info.GetDamage() * ((32 * 32 * 72.0f) / (WorldAlignSize().x * WorldAlignSize().y * WorldAlignSize().z)) * 5;
 				
-				if (flForce > 1000.0) 
-					flForce = 1000.0;
+				if (flForce > 1000.0f)
+					flForce = 1000.0f;
 				ApplyAbsVelocityImpulse( vecDir * flForce );
 			}
 		}
@@ -2280,7 +2283,6 @@ static void CheckPushedEntity( CBaseEntity *pEntity, pushblock_t &params )
 	pPhysics->GetShadowPosition( &origin, &angles );
 	float fraction = -1.0f;
 
-	matrix3x4_t parentDelta;
 	if ( pEntity == params.pRootParent )
 	{
 		if ( pEntity->GetLocalAngularVelocity() == vec3_angle )
@@ -3130,7 +3132,7 @@ CBaseEntity * CBaseEntity::CreateNoSpawn( const char *szName, const Vector &vecO
 	CBaseEntity *pEntity = CreateEntityByName( szName );
 	if ( !pEntity )
 	{
-		Assert( !"CreateNoSpawn: only works for CBaseEntities" );
+		AssertMsg( false, "CreateNoSpawn: only works for CBaseEntities" );
 		return NULL;
 	}
 
@@ -3370,9 +3372,9 @@ void CBaseEntity::FunctionCheck( void *pFunction, const char *name )
 	// Note, if you crash here and your class is using multiple inheritance, it is
 	// probably the case that CBaseEntity (or a descendant) is not the first
 	// class in your list of ancestors, which it must be.
-	if (pFunction && !UTIL_FunctionToName( GetDataDescMap(), (inputfunc_t *)pFunction ) )
+	if (pFunction && !UTIL_FunctionToName( GetDataDescMap(), static_cast<inputfunc_t *>(pFunction) ) )
 	{
-		Warning( "FUNCTION NOT IN TABLE!: %s:%s (%08lx)\n", STRING(m_iClassname), name, (unsigned long)pFunction );
+		Warning( "FUNCTION NOT IN TABLE!: %s:%s (%p)\n", STRING(m_iClassname), name, pFunction );
 		Assert(0);
 	}
 #endif
@@ -3716,9 +3718,6 @@ void CBaseEntity::ComputeWorldSpaceSurroundingBox( Vector *pMins, Vector *pMaxs 
 //------------------------------------------------------------------------------
 const char *CBaseEntity::GetDebugName(void)
 {
-	if ( this == NULL )
-		return "<<null>>";
-
 	if ( m_iName != NULL_STRING ) 
 	{
 		return STRING(m_iName);
@@ -3749,7 +3748,7 @@ void CBaseEntity::DrawInputOverlay(const char *szInputName, CBaseEntity *pCaller
 	{
 		Q_snprintf( bigstring,sizeof(bigstring), "%3.1f  (%s) <-- (%s)\n", gpGlobals->curtime, szInputName, pCaller ? pCaller->GetDebugName() : NULL);
 	}
-	AddTimedOverlay(bigstring, 10.0);
+	AddTimedOverlay(bigstring, 10);
 
 	if ( Value.FieldType() == FIELD_INTEGER )
 	{
@@ -3780,7 +3779,7 @@ void CBaseEntity::DrawOutputOverlay(CEventAction *ev)
 	{
 		Q_snprintf( bigstring,sizeof(bigstring), "%3.1f  (%s) --> (%s)\n", gpGlobals->curtime,  STRING(ev->m_iTargetInput), STRING(ev->m_iTarget));
 	}
-	AddTimedOverlay(bigstring, 10.0);
+	AddTimedOverlay(bigstring, 10);
 
 	// Now print to the console
 	if ( ev->m_flDelay )
@@ -3804,7 +3803,7 @@ void CBaseEntity::OnEntityEvent( EntityEvent_t event, void *pEventData )
 	{
 	case ENTITY_EVENT_WATER_TOUCH:
 		{
-			int nContents = (int)pEventData;
+			intp nContents = (intp)pEventData;
 			if ( !nContents || (nContents & CONTENTS_WATER) )
 			{
 				++m_nWaterTouch;
@@ -3818,7 +3817,7 @@ void CBaseEntity::OnEntityEvent( EntityEvent_t event, void *pEventData )
 
 	case ENTITY_EVENT_WATER_UNTOUCH:
 		{
-			int nContents = (int)pEventData;
+			intp nContents = (intp)pEventData;
 			if ( !nContents || (nContents & CONTENTS_WATER) )
 			{
 				--m_nWaterTouch;
@@ -4513,12 +4512,12 @@ void CBaseEntity::Teleport( const Vector *newPosition, const QAngle *newAngles, 
 {
 	if ( g_TeleportStack.Find( this ) >= 0 )
 		return;
-	int index = g_TeleportStack.AddToTail( this );
+	intp index = g_TeleportStack.AddToTail( this );
 
 	CUtlVector<TeleportListEntry_t> teleportList;
 	BuildTeleportList_r( this, teleportList );
 
-	int i;
+	intp i;
 	for ( i = 0; i < teleportList.Count(); i++)
 	{
 		TeleportEntity( this, teleportList[i], newPosition, newAngles, newVelocity );
@@ -5426,7 +5425,7 @@ public:
 				continue;
 
 			CUtlString sym = STRING( pos->GetEntityName() );
-			int idx = symbols.Find( sym );
+			auto idx = symbols.Find( sym );
 			if ( idx == symbols.InvalidIndex() )
 			{
 				symbols.Insert( sym );
@@ -5438,7 +5437,7 @@ public:
 		}
 
 		// Now fill in the results
-		for ( int i = symbols.FirstInorder(); i != symbols.InvalidIndex(); i = symbols.NextInorder( i ) )
+		for ( auto i = symbols.FirstInorder(); i != symbols.InvalidIndex(); i = symbols.NextInorder( i ) )
 		{
 			const char *name = symbols[ i ].String();
 
@@ -5464,11 +5463,11 @@ private:
 			substring = (char *)partial + strlen( cmdname ) + 1;
 		}
 
-		int checklen = 0;
+		intp checklen = 0;
 		char *space = Q_strstr( substring, " " );
 		if ( !space )
 		{
-			Assert( !"CC_EntFireAutoCompleteInputFunc is broken\n" );
+			AssertMsg( false, "CC_EntFireAutoCompleteInputFunc is broken\n" );
 			return 0;
 		}
 
@@ -5533,7 +5532,7 @@ private:
 		}
 
 		// Now fill in the results
-		for ( int i = symbols.FirstInorder(); i != symbols.InvalidIndex(); i = symbols.NextInorder( i ) )
+		for ( auto i = symbols.FirstInorder(); i != symbols.InvalidIndex(); i = symbols.NextInorder( i ) )
 		{
 			const char *name = symbols[ i ].String();
 
@@ -6770,7 +6769,7 @@ void CBaseEntity::ComputeStepSimulationNetwork( StepSimulationData *step )
 {
 	if ( !step )
 	{
-		Assert( !"ComputeStepSimulationNetworkOriginAndAngles with NULL step\n" );
+		AssertMsg( false, "ComputeStepSimulationNetworkOriginAndAngles with NULL step\n" );
 		return;
 	}
 
@@ -7190,7 +7189,7 @@ void CBaseEntity::SUB_PerformFadeOut( void )
 		dt = 0.1f;
 	}
 	m_nRenderMode = kRenderTransTexture;
-	int speed = MAX(1,256*dt); // fade out over 1 second
+	float speed = MAX(1.0f,256*dt); // fade out over 1 second
 	SetRenderColorA( UTIL_Approach( 0, m_clrRender->a, speed ) );
 }
 

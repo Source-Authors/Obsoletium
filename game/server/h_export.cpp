@@ -25,7 +25,7 @@
 HMODULE win32DLLHandle;
 
 // Required DLL entry point
-BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
+BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID )
 {
 	// ensure data sizes are stable
 	static_assert( sizeof(inputfunc_t) == sizeof(void*) );
@@ -36,6 +36,7 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
     }
 	else if ( fdwReason == DLL_PROCESS_DETACH )
     {
+		win32DLLHandle = nullptr;
     }
 	return TRUE;
 }

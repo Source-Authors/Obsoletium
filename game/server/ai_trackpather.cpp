@@ -23,10 +23,17 @@ BEGIN_DATADESC( CAI_TrackPather )
 	DEFINE_FIELD( m_vecDesiredPosition,		FIELD_POSITION_VECTOR ),
 	DEFINE_FIELD( m_vecGoalOrientation,		FIELD_VECTOR ),
 
+#ifndef PLATFORM_64BITS
 	DEFINE_FIELD( m_pCurrentPathTarget,		FIELD_CLASSPTR ),
 	DEFINE_FIELD( m_pDestPathTarget,		FIELD_CLASSPTR ),
 	DEFINE_FIELD( m_pLastPathTarget,		FIELD_CLASSPTR ),
 	DEFINE_FIELD( m_pTargetNearestPath,		FIELD_CLASSPTR ),
+#else
+	DEFINE_FIELD( m_pCurrentPathTarget,		FIELD_EHANDLE ),
+	DEFINE_FIELD( m_pDestPathTarget,		FIELD_EHANDLE ),
+	DEFINE_FIELD( m_pLastPathTarget,		FIELD_EHANDLE ),
+	DEFINE_FIELD( m_pTargetNearestPath,		FIELD_EHANDLE ),
+#endif
 	
 	DEFINE_FIELD( m_strCurrentPathName,		FIELD_STRING ),
 	DEFINE_FIELD( m_strDestPathName,		FIELD_STRING ),
@@ -275,7 +282,7 @@ CPathTrack *CAI_TrackPather::BestPointOnPath( CPathTrack *pPath, const Vector &t
 
 	// Find the nearest node to the target (going forward)
 	CPathTrack *pNearestPath	= NULL;
-	float		flNearestDist	= bFarthestPoint ? 0 : 999999999;
+	float		flNearestDist	= bFarthestPoint ? 0 : std::numeric_limits<float>::max();
 	float		flPathDist;
 
 	float flFarthestDistSqr = ( m_flFarthestPathDist - 2.0f * m_flTargetDistanceThreshold );

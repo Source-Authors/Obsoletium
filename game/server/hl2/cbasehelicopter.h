@@ -58,6 +58,8 @@ struct washentity_t
 {
 	DECLARE_DATADESC();
 
+	virtual ~washentity_t() {}
+
 	EHANDLE		hEntity;
 	float		flWashStartTime;
 };

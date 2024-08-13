@@ -35,32 +35,32 @@ ConVar	pistol_use_new_accuracy( "pistol_use_new_accuracy", "1" );
 
 class CWeaponPistol : public CBaseHLCombatWeapon
 {
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 
 public:
 	DECLARE_CLASS( CWeaponPistol, CBaseHLCombatWeapon );
 
 	CWeaponPistol(void);
 
-	DECLARE_SERVERCLASS();
+	DECLARE_SERVERCLASS_OVERRIDE();
 
-	void	Precache( void );
-	void	ItemPostFrame( void );
-	void	ItemPreFrame( void );
-	void	ItemBusyFrame( void );
-	void	PrimaryAttack( void );
-	void	AddViewKick( void );
+	void	Precache( void ) override;
+	void	ItemPostFrame( void ) override;
+	void	ItemPreFrame( void ) override;
+	void	ItemBusyFrame( void ) override;
+	void	PrimaryAttack( void ) override;
+	void	AddViewKick( void ) override;
 	void	DryFire( void );
-	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator ) override;
 
 	void	UpdatePenaltyTime( void );
 
-	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
-	Activity	GetPrimaryAttackActivity( void );
+	int		CapabilitiesGet( void ) override { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+	Activity	GetPrimaryAttackActivity( void ) override;
 
-	virtual bool Reload( void );
+	bool Reload( void ) override;
 
-	virtual const Vector& GetBulletSpread( void )
+	const Vector& GetBulletSpread( void ) override
 	{		
 		// Handle NPCs first
 		static Vector npcCone = VECTOR_CONE_5DEGREES;
@@ -89,17 +89,17 @@ public:
 		return cone;
 	}
 	
-	virtual int	GetMinBurst() 
+	int	GetMinBurst() override
 	{ 
 		return 1; 
 	}
 
-	virtual int	GetMaxBurst() 
+	int GetMaxBurst() override
 	{ 
 		return 3; 
 	}
 
-	virtual float GetFireRate( void ) 
+	float GetFireRate( void ) override
 	{
 		return 0.5f; 
 	}
@@ -193,7 +193,7 @@ void CWeaponPistol::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCh
 
 			vecShootDir = npc->GetActualShootTrajectory( vecShootOrigin );
 
-			CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_PISTOL, 0.2, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
+			CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_PISTOL, 0.2f, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
 
 			WeaponSound( SINGLE_NPC );
 			pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED, MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2 );
@@ -235,7 +235,7 @@ void CWeaponPistol::PrimaryAttack( void )
 
 	m_flLastAttackTime = gpGlobals->curtime;
 	m_flSoonestPrimaryAttack = gpGlobals->curtime + PISTOL_FASTEST_REFIRE_TIME;
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_PISTOL, 0.2, GetOwner() );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_PISTOL, 0.2f, GetOwner() );
 
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 

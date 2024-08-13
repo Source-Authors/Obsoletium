@@ -297,7 +297,7 @@ void CBaseToggle::AngularMove( const QAngle &vecDestAngle, float flSpeed )
 	SetMoveDoneTime( flTravelTime );
 
 	// scale the destdelta vector by the time spent traveling to get velocity
-	SetLocalAngularVelocity( vecDestDelta * (1.0 / flTravelTime) );
+	SetLocalAngularVelocity( vecDestDelta * (1.0f / flTravelTime) );
 }
 
 

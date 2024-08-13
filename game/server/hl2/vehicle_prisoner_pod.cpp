@@ -322,7 +322,7 @@ Vector CPropVehiclePrisonerPod::BodyTarget( const Vector &posSrc, bool bNoisy )
 //-----------------------------------------------------------------------------
 void CPropVehiclePrisonerPod::Think(void)
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if ( GetDriver() )
 	{

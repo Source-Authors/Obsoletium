@@ -384,7 +384,7 @@ public:
     void *operator new( size_t stAllocateBlock );
     void *operator new( size_t stAllocateBlock, int nBlockUse, const char *pFileName, int nLine );
 	void operator delete( void *pMem );
-	void operator delete( void *pMem, int nBlockUse, const char *pFileName, int nLine ) { operator delete(pMem); }
+	void operator delete( void *pMem, int, const char *, int ) { operator delete(pMem); }
 
 	// Class factory
 	static CBaseEntity				*CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist = false );
@@ -881,8 +881,8 @@ public:
 // Classify - returns the type of group (i.e, "houndeye", or "human military" so that NPCs with different classnames
 // still realize that they are teammates. (overridden for NPCs that form groups)
 	virtual Class_T Classify ( void );
-	virtual void	DeathNotice ( CBaseEntity *pVictim ) {}// NPC maker children use this to tell the NPC maker that they have died.
-	virtual bool	ShouldAttractAutoAim( CBaseEntity *pAimingEnt ) { return ((GetFlags() & FL_AIMTARGET) != 0); }
+	virtual void	DeathNotice ( CBaseEntity * ) {}// NPC maker children use this to tell the NPC maker that they have died.
+	virtual bool	ShouldAttractAutoAim( CBaseEntity * ) { return ((GetFlags() & FL_AIMTARGET) != 0); }
 	virtual float	GetAutoAimRadius();
 	virtual Vector	GetAutoAimCenter() { return WorldSpaceCenter(); }
 
@@ -898,14 +898,14 @@ protected:
 
 public:
 
-	virtual bool	CanBeHitByMeleeAttack( CBaseEntity *pAttacker ) { return true; }
+	virtual bool	CanBeHitByMeleeAttack( CBaseEntity * ) { return true; }
 
 	// returns the amount of damage inflicted
 	virtual int		OnTakeDamage( const CTakeDamageInfo &info );
 
 	// This is what you should call to apply damage to an entity.
 	int TakeDamage( const CTakeDamageInfo &info );
-	virtual void AdjustDamageDirection( const CTakeDamageInfo &info, Vector &dir, CBaseEntity *pEnt ) {}
+	virtual void AdjustDamageDirection( const CTakeDamageInfo &, Vector &, CBaseEntity * ) {}
 
 	virtual int		TakeHealth( float flHealth, int bitsDamageType );
 
@@ -916,13 +916,13 @@ public:
 	void SendOnKilledGameEvent( const CTakeDamageInfo &info );
 
 	// Notifier that I've killed some other entity. (called from Victim's Event_Killed).
-	virtual void	Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info ) { return; }
+	virtual void	Event_KilledOther( CBaseEntity *, const CTakeDamageInfo & ) { return; }
 
 	// UNDONE: Make this data?
 	virtual int				BloodColor( void );
 
 	void					TraceBleed( float flDamage, const Vector &vecDir, trace_t *ptr, int bitsDamageType );
-	virtual bool			IsTriggered( CBaseEntity *pActivator ) {return true;}
+	virtual bool			IsTriggered( CBaseEntity * ) {return true;}
 	virtual bool			IsNPC( void ) const { return false; }
 	CAI_BaseNPC				*MyNPCPointer( void ); 
 	virtual CBaseCombatCharacter *MyCombatCharacterPointer( void ) { return NULL; }
@@ -938,7 +938,7 @@ public:
 	void			AddPointsToTeam( int score, bool bAllowNegativeScore );
 	void			RemoveAllDecals( void );
 
-	virtual bool	OnControls( CBaseEntity *pControls ) { return false; }
+	virtual bool	OnControls( CBaseEntity * ) { return false; }
 	virtual bool	HasTarget( string_t targetname );
 	virtual	bool	IsPlayer( void ) const { return false; }
 	virtual bool	IsNetClient( void ) const { return false; }
@@ -997,7 +997,7 @@ public:
 	virtual void			StartTouch( CBaseEntity *pOther );
 	virtual void			Touch( CBaseEntity *pOther ); 
 	virtual void			EndTouch( CBaseEntity *pOther );
-	virtual void			StartBlocked( CBaseEntity *pOther ) {}
+	virtual void			StartBlocked( CBaseEntity * ) {}
 	virtual void			Blocked( CBaseEntity *pOther );
 	virtual void			EndBlocked( void ) {}
 
@@ -1069,7 +1069,7 @@ public:
 		const Vector &vecSpread, float flDistance, int iAmmoType, int iTracerFreq = 4, 
 		int firingEntID = -1, int attachmentID = -1, int iDamage = 0, 
 		CBaseEntity *pAttacker = NULL, bool bFirstShotAccurate = false, bool bPrimaryAttack = true );
-	virtual void ModifyFireBulletsDamage( CTakeDamageInfo* dmgInfo ) {}
+	virtual void ModifyFireBulletsDamage( CTakeDamageInfo* ) {}
 
 	virtual CBaseEntity *Respawn( void ) { return NULL; }
 
@@ -1099,21 +1099,21 @@ public:
 #endif
 
 	void FunctionCheck( void *pFunction, const char *name );
-	ENTITYFUNCPTR TouchSet( ENTITYFUNCPTR func, char *name ) 
+	ENTITYFUNCPTR TouchSet( ENTITYFUNCPTR func, const char *name ) 
 	{ 
 		COMPILE_TIME_ASSERT( sizeof(func) == ENTITYFUNCPTR_SIZE );
 		m_pfnTouch = func; 
 		FunctionCheck( *(reinterpret_cast<void **>(&m_pfnTouch)), name ); 
 		return func;
 	}
-	USEPTR	UseSet( USEPTR func, char *name ) 
+	USEPTR	UseSet( USEPTR func, const char *name ) 
 	{ 
 		COMPILE_TIME_ASSERT( sizeof(func) == ENTITYFUNCPTR_SIZE );
 		m_pfnUse = func; 
 		FunctionCheck( *(reinterpret_cast<void **>(&m_pfnUse)), name ); 
 		return func;
 	}
-	ENTITYFUNCPTR	BlockedSet( ENTITYFUNCPTR func, char *name ) 
+	ENTITYFUNCPTR	BlockedSet( ENTITYFUNCPTR func, const char *name ) 
 	{ 
 		COMPILE_TIME_ASSERT( sizeof(func) == ENTITYFUNCPTR_SIZE );
 		m_pfnBlocked = func; 
@@ -1173,7 +1173,7 @@ public:
 	// Damage accessors
 	virtual int		GetDamageType() const;
 	virtual float	GetDamage() { return 0; }
-	virtual void	SetDamage(float flDamage) {}
+	virtual void	SetDamage(float) {}
 
 	virtual Vector	EyePosition( void );			// position of eyes
 	virtual const QAngle &EyeAngles( void );		// Direction of eyes in world space
@@ -1229,7 +1229,7 @@ public:
 	virtual	bool FVisible ( CBaseEntity *pEntity, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL );
 	virtual bool FVisible( const Vector &vecTarget, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL );
 
-	virtual bool CanBeSeenBy( CAI_BaseNPC *pNPC ) { return true; } // allows entities to be 'invisible' to NPC senses.
+	virtual bool CanBeSeenBy( CAI_BaseNPC * ) { return true; } // allows entities to be 'invisible' to NPC senses.
 
 	// This function returns a value that scales all damage done by this entity.
 	// Use CDamageModifier to hook in damage modifiers on a guy.
@@ -1253,7 +1253,7 @@ public:
 	int						GetWaterType() const;
 	void					SetWaterType( int nType );
 
-	virtual bool			PhysicsSplash( const Vector &centerPoint, const Vector &normal, float rawSpeed, float scaledSpeed ) { return false; }
+	virtual bool			PhysicsSplash( const Vector &, const Vector &, float, float ) { return false; }
 	virtual void			Splash() {}
 
 	void					ClearSolidFlags( void );	
@@ -1376,7 +1376,7 @@ public:
 	static bool IsSimulatingOnAlternateTicks();
 
 	virtual bool IsDeflectable() { return false; }
-	virtual void Deflected( CBaseEntity *pDeflectedBy, Vector &vecDir ) {}
+	virtual void Deflected( CBaseEntity *, Vector & ) {}
 
 //	void Relink() {}
 
@@ -1402,7 +1402,7 @@ public:
 	IPhysicsObject *VPhysicsInitShadow( bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t *pSolid = NULL );
 
 	// Force a non-solid (ie. solid_trigger) physics object to collide with other entities.
-	virtual bool	ForceVPhysicsCollide( CBaseEntity *pEntity ) { return false; }
+	virtual bool	ForceVPhysicsCollide( CBaseEntity * ) { return false; }
 
 private:
 	// called by all vphysics inits
@@ -1421,7 +1421,7 @@ public:
 	// react physically to damage (called from CBaseEntity::OnTakeDamage() by default)
 	virtual int		VPhysicsTakeDamage( const CTakeDamageInfo &info );
 	virtual void	VPhysicsShadowCollision( int index, gamevcollisionevent_t *pEvent );
-	virtual void	VPhysicsShadowUpdate( IPhysicsObject *pPhysics ) {}
+	virtual void	VPhysicsShadowUpdate( IPhysicsObject * ) {}
 	virtual void	VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );
 	virtual void	VPhysicsFriction( IPhysicsObject *pObject, float energy, int surfaceProps, int surfacePropsHit );
 	
@@ -1454,7 +1454,7 @@ public:
 	bool					IsEdictFree() const { return edict()->IsFree(); }
 
 	// Callbacks for the physgun/cannon picking up an entity
-	virtual	CBasePlayer		*HasPhysicsAttacker( float dt ) { return NULL; }
+	virtual	CBasePlayer		*HasPhysicsAttacker( float ) { return NULL; }
 
 	// UNDONE: Make this data?
 	virtual unsigned int	PhysicsSolidMaskForEntity( void ) const;
@@ -1803,7 +1803,7 @@ public:
 
 	virtual bool ShouldBlockNav() const { return true; }
 
-	virtual bool ShouldForceTransmitsForTeam( int iTeam ) { return false; }
+	virtual bool ShouldForceTransmitsForTeam( int ) { return false; }
 
 	void 			SetTruceValidForEnt( bool bTruceValidForEnt ) { m_bTruceValidForEnt = bTruceValidForEnt; }
 	virtual bool	IsTruceValidForEnt( void ) const { return m_bTruceValidForEnt; }
@@ -2630,7 +2630,7 @@ inline void CBaseEntity::FireBullets( int cShots, const Vector &vecSrc,
 	do \
 	{ \
 		m_pfnMoveDone = static_cast <void (CBaseEntity::*)(void)> (a); \
-		FunctionCheck( (void *)*((int *)((char *)this + ( offsetof(CBaseEntity,m_pfnMoveDone)))), "BaseMoveFunc" ); \
+		FunctionCheck( (void *)*((intp *)((char *)this + ( offsetof(CBaseEntity,m_pfnMoveDone)))), "BaseMoveFunc" ); \
 	} while ( 0 )
 #else
 #define SetMoveDone( a ) \

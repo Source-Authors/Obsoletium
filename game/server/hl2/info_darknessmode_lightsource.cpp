@@ -95,7 +95,7 @@ public:
 		Vector vecRadius( m_flLightRadius, m_flLightRadius, m_flLightRadius );
 		NDebugOverlay::Box( GetAbsOrigin(), -vecRadius, vecRadius, 255,255,255, 8, 0.1 );
 		NDebugOverlay::Box( GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255,0,0, 8, 0.1 );
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		SetNextThink( gpGlobals->curtime + 0.1f );
 
 		int textoffset = 0;
 		EntityText( textoffset, UTIL_VarArgs("Org: %.2f %.2f %.2f", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z ), 0.1 );

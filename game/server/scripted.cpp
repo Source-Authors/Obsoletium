@@ -1758,7 +1758,7 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 	
 	pTarget->ForceDecisionThink();
 
-	Assert( m_nForceState >= 0 && m_nForceState < ARRAYSIZE(forcedStatesMap) );
+	Assert( m_nForceState >= 0 && m_nForceState < static_cast<int>(ARRAYSIZE(forcedStatesMap)) );
 	
 	NPC_STATE forcedState = forcedStatesMap[m_nForceState];
 
@@ -2083,7 +2083,7 @@ void CAI_ScriptedSentence::FindThink( void )
 		if ( m_spawnflags & SF_SENTENCE_ONCE )
 			UTIL_Remove( this );
 		
-		float delay = m_flDelay + length + 0.1;
+		float delay = m_flDelay + length + 0.1f;
 		if ( delay < 0 )
 			delay = 0;
 
@@ -2098,7 +2098,7 @@ void CAI_ScriptedSentence::FindThink( void )
 	else
 	{
 		//Msg( "%s: can't find NPC %s\n", STRING(m_iszSentence), STRING(m_iszEntity) );
-		SetNextThink( gpGlobals->curtime + m_flRepeat + 0.5 );
+		SetNextThink( gpGlobals->curtime + m_flRepeat + 0.5f );
 	}
 }
 

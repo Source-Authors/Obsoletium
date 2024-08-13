@@ -80,7 +80,7 @@ void CNPCEventResponseSystem::FrameUpdatePreEntityThink()
 	m_flNextEventPoll = gpGlobals->curtime + 0.2f;
 
 	// Move through all events, removing expired ones and finding NPCs for active ones.
-	for ( int i = m_ActiveEvents.First(); i != m_ActiveEvents.InvalidIndex(); )
+	for ( auto i = m_ActiveEvents.First(); i != m_ActiveEvents.InvalidIndex(); )
 	{	
  		float flTime = m_ActiveEvents[i].flEventTime;
 		const char *pResponse = m_ActiveEvents.GetElementName(i);

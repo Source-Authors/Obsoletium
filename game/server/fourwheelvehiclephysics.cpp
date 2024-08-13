@@ -784,7 +784,7 @@ bool CFourWheelVehiclePhysics::Think()
 	}
 
 	// Make the steering wheel match the input, with a little dampening.
-	#define STEER_DAMPING	0.8
+	#define STEER_DAMPING	0.8f
 	float flSteer = GetPoseParameter( m_poseParameters[VEH_STEER] );
 	float flPhysicsSteer = carState.steeringAngle / vehicleData.steering.degreesSlow;
 	SetPoseParameter( m_poseParameters[VEH_STEER], (STEER_DAMPING * flSteer) + ((1 - STEER_DAMPING) * flPhysicsSteer) );
@@ -1190,7 +1190,7 @@ void CFourWheelVehiclePhysics::UpdateDriverControls( CUserCmd *cmd, float flFram
 			m_controls.throttle = 0;
 		}
 
-		float flMaxThrottle = MAX( 0.1, m_maxThrottle );
+		float flMaxThrottle = MAX( 0.1f, m_maxThrottle );
 		if ( m_controls.steering != 0 )
 		{
 			float flThrottleReduce = 0;
@@ -1240,7 +1240,7 @@ void CFourWheelVehiclePhysics::UpdateDriverControls( CUserCmd *cmd, float flFram
 			m_controls.throttle = 0;
 		}
 
-		float flMaxThrottle = MIN( -0.1, m_flMaxRevThrottle  );
+		float flMaxThrottle = MIN( -0.1f, m_flMaxRevThrottle  );
 		m_controls.throttle = Approach( flMaxThrottle * flAnalogBrake, m_controls.throttle, flFrameTime * m_throttleRate );
 
 		// Apply the brake.
@@ -1265,7 +1265,7 @@ void CFourWheelVehiclePhysics::UpdateDriverControls( CUserCmd *cmd, float flFram
 			m_controls.throttle = 0;
 		}
 
-		float flMaxThrottle = MAX( 0.1, m_maxThrottle );
+		float flMaxThrottle = MAX( 0.1f, m_maxThrottle );
 
 		if ( m_controls.steering != 0 )
 		{
@@ -1312,7 +1312,7 @@ void CFourWheelVehiclePhysics::UpdateDriverControls( CUserCmd *cmd, float flFram
 			m_controls.throttle = 0;
 		}
 
-		float flMaxThrottle = MIN( -0.1, m_flMaxRevThrottle );
+		float flMaxThrottle = MIN( -0.1f, m_flMaxRevThrottle );
 		m_controls.throttle = Approach( flMaxThrottle, m_controls.throttle, flFrameTime * m_throttleRate );
 
 		// Apply the brake.

@@ -650,7 +650,7 @@ void CBaseServerVehicle::ParseExitAnim( KeyValues *pkvExitList, bool bEscapeExit
 	while ( pkvExitAnim )
 	{
 		// Add 'em to our list
-		int iIndex = m_ExitAnimations.AddToTail();
+		intp iIndex = m_ExitAnimations.AddToTail();
 		Q_strncpy( m_ExitAnimations[iIndex].szAnimName, pkvExitAnim->GetName(), sizeof(m_ExitAnimations[iIndex].szAnimName) );
 		m_ExitAnimations[iIndex].bEscapeExit = bEscapeExit;
 		if ( !Q_strncmp( pkvExitAnim->GetString(), "upsidedown", 10 ) )
@@ -708,14 +708,14 @@ void CBaseServerVehicle::ParseNPCPassengerSeat( KeyValues *pSetKeyValues, CPasse
 
 		if ( Q_stricmp( lpszName, "entry" ) == 0 )
 		{
-			int nIndex = pSeat->m_EntryTransitions.AddToTail();
+			intp nIndex = pSeat->m_EntryTransitions.AddToTail();
 			Assert( pSeat->m_EntryTransitions.IsValidIndex( nIndex ) );
 
 			ParseNPCSeatTransition( pKey, &pSeat->m_EntryTransitions[nIndex] );
 		}
 		else if ( Q_stricmp( lpszName, "exit" ) == 0 )
 		{
-			int nIndex = pSeat->m_ExitTransitions.AddToTail();
+			intp nIndex = pSeat->m_ExitTransitions.AddToTail();
 			Assert( pSeat->m_ExitTransitions.IsValidIndex( nIndex ) );
 
 			ParseNPCSeatTransition( pKey, &pSeat->m_ExitTransitions[nIndex] );
@@ -755,7 +755,7 @@ CPassengerRole *CBaseServerVehicle::FindOrCreatePassengerRole( string_t strName,
 	}
 
 	// Create a new container
-	int nNewIndex = m_PassengerRoles.AddToTail();
+	intp nNewIndex = m_PassengerRoles.AddToTail();
 	Assert( m_PassengerRoles.IsValidIndex( nNewIndex ) );
 	
 	m_PassengerRoles[nNewIndex].m_strName = strName;
@@ -806,14 +806,14 @@ void CBaseServerVehicle::ParseNPCRoles( KeyValues *pkvPassengerList )
 			continue;
 
 		// Add a new role
-		int nSeatIndex = pRole->m_PassengerSeats.AddToTail();
+		intp nSeatIndex = pRole->m_PassengerSeats.AddToTail();
 		Assert( pRole->m_PassengerSeats.IsValidIndex( nSeatIndex ) );
 
 		// Parse the information
 		ParseNPCPassengerSeat( pkvPassengerKey, &pRole->m_PassengerSeats[nSeatIndex] );
 	
 		// Add a matching entry into our passenger manifest
-		int nPassengerIndex = m_PassengerInfo.AddToTail();
+		intp nPassengerIndex = m_PassengerInfo.AddToTail();
 		m_PassengerInfo[nPassengerIndex].m_hPassenger = NULL;
 		m_PassengerInfo[nPassengerIndex].m_nSeat = nSeatIndex;
 		m_PassengerInfo[nPassengerIndex].m_nRole = nRoleIndex;
@@ -987,7 +987,7 @@ void CBaseServerVehicle::ParseEntryExitAnims( void )
 			while ( pkvEntryAnim )
 			{
 				// Add 'em to our list
-				int iIndex = m_EntryAnimations.AddToTail();
+				intp iIndex = m_EntryAnimations.AddToTail();
 				Q_strncpy( m_EntryAnimations[iIndex].szAnimName, pkvEntryAnim->GetName(), sizeof(m_EntryAnimations[iIndex].szAnimName) );
 				m_EntryAnimations[iIndex].iHitboxGroup = pkvEntryAnim->GetInt();
 
@@ -1744,7 +1744,7 @@ static int SoundStateIndexFromName( const char *pName )
 {
 	for ( int i = 0; i < SS_NUM_STATES; i++ )
 	{
-		Assert( i < ARRAYSIZE(pSoundStateNames) );
+		Assert( i < static_cast<int>(ARRAYSIZE(pSoundStateNames)) );
 		if ( !strcmpi( pSoundStateNames[i], pName ) )
 			return i;
 	}
@@ -2624,7 +2624,7 @@ void CVehicleSoundsParser::ParseKeyValue( void *pData, const char *pKey, const c
 	if ( !strcmpi( pKey, "gear" ) )
 	{
 		// Create, initialize, and add a new gear to our list
-		int iNewGear = pSounds->pGears.AddToTail();
+		intp iNewGear = pSounds->pGears.AddToTail();
 		pSounds->pGears[iNewGear].flMaxSpeed = 0;
 		pSounds->pGears[iNewGear].flSpeedApproachFactor = 1.0;
 

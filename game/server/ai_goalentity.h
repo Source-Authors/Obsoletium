@@ -71,8 +71,8 @@ protected:
 	virtual void 	OnEntityCreated( CBaseEntity *pEntity );
 	virtual void 	OnEntityDeleted( CBaseEntity *pEntity );
 
-	virtual void	EnableGoal( CAI_BaseNPC *pAI )	{}
-	virtual void	DisableGoal( CAI_BaseNPC *pAI  ) {}
+	virtual void	EnableGoal( CAI_BaseNPC * )	{}
+	virtual void	DisableGoal( CAI_BaseNPC * ) {}
 	
 	void UpdateActors();
 

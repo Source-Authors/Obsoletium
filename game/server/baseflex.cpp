@@ -899,7 +899,7 @@ void CBaseFlex::ProcessSceneEvents( void )
 	// slowly decay to netural expression
 	for ( LocalFlexController_t i = LocalFlexController_t(0); i < GetNumFlexControllers(); i++)
 	{
-		SetFlexWeight( i, GetFlexWeight( i ) * 0.95 );
+		SetFlexWeight( i, GetFlexWeight( i ) * 0.95f );
 	}
 
 	bool bHasForegroundEvents = false;
@@ -1658,7 +1658,7 @@ void CBaseFlex::AddFlexAnimation( CSceneEventInfo *info )
 
 				if ( CAI_BaseActor::IsServerSideFlexController( name ) )
 				{
-					Assert( !"Should stereo controllers ever be server side only?" );
+					AssertMsg( false, "Should stereo controllers ever be server side only?" );
 					track->SetServerSide( true );
 				}
 
@@ -1669,7 +1669,7 @@ void CBaseFlex::AddFlexAnimation( CSceneEventInfo *info )
 
 				if ( CAI_BaseActor::IsServerSideFlexController( name ) )
 				{
-					Assert( !"Should stereo controllers ever be server side only?" );
+					AssertMsg( false, "Should stereo controllers ever be server side only?" );
 					track->SetServerSide( true );
 				}
 			}
@@ -2024,7 +2024,7 @@ bool CBaseFlex::EnterSceneSequence( CChoreoScene *scene, CChoreoEvent *event, bo
 	}
 
 	// 2 seconds past current event, or 0.2 seconds past end of scene, whichever is shorter
-	float flDuration = MIN( 2.0, MIN( event->GetEndTime() - scene->GetTime() + 2.0, scene->FindStopTime() - scene->GetTime() + 0.2 ) );
+	float flDuration = MIN( 2.0f, MIN( event->GetEndTime() - scene->GetTime() + 2.0f, scene->FindStopTime() - scene->GetTime() + 0.2f ) );
 
 	if (myNpc->IsCurSchedule( SCHED_SCENE_GENERIC ))
 	{

@@ -96,8 +96,8 @@ extern ConVar sk_dmg_sniper_penetrate_npc;
 #undef SNIPER_DEBUG
 
 // Target protection
-#define SNIPER_PROTECTION_MINDIST		(1024.0*1024.0)	// Distance around protect target that sniper does priority modification in
-#define SNIPER_PROTECTION_PRIORITYCAP	100.0			// Max addition to priority of an enemy right next to the protect target, falls to 0 at SNIPER_PROTECTION_MINDIST.
+#define SNIPER_PROTECTION_MINDIST		(1024.0f*1024.0f)	// Distance around protect target that sniper does priority modification in
+#define SNIPER_PROTECTION_PRIORITYCAP	100.0f			// Max addition to priority of an enemy right next to the protect target, falls to 0 at SNIPER_PROTECTION_MINDIST.
 
 //---------------------------------------------------------
 // Like an infotarget, but shares a spawnflag that has
@@ -934,10 +934,6 @@ void CProtoSniper::Spawn( void )
 	/// HACK:
 	SetModel( "models/combine_soldier.mdl" );
 
-	//m_hBullet = (CSniperBullet *)Create( "sniperbullet", GetBulletOrigin(), GetLocalAngles(), NULL );
-
-	//Assert( m_hBullet != NULL );
-
 	SetHullType( HULL_HUMAN );
 	SetHullSizeNormal();
 
@@ -1157,7 +1153,7 @@ int CProtoSniper::IRelationPriority( CBaseEntity *pTarget )
 		float flDistance = (pTarget->GetAbsOrigin() - m_hProtectTarget->GetAbsOrigin()).LengthSqr();
 		if ( flDistance <= SNIPER_PROTECTION_MINDIST )
  		{
- 			float flBonus = (1.0 - (flDistance / SNIPER_PROTECTION_MINDIST)) * SNIPER_PROTECTION_PRIORITYCAP;
+ 			float flBonus = (1.0f - (flDistance / SNIPER_PROTECTION_MINDIST)) * SNIPER_PROTECTION_PRIORITYCAP;
 			priority += flBonus;
 
 			if ( m_debugOverlays & OVERLAY_NPC_SELECTED_BIT )
@@ -1573,7 +1569,8 @@ bool CProtoSniper::FCanCheckAttacks ( void )
 //---------------------------------------------------------
 bool CProtoSniper::FindDecoyObject( void )
 {
-#define SEARCH_DEPTH	64
+// dimhotepus: Double sniper decoy search depth.
+#define SEARCH_DEPTH	128
 
 	CBaseEntity *pDecoys[ SNIPER_NUM_DECOYS ];
 	CBaseEntity *pList[ SEARCH_DEPTH ];

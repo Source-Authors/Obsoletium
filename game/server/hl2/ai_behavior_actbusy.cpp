@@ -136,7 +136,7 @@ void CActBusyAnimData::ParseAnimDataFile( void )
 		while ( pKVAnim )
 		{
 			// Create a new anim and add it to our list
-			int index = m_ActBusyAnims.AddToTail();
+			intp index = m_ActBusyAnims.AddToTail();
 			busyanim_t *pAnim = &m_ActBusyAnims[index];
 			if ( !ParseActBusyFromKV( pAnim, pKVAnim ) )
 			{
@@ -1106,7 +1106,7 @@ int	CAI_ActBusyBehavior::SelectScheduleForLeaving( void )
 						GetOuter()->SetOwnerEntity( NULL );
 					}
 					GetOuter()->SetThink( &CBaseEntity::SUB_Remove); //SUB_Remove) ; //GetOuter()->SUB_Remove );
-					GetOuter()->SetNextThink( gpGlobals->curtime + 0.1 );
+					GetOuter()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 					if ( m_hActBusyGoal )
 					{

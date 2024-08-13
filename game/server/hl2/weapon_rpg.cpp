@@ -324,7 +324,7 @@ void CMissile::ShotDown( void )
 	SetThink( &CMissile::AugerThink );
 	SetNextThink( gpGlobals->curtime );
 	m_flAugerTime = gpGlobals->curtime + 1.5f;
-	m_flMarkDeadTime = gpGlobals->curtime + 0.75;
+	m_flMarkDeadTime = gpGlobals->curtime + 0.75f;
 
 	// Let the RPG start reloading immediately
 	if ( m_hOwner != NULL )
@@ -585,7 +585,7 @@ void CMissile::SeekThink( void )
 
 	if ( rpg_missle_use_custom_detonators.GetBool() )
 	{
-		for ( int i = gm_CustomDetonators.Count() - 1; i >=0; --i )
+		for ( intp i = gm_CustomDetonators.Count() - 1; i >=0; --i )
 		{
 			CustomDetonator_t &detonator = gm_CustomDetonators[i];
 			if ( !detonator.hEntity )
@@ -630,7 +630,6 @@ void CMissile::SeekThink( void )
 	Vector	targetPos;
 
 	float flHomingSpeed; 
-	Vector vecLaserDotPosition;
 	ComputeActualDotPosition( pLaserDot, &targetPos, &flHomingSpeed );
 
 	if ( IsSimulatingOnAlternateTicks() )
@@ -733,7 +732,7 @@ CUtlVector<CMissile::CustomDetonator_t> CMissile::gm_CustomDetonators;
 
 void CMissile::AddCustomDetonator( CBaseEntity *pEntity, float radius, float height )
 {
-	int i = gm_CustomDetonators.AddToTail();
+	intp i = gm_CustomDetonators.AddToTail();
 	gm_CustomDetonators[i].hEntity = pEntity;
 	gm_CustomDetonators[i].radiusSq = Square( radius );
 	gm_CustomDetonators[i].halfHeight = height * 0.5f;
@@ -1592,9 +1591,6 @@ void CWeaponRPG::PrimaryAttack( void )
 	if ( GetActivity() == ACT_VM_RELOAD )
 		return;
 
-	Vector vecOrigin;
-	Vector vecForward;
-
 	m_flNextPrimaryAttack = gpGlobals->curtime + 0.5f;
 
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
@@ -1626,7 +1622,7 @@ void CWeaponRPG::PrimaryAttack( void )
 	DecrementAmmo( GetOwner() );
 
 	// Register a muzzleflash for the AI
-	pOwner->SetMuzzleFlashTime( gpGlobals->curtime + 0.5 );
+	pOwner->SetMuzzleFlashTime( gpGlobals->curtime + 0.5f );
 
 	SendWeaponAnim( ACT_VM_PRIMARYATTACK );
 	WeaponSound( SINGLE );

@@ -2302,7 +2302,7 @@ int CNPC_Combine::TranslateSchedule( int scheduleType )
 
 //=========================================================
 //=========================================================
-void CNPC_Combine::OnStartSchedule( int scheduleType ) 
+void CNPC_Combine::OnStartSchedule( int ) 
 {
 }
 
@@ -2312,8 +2312,6 @@ void CNPC_Combine::OnStartSchedule( int scheduleType )
 //=========================================================
 void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 {
-	Vector vecShootDir;
-	Vector vecShootOrigin;
 	bool handledEvent = false;
 
 	if (pEvent->type & AE_TYPE_NEWEVENTSYSTEM)
@@ -3109,8 +3107,6 @@ NPC_STATE CNPC_Combine::SelectIdealState( void )
 			return BaseClass::SelectIdealState();
 		}
 	}
-
-	return GetIdealState();
 }
 
 

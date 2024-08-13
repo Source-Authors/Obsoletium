@@ -725,7 +725,7 @@ static Vector gTankSpread[] =
 	Vector( 0.1, 0.1, 0.1 ),	// large cone
 	Vector( 0.25, 0.25, 0.25 ),	// extra-large cone
 };
-#define MAX_FIRING_SPREADS ARRAYSIZE(gTankSpread)
+#define MAX_FIRING_SPREADS static_cast<int>(ARRAYSIZE(gTankSpread))
 
 
 //-----------------------------------------------------------------------------
@@ -1728,7 +1728,6 @@ void CFuncTank::AimBarrelAtPlayerCrosshair( QAngle *pAngles )
 //-----------------------------------------------------------------------------
 void CFuncTank::CalcNPCEnemyTarget( Vector *pVecTarget )
 {
-	Vector vecTarget;
 	CAI_BaseNPC *pNPC = m_hController->MyNPCPointer();
 
 	// Aim the barrel at the npc's enemy, or where the npc is looking.
@@ -2687,7 +2686,7 @@ void CFuncTankLaser::Fire( int bulletCount, const Vector &barrelEnd, const Vecto
 			
 			m_laserTime = gpGlobals->curtime;
 			m_pLaser->TurnOn();
-			m_pLaser->SetFireTime( gpGlobals->curtime - 1.0 );
+			m_pLaser->SetFireTime( gpGlobals->curtime - 1.0f );
 			m_pLaser->FireAtPoint( tr );
 			m_pLaser->SetNextThink( TICK_NEVER_THINK );
 		}
@@ -3535,12 +3534,12 @@ void UTIL_VisualizeCurve( int type, int steps, float bias )
 //---------------------------------------------------------
 void CMortarShell::FlyThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	SetNextThink( gpGlobals->curtime + 0.05f );
 
 	if ( gpGlobals->curtime > m_flNPCWarnTime )
 	{
 		// Warn the AI. Make this radius a little larger than the explosion will be, and make the sound last a little longer.
-		CSoundEnt::InsertSound ( SOUND_DANGER | SOUND_CONTEXT_MORTAR, GetAbsOrigin(), MORTAR_BLAST_RADIUS * 1.25, (m_flImpactTime - m_flNPCWarnTime) + 0.15 );
+		CSoundEnt::InsertSound ( SOUND_DANGER | SOUND_CONTEXT_MORTAR, GetAbsOrigin(), MORTAR_BLAST_RADIUS * 1.25f, (m_flImpactTime - m_flNPCWarnTime) + 0.15f );
 		m_flNPCWarnTime = FLT_MAX;
 	}
 
@@ -3617,8 +3616,6 @@ void CMortarShell::Warn( void )
 void CMortarShell::Impact( void )
 {
 	// Fire the bullets
-	Vector vecSrc, vecShootDir;
-
 	float flRadius = MORTAR_BLAST_RADIUS;
 
 	trace_t	tr;
@@ -3874,7 +3871,7 @@ void CFuncTankMortar::FiringSequence( const Vector &barrelEnd, const Vector &for
 	{
 		ShootGun();
 		m_fireLast = gpGlobals->curtime;
-		SetNextAttack( gpGlobals->curtime + (1.0 / m_fireRate ) );
+		SetNextAttack( gpGlobals->curtime + (1.0f / m_fireRate ) );
 	}
 	else
 	{
@@ -3889,10 +3886,10 @@ void CFuncTankMortar::Fire( int bulletCount, const Vector &barrelEnd, const Vect
 
 	if ( m_hTarget )
 	{
-		float leadTime = (m_fireDelay * 1.1);
+		float leadTime = (m_fireDelay * 1.1f);
 
 		if ( m_hTarget->IsNPC() ) // Give NPCs a little extra grace
-			leadTime = 1.25;
+			leadTime = 1.25f;
 
 		Vector vLead = m_hTarget->GetSmoothedVelocity() * leadTime;
 		Vector vNoise;
@@ -3922,14 +3919,13 @@ void CFuncTankMortar::Fire( int bulletCount, const Vector &barrelEnd, const Vect
 	#define TARGET_SEARCH_DEPTH 100
 
 	// find something interesting to shoot at near the projected position. 
-	Vector delta;
 
 	// Make a really rough approximation of the last half of the mortar trajectory and trace it. 
 	// Do this so that mortars fired into windows land on rooftops, and that targets projected 
 	// inside buildings (or out of the world) clip to the world. (usually a building facade)
 	
 	// Find halfway between the mortar and the target.
-	Vector vecSpot = ( vecProjectedPosition + GetAbsOrigin() ) * 0.5;
+	Vector vecSpot = ( vecProjectedPosition + GetAbsOrigin() ) * 0.5f;
 	vecSpot.z = GetAbsOrigin().z;
 	
 	// Trace up to find the fake 'apex' of the shell. The skybox or 1024 units, whichever comes first. 
@@ -4175,7 +4171,7 @@ void CFuncTankCombineCannon::AdjustRateOfFire()
 #define COMBINE_CANNON_BEAM_MAX_DIST	1900.0f
 void CFuncTankCombineCannon::UpdateBeamThink()
 {
-	SetContextThink( &CFuncTankCombineCannon::UpdateBeamThink, gpGlobals->curtime + 0.025, s_pUpdateBeamThinkContext );
+	SetContextThink( &CFuncTankCombineCannon::UpdateBeamThink, gpGlobals->curtime + 0.025f, s_pUpdateBeamThinkContext );
 
 	// Always try to create the beam.
 	CreateBeam();

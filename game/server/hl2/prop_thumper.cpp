@@ -88,7 +88,7 @@ END_DATADESC()
 
 void CPropThumper::Spawn( void )
 {
-	char *szModel = (char *)STRING( GetModelName() );
+	const char *szModel = (const char *)STRING( GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = THUMPER_MODEL_NAME;
@@ -185,7 +185,7 @@ void CPropThumper::Think( void )
 {
 	StudioFrameAdvance();
 	DispatchAnimEvents( this );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if ( m_sndMotor == NULL )
 		 InitMotorSound();
@@ -206,7 +206,7 @@ void CPropThumper::Thump ( void )
 		data.m_vOrigin = vOrigin;
 		data.m_flScale = m_iDustScale * m_flPlaybackRate;
 		DispatchEffect( "ThumperDust", data );
-		UTIL_ScreenShake( vOrigin, 10.0 * m_flPlaybackRate, m_flPlaybackRate, m_flPlaybackRate / 2, THUMPER_RADIUS * m_flPlaybackRate, SHAKE_START, false );
+		UTIL_ScreenShake( vOrigin, 10.0f * m_flPlaybackRate, m_flPlaybackRate, m_flPlaybackRate / 2, THUMPER_RADIUS * m_flPlaybackRate, SHAKE_START, false );
 	}
 
 	EmitSound( "coast.thumper_dust" );

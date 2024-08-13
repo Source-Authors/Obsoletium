@@ -712,8 +712,8 @@ void CFuncPlatRot::RotMove( QAngle &destAngle, float time )
 	QAngle vecDestDelta = destAngle - GetLocalAngles();
 
 	// Travel time is so short, we're practically there already;  so make it so.
-	if ( time >= 0.1)
-		SetLocalAngularVelocity( vecDestDelta * (1.0 / time) );
+	if ( time >= 0.1f)
+		SetLocalAngularVelocity( vecDestDelta * (1.0f / time) );
 	else
 	{
 		SetLocalAngularVelocity( vecDestDelta );
@@ -2305,7 +2305,7 @@ void CFuncTrackTrain::Next( void )
 
 	nextPos.z -= m_height;
 	CPathTrack *pNextNext = NULL;
-	CPathTrack *pNext = m_ppath->LookAhead( nextPos, flSpeed * 0.1, 1, &pNextNext );
+	CPathTrack *pNext = m_ppath->LookAhead( nextPos, flSpeed * 0.1f, 1, &pNextNext );
 	//Assert( pNext != NULL );
 
 	// If we're moving towards a dead end, but our desired speed goes in the opposite direction
@@ -3060,7 +3060,7 @@ void CFuncTrackChange::UpdateTrain( QAngle &dest )
 	local.z = DotProduct( offset, up );
 
 	local = local - offset;
-	m_train->SetAbsVelocity( GetAbsVelocity() + (local * (1.0/time)) );
+	m_train->SetAbsVelocity( GetAbsVelocity() + (local * (1.0f/time)) );
 }
 
 

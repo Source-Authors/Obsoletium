@@ -22,11 +22,11 @@ extern ConVar sk_auto_reload_time;
 
 class CWeaponAnnabelle : public CBaseHLCombatWeapon
 {
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 public:
 	DECLARE_CLASS( CWeaponAnnabelle, CBaseHLCombatWeapon );
 
-	DECLARE_SERVERCLASS();
+	DECLARE_SERVERCLASS_OVERRIDE();
 
 private:
 	bool	m_bNeedPump;		// When emptied completely
@@ -34,32 +34,32 @@ private:
 	bool	m_bDelayedFire2;	// Fire secondary when finished reloading
 
 public:
-	void	Precache( void );
+	void	Precache( void ) override;
 
-	int CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+	int CapabilitiesGet( void ) override { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 
-	virtual const Vector& GetBulletSpread( void )
+	const Vector& GetBulletSpread( void ) override
 	{
 		static Vector cone = vec3_origin;
 		return cone;
 	}
 
-	virtual int				GetMinBurst() { return 1; }
-	virtual int				GetMaxBurst() { return 3; }
+	int				GetMinBurst() override { return 1; }
+	int				GetMaxBurst() override { return 3; }
 
-	void ItemHolsterFrame( void );
+	void ItemHolsterFrame( void ) override;
 	bool StartReload( void );
-	bool Reload( void );
+	bool Reload( void ) override;
 	void FillClip( void );
-	void FinishReload( void );
+	void FinishReload( void ) override;
 	void CheckHolsterReload( void );
 	void Pump( void );
 	void DryFire( void );
-	virtual float GetFireRate( void ) { return 1.5; };
-	virtual float			GetMinRestTime() { return 1.0; }
-	virtual float			GetMaxRestTime() { return 1.5; }
+	float GetFireRate( void ) override { return 1.5; };
+	float GetMinRestTime() override { return 1.0; }
+	float GetMaxRestTime() override { return 1.5; }
 
-	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator ) override;
 
 	DECLARE_ACTTABLE();
 

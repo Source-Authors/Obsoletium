@@ -1043,7 +1043,7 @@ void CNPC_Antlion::DelaySquadAttack( float flDuration )
 	{
 		// Reduce the duration by as much as 50% of the total time to make this less robotic
 		float flAdjDuration = flDuration - random->RandomFloat( 0.0f, (flDuration*0.5f) );
-		GetSquad()->BroadcastInteraction( g_interactionAntlionFiredAtTarget, (void *)&flAdjDuration, this );
+		GetSquad()->BroadcastInteraction( g_interactionAntlionFiredAtTarget, &flAdjDuration, this );
 	}
 }
 
@@ -1675,7 +1675,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 			// NOTE: We can't UTIL_Remove here, because we're in the middle of running our AI, and
 			//		 we'll crash later in the bowels of the AI. Remove ourselves next frame.
 			SetThink( &CNPC_Antlion::SUB_Remove );
-			SetNextThink( gpGlobals->curtime + 0.1 );
+			SetNextThink( gpGlobals->curtime + 0.1f );
 		}
 
 		TaskComplete();
@@ -1986,28 +1986,28 @@ bool CNPC_Antlion::IsFirmlyOnGround( void )
 	
 	Vector vOrigin = GetAbsOrigin() + Vector( GetHullMins().x, GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
-	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5f  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 
 	if ( tr.fraction != 1.0f )
 		 return true;
 	
 	vOrigin = GetAbsOrigin() - Vector( GetHullMins().x, GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
-	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5f  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 
 	if ( tr.fraction != 1.0f )
 		 return true;
 
 	vOrigin = GetAbsOrigin() + Vector( GetHullMins().x, -GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
-	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5f  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 
 	if ( tr.fraction != 1.0f )
 		 return true;
 
 	vOrigin = GetAbsOrigin() + Vector( -GetHullMins().x, GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
-	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5f  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 
 	if ( tr.fraction != 1.0f )
 		 return true;
@@ -2760,7 +2760,7 @@ void CNPC_Antlion::PainSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 float CNPC_Antlion::GetIdealAccel( void ) const
 {
-	return GetIdealSpeed() * 2.0;
+	return GetIdealSpeed() * 2.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -2771,21 +2771,16 @@ float CNPC_Antlion::MaxYawSpeed( void )
 {
 	switch ( GetActivity() )
 	{
-	case ACT_IDLE:		
+	case ACT_IDLE:
 		return 32.0f;
-		break;
 	
 	case ACT_WALK:
 		return 16.0f;
-		break;
 	
 	default:
 	case ACT_RUN:
 		return 32.0f;
-		break;
 	}
-
-	return 32.0f;
 }
 
 //-----------------------------------------------------------------------------

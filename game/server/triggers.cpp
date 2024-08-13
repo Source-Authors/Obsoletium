@@ -738,7 +738,7 @@ void CTriggerHurt::RadiationThink( void )
 		HurtAllTouchers( dt );
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.25 );
+	SetNextThink( gpGlobals->curtime + 0.25f );
 }
 
 
@@ -823,7 +823,7 @@ void CTriggerHurt::EndTouch( CBaseEntity *pOther )
 		// if this guy has never taken damage, hurt him now
 		if ( !m_hurtEntities.HasElement( hOther ) )
 		{
-			HurtEntity( pOther, m_flDamage * 0.5 );
+			HurtEntity( pOther, m_flDamage * 0.5f );
 		}
 	}
 	BaseClass::EndTouch( pOther );
@@ -2364,12 +2364,12 @@ class CTriggerTeleport : public CBaseTrigger
 public:
 	DECLARE_CLASS( CTriggerTeleport, CBaseTrigger );
 
-	virtual void Spawn( void ) OVERRIDE;
-	virtual void Touch( CBaseEntity *pOther ) OVERRIDE;
+	void Spawn( void ) override;
+	void Touch( CBaseEntity *pOther ) override;
 
 	string_t m_iLandmark;
 
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 };
 
 LINK_ENTITY_TO_CLASS( trigger_teleport, CTriggerTeleport );
@@ -2474,12 +2474,12 @@ class CTriggerTeleportRelative : public CBaseTrigger
 public:
 	DECLARE_CLASS(CTriggerTeleportRelative, CBaseTrigger);
 
-	virtual void Spawn( void ) OVERRIDE;
-	virtual void Touch( CBaseEntity *pOther ) OVERRIDE;
+	virtual void Spawn( void ) override;
+	virtual void Touch( CBaseEntity *pOther ) override;
 
 	Vector m_TeleportOffset;
 
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 };
 
 LINK_ENTITY_TO_CLASS( trigger_teleport_relative, CTriggerTeleportRelative );
@@ -3759,7 +3759,7 @@ void CTriggerProximity::MeasureThink( void )
 //
 // ##################################################################################
 
-#define MAX_WIND_CHANGE		5.0f
+#define MAX_WIND_CHANGE		5
 
 //------------------------------------------------------------------------------
 // Purpose :
@@ -4001,7 +4001,7 @@ void CTriggerWind::InputEnable( inputdata_t &inputdata )
 void CTriggerWind::WindThink( void )
 {
 	// By default...
-	SetContextThink( &CTriggerWind::WindThink, gpGlobals->curtime + 0.1, WIND_THINK_CONTEXT );
+	SetContextThink( &CTriggerWind::WindThink, gpGlobals->curtime + 0.1f, WIND_THINK_CONTEXT );
 
 	// Is it time to change the wind?
 	if (m_bSwitch)
@@ -4099,7 +4099,7 @@ int CTriggerWind::DrawDebugTextOverlays(void)
 //  Blows physics objects in the trigger
 //
 // ##################################################################################
-#define TRIGGERIMPACT_VIEWKICK_SCALE 0.1
+#define TRIGGERIMPACT_VIEWKICK_SCALE 0.1f
 
 class CTriggerImpact : public CTriggerMultiple
 {
@@ -4816,13 +4816,13 @@ IMotionEvent::simresult_e CTriggerVPhysicsMotion::Simulate( IPhysicsMotionContro
 
 		if ( HasAirDensity() )
 		{
-			float linearDrag = -0.5 * m_addAirDensity * pObject->CalculateLinearDrag( unitVel ) * deltaTime;
+			float linearDrag = -0.5f * m_addAirDensity * pObject->CalculateLinearDrag( unitVel ) * deltaTime;
 			if ( linearDrag < -1 )
 			{
 				linearDrag = -1;
 			}
 			speedScale += linearDrag / deltaTime;
-			float angDrag = -0.5 * m_addAirDensity * pObject->CalculateAngularDrag( unitAngVel ) * deltaTime;
+			float angDrag = -0.5f * m_addAirDensity * pObject->CalculateAngularDrag( unitAngVel ) * deltaTime;
 			if ( angDrag < -1 )
 			{
 				angDrag = -1;

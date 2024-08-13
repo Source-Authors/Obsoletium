@@ -183,7 +183,7 @@ void CGameWeaponManager::Think()
 	int i;
 
 	// Don't have to think all that often. 
-	SetNextThink( gpGlobals->curtime + 2.0 );
+	SetNextThink( gpGlobals->curtime + 2.0f );
 
 	const char *pszWeaponName = STRING( m_iszWeaponName );
 

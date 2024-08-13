@@ -137,7 +137,7 @@ void CWeapon357::PrimaryAttack( void )
 
 	pPlayer->FireBullets( 1, vecSrc, vecAiming, vec3_origin, MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 0 );
 
-	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5 );
+	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5f );
 
 	//Disorient the player
 	QAngle angles = pPlayer->GetLocalAngles();

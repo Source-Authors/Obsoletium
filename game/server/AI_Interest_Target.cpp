@@ -126,7 +126,7 @@ void CAI_InterestTarget::Add( CBaseEntity *pTarget, const Vector &vecPosition, f
 
 void CAI_InterestTarget::Add( CAI_InterestTarget_t::CAI_InterestTarget_e type, CBaseEntity *pTarget, const Vector &vecPosition, float flImportance, float flDuration, float flRamp )
 {
-	int i = AddToTail();
+	intp i = AddToTail();
 	CAI_InterestTarget_t &target = Element( i );
 
 	target.m_eType = type;

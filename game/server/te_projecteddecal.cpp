@@ -71,8 +71,6 @@ void CTEProjectedDecal::Test( const Vector& current_origin, const QAngle& curren
 	m_vecOrigin = current_origin;
 	m_angRotation = current_angles;
 
-	Vector vecEnd;
-	
 	Vector forward;
 
 	m_vecOrigin.GetForModify()[2] += 24;

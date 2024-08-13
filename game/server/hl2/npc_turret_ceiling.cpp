@@ -842,9 +842,6 @@ void CNPC_CeilingTurret::Shoot( const Vector &vecSrc, const Vector &vecDirToEnem
 	else
 	{
 		// Just shoot where you're facing!
-		Vector vecMuzzle, vecMuzzleDir;
-		QAngle vecMuzzleAng;
-		
 		info.m_vecSrc = vecSrc;
 		info.m_vecDirShooting = vecDirToEnemy;
 		info.m_iTracerFreq = 1;

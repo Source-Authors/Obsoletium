@@ -29,7 +29,7 @@
 ConVar template_debug( "template_debug", "0" );
 
 // This is appended to key's values that will need to be unique in template instances
-const char *ENTITYIO_FIXUP_STRING = "&0000";
+const char ENTITYIO_FIXUP_STRING[] = "&0000";
 
 int MapEntity_GetNumKeysInEntity( const char *pEntData );
 
@@ -71,7 +71,7 @@ int	g_iCurrentTemplateInstance;
 // Purpose: Saves the given entity's keyvalue data for later use by a spawner.
 //			Returns the index into the templates.
 //-----------------------------------------------------------------------------
-int Templates_Add(CBaseEntity *pEntity, const char *pszMapData, int nLen)
+intp Templates_Add(CBaseEntity *pEntity, const char *pszMapData, int nLen)
 {
 	const char *pszName = STRING(pEntity->GetEntityName());
 	if ((!pszName) || (!strlen(pszName)))
@@ -86,7 +86,7 @@ int Templates_Add(CBaseEntity *pEntity, const char *pszMapData, int nLen)
 	// We may modify the values of the keys in this mapdata chunk later on to fix Entity I/O
 	// connections. For this reason, we need to ensure we have enough memory to do that.
 	int iKeys = MapEntity_GetNumKeysInEntity( pszMapData );
-	int iExtraSpace = (strlen(ENTITYIO_FIXUP_STRING)+1) * iKeys;
+	intp iExtraSpace = ssize(ENTITYIO_FIXUP_STRING) * iKeys;
 
 	// Extra 1 because the mapdata passed in isn't null terminated
 	pEntData->iMapDataLength = nLen + iExtraSpace + 1;
@@ -309,7 +309,7 @@ void Templates_StartUniqueInstance( void )
 	g_iCurrentTemplateInstance++;
 
 	// Make sure there's enough room to fit it into the string
-	int iMax = pow(10.0f, (int)((strlen(ENTITYIO_FIXUP_STRING) - 1)));	// -1 for the &
+	int iMax = pow(10.0f, ssize(ENTITYIO_FIXUP_STRING) - 2);	// -1 for the &
 	if ( g_iCurrentTemplateInstance >= iMax )
 	{
 		// We won't hit this.
@@ -335,7 +335,7 @@ char *Templates_GetEntityIOFixedMapData( int iIndex )
 		Q_strncpy( g_Templates[iIndex]->pszFixedMapData, g_Templates[iIndex]->pszMapData, g_Templates[iIndex]->iMapDataLength );
 	}
 
-	int iFixupSize = strlen(ENTITYIO_FIXUP_STRING); // don't include \0 when copying in the fixup
+	intp iFixupSize = strlen(ENTITYIO_FIXUP_STRING); // don't include \0 when copying in the fixup
 	char *sOurFixup = new char[iFixupSize+1]; // do alloc room here for the null terminator
 	Q_snprintf( sOurFixup, iFixupSize+1, "%c%.4d", ENTITYIO_FIXUP_STRING[0], g_iCurrentTemplateInstance );
 

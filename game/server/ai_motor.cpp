@@ -482,7 +482,7 @@ void CAI_Motor::MovePaused()
 //-----------------------------------------------------------------------------
 float DeltaV( float v0, float v1, float d )
 {
-	return 0.5 * (v1 * v1 - v0 * v0 ) / d;
+	return 0.5f * (v1 * v1 - v0 * v0 ) / d;
 }
 
 
@@ -490,7 +490,7 @@ float DeltaV( float v0, float v1, float d )
 float CAI_Motor::CalcIntervalMove()
 {
 	// assuming linear acceleration, how far will I travel?
-	return 0.5 * (GetCurSpeed() + GetIdealSpeed()) * GetMoveInterval();
+	return 0.5f * (GetCurSpeed() + GetIdealSpeed()) * GetMoveInterval();
 }
 
 //-----------------------------------------------------------------------------
@@ -756,9 +756,9 @@ void CAI_Motor::UpdateYaw( int yawSpeed )
 	ideal = UTIL_AngleMod( GetIdealYaw() );
 
 	// FIXME: this needs a proper interval
-	float dt = MIN( 0.2, gpGlobals->curtime - GetLastThink() );
+	float dt = MIN( 0.2f, gpGlobals->curtime - GetLastThink() );
 	
-	newYaw = AI_ClampYaw( (float)yawSpeed * 10.0, current, ideal, dt );
+	newYaw = AI_ClampYaw( (float)yawSpeed * 10.0f, current, ideal, dt );
 		
 	if (newYaw != current)
 	{
@@ -906,7 +906,9 @@ AIMoveResult_t CAI_Motor::MoveNormalExecute( const AILocalMoveGoal_t &move )
 		AIMR_BLOCKED_WORLD,                      // AIM_PARTIAL_HIT_WORLD
 		AIMR_BLOCKED_WORLD,                      // AIM_PARTIAL_HIT_TARGET
 	};
-	Assert( ARRAYSIZE( moveResults ) == AIM_NUM_RESULTS && fMotorResult >= 0 && fMotorResult <= ARRAYSIZE( moveResults ) );
+	Assert( ARRAYSIZE( moveResults ) == AIM_NUM_RESULTS &&
+		    fMotorResult >= 0 &&
+		    fMotorResult < ssize( moveResults ) );
 	
 	AIMoveResult_t result = moveResults[fMotorResult];
 	

@@ -533,7 +533,7 @@ void CBaseHeadcrab::JumpAttack( bool bRandomJump, const Vector &vecPos, bool bTh
 		}
 		else
 		{
-			float flMaxHeight = bThrown ? 400 : 120;
+			float flMaxHeight = bThrown ? 400.0f : 120.0f;
 			if ( height > flMaxHeight )
 			{
 				height = flMaxHeight;
@@ -2920,8 +2920,6 @@ float CHeadcrab::MaxYawSpeed ( void )
 	default:
 		return 30;
 	}
-
-	return BaseClass::MaxYawSpeed();
 }
 
 

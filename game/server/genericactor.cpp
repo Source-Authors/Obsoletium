@@ -266,9 +266,9 @@ void CFlextalkActor::SetFlexTarget( LocalFlexController_t flexnum, float value )
 	}
 
 	float value2 = value;
-	if (1 || random->RandomFloat( 0.0, 1.0 ) < 0.2)
+	if (1 || random->RandomFloat( 0.0f, 1.0f ) < 0.2f)
 	{
-		value2 = random->RandomFloat( value - 0.2, value + 0.2 );
+		value2 = random->RandomFloat( value - 0.2f, value + 0.2f );
 		value2 = clamp( value2, 0.0f, 1.0f );
 	}
 

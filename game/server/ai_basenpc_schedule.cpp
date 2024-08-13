@@ -872,11 +872,11 @@ bool CAI_BaseNPC::FindCoverPosInRadius( CBaseEntity *pEntity, const Vector &goal
 	{
 		coverPos = goalPos;
 	}
-	else if ( !pTacticalServices->FindCoverPos( goalPos, enemyPos, enemyEyePos, 0, coverRadius * 0.5, &coverPos ) )
+	else if ( !pTacticalServices->FindCoverPos( goalPos, enemyPos, enemyEyePos, 0, coverRadius * 0.5f, &coverPos ) )
 	{
-		if ( !pTacticalServices->FindLateralCover( goalPos, enemyEyePos, 0, coverRadius * 0.5, 3, &coverPos ) )
+		if ( !pTacticalServices->FindLateralCover( goalPos, enemyEyePos, 0, coverRadius * 0.5f, 3, &coverPos ) )
 		{
-			if ( !pTacticalServices->FindCoverPos( goalPos, enemyPos, enemyEyePos, coverRadius * 0.5 - 0.1, coverRadius, &coverPos ) )
+			if ( !pTacticalServices->FindCoverPos( goalPos, enemyPos, enemyEyePos, coverRadius * 0.5f - 0.1f, coverRadius, &coverPos ) )
 			{
 				pTacticalServices->FindLateralCover( goalPos, enemyEyePos, 0, coverRadius, 5, &coverPos );
 			}
@@ -895,11 +895,11 @@ bool CAI_BaseNPC::FindCoverPos( CSound *pSound, Vector *pResult )
 {
 	if ( !GetTacticalServices()->FindCoverPos( pSound->GetSoundReactOrigin(), 
 												pSound->GetSoundReactOrigin(), 
-												MIN( pSound->Volume(), 120.0 ), 
+												MIN( pSound->Volume(), 120.0f ), 
 												CoverRadius(), 
 												pResult ) )
 	{
-		return GetTacticalServices()->FindLateralCover( pSound->GetSoundReactOrigin(), MIN( pSound->Volume(), 60.0 ), pResult );
+		return GetTacticalServices()->FindLateralCover( pSound->GetSoundReactOrigin(), MIN( pSound->Volume(), 60.0f ), pResult );
 	}
 
 	return true;
@@ -1087,7 +1087,7 @@ float CAI_BaseNPC::GetReasonableFacingDist( void )
 		const float dist = 3.5*12;
 		if ( GetEnemy() )
 		{
-			float distEnemy = ( GetEnemy()->GetAbsOrigin().AsVector2D() - GetAbsOrigin().AsVector2D() ).Length() - 1.0; 
+			float distEnemy = ( GetEnemy()->GetAbsOrigin().AsVector2D() - GetAbsOrigin().AsVector2D() ).Length() - 1.0f; 
 			return MIN( distEnemy, dist );
 		}
 
@@ -1268,6 +1268,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 				break;
 		}
 		// Fall through on TASK_FIND_LOCK_HINTNODE...
+		[[fallthrough]];
 		
 	case TASK_LOCK_HINTNODE:
 	{
@@ -1492,7 +1493,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 	case TASK_FIND_COVER_FROM_ENEMY:
 		{	
 			bool 	bNodeCover 		= ( task != TASK_FIND_COVER_FROM_ENEMY );
-			float 	flMinDistance 	= ( task == TASK_FIND_FAR_NODE_COVER_FROM_ENEMY ) ? pTask->flTaskData : 0.0;
+			float 	flMinDistance 	= ( task == TASK_FIND_FAR_NODE_COVER_FROM_ENEMY ) ? pTask->flTaskData : 0.0f;
 			float 	flMaxDistance 	= ( task == TASK_FIND_NEAR_NODE_COVER_FROM_ENEMY ) ? pTask->flTaskData : FLT_MAX;
 			
 			if ( FindCoverFromEnemy( bNodeCover, flMinDistance, flMaxDistance ) )
@@ -1923,7 +1924,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 			Vector vecEnemy 	= ( task != TASK_GET_PATH_TO_ENEMY_LKP ) ? GetEnemy()->GetAbsOrigin() : GetEnemyLKP();
 			Vector vecEnemyEye	= vecEnemy + GetEnemy()->GetViewOffset();
 
-			Vector posLos;
+			Vector posLos{0, 0, 0};
 			bool found = false;
 
 			if ( ( task != TASK_GET_FLANK_RADIUS_PATH_TO_ENEMY_LOS ) && ( task != TASK_GET_FLANK_ARC_PATH_TO_ENEMY_LOS ) )

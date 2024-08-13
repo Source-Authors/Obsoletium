@@ -217,7 +217,7 @@ void CWeaponAR2::DelayedAttack( void )
 
 	// Register a muzzleflash for the AI
 	pOwner->DoMuzzleFlash();
-	pOwner->SetMuzzleFlashTime( gpGlobals->curtime + 0.5 );
+	pOwner->SetMuzzleFlashTime( gpGlobals->curtime + 0.5f );
 	
 	WeaponSound( WPN_DOUBLE );
 
@@ -345,7 +345,7 @@ void CWeaponAR2::FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, bool bUs
 
 	WeaponSoundRealtime( SINGLE_NPC );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
+	CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2f, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
 
 	pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED, MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2 );
 

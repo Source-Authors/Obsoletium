@@ -487,7 +487,7 @@ string_t MakeButtonSound( int sound )
 void CBaseButton::ButtonSpark ( void )
 {
 	SetThink ( &CBaseButton::ButtonSpark );
-	SetNextThink( gpGlobals->curtime + 0.1 + random->RandomFloat ( 0, 1.5 ) );// spark again at random interval
+	SetNextThink( gpGlobals->curtime + 0.1f + random->RandomFloat ( 0, 1.5f ) );// spark again at random interval
 
 	DoSpark( this, WorldSpaceCenter(), 1, 1, true, vec3_origin );
 }
@@ -1328,19 +1328,19 @@ void CMomentaryRotButton::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 
 			variant_t value;
 			value.SetFloat( flDist );
-			g_EventQueue.AddEvent( this, "SetPosition", value, 0.01, this, this );
+			g_EventQueue.AddEvent( this, "SetPosition", value, 0.01f, this, this );
 
-			value.SetFloat( 0.0 );
-			g_EventQueue.AddEvent( this, "SetPosition", value, 0.1, this, this );
+			value.SetFloat( 0.0f );
+			g_EventQueue.AddEvent( this, "SetPosition", value, 0.1f, this, this );
 
-			value.SetFloat( 0.5 * flDist );
-			g_EventQueue.AddEvent( this, "SetPosition", value, 0.2, this, this );
+			value.SetFloat( 0.5f * flDist );
+			g_EventQueue.AddEvent( this, "SetPosition", value, 0.2f, this, this );
 
-			value.SetFloat( 0.0 );
-			g_EventQueue.AddEvent( this, "SetPosition", value, 0.3, this, this );
+			value.SetFloat( 0.0f );
+			g_EventQueue.AddEvent( this, "SetPosition", value, 0.3f, this, this );
 
 			// Must be last! And must be late enough to cover the settling time.
-			g_EventQueue.AddEvent( this, "_EnableUpdateTarget", 0.5, this, this );
+			g_EventQueue.AddEvent( this, "_EnableUpdateTarget", 0.5f, this, this );
 		}
 
 		return;

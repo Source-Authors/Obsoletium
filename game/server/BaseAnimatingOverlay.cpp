@@ -624,11 +624,11 @@ float CBaseAnimatingOverlay::GetLayerDuration( int iLayer )
 	{
 		if (m_AnimOverlay[iLayer].m_flPlaybackRate != 0.0f)
 		{
-			return (1.0 - m_AnimOverlay[iLayer].m_flCycle) * SequenceDuration( m_AnimOverlay[iLayer].m_nSequence ) / m_AnimOverlay[iLayer].m_flPlaybackRate;
+			return (1.0f - m_AnimOverlay[iLayer].m_flCycle) * SequenceDuration( m_AnimOverlay[iLayer].m_nSequence ) / m_AnimOverlay[iLayer].m_flPlaybackRate;
 		}
 		return SequenceDuration( m_AnimOverlay[iLayer].m_nSequence );
 	}
-	return 0.0;
+	return 0.0f;
 }
 
 
@@ -679,11 +679,11 @@ bool CBaseAnimatingOverlay::IsValidLayer( int iLayer )
 //-----------------------------------------------------------------------------
 int CBaseAnimatingOverlay::AllocateLayer( int iPriority )
 {
-	int i;
+	intp i;
 
 	// look for an open slot and for existing layers that are lower priority
 	int iNewOrder = 0;
-	int iOpenLayer = -1;
+	intp iOpenLayer = -1;
 	int iNumOpen = 0;
 	for (i = 0; i < m_AnimOverlay.Count(); i++)
 	{

@@ -114,7 +114,7 @@ void CBubbling::Spawn( void )
 	if ( !HasSpawnFlags(SF_BUBBLES_STARTOFF) )
 	{
 		SetThink( &CBubbling::FizzThink );
-		SetNextThink( gpGlobals->curtime + 2.0 );
+		SetNextThink( gpGlobals->curtime + 2.0f );
 		m_state = 1;
 	}
 	else
@@ -215,7 +215,7 @@ void CBubbling::InputSetFrequency( inputdata_t &inputdata )
 		}
 		else
 		{
-			SetNextThink( gpGlobals->curtime + 2.5 - (0.1 * m_frequency) );
+			SetNextThink( gpGlobals->curtime + 2.5f - (0.1f * m_frequency) );
 		}
 	}
 }
@@ -232,7 +232,7 @@ void CBubbling::FizzThink( void )
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + 2.5 - (0.1 * m_frequency) );
+		SetNextThink( gpGlobals->curtime + 2.5f - (0.1f * m_frequency) );
 	}
 }
 

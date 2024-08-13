@@ -34,24 +34,24 @@ class CWeaponFrag: public CBaseHLCombatWeapon
 {
 	DECLARE_CLASS( CWeaponFrag, CBaseHLCombatWeapon );
 public:
-	DECLARE_SERVERCLASS();
+	DECLARE_SERVERCLASS_OVERRIDE();
 
 public:
 	CWeaponFrag();
 
-	void	Precache( void );
-	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
-	void	PrimaryAttack( void );
-	void	SecondaryAttack( void );
+	void	Precache( void ) override;
+	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator ) override;
+	void	PrimaryAttack( void ) override;
+	void	SecondaryAttack( void ) override;
 	void	DecrementAmmo( CBaseCombatCharacter *pOwner );
-	void	ItemPostFrame( void );
+	void	ItemPostFrame( void ) override;
 
-	bool	Deploy( void );
-	bool	Holster( CBaseCombatWeapon *pSwitchingTo = NULL );
+	bool	Deploy( void ) override;
+	bool	Holster( CBaseCombatWeapon *pSwitchingTo = nullptr ) override;
 
-	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+	int		CapabilitiesGet( void ) override { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 	
-	bool	Reload( void );
+	bool	Reload( void ) override;
 
 	bool	ShouldDisplayHUDHint() { return true; }
 
@@ -69,7 +69,7 @@ private:
 
 	DECLARE_ACTTABLE();
 
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 };
 
 
@@ -96,7 +96,9 @@ PRECACHE_WEAPON_REGISTER(weapon_frag);
 
 CWeaponFrag::CWeaponFrag() :
 	CBaseHLCombatWeapon(),
-	m_bRedraw( false )
+	m_bRedraw( false ),
+	m_AttackPaused( false ),
+	m_fDrawbackFinished( false )
 {
 }
 
@@ -175,7 +177,7 @@ void CWeaponFrag::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChar
 			break;
 	}
 
-#define RETHROW_DELAY	0.5
+#define RETHROW_DELAY	0.5f
 	if( fThrewGrenade )
 	{
 		m_flNextPrimaryAttack	= gpGlobals->curtime + RETHROW_DELAY;
@@ -183,20 +185,20 @@ void CWeaponFrag::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChar
 		m_flTimeWeaponIdle = FLT_MAX; //NOTE: This is set once the animation has finished up!
 
 		// Make a sound designed to scare snipers back into their holes!
-		CBaseCombatCharacter *pOwner = GetOwner();
+		CBaseCombatCharacter *pOwner2 = GetOwner();
 
-		if( pOwner )
+		if( pOwner2 )
 		{
-			Vector vecSrc = pOwner->Weapon_ShootPosition();
+			Vector vecSrc = pOwner2->Weapon_ShootPosition();
 			Vector	vecDir;
 
-			AngleVectors( pOwner->EyeAngles(), &vecDir );
+			AngleVectors( pOwner2->EyeAngles(), &vecDir );
 
 			trace_t tr;
 
-			UTIL_TraceLine( vecSrc, vecSrc + vecDir * 1024, MASK_SOLID_BRUSHONLY, pOwner, COLLISION_GROUP_NONE, &tr );
+			UTIL_TraceLine( vecSrc, vecSrc + vecDir * 1024, MASK_SOLID_BRUSHONLY, pOwner2, COLLISION_GROUP_NONE, &tr );
 
-			CSoundEnt::InsertSound( SOUND_DANGER_SNIPERONLY, tr.endpos, 384, 0.2, pOwner );
+			CSoundEnt::InsertSound( SOUND_DANGER_SNIPERONLY, tr.endpos, 384, 0.2f, pOwner2 );
 		}
 	}
 }
@@ -240,12 +242,12 @@ void CWeaponFrag::SecondaryAttack( void )
 
 	CBaseCombatCharacter *pOwner  = GetOwner();
 
-	if ( pOwner == NULL )
+	if ( pOwner == nullptr )
 		return;
 
 	CBasePlayer *pPlayer = ToBasePlayer( pOwner );
 	
-	if ( pPlayer == NULL )
+	if ( pPlayer == nullptr )
 		return;
 
 	// Note that this is a secondary attack and prepare the grenade attack to pause.
@@ -273,7 +275,7 @@ void CWeaponFrag::PrimaryAttack( void )
 
 	CBaseCombatCharacter *pOwner  = GetOwner();
 	
-	if ( pOwner == NULL )
+	if ( pOwner == nullptr )
 	{ 
 		return;
 	}
@@ -388,16 +390,16 @@ void CWeaponFrag::ThrowGrenade( CBasePlayer *pPlayer )
 	Vector	vecEye = pPlayer->EyePosition();
 	Vector	vForward, vRight;
 
-	pPlayer->EyeVectors( &vForward, &vRight, NULL );
+	pPlayer->EyeVectors( &vForward, &vRight, nullptr );
 	Vector vecSrc = vecEye + vForward * 18.0f + vRight * 8.0f;
 	CheckThrowPosition( pPlayer, vecEye, vecSrc );
 //	vForward[0] += 0.1f;
 	vForward[2] += 0.1f;
 
 	Vector vecThrow;
-	pPlayer->GetVelocity( &vecThrow, NULL );
+	pPlayer->GetVelocity( &vecThrow, nullptr );
 	vecThrow += vForward * 1200;
-	Fraggrenade_Create( vecSrc, vec3_angle, vecThrow, AngularImpulse(600,random->RandomInt(-1200,1200),0), pPlayer, GRENADE_TIMER, false );
+	Fraggrenade_Create( vecSrc, vec3_angle, vecThrow, AngularImpulse(600,random->RandomFloat(-1200,1200),0), pPlayer, GRENADE_TIMER, false );
 
 	m_bRedraw = true;
 
@@ -416,14 +418,14 @@ void CWeaponFrag::LobGrenade( CBasePlayer *pPlayer )
 	Vector	vecEye = pPlayer->EyePosition();
 	Vector	vForward, vRight;
 
-	pPlayer->EyeVectors( &vForward, &vRight, NULL );
+	pPlayer->EyeVectors( &vForward, &vRight, nullptr );
 	Vector vecSrc = vecEye + vForward * 18.0f + vRight * 8.0f + Vector( 0, 0, -8 );
 	CheckThrowPosition( pPlayer, vecEye, vecSrc );
 	
 	Vector vecThrow;
-	pPlayer->GetVelocity( &vecThrow, NULL );
+	pPlayer->GetVelocity( &vecThrow, nullptr );
 	vecThrow += vForward * 350 + Vector( 0, 0, 50 );
-	Fraggrenade_Create( vecSrc, vec3_angle, vecThrow, AngularImpulse(200,random->RandomInt(-600,600),0), pPlayer, GRENADE_TIMER, false );
+	Fraggrenade_Create( vecSrc, vec3_angle, vecThrow, AngularImpulse(200,random->RandomFloat(-600,600),0), pPlayer, GRENADE_TIMER, false );
 
 	WeaponSound( WPN_DOUBLE );
 
@@ -457,11 +459,11 @@ void CWeaponFrag::RollGrenade( CBasePlayer *pPlayer )
 		CrossProduct( vecFacing, tr.plane.normal, tangent );
 		CrossProduct( tr.plane.normal, tangent, vecFacing );
 	}
-	vecSrc += (vecFacing * 18.0);
+	vecSrc += (vecFacing * 18.0f);
 	CheckThrowPosition( pPlayer, pPlayer->WorldSpaceCenter(), vecSrc );
 
 	Vector vecThrow;
-	pPlayer->GetVelocity( &vecThrow, NULL );
+	pPlayer->GetVelocity( &vecThrow, nullptr );
 	vecThrow += vecFacing * 700;
 	// put it on its side
 	QAngle orientation(0,pPlayer->GetLocalAngles().y,-90);

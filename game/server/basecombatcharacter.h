@@ -120,24 +120,24 @@ public:
 	CBaseCombatCharacter(void);
 	~CBaseCombatCharacter(void);
 
-	DECLARE_SERVERCLASS();
-	DECLARE_DATADESC();
+	DECLARE_SERVERCLASS_OVERRIDE();
+	DECLARE_DATADESC_OVERRIDE();
 	DECLARE_PREDICTABLE();
 
 public:
 
-	virtual void		Spawn( void );
-	virtual void		Precache();
+	void		Spawn( void ) override;
+	void		Precache() override;
 
-	virtual int			Restore( IRestore &restore );
+	int			Restore( IRestore &restore ) override;
 
 	virtual const impactdamagetable_t	&GetPhysicsImpactDamageTable( void );
 
-	int					TakeHealth( float flHealth, int bitsDamageType );
+	int					TakeHealth( float flHealth, int bitsDamageType ) override;
 	void				CauseDeath( const CTakeDamageInfo &info );
 
-	virtual	bool		FVisible ( CBaseEntity *pEntity, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL ); // true iff the parameter can be seen by me.
-	virtual bool		FVisible( const Vector &vecTarget, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL )	{ return BaseClass::FVisible( vecTarget, traceMask, ppBlocker ); }
+	bool		FVisible ( CBaseEntity *pEntity, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL ) override; // true iff the parameter can be seen by me.
+	bool		FVisible( const Vector &vecTarget, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL ) override	{ return BaseClass::FVisible( vecTarget, traceMask, ppBlocker ); }
 	static void			ResetVisibilityCache( CBaseCombatCharacter *pBCC = NULL );
 
 #ifdef PORTAL
@@ -170,7 +170,7 @@ public:
 	virtual Vector		EyeDirection2D( void ) 	{ return HeadDirection2D( );  }; // No eye motion so just return head dir
 	virtual Vector		EyeDirection3D( void ) 	{ return HeadDirection3D( );  }; // No eye motion so just return head dir
 
-	virtual void SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways );
+	void SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways ) override;
 
 	// -----------------------
 	// Fog
@@ -246,8 +246,8 @@ public:
 	// For weapon strip
 	void				Weapon_DropAll( bool bDisallowWeaponPickup = false );
 
-	virtual bool			AddPlayerItem( CBaseCombatWeapon *pItem ) { return false; }
-	virtual bool			RemovePlayerItem( CBaseCombatWeapon *pItem ) { return false; }
+	virtual bool			AddPlayerItem( CBaseCombatWeapon * ) { return false; }
+	virtual bool			RemovePlayerItem( CBaseCombatWeapon * ) { return false; }
 
 	virtual bool			CanBecomeServerRagdoll( void ) { return true; }
 
@@ -255,7 +255,7 @@ public:
 	// Damage
 	// -----------------------
 	// Don't override this for characters, override the per-life-state versions below
-	virtual int				OnTakeDamage( const CTakeDamageInfo &info );
+	int				OnTakeDamage( const CTakeDamageInfo &info ) override;
 
 	// Override these to control how your character takes damage in different states
 	virtual int				OnTakeDamage_Alive( const CTakeDamageInfo &info );
@@ -264,35 +264,35 @@ public:
 
 	virtual float			GetAliveDuration( void ) const;			// return time we have been alive (only valid when alive)
 
-	virtual void 			OnFriendDamaged( CBaseCombatCharacter *pSquadmate, CBaseEntity *pAttacker ) {}
-	virtual void 			NotifyFriendsOfDamage( CBaseEntity *pAttackerEntity ) {}
+	virtual void 			OnFriendDamaged( CBaseCombatCharacter *, CBaseEntity * ) {}
+	virtual void 			NotifyFriendsOfDamage( CBaseEntity * ) {}
 	virtual bool			HasEverBeenInjured( int team = TEAM_ANY ) const;			// return true if we have ever been injured by a member of the given team
 	virtual float			GetTimeSinceLastInjury( int team = TEAM_ANY ) const;		// return time since we were hurt by a member of the given team
 
 
-	virtual void			OnPlayerKilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info ) {}
+	virtual void			OnPlayerKilledOther( CBaseEntity *, const CTakeDamageInfo & ) {}
 
 		// utility function to calc damage force
 	Vector					CalcDamageForceVector( const CTakeDamageInfo &info );
 
-	virtual int				BloodColor();
+	int				BloodColor() override;
 	virtual Activity		GetDeathActivity( void );
 
 	virtual bool			CorpseGib( const CTakeDamageInfo &info );
 	virtual void			CorpseFade( void );	// Called instead of GibNPC() when gibs are disabled
 	virtual bool			HasHumanGibs( void );
 	virtual bool			HasAlienGibs( void );
-	virtual bool			ShouldGib( const CTakeDamageInfo &info ) { return false; }	// Always ragdoll, unless specified by the leaf class
+	virtual bool			ShouldGib( const CTakeDamageInfo & ) { return false; }	// Always ragdoll, unless specified by the leaf class
 
 	float GetDamageAccumulator() { return m_flDamageAccumulator; }
 	int	  GetDamageCount( void ) { return m_iDamageCount; }	// # of times NPC has been damaged.  used for tracking 1-shot kills.
 
 	// Character killed (only fired once)
-	virtual void			Event_Killed( const CTakeDamageInfo &info );
+	void			Event_Killed( const CTakeDamageInfo & ) override;
 
 	// Killed a character
 	void InputKilledNPC( inputdata_t &inputdata );
-	virtual void OnKilledNPC( CBaseCombatCharacter *pKilled ) {}; 
+	virtual void OnKilledNPC( CBaseCombatCharacter * ) {}; 
 
 	// Exactly one of these happens immediately after killed (gibbed may happen later when the corpse gibs)
 	// Character gibbed or faded out (violence controls) (only fired once)
@@ -314,24 +314,24 @@ public:
 	virtual CBaseEntity		*CheckTraceHullAttack( float flDist, const Vector &mins, const Vector &maxs, int iDamage, int iDmgType, float forceScale = 1.0f, bool bDamageAnyNPC = false );
 	virtual CBaseEntity		*CheckTraceHullAttack( const Vector &vStart, const Vector &vEnd, const Vector &mins, const Vector &maxs, int iDamage, int iDmgType, float flForceScale = 1.0f, bool bDamageAnyNPC = false );
 
-	virtual CBaseCombatCharacter *MyCombatCharacterPointer( void ) { return this; }
+	CBaseCombatCharacter *MyCombatCharacterPointer( void ) override { return this; }
 
 	// VPHYSICS
-	virtual void			VPhysicsShadowCollision( int index, gamevcollisionevent_t *pEvent );
-	virtual void			VPhysicsUpdate( IPhysicsObject *pPhysics );
+	void			VPhysicsShadowCollision( int index, gamevcollisionevent_t *pEvent ) override;
+	void			VPhysicsUpdate( IPhysicsObject *pPhysics ) override;
 	float					CalculatePhysicsStressDamage( vphysics_objectstress_t *pStressOut, IPhysicsObject *pPhysics );
 	void					ApplyStressDamage( IPhysicsObject *pPhysics, bool bRequireLargeObject );
 
-	virtual void			PushawayTouch( CBaseEntity *pOther ) {}
+	virtual void			PushawayTouch( CBaseEntity * ) {}
 
 	void SetImpactEnergyScale( float fScale ) { m_impactEnergyScale = fScale; }
 
-	virtual void			UpdateOnRemove( void );
+	void			UpdateOnRemove( void ) override;
 
 	virtual Disposition_t	IRelationType( CBaseEntity *pTarget );
 	virtual int				IRelationPriority( CBaseEntity *pTarget );
 
-	virtual void			SetLightingOriginRelative( CBaseEntity *pLightingOrigin );
+	void			SetLightingOriginRelative( CBaseEntity *pLightingOrigin ) override;
 
 protected:
 	Relationship_t			*FindEntityRelationship( CBaseEntity *pTarget );
@@ -371,7 +371,7 @@ public:
 	virtual bool		RemoveEntityRelationship( CBaseEntity *pEntity );
 	virtual void		AddClassRelationship( Class_T nClass, Disposition_t nDisposition, int nPriority );
 
-	virtual void		ChangeTeam( int iTeamNum ) OVERRIDE;
+	virtual void		ChangeTeam( int iTeamNum ) override;
 
 	// Nav hull type
 	Hull_t	GetHullType() const				{ return m_eHull; }
@@ -386,7 +386,7 @@ public:
 	// Used by weapon_slam + game_ui
 	void SetActiveWeapon( CBaseCombatWeapon *pNewWeapon );
 	void ClearActiveWeapon() { SetActiveWeapon( NULL ); }
-	virtual void OnChangeActiveWeapon( CBaseCombatWeapon *pOldWeapon, CBaseCombatWeapon *pNewWeapon ) {}
+	virtual void OnChangeActiveWeapon( CBaseCombatWeapon *, CBaseCombatWeapon * ) {}
 
 	// I can't use my current weapon anymore. Switch me to the next best weapon.
 	bool SwitchToNextBestWeapon(CBaseCombatWeapon *pCurrent);
@@ -408,13 +408,13 @@ public:
 	virtual bool IsAreaTraversable( const CNavArea *area ) const;							// return true if we can use the given area 
 	virtual void ClearLastKnownArea( void );
 	virtual void UpdateLastKnownArea( void );										// invoke this to update our last known nav area (since there is no think method chained to CBaseCombatCharacter)
-	virtual void OnNavAreaChanged( CNavArea *enteredArea, CNavArea *leftArea ) { }	// invoked (by UpdateLastKnownArea) when we enter a new nav area (or it is reset to NULL)
-	virtual void OnNavAreaRemoved( CNavArea *removedArea );
+	virtual void OnNavAreaChanged( CNavArea *, CNavArea * ) { }	// invoked (by UpdateLastKnownArea) when we enter a new nav area (or it is reset to NULL)
+	virtual void OnNavAreaRemoved( CNavArea * );
 
 	// -----------------------
 	// Notification from INextBots.
 	// -----------------------
-	virtual void		OnPursuedBy( INextBot * RESTRICT pPursuer ){} // called every frame while pursued by a bot in DirectChase.
+	virtual void		OnPursuedBy( INextBot * RESTRICT ){} // called every frame while pursued by a bot in DirectChase.
 
 #ifdef TF_DLL
 	virtual HalloweenBossType GetBossType() const { return HALLOWEEN_BOSS_INVALID; }

@@ -313,7 +313,7 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 	te->Explosion( filter, 0.0,
 		&vecExplodeOrigin, 
 		( m_sFireballSprite < 1 ) ? g_sModelIndexFireball : m_sFireballSprite,
-		!( m_spawnflags & SF_ENVEXPLOSION_NOFIREBALL ) ? ( m_spriteScale / 10.0 ) : 0.0,
+		!( m_spawnflags & SF_ENVEXPLOSION_NOFIREBALL ) ? ( m_spriteScale / 10.0f ) : 0.0f,
 		15,
 		nFlags,
 		iRadius,
@@ -349,7 +349,7 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 	}
 
 	SetThink( &CEnvExplosion::Smoke );
-	SetNextThink( gpGlobals->curtime + 0.3 );
+	SetNextThink( gpGlobals->curtime + 0.3f );
 
 	// Only do these effects if we're not submerged
 	if ( UTIL_PointContents( GetAbsOrigin() ) & CONTENTS_WATER )
@@ -388,7 +388,7 @@ void ExplosionCreate( const Vector &center, const QAngle &angles,
 
 	CEnvExplosion *pExplosion = (CEnvExplosion*)CBaseEntity::Create( "env_explosion", center, angles, pOwner );
 	Q_snprintf( buf,sizeof(buf), "%3d", magnitude );
-	char *szKeyName = "iMagnitude";
+	const char *szKeyName = "iMagnitude";
 	char *szValue = buf;
 	pExplosion->KeyValue( szKeyName, szValue );
 

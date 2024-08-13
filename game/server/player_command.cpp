@@ -115,7 +115,7 @@ void CPlayerMove::CheckMovingGround( CBasePlayer *player, double frametime )
 	if ( !( player->GetFlags() & FL_BASEVELOCITY ) )
 	{
 		// Apply momentum (add in half of the previous frame of velocity first)
-		player->ApplyAbsVelocityImpulse( (1.0 + ( frametime * 0.5 )) * player->GetBaseVelocity() );
+		player->ApplyAbsVelocityImpulse( (1.0f + ( frametime * 0.5f )) * player->GetBaseVelocity() );
 		player->SetBaseVelocity( vec3_origin );
 	}
 

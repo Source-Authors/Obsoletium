@@ -295,9 +295,9 @@ public:
 
 	virtual unsigned int GetSubVersionNumber( void ) const;										// returns sub-version number of data format used by derived classes
 	virtual void SaveCustomData( CUtlBuffer &fileBuffer ) const { }								// store custom mesh data for derived classes
-	virtual void LoadCustomData( CUtlBuffer &fileBuffer, unsigned int subVersion ) { }			// load custom mesh data for derived classes
+	virtual void LoadCustomData( CUtlBuffer &fileBuffer, unsigned int ) { }			// load custom mesh data for derived classes
 	virtual void SaveCustomDataPreArea( CUtlBuffer &fileBuffer ) const { }						// store custom mesh data for derived classes that needs to be loaded before areas are read in
-	virtual void LoadCustomDataPreArea( CUtlBuffer &fileBuffer, unsigned int subVersion ) { }	// load custom mesh data for derived classes that needs to be loaded before areas are read in
+	virtual void LoadCustomDataPreArea( CUtlBuffer &fileBuffer, unsigned int ) { }	// load custom mesh data for derived classes that needs to be loaded before areas are read in
 
 	// events
 	virtual void OnServerActivate( void );								// (EXTEND) invoked when server loads a new map

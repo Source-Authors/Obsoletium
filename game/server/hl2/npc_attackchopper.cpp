@@ -888,9 +888,9 @@ END_DATADESC()
 // Purpose :
 //------------------------------------------------------------------------------
 CNPC_AttackHelicopter::CNPC_AttackHelicopter() : 
-	m_bNonCombat( false ),
 	m_flGracePeriod( 2.0f ),
-	m_bBombsExplodeOnContact( false )
+	m_bBombsExplodeOnContact( false ),
+	m_bNonCombat( false )
 {
 	m_flMaxSpeed = 0;
 }
@@ -2357,7 +2357,7 @@ bool CNPC_AttackHelicopter::DoGunCharging( )
 	case SHOOT_MODE_FAST:
 		{
 			int nBurstCount = sk_helicopter_burstcount.GetInt();
-			m_nRemainingBursts = random->RandomInt( nBurstCount, 2.0 * nBurstCount );
+			m_nRemainingBursts = random->RandomInt( nBurstCount, 2 * nBurstCount );
 			m_flIdleTimeDelay = 0.1f * ( m_nRemainingBursts - nBurstCount );
 		}
 		break;
@@ -2612,9 +2612,9 @@ void CNPC_AttackHelicopter::FireElectricityGun( )
 		{
 			// Select random point *on* sphere
 			Vector vecTargetPt;
-			float flEffectRadius = random->RandomFloat( flRadius * 1.2, flRadius * 1.5f );
-			float flTheta = random->RandomFloat( 0.0f, 2.0f * M_PI );
-			float flPhi = random->RandomFloat( -0.5f * M_PI, 0.5f * M_PI );
+			float flEffectRadius = random->RandomFloat( flRadius * 1.2f, flRadius * 1.5f );
+			float flTheta = random->RandomFloat( 0.0f, 2.0f * M_PI_F );
+			float flPhi = random->RandomFloat( -0.5f * M_PI_F, 0.5f * M_PI_F );
 			vecTargetPt.x = cos(flTheta) * cos(flPhi);
 			vecTargetPt.y = sin(flTheta) * cos(flPhi);
 			vecTargetPt.z = sin(flPhi);
@@ -4618,6 +4618,7 @@ void CNPC_AttackHelicopter::UpdateBullrushState( void )
 			}
 		}
 		// FALL THROUGH!!
+		[[fallthrough]];
 
 	case BULLRUSH_MODE_DROP_BOMBS_FIXED_SPEED:
 		{
@@ -5172,10 +5173,7 @@ void CGrenadeHelicopter::RampSoundThink( )
 //------------------------------------------------------------------------------
 void CGrenadeHelicopter::WarningBlinkerThink()
 {
-#ifndef HL2_EPISODIC
-	return;
-#endif
-
+#ifdef HL2_EPISODIC
 /*
 	if( !m_hWarningSprite.Get() )
 	{
@@ -5218,7 +5216,6 @@ void CGrenadeHelicopter::WarningBlinkerThink()
 	// Frighten people
 	CSoundEnt::InsertSound ( SOUND_DANGER, WorldSpaceCenter(), g_helicopter_bomb_danger_radius.GetFloat(), 0.2f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
 
-#ifdef HL2_EPISODIC
 	if( gpGlobals->curtime >= m_flBlinkFastTime )
 	{
 		SetContextThink( &CGrenadeHelicopter::WarningBlinkerThink, gpGlobals->curtime + 0.1f, s_pWarningBlinkerContext );
@@ -5227,7 +5224,7 @@ void CGrenadeHelicopter::WarningBlinkerThink()
 	{
 		SetContextThink( &CGrenadeHelicopter::WarningBlinkerThink, gpGlobals->curtime + 0.2f, s_pWarningBlinkerContext );
 	}
-#endif//HL2_EPISODIC
+#endif
 }
 
 //------------------------------------------------------------------------------

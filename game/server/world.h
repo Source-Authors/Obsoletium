@@ -30,8 +30,8 @@ public:
 	virtual void Precache( void );
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
 	virtual void DecalTrace( trace_t *pTrace, char const *decalName );
-	virtual void VPhysicsCollision( int index, gamevcollisionevent_t *pEvent ) {}
-	virtual void VPhysicsFriction( IPhysicsObject *pObject, float energy, int surfaceProps, int surfacePropsHit ) {}
+	virtual void VPhysicsCollision( int, gamevcollisionevent_t * ) {}
+	virtual void VPhysicsFriction( IPhysicsObject *, float, int, int ) {}
 
 	inline void GetWorldBounds( Vector &vecMins, Vector &vecMaxs )
 	{

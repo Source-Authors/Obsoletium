@@ -128,7 +128,7 @@ ConVar	ai_citizen_debug_commander( "ai_citizen_debug_commander", "1" );
 #define STATES_WITH_EXPRESSIONS		3		// Idle, Alert, Combat
 #define EXPRESSIONS_PER_STATE		1
 
-char *szExpressionTypes[CIT_EXP_LAST_TYPE] =
+const char *szExpressionTypes[CIT_EXP_LAST_TYPE] =
 {
 	"Unassigned",
 	"Scared",
@@ -138,24 +138,24 @@ char *szExpressionTypes[CIT_EXP_LAST_TYPE] =
 
 struct citizen_expression_list_t
 {
-	char *szExpressions[EXPRESSIONS_PER_STATE];
+	const char *szExpressions[EXPRESSIONS_PER_STATE];
 };
 // Scared
-citizen_expression_list_t ScaredExpressions[STATES_WITH_EXPRESSIONS] =
+const citizen_expression_list_t ScaredExpressions[STATES_WITH_EXPRESSIONS] =
 {
 	{ { "scenes/Expressions/citizen_scared_idle_01.vcd" } },
 	{ { "scenes/Expressions/citizen_scared_alert_01.vcd" } },
 	{ { "scenes/Expressions/citizen_scared_combat_01.vcd" } },
 };
 // Normal
-citizen_expression_list_t NormalExpressions[STATES_WITH_EXPRESSIONS] =
+const citizen_expression_list_t NormalExpressions[STATES_WITH_EXPRESSIONS] =
 {
 	{ { "scenes/Expressions/citizen_normal_idle_01.vcd" } },
 	{ { "scenes/Expressions/citizen_normal_alert_01.vcd" } },
 	{ { "scenes/Expressions/citizen_normal_combat_01.vcd" } },
 };
 // Angry
-citizen_expression_list_t AngryExpressions[STATES_WITH_EXPRESSIONS] =
+const citizen_expression_list_t AngryExpressions[STATES_WITH_EXPRESSIONS] =
 {
 	{ { "scenes/Expressions/citizen_angry_idle_01.vcd" } },
 	{ { "scenes/Expressions/citizen_angry_alert_01.vcd" } },
@@ -644,7 +644,7 @@ void CNPC_Citizen::SelectModel()
 			for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
 			{
 				CNPC_Citizen *pCitizen = dynamic_cast<CNPC_Citizen *>(g_AI_Manager.AccessAIs()[i]);
-				if ( pCitizen && pCitizen != this && pCitizen->m_iHead >= 0 && pCitizen->m_iHead < ARRAYSIZE(g_ppszRandomHeads) )
+				if ( pCitizen && pCitizen != this && pCitizen->m_iHead >= 0 && pCitizen->m_iHead < static_cast<int>(ARRAYSIZE(g_ppszRandomHeads)) )
 				{
 					headCounts[pCitizen->m_iHead]++;
 				}
@@ -653,7 +653,7 @@ void CNPC_Citizen::SelectModel()
 			// Find all candidates
 			CUtlVectorFixed<HeadCandidate_t, ARRAYSIZE(g_ppszRandomHeads)> candidates;
 
-			for ( i = 0; i < ARRAYSIZE(g_ppszRandomHeads); i++ )
+			for ( i = 0; i < static_cast<int>(ARRAYSIZE(g_ppszRandomHeads)); i++ )
 			{
 				if ( !gender || g_ppszRandomHeads[i][0] == gender )
 				{
@@ -697,7 +697,7 @@ void CNPC_Citizen::SelectModel()
 			pszModelName++;
 			if ( m_iHead == -1 )
 			{
-				for ( int i = 0; i < ARRAYSIZE(g_ppszRandomHeads); i++ )
+				for ( int i = 0; i < static_cast<int>(ARRAYSIZE(g_ppszRandomHeads)); i++ )
 				{
 					if ( Q_stricmp( g_ppszRandomHeads[i], pszModelName ) == 0 )
 					{
@@ -1031,15 +1031,15 @@ void CNPC_Citizen::PrescheduleThink()
 		float timeInSquad = gpGlobals->curtime - m_flTimeJoinedPlayerSquad;
 		timeInSquad = MIN( TIME_FADE, MAX( timeInSquad, 0 ) );
 
-		float fade = ( 1.0 - timeInSquad / TIME_FADE );
+		float fade = ( 1.0f - timeInSquad / TIME_FADE );
 
 		float r = rMin + ( rMax - rMin ) * fade;
 		float g = gMin + ( gMax - gMin ) * fade;
 		float b = bMin + ( bMax - bMin ) * fade;
 
 		// THIS IS A PLACEHOLDER UNTIL WE HAVE A REAL DESIGN & ART -- DO NOT REMOVE
-		NDebugOverlay::Line( Vector( mins.x, GetAbsOrigin().y, GetAbsOrigin().z+1 ), Vector( maxs.x, GetAbsOrigin().y, GetAbsOrigin().z+1 ), r, g, b, false, .11 );
-		NDebugOverlay::Line( Vector( GetAbsOrigin().x, mins.y, GetAbsOrigin().z+1 ), Vector( GetAbsOrigin().x, maxs.y, GetAbsOrigin().z+1 ), r, g, b, false, .11 );
+		NDebugOverlay::Line( Vector( mins.x, GetAbsOrigin().y, GetAbsOrigin().z+1 ), Vector( maxs.x, GetAbsOrigin().y, GetAbsOrigin().z+1 ), r, g, b, false, .11f );
+		NDebugOverlay::Line( Vector( GetAbsOrigin().x, mins.y, GetAbsOrigin().z+1 ), Vector( GetAbsOrigin().x, maxs.y, GetAbsOrigin().z+1 ), r, g, b, false, .11f );
 	}
 	if( GetEnemy() && g_ai_citizen_show_enemy.GetBool() )
 	{
@@ -2670,7 +2670,7 @@ void CNPC_Citizen::CommanderUse( CBaseEntity *pActivator, CBaseEntity *pCaller, 
 					CBaseEntity *pRespondant = FindSpeechTarget( AIST_NPCS );
 					if ( pRespondant )
 					{
-						g_EventQueue.AddEvent( pRespondant, "SpeakIdleResponse", ( GetTimeSpeechComplete() - gpGlobals->curtime ) + .2, this, this );
+						g_EventQueue.AddEvent( pRespondant, "SpeakIdleResponse", ( GetTimeSpeechComplete() - gpGlobals->curtime ) + .2f, this, this );
 					}
 				}
 			}
@@ -2841,10 +2841,10 @@ void CNPC_Citizen::UpdatePlayerSquad()
 	}
 
 	// Autosquadding
-	const float JOIN_PLAYER_XY_TOLERANCE_SQ = Square(36*12);
-	const float UNCONDITIONAL_JOIN_PLAYER_XY_TOLERANCE_SQ = Square(12*12);
-	const float UNCONDITIONAL_JOIN_PLAYER_Z_TOLERANCE = 5*12;
-	const float SECOND_TIER_JOIN_DIST_SQ = Square(48*12);
+	constexpr float JOIN_PLAYER_XY_TOLERANCE_SQ = Square(36.0f*12);
+	constexpr float UNCONDITIONAL_JOIN_PLAYER_XY_TOLERANCE_SQ = Square(12.0f*12);
+	constexpr float UNCONDITIONAL_JOIN_PLAYER_Z_TOLERANCE = 5*12;
+	constexpr float SECOND_TIER_JOIN_DIST_SQ = Square(48.0f*12);
 	if ( pPlayer && ShouldAutosquad() && !(pPlayer->GetFlags() & FL_NOTARGET ) && pPlayer->IsAlive() )
 	{
 		CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
@@ -2862,7 +2862,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 				continue;
 
 			CNPC_Citizen *pCitizen = assert_cast<CNPC_Citizen *>(ppAIs[i]);
-			int iNew;
+			intp iNew;
 
 			if ( pCitizen->IsInPlayerSquad() )
 			{
@@ -2959,7 +2959,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 						if ( !pCitizen->FVisible( pPlayer ) )
 							continue;
 
-						int iNew = candidates.AddToTail();
+						intp iNew = candidates.AddToTail();
 						candidates[iNew].pCitizen = pCitizen;
 						candidates[iNew].bIsInSquad = false;
 						candidates[iNew].distSq = distSq;
@@ -3251,7 +3251,7 @@ CAI_BaseNPC *CNPC_Citizen::GetSquadCommandRepresentative()
 				{
 					if ( pAllyNpc->IsCommandable() && dynamic_cast<CNPC_Citizen *>(pAllyNpc) )
 					{
-						int i = candidates.AddToTail();
+						intp i = candidates.AddToTail();
 						candidates[i].pMember = (CNPC_Citizen *)(pAllyNpc);
 						candidates[i].bSeesPlayer = pAllyNpc->HasCondition( COND_SEE_PLAYER );
 						candidates[i].distSq = ( pAllyNpc->GetAbsOrigin() - pPlayer->GetAbsOrigin() ).LengthSqr();
@@ -3316,7 +3316,7 @@ bool CNPC_Citizen::HandleInteraction(int interactionType, void *data, CBaseComba
 			//SetLookTarget(sourceEnt);
 
 			// Don't let anyone else pick me for a couple seconds
-			SetNextScannerInspectTime( gpGlobals->curtime + 5.0 );
+			SetNextScannerInspectTime( gpGlobals->curtime + 5.0f );
 			return true;
 		}
 		return false;
@@ -3446,7 +3446,7 @@ bool CNPC_Citizen::ShouldHealTarget( CBaseEntity *pTarget, bool bActiveUse )
 					float timeFullHeal = m_flPlayerHealTime;
 					float timeRecharge = sk_citizen_heal_player_delay.GetFloat();
 					float maximumHealAmount = sk_citizen_heal_player.GetFloat();
-					float healAmt = ( maximumHealAmount * ( 1.0 - ( timeFullHeal - gpGlobals->curtime ) / timeRecharge ) );
+					float healAmt = ( maximumHealAmount * ( 1.0f - ( timeFullHeal - gpGlobals->curtime ) / timeRecharge ) );
 					if ( healAmt > pTarget->m_iMaxHealth - pTarget->m_iHealth )
 						healAmt = pTarget->m_iMaxHealth - pTarget->m_iHealth;
 					if ( healAmt < sk_citizen_heal_player_min_forced.GetFloat() )
@@ -3610,7 +3610,7 @@ void CNPC_Citizen::Heal()
 			m_flAllyHealTime 	= gpGlobals->curtime + timeRecharge;
 		}
 		
-		float healAmt = ( maximumHealAmount * ( 1.0 - ( timeFullHeal - gpGlobals->curtime ) / timeRecharge ) );
+		float healAmt = ( maximumHealAmount * ( 1.0f - ( timeFullHeal - gpGlobals->curtime ) / timeRecharge ) );
 		
 		if ( healAmt > maximumHealAmount )
 			healAmt = maximumHealAmount;
@@ -4063,7 +4063,7 @@ CCitizenResponseSystem	*GetCitizenResponse()
 	return g_pCitizenResponseSystem;
 }
 
-char *CitizenResponseConcepts[MAX_CITIZEN_RESPONSES] = 
+const char *CitizenResponseConcepts[MAX_CITIZEN_RESPONSES] = 
 {
 	"TLK_CITIZEN_RESPONSE_SHOT_GUNSHIP",
 	"TLK_CITIZEN_RESPONSE_KILLED_GUNSHIP",
@@ -4118,7 +4118,7 @@ void CCitizenResponseSystem::AddResponseTrigger( citizenresponses_t	iTrigger )
 {
 	m_flResponseAddedTime[ iTrigger ] = gpGlobals->curtime;
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -4184,7 +4184,7 @@ void CCitizenResponseSystem::ResponseThink()
 	// Do we need to keep thinking?
 	if ( bStayActive )
 	{
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 

@@ -254,7 +254,7 @@ void CBaseMultiplayerPlayer::AwardAchievement( int iAchievement, int iCount )
 		CBaseMultiplayerPlayer *pPlayer = ToBaseMultiplayerPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
 		if ( pPlayer && pPlayer->GetPerLifeCounterKeys() )
 		{
-			CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			pPlayer->GetPerLifeCounterKeys()->RecursiveSaveToFile( buf, 0 );
 
 			char szBuf[1024];
@@ -294,7 +294,7 @@ void CBaseMultiplayerPlayer::ResetPerLifeCounters( void )
 ConVar tf_escort_score_rate( "tf_escort_score_rate", "1", FCVAR_CHEAT, "Score for escorting the train, in points per second" );
 
 #define ESCORT_SCORE_CONTEXT		"AreaScoreContext"
-#define ESCORT_SCORE_INTERVAL		0.1
+#define ESCORT_SCORE_INTERVAL		0.1f
 
 //-----------------------------------------------------------------------------
 // Purpose: think to accumulate and award points for escorting the train

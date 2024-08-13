@@ -517,9 +517,9 @@ void CWateryDeathLeech::Spawn( void )
 	SetModel( "models/leech.mdl" );
 
 	SetThink( &CWateryDeathLeech::LeechThink );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 
-	m_flPlaybackRate = random->RandomFloat( 0.5, 1.5 );
+	m_flPlaybackRate = random->RandomFloat( 0.5f, 1.5f );
 	SetCycle( random->RandomFloat( 0.0f, 0.9f ) );
 
 	QAngle vAngle;
@@ -536,7 +536,7 @@ void CWateryDeathLeech::LeechThink( void )
 		 return;
 
 	StudioFrameAdvance();
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if ( m_iFadeState != 0 )
 	{
@@ -546,7 +546,7 @@ void CWateryDeathLeech::LeechThink( void )
 			dt = 0.1f;
 		}
 		m_nRenderMode = kRenderTransTexture;
-		int speed = MAX(1,256*dt); // fade out over 1 second
+		float speed = MAX(1.0f,256*dt); // fade out over 1 second
 
 		if ( m_iFadeState == -1 )
 			 SetRenderColorA( UTIL_Approach( 0, m_clrRender->a, speed ) );
@@ -627,8 +627,8 @@ END_DATADESC()
 LINK_ENTITY_TO_CLASS( trigger_waterydeath, CTriggerWateryDeath );
 
 // Stages of the waterydeath trigger, in time offsets from the initial touch
-#define WD_KILLTIME_NEXT_BITE	0.3
-#define WD_PAINVALUE_STEP 2.0
+#define WD_KILLTIME_NEXT_BITE	0.3f
+#define WD_PAINVALUE_STEP 2.0f
 #define WD_MAX_DAMAGE 15.0f
 
 //-----------------------------------------------------------------------------

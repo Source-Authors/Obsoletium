@@ -42,7 +42,7 @@ protected:
 
 	bool PrintHL2Event( IGameEvent * event )	// print Mod specific logs
 	{
-	//	const char * name = event->GetName() + Q_strlen("hl2_"); // remove prefix
+	//	const char * name = event->GetName() + ssize("hl2_") - 1; // remove prefix
 
 		return false;
 	}

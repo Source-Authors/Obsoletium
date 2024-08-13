@@ -59,10 +59,10 @@
 
 // Seagull perching
 const char *g_pJeepThinkContext = "JeepSeagullThink";
-#define	JEEP_SEAGULL_THINK_INTERVAL		10.0		// Interval between checks for seagull perches
-#define	JEEP_SEAGULL_POOP_INTERVAL		45.0		// Interval between checks for seagull poopage
-#define JEEP_SEAGULL_HIDDEN_TIME		15.0		// Time for which the player must be hidden from the jeep for a seagull to perch
-#define JEEP_SEAGULL_MAX_TIME			60.0		// Time at which a seagull will definately perch on the jeep
+#define	JEEP_SEAGULL_THINK_INTERVAL		10.0f		// Interval between checks for seagull perches
+#define	JEEP_SEAGULL_POOP_INTERVAL		45.0f		// Interval between checks for seagull poopage
+#define JEEP_SEAGULL_HIDDEN_TIME		15.0f		// Time for which the player must be hidden from the jeep for a seagull to perch
+#define JEEP_SEAGULL_MAX_TIME			60.0f		// Time at which a seagull will definately perch on the jeep
 
 ConVar	sk_jeep_gauss_damage( "sk_jeep_gauss_damage", "15" );
 ConVar	hud_jeephint_numentries( "hud_jeephint_numentries", "10", FCVAR_NONE );
@@ -600,7 +600,7 @@ void CPropJeep::CheckWaterLevel( void )
 		// Add the jeep's Z view offset
 		Vector vecUp;
 		AngleVectors( vecAttachAngles, NULL, NULL, &vecUp );
-		vecUp.z = clamp( vecUp.z, 0.0f, vecUp.z );
+		vecUp.z = max( vecUp.z, 0.0f );
 		vecAttachPoint.z += r_JeepViewZHeight.GetFloat() * vecUp.z;
 
 		bool bEyes = ( UTIL_PointContents( vecAttachPoint ) & MASK_WATER ) ? true : false;
@@ -919,7 +919,7 @@ void CPropJeep::FireCannon( void )
 	// Register a muzzleflash for the AI
 	if ( m_hPlayer )
 	{
-		m_hPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5 );
+		m_hPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5f );
 		m_hPlayer->RumbleEffect( RUMBLE_PISTOL, 0, RUMBLE_FLAG_RESTART	);
 	}
 
@@ -1275,7 +1275,7 @@ void CPropJeep::DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeA
 	// Get up vector.
 	Vector vecUp;
 	AngleVectors( vecVehicleEyeAngles, NULL, NULL, &vecUp );
-	vecUp.z = clamp( vecUp.z, 0.0f, vecUp.z );
+	vecUp.z = max( vecUp.z, 0.0f );
 	vecVehicleEyePos.z += r_JeepViewZHeight.GetFloat() * vecUp.z;
 
 	// NOTE: Should probably use some damped equation here.
@@ -1421,7 +1421,7 @@ void CPropJeep::CreateDangerSounds( void )
 			}
 			VectorNormalize(vecDir);
 		}
-		const float radius = speed * 0.4;
+		const float radius = speed * 0.4f;
 
 		// 0.3 seconds ahead of the jeep
 		vecSpot = vecStart + vecDir * (speed * 1.1f);
@@ -1553,7 +1553,7 @@ void CPropJeep::JeepSeagullThink( void )
 	}
 
 	// Start checking quickly
-	SetContextThink( &CPropJeep::JeepSeagullThink, gpGlobals->curtime + 0.2, g_pJeepThinkContext );
+	SetContextThink( &CPropJeep::JeepSeagullThink, gpGlobals->curtime + 0.2f, g_pJeepThinkContext );
 
 	// Not taken enough time yet?
 	float flHiddenTime = (gpGlobals->curtime - m_flLastSawPlayerAt);
@@ -1561,7 +1561,7 @@ void CPropJeep::JeepSeagullThink( void )
 		return;
 
 	// Random chance based upon the time it's taken
-	float flChance = clamp( flHiddenTime / JEEP_SEAGULL_MAX_TIME, 0.0, 1.0 );
+	float flChance = clamp( flHiddenTime / JEEP_SEAGULL_MAX_TIME, 0.0f, 1.0f );
 	if ( RandomFloat(0,1) < flChance )
 	{
 		SpawnPerchedSeagull();

@@ -408,7 +408,7 @@ Vector CPropVehicleChoreoGeneric::BodyTarget( const Vector &posSrc, bool bNoisy 
 //-----------------------------------------------------------------------------
 void CPropVehicleChoreoGeneric::Think(void)
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if ( GetDriver() )
 	{
@@ -925,39 +925,39 @@ void CVehicleChoreoViewParser::ParseKeyValue( void *pData, const char *pKey, con
 	}
 	else if ( !strcmpi( pKey, "pitchcurvezero" ) )
 	{
-		pView->flPitchCurveZero = atof( pValue );
+		pView->flPitchCurveZero = strtof(pValue, nullptr);
 	}
 	else if ( !strcmpi( pKey, "pitchcurvelinear" ) )
 	{
-		pView->flPitchCurveLinear = atof( pValue );
+		pView->flPitchCurveLinear = strtof(pValue, nullptr);
 	}
 	else if ( !strcmpi( pKey, "rollcurvezero" ) )
 	{
-		pView->flRollCurveZero = atof( pValue );
+		pView->flRollCurveZero = strtof(pValue, nullptr);
 	}
 	else if ( !strcmpi( pKey, "rollcurvelinear" ) )
 	{
-		pView->flRollCurveLinear = atof( pValue );
+		pView->flRollCurveLinear = strtof(pValue, nullptr);
 	}
 	else if ( !strcmpi( pKey, "yawmin" ) )
 	{
-		pView->flYawMin = atof( pValue );
+		pView->flYawMin = strtof(pValue, nullptr);
 	}
 	else if ( !strcmpi( pKey, "yawmax" ) )
 	{
-		pView->flYawMax = atof( pValue );
+		pView->flYawMax = strtof(pValue, nullptr);
 	}
 	else if ( !strcmpi( pKey, "pitchmin" ) )
 	{
-		pView->flPitchMin = atof( pValue );
+		pView->flPitchMin = strtof(pValue, nullptr);
 	}
 	else if ( !strcmpi( pKey, "pitchmax" ) )
 	{
-		pView->flPitchMax = atof( pValue );
+		pView->flPitchMax = strtof(pValue, nullptr);
 	}
 	else if ( !strcmpi( pKey, "fov" ) )
 	{
-		pView->flFOV = atof( pValue );
+		pView->flFOV = strtof(pValue, nullptr);
 	}
 }
 

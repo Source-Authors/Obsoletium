@@ -27,11 +27,11 @@ extern ConVar sk_plr_num_shotgun_pellets;
 
 class CWeaponShotgun : public CBaseHLCombatWeapon
 {
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 public:
 	DECLARE_CLASS( CWeaponShotgun, CBaseHLCombatWeapon );
 
-	DECLARE_SERVERCLASS();
+	DECLARE_SERVERCLASS_OVERRIDE();
 
 private:
 	bool	m_bNeedPump;		// When emptied completely
@@ -39,11 +39,11 @@ private:
 	bool	m_bDelayedFire2;	// Fire secondary when finished reloading
 
 public:
-	void	Precache( void );
+	void	Precache( void ) override;
 
-	int CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+	int CapabilitiesGet( void ) override { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 
-	virtual const Vector& GetBulletSpread( void )
+	const Vector& GetBulletSpread( void ) override
 	{
 		static Vector vitalAllyCone = VECTOR_CONE_3DEGREES;
 		static Vector cone = VECTOR_CONE_10DEGREES;
@@ -58,30 +58,30 @@ public:
 		return cone;
 	}
 
-	virtual int				GetMinBurst() { return 1; }
-	virtual int				GetMaxBurst() { return 3; }
+	int				GetMinBurst() override { return 1; }
+	int				GetMaxBurst() override { return 3; }
 
-	virtual float			GetMinRestTime();
-	virtual float			GetMaxRestTime();
+	float			GetMinRestTime() override;
+	float			GetMaxRestTime() override;
 
-	virtual float			GetFireRate( void );
+	float			GetFireRate( void ) override;
 
 	bool StartReload( void );
-	bool Reload( void );
+	bool Reload( void ) override;
 	void FillClip( void );
-	void FinishReload( void );
+	void FinishReload( void ) override;
 	void CheckHolsterReload( void );
 	void Pump( void );
 //	void WeaponIdle( void );
-	void ItemHolsterFrame( void );
-	void ItemPostFrame( void );
-	void PrimaryAttack( void );
-	void SecondaryAttack( void );
+	void ItemHolsterFrame( void ) override;
+	void ItemPostFrame( void ) override;
+	void PrimaryAttack( void ) override;
+	void SecondaryAttack( void ) override;
 	void DryFire( void );
 
 	void FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, bool bUseWeaponAngles );
-	void Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary );
-	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+	void Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary ) override;
+	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator ) override;
 
 	DECLARE_ACTTABLE();
 
@@ -467,14 +467,14 @@ void CWeaponShotgun::PrimaryAttack( void )
 	Vector	vecSrc		= pPlayer->Weapon_ShootPosition( );
 	Vector	vecAiming	= pPlayer->GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );	
 
-	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 1.0 );
+	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 1.0f );
 	
 	// Fire the bullets, and force the first shot to be perfectly accuracy
 	pPlayer->FireBullets( sk_plr_num_shotgun_pellets.GetInt(), vecSrc, vecAiming, GetBulletSpread(), MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 0, -1, -1, 0, NULL, true, true );
 	
 	pPlayer->ViewPunch( QAngle( random->RandomFloat( -2, -1 ), random->RandomFloat( -2, 2 ), 0 ) );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_SHOTGUN, 0.2, GetOwner() );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_SHOTGUN, 0.2f, GetOwner() );
 
 	if (!m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
 	{
@@ -529,9 +529,9 @@ void CWeaponShotgun::SecondaryAttack( void )
 	pPlayer->FireBullets( 12, vecSrc, vecAiming, GetBulletSpread(), MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 0, -1, -1, 0, NULL, false, false );
 	pPlayer->ViewPunch( QAngle(random->RandomFloat( -5, 5 ),0,0) );
 
-	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 1.0 );
+	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 1.0f );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_SHOTGUN, 0.2 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_SHOTGUN, 0.2f );
 
 	if (!m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
 	{

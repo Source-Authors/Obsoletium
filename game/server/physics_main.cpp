@@ -105,7 +105,7 @@ CPhysicsPushedEntities::CPhysicsPushedEntities( void ) : m_rgPusher(8, 8), m_rgM
 //-----------------------------------------------------------------------------
 void CPhysicsPushedEntities::AddEntity( CBaseEntity *ent )
 {
-	int i = m_rgMoved.AddToTail();
+	intp i = m_rgMoved.AddToTail();
 	m_rgMoved[i].m_pEntity = ent;
 	m_rgMoved[i].m_vecStartAbsOrigin = ent->GetAbsOrigin();
 }
@@ -442,10 +442,10 @@ void CPhysicsPushedEntities::StoreMovedEntities( physicspushlist_t &list )
 	list.localOrigin = m_rootPusherStartLocalOrigin;
 	list.localAngles = m_rootPusherStartLocalAngles;
 	list.pushedCount = CountMovedEntities();
-	Assert(list.pushedCount < ARRAYSIZE(list.pushedEnts));
-	if ( list.pushedCount > ARRAYSIZE(list.pushedEnts) )
+	Assert(list.pushedCount < static_cast<int>(ARRAYSIZE(list.pushedEnts)));
+	if ( list.pushedCount > static_cast<int>(ARRAYSIZE(list.pushedEnts)) )
 	{
-		list.pushedCount = ARRAYSIZE(list.pushedEnts);
+		list.pushedCount = static_cast<int>(ARRAYSIZE(list.pushedEnts));
 	}
 	for ( int i = 0; i < list.pushedCount; i++ )
 	{
@@ -568,7 +568,7 @@ private:
 			if ( m_collisionGroups[i] == collisionGroup )
 				return;
 		}
-		if ( m_collisionGroupCount < ARRAYSIZE(m_collisionGroups) )
+		if ( m_collisionGroupCount < static_cast<int>(ARRAYSIZE(m_collisionGroups)) )
 		{
 			m_collisionGroups[m_collisionGroupCount] = collisionGroup;
 			m_collisionGroupCount++;
@@ -751,7 +751,7 @@ void CPhysicsPushedEntities::SetupAllInHierarchy( CBaseEntity *pParent )
 	// rotation (which occurs in relink) will put it at the final location
 	// NOTE: The root object at this point is actually at its final position.
 	// We'll fix that up later
-	int i = m_rgPusher.AddToTail();
+	intp i = m_rgPusher.AddToTail();
 	m_rgPusher[i].m_pEntity = pParent;
 	m_rgPusher[i].m_vecStartAbsOrigin = pParent->GetAbsOrigin();
 
@@ -1105,7 +1105,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 				}
 				else
 				{
-					PhysicsClipVelocity( original_velocity, planes[i], new_velocity, 1.0 + sv_bounce.GetFloat() * (1-GetFriction()) );
+					PhysicsClipVelocity( original_velocity, planes[i], new_velocity, 1.0f + sv_bounce.GetFloat() * (1-GetFriction()) );
 				}
 			}
 
@@ -1375,7 +1375,7 @@ void CBaseEntity::PerformPush( float movetime )
 		m_pBlocker = pBlocker;
 		if (m_pBlocker.ToInt() != hPrevBlocker)
 		{
-			if (hPrevBlocker != INVALID_EHANDLE_INDEX)
+			if (static_cast<uint>(hPrevBlocker) != INVALID_EHANDLE_INDEX)
 			{
 				EndBlocked();
 			}

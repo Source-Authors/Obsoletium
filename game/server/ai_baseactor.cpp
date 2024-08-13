@@ -464,7 +464,7 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 			}
 
 			// calc how much to use the spine for turning
-			float spineintensity = (1.0 - MAX( 0.0, (intensity - 0.5) / 0.5 ));
+			float spineintensity = (1.0f - MAX( 0.0f, (intensity - 0.5f) / 0.5f ));
 			// force spine to full if not in scene or locked
 			if (!bInScene || event->IsLockBodyFacing() )
 			{
@@ -668,7 +668,7 @@ bool CAI_BaseActor::CheckSceneEventCompletion( CSceneEventInfo *info, float curr
 					{
 						return true;
 					}
-					float t = (1.0 - GetLayerCycle( info->m_iLayer )) * SequenceDuration( GetLayerSequence( info->m_iLayer ) );
+					float t = (1.0f - GetLayerCycle( info->m_iLayer )) * SequenceDuration( GetLayerSequence( info->m_iLayer ) );
 
 					return (t <= preload);
 				}
@@ -1007,8 +1007,8 @@ void CAI_BaseActor::UpdateHeadControl( const Vector &vHeadTarget, float flHeadIn
 	MatrixAngles( headXform, vTargetAngles );
 
 	// partially debounce head goal
-	float s0 = 1.0 - flHeadInfluence + GetHeadDebounce() * flHeadInfluence;
-	float s1 = (1.0 - s0);
+	float s0 = 1.0f - flHeadInfluence + GetHeadDebounce() * flHeadInfluence;
+	float s1 = (1.0f - s0);
 	// limit velocity of head turns
 	m_goalHeadCorrection.x = UTIL_Approach( m_goalHeadCorrection.x * s0 + vTargetAngles.x * s1, m_goalHeadCorrection.x, 10.0 );
 	m_goalHeadCorrection.y = UTIL_Approach( m_goalHeadCorrection.y * s0 + vTargetAngles.y * s1, m_goalHeadCorrection.y, 30.0 );

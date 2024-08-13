@@ -236,8 +236,8 @@ void CAI_NetworkManager::SaveNetworkGraph( void )
 	Q_snprintf( tempFilename, sizeof( tempFilename ), "%s/%s", szNrpFilename, STRING( gpGlobals->mapname ) );
 	
 	// Remove the filename.
-	int len = strlen( tempFilename );
-	for ( int i=0; i < len; i++ )
+	intp len = V_strlen( tempFilename );
+	for ( intp i=0; i < len; i++ )
 	{
 		if ( tempFilename[len-i-1] == '/' || tempFilename[len-i-1] == '\\' )
 		{
@@ -596,8 +596,7 @@ void CAI_NetworkManager::LoadNetworkGraph( void )
 	if ( numNodes > MAX_NODES || numNodes < 0 )
 	{
 		Error( "AI node graph %s is corrupt\n", szNrpFilename );
-		DevMsg( "%s", (const char *)buf.Base() );
-		DevMsg( "\n" );
+		DevMsg( "%s\n\n", buf.Base<const char>() );
 		Assert( 0 );
 		return;
 	}

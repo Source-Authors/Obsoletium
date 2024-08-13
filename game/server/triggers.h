@@ -78,7 +78,7 @@ public:
 	int	 DrawDebugTextOverlays(void);
 
 	// by default, triggers don't deal with TraceAttack
-	void TraceAttack(CBaseEntity *pAttacker, float flDamage, const Vector &vecDir, trace_t *ptr, int bitsDamageType) {}
+	void TraceAttack( [[maybe_unused]] CBaseEntity *pAttacker, [[maybe_unused]] float flDamage, [[maybe_unused]] const Vector &vecDir, [[maybe_unused]] trace_t *ptr, [[maybe_unused]] int bitsDamageType) {}
 
 	bool PointIsWithin( const Vector &vecPoint );
 

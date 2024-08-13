@@ -2993,10 +2993,7 @@ void CNPC_CombineDropship::MakeTracer( const Vector &vecTracerSrc, const trace_t
 	case TRACER_LINE:
 		{
 			float flTracerDist;
-			Vector vecDir;
-			Vector vecEndPos;
-
-			vecDir = tr.endpos - vecTracerSrc;
+			Vector vecDir = tr.endpos - vecTracerSrc;
 
 			flTracerDist = VectorNormalize( vecDir );
 

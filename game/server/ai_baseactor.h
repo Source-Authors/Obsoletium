@@ -81,11 +81,11 @@ public:
 		m_flBlinktime( 0 ),
 		m_hLookTarget( NULL ),
 		m_iszExpressionScene( NULL_STRING ),
+		m_iszExpressionOverride( NULL_STRING ),
 		m_iszIdleExpression( NULL_STRING ),
 		m_iszAlertExpression( NULL_STRING ),
 		m_iszCombatExpression( NULL_STRING ),
-		m_iszDeathExpression( NULL_STRING ),
-		m_iszExpressionOverride( NULL_STRING )
+		m_iszDeathExpression( NULL_STRING )
 	{
 		memset( m_flextarget, 0, 64 * sizeof( m_flextarget[0] ) );
 	}
@@ -125,7 +125,7 @@ public:
 	virtual bool 			PickRandomLookTarget( AILookTargetArgs_t *pArgs );
 	virtual void			MakeRandomLookTarget( AILookTargetArgs_t *pArgs, float minTime, float maxTime );
 	virtual bool			HasActiveLookTargets( void );
-	virtual void 			OnSelectedLookTarget( AILookTargetArgs_t *pArgs ) { return; }
+	virtual void 			OnSelectedLookTarget( AILookTargetArgs_t * ) { return; }
 	virtual void 			ClearLookTarget( CBaseEntity *pTarget );
 	virtual void			ExpireCurrentRandomLookTarget() { m_flNextRandomLookTime = gpGlobals->curtime - 0.1f; }
 

@@ -326,7 +326,8 @@ public:
 
 	void	SetFadeDistance( float minFadeDist, float maxFadeDist );
 
-	int		GetBoneCacheFlags( void ) { return m_fBoneCacheFlags; }
+	// dimhotepus: return int -> unsigned short.
+	unsigned short		GetBoneCacheFlags( void ) { return m_fBoneCacheFlags; }
 	inline void	SetBoneCacheFlags( unsigned short fFlag ) { m_fBoneCacheFlags |= fFlag; }
 	inline void	ClearBoneCacheFlags( unsigned short fFlag ) { m_fBoneCacheFlags &= ~fFlag; }
 

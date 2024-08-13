@@ -651,9 +651,7 @@ CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 	
 	while( pEnt )
 	{
-		CNPCSpawnDestination *pDestination;
-
-		pDestination = dynamic_cast <CNPCSpawnDestination*>(pEnt);
+		CNPCSpawnDestination *pDestination = dynamic_cast <CNPCSpawnDestination*>(pEnt);
 
 		if( pDestination && pDestination->IsAvailable() )
 		{
@@ -716,55 +714,51 @@ CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 
 		return NULL;
 	}
-	else
+
+	if( m_CriterionDistance == TS_DIST_NEAREST )
 	{
-		if( m_CriterionDistance == TS_DIST_NEAREST )
+		float flNearest = FLT_MAX;
+		CNPCSpawnDestination *pNearest = NULL;
+
+		for( int i = 0 ; i < count ; i++ )
 		{
-			float flNearest = FLT_MAX;
-			CNPCSpawnDestination *pNearest = NULL;
+			Vector vecTest = pDestinations[ i ]->GetAbsOrigin();
+			float flDist = ( vecTest - pPlayer->GetAbsOrigin() ).Length();
 
-			for( int i = 0 ; i < count ; i++ )
+			if ( m_iMinSpawnDistance != 0 && m_iMinSpawnDistance > flDist )
+				continue;
+
+			if( flDist < flNearest && HumanHullFits( vecTest ) )
 			{
-				Vector vecTest = pDestinations[ i ]->GetAbsOrigin();
-				float flDist = ( vecTest - pPlayer->GetAbsOrigin() ).Length();
-
-				if ( m_iMinSpawnDistance != 0 && m_iMinSpawnDistance > flDist )
-					continue;
-
-				if( flDist < flNearest && HumanHullFits( vecTest ) )
-				{
-					flNearest = flDist;
-					pNearest = pDestinations[ i ];
-				}
+				flNearest = flDist;
+				pNearest = pDestinations[ i ];
 			}
-
-			return pNearest;
 		}
-		else
-		{
-			float flFarthest = 0;
-			CNPCSpawnDestination *pFarthest = NULL;
 
-			for( int i = 0 ; i < count ; i++ )
-			{
-				Vector vecTest = pDestinations[ i ]->GetAbsOrigin();
-				float flDist = ( vecTest - pPlayer->GetAbsOrigin() ).Length();
-
-				if ( m_iMinSpawnDistance != 0 && m_iMinSpawnDistance > flDist )
-					continue;
-
-				if( flDist > flFarthest && HumanHullFits( vecTest ) )
-				{
-					flFarthest = flDist;
-					pFarthest = pDestinations[ i ];
-				}
-			}
-
-			return pFarthest;
-		}
+		return pNearest;
 	}
 
-	return NULL;
+	{
+		float flFarthest = 0;
+		CNPCSpawnDestination *pFarthest = NULL;
+
+		for( int i = 0 ; i < count ; i++ )
+		{
+			Vector vecTest = pDestinations[ i ]->GetAbsOrigin();
+			float flDist = ( vecTest - pPlayer->GetAbsOrigin() ).Length();
+
+			if ( m_iMinSpawnDistance != 0 && m_iMinSpawnDistance > flDist )
+				continue;
+
+			if( flDist > flFarthest && HumanHullFits( vecTest ) )
+			{
+				flFarthest = flDist;
+				pFarthest = pDestinations[ i ];
+			}
+		}
+
+		return pFarthest;
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -55,7 +55,7 @@ bool CEventLog::PrintEvent( IGameEvent *event )
 
 bool CEventLog::PrintGameEvent( IGameEvent *event )
 {
-//	const char * name = event->GetName() + Q_strlen("game_"); // remove prefix
+//	const char * name = event->GetName() + ssize("game_") - 1; // remove prefix
 
 	return false;
 }
@@ -65,7 +65,7 @@ bool CEventLog::PrintPlayerEvent( IGameEvent *event )
 	const char * eventName = event->GetName();
 	const int userid = event->GetInt( "userid" );
 
-	if ( !Q_strncmp( eventName, "player_connect", Q_strlen("player_connect") ) ) // player connect is before the CBasePlayer pointer is setup
+	if ( !Q_strncmp( eventName, "player_connect", ssize("player_connect") - 1 ) ) // player connect is before the CBasePlayer pointer is setup
 	{
 		const char *name = event->GetString( "name" );
 		const char *address = event->GetString( "address" );
@@ -73,7 +73,7 @@ bool CEventLog::PrintPlayerEvent( IGameEvent *event )
 		UTIL_LogPrintf( "\"%s<%i><%s><>\" connected, address \"%s\"\n", name, userid, networkid, address);
 		return true;
 	}
-	else if ( !Q_strncmp( eventName, "player_disconnect", Q_strlen("player_disconnect")  ) )
+	else if ( !Q_strncmp( eventName, "player_disconnect", ssize("player_disconnect") - 1  ) )
 	{
 		const char *reason = event->GetString("reason" );
 		const char *name = event->GetString("name" );
@@ -97,7 +97,7 @@ bool CEventLog::PrintPlayerEvent( IGameEvent *event )
 		return false;
 	}
 
-	if ( !Q_strncmp( eventName, "player_team", Q_strlen("player_team") ) )
+	if ( !Q_strncmp( eventName, "player_team", ssize("player_team") - 1 ) )
 	{
 		const bool bDisconnecting = event->GetBool( "disconnect" );
 
@@ -118,7 +118,7 @@ bool CEventLog::PrintPlayerEvent( IGameEvent *event )
 
 		return true;
 	}
-	else if ( !Q_strncmp( eventName, "player_death", Q_strlen("player_death") ) )
+	else if ( !Q_strncmp( eventName, "player_death", ssize("player_death") - 1 ) )
 	{
 		const int attackerid = event->GetInt("attacker" );
 
@@ -196,7 +196,7 @@ bool CEventLog::PrintPlayerEvent( IGameEvent *event )
 		}
 		return true;
 	}
-	else if ( !Q_strncmp( eventName, "player_activate", Q_strlen("player_activate") ) )
+	else if ( !Q_strncmp( eventName, "player_activate", ssize("player_activate") - 1 ) )
 	{
 		UTIL_LogPrintf( "\"%s<%i><%s><>\" entered the game\n",  
 							pPlayer->GetPlayerName(),
@@ -206,7 +206,7 @@ bool CEventLog::PrintPlayerEvent( IGameEvent *event )
 
 		return true;
 	}
-	else if ( !Q_strncmp( eventName, "player_changename", Q_strlen("player_changename") ) )
+	else if ( !Q_strncmp( eventName, "player_changename", ssize("player_changename") - 1 ) )
 	{
 		const char *newName = event->GetString( "newname" );
 		const char *oldName = event->GetString( "oldname" );
@@ -228,7 +228,7 @@ bool CEventLog::PrintPlayerEvent( IGameEvent *event )
 
 bool CEventLog::PrintTeamEvent( IGameEvent *event )
 {
-//	const char * name = event->GetName() + Q_strlen("team_"); // remove prefix
+//	const char * name = event->GetName() + ssize("team_") - 1; // remove prefix
 
 	return false;
 }

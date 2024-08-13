@@ -48,7 +48,7 @@ public:
 
 	void NetworkStateChanged() {}	// TE's are sent out right away so we don't track whether state changes or not,
 									// but we want to allow CNetworkVars.
-	void NetworkStateChanged( void *pVar ) {}
+	void NetworkStateChanged( void * ) {}
 
 private:
 	// Descriptive name, for when running tests

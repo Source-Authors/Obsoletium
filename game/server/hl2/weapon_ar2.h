@@ -24,37 +24,37 @@ public:
 
 	CWeaponAR2();
 
-	DECLARE_SERVERCLASS();
+	DECLARE_SERVERCLASS_OVERRIDE();
 
-	void	ItemPostFrame( void );
-	void	Precache( void );
+	void	ItemPostFrame( void ) override;
+	void	Precache( void ) override;
 	
-	void	SecondaryAttack( void );
+	void	SecondaryAttack( void ) override;
 	void	DelayedAttack( void );
 
-	const char *GetTracerType( void ) { return "AR2Tracer"; }
+	const char *GetTracerType( void ) override { return "AR2Tracer"; }
 
-	void	AddViewKick( void );
+	void	AddViewKick( void ) override;
 
 	void	FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, bool bUseWeaponAngles );
 	void	FireNPCSecondaryAttack( CBaseCombatCharacter *pOperator, bool bUseWeaponAngles );
-	void	Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary );
-	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+	void	Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary ) override;
+	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator ) override;
 
-	int		GetMinBurst( void ) { return 2; }
-	int		GetMaxBurst( void ) { return 5; }
-	float	GetFireRate( void ) { return 0.1f; }
+	int		GetMinBurst( void ) override { return 2; }
+	int		GetMaxBurst( void ) override { return 5; }
+	float	GetFireRate( void ) override { return 0.1f; }
 
-	bool	CanHolster( void ) const;
-	bool	Reload( void );
+	bool	CanHolster( void ) const override;
+	bool	Reload( void ) override;
 
-	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+	int		CapabilitiesGet( void ) override { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 
-	Activity	GetPrimaryAttackActivity( void );
+	Activity	GetPrimaryAttackActivity( void ) override;
 	
-	void	DoImpactEffect( trace_t &tr, int nDamageType );
+	void	DoImpactEffect( trace_t &tr, int nDamageType ) override;
 
-	virtual const Vector& GetBulletSpread( void )
+	const Vector& GetBulletSpread( void ) override
 	{
 		static Vector cone;
 		
@@ -63,7 +63,7 @@ public:
 		return cone;
 	}
 
-	const WeaponProficiencyInfo_t *GetProficiencyValues();
+	const WeaponProficiencyInfo_t *GetProficiencyValues() override;
 
 protected:
 
@@ -72,7 +72,7 @@ protected:
 	int						m_nVentPose;
 	
 	DECLARE_ACTTABLE();
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 };
 
 

@@ -1103,7 +1103,7 @@ void CPropCombineBall::DoExplosion( )
 
 	if( hl2_episodic.GetBool() )
 	{
-		CSoundEnt::InsertSound( SOUND_COMBAT | SOUND_CONTEXT_EXPLOSION, WorldSpaceCenter(), 180.0f, 0.25, this );
+		CSoundEnt::InsertSound( SOUND_COMBAT | SOUND_CONTEXT_EXPLOSION, WorldSpaceCenter(), 180, 0.25, this );
 	}
 
 	// Turn us off and wait because we need our trails to finish up properly
@@ -1648,7 +1648,7 @@ void CPropCombineBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 	m_flLastBounceTime = gpGlobals->curtime;
 
 	// Reset the sound timer
-	SetContextThink( &CPropCombineBall::WhizSoundThink, gpGlobals->curtime + 0.01, s_pWhizThinkContext );
+	SetContextThink( &CPropCombineBall::WhizSoundThink, gpGlobals->curtime + 0.01f, s_pWhizThinkContext );
 
 	// Deflect towards nearby enemies
 	DeflectTowardEnemy( flSpeed, index, pEvent );
@@ -2113,7 +2113,6 @@ void CPointCombineBallLauncher::SpawnBall()
 	pBall->SetRadius( flRadius );
 
 	Vector vecAbsOrigin = GetAbsOrigin();
-	Vector zaxis;
 	
 	pBall->SetAbsOrigin( vecAbsOrigin );
 	pBall->SetSpawner( this );
