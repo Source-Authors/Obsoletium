@@ -28,7 +28,7 @@ namespace vgui
 
 class CBrowseButton : public vgui::Button
 {
-	DECLARE_CLASS_SIMPLE( CBrowseButton, vgui::Button );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBrowseButton, vgui::Button );
 
 public:
 	CBrowseButton( vgui::Panel *pParent );
@@ -102,7 +102,7 @@ struct QCInfo
 //-----------------------------------------------------------------------------
 class CQCGenerator : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CQCGenerator, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CQCGenerator, vgui::EditablePanel );
 
 public:
 	CQCGenerator( vgui::Panel *pParent, const char *pszPath, const char *pszScene );
@@ -111,7 +111,7 @@ public:
 	// overridden frame functions
 //	virtual void Activate();
 
-	virtual void OnCommand( const char *command );
+	void OnCommand( const char *command ) override;
 
 	// Purpose: 
 //	virtual void OnKeyCodeTyped( vgui::KeyCode code );
@@ -127,7 +127,7 @@ public:
 
 	void DeleteLOD( );
 	void EditLOD();
-	virtual void OnKeyCodeTyped( vgui::KeyCode code);
+	void OnKeyCodeTyped( vgui::KeyCode code) override;
 	void InitializeSMDPaths( const char *pszPath, const char *pszScene );
 	
 protected:

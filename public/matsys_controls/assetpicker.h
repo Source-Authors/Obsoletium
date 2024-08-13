@@ -27,7 +27,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CAssetPicker : public CBaseAssetPicker
 {
-	DECLARE_CLASS_SIMPLE( CAssetPicker, CBaseAssetPicker );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAssetPicker, CBaseAssetPicker );
 
 public:
 	CAssetPicker( vgui::Panel *pParent, const char *pAssetType, 
@@ -40,7 +40,7 @@ public:
 //-----------------------------------------------------------------------------
 class CAssetPickerFrame : public CBaseAssetPickerFrame
 {
-	DECLARE_CLASS_SIMPLE( CAssetPickerFrame, CBaseAssetPickerFrame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAssetPickerFrame, CBaseAssetPickerFrame );
 
 public:
 	CAssetPickerFrame( vgui::Panel *pParent, const char *pTitle, 

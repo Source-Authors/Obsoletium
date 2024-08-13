@@ -40,7 +40,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CColorPickerPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CColorPickerPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorPickerPanel, vgui::EditablePanel );
 
 public:
 	// constructor
@@ -50,8 +50,8 @@ public:
 	void GetInitialColor( Color *pColor );
 
 	// Inherited from Panel
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void OnMousePressed( vgui::MouseCode code );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void OnMousePressed( vgui::MouseCode code ) override;
 
 private:
 	MESSAGE_FUNC_PARAMS( OnRadioButtonChecked, "RadioButtonChecked", kv );
@@ -96,14 +96,14 @@ private:
 //-----------------------------------------------------------------------------
 class CColorPickerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CColorPickerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorPickerFrame, vgui::Frame );
 
 public:
 	CColorPickerFrame( vgui::Panel *pParent, const char *pTitle );
 	~CColorPickerFrame();
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 	// Purpose: Activate the dialog
 	// If a color is picked, the message 'ColorPickerPicked' is sent with the "color" field set to the color
@@ -129,7 +129,7 @@ private:
 //-----------------------------------------------------------------------------
 class CColorPickerButton : public vgui::Button
 {
-	DECLARE_CLASS_SIMPLE( CColorPickerButton, vgui::Button );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorPickerButton, vgui::Button );
 
 	/*
 	NOTE: Sends ColorPickerPicked message when a color is picked
@@ -144,8 +144,8 @@ public:
 	CColorPickerButton( vgui::Panel *pParent, const char *pName, vgui::Panel *pActionSignalTarget = NULL );
 	~CColorPickerButton();
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void DoClick();
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void DoClick() override;
 
 	void	SetColor( const Color& clr );
 	void	SetColor( int r, int g, int b, int a );

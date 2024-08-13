@@ -37,7 +37,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CPotteryWheelPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CPotteryWheelPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPotteryWheelPanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
@@ -45,19 +45,19 @@ public:
 	virtual ~CPotteryWheelPanel();
 
 	// Overriden methods of vgui::Panel
-	virtual void ApplySettings( KeyValues *inResourceData );
-	virtual void Init( int x, int y, int wide, int tall );
-	virtual void Paint();
+	void ApplySettings( KeyValues *inResourceData ) override;
+	void Init( int x, int y, int wide, int tall ) override;
+	void Paint() override;
 
-	virtual void OnKeyCodePressed ( vgui::KeyCode code );
-	virtual void OnKeyCodeReleased( vgui::KeyCode code );
-	virtual void OnMousePressed ( vgui::MouseCode code );
-	virtual void OnMouseReleased( vgui::MouseCode code );
-	virtual void OnCursorMoved( int x, int y );
-	virtual void OnMouseWheeled( int delta );
-	virtual void OnTick();
+	void OnKeyCodePressed ( vgui::KeyCode code ) override;
+	void OnKeyCodeReleased( vgui::KeyCode code ) override;
+	void OnMousePressed ( vgui::MouseCode code ) override;
+	void OnMouseReleased( vgui::MouseCode code ) override;
+	void OnCursorMoved( int x, int y ) override;
+	void OnMouseWheeled( int delta ) override;
+	void OnTick() override;
 
-	virtual void OnMouseCaptureLost();
+	void OnMouseCaptureLost() override;
 
 	// Sets the camera to look at the the thing we're spinning around
 	void LookAt( const Vector &vecCenter, float flRadius );

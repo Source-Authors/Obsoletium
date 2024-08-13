@@ -33,16 +33,16 @@ class CGameFileTreeView;
 //-----------------------------------------------------------------------------
 class CMDLSequencePicker : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CMDLSequencePicker, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMDLSequencePicker, vgui::EditablePanel );
 public:
 	CMDLSequencePicker( vgui::Panel *pParent );
 	virtual ~CMDLSequencePicker();
 
 	// overridden frame functions
 	virtual void Activate();
-	virtual void OnClose();
-	virtual void PerformLayout();
-	virtual void OnTick();
+	void OnClose() override;
+	void PerformLayout() override;
+	void OnTick() override;
 
 	char const *GetModelName();
 	char const *GetSequenceName();
@@ -92,16 +92,16 @@ private:
 //-----------------------------------------------------------------------------
 class CMDLSequencePickerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CMDLSequencePickerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMDLSequencePickerFrame, vgui::Frame );
 public:
 	CMDLSequencePickerFrame( vgui::Panel *parent, char const *title );
 	virtual ~CMDLSequencePickerFrame();
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 protected:
 
-	virtual void OnTick();
+	void OnTick() override;
 
 	MESSAGE_FUNC( OnOK, "OnOK" );
 	MESSAGE_FUNC( OnCancel, "OnCancel" );

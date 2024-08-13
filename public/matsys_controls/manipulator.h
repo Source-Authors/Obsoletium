@@ -52,10 +52,10 @@ public:
 	virtual void OnAcceptManipulation( void ) {};
 	virtual void OnCancelManipulation( void ) {};
 
-	virtual void OnCursorMoved( int x, int y ) {};
-	virtual void OnMousePressed( vgui::MouseCode code, int x, int y ) {};
-	virtual void OnMouseReleased( vgui::MouseCode code, int x, int y ) {};
-	virtual void OnMouseWheeled( int delta ) {};
+	virtual void OnCursorMoved( int, int ) {};
+	virtual void OnMousePressed( vgui::MouseCode, int, int ) {};
+	virtual void OnMouseReleased( vgui::MouseCode, int, int ) {};
+	virtual void OnMouseWheeled( int ) {};
 
 	virtual void SetViewportSize( int w, int h )
 	{

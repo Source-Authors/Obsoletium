@@ -46,8 +46,8 @@ using namespace vgui;
 char *strrchrcount(char *string, int character, int count )
 {
 	int j = count;
-	int numChars = strlen( string );
-	for( int i = numChars; i > 0; i-- )
+	intp numChars = V_strlen( string );
+	for( intp i = numChars; i > 0; i-- )
 	{
 		if( string[i-1] == character )
 		{
@@ -238,7 +238,7 @@ void CBrowseButton::SetCharVar( char **pVar, const char *pszNewText )
 
 	if ( pszNewText )
 	{
-		int len = Q_strlen( pszNewText ) + 1;
+		intp len = Q_strlen( pszNewText ) + 1;
 		*pVar = new char[ len ];
 		Q_strncpy( *pVar, pszNewText, len );
 	}
@@ -450,7 +450,7 @@ void CQCGenerator::BrowseFile( KeyValues *data )
 
 void CQCGenerator::OnFileSelected( KeyValues *data ) 
 {
-	if ( m_szTargetField )
+	if ( m_szTargetField[0] )
 	{
 		vgui::Panel *pTargetField = FindChildByName( m_szTargetField );
 		((TextEntry *)pTargetField)->SetText( data->GetString( "fullpath" ) );
@@ -460,7 +460,7 @@ void CQCGenerator::OnFileSelected( KeyValues *data )
 
 void CQCGenerator::OnDirectorySelected( KeyValues *data ) 
 {
-	if ( m_szTargetField )
+	if ( m_szTargetField[0] )
 	{
 		vgui::Panel *pTargetField = FindChildByName( m_szTargetField );
 		((TextEntry *)pTargetField)->SetText( data->GetString( "dir" ) );
@@ -588,7 +588,7 @@ bool CQCGenerator::GenerateQCFile()
 	sprintf( szCommand, "%s -game %s %s", studiomdlPath, szGamePath, szName);
 	bool bReturn = CreateProcess( NULL, szCommand, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &startup, &process);
 #else
-	Assert( !"Implement me, why aren't we using a thread tool abstraction?" );
+	AssertMsg( false, "Implement me, why aren't we using a thread tool abstraction?" );
 	bool bReturn = false;
 #endif
 	return bReturn;
@@ -611,7 +611,7 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 	//iterate through .smd files
   	const char *startName = pszScene;
 
-	int nSearchLength = Q_strlen( pszScene );
+	intp nSearchLength = Q_strlen( pszScene );
 
 	int currentLOD = 1;
 	

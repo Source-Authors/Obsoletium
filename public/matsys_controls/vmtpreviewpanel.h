@@ -30,7 +30,7 @@
 //-----------------------------------------------------------------------------
 class CVMTPreviewPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CVMTPreviewPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CVMTPreviewPanel, vgui::Panel );
 
 public:
 	// constructor
@@ -39,7 +39,7 @@ public:
 	const char *GetVMT() const;
 
 	// Paints the texture
-	virtual void Paint( void );
+	void Paint( void ) override;
 
 	// View it in 3D or 2D mode
 	void DrawIn3DMode( bool b3DMode );

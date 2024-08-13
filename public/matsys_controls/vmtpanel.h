@@ -34,7 +34,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CVMTPanel : public CPotteryWheelPanel
 {
-	DECLARE_CLASS_SIMPLE( CVMTPanel, CPotteryWheelPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CVMTPanel, CPotteryWheelPanel );
 
 public:
 	// constructor, destructor
@@ -48,9 +48,9 @@ public:
 	void RenderUsingActualSize( bool bEnable );
 
 	// performs the layout
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 private:
 	// paint it stretched to the window size
@@ -63,7 +63,7 @@ private:
 	void RenderSphere( const Vector &vCenter, float flRadius, int nTheta, int nPhi );
 
 	// paint it!
-	virtual void OnPaint3D();
+	void OnPaint3D() override;
 
 private:
 	// The material to draw

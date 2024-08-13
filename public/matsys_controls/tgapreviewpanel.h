@@ -23,7 +23,7 @@
 //-----------------------------------------------------------------------------
 class CTGAPreviewPanel : public CProceduralTexturePanel
 {
-	DECLARE_CLASS_SIMPLE( CTGAPreviewPanel, CProceduralTexturePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CTGAPreviewPanel, CProceduralTexturePanel );
 
 public:
 	// constructor

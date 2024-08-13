@@ -35,7 +35,7 @@ typedef unsigned short DirHandle_t;
 //-----------------------------------------------------------------------------
 class CBaseAssetPicker : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CBaseAssetPicker, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseAssetPicker, vgui::EditablePanel );
 
 public:
 	CBaseAssetPicker( vgui::Panel *pParent, const char *pAssetType, 
@@ -43,14 +43,14 @@ public:
 	~CBaseAssetPicker();
 
 	// overridden frame functions
-	virtual void OnTick();
-	virtual bool HasUserConfigSettings();
-	virtual void ApplyUserConfigSettings( KeyValues *pUserConfig );
-	virtual void GetUserConfigSettings( KeyValues *pUserConfig );
-	virtual void OnCommand( const char *pCommand );
+	void OnTick() override;
+	bool HasUserConfigSettings() override;
+	void ApplyUserConfigSettings( KeyValues *pUserConfig ) override;
+	void GetUserConfigSettings( KeyValues *pUserConfig ) override;
+	void OnCommand( const char *pCommand ) override;
 
 	// Purpose: 
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 	// Returns the selected asset name
 	int GetSelectedAssetCount();
@@ -80,7 +80,7 @@ protected:
 	void AddExtension( const char *pExtension );
 
 	// Derived classes have this called when the previewed asset changes
-	virtual void OnSelectedAssetPicked( const char *pAssetName ) {}
+	virtual void OnSelectedAssetPicked( const char * ) {}
 
 	// Derived classes have this called when the next selected asset is selected by default
 	virtual void OnNextSelectionIsDefault() {}
@@ -153,14 +153,14 @@ protected:
 //-----------------------------------------------------------------------------
 class CBaseAssetPickerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CBaseAssetPickerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseAssetPickerFrame, vgui::Frame );
 
 public:
 	CBaseAssetPickerFrame( vgui::Panel *pParent );
 	~CBaseAssetPickerFrame();
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 	// Purpose: Activate the dialog
 	// The message "AssetSelected" will be sent if an asset is picked
