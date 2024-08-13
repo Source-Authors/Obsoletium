@@ -36,16 +36,16 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CBaseAttributeChoicePanel : public CBaseAttributePanel
 {
-	DECLARE_CLASS_SIMPLE( CBaseAttributeChoicePanel, CBaseAttributePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseAttributeChoicePanel, CBaseAttributePanel );
 
 public:
 	CBaseAttributeChoicePanel( vgui::Panel *parent,	const AttributeWidgetInfo_t &info );
 
-	virtual void PostConstructor();
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void PostConstructor() override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 protected:
-	virtual void Refresh();
+	void Refresh() override;
 
 private:
 	// Derived classes can re-implement this to fill the combo box however they like
@@ -55,8 +55,8 @@ private:
 
 	MESSAGE_FUNC_PTR( OnTextChanged, "TextChanged", panel );
 
-	virtual void Apply();
-	virtual vgui::Panel *GetDataPanel();
+	void Apply() override;
+	vgui::Panel *GetDataPanel() override;
 
 	vgui::ComboBox	*m_pData;
 };
