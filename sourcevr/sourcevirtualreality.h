@@ -24,8 +24,8 @@ class CDistortionTextureRegen : public ITextureRegenerator
 {
 public:
 	CDistortionTextureRegen( vr::Hmd_Eye eEye ) : m_eEye( eEye ) {}
-	virtual void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pSubRect ) OVERRIDE;
-	virtual void Release()  OVERRIDE {}
+	virtual void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pSubRect ) override;
+	virtual void Release()  override {}
 
 private:
 	vr::Hmd_Eye m_eEye;
@@ -52,38 +52,38 @@ public:
 	//
 	// IAppSystem
 	//
-	virtual bool							Connect( CreateInterfaceFn factory );
-	virtual void							Disconnect();
-	virtual void *							QueryInterface( const char *pInterfaceName );
+	bool							Connect( CreateInterfaceFn factory ) override;
+	void							Disconnect() override;
+	void *							QueryInterface( const char *pInterfaceName ) override;
 
 	// these will come from the engine
-	virtual InitReturnVal_t					Init();
-	virtual void							Shutdown();
+	InitReturnVal_t					Init() override;
+	void							Shutdown() override;
 
 
 	//---------------------------------------------------------
 	// ISourceVirtualReality implementation
 	//---------------------------------------------------------
-	virtual bool ShouldRunInVR() OVERRIDE;
-	virtual bool IsHmdConnected() OVERRIDE;
-	virtual void GetViewportBounds( VREye eEye, int *pnX, int *pnY, int *pnWidth, int *pnHeight ) OVERRIDE;
-	virtual bool DoDistortionProcessing ( VREye eEye ) OVERRIDE;
-	virtual bool CompositeHud ( VREye eEye, float ndcHudBounds[4], bool bDoUndistort, bool bBlackout, bool bTranslucent ) OVERRIDE;
-	virtual VMatrix GetMideyePose() OVERRIDE;
-	virtual bool SampleTrackingState ( float PlayerGameFov, float fPredictionSeconds ) OVERRIDE;
-	virtual bool GetEyeProjectionMatrix ( VMatrix *pResult, VREye, float zNear, float zFar, float fovScale ) OVERRIDE;
-	virtual bool WillDriftInYaw() OVERRIDE;
-	virtual bool GetDisplayBounds( VRRect_t *pRect ) OVERRIDE;
-	virtual VMatrix GetMidEyeFromEye( VREye eEye ) OVERRIDE;
-	virtual unsigned GetVRModeAdapter() OVERRIDE;
-	virtual void CreateRenderTargets( IMaterialSystem *pMaterialSystem ) OVERRIDE;
-	virtual void ShutdownRenderTargets() OVERRIDE;
-	virtual ITexture *GetRenderTarget( VREye eEye, EWhichRenderTarget eWhich ) OVERRIDE;
-	virtual void GetRenderTargetFrameBufferDimensions( int & nWidth, int & nHeight ) OVERRIDE;
-	virtual bool Activate() OVERRIDE;
-	virtual void Deactivate() OVERRIDE;
-	virtual bool ShouldForceVRMode( ) OVERRIDE;
-	virtual void SetShouldForceVRMode( ) OVERRIDE;
+	virtual bool ShouldRunInVR() override;
+	virtual bool IsHmdConnected() override;
+	virtual void GetViewportBounds( VREye eEye, int *pnX, int *pnY, int *pnWidth, int *pnHeight ) override;
+	virtual bool DoDistortionProcessing ( VREye eEye ) override;
+	virtual bool CompositeHud ( VREye eEye, float ndcHudBounds[4], bool bDoUndistort, bool bBlackout, bool bTranslucent ) override;
+	virtual VMatrix GetMideyePose() override;
+	virtual bool SampleTrackingState ( float PlayerGameFov, float fPredictionSeconds ) override;
+	virtual bool GetEyeProjectionMatrix ( VMatrix *pResult, VREye, float zNear, float zFar, float fovScale ) override;
+	virtual bool WillDriftInYaw() override;
+	virtual bool GetDisplayBounds( VRRect_t *pRect ) override;
+	virtual VMatrix GetMidEyeFromEye( VREye eEye ) override;
+	virtual unsigned GetVRModeAdapter() override;
+	virtual void CreateRenderTargets( IMaterialSystem *pMaterialSystem ) override;
+	virtual void ShutdownRenderTargets() override;
+	virtual ITexture *GetRenderTarget( VREye eEye, EWhichRenderTarget eWhich ) override;
+	virtual void GetRenderTargetFrameBufferDimensions( int & nWidth, int & nHeight ) override;
+	virtual bool Activate() override;
+	virtual void Deactivate() override;
+	virtual bool ShouldForceVRMode( ) override;
+	virtual void SetShouldForceVRMode( ) override;
 
 	void RefreshDistortionTexture();
 	void AcquireNewZeroPose();
