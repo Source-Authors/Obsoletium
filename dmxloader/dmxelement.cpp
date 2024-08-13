@@ -92,8 +92,8 @@ void CDmxElement::Resort( )	const
 		m_bResortNeeded = false;
 
 		// NOTE: This checks for duplicate attribute names
-		int nCount = m_Attributes.Count();
-		for ( int i = nCount; --i >= 1; )
+		intp nCount = m_Attributes.Count();
+		for ( intp i = nCount; --i >= 1; )
 		{
 			if ( m_Attributes[i]->GetNameSymbol() == m_Attributes[i-1]->GetNameSymbol() )
 			{
@@ -156,8 +156,8 @@ void CDmxElement::RemoveAttribute( const char *pAttributeName )
 void CDmxElement::RemoveAttributeByPtr( CDmxAttribute *pAttribute )
 {	
 	CDmxElementModifyScope modify( this );
-	int nCount = m_Attributes.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Attributes.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( m_Attributes[i] != pAttribute )
 			continue;
@@ -170,8 +170,8 @@ void CDmxElement::RemoveAttributeByPtr( CDmxAttribute *pAttribute )
 
 void CDmxElement::RemoveAllAttributes()
 {
-	int nCount = m_Attributes.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Attributes.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		delete m_Attributes[i];
 	}
@@ -262,7 +262,7 @@ const CDmxAttribute *CDmxElement::GetAttribute( const char *pAttributeName ) con
 //-----------------------------------------------------------------------------
 // Attribute interation
 //-----------------------------------------------------------------------------
-int CDmxElement::AttributeCount() const
+intp CDmxElement::AttributeCount() const
 {
 	return m_Attributes.Count();
 }
@@ -306,8 +306,8 @@ void CDmxElement::AddElementsToDelete( CUtlVector< CDmxElement * >& elementsToDe
 		if ( pAttribute->GetType() == AT_ELEMENT_ARRAY )
 		{
 			const CUtlVector< CDmxElement * > &elements = pAttribute->GetArray< CDmxElement* >();
-			int nElementCount = elements.Count();
-			for ( int j = 0; j < nElementCount; ++j )
+			intp nElementCount = elements.Count();
+			for ( intp j = 0; j < nElementCount; ++j )
 			{
 				if ( elements[j] )
 				{
@@ -327,8 +327,8 @@ void CDmxElement::RemoveAllElementsRecursive()
 {
 	CUtlVector< CDmxElement * > elementsToDelete; 
 	AddElementsToDelete( elementsToDelete );
-	int nCount = elementsToDelete.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = elementsToDelete.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		delete elementsToDelete[i];
 	}
@@ -367,7 +367,7 @@ void CDmxElement::UnpackIntoStructure( void *pData, size_t DestSizeInBytes, cons
 				continue;
 
 			// Convert the default string into the target
-			int nLen = Q_strlen( pUnpack->m_pDefaultString );
+			intp nLen = Q_strlen( pUnpack->m_pDefaultString );
 			if ( nLen > 0 )
 			{
 				CUtlBuffer buf( pUnpack->m_pDefaultString, nLen, CUtlBuffer::READ_ONLY | CUtlBuffer::TEXT_BUFFER );

@@ -65,8 +65,8 @@ void* DMXAlloc( size_t size );
 #define DECLARE_DMX_ALLOCATOR( )												\
 	public:																		\
 		inline void* operator new( size_t size ) { MEM_ALLOC_CREDIT_( "DMXAlloc" ); return DMXAlloc(size); }   \
-		inline void* operator new( size_t size, int nBlockUse, const char *pFileName, int nLine ) { MEM_ALLOC_CREDIT_( "DMXAlloc" ); return DMXAlloc(size); }   \
-		inline void  operator delete( void* p ) { }		\
-		inline void  operator delete( void* p, int nBlockUse, const char *pFileName, int nLine ) { }   \
+		inline void* operator new( size_t size, int, const char *, int ) { MEM_ALLOC_CREDIT_( "DMXAlloc" ); return DMXAlloc(size); }   \
+		inline void  operator delete( void* ) { }		\
+		inline void  operator delete( void* , int, const char *, int ) { }   \
 
 #endif // DMXLOADER_H

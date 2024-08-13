@@ -31,13 +31,13 @@ void BeginDMXContext( )
 		s_bAllocatorInitialized = true;
 	}
 
-	s_bInDMXContext = true;
+	s_bInDMXContext = 1;
 }
 
 void EndDMXContext( bool bDecommitMemory )
 {
 	Assert( s_bInDMXContext );
-	s_bInDMXContext = false;
+	s_bInDMXContext = 0;
 	s_DMXAllocator.FreeAll( bDecommitMemory );
 }
 
@@ -151,9 +151,9 @@ void CDmxSerializer::SerializeElementArrayAttribute( CUtlBuffer& buf, CDmxSerial
 {
 	const CUtlVector<CDmxElement*> &vec = pAttribute->GetArray<CDmxElement*>();
 
-	int nCount = vec.Count();
+	intp nCount = vec.Count();
 	buf.PutInt( nCount );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		SerializeElementIndex( buf, list, vec[ i ] );
 	}
@@ -231,7 +231,7 @@ bool CDmxSerializer::SaveElementDict( CUtlBuffer& buf, CUtlRBTree< const char* >
 //-----------------------------------------------------------------------------
 // Main entry point for serialization
 //-----------------------------------------------------------------------------
-bool CDmxSerializer::Serialize( CUtlBuffer &buf, CDmxElement *pRoot, const char *pFileName )
+bool CDmxSerializer::Serialize( CUtlBuffer &buf, CDmxElement *pRoot, [[maybe_unused]] const char *pFileName )
 {
 	// Save elements, attribute links
 	CDmxSerializationDictionary dict;
@@ -257,7 +257,7 @@ bool CDmxSerializer::Serialize( CUtlBuffer &buf, CDmxElement *pRoot, const char 
 	}
 
 	// write out the string table
-	unsigned nStrings = stringTable.Count();
+	size_t nStrings = stringTable.Count();
 	if ( nStrings > 65535U )
 		return false;
 	buf.PutShort( (unsigned short)nStrings );
@@ -399,7 +399,7 @@ int CDmxSerializer::GetStringOffsetTable( CUtlBuffer &buf, int *offsetTable, int
 			{
 				pBegin = ( char* )buf.PeekGet( nBytes + 1, 0 );
 				if ( !pBegin )
-					return false;
+					return 0;
 				pBytes = pBegin + nBytes;
 				nBytes = buf.GetBytesRemaining();
 			}
@@ -526,7 +526,7 @@ bool SerializeDMX( CUtlBuffer &buf, CDmxElement *pRoot, const char *pFileName )
 	return dmxSerializer.Serialize( buf, pRoot, pFileName );
 }
 
-bool SerializeDMX( const char *pFileName, const char *pPathID, bool bTextMode, CDmxElement *pRoot )
+bool SerializeDMX( const char *pFileName, const char *pPathID, [[maybe_unused]] bool bTextMode, CDmxElement *pRoot )
 {
 	// NOTE: This guarantees full path names for pathids
 	char pBuf[MAX_PATH];
@@ -542,7 +542,7 @@ bool SerializeDMX( const char *pFileName, const char *pPathID, bool bTextMode, C
 		}
 	}
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER |  CUtlBuffer::READ_ONLY );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER |  CUtlBuffer::READ_ONLY );
 	g_pFullFileSystem->ReadFile( pFullPath, pPathID, buf );
 
 	if ( !buf.IsValid() )
@@ -591,7 +591,7 @@ bool ReadDMXHeader( CUtlBuffer &buf, char *pEncodingName, int nEncodingNameLen, 
 	if ( !bOk )
 	{
 		buf.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
-		bOk = buf.ParseToken( DMX_LEGACY_VERSION_STARTING_TOKEN, DMX_LEGACY_VERSION_ENDING_TOKEN, pFormatName, sizeof( pFormatName ) );
+		bOk = buf.ParseToken( DMX_LEGACY_VERSION_STARTING_TOKEN, DMX_LEGACY_VERSION_ENDING_TOKEN, pFormatName, nFormatNameLen );
 		if ( bOk )
 		{
 			nEncodingVersion = 0;
@@ -675,7 +675,7 @@ bool UnserializeDMX( const char *pFileName, const char *pPathID, bool bTextMode,
 		nFlags |= CUtlBuffer::TEXT_BUFFER;
 	}
 
-	CUtlBuffer buf( 0, 0, nFlags );
+	CUtlBuffer buf( (intp)0, 0, nFlags );
 	g_pFullFileSystem->ReadFile( pFullPath, pPathID, buf );
 
 	if ( !buf.IsValid() )

@@ -136,8 +136,8 @@ CDmxAttribute::CDmxAttribute( const char *pAttributeName )
 }
 
 CDmxAttribute::CDmxAttribute( CUtlSymbol attributeName )
+	: m_Name{attributeName}
 {
-	m_Name = attributeName;
 	m_Type = AT_UNKNOWN;
 	m_pData = NULL;
 }
@@ -242,7 +242,7 @@ const char *CDmxAttribute::GetName() const
 		return array.Count();									\
 	}
 
-int CDmxAttribute::GetArrayCount() const
+intp CDmxAttribute::GetArrayCount() const
 {
 	if ( !IsArrayType( m_Type ) || !m_pData )
 		return 0;
@@ -359,8 +359,6 @@ bool CDmxAttribute::Serialize( CUtlBuffer &buf ) const
 		AssertMsg( 0, "Cannot serialize elements or element arrays!\n" );
 		return false;
 	}
-
-	return false;
 }
 
 
@@ -405,8 +403,6 @@ bool CDmxAttribute::SerializeElement( int nIndex, CUtlBuffer &buf ) const
 		AssertMsg( 0, "Cannot serialize elements!\n" );
 		return false;
 	}
-
-	return false;
 }
 
 
@@ -458,8 +454,6 @@ bool CDmxAttribute::Unserialize( DmAttributeType_t type, CUtlBuffer &buf )
 		AssertMsg( 0, "Cannot unserialize elements or element arrays!\n" );
 		return false;
 	}
-
-	return false;
 }
 
 
@@ -511,8 +505,6 @@ bool CDmxAttribute::UnserializeElement( DmAttributeType_t type, CUtlBuffer &buf 
 		AssertMsg( 0, "Cannot unserialize elements!\n" );
 		return false;
 	}
-
-	return false;
 }
 
 
@@ -624,7 +616,7 @@ void CDmxAttribute::SetValueFromString( const char *pValue )
 
 	default:
 		{
-			int nLen = pValue ? Q_strlen( pValue ) : 0;
+			intp nLen = pValue ? Q_strlen( pValue ) : 0;
 			if ( nLen == 0 )
 			{
 				SetToDefaultValue();
