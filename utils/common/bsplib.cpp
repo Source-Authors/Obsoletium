@@ -3094,7 +3094,7 @@ void UnparseEntities (void)
 	epair_t	*ep;
 	char	line[2048];
 	int		i;
-	char	key[1024], value[1024];
+	char	key[1020], value[1020];
 
 	CUtlBuffer buffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	buffer.EnsureCapacity( 256 * 1024 );
@@ -3109,9 +3109,9 @@ void UnparseEntities (void)
 				
 		for (ep = entities[i].epairs ; ep ; ep=ep->next)
 		{
-			strcpy (key, ep->key);
+			V_strcpy_safe (key, ep->key);
 			StripTrailing (key);
-			strcpy (value, ep->value);
+			V_strcpy_safe (value, ep->value);
 			StripTrailing (value);
 				
 			sprintf(line, "\"%s\" \"%s\"\n", key, value);
@@ -4783,6 +4783,8 @@ bool SwapBSPFile( const char *pInFilename, const char *pOutFilename, bool bSwapO
 	if ( !CRC_MapFile( &mapCRC, pInFilename ) )
 	{
 		Warning( "Failed to CRC the bsp\n" );
+		// dimhotepus: Do not lean BSP data.
+		CloseBSPFile();
 		return false;
 	}
 
@@ -5069,12 +5071,13 @@ bool SetPakFileLump( const char *pBSPFilename, const char *pNewFilename, void *p
 
 	// save a copy of the old header
 	// generating a new bsp is a destructive operation
-	dheader_t oldHeader;
-	oldHeader = *g_pBSPHeader;
+	dheader_t oldHeader = *g_pBSPHeader;
 
 	g_hBSPFile = SafeOpenWrite( pNewFilename );
 	if ( !g_hBSPFile )
 	{
+		// dimhotepus: Do not leak BSP data.
+		CloseBSPFile();
 		return false;
 	}
 

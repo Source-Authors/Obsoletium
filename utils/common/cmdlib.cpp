@@ -321,8 +321,8 @@ char *ex_argv[MAX_EX_ARGC];
 // Mimic unix command line expansion
 void ExpandWildcards(int *argc, char ***argv) {
   _finddata_t fileinfo;
-  char filename[1024];
-  char filebase[1024];
+  char filename[MAX_PATH * 2 + 1];
+  char filebase[MAX_PATH];
 
   ex_argc = 0;
   for (int i = 0; i < *argc; i++) {
@@ -613,7 +613,7 @@ void SafeWrite(FileHandle_t f, void *buffer, int count) {
 
 qboolean FileExists(const char *filename) {
   FileHandle_t hFile = g_pFileSystem->Open(filename, "rb");
-  if (hFile == FILESYSTEM_INVALID_HANDLE) return false;
+  if (!hFile) return false;
 
   g_pFileSystem->Close(hFile);
   return true;
@@ -623,7 +623,7 @@ int LoadFile(const char *filename, void **bufferptr) {
   int length = 0;
 
   FileHandle_t f = SafeOpenRead(filename);
-  if (FILESYSTEM_INVALID_HANDLE != f) {
+  if (f) {
     length = Q_filelength(f);
 
     void *buffer = malloc(length + 1);
