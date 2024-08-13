@@ -179,7 +179,8 @@ void CVertexBufferDx10::Flush()
 //-----------------------------------------------------------------------------
 void CVertexBufferDx10::BeginCastBuffer( VertexFormat_t format )
 {
-	Assert( format != MATERIAL_INDEX_FORMAT_UNKNOWN );
+	// dimhotepus: Fix vertex format check.
+	Assert( format != VERTEX_FORMAT_UNKNOWN );
 	Assert( m_bIsDynamic && ( m_VertexFormat == 0 || m_VertexFormat == format ) );
 	if ( !m_bIsDynamic )
 		return;
@@ -221,6 +222,9 @@ bool CVertexBufferDx10::Lock( int nMaxVertexCount, bool bAppend, VertexDesc_t &d
 
 	void *pLockedData = NULL;
 	HRESULT hr;
+	
+	int nMemoryRequired = 0;
+	bool bHasEnoughMemory = false;
 
 	// This can happen if the buffer was locked but a type wasn't bound
 	if ( m_VertexFormat == 0 )
@@ -245,8 +249,8 @@ bool CVertexBufferDx10::Lock( int nMaxVertexCount, bool bAppend, VertexDesc_t &d
 	}
 
 	// Check to see if we have enough memory 
-	int nMemoryRequired = nMaxVertexCount * VertexSize();
-	bool bHasEnoughMemory = ( m_nFirstUnwrittenOffset + nMemoryRequired <= m_nBufferSize );
+	nMemoryRequired = nMaxVertexCount * VertexSize();
+	bHasEnoughMemory = ( m_nFirstUnwrittenOffset + nMemoryRequired <= m_nBufferSize );
 
 	D3D10_MAP map;
 	if ( bAppend )
@@ -519,6 +523,9 @@ bool CIndexBufferDx10::Lock( int nMaxIndexCount, bool bAppend, IndexDesc_t &desc
 	void *pLockedData = NULL;
 	HRESULT hr;
 
+	int nMemoryRequired = 0;
+	bool bHasEnoughMemory = false;
+
 	// This can happen if the buffer was locked but a type wasn't bound
 	if ( m_IndexFormat == MATERIAL_INDEX_FORMAT_UNKNOWN )
 		goto indexBufferLockFailed;
@@ -542,8 +549,8 @@ bool CIndexBufferDx10::Lock( int nMaxIndexCount, bool bAppend, IndexDesc_t &desc
 	}
 
 	// Check to see if we have enough memory 
-	int nMemoryRequired = nMaxIndexCount * IndexSize();
-	bool bHasEnoughMemory = ( m_nFirstUnwrittenOffset + nMemoryRequired <= m_nBufferSize );
+	nMemoryRequired = nMaxIndexCount * IndexSize();
+	bHasEnoughMemory = ( m_nFirstUnwrittenOffset + nMemoryRequired <= m_nBufferSize );
 
 	D3D10_MAP map;
 	if ( bAppend )

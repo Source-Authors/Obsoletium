@@ -194,13 +194,12 @@ public:
 
 private:
 	void Create( IDirect3DDevice9 *pD3D );
-	inline void ReallyUnlock( int unlockBytes )
+	inline void ReallyUnlock( [[maybe_unused]] int unlockBytes )
 	{
 		#if DX_TO_GL_ABSTRACTION
 			// Knowing how much data was actually written is critical for performance under OpenGL.
 			m_pVB->UnlockActualSize( unlockBytes );
 		#else
-			unlockBytes; // Unused here
 			m_pVB->Unlock();
 		#endif
 	}
@@ -256,8 +255,8 @@ private:
 
 #ifdef VPROF_ENABLED
 	int				m_Frame;
-	int				*m_pFrameCounter;
-	int				*m_pGlobalCounter;
+	intp				*m_pFrameCounter;
+	intp				*m_pGlobalCounter;
 #endif
 
 #ifdef _DEBUG
@@ -281,28 +280,27 @@ inline CVertexBuffer::CVertexBuffer(IDirect3DDevice9 * pD3D, VertexFormat_t fmt,
 	int vertexSize, int vertexCount, const char *pTextureBudgetName,
 	bool bSoftwareVertexProcessing, bool dynamic ) :
 		m_pVB(0), 
-		m_Position(0),
-		m_VertexSize(vertexSize), 
-		m_VertexCount(vertexCount),
-		m_bFlush(true),
-		m_bLocked(false), 
-		m_bExternalMemory( false ),
-		m_nBufferSize(vertexSize * vertexCount), 
-		m_TheFVF( theFVF ),
-		m_bSoftwareVertexProcessing( bSoftwareVertexProcessing ),
-		m_bDynamic(dynamic),
 		m_VertexBufferFormat( fmt ),
+		m_nBufferSize(vertexSize * vertexCount),
+		m_Position(0),
+		m_VertexCount(vertexCount),
+		m_VertexSize(vertexSize), 
+		m_TheFVF( theFVF ),
+		m_bDynamic(dynamic),
+		m_bLocked(false), 
+		m_bFlush(true),
+		m_bExternalMemory( false ),
+		m_bSoftwareVertexProcessing( bSoftwareVertexProcessing ),
 		m_bLateCreateShouldDiscard( false )
-#ifdef _X360
-		,m_pAllocatedMemory(NULL)
-		,m_iNextBlockingPosition(0)
-		,m_iAllocationSize(0)
-#endif
 #ifdef VPROF_ENABLED
-		,m_Frame( -1 )
+		, m_Frame( -1 )
+		, m_pFrameCounter( nullptr )
 #endif
 {
 	MEM_ALLOC_CREDIT_( pTextureBudgetName );
+	
+	m_nSysmemBufferStartBytes = 0;
+	m_nLockCount = 0;
 
 #ifdef RECORDING
 	// assign a UID
@@ -409,13 +407,13 @@ void CVertexBuffer::Create( IDirect3DDevice9 *pD3D )
 		switch ( hr )
 		{
 		case D3DERR_INVALIDCALL:
-			Assert( !"D3DERR_INVALIDCALL" );
+			AssertMsg( false, "D3DERR_INVALIDCALL" );
 			break;
 		case D3DERR_OUTOFVIDEOMEMORY:
-			Assert( !"D3DERR_OUTOFVIDEOMEMORY" );
+			AssertMsg( false, "D3DERR_OUTOFVIDEOMEMORY" );
 			break;
 		case E_OUTOFMEMORY:
-			Assert( !"E_OUTOFMEMORY" );
+			AssertMsg( false, "E_OUTOFMEMORY" );
 			break;
 		default:
 			Assert( 0 );
@@ -1001,7 +999,7 @@ inline void CVertexBuffer::Unlock( int numVerts )
 			LockData.m_iZPassIdx = ( Dx9Device()->GetDeviceState() & D3DDEVICESTATE_ZPASS_BRACKET ) ? ShaderAPI()->Get360ZPassCounter() : 0;
 
 			// Round dynamic locks to 4k boundaries for GPU cache reasons
-			LockData.m_iEndOffset = ALIGN_VALUE( LockData.m_iEndOffset, 4096 );
+			LockData.m_iEndOffset = AlignValue( LockData.m_iEndOffset, 4096 );
 			if( LockData.m_iEndOffset > m_iAllocationSize )
 				LockData.m_iEndOffset = m_iAllocationSize;
 			
@@ -1074,7 +1072,7 @@ inline void CVertexBuffer::HandleLateCreation( )
 
 	// If this fails we're about to crash. Consider skipping the update and leaving 
 	// m_pSysmemBuffer around to try again later. (For example in case of device loss)
-	Assert( SUCCEEDED( hr ) ); hr; 
+	Assert( SUCCEEDED( hr ) );
 	memcpy( pWritePtr, m_pSysmemBuffer + m_nSysmemBufferStartBytes, dataToWriteBytes );
 	ReallyUnlock( dataToWriteBytes );
 

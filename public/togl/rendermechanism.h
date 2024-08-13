@@ -54,15 +54,10 @@
 #else
 	//USE_ACTUAL_DX
 	#ifdef WIN32
-		#ifdef _X360
-			#include "d3d9.h"
-			#include "d3dx9.h"
-		#else
-			#include <windows.h>
-			#include <d3d9.h>
+		#include <Windows.h>
+		#include <d3d9.h>
       // HACK(proper): Exclude d3d9 extensions, as they are too broad.
 			// #include <d3dx9.h>
-		#endif
 		typedef HWND VD3DHWND;
 	#endif
 

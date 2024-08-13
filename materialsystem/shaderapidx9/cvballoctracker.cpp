@@ -66,8 +66,8 @@ class AllocData
 {
 public:
 	AllocData( void * buffer, int bufferSize, VertexFormat_t fmt, int numVerts, int allocatorHash )
-		: m_buffer( buffer ), m_bufferSize( bufferSize ), m_fmt( fmt ), m_numVerts( numVerts ), m_allocatorHash( allocatorHash ) {}
-	AllocData() : m_buffer( NULL ), m_bufferSize( 0 ), m_fmt( 0 ), m_numVerts( 0 ), m_allocatorHash( 0 ) {}
+		: m_fmt( fmt ), m_buffer( buffer ), m_bufferSize( bufferSize ), m_numVerts( numVerts ), m_allocatorHash( allocatorHash ) {}
+	AllocData() : m_fmt( 0 ), m_buffer( NULL ), m_bufferSize( 0 ), m_numVerts( 0 ), m_allocatorHash( 0 ) {}
 
 	VertexFormat_t	m_fmt;
 	void		*	m_buffer;
@@ -237,7 +237,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CVBAllocTracker, IVBAllocTracker,
 UtlHashFixedHandle_t CVBAllocTracker::TrackAlloc( void * buffer, int bufferSize, VertexFormat_t fmt, int numVerts, short allocatorHash )
 {
 	AllocData newData( buffer, bufferSize, fmt, numVerts, allocatorHash );
-	UtlHashFixedHandle_t handle = m_VBAllocTable.Insert( (int)buffer, newData );
+	UtlHashFixedHandle_t handle = m_VBAllocTable.Insert( (intp)buffer, newData );
 	if ( handle == m_VBAllocTable.InvalidHandle() )
 	{
 		Warning( "[VBMEM] VBMemAllocTable hash collision (grow table).\n" );
@@ -247,7 +247,7 @@ UtlHashFixedHandle_t CVBAllocTracker::TrackAlloc( void * buffer, int bufferSize,
 
 bool CVBAllocTracker::KillAlloc( void * buffer, int & bufferSize, VertexFormat_t & fmt, int & numVerts, short & allocatorHash )
 {
-	UtlHashFixedHandle_t handle = m_VBAllocTable.Find( (int)buffer );
+	UtlHashFixedHandle_t handle = m_VBAllocTable.Find( (intp)buffer );
 	if ( handle != m_VBAllocTable.InvalidHandle() )
 	{
 		AllocData & data = m_VBAllocTable.Element( handle );

@@ -13,7 +13,7 @@
 #include "shaderdevicedx8.h"
 #include "shaderapi/ishaderutil.h"
 #include "shaderapidx10.h"
-#include "shadershadowdx10.h"
+#include "ShaderShadowDx10.h"
 #include "meshdx10.h"
 #include "shaderapidx10_global.h"
 #include "tier1/KeyValues.h"
@@ -326,7 +326,7 @@ se::win::com::com_ptr<IDXGIOutput> CShaderDeviceMgrDx10::GetAdapterOutput( unsig
 {
 	LOCK_SHADERAPI();
 
-  se::win::com::com_ptr<IDXGIAdapter1> pAdapter{GetAdapter(nAdapter)};
+	se::win::com::com_ptr<IDXGIAdapter1> pAdapter{GetAdapter(nAdapter)};
 	if ( !pAdapter ) return {};
 
 	DXGI_OUTPUT_DESC desc;
@@ -422,13 +422,13 @@ void CShaderDeviceMgrDx10::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsig
 	se::win::com::com_ptr<IDXGIOutput> pOutput{g_ShaderDeviceMgrDx10.GetAdapterOutput(nAdapter)};
 	
 	DXGI_OUTPUT_DESC outputDesc;
-  HRESULT hr{pOutput->GetDesc(&outputDesc)};
+	HRESULT hr{pOutput->GetDesc(&outputDesc)};
 	Assert( !FAILED(hr) );
 
 	UINT width = static_cast<unsigned>(outputDesc.DesktopCoordinates.right - outputDesc.DesktopCoordinates.left);
 	UINT height = static_cast<unsigned>(outputDesc.DesktopCoordinates.bottom - outputDesc.DesktopCoordinates.top);
 
-	DXGI_MODE_DESC modeDesc{width, height};
+	DXGI_MODE_DESC modeDesc{width, height, {}, DXGI_FORMAT_UNKNOWN, DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED, DXGI_MODE_SCALING_UNSPECIFIED};
 
 	// FIXME: Implement!
 	Assert(0);
@@ -589,7 +589,7 @@ bool CShaderDeviceDx10::InitDevice( void *hWnd, unsigned nAdapter, const ShaderD
 	se::win::com::com_ptr<IDXGIAdapter1> pAdapter{g_ShaderDeviceMgrDx10.GetAdapter( nAdapter )};
 	if ( !pAdapter ) return false;
 
-	m_pOutput = std::move(g_ShaderDeviceMgrDx10.GetAdapterOutput( nAdapter ));
+	m_pOutput = g_ShaderDeviceMgrDx10.GetAdapterOutput( nAdapter );
 	if ( !m_pOutput )	return false;
 
 	DXGI_SWAP_CHAIN_DESC sd;
@@ -1053,7 +1053,7 @@ IIndexBuffer *CShaderDeviceDx10::GetDynamicIndexBuffer( MaterialIndexFormat_t fm
 	return NULL;
 }
 
-char *CShaderDeviceDx10::GetDisplayDeviceName()
+const char *CShaderDeviceDx10::GetDisplayDeviceName()
 {
 	if( m_sDisplayDeviceName.IsEmpty() )
 	{
@@ -1074,7 +1074,7 @@ char *CShaderDeviceDx10::GetDisplayDeviceName()
 			m_sDisplayDeviceName = deviceName;
 		}
 	}
-	return m_sDisplayDeviceName.GetForModify();
+	return m_sDisplayDeviceName.Get();
 }
 
 bool CShaderDeviceDx10::DetermineHardwareCaps() 

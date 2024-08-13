@@ -271,7 +271,7 @@ public:
 #ifdef DX_TO_GL_ABSTRACTION
 	virtual void DoStartupShaderPreloading( void ) = 0;
 #endif
-	virtual char *GetDisplayDeviceName() = 0;
+	virtual const char *GetDisplayDeviceName() = 0;
 
 };
 
@@ -315,7 +315,7 @@ inline VertexShaderHandle_t IShaderDevice::CreateVertexShader( CUtlBuffer &buf, 
 	if ( buf.IsText() )
 	{
 		Assert( pShaderVersion );
-		return CreateVertexShader( (const char *)buf.Base(), buf.TellMaxPut(), pShaderVersion );
+		return CreateVertexShader( buf.Base<const char>(), buf.TellMaxPut(), pShaderVersion );
 	}
 
 	CUtlShaderBuffer shaderBuffer( buf );
@@ -341,7 +341,7 @@ inline GeometryShaderHandle_t IShaderDevice::CreateGeometryShader( CUtlBuffer &b
 	if ( buf.IsText() )
 	{
 		Assert( pShaderVersion );
-		return CreateGeometryShader( (const char *)buf.Base(), buf.TellMaxPut(), pShaderVersion );
+		return CreateGeometryShader( buf.Base<const char>(), buf.TellMaxPut(), pShaderVersion );
 	}
 
 	CUtlShaderBuffer shaderBuffer( buf );
@@ -367,7 +367,7 @@ inline PixelShaderHandle_t IShaderDevice::CreatePixelShader( CUtlBuffer &buf, co
 	if ( buf.IsText() )
 	{
 		Assert( pShaderVersion );
-		return CreatePixelShader( (const char *)buf.Base(), buf.TellMaxPut(), pShaderVersion );
+		return CreatePixelShader( buf.Base<const char>(), buf.TellMaxPut(), pShaderVersion );
 	}
 
 	CUtlShaderBuffer shaderBuffer( buf );

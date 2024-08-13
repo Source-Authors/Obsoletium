@@ -102,55 +102,55 @@ public:
 	void SetPixelShader( const char *pFileName, int pshIndex );
 
 	// Convert from linear to gamma color space on writes to frame buffer.
-	void EnableSRGBWrite( bool bEnable )
+	void EnableSRGBWrite( bool )
 	{
 	}
 
-	void EnableSRGBRead( Sampler_t stage, bool bEnable )
+	void EnableSRGBRead( Sampler_t, bool )
 	{
 	}
 
-	virtual void FogMode( ShaderFogMode_t fogMode )
+	virtual void FogMode( ShaderFogMode_t )
 	{
 	}
-	virtual void SetDiffuseMaterialSource( ShaderMaterialSource_t materialSource )
-	{
-	}
-
-	virtual void SetMorphFormat( MorphFormat_t flags )
+	virtual void SetDiffuseMaterialSource( ShaderMaterialSource_t )
 	{
 	}
 
-	virtual void EnableStencil( bool bEnable )
-	{
-	}
-	virtual void StencilFunc( ShaderStencilFunc_t stencilFunc )
-	{
-	}
-	virtual void StencilPassOp( ShaderStencilOp_t stencilOp )
-	{
-	}
-	virtual void StencilFailOp( ShaderStencilOp_t stencilOp )
-	{
-	}
-	virtual void StencilDepthFailOp( ShaderStencilOp_t stencilOp )
-	{
-	}
-	virtual void StencilReference( int nReference )
-	{
-	}
-	virtual void StencilMask( int nMask )
-	{
-	}
-	virtual void StencilWriteMask( int nMask )
+	virtual void SetMorphFormat( MorphFormat_t )
 	{
 	}
 
-	virtual void DisableFogGammaCorrection( bool bDisable )
+	virtual void EnableStencil( bool )
+	{
+	}
+	virtual void StencilFunc( ShaderStencilFunc_t )
+	{
+	}
+	virtual void StencilPassOp( ShaderStencilOp_t )
+	{
+	}
+	virtual void StencilFailOp( ShaderStencilOp_t )
+	{
+	}
+	virtual void StencilDepthFailOp( ShaderStencilOp_t )
+	{
+	}
+	virtual void StencilReference( int )
+	{
+	}
+	virtual void StencilMask( int )
+	{
+	}
+	virtual void StencilWriteMask( int )
+	{
+	}
+
+	virtual void DisableFogGammaCorrection( bool )
 	{
 		//FIXME: empty for now.
 	}
-	virtual void FogMode( ShaderFogMode_t fogMode, bool bVertexFog ) 
+	virtual void FogMode( ShaderFogMode_t, bool ) 
 	{
 		//FIXME: empty for now.
 	}

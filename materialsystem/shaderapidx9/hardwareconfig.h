@@ -256,7 +256,7 @@ public:
 	int GetActualSamplerCount() const;
 	int GetActualTextureStageCount() const;
 	bool SupportsMipmapping() const;
-	virtual bool ActuallySupportsPixelShaders_2_b() const;
+	bool ActuallySupportsPixelShaders_2_b() const override;
 
 	virtual bool SupportsHDRMode( HDRType_t nHDRMode ) const;
 

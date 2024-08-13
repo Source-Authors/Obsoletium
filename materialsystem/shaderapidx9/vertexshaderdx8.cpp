@@ -380,7 +380,8 @@ static void PatchPixelShaderForAtiMsaaHack(DWORD *pShader, DWORD dwTexCoordMask)
 						mask <<= 1; 
 					} 
 				} 
-				// Intentionally fall through... 
+				// Intentionally fall through...
+				[[fallthrough]];
 				
 			default: 
 				// Skip instruction 
@@ -509,6 +510,7 @@ struct ShaderFileCache_t
 	{
 		// invalid until version established
 		m_Header.m_nVersion = 0;
+		m_bVertexShader = false;
 	}
 
 	bool IsValid() const
@@ -618,11 +620,14 @@ private:
 
 		ShaderLookup_t()
 		{
-			m_Flags = 0;
-			m_nRefCount = 0;
+			m_nStaticIndex = 0;
 			m_ShaderStaticCombos.m_nCount = 0;
 			m_ShaderStaticCombos.m_pHardwareShaders = 0;
 			m_ShaderStaticCombos.m_pCreationData = 0;
+			m_Flags = 0;
+			m_nRefCount = 0;
+			m_hShaderFileCache = 0;
+			m_nDataOffset = 0;
 			m_pComboDictionary = NULL;
 		}
 		void IncRefCount()
@@ -765,11 +770,14 @@ IShaderManager *g_pShaderManager = &s_ShaderManager;
 // Constructor, destructor
 //-----------------------------------------------------------------------------
 CShaderManager::CShaderManager() : 
-	m_ShaderSymbolTable( 0, 32, true /* caseInsensitive */ ),
 	m_VertexShaderDict( 32 ),
 	m_PixelShaderDict( 32 ),
+	m_ShaderSymbolTable( 0, 32, true /* caseInsensitive */ ),
 	m_ShaderFileCache( 32 )
 {
+	m_HardwareVertexShader = nullptr;
+	m_HardwarePixelShader = nullptr;
+
 	m_bCreateShadersOnDemand = false;
 
 #ifdef DYNAMIC_SHADER_COMPILE
@@ -781,7 +789,9 @@ CShaderManager::CShaderManager() :
 #endif
 
 #ifdef _DEBUG
+	memset( &vshDebugName, 0, sizeof(vshDebugName) );
 	vshDebugIndex = 0;
+	memset( &pshDebugName, 0, sizeof(pshDebugName) );
 	pshDebugIndex = 0;
 #endif
 }
@@ -1773,7 +1783,7 @@ retry_compile:
 		V_strncat( pSendbuf, "", SEND_BUF_SIZE );
 
 		// Send commands to remote shader compiler
-		int nResult = send( m_RemoteShaderCompileSocket, pSendbuf, (int)strlen( pSendbuf ), 0 );
+		int nResult = send( m_RemoteShaderCompileSocket, pSendbuf, V_strlen( pSendbuf ), 0 );
 		if ( nResult == SOCKET_ERROR )
 		{
 			Warning( "send failed: %d\n", WSAGetLastError() );
@@ -1954,7 +1964,7 @@ retry_compile:
 		Assert( hr == D3D_OK );
 		CUtlBuffer tempBuffer;
 		tempBuffer.SetBufferType( true, false );
-		int exampleCommandLineLength = strlen( exampleCommandLine );
+		intp exampleCommandLineLength = V_strlen( exampleCommandLine );
 		tempBuffer.EnsureCapacity( d3dblob->GetBufferSize() + exampleCommandLineLength );
 		memcpy( tempBuffer.Base(), exampleCommandLine, exampleCommandLineLength );
 		memcpy( ( char * )tempBuffer.Base() + exampleCommandLineLength, d3dblob->GetBufferPointer(), d3dblob->GetBufferSize() );
@@ -2065,12 +2075,12 @@ FileHandle_t CShaderManager::OpenFileAndLoadHeader( const char *pFileName, Shade
 void CShaderManager::WriteTranslatedFile( ShaderLookup_t *pLookup, int dynamicCombo, char *pFileContents, char *pFileExtension )
 {
 	const char *pName = m_ShaderSymbolTable.String( pLookup->m_Name );
-	int nNumChars = V_strlen( pFileContents );
+	intp nNumChars = V_strlen( pFileContents );
 
 	CUtlBuffer tempBuffer;
 	tempBuffer.SetBufferType( true, false );
 	tempBuffer.EnsureCapacity( nNumChars );
-	memcpy( ( char * )tempBuffer.Base(), pFileContents, nNumChars );
+	memcpy( tempBuffer.Base(), pFileContents, nNumChars );
 	tempBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, nNumChars );
 
 	char filename[MAX_PATH];
@@ -2093,7 +2103,7 @@ void CShaderManager::DisassembleShader( ShaderLookup_t *pLookup, int dynamicComb
 	CUtlBuffer tempBuffer;
 	tempBuffer.SetBufferType( true, false );
 	tempBuffer.EnsureCapacity( d3dblob->GetBufferSize() );
-	memcpy( ( char * )tempBuffer.Base(), d3dblob->GetBufferPointer(), d3dblob->GetBufferSize() );
+	memcpy( tempBuffer.Base(), d3dblob->GetBufferPointer(), d3dblob->GetBufferSize() );
 	tempBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, d3dblob->GetBufferSize() );
 
 	char filename[MAX_PATH];
@@ -2158,7 +2168,7 @@ bool CShaderManager::CreateDynamicCombos_Ver4( void *pContext, uint8 *pComboBuff
 			Assert( nReferenceComboSizeForDiffs >= nByteCodeSize );
 
 			// use the differencing algorithm to recover the full shader
-			int nOriginalSize;
+			intp nOriginalSize;
 			ApplyDiffs( 
 				pReferenceShader, 
 				pByteCode,
@@ -2339,18 +2349,6 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 					nOptions |= D3DToGL_OptionDoFixupY;					
 					//options |= D3DToGL_OptionSpew;
 					
-//					sg_D3DToOpenGLTranslator.TranslateShader( (uint32 *) pReadPtr, (char *)bufGLCode.Base(), bufGLCode.Size(), &bVertexShader, nOptions, -1, debugLabel );
-//					sg_NewD3DToOpenGLTranslator.TranslateShader( (uint32 *) pReadPtr, &bufNewGLCode, &bVertexShader, nOptions, -1, debugLabel );
-
-
-//					bool bDumpGLSL = false;
-//					if ( !stricmp( "vs-file vertexlit_and_unlit_generic_bump_vs20 vs-index 144", debugLabel ) && ( iIndex == 0 ) )
-//					{
-//						DisassembleShader( pLookup, iIndex, pReadPtr, nBlockSize );									// Direct3D
-//						bDumpGLSL = true;
-//					}
-
-
 					// GLSL options
 					nOptions |= D3DToGL_OptionGLSL; // | D3DToGL_AddHexComments | D3DToGL_PutHexCommentsAfterLines;
 					if ( !IsOSX() )
@@ -2363,10 +2361,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 					// Test to make sure these are identical
 //					if ( bDumpGLSL )//V_strcmp( (char *)bufGLCode.Base(), (char *)bufNewGLCode.Base() ) )
 //					{
-//						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLCode.Base(), "avp" );		// Old
-//						WriteTranslatedFile( pLookup, iIndex, (char *)bufNewGLCode.Base(), "avp2" );	// New
 						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLSLCode.Base(), "glsl_v" );	// GLSL
-//						DisassembleShader( pLookup, iIndex, pReadPtr, nBlockSize );									// Direct3D
 //					}
 
 					#if defined( WRITE_ASSEMBLY )
@@ -2395,9 +2390,6 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 
 					uint32 nOptions = D3DToGL_OptionUseEnvParams;
 
-//					sg_D3DToOpenGLTranslator.TranslateShader( (uint32 *) pReadPtr, (char *)bufGLCode.Base(), bufGLCode.Size(), &bVertexShader, D3DToGL_OptionUseEnvParams, -1, debugLabel );
-//					sg_NewD3DToOpenGLTranslator.TranslateShader( (uint32 *) pReadPtr, &bufNewGLCode, &bVertexShader, D3DToGL_OptionUseEnvParams, -1, debugLabel );
-
 					// GLSL options
 					nOptions |= D3DToGL_OptionGLSL;// | D3DToGL_OptionSRGBWriteSuffix | D3DToGL_AddHexComments | D3DToGL_PutHexCommentsAfterLines;
 					if ( !IsOSX() )
@@ -2411,10 +2403,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 					// Test to make sure these are identical
 //					if ( V_strcmp( (char *)bufGLCode.Base(), (char *)bufNewGLCode.Base() ) )
 //					{
-//						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLCode.Base(), "afp" );		// Old
-//						WriteTranslatedFile( pLookup, iIndex, (char *)bufNewGLCode.Base(), "afp2" );	// New
 						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLSLCode.Base(), "glsl_p" );	// GLSL
-//						DisassembleShader( pLookup, iIndex, pReadPtr, nBlockSize );									// Direct3D
 //					}
 
 					#if defined( WRITE_ASSEMBLY )

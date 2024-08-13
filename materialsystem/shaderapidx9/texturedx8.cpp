@@ -157,9 +157,9 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 	bool bVertexTexture = ( nCreationFlags & TEXTURE_CREATE_VERTEXTEXTURE ) != 0;
 	bool bAllowNonFilterable = ( nCreationFlags & TEXTURE_CREATE_UNFILTERABLE_OK ) != 0;
 	bool bVolumeTexture = ( nDepth > 1 );
-	bool bIsFallback = ( nCreationFlags & TEXTURE_CREATE_FALLBACK ) != 0;
-	bool bNoD3DBits = ( nCreationFlags & TEXTURE_CREATE_NOD3DMEMORY ) != 0;
-	bool bSRGB = (nCreationFlags & TEXTURE_CREATE_SRGB) != 0;			// for Posix/GL only
+	[[maybe_unused]] bool bIsFallback = ( nCreationFlags & TEXTURE_CREATE_FALLBACK ) != 0;
+	[[maybe_unused]] bool bNoD3DBits = ( nCreationFlags & TEXTURE_CREATE_NOD3DMEMORY ) != 0;
+	[[maybe_unused]] bool bSRGB = (nCreationFlags & TEXTURE_CREATE_SRGB) != 0;			// for Posix/GL only
 
 	// NOTE: This function shouldn't be used for creating depth buffers!
 	Assert( !bIsDepthBuffer );
@@ -538,17 +538,6 @@ void UnlockTexture( ShaderAPITextureHandle_t bindId, int copy, IDirect3DBaseText
 // Compute texture size based on compression
 //-----------------------------------------------------------------------------
 
-static constexpr inline int DetermineGreaterPowerOfTwo( int val )
-{
-	int num = 1;
-	while (val > num)
-	{
-		num <<= 1;
-	}
-
-	return num;
-}
-
 constexpr inline int DeterminePowerOfTwo( int val )
 {
 	int pow = 0;
@@ -586,7 +575,6 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 		return;
 
 	RECT			srcRect;
-	RECT			*pSrcRect = NULL;
 	D3DLOCKED_RECT	lockedRect;
 
 	srcRect.left   = xOffset;
@@ -767,174 +755,6 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 	}
 
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - pTextureLevel->Release", __FUNCTION__ );
-	pTextureLevel->Release();
-}
-#endif
-
-//-----------------------------------------------------------------------------
-// Puts 2D texture data into 360 gpu memory.
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, int srcStride )
-{
-	// xbox textures are NOT backed in gpu memory contiguously
-	// stride details are critical - see [Xbox 360 Texture Storage]
-	// a d3dformat identifier on the xbox is tiled, the same d3dformat on the pc is expected linear to the app
-	// we purposely hide the tiling here, otherwise much confusion for the pc
-	// the *entire* target must be un-tiled *only* before any *subrect* blitting linear work
-	// the *entire* target must then be re-tiled after the *subrect* blit
-	// procedural textures require this to subrect blit their new portions correctly
-	// the tiling dance can be avoided if the source and target match in tiled state during a full rect blit
-
-	if ( info.m_bSrcIsTiled )
-	{
-		// not supporting subrect blitting from a tiled source
-		Assert( 0 );
-		return;
-	}
-
-	CUtlBuffer formatConvertMemory;
-	unsigned char *pSrcData = info.m_pSrcData;
-
-	ImageFormat	dstFormat = GetImageFormat( info.m_pTexture );
-	if ( dstFormat != info.m_SrcFormat )
-	{
-		if ( !info.m_bCanConvertFormat )
-		{
-			// texture is expected to be in target format
-			// not supporting conversion of a tiled source
-			Assert( 0 );
-			return;
-		}
-
-		int srcSize = ImageLoader::GetMemRequired( info.m_nWidth, info.m_nHeight, 1, info.m_SrcFormat, false );
-		int dstSize = ImageLoader::GetMemRequired( info.m_nWidth, info.m_nHeight, 1, dstFormat, false );
-		formatConvertMemory.EnsureCapacity( dstSize );
-
-		// due to format conversion, source is in non-native order
-		ImageLoader::PreConvertSwapImageData( (unsigned char*)info.m_pSrcData, srcSize, info.m_SrcFormat, info.m_nWidth, srcStride );
-
-		// slow conversion operation
-		if ( !ShaderUtil()->ConvertImageFormat( 
-				info.m_pSrcData,
-				info.m_SrcFormat,
-				(unsigned char*)formatConvertMemory.Base(),
-				dstFormat,
-				info.m_nWidth,
-				info.m_nHeight,
-				srcStride,
-				0 ) )
-		{
-			// conversion failed
-			Assert( 0 );
-			return;
-		}
-
-		// due to format conversion, source must have been in non-native order
-		ImageLoader::PostConvertSwapImageData( (unsigned char*)formatConvertMemory.Base(), dstSize, dstFormat );
-
-		pSrcData = (unsigned char*)formatConvertMemory.Base();
-	}
-
-	// get the top mip level info (needed for proper sub mip access)
-	XGTEXTURE_DESC baseDesc;
-	XGGetTextureDesc( info.m_pTexture, 0, &baseDesc );
-	bool bDstIsTiled = XGIsTiledFormat( baseDesc.Format ) == TRUE;
-
-	// get the target mip level info
-	XGTEXTURE_DESC mipDesc;
-	XGGetTextureDesc( info.m_pTexture, info.m_nLevel, &mipDesc );
-	bool bFullSurfBlit = ( mipDesc.Width == (unsigned)info.m_nWidth && mipDesc.Height == (unsigned)info.m_nHeight );
-
-	// get the mip level of the texture we want to write into
-	IDirect3DSurface* pTextureLevel;
-	HRESULT hr = GetSurfaceFromTexture( info.m_pTexture, info.m_nLevel, info.m_CubeFaceID, &pTextureLevel );
-	if ( FAILED( hr ) )
-	{
-		Warning( "CShaderAPIDX8::BlitTextureBits: GetSurfaceFromTexture() failure\n" );
-		return;
-	}
-
-	CUtlBuffer scratchMemory;
-	D3DLOCKED_RECT lockedRect;
-
-	hr = pTextureLevel->LockRect( &lockedRect, NULL, D3DLOCK_NOSYSLOCK );
-	if ( FAILED( hr ) )
-	{
-		Warning( "CShaderAPIDX8::BlitTextureBits: couldn't lock texture rect\n" );
-		goto cleanUp;
-	}
-	unsigned char *pTargetImage = (unsigned char *)lockedRect.pBits;
-
-	POINT p;
-	p.x = xOffset;
-	p.y = yOffset;
-
-	RECT r;
-	r.left = 0;
-	r.top = 0;
-	r.right = info.m_nWidth;
-	r.bottom = info.m_nHeight;
-
-	int blockSize = mipDesc.Width/mipDesc.WidthInBlocks;
-	if ( !srcStride )
-	{
-		srcStride = (mipDesc.Width/blockSize)*mipDesc.BytesPerBlock;
-	}
-
-	// subrect blitting path
-	if ( !bDstIsTiled )
-	{
-		// Copy the subrect without conversion
-		hr = XGCopySurface(
-				pTargetImage,
-				mipDesc.RowPitch,
-				mipDesc.Width,
-				mipDesc.Height,
-				mipDesc.Format,
-				&p,
-				pSrcData,
-				srcStride,
-				mipDesc.Format,
-				&r,
-				0,
-				0 );
-		if ( FAILED( hr ) )
-		{
-			Warning( "CShaderAPIDX8::BlitTextureBits: failed subrect copy\n" );
-			goto cleanUp;
-		}
-	}
-	else
-	{
-		int tileFlags = 0;
-		if ( !( mipDesc.Flags & XGTDESC_PACKED ) )
-			tileFlags |= XGTILE_NONPACKED;
-		if ( mipDesc.Flags & XGTDESC_BORDERED )
-			tileFlags |= XGTILE_BORDER;
-
-		// tile the temp store back into the target surface
-		XGTileTextureLevel(
-			baseDesc.Width,
-			baseDesc.Height,
-			info.m_nLevel,
-			XGGetGpuFormat( baseDesc.Format ),
-			tileFlags,
-			pTargetImage,
-			&p,
-			pSrcData,
-			srcStride,
-			&r );
-	}
-
-	hr = pTextureLevel->UnlockRect();
-	if ( FAILED( hr ) ) 
-	{
-		Warning( "CShaderAPIDX8::BlitTextureBits: couldn't unlock texture rect\n" );
-		goto cleanUp;
-	}
-
-cleanUp:
 	pTextureLevel->Release();
 }
 #endif
@@ -1123,7 +943,7 @@ static void BlitTextureBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 	RECORD_INT( srcStride );
 	RECORD_INT( GetImageFormat( info.m_pTexture ) );
 	// strides are in bytes.
-	int srcDataSize;
+	intp srcDataSize;
 	if ( srcStride == 0 )
 	{
 		srcDataSize = ImageLoader::GetMemRequired( info.m_nWidth, info.m_nHeight, 1, info.m_SrcFormat, false );
@@ -1466,9 +1286,7 @@ void LoadSubTexture( TextureLoadInfo_t &info, int xOffset, int yOffset, int srcS
 
 int ComputeTextureMemorySize( const GUID &nDeviceGUID, D3DDEVTYPE deviceType )
 {
-#if defined( _X360 )
-	return 0;
-#elif defined( DONT_CHECK_MEM )
+#if defined( DONT_CHECK_MEM )
 	return (deviceType == D3DDEVTYPE_REF) ? (64 * 1024 * 1024) : 102236160;
 #else
 
@@ -1492,9 +1310,9 @@ int ComputeTextureMemorySize( const GUID &nDeviceGUID, D3DDEVTYPE deviceType )
 	// Sadly, the only way to compute texture memory size
 	// is to allocate a crapload of textures until we can't any more
 	ImageFormat fmt = FindNearestSupportedFormat( IMAGE_FORMAT_BGR565, false, false, false );
-	int textureSize = ShaderUtil()->GetMemRequired( 256, 256, 1, fmt, false );
+	intp textureSize = ShaderUtil()->GetMemRequired( 256, 256, 1, fmt, false );
 
-	int totalSize = 0;
+	intp totalSize = 0;
 	CUtlVector< IDirect3DBaseTexture* > textures;
 
 	s_bTestingVideoMemorySize = true;

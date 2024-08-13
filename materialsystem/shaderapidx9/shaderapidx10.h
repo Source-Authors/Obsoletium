@@ -122,43 +122,43 @@ public:
 	// Methods of IShaderAPI
 	// NOTE: These methods have been ported over
 public:
-	virtual void SetViewports( int nCount, const ShaderViewport_t* pViewports );
-	virtual int GetViewports( ShaderViewport_t* pViewports, int nMax ) const;
-	virtual void ClearBuffers( bool bClearColor, bool bClearDepth, bool bClearStencil, int renderTargetWidth, int renderTargetHeight );
-	virtual void ClearColor3ub( unsigned char r, unsigned char g, unsigned char b );
-	virtual void ClearColor4ub( unsigned char r, unsigned char g, unsigned char b, unsigned char a );
-	virtual void SetRasterState( const ShaderRasterState_t& state );
-	virtual void BindVertexShader( VertexShaderHandle_t hVertexShader );
-	virtual void BindGeometryShader( GeometryShaderHandle_t hGeometryShader );
-	virtual void BindPixelShader( PixelShaderHandle_t hPixelShader );
-	virtual void BindVertexBuffer( int nStreamID, IVertexBuffer *pVertexBuffer, int nOffsetInBytes, int nFirstVertex, int nVertexCount, VertexFormat_t fmt, int nRepetitions = 1 );
-	virtual void BindIndexBuffer( IIndexBuffer *pIndexBuffer, int nOffsetInBytes );
-	virtual void Draw( MaterialPrimitiveType_t primitiveType, int nFirstIndex, int nIndexCount );
+	void SetViewports( int nCount, const ShaderViewport_t* pViewports ) override;
+	int GetViewports( ShaderViewport_t* pViewports, int nMax ) const override;
+	void ClearBuffers( bool bClearColor, bool bClearDepth, bool bClearStencil, int renderTargetWidth, int renderTargetHeight ) override;
+	void ClearColor3ub( unsigned char r, unsigned char g, unsigned char b ) override;
+	void ClearColor4ub( unsigned char r, unsigned char g, unsigned char b, unsigned char a ) override;
+	void SetRasterState( const ShaderRasterState_t& state ) override;
+	void BindVertexShader( VertexShaderHandle_t hVertexShader ) override;
+	void BindGeometryShader( GeometryShaderHandle_t hGeometryShader ) override;
+	void BindPixelShader( PixelShaderHandle_t hPixelShader ) override;
+	void BindVertexBuffer( int nStreamID, IVertexBuffer *pVertexBuffer, int nOffsetInBytes, int nFirstVertex, int nVertexCount, VertexFormat_t fmt, int nRepetitions = 1 ) override;
+	void BindIndexBuffer( IIndexBuffer *pIndexBuffer, int nOffsetInBytes ) override;
+	void Draw( MaterialPrimitiveType_t primitiveType, int nFirstIndex, int nIndexCount ) override;
 
 	// Methods of IShaderDynamicAPI
 public:
-	virtual void GetBackBufferDimensions( int& nWidth, int& nHeight ) const;
+	void GetBackBufferDimensions( int&, int& ) const override;
 
 public:
 	// Methods of CShaderAPIBase
-	virtual bool OnDeviceInit() { ResetRenderState(); return true; }
-	virtual void OnDeviceShutdown() {}
-	virtual void ReleaseShaderObjects();
-	virtual void RestoreShaderObjects();
-	virtual void BeginPIXEvent( unsigned long color, const char *szName ) {}
-	virtual void EndPIXEvent() {}
-	virtual void AdvancePIXFrame() {}
+	bool OnDeviceInit() override { ResetRenderState(); return true; }
+	void OnDeviceShutdown() override {}
+	void ReleaseShaderObjects() override;
+	void RestoreShaderObjects() override;
+	void BeginPIXEvent( unsigned long, const char * ) override {}
+	void EndPIXEvent() override{}
+	void AdvancePIXFrame() override {}
 
 	// NOTE: These methods have not been ported over.
 	// IDebugTextureInfo implementation.
 public:
 
-	virtual bool IsDebugTextureListFresh( int numFramesAllowed = 1 ) { return false; }
-	virtual void EnableDebugTextureList( bool bEnable ) {}
-	virtual void EnableGetAllTextures( bool bEnable ) {}
-	virtual KeyValues* GetDebugTextureList() { return NULL; }
-	virtual int GetTextureMemoryUsed( TextureMemoryType eTextureMemory ) { return 0; }
-	virtual bool SetDebugTextureRendering( bool bEnable ) { return false; }
+	bool IsDebugTextureListFresh( int numFramesAllowed = 1 ) override { return false; }
+	void EnableDebugTextureList( bool ) override {}
+	void EnableGetAllTextures( bool ) override {}
+	KeyValues* GetDebugTextureList() override { return NULL; }
+	int GetTextureMemoryUsed( TextureMemoryType ) override { return 0; }
+	bool SetDebugTextureRendering( bool ) override { return false; }
 	
 public:
 	// Other public methods
@@ -168,104 +168,104 @@ public:
 	void UnbindVertexBuffer( ID3D10Buffer *pBuffer );
 	void UnbindIndexBuffer( ID3D10Buffer *pBuffer );
 
-	void PrintfVA( char *fmt, va_list vargs ) {}
-	void Printf( PRINTF_FORMAT_STRING const char *fmt, ... ) {}
-	float Knob( char *knobname, float *setvalue = NULL ) { return 0.0f;}
+	void PrintfVA( char *fmt, va_list vargs ) override {}
+	void Printf( PRINTF_FORMAT_STRING const char *fmt, ... ) override {}
+	float Knob( char *knobname, float *setvalue = NULL ) override { return 0.0f;}
 
 private:
 
 	// Returns a d3d texture associated with a texture handle
-	virtual IDirect3DBaseTexture* GetD3DTexture( ShaderAPITextureHandle_t hTexture ) { Assert(0); return NULL; }
-	virtual void QueueResetRenderState() {}
+	IDirect3DBaseTexture* GetD3DTexture( ShaderAPITextureHandle_t hTexture ) override { Assert(0); return NULL; }
+	void QueueResetRenderState() override {}
 
 	void SetTopology( MaterialPrimitiveType_t topology );
 
-	virtual bool DoRenderTargetsNeedSeparateDepthBuffer() const;
+	bool DoRenderTargetsNeedSeparateDepthBuffer() const override;
 
-	void SetHardwareGammaRamp( float fGamma )
+	void SetHardwareGammaRamp( float )
 	{
 	}
 
 	// Used to clear the transition table when we know it's become invalid.
-	void ClearSnapshots();
+	void ClearSnapshots() override;
 
 	// Sets the mode...
-	bool SetMode( void* hwnd, unsigned nAdapter, const ShaderDeviceInfo_t &info );
+	bool SetMode( void* hwnd, unsigned nAdapter, const ShaderDeviceInfo_t &info ) override;
 
-	void ChangeVideoMode( const ShaderDeviceInfo_t &info )
+	void ChangeVideoMode(const ShaderDeviceInfo_t &) override
 	{
 	}
 
 	// Called when the dx support level has changed
-	virtual void DXSupportLevelChanged() {}
+	void DXSupportLevelChanged() override {}
 
-	virtual void EnableUserClipTransformOverride( bool bEnable ) {}
-	virtual void UserClipTransform( const VMatrix &worldToView ) {}
-	virtual bool GetUserClipTransform( VMatrix &worldToView ) { return false; }
+	void EnableUserClipTransformOverride( bool ) override {}
+	void UserClipTransform( const VMatrix & ) override {}
+	virtual bool GetUserClipTransform( VMatrix & ) { return false; }
 
 	// Sets the default *dynamic* state
-	void SetDefaultState( );
+	void SetDefaultState( ) override;
 
 	// Returns the snapshot id for the shader state
-	StateSnapshot_t	 TakeSnapshot( );
+	StateSnapshot_t	 TakeSnapshot( ) override;
 
 	// Returns true if the state snapshot is transparent
-	bool IsTranslucent( StateSnapshot_t id ) const;
-	bool IsAlphaTested( StateSnapshot_t id ) const;
-	bool UsesVertexAndPixelShaders( StateSnapshot_t id ) const;
-	virtual bool IsDepthWriteEnabled( StateSnapshot_t id ) const;
+	bool IsTranslucent( StateSnapshot_t id ) const override;
+	bool IsAlphaTested( StateSnapshot_t id ) const override;
+	bool UsesVertexAndPixelShaders( StateSnapshot_t id ) const override;
+	bool IsDepthWriteEnabled( StateSnapshot_t id ) const override;
 
 	// Gets the vertex format for a set of snapshot ids
-	VertexFormat_t ComputeVertexFormat( int numSnapshots, StateSnapshot_t* pIds ) const;
+	VertexFormat_t ComputeVertexFormat( int numSnapshots, StateSnapshot_t* pIds ) const override;
 
 	// Gets the vertex format for a set of snapshot ids
-	VertexFormat_t ComputeVertexUsage( int numSnapshots, StateSnapshot_t* pIds ) const;
+	VertexFormat_t ComputeVertexUsage( int numSnapshots, StateSnapshot_t* pIds ) const override;
 
 	// Begins a rendering pass that uses a state snapshot
-	void BeginPass( StateSnapshot_t snapshot  );
+	void BeginPass( StateSnapshot_t snapshot  ) override;
 
 	// Uses a state snapshot
 	void UseSnapshot( StateSnapshot_t snapshot );
 
 	// Use this to get the mesh builder that allows us to modify vertex data
-	CMeshBuilder* GetVertexModifyBuilder();
+	CMeshBuilder* GetVertexModifyBuilder() override;
 
 	// Sets the color to modulate by
-	void Color3f( float r, float g, float b );
-	void Color3fv( float const* pColor );
-	void Color4f( float r, float g, float b, float a );
-	void Color4fv( float const* pColor );
+	void Color3f( float r, float g, float b ) override;
+	void Color3fv( float const* pColor ) override;
+	void Color4f( float r, float g, float b, float a ) override;
+	void Color4fv( float const* pColor ) override;
 
 	// Faster versions of color
-	void Color3ub( unsigned char r, unsigned char g, unsigned char b );
-	void Color3ubv( unsigned char const* rgb );
-	void Color4ub( unsigned char r, unsigned char g, unsigned char b, unsigned char a );
-	void Color4ubv( unsigned char const* rgba );
+	void Color3ub( unsigned char r, unsigned char g, unsigned char b ) override;
+	void Color3ubv( unsigned char const* rgb ) override;
+	void Color4ub( unsigned char r, unsigned char g, unsigned char b, unsigned char a ) override;
+	void Color4ubv( unsigned char const* rgba ) override;
 
 	// Sets the lights
-	void SetLight( int lightNum, const LightDesc_t& desc );
-	void SetAmbientLight( float r, float g, float b );
-	void SetAmbientLightCube( Vector4D cube[6] );
-	virtual void SetLightingOrigin( Vector vLightingOrigin ) {}
+	void SetLight( int lightNum, const LightDesc_t& desc ) override;
+	void SetAmbientLight( float r, float g, float b ) override;
+	void SetAmbientLightCube( Vector4D cube[6] ) override;
+	void SetLightingOrigin( Vector ) override {}
 
 	// Get the lights
-	int GetMaxLights( void ) const;
-	const LightDesc_t& GetLight( int lightNum ) const;
+	int GetMaxLights( void ) const override;
+	const LightDesc_t& GetLight( int lightNum ) const override;
 
 	// Render state for the ambient light cube (vertex shaders)
-	void SetVertexShaderStateAmbientLightCube();
-	virtual void SetPixelShaderStateAmbientLightCube( int pshReg, bool bForceToBlack = false ) {}
+	void SetVertexShaderStateAmbientLightCube() override;
+	void SetPixelShaderStateAmbientLightCube( int pshReg, bool bForceToBlack = false ) override {}
 	void SetPixelShaderStateAmbientLightCube( int pshReg )
 	{
 	}
-	virtual void GetDX9LightState( LightState_t *state ) const {}
+	void GetDX9LightState( LightState_t *state ) const override {}
 
-	float GetAmbientLightCubeLuminance(void)
+	float GetAmbientLightCubeLuminance(void) override
 	{
 		return 0.0f;
 	}
 
-	void SetSkinningMatrices();
+	void SetSkinningMatrices() override;
 
 	// Lightmap texture binding
 	void BindLightmap( TextureStage_t stage );
@@ -278,15 +278,15 @@ private:
 	void BindBlack( TextureStage_t stage );
 	void BindGrey( TextureStage_t stage );
 	void BindFBTexture( TextureStage_t stage, int textureIdex );
-	void CopyRenderTargetToTexture( ShaderAPITextureHandle_t texID )
+	void CopyRenderTargetToTexture( ShaderAPITextureHandle_t texID ) override
 	{
 	}
 
-	void CopyRenderTargetToTextureEx( ShaderAPITextureHandle_t texID, int nRenderTargetID, Rect_t *pSrcRect, Rect_t *pDstRect )
+	void CopyRenderTargetToTextureEx( ShaderAPITextureHandle_t texID, int nRenderTargetID, Rect_t *pSrcRect, Rect_t *pDstRect ) override
 	{
 	}
 
-	void CopyTextureToRenderTargetEx( int nRenderTargetID, ShaderAPITextureHandle_t textureHandle, Rect_t *pSrcRect = NULL, Rect_t *pDstRect = NULL )
+	void CopyTextureToRenderTargetEx( int nRenderTargetID, ShaderAPITextureHandle_t textureHandle, Rect_t *pSrcRect = NULL, Rect_t *pDstRect = NULL ) override
 	{
 	}
 
@@ -296,10 +296,10 @@ private:
 	void BindSignedNormalizationCubeMap( TextureStage_t stage );
 
 	// Set the number of bone weights
-	void SetNumBoneWeights( int numBones );
+	void SetNumBoneWeights( int numBones ) override;
 
 	// Flushes any primitives that are buffered
-	void FlushBufferedPrimitives();
+	void FlushBufferedPrimitives() override;
 
 	// Creates/destroys Mesh
 	IMesh* CreateStaticMesh( VertexFormat_t fmt, const char *pTextureBudgetGroup, IMaterial * pMaterial = NULL );
@@ -308,8 +308,8 @@ private:
 	// Gets the dynamic mesh; note that you've got to render the mesh
 	// before calling this function a second time. Clients should *not*
 	// call DestroyStaticMesh on the mesh returned by this call.
-	IMesh* GetDynamicMesh( IMaterial* pMaterial, int nHWSkinBoneCount, bool buffered, IMesh* pVertexOverride, IMesh* pIndexOverride );
-	IMesh* GetDynamicMeshEx( IMaterial* pMaterial, VertexFormat_t fmt, int nHWSkinBoneCount, bool buffered, IMesh* pVertexOverride, IMesh* pIndexOverride );
+	IMesh* GetDynamicMesh( IMaterial* pMaterial, int nHWSkinBoneCount, bool buffered, IMesh* pVertexOverride, IMesh* pIndexOverride ) override;
+	IMesh* GetDynamicMeshEx( IMaterial* pMaterial, VertexFormat_t fmt, int nHWSkinBoneCount, bool buffered, IMesh* pVertexOverride, IMesh* pIndexOverride ) override;
 	IVertexBuffer *GetDynamicVertexBuffer( IMaterial* pMaterial, bool buffered )
 	{
 		Assert( 0 );
@@ -320,174 +320,174 @@ private:
 		Assert( 0 );
 		return NULL;
 	}
-	IMesh* GetFlexMesh();
+	IMesh* GetFlexMesh() override;
 
 	// Renders a single pass of a material
-	void RenderPass( int nPass, int nPassCount );
+	void RenderPass( int nPass, int nPassCount ) override;
 
 	// stuff related to matrix stacks
-	void MatrixMode( MaterialMatrixMode_t matrixMode );
-	void PushMatrix();
-	void PopMatrix();
-	void LoadMatrix( float *m );
-	void LoadBoneMatrix( int boneIndex, const float *m ) {}
-	void MultMatrix( float *m );
-	void MultMatrixLocal( float *m );
-	void GetMatrix( MaterialMatrixMode_t matrixMode, float *dst );
-	void LoadIdentity( void );
-	void LoadCameraToWorld( void );
-	void Ortho( double left, double top, double right, double bottom, double zNear, double zFar );
-	void PerspectiveX( double fovx, double aspect, double zNear, double zFar );
-	void PerspectiveOffCenterX( double fovx, double aspect, double zNear, double zFar, double bottom, double top, double left, double right );
-	void PickMatrix( int x, int y, int width, int height );
-	void Rotate( float angle, float x, float y, float z );
-	void Translate( float x, float y, float z );
-	void Scale( float x, float y, float z );
-	void ScaleXY( float x, float y );
+	void MatrixMode( MaterialMatrixMode_t matrixMode ) override;
+	void PushMatrix() override;
+	void PopMatrix() override;
+	void LoadMatrix( float *m ) override;
+	void LoadBoneMatrix( int boneIndex, const float *m ) override {}
+	void MultMatrix( float *m ) override;
+	void MultMatrixLocal( float *m ) override;
+	void GetMatrix( MaterialMatrixMode_t matrixMode, float *dst ) override;
+	void LoadIdentity( void ) override;
+	void LoadCameraToWorld( void ) override;
+	void Ortho( double left, double top, double right, double bottom, double zNear, double zFar ) override;
+	void PerspectiveX( double fovx, double aspect, double zNear, double zFar ) override;
+	void PerspectiveOffCenterX( double fovx, double aspect, double zNear, double zFar, double bottom, double top, double left, double right ) override;
+	void PickMatrix( int x, int y, int width, int height ) override;
+	void Rotate( float angle, float x, float y, float z ) override;
+	void Translate( float x, float y, float z ) override;
+	void Scale( float x, float y, float z ) override;
+	void ScaleXY( float x, float y ) override;
 
 	void Viewport( int x, int y, int width, int height );
 	void GetViewport( int& x, int& y, int& width, int& height ) const;
 
 	// Fog methods...
 	void FogMode( MaterialFogMode_t fogMode );
-	void FogStart( float fStart );
-	void FogEnd( float fEnd );
-	void SetFogZ( float fogZ );
-	void FogMaxDensity( float flMaxDensity );
-	void GetFogDistances( float *fStart, float *fEnd, float *fFogZ );
+	void FogStart( float fStart ) override;
+	void FogEnd( float fEnd ) override;
+	void SetFogZ( float fogZ ) override;
+	void FogMaxDensity( float flMaxDensity ) override;
+	void GetFogDistances( float *fStart, float *fEnd, float *fFogZ ) override;
 	void FogColor3f( float r, float g, float b );
 	void FogColor3fv( float const* rgb );
 	void FogColor3ub( unsigned char r, unsigned char g, unsigned char b );
 	void FogColor3ubv( unsigned char const* rgb );
 
-	virtual void SceneFogColor3ub( unsigned char r, unsigned char g, unsigned char b );
-	virtual void SceneFogMode( MaterialFogMode_t fogMode );
-	virtual void GetSceneFogColor( unsigned char *rgb );
-	virtual MaterialFogMode_t GetSceneFogMode( );
-	virtual int GetPixelFogCombo( );
+	void SceneFogColor3ub( unsigned char r, unsigned char g, unsigned char b ) override;
+	void SceneFogMode( MaterialFogMode_t fogMode ) override;
+	void GetSceneFogColor( unsigned char *rgb ) override;
+	MaterialFogMode_t GetSceneFogMode( ) override;
+	int GetPixelFogCombo( ) override;
 
-	void SetHeightClipZ( float z ); 
-	void SetHeightClipMode( enum MaterialHeightClipMode_t heightClipMode ); 
+	void SetHeightClipZ( float z ) override; 
+	void SetHeightClipMode( enum MaterialHeightClipMode_t heightClipMode ) override; 
 
-	void SetClipPlane( int index, const float *pPlane );
-	void EnableClipPlane( int index, bool bEnable );
+	void SetClipPlane( int index, const float *pPlane ) override;
+	void EnableClipPlane( int index, bool bEnable ) override;
 
-	void SetFastClipPlane( const float *pPlane );
-	void EnableFastClip( bool bEnable );
+	void SetFastClipPlane( const float *pPlane ) override;
+	void EnableFastClip( bool bEnable ) override;
 
 	// We use smaller dynamic VBs during level transitions, to free up memory
-	virtual int  GetCurrentDynamicVBSize( void );
-	virtual void DestroyVertexBuffers( bool bExitingLevel = false );
+	int  GetCurrentDynamicVBSize( void ) override;
+	void DestroyVertexBuffers( bool bExitingLevel = false ) override;
 
 	// Sets the vertex and pixel shaders
-	void SetVertexShaderIndex( int vshIndex );
-	void SetPixelShaderIndex( int pshIndex );
+	void SetVertexShaderIndex( int vshIndex ) override;
+	void SetPixelShaderIndex( int pshIndex ) override;
 
 	// Sets the constant register for vertex and pixel shaders
-	void SetVertexShaderConstant( int var, float const* pVec, int numConst = 1, bool bForce = false );
-	void SetPixelShaderConstant( int var, float const* pVec, int numConst = 1, bool bForce = false );
+	void SetVertexShaderConstant( int var, float const* pVec, int numConst = 1, bool bForce = false ) override;
+	void SetPixelShaderConstant( int var, float const* pVec, int numConst = 1, bool bForce = false ) override;
 
-	void SetBooleanVertexShaderConstant( int var, BOOL const* pVec, int numBools = 1, bool bForce = false )
+	void SetBooleanVertexShaderConstant( int var, BOOL const* pVec, int numBools = 1, bool bForce = false ) override
 	{
 		Assert(0);
 	}
 
 
-	void SetIntegerVertexShaderConstant( int var, int const* pVec, int numIntVecs = 1, bool bForce = false )
+	void SetIntegerVertexShaderConstant( int var, int const* pVec, int numIntVecs = 1, bool bForce = false ) override
 	{
 		Assert(0);
 	}
 
 	
-	void SetBooleanPixelShaderConstant( int var, BOOL const* pVec, int numBools = 1, bool bForce = false )
+	void SetBooleanPixelShaderConstant( int var, BOOL const* pVec, int numBools = 1, bool bForce = false ) override
 	{
 		Assert(0);
 	}
 
-	void SetIntegerPixelShaderConstant( int var, int const* pVec, int numIntVecs = 1, bool bForce = false )
+	void SetIntegerPixelShaderConstant( int var, int const* pVec, int numIntVecs = 1, bool bForce = false ) override
 	{
 		Assert(0);
 	}
 
-	bool ShouldWriteDepthToDestAlpha( void ) const
+	bool ShouldWriteDepthToDestAlpha( void ) const override
 	{
 		Assert(0);
 		return false;
 	}
 
 
-	void InvalidateDelayedShaderConstants( void );
+	void InvalidateDelayedShaderConstants( void ) override;
 
 	// Gamma<->Linear conversions according to the video hardware we're running on
-	float GammaToLinear_HardwareSpecific( float fGamma ) const
+	float GammaToLinear_HardwareSpecific( float fGamma ) const override
 	{
 		return 0.;
 	}
 
-	float LinearToGamma_HardwareSpecific( float fLinear ) const
+	float LinearToGamma_HardwareSpecific( float fLinear ) const override
 	{
 		return 0.;
 	}
 
 	//Set's the linear->gamma conversion textures to use for this hardware for both srgb writes enabled and disabled(identity)
-	void SetLinearToGammaConversionTextures( ShaderAPITextureHandle_t hSRGBWriteEnabledTexture, ShaderAPITextureHandle_t hIdentityTexture );
+	void SetLinearToGammaConversionTextures( ShaderAPITextureHandle_t hSRGBWriteEnabledTexture, ShaderAPITextureHandle_t hIdentityTexture ) override;
 
 	// Cull mode
-	void CullMode( MaterialCullMode_t cullMode );
+	void CullMode( MaterialCullMode_t cullMode ) override;
 
 	// Force writes only when z matches. . . useful for stenciling things out
 	// by rendering the desired Z values ahead of time.
-	void ForceDepthFuncEquals( bool bEnable );
+	void ForceDepthFuncEquals( bool bEnable ) override;
 
 	// Forces Z buffering on or off
-	void OverrideDepthEnable( bool bEnable, bool bDepthEnable );
+	void OverrideDepthEnable( bool bEnable, bool bDepthEnable ) override;
 	// Forces alpha writes on or off
-	void OverrideAlphaWriteEnable( bool bOverrideEnable, bool bAlphaWriteEnable );
+	void OverrideAlphaWriteEnable( bool bOverrideEnable, bool bAlphaWriteEnable ) override;
 	//forces color writes on or off
-	void OverrideColorWriteEnable( bool bOverrideEnable, bool bColorWriteEnable );
+	void OverrideColorWriteEnable( bool bOverrideEnable, bool bColorWriteEnable ) override;
 
 	// Sets the shade mode
-	void ShadeMode( ShaderShadeMode_t mode );
+	void ShadeMode( ShaderShadeMode_t mode ) override;
 
 	// Binds a particular material to render with
-	void Bind( IMaterial* pMaterial );
+	void Bind( IMaterial* pMaterial ) override;
 
 	// Returns the nearest supported format
-	ImageFormat GetNearestSupportedFormat( ImageFormat fmt, bool bFilteringRequired = true ) const;
-	ImageFormat GetNearestRenderTargetFormat( ImageFormat fmt ) const;
+	ImageFormat GetNearestSupportedFormat( ImageFormat fmt, bool bFilteringRequired = true ) const override;
+	ImageFormat GetNearestRenderTargetFormat( ImageFormat fmt ) const override;
 
 	// Sets the texture state
-	void BindTexture( Sampler_t stage, ShaderAPITextureHandle_t textureHandle );
+	void BindTexture( Sampler_t stage, ShaderAPITextureHandle_t textureHandle ) override;
 
-	void SetRenderTarget( ShaderAPITextureHandle_t colorTextureHandle, ShaderAPITextureHandle_t depthTextureHandle )
+	void SetRenderTarget( ShaderAPITextureHandle_t colorTextureHandle, ShaderAPITextureHandle_t depthTextureHandle ) override
 	{
 	}
 
-	void SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHandle_t colorTextureHandle, ShaderAPITextureHandle_t depthTextureHandle )
+	void SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHandle_t colorTextureHandle, ShaderAPITextureHandle_t depthTextureHandle ) override
 	{
 	}
 
 	// Indicates we're going to be modifying this texture
 	// TexImage2D, TexSubImage2D, TexWrap, TexMinFilter, and TexMagFilter
 	// all use the texture specified by this function.
-	void ModifyTexture( ShaderAPITextureHandle_t textureHandle );
+	void ModifyTexture( ShaderAPITextureHandle_t textureHandle ) override;
 
 	// Texture management methods
 	void TexImage2D( int level, int cubeFace, ImageFormat dstFormat, int zOffset, int width, int height, 
-		ImageFormat srcFormat, bool bSrcIsTiled, void *imageData );
+		ImageFormat srcFormat, bool bSrcIsTiled, void *imageData ) override;
 	void TexSubImage2D( int level, int cubeFace, int xOffset, int yOffset, int zOffset, int width, int height,
-		ImageFormat srcFormat, int srcStride, bool bSrcIsTiled, void *imageData );
-	void TexImageFromVTF( IVTFTexture *pVTF, int iVTFFrame );
+		ImageFormat srcFormat, int srcStride, bool bSrcIsTiled, void *imageData ) override;
+	void TexImageFromVTF( IVTFTexture *pVTF, int iVTFFrame ) override;
 
 	bool TexLock( int level, int cubeFaceID, int xOffset, int yOffset, 
-		int width, int height, CPixelWriter& writer );
-	void TexUnlock( );
+		int width, int height, CPixelWriter& writer ) override;
+	void TexUnlock( ) override;
 
 	// These are bound to the texture, not the texture environment
-	void TexMinFilter( ShaderTexFilterMode_t texFilterMode );
-	void TexMagFilter( ShaderTexFilterMode_t texFilterMode );
-	void TexWrap( ShaderTexCoordComponent_t coord, ShaderTexWrapMode_t wrapMode );
-	void TexSetPriority( int priority );	
+	void TexMinFilter( ShaderTexFilterMode_t texFilterMode ) override;
+	void TexMagFilter( ShaderTexFilterMode_t texFilterMode ) override;
+	void TexWrap( ShaderTexCoordComponent_t coord, ShaderTexWrapMode_t wrapMode ) override;
+	void TexSetPriority( int priority ) override;	
 
 	ShaderAPITextureHandle_t CreateTexture( 
 		int width, 
@@ -498,7 +498,7 @@ private:
 		int numCopies, 
 		int flags, 
 		const char *pDebugName,
-		const char *pTextureGroupName );
+		const char *pTextureGroupName ) override;
 	void CreateTextures( 
 		ShaderAPITextureHandle_t *pHandles,
 		int count,
@@ -510,180 +510,180 @@ private:
 		int numCopies, 
 		int flags, 
 		const char *pDebugName,
-		const char *pTextureGroupName );
-	ShaderAPITextureHandle_t CreateDepthTexture( ImageFormat renderFormat, int width, int height, const char *pDebugName, bool bTexture );
-	void DeleteTexture( ShaderAPITextureHandle_t textureHandle );
-	bool IsTexture( ShaderAPITextureHandle_t textureHandle );
-	bool IsTextureResident( ShaderAPITextureHandle_t textureHandle );
+		const char *pTextureGroupName ) override;
+	ShaderAPITextureHandle_t CreateDepthTexture( ImageFormat renderFormat, int width, int height, const char *pDebugName, bool bTexture ) override;
+	void DeleteTexture( ShaderAPITextureHandle_t textureHandle ) override;
+	bool IsTexture( ShaderAPITextureHandle_t textureHandle ) override;
+	bool IsTextureResident( ShaderAPITextureHandle_t textureHandle ) override;
 
 	// stuff that isn't to be used from within a shader
-	void ClearBuffersObeyStencil( bool bClearColor, bool bClearDepth );
-	void ClearBuffersObeyStencilEx( bool bClearColor, bool bClearAlpha, bool bClearDepth );
-	void PerformFullScreenStencilOperation( void );
-	void ReadPixels( int x, int y, int width, int height, unsigned char *data, ImageFormat dstFormat );
-	virtual void ReadPixels( Rect_t *pSrcRect, Rect_t *pDstRect, unsigned char *data, ImageFormat dstFormat, int nDstStride );
+	void ClearBuffersObeyStencil( bool bClearColor, bool bClearDepth ) override;
+	void ClearBuffersObeyStencilEx( bool bClearColor, bool bClearAlpha, bool bClearDepth ) override;
+	void PerformFullScreenStencilOperation( void ) override;
+	void ReadPixels( int x, int y, int width, int height, unsigned char *data, ImageFormat dstFormat ) override;
+	void ReadPixels( Rect_t *pSrcRect, Rect_t *pDstRect, unsigned char *data, ImageFormat dstFormat, int nDstStride ) override;
 
 	// Selection mode methods
-	int SelectionMode( bool selectionMode );
-	void SelectionBuffer( unsigned int* pBuffer, int size );
-	void ClearSelectionNames( );
-	void LoadSelectionName( int name );
-	void PushSelectionName( int name );
-	void PopSelectionName();
+	int SelectionMode( bool selectionMode ) override;
+	void SelectionBuffer( unsigned int* pBuffer, int size ) override;
+	void ClearSelectionNames( ) override;
+	void LoadSelectionName( int name ) override;
+	void PushSelectionName( int name ) override;
+	void PopSelectionName() override;
 
-	void FlushHardware();
-	void ResetRenderState( bool bFullReset = true );
+	void FlushHardware() override;
+	void ResetRenderState( bool bFullReset = true ) override;
 
 	// Can we download textures?
-	virtual bool CanDownloadTextures() const;
+	bool CanDownloadTextures() const override;
 
 	// Board-independent calls, here to unify how shaders set state
 	// Implementations should chain back to IShaderUtil->BindTexture(), etc.
 
 	// Use this to begin and end the frame
-	void BeginFrame();
-	void EndFrame();
+	void BeginFrame() override;
+	void EndFrame() override;
 
 	// returns current time
-	double CurrentTime() const;
+	double CurrentTime() const override;
 
 	// Get the current camera position in world space.
-	void GetWorldSpaceCameraPosition( float * pPos ) const;
+	void GetWorldSpaceCameraPosition( float * pPos ) const override;
 
-	void ForceHardwareSync( void );
+	void ForceHardwareSync( void ) override;
 
-	int GetCurrentNumBones( void ) const;
-	bool IsHWMorphingEnabled( ) const;
-	int GetCurrentLightCombo( void ) const;
+	int GetCurrentNumBones( void ) const override;
+	bool IsHWMorphingEnabled( ) const override;
+	int GetCurrentLightCombo( void ) const override;
 	int MapLightComboToPSLightCombo( int nLightCombo ) const;
-	MaterialFogMode_t GetCurrentFogType( void ) const;
+	MaterialFogMode_t GetCurrentFogType( void ) const override;
 
 	void RecordString( const char *pStr );
 
-	void EvictManagedResources();
+	void EvictManagedResources() override;
 
-	void SetTextureTransformDimension( TextureStage_t textureStage, int dimension, bool projected );
-	void DisableTextureTransform( TextureStage_t textureStage )
+	void SetTextureTransformDimension( TextureStage_t textureStage, int dimension, bool projected ) override;
+	void DisableTextureTransform( TextureStage_t textureStage ) override
 	{
 	}
-	void SetBumpEnvMatrix( TextureStage_t textureStage, float m00, float m01, float m10, float m11 );
+	void SetBumpEnvMatrix( TextureStage_t textureStage, float m00, float m01, float m10, float m11 ) override;
 
 	// Gets the lightmap dimensions
-	virtual void GetLightmapDimensions( int *w, int *h );
+	void GetLightmapDimensions( int *w, int *h ) override;
 
-	virtual void SyncToken( const char *pToken );
+	void SyncToken( const char *pToken ) override;
 
 	// Setup standard vertex shader constants (that don't change)
 	// This needs to be called anytime that overbright changes.
-	virtual void SetStandardVertexShaderConstants( float fOverbright )
+	void SetStandardVertexShaderConstants( float fOverbright ) override
 	{
 	}
 
 	// Scissor Rect
-	virtual void SetScissorRect( const int nLeft, const int nTop, const int nRight, const int nBottom, const bool bEnableScissor ) {}
+	void SetScissorRect( const int nLeft, const int nTop, const int nRight, const int nBottom, const bool bEnableScissor ) override {}
 
 	// Reports support for a given CSAA mode
-	bool SupportsCSAAMode( int nNumSamples, int nQualityLevel ) { return false; }
+	bool SupportsCSAAMode( int nNumSamples, int nQualityLevel ) override { return false; }
 
 	// Level of anisotropic filtering
-	virtual void SetAnisotropicLevel( int nAnisotropyLevel )
+	void SetAnisotropicLevel( int nAnisotropyLevel ) override
 	{
 	}
 
 	void SetDefaultDynamicState()
 	{
 	}
-	virtual void CommitPixelShaderLighting( int pshReg )
+	void CommitPixelShaderLighting( int pshReg ) override
 	{
 	}
 
-	virtual void MarkUnusedVertexFields( unsigned int nFlags, int nTexCoordCount, bool *pUnusedTexCoords )
+	void MarkUnusedVertexFields( unsigned int nFlags, int nTexCoordCount, bool *pUnusedTexCoords ) override
 	{
 	}
 
-	ShaderAPIOcclusionQuery_t CreateOcclusionQueryObject( void )
+	ShaderAPIOcclusionQuery_t CreateOcclusionQueryObject( void ) override
 	{
 		return INVALID_SHADERAPI_OCCLUSION_QUERY_HANDLE;
 	}
 
-	void DestroyOcclusionQueryObject( ShaderAPIOcclusionQuery_t handle )
+	void DestroyOcclusionQueryObject( ShaderAPIOcclusionQuery_t handle ) override
 	{
 	}
 
-	void BeginOcclusionQueryDrawing( ShaderAPIOcclusionQuery_t handle )
+	void BeginOcclusionQueryDrawing( ShaderAPIOcclusionQuery_t handle ) override
 	{
 	}
 
-	void EndOcclusionQueryDrawing( ShaderAPIOcclusionQuery_t handle )
+	void EndOcclusionQueryDrawing( ShaderAPIOcclusionQuery_t handle ) override
 	{
 	}
 
-	int OcclusionQuery_GetNumPixelsRendered( ShaderAPIOcclusionQuery_t handle, bool bFlush )
+	int OcclusionQuery_GetNumPixelsRendered( ShaderAPIOcclusionQuery_t handle, bool bFlush ) override
 	{
 		return 0;
 	}
 
-	virtual void AcquireThreadOwnership() {}
-	virtual void ReleaseThreadOwnership() {}
+	void AcquireThreadOwnership() override {}
+	void ReleaseThreadOwnership() override {}
 
 	virtual bool SupportsBorderColor() const { return false; }
 	virtual bool SupportsFetch4() const { return false; }
-	virtual void EnableBuffer2FramesAhead( bool bEnable ) {}
+	void EnableBuffer2FramesAhead( bool bEnable ) override {}
 
-	virtual void SetDepthFeatheringPixelShaderConstant( int iConstant, float fDepthBlendScale ) {}
+	void SetDepthFeatheringPixelShaderConstant( int iConstant, float fDepthBlendScale ) override {}
 
-	void SetPixelShaderFogParams( int reg )
+	void SetPixelShaderFogParams( int reg ) override
 	{
 	}
 
-	virtual bool InFlashlightMode() const
+	bool InFlashlightMode() const override
 	{
 		return false;
 	}
 
-	virtual bool InEditorMode() const
+	bool InEditorMode() const override
 	{
 		return false;
 	}
 
 	// What fields in the morph do we actually use?
-	virtual MorphFormat_t ComputeMorphFormat( int numSnapshots, StateSnapshot_t* pIds ) const
+	MorphFormat_t ComputeMorphFormat( int numSnapshots, StateSnapshot_t* pIds ) const override
 	{
 		return 0;
 	}
 
 	// Gets the bound morph's vertex format; returns 0 if no morph is bound
-	virtual MorphFormat_t GetBoundMorphFormat()
+	MorphFormat_t GetBoundMorphFormat() override
 	{
 		return 0;
 	}
 
-	void GetStandardTextureDimensions( int *pWidth, int *pHeight, StandardTextureId_t id );
+	void GetStandardTextureDimensions( int *pWidth, int *pHeight, StandardTextureId_t id ) override;
 
 	// Binds a standard texture
-	virtual void BindStandardTexture( Sampler_t stage, StandardTextureId_t id )
+	void BindStandardTexture( Sampler_t stage, StandardTextureId_t id ) override
 	{
 	}
 
-	virtual void BindStandardVertexTexture( VertexTextureSampler_t stage, StandardTextureId_t id )
+	void BindStandardVertexTexture( VertexTextureSampler_t stage, StandardTextureId_t id ) override
 	{
 	}
 
-	virtual void SetFlashlightState( const FlashlightState_t &state, const VMatrix &worldToTexture )
+	void SetFlashlightState( const FlashlightState_t &state, const VMatrix &worldToTexture ) override
 	{
 	}
 
-	virtual void SetFlashlightStateEx( const FlashlightState_t &state, const VMatrix &worldToTexture, ITexture *pFlashlightDepthTexture )
+	void SetFlashlightStateEx( const FlashlightState_t &state, const VMatrix &worldToTexture, ITexture *pFlashlightDepthTexture ) override
 	{
 	}
 
-	virtual const FlashlightState_t &GetFlashlightState( VMatrix &worldToTexture ) const 
+	const FlashlightState_t &GetFlashlightState( VMatrix &worldToTexture ) const override
 	{
 		static FlashlightState_t  blah;
 		return blah;
 	}
 
-	virtual const FlashlightState_t &GetFlashlightStateEx( VMatrix &worldToTexture, ITexture **pFlashlightDepthTexture ) const 
+	const FlashlightState_t &GetFlashlightStateEx( VMatrix &worldToTexture, ITexture **pFlashlightDepthTexture ) const override
 	{
 		static FlashlightState_t  blah;
 		return blah;
@@ -694,191 +694,191 @@ private:
 	}
 
 
-	virtual void ClearVertexAndPixelShaderRefCounts()
+	void ClearVertexAndPixelShaderRefCounts() override
 	{
 	}
 
-	virtual void PurgeUnusedVertexAndPixelShaders()
+	void PurgeUnusedVertexAndPixelShaders() override
 	{
 	}
 
 	// Binds a vertex texture to a particular texture stage in the vertex pipe
-	virtual void BindVertexTexture( VertexTextureSampler_t nStage, ShaderAPITextureHandle_t hTexture )
+	void BindVertexTexture( VertexTextureSampler_t nStage, ShaderAPITextureHandle_t hTexture ) override
 	{
 	}
 
 	// Sets morph target factors
-	virtual void SetFlexWeights( int nFirstWeight, int nCount, const MorphWeight_t* pWeights )
+	void SetFlexWeights( int nFirstWeight, int nCount, const MorphWeight_t* pWeights ) override
 	{
 	}
 
 	// NOTE: Stuff after this is added after shipping HL2.
-	ITexture *GetRenderTargetEx( int nRenderTargetID )
+	ITexture *GetRenderTargetEx( int nRenderTargetID ) override
 	{
 		return NULL;
 	}
 
-	void SetToneMappingScaleLinear( const Vector &scale )
+	void SetToneMappingScaleLinear( const Vector &scale ) override
 	{
 	}
 
-	const Vector &GetToneMappingScaleLinear( void ) const
+	const Vector &GetToneMappingScaleLinear( void ) const override
 	{
 		static Vector dummy;
 		return dummy;
 	}
 
-	virtual float GetLightMapScaleFactor( void ) const
+	float GetLightMapScaleFactor( void ) const override
 	{
 		return 1.0;
 	}
 
 	// For dealing with device lost in cases where SwapBuffers isn't called all the time (Hammer)
-	virtual void HandleDeviceLost()
+	void HandleDeviceLost() override
 	{
 	}
 
-	virtual void EnableLinearColorSpaceFrameBuffer( bool bEnable )
+	void EnableLinearColorSpaceFrameBuffer( bool bEnable ) override
 	{
 	}
 
 	// Lets the shader know about the full-screen texture so it can 
-	virtual void SetFullScreenTextureHandle( ShaderAPITextureHandle_t h )
+	void SetFullScreenTextureHandle( ShaderAPITextureHandle_t h ) override
 	{
 	}
 
-	void SetFloatRenderingParameter(int parm_number, float value)
+	void SetFloatRenderingParameter(int parm_number, float value) override
 	{
 	}
 
-	void SetIntRenderingParameter(int parm_number, int value)
+	void SetIntRenderingParameter(int parm_number, int value) override
 	{
 	}
-	void SetVectorRenderingParameter(int parm_number, Vector const &value)
+	void SetVectorRenderingParameter(int parm_number, Vector const &value) override
 	{
 	}
 
-	float GetFloatRenderingParameter(int parm_number) const
+	float GetFloatRenderingParameter(int parm_number) const override
 	{
 		return 0;
 	}
 
-	int GetIntRenderingParameter(int parm_number) const
+	int GetIntRenderingParameter(int parm_number) const override
 	{
 		return 0;
 	}
 
-	Vector GetVectorRenderingParameter(int parm_number) const
+	Vector GetVectorRenderingParameter(int parm_number) const override
 	{
 		return Vector(0,0,0);
 	}
 
 	// Methods related to stencil
-	void SetStencilEnable(bool onoff)
+	void SetStencilEnable(bool onoff) override
 	{
 	}
 
-	void SetStencilFailOperation(StencilOperation_t op)
+	void SetStencilFailOperation(StencilOperation_t op) override
 	{
 	}
 
-	void SetStencilZFailOperation(StencilOperation_t op)
+	void SetStencilZFailOperation(StencilOperation_t op) override
 	{
 	}
 
-	void SetStencilPassOperation(StencilOperation_t op)
+	void SetStencilPassOperation(StencilOperation_t op) override
 	{
 	}
 
-	void SetStencilCompareFunction(StencilComparisonFunction_t cmpfn)
+	void SetStencilCompareFunction(StencilComparisonFunction_t cmpfn) override
 	{
 	}
 
-	void SetStencilReferenceValue(int ref)
+	void SetStencilReferenceValue(int ref) override
 	{
 	}
 
-	void SetStencilTestMask(uint32 msk)
+	void SetStencilTestMask(uint32 msk) override
 	{
 	}
 
-	void SetStencilWriteMask(uint32 msk)
+	void SetStencilWriteMask(uint32 msk) override
 	{
 	}
 
-	void ClearStencilBufferRectangle( int xmin, int ymin, int xmax, int ymax,int value)
+	void ClearStencilBufferRectangle( int xmin, int ymin, int xmax, int ymax,int value) override
 	{
 	}
 
-	virtual void GetDXLevelDefaults(uint &max_dxlevel,uint &recommended_dxlevel)
+	void GetDXLevelDefaults(uint &max_dxlevel, uint &recommended_dxlevel) override
 	{
 		max_dxlevel=recommended_dxlevel=90;
 	}
 
-	virtual void GetMaxToRender( IMesh *pMesh, bool bMaxUntilFlush, int *pMaxVerts, int *pMaxIndices )
+	void GetMaxToRender( IMesh *pMesh, bool bMaxUntilFlush, int *pMaxVerts, int *pMaxIndices ) override
 	{
 		*pMaxVerts = 32768;
 		*pMaxIndices = 32768;
 	}
 
 	// Returns the max possible vertices + indices to render in a single draw call
-	virtual int GetMaxVerticesToRender( IMaterial *pMaterial )
+	int GetMaxVerticesToRender( IMaterial *pMaterial ) override
 	{
 		return 32768;
 	}
 
-	virtual int GetMaxIndicesToRender( )
+	int GetMaxIndicesToRender( ) override
 	{
 		return 32768;
 	}
-	virtual int CompareSnapshots( StateSnapshot_t snapshot0, StateSnapshot_t snapshot1 ) { return 0; }
+	int CompareSnapshots( StateSnapshot_t snapshot0, StateSnapshot_t snapshot1 ) override { return 0; }
 
-	virtual void DisableAllLocalLights() {}
+	void DisableAllLocalLights() override {}
 
-	virtual bool SupportsMSAAMode( int nMSAAMode ) { return false; }
+	bool SupportsMSAAMode( int nMSAAMode ) override { return false; }
 
 	// Hooks for firing PIX events from outside the Material System...
-	virtual void SetPIXMarker( unsigned long color, const char *szName ) {}
+	void SetPIXMarker( unsigned long color, const char *szName ) override {}
 
-	virtual void ComputeVertexDescription( unsigned char* pBuffer, VertexFormat_t vertexFormat, MeshDesc_t& desc ) const {}
+	void ComputeVertexDescription( unsigned char* pBuffer, VertexFormat_t vertexFormat, MeshDesc_t& desc ) const override {}
 
-	virtual bool SupportsShadowDepthTextures() { return false; }
+	bool SupportsShadowDepthTextures() override { return false; }
 
-	virtual int NeedsShaderSRGBConversion(void) const { return 1; }
+	int NeedsShaderSRGBConversion(void) const { return 1; }
 
-	virtual bool SupportsFetch4() { return false; }
+	bool SupportsFetch4() override { return false; }
 
-	virtual void SetShadowDepthBiasFactors( float fShadowSlopeScaleDepthBias, float fShadowDepthBias ) {}
+	void SetShadowDepthBiasFactors( float fShadowSlopeScaleDepthBias, float fShadowDepthBias ) override {}
 
-	virtual void SetDisallowAccess( bool ) {}
-	virtual void EnableShaderShaderMutex( bool ) {}
-	virtual void ShaderLock() {}
-	virtual void ShaderUnlock() {}
-	virtual void EnableHWMorphing( bool bEnable ) {}
-	ImageFormat GetNullTextureFormat( void ) { 	return IMAGE_FORMAT_ABGR8888; }	// stub
-	virtual void PushDeformation( DeformationBase_t const *Deformation )
+	void SetDisallowAccess( bool ) override {}
+	void EnableShaderShaderMutex( bool ) override {}
+	void ShaderLock() override {}
+	void ShaderUnlock() override {}
+	void EnableHWMorphing( bool bEnable ) override {}
+	ImageFormat GetNullTextureFormat( void ) override { 	return IMAGE_FORMAT_ABGR8888; }	// stub
+	void PushDeformation( DeformationBase_t const *Deformation ) override
 	{
 	}
 
-	virtual void PopDeformation( )
+	void PopDeformation( ) override
 	{
 	}
 
-	virtual int GetNumActiveDeformations() const
+	int GetNumActiveDeformations() const override
 	{
 		return 0;
 	}
 
 
-	virtual void ExecuteCommandBuffer( uint8 *pBuf )
+	void ExecuteCommandBuffer( uint8 *pBuf ) override
 	{
 	}
 
-	void SetStandardTextureHandle(StandardTextureId_t,ShaderAPITextureHandle_t)
+	void SetStandardTextureHandle(StandardTextureId_t,ShaderAPITextureHandle_t) override
 	{
 	}
 
-	virtual void SetPSNearAndFarZ( int pshReg )
+	void SetPSNearAndFarZ( int pshReg ) override
 	{
 	}
 
@@ -894,24 +894,24 @@ private:
 		Assert(0);
 	}
 
-	void UnlockRect( ShaderAPITextureHandle_t texHandle, int mipmap )
+	void UnlockRect( ShaderAPITextureHandle_t texHandle, int mipmap ) override
 	{
 		Assert(0);
 	}
 
 	// Set the finest mipmap that can be used for the texture which is currently being modified. 
-	void TexLodClamp(int finest)
+	void TexLodClamp(int finest) override
 	{
 		Assert(0);
 	}
 
 	// Set the Lod Bias for the texture which is currently being modified. 
-	void TexLodBias( float bias )
+	void TexLodBias( float bias ) override
 	{
 		Assert(0);
 	}
 	
-	void CopyTextureToTexture( ShaderAPITextureHandle_t srcTex, ShaderAPITextureHandle_t dstTex )
+	void CopyTextureToTexture( ShaderAPITextureHandle_t srcTex, ShaderAPITextureHandle_t dstTex ) override
 	{
 		Assert(0);
 	}
@@ -920,13 +920,13 @@ private:
 										 float *pConstantValuesOut,
 										 int nBufferSize,
 										 int nMaximumDeformations,
-										 int *pNumDefsOut ) const
+										 int *pNumDefsOut ) const override
 	{
 		*pNumDefsOut = 0;
 		return 0;
 	}
 	
-	virtual bool OwnGPUResources( bool bEnable )
+	bool OwnGPUResources( bool bEnable ) override
 	{
 		return false;
 	}
@@ -939,10 +939,10 @@ private:
 		VERTEX_AND_PIXEL_SHADERS = 0x4,
 		DEPTHWRITE = 0x8,
 	};
-	void EnableAlphaToCoverage() {} ;
-	void DisableAlphaToCoverage() {} ;
+	void EnableAlphaToCoverage() override {}
+	void DisableAlphaToCoverage() override {}
 
-	ImageFormat GetShadowDepthTextureFormat() { return IMAGE_FORMAT_UNKNOWN; };
+	ImageFormat GetShadowDepthTextureFormat() override { return IMAGE_FORMAT_UNKNOWN; }
 
 	//
 	// NOTE: Under here are real methods being used by dx10 implementation

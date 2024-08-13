@@ -161,7 +161,7 @@ void CVertexBufferBase::ComputeVertexDescription( unsigned char *pBuffer,
 int CVertexBufferBase::VertexFormatSize( VertexFormat_t vertexFormat )
 {
 	// FIXME: We could make this much faster
-	MeshDesc_t temp;
+	MeshDesc_t temp = {};
 	ComputeVertexDescription( 0, vertexFormat, temp );
 	return temp.m_ActualVertexSize;
 }
@@ -264,7 +264,7 @@ void CVertexBufferBase::Spew( int nVertexCount, const VertexDesc_t &desc )
 //-----------------------------------------------------------------------------
 // Validates vertex buffer data
 //-----------------------------------------------------------------------------
-void CVertexBufferBase::ValidateData( int nVertexCount, const VertexDesc_t &spewDesc )
+void CVertexBufferBase::ValidateData( [[maybe_unused]] int nVertexCount, [[maybe_unused]] const VertexDesc_t &spewDesc )
 {
 	LOCK_SHADERAPI();
 #ifdef VALIDATE_DEBUG
@@ -366,9 +366,9 @@ void CIndexBufferBase::Spew( int nIndexCount, const IndexDesc_t &indexDesc )
 	LOCK_SHADERAPI();
 
 	char pTempBuf[512];
-	int nLen = 0;
 	pTempBuf[0] = '\0';
 	char *pTemp = pTempBuf;
+	int nLen = 0;
 	Q_snprintf( pTempBuf, sizeof(pTempBuf), "\nIndices: %d (First %d, Offset %d)\n", nIndexCount, indexDesc.m_nFirstIndex, indexDesc.m_nOffset );
 	Warning( "%s", pTempBuf );
 	for ( int i = 0; i < nIndexCount; ++i )
@@ -392,7 +392,7 @@ void CIndexBufferBase::Spew( int nIndexCount, const IndexDesc_t &indexDesc )
 //-----------------------------------------------------------------------------
 // Call this in debug mode to make sure our data is good.
 //-----------------------------------------------------------------------------
-void CIndexBufferBase::ValidateData( int nIndexCount, const IndexDesc_t& desc )
+void CIndexBufferBase::ValidateData( [[maybe_unused]] int nIndexCount, [[maybe_unused]] const IndexDesc_t& desc )
 { 
 	/* FIXME */ 
 	// NOTE: Is there anything reasonable to do here at all? 

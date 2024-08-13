@@ -56,7 +56,7 @@ static FieldInfo_t s_pFieldInfo[] =
 	{ "TANGENT",		0, VERTEX_TANGENT_S,			sizeof( float ) * 3 },
 	{ "BINORMAL",		0, VERTEX_TANGENT_T,			sizeof( float ) * 3 },
 	{ "USERDATA",		0, USER_DATA_SIZE_MASK,			0 },
-	{ NULL, 0, 0 },
+	{ NULL, 0, 0, 0 },
 };
 
 static D3D10_INPUT_ELEMENT_DESC s_pVertexDesc[] = 
@@ -105,19 +105,19 @@ static D3D10_INPUT_ELEMENT_DESC s_pFallbackVertexDesc[] =
 //-----------------------------------------------------------------------------
 // Computes the required input desc based on the vertex format
 //-----------------------------------------------------------------------------
-static void PrintInputDesc( int nCount, const D3D10_INPUT_ELEMENT_DESC *pDecl )
-{
-	for ( int i = 0; i < nCount; i++ )
-	{
-		Msg( "%s (%d): Stream: %d, Offset: %d, Instanced? %c\n",
-			pDecl[i].SemanticName, 
-			pDecl[i].SemanticIndex, 
-			( int )pDecl[i].InputSlot, 
-			( int )pDecl[i].AlignedByteOffset,
-			pDecl[i].InputSlotClass == D3D10_INPUT_PER_VERTEX_DATA ? 'n' : 'y' 
-			);
-	}
-}
+//static void PrintInputDesc( int nCount, const D3D10_INPUT_ELEMENT_DESC *pDecl )
+//{
+//	for ( int i = 0; i < nCount; i++ )
+//	{
+//		Msg( "%s (%d): Stream: %d, Offset: %d, Instanced? %c\n",
+//			pDecl[i].SemanticName, 
+//			pDecl[i].SemanticIndex, 
+//			( int )pDecl[i].InputSlot, 
+//			( int )pDecl[i].AlignedByteOffset,
+//			pDecl[i].InputSlotClass == D3D10_INPUT_PER_VERTEX_DATA ? 'n' : 'y' 
+//			);
+//	}
+//}
 
 
 //-----------------------------------------------------------------------------

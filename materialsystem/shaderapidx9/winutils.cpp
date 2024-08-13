@@ -22,7 +22,7 @@ static unsigned long GetInstalledRAM()
 		return ulTotalRamMB;
 
 	const char *pszSearchString = "MemTotal:";
-	const uint cchSearchString = strlen( pszSearchString );
+	const uintp cchSearchString = strlen( pszSearchString );
 	while ( fgets( rgchLine, sizeof(rgchLine), fpMemInfo ) )
 	{
 		if ( !strncasecmp( pszSearchString, rgchLine, cchSearchString ) )

@@ -56,8 +56,8 @@ inline void GetTextureOp( unsigned char nBits, TextureStateFunc_t *pFunc, int *p
 //-----------------------------------------------------------------------------
 // Stats
 //-----------------------------------------------------------------------------
-static int s_pRenderTransitions[RENDER_STATE_COUNT];
-static int s_pTextureTransitions[TEXTURE_STATE_COUNT][TEXTURE_STAGE_MAX_STAGE];
+[[maybe_unused]] static int s_pRenderTransitions[RENDER_STATE_COUNT];
+[[maybe_unused]] static int s_pTextureTransitions[TEXTURE_STATE_COUNT][TEXTURE_STAGE_MAX_STAGE];
 
 
 //-----------------------------------------------------------------------------
@@ -81,17 +81,17 @@ inline CTransitionTable::CurrentState_t& CurrentState()
 //-----------------------------------------------------------------------------
 // Less functions
 //-----------------------------------------------------------------------------
-bool CTransitionTable::ShadowStateDictLessFunc::Less( const CTransitionTable::ShadowStateDictEntry_t &src1, const CTransitionTable::ShadowStateDictEntry_t &src2, void *pCtx )
+bool CTransitionTable::ShadowStateDictLessFunc::Less( const CTransitionTable::ShadowStateDictEntry_t &src1, const CTransitionTable::ShadowStateDictEntry_t &src2, void * )
 {
 	return src1.m_nChecksum < src2.m_nChecksum;
 }
 
-bool CTransitionTable::SnapshotDictLessFunc::Less( const CTransitionTable::SnapshotDictEntry_t &src1, const CTransitionTable::SnapshotDictEntry_t &src2, void *pCtx )
+bool CTransitionTable::SnapshotDictLessFunc::Less( const CTransitionTable::SnapshotDictEntry_t &src1, const CTransitionTable::SnapshotDictEntry_t &src2, void * )
 {
 	return src1.m_nChecksum < src2.m_nChecksum;
 }
 
-bool CTransitionTable::UniqueSnapshotLessFunc::Less( const CTransitionTable::TransitionList_t &src1, const CTransitionTable::TransitionList_t &src2, void *pCtx )
+bool CTransitionTable::UniqueSnapshotLessFunc::Less( const CTransitionTable::TransitionList_t &src1, const CTransitionTable::TransitionList_t &src2, void * )
 {
 	return src1.m_NumOperations > src2.m_NumOperations;
 }
@@ -101,14 +101,20 @@ bool CTransitionTable::UniqueSnapshotLessFunc::Less( const CTransitionTable::Tra
 // Constructor, destructor
 //-----------------------------------------------------------------------------
 CTransitionTable::CTransitionTable() : m_DefaultStateSnapshot(-1),
-	m_CurrentShadowId(-1), m_CurrentSnapshotId(-1), m_TransitionOps( (intp)0, 8192 ), m_ShadowStateList( (intp)0, 256 ),
-	m_TransitionTable( (intp)0, 256 ), m_SnapshotList( (intp)0, 256 ), 
-	m_ShadowStateDict(0, 256 ), 
-	m_SnapshotDict( 0, 256 ), 
-	m_UniqueTransitions( 0, 4096 ) 
+	m_CurrentShadowId(-1), m_CurrentSnapshotId(-1), m_ShadowStateList( (intp)0, 256 ),
+	m_ShadowStateDict( (intp)0, 256 ), 
+	m_TransitionTable( (intp)0, 256 ),
+	m_UniqueTransitions( (intp)0, 4096 ),
+	m_TransitionOps( (intp)0, 8192 ),
+	m_SnapshotList( (intp)0, 256 ),
+	m_SnapshotDict( (intp)0, 256 )
 {
+	memset( &m_DefaultTransition, 0, sizeof(m_DefaultTransition) );
+
 	Assert( !g_pTransitionTable );
 	g_pTransitionTable = this;
+
+	memset( &m_CurrentState, 0, sizeof(m_CurrentState) );
 
 #ifdef DEBUG_BOARD_STATE
 	memset( &m_BoardState, 0, sizeof( m_BoardState ) );
@@ -171,30 +177,30 @@ StateSnapshot_t CTransitionTable::CreateStateSnapshot( ShadowStateId_t shadowSta
 //-----------------------------------------------------------------------------
 CTransitionTable::ShadowStateId_t CTransitionTable::CreateShadowState( const ShadowState_t &currentState )
 {
-	int newShaderState = m_ShadowStateList.AddToTail();
+	intp newShaderState = m_ShadowStateList.AddToTail();
 
 	// Copy our snapshot into the list
 	memcpy( &m_ShadowStateList[newShaderState], &currentState, sizeof(ShadowState_t) );
 
 	// all existing states must transition to the new state
-	int i;
+	intp i;
 	for ( i = 0; i < newShaderState; ++i )
 	{
 		// Add a new transition to all existing states
-		int newElem = m_TransitionTable[i].AddToTail();
+		intp newElem = m_TransitionTable[i].AddToTail();
 		m_TransitionTable[i][newElem].m_FirstOperation = INVALID_TRANSITION_OP;
 		m_TransitionTable[i][newElem].m_NumOperations = 0;
 	}
 
 	// Add a new vector for this transition
-	int newTransitionElem = m_TransitionTable.AddToTail();
+	intp newTransitionElem = m_TransitionTable.AddToTail();
 	m_TransitionTable[newTransitionElem].EnsureCapacity( 32 );
 	Assert( newShaderState == newTransitionElem );
 
 	for ( i = 0; i <= newShaderState; ++i )
 	{
 		// Add a new transition from all existing states
-		int newElem = m_TransitionTable[newShaderState].AddToTail();
+		intp newElem = m_TransitionTable[newShaderState].AddToTail();
 		m_TransitionTable[newShaderState][newElem].m_FirstOperation = INVALID_TRANSITION_OP;
 		m_TransitionTable[newShaderState][newElem].m_NumOperations = 0;
 	}
@@ -363,7 +369,7 @@ static bool g_SpewTransitions = false;
 		if (g_SpewTransitions)											\
 		{																\
 			char buf[128];												\
-			sprintf( buf, "Apply %s : %d\n", #_d3dState, shaderState.m_ ## _state ); \
+			sprintf( buf, "Apply %s : %d\n", #_d3dState, static_cast<int>(shaderState.m_ ## _state) ); \
 			Plat_DebugString(buf);										\
 		}																\
 	}
@@ -400,7 +406,7 @@ static bool g_SpewTransitions = false;
 
 
 #define APPLY_RENDER_STATE_FUNC( _d3dState, _state )					\
-	void Apply ## _state( const ShadowState_t& shaderState, int arg )	\
+	void Apply ## _state( const ShadowState_t& shaderState, [[maybe_unused]] int arg )	\
 	{																	\
 		SetRenderState( _d3dState, shaderState.m_ ## _state );			\
 		UPDATE_BOARD_RENDER_STATE( _d3dState, _state );					\
@@ -451,7 +457,7 @@ APPLY_RENDER_STATE_FUNC( D3DRS_DIFFUSEMATERIALSOURCE,	DiffuseMaterialSource )
 APPLY_TEXTURE_STAGE_STATE_FUNC( D3DTSS_TEXCOORDINDEX,	TexCoordIndex )
 
 
-void ApplyZWriteEnable( const ShadowState_t& shaderState, int arg )
+void ApplyZWriteEnable( const ShadowState_t& shaderState, [[maybe_unused]] int arg )
 {
 	SetRenderStateConstMacro( D3DRS_ZWRITEENABLE, shaderState.m_ZWriteEnable );
 #if defined( _X360 )
@@ -461,7 +467,7 @@ void ApplyZWriteEnable( const ShadowState_t& shaderState, int arg )
 	UPDATE_BOARD_RENDER_STATE( D3DRS_ZWRITEENABLE, ZWriteEnable );
 }
 
-void ApplyColorWriteEnable( const ShadowState_t& shaderState, int arg )
+void ApplyColorWriteEnable( const ShadowState_t& shaderState, [[maybe_unused]] int arg )
 {
 	SetRenderState( D3DRS_COLORWRITEENABLE, shaderState.m_ColorWriteEnable );
 	g_pTransitionTable->CurrentState().m_ColorWriteEnable = shaderState.m_ColorWriteEnable;
@@ -485,7 +491,7 @@ void ApplySRGBReadEnable( const ShadowState_t& shaderState, int stage )
 }
 
 
-void ApplySRGBWriteEnable( const ShadowState_t& shadowState, int stageUnused )
+void ApplySRGBWriteEnable( const ShadowState_t& shadowState, [[maybe_unused]] int stageUnused )
 {
 	g_pTransitionTable->ApplySRGBWriteEnable( shadowState );
 }
@@ -547,7 +553,7 @@ void CTransitionTable::ApplySRGBWriteEnable( const ShadowState_t& shaderState  )
 #endif
 }
 
-void ApplyDisableFogGammaCorrection( const ShadowState_t& shadowState, int stageUnused )
+void ApplyDisableFogGammaCorrection( const ShadowState_t& shadowState, [[maybe_unused]] int stageUnused )
 {
 	ShaderAPI()->ApplyFogMode( shadowState.m_FogMode, shadowState.m_SRGBWriteEnable, shadowState.m_bDisableFogGammaCorrection );
 		
@@ -976,7 +982,7 @@ ApplyStateFunc_t s_pTextureFunctionTable[] =
 //-----------------------------------------------------------------------------
 inline void CTransitionTable::AddTransition( RenderStateFunc_t func )
 {
-	int nElem = m_TransitionOps.AddToTail();
+	intp nElem = m_TransitionOps.AddToTail();
 	TransitionOp_t &op = m_TransitionOps[nElem];
 	op.m_nInfo.m_bIsTextureCode = false;
 	op.m_nInfo.m_nOpCode = func;
@@ -987,7 +993,7 @@ inline void CTransitionTable::AddTransition( RenderStateFunc_t func )
 
 inline void CTransitionTable::AddTextureTransition( TextureStateFunc_t func, int stage )
 {
-	int nElem = m_TransitionOps.AddToTail();
+	intp nElem = m_TransitionOps.AddToTail();
 	TransitionOp_t &op = m_TransitionOps[nElem];
 	op.m_nInfo.m_bIsTextureCode = true;
 	op.m_nInfo.m_nOpCode = TextureOp( func, stage );
