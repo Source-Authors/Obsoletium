@@ -202,7 +202,7 @@ void CDemoFile::WriteConsoleCommand( const char *cmdstring, int tick )
 	if ( !m_pBuffer || !m_pBuffer->IsValid() )
 		return;
 
-	int len = Q_strlen( cmdstring ) + 1;
+	intp len = Q_strlen( cmdstring ) + 1;
 	if ( len >= 1024 )
 	{
 		DevMsg("CDemoFile::WriteConsoleCommand: command too long (>1024).\n");

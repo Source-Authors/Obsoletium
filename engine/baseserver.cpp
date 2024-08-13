@@ -418,7 +418,7 @@ int CBaseServer::GetNextUserID()
 			return nTestID;
 	}
 	
-	Assert( !"GetNextUserID: can't find a unique ID." );
+	AssertMsg( false, "GetNextUserID: can't find a unique ID." );
 	return m_nUserid + 1;
 }
 
@@ -744,7 +744,7 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				if ( authProtocol == PROTOCOL_STEAM )
 				{
 					int keyLen = msg.ReadShort();
-					if ( keyLen < 0 || keyLen > sizeof(cdkey) )
+					if ( keyLen < 0 || keyLen > static_cast<int>(sizeof(cdkey)) )
 					{
 						RejectConnection( packet->from, clientChallenge, "#GameUI_ServerRejectBadSteamKey" );
 						break;
@@ -1138,7 +1138,7 @@ void CBaseServer::CalculateCPUUsage( void )
 
 		memcpy(&now, &nowTime, sizeof(__int64));
 
-		m_fCPUPercent = (double)(totalTime-lastTotalTime)/(double)(now-lastNow);
+		m_fCPUPercent = (float)(totalTime-lastTotalTime)/(float)(now-lastNow);
 		
 		// now save this away for next time
 		if ( curtime > lastAvg+5 ) 
@@ -1451,22 +1451,6 @@ bool CBaseServer::CheckChallengeType( CBaseClient * client, int nNewUserID, neta
 	}
 	else if ( nAuthProtocol == PROTOCOL_STEAM )
 	{
-		// Dev hack to allow 360/Steam PC cross platform play
-// 		int ip0 = 207;
-// 		int ip1 = 173;
-// 		int ip2 = 179;
-// 		int ip3Min = 230;
-// 		int ip3Max = 245;
-// 
-// 		if ( adr.ip[0] == ip0 &&
-// 			adr.ip[1] == ip1 &&
-// 			adr.ip[2] == ip2 &&
-// 			adr.ip[3] >= ip3Min &&
-// 			adr.ip[3] <= ip3Max )
-// 		{
-// 			return true;
-// 		}
-
 		client->SetSteamID( CSteamID() ); // set an invalid SteamID
 
 		// Convert raw certificate back into data
@@ -1564,7 +1548,7 @@ bool CBaseServer::CheckPassword( netadr_t &adr, const char *password, const char
 		return true; // local client can always connect
 	}
 
-	int iServerPassLen = Q_strlen(server_password);
+	intp iServerPassLen = Q_strlen(server_password);
 
 	if ( iServerPassLen != Q_strlen(password) )
 	{

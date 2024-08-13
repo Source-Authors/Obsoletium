@@ -56,25 +56,25 @@ ConVar mat_colcorrection_disableentities( "mat_colcorrection_disableentities", "
 //-----------------------------------------------------------------------------
 class CPrecisionSlider : public vgui::Slider
 {
-	DECLARE_CLASS_SIMPLE( CPrecisionSlider, vgui::Slider );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPrecisionSlider, vgui::Slider );
 
 public:
 	CPrecisionSlider( Panel *parent, const char *panelName );
    ~CPrecisionSlider( );
 
-	virtual void SetValue( int value, bool bTriggerChangeMessage = true );
+	void SetValue( int value, bool bTriggerChangeMessage = true ) override;
 
-	virtual void OnSizeChanged( int wide, int tall );
+	void OnSizeChanged( int wide, int tall ) override;
 
-	virtual void GetTrackRect( int &x, int &y, int &w, int &h );
+	void GetTrackRect( int &x, int &y, int &w, int &h ) override;
 
-	virtual void SetEnabled( bool state );
+	void SetEnabled( bool state ) override;
 
 protected:
 
 	MESSAGE_FUNC_PARAMS( OnTextNewLine, "TextNewLine", data );
 
-	virtual void OnMouseWheeled( int delta );
+	void OnMouseWheeled( int delta ) override;
 
 private:
 
@@ -488,7 +488,7 @@ void CColorOperationList::PushBack( int opIndex )
 //-----------------------------------------------------------------------------
 class CColorCorrectionUIChildPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CColorCorrectionUIChildPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorCorrectionUIChildPanel, vgui::Frame );
 
 public:
 	CColorCorrectionUIChildPanel( vgui::Panel *parent, const char *name ) : BaseClass( parent, name )
@@ -499,7 +499,7 @@ public:
 	{
 	}
 
-	virtual void OnClose()
+	void OnClose() override
 	{
 		KeyValues *msg = new KeyValues( "OpPanelClose" );
 		msg->SetPtr( "panel", this );
@@ -511,7 +511,7 @@ public:
 
 	virtual IColorOperation *GetOperation() { return 0; }
 
-	virtual void OnKeyCodeTyped( KeyCode code ) 
+	void OnKeyCodeTyped( KeyCode code ) override
 	{
 		if( code==KEY_ESCAPE )
 		{
@@ -550,6 +550,7 @@ public:
 	};
 
 	CCurvesColorOperation();
+	virtual ~CCurvesColorOperation() {}
 
 	// Methods of IColorOperation
 	virtual void Apply( const Vector &inRGB, Vector &outRGB );
@@ -868,25 +869,25 @@ IColorOperation *CCurvesColorOperation::Clone( )
 //-----------------------------------------------------------------------------
 class CColorCurvesEditPanel : public CCurveEditorPanel
 {
-	DECLARE_CLASS_SIMPLE( CColorCurvesEditPanel, CCurveEditorPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorCurvesEditPanel, CCurveEditorPanel );
 
 public:
 	// constructor
 	CColorCurvesEditPanel( vgui::Panel *pParent, const char *pName );
-	~CColorCurvesEditPanel();
+	virtual ~CColorCurvesEditPanel();
 
 	// Sets the color curves operation to edit
 	void SetCurvesOp( CCurvesColorOperation *pCurvesOp );
 
 protected:
 	// Control points + values...
-	virtual int FindOrAddControlPoint( float flIn, float flTolerance, float flOut );
-	virtual int FindControlPoint( float flIn, float flTolerance );
-	virtual int ModifyControlPoint( int nPoint, float flIn, float flOut );
-	virtual void RemoveControlPoint( int nPoint );
-	virtual float GetValue( float flIn );
-	virtual int ControlPointCount();
-	virtual void GetControlPoint( int nPoint, float *pIn, float *pOut );
+	int FindOrAddControlPoint( float flIn, float flTolerance, float flOut ) override;
+	int FindControlPoint( float flIn, float flTolerance ) override;
+	int ModifyControlPoint( int nPoint, float flIn, float flOut ) override;
+	void RemoveControlPoint( int nPoint ) override;
+	float GetValue( float flIn ) override;
+	int ControlPointCount() override;
+	void GetControlPoint( int nPoint, float *pIn, float *pOut ) override;
 
 private:
 	CCurvesColorOperation *m_pCurvesOp;
@@ -969,24 +970,24 @@ void CColorCurvesEditPanel::SetCurvesOp( CCurvesColorOperation *pCurvesOp )
 //-----------------------------------------------------------------------------
 class CColorCurvesUIPanel : public CColorCorrectionUIChildPanel
 {
-	DECLARE_CLASS_SIMPLE( CColorCurvesUIPanel, CColorCorrectionUIChildPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorCurvesUIPanel, CColorCorrectionUIChildPanel );
 
 public:
 	// constructor
 	CColorCurvesUIPanel( vgui::Panel *pParent, CCurvesColorOperation *pOp );
 	~CColorCurvesUIPanel();
 
-	virtual void Init() {}
-	virtual void Shutdown() {}
+	void Init() override {}
+	void Shutdown() override {}
 
-	virtual void ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char *pPreviewImage ) {};
+	void ReadUncorrectedImage( Rect_t *, unsigned char * ) override {};
 
-	virtual IColorOperation *GetOperation( ) { return (IColorOperation*)m_pColorOp; }
+	IColorOperation *GetOperation( ) override { return (IColorOperation*)m_pColorOp; }
 
 	// Command issued
-	virtual void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel);
+	void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel) override;
 
-	virtual void OnCommand( const char *command );
+	void OnCommand( const char *command ) override;
 
 private:
 	enum
@@ -1155,6 +1156,7 @@ public:
 	};
 
 	CLevelsColorOperation();
+	virtual ~CLevelsColorOperation() {}
 
 	// Methods of IColorOperation
 	virtual void Apply( const Vector &inRGB, Vector &outRGB );
@@ -1427,7 +1429,7 @@ IColorOperation *CLevelsColorOperation::Clone( )
 //-----------------------------------------------------------------------------
 class CColorHistogramPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CColorHistogramPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorHistogramPanel, vgui::Panel );
 
 public:
 	enum HistogramType_t
@@ -1444,8 +1446,8 @@ public:
 	CColorHistogramPanel( vgui::Panel *pParent, const char *pName, CLevelsColorOperation *pOp );
 	~CColorHistogramPanel();
 
-	virtual void Paint( void );
-	virtual void PaintBackground( void );
+	void Paint( void ) override;
+	void PaintBackground( void ) override;
 
 	void SetHistogramType( HistogramType_t type );
 	void ComputeHistogram( Rect_t &srcRect, unsigned char *pBits, ImageFormat format, int nStride );
@@ -1630,7 +1632,7 @@ void CColorHistogramPanel::Paint( void )
 //-----------------------------------------------------------------------------
 class CColorSlider : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CColorSlider, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorSlider, vgui::Panel );
 
 public:
 	// constructor
@@ -1638,7 +1640,7 @@ public:
 	~CColorSlider();
 
 	// Painting
-	virtual void Paint();
+	void Paint() override;
 
  	void SetValue( int nKnobIndex, int value ); 
 	void SetNormalizedValue( int nKnobIndex, float flValue );
@@ -1646,9 +1648,9 @@ public:
 	void SetRange( int min, int max );	 // set to max and min range of rows to display
 	void GetRange( int &min, int &max );
 
-	virtual void OnCursorMoved( int x,int y );
-	virtual void OnMousePressed( vgui::MouseCode code );
-	virtual void OnMouseReleased( MouseCode code );
+	void OnCursorMoved( int x,int y ) override;
+	void OnMousePressed( vgui::MouseCode code ) override;
+	void OnMouseReleased( MouseCode code ) override;
 
 private:
 	// Draws a single knob with a particular color
@@ -1917,7 +1919,7 @@ void CColorSlider::Paint()
 //-----------------------------------------------------------------------------
 class CColorLevelsUIPanel : public CColorCorrectionUIChildPanel
 {
-	DECLARE_CLASS_SIMPLE( CColorLevelsUIPanel, CColorCorrectionUIChildPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorLevelsUIPanel, CColorCorrectionUIChildPanel );
 
 public:
 	// constructor
@@ -1925,17 +1927,17 @@ public:
 	~CColorLevelsUIPanel();
 
 	// Command issued
-	virtual void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel);
+	void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel) override;
 
-	virtual void OnCommand( const char *command );
+	void OnCommand( const char *command ) override;
 
 	// Reads the uncorrected image + generates a hisogram 
-	virtual void ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char *pPreviewImage );
+	void ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char *pPreviewImage ) override;
 
-	virtual void Init() {}
-	virtual void Shutdown() {}
+	void Init() override {}
+	void Shutdown() override {}
 
-	virtual IColorOperation *GetOperation( ) { return (IColorOperation*)m_pLevelsOp; }
+	IColorOperation *GetOperation( ) override { return (IColorOperation*)m_pLevelsOp; }
 
 private:
 	enum
@@ -2149,6 +2151,7 @@ class CSelectedHSVOperation : public IColorOperation
 {
 public:
 	CSelectedHSVOperation();
+	virtual ~CSelectedHSVOperation() {}
 
 	// Selection methods
 	enum SelectionMethod_t
@@ -2559,19 +2562,19 @@ IColorOperation *CSelectedHSVOperation::Clone()
 //-----------------------------------------------------------------------------
 class CFullScreenSelectionPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CFullScreenSelectionPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CFullScreenSelectionPanel, vgui::Panel );
 
 public:
 		
 	CFullScreenSelectionPanel( const char *pName, CSelectedHSVOperation *pOp, vgui::Panel *pParent );
    ~CFullScreenSelectionPanel( );
 
-	virtual void OnMousePressed( vgui::MouseCode code );
-	virtual void OnMouseReleased( vgui::MouseCode code );
+	void OnMousePressed(vgui::MouseCode code) override;
+	void OnMouseReleased( vgui::MouseCode code ) override;
 
-	virtual void OnCursorMoved( int x, int y );
+	void OnCursorMoved( int x, int y ) override;
 
-	virtual void OnKeyCodeTyped( KeyCode code );
+	void OnKeyCodeTyped( KeyCode code ) override;
 
 protected:
 
@@ -2650,18 +2653,18 @@ void CFullScreenSelectionPanel::OnKeyCodeTyped( KeyCode code )
 //-----------------------------------------------------------------------------
 class CUncorrectedImagePanel : public CProceduralTexturePanel
 {
-	DECLARE_CLASS_SIMPLE( CUncorrectedImagePanel, CProceduralTexturePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CUncorrectedImagePanel, CProceduralTexturePanel );
 
 public:
 	// constructor
 	CUncorrectedImagePanel( vgui::Panel *pParent, const char *pName );
 	~CUncorrectedImagePanel();
 
-	virtual void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pRect );
+	void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pRect ) override;
 
-	virtual void OnCursorMoved(int x,int y);
-	virtual void OnMousePressed( vgui::MouseCode code );
-	virtual void OnMouseReleased( MouseCode code );
+	void OnCursorMoved(int x,int y) override;
+	void OnMousePressed( vgui::MouseCode code ) override;
+	void OnMouseReleased( MouseCode code ) override;
 
 	// Sets the HSV color operation
 	void SetHSVOperation( CSelectedHSVOperation *pOp );
@@ -2819,23 +2822,23 @@ void CUncorrectedImagePanel::OnMouseReleased( MouseCode code )
 //-----------------------------------------------------------------------------
 class CSelectedHSVUIPanel : public CColorCorrectionUIChildPanel
 {
-	DECLARE_CLASS_SIMPLE( CSelectedHSVUIPanel, CColorCorrectionUIChildPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSelectedHSVUIPanel, CColorCorrectionUIChildPanel );
 
 public:
 	CSelectedHSVUIPanel( vgui::Panel *parent, CSelectedHSVOperation *pOp );
 	~CSelectedHSVUIPanel();
 
 	// Command issued
-	virtual void	OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel);
+	void	OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel) override;
 
-	virtual void	OnCommand( const char *command );
+	void	OnCommand( const char *command ) override;
 
-	virtual void	Init();
-	virtual void	Shutdown();
+	void	Init() override;
+	void	Shutdown() override;
 
-	virtual void	ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char *pPreviewImage );
+	void	ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char *pPreviewImage ) override;
 
-	virtual IColorOperation *GetOperation( ) { return (IColorOperation*)m_pHSVOperation; }
+	IColorOperation *GetOperation( ) override { return (IColorOperation*)m_pHSVOperation; }
 
 	void	EnableSelectionMode( bool bEnable );
 
@@ -3192,7 +3195,7 @@ class CColorLookupOperation : public IColorOperation
 {
 public:
 	CColorLookupOperation();
-   ~CColorLookupOperation();
+	virtual ~CColorLookupOperation();
 
 	// Methods of IColorOperation
 	virtual void Apply( const Vector &inRGB, Vector &outRGB );
@@ -3428,23 +3431,23 @@ IColorOperation *CColorLookupOperation::Clone()
 //-----------------------------------------------------------------------------
 class CColorLookupUIPanel : public CColorCorrectionUIChildPanel
 {
-	DECLARE_CLASS_SIMPLE( CColorLookupUIPanel, CColorCorrectionUIChildPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorLookupUIPanel, CColorCorrectionUIChildPanel );
 
 public:
 	// constructor
 	CColorLookupUIPanel( vgui::Panel *pParent, CColorLookupOperation *pOp );
 	~CColorLookupUIPanel();
 
-	virtual void Init() {}
-	virtual void Shutdown() {}
+	void Init() override {}
+	void Shutdown() override {}
 
-	virtual void ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char *pPreviewImage ) {}
+	void ReadUncorrectedImage( Rect_t *, unsigned char * ) override {}
 
-	virtual IColorOperation *GetOperation( ) { return (IColorOperation*)m_pLookupOp; }
+	IColorOperation *GetOperation( ) override { return (IColorOperation*)m_pLookupOp; }
 
 	// Command issued
-	virtual void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel);
-	virtual void OnCommand(const char *command);
+	void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel) override;
+	void OnCommand(const char *command) override;
 
 private:
 	
@@ -3574,7 +3577,7 @@ class CColorBalanceOperation : public IColorOperation
 {
 public:
 	CColorBalanceOperation();
-	~CColorBalanceOperation() = default;
+	virtual ~CColorBalanceOperation() = default;
 
 	// Methods of IColorOperation
 	virtual void Apply( const Vector &inRGB, Vector &outRGB );
@@ -3940,24 +3943,24 @@ IColorOperation *CColorBalanceOperation::Clone()
 //-----------------------------------------------------------------------------
 class CColorBalanceUIPanel : public CColorCorrectionUIChildPanel
 {
-	DECLARE_CLASS_SIMPLE( CColorBalanceUIPanel, CColorCorrectionUIChildPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorBalanceUIPanel, CColorCorrectionUIChildPanel );
 
 public:
 	// constructor
 	CColorBalanceUIPanel( vgui::Panel *pParent, CColorBalanceOperation *pOp );
 	~CColorBalanceUIPanel();
 
-	virtual void Init() {}
-	virtual void Shutdown() {}
+	void Init() override {}
+	void Shutdown() override {}
 
-	virtual void ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char *pPreviewImage ) {}
+	void ReadUncorrectedImage( Rect_t *, unsigned char * ) override {}
 
-	virtual IColorOperation *GetOperation( ) { return (IColorOperation*)m_pBalanceOp; }
+	IColorOperation *GetOperation( ) override { return (IColorOperation*)m_pBalanceOp; }
 
 	// Command issued
-	virtual void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel);
+	void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel) override;
 
-	virtual void OnCommand( const char *command );
+	void OnCommand( const char *command ) override;
 
 	ColorBalanceMode_t GetCurrentMode();
 
@@ -4132,13 +4135,13 @@ void CColorBalanceUIPanel::ResetSliders()
 
 class CLookupViewPanel : public CProceduralTexturePanel
 {
-	DECLARE_CLASS_SIMPLE( CLookupViewPanel, CProceduralTexturePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CLookupViewPanel, CProceduralTexturePanel );
 
 public:
     CLookupViewPanel( vgui::Panel *parent, ColorCorrectionHandle_t CCHandle );
    ~CLookupViewPanel( );
 
-   void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pRect );
+   void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pRect ) override;
 
 protected:
 	ColorCorrectionHandle_t m_CCHandle;
@@ -4193,7 +4196,7 @@ void CLookupViewPanel::RegenerateTextureBits( ITexture *pTexture, IVTFTexture *p
 
 class CLookupViewWindow : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CLookupViewWindow, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CLookupViewWindow, vgui::Frame );
 
 public:
 	CLookupViewWindow( vgui::Panel *parent, ColorCorrectionHandle_t CCHandle );
@@ -4255,13 +4258,13 @@ class CColorOperationListPanel;
 
 class CNewOperationDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CNewOperationDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CNewOperationDialog, vgui::Frame );
 
 public:
 	CNewOperationDialog( vgui::Panel *parent, CColorOperationList *pOpList );
    ~CNewOperationDialog( );
 
-   virtual void OnCommand( const char *command );
+   void OnCommand( const char *command ) override;
 
 private:
 
@@ -4344,7 +4347,7 @@ void CNewOperationDialog::PopulateControls()
 //-----------------------------------------------------------------------------
 class COperationListPanel : public vgui::ListPanel
 {
-	DECLARE_CLASS_SIMPLE( COperationListPanel, vgui::ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COperationListPanel, vgui::ListPanel );
 
 public:
 	COperationListPanel( vgui::Panel *parent, const char *pName );
@@ -4352,15 +4355,15 @@ public:
 
 	MESSAGE_FUNC_PARAMS( OnTextNewLine, "TextNewLine", data );
 
-	virtual void OnMousePressed( MouseCode code );
-	virtual void OnMouseDoublePressed( MouseCode code );
+	void OnMousePressed( MouseCode code ) override;
+	void OnMouseDoublePressed( MouseCode code ) override;
 
-	virtual void AddSelectedItem( int itemID );
-	virtual void ClearSelectedItems( );
-	virtual void RemoveItem( int itemID );
+	void AddSelectedItem( int itemID ) override;
+	void ClearSelectedItems( ) override;
+	void RemoveItem( int itemID ) override;
 
-	virtual void SortList( );
-	virtual void SetSortColumn( int column );
+	void SortList( ) override;
+	void SetSortColumn( int column ) override;
 
 private:
 
@@ -4533,7 +4536,7 @@ void COperationListPanel::OnTextNewLine( KeyValues *data )
 //-----------------------------------------------------------------------------
 class CColorOperationListPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CColorOperationListPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorOperationListPanel, vgui::EditablePanel );
 
 public:
 	CColorOperationListPanel( vgui::Panel *parent, ColorCorrectionHandle_t CCHandle );
@@ -4546,9 +4549,9 @@ public:
 
 	CColorOperationList	*GetOperationList( );
 
-	virtual void	OnCommand(const char *command);
+	void	OnCommand(const char *command) override;
 
-	virtual void	OnThink( );
+	void	OnThink( ) override;
 
 	void			ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char *pPreviewImage );
 
@@ -4561,8 +4564,8 @@ private:
 	MESSAGE_FUNC_PARAMS( OnCheckButtonChecked, "CheckButtonChecked", data );
 	MESSAGE_FUNC_CHARPTR( OnFileSelected, "FileSelected", fullpath );
 
-	virtual void OnMouseDoublePressed( MouseCode code );
-	virtual void OnKeyCodeTyped( KeyCode code );
+	void OnMouseDoublePressed( MouseCode code ) override;
+	void OnKeyCodeTyped( KeyCode code ) override;
 
 	void ResetSlider( );
 
@@ -4884,7 +4887,7 @@ void CColorOperationListPanel::PopulateList( )
 			KeyValues *kv = new KeyValues( "operation", "layer", op->GetName() );
 			kv->SetInt( "image", (op->IsEnabled())?1:0 );
 			
-			m_pOperationListPanel->AddItem( kv, (unsigned int)op, false, false );
+			m_pOperationListPanel->AddItem( kv, (uintp)op, false, false );
 		}
 	}
 }
@@ -5031,23 +5034,23 @@ void CColorOperationListPanel::UpdateColorCorrection()
 //-----------------------------------------------------------------------------
 class CColorCorrectionUIPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CColorCorrectionUIPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorCorrectionUIPanel, vgui::Frame );
 
 public:
 	CColorCorrectionUIPanel( vgui::Panel *parent );
 	~CColorCorrectionUIPanel();
 
 	// Command issued
-	virtual void	OnCommand(const char *command);
+	void	OnCommand(const char *command) override;
 
-	virtual void	Activate();
+	void	Activate() override;
 
 	void			Init();
 	void			Shutdown();
 
-	virtual void	OnKeyCodeTyped(KeyCode code);
+	void	OnKeyCodeTyped(KeyCode code) override;
 
-	virtual void	OnThink( );
+	void	OnThink( ) override;
 
 	void			ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char *pPreviewImage );
 

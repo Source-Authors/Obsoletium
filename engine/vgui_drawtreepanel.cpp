@@ -24,7 +24,7 @@
 
 bool g_bForceRefresh = true;
 
-void ChangeCallback_RefreshDrawTree( IConVar *var, const char *pOldString, float flValue )
+void ChangeCallback_RefreshDrawTree( IConVar *, const char *, float )
 {
 	g_bForceRefresh = true;
 }
@@ -85,7 +85,7 @@ public:
 class CDrawTreeFrame : public vgui::Frame
 {
 public:
-	DECLARE_CLASS_SIMPLE( CDrawTreeFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDrawTreeFrame, vgui::Frame );
 	
 	CDrawTreeFrame( vgui::Panel *parent, const char *pName ) : 
 		BaseClass( parent, pName )
@@ -152,7 +152,7 @@ public:
 	}
 
 
-	virtual void PerformLayout()
+	void PerformLayout() override
 	{
 		BaseClass::PerformLayout();
 
@@ -221,7 +221,7 @@ public:
 		m_pTree->SetBounds( x, yOffset, w, t - (yOffset - y) );
 	}
 
-	virtual void OnCommand( const char *command )
+	void OnCommand( const char *command ) override
 	{
 		if ( !Q_stricmp( command, "performlayout" ) )
 		{
@@ -268,7 +268,8 @@ public:
 
 			if ( data )
 			{
-				g_DrawTreeSelectedPanel = (data) ? (vgui::VPANEL)data->GetInt( "PanelPtr", 0 ) : 0;
+				// dimhotepus: GetInt -> GetPtr
+				g_DrawTreeSelectedPanel = (data) ? (vgui::VPANEL)data->GetPtr( "PanelPtr", nullptr ) : 0;
 			}
 			else
 			{
@@ -277,7 +278,7 @@ public:
 		}
 	}
 
-	virtual void OnClose()
+	void OnClose() override
 	{
 		vgui_drawtree.SetValue( 0 );
 		g_DrawTreeSelectedPanel = 0;
@@ -286,7 +287,7 @@ public:
 		// you will sometimes end up on a different panel or on garbage.
 	}
 
-	virtual void OnThink() OVERRIDE
+	virtual void OnThink() override
 	{
 		BaseClass::OnThink();
 
@@ -388,7 +389,8 @@ void VGui_RecursivePrintTree(
 		Q_snprintf( str, sizeof( str ), "%s", name );
 
 	pVal->SetString( "Text", str );
-	pVal->SetInt( "PanelPtr", current );
+	// dimhotepus: SetInt -> SetPtr
+	pVal->SetPtr( "PanelPtr", reinterpret_cast<void*>(current) );
 
 	pNewParent = pVal;
 
@@ -417,7 +419,8 @@ bool UpdateItemState(
 	vgui::IPanel *ipanel = vgui::ipanel();
 
 	KeyValues *pItemData = pTree->GetItemData( iChildItemId );
-	if ( pItemData->GetInt( "PanelPtr" ) != pSub->GetInt( "PanelPtr" ) ||
+	// dimhotepus: GetInt -> GetPtr
+	if ( pItemData->GetPtr( "PanelPtr" ) != pSub->GetPtr( "PanelPtr" ) ||
 		Q_stricmp( pItemData->GetString( "Text" ), pSub->GetString( "Text" ) ) != 0 )
 	{
 		pTree->ModifyItem( iChildItemId, pSub );
@@ -425,7 +428,8 @@ bool UpdateItemState(
 	}
 
 	// Ok, this is a new panel.
-	vgui::VPANEL vPanel = pSub->GetInt( "PanelPtr" );
+	// dimhotepus: GetInt -> GetPtr
+	vgui::VPANEL vPanel = reinterpret_cast<vgui::VPANEL>( pSub->GetPtr( "PanelPtr" ) );
 
 	int iBaseColor[3] = { 255, 255, 255 };
 	if ( ipanel->IsPopup( vPanel ) )

@@ -68,10 +68,10 @@ IVTex* VTex_Load( CSysModule** pModule )
 	*pModule = FileSystem_LoadModule( "vtex_dll" );
 	if ( *pModule )
 	{
-		CreateInterfaceFn factory = Sys_GetFactory( *pModule );
+		CreateInterfaceFnT<IVTex> factory = Sys_GetFactory<IVTex>( *pModule );
 		if ( factory )
 		{
-			pIVTex = ( IVTex * )factory( IVTEX_VERSION_STRING, NULL );
+			pIVTex = factory( IVTEX_VERSION_STRING, NULL );
 		}
 	}
 
@@ -333,10 +333,10 @@ static void BuildSingleCubemap( const char *pVTFName, const Vector &vecOrigin,
 	{
 		char *argv[64];
 		int iArg = 0;
-		argv[iArg++] = "";
-		argv[iArg++] = "-quiet";
-		argv[iArg++] = "-UseStandardError";	// These are only here for the -currently released- version of vtex.dll.
-		argv[iArg++] = "-WarningsAsErrors";
+		argv[iArg++] = (char*)"";
+		argv[iArg++] = (char*)"-quiet";
+		argv[iArg++] = (char*)"-UseStandardError";	// These are only here for the -currently released- version of vtex.dll.
+		argv[iArg++] = (char*)"-WarningsAsErrors";
 		argv[iArg++] = pTXTName;
 		ivt->VTex( CubemapsFSFactory, pGameDir, iArg, argv );
 	}
@@ -376,7 +376,7 @@ CON_COMMAND( envmap, "" )
 		Q_strncpy( base, "Env", sizeof( base ) );
 	}
 
-	int strLen = strlen( base ) + strlen( "cubemap_screenshots/" ) + 1;
+	intp strLen = V_strlen( base ) + ssize( "cubemap_screenshots/" );
 	char *str = ( char * )_alloca( strLen );
 	Q_snprintf( str, strLen, "cubemap_screenshots/%s", base );
 	g_pFileSystem->CreateDirHierarchy( "cubemap_screenshots", "DEFAULT_WRITE_PATH" );
@@ -468,7 +468,7 @@ static void WriteLightProbe( const char *pBasePath, const LightingState_t& state
 		}
 	}
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( SerializeDMX( buf, pLightProbe, pFullPath ) )
 	{
 		g_pFullFileSystem->WriteFile( pFullPath, "MOD", buf );
@@ -1003,10 +1003,10 @@ void R_BuildCubemapSamples( int numIterations )
 		pModule = FileSystem_LoadModule( "bsppack" );
 		if ( pModule )
 		{
-			CreateInterfaceFn factory = Sys_GetFactory( pModule );
+			CreateInterfaceFnT<IBSPPack> factory = Sys_GetFactory<IBSPPack>( pModule );
 			if ( factory )
 			{
-				iBSPPack = ( IBSPPack * )factory( IBSPPACK_VERSION_STRING, NULL );
+				iBSPPack = factory( IBSPPACK_VERSION_STRING, NULL );
 			}
 		}
 		if( !iBSPPack )

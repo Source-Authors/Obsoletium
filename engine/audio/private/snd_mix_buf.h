@@ -77,7 +77,7 @@ extern portable_samplepair_t *g_temppaintbuffer;
 extern CUtlVector< paintbuffer_t > g_paintBuffers;
 
 extern void MIX_SetCurrentPaintbuffer( int ipaintbuffer );
-extern int MIX_GetCurrentPaintbufferIndex( void );
+extern intp MIX_GetCurrentPaintbufferIndex( void );
 extern paintbuffer_t *MIX_GetCurrentPaintbufferPtr( void );
 extern paintbuffer_t *MIX_GetPPaintFromIPaint( int ipaintbuffer );
 extern void MIX_ClearAllPaintBuffers( int SampleCount, bool clearFilters );

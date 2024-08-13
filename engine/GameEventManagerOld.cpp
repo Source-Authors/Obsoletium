@@ -130,13 +130,13 @@ bool CGameEventManagerOld::FireEventIntern( KeyValues *keys, bool bServerSideOnl
 
 
 
-bool CGameEventManagerOld::SerializeKeyValues( KeyValues* event, bf_write* buf, CGameEvent* eventtype )
+bool CGameEventManagerOld::SerializeKeyValues( KeyValues*, bf_write*, CGameEvent* )
 {
 	DevMsg("SerializeKeyValues:: not supported\n");
 	return false;
 }
 
-KeyValues *CGameEventManagerOld::UnserializeKeyValue( bf_read *buf)
+KeyValues *CGameEventManagerOld::UnserializeKeyValue( bf_read * )
 {
 	DevMsg("UnserializeKeyValue:: not supported\n");
 	return NULL;

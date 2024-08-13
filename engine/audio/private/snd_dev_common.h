@@ -20,14 +20,14 @@ public:
 	virtual bool		Should3DMix( void ) { return m_bSurround; }
 	virtual void		StopAllSounds( void ) {}
 
-	virtual int			PaintBegin( float, int soundtime, int paintedtime ) { return 0; }
+	virtual int			PaintBegin( float, int, int ) { return 0; }
 	virtual void		PaintEnd( void ) {}
 
 	virtual void		SpatializeChannel( int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono );
 	virtual void		ApplyDSPEffects( int idsp, portable_samplepair_t *pbuffront, portable_samplepair_t *pbufrear, portable_samplepair_t *pbufcenter, int samplecount );
 	virtual int			GetOutputPosition( void ) { return 0; }
 	virtual void		ClearBuffer( void ) {}
-	virtual void		UpdateListener( const Vector& position, const Vector& forward, const Vector& right, const Vector& up ) {}
+	virtual void		UpdateListener( const Vector&, const Vector&, const Vector&, const Vector& ) {}
 
 	virtual void		MixBegin( int sampleCount );
 	virtual void		MixUpsample( int sampleCount, int filtertype );
@@ -37,8 +37,8 @@ public:
 	virtual void		Mix16Mono( channel_t *pChannel, short *pData, int outputOffset, int inputOffset, fixedint rateScaleFix, int outCount, int timecompress );
 	virtual void		Mix16Stereo( channel_t *pChannel, short *pData, int outputOffset, int inputOffset, fixedint rateScaleFix, int outCount, int timecompress );
 
-	virtual void		ChannelReset( int entnum, int channelIndex, float distanceMod ) {}
-	virtual void		TransferSamples( int end ) {}
+	virtual void		ChannelReset( int, int, float ) {}
+	virtual void		TransferSamples( int ) {}
 	
 	virtual const char *DeviceName( void )			{ return NULL; }
 	virtual int			DeviceChannels( void )		{ return 0; }

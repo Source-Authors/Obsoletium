@@ -202,11 +202,15 @@ void CSteam3Server::Activate( EServerType serverType )
 		usGamePort = NET_GetUDPPort( NS_SERVER );
 	}
 
+#if !defined(_X360) && !defined(NO_STEAM)
 	uint16 usMasterServerUpdaterPort;
+#endif
 	if ( sv_master_share_game_socket.GetBool() )
 	{
 		m_bMasterServerUpdaterSharingGameSocket = true;
+#if !defined(_X360) && !defined(NO_STEAM)
 		usMasterServerUpdaterPort = MASTERSERVERUPDATERPORT_USEGAMESOCKETSHARE;
+#endif
 		if ( serverType == eServerTypeTVRelay )
 			m_QueryPort = NET_GetUDPPort( NS_HLTV );
 		else
@@ -215,7 +219,9 @@ void CSteam3Server::Activate( EServerType serverType )
 	else
 	{
 		m_bMasterServerUpdaterSharingGameSocket = false;
+#if !defined(_X360) && !defined(NO_STEAM)
 		usMasterServerUpdaterPort = m_usPort;
+#endif
 		m_QueryPort = m_usPort;
 	}
 // dimhotepus: NO_STEAM
@@ -234,7 +240,7 @@ void CSteam3Server::Activate( EServerType serverType )
 			break;
 		default:
 			WarningAndLog( "Bogus eServermode %d!\n", m_eServerMode );
-			Assert( !"Bogus server mode?!" );
+			AssertMsg( false, "Bogus server mode?!" );
 			break;
 	}
 
@@ -447,7 +453,7 @@ void CSteam3Server::OnLogonSuccess( SteamServersConnected_t *pLogonSuccess )
 		else
 		{
 			WarningAndLog( "Assigned Steam ID %s, which is of an unexpected type!\n", m_SteamIDGS.Render() );
-			Assert( !"Unexpected steam ID type!" );
+			AssertMsg( false, "Unexpected steam ID type!" );
 		}
 	}
 	else

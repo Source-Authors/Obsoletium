@@ -80,8 +80,8 @@ public:
 	virtual void				SetSentenceWord( bool bIsWord ) { m_bIsSentenceWord = bIsWord; }
 	virtual bool				IsSentenceWord() { return m_bIsSentenceWord; }
 
-	virtual int					SampleToStreamPosition( int samplePosition ) { return 0; }
-	virtual int					StreamToSamplePosition( int streamPosition ) { return 0; }
+	virtual int					SampleToStreamPosition( int ) { return 0; }
+	virtual int					StreamToSamplePosition( int ) { return 0; }
 
 	virtual void				SetSentence( CSentence *pSentence );
 
@@ -98,7 +98,7 @@ protected:
 		CAudioSourceCachedInfo *info = m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_MP3, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
 		if ( !info )
 		{
-			Assert( !"CAudioSourceMP3::GetCachedDataPointer info == NULL" );
+			AssertMsg( false, "CAudioSourceMP3::GetCachedDataPointer info == NULL" );
 			return NULL;
 		}
 
@@ -129,24 +129,24 @@ public:
 	CAudioSourceStreamMP3( CSfxTable *pSfx, CAudioSourceCachedInfo *info );
 	~CAudioSourceStreamMP3() {}
 
-	bool			IsStreaming( void ) OVERRIDE { return true; }
-	bool			IsStereoWav( void ) OVERRIDE { return false; }
-	CAudioMixer		*CreateMixer( int initialStreamPosition = 0 ) OVERRIDE;
-	int				GetOutputData( void **pData, int samplePosition, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] ) OVERRIDE;
+	bool			IsStreaming( void ) override { return true; }
+	bool			IsStereoWav( void ) override { return false; }
+	CAudioMixer		*CreateMixer( int initialStreamPosition = 0 ) override;
+	int				GetOutputData( void **pData, int samplePosition, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] ) override;
 
 	// IWaveStreamSource
-	int UpdateLoopingSamplePosition( int samplePosition ) OVERRIDE
+	int UpdateLoopingSamplePosition( int samplePosition ) override
 	{
 		return samplePosition;
 	}
-	void UpdateSamples( char *pData, int sampleCount ) OVERRIDE {}
+	void UpdateSamples( char *, int ) override {}
 
-	int	GetLoopingInfo( int *pLoopBlock, int *pNumLeadingSamples, int *pNumTrailingSamples ) OVERRIDE
+	int	GetLoopingInfo( int *, int *, int * ) override
 	{
 		return 0;
 	}
 
-	void Prefetch() OVERRIDE;
+	void Prefetch() override;
 
 private:
 	CAudioSourceStreamMP3( const CAudioSourceStreamMP3 & ); // not implemented, not accessible
@@ -159,15 +159,15 @@ public:
 	CAudioSourceMP3Cache( CSfxTable *pSfx, CAudioSourceCachedInfo *info );
 	~CAudioSourceMP3Cache( void );
 
-	int						GetCacheStatus( void ) OVERRIDE;
-	void					CacheLoad( void ) OVERRIDE;
-	void					CacheUnload( void ) OVERRIDE;
+	int						GetCacheStatus( void ) override;
+	void					CacheLoad( void ) override;
+	void					CacheUnload( void ) override;
 	// NOTE: "samples" are bytes for MP3
-	int						GetOutputData( void **pData, int samplePosition, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] ) OVERRIDE;
-	CAudioMixer				*CreateMixer( int initialStreamPosition = 0 ) OVERRIDE;
-	CSentence				*GetSentence( void ) OVERRIDE;
+	int						GetOutputData( void **pData, int samplePosition, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] ) override;
+	CAudioMixer				*CreateMixer( int initialStreamPosition = 0 ) override;
+	CSentence				*GetSentence( void ) override;
 
-	void					Prefetch() OVERRIDE {}
+	void					Prefetch() override {}
 
 protected:
 	virtual char			*GetDataPointer( void );

@@ -172,7 +172,7 @@ void CDownloadListGenerator::OnModelPrecached(const char *relativePathFileName)
 		// it's a materials file, make sure that it starts in the materials directory, and we get the .vtf
 		char file[_MAX_PATH];
 
-		if (!Q_strnicmp(relativePathFileName, "materials", strlen("materials")))
+		if (!Q_strnicmp(relativePathFileName, "materials", ssize("materials") - 1))
 		{
 			Q_strncpy(file, relativePathFileName, sizeof(file));
 		}
@@ -217,7 +217,7 @@ void CDownloadListGenerator::OnSoundPrecached(const char *relativePathFileName)
 
 	// prepend the sound/ directory if necessary
 	char file[_MAX_PATH];
-	if (!Q_strnicmp(relativePathFileName, "sound", strlen("sound")))
+	if (!Q_strnicmp(relativePathFileName, "sound", ssize("sound") - 1))
 	{
 		Q_strncpy(file, relativePathFileName, sizeof(file));
 	}
@@ -282,7 +282,7 @@ void CDownloadListGenerator::ForceSimpleMaterial( const char *relativePathFileNa
 
 	// it's a materials file, make sure that it starts in the materials directory, and we get the .vtf
 	char szFixedFilename[_MAX_PATH];
-	if (!Q_strnicmp(relativePathFileName, "materials", strlen("materials")))
+	if (!Q_strnicmp(relativePathFileName, "materials", ssize("materials") - 1))
 	{
 		V_strcpy_safe( szFixedFilename, relativePathFileName );
 	}

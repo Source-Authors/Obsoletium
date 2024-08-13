@@ -68,7 +68,7 @@ public: // IDemoPlayer interface implementation:
 	virtual bool	ShouldLoopDemos() { return true; }
 	virtual void	OnLastDemoInLoopPlayed() {}
 
-	virtual bool	IsLoading( void );
+	virtual bool	IsLoading( void ) const;
 
 public:	// other public functions
 	void	MarkFrame( float flFPSVariability );

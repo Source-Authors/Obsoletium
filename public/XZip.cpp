@@ -658,8 +658,8 @@ void Assert(TState &state,bool cond, const char *msg)
 { if (cond) return;
   state.err=msg;
 }
-void __cdecl Trace(const char *x, ...) {va_list paramList; va_start(paramList, x); paramList; va_end(paramList);}
-void __cdecl Tracec(bool ,const char *x, ...) {va_list paramList; va_start(paramList, x); paramList; va_end(paramList);}
+void __cdecl Trace(const char *x, ...) {va_list paramList; va_start(paramList, x); vfprintf(stderr, x, paramList); va_end(paramList);}
+void __cdecl Tracec(bool ,const char *x, ...) {va_list paramList; va_start(paramList, x); vfprintf(stderr, x, paramList); va_end(paramList);}
 
 
 
@@ -2297,7 +2297,7 @@ int timet_to_timestamp( time_t time )
 
 class TZip
 { public:
-  TZip() : hfout(0),hmapout(0),zfis(0),obuf(0),hfin(0),writ(0),oerr(false),hasputcen(false),ooffset(0) {}
+  TZip() : hfout(0),hmapout(0),ooffset(0),oerr(false),writ(0),obuf(0),hasputcen(false),zfis(0),hfin(0) {}
   ~TZip() = default;
 
   // These variables say about the file we're writing into

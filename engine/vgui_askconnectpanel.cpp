@@ -22,7 +22,7 @@ using namespace vgui;
 
 class CAskConnectPanel : public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CAskConnectPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAskConnectPanel, vgui::EditablePanel );
 
 public:
 	CAskConnectPanel( VPANEL parent );
@@ -34,9 +34,9 @@ public:
 	void UpdateCurrentPosition();
 	void Hide();
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void ApplySettings(KeyValues *inResourceData);
-	virtual void OnTick();
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void ApplySettings(KeyValues *inResourceData) override;
+	void OnTick() override;
 
 public:
 	static CAskConnectPanel *s_pAskConnectPanel;
@@ -240,12 +240,12 @@ vgui::Panel* CreateAskConnectPanel( VPANEL parent )
 
 void ShowAskConnectPanel( const char *pHostName, float flDuration )
 {
-	const int cubHostName = V_strlen( pHostName );
+	const intp cubHostName = V_strlen( pHostName );
 	if ( cubHostName <= 0 )
 		return;
 
 	// Hostname is not allowed to contain semicolon, whitespace, or control characters
-	for ( int i = 0; i < cubHostName; i++ )
+	for ( intp i = 0; i < cubHostName; i++ )
 	{
 		if ( pHostName[i] == ';' || V_isspace( pHostName[i] ) || pHostName[i] < 0x20 )
 		{

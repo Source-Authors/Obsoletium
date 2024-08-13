@@ -158,7 +158,7 @@ public:
 
 	// Creation/Destruction.
 	CDispCollTree();
-	~CDispCollTree();
+	virtual ~CDispCollTree();
 	virtual bool Create( CCoreDispInfo *pDisp );
 
 	// Raycasts.
@@ -299,7 +299,7 @@ protected:
 	// Utility
 	inline void CalcClosestBoxPoint( const Vector &vecPlaneNormal, const Vector &vecBoxStart, const Vector &vecBoxExtents, Vector &vecBoxPoint );
 	inline void CalcClosestExtents( const Vector &vecPlaneNormal, const Vector &vecBoxExtents, Vector &vecBoxPoint );
-	int AddPlane( const Vector &vecNormal );
+	intp AddPlane( const Vector &vecNormal );
 	bool FORCEINLINE IsLeafNode(int iNode);
 public:
 	Vector							m_mins;									// Bounding box of the displacement surface and base face

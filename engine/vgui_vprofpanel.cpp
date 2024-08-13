@@ -126,22 +126,22 @@ ConVar vprof_scope(
 
 class CProfileTree : public TreeView
 {
-	DECLARE_CLASS_SIMPLE( CProfileTree, TreeView );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CProfileTree, TreeView );
 public:
 	CProfileTree( CVProfPanel *parent, const char *panelName );
 	~CProfileTree();
 
-	virtual void OnCommand( const char *cmd );
+	void OnCommand( const char *cmd ) override;
 
-	virtual void InvalidateLayout( bool layoutNow = false, bool reloadScheme = false );
+	void InvalidateLayout( bool layoutNow = false, bool reloadScheme = false ) override;
 
-	virtual void ApplySchemeSettings( IScheme *pScheme )
+	void ApplySchemeSettings( IScheme *pScheme ) override
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
 		SetFont( pScheme->GetFont( PROF_FONT ) );
 	}
 
-	virtual void SetBgColor( Color color )
+	void SetBgColor( Color color ) override
 	{
 		BaseClass::SetBgColor( color );
 	}
@@ -341,12 +341,11 @@ int CProfileHierarchyPanel::AddItem( KeyValues *data, int parentItemIndex, Colum
 	{
 		m_Panels.Insert( columnPanels );
 
-		int c = columnPanels.m_Columns.Count();
-		for ( int i = 0; i < c; ++i )
+		for ( auto &&c : columnPanels.m_Columns )
 		{
-			if ( columnPanels.m_Columns[ i ].label )
+			if ( c.label )
 			{
-				columnPanels.m_Columns[ i ].label->SetParent( this );
+				c.label->SetParent( this );
 			}
 		}
 	}
@@ -755,8 +754,6 @@ bool ChildCostSortFunc(KeyValues *pNode1, KeyValues *pNode2)
 			return false;
 		}
 	}
-
-	return false;
 }
 
 
@@ -847,7 +844,7 @@ void CVProfPanel::ExpandGroup( const char *pGroupName )
 
 class CVProfLabel : public Label
 {
-	DECLARE_CLASS_SIMPLE( CVProfLabel, Label );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CVProfLabel, Label );
 public:
 
 	CVProfLabel( Panel *parent, const char *panelName ) :
@@ -856,7 +853,7 @@ public:
 		//SetPaintBackgroundEnabled( false );
 	}
 
-	virtual void ApplySchemeSettings( IScheme *pScheme )
+	void ApplySchemeSettings( IScheme *pScheme ) override
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
 		SetFont( pScheme->GetFont( PROF_FONT ) );

@@ -71,7 +71,7 @@ CTextureBudgetPanel *GetTextureBudgetPanel( void )
 }
 
 
-static void TextureCVarChangedCallBack( IConVar *pConVar, const char *pOldString, float flOldValue )
+static void TextureCVarChangedCallBack( IConVar *, const char *, float )
 {
 	if ( GetTextureBudgetPanel() )
 	{
@@ -153,7 +153,7 @@ void CTextureBudgetPanel::SendConfigDataToBase()
 
 				if ( strstr( pGroupName, pPrefixes[iPrefix] ) == pGroupName )
 				{
-					int len = strlen( pPrefixes[iPrefix] );
+					intp len = V_strlen( pPrefixes[iPrefix] );
 					Q_strncpy( alternateName, &pGroupName[len], len );
 					alternateName[len] = '\0';
 

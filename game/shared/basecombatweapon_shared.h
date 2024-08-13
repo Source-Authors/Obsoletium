@@ -109,7 +109,8 @@ class Color;
 
 namespace vgui2
 {
-	typedef unsigned long HFont;
+	// dimhotepus: x86-64 port. unsigned long -> uintp
+	typedef uintp HFont;
 }
 
 // -----------------------------------------

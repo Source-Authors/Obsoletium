@@ -83,12 +83,12 @@ public:
 	// APIS required by CManagedDataCacheClient
 	void DestroyResource();
 	CAsyncWaveData *GetData();
-	unsigned int Size();
+	size_t Size();
 
 	static void AsyncCallback( const FileAsyncRequest_t &asyncRequest, int numReadBytes, FSAsyncStatus_t err );
 	static void QueuedLoaderCallback( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError );
 	static CAsyncWaveData *CreateResource( const asyncwaveparams_t &params );
-	static unsigned int EstimatedSize( const asyncwaveparams_t &params );
+	static size_t EstimatedSize( const asyncwaveparams_t &params );
 
 	void OnAsyncCompleted( const FileAsyncRequest_t* asyncFilePtr, int numReadBytes, FSAsyncStatus_t err );
 	bool BlockingCopyData( void *destbuffer, int destbufsize, int startoffset, int count );
@@ -127,15 +127,15 @@ CAsyncWaveData::CAsyncWaveData() :
 	m_nReadSize( 0 ),
 	m_pvData( 0 ),
 	m_pAlloc( 0 ),
-	m_hBuffer( INVALID_BUFFER_HANDLE ),
-	m_nBufferBytes( 0 ),
 	m_hAsyncControl( NULL ),
-	m_bLoaded( false ),
-	m_bMissing( false ),
 	m_start( 0.0 ),
 	m_arrival( 0.0 ),
-	m_bPostProcessed( false ),
-	m_hFileNameHandle( 0 )
+	m_hFileNameHandle( 0 ),
+	m_nBufferBytes( 0 ),
+	m_hBuffer( INVALID_BUFFER_HANDLE ),
+	m_bLoaded( false ),
+	m_bMissing( false ),
+	m_bPostProcessed( false )
 {
 }
 
@@ -232,9 +232,9 @@ CAsyncWaveData *CAsyncWaveData::GetData()
 // Purpose: 
 // Output : unsigned int
 //-----------------------------------------------------------------------------
-unsigned int CAsyncWaveData::Size()
+size_t CAsyncWaveData::Size()
 { 
-	int size = sizeof( *this );
+	size_t size = sizeof( *this );
 	
 	if ( IsPC() )
 	{
@@ -280,9 +280,9 @@ CAsyncWaveData *CAsyncWaveData::CreateResource( const asyncwaveparams_t &params 
 // Input  : &params - 
 // Output : static unsigned int
 //-----------------------------------------------------------------------------
-unsigned int CAsyncWaveData::EstimatedSize( const asyncwaveparams_t &params )
+size_t CAsyncWaveData::EstimatedSize( const asyncwaveparams_t &params )
 {
-	int size = sizeof( CAsyncWaveData );
+	size_t size = sizeof( CAsyncWaveData );
 
 	if ( IsPC() )
 	{
@@ -316,7 +316,7 @@ void CAsyncWaveData::AsyncCallback(const FileAsyncRequest_t &asyncRequest, int n
 //-----------------------------------------------------------------------------
 // Purpose: Static method, called by thread, don't call anything non-threadsafe from handler!!!
 //-----------------------------------------------------------------------------
-void CAsyncWaveData::QueuedLoaderCallback( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError )
+void CAsyncWaveData::QueuedLoaderCallback( void *pContext, void *, const void *, int nSize, LoaderError_t loaderError )
 {
 	CAsyncWaveData *pObject = reinterpret_cast< CAsyncWaveData * >( pContext );
 	Assert( pObject );
@@ -684,7 +684,7 @@ public:
 	CAsyncWavDataCache();
 	~CAsyncWavDataCache() = default;
 
-	virtual bool			Init( unsigned int memSize );
+	virtual bool			Init( size_t memSize );
 	virtual void			Shutdown();
 
 	// implementation that treats file as monolithic
@@ -790,8 +790,8 @@ private:
 // Purpose: 
 //-----------------------------------------------------------------------------
 CAsyncWavDataCache::CAsyncWavDataCache() :  
-	m_CacheHandles( 0, 0, CacheHandleLessFunc ),
 	m_BufferList( 0, 0, BufferHandleLessFunc ),
+	m_CacheHandles( 0, 0, CacheHandleLessFunc ),
 	m_bInitialized( false ),
 	m_bQueueCacheUnlocks( false )
 {
@@ -801,7 +801,7 @@ CAsyncWavDataCache::CAsyncWavDataCache() :
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CAsyncWavDataCache::Init( unsigned int memSize )
+bool CAsyncWavDataCache::Init( size_t memSize )
 {
 	if ( m_bInitialized )
 		return true;
@@ -828,7 +828,7 @@ bool CAsyncWavDataCache::Init( unsigned int memSize )
 
 #if FORCE_SMALL_MEMORY_CACHE_SIZE
 	memSize = FORCE_SMALL_MEMORY_CACHE_SIZE;
-	Msg( "WARNING CAsyncWavDataCache::Init() forcing small memory cache size: %u\n", memSize );
+	Msg( "WARNING CAsyncWavDataCache::Init() forcing small memory cache size: %zu\n", memSize );
 #endif
 
 	CCacheClientBaseClass::Init( g_pDataCache, "WaveData", memSize );
@@ -1184,7 +1184,6 @@ int CAsyncWavDataCache::CopyStreamedDataIntoMemory( int hStream, void *pBuffer, 
 	asyncwaveparams_t	params;
 	int					nextStartPos;
 	int					bufferPos;
-	bool				bEndOfFile;
 	int					index;
 	bool				bWaiting;
 	bool				bCompleted;
@@ -1204,7 +1203,6 @@ int CAsyncWavDataCache::CopyStreamedDataIntoMemory( int hStream, void *pBuffer, 
 
 	// drive the buffering
 	index = streamedEntry.m_Front;
-	bEndOfFile = 0;
 	actualCopied = 0;
 	bWaiting = false;
 	while ( 1 )
@@ -1658,7 +1656,7 @@ void CAsyncWavDataCache::OnMixEnd()
 {
 	m_bQueueCacheUnlocks = false;
 	// flush the unlock queue
-	for ( int i = 0; i < m_unlockQueue.Count(); i++ )
+	for ( intp i = 0; i < m_unlockQueue.Count(); i++ )
 	{
 		CacheUnlock( m_unlockQueue[i] );
 	}
@@ -1669,7 +1667,7 @@ void CAsyncWavDataCache::OnMixEnd()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CAsyncWavDataCache::GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen  )
+bool CAsyncWavDataCache::GetItemName( DataCacheClientID_t, const void *pItem, char *pDest, unsigned nMaxLen  )
 {
 	CAsyncWaveData *pWaveData = (CAsyncWaveData *)pItem;
 	Q_strncpy( pDest, pWaveData->GetFileName(), nMaxLen );
@@ -1692,7 +1690,7 @@ void CAsyncWavDataCache::SpewMemoryUsage( int level )
 	{
 		float percent = 100.0f * (float)bytesUsed / (float)bytesTotal;
 
-		Msg( "CAsyncWavDataCache:  %i .wavs total %s, %.2f %% of capacity\n", m_CacheHandles.Count(), Q_pretifymem( bytesUsed, 2 ), percent );
+		Msg( "CAsyncWavDataCache:  %zd .wavs total %s, %.2f %% of capacity\n", m_CacheHandles.Count(), Q_pretifymem( bytesUsed, 2 ), percent );
 
 		if ( level >= 1 )
 		{
@@ -1715,7 +1713,7 @@ void CAsyncWavDataCache::SpewMemoryUsage( int level )
 					Msg( "\t%16.16s : %s\n", "not resident",name);
 				}
 			}
-			Msg( "CAsyncWavDataCache:  %i .wavs total %s, %.2f %% of capacity\n", m_CacheHandles.Count(), Q_pretifymem( bytesUsed, 2 ), percent );
+			Msg( "CAsyncWavDataCache:  %zd .wavs total %s, %.2f %% of capacity\n", m_CacheHandles.Count(), Q_pretifymem( bytesUsed, 2 ), percent );
 		}
 	}
 	
@@ -1830,16 +1828,18 @@ public:
 	~CWaveDataStreamAsync( void );
 
 	// return the source pointer (mixer needs this to determine some things like sampling rate)
-	CAudioSource &Source( void ) { return m_source; }
+	CAudioSource &Source( void ) override { return m_source; }
 
 	// Read data from the source - this is the primary function of a IWaveData subclass
 	// Get the data from the buffer (or reload from disk)
-	virtual int ReadSourceData( void **pData, int sampleIndex, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] );
-	bool IsValid() { return m_bValid; }
-	virtual bool IsReadyToMix();
+	int ReadSourceData( void **pData, int sampleIndex, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] ) override;
+
+	bool IsReadyToMix() override;
+
+	bool IsValid() const { return m_bValid; }
 
 private:
-	CWaveDataStreamAsync( const CWaveDataStreamAsync & );
+	CWaveDataStreamAsync( const CWaveDataStreamAsync & ) = delete;
 
 	//-----------------------------------------------------------------------------
 	// Purpose: 
@@ -1852,7 +1852,7 @@ private:
 		CAudioSourceCachedInfo *info = m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_WAV, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
 		if ( !info )
 		{
-			Assert( !"CAudioSourceWave::GetCachedDataPointer info == NULL" );
+			AssertMsg( false, "CAudioSourceWave::GetCachedDataPointer info == NULL" );
 			return NULL;
 		}
 
@@ -1893,13 +1893,13 @@ CWaveDataStreamAsync::CWaveDataStreamAsync
 		int startOffset
 	) : 
 	m_source( source ), 
-	m_dataStart( fileStart ), 
-	m_dataSize( fileSize ), 
 	m_pStreamSource( pStreamSource ), 
-	m_bValid( false ), 
+	m_dataStart( fileStart ), 
+	m_dataSize( fileSize ),  
 	m_hCache( 0 ),
 	m_hStream( INVALID_STREAM_HANDLE ),
 	m_hFileName( 0 ), 
+	m_bValid( false ),
 	m_pSfx( sfx )
 {
 	m_hFileName = g_pFileSystem->FindOrAddFileName( pFileName );
@@ -2110,7 +2110,7 @@ bool CWaveDataStreamAsync::IsReadyToMix()
 //			copyBuf[AUDIOSOURCE_COPYBUF_SIZE] - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CWaveDataStreamAsync::ReadSourceData( void **pData, int sampleIndex, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] )
+int CWaveDataStreamAsync::ReadSourceData( void **pData, int sampleIndex, int sampleCount, char [AUDIOSOURCE_COPYBUF_SIZE] )
 {
 	// Current file position
 	int seekpos = m_dataStart + m_sampleIndex * m_sampleSize;
@@ -2246,30 +2246,6 @@ int CWaveDataStreamAsync::ReadSourceData( void **pData, int sampleIndex, int sam
 				}
 			}
 		}
-
-		if ( IsX360() )
-		{
-			if ( m_hStream != INVALID_STREAM_HANDLE )
-			{
-				// request available data, may get less
-				// drives the buffering
-				m_bufferCount = wavedatacache->CopyStreamedDataIntoMemory( 
-									m_hStream, 
-									m_buffer, 
-									m_bufferSize * m_sampleSize,
-									seekpos, 
-									m_bufferCount * m_sampleSize );
-				// convert to number of samples in the buffer
-				m_bufferCount /= m_sampleSize;
-			}
-			else
-			{
-				return 0;
-			}
-
-			// do any conversion now the source needs (mixer will decode/decompress) on this buffer
-			m_pStreamSource->UpdateSamples( m_buffer, m_bufferCount );
-		}
 	}
 
 	// If we have some samples in the buffer that are within range of the request
@@ -2299,11 +2275,12 @@ class CWaveDataMemoryAsync : public IWaveData
 {
 public:
 	CWaveDataMemoryAsync( CAudioSource &source );
-	~CWaveDataMemoryAsync( void ) {}
-	CAudioSource &Source( void ) { return m_source; }
+	virtual ~CWaveDataMemoryAsync( void ) {}
+
+	CAudioSource &Source( void ) override { return m_source; }
 	
-	virtual int ReadSourceData( void **pData, int sampleIndex, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] );
-	virtual bool IsReadyToMix();
+	int ReadSourceData( void **pData, int sampleIndex, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] ) override;
+	bool IsReadyToMix() override;
 
 private:
 	CAudioSource		&m_source;	// pointer to source

@@ -394,7 +394,7 @@ public:
 				continue;
 
 			int index = data->m_pChannel - g_VoiceChannels;
-			Assert( index >= 0 && index < (int)ARRAYSIZE( g_VoiceChannels ) );
+			Assert( index >= 0 && index < ssize( g_VoiceChannels ) );
 
 			char path[ MAX_PATH ];
 			Q_snprintf( path, sizeof( path ), "%s/voice", g_pSoundServices->GetGameDir() );
@@ -690,11 +690,11 @@ bool Voice_Init( const char *pCodecName, int nSampleRate )
 		int quality = bCelt ? 3 : 4;
 
 		// Get the codec.
-		CreateInterfaceFn createCodecFn = NULL;
+		CreateInterfaceFnT<IVoiceCodec> createCodecFn = NULL;
 		g_hVoiceCodecDLL = FileSystem_LoadModule(pCodecName);
 
-		if ( !g_hVoiceCodecDLL || (createCodecFn = Sys_GetFactory(g_hVoiceCodecDLL)) == NULL ||
-		     (g_pEncodeCodec = (IVoiceCodec*)createCodecFn(pCodecName, NULL)) == NULL || !g_pEncodeCodec->Init( quality ) )
+		if ( !g_hVoiceCodecDLL || (createCodecFn = Sys_GetFactory<IVoiceCodec>(g_hVoiceCodecDLL)) == NULL ||
+		     (g_pEncodeCodec = createCodecFn(pCodecName, NULL)) == NULL || !g_pEncodeCodec->Init( quality ) )
 		{
 			Msg("Unable to load voice codec '%s'. Voice disabled. (module %i, iface %i, codec %i)\n",
 			    pCodecName, !!g_hVoiceCodecDLL, !!createCodecFn, !!g_pEncodeCodec);

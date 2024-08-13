@@ -28,17 +28,17 @@ class Slider;
 //-----------------------------------------------------------------------------
 class CFogUIPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CFogUIPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CFogUIPanel, vgui::Frame );
 
 public:
 	CFogUIPanel( vgui::Panel *parent );
 	~CFogUIPanel();
 
-	virtual void OnTick();
+	void OnTick() override;
 
 	// Command issued
-	virtual void	OnCommand(const char *command);
-	virtual void	OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel);
+	void	OnCommand(const char *command) override;
+	void	OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel) override;
 
 	static	void	InstallFogUI( vgui::Panel *parent );
 	

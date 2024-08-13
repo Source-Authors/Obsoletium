@@ -113,7 +113,7 @@ public: // IConnectionlessPacketHandler implementation
 	virtual void	Clear( void );
 	virtual void	Shutdown( void );
 	virtual CBaseClient *CreateFakeClient( const char *name );
-	virtual void 	RemoveClientFromGame( CBaseClient *client ) {};
+	virtual void 	RemoveClientFromGame( CBaseClient * ) {};
 	virtual void	SendClientMessages ( bool bSendSnapshots );
 	virtual void	FillServerInfo(SVC_ServerInfo &serverinfo);
 	virtual void	UserInfoChanged( int nClientIndex );
@@ -159,10 +159,10 @@ protected:
 	
 	virtual CBaseClient *GetFreeClient( netadr_t &adr );
 
-	virtual CBaseClient *CreateNewClient( int slot ) { AssertMsg( 0, "CBaseServer::CreateNewClient() being called - must be implemented in derived class!" ); return NULL; }; // must be derived
+	virtual CBaseClient *CreateNewClient( int ) { AssertMsg( 0, "CBaseServer::CreateNewClient() being called - must be implemented in derived class!" ); return NULL; }; // must be derived
 
 	
-	virtual bool	FinishCertificateCheck( netadr_t &adr, int nAuthProtocol, const char *szRawCertificate, int clientChallenge ) { return true; };
+	virtual bool	FinishCertificateCheck( netadr_t &, int, const char *, int ) { return true; };
 	
 	virtual int		GetChallengeNr ( netadr_t &adr );
 	virtual int		GetChallengeType ( netadr_t &adr );

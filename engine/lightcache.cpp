@@ -633,7 +633,7 @@ static void ComputeAmbientFromSphericalSamples( const Vector& start,
 	dworldlight_t *pSkylight = FindAmbientLight();
 
 	Vector radcolor[NUMRANDOMNORMALS];
-	Assert( cached_r_lightcache_numambientsamples <= ARRAYSIZE( radcolor ) );
+	Assert( cached_r_lightcache_numambientsamples <= ssize( radcolor ) );
 
 	// sample world by casting N rays distributed across a sphere
 	Vector upend;

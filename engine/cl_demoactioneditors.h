@@ -20,17 +20,17 @@ class CDemoEditorPanel;
 //-----------------------------------------------------------------------------
 class CBaseActionEditDialog : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CBaseActionEditDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseActionEditDialog, vgui::Frame );
 
 public:
 	CBaseActionEditDialog( CDemoEditorPanel *parent, CBaseDemoAction *action, bool newaction );
 
 	virtual void	Init( void );
 
-	virtual void	OnClose();
-	virtual void	OnCancel();
+	void	OnClose() override;
+	void	OnCancel();
 
-	virtual void	OnCommand( char const *commands );
+	virtual void	OnCommand( char const *commands ) override;
 
 	// Returns true if changes were effected
 	virtual bool	OnSaveChanges( void );
@@ -55,16 +55,16 @@ protected:
 //-----------------------------------------------------------------------------
 class CBaseActionWithTargetDialog : public CBaseActionEditDialog
 {
-	DECLARE_CLASS_SIMPLE( CBaseActionWithTargetDialog, CBaseActionEditDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseActionWithTargetDialog, CBaseActionEditDialog );
 
 public:
 	CBaseActionWithTargetDialog( CDemoEditorPanel *parent, CBaseDemoAction *action, bool newaction );
 
 	// Also a pure baseclass
-	virtual void	Init( void );
+	void	Init() override;
 
 	// Returns true if changes were effected
-	virtual bool	OnSaveChanges( void );
+	bool	OnSaveChanges() override;
 
 private:
 

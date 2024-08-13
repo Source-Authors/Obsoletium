@@ -31,58 +31,58 @@ class CAudioSourceWave : public CAudioSource
 public:
 	CAudioSourceWave( CSfxTable *pSfx );
 	CAudioSourceWave( CSfxTable *pSfx, CAudioSourceCachedInfo *info );
-	~CAudioSourceWave( void );
+	virtual ~CAudioSourceWave();
 
-	virtual int				GetType( void );
-	virtual void			GetCacheData( CAudioSourceCachedInfo *info );
+	int				GetType( void ) override;
+	void			GetCacheData( CAudioSourceCachedInfo *info ) override;
 
-	void					Setup( const char *pFormat, int formatSize, IterateRIFF &walk );
-	virtual int				SampleRate( void );
-	virtual int				SampleSize( void );
-	virtual int				SampleCount( void );
+	void			Setup( const char *pFormat, int formatSize, IterateRIFF &walk );
+	int				SampleRate( void ) override;
+	int				SampleSize( void ) override;
+	int				SampleCount( void ) override;
 
-	virtual int				Format( void );
-	virtual int				DataSize( void );
+	int				Format( void ) override;
+	int				DataSize( void ) override;
 
 	void					*GetHeader( void );
-	virtual bool			IsVoiceSource();
+	bool			IsVoiceSource() override;
 
 	virtual	void			ParseChunk( IterateRIFF &walk, int chunkName );
 	virtual void			ParseSentence( IterateRIFF &walk );
 
 	void					ConvertSamples( char *pData, int sampleCount );
-	bool					IsLooped( void );
-	bool					IsStereoWav( void );
-	bool					IsStreaming( void );
-	int						GetCacheStatus( void );
+	bool					IsLooped( void ) override;
+	bool					IsStereoWav( void ) override;
+	bool					IsStreaming( void ) override;
+	int						GetCacheStatus( void ) override;
 	int						ConvertLoopedPosition( int samplePosition );
-	void					CacheLoad( void );
-	void					CacheUnload( void );
-	virtual int				ZeroCrossingBefore( int sample );
-	virtual int				ZeroCrossingAfter( int sample );
-	virtual void			ReferenceAdd( CAudioMixer *pMixer );
-	virtual void			ReferenceRemove( CAudioMixer *pMixer );
-	virtual bool			CanDelete( void );
-	virtual CSentence		*GetSentence( void );
+	void					CacheLoad( void ) override;
+	void					CacheUnload( void ) override;
+	int				ZeroCrossingBefore( int sample ) override;
+	int				ZeroCrossingAfter( int sample ) override;
+	void			ReferenceAdd( CAudioMixer *pMixer ) override;
+	void			ReferenceRemove( CAudioMixer *pMixer ) override;
+	bool			CanDelete( void ) override;
+	CSentence		*GetSentence( void ) override;
 	const char				*GetName();
 
-	virtual bool			IsAsyncLoad();
+	bool			IsAsyncLoad() override;
 
-	virtual void			CheckAudioSourceCache();
+	void			CheckAudioSourceCache() override;
 
-	virtual char const		*GetFileName();
+	char const		*GetFileName() override;
 
 	// 360 uses alternate play once semantics
-	virtual void			SetPlayOnce( bool bIsPlayOnce ) { m_bIsPlayOnce = IsPC() ? bIsPlayOnce : false; }
-	virtual bool			IsPlayOnce() { return IsPC() ? m_bIsPlayOnce : false; }
+	void			SetPlayOnce( bool bIsPlayOnce ) override { m_bIsPlayOnce = IsPC() ? bIsPlayOnce : false; }
+	bool			IsPlayOnce() override { return IsPC() ? m_bIsPlayOnce : false; }
 
-	virtual void			SetSentenceWord( bool bIsWord ) { m_bIsSentenceWord = bIsWord; }
-	virtual bool			IsSentenceWord() { return m_bIsSentenceWord; }
+	void			SetSentenceWord( bool bIsWord ) override { m_bIsSentenceWord = bIsWord; }
+	bool			IsSentenceWord() override { return m_bIsSentenceWord; }
 
-	int						GetLoopingInfo( int *pLoopBlock, int *pNumLeadingSamples, int *pNumTrailingSamples );
+	int				GetLoopingInfo( int *pLoopBlock, int *pNumLeadingSamples, int *pNumTrailingSamples );
 
-	virtual int				SampleToStreamPosition( int samplePosition ) { return 0; }
-	virtual int				StreamToSamplePosition( int streamPosition ) { return 0; }
+	int				SampleToStreamPosition( int ) override { return 0; }
+	int				StreamToSamplePosition( int ) override { return 0; }
 
 protected:
 	void					ParseCueChunk( IterateRIFF &walk );
@@ -103,7 +103,7 @@ protected:
 		CAudioSourceCachedInfo *info = m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_WAV, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
 		if ( !info )
 		{
-			Assert( !"CAudioSourceWave::GetCachedDataPointer info == NULL" );
+			AssertMsg( false, "CAudioSourceWave::GetCachedDataPointer info == NULL" );
 			return NULL;
 		}
 
@@ -147,7 +147,8 @@ protected:
 	unsigned int	m_bIsSentenceWord : 1;
 
 private:
-	CAudioSourceWave( const CAudioSourceWave & ); // not implemented, not allowed
+	CAudioSourceWave( const CAudioSourceWave & ) = delete; // not implemented, not allowed
+
 	int				m_refCount;
 	
 #ifdef _DEBUG

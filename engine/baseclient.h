@@ -121,8 +121,8 @@ public:
 	void			OnSignonStateFull();
 
 	// Is an actual human player or splitscreen player (not a bot and not a HLTV slot)
-	virtual	bool	IsHearingClient( int index ) const { return false; };
-	virtual	bool	IsProximityHearingClient( int index ) const { return false; };
+	virtual	bool	IsHearingClient( int ) const { return false; };
+	virtual	bool	IsProximityHearingClient( int ) const { return false; };
 
 	virtual void	SetMaxRoutablePayloadSize( int nMaxRoutablePayloadSize );
 

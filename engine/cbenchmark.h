@@ -39,7 +39,7 @@ private:
 	bool m_bIsTestRunning;
 	char m_szFilename[256];
 
-	int m_flStartTime;
+	float m_flStartTime;
 	int m_iStartFrame;
 };
 

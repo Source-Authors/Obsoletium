@@ -9,6 +9,8 @@
 
 #include "client_pch.h"
 #include "sound.h"
+// dimhotepus: For SOUND_DMA_SPEED
+#include "snd_device.h"
 #include <inetchannel.h>
 #include "checksum_engine.h"
 #include "con_nprint.h"
@@ -128,10 +130,6 @@ static ConVar jpeg_quality( "jpeg_quality", "98", 0, "jpeg screenshot quality." 
 static int	cl_snapshotnum = 0;
 static char cl_snapshotname[MAX_OSPATH];
 static char cl_snapshot_subdirname[MAX_OSPATH];
-
-// Must match game .dll definition
-// HACK HACK FOR E3 -- Remove this after E3
-#define	HIDEHUD_ALL			( 1<<2 )
 
 void PhonemeMP3Shutdown( void );
 
@@ -1459,9 +1457,6 @@ void CL_StartMovie( const char *filename, int flags, int nWidth, int nHeight, fl
 	bool bSuccess = true;
 	if ( cl_movieinfo.DoVideo() || cl_movieinfo.DoVideoSound() )
 	{
-// HACK:  THIS MUST MATCH snd_device.h.  Should be exposed more cleanly!!!
-#define SOUND_DMA_SPEED		44100		// hardware playback rate
-
 		// MGP - switched over to using valve video services from avi
 		if ( videoSystem == VideoSystem::NONE && g_pVideo )
 		{
@@ -2427,7 +2422,7 @@ void CL_CheckToDisplayStartupMenus( const CCommand &args )
 //----------------------------------------------------------------------------
 extern bool g_bV3SteamInterface;
 char g_minidumpinfo[ 4096 ] = {0};
-PAGED_POOL_INFO_t g_pagedpoolinfo = { 0 };
+PAGED_POOL_INFO_t g_pagedpoolinfo = {};
 void DisplaySystemVersion( char *osversion, int maxlen );
 
 void CL_SetPagedPoolInfo()

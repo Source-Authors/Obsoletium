@@ -279,7 +279,7 @@ public:
 		model_t *model, 
 		const Vector& origin, 
 		const QAngle& angles, 
-		bool bUnused )
+		bool )
 	{
 		R_DrawBrushModel( baseentity, model, origin, angles, DEPTH_MODE_NORMAL, true, true );
 	}
@@ -460,18 +460,18 @@ public:
 		g_EngineRenderer->ViewDrawFade( color, pFadeMaterial );
 	}
 
-	void OLD_SetProjectionMatrix( float fov, float zNear, float zFar )
+	void OLD_SetProjectionMatrix( float, float, float )
 	{
 		// Here to preserve backwards compat
 	}
 
-	void OLD_SetOffCenterProjectionMatrix( float fov, float zNear, float zFar, float flAspectRatio,
-		float flBottom, float flTop, float flLeft, float flRight )
+	void OLD_SetOffCenterProjectionMatrix( float, float, float, float,
+		float, float, float, float )
 	{
 		// Here to preserve backwards compat
 	}
 
-	void OLD_SetProjectionMatrixOrtho( float left, float top, float right, float bottom, float zNear, float zFar )
+	void OLD_SetProjectionMatrixOrtho( float, float, float, float, float, float )
 	{
 		// Here to preserve backwards compat
 	}
@@ -523,7 +523,7 @@ public:
 		int m_nLeafWaterDataID;
 	};
 	
-	bool EnumerateLeaf( int leaf, int context )
+	bool EnumerateLeaf( int leaf, intp context )
 	{
 		BoxIntersectWaterContext_t *pSearchContext = ( BoxIntersectWaterContext_t * )context;
 		mleaf_t *pLeaf = &host_state.worldmodel->brush.pShared->leafs[leaf];
@@ -541,7 +541,7 @@ public:
 		BoxIntersectWaterContext_t context;
 		context.m_bFoundWaterLeaf = false;
 		context.m_nLeafWaterDataID = leafWaterDataID;
-		g_pToolBSPTree->EnumerateLeavesInBox( mins, maxs, this, ( int )&context );
+		g_pToolBSPTree->EnumerateLeavesInBox( mins, maxs, this, reinterpret_cast<intp>(&context) );
 		return context.m_bFoundWaterLeaf;
 	}
 

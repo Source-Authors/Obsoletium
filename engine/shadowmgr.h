@@ -93,7 +93,7 @@ public:
 	// ppOutVertex is pointed to the head of an array of pointers to
 	// clipped vertices the function returns the number of clipped vertices
 	virtual int ProjectAndClipVertices( ShadowHandle_t handle, int count, 
-		Vector** ppPosition, ShadowVertex_t*** ppOutVertex ) = 0;
+		Vector** ppPosition, ShadowVertex_t* RESTRICT ** ppOutVertex ) = 0;
 
 	// Computes information for rendering
 	virtual void ComputeRenderInfo( ShadowDecalRenderInfo_t* pInfo, ShadowHandle_t handle ) const = 0;

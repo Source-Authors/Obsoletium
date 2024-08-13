@@ -69,10 +69,10 @@ static void BuildDispGetSurfNormals( Vector points[4], Vector normals[4] )
 
 static CDispGroup* FindCombo( CUtlVector<CDispGroup*> &combos, int idLMPage, IMaterial *pMaterial )
 {
-	for( int i=0; i < combos.Size(); i++ )
+	for( auto *c : combos )
 	{
-		if( combos[i]->m_LightmapPageID == idLMPage && combos[i]->m_pMaterial == pMaterial )
-			return combos[i];
+		if( c->m_LightmapPageID == idLMPage && c->m_pMaterial == pMaterial )
+			return c;
 	}
 	return NULL;
 }
@@ -377,13 +377,11 @@ void DispInfo_LinkToParentFaces( model_t *pWorld, const ddispinfo_t *pMapDisps, 
 void DispInfo_CreateEmptyStaticBuffers( model_t *pWorld, const ddispinfo_t *pMapDisps )
 {
 	// For each combo, create empty buffers.
-	for( int i=0; i < g_DispGroups.Size(); i++ )
+	for( auto *pCombo : g_DispGroups )
 	{
-		CDispGroup *pCombo = g_DispGroups[i];
-
 		int nTotalVerts=0, nTotalIndices=0;
 		int iStart = 0;
-		for( int iDisp=0; iDisp < pCombo->m_DispInfos.Size(); iDisp++ )
+		for( intp iDisp=0; iDisp < pCombo->m_DispInfos.Count(); iDisp++ )
 		{
 			const ddispinfo_t *pMapDisp = &pMapDisps[pCombo->m_DispInfos[iDisp]];
 
@@ -402,7 +400,7 @@ void DispInfo_CreateEmptyStaticBuffers( model_t *pWorld, const ddispinfo_t *pMap
 				iStart = iDisp;
 				--iDisp;
 			}
-			else if( iDisp == pCombo->m_DispInfos.Size()-1 )
+			else if( iDisp == pCombo->m_DispInfos.Count()-1 )
 			{
 				AddEmptyMesh( pWorld, pCombo, pMapDisps, &pCombo->m_DispInfos[iStart], iDisp-iStart+1, nTotalVerts+nVerts, nTotalIndices+nIndices );
 				break;
@@ -726,14 +724,10 @@ void DispInfo_ReleaseMaterialSystemObjects( model_t *pWorld )
 	CMatRenderContextPtr pRenderContext( materials );
 
 	// Free all the static meshes.
-	for( int iGroup=0; iGroup < g_DispGroups.Size(); iGroup++ )
+	for( auto *pGroup : g_DispGroups )
 	{
-		CDispGroup *pGroup = g_DispGroups[iGroup];
-	
-		for( int iMesh=0; iMesh < pGroup->m_Meshes.Size(); iMesh++ )
+		for( auto *pMesh : pGroup->m_Meshes )
 		{
-			CGroupMesh *pMesh = pGroup->m_Meshes[iMesh];
-
 			pRenderContext->DestroyStaticMesh( pMesh->m_pMesh );
 		}
 

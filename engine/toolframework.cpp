@@ -479,7 +479,7 @@ void CToolFrameworkInternal::LoadToolsFromLibrary( const char *dllname )
 		return;
 	}
 
-	CreateInterfaceFn factory = Sys_GetFactory( module );
+	CreateInterfaceFnT<IToolDictionary> factory = Sys_GetFactory<IToolDictionary>( module );
 	if ( !factory )
 	{
 		Sys_UnloadModule( module );
@@ -487,7 +487,7 @@ void CToolFrameworkInternal::LoadToolsFromLibrary( const char *dllname )
 		return;
 	}
 
-	IToolDictionary *dictionary = ( IToolDictionary * )factory( VTOOLDICTIONARY_INTERFACE_VERSION, NULL );
+	IToolDictionary *dictionary = factory( VTOOLDICTIONARY_INTERFACE_VERSION, NULL );
 	if ( !dictionary )
 	{
 		Sys_UnloadModule( module );
@@ -1010,7 +1010,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CToolFrameworkInternal, IToolFrameworkInterna
 //-----------------------------------------------------------------------------
 // Purpose: exposed from engine to client .dll
 //-----------------------------------------------------------------------------
-class CClientEngineTools : public IClientEngineTools
+class CClientEngineTools final : public IClientEngineTools
 {
 public:
 	virtual void LevelInitPreEntityAllTools();

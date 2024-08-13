@@ -237,7 +237,7 @@ void PreUpdateProfile( float filteredtime )
 			if( g_VProfCurrentProfile.GetCounterGroup( i ) != ( nCounterType - 1 ) )
 				continue;
 			const char *pName;
-			int val;
+			intp val;
 			pName = g_VProfCurrentProfile.GetCounterNameAndValue( i, val );
 			Con_NPrintf( nprintIndex, "%s = %d\n", pName, val );
 			nprintIndex++;
@@ -1092,7 +1092,7 @@ void WriteRemoteVProfGroupData( VProfListenInfo_t &info )
 		const char *pName = g_pVProfileForDisplay->GetBudgetGroupName( i );
 		if ( FindSentGroupIndex( info, pName ) >= 0 )
 			continue;
-		int j = info.m_SentGroups.AddToTail();
+		intp j = info.m_SentGroups.AddToTail();
 		info.m_SentGroups[j] = pName;
 		pIndex[nSendCount++] = i;
 	}
@@ -1178,7 +1178,7 @@ void WriteRemoteVProfData()
 void RegisterVProfDataListener( ra_listener_id listenerID )
 {
 	RemoveVProfDataListener( listenerID );
-	int nIndex = s_VProfListeners.AddToTail( );
+	intp nIndex = s_VProfListeners.AddToTail( );
 	s_VProfListeners[nIndex].m_nListenerId = listenerID;
 	g_VProfExport.AddListener();
 	WriteRemoteVProfGroupData( s_VProfListeners[nIndex] );

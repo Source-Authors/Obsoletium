@@ -279,7 +279,7 @@ void CReplayServer::InitClientRecvTables()
 		AddRecvTableR( pCur->m_pTable, m_pRecvTables, m_nRecvTables );
 
 		ErrorIfNot( 
-			m_nRecvTables < ARRAYSIZE( m_pRecvTables ), 
+			m_nRecvTables < ssize( m_pRecvTables ), 
 			("AddRecvTableR: overflowed MAX_DATATABLES")
 			);
 	}
@@ -288,7 +288,7 @@ void CReplayServer::InitClientRecvTables()
 	for ( pCur = serverGameDLL->GetAllServerClasses(); pCur; pCur=pCur->m_pNext )
 	{
 		ErrorIfNot( 
-			m_nRecvTables < ARRAYSIZE( m_pRecvTables ), 
+			m_nRecvTables < ssize( m_pRecvTables ), 
 			("ClientDLL_InitRecvTableMgr: overflowed MAX_DATATABLES")
 			);
 
@@ -525,7 +525,7 @@ int	CReplayServer::GetReplaySlot( void )
 
 float CReplayServer::GetOnlineTime( void )
 {
-	return MAX(0, net_time - m_flStartTime);
+	return MAX(0.0, net_time - m_flStartTime);
 }
 
 void CReplayServer::FireGameEvent(IGameEvent *event)
@@ -906,7 +906,7 @@ CClientFrame *CReplayServer::GetDeltaFrame( int nTick )
 			return m_FrameCache[iFrame].pFrame;
 	}
 
-	int i = m_FrameCache.AddToTail();
+	intp i = m_FrameCache.AddToTail();
 
 	CReplayFrameCacheEntry_s &entry = m_FrameCache[i];
 
@@ -1012,7 +1012,7 @@ void CReplayServer::Clear( void )
 	m_flStartTime = 0.0f;
 	m_nViewEntity = 1;
 	m_nGameServerMaxClients = 0;
-	m_fNextSendUpdateTime = 0.0f;
+	m_fNextSendUpdateTime = 0.0;
 	m_ReplayFrame.FreeBuffers();
 	m_vPVSOrigin.Init();
 		

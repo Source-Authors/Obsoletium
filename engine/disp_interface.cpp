@@ -135,7 +135,7 @@ unsigned int CDispInfo::ComputeDynamicLightMask( dlight_t *pLights )
 #ifndef SWDS
 	if( !IS_SURF_VALID( m_ParentSurfID ) )
 	{
-		Assert( !"CDispInfo::ComputeDynamicLightMask: no parent surface" );
+		AssertMsg( false, "CDispInfo::ComputeDynamicLightMask: no parent surface" );
 		return 0;
 	}
 
@@ -167,7 +167,7 @@ void CDispInfo::AddDynamicLights( dlight_t *pLights, unsigned int mask )
 #ifndef SWDS
 	if( !IS_SURF_VALID( m_ParentSurfID ) )
 	{
-		Assert( !"CDispInfo::AddDynamicLights: no parent surface" );
+		AssertMsg( false, "CDispInfo::AddDynamicLights: no parent surface" );
 		return;
 	}
 
@@ -562,13 +562,13 @@ void DispInfo_DrawPrimLists( ERenderDepthMode DepthMode )
 #ifndef SWDS
 	VPROF("DispInfo_DrawPrimLists");
 
-	int nDispGroupsSize = g_DispGroups.Size();
+	intp nDispGroupsSize = g_DispGroups.Count();
 
 	int nFullbright = g_pMaterialSystemConfig->nFullbright;
 
 	CMatRenderContextPtr pRenderContext( materials );
 
-	for( int iGroup=0; iGroup < nDispGroupsSize; iGroup++ )
+	for( intp iGroup=0; iGroup < nDispGroupsSize; iGroup++ )
 	{
 		CDispGroup *pGroup = g_DispGroups[iGroup];
 		if( pGroup->m_nVisible == 0 )
@@ -645,9 +645,9 @@ void DispInfo_DrawPrimLists( ERenderDepthMode DepthMode )
 			}
 		}
 
-		int nMeshesSize = pGroup->m_Meshes.Size();
+		intp nMeshesSize = pGroup->m_Meshes.Count();
 
-		for( int iMesh=0; iMesh < nMeshesSize; iMesh++ )
+		for( intp iMesh=0; iMesh < nMeshesSize; iMesh++ )
 		{
 			CGroupMesh *pMesh = pGroup->m_Meshes[iMesh];
 			if( pMesh->m_nVisible == 0 )
@@ -757,7 +757,7 @@ void DispInfo_BatchDecals( CDispInfo **pVisibleDisps, int nVisibleDisps )
 			// There is only one group at a time.
 			int iGroup = 0;
 
-			int iPool = g_aDispDecalSortPool.Alloc( true );
+			intp iPool = g_aDispDecalSortPool.Alloc( true );
 			g_aDispDecalSortPool[iPool] = decal.m_pDecal;
 			
 			int iSortTree = decal.m_pDecal->m_iSortTree;
@@ -766,7 +766,7 @@ void DispInfo_BatchDecals( CDispInfo **pVisibleDisps, int nVisibleDisps )
 			DecalMaterialBucket_t &materialBucket = g_aDispDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].Element( iSortMaterial );
 			if ( materialBucket.m_nCheckCount == g_nDispDecalSortCheckCount )
 			{	
-				int iHead = materialBucket.m_iHead;
+				intp iHead = materialBucket.m_iHead;
 				g_aDispDecalSortPool.LinkBefore( iHead, iPool );
 			}
 			
@@ -837,7 +837,7 @@ void DispInfo_DrawDecalsGroup( int iGroup, int iTreeType )
 			if ( materialBucketList.Element( iBucket ).m_nCheckCount != g_nDispDecalSortCheckCount )
 				continue;
 			
-			int iHead = materialBucketList.Element( iBucket ).m_iHead;
+			intp iHead = materialBucketList.Element( iBucket ).m_iHead;
 			if ( !g_aDispDecalSortPool.IsValidIndex( iHead ) )
 				continue;
 
@@ -856,7 +856,7 @@ void DispInfo_DrawDecalsGroup( int iGroup, int iTreeType )
 			bool bBatchInit = true;
 			
 			int nCount;
-			int iElement = iHead;
+			intp iElement = iHead;
 			while ( iElement != g_aDispDecalSortPool.InvalidIndex() )
 			{
 				decal_t *pDecal = g_aDispDecalSortPool.Element( iElement );
@@ -926,7 +926,7 @@ void DispInfo_DrawDecalsGroup( int iGroup, int iTreeType )
 					if ( bBatchInit )
 					{
 						// Create a batch for this bucket = material/lightmap pair.
-						int iBatchList = meshList.m_aBatches.AddToTail();
+						intp iBatchList = meshList.m_aBatches.AddToTail();
 						pBatch = &meshList.m_aBatches[iBatchList];
 						pBatch->m_iStartIndex = nIndexCount;
 						

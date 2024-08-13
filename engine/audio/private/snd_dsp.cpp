@@ -3387,8 +3387,8 @@ lfo_t * LFO_Alloc( int wtype, float freqHz, bool foneshot, float gain )
 
 			return plfo;
 		}
-		DevMsg ("DSP: Warning, failed to allocate LFO.\n" );
-		return NULL;
+	DevMsg ("DSP: Warning, failed to allocate LFO.\n" );
+	return NULL;
 }
 
 // get next lfo value
@@ -4834,7 +4834,7 @@ amp_t * AMP_Alloc( float gain, float vthresh, float distmix, float vfeed, float 
 	pamp->gain_max = gain * PMAX;
 	pamp->distmix = distmix * PMAX;
 	pamp->vfeed = vfeed * PMAX;
-	pamp->vthresh = vthresh * 32767.0;
+	pamp->vthresh = vthresh * 32767.0f;
 
 	// modrate,	0.01, 200.0},		// frequency at which amplitude values change to new random value. 0 is no self-modulation
 	// moddepth,	0.0, 1.0},			// how much amplitude changes (decreases) from current value (0-1.0) 
@@ -8454,13 +8454,13 @@ struct PreserveDSP_t
 
 static PreserveDSP_t g_PreserveDSP[] =
 {
-	{ &dsp_room },
-	{ &dsp_water },
-	{ &dsp_player },
-	{ &dsp_facingaway },
-	{ &dsp_speaker },
-	{ &dsp_spatial },
-	{ &dsp_automatic }
+	{ &dsp_room, 0.0f },
+	{ &dsp_water, 0.0f },
+	{ &dsp_player, 0.0f },
+	{ &dsp_facingaway, 0.0f },
+	{ &dsp_speaker, 0.0f },
+	{ &dsp_spatial, 0.0f },
+	{ &dsp_automatic, 0.0f }
 };
 
 //-----------------------------------------------------------------------------
@@ -8786,7 +8786,7 @@ void FreeDsps( bool bReleaseTemplateMemory )
 	idsp_spatial = 0;
 	idsp_automatic = 0;
 
-	for ( int i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
+	for ( intp i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
 	{
 		paintbuffer_t *pSpecialBuffer = MIX_GetPPaintFromIPaint( i );
 		if ( pSpecialBuffer->nSpecialDSP != 0 )
@@ -9366,7 +9366,7 @@ void CheckNewDspPresets( void )
 		ipset_automatic_prev = iautomatic;
 	}
 
-	for ( int i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
+	for ( intp i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
 	{
 		paintbuffer_t *pSpecialBuffer = MIX_GetPPaintFromIPaint( i );
 		if ( pSpecialBuffer->nSpecialDSP != pSpecialBuffer->nPrevSpecialDSP && !DSP_IsCrossfading( pSpecialBuffer->idsp_specialdsp ) )
@@ -9455,7 +9455,7 @@ void DSP_DEBUGReloadPresetFile( void )
 	//dsp_automatic.SetValue( 0 );
 
 	CUtlVector< int > specialDSPs;
-	for ( int i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
+	for ( intp i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
 	{
 		paintbuffer_t *pSpecialBuffer = MIX_GetPPaintFromIPaint( i );
 
@@ -9475,7 +9475,7 @@ void DSP_DEBUGReloadPresetFile( void )
 	//dsp_automatic.SetValue( iautomatic );
 
 	int nSpecialDSPNum = 0;
-	for ( int i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
+	for ( intp i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
 	{
 		paintbuffer_t *pSpecialBuffer = MIX_GetPPaintFromIPaint( i );
 

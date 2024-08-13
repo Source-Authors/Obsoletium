@@ -67,7 +67,6 @@ int	d_lightstylenumframes[256];
 
 const MaterialSystem_Config_t *g_pMaterialSystemConfig;
 
-static CSysModule	*g_MaterialsDLL = NULL;
 bool g_LostVideoMemory = false;
 
 IMaterial*	g_materialEmpty;	// purple checkerboard for missing textures
@@ -146,24 +145,26 @@ ConVar mat_show_ab_hdr( "mat_show_ab_hdr", "0" );
 
 static void NukeModeSwitchSaveGames( void )
 {
-	if( g_pFileSystem->FileExists( "save\\modeswitchsave.sav" ) )
+	char modeswitch[MAX_OSPATH];
+	const char* saveDir = saverestore->GetSaveDir();
+
+	V_sprintf_safe( modeswitch, "%s/modeswitchsave.sav", saveDir );
+
+	if (g_pFileSystem->FileExists(modeswitch ))
 	{
-		g_pFileSystem->RemoveFile( "save\\modeswitchsave.sav" );
+		g_pFileSystem->RemoveFile( modeswitch );
 	}
-	if( g_pFileSystem->FileExists( "save\\modeswitchsave.tga" ) )
+
+	V_sprintf_safe( modeswitch, "%s/modeswitchsave.tga", saveDir );
+
+	if (g_pFileSystem->FileExists(modeswitch ))
 	{
-		g_pFileSystem->RemoveFile( "save\\modeswitchsave.tga" );
+		g_pFileSystem->RemoveFile( modeswitch );
 	}
 }
 
 void mat_hdr_level_Callback( IConVar *var, const char *pOldString, float flOldValue )
 {
-	if ( IsX360() )
-	{
-		// can't support, expected to be static
-		return;
-	}
-
 #ifdef CSS_PERF_TEST
 	ConVarRef hdr( var );
 	if ( hdr.GetInt() > 0 )
@@ -232,9 +233,7 @@ static const char *s_pRegistryConVars[] =
 	"mat_reducefillrate",
 	"r_shadowrendertotexture",
 	"r_rootlod",
-#ifndef _X360
 	"r_waterforceexpensive",
-#endif
 	"r_waterforcereflectentities",
 	"mat_antialias",
 	"mat_aaquality",
@@ -243,8 +242,8 @@ static const char *s_pRegistryConVars[] =
 	"mat_hdr_level",
 	"mat_colorcorrection",
 
+	// dimhotepus: Dropped empty string.
 	// NOTE: Empty string must always be last!
-	""
 };
 
 #if defined( OSX )
@@ -438,7 +437,8 @@ static void ReadMaterialSystemConfigFromRegistry( MaterialSystem_Config_t &confi
 	const char *szMonitorGamma = ReadVideoConfigString( "ScreenMonitorGamma", "2.2" );
 	if ( szMonitorGamma && szMonitorGamma[0] )
 	{
-		float flMonitorGamma = atof( szMonitorGamma );
+		// dimhotepus: atof -> strtof
+		float flMonitorGamma = strtof( szMonitorGamma, nullptr );
 		// temp, to make sure people with gamma values saved in the old format don't max out
 		if (flMonitorGamma > 3.0f)
 		{
@@ -451,15 +451,15 @@ static void ReadMaterialSystemConfigFromRegistry( MaterialSystem_Config_t &confi
 		config.m_fMonitorGamma = mat_monitorgamma.GetFloat();
 	}
 
-	for ( int i = 0; s_pRegistryConVars[i][0]; ++i )
+	for ( auto *var : s_pRegistryConVars )
 	{
-		int nValue = ReadVideoConfigInt( s_pRegistryConVars[i], 0x80000000 );
-		if ( nValue == 0x80000000 )
+		int nValue = ReadVideoConfigInt( var, -1 );
+		if ( nValue == -1 )
 			continue;
 		
-		nValue = OverrideVideoConfigFromCommandLine( s_pRegistryConVars[i], nValue );
+		nValue = OverrideVideoConfigFromCommandLine( var, nValue );
 
-		ConVarRef conVar( s_pRegistryConVars[i] );
+		ConVarRef conVar( var );
 		if ( conVar.IsValid() )
 		{
 			conVar.SetValue( nValue );
@@ -549,13 +549,13 @@ static void WriteMaterialSystemConfigToRegistry( const MaterialSystem_Config_t &
 	// Registry only stores ints, so divide/multiply by 100 when reading/writing.
 	WriteVideoConfigString( "ScreenMonitorGamma", mat_monitorgamma.GetString() );
 
-	for ( int i = 0; s_pRegistryConVars[i][0]; ++i )
+	for ( auto *var : s_pRegistryConVars )
 	{
-		ConVarRef conVar( s_pRegistryConVars[i] );
+		ConVarRef conVar( var );
 		if ( !conVar.IsValid() )
 			continue;
 
-		WriteVideoConfigInt( s_pRegistryConVars[i], conVar.GetInt() );
+		WriteVideoConfigInt( var, conVar.GetInt() );
 	}
 #endif
 }
@@ -1160,8 +1160,7 @@ void InitWellKnownRenderTargets( void )
 	// Begin block in which all render targets should be allocated
 	materials->BeginRenderTargetAllocation();
 
-	// JasonM - 
-	// Do we put logic in here to determine which of these to create, based upon DX level, HDR enable etc?
+	// TODO: JasonM - Do we put logic in here to determine which of these to create, based upon DX level, HDR enable etc?
 	// YES! DX Level should gate these
 
 	// before we create anything, see if VR mode wants to override the "framebuffer" size
@@ -2003,7 +2002,7 @@ int FindOrAddMesh( IMaterial *pMaterial, int vertexCount )
 		return i;
 	}
 
-	int index = g_Meshes.AddToTail();
+	intp index = g_Meshes.AddToTail();
 	g_Meshes[index].vertCount = vertexCount;
 	g_Meshes[index].vertexFormat = format;
 	g_Meshes[index].pMaterial = pMaterial;

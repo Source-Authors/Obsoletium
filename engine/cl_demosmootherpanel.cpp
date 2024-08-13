@@ -1894,7 +1894,7 @@ void CDemoSmootherPanel::SetLastFrame( bool jumptotarget, int frame )
 // Undo/Redo
 void CDemoSmootherPanel::Undo( void )
 {
-	if ( m_UndoStack.Size() > 0 && m_nUndoLevel > 0 )
+	if ( m_UndoStack.Count() > 0 && m_nUndoLevel > 0 )
 	{
 		m_nUndoLevel--;
 		DemoSmoothUndo *u = m_UndoStack[ m_nUndoLevel ];
@@ -1907,7 +1907,7 @@ void CDemoSmootherPanel::Undo( void )
 
 void CDemoSmootherPanel::Redo( void )
 {
-	if ( m_UndoStack.Size() > 0 && m_nUndoLevel <= m_UndoStack.Size() - 1 )
+	if ( m_UndoStack.Count() > 0 && m_nUndoLevel <= m_UndoStack.Count() - 1 )
 	{
 		DemoSmoothUndo *u = m_UndoStack[ m_nUndoLevel ];
 		Assert( u->redo );
@@ -1952,7 +1952,7 @@ void CDemoSmootherPanel::PushRedo( const char *description )
 
 void CDemoSmootherPanel::WipeUndo( void )
 {
-	while ( m_UndoStack.Size() > 0 )
+	while ( m_UndoStack.Count() > 0 )
 	{
 		DemoSmoothUndo *u = m_UndoStack[ 0 ];
 		delete u->undo;
@@ -1968,7 +1968,7 @@ void CDemoSmootherPanel::WipeUndo( void )
 void CDemoSmootherPanel::WipeRedo( void )
 {
 	// Wipe everything above level
-	while ( m_UndoStack.Size() > m_nUndoLevel )
+	while ( m_UndoStack.Count() > m_nUndoLevel )
 	{
 		DemoSmoothUndo *u = m_UndoStack[ m_nUndoLevel ];
 		delete u->undo;
@@ -2000,7 +2000,7 @@ const char *CDemoSmootherPanel::GetUndoDescription( void )
 //-----------------------------------------------------------------------------
 const char *CDemoSmootherPanel::GetRedoDescription( void )
 {
-	if ( m_nUndoLevel != m_UndoStack.Size() )
+	if ( m_nUndoLevel != m_UndoStack.Count() )
 	{
 		DemoSmoothUndo *u = m_UndoStack[ m_nUndoLevel ];
 		return u->rdescription;
@@ -2603,7 +2603,7 @@ void CDemoSmootherPanel::ParseSmoothingInfo( CDemoFile &demoFile, CSmoothingCont
 		smoothing_entry.targetpoint = false;
 		smoothing_entry.vectarget = info.GetViewOrigin();
 
-		int sampleIndex = smoothing.smooth.AddToTail( smoothing_entry );
+		auto sampleIndex = smoothing.smooth.AddToTail(smoothing_entry);
 
 		if ( !foundFirstSelectable && 
 			smoothing_entry.vecmoved.LengthSqr() > 0.0f )

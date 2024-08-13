@@ -80,7 +80,7 @@ public:
 	CClientFrame	*m_pNewClientFrame; // not NULL if we just got a packet with a new entity frame
 	CClientFrame	*m_pCurrentClientFrame; // NULL or pointer to last entity frame
 	bool			m_bSaveMemory; //compress data as much as possible to keep whole demos in memory
-	float			m_fNextSendUpdateTime;
+	double			m_fNextSendUpdateTime;
 	CHLTVServer		*m_pHLTV;	// HLTV server this client state belongs too.
 };
 

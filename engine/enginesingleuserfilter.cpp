@@ -45,7 +45,7 @@ void CEngineRecipientFilter::MakeInitMessage( void )
 
 int CEngineRecipientFilter::GetRecipientCount( void ) const
 {
-	return m_Recipients.Size();
+	return m_Recipients.Count();
 }
 
 int	CEngineRecipientFilter::GetRecipientIndex( int slot ) const

@@ -25,11 +25,8 @@
 
 #define MINIMUM_WIN_MEMORY			0x03000000	// FIXME: copy from sys_dll.cpp, find a common header at some point
 
-#ifdef _X360
-#define HUNK_USE_16MB_PAGE
-#endif
-
 CMemoryStack g_HunkMemoryStack;
+
 #ifdef HUNK_USE_16MB_PAGE
 CMemoryStack g_HunkOverflow;
 static bool g_bWarnedOverflow;
@@ -50,7 +47,7 @@ static int GetTargetCacheSize()
 Hunk_AllocName
 ===================
 */
-void *Hunk_AllocName (int size, const char *name, bool bClear)
+void *Hunk_AllocName (unsigned size, const char *name, bool bClear)
 {
 	MEM_ALLOC_CREDIT();
 	void * p = g_HunkMemoryStack.Alloc( size, bClear );
@@ -76,13 +73,13 @@ void *Hunk_AllocName (int size, const char *name, bool bClear)
 Hunk_Alloc
 ===================
 */
-void *Hunk_Alloc(int size, bool bClear )
+void *Hunk_Alloc(unsigned size, bool bClear )
 {
 	MEM_ALLOC_CREDIT();
 	return Hunk_AllocName( size, NULL, bClear );
 }
 
-int	Hunk_LowMark(void)
+int	Hunk_LowMark()
 {
 	return (int)( g_HunkMemoryStack.GetCurrentAllocPoint() );
 }
@@ -118,7 +115,7 @@ int Hunk_Size()
 void Hunk_Print()
 {
 #ifdef HUNK_USE_16MB_PAGE
-	Msg( "Total used memory:      %d (%d/%d)\n", Hunk_Size(), g_HunkMemoryStack.GetUsed(), g_HunkOverflow.GetUsed() );
+	Msg( "Total used memory:      %d (%zd/%zd)\n", Hunk_Size(), g_HunkMemoryStack.GetUsed(), g_HunkOverflow.GetUsed() );
 	Msg( "Total committed memory: %d (%d/%d)\n", Hunk_MallocSize(), g_HunkMemoryStack.GetSize(), g_HunkOverflow.GetSize() );
 #else
 	Msg( "Total used memory:      %d\n", Hunk_Size() );
@@ -130,38 +127,48 @@ void Hunk_Print()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void Memory_Init( void )
+void Memory_Init()
 {
     MEM_ALLOC_CREDIT();
+
 #if defined(_X360) || defined(HUNK_USE_16MB_PAGE)
-	int nMaxBytes = 48 * 1024 * 1024;
+    unsigned nMaxBytes = 48 * 1024 * 1024;
 #else
 	// dimhotepus: With r_hunkalloclightmaps 1 (default), the hunk is not large
 	// enough to alloc some lightmaps, and the game crashes with a hunk overflow
 	// error.
 	// We can do a modest bump up (48->64MB) to increase memory available to the hunk
 	// this was also done in CS:GO for 32 bit clients (64 bit got a bump to 128MB).
-    int nMaxBytes = 64 * 1024 * 1024;
+#ifdef PLATFORM_64BITS
+    unsigned nMaxBytes = 128 * 1024 * 1024;
+#else
+    unsigned nMaxBytes = 64 * 1024 * 1024;
 #endif
-	const int nMinCommitBytes = 0x8000;
+#endif
+
+	constexpr unsigned nMinCommitBytes = 0x8000;
+
 #ifndef HUNK_USE_16MB_PAGE
-	const int nInitialCommit = 0x280000;
+	constexpr unsigned nInitialCommit = 0x280000;
+
 	while ( !g_HunkMemoryStack.Init( nMaxBytes, nMinCommitBytes, nInitialCommit ) )	 
 	{
-		Warning( "Unable to allocate %d MiB of memory, trying %d MiB instead\n", nMaxBytes, nMaxBytes/2 );
+		Warning( "Unable to allocate %u MiB of memory, trying %u MiB instead\n", nMaxBytes, nMaxBytes/2 );
+
 		nMaxBytes /= 2;
+
 		if ( nMaxBytes < MINIMUM_WIN_MEMORY )
 		{
-			Error( "Failed to allocate minimum memory requirement for game (%d MiB)\n", MINIMUM_WIN_MEMORY/(1024*1024));
+			Error( "Failed to allocate minimum memory requirement for game (%u MiB)\n", MINIMUM_WIN_MEMORY/(1024*1024));
 		}
 	}
 #else
 	if ( !g_HunkMemoryStack.InitPhysical( 16*1024*1024 ) || !g_HunkOverflow.Init( nMaxBytes - 16*1024*1024, nMinCommitBytes ) )
 	{
-		Error( "Failed to allocate minimum memory requirement for game (%d MiB)\n", nMaxBytes );
+		Error( "Failed to allocate minimum memory requirement for game (%u MiB)\n", nMaxBytes );
 	}
-
 #endif
+
 	g_pDataCache->SetSize( GetTargetCacheSize() );
 }
 
@@ -169,7 +176,7 @@ void Memory_Init( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void Memory_Shutdown( void )
+void Memory_Shutdown()
 {
 	g_HunkMemoryStack.FreeAll();
 

@@ -147,7 +147,7 @@ public:
 	virtual const Frustum_t &GetFlashlightFrustum( ShadowHandle_t handle );
 	virtual const FlashlightState_t &GetFlashlightState( ShadowHandle_t handle );
 	virtual int ProjectAndClipVertices( ShadowHandle_t handle, int count, 
-		Vector** ppPosition, ShadowVertex_t*** ppOutVertex );
+		Vector** ppPosition, ShadowVertex_t* RESTRICT ** ppOutVertex );
 	virtual void AddShadowToBrushModel( ShadowHandle_t handle, model_t* pModel, 	
 										const Vector& origin, const QAngle& angles );
 	virtual void RemoveAllShadowsFromBrushModel( model_t* pModel );
@@ -166,7 +166,7 @@ public:
 	virtual unsigned short InvalidShadowIndex( );
 
 	// Methods of ISpatialLeafEnumerator
-	virtual bool EnumerateLeaf( int leaf, int context );
+	virtual bool EnumerateLeaf( int leaf, intp context );
 
 	// Sets the texture coordinate range for a shadow...
 	virtual void SetShadowTexCoord( ShadowHandle_t handle, float x, float y, float w, float h );
@@ -355,7 +355,7 @@ private:
 
 	// Actually projects + clips vertices
 	int ProjectAndClipVertices( const Shadow_t& shadow, const VMatrix& worldToShadow, 
-		const VMatrix *pWorldToModel, int count, Vector** ppPosition, ShadowVertex_t*** ppOutVertex );
+		const VMatrix *pWorldToModel, int count, Vector** ppPosition, ShadowVertex_t* RESTRICT ** ppOutVertex );
 
 	// These functions hook/unhook shadows up to surfaces + vice versa
 	void AddSurfaceToShadow( ShadowHandle_t handle, SurfaceHandle_t surfID );
@@ -624,7 +624,7 @@ void CShadowMgr::SetMaterial( Shadow_t& shadow, IMaterial* pMaterial, IMaterial*
 	m_SortOrderIds[shadow.m_SortOrder].m_RefCount = 1;
 
 	// Make sure the render queue has as many entries as the max sort order id.
-	int count = m_RenderQueue.Count();
+	intp count = m_RenderQueue.Count();
 	while( count < m_SortOrderIds.MaxElementIndex() )
 	{
 		MEM_ALLOC_CREDIT();
@@ -897,9 +897,10 @@ void CShadowMgr::RemoveDecalFromShadowList( ShadowHandle_t handle, ShadowDecalHa
 	ShadowSurfaceIndex_t idx = m_ShadowDecals[decalHandle].m_ShadowListIndex;
 
 	// Make sure the list of shadow decals for a single shadow is ok
-	if ( m_Shadows[handle].m_FirstDecal == idx )
+	ShadowSurfaceIndex_t &decal = m_Shadows[handle].m_FirstDecal;
+	if ( decal == idx )
 	{
-		m_Shadows[handle].m_FirstDecal = m_ShadowSurfaces.Next(idx);
+		decal = m_ShadowSurfaces.Next(idx);
 	}
 
 	// Remove it from the shadow surfaces list
@@ -964,7 +965,7 @@ const CShadowMgr::SurfaceBounds_t* CShadowMgr::GetSurfaceBounds( SurfaceHandle_t
 	if ( m_pSurfaceBounds[nSurfaceIndex] != m_SurfaceBoundsCache.InvalidIndex() )
 		return &m_SurfaceBoundsCache[ m_pSurfaceBounds[nSurfaceIndex] ];
 
-	SurfaceBoundsCacheIndex_t nIndex;
+	int nIndex;
 	if ( m_SurfaceBoundsCache.Count() >= SURFACE_BOUNDS_CACHE_COUNT )
 	{
 		// Retire existing cache entry if we're out of space,
@@ -1536,7 +1537,7 @@ void CShadowMgr::ProjectShadow( ShadowHandle_t handle, const Vector &origin,
 	for ( int i  = 0; i < nLeafCount; ++i )
 	{
 		// NOTE: Scope specifier eliminates virtual function call
-		CShadowMgr::EnumerateLeaf( pLeafList[i], (int)&build );
+		CShadowMgr::EnumerateLeaf( pLeafList[i], (intp)&build );
 	}
 }
 
@@ -1650,7 +1651,7 @@ void CShadowMgr::ProjectFlashlight( ShadowHandle_t handle, const VMatrix& worldT
 	for ( int i = 0; i < nLeafCount; ++i )
 	{
 		// NOTE: Scope specifier eliminates virtual function call
-		CShadowMgr::EnumerateLeaf( pLeafList[i], (int)&build );
+		CShadowMgr::EnumerateLeaf( pLeafList[i], (intp)&build );
 	}
 }
 
@@ -1809,7 +1810,7 @@ void CShadowMgr::ApplyShadowToLeaf( const Shadow_t &shadow, mleaf_t* RESTRICT pL
 //-----------------------------------------------------------------------------
 // Applies a projected texture to all surfaces in the leaf
 //-----------------------------------------------------------------------------
-bool CShadowMgr::EnumerateLeaf( int leaf, int context )
+bool CShadowMgr::EnumerateLeaf( int leaf, intp context )
 {
 	VPROF( "CShadowMgr::EnumerateLeaf" );
 	ShadowBuildInfo_t* pBuild = (ShadowBuildInfo_t*)context;
@@ -2133,8 +2134,8 @@ static void ShadowClip( ShadowClipState_t& clip, Clipper& clipper )
 
 	// Ye Olde Sutherland-Hodgman clipping algorithm
 	int numOutVerts = 0;
-	ShadowVertex_t** pSrcVert = clip.m_ppClipVertices[clip.m_CurrVert];
-	ShadowVertex_t** pDestVert = clip.m_ppClipVertices[!clip.m_CurrVert];
+	ShadowVertex_t* RESTRICT * pSrcVert = clip.m_ppClipVertices[clip.m_CurrVert];
+	ShadowVertex_t* RESTRICT * pDestVert = clip.m_ppClipVertices[!clip.m_CurrVert];
 
 	int numVerts = clip.m_ClipCount;
 	ShadowVertex_t* pStart = pSrcVert[numVerts-1];
@@ -2225,7 +2226,7 @@ bool CShadowMgr::ProjectVerticesIntoShadowSpace( const VMatrix& modelToShadow,
 // Projects + clips shadows
 //-----------------------------------------------------------------------------
 int CShadowMgr::ProjectAndClipVertices( const Shadow_t& shadow, const VMatrix& worldToShadow,
-	const VMatrix *pWorldToModel, int count, Vector** ppPosition, ShadowVertex_t*** ppOutVertex )
+	const VMatrix *pWorldToModel, int count, Vector** ppPosition, ShadowVertex_t* RESTRICT ** ppOutVertex )
 {
 	VPROF( "ProjectAndClipVertices" );
 	static ShadowClipState_t clip;
@@ -2279,7 +2280,7 @@ int CShadowMgr::ProjectAndClipVertices( const Shadow_t& shadow, const VMatrix& w
 // Accessor for use by the displacements
 //-----------------------------------------------------------------------------
 int CShadowMgr::ProjectAndClipVertices( ShadowHandle_t handle, int count, 
-	Vector** ppPosition, ShadowVertex_t*** ppOutVertex )
+	Vector** ppPosition, ShadowVertex_t* RESTRICT ** ppOutVertex )
 {
 	return ProjectAndClipVertices( m_Shadows[handle], 
 		m_Shadows[handle].m_WorldToShadow, NULL, count, ppPosition, ppOutVertex );
@@ -2339,7 +2340,7 @@ bool CShadowMgr::ComputeShadowVertices( ShadowDecal_t& decal,
 	// Create vertices to clip to...
 	ShadowVertex_t** ppSrcVert;
 	int clipCount = ProjectAndClipVertices( m_Shadows[decal.m_Shadow], *pModelToShadow, pWorldToModel, 
-		MSurf_VertCount( decal.m_SurfID ), ppVec, &ppSrcVert );
+		MSurf_VertCount( decal.m_SurfID ), ppVec, (ShadowVertex_t* RESTRICT **)&ppSrcVert );
 	if (clipCount == 0)
 	{
 		pVertexCache->m_Count = 0;
@@ -2448,7 +2449,7 @@ inline bool CShadowMgr::GenerateNormalShadowRenderInfo( IMatRenderContext *pRend
 		}
 		else
 		{
-			int i = m_TempVertexCache.AddToTail();
+			intp i = m_TempVertexCache.AddToTail();
 			info.m_pCache[info.m_Count] = -i-1;
 			pVertexCache = &m_TempVertexCache[i];
 			Assert( info.m_pCache[info.m_Count] < 0 );
@@ -2946,10 +2947,10 @@ void ConstructNearAndFarPolygons( Vector *pVecNearPlane, Vector *pVecFarPlane, f
 	float fovY = CalcFovY( view.fov, view.m_flAspectRatio );
 
 	// Compute near and far plane half-width and half-height
-	float flTanHalfAngleRadians = tanf( view.fov * ( 0.5f * M_PI_F / 180.0f ) );
+	float flTanHalfAngleRadians = tanf( DEG2RAD( view.fov * 0.5f ) );
 	float flHalfNearWidth = flTanHalfAngleRadians * ( view.zNear + flPlaneEpsilon );
 	float flHalfFarWidth  = flTanHalfAngleRadians * ( view.zFar  - flPlaneEpsilon );
-	flTanHalfAngleRadians = tanf( fovY * ( 0.5f * M_PI_F / 180.0f ) );
+	flTanHalfAngleRadians = tanf( DEG2RAD( fovY * 0.5f ) );
 	float flHalfNearHeight = flTanHalfAngleRadians * ( view.zNear + flPlaneEpsilon );
 	float flHalfFarHeight  = flTanHalfAngleRadians * ( view.zFar  - flPlaneEpsilon );
 
@@ -2964,15 +2965,21 @@ void ConstructNearAndFarPolygons( Vector *pVecNearPlane, Vector *pVecFarPlane, f
 	Vector vCenterNear = view.origin + vForward * ( view.zNear + flPlaneEpsilon );
 	Vector vCenterFar  = view.origin + vForward * ( view.zFar  - flPlaneEpsilon );
 
-	pVecNearPlane[0] = vCenterNear - ( vRight * flHalfNearWidth ) - ( vUp * flHalfNearHeight );
-	pVecNearPlane[1] = vCenterNear - ( vRight * flHalfNearWidth ) + ( vUp * flHalfNearHeight );
-	pVecNearPlane[2] = vCenterNear + ( vRight * flHalfNearWidth ) + ( vUp * flHalfNearHeight );
-	pVecNearPlane[3] = vCenterNear + ( vRight * flHalfNearWidth ) - ( vUp * flHalfNearHeight );
+	Vector vRightHalfNearWidth = vRight * flHalfNearWidth;
+	Vector vUpHalfNearHeight = vUp * flHalfNearHeight;
 
-	pVecFarPlane[0]  = vCenterNear - ( vRight * flHalfFarWidth )  - ( vUp * flHalfFarHeight );
-	pVecFarPlane[1]  = vCenterNear + ( vRight * flHalfFarWidth )  - ( vUp * flHalfFarHeight );
-	pVecFarPlane[2]  = vCenterNear + ( vRight * flHalfFarWidth )  + ( vUp * flHalfFarHeight );
-	pVecFarPlane[3]  = vCenterNear - ( vRight * flHalfFarWidth )  + ( vUp * flHalfFarHeight );
+	pVecNearPlane[0] = vCenterNear - ( vRightHalfNearWidth ) - ( vUpHalfNearHeight );
+	pVecNearPlane[1] = vCenterNear - ( vRightHalfNearWidth ) + ( vUpHalfNearHeight );
+	pVecNearPlane[2] = vCenterNear + ( vRightHalfNearWidth ) + ( vUpHalfNearHeight );
+	pVecNearPlane[3] = vCenterNear + ( vRightHalfNearWidth ) - ( vUpHalfNearHeight );
+
+	Vector vRightHalfFarWidth = vRight * flHalfFarWidth;
+	Vector vUpHalfFarHeight = vUp * flHalfFarHeight;
+
+	pVecFarPlane[0]  = vCenterNear - ( vRightHalfFarWidth )  - ( vUpHalfFarHeight );
+	pVecFarPlane[1]  = vCenterNear + ( vRightHalfFarWidth )  - ( vUpHalfFarHeight );
+	pVecFarPlane[2]  = vCenterNear + ( vRightHalfFarWidth )  + ( vUpHalfFarHeight );
+	pVecFarPlane[3]  = vCenterNear - ( vRightHalfFarWidth )  + ( vUpHalfFarHeight );
 }
 
 void DrawDebugPolygon( int nNumVerts, Vector *pVecPoints, bool bFrontFacing, bool bNearPlane )

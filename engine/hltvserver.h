@@ -150,9 +150,9 @@ public: // IDemoPlayer interface
 	void	SetPlaybackTimeScale( float timescale ); // sets playback timescale
 	float	GetPlaybackTimeScale( void ); // get playback timescale
 
-	void	PausePlayback( float seconds ) {}
-	void	SkipToTick( int tick, bool bRelative, bool bPause ) {}
-	void	SetEndTick( int tick) {}
+	void	PausePlayback( float ) {}
+	void	SkipToTick( int, bool, bool ) {}
+	void	SetEndTick( int ) {}
 	void	ResumePlayback( void ) {}
 	void	StopPlayback( void ) {}
 	void	InterpolateViewpoint() {}
@@ -164,7 +164,7 @@ public: // IDemoPlayer interface
 	bool	ShouldLoopDemos() { return true; }
 	void	OnLastDemoInLoopPlayed() {}
 
-	bool	IsLoading( void ) { return false; } // true if demo is currently loading
+	bool	IsLoading( void ) const { return false; } // true if demo is currently loading
 
 public:
 	void	StartMaster(CGameClient *client); // start HLTV server as master proxy
@@ -228,10 +228,10 @@ public:
 	CHLTVFrame		m_HLTVFrame;	// all incoming messages go here until Snapshot is made
 
 	bool			m_bSignonState;	// true if connecting to server
-	float			m_flStartTime;
+	double			m_flStartTime;
 	float			m_flFPS;		// FPS the proxy is running;
 	int				m_nGameServerMaxClients; // max clients on game server
-	float			m_fNextSendUpdateTime;	// time to send next HLTV status messages 
+	double			m_fNextSendUpdateTime;	// time to send next HLTV status messages 
 	RecvTable		*m_pRecvTables[MAX_DATATABLES];
 	int				m_nRecvTables;
 	Vector			m_vPVSOrigin; 

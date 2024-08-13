@@ -39,13 +39,13 @@ private:
 	const char *GetDemoFilename();
 
 public:
-	void	SetSignonState( int state ) {}
+	void	SetSignonState( int ) {}
 	bool	IsRecording();
 	void	PauseRecording() {}
 	void	ResumeRecording() {}
 
 	void	RecordCommand( const char *cmdstring );
-	void	RecordUserInput( int cmdnumber ) {} ;  // not need by Replay recorder
+	void	RecordUserInput( int ) {} ;  // not need by Replay recorder
 	void	RecordMessages( bf_read &data, int bits );
 	void	RecordPacket(); 
 	void	RecordServerClasses( ServerClass *pClasses );

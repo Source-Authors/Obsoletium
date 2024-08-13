@@ -242,7 +242,6 @@ private:
 	friend void Host_Speeds();
 	void ComputeFrameVariability();
 
-	double time_base;
 	double times[9];
 	double swaptime;
 	double frametime;
@@ -251,7 +250,7 @@ private:
 	double starttime[NUM_FRAME_SEGMENTS];
 	double deltas[NUM_FRAME_SEGMENTS];
 
-	float m_pFrameTimeHistory[FRAME_HISTORY_COUNT];
+	double m_pFrameTimeHistory[FRAME_HISTORY_COUNT];
 	int m_nFrameTimeHistoryIndex;
 };
 
@@ -614,9 +613,9 @@ CON_COMMAND( host_timer_report, "Spew CPU timer jitter for the last 128 frames i
 {
 	if ( sv.IsDedicated() )
 	{
-		for (int i = 1; i <= ARRAYSIZE( host_jitterhistory ); ++i)
+		for (size_t i = 1; i <= std::size( host_jitterhistory ); ++i)
 		{
-			unsigned int slot = ( i + host_jitterhistorypos ) % ARRAYSIZE( host_jitterhistory );
+			size_t slot = ( i + host_jitterhistorypos ) % std::size( host_jitterhistory );
 			Msg( "%1.3fms\n", host_jitterhistory[ slot ] * 1000 );
 		}
 	}
@@ -845,7 +844,7 @@ void Host_AbortServer()
 Host_EndGame
 ================
 */
-void Host_EndGame (bool bShowMainMenu, const char *message, ...)
+void Host_EndGame (bool bShowMainMenu, PRINTF_FORMAT_STRING const char *message, ...) FMTFUNCTION( 2, 3 )
 {
 	int oldn;
 	va_list		argptr;
@@ -901,7 +900,7 @@ Host_Error
 This shuts down both the client and server
 ================
 */
-void Host_Error (const char *error, ...)
+void Host_Error ( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2 )
 {
 	va_list		argptr;
 	char		string[1024];
@@ -1068,7 +1067,7 @@ void SetupNewBindings()
 		{
 			// Don't consider numpad, windows keys, etc
 			bool bFoundInvalidKey = false;
-			for ( int iKeyIndex = 0; iKeyIndex < sizeof( nInvalidKeyBindings )/sizeof( nInvalidKeyBindings[0] ); iKeyIndex++ )
+			for ( size_t iKeyIndex = 0; iKeyIndex < std::size( nInvalidKeyBindings ); iKeyIndex++ )
 			{
 				if ( nCurButton == (int)nInvalidKeyBindings[iKeyIndex] )
 				{
@@ -1249,7 +1248,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 
 	// Generate a new .cfg file.
 	char		szFileName[MAX_PATH];
-	CUtlBuffer	configBuff( 0, 0, CUtlBuffer::TEXT_BUFFER);
+	CUtlBuffer	configBuff( (intp)0, 0, CUtlBuffer::TEXT_BUFFER);
 
 	Q_snprintf( szFileName, sizeof(szFileName), "cfg/%s", filename );
 	g_pFileSystem->CreateDirHierarchy( "cfg", "MOD" );
@@ -1745,17 +1744,7 @@ CON_COMMAND( host_writeconfig, "Store current settings to config.cfg (or specifi
 //-----------------------------------------------------------------------------
 void Host_ReadPreStartupConfiguration()
 {
-	FileHandle_t f = NULL;
-	if ( IsX360() )
-	{
-		// 360 config is less restrictive and can be anywhere in the game path
-		f = g_pFileSystem->Open( "//game/cfg/config.360.cfg", "rt" );
-	}
-	else
-	{
-		f = g_pFileSystem->Open( "//mod/cfg/config.cfg", "rt" );
-	}
-
+	FileHandle_t f = g_pFileSystem->Open( "//mod/cfg/config.cfg", "rt" );
 	if ( !f )
 		return;
 
@@ -2379,14 +2368,14 @@ void CFrameTimer::ComputeFrameVariability()
 	// Count the number of samples that live within the last half-second
 	int i = m_nFrameTimeHistoryIndex;
 	int nMaxSamples = 0;
-	float flTotalTime = 0.0f;
+	double flTotalTime = 0.0;
 	while( (nMaxSamples < FRAME_HISTORY_COUNT) && (flTotalTime <= FRAME_TIME_FILTER_TIME) )
 	{
 		if ( --i < 0 )
 		{
 			i = FRAME_HISTORY_COUNT - 1;
 		}		
-		if ( m_pFrameTimeHistory[i] == 0.0f )
+		if ( m_pFrameTimeHistory[i] == 0.0 )
 			break;
 
 		flTotalTime += m_pFrameTimeHistory[i];
@@ -2395,16 +2384,16 @@ void CFrameTimer::ComputeFrameVariability()
 
 	if ( nMaxSamples == 0 )
 	{
-		m_flFPSVariability = 0.0f;
-		m_flFPSStdDeviationSeconds = 0.0f;
+		m_flFPSVariability = 0.0;
+		m_flFPSStdDeviationSeconds = 0.0;
 		return;
 	}
 
-	float flExponent = -2.0f / (int)nMaxSamples;
+	double flExponent = -2.0 / (int)nMaxSamples;
 
 	i = m_nFrameTimeHistoryIndex;
-	float flAverageTime = 0.0f;
-	float flExpCurveArea = 0.0f;
+	double flAverageTime = 0.0;
+	double flExpCurveArea = 0.0;
 	int n = 0;
 	while( n < nMaxSamples )
 	{
@@ -2412,41 +2401,39 @@ void CFrameTimer::ComputeFrameVariability()
 		{
 			i = FRAME_HISTORY_COUNT - 1;
 		}
-		flExpCurveArea += expf( flExponent * n );
-		flAverageTime += m_pFrameTimeHistory[i] * expf( flExponent * n );
+		flExpCurveArea += exp( flExponent * n );
+		flAverageTime += m_pFrameTimeHistory[i] * exp( flExponent * n );
 		++n;
 	}
 
 	flAverageTime /= flExpCurveArea;
 
-	float flAveFPS = 0.0f;
-	if ( flAverageTime != 0.0f )
+	double flAveFPS = 0.0;
+	if ( flAverageTime != 0.0 )
 	{
-		flAveFPS = 1.0f / flAverageTime;
+		flAveFPS = 1.0 / flAverageTime;
 	}
 
-	float flCurrentFPS = 0.0f;
+	double flCurrentFPS = 0.0;
 	if ( frametime != 0.0 )
 	{
-		flCurrentFPS = 1.0f / frametime;
+		flCurrentFPS = 1.0 / frametime;
 	}
 
 	// Now subtract out the current fps to get variability in FPS
-	m_flFPSVariability = fabsf( flCurrentFPS - flAveFPS );
+	m_flFPSVariability = fabs( flCurrentFPS - flAveFPS );
 
 	// Now compute variance/stddeviation
-	double sum = 0.0f;
-	int count =0;
-	for ( int j = 0; j < FRAME_HISTORY_COUNT; ++j )
+	double sum = 0.0;
+	int count = 0;
+	for ( double ft : m_pFrameTimeHistory )
 	{
-		if ( m_pFrameTimeHistory[ j ] == 0.0f )
+		if ( ft == 0.0 )
 			continue;
 
-		double ft = min( (double)m_pFrameTimeHistory[ j ], 0.25 );
+		sum += min( ft, 0.25 );
 
-		sum += ft;
 		++count;
-
 	}
 
 	if ( count <= 1 )
@@ -2455,14 +2442,13 @@ void CFrameTimer::ComputeFrameVariability()
 	}
 
 	double avg = sum / (double)count;
-	double devSquared = 0.0f;
-	for ( int j = 0; j < FRAME_HISTORY_COUNT; ++j )
+	double devSquared = 0.0;
+	for ( double ftt : m_pFrameTimeHistory )
 	{
-		if ( m_pFrameTimeHistory[ j ] == 0.0f )
+		if ( ftt == 0.0 )
 			continue;
 
-		double ft = min( (double)m_pFrameTimeHistory[ j ], 0.25 );
-
+		double ft = min( ftt, 0.25 );
 		double dt = ft - avg;
 
 		devSquared += ( dt * dt );
@@ -2990,7 +2976,7 @@ void Host_ShowIPCCallCount()
 	if ( host_ShowIPCCallCount.GetInt() == 0 )
 		return;
 	
-	static float s_flLastTime = 0;
+	static double s_flLastTime = 0;
 	static int s_nLastTick = host_tickcount;
 	static int s_nLastFrame = host_framecount;
 	
@@ -4048,17 +4034,6 @@ void Host_Init( bool bDedicated )
 	}
 
 	ThreadPoolStartParams_t startParams;
-	if ( IsX360() )
-	{
-		// 360 overrides defaults, 2 computation threads distributed to core 1 and 2
-		startParams.nThreads = 2;
-		startParams.nStackSize = 256*1024;
-		startParams.fDistribute = TRS_TRUE;
-		startParams.bUseAffinityTable = true;
-		startParams.iAffinityTable[0] = XBOX_PROCESSOR_2;
-		startParams.iAffinityTable[1] = XBOX_PROCESSOR_4;
-		ThreadSetAffinity( NULL, 1 );
-	}
 	if ( g_pThreadPool )
 		g_pThreadPool->Start( startParams, "CmpJob" );
 
@@ -4304,61 +4279,6 @@ void Host_Init( bool bDedicated )
 //-----------------------------------------------------------------------------
 void AddTransitionResources( CSaveRestoreData *pSaveData, const char *pLevelName, const char *pLandmarkName )
 {
-	if ( !IsX360() || ( g_pFileSystem->GetDVDMode() != DVDMODE_STRICT ) )
-	{
-		return;
-	}
-
-	// get the bit marked for the next level
-	int transitionMask = 0;
-	for ( int i = 0; i < pSaveData->levelInfo.connectionCount; i++ )
-	{
-		if ( !Q_stricmp( pLevelName, pSaveData->levelInfo.levelList[i].mapName ) && !Q_stricmp( pLandmarkName, pSaveData->levelInfo.levelList[i].landmarkName ) )
-		{
-			transitionMask = 1<<i;
-			break;
-		}
-	}
-	
-	if ( !transitionMask )
-	{
-		// nothing to do
-		return;
-	}
-
-	const char *pModelName;
-	bool bHasHumans = false;
-	for ( int i = 0; i < pSaveData->NumEntities(); i++ )
-	{
-		if ( pSaveData->GetEntityInfo(i)->flags & transitionMask )
-		{
-			// this entity will cross the transition and needs to be preserved
-			// add to the next map's resource list which effectively keeps it from being purged
-			// only care about the actual mdl and not any of its dependants
-			pModelName = pSaveData->GetEntityInfo(i)->modelname.ToCStr();
-			g_pQueuedLoader->AddMapResource( pModelName );
-
-			// humans require a post pass
-			if ( !bHasHumans && V_stristr( pModelName, "models/humans" ) )
-			{
-				bHasHumans = true;
-			}
-		}
-	}
-
-	if ( bHasHumans )
-	{
-		// the presence of any human entity in the transition needs to ensure all the human mdls stay
-		int count = modelloader->GetCount();
-		for ( int i = 0; i < count; i++ )
-		{
-			pModelName = modelloader->GetName( modelloader->GetModelForIndex( i ) );
-			if ( V_stristr( pModelName, "models/humans" ) )
-			{
-				g_pQueuedLoader->AddMapResource( pModelName );
-			}
-		}
-	}
 }
 
 bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *start )
@@ -4456,9 +4376,6 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 	CheckForFlushMemory( sv.GetMapName(), szMapName );
 
 #if !defined( SWDS )
-	// Always save as an xsave if we're on the X360
-	saverestore->SetIsXSave( IsX360() );
-
 	// Add on time passed since the last time we kept track till this transition
 	int iAdditionalSeconds = g_ServerGlobalVariables.curtime - saverestore->GetMostRecentElapsedTimeSet();
 	int iElapsedSeconds = saverestore->GetMostRecentElapsedSeconds() + iAdditionalSeconds;

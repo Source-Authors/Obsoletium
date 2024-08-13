@@ -393,15 +393,6 @@ void CHostState::State_LoadGame()
 	GameShutdown();
 	// run the server at the console
 	SetState( HS_RUN, true );
-	
-	if ( IsX360() )
-	{
-		// On the 360 we need to return to the background map
-		g_ServerGlobalVariables.bMapLoadFailed = true;
-		Cbuf_Clear();
-		Cbuf_AddText( "startupmenu force" );
-		Cbuf_Execute();
-	}
 }
 
 
@@ -524,6 +515,7 @@ void CHostState::State_Run( float frameTime )
 		SCR_BeginLoadingPlaque();
 #endif
 		// FALL THROUGH INTENTIONALLY TO SHUTDOWN
+		[[fallthrough]];
 
 	case HS_SHUTDOWN:
 	case HS_RESTART:
@@ -740,7 +732,7 @@ void CHostState::OnClientConnected()
 #ifdef VPROF_ENABLED
 		CVProfile *pProf = &g_VProfCurrentProfile;
 
-		int prefixLen = strlen( "TexGroup_Global_" );
+		intp prefixLen = ssize( "TexGroup_Global_" ) - 1;
 		float total = 0.0f;
 		for ( int i=0; i < pProf->GetNumCounters(); i++ )
 		{

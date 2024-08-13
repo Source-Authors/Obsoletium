@@ -127,7 +127,7 @@ void FileSystem_SetWhitelistSpewFlags()
 #if defined( _DEBUG )
 	if ( !g_pFileSystem )
 	{
-		Assert( !"FileSystem_InitSpewFlags - no filesystem." );
+		AssertMsg( false, "FileSystem_InitSpewFlags - no filesystem." );
 		return;
 	}
 	

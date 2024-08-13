@@ -27,8 +27,9 @@ class CAudioMixerWave8Mono : public CAudioMixerWave
 {
 public:
 	CAudioMixerWave8Mono( IWaveData *data ) : CAudioMixerWave( data ) {}
-	virtual int GetMixSampleSize() { return CalcSampleSize(8, 1); }
-	virtual void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress )
+
+	int GetMixSampleSize() override { return CalcSampleSize(8, 1); }
+	void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress ) override
 	{
 		pDevice->Mix8Mono( pChannel, (char *)pData, outputOffset, inputOffset, fracRate, outCount, timecompress );
 	}
@@ -41,8 +42,9 @@ class CAudioMixerWave8Stereo : public CAudioMixerWave
 {
 public:
 	CAudioMixerWave8Stereo( IWaveData *data ) : CAudioMixerWave( data ) {}
-	virtual int GetMixSampleSize( ) { return CalcSampleSize(8, 2); }
-	virtual void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress )
+
+	int GetMixSampleSize() override { return CalcSampleSize(8, 2); }
+	void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress ) override
 	{
 		pDevice->Mix8Stereo( pChannel, (char *)pData, outputOffset, inputOffset, fracRate, outCount, timecompress );
 	}
@@ -55,8 +57,9 @@ class CAudioMixerWave16Mono : public CAudioMixerWave
 {
 public:
 	CAudioMixerWave16Mono( IWaveData *data ) : CAudioMixerWave( data ) {}
-	virtual int GetMixSampleSize() { return CalcSampleSize(16, 1); }
-	virtual void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress )
+
+	int GetMixSampleSize() override { return CalcSampleSize(16, 1); }
+	void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress ) override
 	{
 		pDevice->Mix16Mono( pChannel, (short *)pData, outputOffset, inputOffset, fracRate, outCount, timecompress );
 	}
@@ -70,8 +73,9 @@ class CAudioMixerWave16Stereo : public CAudioMixerWave
 {
 public:
 	CAudioMixerWave16Stereo( IWaveData *data ) : CAudioMixerWave( data ) {}
-	virtual int GetMixSampleSize() { return CalcSampleSize(16, 2); }
-	virtual void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress )
+
+	int GetMixSampleSize() override { return CalcSampleSize(16, 2); }
+	void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress ) override
 	{
 		pDevice->Mix16Stereo( pChannel, (short *)pData, outputOffset, inputOffset, fracRate, outCount, timecompress );
 	}
@@ -86,7 +90,7 @@ public:
 //			bits - bits per sample
 // Output : CAudioMixer * abstract mixer type that maps mixing to appropriate code
 //-----------------------------------------------------------------------------
-CAudioMixer *CreateWaveMixer( IWaveData *data, int format, int nChannels, int bits, int initialStreamPosition )
+CAudioMixer *CreateWaveMixer( IWaveData *data, int format, int nChannels, int bits, int )
 {
 	CAudioMixer *pMixer = NULL;
 
@@ -111,12 +115,6 @@ CAudioMixer *CreateWaveMixer( IWaveData *data, int format, int nChannels, int bi
 	{
 		return CreateADPCMMixer( data );
 	}
-#if defined( _X360 )
-	else if ( format == WAVE_FORMAT_XMA )
-	{
-		return CreateXMAMixer( data, initialStreamPosition );
-	}
-#endif
 	else
 	{
 		// unsupported format or wav file missing!!!
@@ -131,6 +129,7 @@ CAudioMixer *CreateWaveMixer( IWaveData *data, int format, int nChannels, int bi
 	{
 		Assert( 0 );
 	}
+
 	return pMixer;
 }
 
@@ -141,7 +140,7 @@ CAudioMixer *CreateWaveMixer( IWaveData *data, int format, int nChannels, int bi
 //-----------------------------------------------------------------------------
 CAudioMixerWave::CAudioMixerWave( IWaveData *data ) : m_pData(data)
 {
-	CAudioSource *pSource = GetSource();
+	CAudioSource *pSource = CAudioMixerWave::GetSource();
 	if ( pSource )
 	{
 		pSource->ReferenceAdd( this );
@@ -495,7 +494,7 @@ char *CAudioMixerWave::LoadMixBuffer( channel_t *pChannel, int sample_load_reque
 	{
 		// always save last 2 samples from copy buffer to channel 
 		// (we'll need 0,1 or 2 samples as start of next buffer for interpolation)
-		Assert( sizeof( pChannel->sample_prev ) >= samplesize*2 );
+		Assert( static_cast<int>(sizeof( pChannel->sample_prev )) >= samplesize*2 );
 		pSample = pCopy - samplesize*2;
 		Q_memcpy( &(pChannel->sample_prev[0]), pSample, samplesize*2 );
 	}
@@ -673,7 +672,7 @@ int CAudioMixerWave::MixDataToDevice_( IAudioDevice *pDevice, channel_t *pChanne
 			int readBytes = sampleSize * num_zero_samples;
 
 			// make sure we don't overflow temp copy buffer (g_temppaintbuffer)
-			Assert ( (TEMP_COPY_BUFFER_SIZE * sizeof(portable_samplepair_t)) > readBytes );
+			Assert ( static_cast<int>(TEMP_COPY_BUFFER_SIZE * sizeof(portable_samplepair_t)) > readBytes );
 			pData = (char *)g_temppaintbuffer;
 
 			// Now copy in some zeroes
@@ -726,7 +725,7 @@ int CAudioMixerWave::MixDataToDevice_( IAudioDevice *pDevice, channel_t *pChanne
 			Assert( floor( sampleFraction + RoundToFixedPoint(rate, (outputSampleCount-1), bInterpolated_pitch) ) <= samples_loaded );
 
 			int saveIndex = MIX_GetCurrentPaintbufferIndex();
-			for ( int i = 0 ; i < g_paintBuffers.Count(); i++ )
+			for ( intp i = 0 ; i < g_paintBuffers.Count(); i++ )
 			{
 				if ( g_paintBuffers[i].factive )
 				{

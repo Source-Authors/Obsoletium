@@ -185,7 +185,7 @@ IServerPluginCallbacks *CPlugin::GetCallback()
 	}
 	else
 	{
-		Assert( !"Unable to get plugin callback interface" );
+		AssertMsg( false, "Unable to get plugin callback interface" );
 		Warning( "Unable to get callback interface for \"%s\"\n", GetName() );
 		return NULL;
 	}
@@ -257,8 +257,8 @@ void CServerPlugin::LoadPlugins()
 
 	Sys_FindClose();
 
-	CreateInterfaceFn gameServerFactory = Sys_GetFactory( g_GameDLL );
-	m_PluginHelperCheck = (IPluginHelpersCheck *)gameServerFactory( INTERFACEVERSION_PLUGINHELPERSCHECK, NULL );
+	CreateInterfaceFnT<IPluginHelpersCheck> gameServerFactory = Sys_GetFactory<IPluginHelpersCheck>( g_GameDLL );
+	m_PluginHelperCheck = gameServerFactory( INTERFACEVERSION_PLUGINHELPERSCHECK, nullptr );
 }
 
 //---------------------------------------------------------------------------------

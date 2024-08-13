@@ -86,34 +86,34 @@ bool CHLTVClient::ProcessClientInfo( CLC_ClientInfo *msg )
 	return true;
 }
 
-bool CHLTVClient::ProcessMove(CLC_Move *msg)
+bool CHLTVClient::ProcessMove(CLC_Move *)
 {
 	// HLTV clients can't move
 	return true;
 }
 
-bool CHLTVClient::ProcessListenEvents( CLC_ListenEvents *msg )
+bool CHLTVClient::ProcessListenEvents( CLC_ListenEvents * )
 {
 	// HLTV clients can't subscribe to events, we just send them
 	return true;
 }
 
-bool CHLTVClient::ProcessRespondCvarValue( CLC_RespondCvarValue *msg )
+bool CHLTVClient::ProcessRespondCvarValue( CLC_RespondCvarValue * )
 {
 	return true;
 }
 
-bool CHLTVClient::ProcessFileCRCCheck( CLC_FileCRCCheck *msg )
+bool CHLTVClient::ProcessFileCRCCheck( CLC_FileCRCCheck * )
 {
 	return true;
 }
 
-bool CHLTVClient::ProcessSaveReplay( CLC_SaveReplay *msg )
+bool CHLTVClient::ProcessSaveReplay( CLC_SaveReplay * )
 {
 	return true;
 }
 
-bool CHLTVClient::ProcessVoiceData(CLC_VoiceData *msg)
+bool CHLTVClient::ProcessVoiceData(CLC_VoiceData *)
 {
 	// HLTV clients can't speak
 	return true;
@@ -128,10 +128,10 @@ void CHLTVClient::ConnectionCrashed(const char *reason)
 {
 	DebuggerBreakIfDebugging_StagingOnly();
 
-	Disconnect ( (reason!=NULL)?reason:"Connection lost" );	
+	Disconnect ( (reason!=NULL)?reason:"Connection lost" );
 }
 
-void CHLTVClient::PacketStart(int incoming_sequence, int outgoing_acknowledged)
+void CHLTVClient::PacketStart(int, int)
 {
 	// During connection, only respond if client sends a packet
 	m_bReceivedPacket = true; 

@@ -43,20 +43,6 @@ IClientEntityList *entitylist = NULL;
 
 ConVar sv_debugmanualmode( "sv_debugmanualmode", "0", 0, "Make sure entities correctly report whether or not their network data has changed." );
 
-// Returns false and calls Host_Error if the edict's pvPrivateData is NULL.
-static inline bool SV_EnsurePrivateData(edict_t *pEdict)
-{
-	if(pEdict->GetUnknown())
-	{
-		return true;
-	}
-	else
-	{
-		Host_Error("SV_EnsurePrivateData: pEdict->pvPrivateData==NULL (ent %d).\n", pEdict - sv.edicts);
-		return false;
-	}
-}
-
 // This function makes sure that this entity class has an instance baseline.
 // If it doesn't have one yet, it makes a new one.
 void SV_EnsureInstanceBaseline( ServerClass *pServerClass, int iEdict, const void *pData, int nBytes )
@@ -455,8 +441,8 @@ void PackEntities_Normal(
 	}
 	else
 	{
-		int c = workItems.Count();
-		for ( int i = 0; i < c; ++i )
+		intp c = workItems.Count();
+		for ( intp i = 0; i < c; ++i )
 		{
 			PackWork_t &w = workItems[ i ];
 			SV_PackEntity( w.nIdx, w.pEdict, w.pSnapshot->m_pEntities[ w.nIdx ].m_pClass, w.pSnapshot );

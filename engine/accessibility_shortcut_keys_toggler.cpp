@@ -51,7 +51,7 @@ public:
 			: is_toggled_{},
 			startup_sticky_keys_{sizeof(decltype(startup_sticky_keys_)), 0},
 			startup_toggle_keys_{sizeof(decltype(startup_toggle_keys_)), 0},
-			startup_filter_keys_{sizeof(decltype(startup_filter_keys_)), 0}
+			startup_filter_keys_{sizeof(decltype(startup_filter_keys_)), 0, 0, 0, 0, 0}
 	{
 		// Save the current sticky/toggle/filter key settings so they can be
 		// restored them later.

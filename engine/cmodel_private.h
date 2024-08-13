@@ -346,7 +346,7 @@ public:
 	int									numareaportals;
 	CRangeValidatedArray<dareaportal_t>	map_areaportals;
 	int									numclusters;
-	char								*map_nullname;
+	char								map_nullname[MAX_QPATH];
 	int									numtextures;
 	char								*map_texturenames;
 	CRangeValidatedArray<csurface_t>	map_surfaces;
@@ -388,7 +388,7 @@ void CollisionBSPData_PostLoad( void );
 // Returns the collision tree associated with the ith displacement
 //-----------------------------------------------------------------------------
 
-CDispCollTree* CollisionBSPData_GetCollisionTree( int i );
+CDispCollTree* CollisionBSPData_GetCollisionTree( intp i );
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -461,7 +461,7 @@ struct alignedbbox_t
 		SetContents(contentsIn);
 	}
 };
-extern int g_DispCollTreeCount;
+extern intp g_DispCollTreeCount;
 extern CDispCollTree *g_pDispCollTrees;
 extern alignedbbox_t *g_pDispBounds;
 extern csurface_t dispSurf;
@@ -491,7 +491,7 @@ void FASTCALL CM_RecursiveHullCheck ( TraceInfo_t *pTraceInfo, int num, const fl
 
 //=============================================================================
 
-inline bool TraceInfo_t::Visit( cbrush_t *pBrush, int ndxBrush, TraceCounter_t cachedCount, TraceCounter_t *pCachedCounters )
+inline bool TraceInfo_t::Visit( cbrush_t *, int ndxBrush, TraceCounter_t cachedCount, TraceCounter_t *pCachedCounters )
 {
 	TraceCounter_t * RESTRICT pCounter = pCachedCounters + ndxBrush;
 

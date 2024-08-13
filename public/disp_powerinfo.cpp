@@ -221,17 +221,16 @@ CTesselateVert::CTesselateVert( CVertIndex const &index, int iNode )
 
 CVertInfo::CVertInfo()
 {
-	int i;
-	for( i=0; i < sizeof(m_Dependencies)/sizeof(m_Dependencies[0]); i++ )
+	for( auto& d : m_Dependencies )
 	{
-		m_Dependencies[i].m_iVert = CVertIndex( -1, -1 );
-		m_Dependencies[i].m_iNeighbor = -1;
+		d.m_iVert = CVertIndex( -1, -1 );
+		d.m_iNeighbor = -1;
 	}
 
-	for( i=0; i < sizeof(m_ReverseDependencies)/sizeof(m_ReverseDependencies[0]); i++ )
+	for( auto&d : m_ReverseDependencies )
 	{
-		m_ReverseDependencies[i].m_iVert = CVertIndex( -1, -1 );
-		m_ReverseDependencies[i].m_iNeighbor = -1;
+		d.m_iVert = CVertIndex( -1, -1 );
+		d.m_iNeighbor = -1;
 	}
 	
 	m_iParent.x = m_iParent.y = -1;
@@ -562,7 +561,7 @@ static CPowerInfoInitializer g_PowerInfoInitializer;
 
 const CPowerInfo* GetPowerInfo( int iPower )
 {
-	Assert( iPower >= 0 && iPower < ARRAYSIZE( g_PowerInfos ) );
+	Assert( iPower >= 0 && iPower < ssize( g_PowerInfos ) );
 	Assert( g_PowerInfos[iPower] );
 	return g_PowerInfos[iPower];
 }

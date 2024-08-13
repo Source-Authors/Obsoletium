@@ -2045,14 +2045,14 @@ bool CFocusOverlayPanel::DrawFocusPanelList( void )
 	if( !vgui_drawfocus.GetBool() )
 		return false;
 
-	int c = g_FocusPanelList.Size();
+	intp c = g_FocusPanelList.Count();
 	if ( c <= 0 )
 		return false;
 
 	int slot = 0;
 	int fullscreeninset = 0;
 
-	for ( int i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( slot > 31 )
 			break;
@@ -2157,13 +2157,13 @@ CON_COMMAND( vgui_togglepanel, "show/hide vgui panel by name." )
 	CUtlVector< vgui::VPANEL > panelList;
 
 	VGui_FindNamedPanels( panelList, panelname );
-	if ( !panelList.Size() )
+	if ( !panelList.Count() )
 	{
 		ConMsg( "No panels starting with %s\n", panelname );
 		return;
 	}
 
-	for ( int i = 0; i < panelList.Size(); i++ )
+	for ( intp i = 0; i < panelList.Count(); i++ )
 	{
 		vgui::VPANEL p = panelList[ i ];
 		if ( !p )
@@ -2250,10 +2250,10 @@ void CEngineVGui::DrawMouseFocus( void )
 	con_nprint_t np;
 	np.time_to_live = 1.0f;
 	
-	int c = g_FocusPanelList.Size();
+	intp c = g_FocusPanelList.Count();
 
 	int slot = 0;
-	for ( int i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( slot > 31 )
 			break;

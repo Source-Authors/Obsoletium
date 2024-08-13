@@ -207,7 +207,7 @@ CNetworkStringTable::CNetworkStringTable( TABLEID id, const char *tableName, int
 	m_pItemsClientSide( NULL )
 {
 	m_id = id;
-	int len = strlen( tableName ) + 1;
+	intp len = strlen( tableName ) + 1;
 	m_pszTableName = new char[ len ];
 	Assert( m_pszTableName );
 	Assert( tableName );
@@ -681,7 +681,7 @@ void CNetworkStringTable::ParseUpdate( bf_read &buf, int entries )
 			else
 			{
 				nBytes = buf.ReadUBitLong( CNetworkStringTableItem::MAX_USERDATA_BITS );
-				ErrorIfNot( nBytes <= sizeof( tempbuf ),
+				ErrorIfNot( nBytes <= static_cast<int>(sizeof( tempbuf )),
 					("CNetworkStringTableClient::ParseUpdate: message too large (%d bytes).", nBytes)
 				);
 
@@ -1469,12 +1469,11 @@ void CNetworkStringTableContainer::WriteBaselines( bf_write &buf )
 
 void CNetworkStringTableContainer::WriteStringTables( bf_write& buf )
 {
-	int numTables = m_Tables.Size();
+	int numTables = m_Tables.Count();
 
 	buf.WriteByte( numTables );
-	for ( int i = 0; i < numTables; i++ )
+	for ( auto *table : m_Tables )
 	{
-		CNetworkStringTable *table = m_Tables[ i ];
 		buf.WriteString( table->GetTableName() );
 		table->WriteStringTable( buf );
 	}

@@ -58,7 +58,7 @@ CServerRemoteAccess::CServerRemoteAccess()
 //-----------------------------------------------------------------------------
 ra_listener_id CServerRemoteAccess::GetNextListenerID( bool authConnection, const netadr_t *adr )
 {
-	int i = m_ListenerIDs.AddToTail();
+	auto i = m_ListenerIDs.AddToTail();
 	m_ListenerIDs[i].listenerID = i;
 	m_ListenerIDs[i].authenticated = !authConnection;
 	m_ListenerIDs[i].m_bHasAddress = ( adr != NULL );
@@ -91,7 +91,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 	m_iBytesReceived += bufferSize;
 	// ConMsg("RemoteAccess: bytes received: %d\n", m_iBytesReceived);
 
-	if ( bufferSize < 2*sizeof(int) ) // check that the buffer contains at least the id and type
+	if ( bufferSize < static_cast<int>(2*sizeof(int)) ) // check that the buffer contains at least the id and type
 	{
 		return;
 	}
@@ -265,7 +265,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 			case SERVERDATA_SEND_CONSOLE_LOG:
 				{
 #ifndef SWDS
-					CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+					CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 					if ( GetConsoleLogFileData( buf ) )
 					{
 						HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
@@ -409,7 +409,7 @@ void CServerRemoteAccess::CheckPassword( CRConServer *pNetworkListener, ra_liste
 	}
 
 		// allocate a spot in the list for the response
-	int i = m_ResponsePackets.AddToTail();
+	auto i = m_ResponsePackets.AddToTail();
 	m_ResponsePackets[i].responderID = listener; // record who we need to respond to
 
 	CUtlBuffer &response = m_ResponsePackets[i].packet;
@@ -455,7 +455,7 @@ void CServerRemoteAccess::BadPassword( CRConServer *pNetworkListener, ra_listene
 		//
 
 		// allocate a spot in the list for the response
-		int i = m_ResponsePackets.AddToTail();
+		auto i = m_ResponsePackets.AddToTail();
 		m_ResponsePackets[i].responderID = listener; // record who we need to respond to
 		CUtlBuffer &response = m_ResponsePackets[i].packet;
 
@@ -525,11 +525,11 @@ int CServerRemoteAccess::ReadDataResponse( ra_listener_id listener, void *buffer
 void CServerRemoteAccess::RequestValue( ra_listener_id listener, int requestID, const char *variable)
 {
 	// look up the cvar
-	CUtlBuffer value(0, 256, CUtlBuffer::TEXT_BUFFER);		// text-mode buffer
+	CUtlBuffer value( (intp)0, 256, CUtlBuffer::TEXT_BUFFER );		// text-mode buffer
 	LookupValue(variable, value);
 
 	// allocate a spot in the list for the response
-	int i = m_ResponsePackets.AddToTail();
+	auto i = m_ResponsePackets.AddToTail();
 	m_ResponsePackets[i].responderID = listener; // record who we need to respond to
 
 	CUtlBuffer &response = m_ResponsePackets[i].packet;
@@ -554,7 +554,7 @@ void CServerRemoteAccess::RequestValue( ra_listener_id listener, int requestID, 
 void CServerRemoteAccess::RespondString( ra_listener_id listener, int requestID, const char *pString )
 {
 	// allocate a spot in the list for the response
-	int i = m_ResponsePackets.AddToTail();
+	auto i = m_ResponsePackets.AddToTail();
 	m_ResponsePackets[i].responderID = listener; // record who we need to respond to
 
 	CUtlBuffer &response = m_ResponsePackets[i].packet;
@@ -884,7 +884,7 @@ void CServerRemoteAccess::SendMessageToAdminUI( ra_listener_id listenerID, const
 	}
 
 	// allocate a spot in the list for the response
-	int i = m_ResponsePackets.AddToTail();
+	auto i = m_ResponsePackets.AddToTail();
 	m_ResponsePackets[i].responderID = listenerID; // record who we need to respond to
 	CUtlBuffer &response = m_ResponsePackets[i].packet;
 
@@ -901,7 +901,7 @@ void CServerRemoteAccess::SendMessageToAdminUI( ra_listener_id listenerID, const
 void CServerRemoteAccess::SendResponseToClient( ra_listener_id listenerID, ServerDataResponseType_t type, void *pData, int nDataLen )
 {
 	// allocate a spot in the list for the response
-	int i = m_ResponsePackets.AddToTail();
+	auto i = m_ResponsePackets.AddToTail();
 	m_ResponsePackets[i].responderID = listenerID; // record who we need to respond to
 	CUtlBuffer &response = m_ResponsePackets[i].packet;
 

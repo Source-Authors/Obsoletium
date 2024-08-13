@@ -166,7 +166,7 @@ public:
 	virtual unsigned char			ComputeLevelScreenFade( const Vector &vecAbsOrigin, float flRadius, float flFadeScale ) const { return 0; }
 	virtual unsigned char			ComputeViewScreenFade( const Vector &vecAbsOrigin, float flRadius, float flFadeScale ) const { return 0; }
 
-	int GetAutoplayList( const studiohdr_t *pStudioHdr, unsigned short **pAutoplayList ) const;
+	intp GetAutoplayList( const studiohdr_t *pStudioHdr, unsigned short **pAutoplayList ) const;
 	CPhysCollide *GetCollideForVirtualTerrain( int index );
 	virtual int GetSurfacepropsForVirtualTerrain( int index ) { return CM_SurfacepropsForDisp(index); }
 
@@ -208,8 +208,22 @@ protected:
 public:
 	struct ModelFileHandleHash
 	{
-		uint operator()( model_t *p ) const { return Mix32HashFunctor()( (uint32)( p->fnHandle ) ); }
-		uint operator()( FileNameHandle_t fn ) const { return Mix32HashFunctor()( (uint32) fn ); }
+		uint operator()( model_t *p ) const
+		{
+#ifdef PLATFORM_64BITS
+			return Mix64HashFunctor()( (uintp)( p->fnHandle ) );
+#else
+			return Mix32HashFunctor()( (uint32)( p->fnHandle ) );
+#endif
+		}
+		uint operator()( FileNameHandle_t fn ) const
+		{
+#ifdef PLATFORM_64BITS
+			return Mix64HashFunctor()( (uintp) fn );
+#else
+			return Mix32HashFunctor()( (uint32) fn );
+#endif
+		}
 	};
 	struct ModelFileHandleEq
 	{
@@ -554,7 +568,7 @@ byte *CModelInfo::GetAnimBlock( const studiohdr_t *pStudioHdr, int nBlock ) cons
 	return g_pMDLCache->GetAnimBlock( handle, nBlock );
 }
 
-int CModelInfo::GetAutoplayList( const studiohdr_t *pStudioHdr, unsigned short **pAutoplayList ) const
+intp CModelInfo::GetAutoplayList( const studiohdr_t *pStudioHdr, unsigned short **pAutoplayList ) const
 {
 	MDLHandle_t handle = (MDLHandle_t)(intp)pStudioHdr->virtualModel&0xffff;
 	return g_pMDLCache->GetAutoplayList( handle, pAutoplayList );
@@ -584,7 +598,7 @@ byte *studiohdr_t::GetAnimBlock( int i ) const
 	return g_pMDLCache->GetAnimBlock( (MDLHandle_t)(intp)virtualModel&0xffff, i );
 }
 
-int	studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
+intp	studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 {
 	return g_pMDLCache->GetAutoplayList( (MDLHandle_t)(intp)virtualModel&0xffff, pOut );
 }

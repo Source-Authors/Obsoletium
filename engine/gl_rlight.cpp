@@ -613,7 +613,6 @@ static void AddDisplacementsInLeafToTestList( mleaf_t* pLeaf, LightVecState_t& s
 static SurfaceHandle_t FASTCALL FindIntersectionSurfaceAtLeaf( mleaf_t *pLeaf, 
 					float start, float end, Vector& c, LightVecState_t& state )
 {
-	Vector pt;
 	SurfaceHandle_t closestSurfID = SURFACE_HANDLE_INVALID;
 
 	// Adds displacements in the leaf to a list of displacements to test at the end

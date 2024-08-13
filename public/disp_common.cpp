@@ -104,33 +104,6 @@ inline int SignedBitShift( int val, int shift )
 		return val >> -shift;
 }
 
-static inline void RotateVertIndex( 
-	NeighborOrientation neighor, 
-	int sideLengthMinus1,
-	CVertIndex const &in,
-	CVertIndex &out )
-{
-	if( neighor == ORIENTATION_CCW_0 )
-	{
-		out = in;
-	}
-	else if( neighor == ORIENTATION_CCW_90 )
-	{
-		out.x = in.y;
-		out.y = sideLengthMinus1 - in.x;
-	}
-	else if( neighor == ORIENTATION_CCW_180 )
-	{
-		out.x = sideLengthMinus1 - in.x;
-		out.y = sideLengthMinus1 - in.y;
-	}
-	else
-	{
-		out.x = sideLengthMinus1 - in.y;
-		out.y = in.x;
-	}
-}
-
 static inline void RotateVertIncrement( 
 	NeighborOrientation neighor, 
 	CVertIndex const &in,

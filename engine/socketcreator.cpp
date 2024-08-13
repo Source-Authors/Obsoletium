@@ -176,7 +176,7 @@ void CSocketCreator::ProcessAccept()
 	}
 
 	// new connection TCP request, put in accepted queue
-	int nIndex = m_hAcceptedSockets.AddToTail();
+	intp nIndex = m_hAcceptedSockets.AddToTail();
 	AcceptedSocket_t *pNewEntry = &m_hAcceptedSockets[nIndex];
 	pNewEntry->m_hSocket = newSocket;
 	pNewEntry->m_Address = adr;
@@ -255,7 +255,7 @@ int CSocketCreator::ConnectSocket( const netadr_t &netAdr, bool bSingleSocket )
 
 	// new connection TCP request, put in accepted queue
 	void *pData = NULL;
-	int nIndex = m_hAcceptedSockets.AddToTail();
+	intp nIndex = m_hAcceptedSockets.AddToTail();
 	AcceptedSocket_t *pNewEntry = &m_hAcceptedSockets[nIndex];
 	pNewEntry->m_hSocket = hSocket;
 	pNewEntry->m_Address = netAdr;

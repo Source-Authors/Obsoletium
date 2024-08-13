@@ -2079,7 +2079,7 @@ CON_COMMAND( netchan_test_upload, "[filename]: Uploads a file to server." )
 	}
 
 	//$ TODO: the con command system is truncating the filenames we're passing in. Need to workaround this...
-	const char *filename = args.GetCommandString() + V_strlen( "netchan_test_upload " );
+	const char *filename = args.GetCommandString() + ssize( "netchan_test_upload " ) - 1;
 
 	Msg( "Sending '%s'\n", filename );
 	bool bRet = CNetChan::TestUpload( filename );
@@ -3138,7 +3138,7 @@ bool CNetChan::IsValidFileForTransfer( const char *pszFilename )
 	if ( !COM_IsValidPath( pszFilename ) || V_IsAbsolutePath( pszFilename ) )
 		return false;
 
-	int len = V_strlen( pszFilename );
+	intp len = V_strlen( pszFilename );
 	if ( len >= MAX_PATH )
 		return false;
 
@@ -3151,7 +3151,7 @@ bool CNetChan::IsValidFileForTransfer( const char *pszFilename )
 	if ( szTemp[ len - 1 ] == '/' )
 		return false;
 
-	int slash_count = 0;
+	intp slash_count = 0;
 	for ( const char *psz = szTemp; *psz; psz++ )
 	{
 		if ( *psz == '/' )
@@ -3210,7 +3210,7 @@ bool CNetChan::IsValidFileForTransfer( const char *pszFilename )
 		return false;
 
 	// If the extension is not exactly 3 or 4 characters, bail.
-	int extension_len = V_strlen( extension );
+	intp extension_len = V_strlen( extension );
 	if ( ( extension_len != 3 ) &&
 	     ( extension_len != 4 ) &&
 	     V_stricmp( extension, ".bsp.bz2" ) &&

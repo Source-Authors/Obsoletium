@@ -274,7 +274,6 @@ private:
 	edict_t* m_pTriggerEntity;
 	ICollideable* m_pTrigger;
 	int m_triggerSolidFlags;
-	Vector m_vecDelta;
 	CUtlVector< edict_t* > m_TouchedEntities;
 	bool m_bAccurateBBoxCheck;
 };

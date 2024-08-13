@@ -127,8 +127,8 @@ void CMatchmaking::Cleanup()
 
 int CMatchmaking::FindOrCreateContext( const uint id )
 {
-	int idx = m_SessionContexts.InvalidIndex();
-	for ( int i = 0; i < m_SessionContexts.Count(); ++i )
+	intp idx = m_SessionContexts.InvalidIndex();
+	for ( intp i = 0; i < m_SessionContexts.Count(); ++i )
 	{
 		if ( m_SessionContexts[i].dwContextId == id )
 		{
@@ -144,8 +144,8 @@ int CMatchmaking::FindOrCreateContext( const uint id )
 
 int CMatchmaking::FindOrCreateProperty( const uint id )
 {
-	int idx = m_SessionProperties.InvalidIndex();
-	for ( int i = 0; i < m_SessionProperties.Count(); ++i )
+	intp idx = m_SessionProperties.InvalidIndex();
+	for ( intp i = 0; i < m_SessionProperties.Count(); ++i )
 	{
 		if ( m_SessionProperties[i].dwPropertyId == id )
 		{
@@ -544,14 +544,12 @@ void CMatchmaking::SendMessage( INetMessage *msg, CClientInfo *pClient, bool bVo
 //-----------------------------------------------------------------------------
 void CMatchmaking::SendToRemoteClients( INetMessage *msg, bool bVoice, XUID excludeXUID )
 {
-	for ( int i = 0; i < m_Remote.Count(); ++i )
+	for ( auto *client : m_Remote )
 	{
-		CClientInfo *pInfo = m_Remote[i];
-
-		if ( excludeXUID != -1 && pInfo->m_xuids[0] == excludeXUID )
+		if ( excludeXUID != std::numeric_limits<XUID>::max() && client->m_xuids[0] == excludeXUID )
 			continue;
 
-		SendMessage( msg, m_Remote[i], true );
+		SendMessage( msg, client, true );
 	}
 }
 

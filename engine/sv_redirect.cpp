@@ -71,7 +71,7 @@ void SV_RedirectEnd (void)
 //-----------------------------------------------------------------------------
 void SV_RedirectCheckFlush( int len )
 {
-	if ( len + Q_strlen( sv_redirect_buffer ) > sizeof(sv_redirect_buffer) - 1)
+	if ( len + Q_strlen( sv_redirect_buffer ) > ssize(sv_redirect_buffer) - 1)
 	{
 		SV_RedirectFlush();
 	}

@@ -1149,7 +1149,7 @@ bool COverlayMgr::LoadOverlays( )
 		pOverlayOut->m_nId = iOverlay;
 		pOverlayOut->m_nTexInfo = pOverlayIn->nTexInfo;
 		pOverlayOut->m_nRenderOrder = pOverlayIn->GetRenderOrder();
-		if ( pOverlayOut->m_nRenderOrder >= OVERLAY_NUM_RENDER_ORDERS )
+		if ( pOverlayOut->m_nRenderOrder >=  static_cast<short>(OVERLAY_NUM_RENDER_ORDERS) )
 			Error( "COverlayMgr::LoadOverlays: invalid render order (%d) for an overlay.", pOverlayOut->m_nRenderOrder );
 
 		pOverlayOut->m_flU[0] = pOverlayIn->flU[0];
@@ -1215,7 +1215,7 @@ bool COverlayMgr::LoadOverlays( )
 		pOverlayOut->m_nId = nOverlayCount + iWaterOverlay;
 		pOverlayOut->m_nTexInfo = pWaterOverlayIn->nTexInfo;
 		pOverlayOut->m_nRenderOrder = pWaterOverlayIn->GetRenderOrder();
-		if ( pOverlayOut->m_nRenderOrder >= OVERLAY_NUM_RENDER_ORDERS )
+		if ( pOverlayOut->m_nRenderOrder >= static_cast<short>(OVERLAY_NUM_RENDER_ORDERS) )
 			Error( "COverlayMgr::LoadOverlays: invalid render order (%d) for an overlay.", pOverlayOut->m_nRenderOrder );
 
 		pOverlayOut->m_flU[0] = pWaterOverlayIn->flU[0];
@@ -1410,7 +1410,6 @@ void COverlayMgr::Disp_PostClipFragment( CDispInfo *pDisp, CMeshReader *pReader,
 		pFragment->m_SurfId = surfID;
 		
 		Vector2D vecTmpUV;
-		Vector	 vecTmp;
 		for ( int iVert = 0; iVert < nVertCount; ++iVert )
 		{
 			vecTmpUV.x = pDispFragment->m_aPrimVerts[iVert].pos.x;
@@ -1697,7 +1696,7 @@ OverlayFragmentHandle_t COverlayMgr::AddFragmentToFragmentList( int nSize )
 	MEM_ALLOC_CREDIT();
 
 	// Add to list of fragments.
-	int iFragment = m_aFragments.Alloc( true );
+	auto iFragment = m_aFragments.Alloc( true );
 
 	moverlayfragment_t &frag = m_aFragments[iFragment];
 
@@ -1724,7 +1723,7 @@ OverlayFragmentHandle_t COverlayMgr::AddFragmentToFragmentList( moverlayfragment
 	MEM_ALLOC_CREDIT();
 
 	// Add to list of fragments.
-	int iFragment = m_aFragments.Alloc( true );
+	auto iFragment = m_aFragments.Alloc( true );
 
 	moverlayfragment_t &frag = m_aFragments[iFragment];
 
@@ -1796,7 +1795,7 @@ void COverlayMgr::BuildClipPlanes( SurfaceHandle_t surfID, moverlayfragment_t &s
 		vecEdge = surfaceFrag.m_aPrimVerts[(iVert+1)%nVertCount].pos - surfaceFrag.m_aPrimVerts[iVert].pos;
 		VectorNormalize( vecEdge );
 
-		int iPlane = m_ClipPlanes.AddToTail();
+		intp iPlane = m_ClipPlanes.AddToTail();
 		cplane_t *pPlane = &m_ClipPlanes[iPlane];
 
 		pPlane->normal = vecBasisNormal.Cross( vecEdge );

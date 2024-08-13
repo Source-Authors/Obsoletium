@@ -29,16 +29,16 @@ class CBaseActionEditDialog;
 //-----------------------------------------------------------------------------
 class CDemoEditorPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CDemoEditorPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDemoEditorPanel, vgui::Frame );
 
 public:
 	CDemoEditorPanel( vgui::Panel *parent );
 	~CDemoEditorPanel();
 
-	virtual void OnTick();
+	void OnTick() override;
 
 	// Command issued
-	virtual void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 
 	void	OnVDMChanged( void );
 
@@ -51,7 +51,7 @@ protected:
 	void		CreateNewAction( char const *actiontype );
 
 	void		OnEdit();
-	void		OnDelete();
+	void		OnDelete() override;
 	void		OnSave();
 	void		OnRevert();
 

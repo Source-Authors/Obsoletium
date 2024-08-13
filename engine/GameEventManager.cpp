@@ -139,18 +139,14 @@ void CGameEventManager::Shutdown()
 
 void CGameEventManager::Reset()
 {
-	int number = m_GameEvents.Count();
-
-	for (int i = 0; i<number; i++)
+	for (auto &e : m_GameEvents)
 	{
-		CGameEventDescriptor &e = m_GameEvents.Element( i );
-
 		if ( e.keys )
 		{
 			e.keys->deleteThis(); // free the value keys
 			e.keys = NULL;
 		}
-					
+
 		e.listeners.Purge();	// remove listeners
 	}
 
@@ -180,10 +176,8 @@ void CGameEventManager::WriteEventList(SVC_GameEventList *msg)
 
 	msg->m_nNumEvents = 0;
 
-	for (int i=0; i < m_GameEvents.Count(); i++ )
+	for (auto &descriptor : m_GameEvents)
 	{
-		CGameEventDescriptor &descriptor = m_GameEvents[i];
-
 		if ( descriptor.local )
 			continue;
 
@@ -215,17 +209,14 @@ void CGameEventManager::WriteEventList(SVC_GameEventList *msg)
 
 bool CGameEventManager::ParseEventList(SVC_GameEventList *msg)
 {
-	int i;
-
 	// reset eventids to -1 first
-	for ( i=0; i < m_GameEvents.Count(); i++ )
+	for (auto &descriptor : m_GameEvents)
 	{
-		CGameEventDescriptor &descriptor = m_GameEvents[i];
 		descriptor.eventid = -1;
 	}
 
 	// map server event IDs 
-	for (i = 0; i<msg->m_nNumEvents; i++)
+	for (int i = 0; i<msg->m_nNumEvents; i++)
 	{
 		int id = msg->m_DataIn.ReadUBitLong( MAX_EVENT_BITS );
 		char name[MAX_EVENT_NAME_LENGTH];
@@ -272,16 +263,12 @@ void CGameEventManager::WriteListenEventList(CLC_ListenEvents *msg)
 	msg->m_EventArray.ClearAll();
 
 	// and know tell the server what events we want to listen to
-	for (int i=0; i < m_GameEvents.Count(); i++ )
+	for (auto &descriptor : m_GameEvents)
 	{
-		CGameEventDescriptor &descriptor = m_GameEvents[i];
-
 		bool bHasClientListener = false;
 
-		for ( int j=0; j<descriptor.listeners.Count(); j++ )
+		for (auto *listener : descriptor.listeners)
 		{
-			CGameEventCallback *listener = descriptor.listeners[j];
-
 			if ( listener->m_nListenerType == CGameEventManager::CLIENTSIDE ||
 				 listener->m_nListenerType == CGameEventManager::CLIENTSIDE_OLD	)
 			{
@@ -616,16 +603,14 @@ CGameEventCallback* CGameEventManager::FindEventListener( void* pCallback )
 void CGameEventManager::RemoveListener(IGameEventListener2 *listener)
 {
 	CGameEventCallback *pCallback = FindEventListener( listener );
-	
 	if ( pCallback == NULL )
 	{
 		return;
 	}
 
 	// remove reference from events 
-	for (int i=0; i < m_GameEvents.Count(); i++ )
+	for ( auto &et : m_GameEvents )
 	{
-		CGameEventDescriptor &et = m_GameEvents.Element( i );
 		et.listeners.FindAndRemove( pCallback );
 	}
 
@@ -670,23 +655,23 @@ int CGameEventManager::LoadEventsFromFile( const char * filename )
 	}
 
 	if ( net_showevents.GetBool() )
-		DevMsg( "Event System loaded %i events from file %s.\n", m_GameEvents.Count(), filename );
+		DevMsg( "Event System loaded %zd events from file %s.\n", m_GameEvents.Count(), filename );
 
 	return m_GameEvents.Count();
 }
 
 void CGameEventManager::ReloadEventDefinitions()
 {
-	for ( int i=0; i< m_EventFileNames.Count(); i++ )
+	for ( auto &fn : m_EventFileNames )
 	{
-		const char *filename = m_EventFiles.String( m_EventFileNames[i] );
+		const char *filename = m_EventFiles.String( fn );
 		LoadEventsFromFile( filename );
 	}
 
 	// we are the server, build string table now
-	int number = m_GameEvents.Count();
+	intp number = m_GameEvents.Count();
 
-	for (int j = 0; j<number; j++)
+	for (intp j = 0; j<number; j++)
 	{
 		m_GameEvents[j].eventid = j;
 	}
@@ -702,7 +687,7 @@ bool CGameEventManager::AddListener( IGameEventListener2 *listener, const char *
 
 	if ( !descriptor )
 	{
-		DevMsg( "CGameEventManager::AddListener: event '%s' unknown.\n", event );
+		DevMsg( "CGameEventManager::AddListener: event '%s' unknown. Check 'resource/serverevents.res'.\n", event );
 		return false;	// that should not happen
 	}
 
@@ -763,7 +748,7 @@ bool CGameEventManager::RegisterEvent( KeyValues * event)
 	if ( !descriptor )
 	{
 		// event not known yet, create new one
-		int index = m_GameEvents.AddToTail();
+		intp index = m_GameEvents.AddToTail();
 		descriptor =  &m_GameEvents.Element(index);
 
 		AssertMsg2( V_strlen( event->GetName() ) <= MAX_EVENT_NAME_LENGTH, "Event named '%s' exceeds maximum name length %d", event->GetName(), MAX_EVENT_NAME_LENGTH );
@@ -840,12 +825,10 @@ CGameEventDescriptor *CGameEventManager::GetEventDescriptor(int eventid) // retu
 	if ( eventid < 0 )
 		return NULL;
 
-	for ( int i = 0; i < m_GameEvents.Count(); i++ )
+	for ( auto &descriptor : m_GameEvents )
 	{
-		CGameEventDescriptor *descriptor = &m_GameEvents[i];
-
-		if ( descriptor->eventid == eventid )
-			return descriptor;
+		if ( descriptor.eventid == eventid )
+			return &descriptor;
 	}
 
 	return NULL;
@@ -864,12 +847,10 @@ CGameEventDescriptor *CGameEventManager::GetEventDescriptor(const char * name)
 	if ( !name || !name[0] )
 		return NULL;
 
-	for (int i=0; i < m_GameEvents.Count(); i++ )
+	for ( auto &descriptor : m_GameEvents )
 	{
-		CGameEventDescriptor *descriptor = &m_GameEvents[i];
-
-		if ( Q_strcmp( descriptor->name, name ) == 0 )
-			return descriptor;
+		if ( Q_strcmp( descriptor.name, name ) == 0 )
+			return &descriptor;
 	}
 
 	return NULL;
@@ -880,11 +861,9 @@ bool CGameEventManager::AddListenerAll( void *listener, int nListenerType )
 	if ( !listener )
 		return false;
 
-	for (int i=0; i < m_GameEvents.Count(); i++ )
+	for ( auto &descriptor : m_GameEvents )
 	{
-		CGameEventDescriptor *descriptor = &m_GameEvents[i];
-
-		AddListener( listener, descriptor, nListenerType );
+		AddListener( listener, &descriptor, nListenerType );
 	}
 
 	DevMsg("Warning! Game event listener registerd for all events. Use newer game event interface.\n");
@@ -903,9 +882,8 @@ void CGameEventManager::RemoveListenerOld( void *listener)
 	}
 
 	// remove reference from events 
-	for (int i=0; i < m_GameEvents.Count(); i++ )
+	for ( auto &et : m_GameEvents )
 	{
-		CGameEventDescriptor &et = m_GameEvents.Element( i );
 		et.listeners.FindAndRemove( pCallback );
 	}
 

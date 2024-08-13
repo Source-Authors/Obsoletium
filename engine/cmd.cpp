@@ -153,13 +153,13 @@ static int CreateExecutionMarker()
 		nIndex = g_ExecutionMarkers.Find( nRandomNumber );
 	} while ( nIndex != g_ExecutionMarkers.InvalidIndex() );
 
-	int i = g_ExecutionMarkers.AddToTail( nRandomNumber );
+	auto i = g_ExecutionMarkers.AddToTail( nRandomNumber );
 	return g_ExecutionMarkers[i];
 }
 
 static bool FindAndRemoveExecutionMarker( int iCode )
 {
-	int i = g_ExecutionMarkers.Find( iCode );
+	auto i = g_ExecutionMarkers.Find( iCode );
 	if ( i == g_ExecutionMarkers.InvalidIndex() )
 		return false;
 	
@@ -271,7 +271,7 @@ bool Cbuf_EscapeCommandArg( const char *pText, char *pOut, unsigned int nOut )
 	}
 
 	// Room for quotes+null in out?
-	if ( !pOut || nOut < (unsigned int)V_strlen( pText ) + 3 )
+	if ( !pOut || nOut < (size_t)V_strlen( pText ) + 3 )
 		return false;
 
 	V_snprintf( pOut, nOut, "\"%s\"", pText );
@@ -328,7 +328,7 @@ bool Cbuf_AddTextWithMarkers( ECmdExecutionMarker markerLeft, const char *text, 
 	V_sprintf_safe( szMarkerRight, ";%s %c %d;", CMDSTR_ADD_EXECUTION_MARKER, (char)markerRight, iMarkerCodeRight );
 
 	// Due to the behavior of the command buffer, we may be over-estimating the amount of space required.
-	int cTextToBeAdded = strlen( szMarkerLeft ) + strlen( szMarkerRight ) + strlen( text ) + 3;
+	intp cTextToBeAdded = V_strlen( szMarkerLeft ) + V_strlen( szMarkerRight ) + V_strlen( text ) + 3;
 
 	LOCK_COMMAND_BUFFER();
 	if ( s_CommandBuffer.GetArgumentBufferSize() + cTextToBeAdded + 1 > s_CommandBuffer.GetMaxArgumentBufferSize() )
@@ -478,7 +478,7 @@ CON_COMMAND( stuffcmds, "Parses and stuffs command line + commands to command bu
 
 	MEM_ALLOC_CREDIT();
 
-	CUtlBuffer build( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer build( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	// arg[0] is the executable name
 	for ( int i=1; i < CommandLine()->ParmCount(); i++ )
@@ -525,7 +525,7 @@ CON_COMMAND( stuffcmds, "Parses and stuffs command line + commands to command bu
 		
 	if ( build.TellPut() > 1 )
 	{
-		Cbuf_InsertText( (char *)build.Base() );
+		Cbuf_InsertText( build.Base<char>() );
 	}
 }
 
@@ -641,7 +641,7 @@ void Cmd_Exec_f( const CCommand &args )
 	ConDMsg( "execing %s\n", szFile );
 
 	// check to make sure we're not going to overflow the cmd_text buffer
-	int hCommand = s_CommandBuffer.GetNextCommandHandle();
+	CommandHandle_t hCommand = s_CommandBuffer.GetNextCommandHandle();
 
 	// Execute each command immediately
 	const char *pszDataPtr = f;
@@ -836,9 +836,9 @@ void Cmd_Shutdown( void )
 //-----------------------------------------------------------------------------
 // FIXME: Remove this! This is a temporary hack to deal with backward compat
 //-----------------------------------------------------------------------------
-void Cmd_Dispatch( const ConCommandBase *pCommand, const CCommand &command )
+void Cmd_Dispatch( ConCommandBase *pCommand, const CCommand &command )
 {
-	ConCommand *pConCommand = const_cast<ConCommand*>( static_cast<const ConCommand*>( pCommand ) );
+	ConCommand *pConCommand = static_cast<ConCommand*>( pCommand );
 	pConCommand->Dispatch( command );
 }
 
@@ -956,7 +956,7 @@ const ConCommandBase *Cmd_ExecuteCommand( const CCommand &command, cmd_source_t 
 	cmd_clientslot = nClientSlot;
 
 	// check ConCommands
-	const ConCommandBase *pCommand = g_pCVar->FindCommandBase( command[ 0 ] );
+	ConCommandBase *pCommand = g_pCVar->FindCommandBase( command[ 0 ] );
 
 	// If we prevent a server command due to FCVAR_SERVER_CAN_EXECUTE not being set, then we get out immediately.
 	if ( ShouldPreventServerCommand( pCommand ) )

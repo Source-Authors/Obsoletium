@@ -142,6 +142,8 @@ static inline void DecodeVector(SendProp const *pProp, bf_read *pIn, float *v)
 	}
 }
 
+#if 0 // We can't ship this since it changes the size of DTVariant to be 20 bytes instead of 16 and that breaks MODs!!!
+
 static inline void DecodeQuaternion(SendProp const *pProp, bf_read *pIn, float *v)
 {
 	v[0] = DecodeFloat(pProp, pIn);
@@ -150,6 +152,7 @@ static inline void DecodeQuaternion(SendProp const *pProp, bf_read *pIn, float *
 	v[3] = DecodeFloat(pProp, pIn);
 }
 
+#endif
 int	DecodeBits( DecodeInfo *pInfo, unsigned char *pOut )
 {
 	bf_read temp;

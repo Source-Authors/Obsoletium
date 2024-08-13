@@ -886,7 +886,7 @@ void CMSurfaceSortList::AddSurfaceToTail( msurface2_t *pSurface, int sortGroup, 
 	{
 		// existing block
 		pList = &m_list[pGroup->listTail];
-		if ( pList->count >= ARRAYSIZE(pList->pSurfaces) )
+		if ( pList->count >= ssize(pList->pSurfaces) )
 		{
 			prevIndex = pGroup->listTail;
 			// no space in existing block

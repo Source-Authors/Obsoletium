@@ -781,7 +781,7 @@ public:
 		return data;
 	}
 
-	static unsigned int EstimatedSize( const colormeshparams_t &params )
+	static size_t EstimatedSize( const colormeshparams_t &params )
 	{
 		// each vertex is a 4 byte color
 		return params.m_nMeshes * sizeof( IMesh* ) + params.m_nTotalVertexes * 4;
@@ -2040,7 +2040,6 @@ void CModelRender::DebugDrawLightingOrigin( const DrawModelState_t& state, const
 	CDebugOverlay::AddLineOverlay( pt0, pt1, 0, 255, 0, 255, true, 0.0f );
 
 	// draw lines from the light origin to the hull boundaries to identify model
-	Vector pt;
 	pt0.x = state.m_pStudioHdr->hull_min.x;
 	pt0.y = state.m_pStudioHdr->hull_min.y;
 	pt0.z = state.m_pStudioHdr->hull_min.z;
@@ -2786,9 +2785,9 @@ struct rbatch_t
 // ----------------------------------------
 */
 
-inline int FindModel( const rmodel_t* pList, int listCount, const model_t *pModel )
+inline intp FindModel( const rmodel_t* pList, intp listCount, const model_t *pModel )
 {
-	for ( int j = listCount; --j >= 0 ; )
+	for ( intp j = listCount; --j >= 0 ; )
 	{
 		if ( pList[j].pModel == pModel )
 			return j;
@@ -2808,7 +2807,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
 	CMatRenderContextPtr pRenderContext( materials );
 	const int MAX_OBJECTS = 1024;
-	CUtlSortVector<robject_t, CRobjectLess> objectList(0, MAX_OBJECTS);
+	CUtlSortVector<robject_t, CRobjectLess> objectList( (intp)0, MAX_OBJECTS);
 	CUtlVectorFixedGrowable<rmodel_t, 256> modelList;
 	CUtlVectorFixedGrowable<short,256> lightObjects;
 	CUtlVectorFixedGrowable<short,64> shadowObjects;
@@ -2827,7 +2826,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	{
 		drawnCount++;
 		// UNDONE: This is a perf hit in some scenes!  Use a hash?
-		int modelIndex = FindModel( modelList.Base(), modelList.Count(), pProps[i].pModel );
+		intp modelIndex = FindModel( modelList.Base(), modelList.Count(), pProps[i].pModel );
 		if ( modelIndex < 0 )
 		{
 			modelIndex = modelList.AddToTail();
@@ -2900,7 +2899,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	}
 	// UNDONE: Don't sort if rendering transparent objects - for now this isn't called in the transparent case
 	// sort by model, then by lod
-	objectList.SetLessContext( static_cast<void *>(modelList.Base()) );
+	objectList.SetLessContext( modelList.Base() );
 	objectList.RedoSort(true);
 
 	ICallQueue *pCallQueue = pRenderContext->GetCallQueue();
@@ -3318,7 +3317,7 @@ void CModelRender::InitColormeshParams( ModelInstance_t &instance, studiohwdata_
 			for ( int groupID = 0; groupID < pMesh->m_NumGroup; groupID++ )
 			{
 				pColorMeshParams->m_nVertexes[pColorMeshParams->m_nMeshes++] = pMesh->m_pMeshGroup[groupID].m_NumVertices;
-				Assert( pColorMeshParams->m_nMeshes <= ARRAYSIZE( pColorMeshParams->m_nVertexes ) );
+				Assert( pColorMeshParams->m_nMeshes <= static_cast<intp>(std::size( pColorMeshParams->m_nVertexes )) );
 
 				pColorMeshParams->m_nTotalVertexes += pMesh->m_pMeshGroup[groupID].m_NumVertices;
 			}
@@ -3669,7 +3668,7 @@ void CModelRender::ValidateStaticPropColorData( ModelInstanceHandle_t handle )
 
 	studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( pInstance->m_pModel->studio );
 
-	HardwareVerts::FileHeader_t *pVhvHdr = (HardwareVerts::FileHeader_t *)utlBuf.Base();
+	HardwareVerts::FileHeader_t *pVhvHdr = utlBuf.Base<HardwareVerts::FileHeader_t>();
 	if ( pVhvHdr->m_nVersion != VHV_VERSION || 
 		pVhvHdr->m_nChecksum != (unsigned int)pStudioHdr->checksum || 
 		pVhvHdr->m_nVertexSize != 4 )

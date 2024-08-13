@@ -141,7 +141,7 @@ const ConCommandBase *Cmd_ExecuteCommand( const CCommand &command, cmd_source_t 
 //-----------------------------------------------------------------------------
 // Dispatches a command with the requested arguments
 //-----------------------------------------------------------------------------
-void Cmd_Dispatch( const ConCommandBase *pCommand, const CCommand &args );
+void Cmd_Dispatch( ConCommandBase *pCommand, const CCommand &args );
 
 
 //-----------------------------------------------------------------------------

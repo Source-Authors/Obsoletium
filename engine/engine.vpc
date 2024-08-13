@@ -39,6 +39,7 @@ $Configuration	"Debug"
 		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include"	[$SDL]
 		$AdditionalIncludeDirectories	"$BASE;$SNAPPYSRCDIR;$SNAPPYSRC2DIR"
 		$PreprocessorDefinitions		"$BASE;USE_CONVARS;VOICE_OVER_IP;BUMPMAP;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER"
+		$PreprocessorDefinitions		"$BASE;SUPPORTS_INT64" [$WIN64]
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
 		$PreprocessorDefinitions		"$BASE;MPA_BUILD_WITHOUT_ATL"
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY"	[$LINUXALL]
@@ -55,7 +56,7 @@ $Configuration	"Debug"
 	{
 		$AdditionalLibraryDirectories		"$BASE;$SNAPPYOUTDIRDEBUG;$MPAHEADERINFOOUTDIRDEBUG;"
 		
-		$AdditionalDependencies			"$BASE Advapi32.lib dsound.lib dxguid.lib Gdi32.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib Shell32.lib User32.lib snappy.lib" [$WINDOWS]
+		$AdditionalDependencies			"$BASE Advapi32.lib dsound.lib dxguid.lib Gdi32.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib Shell32.lib User32.lib comsuppw.lib snappy.lib" [$WINDOWS]
 		$AdditionalDependencies			"$BASE mpaheaderinfo.lib" [$WINDOWS&&!$DEDICATED]
 		$SystemFrameworks				"Carbon;AppKit;OpenAL;CoreAudio;AudioToolbox;SystemConfiguration;Quicktime;AudioUnit" [$OSXALL]
 		$SystemLibraries				"iconv" [$OSXALL]
@@ -84,6 +85,7 @@ $Configuration	"Release"
 		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include"	[$SDL]
 		$AdditionalIncludeDirectories	"$BASE;$SNAPPYSRCDIR;$SNAPPYSRC2DIR"
 		$PreprocessorDefinitions		"$BASE;USE_CONVARS;VOICE_OVER_IP;BUMPMAP;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER"
+		$PreprocessorDefinitions		"$BASE;SUPPORTS_INT64" [$WIN64]
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
 		$PreprocessorDefinitions		"$BASE;MPA_BUILD_WITHOUT_ATL"
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY"	[$LINUXALL]
@@ -100,7 +102,7 @@ $Configuration	"Release"
 	{
 		$AdditionalLibraryDirectories		"$BASE;$SNAPPYOUTDIRRELEASE;$MPAHEADERINFOOUTDIRRELEASE;"
 
-		$AdditionalDependencies			"$BASE Advapi32.lib dsound.lib dxguid.lib Gdi32.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib Shell32.lib User32.lib snappy.lib" [$WINDOWS]
+		$AdditionalDependencies			"$BASE Advapi32.lib dsound.lib dxguid.lib Gdi32.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib Shell32.lib User32.lib comsuppw.lib snappy.lib" [$WINDOWS]
 		$AdditionalDependencies			"$BASE mpaheaderinfo.lib" [$WINDOWS&&!$DEDICATED]
 		$SystemFrameworks				"Carbon;AppKit;OpenAL;CoreAudio;AudioToolbox;SystemConfiguration;Quicktime;AudioUnit" [$OSXALL]
 		$SystemLibraries				"iconv" [$OSXALL]

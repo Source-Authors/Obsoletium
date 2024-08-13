@@ -634,7 +634,7 @@ const char * const z_errmsg[10] = { // indexed by 2-zlib_error
 
 #ifdef DEBUG
   int z_verbose = 0;
-  void z_error (char *m) {fprintf(stderr, "%s\n", m); exit(1);}
+  void z_error (const char *m) {fprintf(stderr, "%s\n", m); exit(1);}
 #  define Assert(cond,msg) {if(!(cond)) z_error(msg);}
 #  define Trace(x) {if (z_verbose>=0) fprintf x ;}
 #  define Tracev(x) {if (z_verbose>0) fprintf x ;}
@@ -1798,7 +1798,7 @@ uInt *v)               // working area: values in order of bit length
 #define C0 *p++ = 0;
 #define C2 C0 C0 C0 C0
 #define C4 C2 C2 C2 C2
-  C4; p;                          // clear c[]--assume BMAX+1 is 16
+  C4;                          // clear c[]--assume BMAX+1 is 16
   p = b;  i = n;
   do {
     c[*p++]++;                  // assume all entries <= BMAX 
@@ -2593,7 +2593,7 @@ int inflate(z_streamp z, int f)
       z->state->sub.check.need += (uLong)IM_NEXTBYTE << 8;
       z->state->mode = IM_DICT1;
     case IM_DICT1:
-      IM_NEEDBYTE; r;
+      IM_NEEDBYTE;
       z->state->sub.check.need += (uLong)IM_NEXTBYTE;
       z->adler = z->state->sub.check.need;
       z->state->mode = IM_DICT0;
@@ -3132,7 +3132,7 @@ int unzClose (unzFile file)
     if (s->pfile_in_zip_read!=NULL)
         unzCloseCurrentFile(file);
 
-	lufclose(s->file);
+    lufclose(s->file);
 	zfree(s); // unused s=0;
 	return UNZ_OK;
 }
@@ -3407,7 +3407,7 @@ int unzLocateFile (unzFile file, const TCHAR *szFileName, int iCaseSensitivity)
     if (_tcslen(szFileName)>=UNZ_MAXFILENAMEINZIP)
         return UNZ_PARAMERROR;
 
-	char szFileNameA[MAX_PATH];
+    char szFileNameA[MAX_PATH];
 
 #ifdef _UNICODE
 	GetAnsiFileName(szFileName, szFileNameA, MAX_PATH-1);
@@ -3458,72 +3458,73 @@ int unzlocal_CheckCurrentFileCoherencyHeader (unz_s *s,uInt *piSizeVar,
 	*poffset_local_extrafield = 0;
 	*psize_local_extrafield = 0;
 
-	if (lufseek(s->file,s->cur_file_info_internal.offset_curfile + s->byte_before_the_zipfile,SEEK_SET)!=0)
-		return UNZ_ERRNO;
+    if (lufseek(s->file,s->cur_file_info_internal.offset_curfile + s->byte_before_the_zipfile,SEEK_SET)!=0)
+        return UNZ_ERRNO;
 
 
-	if (err==UNZ_OK)
-	{
-		if (unzlocal_getLong(s->file,&uMagic) != UNZ_OK)
-			err=UNZ_ERRNO;
-		else if (uMagic!=0x04034b50)
-			err=UNZ_BADZIPFILE;
-	}
+    if (err==UNZ_OK)
+    {
+        if (unzlocal_getLong(s->file,&uMagic) != UNZ_OK)
+            err=UNZ_ERRNO;
+        else if (uMagic!=0x04034b50)
+            err=UNZ_BADZIPFILE;
+    }
 
-	if (unzlocal_getShort(s->file,&uData) != UNZ_OK)
-		err=UNZ_ERRNO;
+    if (unzlocal_getShort(s->file,&uData) != UNZ_OK)
+        err=UNZ_ERRNO;
 //	else if ((err==UNZ_OK) && (uData!=s->cur_file_info.wVersion))
 //		err=UNZ_BADZIPFILE;
-	if (unzlocal_getShort(s->file,&uFlags) != UNZ_OK)
-		err=UNZ_ERRNO;
+    if (unzlocal_getShort(s->file,&uFlags) != UNZ_OK)
+        err=UNZ_ERRNO;
 
-	if (unzlocal_getShort(s->file,&uData) != UNZ_OK)
-		err=UNZ_ERRNO;
-	else if ((err==UNZ_OK) && (uData!=s->cur_file_info.compression_method))
-		err=UNZ_BADZIPFILE;
+    if (unzlocal_getShort(s->file,&uData) != UNZ_OK)
+        err=UNZ_ERRNO;
+    else if ((err==UNZ_OK) && (uData!=s->cur_file_info.compression_method))
+        err=UNZ_BADZIPFILE;
 
     if ((err==UNZ_OK) && (s->cur_file_info.compression_method!=0) &&
                          (s->cur_file_info.compression_method!=Z_DEFLATED))
         err=UNZ_BADZIPFILE;
 
-	if (unzlocal_getLong(s->file,&uData) != UNZ_OK) // date/time
-		err=UNZ_ERRNO;
+    if (unzlocal_getLong(s->file,&uData) != UNZ_OK) // date/time
+        err=UNZ_ERRNO;
 
-	if (unzlocal_getLong(s->file,&uData) != UNZ_OK) // crc
-		err=UNZ_ERRNO;
-	else if ((err==UNZ_OK) && (uData!=s->cur_file_info.crc) &&
-		                      ((uFlags & 8)==0))
-		err=UNZ_BADZIPFILE;
+    if (unzlocal_getLong(s->file,&uData) != UNZ_OK) // crc
+        err=UNZ_ERRNO;
+    else if ((err==UNZ_OK) && (uData!=s->cur_file_info.crc) &&
+                          ((uFlags & 8)==0))
+        err=UNZ_BADZIPFILE;
 
-	if (unzlocal_getLong(s->file,&uData) != UNZ_OK) // size compr
-		err=UNZ_ERRNO;
-	else if ((err==UNZ_OK) && (uData!=s->cur_file_info.compressed_size) &&
-							  ((uFlags & 8)==0))
-		err=UNZ_BADZIPFILE;
+    if (unzlocal_getLong(s->file,&uData) != UNZ_OK) // size compr
+        err=UNZ_ERRNO;
+    else if ((err==UNZ_OK) && (uData!=s->cur_file_info.compressed_size) &&
+                              ((uFlags & 8)==0))
+        err=UNZ_BADZIPFILE;
 
-	if (unzlocal_getLong(s->file,&uData) != UNZ_OK) // size uncompr
-		err=UNZ_ERRNO;
-	else if ((err==UNZ_OK) && (uData!=s->cur_file_info.uncompressed_size) &&
-							  ((uFlags & 8)==0))
-		err=UNZ_BADZIPFILE;
+    if (unzlocal_getLong(s->file,&uData) != UNZ_OK) // size uncompr
+        err=UNZ_ERRNO;
+    else if ((err==UNZ_OK) && (uData!=s->cur_file_info.uncompressed_size) &&
+                              ((uFlags & 8)==0))
+        err=UNZ_BADZIPFILE;
 
 
-	if (unzlocal_getShort(s->file,&size_filename) != UNZ_OK)
-		err=UNZ_ERRNO;
-	else if ((err==UNZ_OK) && (size_filename!=s->cur_file_info.size_filename))
-		err=UNZ_BADZIPFILE;
+    if (unzlocal_getShort(s->file,&size_filename) != UNZ_OK)
+        err=UNZ_ERRNO;
+    else if ((err==UNZ_OK) && (size_filename!=s->cur_file_info.size_filename))
+        err=UNZ_BADZIPFILE;
 
-	*piSizeVar += (uInt)size_filename;
+    *piSizeVar += (uInt)size_filename;
 
-	if (unzlocal_getShort(s->file,&size_extra_field) != UNZ_OK)
-		err=UNZ_ERRNO;
-	*poffset_local_extrafield= s->cur_file_info_internal.offset_curfile +
-									SIZEZIPLOCALHEADER + size_filename;
-	*psize_local_extrafield = (uInt)size_extra_field;
+    if (unzlocal_getShort(s->file,&size_extra_field) != UNZ_OK)
+        err=UNZ_ERRNO;
 
-	*piSizeVar += (uInt)size_extra_field;
+    *poffset_local_extrafield= s->cur_file_info_internal.offset_curfile +
+                                    SIZEZIPLOCALHEADER + size_filename;
+    *psize_local_extrafield = (uInt)size_extra_field;
 
-	return err;
+    *piSizeVar += (uInt)size_extra_field;
+
+    return err;
 }
 
 
@@ -3551,8 +3552,8 @@ int unzOpenCurrentFile (unzFile file)
     if (s->pfile_in_zip_read != NULL)
         unzCloseCurrentFile(file);
 
-	if (unzlocal_CheckCurrentFileCoherencyHeader(s,&iSizeVar,
-				&offset_local_extrafield,&size_local_extrafield)!=UNZ_OK)
+    if (unzlocal_CheckCurrentFileCoherencyHeader(s,&iSizeVar,
+        &offset_local_extrafield,&size_local_extrafield)!=UNZ_OK)
 		return UNZ_BADZIPFILE;
 
 	pfile_in_zip_read_info = (file_in_zip_read_info_s*)zmalloc(sizeof(file_in_zip_read_info_s));
@@ -4157,7 +4158,7 @@ ZRESULT TUnzip::Unzip(int index,void *dst,unsigned int len,DWORD flags)
 			_tcscpy(dir,(const TCHAR*)dst); 
 			dir[name-(const TCHAR*)dst-1] = _T('\0');
 			bool isabsolute = (dir[0]==_T('/') || dir[0]==_T('\\') || dir[1]==_T(':'));
-			isabsolute |= (_tcsstr(dir,_T("../"))!=0) | (_tcsstr(dir,_T("..\\"))!=0);
+			isabsolute |= (_tcsstr(dir,_T("../"))!=0) || (_tcsstr(dir,_T("..\\"))!=0);
 			if (!isabsolute) 
 				EnsureDirectory(rootdir,dir);
 		}

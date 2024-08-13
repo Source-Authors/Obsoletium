@@ -919,9 +919,9 @@ void CDownloadManager::StartNewDownload()
 #ifdef POSIX
 			(void *)
 #endif
-			DownloadThread, m_activeRequest, 0, (unsigned long int *)&threadID );
+			reinterpret_cast<void*>(DownloadThread), m_activeRequest, 0, (unsigned long int *)&threadID );
 
-		ThreadDetach( ( ThreadHandle_t )threadID );
+		ThreadDetach( ( ThreadHandle_t )static_cast<intp>(threadID) );
 	}
 	else
 	{
@@ -1067,9 +1067,9 @@ public:
 #ifdef POSIX
 		 	(void*)
 #endif
-		 	DownloadThread, pContext, 0, (unsigned long int *)&nThreadID );
+		 	reinterpret_cast<void*>(DownloadThread), pContext, 0, (unsigned long int *)&nThreadID );
 
-		ThreadDetach( ( ThreadHandle_t )nThreadID );
+		ThreadDetach( ( ThreadHandle_t )static_cast<intp>(nThreadID) );
 		return nThreadID;
 	}
 };

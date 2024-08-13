@@ -173,7 +173,8 @@ bool CalcBarycentricCooefs( Vector const &v0, Vector const &v1, Vector const &v2
 
 // For some reason, the global optimizer screws up the recursion here.  disable the global optimizations to fix this.
 // IN VC++ 6.0
-#pragma optimize( "g", off )
+// dimhotepus: Reenable optimizer.
+// #pragma optimize( "g", off )
 
 CCoreDispSurface::CCoreDispSurface()
 {
@@ -1301,11 +1302,11 @@ void CCoreDispInfo::CalcErrorTermAtNode( int nodeIndex, int level )
 	//
 	// get the vertex indices
 	//
-	int neighborVertIndices[9];
-	for( int i = 0; i < 8; i++ )
-	{
-		neighborVertIndices[i] = m_Nodes[nodeIndex].GetNeighborVertIndex( i );
-	}
+    int neighborVertIndices[9];
+    for( int i = 0; i < 8; i++ )
+    {
+        neighborVertIndices[i] = m_Nodes[nodeIndex].GetNeighborVertIndex( i );
+    }
 	neighborVertIndices[8] = m_Nodes[nodeIndex].GetCenterVertIndex();
 
 
@@ -1353,7 +1354,7 @@ void CCoreDispInfo::CalcErrorTermAtNode( int nodeIndex, int level )
 	//
 	// add the max child's error term
 	//
-	errorTerm += GetMaxErrorFromChildren( nodeIndex, level );
+    errorTerm += GetMaxErrorFromChildren( nodeIndex, level );
 
 	// set the error term
 	m_Nodes[nodeIndex].SetErrorTerm( errorTerm );
@@ -2208,7 +2209,7 @@ int GetNodeNeighborNodeFromNeighborSurf( int power, int index, int direction, in
 
 
 // Turn the optimizer back on
-#pragma optimize( "", on )
+// #pragma optimize( "", on )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

@@ -66,7 +66,7 @@ bool CollisionBSPData_Init( CCollisionBSPData *pBSPData )
 	pBSPData->map_vis = NULL;
 	pBSPData->numareas = 1;
 	pBSPData->numclusters = 1;
-	pBSPData->map_nullname = "**empty**";
+	V_strcpy_safe( pBSPData->map_nullname, "**empty**" );
 	pBSPData->numtextures = 0;
 
 	return true;
@@ -187,7 +187,7 @@ void CollisionBSPData_Destroy( CCollisionBSPData *pBSPData )
 // Returns the collision tree associated with the ith displacement
 //-----------------------------------------------------------------------------
 
-CDispCollTree* CollisionBSPData_GetCollisionTree( int i )
+CDispCollTree* CollisionBSPData_GetCollisionTree( intp i )
 {
 	if ((i < 0) || (i >= g_DispCollTreeCount))
 		return 0;
@@ -805,7 +805,7 @@ void CollisionBSPData_LoadBrushSides( CCollisionBSPData *pBSPData, CUtlVector<un
 				dbrushside_t * RESTRICT pInputSide = in + firstInputSide + j;
 				pSide->plane = &pBSPData->map_planes[pInputSide->planenum];
 				int t = pInputSide->texinfo;
-				if (t >= map_texinfo.Size())
+				if (t >= map_texinfo.Count())
 				{
 					Sys_Error( "Bad brushside texinfo");
 				}
@@ -1101,7 +1101,7 @@ void CollisionBSPData_LoadDispInfo( CCollisionBSPData *pBSPData )
     //
     // get surf edges data
     //
- 	CMapLoadHelper lhs( LUMP_SURFEDGES );
+    CMapLoadHelper lhs( LUMP_SURFEDGES );
     int *pSurfEdges = ( int* )lhs.LumpBase();
     if ( lhs.LumpSize() % sizeof( int ) )
         Sys_Error( "CMod_LoadDispInfo: bad surf edge lump size!" );
@@ -1109,7 +1109,7 @@ void CollisionBSPData_LoadDispInfo( CCollisionBSPData *pBSPData )
     //
     // get face data
     //
-	int face_lump_to_load = LUMP_FACES;
+    int face_lump_to_load = LUMP_FACES;
 	if ( g_pMaterialSystemHardwareConfig->GetHDRType() != HDR_TYPE_NONE &&
 		CMapLoadHelper::LumpSize( LUMP_FACES_HDR ) > 0 )
 	{
@@ -1134,7 +1134,7 @@ void CollisionBSPData_LoadDispInfo( CCollisionBSPData *pBSPData )
         Sys_Error( "CMod_LoadDispInfo: bad texinfo lump size!" );
 
 	// allocate displacement collision trees
-	g_DispCollTreeCount = coreDispCount;
+    g_DispCollTreeCount = coreDispCount;
 	g_pDispCollTrees = DispCollTrees_Alloc( g_DispCollTreeCount );
 	g_pDispBounds = (alignedbbox_t *)Hunk_Alloc( g_DispCollTreeCount * sizeof(alignedbbox_t), false );
 

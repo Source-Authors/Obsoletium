@@ -145,7 +145,7 @@ int CMapListItem::CheckFSHeaderVersion( char const *name )
 }
 
 // How often to check the filesystem for updated map info
-#define MIN_REFRESH_INTERVAL 60.0f
+#define MIN_REFRESH_INTERVAL 60.0
 
 //-----------------------------------------------------------------------------
 // Purpose: Stores the current list of maps for the engine
@@ -177,7 +177,7 @@ private:
 	CUtlDict< CMapListItem, int > m_Items;
 
 	// Time of last update
-	float			m_flLastRefreshTime;
+	double			m_flLastRefreshTime;
 
 	bool			m_bDirty;
 };
@@ -195,7 +195,7 @@ void Host_UpdateMapList( void )
 //-----------------------------------------------------------------------------
 CMapListManager::CMapListManager( void )
 {
-	m_flLastRefreshTime = -1.0f;
+	m_flLastRefreshTime = -1.0;
 	m_bDirty = false;
 }
 
@@ -223,11 +223,9 @@ void CMapListManager::Think( void )
 		return;
 #endif
 
-	int i;
-
 	m_bDirty = false;
 		
-	for ( i = m_Items.Count() - 1; i >= 0 ; i-- )
+	for ( intp i = m_Items.Count() - 1; i >= 0 ; i-- )
 	{
 		CMapListItem *item = &m_Items[ i ];
 		if ( item->GetValid() != CMapListItem::PENDING )
@@ -250,7 +248,7 @@ void CMapListManager::Think( void )
 //-----------------------------------------------------------------------------
 void CMapListManager::RefreshList( void )
 {
-	if ( m_flLastRefreshTime == -1.0f )
+	if ( m_flLastRefreshTime == -1.0 )
 	{
 		BuildList();
 		return;
@@ -480,16 +478,16 @@ static bool MapList_CheckPrintMap( const char *pakorfilesys, const char *mapname
 //			maxitemlength - 
 // Output : static int
 //-----------------------------------------------------------------------------
-static int MapList_CountMaps( const char *pszSubString, bool listobsolete, int& maxitemlength )
+static int MapList_CountMaps( const char *pszSubString, bool listobsolete, intp& maxitemlength )
 {
 	g_MapListMgr.RefreshList();
 
 	maxitemlength = 0;
 
-	int substringlength = 0;
+	intp substringlength = 0;
 	if ( pszSubString && pszSubString[0] )
 	{
-		substringlength = strlen(pszSubString);
+		substringlength = V_strlen(pszSubString);
 	}
 
 	//
@@ -508,7 +506,7 @@ static int MapList_CountMaps( const char *pszSubString, bool listobsolete, int& 
 			{
 				if ( MapList_CheckPrintMap( "(fs)", mapname, valid, showOutdated ? true : false, false ) )
 				{
-					maxitemlength = max( maxitemlength, (int)( strlen( mapname ) + 1 ) );
+					maxitemlength = max( maxitemlength, (intp)( V_strlen( mapname ) + 1 ) );
 					count++;
 				}
 			}
@@ -527,10 +525,10 @@ static int MapList_CountMaps( const char *pszSubString, bool listobsolete, int& 
 int MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose, int maxcount, int maxitemlength, char maplist[][ 64 ] )
 {
 	g_MapListMgr.RefreshList();
-	int substringlength = 0;
+	intp substringlength = 0;
 	if (pszSubString && pszSubString[0])
 	{
-		substringlength = strlen(pszSubString);
+		substringlength = V_strlen(pszSubString);
 	}
 
 	//
@@ -592,7 +590,7 @@ int _Host_Map_f_CompletionFunc( char const *cmdname, char const *partial, char c
 		substring = (char *)partial + strlen( cmdname );
 	}
 
-	int longest = 0;
+	intp longest = 0;
 	int count = min( MapList_CountMaps( substring, false, longest ), COMMAND_COMPLETION_MAXITEMS );
 	if ( count > 0 )
 	{
@@ -695,7 +693,7 @@ static void Host_Maps_f( const CCommand &args )
 	if ( pszSubString && ( pszSubString[0] == '*' ))
 		pszSubString = NULL;
 
-	int longest = 0;
+	intp longest = 0;
 	int count = MapList_CountMaps( pszSubString, true, longest );
 	if ( count > 0 )
 	{

@@ -75,7 +75,7 @@ static const char *s_pPerfToolNames[PERF_TOOL_COUNT] =
 //-----------------------------------------------------------------------------
 class CPerfUIChildPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CPerfUIChildPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPerfUIChildPanel, vgui::EditablePanel );
 
 public:
 	CPerfUIChildPanel( vgui::Panel *parent, const char *pName )  : BaseClass( parent, pName ) 
@@ -94,13 +94,13 @@ public:
 //-----------------------------------------------------------------------------
 class CPropFadeUIPanel : public CPerfUIChildPanel
 {
-	DECLARE_CLASS_SIMPLE( CPropFadeUIPanel, CPerfUIChildPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPropFadeUIPanel, CPerfUIChildPanel );
 
 public:
 	CPropFadeUIPanel( vgui::Panel *parent );
 	~CPropFadeUIPanel() {}
-	void Activate();
-	void Deactivate();
+	void Activate() override;
+	void Deactivate() override;
 
 protected:
 	enum
@@ -235,13 +235,13 @@ void CPropFadeUIPanel::Deactivate()
 //-----------------------------------------------------------------------------
 class CAreaPortalsUIPanel : public CPerfUIChildPanel
 {
-	DECLARE_CLASS_SIMPLE( CAreaPortalsUIPanel, CPerfUIChildPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAreaPortalsUIPanel, CPerfUIChildPanel );
 
 public:
 	CAreaPortalsUIPanel( vgui::Panel *parent );
 	~CAreaPortalsUIPanel() {}
-	void Activate();
-	void Deactivate();
+	void Activate() override;
+	void Deactivate() override;
 };
 
 
@@ -274,13 +274,13 @@ void CAreaPortalsUIPanel::Deactivate()
 //-----------------------------------------------------------------------------
 class COcclusionUIPanel : public CPerfUIChildPanel
 {
-	DECLARE_CLASS_SIMPLE( COcclusionUIPanel, CPerfUIChildPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( COcclusionUIPanel, CPerfUIChildPanel );
 
 public:
 	COcclusionUIPanel( vgui::Panel *parent );
 	~COcclusionUIPanel() {}
-	void Activate();
-	void Deactivate();
+	void Activate() override;
+	void Deactivate() override;
 
 protected:
 	MESSAGE_FUNC_PARAMS( OnTextChanged, "TextChanged", data );
@@ -441,23 +441,23 @@ void COcclusionUIPanel::OnCheckButtonChecked(Panel *panel)
 //-----------------------------------------------------------------------------
 class CPerfUIPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CPerfUIPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPerfUIPanel, vgui::Frame );
 
 public:
 	CPerfUIPanel( vgui::Panel *parent );
 	~CPerfUIPanel();
 
 	// Command issued
-	virtual void	OnCommand(const char *command);
+	void	OnCommand(const char *command)  override;
 
-	virtual void	Activate();
+	void	Activate() override;
 
 	void			Init();
 	void			Shutdown();
 
-	virtual void	OnKeyCodeTyped(KeyCode code);
+	void	OnKeyCodeTyped(KeyCode code) override;
 
-	virtual void	OnTick();
+	void	OnTick() override;
 
 protected:
 	vgui::ComboBox *m_pPerformanceTool;

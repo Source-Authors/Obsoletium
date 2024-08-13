@@ -92,6 +92,8 @@ private:
 		CCachedEntState()
 		{
 			m_iSerialNumber = -1;
+			m_pDataPointer = nullptr;
+			m_pNetworkable = nullptr;
 		}
 
 		bool	m_bDormant;

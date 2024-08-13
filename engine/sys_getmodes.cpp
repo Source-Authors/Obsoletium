@@ -10,7 +10,7 @@
 #include "include/SDL3/SDL_syswm.h"
 #endif
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include "winlite.h"
 #elif defined(POSIX)
 typedef void *HDC;
@@ -52,11 +52,7 @@ typedef void *HDC;
 #include "tier2/tier2.h"
 #include "tier2/renderutils.h"
 #include "tier0/etwprof.h"
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#else
 #include "xbox/xboxstubs.h"
-#endif
 #include "video/ivideoservices.h"
 #if !defined(NO_STEAM)
 #include "cl_steamauth.h"
@@ -79,8 +75,7 @@ ConVar cl_screenshotlocation( "cl_screenshotlocation", "", FCVAR_HIDDEN, "Locati
 //-----------------------------------------------------------------------------
 static void PFMWrite( float *pFloatImage, const char *pFilename, int width, int height )
 {
-    FileHandle_t fp;
-    fp = g_pFileSystem->Open( pFilename, "wb" );
+    FileHandle_t fp = g_pFileSystem->Open( pFilename, "wb" );
     g_pFileSystem->FPrintf( fp, "PF\n%d %d\n-1.000000\n", width, height );
     int i;
     for( i = height-1; i >= 0; i-- )
@@ -97,36 +92,36 @@ static void PFMWrite( float *pFloatImage, const char *pFilename, int width, int 
 class CVideoMode_Common : public IVideoMode
 {
 public:
-                        CVideoMode_Common( void );
-    virtual             ~CVideoMode_Common( void );
+                        CVideoMode_Common();
+    virtual             ~CVideoMode_Common();
 
     // Methods of IVideoMode
-    virtual bool        Init( );
-    virtual void        Shutdown( void );
-    virtual vmode_t     *GetMode( int num );
-    virtual int         GetModeCount( void );
-    virtual bool        IsWindowedMode( void ) const;
-    virtual void        UpdateWindowPosition( void );
-    virtual void        RestoreVideo( void );
-    virtual void        ReleaseVideo( void );
-    virtual void        DrawNullBackground( void *hdc, int w, int h );
-    virtual void        InvalidateWindow();
-    virtual void        DrawStartupGraphic();
-    virtual bool        CreateGameWindow( int nWidth, int nHeight, bool bWindowed );
-    virtual int         GetModeWidth( void ) const;
-    virtual int         GetModeHeight( void ) const;
-	virtual int			GetModeStereoWidth() const;
-	virtual int			GetModeStereoHeight() const;
-	virtual int			GetModeUIWidth() const  OVERRIDE;
-	virtual int			GetModeUIHeight() const OVERRIDE;
-    virtual const vrect_t &GetClientViewRect( ) const;
-    virtual void        SetClientViewRect( const vrect_t &viewRect );
-    virtual void        MarkClientViewRectDirty();
-    virtual void        TakeSnapshotTGA( const char *pFileName );
-    virtual void        TakeSnapshotTGARect( const char *pFilename, int x, int y, int w, int h, int resampleWidth, int resampleHeight, bool bPFM, CubeMapFaceIndex_t faceIndex );
-    virtual void        WriteMovieFrame( const MovieInfo_t& info );
-    virtual void        TakeSnapshotJPEG( const char *pFileName, int quality );
-    virtual bool        TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality );
+    bool        Init( ) override;
+    void        Shutdown( void ) override;
+    vmode_t     *GetMode( int num ) override;
+    int         GetModeCount( void ) override;
+    bool        IsWindowedMode( void ) const override;
+    void        UpdateWindowPosition( void ) override;
+    void        RestoreVideo( void ) override;
+    void        ReleaseVideo( void ) override;
+    void        DrawNullBackground( void *hdc, int w, int h ) override;
+    void        InvalidateWindow() override;
+    void        DrawStartupGraphic() override;
+    bool        CreateGameWindow( int nWidth, int nHeight, bool bWindowed ) override;
+    int         GetModeWidth( void ) const override;
+    int         GetModeHeight( void ) const override;
+	int			GetModeStereoWidth() const override;
+	int			GetModeStereoHeight() const override;
+	int			GetModeUIWidth() const  override;
+	int			GetModeUIHeight() const override;
+    const vrect_t &GetClientViewRect( ) const override;
+    void        SetClientViewRect( const vrect_t &viewRect ) override;
+    void        MarkClientViewRectDirty() override;
+    void        TakeSnapshotTGA( const char *pFileName ) override;
+    void        TakeSnapshotTGARect( const char *pFilename, int x, int y, int w, int h, int resampleWidth, int resampleHeight, bool bPFM, CubeMapFaceIndex_t faceIndex ) override;
+    void        WriteMovieFrame( const MovieInfo_t& info ) override;
+    void        TakeSnapshotJPEG( const char *pFileName, int quality ) override;
+    bool        TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality ) override;
 protected:
     bool                GetInitialized( ) const;
     void                SetInitialized( bool init );
@@ -164,7 +159,7 @@ private:
     // Overridden by derived classes
     virtual void        ReleaseFullScreen( void );
     virtual void        ChangeDisplaySettingsToFullscreen( int nWidth, int nHeight, int nBPP );
-    virtual void        ReadScreenPixels( int x, int y, int w, int h, void *pBuffer, ImageFormat format );
+    void        ReadScreenPixels( int x, int y, int w, int h, void *pBuffer, ImageFormat format ) override;
 
     // PFM screenshot methods
     ITexture *GetBuildCubemaps16BitTexture( void );
@@ -176,11 +171,7 @@ private:
 protected:
     enum
     {
-#if !defined( _X360 )
         MAX_MODE_LIST = 512
-#else
-        MAX_MODE_LIST = 2
-#endif
     };
 
     enum
@@ -373,36 +364,20 @@ int CVideoMode_Common::GetModeCount( void )
 //          *arg2 - 
 // Output : static int
 //-----------------------------------------------------------------------------
-static int __cdecl VideoModeCompare( const void *arg1, const void *arg2 )
+struct VideoModeComparer
 {
-    vmode_t *m1, *m2;
-
-    m1 = (vmode_t *)arg1;
-    m2 = (vmode_t *)arg2;
-
-    if ( m1->width < m2->width )
+    constexpr bool operator()( const vmode_t &m1, const vmode_t &m2 ) noexcept
     {
-        return -1;
-    }
-
-    if ( m1->width == m2->width )
-    {
-        if ( m1->height < m2->height )
+        if ( m1.width < m2.width )
         {
-            return -1;
+            return true;
         }
 
-        if ( m1->height > m2->height )
-        {
-            return 1;
-        }
-
-        return 0;
+        return
+            m1.width == m2.width &&
+            m1.height < m2.height;
     }
-
-    return 1;
-}
-
+};
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -832,10 +807,7 @@ void CVideoMode_Common::SetupStartupGraphic()
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::DrawStartupVideo()
 {
-    if ( IsX360() )
-        return;
-
-	CETWScope timer( "CVideoMode_Common::DrawStartupGraphic" );
+    CETWScope timer( "CVideoMode_Common::DrawStartupGraphic" );
 
     // render an avi, if we have one
 	if ( !m_bPlayedStartupVideo && !InEditMode() && !ShouldForceVRActive() )
@@ -851,10 +823,7 @@ void CVideoMode_Common::DrawStartupVideo()
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::DrawStartupGraphic()
 {
-    if ( IsX360() )
-        return;
-
-	char debugstartup = CommandLine()->FindParm("-debugstartupscreen");
+    char debugstartup = CommandLine()->FindParm("-debugstartupscreen");
 
     SetupStartupGraphic();
 
@@ -991,9 +960,6 @@ void CVideoMode_Common::DrawStartupGraphic()
 void CVideoMode_Common::BlitGraphicToHDCWithAlpha(HDC hdc, byte *rgba, int imageWidth, int imageHeight, int x0, int y0, int x1, int y1)
 {
 #ifdef WIN32
-    if ( IsX360() )
-        return;
-
     int x = x0;
     int y = y0;
     int wide = x1 - x0;
@@ -1019,7 +985,7 @@ void CVideoMode_Common::BlitGraphicToHDCWithAlpha(HDC hdc, byte *rgba, int image
         }
     }
 #else
-    Assert( !"Impl me" );
+    AssertMsg( false, "Impl me" );
 #endif
 }
 
@@ -1043,9 +1009,6 @@ void CVideoMode_Common::InvalidateWindow()
 void CVideoMode_Common::DrawNullBackground( void *hHDC, int w, int h )
 {
 #ifdef WIN32
-    if ( IsX360() )
-        return;
-
     HDC hdc = (HDC)hHDC;
 
     // Show a message if running without renderer..
@@ -1100,7 +1063,7 @@ void CVideoMode_Common::DrawNullBackground( void *hHDC, int w, int h )
         DeleteObject( fnt );
     }
 #else
-    Assert( !"Impl me" );
+    AssertMsg( false, "Impl me" );
 #endif
 
 }
@@ -1167,9 +1130,6 @@ typedef GUID UUID;
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::BlitGraphicToHDC(HDC hdc, byte *rgba, int imageWidth, int imageHeight, int x0, int y0, int x1, int y1)
 {
-    if ( IsX360() )
-        return;
-
 #ifdef WIN32
     int x = x0;
     int y = y0;
@@ -1294,7 +1254,7 @@ void CVideoMode_Common::BlitGraphicToHDC(HDC hdc, byte *rgba, int imageWidth, in
 
     COM_TimestampedLog( "BlitGraphicToHDC: new ver took %.4f", elapsed );
 #else
-    Assert( !"Impl me" );
+    AssertMsg( false, "Impl me" );
 #endif
 }
 
@@ -1365,7 +1325,6 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 	WindowRect.bottom   = nHeight;
 
 #ifndef USE_SDL
-#ifndef _X360
 	// Get window style
 	DWORD style = GetWindowLong( (HWND)game->GetMainWindow(), GWL_STYLE );
 	DWORD exStyle = GetWindowLong( (HWND)game->GetMainWindow(), GWL_EXSTYLE );
@@ -1397,12 +1356,10 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 
 	// Compute rect needed for that size client area based on window style
 	AdjustWindowRectEx( &WindowRect, style, FALSE, exStyle );
-#endif
 
 	// Prepare to set window pos, which is required when toggling between topmost and not window flags
 	HWND hWndAfter = NULL;
 	DWORD dwSwpFlags = 0;
-#ifndef _X360
 	{
 		if ( bWindowed )
 		{
@@ -1414,11 +1371,6 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 		}
 		dwSwpFlags = SWP_FRAMECHANGED;
 	}
-#else
-	{
-		dwSwpFlags = SWP_NOZORDER;
-	}
-#endif
 
 	// Move the window to 0, 0 and the new true size
 	SetWindowPos( (HWND)game->GetMainWindow(),
@@ -1645,7 +1597,7 @@ void CVideoMode_Common::ReleaseVideo( void )
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::ReadScreenPixels( int x, int y, int w, int h, void *pBuffer, ImageFormat format )
 {
-    int nBytes = ImageLoader::GetMemRequired( w, h, 1, format, false );
+    intp nBytes = ImageLoader::GetMemRequired( w, h, 1, format, false );
     memset( pBuffer, 0, nBytes );
 }
 
@@ -1697,19 +1649,7 @@ ITexture *CVideoMode_Common::GetFullFrameFB0( void )
 
 void CVideoMode_Common::BlitHiLoScreenBuffersTo16Bit( void )
 {
-    if ( IsX360() )
-    {
-        // FIXME: this breaks in 480p due to (at least) the multisampled depth buffer (need to cache, clear and restore the depth target)
-        Assert( 0 );
-        return;
-    }
-    
     IMaterial *pHDRCombineMaterial = materials->FindMaterial( "dev/hdrcombineto16bit", TEXTURE_GROUP_OTHER, true );
-//  if( IsErrorMaterial( pHDRCombineMaterial ) )
-//  {
-//      Assert( 0 );
-//      return;
-//  }
 
     CMatRenderContextPtr pRenderContext( materials );
     ITexture *pSaveRenderTarget;
@@ -1779,22 +1719,12 @@ void GetCubemapOffset( CubeMapFaceIndex_t faceIndex, int &x, int &y, int &faceDi
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::TakeSnapshotPFMRect( const char *pFilename, int x, int y, int w, int h, int resampleWidth, int resampleHeight, CubeMapFaceIndex_t faceIndex )
 {
-    if ( IsX360() )
-    {
-        // FIXME: this breaks in 480p due to (at least) the multisampled depth buffer (need to cache, clear and restore the depth target)
-        Assert( 0 );
-        return;
-    }
-
     if ( g_pMaterialSystemHardwareConfig->GetHDRType() == HDR_TYPE_NONE )
     {
         Warning( "Unable to take PFM screenshots if HDR isn't enabled!\n" );
         return;
     }
 
-    // hack
-//  resampleWidth = w;
-//  resampleHeight = h;
     // bitmap bits
     float16 *pImage = ( float16 * )malloc( w * h * ImageLoader::SizeInBytes( IMAGE_FORMAT_RGBA16161616F ) );
     float *pImage1 = ( float * )malloc( w * h * ImageLoader::SizeInBytes( IMAGE_FORMAT_RGB323232F ) );
@@ -1862,12 +1792,6 @@ void CVideoMode_Common::TakeSnapshotPFMRect( const char *pFilename, int x, int y
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::TakeSnapshotTGARect( const char *pFilename, int x, int y, int w, int h, int resampleWidth, int resampleHeight, bool bPFM, CubeMapFaceIndex_t faceIndex )
 {
-    if ( IsX360() )
-    {
-        Assert( 0 );
-        return;
-    }
-
     if ( bPFM )
     {
         TakeSnapshotPFMRect( pFilename, x, y, w, h, resampleWidth, resampleHeight, faceIndex );
@@ -2102,7 +2026,6 @@ GLOBAL(void) jpeg_UtlBuffer_dest (j_compress_ptr cinfo, CUtlBuffer *pBuffer )
 
 bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
 {
-#if !defined( _X360 )
     if ( g_LostVideoMemory )
         return false;
 
@@ -2169,11 +2092,6 @@ bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
     jpeg_destroy_compress(&cinfo);
     
     delete[] pImage;
-
-#else
-    // not supporting
-    Assert( 0 );
-#endif
     return true;
 }
 
@@ -2183,11 +2101,10 @@ bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::TakeSnapshotJPEG( const char *pFilename, int quality )
 {
-#if !defined( _X360 )
     Assert( pFilename );
 
     // Output buffer
-    CUtlBuffer buf( 0, 0 );
+    CUtlBuffer buf( (intp)0, 0 );
     TakeSnapshotJPEGToBuffer( buf, quality );
 
     int finalSize = 0;
@@ -2199,7 +2116,7 @@ void CVideoMode_Common::TakeSnapshotJPEG( const char *pFilename, int quality )
         g_pFileSystem->Close( fh );
     }
 
-// Show info to console.
+    // Show info to console.
     char orig[ 64 ];
     char final[ 64 ];
     Q_strncpy( orig, Q_pretifymem( GetModeStereoWidth() * 3 * GetModeStereoHeight(), 2, true ), sizeof( orig ) );
@@ -2217,10 +2134,6 @@ void CVideoMode_Common::TakeSnapshotJPEG( const char *pFilename, int quality )
 			AddScreenshotToSteam( szPath, GetModeStereoWidth(), GetModeStereoHeight() );
 		}
 	}
-
-#else
-    Assert( 0 );
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -2356,7 +2269,7 @@ bool CVideoMode_MaterialSystem::Init( )
     // Sort modes for easy searching later
     if ( m_nNumModes > 1 )
     {
-        qsort( (void *)&m_rgModeList[0], m_nNumModes, sizeof(vmode_t), VideoModeCompare );
+        std::sort( &m_rgModeList[0], &m_rgModeList[0] + m_nNumModes, VideoModeComparer{} );
     }
 
     materials->AddModeChangeCallBack( &VideoMode_AdjustForModeChange );
@@ -2402,25 +2315,6 @@ bool CVideoMode_MaterialSystem::SetMode( int nWidth, int nHeight, bool bWindowed
     
     config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, bWindowed );
 
-#if defined( _X360 )
-    XVIDEO_MODE videoMode;
-    XGetVideoMode( &videoMode );
-    if ( videoMode.fIsWideScreen )
-    {
-        extern ConVar r_aspectratio;
-        r_aspectratio.SetValue( 16.0f/9.0f );
-    }
-    config.SetFlag( MATSYS_VIDCFG_FLAGS_SCALE_TO_OUTPUT_RESOLUTION, (DWORD)nWidth != videoMode.dwDisplayWidth || (DWORD)nHeight != videoMode.dwDisplayHeight );
-    if ( nHeight == 480 || nWidth == 576 )
-    {
-        // Use 2xMSAA for standard def (see mat_software_aa_strength for fake hi-def aa)
-        // FIXME: shuffle the EDRAM surfaces to allow 4xMSAA for standard def
-        //        (they would overlap & trash each other with the current arrangement)
-        // NOTE: This should affect 640x480 and 848x480 (which is also used for 640x480 widescreen), and PAL 640x576
-        config.m_nAASamples = 2;
-    }
-#endif
-
     // FIXME: This is trash. We have to do *different* things depending on how we're setting the mode!
     if ( !m_bSetModeOnce )
     {
@@ -2450,8 +2344,8 @@ void CVideoMode_MaterialSystem::AdjustForModeChange( void )
         return;
 
     // get previous size
-	int nOldUIWidth = GetModeUIWidth();
-	int nOldUIHeight = GetModeUIHeight();
+    int nOldUIWidth = GetModeUIWidth();
+    int nOldUIHeight = GetModeUIHeight();
 
     // Get the new mode info from the config record
     int nNewWidth = g_pMaterialSystemConfig->m_VideoMode.m_Width;
@@ -2506,13 +2400,10 @@ void CVideoMode_MaterialSystem::SetGameWindow( void *hWnd )
 //-----------------------------------------------------------------------------
 void CVideoMode_MaterialSystem::ReleaseVideo( void )
 {
-    if ( IsX360() )
-        return;
-
     if ( IsWindowedMode() )
         return;
 
-	ReleaseFullScreen();
+    ReleaseFullScreen();
 }
 
 
@@ -2521,9 +2412,6 @@ void CVideoMode_MaterialSystem::ReleaseVideo( void )
 //-----------------------------------------------------------------------------
 void CVideoMode_MaterialSystem::RestoreVideo( void )
 {
-    if ( IsX360() )
-        return;
-
     if ( IsWindowedMode() )
         return;
 
@@ -2541,9 +2429,6 @@ void CVideoMode_MaterialSystem::RestoreVideo( void )
 //-----------------------------------------------------------------------------
 void CVideoMode_MaterialSystem::ReleaseFullScreen( void )
 {
-    if ( IsX360() )
-        return;
-
     if ( IsWindowedMode() )
         return;
 
@@ -2565,9 +2450,6 @@ void CVideoMode_MaterialSystem::ReleaseFullScreen( void )
 //-----------------------------------------------------------------------------
 void CVideoMode_MaterialSystem::ChangeDisplaySettingsToFullscreen( int nWidth, int nHeight, int nBPP )
 {
-    if ( IsX360() )
-        return;
-
     if ( IsWindowedMode() )
         return;
 
@@ -2615,7 +2497,7 @@ void CVideoMode_MaterialSystem::ChangeDisplaySettingsToFullscreen( int nWidth, i
 #else
 	if ( !HushAsserts() )
 	{
-		Assert( !"Impl me" );
+		AssertMsg( false, "Impl me" );
 	}
 #endif
 }
@@ -2647,7 +2529,7 @@ void CVideoMode_MaterialSystem::ReadScreenPixels( int x, int y, int w, int h, vo
     }
     else
     {
-        int nBytes = ImageLoader::GetMemRequired( w, h, 1, format, false );
+        intp nBytes = ImageLoader::GetMemRequired( w, h, 1, format, false );
         memset( pBuffer, 0, nBytes );
     }
 }

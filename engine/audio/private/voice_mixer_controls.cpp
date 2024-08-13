@@ -108,7 +108,7 @@ bool CMixerControls::Init()
 
 		// Iterate over each destination line, looking for Play Controls.
 		MIXERCAPS mxcaps;
-		mmr = mixerGetDevCaps((UINT)m_hMixer, &mxcaps, sizeof(mxcaps));
+		mmr = mixerGetDevCaps(reinterpret_cast<UINT_PTR>(m_hMixer), &mxcaps, sizeof(mxcaps));
 		if(mmr != MMSYSERR_NOERROR)
 		{
 			continue;

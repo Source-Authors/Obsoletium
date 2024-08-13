@@ -125,7 +125,7 @@ public: // IReplayServer interface:
 	virtual IReplayDirector *GetDirector() { return NULL; }
 	virtual int		GetReplaySlot(); // return entity index-1 of Replay in game
 	virtual float	GetOnlineTime(); // seconds since broadcast started
-	virtual void	BroadcastEvent( IGameEvent *event ) { }
+	virtual void	BroadcastEvent( IGameEvent * ) { }
 	virtual bool	IsRecording()	{ return m_DemoRecorder.IsRecording(); }
 	virtual void	StartRecording();
 	virtual void	StopRecording();
@@ -171,7 +171,7 @@ public:
 	float			m_flStartTime;
 	float			m_flFPS;		// FPS the proxy is running;
 	int				m_nGameServerMaxClients; // max clients on game server
-	float			m_fNextSendUpdateTime;	// time to send next Replay status messages 
+	double			m_fNextSendUpdateTime;	// time to send next Replay status messages 
 	RecvTable		*m_pRecvTables[MAX_DATATABLES];
 	int				m_nRecvTables;
 	Vector			m_vPVSOrigin; 

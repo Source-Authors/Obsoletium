@@ -18,7 +18,7 @@
 
 
 void	ClearCheatCommands( void );
-void	ReadCheatCommandsFromFile( char *pchFileName );
+void	ReadCheatCommandsFromFile( const char *pchFileName );
 void	LogKeyPress( ButtonCode_t code );
 void	CheckCheatCodes();
 

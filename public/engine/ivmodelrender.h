@@ -79,6 +79,8 @@ struct ModelRenderInfo_t
 
 	ModelRenderInfo_t()
 	{
+		pRenderable = NULL;
+		pModel = NULL;
 		pModelToWorld = NULL;
 		pLightingOffset = NULL;
 		pLightingOrigin = NULL;

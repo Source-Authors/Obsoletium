@@ -258,10 +258,10 @@ void CClientFrameManager::FreeFrame( CClientFrame* pFrame )
 }
 
 CClientFrameManager::CClientFrameManager( void )
-:	m_ClientFramePool( MAX_CLIENT_FRAMES, CUtlMemoryPool::GROW_SLOW ),
-	m_Frames(NULL),
+:	m_Frames(NULL),
 	m_LastFrame(NULL),
-	m_nFrames(0)
+	m_nFrames(0),
+	m_ClientFramePool( MAX_CLIENT_FRAMES, CUtlMemoryPool::GROW_SLOW )
 {
 }
 

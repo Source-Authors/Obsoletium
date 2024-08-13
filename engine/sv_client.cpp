@@ -315,7 +315,7 @@ bool CGameClient::ProcessFileCRCCheck( CLC_FileCRCCheck *msg )
 
 	return true;
 }
-bool CGameClient::ProcessFileMD5Check( CLC_FileMD5Check *msg )
+bool CGameClient::ProcessFileMD5Check( CLC_FileMD5Check * )
 {
 	// Legacy message
 	return true;
@@ -323,7 +323,7 @@ bool CGameClient::ProcessFileMD5Check( CLC_FileMD5Check *msg )
 
 
 #if defined( REPLAY_ENABLED )
-bool CGameClient::ProcessSaveReplay( CLC_SaveReplay *pMsg )
+bool CGameClient::ProcessSaveReplay( CLC_SaveReplay * )
 {
 	// Don't allow on listen servers
 	if ( !sv.IsDedicated() )
@@ -445,10 +445,10 @@ void CGameClient::SetupPackInfo( CFrameSnapshot *pSnapshot )
 	// Since area to area visibility is determined by each player's PVS, copy
 	//  the area network lookups into the ClientPackInfo_t
 	m_PackInfo.m_AreasNetworked = 0;
-	int areaCount = g_AreasNetworked.Count();
-	for ( int j = 0; j < areaCount; j++ )
+
+	for ( auto a : g_AreasNetworked )
 	{
-		m_PackInfo.m_Areas[m_PackInfo.m_AreasNetworked] = g_AreasNetworked[ j ];
+		m_PackInfo.m_Areas[m_PackInfo.m_AreasNetworked] = a;
 		m_PackInfo.m_AreasNetworked++;
 
 		// Msg("CGameClient::SetupPackInfo: too much areas (%i)", areaCount );
@@ -1133,7 +1133,7 @@ bool CGameClient::ExecuteStringCommand( const char *pCommandString )
 		return true;
 	}
 	
-	const ConCommandBase *pCommand = g_pCVar->FindCommandBase( args[ 0 ] );
+	ConCommandBase *pCommand = g_pCVar->FindCommandBase( args[ 0 ] );
 	if ( pCommand && pCommand->IsCommand() && pCommand->IsFlagSet( FCVAR_GAMEDLL ) )
 	{
 		// Allow cheat commands in singleplayer, debug, or multiplayer with sv_cheats on
@@ -1324,7 +1324,7 @@ void CGameClient::FileDenied(const char *fileName, unsigned int transferID )
 	ConMsg( "Downloading file '%s' from client %s failed.\n", fileName, GetClientName() );
 }
 
-void CGameClient::FileSent( const char *fileName, unsigned int transferID )
+void CGameClient::FileSent( const char *fileName, unsigned int )
 {
 	ConMsg( "Sent file '%s' to client %s.\n", fileName, GetClientName() );
 }

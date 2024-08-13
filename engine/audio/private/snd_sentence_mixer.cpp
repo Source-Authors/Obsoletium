@@ -78,7 +78,7 @@ CSentenceMixer::CSentenceMixer( voxword_t *pWords )
 		// get a private copy of the words
 		m_VoxWords[m_nNumWords] = pWords[m_nNumWords];
 		m_nNumWords++;
-		if ( m_nNumWords >= ARRAYSIZE( m_VoxWords ) )
+		if ( m_nNumWords >= ssize( m_VoxWords ) )
 		{
 			// very long sentence, prevent overflow
 			break;
@@ -93,7 +93,7 @@ CSentenceMixer::CSentenceMixer( voxword_t *pWords )
 		// the sentence will skip these words
 		m_pWordMixers[nWord] = LoadWord( nWord );
 	}
-	Assert( m_nNumWords < ARRAYSIZE( m_pWordMixers ) );
+	Assert( m_nNumWords < ssize( m_pWordMixers ) );
 
 	// find first valid word mixer
 	m_currentWordIndex = 0;

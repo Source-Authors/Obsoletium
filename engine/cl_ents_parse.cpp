@@ -91,7 +91,7 @@ void SpewToFile( char const* pFmt, ... )
 	va_end( args );
 	Assert( len < 2048 );
 
-	int idx = s_RecordingBuffer.AddMultipleToTail( len );
+	auto idx = s_RecordingBuffer.AddMultipleToTail( len );
 	memcpy( &s_RecordingBuffer[idx], temp, len );
 	if ( 1 ) //s_RecordingBuffer.Size() > 8192)
 	{

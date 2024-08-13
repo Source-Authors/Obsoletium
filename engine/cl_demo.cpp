@@ -389,7 +389,7 @@ void CDemoRecorder::RecordServerClasses( ServerClass *pClasses )
 	{
 		// keep temp large allocations off of stack
 		bigBuff.EnsureCapacity( buffSize );
-		pBigBuffer = (char*)bigBuff.Base();
+		pBigBuffer = bigBuff.Base<char>();
 	}
 
 	bf_write buf( pBigBuffer, buffSize );
@@ -905,7 +905,7 @@ bool CDemoPlayer::IsSkipping( void )
 	return m_bPlayingBack && ( m_nSkipToTick != -1 );
 }
 
-bool CDemoPlayer::IsLoading( void )
+bool CDemoPlayer::IsLoading( void ) const
 {
 	return m_bLoading;
 }

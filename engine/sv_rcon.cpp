@@ -330,7 +330,7 @@ void CRConServer::RunFrame()
 					return;
 				response.SeekGet( CUtlBuffer::SEEK_CURRENT, size ); // eat up the buffer we just sent
 
-				if ( response.TellPut() - response.TellGet() >= sizeof(int) )
+				if ( response.TellPut() - response.TellGet() >= static_cast<intp>(sizeof(int)) )
 				{
 					size = response.GetInt(); // read how much is in this packet
 				}
@@ -475,7 +475,7 @@ bool CRConServer::SendRCONResponse( int nIndex, const void *data, int len, bool 
 			if ( !fromQueue ) // we don't have an entry for this
 					// yet, add a new one
 			{
-				int index = pSocketData->m_OutstandingSends.AddToHead();
+				auto index = pSocketData->m_OutstandingSends.AddToHead();
 				pSocketData->m_OutstandingSends[index].Put( (void *)((char *)data + sendLen), len - sendLen );
 			}
 			else // update the existing queued item to show we 
@@ -500,8 +500,8 @@ bool CRConServer::SendRCONResponse( int nIndex, const void *data, int len, bool 
 //-----------------------------------------------------------------------------
 bool CRConServer::FailedRCon_t::operator<(const struct CRConServer::FailedRCon_t &rhs) const
 {
-	int myTime = 0;
-	int rhsTime = 0;
+	float myTime = 0;
+	float rhsTime = 0;
 
 	if ( badPasswordTimes.Count() )
 		myTime = badPasswordTimes[ badPasswordTimes.Count() - 1 ];
@@ -559,7 +559,7 @@ bool CRConServer::HandleFailedRconAuth( const netadr_t & adr )
 		}
 
 		// add the new rcon
-		int index = m_failedRcons.AddToTail();
+		intp index = m_failedRcons.AddToTail();
 		failedRcon = &m_failedRcons[index];
 		failedRcon->adr = adr;
 		failedRcon->badPasswordCount = 0;

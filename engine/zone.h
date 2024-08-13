@@ -11,16 +11,16 @@
 
 #include "tier0/dbg.h"
 
-void Memory_Init (void);
-void Memory_Shutdown( void );
+void Memory_Init();
+void Memory_Shutdown();
 
-void *Hunk_Alloc(int size, bool bClear = true );
-void *Hunk_AllocName (int size, const char *name, bool bClear = true );
+void* Hunk_Alloc(unsigned size, bool bClear = true);
+void *Hunk_AllocName(unsigned size, const char *name, bool bClear = true );
 
-int	Hunk_LowMark (void);
+int	Hunk_LowMark();
 void Hunk_FreeToLowMark (int mark);
 
-void Hunk_Check (void);
+void Hunk_Check();
 
 int Hunk_MallocSize();
 int Hunk_Size();

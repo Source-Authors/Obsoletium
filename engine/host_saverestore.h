@@ -52,9 +52,6 @@ public:
 	virtual char const				*GetMostRecentlyLoadedFileName() = 0;
 	virtual char const				*GetSaveFileName() = 0;
 
-	virtual bool					IsXSave( void ) = 0;
-	virtual void					SetIsXSave( bool bState ) = 0;
-
 	virtual void					FinishAsyncSave() = 0;
 	virtual bool					StorageDeviceValid() = 0;
 	virtual void					SetMostRecentSaveGame( const char *lpszFilename ) = 0;

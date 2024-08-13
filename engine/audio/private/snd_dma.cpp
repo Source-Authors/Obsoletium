@@ -200,7 +200,7 @@ void CActiveChannels::GetActiveChannels( CChannelList &list )
 		Q_memcpy( list.m_list, m_list, sizeof(m_list[0])*m_count );
 	}
 
-	for ( int i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
+	for ( intp i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
 	{
 		paintbuffer_t *pSpecialBuffer = MIX_GetPPaintFromIPaint( i );
 		if ( pSpecialBuffer->nSpecialDSP != 0 )
@@ -343,7 +343,7 @@ CSfxTable::CSfxTable()
 }
 
 
-void CSfxTable::SetNamePoolIndex( int index )
+void CSfxTable::SetNamePoolIndex( unsigned short index )
 {
 	m_namePoolIndex = index;
 	if ( m_namePoolIndex != s_Sounds.InvalidIndex() )
@@ -362,7 +362,7 @@ void CSfxTable::OnNameChanged( const char *pName )
 		char szString[MAX_PATH];
 		Q_strncpy( szString, pName, sizeof(szString) );
 		Q_FixSlashes( szString, '/' );
-		m_mixGroupCount = MXR_GetMixGroupListFromDirName( szString, m_mixGroupList, ARRAYSIZE(m_mixGroupList) );
+		m_mixGroupCount = MXR_GetMixGroupListFromDirName( szString, m_mixGroupList, ssize(m_mixGroupList) );
 		m_bMixGroupsCached = true;
 	}
 }
@@ -677,8 +677,8 @@ void VAudioInit()
 		g_pVAudioModule = FileSystem_LoadModule( "vaudio_miles" );
 		if ( g_pVAudioModule )
 		{
-			CreateInterfaceFn vaudioFactory = Sys_GetFactory( g_pVAudioModule );
-			vaudio = (IVAudio *)vaudioFactory( VAUDIO_INTERFACE_VERSION, NULL );
+			CreateInterfaceFnT<IVAudio> vaudioFactory = Sys_GetFactory<IVAudio>( g_pVAudioModule );
+			vaudio = vaudioFactory( VAUDIO_INTERFACE_VERSION, NULL );
 		}
 	}
 }
@@ -724,31 +724,7 @@ void S_Init( void )
 
 	AllocDsps( true );
 
-	if ( IsX360() )
-	{
-		g_pQueuedLoader->InstallLoader( RESOURCEPRELOAD_SOUND, &s_ResourcePreloadSound );
-	}
-
-	DevMsg( "Sound Initialization: Finish, Sampling Rate: %i\n", g_AudioDevice->DeviceDmaSpeed() );
-
-#ifdef _X360
-	BOOL bPlaybackControl;
-	// get initial state of the x360 media player
-	if ( XMPTitleHasPlaybackControl( &bPlaybackControl ) == ERROR_SUCCESS )
-	{
-		S_EnableMusic(bPlaybackControl!=0);
-	}
-
-	Assert( g_pVideo != NULL );
-	
-	if ( g_pVideo != NULL )
-	{
-		if ( g_pVideo->SoundDeviceCommand( VideoSoundDeviceOperation::HOOK_X_AUDIO, NULL ) != VideoResult::SUCCESS )
-		{
-			Assert( 0 );
-		}
-	}
-#endif
+	DevMsg( "Sound Initialization: Finish, Sampling Rate: %i Hz\n", g_AudioDevice->DeviceDmaSpeed() );
 }
 
 
@@ -757,12 +733,10 @@ void S_Init( void )
 // =======================================================================
 void S_Shutdown(void)
 {
-#if !defined( _X360 )
 	if ( VoiceTweak_IsStillTweaking() )
 	{
 		VoiceTweak_EndVoiceTweakMode();
 	}
-#endif
 
 	S_StopAllSounds( true );
 	S_ShutdownMixThread();
@@ -790,14 +764,11 @@ void S_Shutdown(void)
 	// release sentences resources
 	TRACESHUTDOWN( VOX_Shutdown() );
 	
-	if ( IsPC() )
-	{
-		// shutdown vaudio
-		delete vaudio;
-		FileSystem_UnloadModule( g_pVAudioModule );
-		g_pVAudioModule = NULL;
-		vaudio = NULL;
-	}
+	// shutdown vaudio
+	delete vaudio;
+	FileSystem_UnloadModule( g_pVAudioModule );
+	g_pVAudioModule = NULL;
+	vaudio = NULL;
 
 	MIX_FreeAllPaintbuffers();
 	snd_initialized = false;
@@ -807,9 +778,8 @@ void S_Shutdown(void)
 	s_buffers = 0;
 	s_oldsampleOutCount = 0;
 	s_lastsoundtime = 0.0f;
-#if !defined( _X360 )
+
 	Voice_Deinit();
-#endif
 }
 
 bool S_IsInitted()
@@ -829,39 +799,18 @@ bool S_IsInitted()
 //-----------------------------------------------------------------------------
 CSfxTable *S_FindName( const char *szName, int *pfInCache )
 {
-	int			i;
 	CSfxTable	*sfx = NULL;
-	char		szBuff[MAX_PATH];
-	const char	*pName;
 
 	if ( !szName )
 	{
 		Error( "S_FindName: NULL\n" );
 	}
 
-	pName = szName;
-	if ( IsX360() )
-	{
-		Q_strncpy( szBuff, pName, sizeof( szBuff ) );
-		int len = Q_strlen( szBuff )-4;
-		if ( len > 0 && !Q_strnicmp( szBuff+len, ".mp3", 4 ) )
-		{
-			// convert unsupported .mp3 to .wav
-			Q_strcpy( szBuff+len, ".wav" );
-		}
-		pName = szBuff;
-
-		if ( pName[0] == CHAR_STREAM )
-		{
-			// streaming (or not) is hardcoded to alternate criteria
-			// prevent the same sound from creating disparate instances
-			pName++;
-		}
-	}
+	const char	*pName = szName;
 
 	// see if already loaded
 	FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( pName );
-	i = s_Sounds.Find( fnHandle );
+	unsigned short i = s_Sounds.Find( fnHandle );
 	if ( i != s_Sounds.InvalidIndex() )
 	{
 		sfx = s_Sounds[i].pSfx;
@@ -875,7 +824,7 @@ CSfxTable *S_FindName( const char *szName, int *pfInCache )
 	}
 	else
 	{
-		SfxDictEntry entry;
+		SfxDictEntry entry = {};
 		entry.pSfx = ( CSfxTable * )s_SoundPool.Alloc();
 
 		Assert( entry.pSfx );
@@ -909,95 +858,15 @@ CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 	VPROF("S_LoadSound");
 	if ( !pSfx->pSource )
 	{
-		if ( IsX360() )
-		{
-			if ( SND_IsInGame() && !g_pQueuedLoader->IsMapLoading() )
-			{
-				// sound should be present (due to reslists), but NOT allowing a load hitch during gameplay 
-				// loading a sound during gameplay is a bad experience, causes a very expensive sync i/o to fetch the header
-				// and in the case of a memory wave, the actual audio data
-				bool bFound = false;
-				if ( !pSfx->m_bIsLateLoad )
-				{
-					if ( pSfx->getname() != PSkipSoundChars( pSfx->getname() ) )
-					{
-						// the sound might already exist as an undecorated audio source
-						FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( pSfx->GetFileName() );
-						int i = s_Sounds.Find( fnHandle );
-						if ( i != s_Sounds.InvalidIndex() )
-						{
-							CSfxTable *pOtherSfx = s_Sounds[i].pSfx;
-							Assert( pOtherSfx );
-							CAudioSource *pOtherSource = pOtherSfx->pSource;
-							if ( pOtherSource && pOtherSource->IsCached() )
-							{
-								// Can safely let the "load" continue because the headers are expected to be in the preload
-								// that are now persisted and the wave data cache will find an existing audio buffer match,
-								// so no sync i/o should occur from either.
-								bFound = true;
-							}
-						}
-					}
-
-					if ( !bFound )
-					{
-						// warn once
-						DevWarning( "S_LoadSound: Late load '%s', skipping.\n", pSfx->getname() ); 
-						pSfx->m_bIsLateLoad = true;
-					}
-				}
-
-				if ( !bFound )
-				{
-					return NULL;
-				}
-			}
-			else if ( pSfx->m_bIsLateLoad )
-			{
-				// outside of gameplay, let the load happen
-				pSfx->m_bIsLateLoad = false;
-			}
-		}
-
 		double st = Plat_FloatTime();
 
-		bool bStream = false;
 		bool bUserVox = false;
 
 		// sound chars can explicitly categorize usage
-		bStream = TestSoundChar( pSfx->getname(), CHAR_STREAM );
+		bool bStream = TestSoundChar( pSfx->getname(), CHAR_STREAM );
 		if ( !bStream )
 		{
 			bUserVox = TestSoundChar( pSfx->getname(), CHAR_USERVOX );
-		}
-
-		// override streaming
-		if ( IsX360() )
-		{
-			const char *s_CriticalSounds[] = 
-			{
-				"common",
-				"items",
-				"physics",
-				"player",
-				"ui",
-				"weapons",
-			};
-
-			// stream everything but critical sounds
-			bStream = true;
-			const char *pFileName = pSfx->GetFileName();
-			for ( const auto *criticalSound : s_CriticalSounds )
-			{
-				size_t len = strlen( criticalSound );
-				if ( !Q_strnicmp( pFileName, criticalSound, len ) &&
-					 ( pFileName[len] == '\\' || pFileName[len] == '/' ) )
-				{
-					// never stream these, regardless of sound chars
-					bStream = false;
-					break;
-				}
-			}
 		}
 
 		if ( bStream )
@@ -1009,15 +878,7 @@ CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 		{
 			if ( bUserVox )
 			{
-				if ( !IsX360() )
-				{
-					pSfx->pSource = Voice_SetupAudioSource( ch->soundsource, ch->entchannel );
-				}
-				else
-				{
-					// not supporting
-					Assert( 0 );
-				}
+				pSfx->pSource = Voice_SetupAudioSource( ch->soundsource, ch->entchannel );
 			}
 			else
 			{
@@ -1077,7 +938,7 @@ CSfxTable *S_PrecacheSound( const char *name )
 	}
 	else
 	{
-		Assert( !"S_PrecacheSound:  Failed to create sfx" );
+		AssertMsg( false, "S_PrecacheSound:  Failed to create sfx" );
 	}
 
 	return sfx;
@@ -1152,7 +1013,7 @@ void S_ReloadFilesInList( IFileList *pFilesToReload )
 		char filename[MAX_PATH * 3];
 		if ( !g_pFileSystem->String( fnHandle, filename, sizeof( filename ) ) )
 		{
-			Assert( !"S_HandlePureServerWhitelist - can't get a filename." );
+			AssertMsg( false, "S_HandlePureServerWhitelist - can't get a filename." );
 			continue;
 		}
 	
@@ -3881,7 +3742,6 @@ void DAS_SetDiffusion( das_room_t *proom )
 void DAS_DisplayRoomDEBUG( das_room_t *proom, bool fnew, float preset )
 {
 	float dx,dy,dz;
-	Vector ctr;
 	float count;
 
 	if (das_debug.GetInt() == 0)
@@ -5292,7 +5152,7 @@ int S_StartDynamicSound( StartSoundParams_t& params )
 
 		// delay count is computed at the sampling rate of the source because the output rate will 
 		// match the source rate when the sound is mixed
-		float rate = target_chan->sfx->pSource->SampleRate();
+		int rate = target_chan->sfx->pSource->SampleRate();
 		int delaySamples = (int)( params.delay * rate );
 
 		if ( params.delay > 0 )
@@ -5571,7 +5431,7 @@ int S_StartStaticSound( StartSoundParams_t& params )
 		Assert( ch->sfx );
 		Assert( ch->sfx->pSource );
 		
-		float rate = ch->sfx->pSource->SampleRate();
+		int rate = ch->sfx->pSource->SampleRate();
 
 		int delaySamples = (int)( params.delay * rate * params.pitch * 0.01f );
 
@@ -5676,14 +5536,6 @@ int S_StartSound( StartSoundParams_t& params )
 		return 0;
 	}
 #endif // STAGING_ONLY
-
-	if ( IsX360() && params.delay < 0 && !params.initialStreamPosition && params.pSfx )
-	{
-		// calculate an initial stream position from the expected sample position
-		float rate = params.pSfx->pSource->SampleRate();
-		int samplePosition = (int)( -params.delay * rate * params.pitch * 0.01f );
-		params.initialStreamPosition = params.pSfx->pSource->SampleToStreamPosition( samplePosition );
-	}
 
 	if ( params.staticsound )
 	{
@@ -6544,15 +6396,11 @@ void S_Update_Guts( float mixAheadTime )
 	DEBUG_StopSoundMeasure( 4, samples );
 }
 
-#if !defined( _X360 )
-#define THREADED_MIX_TIME 33
-#else
-#define THREADED_MIX_TIME XMA_POLL_RATE
-#endif
+constexpr inline int THREADED_MIX_TIME{33};
 
 ConVar snd_ShowThreadFrameTime( "snd_ShowThreadFrameTime", "0" );
 
-bool g_bMixThreadExit;
+std::atomic_bool g_bMixThreadExit{false};
 ThreadHandle_t g_hMixThread;
 void S_Update_Thread()
 {
@@ -6561,13 +6409,11 @@ void S_Update_Thread()
 
 	while ( !g_bMixThreadExit )
 	{
-		// mixing (for 360) needs to be updated at a steady rate
-		// large update times causes the mixer to demand more audio data
-		// the 360 decoder has finite latency and cannot fulfill spike requests
 		double t0 = Plat_FloatTime();
-		S_Update_Guts( frameTime + snd_mixahead.GetFloat() );
-		double updateTime = ( Plat_FloatTime() - t0 ) * 1000.0;
 
+		S_Update_Guts( frameTime + snd_mixahead.GetFloat() );
+
+		double updateTime = ( Plat_FloatTime() - t0 ) * 1000.0;
 		// try to maintain a steadier rate by compensating for fluctuating mix times
 		double sleepTime = THREADED_MIX_TIME - updateTime;
 		if ( sleepTime > 0 )
@@ -6582,7 +6428,7 @@ void S_Update_Thread()
 
 		if ( snd_ShowThreadFrameTime.GetBool() )
 		{
-			Msg( "S_Update_Thread: frameTime: %d ms\n", (int)( frameTime * 1000.0f ) );
+			Msg( "S_Update_Thread: frameTime: %.2f ms\n", frameTime * 1000.0f );
 		}
 	}
 }
@@ -6600,7 +6446,8 @@ void S_ShutdownMixThread()
 
 void S_Update_( float mixAheadTime )
 {
-	if ( !IsConsole() || !snd_mix_async.GetBool() )
+	// dimhotepus: Enable async sound mix for regular PC.
+	if ( !snd_mix_async.GetBool() )
 	{
 		S_ShutdownMixThread();
 		S_Update_Guts( mixAheadTime );
@@ -6611,10 +6458,6 @@ void S_Update_( float mixAheadTime )
 		{
 			g_bMixThreadExit = false;
 			g_hMixThread = ThreadExecuteSolo( "SndMix", S_Update_Thread );
-			if ( IsX360() )
-			{
-				ThreadSetAffinity( g_hMixThread, XBOX_PROCESSOR_5 );
-			}
 		}
 	}
 }
@@ -6803,7 +6646,7 @@ void S_SoundList()
 	int				size, total;
 
 	total = 0;
-	for ( int i = s_Sounds.FirstInorder(); i != s_Sounds.InvalidIndex(); i = s_Sounds.NextInorder( i ) )
+	for ( auto i = s_Sounds.FirstInorder(); i != s_Sounds.InvalidIndex(); i = s_Sounds.NextInorder( i ) )
 	{
 		sfx = s_Sounds[i].pSfx;
 
@@ -7069,7 +6912,7 @@ static void S_Say( const CCommand &args )
 		Q_strncpy(sound, "xxtestxx ", sizeof( sound ) );
 		Q_strncat(sound, args[1], sizeof( sound ), COPY_ALL_CHARACTERS );
 
-		int addIndex = g_Sentences.AddToTail();
+		auto addIndex = g_Sentences.AddToTail();
 		sentence_t *pSentence = &g_Sentences[addIndex];
 		pSentence->pName = sound;
 		pSentence->length = 0;
@@ -7098,7 +6941,7 @@ static void S_Say( const CCommand &args )
 		S_StartDynamicSound ( params );
 		
 		// remove last
-		g_Sentences.Remove( g_Sentences.Size() - 1 );
+		g_Sentences.Remove( g_Sentences.Count() - 1 );
 	}
 	else
 	{

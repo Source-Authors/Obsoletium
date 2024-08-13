@@ -362,8 +362,7 @@ void AddEntityTextOverlay(int ent_index, int line_offset, float duration, int r,
 	AUTO_LOCK( s_OverlayMutex );
 	OverlayText_t *new_overlay = new OverlayText_t;
 
-	Vector myPos, myMins, myMaxs;
-
+	Vector myPos;
 	GetEntityOriginClientOrServer( ent_index, myPos );
 
 	VectorCopy(myPos,new_overlay->origin);
