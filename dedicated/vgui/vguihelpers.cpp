@@ -17,7 +17,7 @@
 #include <vgui/ILocalize.h>
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
-#include <IVGuiModule.h>
+#include "IVguiModule.h"
 
 #include "vgui/MainPanel.h"
 #include "IAdminServer.h"

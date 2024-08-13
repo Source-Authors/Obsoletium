@@ -11,13 +11,13 @@
 // $NoKeywords: $
 //=============================================================================//
 #ifdef _WIN32
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdarg>
 
 #include "winlite.h"
 // base vgui interfaces
-#include <vgui/vgui.h>
+#include <vgui/VGUI.h>
 #include <vgui_controls/Panel.h>
 #include <vgui/IVGui.h>
 #include <vgui/ISurface.h>
@@ -28,9 +28,9 @@
 #include "IAdminServer.h"
 
 #include "MainPanel.h"
-#include <imanageserver.h>
-#include "ivguimodule.h" 
-#include <vgui/IVGui.h>
+#include "IManageServer.h"
+#include "IVguiModule.h" 
+#include "vgui/IVGui.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

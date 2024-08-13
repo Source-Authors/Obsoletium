@@ -20,7 +20,7 @@
 
 //#include <GamePanelInfo.h>
 
-#include "imanageserver.h"
+#include "IManageServer.h"
 //#include "gameserver.h"
 #include "CreateMultiplayerGameServerPage.h"
 

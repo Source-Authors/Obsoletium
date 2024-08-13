@@ -24,7 +24,7 @@ using namespace vgui;
 #include <OfflineMode.h>
 
 #include "filesystem.h"
-#include "mainpanel.h"
+#include "MainPanel.h"
 #include "tier0/icommandline.h"
 #include "netapi.h"
 // for SRC
@@ -84,10 +84,10 @@ const char *GetLiblistFallbackDir( const char *pszGameDir )
 				}
 
 				// copy out between start and end
-				int bytesToCopy = end - start - 1;
-				if ( bytesToCopy >= sizeof(szFallback) - 1 )
+				intp bytesToCopy = end - start - 1;
+				if ( bytesToCopy >= static_cast<intp>(sizeof(szFallback)) - 1 )
 				{
-					bytesToCopy = sizeof(szFallback) - 1;
+					bytesToCopy = static_cast<intp>(sizeof(szFallback)) - 1;
 					break;
 				}
 
@@ -345,7 +345,7 @@ bool CCreateMultiplayerGameServerPage::BadRconChars(const char *pass)
 {
 	bool bad = false;
 
-	for(unsigned int i=0;i<strlen(pass);i++)
+	for(size_t i=0;i<strlen(pass);i++)
 	{
 		bad |= !( V_isalnum(pass[i]) ? true : false );
 	}
@@ -464,7 +464,7 @@ void CCreateMultiplayerGameServerPage::OnCommand(const char *cmd)
 	}
 }
 
-bool CCreateMultiplayerGameServerPage::LaunchOldDedicatedServer( KeyValues *pGameInfo )
+bool CCreateMultiplayerGameServerPage::LaunchOldDedicatedServer( [[maybe_unused]] KeyValues *pGameInfo )
 {
 #if defined( ALLOW_OLD_ENGINE_GAMES )
 	// Validate the gameinfo.txt format..

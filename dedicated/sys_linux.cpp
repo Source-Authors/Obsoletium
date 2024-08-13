@@ -61,9 +61,9 @@ public:
 	void		WriteStatusText( char *szText );
 	void		UpdateStatus( int force );
 
-	long		LoadLibrary( char *lib );
-	void		FreeLibrary( long library );
-	void		*GetProcAddress( long library, const char *name );
+	intp		LoadLibrary( char *lib );
+	void		FreeLibrary( intp library );
+	void		*GetProcAddress( intp library, const char *name );
 
 	bool		CreateConsoleWindow( void );
 	void		DestroyConsoleWindow( void );
@@ -99,7 +99,7 @@ void CSys::Sleep( int msec )
 // Input  : handle, function name-
 // Output : void *
 //-----------------------------------------------------------------------------
-void *CSys::GetProcAddress( long library, const char *name )
+void *CSys::GetProcAddress( intp library, const char *name )
 {
 	return dlsym( library, name );
 }
@@ -109,7 +109,7 @@ void *CSys::GetProcAddress( long library, const char *name )
 // Input  : *lib -
 // Output : long
 //-----------------------------------------------------------------------------
-long CSys::LoadLibrary( char *lib )
+intp CSys::LoadLibrary( char *lib )
 {
 	void *hDll = NULL;
 
@@ -129,10 +129,10 @@ long CSys::LoadLibrary( char *lib )
 	{
 		ErrorMessage( 1, dlerror() );
 	}
-	return (long)hDll;
+	return (intp)hDll;
 }
 
-void CSys::FreeLibrary( long library )
+void CSys::FreeLibrary( intp library )
 {
 	if ( !library )
 		return;
@@ -272,10 +272,10 @@ bool CSys::LoadModules( CDedicatedAppSystemGroup *pAppSystemGroup )
 	if ( !pAppSystemGroup->AddSystems( appSystems ) ) 
 		return false;
 
-	engine = (IDedicatedServerAPI *)pAppSystemGroup->FindSystem( VENGINE_HLDS_API_VERSION );
+	engine = pAppSystemGroup->FindSystem<IDedicatedServerAPI>( VENGINE_HLDS_API_VERSION );
 	// obsolete i think SetCVarIF( (ICvar*)pAppSystemGroup->FindSystem( VENGINE_CVAR_INTERFACE_VERSION ) );
 
-	IMaterialSystem* pMaterialSystem = (IMaterialSystem*)pAppSystemGroup->FindSystem( MATERIAL_SYSTEM_INTERFACE_VERSION );
+	auto* pMaterialSystem = pAppSystemGroup->FindSystem<IMaterialSystem>( MATERIAL_SYSTEM_INTERFACE_VERSION );
 	pMaterialSystem->SetShaderAPI( "shaderapiempty" DLL_EXT_STRING );	
 	return true;
 }

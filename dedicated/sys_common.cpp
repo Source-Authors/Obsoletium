@@ -48,10 +48,11 @@ void Load3rdParty( void )
 {
 	// Only do this if the server operator wants the support.
 	// ( In case of malicious code, too )
-	if ( CommandLine()->CheckParm( "-usegh" ) )   
-	{
-		hDLLThirdParty = sys->LoadLibrary( "ghostinj.dll" );
-	}
+	// dimhotepus: Disable ghost injection feature.
+	// if ( CommandLine()->CheckParm( "-usegh" ) )
+	// {
+	// 	hDLLThirdParty = sys->LoadLibrary( "ghostinj.dll" );
+	// }
 }
 
 /*
@@ -172,7 +173,7 @@ SpewRetval_t DedicatedSpewOutputFunc( SpewType_t spewType, char const *pMsg )
 
 	if ( sys )
 	{
-		sys->Printf( "%s: %s", group, pMsg );
+		sys->Printf( "[%s] %s", group, pMsg );
 
 		// If they have specified -consolelog, log this message there. Otherwise these
 		//	wind up being lost because Sys_InitGame hasn't been called yet, and 
@@ -199,7 +200,7 @@ SpewRetval_t DedicatedSpewOutputFunc( SpewType_t spewType, char const *pMsg )
 		extern bool g_bVGui;
 		if ( g_bVGui )
 		{
-			MessageBox( NULL, pMsg, "Error", MB_OK | MB_TASKMODAL | MB_ICONERROR );
+			MessageBox( NULL, pMsg, "Source - Fatal Error", MB_OK | MB_TASKMODAL | MB_ICONERROR );
 		}
 		TerminateProcess( GetCurrentProcess(), 1 );
 #elif POSIX
@@ -261,7 +262,7 @@ const char *UTIL_GetExecutableDir( )
 
 	// Return the bin directory as the executable dir if it's not in there
 	// because that's really where we're running from...
-	int exeLen = strlen(exedir);
+	intp exeLen = V_strlen(exedir);
 	if ( 	exedir[exeLen-4] != CORRECT_PATH_SEPARATOR || 
 		exedir[exeLen-3] != 'b' || 
 		exedir[exeLen-2] != 'i' || 
@@ -292,7 +293,7 @@ const char *UTIL_GetBaseDir( void )
 	if ( pExeDir )
 	{
 		strcpy( basedir, pExeDir );
-                int dirlen = strlen( basedir );
+                intp dirlen = V_strlen( basedir );
                 if ( basedir[ dirlen - 3 ] == 'b' &&
                      basedir[ dirlen - 2 ] == 'i' &&
                      basedir[ dirlen - 1 ] == 'n' )

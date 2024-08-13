@@ -29,10 +29,10 @@
 #include "SteamAppStartup.h"
 #include "console/textconsole.h"
 #include "vgui/vguihelpers.h"
-#include "appframework/appframework.h"
+#include "appframework/AppFramework.h"
 #include "materialsystem/imaterialsystem.h"
 #include "istudiorender.h"
-#include "vgui/ivgui.h"
+#include "vgui/IVGui.h"
 #include "console/TextConsoleWin32.h"
 #include "icvar.h"
 #include "datacache/idatacache.h"
@@ -62,8 +62,8 @@ public:
 	void		WriteStatusText( char *szText );
 	void		UpdateStatus( int force );
 
-	long		LoadLibrary( char *lib );
-	void		FreeLibrary( long library );
+	intp		LoadLibrary( char *lib );
+	void		FreeLibrary( intp library );
 
 	bool		CreateConsoleWindow( void );
 	void		DestroyConsoleWindow( void );
@@ -101,17 +101,17 @@ void CSys::Sleep( int msec )
 // Input  : *lib - 
 // Output : long
 //-----------------------------------------------------------------------------
-long CSys::LoadLibrary( char *lib )
+intp CSys::LoadLibrary( char *lib )
 {
 	void *hDll = ::LoadLibrary( lib );
-	return (long)hDll;
+	return (intp)hDll;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : library - 
 //-----------------------------------------------------------------------------
-void CSys::FreeLibrary( long library )
+void CSys::FreeLibrary( intp library )
 {
 	if ( !library )
 		return;
@@ -140,7 +140,7 @@ bool CSys::GetExecutableName( char *out )
 //-----------------------------------------------------------------------------
 void CSys::ErrorMessage( int level, const char *msg )
 {
-	MessageBox( NULL, msg, "Half-Life", MB_OK );
+	MessageBox( NULL, msg, "Source - Fatal Error", MB_OK );
 	PostQuitMessage(0);	
 }
 
@@ -287,9 +287,9 @@ bool CSys::LoadModules( CDedicatedAppSystemGroup *pAppSystemGroup )
 	if ( !pAppSystemGroup->AddSystems( appSystems ) ) 
 		return false;
 	
-	engine = (IDedicatedServerAPI *)pAppSystemGroup->FindSystem( VENGINE_HLDS_API_VERSION );
+	engine = pAppSystemGroup->FindSystem<IDedicatedServerAPI>( VENGINE_HLDS_API_VERSION );
 
-	IMaterialSystem* pMaterialSystem = (IMaterialSystem*)pAppSystemGroup->FindSystem( MATERIAL_SYSTEM_INTERFACE_VERSION );
+	auto* pMaterialSystem = pAppSystemGroup->FindSystem<IMaterialSystem>( MATERIAL_SYSTEM_INTERFACE_VERSION );
 	pMaterialSystem->SetShaderAPI( "shaderapiempty.dll" );
 	return true;
 }
@@ -339,7 +339,7 @@ void NET_Shutdown( void )
 //-----------------------------------------------------------------------------
 int main(int argc, char **argv); // in sys_ded.cpp
 
-void MiniDumpFunction( unsigned int nExceptionCode, EXCEPTION_POINTERS *pException )
+static void MiniDumpFunction( unsigned int nExceptionCode, EXCEPTION_POINTERS *pException )
 {
 	// dimhotepus: Write minidump when not under Steam.
 #ifndef NO_STEAM

@@ -64,7 +64,7 @@ static bool init_tinfo_functions()
 		// Long time ago, ncurses was two libraries. So if libtinfo fails, try libncurses.
 		static const char *names[] = { "libtinfo.so.5", "libncurses.so.5" };
 
-		for ( int i = 0; !s_ncurses_handle && ( i < ARRAYSIZE( names ) ); i++ )
+		for ( int i = 0; !s_ncurses_handle && ( i < ssize( names ) ); i++ )
 		{
 			bool bFailed = true;
 			s_ncurses_handle = dlopen( names[i], RTLD_NOW );
@@ -129,7 +129,7 @@ static unsigned char editline_complete( EditLine *el, int ch __attribute__((__un
 
 	if ( len > 0 )
 	{
-		for (int i = 0; i < ARRAYSIZE(s_cmds); i++)
+		for (int i = 0; i < ssize(s_cmds); i++)
 		{
 			if ( len > strlen( s_cmds[i] ) )
 				continue;
@@ -286,7 +286,7 @@ bool CTextConsoleUnix::Init()
 {
 	if( g_threadid != (pthread_t)-1 )
 	{
-		Assert( !"CTextConsoleUnix can only handle a single thread!" );
+		AssertMsg( false, "CTextConsoleUnix can only handle a single thread!" );
 		return false;
 	}
 
@@ -345,9 +345,9 @@ void CTextConsoleUnix::ShutDown()
 	pthread_mutex_destroy( &g_lock ); 
 }
 
-void CTextConsoleUnix::Print( char * pszMsg )
+void CTextConsoleUnix::Print( const char * pszMsg )
 {
-	int nChars = strlen( pszMsg );
+	intp nChars = V_strlen( pszMsg );
 
 	if ( nChars > 0 )
 	{
@@ -365,11 +365,11 @@ void CTextConsoleUnix::Print( char * pszMsg )
 	}
 }
 
-void CTextConsoleUnix::SetTitle( char *pszTitle )
+void CTextConsoleUnix::SetTitle( const char *pszTitle )
 {
 }
 
-void CTextConsoleUnix::SetStatusLine( char *pszStatus )
+void CTextConsoleUnix::SetStatusLine( const char *pszStatus )
 {
 }
 

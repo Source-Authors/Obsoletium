@@ -104,7 +104,7 @@ char * CTextConsoleWin32::GetLine( int index, char *buf, int buflen )
 		if ( numevents <= 0 )
 			break;
 
-		if ( !ReadConsoleInput( hinput, recs, ARRAYSIZE( recs ), &numread ) )
+		if ( !ReadConsoleInput( hinput, recs, std::size( recs ), &numread ) )
 		{
 			Error("CTextConsoleWin32::GetLine: !ReadConsoleInput");
 			return NULL;
@@ -179,7 +179,7 @@ char * CTextConsoleWin32::GetLine( int index, char *buf, int buflen )
 	return NULL;
 }
 
-void CTextConsoleWin32::Print( char * pszMsg )
+void CTextConsoleWin32::Print( const char * pszMsg )
 {
 	if ( m_nConsoleTextLen )
 	{
@@ -260,7 +260,7 @@ int CTextConsoleWin32::GetWidth( void )
 	return nWidth;
 } 
 
-void CTextConsoleWin32::SetStatusLine( char * pszStatus )
+void CTextConsoleWin32::SetStatusLine( const char * pszStatus )
 {
 	strncpy( statusline, pszStatus, 80 );
 	statusline[ 79 ] = '\0';
@@ -285,7 +285,7 @@ void CTextConsoleWin32::UpdateStatus( void )
 }
 
 
-void CTextConsoleWin32::SetTitle( char * pszTitle )
+void CTextConsoleWin32::SetTitle( const char * pszTitle )
 {
 	SetConsoleTitle( pszTitle );
 }
@@ -407,9 +407,9 @@ void CTextConsoleWin32::ReceiveTab( void )
 		pszCurrentCmd = matches[0];
 		while ( pszCurrentCmd )
 		{
-			if ( (int)strlen( pszCurrentCmd) > nLongestCmd )
+			if ( V_strlen( pszCurrentCmd) > nLongestCmd )
 			{
-				nLongestCmd = strlen( pszCurrentCmd);
+				nLongestCmd = V_strlen( pszCurrentCmd);
 			}
 
 			i++;
@@ -461,7 +461,7 @@ void CTextConsoleWin32::ReceiveStandardChar( const char ch )
 	int nCount;
 
 	// If the line buffer is maxed out, ignore this char
-	if ( m_nConsoleTextLen >= ( sizeof( m_szConsoleText ) - 2 ) )
+	if ( m_nConsoleTextLen >= ( static_cast<int>(sizeof( m_szConsoleText )) - 2 ) )
 	{
 		return;
 	}
@@ -533,7 +533,7 @@ void CTextConsoleWin32::ReceiveUpArrow( void )
 	PrintRaw( m_aszLineBuffer[ m_nBrowseLine ] );
 
 	strncpy( m_szConsoleText, m_aszLineBuffer[ m_nBrowseLine ], MAX_CONSOLE_TEXTLEN );
-	m_nConsoleTextLen = strlen( m_aszLineBuffer[ m_nBrowseLine ] );
+	m_nConsoleTextLen = V_strlen( m_aszLineBuffer[ m_nBrowseLine ] );
 
 	m_nCursorPosition = m_nConsoleTextLen;
 }
@@ -577,7 +577,7 @@ void CTextConsoleWin32::ReceiveDownArrow( void )
 
 		strncpy( m_szConsoleText, m_aszLineBuffer[ m_nBrowseLine ], MAX_CONSOLE_TEXTLEN );
 
-		m_nConsoleTextLen = strlen( m_aszLineBuffer[ m_nBrowseLine ] );
+		m_nConsoleTextLen = V_strlen( m_aszLineBuffer[ m_nBrowseLine ] );
 	}
 
 	m_nCursorPosition = m_nConsoleTextLen;
