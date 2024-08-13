@@ -57,19 +57,19 @@ int g_iCreditsPixelHeight = 0;
 //-----------------------------------------------------------------------------
 class CHudCredits : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudCredits, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudCredits, vgui::Panel );
 
 public:
 	CHudCredits( const char *pElementName );
-	virtual void Init( void );
-	virtual void LevelShutdown( void );
+	void Init( void ) override;
+	void LevelShutdown( void ) override;
 
 	int GetStringPixelWidth ( wchar_t *pString, vgui::HFont hFont );
 
 	void MsgFunc_CreditsMsg( bf_read &msg );
 	void MsgFunc_LogoTimeMsg( bf_read &msg );
 
-	virtual bool	ShouldDraw( void ) 
+	bool	ShouldDraw( void ) override
 	{ 
 		g_bRollingCredits = IsActive();
 
@@ -80,8 +80,8 @@ public:
 	}
 
 protected:
-	virtual void Paint();
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void Paint() override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 private:
 
@@ -145,7 +145,7 @@ void CHudCredits::PrepareCredits( const char *pKeyName )
 	{
 		pKV->deleteThis();
 
-		Assert( !"env_credits couldn't be initialized!" );
+		AssertMsg( false, "env_credits couldn't be initialized!" );
 		return;
 	}
 
@@ -205,7 +205,7 @@ void CHudCredits::ReadNames( KeyValues *pKeyValue )
 {
 	if ( pKeyValue == NULL )
 	{
-		Assert( !"CHudCredits couldn't be initialized!" );
+		AssertMsg( false, "CHudCredits couldn't be initialized!" );
 		return;
 	}
 
@@ -227,7 +227,7 @@ void CHudCredits::ReadParams( KeyValues *pKeyValue )
 {
 	if ( pKeyValue == NULL )
 	{
-		Assert( !"CHudCredits couldn't be initialized!" );
+		AssertMsg( false, "CHudCredits couldn't be initialized!" );
 		return;
 	}
 

@@ -194,7 +194,8 @@ CON_COMMAND( r_cheapwaterstart,  "" )
 {
 	if( args.ArgC() == 2 )
 	{
-		float dist = atof( args[ 1 ] );
+		// dimhotepus: atof -> strtof.
+		float dist = strtof( args[ 1 ], nullptr );
 		view->SetCheapWaterStartDistance( dist );
 	}
 	else
@@ -209,7 +210,8 @@ CON_COMMAND( r_cheapwaterend,  "" )
 {
 	if( args.ArgC() == 2 )
 	{
-		float dist = atof( args[ 1 ] );
+		// dimhotepus: atof -> strtof.
+		float dist = strtof( args[ 1 ], nullptr );
 		view->SetCheapWaterEndDistance( dist );
 	}
 	else
@@ -3221,8 +3223,8 @@ bool ClientWorldListInfo_t::OnFinalRelease()
 // Constructor
 //-----------------------------------------------------------------------------
 CBase3dView::CBase3dView( CViewRender *pMainView ) :
-m_pMainView( pMainView ),
-m_Frustum( pMainView->m_Frustum )
+m_Frustum( pMainView->m_Frustum ),
+m_pMainView( pMainView )
 {
 }
 
@@ -3248,12 +3250,12 @@ CObjectPool<ClientWorldListInfo_t> ClientWorldListInfo_t::gm_Pool;
 //-----------------------------------------------------------------------------
 CRendering3dView::CRendering3dView(CViewRender *pMainView) :
 	CBase3dView( pMainView ),
+	m_DrawFlags( 0 ),
+	m_ClearFlags( 0 ),
 	m_pWorldRenderList( NULL ), 
 	m_pRenderablesList( NULL ), 
 	m_pWorldListInfo( NULL ), 
-	m_pCustomVisibility( NULL ),
-	m_DrawFlags( 0 ),
-	m_ClearFlags( 0 )
+	m_pCustomVisibility( NULL )
 {
 }
 
@@ -4963,24 +4965,10 @@ void CShadowDepthView::Draw()
 	m_pMainView->SetupVis( (*this), visFlags );  // @MULTICORE (toml 8/9/2006): Portal problem, not sending custom vis down
 
 	CMatRenderContextPtr pRenderContext( materials );
-
 	pRenderContext->ClearColor3ub(0xFF, 0xFF, 0xFF);
-
-#if defined( _X360 )
-	pRenderContext->PushVertexShaderGPRAllocation( 112 ); //almost all work is done in vertex shaders for depth rendering, max out their threads
-#endif
-
 	pRenderContext.SafeRelease();
 
-	if( IsPC() )
-	{
-		render->Push3DView( (*this), VIEW_CLEAR_DEPTH, m_pRenderTarget, GetFrustum(), m_pDepthTexture );
-	}
-	else if( IsX360() )
-	{
-		//for the 360, the dummy render target has a separate depth buffer which we Resolve() from afterward
-		render->Push3DView( (*this), VIEW_CLEAR_DEPTH, m_pRenderTarget, GetFrustum() );
-	}
+	render->Push3DView( *this, VIEW_CLEAR_DEPTH, m_pRenderTarget, GetFrustum(), m_pDepthTexture );
 
 	SetupCurrentView( origin, angles, VIEW_SHADOW_DEPTH_TEXTURE );
 
@@ -5020,17 +5008,7 @@ void CShadowDepthView::Draw()
 
 	pRenderContext.GetFrom( materials );
 
-	if( IsX360() )
-	{
-		//Resolve() the depth texture here. Before the pop so the copy will recognize that the resolutions are the same
-		pRenderContext->CopyRenderTargetToTextureEx( m_pDepthTexture, -1, NULL, NULL );
-	}
-
 	render->PopView( GetFrustum() );
-
-#if defined( _X360 )
-	pRenderContext->PopVertexShaderGPRAllocation();
-#endif
 }
 
 

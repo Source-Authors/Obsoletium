@@ -28,18 +28,18 @@ using namespace vgui;
 
 class CHudAnimationInfo : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudAnimationInfo, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudAnimationInfo, vgui::Panel );
 
 public:
 
 	CHudAnimationInfo( const char *pElementName );
 
-	virtual bool ShouldDraw();
+	bool ShouldDraw() override;
 
 	// vgui::Panel overrides.
-	virtual void Paint( void );
+	void Paint( void ) override;
 
-	virtual void ApplySchemeSettings( IScheme *scheme );
+	void ApplySchemeSettings( IScheme *scheme ) override;
 
 	void SetWatch( Panel *element )
 	{
@@ -244,10 +244,10 @@ static int HudElementCompletion( const char *partial, char commands[ COMMAND_COM
 {
 	const char *cmdname = "cl_animationinfo";
 
-	char *substring = (char *)partial;
+	const char *substring = partial;
 	if ( Q_strstr( partial, cmdname ) )
 	{
-		substring = (char *)partial + strlen( cmdname ) + 1;
+		substring = partial + strlen( cmdname ) + 1;
 	}
 
 	int current = 0;
@@ -301,11 +301,11 @@ CON_COMMAND_F_COMPLETION( cl_animationinfo, "Hud element to examine.", 0, HudEle
 	// Find it
 	CHudElement *element = NULL;
 	
-	for ( int i = 0; i < gHUD.m_HudList.Size(); i++ )
+	for ( auto *h : gHUD.m_HudList )
 	{
-		if ( stricmp( gHUD.m_HudList[i]->GetName(), args[1]  ) == 0 )
+		if ( stricmp( h->GetName(), args[1]  ) == 0 )
 		{
-			element = gHUD.m_HudList[i];
+			element = h;
 			break;
 		}
 	}

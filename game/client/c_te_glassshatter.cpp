@@ -229,7 +229,7 @@ void C_TEShatterSurface::PostDataUpdate( DataUpdateType_t updateType )
 				pParticle->m_flLifeRemaining	= random->RandomFloat(GLASS_SHARD_MIN_LIFE,GLASS_SHARD_MAX_LIFE);
 				pParticle->m_vecVelocity		= vForceVel;
 				pParticle->m_vecVelocity	   += RandomVector(-25,25);
-				pParticle->m_uchSize			= m_flShardSize + random->RandomFloat(-0.5*m_flShardSize,0.5*m_flShardSize);
+				pParticle->m_uchSize			= m_flShardSize + random->RandomFloat(-0.5f*m_flShardSize,0.5f*m_flShardSize);
 				pParticle->m_vAngles			= m_vecAngles;
 				pParticle->m_flAngSpeed			= random->RandomFloat(-400,400);
 

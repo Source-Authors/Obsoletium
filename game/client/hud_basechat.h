@@ -178,28 +178,28 @@ private:
 
 class CHudChatHistory : public vgui::RichText
 {
-	DECLARE_CLASS_SIMPLE( CHudChatHistory, vgui::RichText );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudChatHistory, vgui::RichText );
 public:
 
 	CHudChatHistory( vgui::Panel *pParent, const char *panelName );
 
-	virtual void	ApplySchemeSettings(vgui::IScheme *pScheme);
+	void	ApplySchemeSettings(vgui::IScheme *pScheme) override;
 };
 
 class CHudChatFilterButton : public vgui::Button
 {
-	DECLARE_CLASS_SIMPLE( CHudChatFilterButton, vgui::Button );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudChatFilterButton, vgui::Button );
 
 public:
 
 	CHudChatFilterButton(  vgui::Panel *pParent, const char *pName, const char *pText );
 
-	virtual void DoClick( void );
+	void DoClick( void ) override;
 };
 
 class CHudChatFilterCheckButton : public vgui::CheckButton
 {
-	DECLARE_CLASS_SIMPLE( CHudChatFilterCheckButton, vgui::CheckButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudChatFilterCheckButton, vgui::CheckButton );
 
 public:
 
@@ -218,7 +218,7 @@ private:
 //-----------------------------------------------------------------------------
 class CBaseHudChat : public CHudElement, public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CBaseHudChat, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseHudChat, vgui::EditablePanel );
 public:
 	DECLARE_MULTIPLY_INHERITED();
 
@@ -233,10 +233,10 @@ public:
 	virtual void	CreateChatInputLine( void );
 	virtual void	CreateChatLines( void );
 	
-	virtual void	Init( void );
+	void	Init( void ) override;
 
 	void			LevelInit( const char *newmap );
-	void			LevelShutdown( void );
+	void			LevelShutdown( void ) override;
 
 	void			MsgFunc_TextMsg(const char *pszName, int iSize, void *pbuf);
 	
@@ -250,10 +250,10 @@ public:
 	MESSAGE_FUNC( OnChatEntrySend, "ChatEntrySend" );
 	MESSAGE_FUNC( OnChatEntryStopMessageMode, "ChatEntryStopMessageMode" );
 
-	virtual void	ApplySchemeSettings(vgui::IScheme *pScheme);
-	virtual void	Paint( void );
-	virtual void	OnTick( void );
-	virtual void	Reset();
+	void	ApplySchemeSettings(vgui::IScheme *pScheme) override;
+	void	Paint( void ) override;
+	void	OnTick( void ) override;
+	void	Reset() override;
 #ifdef _XBOX
 	virtual bool	ShouldDraw();
 #endif
@@ -264,7 +264,7 @@ public:
 	virtual int		GetChatInputOffset( void );
 
 	// IGameEventListener interface:
-	virtual void FireGameEvent( IGameEvent *event);
+	void FireGameEvent( IGameEvent *event) override;
 
 	CHudChatHistory			*GetChatHistory();
 
@@ -419,18 +419,18 @@ protected:
 
 class CHudChatFilterPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CHudChatFilterPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudChatFilterPanel, vgui::EditablePanel );
 
 public:
 
 	CHudChatFilterPanel(  vgui::Panel *pParent, const char *pName );
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	MESSAGE_FUNC_PTR( OnFilterButtonChecked, "CheckButtonChecked", panel );
 
 	CBaseHudChat *GetChatParent( void ) { return dynamic_cast < CBaseHudChat * > ( GetParent() ); }
 
-	virtual void SetVisible(bool state);
+	void SetVisible(bool state) override;
 
 private:
 

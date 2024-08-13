@@ -66,7 +66,8 @@ public:
 		s_bCanAccessCurrentView = true;
 		Frustum frustum;
 		render->Push3DView( *this, 0, NULL, frustum );
-		BuildWorldRenderLists( this, true, true );
+		// dimhotepus: this -> true.
+		BuildWorldRenderLists( true, true, true );
 		render->PopView( frustum );
 		s_bCanAccessCurrentView = false;
 
@@ -531,9 +532,6 @@ void CDebugViewRender::Draw3DDebuggingInfo( const CViewSetup &viewDebug )
 //-----------------------------------------------------------------------------
 void CDebugViewRender::Draw2DDebuggingInfo( const CViewSetup &viewDebug )
 {
-	if ( IsX360() && IsRetail() )
-		return;
-
 	// HDRFIXME: Assert NULL rendertarget
 	if ( mat_yuv.GetInt() && (engine->GetDXSupportLevel() >= 80) )
 	{

@@ -31,17 +31,17 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CHudPoisonDamageIndicator : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudPoisonDamageIndicator, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudPoisonDamageIndicator, vgui::Panel );
 
 public:
 	CHudPoisonDamageIndicator( const char *pElementName );
-	void Reset( void );
-	virtual bool ShouldDraw( void );
+	void Reset( void ) override;
+	bool ShouldDraw( void ) override;
 
 private:
-	virtual void OnThink();
-	virtual void Paint();
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void OnThink() override;
+	void Paint() override;
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 
 private:
 	CPanelAnimationVar( vgui::HFont, m_hTextFont, "TextFont", "Default" );

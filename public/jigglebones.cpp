@@ -44,7 +44,7 @@ JiggleData * CJiggleBones::GetJiggleData( int bone, float currenttime, const Vec
 	data.useGoalMatrixCount = 0;
 	data.useJiggleBoneCount = 16;
 
-	int idx = m_jiggleBoneState.AddToHead( data );
+	auto idx = m_jiggleBoneState.AddToHead( data );
 	if ( idx == m_jiggleBoneState.InvalidIndex() )
 		return NULL;
 

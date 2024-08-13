@@ -31,8 +31,8 @@ static VMatrix s_CatmullRom( -0.5,  1.5, -1.5,  0.5,
 // The last argument represents the number of float channels in addition to position
 //-----------------------------------------------------------------------------
 
-CSplinePatch::CSplinePatch( ) : m_ChannelCount(0),
-	m_Width(0), m_Height(0), m_ppPositions(0), m_LinearFactor(1.0f)
+CSplinePatch::CSplinePatch( ) :
+	m_Width(0), m_Height(0), m_ChannelCount(0), m_ppPositions(0), m_LinearFactor(1.0f)
 {
 }
 
@@ -186,9 +186,9 @@ void CSplinePatch::SetupPatchQuery( float s, float t )
 
 	// This sets up the catmull rom matrix based on the blend factor!!
 	// we can go from linear to curvy!
-	s_CatmullRom.Init(  -0.5 * m_LinearFactor,  1.5 * m_LinearFactor, -1.5 * m_LinearFactor,  0.5 * m_LinearFactor,
-						       m_LinearFactor, -2.5 * m_LinearFactor,    2 * m_LinearFactor, -0.5 * m_LinearFactor,
-						-0.5 * m_LinearFactor,   -1 + m_LinearFactor,    1 - 0.5 * m_LinearFactor,    0,
+	s_CatmullRom.Init(  -0.5f * m_LinearFactor,  1.5f * m_LinearFactor, -1.5f * m_LinearFactor,  0.5f * m_LinearFactor,
+						       m_LinearFactor, -2.5f * m_LinearFactor,    2 * m_LinearFactor, -0.5f * m_LinearFactor,
+						-0.5f * m_LinearFactor,   -1 + m_LinearFactor,    1 - 0.5f * m_LinearFactor,    0,
 											0,					   1,					  0,    0 );
 	Vector4DMultiplyTranspose( s_CatmullRom, svec, m_SVec );
 	Vector4DMultiplyTranspose( s_CatmullRom, tvec, m_TVec );

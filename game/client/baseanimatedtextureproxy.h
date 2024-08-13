@@ -32,7 +32,7 @@ protected:
 
 	// Derived classes may implement this if they choose;
 	// this method is called whenever the animation wraps...
-	virtual void   AnimationWrapped( void* pBaseEntity ) {}
+	virtual void   AnimationWrapped( void* ) {}
 
 protected:
 	void Cleanup();

@@ -108,7 +108,7 @@ void C_TESprite::PostDataUpdate( DataUpdateType_t updateType )
 {
 	VPROF( "C_TESprite::PostDataUpdate" );
 
-	float a = ( 1.0 / 255.0 ) * m_nBrightness;
+	float a = ( 1.0f / 255.0f ) * m_nBrightness;
 	tempents->TempSprite( m_vecOrigin, vec3_origin, m_fScale, m_nModelIndex, kRenderTransAdd, 0, a, 0, FTENT_SPRANIMATE );
 	RecordSprite( m_vecOrigin, m_nModelIndex, m_fScale, m_nBrightness );
 }
@@ -116,14 +116,14 @@ void C_TESprite::PostDataUpdate( DataUpdateType_t updateType )
 void TE_Sprite( IRecipientFilter& filter, float delay,
 	const Vector* pos, int modelindex, float size, int brightness )
 {
-	float a = ( 1.0 / 255.0 ) * brightness;
+	float a = ( 1.0f / 255.0f ) * brightness;
 	tempents->TempSprite( *pos, vec3_origin, size, modelindex, kRenderTransAdd, 0, a, 0, FTENT_SPRANIMATE );
 	RecordSprite( *pos, modelindex, size, brightness );
 }
 
 void TE_Sprite( IRecipientFilter& filter, float delay, KeyValues *pKeyValues )
 {
-	Vector vecOrigin, vecDirection;
+	Vector vecOrigin;
 	vecOrigin.x = pKeyValues->GetFloat( "originx" );
 	vecOrigin.y = pKeyValues->GetFloat( "originy" );
 	vecOrigin.z = pKeyValues->GetFloat( "originz" );

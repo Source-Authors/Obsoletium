@@ -117,7 +117,7 @@ void CBaseModelPanel::ParseModelAnimInfo( KeyValues *inResourceData )
 	if ( !inResourceData )
 		return;
 
-	int iAnim = m_BMPResData.m_aAnimations.AddToTail();
+	intp iAnim = m_BMPResData.m_aAnimations.AddToTail();
 	if ( iAnim == m_BMPResData.m_aAnimations.InvalidIndex() )
 		return;
 
@@ -144,7 +144,7 @@ void CBaseModelPanel::ParseModelAttachInfo( KeyValues *inResourceData )
 	if ( !inResourceData )
 		return;
 
-	int iAttach = m_BMPResData.m_aAttachModels.AddToTail();
+	intp iAttach = m_BMPResData.m_aAttachModels.AddToTail();
 	if ( iAttach == m_BMPResData.m_aAttachModels.InvalidIndex() )
 		return;
 

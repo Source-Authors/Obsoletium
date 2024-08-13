@@ -77,9 +77,9 @@ public:
 	
 	~CFXQuad( void );
 
-	virtual void	Draw( double frametime );
-	virtual bool	IsActive( void );
-	virtual void	Destroy( void );
+	void	Draw( double frametime ) override;
+	bool	IsActive( void ) override;
+	void	Destroy( void ) override;
 	virtual	void	Update( double frametime );
 
 	FXQuadData_t	m_FXData;

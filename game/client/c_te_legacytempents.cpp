@@ -294,9 +294,9 @@ bool C_LocalTempEntity::IsActive( void )
 
 bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 {
-	float fastFreq = gpGlobals->curtime * 5.5;
+	float fastFreq = gpGlobals->curtime * 5.5f;
 	float gravity = -frametime * GetCurrentGravity();
-	float gravitySlow = gravity * 0.5;
+	float gravitySlow = gravity * 0.5f;
 	float traceFraction = 1;
 
 	Assert( !GetMoveParent() );
@@ -319,7 +319,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 
 		SetLocalOrigin( Vector(
 			x + sin( m_vecTempEntVelocity[2] + gpGlobals->curtime /* * anim.prevframe */ ) * (10*m_flSpriteScale),
-			y + sin( m_vecTempEntVelocity[2] + fastFreq + 0.7 ) * (8*m_flSpriteScale),
+			y + sin( m_vecTempEntVelocity[2] + fastFreq + 0.7f ) * (8*m_flSpriteScale),
 			GetLocalOriginDim( Z_INDEX ) + m_vecTempEntVelocity[2] * frametime ) );
 	}
 	else if ( flags & FTENT_SPIRAL )
@@ -583,7 +583,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 
 	if ( flags & FTENT_SMOKETRAIL )
 	{
-		 Assert( !"FIXME:  Rework smoketrail to be client side\n" );
+		 AssertMsg( false, "FIXME:  Rework smoketrail to be client side\n" );
 	}
 
 	// add gravity if we didn't collide in this frame
@@ -814,7 +814,7 @@ void CTempEnts::FizzEffect( C_BaseEntity *pent, int modelIndex, int density, int
 	depth = maxs[1] - mins[1];
 	speed = current;
 
-	SinCos( pent->GetLocalAngles()[1]*M_PI/180, &yspeed, &xspeed );
+	SinCos( pent->GetLocalAngles()[1]*M_PI_F/180, &yspeed, &xspeed );
 	xspeed *= speed;
 	yspeed *= speed;
 	frameCount = modelinfo->GetModelFrameCount( model );
@@ -833,7 +833,7 @@ void CTempEnts::FizzEffect( C_BaseEntity *pent, int modelIndex, int density, int
 		pTemp->x = origin[0];
 		pTemp->y = origin[1];
 
-		float zspeed = random->RandomInt(80,140);
+		float zspeed = random->RandomFloat(80.0f,140.0f);
 		pTemp->SetVelocity( Vector(xspeed, yspeed, zspeed) );
 		pTemp->die = gpGlobals->curtime + (maxHeight / zspeed) - 0.1f;
 		pTemp->m_flFrame = random->RandomInt(0,frameCount-1);
@@ -872,9 +872,9 @@ void CTempEnts::Bubbles( const Vector &mins, const Vector &maxs, float height, i
 
 	for (i=0 ; i<count ; i++)
 	{
-		origin[0] = random->RandomInt( mins[0], maxs[0] );
-		origin[1] = random->RandomInt( mins[1], maxs[1] );
-		origin[2] = random->RandomInt( mins[2], maxs[2] );
+		origin[0] = random->RandomFloat( mins[0], maxs[0] );
+		origin[1] = random->RandomFloat( mins[1], maxs[1] );
+		origin[2] = random->RandomFloat( mins[2], maxs[2] );
 		pTemp = TempEntAlloc( origin, model );
 		if (!pTemp)
 			return;
@@ -883,9 +883,9 @@ void CTempEnts::Bubbles( const Vector &mins, const Vector &maxs, float height, i
 
 		pTemp->x = origin[0];
 		pTemp->y = origin[1];
-		SinCos( random->RandomInt( -3, 3 ), &sine, &cosine );
+		SinCos( random->RandomFloat( -3, 3 ), &sine, &cosine );
 		
-		float zspeed = random->RandomInt(80,140);
+		float zspeed = random->RandomFloat(80.0f,140.0f);
 		pTemp->SetVelocity( Vector(speed * cosine, speed * sine, zspeed) );
 		pTemp->die = gpGlobals->curtime + ((height - (origin[2] - mins[2])) / zspeed) - 0.1f;
 		pTemp->m_flFrame = random->RandomInt( 0, frameCount-1 );
@@ -936,9 +936,9 @@ void CTempEnts::BubbleTrail( const Vector &start, const Vector &end, float flWat
 
 		pTemp->x = origin[0];
 		pTemp->y = origin[1];
-		angle = random->RandomInt( -3, 3 );
+		angle = random->RandomFloat( -3, 3 );
 
-		float zspeed = random->RandomInt(80,140);
+		float zspeed = random->RandomFloat(80.0f,140.0f);
 		pTemp->SetVelocity( Vector(speed * cos(angle), speed * sin(angle), zspeed) );
 		pTemp->die = gpGlobals->curtime + ((flWaterZ - origin[2]) / zspeed) - 0.1f;
 		pTemp->m_flFrame = random->RandomInt(0,frameCount-1);
@@ -950,7 +950,7 @@ void CTempEnts::BubbleTrail( const Vector &start, const Vector &end, float flWat
 	}
 }
 
-#define SHARD_VOLUME 12.0	// on shard ever n^3 units
+#define SHARD_VOLUME 12.0f	// on shard ever n^3 units
 
 //-----------------------------------------------------------------------------
 // Purpose: Only used by BreakModel temp ents for now.  Allows them to share a single
@@ -1358,7 +1358,7 @@ void CTempEnts::Sprite_Trail( const Vector &vecStart, const Vector &vecEnd, int 
 		}
 		else
 		{
-			VectorMA( vecStart, i / (nCount - 1.0), vecDelta, vecPos );
+			VectorMA( vecStart, i / (nCount - 1.0f), vecDelta, vecPos );
 		}
 
 		pTemp = TempEntAlloc( vecPos, pModel );
@@ -1519,7 +1519,7 @@ void CTempEnts::RicochetSprite( const Vector &pos, model_t *pmodel, float durati
 	pTemp->die = gpGlobals->curtime;
 
 	pTemp->m_flFrame = 0;
-	pTemp->SetLocalAnglesDim( Z_INDEX, 45 * random->RandomInt( 0, 7 ) );
+	pTemp->SetLocalAnglesDim( Z_INDEX, 45 * random->RandomFloat( 0.0f, 7.0f ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1539,11 +1539,12 @@ void CTempEnts::BloodSprite( const Vector &org, int r, int g, int b, int a, int 
 	{
 		C_LocalTempEntity		*pTemp;
 		int						frameCount = modelinfo->GetModelFrameCount( model );
-		color32					impactcolor = { (byte)r, (byte)g, (byte)b, (byte)a };
 
 		//Large, single blood sprite is a high-priority tent
 		if ( ( pTemp = TempEntAllocHigh( org, model ) ) != NULL )
 		{
+			color32					impactcolor = { (byte)r, (byte)g, (byte)b, (byte)a };
+
 			pTemp->SetRenderMode( kRenderTransTexture );
 			pTemp->m_nRenderFX		= kRenderFxClampMinScale;
 			pTemp->m_flSpriteScale	= random->RandomFloat( size / 25, size / 35);
@@ -1560,7 +1561,7 @@ void CTempEnts::BloodSprite( const Vector &org, int r, int g, int b, int a, int 
 			pTemp->m_flFrame		= 0;
 			pTemp->m_flFrameMax		= frameCount - 1;
 			pTemp->bounceFactor		= 0;
-			pTemp->SetLocalAnglesDim( Z_INDEX, random->RandomInt( 0, 360 ) );
+			pTemp->SetLocalAnglesDim( Z_INDEX, random->RandomFloat( 0.0f, 360.0f ) );
 		}
 	}
 }
@@ -1908,7 +1909,7 @@ void CTempEnts::Sprite_Explode( C_LocalTempEntity *pTemp, float scale, int flags
 
 	if ( flags & TE_EXPLFLAG_ROTATE )
 	{
-		pTemp->SetLocalAnglesDim( Z_INDEX, random->RandomInt( 0, 360 ) );
+		pTemp->SetLocalAnglesDim( Z_INDEX, random->RandomFloat( 0.0f, 360.0f ) );
 	}
 
 	pTemp->m_nRenderFX = kRenderFxNone;
@@ -2052,8 +2053,8 @@ void CTempEnts::TempEntFree( int index )
 // Free the first low priority tempent it finds.
 bool CTempEnts::FreeLowPriorityTempEnt()
 {
-	int next = 0;
-	for( int i = m_TempEnts.Head(); i != m_TempEnts.InvalidIndex(); i = next )
+	unsigned short next = 0;
+	for( auto i = m_TempEnts.Head(); i != m_TempEnts.InvalidIndex(); i = next )
 	{
 		next = m_TempEnts.Next( i );
 
@@ -2354,8 +2355,8 @@ void CTempEnts::Update(void)
 	}
 	else
 	{
-		int next = 0;
-		for( int i = m_TempEnts.Head(); i != m_TempEnts.InvalidIndex(); i = next )
+		unsigned short next = 0;
+		for( auto i = m_TempEnts.Head(); i != m_TempEnts.InvalidIndex(); i = next )
 		{
 			next = m_TempEnts.Next( i );
 
@@ -2560,7 +2561,7 @@ void CTempEnts::MuzzleFlash_Combine_Player( ClientEntityHandle_t hEntity, int at
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (12-(i))/12) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -2582,7 +2583,7 @@ void CTempEnts::MuzzleFlash_Combine_Player( ClientEntityHandle_t hEntity, int at
 	pParticle->m_uchStartAlpha	= random->RandomInt( 64, 128 );
 	pParticle->m_uchEndAlpha	= 32;
 
-	pParticle->m_uchStartSize	= random->RandomFloat( 10.0f, 16.0f );
+	pParticle->m_uchStartSize	= random->RandomInt( 10, 16 );
 	pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
 	
 	pParticle->m_flRoll			= random->RandomInt( 0, 360 );
@@ -2634,12 +2635,12 @@ void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attac
 		pParticle->m_uchColor[1]	= 255;
 		pParticle->m_uchColor[2]	= 255;
 
-		pParticle->m_uchStartAlpha	= 255.0f;
+		pParticle->m_uchStartAlpha	= 255;
 		pParticle->m_uchEndAlpha	= 0;
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (FRONT_LENGTH*1.25f-(i))/(FRONT_LENGTH)) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 	
@@ -2674,7 +2675,7 @@ void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attac
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 2.0f, 4.0f ) * (SIDE_LENGTH-(i))/(SIDE_LENGTH*0.5f)) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -2704,7 +2705,7 @@ void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attac
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 2.0f, 4.0f ) * (SIDE_LENGTH-(i))/(SIDE_LENGTH*0.5f)) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -2734,7 +2735,7 @@ void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attac
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 2.0f, 4.0f ) * (SIDE_LENGTH-(i))/(SIDE_LENGTH*0.5f)) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -2755,7 +2756,7 @@ void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attac
 	pParticle->m_uchEndAlpha	= 0;
 
 	pParticle->m_uchStartSize	= flScale * random->RandomFloat( 12.0f, 16.0f );
-	pParticle->m_uchEndSize		= 0.0f;
+	pParticle->m_uchEndSize		= 0;
 	pParticle->m_flRoll			= random->RandomInt( 0, 360 );
 	pParticle->m_flRollDelta	= 0.0f;
 
@@ -2858,7 +2859,7 @@ void CTempEnts::MuzzleFlash_SMG1_Player( ClientEntityHandle_t hEntity, int attac
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (8-(i))/6) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 }
@@ -2917,7 +2918,7 @@ void CTempEnts::MuzzleFlash_Shotgun_Player( ClientEntityHandle_t hEntity, int at
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (8-(i))/6) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 }
@@ -3087,8 +3088,8 @@ void CTempEnts::MuzzleFlash_357_Player( ClientEntityHandle_t hEntity, int attach
 	pParticle->m_uchEndAlpha	= 0;
 
 	pParticle->m_uchStartSize	= random->RandomInt( 2, 4 );
-	pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 8.0f;
-	pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 8;
+	pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 	pParticle->m_flRollDelta	= random->RandomFloat( -0.5f, 0.5f );
 
 	float flScale = random->RandomFloat( 1.25f, 1.5f );
@@ -3117,7 +3118,7 @@ void CTempEnts::MuzzleFlash_357_Player( ClientEntityHandle_t hEntity, int attach
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (8-(i))/6) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 }
@@ -3175,8 +3176,8 @@ void CTempEnts::MuzzleFlash_Pistol_Player( ClientEntityHandle_t hEntity, int att
 		pParticle->m_uchEndAlpha	= 0;
 
 		pParticle->m_uchStartSize	= random->RandomInt( 2, 4 );
-		pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 4.0f;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 4;
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= random->RandomFloat( -0.1f, 0.1f );
 	}
 
@@ -3206,7 +3207,7 @@ void CTempEnts::MuzzleFlash_Pistol_Player( ClientEntityHandle_t hEntity, int att
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (8-(i))/6) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 }
@@ -3368,14 +3369,12 @@ void CTempEnts::CSEjectBrass( const Vector &vecPosition, const QAngle &angVeloci
 
 	Vector forward, right, up;
 	Vector velocity;
-	Vector origin;
-	QAngle angle;
 	
 	// Add some randomness to the velocity
 
 	AngleVectors( angVelocity, &forward, &right, &up );
 	
-	velocity = forward * nVelocity * random->RandomFloat( 1.2, 2.8 ) +
+	velocity = forward * nVelocity * random->RandomFloat( 1.2f, 2.8f ) +
 			   up * random->RandomFloat( -10, 10 ) +
 			   right * random->RandomFloat( -20, 20 );
 

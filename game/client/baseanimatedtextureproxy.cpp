@@ -94,7 +94,7 @@ void CBaseAnimatedTextureProxy::OnBind( void *pEntity )
 
 	if ( numFrames <= 0 )
 	{
-		Assert( !"0 frames in material calling animated texture proxy" );
+		AssertMsg( false, "0 frames in material calling animated texture proxy" );
 		return;
 	}
 

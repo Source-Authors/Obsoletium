@@ -1382,7 +1382,7 @@ void C_BasePlayer::CreateWaterEffects( void )
 		pParticle->m_vecVelocity = RandomVector( -2.0f, 2.0f );
 
 		//FIXME: We should tint these based on the water's fog value!
-		float color = random->RandomInt( 32, 128 );
+		int color = random->RandomInt( 32, 128 );
 		pParticle->m_uchColor[0] = color;
 		pParticle->m_uchColor[1] = color;
 		pParticle->m_uchColor[2] = color;
@@ -2939,7 +2939,6 @@ void C_BasePlayer::BuildFirstPersonMeathookTransformations( CStudioHdr *hdr, Vec
 	// Find out where the player's head (driven by the HMD) is in the world.
 	// We can't move this with animations or effects without causing nausea, so we need to move
 	// the whole body so that the animated head is in the right place to match the player-controlled head.
-	Vector vHeadUp;
 	Vector vRealPivotPoint;
 	if( UseVR() )
 	{

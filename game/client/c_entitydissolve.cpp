@@ -170,7 +170,7 @@ static void FX_BuildTesla( C_BaseEntity *pEntity, Vector &vecOrigin, Vector &vec
 	beamInfo.m_flAmplitude = 24;
 	beamInfo.m_flBrightness = 255.0;
 	beamInfo.m_flSpeed = 150.0f;
-	beamInfo.m_nStartFrame = 0.0;
+	beamInfo.m_nStartFrame = 0;
 	beamInfo.m_flFrameRate = 30.0;
 	beamInfo.m_flRed = 255.0;
 	beamInfo.m_flGreen = 255.0;
@@ -248,7 +248,7 @@ void C_EntityDissolve::BuildTeslaEffect( mstudiobbox_t *pHitBox, const matrix3x4
 				pParticle->m_uchColor[0]	= MIN( 1.0f, color[0] * colorRamp ) * 255.0f;
 				pParticle->m_uchColor[1]	= MIN( 1.0f, color[1] * colorRamp ) * 255.0f;
 				pParticle->m_uchColor[2]	= MIN( 1.0f, color[2] * colorRamp ) * 255.0f;
-				pParticle->m_uchStartSize	= RandomFloat( 6,13 );
+				pParticle->m_uchStartSize	= RandomInt( 6,13 );
 				pParticle->m_uchEndSize		= pParticle->m_uchStartSize - 2;
 				pParticle->m_uchStartAlpha	= 255;
 				pParticle->m_uchEndAlpha	= 10;
@@ -737,7 +737,7 @@ int C_EntityDissolve::DrawModel( int flags )
 
 			sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 
-			float alpha = 255;
+			unsigned char alpha = 255;
 
 			sParticle->m_uchColor[0]	= m_vEffectColor.x;
 			sParticle->m_uchColor[1]	= m_vEffectColor.y;
@@ -765,7 +765,7 @@ int C_EntityDissolve::DrawModel( int flags )
 			sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 			sParticle->m_flRollDelta	= Helper_RandomFloat( -2.0f, 2.0f );
 
-			float alpha = 255;
+			unsigned char alpha = 255;
 
 			sParticle->m_uchColor[0]	= m_vEffectColor.x;
 			sParticle->m_uchColor[1]	= m_vEffectColor.y;

@@ -17,15 +17,15 @@ using namespace vgui;
 
 class CIconPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CIconPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CIconPanel, vgui::Panel );
 
 public:
 	CIconPanel( vgui::Panel *parent, const char *name );
 
 	void Init( void );
-	virtual void Paint();
-	virtual void ApplySettings( KeyValues *inResourceData );
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void Paint() override;
+	void ApplySettings( KeyValues *inResourceData ) override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	void SetIcon( const char *szIcon );
 	void SetIconColor( Color cColor ) { m_IconColor = cColor; }

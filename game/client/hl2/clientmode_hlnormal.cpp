@@ -41,10 +41,10 @@ IClientMode *GetClientModeNormal()
 class CHudViewport : public CBaseViewport
 {
 private:
-	DECLARE_CLASS_SIMPLE( CHudViewport, CBaseViewport );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudViewport, CBaseViewport );
 
 protected:
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme )
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
 
@@ -53,7 +53,7 @@ protected:
 		SetPaintBackgroundEnabled( false );
 	}
 
-	virtual void CreateDefaultPanels( void ) { /* don't create any panels yet*/ };
+	void CreateDefaultPanels( void ) override { /* don't create any panels yet*/ };
 };
 
 

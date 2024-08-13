@@ -13,7 +13,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define RESOURCE_THINK_TIME		0.1
+#define RESOURCE_THINK_TIME		0.1f
 
 extern ConVar mp_capstyle;
 extern ConVar mp_capdeteriorate_time;

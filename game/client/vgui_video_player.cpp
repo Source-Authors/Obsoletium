@@ -20,9 +20,9 @@
 VideoPlayerPanel::VideoPlayerPanel( vgui::Panel *parent, const char *panelName, int nXpos, int nYpos, int nWidth, int nHeight, const char *pVideoFile ) : 
 	BaseClass( parent, panelName ),
 	m_VideoMaterial( NULL ),
-	m_VideoFileName( NULL ),
 	m_VideoLoaded( false ),
-	m_VideoPlaying( false )
+	m_VideoPlaying( false ),
+	m_VideoFileName( NULL )
 {
 	Assert( g_pVideo != NULL );
 
@@ -92,7 +92,7 @@ bool VideoPlayerPanel::SetVideo( const char *pVideoFile )
 	}
 
 	// save filename	
-	int sLen = V_strlen( pVideoFile ) + 1;
+	intp sLen = V_strlen( pVideoFile ) + 1;
 	m_VideoFileName = new char[ sLen ];
 	V_strncpy( m_VideoFileName, pVideoFile, sLen );
 	

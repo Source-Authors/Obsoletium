@@ -51,8 +51,6 @@ const float MIN_PROXY_PIXELS = 25.0f;
 
 float PixelVisibility_DrawProxy( IMatRenderContext *pRenderContext, OcclusionQueryObjectHandle_t queryHandle, Vector origin, float scale, float proxyAspect, IMaterial *pMaterial, bool screenspace )
 {
-	Vector point;
-
 	// don't expand this with distance to fit pixels or the sprite will poke through
 	// only expand the parts perpendicular to the view
 	float forwardScale = scale;
@@ -140,6 +138,8 @@ float PixelVisibility_DrawProxy( IMatRenderContext *pRenderContext, OcclusionQue
 
 	// sprite/quad proxy
 #if 0
+	Vector point;
+
 	meshBuilder.Begin( pMesh, MATERIAL_QUADS, 1 );
 
 	VectorMA (origin, -scale, CurrentViewUp(), point);
@@ -345,7 +345,7 @@ float CPixelVisibilityQuery::GetFractionVisible( float fadeTimeInv )
 
 			if ( r_pixelvisibility_spew.GetBool() && CurrentViewID() == 0 ) 
 			{
-				DevMsg( 1, "Pixels visible: %d (qh:%d) Pixels possible: %d (qh:%d) (frame:%d)\n", pixels, (int)m_queryHandle, pixelsPossible, (int)m_queryHandleCount, gpGlobals->framecount );
+				DevMsg( 1, "Pixels visible: %d (qh:%zd) Pixels possible: %d (qh:%zd) (frame:%d)\n", pixels, (intp)m_queryHandle, pixelsPossible, (intp)m_queryHandleCount, gpGlobals->framecount );
 			}
 
 			if ( pixels < 0 || pixelsPossible < 0 )
@@ -376,7 +376,7 @@ float CPixelVisibilityQuery::GetFractionVisible( float fadeTimeInv )
 
 			if ( r_pixelvisibility_spew.GetBool() && CurrentViewID() == 0 ) 
 			{
-				DevMsg( 1, "Pixels visible: %d (qh:%d) (frame:%d)\n", pixels, (int)m_queryHandle, gpGlobals->framecount );
+				DevMsg( 1, "Pixels visible: %d (qh:%zd) (frame:%d)\n", pixels, (intp)m_queryHandle, gpGlobals->framecount );
 			}
 
 			if ( pixels < 0 )
@@ -415,7 +415,7 @@ void CPixelVisibilityQuery::IssueQuery( IMatRenderContext *pRenderContext, float
 
 		if ( r_pixelvisibility_spew.GetBool() && CurrentViewID() == 0 ) 
 		{
-			DevMsg( 1, "Draw Proxy: qh:%d org:<%d,%d,%d> (frame:%d)\n", (int)m_queryHandle, (int)m_origin[0], (int)m_origin[1], (int)m_origin[2], gpGlobals->framecount );
+			DevMsg( 1, "Draw Proxy: qh:%zd org:<%d,%d,%d> (frame:%d)\n", (intp)m_queryHandle, (int)m_origin[0], (int)m_origin[1], (int)m_origin[2], gpGlobals->framecount );
 		}
 
 		m_clipFraction = PixelVisibility_DrawProxy( pRenderContext, m_queryHandle, m_origin, proxySize, proxyAspect, pMaterial, sizeIsScreenSpace );

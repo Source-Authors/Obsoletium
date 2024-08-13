@@ -426,7 +426,7 @@ static int SoundscapeCompletion( const char *partial, char commands[ COMMAND_COM
 
 	const char *cmdname = "playsoundscape";
 	char *substring = NULL;
-	int substringLen = 0;
+	intp substringLen = 0;
 	if ( Q_strstr( partial, cmdname ) && strlen(partial) > strlen(cmdname) + 1 )
 	{
 		substring = (char *)partial + strlen( cmdname ) + 1;
@@ -457,7 +457,7 @@ CON_COMMAND_F_COMPLETION( playsoundscape, "Forces a soundscape to play", FCVAR_C
 		return;
 	}
 	const char *pSoundscapeName = args[1];
-	float radius = args.ArgC() > 2 ? atof( args[2] ) : DEFAULT_SOUND_RADIUS;
+	float radius = args.ArgC() > 2 ? strtof( args[2], nullptr ) : DEFAULT_SOUND_RADIUS;
 	g_SoundscapeSystem.ForceSoundscape( pSoundscapeName, radius );
 }
 
@@ -1103,7 +1103,7 @@ int C_SoundscapeSystem::AddLoopingAmbient( const char *pSoundName, float volume,
 int C_SoundscapeSystem::AddLoopingSound( const char *pSoundName, bool isAmbient, float volume, soundlevel_t soundlevel, int pitch, const Vector &position )
 {
 	loopingsound_t *pSoundSlot = NULL;
-	int soundSlot = m_loopingSounds.Count() - 1;
+	intp soundSlot = m_loopingSounds.Count() - 1;
 	bool bForceSoundUpdate = false;
 	while ( soundSlot >= 0 )
 	{
@@ -1236,7 +1236,7 @@ void C_SoundscapeSystem::UpdateLoopingSound( loopingsound_t &loopSound )
 // add a recurring random sound event
 int C_SoundscapeSystem::AddRandomSound( const randomsound_t &sound )
 {
-	int index = m_randomSounds.AddToTail( sound );
+	intp index = m_randomSounds.AddToTail( sound );
 	m_randomSounds[index].nextPlayTime = gpGlobals->curtime + 0.5f * RandomInterval( sound.time );
 	
 	return index;

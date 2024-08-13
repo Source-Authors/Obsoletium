@@ -102,7 +102,7 @@ void C_MortarShell::AddRisingParticles( float flPerc )
 
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 
-		float alpha = 255 * flPerc;
+		int alpha = 255 * flPerc;
 
 		sParticle->m_flRollDelta	= Helper_RandomFloat( -8.0f * flPerc, 8.0f * flPerc );
 		sParticle->m_uchColor[0]	= alpha;
@@ -152,7 +152,7 @@ void C_MortarShell::AddExplodingParticles( float flPerc )
 
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 
-		float alpha = 255 * flPerc;
+		int alpha = 255 * flPerc;
 
 		sParticle->m_flRollDelta	= Helper_RandomFloat( -8.0f * flPerc, 8.0f * flPerc );
 		sParticle->m_uchColor[0]	= alpha;

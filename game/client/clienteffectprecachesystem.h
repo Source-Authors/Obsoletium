@@ -34,28 +34,28 @@ public:
 class CClientEffectPrecacheSystem : public IGameSystem
 {
 public:
-	virtual char const *Name() { return "CCLientEffectPrecacheSystem"; }
+	char const *Name() override { return "CCLientEffectPrecacheSystem"; }
 
-	virtual bool	IsPerFrame() { return false; }
+	bool	IsPerFrame() override { return false; }
 
 	// constructor, destructor
 	CClientEffectPrecacheSystem() {}
 	virtual ~CClientEffectPrecacheSystem() {}
 
 	// Init, shutdown
-	virtual bool Init() { return true; }
-	virtual void PostInit() {}
-	virtual void Shutdown();
+	bool Init() override { return true; }
+	void PostInit() override {}
+	void Shutdown() override;
 
 	// Level init, shutdown
-	virtual void LevelInitPreEntity();
-	virtual void LevelInitPostEntity() {}
-	virtual void LevelShutdownPreEntity();
-	virtual void LevelShutdownPostEntity();
+	void LevelInitPreEntity() override;
+	void LevelInitPostEntity() override {}
+	void LevelShutdownPreEntity() override;
+	void LevelShutdownPostEntity() override;
 
-	virtual void OnSave() {}
-	virtual void OnRestore() {}
-	virtual void SafeRemoveIfDesired() {}
+	void OnSave() override {}
+	void OnRestore() override {}
+	void SafeRemoveIfDesired() override {}
 
 	void Register( IClientEffect *effect );
 

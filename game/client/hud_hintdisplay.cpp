@@ -26,24 +26,24 @@
 //-----------------------------------------------------------------------------
 class CHudHintDisplay : public vgui::Panel, public CHudElement
 {
-	DECLARE_CLASS_SIMPLE( CHudHintDisplay, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudHintDisplay, vgui::Panel );
 
 public:
 	CHudHintDisplay( const char *pElementName );
 
-	void Init();
-	void Reset();
+	void Init() override;
+	void Reset() override;
 	void MsgFunc_HintText( bf_read &msg );
-	void FireGameEvent( IGameEvent * event);
+	void FireGameEvent( IGameEvent * event) override;
 
 	bool SetHintText( wchar_t *text );
 	void LocalizeAndDisplay( const char *pszHudTxtMsg, const char *szRawString );
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 protected:
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void OnThink();
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void OnThink() override;
 
 protected:
 	vgui::HFont m_hFont;
@@ -347,20 +347,20 @@ void CHudHintDisplay::LocalizeAndDisplay( const char *pszHudTxtMsg, const char *
 //-----------------------------------------------------------------------------
 class CHudHintKeyDisplay : public vgui::Panel, public CHudElement
 {
-	DECLARE_CLASS_SIMPLE( CHudHintKeyDisplay, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudHintKeyDisplay, vgui::Panel );
 
 public:
 	CHudHintKeyDisplay( const char *pElementName );
-	void Init();
-	void Reset();
+	void Init() override;
+	void Reset() override;
 	void MsgFunc_KeyHintText( bf_read &msg );
-	bool ShouldDraw();
+	bool ShouldDraw() override;
 
 	bool SetHintText( const char *text );
 
 protected:
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void OnThink();
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void OnThink() override;
 
 private:
 	CUtlVector<vgui::Label *> m_Labels;

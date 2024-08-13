@@ -33,20 +33,20 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CHudDamageIndicator : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudDamageIndicator, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudDamageIndicator, vgui::Panel );
 
 public:
 	CHudDamageIndicator( const char *pElementName );
-	void Init( void );
-	void Reset( void );
-	virtual bool ShouldDraw( void );
+	void Init( void ) override;
+	void Reset( void ) override;
+	bool ShouldDraw( void ) override;
 
 	// Handler for our message
 	void MsgFunc_Damage( bf_read &msg );
 
 private:
-	virtual void Paint();
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void Paint() override;
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 
 private:
 	CPanelAnimationVarAliasType( float, m_flDmgX, "dmg_xpos", "10", "proportional_float" );
@@ -113,7 +113,7 @@ static DamageAnimation_t g_DamageAnimations[] =
 
 	// fall through to front damage
 	{ "HudTakeDamageFront",		DMG_ANY,	ANGLE_ANY,	ANGLE_ANY,	DAMAGE_ANY },
-	{ NULL },
+	{ NULL,						0,			0,			0,			0 },
 };
 
 

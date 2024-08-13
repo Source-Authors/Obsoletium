@@ -115,14 +115,14 @@ void C_TESpriteSpray::PostDataUpdate( DataUpdateType_t updateType )
 {
 	VPROF( "C_TESpriteSpray::PostDataUpdate" );
 
-	tempents->Sprite_Spray( m_vecOrigin, m_vecDirection, m_nModelIndex, m_nCount, m_nSpeed * 0.2, m_fNoise * 100.0 );
+	tempents->Sprite_Spray( m_vecOrigin, m_vecDirection, m_nModelIndex, m_nCount, m_nSpeed * 2 / 10, m_fNoise * 100.0f );
 	RecordSpriteSpray( m_vecOrigin, m_vecDirection, m_nModelIndex, m_nSpeed, m_fNoise, m_nCount );
 }
 
 void TE_SpriteSpray( IRecipientFilter& filter, float delay,
 	const Vector* pos, const Vector* dir, int modelindex, int speed, float noise, int count )
 {
-	tempents->Sprite_Spray( *pos, *dir, modelindex, count, speed * 0.2, noise * 100.0 );
+	tempents->Sprite_Spray( *pos, *dir, modelindex, count, speed * 2 / 10, noise * 100.0f );
 	RecordSpriteSpray( *pos, *dir, modelindex, speed, noise, count );
 }
 

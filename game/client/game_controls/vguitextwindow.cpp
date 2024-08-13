@@ -296,7 +296,7 @@ void CTextWindow::Update( void )
 		else
 		{
 			// We should have trapped this at a higher level
-			Assert( !"URL protocol is missing or blocked" );
+			AssertMsg( false, "URL protocol is missing or blocked" );
 		}
 	}
 	else if ( m_nContentType == TYPE_FILE )

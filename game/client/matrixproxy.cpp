@@ -109,12 +109,57 @@ void CTextureTransformProxy::OnBind( void *pC_BaseEntity )
 		MatrixMultiply( temp, mat, mat );
 	}
 
+	if ( ToolsEnabled() )
+	{
+		ToolFramework_RecordMaterialParams( GetMaterial() );
+	}
+
+	/*Vector2D center( 0.5f, 0.5f );
+
+	if (m_pCenterVar)
+	{
+		m_pCenterVar->GetVecValue( center.Base(), 2 );
+	}
+
+	DirectX::XMMATRIX mmat = MatrixBuildTranslation( -center.x, -center.y, 0.0f );
+
+	if (m_pScaleVar)
+	{
+		Vector2D scale;
+		m_pScaleVar->GetVecValue( scale.Base(), 2 );
+
+		DirectX::XMMATRIX mscale = DirectX::XMMatrixScaling( scale.x, scale.y, 1.0f );
+		mmat = DirectX::XMMatrixMultiply( mscale, mmat );
+	}
+
+	if (m_pRotateVar)
+	{
+		float angle = m_pRotateVar->GetFloatValue( );
+
+		DirectX::XMMATRIX mrotate = MatrixBuildRotateZ( angle );
+		mmat = DirectX::XMMatrixMultiply( mrotate, mmat );
+	}
+
+	DirectX::XMMATRIX mtemp = MatrixBuildTranslation( center.x, center.y, 0.0f );
+	mmat = DirectX::XMMatrixMultiply( mtemp, mmat );
+
+	if (m_pTranslateVar)
+	{
+		Vector2D translation( 0, 0 );
+		m_pTranslateVar->GetVecValue( translation.Base(), 2 );
+
+		DirectX::XMMATRIX mtranslate = MatrixBuildTranslation( translation.x, translation.y, 0.0f );
+		mmat = DirectX::XMMatrixMultiply( mtranslate, mmat );
+	}
+
+	VMatrix mat;
+	DirectX::XMStoreFloat4x4( mat.XmMBase(), mmat );
 	m_pResult->SetMatrixValue( mat );
 
 	if ( ToolsEnabled() )
 	{
 		ToolFramework_RecordMaterialParams( GetMaterial() );
-	}
+	}*/
 }
 
 

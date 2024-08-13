@@ -166,7 +166,7 @@ bool C_BaseTempEntity::Init( int entnum, int iSerialNum )
 
 void C_BaseTempEntity::Release()
 {
-	Assert( !"C_BaseTempEntity::Release should never be called" );
+	AssertMsg( false, "C_BaseTempEntity::Release should never be called" );
 }
 
 

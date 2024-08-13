@@ -32,15 +32,15 @@ static ConVar		scr_centertime( "scr_centertime", "2" );
 //-----------------------------------------------------------------------------
 class CCenterStringLabel : public vgui::Label
 {
-	DECLARE_CLASS_SIMPLE( CCenterStringLabel, vgui::Label );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCenterStringLabel, vgui::Label );
 
 public:
 						CCenterStringLabel( vgui::VPANEL parent );
 	virtual				~CCenterStringLabel( void );
 
 	// vgui::Panel
-	virtual void		ApplySchemeSettings(vgui::IScheme *pScheme);
-	virtual void		OnTick( void );
+	void		ApplySchemeSettings(vgui::IScheme *pScheme) override;
+	void		OnTick( void ) override;
 	virtual bool		ShouldDraw( void );
 
 	// CVGuiCenterPrint
@@ -52,7 +52,7 @@ public:
 	virtual void		Clear( void );
 
 protected:
-	MESSAGE_FUNC_INT_INT( OnScreenSizeChanged, "OnScreenSizeChanged", oldwide, oldtall );
+	MESSAGE_FUNC_INT_INT_OVERRIDE( OnScreenSizeChanged, "OnScreenSizeChanged", oldwide, oldtall );
 
 private:
 	void ComputeSize( void );

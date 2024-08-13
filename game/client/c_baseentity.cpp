@@ -140,11 +140,11 @@ void CPredictableList::AddToPredictableList( ClientEntityHandle_t add )
 	m_Predictables.AddToTail( add );
 
 	// Maintain sort order by entindex
-	int count = m_Predictables.Size();
+	intp count = m_Predictables.Count();
 	if ( count < 2 )
 		return;
 
-	int i, j;
+	intp i, j;
 	for ( i = 0; i < count; i++ )
 	{
 		for ( j = i + 1; j < count; j++ )
@@ -404,15 +404,15 @@ static void RecvProxy_MoveCollide( const CRecvProxyData *pData, void *pStruct, v
 	((C_BaseEntity*)pStruct)->SetMoveCollide( (MoveCollide_t)(pData->m_Value.m_Int) );
 }
 
-static void RecvProxy_Solid( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	((C_BaseEntity*)pStruct)->SetSolid( (SolidType_t)pData->m_Value.m_Int );
-}
+//static void RecvProxy_Solid( const CRecvProxyData *pData, void *pStruct, void *pOut )
+//{
+//	((C_BaseEntity*)pStruct)->SetSolid( (SolidType_t)pData->m_Value.m_Int );
+//}
 
-static void RecvProxy_SolidFlags( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	((C_BaseEntity*)pStruct)->SetSolidFlags( pData->m_Value.m_Int );
-}
+//static void RecvProxy_SolidFlags( const CRecvProxyData *pData, void *pStruct, void *pOut )
+//{
+//	((C_BaseEntity*)pStruct)->SetSolidFlags( pData->m_Value.m_Int );
+//}
 
 void RecvProxy_EffectFlags( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
@@ -895,9 +895,9 @@ inline int C_BaseEntity::Interp_Interpolate( VarMapping_t *map, float currentTim
 // Functions.
 //-----------------------------------------------------------------------------
 C_BaseEntity::C_BaseEntity() : 
+	m_iv_vecVelocity( "C_BaseEntity::m_iv_vecVelocity" ),
 	m_iv_vecOrigin( "C_BaseEntity::m_iv_vecOrigin" ),
-	m_iv_angRotation( "C_BaseEntity::m_iv_angRotation" ),
-	m_iv_vecVelocity( "C_BaseEntity::m_iv_vecVelocity" )
+	m_iv_angRotation( "C_BaseEntity::m_iv_angRotation" )
 {
 	m_pAttributes = NULL;
 
@@ -1115,7 +1115,7 @@ bool C_BaseEntity::InitializeAsClientEntity( const char *pszModelName, RenderGro
 		if ( nModelIndex == -1 )
 		{
 			// Model could not be found
-			Assert( !"Model could not be found, index is -1" );
+			AssertMsg( false, "Model could not be found, index is -1" );
 			return false;
 		}
 	}
@@ -2318,11 +2318,11 @@ void C_BaseEntity::RemoveFromAimEntsList()
 		return;
 	}
 
-	unsigned int c = g_AimEntsList.Count();
+	auto c = g_AimEntsList.Count();
 
 	Assert( m_AimEntsListHandle < c );
 
-	unsigned int last = c - 1;
+	auto last = c - 1;
 
 	if ( last == m_AimEntsListHandle )
 	{
@@ -5325,7 +5325,7 @@ static int g_FieldSizes[FIELD_TYPECOUNT] =
 {
 	0,					// FIELD_VOID
 	sizeof(float),		// FIELD_FLOAT
-	sizeof(int),		// FIELD_STRING
+	sizeof(const char*),		// FIELD_STRING
 	sizeof(Vector),		// FIELD_VECTOR
 	sizeof(Quaternion),	// FIELD_QUATERNION
 	sizeof(int),		// FIELD_INTEGER
@@ -5338,17 +5338,22 @@ static int g_FieldSizes[FIELD_TYPECOUNT] =
 	
 	//---------------------------------
 
-	sizeof(int),		// FIELD_CLASSPTR
+	sizeof(uintp),		// FIELD_CLASSPTR
 	sizeof(EHANDLE),	// FIELD_EHANDLE
 	sizeof(uintp),		// FIELD_EDICT
 
 	sizeof(Vector),		// FIELD_POSITION_VECTOR
 	sizeof(float),		// FIELD_TIME
 	sizeof(int),		// FIELD_TICK
-	sizeof(int),		// FIELD_MODELNAME
-	sizeof(int),		// FIELD_SOUNDNAME
+	sizeof(const char*),		// FIELD_MODELNAME
+	sizeof(const char*),		// FIELD_SOUNDNAME
 
-	sizeof(int),		// FIELD_INPUT		(uses custom type)
+#ifdef GNUC
+    // pointer to members under gnuc are 8bytes if you have a virtual func
+    sizeof(uint64),  // FIELD_INPUT
+#else
+    sizeof(int *),  // FIELD_INPUT		(uses custom type)
+#endif
 #ifdef GNUC
 	// pointer to members under gnuc are 8bytes if you have a virtual func
 	sizeof(uint64),		// FIELD_FUNCTION
@@ -6422,7 +6427,7 @@ void C_BaseEntity::RemoveVar( void *data, bool bAssert )
 	}
 	if ( bAssert )
 	{
-		Assert( !"RemoveVar" );
+		AssertMsg( false, "RemoveVar" );
 	}
 }
 

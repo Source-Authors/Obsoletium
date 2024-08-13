@@ -48,16 +48,16 @@ using namespace vgui;
 
 class CHUDQuickInfo : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHUDQuickInfo, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHUDQuickInfo, vgui::Panel );
 public:
 	CHUDQuickInfo( const char *pElementName );
-	void Init( void );
-	void VidInit( void );
-	bool ShouldDraw( void );
-	virtual void OnThink();
-	virtual void Paint();
-	
-	virtual void ApplySchemeSettings( IScheme *scheme );
+	void Init( void ) override;
+	void VidInit( void ) override;
+	bool ShouldDraw( void ) override;
+
+	void OnThink() override;
+	void Paint() override;
+	void ApplySchemeSettings( IScheme *scheme ) override;
 private:
 	
 	void	DrawWarning( int x, int y, CHudTexture *icon, float &time );

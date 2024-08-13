@@ -21,7 +21,7 @@
 
 class VideoPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( VideoPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( VideoPanel, vgui::EditablePanel );
 public:
 
 	VideoPanel( unsigned int nXPos, unsigned int nYPos, unsigned int nHeight, unsigned int nWidth, bool allowAlternateMedia = true );
@@ -29,11 +29,11 @@ public:
 	virtual ~VideoPanel( void );
 
 	virtual void Activate( void );
-	virtual void Paint( void );
+	void Paint( void ) override;
 	virtual void DoModal( void );
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
-	virtual void OnClose( void );
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
+	void OnClose( void ) override;
 	virtual void GetPanelPos( int &xpos, int &ypos );
 
 	void SetExitCommand( const char *pExitCommand )
@@ -50,8 +50,8 @@ public:
 
 protected:
 
-	virtual void OnTick( void ) { BaseClass::OnTick(); }
-	virtual void OnCommand( const char *pcCommand ) { BaseClass::OnCommand( pcCommand ); }
+	void OnTick( void ) override { BaseClass::OnTick(); }
+	void OnCommand( const char *pcCommand ) override { BaseClass::OnCommand( pcCommand ); }
 	virtual void OnVideoOver(){}
 
 protected:

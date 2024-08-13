@@ -54,91 +54,91 @@ public:
 					ClientModeShared();
 	virtual			~ClientModeShared();
 	
-	virtual void	Init();
-	virtual void	InitViewport();
-	virtual void	VGui_Shutdown();
-	virtual void	Shutdown();
+	void	Init() override;
+	void	InitViewport() override;
+	void	VGui_Shutdown() override;
+	void	Shutdown() override;
 
-	virtual void	LevelInit( const char *newmap );
-	virtual void	LevelShutdown( void );
+	void	LevelInit( const char *newmap ) override;
+	void	LevelShutdown( void ) override;
 
-	virtual void	Enable();
-	virtual void	Disable();
-	virtual void	Layout();
+	void	Enable() override;
+	void	Disable() override;
+	void	Layout() override;
 
 	virtual void	ReloadScheme( bool flushLowLevel );
-	virtual void	OverrideView( CViewSetup *pSetup );
-	virtual bool	ShouldDrawDetailObjects( );
-	virtual bool	ShouldDrawEntity(C_BaseEntity *pEnt);
-	virtual bool	ShouldDrawLocalPlayer( C_BasePlayer *pPlayer );
-	virtual bool	ShouldDrawViewModel();
-	virtual bool	ShouldDrawParticles( );
-	virtual bool	ShouldDrawCrosshair( void );
-	virtual bool	ShouldBlackoutAroundHUD() OVERRIDE;
-	virtual HeadtrackMovementMode_t ShouldOverrideHeadtrackControl() OVERRIDE;
-	virtual void	AdjustEngineViewport( int& x, int& y, int& width, int& height );
-	virtual void	PreRender(CViewSetup *pSetup);
-	virtual void	PostRender();
-	virtual void	PostRenderVGui();
-	virtual void	ProcessInput(bool bActive);
-	virtual bool	CreateMove( float flInputSampleTime, CUserCmd *cmd );
-	virtual void	Update();
+	void	OverrideView( CViewSetup *pSetup ) override;
+	bool	ShouldDrawDetailObjects( ) override;
+	bool	ShouldDrawEntity(C_BaseEntity *pEnt) override;
+	bool	ShouldDrawLocalPlayer( C_BasePlayer *pPlayer ) override;
+	bool	ShouldDrawViewModel() override;
+	bool	ShouldDrawParticles( ) override;
+	bool	ShouldDrawCrosshair( void ) override;
+	bool	ShouldBlackoutAroundHUD() override;
+	HeadtrackMovementMode_t ShouldOverrideHeadtrackControl() override;
+	void	AdjustEngineViewport( int& x, int& y, int& width, int& height ) override;
+	void	PreRender(CViewSetup *pSetup) override;
+	void	PostRender() override;
+	void	PostRenderVGui() override;
+	void	ProcessInput(bool bActive) override;
+	bool	CreateMove( float flInputSampleTime, CUserCmd *cmd ) override;
+	void	Update() override;
 
 	// Input
-	virtual int		KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
+	int		KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding ) override;
 	virtual int		HudElementKeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
-	virtual void	OverrideMouseInput( float *x, float *y );
-	virtual void	StartMessageMode( int iMessageModeType );
-	virtual vgui::Panel *GetMessagePanel();
+	void	OverrideMouseInput( float *x, float *y ) override;
+	void	StartMessageMode( int iMessageModeType ) override;
+	vgui::Panel *GetMessagePanel() override;
 
-	virtual void	ActivateInGameVGuiContext( vgui::Panel *pPanel );
-	virtual void	DeactivateInGameVGuiContext();
+	void	ActivateInGameVGuiContext( vgui::Panel *pPanel ) override;
+	void	DeactivateInGameVGuiContext() override;
 
 	// The mode can choose to not draw fog
-	virtual bool	ShouldDrawFog( void );
+	bool	ShouldDrawFog( void ) override;
 	
-	virtual float	GetViewModelFOV( void );
-	virtual vgui::Panel* GetViewport() { return m_pViewport; }
+	float	GetViewModelFOV( void ) override;
+	vgui::Panel* GetViewport() override { return m_pViewport; }
 	// Gets at the viewports vgui panel animation controller, if there is one...
-	virtual vgui::AnimationController *GetViewportAnimationController()
+	vgui::AnimationController *GetViewportAnimationController() override
 		{ return m_pViewport->GetAnimationController(); }
 	
-	virtual void FireGameEvent( IGameEvent *event );
+	void FireGameEvent( IGameEvent *event ) override;
 
-	virtual bool CanRecordDemo( char *errorMsg, int length ) const { return true; }
+	bool CanRecordDemo( char *errorMsg, int length ) const override { return true; }
 
 	virtual int HandleSpectatorKeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
 
-	virtual void	ComputeVguiResConditions( KeyValues *pkvConditions ) OVERRIDE;
+	void ComputeVguiResConditions( KeyValues *pkvConditions ) override;
 
 	//=============================================================================
 	// HPE_BEGIN:
 	// [menglish] Save server information shown to the client in a persistent place
 	//=============================================================================
 	 
-	virtual wchar_t* GetServerName() { return NULL; }
-	virtual void SetServerName(wchar_t* name) {}
-	virtual wchar_t* GetMapName() { return NULL; }
-	virtual void SetMapName(wchar_t* name) {}
+	wchar_t* GetServerName() override { return NULL; }
+	void SetServerName(wchar_t* ) override {}
+	wchar_t* GetMapName() override { return NULL; }
+	void SetMapName(wchar_t* ) override {}
 	 
 	//=============================================================================
 	// HPE_END
 	//=============================================================================
 
-	virtual bool	DoPostScreenSpaceEffects( const CViewSetup *pSetup );
+	bool	DoPostScreenSpaceEffects( const CViewSetup *pSetup ) override;
 
-	virtual void	DisplayReplayMessage( const char *pLocalizeName, float flDuration, bool bUrgent,
-										  const char *pSound, bool bDlg );
+	void	DisplayReplayMessage( const char *pLocalizeName, float flDuration, bool bUrgent,
+										  const char *pSound, bool bDlg ) override;
 
-	virtual bool	IsInfoPanelAllowed() OVERRIDE { return true; }
-	virtual void	InfoPanelDisplayed() OVERRIDE { }
-	virtual bool	IsHTMLInfoPanelAllowed() OVERRIDE { return true; }
+	bool	IsInfoPanelAllowed() override { return true; }
+	void	InfoPanelDisplayed() override { }
+	bool	IsHTMLInfoPanelAllowed() override { return true; }
 
 	bool	IsAnyPanelVisibleExceptScores() { return m_pViewport->IsAnyPanelVisibleExceptScores(); }
 	bool	IsPanelVisible( const char* panel ) { return m_pViewport->IsPanelVisible( panel ); }
 
-	virtual void			OnDemoRecordStart( char const* pDemoBaseName ) OVERRIDE {}
-	virtual void			OnDemoRecordStop() OVERRIDE {}
+	void			OnDemoRecordStart( char const* pDemoBaseName ) override {}
+	void			OnDemoRecordStop() override {}
 
 protected:
 	CBaseViewport			*m_pViewport;

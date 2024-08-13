@@ -56,7 +56,7 @@ public:
 	CHeadlightEffect();
 	~CHeadlightEffect();
 
-	virtual void UpdateLight(const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp, int nDistance);
+	void UpdateLight(const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp, int nDistance) override;
 };
 
 

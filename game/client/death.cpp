@@ -25,15 +25,16 @@
 //-----------------------------------------------------------------------------
 class CHudDeathNotice : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudDeathNotice, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudDeathNotice, vgui::Panel );
 public:
 	CHudDeathNotice( const char *pElementName );
-	void Init( void );
-	void VidInit( void );
-	bool ShouldDraw( void );
-	virtual void Paint();
 
-	virtual void ApplySchemeSettings( vgui::IScheme *scheme );
+	void Init( void ) override;
+	void VidInit( void ) override;
+	bool ShouldDraw( void ) override;
+
+	void Paint() override;
+	void ApplySchemeSettings( vgui::IScheme *scheme ) override;
 
 	void FireGameEvent( KeyValues * event);
 

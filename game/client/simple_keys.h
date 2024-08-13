@@ -40,7 +40,7 @@ public:
 class CSimpleKeyList
 {
 public:
-	int		Insert( const CSimpleKeyInterp &key );
+	intp	Insert( const CSimpleKeyInterp &key );
 	bool	Interp( Vector &out, float t );
 
 	CUtlVector<CSimpleKeyInterp>	m_list;

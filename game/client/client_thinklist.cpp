@@ -76,7 +76,7 @@ void CClientThinkList::SetNextClientThink( ClientThinkHandle_t hThink, float flN
 	if ( m_bInThinkLoop )
 	{
 		// Queue up all changes
-		int i = m_aChangeList.AddToTail();
+		intp i = m_aChangeList.AddToTail();
 		m_aChangeList[i].m_hEnt = INVALID_CLIENTENTITY_HANDLE;
 		m_aChangeList[i].m_hThink = hThink;
 		m_aChangeList[i].m_flNextTime = flNextTime;
@@ -110,7 +110,7 @@ void CClientThinkList::SetNextClientThink( ClientEntityHandle_t hEnt, float flNe
 	if ( m_bInThinkLoop )
 	{
 		// Queue up all changes
-		int i = m_aChangeList.AddToTail();
+		intp i = m_aChangeList.AddToTail();
 		m_aChangeList[i].m_hEnt = hEnt;
 		m_aChangeList[i].m_hThink = hThink;
 		m_aChangeList[i].m_flNextTime = flNextTime;
@@ -120,7 +120,7 @@ void CClientThinkList::SetNextClientThink( ClientEntityHandle_t hEnt, float flNe
 	// Add it to the list if it's not already in there.
 	if ( hThink == INVALID_THINK_HANDLE )
 	{
-		hThink = (ClientThinkHandle_t)(uintp)m_ThinkEntries.AddToTail();
+		hThink = (ClientThinkHandle_t)m_ThinkEntries.AddToTail();
 		pThink->SetThinkHandle( hThink );
 
 		ThinkEntry_t *pEntry = GetThinkEntry( hThink );
@@ -145,7 +145,7 @@ void CClientThinkList::RemoveThinkable( ClientThinkHandle_t hThink )
 	if ( m_bInThinkLoop )
 	{
 		// Queue up all changes
-		int i = m_aChangeList.AddToTail();
+		intp i = m_aChangeList.AddToTail();
 		m_aChangeList[i].m_hEnt = INVALID_CLIENTENTITY_HANDLE;
 		m_aChangeList[i].m_hThink = hThink;
 		m_aChangeList[i].m_flNextTime = CLIENT_THINK_NEVER;
@@ -158,7 +158,7 @@ void CClientThinkList::RemoveThinkable( ClientThinkHandle_t hThink )
 	{
 		pThink->SetThinkHandle( INVALID_THINK_HANDLE );
 	}
-	m_ThinkEntries.Remove( (unsigned long)hThink );
+	m_ThinkEntries.Remove( reinterpret_cast<uintp>(hThink) );
 }
 
 
@@ -267,7 +267,7 @@ void CClientThinkList::PerformThinkFunctions()
 {
 	VPROF_("Client Thinks", 1, VPROF_BUDGETGROUP_CLIENT_SIM, false, BUDGETFLAG_CLIENT);
 
-	int nMaxList = m_ThinkEntries.Count();
+	intp nMaxList = m_ThinkEntries.Count();
 	if ( nMaxList == 0 )
 		return;
 
@@ -278,7 +278,7 @@ void CClientThinkList::PerformThinkFunctions()
 	// prevent bad situations where an entity can think more than once in a frame.
 	ThinkEntry_t **ppThinkEntryList = (ThinkEntry_t**)stackalloc( nMaxList * sizeof(ThinkEntry_t*) );
 	int nThinkCount = 0;
-	for ( unsigned short iCur=m_ThinkEntries.Head(); iCur != m_ThinkEntries.InvalidIndex(); iCur = m_ThinkEntries.Next( iCur ) )
+	for ( auto iCur=m_ThinkEntries.Head(); iCur != m_ThinkEntries.InvalidIndex(); iCur = m_ThinkEntries.Next( iCur ) )
 	{
 		AddEntityToFrameThinkList( &m_ThinkEntries[iCur], false, nThinkCount, ppThinkEntryList );
 		Assert( nThinkCount <= nMaxList );
@@ -297,14 +297,14 @@ void CClientThinkList::PerformThinkFunctions()
 	m_bInThinkLoop = false;
 
 	// Apply changes to the think list
-	int nCount = m_aChangeList.Count();
+	intp nCount = m_aChangeList.Count();
 	for ( i = 0; i < nCount; ++i )
 	{
 		ClientThinkHandle_t hThink = m_aChangeList[i].m_hThink;
 		if ( hThink != INVALID_THINK_HANDLE )
 		{
 			// This can happen if the same think handle was removed twice
-			if ( !m_ThinkEntries.IsInList( (unsigned long)hThink ) )
+			if ( !m_ThinkEntries.IsInList( reinterpret_cast<uintp>(hThink) ) )
 				continue;
 
 			// NOTE: This is necessary for the case where the client entity handle

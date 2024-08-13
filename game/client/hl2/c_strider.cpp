@@ -793,7 +793,7 @@ void MuzzleFlash_Strider( ClientEntityHandle_t hEntity, int attachmentIndex )
 		pParticle->m_uchColor[1]	= 255;
 		pParticle->m_uchColor[2]	= 255;
 
-		pParticle->m_uchStartAlpha	= 255.0f;
+		pParticle->m_uchStartAlpha	= 255;
 		pParticle->m_uchEndAlpha	= 0;
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (FRONT_LENGTH-(i))/(FRONT_LENGTH*0.75f)) * flScale );
@@ -917,7 +917,7 @@ void MuzzleFlash_Strider( ClientEntityHandle_t hEntity, int attachmentIndex )
 	pParticle->m_uchEndAlpha	= 0;
 
 	pParticle->m_uchStartSize	= flScale * random->RandomFloat( 12.0f, 16.0f );
-	pParticle->m_uchEndSize		= 0.0f;
+	pParticle->m_uchEndSize		= 0;
 	pParticle->m_flRoll			= random->RandomInt( 0, 360 );
 	pParticle->m_flRollDelta	= 0.0f;
 
@@ -987,7 +987,6 @@ void StriderBlood( const Vector &origin, const Vector &normal, float scale )
 	PMaterialHandle	hMaterial = ParticleMgr()->GetPMaterial( "effects/slime1" );
 
 	float	length = 0.2f;
-	Vector	vForward, vRight, vUp;
 	Vector	offDir;
 
 	TrailParticle	*tParticle;

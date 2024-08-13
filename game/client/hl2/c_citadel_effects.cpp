@@ -157,7 +157,7 @@ void C_CitadelEnergyCore::UpdateIdle( float percentage )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		float alpha = 255 * percentage;
+		int alpha = 255 * percentage;
 
 		sParticle->m_uchColor[0]	= alpha;
 		sParticle->m_uchColor[1]	= alpha;
@@ -165,7 +165,7 @@ void C_CitadelEnergyCore::UpdateIdle( float percentage )
 		sParticle->m_uchStartAlpha	= alpha;
 		sParticle->m_uchEndAlpha	= 0;
 
-		sParticle->m_uchStartSize	= random->RandomFloat( 1, 2 );
+		sParticle->m_uchStartSize	= random->RandomInt( 1, 2 );
 		sParticle->m_uchEndSize		= 0;
 	}
 }
@@ -205,7 +205,7 @@ void C_CitadelEnergyCore::UpdateCharging( float percentage )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		float alpha = 255;
+		int alpha = 255;
 
 		sParticle->m_uchColor[0]	= alpha;
 		sParticle->m_uchColor[1]	= alpha;
@@ -213,24 +213,17 @@ void C_CitadelEnergyCore::UpdateCharging( float percentage )
 		sParticle->m_uchStartAlpha	= alpha;
 		sParticle->m_uchEndAlpha	= 0;
 
-		if ( i < 2 )
+		// dimhotepus: Fix usage special long-live 2 times large particle sometimes.
+		if ( i < 1 || random->RandomInt( 0, 20 ) != 0 )
 		{
 			sParticle->m_uchStartSize	= flScale * (i+1);
-			sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2.0f;
+			sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2;
 		}
 		else
 		{
-			if ( random->RandomInt( 0, 20 ) == 0 )
-			{
-				sParticle->m_uchStartSize	= flScale * (i+1);
-				sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 4.0f;
-				sParticle->m_flDieTime		= 0.25f;
-			}
-			else
-			{
-				sParticle->m_uchStartSize	= flScale * (i+1);
-				sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2.0f;
-			}
+			sParticle->m_uchStartSize	= flScale * (i+1);
+			sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 4;
+			sParticle->m_flDieTime		= 0.25f;
 		}
 	}
 
@@ -273,7 +266,7 @@ void C_CitadelEnergyCore::UpdateCharging( float percentage )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		float alpha = 255 * percentage;
+		int alpha = 255 * percentage;
 
 		sParticle->m_uchColor[0]	= alpha;
 		sParticle->m_uchColor[1]	= alpha;
@@ -281,7 +274,7 @@ void C_CitadelEnergyCore::UpdateCharging( float percentage )
 		sParticle->m_uchStartAlpha	= alpha;
 		sParticle->m_uchEndAlpha	= 0;
 
-		sParticle->m_uchStartSize	= random->RandomFloat( 1, 2 );
+		sParticle->m_uchStartSize	= random->RandomInt( 1, 2 );
 		sParticle->m_uchEndSize		= 0;
 	}
 }
@@ -319,7 +312,7 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 	sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 	sParticle->m_flRollDelta	= 0.0f;
 
-	float alpha = 128;
+	int alpha = 128;
 
 	sParticle->m_uchColor[0]	= alpha;
 	sParticle->m_uchColor[1]	= alpha;
@@ -328,7 +321,7 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 	sParticle->m_uchEndAlpha	= 0;
 
 	sParticle->m_uchStartSize	= flScale * 2.0f;
-	sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2.0f;
+	sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2;
 
 	// Make sure we encompass the complete particle here!
 	m_pSimpleEmitter->SetParticleCullRadius( sParticle->m_uchEndSize );
@@ -348,7 +341,7 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		float alpha = 100;
+		int alpha = 100;
 
 		sParticle->m_uchColor[0]	= alpha;
 		sParticle->m_uchColor[1]	= alpha;
@@ -359,20 +352,20 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 		if ( i < 1 )
 		{
 			sParticle->m_uchStartSize	= flScale * (i+1);
-			sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2.0f;
+			sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2;
 		}
 		else
 		{
 			if ( random->RandomInt( 0, 20 ) == 0 )
 			{
 				sParticle->m_uchStartSize	= flScale * (i+1);
-				sParticle->m_uchEndSize		= 0.0f;
+				sParticle->m_uchEndSize		= 0;
 				sParticle->m_flDieTime		= 0.25f;
 			}
 			else
 			{
 				sParticle->m_uchStartSize	= flScale * (i+1);
-				sParticle->m_uchEndSize		= 0.0f;
+				sParticle->m_uchEndSize		= 0;
 			}
 		}
 	}
@@ -411,7 +404,7 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		float alpha = 255;
+		unsigned char alpha = 255;
 
 		sParticle->m_uchColor[0]	= alpha;
 		sParticle->m_uchColor[1]	= alpha;

@@ -108,11 +108,10 @@ public:
 };
 
 // NOTE: Beam widths are half-widths or radii, so this is a beam that represents a cylinder with 2" radius
-const float NARROW_BEAM_WIDTH = 32;
-const float WIDE_BEAM_WIDTH = 2;
-const float FLARE_SIZE = 128;
-const float	DARK_SIZE = 16;
-const float AFTERGLOW_SIZE = 64;
+constexpr float NARROW_BEAM_WIDTH = 32;
+constexpr float FLARE_SIZE = 128;
+constexpr float	DARK_SIZE = 16;
+constexpr float AFTERGLOW_SIZE = 64;
 
 CGunshipFXEnvelope::CGunshipFXEnvelope()
 {
@@ -274,7 +273,6 @@ int	C_GunshipFX::DrawModel( int )
 		ent->GetAttachment( m_attachment, m_worldPosition, angles );
 	}
 
-	Vector test;
 	m_t += gpGlobals->frametime;
 	if ( m_tMax > 0 )
 	{

@@ -30,24 +30,24 @@ namespace vgui
 class CTextWindow : public vgui::Frame, public IViewPortPanel
 {
 private:
-	DECLARE_CLASS_SIMPLE( CTextWindow, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CTextWindow, vgui::Frame );
 
 public:
 	CTextWindow(IViewPort *pViewPort);
 	virtual ~CTextWindow();
 
-	virtual const char *GetName( void ) { return PANEL_INFO; }
-	virtual void SetData(KeyValues *data);
-	virtual void Reset();
-	virtual void Update();
-	virtual bool NeedsUpdate( void ) { return false; }
-	virtual bool HasInputElements( void ) { return true; }
-	virtual void ShowPanel( bool bShow );
+	const char *GetName( void ) override { return PANEL_INFO; }
+	void SetData(KeyValues *data) override;
+	void Reset() override;
+	void Update() override;
+	bool NeedsUpdate( void ) override { return false; }
+	bool HasInputElements( void ) override { return true; }
+	void ShowPanel( bool bShow ) override;
 
 	// both vgui::Frame and IViewPortPanel define these, so explicitly define them here as passthroughs to vgui
-	vgui::VPANEL GetVPanel( void ) { return BaseClass::GetVPanel(); }
-  	virtual bool IsVisible() { return BaseClass::IsVisible(); }
-  	virtual void SetParent( vgui::VPANEL parent ) { BaseClass::SetParent( parent ); }
+	vgui::VPANEL GetVPanel( void ) override { return BaseClass::GetVPanel(); }
+  	bool IsVisible() override { return BaseClass::IsVisible(); }
+  	void SetParent( vgui::VPANEL parent ) override { BaseClass::SetParent( parent ); }
 
 public:
 
@@ -57,15 +57,15 @@ public:
 	virtual void ShowURL( const char *URL, bool bAllowUserToDisable = true );
 	virtual void ShowIndex( const char *entry );
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
-	virtual GameActionSet_t GetPreferredActionSet() { return GAME_ACTION_SET_IN_GAME_HUD; }
+	GameActionSet_t GetPreferredActionSet() override { return GAME_ACTION_SET_IN_GAME_HUD; }
 
 protected:	
 	// vgui overrides
-	virtual void OnCommand( const char *command );
+	void OnCommand( const char *command ) override;
 
-	void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 	IViewPort	*m_pViewPort;
 	char		m_szTitle[255];
@@ -90,11 +90,11 @@ protected:
 	class CMOTDHTML : public vgui::HTML
 	{
 	private:
-		DECLARE_CLASS_SIMPLE( CMOTDHTML, vgui::HTML );
+		DECLARE_CLASS_SIMPLE_OVERRIDE( CMOTDHTML, vgui::HTML );
 	
 	public:
 		CMOTDHTML( Panel *parent, const char *pchName ) : vgui::HTML( parent, pchName ) {}
-		virtual bool OnStartRequest( const char *url, const char *target, const char *pchPostData, bool bIsRedirect ) OVERRIDE;
+		virtual bool OnStartRequest( const char *url, const char *target, const char *pchPostData, bool bIsRedirect ) override;
 	};
 	CMOTDHTML		*m_pHTMLMessage;
 	

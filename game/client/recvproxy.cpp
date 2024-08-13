@@ -157,24 +157,24 @@ void RecvProxy_InterpolationAmountChanged( const CRecvProxyData *pData, void *pS
 //			*pIn - 
 //			objectID - 
 //-----------------------------------------------------------------------------
-static void RecvProxy_Time( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	float	t;
-	float	clock_base;
-	float	offset;
-
-	// Get msec offset
-	offset	= ( float )pData->m_Value.m_Int / 1000.0f;
-
-	// Get base
-	clock_base = floor( engine->GetLastTimeStamp() );
-
-	// Add together and clamp to msec precision
-	t = ClampToMsec( clock_base + offset );
-
-	// Store decoded value
-	*( float * )pOut = t;
-}
+//static void RecvProxy_Time( const CRecvProxyData *pData, void *pStruct, void *pOut )
+//{
+//	float	t;
+//	float	clock_base;
+//	float	offset;
+//
+//	// Get msec offset
+//	offset	= ( float )pData->m_Value.m_Int / 1000.0f;
+//
+//	// Get base
+//	clock_base = floor( engine->GetLastTimeStamp() );
+//
+//	// Add together and clamp to msec precision
+//	t = ClampToMsec( clock_base + offset );
+//
+//	// Store decoded value
+//	*( float * )pOut = t;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

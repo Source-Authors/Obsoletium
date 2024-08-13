@@ -273,8 +273,8 @@ private:
 template<typename Type>
 struct CInterpolatedVarEntryBase<Type, false>
 {
-	CInterpolatedVarEntryBase() {}
-	~CInterpolatedVarEntryBase() {}
+	CInterpolatedVarEntryBase() = default;
+	~CInterpolatedVarEntryBase() = default;
 
 	const Type *GetValue() const { return &value; }
 	Type *GetValue() { return &value; }
@@ -305,7 +305,7 @@ template<typename T>
 class CSimpleRingBuffer
 {
 public:
-	CSimpleRingBuffer( int startSize = 4 )
+	CSimpleRingBuffer( intp startSize = 4 )
 	{
 		m_pElements = 0;
 		m_maxElement = 0;
@@ -320,15 +320,15 @@ public:
 		m_pElements = NULL;
 	}
 
-	inline int Count() const { return m_count; }
+	inline intp Count() const { return m_count; }
 
-	int Head() const { return (m_count>0) ? 0 : InvalidIndex(); }
+	intp Head() const { return (m_count>0) ? 0 : InvalidIndex(); }
 
-	bool IsIdxValid( int i ) const { return (i >= 0 && i < m_count) ? true : false; }
-	bool IsValidIndex(int i) const { return IsIdxValid(i); }
-	static int InvalidIndex() { return -1; }
+	bool IsIdxValid( intp i ) const { return (i >= 0 && i < m_count) ? true : false; }
+	bool IsValidIndex(intp i) const { return IsIdxValid(i); }
+	static intp InvalidIndex() { return -1; }
 
-	T& operator[]( int i ) 
+	T& operator[]( intp i ) 
 	{ 
 		Assert( IsIdxValid(i) ); 
 		i += m_firstElement;
@@ -336,7 +336,7 @@ public:
 		return m_pElements[i];
 	}
 
-	const T& operator[]( int i ) const
+	const T& operator[]( intp i ) const
 	{ 
 		Assert( IsIdxValid(i) ); 
 		i += m_firstElement;
@@ -344,13 +344,13 @@ public:
 		return m_pElements[i];
 	}
 
-	void EnsureCapacity( int capSize )
+	void EnsureCapacity( intp capSize )
 	{
 		if ( capSize > m_maxElement )
 		{
-			int newMax = m_maxElement + ((capSize+m_growSize-1)/m_growSize) * m_growSize;
+			intp newMax = m_maxElement + ((capSize+m_growSize-1)/m_growSize) * m_growSize;
 			T *pNew = new T[newMax];
-			for ( int i = 0; i < m_maxElement; i++ )
+			for ( intp i = 0; i < m_maxElement; i++ )
 			{
 				// ------------
 				// If you wanted to make this a more generic container you'd probably want this code
@@ -367,24 +367,24 @@ public:
 		}
 	}
 
-	int AddToHead()
+	intp AddToHead()
 	{
 		EnsureCapacity( m_count + 1 );
-		int i = m_firstElement + m_maxElement - 1;
+		intp i = m_firstElement + m_maxElement - 1;
 		m_count++;
 		i = WrapRange(i);
 		m_firstElement = i;
 		return 0;
 	}
 
-	int AddToHead( const T &elem )
+	intp AddToHead( const T &elem )
 	{
 		AddToHead();
 		m_pElements[m_firstElement] = elem;
 		return 0;
 	}
 
-	int AddToTail()
+	intp AddToTail()
 	{
 		EnsureCapacity( m_count + 1 );
 		m_count++;
@@ -406,7 +406,7 @@ public:
 		}
 	}
 
-	void Truncate( int newLength )
+	void Truncate( intp newLength )
 	{
 		if ( newLength < m_count )
 		{
@@ -416,7 +416,7 @@ public:
 	}
 
 private:
-	inline int WrapRange( int i ) const
+	inline intp WrapRange( intp i ) const
 	{
 		return ( i >= m_maxElement ) ? (i - m_maxElement) : i;
 	}
@@ -699,7 +699,7 @@ template< typename Type, bool IS_ARRAY >
 inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::AddToHead( float changeTime, const Type* values, bool bFlushNewer )
 {
 	MEM_ALLOC_CREDIT_CLASS();
-	int newslot;
+	intp newslot;
 	
 	if ( bFlushNewer )
 	{
@@ -723,7 +723,7 @@ inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::AddToHead( float changeTi
 	else
 	{
 		newslot = m_VarHistory.AddToHead();
-		for ( int i = 1; i < m_VarHistory.Count(); i++ )
+		for ( intp i = 1; i < m_VarHistory.Count(); i++ )
 		{
 			if ( m_VarHistory[i].changetime <= changeTime )
 				break;
@@ -1186,9 +1186,9 @@ inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::Copy( IInterpolatedVar *p
 	// Copy the entries.
 	m_VarHistory.RemoveAll();
 
-	for ( int i = 0; i < pSrc->m_VarHistory.Count(); i++ )
+	for ( intp i = 0; i < pSrc->m_VarHistory.Count(); i++ )
 	{
-		int newslot = m_VarHistory.AddToTail();
+		intp newslot = m_VarHistory.AddToTail();
 
 		CInterpolatedVarEntry *dest = &m_VarHistory[newslot];
 		CInterpolatedVarEntry *src	= &pSrc->m_VarHistory[i];

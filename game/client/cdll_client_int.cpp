@@ -1917,7 +1917,7 @@ void CHLClient::PrecacheMaterial( const char *pMaterialName )
 {
 	Assert( pMaterialName );
 
-	int nLen = Q_strlen( pMaterialName );
+	intp nLen = Q_strlen( pMaterialName );
 	char *pTempBuf = (char*)stackalloc( nLen + 1 );
 	memcpy( pTempBuf, pMaterialName, nLen + 1 );
 	char *pFound = Q_strstr( pTempBuf, ".vmt\0" );

@@ -169,7 +169,7 @@ void C_TEAntlionDust::PostDataUpdate( DataUpdateType_t updateType )
 		particle.m_uchColor[1]	= color[1];
 		particle.m_uchColor[2]	= color[2];
 
-		particle.m_uchStartAlpha= random->RandomFloat( 64, 128 );
+		particle.m_uchStartAlpha= random->RandomInt( 64, 128 );
 		particle.m_uchEndAlpha	= 0;
 
 		particle.m_uchStartSize	= random->RandomInt( 16, 32 );

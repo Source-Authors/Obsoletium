@@ -41,15 +41,15 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CHudHealth : public CHudElement, public CHudNumericDisplay
 {
-	DECLARE_CLASS_SIMPLE( CHudHealth, CHudNumericDisplay );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudHealth, CHudNumericDisplay );
 
 public:
 	CHudHealth( const char *pElementName );
-	virtual void Init( void );
-	virtual void VidInit( void );
-	virtual void Reset( void );
-	virtual void OnThink();
-			void MsgFunc_Damage( bf_read &msg );
+	void Init( void ) override;
+	void VidInit( void ) override;
+	void Reset( void ) override;
+	void OnThink() override;
+	void MsgFunc_Damage( bf_read &msg );
 
 private:
 	// old variables
@@ -146,11 +146,9 @@ void CHudHealth::OnThink()
 //-----------------------------------------------------------------------------
 void CHudHealth::MsgFunc_Damage( bf_read &msg )
 {
-
 	int armor = msg.ReadByte();	// armor
 	int damageTaken = msg.ReadByte();	// health
-	long bitsDamage = msg.ReadLong(); // damage bits
-	bitsDamage; // variable still sent but not used
+	[[maybe_unused]] long bitsDamage = msg.ReadLong(); // damage bits variable still sent but not used
 
 	Vector vecFrom;
 

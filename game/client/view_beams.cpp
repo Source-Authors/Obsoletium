@@ -724,13 +724,13 @@ void CViewRenderBeams::SetupBeam( Beam_t *pBeam, const BeamInfo_t &beamInfo )
 
 	if ( beamInfo.m_nSegments == -1 )
 	{
-		if ( pBeam->amplitude >= 0.50 )
+		if ( pBeam->amplitude >= 0.50f )
 		{
-			pBeam->segments = VectorLength( pBeam->delta ) * 0.25 + 3; // one per 4 pixels
+			pBeam->segments = VectorLength( pBeam->delta ) * 0.25f + 3; // one per 4 pixels
 		}
 		else
 		{
-			pBeam->segments = VectorLength( pBeam->delta ) * 0.075 + 3; // one per 16 pixels
+			pBeam->segments = VectorLength( pBeam->delta ) * 0.075f + 3; // one per 16 pixels
 		}
 	}
 	else
@@ -962,6 +962,9 @@ void CViewRenderBeams::CreateBeamEntPoint( int nStartEntity, const Vector *pStar
 		// Don't start beams out of the PVS
 		if ( !beamInfo.m_pStartEnt )
 			return;
+
+		// dimhotepus: Set start vec as used to compute beam segments.
+		beamInfo.m_vecStart = beamInfo.m_pStartEnt->GetRenderOrigin();
 	}
 
 	if ( nEndEntity <= 0 )
@@ -977,6 +980,9 @@ void CViewRenderBeams::CreateBeamEntPoint( int nStartEntity, const Vector *pStar
 		// Don't start beams out of the PVS
 		if ( !beamInfo.m_pEndEnt )
 			return;
+		
+		// dimhotepus: Set end vec as used to compute beam segments.
+		beamInfo.m_vecEnd = beamInfo.m_pEndEnt->GetRenderOrigin();
 	}
 
 	beamInfo.m_nModelIndex = modelIndex;
@@ -1521,10 +1527,10 @@ void CViewRenderBeams::UpdateBeam( Beam_t *pbeam, float frametime )
 
 		// Compute segments from the new endpoints
 		VectorSubtract( pbeam->attachment[1], pbeam->attachment[0], pbeam->delta );
-		if ( pbeam->amplitude >= 0.50 )
-			pbeam->segments = VectorLength( pbeam->delta ) * 0.25 + 3; // one per 4 pixels
+		if ( pbeam->amplitude >= 0.50f )
+			pbeam->segments = VectorLength( pbeam->delta ) * 0.25f + 3; // one per 4 pixels
 		else
-			pbeam->segments = VectorLength( pbeam->delta ) * 0.075 + 3; // one per 16 pixels
+			pbeam->segments = VectorLength( pbeam->delta ) * 0.075f + 3; // one per 16 pixels
 	}
 
 	// Get position data for spline beam
@@ -1574,9 +1580,9 @@ void CViewRenderBeams::UpdateBeam( Beam_t *pbeam, float frametime )
 
 				VectorSubtract( pbeam->attachment[1], pbeam->attachment[0], pbeam->delta );
 				if (pbeam->amplitude >= 0.50)
-					pbeam->segments = VectorLength( pbeam->delta ) * 0.25 + 3; // one per 4 pixels
+					pbeam->segments = VectorLength( pbeam->delta ) * 0.25f + 3; // one per 4 pixels
 				else
-					pbeam->segments = VectorLength( pbeam->delta ) * 0.075 + 3; // one per 16 pixels
+					pbeam->segments = VectorLength( pbeam->delta ) * 0.075f + 3; // one per 16 pixels
 
 			}
 		}

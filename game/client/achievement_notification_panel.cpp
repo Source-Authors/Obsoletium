@@ -171,7 +171,7 @@ bool CAchievementNotificationPanel::ShouldDraw( void )
 void CAchievementNotificationPanel::AddNotification( const char *szIconBaseName, const wchar_t *pHeading, const wchar_t *pTitle )
 {
 	// put this notification in our queue
-	int iQueueItem = m_queueNotification.AddToTail();
+	auto iQueueItem = m_queueNotification.AddToTail();
 	Notification_t &notification = m_queueNotification[iQueueItem];
 	Q_strncpy( notification.szIconBaseName, szIconBaseName, ARRAYSIZE( notification.szIconBaseName ) );
 	Q_wcsncpy( notification.szHeading, pHeading, sizeof( notification.szHeading ) );

@@ -22,13 +22,14 @@
 //-----------------------------------------------------------------------------
 class CHudMenu : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudMenu, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudMenu, vgui::Panel );
 public:
 	CHudMenu( const char *pElementName );
-	void Init( void );
-	void VidInit( void );
-	void Reset( void );
-	virtual bool ShouldDraw( void );
+
+	void Init( void ) override;
+	void VidInit( void ) override;
+	void Reset( void ) override;
+	bool ShouldDraw( void ) override;
 	void MsgFunc_ShowMenu( bf_read &msg );
 	void HideMenu( void );
 	void ShowMenu( const char * menuName, int keySlot );
@@ -38,9 +39,9 @@ public:
 	void SelectMenuItem( int menu_item );
 
 private:
-	virtual void OnThink();
-	virtual void Paint();
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void OnThink() override;
+	void Paint() override;
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 private:
 	void		ProcessText( void );
 

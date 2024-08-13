@@ -24,14 +24,14 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CHudVehicle : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudVehicle, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudVehicle, vgui::Panel );
 public:
 	CHudVehicle( const char *pElementName );
 
-	virtual bool	ShouldDraw();
+	bool	ShouldDraw() override;
 
-	virtual void	ApplySchemeSettings( vgui::IScheme *scheme );
-	virtual void	Paint( void );
+	void	ApplySchemeSettings( vgui::IScheme *scheme ) override;
+	void	Paint( void ) override;
 
 private:
 

@@ -235,7 +235,7 @@ int CMessageCharsPanel::AddText(
 
 	Assert( !msg->text );
 
-	int textLength = Q_strlen( data ) + 1;
+	intp textLength = Q_strlen( data ) + 1;
 	msg->text = new char[ textLength ];
 	Assert( msg->text );
 	Q_strncpy( msg->text, data, textLength );

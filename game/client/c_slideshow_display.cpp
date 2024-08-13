@@ -20,7 +20,7 @@
 #include "tier0/memdbgon.h"
 
 
-#define SLIDESHOW_LIST_BUFFER_MAX 8192
+#define SLIDESHOW_LIST_BUFFER_MAX 8192u
 
 
 enum SlideshowCycleTypes
@@ -295,7 +295,7 @@ void C_SlideshowDisplay::BuildSlideShowImagesList( void )
 				}
 
 				// Find the list with the current keyword
-				int iList;
+				intp iList;
 				for ( iList = 0; iList < m_SlideMaterialLists.Count(); ++iList )
 				{
 					if ( Q_strcmp( m_SlideMaterialLists[ iList ]->szSlideKeyword, pchKeyword ) == 0 )
@@ -318,7 +318,7 @@ void C_SlideshowDisplay::BuildSlideShowImagesList( void )
 		}
 
 		// Find the generic list
-		int iList;
+		intp iList;
 		for ( iList = 0; iList < m_SlideMaterialLists.Count(); ++iList )
 		{
 			if ( Q_strcmp( m_SlideMaterialLists[ iList ]->szSlideKeyword, "" ) == 0 )

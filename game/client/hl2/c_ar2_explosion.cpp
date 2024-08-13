@@ -243,11 +243,11 @@ void C_AR2Explosion::Start(CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArg
 	// In DX7, much fewer particles
 	if ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 80 )
 	{
-		iParticlesToSpawn *= 0.25;
+		iParticlesToSpawn /= 4;
 	}
 	else if ( mat_reduceparticles.GetBool() )
 	{
-		iParticlesToSpawn *= 0.025;
+		iParticlesToSpawn /= 40;
 	}
 
 	if( nSurfInfos > 0 )

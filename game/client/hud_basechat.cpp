@@ -106,7 +106,7 @@ wchar_t* ConvertCRtoNL( wchar_t *str )
 
 void StripEndNewlineFromString( char *str )
 {
-	int s = strlen( str ) - 1;
+	intp s = V_strlen( str ) - 1;
 	if ( s >= 0 )
 	{
 		if ( str[s] == '\n' || str[s] == '\r' )
@@ -895,7 +895,7 @@ void CBaseHudChat::MsgFunc_TextMsg( bf_read &msg )
 	if ( !cl_showtextmsg.GetInt() )
 		return;
 
-	int len;
+	intp len;
 	switch ( msg_dest )
 	{
 	case HUD_PRINTCENTER:
@@ -906,7 +906,7 @@ void CBaseHudChat::MsgFunc_TextMsg( bf_read &msg )
 	case HUD_PRINTNOTIFY:
 		g_pVGuiLocalize->ConstructString_safe( outputBuf, szBuf[0], 4, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 		g_pVGuiLocalize->ConvertUnicodeToANSI( outputBuf, szString, sizeof(szString) );
-		len = strlen( szString );
+		len = V_strlen( szString );
 		if ( len && szString[len-1] != '\n' && szString[len-1] != '\r' )
 		{
 			Q_strncat( szString, "\n", sizeof(szString), 1 );
@@ -917,7 +917,7 @@ void CBaseHudChat::MsgFunc_TextMsg( bf_read &msg )
 	case HUD_PRINTTALK:
 		g_pVGuiLocalize->ConstructString_safe( outputBuf, szBuf[0], 4, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 		g_pVGuiLocalize->ConvertUnicodeToANSI( outputBuf, szString, sizeof(szString) );
-		len = strlen( szString );
+		len = V_strlen( szString );
 		if ( len && szString[len-1] != '\n' && szString[len-1] != '\r' )
 		{
 			Q_strncat( szString, "\n", sizeof(szString), 1 );
@@ -929,7 +929,7 @@ void CBaseHudChat::MsgFunc_TextMsg( bf_read &msg )
 	case HUD_PRINTCONSOLE:
 		g_pVGuiLocalize->ConstructString_safe( outputBuf, szBuf[0], 4, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 		g_pVGuiLocalize->ConvertUnicodeToANSI( outputBuf, szString, sizeof(szString) );
-		len = strlen( szString );
+		len = V_strlen( szString );
 		if ( len && szString[len-1] != '\n' && szString[len-1] != '\r' )
 		{
 			Q_strncat( szString, "\n", sizeof(szString), 1 );
@@ -984,9 +984,8 @@ void CBaseHudChat::MsgFunc_VoiceSubtitle( bf_read &msg )
 		g_pVGuiLocalize->ConvertANSIToUnicode( pszSubtitle, szBuf, sizeof(szBuf) );
 	}
 
-	int len;
 	g_pVGuiLocalize->ConvertUnicodeToANSI( szBuf, szString, sizeof(szString) );
-	len = strlen( szString );
+	intp len = V_strlen( szString );
 	if ( len && szString[len-1] != '\n' && szString[len-1] != '\r' )
 	{
 		Q_strncat( szString, "\n", sizeof(szString), 1 );
@@ -1004,34 +1003,6 @@ const char *CBaseHudChat::GetDisplayedSubtitlePlayerName( int clientIndex )
 {
 	return g_PR->GetPlayerName( clientIndex );
 }
-
-#ifndef _XBOX
-static int __cdecl SortLines( void const *line1, void const *line2 )
-{
-	CBaseHudChatLine *l1 = *( CBaseHudChatLine ** )line1;
-	CBaseHudChatLine *l2 = *( CBaseHudChatLine ** )line2;
-
-	// Invisible at bottom
-	if ( l1->IsVisible() && !l2->IsVisible() )
-		return -1;
-	else if ( !l1->IsVisible() && l2->IsVisible() )
-		return 1;
-
-	// Oldest start time at top
-	if ( l1->GetStartTime() < l2->GetStartTime() )
-		return -1;
-	else if ( l1->GetStartTime() > l2->GetStartTime() )
-		return 1;
-
-	// Otherwise, compare counter
-	if ( l1->GetCount() < l2->GetCount() )
-		return -1;
-	else if ( l1->GetCount() > l2->GetCount() )
-		return 1;
-
-	return 0;
-}
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Allow inheriting classes to change this spacing behavior
@@ -1072,7 +1043,7 @@ void CBaseHudChat::OnTick( void )
 
 		GetChatHistory()->GetBounds( iChatHistoryX, iChatHistoryY, iChatHistoryW, iChatHistoryH );
 
-		iChatHistoryH = (iChatH - (m_iFontHeight * 2.25)) - iChatHistoryY;
+		iChatHistoryH = (iChatH - (m_iFontHeight * 9 / 4)) - iChatHistoryY;
 
 		GetChatHistory()->SetBounds( iChatHistoryX, iChatHistoryY, iChatHistoryW, iChatHistoryH );
 	}
@@ -1535,11 +1506,11 @@ void CBaseHudChatLine::Colorize( int alpha )
 
 	wchar_t wText[4096];
 	Color color;
-	for ( int i=0; i<m_textRanges.Count(); ++i )
+	for ( intp i=0; i<m_textRanges.Count(); ++i )
 	{
 		wchar_t * start = m_text + m_textRanges[i].start;
 		int len = m_textRanges[i].end - m_textRanges[i].start + 1;
-		if ( len > 1 && len <= ARRAYSIZE( wText ) )
+		if ( len > 1 && len <= ssize( wText ) )
 		{
 			wcsncpy( wText, start, len );
 			wText[len-1] = 0;
@@ -1593,7 +1564,7 @@ void CBaseHudChat::Send( void )
 	char ansi[128];
 	g_pVGuiLocalize->ConvertUnicodeToANSI( szTextbuf, ansi, sizeof( ansi ) );
 
-	int len = Q_strlen(ansi);
+	intp len = Q_strlen(ansi);
 
 	/*
 This is a very long string that I am going to attempt to paste into the cs hud chat entry and we will see if it gets cropped or not.
@@ -1782,7 +1753,7 @@ void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, const char *fmt, .
 		engine->GetPlayerInfo( iPlayerIndex, &sPlayerInfo );
 	}	
 
-	int bufSize = (strlen( pmsg ) + 1 ) * sizeof(wchar_t);
+	intp bufSize = (V_strlen( pmsg ) + 1 ) * sizeof(wchar_t);
 	wchar_t *wbuf = static_cast<wchar_t *>( _alloca( bufSize ) );
 	if ( wbuf )
 	{

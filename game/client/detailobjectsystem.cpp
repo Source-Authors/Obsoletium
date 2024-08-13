@@ -223,7 +223,7 @@ public:
 	// IHandleEntity stubs.
 public:
 	virtual void SetRefEHandle( const CBaseHandle &handle )	{ Assert( false ); }
-	virtual const CBaseHandle& GetRefEHandle() const		{ Assert( false ); return *((CBaseHandle*)0); }
+	virtual const CBaseHandle& GetRefEHandle() const		{ Assert( false ); exit(12); }
 
 	//---------------------------------
 	struct LightStyleInfo_t
@@ -403,7 +403,7 @@ public:
 	void BeginTranslucentDetailRendering( );
 
 	// Method of ISpatialLeafEnumerator
-	bool EnumerateLeaf( int leaf, int context );
+	bool EnumerateLeaf( int leaf, intp context );
 
 	DetailPropLightstylesLump_t& DetailLighting( int i ) { return m_DetailLighting[i]; }
 	DetailPropSpriteDict_t& DetailSpriteDict( int i ) { return m_DetailSpriteDict[i]; }
@@ -462,7 +462,7 @@ private:
 	int SortSpritesBackToFront( int nLeaf, const Vector &viewOrigin, const Vector &viewForward, SortInfo_t *pSortInfo );
 
 	// For fast detail object insertion
-	IterationRetval_t EnumElement( int userId, int context );
+	IterationRetval_t EnumElement( int userId, intp context );
 
 	CUtlVector<DetailModelDict_t>			m_DetailObjectDict;
 	CUtlVector<CDetailModel>				m_DetailObjects;
@@ -640,7 +640,7 @@ ClientShadowHandle_t CDetailModel::GetShadowHandle() const
 ClientRenderHandle_t& CDetailModel::RenderHandle()
 {
 	AssertMsg( 0, "CDetailModel has no render handle" );
-	return *((ClientRenderHandle_t*)NULL);
+	exit(23);
 }	
 
 
@@ -767,7 +767,7 @@ bool CDetailModel::Init( int index, const Vector& org, const QAngle& angles,
 	if ( lightstylecount > 0)
 	{
 		m_bHasLightStyle = 1;
-		int iInfo = gm_LightStylesMap.Insert( this );
+		auto iInfo = gm_LightStylesMap.Insert( this );
 		if ( lightstyle >= 0x1000000 || lightstylecount >= 100  )
 			Error( "Light style overflow\n" );
 		gm_LightStylesMap[iInfo].m_LightStyle = lightstyle;
@@ -787,7 +787,7 @@ bool CDetailModel::InitSprite( int index, bool bFlipped, const Vector& org, cons
 	if ( lightstylecount > 0)
 	{
 		m_bHasLightStyle = 1;
-		int iInfo = gm_LightStylesMap.Insert( this );
+		auto iInfo = gm_LightStylesMap.Insert( this );
 		if ( lightstyle >= 0x1000000 || lightstylecount >= 100  )
 			Error( "Light style overflow\n" );
 		gm_LightStylesMap[iInfo].m_LightStyle = lightstyle;
@@ -892,7 +892,7 @@ void CDetailModel::GetColorModulation( float *color )
 	}
 
 	Vector tmp;
-	Vector normal( 1, 0, 0);
+	Vector normal( 1, 0, 0 );
 	engine->ComputeDynamicLighting( m_Origin, &normal, tmp );
 
 	float val = engine->LightStyleValue( 0 );
@@ -903,7 +903,7 @@ void CDetailModel::GetColorModulation( float *color )
 	// Add in the lightstyles
 	if ( m_bHasLightStyle )
 	{
-		int iInfo = gm_LightStylesMap.Find( this );
+		auto iInfo = gm_LightStylesMap.Find( this );
 		Assert( iInfo != gm_LightStylesMap.InvalidIndex() );
 		if ( iInfo != gm_LightStylesMap.InvalidIndex() )
 		{
@@ -1394,7 +1394,7 @@ void CDetailModel::DrawSwayingQuad( CMeshBuilder &meshBuilder, Vector vecOrigin,
 //-----------------------------------------------------------------------------
 // constructor, destructor
 //-----------------------------------------------------------------------------
-CDetailObjectSystem::CDetailObjectSystem() : m_DetailSpriteDict( (intp)0, 32 ), m_DetailObjectDict( (intp)0, 32 ), m_DetailSpriteDictFlipped( (intp)0, 32 )
+CDetailObjectSystem::CDetailObjectSystem() : m_DetailObjectDict( (intp)0, 32 ), m_DetailSpriteDict( (intp)0, 32 ), m_DetailSpriteDictFlipped( (intp)0, 32 )
 {
 	m_pFastSpriteData = NULL;
 	m_pSortInfo = NULL;
@@ -1611,9 +1611,9 @@ void CDetailObjectSystem::UnserializeDetailSprites( CUtlBuffer& buf )
 	m_DetailSpriteDictFlipped.EnsureCapacity( count );
 	while ( --count >= 0 )
 	{
-		int i = m_DetailSpriteDict.AddToTail();
+		intp i = m_DetailSpriteDict.AddToTail();
 		buf.Get( &m_DetailSpriteDict[i], sizeof(DetailSpriteDictLump_t) );
-		int flipi = m_DetailSpriteDictFlipped.AddToTail();
+		intp flipi = m_DetailSpriteDictFlipped.AddToTail();
 		m_DetailSpriteDictFlipped[flipi] = m_DetailSpriteDict[i];
 		::V_swap( m_DetailSpriteDictFlipped[flipi].m_TexUL.x, m_DetailSpriteDictFlipped[flipi].m_TexLR.x );
 	}
@@ -1626,7 +1626,7 @@ void CDetailObjectSystem::UnserializeModelLighting( CUtlBuffer& buf )
 	m_DetailLighting.EnsureCapacity( count );
 	while ( --count >= 0 )
 	{
-		int i = m_DetailLighting.AddToTail();
+		intp i = m_DetailLighting.AddToTail();
 		buf.Get( &m_DetailLighting[i], sizeof(DetailPropLightstylesLump_t) );
 	}
 }
@@ -1658,7 +1658,7 @@ void CDetailObjectSystem::ScanForCounts( CUtlBuffer& buf,
 										 int *nMaxNumFastSpritesInLeaf
 										 ) const
 {
-	int oldpos = buf.TellGet();								// we need to seek back
+	intp oldpos = buf.TellGet();								// we need to seek back
 	int count = buf.GetInt();
 
 	int nOld = 0;
@@ -1825,7 +1825,7 @@ void CDetailObjectSystem::UnserializeModels( CUtlBuffer& buf )
 			{
 				case DETAIL_PROP_TYPE_MODEL:
 				{
-					int newObj = m_DetailObjects.AddToTail();
+					intp newObj = m_DetailObjects.AddToTail();
 					m_DetailObjects[newObj].Init(
 						newObj, lump.m_Origin, lump.m_Angles, 
 						m_DetailObjectDict[lump.m_DetailModel].m_pModel, lump.m_Lighting,
@@ -1846,7 +1846,7 @@ void CDetailObjectSystem::UnserializeModels( CUtlBuffer& buf )
 							pos += RandomVector( -50, 50 );
 							pos. z = lump.m_Origin.z;
 						}
-						int newObj = m_DetailObjects.AddToTail();
+						intp newObj = m_DetailObjects.AddToTail();
 						m_DetailObjects[newObj].InitSprite( 
 							newObj, bFlipped, pos, lump.m_Angles, 
 							lump.m_DetailModel, lump.m_Lighting,
@@ -1935,9 +1935,9 @@ void CDetailObjectSystem::UnserializeFastSprite( FastSpriteX4_t *pSpritex4, int 
 	color[2] = TexLightToLinear( rgbcolor.b, rgbcolor.exponent );
 	color[3] = 255;
 	engine->LinearToGamma( color, color );
-	pSpritex4->m_RGBColor[nSubField][0] = 255.0 * color[0];
-	pSpritex4->m_RGBColor[nSubField][1] = 255.0 * color[1];
-	pSpritex4->m_RGBColor[nSubField][2] = 255.0 * color[2];
+	pSpritex4->m_RGBColor[nSubField][0] = 255.0f * color[0];
+	pSpritex4->m_RGBColor[nSubField][1] = 255.0f * color[1];
+	pSpritex4->m_RGBColor[nSubField][2] = 255.0f * color[2];
 	pSpritex4->m_RGBColor[nSubField][3] = 255;
 
 	pSpritex4->m_pSpriteDefs[nSubField] = pSDef;
@@ -2074,7 +2074,6 @@ int CDetailObjectSystem::SortSpritesBackToFront( int nLeaf, const Vector &viewOr
 	{
 		CDetailModel &model = m_DetailObjects[j];
 
-		Vector v;
 		VectorSubtract( model.GetRenderOrigin(), viewOrigin, vecDelta );
 		float flSqDist = vecDelta.LengthSqr();
 		if ( flSqDist >= flMaxSqDist )
@@ -2123,7 +2122,7 @@ int CDetailObjectSystem::SortSpritesBackToFront( int nLeaf, const Vector &viewOr
 static fltx4 Four_MagicNumbers={ MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
 static fltx4 Four_255s={ 255.0, 255.0, 255.0, 255.0 };
 
-static alignas(16) int32 And255Mask[4] = {0xff,0xff,0xff,0xff};
+alignas(16) static int32 And255Mask[4] = {0xff, 0xff, 0xff, 0xff};
 #define PIXMASK ( * ( reinterpret_cast< fltx4 *>( &And255Mask ) ) )
 
 int CDetailObjectSystem::BuildOutSortedSprites( CFastDetailLeafSpriteList *pData,
@@ -2144,7 +2143,7 @@ int CDetailObjectSystem::BuildOutSortedSprites( CFastDetailLeafSpriteList *pData
 	vecViewPos.DuplicateVector( viewOrigin );
 	fltx4 maxsqdist = ReplicateX4( m_flCurMaxSqDist );
 
-	fltx4 falloffFactor = ReplicateX4( 1.0/ ( m_flCurMaxSqDist - m_flCurFadeSqDist ) );
+	fltx4 falloffFactor = ReplicateX4( 1.0f/ ( m_flCurMaxSqDist - m_flCurFadeSqDist ) );
 	fltx4 startFade = ReplicateX4( m_flCurFadeSqDist );
 
 	FourVectors vecUp;
@@ -2191,11 +2190,9 @@ int CDetailObjectSystem::BuildOutSortedSprites( CFastDetailLeafSpriteList *pData
 			vecPos0 += vecDy;
 			pQuadBufferOut->m_Coords[3] = vecPos0;
 
-			fltx4 fetch4 = *( ( fltx4 *) ( &pSprites->m_pSpriteDefs[0] ) );
-			*( (fltx4 *) ( & ( pQuadBufferOut->m_pSpriteDefs[0] ) ) ) = fetch4;
-
-			fetch4 = *( ( fltx4 *) ( &pSprites->m_RGBColor[0][0] ) );
-			*( (fltx4 *) ( & ( pQuadBufferOut->m_RGBColor[0][0] ) ) ) = fetch4;
+			// dimhotepus: Use memcpy as original fltx4 casts were UB.
+			memcpy( &pQuadBufferOut->m_pSpriteDefs[0], &pSprites->m_pSpriteDefs[0], sizeof(pSprites->m_pSpriteDefs) );
+			memcpy( &pQuadBufferOut->m_RGBColor, &pSprites->m_RGBColor, sizeof(pSprites->m_RGBColor) );
 
 			//!! bug!! store distance
 			// !! speed!! simd?
@@ -2319,34 +2316,33 @@ void CDetailObjectSystem::RenderFastSprites( const Vector &viewOrigin, const Vec
 
 					FastSpriteQuadBuildoutBufferNonSIMDView_t const *pquad = pQuadBuffer+nSIMDIdx;
 
-					// voodoo - since everything is in 4s, offset structure pointer by a couple of floats to handle sub-index
-					pquad = (FastSpriteQuadBuildoutBufferNonSIMDView_t const *) ( ( (int) ( pquad ) )+ ( nSubIdx << 2 ) );
-					uint8 const *pColorsCasted = reinterpret_cast<uint8 const *> ( pquad->m_Alpha );
+					// dimhotepus: Drop pointers voodoo and use subindexes.
+					uint8 const *pColorsCasted = reinterpret_cast<uint8 const *> ( &pquad->m_Alpha[nSubIdx] );
 
 					uint8 color[4];
-					color[0] = pquad->m_RGBColor[0][0];
-					color[1] = pquad->m_RGBColor[0][1];
-					color[2] = pquad->m_RGBColor[0][2];
+					color[0] = pquad->m_RGBColor[nSubIdx][0];
+					color[1] = pquad->m_RGBColor[nSubIdx][1];
+					color[2] = pquad->m_RGBColor[nSubIdx][2];
 					color[3] = pColorsCasted[MANTISSA_LSB_OFFSET];
 
-					DetailPropSpriteDict_t *pDict = pquad->m_pSpriteDefs[0];
+					DetailPropSpriteDict_t *pDict = pquad->m_pSpriteDefs[nSubIdx];
 
-					meshBuilder.Position3f( pquad->m_flX0[0], pquad->m_flY0[0], pquad->m_flZ0[0] );
+					meshBuilder.Position3f( pquad->m_flX0[nSubIdx], pquad->m_flY0[nSubIdx], pquad->m_flZ0[nSubIdx] );
 					meshBuilder.Color4ubv( color );
 					meshBuilder.TexCoord2f( 0, pDict->m_TexLR.x, pDict->m_TexLR.y );
 					meshBuilder.AdvanceVertex();
 
-					meshBuilder.Position3f( pquad->m_flX1[0], pquad->m_flY1[0], pquad->m_flZ1[0] );
+					meshBuilder.Position3f( pquad->m_flX1[nSubIdx], pquad->m_flY1[nSubIdx], pquad->m_flZ1[nSubIdx] );
 					meshBuilder.Color4ubv( color );
 					meshBuilder.TexCoord2f( 0, pDict->m_TexLR.x, pDict->m_TexUL.y );
 					meshBuilder.AdvanceVertex();
 
-					meshBuilder.Position3f( pquad->m_flX2[0], pquad->m_flY2[0], pquad->m_flZ2[0] );
+					meshBuilder.Position3f( pquad->m_flX2[nSubIdx], pquad->m_flY2[nSubIdx], pquad->m_flZ2[nSubIdx] );
 					meshBuilder.Color4ubv( color );
 					meshBuilder.TexCoord2f( 0, pDict->m_TexUL.x, pDict->m_TexUL.y );
 					meshBuilder.AdvanceVertex();
 
-					meshBuilder.Position3f( pquad->m_flX3[0], pquad->m_flY3[0], pquad->m_flZ3[0] );
+					meshBuilder.Position3f( pquad->m_flX3[nSubIdx], pquad->m_flY3[nSubIdx], pquad->m_flZ3[nSubIdx] );
 					meshBuilder.Color4ubv( color );
 					meshBuilder.TexCoord2f( 0, pDict->m_TexUL.x, pDict->m_TexLR.y );
 					meshBuilder.AdvanceVertex();
@@ -2551,34 +2547,33 @@ void CDetailObjectSystem::RenderFastTranslucentDetailObjectsInLeaf( const Vector
 
 			FastSpriteQuadBuildoutBufferNonSIMDView_t const *pquad = pQuadBuffer+nSIMDIdx;
 
-			// voodoo - since everything is in 4s, offset structure pointer by a couple of floats to handle sub-index
-			pquad = (FastSpriteQuadBuildoutBufferNonSIMDView_t const *) ( ( (int) ( pquad ) )+ ( nSubIdx << 2 ) );
-			uint8 const *pColorsCasted = reinterpret_cast<uint8 const *> ( pquad->m_Alpha );
+			// dimhotepus: Drop pointers voodoo and use subindexes.
+			uint8 const *pColorsCasted = reinterpret_cast<uint8 const *> ( &pquad->m_Alpha[nSubIdx] );
 
 			uint8 color[4];
-			color[0] = pquad->m_RGBColor[0][0];
-			color[1] = pquad->m_RGBColor[0][1];
-			color[2] = pquad->m_RGBColor[0][2];
+			color[0] = pquad->m_RGBColor[nSubIdx][0];
+			color[1] = pquad->m_RGBColor[nSubIdx][1];
+			color[2] = pquad->m_RGBColor[nSubIdx][2];
 			color[3] = pColorsCasted[MANTISSA_LSB_OFFSET];
 
-			DetailPropSpriteDict_t *pDict = pquad->m_pSpriteDefs[0];
+			DetailPropSpriteDict_t *pDict = pquad->m_pSpriteDefs[nSubIdx];
 
-			meshBuilder.Position3f( pquad->m_flX0[0], pquad->m_flY0[0], pquad->m_flZ0[0] );
+			meshBuilder.Position3f( pquad->m_flX0[nSubIdx], pquad->m_flY0[nSubIdx], pquad->m_flZ0[nSubIdx] );
 			meshBuilder.Color4ubv( color );
 			meshBuilder.TexCoord2f( 0, pDict->m_TexLR.x, pDict->m_TexLR.y );
 			meshBuilder.AdvanceVertex();
 
-			meshBuilder.Position3f( pquad->m_flX1[0], pquad->m_flY1[0], pquad->m_flZ1[0] );
+			meshBuilder.Position3f( pquad->m_flX1[nSubIdx], pquad->m_flY1[nSubIdx], pquad->m_flZ1[nSubIdx] );
 			meshBuilder.Color4ubv( color );
 			meshBuilder.TexCoord2f( 0, pDict->m_TexLR.x, pDict->m_TexUL.y );
 			meshBuilder.AdvanceVertex();
 
-			meshBuilder.Position3f( pquad->m_flX2[0], pquad->m_flY2[0], pquad->m_flZ2[0] );
+			meshBuilder.Position3f( pquad->m_flX2[nSubIdx], pquad->m_flY2[nSubIdx], pquad->m_flZ2[nSubIdx] );
 			meshBuilder.Color4ubv( color );
 			meshBuilder.TexCoord2f( 0, pDict->m_TexUL.x, pDict->m_TexUL.y );
 			meshBuilder.AdvanceVertex();
 
-			meshBuilder.Position3f( pquad->m_flX3[0], pquad->m_flY3[0], pquad->m_flZ3[0] );
+			meshBuilder.Position3f( pquad->m_flX3[nSubIdx], pquad->m_flY3[nSubIdx], pquad->m_flZ3[nSubIdx] );
 			meshBuilder.Color4ubv( color );
 			meshBuilder.TexCoord2f( 0, pDict->m_TexUL.x, pDict->m_TexLR.y );
 			meshBuilder.AdvanceVertex();
@@ -2705,7 +2700,7 @@ void CDetailObjectSystem::RenderTranslucentDetailObjectsInLeaf( const Vector &vi
 //-----------------------------------------------------------------------------
 // Gets called each view
 //-----------------------------------------------------------------------------
-bool CDetailObjectSystem::EnumerateLeaf( int leaf, int context )
+bool CDetailObjectSystem::EnumerateLeaf( int leaf, intp context )
 {
 	VPROF_BUDGET( "CDetailObjectSystem::EnumerateLeaf", VPROF_BUDGETGROUP_DETAILPROP_RENDERING );
 	Vector v;
@@ -2730,7 +2725,7 @@ bool CDetailObjectSystem::EnumerateLeaf( int leaf, int context )
 		{
 			if ( sqDist > m_flCurFadeSqDist ) 
 			{
-				model.SetAlpha( m_flCurFalloffFactor * ( m_flCurMaxSqDist - sqDist ) );
+				model.SetAlpha( static_cast<unsigned char>(m_flCurFalloffFactor * ( m_flCurMaxSqDist - sqDist )) );
 			}
 			else
 			{
@@ -2768,7 +2763,7 @@ void CDetailObjectSystem::BuildDetailObjectRenderLists( const Vector &vViewOrigi
  	ctx.m_BuildWorldListNumber = view->BuildWorldListsNumber();
 
 	// We need to recompute translucency information for all detail props
-	for (int i = m_DetailObjectDict.Size(); --i >= 0; )
+	for (intp i = m_DetailObjectDict.Count(); --i >= 0; )
 	{
 		if (modelinfo->ModelHasMaterialProxy( m_DetailObjectDict[i].m_pModel ))
 		{
@@ -2804,6 +2799,6 @@ void CDetailObjectSystem::BuildDetailObjectRenderLists( const Vector &vViewOrigi
 
 	ISpatialQuery* pQuery = engine->GetBSPTreeQuery();
 	pQuery->EnumerateLeavesInSphere( CurrentViewOrigin(), 
-									 cl_detaildist.GetFloat(), this, (int)&ctx );
+									 cl_detaildist.GetFloat(), this, (intp)&ctx );
 }
 

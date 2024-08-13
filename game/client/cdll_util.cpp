@@ -302,9 +302,9 @@ float UTIL_WaterLevel( const Vector &position, float minz, float maxz )
 		return maxz;
 
 	float diff = maxz - minz;
-	while (diff > 1.0)
+	while (diff > 1.0f)
 	{
-		midUp.z = minz + diff/2.0;
+		midUp.z = minz + diff/2.0f;
 		if ( UTIL_PointContents(midUp) & MASK_WATER )
 		{
 			minz = midUp.z;
@@ -498,7 +498,7 @@ void UTIL_PrecacheOther( const char *szClassname )
 	pEntity->Release();
 }
 
-static csurface_t	g_NullSurface = { "**empty**", 0 };
+static csurface_t	g_NullSurface = { "**empty**", 0, 0 };
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -800,7 +800,7 @@ int UTIL_ComputeStringWidth( vgui::HFont& font, const wchar_t *str )
 
 void UTIL_MakeSafeName( const char *oldName, char *newName, int newNameBufSize )
 {
-	Assert( newNameBufSize >= sizeof(newName[0]) );
+	Assert( newNameBufSize >= static_cast<int>(sizeof(newName[0])) );
 
 	int newpos = 0;
 
@@ -867,7 +867,7 @@ const char * UTIL_SafeName( const char *oldName )
 //-----------------------------------------------------------------------------
 void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, int inbufsizebytes, OUT_Z_BYTECAP(outbufsizebytes) wchar_t *outbuf, int outbufsizebytes, GameActionSet_t actionset )
 {
-	Assert( outbufsizebytes >= sizeof(outbuf[0]) );
+	Assert( outbufsizebytes >= static_cast<int>(sizeof(outbuf[0])) );
 	// copy to a new buf if there are vars
 	outbuf[0]=0;
 
@@ -1250,7 +1250,7 @@ void UTIL_IncrementMapKey( const char *pszCustomKey )
 		// force create this directory incase it doesn't exist
 		filesystem->CreateDirHierarchy( MAP_KEY_FILE_DIR, "MOD");
 
-		CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 		kvMapLoadFile->RecursiveSaveToFile( buf, 0 );
 		g_pFullFileSystem->WriteFile( szFilename, "MOD", buf );
 
@@ -1285,7 +1285,7 @@ int UTIL_GetMapKeyCount( const char *pszCustomKey )
 			// force create this directory incase it doesn't exist
 			filesystem->CreateDirHierarchy( MAP_KEY_FILE_DIR, "MOD");
 
-			CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			g_pFullFileSystem->WriteFile( szFilename, "MOD", buf );
 		}
 

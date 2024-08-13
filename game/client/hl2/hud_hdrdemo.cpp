@@ -25,14 +25,14 @@
 //-----------------------------------------------------------------------------
 class CHudHDRDemo : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudHDRDemo, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudHDRDemo, vgui::Panel );
 public:
 	CHudHDRDemo( const char *name );
 
 	// vgui overrides
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme );
-	virtual void Paint( void );
-	virtual bool ShouldDraw( void );
+	void ApplySchemeSettings(vgui::IScheme *pScheme ) override;
+	void Paint( void ) override;
+	bool ShouldDraw( void ) override;
 
 	void SetHDRDemoActive( bool bActive );
 
@@ -58,7 +58,7 @@ DECLARE_HUDELEMENT( CHudHDRDemo );
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CHudHDRDemo::CHudHDRDemo( const char *name ) : vgui::Panel( NULL, "HudHDRDemo" ), CHudElement( name )
+CHudHDRDemo::CHudHDRDemo( const char *name ) : CHudElement( name ), vgui::Panel( NULL, "HudHDRDemo" )
 {
 	vgui::Panel *pParent = g_pClientMode->GetViewport();
 	SetParent( pParent );

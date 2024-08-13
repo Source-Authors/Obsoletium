@@ -519,7 +519,7 @@ void CNetGraphPanel::DrawTimes( vrect_t vrect, cmdinfo_t *cmdinfo, int x, int w,
 			for ( j = start; j < h; j++ )
 			{
 				int index = j + extrap_point;
-				Assert( (size_t)index < Q_ARRAYSIZE( colors ) );
+				Assert( (size_t)index < std::size( colors ) );
 				DrawLine(&rcFill, colors[ index ], 255 );	
 				rcFill.y--;
 			}
@@ -539,7 +539,7 @@ void CNetGraphPanel::DrawTimes( vrect_t vrect, cmdinfo_t *cmdinfo, int x, int w,
 			for ( j = 0; j < h; j++ )
 			{
 				int index = j + oldh;
-				Assert( (size_t)index < Q_ARRAYSIZE( colors ) );
+				Assert( (size_t)index < std::size( colors ) );
 				DrawLine(&rcFill, colors[ index ], 255 );	
 				rcFill.y--;
 			}
@@ -1137,7 +1137,7 @@ bool CNetGraphPanel::ShouldDraw( void )
 
 void CNetGraphPanel::DrawLargePacketSizes( int x, int w, int graphtype, float warning_threshold )
 {
-	vrect_t		rcFill = {0,0,0,0};
+	vrect_t		rcFill = {0,0,0,0,nullptr};
 	int a, i;
 
 	for (a=0 ; a<w ; a++)
@@ -1272,7 +1272,7 @@ void CNetGraphPanel::PaintLineArt( int x, int y, int w, int graphtype, int maxms
 	byte		color[3];
 	int			ping;
 	byte		alpha;
-	vrect_t		rcFill = {0,0,0,0};
+	vrect_t		rcFill = {0,0,0,0,nullptr};
 
 	int			pingheight = m_nNetGraphHeight - LERP_HEIGHT - 2;
 
@@ -1480,7 +1480,7 @@ void CNetGraphPanel::DrawLine2( vrect_t *rect, unsigned char *color, unsigned ch
 {
 	VPROF( "CNetGraphPanel::DrawLine2" );
 
-	int idx = m_Rects.AddToTail();
+	intp idx = m_Rects.AddToTail();
 	CLineSegment *seg = &m_Rects[ idx ];
 
 	seg->color[0] = color[0];

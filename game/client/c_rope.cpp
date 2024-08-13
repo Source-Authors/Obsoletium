@@ -63,8 +63,8 @@ IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_RopeKeyframe, DT_RopeKeyframe, CRopeKeyframe 
 	RecvPropInt( RECVINFO( m_iParentAttachment ) ),
 END_RECV_TABLE()
 
-#define ROPE_IMPULSE_SCALE	20
-#define ROPE_IMPULSE_DECAY	0.95
+#define ROPE_IMPULSE_SCALE	20.0f
+#define ROPE_IMPULSE_DECAY	0.95f
 
 static ConVar rope_shake( "rope_shake", "0" );
 static ConVar rope_subdiv( "rope_subdiv", "2", 0, "Rope subdivision amount", true, 0, true, MAX_ROPE_SUBDIVS );
@@ -194,7 +194,8 @@ public:
 		if( pReturn == NULL )
 		{
 			int iMaxSize = m_QueuedRopeMemory[m_nCurrentStack].GetMaxSize();
-			Warning( "Overflowed rope queued rendering memory stack. Needed %llu, have %d/%d\n", (uint64)bytes, iMaxSize - m_QueuedRopeMemory[m_nCurrentStack].GetUsed(), iMaxSize );
+			Warning( "Overflowed rope queued rendering memory stack. Needed %zu, have %zd/%d\n",
+				bytes, iMaxSize - m_QueuedRopeMemory[m_nCurrentStack].GetUsed(), iMaxSize );
 			pReturn = malloc( bytes );
 			m_DeleteOnSwitch[m_nCurrentStack].AddToTail( pReturn );
 		}
@@ -364,8 +365,8 @@ void CRopeManager::AddToRenderCache( C_RopeKeyframe *pRope )
 	}
 	
 	// Find the current rope list.
-	int iRenderCache = 0;
-	int nRenderCacheCount = m_aRenderCache.Count();
+	intp iRenderCache = 0;
+	intp nRenderCacheCount = m_aRenderCache.Count();
 	for ( ; iRenderCache < nRenderCacheCount; ++iRenderCache )
 	{
 		if ( ( pRope->GetSolidMaterial() == m_aRenderCache[iRenderCache].m_pSolidMaterial ) &&
@@ -378,17 +379,20 @@ void CRopeManager::AddToRenderCache( C_RopeKeyframe *pRope )
 	if ( iRenderCache == nRenderCacheCount )
 	{
 		iRenderCache = m_aRenderCache.AddToTail();
-		m_aRenderCache[iRenderCache].m_pSolidMaterial = pRope->GetSolidMaterial();
-		if ( m_aRenderCache[iRenderCache].m_pSolidMaterial )
+
+		auto &d = m_aRenderCache[iRenderCache];
+
+		d.m_pSolidMaterial = pRope->GetSolidMaterial();
+		if ( d.m_pSolidMaterial )
 		{
-			m_aRenderCache[iRenderCache].m_pSolidMaterial->IncrementReferenceCount();
+			d.m_pSolidMaterial->IncrementReferenceCount();
 		}
-		m_aRenderCache[iRenderCache].m_pBackMaterial = pRope->GetBackMaterial();
-		if ( m_aRenderCache[iRenderCache].m_pBackMaterial )
+		d.m_pBackMaterial = pRope->GetBackMaterial();
+		if ( d.m_pBackMaterial )
 		{
-			m_aRenderCache[iRenderCache].m_pBackMaterial->IncrementReferenceCount();
+			d.m_pBackMaterial->IncrementReferenceCount();
 		}
-		m_aRenderCache[iRenderCache].m_nCacheCount = 0;
+		d.m_nCacheCount = 0;
 	}
 
 	if ( m_aRenderCache[iRenderCache].m_nCacheCount >= MAX_ROPE_RENDERCACHE )
@@ -811,7 +815,7 @@ void CRopeManager::RemoveRopeFromQueuedRenderCaches( C_RopeKeyframe *pRope )
 {
 	//remove this rope from queued render caches	
 	AUTO_LOCK( m_RenderCacheMutex );
-	int index = m_RopeQueuedRenderCaches.Head();
+	auto index = m_RopeQueuedRenderCaches.Head();
 	while( m_RopeQueuedRenderCaches.IsValidIndex( index ) )
 	{
 		RopeQueuedRenderCache_t &RenderCacheData = m_RopeQueuedRenderCaches[index];
@@ -887,9 +891,8 @@ void C_RopeKeyframe::CPhysicsDelegate::GetNodeForces( CSimplePhysics::CNode *pNo
 	{
 		Vector vecWindVel;
 		GetWindspeedAtTime(gpGlobals->curtime, vecWindVel);
-		if ( vecWindVel.LengthSqr() > 0 )
+		if ( vecWindVel.LengthSqr() > 0.0f )
 		{
-			Vector vecWindAccel;
 			VectorMA( *pAccel, WIND_FORCE_FACTOR, vecWindVel, *pAccel );
 		}
 		else
@@ -897,7 +900,7 @@ void C_RopeKeyframe::CPhysicsDelegate::GetNodeForces( CSimplePhysics::CNode *pNo
 			if (m_pKeyframe->m_flCurrentGustTimer < m_pKeyframe->m_flCurrentGustLifetime )
 			{
 				float div = m_pKeyframe->m_flCurrentGustTimer / m_pKeyframe->m_flCurrentGustLifetime;
-				float scale = 1 - cos( div * M_PI );
+				float scale = 1 - cos( div * M_PI_F );
 
 				*pAccel += m_pKeyframe->m_vWindDir * scale;
 			}
@@ -905,7 +908,7 @@ void C_RopeKeyframe::CPhysicsDelegate::GetNodeForces( CSimplePhysics::CNode *pNo
 	}
 
 	// HACK.. shake the rope around.
-	static float scale=15000;
+	static float scale = 15000.0f;
 	if( rope_shake.GetInt() )
 	{
 		*pAccel += RandomVector( -scale, scale );
@@ -987,7 +990,7 @@ void C_RopeKeyframe::CPhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *
 
 				// Move it out along the face normal.
 				float distBehind = trace.plane.normal.Dot( pNode->m_vPos ) - trace.plane.dist;
-				pNode->m_vPos += trace.plane.normal * (-distBehind + 2.2);
+				pNode->m_vPos += trace.plane.normal * (-distBehind + 2.2f);
 				m_pKeyframe->m_LinksTouchingSomething[i] = true;
 			}
 
@@ -1701,7 +1704,8 @@ void C_RopeKeyframe::BuildRope( RopeSegData_t *pSegmentData, const Vector &vCurr
 
 		if ( !bQueued && RopeManager()->IsHolidayLightMode() && r_rope_holiday_light_scale.GetFloat() > 0.0f )
 		{
-			data.m_nMaterial = reinterpret_cast< int >( this );
+			// dimhotepus: Comment unused m_nMaterial.
+			// data.m_nMaterial = reinterpret_cast< intp >( this );
 			data.m_nHitBox = ( iNode << 8 );
 			data.m_flScale = r_rope_holiday_light_scale.GetFloat();
 			data.m_vOrigin = pSegmentData->m_Segments[nSegmentCount].m_vPos;

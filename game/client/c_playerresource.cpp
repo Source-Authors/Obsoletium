@@ -350,7 +350,7 @@ bool C_PlayerResource::IsConnected( int iIndex )
 //-----------------------------------------------------------------------------
 uint32 C_PlayerResource::GetAccountID( int iIndex )
 {
-	if ( ( iIndex < 0 ) || ( iIndex >= ARRAYSIZE( m_iAccountID ) ) )
+	if ( ( iIndex < 0 ) || ( iIndex >= ssize( m_iAccountID ) ) )
 		return 0;
 
 	if ( !IsConnected( iIndex ) && !IsValid( iIndex ) )
@@ -364,7 +364,7 @@ uint32 C_PlayerResource::GetAccountID( int iIndex )
 //-----------------------------------------------------------------------------
 bool C_PlayerResource::IsValid( int iIndex )
 {
-	if ( ( iIndex < 0 ) || ( iIndex >= ARRAYSIZE( m_bValid ) ) )
+	if ( ( iIndex < 0 ) || ( iIndex >= ssize( m_bValid ) ) )
 		return false;
 
 	return m_bValid[iIndex];

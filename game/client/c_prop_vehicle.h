@@ -19,7 +19,7 @@ public:
 
 	DECLARE_CLIENTCLASS();
 	DECLARE_INTERPOLATION();
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 
 	C_PropVehicleDriveable();
 	~C_PropVehicleDriveable();
@@ -27,51 +27,51 @@ public:
 // IVehicle overrides.
 public:
 
-	virtual C_BaseCombatCharacter* GetPassenger( int nRole );
-	virtual int	GetPassengerRole( C_BaseCombatCharacter *pEnt );
-	virtual bool IsPassengerUsingStandardWeapons( int nRole = VEHICLE_ROLE_DRIVER ) { return false; }
-	virtual void GetVehicleViewPosition( int nRole, Vector *pOrigin, QAngle *pAngles, float *pFOV = NULL );
+	C_BaseCombatCharacter* GetPassenger( int nRole ) override;
+	int	GetPassengerRole( C_BaseCombatCharacter *pEnt ) override;
+	bool IsPassengerUsingStandardWeapons( int nRole = VEHICLE_ROLE_DRIVER ) override { return false; }
+	void GetVehicleViewPosition( int nRole, Vector *pOrigin, QAngle *pAngles, float *pFOV = NULL ) override;
 
-	virtual void SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *pHelper, CMoveData *move ) {}
-	virtual void ProcessMovement( C_BasePlayer *pPlayer, CMoveData *pMoveData ) {}
-	virtual void FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *move ) {}
+	void SetupMove( C_BasePlayer *, CUserCmd *, IMoveHelper *, CMoveData * ) override {}
+	void ProcessMovement( C_BasePlayer *, CMoveData * ) override {}
+	void FinishMove( C_BasePlayer *, CUserCmd *, CMoveData * ) override {}
 
-	virtual void ItemPostFrame( C_BasePlayer *pPlayer ) {}
+	void ItemPostFrame( C_BasePlayer * ) override {}
 
 // IClientVehicle overrides.
 public:
 
-	virtual void GetVehicleFOV( float &flFOV ) { flFOV = m_flFOV; }
-	virtual void DrawHudElements();
-	virtual void UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd );
+	void GetVehicleFOV( float &flFOV ) override { flFOV = m_flFOV; }
+	void DrawHudElements() override;
+	void UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUserCmd *pCmd ) override;
 	virtual void DampenEyePosition( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeAngles );
-	virtual void GetVehicleClipPlanes( float &flZNear, float &flZFar ) const;
+	void GetVehicleClipPlanes( float &flZNear, float &flZFar ) const override;
 
 #ifdef HL2_CLIENT_DLL
-	virtual int GetPrimaryAmmoType() const { return -1; }
-	virtual int GetPrimaryAmmoCount() const { return -1; }
-	virtual int GetPrimaryAmmoClip() const  { return -1; }
-	virtual bool PrimaryAmmoUsesClips() const { return false; }
+	int GetPrimaryAmmoType() const override { return -1; }
+	int GetPrimaryAmmoCount() const override { return -1; }
+	int GetPrimaryAmmoClip() const override  { return -1; }
+	bool PrimaryAmmoUsesClips() const override { return false; }
 #endif
 
-	virtual bool IsPredicted() const { return false; }
-	virtual int GetJoystickResponseCurve() const;
+	bool IsPredicted() const override { return false; }
+	int GetJoystickResponseCurve() const override;
 
 // C_BaseEntity overrides.
 public:
 
-	virtual IClientVehicle*	GetClientVehicle() { return this; }
-	virtual C_BaseEntity	*GetVehicleEnt() { return this; }
-	virtual bool IsSelfAnimating() { return false; };
+	IClientVehicle*	GetClientVehicle() override { return this; }
+	C_BaseEntity	*GetVehicleEnt() override { return this; }
+	bool IsSelfAnimating() override { return false; };
 
-	virtual void OnPreDataChanged( DataUpdateType_t updateType );
-	virtual void OnDataChanged( DataUpdateType_t updateType );
+	void OnPreDataChanged( DataUpdateType_t updateType ) override;
+	void OnDataChanged( DataUpdateType_t updateType ) override;
 
 	// Should this object cast render-to-texture shadows?
-	virtual ShadowType_t ShadowCastType();
+	ShadowType_t ShadowCastType() override;
 
 	// Mark the shadow as dirty while the vehicle is being driven
-	virtual void ClientThink( void );
+	void ClientThink( void ) override;
 
 // C_PropVehicleDriveable
 public:

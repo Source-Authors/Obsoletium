@@ -263,13 +263,13 @@ public:
 	// the particles. If you manage your own list of particles and want to 
 	// simulate them all at once, you can do that here and just render them in 
 	// the SimulateAndRender call.
-	virtual void	Update( float fTimeDelta ) {}
+	virtual void	Update( [[maybe_unused]] float fTimeDelta ) {}
 	
 	// Called once for the entire effect before the batch of SimulateAndRender() calls.
 	// For particle systems using FLAGS_CAMERASPACE (the default), effectMatrix transforms the particles from
 	// world space into camera space. You can change this matrix if you want your particles relative to something
 	// else like an attachment's space.
-	virtual void	StartRender( VMatrix &effectMatrix ) {}
+	virtual void	StartRender( [[maybe_unused]] VMatrix &effectMatrix ) {}
 
 	// Simulate the particles.
 	virtual bool	ShouldSimulate() const = 0;
@@ -291,7 +291,7 @@ public:
 	// NOTE: The particle effect's GetNumActiveParticles is updated BEFORE this is called
 	//       so if GetNumActiveParticles returns 0, then you know this is the last particle
 	//       in the system being removed.
-	virtual void	NotifyDestroyParticle( Particle* pParticle ) {}
+	virtual void	NotifyDestroyParticle( [[maybe_unused]] Particle* pParticle ) {}
 
 	// Fill in the origin used to sort this entity.
 	// This is a world space position.
@@ -763,8 +763,6 @@ private:
 	CUtlMap< const char*, CreateParticleEffectFN > m_effectFactories;
 
 	int m_nToolParticleEffectId;
-
-	IThreadPool *m_pThreadPool[2];
 };
 
 inline int CParticleMgr::AllocateToolParticleEffectId()

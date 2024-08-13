@@ -72,43 +72,43 @@ class C_BasePlayer : public C_BaseCombatCharacter, public CGameEventListener
 {
 public:
 	DECLARE_CLASS( C_BasePlayer, C_BaseCombatCharacter );
-	DECLARE_CLIENTCLASS();
-	DECLARE_PREDICTABLE();
+	DECLARE_CLIENTCLASS_OVERRIDE();
+	DECLARE_PREDICTABLE_OVERRIDE();
 	DECLARE_INTERPOLATION();
 
 	C_BasePlayer();
 	virtual			~C_BasePlayer();
 
-	virtual void	Spawn( void );
+	void	Spawn( void ) override;
 	virtual void	SharedSpawn(); // Shared between client and server.
 	virtual bool	GetSteamID( CSteamID *pID );
 
 	// IClientEntity overrides.
-	virtual void	OnPreDataChanged( DataUpdateType_t updateType );
-	virtual void	OnDataChanged( DataUpdateType_t updateType );
+	void	OnPreDataChanged( DataUpdateType_t updateType ) override;
+	void	OnDataChanged( DataUpdateType_t updateType ) override;
 
-	virtual void	PreDataUpdate( DataUpdateType_t updateType );
-	virtual void	PostDataUpdate( DataUpdateType_t updateType );
+	void	PreDataUpdate( DataUpdateType_t updateType ) override;
+	void	PostDataUpdate( DataUpdateType_t updateType ) override;
 	
-	virtual void	ReceiveMessage( int classID, bf_read &msg );
+	void	ReceiveMessage( int classID, bf_read &msg ) override;
 
-	virtual void	OnRestore();
+	void	OnRestore() override;
 	// dimhotepus: Notify engine about new client angles for player.
-	virtual int		Restore( IRestore &restore ) OVERRIDE;
+	virtual int		Restore( IRestore &restore ) override;
 
-	virtual void	AddEntity( void );
+	void	AddEntity( void ) override;
 
-	virtual void	MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType );
+	void	MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType ) override;
 
-	virtual void	GetToolRecordingState( KeyValues *msg );
+	void	GetToolRecordingState( KeyValues *msg ) override;
 
 	virtual float GetPlayerMaxSpeed();
 
 	void	SetAnimationExtension( const char *pExtension );
 
 	C_BaseViewModel		*GetViewModel( int viewmodelindex = 0, bool bObserverOK=true );
-	C_BaseCombatWeapon	*GetActiveWeapon( void ) const;
-	const char			*GetTracerType( void );
+	C_BaseCombatWeapon	*GetActiveWeapon( void ) const override;
+	const char			*GetTracerType( void ) override;
 
 	// View model prediction setup
 	virtual void		CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov );
@@ -140,8 +140,8 @@ public:
 	virtual bool	IsUseableEntity( CBaseEntity *pEntity, unsigned int requiredCaps );
 
 	// Data handlers
-	virtual bool	IsPlayer( void ) const { return true; }
-	virtual int		GetHealth() const { return m_iHealth; }
+	bool	IsPlayer( void ) const override { return true; }
+	int		GetHealth() const override { return m_iHealth; }
 
 	int		GetBonusProgress() const { return m_iBonusProgress; }
 	int		GetBonusChallenge() const { return m_iBonusChallenge; }
@@ -161,17 +161,17 @@ public:
 	bool IsBot( void ) const { return false; }
 
 	// Eye position..
-	virtual Vector		 EyePosition();
-	virtual const QAngle &EyeAngles();		// Direction of eyes
+	Vector		 EyePosition() override;
+	const QAngle &EyeAngles() override;		// Direction of eyes
 	void				 EyePositionAndVectors( Vector *pPosition, Vector *pForward, Vector *pRight, Vector *pUp );
-	virtual const QAngle &LocalEyeAngles();		// Direction of eyes
+	const QAngle &LocalEyeAngles() override;		// Direction of eyes
 	
 	// This can be overridden to return something other than m_pRagdoll if the mod uses separate 
 	// entities for ragdolls.
 	virtual IRagdoll* GetRepresentativeRagdoll() const;
 
 	// override the initial bone position for ragdolls
-	virtual bool GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt ) OVERRIDE;
+	virtual bool GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt ) override;
 
 	// Returns eye vectors
 	void			EyeVectors( Vector *pForward, Vector *pRight = NULL, Vector *pUp = NULL );
@@ -205,9 +205,9 @@ public:
 	float						MaxSpeed() const		{ return m_flMaxspeed; }
 
 	// Should this object cast shadows?
-	virtual ShadowType_t		ShadowCastType() { return SHADOWS_NONE; }
+	ShadowType_t		ShadowCastType() override { return SHADOWS_NONE; }
 
-	virtual bool				ShouldReceiveProjectedTextures( int flags )
+	bool				ShouldReceiveProjectedTextures( [[maybe_unused]] int flags ) override
 	{
 		return false;
 	}
@@ -242,11 +242,11 @@ public:
 	void						ClearPlayerSimulationList( void );
 #endif
 
-	virtual void				PhysicsSimulate( void );
-	virtual unsigned int	PhysicsSolidMaskForEntity( void ) const { return MASK_PLAYERSOLID; }
+	void				PhysicsSimulate( void ) override;
+	unsigned int	PhysicsSolidMaskForEntity( void ) const override { return MASK_PLAYERSOLID; }
 
 	// Prediction stuff
-	virtual bool				ShouldPredict( void );
+	bool				ShouldPredict( void ) override;
 
 	virtual void				PreThink( void );
 	virtual void				PostThink( void );
@@ -259,7 +259,7 @@ public:
 	virtual void				Weapon_SetLast( C_BaseCombatWeapon *pWeapon );
 	virtual bool				Weapon_ShouldSetLast( C_BaseCombatWeapon *pOldWeapon, C_BaseCombatWeapon *pNewWeapon ) { return true; }
 	virtual bool				Weapon_ShouldSelectItem( C_BaseCombatWeapon *pWeapon );
-	virtual	bool				Weapon_Switch( C_BaseCombatWeapon *pWeapon, int viewmodelindex = 0 );		// Switch to given weapon if has ammo (false if failed)
+	bool				Weapon_Switch( C_BaseCombatWeapon *pWeapon, int viewmodelindex = 0 ) override;		// Switch to given weapon if has ammo (false if failed)
 	virtual C_BaseCombatWeapon *GetLastWeapon( void ) { return m_hLastWeapon.Get(); }
 	void						ResetAutoaim( void );
 	virtual void 				SelectItem( const char *pstr, int iSubType = 0 );
@@ -281,12 +281,12 @@ public:
 	void						UpdateButtonState( int nUserCmdButtonMask );
 	int							GetImpulse( void ) const;
 
-	virtual void				Simulate();
+	void				Simulate() override;
 
-	virtual bool				ShouldInterpolate();
+	bool				ShouldInterpolate() override;
 
-	virtual bool				ShouldDraw();
-	virtual int					DrawModel( int flags );
+	bool				ShouldDraw() override;
+	int					DrawModel( int flags ) override;
 
 	// Called when not in tactical mode. Allows view to be overriden for things like driving a tank.
 	virtual void				OverrideView( CViewSetup *pSetup );
@@ -341,7 +341,7 @@ public:
 	// CS wants to allow small FOVs for zoomed-in AWPs.
 	virtual float GetMinFOV() const;
 
-	virtual void DoMuzzleFlash();
+	void DoMuzzleFlash() override;
 	virtual void PlayPlayerJingle();
 
 	virtual void UpdateStepSound( surfacedata_t *psurface, const Vector &vecOrigin, const Vector &vecVelocity  );
@@ -472,7 +472,7 @@ protected:
 	// used by client side player footsteps 
 	surfacedata_t* GetGroundSurface();
 
-	virtual void	FireGameEvent( IGameEvent *event );
+	void	FireGameEvent( IGameEvent *event ) override;
 
 protected:
 	// Did we just enter a vehicle this frame?

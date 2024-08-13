@@ -149,7 +149,7 @@ struct BMPResData_t
 //-----------------------------------------------------------------------------
 class CBaseModelPanel : public CMDLPanel
 {
-	DECLARE_CLASS_SIMPLE( CBaseModelPanel, CMDLPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseModelPanel, CMDLPanel );
 
 public:
 
@@ -158,14 +158,14 @@ public:
 	virtual ~CBaseModelPanel();
 
 	// Overridden mdlpanel.h
-	virtual void SetMDL( MDLHandle_t handle, void *pProxyData = NULL );
-	virtual void SetMDL( const char *pMDLName, void *pProxyData = NULL );
-	virtual void SetModelAnglesAndPosition( const QAngle &angRot, const Vector &vecPos );
+	void SetMDL( MDLHandle_t handle, void *pProxyData = NULL ) override;
+	void SetMDL( const char *pMDLName, void *pProxyData = NULL ) override;
+	void SetModelAnglesAndPosition( const QAngle &angRot, const Vector &vecPos ) override;
 
 	// Overridden methods of vgui::Panel
-	virtual void ApplySettings( KeyValues *inResourceData );
-	virtual void PerformLayout();
-	virtual void OnTick() OVERRIDE;
+	void ApplySettings( KeyValues *inResourceData ) override;
+	void PerformLayout() override;
+	void OnTick() override;
 
 	// Animation.
 	int FindDefaultAnim( void );
@@ -173,12 +173,12 @@ public:
 	void SetModelAnim( int iAnim );
 
 	// Manipulation.
-	virtual void OnKeyCodePressed ( vgui::KeyCode code );
-	virtual void OnKeyCodeReleased( vgui::KeyCode code );
-	virtual void OnMousePressed ( vgui::MouseCode code );
-	virtual void OnMouseReleased( vgui::MouseCode code );
-	virtual void OnCursorMoved( int x, int y );
-	virtual void OnMouseWheeled( int delta );
+	void OnKeyCodePressed ( vgui::KeyCode code ) override;
+	void OnKeyCodeReleased( vgui::KeyCode code ) override;
+	void OnMousePressed ( vgui::MouseCode code ) override;
+	void OnMouseReleased( vgui::MouseCode code ) override;
+	void OnCursorMoved( int x, int y ) override;
+	void OnMouseWheeled( int delta ) override;
 
 	studiohdr_t* GetStudioHdr( void ) { return m_RootMDL.m_MDL.GetStudioHdr(); }
 	void SetBody( unsigned int nBody ) { m_RootMDL.m_MDL.m_nBody = nBody; }
@@ -247,8 +247,8 @@ protected:
 	particle_data_t *CreateParticleData( const char *pszParticleName );
 	bool SafeDeleteParticleData( particle_data_t **pData );
 
-	virtual void PrePaint3D( IMatRenderContext *pRenderContext ) OVERRIDE;
-	virtual void PostPaint3D( IMatRenderContext *pRenderContext ) OVERRIDE;
+	virtual void PrePaint3D( IMatRenderContext *pRenderContext ) override;
+	virtual void PostPaint3D( IMatRenderContext *pRenderContext ) override;
 };
 
 #endif // BASEMODEL_PANEL_H

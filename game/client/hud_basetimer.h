@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------
 class CHudBaseTimer : public CHudNumericDisplay
 {
-	DECLARE_CLASS_SIMPLE( CHudBaseTimer, CHudNumericDisplay );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudBaseTimer, CHudNumericDisplay );
 
 public:
 	CHudBaseTimer(vgui::Panel *parent, const char *name);
@@ -28,7 +28,7 @@ public:
 
 protected:
 	// vgui overrides
-	virtual void Paint();
+	void Paint() override;
 
 	void SetToPrimaryColor();
 	void SetToSecondaryColor();

@@ -54,7 +54,7 @@ void CHud::Think(void)
 #endif
 
 	// Determine the visibility of all hud elements
-	for ( int i = 0; i < m_HudList.Size(); i++ )
+	for ( intp i = 0; i < m_HudList.Count(); i++ )
 	{
 		// Visible?
 		bool visible = m_HudList[i]->ShouldDraw();

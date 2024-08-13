@@ -248,7 +248,7 @@ void C_SmokeStack::Start(CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArgs)
 	int iCount = 1;
 	char szNames[512];
 
-	int iLength = Q_strlen( str );
+	intp iLength = Q_strlen( str );
 	str[iLength-1] = '\0';
 
 	Q_snprintf( szNames, sizeof( szNames ), "%s%d.vmt", str, iCount );

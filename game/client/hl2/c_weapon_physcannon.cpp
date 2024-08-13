@@ -18,14 +18,14 @@ class C_WeaponPhysCannon: public C_BaseHLCombatWeapon
 public:
 	C_WeaponPhysCannon( void );
 
-	DECLARE_CLIENTCLASS();
-	DECLARE_PREDICTABLE();
+	DECLARE_CLIENTCLASS_OVERRIDE();
+	DECLARE_PREDICTABLE_OVERRIDE();
 
-	virtual void OnDataChanged( DataUpdateType_t updateType );
-	virtual int DrawModel( int flags );
-	virtual void ClientThink( void );
+	void OnDataChanged( DataUpdateType_t updateType ) override;
+	int DrawModel( int flags ) override;
+	void ClientThink( void ) override;
 
-	virtual bool ShouldUseLargeViewModelVROverride() OVERRIDE { return true; }
+	virtual bool ShouldUseLargeViewModelVROverride() override { return true; }
 
 private:
 
@@ -298,7 +298,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 					sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 					sParticle->m_flRollDelta	= Helper_RandomFloat( -2.0f, 2.0f );
 
-					float alpha = 40;
+					unsigned char alpha = 40;
 
 					sParticle->m_uchColor[0]	= alpha;
 					sParticle->m_uchColor[1]	= alpha;
@@ -334,7 +334,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		float alpha = 255;
+		unsigned char alpha = 255;
 
 		sParticle->m_uchColor[0]	= alpha;
 		sParticle->m_uchColor[1]	= alpha;
@@ -352,13 +352,13 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 			if ( random->RandomInt( 0, 20 ) == 0 )
 			{
 				sParticle->m_uchStartSize	= random->RandomFloat( 1, 2 ) * (i+1);
-				sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 4.0f;
+				sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 4;
 				sParticle->m_flDieTime		= 0.25f;
 			}
 			else
 			{
 				sParticle->m_uchStartSize	= random->RandomFloat( 1, 2 ) * (i+1);
-				sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2.0f;
+				sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2;
 			}
 		}
 	}
@@ -386,7 +386,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 			sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 			sParticle->m_flRollDelta	= 0.0f;
 
-			float alpha = 255;
+			unsigned char alpha = 255;
 
 			sParticle->m_uchColor[0]	= alpha;
 			sParticle->m_uchColor[1]	= alpha;

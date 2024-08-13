@@ -16,7 +16,7 @@ class C_BaseAnimating;
 
 struct RagdollSimulationFrame_t
 {
-	RagdollSimulationFrame_t() : pPositions(NULL), pAngles(NULL), nTick(-1) {}
+	RagdollSimulationFrame_t() : nTick(-1), pPositions(NULL), pAngles(NULL) {}
 
 	static RagdollSimulationFrame_t* Alloc( int nNumBones );
 

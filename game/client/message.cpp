@@ -69,7 +69,7 @@ struct message_parms_t
 
 class CHudMessage: public CHudElement, public vgui::Panel, public ITextMessage 
 {
-	DECLARE_CLASS_SIMPLE( CHudMessage, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudMessage, vgui::Panel );
 public:
 
 	enum
@@ -92,10 +92,10 @@ public:
 	CHudMessage( const char *pElementName );
 	~CHudMessage();
 
-	void Init( void );
-	void VidInit( void );
-	bool ShouldDraw( void );
-	virtual void Paint();
+	void Init( void ) override;
+	void VidInit( void ) override;
+	bool ShouldDraw( void ) override;
+	void Paint() override;
 	void MsgFunc_HudText(bf_read &msg);
 	void MsgFunc_GameTitle(bf_read &msg);
 	void MsgFunc_HudMsg(bf_read &msg);
@@ -108,21 +108,21 @@ public:
 	void MessageDrawScan( client_textmessage_t *pMessage, float time );
 	void MessageScanStart( void );
 	void MessageScanNextChar( void );
-	void Reset( void );
+	void Reset( void ) override;
 
-	virtual void ApplySchemeSettings( IScheme *scheme );
+	void ApplySchemeSettings( IScheme *scheme ) override;
 
 	void SetFont( HScheme scheme, const char *pFontName );
 
 public: // ITextMessage
-	virtual void		SetPosition( int x, int y );
-	virtual void		AddChar( int r, int g, int b, int a, wchar_t ch );
+	void		SetPosition( int x, int y ) override;
+	void		AddChar( int r, int g, int b, int a, wchar_t ch ) override;
 
-	virtual void		GetLength( int *wide, int *tall, const char *string );
-	virtual int			GetFontInfo( FONTABC *pABCs, vgui::HFont hFont );
+	void		GetLength( int *wide, int *tall, const char *string ) override;
+	int			GetFontInfo( FONTABC *pABCs, vgui::HFont hFont ) override;
 
-	virtual void		SetFont( vgui::HFont hCustomFont );
-	virtual void		SetDefaultFont( void );
+	void		SetFont( vgui::HFont hCustomFont ) override;
+	void		SetDefaultFont( void ) override;
 
 private:
 
@@ -283,7 +283,7 @@ int	CHudMessage::XPosition( float x, int width, int totalWidth )
 	else
 	{
 		if ( x < 0 )
-			xPos = (1.0 + x) * ScreenWidth() - totalWidth;	// Align to right
+			xPos = (1.0f + x) * ScreenWidth() - totalWidth;	// Align to right
 		else
 			xPos = x * ScreenWidth();
 	}
@@ -305,12 +305,12 @@ int CHudMessage::YPosition( float y, int height )
 	int yPos;
 
 	if ( y == -1 )	// Centered?
-		yPos = (ScreenHeight() - height) * 0.5;
+		yPos = (ScreenHeight() - height) / 2;
 	else
 	{
 		// Alight bottom?
 		if ( y < 0 )
-			yPos = (1.0 + y) * ScreenHeight() - height;	// Alight bottom
+			yPos = (1.0f + y) * ScreenHeight() - height;	// Alight bottom
 		else // align top
 			yPos = y * ScreenHeight();
 	}
@@ -370,7 +370,7 @@ void CHudMessage::MessageScanNextChar( void )
 				destRed = m_parms.pMessage->r2;
 				destGreen = m_parms.pMessage->g2;
 				destBlue = m_parms.pMessage->b2;
-				blend = 255 - (deltaTime * (1.0/m_parms.pMessage->fxtime) * 255.0 + 0.5);
+				blend = 255 - (deltaTime * (1.0f/m_parms.pMessage->fxtime) * 255.0f + 0.5f);
 			}
 		}
 		break;
@@ -420,7 +420,7 @@ void CHudMessage::MessageScanStart( void )
 
 		if ( m_parms.time < m_parms.pMessage->fadein )
 		{
-			m_parms.fadeBlend = ((m_parms.pMessage->fadein - m_parms.time) * (1.0/m_parms.pMessage->fadein) * 255);
+			m_parms.fadeBlend = ((m_parms.pMessage->fadein - m_parms.time) * (1.0f/m_parms.pMessage->fadein) * 255);
 		}
 		else if ( m_parms.time > m_parms.fadeTime )
 		{
@@ -469,8 +469,8 @@ void CHudMessage::MessageDrawScan( client_textmessage_t *pMessage, float time )
 	{
 		// look up in localization table
 		// strip off any trailing newlines
-		int len = Q_strlen( pMessage->pMessage );
-		int tempLen = len + 2;
+		intp len = Q_strlen( pMessage->pMessage );
+		intp tempLen = len + 2;
 		char *localString = (char *)_alloca( tempLen );
 		Q_strncpy( localString, pMessage->pMessage, tempLen );
 		if (V_iscntrl(localString[len - 1]))
@@ -565,9 +565,9 @@ void CHudMessage::MessageDrawScan( client_textmessage_t *pMessage, float time )
 			line[m_parms.lineLength] = c;
 			m_parms.width += vgui::surface()->GetCharacterWidth( m_parms.font, c);
 			m_parms.lineLength++;
-			if ( m_parms.lineLength > (ARRAYSIZE(line)-1) )
+			if ( m_parms.lineLength > ssize(line)-1 )
 			{
-				m_parms.lineLength = ARRAYSIZE(line)-1;
+				m_parms.lineLength = ssize(line)-1;
 			}
 			pText++;
 		}
@@ -804,8 +804,8 @@ void CHudMessage::MsgFunc_GameTitle( bf_read &msg )
 		sf.r = 0;
 		sf.g = 0;
 		sf.b = 0;
-		sf.duration = (float)(1<<SCREENFADE_FRACBITS) * 5.0f;
-		sf.holdTime = (float)(1<<SCREENFADE_FRACBITS) * 1.0f;
+		sf.duration = (1<<SCREENFADE_FRACBITS) * 5;
+		sf.holdTime = (1<<SCREENFADE_FRACBITS);
 		sf.fadeFlags = FFADE_IN | FFADE_PURGE;
 		vieweffects->Fade( sf );
 

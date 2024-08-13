@@ -27,7 +27,7 @@ static Vector s_FadePlaneDirections[] =
 	Vector(0,0, 1),
 	Vector(0,0,-1)
 };
-#define NUM_FADE_PLANES	(sizeof(s_FadePlaneDirections)/sizeof(s_FadePlaneDirections[0]))
+#define NUM_FADE_PLANES	ssize(s_FadePlaneDirections)
 
 // ------------------------------------------------------------------------- //
 // Classes
@@ -211,27 +211,6 @@ static inline Vector EngineGetLightForPoint(const Vector &vPos)
 	return Vector(1,1,1);
 #else
 	return engine->GetLightForPoint(vPos, true);
-#endif
-}
-
-static inline Vector& EngineGetVecRenderOrigin()
-{
-#if defined(PARTICLEPROTOTYPE_APP)
-	static Vector dummy(0,0,0);
-	return dummy;
-#else
-	extern Vector g_vecRenderOrigin;
-	return g_vecRenderOrigin;
-#endif
-}
-
-static inline float& EngineGetSmokeFogOverlayAlpha()
-{
-#if defined(PARTICLEPROTOTYPE_APP)
-	static float dummy;
-	return dummy;
-#else
-	return g_SmokeFogOverlayAlpha;
 #endif
 }
 
@@ -608,10 +587,10 @@ void C_FuncSmokeVolume::FillVolume()
 						// Cast some rays and if it's too close to anything, fade its alpha down.
 						pInfo->m_FadeAlpha = 1;
 
-						for(int i=0; i < NUM_FADE_PLANES; i++)
+						for( auto&& d : s_FadePlaneDirections )
 						{
 							trace_t trace;
-							WorldTraceLine(vPos, vPos + s_FadePlaneDirections[i] * 100, MASK_SOLID_BRUSHONLY, &trace);
+							WorldTraceLine(vPos, vPos + d * 100, MASK_SOLID_BRUSHONLY, &trace);
 							if(trace.fraction < 1.0f)
 							{
 								float dist = DotProduct(trace.plane.normal, vPos) - trace.plane.dist;

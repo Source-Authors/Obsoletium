@@ -899,7 +899,7 @@ void C_FuncPhysicsRespawnZone::InitializePropsWithin( void )
 			pProp->SetRespawnZone( this );
 
 			// This is a crappy way to do this
-			int iProp = m_PropList.AddToTail();
+			intp iProp = m_PropList.AddToTail();
 			m_PropList[iProp].iszModelName = pProp->GetModelName();
 			m_PropList[iProp].vecOrigin = pProp->GetAbsOrigin();
 			m_PropList[iProp].vecAngles = pProp->GetAbsAngles();

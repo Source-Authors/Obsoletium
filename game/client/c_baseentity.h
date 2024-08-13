@@ -62,7 +62,7 @@ class IHasAttributes;
 
 struct CSoundParameters;
 
-typedef unsigned int			AimEntsListHandle_t;
+typedef intp			AimEntsListHandle_t;
 
 #define		INVALID_AIMENTS_LIST_HANDLE		(AimEntsListHandle_t)~0
 
@@ -192,7 +192,7 @@ public:
 	
 	// FireBullets uses shared code for prediction.
 	virtual void					FireBullets( const FireBulletsInfo_t &info );
-	virtual void					ModifyFireBulletsDamage( CTakeDamageInfo* dmgInfo ) {}
+	virtual void					ModifyFireBulletsDamage( CTakeDamageInfo* ) {}
 	virtual bool					ShouldDrawUnderwaterBulletBubbles();
 	virtual bool					ShouldDrawWaterImpacts( void ) { return true; }
 	virtual bool					HandleShotImpactingWater( const FireBulletsInfo_t &info, 
@@ -249,7 +249,7 @@ public:
 	void							*operator new[]( size_t stAllocateBlock, int nBlockUse, const char *pFileName, int nLine );
 	void							operator delete( void *pMem );
 	void							operator delete[]( void *pMem );
-	void							operator delete( void *pMem, int nBlockUse, const char *pFileName, int nLine ) { operator delete( pMem ); }
+	void							operator delete( void *pMem, int, const char *, int ) { operator delete( pMem ); }
 	void							operator delete[]( void *pMem, int nBlockUse, const char *pFileName, int nLine ) { operator delete( pMem, nBlockUse, pFileName, nLine ); }
 
 	// This just picks one of the routes to IClientUnknown.
@@ -1121,7 +1121,7 @@ public:
 	virtual int GetSkin() { return 0; }
 
 	// Stubs on client
-	void	NetworkStateManualMode( bool activate )		{ }
+	void	NetworkStateManualMode( bool )				{ }
 	void	NetworkStateChanged()						{ }
 	void	NetworkStateChanged( void *pVar )			{ }
 	void	NetworkStateSetUpdateInterval( float N )	{ }
@@ -1157,7 +1157,7 @@ public:
 #ifdef _DEBUG
 	void FunctionCheck( void *pFunction, const char *name );
 
-	ENTITYFUNCPTR TouchSet( ENTITYFUNCPTR func, char *name ) 
+	ENTITYFUNCPTR TouchSet( ENTITYFUNCPTR func, const char *name ) 
 	{ 
 		//COMPILE_TIME_ASSERT( sizeof(func) == 4 );
 		m_pfnTouch = func; 

@@ -20,8 +20,8 @@
 VideoPanel::VideoPanel( unsigned int nXPos, unsigned int nYPos, unsigned int nHeight, unsigned int nWidth, bool allowAlternateMedia ) : 
 	BaseClass( NULL, "VideoPanel" ),
 	m_VideoMaterial( NULL ),
-	m_nPlaybackWidth( 0 ),
 	m_nPlaybackHeight( 0 ),
+	m_nPlaybackWidth( 0 ),
 	m_bAllowAlternateMedia( allowAlternateMedia )
 {
 	vgui::VPANEL pParent = enginevgui->GetPanel( PANEL_GAMEUIDLL );

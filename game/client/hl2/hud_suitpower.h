@@ -19,17 +19,17 @@
 //-----------------------------------------------------------------------------
 class CHudSuitPower : public CHudElement, public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudSuitPower, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudSuitPower, vgui::Panel );
 
 public:
 	CHudSuitPower( const char *pElementName );
-	virtual void	Init( void );
-	virtual void	Reset( void );
-	virtual void	OnThink( void );
-	bool			ShouldDraw( void );
+	void	Init( void ) override;
+	void	Reset( void ) override;
+	void	OnThink( void ) override;
+	bool	ShouldDraw( void ) override;
 
 protected:
-	virtual void	Paint();
+	void	Paint() override;
 
 private:
 	CPanelAnimationVar( Color, m_AuxPowerColor, "AuxPowerColor", "255 0 0 255" );

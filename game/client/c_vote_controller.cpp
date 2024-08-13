@@ -55,7 +55,7 @@ void C_VoteController::RecvProxy_VoteOption( const CRecvProxyData *pData, void *
 	
 	pMe->m_nVoteOptionCount[index] = pData->m_Value.m_Int;
 	pMe->m_bVotesDirty = true;
-	pMe->SetNextClientThink( gpGlobals->curtime + 0.001 );
+	pMe->SetNextClientThink( gpGlobals->curtime + 0.001f );
 }
 
 //-----------------------------------------------------------------------------

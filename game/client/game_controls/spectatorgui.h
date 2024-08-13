@@ -42,25 +42,25 @@ class IBaseFileSystem;
 //-----------------------------------------------------------------------------
 class CSpectatorGUI : public vgui::EditablePanel, public IViewPortPanel
 {
-	DECLARE_CLASS_SIMPLE( CSpectatorGUI, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSpectatorGUI, vgui::EditablePanel );
 
 public:
 	CSpectatorGUI( IViewPort *pViewPort );
 	virtual ~CSpectatorGUI();
 
-	virtual const char *GetName( void ) { return PANEL_SPECGUI; }
-	virtual void SetData(KeyValues *data) {};
-	virtual void Reset() {};
-	virtual void Update();
-	virtual bool NeedsUpdate( void ) { return false; }
-	virtual bool HasInputElements( void ) { return false; }
-	virtual void ShowPanel( bool bShow );
+	const char *GetName( void ) override { return PANEL_SPECGUI; }
+	void SetData(KeyValues *) override {};
+	void Reset() override {};
+	void Update() override;
+	bool NeedsUpdate( void ) override { return false; }
+	bool HasInputElements( void ) override { return false; }
+	void ShowPanel( bool bShow ) override;
 	
 	// both vgui::Frame and IViewPortPanel define these, so explicitly define them here as passthroughs to vgui
-	vgui::VPANEL GetVPanel( void ) { return BaseClass::GetVPanel(); }
-	virtual bool IsVisible() { return BaseClass::IsVisible(); }
-	virtual void SetParent(vgui::VPANEL parent) { BaseClass::SetParent(parent); }
-	virtual void OnThink();
+	vgui::VPANEL GetVPanel( void ) override { return BaseClass::GetVPanel(); }
+	bool IsVisible() override { return BaseClass::IsVisible(); }
+	void SetParent(vgui::VPANEL parent) override { BaseClass::SetParent(parent); }
+	void OnThink() override;
 
 	virtual int GetTopBarHeight() { return m_pTopBar->GetTall(); }
 	virtual int GetBottomBarHeight() { return m_pBottomBarBlank->GetTall(); }
@@ -71,7 +71,7 @@ public:
 
 	virtual const char *GetResFile( void );
 
-	virtual GameActionSet_t GetPreferredActionSet() { return GAME_ACTION_SET_SPECTATOR; }
+	GameActionSet_t GetPreferredActionSet() override { return GAME_ACTION_SET_SPECTATOR; }
 	
 protected:
 
@@ -85,8 +85,8 @@ protected:
 	enum { INSET_OFFSET = 2 } ; 
 
 	// vgui overrides
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void PerformLayout() override;
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 //	virtual void OnCommand( const char *command );
 
 	vgui::Panel *m_pTopBar;
@@ -109,35 +109,35 @@ protected:
 //----------------------------------------------------------------------------
 class CSpectatorMenu : public vgui::Frame, public IViewPortPanel, public CGameEventListener
 {
-	DECLARE_CLASS_SIMPLE(  CSpectatorMenu, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE(  CSpectatorMenu, vgui::Frame );
 
 public:
 	CSpectatorMenu( IViewPort *pViewPort );
 	~CSpectatorMenu() {}
 
-	virtual const char *GetName( void ) { return PANEL_SPECMENU; }
-	virtual void SetData(KeyValues *data) {};
-	virtual void Reset( void ) { m_pPlayerList->DeleteAllItems(); }
-	virtual void Update( void );
-	virtual bool NeedsUpdate( void ) { return false; }
-	virtual bool HasInputElements( void ) { return true; }
-	virtual void ShowPanel( bool bShow );
-	virtual void FireGameEvent( IGameEvent *event );
+	const char *GetName( void ) override { return PANEL_SPECMENU; }
+	void SetData(KeyValues *data) override {};
+	void Reset( void ) override { m_pPlayerList->DeleteAllItems(); }
+	void Update( void ) override;
+	bool NeedsUpdate( void ) override { return false; }
+	bool HasInputElements( void ) override { return true; }
+	void ShowPanel( bool bShow ) override;
+	void FireGameEvent( IGameEvent *event ) override;
 
 	// both vgui::Frame and IViewPortPanel define these, so explicitly define them here as passthroughs to vgui
-	virtual bool IsVisible() { return BaseClass::IsVisible(); }
-	vgui::VPANEL GetVPanel( void ) { return BaseClass::GetVPanel(); }
-	virtual void SetParent(vgui::VPANEL parent) { BaseClass::SetParent(parent); }
+	bool IsVisible() override { return BaseClass::IsVisible(); }
+	vgui::VPANEL GetVPanel( void ) override { return BaseClass::GetVPanel(); }
+	void SetParent(vgui::VPANEL parent) override { BaseClass::SetParent(parent); }
 
-	virtual GameActionSet_t GetPreferredActionSet() { return GAME_ACTION_SET_SPECTATOR; }
+	GameActionSet_t GetPreferredActionSet() override { return GAME_ACTION_SET_SPECTATOR; }
 
 private:
 	// VGUI2 overrides
 	MESSAGE_FUNC_PARAMS( OnTextChanged, "TextChanged", data );
-	virtual void OnCommand( const char *command );
-	virtual void OnKeyCodePressed(vgui::KeyCode code);
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
-	virtual void PerformLayout();
+	void OnCommand( const char *command ) override;
+	void OnKeyCodePressed(vgui::KeyCode code) override;
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
+	void PerformLayout() override;
 
 	void SetViewModeText( const char *text ) { m_pViewOptions->SetText( text ); }
 	void SetPlayerFgColor( Color c1 ) { m_pPlayerList->SetFgColor(c1); }

@@ -26,9 +26,9 @@ CClientEffectPrecacheSystem	*ClientEffectPrecacheSystem( void )
 void CClientEffectPrecacheSystem::LevelInitPreEntity( void )
 {
 	//Precache all known effects
-	for ( int i = 0; i < m_Effects.Size(); i++ )
+	for ( auto *e : m_Effects )
 	{
-		m_Effects[i]->Cache();
+		e->Cache();
 	}
 	
 	//FIXME: Double check this
@@ -52,9 +52,9 @@ void CClientEffectPrecacheSystem::LevelShutdownPreEntity( void )
 void CClientEffectPrecacheSystem::LevelShutdownPostEntity( void )
 {
 	// mark all known effects as free
-	for ( int i = 0; i < m_Effects.Size(); i++ )
+	for ( auto *e : m_Effects )
 	{
-		m_Effects[i]->Cache( false );
+		e->Cache( false );
 	}
 }
 

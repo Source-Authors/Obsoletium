@@ -59,7 +59,6 @@ void C_TELargeFunnel::CreateFunnel( void )
 	SimpleParticle *pParticle;
 
 	Vector		vecDir;
-	Vector		vecDest;
 
 	float ratio = 0.25;
 	float invratio = 1 / ratio;
@@ -111,7 +110,7 @@ void C_TELargeFunnel::CreateFunnel( void )
 					pParticle->m_uchColor[1] = 255;
 					pParticle->m_uchColor[2] = 0;
 				
-					pParticle->m_uchStartSize	= 4.0;
+					pParticle->m_uchStartSize	= 4;
 				}
 				else
 				{
@@ -120,7 +119,7 @@ void C_TELargeFunnel::CreateFunnel( void )
 					pParticle->m_uchColor[1] = 255;
 					pParticle->m_uchColor[2] = 255;
 				
-					pParticle->m_uchStartSize	= 15.0;
+					pParticle->m_uchStartSize	= 15;
 				}
 
 				pParticle->m_uchEndSize		= pParticle->m_uchStartSize;

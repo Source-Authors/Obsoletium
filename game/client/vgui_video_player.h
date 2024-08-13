@@ -23,14 +23,14 @@ class VideoPlayerPanel : public vgui::Panel		// Should this be EditablePanel ?
 {
 	public:
 
-		DECLARE_CLASS_SIMPLE( VideoPlayerPanel, vgui::Panel );
+		DECLARE_CLASS_SIMPLE_OVERRIDE( VideoPlayerPanel, vgui::Panel );
 	
 							VideoPlayerPanel( vgui::Panel *parent, const char *panelName, int nXpos, int nYpos, int nWidth, int nHeight, const char *pVideoFile = NULL );
 	
 		virtual			   ~VideoPlayerPanel();
 
 		virtual void 		Activate( void );
-		virtual void 		Paint( void );
+		void 		Paint( void ) override;
 		virtual void 		OnClose( void );
 		
 		bool				SetVideo( const char *pVideoFile );
@@ -59,8 +59,8 @@ class VideoPlayerPanel : public vgui::Panel		// Should this be EditablePanel ?
 
 	protected:
 
-		virtual void		OnTick( void ) { BaseClass::OnTick(); }
-		virtual void		OnCommand( const char *pcCommand ) { BaseClass::OnCommand( pcCommand ); }
+		void		OnTick( void ) override { BaseClass::OnTick(); }
+		void		OnCommand( const char *pcCommand ) override { BaseClass::OnCommand( pcCommand ); }
 
 	private:
 

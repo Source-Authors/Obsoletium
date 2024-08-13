@@ -30,16 +30,17 @@
 //-----------------------------------------------------------------------------
 class CHudBattery : public CHudNumericDisplay, public CHudElement
 {
-	DECLARE_CLASS_SIMPLE( CHudBattery, CHudNumericDisplay );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudBattery, CHudNumericDisplay );
 
 public:
 	CHudBattery( const char *pElementName );
-	void Init( void );
-	void Reset( void );
-	void VidInit( void );
-	void OnThink( void );
+
+	void Init( void ) override;
+	void Reset( void ) override;
+	void VidInit( void ) override;
+	void OnThink( void ) override;
 	void MsgFunc_Battery(bf_read &msg );
-	bool ShouldDraw();
+	bool ShouldDraw() override;
 	
 private:
 	int		m_iBat;	

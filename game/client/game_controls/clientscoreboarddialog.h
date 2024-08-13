@@ -28,7 +28,7 @@
 class CClientScoreBoardDialog : public vgui::EditablePanel, public IViewPortPanel, public CGameEventListener
 {
 private:
-	DECLARE_CLASS_SIMPLE( CClientScoreBoardDialog, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CClientScoreBoardDialog, vgui::EditablePanel );
 
 protected:
 // column widths at 640
@@ -39,13 +39,13 @@ public:
 	CClientScoreBoardDialog( IViewPort *pViewPort );
 	~CClientScoreBoardDialog();
 
-	virtual const char *GetName( void ) { return PANEL_SCOREBOARD; }
-	virtual void SetData(KeyValues *data) {};
-	virtual void Reset();
-	virtual void Update();
-	virtual bool NeedsUpdate( void );
-	virtual bool HasInputElements( void ) { return true; }
-	virtual void ShowPanel( bool bShow );
+	const char *GetName( void ) override { return PANEL_SCOREBOARD; }
+	void SetData(KeyValues *) override {};
+	void Reset() override;
+	void Update() override;
+	bool NeedsUpdate( void ) override;
+	bool HasInputElements( void ) override { return true; }
+	void ShowPanel( bool bShow ) override;
 
 	virtual bool ShowAvatars() 
 	{ 
@@ -56,17 +56,17 @@ public:
 	}
 
 	// both vgui::Frame and IViewPortPanel define these, so explicitly define them here as passthroughs to vgui
-	vgui::VPANEL GetVPanel( void ) { return BaseClass::GetVPanel(); }
-  	virtual bool IsVisible() { return BaseClass::IsVisible(); }
-  	virtual void SetParent( vgui::VPANEL parent ) { BaseClass::SetParent( parent ); }
+	vgui::VPANEL GetVPanel( void ) override { return BaseClass::GetVPanel(); }
+  	bool IsVisible() override { return BaseClass::IsVisible(); }
+  	void SetParent( vgui::VPANEL parent ) override { BaseClass::SetParent( parent ); }
  	
 	// IGameEventListener interface:
-	virtual void FireGameEvent( IGameEvent *event);
+	void FireGameEvent( IGameEvent *event) override;
 
 	virtual void UpdatePlayerAvatar( int playerIndex, KeyValues *kv );
 
-	virtual GameActionSet_t GetPreferredActionSet() { return GAME_ACTION_SET_NONE;  }
-			
+	GameActionSet_t GetPreferredActionSet() override { return GAME_ACTION_SET_NONE;  }
+
 protected:
 	MESSAGE_FUNC_INT( OnPollHideCode, "PollHideCode", code );
 
@@ -75,7 +75,7 @@ protected:
 	virtual void InitScoreboardSections();
 	virtual void UpdateTeamInfo();
 	virtual void UpdatePlayerInfo();
-	virtual void OnThink();
+	void OnThink() override;
 	virtual void AddHeader(); // add the start header of the scoreboard
 	virtual void AddSection(int teamType, int teamNumber); // add a new section header for a team
 	virtual int GetAdditionalHeight() { return 0; }
@@ -83,7 +83,7 @@ protected:
 	// sorts players within a section
 	static bool StaticPlayerSortFunc(vgui::SectionedListPanel *list, int itemID1, int itemID2);
 
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
 
 	virtual void PostApplySchemeSettings( vgui::IScheme *pScheme );
 
@@ -105,7 +105,7 @@ protected:
 	void MoveToCenterOfScreen();
 
 	vgui::ImageList				*m_pImageList;
-	CUtlMap<CSteamID,int>		m_mapAvatarsToImageList;
+	CUtlMap<CSteamID,intp>		m_mapAvatarsToImageList;
 
 	CPanelAnimationVar( int, m_iAvatarWidth, "avatar_width", "34" );		// Avatar width doesn't scale with resolution
 	CPanelAnimationVarAliasType( int, m_iNameWidth, "name_width", "136", "proportional_int" );

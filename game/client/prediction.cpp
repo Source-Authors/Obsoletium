@@ -59,35 +59,6 @@ extern CMoveData *g_pMoveData;
 void COM_Log( char *pszFile, const char *fmt, ...);
 typedescription_t *FindFieldByName( const char *fieldname, datamap_t *dmap );
 
-#if !defined( NO_ENTITY_PREDICTION )
-//-----------------------------------------------------------------------------
-// Purpose: For debugging, find predictable by classname
-// Input  : *classname - 
-// Output : static C_BaseEntity
-//-----------------------------------------------------------------------------
-static C_BaseEntity *FindPredictableByGameClass( const char *classname )
-{
-	// Walk backward due to deletion from UtlVector
-	int c = predictables->GetPredictableCount();
-	int i;
-	for ( i = 0; i < c; i++ )
-	{
-		C_BaseEntity *ent = predictables->GetPredictable( i );
-		if ( !ent )
-			continue;
-
-		// Don't do anything to truly predicted things (like player and weapons )
-		if ( !FClassnameIs( ent, classname ) )
-			continue;
-
-		return ent;
-	}
-
-	return NULL;
-}
-#endif
-
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -165,8 +136,7 @@ void CPrediction::CheckError( int commands_acknowledged )
 		return;
 
 	Vector predicted_origin;
-
-	memcpy( (Vector *)&predicted_origin, (Vector *)( (byte *)slot + td->fieldOffset[ PC_DATA_PACKED ] ), sizeof( Vector ) );
+	memcpy( &predicted_origin, (Vector *)( (byte *)slot + td->fieldOffset[ PC_DATA_PACKED ] ), sizeof( Vector ) );
 	
 	// Compare what the server returned with what we had predicted it to be
 	VectorSubtract ( predicted_origin, origin, delta );

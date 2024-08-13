@@ -330,7 +330,7 @@ void C_ClientRagdoll::OnRestore( void )
 	{
 		m_bReleaseRagdoll = true;
 		m_pRagdoll = NULL;
-		Assert( !"Attempted to restore a ragdoll without physobjects!" );
+		AssertMsg( false, "Attempted to restore a ragdoll without physobjects!" );
 		return;
 	}
 
@@ -675,9 +675,9 @@ class C_BaseAnimatingGameSystem : public CAutoGameSystem
 // Purpose: convert axis rotations to a quaternion
 //-----------------------------------------------------------------------------
 C_BaseAnimating::C_BaseAnimating() :
-	m_iv_flCycle( "C_BaseAnimating::m_iv_flCycle" ),
 	m_iv_flPoseParameter( "C_BaseAnimating::m_iv_flPoseParameter" ),
-	m_iv_flEncodedController("C_BaseAnimating::m_iv_flEncodedController")
+	m_iv_flEncodedController("C_BaseAnimating::m_iv_flEncodedController"),
+	m_iv_flCycle( "C_BaseAnimating::m_iv_flCycle" )
 {
 	m_vecForce.Init();
 	m_nForceBone = -1;
@@ -1123,7 +1123,7 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 
 	}
 
-	Assert( hdr->GetNumPoseParameters() <= ARRAYSIZE( m_flPoseParameter ) );
+	Assert( hdr->GetNumPoseParameters() <= ssize( m_flPoseParameter ) );
 
 	m_iv_flPoseParameter.SetMaxCount( hdr->GetNumPoseParameters() );
 	
@@ -1910,42 +1910,43 @@ void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float curre
 {
 	return;
 
-	Vector		childPos[MAXSTUDIOBONES];
-	Quaternion	childQ[MAXSTUDIOBONES];
-	float		childPoseparam[MAXSTUDIOPOSEPARAM];
+	// dimhotepus: Comment unreachable code. if enabled causes issues with combine holding SMG.
+	//Vector		childPos[MAXSTUDIOBONES];
+	//Quaternion	childQ[MAXSTUDIOBONES];
+	//float		childPoseparam[MAXSTUDIOPOSEPARAM];
 
-	// go through all children
-	for ( C_BaseEntity *pChild = FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
-	{
-		C_BaseAnimating *pChildAnimating = pChild->GetBaseAnimating();
+	//// go through all children
+	//for ( C_BaseEntity *pChild = FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
+	//{
+	//	C_BaseAnimating *pChildAnimating = pChild->GetBaseAnimating();
 
-		if ( pChildAnimating )
-		{
-			CStudioHdr *pChildHdr = pChildAnimating->GetModelPtr();
+	//	if ( pChildAnimating )
+	//	{
+	//		CStudioHdr *pChildHdr = pChildAnimating->GetModelPtr();
 
-			// FIXME: needs a new type of EF_BONEMERGE (EF_CHILDMERGE?)
-			if ( pChildHdr && pChild->IsEffectActive( EF_BONEMERGE ) && pChildHdr->SequencesAvailable() && pChildAnimating->m_pBoneMergeCache )
-			{
-				// FIXME: these should Inherit from the parent
-				GetPoseParameters( pChildHdr, childPoseparam );
+	//		// FIXME: needs a new type of EF_BONEMERGE (EF_CHILDMERGE?)
+	//		if ( pChildHdr && pChild->IsEffectActive( EF_BONEMERGE ) && pChildHdr->SequencesAvailable() && pChildAnimating->m_pBoneMergeCache )
+	//		{
+	//			// FIXME: these should Inherit from the parent
+	//			GetPoseParameters( pChildHdr, childPoseparam );
 
-				IBoneSetup childBoneSetup( pChildHdr, boneMask, childPoseparam );
-				childBoneSetup.InitPose( childPos, childQ );
+	//			IBoneSetup childBoneSetup( pChildHdr, boneMask, childPoseparam );
+	//			childBoneSetup.InitPose( childPos, childQ );
 
-				// set up the child into the parent's current pose
-				pChildAnimating->m_pBoneMergeCache->CopyParentToChild( pos, q, childPos, childQ, boneMask );
+	//			// set up the child into the parent's current pose
+	//			pChildAnimating->m_pBoneMergeCache->CopyParentToChild( pos, q, childPos, childQ, boneMask );
 
-				// FIXME: needs some kind of sequence
-				// merge over whatever bones the childs sequence modifies
-				childBoneSetup.AccumulatePose( childPos, childQ, 0, GetCycle(), 1.0, currentTime, NULL );
+	//			// FIXME: needs some kind of sequence
+	//			// merge over whatever bones the childs sequence modifies
+	//			childBoneSetup.AccumulatePose( childPos, childQ, 0, GetCycle(), 1.0, currentTime, NULL );
 
-				// copy the result back into the parents bones
-				pChildAnimating->m_pBoneMergeCache->CopyChildToParent( childPos, childQ, pos, q, boneMask );
+	//			// copy the result back into the parents bones
+	//			pChildAnimating->m_pBoneMergeCache->CopyChildToParent( childPos, childQ, pos, q, boneMask );
 
-				// probably needs an IK merge system of some sort =(
-			}
-		}
-	}
+	//			// probably needs an IK merge system of some sort =(
+	//		}
+	//	}
+	//}
 }
 
 
@@ -3009,7 +3010,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 		}
 		else
 		{
-			ExecuteNTimes( 25, Warning( "SetupBones: invalid bone array size (%d - needs %d)\n", nMaxBones, m_CachedBoneData.Count() ) );
+			ExecuteNTimes( 25, Warning( "SetupBones: invalid bone array size (%d - needs %zi)\n", nMaxBones, m_CachedBoneData.Count() ) );
 			return false;
 		}
 	}
@@ -3115,7 +3116,7 @@ void C_BaseAnimating::PopBoneAccess( char const *tagPop )
 	int lastIndex = g_BoneAccessStack.Count() - 1;
 	if ( lastIndex < 0 )
 	{
-		Assert( !"C_BaseAnimating::PopBoneAccess:  Stack is empty!!!" );
+		AssertMsg( false, "C_BaseAnimating::PopBoneAccess:  Stack is empty!!!" );
 		return;
 	}
 	g_BoneAcessBase = g_BoneAccessStack[lastIndex ];
@@ -5421,7 +5422,7 @@ void C_BaseAnimating::GetBlendedLinearVelocity( Vector *pVec )
 	GetSequenceLinearMotion( GetSequence(), &vecDist );
 	flDuration = SequenceDuration( GetSequence() );
 
-	VectorScale( vecDist, 1.0 / flDuration, *pVec );
+	VectorScale( vecDist, 1.0f / flDuration, *pVec );
 
 	Vector tmp;
 	for (int i = m_SequenceTransitioner.m_animationQueue.Count() - 2; i >= 0; i--)
@@ -5431,7 +5432,7 @@ void C_BaseAnimating::GetBlendedLinearVelocity( Vector *pVec )
 		GetSequenceLinearMotion( blend->m_nSequence, &vecDist );
 		flDuration = SequenceDuration( blend->m_nSequence );
 
-		VectorScale( vecDist, 1.0 / flDuration, tmp );
+		VectorScale( vecDist, 1.0f / flDuration, tmp );
 
 		float flWeight = blend->GetFadeout( gpGlobals->curtime );
 		*pVec = Lerp( flWeight, *pVec, tmp );

@@ -687,7 +687,7 @@ static int GetHighestBit( int flags )
 	return 0;
 }
 
-#define ATTACH_INTERP_TIME	0.2
+#define ATTACH_INTERP_TIME	0.2f
 class C_ServerRagdollAttached : public C_ServerRagdoll
 {
 	DECLARE_CLASS( C_ServerRagdollAttached, C_ServerRagdoll );
@@ -846,7 +846,7 @@ struct ragdoll_memory_list_t
 	void AddToList( C_BaseEntity *pRagdoll )
 	{
 		Update();
-		int index = list.AddToTail();
+		intp index = list.AddToTail();
 		list[index].ragdoll = pRagdoll;
 		list[index].tickCount = gpGlobals->tickcount;
 	}

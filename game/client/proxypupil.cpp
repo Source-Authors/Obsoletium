@@ -89,7 +89,7 @@ void CPupilProxy::OnBind( C_BaseEntity *pBaseEntity )
 	engine->ComputeLighting( eyePt, &forward, false, color );
 
 	// Compute the intensity...
-	float flIntensity = ( 0.299f * color[0] + 0.587f * color[1] + 0.114f * color[2] ) * 0.5;
+	float flIntensity = ( 0.299f * color[0] + 0.587f * color[1] + 0.114f * color[2] ) * 0.5f;
 	flIntensity = clamp( flIntensity, 0.f, 1.f );
 	float flLastIntensity = m_pLightingVar->GetFloatValue( );
 	if ( flIntensity > flLastIntensity )

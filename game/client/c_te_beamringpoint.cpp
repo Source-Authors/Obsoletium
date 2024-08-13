@@ -59,8 +59,8 @@ void TE_BeamRingPoint( IRecipientFilter& filter, float delay,
 	float life, float width, int spread, float amplitude, int r, int g, int b, int a, int speed, int flags )
 {
 	beams->CreateBeamRingPoint( center, start_radius, end_radius, modelindex, haloindex, 0.0f,
-		life, width, 0.1 * spread, 0.0f, amplitude, a, 0.1 * speed, 
-		startframe, 0.1 * framerate, r, g, b, flags );
+		life, width, 0.1f * spread, 0.0f, amplitude, a, 0.1f * speed, 
+		startframe, 0.1f * framerate, r, g, b, flags );
 }
 
 //-----------------------------------------------------------------------------
@@ -70,8 +70,8 @@ void TE_BeamRingPoint( IRecipientFilter& filter, float delay,
 void C_TEBeamRingPoint::PostDataUpdate( DataUpdateType_t updateType )
 {
 	beams->CreateBeamRingPoint( m_vecCenter, m_flStartRadius, m_flEndRadius, m_nModelIndex, m_nHaloIndex, 0.0f,
-		m_fLife, m_fWidth, m_fEndWidth, m_nFadeLength, m_fAmplitude, a, 0.1 * m_nSpeed, 
-		m_nStartFrame, 0.1 * m_nFrameRate, r, g, b, m_nFlags );
+		m_fLife, m_fWidth, m_fEndWidth, m_nFadeLength, m_fAmplitude, a, 0.1f * m_nSpeed, 
+		m_nStartFrame, 0.1f * m_nFrameRate, r, g, b, m_nFlags );
 }
 
 IMPLEMENT_CLIENTCLASS_EVENT_DT(C_TEBeamRingPoint, DT_TEBeamRingPoint, CTEBeamRingPoint)

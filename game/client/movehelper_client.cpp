@@ -53,7 +53,7 @@ private:
 		Vector	deltavelocity;
 		trace_t trace;
 
-		touchlist_t() {}
+		touchlist_t() = default;
 
 	private:
 		touchlist_t( const touchlist_t &src );
@@ -108,10 +108,10 @@ void CMoveHelperClient::ResetTouchList( void )
 
 bool CMoveHelperClient::AddToTouched( const trace_t& tr, const Vector& impactvelocity )
 {
-	int i;
+	intp i;
 
 	// Look for duplicates
-	for (i = 0; i < m_TouchList.Size(); i++)
+	for (i = 0; i < m_TouchList.Count(); i++)
 	{
 		if (m_TouchList[i].trace.m_pEnt == tr.m_pEnt)
 		{
@@ -146,7 +146,7 @@ void CMoveHelperClient::ProcessImpacts( void )
 	Vector vel = pPlayer->GetAbsVelocity();
 
 	// Touch other objects that were intersected during the movement.
-	for (int i = 0 ; i < m_TouchList.Size(); i++)
+	for (intp i = 0 ; i < m_TouchList.Count(); i++)
 	{
 		// Run the impact function as if we had run it during movement.
 		C_BaseEntity *entity = ClientEntityList().GetEnt( m_TouchList[i].trace.m_pEnt->entindex() );

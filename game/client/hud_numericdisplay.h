@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------
 class CHudNumericDisplay : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CHudNumericDisplay, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHudNumericDisplay, vgui::Panel );
 
 public:
 	CHudNumericDisplay(vgui::Panel *parent, const char *name);
@@ -38,7 +38,7 @@ public:
 
 protected:
 	// vgui overrides
-	virtual void Paint();
+	void Paint() override;
 	virtual void PaintLabel();
 
 	virtual void PaintNumbers(vgui::HFont font, int xpos, int ypos, int value);

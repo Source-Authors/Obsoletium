@@ -298,9 +298,9 @@ inline CClientEntityList& ClientEntityList()
 class IClientEntityListener
 {
 public:
-	virtual void OnEntityCreated( C_BaseEntity *pEntity ) {};
+	virtual void OnEntityCreated( C_BaseEntity * ) {};
 	//virtual void OnEntitySpawned( C_BaseEntity *pEntity ) {};
-	virtual void OnEntityDeleted( C_BaseEntity *pEntity ) {};
+	virtual void OnEntityDeleted( C_BaseEntity * ) {};
 };
 
 

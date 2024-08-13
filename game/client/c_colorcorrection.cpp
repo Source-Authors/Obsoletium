@@ -137,7 +137,7 @@ void C_ColorCorrection::ClientThink()
 		if ( weight>1.0f ) weight = 1.0f;	
 	}
 	
-	g_pColorCorrectionMgr->SetColorCorrectionWeight( m_CCHandle, m_flCurWeight * ( 1.0 - weight ) );
+	g_pColorCorrectionMgr->SetColorCorrectionWeight( m_CCHandle, m_flCurWeight * ( 1.0f - weight ) );
 
 	BaseClass::ClientThink();
 }

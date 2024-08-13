@@ -18,18 +18,18 @@ using namespace vgui;
 
 class CAchievementNotificationPanel : public CHudElement, public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CAchievementNotificationPanel, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAchievementNotificationPanel, EditablePanel );
 
 public:
 	CAchievementNotificationPanel( const char *pElementName );
 
-	virtual void	Init();
-	virtual void	ApplySchemeSettings( IScheme *scheme );
-	virtual bool	ShouldDraw( void );
-	virtual void	PerformLayout( void );
-	virtual void	LevelInit( void ) { m_flHideTime = 0; }
-	virtual void	FireGameEvent( IGameEvent * event );
-	virtual void	OnTick( void );
+	void	Init() override;
+	void	ApplySchemeSettings( IScheme *scheme ) override;
+	bool	ShouldDraw( void ) override;
+	void	PerformLayout( void ) override;
+	void	LevelInit( void ) override { m_flHideTime = 0; }
+	void	FireGameEvent( IGameEvent * event ) override;
+	void	OnTick( void ) override;
 
 	void AddNotification( const char *szIconBaseName, const wchar_t *pHeading, const wchar_t *pTitle );
 

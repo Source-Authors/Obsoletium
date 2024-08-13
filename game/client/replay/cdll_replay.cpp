@@ -184,7 +184,7 @@ public:
 #endif
 	}
 
-	virtual void OnPlaybackComplete( ReplayHandle_t hReplay, int iPerformance )
+	virtual void OnPlaybackComplete( ReplayHandle_t hReplay, intp iPerformance )
 	{
 		ReplayUI_ReloadBrowser( hReplay, iPerformance );
 	}

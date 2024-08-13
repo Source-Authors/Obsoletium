@@ -169,14 +169,14 @@ public:
 class CModelPanel : public vgui::EditablePanel, public CGameEventListener
 {
 public:
-	DECLARE_CLASS_SIMPLE( CModelPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CModelPanel, vgui::EditablePanel );
 
 	CModelPanel( vgui::Panel *parent, const char *name );
 	virtual ~CModelPanel();
 
-	virtual void Paint();
-	virtual void ApplySettings( KeyValues *inResourceData );
-	virtual void OnCommand( const char *command ) OVERRIDE;
+	void Paint() override;
+	void ApplySettings( KeyValues *inResourceData ) override;
+	void OnCommand( const char *command ) override;
 	virtual void DeleteVCDData( void );
 	virtual void DeleteModelData( void );
 
@@ -201,7 +201,7 @@ public:
 
 	void		UpdateModel();
 public: // IGameEventListener:
-	virtual void FireGameEvent( IGameEvent * event );
+	void FireGameEvent( IGameEvent * event ) override;
 
 protected:
 	virtual void SetupModel( void );

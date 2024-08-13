@@ -501,7 +501,7 @@ void CClientScoreBoardDialog::UpdatePlayerAvatar( int playerIndex, KeyValues *kv
 
 				// See if we already have that avatar in our list
 				int iMapIndex = m_mapAvatarsToImageList.Find( steamIDForPlayer );
-				int iImageIndex;
+				intp iImageIndex;
 				if ( iMapIndex == m_mapAvatarsToImageList.InvalidIndex() )
 				{
 					CAvatarImage *pImage = new CAvatarImage();

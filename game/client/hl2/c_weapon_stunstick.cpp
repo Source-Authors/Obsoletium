@@ -101,7 +101,7 @@ public:
 			beamInfo.m_flAmplitude = random->RandomFloat( 1, 2 );
 			beamInfo.m_flBrightness = 255.0;
 			beamInfo.m_flSpeed = 0.0;
-			beamInfo.m_nStartFrame = 0.0;
+			beamInfo.m_nStartFrame = 0;
 			beamInfo.m_flFrameRate = 1.0f;
 			beamInfo.m_flRed = 255.0f;;
 			beamInfo.m_flGreen = 255.0f;

@@ -137,8 +137,7 @@ void CAvatarImage::LoadAvatarImage()
   // dimhotepus: NO_STEAM
 #ifdef NO_STEAM
 	return;
-#endif
-
+#else
 	// attempt to retrieve the avatar image from Steam
 	if ( m_bLoadPending && steamapicontext->SteamFriends() && steamapicontext->SteamUtils() && gpGlobals->curtime >= m_fNextLoadTime )
 	{
@@ -186,6 +185,7 @@ void CAvatarImage::LoadAvatarImage()
 			m_fNextLoadTime = gpGlobals->curtime + 1.0f;
 		}
 	}
+#endif
 }
 
 

@@ -246,7 +246,7 @@ int KB_ConvertString( char *in, char **ppout )
 
 	*pOut = '\0';
 
-	int maxlen = strlen( sz ) + 1;
+	intp maxlen = V_strlen( sz ) + 1;
 	pOut = ( char * )malloc( maxlen );
 	Q_strncpy( pOut, sz, maxlen );
 	*ppout = pOut;
@@ -1273,7 +1273,7 @@ void CInput::CreateMove ( int sequence_number, float input_sample_frametime, boo
 
 #if defined( HL2_CLIENT_DLL )
 	// copy backchannel data
-	int i;
+	intp i;
 	for (i = 0; i < m_EntityGroundContact.Count(); i++)
 	{
 		cmd->entitygroundcontact.AddToTail( m_EntityGroundContact[i] );

@@ -486,7 +486,7 @@ WaterDebrisEffect* WaterDebrisEffect::Create( const char *pDebugName )
 //-----------------------------------------------------------------------------
 float WaterDebrisEffect::UpdateAlpha( const SimpleParticle *pParticle )
 {
-	return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
+	return ( (pParticle->m_uchStartAlpha/255.0f) * sin( M_PI_F * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
 }
 
 //-----------------------------------------------------------------------------
