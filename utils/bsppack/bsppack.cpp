@@ -10,9 +10,8 @@
 #include "cmdlib.h"
 #include "zip_utils.h"
 
-class CBSPPack final : public IBSPPack 
+struct CBSPPack final : public IBSPPack 
 {
-public:
 	void LoadBSPFile( IFileSystem *pFileSystem, char *filename ) override;
 	void WriteBSPFile( char *filename ) override;
 	void ClearPackFile( void ) override;
