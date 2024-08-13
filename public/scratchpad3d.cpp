@@ -233,7 +233,7 @@ bool CScratchPad3D::LoadCommandsFromFile( )
 
 		if( !pCmd )
 		{
-			Assert( !"LoadCommandsFromFile: invalid file" );
+			AssertMsg( false, "LoadCommandsFromFile: invalid file" );
 			m_pFileSystem->Close( fp );
 			return false;
 		}
@@ -597,9 +597,9 @@ IFileSystem* ScratchPad3D_SetupFileSystem()
 	if( !pModule )
 		return NULL;
 
-	CreateInterfaceFn fn = Sys_GetFactory( pModule );
+	CreateInterfaceFnT<IFileSystem> fn = Sys_GetFactory<IFileSystem>( pModule );
 	IFileSystem *pFileSystem;
-	if( !fn || (pFileSystem = (IFileSystem *)fn( FILESYSTEM_INTERFACE_VERSION, NULL )) == NULL )
+	if( !fn || (pFileSystem = fn( FILESYSTEM_INTERFACE_VERSION, NULL )) == NULL )
 	{
 		Sys_UnloadModule( pModule );
 		return NULL;

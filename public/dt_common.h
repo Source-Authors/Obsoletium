@@ -128,7 +128,7 @@ typedef enum
 class DVariant
 {
 public:
-				DVariant()				{m_Type = DPT_Float;}
+				DVariant() : DVariant{0.0f} {}
 				DVariant(float val)		{m_Type = DPT_Float; m_Float = val;}
 				
 				const char *ToString()

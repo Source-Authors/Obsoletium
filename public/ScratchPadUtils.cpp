@@ -367,8 +367,8 @@ void ScratchPad_DrawArrowSimple(
 		vDirection,
 		vColor,
 		flLength,
-		flLength * 1.0/15,
-		flLength * 3.0/15,
+		flLength * 1.0f/15,
+		flLength * 3.0f/15,
 		4,
 		4 );
 }

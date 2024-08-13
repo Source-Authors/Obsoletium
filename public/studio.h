@@ -13,7 +13,7 @@
 #pragma once
 #endif
 
-#include "basetypes.h"
+#include "tier0/basetypes.h"
 #include "mathlib/vector2d.h"
 #include "mathlib/vector.h"
 #include "mathlib/vector4d.h"
@@ -21,12 +21,12 @@
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
 #include "mathlib/mathlib.h"
-#include "utlvector.h"
-#include "utlhash.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlhash.h"
 #include "datamap.h"
-#include "generichash.h"
+#include "tier1/generichash.h"
 #include "localflexcontroller.h"
-#include "utlsymbol.h"
+#include "tier1/utlsymbol.h"
 
 #define STUDIO_ENABLE_PERF_COUNTERS
 
@@ -115,7 +115,6 @@ struct mstudioaxisinterpbone_t
 	Quaternion		quat[6];// X+, X-, Y+, Y-, Z+, Z-
 
 	mstudioaxisinterpbone_t() : control{-1}, axis{-1} {}
-private:
 	// No copy constructors allowed
 	mstudioaxisinterpbone_t(const mstudioaxisinterpbone_t& vOther) = delete;
 };
@@ -130,7 +129,6 @@ struct mstudioquatinterpinfo_t
 	Quaternion		quat;		// new angle
 
 	mstudioquatinterpinfo_t() : inv_tolerance{FLOAT32_NAN} {}
-private:
 	// No copy constructors allowed
 	mstudioquatinterpinfo_t(const mstudioquatinterpinfo_t& vOther) = delete;
 };
@@ -141,10 +139,9 @@ struct mstudioquatinterpbone_t
 	int				control;// local transformation to check
 	int				numtriggers;
 	int				triggerindex;
-	inline mstudioquatinterpinfo_t *pTrigger( int i ) const { return  (mstudioquatinterpinfo_t *)(((byte *)this) + triggerindex) + i; };
+	inline mstudioquatinterpinfo_t *pTrigger( int i ) const { return  (mstudioquatinterpinfo_t *)(((byte *)this) + triggerindex) + i; }
 
 	mstudioquatinterpbone_t() : control{-1}, numtriggers{-1}, triggerindex{-1} {}
-private:
 	// No copy constructors allowed
 	mstudioquatinterpbone_t(const mstudioquatinterpbone_t& vOther) = delete;
 };
@@ -229,7 +226,6 @@ struct mstudioaimatbone_t
 	Vector			basepos;
 
 	mstudioaimatbone_t() : parent{-1}, aim{-1} {}
-private:
 	// No copy constructors allowed
 	mstudioaimatbone_t(const mstudioaimatbone_t& vOther) = delete;
 };
@@ -239,7 +235,7 @@ struct mstudiobone_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int					sznameindex;
-	inline char * const pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char * pszName( void ) const { return ((char *)this) + sznameindex; }
 	int		 			parent;		// parent bone
 	int					bonecontroller[6];	// bone controller index, -1 == none
 
@@ -257,15 +253,14 @@ struct mstudiobone_t
 	int					proctype;
 	int					procindex;		// procedural rule
 	mutable int			physicsbone;	// index into physically simulated bone
-	inline void *pProcedure( ) const { if (procindex == 0) return NULL; else return  (void *)(((byte *)this) + procindex); };
+	inline void *pProcedure( ) const { if (procindex == 0) return nullptr; else return  (void *)(((byte *)this) + procindex); }
 	int					surfacepropidx;	// index into string tablefor property name
-	inline char * const pszSurfaceProp( void ) const { return ((char *)this) + surfacepropidx; }
+	inline const char * pszSurfaceProp( void ) const { return ((char *)this) + surfacepropidx; }
 	int					contents;		// See BSPFlags.h for the contents flags
 
 	int					unused[8];		// remove as appropriate
 
 	mstudiobone_t() = default;
-private:
 	// No copy constructors allowed
 	mstudiobone_t(const mstudiobone_t& vOther) = delete;
 };
@@ -277,37 +272,36 @@ struct mstudiolinearbone_t
 	int numbones;
 
 	int flagsindex;
-	inline int flags( int i ) const { Assert( i >= 0 && i < numbones); return *((int *)(((byte *)this) + flagsindex) + i); };
-	inline int *pflags( int i ) { Assert( i >= 0 && i < numbones); return ((int *)(((byte *)this) + flagsindex) + i); };
+	inline int flags( int i ) const { Assert( i >= 0 && i < numbones); return *((int *)(((byte *)this) + flagsindex) + i); }
+	inline int *pflags( int i ) { Assert( i >= 0 && i < numbones); return ((int *)(((byte *)this) + flagsindex) + i); }
 
 	int	parentindex;
-	inline int parent( int i ) const { Assert( i >= 0 && i < numbones); return *((int *)(((byte *)this) + parentindex) + i); };
+	inline int parent( int i ) const { Assert( i >= 0 && i < numbones); return *((int *)(((byte *)this) + parentindex) + i); }
 
 	int	posindex;
-	inline Vector pos( int i ) const { Assert( i >= 0 && i < numbones); return *((Vector *)(((byte *)this) + posindex) + i); };
+	inline Vector pos( int i ) const { Assert( i >= 0 && i < numbones); return *((Vector *)(((byte *)this) + posindex) + i); }
 
 	int quatindex;
-	inline Quaternion quat( int i ) const { Assert( i >= 0 && i < numbones); return *((Quaternion *)(((byte *)this) + quatindex) + i); };
+	inline Quaternion quat( int i ) const { Assert( i >= 0 && i < numbones); return *((Quaternion *)(((byte *)this) + quatindex) + i); }
 
 	int rotindex;
-	inline RadianEuler rot( int i ) const { Assert( i >= 0 && i < numbones); return *((RadianEuler *)(((byte *)this) + rotindex) + i); };
+	inline RadianEuler rot( int i ) const { Assert( i >= 0 && i < numbones); return *((RadianEuler *)(((byte *)this) + rotindex) + i); }
 
 	int posetoboneindex;
-	inline matrix3x4_t poseToBone( int i ) const { Assert( i >= 0 && i < numbones); return *((matrix3x4_t *)(((byte *)this) + posetoboneindex) + i); };
+	inline matrix3x4_t poseToBone( int i ) const { Assert( i >= 0 && i < numbones); return *((matrix3x4_t *)(((byte *)this) + posetoboneindex) + i); }
 
 	int	posscaleindex;
-	inline Vector posscale( int i ) const { Assert( i >= 0 && i < numbones); return *((Vector *)(((byte *)this) + posscaleindex) + i); };
+	inline Vector posscale( int i ) const { Assert( i >= 0 && i < numbones); return *((Vector *)(((byte *)this) + posscaleindex) + i); }
 
 	int	rotscaleindex;
-	inline Vector rotscale( int i ) const { Assert( i >= 0 && i < numbones); return *((Vector *)(((byte *)this) + rotscaleindex) + i); };
+	inline Vector rotscale( int i ) const { Assert( i >= 0 && i < numbones); return *((Vector *)(((byte *)this) + rotscaleindex) + i); }
 
 	int	qalignmentindex;
-	inline Quaternion qalignment( int i ) const { Assert( i >= 0 && i < numbones); return *((Quaternion *)(((byte *)this) + qalignmentindex) + i); };
+	inline Quaternion qalignment( int i ) const { Assert( i >= 0 && i < numbones); return *((Quaternion *)(((byte *)this) + qalignmentindex) + i); }
 
 	int unused[6];
 
 	mstudiolinearbone_t() = default;
-private:
 	// No copy constructors allowed
 	mstudiolinearbone_t(const mstudiolinearbone_t& vOther) = delete;
 };
@@ -338,7 +332,6 @@ struct mstudioboneflexdrivercontrol_t
 	float m_flMax;				// Max value of bone component mapped to 1 on flex controller
 
 	mstudioboneflexdrivercontrol_t() : m_nBoneComponent{-1}, m_nFlexControllerIndex{-1}, m_flMin{FLOAT32_NAN}, m_flMax{FLOAT32_NAN} {}
-private:
 	// No copy constructors allowed
 	mstudioboneflexdrivercontrol_t( const mstudioboneflexdrivercontrol_t &vOther ) = delete;
 };
@@ -364,7 +357,6 @@ struct mstudioboneflexdriver_t
 	int unused[3];	//-V730_NOINIT
 
 	mstudioboneflexdriver_t() : m_nBoneIndex{-1}, m_nControlCount{-1}, m_nControlIndex{-1} {}
-private:
 	// No copy constructors allowed
 	mstudioboneflexdriver_t( const mstudioboneflexdriver_t &vOther ) = delete;
 };
@@ -436,8 +428,6 @@ struct mstudiobbox_t
 	}
 
 	mstudiobbox_t() : bone{-1}, group{-1}, szhitboxnameindex{-1} {}
-
-private:
 	// No copy constructors allowed
 	mstudiobbox_t(const mstudiobbox_t& vOther) = delete;
 };
@@ -447,9 +437,9 @@ struct mstudiomodelgroup_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int					szlabelindex;	// textual name
-	inline char * const pszLabel( void ) const { return ((char *)this) + szlabelindex; }
+	inline const char * pszLabel( void ) const { return ((char *)this) + szlabelindex; }
 	int					sznameindex;	// file name
-	inline char * const pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char * pszName( void ) const { return ((char *)this) + sznameindex; }
 };
 
 struct mstudiomodelgrouplookup_t
@@ -469,7 +459,7 @@ struct mstudioevent_t
 	char				options[64];
 
 	int					szeventindex;
-	inline char * const pszEventName( void ) const { return ((char *)this) + szeventindex; }
+	inline const char * pszEventName( void ) const { return ((char *)this) + szeventindex; }
 };
 
 #define	ATTACHMENT_FLAG_WORLD_ALIGN 0x10000
@@ -479,7 +469,7 @@ struct mstudioattachment_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int					sznameindex;
-	inline char * const pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char * pszName( void ) const { return ((char *)this) + sznameindex; }
 	unsigned int		flags;
 	int					localbone;
 	matrix3x4_t			local; // attachment point
@@ -500,8 +490,6 @@ struct mstudioikerror_t
 	Quaternion	q;
 
 	mstudioikerror_t() = default;
-
-private:
 	// No copy constructors allowed
 	mstudioikerror_t(const mstudioikerror_t& vOther) = delete;
 };
@@ -513,10 +501,9 @@ struct mstudiocompressedikerror_t
 	DECLARE_BYTESWAP_DATADESC();
 	float	scale[6];
 	short	offset[6];
-	inline mstudioanimvalue_t *pAnimvalue( int i ) const { if (offset[i] > 0) return  (mstudioanimvalue_t *)(((byte *)this) + offset[i]); else return NULL; };
-	mstudiocompressedikerror_t() { memset( scale, 0, sizeof(scale) ); memset( offset, 0, sizeof(offset) );}
+	inline mstudioanimvalue_t *pAnimvalue( int i ) const { if (offset[i] > 0) return  (mstudioanimvalue_t *)(((byte *)this) + offset[i]); else return nullptr; }
 
-private:
+	mstudiocompressedikerror_t() { memset( scale, 0, sizeof(scale) ); memset( offset, 0, sizeof(offset) );}
 	// No copy constructors allowed
 	mstudiocompressedikerror_t(const mstudiocompressedikerror_t& vOther) = delete;
 };
@@ -539,12 +526,12 @@ struct mstudioikrule_t
 	Quaternion	q;
 
 	int			compressedikerrorindex;
-	inline mstudiocompressedikerror_t *pCompressedError() const { return (mstudiocompressedikerror_t *)(((byte *)this) + compressedikerrorindex); };
+	inline mstudiocompressedikerror_t *pCompressedError() const { return (mstudiocompressedikerror_t *)(((byte *)this) + compressedikerrorindex); }
 	int			unused2; //-V730_NOINIT
 
 	int			iStart;
 	int			ikerrorindex;
-	inline mstudioikerror_t *pError( int i ) const { return  (ikerrorindex) ? (mstudioikerror_t *)(((byte *)this) + ikerrorindex) + (i - iStart) : NULL; };
+	inline mstudioikerror_t *pError( int i ) const { return  (ikerrorindex) ? (mstudioikerror_t *)(((byte *)this) + ikerrorindex) + (i - iStart) : nullptr; }
 
 	float		start;	// beginning of influence
 	float		peak;	// start of full influence
@@ -561,13 +548,11 @@ struct mstudioikrule_t
 	int			unused8; //-V730_NOINIT
 
 	int			szattachmentindex;		// name of world attachment
-	inline char * const pszAttachment( void ) const { return ((char *)this) + szattachmentindex; }
+	inline const char * pszAttachment( void ) const { return ((char *)this) + szattachmentindex; }
 
 	int			unused[7]; //-V730_NOINIT
 
-	mstudioikrule_t() {}
-
-private:
+	mstudioikrule_t() = default;
 	// No copy constructors allowed
 	mstudioikrule_t(const mstudioikrule_t& vOther) = delete;
 };
@@ -599,7 +584,7 @@ struct mstudiolocalhierarchy_t
 	int			iStart;			// first frame 
 
 	int			localanimindex;
-	inline mstudiocompressedikerror_t *pLocalAnim() const { return (mstudiocompressedikerror_t *)(((byte *)this) + localanimindex); };
+	inline mstudiocompressedikerror_t *pLocalAnim() const { return (mstudiocompressedikerror_t *)(((byte *)this) + localanimindex); }
 
 	int			unused[4];
 };
@@ -621,7 +606,7 @@ struct mstudioanim_valueptr_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	short	offset[3];
-	inline mstudioanimvalue_t *pAnimvalue( int i ) const { if (offset[i] > 0) return  (mstudioanimvalue_t *)(((byte *)this) + offset[i]); else return NULL; };
+	inline mstudioanimvalue_t *pAnimvalue( int i ) const { if (offset[i] > 0) return  (mstudioanimvalue_t *)(((byte *)this) + offset[i]); else return nullptr; }
 };
 
 #define STUDIO_ANIM_RAWPOS	0x01 // Vector48
@@ -640,17 +625,17 @@ struct mstudioanim_t
 	byte				flags;		// weighing options
 
 	// valid for animating data only
-	inline byte				*pData( void ) const { return (((byte *)this) + sizeof( struct mstudioanim_t )); };
-	inline mstudioanim_valueptr_t	*pRotV( void ) const { return (mstudioanim_valueptr_t *)(pData()); };
-	inline mstudioanim_valueptr_t	*pPosV( void ) const { return (mstudioanim_valueptr_t *)(pData()) + ((flags & STUDIO_ANIM_ANIMROT) != 0); };
+	inline byte				*pData( void ) const { return (((byte *)this) + sizeof( struct mstudioanim_t )); }
+	inline mstudioanim_valueptr_t	*pRotV( void ) const { return (mstudioanim_valueptr_t *)(pData()); }
+	inline mstudioanim_valueptr_t	*pPosV( void ) const { return (mstudioanim_valueptr_t *)(pData()) + ((flags & STUDIO_ANIM_ANIMROT) != 0); }
 
 	// valid if animation unvaring over timeline
-	inline Quaternion48		*pQuat48( void ) const { return (Quaternion48 *)(pData()); };
-	inline Quaternion64		*pQuat64( void ) const { return (Quaternion64 *)(pData()); };
-	inline Vector48			*pPos( void ) const { return (Vector48 *)(pData() + ((flags & STUDIO_ANIM_RAWROT) != 0) * sizeof( *pQuat48() ) + ((flags & STUDIO_ANIM_RAWROT2) != 0) * sizeof( *pQuat64() ) ); };
+	inline Quaternion48		*pQuat48( void ) const { return (Quaternion48 *)(pData()); }
+	inline Quaternion64		*pQuat64( void ) const { return (Quaternion64 *)(pData()); }
+	inline Vector48			*pPos( void ) const { return (Vector48 *)(pData() + ((flags & STUDIO_ANIM_RAWROT) != 0) * sizeof( *pQuat48() ) + ((flags & STUDIO_ANIM_RAWROT2) != 0) * sizeof( *pQuat64() ) ); }
 
 	short				nextoffset;
-	inline mstudioanim_t	*pNext( void ) const { if (nextoffset != 0) return  (mstudioanim_t *)(((byte *)this) + nextoffset); else return NULL; };
+	inline mstudioanim_t	*pNext( void ) const { if (nextoffset != 0) return  (mstudioanim_t *)(((byte *)this) + nextoffset); else return nullptr; }
 };
 
 struct mstudiomovement_t
@@ -665,7 +650,6 @@ struct mstudiomovement_t
 	Vector				position;	// relative to start of animation???
 
 	mstudiomovement_t() : endframe{-1}, motionflags{0}, v0{FLOAT32_NAN}, v1{FLOAT32_NAN}, angle{FLOAT32_NAN} {}
-private:
 	// No copy constructors allowed
 	mstudiomovement_t(const mstudiomovement_t& vOther) = delete;
 };
@@ -694,7 +678,7 @@ struct mstudioanimdesc_t
 	inline studiohdr_t	*pStudiohdr( void ) const { return (studiohdr_t *)(((byte *)this) + baseptr); }
 
 	int					sznameindex;
-	inline char * const pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char * pszName( void ) const { return ((char *)this) + sznameindex; }
 
 	float				fps;		// frames per second	
 	int					flags;		// looping/non-looping flags
@@ -704,7 +688,7 @@ struct mstudioanimdesc_t
 	// piecewise movement
 	int					nummovements;
 	int					movementindex;
-	inline mstudiomovement_t * const pMovement( int i ) const { return (mstudiomovement_t *)(((byte *)this) + movementindex) + i; };
+	inline const mstudiomovement_t * pMovement( int i ) const { return (mstudiomovement_t *)(((byte *)this) + movementindex) + i; }
 
 	int					unused1[6];			// remove as appropriate (and zero if loading older versions)	 //-V730_NOINIT
 
@@ -725,16 +709,15 @@ struct mstudioanimdesc_t
 
 	int					sectionindex;
 	int					sectionframes; // number of frames used in each fast lookup section, zero if not used
-	inline mstudioanimsections_t * const pSection( int i ) const { return (mstudioanimsections_t *)(((byte *)this) + sectionindex) + i; }
+	inline const mstudioanimsections_t * pSection( int i ) const { return (mstudioanimsections_t *)(((byte *)this) + sectionindex) + i; }
 
 	short				zeroframespan;	// frames per span
 	short				zeroframecount; // number of spans
 	int					zeroframeindex;
-	byte				*pZeroFrameData( ) const { if (zeroframeindex) return (((byte *)this) + zeroframeindex); else return NULL; };
+	byte				*pZeroFrameData( ) const { if (zeroframeindex) return (((byte *)this) + zeroframeindex); else return nullptr; }
 	mutable float		zeroframestalltime;		// saved during read stalls
 
 	mstudioanimdesc_t() = default;
-private:
 	// No copy constructors allowed
 	mstudioanimdesc_t(const mstudioanimdesc_t& vOther) = delete;
 };
@@ -744,10 +727,8 @@ struct mstudioikrule_t;
 struct mstudioautolayer_t
 {
 	DECLARE_BYTESWAP_DATADESC();
-//private:
 	short				iSequence;
 	short				iPose;
-//public:
 	int					flags;
 	float				start;	// beginning of influence
 	float				peak;	// start of full influence
@@ -760,7 +741,7 @@ struct mstudioactivitymodifier_t
 	DECLARE_BYTESWAP_DATADESC();
 	
 	int					sznameindex;
-	inline char			*pszName() { return (sznameindex) ? (char *)(((byte *)this) + sznameindex ) : NULL; }
+	inline char			*pszName() { return (sznameindex) ? (char *)(((byte *)this) + sznameindex ) : nullptr; }
 };
 
 // sequence descriptions
@@ -771,10 +752,10 @@ struct mstudioseqdesc_t
 	inline studiohdr_t	*pStudiohdr( void ) const { return (studiohdr_t *)(((byte *)this) + baseptr); }
 
 	int					szlabelindex;
-	inline char * const pszLabel( void ) const { return ((char *)this) + szlabelindex; }
+	inline const char * pszLabel( void ) const { return ((char *)this) + szlabelindex; }
 
 	int					szactivitynameindex;
-	inline char * const pszActivityName( void ) const { return ((char *)this) + szactivitynameindex; }
+	inline const char * pszActivityName( void ) const { return ((char *)this) + szactivitynameindex; }
 
 	int					flags;		// looping/non-looping flags
 
@@ -783,7 +764,7 @@ struct mstudioseqdesc_t
 
 	int					numevents;
 	int					eventindex;
-	inline mstudioevent_t *pEvent( int i ) const { Assert( i >= 0 && i < numevents); return (mstudioevent_t *)(((byte *)this) + eventindex) + i; };
+	inline mstudioevent_t *pEvent( int i ) const { Assert( i >= 0 && i < numevents); return (mstudioevent_t *)(((byte *)this) + eventindex) + i; }
 	
 	Vector				bbmin;		// per sequence bounding box
 	Vector				bbmax;		
@@ -837,11 +818,11 @@ struct mstudioseqdesc_t
 
 	int					numautolayers;	//
 	int					autolayerindex;
-	inline mstudioautolayer_t *pAutolayer( int i ) const { Assert( i >= 0 && i < numautolayers); return (mstudioautolayer_t *)(((byte *)this) + autolayerindex) + i; };
+	inline mstudioautolayer_t *pAutolayer( int i ) const { Assert( i >= 0 && i < numautolayers); return (mstudioautolayer_t *)(((byte *)this) + autolayerindex) + i; }
 
 	int					weightlistindex;
-	inline float		*pBoneweight( int i ) const { return ((float *)(((byte *)this) + weightlistindex) + i); };
-	inline float		weight( int i ) const { return *(pBoneweight( i)); };
+	inline float		*pBoneweight( int i ) const { return ((float *)(((byte *)this) + weightlistindex) + i); }
+	inline float		weight( int i ) const { return *(pBoneweight( i)); }
 
 	// FIXME: make this 2D instead of 2x1D arrays
 	int					posekeyindex;
@@ -850,23 +831,23 @@ struct mstudioseqdesc_t
 
 	int					numiklocks;
 	int					iklockindex;
-	inline mstudioiklock_t *pIKLock( int i ) const { Assert( i >= 0 && i < numiklocks); return (mstudioiklock_t *)(((byte *)this) + iklockindex) + i; };
+	inline mstudioiklock_t *pIKLock( int i ) const { Assert( i >= 0 && i < numiklocks); return (mstudioiklock_t *)(((byte *)this) + iklockindex) + i; }
 
 	// Key values
 	int					keyvalueindex;
 	int					keyvaluesize;
-	inline const char * KeyValueText( void ) const { return keyvaluesize != 0 ? ((char *)this) + keyvalueindex : NULL; }
+	inline const char * KeyValueText( void ) const { return keyvaluesize != 0 ? ((char *)this) + keyvalueindex : nullptr; }
 
 	int					cycleposeindex;		// index of pose parameter to use as cycle index
 
 	int					activitymodifierindex;
 	int					numactivitymodifiers;
-	inline mstudioactivitymodifier_t *pActivityModifier( int i ) const { Assert( i >= 0 && i < numactivitymodifiers); return activitymodifierindex != 0 ? (mstudioactivitymodifier_t *)(((byte *)this) + activitymodifierindex) + i : NULL; };
+	inline mstudioactivitymodifier_t *pActivityModifier( int i ) const { Assert( i >= 0 && i < numactivitymodifiers); return activitymodifierindex != 0 ? (mstudioactivitymodifier_t *)(((byte *)this) + activitymodifierindex) + i : nullptr; }
 
 	int					unused[5];		// remove/add as appropriate (grow back to 8 ints on version change!) //-V730_NOINIT
 
-	mstudioseqdesc_t(){}
-private:
+	mstudioseqdesc_t() = default;
+	mstudioseqdesc_t& operator=(const mstudioseqdesc_t& vOther) = default;
 	// No copy constructors allowed
 	mstudioseqdesc_t(const mstudioseqdesc_t& vOther) = delete;
 };
@@ -876,7 +857,7 @@ struct mstudioposeparamdesc_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int					sznameindex;
-	inline char * const pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char * pszName( void ) const { return ((char *)this) + sznameindex; }
 	int					flags;	// ????
 	float				start;	// starting value
 	float				end;	// ending value
@@ -887,7 +868,7 @@ struct mstudioflexdesc_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int					szFACSindex;
-	inline char * const pszFACS( void ) const { return ((char *)this) + szFACSindex; }
+	inline const char * pszFACS( void ) const { return ((char *)this) + szFACSindex; }
 };
 
 
@@ -896,9 +877,9 @@ struct mstudioflexcontroller_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int					sztypeindex;
-	inline char * const pszType( void ) const { return ((char *)this) + sztypeindex; }
+	inline const char * pszType( void ) const { return ((char *)this) + sztypeindex; }
 	int					sznameindex;
-	inline char * const pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char * pszName( void ) const { return ((char *)this) + sznameindex; }
 	mutable int			localToGlobal;	// remapped at load time to master list
 	float				min;
 	float				max;
@@ -919,7 +900,7 @@ struct mstudioflexcontrollerui_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int					sznameindex;
-	inline char * const pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char * pszName( void ) const { return ((char *)this) + sznameindex; }
 
 	// These are used like a union to save space
 	// Here are the possible configurations for a UI controller
@@ -935,31 +916,31 @@ struct mstudioflexcontrollerui_t
 
 	inline const mstudioflexcontroller_t *pController( void ) const
 	{
-		return !stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex0 ) : NULL;
+		return !stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex0 ) : nullptr;
 	}
-	inline char * const	pszControllerName( void ) const { return !stereo ? pController()->pszName() : NULL; }
-	inline int			controllerIndex( const CStudioHdr &cStudioHdr ) const;
+	inline const char *	pszControllerName( void ) const { return !stereo ? pController()->pszName() : nullptr; }
+	inline intp			controllerIndex( const CStudioHdr &cStudioHdr ) const;
 
 	inline const mstudioflexcontroller_t *pLeftController( void ) const
 	{
-		return stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex0 ) : NULL;
+		return stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex0 ) : nullptr;
 	}
-	inline char * const	pszLeftName( void ) const { auto *c = pLeftController(); return c ? c->pszName() : NULL; }
-	inline int			leftIndex( const CStudioHdr &cStudioHdr ) const;
+	inline const char *	pszLeftName( void ) const { auto *c = pLeftController(); return c ? c->pszName() : nullptr; }
+	inline intp			leftIndex( const CStudioHdr &cStudioHdr ) const;
 
 	inline const mstudioflexcontroller_t *pRightController( void ) const
 	{
-		return stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex1 ): NULL;
+		return stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex1 ): nullptr;
 	}
-	inline char * const	pszRightName( void ) const { auto *c = pRightController(); return c ? c->pszName() : NULL; }
-	inline int			rightIndex( const CStudioHdr &cStudioHdr ) const;
+	inline const char *	pszRightName( void ) const { auto *c = pRightController(); return c ? c->pszName() : nullptr; }
+	inline intp			rightIndex( const CStudioHdr &cStudioHdr ) const;
 
 	inline const mstudioflexcontroller_t *pNWayValueController( void ) const
 	{
-		return remaptype == FLEXCONTROLLER_REMAP_NWAY ? (mstudioflexcontroller_t *)( (char *)this + szindex2 ) : NULL;
+		return remaptype == FLEXCONTROLLER_REMAP_NWAY ? (mstudioflexcontroller_t *)( (char *)this + szindex2 ) : nullptr;
 	}
-	inline char * const	pszNWayValueName( void ) const { auto *c = pNWayValueController(); return c ? c->pszName() : NULL; }
-	inline int			nWayValueIndex( const CStudioHdr &cStudioHdr ) const;
+	inline char const *	pszNWayValueName( void ) const { auto *c = pNWayValueController(); return c ? c->pszName() : nullptr; }
+	inline intp			nWayValueIndex( const CStudioHdr &cStudioHdr ) const;
 
 	// Number of controllers this ui description contains, 1, 2 or 3
 	inline int			Count() const { return ( stereo ? 2 : 1 ) + ( remaptype == FLEXCONTROLLER_REMAP_NWAY ? 1 : 0 ); }
@@ -1121,10 +1102,10 @@ struct mstudioflex_t
 	int					numverts;
 	int					vertindex;
 
-	inline	mstudiovertanim_t *pVertanim( int i ) const { Assert( vertanimtype == STUDIO_VERT_ANIM_NORMAL ); return (mstudiovertanim_t *)(((byte *)this) + vertindex) + i; };
-	inline	mstudiovertanim_wrinkle_t *pVertanimWrinkle( int i ) const { Assert( vertanimtype == STUDIO_VERT_ANIM_WRINKLE ); return  (mstudiovertanim_wrinkle_t *)(((byte *)this) + vertindex) + i; };
+	inline	mstudiovertanim_t *pVertanim( int i ) const { Assert( vertanimtype == STUDIO_VERT_ANIM_NORMAL ); return (mstudiovertanim_t *)(((byte *)this) + vertindex) + i; }
+	inline	mstudiovertanim_wrinkle_t *pVertanimWrinkle( int i ) const { Assert( vertanimtype == STUDIO_VERT_ANIM_WRINKLE ); return  (mstudiovertanim_wrinkle_t *)(((byte *)this) + vertindex) + i; }
 
-	inline	byte *pBaseVertanim( ) const { return ((byte *)this) + vertindex; };
+	inline	byte *pBaseVertanim( ) const { return ((byte *)this) + vertindex; }
 	inline	int	VertAnimSizeBytes() const { return ( vertanimtype == STUDIO_VERT_ANIM_NORMAL ) ? sizeof(mstudiovertanim_t) : sizeof(mstudiovertanim_wrinkle_t); }
 
 	int					flexpair;	// second flex desc
@@ -1151,7 +1132,7 @@ struct mstudioflexrule_t
 	int					flex;
 	int					numops;
 	int					opindex;
-	inline mstudioflexop_t *iFlexOp( int i ) const { return  (mstudioflexop_t *)(((byte *)this) + opindex) + i; };
+	inline mstudioflexop_t *iFlexOp( int i ) const { return  (mstudioflexop_t *)(((byte *)this) + opindex) + i; }
 };
 
 // 16 bytes
@@ -1177,8 +1158,6 @@ struct mstudiovertex_t
 	Vector2D			m_vecTexCoord;
 
 	mstudiovertex_t() { memset( &m_BoneWeights, 0, sizeof(m_BoneWeights) ); }
-
-private:
 	// No copy constructors allowed
 	mstudiovertex_t(const mstudiovertex_t& vOther) = delete;
 };
@@ -1188,14 +1167,17 @@ struct mstudiotexture_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int						sznameindex;
-	inline char * const		pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char *	pszName( void ) const { return ((char *)this) + sznameindex; }
 	int						flags;
 	int						used;
-    int						unused1;
+	int						unused1;
 	mutable IMaterial		*material;  // fixme: this needs to go away . .isn't used by the engine, but is used by studiomdl
 	mutable void			*clientmaterial;	// gary, replace with client material pointer if used
-	
+#if PLATFORM_64BITS
+	int						unused[8];
+#else
 	int						unused[10];
+#endif
 };
 
 // eyeball
@@ -1203,7 +1185,7 @@ struct mstudioeyeball_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int					sznameindex;
-	inline char * const pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char * pszName( void ) const { return ((char *)this) + sznameindex; }
 	int		bone;
 	Vector	org;
 	float	zoffset;
@@ -1228,8 +1210,7 @@ struct mstudioeyeball_t
 	char	unused3[3]; //-V730_NOINIT
 	int		unused4[7]; //-V730_NOINIT
 
-	mstudioeyeball_t(){}
-private:
+	mstudioeyeball_t() = default;
 	// No copy constructors allowed
 	mstudioeyeball_t(const mstudioeyeball_t& vOther) = delete;
 };
@@ -1244,7 +1225,6 @@ struct mstudioiklink_t
 	Vector	unused0;	// unused
 
 	mstudioiklink_t() : bone{-1} {}
-private:
 	// No copy constructors allowed
 	mstudioiklink_t(const mstudioiklink_t& vOther) = delete;
 };
@@ -1253,11 +1233,11 @@ struct mstudioikchain_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int				sznameindex;
-	inline char * const pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char * pszName( void ) const { return ((char *)this) + sznameindex; }
 	int				linktype;
 	int				numlinks;
 	int				linkindex;
-	inline mstudioiklink_t *pLink( int i ) const { return (mstudioiklink_t *)(((byte *)this) + linkindex) + i; };
+	inline mstudioiklink_t *pLink( int i ) const { return (mstudioiklink_t *)(((byte *)this) + linkindex) + i; }
 	// FIXME: add unused entries
 };
 
@@ -1286,7 +1266,19 @@ struct mstudio_modelvertexdata_t
 	// base of external vertex data stores
 	const void			*pVertexData;
 	const void			*pTangentData;
+
+    const void	*GetVertexData() const {
+        return pVertexData;
+    }
+    const void	*GetTangentData() const {
+        return pTangentData;
+    }
 };
+
+#ifdef PLATFORM_64BITS
+// Ensure packing on x64 and x86 is same.
+#pragma pack(push, 4)
+#endif
 
 struct mstudio_meshvertexdata_t
 {
@@ -1301,12 +1293,25 @@ struct mstudio_meshvertexdata_t
 	int					GetModelVertexIndex( int i ) const;
 	int					GetGlobalVertexIndex( int i ) const;
 
+#ifdef PLATFORM_64BITS
+	// 64 bit requires 4 byte value here to match 32 bit definition
+    int                index_modelvertexdata;
+#else
 	// indirection to this mesh's model's vertex data
 	const mstudio_modelvertexdata_t	*modelvertexdata;
+#endif
 
 	// used for fixup calcs when culling top level lods
 	// expected number of mesh verts at desired lod
 	int					numLODVertexes[MAX_NUM_LODS];
+
+	const mstudio_modelvertexdata_t	*pModelVertexData() const {
+#ifdef PLATFORM_64BITS
+        return *(const mstudio_modelvertexdata_t **)((byte *)this + index_modelvertexdata);
+#else
+        return modelvertexdata;
+#endif
+    }
 };
 
 struct mstudiomesh_t
@@ -1320,13 +1325,13 @@ struct mstudiomesh_t
 	int					numvertices;		// number of unique vertices/normals/texcoords
 	int					vertexoffset;		// vertex mstudiovertex_t
 
-	// Access thin/fat mesh vertex data (only one will return a non-NULL result)
-	const mstudio_meshvertexdata_t	*GetVertexData(		void *pModelData = NULL );
-	const thinModelVertices_t		*GetThinVertexData(	void *pModelData = NULL );
+	// Access thin/fat mesh vertex data (only one will return a non-nullptr result)
+	const mstudio_meshvertexdata_t	*GetVertexData(		void *pModelData = nullptr );
+	const thinModelVertices_t		*GetThinVertexData(	void *pModelData = nullptr );
 	
 	int					numflexes;			// vertex animation
 	int					flexindex;
-	inline mstudioflex_t *pFlex( int i ) const { return (mstudioflex_t *)(((byte *)this) + flexindex) + i; };
+	inline mstudioflex_t *pFlex( int i ) const { return (mstudioflex_t *)(((byte *)this) + flexindex) + i; }
 
 	// special codes for material operations
 	int					materialtype;
@@ -1339,10 +1344,15 @@ struct mstudiomesh_t
 
 	mstudio_meshvertexdata_t vertexdata;
 
-	int					unused[8]; // remove as appropriate //-V730_NOINIT
+#ifdef PLATFORM_64BITS
+	const mstudio_modelvertexdata_t *modelvertexdata;
 
-	mstudiomesh_t(){}
-private:
+    int					unused[6]; // remove as appropriate //-V730_NOINIT
+#else
+	int					unused[8]; // remove as appropriate //-V730_NOINIT
+#endif
+
+	mstudiomesh_t() = default;
 	// No copy constructors allowed
 	mstudiomesh_t(const mstudiomesh_t& vOther) = delete;
 };
@@ -1360,7 +1370,7 @@ struct mstudiomodel_t
 
 	int					nummeshes;	
 	int					meshindex;
-	inline mstudiomesh_t *pMesh( int i ) const { return (mstudiomesh_t *)(((byte *)this) + meshindex) + i; };
+	inline mstudiomesh_t *pMesh( int i ) const { return (mstudiomesh_t *)(((byte *)this) + meshindex) + i; }
 
 	// cache purposes
 	int					numvertices;		// number of unique vertices/normals/texcoords
@@ -1370,25 +1380,35 @@ struct mstudiomodel_t
 	// These functions are defined in application-specific code:
 	const vertexFileHeader_t			*CacheVertexData(			void *pModelData );
 
-	// Access thin/fat mesh vertex data (only one will return a non-NULL result)
-	const mstudio_modelvertexdata_t		*GetVertexData(		void *pModelData = NULL );
-	const thinModelVertices_t			*GetThinVertexData(	void *pModelData = NULL );
+	// Access thin/fat mesh vertex data (only one will return a non-nullptr result)
+	const mstudio_modelvertexdata_t		*GetVertexData(		void *pModelData = nullptr );
+	const thinModelVertices_t			*GetThinVertexData(	void *pModelData = nullptr );
 
 	int					numattachments;
 	int					attachmentindex;
 
 	int					numeyeballs;
 	int					eyeballindex;
-	inline  mstudioeyeball_t *pEyeball( int i ) { return (mstudioeyeball_t *)(((byte *)this) + eyeballindex) + i; };
+	inline  mstudioeyeball_t *pEyeball( int i ) { return (mstudioeyeball_t *)(((byte *)this) + eyeballindex) + i; }
 
 	mstudio_modelvertexdata_t vertexdata;
 
+#ifdef PLATFORM_64BITS
+	// sizeof(vertexdata) == 16
+	int					unused[6];		// remove as appropriate
+#else
+	// sizeof(vertexdata) == 8
 	int					unused[8];		// remove as appropriate
+#endif
 };
+
+#ifdef PLATFORM_64BITS
+#pragma pack(pop)
+#endif
 
 inline bool mstudio_modelvertexdata_t::HasTangentData( void ) const 
 {
-	return (pTangentData != NULL);
+	return (pTangentData != nullptr);
 }
 
 inline int mstudio_modelvertexdata_t::GetGlobalVertexIndex( int i ) const
@@ -1407,7 +1427,7 @@ inline int mstudio_modelvertexdata_t::GetGlobalTangentIndex( int i ) const
 
 inline mstudiovertex_t *mstudio_modelvertexdata_t::Vertex( int i ) const 
 {
-	return (mstudiovertex_t *)pVertexData + GetGlobalVertexIndex( i );
+	return (mstudiovertex_t *)GetVertexData() + GetGlobalVertexIndex( i );
 }
 
 inline Vector *mstudio_modelvertexdata_t::Position( int i ) const 
@@ -1425,7 +1445,7 @@ inline Vector4D *mstudio_modelvertexdata_t::TangentS( int i ) const
 	// NOTE: The tangents vector is 16-bytes in a separate array
 	// because it only exists on the high end, and if I leave it out
 	// of the mstudiovertex_t, the vertex is 64-bytes (good for low end)
-	return (Vector4D *)pTangentData + GetGlobalTangentIndex( i );
+	return (Vector4D *)GetTangentData() + GetGlobalTangentIndex( i );
 }
 
 inline Vector2D *mstudio_modelvertexdata_t::Texcoord( int i ) const 
@@ -1445,18 +1465,23 @@ inline mstudiomodel_t *mstudiomesh_t::pModel() const
 
 inline bool mstudio_meshvertexdata_t::HasTangentData( void ) const
 {
-	return modelvertexdata->HasTangentData();
+	return pModelVertexData()->HasTangentData();
 }
 
 inline const mstudio_meshvertexdata_t *mstudiomesh_t::GetVertexData( void *pModelData )
 {
 	// get this mesh's model's vertex data (allow for mstudiomodel_t::GetVertexData
-	// returning NULL if the data has been converted to 'thin' vertices)
+	// returning nullptr if the data has been converted to 'thin' vertices)
 	this->pModel()->GetVertexData( pModelData );
-	vertexdata.modelvertexdata = &( this->pModel()->vertexdata );
+#ifdef PLATFORM_64BITS
+	modelvertexdata = &this->pModel()->vertexdata;
+	vertexdata.index_modelvertexdata = (byte *)&modelvertexdata - (byte *)&vertexdata;
+#else
+	vertexdata.modelvertexdata = &this->pModel()->vertexdata;
+#endif
 
-	if ( !vertexdata.modelvertexdata->pVertexData )
-		return NULL;
+	if ( !vertexdata.pModelVertexData()->pVertexData )
+		return nullptr;
 
 	return &vertexdata;
 }
@@ -1475,37 +1500,37 @@ inline int mstudio_meshvertexdata_t::GetModelVertexIndex( int i ) const
 
 inline int mstudio_meshvertexdata_t::GetGlobalVertexIndex( int i ) const
 {
-	return modelvertexdata->GetGlobalVertexIndex( GetModelVertexIndex( i ) );
+	return pModelVertexData()->GetGlobalVertexIndex( GetModelVertexIndex( i ) );
 }
 
 inline Vector *mstudio_meshvertexdata_t::Position( int i ) const 
 {
-	return modelvertexdata->Position( GetModelVertexIndex( i ) ); 
+	return pModelVertexData()->Position( GetModelVertexIndex( i ) ); 
 };
 
 inline Vector *mstudio_meshvertexdata_t::Normal( int i ) const 
 {
-	return modelvertexdata->Normal( GetModelVertexIndex( i ) ); 
+	return pModelVertexData()->Normal( GetModelVertexIndex( i ) ); 
 };
 
 inline Vector4D *mstudio_meshvertexdata_t::TangentS( int i ) const
 {
-	return modelvertexdata->TangentS( GetModelVertexIndex( i ) );
+	return pModelVertexData()->TangentS( GetModelVertexIndex( i ) );
 }
 
 inline Vector2D *mstudio_meshvertexdata_t::Texcoord( int i ) const 
 {
-	return modelvertexdata->Texcoord( GetModelVertexIndex( i ) ); 
+	return pModelVertexData()->Texcoord( GetModelVertexIndex( i ) ); 
 };
 
 inline mstudioboneweight_t *mstudio_meshvertexdata_t::BoneWeights( int i ) const 
 {
-	return modelvertexdata->BoneWeights( GetModelVertexIndex( i ) ); 
+	return pModelVertexData()->BoneWeights( GetModelVertexIndex( i ) ); 
 };
 
 inline mstudiovertex_t *mstudio_meshvertexdata_t::Vertex( int i ) const
 {
-	return modelvertexdata->Vertex( GetModelVertexIndex( i ) );
+	return pModelVertexData()->Vertex( GetModelVertexIndex( i ) );
 }
 
 // a group of studio model data
@@ -1600,11 +1625,11 @@ struct mstudiobodyparts_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int					sznameindex;
-	inline char * const pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char * pszName( void ) const { return ((char *)this) + sznameindex; }
 	int					nummodels;
 	int					base;
 	int					modelindex; // index into models array
-	inline mstudiomodel_t *pModel( int i ) const { return (mstudiomodel_t *)(((byte *)this) + modelindex) + i; };
+	inline mstudiomodel_t *pModel( int i ) const { return (mstudiomodel_t *)(((byte *)this) + modelindex) + i; }
 };
 
 
@@ -1625,10 +1650,10 @@ struct mstudiohitboxset_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int					sznameindex;
-	inline char * const	pszName( void ) const { return ((char *)this) + sznameindex; }
+	inline const char *	pszName( void ) const { return ((char *)this) + sznameindex; }
 	int					numhitboxes;
 	int					hitboxindex;
-	inline mstudiobbox_t *pHitbox( int i ) const { return (mstudiobbox_t *)(((byte *)this) + hitboxindex) + i; };
+	inline mstudiobbox_t *pHitbox( int i ) const { return (mstudiobbox_t *)(((byte *)this) + hitboxindex) + i; }
 };
 
 
@@ -1654,7 +1679,7 @@ struct mstudiosrcbonetransform_t
 class virtualgroup_t 
 {
 public:
-	virtualgroup_t( void ) { cache = NULL; };
+	virtualgroup_t( void ) { cache = nullptr; }
 	// tool dependant.  In engine this is a model_t, in tool it's a direct pointer
 	void *cache;
 	// converts cache entry into a usable studiohdr_t *
@@ -1719,7 +1744,7 @@ struct virtualmodel_t
 		if ( (unsigned)sequence >= (unsigned)m_seq.Count() )
 		{
 			Assert( 0 );
-			return 0;
+			return nullptr;
 		}
 		return &m_group[ m_seq[ sequence ].group ];
 	} // Note: user must manage mutex for this
@@ -1741,8 +1766,8 @@ struct thinModelVertices_t
 {
 	void Init( int numBoneInfluences, Vector *positions, unsigned short *normals, float *boneWeights, char *boneIndices )
 	{
-		Assert( positions != NULL );
-		Assert( normals   != NULL );
+		Assert( positions != nullptr );
+		Assert( normals   != nullptr );
 		Assert( ( numBoneInfluences >= 0 ) && ( numBoneInfluences <= 3 ) );
 		Assert( numBoneInfluences > 0 ? !!boneIndices : !boneIndices );
 		Assert( numBoneInfluences > 1 ? !!boneWeights : !boneWeights );
@@ -1839,8 +1864,8 @@ private:
 	void GetBoneWeights( int vertIndex, mstudioboneweight_t *pBoneWeights ) const
 	{
 		Assert( pBoneWeights );
-		Assert( ( m_numBoneInfluences <= 1 ) || ( m_boneWeights != NULL ) );
-		Assert( ( m_numBoneInfluences <= 0 ) || ( m_boneIndices != NULL ) );
+		Assert( ( m_numBoneInfluences <= 1 ) || ( m_boneWeights != nullptr ) );
+		Assert( ( m_numBoneInfluences <= 0 ) || ( m_boneIndices != nullptr ) );
 		int    numStoredWeights = max( 0, ( m_numBoneInfluences - 1 ) );
 		float *pBaseWeight	= m_boneWeights + vertIndex*numStoredWeights;
 		char  *pBaseIndex	= m_boneIndices + vertIndex*m_numBoneInfluences;
@@ -1897,25 +1922,25 @@ public:
 	const mstudiovertex_t *GetVertexData() const
 	{
 		if ( ( id == MODEL_VERTEX_FILE_ID ) && ( vertexDataStart != 0 ) )
-			return ( mstudiovertex_t * ) ( vertexDataStart + (byte *)this );
+			return ( const mstudiovertex_t * ) ( vertexDataStart + (byte *)this );
 		else
-			return NULL;
+			return nullptr;
 	}
 	// Accessor to (fat) tangent vertex data (tangents aren't stored in compressed data)
 	const Vector4D *GetTangentData() const
 	{
 		if ( ( id == MODEL_VERTEX_FILE_ID ) && ( tangentDataStart != 0 ) )
-			return ( Vector4D * ) ( tangentDataStart + (byte *)this );
+			return ( const Vector4D * ) ( tangentDataStart + (const byte *)this );
 		else
-			return NULL;
+			return nullptr;
 	}
 	// Accessor to thin vertex data
 	const  thinModelVertices_t *GetThinVertexData() const
 	{
 		if ( ( id == MODEL_VERTEX_FILE_THIN_ID ) && ( vertexDataStart != 0 ) )
-			return ( thinModelVertices_t * ) ( vertexDataStart + (byte *)this );
+			return ( const thinModelVertices_t * ) ( vertexDataStart + (const byte *)this );
 		else
-			return NULL;
+			return nullptr;
 	}
 };
 
@@ -1925,16 +1950,16 @@ inline const mstudio_modelvertexdata_t * mstudiomodel_t::GetVertexData( void *pM
 	const vertexFileHeader_t * pVertexHdr = CacheVertexData( pModelData );
 	if ( !pVertexHdr )
 	{
-		vertexdata.pVertexData = NULL;
-		vertexdata.pTangentData = NULL;
-		return NULL;
+		vertexdata.pVertexData = nullptr;
+		vertexdata.pTangentData = nullptr;
+		return nullptr;
 	}
 
 	vertexdata.pVertexData  = pVertexHdr->GetVertexData();
 	vertexdata.pTangentData = pVertexHdr->GetTangentData();
 
-	if ( !vertexdata.pVertexData )
-		return NULL;
+	if ( !vertexdata.pVertexData ) //-V1051
+		return nullptr;
 
 	return &vertexdata;
 }
@@ -1944,7 +1969,7 @@ inline const thinModelVertices_t * mstudiomodel_t::GetThinVertexData( void *pMod
 {
 	const vertexFileHeader_t * pVertexHdr = CacheVertexData( pModelData );
 	if ( !pVertexHdr )
-		return NULL;
+		return nullptr;
 
 	return pVertexHdr->GetThinVertexData();
 }
@@ -2047,10 +2072,10 @@ struct studiohdr2_t
 	inline float		MaxEyeDeflection() const { return flMaxEyeDeflection != 0.0f ? flMaxEyeDeflection : 0.866f; } // default to cos(30) if not set
 
 	int linearboneindex;
-	inline mstudiolinearbone_t *pLinearBones() const { return (linearboneindex) ? (mstudiolinearbone_t *)(((byte *)this) + linearboneindex) : NULL; }
+	inline mstudiolinearbone_t *pLinearBones() const { return (linearboneindex) ? (mstudiolinearbone_t *)(((byte *)this) + linearboneindex) : nullptr; }
 
 	int sznameindex;
-	inline char *pszName() { return (sznameindex) ? (char *)(((byte *)this) + sznameindex ) : NULL; }
+	inline char *pszName() { return (sznameindex) ? (char *)(((byte *)this) + sznameindex ) : nullptr; }
 
 	int m_nBoneFlexDriverCount;
 	int m_nBoneFlexDriverIndex;
@@ -2086,13 +2111,13 @@ struct studiohdr_t
 
 	int					numbones;			// bones
 	int					boneindex;
-	inline mstudiobone_t *pBone( int i ) const { Assert( i >= 0 && i < numbones); return (mstudiobone_t *)(((byte *)this) + boneindex) + i; };
+	inline mstudiobone_t *pBone( int i ) const { Assert( i >= 0 && i < numbones); return (mstudiobone_t *)(((byte *)this) + boneindex) + i; }
 	int					RemapSeqBone( int iSequence, int iLocalBone ) const;	// maps local sequence bone to global bone
 	int					RemapAnimBone( int iAnim, int iLocalBone ) const;		// maps local animations bone to global bone
 
 	int					numbonecontrollers;		// bone controllers
 	int					bonecontrollerindex;
-	inline mstudiobonecontroller_t *pBonecontroller( int i ) const { Assert( i >= 0 && i < numbonecontrollers); return (mstudiobonecontroller_t *)(((byte *)this) + bonecontrollerindex) + i; };
+	inline mstudiobonecontroller_t *pBonecontroller( int i ) const { Assert( i >= 0 && i < numbonecontrollers); return (mstudiobonecontroller_t *)(((byte *)this) + bonecontrollerindex) + i; }
 
 	int					numhitboxsets;
 	int					hitboxsetindex;
@@ -2102,37 +2127,31 @@ struct studiohdr_t
 	{ 
 		Assert( i >= 0 && i < numhitboxsets); 
 		return (mstudiohitboxset_t *)(((byte *)this) + hitboxsetindex ) + i; 
-	};
+	}
 
 	// Calls through to hitbox to determine size of specified set
 	inline mstudiobbox_t *pHitbox( int i, int set ) const 
 	{ 
 		mstudiohitboxset_t const *s = pHitboxSet( set );
-		if ( !s )
-			return NULL;
-
 		return s->pHitbox( i );
-	};
+	}
 
 	// Calls through to set to get hitbox count for set
 	inline int			iHitboxCount( int set ) const
 	{
 		mstudiohitboxset_t const *s = pHitboxSet( set );
-		if ( !s )
-			return 0;
-
 		return s->numhitboxes;
-	};
+	}
 
 	// file local animations? and sequences
 //private:
 	int					numlocalanim;			// animations/poses
 	int					localanimindex;		// animation descriptions
-  	inline mstudioanimdesc_t *pLocalAnimdesc( int i ) const { if (i < 0 || i >= numlocalanim) i = 0; return (mstudioanimdesc_t *)(((byte *)this) + localanimindex) + i; };
+  	inline mstudioanimdesc_t *pLocalAnimdesc( int i ) const { if (i < 0 || i >= numlocalanim) i = 0; return (mstudioanimdesc_t *)(((byte *)this) + localanimindex) + i; }
 
 	int					numlocalseq;				// sequences
 	int					localseqindex;
-  	inline mstudioseqdesc_t *pLocalSeqdesc( int i ) const { if (i < 0 || i >= numlocalseq) i = 0; return (mstudioseqdesc_t *)(((byte *)this) + localseqindex) + i; };
+  	inline mstudioseqdesc_t *pLocalSeqdesc( int i ) const { if (i < 0 || i >= numlocalseq) i = 0; return (mstudioseqdesc_t *)(((byte *)this) + localseqindex) + i; }
 
 //public:
 	bool				SequencesAvailable() const;
@@ -2156,29 +2175,29 @@ struct studiohdr_t
 	// raw textures
 	int					numtextures;
 	int					textureindex;
-	inline mstudiotexture_t *pTexture( int i ) const { Assert( i >= 0 && i < numtextures ); return (mstudiotexture_t *)(((byte *)this) + textureindex) + i; }; 
+	inline mstudiotexture_t *pTexture( int i ) const { Assert( i >= 0 && i < numtextures ); return (mstudiotexture_t *)(((byte *)this) + textureindex) + i; } 
 
 
 	// raw textures search paths
 	int					numcdtextures;
 	int					cdtextureindex;
-	inline char			*pCdtexture( int i ) const { return (((char *)this) + *((int *)(((byte *)this) + cdtextureindex) + i)); };
+	inline char			*pCdtexture( int i ) const { return (((char *)this) + *((int *)(((byte *)this) + cdtextureindex) + i)); }
 
 	// replaceable textures tables
 	int					numskinref;
 	int					numskinfamilies;
 	int					skinindex;
-	inline short		*pSkinref( int i ) const { return (short *)(((byte *)this) + skinindex) + i; };
+	inline short		*pSkinref( int i ) const { return (short *)(((byte *)this) + skinindex) + i; }
 
 	int					numbodyparts;		
 	int					bodypartindex;
-	inline mstudiobodyparts_t	*pBodypart( int i ) const { return (mstudiobodyparts_t *)(((byte *)this) + bodypartindex) + i; };
+	inline mstudiobodyparts_t	*pBodypart( int i ) const { return (mstudiobodyparts_t *)(((byte *)this) + bodypartindex) + i; }
 
 	// queryable attachable points
 //private:
 	int					numlocalattachments;
 	int					localattachmentindex;
-	inline mstudioattachment_t	*pLocalAttachment( int i ) const { Assert( i >= 0 && i < numlocalattachments); return (mstudioattachment_t *)(((byte *)this) + localattachmentindex) + i; };
+	inline mstudioattachment_t	*pLocalAttachment( int i ) const { Assert( i >= 0 && i < numlocalattachments); return (mstudioattachment_t *)(((byte *)this) + localattachmentindex) + i; }
 //public:
 	int					GetNumAttachments( void ) const;
 	const mstudioattachment_t &pAttachment( int i ) const;
@@ -2192,60 +2211,60 @@ struct studiohdr_t
 	int					localnodeindex;
 	int					localnodenameindex;
 	inline char			*pszLocalNodeName( int iNode ) const { Assert( iNode >= 0 && iNode < numlocalnodes); return (((char *)this) + *((int *)(((byte *)this) + localnodenameindex) + iNode)); }
-	inline byte			*pLocalTransition( int i ) const { Assert( i >= 0 && i < (numlocalnodes * numlocalnodes)); return (byte *)(((byte *)this) + localnodeindex) + i; };
+	inline byte			*pLocalTransition( int i ) const { Assert( i >= 0 && i < (numlocalnodes * numlocalnodes)); return (byte *)(((byte *)this) + localnodeindex) + i; }
 
 //public:
 	int					EntryNode( int iSequence );
 	int					ExitNode( int iSequence );
-	char				*pszNodeName( int iNode );
+	const char			*pszNodeName( int iNode );
 	int					GetTransition( int iFrom, int iTo ) const;
 
 	int					numflexdesc;
 	int					flexdescindex;
-	inline mstudioflexdesc_t *pFlexdesc( int i ) const { Assert( i >= 0 && i < numflexdesc); return (mstudioflexdesc_t *)(((byte *)this) + flexdescindex) + i; };
+	inline mstudioflexdesc_t *pFlexdesc( int i ) const { Assert( i >= 0 && i < numflexdesc); return (mstudioflexdesc_t *)(((byte *)this) + flexdescindex) + i; }
 
 	int					numflexcontrollers;
 	int					flexcontrollerindex;
-	inline mstudioflexcontroller_t *pFlexcontroller( LocalFlexController_t i ) const { Assert( numflexcontrollers == 0 || ( i >= 0 && i < numflexcontrollers ) ); return (mstudioflexcontroller_t *)(((byte *)this) + flexcontrollerindex) + i; };
+	inline mstudioflexcontroller_t *pFlexcontroller( LocalFlexController_t i ) const { Assert( numflexcontrollers == 0 || ( i >= 0 && i < numflexcontrollers ) ); return (mstudioflexcontroller_t *)(((byte *)this) + flexcontrollerindex) + i; }
 
 	int					numflexrules;
 	int					flexruleindex;
-	inline mstudioflexrule_t *pFlexRule( int i ) const { Assert( i >= 0 && i < numflexrules); return (mstudioflexrule_t *)(((byte *)this) + flexruleindex) + i; };
+	inline mstudioflexrule_t *pFlexRule( int i ) const { Assert( i >= 0 && i < numflexrules); return (mstudioflexrule_t *)(((byte *)this) + flexruleindex) + i; }
 
 	int					numikchains;
 	int					ikchainindex;
-	inline mstudioikchain_t *pIKChain( int i ) const { Assert( i >= 0 && i < numikchains); return (mstudioikchain_t *)(((byte *)this) + ikchainindex) + i; };
+	inline mstudioikchain_t *pIKChain( int i ) const { Assert( i >= 0 && i < numikchains); return (mstudioikchain_t *)(((byte *)this) + ikchainindex) + i; }
 
 	int					nummouths;
 	int					mouthindex;
-	inline mstudiomouth_t *pMouth( int i ) const { Assert( i >= 0 && i < nummouths); return (mstudiomouth_t *)(((byte *)this) + mouthindex) + i; };
+	inline mstudiomouth_t *pMouth( int i ) const { Assert( i >= 0 && i < nummouths); return (mstudiomouth_t *)(((byte *)this) + mouthindex) + i; }
 
 //private:
 	int					numlocalposeparameters;
 	int					localposeparamindex;
-	inline mstudioposeparamdesc_t *pLocalPoseParameter( int i ) const { Assert( i >= 0 && i < numlocalposeparameters); return (mstudioposeparamdesc_t *)(((byte *)this) + localposeparamindex) + i; };
+	inline mstudioposeparamdesc_t *pLocalPoseParameter( int i ) const { Assert( i >= 0 && i < numlocalposeparameters); return (mstudioposeparamdesc_t *)(((byte *)this) + localposeparamindex) + i; }
 //public:
 	int					GetNumPoseParameters( void ) const;
 	const mstudioposeparamdesc_t &pPoseParameter( int i );
 	int					GetSharedPoseParameter( int iSequence, int iLocalPose ) const;
 
 	int					surfacepropindex;
-	inline char * const pszSurfaceProp( void ) const { return ((char *)this) + surfacepropindex; }
+	inline const char * pszSurfaceProp( void ) const { return ((char *)this) + surfacepropindex; }
 
 	// Key values
 	int					keyvalueindex;
 	int					keyvaluesize;
-	inline const char * KeyValueText( void ) const { return keyvaluesize != 0 ? ((char *)this) + keyvalueindex : NULL; }
+	inline const char * KeyValueText( void ) const { return keyvaluesize != 0 ? ((char *)this) + keyvalueindex : nullptr; }
 
 	int					numlocalikautoplaylocks;
 	int					localikautoplaylockindex;
-	inline mstudioiklock_t *pLocalIKAutoplayLock( int i ) const { Assert( i >= 0 && i < numlocalikautoplaylocks); return (mstudioiklock_t *)(((byte *)this) + localikautoplaylockindex) + i; };
+	inline mstudioiklock_t *pLocalIKAutoplayLock( int i ) const { Assert( i >= 0 && i < numlocalikautoplaylocks); return (mstudioiklock_t *)(((byte *)this) + localikautoplaylockindex) + i; }
 
 	int					GetNumIKAutoplayLocks( void ) const;
 	const mstudioiklock_t &pIKAutoplayLock( int i );
 	int					CountAutoplaySequences() const;
 	int					CopyAutoplaySequences( unsigned short *pOut, int outCount ) const;
-	int					GetAutoplayList( unsigned short **pOut ) const;
+	intp				GetAutoplayList( unsigned short **pOut ) const;
 
 	// The collision model mass that jay wanted
 	float				mass;
@@ -2254,21 +2273,21 @@ struct studiohdr_t
 	// external animations, models, etc.
 	int					numincludemodels;
 	int					includemodelindex;
-	inline mstudiomodelgroup_t *pModelGroup( int i ) const { Assert( i >= 0 && i < numincludemodels); return (mstudiomodelgroup_t *)(((byte *)this) + includemodelindex) + i; };
+	inline mstudiomodelgroup_t *pModelGroup( int i ) const { Assert( i >= 0 && i < numincludemodels); return (mstudiomodelgroup_t *)(((byte *)this) + includemodelindex) + i; }
 	// implementation specific call to get a named model
 	const studiohdr_t	*FindModel( void **cache, char const *modelname ) const;
 
 	// implementation specific back pointer to virtual data
-	mutable void		*virtualModel;
+	int					virtualModel;
 	virtualmodel_t		*GetVirtualModel( void ) const;
 
 	// for demand loaded animation blocks
-	int					szanimblocknameindex;	
-	inline char * const pszAnimBlockName( void ) const { return ((char *)this) + szanimblocknameindex; }
+	int					szanimblocknameindex;
+	inline const char *	pszAnimBlockName( void ) const { return ((char *)this) + szanimblocknameindex; }
 	int					numanimblocks;
 	int					animblockindex;
-	inline mstudioanimblock_t *pAnimBlock( int i ) const { Assert( i > 0 && i < numanimblocks); return (mstudioanimblock_t *)(((byte *)this) + animblockindex) + i; };
-	mutable void		*animblockModel;
+	inline mstudioanimblock_t *pAnimBlock( int i ) const { Assert( i > 0 && i < numanimblocks); return (mstudioanimblock_t *)(((byte *)this) + animblockindex) + i; }
+	int					animblockModel;
 	byte *				GetAnimBlock( int i ) const;
 
 	int					bonetablebynameindex;
@@ -2276,8 +2295,8 @@ struct studiohdr_t
 
 	// used by tools only that don't cache, but persist mdl's peer data
 	// engine uses virtualModel to back link to cache pointers
-	void				*pVertexBase;
-	void				*pIndexBase;
+	int					pVertexBase;
+	int					pIndexBase;
 
 	// if STUDIOHDR_FLAGS_CONSTANT_DIRECTIONAL_LIGHT_DOT is set,
 	// this value is used to calculate directional components of lighting 
@@ -2320,17 +2339,17 @@ struct studiohdr_t
 
 	inline float		MaxEyeDeflection() const { return studiohdr2index ? pStudioHdr2()->MaxEyeDeflection() : 0.866f; } // default to cos(30) if not set
 
-	inline mstudiolinearbone_t *pLinearBones() const { return studiohdr2index ? pStudioHdr2()->pLinearBones() : NULL; }
+	inline mstudiolinearbone_t *pLinearBones() const { return studiohdr2index ? pStudioHdr2()->pLinearBones() : nullptr; }
 
 	inline int			BoneFlexDriverCount() const { return studiohdr2index ? pStudioHdr2()->m_nBoneFlexDriverCount : 0; }
-	inline const mstudioboneflexdriver_t* BoneFlexDriver( int i ) const { Assert( i >= 0 && i < BoneFlexDriverCount() ); return studiohdr2index ? pStudioHdr2()->pBoneFlexDriver( i ) : NULL; }
+	inline const mstudioboneflexdriver_t* BoneFlexDriver( int i ) const { Assert( i >= 0 && i < BoneFlexDriverCount() ); return studiohdr2index ? pStudioHdr2()->pBoneFlexDriver( i ) : nullptr; }
 
 	// NOTE: No room to add stuff? Up the .mdl file format version 
 	// [and move all fields in studiohdr2_t into studiohdr_t and kill studiohdr2_t],
 	// or add your stuff to studiohdr2_t. See NumSrcBoneTransforms/SrcBoneTransform for the pattern to use.
 	int					unused2[1]; //-V730_NOINIT
 
-	studiohdr_t() {}
+	studiohdr_t() = default;
 
 private:
 	// No copy constructors allowed
@@ -2352,18 +2371,18 @@ class CStudioHdr
 {
 public:
 	CStudioHdr( void );
-	CStudioHdr( const studiohdr_t *pStudioHdr, IMDLCache *mdlcache = NULL );
+	CStudioHdr( const studiohdr_t *pStudioHdr, IMDLCache *mdlcache = nullptr );
 	~CStudioHdr() { Term(); }
 
-	void Init( const studiohdr_t *pStudioHdr, IMDLCache *mdlcache = NULL );
+	void Init( const studiohdr_t *pStudioHdr, IMDLCache *mdlcache = nullptr );
 	void Term();
 
 public:
-	inline bool IsVirtual( void ) { return (m_pVModel != NULL); };
-	inline bool IsValid( void ) { return (m_pStudioHdr != NULL); };
-	inline bool IsReadyForAccess( void ) const { return (m_pStudioHdr != NULL); };
-	inline virtualmodel_t		*GetVirtualModel( void ) const { return m_pVModel; };
-	inline const studiohdr_t	*GetRenderHdr( void ) const { return m_pStudioHdr; };
+	inline bool IsVirtual( void ) { return (m_pVModel != nullptr); }
+	inline bool IsValid( void ) { return (m_pStudioHdr != nullptr); }
+	inline bool IsReadyForAccess( void ) const { return (m_pStudioHdr != nullptr); }
+	inline virtualmodel_t		*GetVirtualModel( void ) const { return m_pVModel; }
+	inline const studiohdr_t	*GetRenderHdr( void ) const { return m_pStudioHdr; }
 	const studiohdr_t *pSeqStudioHdr( int sequence );
 	const studiohdr_t *pAnimStudioHdr( int animation );
 
@@ -2380,8 +2399,8 @@ private:
 	CThreadFastMutex	m_FrameUnlockCounterMutex;
 
 public:
-	inline int			numbones( void ) const { return m_pStudioHdr->numbones; };
-	inline mstudiobone_t *pBone( int i ) const { return m_pStudioHdr->pBone( i ); };
+	inline int			numbones( void ) const { return m_pStudioHdr->numbones; }
+	inline mstudiobone_t *pBone( int i ) const { return m_pStudioHdr->pBone( i ); }
 	int					RemapAnimBone( int iAnim, int iLocalBone ) const;		// maps local animations bone to global bone
 	int					RemapSeqBone( int iSequence, int iLocalBone ) const;	// maps local sequence bone to global bone
 
@@ -2407,7 +2426,7 @@ public:
 
 	int					EntryNode( int iSequence );
 	int					ExitNode( int iSequence );
-	char				*pszNodeName( int iNode );
+	const char			*pszNodeName( int iNode );
 	// FIXME: where should this one be?
 	int					GetTransition( int iFrom, int iTo ) const;
 
@@ -2418,65 +2437,65 @@ public:
 	int					GetNumIKAutoplayLocks( void ) const;
 	const mstudioiklock_t &pIKAutoplayLock( int i );
 
-	inline int			CountAutoplaySequences() const { return m_pStudioHdr->CountAutoplaySequences(); };
-	inline int			CopyAutoplaySequences( unsigned short *pOut, int outCount ) const { return m_pStudioHdr->CopyAutoplaySequences( pOut, outCount ); };
-	inline int			GetAutoplayList( unsigned short **pOut ) const { return m_pStudioHdr->GetAutoplayList( pOut ); };
+	inline int			CountAutoplaySequences() const { return m_pStudioHdr->CountAutoplaySequences(); }
+	inline int			CopyAutoplaySequences( unsigned short *pOut, int outCount ) const { return m_pStudioHdr->CopyAutoplaySequences( pOut, outCount ); }
+	inline intp			GetAutoplayList( unsigned short **pOut ) const { return m_pStudioHdr->GetAutoplayList( pOut ); }
 
-	inline int			GetNumBoneControllers( void ) const { return m_pStudioHdr->numbonecontrollers; };
-	inline mstudiobonecontroller_t *pBonecontroller( int i ) const { return m_pStudioHdr->pBonecontroller( i ); };
+	inline int			GetNumBoneControllers( void ) const { return m_pStudioHdr->numbonecontrollers; }
+	inline mstudiobonecontroller_t *pBonecontroller( int i ) const { return m_pStudioHdr->pBonecontroller( i ); }
 
-	inline int			numikchains() const { return m_pStudioHdr->numikchains; };
-	inline int			GetNumIKChains( void ) const { return m_pStudioHdr->numikchains; };
-	inline mstudioikchain_t	*pIKChain( int i ) const { return m_pStudioHdr->pIKChain( i ); };
+	inline int			numikchains() const { return m_pStudioHdr->numikchains; }
+	inline int			GetNumIKChains( void ) const { return m_pStudioHdr->numikchains; }
+	inline mstudioikchain_t	*pIKChain( int i ) const { return m_pStudioHdr->pIKChain( i ); }
 
-	inline int			numflexrules() const { return m_pStudioHdr->numflexrules; };
-	inline mstudioflexrule_t *pFlexRule( int i ) const { return m_pStudioHdr->pFlexRule( i ); };
+	inline int			numflexrules() const { return m_pStudioHdr->numflexrules; }
+	inline mstudioflexrule_t *pFlexRule( int i ) const { return m_pStudioHdr->pFlexRule( i ); }
 
-	inline int			numflexdesc() const{ return m_pStudioHdr->numflexdesc; };
-	inline mstudioflexdesc_t *pFlexdesc( int i ) const { return m_pStudioHdr->pFlexdesc( i ); };
+	inline int			numflexdesc() const{ return m_pStudioHdr->numflexdesc; }
+	inline mstudioflexdesc_t *pFlexdesc( int i ) const { return m_pStudioHdr->pFlexdesc( i ); }
 
-	inline LocalFlexController_t			numflexcontrollers() const{ return (LocalFlexController_t)m_pStudioHdr->numflexcontrollers; };
-	inline mstudioflexcontroller_t *pFlexcontroller( LocalFlexController_t i ) const { return m_pStudioHdr->pFlexcontroller( i ); };
+	inline LocalFlexController_t			numflexcontrollers() const{ return (LocalFlexController_t)m_pStudioHdr->numflexcontrollers; }
+	inline mstudioflexcontroller_t *pFlexcontroller( LocalFlexController_t i ) const { return m_pStudioHdr->pFlexcontroller( i ); }
 
-	inline int			numflexcontrollerui() const{ return m_pStudioHdr->numflexcontrollerui; };
-	inline mstudioflexcontrollerui_t *pFlexcontrollerUI( int i ) const { return m_pStudioHdr->pFlexControllerUI( i ); };
+	inline int			numflexcontrollerui() const{ return m_pStudioHdr->numflexcontrollerui; }
+	inline mstudioflexcontrollerui_t *pFlexcontrollerUI( int i ) const { return m_pStudioHdr->pFlexControllerUI( i ); }
 
 	//inline const char	*name() const { return m_pStudioHdr->name; }; // deprecated -- remove after full xbox merge
-	inline const char	*pszName() const { return m_pStudioHdr->pszName(); };
+	inline const char	*pszName() const { return m_pStudioHdr->pszName(); }
 
-	inline int			numbonecontrollers() const { return m_pStudioHdr->numbonecontrollers; };
+	inline int			numbonecontrollers() const { return m_pStudioHdr->numbonecontrollers; }
 
-	inline int			numhitboxsets() const { return m_pStudioHdr->numhitboxsets; };
-	inline mstudiohitboxset_t	*pHitboxSet( int i ) const { return m_pStudioHdr->pHitboxSet( i ); };
+	inline int			numhitboxsets() const { return m_pStudioHdr->numhitboxsets; }
+	inline mstudiohitboxset_t	*pHitboxSet( int i ) const { return m_pStudioHdr->pHitboxSet( i ); }
 
-	inline mstudiobbox_t *pHitbox( int i, int set ) const { return m_pStudioHdr->pHitbox( i, set ); }; 
-	inline int			iHitboxCount( int set ) const { return m_pStudioHdr->iHitboxCount( set ); };
+	inline mstudiobbox_t *pHitbox( int i, int set ) const { return m_pStudioHdr->pHitbox( i, set ); } 
+	inline int			iHitboxCount( int set ) const { return m_pStudioHdr->iHitboxCount( set ); }
 
-	inline int			numbodyparts() const { return m_pStudioHdr->numbodyparts; };		
-	inline mstudiobodyparts_t	*pBodypart( int i ) const { return m_pStudioHdr->pBodypart( i ); };
+	inline int			numbodyparts() const { return m_pStudioHdr->numbodyparts; }
+	inline mstudiobodyparts_t	*pBodypart( int i ) const { return m_pStudioHdr->pBodypart( i ); }
 
 	inline int			numskinfamilies() const { return m_pStudioHdr->numskinfamilies; }
 
-	inline Vector		eyeposition() const { return m_pStudioHdr->eyeposition; };
+	inline Vector		eyeposition() const { return m_pStudioHdr->eyeposition; }
 
-	inline int			flags() const { return m_pStudioHdr->flags; };
+	inline int			flags() const { return m_pStudioHdr->flags; }
 
-	inline char			*const pszSurfaceProp( void ) const { return m_pStudioHdr->pszSurfaceProp(); };
+	inline const char		*pszSurfaceProp( void ) const { return m_pStudioHdr->pszSurfaceProp(); }
 
-	inline float		mass() const { return m_pStudioHdr->mass; };
+	inline float		mass() const { return m_pStudioHdr->mass; }
 	inline int			contents() const { return m_pStudioHdr->contents; }
 
-	inline const byte	*GetBoneTableSortedByName() const { return m_pStudioHdr->GetBoneTableSortedByName(); };
+	inline const byte	*GetBoneTableSortedByName() const { return m_pStudioHdr->GetBoneTableSortedByName(); }
 
-	inline Vector		illumposition() const { return m_pStudioHdr->illumposition; };
+	inline Vector		illumposition() const { return m_pStudioHdr->illumposition; }
 	
-	inline Vector		hull_min() const { return m_pStudioHdr->hull_min; };		// ideal movement hull size
-	inline Vector		hull_max() const { return m_pStudioHdr->hull_max; };			
+	inline Vector		hull_min() const { return m_pStudioHdr->hull_min; }		// ideal movement hull size
+	inline Vector		hull_max() const { return m_pStudioHdr->hull_max; }			
 
-	inline Vector		view_bbmin() const { return m_pStudioHdr->view_bbmin; };		// clipping bounding box
-	inline Vector		view_bbmax() const { return m_pStudioHdr->view_bbmax; };		
+	inline Vector		view_bbmin() const { return m_pStudioHdr->view_bbmin; }		// clipping bounding box
+	inline Vector		view_bbmax() const { return m_pStudioHdr->view_bbmax; }		
 
-	inline int			numtextures() const { return m_pStudioHdr->numtextures; };
+	inline int			numtextures() const { return m_pStudioHdr->numtextures; }
 
 	inline int			IllumPositionAttachmentIndex() const { return m_pStudioHdr->IllumPositionAttachmentIndex(); }
 
@@ -2586,16 +2605,19 @@ public:
 
 		// ctor
 		CActivityToSequenceMapping( void ) 
-			: m_pSequenceTuples(NULL), m_iSequenceTuplesCount(0), m_ActToSeqHash(8,0,0), m_expectedPStudioHdr(NULL), m_expectedVModel(NULL) 
+			: m_pSequenceTuples(nullptr), m_iSequenceTuplesCount(0)
 #if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
 			, m_bIsInitialized(false) 
 #endif
-		{};
+			, m_ActToSeqHash(8,0,0)
+			, m_expectedPStudioHdr(nullptr)
+			, m_expectedVModel(nullptr) 
+		{}
 
 		// dtor -- not virtual because this class has no inheritors
 		~CActivityToSequenceMapping()
 		{	
-			if ( m_pSequenceTuples != NULL )
+			if ( m_pSequenceTuples != nullptr )
 			{
 				delete[] m_pSequenceTuples->pActivityModifiers;
 				delete[] m_pSequenceTuples;
@@ -2652,8 +2674,8 @@ public:
 		const void *m_expectedVModel;
 
 		// double-check that the data I point to hasn't changed
-		bool ValidateAgainst( const CStudioHdr * RESTRICT pstudiohdr );
-		void SetValidationPair( const CStudioHdr *RESTRICT pstudiohdr );
+		bool ValidateAgainst( const CStudioHdr * RESTRICT pstudiohdr ) RESTRICT;
+		void SetValidationPair( const CStudioHdr *RESTRICT pstudiohdr ) RESTRICT;
 
 		friend class CStudioHdr;
 	};
@@ -2713,7 +2735,7 @@ public:
 		m_nPerfAnimatedBones = 0;
 		m_nPerfUsedBones = 0;
 		m_nPerfAnimationLayers = 0;
-	};
+	}
 
 	// timing info
 	mutable	int			m_nPerfAnimatedBones;
@@ -2808,7 +2830,7 @@ struct flexsettinghdr_t
 
 	int					numflexsettings;
 	int					flexsettingindex;
-	inline flexsetting_t *pSetting( int i ) const { return (flexsetting_t *)(((byte *)this) + flexsettingindex) + i; };
+	inline flexsetting_t *pSetting( int i ) const { return (flexsetting_t *)(((byte *)this) + flexsettingindex) + i; }
 	int					nameindex;
 
 	// look up flex settings by "index"
@@ -2819,14 +2841,14 @@ struct flexsettinghdr_t
 	{ 
 		if ( index < 0 || index >= numindexes )
 		{
-			return NULL;
+			return nullptr;
 		}
 
 		int i = *((int *)(((byte *)this) + indexindex) + index);
 		
 		if (i == -1) 
 		{
-			return NULL;
+			return nullptr;
 		}
 
 		return pSetting( i );
@@ -2835,11 +2857,11 @@ struct flexsettinghdr_t
 	// index names of "flexcontrollers"
 	int					numkeys;
 	int					keynameindex;
-	inline char			*pLocalName( int i ) const { return (char *)(((byte *)this) + *((int *)(((byte *)this) + keynameindex) + i)); };
+	inline char			*pLocalName( int i ) const { return (char *)(((byte *)this) + *((int *)(((byte *)this) + keynameindex) + i)); }
 
 	int					keymappingindex;
-	inline int			*pLocalToGlobal( int i ) const { return (int *)(((byte *)this) + keymappingindex) + i; };
-	inline int			LocalToGlobal( int i ) const { return *pLocalToGlobal( i ); };
+	inline int			*pLocalToGlobal( int i ) const { return (int *)(((byte *)this) + keymappingindex) + i; }
+	inline int			LocalToGlobal( int i ) const { return *pLocalToGlobal( i ); }
 };
 
 //-----------------------------------------------------------------------------
@@ -2849,7 +2871,7 @@ struct flexsettinghdr_t
 //			**weights - destination for weights array starting at index i.
 // Output : int
 //-----------------------------------------------------------------------------
-inline int flexsetting_t::psetting( byte *base, int i, flexweight_t **weights ) const
+inline int flexsetting_t::psetting( [[maybe_unused]] byte *base, int i, flexweight_t **weights ) const
 { 
 	// Grab array pointer
 	*weights = (flexweight_t *)(((byte *)this) + settingindex) + i;
@@ -2867,27 +2889,27 @@ inline int flexsetting_t::psetting( byte *base, int i, flexweight_t **weights ) 
 // If these functions are called and the ui controller isn't of the type
 // specified then -1 is returned
 //-----------------------------------------------------------------------------
-inline int mstudioflexcontrollerui_t::controllerIndex( const CStudioHdr &cStudioHdr ) const
+inline intp mstudioflexcontrollerui_t::controllerIndex( const CStudioHdr &cStudioHdr ) const
 {
 	return !stereo ? pController() - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
 }
 
 
-inline int mstudioflexcontrollerui_t::rightIndex( const CStudioHdr &cStudioHdr ) const
+inline intp mstudioflexcontrollerui_t::rightIndex( const CStudioHdr &cStudioHdr ) const
 {
 	auto *c = pRightController();
 	return c ? c - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
 }
 
 
-inline int mstudioflexcontrollerui_t::leftIndex( const CStudioHdr &cStudioHdr ) const
+inline intp mstudioflexcontrollerui_t::leftIndex( const CStudioHdr &cStudioHdr ) const
 {
 	auto *c = pLeftController();
 	return c ? c - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
 }
 
 
-inline int mstudioflexcontrollerui_t::nWayValueIndex( const CStudioHdr &cStudioHdr ) const
+inline intp mstudioflexcontrollerui_t::nWayValueIndex( const CStudioHdr &cStudioHdr ) const
 {
 	auto *c = pNWayValueController();
 	return c ? c - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
@@ -2897,7 +2919,7 @@ inline int mstudioflexcontrollerui_t::nWayValueIndex( const CStudioHdr &cStudioH
 inline const mstudioflexcontroller_t *mstudioflexcontrollerui_t::pController( int index ) const
 {
 	if ( index < 0 || index > Count() )
-		return NULL;
+		return nullptr;
 
 	if ( remaptype == FLEXCONTROLLER_REMAP_NWAY )
 	{
@@ -2910,17 +2932,17 @@ inline const mstudioflexcontroller_t *mstudioflexcontrollerui_t::pController( in
 		if ( index == 1 )
 			return pNWayValueController();
 
-		return NULL;
+		return nullptr;
 	}
 
 	if ( index > 1 )
-		return NULL;
+		return nullptr;
 
 	if ( stereo )
 		return (mstudioflexcontroller_t *)( ( char * ) this ) + *( &szindex0 + index ); //-V650
 
 	if ( index > 0 )
-		return NULL;
+		return nullptr;
 
 	return pController();
 }
@@ -3205,7 +3227,7 @@ inline int Studio_LoadVertexes( const vertexFileHeader_t *pTempVvdHdr, vertexFil
 		// copy vertexes
 		memcpy(
 			(mstudiovertex_t *)((byte *)pNewVvdHdr+pNewVvdHdr->vertexDataStart) + target,
-			(mstudiovertex_t *)((byte *)pTempVvdHdr+pTempVvdHdr->vertexDataStart) + pFixupTable[i].sourceVertexID,
+			(const mstudiovertex_t *)((const byte *)pTempVvdHdr+pTempVvdHdr->vertexDataStart) + pFixupTable[i].sourceVertexID,
 			pFixupTable[i].numVertexes*sizeof(mstudiovertex_t) );
 
 		if (bNeedsTangentS)
@@ -3213,7 +3235,7 @@ inline int Studio_LoadVertexes( const vertexFileHeader_t *pTempVvdHdr, vertexFil
 			// copy tangents
 			memcpy(
 				(Vector4D *)((byte *)pNewVvdHdr+pNewVvdHdr->tangentDataStart) + target,
-				(Vector4D *)((byte *)pTempVvdHdr+pTempVvdHdr->tangentDataStart) + pFixupTable[i].sourceVertexID,
+				(const Vector4D *)((const byte *)pTempVvdHdr+pTempVvdHdr->tangentDataStart) + pFixupTable[i].sourceVertexID,
 				pFixupTable[i].numVertexes*sizeof(Vector4D) );
 		}
 

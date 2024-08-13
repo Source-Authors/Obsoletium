@@ -1,19 +1,10 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
 #ifndef COLOR_H
 #define COLOR_H
 
 #include "tier0/dbg.h"
 #include "minmax.h"
-
-#ifdef _WIN32
-#pragma once
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Basic handler for an rgb set of colors
@@ -64,12 +55,14 @@ public:
 
 	void SetRawColor( int color32 )
 	{
-		*((int *)this) = color32;
+		std::memcpy( this, &color32, sizeof(*this) );
 	}
 
 	int GetRawColor() const
 	{
-		return *((int *)this);
+		int raw;
+		std::memcpy( &raw, this, sizeof(raw) );
+		return raw;
 	}
 
 	inline int r() const	{ return _color[0]; }
@@ -113,6 +106,5 @@ public:
 private:
 	component _color[4]; //-V112
 };
-
 
 #endif // COLOR_H

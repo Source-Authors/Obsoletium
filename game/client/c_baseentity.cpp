@@ -5340,7 +5340,7 @@ static int g_FieldSizes[FIELD_TYPECOUNT] =
 
 	sizeof(int),		// FIELD_CLASSPTR
 	sizeof(EHANDLE),	// FIELD_EHANDLE
-	sizeof(int),		// FIELD_EDICT
+	sizeof(uintp),		// FIELD_EDICT
 
 	sizeof(Vector),		// FIELD_POSITION_VECTOR
 	sizeof(float),		// FIELD_TIME

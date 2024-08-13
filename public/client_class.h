@@ -82,6 +82,11 @@ public:
 	static RecvTable *m_pClassRecvTable; \
 	DECLARE_CLIENTCLASS_NOBASE()
 
+#define DECLARE_CLIENTCLASS_OVERRIDE() \
+	int YouForgotToImplementOrDeclareClientClass() override;\
+	ClientClass* GetClientClass() override;\
+	static RecvTable *m_pClassRecvTable; \
+	DECLARE_CLIENTCLASS_NOBASE()
 
 // This can be used to give all datatables access to protected and private members of the class.
 #define ALLOW_DATATABLES_PRIVATE_ACCESS() \

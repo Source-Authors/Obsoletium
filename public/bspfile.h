@@ -9,49 +9,60 @@
 #define BSPFILE_H
 #pragma once
 
-#ifndef MATHLIB_H
 #include "mathlib/mathlib.h"
-#endif
 
 #include "datamap.h"
-#include "mathlib/bumpvects.h"
 #include "mathlib/compressed_light_cube.h"
 
+#include "mathlib/vector.h"
+#include "tier0/basetypes.h"
+#include "tier0/platform.h"
+#include "tier0/dbg.h"
+
 // little-endian "VBSP"
-#define IDBSPHEADER	(('P'<<24)+('S'<<16)+('B'<<8)+'V')		
+constexpr int IDBSPHEADER{('P' << 24) + ('S' << 16) + ('B' << 8) + 'V'};
 
 // MINBSPVERSION is the minimum acceptable version.  The engine will load MINBSPVERSION through BSPVERSION
-#define MINBSPVERSION 19
-#define BSPVERSION 20
+constexpr int MINBSPVERSION{19};
+constexpr int BSPVERSION{20};
 
 
 // This needs to match the value in gl_lightmap.h
 // Need to dynamically allocate the weights and light values in radial_t to make this variable.
-#define MAX_BRUSH_LIGHTMAP_DIM_WITHOUT_BORDER 32
+constexpr int MAX_BRUSH_LIGHTMAP_DIM_WITHOUT_BORDER{32};
 // This is one more than what vbsp cuts for to allow for rounding errors
-#define MAX_BRUSH_LIGHTMAP_DIM_INCLUDING_BORDER	35
+constexpr int MAX_BRUSH_LIGHTMAP_DIM_INCLUDING_BORDER{35};
 
 // We can have larger lightmaps on displacements
-#define MAX_DISP_LIGHTMAP_DIM_WITHOUT_BORDER	125
-#define MAX_DISP_LIGHTMAP_DIM_INCLUDING_BORDER	128
+constexpr int MAX_DISP_LIGHTMAP_DIM_WITHOUT_BORDER{125};
+constexpr int MAX_DISP_LIGHTMAP_DIM_INCLUDING_BORDER{128};
 
 
 // This is the actual max.. (change if you change the brush lightmap dim or disp lightmap dim
-#define MAX_LIGHTMAP_DIM_WITHOUT_BORDER		MAX_DISP_LIGHTMAP_DIM_WITHOUT_BORDER
-#define MAX_LIGHTMAP_DIM_INCLUDING_BORDER	MAX_DISP_LIGHTMAP_DIM_INCLUDING_BORDER
+constexpr int MAX_LIGHTMAP_DIM_WITHOUT_BORDER{MAX_DISP_LIGHTMAP_DIM_WITHOUT_BORDER};
+constexpr int MAX_LIGHTMAP_DIM_INCLUDING_BORDER{MAX_DISP_LIGHTMAP_DIM_INCLUDING_BORDER};
 
-#define	MAX_LIGHTSTYLES	64
+constexpr int MAX_LIGHTSTYLES{64};
 
 
 // upper design bounds
-#define MIN_MAP_DISP_POWER		2	// Minimum and maximum power a displacement can be.
-#define MAX_MAP_DISP_POWER		4	
+constexpr int MIN_MAP_DISP_POWER{2};	// Minimum and maximum power a displacement can be.;
+constexpr int MAX_MAP_DISP_POWER{4};	
 
 // Max # of neighboring displacement touching a displacement's corner.
-#define MAX_DISP_CORNER_NEIGHBORS	4
+constexpr int MAX_DISP_CORNER_NEIGHBORS{4};
 
-#define NUM_DISP_POWER_VERTS(power)	( ((1 << (power)) + 1) * ((1 << (power)) + 1) )
-#define NUM_DISP_POWER_TRIS(power)	( (1 << (power)) * (1 << (power)) * 2 )
+template<typename T>
+constexpr inline T NUM_DISP_POWER_VERTS(T power)
+{
+	return ((1 << power) + 1) * ((1 << power) + 1);
+}
+
+template <typename T>
+constexpr inline T NUM_DISP_POWER_TRIS(T power)
+{
+	return (1 << power) * (1 << power) * 2;
+}
 
 #if !defined( BSP_USE_LESS_MEMORY )
 // Common limits
@@ -149,8 +160,8 @@
 #endif // BSP_USE_LESS_MEMORY
 
 // key / value pair sizes
-#define	MAX_KEY		32
-#define	MAX_VALUE	1024
+constexpr unsigned MAX_KEY{32u};
+constexpr unsigned MAX_VALUE{1024u};
 
 
 // ------------------------------------------------------------------------------------------------ //
@@ -256,22 +267,22 @@ enum
 // These denote where one dispinfo fits on another.
 // Note: tables are generated based on these indices so make sure to update
 //       them if these indices are changed.
-typedef enum
+enum NeighborSpan
 {
 	CORNER_TO_CORNER=0,
 	CORNER_TO_MIDPOINT=1,
 	MIDPOINT_TO_CORNER=2
-} NeighborSpan;
+};
 
 
 // These define relative orientations of displacement neighbors.
-typedef enum
+enum NeighborOrientation
 {
 	ORIENTATION_CCW_0=0,
 	ORIENTATION_CCW_90=1,
 	ORIENTATION_CCW_180=2,
 	ORIENTATION_CCW_270=3
-} NeighborOrientation;
+};
 
 
 //=============================================================================
@@ -367,7 +378,7 @@ enum
 };
 
 
-#define	HEADER_LUMPS		64
+constexpr int HEADER_LUMPS{64};
 
 #include "zip_uncompressed.h"
 
@@ -392,8 +403,8 @@ struct dheader_t
 };
 
 // level feature flags
-#define LVLFLAGS_BAKED_STATIC_PROP_LIGHTING_NONHDR 0x00000001	// was processed by vrad with -staticproplighting, no hdr data
-#define LVLFLAGS_BAKED_STATIC_PROP_LIGHTING_HDR    0x00000002   // was processed by vrad with -staticproplighting, in hdr
+constexpr unsigned LVLFLAGS_BAKED_STATIC_PROP_LIGHTING_NONHDR{0x00000001u};	// was processed by vrad with -staticproplighting, no hdr data;
+constexpr unsigned LVLFLAGS_BAKED_STATIC_PROP_LIGHTING_HDR{0x00000002u};   // was processed by vrad with -staticproplighting, in hdr;
 
 struct dflagslump_t
 {
@@ -419,12 +430,12 @@ struct dgamelumpheader_t
 };
 
 // This is expected to be a four-CC code ('lump')
-typedef int GameLumpId_t;
+using GameLumpId_t = int;
 
 // game lump is compressed, filelen reflects original size
 // use next entry fileofs to determine actual disk lump compressed size
 // compression stage ensures a terminal null dictionary entry
-#define GAMELUMPFLAG_COMPRESSED	0x0001
+constexpr unsigned short GAMELUMPFLAG_COMPRESSED{0x0001};
 
 struct dgamelump_t
 {
@@ -449,7 +460,7 @@ struct dmodel_t
 
 struct dphysmodel_t
 {
-	DECLARE_BYTESWAP_DATADESC()
+	DECLARE_BYTESWAP_DATADESC();
 	int			modelIndex;
 	int			dataSize;
 	int			keydataSize;
@@ -459,7 +470,7 @@ struct dphysmodel_t
 // contains the binary blob for each displacement surface's virtual hull
 struct dphysdisp_t
 {
-	DECLARE_BYTESWAP_DATADESC()
+	DECLARE_BYTESWAP_DATADESC();
 	unsigned short numDisplacements;
 	//unsigned short dataSize[numDisplacements];
 };
@@ -478,10 +489,6 @@ struct dplane_t
 	float	dist;
 	int		type;		// PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
 };
-
-#ifndef BSPFLAGS_H
-#include "bspflags.h"
-#endif
 
 struct dnode_t
 {
@@ -505,7 +512,7 @@ typedef struct texinfo_s
 	int			texdata;			// Pointer to texture name, size, etc.
 } texinfo_t;
 
-#define TEXTURE_NAME_LENGTH	 128			// changed from 64 BSPVERSION 8
+constexpr int TEXTURE_NAME_LENGTH{128};  // changed from 64 BSPVERSION 8;
 
 struct dtexdata_t
 {
@@ -589,7 +596,7 @@ public:
 	void				SetInvalid()	{ m_SubNeighbors[0].SetInvalid(); m_SubNeighbors[1].SetInvalid(); }
 	
 	// Returns false if there isn't anything touching this edge.
-	bool				IsValid()		{ return m_SubNeighbors[0].IsValid() || m_SubNeighbors[1].IsValid(); }
+	bool				IsValid() const		{ return m_SubNeighbors[0].IsValid() || m_SubNeighbors[1].IsValid(); }
 
 
 public:
@@ -621,12 +628,12 @@ public:
 	float		m_flAlpha;		// "per vertex" alpha values.
 };
 
-#define DISPTRI_TAG_SURFACE			(1<<0)
-#define DISPTRI_TAG_WALKABLE		(1<<1)
-#define DISPTRI_TAG_BUILDABLE		(1<<2)
-#define DISPTRI_FLAG_SURFPROP1		(1<<3)
-#define DISPTRI_FLAG_SURFPROP2		(1<<4)
-#define DISPTRI_TAG_REMOVE			(1<<5)
+constexpr int DISPTRI_TAG_SURFACE = (1<<0);
+constexpr int DISPTRI_TAG_WALKABLE = (1<<1);
+constexpr int DISPTRI_TAG_BUILDABLE = (1<<2);
+constexpr int DISPTRI_FLAG_SURFPROP1 = (1<<3);
+constexpr int DISPTRI_FLAG_SURFPROP2 = (1<<4);
+constexpr int DISPTRI_TAG_REMOVE = (1<<5);
 
 class CDispTri
 {
@@ -676,7 +683,7 @@ struct dedge_t
 	unsigned short	v[2];		// vertex numbers
 };
 
-#define	MAXLIGHTMAPS	4
+constexpr inline int MAXLIGHTMAPS{4};
 
 enum dprimitive_type
 {
@@ -740,7 +747,7 @@ public:
 
 	unsigned short GetNumPrims() const;
 	void SetNumPrims( unsigned short nPrims );
-	bool AreDynamicShadowsEnabled();
+	bool AreDynamicShadowsEnabled() const;
 	void SetDynamicShadowsEnabled( bool bEnabled );
 
 	// non-polygon primitives (strips and lists)
@@ -766,7 +773,7 @@ inline void dface_t::SetNumPrims( unsigned short nPrims )
 	m_NumPrims |= (nPrims & 0x7FFF);
 }
 
-inline bool dface_t::AreDynamicShadowsEnabled()
+inline bool dface_t::AreDynamicShadowsEnabled() const
 {
 	return (m_NumPrims & 0x8000) == 0;
 }
@@ -787,9 +794,9 @@ struct dfaceid_t
 
 
 // NOTE: Only 7-bits stored!!!
-#define LEAF_FLAGS_SKY			0x01		// This leaf has 3D sky in its PVS
-#define LEAF_FLAGS_RADIAL		0x02		// This leaf culled away some portals due to radial vis
-#define LEAF_FLAGS_SKY2D		0x04		// This leaf has 2D sky in its PVS
+constexpr int LEAF_FLAGS_SKY{0x01};    // This leaf has 3D sky in its PVS;
+constexpr int LEAF_FLAGS_RADIAL{0x02}; // This leaf culled away some portals due to radial vis;
+constexpr int LEAF_FLAGS_SKY2D{0x04};  // This leaf has 2D sky in its PVS;
 
 #if defined( _X360 )
 #pragma bitfield_order( push, lsb_to_msb )
@@ -801,7 +808,7 @@ struct dleaf_version_0_t
 
 	short			cluster;
 
-	BEGIN_BITFIELD( bf );
+	BEGIN_BITFIELD( bf )
 	short			area:9;
 	short			flags:7;			// Per leaf flags.
 	END_BITFIELD();
@@ -828,7 +835,7 @@ struct dleaf_t
 
 	short			cluster;
 
-	BEGIN_BITFIELD( bf );
+	BEGIN_BITFIELD( bf )
 	short			area:9;
 	short			flags:7;			// Per leaf flags.
 	END_BITFIELD();
@@ -889,15 +896,15 @@ struct dbrush_t
 	int			contents;
 };
 
-#define	ANGLE_UP	-1
-#define	ANGLE_DOWN	-2
+constexpr int ANGLE_UP{-1};
+constexpr int ANGLE_DOWN{-2};
 
 
 // the visibility lump consists of a header with a count, then
 // byte offsets for the PVS and PHS of each cluster, then the raw
 // compressed bit vectors
-#define	DVIS_PVS	0
-#define	DVIS_PAS	1
+constexpr int DVIS_PVS{0};
+constexpr int DVIS_PAS{1};
 struct dvis_t
 {
 	int			numclusters;
@@ -960,7 +967,7 @@ enum emittype_t
 
 
 // Flags for dworldlight_t::flags
-#define DWL_FLAGS_INAMBIENTCUBE		0x0001	// This says that the light was put into the per-leaf ambient cubes.
+constexpr int DWL_FLAGS_INAMBIENTCUBE{0x0001};	// This says that the light was put into the per-leaf ambient cubes.;
 
 
 struct dworldlight_t
@@ -995,11 +1002,11 @@ struct dcubemapsample_t
 									// otherwise, 1<<(size-1)
 };
 
-#define OVERLAY_BSP_FACE_COUNT	64
+constexpr int OVERLAY_BSP_FACE_COUNT{64};
 
-#define OVERLAY_NUM_RENDER_ORDERS		(1<<OVERLAY_RENDER_ORDER_NUM_BITS)
-#define OVERLAY_RENDER_ORDER_NUM_BITS	2
-#define OVERLAY_RENDER_ORDER_MASK		0xC000	// top 2 bits set
+constexpr unsigned OVERLAY_RENDER_ORDER_NUM_BITS{2};
+constexpr unsigned OVERLAY_NUM_RENDER_ORDERS{1u << OVERLAY_RENDER_ORDER_NUM_BITS};
+constexpr unsigned short OVERLAY_RENDER_ORDER_MASK{0xC000};  // top 2 bits set
 
 struct doverlay_t
 {
@@ -1041,12 +1048,12 @@ inline unsigned short doverlay_t::GetFaceCount() const
 inline void doverlay_t::SetRenderOrder( unsigned short order )
 {
 	m_nFaceCountAndRenderOrder &= ~OVERLAY_RENDER_ORDER_MASK;
-	m_nFaceCountAndRenderOrder |= (order << (16 - OVERLAY_RENDER_ORDER_NUM_BITS));	// leave 2 bits for render order.
+	m_nFaceCountAndRenderOrder |= (order << (16u - OVERLAY_RENDER_ORDER_NUM_BITS));	// leave 2 bits for render order.
 }
 
 inline unsigned short doverlay_t::GetRenderOrder() const
 {
-	return (m_nFaceCountAndRenderOrder >> (16 - OVERLAY_RENDER_ORDER_NUM_BITS));
+	return (m_nFaceCountAndRenderOrder >> (16u - OVERLAY_RENDER_ORDER_NUM_BITS));
 }
 
 
@@ -1059,10 +1066,10 @@ struct doverlayfade_t
 };
 
 
-#define WATEROVERLAY_BSP_FACE_COUNT				256
-#define WATEROVERLAY_RENDER_ORDER_NUM_BITS		2
-#define WATEROVERLAY_NUM_RENDER_ORDERS			(1<<WATEROVERLAY_RENDER_ORDER_NUM_BITS)
-#define WATEROVERLAY_RENDER_ORDER_MASK			0xC000	// top 2 bits set
+constexpr int WATEROVERLAY_BSP_FACE_COUNT{256};
+constexpr unsigned WATEROVERLAY_RENDER_ORDER_NUM_BITS{2};
+constexpr unsigned WATEROVERLAY_NUM_RENDER_ORDERS{1u << WATEROVERLAY_RENDER_ORDER_NUM_BITS};
+constexpr unsigned short WATEROVERLAY_RENDER_ORDER_MASK{0xC000};	// top 2 bits set;
 struct dwateroverlay_t
 {
 	DECLARE_BYTESWAP_DATADESC();
@@ -1103,12 +1110,12 @@ inline unsigned short dwateroverlay_t::GetFaceCount() const
 inline void dwateroverlay_t::SetRenderOrder( unsigned short order )
 {
 	m_nFaceCountAndRenderOrder &= ~WATEROVERLAY_RENDER_ORDER_MASK;
-	m_nFaceCountAndRenderOrder |= ( order << ( 16 - WATEROVERLAY_RENDER_ORDER_NUM_BITS ) );	// leave 2 bits for render order.
+	m_nFaceCountAndRenderOrder |= ( order << ( 16u - WATEROVERLAY_RENDER_ORDER_NUM_BITS ) );	// leave 2 bits for render order.
 }
 
 inline unsigned short dwateroverlay_t::GetRenderOrder() const
 {
-	return ( m_nFaceCountAndRenderOrder >> ( 16 - WATEROVERLAY_RENDER_ORDER_NUM_BITS ) );
+	return ( m_nFaceCountAndRenderOrder >> ( 16u - WATEROVERLAY_RENDER_ORDER_NUM_BITS ) );
 }
 
 #ifndef _DEF_BYTE_
@@ -1118,8 +1125,6 @@ typedef unsigned short	word;
 #endif
 
 
-#define	ANGLE_UP	-1
-#define	ANGLE_DOWN	-2
 
 
 //===============
@@ -1133,8 +1138,9 @@ struct epair_t
 };
 
 // finalized page of surface's lightmaps
-#define MAX_LIGHTMAPPAGE_WIDTH	256
-#define MAX_LIGHTMAPPAGE_HEIGHT	128
+constexpr int MAX_LIGHTMAPPAGE_WIDTH{256};
+constexpr int MAX_LIGHTMAPPAGE_HEIGHT{128};
+
 typedef struct nameForDatadesc_dlightmappage_t // unnamed structs collide in the datadesc macros
 {
 	DECLARE_BYTESWAP_DATADESC();

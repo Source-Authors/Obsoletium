@@ -92,6 +92,16 @@ struct democmdinfo_t
 	}
 
 	// Copy constructor
+	democmdinfo_t( const democmdinfo_t& src )
+	{
+		flags = src.flags;
+		viewOrigin = src.viewOrigin;
+		viewAngles = src.viewAngles;
+		localViewAngles = src.localViewAngles;
+		viewOrigin2 = src.viewOrigin2;
+		viewAngles2 = src.viewAngles2;
+		localViewAngles2 = src.localViewAngles2;
+	}
 	// Assignment
 	democmdinfo_t&	operator=(const democmdinfo_t& src )
 	{
@@ -172,6 +182,21 @@ struct demosmoothing_t
 		vectarget.Init();
 	}
 
+	demosmoothing_t(const demosmoothing_t& src )
+	{
+		file_offset = src.file_offset;
+		frametick = src.frametick;
+		selected = src.selected;
+		samplepoint = src.samplepoint;
+		vecmoved = src.vecmoved;
+		angmoved = src.angmoved;
+
+		targetpoint = src.targetpoint;
+		vectarget = src.vectarget;
+
+		info = src.info;
+	}
+
 	demosmoothing_t&	operator=(const demosmoothing_t& src )
 	{
 		if ( this == &src )
@@ -227,8 +252,8 @@ struct CSmoothingContext
 		Q_strncpy( filename, src.filename, sizeof( filename ) );
 
 		smooth.RemoveAll();
-		int c = src.smooth.Count();
-		int i;
+		intp c = src.smooth.Count();
+		intp i;
 		for ( i = 0; i < c; i++ )
 		{
 			demosmoothing_t newitem;

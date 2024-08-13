@@ -11,9 +11,10 @@
 #pragma once
 #endif
 
-#include "interface.h"
-#include "utlvector.h"
-#include "utlstring.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlstring.h"
+#include "tier0/platform.h"
 
 class IFileSystem;
 
@@ -43,6 +44,6 @@ public:
 	virtual bool GetBSPDependants( IFileSystem *pFileSystem, const char *pBSPFilename, CUtlVector< CUtlString > *pList ) = 0;
 };
 
-#define IBSPPACK_VERSION_STRING "IBSPPACK004"
+constexpr char IBSPPACK_VERSION_STRING[]{"IBSPPACK004"};
 
 #endif // IBSPPACK_H

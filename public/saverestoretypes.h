@@ -461,7 +461,7 @@ inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToke
 	unsigned short	hash = (unsigned short)(HashString( pszToken ) % (unsigned)tokenCount );
 	
 #if _DEBUG
-	static int tokensparsed = 0;
+	[[maybe_unused]] static int tokensparsed = 0;
 	tokensparsed++;
 	if ( !tokenCount || !pTokens )
 	{
@@ -510,17 +510,18 @@ inline const char *CSaveRestoreSegment::StringFromSymbol( int token )
 ///             compilers. Either way, there's no portable intrinsic.
 
 // Newer GCC versions provide this in this header, older did by default.
-#if !defined( _rotr ) && defined( COMPILER_GCC )
+#if !defined( _rotr ) && (defined( COMPILER_GCC ) || defined( COMPILER_CLANG ))
 #include <x86intrin.h>
 #endif
 
-#ifdef COMPILER_CLANG
-static __inline__ unsigned int __attribute__((__always_inline__, __nodebug__))
-_rotr(unsigned int _Value, int _Shift) {
-	_Shift &= 0x1f;
-	return _Shift ? (_Value >> _Shift) | (_Value << (32 - _Shift)) : _Value;
-}
-#endif
+// dimhotepus: clang now support _rotr
+//#ifdef COMPILER_CLANG
+//static __inline__ unsigned int __attribute__((__always_inline__, __nodebug__))
+//_rotr(unsigned int _Value, int _Shift) {
+//	_Shift &= 0x1f;
+//	return _Shift ? (_Value >> _Shift) | (_Value << (32 - _Shift)) : _Value;
+//}
+//#endif
 
 
 inline unsigned int CSaveRestoreSegment::HashString( const char *pszToken )

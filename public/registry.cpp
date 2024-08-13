@@ -66,7 +66,7 @@ void ReleaseInstancedRegistry( IRegistry *reg )
 {
 	if ( !reg )
 	{
-		Assert( !"ReleaseInstancedRegistry( reg == NULL )!" );
+		AssertMsg( false, "ReleaseInstancedRegistry( reg == NULL )!" );
 		return;
 	}
 
@@ -83,8 +83,8 @@ IRegistry *registry = ( IRegistry * )&g_Registry;
 //-----------------------------------------------------------------------------
 int CRegistry::ReadInt( const char *pKeyBase, const char *pKey, int defaultValue )
 {
-	int nLen = strlen( pKeyBase );
-	int nKeyLen = strlen( pKey );
+	intp nLen = V_strlen( pKeyBase );
+	intp nKeyLen = V_strlen( pKey );
 	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	return ReadInt( pFullKey, defaultValue );
@@ -92,8 +92,8 @@ int CRegistry::ReadInt( const char *pKeyBase, const char *pKey, int defaultValue
 
 void CRegistry::WriteInt( const char *pKeyBase, const char *pKey, int value )
 {
-	int nLen = strlen( pKeyBase );
-	int nKeyLen = strlen( pKey );
+	intp nLen = V_strlen( pKeyBase );
+	intp nKeyLen = V_strlen( pKey );
 	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	WriteInt( pFullKey, value );
@@ -101,8 +101,8 @@ void CRegistry::WriteInt( const char *pKeyBase, const char *pKey, int value )
 
 const char *CRegistry::ReadString( const char *pKeyBase, const char *pKey, const char *defaultValue )
 {
-	int nLen = strlen( pKeyBase );
-	int nKeyLen = strlen( pKey );
+	intp nLen = V_strlen( pKeyBase );
+	intp nKeyLen = V_strlen( pKey );
 	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	return ReadString( pFullKey, defaultValue );
@@ -110,8 +110,8 @@ const char *CRegistry::ReadString( const char *pKeyBase, const char *pKey, const
 
 void CRegistry::WriteString( const char *pKeyBase, const char *pKey, const char *value )
 {
-	int nLen = strlen( pKeyBase );
-	int nKeyLen = strlen( pKey );
+	intp nLen = V_strlen( pKeyBase );
+	intp nKeyLen = V_strlen( pKey );
 	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	WriteString( pFullKey, value );

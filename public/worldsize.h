@@ -18,8 +18,8 @@
 // NOTE THAT IF THIS GOES ANY BIGGER THEN DISK NODES/LEAVES CANNOT USE SHORTS TO STORE THE BOUNDS
 #define MAX_COORD_INTEGER			(16384)
 #define MIN_COORD_INTEGER			(-MAX_COORD_INTEGER)
-#define MAX_COORD_FRACTION			(1.0-(1.0/16.0))
-#define MIN_COORD_FRACTION			(-1.0+(1.0/16.0))
+#define MAX_COORD_FRACTION			(1.0f-(1.0f/16.0f))
+#define MIN_COORD_FRACTION			(-1.0f+(1.0f/16.0f))
 
 #define MAX_COORD_FLOAT				(16384.0f)
 #define MIN_COORD_FLOAT				(-MAX_COORD_FLOAT)
@@ -29,7 +29,7 @@
 
 // Maximum traceable distance ( assumes cubic world and trace from one corner to opposite )
 // COORD_EXTENT * sqrt(3)
-#define MAX_TRACE_LENGTH			( 1.732050807569 * COORD_EXTENT )		
+#define MAX_TRACE_LENGTH			( 1.732050807569f * COORD_EXTENT )		
 
 // This value is the LONGEST possible range (limited by max valid coordinate number, not 2x)
 #define MAX_COORD_RANGE				(MAX_COORD_INTEGER)

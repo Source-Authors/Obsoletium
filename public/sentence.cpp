@@ -298,7 +298,7 @@ void CPhonemeTag::SetTag( const char *phoneme )
 	if ( !phoneme || !phoneme [ 0 ] )
 		return;
 
-	int len = Q_strlen( phoneme ) + 1;
+	intp len = Q_strlen( phoneme ) + 1;
 	m_szPhoneme = new char[ len ];
 	Assert( m_szPhoneme );
 	Q_strncpy( m_szPhoneme, phoneme, len );
@@ -600,7 +600,7 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 
 			buf.GetString( token );
 			cc_length = atoi( token );
-			Assert( cc_length >= 0 && cc_length < sizeof( cc_stream ) );
+			Assert( cc_length >= 0 && cc_length < ssize( cc_stream ) );
 			// Skip space
 			buf.GetChar();
 			buf.Get( cc_stream, cc_length );
@@ -999,7 +999,7 @@ void CSentence::SaveToBuffer( CUtlBuffer& buf )
 //-----------------------------------------------------------------------------
 void CSentence::InitFromDataChunk( void *data, int size )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	buf.EnsureCapacity( size );
 	buf.Put( data, size );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, size );

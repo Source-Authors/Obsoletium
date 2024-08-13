@@ -142,7 +142,7 @@ public:
 	// accumulated offset from ideal footplant location
 public:
 	struct x2 {
-		char		*pAttachmentName;
+		const char		*pAttachmentName;
 		Vector		pos;
 		Quaternion	q;
 	} offset;
@@ -244,16 +244,16 @@ struct ikcontextikrule_t
 	float		flWeight;		// processed version of start-end cycle
 	float		flRuleWeight;	// blending weight
 	float		latched;		// does the IK rule use a latched value?
-	char		*szLabel;
+	const char		*szLabel;
 
 	Vector		kneeDir;
 	Vector		kneePos;
 
 	ikcontextikrule_t() : szLabel() {}
 
-private:
 	// No copy constructors allowed
-	ikcontextikrule_t(const ikcontextikrule_t& vOther);
+	ikcontextikrule_t(const ikcontextikrule_t&) = delete;
+	ikcontextikrule_t& operator=(const ikcontextikrule_t&) = default;
 };
 
 
@@ -426,7 +426,7 @@ private:
 	unsigned short	m_cachedBoneCount;
 	unsigned short	m_matrixOffset;
 	unsigned short	m_cachedToStudioOffset;
-	unsigned short	m_boneOutOffset;
+	[[maybe_unused]] unsigned short	m_unused;
 };
 
 CBoneCache *Studio_GetBoneCache( memhandle_t cacheHandle );

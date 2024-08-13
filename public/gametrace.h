@@ -79,9 +79,9 @@ public:
 		memset( &surface, 0, sizeof(surface) );
 	}
 
-private:
 	// No copy constructors allowed
 	CGameTrace(const CGameTrace& vOther) = delete;
+	CGameTrace& operator=(const CGameTrace& vOther) = default;
 };
 
 
@@ -115,7 +115,7 @@ public:
 		m_aEntityList.SetSize( nEntityMax );
 	}
 
-	~CTraceListData()
+	virtual ~CTraceListData()
 	{
 		m_nLeafCount = 0;
 		m_aLeafList.RemoveAll();
@@ -133,11 +133,11 @@ public:
 	bool	IsEmpty( void ) const			{ return ( m_nLeafCount == 0 && m_nEntityCount == 0 ); }
 
 	int		LeafCount( void ) const			{ return m_nLeafCount; }
-	int		LeafCountMax( void ) const		{ return m_aLeafList.Count(); }
+	intp		LeafCountMax( void ) const		{ return m_aLeafList.Count(); }
 	void    LeafCountReset( void )			{ m_nLeafCount = 0; }
 
 	int		EntityCount( void ) const		{ return m_nEntityCount; }
-	int		EntityCountMax( void ) const	{ return m_aEntityList.Count(); }
+	intp		EntityCountMax( void ) const	{ return m_aEntityList.Count(); }
 	void	EntityCountReset( void )		{ m_nEntityCount = 0; }
 
 	// For leaves...
@@ -154,7 +154,7 @@ public:
 	}
 
 	// For entities...
-	IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
+	IterationRetval_t EnumElement( IHandleEntity *pHandleEntity ) override
 	{
 		if ( m_nEntityCount >= m_aEntityList.Count() )
 		{

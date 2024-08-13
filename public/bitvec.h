@@ -144,7 +144,7 @@ inline unsigned GetEndMask( T numBits )
 template<typename T, typename = std::enable_if_t<sizeof(T) <= sizeof(unsigned)>>
 constexpr inline T GetBitForBitnum( T bitNum ) 
 { 
-	static T bitsForBitnum[] = 
+	T bitsForBitnum[] = 
 	{
 		( static_cast<T>(1) << 0 ),
 		( static_cast<T>(1) << 1 ),
@@ -283,7 +283,7 @@ template <typename BITCOUNTTYPE>
 class CVarBitVecBase
 {
 public:
-	using BitCountType = typename BITCOUNTTYPE;
+	using BitCountType = BITCOUNTTYPE;
 
 	bool	IsFixedSize() const			{ return false; }
 	BITCOUNTTYPE		GetNumBits(void) const		{ return m_numBits; }
@@ -367,7 +367,7 @@ template <int NUM_BITS>
 class CFixedBitVecBase
 {
 public:
-	using BitCountType = typename int;
+	using BitCountType = int;
 
 	bool	IsFixedSize() const								{ return true; }
 	int		GetNumBits(void) const							{ return NUM_BITS; }
@@ -473,7 +473,9 @@ inline CVarBitVecBase<BITCOUNTTYPE>::CVarBitVecBase(BITCOUNTTYPE numBits)
 
 	// Figure out how many ints are needed
 	m_numInts = CalcNumIntsForBits( numBits );
-	m_pInt = NULL;
+	m_iBitStringStorage = 0;
+	m_pInt = nullptr;
+
 	AllocInts( m_numInts );
 }
 
@@ -555,8 +557,15 @@ inline bool CVarBitVecBase<BITCOUNTTYPE>::Detach( uint32 **ppBits, BITCOUNTTYPE 
 	else
 	{
 		*ppBits = (uint32 *)malloc( sizeof(uint32) );
-		**ppBits = m_iBitStringStorage;
+		if (*ppBits) 
+		{
+			**ppBits = m_iBitStringStorage;
+		}
 		free( m_pInt );
+		if (!*ppBits) 
+		{
+			return false;
+		}
 	}
 
 	memset( this, 0, sizeof( *this ) );
@@ -569,8 +578,6 @@ template <class BASE_OPS>
 inline CBitVecT<BASE_OPS>::CBitVecT()
 {
 	// undef this is ints are not 4 bytes
-	// generate a compile error if sizeof(int) is not 4 (HACK: can't use the preprocessor so use the compiler)
-	
 	COMPILE_TIME_ASSERT( sizeof(int)==4 );
 	
 	// Initialize bitstring by clearing all bits
@@ -583,8 +590,6 @@ inline CBitVecT<BASE_OPS>::CBitVecT(typename BASE_OPS::BitCountType numBits)
  : BASE_OPS( numBits )
 {
 	// undef this is ints are not 4 bytes
-	// generate a compile error if sizeof(int) is not 4 (HACK: can't use the preprocessor so use the compiler)
-	
 	COMPILE_TIME_ASSERT( sizeof(int)==4 );
 	
 	// Initialize bitstring by clearing all bits
@@ -1318,7 +1323,7 @@ inline void CVarBitVecBase<BITCOUNTTYPE>::Resize( BITCOUNTTYPE resizeNumBits, bo
 {
 	Assert( resizeNumBits >= 0 );
 
-	int newIntCount = CalcNumIntsForBits( resizeNumBits );
+	BITCOUNTTYPE newIntCount = CalcNumIntsForBits(resizeNumBits);
 	if ( newIntCount != GetNumDWords() )
 	{
 		if ( Base() )

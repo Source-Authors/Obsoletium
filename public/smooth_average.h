@@ -54,7 +54,7 @@ public:
 
 public:	
 	CUtlVector< CEntry > m_Values;
-	int m_iCurValue;
+	intp m_iCurValue;
 };
 
 
@@ -95,7 +95,7 @@ inline CTimingInfo< T > CalcSmoothAverage_Struct( const T &value, int nTimes, co
 	}
 	
 	// Add the new value.
-	int newValueIndex;
+	intp newValueIndex;
 	CAveragesInfo< T >::CEntry entry;
 	entry.m_Value = value;
 	if ( pInfo->m_Values.Count() < nTimes )
@@ -179,7 +179,7 @@ inline CTimingInfo< T > SumOverTimeInterval_Struct( const T &value, float nSecon
 	typename CAveragesInfo_TimeBased< T >::CEntry newEntry;
 	newEntry.m_Time = curTime;
 	newEntry.m_Value = value;
-	int newValueIndex = pInfo->m_Values.AddToTail( newEntry );
+	intp newValueIndex = pInfo->m_Values.AddToTail( newEntry );
 
 	CTimingInfo< T > info;
 	info.m_AverageValue = pInfo->m_Values[0].m_Value;
@@ -190,7 +190,7 @@ inline CTimingInfo< T > SumOverTimeInterval_Struct( const T &value, float nSecon
 	info.m_HighValue = pInfo->m_Values[0].m_Value;
 	info.m_LowValue = pInfo->m_Values[0].m_Value;
 
-	for ( int i=1; i < pInfo->m_Values.Count(); i++ )
+	for ( intp i=1; i < pInfo->m_Values.Count(); i++ )
 	{
 		if ( i != newValueIndex )
 		{

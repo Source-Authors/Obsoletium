@@ -115,8 +115,6 @@ struct Ray_t
 		}
 		return vecInvDelta;
 	}
-
-private:
 };
 
 

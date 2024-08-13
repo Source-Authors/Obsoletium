@@ -61,13 +61,13 @@ public:
 		m_sRepositoryFileName( repositoryFileName ),
 		m_nVersion( version ),
 		m_pfnMetaChecksum( checksumfunc ),
-		m_bDirty( false ),
-		m_bInitialized( false ),
 		m_uCurrentMetaChecksum( 0u ),
 		m_fileCheckType( fileCheckType ),
 		m_bNeverCheckDisk( nevercheckdisk ),
 		m_bReadOnly( readonly ),
-		m_bSaveManifest( savemanifest )
+		m_bSaveManifest( savemanifest ),
+		m_bDirty( false ),
+		m_bInitialized( false )
 	{
 		Assert( !m_sRepositoryFileName.IsEmpty() );
 	}
@@ -113,7 +113,7 @@ public:
 	{
 		SetDirty( true );
 
-		int idx = GetIndex( name );
+		unsigned short idx = GetIndex( name );
 
 		Assert( idx != m_Elements.InvalidIndex() );
 
@@ -192,16 +192,16 @@ private:
 	void		InitSmallBuffer( FileHandle_t& fh, int fileSize, bool& deleteFile );
 	void		InitLargeBuffer( FileHandle_t& fh, bool& deleteFile );
 
-	int			GetIndex( const char *filename )
+	unsigned short			GetIndex( const char *filename )
 	{
 		ElementType_t element;
 		element.handle = g_pFullFileSystem->FindOrAddFileName( filename );
-		int idx = m_Elements.Find( element );
+		unsigned short idx{m_Elements.Find( element )};
 		if ( idx == m_Elements.InvalidIndex() )
 		{
 			T *data = new T();
 
-			int dataIndex = m_Data.AddToTail( data );
+			intp dataIndex = m_Data.AddToTail( data );
 			idx = m_Elements.Insert( element );
 			m_Elements[ idx ].dataIndex = dataIndex;
 		}
@@ -258,7 +258,7 @@ private:
 template <class T>
 T* CUtlCachedFileData<T>::Get( char const *filename )
 {
-	int idx = GetIndex( filename );
+	unsigned short idx = GetIndex( filename );
 
 	ElementType_t& e = m_Elements[ idx ];
 
@@ -444,7 +444,7 @@ void CUtlCachedFileData<T>::InitSmallBuffer( FileHandle_t& fh, int fileSize, boo
 				
 				Assert( count < 2000000 );
 
-				CUtlBuffer buf( 0, 0, 0 );
+				CUtlBuffer buf( (intp)0, 0, 0 );
 
 				for ( int i = 0 ; i < count; ++i )
 				{
@@ -464,7 +464,7 @@ void CUtlCachedFileData<T>::InitSmallBuffer( FileHandle_t& fh, int fileSize, boo
 					buf.GetString( elementFileName );
 
 					// Now read the element
-					int slot = GetIndex( elementFileName );
+					unsigned short slot = GetIndex( elementFileName );
 
 					Assert( slot != m_Elements.InvalidIndex() );
 
@@ -535,7 +535,7 @@ void CUtlCachedFileData<T>::InitLargeBuffer( FileHandle_t& fh, bool& deleteFile 
 
 				Assert( count < 2000000 );
 
-				CUtlBuffer buf( 0, 0, 0 );
+				CUtlBuffer buf( (intp)0, 0, 0 );
 
 				for ( int i = 0 ; i < count; ++i )
 				{
@@ -564,7 +564,7 @@ void CUtlCachedFileData<T>::InitLargeBuffer( FileHandle_t& fh, bool& deleteFile 
 					buf.GetString( elementFileName );
 
 					// Now read the element
-					int slot = GetIndex( elementFileName );
+					unsigned short slot = GetIndex( elementFileName );
 
 					Assert( slot != m_Elements.InvalidIndex() );
 
@@ -700,9 +700,9 @@ void CUtlCachedFileData<T>::Save()
 		g_pFullFileSystem->Write( &c, sizeof( c ), fh );
 
 		// Save repository back out to disk...
-		CUtlBuffer buf( 0, 0, 0 );
+		CUtlBuffer buf( (intp)0, 0, 0 );
 
-		for ( int i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
+		for ( auto i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
 		{
 			buf.SeekPut( CUtlBuffer::SEEK_HEAD, 0 );
 
@@ -772,9 +772,9 @@ template <class T>
 void CUtlCachedFileData<T>::SaveManifest()
 {
 	// Save manifest out to disk...
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
-	for ( int i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
+	for ( auto i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
 	{
 		ElementType_t& element = m_Elements[ i ];
 
@@ -820,7 +820,7 @@ void CUtlCachedFileData<T>::SaveManifest()
 template <class T>
 T *CUtlCachedFileData<T>::RebuildItem( const char *filename )
 {
-	int idx = GetIndex( filename );
+	unsigned short idx = GetIndex( filename );
 	ElementType_t& e = m_Elements[ idx ];
 
 	ForceRecheckDiskInfo();
@@ -892,16 +892,16 @@ class CSortedCacheFile
 {
 public:
 	FileNameHandle_t	handle;
-	int					index;
+	unsigned short		index;
 
-	 bool Less( const CSortedCacheFile &file0, const CSortedCacheFile &file1, void * )
-	 {
-		 char name0[ 512 ];
-		 char name1[ 512 ];
-		 g_pFullFileSystem->String( file0.handle, name0, sizeof( name0 ) );
-		 g_pFullFileSystem->String( file1.handle, name1, sizeof( name1 ) );
-		 return Q_stricmp( name0, name1 ) < 0 ? true : false;
-	 }
+	bool Less( const CSortedCacheFile &file0, const CSortedCacheFile &file1, void * )
+	{
+		char name0[ 512 ];
+		char name1[ 512 ];
+		g_pFullFileSystem->String( file0.handle, name0, sizeof( name0 ) );
+		g_pFullFileSystem->String( file1.handle, name1, sizeof( name1 ) );
+		return Q_stricmp( name0, name1 ) < 0 ? true : false;
+	}
 };
 
 // Iterates all entries and causes rebuild on any existing items which are out of date
@@ -909,7 +909,7 @@ template <class T>
 void	CUtlCachedFileData<T>::CheckDiskInfo( bool forcerebuild, long cacheFileTime )
 {
 	char fn[ 512 ];
-	int i;
+	unsigned short i;
 	if ( forcerebuild )
 	{
 		for ( i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
@@ -935,7 +935,7 @@ void	CUtlCachedFileData<T>::CheckDiskInfo( bool forcerebuild, long cacheFileTime
 	if ( !list.Count() )
 		return;
 
-	for ( int listStart = 0, listEnd = 0; listStart < list.Count(); listStart = listEnd+1 )
+	for ( intp listStart = 0, listEnd = 0; listStart < list.Count(); listStart = listEnd+1 )
 	{
 		int pathIndex = g_pFullFileSystem->GetPathIndex( m_Elements[list[listStart].index].handle );
 		for ( listEnd = listStart; listEnd < list.Count(); listEnd++ )

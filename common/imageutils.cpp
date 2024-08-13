@@ -321,7 +321,7 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 	height = pVTFTexture->Height();
 	pVTFTexture->ConvertImageFormat( IMAGE_FORMAT_RGBA8888, false );
 
-	int nMemSize = ImageLoader::GetMemRequired( width, height, 1, IMAGE_FORMAT_RGBA8888, false );
+	intp nMemSize = ImageLoader::GetMemRequired( width, height, 1, IMAGE_FORMAT_RGBA8888, false );
 	unsigned char *pMemImage = (unsigned char *)malloc(nMemSize);
 	if ( pMemImage == NULL )
 	{
@@ -681,7 +681,7 @@ unsigned char		*ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, 
 {
 #if !defined( _X360 )
 
-	png_const_bytep pngData = (png_const_bytep)buffer.Base();
+	png_const_bytep pngData = buffer.Base<const png_byte>();
 	if (png_sig_cmp( pngData, 0, 8))
 	{
         errcode = CE_ERROR_PARSING_SOURCE;
@@ -765,11 +765,11 @@ fail:
         color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
         png_set_gray_to_rgb( png_ptr );
 
-	// Force in an alpha channel
-	if ( !( color_type & PNG_COLOR_MASK_ALPHA ) )
-	{
-		png_set_add_alpha(png_ptr, 255, PNG_FILLER_AFTER);
-	}
+    // Force in an alpha channel
+    if ( !( color_type & PNG_COLOR_MASK_ALPHA ) )
+    {
+        png_set_add_alpha(png_ptr, 255, PNG_FILLER_AFTER);
+    }
 
   /*
 	double gamma;
@@ -1463,7 +1463,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 
 	int imageMemoryFootprint = header.width * header.height * header.bits / 8;
 
-	CUtlBuffer inbuf(0, imageMemoryFootprint);
+	CUtlBuffer inbuf((intp)0, imageMemoryFootprint);
 
 	// read in the image
 	int nBytesRead = fread(inbuf.Base(), imageMemoryFootprint, 1, infile);
@@ -1479,7 +1479,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 		return CE_ERROR_LOADING_DLL;
 	}
 
-	CreateInterfaceFn factory = Sys_GetFactory(vtexmod);
+	CreateInterfaceFnT<IVTex> factory = Sys_GetFactory<IVTex>(vtexmod);
 	if (factory == NULL)
 	{
 		Sys_UnloadModule(vtexmod);
@@ -1487,7 +1487,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 		return CE_ERROR_LOADING_DLL;
 	}
 
-	IVTex *vtex = (IVTex *)factory(IVTEX_VERSION_STRING, NULL);
+	IVTex *vtex = factory(IVTEX_VERSION_STRING, NULL);
 	if (vtex == NULL)
 	{
 		Sys_UnloadModule(vtexmod);
@@ -1498,9 +1498,9 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	char *vtfParams[4];
 
 	// the 0th entry is skipped cause normally thats the program name.
-	vtfParams[0] = "";
-	vtfParams[1] = "-quiet";
-	vtfParams[2] = "-dontusegamedir";
+	vtfParams[0] = (char *)"";
+	vtfParams[1] = (char *)"-quiet";
+	vtfParams[2] = (char *)"-dontusegamedir";
 	vtfParams[3] = (char *)tgaPath;
 
 	// call vtex to do the conversion.
@@ -1910,9 +1910,9 @@ fail:
         goto fail;
     }
 
-    /* set the individual row_pointers to point at the correct offsets */
-    for ( int i = 0;  i < nHeight;  ++i)
-        row_pointers[i] = const_cast<unsigned char *>(pRGBAData + i*nStride);
+	/* set the individual row_pointers to point at the correct offsets */
+	for ( int i = 0;  i < nHeight;  ++i)
+		row_pointers[i] = const_cast<unsigned char *>(pRGBAData + i*nStride);
 
 	// Write the image
 	png_write_image(png_ptr, row_pointers);
@@ -2158,7 +2158,7 @@ ConversionErrorType ImgUtl_LoadBitmap( const char *pszFilename, Bitmap_t &bitmap
 	return CE_SUCCESS;
 }
 
-static ConversionErrorType ImgUtl_LoadJPEGBitmapFromBuffer( CUtlBuffer &fileData, Bitmap_t &bitmap )
+static ConversionErrorType ImgUtl_LoadJPEGBitmapFromBuffer( CUtlBuffer &fileData, Bitmap_t & )
 {
 	// @todo implement
 	return CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;

@@ -111,12 +111,6 @@
 #include <time.h>
 #include "zip/XZip.h"
 
-#ifdef __clang__
-	// These clang 3.1 warnings don't seem very useful, and cannot easily be
-	// avoided in this file.
-	#pragma GCC diagnostic ignored "-Wdangling-else"	// warning: add explicit braces to avoid dangling else [-Wdangling-else]
-#endif
-
 #ifdef OSX
 #define MAP_ANONYMOUS MAP_ANON
 #endif

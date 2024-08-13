@@ -128,7 +128,7 @@ inline int CheckDeclareClass_Access( T *, const char *pShouldBe )
 	#define DECLARE_NETWORKVAR_CHAIN() \
 		CAutoInitEntPtr __m_pChainEntity; \
 		void NetworkStateChanged() { CHECK_USENETWORKVARS __m_pChainEntity.m_pEnt->NetworkStateChanged(); } \
-		void NetworkStateChanged( void *pVar ) { CHECK_USENETWORKVARS __m_pChainEntity.m_pEnt->NetworkStateChanged(); }
+		void NetworkStateChanged( void * ) { CHECK_USENETWORKVARS __m_pChainEntity.m_pEnt->NetworkStateChanged(); }
 
 	#define IMPLEMENT_NETWORKVAR_CHAIN( varName ) \
 		(varName)->__m_pChainEntity.m_pEnt = this;
@@ -151,7 +151,7 @@ static inline void DispatchNetworkStateChanged( T *pObj, void *pVar )
 #define DECLARE_EMBEDDED_NETWORKVAR() \
 	template <typename T> friend int ServerClassInit(T *);	\
 	template <typename T> friend int ClientClassInit(T *); \
-	virtual void NetworkStateChanged() {}  virtual void NetworkStateChanged( void *pProp ) {}
+	virtual void NetworkStateChanged() {}  virtual void NetworkStateChanged( void * ) {}
 
 // NOTE: Assignment operator is disabled because it doesn't call copy constructors of scalar types within the aggregate, so they are not marked changed
 #define CNetworkVarEmbedded( type, name ) \
@@ -532,7 +532,7 @@ private:
 
 // Network ehandle wrapper.
 #if defined( CLIENT_DLL ) || defined( GAME_DLL )
-	inline void NetworkVarConstruct( CBaseHandle &x ) {}
+	inline void NetworkVarConstruct( CBaseHandle & ) {}
 
 	template< class Type, class Changer >
 	class CNetworkHandleBase : public CNetworkVarBase< CBaseHandle, Changer >
@@ -611,23 +611,23 @@ private:
 // an entity that wants to transmit the variable.
 	#define CNetworkVarForDerived( type, name ) \
 		virtual void NetworkStateChanged_##name() {} \
-		virtual void NetworkStateChanged_##name( void *pVar ) {} \
+		virtual void NetworkStateChanged_##name( void * ) {} \
 		NETWORK_VAR_START( type, name ) \
 		NETWORK_VAR_END( type, name, CNetworkVarBase, NetworkStateChanged_##name )
 
 	#define CNetworkVectorForDerived( name ) \
 		virtual void NetworkStateChanged_##name() {} \
-		virtual void NetworkStateChanged_##name( void *pVar ) {} \
+		virtual void NetworkStateChanged_##name( void * ) {} \
 		CNetworkVectorInternal( Vector, name, NetworkStateChanged_##name )
 		
 	#define CNetworkHandleForDerived( type, name ) \
 		virtual void NetworkStateChanged_##name() {} \
-		virtual void NetworkStateChanged_##name( void *pVar ) {} \
+		virtual void NetworkStateChanged_##name( void * ) {} \
 		CNetworkHandleInternal( type, name, NetworkStateChanged_##name )
 		
 	#define CNetworkArrayForDerived( type, name, count ) \
 		virtual void NetworkStateChanged_##name() {} \
-		virtual void NetworkStateChanged_##name( void *pVar ) {} \
+		virtual void NetworkStateChanged_##name( void * ) {} \
 		CNetworkArrayInternal( type, name, count, NetworkStateChanged_##name )
 
 	#define IMPLEMENT_NETWORK_VAR_FOR_DERIVED( name ) \
@@ -647,7 +647,7 @@ private:
 
 	#define DISABLE_NETWORK_VAR_FOR_DERIVED( name ) \
 		virtual void NetworkStateChanged_##name() {} \
-		virtual void NetworkStateChanged_##name( void *pVar ) {}
+		virtual void NetworkStateChanged_##name( void * ) {}
 
 
 

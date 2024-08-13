@@ -20,11 +20,12 @@ class IClientRenderable;
 //-----------------------------------------------------------------------------
 // Handle to an renderable in the client leaf system
 //-----------------------------------------------------------------------------
-typedef unsigned short ClientRenderHandle_t;
+// dimhotepus: Make unsigned int as expected.
+typedef unsigned int ClientRenderHandle_t;
 
-enum
+enum : ClientRenderHandle_t
 {
-	INVALID_CLIENT_RENDER_HANDLE = (ClientRenderHandle_t)0xffff,
+	INVALID_CLIENT_RENDER_HANDLE = (ClientRenderHandle_t)~0,
 };
 
 

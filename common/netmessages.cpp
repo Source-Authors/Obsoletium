@@ -279,7 +279,7 @@ const char *g_MostCommonPrefixes[] =
 
 static int FindCommonPathID( const char *pPathID )
 {
-	for ( int i=0; i < ARRAYSIZE( g_MostCommonPathIDs ); i++ )
+	for ( int i=0; i < ssize( g_MostCommonPathIDs ); i++ )
 	{
 		if ( V_stricmp( pPathID, g_MostCommonPathIDs[i] ) == 0 )
 			return i;
@@ -289,7 +289,7 @@ static int FindCommonPathID( const char *pPathID )
 
 static int FindCommonPrefix( const char *pStr )
 {
-	for ( int i=0; i < ARRAYSIZE( g_MostCommonPrefixes ); i++ )
+	for ( int i=0; i < ssize( g_MostCommonPrefixes ); i++ )
 	{
 		if ( V_stristr( pStr, g_MostCommonPrefixes[i] ) == pStr  )
 		{
@@ -358,13 +358,13 @@ bool CLC_FileCRCCheck::ReadFromBuffer( bf_read &buffer )
 	{
 		buffer.ReadString( m_szPathID, sizeof( m_szPathID ) );
 	}
-	else if ( (iCode-1) < ARRAYSIZE( g_MostCommonPathIDs ) )
+	else if ( (iCode-1) < ssize( g_MostCommonPathIDs ) )
 	{
 		V_strncpy( m_szPathID, g_MostCommonPathIDs[iCode-1], sizeof( m_szPathID ) );
 	}
 	else
 	{
-		Assert( !"Invalid path ID code in CLC_FileCRCCheck" );
+		AssertMsg( false, "Invalid path ID code in CLC_FileCRCCheck" );
 		return false;
 	}
 
@@ -389,13 +389,13 @@ bool CLC_FileCRCCheck::ReadFromBuffer( bf_read &buffer )
 	{
 		V_strcpy_safe( m_szFilename, szTemp );
 	}
-	else if ( (iCode-1) < ARRAYSIZE( g_MostCommonPrefixes ) )
+	else if ( (iCode-1) < ssize( g_MostCommonPrefixes ) )
 	{
 		V_sprintf_safe( m_szFilename, "%s%c%s", g_MostCommonPrefixes[iCode-1], CORRECT_PATH_SEPARATOR, szTemp );
 	}
 	else
 	{
-		Assert( !"Invalid prefix code in CLC_FileCRCCheck." );
+		AssertMsg( false, "Invalid prefix code in CLC_FileCRCCheck." );
 		return false;
 	}
 
@@ -473,13 +473,13 @@ bool CLC_FileMD5Check::ReadFromBuffer( bf_read &buffer )
 	{
 		buffer.ReadString( m_szPathID, sizeof( m_szPathID ) );
 	}
-	else if ( (iCode-1) < ARRAYSIZE( g_MostCommonPathIDs ) )
+	else if ( (iCode-1) < ssize( g_MostCommonPathIDs ) )
 	{
 		V_strncpy( m_szPathID, g_MostCommonPathIDs[iCode-1], sizeof( m_szPathID ) );
 	}
 	else
 	{
-		Assert( !"Invalid path ID code in CLC_FileMD5Check" );
+		AssertMsg( false, "Invalid path ID code in CLC_FileMD5Check" );
 		return false;
 	}
 
@@ -489,7 +489,7 @@ bool CLC_FileMD5Check::ReadFromBuffer( bf_read &buffer )
 	{
 		buffer.ReadString( m_szFilename, sizeof( m_szFilename ) );
 	}
-	else if ( (iCode-1) < ARRAYSIZE( g_MostCommonPrefixes ) )
+	else if ( (iCode-1) < ssize( g_MostCommonPrefixes ) )
 	{
 		char szTemp[MAX_PATH];
 		buffer.ReadString( szTemp, sizeof( szTemp ) );
@@ -497,7 +497,7 @@ bool CLC_FileMD5Check::ReadFromBuffer( bf_read &buffer )
 	}
 	else
 	{
-		Assert( !"Invalid prefix code in CLC_FileMD5Check." );
+		AssertMsg( false, "Invalid prefix code in CLC_FileMD5Check." );
 		return false;
 	}
 
@@ -1137,16 +1137,16 @@ bool NET_SetConVar::WriteToBuffer( bf_write &buffer )
 {
 	buffer.WriteUBitLong( GetType(), NETMSG_TYPE_BITS );
 
-	int numvars = m_ConVars.Count();
+	intp numvars = m_ConVars.Count();
+	Assert( numvars <= UCHAR_MAX );
 
 	// Note how many we're sending
 	buffer.WriteByte( numvars );
 
-	for (int i=0; i< numvars; i++ )
+	for (auto &cvar : m_ConVars)
 	{
-		cvar_t * var = &m_ConVars[i];
-		buffer.WriteString( var->name  );
-		buffer.WriteString( var->value );
+		buffer.WriteString( cvar.name  );
+		buffer.WriteString( cvar.value );
 	}
 
 	return !buffer.IsOverflowed();
@@ -1173,7 +1173,7 @@ bool NET_SetConVar::ReadFromBuffer( bf_read &buffer )
 
 const char *NET_SetConVar::ToString(void) const
 {
-	Q_snprintf(s_text, sizeof(s_text), "%s: %i cvars, \"%s\"=\"%s\"", 
+	Q_snprintf(s_text, sizeof(s_text), "%s: %zd cvars, \"%s\"=\"%s\"", 
 		GetName(), m_ConVars.Count(), 
 		m_ConVars[0].name, m_ConVars[0].value );
 	return s_text;
@@ -1448,21 +1448,21 @@ bool SVC_ClassInfo::WriteToBuffer( bf_write &buffer )
 {
 	if ( !m_bCreateOnClient )
 	{
-		m_nNumServerClasses = m_Classes.Count();	// use number from list list	
+		m_nNumServerClasses = m_Classes.Count();	// use number from list
 	}
+
+	Assert( m_nNumServerClasses <= SHRT_MAX );
+	int numServerClasses = static_cast<int>(m_nNumServerClasses);
 	
 	buffer.WriteUBitLong( GetType(), NETMSG_TYPE_BITS );
-
-	buffer.WriteShort( m_nNumServerClasses );
-
-	int serverClassBits = Q_log2( m_nNumServerClasses ) + 1;
-
-	buffer.WriteOneBit( m_bCreateOnClient?1:0 );
+	buffer.WriteShort( numServerClasses );
+	buffer.WriteOneBit( m_bCreateOnClient ? 1 : 0 );
 
 	if ( m_bCreateOnClient )
 		return !buffer.IsOverflowed();
 
-	for ( int i=0; i< m_nNumServerClasses; i++ )
+	int serverClassBits = Q_log2( numServerClasses ) + 1;
+	for ( intp i = 0; i < m_nNumServerClasses; i++ )
 	{
 		class_t * serverclass = &m_Classes[i];
 
@@ -1480,10 +1480,10 @@ bool SVC_ClassInfo::ReadFromBuffer( bf_read &buffer )
 
 	m_Classes.RemoveAll();
 
-	m_nNumServerClasses = buffer.ReadShort();
+	int numServerClasses = buffer.ReadShort();
+	int nServerClassBits = Q_log2( numServerClasses ) + 1;
 
-	int nServerClassBits = Q_log2( m_nNumServerClasses ) + 1;
-
+	m_nNumServerClasses = numServerClasses;
 	m_bCreateOnClient = buffer.ReadOneBit() != 0;
 
 	if ( m_bCreateOnClient )
@@ -1491,7 +1491,7 @@ bool SVC_ClassInfo::ReadFromBuffer( bf_read &buffer )
 		return !buffer.IsOverflowed(); // stop here
 	}
 
-	for ( int i=0; i<m_nNumServerClasses; i++ )
+	for ( intp i=0; i < m_nNumServerClasses; i++ )
 	{
 		class_t serverclass;
 
@@ -1507,8 +1507,8 @@ bool SVC_ClassInfo::ReadFromBuffer( bf_read &buffer )
 
 const char *SVC_ClassInfo::ToString(void) const
 {
-	Q_snprintf(s_text, sizeof(s_text), "%s: num %i, %s", GetName(), 
-		m_nNumServerClasses, m_bCreateOnClient?"use client classes":"full update" );
+	Q_snprintf(s_text, sizeof(s_text), "%s: num %zd, %s", GetName(), 
+		m_nNumServerClasses, m_bCreateOnClient ? "use client classes" : "full update" );
 	return s_text;
 } 
 
@@ -1704,7 +1704,7 @@ const char *SVC_PacketEntities::ToString(void) const
 	return s_text;
 } 
 
-SVC_Menu::SVC_Menu( DIALOG_TYPE type, KeyValues *data )
+SVC_Menu::SVC_Menu( DIALOG_TYPE type, KeyValues *data ) : m_pMessageHandler{nullptr}
 {
 	m_bReliable = true;
 
@@ -1752,7 +1752,7 @@ bool SVC_Menu::ReadFromBuffer( bf_read &buffer )
 	m_Type = (DIALOG_TYPE)buffer.ReadShort();
 	m_iLength = buffer.ReadWord();
 
-	CUtlBuffer buf( 0, m_iLength );
+	CUtlBuffer buf( (intp)0, m_iLength );
 	buffer.ReadBytes( buf.Base(), m_iLength );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, m_iLength );
 

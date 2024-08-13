@@ -205,7 +205,7 @@ bool CCrypto::SymmetricEncryptWithIV( const uint8 *pubPlaintextData, const uint3
 			AESEncryption aesEncrypt( pubKey, cubKey );
 
 			byte rgubIVEncrypted[k_cMedBuff];
-			Assert( Q_ARRAYSIZE( rgubIVEncrypted ) >= aesEncrypt.BlockSize() );
+			Assert( std::size( rgubIVEncrypted ) >= aesEncrypt.BlockSize() );
 			Assert( pIV != NULL && cubIV >= aesEncrypt.BlockSize() );
 
 			ArraySink * pOutputSink = new ArraySink( pTemp, *pcubEncryptedData );
@@ -495,7 +495,7 @@ bool CCrypto::SymmetricDecrypt( const uint8 *pubEncryptedData, uint32 cubEncrypt
 
 	// Decrypt the IV
 	byte rgubIV[k_cMedBuff];
-	Assert( Q_ARRAYSIZE( rgubIV ) >= aesDecrypt.BlockSize() );
+	Assert( std::size( rgubIV ) >= aesDecrypt.BlockSize() );
 	aesDecrypt.ProcessBlock( pubEncryptedData, rgubIV );
 
 	// We have now consumed the IV, so remove it from the front of the message
@@ -1435,14 +1435,14 @@ bool CCrypto::Base64Decode( const char *pchData, uint32 cchDataMax, uint8 *pubDe
 		32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
 		47, 48, 49, 50, 51
 	};
-	COMPILE_TIME_ASSERT( Q_ARRAYSIZE(rgchInvBase64) == 0x7A - 0x2B + 1 );
+	static_assert( ssize(rgchInvBase64) == 0x7A - 0x2B + 1 );
 
 	uint32 un24BitsWithSentinel = 1;
 	while ( cchDataMax-- > 0 )
 	{
 		char c = *pchData++;
 
-		if ( (uint8)(c - 0x2B) >= Q_ARRAYSIZE( rgchInvBase64 ) )
+		if ( (uint8)(c - 0x2B) >= std::size( rgchInvBase64 ) )
 		{
 			if ( c == '\0' )
 				break;
@@ -1583,7 +1583,7 @@ bool CCrypto::GenerateSaltedSHA1Digest( const char *pchInput, const Salt_t *pSal
 	Assert( pSalt );
 	Assert( pOutDigest );
 
-	int iInputLen = Q_strlen( pchInput );
+	ptrdiff_t iInputLen = Q_strlen( pchInput );
 	uint8 *pubSaltedInput = new uint8[ iInputLen + sizeof( Salt_t ) ];
 
 	// Insert half the salt before the input string and half at the end.
@@ -1770,7 +1770,7 @@ CCustomHexEncoder::CCustomHexEncoder( const char *pchEncodingTable )
 //			pchEncodedData -	Pointer to string buffer to store output in
 //			cchEncodedData -	Size of pchEncodedData buffer
 //-----------------------------------------------------------------------------
-bool CCustomHexEncoder::Encode( const uint8 *pubData, const uint32 cubData, char *pchEncodedData, uint32 cchEncodedData )
+bool CCustomHexEncoder::Encode( const uint8 *pubData, const size_t cubData, char *pchEncodedData, size_t cchEncodedData )
 {
 	VPROF_BUDGET( "CCrypto::CustomHexEncode", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pubData );
@@ -1788,7 +1788,7 @@ bool CCustomHexEncoder::Encode( const uint8 *pubData, const uint32 cubData, char
 	hexEncoder.Put( pubData, cubData );
 	hexEncoder.MessageEnd();
 
-	uint32 len = pArraySinkOutput->TotalPutLength();
+	size_t len = pArraySinkOutput->TotalPutLength();
 	pchEncodedData[len] = 0;	// NULL-terminate
 	if ( len >= cchEncodedData )
 	{
@@ -1810,7 +1810,7 @@ bool CCustomHexEncoder::Encode( const uint8 *pubData, const uint32 cubData, char
 //								output buffer.  At exit, is filled in with actual size
 //								of decoded data.
 //-----------------------------------------------------------------------------
-bool CCustomHexEncoder::Decode( const char *pchData, uint8 *pubDecodedData, uint32 *pcubDecodedData )
+bool CCustomHexEncoder::Decode( const char *pchData, uint8 *pubDecodedData, size_t *pcubDecodedData )
 {
 	VPROF_BUDGET( "CCrypto::CustomHexDecode", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pchData );
@@ -1827,7 +1827,7 @@ bool CCustomHexEncoder::Decode( const char *pchData, uint8 *pubDecodedData, uint
 	hexDecoder.Put( (byte *) pchData, Q_strlen( pchData ) );
 	hexDecoder.MessageEnd();
 
-	uint32 len = pArraySinkOutput->TotalPutLength();
+	size_t len = pArraySinkOutput->TotalPutLength();
 	if ( len > *pcubDecodedData )
 	{
 		AssertMsg2( false, "CCrypto::CustomHexDecode: insufficient output buffer for decoding, needed %d got %d\n",
@@ -1872,7 +1872,7 @@ CCustomBase32Encoder::CCustomBase32Encoder( const char *pchEncodingTable )
 //			pchEncodedData -	Pointer to string buffer to store output in
 //			cchEncodedData -	Size of pchEncodedData buffer
 //-----------------------------------------------------------------------------
-bool CCustomBase32Encoder::Encode( const uint8 *pubData, const uint32 cubData, char *pchEncodedData, uint32 cchEncodedData )
+bool CCustomBase32Encoder::Encode( const uint8 *pubData, const size_t cubData, char *pchEncodedData, size_t cchEncodedData )
 {
 	VPROF_BUDGET( "CCrypto::CustomBase32Encode", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pubData );
@@ -1890,7 +1890,7 @@ bool CCustomBase32Encoder::Encode( const uint8 *pubData, const uint32 cubData, c
 	base32Encoder.Put( pubData, cubData );
 	base32Encoder.MessageEnd();
 
-	uint32 len = pArraySinkOutput->TotalPutLength();
+	size_t len = pArraySinkOutput->TotalPutLength();
 	pchEncodedData[len] = 0;	// NULL-terminate
 	if ( len >= cchEncodedData )
 	{
@@ -1912,7 +1912,7 @@ bool CCustomBase32Encoder::Encode( const uint8 *pubData, const uint32 cubData, c
 //								output buffer.  At exit, is filled in with actual size
 //								of decoded data.
 //-----------------------------------------------------------------------------
-bool CCustomBase32Encoder::Decode( const char *pchData, uint8 *pubDecodedData, uint32 *pcubDecodedData )
+bool CCustomBase32Encoder::Decode( const char *pchData, uint8 *pubDecodedData, size_t *pcubDecodedData )
 {
 	VPROF_BUDGET( "CCrypto::CustomBase32Decode", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pchData );
@@ -1929,7 +1929,7 @@ bool CCustomBase32Encoder::Decode( const char *pchData, uint8 *pubDecodedData, u
 	base32Decoder.Put( (byte *) pchData, Q_strlen( pchData ) );
 	base32Decoder.MessageEnd();
 
-	uint32 len = pArraySinkOutput->TotalPutLength();
+	size_t len = pArraySinkOutput->TotalPutLength();
 	if ( len > *pcubDecodedData )
 	{
 		AssertMsg2( false, "CCrypto::CustomBase32Decode: insufficient output buffer for decoding, needed %d got %d\n",
@@ -1951,7 +1951,7 @@ bool CCustomBase32Encoder::Decode( const char *pchData, uint8 *pubDecodedData, u
 //			pchEncodedData -	Pointer to string buffer to store output in
 //			cchEncodedData -	Size of pchEncodedData buffer
 //-----------------------------------------------------------------------------
-bool CCustomBase32Encoder::Encode( CSimpleBitString *pBitStringData, char *pchEncodedData, uint32 cchEncodedData )
+bool CCustomBase32Encoder::Encode( CSimpleBitString *pBitStringData, char *pchEncodedData, size_t cchEncodedData )
 {
 	// This is useful if you have, say, 125 bits of information and
 	// want to encode them into 25 base32-encoded characters. 
@@ -2104,7 +2104,7 @@ bool CCrypto::BGeneratePBKDF2Hash( const char* pchInput, const Salt_t &Salt, uns
 {
 	PKCS5_PBKDF2_HMAC<SHA256> pbkdf;
 
-	unsigned int iterations = pbkdf.DeriveKey( (byte *)&OutPasswordHash.pbkdf2, sizeof(OutPasswordHash.pbkdf2), 0, (const byte *)pchInput, Q_strlen(pchInput), (const byte *)&Salt, sizeof(Salt), rounds );
+	size_t iterations = pbkdf.DeriveKey( (byte *)&OutPasswordHash.pbkdf2, sizeof(OutPasswordHash.pbkdf2), 0, (const byte *)pchInput, Q_strlen(pchInput), (const byte *)&Salt, sizeof(Salt), rounds );
 
 	return ( iterations == rounds );
 }
@@ -2122,7 +2122,7 @@ bool CCrypto::BGenerateWrappedSHA1PasswordHash( const char *pchInput, const Salt
 	if ( bResult )
 	{
 		PKCS5_PBKDF2_HMAC<SHA256> pbkdf;
-		unsigned int iterations = pbkdf.DeriveKey( (byte *)&OutPasswordHash.pbkdf2, sizeof(OutPasswordHash.pbkdf2), 0, (const byte *)&OutPasswordHash.sha, sizeof(OutPasswordHash.sha), (const byte *)&Salt, sizeof(Salt), rounds );
+		size_t iterations = pbkdf.DeriveKey( (byte *)&OutPasswordHash.pbkdf2, sizeof(OutPasswordHash.pbkdf2), 0, (const byte *)&OutPasswordHash.sha, sizeof(OutPasswordHash.sha), (const byte *)&Salt, sizeof(Salt), rounds );
 
 		bResult = ( iterations == rounds );
 	}
@@ -2171,7 +2171,7 @@ bool CCrypto::BUpgradeOrWrapPasswordHash( PasswordHash_t &InPasswordHash, EPassw
 
 			PKCS5_PBKDF2_HMAC<SHA256> pbkdf;
 			PasswordHash_t passOut;
-			unsigned int iterations = pbkdf.DeriveKey( (byte *)passOut.pbkdf2, sizeof(passOut.pbkdf2), 0, pbHash, k_HashLengths[k_EHashSHA1], (const byte *)&Salt, sizeof(Salt), 10000 );
+			size_t iterations = pbkdf.DeriveKey( (byte *)passOut.pbkdf2, sizeof(passOut.pbkdf2), 0, pbHash, k_HashLengths[k_EHashSHA1], (const byte *)&Salt, sizeof(Salt), 10000 );
 
 			bResult = ( iterations == 10000 );
 			if ( bResult )

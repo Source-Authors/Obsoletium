@@ -19,7 +19,7 @@
 #if !defined(_STATIC_LINKED) || defined(GAME_DLL)
 
 
-static CNonModifiedPointerProxy *s_pNonModifiedPointerProxyHead = NULL;
+static CNonModifiedPointerProxy *s_pNonModifiedPointerProxyHead = nullptr;
 
 
 void SendProxy_UInt8ToInt32( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID);
@@ -139,8 +139,8 @@ const char *s_ElementNames[MAX_ARRAY_ELEMENTS] =
 
 CNonModifiedPointerProxy::CNonModifiedPointerProxy( SendTableProxyFn fn )
 {
-	m_pNext = s_pNonModifiedPointerProxyHead;
-	s_pNonModifiedPointerProxyHead = this;
+	// dimhotepus: Better to make thread-safe as implicitly expected.
+	m_pNext = static_cast<CNonModifiedPointerProxy*>(ThreadInterlockedExchangePointer( reinterpret_cast<void * volatile *>( &s_pNonModifiedPointerProxyHead), this ));
 	m_Fn = fn;
 }
 
@@ -323,9 +323,7 @@ float AssignRangeMultiplier( int nBits, double range )
 	else
 		iHighValue = ((1 << (unsigned long)nBits) - 1);
 
-	float fHighLowMul = iHighValue / range;
-	if ( CloseEnough( range, 0 ) )
-		fHighLowMul = iHighValue;
+	float fHighLowMul = fabs(range) <= DBL_EPSILON ? iHighValue : iHighValue / range;
 	
 	// If the precision is messing us up, then adjust it so it won't.
 	if ( (unsigned long)(fHighLowMul * range) > iHighValue ||
@@ -334,8 +332,8 @@ float AssignRangeMultiplier( int nBits, double range )
 		// Squeeze it down smaller and smaller until it's going to produce an integer
 		// in the valid range when given the highest value.
 		float multipliers[] = { 0.9999, 0.99, 0.9, 0.8, 0.7 };
-		int i;
-		for ( i=0; i < ARRAYSIZE( multipliers ); i++ )
+		size_t i;
+		for ( i=0; i < std::size( multipliers ); i++ )
 		{
 			fHighLowMul = (float)( iHighValue / range ) * multipliers[i];
 			if ( (unsigned long)(fHighLowMul * range) > iHighValue ||
@@ -348,7 +346,7 @@ float AssignRangeMultiplier( int nBits, double range )
 			}
 		}
 
-		if ( i == ARRAYSIZE( multipliers ) )
+		if ( i == std::size( multipliers ) )
 		{
 			// Doh! We seem to be unable to represent this range.
 			Assert( false );
@@ -621,7 +619,7 @@ SendProp SendPropInt(
 #endif
 		else
 		{
-			Assert(!"SendPropInt var has invalid size");
+			AssertMsg( false, "SendPropInt var has invalid size" );
 			varProxy = SendProxy_Int8ToInt32;	// safest one...
 		}
 	}
@@ -835,14 +833,7 @@ SendProp::~SendProp()
 int SendProp::GetNumArrayLengthBits() const
 {
 	Assert( GetType() == DPT_Array );
-#if _X360
-	int elemCount = GetNumElements();
-	if ( !elemCount )
-		return 1;
-	return (32 - _CountLeadingZeros(GetNumElements()));
-#else
 	return Q_log2( GetNumElements() ) + 1;
-#endif
 }
 
 
