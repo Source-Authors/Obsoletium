@@ -76,7 +76,7 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 
 	// find a match that can use same entries
 	BitmapFontTable_t *pFontTable = NULL;
-	for ( int i=0; i<g_BitmapFontTable.Count(); i++ )
+	for ( intp i=0; i<g_BitmapFontTable.Count(); i++ )
 	{
 		if ( symbol == g_BitmapFontTable[i].m_szName )
 		{
@@ -248,7 +248,7 @@ void CBitmapFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
 	c = static_cast<int>(pFont->m_pBitmapGlyphs[ch].c * m_scalex);
 }
 
-void CBitmapFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned char *prgba )
+void CBitmapFont::GetCharRGBA( wchar_t, int, int, unsigned char * )
 {
 	// CBitmapFont derives off CLinuxFont, etc. But you should never call GetCharRGBA on a bitmap font.
 	// If we let this fall into the CLinuxFont code, we'd have a difficult to track down bug - so crash
@@ -256,7 +256,7 @@ void CBitmapFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned 
 	Error( "GetCharRGBA called on CBitmapFont." );
 }
 
-void CBitmapFont::GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &abcA, float &abcC )
+void CBitmapFont::GetKernedCharWidth( wchar_t ch, wchar_t, wchar_t, float &wide, float &abcA, float &abcC )
 {
 	Assert( IsValid() && ch >= 0 && ch <= 255 );
 

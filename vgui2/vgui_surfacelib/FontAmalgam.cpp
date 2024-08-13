@@ -45,7 +45,7 @@ void CFontAmalgam::SetName(const char *name)
 //-----------------------------------------------------------------------------
 void CFontAmalgam::AddFont(font_t *font, int lowRange, int highRange)
 {
-	int i = m_Fonts.AddToTail();
+	intp i = m_Fonts.AddToTail();
 
 	m_Fonts[i].font = font;
 	m_Fonts[i].lowRange = lowRange;
@@ -184,7 +184,7 @@ int CFontAmalgam::GetFlags(int i)
 //-----------------------------------------------------------------------------
 // Purpose: returns the number of fonts this amalgam contains
 //-----------------------------------------------------------------------------
-int CFontAmalgam::GetCount()
+intp CFontAmalgam::GetCount()
 {		
 	return m_Fonts.Count();
 }

@@ -50,7 +50,7 @@ public:
 	const char *GetFontFamilyName(int i);
 
 	// returns the number of fonts in this amalgam
-	int GetCount();
+	intp GetCount();
 
 	// returns true if this font is underlined
 	bool GetUnderlined();
