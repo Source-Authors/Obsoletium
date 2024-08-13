@@ -144,14 +144,14 @@ bool CImportVMF::SerializeAttribute( CUtlBuffer &buf, CDmAttribute *pAttribute, 
 bool CImportVMF::SerializeOther( CUtlBuffer &buf, CDmAttribute *pOther, const char **ppFilter )
 {
 	CDmrElementArray<> array( pOther );
-	int nCount = array.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = array.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmElement *pElement = array[i];
 		const char *pElementName = pElement->GetName();
 		if ( ppFilter )
 		{
-			int j;
+			intp j;
 			for ( j = 0; ppFilter[j]; ++j )
 			{
 				if ( !Q_stricmp( pElementName, ppFilter[j] ) )
@@ -162,7 +162,7 @@ bool CImportVMF::SerializeOther( CUtlBuffer &buf, CDmAttribute *pOther, const ch
 				continue;
 		}
 
-		int nLen = Q_strlen( pElementName ) + 1;
+		intp nLen = Q_strlen( pElementName ) + 1;
 		char *pTemp = (char*)_alloca( nLen );
 		Q_strncpy( pTemp, pElementName, nLen );
 		Q_strlower( pTemp );
@@ -248,8 +248,8 @@ bool CImportVMF::SerializeEntities( CUtlBuffer &buf, CDmAttribute *pEntities )
 	// to minimize diffs
 	CDmrElementArray<> array( pEntities );
 
-	int nCount = array.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = array.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmElement *pElement = array[i];
 		buf.Printf( "entity\n" );

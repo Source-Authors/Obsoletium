@@ -86,10 +86,10 @@ bool CImportActBusy::Serialize( CUtlBuffer &buf, CDmElement *pRoot )
 		return NULL;
 
 	CDmrElementArray<> children( pChildren );
-	int nCount = children.Count();
+	intp nCount = children.Count();
 
 	buf.PushTab();
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmElement *pChild = children[i];
  		buf.Printf( "\"%s\"\n", pChild->GetName() );

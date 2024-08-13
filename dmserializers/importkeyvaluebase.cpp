@@ -16,7 +16,7 @@
 //-----------------------------------------------------------------------------
 // Default serialization method
 //-----------------------------------------------------------------------------
-bool CImportKeyValueBase::Serialize( CUtlBuffer &outBuf, CDmElement *pRoot )
+bool CImportKeyValueBase::Serialize( CUtlBuffer &, CDmElement * )
 {
 	Warning( "Serialization not supported for importing from keyvalues files\n");
 	return false;
@@ -252,8 +252,8 @@ void CImportKeyValueBase::RecursivelyResolveElement( CDmElement* pElement )
 		case AT_ELEMENT_ARRAY:
 			{
 				CDmrElementArray<> array( pAttribute );
-				int nCount = array.Count();
-				for ( int i = 0; i < nCount; ++i )
+				intp nCount = array.Count();
+				for ( intp i = 0; i < nCount; ++i )
 				{
 					CDmElement *pElementAt = array[ i ];
 					RecursivelyResolveElement( pElementAt );

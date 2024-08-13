@@ -132,8 +132,8 @@ void CopyValues( int layerType, CDmElement *pElement, CDmElement *pLayer, CDmAtt
 	CDmrArray<int> inCurveTypes( pInCurveTypeAttribute );
 
 	Assert( inValues.Count() == inTimes.Count() );
-	int c = inValues.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = inValues.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		outTimes.AddToTail( inTimes[ i ] );
 		outValues.AddToTail( inValues[ i ] );
@@ -267,8 +267,8 @@ void CImportSFMV2::BuildList( CDmElement *pElement, CUtlRBTree< CDmElement *, in
 		if ( pAttribute->GetType() == AT_ELEMENT_ARRAY )
 		{
 			CDmrElementArray<> array( pAttribute );
-			int nCount = array.Count();
-			for ( int i = 0; i < nCount; ++i )
+			intp nCount = array.Count();
+			for ( intp i = 0; i < nCount; ++i )
 			{
 				CDmElement *pChild = array[ i ];
 				BuildList( pChild, list );

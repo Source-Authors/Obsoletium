@@ -191,8 +191,8 @@ bool CImportVMT::SerializeFallbacks( CUtlBuffer &buf, CDmElement *pRoot )
 		return false;
 
 	CDmrElementArray<> array( pFallbacks );
-	int nCount = array.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = array.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmElement *pFallback = array[i];
 		Assert( pFallback );
@@ -222,14 +222,14 @@ bool CImportVMT::SerializeProxies( CUtlBuffer &buf, CDmElement *pRoot )
 		return false;
 
 	CDmrElementArray<> array( pProxies );
-	int nCount = array.Count();
+	intp nCount = array.Count();
 	if ( nCount == 0 )
 		return true;
 
 	buf.Printf( "\"Proxies\"\n" );
 	buf.Printf( "{\n" );
 	buf.PushTab();
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmElement *pProxy = array[i];
 		Assert( pProxy );

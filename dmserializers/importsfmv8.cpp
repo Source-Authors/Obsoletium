@@ -70,8 +70,8 @@ void CImportSFMV8::FixupElement( CDmElement *pElement )
 		CDmrElementArray<> srcControls( pElement, "controls" );
 		if ( srcControls.IsValid() )
 		{
-			int nCount = srcControls.Count();
-			for ( int i = 0; i < nCount; ++i )
+			intp nCount = srcControls.Count();
+			for ( intp i = 0; i < nCount; ++i )
 			{
 				CDmElement *pControl = srcControls[i];
 				if ( pControl )
@@ -115,8 +115,8 @@ void CImportSFMV8::BuildList( CDmElement *pElement, CUtlRBTree< CDmElement *, in
 		if ( pAttribute->GetType() == AT_ELEMENT_ARRAY )
 		{
 			CDmrElementArray<> array( pAttribute );
-			int nCount = array.Count();
-			for ( int i = 0; i < nCount; ++i )
+			intp nCount = array.Count();
+			for ( intp i = 0; i < nCount; ++i )
 			{
 				CDmElement *pChild = array[ i ];
 				BuildList( pChild, list );
