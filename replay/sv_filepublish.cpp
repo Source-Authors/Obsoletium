@@ -306,17 +306,17 @@ public:
 	CBaseFilePublisher()
 	:	m_pCallbackHandler( NULL ),
 		m_pUserData( NULL ),
-		m_pCurrentJob( NULL ),
-		m_pInData( NULL ),
-		m_pHeaderData( NULL ),
-		m_nStatus( PUBLISHSTATUS_INVALID ),
-		m_nPhase( PHASE_INVALID ),
 		m_bCompressedOk( false ),
 		m_bHashedOk( false ),
-		m_nHeaderSize( 0 ),
+		m_nPhase( PHASE_INVALID ),
+		m_nStatus( PUBLISHSTATUS_INVALID ),
+		m_pCurrentJob( NULL ),
 		m_nCompressedSize( 0 ),
+		m_nInType( IO_INVALID ),
+		m_pInData( NULL ),
 		m_nInSize( 0 ),
-		m_nInType( IO_INVALID )
+		m_pHeaderData( NULL ),
+		m_nHeaderSize( 0 )
 	{
 		m_szOutFilename[ 0 ] = 0;
 		V_memset( m_aHash, 0, sizeof( m_aHash ) );

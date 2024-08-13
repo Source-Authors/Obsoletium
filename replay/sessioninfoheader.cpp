@@ -12,7 +12,7 @@
 
 bool ReadSessionInfoHeader( const void *pBuf, int nBufSize, SessionInfoHeader_t &outHeader )
 {
-	if ( nBufSize < sizeof( SessionInfoHeader_t ) )
+	if ( nBufSize < static_cast<int>(sizeof( SessionInfoHeader_t )) )
 	{
 		AssertMsg( 0, "Buffer size too small to read session info header" );
 		return false;

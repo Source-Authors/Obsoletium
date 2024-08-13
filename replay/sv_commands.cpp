@@ -104,7 +104,7 @@ void PrintSessionInfo( const char *pFilename )
 	Msg( "\t%27s: %u bytes\n", "payload size (uncompressed)", header.m_uPayloadSizeUC );
 	Msg( "\n" );
 
-	const uint8 *pPayload = (uint8 *)buf.Base() + sizeof( SessionInfoHeader_t );
+	const uint8 *pPayload = buf.Base<uint8>() + sizeof( SessionInfoHeader_t );
 	uint32 uUncompressedPayloadSize = header.m_uPayloadSizeUC;
 	if ( !g_pEngine->MD5_HashBuffer( header.m_aHash, (const uint8 *)pPayload, header.m_uPayloadSize, NULL ) )
 	{

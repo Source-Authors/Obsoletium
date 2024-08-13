@@ -22,15 +22,15 @@ extern IEngineReplay		*g_pEngine;
 //----------------------------------------------------------------------------------------
 
 CHttpDownloader::CHttpDownloader( IDownloadHandler *pHandler )
-:	m_pHandler( pHandler ),
+:	m_pThreadState( NULL ),
 	m_flNextThinkTime( 0.0f ),
-	m_uBytesDownloaded( 0 ),
-	m_uSize( 0 ),
-	m_pThreadState( NULL ),
 	m_bDone( false ),
 	m_nHttpError( HTTP_ERROR_NONE ),
 	m_nHttpStatus( HTTP_INVALID ),
+	m_uBytesDownloaded( 0 ),
 	m_pBytesDownloaded( NULL ),
+	m_uSize( 0 ),
+	m_pHandler( pHandler ),
 	m_pUserData( NULL )
 {
 }

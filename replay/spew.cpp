@@ -31,7 +31,7 @@ class CBlockSpewer : public ISpewer
 	virtual void PrintEventStartMsg( const char *pMsg ) const
 	{
 		char pDots[] = { "............................................." };
-		const int nNumDots = MAX( 3, V_strlen( pDots ) - V_strlen( pMsg ) );
+		const intp nNumDots = MAX( 3, V_strlen( pDots ) - V_strlen( pMsg ) );
 		pDots[ nNumDots ] = '\0';
 		Log( "*      %s%s", pMsg, pDots );
 	}
@@ -54,7 +54,7 @@ class CBlockSpewer : public ISpewer
 	virtual void PrintValue( const char *pWhat, const char *pValue ) const
 	{
 		char pSpaces[] = { "                  " };
-		const int nNumSpaces = MAX( 3, V_strlen( pSpaces ) - V_strlen( pWhat ) );
+		const intp nNumSpaces = MAX( 3, V_strlen( pSpaces ) - V_strlen( pWhat ) );
 		pSpaces[ nNumSpaces ] = '\0';
 		Log( "*      %s: %s%s\n", pWhat, pSpaces, pValue );
 	}

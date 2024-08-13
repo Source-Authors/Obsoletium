@@ -52,7 +52,7 @@ public:
 
 	virtual void			OnSaveReplay( ReplayHandle_t hNewReplay, bool bShowInputDlg ) = 0;
 	virtual void			OnDeleteReplay( ReplayHandle_t hReplay ) = 0;	// Called before replay is actually removed from the replay manager
-	virtual void			OnPlaybackComplete( ReplayHandle_t hReplay, int iPerformance ) = 0;
+	virtual void			OnPlaybackComplete( ReplayHandle_t hReplay, intp iPerformance ) = 0;
 	virtual void			OnRenderStart() = 0;
 	virtual void			OnRenderComplete( const RenderMovieParams_t &RenderParams, bool bCancelled, bool bSuccess, bool bShowBrowser ) = 0;
 	virtual bool			OnConfirmQuit() = 0;

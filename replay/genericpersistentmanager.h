@@ -94,9 +94,9 @@ protected:
 	virtual bool		ShouldDeleteObjects() const { return true; }	// TODO: Used by Clear() - I'm not convinced this is needed yet though.
 	virtual int			GetVersion() const = 0;
 	virtual bool		ShouldSerializeToIndividualFiles() const { return true; }
-	virtual bool		ShouldSerializeIndexWithFullPath()  const { return false; }
-	virtual bool		ShouldLoadObj( const T *pObj ) const { return true; }
-	virtual void		OnObjLoaded( T *pObj ) {}
+	virtual bool		ShouldSerializeIndexWithFullPath() const { return false; }
+	virtual bool		ShouldLoadObj( const T * ) const { return true; }
+	virtual void		OnObjLoaded( T * ) {}
 
 	virtual int			GetHandleBase() const	{ return 0; }	// Subclass can implement this to provide a base/minimum for handles
 	virtual void		PreLoad() {}

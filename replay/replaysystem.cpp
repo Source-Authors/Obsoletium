@@ -469,7 +469,7 @@ const char *Replay_GetDownloadURL()
 	);
 
 	// Cleanup
-	V_FixDoubleSlashes( s_szFileURL + V_strlen("http://") );
+	V_FixDoubleSlashes( s_szFileURL + ssize("http://") - 1 );
 
 	return s_szFileURL;
 }

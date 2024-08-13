@@ -58,7 +58,7 @@ private:
 	//
 	virtual void		OnPublishComplete( const IFilePublisher *pPublisher, void *pUserData );
 	virtual void		OnPublishAborted( const IFilePublisher *pPublisher );
-	virtual void		AdjustHeader( const IFilePublisher *pPublisher, void *pHeaderData ) {}
+	virtual void		AdjustHeader( const IFilePublisher *, void * ) {}
 
 	void				PublishBlock( CServerRecordingSessionBlock *pBlock );
 

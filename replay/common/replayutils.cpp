@@ -19,18 +19,18 @@ static char gs_szGameDir[MAX_OSPATH];
 
 //----------------------------------------------------------------------------------------
 
-void Replay_GetFirstAvailableFilename( char *pDst, int nDstLen, const char *pIdealFilename, const char *pExt,
-									   const char *pFilePath, int nStartIndex )
+void Replay_GetFirstAvailableFilename( char *pDst, intp nDstLen, const char *pIdealFilename, const char *pExt,
+									   const char *pFilePath, intp nStartIndex )
 {
 	// Strip extension from ideal filename
 	char szIdealFilename[ MAX_OSPATH ];
 	V_StripExtension( pIdealFilename, szIdealFilename, sizeof( szIdealFilename ) );
 
-	int i = nStartIndex;
+	intp i = nStartIndex;
 	while ( 1 )
 	{
 		V_strncpy( pDst, szIdealFilename, nDstLen );
-		V_strcat( pDst, Replay_va( "_%i%s", i, pExt ), nDstLen );
+		V_strcat( pDst, Replay_va( "_%zd%s", i, pExt ), nDstLen );
 
 		// Get a potential working path/filename
 		CFmtStr fmtTestFilename(

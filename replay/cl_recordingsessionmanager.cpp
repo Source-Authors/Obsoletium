@@ -20,7 +20,6 @@
 
 CClientRecordingSessionManager::CClientRecordingSessionManager( IReplayContext *pContext )
 :	CBaseRecordingSessionManager( pContext ),
-	m_nNumSessionBlockDownloaders( 0 ),
 	m_flNextBlockUpdateTime( 0.0f ),
 	m_flNextPossibleDownloadTime( 0.0f )
 {

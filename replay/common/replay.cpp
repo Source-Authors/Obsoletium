@@ -27,24 +27,24 @@ extern vgui::ILocalize *g_pVGuiLocalize;
 
 CReplay::CReplay()
 :	m_pDownloadEventHandler( NULL ),
-	m_pUserData( NULL ),
-	m_bComplete( false ),
-	m_bRequestedByUser( false ),
 	m_bSaved( false ),
-	m_bRendered( false ),
+	m_bRequestedByUser( false ),
+	m_bComplete( false ),
+	m_pUserData( NULL ),
+	m_flNextUpdateTime( 0.0f ),
 	m_bDirty( false ),
-	m_bSavedDuringThisSession( true ),
-	m_flLength( 0 ),
-	m_nPlayerSlot( -1 ),
+	m_hSession( REPLAY_HANDLE_INVALID ),
+	m_nStatus( REPLAYSTATUS_INVALID ),
+	m_pFileURL( NULL ),
 	m_nSpawnTick( -1 ),
 	m_nDeathTick( -1 ),
-	m_iMaxSessionBlockRequired( 0 ),
-	m_nStatus( REPLAYSTATUS_INVALID ),
-	m_hSession( REPLAY_HANDLE_INVALID ),
-	m_pFileURL( NULL ),
+	m_flLength( 0 ),
+	m_bRendered( false ),
+	m_nPlayerSlot( -1 ),
 	m_nPostDeathRecordTime( 0 ),
+	m_iMaxSessionBlockRequired( 0 ),
 	m_flStartTime( 0.0f ),
-	m_flNextUpdateTime( 0.0f )
+	m_bSavedDuringThisSession( true )
 {
 	m_wszTitle[0] = L'\0';
 	m_szMapName[0] = 0;
@@ -55,12 +55,12 @@ bool CReplay::IsDownloaded() const
 	return m_nStatus == REPLAYSTATUS_READYTOCONVERT;
 }
 
-const CReplayPerformance *CReplay::GetPerformance( int i ) const
+const CReplayPerformance *CReplay::GetPerformance( intp i ) const
 {
 	return const_cast< CReplay * >( this )->GetPerformance( i );
 }
 
-CReplayPerformance *CReplay::GetPerformance( int i )
+CReplayPerformance *CReplay::GetPerformance( intp i )
 {
 	if ( i < 0 || i >= m_vecPerformances.Count() )
 		return NULL;
@@ -68,9 +68,9 @@ CReplayPerformance *CReplay::GetPerformance( int i )
 	return m_vecPerformances[ i ];
 }
 
-bool CReplay::FindPerformance( CReplayPerformance *pPerformance, int &iResult )
+bool CReplay::FindPerformance( CReplayPerformance *pPerformance, intp &iResult )
 {
-	const int it = m_vecPerformances.Find( pPerformance );
+	const intp it = m_vecPerformances.Find( pPerformance );
 	if ( it == m_vecPerformances.InvalidIndex() )
 	{
 		iResult = -1;

@@ -22,11 +22,10 @@
 //----------------------------------------------------------------------------------------
 
 CSharedReplayContext::CSharedReplayContext( IReplayContext *pOwnerContext )
-:	m_pOwnerContext( pOwnerContext ),
+:	m_pThreadPool( NULL ),
 	m_pRecordingSessionManager( NULL ),
 	m_pRecordingSessionBlockManager( NULL ),
 	m_pErrorSystem( NULL ),
-	m_pThreadPool( NULL ),
 	m_bInit( false )
 {
 }
