@@ -171,7 +171,7 @@ void C_INIT_CreateOnModel::InitNewParticlesScalar(
 		Vector vecPnts[100];								// minimize stack usage
 		Vector vecUVW[100];
 		int nHitBoxIndex[100];
-		int nToDo = min( (int)ARRAYSIZE( vecPnts ), nParticleCount );
+		int nToDo = min( ssize( vecPnts ), (ptrdiff_t)nParticleCount );
 
 		Assert( m_nControlPointNumber <= pParticles->GetHighestControlPoint() );
 

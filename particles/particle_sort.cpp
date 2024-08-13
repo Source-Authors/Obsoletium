@@ -14,7 +14,7 @@
 #include "tier0/memdbgon.h"
 
 
-static alignas(16) ParticleRenderData_t s_SortedIndexList[MAX_PARTICLES_IN_A_SYSTEM];
+alignas(16) static ParticleRenderData_t s_SortedIndexList[MAX_PARTICLES_IN_A_SYSTEM];
 
 
 enum EParticleSortKeyType

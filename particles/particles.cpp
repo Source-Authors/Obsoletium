@@ -91,7 +91,7 @@ static const char *s_RemapOperatorNameTable[]={
 
 static char const *RemapOperatorName( char const *pOpName )
 {
-	for( int i = 0 ; i < ARRAYSIZE( s_RemapOperatorNameTable ) ; i += 2 )
+	for( size_t i = 0 ; i < std::size( s_RemapOperatorNameTable ) ; i += 2 )
 	{
 		if ( Q_stricmp( pOpName, s_RemapOperatorNameTable[i] ) == 0 )
 		{
@@ -159,8 +159,8 @@ private:
 //-----------------------------------------------------------------------------
 CParticleSystemDictionary::~CParticleSystemDictionary()
 {
-	int nCount = m_ParticleIdMap.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ParticleIdMap.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		delete m_ParticleIdMap[i];
 	}
@@ -186,9 +186,9 @@ void CParticleSystemDictionary::DestroyExistingElement( CDmxElement *pElement )
 	}
 	
 	// Use id based lookup instead
-	int nCount = m_ParticleIdMap.Count();
+	intp nCount = m_ParticleIdMap.Count();
 	const DmObjectId_t& id = pElement->GetId();
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		// Was already removed by the name lookup
 		if ( !IsUniqueIdEqual( m_ParticleIdMap[i]->GetId(), id ) )
@@ -265,8 +265,8 @@ CParticleSystemDefinition* CParticleSystemDictionary::FindParticleSystem( const 
 
 CParticleSystemDefinition* CParticleSystemDictionary::FindParticleSystem( const DmObjectId_t &id )
 {
-	int nCount = m_ParticleIdMap.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ParticleIdMap.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( IsUniqueIdEqual( m_ParticleIdMap[i]->GetId(), id ) )
 			return m_ParticleIdMap[i];
@@ -384,8 +384,8 @@ void CParticleSystemDefinition::Precache()
 	m_Material.Init( MaterialName(), TEXTURE_GROUP_OTHER, true );
 #endif
 
-	int nChildCount = m_Children.Count();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = m_Children.Count();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CParticleSystemDefinition *pChild;
 		if ( m_Children[i].m_bUseNameBasedLookup )
@@ -413,8 +413,8 @@ void CParticleSystemDefinition::Uncache()
 	m_Material.Shutdown();	
 //	m_Material.Init( "debug/particleerror", TEXTURE_GROUP_OTHER, true );
 
-	int nChildCount = m_Children.Count();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = m_Children.Count();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CParticleSystemDefinition *pChild;
 		if ( m_Children[i].m_bUseNameBasedLookup )
@@ -457,8 +457,8 @@ void CParticleSystemDefinition::ParseOperators(
 	const CUtlVector<IParticleOperatorDefinition *> &flist = g_pParticleSystemMgr->GetAvailableParticleOperatorList( nFunctionType );
 
 	const CUtlVector< CDmxElement* >& ops = pAttribute->GetArray<CDmxElement*>( );
-	int nCount = ops.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = ops.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const char *pOrigName = ops[i]->GetValueString( "functionName" );
 		char const *pOpName = RemapOperatorName( pOrigName );
@@ -467,8 +467,8 @@ void CParticleSystemDefinition::ParseOperators(
 			pElement->SetValue( "functionName", pOpName );
 		}
 		bool bFound = false;
-		int nFunctionCount = flist.Count();
-		for( int j = 0; j < nFunctionCount; ++j )
+		intp nFunctionCount = flist.Count();
+		for( intp j = 0; j < nFunctionCount; ++j )
 		{
 			if ( Q_stricmp( pOpName, flist[j]->GetName() ) )
 				continue;
@@ -527,14 +527,14 @@ void CParticleSystemDefinition::ParseOperators(
 void CParticleSystemDefinition::ParseChildren( CDmxElement *pElement )
 {
 	const CUtlVector<CDmxElement*>& children = pElement->GetArray<CDmxElement*>( "children" );
-	int nCount = children.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = children.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxElement *pChild = children[i]->GetValue<CDmxElement*>( "child" );
 		if ( !pChild || Q_stricmp( pChild->GetTypeString(), "DmeParticleSystemDefinition" ) )
 			continue;
 
-		int j = m_Children.AddToTail();
+		intp j = m_Children.AddToTail();
 		children[i]->UnpackIntoStructure( &m_Children[j], sizeof( m_Children[j] ), s_ChildrenInfoUnpack );
 		m_Children[j].m_bUseNameBasedLookup = !pChild->GetValue<bool>( "preventNameBasedLookup" );
 		if ( m_Children[j].m_bUseNameBasedLookup )
@@ -628,8 +628,8 @@ void CParticleSystemDefinition::WriteOperators( CDmxElement *pElement,
 	CDmxAttribute* pAttribute = pElement->AddAttribute( pOpKeyName );
 	CUtlVector< CDmxElement* >& ops = pAttribute->GetArrayForEdit<CDmxElement*>( );
 
-	int nCount = inList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = inList.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxElement *pOperator = CreateDmxElement( "DmeParticleOperator" );
 		ops.AddToTail( pOperator );
@@ -651,8 +651,8 @@ void CParticleSystemDefinition::WriteChildren( CDmxElement *pElement )
 	CDmxElementModifyScope modify( pElement );
 	CDmxAttribute* pAttribute = pElement->AddAttribute( "children" );
 	CUtlVector< CDmxElement* >& children = pAttribute->GetArrayForEdit<CDmxElement*>( );
-	int nCount = m_Children.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Children.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxElement *pChildRef = CreateDmxElement( "DmeParticleChild" );
 		children.AddToTail( pChildRef );
@@ -704,10 +704,10 @@ void CParticleSystemDefinition::SetupContextData( void )
 
 	// loop through all operators, fill in offset entries, and calulate total data needed
 	m_nContextDataSize = 0;
-	for( int i = 0; i < NELEMS( olists ); i++ )
+	for( size_t i = 0; i < std::size( olists ); i++ )
 	{
-		int nCount = olists[i]->Count();
-		for( int j = 0; j < nCount; j++ )
+		intp nCount = olists[i]->Count();
+		for( intp j = 0; j < nCount; j++ )
 		{
 			offsetLists[i]->AddToTail( m_nContextDataSize );
 			m_nContextDataSize += (*olists[i])[j]->GetRequiredContextBytes();
@@ -753,8 +753,8 @@ CParticleOperatorInstance *CParticleSystemDefinition::FindOperatorById( Particle
 	if ( !pVec )
 		return NULL;
 
-	int nCount = pVec->Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pVec->Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( IsUniqueIdEqual( id, pVec->Element(i)->GetId() ) )
 			return pVec->Element(i);
@@ -1073,10 +1073,10 @@ void CParticleCollection::Init( CParticleSystemDefinition *pDef, float flDelay, 
 
 	};
 
-	for( int i=0; i<NELEMS( olists ); i++ )
+	for( size_t i=0; i<std::size( olists ); i++ )
 	{
-		int nOperatorCount = olists[i]->Count();
-		for( int j=0; j < nOperatorCount; j++ )
+		intp nOperatorCount = olists[i]->Count();
+		for( intp j=0; j < nOperatorCount; j++ )
 		{
 			(*olists[i])[j]->InitializeContextData( this, m_pOperatorContextData+ (*offsetlists)[i][j] );
 		}
@@ -1085,8 +1085,8 @@ void CParticleCollection::Init( CParticleSystemDefinition *pDef, float flDelay, 
 	m_nControlPointReadMask = pDef->m_nControlPointReadMask;
 
 	// Instance child particle systems
-	int nChildCount = pDef->m_Children.Count();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = pDef->m_Children.Count();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		if ( nRandomSeed != 0 )
 		{
@@ -1539,8 +1539,8 @@ bool CParticleCollection::IsBatchable() const
 
 bool CParticleCollection::ComputeIsBatchable()
 {
-	int nRendererCount = GetRendererCount();
-	for( int i = 0; i < nRendererCount; i++ )
+	intp nRendererCount = GetRendererCount();
+	for( intp i = 0; i < nRendererCount; i++ )
 	{
 		if ( !GetRenderer( i )->IsBatchable() )
 			return false;
@@ -1559,8 +1559,8 @@ bool CParticleCollection::ComputeIsBatchable()
 //-----------------------------------------------------------------------------
 bool CParticleCollection::ComputeRequiresOrderInvariance()
 {
-	const int nRendererCount = GetRendererCount();
-	for( int i = 0; i < nRendererCount; i++ )
+	const intp nRendererCount = GetRendererCount();
+	for( intp i = 0; i < nRendererCount; i++ )
 	{
 		if ( GetRenderer( i )->RequiresOrderInvariance() )
 			return true;
@@ -1578,17 +1578,17 @@ bool CParticleCollection::ComputeRequiresOrderInvariance()
 //-----------------------------------------------------------------------------
 // Renderer iteration
 //-----------------------------------------------------------------------------
-int CParticleCollection::GetRendererCount() const
+intp CParticleCollection::GetRendererCount() const
 {
 	return IsValid() ? m_pDef->m_Renderers.Count() : 0;
 }
 
-CParticleOperatorInstance *CParticleCollection::GetRenderer( int i )
+CParticleOperatorInstance *CParticleCollection::GetRenderer( intp i )
 {
 	return IsValid() ? m_pDef->m_Renderers[i] : NULL;
 }
 
-void *CParticleCollection::GetRendererContext( int i )
+void *CParticleCollection::GetRendererContext( intp i )
 {
 	return IsValid() ? m_pOperatorContextData + m_pDef->m_nRenderersCtxOffsets[i] : NULL;
 }
@@ -1666,8 +1666,8 @@ bool CParticleCollection::CheckIfOperatorShouldRun(
 //-----------------------------------------------------------------------------
 void CParticleCollection::Restart()
 {
-	int i;
-	int nEmitterCount = m_pDef->m_Emitters.Count();
+	intp i;
+	intp nEmitterCount = m_pDef->m_Emitters.Count();
 	for( i = 0; i < nEmitterCount; i++ )
 	{
 		m_pDef->m_Emitters[i]->Restart( this, m_pOperatorContextData + m_pDef->m_nEmittersCtxOffsets[i] );
@@ -1697,8 +1697,8 @@ void CParticleCollection::Render( IMatRenderContext *pRenderContext, bool bTrans
 	{
 		if ( !bTranslucentOnly || m_pDef->GetMaterial()->IsTranslucent() )
 		{
-			int nCount = m_pDef->m_Renderers.Count();
-			for( int i = 0; i < nCount; i++ )
+			intp nCount = m_pDef->m_Renderers.Count();
+			for( intp i = 0; i < nCount; i++ )
 			{
 				if ( CheckIfOperatorShouldRun( m_pDef->m_Renderers[i] ) )
 				{
@@ -1779,8 +1779,8 @@ void CParticleCollection::InitializeNewParticles( int nFirstParticle, int nParti
 	// now, initialize the attributes of all the new particles
 	int nPerParticleAttributeMask = m_nPerParticleInitializedAttributeMask | m_nPerParticleUpdatedAttributeMask;
 	int nAttrsLeftToInit = nPerParticleAttributeMask & ~nInittedMask;
-	int nInitializerCount = m_pDef->m_Initializers.Count();
-	for ( int i = 0; i < nInitializerCount; i++ )
+	intp nInitializerCount = m_pDef->m_Initializers.Count();
+	for ( intp i = 0; i < nInitializerCount; i++ )
 	{
 		CParticleOperatorInstance *pOp = m_pDef->m_Initializers[i];
 		int nInitializerAttrMask = pOp->GetWrittenAttributes();
@@ -1848,8 +1848,8 @@ void CParticleCollection::SkipToTime( float t )
 		m_nParticleFlags &= ~PCFLAGS_FIRST_FRAME;
 		
 		// FIXME: In future, we may have to tell operators, initializers about this too
-		int nEmitterCount = m_pDef->m_Emitters.Count();
-		int i;
+		intp nEmitterCount = m_pDef->m_Emitters.Count();
+		intp i;
 		for( i = 0; i < nEmitterCount; i++ )
 		{
 			m_pDef->m_Emitters[i]->SkipToTime( t, this, m_pOperatorContextData + m_pDef->m_nEmittersCtxOffsets[i] );
@@ -1908,8 +1908,8 @@ void CParticleCollection::SimulateFirstFrame( )
 	}
 
 	m_nOperatorRandomSampleOffset = 0;
-	int nCount = m_pDef->m_Operators.Count();
-	for( int i = 0; i < nCount; i++ )
+	intp nCount = m_pDef->m_Operators.Count();
+	for( intp i = 0; i < nCount; i++ )
 	{
 		float flStrength;
 		CParticleOperatorInstance *pOp = m_pDef->m_Operators[i];
@@ -2017,8 +2017,8 @@ void CParticleCollection::Simulate( float dt, bool updateBboxOnly )
 #endif
 		
 			m_nOperatorRandomSampleOffset = 0;
-			int nCount = m_pDef->m_Operators.Count();
-			for( int i = 0; i < nCount; i++ )
+			intp nCount = m_pDef->m_Operators.Count();
+			for( intp i = 0; i < nCount; i++ )
 			{
 				float flStrength;
 				CParticleOperatorInstance *pOp = m_pDef->m_Operators[i];
@@ -2041,8 +2041,8 @@ void CParticleCollection::Simulate( float dt, bool updateBboxOnly )
 #endif
 
 
-			int nEmitterCount = m_pDef->m_Emitters.Count();
-			for( int i=0; i < nEmitterCount; i++ )
+			intp nEmitterCount = m_pDef->m_Emitters.Count();
+			for( intp i=0; i < nEmitterCount; i++ )
 			{
 				int nOldParticleCount = m_nActiveParticles;
 				float flEmitStrength;
@@ -2504,8 +2504,8 @@ bool CParticleCollection::IsFinished( void )
 		return false;
 
 	// no particles. See if any emmitters intead to create more particles
-	int nEmitterCount = m_pDef->m_Emitters.Count();
-	for( int i=0; i < nEmitterCount; i++ )
+	intp nEmitterCount = m_pDef->m_Emitters.Count();
+	for( intp i=0; i < nEmitterCount; i++ )
 	{
 		if ( m_pDef->m_Emitters[i]->MayCreateMoreParticles( this, m_pOperatorContextData+m_pDef->m_nEmittersCtxOffsets[i] ) )
 			return false;
@@ -2680,11 +2680,11 @@ void CParticleSystemMgr::DetachKillList( CParticleCollection *pParticles )
 	if ( pParticles->m_pParticleKillList )
 	{
 		// find which it is
-		for(int i=0; i < NELEMS( g_pKillBuffers ); i++)
+		for(size_t i=0; i < std::size( g_pKillBuffers ); i++)
 		{
 			if ( g_pKillBuffers[i] == pParticles->m_pParticleKillList )
 			{
-				pParticles->m_pParticleKillList = NULL;
+				pParticles->m_pParticleKillList = nullptr;
 				g_nKillBufferInUse[i] = 0;					// no need to interlock
 				return;
 			}
@@ -2698,12 +2698,12 @@ void CParticleSystemMgr::AttachKillList( CParticleCollection *pParticles )
 	// look for a free slot
 	for(;;)
 	{
-		for(int i=0; i < NELEMS( g_nKillBufferInUse ); i++)
+		for(size_t i=0; i < std::size( g_nKillBufferInUse ); i++)
 		{
 			if ( ! g_nKillBufferInUse[i] )					// available?
 			{
 				// try to take it!
-				if ( g_nKillBufferInUse->AssignIf( 0, 1 ) )
+				if ( g_nKillBufferInUse[i].AssignIf( 0, 1 ) )
 				{
 					if ( ! g_pKillBuffers[i] )
 					{
@@ -3027,8 +3027,8 @@ void CParticleSystemMgr::UncacheAllParticleSystems()
 	if ( !m_pParticleSystemDictionary )
 		return;
 
-	int nCount = m_pParticleSystemDictionary->Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_pParticleSystemDictionary->Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		m_pParticleSystemDictionary->GetParticleSystem( i )->Uncache();
 	}
@@ -3180,8 +3180,8 @@ bool CParticleSystemMgr::ReadParticleDefinitions( CUtlBuffer &buf, const char *p
 	}
 
 	const CUtlVector< CDmxElement* >& definitions = pDefinitions->GetArray<CDmxElement*>( );
-	int nCount = definitions.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = definitions.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CParticleSystemDefinition *pDef = m_pParticleSystemDictionary->AddParticleSystem( definitions[i] );
 		if ( pDef && bPrecache )
@@ -3365,7 +3365,7 @@ bool CParticleSystemMgr::ReadParticleConfigFile( const char *pFileName, bool bPr
 		}
 	}
 
-	CUtlBuffer buf( 0, 0, 0 );
+	CUtlBuffer buf( (intp)0, 0, 0 );
 	if ( IsX360() )
 	{
 		// fell through, load as pc particle resource file
@@ -3407,8 +3407,8 @@ bool CParticleSystemMgr::WriteParticleConfigFile( CDmxElement *pParticleSystem, 
 
 	CDmxAttribute* pAttribute = pParticleSystem->GetAttribute( "children" );
 	const CUtlVector< CDmxElement* >& children = pAttribute->GetArray<CDmxElement*>( );
-	int nCount = children.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = children.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxElement *pChildRef = children[ i ];
 		CDmxElement *pChild = pChildRef->GetValue<CDmxElement*>( "child" );
@@ -3435,7 +3435,7 @@ const char *CParticleSystemMgr::GetParticleSystemNameFromIndex( ParticleSystemHa
 	return pDef ? pDef->GetName() : "Unknown";
 }
 
-int CParticleSystemMgr::GetParticleSystemCount( void )
+intp CParticleSystemMgr::GetParticleSystemCount( void )
 {
 	return m_pParticleSystemDictionary->NameCount();
 }
@@ -3602,8 +3602,8 @@ void CParticleSystemMgr::FlushAllSheets( void )
 //-----------------------------------------------------------------------------
 void CParticleSystemMgr::ResetRenderCache( void )
 {
-	int nCount = m_RenderCache.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_RenderCache.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		m_RenderCache[i].m_ParticleCollections.RemoveAll();
 	}
@@ -3616,8 +3616,8 @@ void CParticleSystemMgr::AddToRenderCache( CParticleCollection *pParticles )
 
 	pParticles->m_flNextSleepTime = Max ( pParticles->m_flNextSleepTime, ( g_pParticleSystemMgr->GetLastSimulationTime() + pParticles->m_pDef->m_flNoDrawTimeToGoToSleep ));
 	// Find the current rope list.
-	int iRenderCache = 0;
-	int nRenderCacheCount = m_RenderCache.Count();
+	intp iRenderCache = 0;
+	intp nRenderCacheCount = m_RenderCache.Count();
 	for ( ; iRenderCache < nRenderCacheCount; ++iRenderCache )
 	{
 		if ( ( pParticles->m_pDef->GetMaterial() == m_RenderCache[iRenderCache].m_pMaterial ) )
@@ -3641,7 +3641,7 @@ void CParticleSystemMgr::AddToRenderCache( CParticleCollection *pParticles )
 }
 
 
-void CParticleSystemMgr::BuildBatchList( int iRenderCache, IMatRenderContext *pRenderContext, CUtlVector< Batch_t >& batches )
+void CParticleSystemMgr::BuildBatchList( intp iRenderCache, IMatRenderContext *pRenderContext, CUtlVector< Batch_t >& batches )
 {
 	batches.RemoveAll();
 
@@ -3652,21 +3652,21 @@ void CParticleSystemMgr::BuildBatchList( int iRenderCache, IMatRenderContext *pR
 	int nRemainingVertices = nMaxVertices;
 	int nRemainingIndices = nMaxIndices;
 
-	int i = batches.AddToTail();
+	intp i = batches.AddToTail();
 	Batch_t* pBatch = &batches[i];
 	pBatch->m_nVertCount = 0;
 	pBatch->m_nIndexCount = 0;
 
 	// Ask each renderer about the # of verts + ints it will draw
-	int nCacheCount = m_RenderCache[iRenderCache].m_ParticleCollections.Count();
-	for ( int iCache = 0; iCache < nCacheCount; ++iCache )
+	intp nCacheCount = m_RenderCache[iRenderCache].m_ParticleCollections.Count();
+	for ( intp iCache = 0; iCache < nCacheCount; ++iCache )
 	{
 		CParticleCollection *pParticles = m_RenderCache[iRenderCache].m_ParticleCollections[iCache];
 		if ( !pParticles->IsValid() )
 			continue;
 
-		int nRenderCount = pParticles->GetRendererCount();
-		for ( int j = 0; j < nRenderCount; ++j )
+		intp nRenderCount = pParticles->GetRendererCount();
+		for ( intp j = 0; j < nRenderCount; ++j )
 		{
 			int nFirstParticle = 0;
 			while ( nFirstParticle < pParticles->m_nActiveParticles )
@@ -3724,7 +3724,7 @@ void CParticleSystemMgr::DumpProfileInformation( void )
 			g_pFullFileSystem->FPrintf( fh, "%s,%f,%f,%d,%d\n", p->m_Name.Get(), p->m_flTotalSimTime, p->m_flMaxMeasuredSimTime, p->m_nMaximumActiveParticles, p->m_nMaxParticles );
 	}
 	g_pFullFileSystem->FPrintf( fh, "\n\nopname, total time, max time\n");
-	for(int i=0; i < ARRAYSIZE( m_ParticleOperators ); i++)
+	for(int i=0; i < ssize( m_ParticleOperators ); i++)
 	{
 		for(int j=0; j < m_ParticleOperators[i].Count() ; j++ )
 		{
@@ -3753,7 +3753,7 @@ void CParticleSystemMgr::CommitProfileInformation( bool bCommit )
 				p->m_flTotalSimTime += p->m_flUncomittedTotalSimTime;
 			p->m_flUncomittedTotalSimTime = 0.;
 		}
-		for(int i=0; i < ARRAYSIZE( m_ParticleOperators ); i++)
+		for(int i=0; i < ssize( m_ParticleOperators ); i++)
 		{
 			for(int j=0; j < m_ParticleOperators[i].Count() ; j++ )
 			{
@@ -3768,7 +3768,7 @@ void CParticleSystemMgr::CommitProfileInformation( bool bCommit )
 
 void CParticleSystemMgr::DrawRenderCache( bool bShadowDepth )
 {
-	int nRenderCacheCount = m_RenderCache.Count();
+	intp nRenderCacheCount = m_RenderCache.Count();
 	if ( nRenderCacheCount == 0 )
 		return;
 
@@ -3781,9 +3781,9 @@ void CParticleSystemMgr::DrawRenderCache( bool bShadowDepth )
 
 	CUtlVector< Batch_t > batches( (intp)0, 8 );
 
-	for ( int iRenderCache = 0; iRenderCache < nRenderCacheCount; ++iRenderCache )
+	for ( intp iRenderCache = 0; iRenderCache < nRenderCacheCount; ++iRenderCache )
 	{
-		int nCacheCount = m_RenderCache[iRenderCache].m_ParticleCollections.Count();
+		intp nCacheCount = m_RenderCache[iRenderCache].m_ParticleCollections.Count();
 		if ( nCacheCount == 0 )
 			continue;
 
@@ -3791,7 +3791,7 @@ void CParticleSystemMgr::DrawRenderCache( bool bShadowDepth )
 		IMaterial *pMaterial = bShadowDepth ? m_pShadowDepthMaterial : m_RenderCache[iRenderCache].m_pMaterial;
 
 		BuildBatchList( iRenderCache, pRenderContext, batches );
-		int nBatchCount = batches.Count();
+		intp nBatchCount = batches.Count();
 		if ( nBatchCount == 0 )
 			continue;
 
@@ -3799,7 +3799,7 @@ void CParticleSystemMgr::DrawRenderCache( bool bShadowDepth )
 		CMeshBuilder meshBuilder;
 		IMesh* pMesh = pRenderContext->GetDynamicMesh( );
 
-		for ( int i = 0; i < nBatchCount; ++i )
+		for ( intp i = 0; i < nBatchCount; ++i )
 		{
 			const Batch_t& batch = batches[i];
 			Assert( batch.m_nVertCount > 0 && batch.m_nIndexCount > 0 );
@@ -3809,8 +3809,8 @@ void CParticleSystemMgr::DrawRenderCache( bool bShadowDepth )
 			meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, batch.m_nVertCount, batch.m_nIndexCount );
 
 			int nVertexOffset = 0;
-			int nBatchStepCount = batch.m_BatchStep.Count();
-			for ( int j = 0; j < nBatchStepCount; ++j )
+			intp nBatchStepCount = batch.m_BatchStep.Count();
+			for ( intp j = 0; j < nBatchStepCount; ++j )
 			{
 				const BatchStep_t &step = batch.m_BatchStep[j];
 				// FIXME: this will break if it ever calls into C_OP_RenderSprites::Render[TwoSequence]SpriteCard()

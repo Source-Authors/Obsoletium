@@ -228,21 +228,21 @@ public:
 
 	// given a possible spawn point, tries to movie it to be on or in the source object. returns
 	// true if it succeeded
-	virtual bool MovePointInsideControllingObject( CParticleCollection *pParticles,
-												   void *pObject,
-												   Vector *pPnt )
+	virtual bool MovePointInsideControllingObject( [[maybe_unused]] CParticleCollection *pParticles,
+												   [[maybe_unused]] void *pObject,
+												   [[maybe_unused]] Vector *pPnt )
 	{
 		return true;
 	}
 
 	virtual	bool IsPointInControllingObjectHitBox( 
-		CParticleCollection *pParticles,
-		int nControlPointNumber, Vector vecPos, bool bBBoxOnly = false )
+		[[maybe_unused]] CParticleCollection *pParticles,
+		[[maybe_unused]] int nControlPointNumber, [[maybe_unused]] Vector vecPos, [[maybe_unused]] bool bBBoxOnly = false )
 	{
 		return true;
 	}
 
-	virtual int GetCollisionGroupFromName( const char *pszCollisionGroupName )
+	virtual int GetCollisionGroupFromName( [[maybe_unused]] const char *pszCollisionGroupName )
 	{
 		return 0;											// == COLLISION_GROUP_NONE
 	}
@@ -260,10 +260,10 @@ public:
 
 
 	virtual int GetControllingObjectHitBoxInfo(
-		CParticleCollection *pParticles,
-		int nControlPointNumber,
-		int nBufSize,										// # of output slots available
-		ModelHitBoxInfo_t *pHitBoxOutputBuffer )
+		[[maybe_unused]] CParticleCollection *pParticles,
+		[[maybe_unused]] int nControlPointNumber,
+		[[maybe_unused]] int nBufSize,										// # of output slots available
+		[[maybe_unused]] ModelHitBoxInfo_t *pHitBoxOutputBuffer )
 	{
 		// returns number of hit boxes output
 		return 0;
@@ -283,7 +283,7 @@ public:
 
 	virtual float GetPixelVisibility( int *pQueryHandle, const Vector &vecOrigin, float flScale ) = 0;
 
-	virtual void SetUpLightingEnvironment( const Vector& pos )
+	virtual void SetUpLightingEnvironment( [[maybe_unused]] const Vector& pos )
 	{
 	}
 };
@@ -344,7 +344,7 @@ public:
 	const char *GetParticleSystemNameFromIndex( ParticleSystemHandle_t iIndex );
 
 	// Return the number of particle systems in our dictionary
-	int GetParticleSystemCount( void );
+	intp GetParticleSystemCount( void );
 
 	// call to get available particle operator definitions
 	// NOTE: FUNCTION_CHILDREN will return a faked one, for ease of writing the editor
@@ -436,7 +436,7 @@ private:
 	bool WriteParticleConfigFile( CDmxElement *pParticleSystem, CUtlBuffer &buf, bool bPreventNameBasedLookup );
 
 	// Builds a list of batches to render
-	void BuildBatchList( int iRenderCache, IMatRenderContext *pRenderContext, CUtlVector< Batch_t >& batches );
+	void BuildBatchList( intp iRenderCache, IMatRenderContext *pRenderContext, CUtlVector< Batch_t >& batches );
 
 	// Known operators
 	CUtlVector<IParticleOperatorDefinition *> m_ParticleOperators[PARTICLE_FUNCTION_COUNT];
@@ -640,11 +640,11 @@ public:
 
 
 	// a force generator does this. It accumulates in the force array
-	virtual void AddForces( FourVectors *AccumulatedForces, 
-							CParticleCollection *pParticles,
-							int nBlocks,
-							float flCurStrength,
-							void *pContext ) const
+	virtual void AddForces( FourVectors *, 
+							CParticleCollection *,
+							int,
+							float,
+							void * ) const
 	{
 	}
 
@@ -1164,9 +1164,9 @@ public:
 	bool IsBatchable() const;
 
 	// Renderer iteration
-	int GetRendererCount() const;
-	CParticleOperatorInstance *GetRenderer( int i );
-	void *GetRendererContext( int i );
+	intp GetRendererCount() const;
+	CParticleOperatorInstance *GetRenderer( intp i );
+	void *GetRendererContext( intp i );
 
 
 	bool CheckIfOperatorShouldRun( CParticleOperatorInstance const * op, float *pflCurStrength = NULL );
