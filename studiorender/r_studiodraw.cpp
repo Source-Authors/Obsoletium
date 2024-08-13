@@ -22,7 +22,7 @@
 #include "tier0/vprof.h"
 
 //#define PROFILE_STUDIO VPROF
-#define PROFILE_STUDIO
+#define PROFILE_STUDIO(x)
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -483,7 +483,7 @@ void CStudioRender::DrawShadows( const DrawModelInfo_t& info, int flags, int bon
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 
 	pRenderContext->SetFlashlightMode( true );
-	int i;
+	intp i;
 	for (i = 0; i < m_ShadowState.Count(); ++i )
 	{
 		if( !m_ShadowState[i].m_pMaterial )
@@ -503,7 +503,7 @@ void CStudioRender::DrawShadows( const DrawModelInfo_t& info, int flags, int bon
 	pRenderContext->SetFlashlightMode( false );
 
 	// Here, we have to redraw the model one time for each shadow
-	for (int i = 0; i < m_ShadowState.Count(); ++i )
+	for (intp i = 0; i < m_ShadowState.Count(); ++i )
 	{
 		if( m_ShadowState[i].m_pMaterial )
 		{
@@ -541,7 +541,7 @@ void CStudioRender::DrawFlashlightDecals( const DrawModelInfo_t& info, int lod )
 
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	pRenderContext->SetFlashlightMode( true );
-	int i;
+	intp i;
 	for (i = 0; i < m_ShadowState.Count(); ++i )
 	{
 		// This isn't clear.  This means that this is a flashlight if the material is NULL.  FLASHLIGHTFIXME
@@ -560,37 +560,50 @@ void CStudioRender::DrawFlashlightDecals( const DrawModelInfo_t& info, int lod )
 	pRenderContext->SetFlashlightMode( false );
 }
 
-
+// dimhotepus: Added SSE / NEON support.
 static matrix3x4_t *ComputeSkinMatrix( mstudioboneweight_t &boneweights, matrix3x4_t *pPoseToWorld, matrix3x4_t &result )
 {
-	float flWeight0, flWeight1, flWeight2;
-
 	switch( boneweights.numbones )
 	{
 	default:
 	case 1:
-		return &pPoseToWorld[(unsigned)boneweights.bone[0]];
+		return &pPoseToWorld[static_cast<unsigned>(boneweights.bone[0])];
 
 	case 2:
 		{
-			matrix3x4_t &boneMat0 = pPoseToWorld[(unsigned)boneweights.bone[0]];
-			matrix3x4_t &boneMat1 = pPoseToWorld[(unsigned)boneweights.bone[1]];
-			flWeight0 = boneweights.weight[0];
-			flWeight1 = boneweights.weight[1];
+			matrix3x4_t &boneMat0 = pPoseToWorld[static_cast<unsigned>(boneweights.bone[0])];
+			matrix3x4_t &boneMat1 = pPoseToWorld[static_cast<unsigned>(boneweights.bone[1])];
 
-			// NOTE: Inlining here seems to make a fair amount of difference
-			result[0][0] = boneMat0[0][0] * flWeight0 + boneMat1[0][0] * flWeight1;
-			result[0][1] = boneMat0[0][1] * flWeight0 + boneMat1[0][1] * flWeight1;
-			result[0][2] = boneMat0[0][2] * flWeight0 + boneMat1[0][2] * flWeight1;
-			result[0][3] = boneMat0[0][3] * flWeight0 + boneMat1[0][3] * flWeight1;
-			result[1][0] = boneMat0[1][0] * flWeight0 + boneMat1[1][0] * flWeight1;
-			result[1][1] = boneMat0[1][1] * flWeight0 + boneMat1[1][1] * flWeight1;
-			result[1][2] = boneMat0[1][2] * flWeight0 + boneMat1[1][2] * flWeight1;
-			result[1][3] = boneMat0[1][3] * flWeight0 + boneMat1[1][3] * flWeight1;
-			result[2][0] = boneMat0[2][0] * flWeight0 + boneMat1[2][0] * flWeight1;
-			result[2][1] = boneMat0[2][1] * flWeight0 + boneMat1[2][1] * flWeight1;
-			result[2][2] = boneMat0[2][2] * flWeight0 + boneMat1[2][2] * flWeight1;
-			result[2][3] = boneMat0[2][3] * flWeight0 + boneMat1[2][3] * flWeight1;
+			DirectX::XMVECTOR weight0 = DirectX::XMVectorReplicate(boneweights.weight[0]);
+			DirectX::XMVECTOR weight1 = DirectX::XMVectorReplicate(boneweights.weight[1]);
+
+			DirectX::XMStoreFloat4
+			(
+				result.XmBase() + 0,
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat0.XmBase() + 0), weight0 ),
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat1.XmBase() + 0), weight1 )
+				)
+			);
+			DirectX::XMStoreFloat4
+			(
+				result.XmBase() + 1,
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat0.XmBase() + 1), weight0 ),
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat1.XmBase() + 1), weight1 )
+				)
+			);
+			DirectX::XMStoreFloat4
+			(
+				result.XmBase() + 2,
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat0.XmBase() + 2), weight0 ),
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat1.XmBase() + 2), weight1 )
+				)
+			);
 		}
 		return &result;
 
@@ -599,22 +612,50 @@ static matrix3x4_t *ComputeSkinMatrix( mstudioboneweight_t &boneweights, matrix3
 			matrix3x4_t &boneMat0 = pPoseToWorld[(unsigned)boneweights.bone[0]];
 			matrix3x4_t &boneMat1 = pPoseToWorld[(unsigned)boneweights.bone[1]];
 			matrix3x4_t &boneMat2 = pPoseToWorld[(unsigned)boneweights.bone[2]];
-			flWeight0 = boneweights.weight[0];
-			flWeight1 = boneweights.weight[1];
-			flWeight2 = boneweights.weight[2];
 
-			result[0][0] = boneMat0[0][0] * flWeight0 + boneMat1[0][0] * flWeight1 + boneMat2[0][0] * flWeight2;
-			result[0][1] = boneMat0[0][1] * flWeight0 + boneMat1[0][1] * flWeight1 + boneMat2[0][1] * flWeight2;
-			result[0][2] = boneMat0[0][2] * flWeight0 + boneMat1[0][2] * flWeight1 + boneMat2[0][2] * flWeight2;
-			result[0][3] = boneMat0[0][3] * flWeight0 + boneMat1[0][3] * flWeight1 + boneMat2[0][3] * flWeight2;
-			result[1][0] = boneMat0[1][0] * flWeight0 + boneMat1[1][0] * flWeight1 + boneMat2[1][0] * flWeight2;
-			result[1][1] = boneMat0[1][1] * flWeight0 + boneMat1[1][1] * flWeight1 + boneMat2[1][1] * flWeight2;
-			result[1][2] = boneMat0[1][2] * flWeight0 + boneMat1[1][2] * flWeight1 + boneMat2[1][2] * flWeight2;
-			result[1][3] = boneMat0[1][3] * flWeight0 + boneMat1[1][3] * flWeight1 + boneMat2[1][3] * flWeight2;
-			result[2][0] = boneMat0[2][0] * flWeight0 + boneMat1[2][0] * flWeight1 + boneMat2[2][0] * flWeight2;
-			result[2][1] = boneMat0[2][1] * flWeight0 + boneMat1[2][1] * flWeight1 + boneMat2[2][1] * flWeight2;
-			result[2][2] = boneMat0[2][2] * flWeight0 + boneMat1[2][2] * flWeight1 + boneMat2[2][2] * flWeight2;
-			result[2][3] = boneMat0[2][3] * flWeight0 + boneMat1[2][3] * flWeight1 + boneMat2[2][3] * flWeight2;
+			DirectX::XMVECTOR weight0 = DirectX::XMVectorReplicate(boneweights.weight[0]);
+			DirectX::XMVECTOR weight1 = DirectX::XMVectorReplicate(boneweights.weight[1]);
+			DirectX::XMVECTOR weight2 = DirectX::XMVectorReplicate(boneweights.weight[2]);
+			
+			DirectX::XMStoreFloat4
+			(
+				result.XmBase() + 0,
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMVectorAdd
+					(
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat0.XmBase() + 0), weight0 ),
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat1.XmBase() + 0), weight1 )
+					),
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat2.XmBase() + 0), weight2 )
+				)
+			);
+			DirectX::XMStoreFloat4
+			(
+				result.XmBase() + 1,
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMVectorAdd
+					(
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat0.XmBase() + 1), weight0 ),
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat1.XmBase() + 1), weight1 )
+					),
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat2.XmBase() + 1), weight2 )
+				)
+			);
+			DirectX::XMStoreFloat4
+			(
+				result.XmBase() + 2,
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMVectorAdd
+					(
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat0.XmBase() + 2), weight0 ),
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat1.XmBase() + 2), weight1 )
+					),
+					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat2.XmBase() + 2), weight2 )
+				)
+			);
 		}
 		return &result;
 
@@ -623,259 +664,76 @@ static matrix3x4_t *ComputeSkinMatrix( mstudioboneweight_t &boneweights, matrix3
 #if (MAX_NUM_BONES_PER_VERT > 3)
 		{
 			// Don't compile this if MAX_NUM_BONES_PER_VERT is too low
-			matrix3x4_t &boneMat0 = pPoseToWorld[boneweights.bone[0]];
-			matrix3x4_t &boneMat1 = pPoseToWorld[boneweights.bone[1]];
-			matrix3x4_t &boneMat2 = pPoseToWorld[boneweights.bone[2]];
-			matrix3x4_t &boneMat3 = pPoseToWorld[boneweights.bone[3]];
-			flWeight0 = boneweights.weight[0];
-			flWeight1 = boneweights.weight[1];
-			flWeight2 = boneweights.weight[2];
-			float flWeight3 = boneweights.weight[3];
+			matrix3x4_t &boneMat0 = pPoseToWorld[(unsigned)boneweights.bone[0]];
+			matrix3x4_t &boneMat1 = pPoseToWorld[(unsigned)boneweights.bone[1]];
+			matrix3x4_t &boneMat2 = pPoseToWorld[(unsigned)boneweights.bone[2]];
+			matrix3x4_t &boneMat3 = pPoseToWorld[(unsigned)boneweights.bone[3]];
 
-			result[0][0] = boneMat0[0][0] * flWeight0 + boneMat1[0][0] * flWeight1 + boneMat2[0][0] * flWeight2 + boneMat3[0][0] * flWeight3;
-			result[0][1] = boneMat0[0][1] * flWeight0 + boneMat1[0][1] * flWeight1 + boneMat2[0][1] * flWeight2 + boneMat3[0][1] * flWeight3;
-			result[0][2] = boneMat0[0][2] * flWeight0 + boneMat1[0][2] * flWeight1 + boneMat2[0][2] * flWeight2 + boneMat3[0][2] * flWeight3;
-			result[0][3] = boneMat0[0][3] * flWeight0 + boneMat1[0][3] * flWeight1 + boneMat2[0][3] * flWeight2 + boneMat3[0][3] * flWeight3;
-			result[1][0] = boneMat0[1][0] * flWeight0 + boneMat1[1][0] * flWeight1 + boneMat2[1][0] * flWeight2 + boneMat3[1][0] * flWeight3;
-			result[1][1] = boneMat0[1][1] * flWeight0 + boneMat1[1][1] * flWeight1 + boneMat2[1][1] * flWeight2 + boneMat3[1][1] * flWeight3;
-			result[1][2] = boneMat0[1][2] * flWeight0 + boneMat1[1][2] * flWeight1 + boneMat2[1][2] * flWeight2 + boneMat3[1][2] * flWeight3;
-			result[1][3] = boneMat0[1][3] * flWeight0 + boneMat1[1][3] * flWeight1 + boneMat2[1][3] * flWeight2 + boneMat3[1][3] * flWeight3;
-			result[2][0] = boneMat0[2][0] * flWeight0 + boneMat1[2][0] * flWeight1 + boneMat2[2][0] * flWeight2 + boneMat3[2][0] * flWeight3;
-			result[2][1] = boneMat0[2][1] * flWeight0 + boneMat1[2][1] * flWeight1 + boneMat2[2][1] * flWeight2 + boneMat3[2][1] * flWeight3;
-			result[2][2] = boneMat0[2][2] * flWeight0 + boneMat1[2][2] * flWeight1 + boneMat2[2][2] * flWeight2 + boneMat3[2][2] * flWeight3;
-			result[2][3] = boneMat0[2][3] * flWeight0 + boneMat1[2][3] * flWeight1 + boneMat2[2][3] * flWeight2 + boneMat3[2][3] * flWeight3;
+			DirectX::XMVECTOR weight0 = DirectX::XMVectorReplicate(boneweights.weight[0]);
+			DirectX::XMVECTOR weight1 = DirectX::XMVectorReplicate(boneweights.weight[1]);
+			DirectX::XMVECTOR weight2 = DirectX::XMVectorReplicate(boneweights.weight[2]);
+			DirectX::XMVECTOR weight3 = DirectX::XMVectorReplicate(boneweights.weight[3]);
+
+			DirectX::XMStoreFloat4
+			(
+				result.XmBase() + 0,
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMVectorAdd
+					(
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat0.XmBase() + 0), weight0 ),
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat1.XmBase() + 0), weight1 )
+					),
+					DirectX::XMVectorAdd
+					(
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat2.XmBase() + 0), weight2 ),
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat3.XmBase() + 0), weight3 )
+					)
+				)
+			);
+			DirectX::XMStoreFloat4
+			(
+				result.XmBase() + 1,
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMVectorAdd
+					(
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat0.XmBase() + 1), weight0 ),
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat1.XmBase() + 1), weight1 )
+					),
+					DirectX::XMVectorAdd
+					(
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat2.XmBase() + 1), weight2 ),
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat3.XmBase() + 1), weight3 )
+					)
+				)
+			);
+			DirectX::XMStoreFloat4
+			(
+				result.XmBase() + 2,
+				DirectX::XMVectorAdd
+				(
+					DirectX::XMVectorAdd
+					(
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat0.XmBase() + 2), weight0 ),
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat1.XmBase() + 2), weight1 )
+					),
+					DirectX::XMVectorAdd
+					(
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat2.XmBase() + 2), weight2 ),
+						DirectX::XMVectorMultiply( DirectX::XMLoadFloat4(boneMat3.XmBase() + 2), weight3 )
+					)
+				)
+			);
 		}
 		return &result;
 #endif
 	}
 
 	Assert(0);
-	return NULL;
+	return nullptr;
 }
 
-
-static matrix3x4_t *ComputeSkinMatrixSSE( mstudioboneweight_t &boneweights, matrix3x4_t *pPoseToWorld, matrix3x4_t &result )
-{
-	// NOTE: pPoseToWorld, being cache aligned, doesn't need explicit initialization
-#if defined( _WIN32 ) && !defined(_WIN64) && !defined( _X360 )
-	switch( boneweights.numbones )
-	{
-	default:
-	case 1:
-		return &pPoseToWorld[boneweights.bone[0]];
-
-	case 2:
-		{
-			matrix3x4_t &boneMat0 = pPoseToWorld[boneweights.bone[0]];
-			matrix3x4_t &boneMat1 = pPoseToWorld[boneweights.bone[1]];
-			float *pWeights = boneweights.weight;
-
-			__asm
-			{
-				mov		eax, DWORD PTR [pWeights]
-				movss	xmm6, dword ptr[eax]		; boneweights.weight[0]
-				movss	xmm7, dword ptr[eax + 4]	; boneweights.weight[1]
-
-				mov		eax, DWORD PTR [boneMat0]
-				mov		ecx, DWORD PTR [boneMat1]
-				mov		edi, DWORD PTR [result]
-
-				// Fill xmm6, and 7 with all the bone weights
-				shufps	xmm6, xmm6, 0
-				shufps	xmm7, xmm7, 0
-
-				// Load up all rows of the three matrices
-				movaps	xmm0, XMMWORD PTR [eax]
-				movaps	xmm1, XMMWORD PTR [ecx]
-				movaps	xmm2, XMMWORD PTR [eax + 16]
-				movaps	xmm3, XMMWORD PTR [ecx + 16]
-				movaps	xmm4, XMMWORD PTR [eax + 32]
-				movaps	xmm5, XMMWORD PTR [ecx + 32]
-
-				// Multiply the rows by the weights
-				mulps	xmm0, xmm6
-				mulps	xmm1, xmm7
-				mulps	xmm2, xmm6
-				mulps	xmm3, xmm7
-				mulps	xmm4, xmm6
-				mulps	xmm5, xmm7
-
-				addps	xmm0, xmm1
-				addps	xmm2, xmm3
-				addps	xmm4, xmm5
-
-				movaps	XMMWORD PTR [edi], xmm0
-				movaps	XMMWORD PTR [edi + 16], xmm2
-				movaps	XMMWORD PTR [edi + 32], xmm4
-			}
-		}
-		return &result;
-
-	case 3:
-		{
-			matrix3x4_t &boneMat0 = pPoseToWorld[boneweights.bone[0]];
-			matrix3x4_t &boneMat1 = pPoseToWorld[boneweights.bone[1]];
-			matrix3x4_t &boneMat2 = pPoseToWorld[boneweights.bone[2]];
-			float *pWeights = boneweights.weight;
-
-			__asm
-			{
-				mov		eax, DWORD PTR [pWeights]
-				movss	xmm5, dword ptr[eax]		; boneweights.weight[0]
-				movss	xmm6, dword ptr[eax + 4]	; boneweights.weight[1]
-				movss	xmm7, dword ptr[eax + 8]	; boneweights.weight[2]
-
-				mov		eax, DWORD PTR [boneMat0]
-				mov		ecx, DWORD PTR [boneMat1]
-				mov		edx, DWORD PTR [boneMat2]
-				mov		edi, DWORD PTR [result]
-
-				// Fill xmm5, 6, and 7 with all the bone weights
-				shufps	xmm5, xmm5, 0
-				shufps	xmm6, xmm6, 0
-				shufps	xmm7, xmm7, 0
-
-				// Load up the first row of the three matrices
-				movaps	xmm0, XMMWORD PTR [eax]
-				movaps	xmm1, XMMWORD PTR [ecx]
-				movaps	xmm2, XMMWORD PTR [edx]
-
-				// Multiply the rows by the weights
-				mulps	xmm0, xmm5
-				mulps	xmm1, xmm6
-				mulps	xmm2, xmm7
-
-				addps	xmm0, xmm1
-				addps	xmm0, xmm2
-				movaps	XMMWORD PTR [edi], xmm0
-				
-				// Load up the second row of the three matrices
-				movaps	xmm0, XMMWORD PTR [eax + 16]
-				movaps	xmm1, XMMWORD PTR [ecx + 16]
-				movaps	xmm2, XMMWORD PTR [edx + 16]
-
-				// Multiply the rows by the weights
-				mulps	xmm0, xmm5
-				mulps	xmm1, xmm6
-				mulps	xmm2, xmm7
-
-				addps	xmm0, xmm1
-				addps	xmm0, xmm2
-				movaps	XMMWORD PTR [edi + 16], xmm0	
-
-				// Load up the third row of the three matrices
-				movaps	xmm0, XMMWORD PTR [eax + 32]
-				movaps	xmm1, XMMWORD PTR [ecx + 32]
-				movaps	xmm2, XMMWORD PTR [edx + 32]
-
-				// Multiply the rows by the weights
-				mulps	xmm0, xmm5
-				mulps	xmm1, xmm6
-				mulps	xmm2, xmm7
-
-				addps	xmm0, xmm1
-				addps	xmm0, xmm2
-				movaps	XMMWORD PTR [edi + 32], xmm0	
-			}
-		}
-		return &result;
-
-	case 4:
-		Assert(0);
-#if (MAX_NUM_BONES_PER_VERT > 3)
-		{
-			// Don't compile this if MAX_NUM_BONES_PER_VERT is too low
-			matrix3x4_t &boneMat0 = pPoseToWorld[boneweights.bone[0]];
-			matrix3x4_t &boneMat1 = pPoseToWorld[boneweights.bone[1]];
-			matrix3x4_t &boneMat2 = pPoseToWorld[boneweights.bone[2]];
-			matrix3x4_t &boneMat3 = pPoseToWorld[boneweights.bone[3]];
-			float *pWeights = boneweights.weight;
-
-			__asm
-			{
-				mov		eax, DWORD PTR [pWeights]
-				movss	xmm4, dword ptr[eax]		; boneweights.weight[0]
-				movss	xmm5, dword ptr[eax + 4]	; boneweights.weight[1]
-				movss	xmm6, dword ptr[eax + 8]	; boneweights.weight[2]
-				movss	xmm7, dword ptr[eax + 12]	; boneweights.weight[3]
-
-				mov		eax, DWORD PTR [boneMat0]
-				mov		ecx, DWORD PTR [boneMat1]
-				mov		edx, DWORD PTR [boneMat2]
-				mov		esi, DWORD PTR [boneMat3]
-				mov		edi, DWORD PTR [result]
-
-				// Fill xmm5, 6, and 7 with all the bone weights
-				shufps	xmm4, xmm4, 0
-				shufps	xmm5, xmm5, 0
-				shufps	xmm6, xmm6, 0
-				shufps	xmm7, xmm7, 0
-
-				// Load up the first row of the four matrices
-				movaps	xmm0, XMMWORD PTR [eax]
-				movaps	xmm1, XMMWORD PTR [ecx]
-				movaps	xmm2, XMMWORD PTR [edx]
-				movaps	xmm3, XMMWORD PTR [esi]
-
-				// Multiply the rows by the weights
-				mulps	xmm0, xmm4
-				mulps	xmm1, xmm5
-				mulps	xmm2, xmm6
-				mulps	xmm3, xmm7
-
-				addps	xmm0, xmm1
-				addps	xmm2, xmm3
-				addps	xmm0, xmm2
-				movaps	XMMWORD PTR [edi], xmm0
-				
-				// Load up the second row of the three matrices
-				movaps	xmm0, XMMWORD PTR [eax + 16]
-				movaps	xmm1, XMMWORD PTR [ecx + 16]
-				movaps	xmm2, XMMWORD PTR [edx + 16]
-				movaps	xmm3, XMMWORD PTR [esi + 16]
-
-				// Multiply the rows by the weights
-				mulps	xmm0, xmm4
-				mulps	xmm1, xmm5
-				mulps	xmm2, xmm6
-				mulps	xmm3, xmm7
-
-				addps	xmm0, xmm1
-				addps	xmm2, xmm3
-				addps	xmm0, xmm2
-				movaps	XMMWORD PTR [edi + 16], xmm0	
-
-				// Load up the third row of the three matrices
-				movaps	xmm0, XMMWORD PTR [eax + 32]
-				movaps	xmm1, XMMWORD PTR [ecx + 32]
-				movaps	xmm2, XMMWORD PTR [edx + 32]
-				movaps	xmm3, XMMWORD PTR [esi + 32]
-
-				// Multiply the rows by the weights
-				mulps	xmm0, xmm4
-				mulps	xmm1, xmm5
-				mulps	xmm2, xmm6
-				mulps	xmm3, xmm7
-
-				addps	xmm0, xmm1
-				addps	xmm2, xmm3
-				addps	xmm0, xmm2
-				movaps	XMMWORD PTR [edi + 32], xmm0	
-			}
-		}
-		return &result;
-#endif
-	}
-#elif POSIX
-#warning "ComputeSkinMatrixSSE C implementation only"
-	return ComputeSkinMatrix( boneweights, pPoseToWorld, result );
-#elif defined(_WIN64) || defined(_X360)
-#pragma message ("WARNING: ComputeSkinMatrixSSE C implementation only")
-	return ComputeSkinMatrix( boneweights, pPoseToWorld, result );
-#else
-#error "Please define your platform"
-#endif
-}
 
 //-----------------------------------------------------------------------------
 // Designed for inter-module draw optimized calling, requires R_InitLightEffectWorld3()
@@ -905,13 +763,6 @@ inline void CStudioRender::R_ComputeLightAtPoint3( const Vector &pos, const Vect
 }
 
 
-// define SPECIAL_SSE_MESH_PROCESSOR to enable code which contains a special optimized SSE lighting loop, significantly
-// improving software vertex processing performace.
-#if defined( _WIN32 ) && !defined( _X360 )
-#define SPECIAL_SSE_MESH_PROCESSOR
-#endif
-
-#ifdef SPECIAL_SSE_MESH_PROCESSOR
 //#define VERIFY_SSE_LIGHTING
 
 // false: MAX(0,L*N) true: .5*(L.N)+.5. set based on material
@@ -1013,8 +864,6 @@ inline void CStudioRender::R_ComputeLightAtPoints3( const FourVectors &pos, cons
 	}
 }
 
-#endif // SPECIAL_SSE_MESH_PROCESSOR
-
 //-----------------------------------------------------------------------------
 // Optimized for low-end hardware
 //-----------------------------------------------------------------------------
@@ -1027,7 +876,7 @@ public:
 	static void R_PerformLighting( const Vector &forward, float fIllum, 
 		const Vector &pos, const Vector &norm, unsigned int nAlphaMask, unsigned int *pColor )
 	{
-		if ( nLighting == LIGHTING_SOFTWARE )
+		if constexpr ( nLighting == LIGHTING_SOFTWARE )
 		{
 			Vector color;
 			g_StudioRender.R_ComputeLightAtPoint3( pos, norm, color );
@@ -1038,7 +887,7 @@ public:
 
 			*pColor = b | (g << 8) | (r << 16) | nAlphaMask;
 		}
-		else if ( nLighting == LIGHTING_MOUTH )
+		else if constexpr ( nLighting == LIGHTING_MOUTH )
 		{
 			if ( fIllum != 0.0f )
 			{
@@ -1086,7 +935,6 @@ public:
 		CCachedRenderData &vertexCache, CMeshBuilder& meshBuilder, int numVertices, unsigned short* pGroupToMesh, unsigned int nAlphaMask,
 											 IMaterial* pMaterial)		
 	{
-		Vector color;
 		Vector4D *pStudioTangentS;
 		Vector4DAligned tangentS;
 		Vector *pSrcPos;
@@ -1177,15 +1025,9 @@ public:
 
 			ntemp[idx] = pGroupToMesh[j + PREFETCH_VERT_COUNT];
 
+			// dimhotepus: Always use SSE / NEON. Fallback to C++ inside.
 			// Compute the skinning matrix
-			if ( nHasSIMD )
-			{
-				pSkinMat = ComputeSkinMatrixSSE( vert.m_BoneWeights, pPoseToWorld, temp );
-			}
-			else
-			{
-				pSkinMat = ComputeSkinMatrix( vert.m_BoneWeights, pPoseToWorld, temp );
-			}
+			pSkinMat = ComputeSkinMatrix( vert.m_BoneWeights, pPoseToWorld, temp );
 
 			// transform into world space
 			if (nDoFlex && vertexCache.IsVertexFlexed(n))
@@ -1263,8 +1105,6 @@ public:
 		meshBuilder.FastAdvanceNVertices( numVertices );
 	}
 
-#ifdef SPECIAL_SSE_MESH_PROCESSOR
-
 #ifdef VERIFY_SSE_LIGHTING
 	static int NotCloseEnough( float a, float b )
 	{
@@ -1303,8 +1143,8 @@ public:
 
 			for (int i=0; i<4; i++)
 			{
-				Vector color;
 #ifdef VERIFY_SSE_LIGHTING
+				Vector color;
 				// debug - check sse version against "real" version
 				g_StudioRender.R_ComputeLightAtPoint3( dst[i].m_vecPosition,dst[i].m_vecNormal, color );
 				if ( NotCloseEnough(color.x,Color.X(i)) ||
@@ -1353,10 +1193,10 @@ public:
 		mstudiovertex_t *pVertices = vertData->Vertex( 0 );
 
 #define N_VERTS_TO_DO_AT_ONCE 4								// for SSE processing
-		Assert(N_VERTS_TO_DO_AT_ONCE<=PREFETCH_VERT_COUNT);
+		static_assert(N_VERTS_TO_DO_AT_ONCE<=PREFETCH_VERT_COUNT);
 
 		SSELightingHalfLambert=(pMaterial && (pMaterial->GetMaterialVarFlag( MATERIAL_VAR_HALFLAMBERT)));
-		Vector color;
+
 		Vector *pSrcPos;
 		Vector *pSrcNorm;
 		
@@ -1432,7 +1272,7 @@ public:
 				mstudiovertex_t &vert = pVertices[n];
 				
 				// Compute the skinning matrix
-				pSkinMat = ComputeSkinMatrixSSE( vert.m_BoneWeights, pPoseToWorld, temp );
+				pSkinMat = ComputeSkinMatrix( vert.m_BoneWeights, pPoseToWorld, temp );
 			
 				// transform into world space
 				if (nDoFlex && vertexCache.IsVertexFlexed(n))
@@ -1481,95 +1321,70 @@ public:
 		}
 		meshBuilder.FastAdvanceNVertices( numVertices );
 	}
-#endif // SPECIAL_SSE_MESH_PROCESSOR
 };
 
 //-----------------------------------------------------------------------------
 // Draws the mesh as tristrips using software
 //-----------------------------------------------------------------------------
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< false, false, false, LIGHTING_HARDWARE, false >	ProcessMesh000H7_t;
 typedef CProcessMeshWrapper< false, false, false, LIGHTING_SOFTWARE, false >	ProcessMesh000S7_t;
 typedef CProcessMeshWrapper< false, false, false, LIGHTING_MOUTH, false >		ProcessMesh000M7_t;
-#endif
 
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< false, false, true, LIGHTING_HARDWARE, false >		ProcessMesh001H7_t;
 typedef CProcessMeshWrapper< false, false, true, LIGHTING_SOFTWARE, false >		ProcessMesh001S7_t;
 typedef CProcessMeshWrapper< false, false, true, LIGHTING_MOUTH, false >		ProcessMesh001M7_t;
-#endif
 
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< false, true, false, LIGHTING_HARDWARE, false >		ProcessMesh010H7_t;
 typedef CProcessMeshWrapper< false, true, false, LIGHTING_SOFTWARE, false >		ProcessMesh010S7_t;
 typedef CProcessMeshWrapper< false, true, false, LIGHTING_MOUTH, false >		ProcessMesh010M7_t;
-#endif
 
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< false, true, true, LIGHTING_HARDWARE, false >		ProcessMesh011H7_t;
 typedef CProcessMeshWrapper< false, true, true, LIGHTING_SOFTWARE, false >		ProcessMesh011S7_t;
 typedef CProcessMeshWrapper< false, true, true, LIGHTING_MOUTH, false >			ProcessMesh011M7_t;
-#endif
 
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< true, false, false, LIGHTING_HARDWARE, false >		ProcessMesh100H7_t;
 typedef CProcessMeshWrapper< true, false, false, LIGHTING_SOFTWARE, false >		ProcessMesh100S7_t;
 typedef CProcessMeshWrapper< true, false, false, LIGHTING_MOUTH, false >		ProcessMesh100M7_t;
-#endif
 
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< true, false, true, LIGHTING_HARDWARE, false >		ProcessMesh101H7_t;
 typedef CProcessMeshWrapper< true, false, true, LIGHTING_SOFTWARE, false >		ProcessMesh101S7_t;
 typedef CProcessMeshWrapper< true, false, true, LIGHTING_MOUTH, false >			ProcessMesh101M7_t;
-#endif
 
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< true, true, false, LIGHTING_HARDWARE, false >		ProcessMesh110H7_t;
 typedef CProcessMeshWrapper< true, true, false, LIGHTING_SOFTWARE, false >		ProcessMesh110S7_t;
 typedef CProcessMeshWrapper< true, true, false, LIGHTING_MOUTH, false >			ProcessMesh110M7_t;
-#endif
 
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< true, true, true, LIGHTING_HARDWARE, false >		ProcessMesh111H7_t;
 typedef CProcessMeshWrapper< true, true, true, LIGHTING_SOFTWARE, false >		ProcessMesh111S7_t;
 typedef CProcessMeshWrapper< true, true, true, LIGHTING_MOUTH, false >			ProcessMesh111M7_t;
-#endif
 
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< false, false, false, LIGHTING_HARDWARE, true >		ProcessMesh000H8_t;
 typedef CProcessMeshWrapper< false, false, false, LIGHTING_SOFTWARE, true >		ProcessMesh000S8_t;
 typedef CProcessMeshWrapper< false, false, false, LIGHTING_MOUTH, true >		ProcessMesh000M8_t;
-#endif
 
 typedef CProcessMeshWrapper< false, false, true, LIGHTING_HARDWARE, true >		ProcessMesh001H8_t;
 typedef CProcessMeshWrapper< false, false, true, LIGHTING_SOFTWARE, true >		ProcessMesh001S8_t;
 typedef CProcessMeshWrapper< false, false, true, LIGHTING_MOUTH, true >			ProcessMesh001M8_t;
 
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< false, true, false, LIGHTING_HARDWARE, true >		ProcessMesh010H8_t;
 typedef CProcessMeshWrapper< false, true, false, LIGHTING_SOFTWARE, true >		ProcessMesh010S8_t;
 typedef CProcessMeshWrapper< false, true, false, LIGHTING_MOUTH, true >			ProcessMesh010M8_t;
-#endif
 
 typedef CProcessMeshWrapper< false, true, true, LIGHTING_HARDWARE, true >		ProcessMesh011H8_t;
 typedef CProcessMeshWrapper< false, true, true, LIGHTING_SOFTWARE, true >		ProcessMesh011S8_t;
 typedef CProcessMeshWrapper< false, true, true, LIGHTING_MOUTH, true >			ProcessMesh011M8_t;
 
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< true, false, false, LIGHTING_HARDWARE, true >		ProcessMesh100H8_t;
 typedef CProcessMeshWrapper< true, false, false, LIGHTING_SOFTWARE, true >		ProcessMesh100S8_t;
 typedef CProcessMeshWrapper< true, false, false, LIGHTING_MOUTH, true >			ProcessMesh100M8_t;
-#endif
 
 typedef CProcessMeshWrapper< true, false, true, LIGHTING_HARDWARE, true >		ProcessMesh101H8_t;
 typedef CProcessMeshWrapper< true, false, true, LIGHTING_SOFTWARE, true >		ProcessMesh101S8_t;
 typedef CProcessMeshWrapper< true, false, true, LIGHTING_MOUTH, true >			ProcessMesh101M8_t;
 
-#if !defined( _X360 )
 typedef CProcessMeshWrapper< true, true, false, LIGHTING_HARDWARE, true >		ProcessMesh110H8_t;
 typedef CProcessMeshWrapper< true, true, false, LIGHTING_SOFTWARE, true >		ProcessMesh110S8_t;
 typedef CProcessMeshWrapper< true, true, false, LIGHTING_MOUTH, true >			ProcessMesh110M8_t;
-#endif
 
 typedef CProcessMeshWrapper< true, true, true, LIGHTING_HARDWARE, true >		ProcessMesh111H8_t;
 typedef CProcessMeshWrapper< true, true, true, LIGHTING_SOFTWARE, true >		ProcessMesh111S8_t;
@@ -1577,32 +1392,21 @@ typedef CProcessMeshWrapper< true, true, true, LIGHTING_MOUTH, true >			ProcessM
 
 static SoftwareProcessMeshFunc_t g_SoftwareProcessMeshFunc[] =
 {
-#if !defined( _X360 )
 	ProcessMesh000H7_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh000S7_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh000M7_t::R_StudioSoftwareProcessMesh,
 
 	ProcessMesh001H7_t::R_StudioSoftwareProcessMesh,
-#ifdef SPECIAL_SSE_MESH_PROCESSOR
 	ProcessMesh001S7_t::R_StudioSoftwareProcessMeshSSE_DX7,
 	ProcessMesh001M7_t::R_StudioSoftwareProcessMeshSSE_DX7,
-#else
-	ProcessMesh001S7_t::R_StudioSoftwareProcessMesh,
-	ProcessMesh001M7_t::R_StudioSoftwareProcessMesh,
-#endif
 
 	ProcessMesh010H7_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh010S7_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh010M7_t::R_StudioSoftwareProcessMesh,
 
 	ProcessMesh011H7_t::R_StudioSoftwareProcessMesh,
-#ifdef SPECIAL_SSE_MESH_PROCESSOR
 	ProcessMesh011S7_t::R_StudioSoftwareProcessMeshSSE_DX7,
 	ProcessMesh011M7_t::R_StudioSoftwareProcessMeshSSE_DX7,
-#else
-	ProcessMesh011S7_t::R_StudioSoftwareProcessMesh,
-	ProcessMesh011M7_t::R_StudioSoftwareProcessMesh,
-#endif
 
 	ProcessMesh100H7_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh100S7_t::R_StudioSoftwareProcessMesh,
@@ -1619,43 +1423,41 @@ static SoftwareProcessMeshFunc_t g_SoftwareProcessMeshFunc[] =
 	ProcessMesh111H7_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh111S7_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh111M7_t::R_StudioSoftwareProcessMesh,
-#endif
 
-#if !defined( _X360 )
 	ProcessMesh000H8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh000S8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh000M8_t::R_StudioSoftwareProcessMesh,
-#endif
+
 	ProcessMesh001H8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh001S8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh001M8_t::R_StudioSoftwareProcessMesh,
-#if !defined( _X360 )
+
 	ProcessMesh010H8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh010S8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh010M8_t::R_StudioSoftwareProcessMesh,
-#endif
+
 	ProcessMesh011H8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh011S8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh011M8_t::R_StudioSoftwareProcessMesh,
-#if !defined( _X360 )
+
 	ProcessMesh100H8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh100S8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh100M8_t::R_StudioSoftwareProcessMesh,
-#endif
+
 	ProcessMesh101H8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh101S8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh101M8_t::R_StudioSoftwareProcessMesh,
-#if !defined( _X360 )
+
 	ProcessMesh110H8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh110S8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh110M8_t::R_StudioSoftwareProcessMesh,
-#endif
+
 	ProcessMesh111H8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh111S8_t::R_StudioSoftwareProcessMesh,
 	ProcessMesh111M8_t::R_StudioSoftwareProcessMesh,
 };
 
-inline const mstudio_meshvertexdata_t * GetFatVertexData( mstudiomesh_t * pMesh, studiohdr_t * pStudioHdr )
+static inline const mstudio_meshvertexdata_t * GetFatVertexData( mstudiomesh_t * pMesh, studiohdr_t * pStudioHdr )
 {
 	if ( !pMesh->pModel()->CacheVertexData( pStudioHdr ) )
 	{
@@ -1972,8 +1774,6 @@ void CStudioRender::R_StudioProcessFlexedMesh( mstudiomesh_t* pmesh, CMeshBuilde
 {
 	PROFILE_STUDIO("FlexMeshBuilder");
 
-	Vector4D *pStudioTangentS;
-
 	// get the vertex data
 	const mstudio_meshvertexdata_t *vertData = GetFatVertexData( pmesh, m_pStudioHdr );
 	if ( !vertData )
@@ -1981,11 +1781,12 @@ void CStudioRender::R_StudioProcessFlexedMesh( mstudiomesh_t* pmesh, CMeshBuilde
 		// not available
 		return;
 	}
+
 	mstudiovertex_t *pVertices = vertData->Vertex( 0 );
 
 	if (vertData->HasTangentData())
 	{
-		pStudioTangentS = vertData->TangentS( 0 );
+		Vector4D *pStudioTangentS = vertData->TangentS( 0 );
 		Assert( pStudioTangentS->w == -1.0f || pStudioTangentS->w == 1.0f );
 
 		for ( int j=0; j < numVertices ; j++)
@@ -2084,11 +1885,6 @@ void CStudioRender::R_StudioProcessFlexedMesh( mstudiomesh_t* pmesh, CMeshBuilde
 //-----------------------------------------------------------------------------
 template<VertexCompressionType_t T> void CStudioRender::R_StudioRestoreMesh( mstudiomesh_t* pmesh, studiomeshgroup_t* pMeshData )
 {
-	Vector4D *pStudioTangentS;
-
-	if ( IsX360() )
-		return;
-
 	// get at the vertex data
 	const mstudio_meshvertexdata_t *vertData = GetFatVertexData( pmesh, m_pStudioHdr );
 	if ( !vertData )
@@ -2096,16 +1892,9 @@ template<VertexCompressionType_t T> void CStudioRender::R_StudioRestoreMesh( mst
 		// not available
 		return;
 	}
-	mstudiovertex_t *pVertices = vertData->Vertex( 0 );
 
-	if (vertData->HasTangentData())
-	{
-		pStudioTangentS = vertData->TangentS( 0 );
-	}
-	else
-	{
-		pStudioTangentS = NULL;
-	}
+	mstudiovertex_t *pVertices = vertData->Vertex( 0 );
+	Vector4D *pStudioTangentS = vertData->HasTangentData() ? vertData->TangentS( 0 ) : nullptr;
 
 	CMeshBuilder meshBuilder;
 
@@ -2294,9 +2083,10 @@ int CStudioRender::R_StudioDrawStaticMesh( IMatRenderContext *pRenderContext, ms
 		{
 			Assert( ( pGroup->m_Flags & ( MESHGROUP_IS_FLEXED | MESHGROUP_IS_DELTA_FLEXED ) ) == 0 );
 		}
+		
+		IMesh* pMesh = pRenderContext->GetDynamicMeshEx( fmt, false, 0, pGroup->m_pMesh );
 
 		CMeshBuilder meshBuilder;
-		IMesh* pMesh = pRenderContext->GetDynamicMeshEx( fmt, false, 0, pGroup->m_pMesh );
 		meshBuilder.Begin( pMesh, MATERIAL_HETEROGENOUS, pGroup->m_NumVertices, 0 );
 
 		R_StudioSoftwareProcessMesh( pmesh, meshBuilder, 
@@ -2420,7 +2210,7 @@ int CStudioRender::R_StudioDrawDynamicMesh( IMatRenderContext *pRenderContext, m
 	int numTrianglesRendered = 0;
 
 #ifdef _DEBUG
-	const char *pDebugMaterialName = NULL;
+	[[maybe_unused]] const char *pDebugMaterialName = NULL;
 	if ( pMaterial )
 	{
 		pDebugMaterialName = pMaterial->GetName();
@@ -2436,14 +2226,14 @@ int CStudioRender::R_StudioDrawDynamicMesh( IMatRenderContext *pRenderContext, m
 		R_StudioFlexVerts( pmesh, lod ); 
 	}
 
-	IMesh* pMesh;
 	bool bNeedsTangentSpace = pMaterial ? pMaterial->NeedsTangentSpace() : false;
 
 	VertexFormat_t fmt = ComputeSWSkinVertexFormat( pMaterial );
 	bool bDX8Vertex = ( UserDataSize( fmt ) != 0 );
 
+	IMesh* pMesh = pRenderContext->GetDynamicMeshEx( fmt, false, 0, pGroup->m_pMesh);
+
 	CMeshBuilder meshBuilder;
-	pMesh = pRenderContext->GetDynamicMeshEx( fmt, false, 0, pGroup->m_pMesh);
 	meshBuilder.Begin( pMesh, MATERIAL_HETEROGENOUS, pGroup->m_NumVertices, 0 );
 
 	if ( swSkin )
@@ -2502,6 +2292,7 @@ static unsigned int irisUCache = 0;
 static unsigned int irisVCache = 0;
 static unsigned int glintUCache = 0;
 static unsigned int glintVCache = 0;
+
 void CStudioRender::SetEyeMaterialVars( IMaterial* pMaterial, mstudioeyeball_t* peyeball, 
 		Vector const& eyeOrigin, const matrix3x4_t& irisTransform, const matrix3x4_t& glintTransform )
 {
@@ -2841,8 +2632,6 @@ int CStudioRender::SortMeshes( int* pIndices, IMaterial **ppMaterials,
 	int numMeshes = 0;
 	if (m_bDrawTranslucentSubModels)
 	{
-//		float* pDist = (float*)_alloca( m_pSubModel->nummeshes * sizeof(float) );
-
 		// Sort each model piece by it's center, if it's translucent
 		for (int i = 0; i < m_pSubModel->nummeshes; ++i)
 		{
@@ -2851,14 +2640,6 @@ int CStudioRender::SortMeshes( int* pIndices, IMaterial **ppMaterials,
 			IMaterial *pMaterial = ppMaterials[pskinref[pmesh->material]];
 			if( !pMaterial || !pMaterial->IsTranslucent() )
 				continue;
-
-			// FIXME: put the "center" of the mesh into delta
-//			Vector delta;
-//			VectorSubtract( delta, r_origin, delta );
-//			float dist = DotProduct( delta, vforward );
-
-			// Add it to our lists
-//			InsertRenderable( i, dist, numMeshes, pIndices, pDist );
 
 			// One more mesh
 			++numMeshes;
@@ -2900,13 +2681,8 @@ int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int sk
 	IMaterial **ppMaterials, int *pMaterialFlags, int boneMask, int lod, ColorMeshInfo_t *pColorMeshes )
 {
 	VPROF( "R_StudioDrawPoints" );
-	int			i;
-	int numTrianglesRendered = 0;
 
-#if 0 // garymcthack
-	if ( m_pSubModel->numfaces == 0 )
-		return 0;
-#endif
+	int numTrianglesRendered = 0;
 
 	// happens when there's a model load failure
 	if ( m_pStudioMeshes == 0 )
@@ -2937,7 +2713,7 @@ int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int sk
 //	int numMeshes = SortMeshes( pIndices, ppMaterials, pskinref, vforward, r_origin );
 
 	// draw each mesh
-	for ( i = 0; i < m_pSubModel->nummeshes; ++i)
+	for ( int i = 0; i < m_pSubModel->nummeshes; ++i)
 	{
 		mstudiomesh_t *pmesh = m_pSubModel->pMesh(i);
 		studiomeshdata_t *pMeshData = &m_pStudioMeshes[pmesh->meshid];
@@ -2966,7 +2742,7 @@ int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int sk
 		// the normal static/dynamic methods due to optimization reasons
 		switch ( pmesh->materialtype )
 		{
-		case 1:	
+		case 1:
 			// eyeballs
 			numTrianglesRendered += R_StudioDrawEyeball( pRenderContext, pmesh, pMeshData, lighting, pMaterial, lod );
 			break;

@@ -303,7 +303,7 @@ static void ReleaseMaterialSystemObjects()
 //	g_StudioRender.UncacheGlint();
 }
 
-static void RestoreMaterialSystemObjects( int nChangeFlags )
+static void RestoreMaterialSystemObjects( int )
 {
 //	g_StudioRender.PrecacheGlint();
 }
@@ -382,7 +382,7 @@ void CStudioRender::SetLightingRenderState()
 //-----------------------------------------------------------------------------
 void CStudioRender::AddShadow( IMaterial* pMaterial, void* pProxyData, FlashlightState_t *pFlashlightState, VMatrix *pWorldToTexture, ITexture *pFlashlightDepthTexture )
 {
-	int i = m_ShadowState.AddToTail();
+	intp i = m_ShadowState.AddToTail();
 	ShadowState_t& state = m_ShadowState[i];
 	state.m_pMaterial = pMaterial;
 	state.m_pProxyData = pProxyData;

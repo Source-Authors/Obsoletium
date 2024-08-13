@@ -502,10 +502,10 @@ void CStudioRenderContext::ComputeLighting( const Vector* pAmbient, int lightCou
 		return;
 	}
 
-	if ( lightCount > ARRAYSIZE( m_pLightPos ) )
+	if ( lightCount > ssize( m_pLightPos ) )
 	{
 		AssertMsg( 0, "Light count out of range in ComputeLighting\n" );
-		lightCount = ARRAYSIZE( m_pLightPos );
+		lightCount = ssize( m_pLightPos );
 	}
 
 	// Calculate color given lightpos_t lightpos, a normal, and the ambient
@@ -529,10 +529,10 @@ void CStudioRenderContext::ComputeLightingConstDirectional( const Vector* pAmbie
 		return;
 	}
 
-	if ( lightCount > ARRAYSIZE( m_pLightPos ) )
+	if ( lightCount > ssize( m_pLightPos ) )
 	{
 		AssertMsg( 0, "Light count out of range in ComputeLighting\n" );
-		lightCount = ARRAYSIZE( m_pLightPos );
+		lightCount = ssize( m_pLightPos );
 	}
 
 	// Calculate color given lightpos_t lightpos, a normal, and the ambient

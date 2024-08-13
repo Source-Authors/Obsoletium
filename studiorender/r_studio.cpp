@@ -290,7 +290,7 @@ int R_StudioSetupModel( int bodypart, int entity_body, mstudiomodel_t **ppSubMod
 }
 
 
-
+#if 0
 //-----------------------------------------------------------------------------
 // Generates the PoseToBone Matrix nessecary to align the given bone with the 
 // world.
@@ -333,7 +333,7 @@ static void ScreenAlignBone( matrix3x4_t *pPoseToWorld, mstudiobone_t *pCurBone,
 		vX.z, vY.z, vZ.z, vT.z );
 	ConcatTransforms( matBoneBillboard, pCurBone->poseToBone, *pPoseToWorld );
 }
-
+#endif
 
 //-----------------------------------------------------------------------------
 // Computes PoseToWorld from BoneToWorld

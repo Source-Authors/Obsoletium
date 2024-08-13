@@ -120,7 +120,7 @@ StudioDecalHandle_t CStudioRender::CreateDecalList( studiohwdata_t *pHardwareDat
 
 	// NOTE: This function is called directly without queueing 
 	m_DecalMutex.Lock();
-	int handle = m_DecalList.AddToTail();
+	intp handle = m_DecalList.AddToTail();
 	m_DecalMutex.Unlock();
 
 	m_DecalList[handle].m_pHardwareData = pHardwareData;
@@ -142,7 +142,7 @@ void CStudioRender::DestroyDecalList( StudioDecalHandle_t hDecal )
 
 	RemoveDecalListFromLRU( hDecal );
 
-	int h = (int)hDecal;
+	intp h = (intp)hDecal;
 	// Clean up 
 	for (int i = 0; i < m_DecalList[h].m_nLods; i++ )
 	{
@@ -1132,7 +1132,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 		return;
 
 	// For each lod, build the decal list
-	int h = (int)hDecal;
+	intp h = (intp)hDecal;
 	DecalModelList_t& list = m_DecalList[h];
 
 	if ( list.m_pHardwareData->m_NumStudioMeshes == 0 )
@@ -1217,7 +1217,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 		{
 			DecalId_t nRetireID = m_DecalLRU[ m_DecalLRU.Head() ].m_nDecalId;
 			StudioDecalHandle_t hRetire = m_DecalLRU[ m_DecalLRU.Head() ].m_hDecalHandle;
-			DecalModelList_t &modelList = m_DecalList[(int)hRetire];
+			DecalModelList_t &modelList = m_DecalList[(intp)hRetire];
 			RetireDecal( modelList, nRetireID, modelList.m_pHardwareData->m_RootLOD, modelList.m_pHardwareData->m_NumLODs );
 		}
 	}
@@ -1231,7 +1231,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 	{
 		DecalId_t nRetireID = m_DecalLRU[ m_DecalLRU.Head() ].m_nDecalId;
 		StudioDecalHandle_t hRetire = m_DecalLRU[ m_DecalLRU.Head() ].m_hDecalHandle;
-		DecalModelList_t &modelList = m_DecalList[(int)hRetire];
+		DecalModelList_t &modelList = m_DecalList[(intp)hRetire];
 		RetireDecal( modelList, nRetireID, modelList.m_pHardwareData->m_RootLOD, modelList.m_pHardwareData->m_NumLODs );
 	}
 
@@ -1240,7 +1240,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 		DecalHistory_t *pDecalHistory = &pHistoryList->Element( pHistoryList->Head() );
 		DecalId_t nRetireID = pDecalHistory->m_nId;
 		StudioDecalHandle_t hRetire = hDecal;
-		RetireDecal( m_DecalList[(int)hRetire], nRetireID, nRootLOD, nFinalLOD );
+		RetireDecal( m_DecalList[(intp)hRetire], nRetireID, nRootLOD, nFinalLOD );
 	}
 
 	// Search all LODs for an overflow condition and retire those also
@@ -1250,11 +1250,11 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 		int materialIdx = GetDecalMaterial( list.m_pLod[i], pDecalMaterial );
 
 		// Check to see if we should retire the decal
-		DecalMaterial_t *pDecalMaterial = &m_DecalMaterial[materialIdx];
-		while ( pDecalMaterial->m_Indices.Count() > MAX_DECAL_INDICES_PER_MODEL )
+		DecalMaterial_t *dm = &m_DecalMaterial[materialIdx];
+		while ( dm->m_Indices.Count() > MAX_DECAL_INDICES_PER_MODEL )
 		{
-			DecalHistoryList_t *pHistoryList = &list.m_pLod[i].m_DecalHistory;
-			DecalHistory_t *pDecalHistory = &pHistoryList->Element( pHistoryList->Head() );
+			DecalHistoryList_t *l = &list.m_pLod[i].m_DecalHistory;
+			DecalHistory_t *pDecalHistory = &l->Element( l->Head() );
 			RetireDecal( list, pDecalHistory->m_nId, nRootLOD, nFinalLOD );
 		}
 	}	
@@ -1277,7 +1277,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 		buildInfo.m_FirstVertex = buildInfo.m_pDecalMaterial->m_Vertices.InvalidIndex();
 		buildInfo.m_VertexCount = 0;
 
-		int prevIndexCount = buildInfo.m_pDecalMaterial->m_Indices.Count();
+		intp prevIndexCount = buildInfo.m_pDecalMaterial->m_Indices.Count();
 
 		// Step over all body parts + add decals to em all!
 		int k;
@@ -1299,7 +1299,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 		{
 			bAddedDecals = true;
 
-			int decalIndexCount = buildInfo.m_pDecalMaterial->m_Indices.Count() - prevIndexCount;
+			intp decalIndexCount = buildInfo.m_pDecalMaterial->m_Indices.Count() - prevIndexCount;
 			Assert(decalIndexCount > 0);
 
 			int decalIndex = AddDecalToMaterialList( buildInfo.m_pDecalMaterial );
@@ -1535,7 +1535,7 @@ bool CStudioRender::DrawMultiBoneDecals( CMeshBuilder& meshBuilder, DecalMateria
 
 			// Add a little extra offset for hardware skinning; in that case
 			// we're doing software skinning for decals and it might not be quite right
-			VectorMA( pCachedVert->m_Position.AsVector3D(), 0.1, pCachedVert->m_Normal.AsVector3D(), pCachedVert->m_Position.AsVector3D() );
+			VectorMA( pCachedVert->m_Position.AsVector3D(), 0.1f, pCachedVert->m_Normal.AsVector3D(), pCachedVert->m_Position.AsVector3D() );
 
 			meshBuilder.Position3fv( pCachedVert->m_Position.Base() );
 			meshBuilder.Normal3fv( pCachedVert->m_Normal.Base() );
@@ -1663,7 +1663,7 @@ bool CStudioRender::DrawMultiBoneFlexedDecals( IMatRenderContext *pRenderContext
 
 				// Add a little extra offset for hardware skinning; in that case
 				// we're doing software skinning for decals and it might not be quite right
-				VectorMA( pCachedVert->m_Position.AsVector3D(), 0.1, pCachedVert->m_Normal.AsVector3D(), pCachedVert->m_Position.AsVector3D() );
+				VectorMA( pCachedVert->m_Position.AsVector3D(), 0.1f, pCachedVert->m_Normal.AsVector3D(), pCachedVert->m_Position.AsVector3D() );
 
 				meshBuilder.Position3fv( pCachedVert->m_Position.Base() );
 				meshBuilder.Normal3fv( pCachedVert->m_Normal.Base() );
@@ -1724,7 +1724,7 @@ void CStudioRender::DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalM
 	VPROF( "DecalsDrawStudio" );
 
 	// It's possible for the index count to become zero due to decal retirement
-	int indexCount = decalMaterial.m_Indices.Count();
+	intp indexCount = decalMaterial.m_Indices.Count();
 	if ( indexCount == 0 )
 		return;
 
@@ -1752,7 +1752,7 @@ void CStudioRender::DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalM
 	// Use a dynamic mesh...
 	IMesh* pMesh = pRenderContext->GetDynamicMesh();
 
-	int vertexCount = decalMaterial.m_Vertices.Count();
+	intp vertexCount = decalMaterial.m_Vertices.Count();
 
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, vertexCount, indexCount );
@@ -1798,7 +1798,7 @@ void CStudioRender::DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalM
 	// each decal, and then fix up the indices based on how many vertices
 	// we wrote out for the decals
 	unsigned short decal = decalMaterial.m_Decals.Head();
-	int indicesRemaining = decalMaterial.m_Decals[decal].m_IndexCount;
+	intp indicesRemaining = decalMaterial.m_Decals[decal].m_IndexCount;
 	int vertexOffset = 0;
 	for ( int i = 0; i < indexCount; ++i)
 	{
@@ -1902,7 +1902,7 @@ void CStudioRender::DrawDecal( const DrawModelInfo_t &drawInfo, int lod, int bod
 	// FIXME: Body stuff isn't hooked in at all for decals
 
 	// Get the decal list for this lod
-	const DecalModelList_t& list = m_DecalList[(int)handle];
+	const DecalModelList_t& list = m_DecalList[(intp)handle];
 	m_pStudioHdr = drawInfo.m_pStudioHdr;
 
 	// Add this fix after I fix the other problem.
@@ -1975,7 +1975,7 @@ void CStudioRender::DrawStaticPropDecals( const DrawModelInfo_t &drawInfo, const
 	pRenderContext->MatrixMode( MATERIAL_MODEL );
 	pRenderContext->LoadMatrix( modelToWorld );
 
-	const DecalModelList_t& list = m_DecalList[(int)handle];
+	const DecalModelList_t& list = m_DecalList[(intp)handle];
 	// Gotta do this for all LODs
 	// Draw each set of decals using a particular material
 	unsigned short mat = list.m_pLod[drawInfo.m_Lod].m_FirstMaterial;
