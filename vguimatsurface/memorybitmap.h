@@ -31,16 +31,16 @@ public:
 	~MemoryBitmap();
 
 	// IImage implementation
-	virtual void Paint();
-	virtual void GetSize(int &wide, int &tall);
-	virtual void GetContentSize(int &wide, int &tall);
-	virtual void SetPos(int x, int y);
-	virtual void SetSize(int x, int y);
-	virtual void SetColor(Color col);
+	void Paint() override;
+	void GetSize(int &wide, int &tall) override;
+	void GetContentSize(int &wide, int &tall) override;
+	void SetPos(int x, int y) override;
+	void SetSize(int x, int y) override;
+	void SetColor(Color col) override;
 
 	// methods
 	void ForceUpload(unsigned char *texture,int wide, int tall);	// ensures the bitmap has been uploaded
-	HTexture GetID();		// returns the texture id
+	HTexture GetID() override;		// returns the texture id
 	const char *GetName();
 	bool IsValid()
 	{

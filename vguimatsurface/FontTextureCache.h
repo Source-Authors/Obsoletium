@@ -76,7 +76,7 @@ private:
 	};
 
 	// allocates a new page for a given character
-	bool AllocatePageForChar(int charWide, int charTall, int &pageIndex, int &drawX, int &drawY, int &twide, int &ttall);
+	bool AllocatePageForChar(int charWide, int charTall, intp &pageIndex, int &drawX, int &drawY, int &twide, int &ttall);
 
 	// Creates font materials
 	void CreateFontMaterials( Page_t &page, ITexture *pFontTexture, bool bitmapFont = false );
@@ -92,7 +92,7 @@ private:
 	typedef CUtlVector<Page_t>	FontPageList_t;
 	FontPageList_t				m_PageList;
 	
-	int			m_pCurrPage[FONT_PAGE_SIZE_COUNT];
+	intp		m_pCurrPage[FONT_PAGE_SIZE_COUNT];
 	HCacheEntry	m_LRUListHeadIndex;
 	static int	s_pFontPageSize[FONT_PAGE_SIZE_COUNT];
 	CUtlMap< vgui::HFont, Page_t >	m_FontPages;

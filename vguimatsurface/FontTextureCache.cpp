@@ -33,7 +33,6 @@
 #include "tier0/memdbgon.h"
 
 extern CMatSystemSurface g_MatSystemSurface;
-static int g_FontRenderBoundingBoxes = -1;
 
 #define TEXTURE_PAGE_WIDTH	256
 #define TEXTURE_PAGE_HEIGHT	256
@@ -75,7 +74,7 @@ void CFontTextureCache::Clear()
 	m_PageList.RemoveAll();
 
 	// reinitialize
-	CacheEntry_t listHead = { 0, 0 };
+	CacheEntry_t listHead = {};
 	m_LRUListHeadIndex = m_CharCache.Insert(listHead);
 
 	m_CharCache[m_LRUListHeadIndex].nextEntry = m_LRUListHeadIndex;
@@ -182,7 +181,7 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 	{
 		struct newPageEntry_t
 		{
-			int	page;	// The font page a new character will go in
+			intp	page;	// The font page a new character will go in
 			int	drawX;	// X location within the font page
 			int	drawY;	// Y location within the font page
 		};
@@ -221,7 +220,8 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 				}
 
 				// Get a texture to render into
-				int page, drawX, drawY, twide, ttall;
+				intp page;
+				int drawX, drawY, twide, ttall;
 				if ( !AllocatePageForChar( fontWide, fontTall, page, drawX, drawY, twide, ttall ) )
 					return false;
 
@@ -253,7 +253,7 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 				Assert( m_CharCache.IsValidIndex( cacheHandle ) );
 			}
 			
-			int page = m_CharCache[cacheHandle].page;
+			intp page = m_CharCache[cacheHandle].page;
 			textureID[i] = m_PageList[page].textureID[typePage];
 			texCoords[i] = m_CharCache[cacheHandle].texCoords;
 		}
@@ -262,32 +262,6 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 		if ( numNewChars > 0 )
 		{
 
-#ifdef _X360
-			if ( numNewChars > 1 )
-			{
-				MEM_ALLOC_CREDIT();
-
-				// Use the 360 fast path that generates multiple characters at once
-				int newCharDataSize = totalNewCharTexels*4;
-				CUtlBuffer newCharData( newCharDataSize, newCharDataSize, 0 );
-				unsigned char *pRGBA = (unsigned char *)newCharData.Base();
-				winFont->GetCharsRGBA( newChars, numNewChars, pRGBA );
-
-				// Copy the data into our font pages
-				for ( int i = 0; i < numNewChars; i++ )
-				{
-					newChar_t		& newChar	= newChars[i];
-					newPageEntry_t	& newEntry	= newEntries[i];
-
-					// upload the new sub texture 
-					// NOTE: both textureIDs reference the same ITexture, so we're ok
-					g_MatSystemSurface.DrawSetTexture( m_PageList[newEntry.page].textureID[typePage] );
-					unsigned char *characterRGBA = pRGBA + newChar.offset;
-					g_MatSystemSurface.DrawSetSubTextureRGBA( m_PageList[newEntry.page].textureID[typePage], newEntry.drawX, newEntry.drawY, characterRGBA, newChar.fontWide, newChar.fontTall );
-				}
-			}
-			else
-#endif
 			{
 				// create a buffer for new characters to be rendered into
 				int nByteCount = maxNewCharTexels * 4;
@@ -404,13 +378,13 @@ int CFontTextureCache::ComputePageType( int charTall ) const
 //-----------------------------------------------------------------------------
 // Purpose: allocates a new page for a given character
 //-----------------------------------------------------------------------------
-bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, int &pageIndex, int &drawX, int &drawY, int &twide, int &ttall)
+bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, intp &pageIndex, int &drawX, int &drawY, int &twide, int &ttall)
 {
 	// see if there is room in the last page for this character
 	int nPageType = ComputePageType( charTall );
 	if ( nPageType < 0 )
 	{
-		Assert( !"Font is too tall for texture cache of glyphs\n" );
+		AssertMsg( false, "Font is too tall for texture cache of glyphs\n" );
 		return false; 
 	}
 	
