@@ -26,7 +26,7 @@
 class CDmxAttributeLess
 {
 public:
-	bool Less( const CDmxAttribute * pAttribute1, const CDmxAttribute *pAttribute2, void *pContext )
+	bool Less( const CDmxAttribute * pAttribute1, const CDmxAttribute *pAttribute2, void * )
 	{
 		return pAttribute1->GetNameSymbol() < pAttribute2->GetNameSymbol();
 	}
@@ -102,7 +102,7 @@ public:
 	bool				HasAttribute( const char *pAttributeName ) const;
 	CDmxAttribute		*GetAttribute( const char *pAttributeName );
 	const CDmxAttribute *GetAttribute( const char *pAttributeName ) const;
-	int					AttributeCount() const;
+	intp					AttributeCount() const;
 	CDmxAttribute		*GetAttribute( int nIndex );
 	const CDmxAttribute *GetAttribute( int nIndex ) const;
 	CUtlSymbol			GetType() const;

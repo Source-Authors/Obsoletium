@@ -79,7 +79,7 @@ static CDmxKeyValues2ErrorStack g_KeyValues2ErrorStack;
 // Constructor
 //-----------------------------------------------------------------------------
 CDmxKeyValues2ErrorStack::CDmxKeyValues2ErrorStack() : 
-	m_pFilename("NULL"), m_errorIndex(0), m_maxErrorIndex(0), m_nFileLine(1) 
+	m_pFilename("NULL"), m_nFileLine(1), m_errorIndex(0), m_maxErrorIndex(0) 
 {
 }
 
@@ -221,7 +221,7 @@ private:
 //-----------------------------------------------------------------------------
 // Element dictionary used in unserialization
 //-----------------------------------------------------------------------------
-typedef int DmxElementDictHandle_t;
+typedef intp DmxElementDictHandle_t;
 enum
 {
 	ELEMENT_DICT_HANDLE_INVALID = (DmxElementDictHandle_t)~0
@@ -291,9 +291,7 @@ private:
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CDmxElementDictionary::CDmxElementDictionary()
-{
-}
+CDmxElementDictionary::CDmxElementDictionary() = default;
 
 
 //-----------------------------------------------------------------------------
@@ -347,7 +345,7 @@ CDmxElement *CDmxElementDictionary::GetElement( DmxElementDictHandle_t handle )
 //-----------------------------------------------------------------------------
 void CDmxElementDictionary::AddAttribute( CDmxAttribute *pAttribute, const DmObjectId_t &objectId )
 {
-	int i = m_Attributes.AddToTail();
+	auto i = m_Attributes.AddToTail();
 	m_Attributes[i].m_nType = AT_OBJECTID;
 	m_Attributes[i].m_pAttribute = pAttribute;
 	CopyUniqueId( objectId, &m_Attributes[i].m_ObjectId );
@@ -359,7 +357,7 @@ void CDmxElementDictionary::AddAttribute( CDmxAttribute *pAttribute, const DmObj
 //-----------------------------------------------------------------------------
 void CDmxElementDictionary::AddArrayAttribute( CDmxAttribute *pAttribute, DmxElementDictHandle_t hElement )
 {
-	int i = m_ArrayAttributes.AddToTail();
+	auto i = m_ArrayAttributes.AddToTail();
 	m_ArrayAttributes[i].m_nType = AT_ELEMENT;
 	m_ArrayAttributes[i].m_pAttribute = pAttribute;
 	m_ArrayAttributes[i].m_hElement = hElement;
@@ -367,7 +365,7 @@ void CDmxElementDictionary::AddArrayAttribute( CDmxAttribute *pAttribute, DmxEle
 
 void CDmxElementDictionary::AddArrayAttribute( CDmxAttribute *pAttribute, const DmObjectId_t &objectId )
 {
-	int i = m_ArrayAttributes.AddToTail();
+	auto i = m_ArrayAttributes.AddToTail();
 	m_ArrayAttributes[i].m_nType = AT_OBJECTID;
 	m_ArrayAttributes[i].m_pAttribute = pAttribute;
 	CopyUniqueId( objectId, &m_ArrayAttributes[i].m_ObjectId );
@@ -379,8 +377,8 @@ void CDmxElementDictionary::AddArrayAttribute( CDmxAttribute *pAttribute, const 
 //-----------------------------------------------------------------------------
 DmxElementDictHandle_t CDmxElementDictionary::FindElement( CDmxElement *pElement )
 {
-	int nCount = m_Dict.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Dict.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pElement == m_Dict[i].m_pElement )
 			return i;
@@ -394,8 +392,8 @@ DmxElementDictHandle_t CDmxElementDictionary::FindElement( CDmxElement *pElement
 //-----------------------------------------------------------------------------
 DmxElementDictHandle_t CDmxElementDictionary::FindElement( const DmObjectId_t &objectId )
 {
-	int nCount = m_Dict.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Dict.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( IsUniqueIdEqual( objectId, m_Dict[i].m_Id ) )
 			return i;
@@ -409,8 +407,8 @@ DmxElementDictHandle_t CDmxElementDictionary::FindElement( const DmObjectId_t &o
 //-----------------------------------------------------------------------------
 void CDmxElementDictionary::HookUpElementAttributes()
 {
-	int n = m_Attributes.Count();
-	for ( int i = 0; i < n; ++i )
+	intp n = m_Attributes.Count();
+	for ( intp i = 0; i < n; ++i )
 	{
 		Assert( m_Attributes[i].m_nType == AT_OBJECTID );
 
@@ -426,8 +424,8 @@ void CDmxElementDictionary::HookUpElementAttributes()
 //-----------------------------------------------------------------------------
 void CDmxElementDictionary::HookUpElementArrayAttributes()
 {
-	int n = m_ArrayAttributes.Count();
-	for ( int i = 0; i < n; ++i )
+	intp n = m_ArrayAttributes.Count();
+	for ( intp i = 0; i < n; ++i )
 	{
 		CUtlVector< CDmxElement* > &array = m_ArrayAttributes[i].m_pAttribute->GetArrayForEdit<CDmxElement*>();
 
@@ -515,12 +513,12 @@ void CDmxSerializerKeyValues2::SerializeElementAttribute( CUtlBuffer& buf, CDmxS
 	CDmxElement *pElement = pAttribute->GetValue< CDmxElement* >();
 	if ( dict.ShouldInlineElement( pElement ) )
 	{
-		buf.Printf( "\"%s\"\n{\n", pElement->GetTypeString() );
 		if ( pElement )
 		{
+			buf.Printf( "\"%s\"\n{\n", pElement->GetTypeString() );
 			SaveElement( buf, dict, pElement, false );
+			buf.Printf( "}\n" );
 		}
-		buf.Printf( "}\n" );
 	}
 	else
 	{
@@ -544,8 +542,8 @@ void CDmxSerializerKeyValues2::SerializeElementArrayAttribute( CUtlBuffer& buf, 
 	buf.Printf( "\n[\n" );
 	buf.PushTab();
 
-	int nCount = array.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = array.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxElement *pElement = array[i];
 		if ( dict.ShouldInlineElement( pElement ) )
@@ -865,7 +863,7 @@ CDmxSerializerKeyValues2::TokenType_t CDmxSerializerKeyValues2::ReadToken( CUtlB
 	buf.SeekGet( CUtlBuffer::SEEK_CURRENT, nLength );
 
 	// Count the number of crs in the token + update the current line
-	const char *pMem = (const char *)token.Base();
+	const char *pMem = token.Base<const char>();
 	for ( int i = 0; i < nLength; ++i )
 	{
 		if ( pMem[i] == '\n' )
@@ -1042,7 +1040,7 @@ bool CDmxSerializerKeyValues2::UnserializeAttributeValueFromToken( CDmxAttribute
 	// NOTE: This code is necessary because the attribute code is using Scanf
 	// which is not really friendly toward delimiters, so we must pass in
 	// non-delimited buffers. Sucky. There must be a better way of doing this
-	const char *pBuf = (const char*)tokenBuf.Base();
+	const char *pBuf = tokenBuf.Base<const char>();
 	int nLength = tokenBuf.TellMaxPut();
 	char *pTemp = (char*)stackalloc( nLength + 1 );
 

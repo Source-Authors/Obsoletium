@@ -84,8 +84,8 @@ void CDmxSerializationDictionary::BuildElementList_R( CDmxElement *pElement, boo
 		case AT_ELEMENT_ARRAY:
 			{
 				const CUtlVector<CDmxElement*> &array = pAttribute->GetArray<CDmxElement*>( );
-				int nCountArray = array.Count();
-				for ( int j = 0; j < nCountArray; ++j )
+				intp nCountArray = array.Count();
+				for ( intp j = 0; j < nCountArray; ++j )
 				{
 					CDmxElement *pChild = array[ j ];
 					if ( !pChild )
@@ -158,7 +158,7 @@ DmxSerializationHandle_t CDmxSerializationDictionary::FirstRootElement() const
 	// NOTE: I don't have to use First/NextInorder here because there
 	// are guaranteed to be no removals from the dictionary.
 	// Also, using inorder traversal won't get my actual root element to be first in the file
-	int nCount = m_Dict.Count();
+	intp nCount = m_Dict.Count();
 	for ( DmxSerializationHandle_t h = 0; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )
@@ -170,7 +170,7 @@ DmxSerializationHandle_t CDmxSerializationDictionary::FirstRootElement() const
 DmxSerializationHandle_t CDmxSerializationDictionary::NextRootElement( DmxSerializationHandle_t h ) const
 {
 	++h;
-	int nCount = m_Dict.Count();
+	intp nCount = m_Dict.Count();
 	for ( ; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )

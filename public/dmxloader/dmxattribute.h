@@ -75,7 +75,7 @@ public:
 	const char *GetValueAsString( char *pBuffer, size_t nBufLen ) const;
 
 	// Gets the size of an array, returns 0 if it's not an array type
-	int GetArrayCount() const;
+	intp GetArrayCount() const;
 
 	// Read from file
 	bool Unserialize( DmAttributeType_t type, CUtlBuffer &buf );
