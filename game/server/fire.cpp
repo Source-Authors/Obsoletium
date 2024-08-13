@@ -60,7 +60,7 @@
 
 #define FIRE_MAX_HEAT_LEVEL		64.0f
 #define	FIRE_NORMAL_ATTACK_TIME	20.0f
-#define FIRE_THINK_INTERVAL		0.1
+#define FIRE_THINK_INTERVAL		0.1f
 
 ConVar fire_maxabsorb( "fire_maxabsorb", "50" );
 ConVar fire_absorbrate( "fire_absorbrate", "3" );
@@ -997,7 +997,7 @@ void CFire::Update( float simTime )
 		}
 		else if ( FClassnameIs( pOther, "env_fire" ) )
 		{
-			if ( fireCount < ARRAYSIZE(pFires) )
+			if ( fireCount < static_cast<int>(ARRAYSIZE(pFires)) )
 			{
 				pFires[fireCount] = (CFire *)pOther;
 				fireCount++;
@@ -1213,7 +1213,7 @@ bool CFire::GoOut()
 // cannot put out
 //==================================================
 
-#define FIRESOURCE_THINK_TIME		0.25		// seconds to 
+#define FIRESOURCE_THINK_TIME		0.25f		// seconds to 
 
 #define SF_FIRESOURCE_START_ON		0x0001
 

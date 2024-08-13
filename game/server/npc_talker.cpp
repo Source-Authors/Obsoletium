@@ -37,7 +37,7 @@ BEGIN_DATADESC( CNPCSimpleTalker )
 END_DATADESC()
 
 // array of friend names
-char *CNPCSimpleTalker::m_szFriends[TLK_CFRIENDS] = 
+const char *CNPCSimpleTalker::m_szFriends[TLK_CFRIENDS] = 
 {
 	"NPC_barney",
 	"NPC_scientist",
@@ -312,9 +312,8 @@ void CNPCSimpleTalker::Event_Killed( const CTakeDamageInfo &info )
 CBaseEntity	*CNPCSimpleTalker::EnumFriends( CBaseEntity *pPrevious, int listNumber, bool bTrace )
 {
 	CBaseEntity *pFriend = pPrevious;
-	char *pszFriend;
+	const char *pszFriend;
 	trace_t tr;
-	Vector vecCheck;
 
 	pszFriend = m_szFriends[ FriendNumber(listNumber) ];
 	while ( pszFriend != NULL && ((pFriend = gEntList.FindEntityByClassname( pFriend, pszFriend )) != NULL) )
@@ -742,7 +741,7 @@ void CNPCSimpleTalker::FIdleSpeakWhileMoving( void )
 			// override so that during walk, a scientist may talk and greet player
 			FIdleHello();
 
-			if ( ShouldSpeakRandom( m_nSpeak * 20, GetSpeechFilter() ? GetSpeechFilter()->GetIdleModifier() : 1.0 ) )
+			if ( ShouldSpeakRandom( m_nSpeak * 20, GetSpeechFilter() ? GetSpeechFilter()->GetIdleModifier() : 1.0f ) )
 			{
 				FIdleSpeak();
 			}
@@ -765,7 +764,7 @@ int CNPCSimpleTalker::PlayScriptedSentence( const char *pszSentence, float delay
 	m_useTime = gpGlobals->curtime + delay;
 
 	// Stop all idle speech until after the sentence has completed
-	DeferAllIdleSpeech( delay + random->RandomInt( 3.0f, 5.0f ) );
+	DeferAllIdleSpeech( delay + random->RandomFloat( 3.0f, 5.0f ) );
 
 	return sentenceIndex;
 }
@@ -815,7 +814,7 @@ int CNPCSimpleTalker::SelectNonCombatSpeechSchedule()
 		return SCHED_NONE;
 		
 	// talk about world
-	if ( ShouldSpeakRandom( m_nSpeak * 2, GetSpeechFilter() ? GetSpeechFilter()->GetIdleModifier() : 1.0 ) )
+	if ( ShouldSpeakRandom( m_nSpeak * 2, GetSpeechFilter() ? GetSpeechFilter()->GetIdleModifier() : 1.0f ) )
 	{
 		//Msg("standing idle speak\n" );
 		return SCHED_TALKER_IDLE_SPEAK;

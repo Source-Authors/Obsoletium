@@ -176,7 +176,7 @@ CAI_Enemies::~CAI_Enemies()
 AI_EnemyInfo_t *CAI_Enemies::GetFirst( AIEnemiesIter_t *pIter )
 {
 	CMemMap::IndexType_t i = m_Map.FirstInorder();
-	*pIter = (AIEnemiesIter_t)(unsigned)i;
+	*pIter = (AIEnemiesIter_t)(uintp)i;
 
 	if ( i == m_Map.InvalidIndex() )
 		return NULL;
@@ -191,13 +191,13 @@ AI_EnemyInfo_t *CAI_Enemies::GetFirst( AIEnemiesIter_t *pIter )
 
 AI_EnemyInfo_t *CAI_Enemies::GetNext( AIEnemiesIter_t *pIter )
 {
-	CMemMap::IndexType_t i = (CMemMap::IndexType_t)((unsigned)(*pIter));
+	CMemMap::IndexType_t i = (CMemMap::IndexType_t)((uintp)(*pIter));
 
 	if ( i == m_Map.InvalidIndex() )
 		return NULL;
 
 	i = m_Map.NextInorder( i );
-	*pIter = (AIEnemiesIter_t)(unsigned)i;
+	*pIter = (AIEnemiesIter_t)(uintp)i;
 	if ( i == m_Map.InvalidIndex() )
 		return NULL;
 
@@ -209,7 +209,7 @@ AI_EnemyInfo_t *CAI_Enemies::GetNext( AIEnemiesIter_t *pIter )
 	
 //-----------------------------------------------------------------------------
 
-AI_EnemyInfo_t *CAI_Enemies::Find( CBaseEntity *pEntity, bool bTryDangerMemory )
+AI_EnemyInfo_t *CAI_Enemies::Find( const CBaseEntity *pEntity, bool bTryDangerMemory )
 {
 	if ( pEntity == AI_UNKNOWN_ENEMY )
 		pEntity = NULL;
@@ -320,9 +320,9 @@ bool CAI_Enemies::UpdateMemory(CAI_Network* pAINet, CBaseEntity *pEnemy, const V
 	if ( pEnemy == AI_UNKNOWN_ENEMY )
 		pEnemy = NULL;
 
-	const float DIST_TRIGGER_REACQUIRE_SQ			= Square(20.0 * 12.0);
-	const float TIME_TRIGGER_REACQUIRE				= 4.0;
-	const float MIN_DIST_TIME_TRIGGER_REACQUIRE_SQ 	= Square(4.0 * 12.0);
+	constexpr float DIST_TRIGGER_REACQUIRE_SQ			= Square(20.0f * 12.0f);
+	constexpr float TIME_TRIGGER_REACQUIRE				= 4.0f;
+	constexpr float MIN_DIST_TIME_TRIGGER_REACQUIRE_SQ 	= Square(4.0f * 12.0f);
 
 	AI_EnemyInfo_t *pMemory = Find( pEnemy );
 	// -------------------------------------------
@@ -438,7 +438,7 @@ void CAI_Enemies::MarkAsEluded( CBaseEntity *pEnemy )
 //-----------------------------------------------------------------------------
 // Purpose: Returns last known posiiton of given enemy
 //-----------------------------------------------------------------------------
-const Vector &CAI_Enemies::LastKnownPosition( CBaseEntity *pEnemy )
+const Vector &CAI_Enemies::LastKnownPosition( const CBaseEntity *pEnemy )
 {
 	AI_EnemyInfo_t *pMemory = Find( pEnemy, true );
 	if ( pMemory )
@@ -492,7 +492,7 @@ float CAI_Enemies::TimeLastReacquired( CBaseEntity *pEnemy )
 //			was not found returns last memory of danger position if it exists
 // Output : Returns false is no position is known
 //-----------------------------------------------------------------------------
-float CAI_Enemies::LastTimeSeen( CBaseEntity *pEnemy, bool bCheckDangerMemory /*= true*/ )
+float CAI_Enemies::LastTimeSeen( const CBaseEntity *pEnemy, bool bCheckDangerMemory /*= true*/ )
 {
 	// I've never seen something that doesn't exist
 	if (!pEnemy)

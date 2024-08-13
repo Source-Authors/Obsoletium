@@ -1664,14 +1664,6 @@ void CBaseCombatCharacter::Event_Killed( const CTakeDamageInfo &info )
 	// no longer standing on a nav area
 	ClearLastKnownArea();
 
-#if 0
-	// L4D specific hack for zombie commentary mode
-	if( GetOwnerEntity() != NULL )
-	{
-		GetOwnerEntity()->DeathNotice( this );
-	}
-#endif
-	
 #ifdef NEXT_BOT
 	// inform bots
 	TheNextBots().OnKilled( this, info );
@@ -1767,7 +1759,6 @@ void CBaseCombatCharacter::ThrowDirForWeaponStrip( CBaseCombatWeapon *pWeapon, c
 		VMatrix zRot;
 		MatrixBuildRotateZ( zRot, random->RandomFloat( -60.0f, 60.0f ) );
 
-		Vector vecThrow;
 		Vector3DMultiply( zRot, vecForward, *pVecThrowDir );
 
 		pVecThrowDir->z = random->RandomFloat( -0.5f, 0.5f );
@@ -2601,7 +2592,7 @@ void CBaseCombatCharacter::AddClassRelationship ( Class_T class_type, Dispositio
 		}
 	}
 
-	int index = m_Relationship.AddToTail();
+	intp index = m_Relationship.AddToTail();
 	// Add the new class relationship to our relationship table
 	m_Relationship[index].classType		= class_type;
 	m_Relationship[index].entity		= NULL;
@@ -2629,7 +2620,7 @@ void CBaseCombatCharacter::AddEntityRelationship ( CBaseEntity* pEntity, Disposi
 		}
 	}
 
-	int index = m_Relationship.AddToTail();
+	intp index = m_Relationship.AddToTail();
 	// Add the new class relationship to our relationship table
 	m_Relationship[index].classType		= CLASS_NONE;
 	m_Relationship[index].entity		= pEntity;
@@ -3190,7 +3181,7 @@ void RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc, float flRa
 	{
 		// Even the tiniest explosion gets attention. Don't let the radius
 		// be less than 128 units.
-		float soundRadius = MAX( 128.0f, flRadius * 1.5 );
+		float soundRadius = MAX( 128.0f, flRadius * 1.5f );
 
 		CSoundEnt::InsertSound( SOUND_COMBAT | SOUND_CONTEXT_EXPLOSION, vecSrc, soundRadius, 0.25, info.GetInflictor() );
 	}

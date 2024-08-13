@@ -39,7 +39,7 @@ extern vehiclesound g_iSoundsToStopOnExit[NUM_SOUNDS_TO_STOP_ON_EXIT];
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-struct vehicle_gear_t
+struct vehicle_gear_t final
 {
 	DECLARE_DATADESC();
 
@@ -48,7 +48,7 @@ struct vehicle_gear_t
 	float		flSpeedApproachFactor;
 };
 
-struct vehicle_crashsound_t
+struct vehicle_crashsound_t final
 {
 	DECLARE_DATADESC();
 
@@ -88,7 +88,7 @@ enum sound_states
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-struct vehiclesounds_t
+struct vehiclesounds_t final
 {
 	void Init( void )
 	{
@@ -129,9 +129,9 @@ public:
 
 private:
 	// Index of the gear we're currently reading data into
-	int	m_iCurrentGear;
+	intp	m_iCurrentGear;
 	int	m_iCurrentState;
-	int m_iCurrentCrashSound;
+	intp m_iCurrentCrashSound;
 };
 
 #endif // VEHICLE_SOUNDS_H

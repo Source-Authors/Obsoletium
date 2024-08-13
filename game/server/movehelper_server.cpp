@@ -185,12 +185,12 @@ bool CMoveHelperServer::AddToTouched( const trace_t &tr, const Vector& impactvel
 
 	if ( tr.m_pEnt == m_pHostPlayer )
 	{
-		Assert( !"CMoveHelperServer::AddToTouched:  Tried to add self to touchlist!!!" );
+		AssertMsg( false, "CMoveHelperServer::AddToTouched:  Tried to add self to touchlist!!!" );
 		return false;
 	}
 
 	// Check for duplicate entities
-	for ( int j = m_TouchList.Size(); --j >= 0; )
+	for ( int j = m_TouchList.Count(); --j >= 0; )
 	{
 		if ( m_TouchList[j].trace.m_pEnt == tr.m_pEnt )
 		{
@@ -198,7 +198,7 @@ bool CMoveHelperServer::AddToTouched( const trace_t &tr, const Vector& impactvel
 		}
 	}
 	
-	int i = m_TouchList.AddToTail();
+	intp i = m_TouchList.AddToTail();
 	m_TouchList[i].trace = tr;
 	VectorCopy( impactvelocity, m_TouchList[i].deltavelocity );
 
@@ -225,7 +225,7 @@ void CMoveHelperServer::ProcessImpacts( void )
 	Vector vel = m_pHostPlayer->GetAbsVelocity();
 
 	// Touch other objects that were intersected during the movement.
-	for (int i = 0 ; i < m_TouchList.Size(); i++)
+	for (int i = 0 ; i < m_TouchList.Count(); i++)
 	{
 		CBaseHandle entindex = m_TouchList[i].trace.m_pEnt->GetRefEHandle();
 

@@ -50,7 +50,7 @@ void CEnvSoundscapeProxy::Activate()
 	{
 		// Copy the relevant parameters from our main soundscape.
 		m_soundscapeIndex = m_hProxySoundscape->m_soundscapeIndex;
-		for ( int i=0; i < ARRAYSIZE( m_positionNames ); i++ )
+		for ( int i=0; i < static_cast<int>(ARRAYSIZE( m_positionNames )); i++ )
 			m_positionNames[i] = m_hProxySoundscape->m_positionNames[i];
 	}
 	else
@@ -220,7 +220,7 @@ void CEnvSoundscape::WriteAudioParamsTo( audioparams_t &audio )
 	audio.ent.Set( this );
 	audio.soundscapeIndex = m_soundscapeIndex;
 	audio.localBits = 0;
-	for ( int i = 0; i < ARRAYSIZE(m_positionNames); i++ )
+	for ( int i = 0; i < static_cast<int>(ARRAYSIZE(m_positionNames)); i++ )
 	{
 		if ( m_positionNames[i] != NULL_STRING )
 		{
@@ -335,7 +335,7 @@ void CEnvSoundscape::UpdateForPlayer( ss_update_t &update )
 				// also draw lines to each sound position.
 				// we don't store the number of local sound positions, just a bitvector of which ones are on.
 				unsigned int soundbits = audio.localBits.Get();
-				float periodic = 2.0f * sin((fmod(gpGlobals->curtime,2.0f) - 1.0f) * M_PI); // = -4f .. 4f
+				float periodic = 2.0f * sin((fmod(gpGlobals->curtime,2.0f) - 1.0f) * M_PI_F); // = -4f .. 4f
 				for (int ii = 0 ; ii < NUM_AUDIO_LOCAL_SOUNDS ; ++ii )
 				{
 					if ( soundbits & (1 << ii) )
@@ -540,7 +540,7 @@ void CTriggerSoundscape::Spawn()
 	InitTrigger();
 
 	SetThink( &CTriggerSoundscape::PlayerUpdateThink );
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	SetNextThink( gpGlobals->curtime + 0.2f );
 }
 
 
@@ -555,7 +555,7 @@ void CTriggerSoundscape::Activate()
 void CTriggerSoundscape::PlayerUpdateThink()
 {
 	int i;
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	SetNextThink( gpGlobals->curtime + 0.2f );
 
 	CUtlVector<CBasePlayerHandle> oldSpectators;
 	oldSpectators = m_spectators;

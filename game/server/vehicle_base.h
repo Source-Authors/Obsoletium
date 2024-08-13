@@ -99,7 +99,7 @@ public:
 
 	Vector GetSmoothedVelocity( void );	//Save and update our smoothed velocity for prediction
 
-	virtual void DampenEyePosition( Vector &vecVehicleEyePos, QAngle &vecVehicleEyeAngles ) {}
+	virtual void DampenEyePosition( [[maybe_unused]] Vector &vecVehicleEyePos, [[maybe_unused]] QAngle &vecVehicleEyeAngles ) {}
 
 	// Inputs
 	void InputThrottle( inputdata_t &inputdata );
@@ -164,28 +164,28 @@ public:
 class CPropVehicleDriveable : public CPropVehicle, public IDrivableVehicle, public INPCPassengerCarrier
 {
 	DECLARE_CLASS( CPropVehicleDriveable, CPropVehicle );
-	DECLARE_SERVERCLASS();
-	DECLARE_DATADESC();
+	DECLARE_SERVERCLASS_OVERRIDE();
+	DECLARE_DATADESC_OVERRIDE();
 public:
 	CPropVehicleDriveable( void );
 	~CPropVehicleDriveable( void );
 
-	virtual void	Precache( void );
-	virtual void	Spawn( void );
-	virtual int		Restore( IRestore &restore );
-	virtual void	OnRestore();
+	void	Precache( void ) override;
+	void	Spawn( void ) override;
+	int		Restore( IRestore &restore ) override;
+	void	OnRestore() override;
 	virtual void	CreateServerVehicle( void );
-	virtual int		ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_IMPULSE_USE; };
-	virtual void	GetVectors(Vector* pForward, Vector* pRight, Vector* pUp) const;
+	int		ObjectCaps( void ) override { return BaseClass::ObjectCaps() | FCAP_IMPULSE_USE; };
+	void	GetVectors(Vector* pForward, Vector* pRight, Vector* pUp) const override;
 	virtual void	VehicleAngleVectors( const QAngle &angles, Vector *pForward, Vector *pRight, Vector *pUp );
-	virtual void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
-	virtual void	Think( void );
-	virtual void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
-	virtual void	Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info );
+	void	Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value ) override;
+	void	Think( void ) override;
+	void	TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator ) override;
+	void	Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info ) override;
 
 	// Vehicle handling
-	virtual void	VPhysicsCollision( int index, gamevcollisionevent_t *pEvent );
-	virtual int		VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
+	void	VPhysicsCollision( int index, gamevcollisionevent_t *pEvent ) override;
+	int		VPhysicsGetObjectList( IPhysicsObject **pList, int listMax ) override;
 
 	// Inputs
 	void	InputLock( inputdata_t &inputdata );
@@ -210,27 +210,27 @@ public:
 
 // IDrivableVehicle
 public:
-	virtual CBaseEntity *GetDriver( void );
-	virtual void		ItemPostFrame( CBasePlayer *pPlayer ) { return; }
-	virtual void		SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *pHelper, CMoveData *move );
-	virtual void		ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData ) { return; }
-	virtual void		FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *move ) { return; }
-	virtual bool		CanEnterVehicle( CBaseEntity *pEntity );
-	virtual bool		CanExitVehicle( CBaseEntity *pEntity );
-	virtual void		SetVehicleEntryAnim( bool bOn ) { m_bEnterAnimOn = bOn; }
-	virtual void		SetVehicleExitAnim( bool bOn, Vector vecEyeExitEndpoint ) { m_bExitAnimOn = bOn; if ( bOn ) m_vecEyeExitEndpoint = vecEyeExitEndpoint; }
-	virtual void		EnterVehicle( CBaseCombatCharacter *pPassenger );
+	CBaseEntity *GetDriver( void ) override;
+	void		ItemPostFrame( CBasePlayer * ) override {}
+	void		SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *pHelper, CMoveData *move ) override;
+	void		ProcessMovement( CBasePlayer *, CMoveData * ) override {}
+	void		FinishMove( CBasePlayer *, CUserCmd *, CMoveData * ) override {}
+	bool		CanEnterVehicle( CBaseEntity *pEntity ) override;
+	bool		CanExitVehicle( CBaseEntity *pEntity ) override;
+	void		SetVehicleEntryAnim( bool bOn ) override { m_bEnterAnimOn = bOn; }
+	void		SetVehicleExitAnim( bool bOn, Vector vecEyeExitEndpoint ) override { m_bExitAnimOn = bOn; if ( bOn ) m_vecEyeExitEndpoint = vecEyeExitEndpoint; }
+	void		EnterVehicle( CBaseCombatCharacter *pPassenger ) override;
 
-	virtual bool		AllowBlockedExit( CBaseCombatCharacter *pPassenger, int nRole ) { return true; }
-	virtual bool		AllowMidairExit( CBaseCombatCharacter *pPassenger, int nRole ) { return false; }
-	virtual void		PreExitVehicle( CBaseCombatCharacter *pPassenger, int nRole ) {}
-	virtual void		ExitVehicle( int nRole );
-	virtual string_t	GetVehicleScriptName() { return m_vehicleScript; }
+	bool		AllowBlockedExit( CBaseCombatCharacter *, int ) override { return true; }
+	bool		AllowMidairExit( CBaseCombatCharacter *, int ) override { return false; }
+	void		PreExitVehicle( CBaseCombatCharacter *, int ) override {}
+	void		ExitVehicle( int nRole ) override;
+	string_t	GetVehicleScriptName() override { return m_vehicleScript; }
 	
-	virtual bool		PassengerShouldReceiveDamage( CTakeDamageInfo &info ) { return true; }
+	bool		PassengerShouldReceiveDamage( CTakeDamageInfo & ) override { return true; }
 
 	// If this is a vehicle, returns the vehicle interface
-	virtual IServerVehicle *GetServerVehicle() { return m_pServerVehicle; }
+	IServerVehicle *GetServerVehicle() override { return m_pServerVehicle; }
 
 protected:
 
@@ -276,12 +276,12 @@ public:
 	// NPC Passengers
 public:
 
-	virtual bool	NPC_CanEnterVehicle( CAI_BaseNPC *pPassenger, bool bCompanion );
-	virtual bool	NPC_CanExitVehicle( CAI_BaseNPC *pPassenger, bool bCompanion );
-	virtual bool	NPC_AddPassenger( CAI_BaseNPC *pPassenger, string_t strRoleName, int nSeatID );
-	virtual bool 	NPC_RemovePassenger( CAI_BaseNPC *pPassenger );
-	virtual void	NPC_FinishedEnterVehicle( CAI_BaseNPC *pPassenger, bool bCompanion ) {} 
-	virtual void	NPC_FinishedExitVehicle( CAI_BaseNPC *pPassenger, bool bCompanion ) {}
+	bool	NPC_CanEnterVehicle( CAI_BaseNPC *pPassenger, bool bCompanion ) override;
+	bool	NPC_CanExitVehicle( CAI_BaseNPC *pPassenger, bool bCompanion ) override;
+	bool	NPC_AddPassenger( CAI_BaseNPC *pPassenger, string_t strRoleName, int nSeatID ) override;
+	bool 	NPC_RemovePassenger( CAI_BaseNPC *pPassenger ) override;
+	void	NPC_FinishedEnterVehicle( CAI_BaseNPC *, bool ) override {} 
+	void	NPC_FinishedExitVehicle( CAI_BaseNPC *, bool ) override {}
 
 	// NPC Passengers
 	// --------------------------------

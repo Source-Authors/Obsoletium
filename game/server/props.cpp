@@ -284,8 +284,6 @@ bool CBaseProp::KeyValue( const char *szKeyName, const char *szValue )
 	{ 
 		return BaseClass::KeyValue( szKeyName, szValue );
 	}
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -972,7 +970,7 @@ void CBreakableProp::BreakablePropTouch( CBaseEntity *pOther )
 	if ( HasSpawnFlags( SF_PHYSPROP_TOUCH ) )
 	{
 		// can be broken when run into 
-		float flDamage = pOther->GetSmoothedVelocity().Length() * 0.01;
+		float flDamage = pOther->GetSmoothedVelocity().Length() * 0.01f;
 
 		if ( flDamage >= m_iHealth )
 		{
@@ -1282,7 +1280,7 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 		if ( iSequence != ACTIVITY_NOT_AVAILABLE )
 		{
 			m_nPhysgunState = PHYSGUN_ANIMATE_IS_PRE_ANIMATING;
-			SetContextThink( &CBreakableProp::AnimateThink, gpGlobals->curtime + 0.1, s_pPropAnimateThink );
+			SetContextThink( &CBreakableProp::AnimateThink, gpGlobals->curtime + 0.1f, s_pPropAnimateThink );
 
 			m_OnPhysCannonAnimatePreStarted.FireOutput( NULL,this );
 		}
@@ -1320,7 +1318,7 @@ bool CBreakableProp::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunP
 			if ( iSequence != ACTIVITY_NOT_AVAILABLE )
 			{
 				m_nPhysgunState = PHYSGUN_ANIMATE_IS_POST_ANIMATING;
-				SetContextThink( &CBreakableProp::AnimateThink, gpGlobals->curtime + 0.1, s_pPropAnimateThink );
+				SetContextThink( &CBreakableProp::AnimateThink, gpGlobals->curtime + 0.1f, s_pPropAnimateThink );
 				ResetSequence( iSequence );
 				SetPlaybackRate( 1.0f );
 				ResetClientsideFrame();
@@ -1360,9 +1358,9 @@ void CBreakableProp::AnimateThink( void )
 {
 	if ( m_nPhysgunState == PHYSGUN_ANIMATE_IS_PRE_ANIMATING || m_nPhysgunState == PHYSGUN_ANIMATE_IS_POST_ANIMATING )
 	{
-		StudioFrameAdvanceManual( 0.1 );
+		StudioFrameAdvanceManual( 0.1f );
 		DispatchAnimEvents( this );
-		SetNextThink( gpGlobals->curtime + 0.1, s_pPropAnimateThink );
+		SetNextThink( gpGlobals->curtime + 0.1f, s_pPropAnimateThink );
 
 		if ( IsActivityFinished() )
 		{
@@ -1906,7 +1904,7 @@ void CDynamicProp::Spawn( )
 		{
 			SetThink( &CDynamicProp::AnimThink );
 			m_flNextRandAnim = gpGlobals->curtime + random->RandomFloat( m_flMinRandAnimTime, m_flMaxRandAnimTime );
-			SetNextThink( gpGlobals->curtime + m_flNextRandAnim + 0.1 );
+			SetNextThink( gpGlobals->curtime + m_flNextRandAnim + 0.1f );
 		}
 		else
 		{
@@ -2185,7 +2183,7 @@ void CDynamicProp::AnimThink( void )
 			// If I'm a random animator, think again when it's time to change sequence
 			if ( m_bRandomAnimator )
 			{
-				SetNextThink( gpGlobals->curtime + m_flNextRandAnim + 0.1 );
+				SetNextThink( gpGlobals->curtime + m_flNextRandAnim + 0.1f );
 			}
 			else 
 			{
@@ -4143,7 +4141,7 @@ void CBasePropDoor::DoorOpenMoveDone(void)
 	if (WillAutoReturn())
 	{
 		// In flWait seconds, DoorClose will fire, unless wait is -1, then door stays open
-		SetMoveDoneTime(m_flAutoReturnDelay + 0.1);
+		SetMoveDoneTime(m_flAutoReturnDelay + 0.1f);
 		SetMoveDone(&CBasePropDoor::DoorAutoCloseThink);
 
 		if (m_flAutoReturnDelay == -1)
@@ -4185,7 +4183,7 @@ void CBasePropDoor::DoorAutoCloseThink(void)
 		else
 		{
 			// In flWait seconds, DoorClose will fire, unless wait is -1, then door stays open
-			SetMoveDoneTime(m_flAutoReturnDelay + 0.1);
+			SetMoveDoneTime(m_flAutoReturnDelay + 0.1f);
 			SetMoveDone(&CBasePropDoor::DoorAutoCloseThink);
 		}
 
@@ -5159,7 +5157,7 @@ void CPropDoorRotating::AngularMove(const QAngle &vecDestAngle, float flSpeed)
 	SetMoveDoneTime(flTravelTime);
 
 	// Scale the destdelta vector by the time spent traveling to get velocity.
-	SetLocalAngularVelocity(vecDestDelta * (1.0 / flTravelTime));
+	SetLocalAngularVelocity(vecDestDelta * (1.0f / flTravelTime));
 }
 
 
@@ -6108,7 +6106,8 @@ void CC_Ent_Rotate( const CCommand &args )
 		return;
 
 	QAngle angles = pEntity->GetLocalAngles();
-	float flAngle = (args.ArgC() == 2) ? atof( args[1] ) : 7.5f;
+	// dimhotepus: atof -> strtof.
+	float flAngle = (args.ArgC() == 2) ? strtof( args[1], nullptr ) : 7.5f;
 	   
 	VMatrix entToWorld, rot, newEntToWorld;
 	MatrixBuildRotateZ( rot, flAngle );

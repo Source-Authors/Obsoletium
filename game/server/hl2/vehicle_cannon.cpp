@@ -509,7 +509,7 @@ void CPropCannon::ProjectileExplosion( void )
 //-----------------------------------------------------------------------------
 void CPropCannon::Think( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if ( GetDriver() )
 	{

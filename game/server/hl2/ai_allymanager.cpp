@@ -90,7 +90,7 @@ END_DATADESC()
 void CAI_AllyManager::Spawn()
 {
 	SetThink( &CAI_AllyManager::WatchCounts );
-	SetNextThink( gpGlobals->curtime + 1.0 );
+	SetNextThink( gpGlobals->curtime + 1.0f );
 }
 
 //-----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ void CAI_AllyManager::WatchCounts()
 	m_iAlliesLast = iCurrentAllies;
 	m_iMedicsLast = iCurrentMedics;
 
-	SetNextThink( gpGlobals->curtime + 1.0 );
+	SetNextThink( gpGlobals->curtime + 1.0f );
 
 	if ( ai_ally_manager_debug.GetBool() )
 		DevMsg( "Ally manager counts %d allies, %d of which are medics\n", iCurrentAllies, iCurrentMedics );

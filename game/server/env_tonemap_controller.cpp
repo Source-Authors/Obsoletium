@@ -152,7 +152,7 @@ void CEnvTonemapController::InputBlendTonemapScale( inputdata_t &inputdata )
 	m_flBlendTonemapStart = mat_hdr_tonemapscale.GetFloat();
 
 	// Start thinking
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 	SetThink( &CEnvTonemapController::UpdateTonemapScaleBlend );
 }
 
@@ -200,7 +200,7 @@ void CEnvTonemapController::UpdateTonemapScaleBlend( void )
 	if ( gpGlobals->curtime >= m_flBlendEndTime )
 		return;
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------

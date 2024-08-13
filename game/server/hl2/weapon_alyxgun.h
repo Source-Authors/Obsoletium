@@ -15,37 +15,37 @@
 
 class CWeaponAlyxGun : public CHLSelectFireMachineGun
 {
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 public:
 	DECLARE_CLASS( CWeaponAlyxGun, CHLSelectFireMachineGun );
 
 	CWeaponAlyxGun();
 	~CWeaponAlyxGun();
 
-	DECLARE_SERVERCLASS();
+	DECLARE_SERVERCLASS_OVERRIDE();
 	
-	void	Precache( void );
+	void	Precache( void ) override;
 
-	virtual int		GetMinBurst( void ) { return 4; }
-	virtual int		GetMaxBurst( void ) { return 7; }
-	virtual float	GetMinRestTime( void );
-	virtual float	GetMaxRestTime( void );
+	int		GetMinBurst( void ) override { return 4; }
+	int		GetMaxBurst( void ) override { return 7; }
+	float	GetMinRestTime( void ) override;
+	float	GetMaxRestTime( void ) override;
 
-	virtual void Equip( CBaseCombatCharacter *pOwner );
+	void Equip(CBaseCombatCharacter *pOwner) override;
 
-	float	GetFireRate( void ) { return 0.1f; }
-	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
-	int		WeaponRangeAttack1Condition( float flDot, float flDist );
-	int		WeaponRangeAttack2Condition( float flDot, float flDist );
+	float	GetFireRate( void ) override { return 0.1f; }
+	int		CapabilitiesGet( void ) override { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+	int		WeaponRangeAttack1Condition( float flDot, float flDist ) override;
+	int		WeaponRangeAttack2Condition( float flDot, float flDist ) override;
 
-	virtual const Vector& GetBulletSpread( void );
+	const Vector& GetBulletSpread( void ) override;
 
 	void FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, bool bUseWeaponAngles );
 
-	void Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary );
-	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+	void Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary ) override;
+	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator ) override;
 
-	virtual void SetPickupTouch( void )
+	void SetPickupTouch( void ) override
 	{
 		// Alyx gun cannot be picked up
 		SetTouch(NULL);

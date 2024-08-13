@@ -184,6 +184,8 @@ impactdamagetable_t gGlassImpactDamageTable =
 
 	50,			// large mass in kg 
 	4,			// large mass scale (anything over 50kg does 4X as much energy to read from damage table)
+	// dimhotepus: Add large mass failing scale for glass.
+	1.0f,		// large mass falling scale
 	0.0f,		// min vel
 };
 

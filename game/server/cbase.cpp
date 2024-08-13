@@ -1062,7 +1062,7 @@ void CEventQueue::CancelEventOn( CBaseEntity *pTarget, const char *sInputName )
 
 	EventQueuePrioritizedEvent_t *pCur = m_Events.m_pNext;
 
-	const int iInputLength = strlen(sInputName);
+	const intp iInputLength = V_strlen(sInputName);
 
 	while (pCur != NULL)
 	{
@@ -1099,7 +1099,7 @@ bool CEventQueue::HasEventPending( CBaseEntity *pTarget, const char *sInputName 
 
 	EventQueuePrioritizedEvent_t *pCur = m_Events.m_pNext;
 
-	const int iInputLength = strlen(sInputName);
+	const intp iInputLength = V_strlen(sInputName);
 
 	while (pCur != NULL)
 	{
@@ -1393,7 +1393,8 @@ bool variant_t::Convert( fieldtype_t newType )
 				{
 					if (iszVal != NULL_STRING)
 					{
-						SetFloat(atof(STRING(iszVal)));
+						// dimhotepus: atof -> strtof
+						SetFloat(strtof(STRING(iszVal),nullptr));
 					}
 					else
 					{

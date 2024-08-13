@@ -347,7 +347,7 @@ IMotionEvent::simresult_e CAI_BasePhysicsFlyingBot::Simulate( IPhysicsMotionCont
 	Vector actualVelocity;
 	AngularImpulse actualAngularVelocity;
 	pPhysicsObject->GetVelocity( &actualVelocity, &actualAngularVelocity );
-	linear = (m_vCurrentVelocity - actualVelocity) * (0.1 / deltaTime) * 10.0;
+	linear = (m_vCurrentVelocity - actualVelocity) * (0.1f / deltaTime) * 10.0f;
 
 	/*
 	DevMsg("Sim %d : %5.1f %5.1f %5.1f\n", count++,
@@ -366,7 +366,7 @@ IMotionEvent::simresult_e CAI_BasePhysicsFlyingBot::Simulate( IPhysicsMotionCont
 	angular.y = (UTIL_AngleDiff( m_vCurrentBanking.x, actualAngles.x ) - actualAngularVelocity.y) * (1 / deltaTime);
 
 	// turn toward target
-	angular.z = UTIL_AngleDiff( m_fHeadYaw, actualAngles.y + actualAngularVelocity.z * 0.1 ) * (1 / deltaTime);
+	angular.z = UTIL_AngleDiff( m_fHeadYaw, actualAngles.y + actualAngularVelocity.z * 0.1f ) * (1 / deltaTime);
 
 	// angular = m_vCurrentAngularVelocity - actualAngularVelocity;
 

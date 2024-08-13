@@ -20,12 +20,12 @@ class CWeaponCitizenPackage : public CBaseHLCombatWeapon
 	DECLARE_CLASS( CWeaponCitizenPackage, CBaseHLCombatWeapon );
 public:
 
-	DECLARE_SERVERCLASS();
-	DECLARE_DATADESC();	
+	DECLARE_SERVERCLASS_OVERRIDE();
+	DECLARE_DATADESC_OVERRIDE();	
 	DECLARE_ACTTABLE();
 
-	void ItemPostFrame( void );
-	void Drop( const Vector &vecVelocity );
+	void ItemPostFrame( void ) override;
+	void Drop( const Vector &vecVelocity ) override;
 };
 
 #endif // WEAPON_CITIZENPACKAGE_H

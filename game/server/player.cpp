@@ -744,7 +744,7 @@ bool CBasePlayer::WantsLagCompensationOnEntity( const CBasePlayer *pPlayer, cons
 
 	// get max distance player could have moved within max lag compensation time, 
 	// multiply by 1.5 to to avoid "dead zones"  (sqrt(2) would be the exact value)
-	float maxDistance = 1.5 * pPlayer->MaxSpeed() * sv_maxunlag.GetFloat();
+	float maxDistance = 1.5f * pPlayer->MaxSpeed() * sv_maxunlag.GetFloat();
 
 	// If the player is within this distance, lag compensate them in case they're running past us.
 	if ( vHisOrigin.DistTo( vMyOrigin ) < maxDistance )
@@ -1571,11 +1571,11 @@ bool CBasePlayer::IsDead() const
 
 static float DamageForce( const Vector &size, float damage )
 { 
-	float force = damage * ((32 * 32 * 72.0) / (size.x * size.y * size.z)) * 5;
+	float force = damage * ((32 * 32 * 72.0f) / (size.x * size.y * size.z)) * 5;
 	
-	if ( force > 1000.0) 
+	if ( force > 1000.0f) 
 	{
-		force = 1000.0;
+		force = 1000.0f;
 	}
 
 	return force;
@@ -2982,7 +2982,7 @@ CCommandContext *CBasePlayer::GetCommandContext( int index )
 //-----------------------------------------------------------------------------
 CCommandContext	*CBasePlayer::AllocCommandContext( void )
 {
-	int idx = m_CommandContext.AddToTail();
+	intp idx = m_CommandContext.AddToTail();
 	if ( m_CommandContext.Count() > 1000 )
 	{
 		Assert( 0 );
@@ -3560,7 +3560,7 @@ void CBasePlayer::DumpPerfToRecipient( CBasePlayer *pRecipient, int nMaxRecords 
 	Vector prevo( 0, 0, 0 );
 	float prevt = 0.0f;
 
-	for ( int i = m_vecPlayerSimInfo.Tail(); i != m_vecPlayerSimInfo.InvalidIndex() ; i = m_vecPlayerSimInfo.Previous( i ) )
+	for ( auto i = m_vecPlayerSimInfo.Tail(); i != m_vecPlayerSimInfo.InvalidIndex() ; i = m_vecPlayerSimInfo.Previous( i ) )
 	{
 		const CPlayerSimInfo *pi = &m_vecPlayerSimInfo[ i ];
 
@@ -3609,7 +3609,7 @@ void CBasePlayer::DumpPerfToRecipient( CBasePlayer *pRecipient, int nMaxRecords 
 	nDumped = 0;
 	curpos = 0;
 
-	for ( int i = m_vecPlayerCmdInfo.Tail(); i != m_vecPlayerCmdInfo.InvalidIndex() ; i = m_vecPlayerCmdInfo.Previous( i ) )
+	for ( auto i = m_vecPlayerCmdInfo.Tail(); i != m_vecPlayerCmdInfo.InvalidIndex() ; i = m_vecPlayerCmdInfo.Previous( i ) )
 	{
 		const CPlayerCmdInfo *pi = &m_vecPlayerCmdInfo[ i ];
 
@@ -4155,7 +4155,7 @@ void CBasePlayer::UpdateGeigerCounter( void )
 	// This is to make sure you aren't driven crazy by geiger while in the airboat
 	if ( IsInAVehicle() )
 	{
-		range = clamp( (int)range * 4, 0, 255 );
+		range = (byte) clamp( (int)range * 4, 0, 255 );
 	}
 
 	if (range != m_igeigerRangePrev)
@@ -4559,7 +4559,7 @@ void CBasePlayer::PostThink()
 			{		
 				if (m_Local.m_flFallVelocity > 64 && !g_pGameRules->IsMultiplayer())
 				{
-					CSoundEnt::InsertSound ( SOUND_PLAYER, GetAbsOrigin(), m_Local.m_flFallVelocity, 0.2, this );
+					CSoundEnt::InsertSound ( SOUND_PLAYER, GetAbsOrigin(), m_Local.m_flFallVelocity, 0.2f, this );
 					// Msg( "fall %f\n", m_Local.m_flFallVelocity );
 				}
 				m_Local.m_flFallVelocity = 0;
@@ -5673,9 +5673,7 @@ CBaseEntity	*CBasePlayer::GiveNamedItem( const char *pszName, int iSubType )
 
 	// Msg( "giving %s\n", pszName );
 
-	EHANDLE pent;
-
-	pent = CreateEntityByName(pszName);
+	EHANDLE pent = CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -6110,27 +6108,26 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 	}
 
 	CBaseEntity *pEntity;
-	trace_t tr;
 
 	switch ( iImpulse )
 	{
-	case 76:
-		{
-			if (!giPrecacheGrunt)
-			{
-				giPrecacheGrunt = 1;
-				Msg( "You must now restart to use Grunt-o-matic.\n");
-			}
-			else
-			{
-				Vector forward = UTIL_YawToVector( EyeAngles().y );
-				Create("NPC_human_grunt", GetLocalOrigin() + forward * 128, GetLocalAngles());
-			}
-			break;
-		}
+	// dimhotepus: Drop as no grunt model in hl2
+	// case 76:
+	// 	{
+	// 		if (!giPrecacheGrunt)
+	// 		{
+	// 			giPrecacheGrunt = 1;
+	// 			Msg( "You must now restart to use Grunt-o-matic.\n");
+	// 		}
+	// 		else
+	// 		{
+	// 			Vector forward = UTIL_YawToVector( EyeAngles().y );
+	// 			Create("NPC_human_grunt", GetLocalOrigin() + forward * 128, GetLocalAngles());
+	// 		}
+	// 		break;
+	// 	}
 
 	case 81:
-
 		GiveNamedItem( "weapon_cubemap" );
 		break;
 
@@ -6229,6 +6226,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 
 	case 107:
 		{
+			// Gets texture name under the crosshair.
 			trace_t tr;
 
 			edict_t		*pWorld = engine->PEntityOfEntIndex( 0 );
@@ -6285,11 +6283,13 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		{
 			Vector forward;
 			EyeVectors( &forward );
+
+			trace_t tr;
 			UTIL_TraceLine ( EyePosition(), 
 				EyePosition() + forward * 128, 
 				MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, & tr);
-
-			if ( tr.fraction != 1.0 )
+			
+			if ( tr.fraction != 1.0f )
 			{// line hit something, so paint a decal
 				CBloodSplat *pBlood = CREATE_UNSAVED_ENTITY( CBloodSplat, "bloodsplat" );
 				pBlood->Spawn( this );
@@ -6318,7 +6318,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 	{
 		if ( sv_cheats && sv_cheats->GetBool() )
 		{
-			ParticleSmokeGrenade *pSmoke = dynamic_cast<ParticleSmokeGrenade*>( CreateEntityByName(PARTICLESMOKEGRENADE_ENTITYNAME) );
+			auto *pSmoke = dynamic_cast<ParticleSmokeGrenade*>( CreateEntityByName(PARTICLESMOKEGRENADE_ENTITYNAME) );
 			if ( pSmoke )
 			{
 				Vector vForward;
@@ -6371,14 +6371,10 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 		if ( GetTeamNumber() == TEAM_SPECTATOR )
 			return true;
 
-		ConVarRef mp_allowspectators( "mp_allowspectators" );
-		if ( mp_allowspectators.IsValid() )
+		if ( ( mp_allowspectators.GetBool() == false ) && !IsHLTV() && !IsReplay() )
 		{
-			if ( ( mp_allowspectators.GetBool() == false ) && !IsHLTV() && !IsReplay() )
-			{
-				ClientPrint( this, HUD_PRINTCENTER, "#Cannot_Be_Spectator" );
-				return true;
-			}
+			ClientPrint( this, HUD_PRINTCENTER, "#Cannot_Be_Spectator" );
+			return true;
 		}
 
 		if ( !IsDead() )
@@ -6537,10 +6533,10 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 			nRecords = MAX( Q_atoi( args.Arg( 2 ) ), 1 );
 		}
 
-		CBasePlayer *pl = UTIL_PlayerByIndex( nRecip );
-		if ( pl )
+		CBasePlayer *player = UTIL_PlayerByIndex( nRecip );
+		if ( player )
 		{
-			pl->DumpPerfToRecipient( this, nRecords );
+			player->DumpPerfToRecipient( this, nRecords );
 		}
 		return true;
 	}
@@ -7034,7 +7030,6 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 	QAngle		eyeAngles;
 	Vector		bestdir;
 	CBaseEntity	*bestent;
-	trace_t		tr;
 	Vector		v_forward, v_right, v_up;
 
 	if ( ShouldAutoaim() == false )
@@ -7063,6 +7058,8 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 	}
 
 	CTraceFilterSkipTwoEntities traceFilter( this, pIgnore, COLLISION_GROUP_NONE );
+
+	trace_t		tr;
 
 	UTIL_TraceLine( vecSrc, vecSrc + bestdir * MAX_COORD_FLOAT, MASK_SHOT, &traceFilter, &tr );
 

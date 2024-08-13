@@ -594,7 +594,7 @@ CAI_Schedule::CAI_Schedule(char *name, int schedule_id, CAI_Schedule *pNext)
 {
 	m_iScheduleID = schedule_id;
 
-	int len = strlen(name);
+	intp len = V_strlen(name);
 	m_pName = new char[len+1];
 	Q_strncpy(m_pName,name,len+1);
 

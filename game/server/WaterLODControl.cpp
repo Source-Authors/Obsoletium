@@ -109,10 +109,12 @@ void CWaterLODControl::Spawn( void )
 //------------------------------------------------------------------------------
 void CWaterLODControl::SetCheapWaterStartDistance( inputdata_t &inputdata )
 {
-	m_flCheapWaterStartDistance = atof( inputdata.value.String() );
+	// dimhotepus: atof -> strtof.
+	m_flCheapWaterStartDistance = strtof( inputdata.value.String(), nullptr );
 }
 
 void CWaterLODControl::SetCheapWaterEndDistance( inputdata_t &inputdata )
 {
-	m_flCheapWaterEndDistance = atof( inputdata.value.String() );
+	// dimhotepus: atof -> strtof.
+	m_flCheapWaterEndDistance = strtof( inputdata.value.String(), nullptr );
 }

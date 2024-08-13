@@ -15,9 +15,9 @@ class CAI_Network;
 
 DECLARE_POINTER_HANDLE(AIEnemiesIter_t);
 
-const float AI_DEF_ENEMY_DISCARD_TIME = 60.0;
+constexpr inline float AI_DEF_ENEMY_DISCARD_TIME = 60.0;
 
-#define AI_UNKNOWN_ENEMY (((CBaseEntity *)NULL)+1) // use this to probe for unseen attackers
+const inline CBaseEntity* AI_UNKNOWN_ENEMY{((CBaseEntity *)nullptr)+1}; // use this to probe for unseen attackers
 #define AI_INVALID_TIME (FLT_MAX * -1.0)
 
 //-----------------------------------------------------------------------------
@@ -62,7 +62,7 @@ public:
 	
 	AI_EnemyInfo_t *GetFirst( AIEnemiesIter_t *pIter );
 	AI_EnemyInfo_t *GetNext( AIEnemiesIter_t *pIter );
-	AI_EnemyInfo_t *Find( CBaseEntity *pEntity, bool bTryDangerMemory = false );
+	AI_EnemyInfo_t *Find( const CBaseEntity *pEntity, bool bTryDangerMemory = false );
 	AI_EnemyInfo_t *GetDangerMemory();
 
 	int				NumEnemies() const		{ return m_Map.Count(); }
@@ -75,11 +75,11 @@ public:
 	bool			HasMemory( CBaseEntity *enemy );
 	void			ClearMemory( CBaseEntity *enemy );
 
-	const Vector &	LastKnownPosition( CBaseEntity *pEnemy );
+	const Vector &	LastKnownPosition( const CBaseEntity *pEnemy );
 	const Vector &	LastSeenPosition( CBaseEntity *pEnemy );
 
 	float			TimeLastReacquired( CBaseEntity *pEnemy );
-	float			LastTimeSeen( CBaseEntity *pEnemy, bool bCheckDangerMemory = true );
+	float			LastTimeSeen( const CBaseEntity *pEnemy, bool bCheckDangerMemory = true );
 	float			FirstTimeSeen( CBaseEntity *pEnemy);
 	bool			HasFreeKnowledgeOf( CBaseEntity *pEnemy );
 
@@ -101,7 +101,7 @@ public:
 
 	DECLARE_SIMPLE_DATADESC();
 
-	typedef CUtlMap<CBaseEntity *, AI_EnemyInfo_t*, unsigned char> CMemMap;
+	typedef CUtlMap<const CBaseEntity *, AI_EnemyInfo_t*, unsigned char> CMemMap;
 
 private:
 	bool ShouldDiscardMemory( AI_EnemyInfo_t *pMemory );

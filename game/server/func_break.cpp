@@ -218,13 +218,13 @@ bool CBreakable::KeyValue( const char *szKeyName, const char *szValue )
 	else if (FStrEq(szKeyName, "spawnobject") )
 	{
 		int object = atoi( szValue );
-		if ( object > 0 && object < ARRAYSIZE(pSpawnObjects) )
+		if ( object > 0 && object < static_cast<int>(ARRAYSIZE(pSpawnObjects)) )
 			m_iszSpawnObject = MAKE_STRING( pSpawnObjects[object] );
 	}
 	else if (FStrEq(szKeyName, "propdata") )
 	{
 		int pdata = atoi( szValue );
-		if ( pdata > 0 && pdata < ARRAYSIZE(pFGDPropData) )
+		if ( pdata > 0 && pdata < static_cast<int>(ARRAYSIZE(pFGDPropData)) )
 		{
 			m_iszPropData = MAKE_STRING( pFGDPropData[pdata] );
 		}
@@ -472,7 +472,7 @@ void CBreakable::Precache( void )
 			if ( !o )
 				continue;
 
-			if ( !Q_strnicmp( o, "unused", Q_strlen( "unused" ) ) )
+			if ( !Q_strnicmp( o, "unused", ssize( "unused" ) - 1 ) )
 				continue;
 
 			UTIL_PrecacheOther( o );

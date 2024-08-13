@@ -95,7 +95,7 @@ public:
 		return pGroup->followers.Count();
 	}
 
-	int CountFollowers( CBaseEntity *pFollowTarget, string_t iszClassname )
+	intp CountFollowers( CBaseEntity *pFollowTarget, string_t iszClassname )
 	{
 		AI_FollowGroup_t *pGroup = FindGroup( pFollowTarget );
 
@@ -110,8 +110,8 @@ public:
 		}
 		else
 		{
-			int result = 0;
-			for ( int i = pGroup->followers.Head(); i != pGroup->followers.InvalidIndex(); i = pGroup->followers.Next( i ) )
+			intp result = 0;
+			for ( intp i = pGroup->followers.Head(); i != pGroup->followers.InvalidIndex(); i = pGroup->followers.Next( i ) )
 			{
 				if ( pGroup->followers[i].hFollower && pGroup->followers[i].hFollower->ClassMatches( iszClassname ) )
 				{
@@ -131,7 +131,7 @@ public:
 			return 0;
 		}
 
-		int h = pGroup->followers.Head();
+		intp h = pGroup->followers.Head();
 
 		while( h != pGroup->followers.InvalidIndex() )
 		{
@@ -806,7 +806,7 @@ int CAI_FollowBehavior::SelectFailSchedule( int failedSchedule, int failedTask, 
 	{
 		if ( m_hFollowTarget )
 		{
-			m_TargetMonitor.SetMark( m_hFollowTarget, m_FollowNavGoal.targetMoveTolerance * 0.5 );	
+			m_TargetMonitor.SetMark( m_hFollowTarget, m_FollowNavGoal.targetMoveTolerance * 0.5f );	
 			m_FollowDelay.Start();
 			NoteFailedFollow();
 		}
@@ -993,7 +993,7 @@ void CAI_FollowBehavior::SetFollowPoint( CAI_Hint *pHintNode )
 
 int CAI_FollowBehavior::SelectScheduleFollowPoints()
 {
-	bool bShouldUseFollowPoints = ( ShouldUseFollowPoints() && IsFollowGoalInRange( m_FollowNavGoal.followPointTolerance + 0.1, GetGoalZRange(), GetGoalFlags() ) );
+	bool bShouldUseFollowPoints = ( ShouldUseFollowPoints() && IsFollowGoalInRange( m_FollowNavGoal.followPointTolerance + 0.1f, GetGoalZRange(), GetGoalFlags() ) );
 	float distSqToPoint = FLT_MAX;
 	bool bHasFollowPoint = HasFollowPoint();
 
@@ -1120,7 +1120,7 @@ int CAI_FollowBehavior::SelectSchedule()
 
 	if ( HasCondition( COND_TARGET_MOVED_FROM_MARK ) )
 	{
-		m_TargetMonitor.SetMark( m_hFollowTarget, m_FollowNavGoal.targetMoveTolerance * 0.5 );
+		m_TargetMonitor.SetMark( m_hFollowTarget, m_FollowNavGoal.targetMoveTolerance * 0.5f );
 	}
 
 	return FollowCallBaseSelectSchedule();
@@ -2041,7 +2041,7 @@ void CAI_FollowBehavior::OnMovementFailed()
 		flZRange = GetHullHeight() * 2;
 	}
 
-	if ( IsFollowGoalInRange( acceptDist * 1.5, flZRange, GetGoalFlags() ) )
+	if ( IsFollowGoalInRange( acceptDist * 1.5f, flZRange, GetGoalFlags() ) )
 		m_bTargetUnreachable = true;
 	else
 		m_FollowDelay.Start();
@@ -2561,7 +2561,7 @@ bool CAI_FollowManager::AddFollower( CBaseEntity *pTarget, CAI_BaseNPC *pFollowe
 
 		AI_FollowSlot_t *pSlot 		= &pGroup->pFormation->pSlots[slot];
 
-		int i = pGroup->followers.AddToTail( );
+		intp i = pGroup->followers.AddToTail( );
 
 		AI_Follower_t *iterNode = &pGroup->followers[i];
 		iterNode->hFollower 	= pFollower;
@@ -2637,12 +2637,12 @@ bool CAI_FollowManager::RedistributeSlots( AI_FollowGroup_t *pGroup )
 	const Vector &originFollowed = pGroup->hFollowTarget->GetAbsOrigin();
 	int 		  bestSlot;
 
-	while ( ( bestSlot = FindBestSlot( pGroup ) ) != -1 && ((int)movedFollowers.Count() < pGroup->followers.Count()) )
+	while ( ( bestSlot = FindBestSlot( pGroup ) ) != -1 && ((intp)movedFollowers.Count() < pGroup->followers.Count()) )
 	{
 		AI_FollowSlot_t *  pSlot 	  = &pGroup->pFormation->pSlots[bestSlot];
 		Vector			   slotPos	  = originFollowed + pSlot->position;
-		int  h			= pGroup->followers.Head();
-		int  hBest 		= pGroup->followers.InvalidIndex();
+		intp  h						  = pGroup->followers.Head();
+		intp  hBest 				  = pGroup->followers.InvalidIndex();
 		float 			   distSqBest = FLT_MAX;
 		
 		while ( h != pGroup->followers.InvalidIndex() )
@@ -2691,7 +2691,7 @@ void CAI_FollowManager::ChangeFormation( AI_FollowManagerInfoHandle_t& hInfo, AI
 	if ( pNewFormation == pGroup->pFormation )
 		return;
 
-	int h = pGroup->followers.Head();
+	intp h = pGroup->followers.Head();
 		
 	while ( h != pGroup->followers.InvalidIndex() )
 	{
@@ -2817,7 +2817,7 @@ AI_FollowGroup_t *CAI_FollowManager::FindCreateGroup( CBaseEntity *pTarget, AI_F
 
 void CAI_FollowManager::RemoveGroup( AI_FollowGroup_t *pGroup )
 {
-	for ( int i = 0; i < m_groups.Count(); i++ )
+	for ( intp i = 0; i < m_groups.Count(); i++ )
 	{
 		if ( m_groups[i] == pGroup )
 		{
@@ -2832,7 +2832,7 @@ void CAI_FollowManager::RemoveGroup( AI_FollowGroup_t *pGroup )
 
 AI_FollowGroup_t *CAI_FollowManager::FindGroup( CBaseEntity *pTarget )
 {
-	for ( int i = 0; i < m_groups.Count(); i++ )
+	for ( intp i = 0; i < m_groups.Count(); i++ )
 	{
 		if ( m_groups[i]->hFollowTarget == pTarget )
 			return m_groups[i];
@@ -2844,9 +2844,9 @@ AI_FollowGroup_t *CAI_FollowManager::FindGroup( CBaseEntity *pTarget )
 
 AI_FollowGroup_t *CAI_FollowManager::FindFollowerGroup( CBaseEntity *pFollower )
 {
-	for ( int i = 0; i < m_groups.Count(); i++ )
+	for ( intp i = 0; i < m_groups.Count(); i++ )
 	{
-		int h = m_groups[i]->followers.Head();
+		auto h = m_groups[i]->followers.Head();
 		while( h != m_groups[i]->followers.InvalidIndex() )
 		{
 			AI_Follower_t *p = &m_groups[i]->followers[h];

@@ -124,13 +124,13 @@ enum bodygroups
 
 //-----------------------------------------------------------------------------
 
-#define STRIDER_DEFAULT_SHOOT_DURATION			2.5 // spend this much time stitching to each target.
-#define STRIDER_SHOOT_ON_TARGET_TIME			0.5 // How much of DEFAULT_SHOOT_DURATION is spent on-target (vs. stitching up to a target)
-#define STRIDER_SHOOT_VARIATION					1.0 // up to 1 second of variance
-#define STRIDER_SHOOT_DOWNTIME					1.0 // This much downtime between bursts
-#define STRIDER_SUBSEQUENT_TARGET_DURATION		1.5 // Spend this much time stitching to targets chosen by distributed fire.
-#define STRIDER_IGNORE_TARGET_DURATION			1.0
-#define STRIDER_IGNORE_PLAYER_DURATION			1.5
+#define STRIDER_DEFAULT_SHOOT_DURATION			2.5f // spend this much time stitching to each target.
+#define STRIDER_SHOOT_ON_TARGET_TIME			0.5f // How much of DEFAULT_SHOOT_DURATION is spent on-target (vs. stitching up to a target)
+#define STRIDER_SHOOT_VARIATION					1.0f // up to 1 second of variance
+#define STRIDER_SHOOT_DOWNTIME					1.0f // This much downtime between bursts
+#define STRIDER_SUBSEQUENT_TARGET_DURATION		1.5f // Spend this much time stitching to targets chosen by distributed fire.
+#define STRIDER_IGNORE_TARGET_DURATION			1.0f
+#define STRIDER_IGNORE_PLAYER_DURATION			1.5f
 #define STRIDER_DEFAULT_RATE_OF_FIRE			5	// Rounds per second
 
 #define STRIDER_EP1_RATE_OF_FIRE			10.0f
@@ -1168,7 +1168,7 @@ void CNPC_Strider::GatherHeightConditions( const Vector &vTestPos, CBaseEntity *
 	float minZ = (maxZ - ( GetMaxHeight() - GetMinHeight()));;
 	float newHeight = FLT_MAX;
 
-	if( FInViewCone( pEntity ) && GetWeaponLosZ( vTestPos, minZ, maxZ, GetHeightRange() * .1, pEntity, &newHeight ) )
+	if( FInViewCone( pEntity ) && GetWeaponLosZ( vTestPos, minZ, maxZ, GetHeightRange() * .1f, pEntity, &newHeight ) )
 	{
 		bool bDoProceduralHeightChange = true;
 		newHeight = GetMaxHeightModel() - ( GetAbsOrigin().z - newHeight);
@@ -1186,9 +1186,9 @@ void CNPC_Strider::GatherHeightConditions( const Vector &vTestPos, CBaseEntity *
 				trace_t tr;
 				AI_TraceLine( muzzlePos, targetPos, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr);
 
-				if ( ( tr.m_pEnt != pEntity) && tr.fraction != 1.0 && !CanShootThrough( tr, targetPos ) )
+				if ( ( tr.m_pEnt != pEntity) && tr.fraction != 1.0f && !CanShootThrough( tr, targetPos ) )
 				{
-					if ( !GetWeaponLosZ( vTestPos, minZ + GetHeightRange() * .33, maxZ, GetHeightRange() * .1, pEntity, &newHeight ) )
+					if ( !GetWeaponLosZ( vTestPos, minZ + GetHeightRange() * .33f, maxZ, GetHeightRange() * .1f, pEntity, &newHeight ) )
 					{
 						return;
 					}
@@ -1196,7 +1196,7 @@ void CNPC_Strider::GatherHeightConditions( const Vector &vTestPos, CBaseEntity *
 				}
 				else
 				{
-					m_LowZCorrectionTimer.Set( 5.0 );
+					m_LowZCorrectionTimer.Set( 5.0f );
 				}
 			}
 		}
@@ -2735,10 +2735,7 @@ Vector CNPC_Strider::Weapon_ShootPosition( )
 void CNPC_Strider::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType )
 {
 	float flTracerDist;
-	Vector vecDir;
-	Vector vecEndPos;
-
-	vecDir = tr.endpos - vecTracerSrc;
+	Vector vecDir = tr.endpos - vecTracerSrc;
 
 	flTracerDist = VectorNormalize( vecDir );
 
@@ -2821,7 +2818,7 @@ bool CNPC_Strider::CanShootThrough( const trace_t &tr, const Vector &vecTarget )
 	trace_t continuedTrace;
 	AI_TraceLine( tr.endpos, vecTarget, MASK_SHOT, tr.m_pEnt, COLLISION_GROUP_NONE, &continuedTrace );
 
-	if( continuedTrace.fraction != 1.0 )
+	if( continuedTrace.fraction != 1.0f )
 	{
 		if( continuedTrace.m_pEnt != GetEnemy() )
 		{
@@ -2870,7 +2867,7 @@ bool CNPC_Strider::GetWeaponLosZ( const Vector &vOrigin, float minZ, float maxZ,
 		if ( WeaponLOSCondition( vTestPos, vTargetPos, false ) )
 		{
 			if ( strider_show_weapon_los_z.GetBool() )
-				NDebugOverlay::Line( vTestPos, vTargetPos, 0, 255, 0, false, 0.1 );
+				NDebugOverlay::Line( vTestPos, vTargetPos, 0, 255, 0, false, 0.1f );
 			*pResult = vTestPos.z;
 			return true;
 		}
@@ -2884,7 +2881,7 @@ bool CNPC_Strider::GetWeaponLosZ( const Vector &vOrigin, float minZ, float maxZ,
 		if ( WeaponLOSCondition( vTestPos, vTargetPos, false ) )
 		{
 			if ( strider_show_weapon_los_z.GetBool() )
-				NDebugOverlay::Line( vTestPos, vTargetPos, 0, 255, 0, false, 0.1 );
+				NDebugOverlay::Line( vTestPos, vTargetPos, 0, 255, 0, false, 0.1f );
 			*pResult = vTestPos.z;
 			return true;
 		}
@@ -2896,7 +2893,7 @@ bool CNPC_Strider::GetWeaponLosZ( const Vector &vOrigin, float minZ, float maxZ,
 	if ( WeaponLOSCondition( vTestPos, vTargetPos, false ) )
 	{
 		if ( strider_show_weapon_los_z.GetBool() )
-			NDebugOverlay::Line( vOrigin, vTargetPos, 0, 255, 0, false, 0.1 );
+			NDebugOverlay::Line( vOrigin, vTargetPos, 0, 255, 0, false, 0.1f );
 		*pResult = vTestPos.z;
 		return true;
 	}
@@ -2906,7 +2903,7 @@ bool CNPC_Strider::GetWeaponLosZ( const Vector &vOrigin, float minZ, float maxZ,
 	if ( WeaponLOSCondition( vTestPos, vTargetPos, false ) )
 	{
 		if ( strider_show_weapon_los_z.GetBool() )
-			NDebugOverlay::Line( vTestPos, vTargetPos, 0, 255, 0, false, 0.1 );
+			NDebugOverlay::Line( vTestPos, vTargetPos, 0, 255, 0, false, 0.1f );
 		*pResult = vTestPos.z;
 		return true;
 	}
@@ -2921,7 +2918,7 @@ bool CNPC_Strider::GetWeaponLosZ( const Vector &vOrigin, float minZ, float maxZ,
 	if ( vTestPos.z <= maxZ )
 	{
 		if ( strider_show_weapon_los_z.GetBool() )
-			NDebugOverlay::Line( vTestPos, vTargetPos, 0, 255, 0, false, 0.1 );
+			NDebugOverlay::Line( vTestPos, vTargetPos, 0, 255, 0, false, 0.1f );
 		*pResult = vTestPos.z;
 		return true;
 	}
@@ -2936,7 +2933,7 @@ bool CNPC_Strider::GetWeaponLosZ( const Vector &vOrigin, float minZ, float maxZ,
 	if ( vTestPos.z >= minZ )
 	{
 		if ( strider_show_weapon_los_z.GetBool() )
-			NDebugOverlay::Line( vTestPos, vTargetPos, 0, 255, 0, false, 0.1 );
+			NDebugOverlay::Line( vTestPos, vTargetPos, 0, 255, 0, false, 0.1f );
 		*pResult = vTestPos.z;
 		return true;
 	}
@@ -3038,7 +3035,7 @@ void CNPC_Strider::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &
 		g_pEffects->Ricochet(ptr->endpos,ptr->plane.normal);
 		if ( ptr->hitgroup != HITGROUP_HEAD )
 		{
-			info.SetDamage( 0.01 );
+			info.SetDamage( 0.01f );
 		}
 	}
 
@@ -3082,12 +3079,12 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			if ( bPlayer )
 			{
 				m_PlayerFreePass.Revoke();
-				AddFacingTarget( info.GetAttacker(), info.GetAttacker()->GetAbsOrigin(), 1.0, 2.0 );
+				AddFacingTarget( info.GetAttacker(), info.GetAttacker()->GetAbsOrigin(), 1.0f, 2.0f );
 
 				UpdateEnemyMemory( info.GetAttacker(), info.GetAttacker()->GetAbsOrigin() );
 			}
 			else
-				AddFacingTarget( info.GetAttacker(), info.GetAttacker()->GetAbsOrigin(), 0.5, 2.0 );
+				AddFacingTarget( info.GetAttacker(), info.GetAttacker()->GetAbsOrigin(), 0.5f, 2.0f );
 
 			// Default to NPC damage value
 			int damage = 20;
@@ -3200,7 +3197,7 @@ int CNPC_Strider::TakeDamageFromCombineBall( const CTakeDamageInfo &info )
 		damage = g_pGameRules->AdjustPlayerDamageInflicted(damage);
 	}
 
-	AddFacingTarget( info.GetInflictor(), info.GetInflictor()->GetAbsOrigin(), 0.5, 2.0 );
+	AddFacingTarget( info.GetInflictor(), info.GetInflictor()->GetAbsOrigin(), 0.5f, 2.0f );
 	if ( !UTIL_IsAR2CombineBall( info.GetInflictor() ) )
 		RestartGesture( ACT_GESTURE_BIG_FLINCH );
 	else
@@ -3336,7 +3333,6 @@ bool CNPC_Strider::ShouldExplodeFromDamage( const CTakeDamageInfo &info )
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-ConVarRef mat_dxlevel( "mat_dxlevel" );
 bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &forceVector ) 
 { 
 	// Combine balls make us explode
@@ -3346,8 +3342,11 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 	}
 	else
 	{
+		// dimhotepus: Moved from global 
+		static ConVarRef mat_dxlevel( "mat_dxlevel" );
+
 		// Otherwise just keel over
-		CRagdollProp *pRagdoll = NULL;
+		CRagdollProp *pRagdoll = nullptr;
 		CBasePlayer *pPlayer = AI_GetSinglePlayer();
 		if ( pPlayer && mat_dxlevel.GetInt() > 0 )
 		{
@@ -3357,7 +3356,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 			if ( maxRagdolls > 0 )
 			{
 				CUtlVectorFixed<CRagdollProp *, 2> striderRagdolls;
-				while ( ( pRagdoll = gEntList.NextEntByClass( pRagdoll ) ) != NULL )
+				while ( ( pRagdoll = gEntList.NextEntByClass( pRagdoll ) ) != nullptr )
 				{
 					if ( pRagdoll->GetModelName() == GetModelName() && !pRagdoll->IsFading() )
 					{
@@ -3370,20 +3369,20 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 				if ( striderRagdolls.Count() >= maxRagdolls )
 				{
 					float distSqrFurthest = FLT_MAX;
-					CRagdollProp *pFurthest = NULL;
+					CRagdollProp *pFurthest = nullptr;
 
-					for ( int i = 0; i < striderRagdolls.Count(); i++ )
+					for ( auto *sr : striderRagdolls )
 					{
-						float distSqrCur = CalcSqrDistanceToAABB( striderRagdolls[i]->WorldAlignMins(), striderRagdolls[i]->WorldAlignMaxs(), pPlayer->GetAbsOrigin() );
+						float distSqrCur = CalcSqrDistanceToAABB( sr->WorldAlignMins(), sr->WorldAlignMaxs(), pPlayer->GetAbsOrigin() );
 						if ( distSqrCur < distSqrFurthest )
 						{
 							distSqrFurthest = distSqrCur;
-							pFurthest = striderRagdolls[i];
+							pFurthest = sr;
 						}
 					}
 
 					if ( pFurthest )
-						pFurthest->FadeOut( 0.75, 1.5 );
+						pFurthest->FadeOut( 0.75f, 1.5f );
 				}
 			}
 
@@ -3392,7 +3391,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 
 			if ( maxRagdolls == 0 )
 			{
-				pRagdoll->FadeOut( 6.0, .75 );
+				pRagdoll->FadeOut( 6.0f, .75f );
 				RagdollDeathEffect( pRagdoll, 6.0f );
 			}
 			else
@@ -3538,11 +3537,11 @@ bool CNPC_Strider::OverrideMove( float flInterval )
 	// If we're not supposed to crouch walk and we're under the threshold for what we consider crouch walking, stand back up!
 	if ( !m_bCrouchLocked && m_bNoCrouchWalk && IsMoving() && ( GetIdealHeight() < ( GetMinHeight() + GetHeightRange() * ( strider_pct_height_no_crouch_move.GetFloat() / 100.0 ) ) ) )
 	{
-		SetIdealHeight( GetMinHeight() + GetHeightRange() * ( strider_pct_height_no_crouch_move.GetFloat() / 100.0 ) );
+		SetIdealHeight( GetMinHeight() + GetHeightRange() * ( strider_pct_height_no_crouch_move.GetFloat() / 100.0f ) );
 	}
 
 	float heightMove = GetIdealHeight() - GetHeight();
-	float heightMoveSign = ( heightMove < 0 ) ? -1 : 1;
+	float heightMoveSign = Sign( heightMove );
 	heightMove = fabsf( heightMove );
 	if ( heightMove > 0.01 )
 	{
@@ -4139,7 +4138,7 @@ void CNPC_Strider::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pE
 	{
 		Vector damagePos;
 		pEvent->pInternalData->GetContactPoint( damagePos );
-		CTakeDamageInfo dmgInfo( pOther, pOther, vec3_origin, damagePos, (m_iMaxHealth / 3) + 1, DMG_BLAST | DMG_PREVENT_PHYSICS_FORCE );
+		CTakeDamageInfo dmgInfo( pOther, pOther, vec3_origin, damagePos, (m_iMaxHealth / 3.0f) + 1, DMG_BLAST | DMG_PREVENT_PHYSICS_FORCE );
 
 		// FIXME: is there a better way for physics objects to keep track of what root entity responsible for them moving?
 		CBasePlayer *pPlayer = pOther->HasPhysicsAttacker( 1.0 );
@@ -4191,7 +4190,7 @@ bool CNPC_Strider::CarriedByDropship()
 //---------------------------------------------------------
 void CNPC_Strider::CarriedThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	SetNextThink( gpGlobals->curtime + 0.05f );
 	StudioFrameAdvance();
 
 	Vector vecGround = GetAbsOrigin();
@@ -4381,7 +4380,7 @@ void CNPC_Strider::FootFX( const Vector &origin )
 {
 	trace_t tr;
 	AI_TraceLine( origin + Vector(0, 0, 48), origin - Vector(0,0,100), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
-	float yaw = random->RandomInt(0,120);
+	float yaw = random->RandomFloat(0.0f,120.0f);
 	
 	if ( UTIL_PointContents( tr.endpos + Vector( 0, 0, 1 ) ) & MASK_WATER )
 	{
@@ -4392,7 +4391,7 @@ void CNPC_Strider::FootFX( const Vector &origin )
 		data.m_vOrigin = tr.endpos;
 		data.m_vOrigin.z = flWaterZ;
 		data.m_vNormal = Vector( 0, 0, 1 );
-		data.m_flScale = random->RandomFloat( 10.0, 14.0 );
+		data.m_flScale = random->RandomFloat( 10.0f, 14.0f );
 
 		DispatchEffect( "watersplash", data );
 	}
@@ -4407,7 +4406,7 @@ void CNPC_Strider::FootFX( const Vector &origin )
 			g_pEffects->Dust( tr.endpos, dir, 12, 50 );
 		}
 	}
-	UTIL_ScreenShake( tr.endpos, 4.0, 1.0, 0.5, 1000, SHAKE_START, false );
+	UTIL_ScreenShake( tr.endpos, 4.0f, 1.0f, 0.5f, 1000, SHAKE_START, false );
 	
 	if ( npc_strider_shake_ropes_radius.GetInt() )
 	{
@@ -5346,7 +5345,7 @@ void CStriderMinigun::Think( IStriderMinigunHost *pHost, float dt )
 				{
 					m_bWarnedAI = true;
 
-					CSoundEnt::InsertSound( SOUND_DANGER | SOUND_CONTEXT_REACT_TO_SOURCE, pTargetEnt->EarPosition() + Vector( 0, 0, 1 ), 120, MAX( 1.0, flRemainingShootTime ), pHost->GetEntity() );
+					CSoundEnt::InsertSound( SOUND_DANGER | SOUND_CONTEXT_REACT_TO_SOURCE, pTargetEnt->EarPosition() + Vector( 0, 0, 1 ), 120, MAX( 1.0f, flRemainingShootTime ), pHost->GetEntity() );
 				}
 			}
 		}
@@ -5409,7 +5408,7 @@ void CSparkTrail::Spawn()
 
 void CSparkTrail::SparkThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	SetNextThink( gpGlobals->curtime + 0.05f );
 
 	g_pEffects->Sparks( GetAbsOrigin() );
 

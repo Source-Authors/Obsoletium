@@ -1737,7 +1737,7 @@ void CNPC_PlayerCompanion::UpdateReadiness()
 		if( m_flReadiness > 0.0f && GetReadinessDecay() > 0 )
 		{
 			// Decay.
-			SubtractReadiness( ( 0.1 * (1.0f/GetReadinessDecay())) * m_flReadinessSensitivity );
+			SubtractReadiness( ( 0.1f * (1.0f/GetReadinessDecay())) * m_flReadinessSensitivity );
 		}
 	}
 
@@ -1833,7 +1833,7 @@ void CNPC_PlayerCompanion::SetAimTarget( CBaseEntity *pTarget )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CNPC_PlayerCompanion::StopAiming( char *pszReason )
+void CNPC_PlayerCompanion::StopAiming( const char *pszReason )
 {
 #if 0
 	if( pszReason )
@@ -2894,7 +2894,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 			if( pSound && pSound->SoundContext() == SOUND_CONTEXT_MORTAR )
 			{
 				// Try not to get any closer to the center
-				GetLocalNavigator()->AddObstacle( pSound->GetSoundOrigin(), (pSound->GetSoundOrigin() - GetAbsOrigin()).Length2D() * 0.5, AIMST_AVOID_DANGER );
+				GetLocalNavigator()->AddObstacle( pSound->GetSoundOrigin(), (pSound->GetSoundOrigin() - GetAbsOrigin()).Length2D() * 0.5f, AIMST_AVOID_DANGER );
 			}
 		}
 
@@ -2913,7 +2913,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 					UTIL_TraceLine( WorldSpaceCenter(), pEntity->WorldSpaceCenter(), MASK_FIRE_SOLID, pEntity, COLLISION_GROUP_NONE, &tr );
 					if (tr.fraction == 1.0 && !tr.startsolid)
 					{
-						GetLocalNavigator()->AddObstacle( pEntity->GetAbsOrigin(), ( ( vMaxs.x - vMins.x ) * 1.414 * 0.5 ) + 6.0, AIMST_AVOID_DANGER );
+						GetLocalNavigator()->AddObstacle( pEntity->GetAbsOrigin(), ( ( vMaxs.x - vMins.x ) * 1.414f * 0.5f ) + 6.0f, AIMST_AVOID_DANGER );
 					}
 				}
 			}

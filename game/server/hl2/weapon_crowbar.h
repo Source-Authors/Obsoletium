@@ -29,22 +29,22 @@ class CWeaponCrowbar : public CBaseHLBludgeonWeapon
 public:
 	DECLARE_CLASS( CWeaponCrowbar, CBaseHLBludgeonWeapon );
 
-	DECLARE_SERVERCLASS();
+	DECLARE_SERVERCLASS_OVERRIDE();
 	DECLARE_ACTTABLE();
 
 	CWeaponCrowbar();
 
-	float		GetRange( void )		{	return	CROWBAR_RANGE;	}
-	float		GetFireRate( void )		{	return	CROWBAR_REFIRE;	}
+	float		GetRange( void ) override		{	return	CROWBAR_RANGE;	}
+	float		GetFireRate( void ) override		{	return	CROWBAR_REFIRE;	}
 
-	void		AddViewKick( void );
-	float		GetDamageForActivity( Activity hitActivity );
+	void		AddViewKick( void ) override;
+	float		GetDamageForActivity( Activity hitActivity ) override;
 
-	virtual int WeaponMeleeAttack1Condition( float flDot, float flDist );
-	void		SecondaryAttack( void )	{	return;	}
+	int			WeaponMeleeAttack1Condition( float flDot, float flDist ) override;
+	void		SecondaryAttack( void ) override { }
 
 	// Animation event
-	virtual void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator ) override;
 
 private:
 	// Animation event handlers

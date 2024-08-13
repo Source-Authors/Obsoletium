@@ -103,15 +103,15 @@ CON_COMMAND_F( sv_soundscape_printdebuginfo, "print soundscapes", FCVAR_DEVELOPM
 void CSoundscapeSystem::PrintDebugInfo()
 {
 	Msg( "\n------- SERVER SOUNDSCAPES -------\n" );
-	for ( int key=m_soundscapes.First(); key != m_soundscapes.InvalidIndex(); key = m_soundscapes.Next( key ) )
+	for ( auto key=m_soundscapes.First(); key != m_soundscapes.InvalidIndex(); key = m_soundscapes.Next( key ) )
 	{
-		int id = m_soundscapes.GetIDForKey( key );
+		auto id = m_soundscapes.GetIDForKey( key );
 		const char *pName = m_soundscapes.GetStringForKey( key );
 
 		Msg( "- %d: %s\n", id, pName );
 	}
 	Msg( "-------- SOUNDSCAPE ENTITIES -----\n" );
-	for( int entityIndex = 0; entityIndex < m_soundscapeEntities.Size(); ++entityIndex )
+	for( int entityIndex = 0; entityIndex < m_soundscapeEntities.Count(); ++entityIndex )
 	{
 		CEnvSoundscape *currentSoundscape = m_soundscapeEntities[entityIndex];
 		Msg("- %d: %s x:%.4f y:%.4f z:%.4f\n", 
@@ -279,7 +279,7 @@ void CSoundscapeSystem::AddSoundscapeEntity( CEnvSoundscape *pSoundscape )
 {
 	if ( m_soundscapeEntities.Find( pSoundscape ) == -1 )
 	{
-		int index = m_soundscapeEntities.AddToTail( pSoundscape );
+		intp index = m_soundscapeEntities.AddToTail( pSoundscape );
 		pSoundscape->m_soundscapeEntityId = index + 1;
 	}
 }
@@ -372,7 +372,7 @@ void CSoundscapeSystem::AddSoundscapeSounds( KeyValues *pSoundscape, int soundsc
 		return;
 	}
 
-	int i = m_soundscapeSounds.AddToTail();
+	intp i = m_soundscapeSounds.AddToTail();
 	Assert( i == soundscapeIndex );
 
 	KeyValues *pKey = pSoundscape->GetFirstSubKey();

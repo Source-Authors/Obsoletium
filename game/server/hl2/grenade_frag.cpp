@@ -352,7 +352,7 @@ void CGrenadeFrag::DelayThink()
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void CGrenadeFrag::SetVelocity( const Vector &velocity, const AngularImpulse &angVelocity )

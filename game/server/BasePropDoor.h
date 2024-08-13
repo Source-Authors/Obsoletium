@@ -68,7 +68,7 @@ public:
 
 	// Implement these in your leaf class.
 	// {
-	virtual bool DoorCanClose( bool bAutoClose ) { return true; }
+	virtual bool DoorCanClose( bool ) { return true; }
 	virtual bool DoorCanOpen( void ) { return true; }
 
 	virtual void GetNPCOpenData(CAI_BaseNPC *pNPC, opendata_t &opendata) = 0;

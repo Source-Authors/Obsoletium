@@ -1205,7 +1205,7 @@ void CFastZombie::LeapAttack( void )
 		//
 		// Don't jump too far/fast.
 		//
-#define CLAMP 1000.0
+#define CLAMP 1000.0f
 		float distance = vecJumpDir.Length();
 		if ( distance > CLAMP )
 		{

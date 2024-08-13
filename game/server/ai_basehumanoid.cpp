@@ -134,7 +134,7 @@ bool CAI_BaseHumanoid::OnMoveBlocked( AIMoveResult_t *pResult )
 	{
 		CBaseEntity *pBlocker = GetNavigator()->GetBlockingEntity();
 
-		float massBonus = ( IsNavigationUrgent() ) ? 40.0 : 0;
+		float massBonus = ( IsNavigationUrgent() ) ? 40.0f : 0;
 
 		if ( pBlocker->GetMoveType() == MOVETYPE_VPHYSICS && 
 			 pBlocker != GetGroundEntity() && 

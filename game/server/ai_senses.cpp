@@ -258,7 +258,7 @@ CBaseEntity *CAI_Senses::GetFirstSeenEntity( AISightIter_t *pIter, seentype_t iS
 	pIterVal->SeenArray = (char)iSeenType;
 	int iFirstArray = ( iSeenType == SEEN_ALL ) ? 0 : iSeenType;
 
-	for ( int i = iFirstArray; i < ARRAYSIZE( m_SeenArrays ); i++ )
+	for ( int i = iFirstArray; i < static_cast<int>(ARRAYSIZE( m_SeenArrays )); i++ )
 	{
 		if ( m_SeenArrays[i]->Count() != 0 )
 		{
@@ -280,7 +280,7 @@ CBaseEntity *CAI_Senses::GetNextSeenEntity( AISightIter_t *pIter ) const
 	{
 		AISightIterVal_t *pIterVal = (AISightIterVal_t *)pIter;
 		
-		for ( int i = pIterVal->array;  i < ARRAYSIZE( m_SeenArrays ); i++ )
+		for ( int i = pIterVal->array;  i < static_cast<int>(ARRAYSIZE( m_SeenArrays )); i++ )
 		{
 			for ( int j = pIterVal->iNext; j < m_SeenArrays[i]->Count(); j++ )
 			{
@@ -566,7 +566,7 @@ float CAI_Senses::GetTimeLastUpdate( CBaseEntity *pEntity )
 
 CSound* CAI_Senses::GetFirstHeardSound( AISoundIter_t *pIter )
 {
-	int iFirst = GetAudibleList(); 
+	intp iFirst = GetAudibleList(); 
 
 	if ( iFirst == SOUNDLIST_EMPTY )
 	{

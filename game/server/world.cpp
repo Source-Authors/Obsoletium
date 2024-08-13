@@ -567,7 +567,7 @@ static const char *g_DefaultLightstyles[] =
 
 const char *GetDefaultLightstyleString( int styleIndex )
 {
-	if ( styleIndex < ARRAYSIZE(g_DefaultLightstyles) )
+	if ( styleIndex < static_cast<int>(ARRAYSIZE(g_DefaultLightstyles)) )
 	{
 		return g_DefaultLightstyles[styleIndex];
 	}
@@ -651,7 +651,7 @@ void CWorld::Precache( void )
 //
 // Setup light animation tables. 'a' is total darkness, 'z' is maxbright.
 //
-	for ( int i = 0; i < ARRAYSIZE(g_DefaultLightstyles); i++ )
+	for ( int i = 0; i < static_cast<int>(ARRAYSIZE(g_DefaultLightstyles)); i++ )
 	{
 		engine->LightStyle( i, GetDefaultLightstyleString(i) );
 	}

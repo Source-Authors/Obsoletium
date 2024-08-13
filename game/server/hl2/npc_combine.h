@@ -32,35 +32,35 @@
 //=========================================================
 class CNPC_Combine : public CAI_BaseActor
 {
-	DECLARE_DATADESC();
-	DEFINE_CUSTOM_AI;
+	DECLARE_DATADESC_OVERRIDE();
+	DEFINE_CUSTOM_AI_OVERRIDE;
 	DECLARE_CLASS( CNPC_Combine, CAI_BaseActor );
 
 public:
 	CNPC_Combine();
 
 	// Create components
-	virtual bool	CreateComponents();
+	bool	CreateComponents() override;
 
 	bool			CanThrowGrenade( const Vector &vecTarget );
 	bool			CheckCanThrowGrenade( const Vector &vecTarget );
 	virtual	bool	CanGrenadeEnemy( bool bUseFreeKnowledge = true );
 	virtual bool	CanAltFireEnemy( bool bUseFreeKnowledge );
 	int				GetGrenadeConditions( float flDot, float flDist );
-	int				RangeAttack2Conditions( float flDot, float flDist ); // For innate grenade attack
-	int				MeleeAttack1Conditions( float flDot, float flDist ); // For kick/punch
-	bool			FVisible( CBaseEntity *pEntity, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL );
-	virtual bool	IsCurTaskContinuousMove();
+	int				RangeAttack2Conditions( float flDot, float flDist ) override; // For innate grenade attack
+	int				MeleeAttack1Conditions( float flDot, float flDist ) override; // For kick/punch
+	bool			FVisible( CBaseEntity *pEntity, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL ) override;
+	virtual bool	IsCurTaskContinuousMove() override;
 
-	virtual float	GetJumpGravity() const		{ return 1.8f; }
+	float	GetJumpGravity() const override	{ return 1.8f; }
 
-	virtual Vector  GetCrouchEyeOffset( void );
+	Vector  GetCrouchEyeOffset( void ) override;
 
-	void Event_Killed( const CTakeDamageInfo &info );
+	void Event_Killed( const CTakeDamageInfo &info ) override;
 
 
-	void SetActivity( Activity NewActivity );
-	NPC_STATE		SelectIdealState ( void );
+	void SetActivity( Activity NewActivity ) override;
+	NPC_STATE		SelectIdealState ( void ) override;
 
 	// Input handlers.
 	void InputLookOn( inputdata_t &inputdata );
@@ -71,51 +71,51 @@ public:
 	void InputHitByBugbait( inputdata_t &inputdata );
 	void InputThrowGrenadeAtTarget( inputdata_t &inputdata );
 
-	bool			UpdateEnemyMemory( CBaseEntity *pEnemy, const Vector &position, CBaseEntity *pInformer = NULL );
+	bool			UpdateEnemyMemory( CBaseEntity *pEnemy, const Vector &position, CBaseEntity *pInformer = NULL ) override;
 
-	void			Spawn( void );
-	void			Precache( void );
-	void			Activate();
+	void			Spawn( void ) override;
+	void			Precache( void ) override;
+	void			Activate() override;
 
-	Class_T			Classify( void );
+	Class_T			Classify( void ) override;
 	bool			IsElite() { return m_fIsElite; }
 	void			DelayAltFireAttack( float flDelay );
 	void			DelaySquadAltFireAttack( float flDelay );
-	float			MaxYawSpeed( void );
-	bool			ShouldMoveAndShoot();
-	bool			OverrideMoveFacing( const AILocalMoveGoal_t &move, float flInterval );;
-	void			HandleAnimEvent( animevent_t *pEvent );
-	Vector			Weapon_ShootPosition( );
+	float			MaxYawSpeed( void ) override;
+	bool			ShouldMoveAndShoot() override;
+	bool			OverrideMoveFacing( const AILocalMoveGoal_t &move, float flInterval ) override;
+	void			HandleAnimEvent( animevent_t *pEvent ) override;
+	Vector			Weapon_ShootPosition( ) override;
 
-	Vector			EyeOffset( Activity nActivity );
-	Vector			EyePosition( void );
-	Vector			BodyTarget( const Vector &posSrc, bool bNoisy = true );
+	Vector			EyeOffset( Activity nActivity ) override;
+	Vector			EyePosition( void ) override;
+	Vector			BodyTarget( const Vector &posSrc, bool bNoisy = true ) override;
 	Vector			GetAltFireTarget();
 
-	void			StartTask( const Task_t *pTask );
-	void			RunTask( const Task_t *pTask );
-	void			PostNPCInit();
-	void			GatherConditions();
-	virtual void	PrescheduleThink();
+	void			StartTask( const Task_t *pTask ) override;
+	void			RunTask( const Task_t *pTask ) override;
+	void			PostNPCInit() override;
+	void			GatherConditions() override;
+	void			PrescheduleThink() override;
 
-	Activity		NPC_TranslateActivity( Activity eNewActivity );
-	void			BuildScheduleTestBits( void );
-	virtual int		SelectSchedule( void );
-	virtual int		SelectFailSchedule( int failedSchedule, int failedTask, AI_TaskFailureCode_t taskFailCode );
+	Activity		NPC_TranslateActivity( Activity eNewActivity ) override;
+	void			BuildScheduleTestBits( void ) override;
+	int				SelectSchedule( void ) override;
+	int				SelectFailSchedule( int failedSchedule, int failedTask, AI_TaskFailureCode_t taskFailCode ) override;
 	int				SelectScheduleAttack();
 
-	bool			CreateBehaviors();
+	bool			CreateBehaviors() override;
 
-	bool			OnBeginMoveAndShoot();
-	void			OnEndMoveAndShoot();
+	bool			OnBeginMoveAndShoot() override;
+	void			OnEndMoveAndShoot() override;
 
 	// Combat
-	WeaponProficiency_t CalcWeaponProficiency( CBaseCombatWeapon *pWeapon );
+	WeaponProficiency_t CalcWeaponProficiency( CBaseCombatWeapon *pWeapon ) override;
 	bool			HasShotgun();
 	bool			ActiveWeaponIsFullyLoaded();
 
-	bool			HandleInteraction(int interactionType, void *data, CBaseCombatCharacter *sourceEnt);
-	const char*		GetSquadSlotDebugName( int iSquadSlot );
+	bool			HandleInteraction(int interactionType, void *data, CBaseCombatCharacter *sourceEnt) override;
+	const char*		GetSquadSlotDebugName( int iSquadSlot ) override;
 
 	bool			IsUsingTacticalVariant( int variant );
 	bool			IsUsingPathfindingVariant( int variant ) { return m_iPathfindingVariant == variant; }
@@ -129,27 +129,27 @@ public:
 	void			DeathSound( const CTakeDamageInfo & ) override;
 	// dimhotepus: Combine can scream from pain.
 	void			PainSound( const CTakeDamageInfo & ) override;
-	void			IdleSound( void );
-	void			AlertSound( void );
-	void			LostEnemySound( void );
-	void			FoundEnemySound( void );
+	void			IdleSound( void ) override;
+	void			AlertSound( void ) override;
+	void			LostEnemySound( void ) override;
+	void			FoundEnemySound( void ) override;
 	void			AnnounceAssault( void );
 	void			AnnounceEnemyType( CBaseEntity *pEnemy );
 	void			AnnounceEnemyKill( CBaseEntity *pEnemy );
 
-	void			NotifyDeadFriend( CBaseEntity* pFriend );
+	void			NotifyDeadFriend( CBaseEntity* pFriend ) override;
 
-	virtual float	HearingSensitivity( void ) { return 1.0; };
-	int				GetSoundInterests( void );
-	virtual bool	QueryHearSound( CSound *pSound );
+	float			HearingSensitivity( void ) override { return 1.0; };
+	int				GetSoundInterests( void ) override;
+	bool			QueryHearSound( CSound *pSound ) override;
 
 	// Speaking
-	void			SpeakSentence( int sentType );
+	void			SpeakSentence( int sentType ) override;
 
-	virtual int		TranslateSchedule( int scheduleType );
-	void			OnStartSchedule( int scheduleType );
+	int				TranslateSchedule( int scheduleType ) override;
+	void			OnStartSchedule( int scheduleType ) override;
 
-	virtual bool	ShouldPickADeathPose( void );
+	bool	ShouldPickADeathPose( void ) override;
 
 protected:
 	void			SetKickDamage( int nDamage ) { m_nKickDamage = nDamage; }
@@ -254,8 +254,8 @@ private:
 	};
 
 	// Rappel
-	virtual bool IsWaitingToRappel( void ) { return m_RappelBehavior.IsWaitingToRappel(); }
-	void BeginRappel() { m_RappelBehavior.BeginRappel(); }
+	bool IsWaitingToRappel( void ) override { return m_RappelBehavior.IsWaitingToRappel(); }
+	void BeginRappel() override { m_RappelBehavior.BeginRappel(); }
 
 private:
 	int				m_nKickDamage;

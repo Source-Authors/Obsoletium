@@ -454,7 +454,7 @@ bool CAI_BaseNPC::AutoMovement( float flInterval, CBaseEntity *pTarget, AIMoveTr
 		{
 			Vector dist = newPos - GetLocalOrigin();
 
-			VectorScale( dist, 1.0 / flInterval, dist );
+			VectorScale( dist, 1.0f / flInterval, dist );
 
 			SetLocalVelocity( dist );
 			return true;

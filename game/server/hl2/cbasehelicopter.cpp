@@ -36,8 +36,8 @@ void ExpandBBox(Vector &vecMins, Vector &vecMaxs);
 virtual void NullThink( void );
 #endif //0
 
-#define HELICOPTER_THINK_INTERVAL 0.1
-#define HELICOPTER_ROTORWASH_THINK_INTERVAL 0.01
+#define HELICOPTER_THINK_INTERVAL 0.1f
+#define HELICOPTER_ROTORWASH_THINK_INTERVAL 0.01f
 #define	BASECHOPPER_DEBUG_WASH		1
 
 ConVar g_debug_basehelicopter( "g_debug_basehelicopter", "0", FCVAR_CHEAT );
@@ -409,7 +409,7 @@ void CBaseHelicopter::DoWashPushOnAirboat( CBaseEntity *pAirboat,
 
 	// Find the angle between how vertical we are and how vertical we should be
 	float flCosDelta = DotProduct( vecExtremeUp, vecUp );
-	float flDelta = acos(flCosDelta) * 180.0f / M_PI;
+	float flDelta = acos(flCosDelta) * 180.0f / M_PI_F;
 	flDelta = clamp( flDelta, 0.0f, MAX_AIRBOAT_ROLL_ANGLE );
 	flDelta = SimpleSplineRemapVal( flDelta, 0.0f, MAX_AIRBOAT_ROLL_ANGLE, 0.0f, 1.0f );
 
@@ -464,7 +464,7 @@ bool CBaseHelicopter::DoWashPush( washentity_t *pWash, const Vector &vecWashOrig
 		washentity_t Wash;
 		Wash.hEntity = pEntity;
 		Wash.flWashStartTime = pWash->flWashStartTime;
-		int i = m_hEntitiesPushedByWash.AddToTail( Wash );
+		intp i = m_hEntitiesPushedByWash.AddToTail( Wash );
 		pWash = &m_hEntitiesPushedByWash[i];
 		
 		pPhysObject = pEntity->VPhysicsGetObject();

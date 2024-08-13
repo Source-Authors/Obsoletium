@@ -785,7 +785,7 @@ bool CNPC_VehicleDriver::OverridePathMove( float flInterval )
 	}
 	else
 	{
-		VectorLerp( vSplineTangent, vecToDesired * flTangentLength, (flDistToDesired / (flTangentLength * 0.5)), m_vecDesiredVelocity );
+		VectorLerp( vSplineTangent, vecToDesired * flTangentLength, (flDistToDesired / (flTangentLength * 0.5f)), m_vecDesiredVelocity );
 	}
 
 	// Decrease speed according to the turn we're trying to make
@@ -832,11 +832,11 @@ bool CNPC_VehicleDriver::OverridePathMove( float flInterval )
 	{
 		for ( int i = 0; i < 10; i++ )
 		{
-			Vector vecTarget = m_pCurrentWaypoint->GetPointAt( 0.1 * i );
-			Vector vecTangent = m_pCurrentWaypoint->GetTangentAt( 0.1 * i );
+			Vector vecTarget = m_pCurrentWaypoint->GetPointAt( 0.1f * i );
+			Vector vecTangent = m_pCurrentWaypoint->GetTangentAt( 0.1f * i );
 			VectorNormalize(vecTangent);
-			NDebugOverlay::Box( vecTarget, -Vector(10,10,10), Vector(10,10,10), 255,0,0, true, 0.1 );
-			NDebugOverlay::Line( vecTarget, vecTarget + (vecTangent * 10), 255,255,0, true, 0.1);
+			NDebugOverlay::Box( vecTarget, -Vector(10,10,10), Vector(10,10,10), 255,0,0, true, 0.1f );
+			NDebugOverlay::Line( vecTarget, vecTarget + (vecTangent * 10), 255,255,0, true, 0.1f);
 		}
 	}
 

@@ -22,7 +22,7 @@
 
 #undef LOCAL_STEP_SIZE
 // FIXME: this should be based in their hull width
-#define	LOCAL_STEP_SIZE	16.0 // 8 // 16
+#define	LOCAL_STEP_SIZE	16.0f // 8 // 16
 
 // If set to 1, results will be drawn for moveprobes done by player-selected NPCs
 ConVar	ai_moveprobe_debug( "ai_moveprobe_debug", "0" );
@@ -529,19 +529,19 @@ bool CAI_MoveProbe::TestGroundMove( const Vector &vecActualStart, const Vector &
 	checkStepResult.hitNormal = vec3_origin;
 	checkStepResult.pBlocker = NULL;
 	
-	float distStartToIgnoreGround = (pctToCheckStandPositions == 100) ? pMoveTrace->flTotalDist : pMoveTrace->flTotalDist * ( pctToCheckStandPositions * 0.01);
-	bool bTryNavIgnore = ( ( vecActualStart - GetLocalOrigin() ).Length2DSqr() < 0.1 && fabsf(vecActualStart.z - GetLocalOrigin().z) < checkStepArgs.stepHeight * 0.5 );
+	float distStartToIgnoreGround = (pctToCheckStandPositions == 100) ? pMoveTrace->flTotalDist : pMoveTrace->flTotalDist * ( pctToCheckStandPositions * 0.01f);
+	bool bTryNavIgnore = ( ( vecActualStart - GetLocalOrigin() ).Length2DSqr() < 0.1 && fabsf(vecActualStart.z - GetLocalOrigin().z) < checkStepArgs.stepHeight * 0.5f );
 
 	CUtlVector<CBaseEntity *> ignoredEntities;
 
 	for (;;)
 	{
 		float flStepSize = MIN( LOCAL_STEP_SIZE, pMoveTrace->flTotalDist - distClear );
-		if ( flStepSize < 0.001 )
+		if ( flStepSize < 0.001f )
 			break;
 
 		checkStepArgs.stepSize = flStepSize;
-		if ( distClear - distStartToIgnoreGround > 0.001 )
+		if ( distClear - distStartToIgnoreGround > 0.001f )
 			checkStepArgs.groundTest = STEP_DONT_CHECK_GROUND;
 
 		Assert( !m_pTraceListData || m_pTraceListData->IsEmpty() );
@@ -651,7 +651,7 @@ bool CAI_MoveProbe::TestGroundMove( const Vector &vecActualStart, const Vector &
 	// and not a ledge above or below the target.
 	if (!(flags & AITGM_2D))
 	{
-		float threshold = MAX(  0.5f * GetHullHeight(), StepHeight() + 0.1 );
+		float threshold = MAX(  0.5f * GetHullHeight(), StepHeight() + 0.1f );
 		if (fabs(pMoveTrace->vEndPosition.z - vecDesiredEnd.z) > threshold)
 		{
 #if 0
@@ -806,7 +806,7 @@ void CAI_MoveProbe::JumpMoveLimit( const Vector &vecStart, const Vector &vecEnd,
 	IterativeFloorPoint( vecStart, collisionMask, &vecFrom );
 
 	Vector vecTo;
-	IterativeFloorPoint( vecEnd, collisionMask, StepHeight() * 0.5, &vecTo );
+	IterativeFloorPoint( vecEnd, collisionMask, StepHeight() * 0.5f, &vecTo );
 	if (!CheckStandPosition( vecTo, collisionMask))
 	{
 		pMoveTrace->fStatus = AIMR_ILLEGAL;
@@ -990,10 +990,10 @@ void CAI_MoveProbe::ClimbMoveLimit( const Vector &vecStart, const Vector &vecEnd
 			pMoveTrace->vHitNormal = vec3_origin;
 			pMoveTrace->fStatus = AIComputeBlockerMoveResult( pEntity );
 
-			float flDist = (1.0 - tr.fraction) * ComputePathDistance( NAV_CLIMB, vecStart, vecEnd );
-			if (flDist <= 0.001) 
+			float flDist = (1.0f - tr.fraction) * ComputePathDistance( NAV_CLIMB, vecStart, vecEnd );
+			if (flDist <= 0.001f) 
 			{
-				flDist = 0.001;
+				flDist = 0.001f;
 			}
 			pMoveTrace->flDistObstructed = flDist;
 			return;
@@ -1104,7 +1104,7 @@ Vector CAI_MoveProbe::CalcJumpLaunchVelocity(const Vector &startPos, const Vecto
 
 	// get minimum times and heights to meet ideal horz velocity
 	float minHorzTime = distance / maxHorzVelocity;
-	float minHorzHeight = 0.5 * flGravity * (minHorzTime * 0.5) * (minHorzTime * 0.5);
+	float minHorzHeight = 0.5f * flGravity * (minHorzTime * 0.5f) * (minHorzTime * 0.5f);
 
 	// jump height must be enough to hang in the air
 	*pminHeight = MAX( *pminHeight, minHorzHeight );
@@ -1154,7 +1154,7 @@ bool CAI_MoveProbe::CheckStandPosition( const Vector &vecStart, unsigned int col
 	Vector contactMin, contactMax;
 
 	// this should assume the model is already standing
-	Vector vecUp	= Vector( vecStart.x, vecStart.y, vecStart.z + 0.1 );
+	Vector vecUp	= Vector( vecStart.x, vecStart.y, vecStart.z + 0.1f );
 	Vector vecDown	= Vector( vecStart.x, vecStart.y, vecStart.z - StepHeight() * GetOuter()->GetStepDownMultiplier() );
 
 	// check a half sized box centered around the foot
@@ -1233,7 +1233,7 @@ bool CAI_MoveProbe::OldCheckStandPosition( const Vector &vecStart, unsigned int 
 	Vector contactMin, contactMax;
 
 	// this should assume the model is already standing
-	Vector vecUp	= Vector( vecStart.x, vecStart.y, vecStart.z + 0.1 );
+	Vector vecUp	= Vector( vecStart.x, vecStart.y, vecStart.z + 0.1f );
 	Vector vecDown	= Vector( vecStart.x, vecStart.y, vecStart.z - StepHeight() * GetOuter()->GetStepDownMultiplier() );
 
 	// check a half sized box centered around the foot

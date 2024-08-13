@@ -53,7 +53,7 @@ void CAI_MoveSolver::VisualizeRegulations( const Vector& origin )
 			// Stronger weighted ones are bigger
 			if ( regulations[i].weight < 0 )
 			{
-				float flLength = 10 + 40 * ( regulations[i].weight * -1.0);
+				float flLength = 10 + 40 * ( regulations[i].weight * -1.0f);
 				side1 *= flLength;
 				side2 *= flLength;
 				mid *= flLength;
@@ -132,7 +132,7 @@ bool CAI_MoveSolver::Solve( const AI_MoveSuggestion_t *pSuggestions, int nSugges
 		AI_MoveSuggestion_t &current = suggestions[iSuggestion];
 
 		// Convert arc values to solution indices relative to right post. Right is angle down, left is angle up.
-		float halfSpan	= current.arc.span * 0.5;
+		float halfSpan	= current.arc.span * 0.5f;
 		int   center 	= V_round( ( halfSpan * NUM_SOLUTIONS ) / 360 );
 		int   left		= ( current.arc.span * NUM_SOLUTIONS ) / 360;
 

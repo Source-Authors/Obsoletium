@@ -11,7 +11,7 @@
 #include "filesystem.h"
 
 
-#define SLIDESHOW_LIST_BUFFER_MAX 8192
+#define SLIDESHOW_LIST_BUFFER_MAX 8192u
 
 
 struct SlideKeywordList_t
@@ -410,7 +410,7 @@ void CSlideshowDisplay::SpawnControlPanels()
 		pScreen->SetActive( true );
 		pScreen->MakeVisibleOnlyToTeammates( false );
 		pScreen->SetTransparency( true );
-		int nScreen = m_hScreens.AddToTail( );
+		intp nScreen = m_hScreens.AddToTail( );
 		m_hScreens[nScreen].Set( pScreen );
 
 		return;
@@ -441,7 +441,7 @@ void CSlideshowDisplay::RestoreControlPanels( void )
 
 		if ( pScreen )
 		{
-			int nScreen = m_hScreens.AddToTail( );
+			intp nScreen = m_hScreens.AddToTail( );
 			m_hScreens[nScreen].Set( pScreen );	
 			pScreen->SetActive( true );
 		}
@@ -570,7 +570,7 @@ void CSlideshowDisplay::BuildSlideShowImagesList( void )
 		}
 
 		// Find the generic list
-		int iList;
+		intp iList;
 		for ( iList = 0; iList < m_SlideKeywordList.Count(); ++iList )
 		{
 			if ( Q_strcmp( m_SlideKeywordList[ iList ]->szSlideKeyword, "" ) == 0 )

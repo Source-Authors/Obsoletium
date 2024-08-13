@@ -181,8 +181,8 @@ public:
 	virtual void			NPC_SecondaryFire( void );
 	virtual bool			NPC_HasPrimaryWeapon( void ) { return false; }
 	virtual bool			NPC_HasSecondaryWeapon( void ) { return false; }
-	virtual void			NPC_AimPrimaryWeapon( Vector vecTarget ) { return; }
-	virtual void			NPC_AimSecondaryWeapon( Vector vecTarget ) { return; }
+	virtual void			NPC_AimPrimaryWeapon( [[maybe_unused]] Vector vecTarget ) { return; }
+	virtual void			NPC_AimSecondaryWeapon( [[maybe_unused]] Vector vecTarget ) { return; }
 
 	// Weapon handling
 	virtual void			Weapon_PrimaryRanges( float *flMinRange, float *flMaxRange );

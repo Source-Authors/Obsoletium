@@ -955,7 +955,7 @@ int CNPC_AntlionGuard::SelectUnreachableSchedule( void )
 		// Tell any squadmates I'm going for this item so they don't as well
 		if ( GetSquad() != NULL )
 		{
-			GetSquad()->BroadcastInteraction( g_interactionAntlionGuardFoundPhysicsObject, (void *)((CBaseEntity *)m_hPhysicsTarget), this );
+			GetSquad()->BroadcastInteraction( g_interactionAntlionGuardFoundPhysicsObject, (CBaseEntity *)m_hPhysicsTarget, this );
 		}
 
 		return SCHED_ANTLIONGUARD_PHYSICS_ATTACK;
@@ -1108,7 +1108,7 @@ bool CNPC_AntlionGuard::ShouldCharge( const Vector &startPos, const Vector &endP
 	// We only need to hit the endpos with the edge of our bounding box
 	Vector vecDir = endPos - startPos;
 	VectorNormalize( vecDir );
-	float flWidth = WorldAlignSize().x * 0.5;
+	float flWidth = WorldAlignSize().x * 0.5f;
 	Vector vecTargetPos = endPos - (vecDir * flWidth);
 
 	// See if we can directly move there
@@ -1289,7 +1289,7 @@ int CNPC_AntlionGuard::MeleeAttack1Conditions( float flDot, float flDist )
 		return COND_CAN_MELEE_ATTACK1;
 
 	trace_t	tr;
-	TraceHull_SkipPhysics( WorldSpaceCenter(), GetEnemy()->WorldSpaceCenter(), Vector(-10,-10,-10), Vector(10,10,10), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5 );
+	TraceHull_SkipPhysics( WorldSpaceCenter(), GetEnemy()->WorldSpaceCenter(), Vector(-10,-10,-10), Vector(10,10,10), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5f );
 
 	// If we hit anything, go for it
 	if ( tr.fraction < 1.0f )
@@ -1759,7 +1759,6 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 				if ( HasCondition( COND_ENEMY_UNREACHABLE ) && HasCondition( COND_ENEMY_FACING_ME ) == false )
 				{
 					// Build an arc around the top of the target that we'll offset our aim by
-					Vector vecOffset;
 					float flSin, flCos;
 					float flRad = random->RandomFloat( 0, M_PI / 6.0f ); // +/- 30 deg
 					if ( random->RandomInt( 0, 1 ) )
@@ -1830,7 +1829,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 		// Notify any squad members that we're no longer monopolizing this object
 		if ( GetSquad() != NULL )
 		{
-			GetSquad()->BroadcastInteraction( g_interactionAntlionGuardShovedPhysicsObject, (void *)((CBaseEntity *)m_hPhysicsTarget), this );
+			GetSquad()->BroadcastInteraction( g_interactionAntlionGuardShovedPhysicsObject, (CBaseEntity *)m_hPhysicsTarget, this );
 		}
 
 		m_hPhysicsTarget = NULL;
@@ -2152,7 +2151,7 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	// Hack to make antlion guard harder in HARD
 	if ( g_pGameRules->IsSkillLevel(SKILL_HARD) && !(info.GetDamageType() & DMG_CRUSH) )
 	{
-		dInfo.SetDamage( dInfo.GetDamage() * 0.75 );
+		dInfo.SetDamage( dInfo.GetDamage() * 0.75f );
 	}
 
 	// Cap damage taken by crushing (otherwise we can get crushed oddly)
@@ -2690,7 +2689,7 @@ void CNPC_AntlionGuard::ChargeLookAhead( void )
 	Vector vecTestPos = GetAbsOrigin() + ( vecForward * m_flGroundSpeed * 0.75 );
 	Vector testHullMins = GetHullMins();
 	testHullMins.z += (StepHeight() * 2);
-	TraceHull_SkipPhysics( GetAbsOrigin(), vecTestPos, testHullMins, GetHullMaxs(), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5 );
+	TraceHull_SkipPhysics( GetAbsOrigin(), vecTestPos, testHullMins, GetHullMaxs(), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5f );
 
 	//NDebugOverlay::Box( tr.startpos, testHullMins, GetHullMaxs(), 0, 255, 0, true, 0.1f );
 	//NDebugOverlay::Box( vecTestPos, testHullMins, GetHullMaxs(), 255, 0, 0, true, 0.1f );
@@ -3151,7 +3150,7 @@ void CNPC_AntlionGuard::SummonAntlions( void )
 
 	// Only spawn up to our max count
 	int iSpawnPoint = 0;
-	for ( int i = 0; (m_iNumLiveAntlions < ANTLIONGUARD_SUMMON_COUNT) && (iSpawnPoint < ARRAYSIZE(sAntlionSpawnPositions)); i++ )
+	for ( int i = 0; (m_iNumLiveAntlions < ANTLIONGUARD_SUMMON_COUNT) && (iSpawnPoint < static_cast<int>(ARRAYSIZE(sAntlionSpawnPositions))); i++ )
 	{
 		// Determine spawn position for the antlion
 		Vector vecSpawn = GetAbsOrigin() + ( sAntlionSpawnPositions[iSpawnPoint].flForward * vecForward ) + ( sAntlionSpawnPositions[iSpawnPoint].flRight * vecRight );
@@ -3726,7 +3725,7 @@ bool CNPC_AntlionGuard::IsUnreachable(CBaseEntity *pEntity)
 
 	// Note that it's ok to remove elements while I'm iterating
 	// as long as I iterate backwards and remove them using FastRemove
-	for (int i=m_UnreachableEnts.Size()-1;i>=0;i--)
+	for (intp i=m_UnreachableEnts.Count()-1;i>=0;i--)
 	{
 		// Remove any dead elements
 		if (m_UnreachableEnts[i].hUnreachableEnt == NULL)

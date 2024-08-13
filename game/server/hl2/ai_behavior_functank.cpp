@@ -133,8 +133,6 @@ int	CAI_FuncTankBehavior::SelectSchedule()
 		// Scan for enemies.
 		return SCHED_SCAN_WITH_FUNCTANK;
 	}
-
-	return SCHED_IDLE_STAND;
 }
 
 //-----------------------------------------------------------------------------

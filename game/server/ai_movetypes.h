@@ -244,19 +244,19 @@ public:
 	//
 	// Local navigation notifications, each allows services provider to overridde default result
 	//
-	virtual bool OnCalcBaseMove( AILocalMoveGoal_t *pMoveGoal, float distClear, AIMoveResult_t *pResult ) { return false; }
-	virtual bool OnObstructionPreSteer( AILocalMoveGoal_t *pMoveGoal, float distClear, AIMoveResult_t *pResult ) { return false;	}
-	virtual bool OnFailedSteer( AILocalMoveGoal_t *pMoveGoal, float distClear, AIMoveResult_t *pResult ) { return false;	}
-	virtual bool OnFailedLocalNavigation( AILocalMoveGoal_t *pMoveGoal, float distClear, AIMoveResult_t *pResult ) { return false;	}
-	virtual bool OnInsufficientStopDist( AILocalMoveGoal_t *pMoveGoal, float distClear, AIMoveResult_t *pResult ) { return false;	}
-	virtual bool OnMoveBlocked( AIMoveResult_t *pResult ) { return false;	}
+	virtual bool OnCalcBaseMove( AILocalMoveGoal_t *, float, AIMoveResult_t * ) { return false; }
+	virtual bool OnObstructionPreSteer( AILocalMoveGoal_t *, float, AIMoveResult_t * ) { return false;	}
+	virtual bool OnFailedSteer( AILocalMoveGoal_t *, float, AIMoveResult_t * ) { return false;	}
+	virtual bool OnFailedLocalNavigation( AILocalMoveGoal_t *, float, AIMoveResult_t * ) { return false;	}
+	virtual bool OnInsufficientStopDist( AILocalMoveGoal_t *, float, AIMoveResult_t * ) { return false;	}
+	virtual bool OnMoveBlocked( AIMoveResult_t * ) { return false;	}
 	
 	//---------------------------------
 	//
 	// Motor notifications, each allows services provider to overridde default result
 	//
-	virtual bool OnMoveStalled( const AILocalMoveGoal_t &move ) { return false;	}
-	virtual bool OnMoveExecuteFailed( const AILocalMoveGoal_t &move, const AIMoveTrace_t &trace, AIMotorMoveResult_t fMotorResult, AIMoveResult_t *pResult ) { return false;	}
+	virtual bool OnMoveStalled( const AILocalMoveGoal_t & ) { return false;	}
+	virtual bool OnMoveExecuteFailed( const AILocalMoveGoal_t &, const AIMoveTrace_t &, AIMotorMoveResult_t, AIMoveResult_t * ) { return false;	}
 	
 };
 

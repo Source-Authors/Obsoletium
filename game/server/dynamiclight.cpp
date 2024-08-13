@@ -166,7 +166,7 @@ void CDynamicLight::Spawn( void )
 	if ( m_target != NULL_STRING )
 	{
 		SetThink( &CDynamicLight::DynamicLightThink );
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 	
 	int clampedExponent = clamp( (int) m_Exponent, MIN_DL_EXPONENT_VALUE, MAX_DL_EXPONENT_VALUE );
@@ -199,5 +199,5 @@ void CDynamicLight::DynamicLightThink( void )
 		SetAbsAngles( vecAngles );
 	}
 	
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 }

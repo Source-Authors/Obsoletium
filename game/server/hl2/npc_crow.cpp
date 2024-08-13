@@ -95,7 +95,7 @@ void CNPC_Crow::Spawn( void )
 	AddSpawnFlags( SF_NPC_FADE_CORPSE );
 #endif // _XBOX
 
-	char *szModel = (char *)STRING( GetModelName() );
+	const char *szModel = (const char *)STRING( GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = "models/crow.mdl";
@@ -245,7 +245,7 @@ void CNPC_Crow::HandleAnimEvent( animevent_t *pEvent )
 			gravity = 1;
 		}
 
-		float height = 0.25 * flHopDistance;
+		float height = 0.25f * flHopDistance;
 		float speed = sqrt( 2 * gravity * height );
 		float time = speed / gravity;
 
@@ -266,7 +266,7 @@ void CNPC_Crow::HandleAnimEvent( animevent_t *pEvent )
 		float distance = vecJumpDir.Length();
 		if ( distance > 650 )
 		{
-			vecJumpDir = vecJumpDir * ( 650.0 / distance );
+			vecJumpDir = vecJumpDir * ( 650.0f / distance );
 		}
 
 		m_nMorale -= random->RandomInt( 1, 6 );

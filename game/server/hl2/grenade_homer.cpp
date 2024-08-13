@@ -145,7 +145,7 @@ void CGrenadeHomer::SetSpin(float flSpinMagnitude, float flSpinSpeed)
 {
 	m_flSpinMagnitude	= flSpinMagnitude;
 	m_flSpinSpeed		= flSpinSpeed;
-	m_flSpinOffset		= random->RandomInt(-m_flSpinSpeed,m_flSpinSpeed);
+	m_flSpinOffset		= random->RandomFloat(-m_flSpinSpeed,m_flSpinSpeed);
 }
 
 //------------------------------------------------------------------------------
@@ -330,7 +330,7 @@ void CGrenadeHomer::Launch( CBaseEntity*		pOwner,
 	{
 		// Figure out how long it'll take for me to reach the target.
 		float flDist = ( pTarget->WorldSpaceCenter() - WorldSpaceCenter() ).Length();
-		float flTime = MAX( 0.5, flDist / GetAbsVelocity().Length() );
+		float flTime = MAX( 0.5f, flDist / GetAbsVelocity().Length() );
 
 		CSoundEnt::InsertSound ( SOUND_DANGER, m_hTarget->GetAbsOrigin(), 300, flTime, pOwner );
 	}

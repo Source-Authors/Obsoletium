@@ -683,7 +683,7 @@ void CAI_RadialLinkController::ModifyNodeLinks( bool bMakeStale )
 
 	VPROF_BUDGET("ModifyLinks", "ModifyLinks");
 
-	const float MinDistCareSq = Square( ai_radial_max_link_dist.GetFloat() + 0.1 );
+	const float MinDistCareSq = Square( ai_radial_max_link_dist.GetFloat() + 0.1f );
 
 	for ( int i = 0; i < nNodes; i++ )
 	{

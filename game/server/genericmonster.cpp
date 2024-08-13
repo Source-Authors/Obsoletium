@@ -75,7 +75,7 @@ float CGenericNPC::MaxYawSpeed ( void )
 void CGenericNPC::TempGunEffect( void )
 {
 	QAngle vecAngle;
-	Vector vecDir, vecShot;
+	Vector vecDir;
 	Vector vecMuzzle, vecButt;
 
 	GetAttachment( 2, vecMuzzle, vecAngle );

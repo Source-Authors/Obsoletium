@@ -14,7 +14,7 @@
 
 class CAI_BaseNPC;
 class CAI_Enemies;
-typedef int AI_TaskFailureCode_t;
+typedef intp AI_TaskFailureCode_t;
 struct Task_t;
 
 //-----------------------------------------------------------------------------
@@ -129,7 +129,7 @@ public:
 		return pResult;
 	};
 
-	void *operator new( size_t nBytes, int nBlockUse, const char *pFileName, int nLine )
+	void *operator new( size_t nBytes, int, const char *pFileName, int nLine )
 	{
 		MEM_ALLOC_CREDIT();
 		void *pResult = MemAlloc_Alloc( nBytes, pFileName, nLine );
@@ -144,7 +144,7 @@ public:
 	}
 
 	// dimhotepus: Add to call this.
-	void operator delete( void *pMem, int nBlockUse, const char *pFileName, int nLine )
+	void operator delete( void *pMem, int, const char *pFileName, int nLine )
 	{ 
 		MemAlloc_Free( pMem, pFileName, nLine );
 	}

@@ -272,7 +272,7 @@ void CNPC_GroundTurret::DeathEffects()
 		CTakeDamageInfo info;
 		DeathSound( info );
 		m_bHasExploded = true;
-		SetNextThink( gpGlobals->curtime + 0.5 );
+		SetNextThink( gpGlobals->curtime + 0.5f );
 	}
 	else
 	{

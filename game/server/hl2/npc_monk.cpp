@@ -305,7 +305,7 @@ void CNPC_Monk::DeathSound( const CTakeDamageInfo &info )
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-WeaponProficiency_t CNPC_Monk::CalcWeaponProficiency( CBaseCombatWeapon *pWeapon )
+WeaponProficiency_t CNPC_Monk::CalcWeaponProficiency( CBaseCombatWeapon * )
 {
 	return WEAPON_PROFICIENCY_PERFECT;
 }

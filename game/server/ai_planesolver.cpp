@@ -54,13 +54,13 @@ inline float cube( float f )
 
 CAI_PlaneSolver::CAI_PlaneSolver( CAI_BaseNPC *pNpc ) 
  :	m_pNpc( pNpc ),
-	m_fSolvedPrev( false ),
 	m_PrevTarget( FLT_MAX, FLT_MAX, FLT_MAX ),
+	m_fSolvedPrev( false ),
 	m_PrevSolution( 0 ),
 	m_ClosestHaveBeenToCurrent( FLT_MAX ),
 	m_TimeLastProgress( FLT_MAX ),
 	m_fCannotSolveCurrent( false ),
-	m_RefreshSamplesTimer( PLANE_SOLVER_THINK_FREQUENCY[AIStrongOpt()] - 0.05 )
+	m_RefreshSamplesTimer( PLANE_SOLVER_THINK_FREQUENCY[AIStrongOpt()] - 0.05f )
 {
 }
 
@@ -202,7 +202,7 @@ float CAI_PlaneSolver::CalculateRegulationWeight( const AIMoveTrace_t &moveTrace
 		weight = 0;
 	else
 	{
-		weight = sq( ( pctBlocked - 0.1 ) / 0.8 );
+		weight = sq( ( pctBlocked - 0.1f ) / 0.8f );
 		weight = AdjustRegulationWeight( moveTrace.pObstruction, weight );
 	}
 
@@ -440,7 +440,6 @@ AI_SuggestorResult_t CAI_PlaneSolver::GenerateObstacleSuggestions( const AILocal
 		int   nSideProbes  = (nProbes - 1) / 2;
 		float yawGoalDir   = UTIL_VecToYaw( goal.dir );
 		
-		Vector 		  probeTarget;
 		AIMoveTrace_t moveTrace;
 		int			  i;
 		

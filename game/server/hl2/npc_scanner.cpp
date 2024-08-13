@@ -498,7 +498,7 @@ void CNPC_CScanner::HandleAnimEvent( animevent_t *pEvent )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-char *CNPC_CScanner::GetEngineSound( void )
+const char *CNPC_CScanner::GetEngineSound( void )
 {
 	if( m_bIsClawScanner )
 		return "NPC_SScanner.FlyLoop";
@@ -603,11 +603,11 @@ void CNPC_CScanner::RequestInspectSupport(void)
 			{
 				if (GetTarget())
 				{
-					pSquadMember->DispatchInteraction(g_interactionScannerSupportEntity,((void *)((CBaseEntity*)GetTarget())),this);
+					pSquadMember->DispatchInteraction(g_interactionScannerSupportEntity,GetTarget(),this);
 				}
 				else
 				{
-					pSquadMember->DispatchInteraction(g_interactionScannerSupportPosition,((void *)m_vInspectPos.Base()),this);
+					pSquadMember->DispatchInteraction(g_interactionScannerSupportPosition,m_vInspectPos.Base(),this);
 				}
 			}
 		}
@@ -1723,7 +1723,8 @@ Vector CNPC_CScanner::SpotlightCurrentPos(void)
 	//  Calculate new beam direction
 	// ------------------------------
 	m_vSpotlightDir = m_vSpotlightDir + m_vSpotlightAngVelocity;
-	m_vSpotlightDir = m_vSpotlightDir;
+	// dimhotepus: Drop self-assignment.
+	// m_vSpotlightDir = m_vSpotlightDir;
 	VectorNormalize(m_vSpotlightDir);
 
 
@@ -1839,7 +1840,7 @@ void CNPC_CScanner::SpotlightUpdate(void)
 	}
 	else
 	{
-		m_hSpotlightTarget->SetRenderColorA( 1.0 );
+		m_hSpotlightTarget->SetRenderColorA( 1 );
 		m_hSpotlight->SetFadeLength(m_flSpotlightCurLength);
 	}
 
@@ -1873,7 +1874,6 @@ void CNPC_CScanner::TakePhoto(void)
 	m_pEyeFlash->SetColor(255,255,255);
 
 	Vector vRawPos		= InspectTargetPosition();
-	Vector vLightPos	= vRawPos;
 
 	// If taking picture of entity, aim at feet
 	if ( GetTarget() )
@@ -2084,7 +2084,7 @@ void CNPC_CScanner::StartTask( const Task_t *pTask )
 			CNPC_Citizen *pCitizen = dynamic_cast<CNPC_Citizen *>( GetTarget() );
 			if ( pCitizen )
 			{
-				pCitizen->SetNextScannerInspectTime( gpGlobals->curtime + 5.0 );
+				pCitizen->SetNextScannerInspectTime( gpGlobals->curtime + 5.0f );
 			}
 
 			TaskFail("No route to inspection target!\n");
@@ -2261,7 +2261,7 @@ void CNPC_CScanner::StartTask( const Task_t *pTask )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-char *CNPC_CScanner::GetScannerSoundPrefix( void )
+const char *CNPC_CScanner::GetScannerSoundPrefix( void )
 {
 	if( m_bIsClawScanner )
 		return "NPC_SScanner";
@@ -2289,7 +2289,7 @@ void CNPC_CScanner::AdjustScannerVelocity( void )
 {
 	if ( m_bIsClawScanner )
 	{
-		m_vCurrentVelocity *= ( 1 + sin( ( gpGlobals->curtime + m_flFlyNoiseBase ) * 2.5f ) * .1 );
+		m_vCurrentVelocity *= ( 1 + sin( ( gpGlobals->curtime + m_flFlyNoiseBase ) * 2.5f ) * .1f );
 	}
 }
 

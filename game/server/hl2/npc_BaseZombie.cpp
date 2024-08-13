@@ -1019,7 +1019,7 @@ void CNPC_BaseZombie::MoanSound( envelopePoint_t *pEnvelope, int iEnvelopeSize )
 	float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pMoanSound, SOUNDCTRL_CHANGE_VOLUME, pEnvelope, iEnvelopeSize );
 
 	float flPitch = random->RandomInt( m_flMoanPitch + zombie_changemin.GetInt(), m_flMoanPitch + zombie_changemax.GetInt() );
-	ENVELOPE_CONTROLLER.SoundChangePitch( m_pMoanSound, flPitch, 0.3 );
+	ENVELOPE_CONTROLLER.SoundChangePitch( m_pMoanSound, flPitch, 0.3f );
 
 	m_flNextMoanSound = gpGlobals->curtime + duration + 9999;
 }
@@ -1628,7 +1628,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 
 		pString = nexttoken( token, pString, ' ' );
 
-		if ( !token )
+		if ( !token[0] )
 		{
 			Warning( "AE_ZOMBIE_POPHEADCRAB event format missing velocity parameter! Usage: event AE_ZOMBIE_POPHEADCRAB \"<BoneName> <Speed>\" \n" );
 			return;
@@ -2087,7 +2087,6 @@ void CNPC_BaseZombie::StartTask( const Task_t *pTask )
 
 	case TASK_ZOMBIE_GET_PATH_TO_PHYSOBJ:
 		{
-			Vector vecGoalPos;
 			Vector vecDir;
 
 			vecDir = GetLocalOrigin() - m_hPhysicsEnt->GetLocalOrigin();
@@ -2150,8 +2149,7 @@ void CNPC_BaseZombie::StartTask( const Task_t *pTask )
 #ifndef HL2_EPISODIC
 			TaskComplete();
 			return;
-#endif
-
+#else
 			// Don't wait when attacking the player
 			if ( GetEnemy() && GetEnemy()->IsPlayer() )
 			{
@@ -2160,7 +2158,8 @@ void CNPC_BaseZombie::StartTask( const Task_t *pTask )
 			}
 
 			// Wait a single think
-			SetWait( 0.1 );
+			SetWait( 0.1f );
+#endif
 		}
 		break;
 

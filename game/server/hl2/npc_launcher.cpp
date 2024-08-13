@@ -288,7 +288,7 @@ void CNPC_Launcher::LaunchGrenade( CBaseEntity* pEnemy )
 		CGrenadeHomer *pGrenade = CGrenadeHomer::CreateGrenadeHomer( m_sMissileModel, m_sFlySound,  GetAbsOrigin(), vec3_angle, edict() );
 		pGrenade->Spawn( );
 		pGrenade->SetSpin(m_flSpinMagnitude,m_flSpinSpeed);
-		pGrenade->SetHoming((0.01*m_nHomingStrength),m_flHomingDelay,m_flHomingRampUp,m_flHomingDuration,m_flHomingRampDown);
+		pGrenade->SetHoming((0.01f*m_nHomingStrength),m_flHomingDelay,m_flHomingRampUp,m_flHomingDuration,m_flHomingRampDown);
 		pGrenade->SetDamage(m_flDamage);
 		pGrenade->SetDamageRadius(m_flDamageRadius);
 		pGrenade->Launch(this,pEnemy,vLaunchVelocity,m_flHomingSpeed,GetGravity(),m_nSmokeTrail);
@@ -348,7 +348,7 @@ bool CNPC_Launcher::IsValidEnemy( CBaseEntity *pTarget )
 
 	// Trace from launch position to target position.  
 	// Use position above actual barral based on vertical launch speed
-	Vector vStartPos = GetAbsOrigin() + Vector(0,0,0.2*m_flLaunchSpeed);
+	Vector vStartPos = GetAbsOrigin() + Vector(0,0,0.2f*m_flLaunchSpeed);
 	Vector vEndPos	 = pTarget->GetAbsOrigin();
 	AI_TraceLine( vStartPos, vEndPos, MASK_SHOT, pTarget, COLLISION_GROUP_NONE, &tr );
 

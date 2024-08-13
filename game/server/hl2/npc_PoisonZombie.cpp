@@ -722,7 +722,7 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 		QAngle qaPunch( 45, random->RandomInt(-5, 5), random->RandomInt(-5, 5) );
 		AngleVectors( GetLocalAngles(), &forward );
 		forward = forward * 200;
-		ClawAttack( GetClawAttackRange(), sk_zombie_poison_dmg_spit.GetFloat(), qaPunch, forward, ZOMBIE_BLOOD_BITE );
+		ClawAttack( GetClawAttackRange(), sk_zombie_poison_dmg_spit.GetInt(), qaPunch, forward, ZOMBIE_BLOOD_BITE );
 		return;
 	}
 
@@ -1081,8 +1081,8 @@ void CNPC_PoisonZombie::MoanSound( envelopePoint_t *pEnvelope, int iEnvelopeSize
 
 	float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pMoanSound, SOUNDCTRL_CHANGE_VOLUME, pEnvelope, iEnvelopeSize );
 
-	float flPitchShift = random->RandomInt( -4, 4 );
-	ENVELOPE_CONTROLLER.SoundChangePitch( m_pMoanSound, m_flMoanPitch + flPitchShift, 0.3 );
+	float flPitchShift = random->RandomFloat( -4.0f, 4.0f );
+	ENVELOPE_CONTROLLER.SoundChangePitch( m_pMoanSound, m_flMoanPitch + flPitchShift, 0.3f );
 
 	m_flNextMoanSound = gpGlobals->curtime + duration + 9999;
 }

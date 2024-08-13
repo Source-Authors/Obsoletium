@@ -25,40 +25,40 @@ extern ConVar    sk_plr_dmg_smg1_grenade;
 
 class CWeaponSMG1 : public CHLSelectFireMachineGun
 {
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 public:
 	DECLARE_CLASS( CWeaponSMG1, CHLSelectFireMachineGun );
 
 	CWeaponSMG1();
 
-	DECLARE_SERVERCLASS();
+	DECLARE_SERVERCLASS_OVERRIDE();
 	
-	void	Precache( void );
-	void	AddViewKick( void );
-	void	SecondaryAttack( void );
+	void	Precache( void ) override;
+	void	AddViewKick( void ) override;
+	void	SecondaryAttack( void ) override;
 
-	int		GetMinBurst() { return 2; }
-	int		GetMaxBurst() { return 5; }
+	int		GetMinBurst() override { return 2; }
+	int		GetMaxBurst() override { return 5; }
 
-	virtual void Equip( CBaseCombatCharacter *pOwner );
-	bool	Reload( void );
+	void Equip( CBaseCombatCharacter *pOwner ) override;
+	bool	Reload( void ) override;
 
-	float	GetFireRate( void ) { return 0.075f; }	// 13.3hz
-	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
-	int		WeaponRangeAttack2Condition( float flDot, float flDist );
-	Activity	GetPrimaryAttackActivity( void );
+	float	GetFireRate( void ) override { return 0.075f; }	// 13.3hz
+	int		CapabilitiesGet( void ) override { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+	int		WeaponRangeAttack2Condition( float flDot, float flDist ) override;
+	Activity	GetPrimaryAttackActivity( void ) override;
 
-	virtual const Vector& GetBulletSpread( void )
+	const Vector& GetBulletSpread( void ) override
 	{
 		static const Vector cone = VECTOR_CONE_5DEGREES;
 		return cone;
 	}
 
-	const WeaponProficiencyInfo_t *GetProficiencyValues();
+	const WeaponProficiencyInfo_t *GetProficiencyValues() override;
 
 	void FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, Vector &vecShootOrigin, Vector &vecShootDir );
-	void Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary );
-	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+	void Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary ) override;
+	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator ) override;
 
 	DECLARE_ACTTABLE();
 
@@ -179,7 +179,7 @@ void CWeaponSMG1::FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, Vector 
 	// FIXME: use the returned number of bullets to account for >10hz firerate
 	WeaponSoundRealtime( SINGLE_NPC );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
+	CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2f, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
 	pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED,
 		MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2, entindex(), 0 );
 
@@ -380,7 +380,7 @@ void CWeaponSMG1::SecondaryAttack( void )
 	m_flNextSecondaryAttack = gpGlobals->curtime + 1.0f;
 
 	// Register a muzzleflash for the AI.
-	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5 );	
+	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5f );	
 
 	m_iSecondaryAttacks++;
 	gamestats->Event_WeaponFired( pPlayer, false, GetClassname() );

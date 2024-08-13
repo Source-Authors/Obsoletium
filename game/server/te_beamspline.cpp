@@ -86,7 +86,7 @@ void CTEBeamSpline::Test( const Vector& current_origin, const QAngle& current_an
 	{
 		m_vecPoints.Set( i, m_vecStart );
 		VectorMA( m_vecStart, 128/m_nPoints, right, m_vecStart );
-		VectorMA( m_vecStart, 30.0/m_nPoints, forward, m_vecStart );
+		VectorMA( m_vecStart, 30.0f/m_nPoints, forward, m_vecStart );
 	}
 
 	CBroadcastRecipientFilter filter;

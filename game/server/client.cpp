@@ -125,7 +125,7 @@ char * CheckChatText( CBasePlayer *pPlayer, char *text )
 	if ( !text || !text[0] )
 		return NULL;
 
-	int length = Q_strlen( text );
+	intp length = Q_strlen( text );
 
 	// remove quotes (leading & trailing) if present
 	if (*p == '"')
@@ -153,7 +153,7 @@ char * CheckChatText( CBasePlayer *pPlayer, char *text )
 void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 {
 	CBasePlayer *client;
-	int		j;
+	intp	j;
 	char	*p;
 	char	text[256];
 	char    szTemp[256];
@@ -251,8 +251,8 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 		Q_snprintf( text, sizeof(text), "%s: ", pszPlayerName );
 	}
 
-	j = sizeof(text) - 2 - strlen(text);  // -2 for /n and null terminator
-	if ( (int)strlen(p) > j )
+	j = sizeof(text) - 2 - V_strlen(text);  // -2 for /n and null terminator
+	if ( V_strlen(p) > j )
 		p[j] = 0;
 
 	Q_strncat( text, p, sizeof( text ), COPY_ALL_CHARACTERS );
@@ -657,12 +657,13 @@ void CC_DrawLine( const CCommand &args )
 	Vector startPos;
 	Vector endPos;
 
-	startPos.x = clamp( atof(args[1]), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
-	startPos.y = clamp( atof(args[2]), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
-	startPos.z = clamp( atof(args[3]), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
-	endPos.x = clamp( atof(args[4]), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
-	endPos.y = clamp( atof(args[5]), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
-	endPos.z = clamp( atof(args[6]), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+	// dimhotepus: atof -> strtof.
+	startPos.x = clamp( strtof(args[1], nullptr), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+	startPos.y = clamp( strtof(args[2], nullptr), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+	startPos.z = clamp( strtof(args[3], nullptr), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+	endPos.x = clamp( strtof(args[4], nullptr), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+	endPos.y = clamp( strtof(args[5], nullptr), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+	endPos.z = clamp( strtof(args[6], nullptr), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
 
 	UTIL_AddDebugLine(startPos,endPos,true,true);
 }
@@ -677,9 +678,10 @@ void CC_DrawCross( const CCommand &args )
 {
 	Vector vPosition;
 
-	vPosition.x = clamp( atof(args[1]), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
-	vPosition.y = clamp( atof(args[2]), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
-	vPosition.z = clamp( atof(args[3]), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+	// dimhotepus: atof -> strtof.
+	vPosition.x = clamp( strtof(args[1], nullptr), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+	vPosition.y = clamp( strtof(args[2], nullptr), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+	vPosition.z = clamp( strtof(args[3], nullptr), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
 
 	// Offset since min and max z in not about center
 	Vector mins = Vector(-5,-5,-5);
@@ -1249,9 +1251,10 @@ CON_COMMAND_F( setpos, "Move player to specified origin (must have sv_cheats).",
 	Vector oldorigin = pPlayer->GetAbsOrigin();
 
 	Vector newpos;
-	newpos.x = clamp( atof( args[1] ), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
-	newpos.y = clamp( atof( args[2] ), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
-	newpos.z = args.ArgC() == 4 ?  clamp( atof( args[3] ), MIN_COORD_FLOAT, MAX_COORD_FLOAT ) : oldorigin.z;
+	// dimhotepus: atof -> strtof.
+	newpos.x = clamp( strtof( args[1], nullptr ), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+	newpos.y = clamp( strtof( args[2], nullptr ), MIN_COORD_FLOAT, MAX_COORD_FLOAT );
+	newpos.z = args.ArgC() == 4 ?  clamp( strtof( args[3], nullptr ), MIN_COORD_FLOAT, MAX_COORD_FLOAT ) : oldorigin.z;
 
 	pPlayer->SetAbsOrigin( newpos );
 
@@ -1300,7 +1303,8 @@ static float GetHexFloat( const char *pStr )
 		return *reinterpret_cast< const float * >( &f );
 	}
 	
-	return atof( pStr );
+	// dimhotepus: atof -> strtof.
+	return strtof( pStr, nullptr );
 }
 
 //------------------------------------------------------------------------------

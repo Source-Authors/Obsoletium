@@ -318,7 +318,7 @@ void CAI_AccelDecay::SetMaxVelocity( float maxVelocity )
 {
 	if (maxVelocity != m_maxVelocity)
 	{
-		SetParameters( m_minVelocity, maxVelocity, m_accel, 1.0 - m_invDecay );
+		SetParameters( m_minVelocity, maxVelocity, m_accel, 1.0f - m_invDecay );
 	}
 }
 

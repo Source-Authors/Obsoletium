@@ -21,19 +21,19 @@
 #include "rope_shared.h"
 #include "physics_bone_follower.h"
 
-#define CRANE_EXTENSION_RATE_MAX	0.01
-#define CRANE_TURN_RATE_MAX			1.2
+#define CRANE_EXTENSION_RATE_MAX	0.01f
+#define CRANE_TURN_RATE_MAX			1.2f
 #define MAXIMUM_CRANE_PICKUP_MASS	10000
 #define MINIMUM_CRANE_PICKUP_MASS	500
 
-#define MAX_CRANE_FLAT_REACH		1400.0
-#define MIN_CRANE_FLAT_REACH		700.0
-#define CRANE_EXTENSION_ACCEL		0.006
-#define CRANE_EXTENSION_DECEL		0.02
-#define CRANE_TURN_ACCEL			0.2
-#define CRANE_DECEL					0.5
+#define MAX_CRANE_FLAT_REACH		1400.0f
+#define MIN_CRANE_FLAT_REACH		700.0f
+#define CRANE_EXTENSION_ACCEL		0.006f
+#define CRANE_EXTENSION_DECEL		0.02f
+#define CRANE_TURN_ACCEL			0.2f
+#define CRANE_DECEL					0.5f
 
-#define CRANE_SLOWRAISE_TIME		5.0
+#define CRANE_SLOWRAISE_TIME		5.0f
 
 // Turning stats
 enum

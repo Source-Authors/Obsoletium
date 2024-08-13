@@ -64,6 +64,14 @@ struct LayerRecord
 		m_weight = src.m_weight;
 		m_order = src.m_order;
 	}
+	LayerRecord& operator=(const LayerRecord& src )
+	{
+		m_sequence = src.m_sequence;
+		m_cycle = src.m_cycle;
+		m_weight = src.m_weight;
+		m_order = src.m_order;
+		return *this;
+	}
 };
 
 struct LagRecord
@@ -176,26 +184,26 @@ public:
 	}
 
 	// IServerSystem stuff
-	virtual void Shutdown()
+	void Shutdown() override
 	{
 		ClearHistory();
 	}
 
-	virtual void LevelShutdownPostEntity()
+	void LevelShutdownPostEntity() override
 	{
 		ClearHistory();
 	}
 
 	// called after entities think
-	virtual void FrameUpdatePostEntityThink();
+	void FrameUpdatePostEntityThink() override;
 
 	// ILagCompensationManager stuff
 
 	// Called during player movement to set up/restore after lag compensation
-	void			StartLagCompensation( CBasePlayer *player, CUserCmd *cmd );
-	void			FinishLagCompensation( CBasePlayer *player );
+	void			StartLagCompensation( CBasePlayer *player, CUserCmd *cmd ) override;
+	void			FinishLagCompensation( CBasePlayer *player ) override;
 
-	bool			IsCurrentlyDoingLagCompensation() const OVERRIDE { return m_isCurrentlyDoingCompensation; }
+	bool			IsCurrentlyDoingLagCompensation() const override { return m_isCurrentlyDoingCompensation; }
 
 private:
 	void			BacktrackPlayer( CBasePlayer *player, float flTargetTime );
@@ -265,7 +273,7 @@ void CLagCompensationManager::FrameUpdatePostEntityThink()
 		Assert( track->Count() < 1000 ); // insanity check
 
 		// remove tail records that are too old
-		int tailIndex = track->Tail();
+		intp tailIndex = track->Tail();
 		while ( track->IsValidIndex( tailIndex ) )
 		{
 			LagRecord &tail = track->Element( tailIndex );
@@ -437,7 +445,7 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 	if ( track->Count() <= 0 )
 		return;
 
-	int curr = track->Head();
+	intp curr = track->Head();
 
 	LagRecord *prevRecord = NULL;
 	LagRecord *record = NULL;

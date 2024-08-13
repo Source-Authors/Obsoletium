@@ -107,9 +107,9 @@ void BasicGameStats_t::SaveToBuffer( CUtlBuffer& buf )
 
 	m_Summary.SaveToBuffer( buf );
 
-	int c = m_MapTotals.Count();
+	size_t c = m_MapTotals.Count();
 	buf.PutInt( c );
-	for ( int i = m_MapTotals.First(); i != m_MapTotals.InvalidIndex(); i = m_MapTotals.Next( i ) )
+	for ( auto i = m_MapTotals.First(); i != m_MapTotals.InvalidIndex(); i = m_MapTotals.Next( i ) )
 	{
 		char const *name = m_MapTotals.GetElementName( i );
 		BasicGameStatsRecord_t &rec = m_MapTotals[ i ];
@@ -126,7 +126,7 @@ void BasicGameStats_t::SaveToBuffer( CUtlBuffer& buf )
 
 BasicGameStatsRecord_t *BasicGameStats_t::FindOrAddRecordForMap( char const *mapname )
 {
-	int idx = m_MapTotals.Find( mapname );
+	auto idx = m_MapTotals.Find( mapname );
 	if ( idx == m_MapTotals.InvalidIndex() )
 	{
 		idx = m_MapTotals.Insert( mapname );

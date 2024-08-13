@@ -60,7 +60,7 @@ CTEMuzzleFlash::~CTEMuzzleFlash( void )
 // Input  : *current_origin - 
 //			*current_angles - 
 //-----------------------------------------------------------------------------
-void CTEMuzzleFlash::Test( const Vector& current_origin, const QAngle& current_angles )
+void CTEMuzzleFlash::Test( const Vector&, const QAngle& )
 {
 }
 

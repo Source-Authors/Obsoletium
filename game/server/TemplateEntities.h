@@ -18,7 +18,7 @@
 class CBaseEntity;
 class CPointTemplate;
 
-int			Templates_Add(CBaseEntity *pEntity, const char *pszMapData, int nLen);
+intp		Templates_Add(CBaseEntity *pEntity, const char *pszMapData, int nLen);
 string_t	Templates_FindByIndex( int iIndex );
 int			Templates_GetStringSize( int iIndex );
 string_t	Templates_FindByTargetName(const char *pszName);

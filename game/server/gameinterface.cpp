@@ -321,7 +321,7 @@ bool UTIL_GetModDir( char *lpszTextOut, unsigned int nSize )
 		Q_StripLastDir( lpszTextOut, nSize );
 		
 		// Find the difference in string lengths and take that difference from the original string as the mod dir
-		int dirlen = Q_strlen( lpszTextOut );
+		intp dirlen = Q_strlen( lpszTextOut );
 		Q_strncpy( lpszTextOut, pGameDir + dirlen, Q_strlen( pGameDir ) - dirlen + 1 );
 	}
 
@@ -619,10 +619,6 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	if ( (serverpluginhelpers = (IServerPluginHelpers *)appSystemFactory(INTERFACEVERSION_ISERVERPLUGINHELPERS, NULL)) == NULL )
 		return false;
 	if ( (scenefilecache = (ISceneFileCache *)appSystemFactory( SCENE_FILE_CACHE_INTERFACE_VERSION, NULL )) == NULL )
-		return false;
-	if ( IsX360() && (xboxsystem = (IXboxSystem *)appSystemFactory( XBOXSYSTEM_INTERFACE_VERSION, NULL )) == NULL )
-		return false;
-	if ( IsX360() && (matchmaking = (IMatchmaking *)appSystemFactory( VENGINE_MATCHMAKING_VERSION, NULL )) == NULL )
 		return false;
 
 	// If not running dedicated, grab the engine vgui interface
@@ -3005,7 +3001,7 @@ void CServerGameClients::ClientSetupVisibility( edict_t *pViewEntity, edict_t *p
 #endif
 
 		++iOutPortal;
-		if ( iOutPortal >= ARRAYSIZE( portalNums ) )
+		if ( iOutPortal >= static_cast<int>(ARRAYSIZE( portalNums )) )
 		{
 			engine->SetAreaPortalStates( portalNums, isOpen, iOutPortal );
 			iOutPortal = 0;
@@ -3020,7 +3016,7 @@ void CServerGameClients::ClientSetupVisibility( edict_t *pViewEntity, edict_t *p
 		{
 			if ( pCur->m_portalNumber < 0 )
 				continue;
-			else if ( pCur->m_portalNumber >= sizeof( portalBits ) * 8 )
+			else if ( pCur->m_portalNumber >= static_cast<int>(sizeof( portalBits )) * 8 )
 				Error( "ClientSetupVisibility: portal number (%d) too large", pCur->m_portalNumber );
 			else
 				portalBits[pCur->m_portalNumber >> 3] |= (1 << (pCur->m_portalNumber & 7));

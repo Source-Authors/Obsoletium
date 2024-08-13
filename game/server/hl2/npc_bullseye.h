@@ -40,7 +40,7 @@ public:
 	int		OnTakeDamage( const CTakeDamageInfo &info );
 	bool	UsePerfectAccuracy( void ) { return m_bPerfectAccuracy; }
 
-	bool	TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr ) { return false; } // force traces to test against hull
+	bool	TestHitboxes( const Ray_t &, unsigned int, trace_t& ) { return false; } // force traces to test against hull
 	
 	void	BullseyeThink( void );
 	bool	CanBecomeRagdoll( void );

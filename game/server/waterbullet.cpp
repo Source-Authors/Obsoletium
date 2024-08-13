@@ -74,14 +74,7 @@ void CWaterBullet::Spawn( const Vector &vecOrigin, const Vector &vecDir )
 void CWaterBullet::BulletThink()
 {
 	//NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() - GetAbsVelocity() * 0.1, 255, 255, 255, false, 1 );
-	SetNextThink( gpGlobals->curtime + 0.05 );
-
-/*
-	QAngle angles = GetAbsAngles();
-	angles.x += random->RandomInt( -6, 6 );
-	angles.y += random->RandomInt( -6, 6 );
-	SetAbsAngles( angles );
-*/
+	SetNextThink( gpGlobals->curtime + 0.05f );
 
 	Vector forward;
 	AngleVectors( GetAbsAngles(), &forward );

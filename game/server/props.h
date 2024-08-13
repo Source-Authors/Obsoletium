@@ -29,7 +29,7 @@ public:
 
 	void Spawn( void );
 	void Precache( void );
-	void Activate( void );
+	void Activate( void ) override;
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	void CalculateBlockLOS( void );
 	int  ParsePropData( void );
@@ -145,7 +145,7 @@ public:
 	mp_break_t		GetMultiplayerBreakMode( void ) const { return m_mpBreakMode; }
 
 // derived by multiplayer phys props:
-	virtual void	SetPhysicsMode(int iMode) {}
+	virtual void	SetPhysicsMode(int) {}
 	virtual int		GetPhysicsMode() { return PHYSICS_MULTIPLAYER_SOLID; }
 
 	// Copy fade from another breakable prop
@@ -154,7 +154,7 @@ public:
 protected:
 
 	bool			UpdateHealth( int iNewHealth, CBaseEntity *pActivator );
-	virtual void	OnBreak( const Vector &vecVelocity, const AngularImpulse &angVel, CBaseEntity *pBreaker ) {}
+	virtual void	OnBreak( const Vector &, const AngularImpulse &, CBaseEntity * ) {}
 
 protected:
 
@@ -207,8 +207,8 @@ private:
 	void InputEnablePhyscannonPickup( inputdata_t &inputdata );
 	void InputDisablePhyscannonPickup( inputdata_t &inputdata );
 
-	void InputEnablePuntSound( inputdata_t &inputdata ) { m_bUsePuntSound = true; }
-	void InputDisablePuntSound( inputdata_t &inputdata ) { m_bUsePuntSound = false; }
+	void InputEnablePuntSound( inputdata_t & ) { m_bUsePuntSound = true; }
+	void InputDisablePuntSound( inputdata_t & ) { m_bUsePuntSound = false; }
 
 	// Prevents fade scale from happening
 	void ForceFadeScaleToAlwaysVisible();

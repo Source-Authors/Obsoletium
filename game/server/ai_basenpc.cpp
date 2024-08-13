@@ -110,12 +110,6 @@ extern ConVar sk_healthkit;
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef __clang__
-	// These clang 3.1 warnings don't seem very useful, and cannot easily be
-	// avoided in this file.
-	#pragma GCC diagnostic ignored "-Wdangling-else"	// warning: add explicit braces to avoid dangling else [-Wdangling-else]
-#endif
-
 //#define DEBUG_LOOK
 
 bool RagdollManager_SaveImportant( CAI_BaseNPC *pNPC );
@@ -177,7 +171,7 @@ extern ConVar ai_vehicle_avoidance;
 #ifdef DEBUG_AI_FRAME_THINK_LIMITS
 #define DbgFrameLimitMsg DevMsg
 #else
-#define DbgFrameLimitMsg (void)
+#define DbgFrameLimitMsg(msg, self, arg)
 #endif
 
 // NPC damage adjusters
@@ -985,8 +979,8 @@ void CAI_BaseNPC::NotifyFriendsOfDamage( CBaseEntity *pAttackerEntity )
 		const Vector &origin = GetAbsOrigin();
 		for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
-			const float NEAR_Z		= 10*12;
-			const float NEAR_XY_SQ	= Square( 50*12 );
+			constexpr float NEAR_Z		= 10*12;
+			constexpr float NEAR_XY_SQ	= Square( 50.0f*12 );
 			CAI_BaseNPC *pNpc = g_AI_Manager.AccessAIs()[i];
 			if ( pNpc && pNpc != this )
 			{
@@ -1035,13 +1029,13 @@ bool CAI_BaseNPC::IsHeavyDamage( const CTakeDamageInfo &info )
 
 void CAI_BaseNPC::DoRadiusDamage( const CTakeDamageInfo &info, int iClassIgnore, CBaseEntity *pEntityIgnore )
 {
-	RadiusDamage( info, GetAbsOrigin(), info.GetDamage() * 2.5, iClassIgnore, pEntityIgnore );
+	RadiusDamage( info, GetAbsOrigin(), info.GetDamage() * 2.5f, iClassIgnore, pEntityIgnore );
 }
 
 
 void CAI_BaseNPC::DoRadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc, int iClassIgnore, CBaseEntity *pEntityIgnore )
 {
-	RadiusDamage( info, vecSrc, info.GetDamage() * 2.5, iClassIgnore, pEntityIgnore );
+	RadiusDamage( info, vecSrc, info.GetDamage() * 2.5f, iClassIgnore, pEntityIgnore );
 }
 
 
@@ -1362,7 +1356,7 @@ class CTriggerTraceEnum : public IEntityEnumerator
 {
 public:
 	CTriggerTraceEnum( Ray_t *pRay, const CTakeDamageInfo &info, const Vector& dir, int contentsMask ) :
-		m_info( info ),	m_VecDir(dir), m_ContentsMask(contentsMask), m_pRay(pRay)
+		m_VecDir(dir), m_ContentsMask(contentsMask), m_pRay(pRay), m_info( info )
 	{
 	}
 
@@ -3221,8 +3215,11 @@ void CAI_BaseNPC::UpdateEfficiency( bool bInPVS )
 					break;
 				}
 			}
-			
-			iSound = pCurrentSound->NextSound();
+
+			if ( pCurrentSound )
+			{
+				iSound = pCurrentSound->NextSound();
+			}
 		}
 	}
 
@@ -3326,7 +3323,7 @@ void CAI_BaseNPC::UpdateEfficiency( bool bInPVS )
 	int iPVSOffset = (bInPVS) ? 0 : NO_PVS_OFFSET;
 	int iMapping = iStateOffset + iPVSOffset + iFacingOffset + range;
 
-	Assert( iMapping < ARRAYSIZE( mappings ) );
+	Assert( iMapping < ssize( mappings ) );
 
 	AI_Efficiency_t efficiency = mappings[iMapping];
 
@@ -3555,11 +3552,8 @@ void CAI_BaseNPC::RebalanceThinks()
 		int i;
 
 		CBasePlayer *pPlayer = AI_GetSinglePlayer();
-		Vector vPlayerForward;
-		Vector vPlayerEyePosition;
-
-		vPlayerForward.Init();
-		vPlayerEyePosition.Init();
+		Vector vPlayerForward{0, 0, 0};
+		Vector vPlayerEyePosition{0, 0, 0};
 
 		if ( pPlayer )
 		{
@@ -3577,7 +3571,7 @@ void CAI_BaseNPC::RebalanceThinks()
 				( pCandidate->GetNextThinkTick() >= iMinTickRebalance && 
 				pCandidate->GetNextThinkTick() < iMaxTickRebalance ) )
 			{
-				int iInfo = rebalanceCandidates.AddToTail();
+				intp iInfo = rebalanceCandidates.AddToTail();
 
 				rebalanceCandidates[iInfo].pNPC = pCandidate;
 				rebalanceCandidates[iInfo].iNextThinkTick = pCandidate->GetNextThinkTick();
@@ -3699,13 +3693,13 @@ bool CAI_BaseNPC::PreNPCThink()
 	{
 		if ( m_iFrameBlocked == gpGlobals->framecount )
 		{
-			DbgFrameLimitMsg( "Stalled %d (%d)\n", this, gpGlobals->framecount );
+			DbgFrameLimitMsg( "Stalled %p (%d)\n", this, gpGlobals->framecount );
 			SetNextThink( gpGlobals->curtime );
 			return false;
 		}
 		else if ( gpGlobals->framecount != iPrevFrame )
 		{
-			DbgFrameLimitMsg( "--- FRAME: %d (%d)\n", this, gpGlobals->framecount );
+			DbgFrameLimitMsg( "--- FRAME: %p (%d)\n", this, gpGlobals->framecount );
 			float timescale = pHostTimescale->GetFloat();
 			if ( timescale < 1 )
 				timescale = 1;
@@ -3722,19 +3716,19 @@ bool CAI_BaseNPC::PreNPCThink()
 				// Don't bump anyone more that a quarter second
 				if ( timeSinceLastRealThink <= .25 )
 				{
-					DbgFrameLimitMsg( "Bumped %d (%d)\n", this, gpGlobals->framecount );
+					DbgFrameLimitMsg( "Bumped %p (%d)\n", this, gpGlobals->framecount );
 					m_iFrameBlocked = gpGlobals->framecount;
 					SetNextThink( gpGlobals->curtime );
 					return false;
 				}
 				else
 				{
-					DbgFrameLimitMsg( "(Over %d )\n", this );
+					DbgFrameLimitMsg( "(Over %p / %p)\n", this, this );
 				}
 			}
 		}
 
-		DbgFrameLimitMsg( "Running %d (%d)\n", this, gpGlobals->framecount );
+		DbgFrameLimitMsg( "Running %p (%d)\n", this, gpGlobals->framecount );
 		g_StartTimeCurThink = engine->Time();
 
 		m_iFrameBlocked = -1;
@@ -4036,11 +4030,11 @@ void CAI_BaseNPC::NPCThink( void )
 
 		if ( GetMoveEfficiency() == AIME_NORMAL || GetEfficiency() == AIE_NORMAL )
 		{
-			SetNextThink( gpGlobals->curtime + .1 );
+			SetNextThink( gpGlobals->curtime + .1f );
 		}
 		else
 		{
-			SetNextThink( gpGlobals->curtime + .2 );
+			SetNextThink( gpGlobals->curtime + .2f );
 		}
 	}
 	else
@@ -4055,7 +4049,8 @@ void CAI_BaseNPC::NPCThink( void )
 //=========================================================
 void CAI_BaseNPC::NPCUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-	return;
+	// dimhotepus: Try to handle use.
+	// return;
 
 	// Can't +USE NPCs running scripts
 	if ( GetState() == NPC_STATE_SCRIPT )
@@ -6585,8 +6580,8 @@ void CAI_BaseNPC::SetupVPhysicsHull()
 		}
 #endif
 		IPhysicsShadowController *pController = pPhysObj->GetShadowController();
-		float avgsize = (WorldAlignSize().x + WorldAlignSize().y) * 0.5;
-		pController->SetTeleportDistance( avgsize * 0.5 );
+		float avgsize = (WorldAlignSize().x + WorldAlignSize().y) * 0.5f;
+		pController->SetTeleportDistance( avgsize * 0.5f );
 		m_bCheckContacts = true;
 	}
 }
@@ -7006,7 +7001,7 @@ int	CAI_BaseNPC::HolsterWeapon( void )
 	{
 		// Prevent firing during the holster / unholster
 		float flDuration = GetLayerDuration( iLayer );
-		m_ShotRegulator.FireNoEarlierThan( gpGlobals->curtime + flDuration + 0.5 );
+		m_ShotRegulator.FireNoEarlierThan( gpGlobals->curtime + flDuration + 0.5f );
 
 		if( m_iDesiredWeaponState == DESIREDWEAPONSTATE_HOLSTERED_DESTROYED )
 		{
@@ -7052,7 +7047,7 @@ int CAI_BaseNPC::UnholsterWeapon( void )
 			{
 				// Prevent firing during the holster / unholster
 				float flDuration = GetLayerDuration( iLayer );
-				m_ShotRegulator.FireNoEarlierThan( gpGlobals->curtime + flDuration + 0.5 );
+				m_ShotRegulator.FireNoEarlierThan( gpGlobals->curtime + flDuration + 0.5f );
 
 				m_iDesiredWeaponState = DESIREDWEAPONSTATE_CHANGING;
 			}
@@ -7612,7 +7607,7 @@ void CAI_BaseNPC::RememberUnreachable(CBaseEntity *pEntity, float duration )
 	}
 
 	// Add new unreachabe entity to list
-	int nNewIndex = m_UnreachableEnts.AddToTail();
+	intp nNewIndex = m_UnreachableEnts.AddToTail();
 	m_UnreachableEnts[nNewIndex].hUnreachableEnt = pEntity;
 	m_UnreachableEnts[nNewIndex].fExpireTime	 = gpGlobals->curtime + NPC_UNREACHABLE_TIMEOUT;
 	m_UnreachableEnts[nNewIndex].vLocationWhenUnreachable = pEntity->GetAbsOrigin();
@@ -8173,6 +8168,8 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 		if (random->RandomInt(0,2) == 0)
 			break;
 		// fall through...
+		[[fallthrough]];
+
 	case SCRIPT_EVENT_SENTENCE:			// Play a named sentence group
 		SENTENCEG_PlayRndSz( edict(), pEvent->options, 1.0, SNDLVL_TALKING, 0, 100 );
 		break;
@@ -9007,7 +9004,7 @@ int CAI_BaseNPC::DrawDebugTextOverlays(void)
 		// Print State
 		// --------------
 		static const char *pStateNames[] = { "None", "Idle", "Alert", "Combat", "Scripted", "PlayDead", "Dead" };
-		if ( (int)m_NPCState < ARRAYSIZE(pStateNames) )
+		if ( (int)m_NPCState < static_cast<int>(ARRAYSIZE(pStateNames)) )
 		{
 			Q_snprintf(tempstr,sizeof(tempstr),"Stat: %s, ", pStateNames[m_NPCState] );
 			EntityText(text_offset,tempstr,0);
@@ -9039,8 +9036,8 @@ int CAI_BaseNPC::DrawDebugTextOverlays(void)
 		// -----------------
 		int navTypeIndex = (int)GetNavType() + 1;
 		static const char *pMoveNames[] = { "None", "Ground", "Jump", "Fly", "Climb" };
-		Assert( navTypeIndex >= 0 && navTypeIndex < ARRAYSIZE(pMoveNames) );
-		if ( navTypeIndex < ARRAYSIZE(pMoveNames) )
+		Assert( navTypeIndex >= 0 && navTypeIndex < static_cast<int>(ARRAYSIZE(pMoveNames)) );
+		if ( navTypeIndex < static_cast<int>(ARRAYSIZE(pMoveNames)) )
 		{
 			Q_snprintf(tempstr,sizeof(tempstr),"Move: %s, ", pMoveNames[navTypeIndex] );
 			EntityText(text_offset,tempstr,0);
@@ -9282,7 +9279,7 @@ void CAI_BaseNPC::ReportAIState( void )
 	static const char *pStateNames[] = { "None", "Idle", "Alert", "Combat", "Scripted", "PlayDead", "Dead" };
 
 	DevMsg( "%s: ", GetClassname() );
-	if ( (int)m_NPCState < ARRAYSIZE(pStateNames) )
+	if ( (int)m_NPCState < static_cast<int>(ARRAYSIZE(pStateNames)) )
 		DevMsg( "State: %s, ", pStateNames[m_NPCState] );
 
 	if( m_Activity != ACT_INVALID && m_IdealActivity != ACT_INVALID )
@@ -9361,7 +9358,7 @@ void CAI_BaseNPC::ReportOverThinkLimit( float time )
 		CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &tmp );
 		tmp.z += 16;
 
-		float max = -1;
+		double max = -1;
 		const char *pszMax = "unknown";
 
 		if ( g_AIConditionsTimer.GetDuration().GetMillisecondsF() > max )
@@ -10785,7 +10782,11 @@ BEGIN_SIMPLE_DATADESC( AIScheduleState_t )
 	DEFINE_FIELD( fTaskStatus,			FIELD_INTEGER ),
 	DEFINE_FIELD( timeStarted,			FIELD_TIME ),
 	DEFINE_FIELD( timeCurTaskStarted,	FIELD_TIME ),
+#ifndef PLATFORM_64BITS
 	DEFINE_FIELD( taskFailureCode,		FIELD_INTEGER ),
+#else
+	DEFINE_FIELD( taskFailureCode,		FIELD_CLASSPTR ),
+#endif
 	DEFINE_FIELD( iTaskInterrupt,		FIELD_INTEGER ),
 	DEFINE_FIELD( bTaskRanAutomovement,	FIELD_BOOLEAN ),
 	DEFINE_FIELD( bTaskUpdatedYaw,		FIELD_BOOLEAN ),
@@ -10976,7 +10977,7 @@ int CAI_BaseNPC::Save( ISave &save )
 	{
 		const char *pszSchedule = m_pSchedule->GetName();
 
-		Assert( Q_strlen( pszSchedule ) < sizeof( saveHeader.szSchedule ) - 1 );
+		Assert( Q_strlen( pszSchedule ) < static_cast<int>(sizeof( saveHeader.szSchedule )) - 1 );
 		Q_strncpy( saveHeader.szSchedule, pszSchedule, sizeof( saveHeader.szSchedule ) );
 
 		CRC32_Init( &saveHeader.scheduleCrc );
@@ -10997,7 +10998,7 @@ int CAI_BaseNPC::Save( ISave &save )
 		if ( pIdealSchedule )
 		{
 			const char *pszIdealSchedule = pIdealSchedule->GetName();
-			Assert( Q_strlen( pszIdealSchedule ) < sizeof( saveHeader.szIdealSchedule ) - 1 );
+			Assert( Q_strlen( pszIdealSchedule ) < static_cast<int>(sizeof( saveHeader.szIdealSchedule )) - 1 );
 			Q_strncpy( saveHeader.szIdealSchedule, pszIdealSchedule, sizeof( saveHeader.szIdealSchedule ) );
 		}
 	}
@@ -11009,7 +11010,7 @@ int CAI_BaseNPC::Save( ISave &save )
 		if ( pFailSchedule )
 		{
 			const char *pszFailSchedule = pFailSchedule->GetName();
-			Assert( Q_strlen( pszFailSchedule ) < sizeof( saveHeader.szFailSchedule ) - 1 );
+			Assert( Q_strlen( pszFailSchedule ) < static_cast<int>(sizeof( saveHeader.szFailSchedule )) - 1 );
 			Q_strncpy( saveHeader.szFailSchedule, pszFailSchedule, sizeof( saveHeader.szFailSchedule ) );
 		}
 	}
@@ -11019,7 +11020,7 @@ int CAI_BaseNPC::Save( ISave &save )
 		const char *pszSequenceName = GetSequenceName( GetSequence() );
 		if ( pszSequenceName && *pszSequenceName )
 		{
-			Assert( Q_strlen( pszSequenceName ) < sizeof( saveHeader.szSequence ) - 1 );
+			Assert( Q_strlen( pszSequenceName ) < static_cast<int>(sizeof( saveHeader.szSequence )) - 1 );
 			Q_strncpy( saveHeader.szSequence, pszSequenceName, sizeof(saveHeader.szSequence) );
 		}
 	}
@@ -11994,10 +11995,7 @@ void CAI_BaseNPC::Teleport( const Vector *newPosition, const QAngle *newAngles, 
 bool CAI_BaseNPC::FindSpotForNPCInRadius( Vector *pResult, const Vector &vStartPos, CAI_BaseNPC *pNPC, float radius, bool bOutOfPlayerViewcone )
 {
 	CBasePlayer *pPlayer = AI_GetSinglePlayer();
-	QAngle fan;
-
-	fan.x = 0;
-	fan.z = 0;
+	QAngle fan{0, 0, 0};
 
 	for( fan.y = 0 ; fan.y < 360 ; fan.y += 18.0 )
 	{
@@ -12472,7 +12470,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 
 static void AIMsgGuts( CAI_BaseNPC *pAI, unsigned flags, const char *pszMsg )
 {
-	int			len		= strlen( pszMsg );
+	intp		len		= V_strlen( pszMsg );
 	const char *pszFmt2 = NULL;
 
 	if ( len && pszMsg[len-1] == '\n' )
@@ -12702,9 +12700,9 @@ void CAI_BaseNPC::CascadePlayerPush( const Vector &push, const Vector &pushOrigi
 	const Vector &	origin							= GetAbsOrigin();
 	const Vector2D &origin2D						= origin.AsVector2D();
 
-	const float		MIN_Z_TO_TRANSMIT				= GetHullHeight() * 0.5 + 0.1;
-	const float		DIST_REQD_TO_TRANSMIT_PUSH_SQ	= Square( hullWidth * 5 + 0.1 );
-	const float		DIST_FROM_PUSH_VECTOR_REQD_SQ	= Square( hullWidth + 0.1 );
+	const float		MIN_Z_TO_TRANSMIT				= GetHullHeight() * 0.5f + 0.1f;
+	const float		DIST_REQD_TO_TRANSMIT_PUSH_SQ	= Square( hullWidth * 5 + 0.1f );
+	const float		DIST_FROM_PUSH_VECTOR_REQD_SQ	= Square( hullWidth + 0.1f );
 
 	Vector2D		pushTestPoint = vec2_invalid;
 
@@ -13127,7 +13125,7 @@ void CAI_BaseNPC::ParseScriptedNPCInteractions( void )
 //-----------------------------------------------------------------------------
 void CAI_BaseNPC::AddScriptedNPCInteraction( ScriptedNPCInteraction_t *pInteraction  )
 {
-	int nNewIndex = m_ScriptedInteractions.AddToTail();
+	intp nNewIndex = m_ScriptedInteractions.AddToTail();
 
 	if ( ai_debug_dyninteractions.GetBool() )
 	{

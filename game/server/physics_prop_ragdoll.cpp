@@ -710,7 +710,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 		{
 			int objectIndex = atoi(szToken);
 			// sanity check to make sure this token is an integer
-			Assert( atof(szToken) == ((float)objectIndex) );
+			Assert( strtof(szToken, nullptr) == ((float)objectIndex) );
 			pStr = nexttoken(szToken, pStr, ',');
 			Assert( szToken[0] );
 			if ( objectIndex >= m_ragdoll.listCount )
@@ -971,7 +971,6 @@ void CRagdollProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 	matrix3x4_t boneToWorld[MAXSTUDIOBONES];
 	QAngle angles;
-	Vector surroundingMins, surroundingMaxs;
 
 	int i;
 	for ( i = 0; i < m_ragdoll.listCount; i++ )
@@ -1113,7 +1112,7 @@ void CRagdollProp::FadeOutThink(void)
 	float dt = gpGlobals->curtime - m_flFadeOutStartTime;
 	if ( dt < 0 )
 	{
-		SetContextThink( &CRagdollProp::FadeOutThink, gpGlobals->curtime + 0.1, s_pFadeOutContext );
+		SetContextThink( &CRagdollProp::FadeOutThink, gpGlobals->curtime + 0.1f, s_pFadeOutContext );
 	}
 	else if ( dt < m_flFadeTime )
 	{

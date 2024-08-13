@@ -75,15 +75,15 @@ public:
 class CDefaultPlayerPickupVPhysics : public IPlayerPickupVPhysics
 {
 public:
-	virtual bool			OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON ) { return true; }
-	virtual CBaseEntity		*OnFailedPhysGunPickup( Vector vPhysgunPos ) { return NULL; }
-	virtual void			OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON ) {}
-	virtual void			OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t reason ) {}
-	virtual bool			HasPreferredCarryAnglesForPlayer( CBasePlayer *pPlayer ) { return false; }
+	virtual bool			OnAttemptPhysGunPickup( CBasePlayer *, [[maybe_unused]] PhysGunPickup_t reason = PICKED_UP_BY_CANNON ) { return true; }
+	virtual CBaseEntity		*OnFailedPhysGunPickup( Vector ) { return NULL; }
+	virtual void			OnPhysGunPickup( CBasePlayer *, [[maybe_unused]] PhysGunPickup_t reason = PICKED_UP_BY_CANNON ) {}
+	virtual void			OnPhysGunDrop( CBasePlayer *, PhysGunDrop_t  ) {}
+	virtual bool			HasPreferredCarryAnglesForPlayer( CBasePlayer * ) { return false; }
 	virtual QAngle			PreferredCarryAngles( void ) { return vec3_angle; }
-	virtual bool			ForcePhysgunOpen( CBasePlayer *pPlayer ) { return false; }
+	virtual bool			ForcePhysgunOpen( CBasePlayer * ) { return false; }
 	virtual AngularImpulse	PhysGunLaunchAngularImpulse() { return RandomAngularImpulse( -600, 600 ); }
-	virtual bool			ShouldPuntUseLaunchForces( PhysGunForce_t reason ) { return false; }
+	virtual bool			ShouldPuntUseLaunchForces( PhysGunForce_t ) { return false; }
 	virtual Vector			PhysGunLaunchVelocity( const Vector &vecForward, float flMass )
 	{
 		return Pickup_DefaultPhysGunLaunchVelocity( vecForward, flMass );

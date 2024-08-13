@@ -39,7 +39,7 @@ class variant_t
 public:
 
 	// constructor
-	variant_t() : fieldType(FIELD_VOID), iVal(0) {}
+	variant_t() : iVal(0), fieldType(FIELD_VOID) {}
 
 	inline bool Bool( void ) const						{ return( fieldType == FIELD_BOOLEAN ) ? bVal : false; }
 	inline const char *String( void ) const				{ return( fieldType == FIELD_STRING ) ? STRING(iszVal) : ToString(); }
@@ -53,9 +53,9 @@ public:
 	fieldtype_t FieldType( void ) { return fieldType; }
 
 	void SetBool( bool b ) { bVal = b; fieldType = FIELD_BOOLEAN; }
-	void SetString( string_t str ) { iszVal = str, fieldType = FIELD_STRING; }
-	void SetInt( int val ) { iVal = val, fieldType = FIELD_INTEGER; }
-	void SetFloat( float val ) { flVal = val, fieldType = FIELD_FLOAT; }
+	void SetString( string_t str ) { iszVal = str; fieldType = FIELD_STRING; }
+	void SetInt( int val ) { iVal = val; fieldType = FIELD_INTEGER; }
+	void SetFloat( float val ) { flVal = val; fieldType = FIELD_FLOAT; }
 	void SetEntity( CBaseEntity *val );
 	void SetVector3D( const Vector &val ) { vecVal[0] = val[0]; vecVal[1] = val[1]; vecVal[2] = val[2]; fieldType = FIELD_VECTOR; }
 	void SetPositionVector3D( const Vector &val ) { vecVal[0] = val[0]; vecVal[1] = val[1]; vecVal[2] = val[2]; fieldType = FIELD_POSITION_VECTOR; }

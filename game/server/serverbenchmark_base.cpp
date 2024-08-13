@@ -21,7 +21,7 @@
 static ConVar sv_benchmark_numticks( "sv_benchmark_numticks", "3300", 0, "If > 0, then it only runs the benchmark for this # of ticks." );
 static ConVar sv_benchmark_autovprofrecord( "sv_benchmark_autovprofrecord", "0", 0, "If running a benchmark and this is set, it will record a vprof file over the duration of the benchmark with filename benchmark.vprof." );
 
-static float s_flBenchmarkStartWaitSeconds = 3;	// Wait this many seconds after level load before starting the benchmark.
+static double s_flBenchmarkStartWaitSeconds = 3;	// Wait this many seconds after level load before starting the benchmark.
 
 static int s_nBenchmarkBotsToCreate = 22;		// Create this many bots.
 static int s_nBenchmarkBotCreateInterval = 50;	// Create a bot every N ticks.
@@ -64,7 +64,7 @@ public:
 	// nBenchmarkMode: 0 = no benchmark
 	//                 1 = benchmark
 	//                 2 = exit out afterwards and write sv_benchmark.txt
-	bool InternalStartBenchmark( int nBenchmarkMode, float flCountdown )
+	bool InternalStartBenchmark( int nBenchmarkMode, double flCountdown )
 	{
 		bool bWasRunningBenchmark = (m_BenchmarkState != BENCHMARKSTATE_NOT_RUNNING);
 
@@ -168,7 +168,7 @@ public:
 	virtual void EndBenchmark( void )
 	{
 		// Write out the results if we're running the build scripts.
-		float flRunTime = Benchmark_ValidTime() - m_fl_ValidTime_BenchmarkStartTime;
+		double flRunTime = Benchmark_ValidTime() - m_fl_ValidTime_BenchmarkStartTime;
 		if ( m_nBenchmarkMode == 2 )
 		{
 			FileHandle_t fh = filesystem->Open( "sv_benchmark_results.txt", "wt", "DEFAULT_WRITE_PATH" );
@@ -284,8 +284,8 @@ public:
 
 	void UpdateBenchmarkCounter()
 	{
-		float flCurTime = Plat_FloatTime();
-		if ( (flCurTime - m_flLastBenchmarkCounterUpdate) > 3.0f )
+		double flCurTime = Plat_FloatTime();
+		if ( (flCurTime - m_flLastBenchmarkCounterUpdate) > 3.0 )
 		{
 			m_flLastBenchmarkCounterUpdate = flCurTime;
 			Msg( "Benchmark: %d%% complete.\n", ((gpGlobals->tickcount - m_nBenchmarkStartTick) * 100) / sv_benchmark_numticks.GetInt() );
@@ -328,7 +328,7 @@ public:
 
 	void OutputResults()
 	{
-		float flRunTime = Benchmark_ValidTime() - m_fl_ValidTime_BenchmarkStartTime;
+		double flRunTime = Benchmark_ValidTime() - m_fl_ValidTime_BenchmarkStartTime;
 
 		Warning( "------------------ SERVER BENCHMARK RESULTS ------------------\n" );
 		Warning( "Total time          : %.2f seconds\n", flRunTime );
@@ -377,11 +377,11 @@ private:
 	};
 	EBenchmarkState m_BenchmarkState;
 
-	float m_fl_ValidTime_BenchmarkStartTime;
+	double m_fl_ValidTime_BenchmarkStartTime;
 	
-	float m_flBenchmarkStartTime;
-	float m_flLastBenchmarkCounterUpdate;
-	float m_flBenchmarkStartWaitTime;
+	double m_flBenchmarkStartTime;
+	double m_flLastBenchmarkCounterUpdate;
+	double m_flBenchmarkStartWaitTime;
 
 	int m_nBenchmarkStartTick;
 	int m_nStartWaitCounter;

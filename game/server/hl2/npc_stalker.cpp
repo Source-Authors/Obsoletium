@@ -844,7 +844,7 @@ void CNPC_Stalker::CalcBeamPosition(void)
 		// Must be scaled with distance 
 		// -----------------------------------------
 		float fTargetDist = (GetAbsOrigin() - m_vLaserTargetPos).Length();
-		float noiseScale		= atan(0.2/fTargetDist);
+		float noiseScale		= atan(0.2f/fTargetDist);
 		float m_fNoiseModX		= 5;
 		float m_fNoiseModY		= 5;
 		float m_fNoiseModZ		= 5;
@@ -1261,7 +1261,7 @@ void CNPC_Stalker::HandleAnimEvent( animevent_t *pEvent )
 		{
 			CBaseEntity *pHurt;
 
-			pHurt = CheckTraceHullAttack( 32, Vector(-16,-16,-16), Vector(16,16,16), sk_stalker_melee_dmg.GetFloat(), DMG_SLASH );
+			pHurt = CheckTraceHullAttack( 32, Vector(-16,-16,-16), Vector(16,16,16), sk_stalker_melee_dmg.GetInt(), DMG_SLASH );
 
 			if ( pHurt )
 			{

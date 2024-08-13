@@ -63,7 +63,7 @@ void CLogicRelay::Activate()
 	
 	if ( m_OnSpawn.NumberOfElements() > 0)
 	{
-		SetNextThink( gpGlobals->curtime + 0.01 );
+		SetNextThink( gpGlobals->curtime + 0.01f );
 	}
 }
 
@@ -155,7 +155,7 @@ void CLogicRelay::InputTrigger( inputdata_t &inputdata )
 			// has been fired and post an input to re-enable ourselves.
 			//
 			m_bWaitForRefire = true;
-			g_EventQueue.AddEvent(this, "EnableRefire", m_OnTrigger.GetMaxDelay() + 0.001, this, this);
+			g_EventQueue.AddEvent(this, "EnableRefire", m_OnTrigger.GetMaxDelay() + 0.001f, this, this);
 		}
 	}
 }

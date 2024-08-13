@@ -55,9 +55,9 @@ END_DATADESC()
 
 void CSpeaker::Spawn( void )
 {
-	const char *soundfile = (const char *)STRING( m_iszRuleScriptFile );
+	const char *soundfile = STRING( m_iszRuleScriptFile );
 
-	if ( Q_strlen( soundfile ) < 1 )
+	if ( !soundfile[0] )
 	{
 		Warning( "'speaker' entity with no Level/Sentence! at: %f, %f, %f\n", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
 		SetNextThink( gpGlobals->curtime + 0.1f );
@@ -185,7 +185,7 @@ void CSpeaker::SpeakerThink( void )
 void CSpeaker::InputTurnOn( inputdata_t &inputdata )
 {
 	// turn on announcements
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 

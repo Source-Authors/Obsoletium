@@ -69,7 +69,7 @@ void CTEImpact::Precache( void )
 // Input  : *current_origin - 
 //			*current_angles - 
 //-----------------------------------------------------------------------------
-void CTEImpact::Test( const Vector& current_origin, const Vector& current_normal )
+void CTEImpact::Test( const Vector&, const Vector& )
 {
 }
 

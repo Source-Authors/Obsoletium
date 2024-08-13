@@ -131,10 +131,10 @@ Vector Pickup_DefaultPhysGunLaunchVelocity( const Vector &vecForward, float flMa
 	}
 
 	return ( vecForward * flForce );
-#endif
-
+#else
 	// Do the simple calculation
 	return ( vecForward * flMass );
+#endif
 }
 
 Vector Pickup_PhysGunLaunchVelocity( CBaseEntity *pObject, const Vector &vecForward, PhysGunForce_t reason )

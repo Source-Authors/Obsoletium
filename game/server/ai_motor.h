@@ -82,7 +82,7 @@ public:
 	float				GetCurSpeed() const			{ return m_vecVelocity.Length(); }
 	const Vector &		GetCurVel() const			{ return m_vecVelocity;			 }
 
-	virtual float		OverrideMaxYawSpeed( Activity activity )	{ return -1; }
+	virtual float		OverrideMaxYawSpeed( Activity )	{ return -1; }
 	bool				IsDeceleratingToGoal() const				{ return false; }
 
 	//---------------------------------
@@ -133,7 +133,7 @@ public:
 
 	// Issues turn gestures when needed due to turning
 	virtual	void		MaintainTurnActivity( void ) { };
-	virtual bool		AddTurnGesture( float flYD ) { return false; };
+	virtual bool		AddTurnGesture( float ) { return false; };
 
 	// --------------------------------
 	// Move primitives

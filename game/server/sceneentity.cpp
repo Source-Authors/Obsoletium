@@ -58,7 +58,7 @@ static ConVar scene_maxcaptionradius( "scene_maxcaptionradius", "1200", 0, "Only
 #define SOUND_SYSTEM_LATENCY_DEFAULT ( 0.1f )
 
 // Think every 50 msec (FIXME: Try 10hz?)
-#define SCENE_THINK_INTERVAL 0.001 // FIXME: make scene's think in concert with their npc's	
+#define SCENE_THINK_INTERVAL 0.001f // FIXME: make scene's think in concert with their npc's	
 
 #define FINDNAMEDENTITY_MAX_ENTITIES	32		// max number of entities to be considered for random entity selection in FindNamedEntity
 
@@ -1292,7 +1292,8 @@ void CSceneEntity::DispatchPauseScene( CChoreoScene *scene, const char *paramete
 		if ( m_nAutomatedAction != SCENE_ACTION_UNKNOWN )
 		{
 			buffer = engine->ParseFile( buffer, token, sizeof( token ) );
-			m_flAutomationDelay = (float)atof( token );
+			// dimhotepus: atof -> strtof
+			m_flAutomationDelay = strtof( token, nullptr );
 
 			if ( m_flAutomationDelay > 0.0f )
 			{
@@ -2197,7 +2198,7 @@ void CSceneEntity::InputInterjectResponse( inputdata_t &inputdata )
 	{
 		// Use any actor if not playing a scene
 		// int useIndex = RandomInt( 0, c - 1 );
-		Assert( !"m_bIsPlayBack is false and this code does nothing. Should it?");
+		AssertMsg( false, "m_bIsPlayBack is false and this code does nothing. Should it?");
 	}
 	else
 	{
@@ -2910,7 +2911,7 @@ void CSceneEntity::StartEvent( float currenttime, CChoreoScene *scene, CChoreoEv
 			// FIXME: make sure moveto's aren't edge triggered
 			if ( !event->HasEndTime() )
 			{
-				event->SetEndTime( event->GetStartTime() + 1.0 );
+				event->SetEndTime( event->GetStartTime() + 1.0f );
 			}
 
 			if ( pActor && !IsMultiplayer() )
@@ -3461,7 +3462,7 @@ CBaseFlex *CSceneEntity::FindNamedActor( int index )
 
 	if ( !m_hActorList.IsValidIndex( index ) )
 	{
-		DevWarning( "Scene %s has %d actors, but scene entity only has %d actors\n", m_pScene->GetFilename(), m_pScene->GetNumActors(), m_hActorList.Size() );
+		DevWarning( "Scene %s has %d actors, but scene entity only has %zd actors\n", m_pScene->GetFilename(), m_pScene->GetNumActors(), m_hActorList.Count() );
 		return NULL;
 	}
 
@@ -3494,7 +3495,7 @@ CBaseFlex *CSceneEntity::FindNamedActor( int index )
 
 CBaseFlex *CSceneEntity::FindNamedActor( CChoreoActor *pChoreoActor )
 {
-	int index = m_pScene->FindActorIndex( pChoreoActor );
+	intp index = m_pScene->FindActorIndex( pChoreoActor );
 
 	if (index >= 0)
 	{

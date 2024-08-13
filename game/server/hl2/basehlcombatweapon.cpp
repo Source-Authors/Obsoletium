@@ -100,7 +100,7 @@ void CHLMachineGun::PrimaryAttack( void )
 	//Factor in the view kick
 	AddViewKick();
 
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2, pPlayer );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2f, pPlayer );
 	
 	if (!m_iClip1 && pPlayer->GetAmmoCount(m_iPrimaryAmmoType) <= 0)
 	{
@@ -112,7 +112,7 @@ void CHLMachineGun::PrimaryAttack( void )
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
 
 	// Register a muzzleflash for the AI
-	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5 );
+	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5f );
 }
 
 //-----------------------------------------------------------------------------

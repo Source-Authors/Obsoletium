@@ -888,7 +888,6 @@ void CNPC_Manhack::OnStateChange( NPC_STATE OldState, NPC_STATE NewState )
 //-----------------------------------------------------------------------------
 void CNPC_Manhack::HandleAnimEvent( animevent_t *pEvent )
 {
-	Vector vecNewVelocity;
 	switch( pEvent->event )
 	{
 	case MANHACK_AE_START_ENGINE:

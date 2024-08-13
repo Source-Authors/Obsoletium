@@ -92,7 +92,7 @@ bool CAI_LocalNavigator::MoveCalcDirect( AILocalMoveGoal_t *pMoveGoal, bool bOnl
 		float  minCheckDist = pMotor->MinCheckDist();
 		float  probeDist	= m_pPlaneSolver->CalcProbeDist( pMoveGoal->speed ); // having this match steering allows one fewer traces
 		float  checkDist	= MAX( minCheckDist, probeDist );
-		float  checkStepDist = MAX( 16.0, probeDist * 0.5 );
+		float  checkStepDist = MAX( 16.0f, probeDist * 0.5f );
 
 		if ( pMoveGoal->flags & ( AILMG_TARGET_IS_TRANSITION | AILMG_TARGET_IS_GOAL ) )
 		{

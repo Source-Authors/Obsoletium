@@ -318,8 +318,8 @@ public:
 					// an output inside our commentary files. We convert ^s to "s here.
 					char szTmp[COMMENTARY_STRING_LENGTH_MAX];
 					Q_strncpy( szTmp, pszValue, COMMENTARY_STRING_LENGTH_MAX );
-					int len = Q_strlen( szTmp );
-					for ( int i = 0; i < len; i++ )
+					intp len = Q_strlen( szTmp );
+					for ( intp i = 0; i < len; i++ )
 					{
 						if ( szTmp[i] == '^' )
 						{
@@ -882,7 +882,7 @@ bool IsListeningToCommentary( void )
 void CPointCommentaryNode::Spawn( void )
 {
 	// No model specified?
-	char *szModel = (char *)STRING( GetModelName() );
+	const char *szModel = (const char *)STRING( GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = "models/extras/info_speech.mdl";

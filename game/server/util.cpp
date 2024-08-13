@@ -260,7 +260,7 @@ int UTIL_PrecacheDecal( const char *name, bool preload )
 	{
 		if ( !engine->IsDecalPrecached( name ) )
 		{
-			Assert( !"UTIL_PrecacheDecal:  too late" );
+			AssertMsg( false, "UTIL_PrecacheDecal:  too late" );
 
 			Warning( "Late precache of %s\n", name );
 		}
@@ -583,7 +583,7 @@ CBasePlayer *UTIL_GetLocalPlayer( void )
 	{
 		if ( developer.GetBool() )
 		{
-			Assert( !"UTIL_GetLocalPlayer" );
+			AssertMsg( false, "UTIL_GetLocalPlayer" );
 			
 #ifdef	DEBUG
 			Warning( "UTIL_GetLocalPlayer() called in multiplayer game.\n" );
@@ -604,7 +604,7 @@ CBasePlayer *UTIL_GetListenServerHost( void )
 	// no "local player" if this is a dedicated server or a single player game
 	if (engine->IsDedicatedServer())
 	{
-		Assert( !"UTIL_GetListenServerHost" );
+		AssertMsg( false, "UTIL_GetListenServerHost" );
 		Warning( "UTIL_GetListenServerHost() called from a dedicated server or single-player game.\n" );
 		return NULL;
 	}
@@ -1186,7 +1186,7 @@ void UTIL_ShowMessageAll( const char *pString )
 }
 
 // So we always return a valid surface
-static csurface_t	g_NullSurface = { "**empty**", 0 };
+static csurface_t	g_NullSurface = { "**empty**", 0, 0 };
 
 void UTIL_SetTrace(trace_t& trace, const Ray_t &ray, edict_t *ent, float fraction, 
 				   int hitgroup, unsigned int contents, const Vector& normal, float intercept )
@@ -2128,7 +2128,7 @@ void UTIL_SetClientVisibilityPVS( edict_t *pClient, const unsigned char *pvs, in
 {
 	if ( pClient == UTIL_GetCurrentCheckClient() )
 	{
-		Assert( pvssize <= sizeof(g_CheckClient.m_checkVisibilityPVS) );
+		Assert( pvssize <= static_cast<int>(sizeof(g_CheckClient.m_checkVisibilityPVS)) );
 
 		g_CheckClient.m_bClientPVSIsExpanded = false;
 
@@ -2827,21 +2827,21 @@ void CC_KDTreeTest( const CCommand &args )
 	if ( bFirst )
 	{
 		vecTargets = new Vector [NUM_KDTREE_TESTS];
-		double flRadius = 0;
-		double flTheta = 0;
-		double flPhi = 0;
+		float flRadius = 0;
+		float flTheta = 0;
+		float flPhi = 0;
 		for ( int i = 0; i < NUM_KDTREE_TESTS; ++i )
 		{
-			flRadius += NUM_KDTREE_TESTS * 123.123;
-			flRadius =  fmod( flRadius, 128.0 );
+			flRadius += NUM_KDTREE_TESTS * 123.123f;
+			flRadius =  fmod( flRadius, 128.0f );
 			flRadius =  fabs( flRadius );
 
-			flTheta  += NUM_KDTREE_TESTS * 76.76;
-			flTheta  =  fmod( flTheta, DEG2RAD( 360.0 ) );
+			flTheta  += NUM_KDTREE_TESTS * 76.76f;
+			flTheta  =  fmod( flTheta, DEG2RAD( 360.0f ) );
 			flTheta  =  fabs( flTheta );
 
-			flPhi    += NUM_KDTREE_TESTS * 1997.99;
-			flPhi    =  fmod( flPhi, DEG2RAD( 180.0 ) );
+			flPhi    += NUM_KDTREE_TESTS * 1997.99f;
+			flPhi    =  fmod( flPhi, DEG2RAD( 180.0f ) );
 			flPhi    =  fabs( flPhi );
 
 			float st, ct, sp, cp;

@@ -109,13 +109,13 @@ public:
 		return m_nameList.String( m_list[globalIndex].name );
 	}
 
-	int GetIndex( const char *pGlobalname )
+	intp GetIndex( const char *pGlobalname )
 	{
 		CUtlSymbol symName = m_nameList.Find( pGlobalname );
 
 		if ( symName.IsValid() )
 		{
-			for ( int i = m_list.Count() - 1; i >= 0; --i )
+			for ( intp i = m_list.Count() - 1; i >= 0; --i )
 			{
 				if ( m_list[i].name == symName )
 					return i;
@@ -125,7 +125,7 @@ public:
 		return -1;
 	}
 
-	int AddEntity( const char *pGlobalname, const char *pMapName, GLOBALESTATE state )
+	intp AddEntity( const char *pGlobalname, const char *pMapName, GLOBALESTATE state )
 	{
 		globalentity_t entity;
 		entity.name = m_nameList.AddString( pGlobalname );
@@ -133,13 +133,13 @@ public:
 		entity.state = state;
 		entity.counter = 0;
 
-		int index = GetIndex( m_nameList.String( entity.name ) );
+		intp index = GetIndex( m_nameList.String( entity.name ) );
 		if ( index >= 0 )
 			return index;
 		return m_list.AddToTail( entity );
 	}
 
-	int GetNumGlobals( void )
+	intp GetNumGlobals( void )
 	{
 		return m_list.Count();
 	}

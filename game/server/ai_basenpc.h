@@ -497,36 +497,36 @@ public:
 
 	//---------------------------------
 	
-	DECLARE_DATADESC();
-	DECLARE_SERVERCLASS();
+	DECLARE_DATADESC_OVERRIDE();
+	DECLARE_SERVERCLASS_OVERRIDE();
 
-	virtual int			Save( ISave &save ); 
-	virtual int			Restore( IRestore &restore );
-	virtual void		OnRestore();
+	int			Save( ISave &save ) override;
+	int			Restore( IRestore &restore ) override;
+	void		OnRestore() override;
 	void				SaveConditions( ISave &save, const CAI_ScheduleBits &conditions );
 	void				RestoreConditions( IRestore &restore, CAI_ScheduleBits *pConditions );
 
-	bool				ShouldSavePhysics()	{ return false; }
-	virtual unsigned int	PhysicsSolidMaskForEntity( void ) const;
+	bool				ShouldSavePhysics() override	{ return false; }
+	unsigned int	PhysicsSolidMaskForEntity( void ) const override;
 
-	virtual bool KeyValue( const char *szKeyName, const char *szValue );
+	bool KeyValue( const char *szKeyName, const char *szValue ) override;
 
 	//---------------------------------
 	
-	virtual void		PostConstructor( const char *szClassname );
-	virtual void		Activate( void );
-	virtual void		Precache( void ); // derived calls at start of Spawn()
-	virtual bool 		CreateVPhysics();
+	void		PostConstructor( const char *szClassname ) override;
+	void		Activate( void ) override;
+	void		Precache( void ) override; // derived calls at start of Spawn()
+	bool 		CreateVPhysics() override;
 	virtual void		NPCInit( void ); // derived calls after Spawn()
 	void				NPCInitThink( void );
 	virtual void		PostNPCInit() {};// called after NPC_InitThink
 	virtual void		StartNPC( void );
-	virtual bool		IsTemplate( void );
+	bool		IsTemplate( void ) override;
 
 	virtual void		CleanupOnDeath( CBaseEntity *pCulprit = NULL, bool bFireDeathOutput = true );
-	virtual void		UpdateOnRemove( void );
+	void		UpdateOnRemove( void ) override;
 
-	virtual int			UpdateTransmitState();
+	int			UpdateTransmitState() override;
 
 	//---------------------------------
 	// Component creation factories
@@ -546,7 +546,7 @@ public:
 
 	//---------------------------------
 
-	virtual bool			IsNPC( void ) const { return true; }
+	bool			IsNPC( void ) const override { return true; }
 
 	//---------------------------------
 
@@ -581,7 +581,7 @@ public:
 	virtual void		OnScheduleChange( void );
 
 	// Notification that a new schedule is about to run its first task
-	virtual void		OnStartSchedule( int scheduleType ) {};
+	virtual void		OnStartSchedule( int ) {};
 
 	// This function implements a decision tree for the NPC.  It is responsible for choosing the next behavior (schedule)
 	// based on the current conditions and state.
@@ -597,7 +597,7 @@ public:
 
 	void				ClearTransientConditions();
 
-	virtual void		HandleAnimEvent( animevent_t *pEvent );
+	void		HandleAnimEvent( animevent_t *pEvent ) override;
 
 	virtual bool		IsInterruptable();
 	virtual void		OnStartScene( void ) {}	// Called when an NPC begins a cine scene (useful for clean-up)
@@ -610,9 +610,9 @@ public:
 
 	virtual float		LineOfSightDist( const Vector &vecDir = vec3_invalid, float zEye = FLT_MAX );
 
-	virtual void		MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType );
-	virtual const char	*GetTracerType( void );
-	virtual void		DoImpactEffect( trace_t &tr, int nDamageType );
+	void		MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType ) override;
+	const char	*GetTracerType( void ) override;
+	void		DoImpactEffect( trace_t &tr, int nDamageType ) override;
 		
 	enum
 	{
@@ -777,7 +777,7 @@ protected: // pose parameters
 	int					m_poseAim_Pitch;
 	int					m_poseAim_Yaw;
 	int					m_poseMove_Yaw;
-	virtual void		PopulatePoseParameters( void );
+	void		PopulatePoseParameters( void ) override;
 
 public:
 	inline bool			HasPoseMoveYaw()		{ return ( m_poseMove_Yaw >= 0 );  }
@@ -808,12 +808,12 @@ public:
 
 	virtual CAI_BehaviorBase *GetRunningBehavior() { return NULL; }
 
-	virtual bool ShouldAcceptGoal( CAI_BehaviorBase *pBehavior, CAI_GoalEntity *pGoal )	{ return true; }
-	virtual void OnClearGoal( CAI_BehaviorBase *pBehavior, CAI_GoalEntity *pGoal )		{}
+	virtual bool ShouldAcceptGoal( [[maybe_unused]] CAI_BehaviorBase *pBehavior, [[maybe_unused]] CAI_GoalEntity *pGoal )	{ return true; }
+	virtual void OnClearGoal( [[maybe_unused]] CAI_BehaviorBase *pBehavior, [[maybe_unused]] CAI_GoalEntity *pGoal )		{}
 
 	// Notification that the status behavior ability to select schedules has changed.
 	// Return "true" to signal a schedule interrupt is desired
-	virtual bool OnBehaviorChangeStatus(  CAI_BehaviorBase *pBehavior, bool fCanFinishSchedule ) { return false; }
+	virtual bool OnBehaviorChangeStatus( [[maybe_unused]]  CAI_BehaviorBase *pBehavior, [[maybe_unused]] bool fCanFinishSchedule ) { return false; }
 
 private:
 	virtual CAI_BehaviorBase **	AccessBehaviors() 	{ return NULL; }
@@ -874,9 +874,9 @@ public:
 	inline NPC_STATE	GetIdealState();
 	virtual NPC_STATE	SelectIdealState( void );
 
-	void				SetState( NPC_STATE State );
+	void				SetState( [[maybe_unused]] NPC_STATE State );
 	virtual bool		ShouldGoToIdleState( void ) 							{ return ( false ); }
-	virtual	void 		OnStateChange( NPC_STATE OldState, NPC_STATE NewState ) {/*Base class doesn't care*/};
+	virtual	void 		OnStateChange( [[maybe_unused]] NPC_STATE OldState, [[maybe_unused]] NPC_STATE NewState ) {/*Base class doesn't care*/};
 	
 	NPC_STATE			GetState( void )										{ return m_NPCState; }
 
@@ -925,7 +925,7 @@ public:
 	//-----------------------------------------------------
 	
 	Activity			TranslateActivity( Activity idealActivity, Activity *pIdealWeaponActivity = NULL );
-	Activity			NPC_TranslateActivity( Activity eNewActivity );
+	Activity			NPC_TranslateActivity( Activity eNewActivity ) override;
 	Activity			GetActivity( void ) { return m_Activity; }
 	virtual void		SetActivity( Activity NewActivity );
 	Activity			GetIdealActivity( void ) { return m_IdealActivity; }
@@ -938,7 +938,7 @@ public:
 	Activity			GetStoppedActivity( void );
 	inline bool			HaveSequenceForActivity( Activity activity );
 	inline bool			IsActivityStarted(void);
-	virtual bool		IsActivityFinished( void );
+	bool		IsActivityFinished( void ) override;
 	virtual bool		IsActivityMovementPhased( Activity activity );
 	virtual void		OnChangeActivity( Activity eNewActivity );
 	void				MaintainActivity(void);
@@ -980,7 +980,7 @@ public:
 	virtual void		OnLooked( int iDistance );
 	virtual void		OnListened();
 
-	virtual void		OnSeeEntity( CBaseEntity *pEntity ) {}
+	virtual void		OnSeeEntity( [[maybe_unused]] CBaseEntity *pEntity ) {}
 
 	// If true, AI will try to see this entity regardless of distance.
 	virtual bool		ShouldNotDistanceCull() { return false; }
@@ -1012,10 +1012,10 @@ public:
 	//
 	//-----------------------------------------------------
 
-	Vector GetSmoothedVelocity( void );
+	Vector GetSmoothedVelocity( void ) override;
 
-	CBaseEntity*		GetEnemy()							{ return m_hEnemy.Get(); }
-	CBaseEntity*		GetEnemy() const					{ return m_hEnemy.Get(); }
+	CBaseEntity*		GetEnemy() override							{ return m_hEnemy.Get(); }
+	CBaseEntity*		GetEnemy() const override					{ return m_hEnemy.Get(); }
 	float				GetTimeEnemyAcquired()				{ return m_flTimeEnemyAcquired; }
 	void				SetEnemy( CBaseEntity *pEnemy, bool bSetCondNewEnemy = true );
 
@@ -1063,7 +1063,7 @@ protected:
 	virtual float 		GetGoalRepathTolerance( CBaseEntity *pGoalEnt, GoalType_t type, const Vector &curGoal, const Vector &curTargetPos );
 
 private:
-	void *				CheckEnemy( CBaseEntity *pEnemy ) { return NULL; } // OBSOLETE, replaced by GatherEnemyConditions(), left here to make derived code not compile
+	void *				CheckEnemy( [[maybe_unused]] CBaseEntity *pEnemy ) { return NULL; } // OBSOLETE, replaced by GatherEnemyConditions(), left here to make derived code not compile
 
 	// Updates the goal position in case of GOALTYPE_ENEMY
 	void				UpdateEnemyPos();
@@ -1101,15 +1101,15 @@ public:
 	virtual void ClearCommandGoal();
 	virtual void OnTargetOrder()										{}
 	virtual void OnMoveOrder()											{}
-	virtual bool IsValidCommandTarget( CBaseEntity *pTarget )			{ return false; }
+	virtual bool IsValidCommandTarget( CBaseEntity * )			{ return false; }
 	const Vector &GetCommandGoal() const								{ return m_vecCommandGoal; }
 	virtual void OnMoveToCommandGoalFailed()							{}
 	string_t GetPlayerSquadName() const									{ Assert( gm_iszPlayerSquad != NULL_STRING ); return gm_iszPlayerSquad; }
 	bool IsInPlayerSquad() const;
 	virtual CAI_BaseNPC *GetSquadCommandRepresentative()				{ return NULL; }
 
-	virtual bool TargetOrder( CBaseEntity *pTarget, CAI_BaseNPC **Allies, int numAllies ) { OnTargetOrder(); return true; }
-	virtual void MoveOrder( const Vector &vecDest, CAI_BaseNPC **Allies, int numAllies ) { SetCommandGoal( vecDest ); SetCondition( COND_RECEIVED_ORDERS ); OnMoveOrder(); }
+	virtual bool TargetOrder( CBaseEntity *, CAI_BaseNPC **, int ) { OnTargetOrder(); return true; }
+	virtual void MoveOrder( const Vector &vecDest, CAI_BaseNPC **, int ) { SetCommandGoal( vecDest ); SetCondition( COND_RECEIVED_ORDERS ); OnMoveOrder(); }
 
 	// Return true if you're willing to be idly talked to by other friends.
 	virtual bool CanBeUsedAsAFriend( void );
@@ -1182,16 +1182,16 @@ public:
 	virtual bool		FOkToMakeSound( int soundPriority = 0 );
 	virtual void		JustMadeSound( int soundPriority = 0, float flSoundLength = 0.0f );
 
-	virtual void		DeathSound( const CTakeDamageInfo &info )	{ return; };
+	virtual void		DeathSound( [[maybe_unused]] const CTakeDamageInfo &info )	{ return; };
 	virtual void		AlertSound( void )							{ return; };
 	virtual void		IdleSound( void )							{ return; };
-	virtual void		PainSound( const CTakeDamageInfo &info )	{ return; };
+	virtual void		PainSound( [[maybe_unused]] const CTakeDamageInfo &info )	{ return; };
 	virtual void		FearSound( void )				 			{ return; };
 	virtual void		LostEnemySound( void ) 						{ return; };
 	virtual void		FoundEnemySound( void ) 					{ return; };
 	virtual void		BarnacleDeathSound( void )					{ CTakeDamageInfo info;	PainSound( info ); }
 
-	virtual void		SpeakSentence( int sentenceType ) 			{ return; };
+	virtual void		SpeakSentence( int ) 			{ return; };
 	virtual bool		ShouldPlayIdleSound( void );
 
 	virtual void		MakeAIFootstepSound( float volume, float duration = 0.5f );
@@ -1203,12 +1203,12 @@ public:
 
 	//---------------------------------
 	// NPC Event Response System
-	virtual bool		CanRespondToEvent( const char *ResponseConcept ) { return false; }
-	virtual bool 		RespondedTo( const char *ResponseConcept, bool bForce, bool bCancelScene ) { return false; }
+	virtual bool		CanRespondToEvent( const char * ) { return false; }
+	virtual bool 		RespondedTo( const char *, bool, bool ) { return false; }
 
 	virtual void		PlayerHasIlluminatedNPC( CBasePlayer *pPlayer, float flDot );
 
-	virtual void		ModifyOrAppendCriteria( AI_CriteriaSet& set );
+	void		ModifyOrAppendCriteria( AI_CriteriaSet& set ) override;
 
 protected:
 	float		SoundWaitTime() const { return m_flSoundWaitTime; }
@@ -1267,7 +1267,7 @@ public:
 	
 	CBaseEntity *		GetNavTargetEntity(void);
 
-	bool				IsMoving( void );
+	bool				IsMoving( void ) override;
 	virtual float 		GetTimeToNavGoal();
 	
 	// NPCs can override this to tweak with how costly particular movements are
@@ -1291,7 +1291,7 @@ public:
 	// ------------
 	// Methods used by motor to query properties/preferences/move-related state
 	// ------------
-	virtual bool		CanStandOn( CBaseEntity *pSurface ) const;
+	bool		CanStandOn( CBaseEntity *pSurface ) const override;
 
 	virtual bool		IsJumpLegal( const Vector &startPos, const Vector &apex, const Vector &endPos ) const; // Override for specific creature types
 	bool				IsJumpLegal( const Vector &startPos, const Vector &apex, const Vector &endPos, float maxUp, float maxDown, float maxDist ) const;
@@ -1311,7 +1311,7 @@ public:
 	virtual bool		IsUnusableNode(int iNodeID, CAI_Hint *pHint); // Override for special NPC behavior
 	virtual bool		ValidateNavGoal();
 	virtual bool		IsCurTaskContinuousMove();
-	virtual bool		IsValidMoveAwayDest( const Vector &vecDest )	{ return true; }
+	virtual bool		IsValidMoveAwayDest( [[maybe_unused]] const Vector &vecDest )	{ return true; }
 
 	//---------------------------------
 	//
@@ -1329,15 +1329,15 @@ public:
 
 	//---------------------------------
 	// Inherited from IAI_MotorMovementServices
-	virtual float		CalcYawSpeed( void );
+	float		CalcYawSpeed( void ) override;
 
-	virtual bool		OnCalcBaseMove( AILocalMoveGoal_t *pMoveGoal, 
+	bool		OnCalcBaseMove( AILocalMoveGoal_t *pMoveGoal, 
 										float distClear, 
-										AIMoveResult_t *pResult );
+										AIMoveResult_t *pResult ) override;
 
-	virtual bool		OnObstructionPreSteer( AILocalMoveGoal_t *pMoveGoal, 
+	bool		OnObstructionPreSteer( AILocalMoveGoal_t *pMoveGoal, 
 												float distClear, 
-												AIMoveResult_t *pResult );
+												AIMoveResult_t *pResult ) override;
 
 	// Translations of the above into some useful game terms
 	virtual bool		OnObstructingDoor( AILocalMoveGoal_t *pMoveGoal, 
@@ -1402,18 +1402,18 @@ public:
 	virtual Vector		GetNodeViewOffset()					{ return GetViewOffset();		}
 
 	virtual Vector		EyeOffset( Activity nActivity );
-	virtual Vector		EyePosition( void );
+	Vector		EyePosition( void ) override;
 
 	//---------------------------------
 	
-	virtual Vector		HeadDirection2D( void );
-	virtual Vector		HeadDirection3D( void );
-	virtual Vector		EyeDirection2D( void );
-	virtual Vector		EyeDirection3D( void );
+	Vector		HeadDirection2D( void ) override;
+	Vector		HeadDirection3D( void ) override;
+	Vector		EyeDirection2D( void ) override;
+	Vector		EyeDirection3D( void ) override;
 
 	virtual CBaseEntity *EyeLookTarget( void );		// Overridden by subclass to force look at an entity
-	virtual void		AddLookTarget( CBaseEntity *pTarget, float flImportance, float flDuration, float flRamp = 0.0 ) { };
-	virtual void		AddLookTarget( const Vector &vecPosition, float flImportance, float flDuration, float flRamp = 0.0 ) { };
+	virtual void		AddLookTarget( [[maybe_unused]] CBaseEntity *pTarget, [[maybe_unused]] float flImportance, [[maybe_unused]] float flDuration, [[maybe_unused]] float flRamp = 0.0 ) { };
+	virtual void		AddLookTarget( [[maybe_unused]] const Vector &vecPosition, [[maybe_unused]] float flImportance, [[maybe_unused]] float flDuration, [[maybe_unused]] float flRamp = 0.0 ) { };
 	virtual void		SetHeadDirection( const Vector &vTargetPos, float flInterval );
 	virtual void		MaintainLookTargets( float flInterval );
 	virtual bool		ValidEyeTarget(const Vector &lookTargetPos);
@@ -1422,7 +1422,7 @@ public:
 
 	virtual	void		MaintainTurnActivity( void );
 
-	virtual bool		FInAimCone( const Vector &vecSpot );
+	bool		FInAimCone( const Vector &vecSpot ) override;
 	virtual void		AimGun();
 	virtual void		SetAim( const Vector &aimDir );
 	virtual	void		RelaxAim( void );
@@ -1453,16 +1453,16 @@ public:
 	//-----------------------------------------------------
 	inline bool			IsInAScript( void ) { return m_bInAScript; }
 	inline void			SetInAScript( bool bScript ) { m_bInAScript = bScript; }
-	void				InputStartScripting( inputdata_t &inputdata ) { m_bInAScript = true; }
-	void				InputStopScripting( inputdata_t &inputdata ) { m_bInAScript = false; }
+	void				InputStartScripting( [[maybe_unused]] inputdata_t &inputdata ) { m_bInAScript = true; }
+	void				InputStopScripting( [[maybe_unused]] inputdata_t &inputdata ) { m_bInAScript = false; }
 
-	void				InputGagEnable( inputdata_t &inputdata ) { AddSpawnFlags(SF_NPC_GAG); }
-	void				InputGagDisable( inputdata_t &inputdata ) { RemoveSpawnFlags(SF_NPC_GAG); }
+	void				InputGagEnable( [[maybe_unused]] inputdata_t &inputdata ) { AddSpawnFlags(SF_NPC_GAG); }
+	void				InputGagDisable( [[maybe_unused]] inputdata_t &inputdata ) { RemoveSpawnFlags(SF_NPC_GAG); }
 
-	bool				HandleInteraction(int interactionType, void *data, CBaseCombatCharacter* sourceEnt);
+	bool				HandleInteraction(int interactionType, void *data, CBaseCombatCharacter* sourceEnt) override;
 
-	virtual void		InputOutsideTransition( inputdata_t &inputdata );
-	virtual void		InputInsideTransition( inputdata_t &inputdata );
+	virtual void		InputOutsideTransition( [[maybe_unused]] inputdata_t &inputdata );
+	virtual void		InputInsideTransition( [[maybe_unused]] inputdata_t &inputdata );
 
 	void				CleanupScriptsOnTeleport( bool bEnrouteAsWell );
 
@@ -1493,7 +1493,7 @@ public:
 	bool				ExitScriptedSequence();
 	bool				CineCleanup();
 
-	virtual void		Teleport( const Vector *newPosition, const QAngle *newAngles, const Vector *newVelocity );
+	void		Teleport( const Vector *newPosition, const QAngle *newAngles, const Vector *newVelocity ) override;
 
 	// forces movement and sets a new schedule
 	virtual bool		ScheduledMoveToGoalEntity( int scheduleType, CBaseEntity *pGoalEntity, Activity movementActivity );
@@ -1549,7 +1549,7 @@ public:
 	float				GetLastEnemyTime() const { return m_flLastEnemyTime; }
 
 	// Set up the shot regulator based on the equipped weapon
-	virtual void		OnChangeActiveWeapon( CBaseCombatWeapon *pOldWeapon, CBaseCombatWeapon *pNewWeapon );
+	void		OnChangeActiveWeapon( CBaseCombatWeapon *pOldWeapon, CBaseCombatWeapon *pNewWeapon ) override;
 
 	// Weapon holstering
 	virtual bool		CanHolsterWeapon( void );
@@ -1643,7 +1643,7 @@ public:
 	virtual float		GetMaxTacticalLateralMovement( void ) { return MAXTACLAT_IGNORE; }
 
 protected:
-	virtual void		OnChangeHintGroup( string_t oldGroup, string_t newGroup ) {}
+	virtual void		OnChangeHintGroup( [[maybe_unused]] string_t oldGroup, [[maybe_unused]] string_t newGroup ) {}
 
 	CAI_Squad *			m_pSquad;		// The squad that I'm on
 	string_t			m_SquadName;
@@ -1665,8 +1665,8 @@ public:
 	void				InitRelationshipTable( void );
 	void				AddRelationship( const char *pszRelationship, CBaseEntity *pActivator );
 
-	virtual void		AddEntityRelationship( CBaseEntity *pEntity, Disposition_t nDisposition, int nPriority );
-	virtual void		AddClassRelationship( Class_T nClass, Disposition_t nDisposition, int nPriority );
+	void		AddEntityRelationship( CBaseEntity *pEntity, Disposition_t nDisposition, int nPriority ) override;
+	void		AddClassRelationship( Class_T nClass, Disposition_t nDisposition, int nPriority ) override;
 
 	void				NPCUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
@@ -1705,9 +1705,9 @@ public:
 	void				GatherAttackConditions( CBaseEntity *pTarget, float flDist );
 	virtual bool		ShouldLookForBetterWeapon();
 	bool				Weapon_IsBetterAvailable ( void ) ;
-	virtual Vector		Weapon_ShootPosition( void );
+	Vector		Weapon_ShootPosition( void ) override;
 	virtual	void		GiveWeapon( string_t iszWeaponName );
-	virtual void		OnGivenWeapon( CBaseCombatWeapon *pNewWeapon ) { }
+	virtual void		OnGivenWeapon( [[maybe_unused]] CBaseCombatWeapon *pNewWeapon ) { }
 	bool				IsMovingToPickupWeapon();
 	virtual bool		WeaponLOSCondition(const Vector &ownerPos, const Vector &targetPos, bool bSetConditions);
 	virtual bool		CurrentWeaponLOSCondition(const Vector &targetPos, bool bSetConditions) { return WeaponLOSCondition( GetAbsOrigin(), targetPos, bSetConditions ); }
@@ -1739,16 +1739,16 @@ public:
 
 	//---------------------------------
 
-	virtual void		Ignite( float flFlameLifetime, bool bNPCOnly = true, float flSize = 0.0f, bool bCalledByLevelDesigner = false );
-	virtual bool		PassesDamageFilter( const CTakeDamageInfo &info );
+	void		Ignite( float flFlameLifetime, bool bNPCOnly = true, float flSize = 0.0f, bool bCalledByLevelDesigner = false ) override;
+	bool		PassesDamageFilter( const CTakeDamageInfo &info ) override;
 
 	//---------------------------------
 
 	void				MakeDamageBloodDecal( int cCount, float flNoise, trace_t *ptr, Vector vecDir );
 	virtual float		GetHitgroupDamageMultiplier( int iHitGroup, const CTakeDamageInfo &info );
-	void				TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
-	void				DecalTrace( trace_t *pTrace, char const *decalName );
-	void				ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );
+	void				TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator ) override;
+	void				DecalTrace( trace_t *pTrace, char const *decalName ) override;
+	void				ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName ) override;
 	virtual	bool		PlayerInSpread( const Vector &sourcePos, const Vector &targetPos, float flSpread, float maxDistOffCenter, bool ignoreHatedPlayers = true );
 	CBaseEntity *		PlayerInRange( const Vector &vecLocation, float flDist );
 	bool				PointInSpread( CBaseCombatCharacter *pCheckEntity, const Vector &sourcePos, const Vector &targetPos, const Vector &testPoint, float flSpread, float maxDistOffCenter );
@@ -1761,20 +1761,20 @@ public:
 
 	virtual Activity	GetFlinchActivity( bool bHeavyDamage, bool bGesture );
 	
-	virtual bool		Event_Gibbed( const CTakeDamageInfo &info );
-	virtual void		Event_Killed( const CTakeDamageInfo &info );
+	bool		Event_Gibbed( const CTakeDamageInfo &info ) override;
+	void		Event_Killed( const CTakeDamageInfo &info ) override;
 
 	virtual Vector		GetShootEnemyDir( const Vector &shootOrigin, bool bNoisy = true );
 #ifdef HL2_DLL
 	virtual Vector		GetActualShootPosition( const Vector &shootOrigin );
 	virtual Vector		GetActualShootTrajectory( const Vector &shootOrigin );
-	virtual	Vector		GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget = NULL );
-	virtual	float		GetSpreadBias( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget );
+	Vector		GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget = NULL ) override;
+	float		GetSpreadBias( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget ) override;
 #endif //HL2_DLL
 	virtual void		CollectShotStats( const Vector &vecShootOrigin, const Vector &vecShootDir );
-	virtual Vector		BodyTarget( const Vector &posSrc, bool bNoisy = true );
-	virtual Vector		GetAutoAimCenter() { return BodyTarget(vec3_origin, false); }
-	virtual void		FireBullets( const FireBulletsInfo_t &info );
+	Vector		BodyTarget( const Vector &posSrc, bool bNoisy = true ) override;
+	Vector		GetAutoAimCenter() override { return BodyTarget(vec3_origin, false); }
+	void		FireBullets( const FireBulletsInfo_t &info ) override;
 
 	// OLD VERSION! Use the struct version
 	void FireBullets( int cShots, const Vector &vecSrc, const Vector &vecDirShooting, 
@@ -1787,12 +1787,12 @@ public:
 	//---------------------------------
 	//  Damage
 	//---------------------------------
-	virtual int			OnTakeDamage_Alive( const CTakeDamageInfo &info );
-	virtual int			OnTakeDamage_Dying( const CTakeDamageInfo &info );
-	virtual int			OnTakeDamage_Dead( const CTakeDamageInfo &info );
+	int			OnTakeDamage_Alive( const CTakeDamageInfo &info ) override;
+	int			OnTakeDamage_Dying( const CTakeDamageInfo &info ) override;
+	int			OnTakeDamage_Dead( const CTakeDamageInfo &info ) override;
 
-	virtual void		NotifyFriendsOfDamage( CBaseEntity *pAttackerEntity );
-	virtual void		OnFriendDamaged( CBaseCombatCharacter *pSquadmate, CBaseEntity *pAttacker );
+	void		NotifyFriendsOfDamage( CBaseEntity *pAttackerEntity ) override;
+	void		OnFriendDamaged( CBaseCombatCharacter *pSquadmate, CBaseEntity *pAttacker ) override;
 
 	virtual bool		IsLightDamage( const CTakeDamageInfo &info );
 	virtual bool		IsHeavyDamage( const CTakeDamageInfo &info );
@@ -1803,7 +1803,7 @@ public:
 	//---------------------------------
 
 	virtual void	PickupWeapon( CBaseCombatWeapon *pWeapon );
-	virtual void	PickupItem( CBaseEntity *pItem ) { };
+	virtual void	PickupItem( [[maybe_unused]] CBaseEntity *pItem ) { };
 	CBaseEntity*	DropItem( const char *pszItemName, Vector vecPos, QAngle vecAng );// drop an item.
 
 
@@ -1822,7 +1822,7 @@ public:
 
 	//---------------------------------
 	
-	virtual void		NotifyDeadFriend( CBaseEntity *pFriend ) { return; }
+	virtual void		NotifyDeadFriend( [[maybe_unused]] CBaseEntity *pFriend ) { return; }
 
 	//---------------------------------
 	// Utility methods
@@ -1916,7 +1916,7 @@ public:
 	float				GetHullHeight() const	{ return NAI_Hull::Height(GetHullType()); }
 
 	void				SetupVPhysicsHull();
-	virtual void		StartTouch( CBaseEntity *pOther );
+	void				StartTouch( CBaseEntity *pOther )  override;
 	void				CheckPhysicsContacts();
 
 private:
@@ -1936,7 +1936,7 @@ private:
 
 protected:
 	virtual float CalcReasonableFacing( bool bIgnoreOriginalFacing = false );
-	virtual bool IsValidReasonableFacing( const Vector &vecSightDir, float sightDist ) { return true; }
+	virtual bool IsValidReasonableFacing( [[maybe_unused]] const Vector &vecSightDir, [[maybe_unused]] float sightDist ) { return true; }
 	virtual float GetReasonableFacingDist( void );
 
 public:
@@ -1947,7 +1947,7 @@ public:
 		return baseCaps;
 	}
 
-	virtual int	ObjectCaps()	{ return (BaseClass::ObjectCaps() | FCAP_NOTIFY_ON_TRANSITION); }
+	int	ObjectCaps() override	{ return (BaseClass::ObjectCaps() | FCAP_NOTIFY_ON_TRANSITION); }
 
 	//-----------------------------------------------------
 	//
@@ -2061,8 +2061,8 @@ public:
 	virtual void		ReportAIState( void );
 	virtual void		ReportOverThinkLimit( float time );
 	void 				DumpTaskTimings();
-	void				DrawDebugGeometryOverlays(void);
-	virtual int			DrawDebugTextOverlays(void);
+	void				DrawDebugGeometryOverlays(void) override;
+	int					DrawDebugTextOverlays(void) override;
 	void				ToggleFreeze(void);
 
 	static void			ClearAllSchedules(void);
@@ -2111,8 +2111,8 @@ public:
 	CNetworkVar( int,   m_iSpeedModSpeed );
 	CNetworkVar( float, m_flTimePingEffect );			// Display the pinged effect until this time
 
-	void				InputActivateSpeedModifier( inputdata_t &inputdata ) { m_bSpeedModActive = true; }
-	void				InputDisableSpeedModifier( inputdata_t &inputdata ) { m_bSpeedModActive = false; }
+	void				InputActivateSpeedModifier( [[maybe_unused]] inputdata_t &inputdata ) { m_bSpeedModActive = true; }
+	void				InputDisableSpeedModifier( [[maybe_unused]] inputdata_t &inputdata ) { m_bSpeedModActive = false; }
 	void				InputSetSpeedModifierRadius( inputdata_t &inputdata );
 	void				InputSetSpeedModifierSpeed( inputdata_t &inputdata );
 
@@ -2598,10 +2598,41 @@ public:
 	\
 	friend class CScheduleLoader;
 
+#define DEFINE_CUSTOM_SCHEDULE_PROVIDER_OVERRIDE\
+	static AI_SchedLoadStatus_t 		gm_SchedLoadStatus; \
+	static CAI_ClassScheduleIdSpace 	gm_ClassScheduleIdSpace; \
+	static const char *					gm_pszErrorClassName;\
+	\
+	static CAI_ClassScheduleIdSpace &	AccessClassScheduleIdSpaceDirect() 	{ return gm_ClassScheduleIdSpace; } \
+	CAI_ClassScheduleIdSpace *	GetClassScheduleIdSpace() override			{ return &gm_ClassScheduleIdSpace; } \
+	const char *				GetSchedulingErrorName() override			{ return gm_pszErrorClassName; } \
+	\
+	static void					InitCustomSchedules(void);\
+	\
+	static bool					LoadSchedules(void);\
+	bool						LoadedSchedules(void) override; \
+	\
+	friend class ScheduleLoadHelperImpl;	\
+	\
+	class CScheduleLoader \
+	{ \
+	public: \
+		CScheduleLoader(); \
+	} m_ScheduleLoader; \
+	\
+	friend class CScheduleLoader;
+
 //-------------------------------------
 
 #define DEFINE_CUSTOM_AI\
 	DEFINE_CUSTOM_SCHEDULE_PROVIDER \
+	\
+	static CAI_LocalIdSpace gm_SquadSlotIdSpace; \
+	\
+	const char*				SquadSlotName	(int squadSlotID);
+
+#define DEFINE_CUSTOM_AI_OVERRIDE\
+	DEFINE_CUSTOM_SCHEDULE_PROVIDER_OVERRIDE \
 	\
 	static CAI_LocalIdSpace gm_SquadSlotIdSpace; \
 	\
@@ -3068,9 +3099,9 @@ class CNPCBaseInteractive : public NPC_CLASS, public INPCInteractive
 {
 	DECLARE_CLASS( CNPCBaseInteractive, NPC_CLASS );
 public:
-	virtual bool	CanInteractWith( CAI_BaseNPC *pUser ) { return false; };
+	virtual bool	CanInteractWith( CAI_BaseNPC * ) { return false; };
 	virtual	bool	HasBeenInteractedWith()	{ return false; };
-	virtual void	NotifyInteraction( CAI_BaseNPC *pUser ) { return; };
+	virtual void	NotifyInteraction( CAI_BaseNPC * ) { return; };
 
 	virtual void	InputPowerdown( inputdata_t &inputdata )
 	{

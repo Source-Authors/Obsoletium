@@ -40,7 +40,7 @@ struct commandgoal_t
 };
 
 // Time between checks to determine whether NPCs are illuminated by the flashlight
-#define FLASHLIGHT_NPC_CHECK_INTERVAL	0.4
+#define FLASHLIGHT_NPC_CHECK_INTERVAL	0.4f
 
 //----------------------------------------------------
 // Definitions for weapon slots

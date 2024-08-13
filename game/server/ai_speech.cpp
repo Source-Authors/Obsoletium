@@ -146,7 +146,7 @@ public:
 			}
 			else
 			{
-				Assert( !"Error restoring ConceptHistory_t, discarding!" );
+				AssertMsg( false, "Error restoring ConceptHistory_t, discarding!" );
 			}
 		}
 	}
@@ -211,13 +211,13 @@ static int g_nExpressers;
 #endif
 
 CAI_Expresser::CAI_Expresser( CBaseFlex *pOuter )
- :	m_pOuter( pOuter ),
-	m_pSink( NULL ),
+ :	m_pSink( NULL ),
 	m_flStopTalkTime( 0 ),
-	m_flLastTimeAcceptedSpeak( 0 ),
-	m_flBlockedTalkTime( 0 ),
 	m_flStopTalkTimeWithoutDelay( 0 ),
-	m_voicePitch( 100 )
+	m_flBlockedTalkTime( 0 ),
+	m_voicePitch( 100 ),
+	m_flLastTimeAcceptedSpeak( 0 ),
+	m_pOuter( pOuter )
 {
 #ifdef DEBUG
 	g_nExpressers++;
@@ -264,7 +264,7 @@ void CAI_Expresser::TestAllResponses()
 
 //-----------------------------------------------------------------------------
 
-static const int LEN_SPECIFIC_SCENE_MODIFIER = strlen( AI_SPECIFIC_SCENE_MODIFIER );
+static constexpr int LEN_SPECIFIC_SCENE_MODIFIER = std::size( AI_SPECIFIC_SCENE_MODIFIER ) - 1;
 
 //-----------------------------------------------------------------------------
 // Purpose: Searches for a possible response
@@ -277,7 +277,7 @@ bool CAI_Expresser::SpeakFindResponse( AI_Response &outResponse, AIConcept_t con
 	IResponseSystem *rs = GetOuter()->GetResponseSystem();
 	if ( !rs )
 	{
-		Assert( !"No response system installed for CAI_Expresser::GetOuter()!!!" );
+		AssertMsg( false, "No response system installed for CAI_Expresser::GetOuter()!!!" );
 		return false;
 	}
 
@@ -779,7 +779,7 @@ void CAI_Expresser::ClearSpokeConcept( AIConcept_t concept )
 void CAI_Expresser::DumpHistories()
 {
 	int c = 1;
-	for ( int i = m_ConceptHistories.First(); i != m_ConceptHistories.InvalidIndex(); i = m_ConceptHistories.Next(i ) )
+	for ( auto i = m_ConceptHistories.First(); i != m_ConceptHistories.InvalidIndex(); i = m_ConceptHistories.Next(i ) )
 	{
 		ConceptHistory_t *h = &m_ConceptHistories[ i ];
 
@@ -849,7 +849,7 @@ void CAI_ExpresserHost_NPC_DoModifyOrAppendCriteria( CAI_BaseNPC *pSpeaker, AI_C
 	}
 
 	static const char *pStateNames[] = { "None", "Idle", "Alert", "Combat", "Scripted", "PlayDead", "Dead" };
-	if ( (int)pSpeaker->m_NPCState < ARRAYSIZE(pStateNames) )
+	if ( (int)pSpeaker->m_NPCState < static_cast<int>(ARRAYSIZE(pStateNames)) )
 	{
 		set.AppendCriteria( "npcstate", UTIL_VarArgs( "[NPCState::%s]", pStateNames[pSpeaker->m_NPCState] ) );
 	}

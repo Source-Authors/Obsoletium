@@ -117,7 +117,7 @@ class AI_Response;
 class CAI_ExpresserSink
 {
 public:
-	virtual void OnSpokeConcept( AIConcept_t concept, AI_Response *response )	{};
+	virtual void OnSpokeConcept( [[maybe_unused]] AIConcept_t concept, [[maybe_unused]] AI_Response *response )	{};
 	virtual void OnStartSpeaking()						{}
 	virtual bool UseSemaphore()							{ return true; }
 };
@@ -285,7 +285,7 @@ public:
 	// These two methods allow looking up a response and dispatching it to be two different steps
 	bool			SpeakFindResponse( AI_Response& response, AIConcept_t concept, const char *modifiers = NULL );
 	bool 			SpeakDispatchResponse( AIConcept_t concept, AI_Response& response );
-	virtual void	PostSpeakDispatchResponse( AIConcept_t concept, AI_Response& response ) { return; }
+	virtual void	PostSpeakDispatchResponse( AIConcept_t, AI_Response& ) { return; }
 	float 			GetResponseDuration( AI_Response& response );
 
 	float GetTimeSpeechComplete() const 	{ return this->GetExpresser()->GetTimeSpeechComplete(); }

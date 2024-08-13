@@ -627,7 +627,7 @@ void CNPC_RollerMine::Bury( trace_t *tr )
 	//NDebugOverlay::Box( tr->endpos, Vector(-16,-16,-16), Vector(16,16,16), 0, 255, 0, 64, 10.0 );
 
 	// Move into the ground layer
-	Vector buriedPos = tr->endpos - Vector( 0, 0, GetHullHeight() * 0.5 );
+	Vector buriedPos = tr->endpos - Vector( 0, 0, GetHullHeight() * 0.5f );
 	Teleport( &buriedPos, NULL, &vec3_origin );
 	SetMoveType( MOVETYPE_NONE );
 
@@ -830,7 +830,7 @@ void CNPC_RollerMine::RunAI()
 		// Scare combine if hacked by Alyx.
 		IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
 
-		Vector vecVelocity;
+		Vector vecVelocity{0, 0, 0};
 
 		if ( pPhysicsObject != NULL )
 		{
@@ -842,12 +842,12 @@ void CNPC_RollerMine::RunAI()
 			if( m_bHackedByAlyx )
 			{
 				// Scare combine
-				CSoundEnt::InsertSound( (SOUND_DANGER | SOUND_CONTEXT_COMBINE_ONLY | SOUND_CONTEXT_REACT_TO_SOURCE | SOUND_CONTEXT_DANGER_APPROACH), WorldSpaceCenter() + Vector( 0, 0, 32 ) + vecVelocity * 0.5f, 120.0f, 0.2f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
+				CSoundEnt::InsertSound( (SOUND_DANGER | SOUND_CONTEXT_COMBINE_ONLY | SOUND_CONTEXT_REACT_TO_SOURCE | SOUND_CONTEXT_DANGER_APPROACH), WorldSpaceCenter() + Vector( 0, 0, 32 ) + vecVelocity * 0.5f, 120, 0.2f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
 			}
 			else
 			{
 				// Scare player allies
-				CSoundEnt::InsertSound( (SOUND_DANGER | SOUND_CONTEXT_EXCLUDE_COMBINE | SOUND_CONTEXT_REACT_TO_SOURCE | SOUND_CONTEXT_DANGER_APPROACH), WorldSpaceCenter() + Vector( 0, 0, 32 ) + vecVelocity * 0.5f, 120.0f, 0.2f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
+				CSoundEnt::InsertSound( (SOUND_DANGER | SOUND_CONTEXT_EXCLUDE_COMBINE | SOUND_CONTEXT_REACT_TO_SOURCE | SOUND_CONTEXT_DANGER_APPROACH), WorldSpaceCenter() + Vector( 0, 0, 32 ) + vecVelocity * 0.5f, 120, 0.2f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
 			}
 		}
 
@@ -1355,7 +1355,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 				vecCompensate.y = -vecVelocity.x;
 				vecCompensate.z = 0;
 
-				m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75 );
+				m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75f );
 			}
 
 			if( m_bHackedByAlyx )
@@ -1489,7 +1489,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			vecCompensate.z = 0;
 			VectorNormalize( vecCompensate );
 
-			m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75 );
+			m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75f );
 			m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, m_flForwardSpeed  * flTorqueFactor );
 		
 			// Taunt when I get closer
@@ -1608,7 +1608,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			vecCompensate.z = 0;
 			VectorNormalize( vecCompensate );
 
-			m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75 );
+			m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75f );
 			m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, m_flForwardSpeed  * flTorqueFactor );
 
 			// Once we're near the player, slow & stop
@@ -2005,7 +2005,6 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 
 	// jump up at a 30 degree angle away from the guy we hit
 	SetTouch( &CNPC_RollerMine::CloseTouch );
-	Vector vel;
 	pPhysics->SetVelocity( &impulse, NULL );
 	EmitSound( "NPC_RollerMine.Shock" );
 	// Do a shock effect
@@ -2043,7 +2042,7 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 		}
 		else
 		{
-			info.SetDamage( pOther->GetMaxHealth()/2 );
+			info.SetDamage( pOther->GetMaxHealth()/2.0f );
 		}
 	}
 
@@ -2515,7 +2514,7 @@ void CNPC_RollerMine::Explode( void )
 	m_takedamage = DAMAGE_NO;
 
 	//FIXME: Hack to make thrown mines more deadly and fun
-	float expDamage = m_bIsPrimed ? 100 : 25;
+	int expDamage = m_bIsPrimed ? 100 : 25;
 
 	//If we've been hacked and we're blowing up cause we've been shut down then do moderate damage.
 	if ( m_bPowerDown == true )

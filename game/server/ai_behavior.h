@@ -56,7 +56,7 @@ public:
 
 	virtual const char *GetName() = 0;
 
-	virtual bool KeyValue( const char *szKeyName, const char *szValue ) 
+	virtual bool KeyValue( const char *, const char * ) 
 	{
 		return false;
 	}
@@ -149,8 +149,8 @@ protected:
 	virtual void Precache()										{}
 	virtual void Spawn()										{}
 	virtual void UpdateOnRemove()								{}
-	virtual void Event_Killed( const CTakeDamageInfo &info )	{}
-	virtual void CleanupOnDeath( CBaseEntity *pCulprit, bool bFireDeathOutput ) {}
+	virtual void Event_Killed( [[maybe_unused]] const CTakeDamageInfo &info )	{}
+	virtual void CleanupOnDeath( [[maybe_unused]] CBaseEntity *pCulprit, [[maybe_unused]] bool bFireDeathOutput ) {}
 	
 	virtual void PrescheduleThink();
 	virtual void OnScheduleChange();
@@ -215,8 +215,8 @@ protected:
 
 	virtual bool ShouldAlwaysThink();
 
-	virtual void OnChangeActiveWeapon( CBaseCombatWeapon *pOldWeapon, CBaseCombatWeapon *pNewWeapon ) {};
-	virtual bool SpeakMapmakerInterruptConcept( string_t iszConcept ) { return false; };
+	virtual void OnChangeActiveWeapon( [[maybe_unused]] CBaseCombatWeapon *pOldWeapon, [[maybe_unused]] CBaseCombatWeapon *pNewWeapon ) {};
+	virtual bool SpeakMapmakerInterruptConcept( [[maybe_unused]] string_t iszConcept ) { return false; };
 	
 	virtual void OnRestore() {};
 	
@@ -230,14 +230,14 @@ protected:
 	void				ClearHintGroup()			{ GetOuter()->ClearHintGroup();			}
 	void				SetHintGroup( string_t name )	{ GetOuter()->SetHintGroup( name );		}
 
-	virtual void		OnChangeHintGroup( string_t oldGroup, string_t newGroup ) {}
+	virtual void		OnChangeHintGroup( [[maybe_unused]] string_t oldGroup, [[maybe_unused]] string_t newGroup ) {}
 
 	//
 	// These allow derived classes to implement custom schedules
 	//
 	static CAI_GlobalScheduleNamespace *GetSchedulingSymbols()		{ return CAI_BaseNPC::GetSchedulingSymbols(); }
 	static bool				LoadSchedules()							{ return true; }
-	virtual bool			IsBehaviorSchedule( int scheduleType )	{ return false; }
+	virtual bool			IsBehaviorSchedule( int )	{ return false; }
 
 	CAI_Navigator *			GetNavigator() 							{ return GetOuter()->GetNavigator(); 		}
 	CAI_Motor *				GetMotor() 								{ return GetOuter()->GetMotor(); 			}
@@ -474,7 +474,7 @@ protected:
 	void			AddBehavior( CAI_BehaviorBase *pBehavior );
 	
 	bool			BehaviorSelectSchedule();
-	virtual bool	ShouldBehaviorSelectSchedule( CAI_BehaviorBase *pBehavior ) { return true; }
+	virtual bool	ShouldBehaviorSelectSchedule( CAI_BehaviorBase * ) { return true; }
 
 	bool 			IsRunningBehavior() const;
 	CAI_BehaviorBase *GetRunningBehavior();
@@ -1878,7 +1878,7 @@ inline bool CAI_BehaviorHost<BASE_NPC>::OnBehaviorChangeStatus(  CAI_BehaviorBas
 //-------------------------------------
 
 template <class BASE_NPC>
-inline void CAI_BehaviorHost<BASE_NPC>::OnChangeRunningBehavior( CAI_BehaviorBase *pOldBehavior,  CAI_BehaviorBase *pNewBehavior )
+inline void CAI_BehaviorHost<BASE_NPC>::OnChangeRunningBehavior( CAI_BehaviorBase *,  CAI_BehaviorBase * )
 {
 }
 
@@ -1892,7 +1892,9 @@ inline void CAI_BehaviorHost<BASE_NPC>::AddBehavior( CAI_BehaviorBase *pBehavior
 	Assert( m_fDebugInCreateBehaviors );
 	for ( int i = 0; i < m_Behaviors.Count(); i++)
 	{
-		Assert( typeid(*m_Behaviors[i]) != typeid(*pBehavior) );
+		auto &b = *m_Behaviors[i];
+		auto &c = *pBehavior;
+		Assert( typeid(b) != typeid(c) );
 	}
 #endif
 	m_Behaviors.AddToTail( pBehavior );

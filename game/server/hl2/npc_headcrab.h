@@ -68,7 +68,7 @@ public:
 	virtual int		SelectFailSchedule( int failedSchedule, int failedTask, AI_TaskFailureCode_t taskFailCode );
 	virtual int		TranslateSchedule( int scheduleType );
 
-	virtual float	GetReactionDelay( CBaseEntity *pEnemy ) { return 0.0; }
+	virtual float	GetReactionDelay( CBaseEntity * ) { return 0.0; }
 
 	bool			HandleInteraction(int interactionType, void *data, CBaseCombatCharacter* sourceEnt);
 

@@ -37,7 +37,7 @@ inline static char *CopyString( const char *in )
 	if ( !in )
 		return NULL;
 
-	int len = Q_strlen( in );
+	intp len = Q_strlen( in );
 	char *out = new char[ len + 1 ];
 	Q_memcpy( out, in, len );
 	out[ len ] = 0;
@@ -867,7 +867,8 @@ void CResponseSystem::ResolveToken( Matcher& matcher, char *token, size_t bufsiz
 
 static bool AppearsToBeANumber( char const *token )
 {
-	if ( atof( token ) != 0.0f )
+	// dimhotepus: atof -> strtof.
+	if ( strtof( token, nullptr ) != 0.0f )
 		return true;
 
 	char const *p = token;
@@ -996,7 +997,8 @@ bool CResponseSystem::CompareUsingMatcher( const char *setValue, Matcher& m, boo
 	if ( !m.valid )
 		return false;
 
-	float v = (float)atof( setValue );
+	// dimhotepus: atof -> strtof.
+	float v = strtof( setValue, nullptr );
 	if ( setValue[0] == '[' )
 	{
 		bool found = false;
@@ -1047,7 +1049,8 @@ bool CResponseSystem::CompareUsingMatcher( const char *setValue, Matcher& m, boo
 	{
 		if ( m.isnumeric )
 		{
-			if ( v == (float)atof( m.GetToken() ) )
+			// dimhotepus: atof -> strtof.
+			if ( v == strtof( m.GetToken(), nullptr ) )
 				return false;
 		}
 		else
@@ -1317,7 +1320,7 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 	int c = g->group.Count();
 	if ( !c )
 	{
-		Assert( !"Expecting response group with >= 1 elements" );
+		AssertMsg( false, "Expecting response group with >= 1 elements" );
 		return -1;
 	}
 
@@ -1856,7 +1859,7 @@ void CResponseSystem::Precache()
 					if ( gender )
 					{
 						// replace with male & female
-						const char *postGender = gender + strlen("$gender");
+						const char *postGender = gender + std::size("$gender") - 1;
 						*gender = 0;
 						char genderFile[_MAX_PATH];
 						// male
@@ -2384,6 +2387,7 @@ int CResponseSystem::ParseOneCriterion( const char *criterionName )
 		else if ( !Q_stricmp( token, "weight" ) )
 		{
 			ParseToken();
+			// dimhotepus: atof -> strtof.
 			newCriterion.weight.SetFloat( (float)atof( token ) );
 		}
 		else
@@ -2464,7 +2468,8 @@ void CResponseSystem::ParseEnumeration( void )
 
 		Q_strncpy( key, token, sizeof( key ) );
 		ParseToken();
-		float value = (float)atof( token );
+		// dimhotepus: atof -> strtof.
+		float value = strtof( token, nullptr );
 
 		char sz[ 128 ];
 		Q_snprintf( sz, sizeof( sz ), "[%s::%s]", enumerationName, key );
@@ -2821,7 +2826,7 @@ public:
 	{
 		Assert( scriptfile );
 
-		int len = Q_strlen( scriptfile ) + 1;
+		intp len = Q_strlen( scriptfile ) + 1;
 		m_pszScriptFile = new char[ len ];
 		Assert( m_pszScriptFile );
 		Q_strncpy( m_pszScriptFile, scriptfile, len );

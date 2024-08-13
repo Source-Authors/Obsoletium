@@ -65,7 +65,7 @@ void CRopeAnchor::Spawn()
 	ASSERT( m_hRope != NULL );
 
 	SetThink( &CRopeAnchor::FallThink );
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	SetNextThink( gpGlobals->curtime + 0.2f );
 }
 
 //---------------------------------------------------------
@@ -82,7 +82,7 @@ void CRopeAnchor::FallThink()
 	SetAbsVelocity( vecVelocity );
 
 	SetThink( &CRopeAnchor::RemoveThink );
-	SetNextThink( gpGlobals->curtime + 3.0 );
+	SetNextThink( gpGlobals->curtime + 3.0f );
 }
 
 //---------------------------------------------------------
@@ -333,8 +333,6 @@ int CAI_RappelBehavior::SelectSchedule()
 	{
 		return SCHED_RAPPEL;
 	}
-	
-	return BaseClass::SelectSchedule();
 }
 
 //-----------------------------------------------------------------------------

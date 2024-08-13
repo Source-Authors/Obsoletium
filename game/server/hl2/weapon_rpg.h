@@ -141,7 +141,7 @@ public:
 protected:
 	virtual void DoExplosion();	
 	virtual void ComputeActualDotPosition( CLaserDot *pLaserDot, Vector *pActualDotPosition, float *pHomingSpeed );
-	virtual int AugerHealth();
+	int AugerHealth() override;
 
 private:
 	void Init();
@@ -177,34 +177,34 @@ public:
 	CWeaponRPG();
 	~CWeaponRPG();
 
-	DECLARE_SERVERCLASS();
+	DECLARE_SERVERCLASS_OVERRIDE();
 
-	void	Precache( void );
+	void	Precache( void ) override;
 
-	void	PrimaryAttack( void );
-	virtual float GetFireRate( void ) { return 1; };
-	void	ItemPostFrame( void );
+	void	PrimaryAttack( void ) override;
+	float	GetFireRate( void ) override { return 1; };
+	void	ItemPostFrame( void ) override;
 
-	void	Activate( void );
+	void	Activate( void ) override;
 	void	DecrementAmmo( CBaseCombatCharacter *pOwner );
 
-	bool	Deploy( void );
-	bool	Holster( CBaseCombatWeapon *pSwitchingTo = NULL );
-	bool	Reload( void );
-	bool	WeaponShouldBeLowered( void );
-	bool	Lower( void );
+	bool	Deploy( void ) override;
+	bool	Holster( CBaseCombatWeapon *pSwitchingTo = NULL ) override;
+	bool	Reload( void ) override;
+	bool	WeaponShouldBeLowered( void ) override;
+	bool	Lower( void ) override;
 
-	virtual void Drop( const Vector &vecVelocity );
+	void Drop( const Vector &vecVelocity ) override;
 
-	int		GetMinBurst() { return 1; }
-	int		GetMaxBurst() { return 1; }
-	float	GetMinRestTime() { return 4.0; }
-	float	GetMaxRestTime() { return 4.0; }
+	int		GetMinBurst() override { return 1; }
+	int		GetMaxBurst() override { return 1; }
+	float	GetMinRestTime() override { return 4.0; }
+	float	GetMaxRestTime() override { return 4.0; }
 
-	bool	WeaponLOSCondition( const Vector &ownerPos, const Vector &targetPos, bool bSetConditions );
-	int		WeaponRangeAttack1Condition( float flDot, float flDist );
+	bool	WeaponLOSCondition( const Vector &ownerPos, const Vector &targetPos, bool bSetConditions ) override;
+	int		WeaponRangeAttack1Condition( float flDot, float flDist ) override;
 
-	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator ) override;
 	void	StartGuiding( void );
 	void	StopGuiding( void );
 	void	ToggleGuiding( void );
@@ -212,7 +212,7 @@ public:
 
 	void	NotifyRocketDied( void );
 
-	bool	HasAnyAmmo( void );
+	bool	HasAnyAmmo( void ) override;
 
 	void	SuppressGuiding( bool state = true );
 
@@ -228,9 +228,9 @@ public:
 	void	SetNPCLaserPosition( const Vector &vecTarget );
 	const Vector &GetNPCLaserPosition( void );
 
-	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+	int		CapabilitiesGet( void ) override { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 
-	virtual const Vector& GetBulletSpread( void )
+	const Vector& GetBulletSpread( void ) override
 	{
 		static Vector cone = VECTOR_CONE_3DEGREES;
 		return cone;
@@ -239,7 +239,7 @@ public:
 	CBaseEntity *GetMissile( void ) { return m_hMissile; }
 
 	DECLARE_ACTTABLE();
-	DECLARE_DATADESC();
+	DECLARE_DATADESC_OVERRIDE();
 	
 protected:
 
