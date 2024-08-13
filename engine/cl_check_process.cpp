@@ -59,32 +59,29 @@ typedef struct _SYSTEM_HANDLE_INFORMATION
 // 
 int CheckOtherInstancesRunningWithSnapShot( const char *thisProcessNameShort )
 {
-	DWORD nLength;
 	char otherProcessNameShort[ MAX_PATH ];
-
-	nLength = MAX_PATH;
-
 	int iSnapShotCount = 0;
 
-	//
 	HANDLE hSnapshot = CreateToolhelp32Snapshot( TH32CS_SNAPPROCESS, 0 );
 	if( hSnapshot )
 	{
-		PROCESSENTRY32 pe32;
+		PROCESSENTRY32 pe32 = {};
 		pe32.dwSize = sizeof(PROCESSENTRY32);
+
 		if ( Process32First( hSnapshot, &pe32 ) )
 		{
 			do
 			{
 				V_FileBase( pe32.szExeFile, otherProcessNameShort, MAX_PATH );
+
 				if ( V_strcmp( thisProcessNameShort, otherProcessNameShort ) == 0 )
 				{
-//					DevMsg( "CreateToolhelp32Snapshot - Process Name [ %s ] - OtherName [ %s ] \n", thisProcessNameShort, pe32.szExeFile );
 					//  We found an instance of this executable.
 					iSnapShotCount++;
 				}
 			} while( Process32Next( hSnapshot, &pe32 ) );
 		}
+
 		CloseHandle(hSnapshot);
 	}
 
@@ -103,12 +100,13 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 	DWORD nLastProcess;
 	DWORD i;
 	HANDLE process;
+	HMODULE hInst = nullptr;
 	PSYSTEM_HANDLE_INFORMATION pHandleInfo = NULL;
+	using GetProcessImageFileNameFn = decltype(&GetProcessImageFileNameA);
+	GetProcessImageFileNameFn fn = nullptr;
 	char otherProcessName[ MAX_PATH ];
 	char otherProcessNameShort[ MAX_PATH ];
 	
-	HINSTANCE hInst = NULL;
-
 	//  Start with a count of zero, since we will find ourselves too.
 	int iProcessCount = 0;
 	
@@ -186,13 +184,7 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 	if ( !hInst )
 		return CHECK_PROCESS_UNSUPPORTED;
 
-	typedef DWORD (WINAPI *GetProcessImageFileNameFn)(HANDLE, LPTSTR, DWORD);
-	GetProcessImageFileNameFn fn = (GetProcessImageFileNameFn)GetProcAddress( hInst,
-#ifdef  UNICODE
-		"GetProcessImageFileNameW");
-#else
-		"GetProcessImageFileNameA");
-#endif
+	fn = (GetProcessImageFileNameFn)GetProcAddress( hInst, "GetProcessImageFileNameA" );
 
 	if ( !fn )
 		return CHECK_PROCESS_UNSUPPORTED;
@@ -206,10 +198,8 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 			//nLastProcess = pHandleInfo->HandleInfoArray[ i ].ProcessId;
 			nLastProcess = pHandleInfo->HandleInfoArray[ i ].ProcessId;
 	
-			//
 			//  Try to open a handle to this process.  Note that we may not have
 			//  access to all processes, so we ignore errors.
-			//
 			process = OpenProcess( PROCESS_QUERY_INFORMATION,
 				FALSE,
 				nLastProcess );
@@ -224,15 +214,12 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 				
 				if ( bStatus )
 				{
-					//
 					//  We have the process name.  See if it is the same name as our process.
-					//
 					V_FileBase( otherProcessName, otherProcessNameShort, MAX_PATH );
 	
 					if ( V_strcmp( thisProcessNameShort, otherProcessNameShort ) == 0 )
 					{
 						//  We found an instance of this executable.
-//						DevMsg( "EnumProcess - Process Name [ %s ] - OtherName [ %s ] \n", thisProcessNameShort, otherProcessName );
 						iProcessCount++;
 					}
 				}
@@ -264,7 +251,7 @@ Cleanup:
 }
 #endif // IS_WINDOWS_PC
 
-int CheckOtherInstancesRunning( void )
+int CheckOtherInstancesRunning()
 {
 #ifdef IS_WINDOWS_PC
 	BOOL bStatus = 0;
@@ -274,11 +261,11 @@ int CheckOtherInstancesRunning( void )
 	char thisProcessNameShort[ MAX_PATH ];
 
 	// Load the pspapi to get our current process' name
-	HINSTANCE hInst = LoadLibraryExA( "Psapi.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
+	HINSTANCE hInst{LoadLibraryExA( "Psapi.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 )};
 	if ( hInst )
 	{
-		using GetProcessImageFileNameFn = decltype(&GetProcessImageFileName);
-		auto fn = (GetProcessImageFileNameFn)GetProcAddress( hInst, V_STRINGIFY(GetProcessImageFileName) );
+		using GetProcessImageFileNameFn = decltype(&GetProcessImageFileNameA);
+		auto fn = (GetProcessImageFileNameFn)GetProcAddress( hInst, V_STRINGIFY(GetProcessImageFileNameA) );
 		if ( fn )
 		{
 			bStatus = fn( GetCurrentProcess(), thisProcessName, nLength );
@@ -293,8 +280,6 @@ int CheckOtherInstancesRunning( void )
 	}
 
 	V_FileBase( thisProcessName, thisProcessNameShort, MAX_PATH );
-
-//	Msg( "Checking Other Instances Running : ProcessShortName [ %s - %s ] \n", thisProcessName, thisProcessNameShort );
 
 	int iSnapShotCount = CheckOtherInstancesRunningWithSnapShot( thisProcessNameShort );
 	if ( iSnapShotCount > 1 )

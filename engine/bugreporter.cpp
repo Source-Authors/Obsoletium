@@ -156,9 +156,9 @@ const char *GetInternalBugReporterDLL( void )
 // See https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-checktokenmembership
 BOOL IsUserAdmin()
 {
-  SID_IDENTIFIER_AUTHORITY ntAuthority{ SECURITY_NT_AUTHORITY };
+	SID_IDENTIFIER_AUTHORITY ntAuthority{ SECURITY_NT_AUTHORITY };
 	PSID administratorsGroup;
-	BOOL b = AllocateAndInitializeSid(
+	BOOL ok = AllocateAndInitializeSid(
 			&ntAuthority,
 			2,
 			SECURITY_BUILTIN_DOMAIN_RID,
@@ -166,17 +166,17 @@ BOOL IsUserAdmin()
 			0, 0, 0, 0, 0, 0,
 			&administratorsGroup);
 
-	if (b)
+	if (ok)
 	{
-			if (!CheckTokenMembership( NULL, administratorsGroup, &b)) 
+			if (!CheckTokenMembership( NULL, administratorsGroup, &ok)) 
 			{
-					 b = FALSE;
+				ok = FALSE;
 			}
 
 			FreeSid(administratorsGroup); 
 	}
 
-	return b;
+	return ok;
 }
 #endif
 
@@ -199,8 +199,15 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 #ifdef WIN32
 	osversion[ 0 ] = '\0';
 
-	OSVERSIONINFOEX osvi = { sizeof(osvi) };
+	OSVERSIONINFOEX osvi = {sizeof(osvi), 0, 0, 0, 0, {L'\0'}, 0, 0, 0, 0, 0};
+
+// dimhotepus: Directly get os version as have os manifest.
+MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+MSVC_DISABLE_WARNING(4996)
+
 	BOOL bOsVersionInfoEx = GetVersionEx( (OSVERSIONINFO *)&osvi );
+
+MSVC_END_WARNING_OVERRIDE_SCOPE()
 	if( !bOsVersionInfoEx )
 	{
 		Q_strncpy( osversion, "Unable to get OS Version", maxlen );
@@ -256,12 +263,12 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 		// Display version, service pack (if any), and build number.
 		
 		char build[256];
-		Q_snprintf (build, sizeof( build ), "%s (Build %lu) version %lu.%lu (LimitedUser: %s)",
+		Q_snprintf (build, sizeof( build ), "%s (Build %lu) version %lu.%lu (super user: %s)",
 			osvi.szCSDVersion,
 			osvi.dwBuildNumber & 0xFFFF,
 			osvi.dwMajorVersion,
 			osvi.dwMinorVersion,
-			Plat_IsUserAnAdmin() ? "no" : "yes" );
+			Plat_IsUserAnAdmin() ? "yes" : "no" );
 		Q_strncat ( osversion, build, maxlen, COPY_ALL_CHARACTERS );
 		break;
 	
@@ -274,7 +281,7 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 #elif defined(OSX)
 	FILE *fpVersionInfo = popen( "/usr/bin/sw_vers", "r" );
 	const char *pszSearchString = "ProductVersion:\t";
-	const int cchSearchString = Q_strlen( pszSearchString );
+	const intp cchSearchString = Q_strlen( pszSearchString );
 	char rgchVersionLine[1024];
 		
 	if ( !fpVersionInfo )
@@ -289,11 +296,11 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 			{
 				// dimhotepus: Just get MacOS version.
 				const char *pchVersion = rgchVersionLine + cchSearchString;
-				int ccVersion = Q_strlen(pchVersion); // trim the \n
+				intp ccVersion = Q_strlen(pchVersion); // trim the \n
 				Q_strncpy ( osversion, pchVersion, ccVersion );
 				osversion[ ccVersion ] = 0;
 				Q_strncat ( osversion, " (super user: " );
-				Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "no)" : "yes)" );
+				Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "yes)" : "no)" );
 				break;
 			}
 		}
@@ -311,7 +318,7 @@ void DisplaySystemVersion( char *osversion, int maxlen )
 		fgets( osversion, maxlen, fpKernelVer );
 		osversion[ maxlen - 1 ] = 0;
 		Q_strncat ( osversion, " (super user: " );
-		Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "no)" : "yes)" );
+		Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "yes)" : "no)" );
 
 		char *szlf = Q_strrchr( osversion, '\n' );
 		if( szlf )
@@ -454,21 +461,21 @@ void CBugReportFinishedDialog::PerformLayout()
 //-----------------------------------------------------------------------------
 class CBugUIPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CBugUIPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBugUIPanel, vgui::Frame );
 
 public:
 	CBugUIPanel( bool bIsPublic, vgui::Panel *parent );
 	~CBugUIPanel();
 
-	virtual void	OnTick();
+	void	OnTick() override;
 
 	// Command issued
-	virtual void	OnCommand(const char *command);
-	virtual void	Close();
+	void	OnCommand(const char *command) override;
+	void	Close() override;
 
-	virtual void	Activate();
+	void	Activate() override;
 
-	virtual void	SetVisible( bool state )
+	void	SetVisible( bool state ) override
 	{
 		bool changed = state != IsVisible();
 		BaseClass::SetVisible( state );
@@ -482,7 +489,7 @@ public:
 	bool			Init();
 	void			Shutdown();
 
-	virtual void	OnKeyCodePressed( KeyCode code );
+	void	OnKeyCodePressed( KeyCode code ) override;
 
 	void			ParseDefaultParams( void );
 	void			ParseCommands( const CCommand &args );
@@ -642,8 +649,8 @@ protected:
 //-----------------------------------------------------------------------------
 CBugUIPanel::CBugUIPanel( bool bIsPublic, vgui::Panel *parent ) : 
 	BaseClass( parent, "BugUIPanel"),
-	m_bIsPublic( bIsPublic ),
-	m_bAddVMF( false )
+	m_bAddVMF( false ),
+	m_bIsPublic( bIsPublic )
 {
 	m_sDllName = m_bIsPublic ? 
 		BUG_REPORTER_PUBLIC_DLLNAME : 
@@ -794,10 +801,10 @@ bool CBugUIPanel::Init()
 
 	if ( m_hBugReporter )
 	{
-		CreateInterfaceFn factory = Sys_GetFactory( m_hBugReporter );
+		CreateInterfaceFnT<IBugReporter> factory = Sys_GetFactory<IBugReporter>( m_hBugReporter );
 		if ( factory )
 		{
-			m_pBugReporter = (IBugReporter *)factory( INTERFACEVERSION_BUGREPORTER, NULL );
+			m_pBugReporter = factory( INTERFACEVERSION_BUGREPORTER, NULL );
 			if( m_pBugReporter )
 			{    
 				extern CreateInterfaceFn g_AppSystemFactory;
@@ -1874,7 +1881,11 @@ void CBugUIPanel::OnSubmit()
 	
 	if ( m_szSaveGameName[ 0 ] )
 	{
+#ifdef PLATFORM_64BITS
+		Msg( "save file save/x64/%s.sav\n", m_szSaveGameName );
+#else
 		Msg( "save file save/%s.sav\n", m_szSaveGameName );
+#endif
 	}
 	else
 	{
@@ -1958,7 +1969,7 @@ void CBugUIPanel::OnSubmit()
 		bool attachedSave = false;
 		bool attachedScreenshot = false;
 
-		CUtlBuffer buginfo( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer buginfo( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 		buginfo.Printf( "Title:  %s\n", title );
 		buginfo.Printf( "Description:  %s\n\n", desc );
@@ -1982,14 +1993,14 @@ void CBugUIPanel::OnSubmit()
 		buginfo.PutChar( 0 );
 
 
-		int maxlen = buginfo.TellPut() * 2 + 1;
+		intp maxlen = buginfo.TellPut() * 2 + 1;
 		char *fixed = new char [ maxlen ];
 		Assert( fixed );
 		if ( fixed )
 		{
 			Q_memset( fixed, 0, maxlen );
 
-			char *i = (char *)buginfo.Base();
+			char *i = buginfo.Base<char>();
 			char *o = fixed;
 			while ( *i && ( o - fixed ) < maxlen - 1 )
 			{
@@ -2007,13 +2018,17 @@ void CBugUIPanel::OnSubmit()
 		}
 		else
 		{
-			Sys_Error( "Unable to allocate %i bytes for bug description\n", maxlen );
+			Sys_Error( "Unable to allocate %zd bytes for bug description\n", maxlen );
 		}
 
 		// Only attach .sav files in single player
 		if ( ( cl.m_nMaxClients == 1 ) && m_szSaveGameName[ 0 ] )
 		{
+#ifdef PLATFORM_64BITS
+			Q_snprintf( fn, sizeof( fn ), "save/x64/%s.sav", m_szSaveGameName );
+#else
 			Q_snprintf( fn, sizeof( fn ), "save/%s.sav", m_szSaveGameName );
+#endif
 			Q_FixSlashes( fn );
 			attachedSave = AddFileToZip( fn );
 		}
@@ -2296,7 +2311,11 @@ bool CBugUIPanel::UploadBugSubmission( char const *levelname, int bugId, char co
 
 	if ( savefile && savefile[ 0 ] )
 	{
+#ifdef PLATFORM_64BITS
+		Q_snprintf( localfile, sizeof( localfile ), "%s/save/x64/%s.sav", com_gamedir, savefile );
+#else
 		Q_snprintf( localfile, sizeof( localfile ), "%s/save/%s.sav", com_gamedir, savefile );
+#endif
 		Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.sav", GetSubmissionURL(bugId), savefile );
 		Q_FixSlashes( localfile );
 		Q_FixSlashes( remotefile );
@@ -2356,8 +2375,8 @@ bool CBugUIPanel::UploadBugSubmission( char const *levelname, int bugId, char co
 	if ( files.Count() > 0 )
 	{
 		bAsync = false;
-		int c = files.Count();
-		for ( int i = 0 ; i < c; ++i )
+		intp c = files.Count();
+		for ( intp i = 0 ; i < c; ++i )
 		{
 			Q_snprintf( localfile, sizeof( localfile ), "%s/%s", com_gamedir, files[ i ].name );
 			Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s", GetSubmissionURL(bugId), files[ i ].fixedname );
@@ -2953,12 +2972,12 @@ CON_COMMAND_F( bug, "Show/hide the bug reporting UI.", FCVAR_DONTRECORD )
 int CBugUIPanel::GetArea()
 {
 	char mapname[256] = "";
-	int iNewTitleLength = 80;
+	intp iNewTitleLength = 80;
 
 	if ( host_state.worldmodel )
 	{		
 		CL_SetupMapName( modelloader->GetName( host_state.worldmodel ), mapname, sizeof( mapname ) );
-		iNewTitleLength = (80 - (strlen( mapname )+2)); 		
+		iNewTitleLength = (80 - (V_strlen( mapname )+2)); 		
 	}
 	m_pTitle->SetMaximumCharCount( iNewTitleLength );
 
@@ -2971,7 +2990,7 @@ int CBugUIPanel::GetArea()
 		V_strcpy_safe( szAreaMap, m_pBugReporter->GetAreaMap( i ) );
 		char *pszAreaDir = Q_strrchr( szAreaMap, '@' );
 		char *pszAreaPrefix = Q_strrchr( szAreaMap, '%' );
-		int iDirLength = 0;
+		intp iDirLength = 0;
 		if ( pszAreaDir && pszAreaPrefix )
 		{
 			iDirLength = pszAreaPrefix - pszAreaDir - 1;

@@ -18,7 +18,7 @@ static ConVar cl_showevents	( "cl_showevents", "0", FCVAR_CHEAT, "Print event fi
 // Input  : slot - 
 //			*eventname - 
 //-----------------------------------------------------------------------------
-void CL_DescribeEvent( int slot, CEventInfo *event, const char *eventname )
+void CL_DescribeEvent( intp slot, CEventInfo *event, const char *eventname )
 {
 	int idx = (slot & 31);
 
@@ -36,11 +36,11 @@ void CL_DescribeEvent( int slot, CEventInfo *event, const char *eventname )
 	n.color[1] = 0.8;
 	n.color[2] = 1.0;
 
-	Con_NXPrintf( &n, "%02i %6.3ff %20s %03i bytes", slot, cl.GetTime(), eventname, Bits2Bytes( event->bits ) );
+	Con_NXPrintf( &n, "%02zi %6.3ff %20s %03i bytes", slot, cl.GetTime(), eventname, Bits2Bytes( event->bits ) );
 
 	if ( cl_showevents.GetInt() == 2 )
 	{
-		DevMsg( "%02i %6.3ff %20s %03i bytes\n", slot, cl.GetTime(), eventname, Bits2Bytes( event->bits ) );
+		DevMsg( "%02zi %6.3ff %20s %03i bytes\n", slot, cl.GetTime(), eventname, Bits2Bytes( event->bits ) );
 	}
 }
 
@@ -81,7 +81,7 @@ void CL_FireEvents( void )
 		return;
 	}
 
-	int i, next;
+	intp i, next;
 	for ( i = cl.events.Head(); i != cl.events.InvalidIndex(); i = next )
 	{
 		next = cl.events.Next( i );

@@ -100,7 +100,7 @@ CChangeTrack* GetChangeTrack( const char *pName )
 	}
 
 	CChangeTrack *pCur = new CChangeTrack;
-	int len = strlen(pName)+1;
+	intp len = strlen(pName)+1;
 	pCur->m_pName = new char[len];
 	Q_strncpy( pCur->m_pName, pName, len );
 	pCur->m_nChanged = pCur->m_nUnchanged = 0;
@@ -565,7 +565,7 @@ static inline void SV_WriteEnterPVS( CEntityWriteInfo &u )
 
 	if ( !pClass )
 	{
-		Host_Error("SV_CreatePacketEntities: GetEntServerClass failed for ent %d.\n", u.m_nNewEntity);
+		Host_Error("SV_WriteEnterPVS: GetEntServerClass failed for ent %d.\n", u.m_nNewEntity);
 	}
 	
 	TRACE_PACKET(( "  SV Enter Class %s\n", pClass->m_pNetworkName ) );

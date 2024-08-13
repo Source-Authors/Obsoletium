@@ -81,21 +81,21 @@ private:
 	class CWaveDataVoice : public IWaveData
 	{
 	public:
-							CWaveDataVoice( CAudioSourceWave &source ) : m_source(source) {}
-							~CWaveDataVoice( void ) {}
+		CWaveDataVoice( CAudioSourceWave &source ) : m_source(source) {}
+		virtual ~CWaveDataVoice( void ) {}
 
-		virtual CAudioSource &Source( void )
+		CAudioSource &Source( void ) override
 		{
 			return m_source;
 		}
 		
 		// this file is in memory, simply pass along the data request to the source
-		virtual int ReadSourceData( void **pData, int sampleIndex, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] )
+		int ReadSourceData( void **pData, int sampleIndex, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] ) override
 		{
 			return m_source.GetOutputData( pData, sampleIndex, sampleCount, copyBuf );
 		}
 
-		virtual bool IsReadyToMix() 
+		bool IsReadyToMix() override
 		{ 
 			return true; 
 		}
@@ -172,14 +172,14 @@ CAudioSourceVoice::~CAudioSourceVoice()
 	Voice_OnAudioSourceShutdown( m_iChannel );
 }
 
-CAudioMixer *CAudioSourceVoice::CreateMixer( int initialStreamPosition )
+CAudioMixer *CAudioSourceVoice::CreateMixer( int )
 {
 	CWaveDataVoice *pVoice = new CWaveDataVoice(*this);
-	if(!pVoice)
+	if (!pVoice)
 		return NULL;
 
 	CAudioMixer *pMixer = CreateWaveMixer( pVoice, WAVE_FORMAT_PCM, 1, BYTES_PER_SAMPLE*8, 0 );
-	if(!pMixer)
+	if (!pMixer)
 	{
 		delete pVoice;
 		return NULL;

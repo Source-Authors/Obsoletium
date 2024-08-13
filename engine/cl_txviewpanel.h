@@ -31,17 +31,17 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class TxViewPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( TxViewPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( TxViewPanel, vgui::Frame );
 
 public:
 	TxViewPanel( vgui::Panel *parent );
 	~TxViewPanel();
 
-	virtual void OnTick();
+	void OnTick() override;
 
 	// Command issued
-	virtual void OnCommand( const char *command );
-	virtual void OnMessage( const KeyValues *params,  vgui::VPANEL fromPanel );
+	void OnCommand( const char *command ) override;
+	void OnMessage( const KeyValues *params, vgui::VPANEL fromPanel ) override;
 
 	static	void	Install( vgui::Panel *parent );
 

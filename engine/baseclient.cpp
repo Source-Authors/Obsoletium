@@ -1075,7 +1075,7 @@ void CBaseClient::EndTrace( bf_write &msg )
 		return;
 	}
 
-	CUtlBuffer logData( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer logData( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	logData.Printf( "%f/%d Player [%s][%d][adr:%s] was sent a datagram %d bits (%8.3f bytes), took %.2fms\n",
 		realtime, 

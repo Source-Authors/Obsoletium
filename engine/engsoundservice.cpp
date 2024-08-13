@@ -46,7 +46,7 @@ class CEngineSoundServices : public ISoundServices
 public:
 	CEngineSoundServices() { m_frameTime = 0; }
 
-	virtual void *LevelAlloc( int nBytes, const char *pszTag )
+	virtual void *LevelAlloc( unsigned nBytes, const char *pszTag )
 	{
 		return Hunk_AllocName(nBytes, pszTag);
 	}
@@ -172,7 +172,7 @@ public:
 		extern IVEngineClient *engineClient;
 		if ( !engineClient )
 		{
-			Assert( !"No engineClient, bug???" );
+			AssertMsg( false, "No engineClient, bug???" );
 			return false;
 		}
 
@@ -184,7 +184,7 @@ public:
 		extern IVEngineClient *engineClient;
 		if ( !engineClient )
 		{
-			Assert( !"No engineClient, bug???" );
+			AssertMsg( false, "No engineClient, bug???" );
 			return true;
 		}
 

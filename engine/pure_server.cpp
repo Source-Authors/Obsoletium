@@ -314,7 +314,7 @@ bool CPureServerWhitelist::LoadTrustedKeysFromKeyValues( KeyValues *kv )
 		}
 
 		PureServerPublicKey_t &key = m_vecTrustedKeys[ m_vecTrustedKeys.AddToTail() ];
-		int nKeyDataLen = V_strlen( pszKeyData );
+		intp nKeyDataLen = V_strlen( pszKeyData );
 		key.SetSize( nKeyDataLen / 2 );
 		// Aaaannnnnnnnddddd V_hextobinary has no return code.
 		// Because nobody could *ever* possible attempt to parse bad data.  It could never possibly happen.
@@ -326,7 +326,7 @@ bool CPureServerWhitelist::LoadTrustedKeysFromKeyValues( KeyValues *kv )
 
 void CPureServerWhitelist::UpdateCommandStats( CUtlDict<CPureServerWhitelist::CCommand*,int> &commands, int *pHighest, int *pLongestPathName )
 {
-	for ( int i=commands.First(); i != commands.InvalidIndex(); i=commands.Next( i ) )
+	for ( auto i=commands.First(); i != commands.InvalidIndex(); i=commands.Next( i ) )
 	{
 		*pHighest = max( *pHighest, (int)commands[i]->m_LoadOrder );
 		
@@ -340,7 +340,7 @@ void CPureServerWhitelist::PrintCommand( const char *pFileSpec, const char *pExt
 	// Get rid of the trailing slash if there is one.
 	char tempFileSpec[MAX_PATH];
 	V_strncpy( tempFileSpec, pFileSpec, sizeof( tempFileSpec ) );
-	int len = V_strlen( tempFileSpec );
+	intp len = V_strlen( tempFileSpec );
 	if ( len > 0 && (tempFileSpec[len-1] == '/' || tempFileSpec[len-1] == '\\') )
 		tempFileSpec[len-1] = 0;
 
@@ -383,7 +383,7 @@ void CPureServerWhitelist::PrintCommand( const char *pFileSpec, const char *pExt
 
 int CPureServerWhitelist::FindCommandByLoadOrder( CUtlDict<CPureServerWhitelist::CCommand*,int> &commands, int iLoadOrder )
 {
-	for ( int i=commands.First(); i != commands.InvalidIndex(); i=commands.Next( i ) )
+	for ( auto i=commands.First(); i != commands.InvalidIndex(); i=commands.Next( i ) )
 	{
 		if ( commands[i]->m_LoadOrder == iLoadOrder )
 			return i;
@@ -453,7 +453,7 @@ void CPureServerWhitelist::EncodeCommandList( CUtlDict<CPureServerWhitelist::CCo
 {
 	// Count how many we're really going to write
 	int nCount = 0;
-	for ( int i=theList.First(); i != theList.InvalidIndex(); i = theList.Next( i ) )
+	for ( auto i=theList.First(); i != theList.InvalidIndex(); i = theList.Next( i ) )
 	{
 		if ( theList[i]->m_LoadOrder != kLoadOrder_HardcodedOverride )
 			++nCount;
@@ -461,7 +461,7 @@ void CPureServerWhitelist::EncodeCommandList( CUtlDict<CPureServerWhitelist::CCo
 	buf.PutInt( nCount );
 
 	// Write them
-	for ( int i=theList.First(); i != theList.InvalidIndex(); i = theList.Next( i ) )
+	for ( auto i=theList.First(); i != theList.InvalidIndex(); i = theList.Next( i ) )
 	{
 		CPureServerWhitelist::CCommand *pCommand = theList[i];
 		if ( pCommand->m_LoadOrder == kLoadOrder_HardcodedOverride )
@@ -526,7 +526,7 @@ void CPureServerWhitelist::CacheFileCRCs()
 // !SV_PURE FIXME! Do we need this?
 void CPureServerWhitelist::InternalCacheFileCRCs( CUtlDict<CCommand*,int> &theList, ECacheCRCType eType )
 {
-//	for ( int i=theList.First(); i != theList.InvalidIndex(); i = theList.Next( i ) )
+//	for ( auto i=theList.First(); i != theList.InvalidIndex(); i = theList.Next( i ) )
 //	{
 //		CCommand *pCommand = theList[i];
 //		if ( pCommand->m_bCheckCRC )

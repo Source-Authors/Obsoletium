@@ -99,7 +99,7 @@ void CBenchmarkResults::StopBenchmark()
 	Q_snprintf( szFilename, sizeof( szFilename ), "%s\\%s", DEFAULT_RESULTS_FOLDER, m_szFilename );
 
 	// write out the data as keyvalues
-	KeyValues *kv = new KeyValues( "benchmark" );
+	KeyValues::AutoDelete kv = KeyValues::AutoDelete( "benchmark" );
 	kv->SetFloat( "framerate", framerate );
 	kv->SetInt( "build", build_number() );
 
@@ -108,7 +108,6 @@ void CBenchmarkResults::StopBenchmark()
 
 	// save
 	kv->SaveToFile( g_pFileSystem, szFilename, "MOD" );
-	kv->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -141,14 +140,12 @@ void CBenchmarkResults::Upload()
 	// upload
 	char szFilename[256];
 	Q_snprintf( szFilename, sizeof( szFilename ), "%s\\%s", DEFAULT_RESULTS_FOLDER, m_szFilename );
-	KeyValues *kv = new KeyValues( "benchmark" );
+	KeyValues::AutoDelete kv = KeyValues::AutoDelete( "benchmark" );
 	if ( kv->LoadFromFile( g_pFileSystem, szFilename, "MOD" ) )
 	{
 		// this sends the data to the Steam CSER
 		UploadData( netadr_CserIP.ToString(), "benchmark", kv );
 	}
-
-	kv->deleteThis();
 #endif
 }
 

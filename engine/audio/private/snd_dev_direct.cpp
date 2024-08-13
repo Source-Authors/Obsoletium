@@ -10,6 +10,7 @@
 #include <ks.h>
 #include <ksmedia.h>
 
+#include "com_ptr.h"
 #include "iprediction.h"
 #include "eax.h"
 #include "tier0/icommandline.h"
@@ -38,8 +39,8 @@ typedef enum {SIS_SUCCESS, SIS_FAILURE, SIS_NOTAVAIL} sndinitstat;
 #define SECONDARY_BUFFER_SIZE_SURROUND	0x04000		// output buffer size in bytes, one per channel
 
 
-using DirectSoundCreateFn = decltype(&DirectSoundCreate);
-DirectSoundCreateFn pDirectSoundCreate;
+using DirectSoundCreate8Fn = decltype(&DirectSoundCreate8);
+DirectSoundCreate8Fn pDirectSoundCreate;
 
 extern void ReleaseSurround(void);
 extern bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int volume[CCHANVOLUMES], int mixchans );
@@ -47,8 +48,11 @@ void OnSndSurroundCvarChanged( IConVar *var, const char *pOldString, float flOld
 void OnSndSurroundLegacyChanged( IConVar *var, const char *pOldString, float flOldValue );
 void OnSndVarChanged( IConVar *var, const char *pOldString, float flOldValue );
 
-static LPDIRECTSOUND pDS = NULL;
-static LPDIRECTSOUNDBUFFER pDSBuf = NULL, pDSPBuf = NULL;
+static LPDIRECTSOUND8 pDS = NULL;
+static LPDIRECTSOUNDBUFFER pDSBuf = NULL;
+// For the primary buffer, you must use the IDirectSoundBuffer interface; IDirectSoundBuffer8 is not available.
+// See https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418055(v=vs.85)
+static LPDIRECTSOUNDBUFFER pDSPBuf = NULL;
 
 static GUID IID_IDirectSound3DBufferDef = {0x279AFA86, 0x4981, 0x11CE, {0xA5, 0x21, 0x00, 0x20, 0xAF, 0x0B, 0xE5, 0x60}};
 static ConVar windows_speaker_config("windows_speaker_config", "-1", FCVAR_ARCHIVE);
@@ -100,8 +104,8 @@ private:
 	bool		IsUsingBufferPerSpeaker();
 
 	sndinitstat SNDDMA_InitDirect( void );
-	bool		SNDDMA_InitInterleaved( LPDIRECTSOUND lpDS, WAVEFORMATEX* lpFormat, int channelCount );
-	bool		SNDDMA_InitSurround(LPDIRECTSOUND lpDS, WAVEFORMATEX* lpFormat, DSBCAPS* lpdsbc, int cchan);
+	bool		SNDDMA_InitInterleaved( LPDIRECTSOUND8 lpDS, WAVEFORMATEX* lpFormat, int channelCount );
+	bool		SNDDMA_InitSurround(LPDIRECTSOUND8 lpDS, WAVEFORMATEX* lpFormat, DSBCAPS* lpdsbc, int cchan);
 	void		S_TransferSurround16( portable_samplepair_t *pfront, portable_samplepair_t *prear, portable_samplepair_t *pcenter, int lpaintedtime, int endtime, int cchan);
 	void		S_TransferSurround16Interleaved( const portable_samplepair_t *pfront, const portable_samplepair_t *prear, const portable_samplepair_t *pcenter, int lpaintedtime, int endtime);
 	void		S_TransferSurround16Interleaved_FullLock( const portable_samplepair_t *pfront, const portable_samplepair_t *prear, const portable_samplepair_t *pcenter, int lpaintedtime, int endtime);
@@ -119,16 +123,16 @@ private:
 
 CAudioDirectSound *CAudioDirectSound::m_pSingleton = NULL;
 
-LPDIRECTSOUNDBUFFER pDSBufFL = NULL;
-LPDIRECTSOUNDBUFFER pDSBufFR = NULL;
-LPDIRECTSOUNDBUFFER pDSBufRL = NULL;
-LPDIRECTSOUNDBUFFER pDSBufRR = NULL;
-LPDIRECTSOUNDBUFFER pDSBufFC = NULL;
-LPDIRECTSOUND3DBUFFER pDSBuf3DFL = NULL;
-LPDIRECTSOUND3DBUFFER pDSBuf3DFR = NULL;
-LPDIRECTSOUND3DBUFFER pDSBuf3DRL = NULL;
-LPDIRECTSOUND3DBUFFER pDSBuf3DRR = NULL;
-LPDIRECTSOUND3DBUFFER pDSBuf3DFC = NULL;
+LPDIRECTSOUNDBUFFER8 pDSBufFL = NULL;
+LPDIRECTSOUNDBUFFER8 pDSBufFR = NULL;
+LPDIRECTSOUNDBUFFER8 pDSBufRL = NULL;
+LPDIRECTSOUNDBUFFER8 pDSBufRR = NULL;
+LPDIRECTSOUNDBUFFER8 pDSBufFC = NULL;
+LPDIRECTSOUND3DBUFFER8 pDSBuf3DFL = NULL;
+LPDIRECTSOUND3DBUFFER8 pDSBuf3DFR = NULL;
+LPDIRECTSOUND3DBUFFER8 pDSBuf3DRL = NULL;
+LPDIRECTSOUND3DBUFFER8 pDSBuf3DRR = NULL;
+LPDIRECTSOUND3DBUFFER8 pDSBuf3DFC = NULL;
 
 // ----------------------------------------------------------------------------- //
 // Helpers.
@@ -598,9 +602,9 @@ void CAudioDirectSound::StopAllSounds( void )
 {
 }
 
-bool CAudioDirectSound::SNDDMA_InitInterleaved( LPDIRECTSOUND lpDS, WAVEFORMATEX* lpFormat, int channelCount )
+bool CAudioDirectSound::SNDDMA_InitInterleaved( LPDIRECTSOUND8 lpDS, WAVEFORMATEX* lpFormat, int channelCount )
 {
-	WAVEFORMATEXTENSIBLE    wfx = { 0 } ;     // DirectSoundBuffer wave format (extensible)
+	WAVEFORMATEXTENSIBLE    wfx = {};     // DirectSoundBuffer wave format (extensible)
 
     // set the channel mask and number of channels based on the command line parameter
     if(channelCount == 2)
@@ -636,7 +640,7 @@ bool CAudioDirectSound::SNDDMA_InitInterleaved( LPDIRECTSOUND lpDS, WAVEFORMATEX
     wfx.SubFormat                     = KSDATAFORMAT_SUBTYPE_PCM;
 
     // setup the DirectSound
-    DSBUFFERDESC            dsbdesc = { 0 };  // DirectSoundBuffer descriptor	
+    DSBUFFERDESC            dsbdesc = {};  // DirectSoundBuffer descriptor	
     dsbdesc.dwSize = sizeof(DSBUFFERDESC);
 	dsbdesc.dwFlags = 0;
 
@@ -663,10 +667,12 @@ bool CAudioDirectSound::SNDDMA_InitInterleaved( LPDIRECTSOUND lpDS, WAVEFORMATEX
 			dsbdesc.dwFlags |= DSBCAPS_GLOBALFOCUS;
 		}
 
-		if(!FAILED(lpDS->CreateSoundBuffer(&dsbdesc, &pDSBuf, NULL)))
+		se::win::com::com_ptr<IDirectSoundBuffer, &IID_IDirectSoundBuffer> buffer;
+		if(!FAILED(lpDS->CreateSoundBuffer(&dsbdesc, &buffer, NULL)) &&
+		   !FAILED(buffer.QueryInterface(IID_IDirectSoundBuffer8, &pDSBuf)))
 		{
-			bSuccess = true;
-			break;
+				bSuccess = true;
+				break;
 		}
 	}
 	if ( !bSuccess )
@@ -726,7 +732,7 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 			return SIS_FAILURE;
 		}
 
-		pDirectSoundCreate = (DirectSoundCreateFn)GetProcAddress(m_hInstDS, V_STRINGIFY(DirectSoundCreate) );
+		pDirectSoundCreate = (DirectSoundCreate8Fn)GetProcAddress(m_hInstDS, V_STRINGIFY(DirectSoundCreate8) );
 		if (!pDirectSoundCreate)
 		{
 			Warning( "Couldn't get DS proc addr\n");
@@ -743,6 +749,13 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 		}
 
 		return SIS_NOTAVAIL;
+	}
+
+	DWORD isCertified = DS_UNCERTIFIED;
+	hresult = pDS->VerifyCertification( &isCertified );
+	if ( SUCCEEDED(hresult) && isCertified == DS_CERTIFIED )
+	{
+		Msg( "Direct Sound card driver is certified." );
 	}
 
 	// get snd_surround value from window settings
@@ -892,7 +905,9 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 				dsbuf.dwFlags |= DSBCAPS_GLOBALFOCUS;
 			}
 
-			if (DS_OK != pDS->CreateSoundBuffer(&dsbuf, &pDSBuf, NULL))
+			se::win::com::com_ptr<IDirectSoundBuffer, &IID_IDirectSoundBuffer> buffer;
+			if (DS_OK != pDS->CreateSoundBuffer(&dsbuf, &buffer, NULL) || 
+				FAILED(buffer.QueryInterface(IID_IDirectSoundBuffer8, &pDSBuf)))
 			{
 				Warning( "DS:CreateSoundBuffer Failed");
 				Shutdown();
@@ -939,10 +954,8 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 
 		if ( snd_firsttime )
 		{
-			DevMsg("   %d channel(s)\n"
-						   "   %d bits/sample\n"
-						   "   %d samples/sec\n",
-						   DeviceChannels(), DeviceSampleBits(), DeviceDmaSpeed());
+			DevMsg("   %d channel(s) |  %d bits/sample |  %d samples/sec\n",
+				DeviceChannels(), DeviceSampleBits(), DeviceDmaSpeed());
 		}
 
 		// initialize the buffer
@@ -1280,7 +1293,7 @@ void DS3D_SetBufferParams( LPDIRECTSOUND3DBUFFER pDSBuf3D, D3DVECTOR *pbpos, D3D
 
 // Initialization for Surround sound support (4 channel or 5 channel). 
 // Creates 4 or 5 mono 3D buffers to be used as Front Left, (Front Center), Front Right, Rear Left, Rear Right
-bool CAudioDirectSound::SNDDMA_InitSurround(LPDIRECTSOUND lpDS, WAVEFORMATEX* lpFormat, DSBCAPS* lpdsbc, int cchan)
+bool CAudioDirectSound::SNDDMA_InitSurround(LPDIRECTSOUND8 lpDS, WAVEFORMATEX* lpFormat, DSBCAPS* lpdsbc, int cchan)
 {
 	DSBUFFERDESC	dsbuf;
 	WAVEFORMATEX wvex;
@@ -1313,30 +1326,35 @@ bool CAudioDirectSound::SNDDMA_InitSurround(LPDIRECTSOUND lpDS, WAVEFORMATEX* lp
 
 	dsbuf.lpwfxFormat = &wvex;
 
+	se::win::com::com_ptr<IDirectSoundBuffer, &IID_IDirectSoundBuffer> buffer;
+	
 	// create 4 mono buffers FL, FR, RL, RR
-
-	if (DS_OK != lpDS->CreateSoundBuffer(&dsbuf, &pDSBufFL, NULL))
+	if (DS_OK != lpDS->CreateSoundBuffer(&dsbuf, &buffer, NULL) ||
+        FAILED(buffer.QueryInterface(IID_IDirectSoundBuffer8, &pDSBufFL)))
 	{
 		Warning( "DS:CreateSoundBuffer for 3d front left failed");
 		ReleaseSurround();
 		return FALSE;
 	}
 
-	if (DS_OK != lpDS->CreateSoundBuffer(&dsbuf, &pDSBufFR, NULL))
+	if (DS_OK != lpDS->CreateSoundBuffer(&dsbuf, &buffer, NULL) ||
+        FAILED(buffer.QueryInterface(IID_IDirectSoundBuffer8, &pDSBufFR)))
 	{
 		Warning( "DS:CreateSoundBuffer for 3d front right failed");
 		ReleaseSurround();
 		return FALSE;
 	}
 
-	if (DS_OK != lpDS->CreateSoundBuffer(&dsbuf, &pDSBufRL, NULL))
+	if (DS_OK != lpDS->CreateSoundBuffer(&dsbuf, &buffer, NULL) ||
+        FAILED(buffer.QueryInterface(IID_IDirectSoundBuffer8, &pDSBufRL)))
 	{
 		Warning( "DS:CreateSoundBuffer for 3d rear left failed");
 		ReleaseSurround();
 		return FALSE;
 	}
 
-	if (DS_OK != lpDS->CreateSoundBuffer(&dsbuf, &pDSBufRR, NULL))
+	if (DS_OK != lpDS->CreateSoundBuffer(&dsbuf, &buffer, NULL) ||
+        FAILED(buffer.QueryInterface(IID_IDirectSoundBuffer8, &pDSBufRR)))
 	{
 		Warning( "DS:CreateSoundBuffer for 3d rear right failed");
 		ReleaseSurround();
@@ -1347,7 +1365,8 @@ bool CAudioDirectSound::SNDDMA_InitSurround(LPDIRECTSOUND lpDS, WAVEFORMATEX* lp
 
 	if (cchan == 5)
 	{
-		if (DS_OK != lpDS->CreateSoundBuffer(&dsbuf, &pDSBufFC, NULL))
+		if (DS_OK != lpDS->CreateSoundBuffer(&dsbuf, &buffer, NULL) ||
+			FAILED(buffer.QueryInterface(IID_IDirectSoundBuffer8, &pDSBufFC)))
 		{
 			Warning( "DS:CreateSoundBuffer for 3d front center failed");
 			ReleaseSurround();
@@ -1479,9 +1498,7 @@ bool CAudioDirectSound::SNDDMA_InitSurround(LPDIRECTSOUND lpDS, WAVEFORMATEX* lp
 		pDSBufFC->Play(0, 0, DSBPLAY_LOOPING);
 
 	if (snd_firsttime)
-		DevMsg("   %d channel(s)\n"
-					"   %d bits/sample\n"
-					"   %d samples/sec\n",
+		DevMsg("   %d channel(s) |  %d bits/sample |  %d samples/sec\n",
 					cchan, DeviceSampleBits(), DeviceDmaSpeed());
 
 	m_bufferSizeBytes = lpdsbc->dwBufferBytes;

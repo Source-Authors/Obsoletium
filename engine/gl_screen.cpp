@@ -125,10 +125,7 @@ void SCR_EndLoadingPlaque( void )
 	}
 	else if ( gfExtendedError )
 	{
-		if ( IsPC() )
-		{
-			EngineVGui()->ShowErrorMessage();
-		}
+		EngineVGui()->ShowErrorMessage();
 	}
 
 	g_pMatchmaking->OnLevelLoadingFinished();
@@ -136,22 +133,6 @@ void SCR_EndLoadingPlaque( void )
 	scr_disabled_for_loading = false;
 	scr_drawloading = false;
 }
-
-//-----------------------------------------------------------------------------
-// Places TCR required defective media message and halts 
-//-----------------------------------------------------------------------------
-#ifdef _XBOX
-void SCR_FatalDiskError()
-{
-	EngineVGui()->OnDiskError();
-	while ( 1 )
-	{
-		// run the minimal frame to update and paint
-		EngineVGui()->Simulate();
-		V_RenderVGuiOnly();
-	}
-}
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 

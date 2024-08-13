@@ -36,7 +36,7 @@ public:
 			m_pFrameEncoder->Release();
 	}
 	
-	virtual bool	Init( int quality )
+	bool	Init( int quality ) override
 	{
 		if(m_pFrameEncoder && m_pFrameEncoder->Init(quality, m_nRawBytes, m_nEncodedBytes))
 		{
@@ -54,12 +54,12 @@ public:
 		}
 	}
 
-	virtual void	Release()
+	void	Release() override
 	{
 		delete this;
 	}
 
-	virtual int		Compress(const char *pUncompressedBytes, int nSamples, char *pCompressed, int maxCompressedBytes, bool bFinal)
+	int		Compress(const char *pUncompressedBytes, int nSamples, char *pCompressed, int maxCompressedBytes, bool bFinal) override
 	{
 		if(!m_pFrameEncoder)
 			return 0;
@@ -102,7 +102,7 @@ public:
 		return nCompressedBytes;
 	}
 
-	virtual int		Decompress(const char *pCompressed, int compressedBytes, char *pUncompressed, int maxUncompressedBytes)
+	int		Decompress(const char *pCompressed, int compressedBytes, char *pUncompressed, int maxUncompressedBytes) override
 	{
 		if(!m_pFrameEncoder)
 			return 0;
@@ -120,7 +120,7 @@ public:
 		return nDecompressedBytes / BYTES_PER_SAMPLE;
 	}
 
-	virtual bool	ResetState()
+	bool	ResetState() override
 	{
 		if(m_pFrameEncoder)
 			return m_pFrameEncoder->ResetState();

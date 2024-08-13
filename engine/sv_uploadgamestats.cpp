@@ -273,7 +273,7 @@ public:
 
 	#define GAMESTATSUPLOADER_CONNECT_RETRY_TIME	1.0F
 
-	CUploadGameStats() : m_bConnected(false), m_flNextConnectAttempt(0) {}
+	CUploadGameStats() : m_flNextConnectAttempt(0), m_bConnected(false) {}
 
 	//-----------------------------------------------------------------------------
 	// Purpose: Initializes the connection to the CSER
@@ -432,7 +432,7 @@ public:
 #endif
 				if ( bOk )
 				{
-					int nBytesToCopy = min( (size_t)Q_strlen( username ), sizeof( hex ) - 1 );
+					intp nBytesToCopy = min( V_strlen( username ), ssize( hex ) - 1 );
 					// NOTE:  This doesn't copy the NULL terminator from username because we want the "random" bits after the name
 					Q_memcpy( hex, username, nBytesToCopy );					
 				}
@@ -737,7 +737,7 @@ bool CWin32UploadGameStats::SendProtocolVersion( EGameStatsUploadStatus& status,
 	buf.Purge();
 	buf.PutInt( cuCurrentProtocolVersion );
 
-	if ( send( m_SocketTCP, (const char *)buf.Base(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
+	if ( send( m_SocketTCP, buf.Base<const char>(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
 	{
 		UpdateProgress( m_rCrashParameters, "Send failed." );
 
@@ -803,7 +803,7 @@ bool CWin32UploadGameStats::SendUploadCommand( EGameStatsUploadStatus& status, C
 	buf.PutInt( static_cast<HarvestFileCommand::FileSize_t>( 0 ) );
 
 	// Send command to server
-	if ( send( m_SocketTCP, (const char *)buf.Base(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
+	if ( send( m_SocketTCP, buf.Base<const char>(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
 	{
 		UpdateProgress( m_rCrashParameters, "Send failed." );
 
@@ -916,7 +916,7 @@ bool CWin32UploadGameStats::SendGracefulClose( EGameStatsUploadStatus& status, C
 	buf.PutInt( (int)messageSize );
 	buf.PutChar( Commands::cuGracefulClose );
 
-	if ( send( m_SocketTCP, (const char *)buf.Base(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
+	if ( send( m_SocketTCP, buf.Base<const char>(), (int)buf.TellPut(), 0 ) == SOCKET_ERROR )
 	{
 		UpdateProgress( m_rCrashParameters, "Send failed." );
 
@@ -987,7 +987,7 @@ EGameStatsUploadStatus Win32UploadGameStatsBlocking
 
 	UpdateProgress( rGameStatsParameters, "Sending game stats to server %s.", rGameStatsParameters.m_ipCSERServer.ToString() );
 
-	bcs.SendSocketMessage( sa, (const u8 *)buf.Base(), buf.TellPut() ); //lint !e534
+	bcs.SendSocketMessage( sa, buf.Base<const u8>(), buf.TellPut() ); //lint !e534
 
 	UpdateProgress( rGameStatsParameters, "Waiting for response." );
 
@@ -998,7 +998,7 @@ EGameStatsUploadStatus Win32UploadGameStatsBlocking
 		struct sockaddr_in replyaddress;
 		buf.EnsureCapacity( 4096 );
 
-		uint bytesReceived = bcs.ReceiveSocketMessage( &replyaddress, (u8 *)buf.Base(), 4096 );
+		uint bytesReceived = bcs.ReceiveSocketMessage( &replyaddress, buf.Base<unsigned char>(), 4096 );
 		if ( bytesReceived > 0 )
 		{
 			// Fixup actual size
@@ -1069,7 +1069,7 @@ class CAsyncUploaderThread
 {
 public:
 	CAsyncUploaderThread()
-		: m_hThread( NULL ), m_bRunning( false ), m_eventQueue(false), m_eventInitShutdown(false) {}
+		: m_hThread( NULL ), m_eventQueue(false), m_eventInitShutdown(false), m_bRunning( false ) {}
 
 	ThreadHandle_t m_hThread;
 
@@ -1109,8 +1109,8 @@ static CAsyncUploaderThread *g_pAsyncUploader = NULL;
 CAsyncUploaderThread::DataEntry * CAsyncUploaderThread::DataEntry::AllocCopy() const
 {
 	// Find out how much memory we would need
-	uint lenMapName = ( szMapName ? strlen( szMapName ) : 0 );
-	uint numBytes = sizeof( DataEntry ) + uiBlobSize + lenMapName + 1;
+	size_t lenMapName = ( szMapName ? strlen( szMapName ) : 0 );
+	size_t numBytes = sizeof( DataEntry ) + uiBlobSize + lenMapName + 1;
 
 	char *pbData = new char[ numBytes ];
 	DataEntry *pNew = ( DataEntry * )( pbData );
@@ -1211,8 +1211,7 @@ void CAsyncUploaderThread::ThreadProc()
 			// DevMsg( 3, "AsyncUploaderThread: Uploading [%.*s]\n", pUpload->uiBlobSize, pUpload->pvBlob );
 
 			// Attempt to upload the data until successful
-			bool bSuccess = g_UploadGameStats.UploadGameStatsInternal( pUpload->szMapName, pUpload->uiBlobVersion, pUpload->uiBlobSize, pUpload->pvBlob );
-			bSuccess;
+			[[maybe_unused]] bool bSuccess = g_UploadGameStats.UploadGameStatsInternal( pUpload->szMapName, pUpload->uiBlobVersion, pUpload->uiBlobSize, pUpload->pvBlob );
 
 			pUpload->Free();
 

@@ -9,17 +9,15 @@
 // This module implements the voice record and compression functions 
 
 #include "audio_pch.h"
-#if !defined( _X360 )
+
 #include <dsound.h>
 #include <VersionHelpers.h>
-#endif
+
+#include "com_ptr.h"
+#include "scoped_dll.h"
 #include "voice.h"
 #include "tier0/vcrmode.h"
 #include "ivoicerecord.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -29,7 +27,7 @@
 // Globals.
 // ------------------------------------------------------------------------------
 
-using DirectSoundCaptureCreateFn = decltype(&DirectSoundCaptureCreate);
+using DirectSoundCaptureCreate8Fn = decltype(&DirectSoundCaptureCreate8);
 
 
 
@@ -77,10 +75,10 @@ private:
 
 
 private:
-	HINSTANCE					m_hInstDS;
+	source::ScopedDll					m_hInstDS;
 
-	LPDIRECTSOUNDCAPTURE		m_pCapture;
-	LPDIRECTSOUNDCAPTUREBUFFER	m_pCaptureBuffer;
+	se::win::com::com_ptr<IDirectSoundCapture8, &IID_IDirectSoundCapture8> m_pCapture;
+	se::win::com::com_ptr<IDirectSoundCaptureBuffer8, &IID_IDirectSoundCaptureBuffer8> m_pCaptureBuffer;
 
 	// How many bytes our capture buffer has.
 	DWORD						m_nCaptureBufferBytes;
@@ -97,6 +95,7 @@ private:
 
 
 VoiceRecord_DSound::VoiceRecord_DSound()
+	: m_hInstDS{source::ScopedDll("N/A", 0)}
 {
 	Clear();
 }
@@ -119,7 +118,7 @@ bool VoiceRecord_DSound::RecordStart()
 	//When we start recording we want to make sure we don't provide any audio
 	//that occurred before now. So set m_LastReadPos to the current
 	//read position of the audio device
-	if (m_pCaptureBuffer == NULL)
+	if (!m_pCaptureBuffer)
 	{
 		return false;
 	}
@@ -150,8 +149,10 @@ bool VoiceRecord_DSound::Init(int sampleRate)
 {
 	HRESULT hr;
 	DSCBUFFERDESC dscDesc;
-	DirectSoundCaptureCreateFn createFn;
-
+	DirectSoundCaptureCreate8Fn createFn;
+	const GUID FAR *pGuid;
+	se::win::com::com_ptr<IDirectSoundCaptureBuffer, &IID_IDirectSoundCaptureBuffer> captureBuffer;
+	std::error_code rc;
 	
 	Term();
 
@@ -168,21 +169,25 @@ bool VoiceRecord_DSound::Init(int sampleRate)
 	};
 
 	// Load the DSound DLL.
-	m_hInstDS = LoadLibraryExA( "dsound.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
+	m_hInstDS = source::ScopedDll( "dsound.dll", LOAD_LIBRARY_SEARCH_SYSTEM32 );
 	if(!m_hInstDS)
-		goto HandleError;
-
-	createFn = (DirectSoundCaptureCreateFn)GetProcAddress(m_hInstDS, V_STRINGIFY(DirectSoundCaptureCreate));
-	if(!createFn)
-		goto HandleError;
-
-	const GUID FAR *pGuid = &DSDEVID_DefaultVoiceCapture;
-#ifndef _X360
-	if ( IsWindows7OrGreater() )
 	{
-		pGuid = NULL;
+		Warning( "Unable to load dsound.dll. Will continue without voice recording. %s ",
+			m_hInstDS.error_code().message().c_str() );
+		goto HandleError;
 	}
-#endif
+
+	std::tie(createFn, rc) = m_hInstDS
+		.GetFunction<DirectSoundCaptureCreate8Fn>(V_STRINGIFY(DirectSoundCaptureCreate8));
+	if(!createFn)
+	{
+		Warning( "Unable to get %s from dsound.dll. Will continue without voice recording. %s ",
+			V_STRINGIFY(DirectSoundCaptureCreate8), rc.message().c_str() );
+		goto HandleError;
+	}
+
+	// Windows7+ doesn't accept any except nullptr
+	pGuid = nullptr;
 	hr = createFn(pGuid, &m_pCapture, NULL);
 	if(FAILED(hr))
 		goto HandleError;
@@ -194,10 +199,16 @@ bool VoiceRecord_DSound::Init(int sampleRate)
 	dscDesc.dwBufferBytes = recordFormat.nAvgBytesPerSec;
 	dscDesc.lpwfxFormat = &recordFormat;
 
-	hr = m_pCapture->CreateCaptureBuffer(&dscDesc, &m_pCaptureBuffer, NULL);
+	hr = m_pCapture->CreateCaptureBuffer(&dscDesc, &captureBuffer, NULL);
 	if(FAILED(hr))
 		goto HandleError;
 
+	hr = captureBuffer.QueryInterface(IID_IDirectSoundCaptureBuffer8, &m_pCaptureBuffer);
+	if (FAILED(hr))
+		goto HandleError;
+
+	if (FAILED(hr))
+		goto HandleError;
 
 	// Figure out how many bytes we got in our capture buffer.
 	DSCBCAPS caps;
@@ -248,18 +259,17 @@ HandleError:;
 void VoiceRecord_DSound::Term()
 {
 	if(m_pCaptureBuffer)
-		m_pCaptureBuffer->Release();
+		m_pCaptureBuffer.Release();
 
 	if(m_pCapture)
-		m_pCapture->Release();
+		m_pCapture.Release();
 
 	if(m_hWrapEvent)
 		DeleteObject(m_hWrapEvent);
 
-	if(m_hInstDS)
+	if(!!m_hInstDS)
 	{
-		FreeLibrary(m_hInstDS);
-		m_hInstDS = NULL;
+		m_hInstDS.~ScopedDll();
 	}
 
 	Clear();
@@ -268,12 +278,9 @@ void VoiceRecord_DSound::Term()
 
 void VoiceRecord_DSound::Clear()
 {
-	m_pCapture = NULL;
-	m_pCaptureBuffer = NULL;
 	m_WrapOffset = 0;
 	m_LastReadPos = 0;
 	m_hWrapEvent = NULL;
-	m_hInstDS = NULL;
 }
 
 

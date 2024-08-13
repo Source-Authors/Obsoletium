@@ -564,12 +564,6 @@ void CBaseClientState::SendConnectPacket (int challengeNr, int authProtocol, uin
 //-----------------------------------------------------------------------------
 bool CBaseClientState::PrepareSteamConnectResponse( uint64 unGSSteamID, bool bGSSecure, const netadr_t &adr, bf_write &msg )
 {
-	// X360TBD: Network - Steam Dedicated Server hack
-	if ( IsX360() )
-	{
-		return true;
-	}
-
 #if !defined( NO_STEAM ) && !defined( SWDS  ) 
 	if ( !Steam3Client().SteamUser() )
 	{
@@ -944,7 +938,7 @@ bool CBaseClientState::ProcessConnectionlessPacket( netpacket_t *packet )
 										Disconnect( "Invalid Steam key size", true );
 										return false;
 									}
-									if ( msg.GetNumBytesLeft() > sizeof(unGSSteamID) ) 
+									if ( msg.GetNumBytesLeft() > static_cast<int>(sizeof(unGSSteamID)) ) 
 									{
 										if ( !msg.ReadBytes( &unGSSteamID, sizeof(unGSSteamID) ) )
 										{
@@ -1301,7 +1295,7 @@ bool CBaseClientState::ProcessClassInfo( SVC_ClassInfo *msg )
 
 		C_ServerClassInfo * svclassinfo = &m_pServerClasses[svclass->classID];
 
-		int len = Q_strlen(svclass->classname) + 1;
+		intp len = Q_strlen(svclass->classname) + 1;
 		svclassinfo->m_ClassName = new char[ len ];
 		Q_strncpy( svclassinfo->m_ClassName, svclass->classname, len );
 		len = Q_strlen(svclass->datatablename) + 1;

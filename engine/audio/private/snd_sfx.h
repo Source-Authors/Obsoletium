@@ -18,6 +18,7 @@ class CSfxTable
 {
 public:
 	CSfxTable();
+	virtual ~CSfxTable() {}
 
 	// gets sound name, possible decoracted with prefixes
 	virtual const char	*getname();
@@ -25,11 +26,11 @@ public:
 	const char			*GetFileName();
 	FileNameHandle_t	GetFileNameHandle();
 
-	void				SetNamePoolIndex( int index );
+	void				SetNamePoolIndex( unsigned short index );
 	bool				IsPrecachedSound();
 	void				OnNameChanged( const char *pName );
 
-	int					m_namePoolIndex;
+	unsigned short		m_namePoolIndex;
 	CAudioSource		*pSource;
 
 	bool				m_bUseErrorFilename : 1;

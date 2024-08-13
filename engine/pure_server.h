@@ -61,7 +61,7 @@ public:
 private:
 
 	CPureServerWhitelist();
-	~CPureServerWhitelist();
+	virtual ~CPureServerWhitelist();
 
 	void				Init( IFileSystem *pFileSystem );
 	void				Term();

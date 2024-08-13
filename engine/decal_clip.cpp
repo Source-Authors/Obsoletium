@@ -46,8 +46,8 @@ public:
 // --------------------------------------------------------------------------- //
 // Globals.
 // --------------------------------------------------------------------------- //
-CDecalVert alignas(16) g_DecalClipVerts[MAX_DECALCLIPVERT];
-static CDecalVert alignas(16) g_DecalClipVerts2[MAX_DECALCLIPVERT];
+alignas(16) CDecalVert g_DecalClipVerts[MAX_DECALCLIPVERT];
+alignas(16) static CDecalVert g_DecalClipVerts2[MAX_DECALCLIPVERT];
 
 
 

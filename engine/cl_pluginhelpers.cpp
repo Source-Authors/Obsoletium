@@ -38,14 +38,14 @@ extern CClientState	cl;
 class CPluginMenu : public vgui::EditablePanel
 {
 private:
-	DECLARE_CLASS_SIMPLE( CPluginMenu, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPluginMenu, vgui::EditablePanel );
 
 public:
 	CPluginMenu( vgui::Panel *parent );
 	virtual ~CPluginMenu();
 
 	void Show( KeyValues *kv );
-	void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -120,7 +120,7 @@ void CPluginMenu::OnCommand( const char *command )
 class CPluginGameUIDialog : public vgui::Frame
 {
 private:
-	DECLARE_CLASS_SIMPLE( CPluginGameUIDialog, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPluginGameUIDialog, vgui::Frame );
 
 public:
 	CPluginGameUIDialog();
@@ -129,7 +129,7 @@ public:
 	virtual void Show( DIALOG_TYPE type, KeyValues *kv );
 
 protected:
-	void OnCommand( const char *cmd );
+	void OnCommand( const char *cmd ) override;
 
 private:
 	CPluginMenu *m_Menu;
@@ -253,7 +253,7 @@ void CPluginGameUIDialog::Show( DIALOG_TYPE type, KeyValues *kv )
 class CMessage : public vgui::Label
 {
 private:
-	DECLARE_CLASS_SIMPLE( CMessage, vgui::Label );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMessage, vgui::Label );
 public:
 	CMessage(vgui::Panel *parent, const char *panelName, const char *text);
 	~CMessage();
@@ -261,7 +261,7 @@ public:
 	bool HasExtraPanel() { return m_bHasExtraPanel; }
 
 protected:
-	void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 private:
 	bool m_bHasExtraPanel;
@@ -294,7 +294,7 @@ void CMessage::ApplySchemeSettings( vgui::IScheme *pScheme )
 class CPluginHudMessage : public vgui::Frame
 {
 private:
-	DECLARE_CLASS_SIMPLE( CPluginHudMessage, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPluginHudMessage, vgui::Frame );
 
 public:
 	CPluginHudMessage( vgui::VPANEL parent );
@@ -305,9 +305,9 @@ public:
 	void Hide();
 
 protected:
-	void ApplySchemeSettings( vgui::IScheme *pScheme );
-	void OnTick();
-	void OnSizeChanged( int newWide, int newTall );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void OnTick() override;
+	void OnSizeChanged( int newWide, int newTall ) override;
 
 private:
 	enum { MESSAGE_X_INSET = 40, MAX_TEXT_LEN_PIXELS = 400  };

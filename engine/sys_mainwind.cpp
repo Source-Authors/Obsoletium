@@ -368,9 +368,9 @@ void CGame::DispatchAllStoredGameMessages()
 	}
 	else
 	{
-		int nEventCount = g_pInputSystem->GetEventCount();
+		intp nEventCount = g_pInputSystem->GetEventCount();
 		const InputEvent_t* pEvents = g_pInputSystem->GetEventData( );
-		for ( int i = 0; i < nEventCount; ++i )
+		for ( intp i = 0; i < nEventCount; ++i )
 		{
 			VCRHook_RecordGameMsg( pEvents[i] );
 			DispatchInputEvent( pEvents[i] );
@@ -378,9 +378,9 @@ void CGame::DispatchAllStoredGameMessages()
 		VCRHook_RecordEndGameMsg();
 	}
 #else
-	int nEventCount = g_pInputSystem->GetEventCount();
+	intp nEventCount = g_pInputSystem->GetEventCount();
 	const InputEvent_t* pEvents = g_pInputSystem->GetEventData( );
-	for ( int i = 0; i < nEventCount; ++i )
+	for ( intp i = 0; i < nEventCount; ++i )
 	{
 		DispatchInputEvent( pEvents[i] );
 	}
@@ -421,7 +421,7 @@ void VCR_EnterPausedState()
 		ThreadSleep( 2 );
 	}
 #else
-	Assert( !"Impl me" );
+	AssertMsg( false, "Impl me" );
 #endif
 }
 
@@ -734,7 +734,7 @@ bool CGame::CreateGameWindow( void )
 
 #if defined( WIN32 ) && !defined( USE_SDL )
 #ifndef SWDS
-	WNDCLASSW wc = {0};
+	WNDCLASSW wc = {};
 	wc.style         = CS_OWNDC | CS_DBLCLKS;
 	wc.lpfnWndProc   = CallDefaultWindowProc;
 	wc.hInstance     = m_hInstance;
@@ -979,7 +979,7 @@ bool CGame::InputAttachToGameWindow()
 	// Capture + hide the mouse
 	SetCapture( m_hWindow );
 #elif defined( USE_SDL )
-	Assert( !"Impl me" );
+	AssertMsg( false, "Impl me" );
 	return false;
 #else
 #error "Please define your platform"
@@ -1000,7 +1000,7 @@ void CGame::InputDetachFromGameWindow()
 	// Release + show the mouse
 	ReleaseCapture();
 #elif defined( USE_SDL )
-	Assert( !"Impl me" );
+	AssertMsg( false, "Impl me" );
 #else
     #error "have no idea what OS we are building for"
 #endif
@@ -1112,7 +1112,10 @@ void CGame::PlayStartupVideos( void )
 
 	extern IVAudio *vaudio;
 	// dimhotepus: Use Miles audio device.
+	// ASAN breaks inside Miles in x64 mode, so disable sound.
+#if !defined(__SANITIZE_ADDRESS__) || !defined(PLATFORM_64BITS)
 	const ScopedMilesAudioDevice scoped_miles_audio_device{vaudio, g_pVideo};
+#endif
 
 	// hide cursor while playing videos
   #if defined( USE_SDL )

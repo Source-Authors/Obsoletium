@@ -30,7 +30,7 @@ CDataManager<CDispCollTree, CDispCollTree *, bool, CThreadFastMutex> g_DispCollT
 struct DispCollPlaneIndex_t
 {
 	Vector vecPlane;
-	int index;
+	intp index;
 };
 
 class CPlaneIndexHashFuncs
@@ -1009,7 +1009,6 @@ bool FORCEINLINE CDispCollTree::AxisPlanesXYZ( const Ray_t &ray, CDispCollTri *p
 		}
 	};
 
-	Vector vecImpactNormal;
 	float flDist, flExpDist, flStart, flEnd;
 	
 	int iAxis;
@@ -1078,7 +1077,7 @@ void CDispCollTree::Cache_Create( CDispCollTri *pTri, int iTri )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int CDispCollTree::AddPlane( const Vector &vecNormal )
+intp CDispCollTree::AddPlane( const Vector &vecNormal )
 {
 	UtlHashHandle_t handle;
 	DispCollPlaneIndex_t planeIndex;

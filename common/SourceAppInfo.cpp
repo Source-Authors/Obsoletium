@@ -37,13 +37,13 @@ static const SourceAppInfo_t s_SteamAppInfo[] =
 //-----------------------------------------------------------------------------
 const char *GetAppFullName( ESourceApp eSourceApp )
 {
-	Assert( Q_ARRAYSIZE(s_SteamAppInfo) == k_App_MAX );
+	static_assert( ssize(s_SteamAppInfo) == k_App_MAX );
 	if ( s_SteamAppInfo[ eSourceApp ].m_ESourceApp == eSourceApp )
 	{
 		return s_SteamAppInfo[ eSourceApp ].m_pchFullName;
 	}
 
-	Assert( !"enum ESourceApp order mismatched from AppInfo_t s_SteamAppInfo, fix it!" );
+	AssertMsg( false, "enum ESourceApp order mismatched from AppInfo_t s_SteamAppInfo, fix it!" );
 	return s_SteamAppInfo[0].m_pchFullName;
 }
 
@@ -52,13 +52,13 @@ const char *GetAppFullName( ESourceApp eSourceApp )
 //-----------------------------------------------------------------------------
 const char *GetAppModName( ESourceApp eSourceApp )
 {
-	Assert( Q_ARRAYSIZE(s_SteamAppInfo) == k_App_MAX );
+	static_assert( ssize(s_SteamAppInfo) == k_App_MAX );
 	if ( s_SteamAppInfo[ eSourceApp ].m_ESourceApp == eSourceApp )
 	{
 		return s_SteamAppInfo[ eSourceApp ].m_pchModName;
 	}
 
-	Assert( !"enum ESourceApp order mismatched from AppInfo_t s_SteamAppInfo, fix it!" );
+	AssertMsg( false, "enum ESourceApp order mismatched from AppInfo_t s_SteamAppInfo, fix it!" );
 	return s_SteamAppInfo[0].m_pchModName;
 }
 
@@ -66,15 +66,15 @@ const char *GetAppModName( ESourceApp eSourceApp )
 //-----------------------------------------------------------------------------
 // Purpose: return the short string name used for this language by SteamUI
 //-----------------------------------------------------------------------------
-const int GetAppSteamAppId( ESourceApp eSourceApp )
+int GetAppSteamAppId( ESourceApp eSourceApp )
 {
-	Assert( Q_ARRAYSIZE(s_SteamAppInfo) == k_App_MAX );
+	static_assert( ssize(s_SteamAppInfo) == k_App_MAX );
 	if ( s_SteamAppInfo[ eSourceApp ].m_ESourceApp == eSourceApp )
 	{
 		return s_SteamAppInfo[ eSourceApp ].m_nSteamAppId;
 	}
 
-	Assert( !"enum ESourceApp order mismatched from AppInfo_t s_SteamAppInfo, fix it!" );
+	AssertMsg( false, "enum ESourceApp order mismatched from AppInfo_t s_SteamAppInfo, fix it!" );
 	return s_SteamAppInfo[0].m_nSteamAppId;
 }
 

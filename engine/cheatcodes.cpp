@@ -47,7 +47,7 @@ void ClearCheatCommands( void )
 	s_CheatCodeCommands.RemoveAll();
 }
 
-void ReadCheatCommandsFromFile( char *pchFileName )
+void ReadCheatCommandsFromFile( const char *pchFileName )
 {
 	KeyValues *pCheatCodeKeys = new KeyValues( "cheat_codes" );
 	pCheatCodeKeys->LoadFromFile( g_pFullFileSystem, pchFileName, NULL );
@@ -55,7 +55,7 @@ void ReadCheatCommandsFromFile( char *pchFileName )
 	KeyValues *pKey = NULL;
 	for ( pKey = pCheatCodeKeys->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
 	{
-		int iCheat = s_CheatCodeCommands.AddToTail();
+		auto iCheat = s_CheatCodeCommands.AddToTail();
 		CheatCodeData_t *pNewCheatCode = &(s_CheatCodeCommands[ iCheat ]);
 
 		Q_strncpy( pNewCheatCode->szName, pKey->GetName(), CHEAT_NAME_MAX_LEN );	// Get the name

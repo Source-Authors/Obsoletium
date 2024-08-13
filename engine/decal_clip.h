@@ -68,6 +68,6 @@ void R_SetupDecalTextureSpaceBasis(
 	Vector textureSpaceBasis[3],
 	float decalWorldScale[2] );
 
-extern alignas(16) CDecalVert g_DecalClipVerts[MAX_DECALCLIPVERT];
+alignas(16) extern CDecalVert g_DecalClipVerts[MAX_DECALCLIPVERT];
 
 #endif // DECAL_CLIP_H

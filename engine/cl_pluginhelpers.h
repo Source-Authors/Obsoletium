@@ -17,7 +17,7 @@ class CPluginHudMessage;
 class CPluginUIManager : public vgui::Panel
 {
 private:
-	DECLARE_CLASS_SIMPLE( CPluginUIManager, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPluginUIManager, vgui::Panel );
 
 public:
 	CPluginUIManager();
@@ -30,7 +30,7 @@ public:
 	void GetHudMessagePosition( int &x, int &y, int &wide, int &tall ); // Gets the position of the plugin HUD message. The askconnect dialog is placed here.
 
 protected:
-	void OnTick();
+	void OnTick() override;
 
 
 	int m_iCurPriority;

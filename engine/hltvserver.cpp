@@ -326,7 +326,7 @@ void CHLTVServer::InitClientRecvTables()
 		AddRecvTableR( pCur->m_pTable, m_pRecvTables, m_nRecvTables );
 
 		ErrorIfNot( 
-			m_nRecvTables < ARRAYSIZE( m_pRecvTables ), 
+			m_nRecvTables < ssize( m_pRecvTables ), 
 			("AddRecvTableR: overflowed MAX_DATATABLES")
 			);
 	}
@@ -335,7 +335,7 @@ void CHLTVServer::InitClientRecvTables()
 	for ( pCur = serverGameDLL->GetAllServerClasses(); pCur; pCur=pCur->m_pNext )
 	{
 		ErrorIfNot( 
-			m_nRecvTables < ARRAYSIZE( m_pRecvTables ), 
+			m_nRecvTables < ssize( m_pRecvTables ), 
 			("ClientDLL_InitRecvTableMgr: overflowed MAX_DATATABLES")
 			);
 
@@ -458,7 +458,7 @@ CHLTVServer::CHLTVServer()
 	m_nViewEntity = 0;
 	m_nPlayerSlot = 0;
 	m_bSignonState = false;
-	m_flStartTime = 0;
+	m_flStartTime = 0.0;
 	m_flFPS = 0;
 	m_nGameServerMaxClients = 0;
 	m_fNextSendUpdateTime = 0;
@@ -771,7 +771,7 @@ int	CHLTVServer::GetHLTVSlot( void )
 
 float CHLTVServer::GetOnlineTime( void )
 {
-	return max(0., net_time - m_flStartTime);
+	return max(0.0, net_time - m_flStartTime);
 }
 
 void CHLTVServer::GetLocalStats( int &proxies, int &slots, int &clients )
@@ -1405,7 +1405,7 @@ void CHLTVServer::UpdateStats( void )
 	if ( m_fNextSendUpdateTime > net_time )
 		return;
 
-	m_fNextSendUpdateTime = net_time + 8.0f;
+	m_fNextSendUpdateTime = net_time + 8.0;
 	
 	// fire game event for everyone
 	IGameEvent *event = NULL; 
@@ -1522,7 +1522,7 @@ CClientFrame *CHLTVServer::GetDeltaFrame( int nTick )
 			return m_FrameCache[iFrame].pFrame;
 	}
 
-	int i = m_FrameCache.AddToTail();
+	intp i = m_FrameCache.AddToTail();
 
 	CFrameCacheEntry_s &entry = m_FrameCache[i];
 
@@ -1666,10 +1666,10 @@ void CHLTVServer::Clear( void )
 	m_nTickCount = 0;
 	m_CurrentFrame = NULL;
 	m_nPlayerSlot = 0;
-	m_flStartTime = 0.0f;
+	m_flStartTime = 0.0;
 	m_nViewEntity = 1;
 	m_nGameServerMaxClients = 0;
-	m_fNextSendUpdateTime = 0.0f;
+	m_fNextSendUpdateTime = 0.0;
 	m_HLTVFrame.FreeBuffers();
 	m_vPVSOrigin.Init();
 		
@@ -2132,7 +2132,7 @@ void CHLTVServer::ReplyInfo( const netadr_t &adr )
 		buf.PutUint64( LittleQWord( CGameID( GetSteamAppID() ).ToUint64() ) );
 	}
 
-	NET_SendPacket( NULL, m_Socket, adr, (unsigned char *)buf.Base(), buf.TellPut() );
+	NET_SendPacket( NULL, m_Socket, adr, buf.Base<unsigned char>(), buf.TellPut() );
 }
 #endif // #ifndef NO_STEAM
 

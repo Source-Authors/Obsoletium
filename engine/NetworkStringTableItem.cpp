@@ -64,7 +64,7 @@ void CNetworkStringTableItem::EnableChangeHistory( void )
 
 void CNetworkStringTableItem::UpdateChangeList( int tick, int length, const void *userData )
 {
-	int count = m_pChangeList->Count();
+	intp count = m_pChangeList->Count();
 	itemchange_s item;
 
 	if ( count > 0 )
@@ -79,7 +79,7 @@ void CNetworkStringTableItem::UpdateChangeList( int tick, int length, const void
 		{
 			if ( item.data && userData )
 			{
-				if ( Q_memcmp( (void*)userData, (void*)item.data, length ) == 0 )
+				if ( Q_memcmp( userData, item.data, length ) == 0 )
 				{
 					return; // no data or size change
 				}
@@ -180,7 +180,7 @@ bool CNetworkStringTableItem::SetUserData( int tick, int length, const void *use
 
 	if ( m_pUserData && 
 		length == m_nUserDataLength &&
-		!Q_memcmp( m_pUserData, (void*)userData, length ) )
+		!Q_memcmp( m_pUserData, userData, length ) )
 	{
 		return false; // old & new data are equal
 	}

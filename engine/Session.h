@@ -143,7 +143,6 @@ private:
 	uint			m_nSessionFlags;			// Session creation flags
 	uint			m_nOwnerId;					// Which player created the session
 	uint			m_SessionState;
-	double			m_fOperationStartTime;
 	CMatchmaking	*m_pParent;
 	AsyncHandle_t	m_hCreateHandle;
 	AsyncHandle_t	m_hMigrateHandle;

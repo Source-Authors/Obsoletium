@@ -121,15 +121,15 @@ public:
 	void	AdjustSurfPointData( void );
 	
 	// Indexed by CORNER_ defines.
-	CDispCornerNeighbors*		GetCornerNeighbors( int iCorner )		{ Assert( iCorner >= 0 && iCorner < ARRAYSIZE( m_CornerNeighbors ) ); return &m_CornerNeighbors[iCorner]; }
-	const CDispCornerNeighbors*	GetCornerNeighbors( int iCorner ) const { Assert( iCorner >= 0 && iCorner < ARRAYSIZE( m_CornerNeighbors ) ); return &m_CornerNeighbors[iCorner]; }
+	CDispCornerNeighbors*		GetCornerNeighbors( int iCorner )		{ Assert( iCorner >= 0 && iCorner < ssize( m_CornerNeighbors ) ); return &m_CornerNeighbors[iCorner]; }
+	const CDispCornerNeighbors*	GetCornerNeighbors( int iCorner ) const { Assert( iCorner >= 0 && iCorner < ssize( m_CornerNeighbors ) ); return &m_CornerNeighbors[iCorner]; }
 	
 	// Indexed by CORNER_ defines.
 	int							GetCornerNeighborCount( int iCorner ) const				{ return GetCornerNeighbors( iCorner )->m_nNeighbors; }
 	int							GetCornerNeighbor( int iCorner, int iNeighbor ) const	{ Assert( iNeighbor >= 0 && iNeighbor < GetCornerNeighbors(iCorner)->m_nNeighbors ); return GetCornerNeighbors( iCorner )->m_Neighbors[iNeighbor]; }
 	
-	CDispNeighbor*			GetEdgeNeighbor( int iEdge )		{ Assert( iEdge >= 0 && iEdge < ARRAYSIZE( m_EdgeNeighbors ) ); return &m_EdgeNeighbors[iEdge]; }
-	const CDispNeighbor*	GetEdgeNeighbor( int iEdge ) const	{ Assert( iEdge >= 0 && iEdge < ARRAYSIZE( m_EdgeNeighbors ) ); return &m_EdgeNeighbors[iEdge]; }
+	CDispNeighbor*			GetEdgeNeighbor( int iEdge )		{ Assert( iEdge >= 0 && iEdge < ssize( m_EdgeNeighbors ) ); return &m_EdgeNeighbors[iEdge]; }
+	const CDispNeighbor*	GetEdgeNeighbor( int iEdge ) const	{ Assert( iEdge >= 0 && iEdge < ssize( m_EdgeNeighbors ) ); return &m_EdgeNeighbors[iEdge]; }
 
 
 protected:
@@ -765,7 +765,7 @@ public:
 	// Creation/Destruction
 	//
 	CCoreDispInfo();
-	~CCoreDispInfo();
+	virtual ~CCoreDispInfo();
 
 	void InitSurf( int parentIndex, Vector points[4], Vector normals[4],
 		           Vector2D texCoords[4], Vector2D lightCoords[4][4], int contents, int flags,

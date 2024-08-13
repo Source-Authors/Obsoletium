@@ -103,7 +103,7 @@ bool CIPRateLimit::CheckIPInternal( netadr_t adr )
 	}
 
 	// now find the entry and check if its within our rate limits
-	struct iprate_s findEntry = { clientIP };
+	struct iprate_s findEntry = { clientIP, 0, 0 };
 	ip_t entry = m_IPTree.Find( findEntry );
 
 	if( m_IPTree.IsValidIndex( entry ) )

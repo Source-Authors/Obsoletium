@@ -21,6 +21,7 @@ abstract_class IWaveData
 {
 public:
 	virtual						~IWaveData( void ) {}
+
 	virtual CAudioSource		&Source( void ) = 0;
 	virtual int					ReadSourceData( void **pData, int sampleIndex, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] ) = 0;
 	virtual bool				IsReadyToMix() = 0;

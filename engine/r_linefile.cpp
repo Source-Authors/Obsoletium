@@ -25,9 +25,9 @@ CUtlVector< Vector >	g_Points;
 void Linefile_Draw( void )
 {
 	Vector *points = g_Points.Base();
-	int pointCount = g_Points.Size();
+	intp pointCount = g_Points.Count();
 
-	for ( int i = 0; i < pointCount-1; i++ )
+	for ( intp i = 0; i < pointCount-1; i++ )
 	{
 		RenderLine( points[i], points[i+1], Color( 255, 255, 0, 255 ), true );
 	}
@@ -50,7 +50,7 @@ void Linefile_Read_f( void )
 
 	Q_snprintf( name, sizeof( name ), "maps/%s.lin", sv.GetMapName() );
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFileSystem->ReadFile( name, NULL, buf ) )
 	{
 		ConMsg ("couldn't open %s\n", name);

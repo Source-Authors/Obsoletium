@@ -452,7 +452,7 @@ int	CAudioSourceWave::ZeroCrossingAfter( int sample )
 //-----------------------------------------------------------------------------
 void CAudioSourceWave::ParseSentence( IterateRIFF &walk )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	buf.EnsureCapacity( walk.ChunkSize() );
 	walk.ChunkRead( buf.Base() );
@@ -540,7 +540,7 @@ bool CAudioSourceWave::GetXboxAudioStartupData()
 	}
 	else
 	{
-		xwvHeader_t* pHeader = (xwvHeader_t *)buf.Base();
+		xwvHeader_t* pHeader = buf.Base<xwvHeader_t>();
 		if ( pHeader->id != XWV_ID || pHeader->version != XWV_VERSION )
 		{
 			return false;
@@ -599,7 +599,7 @@ bool CAudioSourceWave::GetXboxAudioStartupData()
 				return false;
 			}
 
-			unsigned char *pData = (unsigned char *)fileBuffer.Base() + sizeof( xwvHeader_t );
+			unsigned char *pData = fileBuffer.Base<unsigned char>() + sizeof( xwvHeader_t );
 			if ( pHeader->GetSeekTableSize() )
 			{
 				// store off the seek table
@@ -624,7 +624,7 @@ bool CAudioSourceWave::GetXboxAudioStartupData()
 					CUtlBuffer targetBuffer;
 					int originalSize = CLZMA::GetActualSize( pData );
 					targetBuffer.EnsureCapacity( originalSize );
-					CLZMA::Uncompress( pData, (unsigned char *)targetBuffer.Base() );
+					CLZMA::Uncompress( pData, targetBuffer.Base<unsigned char>() );
 					targetBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, originalSize );
 					m_pTempSentence->CacheRestoreFromBuffer( targetBuffer );
 				}
@@ -723,7 +723,7 @@ bool CAudioSourceWave::GetStartupData( void *dest, int destsize, int& bytesCopie
 	// requesting precache snippet as leader for streaming startup latency
 	if ( destsize )
 	{
-		int file = g_pSndIO->open( m_pSfx->GetFileName() );
+		intp file = g_pSndIO->open( m_pSfx->GetFileName() );
 		if ( !file )
 		{
 			return false;
@@ -1738,7 +1738,7 @@ void CAudioSourceStreamWave::ParseChunk( IterateRIFF &walk, int chunkName )
 // Purpose: This is not implemented here.  This source has no data.  It is the
 //			WaveData's responsibility to load/serve the data
 //-----------------------------------------------------------------------------
-int CAudioSourceStreamWave::GetOutputData( void **pData, int samplePosition, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] )
+int CAudioSourceStreamWave::GetOutputData( void **, int, int, char [AUDIOSOURCE_COPYBUF_SIZE] )
 {
 	return 0;
 }
@@ -1774,36 +1774,20 @@ CAudioSource *CreateWave( CSfxTable *pSfx, bool bStreaming )
 
 	CAudioSourceWave *pWave = NULL;
 
-	if ( IsPC() || !IsX360() )
-	{
-		// Caching should always work, so if we failed to cache, it's a problem reading the file data, etc.
-		bool bIsMapSound = pSfx->IsPrecachedSound();
-		CAudioSourceCachedInfo *pInfo = audiosourcecache->GetInfo( CAudioSource::AUDIO_SOURCE_WAV, bIsMapSound, pSfx );
+	// Caching should always work, so if we failed to cache, it's a problem reading the file data, etc.
+	bool bIsMapSound = pSfx->IsPrecachedSound();
+	CAudioSourceCachedInfo *pInfo = audiosourcecache->GetInfo( CAudioSource::AUDIO_SOURCE_WAV, bIsMapSound, pSfx );
 
-		if ( pInfo && pInfo->Type() != CAudioSource::AUDIO_SOURCE_UNK )
-		{
-			// create the source from this file
-			if ( bStreaming )
-			{
-				pWave = new CAudioSourceStreamWave( pSfx, pInfo );
-			}
-			else
-			{
-				pWave = new CAudioSourceMemWave( pSfx, pInfo );
-			}
-		}
-	}
-	else
+	if ( pInfo && pInfo->Type() != CAudioSource::AUDIO_SOURCE_UNK )
 	{
-		// 360 does not use audio cache system
-		// create the desired type
+		// create the source from this file
 		if ( bStreaming )
 		{
-			pWave = new CAudioSourceStreamWave( pSfx );
+			pWave = new CAudioSourceStreamWave( pSfx, pInfo );
 		}
 		else
 		{
-			pWave = new CAudioSourceMemWave( pSfx );
+			pWave = new CAudioSourceMemWave( pSfx, pInfo );
 		}
 	}
 
@@ -1880,12 +1864,6 @@ void MaybeReportMissingWav( char const *wav )
 
 static float Audio_GetWaveDuration( char const *pName )
 {
-	if ( IsX360() )
-	{
-		// should have precached
-		return 0;
-	}
-
 	char formatBuffer[1024];
 	WAVEFORMATEX *pfmt = (WAVEFORMATEX *)formatBuffer;
 
@@ -1991,15 +1969,15 @@ float AudioSource_GetSoundDuration( CSfxTable *pSfx )
 CAudioSourceCachedInfo::CAudioSourceCachedInfo() :
 	infolong( 0 ),
 	flagsbyte( 0 ),
-	m_dataStart( 0 ),
-	m_dataSize( 0 ),
 	m_loopStart( 0 ),
 	m_sampleCount( 0 ),
+	m_dataStart( 0 ),
+	m_dataSize( 0 ),
 	m_usCachedDataSize( 0 ),
-	m_pCachedData( 0 ),
 	m_usHeaderSize( 0 ),
-	m_pHeader( 0 ),
-	m_pSentence( 0 )
+	m_pSentence( 0 ),
+	m_pCachedData( 0 ),
+	m_pHeader( 0 )
 {
 }
 
@@ -2234,15 +2212,6 @@ void CAudioSourceCachedInfo::Rebuild( char const *filename )
 	Assert( s_pSfx );
 	Assert( s_CurrentType != CAudioSource::AUDIO_SOURCE_MAXTYPE );
 
-#if 0 
-	// Never cachify something which is not in the client precache list
-	if ( s_bIsPrecacheSound != s_pSfx->IsPrecachedSound() )
-	{
-		Msg( "Logic bug, precaching entry for '%s' which is not in precache list\n",
-			filename );
-	}
-#endif
-
 	SetType( s_CurrentType );
 
 	CAudioSource *as = NULL;
@@ -2308,7 +2277,7 @@ public:
 		m_bSndCacheDebug = false;
 	}
 
-	bool Init( unsigned int memSize );
+	bool Init( size_t memSize );
 	void Shutdown();
 
 	void CheckSaveDirtyCaches();
@@ -2358,7 +2327,7 @@ void CAudioSourceCachedInfoHandle_t::InvalidateCache()
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CAudioSourceCache::Init( unsigned int memSize )
+bool CAudioSourceCache::Init( size_t memSize )
 {
 #if defined( _DEBUG )
 	Msg( "CAudioSourceCache: Init\n" );
@@ -2369,12 +2338,6 @@ bool CAudioSourceCache::Init( unsigned int memSize )
 	if ( !wavedatacache->Init( memSize ) )
 	{
 		Error( "Unable to init wavedatacache system\n" );
-	}
-
-	if ( IsX360() )
-	{
-		// 360 doesn't use audio source caches
-		return true;
 	}
 
 	// Gather up list of search paths
@@ -2474,11 +2437,6 @@ void CAudioSourceCache::Shutdown()
 //-----------------------------------------------------------------------------
 void CAudioSourceCache::CheckCacheBuild()
 {
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	// !FIXME! We'll just do everything lazily for now!
 	FOR_EACH_VEC( m_vecCaches, idx )
 	{
@@ -2505,11 +2463,6 @@ void CAudioSourceCache::CheckSaveDirtyCaches()
 //-----------------------------------------------------------------------------
 unsigned int CAudioSourceCache::AsyncLookaheadMetaChecksum( void )
 {
-	if ( IsX360() )
-	{
-		return 0;
-	}
-
 	CRC32_t crc;
 	CRC32_Init( &crc );
 
@@ -2550,11 +2503,6 @@ void CAudioSourceCache::GetSoundFilename( char *szResult, int nResultSize, const
 //-----------------------------------------------------------------------------
 CAudioSourceCache::SearchPathCache *CAudioSourceCache::LookUpCacheEntry( const char *fn, int audiosourcetype, bool soundisprecached, CSfxTable *sfx )
 {
-	if ( IsX360() )
-	{
-		return NULL;
-	}
-
 	// Hack to remember the type of audiosource to create if we need to recreate it
 	CAudioSourceCachedInfo::s_CurrentType = audiosourcetype;
 	CAudioSourceCachedInfo::s_pSfx = sfx;
@@ -2595,12 +2543,6 @@ CAudioSourceCachedInfo *CAudioSourceCache::GetInfo( int audiosourcetype, bool so
 {
 	VPROF("CAudioSourceCache::GetInfo");
 
-	if ( IsX360() )
-	{
-		// 360 not using
-		return NULL;
-	}
-
 	Assert( sfx );
 
 	char fn[ 512 ];
@@ -2632,12 +2574,6 @@ void CAudioSourceCache::RebuildCacheEntry( int audiosourcetype, bool soundisprec
 {
 	VPROF("CAudioSourceCache::RebuildCacheEntry");
 
-	if ( IsX360() )
-	{
-		// 360 not using
-		return;
-	}
-
 	Assert( sfx );
 
 	char fn[ 512 ];
@@ -2662,11 +2598,6 @@ void CAudioSourceCache::ForceRecheckDiskInfo()
 //-----------------------------------------------------------------------------
 void CAudioSourceCache::RemoveCache( char const *cachename )
 {
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	if ( g_pFullFileSystem->FileExists( cachename, "MOD" ) )
 	{
 		if ( !g_pFullFileSystem->IsFileWritable( cachename, "MOD" ) )
@@ -2722,7 +2653,7 @@ void CAudioSourceCache::BuildCache( char const *pszSearchPath )
 	}
 
 	g_pFullFileSystem->AddSearchPath( szAbsPath, "game", PATH_ADD_TO_HEAD );
-	int nLenAbsPath = V_strlen( szAbsPath );
+	intp nLenAbsPath = V_strlen( szAbsPath );
 	int iLastShownPct = -1;
 	FOR_EACH_VEC( vecFilenames, idxFilename )
 	{

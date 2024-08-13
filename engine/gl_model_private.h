@@ -408,8 +408,6 @@ inline class IDispInfo *MLeaf_Disaplcement( mleaf_t *pLeaf, int index, worldbrus
 	return DispInfo_IndexArray( pData->hDispInfos, dispIndex );
 }
 
-#define	MAXLIGHTMAPS	4
-
 // drawing surface flags
 #define SURFDRAW_NOLIGHT		0x00000001		// no lightmap
 #define	SURFDRAW_NODE			0x00000002		// This surface is on a node
@@ -530,7 +528,7 @@ inline int MSurf_Index( SurfaceHandle_t surfID, worldbrushdata_t *pData = host_s
 	return surfaceIndex;
 }
 
-inline const SurfaceHandle_t SurfaceHandleFromIndex( int surfaceIndex, const worldbrushdata_t *pData )
+inline SurfaceHandle_t SurfaceHandleFromIndex( int surfaceIndex, const worldbrushdata_t *pData )
 {
 	return &pData->surfaces2[surfaceIndex];
 }
@@ -740,7 +738,7 @@ inline ColorRGBExp32 *MSurf_Samples( SurfaceHandle_t surfID, worldbrushdata_t *p
 	return pData->surfacelighting[surfaceIndex].m_pSamples;
 }
 
-inline IDispInfo *MSurf_DispInfo( SurfaceHandle_t surfID, worldbrushdata_t *pData = host_state.worldbrush )
+inline IDispInfo *MSurf_DispInfo( SurfaceHandle_t surfID, [[maybe_unused]] worldbrushdata_t *pData = host_state.worldbrush )
 {
 	return surfID->pDispInfo;
 }
@@ -760,7 +758,7 @@ inline unsigned short &MSurf_VertBufferIndex( SurfaceHandle_t surfID )
 	return surfID->vertBufferIndex;
 }
 
-inline short& MSurf_MaterialSortID( SurfaceHandle_t surfID, worldbrushdata_t *pData = host_state.worldbrush )
+inline short& MSurf_MaterialSortID( SurfaceHandle_t surfID, [[maybe_unused]] worldbrushdata_t *pData = host_state.worldbrush )
 {
 	return surfID->materialSortID;
 }
@@ -781,7 +779,7 @@ inline VPlane MSurf_GetForwardFacingPlane( SurfaceHandle_t surfID, worldbrushdat
 }
 
 
-inline OverlayFragmentHandle_t &MSurf_OverlayFragmentList( SurfaceHandle_t surfID, worldbrushdata_t *pData = host_state.worldbrush )
+inline OverlayFragmentHandle_t &MSurf_OverlayFragmentList( SurfaceHandle_t surfID, [[maybe_unused]] worldbrushdata_t *pData = host_state.worldbrush )
 {
 	return surfID->m_nFirstOverlayFragment;
 }

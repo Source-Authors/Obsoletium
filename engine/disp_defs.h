@@ -100,15 +100,15 @@ public:
 class CDispDecalBase
 {
 public:
-	CDispDecalBase( int flags ) : m_Flags(flags) {}
-
-	enum 
+	enum DecalFlags : unsigned char
 	{ 
 		NODE_BITFIELD_COMPUTED = 0x1,
 		DECAL_SHADOW = 0x2,
 		NO_INTERSECTION = 0x4,
 		FRAGMENTS_COMPUTED = 0x8,	// *non-shadow* fragments
 	};
+
+	explicit CDispDecalBase( CDispDecalBase::DecalFlags flags ) : m_Flags(flags) {}
 
 	// Precalculated flags on the nodes telling which nodes this decal can intersect.
 	// See CPowerInfo::m_NodeIndexIncrements for a description of how the node tree is
@@ -136,7 +136,7 @@ enum
 class CDispDecal : public CDispDecalBase
 {
 public:
-	CDispDecal() : CDispDecalBase(0) {}
+	CDispDecal() : CDispDecalBase(CDispDecalBase::DecalFlags{}) {}
 
 	decal_t		*m_pDecal;
 	float		m_DecalWorldScale[2];
@@ -176,7 +176,7 @@ enum
 class CDispShadowDecal : public CDispDecalBase
 {
 public:	
-	CDispShadowDecal() : CDispDecalBase(DECAL_SHADOW) {}
+	CDispShadowDecal() : CDispDecalBase(CDispDecalBase::DecalFlags::DECAL_SHADOW) {}
 
 	ShadowHandle_t	m_Shadow;
 	DispShadowFragmentHandle_t	m_FirstFragment;

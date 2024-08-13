@@ -69,7 +69,7 @@ Key_SetBinding
 void Key_SetBinding( ButtonCode_t keynum, const char *pBinding )
 {
 	char	*pNewBinding;
-	int		l;
+	intp		l;
 			
 	if ( keynum == BUTTON_CODE_INVALID )
 		return;

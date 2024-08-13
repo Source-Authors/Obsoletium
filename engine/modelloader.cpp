@@ -174,8 +174,8 @@ class CModelLoader : public IModelLoader
 {
 // Implement IModelLoader interface
 public:
-	CModelLoader() : m_ModelPool( sizeof( model_t ), MAX_KNOWN_MODELS, CUtlMemoryPool::GROW_FAST, "CModelLoader::m_ModelPool" ),
-					m_Models( 0, 0, Model_LessFunc )
+	CModelLoader() : m_Models( 0, 0, Model_LessFunc ),
+		m_ModelPool( sizeof( model_t ), MAX_KNOWN_MODELS, CUtlMemoryPool::GROW_FAST, "CModelLoader::m_ModelPool" )
 	{
 	}
 
@@ -795,7 +795,7 @@ CMapLoadHelper::CMapLoadHelper( int lumpToLoad )
 	if ( s_MapBuffer.Base() )
 	{
 		// bsp is in memory
-		m_pData = (unsigned char*)s_MapBuffer.Base() + m_nLumpOffset;
+		m_pData = s_MapBuffer.Base<unsigned char>() + m_nLumpOffset;
 	}
 	else
 	{
@@ -1615,7 +1615,7 @@ void Mod_LoadVertNormals( void )
     if( lh.LumpSize() % sizeof( *pVertNormals ) )
         Host_Error( "Mod_LoadVertNormals: funny lump size in %s!\n", lh.GetMapName() );
 
-	int count = lh.LumpSize() / sizeof(*pVertNormals);
+    int count = lh.LumpSize() / sizeof(*pVertNormals);
 	Vector *out = (Vector *)Hunk_AllocName( lh.LumpSize(), va( "%s [%s]", lh.GetLoadName(), "vertnormals" ) );
 	memcpy( out, pVertNormals, lh.LumpSize() );
 	
@@ -1801,21 +1801,21 @@ bool Mod_LoadSurfaceLightingV1( msurfacelighting_t *pLighting, dface_t *in, Colo
 	return ((pLighting->m_nStyles[0] != 0) && (pLighting->m_nStyles[0] != 255)) || (pLighting->m_nStyles[1] != 255);
 }
 
-void *Hunk_AllocNameAlignedClear_( int size, int alignment, const char *pHunkName )
+void *Hunk_AllocNameAlignedClear_( intp size, intp alignment, const char *pHunkName )
 {
 	Assert(IsPowerOfTwo(alignment));
 	void *pMem = Hunk_AllocName( alignment + size, pHunkName );
 	memset( pMem, 0, size + alignment );
-	pMem = (void *)( ( ( ( unsigned long )pMem ) + (alignment-1) ) & ~(alignment-1) );
+	pMem = (void *)( ( ( ( uintp )pMem ) + (alignment-1) ) & ~(alignment-1) );
 
 	return pMem;
 }
 
 // Allocates a block of T from the hunk.  Aligns as specified and clears the memory
 template< typename T > 
-T *Hunk_AllocNameAlignedClear( int count, int alignment, const char *pHunkName )
+T *Hunk_AllocNameAlignedClear( intp count, intp alignment, const char *pHunkName )
 {
-	return (T *)Hunk_AllocNameAlignedClear_( alignment + count * sizeof(T), alignment, pHunkName );
+	return static_cast<T *>(Hunk_AllocNameAlignedClear_( alignment + count * sizeof(T), alignment, pHunkName ));
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1845,9 +1845,14 @@ void Mod_LoadFaces( void )
 
 	// align these allocations
 	// If you trip one of these, you need to rethink the alignment of the struct
-	Assert( sizeof(msurface1_t) == 16 );
-	Assert( sizeof(msurface2_t) == 32 );
-	Assert( sizeof(msurfacelighting_t) == 32 );
+	static_assert( sizeof(msurface1_t) == 16 );
+#ifdef PLATFORM_64BITS
+	static_assert( sizeof(msurface2_t) == 40 );
+	static_assert( sizeof(msurfacelighting_t) == 40 );
+#else
+	static_assert( sizeof(msurface2_t) == 32 );
+	static_assert( sizeof(msurfacelighting_t) == 32 );
+#endif
 
 	msurface1_t *out1 = Hunk_AllocNameAlignedClear< msurface1_t >( count, 16, va( "%s [%s]", lh.GetLoadName(), "surface1" ) );
 	msurface2_t *out2 = Hunk_AllocNameAlignedClear< msurface2_t >( count, 32, va( "%s [%s]", lh.GetLoadName(), "surface2" ) );
@@ -2364,7 +2369,7 @@ void Mod_LoadCubemapSamples( void )
 
 	// We have separate HDR versions of the textures.  In order to deal with this,
 	// we have blahenvmap.hdr.vtf and blahenvmap.vtf.
-	char *pHDRExtension = "";
+	const char *pHDRExtension = "";
 	if( bHDR )
 	{
 		pHDRExtension = ".hdr";
@@ -2616,7 +2621,7 @@ void Mod_LoadPlanes( void )
 //-----------------------------------------------------------------------------
 int Mod_GameLumpVersion( int lumpId )
 {
-	for ( int i = g_GameLumpDict.Size(); --i >= 0; )
+	for ( intp i = g_GameLumpDict.Count(); --i >= 0; )
 	{
 		if ( g_GameLumpDict[i].id == lumpId )
 		{
@@ -2633,7 +2638,7 @@ int Mod_GameLumpVersion( int lumpId )
 //-----------------------------------------------------------------------------
 int Mod_GameLumpSize( int lumpId )
 {
-	for ( int i = g_GameLumpDict.Size(); --i >= 0; )
+	for ( intp i = g_GameLumpDict.Count(); --i >= 0; )
 	{
 		if ( g_GameLumpDict[i].id == lumpId )
 		{
@@ -2650,8 +2655,8 @@ int Mod_GameLumpSize( int lumpId )
 //-----------------------------------------------------------------------------
 bool Mod_LoadGameLump( int lumpId, void *pOutBuffer, int size )
 {
-	int i;
-	for ( i = g_GameLumpDict.Size(); --i >= 0; )
+	intp i;
+	for ( i = g_GameLumpDict.Count(); --i >= 0; )
 	{
 		if ( g_GameLumpDict[i].id == lumpId )
 		{
@@ -2698,7 +2703,7 @@ bool Mod_LoadGameLump( int lumpId, void *pOutBuffer, int size )
 			return false;
 		}
 
-		pData = (unsigned char *)s_MapBuffer.Base() + g_GameLumpDict[i].offset;
+		pData = s_MapBuffer.Base<unsigned char>() + g_GameLumpDict[i].offset;
 		if ( !bIsCompressed )
 		{
 			V_memcpy( pOutBuffer, pData, outSize );
@@ -3010,7 +3015,7 @@ void CMDLCacheNotify::OnDataLoaded( MDLCacheDataType_t type, MDLHandle_t handle 
 	}
 }
 
-void CMDLCacheNotify::OnDataUnloaded( MDLCacheDataType_t type, MDLHandle_t handle )
+void CMDLCacheNotify::OnDataUnloaded( MDLCacheDataType_t, MDLHandle_t )
 {
 }
 
@@ -3274,7 +3279,7 @@ class CResourcePreloadModel : public CResourcePreload
 		g_pMDLCache->Flush( MDLCACHE_FLUSH_ANIMBLOCK );
 	}
 
-	virtual void OnEndMapLoading( bool bAbort )
+	virtual void OnEndMapLoading( bool )
 	{
 		// discard the memory mounted bsp
 		CMapLoadHelper::Shutdown();
@@ -4057,7 +4062,7 @@ int Mod_GetMaterialCount( model_t* mod )
 					uniqueMaterials.AddToTail(pMaterial);
 			}
 
-			return uniqueMaterials.Size();
+			return uniqueMaterials.Count();
 		}
 		break;
 
@@ -4301,7 +4306,7 @@ public:
 		m_pShared = pBrush->brush.pShared;
 		m_count = 0;
 	}
-	bool EnumerateLeaf( int leaf, int )
+	bool EnumerateLeaf( int leaf, intp )
 	{
 		// garymcthack - need to test identity brush models
 		int flags = ( m_pShared->leafs[leaf].leafWaterDataID == -1 ) ? SURFDRAW_ABOVEWATER : SURFDRAW_UNDERWATER;
@@ -4348,7 +4353,7 @@ static void MarkBrushModelWaterSurfaces( model_t* world,
 	model_t* pTemp = host_state.worldmodel;
 	CBrushBSPIterator brushIterator( world, brush );
 	host_state.SetWorldModel( world );
-	g_pToolBSPTree->EnumerateLeavesInBox( mins, maxs, &brushIterator, (int)brush );
+	g_pToolBSPTree->EnumerateLeavesInBox( mins, maxs, &brushIterator, reinterpret_cast<intp>(brush) );
 	brushIterator.CheckSurfaces();
 	host_state.SetWorldModel( pTemp );
 }
@@ -4880,7 +4885,7 @@ struct modelsize_t
 class CModelsize_Less
 {
 public:
-	bool Less( const modelsize_t& src1, const modelsize_t& src2, void *pCtx )
+	bool Less( const modelsize_t& src1, const modelsize_t& src2, void * )
 	{
 		return ( src1.size < src2.size );
 	}
@@ -4928,17 +4933,18 @@ void CModelLoader::DumpVCollideStats()
 	}
 
 	Msg("VCollides loaded: %d\n", list.Count() );
-	int totalVCollideMemory = 0;
+	intp totalVCollideMemory = 0;
 	for ( i = 0; i < list.Count(); i++ )
 	{
 		Msg("%8d bytes:%s\n", list[i].size, list[i].pName);
 		totalVCollideMemory += list[i].size;
 	}
-	int bboxCount, bboxSize;
+	unsigned bboxSize;
+	intp bboxCount;
 	physcollision->GetBBoxCacheSize( &bboxSize, &bboxCount );
-	Msg( "%8d bytes BBox physics: %d boxes\n", bboxSize, bboxCount );
+	Msg( "%8u bytes BBox physics: %zd boxes\n", bboxSize, bboxCount );
 	totalVCollideMemory += bboxSize;
-	Msg( "--------------\n%8d bytes total VCollide Memory\n", totalVCollideMemory );
+	Msg( "--------------\n%8zd bytes total VCollide Memory\n", totalVCollideMemory );
 }
 
 
@@ -5258,45 +5264,9 @@ void CModelLoader::Print( void )
 }
 
 //-----------------------------------------------------------------------------
-// Callback for UpdateOrCreate utility function - swaps a bsp.
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-static bool BSPCreateCallback( const char *pSourceName, const char *pTargetName, const char *pPathID, void *pExtraData )
-{
-	// load the bsppack dll
-	IBSPPack *iBSPPack = NULL;
-	CSysModule *pmodule = g_pFullFileSystem->LoadModule( "bsppack" );
-	if ( pmodule )
-	{
-		CreateInterfaceFn factory = Sys_GetFactory( pmodule );
-		if ( factory )
-		{
-			iBSPPack = ( IBSPPack * )factory( IBSPPACK_VERSION_STRING, NULL );
-		}
-	}
-	if( !iBSPPack )
-	{
-		Warning( "Can't load bsppack.dll - unable to swap bsp.\n" );
-		return false;
-	}
-
-	bool bOk = true;
-	if ( !iBSPPack->SwapBSPFile( g_pFileSystem, pSourceName, pTargetName, IsX360(), ConvertVTFTo360Format, NULL, NULL ) )
-	{
-		bOk = false;
-		Warning( "Failed to create %s\n", pTargetName );
-	}
-
-	Sys_UnloadModule( pmodule );
-
-	return bOk;
-}
-#endif
-
-//-----------------------------------------------------------------------------
 // Calls utility function to create .360 version of a file.
 //-----------------------------------------------------------------------------
-int CModelLoader::UpdateOrCreate( const char *pSourceName, char *pTargetName, int targetLen, bool bForce )
+int CModelLoader::UpdateOrCreate( [[maybe_unused]] const char *pSourceName, [[maybe_unused]] char *pTargetName, [[maybe_unused]] int targetLen, [[maybe_unused]] bool bForce )
 {
 #if defined( _X360 )
 	return ::UpdateOrCreate( pSourceName, pTargetName, targetLen, NULL, BSPCreateCallback, bForce );
@@ -5359,7 +5329,7 @@ bool CModelLoader::Map_IsValid( char const *pMapFile, bool bQuiet /* = false */ 
 
 	if ( bIllegalChar )
 	{
-		Assert( !"Map with illegal characters in filename" );
+		AssertMsg( false, "Map with illegal characters in filename" );
 		Warning( "Map with illegal characters in filename\n" );
 		return false;
 	}

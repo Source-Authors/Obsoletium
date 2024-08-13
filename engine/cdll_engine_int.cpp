@@ -132,7 +132,7 @@ void AddIntersectingLeafSurfaces( mleaf_t *pLeaf, GetIntersectingSurfaces_Struct
 		bool foundSurf = false;
 		for(int iTest=0; iTest < pStruct->m_nSetInfos; iTest++)
 		{
-			if(pStruct->m_pInfos[iTest].m_pEngineData == (void *)surfID)
+			if(pStruct->m_pInfos[iTest].m_pEngineData == surfID)
 			{
 				foundSurf = true;
 				break;
@@ -146,7 +146,7 @@ void AddIntersectingLeafSurfaces( mleaf_t *pLeaf, GetIntersectingSurfaces_Struct
 			return;
 		SurfInfo *pOut = &pStruct->m_pInfos[pStruct->m_nSetInfos];
 		pOut->m_nVerts = 0;
-		pOut->m_pEngineData = (void *)surfID;
+		pOut->m_pEngineData = surfID;
 
 		// Build vertex list and bounding box.			
 		Vector vMin( 1000000.0f,  1000000.0f,  1000000.0f);
@@ -342,119 +342,119 @@ public:
 		const float radius,
 		const bool bOnlyVisible,
 		SurfInfo *pInfos, 
-		const int nMaxInfos);
+		const int nMaxInfos) override;
 
-	Vector	GetLightForPoint(const Vector &pos, bool bClamp);
-	Vector	GetLightForPointFast(const Vector &pos, bool bClamp);
-	const char *ParseFile( const char *data, char *token, int maxlen );
-	virtual bool CopyLocalFile( const char *source, const char *destination );
-	void GetScreenSize( int& w, int &h );
-	void ServerCmd( const char *szCmdString, bool bReliable );
-	void ClientCmd( const char *szCmdString );
-	void ClientCmd_Unrestricted( const char *szCmdString );
-	void SetRestrictServerCommands( bool bRestrict );
-	void SetRestrictClientCommands( bool bRestrict );
-	bool GetPlayerInfo( int ent_num, player_info_t *pinfo );
-	client_textmessage_t *TextMessageGet( const char *pName );
-	bool Con_IsVisible( void );
-	int GetLocalPlayer( void );
-	float GetLastTimeStamp( void );
-	const model_t *LoadModel( const char *pName, bool bProp );
+	Vector	GetLightForPoint(const Vector &pos, bool bClamp) override;
+	Vector	GetLightForPointFast(const Vector &pos, bool bClamp) override;
+	const char *ParseFile( const char *data, char *token, int maxlen ) override;
+	virtual bool CopyLocalFile( const char *source, const char *destination ) override;
+	void GetScreenSize( int& w, int &h ) override;
+	void ServerCmd( const char *szCmdString, bool bReliable ) override;
+	void ClientCmd( const char *szCmdString ) override;
+	void ClientCmd_Unrestricted( const char *szCmdString ) override;
+	void SetRestrictServerCommands( bool bRestrict ) override;
+	void SetRestrictClientCommands( bool bRestrict ) override;
+	bool GetPlayerInfo( int ent_num, player_info_t *pinfo ) override;
+	client_textmessage_t *TextMessageGet( const char *pName ) override;
+	bool Con_IsVisible( void ) override;
+	int GetLocalPlayer( void ) override;
+	float GetLastTimeStamp( void ) override;
+	const model_t *LoadModel( const char *pName, bool bProp ) override;
 	void UnloadModel( const model_t *model, bool bProp );
-	CSentence *GetSentence( CAudioSource *pAudioSource );
-	float GetSentenceLength( CAudioSource *pAudioSource );
-	bool IsStreaming( CAudioSource *pAudioSource ) const;
-	void AddPhonemeFile( const char *pszPhonemeFile );
+	CSentence *GetSentence( CAudioSource *pAudioSource ) override;
+	float GetSentenceLength( CAudioSource *pAudioSource ) override;
+	bool IsStreaming( CAudioSource *pAudioSource ) const override;
+	void AddPhonemeFile( const char *pszPhonemeFile ) override;
 
 	// FIXME, move entirely to client .dll
-	void GetViewAngles( QAngle& va );
-	void SetViewAngles( QAngle& va );
-	int GetMaxClients( void );
+	void GetViewAngles( QAngle& va ) override;
+	void SetViewAngles( QAngle& va ) override;
+	int GetMaxClients( void ) override;
 	void Key_Event( ButtonCode_t key, int down );
-	const char *Key_LookupBinding( const char *pBinding );
-	const char *Key_LookupBindingExact( const char *pBinding );
-	const char *Key_BindingForKey( ButtonCode_t code );
-	void StartKeyTrapMode( void );
-	bool CheckDoneKeyTrapping( ButtonCode_t &key );
-	bool IsInGame( void );
-	bool IsConnected( void );
-	bool IsDrawingLoadingImage( void );
-	void Con_NPrintf( int pos, const char *fmt, ... );
-	void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... );
+	const char *Key_LookupBinding( const char *pBinding ) override;
+	const char *Key_LookupBindingExact( const char *pBinding ) override;
+	const char *Key_BindingForKey( ButtonCode_t code ) override;
+	void StartKeyTrapMode( void ) override;
+	bool CheckDoneKeyTrapping( ButtonCode_t &key ) override;
+	bool IsInGame( void ) override;
+	bool IsConnected( void ) override;
+	bool IsDrawingLoadingImage( void ) override;
+	void Con_NPrintf( int pos, const char *fmt, ... ) override;
+	void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... ) override;
 	IMaterial *TraceLineMaterialAndLighting( const Vector &start, const Vector &end, 
-		                                     Vector &diffuseLightColor, Vector &baseColor );
-	int		IsBoxVisible( const Vector& mins, const Vector& maxs );
-	int		IsBoxInViewCluster( const Vector& mins, const Vector& maxs );
+		                                     Vector &diffuseLightColor, Vector &baseColor ) override;
+	int		IsBoxVisible( const Vector& mins, const Vector& maxs ) override;
+	int		IsBoxInViewCluster( const Vector& mins, const Vector& maxs ) override;
 
-	float Time();
-	void Sound_ExtraUpdate( void );
+	float Time() override;
+	void Sound_ExtraUpdate( void ) override;
 
-	bool CullBox ( const Vector& mins, const Vector& maxs );
-	const char *GetGameDirectory( void );
-	const VMatrix& WorldToScreenMatrix();
-	const VMatrix& WorldToViewMatrix();
+	bool CullBox ( const Vector& mins, const Vector& maxs ) override;
+	const char *GetGameDirectory( void ) override;
+	const VMatrix& WorldToScreenMatrix() override;
+	const VMatrix& WorldToViewMatrix() override;
 
 	// Loads a game lump off disk
-	int		GameLumpVersion( int lumpId ) const;
-	int		GameLumpSize( int lumpId ) const;
-	bool	LoadGameLump( int lumpId, void* pBuffer, int size );
+	int		GameLumpVersion( int lumpId ) const override;
+	int		GameLumpSize( int lumpId ) const override;
+	bool	LoadGameLump( int lumpId, void* pBuffer, int size ) override;
 
 	// Returns the number of leaves in the level
-	int		LevelLeafCount() const;
-	virtual ISpatialQuery* GetBSPTreeQuery();
+	int		LevelLeafCount() const override;
+	virtual ISpatialQuery* GetBSPTreeQuery() override;
 
 	// Convert texlight to gamma...
-	virtual void LinearToGamma( float* linear, float* gamma );
+	virtual void LinearToGamma( float* linear, float* gamma ) override;
 
 	// Get the lightstyle value
-	virtual float LightStyleValue( int style );
-	virtual void DrawPortals();
+	virtual float LightStyleValue( int style ) override;
+	virtual void DrawPortals() override;
 
 	// Computes light due to dynamic lighting at a point
 	// If the normal isn't specified, then it'll return the maximum lighting
-	virtual void ComputeDynamicLighting( Vector const& pt, Vector const* pNormal, Vector& color );
+	void ComputeDynamicLighting( Vector const& pt, Vector const* pNormal, Vector& color ) override;
 
 	// Computes light due to dynamic lighting at a point
 	// If the normal isn't specified, then it'll return the maximum lighting
 	// If pBoxColors is specified (it's an array of 6), then it'll copy the light contribution at each box side.
-	virtual void ComputeLighting( const Vector& pt, const Vector* pNormal, bool bClamp, Vector& color, Vector *pBoxColors );
+	virtual void ComputeLighting( const Vector& pt, const Vector* pNormal, bool bClamp, Vector& color, Vector *pBoxColors ) override;
 
 	// Returns the color of the ambient light
-	virtual void GetAmbientLightColor( Vector& color );
+	virtual void GetAmbientLightColor( Vector& color ) override;
 
 	// Returns the dx support level
-	virtual int	GetDXSupportLevel();
+	virtual int	GetDXSupportLevel() override;
 	
-	virtual bool SupportsHDR();
-	virtual void Mat_Stub( IMaterialSystem *pMatSys );
+	virtual bool SupportsHDR() override;
+	virtual void Mat_Stub( IMaterialSystem *pMatSys ) override;
 
 	// menu display
-	virtual void GetChapterName( char *pchBuff, int iMaxLength );
-	virtual char const *GetLevelName( void );
-	virtual int GetLevelVersion( void );
-	virtual bool IsLevelMainMenuBackground( void );
-	virtual void GetMainMenuBackgroundName( char *dest, int destlen );
+	virtual void GetChapterName( char *pchBuff, int iMaxLength ) override;
+	virtual char const *GetLevelName( void ) override;
+	virtual int GetLevelVersion( void ) override;
+	virtual bool IsLevelMainMenuBackground( void ) override;
+	virtual void GetMainMenuBackgroundName( char *dest, int destlen ) override;
 
 	// Occlusion system control
-	virtual void SetOcclusionParameters( const OcclusionParams_t &params );
+	virtual void SetOcclusionParameters( const OcclusionParams_t &params ) override;
 
 	//-----------------------------------------------------------------------------
 	// Purpose: Takes a trackerID and returns which player slot that user is in
 	//			returns 0 if no player found with that ID
 	//-----------------------------------------------------------------------------
-	virtual int	GetPlayerForUserID(int userID);
+	virtual int	GetPlayerForUserID(int userID) override;
 #if !defined( NO_VOICE )
-	virtual struct IVoiceTweak_s *GetVoiceTweakAPI( void );
+	virtual struct IVoiceTweak_s *GetVoiceTweakAPI( void ) override;
 #endif
-	virtual void EngineStats_BeginFrame( void );
-	virtual void EngineStats_EndFrame( void );
-	virtual void FireEvents();
-	virtual void CheckPoint( const char *pName );
-	virtual int GetLeavesArea( int *pLeaves, int nLeaves );
-	virtual bool DoesBoxTouchAreaFrustum( const Vector &mins, const Vector &maxs, int iArea );
+	virtual void EngineStats_BeginFrame( void ) override;
+	virtual void EngineStats_EndFrame( void ) override;
+	virtual void FireEvents() override;
+	virtual void CheckPoint( const char *pName ) override;
+	virtual int GetLeavesArea( int *pLeaves, int nLeaves ) override;
+	virtual bool DoesBoxTouchAreaFrustum( const Vector &mins, const Vector &maxs, int iArea ) override;
 
 	// Sets the hearing origin
-	virtual void SetAudioState( const AudioState_t &audioState );
+	virtual void SetAudioState( const AudioState_t &audioState ) override;
 
 	//-----------------------------------------------------------------------------
 	//
@@ -462,113 +462,113 @@ public:
 	//
 	//-----------------------------------------------------------------------------
 
-	virtual int SentenceGroupPick( int groupIndex, char *name, int nameLen );
-	virtual int SentenceGroupPickSequential( int groupIndex, char *name, int nameLen, int sentenceIndex, int reset );
-	virtual int SentenceIndexFromName( const char *pSentenceName );
-	virtual const char *SentenceNameFromIndex( int sentenceIndex );
-	virtual int SentenceGroupIndexFromName( const char *pGroupName );
-	virtual const char *SentenceGroupNameFromIndex( int groupIndex );
-	virtual float SentenceLength( int sentenceIndex );
-	virtual void DebugDrawPhysCollide( const CPhysCollide *pCollide, IMaterial *pMaterial, matrix3x4_t& transform, const color32 &color );
+	int SentenceGroupPick( int groupIndex, char *name, int nameLen ) override;
+	int SentenceGroupPickSequential( int groupIndex, char *name, int nameLen, int sentenceIndex, int reset ) override;
+	int SentenceIndexFromName( const char *pSentenceName ) override;
+	const char *SentenceNameFromIndex( int sentenceIndex ) override;
+	int SentenceGroupIndexFromName( const char *pGroupName ) override;
+	const char *SentenceGroupNameFromIndex( int groupIndex ) override;
+	float SentenceLength( int sentenceIndex ) override;
+	void DebugDrawPhysCollide( const CPhysCollide *pCollide, IMaterial *pMaterial, matrix3x4_t& transform, const color32 &color ) override;
 
 	// Activates/deactivates an occluder...
-	virtual void ActivateOccluder( int nOccluderIndex, bool bActive );
-	virtual bool IsOccluded( const Vector &vecAbsMins, const Vector &vecAbsMaxs );
-	virtual void *SaveAllocMemory( size_t num, size_t size );
-	virtual void SaveFreeMemory( void *pSaveMem );
-	virtual INetChannelInfo *GetNetChannelInfo( void );
-	virtual bool IsPlayingDemo( void );
-	virtual bool IsRecordingDemo( void );
-	virtual bool IsPlayingTimeDemo( void );
-	virtual int  GetDemoRecordingTick( void );
-	virtual int  GetDemoPlaybackTick( void );
-	virtual int  GetDemoPlaybackStartTick( void );
-	virtual float GetDemoPlaybackTimeScale( void );
-	virtual int  GetDemoPlaybackTotalTicks( void );
-	virtual bool IsPaused( void );
-	virtual bool IsTakingScreenshot( void );
-	virtual bool IsHLTV( void );
-	virtual void GetVideoModes( int &nCount, vmode_s *&pModes );
-	virtual void GetUILanguage( char *dest, int destlen );
+	void ActivateOccluder( int nOccluderIndex, bool bActive ) override;
+	bool IsOccluded( const Vector &vecAbsMins, const Vector &vecAbsMaxs ) override;
+	void *SaveAllocMemory( size_t num, size_t size ) override;
+	void SaveFreeMemory( void *pSaveMem ) override;
+	INetChannelInfo *GetNetChannelInfo( void ) override;
+	bool IsPlayingDemo( void ) override;
+	bool IsRecordingDemo( void ) override;
+	bool IsPlayingTimeDemo( void ) override;
+	int  GetDemoRecordingTick( void ) override;
+	int  GetDemoPlaybackTick( void ) override;
+	int  GetDemoPlaybackStartTick( void ) override;
+	float GetDemoPlaybackTimeScale( void ) override;
+	int  GetDemoPlaybackTotalTicks( void ) override;
+	bool IsPaused( void ) override;
+	bool IsTakingScreenshot( void ) override;
+	bool IsHLTV( void ) override;
+	void GetVideoModes( int &nCount, vmode_s *&pModes ) override;
+	void GetUILanguage( char *dest, int destlen ) override;
 
 	// Can skybox be seen from a particular point?
-	virtual SkyboxVisibility_t IsSkyboxVisibleFromPoint( const Vector &vecPoint );
+	SkyboxVisibility_t IsSkyboxVisibleFromPoint( const Vector &vecPoint ) override;
 
-	virtual const char* GetMapEntitiesString();
-	virtual bool		IsInEditMode( void );
+	const char* GetMapEntitiesString() override;
+	bool		IsInEditMode( void ) override;
 	virtual bool		IsInCommentaryMode( void );
-	virtual float		GetScreenAspectRatio();
+	float		GetScreenAspectRatio() override;
 
-	virtual unsigned int		GetEngineBuildNumber() { return PROTOCOL_VERSION; }
-	virtual const char *		GetProductVersionString() { return GetSteamInfIDVersionInfo().szVersionString; }
-	virtual void				GrabPreColorCorrectedFrame( int x, int y, int width, int height );
-	virtual bool				IsHammerRunning( ) const;
+	unsigned int		GetEngineBuildNumber() override { return PROTOCOL_VERSION; }
+	const char *		GetProductVersionString() override { return GetSteamInfIDVersionInfo().szVersionString; }
+	void				GrabPreColorCorrectedFrame( int x, int y, int width, int height ) override;
+	bool				IsHammerRunning( ) const override;
 
 	// Stuffs the cmd into the buffer & executes it immediately (vs ClientCmd() which executes it next frame)
-	virtual void				ExecuteClientCmd( const char *szCmdString );
+	void				ExecuteClientCmd( const char *szCmdString ) override;
 
-	virtual bool MapHasHDRLighting( void) ;
-	virtual int GetAppID();
+	bool MapHasHDRLighting( void) override;
+	int GetAppID() override;
 
-	virtual void				SetOverlayBindProxy( int iOverlayID, void *pBindProxy );
+	void				SetOverlayBindProxy( int iOverlayID, void *pBindProxy ) override;
 
-	virtual bool				CopyFrameBufferToMaterial( const char *pMaterialName );
+	bool				CopyFrameBufferToMaterial( const char *pMaterialName ) override;
 
 	// Matchmaking
-	void						ChangeTeam( const char *pTeamName );
-	virtual void				ReadConfiguration( const bool readDefault = false );
+	void				ChangeTeam( const char *pTeamName ) override;
+	void				ReadConfiguration( const bool readDefault = false ) override;
 
-	virtual void SetAchievementMgr( IAchievementMgr *pAchievementMgr );
-	virtual IAchievementMgr *GetAchievementMgr();
+	void SetAchievementMgr( IAchievementMgr *pAchievementMgr ) override;
+	IAchievementMgr *GetAchievementMgr() override;
 
-	virtual bool				MapLoadFailed( void );
-	virtual void				SetMapLoadFailed( bool bState );
+	bool				MapLoadFailed( void ) override;
+	void				SetMapLoadFailed( bool bState ) override;
 
-	virtual bool				IsLowViolence();
-	virtual const char			*GetMostRecentSaveGame( void );
-	virtual void				SetMostRecentSaveGame( const char *lpszFilename );
+	bool				IsLowViolence() override;
+	const char			*GetMostRecentSaveGame( void ) override;
+	void				SetMostRecentSaveGame( const char *lpszFilename ) override;
 
-	virtual void				StartXboxExitingProcess();
-	virtual bool				IsSaveInProgress();
+	void				StartXboxExitingProcess() override;
+	bool				IsSaveInProgress() override;
 	
-	virtual uint				OnStorageDeviceAttached( void );
-	virtual void				OnStorageDeviceDetached( void );
+	uint				OnStorageDeviceAttached( void ) override;
+	void				OnStorageDeviceDetached( void ) override;
 
-	virtual void				ResetDemoInterpolation( void );
+	void				ResetDemoInterpolation( void ) override;
 
-	virtual bool		REMOVED_SteamRefreshLogin( const char *password, bool isSecure ) { return false; }
-	virtual bool		REMOVED_SteamProcessCall( bool & finished ) { return false; }
+	bool		REMOVED_SteamRefreshLogin( const char *password, bool isSecure ) override { return false; }
+	bool		REMOVED_SteamProcessCall( bool & finished ) override { return false; }
 
-	virtual void SetGamestatsData( CGamestatsData *pGamestatsData );
-	virtual CGamestatsData *GetGamestatsData();
+	void SetGamestatsData( CGamestatsData *pGamestatsData ) override;
+	CGamestatsData *GetGamestatsData() override;
 
 #if defined( USE_SDL )
-	virtual void GetMouseDelta( int &x, int &y, bool bIgnoreNextMouseDelta );
+	void GetMouseDelta( int &x, int &y, bool bIgnoreNextMouseDelta ) override;
 #endif
 
-	virtual void ServerCmdKeyValues( KeyValues *pKeyValues );
+	void ServerCmdKeyValues( KeyValues *pKeyValues ) override;
 
-	virtual bool IsSkippingPlayback( void );
-	virtual bool IsLoadingDemo( void );
+	bool IsSkippingPlayback( void ) override;
+	bool IsLoadingDemo( void ) override;
 
-	virtual bool IsPlayingDemoALocallyRecordedDemo();
+	bool IsPlayingDemoALocallyRecordedDemo() override;
 
-	virtual uint GetProtocolVersion( void );
+	uint GetProtocolVersion( void ) override;
 
-	virtual bool IsWindowedMode( void );
+	bool IsWindowedMode( void ) override;
 
-	virtual void	FlashWindow();
-	virtual int		GetClientVersion() const; // engines build
-	virtual bool	IsActiveApp();
-	virtual void	DisconnectInternal();
+	void	FlashWindow() override;
+	int		GetClientVersion() const override; // engines build
+	bool	IsActiveApp() override;
+	void	DisconnectInternal() override;
 
-	virtual int		GetInstancesRunningCount( );
+	int		GetInstancesRunningCount( ) override;
 
-	virtual float	GetPausedExpireTime( void ) OVERRIDE;
+	float	GetPausedExpireTime( void ) override;
 
-	virtual bool	StartDemoRecording( const char *pszFilename, const char *pszFolder = NULL );
-	virtual void	StopDemoRecording( void );
-	virtual void	TakeScreenshot( const char *pszFilename, const char *pszFolder = NULL );
+	bool	StartDemoRecording( const char *pszFilename, const char *pszFolder = NULL ) override;
+	void	StopDemoRecording( void ) override;
+	void	TakeScreenshot( const char *pszFilename, const char *pszFolder = NULL ) override;
 };
 
 
@@ -741,7 +741,7 @@ bool CEngineClient::GetPlayerInfo( int ent_num, player_info_t *pinfo )
 	int cubPlayerInfo;
 	player_info_t *pi = (player_info_t*) cl.m_pUserInfoTable->GetStringUserData( ent_num, &cubPlayerInfo );
 
-	if ( !pi || cubPlayerInfo < sizeof( player_info_t ) )
+	if ( !pi || cubPlayerInfo < static_cast<int>(sizeof( player_info_t )) )
 	{
 		Q_memset( pinfo, 0, sizeof( player_info_t ) );
 		return false;
@@ -1685,7 +1685,7 @@ static void ClientDLL_InitRecvTableMgr()
 	for ( ClientClass *pCur = ClientDLL_GetAllClasses(); pCur; pCur=pCur->m_pNext )
 	{
 		ErrorIfNot( 
-			nRecvTables < ARRAYSIZE( pRecvTables ), 
+			nRecvTables < ssize( pRecvTables ), 
 			("ClientDLL_InitRecvTableMgr: overflowed MAX_DATATABLES")
 			);
 		

@@ -35,7 +35,7 @@ void WaveCreateTmpFile( const char *filename, int rate, int bits, int nChannels 
 	g_pFileSystem->Write( &chunkid, sizeof(int), file );
 
 	// create a 16-bit PCM stereo output file
-	PCMWAVEFORMAT fmt = { { 0 } };
+	PCMWAVEFORMAT fmt = {};
 	fmt.wf.wFormatTag = LittleWord( (short)WAVE_FORMAT_PCM );
 	fmt.wf.nChannels = LittleWord( (short)nChannels );
 	fmt.wf.nSamplesPerSec = LittleDWord( rate );

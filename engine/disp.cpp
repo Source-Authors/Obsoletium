@@ -248,7 +248,7 @@ void CDispInfo::TestAddDecalTri( int iIndexStart, unsigned short decalHandle, CD
 	Vector* ppPosition[3] = { &vPositions[0], &vPositions[1], &vPositions[2] };
 
 	ShadowVertex_t** ppClipVertex;
-	int count = g_pShadowMgr->ProjectAndClipVertices( pDecal->m_Shadow, 3, ppPosition, &ppClipVertex );
+	int count = g_pShadowMgr->ProjectAndClipVertices( pDecal->m_Shadow, 3, ppPosition, (ShadowVertex_t* RESTRICT **)&ppClipVertex );
 	if (count < 3)
 		return;
 
@@ -492,7 +492,7 @@ bool CDispInfo::Render( CGroupMesh *pGroup, bool bAllowDebugModes )
 #ifndef SWDS
 	if( !m_pMesh )
 	{
-		Assert( !"CDispInfo::Render: m_pMesh == NULL" );
+		AssertMsg( false, "CDispInfo::Render: m_pMesh == NULL" );
 		return false;
 	}
 
@@ -547,9 +547,9 @@ bool CDispInfo::Render( CGroupMesh *pGroup, bool bAllowDebugModes )
 			VectorAdd( bbMin, bbMax, vecCenter );
 			vecCenter *= 0.5f;
 
-			int nInt = ( mat_surfaceid.GetInt() != 2 ) ? (int)m_ParentSurfID : (msurface2_t*)m_ParentSurfID - host_state.worldbrush->surfaces2;
+			intp nInt = ( mat_surfaceid.GetInt() != 2 ) ? (intp)m_ParentSurfID : (msurface2_t*)m_ParentSurfID - host_state.worldbrush->surfaces2;
 			char buf[32];
-			Q_snprintf( buf, sizeof( buf ), "%d", nInt );
+			Q_snprintf( buf, sizeof( buf ), "%zd", nInt );
 			CDebugOverlay::AddTextOverlay( vecCenter, 0, buf );
 		}
 
@@ -580,7 +580,7 @@ bool CDispInfo::Render( CGroupMesh *pGroup, bool bAllowDebugModes )
 	// Mark it visible.
 	if( bNormalRender )
 	{
-		if( pGroup->m_nVisible < pGroup->m_Visible.Size() )
+		if( pGroup->m_nVisible < pGroup->m_Visible.Count() )
 		{
 			// Don't bother if all faces are backfacing, or somesuch...
 			if (m_nIndices)
@@ -594,7 +594,7 @@ bool CDispInfo::Render( CGroupMesh *pGroup, bool bAllowDebugModes )
 		}
 		else
 		{
-			Assert( !"Overflowed visible mesh list" );
+			AssertMsg( false, "Overflowed visible mesh list" );
 		}
 	}
 #endif
@@ -1076,7 +1076,7 @@ bool CDispInfo::TestRay( Ray_t const& ray, float start, float end, float& dist,
 	tr.fraction = 1.0f;
 
 	// Only test the portion of the ray between start and end
-	Vector startpt, endpt,endpt2;
+	Vector startpt, endpt;
 	VectorMA( ray.m_Start, start, ray.m_Delta, startpt );
 	VectorMA( ray.m_Start, end, ray.m_Delta, endpt );
 
@@ -1109,14 +1109,14 @@ const CPowerInfo* CDispInfo::GetPowerInfo() const
 
 CDispNeighbor* CDispInfo::GetEdgeNeighbor( int index )
 {
-	Assert( index >= 0 && index < ARRAYSIZE( m_EdgeNeighbors ) );
+	Assert( index >= 0 && index < ssize( m_EdgeNeighbors ) );
 	return &m_EdgeNeighbors[index];
 }
 
 
 CDispCornerNeighbors* CDispInfo::GetCornerNeighbors( int index )
 {
-	Assert( index >= 0 && index < ARRAYSIZE( m_CornerNeighbors ) );
+	Assert( index >= 0 && index < ssize( m_CornerNeighbors ) );
 	return &m_CornerNeighbors[index];
 }
 

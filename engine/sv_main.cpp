@@ -339,7 +339,7 @@ static void SpewToFile( const char* pFmt, ... )
 	va_end( args );
 	Assert( len < 2048 );
 
-	int idx = s_RecordingBuffer.AddMultipleToTail( len );
+	intp idx = s_RecordingBuffer.AddMultipleToTail( len );
 	memcpy( &s_RecordingBuffer[idx], temp, len );
 	if ( 1 ) //s_RecordingBuffer.Size() > 8192)
 	{
@@ -778,7 +778,7 @@ void SV_InitSendTables( ServerClass *pClasses )
 }
 
 
-void SV_TermSendTables( ServerClass *pClasses )
+void SV_TermSendTables( ServerClass * )
 {
 	SendTable_Term();
 }
@@ -1739,15 +1739,7 @@ void CGameServer::FinishRestore()
 	// Build the adjacent map list
 	serverGameDLL->BuildAdjacentMapList();
 
-	if ( !saverestore->IsXSave() )
-	{
-		Q_snprintf( name, sizeof( name ), "%s%s.HL2", saverestore->GetSaveDir(), m_szMapname );
-	}
-	else
-	{
-		Q_snprintf( name, sizeof( name ), "%s:\\%s.HL2", GetCurrentMod(), m_szMapname );
-	}
-
+	Q_snprintf( name, sizeof( name ), "%s/%s.HL2", saverestore->GetSaveDir(), m_szMapname );
 	Q_FixSlashes( name );
 
 	saverestore->RestoreClientState( name, false );
@@ -1766,7 +1758,6 @@ void CGameServer::FinishRestore()
 
 	// Reset
 	m_bLoadgame = false;
-	saverestore->SetIsXSave( IsX360() );
 #endif
 }
 

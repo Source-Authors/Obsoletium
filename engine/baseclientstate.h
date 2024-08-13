@@ -80,7 +80,7 @@ public: // INetMsgHandler interface:
 	virtual void ConnectionClosing( const char *reason );
 	virtual void ConnectionCrashed(const char *reason);
 
-	virtual void PacketStart(int incoming_sequence, int outgoing_acknowledged) {};
+	virtual void PacketStart(int, int) {};
 	virtual void PacketEnd( void ) {};
 
 	virtual void FileReceived( const char *fileName, unsigned int transferID );
@@ -125,8 +125,8 @@ public:
 	virtual const char *GetCDKeyHash() { return "123"; }
 	virtual void RunFrame ( void );
 	virtual void CheckForResend ( void );
-	virtual void InstallStringTableCallback( char const *tableName ) { }
-	virtual bool HookClientStringTable( char const *tableName ) { return false; }
+	virtual void InstallStringTableCallback( char const * ) { }
+	virtual bool HookClientStringTable( char const * ) { return false; }
 	virtual bool LinkClasses( void );
 	virtual int  GetConnectionRetryNumber() const { return CL_CONNECTION_RETRIES; }
 	virtual const char *GetClientName() { return cl_name.GetString(); }

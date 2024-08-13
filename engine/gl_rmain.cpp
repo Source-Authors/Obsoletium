@@ -222,7 +222,7 @@ void R_DrawPortals()
 	}
 
 	// Draw the clip rectangles.
-	for( int i=0; i < g_PortalRects.Size(); i++ )
+	for( intp i=0; i < g_PortalRects.Count(); i++ )
 	{
 		CPortalRect *pRect = &g_PortalRects[i];
 		R_DrawScreenRect( pRect->left, pRect->top, pRect->right, pRect->bottom );
@@ -768,7 +768,7 @@ void CRender::BeginUpdateLightmaps( void )
 		materials->BeginUpdateLightmaps();
 		// UNDONE: Move this to an init or constructor?
 		g_LightmapTransformList.RemoveAll();
-		int index = g_LightmapTransformList.AddToTail();
+		intp index = g_LightmapTransformList.AddToTail();
 		g_LightmapTransformList[index].pModel = host_state.worldmodel;
 		SetIdentityMatrix( g_LightmapTransformList[index].xform );
 	}
@@ -784,7 +784,7 @@ void CRender::UpdateBrushModelLightmap( model_t *model, IClientRenderable *pRend
 	R_MarkDlightsOnBrushModel( model, pRenderable );
 	if ( model->flags & MODELFLAG_HAS_DLIGHT )
 	{
-		int transformIndex = g_LightmapTransformList.AddToTail();
+		intp transformIndex = g_LightmapTransformList.AddToTail();
 		LightmapTransformInfo_t &transform = g_LightmapTransformList[transformIndex];
 		transform.pModel = model;
 		AngleMatrix( pRenderable->GetRenderAngles(), pRenderable->GetRenderOrigin(), transform.xform );
@@ -1217,7 +1217,7 @@ IWorldRenderList * CRender::CreateWorldList()
 }
 
 
-// JasonM TODO: optimize in the case of shadow depth mapping (i.e. don't update lightmaps)
+// TODO: JasonM optimize in the case of shadow depth mapping (i.e. don't update lightmaps)
 void CRender::BuildWorldLists( IWorldRenderList *pList, WorldListInfo_t* pInfo, int iForceViewLeaf, const VisOverrideData_t* pVisData, bool bShadowDepth, float *pWaterReflectionHeight )
 {
 	Assert( pList );

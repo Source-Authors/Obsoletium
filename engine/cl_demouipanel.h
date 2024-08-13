@@ -32,17 +32,17 @@ class CDemoSmootherPanel;
 //-----------------------------------------------------------------------------
 class CDemoUIPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CDemoUIPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDemoUIPanel, vgui::Frame );
 
 public:
 	CDemoUIPanel( vgui::Panel *parent );
 	~CDemoUIPanel();
 
-	virtual void OnTick();
+	void OnTick() override;
 
 	// Command issued
-	virtual void OnCommand(const char *command);
-	virtual void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel);
+	void OnCommand(const char *command) override;
+	void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel) override;
 
 	virtual void	OnVDMChanged( void );
 
@@ -116,17 +116,17 @@ extern CDemoUIPanel *g_pDemoUI;
 //-----------------------------------------------------------------------------
 class CDemoUIPanel2 : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CDemoUIPanel2, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDemoUIPanel2, vgui::Frame );
 
 public:
 	CDemoUIPanel2( vgui::Panel *pParentBkgnd, vgui::Panel *pParentFgnd, bool bPutToForeground );
 	~CDemoUIPanel2();
 
-	virtual void OnTick();
+	void OnTick() override;
 
 	// Command issued
-	virtual void OnCommand(const char *command);
-	virtual void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel);
+	void OnCommand(const char *command) override;
+	void OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel) override;
 
 	virtual void	OnVDMChanged( void );
 

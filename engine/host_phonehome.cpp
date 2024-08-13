@@ -86,7 +86,7 @@ public:
 		}
 
 		if ( Q_strlen( build_identifier ) >= 1 &&
-			Q_strnicmp( build_identifier, "VLV_INTERNAL", Q_strlen( "VLV_INTERNAL" ) ) )
+			Q_strnicmp( build_identifier, "VLV_INTERNAL", ssize( "VLV_INTERNAL" ) - 1 ) )
 		{
 			// Strip trailing spaces from identifer
 			char *identifer = &build_identifier[ Q_strlen( build_identifier ) - 1 ];

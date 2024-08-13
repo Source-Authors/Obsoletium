@@ -151,7 +151,7 @@ void MIX_FreeAllPaintbuffers(void)
 			g_temppaintbuffer = NULL;
 		}
 
-		for ( int i = 0; i < g_paintBuffers.Count(); i++ )
+		for ( intp i = 0; i < g_paintBuffers.Count(); i++ )
 		{
 			if ( g_paintBuffers[i].pbuf )
 			{
@@ -207,7 +207,7 @@ bool MIX_InitAllPaintbuffers(void)
 
 	while ( g_paintBuffers.Count() < SOUND_BUFFER_BASETOTAL )
 	{
-		int nIndex = g_paintBuffers.AddToTail();
+		auto nIndex = g_paintBuffers.AddToTail();
 		MIX_InitializePaintbuffer( &(g_paintBuffers[ nIndex ]), bSurround, bSurroundCenter );
 	}
 
@@ -894,9 +894,9 @@ void MIX_SetCurrentPaintbuffer(int ipaintbuffer)
 
 // return index to current paintbuffer
 
-int MIX_GetCurrentPaintbufferIndex( void )
+intp MIX_GetCurrentPaintbufferIndex( void )
 {
-	int i;
+	intp i;
 
 	for ( i = 0; i < g_paintBuffers.Count(); i++ )
 	{
@@ -959,9 +959,9 @@ inline portable_samplepair_t *MIX_GetPCenterFromIPaint(int ipaintbuffer)
 
 // return index to paintbuffer, given buffer pointer
 
-inline int MIX_GetIPaintFromPFront( portable_samplepair_t *pbuf )
+inline intp MIX_GetIPaintFromPFront( portable_samplepair_t *pbuf )
 {
-	int i;
+	intp i;
 
 	for ( i = 0; i < g_paintBuffers.Count(); i++ )
 	{
@@ -1957,7 +1957,8 @@ public:
 	{
 		int m_channelNum;
 		int m_vol; // max volume of sound. -1 means "do not cull, ever, do not even do the math"
-		unsigned int m_nameHash; // a unique id for a sound file
+		// dimhotepus: x86-64 port
+		uintp m_nameHash; // a unique id for a sound file
 	};
 protected:
 	sChannelVolData m_channelInfo[MAX_CHANNELS];
@@ -1989,12 +1990,12 @@ void CChannelCullList::Initialize( CChannelList &list )
 		{
 			m_channelInfo[i].m_vol = ChannelLoudestCurVolume(ch);
 			AssertMsg(m_channelInfo[i].m_vol >= 0, "Sound channel has a negative volume?");
-			m_channelInfo[i].m_nameHash = (unsigned int) ch->sfx;
+			m_channelInfo[i].m_nameHash = (uintp) ch->sfx;
 		}
 		else
 		{
 			m_channelInfo[i].m_vol = -1;
-			m_channelInfo[i].m_nameHash = NULL; // doesn't matter
+			m_channelInfo[i].m_nameHash = 0; // doesn't matter
 		}
 	}
 
@@ -2024,7 +2025,7 @@ void CChannelCullList::Initialize( CChannelList &list )
 			 ++j )
 		{
 			// j steps through the sorted list until we find ourselves:
-			if (m_channelInfo[j].m_nameHash == (unsigned int)(ch->sfx))
+			if (m_channelInfo[j].m_nameHash == (uintp) ch->sfx)
 			{
 				// that's another channel playing this sound but louder than me
 				++howManyLouder;
@@ -2393,7 +2394,7 @@ void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 					bool bSurroundCenter = g_AudioDevice->IsSurroundCenter();
 					bool bSurround = g_AudioDevice->IsSurround() || bSurroundCenter;
 
-					int nIndex = g_paintBuffers.AddToTail();
+					auto nIndex = g_paintBuffers.AddToTail();
 					MIX_InitializePaintbuffer( &(g_paintBuffers[ nIndex ]), bSurround, bSurroundCenter );
 
 					g_paintBuffers[ nIndex ].flags = SOUND_BUSS_SPECIAL_DSP;
@@ -3421,7 +3422,7 @@ void SW_Mix16Mono_Shift( portable_samplepair_t *pOutput, int *volume, short *pDa
 	int vol0 = volume[0];
 	int vol1 = volume[1];
 
-#if !id386
+#if !id386 || defined( COMPILER_CLANG )
 	int sampleIndex = 0;
 	fixedint sampleFrac = inputOffset;
 
@@ -3508,7 +3509,7 @@ void SW_Mix16Mono_NoShift( portable_samplepair_t *pOutput, int *volume, short *p
 {
 	int vol0 = volume[0];
 	int vol1 = volume[1];
-#if !id386
+#if !id386 || defined(COMPILER_CLANG)
 	for ( int i = 0; i < outCount; i++ )
 	{
 		int x = *pData++;

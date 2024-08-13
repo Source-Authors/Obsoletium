@@ -145,30 +145,30 @@ struct DemoActionDictionary
 
 static DemoActionDictionary g_rgDemoTypeNames[ NUM_DEMO_ACTIONS ] =
 {
-	{ DEMO_ACTION_UNKNOWN					, "Unknown" },
-	{ DEMO_ACTION_SKIPAHEAD					, "SkipAhead" },
-	{ DEMO_ACTION_STOPPLAYBACK				, "StopPlayback" },
-	{ DEMO_ACTION_PLAYCOMMANDS				, "PlayCommands" },
-	{ DEMO_ACTION_SCREENFADE_START			, "ScreenFadeStart" },
-	{ DEMO_ACTION_SCREENFADE_STOP			, "ScreenFadeStop" },
-	{ DEMO_ACTION_TEXTMESSAGE_START			, "TextMessageStart" },
-	{ DEMO_ACTION_TEXTMESSAGE_STOP			, "TextMessageStop" },
-	{ DEMO_ACTION_PLAYCDTRACK_START			, "PlayCDTrackStart" },
-	{ DEMO_ACTION_PLAYCDTRACK_STOP			, "PlayCDTrackStop" },
-	{ DEMO_ACTION_PLAYSOUND_START			, "PlaySoundStart" },
-	{ DEMO_ACTION_PLAYSOUND_END				, "PlaySoundStop" },
+	{ DEMO_ACTION_UNKNOWN					, "Unknown", nullptr, nullptr },
+	{ DEMO_ACTION_SKIPAHEAD					, "SkipAhead", nullptr, nullptr },
+	{ DEMO_ACTION_STOPPLAYBACK				, "StopPlayback", nullptr, nullptr },
+	{ DEMO_ACTION_PLAYCOMMANDS				, "PlayCommands", nullptr, nullptr },
+	{ DEMO_ACTION_SCREENFADE_START			, "ScreenFadeStart", nullptr, nullptr },
+	{ DEMO_ACTION_SCREENFADE_STOP			, "ScreenFadeStop", nullptr, nullptr },
+	{ DEMO_ACTION_TEXTMESSAGE_START			, "TextMessageStart", nullptr, nullptr },
+	{ DEMO_ACTION_TEXTMESSAGE_STOP			, "TextMessageStop", nullptr, nullptr },
+	{ DEMO_ACTION_PLAYCDTRACK_START			, "PlayCDTrackStart", nullptr, nullptr },
+	{ DEMO_ACTION_PLAYCDTRACK_STOP			, "PlayCDTrackStop", nullptr, nullptr },
+	{ DEMO_ACTION_PLAYSOUND_START			, "PlaySoundStart", nullptr, nullptr },
+	{ DEMO_ACTION_PLAYSOUND_END				, "PlaySoundStop", nullptr, nullptr },
 
-	{ DEMO_ACTION_ONSKIPPEDAHEAD			, "OnSkippedAhead" },
-	{ DEMO_ACTION_ONSTOPPEDPLAYBACK			, "OnStoppedPlayback" },
-	{ DEMO_ACTION_ONSCREENFADE_FINISHED		, "OnScreenFadeFinished" },
-	{ DEMO_ACTION_ONTEXTMESSAGE_FINISHED	, "OnTextMessageFinished" },
-	{ DEMO_ACTION_ONPLAYCDTRACK_FINISHED	, "OnPlayCDTrackFinished" },
-	{ DEMO_ACTION_ONPLAYSOUND_FINISHED		, "OnPlaySoundFinished" },
+	{ DEMO_ACTION_ONSKIPPEDAHEAD			, "OnSkippedAhead", nullptr, nullptr },
+	{ DEMO_ACTION_ONSTOPPEDPLAYBACK			, "OnStoppedPlayback", nullptr, nullptr },
+	{ DEMO_ACTION_ONSCREENFADE_FINISHED		, "OnScreenFadeFinished", nullptr, nullptr },
+	{ DEMO_ACTION_ONTEXTMESSAGE_FINISHED	, "OnTextMessageFinished", nullptr, nullptr },
+	{ DEMO_ACTION_ONPLAYCDTRACK_FINISHED	, "OnPlayCDTrackFinished", nullptr, nullptr },
+	{ DEMO_ACTION_ONPLAYSOUND_FINISHED		, "OnPlaySoundFinished", nullptr, nullptr },
 
-	{ DEMO_ACTION_PAUSE						, "Pause" },
-	{ DEMO_ACTION_CHANGEPLAYBACKRATE		, "ChangePlaybackRate" },
+	{ DEMO_ACTION_PAUSE						, "Pause", nullptr, nullptr },
+	{ DEMO_ACTION_CHANGEPLAYBACKRATE		, "ChangePlaybackRate", nullptr, nullptr },
 
-	{ DEMO_ACTION_ZOOM						, "Zoom FOV" },
+	{ DEMO_ACTION_ZOOM						, "Zoom FOV", nullptr, nullptr },
 };
 
 //-----------------------------------------------------------------------------

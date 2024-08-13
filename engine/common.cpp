@@ -135,36 +135,6 @@ void COM_ExplainDisconnection( bool bPrint, PRINTF_FORMAT_STRING const char *fmt
 }
 
 /*
-==============================
-COM_ExtendedExplainDisconnection
-
-==============================
-*/
-static void COM_ExtendedExplainDisconnection( bool bPrint, const char *fmt, ... )
-{
-	if ( IsX360() )
-	{
-		g_pMatchmaking->SessionNotification( SESSION_NOTIFY_LOST_SERVER );
-	}
-	else
-	{
-		va_list		argptr;
-		char		string[1024];
-		
-		va_start (argptr, fmt);
-		Q_vsnprintf(string, sizeof( string ), fmt,argptr);
-		va_end (argptr);
-
-		Q_strncpy( gszExtendedDisconnectReason, string, 256 );
-	}
-
-	if ( bPrint )
-	{
-		ConMsg( "%s\n", gszExtendedDisconnectReason );
-	}
-}
-
-/*
 ==============
 COM_Parse
 
@@ -469,7 +439,7 @@ void COM_WriteFile (const char *filename, void *data, int len)
 {
 	FileHandle_t  handle;
 	
-	int nameLen = strlen( filename ) + 2;
+	intp nameLen = V_strlen( filename ) + 2;
 	char *pName = ( char * )_alloca( nameLen );
 
 	Q_snprintf( pName, nameLen, "%s", filename);
@@ -544,7 +514,7 @@ bool COM_CopyFile ( const char *pSourcePath, const char *pDestPath )
 	remaining = g_pFileSystem->Size( in );
 	while ( remaining > 0 )
 	{
-		if (remaining < sizeof(buf))
+		if (remaining < static_cast<int>(sizeof(buf)))
 		{
 			count = remaining;
 		}
@@ -753,7 +723,7 @@ void COM_Shutdown( void )
 //-----------------------------------------------------------------------------
 char *COM_StringCopy(const char *in)
 {
-	int len = Q_strlen(in)+1;
+	intp len = Q_strlen(in)+1;
 	char *out = (char *)new char[ len ];
 	Q_strncpy (out, in, len );
 	return out;
@@ -831,7 +801,7 @@ const char *COM_GetModDirectory()
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
 			Q_StripLastDir( modDir, sizeof(modDir) );
-			int dirlen = Q_strlen( modDir );
+			intp dirlen = Q_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
 	}
@@ -969,23 +939,29 @@ const char *COM_DXLevelToString( int dxlevel )
 		case 81:
 			return "8.1";
 		case 82:
-			if( bHalfPrecision )
-			{
-				return "8.1 with some 9.0 (half-precision)";
-			}
-			else
-			{
-				return "8.1 with some 9.0 (full-precision)";
-			}
+			return !bHalfPrecision
+				? "8.1 with some 9.0 (full-precision)"
+				: "8.1 with some 9.0 (half-precision)";
 		case 90:
-			if( bHalfPrecision )
-			{
-				return "9.0 (half-precision)";
-			}
-			else
-			{
-				return "9.0 (full-precision)";
-			}
+			return !bHalfPrecision
+				? "9.0 [sm2] (full-precision)"
+				: "9.0 [sm2] (half-precision)";
+		case 92:
+			return !bHalfPrecision
+				? "9.0 [sm2] togl (full-precision)"
+				: "9.0 [sm2] togl (half-precision)";
+		case 95:
+			return !bHalfPrecision
+				? "9.0 [sm3] (full-precision)"
+				: "9.0 [sm3] (half-precision)";
+		case 100:
+			return !bHalfPrecision
+				? "10.0 [sm4] (full-precision)"
+				: "10.0 [sm4] (half-precision)";
+		case 114:
+			return !bHalfPrecision
+				? "11.4 [sm5] (full-precision)"
+				: "11.4 [sm5] (half-precision)";
 		default:
 			return "UNKNOWN";
 		}
@@ -1003,23 +979,29 @@ const char *COM_DXLevelToString( int dxlevel )
 		case 81:
 			return "gamemode - 8.1";
 		case 82:
-			if( bHalfPrecision )
-			{
-				return "gamemode - 8.1 with some 9.0 (half-precision)";
-			}
-			else
-			{
-				return "gamemode - 8.1 with some 9.0 (full-precision)";
-			}
+			return !bHalfPrecision
+				? "gamemode - 8.1 with some 9.0 (full-precision)"
+				: "gamemode - 8.1 with some 9.0 (half-precision)";
 		case 90:
-			if( bHalfPrecision )
-			{
-				return "gamemode - 9.0 (half-precision)";
-			}
-			else
-			{
-				return "gamemode - 9.0 (full-precision)";
-			}
+			return !bHalfPrecision
+				? "gamemode - 9.0 [sm2] (full-precision)"
+				: "gamemode - 9.0 [sm2] (half-precision)";
+		case 92:
+			return !bHalfPrecision
+				? "gamemode - 9.0 [sm2] togl (full-precision)"
+				: "gamemode - 9.0 [sm2] togl (half-precision)";
+		case 95:
+			return !bHalfPrecision
+				? "gamemode - 9.0 [sm3] (full-precision)"
+				: "gamemode - 9.0 [sm3] (half-precision)";
+		case 100:
+			return !bHalfPrecision
+				? "gamemode - 10.0 [sm4] (full-precision)"
+				: "gamemode - 10.0 [sm4] (half-precision)";
+		case 114:
+			return !bHalfPrecision
+				? "gamemode - 11.4 [sm5] (full-precision)"
+				: "gamemode - 11.4 [sm5] (half-precision)";
 		default:
 			return "gamemode";
 		}
@@ -1085,7 +1067,7 @@ void COM_LogString( char const *pchFile, char const *pchString )
 	}
 }
 
-void COM_Log( const char *pszFile, const char *fmt, ...)
+void COM_Log( const char *pszFile, PRINTF_FORMAT_STRING const char *fmt, ...) FMTFUNCTION( 2, 3 )
 {
 	if ( !g_pFileSystem )
 	{

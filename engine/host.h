@@ -40,7 +40,7 @@ struct engineparms_t
 	char	*basedir;	// Executable directory ("c:/program files/half-life 2", for example)
 	char	*mod;		// Mod name ("cstrike", for example)
 	char	*game;		// Root game name ("hl2", for example, in the case of cstrike)
-	unsigned int	memsize;
+	uintp	memsize;
 };
 extern engineparms_t host_parms;
 

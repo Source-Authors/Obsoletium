@@ -68,7 +68,7 @@ inline void LocalTransfer_FastType(
 	}
 }
 
-void AddPropOffsetToMap( CSendTablePrecalc *pPrecalc, int iInProp, int iInOffset )
+void AddPropOffsetToMap( CSendTablePrecalc *pPrecalc, int iInProp, intp iInOffset )
 {
 	Assert( iInProp < 0xFFFF && iInOffset < 0xFFFF );	
 	unsigned short iProp = (unsigned short)iInProp;
@@ -168,19 +168,19 @@ void BuildPropOffsetToIndexMap( CSendTablePrecalc *pPrecalc, const CStandardSend
 	CPropMapStack pmStack( pPrecalc, pSendProxies );
 	pmStack.Init();
 	
-	for ( int i=0; i < pPrecalc->m_Props.Count(); i++ )
+	for ( intp i = 0; i < pPrecalc->m_Props.Count(); i++ )
 	{
 		pmStack.SeekToProp( i );
-		if ( pmStack.GetCurStructBase() != 0 )
+		if ( pmStack.GetCurStructBase() != nullptr )
 		{
 			const SendProp *pProp = pPrecalc->m_Props[i];
 			
-			int offset = pProp->GetOffset() + (int)pmStack.GetCurStructBase() - 1;
+			intp offset = pProp->GetOffset() + (intp)pmStack.GetCurStructBase() - 1;
 			int elementCount = 1;
 			int elementStride = 0;
 			if ( pProp->GetType() == DPT_Array )
 			{
-				offset = pProp->GetArrayProp()->GetOffset() + (int)pmStack.GetCurStructBase() - 1;
+				offset = pProp->GetArrayProp()->GetOffset() + (intp)pmStack.GetCurStructBase() - 1;
 				elementCount = pProp->m_nElements;
 				elementStride = pProp->m_ElementStride;
 			}

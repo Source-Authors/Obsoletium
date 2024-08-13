@@ -76,7 +76,7 @@ public:
 class CTraceFilterWorldOnly : public ITraceFilter
 {
 public:
-	bool ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask )
+	bool ShouldHitEntity( IHandleEntity *, int )
 	{
 		return false;
 	}
@@ -89,7 +89,7 @@ public:
 class CTraceFilterWorldAndPropsOnly : public ITraceFilter
 {
 public:
-	bool ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask )
+	bool ShouldHitEntity( IHandleEntity *, int )
 	{
 		return false;
 	}
@@ -102,7 +102,7 @@ public:
 class CTraceFilterHitAll : public CTraceFilter
 {
 public:
-	virtual bool ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask )
+	virtual bool ShouldHitEntity( IHandleEntity *, int )
 	{ 
 		return true; 
 	}

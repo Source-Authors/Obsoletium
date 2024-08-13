@@ -808,14 +808,14 @@ BOX TRACING
 // Custom SIMD implementation for box brushes
 
 const fltx4 Four_DistEpsilons={DIST_EPSILON,DIST_EPSILON,DIST_EPSILON,DIST_EPSILON};
-const int32 alignas(16) g_CubeFaceIndex0[4] = {0,1,2,-1};
-const int32 alignas(16) g_CubeFaceIndex1[4] = {3,4,5,-1};
+alignas(16) const int32 g_CubeFaceIndex0[4] = {0, 1, 2, -1};
+alignas(16) const int32 g_CubeFaceIndex1[4] = {3, 4, 5, -1};
 bool IntersectRayWithBoxBrush( TraceInfo_t *pTraceInfo, const cbrush_t *pBrush, cboxbrush_t *pBox )
 {
 	// Suppress floating-point exceptions in this function because invDelta's
 	// components can get arbitrarily large -- up to FLT_MAX -- and overflow
 	// when multiplied. Only applicable when FP_EXCEPTIONS_ENABLED is defined.
-	FPExceptionDisabler hideExceptions;
+	const FPExceptionDisabler hideExceptions{};
 
 	// Load the unaligned ray/box parameters into SIMD registers
 	fltx4 start = DirectX::XMLoadFloat3(pTraceInfo->m_start.XmBase());
@@ -1105,7 +1105,7 @@ bool IntersectRayWithBox( const Ray_t &ray, const VectorAligned &inInvDelta, con
 			}
 			else
 			{
-				static const int signbits[3]={1,2,4};
+				static const byte signbits[3]={1,2,4};
 				if ( t1 <= 1.0f )
 				{
 					pTrace->fraction = t1;

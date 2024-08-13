@@ -245,7 +245,7 @@ void SendTable_BuildHierarchy_IterateProps(
 
 				// Setup a datatable prop for this node to reference (so the recursion
 				// routines can get at the proxy).
-				if ( bhs->m_nDatatableProps >= ARRAYSIZE( bhs->m_pDatatableProps ) )
+				if ( bhs->m_nDatatableProps >= ssize( bhs->m_pDatatableProps ) )
 					Error( "Overflowed datatable prop list in SendTable '%s'.", pTable->GetName() );
 				
 				bhs->m_pDatatableProps[bhs->m_nDatatableProps] = pProp;
@@ -298,7 +298,7 @@ void SendTable_BuildHierarchy(
 	// Now add the properties.
 
 	// Make sure there's room, then just copy the pointers from the loop above.
-	ErrorIfNot( bhs->m_nProps + nNonDatatableProps < ARRAYSIZE( bhs->m_pProps ),
+	ErrorIfNot( bhs->m_nProps + nNonDatatableProps < ssize( bhs->m_pProps ),
 		("SendTable_BuildHierarchy: overflowed prop buffer.")
 	);
 	

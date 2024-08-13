@@ -42,9 +42,14 @@ client_textmessage_t	gNetworkTextMessage[MAX_NETMESSAGE] =
 	0.0f, // fadeout
 	0.0f, // holdtime
 	0.0f, // fxTime,
-	NULL,//pVGuiSchemeFontName (NULL == default)
-	NETWORK_MESSAGE1,  // pName message name.
-	gNetworkTextMessageBuffer[0] }    // pMessage
+	NULL, //pVGuiSchemeFontName (NULL == default)
+	NETWORK_MESSAGE1, // pName message name.
+	gNetworkTextMessageBuffer[0], // pMessage
+	false, // bRoundedRectBackdropBox
+	0.0f, // flBoxSize
+	{0, 0, 0, 0}, // boxcolor
+	nullptr // pClearMessage
+	}
 };
 
 char	gDemoMessageBuffer[512];
@@ -61,7 +66,11 @@ client_textmessage_t tm_demomessage =
 	0.0f, // fxTime,
 	NULL,// pVGuiSchemeFontName (NULL == default)
 	DEMO_MESSAGE,  // pName message name.
-	gDemoMessageBuffer    // pMessage
+	gDemoMessageBuffer,    // pMessage
+	false, // bRoundedRectBackdropBox
+	0.0f, // flBoxSize
+	{}, // boxcolor
+	nullptr // pClearMessage
 };
 
 static client_textmessage_t orig_demo_message = tm_demomessage;
@@ -73,7 +82,7 @@ int IsComment( char *pText )
 {
 	if ( pText )
 	{
-		int length = strlen( pText );
+		intp length = V_strlen( pText );
 
 		if ( length >= 2 && pText[0] == '/' && pText[1] == '/' )
 			return 1;
@@ -166,7 +175,8 @@ int ParseFloats( const char *pText, float *pFloat, int count )
 		if ( pTemp )
 		{
 			// Parse a float
-			pFloat[index] = (float)atof( pTemp );
+			// dimhotepus: atof -> strtof
+			pFloat[index] = strtof( pTemp, nullptr );
 			count--;
 			index++;
 		}
@@ -205,10 +215,10 @@ int ParseString( char const *pText, char *buf, size_t bufsize )
 // Trims all whitespace from the front and end of a string
 void TrimSpace( const char *source, char *dest )
 {
-	int start, end, length;
+	intp start, end, length;
 
 	start = 0;
-	end = strlen( source );
+	end = V_strlen( source );
 
 	while ( source[start] && IsWhiteSpace( source[start] ) )
 		start++;
@@ -359,7 +369,7 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 	char		buf[512], trim[512];
 	char		*pCurrentText=0, *pNameHeap;
 	char		 currentName[512], nameHeap[ NAME_HEAP_SIZE ];
-	int			lastNamePos;
+	intp		lastNamePos;
 
 	int			mode = MSGFILE_NAME;	// Searching for a message name	
 	int			lineNumber, filePos, lastLinePos;
@@ -367,7 +377,7 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 
 	client_textmessage_t	textMessages[ MAX_MESSAGES ];
 	
-	int			i, nameHeapSize, textHeapSize, messageSize, nameOffset;
+	intp		i, nameHeapSize, textHeapSize, messageSize, nameOffset;
 
 	lastNamePos = 0;
 	lineNumber = 0;
@@ -413,7 +423,7 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 		case MSGFILE_TEXT:
 			if ( IsEndOfText( trim ) )
 			{
-				int length = strlen(currentName);
+				intp length = V_strlen(currentName);
 
 				// Save name on name heap
 				if ( lastNamePos + length > 8192 )
@@ -495,7 +505,7 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 	nameHeapSize = lastNamePos;
 	textHeapSize = 0;
 	for ( i = 0; i < messageCount; i++ )
-		textHeapSize += strlen( textMessages[i].pMessage ) + 1;
+		textHeapSize += V_strlen( textMessages[i].pMessage ) + 1;
 
 
 	messageSize = (messageCount * sizeof(client_textmessage_t));

@@ -236,20 +236,10 @@ void CReplayDemoRecorder::RecordServerClasses( ServerClass *pClasses )
 {
 	MEM_ALLOC_CREDIT();
 
-	char *pBigBuffer;
 	CUtlBuffer bigBuff;
 
-	int buffSize = 256*1024;
-	if ( !IsX360() )
-	{
-		pBigBuffer = (char*)stackalloc( buffSize );
-	}
-	else
-	{
-		// keep temp large allocations off of stack
-		bigBuff.EnsureCapacity( buffSize );
-		pBigBuffer = (char*)bigBuff.Base();
-	}
+	intp buffSize = 256*1024;
+	char *pBigBuffer = (char*)stackalloc( buffSize );
 
 	bf_write buf( pBigBuffer, buffSize );
 
@@ -465,7 +455,7 @@ void CReplayDemoRecorder::RecordMessages(bf_read &data, int bits)
 
 void CReplayDemoRecorder::RecordPacket()
 {
-	Assert( !"Does this ever get called?  I can't find anywhere where it does." );
+	AssertMsg( false, "Does this ever get called?  I can't find anywhere where it does." );
 	if( m_MessageData.GetBasePointer() )
 	{
 		WriteMessages( dem_packet, m_MessageData );

@@ -577,7 +577,7 @@ void CClientState::ProcessSoundsWithProtoVersion( SVC_Sounds *msg, CUtlVector< S
 	
 	for ( int i = 0; i < msg->m_nNumSounds; i++ )
 	{
-		int nSound = sounds.AddToTail();
+		intp nSound = sounds.AddToTail();
 		SoundInfo_t *pSound = &(sounds[ nSound ]);
 
 		pSound->ReadDelta( pDeltaSound, msg->m_DataIn, nProtoVersion );
@@ -983,7 +983,7 @@ bool CClientState::ProcessTempEntities( SVC_TempEntities *msg )
 		ei->bits			= toBuf.GetNumBitsWritten();
 
 		// deltaBitsReader.ReadNextPropIndex reads uint32s, so make sure we alloc in 4-byte chunks.
-		ei->pData			= new byte[ ALIGN_VALUE( size, 4 ) ]; // copy raw data
+		ei->pData			= new byte[ AlignValue( size, 4 ) ]; // copy raw data
 		Q_memcpy( ei->pData, data, size );
 	}
 

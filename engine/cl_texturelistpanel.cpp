@@ -126,7 +126,7 @@ namespace vgui
 
 class TileViewPanelEx : public Panel
 {
-	DECLARE_CLASS_SIMPLE( TileViewPanelEx, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( TileViewPanelEx, Panel );
 
 public:
 	TileViewPanelEx( Panel *parent, const char *panelName );
@@ -152,11 +152,11 @@ protected: // Overrides for contents
 
 protected:
 	// Handlers
-	virtual void OnMouseWheeled( int delta );
-	virtual void OnSizeChanged( int wide, int tall ); 
-	virtual void PerformLayout();
-	virtual void Paint();
-	virtual void ApplySchemeSettings( IScheme *pScheme );
+	void OnMouseWheeled( int delta ) override;
+	void OnSizeChanged( int wide, int tall ) override; 
+	void PerformLayout() override;
+	void Paint() override;
+	void ApplySchemeSettings( IScheme *pScheme ) override;
 	MESSAGE_FUNC( OnSliderMoved, "ScrollBarSliderMoved" );
 
 protected:
@@ -549,7 +549,7 @@ static void FmtCommaNumber( char *pchBuffer, unsigned int uiNumber )
 		}
 	}
 
-	int len = strlen( pchBuffer );
+	intp len = V_strlen( pchBuffer );
 	if ( !len )
 		sprintf( pchBuffer, "0" );
 	else if ( pchBuffer[ len - 1 ] == ',' )
@@ -665,7 +665,7 @@ void RequestSelected( int nCount, UtlSymId_t const *pNameIds )
 //
 struct ViewParamsLast
 {
-	ViewParamsLast() : lstMaterials( DefLessFunc( UtlSymId_t ) ), flTime( 0.f ), bHighlighted( false ) {}
+	ViewParamsLast() : flTime( 0.f ), bHighlighted( false ), lstMaterials( DefLessFunc( UtlSymId_t ) ) {}
 
 	float flTime;
 	bool bHighlighted;
@@ -717,7 +717,7 @@ void DisplaySelectedTextures()
 		// Wait for the flash-time
 		float fCurTime = Plat_FloatTime();
 		if ( fCurTime >= s_viewParamsLast.flTime &&
-			 fCurTime < s_viewParamsLast.flTime + 0.4 )
+			 fCurTime < s_viewParamsLast.flTime + 0.4f )
 			 return;
 
 		s_viewParamsLast.flTime = fCurTime;
@@ -836,7 +836,7 @@ void DisplaySelectedTextures()
 
 class CVmtTextEntry : public vgui::TextEntry
 {
-	DECLARE_CLASS_SIMPLE( CVmtTextEntry, vgui::TextEntry );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CVmtTextEntry, vgui::TextEntry );
 
 public:
 	CVmtTextEntry( vgui::Panel *parent, char const *szName ) : BaseClass( parent, szName ) {}
@@ -844,7 +844,7 @@ public:
 public:
 	MESSAGE_FUNC( OpenVmtSelected, "DoOpenVmtSelected" );
 
-	virtual void OpenEditMenu();
+	void OpenEditMenu() override;
 };
 
 void CVmtTextEntry::OpenEditMenu()
@@ -1030,31 +1030,31 @@ CP4Requirement::~CP4Requirement()
 
 class CRenderTextureEditor : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CRenderTextureEditor, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CRenderTextureEditor, vgui::Frame );
 
 public:
 	CRenderTextureEditor( vgui::Panel *parent, char const *szName );
 	~CRenderTextureEditor();
 
 public:
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void PerformLayout();
-	virtual void OnCommand( const char *command );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void PerformLayout() override;
+	void OnCommand( const char *command ) override;
 	virtual void SetFont( vgui::HFont hFont ) { m_hFont = hFont; Repaint(); }
 	virtual vgui::HFont GetFont() { return m_hFont; }
 
 public:
-	virtual void OnMousePressed( vgui::MouseCode code );
-	virtual void OnMouseDoublePressed( vgui::MouseCode code ) { OnMousePressed( code ); }
-	virtual void Activate();
-	virtual void Close();
+	void OnMousePressed( vgui::MouseCode code ) override;
+	void OnMouseDoublePressed( vgui::MouseCode code ) override { OnMousePressed( code ); }
+	void Activate() override;
+	void Close() override;
 
 public:
 	void SetDispInfo( KeyValues *kv, int iHint );
 	void GetDispInfo( KeyValues *&kv, int &iHint );
 
 public:
-	virtual void Paint();
+	void Paint() override;
 
 	enum
 	{
@@ -1086,10 +1086,10 @@ protected:
 
 CRenderTextureEditor::CRenderTextureEditor( vgui::Panel *parent, char const *szName ) :
 	BaseClass( parent, szName ),
-	m_pInfo( NULL ),
-	m_iInfoHint( 0 ),
 	m_hFont( vgui::INVALID_FONT ),
-	m_bufInfoText( 0, 0, CUtlBuffer::TEXT_BUFFER )
+	m_pInfo( NULL ),
+	m_bufInfoText( (intp)0, 0, CUtlBuffer::TEXT_BUFFER ),
+	m_iInfoHint( 0 )
 {
 	m_pMaterials = vgui::SETUP_PANEL( new CVmtTextEntry( this, "Materials" ) );
 	m_pMaterials->SetMultiline( true );
@@ -1215,7 +1215,7 @@ void CRenderTextureEditor::SetDispInfo( KeyValues *kv, int iHint )
 	}
 
 	// Now that we have a list of materials make a printable version
-	CUtlBuffer bufText( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer bufText( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	if ( !arrMaterials.GetNumStrings() )
 	{
@@ -1252,7 +1252,7 @@ void CRenderTextureEditor::SetDispInfo( KeyValues *kv, int iHint )
 			}
 		}
 
-		m_pMaterials->SetText( ( char const * ) bufText.Base() );
+		m_pMaterials->SetText( bufText.Base<const char>() );
 
 		m_lstMaterials.RemoveAll();
 		m_lstMaterials.EnsureCapacity( arrMaterialsFullNames.GetNumStrings() );
@@ -1415,7 +1415,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 
 	if ( !stricmp( command, "Reload" ) && m_lstMaterials.Count() )
 	{
-		CUtlBuffer bufCommand( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer bufCommand( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 		int idxMaterial = 0;
 
 		//
@@ -1447,7 +1447,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 			bufCommand.Printf( "\"\n" );
 			bufCommand.PutChar( 0 );
 
-			Cbuf_AddText( ( char const * ) bufCommand.Base() );
+			Cbuf_AddText( bufCommand.Base<const char>() );
 			bufCommand.Clear();
 			Cbuf_Execute();
 		}
@@ -1530,13 +1530,13 @@ void CRenderTextureEditor::OnCommand( const char *command )
 			// Have tga - pump in the txt file
 			sprintf( pExtPut, ".txt" );
 
-			CUtlBuffer bufTxtFileBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+			CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			g_pFullFileSystem->ReadFile( szFileName, 0, bufTxtFileBuffer );
 			for ( int k = 0; k < 1024; ++ k ) bufTxtFileBuffer.PutChar( 0 );
 
 			// Now fix maxwidth/maxheight settings
-			SetBufferValue( ( char * ) bufTxtFileBuffer.Base(), "nomip", bNewNoMip ? "1" : "0" );
-			bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( ( char * ) bufTxtFileBuffer.Base() ) );
+			SetBufferValue( bufTxtFileBuffer.Base<char>(), "nomip", bNewNoMip ? "1" : "0" );
+			bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 			// Check out or add the file
 			g_p4factory->SetOpenFileChangeList( "Texture LOD Autocheckout" );
@@ -1567,13 +1567,13 @@ void CRenderTextureEditor::OnCommand( const char *command )
 				vgui::system()->ShellExecuteEx( "open", "cmd.exe", chCommand );
 				Sys_Sleep( 200 );
 
-				CUtlBuffer bufTxtFileBuffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+				CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 				g_pFullFileSystem->ReadFile( szTxtFileName, 0, bufTxtFileBuffer );
 				for ( int k = 0; k < 1024; ++ k ) bufTxtFileBuffer.PutChar( 0 );
 
 				// Now fix maxwidth/maxheight settings
-				SetBufferValue( ( char * ) bufTxtFileBuffer.Base(), "nomip", bNewNoMip ? "1" : "0" );
-				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( ( char * ) bufTxtFileBuffer.Base() ) );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), "nomip", bNewNoMip ? "1" : "0" );
+				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 				// Check out or add the file
 				// Save the file contents
@@ -1643,11 +1643,11 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		// Now we've modified the source, rebuild the texture
 		char *argv[64];
 		int iArg = 0;
-		argv[iArg++] = "";
-		argv[iArg++] = "-quiet";
-		argv[iArg++] = "-UseStandardError";	// These are only here for the -currently released- version of vtex.dll.
-		argv[iArg++] = "-WarningsAsErrors";
-		argv[iArg++] = "-outdir";
+		argv[iArg++] = (char*)"";
+		argv[iArg++] = (char*)"-quiet";
+		argv[iArg++] = (char*)"-UseStandardError";	// These are only here for the -currently released- version of vtex.dll.
+		argv[iArg++] = (char*)"-WarningsAsErrors";
+		argv[iArg++] = (char*)"-outdir";
 		argv[iArg++] = szVTFFilename;
 		argv[iArg++] = szContentFilename;
 		pIVTex->VTex( CubemapsFSFactory, pGameDir, iArg, argv );
@@ -1838,7 +1838,7 @@ void CRenderTextureEditor::Paint()
 			if ( wact > 4 || hact > 4 )
 			{
 				char chbuf[50];
-				int mem = ImageLoader::GetMemRequired( max( min( wact, 4 ), wact / 2 ), max( min( hact, 4 ), hact / 2 ), max( 1, dact / 2 ), fmt, true );
+				intp mem = ImageLoader::GetMemRequired( max( min( wact, 4 ), wact / 2 ), max( min( hact, 4 ), hact / 2 ), max( 1, dact / 2 ), fmt, true );
 				mem = ( mem + 511 ) / 1024;
 				FmtCommaNumber( chbuf, mem );
 				
@@ -1848,7 +1848,7 @@ void CRenderTextureEditor::Paint()
 			if ( wmap > wact || hmap > hact || dmap > dact )
 			{
 				char chbuf[ 50 ];
-				int mem = ImageLoader::GetMemRequired( min( wmap, wact * 2 ), min( hmap, hact * 2 ), min( dmap, dact * 2 ), fmt, true );
+				intp mem = ImageLoader::GetMemRequired( min( wmap, wact * 2 ), min( hmap, hact * 2 ), min( dmap, dact * 2 ), fmt, true );
 				mem = ( mem + 511 ) / 1024;
 				FmtCommaNumber( chbuf, mem );
 
@@ -1859,7 +1859,7 @@ void CRenderTextureEditor::Paint()
 		if ( chLine1[0] )
 		{
 			g_pMatSystemSurface->DrawSetColor( 200, 0, 0, 255 );
-			g_pMatSystemSurface->DrawFilledRect( x - TILE_BORDER/2, y + TILE_TEXT/2, x + TILE_BORDER/2 + (TILE_SIZE * 0.5), y + TILE_TEXT/2 + TILE_TEXT/4 );
+			g_pMatSystemSurface->DrawFilledRect( x - TILE_BORDER/2, y + TILE_TEXT/2, x + TILE_BORDER/2 + (TILE_SIZE/2), y + TILE_TEXT/2 + TILE_TEXT/4 );
 			g_pMatSystemSurface->DrawColoredTextRect( GetFont(), x, y + TILE_TEXT/2, TILE_SIZE, TILE_TEXT / 4,
 				255, 255, 255, 255,
 				"%s", chLine1 );
@@ -1958,21 +1958,21 @@ void CRenderTextureEditor::Paint()
 
 class CRenderTexturesListViewPanel : public vgui::TileViewPanelEx
 {
-	DECLARE_CLASS_SIMPLE( CRenderTexturesListViewPanel, vgui::TileViewPanelEx );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CRenderTexturesListViewPanel, vgui::TileViewPanelEx );
 
 public:
 	CRenderTexturesListViewPanel( vgui::Panel *parent, char const *szName );
 	~CRenderTexturesListViewPanel();
 
 protected:
-	virtual int GetNumTiles();
-	virtual void GetTileSize( int &wide, int &tall );
-	virtual void RenderTile( int iTile, int x, int y );
+	int GetNumTiles() override;
+	void GetTileSize( int &wide, int &tall ) override;
+	void RenderTile( int iTile, int x, int y ) override;
 
 protected:
-	virtual void PerformLayout();
-	virtual void OnMousePressed( vgui::MouseCode code );
-	virtual void OnMouseDoublePressed( vgui::MouseCode code ) { OnMousePressed( code ); }
+	void PerformLayout() override;
+	void OnMousePressed( vgui::MouseCode code ) override;
+	void OnMouseDoublePressed( vgui::MouseCode code ) override { OnMousePressed( code ); }
 
 public:
 	void SetDataListPanel( vgui::ListPanel *pPanel );
@@ -2119,8 +2119,8 @@ void CRenderTexturesListViewPanel::RenderTile( int iTile, int x, int y )
 	int iTxSize = kv->GetInt( KEYNAME_SIZE );
 	char const *szTxFormat = kv->GetString( KEYNAME_FORMAT );
 
-	int iTxFormatLen = strlen( szTxFormat );
-	char *szTxFormatSuffix = "";
+	intp iTxFormatLen = V_strlen( szTxFormat );
+	const char *szTxFormatSuffix = "";
 	if ( iTxFormatLen > 4 )
 	{
 fmtlenreduce:
@@ -2215,7 +2215,7 @@ fmtlenreduce:
 	x += TILE_BORDER;
 	y += TILE_BORDER/2;
 
-	int iLenFile = strlen( szTextureFile );
+	intp iLenFile = V_strlen( szTextureFile );
 	char const *szPrintFilePrefix = ( iLenFile > 22 ) ? "..." : "";
 	char const *szPrintFileName = ( iLenFile > 22 ) ? ( szTextureFile + iLenFile - 22 ) : szTextureFile;
 
@@ -2240,7 +2240,7 @@ fmtlenreduce:
 	sprintf( chInfoText, "%s KiB  %dx%d  %.*s%s  %s",
 		chSizeBuf,
 		iTxWidth, iTxHeight,
-		iTxFormatLen, szTxFormat, szTxFormatSuffix,
+		static_cast<int>(iTxFormatLen), szTxFormat, szTxFormatSuffix,
 		( pMatTexture->GetFlags() & (
 			TEXTUREFLAGS_NOLOD | TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_ONEBITALPHA
 			) ) ? "***" : "" );
@@ -2248,14 +2248,14 @@ fmtlenreduce:
 	int iTextHeight = g_pMatSystemSurface->GetFontTall( GetFont() );
 	{
 		// Compute text extents
-		int iTextLen[4] = { 0 };
-		iTextLen[0] = 5 + strlen( chSizeBuf );
+		intp iTextLen[4] = { 0 };
+		iTextLen[0] = 5 + V_strlen( chSizeBuf );
 		iTextLen[1] = strchr( chInfoText, 'x' ) + 1 - chInfoText;
 		while ( chInfoText[ iTextLen[1] ] != ' ' )
 			++ iTextLen[1];
 		++ iTextLen[1];
 		iTextLen[2] = 2 + iTextLen[1] + iTxFormatLen + strlen( szTxFormatSuffix );
-		iTextLen[3] = strlen( chInfoText );
+		iTextLen[3] = V_strlen( chInfoText );
 		for ( int k = 0; k < 4; ++ k )
 			iTextMargins[k] = g_pMatSystemSurface->DrawTextLen( GetFont(), "%.*s", iTextLen[k], chInfoText );
 	}
@@ -2378,7 +2378,7 @@ void CRenderTexturesListViewPanel::SetPaintAlpha( bool bPaintAlpha )
 //-----------------------------------------------------------------------------
 class CTextureListPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CTextureListPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CTextureListPanel, vgui::Frame );
 
 public:
 	// Construction
@@ -2386,19 +2386,19 @@ public:
 	virtual			~CTextureListPanel( void );
 
 	// Refresh
-	virtual void	Paint();
+	void	Paint() override;
 	void			EndPaint(); // Still inside paint
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	virtual bool	ShouldDraw();
-	virtual void	PerformLayout();
-	virtual void	Close();
+	void	PerformLayout() override;
+	void	Close() override;
 
 	void			OnTurnedOn();
 
 private:
 
 	void UpdateTotalUsageLabel();
-	virtual void OnCommand( const char *command );
+	void OnCommand( const char *command ) override;
 	MESSAGE_FUNC( OnTextChanged, "TextChanged" );
 
 	int AddListItem( KeyValues *kv );

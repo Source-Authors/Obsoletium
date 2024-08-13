@@ -129,7 +129,7 @@ bool Filter_ConvertString( const char *s, ipfilter_t *f )
 //-----------------------------------------------------------------------------
 static void Filter_Add_f( const CCommand& args )
 {
-	int			i = 0;
+	intp		i = 0;
 	float		banTime;
 	bool		bKick = true;
 	bool		bFound = false;
@@ -466,9 +466,9 @@ USERID_t *Filter_StringToUserID( const char *str )
 	if ( str && str[ 0 ] )
 	{
 		char szTemp[128];
-		if ( !Q_strnicmp( str, STEAM_PREFIX, strlen( STEAM_PREFIX ) ) )
+		if ( !Q_strnicmp( str, STEAM_PREFIX, ssize( STEAM_PREFIX ) - 1 ) )
 		{
-			Q_strncpy( szTemp, str + Q_strlen( STEAM_PREFIX ), sizeof( szTemp ) - 1 );
+			Q_strncpy( szTemp, str + ssize( STEAM_PREFIX ) - 1, sizeof( szTemp ) - 1 );
 			id.idtype = IDTYPE_STEAM;
 
 			szTemp[ sizeof( szTemp ) - 1 ] = '\0';
@@ -712,7 +712,7 @@ CON_COMMAND( listid, "Lists banned users." )
 CON_COMMAND( banid, "Add a user ID to the ban list." )
 {
 #ifndef _XBOX
-	int			i;
+	intp		i;
 	float		banTime;
 	USERID_t	localId;
 	USERID_t *	id = NULL;
@@ -766,7 +766,7 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 		iSearchIndex = -1;
 
 		// SteamID (need to reassemble it)
-		if ( !Q_strnicmp( pszArg2, STEAM_PREFIX, strlen( STEAM_PREFIX ) ) && Q_strstr( args[3], ":" ) )
+		if ( !Q_strnicmp( pszArg2, STEAM_PREFIX, ssize( STEAM_PREFIX ) - 1 ) && Q_strstr( args[3], ":" ) )
 		{
 			Q_snprintf( szSearchString, sizeof( szSearchString ), "%s:%s:%s", pszArg2, args[4], args[6] );
 			bValid = true;

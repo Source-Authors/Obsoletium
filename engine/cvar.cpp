@@ -165,13 +165,13 @@ public:
 			// One must be in client .dll and the other in the game .dll, or both in the engine
 			if ( child->IsFlagSet( FCVAR_GAMEDLL ) && !parent->IsFlagSet( FCVAR_CLIENTDLL ) )
 			{
-				ConMsg( "For FCVAR_REPLICATED, ConVar must be defined in client and game .dlls (%s)\n", child->GetName() );
+				ConMsg( "For FCVAR_REPLICATED, ConVar must be defined in client and game " DLL_EXT_STRING "s (%s)\n", child->GetName() );
 				return false;
 			}
 
 			if ( child->IsFlagSet( FCVAR_CLIENTDLL ) && !parent->IsFlagSet( FCVAR_GAMEDLL ) )
 			{
-				ConMsg( "For FCVAR_REPLICATED, ConVar must be defined in client and game .dlls (%s)\n", child->GetName() );
+				ConMsg( "For FCVAR_REPLICATED, ConVar must be defined in client and game " DLL_EXT_STRING "s (%s)\n", child->GetName() );
 				return false;
 			}
 
@@ -296,10 +296,10 @@ void CCvarUtilities::SetDirect( ConVar *var, const char *value )
 		*pD = L'\0';
 
 		// If it's empty or all spaces, then insert a marker string
-		if ( !wcslen( newUnicode ) || IsAllSpaces( newUnicode ) )
+		if ( !newUnicode[0] || IsAllSpaces( newUnicode ) )
 		{
-			wcsncpy( newUnicode, L"#empty", ( sizeof( newUnicode ) / sizeof( wchar_t ) ) - 1 );
-			newUnicode[ ( sizeof( newUnicode ) / sizeof( wchar_t ) ) - 1 ] = L'\0';
+			wcsncpy( newUnicode, L"#empty", std::size( newUnicode ) - 1 );
+			newUnicode[ std::size( newUnicode ) - 1 ] = L'\0';
 		}
 
 #ifndef SWDS
@@ -320,7 +320,8 @@ void CCvarUtilities::SetDirect( ConVar *var, const char *value )
 
 	if ( var->IsFlagSet( FCVAR_NEVER_AS_STRING ) )
 	{
-		var->SetValue( (float)atof( pszValue ) );
+		// dimhotepus: atof -> strtof.
+		var->SetValue( strtof( pszValue, nullptr ) );
 	}
 	else
 	{
@@ -441,7 +442,7 @@ bool CCvarUtilities::IsCommand( const CCommand &args )
 	// except for surrounding quotes
 	char remaining[1024];
 	const char *pArgS = args.ArgS();
-	int nLen = Q_strlen( pArgS );
+	intp nLen = Q_strlen( pArgS );
 	bool bIsQuoted = pArgS[0] == '\"';
 	if ( !bIsQuoted )
 	{
@@ -804,7 +805,7 @@ void CCvarUtilities::CvarList( const CCommand &args )
 	int iArgs;						// Argument count
 	const char *partial = NULL;		// Partial cvar to search for...
 									// E.eg
-	int ipLen = 0;					// Length of the partial cvar
+	intp ipLen = 0;					// Length of the partial cvar
 
 	FileHandle_t f = FILESYSTEM_INVALID_HANDLE;         // FilePointer for logging
 	bool bLogging = false;
@@ -880,7 +881,7 @@ void CCvarUtilities::CvarList( const CCommand &args )
 	{
 		PrintListHeader( f );
 	}
-	for ( int i = sorted.FirstInorder(); i != sorted.InvalidIndex(); i = sorted.NextInorder( i ) )
+	for ( auto i = sorted.FirstInorder(); i != sorted.InvalidIndex(); i = sorted.NextInorder( i ) )
 	{
 		var = sorted[ i ];
 		if ( var->IsCommand() )

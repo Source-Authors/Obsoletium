@@ -1863,7 +1863,7 @@ class CEnumerationFilter : public IPartitionEnumerator
 {
 public:
 	CEnumerationFilter( CEngineTrace *pEngineTrace, IEntityEnumerator* pEnumerator ) : 
-		m_pEngineTrace(pEngineTrace), m_pEnumerator(pEnumerator) {}
+		m_pEnumerator(pEnumerator), m_pEngineTrace(pEngineTrace) {}
 
 	IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
 	{

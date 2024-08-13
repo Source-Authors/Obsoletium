@@ -64,27 +64,34 @@
 #include "vgui_baseui_interface.h"
 #include "tier0/systeminformation.h"
 #ifdef _WIN32
-#if !defined( _X360 )
 #include <io.h>
 #endif
-#endif
 #include "toolframework/itoolframework.h"
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 #define ONE_HUNDRED_TWENTY_EIGHT_MB	(128 * 1024 * 1024)
 
-ConVar mem_min_heapsize( "mem_min_heapsize", "48", FCVAR_INTERNAL_USE, "Minimum amount of memory to dedicate to engine hunk and datacache (in MiB)" );
-ConVar mem_max_heapsize( "mem_max_heapsize", "256", FCVAR_INTERNAL_USE, "Maximum amount of memory to dedicate to engine hunk and datacache (in MiB)" );
+ConVar mem_min_heapsize( "mem_min_heapsize",
+#ifdef PLATFORM_64BITS	
+	"96"
+#else
+	"48"
+#endif
+	, FCVAR_INTERNAL_USE, "Minimum amount of memory to dedicate to engine hunk and datacache (in MiB)" );
+ConVar mem_max_heapsize( "mem_max_heapsize",
+#ifdef PLATFORM_64BITS	
+	"512"
+#else
+	"256"
+#endif
+	, FCVAR_INTERNAL_USE, "Maximum amount of memory to dedicate to engine hunk and datacache (in MiB)" );
 ConVar mem_max_heapsize_dedicated( "mem_max_heapsize_dedicated", "64", FCVAR_INTERNAL_USE, "Maximum amount of memory to dedicate to engine hunk and datacache, for dedicated server (in MiB)" );
 
-#define MINIMUM_WIN_MEMORY			(unsigned)(mem_min_heapsize.GetInt()*1024*1024)
-#define MAXIMUM_WIN_MEMORY			max( (unsigned)(mem_max_heapsize.GetInt()*1024*1024), MINIMUM_WIN_MEMORY )
-#define MAXIMUM_DEDICATED_MEMORY	(unsigned)(mem_max_heapsize_dedicated.GetInt()*1024*1024)
+#define MINIMUM_WIN_MEMORY			(size_t)(mem_min_heapsize.GetInt()*1024*1024)
+#define MAXIMUM_WIN_MEMORY			max( (size_t)(mem_max_heapsize.GetInt()*1024*1024), MINIMUM_WIN_MEMORY )
+#define MAXIMUM_DEDICATED_MEMORY	(size_t)(mem_max_heapsize_dedicated.GetInt()*1024*1024)
 
 
 char *CheckParm(const char *psz, char **ppszValue = NULL);
@@ -179,8 +186,8 @@ void Sys_mkdir( const char *path )
 	char testpath[ MAX_OSPATH ];
 
 	// Remove any terminal backslash or /
-	Q_strncpy( testpath, path, sizeof( testpath ) );
-	int nLen = Q_strlen( testpath );
+	V_strcpy_safe( testpath, path );
+	intp nLen = Q_strlen( testpath );
 	if ( (nLen > 0) && IsSlash( testpath[ nLen - 1 ] ) )
 	{
 		testpath[ nLen - 1 ] = 0;
@@ -304,7 +311,7 @@ void Sys_Shutdown( void )
 //			... - 
 // Output : void Sys_Printf
 //-----------------------------------------------------------------------------
-void Sys_Printf(char *fmt, ...)
+void Sys_Printf(const char *fmt, ...)
 {
 	va_list		argptr;
 	char		text[1024];
@@ -387,7 +394,7 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 
 	if ( s_bIsDedicated )
 	{
-		printf( "%s\n", text );
+		fprintf( stderr, "%s\n", text );
 	}
 	else
 	{
@@ -401,12 +408,11 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 	g_bInErrorExit = true;
 
 #if !defined( SWDS )
-	if ( IsPC() && videomode )
+	if ( videomode )
 		videomode->Shutdown();
 #endif
 
-	if ( IsPC() &&
-		!CommandLine()->FindParm( "-makereslists" ) &&
+	if (!CommandLine()->FindParm( "-makereslists" ) &&
 		!CommandLine()->FindParm( "-nomessagebox" ) &&
 		!CommandLine()->FindParm( "-nocrashdialog" ) )
 	{
@@ -417,16 +423,7 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 #endif
 	}
 
-	if ( IsPC() )
-	{
-		DebuggerBreakIfDebugging();
-	}
-	else if ( !IsRetail() )
-	{
-		DebuggerBreak(); 
-	}
-
-#if !defined( _X360 )
+	DebuggerBreakIfDebugging();
 
 	BuildMinidumpComment( text, true );
 	g_bUpdateMinidumpComment = false;
@@ -471,22 +468,29 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 		fflush( stdout );
 
 		int *p = 0;
+#ifdef PLATFORM_64BITS
+		*p = 0xdeadbeefdeadbeef;
+#else
 		*p = 0xdeadbeef;
+#endif
 #elif defined( LINUX )
 		// Doing this doesn't quite work the way we want because there is no "crashing" thread
 		// and we see "No thread was identified as the cause of the crash; No signature could be created because we do not know which thread crashed" on the back end
 		//SteamAPI_WriteMiniDump( 0, NULL, build_number() );
 		int *p = 0;
+#ifdef PLATFORM_64BITS
+		*p = 0xdeadbeefdeadbeef;
+#else
 		*p = 0xdeadbeef;
+#endif
 #else
 #warning "need minidump impl on sys_error"
 #endif
 	}
 
-#endif // _X360
-
 	host_initialized = false;
-#if defined(_WIN32) && !defined( _X360 )
+
+#if defined(_WIN32)
 	// We don't want global destructors in our process OR in any DLL to get executed.
 	// _exit() avoids calling global destructors in our module, but not in other DLLs.
 	TerminateProcess( GetCurrentProcess(), 100 );
@@ -501,14 +505,13 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 //			... - 
 // Output : void Sys_Error
 //-----------------------------------------------------------------------------
-void Sys_Error(const char *error, ...)
+void Sys_Error( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2 )
 {
 	va_list		argptr;
 
 	va_start( argptr, error );
 	Sys_Error_Internal( true, error, argptr );
 	va_end( argptr );
-
 }
 
 
@@ -518,7 +521,7 @@ void Sys_Error(const char *error, ...)
 //			... - 
 // Output : void Sys_Error
 //-----------------------------------------------------------------------------
-void Sys_Exit(const char *error, ...)
+void Sys_Exit( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2 )
 {
 	va_list		argptr;
 
@@ -544,22 +547,18 @@ void Sys_Sleep( int msec )
 	ThreadSleep ( msec );
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : hInst - 
-//			ulInit - 
-//			lpReserved - 
-// Output : BOOL WINAPI   DllMain
-//-----------------------------------------------------------------------------
 #if defined(_WIN32) && !defined( _X360 )
-BOOL WINAPI DllMain(HANDLE hInst, ULONG ulInit, LPVOID lpReserved)
+int prevCRTMemDebugState = 0;
+
+BOOL WINAPI DllMain(HANDLE, ULONG ulInit, LPVOID)
 {
-	InitCRTMemDebug();
 	if (ulInit == DLL_PROCESS_ATTACH)
 	{
+		prevCRTMemDebugState = InitCRTMemDebug();
 	} 
 	else if (ulInit == DLL_PROCESS_DETACH)
 	{
+		ShutdownCRTMemDebug(prevCRTMemDebugState);
 	}
 
 	return TRUE;
@@ -585,9 +584,13 @@ void Sys_InitMemory( void )
 	MemoryInformation info;
 	if (GetMemoryInformation(&info))
 	{
+#ifdef PLATFORM_64BITS
+		host_parms.memsize = static_cast<uintp>(info.m_nPhysicalRamMbTotal) * 1024 * 1024;
+#else
 		host_parms.memsize = info.m_nPhysicalRamMbTotal > 4095
 			? 0xFFFFFFFFUL
 			: info.m_nPhysicalRamMbTotal * 1024 * 1024;
+#endif
 	}
 
 	if ( host_parms.memsize == 0 )
@@ -597,11 +600,11 @@ void Sys_InitMemory( void )
 
 	if ( host_parms.memsize < ONE_HUNDRED_TWENTY_EIGHT_MB )
 	{
-		Sys_Error( "Available memory less than 128MiB!!! %u\n", host_parms.memsize );
+		Sys_Error( "Available memory less than 128MiB!!! %zu\n", host_parms.memsize );
 	}
 
 	// take one quarter the physical memory
-	if ( host_parms.memsize <= 512*1024*1024)
+	if ( host_parms.memsize <= 512u*1024u*1024u)
 	{
 		host_parms.memsize >>= 2;
 		// Apply cap of 64MB for 512MB systems
@@ -661,12 +664,12 @@ static CThreadFastMutex g_SpewMutex;
 
 static void AddSpewRecord( char const *pMsg )
 {
-#if !defined( _X360 )
 	AUTO_LOCK( g_SpewMutex );
 
 	static bool s_bReentrancyGuard = false;
 	if ( s_bReentrancyGuard )
 		return;
+
 	s_bReentrancyGuard = true;
 
 	if ( g_SpewHistory.Count() > sys_minidumpspewlines.GetInt() )
@@ -678,7 +681,6 @@ static void AddSpewRecord( char const *pMsg )
 	g_SpewHistory[ i ].Format( "%d(%f):  %s", g_nSpewLines++, Plat_FloatTime(), pMsg );
 
 	s_bReentrancyGuard = false;
-#endif
 }
 
 void GetSpew( char *buf, size_t buflen )
@@ -687,14 +689,14 @@ void GetSpew( char *buf, size_t buflen )
 
 	// Walk list backward
 	char *pcur = buf;
-	int remainder = (int)buflen - 1;
+	intp remainder = (intp)buflen - 1;
 
 	// Walk backward(
-	for ( int i = g_SpewHistory.Tail(); i != g_SpewHistory.InvalidIndex(); i = g_SpewHistory.Previous( i ) )
+	for ( auto i = g_SpewHistory.Tail(); i != g_SpewHistory.InvalidIndex(); i = g_SpewHistory.Previous( i ) )
 	{
 		const CUtlString &rec = g_SpewHistory[ i ];
-		int len = rec.Length();
-		int tocopy = MIN( len, remainder );
+		intp len = rec.Length();
+		intp tocopy = MIN( len, remainder );
 
 		if ( tocopy <= 0 )
 			break;
@@ -747,11 +749,11 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 		{
 			if (spewType == SPEW_MESSAGE || spewType == SPEW_LOG)
 			{
-				printf( "%s: %s", group, pMsg );
+				printf( "[%s] %s", group, pMsg );
 			}
 			else
 			{
-				fprintf( stderr, "%s: %s", group, pMsg );
+				fprintf( stderr, "[%s] %s", group, pMsg );
 			}
 		}
 
@@ -783,12 +785,12 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 				}
 				break;
 			}
-			Con_ColorPrintf( color, "%s: %s", group, pMsg );
+			Con_ColorPrintf( color, "[%s] %s", group, pMsg );
 
 		}
 		else
 		{
-			g_Log.Printf( "%s: %s", group, pMsg );
+			g_Log.Printf( "[%s] %s", group, pMsg );
 		}
 	}
 
@@ -796,7 +798,7 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 
 	if (spewType == SPEW_ERROR)
 	{
-		Sys_Error( "%s: %s", group, pMsg );
+		Sys_Error( "[%s] %s", group, pMsg );
 		return SPEW_ABORT;
 	}
 	if (spewType == SPEW_ASSERT)
@@ -825,10 +827,8 @@ void DeveloperChangeCallback( IConVar *pConVar, const char *pOldString, float fl
 //-----------------------------------------------------------------------------
 void *GameFactory( const char *pName, int *pReturnCode )
 {
-	void *pRetVal = NULL;
-
 	// first ask the app factory
-	pRetVal = g_AppSystemFactory( pName, pReturnCode );
+	void *pRetVal = g_AppSystemFactory( pName, pReturnCode );
 	if (pRetVal)
 		return pRetVal;
 
@@ -908,7 +908,6 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory, const char* pBaseDir, void
 	Q_FixSlashes( s_pBaseDir );
 	host_parms.basedir = s_pBaseDir;
 
-#ifndef _X360
 	if ( CommandLine()->FindParm ( "-pidfile" ) )
 	{	
 		FileHandle_t pidFile = g_pFileSystem->Open( CommandLine()->ParmValue ( "-pidfile", "srcds.pid" ), "w+" );
@@ -922,18 +921,14 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory, const char* pBaseDir, void
 			Warning("Unable to open pidfile (%s)\n", CommandLine()->CheckParm ( "-pidfile" ));
 		}
 	}
-#endif
 
 	// Initialize clock
 	TRACEINIT( Sys_Init(), Sys_Shutdown() );
 
 #if defined(_DEBUG)
-	if ( IsPC() )
+	if( !CommandLine()->FindParm( "-nodttest" ) && !CommandLine()->FindParm( "-dti" ) )
 	{
-		if( !CommandLine()->FindParm( "-nodttest" ) && !CommandLine()->FindParm( "-dti" ) )
-		{
-			RunDataTableTest();	
-		}
+		RunDataTableTest();	
 	}
 #endif
 
@@ -988,7 +983,7 @@ void Sys_ShutdownGame( void )
 CreateInterfaceFn g_ServerFactory;
 
 
-static bool LoadThisDll( char *szDllFilename, bool bIsServerOnly )
+static bool LoadThisDll( const char *szDllFilename, bool bIsServerOnly )
 {
 	CSysModule *pDLL = NULL;
 
@@ -1103,20 +1098,23 @@ void LoadEntityDLLs( const char *szBaseDir, bool bIsServerOnly )
 	g_GameDLL = NULL;
 	sv_noclipduringpause = NULL;
 
-	// Listing file for this game.
-	KeyValues *modinfo = new KeyValues("modinfo");
-	MEM_ALLOC_CREDIT();
-	if (modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt"))
 	{
-		Q_strncpy( gmodinfo.szInfo, modinfo->GetString("url_info"), sizeof( gmodinfo.szInfo ) );
-		Q_strncpy( gmodinfo.szDL, modinfo->GetString("url_dl"), sizeof( gmodinfo.szDL ) );
-		gmodinfo.version = modinfo->GetInt("version");
-		gmodinfo.size = modinfo->GetInt("size");
-		gmodinfo.svonly = modinfo->GetInt("svonly") ? true : false;
-		gmodinfo.cldll = modinfo->GetInt("cldll") ? true : false;
-		Q_strncpy( gmodinfo.szHLVersion, modinfo->GetString("hlversion"), sizeof( gmodinfo.szHLVersion ) );
+		// Listing file for this game.
+		KeyValues::AutoDelete modinfo = KeyValues::AutoDelete("modinfo");
+		MEM_ALLOC_CREDIT();
+		if (modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt"))
+		{
+			Q_strncpy( gmodinfo.szInfo, modinfo->GetString("url_info"), sizeof( gmodinfo.szInfo ) );
+			Q_strncpy( gmodinfo.szDL, modinfo->GetString("url_dl"), sizeof( gmodinfo.szDL ) );
+
+			gmodinfo.version = modinfo->GetInt("version");
+			gmodinfo.size = modinfo->GetInt("size");
+			gmodinfo.svonly = modinfo->GetInt("svonly") ? true : false;
+			gmodinfo.cldll = modinfo->GetInt("cldll") ? true : false;
+
+			Q_strncpy( gmodinfo.szHLVersion, modinfo->GetString("hlversion"), sizeof( gmodinfo.szHLVersion ) );
+		}
 	}
-	modinfo->deleteThis();
 	
 	// Load the game .dll
 	LoadThisDll( "server" DLL_EXT_STRING, bIsServerOnly );
@@ -1138,7 +1136,6 @@ void LoadEntityDLLs( const char *szBaseDir, bool bIsServerOnly )
 #if defined(_WIN32)
 void Sys_GetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const char *pszElement, OUT_Z_CAP(nReturnLength) char *pszReturnString, int nReturnLength, const char *pszDefaultValue )
 {
-	LONG lResult;           // Registry function result code
 	HKEY hKey;              // Handle of opened/created key
 	char szBuff[128];       // Temp. buffer
 	ULONG dwDisposition;    // Type of key opening event
@@ -1155,17 +1152,16 @@ void Sys_GetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 	}
 
 	// Create it if it doesn't exist.  (Create opens the key otherwise)
-	lResult = VCRHook_RegCreateKeyEx(
+	LONG lResult = VCRHook_RegCreateKeyEx(
 		rootKey,	// handle of open key 
 		pszSubKey,			// address of name of subkey to open 
 		0ul,					// DWORD ulOptions,	  // reserved 
-		"String",			// Type of value
+		nullptr,			// Type of value
 		REG_OPTION_NON_VOLATILE, // Store permanently in reg.
 		KEY_ALL_ACCESS,		// REGSAM samDesired, // security access mask 
 		NULL,
 		&hKey,				// Key we are creating
 		&dwDisposition);    // Type of creation
-	
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return;
 
@@ -1201,7 +1197,6 @@ void Sys_GetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 
 	// Always close this key before exiting.
 	VCRHook_RegCloseKey(hKey);
-
 }
 
 
@@ -1210,7 +1205,6 @@ void Sys_GetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 //-----------------------------------------------------------------------------
 void Sys_GetRegKeyValueUnderRootInt( HKEY rootKey, const char *pszSubKey, const char *pszElement, long *plReturnValue, const long lDefaultValue )
 {
-	LONG lResult;           // Registry function result code
 	HKEY hKey;              // Handle of opened/created key
 	ULONG dwDisposition;    // Type of key opening event
 	DWORD dwType;           // Type of key
@@ -1221,17 +1215,16 @@ void Sys_GetRegKeyValueUnderRootInt( HKEY rootKey, const char *pszSubKey, const 
 	*plReturnValue = lDefaultValue; 
 
 	// Create it if it doesn't exist.  (Create opens the key otherwise)
-	lResult = VCRHook_RegCreateKeyEx(
+	LONG lResult = VCRHook_RegCreateKeyEx(
 		rootKey,	// handle of open key 
 		pszSubKey,			// address of name of subkey to open 
 		0ul,					// DWORD ulOptions,	  // reserved 
-		"String",			// Type of value
+		nullptr,			// Type of value
 		REG_OPTION_NON_VOLATILE, // Store permanently in reg.
 		KEY_ALL_ACCESS,		// REGSAM samDesired, // security access mask 
-		NULL,
+		nullptr,
 		&hKey,				// Key we are creating
 		&dwDisposition);    // Type of creation
-
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return;
 
@@ -1258,31 +1251,25 @@ void Sys_GetRegKeyValueUnderRootInt( HKEY rootKey, const char *pszSubKey, const 
 
 	// Always close this key before exiting.
 	VCRHook_RegCloseKey(hKey);
-
 }
 
 
 void Sys_SetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const char *pszElement, const char *pszValue )
 {
-	LONG lResult;           // Registry function result code
 	HKEY hKey;              // Handle of opened/created key
-	//char szBuff[128];       // Temp. buffer
 	ULONG dwDisposition;    // Type of key opening event
-	//DWORD dwType;           // Type of key
-	//DWORD dwSize;           // Size of element data
 
 	// Create it if it doesn't exist.  (Create opens the key otherwise)
-	lResult = VCRHook_RegCreateKeyEx(
+	LONG lResult = VCRHook_RegCreateKeyEx(
 		rootKey,			// handle of open key 
 		pszSubKey,			// address of name of subkey to open 
-		0ul,					// DWORD ulOptions,	  // reserved 
-		"String",			// Type of value
+		0ul,				// DWORD ulOptions,	
+		nullptr,			// Type of value
 		REG_OPTION_NON_VOLATILE, // Store permanently in reg.
 		KEY_ALL_ACCESS,		// REGSAM samDesired, // security access mask 
-		NULL,
+		nullptr,
 		&hKey,				// Key we are creating
 		&dwDisposition);    // Type of creation
-	
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return;
 
@@ -1294,30 +1281,10 @@ void Sys_SetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 	}
 	else
 	{
-		/*
-		// FIXE:  We might want to support a mode where we only create this key, we don't overwrite values already present
-		// We opened the existing key. Now go ahead and find out how big the key is.
-		dwSize = nReturnLength;
-		lResult = VCRHook_RegQueryValueEx( hKey, pszElement, 0, &dwType, (unsigned char *)szBuff, &dwSize );
-
-		// Success?
-		if (lResult == ERROR_SUCCESS)
-		{
-			// Only copy strings, and only copy as much data as requested.
-			if (dwType == REG_SZ)
-			{
-				Q_strncpy(pszReturnString, szBuff, nReturnLength);
-				pszReturnString[nReturnLength - 1] = '\0';
-			}
-		}
-		else
-		*/
 		// Didn't find it, so write out new value
-		{
-			// Just Set the Values according to the defaults
-			lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszValue, Q_strlen(pszValue) + 1 ); 
-		}
-	};
+		// Just Set the Values according to the defaults
+		lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszValue, Q_strlen(pszValue) + 1 ); 
+	}
 
 	// Always close this key before exiting.
 	VCRHook_RegCloseKey(hKey);
@@ -1329,7 +1296,7 @@ void Sys_GetRegKeyValue( const char *pszSubKey, const char *pszElement, OUT_Z_CA
 #if defined(_WIN32)
 	Sys_GetRegKeyValueUnderRoot( HKEY_CURRENT_USER, pszSubKey, pszElement, pszReturnString, nReturnLength, pszDefaultValue );
 #else
-	//hushed Assert( !"Impl me" );
+	//hushed AssertMsg( false, "Impl me" );
 	// Copying a string to itself is both unnecessary and illegal.
 	if ( pszReturnString != pszDefaultValue )
 	{
@@ -1343,7 +1310,7 @@ void Sys_GetRegKeyValueInt( const char *pszSubKey, const char *pszElement, long 
 #if defined(_WIN32)
 	Sys_GetRegKeyValueUnderRootInt( HKEY_CURRENT_USER, pszSubKey, pszElement, plReturnValue, lDefaultValue );
 #else
-	//hushed Assert( !"Impl me" );
+	//hushed AssertMsg( false, "Impl me" );
 	*plReturnValue = lDefaultValue;
 #endif
 }
@@ -1353,7 +1320,7 @@ void Sys_SetRegKeyValue( const char *pszSubKey, const char *pszElement,	const ch
 #if defined(_WIN32)
 	Sys_SetRegKeyValueUnderRoot( HKEY_CURRENT_USER, pszSubKey, pszElement, pszValue );
 #else
-	//hushed Assert( !"Impl me" );
+	//hushed AssertMsg( false, "Impl me" );
 #endif
 }
 
@@ -1362,9 +1329,6 @@ void Sys_SetRegKeyValue( const char *pszSubKey, const char *pszElement,	const ch
 void Sys_CreateFileAssociations( int count, FileAssociationInfo *list )
 {
 #if defined(_WIN32)
-	if ( IsX360() )
-		return;
-
 	char appname[ 512 ];
 
 	GetModuleFileName( 0, appname, sizeof( appname ) );
@@ -1372,7 +1336,7 @@ void Sys_CreateFileAssociations( int count, FileAssociationInfo *list )
 	Q_strlower( appname );
 
 	char quoted_appname_with_arg[ 512 ];
-	Q_snprintf( quoted_appname_with_arg, sizeof( quoted_appname_with_arg ), "\"%s\" \"%%1\"", appname );
+	V_sprintf_safe(quoted_appname_with_arg, "\"%s\" \"%%1\"", appname );
 	char base_exe_name[ 256 ];
 	Q_FileBase( appname, base_exe_name, sizeof( base_exe_name) );
 	Q_DefaultExtension( base_exe_name, ".exe", sizeof( base_exe_name ) );
@@ -1382,11 +1346,13 @@ void Sys_CreateFileAssociations( int count, FileAssociationInfo *list )
 	// HKEY_CLASSES_ROOT/Applications/hl2.exe/shell/open/command == "u:\tf2\hl2.exe" "%1" quoted
 	Sys_SetRegKeyValueUnderRoot( HKEY_CLASSES_ROOT, va( "Applications\\%s\\shell\\open\\command", base_exe_name ), "", quoted_appname_with_arg );
 
+	char binding[32];
 	for ( int i = 0; i < count ; i++ )
 	{
 		FileAssociationInfo *fa = &list[ i ];
-		char binding[32];
-		binding[0] = 0;
+
+		binding[0] = '\0';
+
 		// Create file association for our .exe
 		// HKEY_CLASSES_ROOT/.dem == "Valve.Source"
 		Sys_GetRegKeyValueUnderRoot( HKEY_CLASSES_ROOT, fa->extension, "", binding, sizeof(binding), "" );
@@ -1400,20 +1366,16 @@ void Sys_CreateFileAssociations( int count, FileAssociationInfo *list )
 
 void Sys_TestSendKey( const char *pKey )
 {
-#if defined(_WIN32) && !defined(USE_SDL) && !defined(_XBOX)
+#if defined(_WIN32) && !defined(USE_SDL)
 	int key = pKey[0];
 	if ( pKey[0] == '\\' && pKey[1] == 'r' )
 	{
 		key = VK_RETURN;
 	}
 
-	HWND hWnd = (HWND)game->GetMainWindow();
+	HWND hWnd = static_cast<HWND>(game->GetMainWindow());
 	PostMessageA( hWnd, WM_KEYDOWN, key, 0 );
 	PostMessageA( hWnd, WM_KEYUP, key, 0 );
-
-	//void Key_Event (int key, bool down);
-	//Key_Event( key, 1 );
-	//Key_Event( key, 0 );
 #endif
 }
 
@@ -1582,7 +1544,7 @@ CON_COMMAND( star_memory, "Dump RAM stats" )
 		Q_pretifymem(memstats.bytes_used, 2, true),
 		memstats.chunks_used );
 #else
-	MEMORYSTATUSEX stat = { sizeof(stat) };
+	MEMORYSTATUSEX stat = { sizeof(stat), 0, 0, 0, 0, 0, 0, 0, 0 };
 	if ( GlobalMemoryStatusEx( &stat ) )
 	{
 		ConDMsg( "hardware: RAM available: %s, Used: %s, Free: %s\n",

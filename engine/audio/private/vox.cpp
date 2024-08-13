@@ -460,7 +460,7 @@ int VOX_ParseWordParams(char *psz, voxword_t *pvoxword, int fFirst)
 			break;
 
 		// read number
-		while (V_isdigit(c) && i < sizeof(sznum) - 1)
+		while (V_isdigit(c) && i < static_cast<int>(sizeof(sznum)) - 1)
 		{
 			sznum[i++] = c;
 			c = *(++psz);
@@ -637,7 +637,7 @@ char * VOX_LookupRndVirtual( char *pGroupName )
 
 // given groupname, get pointer to first word of n'th sentence in group
 
-char *VOX_LookupSentenceByIndex( char *pGroupname, int ipick, int *pipicknext )
+char *VOX_LookupSentenceByIndex( const char *pGroupname, int ipick, int *pipicknext )
 {
 	// get group index
 
@@ -679,11 +679,9 @@ char * VOX_LookupNumber( char *pGroupName, int ipick )
 {
 	// construct group name from V_NUMBERS + TYPE
 
-	char sznumbers[16];
-	int glen = Q_strlen(pGroupName);
-	int slen = Q_strlen("V_NUMBERS");
-	
-	V_strcpy_safe(sznumbers, "V_NUMBERS");
+	char sznumbers[16] = "V_NUMBERS";
+	intp glen = Q_strlen(pGroupName);
+	intp slen = ssize("V_NUMBERS") - 1;
 
 	// insert type character
 	sznumbers[slen] = pGroupName[glen-1];
@@ -1206,7 +1204,7 @@ void VOX_ReplaceVirtualNames( channel_t *pchan )
 			pszNew2 = NULL;
 			char szparseword[256];
 			
-			int slen = Q_strlen(rgpparseword[i]);
+			intp slen = Q_strlen(rgpparseword[i]);
 			char chtype = rgpparseword[i][slen-1];
 
 			// copy word to temp location so we can perform in-place substitutions
@@ -1503,10 +1501,8 @@ void VOX_Precache( IEngineSound *pSoundSystem, int sentenceIndex, const char *pP
 
 void VOX_PrecacheSentenceGroup( IEngineSound *pSoundSystem, const char *pGroupName, const char *pPathOverride )
 {
-	int i;
-
-	int len = Q_strlen( pGroupName );
-	for ( i = 0; i < g_Sentences.Count(); i++ )
+	intp len = Q_strlen( pGroupName );
+	for ( intp i = 0; i < g_Sentences.Count(); i++ )
 	{
 		if ( !g_Sentences[i].isPrecached && !Q_strncasecmp( g_Sentences[i].pName, pGroupName, len ) )
 		{
@@ -1551,7 +1547,7 @@ void VOX_LoadSound( channel_t *pchan, const char *pszin )
 	// get directory from string, advance psz
 	psz = VOX_GetDirectory(szpath, sizeof( szpath ), psz );
 
-	if ( Q_strlen(psz) > sizeof(buffer) - 1 )
+	if ( Q_strlen(psz) > ssize(buffer) - 1 )
 	{
 		DevMsg ("VOX_LoadSound: sentence is too long %s\n",psz);
 		return;
@@ -1580,7 +1576,7 @@ void VOX_LoadSound( channel_t *pchan, const char *pszin )
 	char groupname[ 512 ];
 	Q_strncpy( groupname, pszin, sizeof( groupname ) );
 
-	int len = Q_strlen( groupname );
+	intp len = Q_strlen( groupname );
 
 	while ( len > 0 && V_isdigit( groupname[ len - 1 ] ) )
 	{
@@ -1677,11 +1673,9 @@ void VOX_AddNumbers( char *pGroupName, CUtlVector< WordBuf >& list )
 	// construct group name from V_NUMBERS + TYPE
 	for ( int i = 0; i <= 30; ++i )
 	{
-		char sznumbers[16];
-		int glen = Q_strlen(pGroupName);
-		int slen = Q_strlen("V_NUMBERS");
-		
-		V_strcpy_safe(sznumbers, "V_NUMBERS");
+		char sznumbers[16] = "V_NUMBERS";
+		intp glen = Q_strlen(pGroupName);
+		intp slen = ssize("V_NUMBERS") - 1;
 
 		// insert type character
 		sznumbers[slen] = pGroupName[glen-1];
@@ -1740,7 +1734,7 @@ void VOX_BuildVirtualNameList( char *word, CUtlVector< WordBuf >& list )
 
 	char szparseword[256];
 	
-	int slen = Q_strlen(word);
+	intp slen = Q_strlen(word);
 	char chtype = word[slen-1];
 
 	// copy word to temp location so we can perform in-place substitutions
@@ -1925,8 +1919,7 @@ void VOX_Touch( char const *fn, CUtlDict< int, int >& list )
 //-----------------------------------------------------------------------------
 void VOX_TouchSounds( CUtlDict< int, int >& list, CUtlRBTree< ccpair, int >& ccpairs, bool spewsentences )
 {
-	int i;
-	for ( i = list.First(); i != list.InvalidIndex(); i = list.Next( i ) )
+	for ( auto i = list.First(); i != list.InvalidIndex(); i = list.Next( i ) )
 	{
 		char const *fn = list.GetElementName( i );
 		
@@ -1943,7 +1936,7 @@ void VOX_TouchSounds( CUtlDict< int, int >& list, CUtlRBTree< ccpair, int >& ccp
 
 	if ( spewsentences )
 	{
-		for ( i = ccpairs.FirstInorder() ; i != ccpairs.InvalidIndex(); i = ccpairs.NextInorder( i ) )
+		for ( auto i = ccpairs.FirstInorder() ; i != ccpairs.InvalidIndex(); i = ccpairs.NextInorder( i ) )
 		{
 			ccpair& pair = ccpairs[ i ];
 
@@ -1955,7 +1948,7 @@ void VOX_TouchSounds( CUtlDict< int, int >& list, CUtlRBTree< ccpair, int >& ccp
 		FileHandle_t fh = g_pFileSystem->Open( "sentences.m3u", "wt", "GAME" );
 		if ( FILESYSTEM_INVALID_HANDLE != fh )
 		{
-			for ( i = ccpairs.FirstInorder() ; i != ccpairs.InvalidIndex(); i = ccpairs.NextInorder( i ) )
+			for ( auto i = ccpairs.FirstInorder() ; i != ccpairs.InvalidIndex(); i = ccpairs.NextInorder( i ) )
 			{
 				ccpair& pair = ccpairs[ i ];
 
@@ -2002,7 +1995,7 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 	// get directory from string, advance psz
 	psz = VOX_GetDirectory(szpath, sizeof( szpath ), psz );
 
-	if ( Q_strlen(psz) > sizeof(buffer) - 1 )
+	if ( Q_strlen(psz) > ssize(buffer) - 1 )
 	{
 		DevMsg ("VOX_TouchSound: sentence is too long %s\n",psz);
 		return;
@@ -2160,7 +2153,7 @@ void VOX_ParseLineCommands( char *pSentenceData, int sentenceIndex )
 
 		// Find length of "good" portion of the string (not a {} command)
 		length = pNext - pSentenceData;
-		if ( tempBufferPos + length > sizeof(tempBuffer) )
+		if ( tempBufferPos + length > static_cast<int>(sizeof(tempBuffer)) )
 		{
 			DevMsg("Error! sentence too long!\n" );
 			return;
@@ -2258,7 +2251,7 @@ void VOX_ParseLineCommands( char *pSentenceData, int sentenceIndex )
 			pSentenceData++;
 	}
 
-	if ( tempBufferPos < sizeof(tempBuffer) )
+	if ( tempBufferPos < static_cast<int>(sizeof(tempBuffer)) )
 	{
 		// terminate cleaned up copy
 		tempBuffer[ tempBufferPos ] = 0;
@@ -2274,7 +2267,7 @@ void VOX_ParseLineCommands( char *pSentenceData, int sentenceIndex )
 //-----------------------------------------------------------------------------
 int VOX_GroupAdd( const char *pSentenceName )
 {
-	int len = strlen( pSentenceName ) - 1;
+	intp len = V_strlen( pSentenceName ) - 1;
 
 	// group members end in a number
 	if ( len <= 0 || !V_isdigit(pSentenceName[len]) )
@@ -2291,14 +2284,14 @@ int VOX_GroupAdd( const char *pSentenceName )
 	Q_strncpy( groupName, pSentenceName, len+2 );
 
 	// check for it in the list
-	int i;
+	intp i;
 	sentencegroup_t *pGroup;
 
 	CUtlSymbol symGroupName = sentencegroup_t::GetSymbol( groupName );
-	int groupCount = g_SentenceGroups.Size();
+	intp groupCount = g_SentenceGroups.Count();
 	for ( i = 0; i < groupCount; i++ )
 	{
-		int groupIndex = (i + groupCount-1) % groupCount;
+		intp groupIndex = (i + groupCount-1) % groupCount;
 
 		// Start at the last group a loop around
 		pGroup = &g_SentenceGroups[groupIndex];
@@ -2311,7 +2304,7 @@ int VOX_GroupAdd( const char *pSentenceName )
 	}
 
 	// new group
-	int addIndex = g_SentenceGroups.AddToTail();
+	auto addIndex = g_SentenceGroups.AddToTail();
 	sentencegroup_t *group = &g_SentenceGroups[addIndex];
 	group->SetGroupName( groupName );
 	group->count = 1;
@@ -2362,14 +2355,14 @@ void VOX_GroupInitAllLRUs( void )
 	int i;
 
 	int totalCount = 0;
-	for ( i = 0; i < g_SentenceGroups.Size(); i++ )
+	for ( i = 0; i < g_SentenceGroups.Count(); i++ )
 	{
 		g_SentenceGroups[i].lru = totalCount;
 		totalCount += g_SentenceGroups[i].count;
 	}
 	g_GroupLRU.Purge();
 	g_GroupLRU.EnsureCount( totalCount );
-	for ( i = 0; i < g_SentenceGroups.Size(); i++ )
+	for ( i = 0; i < g_SentenceGroups.Count(); i++ )
 	{
 		VOX_LRUInit( &g_SentenceGroups[i] );
 	}
@@ -2436,7 +2429,7 @@ int VOX_GroupIndexFromName( const char *pGroupName )
 	{
 		// search rgsentenceg for match on szgroupname
 		CUtlSymbol symGroupName = sentencegroup_t::GetSymbol( pGroupName );
-		for ( i = 0; i < g_SentenceGroups.Size(); i++ )
+		for ( i = 0; i < g_SentenceGroups.Count(); i++ )
 		{
 			if ( symGroupName == g_SentenceGroups[i].GroupNameSymbol() )
 				return i;
@@ -2454,7 +2447,7 @@ int VOX_GroupIndexFromName( const char *pGroupName )
 //-----------------------------------------------------------------------------
 const char *VOX_GroupNameFromIndex( int groupIndex )
 {
-	if ( groupIndex >= 0 && groupIndex < g_SentenceGroups.Size() )
+	if ( groupIndex >= 0 && groupIndex < g_SentenceGroups.Count() )
 		return g_SentenceGroups[groupIndex].GroupName();
 
 	return NULL;
@@ -2471,7 +2464,7 @@ int VOX_GroupPickSequential( int isentenceg, char *szfound, int szfoundLen, int 
 	const char *szgroupname;
 	unsigned char count;
 	
-	if (isentenceg < 0 || isentenceg > g_SentenceGroups.Size())
+	if (isentenceg < 0 || isentenceg > g_SentenceGroups.Count())
 		return -1;
 
 	szgroupname = g_SentenceGroups[isentenceg].GroupName();
@@ -2516,7 +2509,7 @@ int VOX_GroupPick( int isentenceg, char *szfound, int strLen )
 	unsigned char ipick=0;
 	int ffound = FALSE;
 	
-	if (isentenceg < 0 || isentenceg > g_SentenceGroups.Size())
+	if (isentenceg < 0 || isentenceg > g_SentenceGroups.Count())
 		return -1;
 
 	szgroupname = g_SentenceGroups[isentenceg].GroupName();
@@ -2604,7 +2597,7 @@ void VOX_ListMarkFileLoaded( const char *psentenceFileName )
 	filelist_t	*pEntry;
 	char		*pName;
 
-	pEntry = (filelist_t *)malloc( sizeof(filelist_t) + strlen( psentenceFileName ) + 1);
+	pEntry = (filelist_t *)malloc( sizeof(filelist_t) + V_strlen( psentenceFileName ) + 1);
 
 	if ( pEntry )
 	{
@@ -2622,21 +2615,21 @@ void VOX_ListMarkFileLoaded( const char *psentenceFileName )
 void VOX_CompactSentenceFile()
 {
 	int totalMem = 0;
-	int i;
+	intp i;
 	for ( i = 0; i < g_Sentences.Count(); i++ )
 	{
-		int len = Q_strlen( g_Sentences[i].pName ) + 1;
+		intp len = Q_strlen( g_Sentences[i].pName ) + 1;
 		const char *pData = g_Sentences[i].pName + len;
-		int dataLen = Q_strlen( pData ) + 1;
+		intp dataLen = Q_strlen( pData ) + 1;
 		totalMem += len + dataLen;
 	}
 	g_SentenceFile.EnsureCount( totalMem );
 	totalMem = 0;
 	for ( i = 0; i < g_Sentences.Count(); i++ )
 	{
-		int len = Q_strlen( g_Sentences[i].pName ) + 1;
+		intp len = Q_strlen( g_Sentences[i].pName ) + 1;
 		const char *pData = g_Sentences[i].pName + len;
-		int dataLen = Q_strlen( pData ) + 1;
+		intp dataLen = Q_strlen( pData ) + 1;
 		char *pDest = &g_SentenceFile[totalMem];
 		memcpy( pDest, g_Sentences[i].pName, len + dataLen );
 		g_Sentences[i].pName = pDest;
@@ -2723,7 +2716,7 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 		// skip entire line if first char is /
 		if (*pch != '/')
 		{
-			int addIndex = g_Sentences.AddToTail();
+			auto addIndex = g_Sentences.AddToTail();
 			sentence_t *pSentence = &g_Sentences[addIndex];
 			pName = pch;
 			pSentence->pName = pch;
@@ -2758,7 +2751,7 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 		{
 			// Add a new group or increment count of the existing one
 			VOX_GroupAdd( pName );
-			int index = g_Sentences.Size()-1;
+			int index = g_Sentences.Count()-1;
 			// The current sentence has an index of count-1
 			VOX_ParseLineCommands( pSentenceData, index );
 
@@ -2783,13 +2776,13 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 //-----------------------------------------------------------------------------
 int VOX_SentenceCount( void )
 {
-	return g_Sentences.Size();
+	return g_Sentences.Count();
 }
 
 
 float VOX_SentenceLength( int sentence_num )
 {
-	if ( sentence_num < 0 || sentence_num > g_Sentences.Size()-1 )
+	if ( sentence_num < 0 || sentence_num > g_Sentences.Count()-1 )
 		return 0.0f;
 	
 	return g_Sentences[ sentence_num ].length;
@@ -2817,7 +2810,7 @@ char *VOX_LookupString(const char *pSentenceName, int *psentencenum, bool *pbEmi
 	}
 
 	int i;
-	int c = g_Sentences.Size();
+	int c = g_Sentences.Count();
 	for (i = 0; i < c; i++)
 	{
 		char const *name = g_Sentences[i].pName;
@@ -2854,7 +2847,7 @@ char *VOX_LookupString(const char *pSentenceName, int *psentencenum, bool *pbEmi
 // Abstraction for sentence name array
 const char *VOX_SentenceNameFromIndex( int sentencenum )
 {
-	if ( sentencenum < g_Sentences.Size() )
+	if ( sentencenum < g_Sentences.Count() )
 		return g_Sentences[sentencenum].pName;
 	return NULL;
 }

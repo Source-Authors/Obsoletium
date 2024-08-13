@@ -79,7 +79,7 @@ public:
 	virtual bool	ShouldLoopDemos() = 0;		// if we're in "startdemos" - should we loop?
 	virtual void	OnLastDemoInLoopPlayed() = 0;	// Last demo of "startdemos" just completed
 
-	virtual bool	IsLoading( void ) = 0; // true if demo is currently loading
+	virtual bool	IsLoading( void ) const = 0; // true if demo is currently loading
 };
 
 extern IDemoPlayer *demoplayer;	// reference to current demo player

@@ -532,7 +532,7 @@ bool CompareCharArray(DTTestClient *pClient, DTTestServer *pServer)
 }
 void RandomlyChangeCharArray(DTTestServer *pServer)
 {
-	for(int i=0; i < (sizeof(pServer->m_CharArray) / sizeof(pServer->m_CharArray[0])); i++)
+	for(size_t i=0; i < std::size(pServer->m_CharArray); i++)
 		pServer->m_CharArray[i] = (char)rand();
 }
 
@@ -748,7 +748,7 @@ VarTestInfo g_VarTestInfos[] =
 	{CompareIntArray,		RandomlyChangeIntArray},
 	{CompareSubArray,		RandomlyChangeSubArray}
 };
-#define NUMVARTESTINFOS	(sizeof(g_VarTestInfos) / sizeof(g_VarTestInfos[0]))
+#define NUMVARTESTINFOS	(std::size(g_VarTestInfos))
 
 
 int g_GuardOffsets[] = 
@@ -792,11 +792,11 @@ void CheckGuardBytes( DTTestClient *pClient )
 
 bool CompareDTTest(DTTestClient *pClient, DTTestServer *pServer)
 {
-	for(int iVar=0; iVar < NUMVARTESTINFOS; iVar++)
+	for( auto& i : g_VarTestInfos )
 	{
-		if(!g_VarTestInfos[iVar].m_CompareFn(pClient, pServer))
+		if(!i.m_CompareFn(pClient, pServer))
 		{
-			Assert( !"CompareDTTest: comparison failed. There is a new datatable bug." );
+			AssertMsg( false, "CompareDTTest: comparison failed. There is a new datatable bug." );
 			return false;
 		}
 	}
@@ -860,7 +860,7 @@ void RunDataTableTest()
 	bf_write bfWrite( "RunDataTableTest->commBuf", commBuf, sizeof(commBuf) );
 	if( !WriteSendTable_R( pSendTable, bfWrite, true ) )
 	{
-		Assert( !"RunDataTableTest: SendTable_SendInfo failed." );
+		AssertMsg( false, "RunDataTableTest: SendTable_SendInfo failed." );
 	}	
 	bfWrite.WriteOneBit(0);
 
@@ -873,7 +873,7 @@ void RunDataTableTest()
 
 		if( !RecvTable_RecvClassInfos( &bfRead, bNeedsDecoder ) )
 		{
-			Assert( !"RunDataTableTest: RecvTable_ReadInfos failed." );
+			AssertMsg( false, "RunDataTableTest: RecvTable_ReadInfos failed." );
 			continue;
 		}
 	}
@@ -912,13 +912,13 @@ void RunDataTableTest()
 		if( (iIteration & 3) == 0 )
 		{
 			// Every once in a while, change ALL the properties.
-			for( int iChange=0; iChange < NUMVARTESTINFOS; iChange++ )
-				g_VarTestInfos[iChange].m_ChangeFn( &dtServer );
+			for( auto &i : g_VarTestInfos )
+				i.m_ChangeFn( &dtServer );
 		}
 		else
 		{
-			int nChanges = 3 + rand() % NUMVARTESTINFOS;
-			for( int iChange=0; iChange < nChanges; iChange++ )
+			intp nChanges = 3 + rand() % static_cast<int>(NUMVARTESTINFOS);
+			for( intp iChange=0; iChange < nChanges; iChange++ )
 			{
 				int iInfo = rand() % NUMVARTESTINFOS;
 				g_VarTestInfos[iInfo].m_ChangeFn( &dtServer );

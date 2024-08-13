@@ -48,9 +48,9 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CReplayDemoPlayer, IReplayDemoPlayer, INTERFA
 CReplayDemoPlayer::CReplayDemoPlayer()
 :	m_pMovie( NULL ),
 	m_nCurReplayIndex( 0 ),
-	m_flStartRenderTime( 0.0f ),
 	m_bInStartPlayback( false ),
 	m_bStopCommandEncountered( false ),
+	m_flStartRenderTime( 0.0f ),
 	m_bFullSignonStateReached( false )
 {
 }
@@ -432,7 +432,7 @@ void CReplayDemoPlayer::StopPlayback()
 		m_pMovie->SetIsRendered( true );
 		
 		// Compute the time it took to render
-		m_pMovie->SetRenderTime( MAX( 0, realtime - m_flStartRenderTime ) );
+		m_pMovie->SetRenderTime( MAX( 0.0f, realtime - m_flStartRenderTime ) );
 
 		// Sets the recorded date & time of the movie
 		m_pMovie->CaptureRecordTime();
@@ -458,7 +458,7 @@ void CReplayDemoPlayer::StopPlayback()
 		CReplayPerformance *pSavedPerformance = g_pReplayPerformanceController->GetSavedPerformance();
 
 		// Get the index - FindPerformance() will set the output index to -1 if it can't find the performance
-		int iHighlightPerformance;
+		intp iHighlightPerformance;
 		pReplay->FindPerformance( pSavedPerformance, iHighlightPerformance );
 
 		// Notify UI that playback is complete

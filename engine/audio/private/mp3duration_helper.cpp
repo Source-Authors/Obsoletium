@@ -37,7 +37,7 @@ float GetMP3Duration_Helper( char const *filename )
 	char fn[ 512 ];
 	Q_snprintf( fn, sizeof( fn ), "sound/%s", PSkipSoundChars( filename ) );
 
-	MP3Duration_t search = {0};
+	MP3Duration_t search = {};
 	search.h = g_pFullFileSystem->FindOrAddFileName( fn );
 	
 	auto idx = g_MP3Durations.Find( search );

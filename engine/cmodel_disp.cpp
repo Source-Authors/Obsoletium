@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <float.h>
 #include "cmodel_engine.h"
 #include "dispcoll_common.h"
 #include "cmodel_private.h"
@@ -19,7 +18,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-int g_DispCollTreeCount = 0;
+intp g_DispCollTreeCount = 0;
 CDispCollTree *g_pDispCollTrees = NULL;
 alignedbbox_t *g_pDispBounds = NULL;
 class CVirtualTerrain;
@@ -59,14 +58,14 @@ public:
 		// size both of these to the size of the array since there is exactly one per element
 		m_leafCount.SetCount( g_DispCollTreeCount );
 		m_firstIndex.SetCount( g_DispCollTreeCount );
-		for ( int i = 0; i < g_DispCollTreeCount; i++ )
+		for ( intp i = 0; i < g_DispCollTreeCount; i++ )
 		{
 			m_leafCount[i] = 0;
 			m_firstIndex[i] = -1;
 		}
 	}
 
-	void BuildLeafListForDisplacement( int index )
+	void BuildLeafListForDisplacement( intp index )
 	{
 		// get tree and see if it is real (power != 0)
 		CDispCollTree *pDispTree = &g_pDispCollTrees[index];
@@ -196,7 +195,7 @@ void CM_DispTreeLeafnum( CCollisionBSPData *pBSPData )
 	//
 	CDispLeafBuilder leafBuilder( pBSPData );
 
-	for ( int i = 0; i < g_DispCollTreeCount; i++ )
+	for ( intp i = 0; i < g_DispCollTreeCount; i++ )
 	{
 		leafBuilder.BuildLeafListForDisplacement( i );
 	}
@@ -227,7 +226,7 @@ public:
 	// Fill out the meshlist for this terrain patch
 	virtual void GetVirtualMesh( void *userData, virtualmeshlist_t *pList )
 	{
-		int index = (int)userData;
+		intp index = (intp)userData;
 		Assert(index >= 0 && index < g_DispCollTreeCount );
 		g_pDispCollTrees[index].GetVirtualMeshList( pList );
 		pList->pHull = NULL;
@@ -242,14 +241,14 @@ public:
 	// returns the bounds for the terrain patch
 	virtual void GetWorldspaceBounds( void *userData, Vector *pMins, Vector *pMaxs )
 	{
-		int index = (int)userData;
+		intp index = (intp)userData;
 		*pMins = g_pDispBounds[index].mins;
 		*pMaxs = g_pDispBounds[index].maxs;
 	}
 	// Query against the AABB tree to find the list of triangles for this patch in a sphere
 	virtual void GetTrianglesInSphere( void *userData, const Vector &center, float radius, virtualmeshtrianglelist_t *pList )
 	{
-		int index = (int)userData;
+		intp index = (intp)userData;
 		pList->triangleCount = g_pDispCollTrees[index].AABBTree_GetTrisInSphere( center, radius, pList->triangleIndices, ARRAYSIZE(pList->triangleIndices) );
 	}
 	void LevelInit( dphysdisp_t *pLump, int lumpSize )
@@ -300,7 +299,7 @@ static CVirtualTerrain g_VirtualTerrain;
 static CUtlVector<CPhysCollide *> g_TerrainList;
 
 // Find or create virtual terrain collision model.  Note that these will be shared by client & server
-CPhysCollide *CM_PhysCollideForDisp( int index )
+CPhysCollide *CM_PhysCollideForDisp( intp index )
 {
 	if ( index < 0 || index >= g_DispCollTreeCount )
 		return NULL;
@@ -308,7 +307,7 @@ CPhysCollide *CM_PhysCollideForDisp( int index )
 	return g_TerrainList[index];
 }
 
-int CM_SurfacepropsForDisp( int index )
+int CM_SurfacepropsForDisp( intp index )
 {
 	return g_pDispCollTrees[index].GetSurfaceProps(0);
 }
@@ -317,7 +316,7 @@ void CM_CreateDispPhysCollide( dphysdisp_t *pDispLump, int dispLumpSize )
 {
 	g_VirtualTerrain.LevelInit(pDispLump, dispLumpSize);
 	g_TerrainList.SetCount( g_DispCollTreeCount );
-	for ( int i = 0; i < g_DispCollTreeCount; i++ )
+	for ( intp i = 0; i < g_DispCollTreeCount; i++ )
 	{
 		// Don't create a physics collision model for displacements that have been tagged as such.
 		CDispCollTree *pDispTree = &g_pDispCollTrees[i];

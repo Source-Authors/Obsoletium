@@ -159,7 +159,7 @@ public:
 	virtual unsigned char			ComputeViewScreenFade( const Vector &vecAbsOrigin, float flRadius, float flFadeScale ) const = 0;
 
 	// both client and server
-	virtual int						GetAutoplayList( const studiohdr_t *pStudioHdr, unsigned short **pAutoplayList ) const = 0;
+	virtual intp					GetAutoplayList( const studiohdr_t *pStudioHdr, unsigned short **pAutoplayList ) const = 0;
 
 	// Gets a virtual terrain collision model (creates if necessary)
 	// NOTE: This may return NULL if the terrain model cannot be virtualized
@@ -168,13 +168,13 @@ public:
 	virtual bool					IsUsingFBTexture( const model_t *model, int nSkin, int nBody, void /*IClientRenderable*/ *pClientRenderable ) const = 0;
 
 	// Obsolete methods. These are left in to maintain binary compatibility with clients using the IVModelInfo old version.
-	virtual const model_t			*FindOrLoadModel( const char *name ) { Warning( "IVModelInfo::FindOrLoadModel is now obsolte.\n" ); return NULL; }
+	virtual const model_t			*FindOrLoadModel( const char * ) { Warning( "IVModelInfo::FindOrLoadModel is now obsolte.\n" ); return NULL; }
 	virtual void					InitDynamicModels( ) { Warning( "IVModelInfo::InitDynamicModels is now obsolte.\n" ); }
 	virtual void					ShutdownDynamicModels( ) { Warning( "IVModelInfo::ShutdownDynamicModels is now obsolte.\n" ); }
-	virtual void					AddDynamicModel( const char *name, int nModelIndex = -1 ) { Warning( "IVModelInfo::AddDynamicModel is now obsolte.\n" ); }
-	virtual void					ReferenceModel( int modelindex ) { Warning( "IVModelInfo::ReferenceModel is now obsolte.\n" ); }
-	virtual void					UnreferenceModel( int modelindex ) { Warning( "IVModelInfo::UnreferenceModel is now obsolte.\n" ); }
-	virtual void					CleanupDynamicModels( bool bForce = false ) { Warning( "IVModelInfo::CleanupDynamicModels is now obsolte.\n" ); }
+	virtual void					AddDynamicModel( const char *, [[maybe_unused]] int nModelIndex = -1 ) { Warning( "IVModelInfo::AddDynamicModel is now obsolte.\n" ); }
+	virtual void					ReferenceModel( int ) { Warning( "IVModelInfo::ReferenceModel is now obsolte.\n" ); }
+	virtual void					UnreferenceModel( int ) { Warning( "IVModelInfo::UnreferenceModel is now obsolte.\n" ); }
+	virtual void					CleanupDynamicModels( [[maybe_unused]] bool bForce = false ) { Warning( "IVModelInfo::CleanupDynamicModels is now obsolte.\n" ); }
 
 	virtual MDLHandle_t				GetCacheHandle( const model_t *model ) const = 0;
 

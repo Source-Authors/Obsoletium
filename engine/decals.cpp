@@ -81,17 +81,17 @@ void Draw_DecalSetName( int decal, char *name )
 	while ( decal >= g_DecalLookup.Count() )
 	{
 		MEM_ALLOC_CREDIT();
-		int idx = g_DecalLookup.AddToTail();
+		intp idx = g_DecalLookup.AddToTail();
 		g_DecalLookup[idx] = g_DecalDictionary.InvalidIndex();
 	}
 
 	FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( name );
-	int lookup = g_DecalDictionary.Find( fnHandle );
+	auto lookup = g_DecalDictionary.Find( fnHandle );
 	if ( lookup == g_DecalDictionary.InvalidIndex() )
 	{
 		DecalEntry entry;
 #ifdef _DEBUG
-		int len = strlen(name) + 1;
+		intp len = V_strlen(name) + 1;
 		entry.m_pDebugName = new char[len];
 		memcpy( entry.m_pDebugName, name, len );
 #endif

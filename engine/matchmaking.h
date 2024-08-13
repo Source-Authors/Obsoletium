@@ -178,13 +178,13 @@ public:
 	PROCESS_MM_MESSAGE( Heartbeat ) { return true; }
 
 	// (Not used)
-	virtual void ConnectionClosing(const char *reason) {};							// network channel is being closed by remote site
-	virtual void ConnectionCrashed(const char *reason) {};							// network error occurred
-	virtual void PacketStart(int incoming_sequence, int outgoing_acknowledged) {};	// called each time a new packet arrived
-	virtual void FileRequested(const char *fileName, unsigned int transferID ) {};	// other side request a file for download
-	virtual void FileReceived(const char *fileName, unsigned int transferID ) {};	// we received a file
-	virtual void FileDenied(const char *fileName, unsigned int transferID ) {};		// a file request was denied by other side
-	virtual void FileSent(const char *fileName, unsigned int transferID ) {};		// a file was sent
+	virtual void ConnectionClosing(const char *) {};							// network channel is being closed by remote site
+	virtual void ConnectionCrashed(const char *) {};							// network error occurred
+	virtual void PacketStart(int, int) {};	// called each time a new packet arrived
+	virtual void FileRequested(const char *, unsigned int ) {};	// other side request a file for download
+	virtual void FileReceived(const char *, unsigned int ) {};	// we received a file
+	virtual void FileDenied(const char *, unsigned int ) {};		// a file request was denied by other side
+	virtual void FileSent(const char *, unsigned int ) {};		// a file was sent
 
 	// Debugging helpers
 	void	ShowSessionInfo();

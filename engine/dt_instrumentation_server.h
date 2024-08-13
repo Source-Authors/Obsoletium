@@ -82,6 +82,11 @@ inline CServerDTITimer::CServerDTITimer( const SendTable *pTable, ServerDTITimer
 		m_Type = type;
 		m_Timer.Start();
 	}
+	else
+	{
+		m_pTable = nullptr;
+		m_Type = SERVERDTI_CALCDELTA;
+	}
 }
 
 inline CServerDTITimer::~CServerDTITimer()

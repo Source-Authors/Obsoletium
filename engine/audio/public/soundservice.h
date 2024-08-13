@@ -40,7 +40,7 @@ public:
 	// Allocate a block of memory that will be automatically
 	// cleaned up on level change
 	//---------------------------------
-	virtual void *LevelAlloc( int nBytes, const char *pszTag ) = 0;
+	virtual void *LevelAlloc( unsigned nBytes, const char *pszTag ) = 0;
 
 	//---------------------------------
 	// Notification that someone called S_ExtraUpdate()

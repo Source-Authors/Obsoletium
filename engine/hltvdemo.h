@@ -28,14 +28,14 @@ public:
 
 	void	StartRecording( const char *filename, bool bContinuously );
 	void	StartAutoRecording();
-	void	SetSignonState( int state ) {}; // not need by HLTV recorder
+	void	SetSignonState( int ) {}; // not need by HLTV recorder
 	bool	IsRecording( void );
 	void	PauseRecording( void ) {};
 	void	ResumeRecording( void ) {};
 	void	StopRecording( void );
 	
 	void	RecordCommand( const char *cmdstring );
-	void	RecordUserInput( int cmdnumber ) {} ;  // not need by HLTV recorder
+	void	RecordUserInput( int ) {} ;  // not need by HLTV recorder
 	void	RecordMessages( bf_read &data, int bits );
 	void	RecordPacket( void ); 
 	void	RecordServerClasses( ServerClass *pClasses );

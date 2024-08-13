@@ -147,8 +147,8 @@ typedef struct
 #define MAX_USER_MAXROUTABLE_SIZE	MAX_ROUTABLE_PAYLOAD
 
 
-#define MAX_SPLIT_SIZE	(MAX_USER_MAXROUTABLE_SIZE - sizeof( SPLITPACKET ))
-#define MIN_SPLIT_SIZE	(MIN_USER_MAXROUTABLE_SIZE - sizeof( SPLITPACKET ))
+#define MAX_SPLIT_SIZE	(MAX_USER_MAXROUTABLE_SIZE - static_cast<int>(sizeof( SPLITPACKET )))
+#define MIN_SPLIT_SIZE	(MIN_USER_MAXROUTABLE_SIZE - static_cast<int>(sizeof( SPLITPACKET )))
 
 // For metering out splitpackets, don't do them too fast as remote UDP socket will drop some payloads causing them to always fail to be reconstituted
 // This problem is largely solved by increasing the buffer sizes for UDP sockets on Windows
@@ -1114,8 +1114,7 @@ public:
 	{
 		memset( &from, 0, sizeof( from ) );
 
-		unsigned i;
-		for ( i = 0; i < MAX_SPLITPACKET_SPLITS; i++ )
+		for ( int i = 0; i < MAX_SPLITPACKET_SPLITS; i++ )
 		{
 			splitflags[ i ] = -1;
 		}
@@ -1235,7 +1234,7 @@ bool NET_GetLong( const int sock, netpacket_t *packet )
 	short			packetID;
 	SPLITPACKET		*pHeader;
 	
-	if ( packet->size < sizeof(SPLITPACKET) ) 
+	if ( packet->size < static_cast<int>(sizeof(SPLITPACKET)) ) 
 	{
 		Msg( "Invalid split packet length %i\n", packet->size );
 		return false;
@@ -1344,7 +1343,7 @@ bool NET_GetLong( const int sock, netpacket_t *packet )
 	if ( entry->netsplit.splitCount <= 0 )
 	{
 		entry->netsplit.currentSequence = -1;	// Clear packet
-		if ( entry->netsplit.totalSize > sizeof(entry->netsplit.buffer) )
+		if ( entry->netsplit.totalSize > static_cast<int>(sizeof(entry->netsplit.buffer)) )
 		{
 			Msg("Split packet too large! %d bytes from %s\n", entry->netsplit.totalSize, packet->from.ToString() );
 			return false;
@@ -1463,7 +1462,7 @@ bool NET_ReceiveDatagram ( const int sock, netpacket_t * packet )
 
 					// Decompress it
 					unsigned unActualDecompressedSize = (unsigned)nDecompressedVoice;
-					if ( !COM_BufferToBufferDecompress( (char*)bufVoice.Base(), &unActualDecompressedSize, pVoice, nCompressedSize ) )
+					if ( !COM_BufferToBufferDecompress( bufVoice.Base(), &unActualDecompressedSize, pVoice, nCompressedSize ) )
 						return false;
 					Assert( unActualDecompressedSize == (unsigned)nDecompressedVoice );
 
@@ -1507,7 +1506,7 @@ bool NET_ReceiveDatagram ( const int sock, netpacket_t * packet )
 				memDecompressed.EnsureCapacity( actualSize );
 
 				unsigned uDecompressedSize = (unsigned)actualSize;
-				COM_BufferToBufferDecompress( (char*)memDecompressed.Base(), &uDecompressedSize, pCompressedData, nCompressedDataSize );
+				COM_BufferToBufferDecompress( memDecompressed.Base(), &uDecompressedSize, pCompressedData, nCompressedDataSize );
 				if ( uDecompressedSize == 0 || ((unsigned int)actualSize) != uDecompressedSize )
 				{
 					if ( net_showudp.GetBool() )
@@ -1809,7 +1808,7 @@ void NET_ProcessListen(int sock)
 	}
 }
 
-struct NetScratchBuffer_t : TSLNodeBase_t
+struct TSLIST_NODE_ALIGN NetScratchBuffer_t : CAlignedNewDelete<TSLIST_NODE_ALIGNMENT, TSLNodeBase_t>
 {
 	byte data[NET_MAX_MESSAGE];
 };
@@ -2400,7 +2399,7 @@ int NET_SendPacket ( INetChannel *chan, int sock,  const netadr_t &to, const uns
 		unsigned int nCompressedLength = COM_GetIdealDestinationCompressionBufferSize_Snappy( pVoicePayload->GetNumBytesWritten() );
 		memCompressedVoice.EnsureCapacity( nCompressedLength + sizeof( unsigned short ) );
 
-		byte *pVoice = (byte *)memCompressedVoice.Base();
+		uint8 *pVoice = memCompressedVoice.Base();
 
 		unsigned short usVoiceBits = pVoicePayload->GetNumBitsWritten();
 		*( unsigned short * )pVoice = LittleShort( usVoiceBits );
@@ -2440,7 +2439,7 @@ int NET_SendPacket ( INetChannel *chan, int sock,  const netadr_t &to, const uns
 
 			if ( pVoicePayload && pVoicePayload->GetNumBitsWritten() > 0 )
 			{
-				byte *pVoice = (byte *)memCompressed.Base() + length;
+				uint8 *pVoice = memCompressed.Base() + length;
 				Q_memcpy( pVoice, memCompressedVoice.Base(), nVoiceBytes );
 			}
 			
@@ -2456,7 +2455,7 @@ int NET_SendPacket ( INetChannel *chan, int sock,  const netadr_t &to, const uns
 	{
 		memCompressed.EnsureCapacity( length + nVoiceBytes );
 
-		byte *pVoice = (byte *)memCompressed.Base();
+		uint8 *pVoice = memCompressed.Base();
 		Q_memcpy( pVoice, (const void *)data, length );
 		pVoice += length;
 		Q_memcpy( pVoice, memCompressedVoice.Base(), nVoiceBytes );
@@ -2518,7 +2517,7 @@ void NET_OutOfBandPrintf(int sock, const netadr_t &adr, const char *format, ...)
 	Q_vsnprintf (string+4, sizeof( string ) - 4, format,argptr);
 	va_end (argptr);
 
-	int length = Q_strlen(string+4) + 5;
+	intp length = Q_strlen(string+4) + 5;
 
 	NET_SendPacket ( NULL, sock, adr, (byte *)string, length );
 }

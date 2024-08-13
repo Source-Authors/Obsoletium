@@ -81,7 +81,7 @@ public:
 						// Add ALL properties under this proxy because the previous state didn't have any of them.
 						for ( int i=0; i < pNode->m_nRecursiveProps; i++ )
 						{
-							if ( m_nNewProxyProps < ARRAYSIZE( m_NewProxyProps ) )
+							if ( m_nNewProxyProps < ssize( m_NewProxyProps ) )
 							{
 								m_NewProxyProps[m_nNewProxyProps] = pNode->m_iFirstRecursiveProp + i;
 							}

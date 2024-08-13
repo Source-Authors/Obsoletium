@@ -82,8 +82,8 @@ vcollide_t *CM_GetVCollide( int modelIndex );
 vcollide_t* CM_VCollideForModel( int modelindex, const model_t* pModel );
 
 // gets a virtual physcollide for a displacement
-CPhysCollide *CM_PhysCollideForDisp( int index );
-int			CM_SurfacepropsForDisp( int index );
+CPhysCollide *CM_PhysCollideForDisp( intp index );
+int			CM_SurfacepropsForDisp( intp index );
 void		CM_CreateDispPhysCollide( dphysdisp_t *pDispLump, int dispLumpSize );
 void		CM_DestroyDispPhysCollide();
 

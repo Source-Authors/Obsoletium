@@ -117,25 +117,8 @@ struct demosmoothing_t
 		vectarget.Init();
 	}
 
-	demosmoothing_t&	operator=(const demosmoothing_t& src )
-	{
-		if ( this == &src )
-			return *this;
-
-		file_offset = src.file_offset;
-		frametick = src.frametick;
-		selected = src.selected;
-		samplepoint = src.samplepoint;
-		vecmoved = src.vecmoved;
-		angmoved = src.angmoved;
-
-		targetpoint = src.targetpoint;
-		vectarget = src.vectarget;
-
-		info = src.info;
-
-		return *this;
-	}
+	demosmoothing_t(const demosmoothing_t& src ) = default;
+	demosmoothing_t& operator=(const demosmoothing_t& src ) = default;
 
 	int					file_offset;
 

@@ -1357,7 +1357,7 @@ void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 		// If it's <100 or so, we should be fine
 		if (lump.m_Flags & STATIC_PROP_FLAG_FADES)
 		{
-			int idx = m_StaticPropFade.AddToTail();
+			intp idx = m_StaticPropFade.AddToTail();
 			m_StaticProps[i].SetFadeIndex( (unsigned short)idx );
 			StaticPropFade_t& fade = m_StaticPropFade[idx];
 			fade.m_Model = i;
@@ -1438,7 +1438,7 @@ void CStaticPropMgr::UnserializeStaticProps()
 	COM_TimestampedLog( "UnserializeStaticProps - start");
 
 	MEM_ALLOC_CREDIT();
-	CUtlBuffer buf( 0, size );
+	CUtlBuffer buf( (intp)0, size );
 	if ( Mod_LoadGameLump( GAMELUMP_STATIC_PROPS, buf.PeekPut(), size ))
 	{
 		buf.SeekPut( CUtlBuffer::SEEK_HEAD, size );
@@ -2235,7 +2235,7 @@ void CStaticPropMgr::AddColorDecalToStaticProp( Vector const& rayStart, Vector c
 {
 #ifndef SWDS
 	// Invalid static prop? Blow it off! 
-	if (staticPropIndex >= m_StaticProps.Size())
+	if (staticPropIndex >= m_StaticProps.Count())
 	{
 		memset( &tr, 0, sizeof(trace_t) );
 		tr.fraction = 1.0f;
@@ -2321,7 +2321,7 @@ void CStaticPropMgr::GetStaticPropMaterialColorAndLighting( trace_t* pTrace,
 {
 #ifndef SWDS
 	// Invalid static prop? Blow it off! 
-	if (staticPropIndex >= m_StaticProps.Size())
+	if (staticPropIndex >= m_StaticProps.Count())
 	{
 		lighting.Init( 0, 0, 0 );
 		matColor.Init( 1, 1, 1 );

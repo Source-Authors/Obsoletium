@@ -41,16 +41,16 @@ typedef float (*EASEFUNC)( float t );
 //-----------------------------------------------------------------------------
 class CDemoSmootherPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CDemoSmootherPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDemoSmootherPanel, vgui::Frame );
 
 public:
 	CDemoSmootherPanel( vgui::Panel *parent );
 	~CDemoSmootherPanel();
 
-	virtual void OnTick();
+	void OnTick() override;
 
 	// Command issued
-	virtual void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 
 	void		OnVDMChanged( void );
 
@@ -58,7 +58,7 @@ public:
 
 	virtual bool		OverrideView( democmdinfo_t& info, int tick );
 
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	virtual void	DrawDebuggingInfo(  int frame, float elapsed );
 

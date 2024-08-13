@@ -240,7 +240,7 @@ inline CWingedEdgeList::WingedEdge_t &CWingedEdgeList::WingedEdge( int i )
 //-----------------------------------------------------------------------------
 inline int CWingedEdgeList::AddEdge( )
 {
-	int i = m_WingedEdges.AddToTail();
+	intp i = m_WingedEdges.AddToTail();
 
 	WingedEdge_t &newEdge = m_WingedEdges[i];
 	newEdge.m_pPrevActiveEdge = NULL;
@@ -260,7 +260,7 @@ int CWingedEdgeList::AddEdge( const Vector &vecStartVert, const Vector &vecEndVe
 	if (dy == 0.0f)
 		return -1;
 
-	int i = m_WingedEdges.AddToTail();
+	intp i = m_WingedEdges.AddToTail();
 	WingedEdge_t &newEdge = m_WingedEdges[i];
 
 	newEdge.m_flOODy = 1.0f / dy;
@@ -281,7 +281,7 @@ int CWingedEdgeList::AddEdge( const Vector &vecStartVert, const Vector &vecEndVe
 //-----------------------------------------------------------------------------
 int CWingedEdgeList::AddSurface( const cplane_t &plane )
 {
-	int i = m_Surfaces.AddToTail();
+	intp i = m_Surfaces.AddToTail();
 	m_Surfaces[i].m_Plane = plane;
 	return i;
 }
@@ -719,8 +719,8 @@ void CWingedEdgeList::QueueVisualization( unsigned char *pColor )
 	if ( !r_visocclusion.GetInt() )
 		return;
 
-	int nFirst = g_EdgeVisualization.AddMultipleToTail( m_WingedEdges.Count() );
-	for ( int i = m_WingedEdges.Count(); --i >= 0; )
+	intp nFirst = g_EdgeVisualization.AddMultipleToTail( m_WingedEdges.Count() );
+	for ( intp i = m_WingedEdges.Count(); --i >= 0; )
 	{
 		WingedEdge_t *pEdge = &m_WingedEdges[i];
 		EdgeVisualizationInfo_t &info = g_EdgeVisualization[nFirst + i];
@@ -1010,7 +1010,7 @@ bool CEdgeList::EdgeLess::Less( const unsigned short& src1, const unsigned short
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CEdgeList::CEdgeList() : m_Edges( (intp)0, 32 ), m_OrigSortIndices( 0, 32 )
+CEdgeList::CEdgeList() : m_Edges( (intp)0, 32 ), m_OrigSortIndices( (intp)0, 32 )
 {
 	m_OrigSortIndices.SetLessContext( &m_Edges );
 
@@ -1190,7 +1190,7 @@ inline void CEdgeList::ComputePointAlongEdge( const Edge_t *pEdge, int nSurfID, 
 //-----------------------------------------------------------------------------
 int CEdgeList::AddSurface( const cplane_t &plane )
 {
-	int nIndex = m_Surfaces.AddToTail();
+	intp nIndex = m_Surfaces.AddToTail();
 
 	Surface_t &surf = m_Surfaces[nIndex];
 	surf.m_flOOz = 0.0f;
@@ -1223,7 +1223,7 @@ void CEdgeList::AddEdge( Vector **ppEdgeVertices, int nSurfID )
 	if (dy == 0.0f)
 		return;
 
-	int i = m_Edges.AddToTail();
+	intp i = m_Edges.AddToTail();
 	Edge_t &newEdge = m_Edges[i];
 
 	newEdge.m_flOODy = 1.0f / dy;
@@ -1971,8 +1971,8 @@ void CEdgeList::QueueVisualization( unsigned char *pColor )
 	if ( !r_visocclusion.GetInt() )
 		return;
 
-	int nFirst = g_EdgeVisualization.AddMultipleToTail( m_Edges.Count() );
-	for ( int i = m_Edges.Count(); --i >= 0; )
+	intp nFirst = g_EdgeVisualization.AddMultipleToTail( m_Edges.Count() );
+	for ( intp i = m_Edges.Count(); --i >= 0; )
 	{
 		EdgeVisualizationInfo_t &info = g_EdgeVisualization[nFirst + i];
 		info.m_vecPoint[0] = m_Edges[i].m_vecPosition;

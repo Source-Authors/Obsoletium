@@ -371,7 +371,7 @@ static void DumpConVars( DumpedConVarVector_t &conVars )
 		if ( ( !pName ) || ( !pVal ) )
 			continue;
 
-		int nIndex = conVars.AddToTail();
+		auto nIndex = conVars.AddToTail();
 		conVars[nIndex].m_Name.Set( pName );
 		conVars[nIndex].m_Value.Set( pVal );
 	}
@@ -870,9 +870,9 @@ private:
 
 					while ( pCur < pEnd )
 					{
-						const uint nBytesLeft = pEnd - pCur;
+						const size_t nBytesLeft = pEnd - pCur;
 
-						uint nNameLen = V_strlen( pCur );
+						size_t nNameLen = V_strlen( pCur );
 						if ( ( nNameLen + 1 ) >= nBytesLeft )
 						{
 							Warning( "CONCMDSRV: Failed parsing convar dump reply!\n" );
@@ -880,9 +880,9 @@ private:
 							return false;
 						}
 
-						uint nValLen = V_strlen( pCur + nNameLen + 1 );
+						size_t nValLen = V_strlen( pCur + nNameLen + 1 );
 						
-						uint nTotalLenInBytes = nNameLen + 1 + nValLen + 1;
+						size_t nTotalLenInBytes = nNameLen + 1 + nValLen + 1;
 						if ( nTotalLenInBytes > nBytesLeft )
 						{
 							Warning( "CONCMDSRV: Failed parsing convar dump reply!\n" );
@@ -890,14 +890,14 @@ private:
 							return false;
 						}
 
-						int nIndex = m_DumpedConVars.AddToTail();
+						auto nIndex = m_DumpedConVars.AddToTail();
 						m_DumpedConVars[nIndex].m_Name.Set( pCur );
 						m_DumpedConVars[nIndex].m_Value.Set( pCur + nNameLen + 1 );
 						
 						pCur += nTotalLenInBytes;
 					}
 
-					ConMsg( "Received convar dump reply from endpoint %i, %u total convars\n", m_nEndpointIndex, m_DumpedConVars.Count() );
+					ConMsg( "Received convar dump reply from endpoint %i, %zd total convars\n", m_nEndpointIndex, m_DumpedConVars.Count() );
 					
 					break;
 				}
@@ -1170,7 +1170,7 @@ public:
 		if ( !m_bInitialized )
 			return;
 
-		int n = V_strlen( pCmd );
+		intp n = V_strlen( pCmd );
 
 		char buf[4096];
 		if ( ( n >= 2 ) && ( pCmd[0] == '\"' ) && ( pCmd[ n - 1 ] == '\"' ) )
@@ -1185,7 +1185,7 @@ public:
 
 	void SendConCommandToClients( const char * pCmd, bool bExecLocally = false )
 	{
-		int n = V_strlen( pCmd );
+		intp n = V_strlen( pCmd );
 
 		char buf[4096];
 		if ( ( n >= 2 ) && ( pCmd[0] == '\"' ) && ( pCmd[ n - 1 ] == '\"' ) )
@@ -1320,7 +1320,7 @@ private:
 	{
 		uint8 buf[8192];
 
-		uint nStrLen = strlen( pCmd );
+		size_t nStrLen = strlen( pCmd );
 		const uint nMaxStrLen = sizeof( buf ) - cPacketHeaderSize;
 		nStrLen = MIN( nStrLen, nMaxStrLen );
 

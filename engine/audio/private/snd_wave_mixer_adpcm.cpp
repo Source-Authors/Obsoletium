@@ -396,7 +396,7 @@ bool CAudioMixerWaveADPCM::DecodeBlock( void )
 //			sampleCount - number of samples (or pairs)
 // Output : int - available samples (zero to stop decoding)
 //-----------------------------------------------------------------------------
-int CAudioMixerWaveADPCM::GetOutputData( void **pData, int sampleCount, char copyBuf[AUDIOSOURCE_COPYBUF_SIZE] )
+int CAudioMixerWaveADPCM::GetOutputData( void **pData, int sampleCount, char [AUDIOSOURCE_COPYBUF_SIZE] )
 {
 	if ( m_samplePosition >= m_sampleCount )
 	{

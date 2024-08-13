@@ -101,11 +101,11 @@ static bool ReslistLogLessFunc( CUtlString const &pLHS, CUtlString const &pRHS )
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
 CMapReslistGenerator::CMapReslistGenerator() : 
+	m_bAutoQuit( false ),
 	m_AlreadyWrittenFileNames( 0, 0, true ),
 	m_DeletionListWarnings( 0, 0, DefLessFunc( CUtlSymbol ) ),
-	m_EngineLog( 0, 0, ReslistLogLessFunc ),
 	m_MapLog( 0, 0, ReslistLogLessFunc ),
-	m_bAutoQuit( false )
+	m_EngineLog( 0, 0, ReslistLogLessFunc )
 {
 	MEM_ALLOC_CREDIT_CLASS();
 
@@ -151,7 +151,7 @@ void CMapReslistGenerator::BuildMapList()
 	}
 }
 
-bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile, const char *pMapFile, char *pSystemMsg, int *iCurrentMap )
+bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile, const char *pMapFile, const char *pSystemMsg, int *iCurrentMap )
 {
 	if ( !bUseMapListFile )
 	{
@@ -325,7 +325,7 @@ void CMapReslistGenerator::BuildEngineLogFromReslist()
 {
 	m_EngineLog.RemoveAll();
 
-	CUtlBuffer buffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFileSystem->ReadFile( CFmtStr( "%s\\%s", m_sResListDir.String(), ENGINE_RESLIST_FILE ), "DEFAULT_WRITE_PATH", buffer ) )
 	{
 		// does not exist

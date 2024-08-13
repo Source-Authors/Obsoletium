@@ -983,17 +983,17 @@ DECLARE_DEMOACTIONEDIT( DEMO_ACTION_PLAYCDTRACK_START, CBaseActionCDTrackStartDi
 //-----------------------------------------------------------------------------
 class CBaseActionPlaySoundStartDialog : public CBaseActionEditDialog
 {
-	DECLARE_CLASS_SIMPLE( CBaseActionPlaySoundStartDialog, CBaseActionEditDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseActionPlaySoundStartDialog, CBaseActionEditDialog );
 
 public:
 	CBaseActionPlaySoundStartDialog( CDemoEditorPanel *parent, CBaseDemoAction *action, bool newaction );
 
-	virtual void	Init( void );
+	void	Init( void ) override;
 
 	// Returns true if changes were effected
-	virtual bool	OnSaveChanges( void );
+	bool	OnSaveChanges( void ) override;
 
-	virtual void	OnCommand( char const *command );
+	void	OnCommand( char const *command ) override;
 
 private:
 	CDemoActionPlaySoundStart	*GetAction( void ) { return static_cast< CDemoActionPlaySoundStart * >( m_pAction ); }
@@ -1056,9 +1056,9 @@ void CBaseActionPlaySoundStartDialog::OnFileSelected( char const *fullpath )
 	Q_FixSlashes( relativepath );
 
 	char *soundname = relativepath;
-	if ( !Q_strnicmp( relativepath, "sound\\", strlen( "sound\\" ) ) )
+	if ( !Q_strnicmp( relativepath, "sound\\", ssize( "sound\\" ) - 1 ) )
 	{
-		soundname += strlen( "sound\\" );
+		soundname += ssize( "sound\\" ) - 1;
 	}
 
 	m_pSoundName->SetText( soundname );

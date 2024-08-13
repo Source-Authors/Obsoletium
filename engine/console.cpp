@@ -953,7 +953,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 
 	CNotifyText *current = NULL;
 
-	int slot = m_NotifyText.Count() - 1;
+	intp slot = m_NotifyText.Count() - 1;
 	if ( slot < 0 )
 	{
 		slot = m_NotifyText.AddToTail();

@@ -25,7 +25,7 @@ class CVProfile;
 
 class CProfileHierarchyPanel : public vgui::CTreeViewListControl 
 {
-	DECLARE_CLASS_SIMPLE( CProfileHierarchyPanel, vgui::CTreeViewListControl );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CProfileHierarchyPanel, vgui::CTreeViewListControl );
 
 public:
 
@@ -55,18 +55,18 @@ struct PanelEntry_t
 		CUtlVector< PanelEntry_t >	m_Columns;
 	};
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	virtual int AddItem( KeyValues *data, int parentItemIndex, ColumnPanels_t& columnPanels );
 	virtual void ModifyItem( KeyValues *data, int itemIndex );
 	virtual void SetItemColors( int id, const Color& fg, const Color& bg );
 	virtual void SetItemColumnColors( int id, int col, const Color& fg, const Color& bg );
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	virtual void RemoveAll();
 
-	virtual void	PostChildPaint();
+	void	PostChildPaint() override;
 
     virtual void ExpandItem(int itemIndex, bool bExpand);
 	virtual bool IsItemExpanded( int itemIndex );
@@ -94,7 +94,7 @@ public:
 //-----------------------------------------------------------------------------
 class CVProfPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CVProfPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CVProfPanel, vgui::Frame );
 
 public:
 	CVProfPanel( vgui::Panel *pParent, const char *pElementName );
@@ -107,11 +107,11 @@ public:
 	void UserCmd_HideVProf( void );
 
 	// Inherited from vgui::Frame
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void Close();
-	virtual void Paint();
-	virtual void OnTick( void );
-	virtual void OnCommand( const char *command );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void Close() override;
+	void Paint() override;
+	void OnTick( void ) override;
+	void OnCommand( const char *command ) override;
 
 	void ExpandAll( void );
 	void CollapseAll( void );
@@ -120,7 +120,7 @@ public:
 
 protected:
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 private:
 	MESSAGE_FUNC_PARAMS( OnTextChanged, "TextChanged", data );

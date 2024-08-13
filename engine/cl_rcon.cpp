@@ -180,7 +180,7 @@ void CRConVProfExport::OnRemoteGroupData( const void *data, int len )
 	// NOTE: See WriteRemoteVProfGroupData in vprof_engine.cpp
 	// to see the encoding of this data
 	int nGroupCount = buf.GetInt();
-	int nBase = m_Info.AddMultipleToTail( nGroupCount );
+	intp nBase = m_Info.AddMultipleToTail( nGroupCount );
 	char temp[1024];
 	for ( int i = 0; i < nGroupCount; ++i )
 	{
@@ -192,7 +192,7 @@ void CRConVProfExport::OnRemoteGroupData( const void *data, int len )
 		blue = buf.GetUnsignedChar( );
 		alpha = buf.GetUnsignedChar( );
 		buf.GetString( temp );
-		int nLen = Q_strlen( temp );
+		intp nLen = Q_strlen( temp );
 
 		pInfo->m_Color.SetColor( red, green, blue, alpha );
 		char *pBuf = new char[ nLen + 1 ];
@@ -364,7 +364,7 @@ void CRConClient::CloseListenSocket()
 void CRConClient::SendQueuedData()
 {
 	SocketHandle_t hSocket = GetSocketHandle();
-	while ( m_SendBuffer.TellMaxPut() - m_SendBuffer.TellGet() > sizeof(int) )
+	while ( m_SendBuffer.TellMaxPut() - m_SendBuffer.TellGet() > static_cast<intp>(sizeof(int)) )
 	{
 		size_t nSize = *(int*)m_SendBuffer.PeekGet();
 		Assert( nSize >= m_SendBuffer.TellMaxPut() - m_SendBuffer.TellGet() - sizeof( int ) );
@@ -384,7 +384,7 @@ void CRConClient::SendQueuedData()
 	}
 
 	int nSizeRemaining = m_SendBuffer.TellMaxPut() - m_SendBuffer.TellGet();
-	if ( nSizeRemaining <= sizeof(int) )
+	if ( nSizeRemaining <= static_cast<int>(sizeof(int)) )
 	{
 		m_SendBuffer.Purge();
 		return;
@@ -477,19 +477,19 @@ void CRConClient::ParseReceivedData()
 		default:
 			{
 				// Displays a message from the server
-				int strLen = m_RecvBuffer.TellPut() - m_RecvBuffer.TellGet();
+				intp strLen = m_RecvBuffer.TellPut() - m_RecvBuffer.TellGet();
 				CUtlMemory<char> msg;
 				msg.EnsureCapacity( strLen + 1 );
 				m_RecvBuffer.GetStringManualCharCount( msg.Base(), msg.Count() );
 
 				msg[ msg.Count() - 1 ] = '\0';
-				Msg( "%s", (const char *)msg.Base() );
+				Msg( "%s", msg.Base() );
 				m_RecvBuffer.GetStringManualCharCount( msg.Base(), msg.Count() ); // ignore the second string
 			}
 			break;
 		}
 
-		if ( m_RecvBuffer.TellPut() - m_RecvBuffer.TellGet() >= sizeof(int) )
+		if ( m_RecvBuffer.TellPut() - m_RecvBuffer.TellGet() >= static_cast<intp>(sizeof(int)) )
 		{
 			size = m_RecvBuffer.GetInt(); // read how much is in this packet
 		}
@@ -605,7 +605,7 @@ void CRConClient::SendResponse( CUtlBuffer &response, bool bAutoAuthenticate )
 		return;
 	}
 
-	int ret = send( GetSocketHandle(), (const char *)response.Base(), response.TellMaxPut(), 0 );
+	int ret = send( GetSocketHandle(), response.Base<const char>(), response.TellMaxPut(), 0 );
 	if ( ret == -1 )
 	{
 		if ( SocketWouldBlock() )

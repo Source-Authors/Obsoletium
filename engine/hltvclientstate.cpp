@@ -870,14 +870,14 @@ void CHLTVClientState::UpdateStats()
 {
 	if ( m_nSignonState < SIGNONSTATE_FULL )
 	{
-		m_fNextSendUpdateTime = 0.0f;
+		m_fNextSendUpdateTime = 0.0;
 		return;
 	}
 
 	if ( m_fNextSendUpdateTime > net_time )
 		return;
 
-	m_fNextSendUpdateTime = net_time + 8.0f;
+	m_fNextSendUpdateTime = net_time + 8.0;
 
 	int proxies, slots, clients;
 
