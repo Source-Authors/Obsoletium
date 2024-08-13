@@ -21,14 +21,14 @@ CSourceVirtualReality g_SourceVirtualReality;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CSourceVirtualReality, ISourceVirtualReality,
 	SOURCE_VIRTUAL_REALITY_INTERFACE_VERSION, g_SourceVirtualReality );
 
-static VMatrix VMatrixFrom44(const float v[4][4]);
+//static VMatrix VMatrixFrom44(const float v[4][4]);
 static VMatrix VMatrixFrom34(const float v[3][4]);
 static VMatrix OpenVRToSourceCoordinateSystem(const VMatrix& vortex);
 
 // --------------------------------------------------------------------
 // Purpose: Set the current HMD pose as the zero pose
 // --------------------------------------------------------------------
-void CC_VR_Reset_Home_Pos( const CCommand& args )
+void CC_VR_Reset_Home_Pos( const CCommand& )
 {
 	g_SourceVirtualReality.AcquireNewZeroPose();
 }
@@ -38,7 +38,7 @@ static ConCommand vr_reset_home_pos("vr_reset_home_pos", CC_VR_Reset_Home_Pos, "
 // --------------------------------------------------------------------
 // Purpose: Reinitialize the IHeadtrack object
 // --------------------------------------------------------------------
-void CC_VR_Track_Reinit( const CCommand& args )
+void CC_VR_Track_Reinit( const CCommand& )
 {
 	if( g_SourceVirtualReality.ResetTracking() )
 	{
@@ -64,7 +64,7 @@ ConVar vr_debug_nochromatic ( "vr_debug_nochromatic", "0" );
 static const int distortionTextureSize = 128;
 
 
-void CC_vr_refresh_distortion_texture( const CCommand& args )
+void CC_vr_refresh_distortion_texture( const CCommand& )
 {
 	g_SourceVirtualReality.RefreshDistortionTexture();
 }
@@ -122,8 +122,7 @@ void			CSourceVirtualReality::Disconnect()
 // --------------------------------------------------------------------
 void *			CSourceVirtualReality::QueryInterface( const char *pInterfaceName )
 {
-	CreateInterfaceFn factory = Sys_GetFactoryThis();	// This silly construction is necessary
-	return factory( pInterfaceName, NULL );				// to prevent the LTCG compiler from crashing.
+	return Sys_GetFactoryThis()( pInterfaceName, nullptr );
 }
 
 
@@ -163,7 +162,7 @@ void CSourceVirtualReality::RefreshDistortionTexture()
 }
 
 
-void CDistortionTextureRegen::RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pSubRect )
+void CDistortionTextureRegen::RegenerateTextureBits( [[maybe_unused]] ITexture *pTexture, IVTFTexture *pVTFTexture, [[maybe_unused]] Rect_t *pSubRect )
 {
 	// only do this if we have an HMD
 	if( !g_SourceVirtualReality.GetHmd() )
@@ -362,7 +361,7 @@ void CSourceVirtualReality::GetRenderTargetFrameBufferDimensions( int & nWidth, 
 // --------------------------------------------------------------------
 // Purpose: fetches the render target for the specified eye
 // --------------------------------------------------------------------
-ITexture *CSourceVirtualReality::GetRenderTarget( ISourceVirtualReality::VREye eEye, ISourceVirtualReality::EWhichRenderTarget eWhich )
+ITexture *CSourceVirtualReality::GetRenderTarget( [[maybe_unused]] ISourceVirtualReality::VREye eEye, ISourceVirtualReality::EWhichRenderTarget eWhich )
 {
 	// we don't use any render targets if distortion is disabled
 	// Just let the game render to the frame buffer.
@@ -534,7 +533,7 @@ void CSourceVirtualReality::AcquireNewZeroPose()
 		m_pHmd->ResetSeatedZeroPose();
 }
 
-bool CSourceVirtualReality::SampleTrackingState ( float PlayerGameFov, float fPredictionSeconds )
+bool CSourceVirtualReality::SampleTrackingState ( [[maybe_unused]] float PlayerGameFov, [[maybe_unused]] float fPredictionSeconds )
 {
 	if( !m_pHmd || !m_bActive )
 		return false;
@@ -829,14 +828,14 @@ static VMatrix OpenVRToSourceCoordinateSystem(const VMatrix& vortex)
 	return result;
 }
 
-static VMatrix VMatrixFrom44(const float v[4][4])
-{
-	return VMatrix(
-		v[0][0], v[0][1], v[0][2], v[0][3],
-		v[1][0], v[1][1], v[1][2], v[1][3],
-		v[2][0], v[2][1], v[2][2], v[2][3],
-		v[3][0], v[3][1], v[3][2], v[3][3]);
-}
+//static VMatrix VMatrixFrom44(const float v[4][4])
+//{
+//	return VMatrix(
+//		v[0][0], v[0][1], v[0][2], v[0][3],
+//		v[1][0], v[1][1], v[1][2], v[1][3],
+//		v[2][0], v[2][1], v[2][2], v[2][3],
+//		v[3][0], v[3][1], v[3][2], v[3][3]);
+//}
 
 static VMatrix VMatrixFrom34(const float v[3][4])
 {
@@ -847,11 +846,11 @@ static VMatrix VMatrixFrom34(const float v[3][4])
 		0,       0,       0,       1       );
 }
 
-static VMatrix VMatrixFrom33(const float v[3][3])
-{
-	return VMatrix(
-		v[0][0], v[0][1], v[0][2], 0,
-		v[1][0], v[1][1], v[1][2], 0,
-		v[2][0], v[2][1], v[2][2], 0,
-		0,       0,       0,       1);
-}
+//static VMatrix VMatrixFrom33(const float v[3][3])
+//{
+//	return VMatrix(
+//		v[0][0], v[0][1], v[0][2], 0,
+//		v[1][0], v[1][1], v[1][2], 0,
+//		v[2][0], v[2][1], v[2][2], 0,
+//		0,       0,       0,       1);
+//}
