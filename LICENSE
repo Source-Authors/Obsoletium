@@ -56,7 +56,7 @@ marked with other licenses or externally maintained libraries.
 
 Externally maintained by Source 1 libraries are:
 
-- bzip2 located at thirdparty\bzip2 is licensed as:
+- bzip2 located at thirdparty/bzip2 is licensed as:
 """
   This program, "bzip2", the associated library "libbzip2", and all
   documentation, are copyright (C) 1996-2019 Julian R Seward.  All
@@ -97,7 +97,36 @@ Externally maintained by Source 1 libraries are:
   bzip2/libbzip2 version 1.0.8 of 13 July 2019
 """
 
-- cryptopp located at thirdparty\cryptopp is licensed as:
+- celt located at thirdparty/celt is licensed as:
+"""
+  Copyright 2001-2009 Jean-Marc Valin, Timothy B. Terriberry,
+                    CSIRO, and other contributors
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+  
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+  
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+"""
+
+- cryptopp located at thirdparty/cryptopp is licensed as:
 """
   Compilation Copyright (c) 1995-2019 by Wei Dai.  All rights reserved.
   This copyright applies only to this software distribution package
@@ -185,7 +214,7 @@ Externally maintained by Source 1 libraries are:
     derived from this software without specific prior written permission.
 """
 
-- DirectXMath located at thirdparty\DirectXMath is licensed as:
+- DirectXMath located at thirdparty/DirectXMath is licensed as:
 """
   MIT License
   
@@ -210,7 +239,7 @@ Externally maintained by Source 1 libraries are:
   SOFTWARE
 """
 
-- libjpeg-turbo located at thirdparty\libjpeg-turbo is licensed as:
+- libjpeg-turbo located at thirdparty/libjpeg-turbo is licensed as:
 """
   libjpeg-turbo Licenses
   ======================
@@ -346,7 +375,7 @@ Externally maintained by Source 1 libraries are:
   that were granted to the IJG for code derived from their software.
 """
 
-- libpng located at thirdparty\libpng is licensed as:
+- libpng located at thirdparty/libpng is licensed as:
 """
   COPYRIGHT NOTICE, DISCLAIMER, and LICENSE
   =========================================
@@ -484,7 +513,14 @@ Externally maintained by Source 1 libraries are:
   be appreciated.
 """
 
-- minimp3 located at thirdparty\minimp3 is licensed as:
+- Miles Sound System 8.0b located at thirdparty/mss is licensed as:
+"""
+  Author: John Miles
+
+  Contact RAD Game Tools at 425-893-4300 for technical support.
+"""
+
+- minimp3 located at thirdparty/minimp3 is licensed as:
 """
   CC0 1.0 Universal
 
@@ -604,14 +640,7 @@ Externally maintained by Source 1 libraries are:
   <http://creativecommons.org/publicdomain/zero/1.0/>
 """
 
-- Miles Sound System 8.0b located at thirdparty\mss is licensed as:
-"""
-  Author: John Miles
-
-  Contact RAD Game Tools at 425-893-4300 for technical support.
-"""
-
-- MPAHeaderInfo 2.2 located at thirdparty\MPAHeaderInfo is licensed as:
+- mpaheaderinfo 2.2 located at thirdparty/mpaheaderinfo is licensed as:
 """
   GNU LESSER GENERAL PUBLIC LICENSE
   Version 3, 29 June 2007
@@ -626,7 +655,7 @@ Externally maintained by Source 1 libraries are:
   additional permissions listed below.
 """
 
-- openvr 0.9.11 located at thirdparty\openvr is licensed as:
+- openvr 0.9.11 located at thirdparty/openvr is licensed as:
 """
   Copyright (c) 2015, Valve Corporation
   All rights reserved.
@@ -657,7 +686,7 @@ Externally maintained by Source 1 libraries are:
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-- protobuf 2.6.1 located at thirdparty\protobuf-2.6.1 is licensed as:
+- protobuf 2.6.1 located at thirdparty/protobuf-2.6.1 is licensed as:
 """
   Copyright 2008, Google Inc.
   All rights reserved.
@@ -694,7 +723,7 @@ Externally maintained by Source 1 libraries are:
   support library is itself covered by the above license.
 """
 
-- sdl located at thirdparty\sdl is licensed as:
+- sdl3 located at thirdparty/sdl is licensed as:
 """
   Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
   
@@ -715,7 +744,7 @@ Externally maintained by Source 1 libraries are:
   3. This notice may not be removed or altered from any source distribution.
 """
 
-- snappy located at thirdparty\snappy is licensed as:
+- snappy located at thirdparty/snappy is licensed as:
 """
   Copyright 2005 and onwards Google Inc.
  
@@ -756,7 +785,46 @@ Externally maintained by Source 1 libraries are:
   Snappy.
 """
 
-- stb located at thirdparty\stb is licensed as:
+- speex located at thirdparty/speex is licensed as:
+"""
+  Copyright 2002-2008 	Xiph.org Foundation
+  Copyright 2002-2008 	Jean-Marc Valin
+  Copyright 2005-2007	Analog Devices Inc.
+  Copyright 2005-2008	Commonwealth Scientific and Industrial Research
+                          Organisation (CSIRO)
+  Copyright 1993, 2002, 2006 David Rowe
+  Copyright 2003 		EpicGames
+  Copyright 1992-1994	Jutta Degener, Carsten Bormann
+  
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+  
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+  
+  - Neither the name of the Xiph.org Foundation nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+  
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+"""
+
+- stb located at thirdparty/stb is licensed as:
 """
   This software is available under 2 licenses -- choose whichever you prefer.
   ------------------------------------------------------------------------------
@@ -797,7 +865,7 @@ Externally maintained by Source 1 libraries are:
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-- zlib located at thirdparty\zlib is licensed as:
+- zlib located at thirdparty/zlib is licensed as:
 """
   Copyright notice:
   

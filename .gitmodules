@@ -23,7 +23,6 @@
 [submodule "thirdparty/protobuf"]
 	path = thirdparty/protobuf
 	url = git@github.com:Source-Authors/protobuf.git
-	branch = v2.6.2
 [submodule "thirdparty/bzip2"]
 	path = thirdparty/bzip2
 	url = git@github.com:Source-Authors/bzip2.git
@@ -45,3 +44,9 @@
 [submodule "thirdparty/minimp3"]
 	path = thirdparty/minimp3
 	url = git@github.com:Source-Authors/minimp3.git
+[submodule "thirdparty/celt"]
+	path = thirdparty/celt
+	url = git@github.com:Source-Authors/celt.git
+[submodule "thirdparty/speex"]
+	path = thirdparty/speex
+	url = git@github.com:Source-Authors/speex.git

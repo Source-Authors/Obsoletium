@@ -49,6 +49,20 @@ if ERRORLEVEL 1 (
 POPD
 
 
+REM Build celt.
+MSBuild.exe /m /p:Platform=%MSBUILD_PLATFORM% /p:Configuration=Debug thirdparty\celt\win32\VS2022\libcelt\libcelt.vcxproj
+if ERRORLEVEL 1 (
+  ECHO MSBuild Debug for thirdparty\celt failed.
+  EXIT /B 1
+)
+
+MSBuild.exe /m /p:Platform=%MSBUILD_PLATFORM% /p:Configuration=Release thirdparty\celt\win32\VS2022\libcelt\libcelt.vcxproj
+if ERRORLEVEL 1 (
+  ECHO MSBuild Release for thirdparty\celt failed.
+  EXIT /B 1
+)
+
+
 REM Build cryptopp.
 MSBuild.exe /m /p:Platform=%MSBUILD_PLATFORM% /p:Configuration=Debug thirdparty\cryptopp\cryptlib.vcxproj
 if ERRORLEVEL 1 (
@@ -117,24 +131,24 @@ if ERRORLEVEL 1 (
 POPD
 
 
-REM Build MPAHeaderInfo.
-MKDIR thirdparty\MPAHeaderInfo\out
-PUSHD thirdparty\MPAHeaderInfo\out
+REM Build mpaheaderinfo.
+MKDIR thirdparty\mpaheaderinfo\out
+PUSHD thirdparty\mpaheaderinfo\out
 cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DMPA_BUILD_WITHOUT_ATL=ON ..
 if ERRORLEVEL 1 (
-  ECHO cmake generation for thirdparty\MPAHeaderInfo failed.
+  ECHO cmake generation for thirdparty\mpaheaderinfo failed.
   EXIT /B 1
 )
 
 cmake --build . --config Release
 if ERRORLEVEL 1 (
-  ECHO cmake --build Release for thirdparty\MPAHeaderInfo failed.
+  ECHO cmake --build Release for thirdparty\mpaheaderinfo failed.
   EXIT /B 1
 )
 
 cmake --build . --config Debug
 if ERRORLEVEL 1 (
-  ECHO cmake --build Debug for thirdparty\MPAHeaderInfo failed.
+  ECHO cmake --build Debug for thirdparty\mpaheaderinfo failed.
   EXIT /B 1
 )
 POPD
@@ -201,6 +215,20 @@ if ERRORLEVEL 1 (
   EXIT /B 1
 )
 POPD
+
+
+REM Build speex.
+MSBuild.exe /m /p:Platform=%MSBUILD_PLATFORM% /p:Configuration=Debug thirdparty\speex\win32\VS2022\libspeex\libspeex.vcxproj
+if ERRORLEVEL 1 (
+  ECHO MSBuild Debug for thirdparty\speex failed.
+  EXIT /B 1
+)
+
+MSBuild.exe /m /p:Platform=%MSBUILD_PLATFORM% /p:Configuration=Release thirdparty\speex\win32\VS2022\libspeex\libspeex.vcxproj
+if ERRORLEVEL 1 (
+  ECHO MSBuild Release for thirdparty\speex failed.
+  EXIT /B 1
+)
 
 
 REM Generate version info, etc.

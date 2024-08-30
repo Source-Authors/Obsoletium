@@ -13,7 +13,18 @@
 #include "tier0/memdbgon.h"
 
 static int s_MilesRefCount = 0;
+static AILMEMALLOCCB s_OldMemAlloc = nullptr;
+static AILMEMFREECB s_OldMemFree = nullptr;
 
+static void* AILCALL MssAlloc( UINTa size )
+{
+	return MemAlloc_AllocAligned( size, 16 );
+}
+
+static void AILCALL MssFree( void* mem )
+{
+	MemAlloc_FreeAligned( mem );
+}
 
 void IncrementRefMiles()
 {
@@ -22,7 +33,11 @@ void IncrementRefMiles()
 #ifdef WIN32
 		AIL_set_redist_directory( "." );
 #elif defined( OSX )
+		#ifdef PLATFORM_64BITS
 		AIL_set_redist_directory( "osx32" );
+#else
+		AIL_set_redist_directory( "osx64" );
+#endif
 #elif defined( LINUX )
 #ifdef PLATFORM_64BITS
 		AIL_set_redist_directory( "bin/linux64" );
@@ -36,8 +51,17 @@ void IncrementRefMiles()
 
 		if ( AIL_startup() == 0 )
 		{
-			Warning( "Miles Audio startup failed. Audio may not be available. ");
+			Warning( "Miles Sound System startup failed. Audio may not be available. %s\n", AIL_last_error());
 		}
+		else
+		{
+			Msg( "Start up Miles Sound System %s (%u.%u.%u)\n",
+				MSS_VERSION, MSS_MAJOR_VERSION, MSS_MINOR_VERSION, MSS_SUB_VERSION );
+		}
+
+		// dimhotepus: Use our allocators (ASAN happier).
+		s_OldMemAlloc = AIL_mem_use_malloc( MssAlloc );
+		s_OldMemFree = AIL_mem_use_free( MssFree );
 	}
 	
 	++s_MilesRefCount;
@@ -49,8 +73,15 @@ void DecrementRefMiles()
 	--s_MilesRefCount;
 	if(s_MilesRefCount == 0)
 	{
+        // dimhotepus: Reset our allocators.
+		AIL_mem_use_free( s_OldMemFree );
+		AIL_mem_use_malloc( s_OldMemAlloc );
+
 		CProvider::FreeAllProviders();
 		AIL_shutdown();
+
+		Msg( "Shut down Miles Sound System %s (%u.%u.%u)\n",
+			MSS_VERSION, MSS_MAJOR_VERSION, MSS_MINOR_VERSION, MSS_SUB_VERSION );
 	}
 }
 

@@ -73,6 +73,7 @@ $Configuration
 									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
 									"IF EXIST $(TargetDir)$(TargetName).map COPY $(TargetDir)$(TargetName).map $OUTBINDIR\hl2.map" "\n" \
 									"$OUTBINDIR\bin\newdat $OUTBINDIR\hl2.exe" "\n"					\
+									"COPY $(SolutionDir)LICENSE $OUTBINDIR\LICENSE" "\n"			\
 									"GOTO BuildEventOK" "\n" \
 									":BuildEventFailed" "\n" \
 									"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
@@ -93,6 +94,7 @@ $Configuration
 									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
 									"IF EXIST $(TargetDir)$(TargetName).map COPY $(TargetDir)$(TargetName).map $OUTBINDIRX64\hl2_win64.map" "\n" \
 									"$OUTBINDIRX64\bin\x64\newdat $OUTBINDIRX64\hl2_win64.exe" "\n"					\
+									"COPY $(SolutionDir)LICENSE $OUTBINDIRX64\LICENSE" "\n"			\
 									"GOTO BuildEventOK" "\n" \
 									":BuildEventFailed" "\n" \
 									"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \

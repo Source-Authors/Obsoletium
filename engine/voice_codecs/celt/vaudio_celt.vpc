@@ -6,6 +6,7 @@
 
 $Macro SRCDIR		"..\..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro LIBCELTSRCDIR	"$SRCDIR\thirdparty\celt"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -13,12 +14,11 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,..\frame_encoder,..\celt,..\..\..\public,..\..\..\public\tier1,..\..,..\..\..\common,.\source\libcelt,..\..\audio\public"
+		$AdditionalIncludeDirectories		"$BASE,..\frame_encoder,..\..,..\..\audio\public,$LIBCELTSRCDIR\libcelt"
 		$PreprocessorDefinitions			"$BASE;CELT_EXPORTS"
 	}
 	$Linker
 	{
-		$AdditionalLibraryDirectories		"$BASE,source\osx"
 		$SystemLibraries                    "iconv" [$OSXALL]
 	}
 }
@@ -40,8 +40,27 @@ $Project "vaudio_celt"
 
 	$Folder	"Link Libraries"
 	{
-		$File "source/libcelt/libcelt.lib" [$WIN32]
 		$File "source/osx/libcelt.a" [$OSXALL]
 		$File "source/linux/libcelt.a" [$LINUX]
+	}
+
+	$Folder "Link Libraries" [$VS2015]
+	{
+		$File "$LIBCELTSRCDIR\win32\VS2022\libcelt\Release\libcelt.lib" [$WIN32]
+		{
+			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
+		}
+		$File "$LIBCELTSRCDIR\win32\VS2022\libcelt\x64\Release\libcelt.lib" [$WIN64]
+		{
+			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
+		}
+		$File "$LIBCELTSRCDIR\win32\VS2022\libcelt\Debug\libcelt.lib" [$WIN32]
+		{
+			$Configuration "Release" { $ExcludedFromBuild "Yes" }
+		}
+		$File "$LIBCELTSRCDIR\win32\VS2022\libcelt\x64\Debug\libcelt.lib" [$WIN64]
+		{
+			$Configuration "Release" { $ExcludedFromBuild "Yes" }
+		}
 	}
 }

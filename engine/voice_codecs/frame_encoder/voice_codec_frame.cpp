@@ -6,9 +6,8 @@
 //
 //=============================================================================//
 
-#include "audio/public/ivoicecodec.h"
+#include "ivoicecodec.h"
 
-#include <cstring>
 #include "tier0/dbg.h"
 #include "iframeencoder.h"
 
@@ -36,7 +35,7 @@ public:
 			m_pFrameEncoder->Release();
 	}
 	
-	bool	Init( int quality ) override
+	bool	Init( VoiceCodecQuality quality ) override
 	{
 		if(m_pFrameEncoder && m_pFrameEncoder->Init(quality, m_nRawBytes, m_nEncodedBytes))
 		{

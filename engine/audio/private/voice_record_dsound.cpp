@@ -267,11 +267,6 @@ void VoiceRecord_DSound::Term()
 	if(m_hWrapEvent)
 		DeleteObject(m_hWrapEvent);
 
-	if(!!m_hInstDS)
-	{
-		m_hInstDS.~ScopedDll();
-	}
-
 	Clear();
 }
 
