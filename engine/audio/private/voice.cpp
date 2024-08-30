@@ -687,7 +687,8 @@ bool Voice_Init( const char *pCodecName, int nSampleRate )
 		//
 		// Changing the quality level we use here will require either extending SVC_VoiceInit to pass down which quality is
 		// in use or using a different codec name (vaudio_celtHD!) for backwards compatibility
-		int quality = bCelt ? 3 : 4;
+		// dimhotepus: Breaking change. Always use good quality.
+		VoiceCodecQuality quality = VoiceCodecQuality::Good;
 
 		// Get the codec.
 		CreateInterfaceFnT<IVoiceCodec> createCodecFn = NULL;
@@ -696,8 +697,8 @@ bool Voice_Init( const char *pCodecName, int nSampleRate )
 		if ( !g_hVoiceCodecDLL || (createCodecFn = Sys_GetFactory<IVoiceCodec>(g_hVoiceCodecDLL)) == NULL ||
 		     (g_pEncodeCodec = createCodecFn(pCodecName, NULL)) == NULL || !g_pEncodeCodec->Init( quality ) )
 		{
-			Msg("Unable to load voice codec '%s'. Voice disabled. (module %i, iface %i, codec %i)\n",
-			    pCodecName, !!g_hVoiceCodecDLL, !!createCodecFn, !!g_pEncodeCodec);
+			Msg("Unable to init voice codec '%s' with quaiity level %d. Voice disabled.\n",
+			    pCodecName, to_underlying(quality));
 			Voice_Deinit();
 			return false;
 		}

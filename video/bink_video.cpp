@@ -1,3 +1,4 @@
+
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
@@ -104,6 +105,15 @@ void* CBinkVideoSubSystem::QueryInterface( const char *pInterfaceName )
 	return nullptr;
 }
 
+static void* RADLINK BinkAlloc( U32 bytes )
+{
+	return MemAlloc_AllocAligned( bytes, 16 );
+}
+
+static void RADLINK BinkFree( void *mem )
+{
+	return MemAlloc_FreeAligned( mem );
+}
 
 InitReturnVal_t CBinkVideoSubSystem::Init()
 {
@@ -113,14 +123,22 @@ InitReturnVal_t CBinkVideoSubSystem::Init()
 		return nRetVal;
 	}
 
-	return INIT_OK;
+	Msg( "Start up Bink Video %s (%u.%u.%u)\n",
+		BINKVERSION, BINKMAJORVERSION, BINKMINORVERSION, BINKSUBVERSION );
 
+	// dimhotepus: Use our allocators (ASAN happier).
+	BinkSetMemory( BinkAlloc, BinkFree );
+
+	return INIT_OK;
 }
 
 void CBinkVideoSubSystem::Shutdown()
 {
 	// Make sure we shut down Bink
 	ShutdownBink();
+
+	Msg("Shut down Bink Video %s (%u.%u.%u)\n",
+		BINKVERSION, BINKMAJORVERSION, BINKMINORVERSION, BINKSUBVERSION);
 
 	BaseClass::Shutdown();
 }

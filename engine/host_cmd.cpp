@@ -1750,7 +1750,7 @@ void Host_VoiceRecordStart_f(void)
 #if !defined( NO_VOICE )
 		if (Voice_RecordStart(pUncompressedFile, pDecompressedFile, pInputFile))
 		{
-			Msg( "Started voice recording..." );
+			Msg( "Started voice recording...\n" );
 		}
 #endif
 	}
@@ -1773,7 +1773,7 @@ void Host_VoiceRecordStop_f(void)
 			CL_SendVoicePacket( g_bUsingSteamVoice ? false : true );
 			Voice_UserDesiresStop();
 
-			Msg( "Stopped voice recording..." );
+			Msg( "Stopped voice recording...\n" );
 		}
 #endif
 	}

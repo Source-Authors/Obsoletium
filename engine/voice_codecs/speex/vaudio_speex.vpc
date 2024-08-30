@@ -6,6 +6,7 @@
 
 $Macro SRCDIR		"..\..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro LIBSPEEXSRCDIR	"$SRCDIR\thirdparty\speex"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -13,7 +14,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,..\frame_encoder,..\..\..\public,..\..\..\public\tier1,..\..,..\..\..\common,.\source\libspeex,..\..\audio\public"
+		$AdditionalIncludeDirectories		"$BASE,..\frame_encoder,..\..\audio\public,$LIBSPEEXSRCDIR\include"
 		$PreprocessorDefinitions			"$BASE;SPEEX_EXPORTS"
 	}
 	$Linker
@@ -40,17 +41,24 @@ $Project "vaudio_speex"
 
 	$Folder	"Link Libraries"
 	{
-		$File "source\win32\libspeex\Release\libspeex.lib" [$WIN32&&!$VS2015]
 		$Lib "$LIBCOMMON/libspeex" [$POSIX]
 	}
 
 	$Folder "Link Libraries" [$VS2015]
 	{
-		$File "$SRCDIR\engine\voice_codecs\speex\source\win32\libspeex\2015\release\libspeex.lib" [$WIN32]
+		$File "$LIBSPEEXSRCDIR\win32\VS2022\libspeex\Release\libspeex.lib" [$WIN32]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$SRCDIR\engine\voice_codecs\speex\source\win32\libspeex\2015\debug\libspeex.lib" [$WIN32]
+		$File "$LIBSPEEXSRCDIR\win32\VS2022\libspeex\x64\Release\libspeex.lib" [$WIN64]
+		{
+			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
+		}
+		$File "$LIBSPEEXSRCDIR\win32\VS2022\libspeex\Debug\libspeex.lib" [$WIN32]
+		{
+			$Configuration "Release" { $ExcludedFromBuild "Yes" }
+		}
+		$File "$LIBSPEEXSRCDIR\win32\VS2022\libspeex\x64\Debug\libspeex.lib" [$WIN64]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}

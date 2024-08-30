@@ -28,7 +28,7 @@ protected:
 public:
 	FrameEncoder_Miles();
 
-	bool	Init(int quality, int &rawFrameSize, int &encodedFrameSize) override;
+	bool	Init(VoiceCodecQuality quality, int &rawFrameSize, int &encodedFrameSize) override;
 	void	Release() override;
 	void	EncodeFrame(const char *pUncompressed, char *pCompressed) override;
 	void	DecodeFrame(const char *pCompressed, char *pDecompressed) override;
@@ -117,7 +117,7 @@ FrameEncoder_Miles::~FrameEncoder_Miles()
 	Shutdown();
 }
 
-bool FrameEncoder_Miles::Init(int quality, int &rawFrameSize, int &encodedFrameSize)
+bool FrameEncoder_Miles::Init(VoiceCodecQuality quality, int &rawFrameSize, int &encodedFrameSize)
 {
 	Shutdown();
 

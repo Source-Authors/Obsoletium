@@ -22,7 +22,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,..\frame_encoder,..\..;$SRCDIR\thirdparty\"
+		$AdditionalIncludeDirectories		"$BASE,..\frame_encoder,..\..\audio\public,..\..;$SRCDIR\thirdparty"
 	}
 	$Linker
 	{

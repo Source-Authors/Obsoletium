@@ -9,6 +9,7 @@
 #define IFRAMEENCODER_H
 #pragma once
 
+#include "ivoicecodec.h"
 
 // A frame encoder is a codec that encodes and decodes data in fixed-size frames.
 // VoiceCodec_Frame handles queuing of data and the IVoiceCodec interface.
@@ -19,7 +20,7 @@ public:
 
 	// This is called by VoiceCodec_Frame to see if it can initialize..
 	// Fills in the uncompressed and encoded frame size (both are in BYTES).
-	virtual bool	Init(int quality, int &rawFrameSize, int &encodedFrameSize) = 0;
+	virtual bool	Init(VoiceCodecQuality quality, int &rawFrameSize, int &encodedFrameSize) = 0;
 
 	virtual void	Release() = 0;
 	

@@ -15,6 +15,21 @@
 
 #define BYTES_PER_SAMPLE	2
 
+// Defines voice codec encode / decode quality.
+enum class VoiceCodecQuality
+{
+	// Vocoder (mostly for comfortable noise).
+	Noise = 0,
+	// Very noticeable artifacts/noise, good intelligibility.
+	Lowest = 1,
+	// Artifacts/noise sometimes noticeable with / without headphones.
+	Average = 2,
+	// Need good headphones to tell the difference or hard to tell even with good headphones.
+	Good = 3,
+	// Completely transparent for voice, good quality music.
+	Perfect = 4
+};
+
 
 // This interface is for voice codecs to implement.
 
@@ -35,23 +50,23 @@ protected:
 
 public:
 	// Initialize the object. The uncompressed format is always 8-bit signed mono.
-	virtual bool	Init( int quality )=0;
+	virtual bool	Init( VoiceCodecQuality quality )=0;
 
 	// Use this to delete the object.
 	virtual void	Release()=0;
 
 
 	// Compress the voice data.
-	// pUncompressed		-	16-bit signed mono voice data.
-	// maxCompressedBytes	-	The length of the pCompressed buffer. Don't exceed this.
+	// in		-	16-bit signed mono voice data.
+	// max_out	-	The length of the out buffer. Don't exceed this.
 	// bFinal        		-	Set to true on the last call to Compress (the user stopped talking).
 	//							Some codecs like big block sizes and will hang onto data you give them in Compress calls.
 	//							When you call with bFinal, the codec will give you compressed data no matter what.
-	// Return the number of bytes you filled into pCompressed.
-	virtual int		Compress(const char *pUncompressed, int nSamples, char *pCompressed, int maxCompressedBytes, bool bFinal)=0;
+	// Return the number of bytes you filled into out.
+	virtual int		Compress(const char *in, int nSamples, char *out, int max_out, bool bFinal)=0;
 
 	// Decompress voice data. pUncompressed is 16-bit signed mono.
-	virtual int		Decompress(const char *pCompressed, int compressedBytes, char *pUncompressed, int maxUncompressedBytes)=0;
+	virtual int		Decompress(const char *in, int in_size, char *out, int max_out)=0;
 
 	// Some codecs maintain state between Compress and Decompress calls. This should clear that state.
 	virtual bool	ResetState()=0;
