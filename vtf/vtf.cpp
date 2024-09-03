@@ -221,6 +221,8 @@ unsigned short VTFFileHeaderSize( int nMajorVersion, int nMinorVersion )
 		case 3:
 			return sizeof( VTFFileHeaderV7_3_t ) + sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES;
 		case VTF_MINOR_VERSION:
+		// dimhotepus: CS-GO backport.
+		case 5:
 			constexpr size_t size1 = sizeof( VTFFileHeader_t );
 			constexpr size_t size2 = sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES;
 			constexpr size_t result = size1 + size2;
@@ -387,11 +389,11 @@ bool CVTFTexture::Init( int nWidth, int nHeight, int nDepth, ImageFormat fmt, in
 		}
 	}
 
-	if ( !IsMultipleOf4( nWidth ) || !IsMultipleOf4( nHeight ) || !IsMultipleOf4( nDepth ) )
-	{
-		Warning( "Image dimensions must be multiple of 4!\n" );
-		return false;
-	}
+		if ( !IsMultipleOf4( nWidth ) || !IsMultipleOf4( nHeight ) || !IsMultipleOf4( nDepth ) )
+		{
+			Warning( "Image dimensions must be multiple of 4!\n" );
+			return false;
+		}
 
 	if ( fmt == IMAGE_FORMAT_DEFAULT )
 	{
@@ -912,7 +914,8 @@ bool CVTFTexture::SetupByteSwap( CUtlBuffer &buf )
 static bool ReadHeaderFromBufferPastBaseHeader( CUtlBuffer &buf, VTFFileHeader_t &header )
 {
 	unsigned char *pBuf = (unsigned char*)(&header) + sizeof(VTFFileBaseHeader_t);
-	if ( header.version[1] == VTF_MINOR_VERSION )
+	// dimhotepus: CS-GO backport. VTF 7.5
+	if ( header.version[1] <= 5 && header.version[1] >= VTF_MINOR_VERSION )
 	{
 		buf.Get( pBuf, sizeof(VTFFileHeader_t) - sizeof(VTFFileBaseHeader_t) );
 	}
@@ -993,6 +996,8 @@ bool CVTFTexture::ReadHeader( CUtlBuffer &buf, VTFFileHeader_t &header )
 		header.flags &= VERSIONED_VTF_FLAGS_MASK_7_3;
         [[fallthrough]];
 	case VTF_MINOR_VERSION:
+	// dimhotepus: CS-GO backport.
+	case 5:
 		break;
 	}
 
@@ -1042,9 +1047,8 @@ bool CVTFTexture::UnserializeEx( CUtlBuffer &buf, bool bHeaderOnly, int nForceFl
 		return false;
 	}
 	
-	// If the header says we should be doing a texture allocation of more than 32M, just tell the caller we failed.
-	const int cMaxImageSizeLog2 = Q_log2( 32 * 1024 * 1024 );
-	if ( ( Q_log2( header.width ) + Q_log2( header.height ) + Q_log2( header.depth ) + Q_log2( header.numFrames ) > cMaxImageSizeLog2 ) || ( header.numResources > MAX_RSRC_DICTIONARY_ENTRIES ) )
+	// If the header says we should be doing a large texture allocation, just tell the caller we failed.
+	if ( ( header.numResources > MAX_RSRC_DICTIONARY_ENTRIES ) )
 	{
 		STAGING_ONLY_EXEC( DevWarning( "Asked for a large texture to be created (%d h x %d w x %d d x %d f). Nope.\n", header.width, header.height, header.depth, header.numFrames ) );
 		return false;
@@ -1868,8 +1872,7 @@ void CVTFTexture::ConvertImageFormat( ImageFormat fmt, bool bNormalToDUDV )
 			for (int iFace = 0; iFace < m_nFaceCount; ++iFace)
 			{
 				unsigned char *pSrcData = ImageData( iFrame, iFace, iMip );
-				unsigned char *pDstData = pConvertedImage + 
-					GetImageOffset( iFrame, iFace, iMip, fmt );
+				unsigned char *pDstData = pConvertedImage + GetImageOffset( iFrame, iFace, iMip, fmt );
 
 				for ( int z = 0; z < nMipDepth; ++z, pSrcData += nSrcFaceStride, pDstData += nDstFaceStride )
 				{
