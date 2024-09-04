@@ -45,7 +45,8 @@ void QueryCacheKey_t::ComputeHashIndex( void )
 	for( int i = 0 ; i < m_nNumValidPoints; i++ )
 	{
 		ret += ( unsigned int ) m_pEntities[i].ToInt();
-		ret += ( unsigned int ) m_nOffsetMode;
+		// dimhotepus: Use i offset mode instead of array ptr.
+		ret += ( unsigned int ) m_nOffsetMode[i];
 	}
 	ret += *( ( uint32 *) &m_flMinimumUpdateInterval );
 	ret += m_nTraceMask;
