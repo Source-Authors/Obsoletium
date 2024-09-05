@@ -146,7 +146,8 @@ public:
 		bool m_bRumbleEnabled;
 		int m_nButtonCount;
 		int m_nAxisFlags;
-		int m_nDeviceId;
+		// dimhotepus: signed -> unsigned as SDL does.
+		unsigned m_nDeviceId;
 		bool m_bHasPOVControl;
 		bool m_bDiagonalPOVControlEnabled;
 		unsigned int m_nFlags;
@@ -315,11 +316,12 @@ public:
 	void PollInputState_Windows();
 #endif
 
-	void JoystickHotplugAdded( int joystickIndex );
-	void JoystickHotplugRemoved( int joystickId );
-	void JoystickButtonPress( int joystickId, int button ); // button is a SDL_CONTROLLER_BUTTON;
-	void JoystickButtonRelease( int joystickId, int button ); // same as above.
-	void JoystickAxisMotion( int joystickId, int axis, int value );
+	// dimhotepus: joystickId signed -> unsigned as SDL does.
+	void JoystickHotplugAdded( unsigned joystickId );
+	void JoystickHotplugRemoved( unsigned joystickId );
+	void JoystickButtonPress( unsigned joystickId, int button ); // button is a SDL_CONTROLLER_BUTTON;
+	void JoystickButtonRelease( unsigned joystickId, int button ); // same as above.
+	void JoystickAxisMotion( unsigned joystickId, uint8 axis, int16 value );
 
 	// Steam Controller
 	void ReadSteamController( int iIndex );
