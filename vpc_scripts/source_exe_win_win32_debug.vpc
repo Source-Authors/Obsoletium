@@ -154,7 +154,8 @@ $Configuration "Debug"
 		$OutputFile								"$(OutDir)/$OUTBINNAME.exe"
 		$ShowProgress							"Not Set"
 		$Version
-		$EnableIncrementalLinking				"Yes (/INCREMENTAL)"
+		$EnableIncrementalLinking				"Yes (/INCREMENTAL)"   [!$ASAN]
+		$EnableIncrementalLinking				"No (/INCREMENTAL:NO)" [$ASAN]
 		$SuppressStartupBanner
 		$IgnoreImportLibrary
 		$RegisterOutput
@@ -164,7 +165,10 @@ $Configuration "Debug"
 		$UseUNICODEResponseFiles				"No"
 
 		// Input
-		$AdditionalDependencies
+		$AdditionalDependencies					"$BASE libvcasand.lib" [$ASAN]
+		$AdditionalDependencies					"$BASE clang_rt.fuzzer_no_main_MTd-i386.lib" [$WIN32 && $FUZZER]
+		$AdditionalDependencies					"$BASE clang_rt.fuzzer_no_main_MTd-x86_64.lib" [$WIN64 && $FUZZER]
+
 		$IgnoreAllDefaultLibraries
 		$IgnoreSpecificLibrary					"libc;libcd;libcmt;libcpmt;libcpmt1"
 		$ModuleDefinitionFile
@@ -200,8 +204,8 @@ $Configuration "Debug"
 		$SwapRunFromNetwork
 		$Driver
 
-		// DYNAMICBASE/ASLR in debug builds is annoying and not helpful.
-		$RandomizedBaseAddress				"false"
+		// dimhotepus: Enable even for debug builds to check we do not rely on fixed base address.
+		$RandomizedBaseAddress				"true"
 
 		// Optimization
 		$References

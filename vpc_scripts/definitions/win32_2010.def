@@ -313,7 +313,22 @@
 			"output"	"TreatWarningAsError"
 		}
 
+		"$SDLCheck"
+		{
+			"type"		"bool"
+		}
+
 		"$MultiProcessorCompilation"
+		{
+			"type"		"bool"
+		}
+
+		"$EnableASAN"
+		{
+			"type"		"bool"
+		}
+
+		"$EnableFuzzer"
 		{
 			"type"		"bool"
 		}
@@ -482,7 +497,21 @@
 		
 		"$BufferSecurityCheck"
 		{
-			"type"	"bool"
+			"type"		"bool"
+		}
+
+		"$ControlFlowGuard"
+		{
+			"ordinals"
+			{
+				"Control Flow Guard (/guard:no)"	"False"
+				"Control Flow Guard (/guard:cf)"	"Guard"
+			}
+		}
+
+		"$GuardEHContMetadata"
+		{
+			"type"		"bool"
 		}
 
 		"$EnableFunctionLevelLinking"
@@ -495,11 +524,14 @@
 		{
 			"ordinals"
 			{
-				"Streaming SIMD Extensions (/arch:SSE)"					"StreamingSIMDExtensions"
-				"Streaming SIMD Extensions (/arch:SSE) (/arch:SSE)"		"StreamingSIMDExtensions"
-				"Streaming SIMD Extensions 2 (/arch:SSE2)"				"StreamingSIMDExtensions2"
-				"Streaming SIMD Extensions 2 (/arch:SSE2) (/arch:SSE2)"	"StreamingSIMDExtensions2"
-				"Not Set"												"NotSet"
+				"Streaming SIMD Extensions (/arch:SSE)"						"StreamingSIMDExtensions"
+				"Streaming SIMD Extensions (/arch:SSE) (/arch:SSE)"			"StreamingSIMDExtensions"
+				"Streaming SIMD Extensions 2 (/arch:SSE2)"					"StreamingSIMDExtensions2"
+				"Streaming SIMD Extensions 2 (/arch:SSE2) (/arch:SSE2)"		"StreamingSIMDExtensions2"
+				"Advanced Vector Extensions (X86/X64) (/arch:AVX)"			"AdvancedVectorExtensions"
+				"Advanced Vector Extensions 2 (X86/X64) (/arch:AVX2)"		"AdvancedVectorExtensions2"
+				"Advanced Vector Extensions 512 (X86/X64) (/arch:AVX512)"	"AdvancedVectorExtensions512"
+				"Not Set"													"NotSet"
 			}
 		}
 
@@ -531,6 +563,7 @@
 			{
 				"ISO C++14 Standard (std:c++14)"	"stdcpp14"
 				"ISO C++17 Standard (std:c++17)"	"stdcpp17"
+				"ISO C++20 Standard (std:c++20)"	"stdcpp20"
 				"Preview - Features from the Latest C++ Working Draft (std:c++latest)"		"stdcpplatest"
 			}
 		}
@@ -555,6 +588,11 @@
 			"type"	"bool"
 		}
 
+		"$EnforceTypeConversionRules"
+		{
+			"type"		"bool"
+		}
+
 		"$EnableRunTimeTypeInfo"
 		{
 			"type"		"bool"
@@ -562,6 +600,11 @@
 		}
 
 		"$OpenMPSupport"
+		{
+			"type"		"bool"
+		}
+
+		"$ConformanceMode"
 		{
 			"type"		"bool"
 		}

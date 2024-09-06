@@ -173,7 +173,10 @@ $Configuration "Release"
 		$UseUNICODEResponseFiles				"No"
 
 		// Input
-		$AdditionalDependencies
+		$AdditionalDependencies					"$BASE libvcasan.lib" [$ASAN]
+		$AdditionalDependencies					"$BASE clang_rt.fuzzer_no_main_MT-i386.lib" [$WIN32 && $FUZZER]
+		$AdditionalDependencies					"$BASE clang_rt.fuzzer_no_main_MT-x86_64.lib" [$WIN64 && $FUZZER]
+
 		$IgnoreAllDefaultLibraries
 		$IgnoreSpecificLibrary					"libc;libcd;libcmtd;libcpmtd;libcpmtd0;libcpmtd1"
 		$ModuleDefinitionFile
@@ -208,13 +211,9 @@ $Configuration "Release"
 		$SwapRunFromCD
 		$SwapRunFromNetwork
 		$Driver
-
-		// RandomizeBaseAddress (/DYNAMICBASE, /ASLR) is a hugely important security setting.
-		// However it can cause confusion during development and can make tracking down certain
-		// bugs tricky by making code/stack/heap addresses change between runs. Enable for retail,
-		// but disable for development builds.
-		$RandomizedBaseAddress				"true" [$RETAIL]
-		$RandomizedBaseAddress				"false" [!$RETAIL]
+		
+		// dimhotepus: Enable even for debug builds to check we do not rely on fixed base address.
+		$RandomizedBaseAddress				"true"
 
 		// Optimization
 		$References							"Eliminate Unreferenced Data (/OPT:REF)"

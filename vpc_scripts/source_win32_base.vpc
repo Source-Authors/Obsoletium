@@ -23,7 +23,14 @@ $Configuration
 
 	$Compiler
 	{
-		$MultiProcessorCompilation "True"
+		// dimhotepus: Enable Secure Development Lifecycle by default.
+		$SDLCheck							"True"
+
+		$MultiProcessorCompilation			"True"
+
+		// dimhotepus: Add AddressSanitizer and LibFuzzer support.
+		$EnableASAN							"True" [$ASAN]
+		$EnableFuzzer						"True" [$FUZZER]
 
 		// Having lots of warnings makes it harder to notice new, and possibly
 		// important warnings, both on buildbot and in the output window. Lots
@@ -32,12 +39,15 @@ $Configuration
 		// keep the warning count down is to have warnings-as-errors.
 		// We will not be warning free on 64-bit for a while...
 		// dimhotepus: Do not treat warnings as errors, there are too much warnings to fix at once.
-		// $TreatWarningsAsErrors				"Yes (/WX)" [!$ANALYZE && !$WIN64]
+		// $TreatWarningsAsErrors			"Yes (/WX)" [!$ANALYZE && !$WIN64]
 		$TreatWarningsAsErrors				"No (/WX-)"
 
 		// Defines to differentiate 32 from 64 bit builds
-		$PreprocessorDefinitions			"$BASE;PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64" [$WIN64]
-		$PreprocessorDefinitions			"$BASE;COMPILER_MSVC32" [$WIN32]
+		$PreprocessorDefinitions			"$BASE;COMPILER_MSVC;COMPILER_MSVC64;PLATFORM_64BITS;WIN64;_WIN64" [$WIN64]
+		$PreprocessorDefinitions			"$BASE;COMPILER_MSVC;COMPILER_MSVC32" [$WIN32]
+
+		// dimhotepus: Enable CFG by default.
+		$ControlFlowGuard					"Control Flow Guard (/guard:cf)"
 
 		// /Gw is a VS 2013 option that puts global and static variables in individual sections so that the
 		// linker can discard unreferenced data. When building @client /dota with linker optimizations this
