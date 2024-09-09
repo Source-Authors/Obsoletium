@@ -81,11 +81,13 @@ extern ConVar cam_idealpitch;
 extern ConVar thirdperson_platformer;
 
 static ConVar m_filter( "m_filter","0", FCVAR_ARCHIVE, "Mouse filtering (set this to 1 to average the mouse over 2 frames)." );
-ConVar sensitivity( "sensitivity","3", FCVAR_ARCHIVE, "Mouse sensitivity.", true, 0.0001f, true, 10000000 );
+// dimhotepus: max 100000 -> 1000 as in CS:GO 
+ConVar sensitivity( "sensitivity","3", FCVAR_ARCHIVE, "Mouse sensitivity.", true, 0.0001f, true, 1000 );
 
-static ConVar m_side( "m_side","0.8", FCVAR_ARCHIVE, "Mouse side factor." );
-static ConVar m_yaw( "m_yaw","0.022", FCVAR_ARCHIVE, "Mouse yaw factor." );
-static ConVar m_forward( "m_forward","1", FCVAR_ARCHIVE, "Mouse forward factor." );
+// dimhotepus: Limit min / max as in CS:GO.
+static ConVar m_side( "m_side","0.8", FCVAR_ARCHIVE, "Mouse side factor.", true, 0.0001f, true, 1000 );
+static ConVar m_yaw( "m_yaw","0.022", FCVAR_ARCHIVE, "Mouse yaw factor.", true, 0.0001f, true, 1000 );
+static ConVar m_forward( "m_forward","1", FCVAR_ARCHIVE, "Mouse forward factor.", true, 0.0001f, true, 1000 );
 
 static ConVar m_customaccel( "m_customaccel", "0", FCVAR_ARCHIVE, "Custom mouse acceleration:"
 	"\n0: custom accelaration disabled"
@@ -93,7 +95,8 @@ static ConVar m_customaccel( "m_customaccel", "0", FCVAR_ARCHIVE, "Custom mouse 
 	"\n2: Same as 1, with but x and y sensitivity are scaled by m_pitch and m_yaw respectively."
 	"\n3: mouse_acceleration = pow(raw_mouse_delta, m_customaccel_exponent - 1) * sensitivity"
 	);
-static ConVar m_customaccel_scale( "m_customaccel_scale", "0.04", FCVAR_ARCHIVE, "Custom mouse acceleration value.", true, 0, false, 0.0f );
+// dimhotepus: Limit max custom acceleration scale to 10 as in CS:GO.
+static ConVar m_customaccel_scale( "m_customaccel_scale", "0.04", FCVAR_ARCHIVE, "Custom mouse acceleration value.", true, 0, false, 10 );
 static ConVar m_customaccel_max( "m_customaccel_max", "0", FCVAR_ARCHIVE, "Max mouse move scale factor, 0 for no limit" );
 static ConVar m_customaccel_exponent( "m_customaccel_exponent", "1", FCVAR_ARCHIVE, "Mouse move is raised to this power before being scaled by scale factor.", true, 1.0f, false, 0.0f);
 
