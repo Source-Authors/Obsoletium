@@ -22,13 +22,13 @@ if ["%~2"]==["x86"] (
   SET CMAKE_MSVC_ARCH_NAME=Win32
   SET MSBUILD_PLATFORM=x86
 
-  ECHO "Generating solution %SOLUTION_NAME for x86"
+  ECHO "Generating solution %SOLUTION_NAME% for x86"
   SET "SOLUTION_NAME=%SOLUTION_NAME%_x86"
 ) else if ["%~2"]==["x64"] (
   SET CMAKE_MSVC_ARCH_NAME=x64
   SET MSBUILD_PLATFORM=x64
 
-  ECHO "Generating solution %SOLUTION_NAME_x64 for x64"
+  ECHO "Generating solution %SOLUTION_NAME% for x64"
   SET "SOLUTION_NAME=%SOLUTION_NAME%_x64"
 ) else (
   ECHO Please pass CPU architecture as second argument. Supported x86 and x64.
