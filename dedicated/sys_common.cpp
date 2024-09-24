@@ -164,16 +164,30 @@ static const char *get_consolelog_filename()
 	return s_consolelog;
 }
 
+template <size_t out_size>
+const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
+                               const char *message) {
+  const char *out_group{GetSpewOutputGroup()};
+
+  out_group = out_group && out_group[0] ? out_group : group;
+
+  const size_t length{strlen(message)};
+  if (length > 1 && message[length - 1] == '\n') {
+    Q_snprintf(out, std::size(out), "[%s] %s", out_group, message);
+  } else {
+    Q_snprintf(out, std::size(out), "%s", message);
+  }
+
+  return out;
+}
+
 SpewRetval_t DedicatedSpewOutputFunc( SpewType_t spewType, char const *pMsg )
 {
-	constexpr char swdsGroup[] = "swds";
-	const char* group = GetSpewOutputGroup();
-
-	group = group && group[0] ? group : swdsGroup;
+	char message[4096];
 
 	if ( sys )
 	{
-		sys->Printf( "[%s] %s", group, pMsg );
+		sys->Printf( "%s", PrefixMessageGroup(message, "swds", pMsg) );
 
 		// If they have specified -consolelog, log this message there. Otherwise these
 		//	wind up being lost because Sys_InitGame hasn't been called yet, and 

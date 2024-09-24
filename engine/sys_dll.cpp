@@ -713,8 +713,26 @@ void GetSpew( char *buf, size_t buflen )
 
 ConVar spew_consolelog_to_debugstring( "spew_consolelog_to_debugstring", "0", 0, "Send console log to PLAT_DebugString()" );
 
+template <size_t out_size>
+const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
+                               const char *message) {
+  const char *out_group{GetSpewOutputGroup()};
+
+  out_group = out_group && out_group[0] ? out_group : group;
+
+  const size_t length{strlen(message)};
+  if (length > 1 && message[length - 1] == '\n') {
+    Q_snprintf(out, std::size(out), "[%s] %s", out_group, message);
+  } else {
+    Q_snprintf(out, std::size(out), "%s", message);
+  }
+
+  return out;
+}
+
 SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 {
+	char message[4096];
 	bool suppress = g_bInSpew;
 
 	g_bInSpew = true;
@@ -727,11 +745,8 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 	// excessive spew. Having the output in traces is also generically useful
 	// for understanding slowdowns.
 	ETWMark1I( pMsg, spewType );
-	
-	constexpr char engineGroup[] = "engine";
-	const char* group = GetSpewOutputGroup();
 
-	group = group && group[0] ? group : engineGroup;
+	PrefixMessageGroup(message, "engine", pMsg);
 
 	if ( !suppress )
 	{
@@ -749,11 +764,11 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 		{
 			if (spewType == SPEW_MESSAGE || spewType == SPEW_LOG)
 			{
-				printf( "[%s] %s", group, pMsg );
+				printf( "%s", message );
 			}
 			else
 			{
-				fprintf( stderr, "[%s] %s", group, pMsg );
+				fprintf( stderr, "%s", message );
 			}
 		}
 
@@ -785,12 +800,12 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 				}
 				break;
 			}
-			Con_ColorPrintf( color, "[%s] %s", group, pMsg );
+			Con_ColorPrintf( color, "%s", message );
 
 		}
 		else
 		{
-			g_Log.Printf( "[%s] %s", group, pMsg );
+			g_Log.Printf( "%s", message );
 		}
 	}
 
@@ -798,7 +813,7 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 
 	if (spewType == SPEW_ERROR)
 	{
-		Sys_Error( "[%s] %s", group, pMsg );
+		Sys_Error( "%s", message );
 		return SPEW_ABORT;
 	}
 	if (spewType == SPEW_ASSERT)
