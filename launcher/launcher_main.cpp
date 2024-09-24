@@ -51,18 +51,28 @@ extern void *CreateSDLMgr();
 
 namespace {
 
+template <size_t out_size>
+const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
+                               const char *message) {
+  const char *out_group{GetSpewOutputGroup()};
+
+  out_group = out_group && out_group[0] ? out_group : group;
+
+  const size_t length{strlen(message)};
+  if (length > 1 && message[length - 1] == '\n') {
+    Q_snprintf(out, std::size(out), "[%s] %s", out_group, message);
+  } else {
+    Q_snprintf(out, std::size(out), "%s", message);
+  }
+
+  return out;
+}
+
 // Spew function!
 SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type, const char *raw) {
   char message[4096];
 
-  constexpr char engineGroup[] = "launcher";
-  const char *group = GetSpewOutputGroup();
-
-  group = group && group[0] ? group : engineGroup;
-
-  Q_snprintf(message, std::size(message), "[%s] %s", group, raw);
-
-  Plat_DebugString(message);
+  Plat_DebugString(PrefixMessageGroup(message, "launcher", raw));
 
   switch (spew_type) {
     case SPEW_MESSAGE:
