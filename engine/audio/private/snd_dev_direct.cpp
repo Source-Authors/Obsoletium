@@ -744,7 +744,7 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 	{
 		if (hresult != DSERR_ALLOCATED)
 		{
-			DevMsg ("DirectSound create failed\n");
+			DevMsg ("DirectSound create failed w/e 0x%8x\n", hresult);
 			return SIS_FAILURE;
 		}
 
@@ -1653,14 +1653,26 @@ void CAudioDirectSound::ChannelReset( int entnum, int channelIndex, float distan
 }
 
 const char *CAudioDirectSound::DeviceName( void )
-{ 
-	if ( m_bSurroundCenter )
-		return "5 Channel Surround";
+{
+	switch (snd_surround.GetInt())
+	{
+	case 0:
+		return "Direct Sound Headphones";
 
-	if ( m_bSurround )
-		return "4 Channel Surround";
+	case 2:
+		return "Direct Sound Speakers";
 
-	return "Direct Sound"; 
+	case 4:
+		return "Direct Sound 4 Channel Surround";
+
+	case 5:
+		return "Direct Sound 5.1 Channel Surround";
+
+	case 7:
+		return "Direct Sound 7.1 Channel Surround";
+	}
+
+	return "Direct Sound";
 }
 
 // use the partial buffer locking code in stereo as well - not available when recording a movie
