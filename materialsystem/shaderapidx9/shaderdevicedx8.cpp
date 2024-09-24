@@ -2837,9 +2837,8 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 	// Do mode change if we have a video mode change.
 	if ( m_bPendingVideoModeChange && !IsDeactivated() )
 	{
-#ifdef _DEBUG
 		const ShaderDisplayMode_t &newMode = m_PendingVideoModeChangeConfig.m_DisplayMode;
-		Warning
+		DevMsg
 		(
 			"Video mode change detected [dx level %d, %d x %d, %s]\n",
 			m_PendingVideoModeChangeConfig.m_nDXLevel,
@@ -2847,7 +2846,7 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 			newMode.m_nHeight,
 			m_PendingVideoModeChangeConfig.m_bWindowed ? "window" : "fullscreen"
 		);
-#endif
+
 		// now purge unreferenced materials
 		g_pShaderUtil->UncacheUnusedMaterials( true );
 
