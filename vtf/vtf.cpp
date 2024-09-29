@@ -752,7 +752,7 @@ bool CVTFTexture::LoadImageData( CUtlBuffer &buf, const VTFFileHeader_t &header,
 		{
 			for (int iFace = 0; iFace < nFacesToRead; ++iFace)
 			{
-				// printf("\n tex %p mip %i frame %i face %i  size %i  buf offset %i", this, iMip, iFrame, iFace, iMipSize, buf.TellGet() );
+				// Msg("\n tex %p mip %i frame %i face %i  size %i  buf offset %i", this, iMip, iFrame, iFace, iMipSize, buf.TellGet() );
 				unsigned char *pMipBits = ImageData( iFrame, iFace, iMip );
 				buf.Get( pMipBits, iMipSize );
 			}
@@ -2201,7 +2201,7 @@ static void CalcHemisphereColor( SphereCalc_t *pCalc, float x, float y )
 	// Transform the normal based on the actual view direction
 	TransformNormal( pCalc, normal );
 
-//	printf( "x: %f y: %f normal: %f %f %f\n", x, y, normal.x, normal.y, normal.z );
+//	Msg( "x: %f y: %f normal: %f %f %f\n", x, y, normal.x, normal.y, normal.z );
 	
 	/*
 	// Compute the reflection vector (full spheremap solution)
@@ -2600,13 +2600,13 @@ void CVTFTexture::GenerateMipmaps()
 			if ( !bMipBlendActive )
 			{
 				bMipBlendActive = true;
-				printf( "Blending mip%d %dx%d to", iMipLevel, info.m_nDestWidth, info.m_nDestHeight );
+				Msg( "Blending mip%d %dx%d to", iMipLevel, info.m_nDestWidth, info.m_nDestHeight );
 			}
 
-			printf( "   %c=%d ~%d%%", chChannels[ch], m_Options.clrDecayGoal[ch], int( (1.f - info.m_flColorScale[ch]) * 100.0f + 0.5f ) );
+			Msg( "   %c=%d ~%d%%", chChannels[ch], m_Options.clrDecayGoal[ch], int( (1.f - info.m_flColorScale[ch]) * 100.0f + 0.5f ) );
 		}
 		if ( bMipBlendActive )
-			printf( "\n" );
+			Msg( "\n" );
 
 		if ( bNormalMap )
 		{
