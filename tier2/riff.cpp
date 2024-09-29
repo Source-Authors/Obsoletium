@@ -89,7 +89,7 @@ InFileRIFF::InFileRIFF( const char *pFileName, IFileReadBinary &io ) : m_io(io)
 	riff = ReadInt();
 	if ( riff != RIFF_ID )
 	{
-		printf( "Not a RIFF File [%s]\n", pFileName );
+		fprintf( stderr, "Not a RIFF File [%s]\n", pFileName );
 		m_riffSize = 0;
 	}
 	else

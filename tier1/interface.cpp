@@ -109,7 +109,7 @@ void *GetModuleHandle(const char *name)
 
     if( (handle=dlopen(name, RTLD_NOW))==NULL)
     {
-            printf("DLOPEN Error:%s\n",dlerror());
+            fprintf(stderr, "DLOPEN Error:%s\n",dlerror());
             // couldn't open this file
             return NULL;
     }

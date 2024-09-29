@@ -70,7 +70,7 @@ class CVCRHelpers : public IVCRHelpers
 public:
 	virtual void	ErrorMessage( const char *pMsg )
 	{
-		printf( "ERROR: %s\n", pMsg );
+		fprintf( stderr, "ERROR: %s\n", pMsg );
 	}
 
 	virtual void*	GetMainWindow()
