@@ -2044,7 +2044,7 @@ void CChannelCullList::Initialize( CChannelList &list )
 	}
 }
 
-ConVar snd_mute_losefocus("snd_mute_losefocus", "1", FCVAR_ARCHIVE);
+ConVar snd_mute_losefocus("snd_mute_losefocus", "1", FCVAR_ARCHIVE, "Should mute audio when app looses focus", true, 0, true, 1);
 
 // build a list of channels that will actually do mixing in this update
 // remove all active channels that won't mix for some reason
