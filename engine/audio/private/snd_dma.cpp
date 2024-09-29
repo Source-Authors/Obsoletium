@@ -462,7 +462,7 @@ static ConVar volume( "volume", "1.0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX, "Soun
 ConVar snd_musicvolume( "snd_musicvolume", "1.0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX, "Music volume", true, 0.0f, true, 1.0f );	
 
 ConVar snd_mixahead( "snd_mixahead", "0.1", FCVAR_ARCHIVE );
-ConVar snd_mix_async( "snd_mix_async", "0" );
+ConVar snd_mix_async( "snd_mix_async", "0", 0, "Perform sound mixing in dedicated thread", true, 0, true, 1 );
 #ifdef _DEBUG
 static ConCommand snd_mixvol("snd_mixvol", MXR_DebugSetMixGroupVolume, "Set named Mixgroup to mix volume.");
 #endif
