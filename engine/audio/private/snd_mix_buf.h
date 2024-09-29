@@ -33,7 +33,8 @@ enum SoundBufferType_t
 };
 
 // !!! if this is changed, it much be changed in native assembly too !!!
-struct portable_samplepair_t
+// dimhotepus: align as int as it is casted to usually.
+struct alignas(int) portable_samplepair_t
 {
 	int left;
 	int right;
@@ -102,6 +103,9 @@ extern portable_samplepair_t *g_curcenterpaintbuffer;
 #endif
 
 // hard clip input value to -32767 <= y <= 32767
-#define CLIP(x) ((x) > 32767 ? 32767 : ((x) < -32767 ? -32767 : (x)))
+template<typename T>
+constexpr inline short CLIP(T x) noexcept {
+  return x > 32767 ? 32767 : (x < -32767 ? -32767 : static_cast<short>(x));
+}
 
 #endif // SND_MIX_BUF_H
