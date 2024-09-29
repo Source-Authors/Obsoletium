@@ -2143,7 +2143,7 @@ studiohdr_t *CMDLCache::GetStudioHdr( MDLHandle_t handle )
 				if (IsOSX())
 				{
 					// rbarris wants this to go somewhere like the console.log prior to crashing, which is what the Error call will do next
-					printf("\n ##### Model %s not found and %s couldn't be loaded", pModelName, ERROR_MODEL );
+					fprintf(stderr, "\n ##### Model %s not found and %s couldn't be loaded", pModelName, ERROR_MODEL );
 					fflush( stdout );
 				}
 				Error( "Model %s not found and %s couldn't be loaded", pModelName, ERROR_MODEL );

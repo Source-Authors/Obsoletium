@@ -4659,7 +4659,7 @@ void CBaseFileSystem::Warning( FileWarningLevel_t level, PRINTF_FORMAT_STRING co
     va_end( argptr );
 
 	// Dump to stdio
-	printf( "%s", warningtext );
+	fprintf( stderr, "%s", warningtext );
 	if ( m_pfnWarning )
 	{
 		(*m_pfnWarning)( warningtext );
