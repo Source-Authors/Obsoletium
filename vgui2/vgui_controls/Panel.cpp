@@ -4177,19 +4177,28 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 	AutoResize_e autoResize = (AutoResize_e)inResourceData->GetInt( "AutoResize", AUTORESIZE_NO );
 	PinCorner_e pinCorner = (PinCorner_e)inResourceData->GetInt( "PinCorner", PIN_TOPLEFT );
 
+	// dimhotepus: Correctly compute when child size depends on nonsized parent.
+#if defined( _DEBUG )
+	bool isParentSizeComputed = true;
+	// pinned x, pinned y, unpinned x, unpinned y.
+	bool dimension2ParentSizeUsageMap[] = {
+		pinCorner == PIN_TOPRIGHT || pinCorner == PIN_BOTTOMRIGHT,
+		pinCorner == PIN_BOTTOMLEFT || pinCorner == PIN_BOTTOMRIGHT,
+		pinCorner == PIN_TOPLEFT || pinCorner == PIN_BOTTOMLEFT,
+		pinCorner == PIN_TOPLEFT || pinCorner == PIN_TOPRIGHT
+	};
+#endif
+
 	// By default, measure unpinned corner for the offset
 	int pw = wide, pt = tall;
-	if ( GetParent() )
+	vgui::Panel *parent = GetParent();
+	if ( parent )
 	{
-		GetParent()->GetSize( pw, pt );
+		parent->GetSize( pw, pt );
 #if defined( _DEBUG )
 		if ( pw == 64 && pt == 24 )
 		{
-			if ( GetParent() != lastWarningParent )
-			{
-				lastWarningParent = GetParent();
-				Warning( "Resize parent (panel(%s) -> parent(%s)) not sized yet!!!\n", GetName(), GetParent()->GetName() );
-			}
+			isParentSizeComputed = false;
 		}
 #endif
 	}
@@ -4230,35 +4239,80 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 	// Allow specific overrides in the resource file
 	if ( IsProportional() )
 	{
-		if ( inResourceData->FindKey( "PinnedCornerOffsetX" ) )
+		vgui::HScheme panelScheme = GetScheme();
+		if ( auto *kv = inResourceData->FindKey( "PinnedCornerOffsetX" ) )
 		{
-			nPinnedCornerOffsetX = scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "PinnedCornerOffsetX" ) );
+			nPinnedCornerOffsetX = scheme()->GetProportionalScaledValueEx( panelScheme, kv->GetInt( "PinnedCornerOffsetX" ) );
 		}
-		if ( inResourceData->FindKey( "PinnedCornerOffsetY" ) )
+		if ( auto *kv = inResourceData->FindKey( "PinnedCornerOffsetY" ) )
 		{
-			nPinnedCornerOffsetY =	scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "PinnedCornerOffsetY" ) );
+			nPinnedCornerOffsetY = scheme()->GetProportionalScaledValueEx( panelScheme, kv->GetInt( "PinnedCornerOffsetY" ) );
 		}
-		if ( inResourceData->FindKey( "UnpinnedCornerOffsetX" ) )
+		if ( auto *kv = inResourceData->FindKey( "UnpinnedCornerOffsetX" ) )
 		{
-			nUnpinnedCornerOffsetX = scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "UnpinnedCornerOffsetX" ) );
+			nUnpinnedCornerOffsetX = scheme()->GetProportionalScaledValueEx( panelScheme, kv->GetInt( "UnpinnedCornerOffsetX" ) );
 		}
-		if ( inResourceData->FindKey( "UnpinnedCornerOffsetY" ) )
+		if ( auto *kv = inResourceData->FindKey( "UnpinnedCornerOffsetY" ) )
 		{
-			nUnpinnedCornerOffsetY = scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "UnpinnedCornerOffsetY" ) );
+			nUnpinnedCornerOffsetY = scheme()->GetProportionalScaledValueEx( panelScheme, kv->GetInt( "UnpinnedCornerOffsetY" ) );
 		}
 	}
 	else
 	{
-		nPinnedCornerOffsetX = inResourceData->GetInt( "PinnedCornerOffsetX", nPinnedCornerOffsetX );
-		nPinnedCornerOffsetY = inResourceData->GetInt( "PinnedCornerOffsetY", nPinnedCornerOffsetY );
-		nUnpinnedCornerOffsetX = inResourceData->GetInt( "UnpinnedCornerOffsetX", nUnpinnedCornerOffsetX );
-		nUnpinnedCornerOffsetY = inResourceData->GetInt( "UnpinnedCornerOffsetY", nUnpinnedCornerOffsetY );
+		if ( auto *kv = inResourceData->FindKey( "PinnedCornerOffsetX" ) )
+		{
+#if defined(_DEBUG)
+			dimension2ParentSizeUsageMap[0] = false;
+#endif
+			nPinnedCornerOffsetX = kv->GetInt( "PinnedCornerOffsetX", nPinnedCornerOffsetX );
+	}
+		if ( auto *kv = inResourceData->FindKey( "PinnedCornerOffsetY" ) )
+		{
+#if defined( _DEBUG )
+			dimension2ParentSizeUsageMap[1] = false;
+#endif
+			nPinnedCornerOffsetY = kv->GetInt( "PinnedCornerOffsetY", nPinnedCornerOffsetY );
+		}
+		if ( auto *kv = inResourceData->FindKey( "UnpinnedCornerOffsetX" ) )
+		{
+#if defined(_DEBUG)
+			dimension2ParentSizeUsageMap[2] = false;
+#endif
+			nUnpinnedCornerOffsetX = kv->GetInt( "UnpinnedCornerOffsetX", nUnpinnedCornerOffsetX );
+		}
+		if ( auto *kv = inResourceData->FindKey( "UnpinnedCornerOffsetY" ) )
+		{
+#if defined( _DEBUG )
+			dimension2ParentSizeUsageMap[3] = false;
+#endif
+			nUnpinnedCornerOffsetY = kv->GetInt( "UnpinnedCornerOffsetY", nUnpinnedCornerOffsetY );
+		}
 	}
 
 	if ( autoResize == AUTORESIZE_NO )
 	{
 		nUnpinnedCornerOffsetX = nUnpinnedCornerOffsetY = 0;
+#if defined(_DEBUG)
+		dimension2ParentSizeUsageMap[2] = dimension2ParentSizeUsageMap[3] = false;
+#endif
 	}
+
+	// dimhotepus: Correctly compute when child size depends on nonsized
+	// parent.
+#if defined( _DEBUG )
+	if ( !isParentSizeComputed )
+	{
+		for ( bool isParentSizeUsed : dimension2ParentSizeUsageMap )
+		{
+			if ( isParentSizeUsed && parent != lastWarningParent )
+			{
+				lastWarningParent = parent;
+				Warning( "Resize parent (panel(%s) -> parent(%s)) not sized yet!!!\n", GetName(), parent->GetName() );
+				break;
+			}
+		}
+	}
+#endif
 
 	SetAutoResize( pinCorner, autoResize, nPinnedCornerOffsetX, nPinnedCornerOffsetY, nUnpinnedCornerOffsetX, nUnpinnedCornerOffsetY );
 }
