@@ -70,7 +70,7 @@ IQueuedPacketSender *g_pQueuedPackedSender = &g_QueuedPacketSender;
 CQueuedPacketSender::CQueuedPacketSender() :
 	m_QueuedPackets( (intp)0, 0, CQueuedPacket::LessFunc )
 {
-	SetName( "QueuedPacketSender" );
+	SetName( "QueuedPacketSnd" );
 	m_bThreadShouldExit = false;
 }
 

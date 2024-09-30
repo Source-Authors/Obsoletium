@@ -6457,7 +6457,7 @@ void S_Update_( float mixAheadTime )
 		if ( !g_hMixThread )
 		{
 			g_bMixThreadExit = false;
-			g_hMixThread = ThreadExecuteSolo( "SndMix", S_Update_Thread );
+			g_hMixThread = ThreadExecuteSolo( "SoundMixer", S_Update_Thread );
 		}
 	}
 }

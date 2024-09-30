@@ -1093,7 +1093,7 @@ private:
 
 	static unsigned LoaderMain( void* _this )
 	{
-		ThreadSetDebugName( "Loader" );
+		ThreadSetDebugName( "TextureLoader" );
 
 		s_TextureManager.m_nAsyncLoadThread = ThreadGetCurrentId();
 		( ( AsyncLoader* )_this )->ThreadLoader_Main();
@@ -1393,7 +1393,7 @@ private:
 	}
 	static unsigned ReaderMain( void* _this )
 	{
-		ThreadSetDebugName( "Helper" );
+		ThreadSetDebugName( "TextureReader" );
 
 		s_TextureManager.m_nAsyncReadThread = ThreadGetCurrentId();
 		( ( AsyncReader* ) _this )->ThreadReader_Main();
