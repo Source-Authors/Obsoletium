@@ -406,28 +406,22 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 #ifdef _WIN32
 	if ( Plat_IsInDebugSession() )
 	{
-#define MS_VC_EXCEPTION 0x406d1388
-
-		typedef struct tagTHREADNAME_INFO
+		HANDLE handle = OpenThread( STANDARD_RIGHTS_READ | THREAD_SET_INFORMATION,
+			FALSE,
+			id != -1 ? id : GetThreadId( GetCurrentThread() ) );
+		if ( handle )
 		{
-			DWORD dwType;        // must be 0x1000
-			LPCSTR szName;       // pointer to name (in same addr space)
-			DWORD dwThreadID;    // thread ID (-1 caller thread)
-			DWORD dwFlags;       // reserved for future use, most be zero
-		} THREADNAME_INFO;
+			const size_t wcharsNeeded = mbstowcs( nullptr, pszName, INT_MAX );
+			const size_t descriptionSize = (wcharsNeeded + 1) * sizeof(wchar_t);
+			wchar_t *description = static_cast<wchar_t*>( stackalloc( descriptionSize ) );
 
-		THREADNAME_INFO info;
-		info.dwType = 0x1000;
-		info.szName = pszName;
-		info.dwThreadID = id;
-		info.dwFlags = 0;
+			[[maybe_unused]] const size_t wcharsConverted = mbstowcs( description, pszName, INT_MAX );
+			Assert( wcharsNeeded == wcharsConverted );
+			description[descriptionSize / sizeof(wchar_t) - 1] = L'\0';
 
-		__try
-		{
-			RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(DWORD), (ULONG_PTR *)&info);
-		}
-		__except (EXCEPTION_EXECUTE_HANDLER)
-		{
+			SetThreadDescription( handle, description );
+
+			CloseHandle( handle );
 		}
 	}
 #elif defined( _LINUX )
