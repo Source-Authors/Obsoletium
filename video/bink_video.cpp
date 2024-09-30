@@ -123,8 +123,8 @@ InitReturnVal_t CBinkVideoSubSystem::Init()
 		return nRetVal;
 	}
 
-	Msg( "Start up Bink Video %s (%u.%u.%u)\n",
-		BINKVERSION, BINKMAJORVERSION, BINKMINORVERSION, BINKSUBVERSION );
+	Msg( "Start up Bink Video %s (%u.%u.%u.%u)\n", BinkVersion,
+		Bink1MajorVersion, Bink1MinorVersion, Bink1BuildNumber, Bink1Customization);
 
 	// dimhotepus: Use our allocators (ASAN happier).
 	BinkSetMemory( BinkAlloc, BinkFree );
@@ -137,8 +137,8 @@ void CBinkVideoSubSystem::Shutdown()
 	// Make sure we shut down Bink
 	ShutdownBink();
 
-	Msg("Shut down Bink Video %s (%u.%u.%u)\n",
-		BINKVERSION, BINKMAJORVERSION, BINKMINORVERSION, BINKSUBVERSION);
+	Msg("Shut down Bink Video %s (%u.%u.%u.%u)\n", BinkVersion,
+		Bink1MajorVersion, Bink1MinorVersion, Bink1BuildNumber, Bink1Customization);
 
 	BaseClass::Shutdown();
 }
@@ -217,9 +217,8 @@ VideoResult_t CBinkVideoSubSystem::VideoSoundDeviceCMD( VideoSoundDeviceOperatio
 
 		case VideoSoundDeviceOperation::HOOK_X_AUDIO:
 		{
-#ifdef __RADXENON__
-			BinkSoundUseXAudio();
-			return SetResult( VideoResult::SUCCESS );
+#if defined(__RADXENON__) || defined(__RADWIN__)
+			return SetResult( BinkSoundUseXAudio2( pDevice ) ? VideoResult::SUCCESS : VideoResult::AUDIO_ERROR_OCCURED );
 #else
 			return SetResult( VideoResult::OPERATION_NOT_SUPPORTED );
 #endif
@@ -278,7 +277,7 @@ VideoSystemFeature_t CBinkVideoSubSystem::GetSupportedFileExtensionFeatures( int
 VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename, void *mainWindow, int windowWidth, int windowHeight, int desktopWidth, int desktopHeight, bool windowed, float forcedMinTime, VideoPlaybackFlags_t playbackFlags )
 {
 	// See if the caller is asking for a feature we can not support....
-	VideoPlaybackFlags_t unsupportedFeatures = VideoPlaybackFlags::PRELOAD_VIDEO | VideoPlaybackFlags::LOOP_VIDEO;
+	VideoPlaybackFlags_t unsupportedFeatures = VideoPlaybackFlags::PRELOAD_VIDEO;
 	if ( playbackFlags & unsupportedFeatures )
 	{
 		return SetResult( VideoResult::FEATURE_NOT_AVAILABLE );
@@ -301,9 +300,15 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 
 	// Check to see if we should include audio playback
 	bool enableMovieAudio = !BITFLAGS_SET( playbackFlags, VideoPlaybackFlags::NO_AUDIO );
+	unsigned binkFlags = enableMovieAudio ? BINKSNDTRACK : 0;
+
+	if ( playbackFlags & VideoPlaybackFlags::LOOP_VIDEO )
+	{
+		binkFlags = binkFlags | BINKWILLLOOP;
+	}
 
 	// Open the bink file with audio
-	HBINK hBINK = BinkOpen( filename, enableMovieAudio ? BINKSNDTRACK : 0 );
+	HBINK hBINK = BinkOpen( filename, binkFlags );
 	if ( hBINK == 0 )
 	{
 		Warning( "Bink video %s open error: %s.", filename, BinkGetError() );
@@ -436,7 +441,20 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 			}
 
 			// Check for video being complete
-			if ( hBINK->FrameNum == hBINK->Frames ) break;
+			if ( hBINK->FrameNum == hBINK->Frames )
+			{
+				if ( playbackFlags & VideoPlaybackFlags::LOOP_VIDEO )
+				{
+					// This flag clears to non-looping each time the file loops.
+					// So, if you are going to loop over and over, then you need
+					// to reset the loop each playback cycle.
+					BinkSetWillLoop( hBINK, 1 );
+				}
+				else
+				{
+					break;
+				}
+			}
 
 			// Move on
 			BinkNextFrame( hBINK );

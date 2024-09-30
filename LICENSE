@@ -56,6 +56,13 @@ marked with other licenses or externally maintained libraries.
 
 Externally maintained by Source 1 libraries are:
 
+- bink2 located at thirdparty/bink is licensed as:
+"""
+  RAD Game Tools.
+
+  See https://www.radgametools.com/bnkmain.htm
+"""
+
 - bzip2 located at thirdparty/bzip2 is licensed as:
 """
   This program, "bzip2", the associated library "libbzip2", and all
