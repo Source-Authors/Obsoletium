@@ -172,6 +172,12 @@ bool CAudioDirectSound::Init( void )
 
 void CAudioDirectSound::Shutdown( void )
 {
+	// dimhotepus: Notify video we shut down sound device.
+	if ( g_pVideo != NULL )
+	{
+		g_pVideo->SoundDeviceCommand( VideoSoundDeviceOperation::SET_DIRECT_SOUND_DEVICE, nullptr );
+	}
+
 	ReleaseSurround();
 
 	if (pDSBuf)
