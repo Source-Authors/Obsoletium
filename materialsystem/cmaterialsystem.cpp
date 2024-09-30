@@ -2719,7 +2719,7 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 			{
 				DevWarning( "%s", pComplainPrefix );
 			}
-			DevWarning( "material \"%s\" not found.\n", name );
+			DevWarning( "Material '%s' not found.\n", name );
 		}
 	}
 
