@@ -153,7 +153,7 @@ namespace VideoSoundDeviceOperation
 	{
 		SET_DIRECT_SOUND_DEVICE = 0,			// Windows option
 		SET_MILES_SOUND_DEVICE,					// Supported by RAD
-		HOOK_X_AUDIO,							// Xbox Option
+		HOOK_X_AUDIO,							// XAudio2 Option (PC / XBOX)
 		SET_SOUND_MANAGER_DEVICE,				// OSX Option
 		SET_LIB_AUDIO_DEVICE,					// PS3 Option
 		SET_SDL_SOUND_DEVICE,					// SDL Audio
