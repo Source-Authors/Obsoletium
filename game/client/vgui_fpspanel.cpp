@@ -6,19 +6,22 @@
 
 #include "cbase.h"
 #include "ifpspanel.h"
-#include <vgui_controls/Panel.h>
 #include "view.h"
-#include <vgui/IVGui.h>
 #include "VGuiMatSurface/IMatSystemSurface.h"
-#include <vgui_controls/Controls.h>
-#include <vgui/ISurface.h>
-#include <vgui/IScheme.h>
-#include <vgui/IPanel.h>
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Panel.h"
+#include "vgui/IVGui.h"
+#include "vgui/ISurface.h"
+#include "vgui/IScheme.h"
+#include "vgui/IPanel.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "filesystem.h"
-#include "../common/xbox/xboxstubs.h"
 #include "steam/steam_api.h"
 #include "tier0/cpumonitoring.h"
+
+#ifdef _WIN32
+#include "winlite.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -351,12 +354,27 @@ void CFPSPanel::Paint()
 	
 	if ( cl_showbattery.GetInt() > 0 )
 	{
+#ifndef NO_STEAM
 		if ( steamapicontext && steamapicontext->SteamUtils() && 
 			( m_lastBatteryPercent == -1.0f || (gpGlobals->realtime - m_lastBatteryPercent) > 10.0f ) )
 		{
 			m_BatteryPercent = steamapicontext->SteamUtils()->GetCurrentBatteryPower();
 			m_lastBatteryPercent = gpGlobals->realtime;
 		}
+#elif defined(_WIN32)
+		if ( ( m_lastBatteryPercent == -1.0f || (gpGlobals->realtime - m_lastBatteryPercent) > 10.0f ) )
+		{
+			SYSTEM_POWER_STATUS power_status = {};
+			if (::GetSystemPowerStatus(&power_status))
+			{
+				// 255 if status is unknown. Or if AC enabled.
+				m_BatteryPercent = power_status.ACLineStatus == 1
+					? 255
+					: power_status.BatteryLifePercent;
+				m_lastBatteryPercent = gpGlobals->realtime;
+			}
+		}
+#endif
 		
 		if ( m_BatteryPercent > 0 )
 		{
