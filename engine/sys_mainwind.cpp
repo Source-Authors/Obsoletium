@@ -17,11 +17,18 @@
 
 #if defined( WIN32 ) && !defined( DX_TO_GL_ABSTRACTION )
 #include "winlite.h"
+#include <combaseapi.h>
 #include <imm.h>
 // dimhotepus: Disable accessibility keys (ex. five times Shift).
 #include "accessibility_shortcut_keys_toggler.h"
 // dimhotepus: Disable Win key.
 #include "windows_shortcut_keys_toggler.h"
+// dimhotepus: Notify when system suspend / resume. Save game when suspend.
+#include "scoped_power_suspend_resume_notifications_registrator.h"
+// dimhotepus: Notify when system power settings changed (battery, AC, power plan, etc.).
+#include "scoped_power_settings_notifications_registrator.h"
+// dimhotepus: Do not disable display during video playback when no user input.
+#include "scoped_thread_execution_state.h"
 #endif
 
 #if defined( IS_WINDOWS_PC ) && !defined( USE_SDL )
@@ -207,6 +214,10 @@ private:
 	source::engine::win::WindowsShortcutKeysToggler m_windowsShortcutKeysToggler;
 	// dimhotepus: Disable accessibility keys (ex. five times Shift).
 	source::engine::win::AccessibilityShortcutKeysToggler m_accessibilityShortcutKeysToggler;
+	// dimhotepus: Notify when system suspend / resume.
+	std::unique_ptr<source::engine::win::ScopedPowerSuspendResumeNotificationsRegistrator> m_powerSuspendResumeRegistrator;
+	// dimhotepus: Notify when active session display on / offs changed.
+	std::unique_ptr<source::engine::win::ScopedPowerSettingNotificationsRegistrator> m_sessionDisplayStatusChangedNotificationsRegistrator;
 #endif
 
 	void			UpdateDesktopInformation();
@@ -475,6 +486,119 @@ static LRESULT WINAPI CallDefaultWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam
 #endif
 
 #if defined( WIN32 ) && !defined( USE_SDL )
+
+/**
+ * @brief AC power status.
+ */
+enum class SystemPowerAcLineStatus : unsigned char {
+	/**
+	 * @brief Offline.
+	 */
+	kOffline = 0,
+	/**
+	 * @brief Online.
+	 */
+	kOnline = 1,
+	/**
+	 * @brief Unknown status.
+	 */
+	kUnknown = 255
+};
+
+[[nodiscard]] const char* GetAcLineStatusDescription(SystemPowerAcLineStatus status) noexcept {
+  switch (status) {
+    case SystemPowerAcLineStatus::kOffline:
+      return "Offline";
+    case SystemPowerAcLineStatus::kOnline:
+      return "Online";
+    case SystemPowerAcLineStatus::kUnknown:
+    default:
+      return "Unknown";
+  }
+}
+
+/**
+ * @brief The battery charge status flags.
+ */
+enum class SystemPowerBatteryChargeStatusFlags : unsigned char {
+	/**
+	 * @brief The battery is not being charged and the battery capacity is
+	 * between low and high.
+	 */
+	kNotChargingAndBetween33And66Percent = 0,
+	/**
+	 * @brief High — the battery capacity is at more than 66 percent.
+	 */
+	kMoreThan66Percent = 1,
+	/**
+	 * @brief Low — the battery capacity is at less than 33 percent.
+	 */
+	kLessThan33Percent = 2,
+	/**
+	 * @brief Critical — the battery capacity is at less than five percent.
+	 */
+	kLessThan5Percent = 4,
+	/**
+	 * @brief Charging.
+	 */
+	kCharging = 8,
+	/**
+	 * @brief No system battery.
+	 */
+	kNoSystemBattery = 128,
+	/**
+	 * @brief Unknown status — unable to read the battery flag information.
+	 */
+	kUnknown = 255
+};
+
+[[nodiscard]] const char* GetBatteryChargeStatusDescription(SystemPowerBatteryChargeStatusFlags flags) noexcept {
+  switch (flags) {
+    case SystemPowerBatteryChargeStatusFlags::kNotChargingAndBetween33And66Percent:
+      return "33..66%";
+    case SystemPowerBatteryChargeStatusFlags::kMoreThan66Percent:
+      return "> 66%";
+    case SystemPowerBatteryChargeStatusFlags::kLessThan33Percent:
+      return "< 33%";
+    case SystemPowerBatteryChargeStatusFlags::kLessThan5Percent:
+      return "< 5%";
+    case SystemPowerBatteryChargeStatusFlags::kCharging:
+      return "Charging";
+    case SystemPowerBatteryChargeStatusFlags::kNoSystemBattery:
+      return "No battery";
+	default:
+    case SystemPowerBatteryChargeStatusFlags::kUnknown:
+      return "Unknown";
+  }
+}
+
+/**
+ * @brief The status of battery saver.  To participate in energy conservation,
+ * avoid resource intensive tasks when battery saver is on.
+ */
+enum class SystemPowerBatterySaverStatus : unsigned char {
+	/**
+	 * @brief Battery saver is off.
+	 */
+	kOff = 0,
+	/**
+	 * @brief Battery saver on.  Save energy where possible.
+	 */
+	kOn = 1
+};
+
+[[nodiscard]] const char *GetBatterySaverStatusDescription(
+    SystemPowerBatterySaverStatus status) noexcept {
+  switch (status) {
+    case SystemPowerBatterySaverStatus::kOff:
+      return "Off";
+    case SystemPowerBatterySaverStatus::kOn:
+      return "On";
+    default:
+      return "Unknown";
+  }
+}
+
 //-----------------------------------------------------------------------------
 // Main windows procedure
 //-----------------------------------------------------------------------------
@@ -531,12 +655,128 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_POWERBROADCAST:
-		// Don't go into Sleep mode when running engine, we crash on resume for some reason (as
-		//  do half of the apps I have running usually anyway...)
-		if ( wParam == PBT_APMQUERYSUSPEND )
+		switch (wParam)
 		{
-			Msg( "OS requested hibernation, ignoring request.\n" );
-			return BROADCAST_QUERY_DENY;
+			case PBT_APMPOWERSTATUSCHANGE:
+				{
+					// Notifies applications of a change in the power status of the
+					// computer, such as a switch from battery power to A/C.  The
+					// system also broadcasts this event when remaining battery
+					// power slips below the threshold specified by the user or if
+					// the battery power changes by a specified percentage.
+					//
+					// This event can occur when battery life drops to less than 5
+					// minutes, or when the percentage of battery life drops below
+					// 10 percent, or if the battery life changes by 3 percent.
+					SYSTEM_POWER_STATUS power_status = {};
+					if (::GetSystemPowerStatus(&power_status))
+					{
+						SystemPowerAcLineStatus ac_line_status =
+							static_cast<SystemPowerAcLineStatus>(power_status.ACLineStatus);
+						SystemPowerBatteryChargeStatusFlags battery_status_flags =
+							static_cast<SystemPowerBatteryChargeStatusFlags>(power_status.BatteryFlag);
+						SystemPowerBatterySaverStatus battery_saver_status =
+							static_cast<SystemPowerBatterySaverStatus>(power_status.SystemStatusFlag);
+
+						Msg("System power status changed: AC power '%s', battery charge '%s', battery saver '%s'.\n",
+							GetAcLineStatusDescription(ac_line_status),
+							GetBatteryChargeStatusDescription(battery_status_flags),
+							GetBatterySaverStatusDescription(battery_saver_status));
+
+						// The number of seconds of battery life remaining, or
+						// –1 if remaining seconds are unknown or if the device
+						// is connected to AC power.
+						if (power_status.BatteryLifeTime != static_cast<DWORD>(-1))
+						{
+							Msg("System power status changed: %lu hours %.1f mins estimated battery life remaining.\n",
+								power_status.BatteryLifeTime / 3600, ((power_status.BatteryLifeTime % 3600) / 60.0));
+
+							// Ok, less than 3 minutes left.
+							if (power_status.BatteryLifeTime < 180)
+							{
+								Cbuf_AddText( "save low-battery-auto-save" );
+							}
+						}
+					}
+				}
+				break;
+
+			case PBT_APMRESUMEAUTOMATIC:
+				// Notifies applications that the system is resuming from sleep
+				// or hibernation.  This event is delivered every time the system
+				// resumes and does not indicate whether a user is present.
+				//
+				// Possible reasons include:
+				// * user activity (such as pressing the power button)
+				// * user interaction at the physical console (such as mouse or
+				//   keyboard input) after waking unattended
+				// * remote wake signal.
+				//
+				// In Windows 10, version 1507 systems and later, if the system
+				// is resuming from sleep only to immediately enter hibernation,
+				// then this event isn't delivered.  A WM_POWERBROADCAST message
+				// is not sent in this case.
+				Msg("System is resuming from sleep or hibernation by any reason.\n");
+				break;
+
+			case PBT_APMRESUMESUSPEND:
+				// Notifies applications that the system has resumed operation
+				// after being suspended.
+				//
+				// Your application should reopen files that it closed when the
+				// system entered sleep and prepare for user input.
+				Msg("System is resuming from sleep or hibernation by user input.\n");
+				break;
+
+			case PBT_APMSUSPEND:
+				// Notifies applications that the computer is about to enter a
+				// suspended state.  This event is typically broadcast when all
+				// applications and installable drivers have returned TRUE to a
+				// previous PBT_APMQUERYSUSPEND event.
+				//
+				// An application should process this event by completing all
+				// tasks necessary to save data.  The system allows approximately
+				// two seconds for an application to handle this notification.
+				// If an application is still performing operations after its
+				// time allotment has expired, the system may interrupt the
+				// application.
+				Msg("System is about to enter suspended state. Saving the game...\n");
+				Cbuf_AddText( "save suspend-auto-save" );
+				break;
+
+			case PBT_POWERSETTINGCHANGE:
+				{
+					// Power setting change event.
+					POWERBROADCAST_SETTING *power_broadcast_setting =
+						reinterpret_cast<POWERBROADCAST_SETTING *>(lParam);
+					Assert(power_broadcast_setting);
+
+					if (power_broadcast_setting)
+					{
+						if (IsEqualGUID(power_broadcast_setting->PowerSetting,
+								GUID_SESSION_DISPLAY_STATUS))
+						{
+							// The display associated with the application's
+							// session has been powered on or off.
+							DWORD data;
+							memcpy(&data,
+								power_broadcast_setting->Data,
+								std::min(static_cast<DWORD>(sizeof(DWORD)), power_broadcast_setting->DataLength));
+
+							const MONITOR_DISPLAY_STATE display_state =
+								static_cast<MONITOR_DISPLAY_STATE>(data);
+							
+							Msg("App session display status changed to '%s'.\n",
+								display_state == MONITOR_DISPLAY_STATE::PowerMonitorOff
+								? "Off"
+								: display_state == MONITOR_DISPLAY_STATE::PowerMonitorOn
+								? "On"
+								: "Dimmed");
+
+							// TODO: Stop rendering when display is off.
+						}
+					}
+				} break;
 		}
 
 		lRet = CallWindowProc( m_ChainedWindowProc, hWnd, uMsg, wParam, lParam );
@@ -896,6 +1136,12 @@ void CGame::AttachToWindow()
 #if defined( WIN32 )
 	if ( !m_hWindow )
 		return;
+
+	m_powerSuspendResumeRegistrator =
+		std::move(std::make_unique<source::engine::win::ScopedPowerSuspendResumeNotificationsRegistrator>(m_hWindow));
+	m_sessionDisplayStatusChangedNotificationsRegistrator = std::move(
+		std::make_unique<source::engine::win::ScopedPowerSettingNotificationsRegistrator>(m_hWindow, GUID_SESSION_DISPLAY_STATUS));
+
 #if !defined( USE_SDL )
 	m_ChainedWindowProc = (WNDPROC)GetWindowLongPtrW( m_hWindow, GWLP_WNDPROC );
 	SetWindowLongPtrW( m_hWindow, GWLP_WNDPROC, (LONG_PTR)HLEngineWindowProc );
@@ -934,6 +1180,9 @@ void CGame::DetachFromWindow()
 		m_ChainedWindowProc = NULL;
 		return;
 	}
+
+	m_sessionDisplayStatusChangedNotificationsRegistrator.reset();
+	m_powerSuspendResumeRegistrator.reset();
 #endif
 
 	if ( g_pMatSystemSurface )
@@ -1117,6 +1366,14 @@ void CGame::PlayStartupVideos( void )
 	const ScopedMilesAudioDevice scoped_miles_audio_device{vaudio, g_pVideo};
 #endif
 
+	// dimhotepus: Ensure display is not disabled by powersaver when playing startup videos.
+	const source::engine::win::ScopedThreadExecutionState
+		scoped_display_required_state{ES_DISPLAY_REQUIRED};
+	if (!scoped_display_required_state.is_success())
+	{
+		Warning("Unable to signal system display is required. Display may disable during video playback.\n");
+	}
+
 	// hide cursor while playing videos
   #if defined( USE_SDL )
 	g_pLauncherMgr->SetMouseVisible( false );
@@ -1240,12 +1497,14 @@ CGame::CGame()
 	: m_windowsShortcutKeysToggler{ ::GetModuleHandleW( L"engine.dll" ), ShouldEnableWindowsShortcutKeys }
 #endif
 {
+#if defined(IS_WINDOWS_PC)
 	// dimhotepus: Disable Win key.
 	if ( m_windowsShortcutKeysToggler.errno_code() )
 	{
 		const auto lastErrorText = m_windowsShortcutKeysToggler.errno_code().message();
 		Warning("Can't disable Windows keys for full screen mode: %s\n", lastErrorText.c_str() );
 	}
+#endif
 
 #if defined( USE_SDL )
 	m_pSDLWindow = 0;
@@ -1514,9 +1773,9 @@ void CGame::SetActiveApp( bool active )
 	m_bActiveApp = active;
 
 #if defined(IS_WINDOWS_PC)
-  // Disable accessibility shortcut keys when app is active.
-  // If app is inactive - restore accessibility shortcut keys to original state.
-  m_accessibilityShortcutKeysToggler.Toggle( !IsActiveApp() );
+	// Disable accessibility shortcut keys when app is active.
+	// If app is inactive - restore accessibility shortcut keys to original state.
+	m_accessibilityShortcutKeysToggler.Toggle( !IsActiveApp() );
 #endif
 }
 
