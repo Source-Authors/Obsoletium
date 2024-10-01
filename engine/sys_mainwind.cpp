@@ -783,38 +783,53 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_SYSCOMMAND:
-		if ( ( wParam == SC_MONITORPOWER ) || ( wParam == SC_KEYMENU ) || ( wParam == SC_SCREENSAVE ) )
-            return lRet;
-    
-		if ( wParam == SC_CLOSE ) 
 		{
-#if !defined( NO_VCR )
-			// handle the close message, but make sure 
-			// it's not because we accidently hit ALT-F4
-			if ( HIBYTE(VCRHook_GetKeyState(VK_LMENU)) || HIBYTE(VCRHook_GetKeyState(VK_RMENU) ) )
+			// In WM_SYSCOMMAND messages, the four low-order bits of the wParam
+			// parameter are used internally by the system.  To obtain the
+			// correct result when testing the value of wParam, an application
+			// must combine the value 0xFFF0 with the wParam value by using the
+			// bitwise AND operator.
+			const unsigned short command_type =
+				static_cast<unsigned short>(wParam & 0xFFF0);
+			// Sets the state of the display.  This command supports devices that
+			// have power-saving features, such as a battery-powered personal
+			// computer.
+			if ( ( command_type == SC_MONITORPOWER ) ||
+				// Retrieves the window menu as a result of a keystroke.
+				( command_type == SC_KEYMENU ) ||
+				// Executes the screen saver application specified.
+				( command_type == SC_SCREENSAVE ) )
 				return lRet;
-#endif
-			Cbuf_Clear();
-			Cbuf_AddText( "quit\n" );
-		}
 
-#ifndef SWDS
-		if ( VCRGetMode() == VCR_Disabled )
-		{
-			S_BlockSound();
-			S_ClearBuffer();
-		}
-#endif
+			if ( command_type == SC_CLOSE )
+			{
+	#if !defined( NO_VCR )
+				// handle the close message, but make sure 
+				// it's not because we accidently hit ALT-F4
+				if ( HIBYTE(VCRHook_GetKeyState(VK_LMENU)) || HIBYTE(VCRHook_GetKeyState(VK_RMENU) ) )
+					return lRet;
+	#endif
+				Cbuf_Clear();
+				Cbuf_AddText( "quit\n" );
+			}
 
-		lRet = CallWindowProc( m_ChainedWindowProc, hWnd, uMsg, wParam, lParam );
+	#ifndef SWDS
+			if ( VCRGetMode() == VCR_Disabled )
+			{
+				S_BlockSound();
+				S_ClearBuffer();
+			}
+	#endif
 
-#ifndef SWDS
-		if ( VCRGetMode() == VCR_Disabled )
-		{
-			S_UnblockSound();
-		}
-#endif
-		break;
+			lRet = CallWindowProc( m_ChainedWindowProc, hWnd, uMsg, wParam, lParam );
+
+	#ifndef SWDS
+			if ( VCRGetMode() == VCR_Disabled )
+			{
+				S_UnblockSound();
+			}
+	#endif
+		} break;
 
 	case WM_CLOSE:
 		// Handle close messages
