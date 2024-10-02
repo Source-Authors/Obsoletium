@@ -286,17 +286,17 @@ public:
 	void ProcessActiveObjects( IVP_Environment *pEnvironment, IPhysicsCollisionEvent *pEvent )
 	{
 		// FIXME: Is this correct? Shouldn't it do next PSI - lastScrape?
-		float nextTime = pEnvironment->get_old_time_of_last_PSI().get_time();
-		float delta = nextTime - m_lastScrapeTime;
+		double nextTime = pEnvironment->get_old_time_of_last_PSI().get_time();
+		double delta = nextTime - m_lastScrapeTime;
 
 		// only process if we have done a PSI
 		if ( delta < pEnvironment->get_delta_PSI_time() )
 			return;
 
-		float t = 0.0f;
-		if ( delta != 0.0f )
+		double t = 0.0;
+		if ( delta != 0.0 )
 		{
-			t = 1.0f / delta;
+			t = 1.0 / delta;
 		}
 
 		m_lastScrapeTime = nextTime;
@@ -304,9 +304,8 @@ public:
 		// UNDONE: This only calls friciton for one object in each pair.
 		// UNDONE: Split energy in half and call for both objects?
 		// UNDONE: Don't split/call if one object is static (like the world)?
-		for ( intp i = 0; i < m_activeObjects.Count(); i++ )
+		for ( auto *pObject : m_activeObjects )
 		{
-			CPhysicsObject *pObject = m_activeObjects[i];
 			IVP_Real_Object *ivpObject = pObject->GetObject();
 			
 			// no friction callbacks for this object
@@ -415,7 +414,7 @@ public:
 
 private:
 	CUtlVector<CPhysicsObject *>	m_activeObjects;
-	float							m_lastScrapeTime;
+	double							m_lastScrapeTime;
 	IPhysicsObjectEvent				*m_pCallback;
 };
 
