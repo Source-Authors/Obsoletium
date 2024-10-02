@@ -953,12 +953,6 @@ void CL_FullyConnected( void )
 	// that the world entity has been created by this point)
 	StaticPropMgr()->LevelInitClient();
 
-	if ( IsX360() )
-	{
-		// Notify the loader the end of the loading context, preloads are about to be purged
-		g_pQueuedLoader->EndMapLoading( false );
-	}
-
 	// flush client-side dynamic models that have no refcount
 	modelloader->FlushDynamicModels();
 
@@ -1022,13 +1016,6 @@ void CL_FullyConnected( void )
 			cl.m_NetChannel->GetName(),
 			Q_pretifymem( cl.m_NetChannel->GetTotalData( FLOW_INCOMING ), 3 ),
 			Q_pretifymem( cl.m_NetChannel->GetTotalData( FLOW_OUTGOING ), 3 ) );
-	}
-
-	if ( IsX360() )
-	{
-		// Reset material system temporary memory (once loading is complete), ready for in-map use
-		bool bOnLevelShutdown = false;
-		materials->ResetTempHWMemory( bOnLevelShutdown );
 	}
 
 	// allow normal screen updates
@@ -1109,7 +1096,6 @@ void CL_FullyConnected( void )
 	extern double g_flAccumulatedModelLoadTimeBrush;
 	extern double g_flAccumulatedModelLoadTimeSprite;
 	extern double g_flAccumulatedModelLoadTimeMaterialNamesOnly;
-//	extern double g_flLoadStudioHdr;
 
 	COM_TimestampedLog( "Sound Loading time %.4f", g_flAccumulatedSoundLoadTime );
 	COM_TimestampedLog( "Model Loading time %.4f", g_flAccumulatedModelLoadTime );
@@ -1121,7 +1107,6 @@ void CL_FullyConnected( void )
 	COM_TimestampedLog( "  Model Loading time world %.4f", g_flAccumulatedModelLoadTimeBrush );
 	COM_TimestampedLog( "  Model Loading time sprites %.4f", g_flAccumulatedModelLoadTimeSprite );
 	COM_TimestampedLog( "  Model Loading time meshes %.4f", g_flAccumulatedModelLoadTimeStaticMesh );
-//	COM_TimestampedLog( "    Model Loading time meshes studiohdr load %.4f", g_flLoadStudioHdr );
 
 	COM_TimestampedLog( "*** Map Load Complete" );
 
