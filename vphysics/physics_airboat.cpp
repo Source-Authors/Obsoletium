@@ -1022,7 +1022,7 @@ void CPhysics_Airboat::DoSimulationSteering( IVP_Event_Sim *pEventSim )
 
 	//Msg("steer force=%f\n", flForceSteering);
 
-	m_flPrevSteeringAngle = m_SteeringAngle * ( m_bSteeringReversed ? -1.0 : 1.0 );
+	m_flPrevSteeringAngle = m_SteeringAngle * ( m_bSteeringReversed ? -1.0f : 1.0f );
 
 	// Get the sign of the drag forces.
 	IVP_FLOAT flRotSpeedSign = m_pCore->rot_speed.k[1] < 0.0f ? -1.0f : 1.0f;
