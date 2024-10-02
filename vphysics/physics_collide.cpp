@@ -681,9 +681,9 @@ CPhysConvex *CPhysicsCollision::RebuildConvexFromPlanes( CPhysConvex *pConvex, f
 		const IVP_U_Float_Point *p2 = IVP_Compact_Ledge_Solver::give_object_coords(pEdge->get_next(), pLedge);
 		const IVP_U_Float_Point *p1 = IVP_Compact_Ledge_Solver::give_object_coords(pEdge->get_prev(), pLedge);
 		plane.calc_hesse(p0, p2, p1);
-		float testLen = plane.real_length();
+		IVP_DOUBLE testLen = plane.real_length();
 		// if the triangle is less than 1mm on each side then skip it
-		if ( testLen > 1e-6f )
+		if ( testLen > 1e-6 )
 		{
 			plane.normize();
 			halfspaces.add_halfspace( &plane );
