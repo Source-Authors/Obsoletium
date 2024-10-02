@@ -130,15 +130,6 @@ bool BootAppSystemGroup::Create() {
 
   engine_api_ = FindSystem<IEngineAPI>(VENGINE_LAUNCHER_API_VERSION);
 
-  // Load the hammer DLL if we're in editor mode
-#if defined(_WIN32) && defined(STAGING_ONLY)
-  if (m_bEditMode) {
-    AppModule_t hammerModule{LoadModule("hammer_dll" DLL_EXT_STRING)};
-    g_pHammer = AddSystem<IHammer>(hammerModule, INTERFACEVERSION_HAMMER);
-    if (!g_pHammer) return false;
-  }
-#endif
-
   {
     // Load up the appropriate shader DLL
     // This has to be done before connection.
@@ -168,7 +159,7 @@ bool BootAppSystemGroup::Create() {
   COM_TimestampedLog(
       "CSourceAppSystemGroup::Create:  Took %.4f secs to load libraries and "
       "get factories.",
-      (float)elapsed);
+      elapsed);
 
   return true;
 }
