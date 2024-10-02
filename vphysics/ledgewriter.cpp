@@ -46,9 +46,9 @@ struct vertmap_t
 static void BuildVertMap( vertmap_t &out, const Vector *pVerts, int vertexCount, const IVP_Compact_Ledge *pLedge )
 {
 	out.map.EnsureCount(MaxLedgeVertIndex(pLedge)+1);
-	for ( intp i = 0; i < out.map.Count(); i++ )
+	for ( auto &m : out.map )
 	{
-		out.map[i] = -1;
+		m = -1;
 	}
 	out.minRef = vertexCount;
 	out.maxRef = 0;
@@ -108,14 +108,14 @@ void PackLedgeIntoBuffer( packedhull_t *pHull, CUtlBuffer &buf, const IVP_Compac
 	pHull->baseVert = vertMap.minRef;
 	// clear the maps
 	triangleMap.EnsureCount(pLedge->get_n_triangles());
-	for ( intp i = 0; i < triangleMap.Count(); i++ )
+	for ( auto& t : triangleMap )
 	{
-		triangleMap[i] = -1;
+		t = -1;
 	}
 	edgeMap.EnsureCount(pLedge->get_n_triangles()*4);	// each triangle also occupies an edge index
-	for ( intp i = 0; i < edgeMap.Count(); i++ )
+	for ( auto& e : edgeMap )
 	{
-		edgeMap[i] = -1;
+		e = -1;
 	}
 
 	// we're going to reorder the triangles and edges so that the ones marked virtual 
