@@ -230,9 +230,6 @@ Con_ShowConsole_f
 */
 void Con_ShowConsole_f( void )
 {
-	if ( IsX360() )
-		return;
-
 	if ( vgui::input()->GetAppModalSurface() )
 	{
 		// If a dialog has modal, it probably has grabbed keyboard focus, so showing
@@ -244,7 +241,10 @@ void Con_ShowConsole_f( void )
 		return;
 
 	// make sure we're allowed to see the console
-	if ( con_enable.GetBool() || developer.GetInt() || CommandLine()->CheckParm("-console") || CommandLine()->CheckParm("-rpt") )
+	if ( con_enable.GetBool() ||
+		developer.GetInt() ||
+		CommandLine()->CheckParm("-console") ||
+		CommandLine()->CheckParm("-rpt") )
 	{
 		// show the console
 		EngineVGui()->ShowConsole();
