@@ -769,9 +769,10 @@ void S_Shutdown(void)
 	
 	// shutdown vaudio
 	delete vaudio;
+	vaudio = nullptr;
+
 	FileSystem_UnloadModule( g_pVAudioModule );
-	g_pVAudioModule = NULL;
-	vaudio = NULL;
+	g_pVAudioModule = nullptr;
 
 	MIX_FreeAllPaintbuffers();
 	snd_initialized = false;
