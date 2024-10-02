@@ -181,7 +181,7 @@ void ConvertRotationToHL( const IVP_U_Matrix3 &in, QAngle& angles )
 	float xyDist = sqrt( forward[0] * forward[0] + forward[1] * forward[1] );
 	
 	// enough here to get angles?
-	if ( xyDist > 0.001 )
+	if ( xyDist > 0.001f )
 	{
 		// (yaw)	y = ATAN( forward.y, forward.x );		-- in our space, forward is the X axis
 		angles[1] = RAD2DEG( atan2( forward[1], forward[0] ) );
