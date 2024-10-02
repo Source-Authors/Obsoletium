@@ -45,15 +45,15 @@ constexpr inline float METERS_PER_INCH{0.0254f};
 constexpr inline float CUBIC_METERS_PER_CUBIC_INCH{METERS_PER_INCH*METERS_PER_INCH*METERS_PER_INCH};
 
 // 2.2 lbs / kg
-#define POUNDS_PER_KG	(2.2f)
-#define KG_PER_POUND	(1.0f/POUNDS_PER_KG)
+constexpr inline float POUNDS_PER_KG = 2.2f;
+constexpr inline float KG_PER_POUND = 1.0f / POUNDS_PER_KG;
 
 // convert from pounds to kg
-#define lbs2kg(x)		((x)*KG_PER_POUND)
-#define kg2lbs(x)		((x)*POUNDS_PER_KG)
+constexpr inline float lbs2kg(float x) noexcept { return x * KG_PER_POUND; }
+constexpr inline float kg2lbs(float x) noexcept { return x * POUNDS_PER_KG; }
 
-const float VPHYSICS_MIN_MASS = 0.1f;
-const float VPHYSICS_MAX_MASS = 5e4f;
+constexpr inline float VPHYSICS_MIN_MASS = 0.1f;
+constexpr inline float VPHYSICS_MAX_MASS = 5e4f;
 
 class IPhysicsObject;
 class IPhysicsEnvironment;
