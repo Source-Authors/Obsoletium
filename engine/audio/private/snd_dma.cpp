@@ -452,7 +452,7 @@ static soundfade_t soundfade;  // Client sound fading singleton object
 ConVar snd_surround( "snd_surround_speakers", "-1", FCVAR_INTERNAL_USE );
 ConVar snd_legacy_surround( "snd_legacy_surround", "0", FCVAR_ARCHIVE );
 ConVar snd_noextraupdate( "snd_noextraupdate", "0" );
-ConVar snd_show( "snd_show", "0", FCVAR_CHEAT, "Show sounds info" );
+ConVar snd_show( "snd_show", "0", FCVAR_CHEAT, "Show sounds info", true, 0, true, 1 );
 ConVar snd_visualize ("snd_visualize", "0", FCVAR_CHEAT, "Show sounds location in world" );
 ConVar snd_pitchquality( "snd_pitchquality", "1", FCVAR_ARCHIVE );		// 1) use high quality pitch shifters
 
