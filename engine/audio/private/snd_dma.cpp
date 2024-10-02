@@ -638,7 +638,7 @@ void S_Startup( void )
 	if ( !g_AudioDevice || g_AudioDevice == Audio_GetNullDevice() )
 	{
 		// dimhotepus: Remove wave device support.
-		g_AudioDevice = IAudioDevice::AutoDetectInit( false );
+		g_AudioDevice = IAudioDevice::AutoDetectInit();
 		if ( !g_AudioDevice )
 		{
 			Error( "Unable to init audio" );
@@ -661,7 +661,7 @@ bool IsValidSampleRate( int rate )
 
 void VAudioInit()
 {
-	if ( IsPC() && !g_pVAudioModule )
+	if ( !g_pVAudioModule )
 	{
 		if ( !IsPosix() )
 		{
@@ -745,12 +745,15 @@ void S_Shutdown(void)
 
 	SNDDMA_Shutdown();
 
-	for ( int i = s_Sounds.FirstInorder(); i != s_Sounds.InvalidIndex(); i = s_Sounds.NextInorder( i ) )
+	for ( auto i = s_Sounds.FirstInorder();
+		i != s_Sounds.InvalidIndex();
+		i = s_Sounds.NextInorder( i ) )
 	{
-		if ( s_Sounds[i].pSfx )
+		CSfxTable *sfx = s_Sounds[i].pSfx;
+		if ( sfx )
 		{
-			delete s_Sounds[i].pSfx->pSource;
-			s_Sounds[i].pSfx->pSource = NULL;
+			delete sfx->pSource;
+			sfx->pSource = nullptr;
 		}
 	}
 	s_Sounds.RemoveAll();

@@ -62,7 +62,7 @@ Try to find a sound device to mix for.
 Returns a CAudioNULLDevice if nothing is found.
 ==================
 */
-IAudioDevice *IAudioDevice::AutoDetectInit( bool )
+IAudioDevice *IAudioDevice::AutoDetectInit()
 {
 	IAudioDevice *pDevice = NULL;
 
