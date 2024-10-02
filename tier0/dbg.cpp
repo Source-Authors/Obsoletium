@@ -13,9 +13,7 @@
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
 #include "tier0/icommandline.h"
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#endif
+#include "posix_file_stream.h"
 
 #include "tier0/etwprof.h"
 
@@ -883,64 +881,67 @@ void ValidateSpew( CValidator &validator )
 void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ... )
 {
 	// dimhotepus: Store time as double
-	static double s_LastStamp = 0.0;
-	static bool s_bShouldLog = false;
-	static bool s_bShouldLogToETW = false;
-	static bool s_bChecked = false;
-	static bool	s_bFirstWrite = false;
+	static double last_time_stamp = 0.0;
+	static bool should_log = false;
+	static bool should_log_2_etw = false;
+	static bool is_log_checked = false;
+	static bool	is_first_write = false;
 
-	if ( !s_bChecked )
+	if ( !is_log_checked )
 	{
-		s_bShouldLog = ( IsX360() || CommandLine()->CheckParm( "-profile" ) ) ? true : false;
-		s_bShouldLogToETW = ( CommandLine()->CheckParm( "-etwprofile" ) ) ? true : false;
-		if ( s_bShouldLogToETW )
-		{
-			s_bShouldLog = true;
-		}
-		s_bChecked = true;
+		should_log_2_etw = !!CommandLine()->CheckParm( "-etwprofile" );
+		should_log = should_log_2_etw || !!CommandLine()->CheckParm( "-profile" );
+		is_log_checked = true;
 	}
-	if ( !s_bShouldLog )
+
+	if ( !should_log )
 	{
 		return;
 	}
 
-	char string[1024];
+	char message[1024];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( string, sizeof( string ), fmt, argptr );
+	_vsnprintf( message, sizeof( message ), fmt, argptr );
 	va_end( argptr );
 
-	double curStamp = Plat_FloatTime();
+	const double now_stamp{Plat_FloatTime()};
 
-#if defined( _X360 )
-	XBX_rTimeStampLog( curStamp, string );
-#endif
-
-	if ( IsPC() )
+	// If ETW profiling is enabled then do it only.
+	if ( should_log_2_etw )
 	{
-		// If ETW profiling is enabled then do it only.
-		if ( s_bShouldLogToETW )
+		ETWMark( message );
+	}
+	else
+	{
+		constexpr char kLogFileName[] = "timestamped.log";
+
+		if ( !is_first_write )
 		{
-			ETWMark( string );
+			unlink( kLogFileName );
+
+			is_first_write = true;
+		}
+
+		auto [file, rc] = se::posix::posix_file_stream_factory::open( kLogFileName, "at+" );
+		if (!rc)
+		{
+			size_t size;
+			std::tie(size, rc) =
+				file.print( "[%8.4f | %8.4f]:  %s\n", now_stamp, now_stamp - last_time_stamp, message );
+
+			if (!rc)
+			{
+				ExecuteOnce( Warning("Write to '%s' failed.\n", kLogFileName) )
+			}
 		}
 		else
 		{
-			if ( !s_bFirstWrite )
-			{
-				unlink( "timestamped.log" );
-				s_bFirstWrite = true;
-			}
-
-			FILE* fp = fopen( "timestamped.log", "at+" );
-			if ( fp )
-			{
-				fprintf( fp, "%8.4f / %8.4f:  %s\n", curStamp, curStamp - s_LastStamp, string );
-				fclose( fp );
-			}
+			ExecuteOnce( Warning("Unable to open '%s' as 'at+'.\n", kLogFileName) )
 		}
 	}
 
-	s_LastStamp = curStamp;
+	last_time_stamp = now_stamp;
 }
 
 //-----------------------------------------------------------------------------
