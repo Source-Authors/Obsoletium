@@ -61,15 +61,17 @@ IVP_Real_Object *GetOppositeSynapseObject( IVP_Synapse_Friction *pfriction )
 }
 
 // simple delete queue
-class IDeleteQueueItem
+struct IDeleteQueueItem
 {
-public:
 	// Add a virtual destructor to silence the clang warning.
 	// Note that this destructor doesn't actually do anything -- you
 	// still have to use the Delete() then delete pattern.
-	virtual ~IDeleteQueueItem() {}
+	virtual ~IDeleteQueueItem() = 0;
+
 	virtual void Delete() = 0;
 };
+
+IDeleteQueueItem::~IDeleteQueueItem() = default;
 
 template <typename T>
 class CDeleteProxy : public IDeleteQueueItem
