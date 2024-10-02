@@ -125,16 +125,18 @@ public:
 class CPhysicsFrictionData : public IPhysicsCollisionData
 {
 public:
-	CPhysicsFrictionData( IVP_Synapse_Friction *synapse, float sign ) : m_sign(sign)
+	CPhysicsFrictionData( IVP_Synapse_Friction *synapse, float sign )
+		: m_pPoint{synapse->get_contact_point()},
+		  m_sign(sign),
+		  m_pContact{nullptr}
 	{
-		m_pPoint = synapse->get_contact_point(); 
-		m_pContact = NULL;
 	}
 
-	CPhysicsFrictionData( IVP_Event_Friction *pEvent ) : m_sign(1.0f)
+	CPhysicsFrictionData( IVP_Event_Friction *pEvent )
+		: m_pPoint{pEvent->friction_handle},
+		  m_sign(1.0f),
+		  m_pContact{pEvent->contact_situation}
 	{
-		m_pPoint = pEvent->friction_handle;
-		m_pContact = pEvent->contact_situation;
 	}
 
 	void GetSurfaceNormal( Vector &out ) override
@@ -348,7 +350,7 @@ public:
 								hitSurface = physprops->RemapIVPMaterialIndex( materialIndex );
 							}
 
-							float sign = (pfriction == contact->get_synapse(0)) ? 1 : -1;
+							float sign = (pfriction == contact->get_synapse(0)) ? 1.0f : -1.0f;
 
 							CPhysicsFrictionData data(pfriction, sign);
 
