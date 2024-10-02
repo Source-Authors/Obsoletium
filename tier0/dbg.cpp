@@ -852,11 +852,22 @@ DBG_INTERFACE float CrackSmokingCompiler( float a )
 
 void* Plat_SimpleLog( const tchar* file, int line )
 {
-	FILE* f = _tfopen( _T("simple.log"), _T("at+") );
-	if ( f )
+	constexpr char kLogFileName[] = "simple.log";
+
+	auto [f, rc] = se::posix::posix_file_stream_factory::open( kLogFileName, "at+" );
+	if (!rc)
 	{
-		_ftprintf( f, _T("%s:%i\n"), file, line );
-		fclose( f );
+		size_t size;
+		std::tie(size, rc) = f.print( "%s:%i\n", file, line );
+
+		if (!rc)
+		{
+			ExecuteOnce( Warning("Write to '%s' failed.\n", kLogFileName) )
+		}
+	}
+	else
+	{
+		ExecuteOnce( Warning("Unable to open '%s' as 'at+'.\n", kLogFileName) )
 	}
 
 	return NULL;
