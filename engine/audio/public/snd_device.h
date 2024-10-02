@@ -52,7 +52,7 @@ public:
 	// which will create a "null" device that makes no sound.  If we can't create a real 
 	// sound device, this will return a device of that type.  All of the interface
 	// functions can be called on the null device, but it will not, of course, make sound.
-	static IAudioDevice *AutoDetectInit( bool );
+	static IAudioDevice *AutoDetectInit();
 
 	// This is needed by some of the routines to avoid doing work when you've got a null device
 	virtual bool		IsActive( void ) = 0;
