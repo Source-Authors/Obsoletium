@@ -41,7 +41,7 @@ private:
 
 	CUtlRBTree< struct iprate_s, ip_t > m_IPTree;
 	int m_iGlobalCount;
-	long m_lLastTime;
+	double m_lLastTime;
 	double m_flFlushTime;
 
 	ConVar *m_maxSec;
