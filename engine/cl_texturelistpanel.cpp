@@ -396,7 +396,8 @@ public:
 
 protected:
 	bool bOldDebugMode;
-	CUtlRBTree< IMaterialVar * > arrCleanupVars;
+	// dimhotepus: Use uin32 for index as expected by code.
+	CUtlRBTree< IMaterialVar *, uint32 > arrCleanupVars;
 };
 
 CAutoMatSysDebugMode::CAutoMatSysDebugMode() :
@@ -665,9 +666,9 @@ void RequestSelected( int nCount, UtlSymId_t const *pNameIds )
 //
 struct ViewParamsLast
 {
-	ViewParamsLast() : flTime( 0.f ), bHighlighted( false ), lstMaterials( DefLessFunc( UtlSymId_t ) ) {}
+	ViewParamsLast() : flTime( 0.0 ), bHighlighted( false ), lstMaterials( DefLessFunc( UtlSymId_t ) ) {}
 
-	float flTime;
+	double flTime;
 	bool bHighlighted;
 
 	struct TxInfo
@@ -715,9 +716,9 @@ void DisplaySelectedTextures()
 	else
 	{
 		// Wait for the flash-time
-		float fCurTime = Plat_FloatTime();
+		double fCurTime = Plat_FloatTime();
 		if ( fCurTime >= s_viewParamsLast.flTime &&
-			 fCurTime < s_viewParamsLast.flTime + 0.4f )
+			 fCurTime < s_viewParamsLast.flTime + 0.4 )
 			 return;
 
 		s_viewParamsLast.flTime = fCurTime;
@@ -1227,7 +1228,7 @@ void CRenderTextureEditor::SetDispInfo( KeyValues *kv, int iHint )
 		bufText.Printf( "  %d material%s:", c, ( c%10 == 1 && c != 11 ) ? "" : "s" );
 	}
 
-	for ( int k = 0; k < arrMaterials.GetNumStrings(); ++ k )
+	for ( intp k = 0; k < arrMaterials.GetNumStrings(); ++ k )
 	{
 		bufText.Printf( "\n%s", arrMaterials.String( k ) );
 	}
@@ -1256,7 +1257,7 @@ void CRenderTextureEditor::SetDispInfo( KeyValues *kv, int iHint )
 
 		m_lstMaterials.RemoveAll();
 		m_lstMaterials.EnsureCapacity( arrMaterialsFullNames.GetNumStrings() );
-		for ( int k = 0; k < arrMaterialsFullNames.GetNumStrings(); ++ k )
+		for ( intp k = 0; k < arrMaterialsFullNames.GetNumStrings(); ++ k )
 		{
 			m_lstMaterials.AddToTail( CUtlSymbol( arrMaterialsFullNames.String( k ) ) );
 		}
@@ -2811,7 +2812,7 @@ static inline void ToLowerInplace( char *chBuffer )
 	for ( char *pch = chBuffer; *pch; ++ pch )
 	{
 		if ( V_isupper( *pch ) )
-			*pch = tolower( *pch );
+			*pch = static_cast<char>(tolower( *pch ));
 	}
 }
 
