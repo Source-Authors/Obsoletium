@@ -699,15 +699,8 @@ void CCommonHostState::SetWorldModel( model_t *pModel )
 
 void Host_DefaultMapFileName( const char *pFullMapName, /* out */ char *pDiskName, unsigned int nDiskNameSize )
 {
-	if ( IsPC() || !IsX360() )
-	{
-		// pc names are as is
-		Q_snprintf( pDiskName, nDiskNameSize, "maps/%s.bsp", pFullMapName );
-	}
-	else if ( IsX360() )
-	{
-		Q_snprintf( pDiskName, nDiskNameSize, "maps/%s.360.bsp", pFullMapName );
-	}
+	// pc names are as is
+	Q_snprintf( pDiskName, nDiskNameSize, "maps/%s.bsp", pFullMapName );
 }
 
 void Host_SetAudioState( const AudioState_t &audioState )
@@ -1148,50 +1141,6 @@ void UseDefaultBindings( void )
 
 static bool g_bConfigCfgExecuted = false;
 
-//-----------------------------------------------------------------------------
-// Purpose: Write out our 360 exclusive settings to internal storage
-//-----------------------------------------------------------------------------
-void Host_WriteConfiguration_360( void )
-{
-#ifdef _X360
-	if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED )
-		return;
-
-	// Construct the name for our config settings for this mod
-	char strFilename[MAX_PATH];
-	Q_snprintf( strFilename, sizeof(strFilename), "cfg:/%s_config.cfg", GetCurrentMod() );
-
-	// Always throw away all keys that are left over.
-	CUtlBuffer	configBuff( 0, 0, CUtlBuffer::TEXT_BUFFER);
-	configBuff.Printf( "unbindall\n" );
-
-	Key_WriteBindings( configBuff );
-	cv->WriteVariables( configBuff );
-
-	ConVarRef mat_monitorgamma( "mat_monitorgamma" );
-	ConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
-
-	char strVideoFilename[MAX_PATH];
-	CUtlBuffer videoBuff( 0, 0, CUtlBuffer::TEXT_BUFFER);
-	Q_snprintf( strVideoFilename, sizeof(strVideoFilename), "cfg:/video_config.cfg" );
-	videoBuff.Printf( "mat_monitorgamma %f\n", mat_monitorgamma.GetFloat() );
-	videoBuff.Printf( "mat_monitorgamma_tv_enabled %d\n", mat_monitorgamma_tv_enabled.GetBool() );
-
-	// Anything to write?
-	if ( configBuff.TellMaxPut() )
-	{
-		g_pFileSystem->WriteFile( strFilename, NULL, configBuff );
-	}
-
-	if ( videoBuff.TellMaxPut() )
-	{
-		g_pFileSystem->WriteFile( strVideoFilename, NULL, videoBuff );
-	}
-
-	g_pXboxSystem->FinishContainerWrites();
-#endif // #ifdef _X360
-}
-
 /*
 ===============
 Host_WriteConfiguration
@@ -1218,13 +1167,6 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 	if ( !cbIsUserRequested && ( CommandLine()->CheckParm( "-default" ) || host_competitive_ever_enabled.GetBool() ) )
 		return;
 	
-	// Write to internal storage on the 360
-	if ( IsX360() )
-	{
-		Host_WriteConfiguration_360();
-		return;
-	}
-
 	// If in map editing mode don't save configuration
 	if (g_bInEditMode)
 	{
@@ -1278,12 +1220,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 		return;
 	}
 
-#if defined(NO_STEAM)
-	// dimhotepus: Show assert only for X360
-#if defined(_X360)
-		AssertMsg( false, "SteamCloud not available on Xbox 360. Badger Martin to fix this." );
-#endif
-#else
+#ifndef NO_STEAM
 		ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
 			SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
 
@@ -1519,72 +1456,6 @@ bool XBX_SetProfileDefaultSettings( void )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Read our configuration from the 360, filling in defaults on our first run
-//-----------------------------------------------------------------------------
-void Host_ReadConfiguration_360( void )
-{
-#ifdef _X360
-	
-	// Exec our defaults on the first pass
-	if ( g_bConfigCfgExecuted == false )
-	{
-		// First, we exec our default configuration for the 360
-		Cbuf_AddText( "exec config.360.cfg game\n" );
-		Cbuf_Execute();
-	}
-
-	// Can't do any more in this function if we don't have a valid user id
-	if ( XBX_GetPrimaryUserId() == INVALID_USER_ID )
-		return;
-
-	// Build the config name we're looking for
-	char strFileName[MAX_PATH];
-	Q_snprintf( strFileName, sizeof(strFileName), "cfg:/%s_config.cfg", GetCurrentMod() );
-
-	bool bStorageDeviceValid = ( XBX_GetStorageDeviceId() != XBX_INVALID_STORAGE_ID && XBX_GetStorageDeviceId() != XBX_STORAGE_DECLINED );
-	bool bSaveConfig = false;
-
-	// Call through normal API function once the content container is opened
-	if ( CommandLine()->CheckParm( "-forcexboxreconfig" ) || bStorageDeviceValid == false || g_pFileSystem->FileExists( strFileName ) == false )
-	{
-		// If we've already done this in this session, never do it again (we don't want to stomp their settings under any circumstances)
-		if ( g_bConfigCfgExecuted == false )
-		{
-			// Get and set all our default setting we care about from the Xbox
-			XBX_SetProfileDefaultSettings();
-		}
-		
-		// Save out what we have
-		bSaveConfig = true;
-	}
-	else
-	{
-		// Otherwise, exec the user settings stored on the 360
-		char szCommand[MAX_PATH];
-		Q_snprintf( szCommand, sizeof( szCommand ), "exec %s_config.cfg x360\n", GetCurrentMod() );
-		Cbuf_AddText( szCommand );
-		
-		// Exec the video config as well
-		Q_snprintf( szCommand, sizeof( szCommand ), "exec video_config.cfg x360\n", GetCurrentMod() );
-		Cbuf_AddText( szCommand );
-		Cbuf_Execute();
-	}
-
-	// Mark that we've loaded a config and can now save it
-	g_bConfigCfgExecuted = true;
-
-	if ( bSaveConfig )
-	{
-		// An ugly hack, but we can probably save this safely
-		bool saveinit = host_initialized;
-		host_initialized = true;
-		Host_WriteConfiguration_360();
-		host_initialized = saveinit;
-	}
-#endif // _X360
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : false - 
 //-----------------------------------------------------------------------------
@@ -1597,13 +1468,6 @@ void Host_ReadConfiguration()
 	if ( !g_pFileSystem )
 	{
 		Sys_Error( "Host_ReadConfiguration:  g_pFileSystem == NULL\n" );
-	}
-
-	// Handle the 360 case
-	if ( IsX360() )
-	{
-		Host_ReadConfiguration_360();
-		return;
 	}
 
 	bool saveconfig = false;
@@ -3644,20 +3508,10 @@ void Host_RunFrame( float time )
 bool IsLowViolence_Secure()
 {
 #ifndef DEDICATED
-	if ( !IsX360() && Steam3Client().SteamApps() )
+	if ( Steam3Client().SteamApps() )
 	{
-		// let Steam determine current violence settings 		
+		// let Steam determine current violence settings
 		return Steam3Client().SteamApps()->BIsLowViolence();
-	}
-	else if ( IsX360() )
-	{
-		// Low violence for the 360 is enabled by the presence of a file.
-		if ( g_pFileSystem->FileExists( "cfg/violence.cfg" ) )
-		{
-			return true;
-		}
-		
-		return false;
 	}
 #endif
 		
