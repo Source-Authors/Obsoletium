@@ -2124,6 +2124,8 @@ int g_bTotalDumps = 0;
 
 void LongTickWatcherThread()
 {
+	ThreadSetDebugName("LongTickWatcher");
+
 	int nLastTick = 0;
 	double flWarnTickTime = 0.0f;
 	double flNextPossibleDumpTime = Plat_FloatTime() + MIN_TIME_BETWEEN_DUMPED_TICKS;
