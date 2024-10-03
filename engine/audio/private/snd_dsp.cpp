@@ -2739,52 +2739,6 @@ void RVA_ConstructDelays( float *rgd, float *rgf, int m, int *D, int *a, int *b,
 	}
 }
 
-void RVA_PerfTest()
-{
-	double time1, time2;
-
-	int i;
-	int k;
-	int j;
-	int m;
-	int a[100];
-
-	time1 = Plat_FloatTime();
-
-	for (m = 0; m < 1000; m++)
-	{
-		for (i = 0, j = 10000; i < 10000; i++, j--)
-		{
-			// j = j % 6;
-			// k = (i * j) >> PBITS;
-	
-			k = i / ((j % 6) + 1);
-		}
-	}
-
-	time2 = Plat_FloatTime();
-	
-	DevMsg("divide = %2.5f \n", (time2-time1));
-
-	
-	for (i=1;i<10;i++)
-		a[i] = PMAX / i;
-
-	time1 = Plat_FloatTime();
-
-	for (m = 0; m < 1000; m++)
-	{
-		for (i = 0, j = 10000; i < 10000; i++, j--)
-		{
-			k = (i * a[(j % 6) + 1] ) >> PBITS;
-		}
-	}
-
-	time2 = Plat_FloatTime();
-
-	DevMsg("shift & multiply = %2.5f \n", (time2-time1));
-}
-
 rva_t * RVA_Params ( prc_t *pprc )
 {
 	rva_t *prva;
@@ -2814,8 +2768,6 @@ rva_t * RVA_Params ( prc_t *pprc )
 	float ftaps		= pprc->prm[rva_iftaps];		// if > 0 increase reverb density using 3 extra taps d = (1.0 - ftaps * n) n = 0,1,2,3
 
 	
-
-//	RVA_PerfTest();
 
 	// D array of CRVB_DLYS reverb delay sizes max sample index w[0...D] (ie: D+1 samples)
 	// a array of reverb feedback parms for parallel delays 
