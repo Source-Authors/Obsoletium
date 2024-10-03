@@ -2511,7 +2511,7 @@ static double g_flLastPeriodicMemDump = -1.0f;
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-static float g_TimeLastMemTest;
+static double g_TimeLastMemTest;
 void Host_CheckDumpMemoryStats( void )
 {
 	if ( mem_test_each_frame.GetBool() )
@@ -2524,7 +2524,7 @@ void Host_CheckDumpMemoryStats( void )
 	}
 	else if ( mem_test_every_n_seconds.GetInt() > 0 )
 	{
-		float now = Plat_FloatTime();
+		double now = Plat_FloatTime();
 		if ( now - g_TimeLastMemTest > mem_test_every_n_seconds.GetInt() )
 		{
 			g_TimeLastMemTest = now;
