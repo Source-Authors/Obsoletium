@@ -3617,8 +3617,8 @@ model_t	*CModelLoader::LoadModel( model_t *mod, REFERENCETYPE *pReferencetype )
 		break;
 	};
 
-	float dt = ( Plat_FloatTime() - st );
-	COM_TimestampedLog( "Load of %s took %.3f msec", mod->strName.String(), 1000.0f * dt );
+	double dt = ( Plat_FloatTime() - st );
+	COM_TimestampedLog( "Load of %s took %.3f ms", mod->strName.String(), 1000.0 * dt );
 	g_flAccumulatedModelLoadTime += dt;
 
 	return mod;
