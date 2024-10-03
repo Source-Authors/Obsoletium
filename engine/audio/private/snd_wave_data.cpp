@@ -109,8 +109,8 @@ public:
 	byte				*m_pAlloc;			// memory of buffer (base may not match)
 	FileAsyncRequest_t	m_async;
 	FSAsyncControl_t	m_hAsyncControl;
-	float				m_start;			// time at request invocation
-	float				m_arrival;			// time at data arrival
+	double				m_start;			// time at request invocation
+	double				m_arrival;			// time at data arrival
 	FileNameHandle_t	m_hFileNameHandle;
 	int					m_nBufferBytes;		// size of any pre-allocated target buffer
 	BufferHandle_t		m_hBuffer;			// used to dequeue the buffer after lru
@@ -333,67 +333,39 @@ void CAsyncWaveData::QueuedLoaderCallback( void *pContext, void *, const void *,
 //-----------------------------------------------------------------------------
 void CAsyncWaveData::OnAsyncCompleted( const FileAsyncRequest_t *asyncFilePtr, int numReadBytes, FSAsyncStatus_t err )
 {
-	if ( IsPC() )
+	// Take hold of pointer (we can just use delete[] across .dlls because we are using a shared memory allocator...)
+	if ( err == FSASYNC_OK || err == FSASYNC_ERR_READING )
 	{
-		// Take hold of pointer (we can just use delete[] across .dlls because we are using a shared memory allocator...)
-		if ( err == FSASYNC_OK || err == FSASYNC_ERR_READING )
+		m_arrival = Plat_FloatTime();
+
+		// Take over ptr
+		m_pAlloc = ( byte * )asyncFilePtr->pData;
+		if ( SndAlignReads() )
 		{
-			m_arrival = ( float )Plat_FloatTime();
-
-			// Take over ptr
-			m_pAlloc = ( byte * )asyncFilePtr->pData;
-			if ( SndAlignReads() )
-			{
-				m_async.nOffset = ( m_async.nBytes - m_nDataSize );
-				m_async.nBytes -= m_async.nOffset;
-				m_pvData = ((byte *)m_pAlloc) + m_async.nOffset;
-				m_nReadSize	= numReadBytes - m_async.nOffset;
-			}
-			else
-			{
-				m_pvData = m_pAlloc;
-				m_nReadSize = numReadBytes;
-			}
-
-			// Needs to be post-processed
-			m_bPostProcessed = false;
-
-			// Finished loading
-			m_bLoaded = true;
+			m_async.nOffset = ( m_async.nBytes - m_nDataSize );
+			m_async.nBytes -= m_async.nOffset;
+			m_pvData = ((byte *)m_pAlloc) + m_async.nOffset;
+			m_nReadSize	= numReadBytes - m_async.nOffset;
 		}
-		else if ( err == FSASYNC_ERR_FILEOPEN )
+		else
 		{
-			// SEE NOTE IN FUNCTION COMMENT ABOVE!!!
-			// Tracker 22905, et al.
-			// Because this api gets called from the other thread, don't spew warning here as it can
-			//  cause a crash in searching CUtlSymbolTables since they use a global var for a LessFunc context!!!
-			m_bMissing = true;
+			m_pvData = m_pAlloc;
+			m_nReadSize = numReadBytes;
 		}
+
+		// Needs to be post-processed
+		m_bPostProcessed = false;
+
+		// Finished loading
+		m_bLoaded = true;
 	}
-
-	if ( IsX360() )
+	else if ( err == FSASYNC_ERR_FILEOPEN )
 	{
-		m_arrival = (float)Plat_FloatTime();
-
-		// possibly reading more than intended due to alignment restriction
-		m_nReadSize = numReadBytes;
-		if ( m_nReadSize > m_nDataSize )
-		{
-			// clamp to expected, extra data is unreliable
-			m_nReadSize = m_nDataSize;
-		}
-
-		if ( err != FSASYNC_OK )
-		{
-			// track as any error
-			m_bMissing = true;
-		}
-
-		if ( err != FSASYNC_ERR_FILEOPEN )
-		{
-			// some data got loaded
-			m_bLoaded = true;
-		}
+		// SEE NOTE IN FUNCTION COMMENT ABOVE!!!
+		// Tracker 22905, et al.
+		// Because this api gets called from the other thread, don't spew warning here as it can
+		//  cause a crash in searching CUtlSymbolTables since they use a global var for a LessFunc context!!!
+		m_bMissing = true;
 	}
 }
 
@@ -415,10 +387,10 @@ bool CAsyncWaveData::BlockingCopyData( void *destbuffer, int destbufsize, int st
 		if ( SndAsyncSpewBlocking() )
 		{
 			// Force it to finish
-			float st = ( float )Plat_FloatTime();
+			double st = Plat_FloatTime();
 			g_pFileSystem->AsyncFinish( m_hAsyncControl, true );
-			float ed = ( float )Plat_FloatTime();
-			Warning( "%f BCD:  Async I/O Force %s (%8.2f msec / %8.2f msec total)\n", realtime, GetFileName(), 1000.0f * (float)( ed - st ), 1000.0f * (float)( m_arrival - m_start ) );
+			double ed = Plat_FloatTime();
+			Warning( "%f BCD:  Async I/O Force %s (%8.2f ms / %8.2f ms total)\n", realtime, GetFileName(), 1000.0 * ( ed - st ), 1000.0 * ( m_arrival - m_start ) );
 		}
 		else
 		{
@@ -445,7 +417,7 @@ bool CAsyncWaveData::BlockingCopyData( void *destbuffer, int destbufsize, int st
 	}
 	else if ( m_arrival != 0 && snd_async_spew.GetBool() )
 	{
-		DevMsg( "%f Async I/O Read successful %s (%8.2f msec)\n", realtime, GetFileName(), 1000.0f * (float)( m_arrival - m_start ) );
+		DevMsg( "%f Async I/O Read successful %s (%8.2f ms)\n", realtime, GetFileName(), 1000.0 * ( m_arrival - m_start ) );
 		m_arrival = 0;
 	}
 
@@ -499,10 +471,10 @@ bool CAsyncWaveData::BlockingGetDataPointer( void **ppData )
 		// It could finish between the above line and here, but the AsyncFinish call will just have a bogus id, not a big deal
 		if ( SndAsyncSpewBlocking() )
 		{
-			float st = ( float )Plat_FloatTime();
+			double st = Plat_FloatTime();
 			g_pFileSystem->AsyncFinish( m_hAsyncControl, true );
-			float ed = ( float )Plat_FloatTime();
-			Warning( "%f BlockingGetDataPointer:  Async I/O Force %s (%8.2f msec / %8.2f msec total )\n", realtime, GetFileName(), 1000.0f * (float)( ed - st ), 1000.0f * (float)( m_arrival - m_start ) );
+			double ed = Plat_FloatTime();
+			Warning( "%f BlockingGetDataPointer:  Async I/O Force %s (%8.2f ms / %8.2f ms total)\n", realtime, GetFileName(), 1000.0 * ( ed - st ), 1000.0 * ( m_arrival - m_start ) );
 		}
 		else
 		{
@@ -529,7 +501,7 @@ bool CAsyncWaveData::BlockingGetDataPointer( void **ppData )
 	}
 	else if ( m_arrival != 0 && snd_async_spew.GetBool() )
 	{
-		DevMsg( "%f Async I/O Read successful %s (%8.2f msec)\n", realtime, GetFileName(), 1000.0f * (float)( m_arrival - m_start ) );
+		DevMsg( "%f Async I/O Read successful %s (%8.2f ms)\n", realtime, GetFileName(), 1000.0 * ( m_arrival - m_start ) );
 		m_arrival = 0;
 	}
 
@@ -549,7 +521,7 @@ void CAsyncWaveData::SetAsyncPriority( int priority )
 		g_pFileSystem->AsyncSetPriority( m_hAsyncControl, m_async.priority );
 		if ( snd_async_spew.GetBool() )
 		{
-			DevMsg( "%f Async I/O Bumped priority for %s (%8.2f msec)\n", realtime, GetFileName(), 1000.0f * (float)( Plat_FloatTime() - m_start ) );
+			DevMsg( "%f Async I/O Bumped priority for %s (%8.2f ms)\n", realtime, GetFileName(), 1000.0 * ( Plat_FloatTime() - m_start ) );
 		}
 	}
 }
@@ -609,7 +581,7 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 	m_bLoaded = false;
 	m_bMissing = false;
 	m_nDataSize = params.datasize;
-	m_start = (float)Plat_FloatTime();
+	m_start = Plat_FloatTime();
 	m_arrival = 0;
 	m_nReadSize = 0;
 	m_bPostProcessed = false;
@@ -953,7 +925,7 @@ memhandle_t CAsyncWavDataCache::FindOrCreateBuffer( asyncwaveparams_t &params, b
 	{
 		// still in cache
 		// same as requesting it and having it arrive instantly
-		pWaveData->m_start = pWaveData->m_arrival = (float)Plat_FloatTime();
+		pWaveData->m_start = pWaveData->m_arrival = Plat_FloatTime();
 	}
 
 	return search.m_hWaveData;
@@ -1220,12 +1192,12 @@ int CAsyncWavDataCache::CopyStreamedDataIntoMemory( int hStream, void *pBuffer, 
 			// a faster audio rate or smaller block size implies a smaller interval
 			// latency is the actual block delivery time
 			// latency must not exceed the delivery interval or stariving occurs and audio pops
-			float nowTime = Plat_FloatTime();
-			int interval = (int)(1000.0f*(nowTime-pFront->m_start));
+			double nowTime = Plat_FloatTime();
+			int interval = (int)(1000.0*(nowTime-pFront->m_start));
 			int latency;
 			if ( bCompleted && pFront->m_bLoaded )
 			{
-				latency = (int)(1000.0f*(pFront->m_arrival-pFront->m_start));
+				latency = (int)(1000.0*(pFront->m_arrival-pFront->m_start));
 			}
 			else
 			{
@@ -1683,79 +1655,39 @@ void CAsyncWavDataCache::SpewMemoryUsage( int level )
 	DataCacheStatus_t status;
 	DataCacheLimits_t limits;
 	GetCacheSection()->GetStatus( &status, &limits );
-	int bytesUsed = status.nBytes;
-	int bytesTotal = limits.nMaxBytes;
+	size_t bytesUsed = status.nBytes;
+	size_t bytesTotal = limits.nMaxBytes;
 
-	if ( IsPC() )
+	float percent = 100.0f * (float)bytesUsed / (float)bytesTotal;
+
+	Msg( "CAsyncWavDataCache:  %zu .wavs total %s, %.2f %% of capacity\n",
+		m_CacheHandles.Count(), Q_pretifymem( bytesUsed, 2 ), percent );
+
+	if ( level >= 1 )
 	{
-		float percent = 100.0f * (float)bytesUsed / (float)bytesTotal;
-
-		Msg( "CAsyncWavDataCache:  %zd .wavs total %s, %.2f %% of capacity\n", m_CacheHandles.Count(), Q_pretifymem( bytesUsed, 2 ), percent );
-
-		if ( level >= 1 )
+		for ( auto i = m_CacheHandles.FirstInorder();
+			m_CacheHandles.IsValidIndex(i);
+			i = m_CacheHandles.NextInorder(i) )
 		{
-			for ( int i = m_CacheHandles.FirstInorder(); m_CacheHandles.IsValidIndex(i); i = m_CacheHandles.NextInorder(i) )
+			char name[MAX_PATH];
+			if ( !g_pFileSystem->String( m_CacheHandles[ i ].name, name, sizeof( name ) ) )
 			{
-				char name[MAX_PATH];
-				if ( !g_pFileSystem->String( m_CacheHandles[ i ].name, name, sizeof( name ) ) )
-				{
-					Assert( 0 );
-					continue;
-				}
-				memhandle_t &handle = m_CacheHandles[ i ].handle;
-				CAsyncWaveData *data = CacheGetNoTouch( handle );
-				if ( data )
-				{
-					Msg( "\t%16.16s : %s\n", Q_pretifymem(data->Size()),name);
-				}
-				else
-				{
-					Msg( "\t%16.16s : %s\n", "not resident",name);
-				}
+				Assert( 0 );
+				continue;
 			}
-			Msg( "CAsyncWavDataCache:  %zd .wavs total %s, %.2f %% of capacity\n", m_CacheHandles.Count(), Q_pretifymem( bytesUsed, 2 ), percent );
-		}
-	}
-	
-	if ( IsX360() )
-	{
-		CAsyncWaveData	*pData;
-		BufferEntry_t	*pBuffer;
-		BufferHandle_t	h;
-		float			percent;
-		int				lockCount;
-		
-		if ( bytesTotal <= 0 )
-		{
-			// unbounded, indeterminate
-			percent = 0;
-			bytesTotal = 0;
-		}
-		else
-		{
-			percent = 100.0f*(float)bytesUsed/(float)bytesTotal;
-		}
-
-		if ( level >= 1 )
-		{
-			// detail buffers
-			ConMsg( "Streaming Buffer List:\n" );
-			for ( h = m_BufferList.FirstInorder(); h != m_BufferList.InvalidIndex(); h = m_BufferList.NextInorder( h ) )
+			memhandle_t &handle = m_CacheHandles[ i ].handle;
+			CAsyncWaveData *data = CacheGetNoTouch( handle );
+			if ( data )
 			{
-				pBuffer = &m_BufferList[h];
-				pData = CacheGetNoTouch( pBuffer->m_hWaveData );
-				lockCount = GetCacheSection()->GetLockCount( pBuffer->m_hWaveData );
-
-				CacheLockMutex();
-				if ( pData )
-				{
-					ConMsg( "Start:%7d Length:%7d Lock:%3d %s\n", pData->m_async.nOffset, pData->m_nDataSize, lockCount, pData->GetFileName() );
-				}
-				CacheUnlockMutex();
+				Msg( "\t%16.16s : %s\n", Q_pretifymem(data->Size()), name);
+			}
+			else
+			{
+				Msg( "\t%16.16s : %s\n", "not resident",name);
 			}
 		}
-
-		ConMsg( "CAsyncWavDataCache: %.2f MiB used of %.2f MiB, %.2f%% of capacity", (float)bytesUsed/(1024.0f*1024.0f), (float)bytesTotal/(1024.0f*1024.0f), percent );
+		Msg( "CAsyncWavDataCache:  %zu .wavs total %s, %.2f %% of capacity\n",
+			m_CacheHandles.Count(), Q_pretifymem( bytesUsed, 2 ), percent );
 	}
 }
 
