@@ -1064,7 +1064,7 @@ void CBaseClient::EndTrace( bf_write &msg )
 	VPROF_BUDGET( "CBaseClient::EndTrace", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	int bits = m_Trace.m_nCurBit - m_Trace.m_nStartBit;
-	float flElapsedMs = ( Plat_FloatTime() - m_Trace.m_StartSendTime ) * 1000.0;
+	double flElapsedMs = ( Plat_FloatTime() - m_Trace.m_StartSendTime ) * 1000.0;
 	int nBitThreshold = m_Trace.m_nMinWarningBytes << 3;
 	if ( m_iTracing < 2 // not forced
 		&& ( nBitThreshold <= 0 || bits < nBitThreshold ) // didn't exceed data threshold
