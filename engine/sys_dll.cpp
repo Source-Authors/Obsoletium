@@ -677,7 +677,7 @@ static void AddSpewRecord( char const *pMsg )
 		g_SpewHistory.Remove( g_SpewHistory.Head() );
 	}
 
-	int i = g_SpewHistory.AddToTail();
+	auto i = g_SpewHistory.AddToTail();
 	g_SpewHistory[ i ].Format( "%d(%f):  %s", g_nSpewLines++, Plat_FloatTime(), pMsg );
 
 	s_bReentrancyGuard = false;
@@ -849,24 +849,26 @@ void *GameFactory( const char *pName, int *pReturnCode )
 
 #ifndef SWDS
 	// now ask the client dll
-	if (ClientDLL_GetFactory())
+	CreateInterfaceFn factory = ClientDLL_GetFactory();
+	if (factory)
 	{
-		pRetVal = ClientDLL_GetFactory()( pName, pReturnCode );
+		pRetVal = factory( pName, pReturnCode );
 		if (pRetVal)
 			return pRetVal;
 	}
 
 	// gameui.dll
-	if (EngineVGui()->GetGameUIFactory())
+	factory = EngineVGui()->GetGameUIFactory();
+	if (factory)
 	{
-		pRetVal = EngineVGui()->GetGameUIFactory()( pName, pReturnCode );
+		pRetVal = factory( pName, pReturnCode );
 		if (pRetVal)
 			return pRetVal;
 	}
 #endif	
 	// server dll factory access would go here when needed
 
-	return NULL;
+	return nullptr;
 }
 
 // factory instance
