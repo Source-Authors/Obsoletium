@@ -1171,10 +1171,10 @@ void CQueuedLoader::CleanQueue()
 
 	m_BatchedJobs.Purge();
 
-	int iIndex = m_SubmittedJobs.Head();
+	auto iIndex = m_SubmittedJobs.Head();
 	while ( iIndex != m_SubmittedJobs.InvalidIndex() )
 	{
-		int iNext = m_SubmittedJobs.Next( iIndex );
+		auto iNext = m_SubmittedJobs.Next( iIndex );
 
 		FileJob_t *pFileJob = m_SubmittedJobs[iIndex];	
 		if ( pFileJob->m_bFinished )
@@ -1211,7 +1211,7 @@ void CQueuedLoader::SpewInfo()
 	{
 		// can only access submitted jobs safely when io thread complete
 		int lastPriority = -1;
-		int iIndex = m_SubmittedJobs.Head();
+		auto iIndex = m_SubmittedJobs.Head();
 		while ( iIndex != m_SubmittedJobs.InvalidIndex() )
 		{
 			FileJob_t *pFileJob = m_SubmittedJobs[iIndex];	
@@ -1525,7 +1525,7 @@ void CQueuedLoader::ParseResourceList( CUtlBuffer &resourceList )
 
 	// add any additional resources
 	// duplicates don't need to be culled, loaders are supposed to handle resources that already exist
-	for ( int i = 0; i < m_AdditionalResources.GetNumStrings(); i++ )
+	for ( intp i = 0; i < m_AdditionalResources.GetNumStrings(); i++ )
 	{
 		if ( g_QueuedLoader.GetSpewDetail() )
 		{
