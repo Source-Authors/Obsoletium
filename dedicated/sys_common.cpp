@@ -184,27 +184,29 @@ const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
 SpewRetval_t DedicatedSpewOutputFunc( SpewType_t spewType, char const *pMsg )
 {
 	char message[4096];
+	PrefixMessageGroup(message, "swds", pMsg);
 
 	if ( sys )
 	{
-		sys->Printf( "%s", PrefixMessageGroup(message, "swds", pMsg) );
+		sys->Printf( "%s", message );
 
 		// If they have specified -consolelog, log this message there. Otherwise these
 		//	wind up being lost because Sys_InitGame hasn't been called yet, and 
 		//  Sys_SpewFunc is the thing that logs stuff to -consolelog, etc.
 		const char *filename = get_consolelog_filename();
-		if ( filename[ 0 ] && pMsg[ 0 ] )
+		if ( filename[ 0 ] && message[ 0 ] )
 		{
 			FileHandle_t fh = g_pFullFileSystem->Open( filename, "a" );
 			if ( fh != FILESYSTEM_INVALID_HANDLE )
 			{
-				g_pFullFileSystem->Write( pMsg, V_strlen( pMsg ), fh );
+				g_pFullFileSystem->Write( message, V_strlen( message ), fh );
 				g_pFullFileSystem->Close( fh );
 			}
 		}
 	}
+
 #ifdef _WIN32
-	Plat_DebugString( pMsg );
+	Plat_DebugString( message );
 #endif
 
 	if (spewType == SPEW_ERROR)
@@ -214,7 +216,7 @@ SpewRetval_t DedicatedSpewOutputFunc( SpewType_t spewType, char const *pMsg )
 		extern bool g_bVGui;
 		if ( g_bVGui )
 		{
-			MessageBox( NULL, pMsg, "Source - Fatal Error", MB_OK | MB_TASKMODAL | MB_ICONERROR );
+			MessageBox( NULL, message, "Source - Fatal Error", MB_OK | MB_TASKMODAL | MB_ICONERROR );
 		}
 		TerminateProcess( GetCurrentProcess(), 1 );
 #elif POSIX
