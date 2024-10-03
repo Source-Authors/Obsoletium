@@ -573,7 +573,7 @@ float		host_frametime_stddeviation = 0.0f;
 double		realtime = 0;			// without any filtering or bounding
 double		host_idealtime = 0;		// "ideal" server time assuming perfect tick rate
 float		host_nexttick = 0;		// next server tick in this many ms
-float		host_jitterhistory[128] = { 0 };
+double		host_jitterhistory[128] = { 0 };
 unsigned int host_jitterhistorypos = 0;
 
 int			host_framecount;
@@ -616,7 +616,7 @@ CON_COMMAND( host_timer_report, "Spew CPU timer jitter for the last 128 frames i
 		for (size_t i = 1; i <= std::size( host_jitterhistory ); ++i)
 		{
 			size_t slot = ( i + host_jitterhistorypos ) % std::size( host_jitterhistory );
-			Msg( "%1.3fms\n", host_jitterhistory[ slot ] * 1000 );
+			Msg( "%1.3fms\n", host_jitterhistory[ slot ] * 1000.0 );
 		}
 	}
 }
@@ -3192,7 +3192,7 @@ void _Host_RunFrame (float time)
 				ETWSimFrameMark( sv.IsDedicated() );
 
 				double now = Plat_FloatTime();
-				float jitter = now - host_idealtime;
+				double jitter = now - host_idealtime;
 
 				// Track jitter (delta between ideal time and actual tick execution time)
 				host_jitterhistory[ host_jitterhistorypos ] = jitter;
