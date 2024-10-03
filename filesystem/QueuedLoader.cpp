@@ -326,7 +326,7 @@ CQueuedLoader::~CQueuedLoader()
 //-----------------------------------------------------------------------------
 void CQueuedLoader::BuildResources( IResourcePreload *pLoader, ResourceList_t *pList, float *pBuildTime )
 {
-	float t0 = Plat_FloatTime();
+	double t0 = Plat_FloatTime();
 
 	if ( pLoader )
 	{
@@ -357,7 +357,7 @@ void CQueuedLoader::BuildResources( IResourcePreload *pLoader, ResourceList_t *p
 //-----------------------------------------------------------------------------
 void CQueuedLoader::BuildMaterialResources( IResourcePreload *pLoader, ResourceList_t *pList, float *pBuildTime )
 {
-	float t0 = Plat_FloatTime();
+	double t0 = Plat_FloatTime();
 
 	char szLastFilename[MAX_PATH];
 	szLastFilename[0] = '\0';
@@ -1387,61 +1387,8 @@ void CQueuedLoader::GetJobRequests()
 	m_bCanBatch = true;
 	m_bBatching = true;
 
-	float t0 = Plat_FloatTime();
+	double t0 = Plat_FloatTime();
 
-	if ( !IsPC() && !m_bDynamic )
-	{
-		// cubemap textures must be first to install correctly before their cubemap materials are built (and precache the cubmeap textures)
-		// cannot be overlapped, must run serially
-		BuildResources( m_pLoaders[RESOURCEPRELOAD_CUBEMAP], &m_ResourceNames[RESOURCEPRELOAD_CUBEMAP], &m_LoaderTimes[RESOURCEPRELOAD_CUBEMAP] );	
-
-		// Overlapping these is not critical in any way, total time is currently < 2 seconds.
-		// These operations flood calls (AddJob) back into the queued loader (which has to mutex its lists),
-		// so in fact it's slightly slower to queue these at this stage. As these routines age they may become more heavyweight.
-		CJob *jobs[5];
-		jobs[0] = g_pThreadPool->QueueCall( BuildResources, m_pLoaders[RESOURCEPRELOAD_SOUND], &m_ResourceNames[RESOURCEPRELOAD_SOUND], &m_LoaderTimes[RESOURCEPRELOAD_SOUND] );	
-		jobs[1] = g_pThreadPool->QueueCall( BuildMaterialResources, m_pLoaders[RESOURCEPRELOAD_MATERIAL], &m_ResourceNames[RESOURCEPRELOAD_MATERIAL], &m_LoaderTimes[RESOURCEPRELOAD_MATERIAL] );
-		jobs[2] = g_pThreadPool->QueueCall( BuildResources, m_pLoaders[RESOURCEPRELOAD_STATICPROPLIGHTING], &m_ResourceNames[RESOURCEPRELOAD_STATICPROPLIGHTING], &m_LoaderTimes[RESOURCEPRELOAD_STATICPROPLIGHTING] );	
-		jobs[3] = g_pThreadPool->QueueCall( BuildResources, m_pLoaders[RESOURCEPRELOAD_MODEL], &m_ResourceNames[RESOURCEPRELOAD_MODEL], &m_LoaderTimes[RESOURCEPRELOAD_MODEL] );	
-		jobs[4] = g_pThreadPool->QueueCall( BuildResources, m_pLoaders[RESOURCEPRELOAD_ANONYMOUS], &m_ResourceNames[RESOURCEPRELOAD_ANONYMOUS], &m_LoaderTimes[RESOURCEPRELOAD_ANONYMOUS] );
-
-		// all jobs must finish
-		float flLastUpdateT = -1000.0f;
-		// Update as if this takes 2 seconds
-		float flDelta = ( PROGRESS_CREATEDRESOURCES - PROGRESS_PARSEDRESLIST ) * 0.03 / 2.0f;
-		float flProgress = PROGRESS_PARSEDRESLIST;
-		while( true )
-		{
-			bool bIsDone = true;
-			for ( const auto *j : jobs )
-			{
-				if ( !j->IsFinished() )
-				{
-					bIsDone = false;
-					break;
-				}
-			}
-			if ( bIsDone )
-				break;
-
-			// Can't sleep; that will allow this thread to be used by the thread pool
-			float newt = Plat_FloatTime();
-			if ( newt - flLastUpdateT > .03f )
-			{
-				m_pProgress->UpdateProgress( flProgress );
-				flProgress = clamp( flProgress + flDelta, PROGRESS_PARSEDRESLIST, PROGRESS_CREATEDRESOURCES );
-
-				// Necessary to take into account any waits for vsync
-				flLastUpdateT = Plat_FloatTime();
-			}
-		}
-
-		for ( auto *j : jobs )
-		{
-			j->Release();
-		}
-	}
-	else
 	{
 		BuildResources( m_pLoaders[RESOURCEPRELOAD_CUBEMAP], &m_ResourceNames[RESOURCEPRELOAD_CUBEMAP], &m_LoaderTimes[RESOURCEPRELOAD_CUBEMAP] );	
 		BuildResources( m_pLoaders[RESOURCEPRELOAD_SOUND], &m_ResourceNames[RESOURCEPRELOAD_SOUND], &m_LoaderTimes[RESOURCEPRELOAD_SOUND] );	
