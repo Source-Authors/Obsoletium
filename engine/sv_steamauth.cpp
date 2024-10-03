@@ -873,9 +873,9 @@ void CSteam3Server::RunFrame()
 		SendUpdatedServerDetails();
 	}
 
-	static double s_fLastRunCallback = 0.0f;
+	static double s_fLastRunCallback = 0.0;
 	double fCurtime = Plat_FloatTime();
-	if ( fCurtime - s_fLastRunCallback > 0.1f )
+	if ( fCurtime - s_fLastRunCallback > 0.1 )
 	{
 		s_fLastRunCallback = fCurtime;
     // dimhotepus: NO_STEAM
