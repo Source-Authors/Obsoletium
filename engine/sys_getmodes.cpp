@@ -1252,7 +1252,7 @@ void CVideoMode_Common::BlitGraphicToHDC(HDC hdc, byte *rgba, int imageWidth, in
 
     double elapsed = Plat_FloatTime() - st;
 
-    COM_TimestampedLog( "BlitGraphicToHDC: new ver took %.4f", elapsed );
+    COM_TimestampedLog( "BlitGraphicToHDC: new ver took %.4fs", elapsed );
 #else
     AssertMsg( false, "Impl me" );
 #endif
