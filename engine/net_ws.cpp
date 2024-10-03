@@ -1512,7 +1512,7 @@ bool NET_ReceiveDatagram ( const int sock, netpacket_t * packet )
 					if ( net_showudp.GetBool() )
 					{
 						Msg( "UDP:  discarding %d bytes from %s due to decompression error [%d decomp, actual %d] at tm=%f rt=%f\n", ret, packet->from.ToString(), uDecompressedSize, actualSize, 
-							(float)net_time, (float)Plat_FloatTime() );
+							net_time, Plat_FloatTime() );
 					}
 					return false;
 				}

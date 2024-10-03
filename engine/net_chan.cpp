@@ -1792,8 +1792,8 @@ int CNetChan::SendDatagram(bf_write *datagram)
 			, m_nInSequenceNr & mask
 			, (flags & PACKET_FLAG_RELIABLE) ? 1 : 0
 			, flags & PACKET_FLAG_CHALLENGE ? 1 : 0
-			, (float)net_time
-			, (float)Plat_FloatTime()
+			, net_time
+			, Plat_FloatTime()
 			, comp );
 	}
 
