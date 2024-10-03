@@ -146,13 +146,13 @@ void LaunchSelfViaSteam(const char *params)
 		if (!steamExe[0])
 		{
 			// still not found, use the one in the registry
-			HKEY hKey;
-			if (ERROR_SUCCESS == RegOpenKey(HKEY_CURRENT_USER, "Software\\Valve\\Steam", &hKey)) 
+			HKEY steam_key;
+			if (ERROR_SUCCESS == RegOpenKey(HKEY_CURRENT_USER, "Software\\Valve\\Steam", &steam_key)) 
 			{
 				DWORD dwType;
 				DWORD dwSize = sizeof(steamExe);
-				RegQueryValueEx( hKey, "SteamExe", NULL, &dwType, (LPBYTE)steamExe, &dwSize);
-				RegCloseKey( hKey );
+				RegQueryValueEx( steam_key, "SteamExe", NULL, &dwType, (LPBYTE)steamExe, &dwSize);
+				RegCloseKey( steam_key );
 			}
 		}
 		
@@ -164,11 +164,11 @@ void LaunchSelfViaSteam(const char *params)
 		}
 
 		// fix any slashes
-		for (char *slash = steamExe; *slash; slash++)
+		for (char *s = steamExe; *s; s++)
 		{
-			if (*slash == '/')
+			if (*s == '/')
 			{
-				*slash = '\\';
+				*s = '\\';
 			}
 		}
 
