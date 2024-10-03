@@ -21,7 +21,7 @@ CIPRateLimit::CIPRateLimit(ConVar *maxSec, ConVar *maxWindow, ConVar *maxSecGlob
 	m_maxSecGlobal( maxSecGlobal )
 {
 	m_iGlobalCount = 0;
-	m_lLastTime = -1;
+	m_lLastTime = -1.0f;
 	m_flFlushTime = 0;
 }
 
@@ -60,7 +60,7 @@ bool CIPRateLimit::CheckIPInternal( netadr_t adr )
 {
 	// check the global count first in case we are being spammed
 	m_iGlobalCount++;
-	long curTime = (long)Plat_FloatTime();
+	double curTime = Plat_FloatTime();
 
 	if( (curTime - m_lLastTime) > m_maxWindow->GetFloat() )
 	{
