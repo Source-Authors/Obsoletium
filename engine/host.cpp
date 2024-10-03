@@ -2153,13 +2153,13 @@ void CFrameTimer::MarkFrame()
 
 	// ConDMsg("%f %f %f\n", time1, time2, time3 );
 
-	float fs_input = (deltas[FRAME_SEGMENT_INPUT])*1000.0;
-	float fs_client = (deltas[FRAME_SEGMENT_CLIENT])*1000.0;
-	float fs_server = (deltas[FRAME_SEGMENT_SERVER])*1000.0;
-	float fs_render = (deltas[FRAME_SEGMENT_RENDER])*1000.0;
-	float fs_sound = (deltas[FRAME_SEGMENT_SOUND])*1000.0;
-	float fs_cldll = (deltas[FRAME_SEGMENT_CLDLL])*1000.0;
-	float fs_exec = (deltas[FRAME_SEGMENT_CMD_EXECUTE])*1000.0;
+	double fs_input = (deltas[FRAME_SEGMENT_INPUT])*1000.0;
+	double fs_client = (deltas[FRAME_SEGMENT_CLIENT])*1000.0;
+	double fs_server = (deltas[FRAME_SEGMENT_SERVER])*1000.0;
+	double fs_render = (deltas[FRAME_SEGMENT_RENDER])*1000.0;
+	double fs_sound = (deltas[FRAME_SEGMENT_SOUND])*1000.0;
+	double fs_cldll = (deltas[FRAME_SEGMENT_CLDLL])*1000.0;
+	double fs_exec = (deltas[FRAME_SEGMENT_CMD_EXECUTE])*1000.0;
 
 	ResetDeltas();
 
@@ -2811,7 +2811,8 @@ CON_COMMAND( host_runofftime, "Run off some time without rendering/updating soun
 		return;
 	}
 
-	float advanceTime = atof( args[1] );
+	// dimhotepus: atof -> strtof.
+	float advanceTime = strtof( args[1], nullptr );
 	if ( advanceTime <= 0.0f )
 		return;
 
@@ -2826,7 +2827,7 @@ CON_COMMAND( host_runofftime, "Run off some time without rendering/updating soun
 	ConMsg( "Skipping ahead for %f seconds\n", advanceTime );
 
 	SCR_UpdateScreen();
-	SCR_UpdateScreen ();
+	SCR_UpdateScreen();
 }
 
 #if !defined( _X360 )
@@ -3491,9 +3492,9 @@ void Host_RunFrame( float time )
 	if (timecount < 1000)
 		return;
 
-	float fps = 1000/(time2 - timestart);
+	double fps = 1000.0/(time2 - timestart);
 
-	ConMsg ("host_profile : %i clients, %.1f msec, %.1f fps\n",  
+	ConMsg ("host_profile : %i clients, %.1f ms, %.1f fps\n",  
 		sv.GetNumClients(),  timetotal, fps );
 
 	timecount = 0;
