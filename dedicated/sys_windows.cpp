@@ -1,10 +1,5 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
+
 #include <cstdio>
 #include <cstdlib>
 #include <system_error>
@@ -48,374 +43,339 @@ extern bool g_bVGui;
 //-----------------------------------------------------------------------------
 // Purpose: Implements OS Specific layer ( loosely )
 //-----------------------------------------------------------------------------
-class CSys : public ISys
-{
-public:
-	virtual		~CSys( void );
+class CSys : public ISys {
+ public:
+  virtual ~CSys(void);
 
-	virtual bool LoadModules( CDedicatedAppSystemGroup *pAppSystemGroup );
+  virtual bool LoadModules(CDedicatedAppSystemGroup *pAppSystemGroup);
 
-	void		Sleep( int msec );
-	bool		GetExecutableName( char *out );
-	void		ErrorMessage( int level, const char *msg );
+  void Sleep(int msec);
+  bool GetExecutableName(char *out);
+  void ErrorMessage(int level, const char *msg);
 
-	void		WriteStatusText( char *szText );
-	void		UpdateStatus( int force );
+  void WriteStatusText(char *szText);
+  void UpdateStatus(int force);
 
-	intp		LoadLibrary( char *lib );
-	void		FreeLibrary( intp library );
+  intp LoadLibrary(char *lib);
+  void FreeLibrary(intp library);
 
-	bool		CreateConsoleWindow( void );
-	void		DestroyConsoleWindow( void );
+  bool CreateConsoleWindow(void);
+  void DestroyConsoleWindow(void);
 
-	void		ConsoleOutput ( char *string );
-	char		*ConsoleInput ( int index, char *buf, int buflen );
-	void		Printf( PRINTF_FORMAT_STRING const char *fmt, ... );
+  void ConsoleOutput(char *string);
+  char *ConsoleInput(int index, char *buf, int buflen);
+  void Printf(PRINTF_FORMAT_STRING const char *fmt, ...);
 };
 
 static CSys g_Sys;
 ISys *sys = &g_Sys;
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose:
 //-----------------------------------------------------------------------------
-CSys::~CSys()
-{
-	sys = NULL;
+CSys::~CSys() { sys = NULL; }
+
+//-----------------------------------------------------------------------------
+// Purpose:
+// Input  : msec -
+//-----------------------------------------------------------------------------
+void CSys::Sleep(int msec) {
+  // Call ThreadSleep because it has the necessary magic to set the system
+  // timer resolution so that Sleep( 1 ) will sleep for one millisecond
+  // instead of for 10-16 ms.
+  ThreadSleep(msec);
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : msec - 
-//-----------------------------------------------------------------------------
-void CSys::Sleep( int msec )
-{
-	// Call ThreadSleep because it has the necessary magic to set the system
-	// timer resolution so that Sleep( 1 ) will sleep for one millisecond
-	// instead of for 10-16 ms.
-	ThreadSleep( msec );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *lib - 
+// Purpose:
+// Input  : *lib -
 // Output : long
 //-----------------------------------------------------------------------------
-intp CSys::LoadLibrary( char *lib )
-{
-	void *hDll = ::LoadLibrary( lib );
-	return (intp)hDll;
+intp CSys::LoadLibrary(char *lib) {
+  void *hDll = ::LoadLibrary(lib);
+  return (intp)hDll;
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : library - 
+// Purpose:
+// Input  : library -
 //-----------------------------------------------------------------------------
-void CSys::FreeLibrary( intp library )
-{
-	if ( !library )
-		return;
+void CSys::FreeLibrary(intp library) {
+  if (!library) return;
 
-	::FreeLibrary( (HMODULE)library );
+  ::FreeLibrary((HMODULE)library);
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *out - 
+// Purpose:
+// Input  : *out -
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CSys::GetExecutableName( char *out )
-{
-	if ( !::GetModuleFileName( ( HINSTANCE )GetModuleHandle( NULL ), out, 256 ) )
-	{
-		return false;
-	}
-	return true;
+bool CSys::GetExecutableName(char *out) {
+  if (!::GetModuleFileName(GetModuleHandle(NULL), out, 256)) {
+    return false;
+  }
+  return true;
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : level - 
-//			*msg - 
+// Purpose:
+// Input  : level -
+//			*msg -
 //-----------------------------------------------------------------------------
-void CSys::ErrorMessage( int level, const char *msg )
-{
-	MessageBox( NULL, msg, "Source - Fatal Error", MB_OK );
-	PostQuitMessage(0);	
+void CSys::ErrorMessage(int level, const char *msg) {
+  MessageBox(NULL, msg, "Source - Fatal Error", MB_OK);
+  PostQuitMessage(0);
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : force - 
+// Purpose:
+// Input  : force -
 //-----------------------------------------------------------------------------
-void CSys::UpdateStatus( int force )
-{
-	static double tLast = 0.0;
-	double	tCurrent;
-	char	szPrompt[256];
-	int		n, nMax;
-	char	szMap[64];
-	char	szHostname[128];
-	float	fps;
+void CSys::UpdateStatus(int force) {
+  static double tLast = 0.0;
+  double tCurrent;
+  char szPrompt[256];
+  int n, nMax;
+  char szMap[64];
+  char szHostname[128];
+  float fps;
 
-	if ( !engine )
-		return;
+  if (!engine) return;
 
-	tCurrent = Sys_FloatTime();
+  tCurrent = Sys_FloatTime();
 
-	if ( !force )
-	{
-		if ( ( tCurrent - tLast ) < 0.5f )
-			return;
-	}
+  if (!force) {
+    if ((tCurrent - tLast) < 0.5f) return;
+  }
 
-	tLast = tCurrent;
+  tLast = tCurrent;
 
-	engine->UpdateStatus( &fps, &n, &nMax, szMap, sizeof( szMap ) );
-	engine->UpdateHostname( szHostname, sizeof( szHostname ) );
+  engine->UpdateStatus(&fps, &n, &nMax, szMap, sizeof(szMap));
+  engine->UpdateHostname(szHostname, sizeof(szHostname));
 
-	console.SetTitle( szHostname );
+  console.SetTitle(szHostname);
 
-	Q_snprintf( szPrompt, sizeof( szPrompt ), "%.1f fps %2i/%2i on map %16s", (float)fps, n, nMax, szMap);
+  Q_snprintf(szPrompt, sizeof(szPrompt), "%.1f fps %2i/%2i on map %16s",
+             (float)fps, n, nMax, szMap);
 
-	console.SetStatusLine(szPrompt);
-	console.UpdateStatus();
+  console.SetStatusLine(szPrompt);
+  console.UpdateStatus();
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *string - 
+// Purpose:
+// Input  : *string -
 // Output : void CSys::ConsoleOutput
 //-----------------------------------------------------------------------------
-void CSys::ConsoleOutput (char *string)
-{
-	if ( g_bVGui )
-	{
-		VGUIPrintf( string );
-	}
-	else
-	{
-		console.Print(string);
-	}
+void CSys::ConsoleOutput(char *string) {
+  if (g_bVGui) {
+    VGUIPrintf(string);
+  } else {
+    console.Print(string);
+  }
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *fmt - 
-//			... - 
+// Purpose:
+// Input  : *fmt -
+//			... -
 //-----------------------------------------------------------------------------
-void CSys::Printf( PRINTF_FORMAT_STRING const char *fmt, ... )
-{
-	// Dump text to debugging console.
-	va_list argptr;
-	char szText[1024];
+void CSys::Printf(PRINTF_FORMAT_STRING const char *fmt, ...) {
+  // Dump text to debugging console.
+  va_list argptr;
+  char szText[1024];
 
-	va_start (argptr, fmt);
-	Q_vsnprintf (szText, sizeof( szText ), fmt, argptr);
-	va_end (argptr);
+  va_start(argptr, fmt);
+  Q_vsnprintf(szText, sizeof(szText), fmt, argptr);
+  va_end(argptr);
 
-	// Get Current text and append it.
-	ConsoleOutput( szText );
+  // Get Current text and append it.
+  ConsoleOutput(szText);
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose:
 // Output : char *
 //-----------------------------------------------------------------------------
-char *CSys::ConsoleInput ( int index, char *buf, int buflen )
-{
-	return console.GetLine( index, buf, buflen );
+char *CSys::ConsoleInput(int index, char *buf, int buflen) {
+  return console.GetLine(index, buf, buflen);
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *szText - 
+// Purpose:
+// Input  : *szText -
 //-----------------------------------------------------------------------------
-void CSys::WriteStatusText( char *szText )
-{
-	SetConsoleTitle( szText );
-}
+void CSys::WriteStatusText(char *szText) { SetConsoleTitle(szText); }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose:
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CSys::CreateConsoleWindow( void )
-{
-	if ( !AllocConsole () )
-	{
-		return false;
-	}
-	
-	InitConProc();
-	return true;
+bool CSys::CreateConsoleWindow(void) {
+  if (!AllocConsole()) {
+    return false;
+  }
+
+  InitConProc();
+  return true;
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose:
 //-----------------------------------------------------------------------------
-void CSys::DestroyConsoleWindow( void )
-{
-	FreeConsole ();
+void CSys::DestroyConsoleWindow(void) {
+  FreeConsole();
 
-	// shut down QHOST hooks if necessary
-	DeinitConProc ();
+  // shut down QHOST hooks if necessary
+  DeinitConProc();
 }
-
 
 //-----------------------------------------------------------------------------
 // Loading modules used by the dedicated server.
 //-----------------------------------------------------------------------------
-bool CSys::LoadModules( CDedicatedAppSystemGroup *pAppSystemGroup )
-{
-	AppSystemInfo_t appSystems[] = 
-	{
-		{ "engine.dll",				CVAR_QUERY_INTERFACE_VERSION },	// NOTE: This one must be first!!
-		{ "inputsystem.dll",		INPUTSYSTEM_INTERFACE_VERSION },
-		{ "materialsystem.dll",		MATERIAL_SYSTEM_INTERFACE_VERSION },
-		{ "studiorender.dll",		STUDIO_RENDER_INTERFACE_VERSION },
-		{ "vphysics.dll",			VPHYSICS_INTERFACE_VERSION },
-		{ "datacache.dll",			DATACACHE_INTERFACE_VERSION },
-		{ "datacache.dll",			MDLCACHE_INTERFACE_VERSION },
-		{ "datacache.dll",			STUDIO_DATA_CACHE_INTERFACE_VERSION },
-		{ "vgui2.dll",				VGUI_IVGUI_INTERFACE_VERSION },
-		{ "engine.dll",				VENGINE_HLDS_API_VERSION },
-		{ "dedicated.dll",			QUEUEDLOADER_INTERFACE_VERSION },
-		{ "", "" }	// Required to terminate the list
-	};
+bool CSys::LoadModules(CDedicatedAppSystemGroup *pAppSystemGroup) {
+  AppSystemInfo_t appSystems[] = {
+      {"engine.dll",
+       CVAR_QUERY_INTERFACE_VERSION},  // NOTE: This one must be first!!
+      {"inputsystem.dll", INPUTSYSTEM_INTERFACE_VERSION},
+      {"materialsystem.dll", MATERIAL_SYSTEM_INTERFACE_VERSION},
+      {"studiorender.dll", STUDIO_RENDER_INTERFACE_VERSION},
+      {"vphysics.dll", VPHYSICS_INTERFACE_VERSION},
+      {"datacache.dll", DATACACHE_INTERFACE_VERSION},
+      {"datacache.dll", MDLCACHE_INTERFACE_VERSION},
+      {"datacache.dll", STUDIO_DATA_CACHE_INTERFACE_VERSION},
+      {"vgui2.dll", VGUI_IVGUI_INTERFACE_VERSION},
+      {"engine.dll", VENGINE_HLDS_API_VERSION},
+      {"dedicated.dll", QUEUEDLOADER_INTERFACE_VERSION},
+      {"", ""}  // Required to terminate the list
+  };
 
-	if ( !pAppSystemGroup->AddSystems( appSystems ) ) 
-		return false;
-	
-	engine = pAppSystemGroup->FindSystem<IDedicatedServerAPI>( VENGINE_HLDS_API_VERSION );
+  if (!pAppSystemGroup->AddSystems(appSystems)) return false;
 
-	auto* pMaterialSystem = pAppSystemGroup->FindSystem<IMaterialSystem>( MATERIAL_SYSTEM_INTERFACE_VERSION );
-	pMaterialSystem->SetShaderAPI( "shaderapiempty.dll" );
-	return true;
-}
+  engine = pAppSystemGroup->FindSystem<IDedicatedServerAPI>(
+      VENGINE_HLDS_API_VERSION);
 
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool NET_Init( void )
-{
-	// Startup winock
-	WORD version = MAKEWORD(2,0);
-	WSADATA wsaData;
-
-	const int wsaError = WSAStartup( version, &wsaData );
-	if ( wsaError != 0 )
-	{
-		char msg[ 256 ];
-		Q_snprintf( msg, sizeof( msg ),
-			"Network library winsock 2.0 unavailable: %s (0x%x).\n",
-			std::system_category().message(wsaError).c_str(),
-			wsaError );
-		sys->Printf( "%s", msg );
-		Plat_DebugString( msg );
-		return false;
-	}
-	return true;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void NET_Shutdown( void )
-{
-	// Kill winsock
-	WSACleanup();
+  auto *pMaterialSystem = pAppSystemGroup->FindSystem<IMaterialSystem>(
+      MATERIAL_SYSTEM_INTERFACE_VERSION);
+  pMaterialSystem->SetShaderAPI("shaderapiempty.dll");
+  return true;
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : hInstance - 
-//			hPrevInstance - 
-//			lpszCmdLine - 
-//			nCmdShow - 
+// Purpose:
+//-----------------------------------------------------------------------------
+bool NET_Init(void) {
+  // Startup winock
+  WORD version = MAKEWORD(2, 0);
+  WSADATA wsaData;
+
+  const int wsaError = WSAStartup(version, &wsaData);
+  if (wsaError != 0) {
+    char msg[256];
+    Q_snprintf(msg, sizeof(msg),
+               "Network library winsock 2.0 unavailable: %s (0x%x).\n",
+               std::system_category().message(wsaError).c_str(), wsaError);
+    sys->Printf("%s", msg);
+    Plat_DebugString(msg);
+    return false;
+  }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void NET_Shutdown(void) {
+  // Kill winsock
+  WSACleanup();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+// Input  : hInstance -
+//			hPrevInstance -
+//			lpszCmdLine -
+//			nCmdShow -
 // Output : int PASCAL
 //-----------------------------------------------------------------------------
-int main(int argc, char **argv); // in sys_ded.cpp
+int main(int argc, char **argv);  // in sys_ded.cpp
 
-static void MiniDumpFunction( unsigned int nExceptionCode, EXCEPTION_POINTERS *pException )
-{
-	// dimhotepus: Write minidump when not under Steam.
+static void MiniDumpFunction(unsigned int nExceptionCode,
+                             EXCEPTION_POINTERS *pException) {
+  // dimhotepus: Write minidump when not under Steam.
 #ifndef NO_STEAM
-	SteamAPI_WriteMiniDump( nExceptionCode, pException, 0 );
+  SteamAPI_WriteMiniDump(nExceptionCode, pException, 0);
 #else
-	WriteMiniDumpUsingExceptionInfo( nExceptionCode, pException, 0x00000002 /* MiniDumpWithFullMemory */, "dedicated_crash" );
+  WriteMiniDumpUsingExceptionInfo(nExceptionCode, pException,
+                                  0x00000002 /* MiniDumpWithFullMemory */,
+                                  "dedicated_crash");
 #endif
 }
 
-class ScopedSeTranslator
-{
-public:
-	ScopedSeTranslator( _se_translator_function newTranslator ) noexcept
-		: m_oldTranslator{ _set_se_translator( newTranslator ) }
-	{
-	}
-	ScopedSeTranslator(ScopedSeTranslator&) = delete;
-	ScopedSeTranslator(ScopedSeTranslator&&) = delete;
-	ScopedSeTranslator& operator=(ScopedSeTranslator&) = delete;
-	ScopedSeTranslator& operator=(ScopedSeTranslator&&) = delete;
-	~ScopedSeTranslator() noexcept
-	{
-		_set_se_translator( m_oldTranslator );
-	}
+class ScopedSeTranslator {
+ public:
+  ScopedSeTranslator(_se_translator_function newTranslator) noexcept
+      : m_oldTranslator{_set_se_translator(newTranslator)} {}
+  ScopedSeTranslator(ScopedSeTranslator &) = delete;
+  ScopedSeTranslator(ScopedSeTranslator &&) = delete;
+  ScopedSeTranslator &operator=(ScopedSeTranslator &) = delete;
+  ScopedSeTranslator &operator=(ScopedSeTranslator &&) = delete;
+  ~ScopedSeTranslator() noexcept { _set_se_translator(m_oldTranslator); }
 
-private:
-	const _se_translator_function m_oldTranslator;
+ private:
+  const _se_translator_function m_oldTranslator;
 };
 
-extern "C" __declspec(dllexport)
-int DedicatedMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
-{
-	SetAppInstance( hInstance );
+extern "C" __declspec(dllexport) int DedicatedMain(HINSTANCE hInstance,
+                                                   HINSTANCE hPrevInstance,
+                                                   LPSTR lpCmdLine,
+                                                   int nCmdShow) {
+  SetAppInstance(hInstance);
 
-	const CPUInformation *cpu_info{GetCPUInformation()};
-	if ( !cpu_info->m_bSSE || !cpu_info->m_bSSE2 || !cpu_info->m_bSSE3 || !cpu_info->m_bSSE41 || !cpu_info->m_bSSE42 )
-	{
-		Error( "Sorry, your CPU missed SSE / SSE2 / SSE3 / SSE4.1 / SSE4.2 instructions required for the game.\n\nPlease upgrade your CPU." );
-		return STATUS_ILLEGAL_INSTRUCTION;
-	}
+  const CPUInformation *cpu_info{GetCPUInformation()};
+  if (!cpu_info->m_bSSE || !cpu_info->m_bSSE2 || !cpu_info->m_bSSE3 ||
+      !cpu_info->m_bSSE41 || !cpu_info->m_bSSE42) {
+    Error(
+        "Sorry, your CPU missed SSE / SSE2 / SSE3 / SSE4.1 / SSE4.2 "
+        "instructions required for the game.\n\nPlease upgrade your CPU.");
+    return STATUS_ILLEGAL_INSTRUCTION;
+  }
 
-	if ( !cpu_info->m_bRDTSC )
-	{
-		Error( "Sorry, your CPU missed RDTSC instruction required for the game.\n\nPlease upgrade your CPU." );
-		return STATUS_ILLEGAL_INSTRUCTION;
-	}
+  if (!cpu_info->m_bRDTSC) {
+    Error(
+        "Sorry, your CPU missed RDTSC instruction required for the "
+        "game.\n\nPlease upgrade your CPU.");
+    return STATUS_ILLEGAL_INSTRUCTION;
+  }
 
-	if ( !IsWindows10OrGreater() )
-	{
-		Error( "Sorry, Windows 10+ required to run the game.\n\nPlease update your operating system." );
-		return ERROR_OLD_WIN_VERSION;
-	}
+  if (!IsWindows10OrGreater()) {
+    Error(
+        "Sorry, Windows 10+ required to run the game.\n\nPlease update your "
+        "operating system.");
+    return ERROR_OLD_WIN_VERSION;
+  }
 
-	const auto args_result = Args::FromCommandLine( GetCommandLineW() );
-	if ( const auto *rc = std::get_if<std::error_code>( &args_result ))
-	{
-		Error( "Sorry, unable to parse command line arguments: %s", rc->message().c_str() );
-		return rc->value();
-	}
+  const auto args_result = Args::FromCommandLine(GetCommandLineW());
+  if (const auto *rc = std::get_if<std::error_code>(&args_result)) {
+    Error("Sorry, unable to parse command line arguments: %s",
+          rc->message().c_str());
+    return rc->value();
+  }
 
-	const auto *args = std::get_if<Args>( &args_result );
-	CommandLine()->CreateCmdLine( VCRHook_GetCommandLine() );
+  const auto *args = std::get_if<Args>(&args_result);
+  CommandLine()->CreateCmdLine(VCRHook_GetCommandLine());
 
-	if ( !Plat_IsInDebugSession() && !CommandLine()->FindParm( "-nominidumps") )
-	{
-		const ScopedSeTranslator seTranslator( MiniDumpFunction );
+  if (!Plat_IsInDebugSession() && !CommandLine()->FindParm("-nominidumps")) {
+    const ScopedSeTranslator seTranslator(MiniDumpFunction);
 
-		try  // this try block allows the SE translator to work
-		{
-			return main( args->count(), args->values() );
-		}
-		catch( ... )
-		{
-			return -1;
-		}
-	}
+    try  // this try block allows the SE translator to work
+    {
+      return main(args->count(), args->values());
+    } catch (...) {
+      return -1;
+    }
+  }
 
-	return main( args->count(), args->values() );
+  return main(args->count(), args->values());
 }
