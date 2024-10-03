@@ -278,7 +278,7 @@ public:
 	CShaderDeviceEmpty() : m_DynamicMesh( true ), m_Mesh( false ) {}
 
 	// Methods of IShaderDevice
-	virtual int GetCurrentAdapter() const { return 0; }
+	virtual unsigned GetCurrentAdapter() const { return 0; }
 	virtual bool IsUsingGraphics() const { return false; }
 	virtual void SpewDriverInfo() const;
 	virtual ImageFormat GetBackBufferFormat() const { return IMAGE_FORMAT_RGB888; }
@@ -316,7 +316,7 @@ public:
 	virtual void DoStartupShaderPreloading( void ) {}
 #endif
 
-	virtual char *GetDisplayDeviceName() OVERRIDE { return ""; }
+	virtual const char *GetDisplayDeviceName() OVERRIDE { return ""; }
 
 private:
 	CEmptyMesh m_Mesh;
@@ -345,14 +345,14 @@ public:
 
 public:
 	// Methods of IShaderDeviceMgr
-	virtual int	 GetAdapterCount() const;
-	virtual void GetAdapterInfo( int adapter, MaterialAdapterInfo_t& info ) const;
-	virtual bool GetRecommendedConfigurationInfo( int nAdapter, int nDXLevel, KeyValues *pKeyValues );
-	virtual int	 GetModeCount( int adapter ) const;
-	virtual void GetModeInfo( ShaderDisplayMode_t *pInfo, int nAdapter, int mode ) const;
-	virtual void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter ) const;
-	virtual bool SetAdapter( int nAdapter, int nFlags );
-	virtual CreateInterfaceFn SetMode( void *hWnd, int nAdapter, const ShaderDeviceInfo_t& mode );
+	virtual unsigned	 GetAdapterCount() const;
+	virtual void GetAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const;
+	virtual bool GetRecommendedConfigurationInfo( unsigned nAdapter, int nDXLevel, KeyValues *pKeyValues );
+	virtual unsigned GetModeCount( unsigned adapter ) const;
+	virtual void GetModeInfo( ShaderDisplayMode_t *pInfo, unsigned nAdapter, unsigned mode ) const;
+	virtual void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const;
+	virtual bool SetAdapter( unsigned nAdapter, int nFlags );
+	virtual CreateInterfaceFn SetMode( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode );
 	virtual void AddModeChangeCallback( ShaderModeChangeCallbackFunc_t func ) {}
 	virtual void RemoveModeChangeCallback( ShaderModeChangeCallbackFunc_t func ) {}
 };
@@ -416,7 +416,7 @@ public:
 	void ClearSnapshots();
 
 	// Sets the mode...
-	bool SetMode( void* hwnd, int nAdapter, const ShaderDeviceInfo_t &info )
+	bool SetMode( void* hwnd, unsigned nAdapter, const ShaderDeviceInfo_t &info )
 	{
 		return true;
 	}
@@ -760,7 +760,7 @@ public:
 	{
 		return "UNKNOWN";
 	}
-	int	 TextureMemorySize() const;
+	size_t	 TextureMemorySize() const;
 	bool SupportsOverbright() const;
 	bool SupportsCubeMaps() const;
 	bool SupportsMipmappedCubemaps() const;
@@ -1335,47 +1335,47 @@ void CShaderDeviceMgrEmpty::Shutdown()
 }
 
 // Sets the adapter
-bool CShaderDeviceMgrEmpty::SetAdapter( int nAdapter, int nFlags )
+bool CShaderDeviceMgrEmpty::SetAdapter( unsigned nAdapter, int nFlags )
 {
 	return true;
 }
 
 // FIXME: Is this a public interface? Might only need to be private to shaderapi
-CreateInterfaceFn CShaderDeviceMgrEmpty::SetMode( void *hWnd, int nAdapter, const ShaderDeviceInfo_t& mode ) 
+CreateInterfaceFn CShaderDeviceMgrEmpty::SetMode( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode ) 
 {
 	return ShaderInterfaceFactory;
 }
 
 // Gets the number of adapters...
-int	 CShaderDeviceMgrEmpty::GetAdapterCount() const
+unsigned	 CShaderDeviceMgrEmpty::GetAdapterCount() const
 {
 	return 0;
 }
 
-bool CShaderDeviceMgrEmpty::GetRecommendedConfigurationInfo( int nAdapter, int nDXLevel, KeyValues *pKeyValues ) 
+bool CShaderDeviceMgrEmpty::GetRecommendedConfigurationInfo( unsigned nAdapter, int nDXLevel, KeyValues *pKeyValues ) 
 {
 	return true;
 }
 
 // Returns info about each adapter
-void CShaderDeviceMgrEmpty::GetAdapterInfo( int adapter, MaterialAdapterInfo_t& info ) const
+void CShaderDeviceMgrEmpty::GetAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const
 {
 	memset( &info, 0, sizeof( info ) );
 	info.m_nDXSupportLevel = 90;
 }
 
 // Returns the number of modes
-int	 CShaderDeviceMgrEmpty::GetModeCount( int nAdapter ) const
+unsigned	 CShaderDeviceMgrEmpty::GetModeCount( unsigned nAdapter ) const
 {
 	return 0;
 }
 
 // Returns mode information..
-void CShaderDeviceMgrEmpty::GetModeInfo( ShaderDisplayMode_t *pInfo, int nAdapter, int nMode ) const
+void CShaderDeviceMgrEmpty::GetModeInfo( ShaderDisplayMode_t *pInfo, unsigned nAdapter, unsigned nMode ) const
 {
 }
 
-void CShaderDeviceMgrEmpty::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, int nAdapter ) const
+void CShaderDeviceMgrEmpty::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const
 {
 }
 
@@ -2028,7 +2028,7 @@ int  CShaderAPIEmpty::MaxTextureAspectRatio() const
 }
 
 
-int	 CShaderAPIEmpty::TextureMemorySize() const
+size_t	 CShaderAPIEmpty::TextureMemorySize() const
 {
 	// fake it
 	return 64 * 1024 * 1024;
