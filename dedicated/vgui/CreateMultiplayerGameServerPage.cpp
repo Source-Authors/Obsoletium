@@ -112,6 +112,8 @@ const char *GetLiblistFallbackDir( const char *pszGameDir )
 CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(vgui::Panel *parent, const char *name) : Frame(parent, name)
 {
 	memset(&m_iServer,0x0,sizeof(serveritem_t));
+	// dimhotepus: Ensure no UB on uninitialized mod read.
+	memset(m_szMod,0x0,sizeof(m_szMod));
 
 	m_MainPanel = parent; // as we are a popup frame we need to store this seperately
 	m_pSavedData = NULL;
