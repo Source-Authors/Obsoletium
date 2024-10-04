@@ -54,7 +54,7 @@
 #else
 	//USE_ACTUAL_DX
 	#ifdef WIN32
-		#include <Windows.h>
+		#include "winlite.h"
 		#include <d3d9.h>
       // HACK(proper): Exclude d3d9 extensions, as they are too broad.
 			// #include <d3dx9.h>
