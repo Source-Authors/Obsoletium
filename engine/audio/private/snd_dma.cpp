@@ -6402,7 +6402,7 @@ void S_Update_Guts( float mixAheadTime )
 
 constexpr inline int THREADED_MIX_TIME{33};
 
-ConVar snd_ShowThreadFrameTime( "snd_ShowThreadFrameTime", "0" );
+ConVar snd_showthreadframetime("snd_showthreadframetime", "0", 0, "Show sound mix thread update time", true, 0, true, 1);
 
 std::atomic_bool g_bMixThreadExit{false};
 ThreadHandle_t g_hMixThread;
@@ -6430,7 +6430,7 @@ void S_Update_Thread()
 		frameTime = t1 - lastFrameTime;
 		lastFrameTime = t1;
 
-		if ( snd_ShowThreadFrameTime.GetBool() )
+		if ( snd_showthreadframetime.GetBool() )
 		{
 			Msg( "S_Update_Thread: frameTime: %.2f ms\n", frameTime * 1000.0f );
 		}
