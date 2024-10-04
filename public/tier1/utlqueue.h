@@ -15,12 +15,7 @@
 
 //#define TEST_UTLQUEUE
 
-#define newmax max
-#undef max
-
 enum QueueIter_t : intp { QUEUE_ITERATOR_INVALID = std::numeric_limits<intp>::max() };
-
-#define max newmax
 
 // T is the type stored in the queue
 template< class T, class M = CUtlMemory< T > > 
