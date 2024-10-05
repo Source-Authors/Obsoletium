@@ -2,7 +2,6 @@
 //
 //=======================================================================================//
 
-#include "bzip2/bzlib.h"
 #include "sv_filepublish.h"
 #include "utlstring.h"
 #include "strtools.h"
@@ -13,6 +12,10 @@
 #include "replay/shared_defs.h"
 #include "spew.h"
 #include "utlqueue.h"
+#include "bzip2/bzlib.h"
+
+#undef CopyFile
+#undef AddJob
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
