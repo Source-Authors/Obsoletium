@@ -90,8 +90,6 @@ typedef AutoSeededX917RNG<AES> CAutoSeededRNG;
 #include "tier0/valve_on.h"
 
 #include "crypto.h"
-#define max(a,b)  (((a) > (b)) ? (a) : (b))
-#define min(a,b)  (((a) < (b)) ? (a) : (b))
 
 
 // list of auto-seeded RNG pointers
