@@ -89,7 +89,7 @@ void CBudgetPanelAdmin::ApplySchemeSettings( vgui::IScheme *pScheme )
 
 void CBudgetPanelAdmin::PostChildPaint()
 {
-	DrawColoredText( m_hFont, 0, 0, m_budgetTextColor[0], m_budgetTextColor[1], m_budgetTextColor[2], m_budgetTextColor[3], "%i fps (showbudget 3D driver time included)", RoundFloatToInt(g_fFrameRate) );
+	DrawColoredText( m_hFont, 0, 0, m_budgetTextColor[0], m_budgetTextColor[1], m_budgetTextColor[2], m_budgetTextColor[3], "%i fps (showbudget 3D driver time included)", floor(g_fFrameRate) );
 	DrawColoredText( m_hFont, 0, 16, m_budgetTextColor[0], m_budgetTextColor[1], m_budgetTextColor[2], m_budgetTextColor[3], "%.1f ms", g_fFrameTimeLessBudget*1000.0f );
 
 	BaseClass::PostChildPaint();

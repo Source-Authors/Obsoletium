@@ -4,8 +4,6 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <stdio.h>
-#include <stdlib.h>
 #ifdef _WIN32
 #include "winsock.h"
 typedef int socklen_t;
@@ -23,7 +21,7 @@ typedef int socklen_t;
 
 #include "netapi.h"
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Implements INetAPI
@@ -37,7 +35,7 @@ public:
 	virtual char		*AdrToString( netadr_t *a );
 	virtual bool		StringToAdr( const char *s, netadr_t *a );
 
-	virtual void		GetSocketAddress( int socket, netadr_t *a );
+	virtual void		GetSocketAddress( socket_handle socket, netadr_t *a );
 
 	virtual bool		CompareAdr( netadr_t *a, netadr_t *b );
 
@@ -145,7 +143,7 @@ static bool StringToSockaddr( const char *s, struct sockaddr *sadr )
 	}
 	
 	// Numeric IP, no DNS
-	if ( copy[0] >= '0' && copy[0] <= '9' && strstr( copy, "." ) )
+	if ( copy[0] >= '0' && copy[0] <= '9' && strchr( copy, '.' ) )
 	{
 		*(int *)&p->sin_addr = inet_addr( copy );
 	}
@@ -195,12 +193,11 @@ bool CNetAPI::StringToAdr( const char *s, netadr_t *a )
 // Input  : socket - 
 //			*a - 
 //-----------------------------------------------------------------------------
-void CNetAPI::GetSocketAddress( int socket, netadr_t *a )
+void CNetAPI::GetSocketAddress( socket_handle socket, netadr_t *a )
 {
 	char	buff[512];
 	struct sockaddr_in	address;
 	int		namelen;
-//	int     net_error = 0;
 
 	memset( a, 0, sizeof( *a ) );
 	gethostname(buff, 512);

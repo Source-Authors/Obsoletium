@@ -19,11 +19,11 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE wsock32.lib"
+		$AdditionalDependencies				"$BASE wsock32.lib shell32.lib"
 	}
 }
 
-$Project "AdminServer"
+$Project "adminserver"
 {
 	$Folder	"Source Files"
 	{

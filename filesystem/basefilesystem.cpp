@@ -49,7 +49,7 @@
 ConVar fs_report_sync_opens( "fs_report_sync_opens", "0", 0, "0:Off, 1:Blocking only, 2:All" );
 ConVar fs_warning_mode( "fs_warning_mode", "0", 0, "0:Off, 1:Warn main thread, 2:Warn other threads"  );
 
-#define BSPOUTPUT	0	// bsp output flag -- determines type of fs_log output to generate
+constexpr inline int BSPOUTPUT{0};	// bsp output flag -- determines type of fs_log output to generate
 
 static void AddSeperatorAndFixPath( char *str );
 

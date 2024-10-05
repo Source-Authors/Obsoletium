@@ -192,7 +192,7 @@ protected:
 public:
 
 	server_state_t	m_State;		// some actions are only valid during load
-	int				m_Socket;		// network socket 
+	intp			m_Socket;		// network socket 
 	int				m_nTickCount;	// current server tick
 	bool			m_bSimulatingTicks;		// whether or not the server is currently simulating ticks
 	char			m_szMapname[64];		// map name

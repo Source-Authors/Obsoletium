@@ -15,12 +15,12 @@
 #include "scoped_app_locale.h"
 #include "scoped_app_multirun.h"
 #include "scoped_app_relaunch.h"
-#include "scoped_com.h"
 #include "scoped_heap_leak_dumper.h"
 
-#ifdef _WIN32
-#include "scoped_timer_resolution.h"
-#include "scoped_winsock.h"
+#ifdef _WIN32 "
+#include "windows/scoped_com.h"
+#include "windows/scoped_timer_resolution.h"
+#include "windows/scoped_winsock.h"
 #endif
 
 #include "appframework/AppFramework.h"
@@ -454,7 +454,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 
 #ifdef WIN32
   // COM is required.
-  const se::launcher::ScopedCom scoped_com{
+  const se::common::windows::ScopedCom scoped_com{
       static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE |
                           COINIT_SPEED_OVER_MEMORY)};
   if (FAILED(scoped_com.errc())) {
@@ -467,7 +467,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   constexpr std::chrono::milliseconds kSystemTimerResolution{2ms};
 
   // System timer precision affects Sleep & friends performance.
-  const se::launcher::ScopedTimerResolution scoped_timer_resolution{
+  const se::common::windows::ScopedTimerResolution scoped_timer_resolution{
       kSystemTimerResolution};
   if (!scoped_timer_resolution) {
     Warning(
@@ -476,11 +476,10 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
         static_cast<long long>(kSystemTimerResolution.count()));
   }
 
-  const se::launcher::ScopedWinsock scoped_winsock{MAKEWORD(2, 0)};
+  const se::common::windows::ScopedWinsock scoped_winsock{MAKEWORD(2, 0)};
   if (scoped_winsock.errc()) {
     Warning("Windows sockets 2.0 unavailable (%d): %s.\n",
-            scoped_winsock.errc(),
-            std::system_category().message(scoped_winsock.errc()).c_str());
+            scoped_winsock.errc(), scoped_winsock.errc().message().c_str());
   }
 
   if (!ApplyProcessPriorityClass(command_line)) {

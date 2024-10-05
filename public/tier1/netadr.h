@@ -1,30 +1,25 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
 //
-// $NoKeywords: $
-//
-//=============================================================================//
-// netadr.h
-#ifndef NETADR_H
-#define NETADR_H
-#ifdef _WIN32
-#pragma once
-#endif
+
+#ifndef SE_TIER1_NETADR_H_
+#define SE_TIER1_NETADR_H_
 
 #include "tier0/platform.h"
+#include "tier0/vcrmode.h"
+
 #undef SetPort
 
 class bf_read;
 class bf_write;
 
-typedef enum
+enum netadrtype_t
 { 
 	NA_NULL = 0,
 	NA_LOOPBACK,
 	NA_BROADCAST,
 	NA_IP,
-} netadrtype_t;
+};
 
 typedef struct netadr_s
 {
@@ -75,7 +70,7 @@ public:
 	bool	IsValid() const;	// ip & port != 0
 	bool	IsBaseAdrValid() const;	// ip != 0
 
-	void    SetFromSocket( int hSocket );
+	void    SetFromSocket( socket_handle hSocket );
 
 	bool	Unserialize( bf_read &readBuf );
 	bool	Serialize( bf_write &writeBuf );
@@ -133,4 +128,4 @@ private:
 	char m_rgchString[32];
 };
 
-#endif // NETADR_H
+#endif  // !SE_TIER1_NETADR_H_

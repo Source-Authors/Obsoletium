@@ -1,8 +1,5 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-//===========================================================================//
+// Copyright Valve Corporation, All rights reserved.
+
 #ifdef _WIN32
 #include "winlite.h"
 #include <direct.h>
@@ -25,168 +22,151 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+namespace {
 
-static CMainPanel *g_pMainPanel = NULL; // the main panel to show
-static CSysModule *g_hAdminServerModule;
-IAdminServer *g_pAdminServer = NULL;
-static IVGuiModule *g_pAdminVGuiModule = NULL;
+CSysModule *g_hAdminServerModule = nullptr;
+IVGuiModule *g_pAdminVGuiModule = nullptr;
 
-void* DedicatedFactory(const char *pName, int *pReturnCode);
+}  // namespace
 
+namespace se::dedicated {
+
+IAdminServer *g_pAdminServer = nullptr;
+CMainPanel *g_pMainPanel = nullptr;  // the main panel to show
 
 //-----------------------------------------------------------------------------
 // Purpose: Starts up the VGUI system and loads the base panel
 //-----------------------------------------------------------------------------
-int StartVGUI( CreateInterfaceFn dedicatedFactory )
-{
-	// the "base dir" so we can scan mod name
-	g_pFullFileSystem->AddSearchPath(".", "MAIN");	
-	// the main platform dir
-	g_pFullFileSystem->AddSearchPath( "platform", "PLATFORM", PATH_ADD_TO_HEAD);
-	
-	vgui::ivgui()->SetSleep(false);
+int StartVGUI(CreateInterfaceFn dedicatedFactory) {
+  // the "base dir" so we can scan mod name
+  g_pFullFileSystem->AddSearchPath(".", "MAIN");
+  // the main platform dir
+  g_pFullFileSystem->AddSearchPath("platform", "PLATFORM", PATH_ADD_TO_HEAD);
 
-	// find our configuration directory
-	char szConfigDir[512];
-	const char *steamPath = getenv("SteamInstallPath");
-	if (steamPath)
-	{
-		// put the config dir directly under steam
-		Q_snprintf(szConfigDir, sizeof(szConfigDir), "%s/config", steamPath);
-	}
-	else
-	{
-		// we're not running steam, so just put the config dir under the platform
-		Q_strncpy( szConfigDir, "platform/config", sizeof(szConfigDir));
-	}
-	g_pFullFileSystem->CreateDirHierarchy("config", "PLATFORM");
-	g_pFullFileSystem->AddSearchPath(szConfigDir, "CONFIG", PATH_ADD_TO_HEAD);
+  vgui::ivgui()->SetSleep(false);
 
-	// initialize the user configuration file
-	vgui::system()->SetUserConfigFile("DedicatedServerDialogConfig.vdf", "CONFIG");
+  // find our configuration directory
+  char szConfigDir[512];
+  const char *steamPath = getenv("SteamInstallPath");
+  if (steamPath) {
+    // put the config dir directly under steam
+    V_sprintf_safe(szConfigDir, "%s/config", steamPath);
+  } else {
+    // we're not running steam, so just put the config dir under the platform
+    V_strcpy_safe(szConfigDir, "platform/config");
+  }
+  g_pFullFileSystem->CreateDirHierarchy("config", "PLATFORM");
+  g_pFullFileSystem->AddSearchPath(szConfigDir, "CONFIG", PATH_ADD_TO_HEAD);
 
-	// Init the surface
-	g_pMainPanel = new CMainPanel( );
-	g_pMainPanel->SetVisible(true);
+  // initialize the user configuration file
+  vgui::system()->SetUserConfigFile("DedicatedServerDialogConfig.vdf",
+                                    "CONFIG");
 
-	vgui::surface()->SetEmbeddedPanel(g_pMainPanel->GetVPanel());
+  // Init the surface
+  g_pMainPanel = new CMainPanel();
+  g_pMainPanel->SetVisible(true);
 
-	// load the scheme
-	vgui::scheme()->LoadSchemeFromFile("Resource/SourceScheme.res", NULL);
+  vgui::surface()->SetEmbeddedPanel(g_pMainPanel->GetVPanel());
 
-	// localization
-	g_pVGuiLocalize->AddFile( "Resource/platform_%language%.txt" );
-	g_pVGuiLocalize->AddFile( "Resource/vgui_%language%.txt" );
-	g_pVGuiLocalize->AddFile( "Admin/server_%language%.txt" );
+  // load the scheme
+  vgui::scheme()->LoadSchemeFromFile("Resource/SourceScheme.res", NULL);
 
-	// Start vgui
-	vgui::ivgui()->Start();
+  // localization
+  g_pVGuiLocalize->AddFile("Resource/platform_%language%.txt");
+  g_pVGuiLocalize->AddFile("Resource/vgui_%language%.txt");
+  g_pVGuiLocalize->AddFile("Admin/server_%language%.txt");
 
-	// load the module
+  // Start vgui
+  vgui::ivgui()->Start();
+
+  // load the module
 #ifdef PLATFORM_64BITS
-	g_pFullFileSystem->GetLocalCopy("bin/x64/AdminServer.dll");
+  g_pFullFileSystem->GetLocalCopy("bin/x64/AdminServer.dll");
 #else
-	g_pFullFileSystem->GetLocalCopy("bin/AdminServer.dll");
+  g_pFullFileSystem->GetLocalCopy("bin/AdminServer.dll");
 #endif
 
-	g_hAdminServerModule = g_pFullFileSystem->LoadModule("AdminServer");
-	Assert(g_hAdminServerModule != NULL);
-	CreateInterfaceFn adminFactory = NULL;
+  g_hAdminServerModule = g_pFullFileSystem->LoadModule("AdminServer");
+  Assert(g_hAdminServerModule);
 
-	if (!g_hAdminServerModule)
-	{
-		vgui::ivgui()->DPrintf2("Admin Error: module version (Admin/AdminServer.dll, %s) invalid, not loading\n", IMANAGESERVER_INTERFACE_VERSION );
-	}
-	else
-	{
-		// make sure we get the right version
-		adminFactory = Sys_GetFactory(g_hAdminServerModule);
-		g_pAdminServer = (IAdminServer *)adminFactory(ADMINSERVER_INTERFACE_VERSION, NULL);
-		g_pAdminVGuiModule = (IVGuiModule *)adminFactory("VGuiModuleAdminServer001", NULL);
-		Assert(g_pAdminServer != NULL);
-		Assert(g_pAdminVGuiModule != NULL);
-		if (!g_pAdminServer || !g_pAdminVGuiModule)
-		{
-			vgui::ivgui()->DPrintf2("Admin Error: module version (Admin/AdminServer.dll, %s) invalid, not loading\n", IMANAGESERVER_INTERFACE_VERSION );
-		}
-	}
+  if (!g_hAdminServerModule) {
+    vgui::ivgui()->DPrintf2(
+        "Admin Error: module version (AdminServer.dll, %s) invalid, not "
+        "loading\n",
+        IMANAGESERVER_INTERFACE_VERSION);
+  } else {
+    // make sure we get the right version
+    CreateInterfaceFn adminFactory = Sys_GetFactory(g_hAdminServerModule);
 
-	// finish initializing admin module
-	g_pAdminVGuiModule->Initialize( &dedicatedFactory, 1 );
-	g_pAdminVGuiModule->PostInitialize(&adminFactory, 1);
-	g_pAdminVGuiModule->SetParent( g_pMainPanel->GetVPanel() );
+    g_pAdminServer =
+        (IAdminServer *)adminFactory(ADMINSERVER_INTERFACE_VERSION, NULL);
+    Assert(g_pAdminServer);
+    g_pAdminVGuiModule =
+        (IVGuiModule *)adminFactory("VGuiModuleAdminServer001", NULL);
+    Assert(g_pAdminVGuiModule);
 
-	// finish setting up main panel
-	g_pMainPanel->Initialize( );
-	g_pMainPanel->Open();
+    if (!g_pAdminServer || !g_pAdminVGuiModule) {
+      vgui::ivgui()->DPrintf2(
+          "Admin Error: module version (AdminServer.dll, %s) invalid, not "
+          "loading\n",
+          IMANAGESERVER_INTERFACE_VERSION);
+    }
 
-	return 0;
+    // finish initializing admin module
+    g_pAdminVGuiModule->Initialize(&dedicatedFactory, 1);
+    g_pAdminVGuiModule->PostInitialize(&adminFactory, 1);
+    g_pAdminVGuiModule->SetParent(g_pMainPanel->GetVPanel());
+  }
+
+  // finish setting up main panel
+  g_pMainPanel->Initialize();
+  g_pMainPanel->Open();
+
+  return 0;
 }
-
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Shuts down the VGUI system
 //-----------------------------------------------------------------------------
-void StopVGUI()
-{
-	SetEvent(g_pMainPanel->GetShutdownHandle());
+void StopVGUI() {
+  SetEvent(g_pMainPanel->GetShutdownHandle());
 
-	delete g_pMainPanel;
-	g_pMainPanel = NULL;
+  delete g_pMainPanel;
+  g_pMainPanel = NULL;
 
-	if (g_hAdminServerModule)
-	{
-		g_pAdminVGuiModule->Shutdown( );
-		Sys_UnloadModule(g_hAdminServerModule);
-	}
+  if (g_hAdminServerModule) {
+    g_pAdminVGuiModule->Shutdown();
+    Sys_UnloadModule(g_hAdminServerModule);
+  }
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Run a single VGUI frame
 //-----------------------------------------------------------------------------
-void RunVGUIFrame()
-{
-	vgui::ivgui()->RunFrame();
+void RunVGUIFrame() { vgui::ivgui()->RunFrame(); }
+
+bool VGUIIsStopping() { return g_pMainPanel->Stopping(); }
+
+bool VGUIIsRunning() { return vgui::ivgui()->IsRunning(); }
+
+bool VGUIIsInConfig() { return g_pMainPanel->IsInConfig(); }
+
+void VGUIFinishedConfig() {
+  Assert(g_pMainPanel);
+  if (g_pMainPanel)  // engine is loaded, pass the message on
+  {
+    SetEvent(g_pMainPanel->GetShutdownHandle());
+  }
 }
 
-
-bool VGUIIsStopping()
-{
-	return g_pMainPanel->Stopping();
+void VGUIPrintf(const char *msg) {
+  if (!g_pMainPanel || VGUIIsInConfig() || VGUIIsStopping()) {
+    Plat_DebugString(msg);
+  } else if (g_pMainPanel) {
+    g_pMainPanel->AddConsoleText(msg);
+  }
 }
 
+}  // namespace se::dedicated
 
-bool VGUIIsRunning()
-{
-	return vgui::ivgui()->IsRunning();
-}
-
-bool VGUIIsInConfig()
-{
-	return g_pMainPanel->IsInConfig();
-}
-
-void VGUIFinishedConfig()
-{
-	Assert( g_pMainPanel );
-	if(g_pMainPanel) // engine is loaded, pass the message on
-	{
-		SetEvent(g_pMainPanel->GetShutdownHandle());
-	}
-}
-
-void VGUIPrintf( const char *msg )
-{
-	if ( !g_pMainPanel || VGUIIsInConfig() || VGUIIsStopping() )
-	{
-		Plat_DebugString( msg );
-	}
-	else if ( g_pMainPanel )
-	{
-		g_pMainPanel->AddConsoleText( msg );
-	}
-}
-
-#endif // _WIN32
-
+#endif  // _WIN32

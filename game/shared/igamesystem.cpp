@@ -11,9 +11,6 @@
 #include "datacache/imdlcache.h"
 #include "utlvector.h"
 #include "vprof.h"
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -166,8 +163,6 @@ CUserCmd *IGameSystem::RunCommandUserCmd()
 //-----------------------------------------------------------------------------
 bool IGameSystem::InitAllSystems()
 {
-	int i;
-
 	{
 		// first add any auto systems to the end
 		CAutoGameSystem *pSystem = s_pSystemList;
@@ -206,23 +201,11 @@ bool IGameSystem::InitAllSystems()
 	// Now remember that we are initted so new CAutoGameSystems will add themselves automatically.
 	s_bSystemsInitted = true;
 
-	for ( i = 0; i < s_GameSystems.Count(); ++i )
+	for ( auto *sys : s_GameSystems )
 	{
 		MDLCACHE_CRITICAL_SECTION();
 
-		IGameSystem *sys = s_GameSystems[i];
-
-#if defined( _X360 )
-		char sz[128];
-		Q_snprintf( sz, sizeof( sz ), "%s->Init():Start", sys->Name() );
-		XBX_rTimeStampLog( Plat_FloatTime(), sz );
-#endif
 		bool valid = sys->Init();
-
-#if defined( _X360 )
-		Q_snprintf( sz, sizeof( sz ), "%s->Init():Finish", sys->Name() );
-		XBX_rTimeStampLog( Plat_FloatTime(), sz );
-#endif
 		if ( !valid )
 			return false;
 	}
@@ -305,11 +288,8 @@ void IGameSystem::UpdateAllSystems( float frametime )
 {
 	SafeRemoveIfDesiredAllSystems();
 
-	int i;
-	int c = s_GameSystemsPerFrame.Count();
-	for ( i = 0; i < c; ++i )
+	for ( auto *sys : s_GameSystemsPerFrame )
 	{
-		IGameSystemPerFrame *sys = s_GameSystemsPerFrame[i];
 		MDLCACHE_CRITICAL_SECTION();
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, sys->Name() );
 		sys->Update( frametime );
@@ -350,12 +330,8 @@ void InvokeMethod( GameSystemFunc_t f, char const *timed /*=0*/ )
 {
 	NOTE_UNUSED( timed );
 
-	int i;
-	int c = s_GameSystems.Count();
-	for ( i = 0; i < c ; ++i )
+	for ( auto *sys : s_GameSystems )
 	{
-		IGameSystem *sys = s_GameSystems[i];
-
 		MDLCACHE_CRITICAL_SECTION();
 
 		(sys->*f)();
@@ -369,12 +345,10 @@ void InvokePerFrameMethod( PerFrameGameSystemFunc_t f, char const *timed /*=0*/ 
 {
 	NOTE_UNUSED( timed );
 
-	int i;
-	int c = s_GameSystemsPerFrame.Count();
-	for ( i = 0; i < c ; ++i )
+	for ( auto *sys : s_GameSystemsPerFrame )
 	{
-		IGameSystemPerFrame *sys  = s_GameSystemsPerFrame[i];
 		MDLCACHE_CRITICAL_SECTION();
+
 		(sys->*f)();
 	}
 }
@@ -384,8 +358,8 @@ void InvokePerFrameMethod( PerFrameGameSystemFunc_t f, char const *timed /*=0*/ 
 //-----------------------------------------------------------------------------
 void InvokeMethodReverseOrder( GameSystemFunc_t f )
 {
-	int i;
-	int c = s_GameSystems.Count();
+	intp i;
+	intp c = s_GameSystems.Count();
 	for ( i = c; --i >= 0; )
 	{
 		IGameSystem *sys = s_GameSystems[i];

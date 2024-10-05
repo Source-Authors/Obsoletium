@@ -19,7 +19,7 @@ $Configuration
 	}
 }
 
-$Project "Client (HL2MP)"
+$Project "client (hl2mp)"
 {
 	$Folder	"Source Files"
 	{

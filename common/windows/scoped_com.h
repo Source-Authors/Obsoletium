@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_LAUNCHER_SCOPED_COM_H
-#define SRC_LAUNCHER_SCOPED_COM_H
+#ifndef SE_COMMON_WINDOWS_SCOPED_COM_H_
+#define SE_COMMON_WINDOWS_SCOPED_COM_H_
 
 #include <sal.h>
 #include <objbase.h>
@@ -16,7 +16,7 @@ __declspec(dllimport) _Check_return_ HRESULT
 __declspec(dllimport) void __stdcall CoUninitialize();
 }
 
-namespace se::launcher {
+namespace se::common::windows {
 
 // Scoped COM.
 class ScopedCom {
@@ -39,6 +39,6 @@ class ScopedCom {
   const HRESULT errc_;
 };
 
-}  // namespace se::launcher
+}  // namespace se::common::windows
 
-#endif  // SRC_LAUNCHER_SCOPED_COM_H
+#endif  // !SE_COMMON_WINDOWS_SCOPED_COM_H_

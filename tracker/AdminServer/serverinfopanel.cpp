@@ -191,8 +191,8 @@ void CServerInfoPanel::UpdateMapCycleValue()
 		return;
 
 	// find it in the map cycle list
-	int listPoint = -1;
-	for (int i = 0; i < m_MapCycle.Count(); i++)
+	intp listPoint = -1;
+	for (intp i = 0; i < m_MapCycle.Count(); i++)
 	{
 		if (!stricmp(m_MapCycle[i].String(), currentMap.String()))
 		{
@@ -204,9 +204,9 @@ void CServerInfoPanel::UpdateMapCycleValue()
 	char nextMaps[512];
 	nextMaps[0] = 0;
 	bool needComma = false;
-	for (int i = 0; i < 2; i++)
+	for (intp i = 0; i < 2; i++)
 	{
-		int point = listPoint + i + 1;
+		intp point = listPoint + i + 1;
 		if (point >= m_MapCycle.Count())
 		{
 			point -= m_MapCycle.Count();
@@ -263,7 +263,7 @@ void CServerInfoPanel::ParseIntoMapList(const char *maplist, CUtlVector<CUtlSymb
 			break;
 
 		char customString[64];
-		int nameSize = end - parse;
+		intp nameSize = end - parse;
 		if (nameSize >= sizeof(customString))
 		{
 			nameSize = sizeof(customString) - 1;
@@ -277,7 +277,7 @@ void CServerInfoPanel::ParseIntoMapList(const char *maplist, CUtlVector<CUtlSymb
 		// add to the list string that aren't comments
 		if (nameSize > 0 && !(customString[0] == '/' && customString[1] == '/'))
 		{
-			int i = mapArray.AddToTail();
+			intp i = mapArray.AddToTail();
 			mapArray[i] = customString;
 		}
 	}

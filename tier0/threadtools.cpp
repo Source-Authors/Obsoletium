@@ -188,8 +188,12 @@ void ThreadSleep(unsigned nMilliseconds)
 	}
 	else
 	{
-		// dimhotepus: Use std thread APIs.
-		std::this_thread::sleep_for( std::chrono::milliseconds{nMilliseconds} );
+		// dimhotepus: Do not use std thread APIs. Causes issues with ASAN.
+#ifdef _WIN32
+		Sleep(nMilliseconds);
+#else
+		usleep(nMilliseconds * 1000);
+#endif
 	}
 }
 

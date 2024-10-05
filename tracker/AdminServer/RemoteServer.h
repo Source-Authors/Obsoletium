@@ -66,7 +66,7 @@ private:
 		int requestID;
 		IServerDataResponse *handler;
 	};
-	CUtlLinkedList<ResponseHandler_t, int> m_ResponseHandlers;
+	CUtlLinkedList<ResponseHandler_t, intp> m_ResponseHandlers;
 
 	// list of constant response handlers
 	struct MessageHandler_t
@@ -74,7 +74,7 @@ private:
 		char messageName[32];
 		IServerDataResponse *handler;
 	};
-	CUtlLinkedList<MessageHandler_t, int> m_MessageHandlers;
+	CUtlLinkedList<MessageHandler_t, intp> m_MessageHandlers;
 
 };
 

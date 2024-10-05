@@ -31,7 +31,7 @@ public:
 	void		SetStatusLine( char *pszStatus );
 	void		UpdateStatus();
 
-	char *		GetLine( int index, char *buf, int buflen );
+	char *		GetLine( int index, char *buf, size_t buflen );
 	int			GetWidth();
 
 private:

@@ -28,6 +28,8 @@ $Configuration
 		$AdditionalDependencies					"$BASE Shell32.lib wsock32.lib odbc32.lib odbccp32.lib winmm.lib User32.lib"
 		$SystemLibraries						"iconv;edit;curses" [$OSXALL]
 		$SystemFrameworks						"AppKit" [$OSXALL]
+		// dimhotepus: Delay load user32 only when needed.  Useful when no GDI mode and ProcessSystemCallDisablePolicy enabled.
+		$DelayLoadedDLL							"$BASE User32.dll"
 	}
 
 	$PostBuildEvent [!$ANALYZE && $SDL]
@@ -121,7 +123,7 @@ $Project "dedicated"
 		$File	"$SRCDIR\public\idedicatedexports.h"
 		$File	"$SRCDIR\common\IManageServer.h"
 		$File	"$SRCDIR\public\tier1\interface.h"
-		$File	"isys.h"
+		$File	"isystem.h"
 		$File	"$SRCDIR\public\mathlib\mathlib.h"
 		$File	"$SRCDIR\common\netapi.h"
 		$File	"$SRCDIR\common\GameUI\ObjectList.h"

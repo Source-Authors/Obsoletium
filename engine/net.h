@@ -1,17 +1,10 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-// net.h -- Half-Life's interface to the networking layer
+// Half-Life's interface to the networking layer.
 // For banning IP addresses (or allowing private games)
-#ifndef NET_H
-#define NET_H
-#ifdef _WIN32
-#pragma once
-#endif
+
+#ifndef SE_ENGINE_NET_H_
+#define SE_ENGINE_NET_H_
 
 #include "common.h"
 #include "bitbuf.h"
@@ -125,37 +118,35 @@ class IConnectionlessPacketHandler;
 // Start up networking
 void		NET_Init( bool bDedicated );
 // Shut down networking
-void		NET_Shutdown (void);
+void		NET_Shutdown();
 // Read any incoming packets, dispatch to known netchannels and call handler for connectionless packets
-void		NET_ProcessSocket( int sock, IConnectionlessPacketHandler * handler );
+void		NET_ProcessSocket( intp sock, IConnectionlessPacketHandler * handler );
 // Set a port to listen mode
-void		NET_ListenSocket( int sock, bool listen );
+void		NET_ListenSocket( intp sock, bool listen );
 // Send connectionsless string over the wire
-void		NET_OutOfBandPrintf(int sock, const netadr_t &adr, PRINTF_FORMAT_STRING const char *format, ...) FMTFUNCTION( 3, 4 );
+void		NET_OutOfBandPrintf( intp sock, const netadr_t &adr, PRINTF_FORMAT_STRING const char *format, ... ) FMTFUNCTION( 3, 4 );
 // Send a raw packet, connectionless must be provided (chan can be NULL)
-int			NET_SendPacket ( INetChannel *chan, int sock,  const netadr_t &to, const  unsigned char *data, int length, bf_write *pVoicePayload = NULL, bool bUseCompression = false );
+int			NET_SendPacket( INetChannel *chan, intp sock,  const netadr_t &to, const  unsigned char *data, int length, bf_write *pVoicePayload = NULL, bool bUseCompression = false );
 // Called periodically to maybe send any queued packets (up to 4 per frame)
 void		NET_SendQueuedPackets();
 // Start set current network configuration
-void		NET_SetMutiplayer(bool multiplayer);
+void		NET_SetMutiplayer( bool multiplayer );
 // Set net_time
 void		NET_SetTime( double realtime );
 // RunFrame must be called each system frame before reading/sending on any socket
 void		NET_RunFrame( double realtime );
 // Check configuration state
-bool		NET_IsMultiplayer( void );
-bool		NET_IsDedicated( void );
+bool		NET_IsMultiplayer();
+bool		NET_IsDedicated();
 // Writes a error file with bad packet content
-void		NET_LogBadPacket(netpacket_t * packet);
+void		NET_LogBadPacket( netpacket_t * packet );
 
 // bForceNew (used for bots) tells it not to share INetChannels (bots will crash when disconnecting if they
 // share an INetChannel).
-INetChannel	*NET_CreateNetChannel(int socketnumber, netadr_t *adr, const char * name, INetChannelHandler * handler, bool bForceNew=false,
-								  int nProtocolVersion=PROTOCOL_VERSION );
-void		NET_RemoveNetChannel(INetChannel *netchan, bool bDeleteNetChan);
+INetChannel	*NET_CreateNetChannel( intp socketnumber, netadr_t *adr, const char * name, INetChannelHandler * handler, bool bForceNew=false,
+								   int nProtocolVersion = PROTOCOL_VERSION );
+void		NET_RemoveNetChannel( INetChannel *netchan, bool bDeleteNetChan );
 void		NET_PrintChannelStatus( INetChannel * chan );
-
-void		NET_WriteStringCmd( const char * cmd, bf_write *buf );
 
 // Address conversion
 bool		NET_StringToAdr ( const char *s, netadr_t *a);
@@ -165,27 +156,28 @@ unsigned short NET_HostToNetShort( unsigned short us_in );
 unsigned short NET_NetToHostShort( unsigned short us_in );
 
 // Find out what port is mapped to a local socket
-unsigned short NET_GetUDPPort(int socket);
+unsigned short NET_GetUDPPort( intp socket );
 
 // add/remove extra sockets for testing
-int NET_AddExtraSocket( int port );
+intp NET_AddExtraSocket( int port );
 void NET_RemoveAllExtraSockets();
 
-const char *NET_ErrorString (int code); // translate a socket error into a friendly string
+const char *NET_ErrorString( int code ); // translate a socket error into a friendly string
 
 //============================================================================
 
 // Message data
-typedef struct
+struct flowstats_t
 {
 	// Size of message sent/received
 	int		size;
 	// Time that message was sent/received
 	float	time;
-} flowstats_t;
+};
 
 // Some hackery to avoid using va() in constructor since we cache off the pointer to the string in the ConVar!!!
 #define NET_STRINGIZE( x ) #x
 #define NET_MAKESTRING( macro, val )	macro(val)
 #define NETSTRING( val ) NET_MAKESTRING( NET_STRINGIZE, val )
-#endif // !NET_H
+
+#endif // !SE_ENGINE_NET_H_

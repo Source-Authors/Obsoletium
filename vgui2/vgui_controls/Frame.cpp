@@ -1338,8 +1338,9 @@ void Frame::SetTitle(const char *title, bool surfaceTitle)
 		StringIndex_t unlocalizedTextSymbol = g_pVGuiLocalize->FindIndex(newTitle + 1);
 		if (unlocalizedTextSymbol != INVALID_LOCALIZE_STRING_INDEX)
 		{
+			// dimhotepus: Use safe wcscpy overload.
 			// we have a new text value
-			wcsncpy( unicodeText, g_pVGuiLocalize->GetValueByIndex(unlocalizedTextSymbol), sizeof( unicodeText) / sizeof(wchar_t) );
+			V_wcscpy_safe( unicodeText, g_pVGuiLocalize->GetValueByIndex(unlocalizedTextSymbol) );
 		}
 	}
 	else

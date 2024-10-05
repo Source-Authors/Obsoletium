@@ -571,6 +571,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	if ( pszExtraSearchPath )
 	{
 		CUtlStringList vecPaths;
+		vecPaths.EnsureCapacity(2);
 		V_SplitString( pszExtraSearchPath, ",", vecPaths );
 		FOR_EACH_VEC( vecPaths, idxExtraPath )
 		{
@@ -706,6 +707,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 
 		// Parse Path ID list
 		CUtlStringList vecPathIDs;
+		vecPathIDs.EnsureCapacity(2);
 		V_SplitString( pCur->GetName(), "+", vecPathIDs );
 		FOR_EACH_VEC( vecPathIDs, idxPathID )
 		{

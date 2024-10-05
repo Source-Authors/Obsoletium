@@ -20,7 +20,7 @@ $Configuration
 	}
 }
 
-$Project "Server (HL2MP)"
+$Project "server (hl2mp)"
 {
 	$Folder	"Source Files"
 	{

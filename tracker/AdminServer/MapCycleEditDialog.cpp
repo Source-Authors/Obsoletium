@@ -234,7 +234,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 	else if (!stricmp(command, "OK"))
 	{
 		// write out the data
-		CUtlBuffer msg(0, 1024, CUtlBuffer::TEXT_BUFFER);
+		CUtlBuffer msg((intp)0, (intp)1024, CUtlBuffer::TEXT_BUFFER);
 
 		for (int i = 0; i < m_pMapCycleList->GetItemCount(); i++)
 		{

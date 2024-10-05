@@ -21,7 +21,9 @@ $Configuration
 {
 	$Linker [$WINDOWS]
 	{
-		$AdditionalDependencies				"$BASE Advapi32.lib User32.lib"
+		$AdditionalDependencies				"$BASE delayimp.lib User32.lib"
+		// dimhotepus: Delay load user32 only when needed.  Useful when no GDI mode and ProcessSystemCallDisablePolicy enabled.
+		$DelayLoadedDLL						"$BASE User32.dll"
 	}
 
 	$ManifestTool

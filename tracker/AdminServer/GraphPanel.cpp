@@ -27,8 +27,6 @@
 #include <vgui_controls/PropertySheet.h>
 #include <vgui_controls/CheckButton.h>
 
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
-
 #define STATS_UPDATE_RATE	5.0f
 
 
@@ -200,7 +198,7 @@ void CGraphPanel::OnServerDataResponse(const char *value, const char *response)
 //-----------------------------------------------------------------------------
 void CGraphPanel::CGraphsImage::Paint()
 {
-	int x,y;
+	int xSize,ySize;
 	float distPoints; // needs to be a float, rounding errors cause problems with lots of points
 	int bottom=5; // be 5 pixels above the bottom
 	int left=2;
@@ -212,14 +210,14 @@ void CGraphPanel::CGraphsImage::Paint()
 	int *pPingX=NULL, *pPingY=NULL;
 	int *pPlayersX=NULL, *pPlayersY=NULL;
 
-	GetSize(x,y);
+	GetSize(xSize,ySize);
 
 	SetColor(bgColor);
 	SetBkColor(bgColor);
-	DrawFilledRect(0,0,x,y);
+	DrawFilledRect(0,0,xSize,ySize);
 
-	y-=4; // borders
-	x-=4;
+	ySize-=4; // borders
+	xSize-=4;
 
 
 	if(!cpu && !fps && !net_i && !net_o && !ping && !players) // no graphs selected
@@ -228,11 +226,11 @@ void CGraphPanel::CGraphsImage::Paint()
 	if(points.Count()<2)
 		return; // not enough points yet...
 
-	if(x<=200 || y<=100) 
+	if(xSize<=200 || ySize<=100) 
 		return; // to small
 
 
-	distPoints= static_cast<float>(x)/static_cast<float>(points.Count()-1);
+	distPoints= static_cast<float>(xSize)/static_cast<float>(points.Count()-1);
 	if(distPoints<=0)
 	{
 		distPoints=1;
@@ -240,9 +238,9 @@ void CGraphPanel::CGraphsImage::Paint()
 
 	SetColor(lineColor);
 	SetBkColor(lineColor);
-	//DrawLine(4,5,x,5);
-	DrawLine(4,y/2,x,y/2);
-	//DrawLine(4,y,x,y);
+	//DrawLine(4,5,xSize,5);
+	DrawLine(4,ySize/2,xSize,ySize/2);
+	//DrawLine(4,ySize,xSize,ySize);
 
 	float RangePing=maxPing;
 	float RangeFPS=maxFPS;
@@ -328,37 +326,37 @@ void CGraphPanel::CGraphsImage::Paint()
 		if(cpu) 
 		{
 			pCpuX[i] = left+static_cast<int>(i*distPoints);
-			pCpuY[i] = static_cast<int>((1-points[i].cpu)*y);
+			pCpuY[i] = static_cast<int>((1-points[i].cpu)*ySize);
 		}
 	
 		if(net_i)
 		{
 			pInX[i] = left+static_cast<int>(i*distPoints);
-			pInY[i] = static_cast<int>(( (Range-points[i].in)/Range)*y-bottom);
+			pInY[i] = static_cast<int>(( (Range-points[i].in)/Range)*ySize-bottom);
 		}
 		
 		if(net_o)
 		{
 			pOutX[i] = left+static_cast<int>(i*distPoints);
-			pOutY[i] = static_cast<int>(((Range-points[i].out)/Range)*y-bottom);
+			pOutY[i] = static_cast<int>(((Range-points[i].out)/Range)*ySize-bottom);
 		}
 
 		if(fps)
 		{
 			pFPSX[i] = left+static_cast<int>(i*distPoints);
-			pFPSY[i] = static_cast<int>(( (RangeFPS-points[i].fps)/RangeFPS)*y-bottom);
+			pFPSY[i] = static_cast<int>(( (RangeFPS-points[i].fps)/RangeFPS)*ySize-bottom);
 		}
 
 		if(ping)
 		{
 			pPingX[i] = left+static_cast<int>(i*distPoints);
-			pPingY[i] = static_cast<int>(( (RangePing-points[i].ping)/RangePing)*y-bottom);
+			pPingY[i] = static_cast<int>(( (RangePing-points[i].ping)/RangePing)*ySize-bottom);
 		}
 
 		if(players)
 		{
 			pPlayersX[i] = left+static_cast<int>(i*distPoints);
-			pPlayersY[i] = static_cast<int>(( (RangePlayers-points[i].players)/RangePlayers)*y-bottom);
+			pPlayersY[i] = static_cast<int>(( (RangePlayers-points[i].players)/RangePlayers)*ySize-bottom);
 		}
 
 	
@@ -509,10 +507,10 @@ void CGraphPanel::CGraphsImage::CheckBounds(Points_t p)
 //-----------------------------------------------------------------------------
 bool CGraphPanel::CGraphsImage::AddPoint(Points_t p)
 {
-	int x,y;
+	int xSize,ySize;
 	bool recalcBounds=false;
 
-	GetSize(x,y);
+	GetSize(xSize,ySize);
 	
 	if(avgPoint.cpu>1)  // cpu is a percent !
 	{
@@ -554,10 +552,10 @@ bool CGraphPanel::CGraphsImage::AddPoint(Points_t p)
 
 	int k=0;
 
-	if(x!=0 && points.Count()> x/2) 
+	if(xSize!=0 && points.Count()> xSize/2) 
 	// there are more points than pixels so thin them out
 	{
-		while(points.Count()> x/2)
+		while(points.Count()> xSize/2)
 		{
 			// check that the bounds don't move
 			if(points[0].in==maxIn ||

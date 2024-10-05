@@ -1,22 +1,12 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-// TextConsole.cpp: implementation of the TextConsole class.
-//
-//////////////////////////////////////////////////////////////////////
+// Copyright Valve Corporation, All rights reserved.
 
 #include "textconsole.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+namespace se::dedicated {
 
-bool CTextConsole::Init()
-{
-	m_ConsoleVisible = true;
-	return true;
+bool CTextConsole::Init() {
+  m_ConsoleVisible = true;
+  return true;
 }
+
+}  // namespace se::dedicated

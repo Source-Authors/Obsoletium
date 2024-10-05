@@ -1642,13 +1642,13 @@ void CGameServer::SetHibernating( bool bHibernating )
 						if ( ( sv_minuptimelimit.GetFloat() > 0 ) &&
 							( ( Plat_FloatTime() - s_flPlatFloatTimeBeginUptime ) / 3600.0 < sv_minuptimelimit.GetFloat() ) )
 						{
-							Warning( "Server is using %zuMB with an sv_memory_limit of %uMB, but will not shutdown because sv_minuptimelimit is %.3f hr while current uptime is %.3f\n",
+							Warning( "Server is using %zuMiB with an sv_memory_limit of %uMiB, but will not shutdown because sv_minuptimelimit is %.3f hr while current uptime is %.3f\n",
 								ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), static_cast<unsigned>(memlimit),
 								sv_minuptimelimit.GetFloat(), ( Plat_FloatTime() - s_flPlatFloatTimeBeginUptime ) / 3600.0 );
 						}
 						else
 						{
-							Warning( "Server shutting down because of using %zuMB with an sv_memory_limit of %uMB\n", ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), static_cast<unsigned>(sv_memlimit.GetInt()) );
+							Warning( "Server shutting down because of using %zuMiB with an sv_memory_limit of %uMB\n", ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), static_cast<unsigned>(sv_memlimit.GetInt()) );
 							bExit = true;
 						}
 					}
@@ -2170,7 +2170,7 @@ bool SV_ActivateServer()
 	// Tell what kind of server has been started.
 	if ( sv.IsMultiplayer() )
 	{
-		ConDMsg ("%i player server started\n", sv.GetMaxClients() );
+		ConDMsg ("%i player%s server started\n", sv.GetMaxClients(), sv.GetMaxClients() > 1 ? "s" : "" );
 	}
 	else
 	{

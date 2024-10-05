@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_LAUNCHER_SCOPED_TIMER_RESOLUTION_H
-#define SRC_LAUNCHER_SCOPED_TIMER_RESOLUTION_H
+#ifndef SE_COMMON_WINDOWS_SCOPED_TIMER_RESOLUTION_H_
+#define SE_COMMON_WINDOWS_SCOPED_TIMER_RESOLUTION_H_
 
 #include <chrono>
 #include <sal.h>
@@ -19,7 +19,7 @@ __declspec(dllimport) MMRESULT __stdcall timeEndPeriod(_In_ unsigned uPeriod);
 
 }  // extern "C"
 
-namespace se::launcher {
+namespace se::common::windows {
 
 // Changes minimum resolution for periodic timers and reverts back when
 // out of scope.
@@ -47,7 +47,6 @@ namespace se::launcher {
 //
 // See
 // https://docs.microsoft.com/en-us/windows/win32/api/timeapi/nf-timeapi-timebeginperiod
-// dimhotepus: Set timer resolution in a single place.
 class ScopedTimerResolution {
  public:
   // Changes minimum resolution for periodic timers.  |resolution_ms| Minimum
@@ -79,6 +78,6 @@ class ScopedTimerResolution {
   unsigned error_code_;
 };
 
-}  // namespace se::launcher
+}  // namespace se::common::windows
 
-#endif  // SRC_LAUNCHER_SCOPED_TIMER_RESOLUTION_H
+#endif  // SE_COMMON_WINDOWS_SCOPED_TIMER_RESOLUTION_H_

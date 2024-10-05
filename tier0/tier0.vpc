@@ -32,6 +32,9 @@ $Configuration
 		$ImportLibrary					"$LIBPUBLIC\$_IMPLIB_PREFIX$OUTBINNAME$_IMPLIB_EXT"	[$POSIX]
 
 		$SystemLibraries                 "rt" [$LINUXALL]
+
+		// dimhotepus: Delay load user32 only when needed.  Useful when no GDI mode and ProcessSystemCallDisablePolicy enabled.
+		$DelayLoadedDLL					"$BASE User32.dll"
 	}
 
 	// tier0/vstdlib traditionally used "lib" prefix though nobody else seems to.

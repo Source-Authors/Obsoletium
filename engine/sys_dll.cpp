@@ -1,11 +1,6 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-// $NoKeywords: $
-//
-//=============================================================================//
-
 
 #if defined(_WIN32) && !defined(_X360)
 #include "winlite.h"
@@ -71,7 +66,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define ONE_HUNDRED_TWENTY_EIGHT_MB	(128 * 1024 * 1024)
+constexpr inline size_t ONE_HUNDRED_TWENTY_EIGHT_MIB{128 * 1024 * 1024u};
 
 ConVar mem_min_heapsize( "mem_min_heapsize",
 #ifdef PLATFORM_64BITS	
@@ -79,22 +74,30 @@ ConVar mem_min_heapsize( "mem_min_heapsize",
 #else
 	"48"
 #endif
-	, FCVAR_INTERNAL_USE, "Minimum amount of memory to dedicate to engine hunk and datacache (in MiB)" );
+	, FCVAR_INTERNAL_USE,
+	"Minimum amount of memory to dedicate to engine hunk and datacache (in MiB)." );
 ConVar mem_max_heapsize( "mem_max_heapsize",
 #ifdef PLATFORM_64BITS	
 	"512"
 #else
 	"256"
 #endif
-	, FCVAR_INTERNAL_USE, "Maximum amount of memory to dedicate to engine hunk and datacache (in MiB)" );
-ConVar mem_max_heapsize_dedicated( "mem_max_heapsize_dedicated", "64", FCVAR_INTERNAL_USE, "Maximum amount of memory to dedicate to engine hunk and datacache, for dedicated server (in MiB)" );
+	, FCVAR_INTERNAL_USE,
+	"Maximum amount of memory to dedicate to engine hunk and datacache (in MiB)." );
+ConVar mem_max_heapsize_dedicated( "mem_max_heapsize_dedicated",
+#ifdef PLATFORM_64BITS
+	"128"
+#else
+    "64"
+#endif
+	, FCVAR_INTERNAL_USE,
+	"Maximum amount of memory to dedicate to engine hunk and datacache, for dedicated server (in MiB)." );
 
-#define MINIMUM_WIN_MEMORY			(size_t)(mem_min_heapsize.GetInt()*1024*1024)
-#define MAXIMUM_WIN_MEMORY			max( (size_t)(mem_max_heapsize.GetInt()*1024*1024), MINIMUM_WIN_MEMORY )
-#define MAXIMUM_DEDICATED_MEMORY	(size_t)(mem_max_heapsize_dedicated.GetInt()*1024*1024)
+inline size_t GetMinimumHeapSize() noexcept { return static_cast<size_t>(mem_min_heapsize.GetInt()) * 1024 * 1024; }
+inline size_t GetMaximumHeapSize() noexcept { return max( static_cast<size_t>(mem_max_heapsize.GetInt()) * 1024 * 1024, GetMinimumHeapSize() ); }
+inline size_t GetMaximumDedicatedHeapSize() noexcept { return static_cast<size_t>(mem_max_heapsize_dedicated.GetInt()) * 1024 * 1024; }
 
 
-char *CheckParm(const char *psz, char **ppszValue = NULL);
 void SeedRandomNumberGenerator( bool random_invariant );
 void Con_ColorPrintf( const Color& clr, PRINTF_FORMAT_STRING const char *fmt, ... ) FMTFUNCTION( 2, 3 );
 
@@ -130,7 +133,7 @@ static FileFindHandle_t	g_hfind = FILESYSTEM_INVALID_FIND_HANDLE;
 CSysModule *g_GameDLL = NULL;
 
 // Prototype of an global method function
-typedef void (DLLEXPORT * PFN_GlobalMethod)( edict_t *pEntity );
+using PFN_GlobalMethod = void (DLLEXPORT *)( edict_t *pEntity );
 
 IServerGameDLL	*serverGameDLL = NULL;
 int g_iServerGameDLLVersion = 0;
@@ -142,9 +145,6 @@ int g_iServerGameClientsVersion = 0;	// This matches the number at the end of th
 IHLTVDirector	*serverGameDirector = NULL;
 
 IServerGameTags *serverGameTags = NULL;
-
-void Sys_InitArgv( char *lpCmdLine );
-void Sys_ShutdownArgv( void );
 
 //-----------------------------------------------------------------------------
 // Purpose: Compare file times
@@ -224,7 +224,7 @@ const char *Sys_FindFirst(const char *path, char *basename, int namelength )
 	if (g_hfind != FILESYSTEM_INVALID_FIND_HANDLE)
 	{
 		Sys_Error ("Sys_FindFirst without close");
-		g_pFileSystem->FindClose(g_hfind);		
+		g_pFileSystem->FindClose(g_hfind);	
 	}
 
 	const char* psz = g_pFileSystem->FindFirst(path, &g_hfind);
@@ -244,7 +244,7 @@ const char *Sys_FindFirstEx( const char *pWildcard, const char *pPathID, char *b
 	if (g_hfind != FILESYSTEM_INVALID_FIND_HANDLE)
 	{
 		Sys_Error ("Sys_FindFirst without close");
-		g_pFileSystem->FindClose(g_hfind);		
+		g_pFileSystem->FindClose(g_hfind);
 	}
 
 	const char* psz = g_pFileSystem->FindFirstEx( pWildcard, pPathID, &g_hfind);
@@ -277,7 +277,7 @@ const char* Sys_FindNext(char *basename, int namelength)
 // Output : void Sys_FindClose
 //-----------------------------------------------------------------------------
 
-void Sys_FindClose(void)
+void Sys_FindClose()
 {
 	if ( FILESYSTEM_INVALID_FIND_HANDLE != g_hfind )
 	{
@@ -290,7 +290,7 @@ void Sys_FindClose(void)
 //-----------------------------------------------------------------------------
 // Purpose: OS Specific initializations
 //-----------------------------------------------------------------------------
-void Sys_Init( void )
+void Sys_Init()
 {
 	// Set default FPU control word to truncate (chop) mode for optimized _ftol()
 	// This does not "stick", the mode is restored somewhere down the line.
@@ -300,7 +300,7 @@ void Sys_Init( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void Sys_Shutdown( void )
+void Sys_Shutdown()
 {
 }
 
@@ -548,17 +548,19 @@ void Sys_Sleep( int msec )
 }
 
 #if defined(_WIN32) && !defined( _X360 )
-int prevCRTMemDebugState = 0;
+int prevCRTMemDebugState = -1;
 
-BOOL WINAPI DllMain(HANDLE, ULONG ulInit, LPVOID)
+BOOL WINAPI DllMain(HMODULE module, ULONG ulInit, LPVOID)
 {
 	if (ulInit == DLL_PROCESS_ATTACH)
 	{
+		::DisableThreadLibraryCalls(module);
 		prevCRTMemDebugState = InitCRTMemDebug();
 	} 
 	else if (ulInit == DLL_PROCESS_DETACH)
 	{
 		ShutdownCRTMemDebug(prevCRTMemDebugState);
+		prevCRTMemDebugState = -1;
 	}
 
 	return TRUE;
@@ -570,12 +572,12 @@ BOOL WINAPI DllMain(HANDLE, ULONG ulInit, LPVOID)
 // Purpose: Allocate memory for engine hunk
 // Input  : *parms - 
 //-----------------------------------------------------------------------------
-void Sys_InitMemory( void )
+void Sys_InitMemory()
 {
 	// Allow overrides
 	if ( CommandLine()->FindParm( "-minmemory" ) )
 	{
-		host_parms.memsize = MINIMUM_WIN_MEMORY;
+		host_parms.memsize = GetMinimumHeapSize();
 		return;
 	}
 
@@ -595,12 +597,14 @@ void Sys_InitMemory( void )
 
 	if ( host_parms.memsize == 0 )
 	{
-		host_parms.memsize = MAXIMUM_WIN_MEMORY;
+		host_parms.memsize = GetMaximumHeapSize();
 	}
 
-	if ( host_parms.memsize < ONE_HUNDRED_TWENTY_EIGHT_MB )
+	if ( host_parms.memsize < ONE_HUNDRED_TWENTY_EIGHT_MIB )
 	{
-		Sys_Error( "Available memory less than 128MiB!!! %zu\n", host_parms.memsize );
+		Sys_Error( "Host available memory %s is less than %s.\n",
+			Q_pretifymem( host_parms.memsize, 2, true ),
+			Q_pretifymem( ONE_HUNDRED_TWENTY_EIGHT_MIB, 2, true ) );
 	}
 
 	// take one quarter the physical memory
@@ -610,9 +614,9 @@ void Sys_InitMemory( void )
 		// Apply cap of 64MB for 512MB systems
 		// this keeps the code the same as HL2 gold
 		// but allows us to use more memory on 1GB+ systems
-		if (host_parms.memsize > MAXIMUM_DEDICATED_MEMORY)
+		if (host_parms.memsize > GetMaximumDedicatedHeapSize())
 		{
-			host_parms.memsize = MAXIMUM_DEDICATED_MEMORY;
+			host_parms.memsize = GetMaximumDedicatedHeapSize();
 		}
 	}
 	else
@@ -621,7 +625,7 @@ void Sys_InitMemory( void )
 		host_parms.memsize >>= 2;
 	}
 
-	host_parms.memsize = std::clamp(host_parms.memsize, MINIMUM_WIN_MEMORY, MAXIMUM_WIN_MEMORY);
+	host_parms.memsize = std::clamp(host_parms.memsize, GetMinimumHeapSize(), GetMaximumHeapSize());
 }
 
 
@@ -753,11 +757,11 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 		// If this is a dedicated server, then we have taken over its spew function, but we still
 		// want its vgui console to show the spew, so pass it into the dedicated server.
 		if ( dedicated )
-			dedicated->Sys_Printf( (char*)pMsg );
+			dedicated->Sys_Printf( message );
 
 		if( spew_consolelog_to_debugstring.GetBool() )
 		{
-			Plat_DebugString( pMsg );
+			Plat_DebugString( message );
 		}
 
 		if ( g_bTextMode )
@@ -980,8 +984,6 @@ void Sys_ShutdownGame( void )
 
 	TRACESHUTDOWN( Sys_ShutdownMemory() );
 
-	// TRACESHUTDOWN( Sys_ShutdownArgv() );
-
 	TRACESHUTDOWN( Sys_Shutdown() );
 
 	// Remove debug spew output....
@@ -1186,7 +1188,7 @@ void Sys_GetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 	if (dwDisposition == REG_CREATED_NEW_KEY)
 	{
 		// Just Set the Values according to the defaults
-		lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszDefaultValue, Q_strlen(pszDefaultValue) + 1 ); 
+		lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszDefaultValue, static_cast<unsigned long>(strlen(pszDefaultValue)) + 1 ); 
 	}
 	else
 	{
@@ -1208,7 +1210,7 @@ void Sys_GetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 		// Didn't find it, so write out new value
 		{
 			// Just Set the Values according to the defaults
-			lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszDefaultValue, Q_strlen(pszDefaultValue) + 1 ); 
+			lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszDefaultValue, static_cast<unsigned long>(strlen(pszDefaultValue)) + 1 ); 
 		}
 	};
 
@@ -1294,13 +1296,13 @@ void Sys_SetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 	if (dwDisposition == REG_CREATED_NEW_KEY)
 	{
 		// Just Set the Values according to the defaults
-		lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszValue, Q_strlen(pszValue) + 1 ); 
+		lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszValue, static_cast<unsigned long>(strlen(pszValue)) + 1 ); 
 	}
 	else
 	{
 		// Didn't find it, so write out new value
 		// Just Set the Values according to the defaults
-		lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszValue, Q_strlen(pszValue) + 1 ); 
+		lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszValue, static_cast<unsigned long>(strlen(pszValue)) + 1 ); 
 	}
 
 	// Always close this key before exiting.
@@ -1594,12 +1596,24 @@ CON_COMMAND( star_gpu, "Dump GPU stats" )
 		gpuRamSize = Q_pretifymem(g_pMaterialSystemHardwareConfig->TextureMemorySize(), 2, true);
 	}
 
+	if (videomode)
+	{
 	Q_snprintf( gpuInfo, sizeof( gpuInfo ),
 		"GPU %s, VRAM %s, DirectX level '%s', Viewport %d x %d",
 		info.m_pDriverName,
 		gpuRamSize,
 		dxlevel ? dxlevel : "N/A",
 		videomode->GetModeWidth(), videomode->GetModeHeight());
+	}
+	else
+	{
+		// Console mode.
+		Q_snprintf( gpuInfo, sizeof( gpuInfo ),
+			"GPU %s, VRAM %s, DirectX level '%s', no viewport",
+			info.m_pDriverName[0] ? info.m_pDriverName : "N/A",
+			gpuRamSize,
+			dxlevel ? dxlevel : "N/A");
+	}
 
 	ConDMsg( "hardware: %s\n", gpuInfo );
 }

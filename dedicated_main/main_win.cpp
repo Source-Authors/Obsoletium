@@ -36,15 +36,23 @@ template <size_t buffer_size>
 
 // Purpose: Shows error box and returns error code.
 [[nodiscard]] int ShowErrorBoxAndExitWithCode(_In_z_ const char *error_message,
-                                              _In_ std::error_code exit_code) {
+                                              _In_ std::error_code exit_code,
+                                              _In_ bool is_console_mode) {
   const auto system_error = exit_code.message();
 
   char entire_error_message[2048];
   _snprintf_s(entire_error_message, _TRUNCATE, "%s\n\n%s", error_message,
               system_error.c_str());
 
-  MessageBoxA(nullptr, entire_error_message, "Dedicated Server - Error",
-              MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
+  if (is_console_mode) {
+    fprintf(stderr, "%s\n", entire_error_message);
+    OutputDebugStringA(entire_error_message);
+  } else {
+    // Note, uses delay load to allow
+    MessageBoxA(nullptr, entire_error_message, "Dedicated Server - Error",
+                MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
+  }
+
   return exit_code.value();
 }
 
@@ -53,14 +61,14 @@ template <size_t buffer_size>
 }
 
 // Purpose: Apply process mitigation policies.
-[[nodiscard]] int ApplyProcessMitigations() {
+[[nodiscard]] int ApplyProcessMitigations(bool is_console_mode) {
   // Disable loading DLLs from current directory to protect against DLL preload
   // attacks.
   if (!::SetDllDirectoryA("")) {
     return ShowErrorBoxAndExitWithCode(
         "Please contact publisher, very likely bug is detected.\n\n"
         "Unable to remove current directory from DLL search order.",
-        GetLastErrorCode());
+        GetLastErrorCode(), is_console_mode);
   }
 
   // Enable heap corruption detection & app termination.
@@ -69,7 +77,7 @@ template <size_t buffer_size>
     return ShowErrorBoxAndExitWithCode(
         "Please, contact publisher. Failed to enable termination on heap "
         "corruption feature for your environment.",
-        GetLastErrorCode());
+        GetLastErrorCode(), is_console_mode);
   }
 
 #if !defined(_WIN64)
@@ -81,7 +89,7 @@ template <size_t buffer_size>
     return ShowErrorBoxAndExitWithCode(
         "Please, contact publisher. Failed to enable DEP policy for your "
         "environment.",
-        GetLastErrorCode());
+        GetLastErrorCode(), is_console_mode);
   }
 #endif
 
@@ -97,7 +105,7 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to enable ASLR policy for your "
           "environment.",
-          GetLastErrorCode());
+          GetLastErrorCode(), is_console_mode);
     }
   }
 
@@ -113,7 +121,7 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to enable Strict Handle policy "
           "for your environment.",
-          GetLastErrorCode());
+          GetLastErrorCode(), is_console_mode);
     }
   }
 
@@ -128,7 +136,7 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to enable Extension Points policy "
           "for your environment.",
-          GetLastErrorCode());
+          GetLastErrorCode(), is_console_mode);
     }
   }
 
@@ -146,11 +154,96 @@ template <size_t buffer_size>
       return ShowErrorBoxAndExitWithCode(
           "Please, contact publisher. Failed to harden Image Load policy for "
           "your environment.",
-          GetLastErrorCode());
+          GetLastErrorCode(), is_console_mode);
+    }
+  }
+
+  // Address Sanitizer generates dynamic code.
+#ifndef __SANITIZE_ADDRESS__
+  {
+    // Prohibit dynamic code generation as no shaders in dedicated server.
+    PROCESS_MITIGATION_DYNAMIC_CODE_POLICY policy = {};
+    // Set (0x1) to prevent the process from generating dynamic code or
+    // modifying existing executable code; otherwise leave unset (0x0).
+    policy.ProhibitDynamicCode = 1;
+    // Set (0x1) to allow threads to opt out of the restrictions on dynamic code
+    // generation by calling the SetThreadInformation function with the
+    // ThreadInformation parameter set to ThreadDynamicCodePolicy; otherwise
+    // leave unset (0x0).  You should not use the AllowThreadOptOut and
+    // ThreadDynamicCodePolicy settings together to provide strong security.
+    // These settings are only intended to enable applications to adapt their
+    // code more easily for full dynamic code restrictions.
+    policy.AllowThreadOptOut = 0;
+    // Set (0x1) to allow non-AppContainer processes to modify all of the
+    // dynamic code settings for the calling process, including relaxing dynamic
+    // code restrictions after they have been set.
+    policy.AllowRemoteDowngrade = 0;
+
+    // The dynamic code policy of the process.  When turned on, the process
+    // cannot generate dynamic code or modify existing executable code.
+    if (!SetProcessMitigationPolicy(ProcessDynamicCodePolicy, &policy,
+                                    sizeof(policy)) &&
+        ERROR_ACCESS_DENIED != ::GetLastError()) {
+      return ShowErrorBoxAndExitWithCode(
+          "Please, contact publisher. Failed to apply Dynamic Code "
+          "Generation Prohibition policy for your environment.",
+          GetLastErrorCode(), is_console_mode);
+    }
+  }
+#endif
+
+  {
+    constexpr char kConsoleArgName[]{"-console"};
+    // Console mode, no NTUser/GDI calls allowed.
+    if (is_console_mode) {
+      PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY policy = {};
+      // When set to 1, the process is not permitted to perform GUI system
+      // calls.
+      policy.DisallowWin32kSystemCalls = 0;
+      // When set to 1, the process is not be able to successfully make
+      // NtFsControlFile system calls, with the following FsControlCode
+      // exceptions.
+      //
+      // FSCTL_IS_VOLUME_MOUNTED
+      // FSCTL_PIPE_IMPERSONATE
+      // FSCTL_PIPE_LISTEN
+      // FSCTL_PIPE_DISCONNECT
+      // FSCTL_PIPE_TRANSCEIVE
+      // FSCTL_PIPE_WAIT
+      // FSCTL_PIPE_GET_PIPE_ATTRIBUTE
+      // FSCTL_PIPE_GET_CONNECTION_ATTRIBUTE
+      // FSCTL_PIPE_GET_HANDLE_ATTRIBUTE
+      // FSCTL_PIPE_PEEK
+      // FSCTL_PIPE_EVENT_SELECT
+      // FSCTL_PIPE_EVENT_ENUM
+      policy.DisallowFsctlSystemCalls = 1;
+
+      if (!SetProcessMitigationPolicy(ProcessSystemCallDisablePolicy, &policy,
+                                      sizeof(policy)) &&
+          ERROR_ACCESS_DENIED != ::GetLastError()) {
+        return ShowErrorBoxAndExitWithCode(
+            "Please, contact publisher. Failed to apply Win32k and Fsctl "
+            "System Calls Prohibition policy for your environment.",
+            GetLastErrorCode(), is_console_mode);
+      }
     }
   }
 
   return 0;
+}
+
+/**
+ * @brief Check app started in console mode.
+ * @param command_line Command line.
+ * @return true if app in console mode, false otherwise.
+ */
+bool IsConsoleMode(const char *command_line) {
+  constexpr char kConsoleArgName[]{"-console"};
+
+  const char *console_arg{strstr(command_line, kConsoleArgName)};
+  const char *next_arg{console_arg + std::size(kConsoleArgName) - 1};
+
+  return isspace(*next_arg) != 0;
 }
 
 }  // namespace
@@ -160,12 +253,14 @@ template <size_t buffer_size>
 
 int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
                      _In_ LPSTR cmd_line, _In_ int window_flags) {
+  const bool is_console_mode{IsConsoleMode(cmd_line)};
+
   // Game uses features of Windows 10.
   if (!IsWindows10OrGreater()) {
     return ShowErrorBoxAndExitWithCode(
         "Unfortunately, your environment is not supported."
         "\n\nApp requires at least Windows 10 to survive.",
-        GetLastErrorCode(ERROR_EXE_MACHINE_TYPE_MISMATCH));
+        GetLastErrorCode(ERROR_EXE_MACHINE_TYPE_MISMATCH), is_console_mode);
   }
 
   // Do not show fault error boxes, etc.
@@ -185,7 +280,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 
   {
     // Apply process mitigations.
-    int rc = ApplyProcessMitigations();
+    int rc = ApplyProcessMitigations(is_console_mode);
     if (rc) return static_cast<int>(rc);
   }
 
@@ -196,7 +291,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
         "Please check game installed in the folder with less "
         "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
         "Unable to get module file name from GetModuleFileName.",
-        GetLastErrorCode());
+        GetLastErrorCode(), is_console_mode);
   }
 
   // Get the base directory the .exe is in.
@@ -221,7 +316,8 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
                 "Unable to load the dedicated DLL from %s.",
                 dedicated_dll_path);
 
-    return ShowErrorBoxAndExitWithCode(user_error, dedicated_dll.error_code());
+    return ShowErrorBoxAndExitWithCode(user_error, dedicated_dll.error_code(),
+                                       is_console_mode);
   }
 
   using DedicatedMainFunction = int (*)(HINSTANCE, HINSTANCE, LPSTR, int);
@@ -234,7 +330,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
                 "DedicatedMain entry point in the dedicated DLL %s.",
                 dedicated_dll_path);
 
-    return ShowErrorBoxAndExitWithCode(user_error, errc);
+    return ShowErrorBoxAndExitWithCode(user_error, errc, is_console_mode);
   }
 
   const auto rc =

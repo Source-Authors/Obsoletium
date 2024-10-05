@@ -67,7 +67,7 @@ $Project "gameui"
 		$File	"ModInfo.cpp"
 		$File	"MouseMessageForwardingPanel.cpp"
 		$File	"$SRCDIR\Tracker\common\msgbuffer.cpp" [!$POSIX]
-		$File	"$SRCDIR\Tracker\common\netapi.cpp" [!$POSIX]
+		$File	"$SRCDIR\common\netapi.cpp" [!$POSIX]
 		$File	"$SRCDIR\common\GameUI\ObjectList.cpp"
 		$File	"PanelListPanel.cpp"
 		$File	"RunGameEngine.cpp"

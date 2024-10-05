@@ -96,7 +96,7 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, KeyValues *rules)
 				break;
 
 			char customString[64];
-			int nameSize = end - parse;
+			intp nameSize = end - parse;
 			if (nameSize >= sizeof(customString))
 			{
 				nameSize = sizeof(customString) - 1;
