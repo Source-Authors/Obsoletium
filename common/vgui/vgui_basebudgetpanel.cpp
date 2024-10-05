@@ -70,7 +70,7 @@ void CBaseBudgetPanel::ClearTimesForAllGroupsForThisFrame( void )
 	}
 }
 
-void CBaseBudgetPanel::ClearAllTimesForGroup( int groupID )
+void CBaseBudgetPanel::ClearAllTimesForGroup( intp groupID )
 {
 	intp i;
 	for( i = 0; i < BUDGET_HISTORY_COUNT; i++ )

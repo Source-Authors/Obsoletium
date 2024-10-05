@@ -11,13 +11,13 @@
 #endif
 
 #include "net.h"
-#include "netadr.h"
 #include "qlimits.h"
-#include "bitbuf.h"
-#include <inetmessage.h>
-#include <filesystem.h>
-#include "utlvector.h"
-#include "utlbuffer.h"
+#include "inetmessage.h"
+#include "filesystem.h"
+#include "tier1/bitbuf.h"
+#include "tier1/netadr.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlbuffer.h"
 #include "const.h"
 #include "inetchannel.h"
 
@@ -179,7 +179,7 @@ public:	// INetChannel interface
 	const netadr_t	&GetRemoteAddress( void ) const;
 	INetChannelHandler *GetMsgHandler( void ) const;
 	int				GetDropNumber( void ) const;
-	int				GetSocket( void ) const;
+	intp			GetSocket( void ) const;
 	unsigned int	GetChallengeNr( void ) const;
 	void			GetSequenceData( int &nOutSequenceNr, int &nInSequenceNr, int &nOutSequenceNrAck );
 	void			SetSequenceData( int nOutSequenceNr, int nInSequenceNr, int nOutSequenceNrAck );
@@ -206,7 +206,7 @@ public:
 
 	static bool	IsValidFileForTransfer( const char *pFilename );
 
-	void		Setup(int sock, netadr_t *adr, const char * name, INetChannelHandler * handler, int nProtocolVersion);
+	void		Setup(intp sock, netadr_t *adr, const char * name, INetChannelHandler * handler, int nProtocolVersion);
 	// Send queue management
 	void		IncrementQueuedPackets();
 	void		DecrementQueuedPackets();
@@ -285,8 +285,8 @@ public:
 
 // don't use any vars below this (only in net_ws.cpp)
 
-	int			m_Socket;   // NS_SERVER or NS_CLIENT index, depending on channel.
-	int			m_StreamSocket;	// TCP socket handle
+	intp				m_Socket;   // NS_SERVER or NS_CLIENT index, depending on channel.
+	socket_handle		m_StreamSocket;	// TCP socket handle
 
 	unsigned int m_MaxReliablePayloadSize;	// max size of reliable payload in a single packet	
 
@@ -294,7 +294,7 @@ public:
 	netadr_t	remote_address;  
 	
 	// For timeouts.  Time last message was received.
-	float		last_received;		
+	double		last_received;		
 	// Time when channel was connected.
 	double      connect_time;       
 

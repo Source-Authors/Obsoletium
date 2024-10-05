@@ -1,89 +1,78 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $Workfile:     $
-// $Date:         $
-// $NoKeywords: $
-//===========================================================================//
-#ifndef CMAINPANEL_H
-#define CMAINPANEL_H
-#ifdef _WIN32
-#pragma once
-#endif
+// Copyright Valve Corporation, All rights reserved.
 
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/ListPanel.h>
-#include <vgui_controls/PHandle.h>
-#include "utlvector.h"
+#ifndef SE_DEDICATED_VGUI_MAIN_PANEL_H_
+#define SE_DEDICATED_VGUI_MAIN_PANEL_H_
 
-//#include <GamePanelInfo.h>
+#include "tier1/utlvector.h"
+
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/PHandle.h"
 
 #include "IManageServer.h"
-//#include "gameserver.h"
 #include "CreateMultiplayerGameServerPage.h"
 
 class IAdminServer;
 
-//-----------------------------------------------------------------------------
-// Purpose: Root panel for dedicated server GUI
-//-----------------------------------------------------------------------------
-class CMainPanel : public vgui::Panel
-{
-public:
-	// Construction/destruction
-						CMainPanel( );
-	virtual				~CMainPanel();
+namespace se::dedicated {
 
-	virtual void		Initialize( );
+// Root panel for dedicated server GUI
+class CMainPanel : public vgui::Panel {
+  using BaseClass = vgui::Panel;
 
-	// displays the dialog, moves it into focus, updates if it has to
-	virtual void		Open( void );
+ public:
+  // Construction/destruction
+  CMainPanel();
+  virtual ~CMainPanel();
 
-	// returns a pointer to a static instance of this dialog
-	// valid for use only in sort functions
-	static CMainPanel *GetInstance();
-	virtual void StartServer(const char *cvars);
+  virtual void Initialize();
 
-	void ActivateBuildMode();
+  // displays the dialog, moves it into focus, updates if it has to
+  virtual void Open();
 
-	void *GetShutdownHandle() { return m_hShutdown; }
+  // returns a pointer to a static instance of this dialog
+  // valid for use only in sort functions
+  static CMainPanel *GetInstance();
+  virtual void StartServer(const char *cvars);
 
-	void AddConsoleText(const char *msg);
+  void ActivateBuildMode();
 
-	bool Stopping() { return m_bClosing; }
+  void *GetShutdownHandle() { return m_hShutdown; }
 
-	bool IsInConfig() { return m_bIsInConfig; }
+  void AddConsoleText(const char *msg);
 
-private:
+  bool Stopping() const { return m_bClosing; }
 
-	// called when dialog is shut down
-	virtual void OnClose();
-	virtual void OnTick();
-	void DoStop();
+  bool IsInConfig() const { return m_bIsInConfig; }
 
-	// GUI elements
-	IManageServer *m_pGameServer;
-	
-	// the popup menu
-	vgui::DHANDLE<vgui::ProgressBox> m_pProgressBox;
-	CCreateMultiplayerGameServerPage *m_pConfigPage;
+ private:
+  // called when dialog is shut down
+  virtual void OnClose();
+  virtual void OnTick();
+  void DoStop();
 
-	// Event that lets the thread tell the main window it shutdown
-	void *m_hShutdown;
+  // GUI elements
+  IManageServer *m_pGameServer;
 
-	bool m_bStarting; // whether the server is currently starting
-	bool m_bStarted; // whether the server has been started or not
-	bool m_bClosing; // whether we are shutting down
-	bool m_bIsInConfig;
-	serveritem_t s1;
-	int m_hResourceWaitHandle;
-	float m_flPreviousSteamProgress;
+  // the popup menu
+  vgui::DHANDLE<vgui::ProgressBox> m_pProgressBox;
+  CCreateMultiplayerGameServerPage *m_pConfigPage;
 
-	typedef vgui::Panel BaseClass;
-	DECLARE_PANELMAP();
+  // Event that lets the thread tell the main window it shutdown
+  void *m_hShutdown;
 
+  bool m_bStarting;  // whether the server is currently starting
+  bool m_bStarted;   // whether the server has been started or not
+  bool m_bClosing;   // whether we are shutting down
+  bool m_bIsInConfig;
+  serveritem_t s1;
+  int m_hResourceWaitHandle;
+  float m_flPreviousSteamProgress;
+
+  DECLARE_PANELMAP();
 };
 
-#endif // CMAINPANEL_H
+}  // namespace se::dedicated
+
+#endif  // !SE_DEDICATED_VGUI_MAIN_PANEL_H_

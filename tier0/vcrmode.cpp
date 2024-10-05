@@ -759,12 +759,12 @@ static void VCR_Hook_ScreenToClient(void *hWnd, struct tagPOINT *pt)
 }
 
 
-static int VCR_Hook_recvfrom(int s, char *buf, int len, int flags, struct sockaddr *from, int *fromlen)
+static int VCR_Hook_recvfrom(socket_handle s, char *buf, int len, int flags, struct sockaddr *from, int *fromlen)
 {
 	// Preamble.
 	if ( !IsVCRModeEnabledForThisThread() )
 	{
-		return recvfrom((SOCKET)s, buf, len, flags, from, fromlen);
+		return recvfrom(s, buf, len, flags, from, fromlen);
 	}
 
 	VCR_THREADSAFE;
@@ -795,7 +795,7 @@ static int VCR_Hook_recvfrom(int s, char *buf, int len, int flags, struct sockad
 	}
 	else
 	{
-		ret = recvfrom((SOCKET)s, buf, len, flags, from, fromlen);
+		ret = recvfrom(s, buf, len, flags, from, fromlen);
 
 		if ( g_VCRMode == VCR_Record )
 		{
@@ -822,12 +822,12 @@ static int VCR_Hook_recvfrom(int s, char *buf, int len, int flags, struct sockad
 }
 
 
-static int VCR_Hook_recv(int s, char *buf, int len, int flags)
+static int VCR_Hook_recv(socket_handle s, char *buf, int len, int flags)
 {
 	// Preamble.
 	if ( !IsVCRModeEnabledForThisThread() )
 	{
-		return recv( (SOCKET)s, buf, len, flags );
+		return recv( s, buf, len, flags );
 	}
 
 	VCR_THREADSAFE;
@@ -851,7 +851,7 @@ static int VCR_Hook_recv(int s, char *buf, int len, int flags)
 	}
 	else
 	{
-		ret = recv( (SOCKET)s, buf, len, flags );
+		ret = recv( s, buf, len, flags );
 
 		if ( g_VCRMode == VCR_Record )
 		{
@@ -873,12 +873,12 @@ static int VCR_Hook_recv(int s, char *buf, int len, int flags)
 }
 
 
-static int VCR_Hook_send(int s, const char *buf, int len, int flags)
+static int VCR_Hook_send(socket_handle s, const char *buf, int len, int flags)
 {
 	// Preamble.
 	if ( !IsVCRModeEnabledForThisThread() )
 	{
-		return send( (SOCKET)s, buf, len, flags );
+		return send( s, buf, len, flags );
 	}
 
 	VCR_THREADSAFE;
@@ -898,7 +898,7 @@ static int VCR_Hook_send(int s, const char *buf, int len, int flags)
 	}
 	else
 	{
-		ret = send( (SOCKET)s, buf, len, flags );
+		ret = send( s, buf, len, flags );
 
 		if ( g_VCRMode == VCR_Record )
 		{

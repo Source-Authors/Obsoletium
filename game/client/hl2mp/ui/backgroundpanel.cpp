@@ -328,16 +328,14 @@ void ResizeWindowControls( EditablePanel *pWindow, int tall, int wide, int offse
 
 	// Resize to account for 1.25 aspect ratio (1280x1024) screens
 	{
-		for ( int i = 0; i < panelList->Size(); ++i )
+		for ( PHandle handle : *panelList )
 		{
-			PHandle handle = (*panelList)[i];
-
 			Panel *panel = handle.Get();
 
 			bool found = false;
-			for ( int j = 0; j < resizedPanels.Size(); ++j )
+			for ( Panel *resizedPanel : resizedPanels )
 			{
-				if (panel == resizedPanels[j])
+				if (panel == resizedPanel)
 					found = true;
 			}
 
@@ -356,16 +354,14 @@ void ResizeWindowControls( EditablePanel *pWindow, int tall, int wide, int offse
 	}
 
 	// and now re-center them.  Woohoo!
-	for ( int i = 0; i < panelList->Size(); ++i )
+	for ( PHandle handle : *panelList )
 	{
-		PHandle handle = (*panelList)[i];
-
 		Panel *panel = handle.Get();
 
 		bool found = false;
-		for ( int j = 0; j < movedPanels.Size(); ++j )
+		for ( Panel *movedPanel : movedPanels )
 		{
-			if (panel == movedPanels[j])
+			if (panel == movedPanel)
 				found = true;
 		}
 

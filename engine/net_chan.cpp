@@ -5,10 +5,8 @@
 //=============================================================================//
 
 #include "net_chan.h"
-#include "tier1/strtools.h"
 #include "filesystem_engine.h"
 #include "demo.h"
-#include "convar.h"
 #include "mathlib/mathlib.h"
 #include "protocol.h"
 #include "inetmsghandler.h"
@@ -17,6 +15,8 @@
 #include "tier0/vcrmode.h"
 #include "tier0/etwprof.h"
 #include "tier0/vprof.h"
+#include "tier1/convar.h"
+#include "tier1/strtools.h"
 #include "net_ws_headers.h"
 #include "net_ws_queued_packet_sender.h"
 #include "filesystem_init.h"
@@ -48,10 +48,10 @@ static ConVar net_maxpacketdrop( "net_maxpacketdrop", "5000", 0, "Ignore any pac
 
 extern ConVar net_maxroutable;
 
-extern int  NET_ConnectSocket( int nSock, const netadr_t &addr );
-extern void NET_CloseSocket( int hSocket, int sock = -1 );
-extern int  NET_SendStream( int nSock, const char * buf, int len, int flags );
-extern int  NET_ReceiveStream( int nSock, char * buf, int len, int flags );
+extern socket_handle  NET_ConnectSocket( intp nSock, const netadr_t &addr );
+extern void NET_CloseSocket( socket_handle hSocket, intp sock = -1 );
+extern int  NET_SendStream( socket_handle nSock, const char * buf, int len, int flags );
+extern int  NET_ReceiveStream( socket_handle nSock, char * buf, int len, int flags );
 
 
 // If the network connection hasn't been active in this many seconds, display some warning text.
@@ -64,15 +64,12 @@ extern int  NET_ReceiveStream( int nSock, char * buf, int len, int flags );
 // We only need to checksum packets on the PC and only when we're actually sending them over the network.
 static bool ShouldChecksumPackets()
 {
-	if ( !IsPC() )
-		return false;
-
 	return NET_IsMultiplayer();
 }
 
 bool CNetChan::IsLoopback() const
 {
-	return remote_address.IsLoopback();		
+	return remote_address.IsLoopback();
 }
 
 bool CNetChan::IsNull() const
@@ -481,7 +478,7 @@ CNetChan::Setup
 called to open a channel to a remote system
 ==============
 */
-void CNetChan::Setup(int sock, netadr_t *adr, const char * name, INetChannelHandler * handler,
+void CNetChan::Setup(intp sock, netadr_t *adr, const char * name, INetChannelHandler * handler,
 					 int nProtocolVersion )
 {
 	Assert( name ); 
@@ -590,11 +587,6 @@ bool CNetChan::StartStreaming( unsigned int challengeNr )
 		m_StreamSocket = 0;
 		return true;	// streaming is done via loopback buffers in SP mode
 	}
-
-#ifdef _XBOX
-	// We don't want to go into here because it'll eat up 192k extra memory in the client and server's m_StreamData.
-	Error( "StartStreaming not allowed on XBOX." );
-#endif
 
 	MEM_ALLOC_CREDIT();
 
@@ -1017,7 +1009,7 @@ bool CNetChan::CreateFragmentsFromBuffer( bf_write *buffer, int stream )
 	// reliable data to the last item. that doesn't work with the first item
 	// since it may have been already send and is waiting for acknowledge
 
-	int count = m_WaitingList[stream].Count();
+	intp count = m_WaitingList[stream].Count();
 
 	if ( count > 1 )
 	{
@@ -2560,15 +2552,13 @@ bool CNetChan::SendNetMsg( INetMessage &msg, bool bForceReliable, bool bVoice )
 
 INetMessage *CNetChan::FindMessage(int type)
 {
-	int numtypes = m_NetMessages.Count();
-
-	for (int i=0; i<numtypes; i++ )
+	for (auto *m : m_NetMessages)
 	{
-		if ( m_NetMessages[i]->GetType() == type )
-			return m_NetMessages[i];
+		if ( m->GetType() == type )
+			return m;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool CNetChan::RegisterMessage(INetMessage *msg)
@@ -2606,7 +2596,7 @@ bool CNetChan::SendData( bf_write &msg, bool bReliable )
 	{
 		if (  bReliable )
 		{
-			ConMsg( "ERROR! SendData reliabe data too big (%i)", msg.GetNumBytesWritten() );
+			ConMsg( "ERROR! SendData reliable data too big (%zd)", msg.GetNumBytesWritten() );
 		}
 
 		return false;
@@ -2777,7 +2767,7 @@ bool CNetChan::ProcessStream( void )
 	if ( m_StreamReceived < m_StreamLength )
 	{
 		// read in 4kB chuncks
-		int bytesLeft = ( m_StreamLength - m_StreamReceived );	
+		int bytesLeft = ( m_StreamLength - m_StreamReceived );
 
 		int bytesRecv = NET_ReceiveStream( m_StreamSocket, (char*)m_StreamData.Base() + m_StreamReceived, bytesLeft, 0 );
 		
@@ -2790,7 +2780,7 @@ bool CNetChan::ProcessStream( void )
 			return false;
 		}
 
-		m_StreamReceived+= bytesRecv;
+		m_StreamReceived += bytesRecv;
 
 		if ( m_StreamReceived > m_StreamLength )
 		{
@@ -2800,7 +2790,7 @@ bool CNetChan::ProcessStream( void )
 
 		if ( m_StreamReceived == m_StreamLength	)
 		{
-			int ackseqnr =m_StreamSeqNr;
+			int ackseqnr = m_StreamSeqNr;
 
 			bf_read buffer( m_StreamData.Base(), m_StreamLength );
 
@@ -2887,7 +2877,7 @@ void CNetChan::Reset()
 	m_nSplitPacketSequence = 1;
 }
 
-int CNetChan::GetSocket() const
+intp CNetChan::GetSocket() const
 {
 	return m_Socket;
 }
@@ -2985,7 +2975,7 @@ float CNetChan::GetAvgChoke( int flow ) const
 
 float CNetChan::GetAvgLatency( int flow ) const
 {
-	return m_DataFlow[flow].avglatency;	
+	return m_DataFlow[flow].avglatency;
 }
 
 float CNetChan::GetAvgLoss( int flow ) const
@@ -3000,35 +2990,35 @@ float CNetChan::GetTime( void ) const
 
 bool CNetChan::GetStreamProgress( int flow, int *received, int *total ) const
 {
-	(*total) = 0;
-	(*received) = 0;
+	*total = 0;
+	*received = 0;
 	
 	if ( flow == FLOW_INCOMING )
 	{
-		for ( int i = 0; i<MAX_STREAMS; i++ )
+		for ( auto &l : m_ReceiveList )
 		{
-			if ( m_ReceiveList[i].buffer != NULL )
+			if ( l.buffer != NULL )
 			{
-				(*total) += m_ReceiveList[i].numFragments * FRAGMENT_SIZE;
-				(*received) += m_ReceiveList[i].ackedFragments * FRAGMENT_SIZE;
+				*total += l.numFragments * FRAGMENT_SIZE;
+				*received += l.ackedFragments * FRAGMENT_SIZE;
 			}
 		}
 
-		return ((*total)>0);
+		return *total > 0;
 	}
 
 	if ( flow == FLOW_OUTGOING )
 	{
-		for ( int i = 0; i<MAX_STREAMS; i++ )
+		for ( auto &l : m_WaitingList )
 		{
-			if ( m_WaitingList[i].Count() > 0 )
+			if ( l.Count() > 0 )
 			{
-				(*total) += m_WaitingList[i][0]->numFragments * FRAGMENT_SIZE;
-				(*received) += m_WaitingList[i][0]->ackedFragments * FRAGMENT_SIZE;
+				*total += l[0]->numFragments * FRAGMENT_SIZE;
+				*received += l[0]->ackedFragments * FRAGMENT_SIZE;
 			}
 		}
 
-		return ((*total)>0);
+		return *total > 0;
 	}
 	
 	return false; // TODO TCP progress

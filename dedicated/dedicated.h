@@ -1,84 +1,72 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
-//
-// Purpose: Defines a group of app systems that all have the same lifetime
-// that need to be connected/initialized, etc. in a well-defined order
-//
-// $NoKeywords: $
-//
-//===========================================================================//
+// Defines a group of app systems that all have the same lifetime that need to
+// be connected/initialized, etc. in a well-defined order.
 
-#ifndef DEDICATED_H
-#define DEDICATED_H
-
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SE_DEDICATED_DEDICATED_H_
+#define SE_DEDICATED_DEDICATED_H_
 
 #include "appframework/tier3app.h"
+#include "tier0/icommandline.h"
+#include "isystem.h"
 
-
-//-----------------------------------------------------------------------------
-// Forward declarations 
-//-----------------------------------------------------------------------------
+// Forward declarations
 class IDedicatedServerAPI;
 
-
-//-----------------------------------------------------------------------------
-// Singleton interfaces 
-//-----------------------------------------------------------------------------
-extern IDedicatedServerAPI *engine;
-
-
-extern char g_szEXEName[ MAX_PATH ];
-
-
-//-----------------------------------------------------------------------------
-// Inner loop: initialize, shutdown main systems, load steam to 
-//-----------------------------------------------------------------------------
 #ifdef POSIX
 #define DEDICATED_BASECLASS CTier2SteamApp
 #else
 #define DEDICATED_BASECLASS CVguiSteamApp
 #endif
 
-class CDedicatedAppSystemGroup : public DEDICATED_BASECLASS
-{
-	typedef DEDICATED_BASECLASS BaseClass;
+namespace se::dedicated {
 
-public:
-	// Methods of IApplication
-	virtual bool Create( );
-	virtual bool PreInit( );
-	virtual int Main( );
-	virtual void PostShutdown();
-	virtual void Destroy();
+/**
+ * @brief Initialize, shutdown main systems, load Steam to.
+ */
+class DedicatedAppSystemGroup : public DEDICATED_BASECLASS {
+  using BaseClass = DEDICATED_BASECLASS;
 
-	// Used to chain to base class
-	AppModule_t LoadModule( CreateInterfaceFn factory )
-	{
-		return CSteamAppSystemGroup::LoadModule( factory );
-	}
+ public:
+  DedicatedAppSystemGroup(ISystem *system, ICommandLine *command_line,
+                          bool is_console_mode)
+      : system_{system},
+        command_line_{command_line},
+        api_{nullptr},
+        is_console_mode_{is_console_mode} {}
 
-	// Method to add various global singleton systems 
-	bool AddSystems( AppSystemInfo_t *pSystems )
-	{
-		return CSteamAppSystemGroup::AddSystems( pSystems );
-	}
+  bool Create() override;
+  bool PreInit() override;
+  int Main() override;
+  void PostShutdown() override;
+  void Destroy() override;
 
-	void *FindSystem( const char *pInterfaceName )
-	{
-		return CSteamAppSystemGroup::FindSystem( pInterfaceName );
-	}
+  // Used to chain to base class
+  AppModule_t LoadModule(CreateInterfaceFn factory) {
+    return CSteamAppSystemGroup::LoadModule(factory);
+  }
 
-	template<typename TSystem>
-	TSystem* FindSystem( const char* pInterfaceName )
-	{
-		return CSteamAppSystemGroup::FindSystem<TSystem>( pInterfaceName );
-	}
+  // Method to add various global singleton systems
+  bool AddSystems(AppSystemInfo_t *systems) {
+    return CSteamAppSystemGroup::AddSystems(systems);
+  }
+
+  void *FindSystem(const char *interface_name) {
+    return CSteamAppSystemGroup::FindSystem(interface_name);
+  }
+
+  template <typename TSystem>
+  TSystem *FindSystem(const char *interface_name) {
+    return CSteamAppSystemGroup::FindSystem<TSystem>(interface_name);
+  }
+
+ private:
+  ISystem *system_;
+  ICommandLine *command_line_;
+  IDedicatedServerAPI *api_;
+  const bool is_console_mode_;
 };
 
+}  // namespace se::dedicated
 
-
-#endif // DEDICATED_H
+#endif  // SE_DEDICATED_DEDICATED_H_

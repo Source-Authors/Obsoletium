@@ -1,17 +1,13 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-// $NoKeywords: $
-//=============================================================================//
-#if !defined( INETAPI_H )
-#define INETAPI_H
-#ifdef _WIN32
-#pragma once
-#endif
+
+#ifndef SE_COMMON_INETAPI_H_
+#define SE_COMMON_INETAPI_H_
 
 #include "tier0/platform.h"
-#include "netadr.h"
+#include "tier0/vcrmode.h"
+#include "tier1/netadr.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Internal winsock helpers for launcher
@@ -29,7 +25,7 @@ public:
 	// Convert a string address to a netadr_t, doing DNS if needed
 	virtual bool		StringToAdr( const char *s, netadr_t *a ) = 0;
 	// Look up IP address for socket
-	virtual void		GetSocketAddress( int socket, netadr_t *a ) = 0;
+	virtual void		GetSocketAddress( socket_handle socket, netadr_t *a ) = 0;
 
 	virtual bool		CompareAdr( netadr_t *a, netadr_t *b ) =0;
 
@@ -40,4 +36,4 @@ public:
 
 extern INetAPI *net;
 
-#endif // INETAPI_H
+#endif  // !SE_COMMON_INETAPI_H_

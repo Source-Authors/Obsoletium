@@ -489,7 +489,7 @@ public:
 
 // This is the minimal interface that can be implemented to provide access to
 // a named set of files.
-#define BASEFILESYSTEM_INTERFACE_VERSION		"VBaseFileSystem011"
+constexpr inline char BASEFILESYSTEM_INTERFACE_VERSION[]{"VBaseFileSystem011"};
 
 abstract_class IBaseFileSystem
 {

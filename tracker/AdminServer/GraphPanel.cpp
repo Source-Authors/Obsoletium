@@ -27,8 +27,6 @@
 #include <vgui_controls/PropertySheet.h>
 #include <vgui_controls/CheckButton.h>
 
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
-
 #define STATS_UPDATE_RATE	5.0f
 
 

@@ -172,7 +172,7 @@ private:
 
 public:
 	// Connection to server.			
-	int				m_Socket;		// network socket 
+	intp			m_Socket;		// network socket 
 	INetChannel		*m_NetChannel;		// Our sequenced channel to the remote server.
 	unsigned int	m_nChallengeNr;	// connection challenge number
 	double			m_flConnectTime;	// If gap of connect_time to net_time > 3000, then resend connect packet

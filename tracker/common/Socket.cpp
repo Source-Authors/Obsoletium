@@ -16,14 +16,10 @@
 #endif
 #include "msgbuffer.h"
 #include "Socket.h"
-#include "inetapi.h"
+#include "netapi.h"
 #include "tier0/vcrmode.h"
 
 #include "vgui/IVGui.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: All socket I/O occurs on a thread
@@ -116,7 +112,7 @@ static DWORD WINAPI SocketThreadFunc( LPVOID threadobject )
 		// number of sockets with messages ready
 		int			number;
 		// number of sockets added to fd_set
-		int			count;
+		socket_handle		count;
 
 		// Check for shutdown event
 		if ( WAIT_OBJECT_0 == VCRHook_WaitForSingleObject( socketthread->GetShutdownHandle(), 0 ) )
@@ -575,14 +571,14 @@ CSocket::CSocket( const char *socketname, int port /*= -1*/ ) : m_SendBuffer(soc
 	m_iRetries			= 0;
 
 	m_pBufferCS = new CRITICAL_SECTION;
-	InitializeCriticalSection((CRITICAL_SECTION *)m_pBufferCS);
+	InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION *)m_pBufferCS, 4000);
 
 	// ensure the socketthread singleton has been created
 	GetSocketThread();
 
 	// Set up the socket
 	m_Socket = socket( PF_INET, SOCK_DGRAM, IPPROTO_UDP );
-	if ( m_Socket == -1 )
+	if ( m_Socket == kInvalidSocketHandle )
 	{
 		//int err = WSAGetLastError();
 		// WSANOTINITIALISED
@@ -593,7 +589,7 @@ CSocket::CSocket( const char *socketname, int port /*= -1*/ ) : m_SendBuffer(soc
 	if ( ioctlsocket ( m_Socket, FIONBIO, &_true ) == -1 )
 	{
 		closesocket( m_Socket );
-		m_Socket = 0;
+		m_Socket = kInvalidSocketHandle;
 		return;
 	}
 
@@ -601,7 +597,7 @@ CSocket::CSocket( const char *socketname, int port /*= -1*/ ) : m_SendBuffer(soc
 	if ( setsockopt( m_Socket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i) ) == -1 )
 	{
 		closesocket( m_Socket );
-		m_Socket = 0;
+		m_Socket = kInvalidSocketHandle;
 		return;
 	}
 
@@ -629,7 +625,7 @@ CSocket::CSocket( const char *socketname, int port /*= -1*/ ) : m_SendBuffer(soc
 		if ( bind( m_Socket, (struct sockaddr *)&address, sizeof(address) ) == -1 )
 		{
 			closesocket (m_Socket);
-			m_Socket = 0;
+			m_Socket = kInvalidSocketHandle;
 			return;
 		}
 	}
@@ -658,7 +654,7 @@ CSocket::~CSocket( void )
 		::shutdown(m_Socket, 0x01);
 		::shutdown(m_Socket, 0x02);
 		closesocket( m_Socket );
-		m_Socket = 0;
+		m_Socket = kInvalidSocketHandle;
 	}
 
 	// Remove handlers
@@ -884,7 +880,7 @@ uintp CSocket::GetUserData(void ) const
 //-----------------------------------------------------------------------------
 // Purpose: Returns the underlying socket id number for setting up the fd_set
 //-----------------------------------------------------------------------------
-int CSocket::GetSocketNumber( void ) const
+socket_handle CSocket::GetSocketNumber( void ) const
 {
 	return m_Socket;
 }

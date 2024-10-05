@@ -1,15 +1,11 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-//===========================================================================//
-#ifndef SOCKET_CREATOR_H
-#define SOCKET_CREATOR_H
 
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SE_ENGINE_SOCKET_CREATOR_H_
+#define SE_ENGINE_SOCKET_CREATOR_H_
 
+#include "tier0/vcrmode.h"
 #include "tier1/utlvector.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/utllinkedlist.h"
@@ -20,7 +16,7 @@
 #include "tier0/memdbgon.h"
 
 
-typedef int SocketHandle_t;
+using SocketHandle_t = socket_handle;
 
 
 struct ISocketCreatorListener
@@ -57,13 +53,13 @@ public:
 	// Use GetAcceptedSocket* methods to access this socket's data
 	// if bSingleSocket == true, all accepted sockets are closed before the new one is opened
 	// NOTE: Closing an accepted socket will re-index all the sockets with higher indices
-	int ConnectSocket( const netadr_t &netAdr, bool bSingleSocket );
-	void CloseAcceptedSocket( int nIndex );
+	intp ConnectSocket( const netadr_t &netAdr, bool bSingleSocket );
+	void CloseAcceptedSocket( intp nIndex );
 	void CloseAllAcceptedSockets();
-	int GetAcceptedSocketCount() const;
-	SocketHandle_t GetAcceptedSocketHandle( int nIndex ) const;
-	const netadr_t& GetAcceptedSocketAddress( int nIndex ) const;
-	void* GetAcceptedSocketData( int nIndex );
+	intp GetAcceptedSocketCount() const;
+	SocketHandle_t GetAcceptedSocketHandle( intp nIndex ) const;
+	const netadr_t& GetAcceptedSocketAddress( intp nIndex ) const;
+	void* GetAcceptedSocketData( intp nIndex );
 
 	// Closes all open sockets (listen + accepted)
 	void Disconnect();
@@ -75,7 +71,7 @@ private:
 	};
 
 	void ProcessAccept();
-	bool ConfigureSocket( int sock );
+	bool ConfigureSocket( socket_handle sock );
 
 public:
 	struct AcceptedSocket_t
@@ -84,7 +80,10 @@ public:
 		netadr_t		m_Address;
 		void			*m_pData;
 
-		bool operator==( const AcceptedSocket_t &rhs ) const { return ( m_Address.CompareAdr( rhs.m_Address ) == 0 ); }
+		bool operator==( const AcceptedSocket_t &rhs ) const
+		{
+			return ( m_Address.CompareAdr( rhs.m_Address ) == 0 );
+		}
 	};
 
 	ISocketCreatorListener *m_pListener;

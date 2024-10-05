@@ -1,85 +1,78 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
 // TextConsoleWin32.h: Win32 interface for the TextConsole class.
-//
-//////////////////////////////////////////////////////////////////////
 
-#if !defined TEXTCONSOLE_WIN32_H
-#define TEXTCONSOLE_WIN32_H
-#pragma once
+#ifndef SE_DEDICATED_CONSOLE_TEXT_CONSOLE_WIN32_H_
+#define SE_DEDICATED_CONSOLE_TEXT_CONSOLE_WIN32_H_
 
-#ifdef _WIN32
-
-#include <cstddef>
+#include <cstddef>  // ptrdiff_t
 #include "textconsole.h"
 
 #define MAX_CONSOLE_TEXTLEN 256
-#define MAX_BUFFER_LINES	30
+#define MAX_BUFFER_LINES 30
 
-using HANDLE = void*;
+using HANDLE = void *;
 using WORD = unsigned short;
 
-class CTextConsoleWin32 : public CTextConsole
-{
-public:
-	CTextConsoleWin32();
-	virtual ~CTextConsoleWin32() { };
+namespace se::dedicated {
 
-	// CTextConsole
-	bool		Init();
-	void		ShutDown( void );
-	void		Print( const char *pszMsg );
+class CTextConsoleWin32 : public CTextConsole {
+ public:
+  CTextConsoleWin32();
+  virtual ~CTextConsoleWin32(){};
 
-	void		SetTitle( const char * pszTitle );
-	void		SetStatusLine( const char * pszStatus );
-	void		UpdateStatus( void );
+  // CTextConsole
+  bool Init();
+  void ShutDown();
+  void Print(const char *pszMsg);
 
-	char *		GetLine( int index, char *buf, int buflen );
-	int			GetWidth( void );
+  void SetTitle(const char *pszTitle);
+  void SetStatusLine(const char *pszStatus);
+  void UpdateStatus();
 
-	void		SetVisible( bool visible );
+  char *GetLine(int index, char *buf, size_t buflen);
+  int GetWidth();
 
-protected:
-	// CTextConsoleWin32
-	void		SetColor( WORD );
-	void		PrintRaw( const char * pszMsg, int nChars = -1 );
+  void SetVisible(bool visible);
 
-private:
-	char	m_szConsoleText[ MAX_CONSOLE_TEXTLEN ];						// console text buffer
-	ptrdiff_t	m_nConsoleTextLen;											// console textbuffer length
-	int		m_nCursorPosition;											// position in the current input line
+ protected:
+  // CTextConsoleWin32
+  void SetColor(WORD);
+  void PrintRaw(const char *pszMsg, ptrdiff_t nChars = -1);
 
-	// Saved input data when scrolling back through command history
-	char	m_szSavedConsoleText[ MAX_CONSOLE_TEXTLEN ];				// console text buffer
-	int		m_nSavedConsoleTextLen;										// console textbuffer length
+ private:
+  char m_szConsoleText[MAX_CONSOLE_TEXTLEN];  // console text buffer
+  ptrdiff_t m_nConsoleTextLen;                // console textbuffer length
+  ptrdiff_t m_nCursorPosition;  // position in the current input line
 
-	char	m_aszLineBuffer[ MAX_BUFFER_LINES ][ MAX_CONSOLE_TEXTLEN ];	// command buffer last MAX_BUFFER_LINES commands
-	int		m_nInputLine;												// Current line being entered
-	int		m_nBrowseLine;												// current buffer line for up/down arrow
-	int		m_nTotalLines;												// # of nonempty lines in the buffer
+  // Saved input data when scrolling back through command history
+  char m_szSavedConsoleText[MAX_CONSOLE_TEXTLEN];  // console text buffer
+  ptrdiff_t m_nSavedConsoleTextLen;                // console textbuffer length
 
-	int		ReceiveNewline( void );
-	void	ReceiveBackspace( void );
-	void	ReceiveTab( void );
-	void	ReceiveStandardChar( const char ch );
-	void	ReceiveUpArrow( void );
-	void	ReceiveDownArrow( void );
-	void	ReceiveLeftArrow( void );
-	void	ReceiveRightArrow( void );
+  char m_aszLineBuffer[MAX_BUFFER_LINES]
+                      [MAX_CONSOLE_TEXTLEN];  // command buffer last
+                                              // MAX_BUFFER_LINES commands
+  int m_nInputLine;                           // Current line being entered
+  int m_nBrowseLine;  // current buffer line for up/down arrow
+  int m_nTotalLines;  // # of nonempty lines in the buffer
 
-private:
-	HANDLE	hinput;		// standard input handle
-	HANDLE	houtput;	// standard output handle
-	WORD	Attrib;		// attrib colours for status bar
-	
-	char	statusline[81];			// first line in console is status line
+  ptrdiff_t ReceiveNewline();
+  void ReceiveBackspace();
+  void ReceiveTab();
+  void ReceiveStandardChar(const char ch);
+  void ReceiveUpArrow();
+  void ReceiveDownArrow();
+  void ReceiveLeftArrow();
+  void ReceiveRightArrow();
+
+ private:
+  HANDLE hinput;   // standard input handle
+  HANDLE houtput;  // standard output handle
+  WORD Attrib;     // attrib colours for status bar
+
+  char statusline[81];  // first line in console is status line
 };
 
-#endif // _WIN32
+}  // namespace se::dedicated
 
-#endif // !defined TEXTCONSOLE_WIN32_H
+#endif  // !SE_DEDICATED_CONSOLE_TEXT_CONSOLE_WIN32_H_

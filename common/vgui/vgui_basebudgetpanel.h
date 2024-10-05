@@ -103,7 +103,7 @@ public:
 protected:
 	void UpdateWindowGeometry();
 	void ClearTimesForAllGroupsForThisFrame( void );
-	void ClearAllTimesForGroup( int groupID );
+	void ClearAllTimesForGroup( intp groupID );
 	void Rebuild( const CBudgetPanelConfigData &data );
 	
 protected:

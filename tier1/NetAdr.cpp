@@ -357,7 +357,7 @@ bool netadr_t::operator<(const netadr_t &netadr) const
 }
 
 
-void netadr_t::SetFromSocket( int hSocket )
+void netadr_t::SetFromSocket( socket_handle hSocket )
 {	
 	// dgoodenough - since this is skipped on X360, seems reasonable to skip as well on PS3
 	// PS3_BUILDFIX
@@ -368,7 +368,7 @@ void netadr_t::SetFromSocket( int hSocket )
 
 	struct sockaddr address;
 	socklen_t namelen = sizeof(address);
-	if ( getsockname( hSocket, (struct sockaddr *)&address, &namelen) == 0 )
+	if ( getsockname( hSocket, &address, &namelen) == 0 )
 	{
 		SetFromSockadr( &address );
 	}

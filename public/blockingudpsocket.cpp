@@ -1,8 +1,8 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-//=============================================================================//
+
+#include "blockingudpsocket.h"
 
 #if defined(_WIN32) && !defined(_X360)
 #include <winsock.h>
@@ -16,10 +16,9 @@
 #define closesocket close
 #endif
 
-#include "blockingudpsocket.h"
 #include "tier0/vcrmode.h"
 
-class CBlockingUDPSocket::CImpl	
+class CBlockingUDPSocket::Impl
 {
 public:
 	struct sockaddr_in	m_SocketIP;
@@ -27,32 +26,33 @@ public:
 };
 
 CBlockingUDPSocket::CBlockingUDPSocket() :
-	m_pImpl( new CImpl ),
+	m_pImpl( new Impl ),
 	m_cserIP(),
-	m_Socket( 0 )
+	m_Socket( kInvalidSocketHandle )
 {
-	CreateSocket(); 
+	CreateSocket();
 }
 
 CBlockingUDPSocket::~CBlockingUDPSocket()
 {
 	delete m_pImpl;
-	closesocket( static_cast<unsigned int>( m_Socket )); 
+
+	if ( m_Socket != kInvalidSocketHandle )
+	{
+		closesocket( m_Socket );
+	}
 }
 
-bool CBlockingUDPSocket::CreateSocket (void)
+bool CBlockingUDPSocket::CreateSocket()
 {
-	struct sockaddr_in	address;
-
 	m_Socket = socket( PF_INET, SOCK_DGRAM, IPPROTO_UDP );
-	if ( m_Socket == INVALID_SOCKET )
+	if ( m_Socket == kInvalidSocketHandle )
 	{
 		return false;
 	}
 
-	address = m_pImpl->m_SocketIP;
-
-	if ( SOCKET_ERROR == bind( m_Socket, ( struct sockaddr * )&address, sizeof( address ) ) )
+	sockaddr_in address = m_pImpl->m_SocketIP;
+	if ( SOCKET_ERROR == bind( m_Socket, reinterpret_cast<sockaddr * >(&address), sizeof( address ) ) )
 	{
 		return false;
 	}
@@ -74,16 +74,15 @@ bool CBlockingUDPSocket::CreateSocket (void)
 
 bool CBlockingUDPSocket::WaitForMessage( float timeOutInSeconds )
 {
-	struct timeval tv;
-
 	FD_ZERO( &m_pImpl->m_FDSet );
 	FD_SET( m_Socket, &m_pImpl->m_FDSet );//lint !e717
-	
+
+	timeval tv;
 	tv.tv_sec = (int)timeOutInSeconds;
 	float remainder = timeOutInSeconds - (int)timeOutInSeconds;
 	tv.tv_usec = (int)( remainder * 1000000 + 0.5f );         /* micro seconds */
 	
-	if ( SOCKET_ERROR == select( ( int )m_Socket + 1, &m_pImpl->m_FDSet, NULL, NULL, &tv ) )
+	if ( SOCKET_ERROR == select( ( intp )m_Socket + 1, &m_pImpl->m_FDSet, NULL, NULL, &tv ) )
 	{
 		return false;
 	}
@@ -97,12 +96,12 @@ bool CBlockingUDPSocket::WaitForMessage( float timeOutInSeconds )
 	return false;
 }
 
-unsigned int CBlockingUDPSocket::ReceiveSocketMessage( struct sockaddr_in *packet_from, unsigned char *buf, size_t bufsize )
+unsigned int CBlockingUDPSocket::ReceiveSocketMessage( sockaddr_in *packet_from, unsigned char *buf, size_t bufsize )
 {
 	memset( packet_from, 0, sizeof( *packet_from ) );
 
-	struct sockaddr fromaddress;
-	int		fromlen = sizeof( fromaddress );
+	sockaddr fromaddress;
+	int	fromlen = sizeof( fromaddress );
 
 	int packet_length = VCRHook_recvfrom
 		(
@@ -120,15 +119,15 @@ unsigned int CBlockingUDPSocket::ReceiveSocketMessage( struct sockaddr_in *packe
 	}
 
 	// In case it's parsed as a string
-	buf[ packet_length ] = 0;		
+	buf[ packet_length ] = 0;
 
 	// Copy over the receive address
-	*packet_from = *( struct sockaddr_in * )&fromaddress;
+	*packet_from = *( sockaddr_in * )&fromaddress;
 
 	return ( unsigned int )packet_length;
 }
 
-bool CBlockingUDPSocket::SendSocketMessage( const struct sockaddr_in & rRecipient, const unsigned char *buf, size_t bufsize )
+bool CBlockingUDPSocket::SendSocketMessage( const sockaddr_in & rRecipient, const unsigned char *buf, size_t bufsize )
 {
 	// Send data
 	int bytesSent = sendto
