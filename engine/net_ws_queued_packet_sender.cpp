@@ -10,6 +10,7 @@
 #include "tier1/utlvector.h"
 #include "tier1/utlpriorityqueue.h"
 
+#include "tier0/vcrmode.h"
 #include "tier0/etwprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -46,7 +47,7 @@ private:
 	public:
 		uint32				m_unSendTime;
 		const void 			*m_pChannel;  // We don't actually use the channel
-		SOCKET				m_Socket;
+		socket_handle		m_Socket;
 		CUtlVector<char>	to;	// sockaddr
 		CUtlVector<char>	buf;
 
@@ -127,7 +128,7 @@ void CQueuedPacketSender::ClearQueuedPacketsForChannel( INetChannel *pChan )
 {
 	AUTO_LOCK( m_QueuedPacketsCS );
 
-	for ( int i = m_QueuedPackets.Count()-1; i >= 0; i-- )
+	for ( intp i = m_QueuedPackets.Count()-1; i >= 0; i-- )
 	{
 		CQueuedPacket *p = m_QueuedPackets.Element( i );
 		if ( p->m_pChannel == pChan )
@@ -244,7 +245,7 @@ int CQueuedPacketSender::Run()
 				{		
 					if ( bTrace )
 					{
-						Warning( "SQ:  sending %d bytes at %f\n", pPacket->buf.Count(), Plat_FloatTime() );
+						Warning( "SQ:  sending %zd bytes at %f\n", pPacket->buf.Count(), Plat_FloatTime() );
 					}
 
 					NET_SendToImpl

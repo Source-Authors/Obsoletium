@@ -156,7 +156,7 @@ ManageServerUIHandle_t CAdminServer::OpenManageServerDialog(const char *serverNa
 	tmp->SetParent(m_hParent);
 
 	// add a new item into the list
-	int i = m_OpenedManageDialog.AddToTail();
+	intp i = m_OpenedManageDialog.AddToTail();
 	m_OpenedManageDialog[i].handle = vgui::ivgui()->PanelToHandle(tmp->GetVPanel());
 	m_OpenedManageDialog[i].manageInterface = tmp;
 

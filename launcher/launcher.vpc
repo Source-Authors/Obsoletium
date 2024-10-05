@@ -49,7 +49,7 @@ $Project "launcher"
 {
 	$Folder	"Source Files"
 	{
-		$File	"$SRCDIR\public\filesystem_init.cpp"
+		$File	"$SRCDIR/public/filesystem_init.cpp"
 		$File	"boot_app_system_group.cpp"
 		$File	"file_logger.cpp"
 		$File	"launcher_main.cpp"
@@ -67,9 +67,9 @@ $Project "launcher"
 		$File	"scoped_app_multirun.h"
 		$File	"scoped_app_relaunch.h"
 		$File	"scoped_heap_leak_dumper.h"
-		$File	"scoped_com.h" [$WINDOWS]
-		$File	"scoped_timer_resolution.h" [$WINDOWS]
-		$File	"scoped_winsock.h" [$WINDOWS]
+		$File	"$SRCDIR/common/windows/scoped_com.h" [$WINDOWS]
+		$File	"$SRCDIR/common/windows/scoped_timer_resolution.h" [$WINDOWS]
+		$File	"$SRCDIR/common/windows/scoped_winsock.h" [$WINDOWS]
 	}
 
 	$folder	"Link Libraries"

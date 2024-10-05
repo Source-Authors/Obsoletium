@@ -159,13 +159,12 @@ void CDialogAddBan::OnCommand(const char *command)
 		}
 		else
 		{
-			if(m_pPermBanRadio->IsSelected())
+			if(m_pPermBanRadio->IsSelected() || sscanf(buf,"%f",&time) != 1)
 			{
 				time=0;
 			}
 			else
 			{
-				sscanf(buf,"%f",&time);
 				m_pTimeCombo->GetText(buf,64);
 				if(strstr(buf,"hour"))
 				{

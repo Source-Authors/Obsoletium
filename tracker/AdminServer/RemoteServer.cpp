@@ -65,7 +65,7 @@ void CRemoteServer::RequestValue(IServerDataResponse *requester, const char *var
 {
 	Assert( m_bInitialized );
 	// add to the response handling table
-	int i = m_ResponseHandlers.AddToTail();
+	intp i = m_ResponseHandlers.AddToTail();
 	m_ResponseHandlers[i].requestID = m_iCurrentRequestID;
 	m_ResponseHandlers[i].handler = requester;
 
@@ -159,7 +159,7 @@ bool CRemoteServer::ProcessServerResponse()
 			{
 				int valueSize = buf.GetInt();
 				Assert(valueSize > 0);
-				CUtlBuffer value(0, valueSize);
+				CUtlBuffer value((intp)0, (intp)valueSize);
 				if (valueSize > 0)
 				{
 					value.Put(buf.PeekGet(), valueSize);
@@ -171,7 +171,7 @@ bool CRemoteServer::ProcessServerResponse()
 				}
 
 				// find callback (usually will be the first one in the list)
-				for (int i = m_ResponseHandlers.Head(); m_ResponseHandlers.IsValidIndex(i); i = m_ResponseHandlers.Next(i))
+				for (intp i = m_ResponseHandlers.Head(); m_ResponseHandlers.IsValidIndex(i); i = m_ResponseHandlers.Next(i))
 				{
 					if (m_ResponseHandlers[i].requestID == requestID)
 					{
@@ -191,7 +191,7 @@ bool CRemoteServer::ProcessServerResponse()
 		case SERVERDATA_UPDATE:
 			{
 				// find all the people watching for this message
-				for (int i = m_MessageHandlers.Head(); m_MessageHandlers.IsValidIndex(i); i = m_MessageHandlers.Next(i))
+				for (intp i = m_MessageHandlers.Head(); m_MessageHandlers.IsValidIndex(i); i = m_MessageHandlers.Next(i))
 				{
 					if (!stricmp(m_MessageHandlers[i].messageName, variable))
 					{
@@ -218,7 +218,7 @@ bool CRemoteServer::ProcessServerResponse()
 void CRemoteServer::AddServerMessageHandler(IServerDataResponse *handler, const char *watch)
 {
 	// add to the server message handling table
-	int i = m_MessageHandlers.AddToTail();
+	intp i = m_MessageHandlers.AddToTail();
 	strncpy(m_MessageHandlers[i].messageName, watch, sizeof(m_MessageHandlers[i].messageName) - 1);
 	m_MessageHandlers[i].messageName[sizeof(m_MessageHandlers[i].messageName) - 1] = 0;
 	m_MessageHandlers[i].handler = handler;
@@ -230,7 +230,7 @@ void CRemoteServer::AddServerMessageHandler(IServerDataResponse *handler, const 
 void CRemoteServer::RemoveServerDataResponseTarget(IServerDataResponse *invalidRequester)
 {
 	// iterate the responses
-	for (int i = 0; i < m_ResponseHandlers.MaxElementIndex(); i++)
+	for (intp i = 0; i < m_ResponseHandlers.MaxElementIndex(); i++)
 	{
 		if (m_ResponseHandlers.IsValidIndex(i))
 		{
@@ -242,7 +242,7 @@ void CRemoteServer::RemoveServerDataResponseTarget(IServerDataResponse *invalidR
 		}
 	}
 	// iterate the message handlers
-	for (int i = 0; i < m_MessageHandlers.MaxElementIndex(); i++)
+	for (intp i = 0; i < m_MessageHandlers.MaxElementIndex(); i++)
 	{
 		if (m_MessageHandlers.IsValidIndex(i))
 		{

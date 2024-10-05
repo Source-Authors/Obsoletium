@@ -10,6 +10,7 @@
 #pragma once
 #endif
 
+#include "tier0/vcrmode.h"
 #include "tier1/netadr.h"
 #include "msgbuffer.h"
 #include "tier1/utlvector.h"
@@ -22,12 +23,12 @@ class IGameList;
 
 // Use this to pick apart the network stream, must be packed
 #pragma pack(1)
-typedef struct
+struct SPLITPACKET
 {
 	int		netID;
 	int		sequenceNumber;
 	char	packetID;
-} SPLITPACKET;
+};
 #pragma pack()
 
 #define MAX_PACKETS 16 // 4 bits for the packet count, so only 
@@ -45,12 +46,12 @@ public:
 		MAX_HANDLER_STRING = 64
 	};
 
-	typedef enum
+	enum HANDLERTYPE
 	{
 		MSGHANDLER_ALL = 0,
 		MSGHANDLER_BYTECODE,
 		MSGHANDLER_STRING
-	} HANDLERTYPE;
+	};
 
 	// Construction
 							CMsgHandler( HANDLERTYPE type, void *typeinfo = 0 );
@@ -121,7 +122,7 @@ public:
 	virtual uintp	GetUserData(void ) const;
 
 	// Allow other objects to get the raw socket interger
-	virtual int				GetSocketNumber( void ) const;
+	virtual socket_handle	GetSocketNumber( void ) const;
 	// Called when FD_ISSET noted that the socket has incoming data
 	virtual bool			ReceiveData( void );
 	// Called to get current time
@@ -143,7 +144,7 @@ private:
 	// One or more listeners for the incoming message
 	CMsgHandler				*m_pMessageHandlers;
 	// Winsock socket number
-	int						m_Socket;
+	socket_handle			m_Socket;
 	// User native-size value
 	uintp					m_nUserData;
 	// Socket to which non Broadcast SendMessage was directed.  The socket will wait for a response

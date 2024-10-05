@@ -1,14 +1,11 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose:  Utility class to help in socket creation. Works for clients + servers
-//
-//===========================================================================//
+// Purpose: Utility class to help in socket creation. Works for clients + servers
 
 
 #if defined(_WIN32)
-#if !defined(_X360)
 #include <winsock.h>
-#endif
+
 #undef SetPort // winsock screws with the SetPort string... *sigh*
 #define socklen_t int
 #define MSG_NOSIGNAL 0
@@ -22,17 +19,15 @@
 #define closesocket close
 #define WSAGetLastError() errno
 #define ioctlsocket ioctl
+
 #ifdef OSX
 #define MSG_NOSIGNAL 0
 #endif
 #endif
-#include <tier0/dbg.h>
+
+#include "tier0/dbg.h"
 #include "socketcreator.h"
 #include "server.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -40,7 +35,7 @@
 bool SocketWouldBlock()
 {
 #ifdef _WIN32
-	return (WSAGetLastError() == WSAEWOULDBLOCK);
+	return WSAGetLastError() == WSAEWOULDBLOCK;
 #elif POSIX
 	return (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINPROGRESS);
 #endif
@@ -51,7 +46,7 @@ bool SocketWouldBlock()
 //-----------------------------------------------------------------------------
 CSocketCreator::CSocketCreator( ISocketCreatorListener *pListener )
 {
-	m_hListenSocket = -1;
+	m_hListenSocket = kInvalidSocketHandle;
 	m_pListener = pListener;
 }
 
@@ -69,7 +64,7 @@ CSocketCreator::~CSocketCreator()
 //-----------------------------------------------------------------------------
 bool CSocketCreator::IsListening() const
 {
-	return m_hListenSocket != -1;
+	return m_hListenSocket != kInvalidSocketHandle;
 }
 
 //-----------------------------------------------------------------------------
@@ -81,9 +76,9 @@ bool CSocketCreator::CreateListenSocket( const netadr_t &netAdr )
 
 	m_ListenAddress = netAdr;
 	m_hListenSocket = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if ( m_hListenSocket == -1 )
+	if ( m_hListenSocket == kInvalidSocketHandle )
 	{
-		Warning( "Socket unable to create socket (%s)\n", NET_ErrorString( WSAGetLastError() ) );
+		Warning( "Create socket(IPPROTO_TCP) failed: %s.\n", NET_ErrorString( WSAGetLastError() ) );
 		return false;
 	}
 
@@ -93,12 +88,12 @@ bool CSocketCreator::CreateListenSocket( const netadr_t &netAdr )
 		return false;
 	}
 
-	struct sockaddr_in s;
-	m_ListenAddress.ToSockadr( (struct sockaddr *)&s );
-	int ret = bind( m_hListenSocket, (struct sockaddr *)&s, sizeof(struct sockaddr_in) );
+	sockaddr_in s;
+	m_ListenAddress.ToSockadr( (sockaddr *)&s );
+	int ret = bind( m_hListenSocket, (sockaddr *)&s, sizeof(s) );
 	if ( ret == -1 )
 	{
-		Warning( "Socket bind failed (%s)\n", NET_ErrorString( WSAGetLastError() ) );
+		Warning( "Socket bind failed: %s.\n", NET_ErrorString( WSAGetLastError() ) );
 		CloseListenSocket();
 		return false;
 	}
@@ -106,7 +101,7 @@ bool CSocketCreator::CreateListenSocket( const netadr_t &netAdr )
 	ret = listen( m_hListenSocket, SOCKET_TCP_MAX_ACCEPTS );
 	if ( ret == -1 )
 	{
-		Warning( "Socket listen failed (%s)\n", NET_ErrorString( WSAGetLastError() ) );
+		Warning( "Socket listen failed: %s.\n", NET_ErrorString( WSAGetLastError() ) );
 		CloseListenSocket();
 		return false;
 	}
@@ -118,22 +113,33 @@ bool CSocketCreator::CreateListenSocket( const netadr_t &netAdr )
 //-----------------------------------------------------------------------------
 // Configures a socket for use
 //-----------------------------------------------------------------------------
-bool CSocketCreator::ConfigureSocket( int sock )
+bool CSocketCreator::ConfigureSocket( socket_handle sock )
 {
 	// disable NAGLE (rcon cmds are small in size)
 	int nodelay = 1;
-	setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay)); 
+	int ret = setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay));
+	if ( ret == -1 )
+	{
+		Warning( "Socket setsockopt(TCP_NODELAY): %s.\n", NET_ErrorString( WSAGetLastError() ) );
+		// continue.
+	}
 
 	nodelay = 1;
 	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&nodelay, sizeof(nodelay));
+	if ( ret == -1 )
+	{
+		Warning( "Socket setsockopt(SO_REUSEADDR): %s.\n", NET_ErrorString( WSAGetLastError() ) );
+		// continue.
+	}
 
-	int opt = 1, ret; 
+	int opt = 1;
 	ret = ioctlsocket( sock, FIONBIO, (unsigned long*)&opt ); // non-blocking
 	if ( ret == -1 )
 	{
-		Warning( "Socket accept ioctl(FIONBIO) failed (%i)\n", WSAGetLastError() );
+		Warning( "Socket ioctlsocket(FIONBIO) failed: %s.\n", NET_ErrorString( WSAGetLastError() ) );
 		return false;
 	}
+
 	return true;
 }
 
@@ -143,12 +149,11 @@ bool CSocketCreator::ConfigureSocket( int sock )
 //-----------------------------------------------------------------------------
 void CSocketCreator::ProcessAccept()
 {
-	int newSocket;
 	sockaddr sa;
 	int nLengthAddr = sizeof(sa);
 
-	newSocket = accept( m_hListenSocket, &sa, (socklen_t *)&nLengthAddr );
-	if ( newSocket == -1 )
+	socket_handle newSocket = accept( m_hListenSocket, &sa, (socklen_t *)&nLengthAddr );
+	if ( newSocket == kInvalidSocketHandle )
 	{
 		if ( !SocketWouldBlock()
 #ifdef POSIX
@@ -156,7 +161,7 @@ void CSocketCreator::ProcessAccept()
 #endif
 		 )
 		{
-			Warning ("Socket ProcessAccept Error: %s\n", NET_ErrorString( WSAGetLastError() ) );
+			Warning ( "Socket accept failed: %s.\n", NET_ErrorString( WSAGetLastError() ) );
 		}
 		return;
 	}
@@ -180,9 +185,9 @@ void CSocketCreator::ProcessAccept()
 	AcceptedSocket_t *pNewEntry = &m_hAcceptedSockets[nIndex];
 	pNewEntry->m_hSocket = newSocket;
 	pNewEntry->m_Address = adr;
-	pNewEntry->m_pData = NULL;
+	pNewEntry->m_pData = nullptr;
 
-	void* pData = NULL;
+	void* pData = nullptr;
 	if ( m_pListener )
 	{
 		m_pListener->OnSocketAccepted( newSocket, adr, &pData );
@@ -194,7 +199,7 @@ void CSocketCreator::ProcessAccept()
 //-----------------------------------------------------------------------------
 // Purpose: connect to the remote server
 //-----------------------------------------------------------------------------
-int CSocketCreator::ConnectSocket( const netadr_t &netAdr, bool bSingleSocket )
+intp CSocketCreator::ConnectSocket( const netadr_t &netAdr, bool bSingleSocket )
 {
 	if ( bSingleSocket )
 	{
@@ -202,34 +207,39 @@ int CSocketCreator::ConnectSocket( const netadr_t &netAdr, bool bSingleSocket )
 	}
 
 	SocketHandle_t hSocket = socket( PF_INET, SOCK_STREAM, IPPROTO_TCP );
-	if ( hSocket == -1 )
+	if ( hSocket == kInvalidSocketHandle )
 	{
-		Warning( "Unable to create socket (%s)\n", NET_ErrorString( WSAGetLastError() ) );
+		Warning( "Create socket(IPPROTO_TCP) failed: %s.\n", NET_ErrorString( WSAGetLastError() ) );
 		return -1;
 	}
 
-	int opt = 1, ret;
-	ret = ioctlsocket( hSocket, FIONBIO, (unsigned long*)&opt ); // non-blocking
+	int opt = 1;
+	int ret = ioctlsocket( hSocket, FIONBIO, (unsigned long*)&opt ); // non-blocking
 	if ( ret == -1 )
 	{
-		Warning( "Socket ioctl(FIONBIO) failed (%s)\n", NET_ErrorString( WSAGetLastError() ) );
+		Warning( "Socket ioctl(FIONBIO) failed: %s.\n", NET_ErrorString( WSAGetLastError() ) );
 		closesocket( hSocket );
-		return -1;																	   
+		return -1;
 	}
 
 	// disable NAGLE (rcon cmds are small in size)
 	int nodelay = 1;
-	setsockopt( hSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay) ); 
+	ret = setsockopt( hSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay) );
+	if ( ret == -1 )
+	{
+		Warning( "Socket setsockopt(TCP_NODELAY): %s.\n", NET_ErrorString( WSAGetLastError() ) );
+		// continue.
+	}
 
-	struct sockaddr_in s;
-	netAdr.ToSockadr( (struct sockaddr *)&s );
+	sockaddr_in s;
+	netAdr.ToSockadr( (sockaddr *)&s );
 
-	ret = connect( hSocket, (struct sockaddr *)&s, sizeof(s));
+	ret = connect( hSocket, (sockaddr *)&s, sizeof(s));
 	if ( ret == -1 )
 	{
 		if ( !SocketWouldBlock() )
 		{	
-			Warning( "Socket connection failed (%s)\n", NET_ErrorString( WSAGetLastError() ) );
+			Warning( "Socket connect failed: %s.\n", NET_ErrorString( WSAGetLastError() ) );
 			closesocket( hSocket );
 			return -1;
 		}
@@ -276,14 +286,14 @@ int CSocketCreator::ConnectSocket( const netadr_t &netAdr, bool bSingleSocket )
 //-----------------------------------------------------------------------------
 void CSocketCreator::CloseListenSocket()
 {
-	if ( m_hListenSocket != -1 )
+	if ( m_hListenSocket != kInvalidSocketHandle )
 	{
 		closesocket( m_hListenSocket );
-		m_hListenSocket = -1;
+		m_hListenSocket = kInvalidSocketHandle;
 	}
 }
 
-void CSocketCreator::CloseAcceptedSocket( int nIndex )
+void CSocketCreator::CloseAcceptedSocket( intp nIndex )
 {
 	if ( nIndex >= m_hAcceptedSockets.Count() )
 		return;
@@ -299,10 +309,8 @@ void CSocketCreator::CloseAcceptedSocket( int nIndex )
 
 void CSocketCreator::CloseAllAcceptedSockets()
 {
-	int nCount = m_hAcceptedSockets.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( auto &connected : m_hAcceptedSockets )
 	{
-		AcceptedSocket_t& connected = m_hAcceptedSockets[i];
 		if ( m_pListener )
 		{
 			m_pListener->OnSocketClosed( connected.m_hSocket, connected.m_Address, connected.m_pData );
@@ -335,24 +343,22 @@ void CSocketCreator::RunFrame()
 //-----------------------------------------------------------------------------
 // Returns socket info
 //-----------------------------------------------------------------------------
-int CSocketCreator::GetAcceptedSocketCount() const
+intp CSocketCreator::GetAcceptedSocketCount() const
 {
 	return m_hAcceptedSockets.Count();
 }
 
-SocketHandle_t CSocketCreator::GetAcceptedSocketHandle( int nIndex ) const
+SocketHandle_t CSocketCreator::GetAcceptedSocketHandle( intp nIndex ) const
 {
 	return m_hAcceptedSockets[nIndex].m_hSocket;
 }
 
-const netadr_t& CSocketCreator::GetAcceptedSocketAddress( int nIndex ) const
+const netadr_t& CSocketCreator::GetAcceptedSocketAddress( intp nIndex ) const
 {
 	return m_hAcceptedSockets[nIndex].m_Address;
 }
 
-void* CSocketCreator::GetAcceptedSocketData( int nIndex )
+void* CSocketCreator::GetAcceptedSocketData( intp nIndex )
 {
 	return m_hAcceptedSockets[nIndex].m_pData;
 }
-
-

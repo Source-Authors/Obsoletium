@@ -1,15 +1,11 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
 //
-//=============================================================================//
 
 #ifndef BLOCKINGUDPSOCKET_H
 #define BLOCKINGUDPSOCKET_H
-#ifdef _WIN32
-#pragma once
-#endif
 
+#include "tier0/vcrmode.h"
 #include "tier1/netadr.h"
 
 class CBlockingUDPSocket
@@ -22,18 +18,16 @@ public:
 	unsigned int ReceiveSocketMessage( struct sockaddr_in *packet_from, unsigned char *buf, size_t bufsize );
 	bool SendSocketMessage( const struct sockaddr_in& rRecipient, const unsigned char *buf, size_t bufsize );
 
-	bool	IsValid() const { return m_Socket != 0; }
+	bool IsValid() const { return m_Socket != kInvalidSocketHandle; }
 
 protected:
-	bool CreateSocket (void);
+	bool CreateSocket();
 
-	class CImpl;
-	CImpl				*m_pImpl;
+	class Impl;
+	Impl				*m_pImpl;
 
 	netadr_t			m_cserIP;
-	uintp				m_Socket;
-
-
+	socket_handle		m_Socket;
 };
 
 #endif // BLOCKINGUDPSOCKET_H

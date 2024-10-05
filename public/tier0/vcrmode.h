@@ -18,6 +18,14 @@
 #include "tier0/vcr_shared.h"
 #include "tier0/dbg.h"
 
+#ifdef _WIN32
+using socket_handle = uintp;
+constexpr inline socket_handle kInvalidSocketHandle = static_cast<socket_handle>(~0);
+#else
+usign socket_handle = int;
+constexpr inline socket_handle kInvalidSocketHandle = -1;
+#endif
+
 #ifdef POSIX
 DBG_INTERFACE const char *BuildCmdLine( int argc, char **argv, bool fAddSteam = true );
 tchar *GetCommandLine();
@@ -118,7 +126,7 @@ typedef struct VCR_s
 	bool		(*Hook_PlaybackGameMsg)( InputEvent_t *pEvent );
 
 	// Hook for recvfrom() calls. This replaces the recvfrom() call.
-	int			(*Hook_recvfrom)(int s, char *buf, int len, int flags, struct sockaddr *from, int *fromlen);
+	int			(*Hook_recvfrom)(socket_handle s, char *buf, int len, int flags, struct sockaddr *from, int *fromlen);
 
 	void		(*Hook_GetCursorPos)(struct tagPOINT *pt);
 	void		(*Hook_ScreenToClient)(void *hWnd, struct tagPOINT *pt);
@@ -148,8 +156,8 @@ typedef struct VCR_s
 	short		(*Hook_GetKeyState)( int nVirtKey );
 
 	// TCP calls.
-	int			(*Hook_recv)( int s, char *buf, int len, int flags );
-	int			(*Hook_send)( int s, const char *buf, int len, int flags );
+	int			(*Hook_recv)( socket_handle s, char *buf, int len, int flags );
+	int			(*Hook_send)( socket_handle s, const char *buf, int len, int flags );
 
 	// These can be used to add events without having to modify VCR mode.
 	// pEventName is used for verification to make sure it's playing back correctly. 

@@ -1,30 +1,34 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-// conproc.h -- support for external server monitoring programs
-#ifndef INC_CONPROCH
-#define INC_CONPROCH
+// Support for external server monitoring programs.
 
-#define CCOM_WRITE_TEXT		0x2
-// Param1 : Text
+#ifndef SE_DEDICATED_CONSOLE_CONPROC_H_
+#define SE_DEDICATED_CONSOLE_CONPROC_H_
 
-#define CCOM_GET_TEXT		0x3
-// Param1 : Begin line
-// Param2 : End line
+#include "tier0/icommandline.h"
 
-#define CCOM_GET_SCR_LINES	0x4
-// No params
+#include "isystem.h"
 
-#define CCOM_SET_SCR_LINES	0x5
-// Param1 : Number of lines
+/**
+ * @brief Console commands.
+ */
+enum class ConsoleCommand : int {
+  // Param1 : Text
+  CCOM_WRITE_TEXT = 0x2,
+  // Param1 : Begin line
+  // Param2 : End line
+  CCOM_GET_TEXT = 0x3,
+  // No params
+  CCOM_GET_SCR_LINES = 0x4,
+  // Param1 : Number of lines
+  CCOM_SET_SCR_LINES = 0x5,
+};
 
-void InitConProc ( void );
-void DeinitConProc ( void );
+namespace se::dedicated {
 
-void WriteStatusText( char *psz );
+bool StartupRemoteConsole(ICommandLine *command_line, ISystem *system);
+void ShutdownRemoteConsole();
 
-#endif // !INC_CONPROCH
+}  // namespace se::dedicated
+
+#endif  // !SE_DEDICATED_CONSOLE_CONPROC_H_

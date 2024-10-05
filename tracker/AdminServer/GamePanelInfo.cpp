@@ -5,8 +5,8 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <stdio.h>
-#include "winsock.h" // this BUGGER defines PropertySheet to PropertySheetA ....
+#include "winlite.h"
+#include <winsock.h> // this BUGGER defines PropertySheet to PropertySheetA ....
 #undef PropertySheet
 #include "tokenline.h"
 

@@ -121,6 +121,7 @@ $Group "console"
 
 $Group "game"
 {
+	"adminserver"
 	"appframework"
 	"bitmap"
 	"bsppack"
