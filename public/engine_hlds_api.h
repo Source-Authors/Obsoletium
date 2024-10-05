@@ -12,6 +12,7 @@
 
 #include "interface.h"
 #include "appframework/IAppSystem.h"
+#include "appframework/IAppSystemGroup.h"
 
 
 #define VENGINE_HLDS_API_VERSION "VENGINE_HLDS_API_VERSION002"
