@@ -1086,6 +1086,9 @@ inline bool Plat_IsInDebugSession( bool bForceRecheck = false ) { return false; 
 #define Plat_DebugString(s) ((void)0)
 #endif
 
+// dimhotepus: Check user is admin or priviledged one.
+PLATFORM_INTERFACE bool Plat_IsUserAnAdmin();
+
 //-----------------------------------------------------------------------------
 // Returns true if running on a 64 bit (windows) OS
 //-----------------------------------------------------------------------------

@@ -288,6 +288,43 @@ bool Plat_IsInDebugSession()
 #endif
 }
 
+// dimhotepus: Additional bug info.
+#if defined(_WIN32) && !defined(_X360)
+// See
+// https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-checktokenmembership
+static BOOL IsUserAdmin() {
+  SID_IDENTIFIER_AUTHORITY ntAuthority{SECURITY_NT_AUTHORITY};
+  PSID administratorsGroup;
+  BOOL ok = AllocateAndInitializeSid(
+      &ntAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0,
+      0, 0, 0, 0, 0, &administratorsGroup);
+
+  if (ok) {
+    if (!CheckTokenMembership(NULL, administratorsGroup, &ok)) {
+      ok = FALSE;
+    }
+
+    FreeSid(administratorsGroup);
+  }
+
+  return ok;
+}
+#endif
+
+// dimhotepus: Additional bug info.
+bool Plat_IsUserAnAdmin() {
+#if defined(_WIN32) && !defined(_X360)
+  return ::IsUserAdmin() ? true : false;
+#else
+  const uid_t uid{getuid()}, euid{geteuid()};
+
+  // We might have elevated privileges beyond that of the user who invoked the
+  // program, due to suid bit.
+  return uid < 0 || euid == 0 || uid != euid;
+#endif
+}
+
+
 void Plat_DebugString( const char * psz )
 {
 #if defined( _WIN32 ) && !defined( _X360 )
