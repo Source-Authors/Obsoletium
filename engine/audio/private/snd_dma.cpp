@@ -447,7 +447,7 @@ typedef struct
 
 static soundfade_t soundfade;  // Client sound fading singleton object
 
-// 0)headphones 2)stereo speakers 4)quad 5)5point1 
+// 0)headphones 2)stereo speakers 4)quad 5)5point1 7)7point1
 // autodetected from windows settings
 ConVar snd_surround( "snd_surround_speakers", "-1", FCVAR_INTERNAL_USE );
 ConVar snd_legacy_surround( "snd_legacy_surround", "0", FCVAR_ARCHIVE );

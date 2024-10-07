@@ -644,6 +644,22 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_ACTIVATEAPP:
 		{
+			// dimhotepus: Unify way to handle sound mute on focus lost.
+			ConVarRef snd_mute_losefocus("snd_mute_losefocus");
+			if (snd_mute_losefocus.GetBool())
+			{
+				if ( wParam == 1 )
+				{
+					S_UnblockSound();
+				}
+				else
+				{
+					S_BlockSound();
+					// dimhotepus: Need to be thread-safe.
+					// S_ClearBuffer();
+				}
+			}
+
 			if ( CanPostActivateEvents() )
 			{
 				bool bActivated = ( wParam == 1 );
