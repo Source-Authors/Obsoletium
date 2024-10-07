@@ -7,6 +7,7 @@
 //=============================================================================//
 
 #include "basetypes.h"
+#include "sound.h"
 #include "snd_fixedint.h"
 
 #ifndef SOUND_PRIVATE_H

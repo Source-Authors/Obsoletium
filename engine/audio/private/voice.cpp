@@ -368,7 +368,7 @@ public:
 
 	void Flush()
 	{
-		for ( int i = m_VoiceWriter.FirstInorder(); i != m_VoiceWriter.InvalidIndex(); i = m_VoiceWriter.NextInorder( i ) )
+		for ( auto i = m_VoiceWriter.FirstInorder(); i != m_VoiceWriter.InvalidIndex(); i = m_VoiceWriter.NextInorder( i ) )
 		{
 			CVoiceWriterData *data = &m_VoiceWriter[ i ];
 
@@ -386,7 +386,7 @@ public:
 			return;
 		}
 
-		for ( int i = m_VoiceWriter.FirstInorder(); i != m_VoiceWriter.InvalidIndex(); i = m_VoiceWriter.NextInorder( i ) )
+		for ( auto i = m_VoiceWriter.FirstInorder(); i != m_VoiceWriter.InvalidIndex(); i = m_VoiceWriter.NextInorder( i ) )
 		{
 			CVoiceWriterData *data = &m_VoiceWriter[ i ];
 			
@@ -420,7 +420,7 @@ public:
 
 		CVoiceWriterData search;
 		search.m_pChannel = ch;
-		int idx = m_VoiceWriter.Find( search ); 
+		auto idx = m_VoiceWriter.Find( search ); 
 		if ( idx == m_VoiceWriter.InvalidIndex() )
 		{
 			idx = m_VoiceWriter.Insert( search );

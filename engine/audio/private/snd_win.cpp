@@ -1,8 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
-//
-//=====================================================================================//
+// Purpose: Sound device dispatch and initialization.
 
 #include "audio_pch.h"
 
@@ -17,8 +15,54 @@ ConVar snd_audioqueue( "snd_audioqueue", "1" );
 
 #endif
 
+#include "snd_dev_xaudio.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+// dimhotepus: Allow to override sound device.
+ConVar snd_device_override( "snd_device_override", "0", FCVAR_ARCHIVE,
+	"Allow to override used sound device.\nPossible values:\n"
+	"0\tAutodetection\n"
+#ifdef PLATFORM_WINDOWS
+	"1\tXAudio 2 [default]\n"
+	"2\tDirect Sound 8\n",
+#elif defined(OSX)
+	"1\tMac Audio Queue [default]\n"
+	"2\tOpen AL\n",
+#elif defined(USE_SDL)
+	"1\tSDL [default]",
+#endif
+	true,
+	0,
+	true,
+#if defined(PLATFORM_WINDOWS)
+	2
+#elif defined(OSX)
+	2
+#elif defined(USE_SDL)
+	1
+#endif
+);
+
+/**
+ * @brief Audio device kind.
+ */
+enum class AudioDeviceKind {
+	/**
+	 * @brief Autodetect.
+	 */
+	kAutodetect = 0
+#ifdef PLATFORM_WINDOWS
+	, kXAudio2 = 1
+	, kDirectSound8 = 2
+#elif defined(OSX)
+	, kMacAudioQueue = 1
+	, kOpenAL = 2
+#elif defined(USE_SDL)
+	, kSDL = 2
+#endif
+};
 
 bool snd_firsttime = true;
 
@@ -26,14 +70,9 @@ bool snd_firsttime = true;
  * Global variables. Must be visible to window-procedure function 
  *  so it can unlock and free the data block after it has been played. 
  */ 
-IAudioDevice *g_AudioDevice = NULL;
+IAudioDevice *g_AudioDevice = nullptr;
 
-/*
-==================
-S_BlockSound
-==================
-*/
-void S_BlockSound( void )
+void S_BlockSound()
 {
 	if ( !g_AudioDevice )
 		return;
@@ -41,12 +80,7 @@ void S_BlockSound( void )
 	g_AudioDevice->Pause();
 }
 
-/*
-==================
-S_UnblockSound
-==================
-*/
-void S_UnblockSound( void )
+void S_UnblockSound()
 {
 	if ( !g_AudioDevice )
 		return;
@@ -54,75 +88,75 @@ void S_UnblockSound( void )
 	g_AudioDevice->UnPause();
 }
 
-/*
-==================
-AutoDetectInit
-
-Try to find a sound device to mix for.
-Returns a CAudioNULLDevice if nothing is found.
-==================
-*/
+/**
+ * @brief Autodetect and find sound device to mix on.
+ * @param Unused.
+ * @return Audio device to mix on. Null device when no sound.
+ */
 IAudioDevice *IAudioDevice::AutoDetectInit()
 {
-	IAudioDevice *pDevice = NULL;
+	IAudioDevice *pDevice = nullptr;
 
-	if ( IsPC() )
-	{
 #if defined( WIN32 ) && !defined( USE_SDL )
-		if ( snd_firsttime )
-		{
-			pDevice = Audio_CreateDirectSoundDevice();
+	if ( snd_firsttime )
+	{
+		const auto device_override =
+			static_cast<AudioDeviceKind>(snd_device_override.GetInt());
+
+		switch (device_override) {
+			default:
+				Warning( "Unknown 'snd_device_override' con var value %d. Using autodetection.\n",
+					to_underlying(device_override) );
+				[[fallthrough]];
+
+			case AudioDeviceKind::kAutodetect:
+			case AudioDeviceKind::kXAudio2:
+				{
+					pDevice = Audio_CreateXAudioDevice();
+					if ( pDevice )
+					{
+						// XAudio2 requires threaded mixing.
+						S_EnableThreadedMixing( true );
+					}
+				}
+				break;
+
+			case AudioDeviceKind::kDirectSound8:
+				pDevice = Audio_CreateDirectSoundDevice();
+				break;
 		}
+	}
 #elif defined(OSX)
-		if ( !CommandLine()->CheckParm( "-snd_openal" ) )
-		{
-			DevMsg( "Using AudioQueue Interface\n" );
+	const auto device_override =
+		static_cast<AudioDeviceKind>(snd_device_override.GetInt());
+
+	switch (device_override) {
+		default:
+			Warning( "Unknown 'snd_device_override' con var value %d. Using autodetection.\n",
+				to_underlying(device_override) );
+			[[fallthrough]];
+
+		case AudioDeviceKind::kAutodetect:
+		case AudioDeviceKind::kMacAudioQueue:
 			pDevice = Audio_CreateMacAudioQueueDevice();
-		}
-		if ( !pDevice )
-		{
-			DevMsg( "Using OpenAL Interface\n" );
-			pDevice = Audio_CreateOpenALDevice(); // fall back to openAL if the audio queue fails
-		}
+			break;
+
+		case AudioDeviceKind::kOpenAL:
+			pDevice = Audio_CreateOpenALDevice();
+			break;
+	}
+
+	if ( !pDevice )
+	{
+		// fall back to openAL if the audio queue fails
+		DevMsg( "Using OpenAL Interface\n" );
+		pDevice = Audio_CreateOpenALDevice();
+	}
 #elif defined( USE_SDL )
-		DevMsg( "Trying SDL Audio Interface\n" );
-		pDevice = Audio_CreateSDLAudioDevice();
-
-#ifdef NEVER
-		// Jul 2012. mikesart. E-mail exchange with Ryan Gordon after figuring out that
-		// Audio_CreatePulseAudioDevice() wasn't working on Ubuntu 12.04 (lots of stuttering).
-		//
-		// > I installed libpulse-dev, rebuilt SDL, and now SDL is using pulse
-		// > audio and everything is working great. However I'm wondering if we
-		// > need to fall back to PulseAudio in our codebase if SDL is doing that
-		// > for us. I mean, is it worth me going through and debugging our Pulse
-		// > Audio path or should I just remove it?
-		// 
-		// Remove it...it never worked well, and only remained in case there were
-		// concerns about relying on SDL. The SDL codepath is way easier to read,
-		// simpler to maintain, and handles all sorts of strange audio backends,
-		// including Pulse.
-		if ( !pDevice )
-		{
-			DevMsg( "Trying PulseAudio Interface\n" );
-			pDevice = Audio_CreatePulseAudioDevice(); // fall back to PulseAudio if SDL fails
-		}
-#endif // NEVER
-
+	DevMsg( "Trying SDL Audio Interface\n" );
+	pDevice = Audio_CreateSDLAudioDevice();
 #else
 #error "Please define your platform"
-#endif
-	}
-#if defined( _X360 )
-	else
-	{
-		pDevice = Audio_CreateXAudioDevice( true );
-		if ( pDevice )
-		{
-			// xaudio requires threaded mixing
-			S_EnableThreadedMixing( true );
-		}
-	}
 #endif
 
 	snd_firsttime = false;
@@ -130,7 +164,7 @@ IAudioDevice *IAudioDevice::AutoDetectInit()
 	if ( !pDevice )
 	{
 		if ( snd_firsttime )
-			DevMsg( "No sound device initialized\n" );
+			DevMsg( "No sound device initialized.\n" );
 
 		return Audio_GetNullDevice();
 	}
@@ -138,14 +172,7 @@ IAudioDevice *IAudioDevice::AutoDetectInit()
 	return pDevice;
 }
 
-/*
-==============
-SNDDMA_Shutdown
-
-Reset the sound device for exiting
-===============
-*/
-void SNDDMA_Shutdown( void )
+void SNDDMA_Shutdown()
 {
 	if ( g_AudioDevice != Audio_GetNullDevice() )
 	{
@@ -159,4 +186,3 @@ void SNDDMA_Shutdown( void )
 		g_AudioDevice = Audio_GetNullDevice();
 	}
 }
-
