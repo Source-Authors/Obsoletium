@@ -75,7 +75,8 @@ VoiceEncoder_Celt::VoiceEncoder_Celt() {
 VoiceEncoder_Celt::~VoiceEncoder_Celt() {
   TermStates();
 
-  Msg("Shut down CELT codec %u (bit stream version)\n", CELT_GET_BITSTREAM_VERSION);
+  Msg("Shut down CELT codec %u (bit stream version)\n",
+      CELT_GET_BITSTREAM_VERSION);
 }
 
 bool VoiceEncoder_Celt::Init(VoiceCodecQuality quality, int &raw_frame_size,
@@ -90,7 +91,8 @@ bool VoiceEncoder_Celt::Init(VoiceCodecQuality quality, int &raw_frame_size,
   preset_ = kCeltPresets[to_underlying(quality)];
   raw_frame_size = preset_.frame_size * BYTES_PER_SAMPLE;
 
-  Msg("Start up CELT codec %u  (bit stream version)\n", CELT_GET_BITSTREAM_VERSION);
+  Msg("Start up CELT codec %u  (bit stream version)\n",
+      CELT_GET_BITSTREAM_VERSION);
 
   int rc = 0;
 
@@ -98,8 +100,7 @@ bool VoiceEncoder_Celt::Init(VoiceCodecQuality quality, int &raw_frame_size,
   if (!mode_) {
     Warning(
         "CELT codec (%d Hz, %d channel(s), %d samples/channel) startup "
-        "failure: "
-        "%s\n",
+        "failure: %s\n",
         preset_.sample_rate, kEncoderDecoderChannelsNo, preset_.frame_size,
         celt_strerror(rc));
     return false;
@@ -188,8 +189,7 @@ void VoiceEncoder_Celt::DecodeFrame(const char *in, char *out) {
     if (rc) {
       Warning(
           "CELT decoder (%d Hz, %d channel(s), %d samples/channel, %d in "
-          "bytes) "
-          "zero data failure: %s\n",
+          "bytes) zero data failure: %s\n",
           preset_.sample_rate, kEncoderDecoderChannelsNo, preset_.frame_size,
           preset_.packet_size, celt_strerror(rc));
     }

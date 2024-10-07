@@ -1,872 +1,1114 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: X360 XAudio Version
-//
-//=====================================================================================//
-
+// Purpose: PC XAudio2 Version.
 
 #include "audio_pch.h"
+
 #include "snd_dev_xaudio.h"
-#include "UtlLinkedList.h"
-#include "session.h"
-#include "server.h"
-#include "client.h"
-#include "matchmaking.h"
+#include "tier1/utllinkedlist.h"
+#include "tier3/tier3.h"
+#include "video/ivideoservices.h"
+
+#include "winlite.h"
+#include "com_ptr.h"
+
+#include <xaudio2.h>
+#include <initguid.h>
+#include <ks.h>
+#include <ksmedia.h>
+#include <mmdeviceapi.h>
+#include <Functiondiscoverykeys_devpkey.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-// The outer code mixes in PAINTBUFFER_SIZE (# of samples) chunks (see MIX_PaintChannels), we will never need more than
-// that many samples in a buffer.  This ends up being about 20ms per buffer
-#define XAUDIO2_BUFFER_SAMPLES	8192
-// buffer return has a latency, so need a decent pool
-#define MAX_XAUDIO2_BUFFERS		32
+/**
+ * @brief Should spew XAudio2 packets delivery stats?
+ */
+ConVar snd_xaudio_spew_packets("snd_xaudio_spew_packets", "0", 0,
+                               "Spew XAudio2 packet delivery", true, 0, true,
+                               1);
 
+extern ConVar snd_mute_losefocus;
 
-#define SURROUND_HEADPHONES		0
-#define SURROUND_STEREO			2
-#define SURROUND_DIGITAL5DOT1	5
+namespace {
 
-// 5.1 means there are a max of 6 channels
-#define MAX_DEVICE_CHANNELS		6
+/**
+ * @brief Add prefix for message group to message.
+ * @tparam out_size
+ * @param out Result message.
+ * @param group Group name to prefix.
+ * @param message Message.
+ * @return Result message.
+ */
+template <size_t out_size>
+const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
+                               const char *message) {
+  const size_t length{strlen(message)};
+  if (length > 1 && message[length - 1] == '\n') {
+    Q_snprintf(out, std::size(out), "[%s] %s", group, message);
+  } else {
+    Q_snprintf(out, std::size(out), "%s", message);
+  }
 
-ConVar snd_xaudio_spew_packets( "snd_xaudio_spew_packets", "0", 0, "Spew XAudio packet delivery" );
+  return out;
+}
 
+/**
+ * @brief Thread-safe debug warn. Can't use tier0/dbg as it writes to console
+ * and not thread safe.
+ * @param format Format.
+ * @param Data.
+ */
+void DebugWarn(PRINTF_FORMAT_STRING const char *format, ...) {
+  char tmp[512];
+  tmp[0] = '\0';
 
+  va_list argptr;
+  va_start(argptr, format);
+  V_vsnprintf(tmp, ssize(tmp), format, argptr);
+  va_end(argptr);
 
-//-----------------------------------------------------------------------------
-// Implementation of XAudio
-//-----------------------------------------------------------------------------
-class CAudioXAudio : public CAudioDeviceBase
-{
-public:
-	~CAudioXAudio( void );
+  char buffer[512];
+  Plat_DebugString(PrefixMessageGroup(buffer, "xaudio2", tmp));
+}
 
-	bool		IsActive( void ) { return true; }
-	bool		Init( void );
-	void		Shutdown( void );
+/**
+ * @brief The outer code mixes in PAINTBUFFER_SIZE (# of samples) chunks (see
+ * MIX_PaintChannels), we will never need more than that many samples in a
+ * buffer.  This ends up being about 20ms per buffer.
+ */
+constexpr inline unsigned kXAudio2BufferSamplesCount{8192u};
 
-	void		Pause( void );
-	void		UnPause( void );
-	int			PaintBegin( float mixAheadTime, int soundtime, int paintedtime );
-	int			GetOutputPosition( void );
-	void		ClearBuffer( void );
-	void		TransferSamples( int end );
+/**
+ * @brief 7.1 means there are a max of 8 channels.
+ */
+constexpr inline unsigned kMaxXAudio2DeviceChannels{
+    std::min(8, XAUDIO2_MAX_AUDIO_CHANNELS)};
 
-	const char *DeviceName( void );
-	int			DeviceChannels( void )		{ return m_deviceChannels; }
-	int			DeviceSampleBits( void )	{ return m_deviceSampleBits; }
-	int			DeviceSampleBytes( void )	{ return m_deviceSampleBits/8; }
-	int			DeviceDmaSpeed( void )		{ return m_deviceDmaSpeed; }	
-	int			DeviceSampleCount( void )	{ return m_deviceSampleCount; }
+/**
+ * @brief Buffer return has a latency, so need a decent pool.
+ */
+constexpr inline unsigned kMaxXAudio2DeviceBuffersCount{
+    std::min(kMaxXAudio2DeviceChannels * 6u,
+             static_cast<unsigned>(XAUDIO2_MAX_QUEUED_BUFFERS))};
 
-
-
-	void		XAudioPacketCallback( int hCompletedBuffer );
-
-	static		CAudioXAudio *m_pSingleton;
-
-	CXboxVoice *GetVoiceData( void ) { return &m_VoiceData; }
-	IXAudio2	*GetXAudio2( void ) { return m_pXAudio2; }
-
-private:
-	int			TransferStereo( const portable_samplepair_t *pFront, int paintedTime, int endTime, char *pOutptuBuffer );
-	int			TransferSurroundInterleaved( const portable_samplepair_t *pFront, const portable_samplepair_t *pRear, const portable_samplepair_t *pCenter, int paintedTime, int endTime, char *pOutputBuffer );
-
-	int			m_deviceChannels;					// channels per hardware output buffer (1 for quad/5.1, 2 for stereo)
-	int			m_deviceSampleBits;					// bits per sample (16)
-	int			m_deviceSampleCount;				// count of mono samples in output buffer
-	int			m_deviceDmaSpeed;					// samples per second per output buffer
-	int			m_clockDivider;
-
-	IXAudio2				*m_pXAudio2;
-	IXAudio2MasteringVoice	*m_pMasteringVoice;
-	IXAudio2SourceVoice		*m_pSourceVoice;
-
-	XAUDIO2_BUFFER		m_Buffers[MAX_XAUDIO2_BUFFERS];
-	BYTE				*m_pOutputBuffer;
-	int					m_bufferSizeBytes;			// size of a single hardware output buffer, in bytes
-	CInterlockedUInt	m_BufferTail;
-	CInterlockedUInt	m_BufferHead;
-	
-	CXboxVoice			m_VoiceData;
+/**
+ * @brief Audio device form factor.
+ */
+enum class AudioDeviceFormFactor {
+  /**
+   * @brief Headphones or headset.
+   */
+  HeadphonesOrHeadset = 0,
+  /**
+   * @brief Mono speaker.
+   */
+  MonoSpeaker = 1,
+  /**
+   * @brief Stereo speakers.
+   */
+  StereoSpeakers = 2,
+  /**
+   * @brief Quad speakers.
+   */
+  QuadSpeakers = 4,
+  /**
+   * @brief 5.1 surround speakers.
+   */
+  Digital5Dot1Surround = 5,
+  /**
+   * @brief 7.1 surround speakers.
+   */
+  Digital7Dot1Surround = 7
 };
 
-CAudioXAudio *CAudioXAudio::m_pSingleton = NULL;
+[[nodiscard]] constexpr short AdjustSampleVolume(int sample,
+                                                 int volume_factor) noexcept {
+  return CLIP((sample * volume_factor) >> 8);
+}
 
-//-----------------------------------------------------------------------------
-// XAudio packet completion callback
-//-----------------------------------------------------------------------------
-class XAudio2VoiceCallback : public IXAudio2VoiceCallback
-{
-public:
-    XAudio2VoiceCallback() {}
-    ~XAudio2VoiceCallback() {}
+}  // namespace
 
-    void OnStreamEnd() {}
+namespace se::engine::audio::xaudio2 {
 
-    void OnVoiceProcessingPassEnd() {}
-
-    void OnVoiceProcessingPassStart( UINT32 SamplesRequired ) {}
-
-    void OnBufferEnd( void *pBufferContext ) 
-	{
-		CAudioXAudio::m_pSingleton->XAudioPacketCallback( (int)pBufferContext );
-	}
-
-    void OnBufferStart( void *pBufferContext ) {}
-
-    void OnLoopEnd( void *pBufferContext ) {}
-
-    void OnVoiceError( void *pBufferContext, HRESULT Error ) {}
+/**
+ * @brief Callback for XAudio2 device events.
+ */
+struct AudioXAudio2Callback {
+  /**
+   * @brief Called when this voice has just finished processing a buffer.  The
+   * buffer can now be reused or destroyed.
+   * @param buffer_idx Buffer index.
+   */
+  virtual void OnBufferEnd(size_t buffer_idx) = 0;
 };
-XAudio2VoiceCallback s_XAudio2VoiceCallback;
 
+/**
+ * @brief Client notification interface for XAudio2 voice events.
+ */
+class XAudio2VoiceCallback : public IXAudio2VoiceCallback {
+ public:
+  explicit XAudio2VoiceCallback(AudioXAudio2Callback *callback)
+      : callback_{callback} {
+    Assert(!!callback);
+  }
+  ~XAudio2VoiceCallback() = default;
 
+  STDMETHOD_(void, OnStreamEnd)() override {}
 
-//-----------------------------------------------------------------------------
+  STDMETHOD_(void, OnVoiceProcessingPassEnd)() override {}
+
+  STDMETHOD_(void, OnVoiceProcessingPassStart)
+  (UINT32 samples_required) override {}
+
+  /**
+   * @brief Called when this voice has just finished processing a buffer.  The
+   * buffer can now be reused or destroyed.
+   * @param ctx Context. Buffer index in our case.
+   */
+  STDMETHOD_(void, OnBufferEnd)(void *ctx) override {
+    callback_->OnBufferEnd(reinterpret_cast<size_t>(ctx));
+  }
+
+  STDMETHOD_(void, OnBufferStart)(void *) override {}
+
+  STDMETHOD_(void, OnLoopEnd)(void *) override {}
+
+  /**
+   * @brief Called in the event of a critical error during voice processing,
+   * such as a failing xAPO or an error from the hardware XMA decoder.  The
+   * voice may have to be destroyed and re-created to recover from the error.
+   * The callback arguments report which buffer was being processed when the
+   * error occurred, and its HRESULT code.
+   * @param ctx Context. Buffer index in our case.
+   * @param hr. HRESULT with error code.
+   */
+  STDMETHOD_(void, OnVoiceError)(void *ctx, HRESULT hr) override {
+    DebugWarn("Voice processing error for buffer %zu: 0x%8x",
+              reinterpret_cast<size_t>(ctx), hr);
+  }
+
+ private:
+  AudioXAudio2Callback *callback_;
+};
+
+// Implementation of XAudio2 device.
+class CAudioXAudio2 : public CAudioDeviceBase, AudioXAudio2Callback {
+ public:
+  friend IAudioDevice * ::Audio_CreateXAudioDevice();
+
+  CAudioXAudio2() : xaudio2_voice_callback_{this} {}
+  ~CAudioXAudio2() = default;
+
+  bool IsActive() override { return true; }
+  bool Init() override;
+  void Shutdown() override;
+
+  void Pause() override;
+  void UnPause() override;
+  int PaintBegin(float mix_ahead_time, int sound_time,
+                 int painted_time) override;
+  int GetOutputPosition() override;
+  void ClearBuffer() override;
+  void TransferSamples(int end) override;
+
+  const char *DeviceName() override;
+  int DeviceChannels() override { return device_channels_count_; }
+  int DeviceSampleBits() override { return device_bits_per_sample_; }
+  int DeviceSampleBytes() override { return device_bits_per_sample_ / 8; }
+  int DeviceDmaSpeed() override { return device_sample_rate_; }
+  int DeviceSampleCount() override { return device_samples_count_; }
+
+  void OnBufferEnd(size_t buffer_idx) override;
+
+ private:
+  unsigned TransferStereo(const portable_samplepair_t *front, int painted_time,
+                          int end_time, unsigned char *out_buffer);
+
+  unsigned TransferMultichannelSurroundInterleaved(
+      const portable_samplepair_t *front, const portable_samplepair_t *rear,
+      const portable_samplepair_t *center, int painted_time, int end_time,
+      unsigned char *out_buffer);
+
+  // Channels per hardware output buffer (6 for 5.1, 2 for stereo)
+  unsigned short device_channels_count_;
+  // Bits per sample (16).
+  unsigned short device_bits_per_sample_;
+  // Count of mono samples in output buffer.
+  unsigned device_samples_count_;
+  // Samples per second per output buffer.
+  unsigned device_sample_rate_;
+
+  unsigned device_clock_divider_;
+
+  se::win::com::com_ptr<IMMDeviceEnumerator> mm_device_enumerator_;
+  se::win::com::com_ptr<IMMNotificationClient> mm_notification_client_;
+
+  se::win::com::com_ptr<IXAudio2> xaudio2_engine_;
+  IXAudio2MasteringVoice *xaudio2_mastering_voice_;
+  IXAudio2SourceVoice *xaudio2_source_voice_;
+
+  XAUDIO2_BUFFER audio_buffers_[kMaxXAudio2DeviceBuffersCount];
+  BYTE *all_audio_buffers_;
+  // Size of a single hardware output buffer, in bytes.
+  unsigned audio_buffer_size_;
+
+  CInterlockedUInt audio_buffer_tail_pos_;
+  CInterlockedUInt audio_buffer_head_pos_;
+
+  XAudio2VoiceCallback xaudio2_voice_callback_;
+};
+
+Singleton<CAudioXAudio2> g_xaudio2_device;
+
+}  // namespace se::engine::audio::xaudio2
+
 // Create XAudio Device
-//-----------------------------------------------------------------------------
-IAudioDevice *Audio_CreateXAudioDevice( void )
-{
-	MEM_ALLOC_CREDIT();
+IAudioDevice *Audio_CreateXAudioDevice() {
+  MEM_ALLOC_CREDIT();
 
-	if ( !CAudioXAudio::m_pSingleton )
-	{
-		CAudioXAudio::m_pSingleton = new CAudioXAudio;
-	}
+  using se::engine::audio::xaudio2::g_xaudio2_device;
 
-	if ( !CAudioXAudio::m_pSingleton->Init() )
-	{
-		delete CAudioXAudio::m_pSingleton;
-		CAudioXAudio::m_pSingleton = NULL;
-	}
+  auto *device = g_xaudio2_device.GetInstance();
 
-	return CAudioXAudio::m_pSingleton;
+  if (!device->Init()) {
+    g_xaudio2_device.Delete();
+
+    return nullptr;
+  }
+
+  return device;
 }
 
-CXboxVoice *Audio_GetXVoice( void )
-{
-	if ( CAudioXAudio::m_pSingleton )
-	{
-		return CAudioXAudio::m_pSingleton->GetVoiceData();
-	}
+namespace se::engine::audio::xaudio2 {
 
-	return NULL;
+class ScopedPropVariant {
+ public:
+  ScopedPropVariant() noexcept { PropVariantInit(&prop_); }
+  ~ScopedPropVariant() noexcept {
+    [[maybe_unused]] HRESULT hr{PropVariantClear(&prop_)};
+    Assert(SUCCEEDED(hr));
+  }
+
+  [[nodiscard]] VARTYPE type() const noexcept { return prop_.vt; }
+
+  [[nodiscard]] PROPVARIANT *operator&() noexcept { return &prop_; }
+
+  [[nodiscard]] bool as_wide_string(wchar_t *&str) const noexcept {
+    if (prop_.vt == VT_LPWSTR) {
+      str = prop_.pwszVal;
+      return true;
+    }
+
+    str = nullptr;
+    return false;
+  }
+
+  [[nodiscard]] bool as_uint(unsigned &value) const noexcept {
+    if (prop_.vt == VT_UI4) {
+      value = prop_.uintVal;
+      return true;
+    }
+
+    value = UINT_MAX;
+    return false;
+  }
+
+  ScopedPropVariant(ScopedPropVariant &) = delete;
+  ScopedPropVariant(ScopedPropVariant &&v) noexcept
+      : prop_{std::move(v.prop_)} {
+    memset(&v, 0, sizeof(v));
+  }
+  ScopedPropVariant &operator=(ScopedPropVariant &) = delete;
+  ScopedPropVariant &operator=(ScopedPropVariant &&v) noexcept {
+    std::swap(v.prop_, prop_);
+    return *this;
+  }
+
+ private:
+  PROPVARIANT prop_;
+};
+
+static bool GetDefaultAudioDeviceFormFactor(
+    se::win::com::com_ptr<IMMDeviceEnumerator> &mm_device_enumerator,
+    EDataFlow device_data_flow, ERole device_role,
+    AudioDeviceFormFactor &form_factor) {
+  // Default value.
+  form_factor = AudioDeviceFormFactor::StereoSpeakers;
+
+  se::win::com::com_ptr<IMMDevice> default_render_device;
+  HRESULT hr{mm_device_enumerator->GetDefaultAudioEndpoint(
+      device_data_flow, device_role, &default_render_device)};
+  if (FAILED(hr)) {
+    DebugWarn("Get default audio render endpoint failed w/e 0x%8x.\n", hr);
+    return false;
+  }
+
+  se::win::com::com_ptr<IPropertyStore> props;
+  hr = default_render_device->OpenPropertyStore(STGM_READ, &props);
+  if (FAILED(hr)) {
+    DebugWarn("Get default audio render endpoint props failed w/e 0x%8x.\n",
+              hr);
+    return false;
+  }
+
+  ScopedPropVariant device_friendly_name;
+  hr = props->GetValue(PKEY_Device_FriendlyName, &device_friendly_name);
+  if (SUCCEEDED(hr)) {
+    wchar_t *audio_device_name{nullptr};
+    if (device_friendly_name.as_wide_string(audio_device_name)) {
+      // Print endpoint friendly name and endpoint ID.
+      DebugWarn("Using system audio device \"%S\".\n", audio_device_name);
+    } else {
+      DebugWarn("Using system audio device \"%S\".\n", L"N/A");
+    }
+  } else {
+    DebugWarn(
+        "Get default audio render endpoint friendly name failed w/e 0x%8x.\n",
+        hr);
+    // Continue.
+  }
+
+  ScopedPropVariant device_physical_speakers;
+  hr = props->GetValue(PKEY_AudioEndpoint_PhysicalSpeakers,
+                       &device_physical_speakers);
+  if (SUCCEEDED(hr)) {
+    unsigned physical_speakers_mask{UINT_MAX};
+    // May fail.
+    if (device_physical_speakers.as_uint(physical_speakers_mask)) {
+      if ((physical_speakers_mask & KSAUDIO_SPEAKER_7POINT1_SURROUND) ==
+              KSAUDIO_SPEAKER_7POINT1_SURROUND ||
+          // Obsolete, but still.
+          (physical_speakers_mask & KSAUDIO_SPEAKER_7POINT1) &
+              KSAUDIO_SPEAKER_7POINT1) {
+        form_factor = AudioDeviceFormFactor::Digital7Dot1Surround;
+        return true;
+      }
+
+      if ((physical_speakers_mask & KSAUDIO_SPEAKER_5POINT1_SURROUND) ==
+              KSAUDIO_SPEAKER_5POINT1_SURROUND ||
+          // Obsolete, but still.
+          (physical_speakers_mask & KSAUDIO_SPEAKER_5POINT1) &
+              KSAUDIO_SPEAKER_5POINT1) {
+        form_factor = AudioDeviceFormFactor::Digital5Dot1Surround;
+        return true;
+      }
+
+      if ((physical_speakers_mask & KSAUDIO_SPEAKER_QUAD) ==
+          KSAUDIO_SPEAKER_QUAD) {
+        form_factor = AudioDeviceFormFactor::QuadSpeakers;
+        return true;
+      }
+
+      if ((physical_speakers_mask & KSAUDIO_SPEAKER_STEREO) ==
+          KSAUDIO_SPEAKER_STEREO) {
+        form_factor = AudioDeviceFormFactor::StereoSpeakers;
+        return true;
+      }
+
+      if ((physical_speakers_mask & KSAUDIO_SPEAKER_MONO) ==
+          KSAUDIO_SPEAKER_MONO) {
+        form_factor = AudioDeviceFormFactor::MonoSpeaker;
+        return true;
+      }
+    }
+
+    // Fallback to PKEY_AudioEndpoint_FormFactor.
+  } else {
+    DebugWarn(
+        "Get default audio render endpoint physical speakers mask failed w/e "
+        "0x%8x.\n",
+        hr);
+
+    // Fallback to PKEY_AudioEndpoint_FormFactor.
+  }
+
+  ScopedPropVariant device_form_factor;
+  hr = props->GetValue(PKEY_AudioEndpoint_FormFactor, &device_form_factor);
+  if (SUCCEEDED(hr)) {
+    unsigned untyped_factor{UINT_MAX};
+    if (device_form_factor.as_uint(untyped_factor)) {
+      EndpointFormFactor typed_factor =
+          static_cast<EndpointFormFactor>(untyped_factor);
+
+      if (typed_factor == EndpointFormFactor::Headphones ||
+          typed_factor == EndpointFormFactor::Headset) {
+        form_factor = AudioDeviceFormFactor::HeadphonesOrHeadset;
+      }
+
+      if (typed_factor == EndpointFormFactor::Handset ||
+          typed_factor == EndpointFormFactor::Speakers) {
+        form_factor = AudioDeviceFormFactor::StereoSpeakers;
+      }
+    }
+  } else {
+    DebugWarn(
+        "Get default audio render endpoint form factor failed w/e 0x%8x.\n",
+        hr);
+    return false;
+  }
+
+  return true;
 }
 
-IXAudio2 *Audio_GetXAudio2( void )
-{
-	if ( CAudioXAudio::m_pSingleton )
-	{
-		return CAudioXAudio::m_pSingleton->GetXAudio2();
-	}
+class DefaultAudioDeviceChangedNotificationClient
+    : public IMMNotificationClient {
+ public:
+  // Copy enumerator to ensure it is alive till client destructed.
+  static HRESULT Create(
+      se::win::com::com_ptr<IMMDeviceEnumerator> mm_device_enumerator,
+      EDataFlow device_data_flow, ERole device_role,
+      IMMNotificationClient **client) noexcept {
+    if (!mm_device_enumerator || !client) return E_POINTER;
 
-	return NULL;
+    auto *default_client = new DefaultAudioDeviceChangedNotificationClient(
+        std::move(mm_device_enumerator), device_data_flow, device_role);
+    const HRESULT hr{default_client->registration_hr()};
+    if (SUCCEEDED(hr)) {
+      *client = default_client;
+      return S_OK;
+    }
+
+    default_client->Release();
+    return hr;
+  }
+
+  HRESULT STDMETHODCALLTYPE QueryInterface(
+      REFIID riid, _COM_Outptr_ void __RPC_FAR *__RPC_FAR *ppvObject) override {
+    if (IID_IUnknown == riid) {
+      AddRef();
+      *ppvObject = static_cast<IUnknown *>(this);
+    } else if (__uuidof(IMMNotificationClient) == riid) {
+      AddRef();
+      *ppvObject = static_cast<IMMNotificationClient *>(this);
+    } else {
+      *ppvObject = nullptr;
+      return E_NOINTERFACE;
+    }
+
+    return S_OK;
+  }
+
+  ULONG STDMETHODCALLTYPE AddRef() override { return ++ref_counter_; }
+
+  ULONG STDMETHODCALLTYPE Release() override {
+    ULONG current_ref_counter = --ref_counter_;
+    if (current_ref_counter == 0) {
+      delete this;
+    }
+    return current_ref_counter;
+  }
+
+  HRESULT STDMETHODCALLTYPE OnDeviceStateChanged(
+      _In_ LPCWSTR pwstrDeviceId, _In_ DWORD dwNewState) override {
+    return S_OK;
+  }
+
+  HRESULT STDMETHODCALLTYPE OnDeviceAdded(_In_ LPCWSTR pwstrDeviceId) override {
+    return S_OK;
+  }
+
+  HRESULT STDMETHODCALLTYPE
+  OnDeviceRemoved(_In_ LPCWSTR pwstrDeviceId) override {
+    return S_OK;
+  }
+
+  HRESULT STDMETHODCALLTYPE
+  OnDefaultDeviceChanged(_In_ EDataFlow flow, _In_ ERole role,
+                         _In_opt_ LPCWSTR pwstrDefaultDeviceId) override {
+    // Note, this code executed from system thread.
+    //
+    // In implementing the IMMNotificationClient interface, the client should
+    // observe these rules to avoid deadlocks and undefined behavior:
+    //
+    // 1. The methods of the interface must be nonblocking.  The client should
+    // never wait on a synchronization object during an event callback.
+    // 2. To avoid dead locks, the client should never call
+    // IMMDeviceEnumerator::RegisterEndpointNotificationCallback or
+    // IMMDeviceEnumerator::UnregisterEndpointNotificationCallback in its
+    // implementation of IMMNotificationClient methods.
+    // 3. The client should never release the final reference on an MMDevice API
+    // object during an event callback.
+    if (flow == device_data_flow_ && role == device_role_) {
+      DebugWarn("Default system audio '%s' device for '%s' has been %s.\n",
+                GetDeviceDataFlowDescription(device_data_flow_),
+                GetDeviceRoleDescription(device_role_),
+                pwstrDefaultDeviceId != nullptr ? "changed" : "removed");
+
+      if (pwstrDefaultDeviceId) {
+        AudioDeviceFormFactor form_factor{
+            GetDefaultAudioDeviceFormFactor(mm_device_enumerator_, flow, role,
+                                            form_factor)
+                ? form_factor
+                : AudioDeviceFormFactor::StereoSpeakers};
+      } else {
+        // TODO: reinit with null audio device as no audio in system.
+      }
+    }
+
+    return S_OK;
+  }
+
+  HRESULT STDMETHODCALLTYPE OnPropertyValueChanged(
+      _In_ LPCWSTR pwstrDeviceId, _In_ const PROPERTYKEY key) override {
+    return S_OK;
+  }
+
+ private:
+  se::win::com::com_ptr<IMMDeviceEnumerator> mm_device_enumerator_;
+
+  const EDataFlow device_data_flow_;
+  const ERole device_role_;
+
+  std::atomic_ulong ref_counter_;
+  HRESULT registration_hr_;
+
+  DefaultAudioDeviceChangedNotificationClient(
+      se::win::com::com_ptr<IMMDeviceEnumerator> &&mm_device_enumerator,
+      EDataFlow device_data_flow, ERole device_role) noexcept
+      : mm_device_enumerator_{std::move(mm_device_enumerator)},
+        device_data_flow_{device_data_flow},
+        device_role_{device_role} {
+    Assert(!!mm_device_enumerator_);
+
+    AddRef();
+
+    // May fail with out of memory.
+    registration_hr_ =
+        mm_device_enumerator_->RegisterEndpointNotificationCallback(this);
+    Assert(SUCCEEDED(registration_hr_));
+  }
+
+  ~DefaultAudioDeviceChangedNotificationClient() noexcept {
+    if (SUCCEEDED(registration_hr_)) {
+      [[maybe_unused]] HRESULT hr{
+          mm_device_enumerator_->UnregisterEndpointNotificationCallback(this)};
+      Assert(SUCCEEDED(hr));
+    }
+  }
+
+  HRESULT registration_hr() const noexcept { return registration_hr_; }
+
+  [[nodiscard]] static const char *GetDeviceDataFlowDescription(
+      EDataFlow device_data_flow) {
+    switch (device_data_flow) {
+      case EDataFlow::eRender:
+        return "Render";
+      case EDataFlow::eCapture:
+        return "Capture";
+      case EDataFlow::eAll:
+        return "Render & Capture";
+      default:
+        return "N/A";
+    }
+  }
+
+  [[nodiscard]] static const char *GetDeviceRoleDescription(ERole device_role) {
+    switch (device_role) {
+      case ERole::eConsole:
+        return "Games, system notification sounds, and voice commands";
+      case ERole::eMultimedia:
+        return "Music, movies, narration, and live music recording.";
+      case ERole::eCommunications:
+        return "Voice communications (talking to another person).";
+      default:
+        return "N/A";
+    }
+  }
+};
+
+// Updates windows settings based on snd_surround cvar changing.  This should
+// only happen if the user has changed it via the console or the UI.  Changes
+// won't take effect until the engine has restarted.
+void OnSndSurroundCvarChanged(IConVar *con_var, const char *old_string,
+                              float old_value) {
+  // if the old value is -1, we're setting this from the detect routine for the
+  // first time no need to reset the device.
+  if (old_value == -1) return;
+
+  // restart sound system so it takes effect.
+  g_pSoundServices->RestartSoundSystem();
 }
 
-//-----------------------------------------------------------------------------
-// Destructor
-//-----------------------------------------------------------------------------
-CAudioXAudio::~CAudioXAudio( void )
-{
-	m_pSingleton = NULL;
+void OnSndVarChanged(IConVar *con_var, const char *old_string,
+                     float old_value) {
+  ConVarRef var(con_var);
+
+  // restart sound system so the change takes effect
+  if (var.GetInt() != static_cast<int>(old_value)) {
+    g_pSoundServices->RestartSoundSystem();
+  }
 }
 
-//-----------------------------------------------------------------------------
-// Initialize XAudio
-//-----------------------------------------------------------------------------
-bool CAudioXAudio::Init( void )
-{	
-	XAUDIOSPEAKERCONFIG xAudioConfig = 0;
-	XAudioGetSpeakerConfig( &xAudioConfig );
-	snd_surround.SetValue( ( xAudioConfig & XAUDIOSPEAKERCONFIG_DIGITAL_DOLBYDIGITAL ) ? SURROUND_DIGITAL5DOT1 : SURROUND_STEREO );
+// Initialize XAudio2
+bool CAudioXAudio2::Init() {
+  snd_surround.InstallChangeCallback(&OnSndSurroundCvarChanged);
+  snd_mute_losefocus.InstallChangeCallback(&OnSndVarChanged);
 
-	m_bHeadphone = false;
-	m_bSurround = false;
-	m_bSurroundCenter = false;
+  // Audio rendering stream.  Audio data flows from the application to the audio
+  // endpoint device, which renders the stream.
+  constexpr EDataFlow device_data_flow{EDataFlow::eRender};
+  // Audio device for games, system notification sounds, and voice commands.
+  constexpr ERole device_role{ERole::eConsole};
 
-	switch ( snd_surround.GetInt() )
-	{
-	case SURROUND_HEADPHONES:
-		m_bHeadphone = true;
-		m_deviceChannels = 2;
-		break;
+  HRESULT hr{mm_device_enumerator_.CreateInstance(__uuidof(MMDeviceEnumerator),
+                                                  nullptr, CLSCTX_ALL)};
+  if (FAILED(hr)) {
+    Warning("XAudio2: Create media devices enumerator failed w/e 0x%8x.\n", hr);
+    Warning(
+        "XAudio2: Unable to get default system audio device, assume stereo "
+        "speakers.\n");
 
-	default:
-	case SURROUND_STEREO:
-		m_deviceChannels = 2;
-		break;
+    snd_surround.SetValue(to_underlying(AudioDeviceFormFactor::StereoSpeakers));
+  } else {
+    hr = DefaultAudioDeviceChangedNotificationClient::Create(
+        mm_device_enumerator_, device_data_flow, device_role,
+        &mm_notification_client_);
+    if (FAILED(hr)) {
+      Warning(
+          "XAudio2: Create default system audio device change watcher failed "
+          "w/e 0x%8x.\n",
+          hr);
+      Warning(
+          "XAudio2: Changing default system audio device will not change game "
+          "sound output.\n");
+    }
 
-	case SURROUND_DIGITAL5DOT1:
-		m_bSurround = true;	
-		m_bSurroundCenter = true;
-		m_deviceChannels = 6;
-		break;
-	}
+    AudioDeviceFormFactor form_factor{
+        GetDefaultAudioDeviceFormFactor(mm_device_enumerator_, device_data_flow,
+                                        device_role, form_factor)
+            ? form_factor
+            : AudioDeviceFormFactor::StereoSpeakers};
+    snd_surround.SetValue(to_underlying(form_factor));
+  }
 
-	m_deviceSampleBits = 16;
-	m_deviceDmaSpeed = SOUND_DMA_SPEED;
+  m_bHeadphone = false;
+  m_bSurround = false;
+  m_bSurroundCenter = false;
 
-    // initialize the XAudio Engine
-	// Both threads on core 2
-	m_pXAudio2 = NULL;
-	HRESULT hr = XAudio2Create( &m_pXAudio2, 0, XboxThread5 );
-	if ( FAILED( hr ) )
-		return false;
+  switch (snd_surround.GetInt()) {
+    case to_underlying(AudioDeviceFormFactor::HeadphonesOrHeadset):
+      m_bHeadphone = true;
+      device_channels_count_ = 2;
+      break;
 
-	// create the mastering voice, this will upsample to the devices target hw output rate
-    m_pMasteringVoice = NULL;
-	hr = m_pXAudio2->CreateMasteringVoice( &m_pMasteringVoice );
-	if ( FAILED( hr ) )
-        return false;
-	
-	// 16 bit PCM
-	WAVEFORMATEX waveFormatEx = { 0 };
-	waveFormatEx.wFormatTag = WAVE_FORMAT_PCM;
-	waveFormatEx.nChannels = m_deviceChannels;
-	waveFormatEx.nSamplesPerSec = m_deviceDmaSpeed;
-	waveFormatEx.wBitsPerSample = 16;
-	waveFormatEx.nBlockAlign = ( waveFormatEx.nChannels * waveFormatEx.wBitsPerSample ) / 8;
-	waveFormatEx.nAvgBytesPerSec = waveFormatEx.nSamplesPerSec * waveFormatEx.nBlockAlign;
-	waveFormatEx.cbSize = 0;
+    default:
+    // TODO: Add mono speaker support.
+    case to_underlying(AudioDeviceFormFactor::MonoSpeaker):
+    case to_underlying(AudioDeviceFormFactor::StereoSpeakers):
+      device_channels_count_ = 2;
+      break;
 
-	m_pSourceVoice = NULL;
-	hr = m_pXAudio2->CreateSourceVoice( 
-			&m_pSourceVoice, 
-			&waveFormatEx, 
-			0,
-			XAUDIO2_DEFAULT_FREQ_RATIO,
-			&s_XAudio2VoiceCallback,
-			NULL,
-			NULL );
-	if ( FAILED( hr ) )
-        return false;
+    case to_underlying(AudioDeviceFormFactor::QuadSpeakers):
+      m_bSurround = true;
+      device_channels_count_ = 4;
+      break;
 
-	float volumes[MAX_DEVICE_CHANNELS];
-	for ( int i = 0; i < MAX_DEVICE_CHANNELS; i++ )
-	{
-		if ( !m_bSurround && i >= 2 )
-		{
-			volumes[i] = 0;
-		}
-		else
-		{
-			volumes[i] = 1.0;
-		}
-	}
-	m_pSourceVoice->SetChannelVolumes( m_deviceChannels, volumes );
+    case to_underlying(AudioDeviceFormFactor::Digital5Dot1Surround):
+      m_bSurround = true;
+      m_bSurroundCenter = true;
+      device_channels_count_ = 6;
+      break;
 
-	m_bufferSizeBytes = XAUDIO2_BUFFER_SAMPLES * (m_deviceSampleBits/8) * m_deviceChannels;
-	m_pOutputBuffer = new BYTE[MAX_XAUDIO2_BUFFERS * m_bufferSizeBytes];
-	ClearBuffer();
+    case to_underlying(AudioDeviceFormFactor::Digital7Dot1Surround):
+      m_bSurround = true;
+      m_bSurroundCenter = true;
+      device_channels_count_ = 8;
+      break;
+  }
 
-	V_memset( m_Buffers, 0, MAX_XAUDIO2_BUFFERS * sizeof( XAUDIO2_BUFFER ) );
-	for ( int i = 0; i < MAX_XAUDIO2_BUFFERS; i++ )
-	{
-		m_Buffers[i].pAudioData = m_pOutputBuffer + i*m_bufferSizeBytes;
-		m_Buffers[i].pContext = (LPVOID)i;
-	}
-	m_BufferHead = 0;
-	m_BufferTail = 0;
+  // Initialize the XAudio2 Engine.
+  //
+  // If you specify XAUDIO2_ANY_PROCESSOR, the system will use all of the
+  // device's processors and, as noted above, create a worker thread for
+  // each processor.
+  //
+  // Implementations targeting Games and WIN10_19H1 and later, should use
+  // XAUDIO2_USE_DEFAULT_PROCESSOR instead to let XAudio2 select the appropriate
+  // default processor for the hardware platform.
+  hr = XAudio2Create(&xaudio2_engine_, 0, XAUDIO2_USE_DEFAULT_PROCESSOR);
+  if (FAILED(hr)) {
+    Warning("XAudio2: Creating engine failed w/e 0x%8x.\n", hr);
+    return false;
+  }
 
-	// number of mono samples output buffer may hold
-	m_deviceSampleCount = MAX_XAUDIO2_BUFFERS * (m_bufferSizeBytes/(DeviceSampleBytes()));
-	
-	// NOTE: This really shouldn't be tied to the # of bufferable samples.
-	// This just needs to be large enough so that it doesn't fake out the sampling in 
-	// GetSoundTime().  Basically GetSoundTime() assumes a cyclical time stamp and finds wraparound cases
-	// but that means it needs to get called much more often than once per cycle.  So this number should be
-	// much larger than the framerate in terms of output time
-	m_clockDivider = m_deviceSampleCount / DeviceChannels();
+  // Create the mastering voice, this will upsample to the devices target
+  // hardware output rate.
+  hr = xaudio2_engine_->CreateMasteringVoice(&xaudio2_mastering_voice_);
+  if (FAILED(hr)) {
+    Warning("XAudio2: Creating mastering voice failed w/e 0x%8x.\n", hr);
+    return false;
+  }
 
-	// not really part of XAudio2, but mixer xma lacks one-time init, so doing it here
-	XMAPlaybackInitialize();
+  device_bits_per_sample_ = 16;
+  device_sample_rate_ = SOUND_DMA_SPEED;
 
-	hr = m_pSourceVoice->Start( 0 );
-    if ( FAILED( hr ) )
-		return false;
+  // 16 bit PCM
+  WAVEFORMATEX waveFormatEx = {};
+  waveFormatEx.wFormatTag = WAVE_FORMAT_PCM;
+  waveFormatEx.nChannels = device_channels_count_;
+  // Sample rate.
+  waveFormatEx.nSamplesPerSec = device_sample_rate_;
+  waveFormatEx.wBitsPerSample = device_bits_per_sample_;
+  // Block size.
+  waveFormatEx.nBlockAlign =
+      (waveFormatEx.nChannels * waveFormatEx.wBitsPerSample) / 8;
+  waveFormatEx.nAvgBytesPerSec =
+      waveFormatEx.nSamplesPerSec * waveFormatEx.nBlockAlign;
+  waveFormatEx.cbSize = 0;
 
-	DevMsg( "XAudio Device Initialized:\n" );
-	DevMsg( "   %s\n"
-			"   %d channel(s)\n"
-			"   %d bits/sample\n"
-			"   %d samples/sec\n", DeviceName(), DeviceChannels(), DeviceSampleBits(), DeviceDmaSpeed() );
+  hr = xaudio2_engine_->CreateSourceVoice(
+      &xaudio2_source_voice_, &waveFormatEx, 0, XAUDIO2_DEFAULT_FREQ_RATIO,
+      &xaudio2_voice_callback_, nullptr, nullptr);
+  if (FAILED(hr)) {
+    Warning("XAudio2: Creating source voice failed w/e 0x%8x.\n", hr);
+    return false;
+  }
 
-	m_VoiceData.VoiceInit();
+  float channel_volumes[kMaxXAudio2DeviceChannels];
+  for (size_t i = 0; i < kMaxXAudio2DeviceChannels; i++) {
+    channel_volumes[i] = !m_bSurround && i >= 2 ? 0 : 1.0f;
+  }
 
-	// success
-	return true;
+  hr = xaudio2_source_voice_->SetChannelVolumes(device_channels_count_,
+                                                channel_volumes);
+  if (FAILED(hr)) {
+    Warning("XAudio2: Setting %hu channel volumes failed w/e 0x%8x.\n",
+            device_channels_count_, hr);
+    return false;
+  }
+
+  audio_buffer_size_ = kXAudio2BufferSamplesCount *
+                       (device_bits_per_sample_ / 8) * device_channels_count_;
+  all_audio_buffers_ =
+      new BYTE[kMaxXAudio2DeviceBuffersCount * audio_buffer_size_];
+
+  ClearBuffer();
+
+  V_memset(audio_buffers_, 0, sizeof(audio_buffers_));
+  for (size_t i = 0; i < kMaxXAudio2DeviceBuffersCount; i++) {
+    audio_buffers_[i].pAudioData = all_audio_buffers_ + i * audio_buffer_size_;
+    audio_buffers_[i].pContext = reinterpret_cast<void *>(i);
+  }
+
+  audio_buffer_head_pos_ = 0;
+  audio_buffer_tail_pos_ = 0;
+
+  // Number of mono samples output buffer may hold
+  device_samples_count_ = kMaxXAudio2DeviceBuffersCount *
+                          (audio_buffer_size_ / DeviceSampleBytes());
+
+  // NOTE: This really shouldn't be tied to the # of bufferable samples.  This
+  // just needs to be large enough so that it doesn't fake out the sampling in
+  // GetSoundTime().  Basically GetSoundTime() assumes a cyclical time stamp and
+  // finds wraparound cases but that means it needs to get called much more
+  // often than once per cycle.  So this number should be much larger than the
+  // framerate in terms of output time.
+  device_clock_divider_ = device_samples_count_ / DeviceChannels();
+
+  hr = xaudio2_source_voice_->Start(0);
+  if (FAILED(hr)) {
+    Warning("XAudio2: Unable to start engine w/e 0x%8x.\n", hr);
+    return false;
+  }
+
+  DevMsg("XAudio2 device initialized:\n");
+  DevMsg("%s |  %d channel(s) |  %d bits/sample |  %d Hz\n", DeviceName(),
+         DeviceChannels(), DeviceSampleBits(), DeviceDmaSpeed());
+
+  // Tell video subsytem to use our device as out one.
+  if (g_pVideo) {
+    g_pVideo->SoundDeviceCommand(VideoSoundDeviceOperation::HOOK_X_AUDIO,
+                                 xaudio2_engine_.GetInterfacePtr());
+  }
+
+  // success
+  return true;
 }
 
-//-----------------------------------------------------------------------------
-// Shutdown XAudio
-//-----------------------------------------------------------------------------
-void CAudioXAudio::Shutdown( void )
-{
-	if ( m_pSourceVoice )
-	{
-		m_pSourceVoice->Stop( 0 );
-		m_pSourceVoice->DestroyVoice();
-		m_pSourceVoice = NULL;
-		delete[] m_pOutputBuffer;
-	}
+// Shutdown XAudio2
+void CAudioXAudio2::Shutdown() {
+  // Tell video subsytem to not use our device as out one.
+  if (g_pVideo) {
+    g_pVideo->SoundDeviceCommand(VideoSoundDeviceOperation::HOOK_X_AUDIO,
+                                 nullptr);
+  }
 
-	if ( m_pMasteringVoice )
-	{
-		m_pMasteringVoice->DestroyVoice();
-		m_pMasteringVoice = NULL;
-	}
+  if (xaudio2_source_voice_) {
+    xaudio2_source_voice_->Stop(0);
+    // Slow, blocking.
+    xaudio2_source_voice_->DestroyVoice();
+    xaudio2_source_voice_ = nullptr;
 
-	// need to release ref to XAudio2
-	m_VoiceData.VoiceShutdown();
+    delete[] all_audio_buffers_;
+  }
 
-	if ( m_pXAudio2 )
-	{
-		m_pXAudio2->Release();
-		m_pXAudio2 = NULL;
-	}
+  if (xaudio2_mastering_voice_) {
+    // Slow, blocking.
+    xaudio2_mastering_voice_->DestroyVoice();
+    xaudio2_mastering_voice_ = nullptr;
+  }
 
-	if ( this == CAudioXAudio::m_pSingleton )
-	{
-		CAudioXAudio::m_pSingleton = NULL;
-	}
+  if (xaudio2_engine_) xaudio2_engine_.Release();
 }
 
-//-----------------------------------------------------------------------------
-// XAudio has completed a packet. Assuming these are sequential
-//-----------------------------------------------------------------------------
-void CAudioXAudio::XAudioPacketCallback( int hCompletedBuffer )
-{
-	// packet completion expected to be sequential
-	Assert( hCompletedBuffer == (int)( m_PacketTail % MAX_XAUDIO2_BUFFERS ) );
+// XAudio2 has completed a packet.  Assuming they are sequential.
+void CAudioXAudio2::OnBufferEnd(size_t buffer_idx) {
+  // packet completion expected to be sequential
+  Assert(buffer_idx == static_cast<size_t>(audio_buffer_tail_pos_ %
+                                           kMaxXAudio2DeviceBuffersCount));
 
-	m_BufferTail++;
+  ++audio_buffer_tail_pos_;
 
-	if ( snd_xaudio_spew_packets.GetBool() )
-	{
-		if ( m_BufferTail == m_BufferHead )
-		{
-			Warning( "XAudio: Starved\n" );
-		}
-		else
-		{
-			Msg( "XAudio: Packet Callback, Submit: %2d, Free: %2d\n", m_BufferHead - m_BufferTail, MAX_XAUDIO2_BUFFERS - ( m_BufferHead - m_BufferTail ) );
-		}
-	}
+  if (snd_xaudio_spew_packets.GetBool()) {
+    if (audio_buffer_tail_pos_ == audio_buffer_head_pos_) {
+      Warning("XAudio2: Starved.\n");
+    } else {
+      Msg("XAudio2: Packet Callback, Submit: %2u, Free: %2u.\n",
+          audio_buffer_head_pos_ - audio_buffer_tail_pos_,
+          kMaxXAudio2DeviceBuffersCount -
+              (audio_buffer_head_pos_ - audio_buffer_tail_pos_));
+    }
+  }
 
-	if ( m_BufferTail == m_BufferHead )
-	{
-		// very bad, out of packets, xaudio is starving
-		// mix thread didn't keep up with audio clock and submit packets
-		// submit a silent buffer to keep stream playing and audio clock running
-		int head = m_BufferHead++;
-		XAUDIO2_BUFFER *pBuffer = &m_Buffers[head % MAX_XAUDIO2_BUFFERS];
-		V_memset( pBuffer->pAudioData, 0, m_bufferSizeBytes );
-		pBuffer->AudioBytes = m_bufferSizeBytes;
-		m_pSourceVoice->SubmitSourceBuffer( pBuffer );
-	}
+  if (audio_buffer_tail_pos_ == audio_buffer_head_pos_) {
+    // Very bad, out of packets, XAudio2 is starving.  Mix thread didn't keep up
+    // with audio clock and submit packets submit a silent buffer to keep stream
+    // playing and audio clock running.
+    unsigned head{audio_buffer_head_pos_++};
+    XAUDIO2_BUFFER &buffer{
+        audio_buffers_[head % kMaxXAudio2DeviceBuffersCount]};
+
+    V_memset(const_cast<byte *>(buffer.pAudioData), 0, audio_buffer_size_);
+
+    buffer.AudioBytes = audio_buffer_size_;
+
+    const HRESULT hr{xaudio2_source_voice_->SubmitSourceBuffer(&buffer)};
+    if (FAILED(hr))
+      Warning("XAudio2: Starved. Submitting silent buffer failed w/e 0x%8x.\n",
+              hr);
+  }
 }
 
-//-----------------------------------------------------------------------------
-// Return the "write" cursor.  Used to clock the audio mixing.
-// The actual hw write cursor and the number of samples it fetches is unknown.
-//-----------------------------------------------------------------------------
-int	CAudioXAudio::GetOutputPosition( void )
-{
-	XAUDIO2_VOICE_STATE state;
+// Return the "write" cursor.  Used to clock the audio mixing.  The actual hw
+// write cursor and the number of samples it fetches is unknown.
+int CAudioXAudio2::GetOutputPosition() {
+  XAUDIO2_VOICE_STATE state = {};
+  state.SamplesPlayed = 0;
 
-	state.SamplesPlayed = 0;
-	m_pSourceVoice->GetState( &state );
+  xaudio2_source_voice_->GetState(&state);
 
-	return ( state.SamplesPlayed % m_clockDivider );
+  return state.SamplesPlayed % device_clock_divider_;
 }
 
-//-----------------------------------------------------------------------------
 // Pause playback
-//-----------------------------------------------------------------------------
-void CAudioXAudio::Pause( void )
-{
-	if ( m_pSourceVoice )
-	{
-		m_pSourceVoice->Stop( 0 );
-	}
+void CAudioXAudio2::Pause() {
+  if (xaudio2_source_voice_) {
+    const HRESULT hr{xaudio2_source_voice_->Stop(0)};
+    if (FAILED(hr)) {
+      Warning("XAudio2: Stopping source voice failed w/e 0x%8x.\n", hr);
+    }
+  }
 }
 
-//-----------------------------------------------------------------------------
 // Resume playback
-//-----------------------------------------------------------------------------
-void CAudioXAudio::UnPause( void )
-{
-	if ( m_pSourceVoice )
-	{
-		m_pSourceVoice->Start( 0 );
-	}
+void CAudioXAudio2::UnPause() {
+  if (xaudio2_source_voice_) {
+    const HRESULT hr{xaudio2_source_voice_->Start(0)};
+    if (FAILED(hr)) {
+      Warning("XAudio2: Starting source voice failed w/e 0x%8x.\n", hr);
+    }
+  }
 }
 
-//-----------------------------------------------------------------------------
-// Calc the paint position
-//-----------------------------------------------------------------------------
-int CAudioXAudio::PaintBegin( float mixAheadTime, int soundtime, int paintedtime )
-{
-	//  soundtime = total full samples that have been played out to hardware at dmaspeed
-	//  paintedtime = total full samples that have been mixed at speed
+// Calculate the paint position.
+int CAudioXAudio2::PaintBegin(float mix_ahead_time, int sound_time,
+                              int painted_time) {
+  // soundtime = total full samples that have been played out to hardware at
+  // dmaspeed paintedtime = total full samples that have been mixed at speed
 
-	//  endtime = target for full samples in mixahead buffer at speed	
-	int mixaheadtime = mixAheadTime * DeviceDmaSpeed();
-	int endtime = soundtime + mixaheadtime;
-	if ( endtime <= paintedtime )
-	{
-		return endtime;
-	}
+  // endtime = target for full samples in mixahead buffer at speed
+  const int mixaheadtime{static_cast<int>(mix_ahead_time * DeviceDmaSpeed())};
 
-	int fullsamps = DeviceSampleCount() / DeviceChannels();
+  int end_time{sound_time + mixaheadtime};
+  if (end_time <= painted_time) return end_time;
 
-	if ( ( endtime - soundtime ) > fullsamps )
-	{
-		endtime = soundtime + fullsamps;
-	}
-	if ( ( endtime - paintedtime ) & 0x03 )
-	{
-		// The difference between endtime and painted time should align on 
-		// boundaries of 4 samples.  This is important when upsampling from 11khz -> 44khz.
-		endtime -= ( endtime - paintedtime ) & 0x03;
-	}
+  const int samples_per_channel{DeviceSampleCount() / DeviceChannels()};
 
-	return endtime;
+  if (end_time - sound_time > samples_per_channel) {
+    end_time = sound_time + samples_per_channel;
+  }
+
+  if ((end_time - painted_time) & 0x03) {
+    // The difference between endtime and painted time should align on
+    // boundaries of 4 samples.  This is important when upsampling from 11khz ->
+    // 44khz.
+    end_time -= (end_time - painted_time) & 0x03;
+  }
+
+  return end_time;
 }
 
-//-----------------------------------------------------------------------------
-// Fill the output buffers with silence
-//-----------------------------------------------------------------------------
-void CAudioXAudio::ClearBuffer( void )
-{
-	V_memset( m_pOutputBuffer, 0, MAX_XAUDIO2_BUFFERS * m_bufferSizeBytes );
+// Fill the output buffers with silence.
+void CAudioXAudio2::ClearBuffer() {
+  V_memset(all_audio_buffers_, 0,
+           kMaxXAudio2DeviceBuffersCount * audio_buffer_size_);
 }
 
-//-----------------------------------------------------------------------------
-// Fill the output buffer with L/R samples
-//-----------------------------------------------------------------------------
-int CAudioXAudio::TransferStereo( const portable_samplepair_t *pFrontBuffer, int paintedTime, int endTime, char *pOutputBuffer )
-{
-	int linearCount;
-	int i;
-	int	val;
+// Fill the output buffer with L/R samples.
+unsigned CAudioXAudio2::TransferStereo(
+    const portable_samplepair_t *front_buffer, int painted_time, int end_time,
+    unsigned char *out_buffer) {
+  const int volume_factor{static_cast<int>(S_GetMasterVolume() * 256)};
 
-	int volumeFactor = S_GetMasterVolume() * 256;
+  // get size of output buffer in full samples (LR pairs)
+  // number of sequential sample pairs that can be written
+  unsigned linear_count{static_cast<unsigned>(DeviceSampleCount()) >> 1};
 
-	int *pFront = (int *)pFrontBuffer;
-	short *pOutput = (short *)pOutputBuffer;
-	
-	// get size of output buffer in full samples (LR pairs)
-	// number of sequential sample pairs that can be wrriten
-	linearCount = g_AudioDevice->DeviceSampleCount() >> 1;
+  // clamp output count to requested number of samples
+  if (linear_count > static_cast<unsigned>(end_time - painted_time)) {
+    linear_count = end_time - painted_time;
+  }
 
-	// clamp output count to requested number of samples
-	if ( linearCount > endTime - paintedTime )
-	{
-		linearCount = endTime - paintedTime;
-	}
+  // linear_count is now number of mono 16 bit samples (L and R) to xfer.
+  linear_count <<= 1u;
 
-	// linearCount is now number of mono 16 bit samples (L and R) to xfer.
-	linearCount <<= 1;
+  const portable_samplepair_t *front{front_buffer};
+  short *out{reinterpret_cast<short *>(out_buffer)};
 
-	// transfer mono 16bit samples multiplying each sample by volume.
-	for ( i=0; i<linearCount; i+=2 )
-	{
-		// L Channel
-		val = ( pFront[i] * volumeFactor ) >> 8;
-		*pOutput++ = CLIP( val );
+  // transfer mono 16bit samples multiplying each sample by volume.
+  for (unsigned i = 0; i < linear_count; i += 2) {
+    // L Channel
+    *out++ = AdjustSampleVolume(front->left, volume_factor);
 
-		// R Channel
-		val = ( pFront[i+1] * volumeFactor ) >> 8;
-		*pOutput++ = CLIP( val );
-	}
+    // R Channel
+    *out++ = AdjustSampleVolume(front->right, volume_factor);
 
-	return linearCount * DeviceSampleBytes();
+    ++front;
+  }
+
+  return linear_count * DeviceSampleBytes();
 }
 
-//-----------------------------------------------------------------------------
-// Fill the output buffer with interleaved surround samples
-//-----------------------------------------------------------------------------
-int CAudioXAudio::TransferSurroundInterleaved( const portable_samplepair_t *pFrontBuffer, const portable_samplepair_t *pRearBuffer, const portable_samplepair_t *pCenterBuffer, int paintedTime, int endTime, char *pOutputBuffer )
-{
-	int linearCount;
-	int i, j;
-	int	val;
+// Fill the output buffer with interleaved surround samples.
+// TODO: Add 7.1 support.
+unsigned CAudioXAudio2::TransferMultichannelSurroundInterleaved(
+    const portable_samplepair_t *front_buffer,
+    const portable_samplepair_t *rear_buffer,
+    const portable_samplepair_t *center_buffer, int painted_time, int end_time,
+    unsigned char *out_buffer) {
+  const int volume_factor{static_cast<int>(S_GetMasterVolume() * 256)};
 
-	int volumeFactor = S_GetMasterVolume() * 256;
+  // number of mono samples per channel
+  // number of sequential samples that can be wrriten
+  unsigned linear_count{audio_buffer_size_ /
+                        (DeviceSampleBytes() * DeviceChannels())};
 
-	int *pFront = (int *)pFrontBuffer;
-	int *pRear = (int *)pRearBuffer;
-	int *pCenter = (int *)pCenterBuffer;
-	short *pOutput = (short *)pOutputBuffer;
-	
-	// number of mono samples per channel
-	// number of sequential samples that can be wrriten
-	linearCount = m_bufferSizeBytes/( DeviceSampleBytes() * DeviceChannels() );		
+  // clamp output count to requested number of samples
+  if (linear_count > static_cast<unsigned>(end_time - painted_time)) {
+    linear_count = end_time - painted_time;
+  }
 
-	// clamp output count to requested number of samples
-	if ( linearCount > endTime - paintedTime )	
-	{	
-		linearCount = endTime - paintedTime;
-	}
+  const portable_samplepair_t *front{front_buffer};
+  const portable_samplepair_t *rear{rear_buffer};
+  const portable_samplepair_t *center{center_buffer};
 
-	for ( i = 0, j = 0; i < linearCount; i++, j += 2 )
-	{
-		// FL
-		val = ( pFront[j] * volumeFactor ) >> 8;
-		*pOutput++ = CLIP( val );
+  short *out{reinterpret_cast<short *>(out_buffer)};
 
-		// FR
-		val = ( pFront[j+1] * volumeFactor ) >> 8;
-		*pOutput++ = CLIP( val );
+  for (unsigned i = 0; i < linear_count; ++i) {
+    // FL
+    *out++ = AdjustSampleVolume(front->left, volume_factor);
 
-		// Center
-		val = ( pCenter[j] * volumeFactor) >> 8;
-		*pOutput++ = CLIP( val );
+    // FR
+    *out++ = AdjustSampleVolume(front->right, volume_factor);
 
-		// Let the hardware mix the sub from the main channels since
-		// we don't have any sub-specific sounds, or direct sub-addressing
-		*pOutput++ = 0;
+    ++front;
 
-		// RL
-		val = ( pRear[j] * volumeFactor ) >> 8;
-		*pOutput++ = CLIP( val );
+    // Quad speakers have no center.
+    if (device_channels_count_ > 4) {
+      // Center
+      *out++ = AdjustSampleVolume(center->left, volume_factor);
 
-		// RR
-		val = ( pRear[j+1] * volumeFactor ) >> 8;
-		*pOutput++ = CLIP( val );
-	}
+      // Let the hardware mix the sub from the main channels since
+      // we don't have any sub-specific sounds, or direct sub-addressing
+      *out++ = 0;
 
-	return linearCount * DeviceSampleBytes() * DeviceChannels();
+      ++center;
+    }
+
+    // RL
+    *out++ = AdjustSampleVolume(rear->left, volume_factor);
+
+    // RR
+    *out++ = AdjustSampleVolume(rear->right, volume_factor);
+
+    ++rear;
+  }
+
+  return linear_count * DeviceSampleBytes() * DeviceChannels();
 }
 
-//-----------------------------------------------------------------------------
-// Transfer up to a full paintbuffer (PAINTBUFFER_SIZE) of samples out to the xaudio buffer(s).
-//-----------------------------------------------------------------------------
-void CAudioXAudio::TransferSamples( int endTime )
-{
-	XAUDIO2_BUFFER *pBuffer;
+// Transfer up to a full paintbuffer (PAINTBUFFER_SIZE) of samples out to the
+// XAudio2 buffer(s).
+void CAudioXAudio2::TransferSamples(int end_time) {
+  if (audio_buffer_head_pos_ - audio_buffer_tail_pos_ >=
+      kMaxXAudio2DeviceBuffersCount) {
+    DebugWarn("No free audio buffers! All %u buffers taken.\n",
+              kMaxXAudio2DeviceBuffersCount);
 
-	if ( m_BufferHead - m_BufferTail >= MAX_XAUDIO2_BUFFERS )
-	{
-		DevWarning( "XAudio: No Free Buffers!\n" );
-		return;
-	}
+    return;
+  }
 
-	int sampleCount = endTime - g_paintedtime;
-	if ( sampleCount > XAUDIO2_BUFFER_SAMPLES )
-	{
-		DevWarning( "XAudio: Overflowed mix buffer!\n" );
-		endTime = g_paintedtime + XAUDIO2_BUFFER_SAMPLES;
-	}
+  const int samples_count{end_time - g_paintedtime};
+  if (samples_count > kXAudio2BufferSamplesCount) {
+    DebugWarn("Overflowed mix buffer! All %u samples taken.\n",
+              kXAudio2BufferSamplesCount);
 
-	unsigned int nBuffer = m_BufferHead++;
-	pBuffer = &m_Buffers[nBuffer % MAX_XAUDIO2_BUFFERS];
+    end_time = g_paintedtime + kXAudio2BufferSamplesCount;
+  }
 
-	if ( !m_bSurround )
-	{
-		pBuffer->AudioBytes = TransferStereo( PAINTBUFFER, g_paintedtime, endTime, (char *)pBuffer->pAudioData );
-	}
-	else
-	{
-		pBuffer->AudioBytes = TransferSurroundInterleaved( PAINTBUFFER, REARPAINTBUFFER, CENTERPAINTBUFFER, g_paintedtime, endTime, (char *)pBuffer->pAudioData );
-	}
+  const unsigned buffer_idx{audio_buffer_head_pos_++};
+  XAUDIO2_BUFFER &buffer{
+      audio_buffers_[buffer_idx % kMaxXAudio2DeviceBuffersCount]};
 
-    // submit buffer
-	m_pSourceVoice->SubmitSourceBuffer( pBuffer );
+  if (!m_bSurround) {
+    buffer.AudioBytes =
+        TransferStereo(PAINTBUFFER, g_paintedtime, end_time,
+                       const_cast<unsigned char *>(buffer.pAudioData));
+  } else {
+    buffer.AudioBytes = TransferMultichannelSurroundInterleaved(
+        PAINTBUFFER, REARPAINTBUFFER, CENTERPAINTBUFFER, g_paintedtime,
+        end_time, const_cast<unsigned char *>(buffer.pAudioData));
+  }
+
+  const HRESULT hr{xaudio2_source_voice_->SubmitSourceBuffer(&buffer)};
+  if (FAILED(hr)) {
+    DebugWarn("Submitting samples buffer failed w/e 0x%8x.\n", hr);
+  }
 }
 
-//-----------------------------------------------------------------------------
 // Get our device name
-//-----------------------------------------------------------------------------
-const char *CAudioXAudio::DeviceName( void )
-{ 
-	if ( m_bSurround )
-	{
-		return "XAudio: 5.1 Channel Surround";
-	}
+const char *CAudioXAudio2::DeviceName() {
+  if (m_bSurround) {
+    if (device_channels_count_ == 4) {
+      return "XAudio2 4 Channel Surround";
+    }
 
-	return "XAudio: Stereo"; 
+    if (device_channels_count_ == 6) {
+      return "XAudio2 5.1 Channel Surround";
+    }
+
+    if (device_channels_count_ == 8) {
+      return "XAudio2 7.1 Channel Surround";
+    }
+  }
+
+  if (m_bHeadphone) {
+    return "XAudio2 Headphones";
+  }
+
+  return "XAudio2 Speakers";
 }
 
-CXboxVoice::CXboxVoice()
-{
-	m_pXHVEngine = NULL;
-}
-
-//-----------------------------------------------------------------------------
-// Initialize Voice
-//-----------------------------------------------------------------------------
-void CXboxVoice::VoiceInit( void )
-{
-	if ( !m_pXHVEngine )
-	{
-		// Set the processing modes
-		XHV_PROCESSING_MODE rgMode = XHV_VOICECHAT_MODE;
-
-		// Set up parameters for the voice chat engine
-		XHV_INIT_PARAMS xhvParams = {0};
-		xhvParams.dwMaxRemoteTalkers = MAX_PLAYERS;
-		xhvParams.dwMaxLocalTalkers = XUSER_MAX_COUNT;
-		xhvParams.localTalkerEnabledModes = &rgMode;
-		xhvParams.remoteTalkerEnabledModes = &rgMode;
-		xhvParams.dwNumLocalTalkerEnabledModes = 1;
-		xhvParams.dwNumRemoteTalkerEnabledModes = 1;
-		xhvParams.pXAudio2 = CAudioXAudio::m_pSingleton->GetXAudio2();
-
-		// Create the engine
-		HRESULT hr = XHV2CreateEngine( &xhvParams, NULL, &m_pXHVEngine );
-		if ( hr != S_OK )
-		{
-			Warning( "Couldn't load XHV engine!\n" );
-		}
-	}
-
-	VoiceResetLocalData( );
-}
-
-void CXboxVoice::VoiceShutdown( void )
-{
-	if ( !m_pXHVEngine )
-		return;
-	
-	m_pXHVEngine->Release();
-	m_pXHVEngine = NULL;
-}
-
-void CXboxVoice::AddPlayerToVoiceList( CClientInfo *pClient, bool bLocal )
-{
-	XHV_PROCESSING_MODE local_proc_mode = XHV_VOICECHAT_MODE;
-
-	for ( int i = 0; i < pClient->m_cPlayers; ++i )
-	{
-		if ( pClient->m_xuids[i] == 0 )
-			continue;
-
-		if ( bLocal == true )
-		{
- 			if ( m_pXHVEngine->RegisterLocalTalker( pClient->m_iControllers[i] ) == S_OK )
-			{
-				m_pXHVEngine->StartLocalProcessingModes( pClient->m_iControllers[i], &local_proc_mode, 1 );
-			}
-		}
-		else
-		{
-			if ( m_pXHVEngine->RegisterRemoteTalker( pClient->m_xuids[i], NULL, NULL, NULL ) == S_OK )
-			{
-				m_pXHVEngine->StartRemoteProcessingModes( pClient->m_xuids[i], &local_proc_mode, 1 );
-			}
-		}
-	}
-}
-
-void CXboxVoice::RemovePlayerFromVoiceList( CClientInfo *pClient, bool bLocal )
-{
-	for ( int i = 0; i < pClient->m_cPlayers; ++i )
-	{
-		if ( pClient->m_xuids[i] == 0 )
-			continue;
-
-		if ( bLocal == true )
-		{
-			m_pXHVEngine->UnregisterLocalTalker( pClient->m_iControllers[i] );
-		}
-		else
-		{
-			m_pXHVEngine->UnregisterRemoteTalker( pClient->m_xuids[i] );
-		}
-	}
-}
-
-void CXboxVoice::PlayIncomingVoiceData( XUID xuid, const byte *pbData, DWORD pdwSize )
-{
-	XUID localXUID;
-
-	XUserGetXUID( XBX_GetPrimaryUserId(), &localXUID );
-
-	//Hack: Don't play stuff that comes from ourselves.
-	if ( localXUID == xuid )
-		return;
-
-	m_pXHVEngine->SubmitIncomingChatData( xuid, pbData, &pdwSize );
-}
-
-
-void CXboxVoice::UpdateHUDVoiceStatus( void )
-{
-	for ( int iClient = 0; iClient < cl.m_nMaxClients; iClient++ )
-	{
-		bool bSelf = (cl.m_nPlayerSlot == iClient);
-
-		int iIndex = iClient + 1;
-		XUID id =  g_pMatchmaking->PlayerIdToXuid( iIndex );
-		
-		if ( id != 0 )
-		{	
-			bool bTalking = false;
-
-			if ( bSelf == true )
-			{
-				//Make sure the player's own label is not on.
-				g_pSoundServices->OnChangeVoiceStatus( iIndex, false );
-
-				iIndex = -1;
-
-				if ( IsPlayerTalking( XBX_GetPrimaryUserId(), true ) )
-				{
-					bTalking = true;
-				}
-			}
-			else
-			{
-				if ( IsPlayerTalking( id, false ) )
-				{
-					bTalking = true;
-				}
-			}
-		
-			g_pSoundServices->OnChangeVoiceStatus( iIndex, bTalking );
-		}
-		else
-		{
-			g_pSoundServices->OnChangeVoiceStatus( iIndex, false );
-		}
-	}
-}
-
-bool CXboxVoice::VoiceUpdateData( void  )
-{
-	DWORD dwNumPackets = 0;
-	DWORD dwBytes = 0;
-	WORD wVoiceBytes = 0;
-	bool bShouldSend = false;
-	DWORD dwVoiceFlags = m_pXHVEngine->GetDataReadyFlags();
-
-	//Update UI stuff.
-	UpdateHUDVoiceStatus();
-
-	for ( uint i = 0; i < XUSER_MAX_COUNT; ++i )
-	{
-		// We currently only allow one player per console
-		if ( i != XBX_GetPrimaryUserId() )
-		{
-			continue;
-		}
-
-		if ( IsHeadsetPresent( i ) == false )
-			continue;
-
-		if ( !(dwVoiceFlags & ( 1 << i )) )
-			continue;
-  
-		dwBytes = m_ChatBufferSize - m_wLocalDataSize;
-
-		if( dwBytes < XHV_VOICECHAT_MODE_PACKET_SIZE )
-		{
-			bShouldSend = true;
-		}
-		else
-		{
-			m_pXHVEngine->GetLocalChatData( i, m_ChatBuffer + m_wLocalDataSize, &dwBytes, &dwNumPackets );
-			m_wLocalDataSize += ((WORD)dwBytes) & MAXWORD;
-
-			if( m_wLocalDataSize > ( ( m_ChatBufferSize * 7 ) / 10 ) )
-			{
-				bShouldSend = true;
-			}
-		}
-
-		wVoiceBytes += m_wLocalDataSize & MAXWORD;
-		break;
-	}
-
-	return  bShouldSend || 
-		( wVoiceBytes && 
-		( GetTickCount() - m_dwLastVoiceSend ) > MAX_VOICE_BUFFER_TIME );
-}
-
-void CXboxVoice::SetPlaybackPriority( XUID remoteTalker, DWORD dwUserIndex, XHV_PLAYBACK_PRIORITY playbackPriority )
-{
-	m_pXHVEngine->SetPlaybackPriority( remoteTalker, dwUserIndex, playbackPriority );
-}
-
-void CXboxVoice::GetRemoteTalkers( int *pNumTalkers, XUID *pRemoteTalkers )
-{
-	m_pXHVEngine->GetRemoteTalkers( (DWORD*)pNumTalkers, pRemoteTalkers );
-}
-
-void CXboxVoice::GetVoiceData( CLC_VoiceData *pMessage )
-{
-	byte *puchVoiceData = NULL;
-	pMessage->m_nLength = m_wLocalDataSize;
-	XUserGetXUID( XBX_GetPrimaryUserId(), &pMessage->m_xuid );
-
-	puchVoiceData = m_ChatBuffer;
-
-	pMessage->m_DataOut.StartWriting( puchVoiceData, pMessage->m_nLength );	
-	pMessage->m_nLength *= 8;
-	pMessage->m_DataOut.SeekToBit( pMessage->m_nLength );	 // set correct writing position
-}
-
-void CXboxVoice::VoiceSendData( INetChannel *pChannel )
-{
-	CLC_VoiceData voiceMsg;
-	GetVoiceData( &voiceMsg );
-
-	if ( pChannel )
-	{
-		pChannel->SendNetMsg( voiceMsg, false, true );
-		VoiceResetLocalData();
-	}
-}
-
-void CXboxVoice::VoiceResetLocalData( void )
-{
-	m_wLocalDataSize = 0;
-	m_dwLastVoiceSend = GetTickCount();
-	Q_memset( m_ChatBuffer, 0, m_ChatBufferSize );
-}
-
-bool CXboxVoice::IsPlayerTalking( XUID uid, bool bLocal )
-{
-	if ( bLocal == true )
-	{
-		return m_pXHVEngine->IsLocalTalking( XBX_GetPrimaryUserId() );
-	}
-	else
-	{
-		return !g_pMatchmaking->IsPlayerMuted( XBX_GetPrimaryUserId(), uid ) && m_pXHVEngine->IsRemoteTalking( uid );
-	}
-
-	return false;
-}
-
-bool CXboxVoice::IsHeadsetPresent( int id )
-{
-	return m_pXHVEngine->IsHeadsetPresent( id );
-}
-
-void CXboxVoice::RemoveAllTalkers( CClientInfo *pLocal )
-{
-	int numRemoteTalkers;
-	XUID remoteTalkers[MAX_PLAYERS];
-	GetRemoteTalkers( &numRemoteTalkers, remoteTalkers );
-
-	for ( int iRemote = 0; iRemote < numRemoteTalkers; iRemote++ )
-	{
-		m_pXHVEngine->UnregisterRemoteTalker( remoteTalkers[iRemote] );
-	}
-
-	if ( pLocal )
-	{
-		for ( int i = 0; i < pLocal->m_cPlayers; ++i )
-		{
-			if ( pLocal->m_xuids[i] == 0 )
-				continue;
-
-			m_pXHVEngine->UnregisterLocalTalker( pLocal->m_iControllers[i] );
-		}
-	}
-}
+}  // namespace se::engine::audio::xaudio2

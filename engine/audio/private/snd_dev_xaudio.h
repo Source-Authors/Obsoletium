@@ -55,7 +55,6 @@ private:
 };
 
 CXboxVoice *Audio_GetXVoice( void );
-IXAudio2 *Audio_GetXAudio2( void );
 
 #endif
 

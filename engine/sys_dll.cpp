@@ -61,6 +61,9 @@
 #ifdef _WIN32
 #include <io.h>
 #endif
+
+#include "audio/public/snd_device.h"
+#include "audio/private/sound_private.h"
 #include "toolframework/itoolframework.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1646,7 +1649,7 @@ CON_COMMAND( star_memory, "Dump RAM stats" )
 			std::system_category().message( (int) ::GetLastError() ).c_str() );
 	}
 
-	ConDMsg( "hardware: Host RAM available: %s\n",
+	ConDMsg( "hardware: Host dedicated RAM available: %s\n",
 			Q_pretifymem(host_parms.memsize, 2, true) );
 #endif
 }
@@ -1667,12 +1670,12 @@ CON_COMMAND( star_gpu, "Dump GPU stats" )
 
 	if (videomode)
 	{
-	Q_snprintf( gpuInfo, sizeof( gpuInfo ),
-		"GPU %s, VRAM %s, DirectX level '%s', Viewport %d x %d",
-		info.m_pDriverName,
-		gpuRamSize,
-		dxlevel ? dxlevel : "N/A",
-		videomode->GetModeWidth(), videomode->GetModeHeight());
+		Q_snprintf( gpuInfo, sizeof( gpuInfo ),
+			"GPU %s, VRAM %s, DirectX level '%s', Viewport %d x %d",
+			info.m_pDriverName,
+			gpuRamSize,
+			dxlevel ? dxlevel : "N/A",
+			videomode->GetModeWidth(), videomode->GetModeHeight());
 	}
 	else
 	{
@@ -1685,6 +1688,20 @@ CON_COMMAND( star_gpu, "Dump GPU stats" )
 	}
 
 	ConDMsg( "hardware: %s\n", gpuInfo );
+}
+
+CON_COMMAND( star_audio_render, "Dump audio render device stats" )
+{
+	if ( g_AudioDevice )
+	{
+		ConDMsg( "hardware: Audio renderer %s, %d channel(s), %d bits/sample, %d Hz\n",
+			g_AudioDevice->DeviceName(), g_AudioDevice->DeviceChannels(),
+			g_AudioDevice->DeviceSampleBits(), g_AudioDevice->DeviceDmaSpeed() );
+	}
+	else
+	{
+		ConDMsg( "hardware: Audio renderer N/A\n" );
+	}
 }
 
 void DisplaySystemVersion(char *osversion, int maxlen);

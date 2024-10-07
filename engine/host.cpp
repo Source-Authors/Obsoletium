@@ -123,10 +123,6 @@
 #include "soundservice.h"
 #include "profile.h"
 #include "steam/isteamremotestorage.h"
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#include "audio_pch.h"
-#endif
 #if defined( LINUX )
 #include <locale.h>
 #include "include/SDL3/SDL.h"
@@ -135,7 +131,6 @@
 #include "audio/private/voice_mixer_controls.h"
 
 #include "ixboxsystem.h"
-extern IXboxSystem *g_pXboxSystem;
 
 extern ConVar cl_cloud_settings;
 extern ConVar cl_logofile;
@@ -3562,6 +3557,11 @@ void Host_InitGpu()
 	Cbuf_AddText("star_gpu");
 }
 
+void Host_InitAudio()
+{
+	Cbuf_AddText("star_audio_render");
+}
+
 void Host_InitOperatingSystem()
 {
 	Cbuf_AddText("star_os");
@@ -3972,6 +3972,8 @@ void Host_Init( bool bDedicated )
 	Host_InitRam();
 	// Print GPU info.
 	Host_InitGpu();
+	// Print Audio info.
+	Host_InitAudio();
 	// Print OS info.
 	Host_InitOperatingSystem();
 

@@ -1250,13 +1250,27 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 	
 #if !defined( USE_SDL )
-	case WM_ACTIVATEAPP:
-		if ( hwnd == m_hAttachedHWnd )
+	// Sent to both the window being activated and the window being deactivated.
+	// If the windows use the same input queue, the message is sent
+	// synchronously, first to the window procedure of the top-level window
+	// being deactivated, then to the window procedure of the top-level window
+	// being activated.  If the windows use different input queues, the message
+	// is sent asynchronously, so the window is activated immediately.
+	case WM_ACTIVATE:
 		{
-			bool bActivated = ( wParam == 1 );
-			if ( !bActivated )
+			const unsigned short window_activation_state{LOWORD( wParam )};
+			const bool is_activated{window_activation_state != WA_INACTIVE};
+			// The high-order word specifies the minimized state of the window
+			// being activated or deactivated.  A nonzero value indicates the
+			// window is minimized.
+			// const bool is_window_minimized{HIWORD( wParam ) != 0};
+
+			if ( hwnd == m_hAttachedHWnd )
 			{
-				ResetInputState();
+				if ( !is_activated )
+				{
+					ResetInputState();
+				}
 			}
 		}
 		break;

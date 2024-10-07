@@ -21,7 +21,7 @@
 #include "vaudio/ivaudio.h"
 #include "../../client.h"
 #include "../../cl_main.h"
-#include "utldict.h"
+#include "tier1/utldict.h"
 #include "mempool.h"
 #include "../../enginetrace.h"			// for traceline
 #include "../../public/bspflags.h"		// for traceline
@@ -37,24 +37,12 @@
 #include "../../pure_server.h"
 #include "filesystem/IQueuedLoader.h"
 #include "voice.h"
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#include "xmp.h"
-#endif
 
 #include "replay/iclientreplaycontext.h"
 #include "replay/ireplaymovierenderer.h"
 
 #include "video/ivideoservices.h"
 extern IVideoServices *g_pVideo;
-
-/*
-#include "gl_model_private.h"
-#include "world.h"
-#include "vphysics_interface.h"
-#include "client_class.h"
-#include "server_class.h"
-*/
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -66,8 +54,23 @@ extern IVideoServices *g_pVideo;
 //
 //#define DEBUG_CHANNELS
 
-#define SNDLVL_TO_DIST_MULT( sndlvl ) ( sndlvl ? ((powf( 10.0f, snd_refdb.GetFloat() / 20 ) / powf( 10.0f, (float)sndlvl / 20 )) / snd_refdist.GetFloat()) : 0 )
-#define DIST_MULT_TO_SNDLVL( dist_mult ) (soundlevel_t)(int)( (dist_mult) ? ( 20 * log10f( powf( 10.0f, snd_refdb.GetFloat() / 20 ) / ((dist_mult) * snd_refdist.GetFloat()) ) ) : 0 )
+extern ConVar snd_refdb;
+extern ConVar snd_refdist;
+
+inline float SNDLVL_TO_DIST_MULT( soundlevel_t sndlvl )
+{
+  return sndlvl != SNDLVL_NONE
+		? powf( 10.0f, ( snd_refdb.GetFloat() - static_cast<float>( sndlvl ) ) / 20 ) / snd_refdist.GetFloat()
+		: 0;
+}
+
+inline soundlevel_t DIST_MULT_TO_SNDLVL( float dist_mult )
+{
+	// dimhotepus: Rewrite and simplify to match SNDLVL_TO_DIST_MULT.
+	return (soundlevel_t)(int)( dist_mult
+		? snd_refdb.GetFloat() - log10f( dist_mult * snd_refdist.GetFloat() ) * 20
+		: 0 );
+}
 
 extern ConVar dsp_spatial;
 extern IPhysicsSurfaceProps	*physprop;
@@ -447,7 +450,7 @@ typedef struct
 
 static soundfade_t soundfade;  // Client sound fading singleton object
 
-// 0)headphones 2)stereo speakers 4)quad 5)5point1 
+// 0)headphones 2)stereo speakers 4)quad 5)5point1 7)7point1
 // autodetected from windows settings
 ConVar snd_surround( "snd_surround_speakers", "-1", FCVAR_INTERNAL_USE );
 ConVar snd_legacy_surround( "snd_legacy_surround", "0", FCVAR_ARCHIVE );
@@ -497,7 +500,7 @@ public:
 	{
 		bool bSpew = ( g_pQueuedLoader->GetSpewDetail() & LOADER_DETAIL_PURGES ) != 0;
 
-		for ( int i = s_Sounds.FirstInorder(); i != s_Sounds.InvalidIndex(); i = s_Sounds.NextInorder( i ) )
+		for ( auto i = s_Sounds.FirstInorder(); i != s_Sounds.InvalidIndex(); i = s_Sounds.NextInorder( i ) )
 		{
 			// the master sound table grows forever
 			// remove sound sources from the master sound table that were not in the preload list
@@ -538,7 +541,7 @@ public:
 	{
 		bool bSpew = ( g_pQueuedLoader->GetSpewDetail() & LOADER_DETAIL_PURGES ) != 0;
 
-		for ( int i = s_Sounds.FirstInorder(); i != s_Sounds.InvalidIndex(); i = s_Sounds.NextInorder( i ) )
+		for ( auto i = s_Sounds.FirstInorder(); i != s_Sounds.InvalidIndex(); i = s_Sounds.NextInorder( i ) )
 		{
 			// the master sound table grows forever
 			// remove sound sources from the master sound table that were not in the preload list
@@ -1010,8 +1013,8 @@ void S_ReloadFilesInList( IFileList *pFilesToReload )
 
 	CUtlVector< CSfxTable * > processed;
 
-	int iLast = s_Sounds.LastInorder();
-	for ( int i = s_Sounds.FirstInorder(); i != iLast; i = s_Sounds.NextInorder( i ) )
+	auto iLast = s_Sounds.LastInorder();
+	for ( auto i = s_Sounds.FirstInorder(); i != iLast; i = s_Sounds.NextInorder( i ) )
 	{
 		FileNameHandle_t fnHandle = s_Sounds.Key( i );
 		char filename[MAX_PATH * 3];
@@ -1812,15 +1815,13 @@ void SND_GetDopplerPoints( channel_t *pChannel, QAngle &source_angles, Vector &v
 
 	pitch = DOPPLER_PITCH_MAX - dist * (DOPPLER_PITCH_MAX - DOPPLER_PITCH_MIN);
 	
-	pChannel->basePitch = (int)(pitch * 100.0);
+	pChannel->basePitch = (int)(pitch * 100.0f);
 }
 
 // console variables used to construct gain curve - don't change these!
 
 extern ConVar snd_foliage_db_loss; 
 extern ConVar snd_gain;
-extern ConVar snd_refdb;
-extern ConVar snd_refdist;
 extern ConVar snd_gain_max;
 extern ConVar snd_gain_min;
 
@@ -6411,7 +6412,7 @@ void S_Update_Thread()
 	float frameTime = THREADED_MIX_TIME * 0.001f;
 	double lastFrameTime = Plat_FloatTime();
 
-	while ( !g_bMixThreadExit )
+	while ( !g_bMixThreadExit.load(std::memory_order::memory_order_relaxed) )
 	{
 		double t0 = Plat_FloatTime();
 
@@ -6441,7 +6442,7 @@ void S_ShutdownMixThread()
 {
 	if ( g_hMixThread )
 	{
-		g_bMixThreadExit = true;
+		g_bMixThreadExit.store(true, std::memory_order::memory_order_relaxed);
 		ThreadJoin( g_hMixThread );
 		ReleaseThreadHandle( g_hMixThread );
 		g_hMixThread = NULL;
@@ -6460,7 +6461,7 @@ void S_Update_( float mixAheadTime )
 	{
 		if ( !g_hMixThread )
 		{
-			g_bMixThreadExit = false;
+			g_bMixThreadExit.store(false, std::memory_order::memory_order_relaxed);
 			g_hMixThread = ThreadExecuteSolo( "SoundMixer", S_Update_Thread );
 		}
 	}

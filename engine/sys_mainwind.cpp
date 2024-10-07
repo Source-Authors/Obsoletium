@@ -454,22 +454,27 @@ void VCR_HandlePlaybackMessages(
 		{
 			g_iVCRPlaybackSleepInterval -= 5;
 		}
-		else if ( toupper( wParam ) == 'Q' )
+		else
 		{
-			TerminateProcess( GetCurrentProcess(), 1 );
-		}
-		else if ( toupper( wParam ) == 'P' )
-		{
-			VCR_EnterPausedState();
-		}
-		else if ( toupper( wParam ) == 'S' && !g_bVCRSingleStep )
-		{
-			g_bWaitingForStepKeyUp = true;
-			VCR_EnterPausedState();
-		}
-		else if ( toupper( wParam ) == 'D' )
-		{
-			g_bShowVCRPlaybackDisplay = !g_bShowVCRPlaybackDisplay;
+			const int upper = toupper(static_cast<unsigned short>(wParam));
+
+			if ( upper == 'Q' )
+			{
+				TerminateProcess( GetCurrentProcess(), 1 );
+			}
+			else if ( upper == 'P' )
+			{
+				VCR_EnterPausedState();
+			}
+			else if ( upper == 'S' && !g_bVCRSingleStep )
+			{
+				g_bWaitingForStepKeyUp = true;
+				VCR_EnterPausedState();
+			}
+			else if ( upper == 'D' )
+			{
+				g_bShowVCRPlaybackDisplay = !g_bShowVCRPlaybackDisplay;
+			}
 		}
 
 		g_iVCRPlaybackSleepInterval = clamp( g_iVCRPlaybackSleepInterval, 0, 500 );
@@ -642,17 +647,46 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		::SetForegroundWindow( hWnd );
 		break;
 
-	case WM_ACTIVATEAPP:
+	// Sent to both the window being activated and the window being deactivated.
+	// If the windows use the same input queue, the message is sent
+	// synchronously, first to the window procedure of the top-level window
+	// being deactivated, then to the window procedure of the top-level window
+	// being activated.  If the windows use different input queues, the message
+	// is sent asynchronously, so the window is activated immediately.
+	case WM_ACTIVATE:
 		{
+			const unsigned short window_activation_state{LOWORD( wParam )};
+			const bool is_activated{window_activation_state != WA_INACTIVE};
+			// The high-order word specifies the minimized state of the window
+			// being activated or deactivated.  A nonzero value indicates the
+			// window is minimized.
+			// const bool is_window_minimized{HIWORD( wParam ) != 0};
+
+			// dimhotepus: Unify way to handle sound mute on focus lost.
+			ConVarRef snd_mute_losefocus("snd_mute_losefocus");
+			if (snd_mute_losefocus.GetBool())
+			{
+				if ( is_activated )
+				{
+					S_UnblockSound();
+				}
+				else
+				{
+					S_BlockSound();
+					// dimhotepus: Need to be thread-safe.
+					// S_ClearBuffer();
+				}
+			}
+
 			if ( CanPostActivateEvents() )
 			{
-				bool bActivated = ( wParam == 1 );
 				event.m_nType = IE_AppActivated;
-				event.m_nData = bActivated;
+				event.m_nData = is_activated;
 				g_pInputSystem->PostUserEvent( event );
 			}
+
+			break;
 		}
-		break;
 
 	case WM_POWERBROADCAST:
 		switch (wParam)
