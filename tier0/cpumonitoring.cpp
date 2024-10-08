@@ -62,9 +62,9 @@ int64 GetFrequency()
 	LARGE_INTEGER waitTime, startCount, curCount;
 	CCycleCount start, end;
 
-	// Take 1/32 of a second for the measurement.
+	// Take 1/128 of a second for the measurement.
 	QueryPerformanceFrequency( &waitTime );
-	int scale = 5;
+	int scale = 7;
 	waitTime.QuadPart >>= scale;
 
 	QueryPerformanceCounter( &startCount );
