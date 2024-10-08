@@ -186,7 +186,7 @@ void CMaterialModifyControl::SetMaterialVar( inputdata_t &inputdata )
 void CMaterialModifyControl::SetMaterialVarToCurrentTime( inputdata_t &inputdata )
 {
 	char temp[32];
-	Q_snprintf( temp, 32, "%f", gpGlobals->curtime );
+	V_to_chars( temp, gpGlobals->curtime );
 	Q_strncpy( m_szMaterialVarValue.GetForModify(), temp, MATERIAL_MODIFY_STRING_SIZE );
 	m_nModifyMode = MATERIAL_MODIFY_MODE_SETVAR;
 }
@@ -213,7 +213,8 @@ void CMaterialModifyControl::InputStartAnimSequence( inputdata_t &inputdata )
 			pszParam = strtok(NULL," ");
 			if ( pszParam && pszParam[0] )
 			{
-				float flFramerate = atof(pszParam);
+				// dimhotepus: atof => strtof.
+				float flFramerate = strtof(pszParam, nullptr);
 
 				pszParam = strtok(NULL," ");
 				if ( pszParam && pszParam[0] )
@@ -254,17 +255,20 @@ void CMaterialModifyControl::InputStartFloatLerp( inputdata_t &inputdata )
 	char *pszParam = strtok(parseString," ");
 	if ( pszParam && pszParam[0] )
 	{
-		float flStartValue = atof(pszParam);
+		// dimhotepus: atof => strtof.
+		float flStartValue = strtof(pszParam, nullptr);
 
 		pszParam = strtok(NULL," ");
 		if ( pszParam && pszParam[0] )
 		{
-			float flEndValue = atof(pszParam);
+			// dimhotepus: atof => strtof.
+			float flEndValue = strtof(pszParam, nullptr);
 
 			pszParam = strtok(NULL," ");
 			if ( pszParam && pszParam[0] )
 			{
-				float flTransitionTime = atof(pszParam);
+				// dimhotepus: atof => strtof.
+				float flTransitionTime = strtof(pszParam, nullptr);
 
 				pszParam = strtok(NULL," ");
 				if ( pszParam && pszParam[0] )

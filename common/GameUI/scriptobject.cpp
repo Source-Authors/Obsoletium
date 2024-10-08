@@ -233,7 +233,7 @@ char * CleanFloat( float val )
 	static char string[2][32];
 	curstring = ( curstring + 1 ) % 2;
 
-	Q_snprintf( string[curstring], sizeof( string[curstring] ), "%f", val );
+	V_to_chars( string[curstring], val );
 
 	char * str = string[curstring];
 
@@ -428,7 +428,7 @@ void CScriptObject::WriteToConfig( void )
 			fVal = max( fVal, fMin );
 		if ( fMax != -1.0 )
 			fVal = min( fVal, fMax );
-		Q_snprintf( szValue, sizeof( szValue ), "%f", fVal );
+		V_to_chars( szValue, fVal );
 		break;
 	case O_STRING:
 		Q_snprintf( szValue, sizeof( szValue ), "\"%s\"", (char *)curValue );

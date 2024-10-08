@@ -21,9 +21,7 @@
 #include "icvar.h"
 #include "tier0/dbg.h"
 #include "Color.h"
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#endif
+
 #include "tier0/memdbgon.h"
 
 #ifndef NDEBUG
@@ -766,14 +764,13 @@ void ConVar::InternalSetValue( const char *value )
 	}
 
 	float fNewValue;
-	char  tempVal[ 32 ];
-	char  *val;
 
 	Assert(m_pParent == this); // Only valid for root convars.
-
+	
+	char tempVal[ 32 ];
 	float flOldValue = m_fValue;
 
-	val = (char *)value;
+	const char *val = value;
 	if ( !value )
 		fNewValue = 0.0f;
 	else
@@ -782,7 +779,8 @@ void ConVar::InternalSetValue( const char *value )
 
 	if ( ClampValue( fNewValue ) )
 	{
-		Q_snprintf( tempVal,sizeof(tempVal), "%f", fNewValue );
+		// dimhotepus: Speedup to chars conversion.
+		V_to_chars(tempVal, fNewValue);
 		val = tempVal;
 	}
 
@@ -921,7 +919,8 @@ void ConVar::InternalSetFloatValue( float fNewValue, bool bForce /*= false */ )
 	if ( !( m_nFlags & FCVAR_NEVER_AS_STRING ) )
 	{
 		char tempVal[ 32 ];
-		Q_snprintf( tempVal, sizeof( tempVal), "%f", m_fValue );
+		// dimhotepus: Speedup to chars conversion.
+		V_to_chars( tempVal, m_fValue );
 		ChangeStringValue( tempVal, flOldValue );
 	}
 	else
@@ -964,7 +963,8 @@ void ConVar::InternalSetIntValue( int nValue )
 	if ( !( m_nFlags & FCVAR_NEVER_AS_STRING ) )
 	{
 		char tempVal[ 32 ];
-		Q_snprintf( tempVal, sizeof( tempVal ), "%d", m_nValue );
+		// dimhotepus: Speedup to chars conversion.
+		V_to_chars( tempVal, m_nValue );
 		ChangeStringValue( tempVal, flOldValue );
 	}
 	else
@@ -1323,11 +1323,13 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 
 			if ( fabsf( (float)intVal - floatVal ) < 0.000001f )
 			{
-				Q_snprintf( tempVal, sizeof( tempVal ), "%d", intVal );
+				// dimhotepus: Speedup to chars conversion.
+				V_to_chars( tempVal, intVal );
 			}
 			else
 			{
-				Q_snprintf( tempVal, sizeof( tempVal ), "%f", floatVal );
+				// dimhotepus: Speedup to chars conversion.
+				V_to_chars( tempVal, floatVal );
 			}
 		}
 		else

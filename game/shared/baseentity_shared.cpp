@@ -497,9 +497,9 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 
 bool CBaseEntity::KeyValue( const char *szKeyName, float flValue ) 
 {
-	char	string[256];
+	char	string[32];
 
-	Q_snprintf(string,sizeof(string), "%f", flValue );
+	V_to_chars(string, flValue );
 
 	return KeyValue( szKeyName, string );
 }

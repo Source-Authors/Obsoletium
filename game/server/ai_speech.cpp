@@ -864,7 +864,12 @@ void CAI_ExpresserHost_NPC_DoModifyOrAppendCriteria( CAI_BaseNPC *pSpeaker, AI_C
 		if ( pSpeaker->GetLastEnemyTime() == 0.0 )
 			set.AppendCriteria( "timesincecombat", "999999.0" );
 		else
-			set.AppendCriteria( "timesincecombat", UTIL_VarArgs( "%f", gpGlobals->curtime - pSpeaker->GetLastEnemyTime() ) );
+		{
+			char buffer[32];
+			V_to_chars(buffer, gpGlobals->curtime - pSpeaker->GetLastEnemyTime());
+
+			set.AppendCriteria( "timesincecombat", buffer );
+		}
 	}
 
 	set.AppendCriteria( "speed", UTIL_VarArgs( "%.3f", pSpeaker->GetSmoothedVelocity().Length() ) );
@@ -884,7 +889,10 @@ void CAI_ExpresserHost_NPC_DoModifyOrAppendCriteria( CAI_BaseNPC *pSpeaker, AI_C
 	{
 		Vector distance = pPlayer->GetAbsOrigin() - pSpeaker->GetAbsOrigin();
 
-		set.AppendCriteria( "distancetoplayer", UTIL_VarArgs( "%f", distance.Length() ) );
+		char buffer[32];
+		V_to_chars(buffer, distance.Length());
+
+		set.AppendCriteria( "distancetoplayer", buffer );
 
 	}
 	else

@@ -997,8 +997,8 @@ void KeyValues::SaveKeyToFile( KeyValues *dat, IBaseFileSystem *filesystem, File
 				INTERNALWRITE(dat->GetName(), Q_strlen(dat->GetName()));
 				INTERNALWRITE("\"\t\t\"", 4);
 
-				char buf[48];
-				Q_snprintf(buf, sizeof( buf ), "%f", dat->m_flValue);
+				char buf[32];
+				V_to_chars(buf, dat->m_flValue);
 
 				INTERNALWRITE(buf, Q_strlen(buf));
 				INTERNALWRITE("\"\n", 2);
@@ -1469,19 +1469,19 @@ const char *KeyValues::GetString( const char *keyName, const char *defaultValue 
 		switch ( dat->m_iDataType )
 		{
 		case TYPE_FLOAT:
-			Q_snprintf( buf, sizeof( buf ), "%f", dat->m_flValue );
+			V_to_chars( buf, dat->m_flValue );
 			SetString( keyName, buf );
 			break;
 		case TYPE_PTR:
-			Q_snprintf( buf, sizeof( buf ), "%lld", (int64)dat->m_pValue );
+			V_to_chars( buf, (int64)dat->m_pValue );
 			SetString( keyName, buf );
 			break;
 		case TYPE_INT:
-			Q_snprintf( buf, sizeof( buf ), "%d", dat->m_iValue );
+			V_to_chars( buf, dat->m_iValue );
 			SetString( keyName, buf );
 			break;
 		case TYPE_UINT64:
-			Q_snprintf( buf, sizeof( buf ), "%lld", *((uint64 *)(dat->m_sValue)) );
+			V_to_chars( buf, *((uint64 *)(dat->m_sValue)) );
 			SetString( keyName, buf );
 			break;
 
@@ -1562,7 +1562,7 @@ const wchar_t *KeyValues::GetWString( const char *keyName, const wchar_t *defaul
 			return defaultValue;
 		}
 		
-		return (const wchar_t* )dat->m_wsValue;
+		return dat->m_wsValue;
 	}
 	return defaultValue;
 }
@@ -3153,8 +3153,8 @@ bool IKeyValuesDumpContextAsText::KvWriteValue( KeyValues *val, int nIndentLevel
 	case KeyValues::TYPE_INT:
 		{
 			int n = val->GetInt();
-			char *chBuffer = ( char * ) stackalloc( 128 );
-			V_snprintf( chBuffer, 128, "int( %d = 0x%X )", n, n );
+			char *chBuffer = ( char * ) stackalloc( 32 );
+			V_snprintf( chBuffer, 32, "int( %d = 0x%X )", n, n );
 			if ( !KvWriteText( chBuffer ) )
 				return false;
 		}
@@ -3163,8 +3163,8 @@ bool IKeyValuesDumpContextAsText::KvWriteValue( KeyValues *val, int nIndentLevel
 	case KeyValues::TYPE_FLOAT:
 		{
 			float fl = val->GetFloat();
-			char *chBuffer = ( char * ) stackalloc( 128 );
-			V_snprintf( chBuffer, 128, "float( %f )", fl );
+			char *chBuffer = ( char * ) stackalloc( 32 );
+			V_snprintf( chBuffer, 32, "float( %f )", fl );
 			if ( !KvWriteText( chBuffer ) )
 				return false;
 		}
@@ -3173,8 +3173,8 @@ bool IKeyValuesDumpContextAsText::KvWriteValue( KeyValues *val, int nIndentLevel
 	case KeyValues::TYPE_PTR:
 		{
 			void *ptr = val->GetPtr();
-			char *chBuffer = ( char * ) stackalloc( 128 );
-			V_snprintf( chBuffer, 128, "ptr( 0x%p )", ptr );
+			char *chBuffer = ( char * ) stackalloc( 32 );
+			V_snprintf( chBuffer, 32, "ptr( 0x%p )", ptr );
 			if ( !KvWriteText( chBuffer ) )
 				return false;
 		}
@@ -3195,8 +3195,8 @@ bool IKeyValuesDumpContextAsText::KvWriteValue( KeyValues *val, int nIndentLevel
 	case KeyValues::TYPE_UINT64:
 		{
 			uint64 n = val->GetUint64();
-			char *chBuffer = ( char * ) stackalloc( 128 );
-			V_snprintf( chBuffer, 128, "u64( %lld = 0x%llX )", n, n );
+			char *chBuffer = ( char * ) stackalloc( 32 );
+			V_snprintf( chBuffer, 32, "u64( %lld = 0x%llX )", n, n );
 			if ( !KvWriteText( chBuffer ) )
 				return false;
 		}
