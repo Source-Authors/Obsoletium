@@ -43,12 +43,12 @@ void CEngineRecipientFilter::MakeInitMessage( void )
 	m_bInit = true;
 }
 
-int CEngineRecipientFilter::GetRecipientCount( void ) const
+intp CEngineRecipientFilter::GetRecipientCount( void ) const
 {
 	return m_Recipients.Count();
 }
 
-int	CEngineRecipientFilter::GetRecipientIndex( int slot ) const
+intp	CEngineRecipientFilter::GetRecipientIndex( intp slot ) const
 {
 	if ( slot < 0 || slot >= GetRecipientCount() )
 		return -1;
@@ -60,7 +60,7 @@ void CEngineRecipientFilter::AddAllPlayers( void )
 {
 	m_Recipients.RemoveAll();
 
-	for ( int i = 0; i < sv.GetClientCount(); i++ )
+	for ( intp i = 0; i < sv.GetClientCount(); i++ )
 	{
 		IClient *cl = sv.GetClient( i );
 
@@ -72,7 +72,7 @@ void CEngineRecipientFilter::AddAllPlayers( void )
 }
 
 
-void CEngineRecipientFilter::AddRecipient( int index )
+void CEngineRecipientFilter::AddRecipient( intp index )
 {
 	// Already in list
 	if ( m_Recipients.Find( index ) != m_Recipients.InvalidIndex() )
@@ -81,7 +81,7 @@ void CEngineRecipientFilter::AddRecipient( int index )
 	m_Recipients.AddToTail( index );
 }
 
-void CEngineRecipientFilter::RemoveRecipient( int index )
+void CEngineRecipientFilter::RemoveRecipient( intp index )
 {
 	// Remove it if it's in the list
 	m_Recipients.FindAndRemove( index );
@@ -89,7 +89,7 @@ void CEngineRecipientFilter::RemoveRecipient( int index )
 
 void CEngineRecipientFilter::AddPlayersFromBitMask( CBitVec< ABSOLUTE_PLAYER_LIMIT >& playerbits )
 {
-	for( int i = 0; i < sv.GetClientCount(); i++ )
+	for( intp i = 0; i < sv.GetClientCount(); i++ )
 	{
 		if ( !playerbits[i] )
 			continue;
@@ -102,9 +102,9 @@ void CEngineRecipientFilter::AddPlayersFromBitMask( CBitVec< ABSOLUTE_PLAYER_LIM
 	}
 }
 
-bool CEngineRecipientFilter::IncludesPlayer(int playerindex)
+bool CEngineRecipientFilter::IncludesPlayer(intp playerindex)
 {
-	for( int i = 0; i < GetRecipientCount(); i++ )
+	for( intp i = 0; i < GetRecipientCount(); i++ )
 	{
 		if ( playerindex ==	GetRecipientIndex(i) )
 			return true;
@@ -115,7 +115,7 @@ bool CEngineRecipientFilter::IncludesPlayer(int playerindex)
 
 void CEngineRecipientFilter::AddPlayersFromFilter(const IRecipientFilter *filter )
 {
-	for( int i = 0; i < filter->GetRecipientCount(); i++ )
+	for( intp i = 0; i < filter->GetRecipientCount(); i++ )
 	{
 		AddRecipient( filter->GetRecipientIndex(i) );
 	}

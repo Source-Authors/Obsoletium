@@ -194,11 +194,11 @@ void CEngineSoundClient::EmitSoundInternal( IRecipientFilter& filter, int iEntIn
 			iSoundSource = cl.m_nViewEntity;
 
 		// See if local player is a recipient
-		int i = 0;
-		int c = filter.GetRecipientCount();
+		intp i = 0;
+		intp c = filter.GetRecipientCount();
 		for ( ; i < c ; i++ )
 		{
-			int index = filter.GetRecipientIndex( i );
+			intp index = filter.GetRecipientIndex( i );
 			if ( index == cl.m_nPlayerSlot + 1 )
 				break;
 		}

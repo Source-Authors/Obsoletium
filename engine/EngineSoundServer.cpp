@@ -306,10 +306,10 @@ void CEngineSoundServer::EmitSound( IRecipientFilter& filter, int iEntIndex, int
 
 void BuildRecipientList( CUtlVector< edict_t * >& list, const IRecipientFilter& filter )
 {
-	int c = filter.GetRecipientCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = filter.GetRecipientCount();
+	for ( intp i = 0; i < c; i++ )
 	{
-		int playerindex = filter.GetRecipientIndex( i );
+		intp playerindex = filter.GetRecipientIndex( i );
 		if ( playerindex < 1 || playerindex > sv.GetClientCount() )
 			continue;
 

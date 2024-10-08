@@ -156,9 +156,9 @@ public:
 			m_Flags |= FLAG_INIT_MESSAGE;
 		}
 
-		for ( int i = 0; i < pSrc->GetRecipientCount(); i++ )
+		for ( intp i = 0; i < pSrc->GetRecipientCount(); i++ )
 		{
-			int index = pSrc->GetRecipientIndex( i );
+			intp index = pSrc->GetRecipientIndex( i );
 			
 			if ( index >= 0 )
 				m_Recipients.AddToTail( index );
@@ -175,12 +175,12 @@ public:
 		return (m_Flags & FLAG_RELIABLE) != 0;
 	}
 
-	virtual int	GetRecipientCount( void ) const
+	virtual intp	GetRecipientCount( void ) const
 	{
 		return m_Recipients.Count();
 	}
 
-	virtual int	GetRecipientIndex( int slot ) const
+	virtual intp	GetRecipientIndex( intp slot ) const
 	{
 		return m_Recipients[ slot ];
 	}

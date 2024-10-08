@@ -1,19 +1,14 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
 //
-//=============================================================================//
 
-#ifndef BASESERVER_H
-#define BASESERVER_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SE_ENGINE_BASESERVER_H_
+#define SE_ENGINE_BASESERVER_H_
 
 #include <iserver.h>
-#include <netadr.h>
-#include <bitbuf.h>
-#include <utlvector.h>
+#include <tier1/netadr.h>
+#include <tier1/bitbuf.h>
+#include <tier1/utlvector.h>
 #include "baseclient.h"
 #include "netmessages.h"
 #include "net.h"
@@ -43,12 +38,12 @@ bool AllowDebugDedicatedServerOutsideSteam();
 // delta baseline, send a full update. 
 #define MAX_DELTA_TICKS	192		// this is about 3 seconds
 
-typedef struct
+struct challenge_t
 {
 	netadr_t    adr;       // Address where challenge value was sent to.
 	int			challenge; // To connect, adr IP address must respond with this #
 	float		time;      // # is valid for only a short duration.
-} challenge_t;
+};
 
 
 class CBaseServer  : public IServer
@@ -57,7 +52,7 @@ public:
 	CBaseServer();
 	virtual ~CBaseServer();
 
-	bool RestartOnLevelChange() { return m_bRestartOnLevelChange; }
+	bool RestartOnLevelChange() const { return m_bRestartOnLevelChange; }
 
 public: // IServer implementation
 
@@ -66,8 +61,8 @@ public: // IServer implementation
 	virtual int		GetNumFakeClients() const; // returns number of fake clients/bots
 	virtual int		GetMaxClients( void ) const { return m_nMaxclients; } // returns current client limit
 	virtual int		GetUDPPort( void ) const { return NET_GetUDPPort( m_Socket );	}
-	virtual IClient	*GetClient( int index ) { return m_Clients[index]; } // returns interface to client 
-	virtual int		GetClientCount() const { return m_Clients.Count(); } // for iteration;
+	virtual IClient	*GetClient( intp index ) { return m_Clients[index]; } // returns interface to client 
+	virtual intp	GetClientCount() const { return m_Clients.Count(); } // for iteration;
 	virtual float	GetTime( void ) const;
 	virtual int		GetTick( void ) const { return m_nTickCount; }
 	virtual float	GetTickInterval( void ) const { return m_flTickInterval; }

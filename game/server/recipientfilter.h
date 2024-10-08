@@ -29,8 +29,8 @@ public:
 	virtual bool	IsReliable( void ) const;
 	virtual bool	IsInitMessage( void ) const;
 
-	virtual int		GetRecipientCount( void ) const;
-	virtual int		GetRecipientIndex( int slot ) const;
+	virtual intp	GetRecipientCount( void ) const;
+	virtual intp	GetRecipientIndex( intp slot ) const;
 
 public:
 
@@ -49,7 +49,7 @@ public:
 	void			AddRecipient( const CBasePlayer *player );
 	void			RemoveAllRecipients( void );
 	void			RemoveRecipient( CBasePlayer *player );
-	void			RemoveRecipientByPlayerIndex( int playerindex );
+	void			RemoveRecipientByPlayerIndex( intp playerindex );
 	void			AddRecipientsByTeam( CTeam *team );
 	void			RemoveRecipientsByTeam( CTeam *team );
 	void			RemoveRecipientsNotOnTeam( CTeam *team );

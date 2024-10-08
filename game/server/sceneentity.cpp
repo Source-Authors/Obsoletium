@@ -1670,15 +1670,15 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 
 		if ( m_pRecipientFilter )
 		{
-			int filterCount = filter.GetRecipientCount();
-			int recipientPlayerCount = m_pRecipientFilter->GetRecipientCount();
-			for ( int i = filterCount-1; i >= 0; --i )
+			intp filterCount = filter.GetRecipientCount();
+			intp recipientPlayerCount = m_pRecipientFilter->GetRecipientCount();
+			for ( intp i = filterCount-1; i >= 0; --i )
 			{
-				int playerindex = filter.GetRecipientIndex( i );
+				intp playerindex = filter.GetRecipientIndex( i );
 
 				bool bFound = false;
 
-				for ( int j = 0; j < recipientPlayerCount; ++j )
+				for ( intp j = 0; j < recipientPlayerCount; ++j )
 				{
 					if ( m_pRecipientFilter->GetRecipientIndex(j) == playerindex )
 					{
@@ -1740,10 +1740,10 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 		// FIXME:  This will  change
 		es.m_bEmitCloseCaption = false;
 
-		int c = filter.GetRecipientCount();
-		for ( int i = 0; i < c; ++i )
+		intp c = filter.GetRecipientCount();
+		for ( intp i = 0; i < c; ++i )
 		{
-			int playerindex = filter.GetRecipientIndex( i );
+			intp playerindex = filter.GetRecipientIndex( i );
 			CBasePlayer *player = UTIL_PlayerByIndex( playerindex );
 			if ( !player )
 				continue;
@@ -1803,8 +1803,8 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 				if ( !event->IsSuppressingCaptionAttenuation() && 
 					( filter.GetRecipientCount() > 0 ) )
 				{
-					int c = filter.GetRecipientCount();
-					for ( int i = c - 1 ; i >= 0; --i )
+					intp c = filter.GetRecipientCount();
+					for ( intp i = c - 1 ; i >= 0; --i )
 					{
 						CBasePlayer *player = UTIL_PlayerByIndex( filter.GetRecipientIndex( i ) );
 						if ( !player )
@@ -4319,10 +4319,10 @@ int CSceneEntity::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 		bool bFound = false;
 
 		// If we can't find them in the recipient list, exclude
-		int i;
+		intp i;
 		for ( i=0; i<m_pRecipientFilter->GetRecipientCount();i++ )
 		{
-			int iRecipient = m_pRecipientFilter->GetRecipientIndex(i);
+			intp iRecipient = m_pRecipientFilter->GetRecipientIndex(i);
 
 			CBasePlayer *player = static_cast< CBasePlayer * >( CBaseEntity::Instance( iRecipient ) );
 
