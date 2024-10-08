@@ -380,22 +380,6 @@ $Project "hk_math"
 	"ivp\havana\havok\hk_math\hk_math.vpc" [$WINDOWS||$POSIX]
 }
 
-// FIXME why doesn't source2 define this?
-$Project "panoramamessages"
-{
-	"panorama/panoramamessages.vpc" [$SOURCE_PANORAMA_FIXME]
-}
-
-$Project "panorama"
-{
-	"panorama/panorama.vpc" [$SOURCE_PANORAMA_FIXME]
-}
-
-$Project "panorama_client"
-{
-	"panorama/panorama_client.vpc" [$SOURCE_PANORAMA_FIXME]
-}
-
 $Project "particles"
 {
 	"particles\particles.vpc"
