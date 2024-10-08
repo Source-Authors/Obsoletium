@@ -687,8 +687,8 @@ public:
 
 			if ( filterCopy.GetRecipientCount() > 0 )
 			{
-				int c = filterCopy.GetRecipientCount();
-				for ( int i = c - 1 ; i >= 0; --i )
+				intp c = filterCopy.GetRecipientCount();
+				for ( intp i = c - 1 ; i >= 0; --i )
 				{
 					CBasePlayer *player = UTIL_PlayerByIndex( filterCopy.GetRecipientIndex( i ) );
 					if ( !player )

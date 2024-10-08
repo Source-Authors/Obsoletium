@@ -1467,19 +1467,19 @@ void SV_AddOriginToPVS( const Vector& origin )
 
 void CGameServer::BroadcastSound( SoundInfo_t &sound, IRecipientFilter &filter )
 {
-	int num = filter.GetRecipientCount();
+	intp num = filter.GetRecipientCount();
 	
 	// don't add sounds while paused, unless we're in developer mode
 	if ( IsPaused() && !developer.GetInt() )
 		return;
 
-	for ( int i = 0; i < num; i++ )
+	for ( intp i = 0; i < num; i++ )
 	{
-		int index = filter.GetRecipientIndex( i );
+		intp index = filter.GetRecipientIndex( i );
 
 		if ( index < 1 || index > GetClientCount() )
 		{
-			Msg( "CGameServer::BroadcastSound:  Recipient Filter for sound (reliable: %s, init: %s) with bogus client index (%i) in list of %i clients\n", 
+			Msg( "CGameServer::BroadcastSound:  Recipient Filter for sound (reliable: %s, init: %s) with bogus client index (%zd) in list of %zd clients\n", 
 					filter.IsReliable() ? "yes" : "no",
 					filter.IsInitMessage() ? "yes" : "no",
 					index, num );

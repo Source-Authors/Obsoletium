@@ -1683,10 +1683,10 @@ ConVarRef suitcharger( "sk_suitcharger" );
 						filter.AddRecipientsByPAS( pPlayer->WorldSpaceCenter() );
 
 						// further reduce the range to a certain radius
-						int i;
+						intp i;
 						for ( i = filter.GetRecipientCount()-1; i >= 0; i-- )
 						{
-							int index = filter.GetRecipientIndex(i);
+							intp index = filter.GetRecipientIndex(i);
 
 							CBasePlayer *pListener = UTIL_PlayerByIndex( index );
 

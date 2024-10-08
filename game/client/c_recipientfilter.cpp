@@ -37,8 +37,8 @@ void C_RecipientFilter::CopyFrom( const C_RecipientFilter& src )
 	m_bUsingPredictionRules = src.IsUsingPredictionRules();
 	m_bIgnorePredictionCull = src.IgnorePredictionCull();
 
-	int c = src.GetRecipientCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = src.GetRecipientCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		m_Recipients.AddToTail( src.GetRecipientIndex( i ) );
 	}
@@ -65,12 +65,12 @@ bool C_RecipientFilter::IsReliable( void ) const
 	return m_bReliable;
 }
 
-int C_RecipientFilter::GetRecipientCount( void ) const
+intp C_RecipientFilter::GetRecipientCount( void ) const
 {
 	return m_Recipients.Count();
 }
 
-int	C_RecipientFilter::GetRecipientIndex( int slot ) const
+intp	C_RecipientFilter::GetRecipientIndex( intp slot ) const
 {
 	if ( slot < 0 || slot >= GetRecipientCount() )
 		return -1;
@@ -187,7 +187,7 @@ void C_RecipientFilter::UsePredictionRules( void )
 	m_bUsingPredictionRules = true;
 
 	// Cull list now, if needed
-	int c = GetRecipientCount();
+	intp c = GetRecipientCount();
 	if ( c == 0 )
 		return;
 

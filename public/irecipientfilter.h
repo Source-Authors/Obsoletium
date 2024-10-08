@@ -22,8 +22,8 @@ public:
 	virtual bool	IsReliable( void ) const = 0;
 	virtual bool	IsInitMessage( void ) const = 0;
 
-	virtual int		GetRecipientCount( void ) const = 0;
-	virtual int		GetRecipientIndex( int slot ) const = 0;
+	virtual intp	GetRecipientCount( void ) const = 0;
+	virtual intp	GetRecipientIndex( intp slot ) const = 0;
 };
 
 #endif // IRECIPIENTFILTER_H

@@ -6989,34 +6989,21 @@ QAngle CBaseEntity::GetStepAngles( void ) const
 //-----------------------------------------------------------------------------
 void CBaseEntity::RemoveRecipientsIfNotCloseCaptioning( CRecipientFilter& filter )
 {
-	int c = filter.GetRecipientCount();
-	for ( int i = c - 1; i >= 0; --i )
+	intp c = filter.GetRecipientCount();
+	for ( intp i = c - 1; i >= 0; --i )
 	{
 		int playerIndex = filter.GetRecipientIndex( i );
 
 		CBasePlayer *player = static_cast< CBasePlayer * >( CBaseEntity::Instance( playerIndex ) );
 		if ( !player )
 			continue;
-#if !defined( _XBOX )
+
 		const char *cvarvalue = engine->GetClientConVarValue( playerIndex, "closecaption" );
 		Assert( cvarvalue );
 		if ( !cvarvalue[ 0 ] )
 			continue;
 
 		int value = atoi( cvarvalue );
-#else
-		static ConVar *s_pCloseCaption = NULL;
-		if ( !s_pCloseCaption )
-		{
-			s_pCloseCaption = cvar->FindVar( "closecaption" );
-			if ( !s_pCloseCaption )
-			{
-				Error( "XBOX couldn't find closecaption convar!!!" );
-			}
-		}
-
-		int value = s_pCloseCaption->GetInt();
-#endif
 		// No close captions?
 		if ( value == 0 )
 		{

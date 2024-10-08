@@ -2184,15 +2184,15 @@ void CBaseServer::BroadcastMessage( INetMessage &msg, IRecipientFilter &filter )
 	{
 		msg.SetReliable( filter.IsReliable() );
 
-		int num = filter.GetRecipientCount();
+		intp num = filter.GetRecipientCount();
 	
-		for ( int i = 0; i < num; i++ )
+		for ( intp i = 0; i < num; i++ )
 		{
-			int index = filter.GetRecipientIndex( i );
+			intp index = filter.GetRecipientIndex( i );
 
 			if ( index < 1 || index > m_Clients.Count() )
 			{
-				Msg( "SV_BroadcastMessage:  Recipient Filter for message type %i (reliable: %s, init: %s) with bogus client index (%i) in list of %i clients\n", 
+				Msg( "SV_BroadcastMessage:  Recipient Filter for message type %i (reliable: %s, init: %s) with bogus client index (%zd) in list of %zd clients\n", 
 						msg.GetType(), 
 						filter.IsReliable() ? "yes" : "no",
 						filter.IsInitMessage() ? "yes" : "no",

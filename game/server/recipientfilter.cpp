@@ -39,8 +39,8 @@ void CRecipientFilter::CopyFrom( const CRecipientFilter& src )
 	m_bUsingPredictionRules = src.IsUsingPredictionRules();
 	m_bIgnorePredictionCull = src.IgnorePredictionCull();
 
-	int c = src.GetRecipientCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = src.GetRecipientCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		m_Recipients.AddToTail( src.GetRecipientIndex( i ) );
 	}
@@ -68,12 +68,12 @@ bool CRecipientFilter::IsReliable( void ) const
 	return m_bReliable;
 }
 
-int CRecipientFilter::GetRecipientCount( void ) const
+intp CRecipientFilter::GetRecipientCount( void ) const
 {
 	return m_Recipients.Count();
 }
 
-int	CRecipientFilter::GetRecipientIndex( int slot ) const
+intp	CRecipientFilter::GetRecipientIndex( intp slot ) const
 {
 	if ( slot < 0 || slot >= GetRecipientCount() )
 		return -1;
@@ -142,7 +142,7 @@ void CRecipientFilter::RemoveRecipient( CBasePlayer *player )
 	}
 }
 
-void CRecipientFilter::RemoveRecipientByPlayerIndex( int playerindex )
+void CRecipientFilter::RemoveRecipientByPlayerIndex( intp playerindex )
 {
 	Assert( playerindex >= 1 && playerindex <= ABSOLUTE_PLAYER_LIMIT );
 
@@ -378,11 +378,11 @@ void CPASAttenuationFilter::Filter( const Vector& origin, float attenuation /*= 
 	float distance, maxAudible;
 	Vector vecRelative;
 
-	int c = GetRecipientCount();
+	intp c = GetRecipientCount();
 	
-	for ( int i = c - 1; i >= 0; i-- )
+	for ( intp i = c - 1; i >= 0; i-- )
 	{
-		int index = GetRecipientIndex( i );
+		intp index = GetRecipientIndex( i );
 
 		CBaseEntity *ent = CBaseEntity::Instance( index );
 		if ( !ent || !ent->IsPlayer() )
