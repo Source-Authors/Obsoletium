@@ -9,12 +9,16 @@
 #ifndef TIER1_STRTOOLS_H
 #define TIER1_STRTOOLS_H
 
+#include "tier0/dbg.h"
 #include "tier0/platform.h"
 
 #include <cctype>
 #include <cstdarg>
 #include <cstring>
 #include <cstdlib>
+#include <charconv>
+#include <system_error>
+#include <type_traits>
 
 #ifdef _WIN32
 #pragma once
@@ -1310,6 +1314,54 @@ constexpr inline bool Q_isempty(char (&v)[size]) { return v[0] == '\0'; }
 
 template<size_t size>
 constexpr inline bool Q_isempty(wchar_t (&v)[size]) { return v[0] == L'\0'; }
+
+// dimhotepus: Fast integral -> char conversion.
+template<size_t size, typename TIntegral>
+constexpr inline std::enable_if_t<std::is_integral_v<TIntegral>, std::errc>
+V_to_chars(char (&buffer)[size], TIntegral value, int base = 10)
+{
+	// Do not NULL terminate, so be careful.
+	const std::to_chars_result result{std::to_chars(buffer, buffer + size, value, base)};
+	if (result.ec == std::errc{})
+	{
+		// If has space for NULL terminate.
+		if (result.ptr != buffer + size)
+		{
+			*result.ptr = '\0';
+			return std::errc{};
+		}
+	}
+	AssertMsg(false, "Unable to convert integral to chars: %s.\n",
+		std::make_error_code(result.ec != std::errc{} ? result.ec : std::errc::value_too_large)
+			.message().c_str());
+	// Overflow.
+	*buffer = '\0';
+	return std::errc::value_too_large;
+}
+
+// dimhotepus: Fast floating point -> char conversion.
+template<size_t size, typename TFloat>
+constexpr inline std::enable_if_t<std::is_floating_point_v<TFloat>, std::errc>
+V_to_chars(char (&buffer)[size], TFloat value)
+{
+	// Do not NULL terminate, so be careful.
+	const std::to_chars_result result{std::to_chars(buffer, buffer + size, value)};
+	if (result.ec == std::errc{})
+	{
+		// If has space for NULL terminate.
+		if (result.ptr != buffer + size)
+		{
+			*result.ptr = '\0';
+			return std::errc{};
+		}
+	}
+	AssertMsg(false, "Unable to convert floating point to chars: %s.\n",
+		std::make_error_code(result.ec != std::errc{} ? result.ec : std::errc::value_too_large)
+			.message().c_str());
+	// Overflow.
+	*buffer = '\0';
+	return std::errc::value_too_large;
+}
 
 #endif // !defined( VSTDLIB_DLL_EXPORT )
 

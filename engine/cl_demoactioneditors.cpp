@@ -670,9 +670,14 @@ void CBaseActionTextMessageStartDialog::Init( void )
 	BaseClass::Init();
 
 	client_textmessage_t *tm = GetAction()->GetTextMessage();
+	
+	char buffer[32];
 
-	m_pX->SetText( va( "%f", tm->x ) );
-	m_pY->SetText( va( "%f", tm->y ) );
+	V_to_chars(buffer, tm->x);
+	m_pX->SetText( buffer );
+
+	V_to_chars(buffer, tm->y);
+	m_pY->SetText( buffer );
 
 	m_pFadeInTime->SetText( va( "%.3f", tm->fadein ) );
 	m_pFadeOutTime->SetText( va( "%.3f", tm->fadeout ) );
@@ -1214,8 +1219,11 @@ void CBaseActionChangePlaybackRateDialog::Init( void )
 	LoadControlSettings( "resource\\BaseActionPlaybackRateDialog.res" );
 
 	BaseClass::Init();
+	
+	char buffer[32];
 
-	m_pRate->SetText( va( "%f", GetAction()->GetPlaybackRate() ) );
+	V_to_chars(buffer, GetAction()->GetPlaybackRate());
+	m_pRate->SetText( buffer );
 
 }
 
@@ -1278,7 +1286,10 @@ void CBaseActionPauseDialog::Init( void )
 
 	BaseClass::Init();
 
-	m_pPauseTime->SetText( va( "%f", GetAction()->GetPauseTime() ) );
+	char buffer[32];
+
+	V_to_chars(buffer, GetAction()->GetPauseTime());
+	m_pPauseTime->SetText( buffer );
 
 }
 
@@ -1370,10 +1381,19 @@ void CBaseActionZoomDialog::Init( void )
 
 	BaseClass::Init();
 
-	m_pFinalFOV->SetText( va( "%f", GetAction()->m_flFinalFOV ) );
-	m_pOutRate->SetText( va( "%f", GetAction()->m_flFOVRateOut ) );
-	m_pInRate->SetText( va( "%f", GetAction()->m_flFOVRateIn ) );
-	m_pHoldTime->SetText( va( "%f", GetAction()->m_flHoldTime ) );
+	char buffer[32];
+
+	V_to_chars( buffer, GetAction()->m_flFinalFOV );
+	m_pFinalFOV->SetText( buffer );
+	
+	V_to_chars( buffer, GetAction()->m_flFOVRateOut );
+	m_pOutRate->SetText( buffer );
+	
+	V_to_chars( buffer, GetAction()->m_flFOVRateIn );
+	m_pInRate->SetText( buffer );
+
+	V_to_chars( buffer, GetAction()->m_flHoldTime );
+	m_pHoldTime->SetText( buffer );
 
 	m_pSpline->SetSelected( GetAction()->m_bSpline );
 	m_pStayout->SetSelected( GetAction()->m_bStayout );

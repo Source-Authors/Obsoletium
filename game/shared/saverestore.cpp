@@ -268,7 +268,7 @@ void CSave::Log( const char *pName, fieldtype_t fieldType, void *value, int coun
 			{
 				short *pValue = ( short* )( value );
 				short nValue = pValue[iCount];
-				Q_snprintf( szTempBuf, sizeof( szTempBuf ), "%d", nValue );
+				V_to_chars( szTempBuf, nValue );
 				Q_strncat( szBuf, szTempBuf, sizeof( szTempBuf ), COPY_ALL_CHARACTERS );
 				break;
 			}
@@ -276,7 +276,7 @@ void CSave::Log( const char *pName, fieldtype_t fieldType, void *value, int coun
 			{
 				float *pValue = ( float* )( value );
 				float flValue = pValue[iCount];
-				Q_snprintf( szTempBuf, sizeof( szTempBuf ), "%f", flValue );
+				V_to_chars( szTempBuf, flValue );
 				Q_strncat( szBuf, szTempBuf, sizeof( szTempBuf ), COPY_ALL_CHARACTERS );
 				break;
 			}
@@ -284,7 +284,7 @@ void CSave::Log( const char *pName, fieldtype_t fieldType, void *value, int coun
 			{
 				bool *pValue = ( bool* )( value );
 				bool bValue = pValue[iCount];
-				Q_snprintf( szTempBuf, sizeof( szTempBuf ), "%d", ( int )( bValue ) );
+				V_to_chars( szTempBuf, ( int )( bValue ) );
 				Q_strncat( szBuf, szTempBuf, sizeof( szTempBuf ), COPY_ALL_CHARACTERS );
 				break;
 			}
@@ -292,7 +292,7 @@ void CSave::Log( const char *pName, fieldtype_t fieldType, void *value, int coun
 			{
 				int *pValue = ( int* )( value );
 				int nValue = pValue[iCount];
-				Q_snprintf( szTempBuf, sizeof( szTempBuf ), "%d", nValue );
+				V_to_chars( szTempBuf, nValue );
 				Q_strncat( szBuf, szTempBuf, sizeof( szTempBuf ), COPY_ALL_CHARACTERS );
 				break;
 			}

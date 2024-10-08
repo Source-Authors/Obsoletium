@@ -526,9 +526,9 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 						float floatVal = pBounded ? pBounded->GetFloat() : var->GetFloat();
 						
 						if ( floatVal == intVal )
-							Q_snprintf( strValue, sizeof( strValue ), "%d", intVal );
+							V_to_chars( strValue, intVal );
 						else
-							Q_snprintf( strValue, sizeof( strValue ), "%f", floatVal );
+							V_to_chars( strValue, floatVal );
 
 						item->m_pText = new CHistoryItem( var->GetName(), strValue );
 					}
