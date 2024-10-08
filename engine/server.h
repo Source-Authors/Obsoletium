@@ -75,7 +75,7 @@ public:
 	bool	IsInPureServerMode() const;
 	CPureServerWhitelist * GetPureServerWhitelist() const;
 	
-	inline  CGameClient *Client( int i ) { return static_cast<CGameClient*>(m_Clients[i]); };
+	inline  CGameClient *Client( intp i ) { return static_cast<CGameClient*>(m_Clients[i]); };
 
 protected :
 

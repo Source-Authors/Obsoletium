@@ -406,7 +406,7 @@ void CBaseClient::SetName(const char * playerName)
 	if ( Q_strncmp( name, m_Name, sizeof(m_Name) ) == 0 )
 		return; // didn't change
 
-	int			i;
+	intp		i;
 	int			dupc = 1;
 	char		*p, *val;
 

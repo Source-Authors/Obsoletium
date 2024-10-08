@@ -23,8 +23,8 @@ class CEngineRecipientFilter : public IRecipientFilter
 public:	// IRecipientFilter interface:
 	
 					CEngineRecipientFilter();
-	virtual int		GetRecipientCount( void ) const;
-	virtual int		GetRecipientIndex( int slot ) const;
+	virtual intp	GetRecipientCount( void ) const;
+	virtual intp	GetRecipientIndex( intp slot ) const;
 	virtual bool	IsReliable( void ) const { return m_bReliable; };
 	virtual bool	IsInitMessage( void )  const { return m_bInit; };
 
@@ -40,15 +40,15 @@ public:
 	void			AddRecipientsByPAS( const Vector& origin );
 	void			AddPlayersFromBitMask( CBitVec< ABSOLUTE_PLAYER_LIMIT >& playerbits );
 	void			AddPlayersFromFilter( const IRecipientFilter *filter );
-	void			AddRecipient( int playerindex );
-	void			RemoveRecipient( int playerindex );
-	bool			IncludesPlayer(int playerindex);
+	void			AddRecipient( intp playerindex );
+	void			RemoveRecipient( intp playerindex );
+	bool			IncludesPlayer(intp playerindex);
 	
 private:
 
 	bool				m_bInit;
 	bool				m_bReliable;
-	CUtlVector< int >	m_Recipients;
+	CUtlVector< intp >	m_Recipients;
 };
 
 //-----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ private:
 class CEngineSingleUserFilter : public IRecipientFilter
 {
 public:
-	CEngineSingleUserFilter( int clientindex, bool bReliable = false )
+	CEngineSingleUserFilter( intp clientindex, bool bReliable = false )
 	{
 		m_nClientIndex = clientindex;
 		m_bReliable = bReliable;
@@ -68,12 +68,12 @@ public:
 		return m_bReliable;
 	}
 
-	virtual int		GetRecipientCount( void ) const
+	virtual intp	GetRecipientCount( void ) const
 	{
 		return 1;
 	}
 
-	virtual int		GetRecipientIndex( int ) const
+	virtual intp	GetRecipientIndex( intp ) const
 	{
 		return m_nClientIndex;
 	}
@@ -89,7 +89,7 @@ public:
 	}
 
 private:
-	int				m_nClientIndex;
+	intp			m_nClientIndex;
 	bool			m_bReliable;
 };
 

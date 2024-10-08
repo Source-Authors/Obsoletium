@@ -31,8 +31,8 @@ public:
 
 	virtual bool	IsReliable( void ) const;
 
-	virtual int		GetRecipientCount( void ) const;
-	virtual int		GetRecipientIndex( int slot ) const;
+	virtual intp	GetRecipientCount( void ) const;
+	virtual intp	GetRecipientIndex( intp slot ) const;
 
 	virtual bool	IsInitMessage( void ) const { return false; };
 
@@ -64,7 +64,7 @@ public:
 
 	bool				m_bReliable;
 	bool				m_bInitMessage;
-	CUtlVector< int >	m_Recipients;
+	CUtlVector< intp >	m_Recipients;
 	// If using prediction rules, the filter itself suppresses local player
 	bool				m_bUsingPredictionRules;
 	// If ignoring prediction cull, then external systems can determine
