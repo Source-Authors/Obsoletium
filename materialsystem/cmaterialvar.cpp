@@ -678,11 +678,11 @@ const char *CMaterialVar::GetStringValue( void ) const
 		return m_pStringVal;
 
 	case MATERIAL_VAR_TYPE_INT:
-		Q_snprintf( s_CharBuf, sizeof( s_CharBuf ), "%d", m_intVal );
+		V_to_chars( s_CharBuf, m_intVal );
 		return s_CharBuf;
 
 	case MATERIAL_VAR_TYPE_FLOAT:
-		Q_snprintf( s_CharBuf, sizeof( s_CharBuf ), "%f", m_VecVal[0] );
+		V_to_chars( s_CharBuf, m_VecVal[0] );
 		return s_CharBuf;
 
 	case MATERIAL_VAR_TYPE_VECTOR:

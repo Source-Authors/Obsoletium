@@ -1793,11 +1793,11 @@ bool CBaseClientState::ProcessGetCvarValue( SVC_GetCvarValue *msg )
 				// The cvar won't store a string, so we have to come up with a string for it ourselves.
 				if ( fabs( pVar->GetFloat() - pVar->GetInt() ) < 0.001f )
 				{
-					Q_snprintf( tempValue, sizeof( tempValue ), "%d", pVar->GetInt() );
+					V_to_chars( tempValue, pVar->GetInt() );
 				}
 				else
 				{
-					Q_snprintf( tempValue, sizeof( tempValue ), "%f", pVar->GetFloat() );
+					V_to_chars( tempValue, pVar->GetFloat() );
 				}
 				returnMsg.m_szCvarValue = tempValue;
 			}
