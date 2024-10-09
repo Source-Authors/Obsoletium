@@ -395,8 +395,10 @@ void C_PropVehicleDriveable::UpdateViewAngles( C_BasePlayer *pLocalPlayer, CUser
 {
 	if ( r_VehicleViewClamp.GetInt() )
 	{
+		// dimhotepus: This is not natural when driver can rotate yaw in vehicle by 360.
+		float yawBounds[2] = { -130.0f, 130.0f };
 		float pitchBounds[2] = { -85.0f, 25.0f };
-		RestrictView( NULL, pitchBounds, NULL, pCmd->viewangles );
+		RestrictView( yawBounds, pitchBounds, NULL, pCmd->viewangles );
 	}
 }
 
