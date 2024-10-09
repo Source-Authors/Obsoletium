@@ -2641,8 +2641,8 @@ int CShadowMgr::AddDisplacementShadowsToMeshBuilder( CMeshBuilder& meshBuilder,
 static void DrawShadowID( ShadowHandle_t shadowHandle, const Vector &vecCentroid )
 {
 #ifndef SWDS
-	char buf[32];
-	Q_snprintf(buf, sizeof( buf ), "%d", shadowHandle );
+	char buf[16];
+	V_to_chars( buf, shadowHandle );
 	CDebugOverlay::AddTextOverlay( vecCentroid, 0, buf );
 #endif
 }

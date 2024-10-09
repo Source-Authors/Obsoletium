@@ -891,15 +891,15 @@ void CHLTVClientState::UpdateStats()
 	NET_SetConVar::cvar_t acvar;
 
 	Q_strncpy( acvar.name, "hltv_proxies", sizeof(acvar.name) );
-	Q_snprintf( acvar.value, sizeof(acvar.value), "%d", proxies  );
+	V_to_chars( acvar.value, proxies  );
 	conVars.m_ConVars.AddToTail( acvar );
 
 	Q_strncpy( acvar.name, "hltv_clients", sizeof(acvar.name) );
-	Q_snprintf( acvar.value, sizeof(acvar.value), "%d", clients );
+	V_to_chars( acvar.value, clients );
 	conVars.m_ConVars.AddToTail( acvar );
 
 	Q_strncpy( acvar.name, "hltv_slots", sizeof(acvar.name) );
-	Q_snprintf( acvar.value, sizeof(acvar.value), "%d", slots );
+	V_to_chars( acvar.value, slots );
 	conVars.m_ConVars.AddToTail( acvar );
 
 	Q_strncpy( acvar.name, "hltv_addr", sizeof(acvar.name) );

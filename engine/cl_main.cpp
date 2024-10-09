@@ -2371,8 +2371,8 @@ void CL_GetBackgroundLevelName( char *pszBackgroundName, int bufSize, bool bMapN
 		int nChapterToLoad = CL_GetBackgroundLevelIndex( nNumChapters );
 
 		// Find the chapter background with this index
-		char buf[4];
-		Q_snprintf( buf, sizeof(buf), "%d", nChapterToLoad );
+		char buf[8];
+		V_to_chars( buf, nChapterToLoad );
 		KeyValues *pLoadChapter = pChapterRoot->FindKey(buf);
 
 		// Copy the background name

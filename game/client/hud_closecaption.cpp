@@ -2111,8 +2111,8 @@ public:
 		int idx = RandomInt( 0, c - 1 );
 
 		caption_t *caption = new caption_t;
-		char foo[ 32 ];
-		Q_snprintf( foo, sizeof( foo ), "%d", idx );
+		char foo[ 16 ];
+		V_to_chars( foo, idx );
 		caption->token = strdup( foo );
 		caption->dirindex = idx;
 		caption->stream = NULL;

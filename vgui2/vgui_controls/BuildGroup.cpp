@@ -250,27 +250,27 @@ void BuildGroup::DrawRulers()
 	
 	// now let's put numbers with the rulers
 	char textstring[20];
-	Q_snprintf (textstring, sizeof( textstring ), "%d", cx);
+	V_to_chars (textstring, cx);
 	_rulerNumber[0]->SetText(textstring);
 	int twide, ttall;
 	_rulerNumber[0]->GetContentSize(twide,ttall);
 	_rulerNumber[0]->SetSize(twide,ttall);
 	_rulerNumber[0]->SetPos(cx/2-twide/2, cy-ttall+3);
 	
-	Q_snprintf (textstring, sizeof( textstring ), "%d", cy);
+	V_to_chars (textstring, cy);
 	_rulerNumber[1]->SetText(textstring);
 	_rulerNumber[1]->GetContentSize(twide,ttall);
 	_rulerNumber[1]->SetSize(twide,ttall);
 	_rulerNumber[1]->GetSize(twide,ttall);
 	_rulerNumber[1]->SetPos(cx-twide + 3, cy/2-ttall/2);
 	
-	Q_snprintf (textstring, sizeof( textstring ), "%d", cy);
+	V_to_chars (textstring, cy);
 	_rulerNumber[2]->SetText(textstring);
 	_rulerNumber[2]->GetContentSize(twide,ttall);
 	_rulerNumber[2]->SetSize(twide,ttall);
 	_rulerNumber[2]->SetPos(cx+cwide+(wide-cx-cwide)/2 - twide/2,  cy+ctall-3);
 	
-	Q_snprintf (textstring, sizeof( textstring ), "%d", cy);
+	V_to_chars (textstring, cy);
 	_rulerNumber[3]->SetText(textstring);
 	_rulerNumber[3]->GetContentSize(twide,ttall);
 	_rulerNumber[3]->SetSize(twide,ttall);

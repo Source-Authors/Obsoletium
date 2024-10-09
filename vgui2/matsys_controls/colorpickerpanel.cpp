@@ -916,38 +916,38 @@ void CColorPickerPanel::OnColorChanged( vgui::TextEntry *pChanged )
 
 	if ( pChanged != m_pRedText )
 	{
-		Q_snprintf( temp, sizeof(temp), "%d", m_CurrentColor.r );
+		V_to_chars( temp, m_CurrentColor.r );
 		m_pRedText->SetText( temp );
 	}
 	if ( pChanged != m_pGreenText )
 	{
-		Q_snprintf( temp, sizeof(temp), "%d", m_CurrentColor.g );
+		V_to_chars( temp, m_CurrentColor.g );
 		m_pGreenText->SetText( temp );
 	}
 	if ( pChanged != m_pBlueText )
 	{
-		Q_snprintf( temp, sizeof(temp), "%d", m_CurrentColor.b );
+		V_to_chars( temp, m_CurrentColor.b );
 		m_pBlueText->SetText( temp );
 	}
 	if ( pChanged != m_pAlphaText )
 	{
-		Q_snprintf( temp, sizeof( temp ), "%d", m_CurrentAlpha );
+		V_to_chars( temp, m_CurrentAlpha );
 		m_pAlphaText->SetText( temp );
 	}
 
 	if ( pChanged != m_pHueText )
 	{
-		Q_snprintf( temp, sizeof(temp), "%d", (int)(m_CurrentHSVColor.x + 0.5f) );
+		V_to_chars( temp, (int)(m_CurrentHSVColor.x + 0.5f) );
 		m_pHueText->SetText( temp );
 	}
 	if ( pChanged != m_pSaturationText )
 	{
-		Q_snprintf( temp, sizeof(temp), "%d", (int)(m_CurrentHSVColor.y * 100 + 0.5f) );
+		V_to_chars( temp, (int)(m_CurrentHSVColor.y * 100 + 0.5f) );
 		m_pSaturationText->SetText( temp );
 	}
 	if ( pChanged != m_pValueText )
 	{
-		Q_snprintf( temp, sizeof(temp), "%d", (int)(m_CurrentHSVColor.z * 100 + 0.5f) );
+		V_to_chars( temp, (int)(m_CurrentHSVColor.z * 100 + 0.5f) );
 		m_pValueText->SetText( temp );
 	}
 

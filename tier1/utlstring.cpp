@@ -262,8 +262,8 @@ CUtlString &CUtlString::operator+=( int rhs )
 {
 	Assert( sizeof( rhs ) == 4 );
 
-	char tmpBuf[ 12 ];	// Sufficient for a signed 32 bit integer [ -2147483648 to +2147483647 ]
-	V_snprintf( tmpBuf, sizeof( tmpBuf ), "%d", rhs );
+	char tmpBuf[ 16 ];	// Sufficient for a signed 32 bit integer [ -2147483648 to +2147483647 ]
+	V_to_chars( tmpBuf, rhs );
 	tmpBuf[ sizeof( tmpBuf ) - 1 ] = '\0';
 
 	return operator+=( tmpBuf );
@@ -271,7 +271,7 @@ CUtlString &CUtlString::operator+=( int rhs )
 
 CUtlString &CUtlString::operator+=( double rhs )
 {
-	char tmpBuf[ 256 ];	// How big can doubles be???  Dunno.
+	char tmpBuf[ 64 ];	// How big can doubles be???  Dunno.
 	V_snprintf( tmpBuf, sizeof( tmpBuf ), "%lg", rhs );
 	tmpBuf[ sizeof( tmpBuf ) - 1 ] = '\0';
 

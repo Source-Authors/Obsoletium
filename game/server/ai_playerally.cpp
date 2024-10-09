@@ -1602,7 +1602,10 @@ void CAI_PlayerAlly::ModifyOrAppendCriteria( AI_CriteriaSet& set )
 	{
 		set.AppendCriteria( "speechtarget", m_hPotentialSpeechTarget->GetClassname() );
 		set.AppendCriteria( "speechtargetname", STRING(m_hPotentialSpeechTarget->GetEntityName()) );
-		set.AppendCriteria( "randomnum", UTIL_VarArgs("%d", m_iQARandomNumber) );
+
+		char buffer[16];
+		V_to_chars(buffer, m_iQARandomNumber);
+		set.AppendCriteria( "randomnum", buffer );
 	}
 
 	// Do we have a speech filter? If so, append it's criteria too

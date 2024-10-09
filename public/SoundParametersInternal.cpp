@@ -112,8 +112,8 @@ static const char *_SoundLevelToString( soundlevel_t level )
 			return entry.name;
 	}
 
-	static char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%d", (int)level );
+	static char sz[ 16 ];
+	V_to_chars( sz, (int)level );
 	return sz;
 }
 
@@ -125,8 +125,8 @@ static const char *_ChannelToString( int channel )
 			return entry.name;
 	}
 
-	static char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%d", channel );
+	static char sz[ 16 ];
+	V_to_chars( sz, channel );
 	return sz;
 }
 
@@ -242,8 +242,8 @@ const char *ChannelToString( int channel )
 			return entry.name;
 	}
 
-	static char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%d", channel );
+	static char sz[ 16 ];
+	V_to_chars( sz, channel );
 	return sz;
 }
 

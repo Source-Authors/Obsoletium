@@ -1279,7 +1279,10 @@ void CHLClient::HudUpdate( bool bActive )
 	// run vgui animations
 	vgui::GetAnimationController()->UpdateAnimations( engine->Time() );
 
-	hudlcd->SetGlobalStat( "(time_int)", VarArgs( "%d", (int)gpGlobals->curtime ) );
+	char buffer[16];
+
+	V_to_chars(buffer, (int)gpGlobals->curtime );
+	hudlcd->SetGlobalStat( "(time_int)", buffer );
 	hudlcd->SetGlobalStat( "(time_float)", VarArgs( "%.2f", gpGlobals->curtime ) );
 
 	// I don't think this is necessary any longer, but I will leave it until

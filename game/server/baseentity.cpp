@@ -5270,7 +5270,7 @@ void CC_Ent_Dump( const CCommand& args )
 							break;
 						case FIELD_INTEGER:
 							if ( var.Int() )
-								Q_snprintf( buf,sizeof(buf), "%d", var.Int() );
+								V_to_chars( buf, var.Int() );
 							break;
 						case FIELD_FLOAT:
 							if ( var.Float() )
@@ -6307,8 +6307,10 @@ void CBaseEntity::ModifyOrAppendCriteria( AI_CriteriaSet& set )
 {
 	// TODO
 	// Append chapter/day?
+	char buffer[16];
+	V_to_chars(buffer, RandomInt(0,100));
 
-	set.AppendCriteria( "randomnum", UTIL_VarArgs("%d", RandomInt(0,100)) );
+	set.AppendCriteria( "randomnum", buffer );
 	// Append map name
 	set.AppendCriteria( "map", gpGlobals->mapname.ToCStr() );
 	// Append our classname and game name
