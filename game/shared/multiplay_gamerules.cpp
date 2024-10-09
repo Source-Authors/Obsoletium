@@ -1436,13 +1436,16 @@ ConVarRef suitcharger( "sk_suitcharger" );
 				int iMaxCat = pKV->GetInt( "categories", 0 );
 				for ( int iCat = 1; iCat <= iMaxCat; iCat++ )
 				{
-					KeyValues *pCategory = pKV->FindKey( UTIL_VarArgs( "%d", iCat ), false );
+					char buffer[16];
+					V_to_chars(buffer, iCat);
+					KeyValues *pCategory = pKV->FindKey( buffer, false );
 					if ( pCategory )
 					{
 						int iMapCount = pCategory->GetInt( "count", 0 );
 						for ( int iMap = 1; iMap <= iMapCount; ++iMap )
 						{
-							KeyValues *pMission = pCategory->FindKey( UTIL_VarArgs( "%d", iMap ), false );
+							V_to_chars(buffer, iMap);
+							KeyValues *pMission = pCategory->FindKey( buffer, false );
 							if ( pMission )
 							{
 								const char *pszMap = pMission->GetString( "map", "" );

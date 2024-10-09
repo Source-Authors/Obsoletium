@@ -937,7 +937,7 @@ void CStaticProp::DisplayStaticPropInfo( int nInfoType )
 		break;
 
 	case 2:
-		Q_snprintf(buf, sizeof( buf ), "%d", (m_EntHandle.ToInt() & (~STATICPROP_EHANDLE_MASK)) );
+		V_to_chars(buf, (m_EntHandle.ToInt() & (~STATICPROP_EHANDLE_MASK)) );
 		break;
 
 	case 3:

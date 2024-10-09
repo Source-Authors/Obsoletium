@@ -1101,8 +1101,8 @@ void DrawSurfaceID( SurfaceHandle_t surfID, const Vector &vecCentroid )
 void DrawSurfaceIDAsInt( SurfaceHandle_t surfID, const Vector &vecCentroid )
 {
 	int nInt = (msurface2_t*)surfID - host_state.worldbrush->surfaces2;
-	char buf[32];
-	Q_snprintf( buf, sizeof( buf ), "%d", nInt );
+	char buf[16];
+	V_to_chars( buf, nInt );
 	CDebugOverlay::AddTextOverlay( vecCentroid, 0, buf );
 }
 

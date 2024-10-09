@@ -146,8 +146,8 @@ void CPrecisionSlider::SetValue( int value, bool bTriggerChangeMessage )
 {
 	BaseClass::SetValue( value, bTriggerChangeMessage );
 
-	char szValueString[256];
-	sprintf( szValueString, "%d", _value );
+	char szValueString[16];
+	V_to_chars( szValueString, _value );
 	m_pTextEntry->SetText( szValueString );
 }
 

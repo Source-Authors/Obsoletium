@@ -312,7 +312,7 @@ void CSessionOptionsDialog::OnMenuItemChanged( KeyValues *pData )
 							propNew.nType = SESSION_PROPERTY;
 							Q_strncpy( propNew.szID, baseProp.szID, sizeof( propNew.szID ) );
 							Q_strncpy( propNew.szValueType, baseProp.szValueType, sizeof( propNew.szValueType ) );
-							Q_snprintf( propNew.szValue, sizeof( propNew.szValue), "%d", i );
+							V_to_chars( propNew.szValue, i );
 							pItem->AddOption( propNew.szValue, propNew );
 						}
 

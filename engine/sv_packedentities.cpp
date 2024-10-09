@@ -63,7 +63,7 @@ void SV_EnsureInstanceBaseline( ServerClass *pServerClass, int iEdict, const voi
 		if ( pClass->m_InstanceBaselineIndex == INVALID_STRING_INDEX ) //-V547
 		{
 			char idString[32];
-			Q_snprintf( idString, sizeof( idString ), "%d", pClass->m_ClassID );
+			V_to_chars( idString, pClass->m_ClassID );
 
 			// Ok, make a new instance baseline so they can reference it.
 			int temp = sv.GetInstanceBaselineTable()->AddString( 

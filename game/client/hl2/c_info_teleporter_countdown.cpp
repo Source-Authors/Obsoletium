@@ -185,7 +185,7 @@ void CTeleportCountdownScreen::OnTick()
 				nTimeRemaining = 0;
 			}
 
-			Q_snprintf( buf, sizeof( buf ), "%d", nTimeRemaining );
+			V_to_chars( buf, nTimeRemaining );
 			m_pTimeRemainingLabel->SetText( buf );
 		}
 	}

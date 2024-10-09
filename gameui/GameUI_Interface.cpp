@@ -1157,8 +1157,8 @@ void CGameUI::SetSavedThisMenuSession( bool bState )
 //-----------------------------------------------------------------------------
 void CGameUI::ShowNewGameDialog( int chapter )
 {
-	char val[32];
-	Q_snprintf( val, sizeof(val), "%d", chapter);
+	char val[16];
+	V_to_chars( val, chapter );
 	staticPanel->OnOpenNewGameDialog(val);
 }
 

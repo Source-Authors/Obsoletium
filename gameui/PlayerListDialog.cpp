@@ -71,8 +71,8 @@ void CPlayerListDialog::Activate()
 		if ( !engine->GetPlayerInfo(i, &pi) )
 			continue;
 
-		char szPlayerIndex[32];
-		Q_snprintf(szPlayerIndex, sizeof( szPlayerIndex ), "%d", i);
+		char szPlayerIndex[16];
+		V_to_chars(szPlayerIndex, i);
 
 		// collate user data then add it to the table
 		KeyValues *data = new KeyValues(szPlayerIndex);

@@ -667,7 +667,9 @@ void CRConClient::Authenticate()
 				{
 					addedUserID = true;
 					// Fixup from network order (little endian)
-					response.PutString( va( "%d", LittleLong( pi->userID ) ) );
+					char buffer[16];
+					V_to_chars(buffer, LittleLong( pi->userID ));
+					response.PutString( buffer );
 				}
 			}
 		}

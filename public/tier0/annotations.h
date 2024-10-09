@@ -9,7 +9,6 @@
 #pragma warning(error : 4789 ) // warning C4789: destination of memory copy is too small
 
 // Suppress some code analysis warnings
-#ifdef _PREFAST_
 // Include the annotation header file.
 #include <sal.h>
 
@@ -55,30 +54,6 @@
 // void V_wcsncpy( OUT_Z_BYTECAP(maxLenInBytes) wchar_t *pDest, wchar_t const *pSrc, int maxLenInBytes );
 // int V_snwprintf( OUT_Z_CAP(maxLenInCharacters) wchar_t *pDest, int maxLenInCharacters, PRINTF_FORMAT_STRING const wchar_t *pFormat, ... );
 
-#endif // _PREFAST_
 #endif // _MSC_VER >= 1600 // VS 2010 and above.
-
-#ifndef ANALYZE_SUPPRESS
-#define ANALYZE_SUPPRESS(wnum)
-#define ANALYZE_SUPPRESS2(wnum1, wnum2)
-#define ANALYZE_SUPPRESS3(wnum1, wnum2, wnum3)
-#define ANALYZE_SUPPRESS4(wnum1, wnum2, wnum3, wnum4)
-#define PRINTF_FORMAT_STRING
-#define SCANF_FORMAT_STRING
-#define IN_Z
-#define IN_CAP(x)
-#define IN_BYTECAP(x)
-#define OUT_Z_CAP(x)
-#define OUT_CAP(x)
-#define OUT_CAP_C(x)
-#define OUT_BYTECAP(x)
-#define OUT_Z_BYTECAP(x)
-#define INOUT_BYTECAP(x)
-#define INOUT_Z_CAP(x)
-#define INOUT_Z_BYTECAP(x)
-#define OUT_Z_ARRAY
-#define INOUT_Z_ARRAY
-#define MUST_CHECK_RETURN
-#endif
 
 #endif // ANALYSIS_ANNOTATIONS_H

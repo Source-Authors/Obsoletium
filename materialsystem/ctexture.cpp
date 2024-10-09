@@ -4759,8 +4759,9 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 			int iMaxWidth = pTx->GetActualWidth(), iMaxHeight = pTx->GetActualHeight();
 			
 			// Save maxwidth and maxheight
-			char chMaxWidth[20], chMaxHeight[20];
-			sprintf( chMaxWidth, "%d", iMaxWidth ), sprintf( chMaxHeight, "%d", iMaxHeight );
+			char chMaxWidth[16], chMaxHeight[16];
+			V_to_chars( chMaxWidth, iMaxWidth );
+			V_to_chars( chMaxHeight, iMaxHeight );
 
 			// We have the texture and path to its content
 			char chResolveName[ MAX_PATH ] = {0}, chResolveNameArg[ MAX_PATH ] = {0};

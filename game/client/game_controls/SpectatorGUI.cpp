@@ -363,7 +363,7 @@ void CSpectatorMenu::Update( void )
 			g_pVGuiLocalize->ConstructString_safe( playerText, g_pVGuiLocalize->Find( "#Spec_PlayerItem" ), 1, playerName );
 		}
 
-		Q_snprintf( szPlayerIndex, sizeof( szPlayerIndex ), "%d", iPlayerIndex );
+		V_to_chars( szPlayerIndex, iPlayerIndex );
 
 		KeyValues *kv = new KeyValues( "UserData", "player", gr->GetPlayerName( iPlayerIndex ), "index", szPlayerIndex );
 		m_pPlayerList->AddItem( playerText, kv );

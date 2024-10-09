@@ -243,8 +243,8 @@ CUtlString AsStringT( const T& _val )
 template<>
 CUtlString AsStringT< int >( const int& _val )
 {
-	char buffer[ 12 ];
-	V_sprintf_safe( buffer, "%d", _val );
+	char buffer[ 16 ];
+	V_to_chars( buffer, _val );
 	return CUtlString( buffer );
 }
 

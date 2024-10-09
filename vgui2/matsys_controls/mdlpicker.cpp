@@ -1646,7 +1646,7 @@ void CMDLPicker::UpdateInfoTab()
 	int nMass = hdr->mass;
 	Panel *pTempPanel = m_pInfoPage->FindChildByName("MassValue");
 	char massBuff[10];
-	Q_snprintf( massBuff, 10, "%d", nMass );
+	V_to_chars( massBuff, nMass );
 	((vgui::Label *)pTempPanel)->SetText( massBuff );
 	bool bIsStatic = hdr->flags & STUDIOHDR_FLAGS_STATIC_PROP;
 	bool bIsPhysics = false;

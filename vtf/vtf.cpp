@@ -3378,7 +3378,7 @@ it was once.
 	for ( int iVert=0; iVert < 8; iVert++ )
 	{
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "%d", iVert );
+		V_to_chars( str, iVert );
 		CTextParams params;
 		params.m_flLetterWidth = 20;
 		params.m_vPos = vertPositions[iVert];

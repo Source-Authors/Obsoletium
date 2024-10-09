@@ -396,7 +396,7 @@ void ExplosionCreate( const Vector &center, const QAngle &angles,
 
 	if ( radius )
 	{
-		Q_snprintf( buf,sizeof(buf), "%d", radius );
+		V_to_chars( buf, radius );
 		pExplosion->KeyValue( "iRadiusOverride", buf );
 	}
 

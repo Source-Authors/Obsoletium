@@ -2449,7 +2449,7 @@ void CClientShadowMgr::DrawRenderToTextureDebugInfo( IClientRenderable* pRendera
 	}
 	else
 	{
-		debugoverlay->AddTextOverlay( vecOrigin, 0, "%X", (size_t)pRenderable );
+		debugoverlay->AddTextOverlay( vecOrigin, 0, "%p", pRenderable );
 	}
 }
 

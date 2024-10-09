@@ -726,11 +726,11 @@ void CClientTools::PostToolMessage( KeyValues *pKeyValues )
 		// NOTE: This cannot be done during particle system init because tools aren't set up at that point
 		CUtlVector<CUtlString> files;
 		GetParticleManifest( files );
-		int nCount = files.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = files.Count();
+		char pTemp[32];
+		for ( intp i = 0; i < nCount; ++i )
 		{
-			char pTemp[256];
-			Q_snprintf( pTemp, sizeof(pTemp), "%d", i );
+			V_to_chars( pTemp, i );
 			KeyValues *pSubKey = pKeyValues->FindKey( pTemp, true );
 			pSubKey->SetString( "file", files[i] );
 		}

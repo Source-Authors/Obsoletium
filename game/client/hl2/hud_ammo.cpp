@@ -155,8 +155,13 @@ void CHudAmmo::UpdatePlayerAmmo( C_BasePlayer *player )
 		ammo2 = player->GetAmmoCount(wpn->GetPrimaryAmmoType());
 	}
 
-	hudlcd->SetGlobalStat( "(ammo_primary)", VarArgs( "%d", ammo1 ) );
-	hudlcd->SetGlobalStat( "(ammo_secondary)", VarArgs( "%d", ammo2 ) );
+	char buffer[16];
+
+	V_to_chars(buffer, ammo1);
+	hudlcd->SetGlobalStat( "(ammo_primary)", buffer );
+
+	V_to_chars(buffer, ammo2);
+	hudlcd->SetGlobalStat( "(ammo_secondary)", buffer );
 
 	if (wpn == m_hCurrentActiveWeapon)
 	{

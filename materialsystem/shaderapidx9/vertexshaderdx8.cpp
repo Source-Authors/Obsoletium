@@ -1648,7 +1648,7 @@ HardwareShader_t CShaderManager::CompileShader( const char *pShaderName,
 		macros[macroIndex].Name = m_ShaderSymbolTable.String( combo.m_ComboName );
 
 		char buf[16];
-		sprintf( buf, "%d", val );
+		V_to_chars( buf, val );
 		CUtlSymbol valSymbol( buf );
 		macros[macroIndex].Definition = valSymbol.String();
 
@@ -1672,7 +1672,7 @@ HardwareShader_t CShaderManager::CompileShader( const char *pShaderName,
 		macros[macroIndex].Name = m_ShaderSymbolTable.String( combo.m_ComboName );
 
 		char buf[16];
-		sprintf( buf, "%d", val );
+		V_to_chars( buf, val );
 		CUtlSymbol valSymbol( buf );
 		macros[macroIndex].Definition = valSymbol.String();
 
@@ -2718,7 +2718,7 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 
 		if ( !bFound )
 		{
-			V_snprintf( szIndex, 8, "%d", nKeys );
+			V_to_chars( szIndex, nKeys );
 			pShaderKey->SetInt( szIndex, nIndex );
 		}
 

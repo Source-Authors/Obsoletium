@@ -735,8 +735,8 @@ void CBaseGamesPage::LoadFilterSettings()
 
 	if (m_iMaxPlayerFilter)
 	{
-		char buf[32];
-		Q_snprintf(buf, sizeof(buf), "%d", m_iMaxPlayerFilter);
+		char buf[16];
+		V_to_chars(buf, m_iMaxPlayerFilter);
 		m_pMaxPlayerFilter->SetText(buf);
 	}
 
@@ -1473,7 +1473,7 @@ void CBaseGamesPage::RecalculateFilterString()
 	if (m_iPingFilter)
 	{
 		char tmpBuf[16];
-		_snprintf( tmpBuf, sizeof(tmpBuf), "%d", m_iPingFilter );
+		V_to_chars( tmpBuf, m_iPingFilter );
 
 		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescLatency" ) );
 		Q_UTF8ToUnicode( " < ", tempUnicode, iTempUnicodeSize );
@@ -1486,7 +1486,7 @@ void CBaseGamesPage::RecalculateFilterString()
 	if ( m_iMaxPlayerFilter )
 	{
 		char tmpBuf[16];
-		_snprintf( tmpBuf, sizeof(tmpBuf), "%d", m_iMaxPlayerFilter );
+		V_to_chars( tmpBuf, m_iMaxPlayerFilter );
 
 		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescMaxPlayers" ) );
 		Q_UTF8ToUnicode( " <= ", tempUnicode, iTempUnicodeSize );

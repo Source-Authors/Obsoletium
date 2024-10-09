@@ -642,7 +642,7 @@ private:
 				int count = DragQueryFile(hdrop, 0xFFFFFFFF, buf, 511);
 				for (int i = 0; i < count; i++)
 				{
-					Q_snprintf(namebuf, sizeof( namebuf ), "%d", i);
+					V_to_chars(namebuf, i);
 					DragQueryFile(hdrop, i, buf, 511);
 					fileList->SetString(namebuf, buf);
 				}

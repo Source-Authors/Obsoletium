@@ -726,13 +726,13 @@ const char *CServerRemoteAccess::LookupStringValue(const char *variable)
 
 	if ( !Q_stricmp( variable, "playercount" ) )
 	{
-		Q_snprintf( s_ReturnBuf, sizeof(s_ReturnBuf) - 1, "%d", sv.GetNumClients() - sv.GetNumProxies());
+		V_to_chars( s_ReturnBuf, sv.GetNumClients() - sv.GetNumProxies());
 		return s_ReturnBuf;
 	}
 	
 	if ( !Q_stricmp( variable, "maxplayers" ) )
 	{
-		Q_snprintf( s_ReturnBuf, sizeof(s_ReturnBuf) - 1, "%d", sv.GetMaxClients() );
+		V_to_chars( s_ReturnBuf, sv.GetMaxClients() );
 		return s_ReturnBuf;
 	}
 	

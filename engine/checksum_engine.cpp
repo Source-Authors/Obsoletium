@@ -256,16 +256,6 @@ bool MD5_MapFile(MD5Value_t *md5value, const char *pszFileName)
 		return false;
 	}
 
-	if ( IsX360() )
-	{
-		// 360 bsp's store the pc checksum in the flags lump header
-		g_pFileSystem->Close(fp);
-		char versionString[65] = {0};
-		V_snprintf( versionString, ARRAYSIZE(versionString), "%d", header.lumps[LUMP_MAP_FLAGS].version );
-		V_memcpy( md5value->bits, versionString, MD5_DIGEST_LENGTH );
-		return true;
-	}
-
 	// MD5 across all lumps except for the Entities lump
 	for (l = 0; l < HEADER_LUMPS; l++)
 	{

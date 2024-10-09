@@ -183,11 +183,11 @@ void QCInfo::SyncToControls()
 	pTargetField = pQCGenerator->FindChildByName( "automassCheck" );
 	((CheckButton *)pTargetField)->SetSelected( bAutomass );
 
-	Q_snprintf( tempText, 10, "%d", (int)fMass );
+	V_to_chars( tempText, (int)fMass );
 	pTargetField = pQCGenerator->FindChildByName( "massField" );
 	((TextEntry *)pTargetField)->SetText( tempText );
 
-	Q_snprintf( tempText, 10, "%d", (int)fScale );
+	V_to_chars( tempText, (int)fScale );
 	pTargetField = pQCGenerator->FindChildByName( "scaleField" );
 	((TextEntry *)pTargetField)->SetText( tempText );
 

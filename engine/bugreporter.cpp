@@ -846,7 +846,10 @@ bool CBugUIPanel::Init()
 	Q_strlower( m_szVMFContentDirFullpath );
 	Q_FixSlashes( m_szVMFContentDirFullpath );
 
-	m_pBuildNumber->SetText( va( "%d", build_number() ) );
+	char buffer[16];
+
+	V_to_chars(buffer, build_number());
+	m_pBuildNumber->SetText( buffer );
 
 	return false;
 }

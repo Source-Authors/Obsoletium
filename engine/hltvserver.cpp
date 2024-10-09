@@ -710,7 +710,9 @@ bool CHLTVServer::DispatchToRelay( CHLTVClient *pClient )
 
  	// increase this proxies client number in advance so this proxy isn't used again next time
 	int clients = Q_atoi( pBestProxy->GetUserSetting( "hltv_clients" ) );
-	pBestProxy->SetUserCVar( "hltv_clients", va("%d", clients+1 ) );
+	char buffer[16];
+	V_to_chars(buffer, clients+1);
+	pBestProxy->SetUserCVar( "hltv_clients", buffer );
 
 	return true;
 }
@@ -1116,7 +1118,7 @@ void CHLTVServer::LinkInstanceBaselines( void )
 	for ( ServerClass *pClass = serverGameDLL->GetAllServerClasses(); pClass; pClass=pClass->m_pNext )
 	{
 		char idString[32];
-		Q_snprintf( idString, sizeof( idString ), "%d", pClass->m_ClassID );
+		V_to_chars( idString, pClass->m_ClassID );
 
 		// Ok, make a new instance baseline so they can reference it.
 		int index  = m_pInstanceBaselineTable->FindStringIndex( idString );
