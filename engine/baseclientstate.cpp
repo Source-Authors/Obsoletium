@@ -1728,8 +1728,8 @@ bool CBaseClientState::GetClassBaseline( int iClass, void const **pData, int *pD
 	if ( pInfo->m_InstanceBaselineIndex == INVALID_STRING_INDEX )
 	{
 		// The key is the class index string.
-		char str[64];
-		Q_snprintf( str, sizeof( str ), "%d", iClass );
+		char str[16];
+		V_to_chars( str, iClass );
 
 		pInfo->m_InstanceBaselineIndex = pBaselineTable->FindStringIndex( str );
 

@@ -32,6 +32,8 @@
 #include "tier1/checksum_sha1.h"
 #endif
 
+#include "tier1/strtools.h"
+
 #define MAX_FILE_READ_BUFFER 8000
 
 // Rotate x bits to the left
@@ -272,12 +274,12 @@ void CSHA1::ReportHash(char *szReport, unsigned char uReportType)
 	}
 	else if(uReportType == REPORT_DIGIT)
 	{
-		sprintf(szTemp, "%u", m_digest[0]);
+		V_to_chars(szTemp, m_digest[0]);
 		strcat(szReport, szTemp);
 
 		for(i = 1; i < k_cubHash; i++)
 		{
-			sprintf(szTemp, " %u", m_digest[i]);
+			sprintf(szTemp, " %hhu", m_digest[i]);
 			strcat(szReport, szTemp);
 		}
 	}

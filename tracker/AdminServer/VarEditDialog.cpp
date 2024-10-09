@@ -169,8 +169,8 @@ void CVarEditDialog::ApplyChanges()
 	{
 		// get the enumeration position from the combo box
 		int iVal = m_pComboEdit->GetActiveItem();
-		char value[32];
-		_snprintf(value, sizeof(value) - 1, "%d", iVal);
+		char value[16];
+		V_to_chars(value, iVal);
 		RemoteServer().SetValue(m_pRules->GetName(), value);
 	
 	}

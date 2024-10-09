@@ -1138,8 +1138,8 @@ void CTeamplayRoundBasedRules::CheckRestartRound( void )
 
 			if ( pFormat )
 			{
-				char strRestartDelay[64];
-				Q_snprintf( strRestartDelay, sizeof( strRestartDelay ), "%d", iRestartDelay );
+				char strRestartDelay[16];
+				V_to_chars( strRestartDelay, iRestartDelay );
 				UTIL_ClientPrintAll( HUD_PRINTCENTER, pFormat, strRestartDelay );
 				UTIL_ClientPrintAll( HUD_PRINTCONSOLE, pFormat, strRestartDelay );
 			}

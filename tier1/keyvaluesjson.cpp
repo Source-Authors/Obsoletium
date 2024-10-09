@@ -156,7 +156,7 @@ bool KeyValuesJSONParser::ParseArray( KeyValues *pArray )
 
 		// Set a dummy key name based on the index
 		char szKeyName[ 32 ];
-		V_sprintf_safe( szKeyName, "%d", idx );
+		V_to_chars( szKeyName, idx );
 		++idx;
 		KeyValues *pChildValue = new KeyValues( szKeyName );
 

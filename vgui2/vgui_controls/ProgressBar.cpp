@@ -236,13 +236,14 @@ bool ProgressBar::ConstructTimeRemainingString(wchar_t *output, int outputBuffer
 		secondsRemaining -= 60;
 	}
 
-    char minutesBuf[16];
-    Q_snprintf(minutesBuf, sizeof( minutesBuf ), "%d", minutesRemaining);
-    char secondsBuf[16];
-    Q_snprintf(secondsBuf, sizeof( secondsBuf ), "%d", secondsRemaining);
+	char secondsBuf[16];
+	V_to_chars(secondsBuf, secondsRemaining);
 
 	if (minutesRemaining > 0)
 	{
+		char minutesBuf[16];
+		V_to_chars(minutesBuf, minutesRemaining);
+
 		wchar_t unicodeMinutes[16];
 		g_pVGuiLocalize->ConvertANSIToUnicode(minutesBuf, unicodeMinutes, sizeof( unicodeMinutes ));
 		wchar_t unicodeSeconds[16];

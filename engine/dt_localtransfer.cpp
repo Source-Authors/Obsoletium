@@ -435,7 +435,7 @@ void PrintPartialChangeEntsList()
 				Q_strncat( str, ", ", sizeof( str ) );
 			
 			char tempStr[512];
-			Q_snprintf( tempStr, sizeof( tempStr ), "%d", g_PartialChangeEnts[i] );
+			V_to_chars( tempStr, g_PartialChangeEnts[i] );
 			Q_strncat( str, tempStr, sizeof( str ) );
 						
 			bFirst = false;
@@ -456,7 +456,7 @@ void PrintPartialChangeEntsList()
 				Q_strncat( str, ", ", sizeof( str ) );
 			
 			char tempStr[512];
-			Q_snprintf( tempStr, sizeof( tempStr ), "%d", -g_PartialChangeEnts[i] );
+			V_to_chars( tempStr, -g_PartialChangeEnts[i] );
 			Q_strncat( str, tempStr, sizeof( str ) );
 						
 			bFirst = false;

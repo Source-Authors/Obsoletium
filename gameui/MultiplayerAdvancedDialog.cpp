@@ -256,8 +256,8 @@ void CMultiplayerAdvancedDialog::CreateControls()
 			const char *pName = pFriends->GetClanName( clanID );
 			const char *pTag = pFriends->GetClanTag( clanID );
 
-			char id[12];
-			Q_snprintf( id, sizeof( id ), "%d", clanID.GetAccountID() );
+			char id[16];
+			V_to_chars( id, clanID.GetAccountID() );
 			pClanObj->AddItem( new CScriptListItem( CFmtStr( "%s (%s)", pTag, pName ), id ) );
 		}
 	}

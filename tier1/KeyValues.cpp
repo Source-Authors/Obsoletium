@@ -962,8 +962,8 @@ void KeyValues::SaveKeyToFile( KeyValues *dat, IBaseFileSystem *filesystem, File
 				INTERNALWRITE(dat->GetName(), Q_strlen(dat->GetName()));
 				INTERNALWRITE("\"\t\t\"", 4);
 
-				char buf[32];
-				Q_snprintf(buf, sizeof( buf ), "%d", dat->m_iValue);
+				char buf[16];
+				V_to_chars(buf, dat->m_iValue);
 
 				INTERNALWRITE(buf, Q_strlen(buf));
 				INTERNALWRITE("\"\n", 2);
@@ -1147,8 +1147,8 @@ KeyValues *KeyValues::CreateNewKey()
 		pLastChild = dat;
 	}
 
-	char buf[12];
-	Q_snprintf( buf, sizeof(buf), "%d", newID );
+	char buf[16];
+	V_to_chars( buf, newID );
 
 	return CreateKeyUsingKnownLastChild( buf, pLastChild );
 }

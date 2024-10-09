@@ -318,7 +318,7 @@ void CDialogGameInfo::PerformLayout()
 
 	if ( m_Server.m_bHadSuccessfulResponse )
 	{
-		Q_snprintf(buf, sizeof(buf), "%d", m_Server.m_nPing );
+		V_to_chars(buf, m_Server.m_nPing );
 		SetControlString("PingText", buf);
 	}
 	else

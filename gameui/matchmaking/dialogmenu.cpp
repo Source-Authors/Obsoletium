@@ -1040,7 +1040,7 @@ void CDialogMenu::ApplySettings( KeyValues *pResourceData )
 					prop.nType = SESSION_PROPERTY;
 					Q_strncpy( prop.szID, pID, sizeof( prop.szID ) );
 					Q_strncpy( prop.szValueType, pValueType, sizeof( prop.szValueType ) );
-					Q_snprintf( prop.szValue, sizeof(prop.szValue), "%d", i ); 
+					V_to_chars( prop.szValue, i ); 
 
 					pItem->AddOption( prop.szValue, prop );
 				}

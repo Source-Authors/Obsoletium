@@ -3718,8 +3718,8 @@ void TextEntry::OnSetText(const wchar_t *text)
 //-----------------------------------------------------------------------------
 void TextEntry::OnSetState(int state)
 {
-	char buf[64];
-	Q_snprintf(buf, sizeof(buf), "%d", state);
+	char buf[16];
+	V_to_chars(buf, state);
 	SetText(buf);
 }
 
