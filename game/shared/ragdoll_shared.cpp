@@ -705,12 +705,8 @@ void RagdollSolveSeparation( ragdoll_t &ragdoll, CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 // LRU
 //-----------------------------------------------------------------------------
-#ifdef _XBOX
-// xbox defaults to 4 ragdolls max
-ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "4", FCVAR_REPLICATED );
-#else
-ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "8", FCVAR_REPLICATED );
-#endif
+// dimhotepus: Increase default ragdolls max count twice (8 -> 16).
+ConVar g_ragdoll_maxcount("g_ragdoll_maxcount", "16", FCVAR_REPLICATED );
 ConVar g_debug_ragdoll_removal("g_debug_ragdoll_removal", "0", FCVAR_REPLICATED |FCVAR_CHEAT );
 
 CRagdollLRURetirement s_RagdollLRU( "CRagdollLRURetirement" );
@@ -813,7 +809,7 @@ void CRagdollLRURetirement::Update( float frametime ) // EPISODIC VERSION
 {
 	VPROF( "CRagdollLRURetirement::Update" );
 	// Compress out dead items
-	int i, next;
+	unsigned short i, next;
 
 	int iMaxRagdollCount = m_iMaxRagdolls;
 
@@ -950,7 +946,7 @@ void CRagdollLRURetirement::Update( float frametime ) // Non-episodic version
 {
 	VPROF( "CRagdollLRURetirement::Update" );
 	// Compress out dead items
-	int i, next;
+	unsigned short next;
 
 	int iMaxRagdollCount = m_iMaxRagdolls;
 
@@ -967,7 +963,7 @@ void CRagdollLRURetirement::Update( float frametime ) // Non-episodic version
 	m_iRagdollCount = 0;
 	m_iSimulatedRagdollCount = 0;
 
-	for ( i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next )
+	for ( auto i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next )
 	{
 		next = m_LRU.Next(i);
 		CBaseAnimating *pRagdoll = m_LRU[i].Get();
@@ -1007,7 +1003,7 @@ void CRagdollLRURetirement::Update( float frametime ) // Non-episodic version
 	//////////////////////////////
 	// not episodic -- this is the original mechanism
 
-	for ( i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next )
+	for ( auto i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next )
 	{
 		if ( m_LRU.Count() <=  iMaxRagdollCount )
 			break;
@@ -1050,7 +1046,7 @@ void CRagdollLRURetirement::MoveToTopOfLRU( CBaseAnimating *pRagdoll, bool bImpo
 
 		if ( m_LRUImportantRagdolls.Count() > g_ragdoll_important_maxcount.GetInt() )
 		{
-			int iIndex = m_LRUImportantRagdolls.Head();
+			auto iIndex = m_LRUImportantRagdolls.Head();
 
 			CBaseAnimating *pRagdollLRU = m_LRUImportantRagdolls[iIndex].Get();
 
@@ -1067,7 +1063,7 @@ void CRagdollLRURetirement::MoveToTopOfLRU( CBaseAnimating *pRagdoll, bool bImpo
 		}
 		return;
 	}
-	for ( int i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = m_LRU.Next(i) )
+	for ( auto i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = m_LRU.Next(i) )
 	{
 		if ( m_LRU[i].Get() == pRagdoll )
 		{
