@@ -1613,7 +1613,8 @@ Color KeyValues::GetColor( const char *keyName )
 		{
 			// parse the colors out of the string
 			float a = 0.0f, b = 0.0f, c = 0.0f, d = 0.0f;
-			sscanf(dat->m_sValue, "%f %f %f %f", &a, &b, &c, &d);
+			[[maybe_unused]] int rc = sscanf(dat->m_sValue, "%f %f %f %f", &a, &b, &c, &d);
+			Assert(rc == 4);
 			color[0] = (unsigned char)a;
 			color[1] = (unsigned char)b;
 			color[2] = (unsigned char)c;
@@ -2974,10 +2975,9 @@ void KeyValues::UnpackIntoStructure( KeyValuesUnpackStructure const *pUnpackTabl
 				}
 				else
 				{
-					if ( pUnpackTable->m_pKeyDefault )
+					if ( !pUnpackTable->m_pKeyDefault ||
 						sscanf(pUnpackTable->m_pKeyDefault,"%f %f %f",
-							   &(dest_v->x), &(dest_v->y), &(dest_v->z));
-					else
+							   &(dest_v->x), &(dest_v->y), &(dest_v->z)) != 3 )
 						dest_v->Init( 0, 0, 0 );
 				}
 				*(dest_v) *= (1.0f/255);
