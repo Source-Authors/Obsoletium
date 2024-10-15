@@ -608,7 +608,7 @@ public:
 	/*
 	Note that this class does not overload operator new[] and delete[] which means that
 	classes that depend on this for alignment may end up misaligned if an array is
-	allocated. This problem is now mostly theoretical because this class is mostly
+	allocated.  This problem is now mostly theoretical because this class is mostly
 	obsolete.
 	*/
 	void *operator new( size_t nSize )
@@ -621,20 +621,25 @@ public:
 		return MemAlloc_AllocAlignedFileLine( nSize, bytesAlignment, pFileName, nLine );
 	}
 
-	void operator delete(void *pData)
+	void operator delete( void *pData )
 	{
-		if ( pData )
-		{
-			MemAlloc_FreeAligned( pData );
-		}
+		MemAlloc_FreeAligned( pData );
 	}
 
 	void operator delete( void* pData, int, const char *pFileName, int nLine )
 	{
-		if ( pData )
-		{
-			MemAlloc_FreeAligned( pData, pFileName, nLine );
-		}
+		MemAlloc_FreeAligned( pData, pFileName, nLine );
+	}
+
+	// These ain't gonna work
+	void* operator new[]( size_t nSize )
+	{
+		return MemAlloc_AllocAligned( nSize, bytesAlignment );
+	}
+
+	void operator delete[]( void* pData )
+	{
+		MemAlloc_FreeAligned( pData );
 	}
 };
 

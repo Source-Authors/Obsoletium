@@ -173,10 +173,8 @@ private:
 	void NoteUnlock( size_t size );
 	void NoteSizeChanged( size_t oldSize, size_t newSize );
 
-	struct TSLIST_NODE_ALIGN FrameLock_t : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT>
+	struct TSLIST_NODE_ALIGN FrameLock_t : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT, TSLNodeBase_t>
 	{
-		//$ WARNING: This needs a TSLNodeBase_t as the first item in here.
-		TSLNodeBase_t	base;
 		int				m_iLock;
 		DataCacheItem_t *m_pFirst;
 		int				m_iThread;

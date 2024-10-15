@@ -135,7 +135,6 @@ $Project "tier0"
 		$File	"thread.cpp"		[$WINDOWS||$POSIX]
 		$File	"threadtools.cpp"
 		$File	"tier0_strtools.cpp"
-		$File	"tslist.cpp"
 		$File	"vcrmode.cpp"		[$WINDOWS]
 		$File	"vcrmode_posix.cpp"	[$POSIX]
 		$File	"vprof.cpp"

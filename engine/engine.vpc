@@ -447,6 +447,15 @@ $Project "engine"
 		$File	"xboxsystem.cpp" [!$DEDICATED]
 		$File	"$SRCDIR\common\SourceAppInfo.cpp"
 	}
+
+	$Folder "Self Tests"
+	{
+		$File	"tests_thread_pool.h"
+		$File	"tests_thread_pool.cpp"
+		$File	"tests_ts_collections.h"
+		$File	"tests_ts_collections.cpp"
+		$File	"tests_runner.cpp"
+	}
 	
 	$Folder	"Audio"
 	{

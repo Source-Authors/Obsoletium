@@ -240,7 +240,7 @@ FORCEINLINE void XM_CALLCONV NetworkVarConstruct( Vector &v ) { v.Zero(); }
 //=========================================================
 // 4D Short Vector (aligned on 8-byte boundary)
 //=========================================================
-class ALIGN8 ShortVector : CAlignedNewDelete<8>
+class ALIGN8 ShortVector : public CAlignedNewDelete<8>
 {
 public:
 	short x, y, z, w;
