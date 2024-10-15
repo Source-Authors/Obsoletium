@@ -12,12 +12,14 @@
 #include <thread>
 
 #include "app_version_config.h"
+#include "../launcher_main/resource.h"
+
 #include "scoped_app_locale.h"
 #include "scoped_app_multirun.h"
 #include "scoped_app_relaunch.h"
 #include "scoped_heap_leak_dumper.h"
 
-#ifdef _WIN32 "
+#ifdef _WIN32
 #include "windows/scoped_com.h"
 #include "windows/scoped_timer_resolution.h"
 #include "windows/scoped_winsock.h"
@@ -41,6 +43,8 @@
 #ifdef __GLIBC__
 #include <gnu/libc-version.h>
 #endif
+
+#include "tier0/tslist.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -314,31 +318,34 @@ void DumpAppInformation(
 #ifdef __GLIBCXX__
   Msg("%s v.%s build with %s on glibc v.%u.%u [compiled], %s [runtime]. "
       "glibc++ v.%u, ABI v.%u.\n",
-      SRC_PRODUCT_NAME_STRING, SRC_PRODUCT_FILE_VERSION_INFO_STRING,
+      SRC_PRODUCT_FILE_DESCRIPTION_STRING, SRC_PRODUCT_FILE_VERSION_INFO_STRING,
       kCompilerVersion.c_str(), __GLIBC__, __GLIBC_MINOR__,
       gnu_get_libc_version(), _GLIBCXX_RELEASE, __GLIBCXX__);
 #endif
 
 #ifdef _LIBCPP_VERSION
   Msg("%s v.%s build with %s on libc++ v.%u, ABI v.%u.\n",
-      SRC_PRODUCT_NAME_STRING, SRC_PRODUCT_FILE_VERSION_INFO_STRING,
+      SRC_PRODUCT_FILE_DESCRIPTION_STRING, SRC_PRODUCT_FILE_VERSION_INFO_STRING,
       kCompilerVersion.c_str(), _LIBCPP_VERSION, _LIBCPP_ABI_VERSION);
 #endif
 #endif  // POSIX
 
 #ifdef _WIN32
-  Msg("%s v.%s build with MSVC %u.%u\n", SRC_PRODUCT_NAME_STRING,
+  Msg("%s v.%s build with MSVC %u.%u\n", SRC_PRODUCT_FILE_DESCRIPTION_STRING,
       SRC_PRODUCT_FILE_VERSION_INFO_STRING, _MSC_FULL_VER, _MSC_BUILD);
-  Msg("%s started with command line '%s'\n", SRC_PRODUCT_NAME_STRING, cmd_line);
+  Msg("%s started with command line '%s'\n",
+      SRC_PRODUCT_FILE_DESCRIPTION_STRING, cmd_line);
 #else
-  Msg("%s started with command line args:\n", SRC_PRODUCT_NAME_STRING);
+  Msg("%s started with command line args:\n",
+      SRC_PRODUCT_FILE_DESCRIPTION_STRING);
   for (int i{0}; i < argc; ++i) {
     Msg("  %s\n", argv[i]);
   }
 #endif
 
 #ifdef __SANITIZE_ADDRESS__
-  Msg("%s running under AddressSanitizer.\n", SRC_PRODUCT_NAME_STRING);
+  Msg("%s running under AddressSanitizer.\n",
+      SRC_PRODUCT_FILE_DESCRIPTION_STRING);
 #endif
 }
 
