@@ -34,8 +34,9 @@ float GetMP3Duration_Helper( char const *filename )
 	float duration = 60.0f;
 
 	// See if it's in the RB tree already...
-	char fn[ 512 ];
+	char fn[ MAX_PATH ];
 	Q_snprintf( fn, sizeof( fn ), "sound/%s", PSkipSoundChars( filename ) );
+	V_FixSlashes(fn);
 
 	MP3Duration_t search = {};
 	search.h = g_pFullFileSystem->FindOrAddFileName( fn );
@@ -46,9 +47,13 @@ float GetMP3Duration_Helper( char const *filename )
 		return g_MP3Durations[ idx ].duration;
 	}
 
+	char fullPath[MAX_PATH];
+	fullPath[0] = '\0';
+	g_pFullFileSystem->RelativePathToFullPath_safe( fn, "MOD", fullPath );
+
 	try
 	{
-		CMPAFile MPAFile( fn );
+		CMPAFile MPAFile( !Q_isempty( fullPath ) ? fullPath : fn );
 		duration = (float)MPAFile.GetLengthSec();
 	}
 	catch ( std::exception &e )
