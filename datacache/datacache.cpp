@@ -866,9 +866,9 @@ bool CDataCacheSection::DiscardItem( memhandle_t hItem, DataCacheNotificationTyp
 		}
 
 #ifdef _DEBUG
-		for ( int i = 0; i < DC_MAX_THREADS_FRAMELOCKED; i++ )
+		for ( auto *c : pItem->pNextFrameLocked )
 		{
-			if ( pItem->pNextFrameLocked[i] != DC_NO_NEXT_LOCKED )
+			if ( c != DC_NO_NEXT_LOCKED )
 			{
 				DebuggerBreak(); // higher level code needs to handle better
 			}

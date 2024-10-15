@@ -1002,9 +1002,8 @@ static bool g_fTelemetryLevelChanged = false;
 
 static const TmU32 TELEMETRY_ARENA_SIZE = 8 * 1024 * 1024; // How much memory we want Telemetry to use.
 
-struct ThreadNameInfo_t
+struct ThreadNameInfo_t : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT, TSLNodeBase_t>
 {
-	TSLNodeBase_t base;
 	ThreadId_t ThreadID;
 	char szName[ 64 ];
 };

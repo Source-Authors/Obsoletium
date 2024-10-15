@@ -1,29 +1,25 @@
 // Copyright Valve Corporation, All rights reserved.
 //
 // LIFO from disassembly of Windows API and
-// https://stackoverflow.com/questions/2979165/fober-et-al-lock-free-fifo-queue-multiple-consumers-and-producers
+// http://jim.afim-asso.org/jim2002/articles/L17_Fober.pdf
 // FIFO from
-// https://stackoverflow.com/questions/2979165/fober-et-al-lock-free-fifo-queue-multiple-consumers-and-producers
+// http://jim.afim-asso.org/jim2002/articles/L17_Fober.pdf
 
 #ifndef TIER0_TSLIST_H_
 #define TIER0_TSLIST_H_
 
-#if defined( USE_NATIVE_SLIST )
-#include "winlite.h"
-#endif
+#include <atomic>
+#include <type_traits>
 
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
 #include "tier0/memalloc.h"
 #include "tier0/memdbgoff.h"
 
-//-----------------------------------------------------------------------------
 
 #if defined( PLATFORM_64BITS )
 
-#if defined (PLATFORM_WINDOWS)  && defined( _XM_SSE_INTRINSICS_ )
-//typedef __m128i int128;
-//inline int128 int128_zero()	{ return _mm_setzero_si128(); }
+#if defined (PLATFORM_WINDOWS) && defined( _XM_SSE_INTRINSICS_ )
 #else  // PLATFORM_WINDOWS
 typedef __int128_t int128;
 #define int128_zero() 0
@@ -45,66 +41,35 @@ inline bool ThreadInterlockedAssignIf128( int128 volatile * pDest, const int128 
 inline bool ThreadInterlockedAssignIf64x128( volatile int128 *pDest, const int128 &value, const int128 &comperand )
 	{ return ThreadInterlockedAssignIf128( pDest, value, comperand ); }
 #else
+
 #define TSLIST_HEAD_ALIGNMENT 8
 #define TSLIST_NODE_ALIGNMENT 8
+
 inline bool ThreadInterlockedAssignIf64x128( volatile int64 *pDest, const int64 value, const int64 comperand )
 	{ return ThreadInterlockedAssignIf64( pDest, value, comperand ); }
+
 #endif
 
-#if defined(_MSC_VER) || defined(GNUC)
 #define TSLIST_HEAD_ALIGN alignas(TSLIST_HEAD_ALIGNMENT)
 #define TSLIST_NODE_ALIGN alignas(TSLIST_NODE_ALIGNMENT)
 #define TSLIST_HEAD_ALIGN_POST
 #define TSLIST_NODE_ALIGN_POST
-#elif defined( _PS3 )
-#define TSLIST_HEAD_ALIGNMENT 8
-#define TSLIST_NODE_ALIGNMENT 8
 
-#define TSLIST_HEAD_ALIGN ALIGN8
-#define TSLIST_NODE_ALIGN ALIGN8
-#define TSLIST_HEAD_ALIGN_POST ALIGN8_POST
-#define TSLIST_NODE_ALIGN_POST ALIGN8_POST
-
-#else
-#error "Please define your platform"
-#endif
-
-//-----------------------------------------------------------------------------
-
-PLATFORM_INTERFACE bool RunTSQueueTests( int nListSize = 10000, int nTests = 1 );
-PLATFORM_INTERFACE bool RunTSListTests( int nListSize = 10000, int nTests = 1 );
-
-//-----------------------------------------------------------------------------
-// Lock free list.
-//-----------------------------------------------------------------------------
-//#define USE_NATIVE_SLIST
-
-#ifdef USE_NATIVE_SLIST
-typedef SLIST_ENTRY TSLNodeBase_t;
-typedef SLIST_HEADER TSLHead_t;
-#else
+// Lock free stack node.
 struct TSLIST_NODE_ALIGN TSLNodeBase_t
 {
 	TSLNodeBase_t *Next; // name to match Windows
-} TSLIST_NODE_ALIGN_POST;
+};
 
+// Lock free stack head.
 union TSLIST_HEAD_ALIGN TSLHead_t
 {
 	struct Value_t
 	{
 		TSLNodeBase_t *Next;
-		// <sergiy> Depth must be in the least significant halfword when atomically loading into register,
-		//          to avoid carrying digits from Sequence. Carrying digits from Depth to Sequence is ok,
-		//          because Sequence can be pretty much random. We could operate on both of them separately,
-		//          but it could perhaps (?) lead to problems with store forwarding. I don't know 'cause I didn't 
-		//          performance-test or design original code, I'm just making it work on PowerPC.
-		#ifdef VALVE_BIG_ENDIAN
-		int16	Sequence;
-		int16   Depth;
-		#else
 		int16   Depth;
 		int16	Sequence;
-		#endif
+
 #ifdef PLATFORM_64BITS
 		int32   Padding;
 #endif
@@ -121,197 +86,84 @@ union TSLIST_HEAD_ALIGN TSLHead_t
 #else
 	int64 value64x128;
 #endif
-} TSLIST_HEAD_ALIGN_POST;
+};
 
-#endif
+// Basic lock free stack.
+class TSLIST_HEAD_ALIGN CTSListBase : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT> {
+ public:
+  CTSListBase() : head_{TSLHead_t{nullptr, 0}} {
+    if (((size_t)&head_) % TSLIST_HEAD_ALIGNMENT != 0) {
+      Error("CTSListBase: Misaligned list head.\n");
+    }
+  }
 
-//-------------------------------------
-class TSLIST_HEAD_ALIGN CTSListBase
-{
-public:
+  ~CTSListBase() { Detach(); }
 
-	// override new/delete so we can guarantee 8-byte aligned allocs
-	static void * operator new( size_t size )
-	{
-		CTSListBase *pNode = (CTSListBase *)MemAlloc_AllocAligned( size, TSLIST_HEAD_ALIGNMENT, __FILE__, __LINE__ );
-		return pNode;
-	}
+  TSLNodeBase_t *Push(TSLNodeBase_t *node) {
+    TSLHead_t next = {}, orig = head_.load(std::memory_order::memory_order_relaxed);
 
-	static void * operator new( size_t size, int , const char *pFileName, int nLine )
-	{
-		CTSListBase *pNode = (CTSListBase *)MemAlloc_AllocAligned( size, TSLIST_HEAD_ALIGNMENT, pFileName, nLine );
-		return pNode;
-	}
+    do {
+      node->Next = orig.value.Next;
 
-	static void operator delete( void *p)
-	{
-		MemAlloc_FreeAligned( p );
-	}
+      next.value.Next = node;
+      next.value.Depth = orig.value.Depth + 1;
+	  // Solve ABA problem.
+      next.value.Sequence = orig.value.Sequence + 1;
+    } while (!head_.compare_exchange_weak(
+        orig, next, std::memory_order::memory_order_acq_rel,
+        std::memory_order::memory_order_relaxed));
 
-	static void operator delete( void *p, int , const char *, int  )
-	{
-		MemAlloc_FreeAligned( p );
-	}
+    return orig.value.Next;
+  }
 
-private:
-	// These ain't gonna work
-	static void * operator new[] ( size_t size );
-	static void operator delete [] ( void *p);
-	
-public:
+  TSLNodeBase_t *Pop() {
+    TSLHead_t next = {}, orig = head_.load(std::memory_order::memory_order_relaxed);
 
-	CTSListBase()
-	{
-		if ( ((size_t)&m_Head) % TSLIST_HEAD_ALIGNMENT != 0 )
-		{
-			Error( "CTSListBase: Misaligned list\n" );
-		}
+    do {
+      if (orig.value.Next == nullptr) return nullptr;
 
-#ifdef USE_NATIVE_SLIST
-		InitializeSListHead( &m_Head );
-#elif defined(PLATFORM_64BITS)
-		m_Head.value64x128 = int128_zero();
-#else
-		m_Head.value64x128 = (int64)0;
-#endif
-	}
+	  // dimhotepus: Same bug as in original code.
+	  // Here is data race, if old head was deleted between nullptr check and
+	  // ->Next it accesses stall data!
+      next.value.Next = orig.value.Next->Next;
+      next.value.Depth = orig.value.Depth - 1;
+	  // No need to solve ABA problem, solved in Push.
+    } while (!head_.compare_exchange_weak(
+        orig, next, std::memory_order::memory_order_acq_rel,
+        std::memory_order::memory_order_relaxed));
 
-	~CTSListBase()
-	{
-		Detach();
-	}
+    return orig.value.Next;
+  }
 
-	TSLNodeBase_t *Push( TSLNodeBase_t *pNode )
-	{
-#ifdef _DEBUG
-		if ( (size_t)pNode % TSLIST_NODE_ALIGNMENT != 0 )
-		{
-			Error( "CTSListBase: Misaligned node\n" );
-		}
-#endif
+  TSLNodeBase_t *Detach() {
+    TSLHead_t next = {}, orig = head_.load(std::memory_order::memory_order_relaxed);
 
-#ifdef USE_NATIVE_SLIST
-		return (TSLNodeBase_t *)InterlockedPushEntrySList( &m_Head, pNode );
-#else
-		TSLHead_t oldHead;
-		TSLHead_t newHead;
+    do {
+      next.value.Next = nullptr;
+      next.value.Depth = 0;
+    } while (!head_.compare_exchange_weak(
+        orig, next, std::memory_order::memory_order_acq_rel,
+        std::memory_order::memory_order_relaxed));
 
-		#if defined( PLATFORM_PS3 ) || defined( PLATFORM_X360 )
-		__lwsync(); // write-release barrier
-		#endif
+    return orig.value.Next;
+  }
 
-#ifdef PLATFORM_64BITS
-		newHead.value.Padding = 0;
-#endif
-		for (;;)
-		{
-			oldHead.value64x128 = m_Head.value64x128;
-			pNode->Next = oldHead.value.Next;
-			newHead.value.Next = pNode;
-			
-			newHead.value32.DepthAndSequence = oldHead.value32.DepthAndSequence + 0x10001;
-			
-			
-			if ( ThreadInterlockedAssignIf64x128( &m_Head.value64x128, newHead.value64x128, oldHead.value64x128 ) )
-			{
-				break;
-			}
-			ThreadPause();
-		}
+  [[nodiscard]] [[deprecated("Unprotected access is unsafe and should not be used")]]
+  std::atomic<TSLHead_t> *AccessUnprotected() {
+    return &head_;
+  }
 
-		return (TSLNodeBase_t *)oldHead.value.Next;
-#endif
-	}
+  [[nodiscard]] int Count() const {
+    TSLHead_t orig = head_.load(std::memory_order::memory_order_relaxed);
+    return orig.value.Depth;
+  }
 
-	TSLNodeBase_t *Pop()
-	{
-#ifdef USE_NATIVE_SLIST
-		TSLNodeBase_t *pNode = (TSLNodeBase_t *)InterlockedPopEntrySList( &m_Head );
-		return pNode;
-#else
-		TSLHead_t oldHead;
-		TSLHead_t newHead;
+ private:
+  std::atomic<TSLHead_t> head_;
+};
 
-#ifdef PLATFORM_64BITS
-		newHead.value.Padding = 0;
-#endif
-		for (;;)
-		{
-			oldHead.value64x128 = m_Head.value64x128;
-			if ( !oldHead.value.Next )
-				return NULL;
-
-			newHead.value.Next = oldHead.value.Next->Next;
-			newHead.value32.DepthAndSequence = oldHead.value32.DepthAndSequence	- 1;
-
-
-			if ( ThreadInterlockedAssignIf64x128( &m_Head.value64x128, newHead.value64x128, oldHead.value64x128 ) )
-			{
-				#if defined( PLATFORM_PS3 ) || defined( PLATFORM_X360 )
-					__lwsync(); // read-acquire barrier
-				#endif
-				break;
-			}
-			ThreadPause();
-		}
-
-		return (TSLNodeBase_t *)oldHead.value.Next;
-#endif
-	}
-
-	TSLNodeBase_t *Detach()
-	{
-#ifdef USE_NATIVE_SLIST
-		TSLNodeBase_t *pBase = (TSLNodeBase_t *)InterlockedFlushSList( &m_Head );
-		return pBase;
-#else
-		TSLHead_t oldHead;
-		TSLHead_t newHead;
-
-#ifdef PLATFORM_64BITS
-		newHead.value.Padding = 0;
-#endif
-		do
-		{
-			ThreadPause();
-
-			oldHead.value64x128 = m_Head.value64x128;
-			if ( !oldHead.value.Next )
-				return NULL;
-
-			newHead.value.Next = NULL;
-			// <sergiy> the reason for AND'ing it instead of poking a short into memory 
-			//          is probably to avoid store forward issues, but I'm not sure because
-			//          I didn't construct this code. In any case, leaving it as is on big-endian
-			newHead.value32.DepthAndSequence = oldHead.value32.DepthAndSequence & 0xffff0000;
-
-		} while( !ThreadInterlockedAssignIf64x128( &m_Head.value64x128, newHead.value64x128, oldHead.value64x128 ) );
-
-		return (TSLNodeBase_t *)oldHead.value.Next;
-#endif
-	}
-
-	TSLHead_t *AccessUnprotected()
-	{
-		return &m_Head;
-	}
-
-	int Count() const
-	{
-#ifdef USE_NATIVE_SLIST
-		return QueryDepthSList( const_cast<TSLHead_t*>( &m_Head ) );
-#else
-		return m_Head.value.Depth;
-#endif
-	}
-
-private:
-	TSLHead_t m_Head;
-} TSLIST_HEAD_ALIGN_POST;
-
-//-------------------------------------
-
-template <typename T>
+// Lock free simple stack.
+template <typename T, typename = std::enable_if_t<std::is_base_of_v<TSLNodeBase_t, T>>>
 class TSLIST_HEAD_ALIGN CTSSimpleList : public CTSListBase
 {
 public:
@@ -325,25 +177,23 @@ public:
 	{
 		return (T *)CTSListBase::Pop();
 	}
-} TSLIST_HEAD_ALIGN_POST;
+};
 
-//-------------------------------------
-// this is a replacement for CTSList<> and CObjectPool<> that does not
-// have a per-item, per-alloc new/delete overhead
-// similar to CTSSimpleList except that it allocates it's own pool objects
-// and frees them on destruct.  Also it does not overlay the TSNodeBase_t memory
-// on T's memory
+// Replacement for CTSList<> and CObjectPool<> that does not have a per-item,
+// per-alloc new/delete overhead similar to CTSSimpleList except that it
+// allocates it's own pool objects and frees them on destruct.  Also it does not
+// overlay the TSLNodeBase_t memory on T's memory.
 template< class T > 
 class TSLIST_HEAD_ALIGN CTSPool : public CTSListBase
 {
 	// packs the node and the item (T) into a single struct and pools those
-	struct TSLIST_NODE_ALIGN simpleTSPoolStruct_t : public TSLNodeBase_t
+	struct TSLIST_NODE_ALIGN TSPoolNode_t :
+		public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT, TSLNodeBase_t>
 	{
 		T elem;
-	} TSLIST_NODE_ALIGN_POST;
+	};
 
 public:
-
 	~CTSPool()
 	{
 		Purge();
@@ -351,31 +201,31 @@ public:
 
 	void Purge()
 	{
-		simpleTSPoolStruct_t *pNode = NULL;
-		while ( 1 )
+		while ( true )
 		{
-			pNode = (simpleTSPoolStruct_t *)CTSListBase::Pop();
+			TSPoolNode_t *pNode = (TSPoolNode_t *)CTSListBase::Pop();
 			if ( !pNode )
 				break;
+
 			delete pNode;
 		}
 	}
 
 	void PutObject( T *pInfo )
 	{
-		char *pElem = (char *)pInfo;
-		pElem -= offsetof(simpleTSPoolStruct_t,elem);
-		simpleTSPoolStruct_t *pNode = (simpleTSPoolStruct_t *)pElem;
+		unsigned char *pElem = (unsigned char *)pInfo;
+		pElem -= offsetof(TSPoolNode_t, elem);
+		TSPoolNode_t *pNode = (TSPoolNode_t *)pElem;
 
 		CTSListBase::Push( pNode );
 	}
 
 	T *GetObject()
 	{
-		simpleTSPoolStruct_t *pNode = (simpleTSPoolStruct_t *)CTSListBase::Pop();
+		TSPoolNode_t *pNode = (TSPoolNode_t *)CTSListBase::Pop();
 		if ( !pNode )
 		{
-			pNode = new simpleTSPoolStruct_t;
+			pNode = new TSPoolNode_t;
 		}
 		return &pNode->elem;
 	}
@@ -385,43 +235,20 @@ public:
 	{
 		return GetObject();
 	}
-} TSLIST_HEAD_ALIGN_POST;
-//-------------------------------------
+};
 
+// Lock free typed list.
 template <typename T>
 class TSLIST_HEAD_ALIGN CTSList : public CTSListBase
 {
 public:
-	struct TSLIST_NODE_ALIGN Node_t : public TSLNodeBase_t
+	struct TSLIST_NODE_ALIGN Node_t : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT, TSLNodeBase_t>
 	{
 		Node_t() = default;
 		Node_t( const T &init ) : elem( init ) {}
+
 		T elem;
-
-	    // override new/delete so we can guarantee 8-byte aligned allocs
-	    static void * operator new( size_t size )
-	    {
-      		Node_t *pNode = (Node_t *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, __FILE__, __LINE__ );
-			return pNode;
-	    }
-
-		// override new/delete so we can guarantee 8-byte aligned allocs
-		static void * operator new( size_t size, int, const char *pFileName, int nLine )
-		{
-			Node_t *pNode = (Node_t *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, pFileName, nLine );
-			return pNode;
-		}
-
-	    static void operator delete( void *p)
-	    {
-			MemAlloc_FreeAligned( p );
-	    }
-		static void operator delete( void *p, int, const char *, int )
-		{
-			MemAlloc_FreeAligned( p );
-		}
-
-	} TSLIST_NODE_ALIGN_POST;
+	};
 
 	~CTSList()
 	{
@@ -431,10 +258,9 @@ public:
 	void Purge()
 	{
 		Node_t *pCurrent = Detach();
-		Node_t *pNext;
 		while ( pCurrent )
 		{
-			pNext = (Node_t *)pCurrent->Next;
+			Node_t *pNext = (Node_t *)pCurrent->Next;
 			delete pCurrent;
 			pCurrent = pNext;
 		}
@@ -465,6 +291,7 @@ public:
 		Node_t *pNode = Pop();
 		if ( !pNode )
 			return false;
+
 		*pResult = pNode->elem;
 		delete pNode;
 		return true;
@@ -474,11 +301,9 @@ public:
 	{
 		return (Node_t *)CTSListBase::Detach();
 	}
+};
 
-} TSLIST_HEAD_ALIGN_POST;
-
-//-------------------------------------
-
+// Lock free list with list for free nodes.
 template <typename T>
 class TSLIST_HEAD_ALIGN CTSListWithFreeList : public CTSListBase
 {
@@ -489,7 +314,7 @@ public:
 		Node_t( const T &init ) : elem( init ) {}
 
 		T elem;
-	} TSLIST_NODE_ALIGN_POST;
+	};
 
 	~CTSListWithFreeList()
 	{
@@ -499,17 +324,16 @@ public:
 	void Purge()
 	{
 		Node_t *pCurrent = Detach();
-		Node_t *pNext;
 		while ( pCurrent )
 		{
-			pNext = (Node_t *)pCurrent->Next;
+			Node_t *pNext = (Node_t *)pCurrent->Next;
 			delete pCurrent;
 			pCurrent = pNext;
 		}
 		pCurrent = (Node_t *)m_FreeList.Detach();
 		while ( pCurrent )
 		{
-			pNext = (Node_t *)pCurrent->Next;
+			Node_t *pNext = (Node_t *)pCurrent->Next;
 			delete pCurrent;
 			pCurrent = pNext;
 		}
@@ -518,10 +342,9 @@ public:
 	void RemoveAll()
 	{
 		Node_t *pCurrent = Detach();
-		Node_t *pNext;
 		while ( pCurrent )
 		{
-			pNext = (Node_t *)pCurrent->Next;
+			Node_t *pNext = (Node_t *)pCurrent->Next;
 			m_FreeList.Push( pCurrent );
 			pCurrent = pNext;
 		}
@@ -553,6 +376,7 @@ public:
 		Node_t *pNode = Pop();
 		if ( !pNode )
 			return false;
+
 		*pResult = pNode->elem;
 		m_FreeList.Push( pNode );
 		return true;
@@ -570,106 +394,43 @@ public:
 
 private:
 	CTSListBase m_FreeList;
-} TSLIST_HEAD_ALIGN_POST;
+};
 
-//-----------------------------------------------------------------------------
-// Lock free queue
+// Lock free queue.
 //
-// A special consideration: the element type should be simple. This code
-// actually dereferences freed nodes as part of pop, but later detects
-// that. If the item in the queue is a complex type, only bad things can
-// come of that. Also, therefore, if you're using Push/Pop instead of
-// push item, be aware that the node memory cannot be freed until
-// all threads that might have been popping have completed the pop.
-// The PushItem()/PopItem() for handles this by keeping a persistent
-// free list. Dont mix Push/PushItem. Note also nodes will be freed at the end, 
-// and are expected to have been allocated with operator new.
-//-----------------------------------------------------------------------------
-
+// A special consideration: the element type should be simple.  This code
+// actually dereferences freed nodes as part of pop, but later detects that.
+// If the item in the queue is a complex type, only bad things can come of that.
+// 
+// Also, therefore, if you're using Push/Pop instead of push item, be aware that
+// the node memory cannot be freed until all threads that might have been
+// popping have completed the pop.  The PushItem()/PopItem() for handles this by
+// keeping a persistent free list.  Don't mix Push/PushItem.  Note also nodes
+// will be freed at the end, and are expected to have been allocated with
+// operator new.
 template <typename T, bool bTestOptimizer = false>
-class TSLIST_NODE_ALIGN CTSQueue
+class TSLIST_NODE_ALIGN CTSQueue : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT>
 {
 public:
-
-	// override new/delete so we can guarantee 8-byte aligned allocs
-	static void * operator new( size_t size )
+	struct TSLIST_NODE_ALIGN Node_t : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT>
 	{
-		CTSQueue *pNode = (CTSQueue *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, __FILE__, __LINE__ );
-		return pNode;
-	}
-
-	// override new/delete so we can guarantee 8-byte aligned allocs
-	static void * operator new( size_t size, int, const char *pFileName, int nLine )
-	{
-		CTSQueue *pNode = (CTSQueue *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, pFileName, nLine );
-		return pNode;
-	}
-
-	static void operator delete( void *p)
-	{
-		MemAlloc_FreeAligned( p );
-	}
-
-	static void operator delete( void *p, int nBlockUse, const char *pFileName, int nLine )
-	{
-		MemAlloc_FreeAligned( p );
-	}
-
-private:
-	// These ain't gonna work
-	static void * operator new[] ( size_t size )
-	{
-		return NULL;
-	}
-
-	static void operator delete [] ( void *p)
-	{
-	}
-
-public:
-
-	struct TSLIST_NODE_ALIGN Node_t
-	{
-		// override new/delete so we can guarantee 8-byte aligned allocs
-		static void * operator new( size_t size )
-		{
-			Node_t *pNode = (Node_t *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, __FILE__, __LINE__ );
-			return pNode;
-		}
-
-		static void * operator new( size_t size, int nBlockUse, const char *pFileName, int nLine )
-		{
-			Node_t *pNode = (Node_t *)MemAlloc_AllocAligned( size, TSLIST_NODE_ALIGNMENT, pFileName, nLine );
-			return pNode;
-		}
-
-		static void operator delete( void *p)
-		{
-			MemAlloc_FreeAligned( p );
-		}
-
-		static void operator delete( void *p, int nBlockUse, const char *pFileName, int nLine )
-		{
-			MemAlloc_FreeAligned( p );
-		}
-
 		Node_t() = default;
 		Node_t( const T &init ) : pNext{nullptr}, elem{init} {}
 
 		Node_t *pNext;
 		T elem;
-	} TSLIST_NODE_ALIGN_POST;
+	};
 
 	union TSLIST_HEAD_ALIGN NodeLink_t
 	{
-		// override new/delete so we can guarantee 8-byte aligned allocs
+		// override new/delete so we can guarantee {8,16}-byte aligned allocs
 		static void * operator new( size_t size )
 		{
-			NodeLink_t *pNode = (NodeLink_t *)MemAlloc_AllocAligned( size, TSLIST_HEAD_ALIGNMENT, __FILE__, __LINE__ );
-			return pNode;
+			auto *link = static_cast<NodeLink_t *>(MemAlloc_AllocAligned( size, TSLIST_HEAD_ALIGNMENT, __FILE__, __LINE__ ));
+			return link;
 		}
 
-		static void operator delete( void *p)
+		static void operator delete( void *p )
 		{
 			MemAlloc_FreeAligned( p );
 		}
@@ -685,44 +446,49 @@ public:
 #else
 		int64 value64x128;
 #endif
-	} TSLIST_HEAD_ALIGN_POST;
+	};
 
 	CTSQueue()
 	{
-		COMPILE_TIME_ASSERT( sizeof(Node_t) >= sizeof(TSLNodeBase_t) );
+		static_assert( sizeof(Node_t) >= sizeof(TSLNodeBase_t) );
+
 		if ( ((size_t)&m_Head) % TSLIST_HEAD_ALIGNMENT != 0 )
 		{
-			Error( "CTSQueue: Misaligned queue\n" );
+			Error( "CTSQueue: Misaligned queue head %p.\n", &m_Head );
 		}
 		if ( ((size_t)&m_Tail) % TSLIST_HEAD_ALIGNMENT != 0 )
 		{
-			Error( "CTSQueue: Misaligned queue\n" );
+			Error( "CTSQueue: Misaligned queue tail %p.\n", &m_Tail );
 		}
-		m_Count = 0;
-		m_Head.value.sequence = m_Tail.value.sequence = 0;
-		m_Head.value.pNode = m_Tail.value.pNode = new Node_t; // list always contains a dummy node
+
+		m_Count.store(0, std::memory_order::memory_order_relaxed );
+		
+		 // list always contains a dummy node
+		m_Head.value.pNode = m_Tail.value.pNode = new Node_t;
 		m_Head.value.pNode->pNext = End();
+		m_Head.value.sequence = m_Tail.value.sequence = 0;
 	}
 
 	~CTSQueue()
 	{
 		Purge();
-		Assert( m_Count == 0 );
+
+		Assert( m_Count.load( std::memory_order::memory_order_relaxed ) == 0 );
 		Assert( m_Head.value.pNode == m_Tail.value.pNode );
 		Assert( m_Head.value.pNode->pNext == End() );
+
 		delete m_Head.value.pNode;
 	}
 
 	// Note: Purge, RemoveAll, and Validate are *not* threadsafe
 	void Purge()
 	{
-		if ( IsDebug() )
-		{
-			ValidateQueue();
-		}
+#ifdef _DEBUG
+		ValidateQueue();
+#endif
 
 		Node_t *pNode;
-		while ( ( pNode = Pop() ) != NULL )
+		while ( ( pNode = Pop() ) != nullptr )
 		{
 			delete pNode;
 		}
@@ -732,7 +498,7 @@ public:
 			delete pNode;
 		}
 
-		Assert( m_Count == 0 );
+		Assert( m_Count.load() == 0 );
 		Assert( m_Head.value.pNode == m_Tail.value.pNode );
 		Assert( m_Head.value.pNode->pNext == End() );
 
@@ -741,13 +507,12 @@ public:
 
 	void RemoveAll()
 	{
-		if ( IsDebug() )
-		{
-			ValidateQueue();
-		}
+#ifdef _DEBUG
+		ValidateQueue();
+#endif
 
 		Node_t *pNode;
-		while ( ( pNode = Pop() ) != NULL )
+		while ( ( pNode = Pop() ) != nullptr )
 		{
 			m_FreeNodes.Push( (TSLNodeBase_t *)pNode );
 		}
@@ -755,7 +520,7 @@ public:
 
 	bool ValidateQueue()
 	{
-		if ( IsDebug() )
+#ifdef _DEBUG
 		{
 			bool bResult = true;
 			int nNodes = 0;
@@ -765,7 +530,7 @@ public:
 				bResult = false;
 			}
 
-			if ( m_Count == 0 )
+			if ( m_Count.load( std::memory_order::memory_order_relaxed ) == 0 )
 			{
 				if ( m_Head.value.pNode != m_Tail.value.pNode )
 				{
@@ -783,7 +548,7 @@ public:
 
 			nNodes--;// skip dummy node
 
-			if ( nNodes != m_Count )
+			if ( nNodes != m_Count.load( std::memory_order::memory_order_relaxed) )
 			{
 				DebuggerBreakIfDebugging();
 				bResult = false;
@@ -791,15 +556,14 @@ public:
 
 			if ( !bResult )
 			{
-				Msg( "Corrupt CTSQueueDetected" );
+				Warning( "Corrupt CTSQueue %p detected.\n", this );
 			}
 
 			return bResult;
 		}
-		else
-		{
-			return true;
-		}
+#else
+		return true;
+#endif
 	}
 
 	void FinishPush( Node_t *pNode, const NodeLink_t &oldTail )
@@ -819,7 +583,7 @@ public:
 #ifdef _DEBUG
 		if ( (size_t)pNode % TSLIST_NODE_ALIGNMENT != 0 )
 		{
-			Error( "CTSListBase: Misaligned node\n" );
+			Error( "CTSQueue: Misaligned node %p.\n", pNode );
 		}
 #endif
 
@@ -842,9 +606,10 @@ public:
 			}
 		}
 
-		FinishPush( pNode, oldTail ); // This can fail if another thread pushed between the sequence and node grabs above. Later pushes or pops corrects
+		// This can fail if another thread pushed between the sequence and node grabs above. Later pushes or pops corrects
+		FinishPush( pNode, oldTail ); 
 
-		++m_Count;
+		m_Count.fetch_add(1, std::memory_order::memory_order_relaxed);
 
 		return oldTail.value.pNode;
 	}
@@ -875,7 +640,7 @@ public:
 			ThreadMemoryBarrier(); // need a barrier to prevent reordering of these assignments
 			head.value.pNode	= *pHeadNode;
 			tailSequence		= pTail->value.sequence;
-         	pNext				= head.value.pNode->pNext;
+			pNext				= head.value.pNode->pNext;
 
 			// Checking pNext only to force optimizer to not reorder the assignment
 			// to pNext and the compare of the sequence
@@ -886,7 +651,7 @@ public:
 			{
 				if ( pNext == TSQUEUE_BAD_NODE_LINK )
 				{
-					Msg( "Bad node link detected\n" );
+					Warning( "TSQueue: Bad node link detected.\n" );
 					continue;
 				}
 			}
@@ -920,7 +685,7 @@ public:
 			}
 		}
 
-		--m_Count;
+		m_Count.fetch_sub(1, std::memory_order::memory_order_relaxed);
 		head.value.pNode->elem = elem;
 		return head.value.pNode;
 	}
@@ -957,11 +722,12 @@ public:
 
 	int Count() const
 	{
-		return m_Count;
+		return m_Count.load(std::memory_order::memory_order_relaxed);
 	}
 
 private:
-	Node_t *End() { return (Node_t *)this; } // just need a unique signifier
+	// just need a unique signifier
+	Node_t *End() { return &m_end; }
 
 	Node_t *InterlockedCompareExchangeNode( Node_t * volatile *ppNode, Node_t *value, Node_t *comperand )
 	{
@@ -976,9 +742,11 @@ private:
 	NodeLink_t m_Head;
 	NodeLink_t m_Tail;
 
-	CInterlockedInt m_Count;
+	std::atomic_int m_Count;
 	
-	 CTSListBase m_FreeNodes;
-} TSLIST_NODE_ALIGN_POST;
+	CTSListBase m_FreeNodes;
+
+	Node_t m_end;
+};
 
 #endif  // TIER0_TSLIST_H_
