@@ -784,7 +784,8 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 #ifndef SWDS
 			case SPEW_WARNING:
 				{
-					color.SetColor( 255, 90, 90, 255 );
+					// dimhotepus: Use portal orange for warnings.
+					color.SetColor( 0xEE, 0x7F, 0x1B, 255 );
 				}
 				break;
 			case SPEW_ASSERT:
