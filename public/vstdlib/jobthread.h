@@ -429,10 +429,6 @@ public:
 JOB_INTERFACE IThreadPool *CreateThreadPool();
 JOB_INTERFACE void DestroyThreadPool( IThreadPool *pPool );
 
-//-------------------------------------
-
-JOB_INTERFACE void RunThreadPoolTests();
-
 //-----------------------------------------------------------------------------
 
 JOB_INTERFACE IThreadPool *g_pThreadPool;

@@ -941,7 +941,7 @@ struct ExtendedParticleRenderData_t : ParticleRenderData_t
 };
 
 
-typedef struct alignas(16) _FourInts : CAlignedNewDelete<16> {
+typedef struct alignas(16) _FourInts : public CAlignedNewDelete<16> {
 	int32 m_nValue[4];
 } FourInts;
 

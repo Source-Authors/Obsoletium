@@ -234,7 +234,7 @@ struct CachedVPKRead_t
 // The primary reason we do this is so that the FileTracker can calculate the 
 // MD5 of the 1MB chunks asynchronously in another thread - while we hold
 // the chunk in cache - making the MD5 calculation "free"
-class CPackedStoreReadCache : CAlignedNewDelete<16>
+class CPackedStoreReadCache : public CAlignedNewDelete<16>
 {
 public:
 	CPackedStoreReadCache( IBaseFileSystem *pFS );
