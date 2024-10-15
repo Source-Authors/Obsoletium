@@ -1061,7 +1061,8 @@ const ConCommandBase *Cmd_ExecuteCommand( const CCommand &command, cmd_source_t 
 		}
 	}
 	
-	Msg( "Unknown command \"%s\"\n", command[0] );
+	// dimhotepus: Dump entire unknown command, not just (potentially incorrectly) parsed 1 arg.
+	Msg( "Unknown command \"%s\"\n", command.GetCommandString() );
 	return NULL;
 }
 
