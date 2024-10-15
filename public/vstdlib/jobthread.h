@@ -802,14 +802,13 @@ template <typename T>
 class CFuncJobItemProcessor : public CJobItemProcessor<T>
 {
 public:
-	void Init(void (*pfnProcess)( T & ), void (*pfnBegin)() = NULL, void (*pfnEnd)() = NULL )
+	void Init(void (*pfnProcess)( T & ), void (*pfnBegin)() = nullptr, void (*pfnEnd)() = nullptr )
 	{
 		m_pfnProcess = pfnProcess;
 		m_pfnBegin = pfnBegin;
 		m_pfnEnd = pfnEnd;
 	}
 
-	//CFuncJobItemProcessor(OBJECT_TYPE_PTR pObject, void (FUNCTION_CLASS::*pfnProcess)( ITEM_TYPE & ), void (*pfnBegin)() = NULL, void (*pfnEnd)() = NULL );
 	void Begin()						{ if ( m_pfnBegin ) (*m_pfnBegin)(); }
 	void Process( T &item )	{ (*m_pfnProcess)( item ); }
 	void End()							{ if ( m_pfnEnd ) (*m_pfnEnd)(); }
@@ -824,7 +823,7 @@ template <typename T, class OBJECT_TYPE, class FUNCTION_CLASS = OBJECT_TYPE >
 class CMemberFuncJobItemProcessor : public CJobItemProcessor<T>
 {
 public:
-	void Init( OBJECT_TYPE *pObject, void (FUNCTION_CLASS::*pfnProcess)( T & ), void (FUNCTION_CLASS::*pfnBegin)() = NULL, void (FUNCTION_CLASS::*pfnEnd)() = NULL )
+	void Init( OBJECT_TYPE *pObject, void (FUNCTION_CLASS::*pfnProcess)( T & ), void (FUNCTION_CLASS::*pfnBegin)() = nullptr, void (FUNCTION_CLASS::*pfnEnd)() = nullptr )
 	{
 		m_pObject = pObject;
 		m_pfnProcess = pfnProcess;
@@ -833,7 +832,7 @@ public:
 	}
 
 	void Begin()						{ if ( m_pfnBegin ) ((*m_pObject).*m_pfnBegin)(); }
-	void Process( T &item )	            { ((*m_pObject).*m_pfnProcess)( item ); }
+	void Process( T &item )				{ ((*m_pObject).*m_pfnProcess)( item ); }
 	void End()							{ if ( m_pfnEnd ) ((*m_pObject).*m_pfnEnd)(); }
 
 protected:
@@ -849,13 +848,13 @@ class CParallelProcessor
 public:
 	CParallelProcessor( const char *pszDescription )
 	{
-		m_pItems = m_pLimit= 0;
+		m_pItems = m_pLimit = 0;
 		m_szDescription = pszDescription;
 	}
 
-	void Run( ITEM_TYPE *pItems, unsigned nItems, int nMaxParallel = INT_MAX, IThreadPool *pThreadPool = NULL )
+	void Run( ITEM_TYPE *pItems, size_t nItems, intp nMaxParallel = PTRDIFF_MAX, IThreadPool *pThreadPool = nullptr )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "Run %s %d", m_szDescription, nItems );
+		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "Run %s %zd", m_szDescription, nItems );
 
 		if ( nItems == 0 )
 			return;
@@ -868,7 +867,7 @@ public:
 		m_pItems = pItems;
 		m_pLimit = pItems + nItems;
 
-		int nJobs = nItems - 1;
+		intp nJobs = nItems - 1;
 
 		if ( nJobs > nMaxParallel )
 		{
@@ -890,7 +889,7 @@ public:
 		if ( nJobs > 1 )
 		{
 			CJob **jobs = (CJob **)stackalloc( nJobs * sizeof(CJob **) );
-			int i = nJobs;
+			intp i = nJobs;
 
 			while( i-- )
 			{
@@ -947,7 +946,7 @@ private:
 };
 
 template <typename ITEM_TYPE> 
-inline void ParallelProcess( const char *pszDescription, ITEM_TYPE *pItems, unsigned nItems, void (*pfnProcess)( ITEM_TYPE & ), void (*pfnBegin)() = NULL, void (*pfnEnd)() = NULL, int nMaxParallel = INT_MAX )
+inline void ParallelProcess( const char *pszDescription, ITEM_TYPE *pItems, size_t nItems, void (*pfnProcess)( ITEM_TYPE & ), void (*pfnBegin)() = NULL, void (*pfnEnd)() = NULL, intp nMaxParallel = PTRDIFF_MAX )
 {
 	CParallelProcessor<ITEM_TYPE, CFuncJobItemProcessor<ITEM_TYPE> > processor( pszDescription );
 	processor.m_ItemProcessor.Init( pfnProcess, pfnBegin, pfnEnd );
@@ -956,7 +955,7 @@ inline void ParallelProcess( const char *pszDescription, ITEM_TYPE *pItems, unsi
 }
 
 template <typename ITEM_TYPE, typename OBJECT_TYPE, typename FUNCTION_CLASS > 
-inline void ParallelProcess( const char *pszDescription, ITEM_TYPE *pItems, unsigned nItems, OBJECT_TYPE *pObject, void (FUNCTION_CLASS::*pfnProcess)( ITEM_TYPE & ), void (FUNCTION_CLASS::*pfnBegin)() = NULL, void (FUNCTION_CLASS::*pfnEnd)() = NULL, int nMaxParallel = INT_MAX )
+inline void ParallelProcess( const char *pszDescription, ITEM_TYPE *pItems, size_t nItems, OBJECT_TYPE *pObject, void (FUNCTION_CLASS::*pfnProcess)( ITEM_TYPE & ), void (FUNCTION_CLASS::*pfnBegin)() = NULL, void (FUNCTION_CLASS::*pfnEnd)() = NULL, intp nMaxParallel = PTRDIFF_MAX )
 {
 	CParallelProcessor<ITEM_TYPE, CMemberFuncJobItemProcessor<ITEM_TYPE, OBJECT_TYPE, FUNCTION_CLASS> > processor( pszDescription );
 	processor.m_ItemProcessor.Init( pObject, pfnProcess, pfnBegin, pfnEnd );
@@ -965,7 +964,7 @@ inline void ParallelProcess( const char *pszDescription, ITEM_TYPE *pItems, unsi
 
 // Parallel Process that lets you specify threadpool
 template <typename ITEM_TYPE> 
-inline void ParallelProcess( const char *pszDescription, IThreadPool *pPool, ITEM_TYPE *pItems, unsigned nItems, void (*pfnProcess)( ITEM_TYPE & ), void (*pfnBegin)() = NULL, void (*pfnEnd)() = NULL, int nMaxParallel = INT_MAX )
+inline void ParallelProcess( const char *pszDescription, IThreadPool *pPool, ITEM_TYPE *pItems, size_t nItems, void (*pfnProcess)( ITEM_TYPE & ), void (*pfnBegin)() = NULL, void (*pfnEnd)() = NULL, intp nMaxParallel = PTRDIFF_MAX )
 {
 	CParallelProcessor<ITEM_TYPE, CFuncJobItemProcessor<ITEM_TYPE> > processor( pszDescription );
 	processor.m_ItemProcessor.Init( pfnProcess, pfnBegin, pfnEnd );
@@ -977,19 +976,22 @@ template <class ITEM_PROCESSOR_TYPE>
 class CParallelLoopProcessor
 {
 public:
-	CParallelLoopProcessor( const char *pszDescription )
+	explicit CParallelLoopProcessor( const char *pszDescription )
 	{
-		m_lIndex = m_lLimit= 0;
-		m_nActive = 0;
+		m_lIndex.store( 0, std::memory_order::memory_order_relaxed );
+		m_lLimit = 0;
+		m_nActive.store( 0, std::memory_order::memory_order_relaxed );
+
 		m_szDescription = pszDescription;
 	}
 
-	void Run( long lBegin, long nItems, int nMaxParallel = INT_MAX )
+	void Run( intp lBegin, intp nItems, intp nMaxParallel = PTRDIFF_MAX )
 	{
 		if ( nItems )
 		{
-			m_lIndex = lBegin;
+			m_lIndex.exchange( lBegin );
 			m_lLimit = lBegin + nItems;
+
 			intp i = g_pThreadPool->NumIdleThreads();
 
 			if ( nMaxParallel < i)
@@ -999,14 +1001,14 @@ public:
 
 			while( i-- )
 			{
-				++m_nActive;
+				m_nActive.fetch_add(1, std::memory_order::memory_order_relaxed);
 				ThreadExecute( this, &CParallelLoopProcessor<ITEM_PROCESSOR_TYPE>::DoExecute )->Release();
 			}
-
-			++m_nActive;
+			
+			m_nActive.fetch_add(1, std::memory_order::memory_order_relaxed);
 			DoExecute();
 
-			while ( m_nActive )
+			while ( m_nActive.load( std::memory_order::memory_order_relaxed) )
 			{
 				ThreadPause();
 			}
@@ -1022,11 +1024,12 @@ private:
 
 		m_ItemProcessor.Begin();
 
-		long lLimit = m_lLimit;
+		intp lLimit = m_lLimit;
 
 		for (;;)
 		{
-			long lIndex = m_lIndex ++;
+			intp lIndex = m_lIndex.fetch_add(1, std::memory_order::memory_order_relaxed);
+
 			if ( lIndex < lLimit )
 			{
 				m_ItemProcessor.Process( lIndex );
@@ -1041,24 +1044,36 @@ private:
 
 		--m_nActive;
 	}
-	CInterlockedInt				m_lIndex;
-	long						m_lLimit;
-	CInterlockedInt				m_nActive;
+	
+#ifdef PLATFORM_64BITS
+	std::atomic_int64_t			m_lIndex;
+#else
+	std::atomic_int32_t			m_lIndex;
+#endif
+
+	intp						m_lLimit;
+
+#ifdef PLATFORM_64BITS
+	std::atomic_int64_t			m_nActive;
+#else
+	std::atomic_int32_t			m_nActive;
+#endif
+
 	const char *				m_szDescription;
 };
 
-inline void ParallelLoopProcess( const char *szDescription, long lBegin, unsigned nItems, void (*pfnProcess)( long const & ), void (*pfnBegin)() = NULL, void (*pfnEnd)() = NULL, int nMaxParallel = INT_MAX )
+inline void ParallelLoopProcess( const char *szDescription, intp lBegin, size_t nItems, void (*pfnProcess)( intp const & ), void (*pfnBegin)() = NULL, void (*pfnEnd)() = NULL, intp nMaxParallel = PTRDIFF_MAX )
 {
-	CParallelLoopProcessor< CFuncJobItemProcessor< long const > > processor( szDescription );
+	CParallelLoopProcessor< CFuncJobItemProcessor< intp const > > processor( szDescription );
 	processor.m_ItemProcessor.Init( pfnProcess, pfnBegin, pfnEnd );
 	processor.Run( lBegin, nItems, nMaxParallel );
 
 }
 
 template < typename OBJECT_TYPE, typename FUNCTION_CLASS > 
-inline void ParallelLoopProcess( const char *szDescription, long lBegin, unsigned nItems, OBJECT_TYPE *pObject, void (FUNCTION_CLASS::*pfnProcess)( long const & ), void (FUNCTION_CLASS::*pfnBegin)() = NULL, void (FUNCTION_CLASS::*pfnEnd)() = NULL, int nMaxParallel = INT_MAX )
+inline void ParallelLoopProcess( const char *szDescription, intp lBegin, size_t nItems, OBJECT_TYPE *pObject, void (FUNCTION_CLASS::*pfnProcess)( intp const & ), void (FUNCTION_CLASS::*pfnBegin)() = NULL, void (FUNCTION_CLASS::*pfnEnd)() = NULL, intp nMaxParallel = PTRDIFF_MAX )
 {
-	CParallelLoopProcessor< CMemberFuncJobItemProcessor<long const, OBJECT_TYPE, FUNCTION_CLASS> > processor( szDescription );
+	CParallelLoopProcessor< CMemberFuncJobItemProcessor< intp const, OBJECT_TYPE, FUNCTION_CLASS> > processor( szDescription );
 	processor.m_ItemProcessor.Init( pObject, pfnProcess, pfnBegin, pfnEnd );
 	processor.Run( lBegin, nItems, nMaxParallel );
 }
@@ -1074,7 +1089,7 @@ protected:
 public:
 	CParallelProcessorBase()
 	{
-		m_nActive = 0;
+		m_nActive.store( 0, std::memory_order::memory_order_relaxed );
 		m_szDescription = NULL;
 	}
 	void SetDescription( const char *pszDescription )
@@ -1083,7 +1098,7 @@ public:
 	}
 
 protected:
-	void Run( intp nMaxParallel = INT_MAX, intp threadOverride = -1 )
+	void Run( intp nMaxParallel = PTRDIFF_MAX, intp threadOverride = -1 )
 	{
 		intp i = g_pThreadPool->NumIdleThreads();
 
@@ -1094,20 +1109,20 @@ protected:
 
 		while( i -- > 0 )
 		{
-			if (  threadOverride == -1 || i == threadOverride - 1 )
+			if ( threadOverride == -1 || i == threadOverride - 1 )
 			{
-				++m_nActive;
+				m_nActive.fetch_add( 1, std::memory_order::memory_order_relaxed );
 				ThreadExecute( this, &ThisParallelProcessorBase_t::DoExecute )->Release();
 			}
 		}
 
 		if ( threadOverride == -1 || threadOverride == 0 )
 		{
-			++m_nActive;
+			m_nActive.fetch_add( 1, std::memory_order::memory_order_relaxed );
 			DoExecute();
 		}
 
-		while ( m_nActive )
+		while ( m_nActive.load( std::memory_order::memory_order_relaxed ) )
 		{
 			ThreadPause();
 		}
@@ -1128,12 +1143,16 @@ private:
 		while ( static_cast<Derived *>( this )->OnProcess() )
 			continue;
 
-		static_cast<Derived *>(this)->OnEnd();
+		static_cast<Derived *>( this )->OnEnd();
 
-		-- m_nActive;
+		m_nActive.fetch_sub(1, std::memory_order::memory_order_relaxed);
 	}
 
-	CInterlockedInt				m_nActive;
+#ifdef PLATFORM_64BITS
+	std::atomic_int64_t			m_nActive;
+#else
+	std::atomic_int32_t			m_nActive;
+#endif
 	const char *				m_szDescription;
 };
 
@@ -1154,9 +1173,8 @@ inline unsigned FunctorExecuteThread( void *pParam )
 
 inline ThreadHandle_t ThreadExecuteSoloImpl( CFunctor *pFunctor, const char *pszName = NULL )
 {
-	ThreadHandle_t hThread;
 	ThreadId_t threadId;
-	hThread = CreateSimpleThread( FunctorExecuteThread, pFunctor, &threadId );
+	ThreadHandle_t hThread = CreateSimpleThread( FunctorExecuteThread, pFunctor, &threadId );
 	if ( pszName )
 	{
 		ThreadSetDebugName( threadId, pszName );
