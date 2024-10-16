@@ -77,16 +77,21 @@ void CVguiMatSysApp::Destroy()
 //-----------------------------------------------------------------------------
 // Window management
 //-----------------------------------------------------------------------------
-void*CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w, int h )
+void* CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w, int h )
 {
-	WNDCLASSEX	wc = {sizeof( wc ), 0, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+	WNDCLASSEX  wc   = {sizeof( wc ), 0, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	wc.style         = CS_OWNDC | CS_DBLCLKS;
 	wc.lpfnWndProc   = DefWindowProc;
 	wc.hInstance     = static_cast<HINSTANCE>(GetAppInstance());
 	wc.lpszClassName = "Valve001";
 	wc.hIconSm       = wc.hIcon;
 
-	RegisterClassEx( &wc );
+	if (!RegisterClassExA( &wc ))
+	{
+		Warning("Unable to register window '%s' class: %s.\n",
+			pTitle, std::system_category().message(::GetLastError()).c_str());
+		return nullptr;
+	}
 
 	// Note, it's hidden
 	DWORD style = WS_POPUP | WS_CLIPSIBLINGS;
@@ -101,17 +106,21 @@ void*CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w,
 	// Never a max box
 	style &= ~WS_MAXIMIZEBOX;
 
-	RECT windowRect = {};
-	windowRect.right	= w;
-	windowRect.bottom	= h;
+	RECT windowRect{0, 0, w, h};
 
 	// Compute rect needed for that size client area based on window style
 	AdjustWindowRectEx(&windowRect, style, FALSE, 0);
 
 	// Create the window
-	HWND hWnd = CreateWindow( wc.lpszClassName, pTitle, style, 0, 0, 
+	HWND hWnd{CreateWindowExA( 0, wc.lpszClassName, pTitle, style, 0, 0,
 		windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, 
-		nullptr, nullptr, static_cast<HINSTANCE>(GetAppInstance()), nullptr );
+		nullptr, nullptr, static_cast<HINSTANCE>(GetAppInstance()), nullptr )};
+	if (!hWnd)
+	{
+		Warning("Unable to create window '%s': %s.\n", pTitle,
+				std::system_category().message(::GetLastError()).c_str());
+		return nullptr;
+	}
 
 	if (!hWnd)
 		return nullptr;
@@ -121,9 +130,11 @@ void*CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w,
 	CenterX = (CenterX < 0) ? 0: CenterX;
 	CenterY = (CenterY < 0) ? 0: CenterY;
 
-	// In VCR modes, keep it in the upper left so mouse coordinates are always relative to the window.
-	SetWindowPos( hWnd, nullptr, CenterX, CenterY, 0, 0,
-		SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_DRAWFRAME);
+	// In VCR modes, keep it in the upper left so mouse coordinates are always
+	// relative to the window.
+	::SetWindowPos( hWnd, nullptr, CenterX, CenterY,
+		windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
+		SWP_NOZORDER | SWP_SHOWWINDOW | SWP_DRAWFRAME);
 
 	return hWnd;
 }
