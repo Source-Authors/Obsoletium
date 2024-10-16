@@ -149,7 +149,7 @@ protected:
 private:
     // Purpose: Loads the startup graphic
     void                SetupStartupGraphic();
-    void                CenterEngineWindow(void *hWndCenter, int width, int height);
+    void                CenterEngineWindow(int width, int height);
     void                DrawStartupGraphic( HWND window );
     void                BlitGraphicToHDC(HDC hdc, byte *rgba, int imageWidth, int imageHeight, int x0, int y0, int x1, int y1);
     void                BlitGraphicToHDCWithAlpha(HDC hdc, byte *rgba, int imageWidth, int imageHeight, int x0, int y0, int x1, int y1);
@@ -251,8 +251,8 @@ CVideoMode_Common::CVideoMode_Common( void )
     m_pBackgroundTexture   = NULL;
     m_pLoadingTexture      = NULL;
     m_bWindowed            = false;
-    m_nModeWidth           = IsPC() ? 1024 : 640;
-    m_nModeHeight          = IsPC() ? 768 : 480;
+    m_nModeWidth           = 1024;
+    m_nModeHeight          = 768;
 	m_bVROverride = false;
 }
 
@@ -1381,13 +1381,13 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 #endif // !USE_SDL
 
 	// Now center
-	CenterEngineWindow( game->GetMainWindow(),
+	CenterEngineWindow(
 		WindowRect.right - WindowRect.left,
 		WindowRect.bottom - WindowRect.top );
 #if defined( USE_SDL )
 	g_pLauncherMgr->SetWindowFullScreen( !bWindowed, WindowRect.right - WindowRect.left, WindowRect.bottom - WindowRect.top );
 
-	CenterEngineWindow( game->GetMainWindow(),
+	CenterEngineWindow(
 		WindowRect.right - WindowRect.left,
 		WindowRect.bottom - WindowRect.top );
 
@@ -1480,12 +1480,11 @@ void CVideoMode_Common::RecomputeClientViewRect()
 
 //-----------------------------------------------------------------------------
 // Purpose: 
-// Input  : hWndCenter - 
-//          width - 
+// Input  : width - 
 //          height - 
 // Output : static void
 //-----------------------------------------------------------------------------
-void CVideoMode_Common::CenterEngineWindow( void *hWndCenter, int width, int height)
+void CVideoMode_Common::CenterEngineWindow( int width, int height)
 {
     int     CenterX, CenterY;
 
@@ -1530,7 +1529,9 @@ void CVideoMode_Common::CenterEngineWindow( void *hWndCenter, int width, int hei
 	game->SetWindowXY( CenterX, CenterY );
 	g_pLauncherMgr->MoveWindow( CenterX, CenterY );
 #else
-   if ( IsPC() )
+    void *hWndCenter = game->GetMainWindow();
+
+    if ( IsPC() )
     {
         // In windowed mode go through game->GetDesktopInfo because system metrics change
         // when going fullscreen vs windowed.

@@ -975,7 +975,7 @@ static VD3DHWND GetTopmostParentWindow( VD3DHWND hWnd )
 
 static BOOL CALLBACK EnumChildWindowsProc( VD3DHWND hWnd, LPARAM lParam )
 {
-	long windowId = GetWindowLongPtr( hWnd, GWLP_USERDATA );
+	intptr_t windowId = GetWindowLongPtr( hWnd, GWLP_USERDATA );
 	if (static_cast<unsigned>(windowId) == MATERIAL_SYSTEM_WINDOW_ID)
 	{
 		COPYDATASTRUCT copyData = {};
@@ -1069,21 +1069,39 @@ void CShaderDeviceBase::InstallWindowHook( void* hWnd )
 	// Attach a child window to the parent; we're gonna store special info there
 	// We can't use the USERDATA, cause other apps may want to use this.
 	HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr( hParent, GWLP_HINSTANCE );
-	WNDCLASS		wc;
-	memset( &wc, 0, sizeof( wc ) );
+
+	WNDCLASSW     wc = {};
 	wc.style         = CS_NOCLOSE | CS_PARENTDC;
 	wc.lpfnWndProc   = ShaderDX8WndProc;
 	wc.hInstance     = hInst;
-	wc.lpszClassName = "shaderdx8";
+	wc.lpszClassName = L"shaderdx8";
 
-	// In case an old one is sitting around still...
-	UnregisterClass( "shaderdx8", hInst );
+	if ( WNDCLASSW ewc; GetClassInfoW( hInst, wc.lpszClassName, &ewc ) )
+	{
+		// In case an old one is sitting around still...
+		UnregisterClassW( wc.lpszClassName, hInst );
+	}
 
-	RegisterClass( &wc );
+	constexpr wchar_t kWindowName[]{L"shaderdx8"};
+
+	if ( !RegisterClassW( &wc ) )
+	{
+		auto error = std::system_category().message(::GetLastError());
+		Warning("Unable to register window '%S' class: %s.\n",
+			kWindowName, error.c_str());
+		return;
+	}
 
 	// Create the window
-	m_hWndCookie = CreateWindow( "shaderdx8", "shaderdx8", WS_CHILD, 
+	m_hWndCookie = CreateWindowExW( 0, wc.lpszClassName, kWindowName, WS_CHILD,
 		0, 0, 0, 0, hParent, NULL, hInst, NULL );
+	if ( !m_hWndCookie )
+	{
+		auto error = std::system_category().message(::GetLastError());
+		Warning("Unable to create window '%S' class: %s.\n",
+			kWindowName, error.c_str());
+		return;
+	}
 
 	// Marks it as a material system window
 	SetWindowLongPtr( (VD3DHWND)m_hWndCookie, GWLP_USERDATA, MATERIAL_SYSTEM_WINDOW_ID );
@@ -1097,13 +1115,17 @@ void CShaderDeviceBase::RemoveWindowHook( void* hWnd )
 #if !defined( _X360 )
 	if ( m_hWndCookie )
 	{
-		DestroyWindow( (VD3DHWND)m_hWndCookie ); 
+		DestroyWindow( (VD3DHWND)m_hWndCookie );
 		m_hWndCookie = 0;
 	}
 
 	VD3DHWND hParent = GetTopmostParentWindow( (VD3DHWND)hWnd );
 	HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr( hParent, GWLP_HINSTANCE );
-	UnregisterClass( "shaderdx8", hInst );
+
+	if ( WNDCLASSW ewc; GetClassInfoW( hInst, L"shaderdx8", &ewc ) )
+	{
+		UnregisterClassW( L"shaderdx8", hInst );
+	}
 #endif
 #endif
 }

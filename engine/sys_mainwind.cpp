@@ -186,14 +186,14 @@ private:
 
 #if defined( WIN32 )
 	HWND			m_hWindow;
-	#if !defined( USE_SDL )
-		HINSTANCE		m_hInstance;
+#if !defined( USE_SDL )
+	HINSTANCE		m_hInstance;
 
-		// Stores a wndproc to chain message calls to
-		WNDPROC			m_ChainedWindowProc;
+	// Stores a wndproc to chain message calls to
+	WNDPROC			m_ChainedWindowProc;
 
-		RECT			m_rcLastRestoredClientRect;
-	#endif
+	RECT			m_rcLastRestoredClientRect;
+#endif
 #endif
 
 #if defined( USE_SDL )
@@ -953,74 +953,83 @@ static LRESULT WINAPI HLEngineWindowProc( HWND hWnd, UINT uMsg, WPARAM  wParam, 
 bool CGame::CreateGameWindow( void )
 {
 	// get the window name
-	char windowName[256];
-	windowName[0] = '\0';
+	char utf8_window_name[256];
+	utf8_window_name[0] = '\0';
 
+	if ( auto modinfo = KeyValues::AutoDelete("ModInfo");
+		 modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt") )
 	{
-		auto modinfo = KeyValues::AutoDelete("ModInfo");
-		if (modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt"))
-		{
-			Q_strncpy( windowName, modinfo->GetString("game"), sizeof(windowName) );
-		}
+		V_strncpy( utf8_window_name, modinfo->GetString("game"), sizeof(utf8_window_name) );
 	}
 
-	if (!windowName[0])
+	if (!utf8_window_name[0])
 	{
 		// dimhotepus: Not HALF-LIFE 2 when no info.
-		Q_strncpy( windowName, "N/A", sizeof(windowName) );
+		V_strncpy( utf8_window_name, "N/A", sizeof(utf8_window_name) );
 	}
+
+#ifdef PLATFORM_64BITS
+	V_strcat( utf8_window_name, " - 64 bit", sizeof( utf8_window_name ) );
+#endif
 
 	if ( IsOpenGL() )
 	{
-		V_strcat( windowName, " - OpenGL", sizeof( windowName ) );
+		V_strcat( utf8_window_name, " - OpenGL", sizeof( utf8_window_name ) );
 	}
 
 #if PIX_ENABLE || defined( PIX_INSTRUMENTATION )
-	// PIX_ENABLE/PIX_INSTRUMENTATION is a big slowdown (that should never be checked in, but sometimes is by accident), so add this to the Window title too.
+	// PIX_ENABLE/PIX_INSTRUMENTATION is a big slowdown (that should never be
+	// checked in, but sometimes is by accident), so add this to the Window title too.
 	V_strcat( windowName, " - PIX_ENABLE", sizeof( windowName ) );
 #endif
 
-	const char *p = CommandLine()->ParmValue( "-window_name_suffix", "" );
-	if ( p && V_strlen( p ) )
+	if ( const char *p = CommandLine()->ParmValue( "-window_name_suffix", "" );
+		 p && !Q_isempty( p ) )
 	{
-		V_strcat( windowName, " - ", sizeof( windowName ) );
-		V_strcat( windowName, p, sizeof( windowName ) );
+		V_strcat( utf8_window_name, " - ", sizeof( utf8_window_name ) );
+		V_strcat( utf8_window_name, p, sizeof( utf8_window_name ) );
 	}
 
 #if defined( WIN32 ) && !defined( USE_SDL )
 #ifndef SWDS
-	WNDCLASSW wc = {};
+	WNDCLASSW     wc = {};
 	wc.style         = CS_OWNDC | CS_DBLCLKS;
 	wc.lpfnWndProc   = CallDefaultWindowProc;
 	wc.hInstance     = m_hInstance;
 	wc.lpszClassName = CLASSNAME;
 
 	// find the icon file in the filesystem
-	if ( IsPC() )
+	if ( char localPath[ MAX_PATH ];
+		 g_pFileSystem->GetLocalPath( "resource/game.ico", localPath, sizeof(localPath) ) )
 	{
-		char localPath[ MAX_PATH ];
-		if ( g_pFileSystem->GetLocalPath( "resource/game.ico", localPath, sizeof(localPath) ) )
-		{
-			g_pFileSystem->GetLocalCopy( localPath );
-			wc.hIcon = (HICON)::LoadImage(NULL, localPath, IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
-		}
-		else
-		{
-			wc.hIcon = (HICON)::LoadIcon( GetModuleHandle( 0 ), MAKEINTRESOURCE( DEFAULT_EXE_ICON ) );
-		}
+		g_pFileSystem->GetLocalCopy( localPath );
+
+		wc.hIcon = (HICON)::LoadImage(NULL, localPath, IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
+	}
+	else
+	{
+		wc.hIcon = ::LoadIcon( m_hInstance, MAKEINTRESOURCE( DEFAULT_EXE_ICON ) );
 	}
 
-	wchar_t uc[512];
-	if ( IsPC() )
+	wchar_t utf16_window_name[512];
+	V_strtowcs( utf8_window_name, std::size(utf8_window_name),
+		utf16_window_name, sizeof(utf16_window_name) );
+
+	if ( WNDCLASSW ewc; GetClassInfoW( m_hInstance, CLASSNAME, &ewc ) )
 	{
-		Q_strtowcs( windowName, std::size(windowName), uc, sizeof(uc) );
+		// Oops, we didn't clean up the class registration from last cycle which
+		// might mean that the wndproc pointer is bogus.
+		UnregisterClassW( CLASSNAME, m_hInstance );
 	}
 
-	// Oops, we didn't clean up the class registration from last cycle which
-	// might mean that the wndproc pointer is bogus
-	UnregisterClassW( CLASSNAME, m_hInstance );
-	// Register it again
-	RegisterClassW( &wc );
+	// Register it again.
+	if (!RegisterClassW( &wc ))
+	{
+		auto error = std::system_category().message(::GetLastError());
+		Warning("Unable to register window '%s' class: %s.\n",
+			utf8_window_name, error.c_str());
+		return false;
+	}
 
 	// Note, it's hidden
 	DWORD style = WS_POPUP | WS_CLIPSIBLINGS;
@@ -1037,10 +1046,12 @@ bool CGame::CreateGameWindow( void )
 
 	// Never a max box
 	style &= ~WS_MAXIMIZEBOX;
+	
+	const unsigned system_dpi{GetDpiForSystem()};
 
 	// Create a full screen size window by default, it'll get resized later anyway
-	int w = GetSystemMetrics( SM_CXSCREEN );
-	int h = GetSystemMetrics( SM_CYSCREEN );
+	int w = GetSystemMetricsForDpi( SM_CXSCREEN, system_dpi );
+	int h = GetSystemMetricsForDpi( SM_CYSCREEN, system_dpi );
 
 	// Create the window
 	DWORD exFlags = 0;
@@ -1050,16 +1061,17 @@ bool CGame::CreateGameWindow( void )
 		exFlags |= WS_EX_TOOLWINDOW; // So it doesn't show up in the taskbar.
 	}
 
-	HWND hwnd = CreateWindowExW( exFlags, CLASSNAME, uc, style, 
+	HWND hwnd = CreateWindowExW( exFlags, CLASSNAME, utf16_window_name, style,
 		0, 0, w, h, nullptr, nullptr, m_hInstance, nullptr );
-	// NOTE: On some cards, CreateWindowExW slams the FPU control word
-	SetupFPUControlWord();
-
 	if ( !hwnd )
 	{
 		auto error = std::system_category().message(::GetLastError());
-		Error( "Fatal Error: Unable to create game window: %s!", error.c_str() );
+		Error( "Unable to create game window '%s': %s.\n", utf8_window_name, error.c_str() );
+		return false;
 	}
+	
+	// NOTE: On some cards, CreateWindowExW slams the FPU control word
+	SetupFPUControlWord();
 
 	SetMainWindow( hwnd );
 
@@ -1117,7 +1129,10 @@ void CGame::DestroyGameWindow()
 			m_hWindow = nullptr;
 		}
 
-		UnregisterClassW( CLASSNAME, m_hInstance );
+		if ( WNDCLASSW ewc; GetClassInfoW( m_hInstance, CLASSNAME, &ewc ) )
+		{
+			UnregisterClassW( CLASSNAME, m_hInstance );
+		}
 	}
 	else
 	{
