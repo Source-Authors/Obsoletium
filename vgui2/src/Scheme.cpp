@@ -283,7 +283,7 @@ CSchemeManager::~CSchemeManager()
 //-----------------------------------------------------------------------------
 void CSchemeManager::ReloadFonts()
 {
-	for (int i = 1; i < m_Schemes.Count(); i++)
+	for (intp i = 1; i < m_Schemes.Count(); i++)
 	{
 		m_Schemes[i]->ReloadFontGlyphs();
 	}
@@ -294,7 +294,7 @@ void CSchemeManager::ReloadFonts()
 //-----------------------------------------------------------------------------
 IScheme *CSchemeManager::GetIScheme( HScheme scheme )
 {
-	if ( scheme < (unsigned long)m_Schemes.Count() )
+	if ( scheme < (uintp)m_Schemes.Count() )
 	{
 		return m_Schemes[scheme];
 	}

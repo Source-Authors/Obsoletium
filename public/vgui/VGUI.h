@@ -50,7 +50,9 @@ using VPANEL = uintp;
 
 // handles to vgui objects
 // NULL values signify an invalid value
-using HScheme = unsigned long;
+
+// dimhotepus: x64 port. unsigned long -> uintp.
+using HScheme = uintp;
 // Both -1 and 0 are used for invalid textures. Be careful.
 using HTexture = unsigned long;
 using HCursor = unsigned long;
@@ -60,7 +62,7 @@ constexpr inline HPanel INVALID_PANEL{std::numeric_limits<HPanel>::max()};
 
 // dimhotepus: x86-64 port. unsigned long -> uintp
 using HFont = uintp;
-constexpr HFont INVALID_FONT{0};  // the value of an invalid font handle
+constexpr inline HFont INVALID_FONT{0};  // the value of an invalid font handle
 }
 
 #include "tier1/strtools.h"

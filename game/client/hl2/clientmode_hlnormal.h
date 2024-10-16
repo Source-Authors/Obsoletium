@@ -20,7 +20,8 @@ class CHudViewport;
 
 namespace vgui
 {
-	typedef unsigned long HScheme;
+	// dimhotepus: x64 port. unsigned long -> uintp.
+	typedef uintp HScheme;
 }
 
 
