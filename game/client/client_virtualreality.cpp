@@ -1429,7 +1429,7 @@ void CClientVirtualReality::Activate()
 	mat_vsync.SetValue( 0 );
 #endif
 
-	g_pMatSystemSurface->ForceScreenSizeOverride(true, 640, 480 );
+	g_pMatSystemSurface->ForceScreenSizeOverride(true, BASE_WIDTH, BASE_HEIGHT );
 	int nViewportWidth, nViewportHeight;
 
 	g_pSourceVR->GetViewportBounds( ISourceVirtualReality::VREye_Left, NULL, NULL, &nViewportWidth, &nViewportHeight );

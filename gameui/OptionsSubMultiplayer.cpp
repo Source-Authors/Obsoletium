@@ -36,6 +36,7 @@
 #include "BitmapImagePanel.h"
 #include "tier1/utlbuffer.h"
 #include "ModInfo.h"
+#include "qlimits.h"
 #include "tier1/convar.h"
 #include "tier0/icommandline.h"
 
@@ -541,8 +542,8 @@ void CrosshairImagePanelCS::Paint()
 	int centerX = wide / 2;
 	int centerY = tall / 2;
 
-	int iBarSize = RoundFloatToInt(m_barSize * screenTall / 480.0f);
-	int iBarThickness = max(1, RoundFloatToInt(m_barThickness * (float)screenTall / 480.0f));
+	int iBarSize = RoundFloatToInt(m_barSize * screenTall / BASE_HEIGHT);
+	int iBarThickness = max(1, RoundFloatToInt(m_barThickness * (float)screenTall / BASE_HEIGHT));
 
 	float fBarGap = 4.0f;
 	if ( bDynamic )
@@ -551,7 +552,7 @@ void CrosshairImagePanelCS::Paint()
 		fBarGap *= (1.0f + cosf(curtime * 1.5f) * 0.5f);
 	}
 
-	int iBarGap = RoundFloatToInt(fBarGap * screenTall / 480.0f);
+	int iBarGap = RoundFloatToInt(fBarGap * screenTall / BASE_HEIGHT);
 
 	// draw horizontal crosshair lines
 	int iInnerLeft	= centerX - iBarGap - iBarThickness / 2;

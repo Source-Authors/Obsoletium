@@ -9,6 +9,7 @@
 #include "tier1/utldict.h"
 #include "datacache/imdlcache.h"
 #include "filesystem.h"
+#include "qlimits.h"
 #include "studio.h"
 #include "vgui/IVGui.h"
 #include "vgui/Cursor.h"
@@ -471,7 +472,7 @@ CMDLSequencePickerFrame::CMDLSequencePickerFrame( vgui::Panel *parent, char cons
 	SetSizeable( false );
 	SetCloseButtonVisible( false );
 	SetMoveable( true );
-	SetMinimumSize( 640, 480 );
+	SetMinimumSize( BASE_WIDTH, BASE_HEIGHT );
 	Activate();
 	m_pMDLSequencePicker->Activate();
 

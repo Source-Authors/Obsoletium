@@ -1645,8 +1645,8 @@ void CGame::GetDesktopInfo( int &width, int &height, int &refreshrate )
 {
 #if defined( USE_SDL )
 
-	width = 640;
-	height = 480;
+	width = BASE_WIDTH;
+	height = BASE_HEIGHT;
 	refreshrate = 0;
 
 	// Go through all the displays and return the size of the largest.

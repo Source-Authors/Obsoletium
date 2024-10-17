@@ -9,7 +9,8 @@
 #include "EngineInterface.h"
 #include "vgui_controls/ImagePanel.h"
 #include "vgui_controls/Label.h"
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
+#include "qlimits.h"
 #include "vgui/ISurface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -193,7 +194,7 @@ void CSessionBrowserDialog::UpdateScenarioDisplay( void )
 	// Get the screen size
 	int wide, tall;
 	vgui::surface()->GetScreenSize(wide, tall);
-	bool bLodef = ( tall <= 480 );
+	bool bLodef = ( tall <= BASE_HEIGHT );
 
 	const char *pState = "";
 	switch( m_GameStates[idx] )

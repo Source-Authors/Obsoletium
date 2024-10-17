@@ -168,7 +168,7 @@ void CPrecisionSlider::OnTextNewLine( KeyValues *data )
 	char buf[256];
 	m_pTextEntry->GetText( buf, 256 );
 
-	int value;
+	int value = 0;
 	sscanf( buf, "%d", &value );
 
 	SetValue( value );
@@ -5002,7 +5002,7 @@ void CColorOperationListPanel::LaunchOperationPanel( IColorOperation *pOp )
 		int xPos = parentX - 250*panelOffset;
 
 		pOpPanel->SetPos(  xPos, parentY );
-		pOpPanel->SetSize( 250, 480 );
+		pOpPanel->SetSize( 250, BASE_HEIGHT );
 		pOpPanel->SetTitle( pOp->GetName(), true );
 		pOpPanel->AddActionSignalTarget( this );
 		pOpPanel->SetSizeable( false );
@@ -5113,7 +5113,7 @@ CColorCorrectionUIPanel::CColorCorrectionUIPanel( vgui::Panel *parent ) : BaseCl
 	SetMoveable( true );
 
 	int w = 250;
-	int h = 480;
+	int h = BASE_HEIGHT;
 
 	int x = videomode->GetModeStereoWidth() - w - 10;
 	int y = videomode->GetModeStereoHeight() - h - 10;

@@ -152,11 +152,6 @@ CUtlDict< CMatSystemSurface::font_entry, unsigned short > CMatSystemSurface::m_F
 CMatEmbeddedPanel::CMatEmbeddedPanel() : BaseClass( NULL, "MatSystemTopPanel" )
 {
 	SetPaintBackgroundEnabled( false );
-
-#if defined( _X360 )
-	SetPos( 0, 0 );
-	SetSize( GetSystemMetrics( SM_CXSCREEN ), GetSystemMetrics( SM_CYSCREEN ) );
-#endif
 }
 
 void CMatEmbeddedPanel::OnThink()
@@ -4352,7 +4347,7 @@ const char *CMatSystemSurface::GetResolutionKey( void ) const
 	int x, y, width, height;
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	pRenderContext->GetViewport( x, y, width, height );
-	if( height <= 480 )
+	if( height <= BASE_HEIGHT )
 	{
 		return "_lodef";
 	}

@@ -28,6 +28,7 @@
 #include "materialsystem/MaterialSystemUtil.h"
 #include "tier1/utldict.h"
 #include "tier3/tier3.h"
+#include "qlimits.h"
 
 using namespace vgui;
 
@@ -362,7 +363,7 @@ private:
 	void DrawRenderCharInternal( const CharRenderInfo& info );
 
 private:
-	enum { BASE_HEIGHT = 480, BASE_WIDTH = 640 };
+	enum { BASE_HEIGHT = ::BASE_HEIGHT, BASE_WIDTH = ::BASE_WIDTH };
 
 	struct PaintState_t
 	{

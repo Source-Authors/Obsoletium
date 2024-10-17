@@ -10,7 +10,8 @@
 #include "vgui_controls/ImagePanel.h"
 #include "vgui/ILocalize.h"
 #include "vgui/ISurface.h"
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
+#include "qlimits.h"
 #include "dialogmenu.h"
 #include "BasePanel.h"
 #include "vgui_controls/ImagePanel.h"
@@ -552,7 +553,7 @@ CAchievementItem::CAchievementItem( CDialogMenu *pParent, const wchar_t *pName, 
 
 		unsigned int iWrapLen;
 
-		if ( tall <= 480 )
+		if ( tall <= BASE_HEIGHT )
 		{
 			iWrapLen = 50;
 		}

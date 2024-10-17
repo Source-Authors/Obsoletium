@@ -39,9 +39,6 @@ using namespace vgui;
 
 ConVar binds_per_command( "binds_per_command", "1", 0 );
 
-ConVar x360_resolution_widescreen_mode( "x360_resolution_widescreen_mode", "0", 0, "This is only used for reference. Changing this value does nothing" );
-ConVar x360_resolution_width( "x360_resolution_width", "640", 0, "This is only used for reference. Changing this value does nothing" );
-ConVar x360_resolution_height( "x360_resolution_height", "480", 0, "This is only used for reference. Changing this value does nothing" );
 ConVar x360_resolution_interlaced( "x360_resolution_interlaced", "0", 0, "This is only used for reference. Changing this value does nothing" );
 
 ConVar x360_audio_english("x360_audio_english", "0", 0, "Keeps track of whether we're forcing english in a localized language." );
@@ -176,16 +173,6 @@ bool ActionsAreTheSame( const char *pchAction1, const char *pchAction2 )
 
 COptionsDialogXbox::COptionsDialogXbox( vgui::Panel *parent, bool bControllerOptions ) : BaseClass( parent, "OptionsDialog" )
 {
-#ifdef _X360
-	// Get out current resolution and stuff it into convars for later reference
-	XVIDEO_MODE videoMode;
-	XGetVideoMode( &videoMode );
-	x360_resolution_widescreen_mode.SetValue( videoMode.fIsWideScreen );
-	x360_resolution_width.SetValue( static_cast<int>( videoMode.dwDisplayWidth ) );
-	x360_resolution_height.SetValue( static_cast<int>( videoMode.dwDisplayHeight ) );
-	x360_resolution_interlaced.SetValue( videoMode.fIsInterlaced );
-#endif
-
 	//Figure out which way duck is bound, and set the option_duck_method convar the correct way.
 	const char *pDuckKey = engine->Key_LookupBinding( "+duck" );
 	ButtonCode_t code = g_pInputSystem->StringToButtonCode( pDuckKey );

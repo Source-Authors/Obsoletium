@@ -8,10 +8,6 @@
 #ifndef QLIMITS_H
 #define QLIMITS_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
 // DATA STRUCTURE INFO
 
 #define MAX_NUM_ARGVS	50
@@ -31,5 +27,9 @@
 #define MAX_GENERIC				(1<<MAX_GENERIC_INDEX_BITS)
 #define MAX_DECAL_INDEX_BITS	9
 #define MAX_BASE_DECALS			(1<<MAX_DECAL_INDEX_BITS)
+
+// Base width and height for display.
+constexpr inline int BASE_WIDTH{640};
+constexpr inline int BASE_HEIGHT{480};
 
 #endif // QLIMITS_H

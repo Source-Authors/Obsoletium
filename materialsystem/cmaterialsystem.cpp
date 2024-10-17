@@ -1504,7 +1504,7 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 
 	// Get the recommended resolution from dxsupport.cfg, this assumes a 4:3 aspect ratio
 	int nRecommendedWidth, nRecommendedHeight;
-	ReadInt( pKeyValues, "DefaultRes", 640, -1, &nRecommendedWidth );
+	ReadInt( pKeyValues, "DefaultRes", BASE_WIDTH, -1, &nRecommendedWidth );
 	nRecommendedHeight = ( nRecommendedWidth * 3 ) / 4;
 	int nRecommendedPixels = nRecommendedHeight * nRecommendedWidth;
 

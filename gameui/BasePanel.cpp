@@ -3596,7 +3596,7 @@ CFooterPanel::CFooterPanel( Panel *parent, const char *panelName ) : BaseClass( 
 	int wide, tall;
 	surface()->GetScreenSize(wide, tall);
 
-	if ( tall <= 480 )
+	if ( tall <= BASE_HEIGHT )
 	{
 		m_FooterTall = 60;
 	}
