@@ -665,22 +665,17 @@ void CMapLoadHelper::FreeLightingLump( void )
 int CMapLoadHelper::LumpSize( int lumpId )
 {
 	// If we have a lump file for this lump, return its length instead
-	if ( IsPC() && s_MapLumpFiles[lumpId].file != FILESYSTEM_INVALID_HANDLE )
+	if ( const lumpfiles_t &lf = s_MapLumpFiles[lumpId];
+		 lf.file != FILESYSTEM_INVALID_HANDLE )
 	{
-		return s_MapLumpFiles[lumpId].header.lumpLength;
+		return lf.header.lumpLength;
 	}
 
-	lump_t *pLump = &s_MapHeader.lumps[ lumpId ];
-	Assert( pLump );
+	const lump_t &lump = s_MapHeader.lumps[lumpId];
 
 	// all knowledge of compression is private, they expect and get the original size
-	int originalSize = s_MapHeader.lumps[lumpId].uncompressedSize;
-	if ( originalSize != 0 )
-	{
-		return originalSize;
-	}
-
-	return pLump->filelen;
+	const int originalSize = lump.uncompressedSize;
+	return originalSize != 0 ? originalSize : lump.filelen;
 }
 
 //-----------------------------------------------------------------------------
@@ -1013,32 +1008,23 @@ void Map_CheckFeatureFlags()
 // Parse the map header for HDR ability. Returns the presence of HDR data only,
 // not the HDR enable state.
 //-----------------------------------------------------------------------------
-bool Map_CheckForHDR( model_t *pModel, const char *pLoadName )
+bool Map_CheckForHDR( /*model_t *pModel, const char *pLoadName*/ )
 {
+	// dimhotepus: Speedup loading as we already init helper.
 	// parse the map header only
-	CMapLoadHelper::Init( pModel, pLoadName );
+	// CMapLoadHelper::Init( pModel, pLoadName );
 
-	bool bHasHDR = false;
-	if ( IsX360() )
-	{
-		// If this is true, the 360 MUST use HDR, because the LDR data gets stripped out.
-		bHasHDR = CMapLoadHelper::LumpSize( LUMP_LIGHTING_HDR ) > 0;
-	}
-	else
-	{
-		// might want to also consider the game lumps GAMELUMP_DETAIL_PROP_LIGHTING_HDR
-		bHasHDR = CMapLoadHelper::LumpSize( LUMP_LIGHTING_HDR ) > 0 &&
+	// might want to also consider the game lumps GAMELUMP_DETAIL_PROP_LIGHTING_HDR
+	bool bHasHDR = CMapLoadHelper::LumpSize( LUMP_LIGHTING_HDR ) > 0 &&
 			CMapLoadHelper::LumpSize( LUMP_WORLDLIGHTS_HDR ) > 0;
 		//			 Mod_GameLumpSize( GAMELUMP_DETAIL_PROP_LIGHTING_HDR ) > 0  // fixme
-	}
 	if ( s_MapHeader.version >= 20 && CMapLoadHelper::LumpSize( LUMP_LEAF_AMBIENT_LIGHTING_HDR ) == 0 )
 	{
 		// This lump only exists in version 20 and greater, so don't bother checking for it on earlier versions.
 		bHasHDR = false;
 	}
 	
-	bool bEnableHDR = ( IsX360() && bHasHDR ) ||
-		( bHasHDR && ( mat_hdr_level.GetInt() >= 2 ) &&
+	bool bEnableHDR = ( bHasHDR && ( mat_hdr_level.GetInt() >= 2 ) &&
 		( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 90 ) );
 	
 	EnableHDR( bEnableHDR );
@@ -1047,7 +1033,8 @@ bool Map_CheckForHDR( model_t *pModel, const char *pLoadName )
 	// establish the features now, before the real bsp load commences
 	Map_CheckFeatureFlags();
 
-	CMapLoadHelper::Shutdown();
+	// dimhotepus: Speedup loading, do not shutdown helper.
+	// CMapLoadHelper::Shutdown();
 
 	return bHasHDR;
 }
@@ -3579,25 +3566,8 @@ model_t	*CModelLoader::LoadModel( model_t *mod, REFERENCETYPE *pReferencetype )
 
 			//NotifyHunkBeginMapLoad( m_szActiveMapName );
 
-			bool bQueuedLoader = false;
-			if ( IsX360() )
-			{
-				// must establish the bsp feature set first to ensure proper state during queued loading
-				Map_CheckForHDR( mod, m_szLoadName );
-
-				// Do not optimize map-to-same-map loading in TF
-				// FIXME/HACK: this fixes a bug (when shipping Orange Box) where static props would sometimes
-				//             disappear when a client disconnects and reconnects to the same map+server
-				//             (static prop lighting data persists when loading map A after map A)
-				bool bIsTF = !V_stricmp( COM_GetModDirectory(), "tf" );
-				bool bOptimizeMapReload = !bIsTF;
-
-				// start the queued loading process
-				bQueuedLoader = g_pQueuedLoader->BeginMapLoading( mod->strName, g_pMaterialSystemHardwareConfig->GetHDREnabled(), bOptimizeMapReload );
-			}
-
 			// the queued loader process needs to own the actual texture update
-			if ( !bQueuedLoader && ( IsX360() || mat_excludetextures.GetBool() ) )
+			if ( mat_excludetextures.GetBool() )
 			{
 				g_pMaterialSystem->UpdateExcludedTextures();
 			}
@@ -4386,13 +4356,12 @@ void CModelLoader::Map_LoadModel( model_t *mod )
 	mod->brush.pShared = &m_worldBrushData;
 	mod->brush.renderHandle = 0;
 
+	// dimhotepus: Init once to speedup loading.
+	CMapLoadHelper::Init( mod, m_szLoadName );
+	
 	// HDR and features must be established first
 	COM_TimestampedLog( "  Map_CheckForHDR" );
-	m_bMapHasHDRLighting = Map_CheckForHDR( mod, m_szLoadName );
-	if ( IsX360() && !m_bMapHasHDRLighting )
-	{
-		Warning( "Map '%s' lacks exepected HDR data! 360 does not support accurate LDR visuals.", m_szLoadName );
-	}
+	m_bMapHasHDRLighting = Map_CheckForHDR();
 
 	// Load the collision model
 	COM_TimestampedLog( "  CM_LoadMap" );
@@ -4402,7 +4371,8 @@ void CModelLoader::Map_LoadModel( model_t *mod )
 	// Load the map
 	mod->type = mod_brush;
 	mod->nLoadFlags |= FMODELLOADER_LOADED;
-	CMapLoadHelper::Init( mod, m_szLoadName );
+	// dimhotepus: Init once to speedup loading.
+	//CMapLoadHelper::Init( mod, m_szLoadName );
 
 	COM_TimestampedLog( "  Mod_LoadVertices" );
 	Mod_LoadVertices();
