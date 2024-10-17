@@ -15,6 +15,7 @@
 
 #ifdef CON_COMMAND_SERVER_SUPPORT
 #include <algorithm>
+#include "qlimits.h"
 #include "socketlib/socketlib.h"
 #define MINIZ_NO_ARCHIVE_APIS
 #include "../../thirdparty/miniz/miniz.c"
@@ -86,7 +87,7 @@ class frame_buf_window
 	}
 
 public:
-	frame_buf_window(const char* pTitle = "frame_buf_window", int width = 640, int height = 480, int scaleX = 1, int scaleY = 1);
+	frame_buf_window(const char* pTitle = "frame_buf_window", int width = BASE_WIDTH, int height = BASE_HEIGHT, int scaleX = 1, int scaleY = 1);
 
 	virtual ~frame_buf_window();
 
@@ -272,7 +273,7 @@ LRESULT frame_buf_window::window_proc(HWND hWnd, UINT message, WPARAM wParam, LP
 				GetClientRect(hWnd, &window_size);
 
 				StretchDIBits(m_windowHDC, 
-					0, 0, window_size.right, window_size.bottom, 
+					0, 0, window_size.right - window_size.left, window_size.bottom - window_size.top, 
 					0, 0, m_width, m_height, 
 					m_frame_buffer.get_ptr(), m_pBitmap_hdr, 
 					DIB_RGB_COLORS, SRCCOPY);

@@ -15,6 +15,7 @@
 #endif
 
 #include "vmodes.h"
+#include "qlimits.h"
 #include "vtf/vtf.h"
 
 struct MovieInfo_t;
@@ -101,15 +102,13 @@ public:
 //-----------------------------------------------------------------------------
 // Utilities for virtual screen coordinates
 //-----------------------------------------------------------------------------
-#define XRES(x)	( (x)  * ( ( float )videomode->GetModeStereoWidth() / 640.0 ) )
-#define YRES(y)	( (y)  * ( ( float )videomode->GetModeStereoHeight() / 480.0 ) )
+inline float XRES(float x) {
+  return x * videomode->GetModeStereoWidth() / BASE_WIDTH;
+}
 
-
-//-----------------------------------------------------------------------------
-// Singleton accessor 
-//-----------------------------------------------------------------------------
-extern IVideoMode *videomode;
-
+inline float YRES(float y) {
+  return y * videomode->GetModeStereoHeight() / BASE_HEIGHT;
+}
 
 //-----------------------------------------------------------------------------
 // Class factory 

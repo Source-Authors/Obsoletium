@@ -952,10 +952,6 @@ void CLuminanceHistogramSystem::DisplayHistogram( void )
 	}
 
 	int xpStart = dest_width - nTotalGraphPixelsWide - 10;
-	if ( IsX360() )
-	{
-		xpStart -= 50;
-	}
 
 	int xp = xpStart;
 	for ( int l=0; l<nNumRanges; l++ )
@@ -1025,10 +1021,6 @@ void CLuminanceHistogramSystem::DisplayHistogram( void )
 
 		float flBarWidth = 600.0f;
 		float flBarStart = dest_width - flBarWidth - 10.0f;
-		if ( IsX360() )
-		{
-			flBarStart -= 50;
-		}
 
 		pRenderContext->Viewport( flBarStart, 4 + HISTOGRAM_BAR_SIZE - 4 + 75, flBarWidth, 4 );
 		pRenderContext->ClearColor3ub( 200, 200, 200 );
@@ -1045,10 +1037,7 @@ void CLuminanceHistogramSystem::DisplayHistogram( void )
 
 		if ( bDrawTextThisFrame == true )
 		{
-			if ( IsX360() )
-				engine->Con_NPrintf( 26, "Min: %.2f  Max: %.2f", flAutoExposureMin, flAutoExposureMax );
-			else
-				engine->Con_NPrintf( 26, "%.2f                                                                                       %.2f                                                                                           %.2f", flAutoExposureMin, ( flAutoExposureMax + flAutoExposureMin ) / 2.0f, flAutoExposureMax );
+			engine->Con_NPrintf( 26, "%.2f                                                                                       %.2f                                                                                           %.2f", flAutoExposureMin, ( flAutoExposureMax + flAutoExposureMin ) / 2.0f, flAutoExposureMax );
 		}
 	}
 
@@ -1503,11 +1492,7 @@ static void Generate8BitBloomTexture( IMatRenderContext *pRenderContext, float f
 												0, 0, nSrcWidth-2, nSrcHeight-2,
 												nSrcWidth, nSrcHeight );
 
-	if ( IsX360() )
-	{
-		pRenderContext->CopyRenderTargetToTextureEx( dest_rt0, 0, NULL, NULL );
-	}
-	else if ( g_bDumpRenderTargets )
+	if ( g_bDumpRenderTargets )
 	{
 		DumpTGAofRenderTarget( nSrcWidth/4, nSrcHeight/4, "QuarterSizeFB" );
 	}
@@ -1517,11 +1502,7 @@ static void Generate8BitBloomTexture( IMatRenderContext *pRenderContext, float f
 	pRenderContext->DrawScreenSpaceRectangle(	xblur_mat, 0, 0, nSrcWidth/4, nSrcHeight/4,
 												0, 0, nSrcWidth/4-1, nSrcHeight/4-1,
 												nSrcWidth/4, nSrcHeight/4 );
-	if ( IsX360() )
-	{
-		pRenderContext->CopyRenderTargetToTextureEx( dest_rt1, 0, NULL, NULL );
-	}
-	else if ( g_bDumpRenderTargets )
+	if ( g_bDumpRenderTargets )
 	{
 		DumpTGAofRenderTarget( nSrcWidth/4, nSrcHeight/4, "BlurX" );
 	}
@@ -1533,11 +1514,7 @@ static void Generate8BitBloomTexture( IMatRenderContext *pRenderContext, float f
 	pRenderContext->DrawScreenSpaceRectangle(	yblur_mat, 0, 0, nSrcWidth / 4, nSrcHeight / 4,
 												0, 0, nSrcWidth / 4 - 1, nSrcHeight / 4 - 1,
 												nSrcWidth / 4, nSrcHeight / 4 );
-	if ( IsX360() )
-	{
-		pRenderContext->CopyRenderTargetToTextureEx( dest_rt0, 0, NULL, NULL );
-	}
-	else if ( g_bDumpRenderTargets )
+	if ( g_bDumpRenderTargets )
 	{
 		DumpTGAofRenderTarget( nSrcWidth/4, nSrcHeight/4, "BlurYAndBloom" );
 	}
@@ -1572,23 +1549,9 @@ static void DoPreBloomTonemapping( IMatRenderContext *pRenderContext, int nX, in
 			
 			if ( mat_debug_autoexposure.GetInt() || mat_show_histogram.GetInt() )
 			{
-				bool bDrawTextThisFrame = true;
+				constexpr bool bDrawTextThisFrame = true;
 
-				if ( IsX360() )
-				{
-					static float s_flLastTimeUpdate = 0.0f;
-					if ( int( gpGlobals->curtime ) - int( s_flLastTimeUpdate ) >= 2 )
-					{
-						s_flLastTimeUpdate = gpGlobals->curtime;
-						bDrawTextThisFrame = true;
-					}
-					else
-					{
-						bDrawTextThisFrame = false;
-					}
-				}
-
-				if ( bDrawTextThisFrame == true )
+				if constexpr ( bDrawTextThisFrame == true )
 				{
 					if ( mat_tonemap_algorithm.GetInt() == 0 )
 					{
@@ -2180,10 +2143,6 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 		DumpTGAofRenderTarget( w, h, "BackBuffer" );
 	}
 
-#if defined( _X360 )
-	pRenderContext->PushVertexShaderGPRAllocation( 16 ); //max out pixel shader threads
-#endif
-
 	if ( r_queued_post_processing.GetInt() )
 	{
 		ICallQueue *pCallQueue = pRenderContext->GetCallQueue();
@@ -2223,57 +2182,24 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 				DoPreBloomTonemapping( pRenderContext, x, y, w, h, flAutoExposureMin, flAutoExposureMax );
 			}
 
-			// Set software-AA on by default for 360
 			if ( mat_software_aa_strength.GetFloat() == -1.0f )
 			{
-				if ( IsX360() )
-				{
-					mat_software_aa_strength.SetValue( 1.0f );
-					if ( g_pMaterialSystem->GetCurrentConfigForVideoCard().m_VideoMode.m_Height > 480 )
-					{
-						mat_software_aa_quality.SetValue( 0 );
-					}
-					else
-					{
-						// For standard-def, we have fewer pixels so we can afford 'high quality' mode (5->9 taps/pixel)
-						mat_software_aa_quality.SetValue( 1 );
-					}
-				}
-				else
-				{
-					mat_software_aa_strength.SetValue( 0.0f );
-				}
+				mat_software_aa_strength.SetValue( 0.0f );
 			}
 
 			// Same trick for setting up the vgui aa strength
 			if ( mat_software_aa_strength_vgui.GetFloat() == -1.0f )
 			{
-				if ( IsX360() && (g_pMaterialSystem->GetCurrentConfigForVideoCard().m_VideoMode.m_Height == 720) )
-				{
-					mat_software_aa_strength_vgui.SetValue( 2.0f );
-				}
-				else
-				{
-					mat_software_aa_strength_vgui.SetValue( 1.0f );
-				}
+				mat_software_aa_strength_vgui.SetValue( 1.0f );
 			}
-
-			float flAAStrength;
 
 			// We do a second AA blur pass over the TF intro menus. use mat_software_aa_strength_vgui there instead
-			if ( IsX360() && bPostVGui )
-			{
-				flAAStrength = mat_software_aa_strength_vgui.GetFloat();
-			}
-			else
-			{
-				flAAStrength = mat_software_aa_strength.GetFloat();
-			}
+			float flAAStrength = mat_software_aa_strength.GetFloat();
 
 			static ConVarRef mat_colorcorrection( "mat_colorcorrection" );
 
 			// bloom, software-AA and colour-correction (applied in 1 pass, after generation of the bloom texture)
-			bool  bPerformSoftwareAA	= IsX360() && ( engine->GetDXSupportLevel() >= 90 ) && ( flAAStrength != 0.0f );
+			const bool  bPerformSoftwareAA	= false;
 			bool  bPerformBloom			= !bPostVGui && ( flBloomScale > 0.0f ) && ( engine->GetDXSupportLevel() >= 90 );
 			bool  bPerformColCorrect	= !bPostVGui && 
 										  ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 90) &&
@@ -2343,7 +2269,7 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 				// when run outside the debugger for some mods (DoD). This forces it to skip
 				// a frame, ensuring we don't get the weird texture crash we otherwise would.
 				// FIXME: This will be removed when the true cause is found [added: Main CL 144694]
-				static bool bFirstFrame = !IsX360();
+				static bool bFirstFrame = true;
 				if( !bFirstFrame || !bPerformColCorrect )
 				{
 					bool bFBUpdated = false;
@@ -2576,10 +2502,6 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 			break;
 		}
 	}
-
-#if defined( _X360 )
-	pRenderContext->PopVertexShaderGPRAllocation();
-#endif
 }
 
 // Motion Blur Material Proxy =========================================================================================
@@ -2859,7 +2781,6 @@ void DoImageSpaceMotionBlur( const CViewSetup &viewBlur, int x, int y, int w, in
 			//===============================================================//
 			// Dampen motion blur from 100%-0% as fps drops from 50fps-30fps //
 			//===============================================================//
-			if ( !IsX360() ) // I'm not doing this on the 360 yet since I can't test it
 			{
 				float flSlowFps = 30.0f;
 				float flFastFps = 50.0f;

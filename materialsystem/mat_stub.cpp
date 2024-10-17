@@ -1358,7 +1358,8 @@ public:
 	virtual void				GetViewport( int& x, int& y, int& width, int& height ) const
 	{
 		x = y = 0;
-		width = height = 640;
+		width = BASE_WIDTH;
+		height = BASE_HEIGHT;
 	}
 
 	// The cull mode
