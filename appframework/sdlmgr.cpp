@@ -18,6 +18,8 @@
 #include "tier1/utllinkedlist.h"
 #include "tier1/convar.h"
 
+#include "qlimits.h"
+
 // NOTE: This has to be the last file included! (turned off below, since this is included like a header)
 #include "tier0/memdbgon.h"
 
@@ -395,8 +397,8 @@ static int GetLargestDisplaySize( int& Width, int& Height )
 {
 	int nDisplay = 0;
 
-	Width = 640;
-	Height = 480;
+	Width = BASE_WIDTH;
+	Height = BASE_HEIGHT;
 
 	for ( int i = 0; i < SDL_GetNumVideoDisplays(); i++ )
 	{
@@ -565,7 +567,7 @@ InitReturnVal_t CSDLMgr::Init()
 	//  GL entry points, but the game hasn't made a window yet. So it's time
 	//  to make a window! We make a 640x480 one here, and later, when asked
 	//  to really actually make a window, we just resize the one we built here.
-	if ( !CreateHiddenGameWindow( "", 640, 480 ) )
+	if ( !CreateHiddenGameWindow( "", BASE_WIDTH, BASE_HEIGHT ) )
 		Error( "CreateGameWindow failed" );
 	
 	SDL_HideWindow( m_Window );

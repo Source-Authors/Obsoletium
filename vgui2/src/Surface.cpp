@@ -46,6 +46,7 @@
 #include "tier1/utldict.h"
 
 #include "filesystem.h"
+#include "qlimits.h"
 #include "SteamBootStrapper.h"
 
 #include "vgui_surfacelib/Win32Font.h"
@@ -386,7 +387,7 @@ private:
 
 	CUtlDict< IImage *, unsigned short >	m_FileTypeImages;
 
-	enum { BASE_HEIGHT = 480, BASE_WIDTH = 640 };
+	enum { BASE_HEIGHT = ::BASE_HEIGHT, BASE_WIDTH = ::BASE_WIDTH };
 
 	bool LoadTGA(Texture *texture, const char *filename);
 	bool LoadBMP(Texture *texture, const char *filename);

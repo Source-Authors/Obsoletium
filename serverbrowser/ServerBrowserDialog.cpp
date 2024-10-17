@@ -17,9 +17,7 @@
 //=============================================================================
 #include "pch_serverbrowser.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
+#include "qlimits.h"
 
 #if defined( _WIN32 ) && !defined( _X360 )
 #define WIN32_LEAN_AND_MEAN
@@ -81,8 +79,8 @@ CServerBrowserDialog::CServerBrowserDialog(vgui::Panel *parent) : Frame(parent, 
 	m_pLanGames = new CLanGames(this);
 	m_pFriendsGames = new CFriendsGames(this);
 
-	SetMinimumSize( 640, 384 );
-	SetSize( 640, 384 );
+	SetMinimumSize( BASE_WIDTH, 384 );
+	SetSize( BASE_WIDTH, 384 );
 
 	m_pGameList = m_pInternetGames;
 

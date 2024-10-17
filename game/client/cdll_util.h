@@ -18,6 +18,7 @@
 #include <shareddefs.h>
 
 #include "shake.h"
+#include "qlimits.h"
 #include "bitmap/imageformat.h"
 #include "ispatialpartition.h"
 #include "materialsystem/MaterialSystemUtil.h"
@@ -51,8 +52,12 @@ int		ScreenHeight( void );
 // ScreenWidth returns the width of the screen, in pixels
 int		ScreenWidth( void );
 
-#define XRES(x)	( (x)  * ( ( float )ScreenWidth() / 640.0 ) )
-#define YRES(y)	( (y)  * ( ( float )ScreenHeight() / 480.0 ) )
+inline float XRES(float x) {
+	return x * ScreenWidth() / BASE_WIDTH;
+}
+inline float YRES(float y) {
+	return y * ScreenHeight() / BASE_HEIGHT;
+}
 
 int		UTIL_ComputeStringWidth( vgui::HFont& font, const char *str );
 int		UTIL_ComputeStringWidth( vgui::HFont& font, const wchar_t *str );

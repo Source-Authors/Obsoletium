@@ -667,8 +667,8 @@ static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t
 	if ( CommandLine()->FindParm( "-safe" ) )
 	{
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, true );
-		config.m_VideoMode.m_Width = 640;
-		config.m_VideoMode.m_Height = 480;
+		config.m_VideoMode.m_Width = BASE_WIDTH;
+		config.m_VideoMode.m_Height = BASE_HEIGHT;
 		config.m_VideoMode.m_RefreshRate = 0;
 		config.m_nAASamples = 0;
 		config.m_nAAQuality = 0;

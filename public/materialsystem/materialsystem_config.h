@@ -13,6 +13,8 @@
 
 #include "materialsystem/imaterialsystem.h"
 
+#include "qlimits.h"
+
 #define MATERIALSYSTEM_CONFIG_VERSION "VMaterialSystemConfig002"
 
 enum MaterialSystem_Config_Flags_t
@@ -166,8 +168,8 @@ struct MaterialSystem_Config_t
 		SetFlag( MATSYS_VIDCFG_FLAGS_DISABLE_PHONG, false );
 		SetFlag( MATSYS_VIDCFG_FLAGS_VR_MODE, false );
 
-		m_VideoMode.m_Width = 640;
-		m_VideoMode.m_Height = 480;
+		m_VideoMode.m_Width = BASE_WIDTH;
+		m_VideoMode.m_Height = BASE_HEIGHT;
 		m_VideoMode.m_RefreshRate = 60;
 		dxSupportLevel = 0;
 		bCompressedTextures = true;

@@ -15,6 +15,7 @@
 #include "KeyValues.h"
 #include "vgui/Cursor.h"
 #include "tier1/utldict.h"
+#include "qlimits.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -793,7 +794,7 @@ CKeyBoardEditorDialog::CKeyBoardEditorDialog( Panel *parent, Panel *panelToEdit,
 	SetTitle( "#KBEditorTitle", true );
 
 	SetSmallCaption( true );
-	SetMinimumSize( 640, 200 );
+	SetMinimumSize( BASE_WIDTH, 200 );
 	SetMinimizeButtonVisible( false );
 	SetMaximizeButtonVisible( false );
 	SetSizeable( true );

@@ -7,12 +7,13 @@
 #include "cbase.h"
 
 #include "sourcevirtualreality.h"
-#include "icommandline.h"
+#include "tier0/icommandline.h"
 #include "filesystem.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterialvar.h"
 #include "renderparm.h"
+#include "qlimits.h"
 #include "openvr/headers/openvr.h"
 
 using namespace vr;
@@ -301,7 +302,7 @@ void CSourceVirtualReality::CreateRenderTargets( IMaterialSystem *pMaterialSyste
 
 	g_StereoGuiTexture.Init( materials->CreateNamedRenderTargetTextureEx2(
 		"_rt_gui",
-		640, 480, RT_SIZE_OFFSCREEN,
+		BASE_WIDTH, BASE_HEIGHT, RT_SIZE_OFFSCREEN,
 		materials->GetBackBufferFormat(),
 		MATERIAL_RT_DEPTH_SHARED,
 		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT,

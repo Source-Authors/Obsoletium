@@ -237,8 +237,8 @@ CVideoMode_Common::CVideoMode_Common( void )
     m_nNumModes    = 0;
     m_bInitialized = false;
 
-    DefaultVideoMode().width  = 640;
-    DefaultVideoMode().height = 480;
+    DefaultVideoMode().width  = BASE_WIDTH;
+    DefaultVideoMode().height = BASE_HEIGHT;
     DefaultVideoMode().bpp    = 32;
     DefaultVideoMode().refreshRate = 0;
 
@@ -522,8 +522,8 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 
 
 			// This is the smallest size the the UI in source games can handle.
-			m_nUIWidth =	640;
-			m_nUIHeight =	480;
+			m_nUIWidth =	BASE_WIDTH;
+			m_nUIHeight =	BASE_HEIGHT;
 
 #if defined( WIN32 ) && !defined( USE_SDL )
 			m_nVROverrideX = vrBounds.nX;
@@ -2216,7 +2216,7 @@ bool CVideoMode_MaterialSystem::Init( )
         MaterialVideoMode_t info;
         materials->GetModeInfo( nAdapter, i, info );
 
-        if ( info.m_Width < 640 || info.m_Height < 480 )
+        if ( info.m_Width < BASE_WIDTH || info.m_Height < BASE_HEIGHT )
         {
             if ( !bAllowSmallModes )
                 continue;

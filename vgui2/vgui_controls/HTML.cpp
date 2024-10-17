@@ -14,6 +14,7 @@
 #include <vgui_controls/MessageBox.h>
 
 #include "filesystem.h"
+#include "qlimits.h"
 #include "../vgui2/src/vgui_key_translation.h"
 
 #undef PostMessage
@@ -1412,8 +1413,8 @@ void HTML::BrowserPopupHTMLWindow( HTML_NewWindow_t *pCmd )
 	int tall = pCmd->unTall;
 	if ( wide == 0 || tall == 0 )
 	{
-		wide = MAX( 640, GetWide() );
-		tall = MAX( 480, GetTall() );
+		wide = MAX( BASE_WIDTH, GetWide() );
+		tall = MAX( BASE_HEIGHT, GetTall() );
 	}
 
 	p->SetBounds( pCmd->unX, pCmd->unY, wide, tall  );
