@@ -1025,7 +1025,7 @@ void CVideoMode_Common::DrawNullBackground( void *hHDC, int w, int h )
          ANSI_CHARSET,
          OUT_TT_PRECIS,
          CLIP_DEFAULT_PRECIS,
-         ANTIALIASED_QUALITY,
+         CLEARTYPE_NATURAL_QUALITY,
          DEFAULT_PITCH,
          "Arial" );
 
