@@ -1631,8 +1631,8 @@ void CEngineVGui::Simulate()
 			RECT rect;
 			::GetClientRect(*pmainwindow, &rect);
 
-			w = rect.right;
-			h = rect.bottom;
+			w = rect.right - rect.left;
+			h = rect.bottom - rect.top;
 		}
 #endif
 		// don't hold this reference over RunFrame()
