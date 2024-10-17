@@ -109,7 +109,7 @@ void* CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w
 	RECT windowRect{0, 0, w, h};
 
 	// Compute rect needed for that size client area based on window style
-	AdjustWindowRectEx(&windowRect, style, FALSE, 0);
+	::AdjustWindowRectExForDpi( &windowRect, style, FALSE, 0, ::GetDpiForSystem() );
 
 	// Create the window
 	HWND hWnd{CreateWindowExA( 0, wc.lpszClassName, pTitle, style, 0, 0,
@@ -122,13 +122,12 @@ void* CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w
 		return nullptr;
 	}
 
-	if (!hWnd)
-		return nullptr;
+	const unsigned window_dpi{::GetDpiForWindow(hWnd)};
+	// Compute rect needed for DPI + that size client area based on window style
+    ::AdjustWindowRectExForDpi(&windowRect, style, FALSE, 0, window_dpi);
 
-	int CenterX = (GetSystemMetrics(SM_CXSCREEN) - w) / 2;
-	int CenterY = (GetSystemMetrics(SM_CYSCREEN) - h) / 2;
-	CenterX = (CenterX < 0) ? 0: CenterX;
-	CenterY = (CenterY < 0) ? 0: CenterY;
+	const int CenterX{std::max(0, (GetSystemMetricsForDpi(SM_CXSCREEN, window_dpi) - w) / 2)};
+	const int CenterY{std::max(0, (GetSystemMetricsForDpi(SM_CYSCREEN, window_dpi) - h) / 2)};
 
 	// In VCR modes, keep it in the upper left so mouse coordinates are always
 	// relative to the window.
