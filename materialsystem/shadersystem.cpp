@@ -90,7 +90,7 @@ public:
 	virtual void		LoadCubeMap( IMaterialVar **ppParams, IMaterialVar *pTextureVar, int nAdditionalCreationFlags = 0 );
 
 	// Used to prevent re-entrant rendering from warning messages
-	void				BufferSpew( SpewType_t spewType, const Color &c, const char *pMsg );
+	void				BufferSpew( SpewType_t spewType, const char *pGroup, const Color &c, const char *pMsg );
 
 private:
 	struct ShaderDLLInfo_t
@@ -865,10 +865,11 @@ void CShaderSystem::CleanUpDebugMaterials()
 // recursive spew during precache due to fonts not being loaded, etc.
 //-----------------------------------------------------------------------------
 CThreadFastMutex g_StgoredSpewMutex;
-void CShaderSystem::BufferSpew( SpewType_t spewType, const Color &c, const char *pMsg )
+void CShaderSystem::BufferSpew( SpewType_t spewType, const char *pGroup, const Color &c, const char *pMsg )
 {
 	AUTO_LOCK( g_StgoredSpewMutex );
 	m_StoredSpew.PutInt( spewType );
+	m_StoredSpew.PutString( pGroup );
 	m_StoredSpew.PutChar( c.r() );
 	m_StoredSpew.PutChar( c.g() );
 	m_StoredSpew.PutChar( c.b() );
@@ -882,6 +883,13 @@ void CShaderSystem::PrintBufferedSpew( void )
 	while ( m_StoredSpew.GetBytesRemaining() > 0 )
 	{
 		SpewType_t spewType	= (SpewType_t)m_StoredSpew.GetInt();
+
+		intp nGroupLen = m_StoredSpew.PeekStringLength();
+		char *pGroup = (char*)_alloca( nGroupLen );
+		if ( nGroupLen )
+		{
+			m_StoredSpew.GetStringManualCharCount( pGroup, nGroupLen );
+		}
 		
 		unsigned char r, g, b, a;
 		r = m_StoredSpew.GetChar();
@@ -891,12 +899,20 @@ void CShaderSystem::PrintBufferedSpew( void )
 
 		Color c( r, g, b, a );
 		
-		intp nLen = m_StoredSpew.PeekStringLength();
-		if ( nLen )
+		intp nMsgLen = m_StoredSpew.PeekStringLength();
+		if ( nMsgLen )
 		{
-			char *pBuf = (char*)_alloca( nLen );
-			m_StoredSpew.GetStringManualCharCount( pBuf, nLen );
-			ColorSpewMessage( spewType, &c, "%s", pBuf );
+			char *pMsg = (char*)_alloca( nMsgLen );
+			m_StoredSpew.GetStringManualCharCount( pMsg, nMsgLen );
+
+			if ( nGroupLen && pGroup )
+			{
+				DColorSpewMessage( spewType, pGroup, &c, "%s", pMsg );
+			}
+			else
+			{
+				ColorSpewMessage( spewType, &c, "%s", pMsg );
+			}
 		}
 		else
 		{
@@ -910,8 +926,9 @@ void CShaderSystem::PrintBufferedSpew( void )
 static SpewRetval_t MySpewOutputFunc( SpewType_t spewType, char const *pMsg )
 {
 	AUTO_LOCK( g_StgoredSpewMutex );
+	const char *g = GetSpewOutputGroup();
 	Color c = *GetSpewOutputColor();
-	s_ShaderSystem.BufferSpew( spewType, c, pMsg );
+	s_ShaderSystem.BufferSpew( spewType, g, c, pMsg );
 
 	switch( spewType )
 	{

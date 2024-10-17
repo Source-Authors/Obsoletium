@@ -433,6 +433,15 @@ DBG_INTERFACE SpewRetval_t ColorSpewMessage( SpewType_t type, const Color *pColo
 	return ret;
 }
 
+DBG_INTERFACE SpewRetval_t DColorSpewMessage( SpewType_t type, const tchar *pGroupName, const Color *pColor, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
+{
+	va_list args;
+	va_start( args, pMsgFormat );
+	SpewRetval_t ret = _SpewMessage( type, pGroupName, 0, pColor, pMsgFormat, args );
+	va_end(args);
+	return ret;
+}
+
 void Msg( PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	va_list args;
