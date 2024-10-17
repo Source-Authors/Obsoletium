@@ -344,9 +344,11 @@ cmodel_t *CM_LoadMap( const char *name, bool allowReusePrevious, unsigned *check
 	}
 
 	// read in the collision model data
-	CMapLoadHelper::Init( 0, name );
+	// dimhotepus: Speedup loading as we already initialized helper.
+	//CMapLoadHelper::Init( 0, name );
 	CollisionBSPData_Load( name, pBSPData );
-	CMapLoadHelper::Shutdown( );
+	// dimhotepus: Speedup loading as we already initialized helper.
+	//CMapLoadHelper::Shutdown( );
 
     // Push the displacement bounding boxes down the tree and set leaf data.
     CM_DispTreeLeafnum( pBSPData );
