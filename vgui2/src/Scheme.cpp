@@ -842,6 +842,10 @@ void CScheme::ReloadFontGlyphs()
 			{
 				flags |= ISurface::FONTFLAG_CLEARTYPE;
 			}
+			if (fontdata->GetInt( "cleartype_natural" ) && g_pSurface->SupportsFeature(ISurface::CLEARTYPE_FONTS))
+			{
+				flags |= ISurface::FONTFLAG_CLEARTYPE_NATURAL;
+			}
 			if (fontdata->GetInt( "dropshadow" ) && g_pSurface->SupportsFeature(ISurface::DROPSHADOW_FONTS))
 			{
 				flags |= ISurface::FONTFLAG_DROPSHADOW;

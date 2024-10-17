@@ -51,6 +51,7 @@ CWin32Font::CWin32Font() : m_ExtendedABCWidthsCache(256, 0, &ExtendedABCWidthsCa
 	m_iOutlineSize = 0;
 	m_bAntiAliased = false;
 	m_bClearType = false;
+	m_bClearTypeNatural = false;
 	m_bRotary = false;
 	m_bAdditive = false;
 
@@ -96,8 +97,9 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	m_iWeight = weight;
 	m_iFlags = flags;
 	m_bClearType = (flags & vgui::ISurface::FONTFLAG_CLEARTYPE) ? 1 : 0;
+	m_bClearTypeNatural = (flags & vgui::ISurface::FONTFLAG_CLEARTYPE_NATURAL) ? 1 : 0;
 	// dimhotepus: Use antialised font as fallback when not ClearType font.
-	m_bAntiAliased = !m_bClearType && (flags & vgui::ISurface::FONTFLAG_ANTIALIAS) ? 1 : 0;
+	m_bAntiAliased = !m_bClearType && !m_bClearTypeNatural && (flags & vgui::ISurface::FONTFLAG_ANTIALIAS) ? 1 : 0;
 	m_bUnderlined = flags & vgui::ISurface::FONTFLAG_UNDERLINE;
 	m_iDropShadowOffset = (flags & vgui::ISurface::FONTFLAG_DROPSHADOW) ? 1 : 0;
 	m_iOutlineSize = (flags & vgui::ISurface::FONTFLAG_OUTLINE) ? 1 : 0;
@@ -135,6 +137,12 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 		return false;
 	}
 
+	const DWORD quality = m_bClearTypeNatural
+		? CLEARTYPE_NATURAL_QUALITY
+		: (m_bClearType
+			? CLEARTYPE_QUALITY
+			: (m_bAntiAliased
+				? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY));
 	m_hFont = ::CreateFontA(tall, 0, 0, 0, 
 								m_iWeight, 
 								flags & vgui::ISurface::FONTFLAG_ITALIC, 
@@ -143,12 +151,13 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 								charset, 
 								OUT_DEFAULT_PRECIS, 
 								CLIP_DEFAULT_PRECIS, 
-								m_bClearType ? CLEARTYPE_QUALITY : (m_bAntiAliased ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY), 
+								quality,
 								DEFAULT_PITCH | FF_DONTCARE, 
 								windowsFontName);
 	if (!m_hFont)
 	{
-		Error("Couldn't create windows font '%s'\n", windowsFontName);
+		Error("Couldn't create windows font '%s' with flags '0x%x' and quality '%lu'.\n",
+			windowsFontName, flags, quality);
 	}
 
 	// set as the active font
@@ -209,7 +218,7 @@ void CWin32Font::GetCharRGBA(wchar_t ch, int rgbaWide, int rgbaTall, unsigned ch
 	MAT2 mat2 = { { 0, 1}, { 0, 0}, { 0, 0}, { 0, 1}};
 	int bytesNeeded = 0;
 
-	bool bShouldAntialias = m_bAntiAliased || m_bClearType;
+	bool bShouldAntialias = m_bAntiAliased || m_bClearType || m_bClearTypeNatural;
 	// filter out 
 	if ( ch > 0x00FF && !(m_iFlags & vgui::ISurface::FONTFLAG_CUSTOM) )
 	{
@@ -454,7 +463,7 @@ void CWin32Font::GetCharABCWidths(int ch, int &a, int &b, int &c)
 			char mbcs[6] = { 0 };
 			wchar_t wch = ch;
 			::WideCharToMultiByte(CP_ACP, 0, &wch, 1, mbcs, sizeof(mbcs), NULL, NULL);
-			if (::GetTextExtentPoint32(m_hDC, mbcs, V_strlen(mbcs), &size))
+			if (::GetTextExtentPoint32(m_hDC, mbcs, static_cast<int>(V_strlen(mbcs)), &size))
 			{
 				a = c = 0;
 				b = size.cx;
