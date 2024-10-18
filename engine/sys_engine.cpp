@@ -48,10 +48,8 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory,
 			char const* pBaseDir, void *pwnd, int bIsDedicated );
 
 // Sleep time when not focus. Set to 0 to not sleep even if app doesn't have focus.
-ConVar engine_no_focus_sleep( "engine_no_focus_sleep", "50", FCVAR_ARCHIVE );
-
-// sleep time when not focus
-#define NOT_FOCUS_SLEEP	50				
+// dimhotepus: Reduce default no focus sleep time from 50 to 25 milliseconds.
+ConVar engine_no_focus_sleep( "engine_no_focus_sleep", "25", FCVAR_ARCHIVE, "How much time in milliseconds to sleep", true, 0, true, INT_MAX );
 
 #define DEFAULT_FPS_MAX	300
 #define DEFAULT_FPS_MAX_S "300"
@@ -88,7 +86,7 @@ static void mat_powersavingsmode_callback( IConVar *var, const char *pOldValue, 
 	fps_max.SetValue( nRefresh );
 	s_bFPSMaxDrivenByPowerSavings = false;
 }
-static ConVar mat_powersavingsmode( "mat_powersavingsmode", "0", FCVAR_ARCHIVE, "Power Savings Mode", mat_powersavingsmode_callback );
+static ConVar mat_powersavingsmode( "mat_powersavingsmode", "0", FCVAR_ARCHIVE, "Enable power savings mode (half of display refresh rate, 30 FPS min).", true, 0, true, 1, mat_powersavingsmode_callback );
 
 #ifndef _RETAIL
 static ConVar async_serialize( "async_serialize", "0", 0, "Force async reads to serialize for profiling" );
