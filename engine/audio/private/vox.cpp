@@ -139,7 +139,7 @@ struct WordBuf
 {
 	WordBuf()
 	{
-		word[ 0 ] = 0;
+		word[ 0 ] = '\0';
 	}
 
 	WordBuf( const WordBuf& src )
@@ -151,13 +151,17 @@ struct WordBuf
 	{
 		if ( !w )
 		{
-			word[ 0 ] = 0;
+			word[ 0 ] = '\0';
 			return;
 		}
+
 		Q_strncpy( word, w, sizeof( word ) );
-		while ( Q_strlen( word ) >= 1 && word[ Q_strlen( word ) - 1 ] == ' ' )
+		intp size = V_strlen( word );
+
+		while ( size >= 1 && word[ size - 1 ] == ' ' )
 		{
-			word[ Q_strlen( word ) - 1 ] = 0;
+			word[ size - 1 ] = '\0';
+			--size;
 		}
 	}
 
