@@ -1422,6 +1422,37 @@ void UnloadEntityDLLs( void )
 	sv_noclipduringpause = NULL;
 }
 
+
+static bool CheckCPUFMA3Technology( unsigned ecx )
+{
+	return ( ecx & (1U << 12U) ) != 0;
+}
+
+static bool CheckCPUCMPXCHG16BTechnology( unsigned ecx )
+{
+	return ( ecx & (1U << 13U) ) != 0;
+}
+
+static bool CheckCPUPOPCNTTechnology( unsigned ecx )
+{
+	return ( ecx & (1U << 23U) ) != 0;
+}
+
+static bool CheckCPUAESTechnology( unsigned ecx )
+{
+	return ( ecx & (1U << 25U) ) != 0;
+}
+
+static bool CheckCPUAVXTechnology( unsigned ecx )
+{
+	return ( ecx & (1U << 28U) ) != 0;
+}
+
+static bool CheckCPUF16CTechnology( unsigned ecx )
+{
+	return ( ecx & (1U << 29U) ) != 0;
+}
+
 CON_COMMAND( star_cpu, "Dump CPU stats" )
 {
 	const CPUInformation& pi{*GetCPUInformation()};
@@ -1432,6 +1463,20 @@ CON_COMMAND( star_cpu, "Dump CPU stats" )
 
 	char features[256];
 	features[0] = '\0';
+
+	if( pi.m_bMMX )
+	{
+		Q_strncat(features,
+			MathLib_SSEEnabled() ? "MMX " : "(MMX) ",
+			sizeof( features ) );
+	}
+
+	if( pi.m_b3DNow )
+	{
+		Q_strncat(features,
+			MathLib_SSEEnabled() ? "3DNow " : "(3DNow) ",
+			sizeof( features ) );
+	}
 
 	if( pi.m_bSSE )
 	{
@@ -1493,27 +1538,49 @@ CON_COMMAND( star_cpu, "Dump CPU stats" )
 #endif
 			sizeof(features) );
 	}
-
-	if( pi.m_bMMX )
-	{
+	
+	if( CheckCPUAVXTechnology( pi.m_nFeatures[1]) )
 		Q_strncat(features,
-			MathLib_SSEEnabled() ? "MMX " : "(MMX) ",
+#ifdef _XM_AVX_INTRINSICS_
+			"AVX ",
+#else
+			"(AVX) ",
+#endif			
 			sizeof( features ) );
-	}
 
-	if( pi.m_b3DNow )
-	{
+	
+	if( CheckCPUFMA3Technology(pi.m_nFeatures[1]) )
 		Q_strncat(features,
-			MathLib_SSEEnabled() ? "3DNow " : "(3DNow) ",
+#ifdef _XM_FMA3_INTRINSICS_
+			"FMA3 ",
+#else
+			"(FMA3) ",
+#endif
 			sizeof( features ) );
-	}
+
+	if( CheckCPUF16CTechnology( pi.m_nFeatures[1]) )
+		Q_strncat(features,
+#ifdef _XM_F16C_INTRINSICS_
+			"F16C ",
+#else
+			"(F16C) ",
+#endif
+			sizeof( features ) );
+
+	if( pi.m_bFCMOV )
+		Q_strncat(features, "FCMOV ", sizeof( features ) );
 
 	if( pi.m_bRDTSC )
 		Q_strncat(features, "RDTSC ", sizeof( features ) );
 	if( pi.m_bCMOV )
 		Q_strncat(features, "CMOV ", sizeof( features ) );
-	if( pi.m_bFCMOV )
-		Q_strncat(features, "FCMOV ", sizeof( features ) );
+
+	if( CheckCPUCMPXCHG16BTechnology( pi.m_nFeatures[1]) )
+		Q_strncat(features, "CMPXCHG16B ", sizeof( features ) );
+	if( CheckCPUPOPCNTTechnology( pi.m_nFeatures[1]) )
+		Q_strncat(features, "POPCNT ", sizeof( features ) );
+	if( CheckCPUAESTechnology( pi.m_nFeatures[1]) )
+		Q_strncat(features, "AES ", sizeof( features ) );
 
 	// Remove the trailing space.  There will always be one.
 	features[Q_strlen(features)-1] = '\0';
@@ -1521,7 +1588,8 @@ CON_COMMAND( star_cpu, "Dump CPU stats" )
 	// Dump CPU information:
 	if( pi.m_nLogicalProcessors != 1 )
 	{
-		char buffer[256] = "";
+		char buffer[256];
+		buffer[0] = '\0';
 		if( pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors )
 		{
 			Q_snprintf(buffer,
@@ -1530,7 +1598,7 @@ CON_COMMAND( star_cpu, "Dump CPU stats" )
 				pi.m_nPhysicalProcessors );
 		}
 
-		ConDMsg( "hardware: CPU %s, %hhu logical%s cores, Frequency: %.01f %s,  Features: %s\n",
+		ConDMsg( "hardware: CPU %s, %hhu logical%s cores.\nFrequency: %.01f %s.\nFeatures: %s\n",
 			pi.m_szProcessorBrand,
 			pi.m_nLogicalProcessors,
 			buffer,
@@ -1541,7 +1609,7 @@ CON_COMMAND( star_cpu, "Dump CPU stats" )
 		return;
 	}
 
-	ConDMsg( "hardware: CPU %s, 1 logical (1 physical) core, Frequency: %.01f %s,  Features: %s\n",
+	ConDMsg( "hardware: CPU %s, 1 logical (1 physical) core.\nFrequency: %.01f %s.\nFeatures: %s\n",
 		pi.m_szProcessorBrand,
 		frequency,
 		frequence_denomination,

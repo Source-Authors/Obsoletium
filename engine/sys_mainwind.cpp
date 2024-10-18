@@ -860,7 +860,7 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			rcWindow.right = rcWindow.left + m_rcLastRestoredClientRect.right;
 			rcWindow.bottom = rcWindow.top + m_rcLastRestoredClientRect.bottom;
 
-			::AdjustWindowRect( &rcWindow, ::GetWindowLong( hWnd, GWL_STYLE ), FALSE );
+			::AdjustWindowRectEx( &rcWindow, ::GetWindowLong( hWnd, GWL_STYLE ), FALSE, ::GetWindowLong( hWnd, GWL_EXSTYLE ) );
 			::MoveWindow( hWnd, rcWindow.left, rcWindow.top,
 				rcWindow.right - rcWindow.left, rcWindow.bottom - rcWindow.top, FALSE );
 		}
@@ -883,13 +883,13 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		PAINTSTRUCT	ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
 #ifndef SWDS
-		RECT rcClient;
-		GetClientRect( hWnd, &rcClient );
+		RECT rc_client;
+		GetClientRect( hWnd, &rc_client );
 
 		// Only renders stuff if running -noshaderapi
 		if ( videomode )
 		{
-			videomode->DrawNullBackground( hdc, rcClient.right, rcClient.bottom );
+			videomode->DrawNullBackground( hdc, rc_client.right - rc_client.left, rc_client.bottom - rc_client.top );
 		}
 #endif
 		EndPaint(hWnd, &ps);
@@ -1047,7 +1047,7 @@ bool CGame::CreateGameWindow( void )
 	// Never a max box
 	style &= ~WS_MAXIMIZEBOX;
 	
-	const unsigned system_dpi{GetDpiForSystem()};
+	const unsigned system_dpi{::GetDpiForSystem()};
 
 	// Create a full screen size window by default, it'll get resized later anyway
 	int w = GetSystemMetricsForDpi( SM_CXSCREEN, system_dpi );
