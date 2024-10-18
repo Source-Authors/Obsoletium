@@ -2092,13 +2092,14 @@ void *CInputSystem::GetIMEWindow()
 }
 
 #ifdef DO_IME
-static void SpewIMEInfo( int langid )
+static void SpewIMEInfo( unsigned short langid )
 {
 	LanguageIds *info = GetLanguageInfo( langid );
 	if ( info )
 	{
 		wchar_t const *name = info->shortcode ? info->shortcode : L"???";
 		wchar_t outstr[ 512 ];
+
 		V_swprintf_safe( outstr, L"IME language changed to:  %s", name );
 		OutputDebugStringW( outstr );
 		OutputDebugStringW( L"\n" );
@@ -2114,7 +2115,7 @@ void CInputSystem::OnChangeIME( bool forward )
 #ifdef DO_IME
 	HKL currentKb = GetKeyboardLayout( 0 );
 
-	UINT numKBs = GetKeyboardLayoutList( 0, NULL );
+	int numKBs = GetKeyboardLayoutList( 0, NULL );
 	if ( numKBs > 0 )
 	{
 		HKL *list = new HKL[ numKBs ];
@@ -2124,10 +2125,9 @@ void CInputSystem::OnChangeIME( bool forward )
 		int oldKb = 0;
 		CUtlVector< HKL >	selections;
 
-		for ( unsigned int i = 0; i < numKBs; ++i )
+		for ( int i = 0; i < numKBs; ++i )
 		{
-			BOOL first = !IsIDInList( LOWORD( list[ i ] ), i, list );
-
+			bool first = !IsIDInList( LOWORD( list[ i ] ), i, list );
 			if ( !first )
 				continue;
 
@@ -2150,7 +2150,7 @@ void CInputSystem::OnChangeIME( bool forward )
 
 		ActivateKeyboardLayout( selections[ oldKb ], 0 );
 
-		int langid = LOWORD( selections[ oldKb ] );
+		unsigned short langid = LOWORD( selections[ oldKb ] );
 		SpewIMEInfo( langid );
 
 		delete[] list;
@@ -2186,11 +2186,9 @@ void CInputSystem::OnChangeIMEByHandle( intp handleValue )
 
 #ifdef DO_IME
 	HKL hkl = (HKL)handleValue;
-
 	ActivateKeyboardLayout( hkl, 0 );
 
-	int langid = LOWORD( hkl);
-
+	unsigned short langid = LOWORD( hkl );
 	SpewIMEInfo( langid );
 #endif
 }
@@ -2235,7 +2233,7 @@ int CInputSystem::GetIMELanguageList( LanguageItem *dest, int destcount )
 #ifdef DO_IME
 	int iret = 0;
 
-	UINT numKBs = GetKeyboardLayoutList( 0, NULL );
+	int numKBs = GetKeyboardLayoutList( 0, NULL );
 	if ( numKBs > 0 )
 	{
 		HKL *list = new HKL[ numKBs ];
@@ -2244,10 +2242,9 @@ int CInputSystem::GetIMELanguageList( LanguageItem *dest, int destcount )
 
 		CUtlVector< HKL >	selections;
 
-		for ( unsigned int i = 0; i < numKBs; ++i )
+		for ( int i = 0; i < numKBs; ++i )
 		{
-			BOOL first = !IsIDInList( LOWORD( list[ i ] ), i, list );
-
+			bool first = !IsIDInList( LOWORD( list[ i ] ), i, list );
 			if ( !first )
 				continue;
 
@@ -2267,14 +2264,14 @@ int CInputSystem::GetIMELanguageList( LanguageItem *dest, int destcount )
 
 				memset( p, 0, sizeof( IInput::LanguageItem ) );
 
-				wcsncpy( p->shortname, info->shortcode, sizeof( p->shortname ) / sizeof( wchar_t ) );
-				p->shortname[ sizeof( p->shortname ) / sizeof( wchar_t ) - 1 ] = L'\0';
+				wcsncpy( p->shortname, info->shortcode, std::size( p->shortname ) );
+				p->shortname[ std::size( p->shortname ) - 1 ] = L'\0';
 
-				wcsncpy( p->menuname, info->displayname, sizeof( p->menuname ) / sizeof( wchar_t ) );
-				p->menuname[ sizeof( p->menuname ) / sizeof( wchar_t ) - 1 ] = L'\0';
+				wcsncpy( p->menuname, info->displayname, std::size( p->menuname ) );
+				p->menuname[ std::size( p->menuname ) - 1 ] = L'\0';
 
 				p->handleValue = (intp)hkl;
-				p->active = ( hkl == GetKeyboardLayout( 0 ) ) ? true : false;
+				p->active = hkl == GetKeyboardLayout( 0 );
 			}
 		}
 
@@ -2987,11 +2984,8 @@ void CInputSystem::SetCandidateWindowPos( int x, int y )
 	ASSERT_IF_IME_NYI();
 
 #ifdef DO_IME
-    POINT		point;
+    POINT		point{x, y};
     CANDIDATEFORM Candidate;
-
-	point.x = x;
-	point.y = y;
 
 	HIMC hIMC = ImmGetContext( ( HWND )GetIMEWindow() );
 	if ( hIMC ) 
@@ -3098,8 +3092,8 @@ void CInputSystem::OnKeyCodeUnhandled( int keyCode )
 	if ( !pContext )
 		return;
 
-	int c = pContext->m_KeyCodeUnhandledListeners.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = pContext->m_KeyCodeUnhandledListeners.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		VPanel *listener = pContext->m_KeyCodeUnhandledListeners[ i ];
 		g_pIVgui->PostMessage((VPANEL)listener, new KeyValues( "KeyCodeUnhandled", "code", keyCode ), NULL );
