@@ -53,7 +53,8 @@ csurface_t *CCollisionBSPData::GetSurfaceAtIndex( unsigned short surfaceIndex )
 #if TEST_TRACE_POOL
 CTSPool<TraceInfo_t> g_TraceInfoPool;
 #else
-class CTraceInfoPool : public CTSList<TraceInfo_t *>
+// dimhotepus: CTSList -> CTSListWithFreeList. CTSList has multihreaded bug in Pop!
+class CTraceInfoPool : public CTSListWithFreeList<TraceInfo_t *>
 {
 public:
 	CTraceInfoPool() = default;
