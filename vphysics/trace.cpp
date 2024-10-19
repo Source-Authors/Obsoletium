@@ -36,6 +36,7 @@
 #define CHECK_TOI_CALCS 0
 
 constexpr inline int BRUTE_FORCE_VERT_COUNT{128};
+static_assert(UCHAR_MAX >= BRUTE_FORCE_VERT_COUNT);
 
 // NOTE: This is in inches (HL units)
 const float TEST_EPSILON{g_PhysicsUnits.collisionSweepIncrementalEpsilon};
@@ -238,7 +239,7 @@ void InitLeafmap( IVP_Compact_Ledge *pLedge, leafmap_t *pLeafmapOut )
 				}
 				// now find the vertex spans and encode them
 				byte spans[BRUTE_FORCE_VERT_COUNT];
-				int spanIndex = 0;
+				byte spanIndex = 0;
 				char has = hasVert[0];
 				Assert(has);
 				byte count = 1;
