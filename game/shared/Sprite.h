@@ -154,7 +154,7 @@ public:
 	bool IsOn() { return !IsEffectActive( EF_NODRAW ); }
 
 	inline float Frames( void ) { return m_flMaxFrame; }
-	inline void SetTransparency( int rendermode, int r, int g, int b, int a, int fx )
+	inline void SetTransparency( int rendermode, byte r, byte g, byte b, byte a, int fx )
 	{
 		SetRenderMode( (RenderMode_t)rendermode );
 		SetColor( r, g, b );
@@ -162,7 +162,7 @@ public:
 		m_nRenderFX = fx;
 	}
 	inline void SetTexture( int spriteIndex ) { SetModelIndex( spriteIndex ); }
-	inline void SetColor( int r, int g, int b ) { SetRenderColor( r, g, b, GetRenderColor().a ); }
+	inline void SetColor( byte r, byte g, byte b ) { SetRenderColor( r, g, b, GetRenderColor().a ); }
 	
 	void SetBrightness( int brightness, float duration = 0.0f );
 	void SetScale( float scale, float duration = 0.0f );
