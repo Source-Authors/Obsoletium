@@ -936,28 +936,28 @@ inline void CDmaColor::SetColor( int r, int g, int b, int a )
 inline void CDmaColor::SetRed( int r )
 {
 	Color org = Value();
-	org[ 0 ] = r;
+	org[ 0 ] = static_cast<unsigned char>(r);
 	m_pAttribute->SetValue( org );
 }
 
 inline void CDmaColor::SetGreen( int g )
 {
 	Color org = Value();
-	org[ 1 ] = g;
+	org[ 1 ] = static_cast<unsigned char>(g);
 	m_pAttribute->SetValue( org );
 }
 
 inline void CDmaColor::SetBlue( int b )
 {
 	Color org = Value();
-	org[ 2 ] = b;
+	org[ 2 ] = static_cast<unsigned char>(b);
 	m_pAttribute->SetValue( org );
 }
 
 inline void CDmaColor::SetAlpha( int a )
 {
 	Color org = Value();
-	org[ 3 ] = a;
+	org[ 3 ] = static_cast<unsigned char>(a);
 	m_pAttribute->SetValue( org );
 }
 
