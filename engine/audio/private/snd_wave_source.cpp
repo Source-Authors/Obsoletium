@@ -11,7 +11,6 @@
 #include "utlsymbol.h"
 #include "checksum_crc.h"
 #include "../../host.h"
-#include "xwvfile.h"
 #include "filesystem/IQueuedLoader.h"
 #include "tier1/lzmaDecoder.h"
 #include "tier2/fileutils.h"
@@ -520,126 +519,6 @@ const char *CAudioSourceWave::GetName()
 }
 
 //-----------------------------------------------------------------------------
-// Load a native xaudio or legacy wav
-//-----------------------------------------------------------------------------
-bool CAudioSourceWave::GetXboxAudioStartupData()
-{
-	CUtlBuffer	buf;
-	char		fileName[MAX_PATH];
-	char		tempFileName[MAX_PATH];
-	
-	MEM_ALLOC_CREDIT();
-
-	// try native optimal xma wav file first
-	Q_StripExtension( m_pSfx->GetFileName(), tempFileName, sizeof( tempFileName ) );
-	Q_snprintf( fileName, sizeof( fileName ), "sound\\%s.360.wav", tempFileName );
-	if ( !g_pFullFileSystem->ReadFile( fileName, "GAME", buf, sizeof( xwvHeader_t ) ) )
-	{
-		// not found, not supported
-		return false;
-	}
-	else
-	{
-		xwvHeader_t* pHeader = buf.Base<xwvHeader_t>();
-		if ( pHeader->id != XWV_ID || pHeader->version != XWV_VERSION )
-		{
-			return false;
-		}
-
-		if ( pHeader->format == XWV_FORMAT_XMA )
-		{
-			m_format = WAVE_FORMAT_XMA;
-		}
-		else if ( pHeader->format == XWV_FORMAT_PCM )
-		{
-			m_format = WAVE_FORMAT_PCM;
-		}
-		else
-		{
-			// unknown
-			return false;
-		}
-
-		m_rate = pHeader->GetSampleRate();
-		m_channels = pHeader->channels;
-		m_dataStart = pHeader->dataOffset;
-		m_dataSize = pHeader->dataSize;
-
-		m_loopStart = pHeader->loopStart;
-		m_loopBlock = pHeader->loopBlock;
-		m_numLeadingSamples	= pHeader->numLeadingSamples;
-		m_numTrailingSamples = pHeader->numTrailingSamples;
-
-		if ( m_format == WAVE_FORMAT_XMA )
-		{
-			// xma is compressed blocks, trick to fool system to treat data as bytes, not samples
-			// unfortunate, but callers must know xma context and provide offsets in samples or bytes
-			m_bits = 16;
-			m_sampleSize = 1;
-			m_sampleCount = m_dataSize;
-		}
-		else
-		{
-			m_bits = 16;
-			m_sampleSize = sizeof( short ) * m_channels;
-			m_sampleCount = m_dataSize / m_sampleSize;
-		}
-
-		// keep true decoded samples because cannot be easily determined
-		m_numDecodedSamples = pHeader->numDecodedSamples;
-
-		m_bNoSentence = true;
-
-		CUtlBuffer fileBuffer;
-		if ( pHeader->staticDataSize )
-		{
-			// get optional data
-			if ( !g_pFullFileSystem->ReadFile( fileName, "GAME", fileBuffer, pHeader->staticDataSize, sizeof( xwvHeader_t ) ) )
-			{
-				return false;
-			}
-
-			unsigned char *pData = fileBuffer.Base<unsigned char>() + sizeof( xwvHeader_t );
-			if ( pHeader->GetSeekTableSize() )
-			{
-				// store off the seek table
-				m_nHeaderSize = pHeader->GetSeekTableSize();
-				m_pHeader = new char[m_nHeaderSize];
-				V_memcpy( m_pHeader, pData, m_nHeaderSize );
-
-				// advance past optional seek table
-				pData += m_nHeaderSize;
-			}
-
-			if ( pHeader->vdatSize )
-			{
-				m_pTempSentence = new CSentence();
-				Assert( m_pTempSentence );
-				m_bNoSentence = false;
-
-				// vdat is precompiled into minimal binary format and possibly compressed
-				if ( CLZMA::IsCompressed( pData ) )
-				{
-					// uncompress binary vdat and restore
-					CUtlBuffer targetBuffer;
-					int originalSize = CLZMA::GetActualSize( pData );
-					targetBuffer.EnsureCapacity( originalSize );
-					CLZMA::Uncompress( pData, targetBuffer.Base<unsigned char>() );
-					targetBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, originalSize );
-					m_pTempSentence->CacheRestoreFromBuffer( targetBuffer );
-				}
-				else
-				{
-					m_pTempSentence->CacheRestoreFromBuffer( fileBuffer );
-				}
-			}
-		}
-	}
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Bastardized construction routine.  This is just to avoid complex
 //			constructor functions so code can be shared more easily by sub-classes
 // Input  : *pFormatBuffer - RIFF header
@@ -997,27 +876,6 @@ CAudioSourceMemWave::CAudioSourceMemWave( CSfxTable *pSfx ) :
 {
 	m_hCache = 0;
 	m_hStream = INVALID_STREAM_HANDLE;
-
-	if ( IsX360() )
-	{
-		bool bValid = GetXboxAudioStartupData();
-		if ( !bValid )
-		{
-			// failed, substitute placeholder
-			pSfx->m_bUseErrorFilename = true;
-			bValid = GetXboxAudioStartupData();
-			if ( bValid )
-			{
-				DevWarning( "Failed to load sound \"%s\", substituting \"%s\"\n", pSfx->getname(), pSfx->GetFileName() );
-			}
-		}
-	
-		if ( bValid )
-		{
-			// a 360 memory wave is a critical resource kept locked in memory, load its data now
-			CacheLoad();
-		}
-	}
 }
 
 CAudioSourceMemWave::CAudioSourceMemWave( CSfxTable *pSfx, CAudioSourceCachedInfo *info ) :
@@ -1559,21 +1417,6 @@ CAudioSourceStreamWave::CAudioSourceStreamWave( CSfxTable *pSfx ) : CAudioSource
 	m_dataStart = -1;
 	m_dataSize = 0;
 	m_sampleCount = 0;
-
-	if ( IsX360() )
-	{
-		bool bValid = GetXboxAudioStartupData();
-		if ( !bValid )
-		{
-			// failed, substitute placeholder
-			pSfx->m_bUseErrorFilename = true;
-			bValid = GetXboxAudioStartupData();
-			if ( bValid )
-			{
-				DevWarning( "Failed to load sound \"%s\", substituting \"%s\"\n", pSfx->getname(), pSfx->GetFileName() );
-			}
-		}
-	}
 }
 
 CAudioSourceStreamWave::CAudioSourceStreamWave( CSfxTable *pSfx, CAudioSourceCachedInfo *info ) : 

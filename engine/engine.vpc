@@ -1158,7 +1158,6 @@ $Project "engine"
 		$File	"$SRCDIR\public\worldsize.h"
 		$File	"$SRCDIR\public\zip\XZip.h"
 		$File	"$SRCDIR\public\zip_uncompressed.h"
-		$File	"$SRCDIR\public\xwvfile.h"
 	}
 
 	$Folder	"Link libraries"
