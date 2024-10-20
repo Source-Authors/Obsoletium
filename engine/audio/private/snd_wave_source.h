@@ -90,7 +90,6 @@ protected:
 
 	void					Init( const char *pHeaderBuffer, int headerSize );
 	bool					GetStartupData( void *dest, int destsize, int& bytesCopied );
-	bool					GetXboxAudioStartupData();
 
 	//-----------------------------------------------------------------------------
 	// Purpose: 
