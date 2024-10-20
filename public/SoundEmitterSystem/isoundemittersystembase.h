@@ -149,8 +149,8 @@ struct CSoundParametersInternal
 
 	void		SetChannel( int newChannel )				{ channel = newChannel; }
 	void		SetVolume( float start, float range = 0.0 )	{ volume.start = start; volume.range = range; }
-	void		SetPitch( float start, float range = 0.0 )	{ pitch.start = start; pitch.range = range; }
-	void		SetSoundLevel( float start, float range = 0.0 )	{ soundlevel.start = start; soundlevel.range = range; }
+	void		SetPitch( uint8 start, uint8 range = 0 )	{ pitch.start = start; pitch.range = range; }
+	void		SetSoundLevel( uint16 start, uint16 range = 0 )	{ soundlevel.start = start; soundlevel.range = range; }
 	void		SetDelayMsec( int delay )					{ delay_msec = delay; }
 	void		SetShouldPreload( bool bShouldPreload )		{ m_bShouldPreload = bShouldPreload;	}
 	void		SetOnlyPlayToOwner( bool b )				{ play_to_owner_only = b; }
