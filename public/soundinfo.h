@@ -47,7 +47,7 @@
 	else					\
 	{					\
 	buffer.WriteOneBit(1);		\
-	buffer.WriteSBitLong( name / scale, length ); \
+	buffer.WriteSBitLong( static_cast<int>( name / scale ), length ); \
 	}
 
 #define READ_DELTA_SINT( name, length )			\
