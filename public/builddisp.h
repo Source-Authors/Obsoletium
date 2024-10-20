@@ -873,8 +873,8 @@ public:
 
 	inline void SetRenderIndexCount( int count );
 	inline int GetRenderIndexCount( void );
-	inline void SetRenderIndex( int index, int triIndex );
-	inline int GetRenderIndex( int index );
+	inline void SetRenderIndex( int index, unsigned short triIndex );
+	inline unsigned short GetRenderIndex( int index );
 
 	inline CoreDispVert_t *GetDispVert( int iVert )					{ return &m_pVerts[iVert]; }
 	inline CoreDispVert_t *GetDispVertList();
@@ -1396,7 +1396,7 @@ inline int CCoreDispInfo::GetRenderIndexCount( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-inline void CCoreDispInfo::SetRenderIndex( int index, int triIndex )
+inline void CCoreDispInfo::SetRenderIndex( int index, unsigned short triIndex )
 {
 	Assert( index >= 0 );
 	Assert( index < ( MAX_VERT_COUNT*2*3) );
@@ -1406,7 +1406,7 @@ inline void CCoreDispInfo::SetRenderIndex( int index, int triIndex )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-inline int CCoreDispInfo::GetRenderIndex( int index )
+inline unsigned short CCoreDispInfo::GetRenderIndex( int index )
 {
 	Assert( index >= 0 );
 	Assert( index < ( MAX_VERT_COUNT*2*3) );
