@@ -585,7 +585,7 @@ void CAchievementMgr::LevelShutdownPreEntity()
 //-----------------------------------------------------------------------------
 CBaseAchievement *CAchievementMgr::GetAchievementByID( int iAchievementID )
 {
-	int iAchievement = m_mapAchievement.Find( iAchievementID );
+	auto iAchievement = m_mapAchievement.Find( iAchievementID );
 	if ( iAchievement != m_mapAchievement.InvalidIndex() )
 	{
 		return m_mapAchievement[iAchievement];

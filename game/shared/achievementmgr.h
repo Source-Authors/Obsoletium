@@ -141,7 +141,8 @@ private:
 
 	float m_flLastClassChangeTime;		// Time when player last changed class
 	float m_flTeamplayStartTime;		// Time when player joined a non-spectating team.  Not updated if she switches game teams; cleared if she joins spectator
-	float m_iMiniroundsCompleted;		// # of minirounds played since game start (for maps that have minirounds)
+	// dimhotepus: float -> int.
+	int   m_iMiniroundsCompleted;		// # of minirounds played since game start (for maps that have minirounds)
 	char  m_szMap[MAX_PATH];			// file base of map name, cached since we access it frequently in this form
 	bool  m_bGlobalStateDirty;			// do we have interesting state changes that needs to be saved?
 	bool  m_bSteamDataDirty;			// do we have changes to upload to Steamworks?
