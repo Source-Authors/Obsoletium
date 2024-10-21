@@ -799,7 +799,8 @@ void UTIL_BloodDrips( const Vector &origin, const Vector &direction, int color, 
 		g_pEffects->Sparks(origin);
 		if (random->RandomFloat(0, 2) >= 1)
 		{
-			UTIL_Smoke(origin, random->RandomInt(10, 15), 10);
+			// dimhotepus: Make smoke scale float.
+			UTIL_Smoke(origin, random->RandomFloat(10, 15), 10);
 		}
 	}
 	else
@@ -981,10 +982,10 @@ void UTIL_StringToColor32( color32 *color, const char *pString )
 {
 	int tmp[4];
 	UTIL_StringToIntArray( tmp, 4, pString );
-	color->r = tmp[0];
-	color->g = tmp[1];
-	color->b = tmp[2];
-	color->a = tmp[3];
+	color->r = static_cast<byte>(tmp[0]);
+	color->g = static_cast<byte>(tmp[1]);
+	color->b = static_cast<byte>(tmp[2]);
+	color->a = static_cast<byte>(tmp[3]);
 }
 
 #ifndef _XBOX
