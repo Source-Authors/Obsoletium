@@ -39,7 +39,8 @@ CON_COMMAND_EXTERN( Test_Wait, Test_Wait, "" )
 		return;
 	}
 
-	float flSeconds = atof( args[ 1 ] );
+	// dimhotepus: atof -> strtof
+	float flSeconds = strtof( args[ 1 ], nullptr );
 	GetTestScriptMgr()->SetWaitTime( flSeconds );
 }
 
@@ -111,7 +112,8 @@ CON_COMMAND( Test_RandomChance, "Test_RandomChance <percent chance, 0-100> <toke
 		Error( "Test_RandomChance: requires percentage chance parameter (0-100) followed by command to execute." );
 	}
 
-	float flPercent = atof( args[ 1 ] );
+	// dimhotepus: atof -> strtof
+	float flPercent = strtof( args[ 1 ], nullptr );
 	if ( RandomFloat( 0, 100 ) < flPercent )
 	{
 		char newString[1024];

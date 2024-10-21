@@ -976,7 +976,7 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				bool bScaleEdges = IsBoolSet( info.m_nScaleEdgeSoftnessBasedOnScreenRes, params );
 				bool bScaleOutline = IsBoolSet( info.m_nScaleOutlineSoftnessBasedOnScreenRes, params );
 
-				float flResScale = 1.0;
+				float flResScale = 1.0f;
 
 				float flOutlineStart0 = GetFloatParam( info.m_nOutlineStart0, params );
 				float flOutlineStart1 = GetFloatParam( info.m_nOutlineStart1, params );
@@ -991,19 +991,19 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				
 					if ( bScaleEdges )
 					{
-						float flMid = 0.5 * ( flSoftStart + flSoftEnd );
-						flSoftStart = clamp( flMid + flResScale * ( flSoftStart - flMid ), 0.05, 0.99 );
-						flSoftEnd = clamp( flMid + flResScale * ( flSoftEnd - flMid ), 0.05, 0.99 );
+						float flMid = 0.5f * ( flSoftStart + flSoftEnd );
+						flSoftStart = clamp( flMid + flResScale * ( flSoftStart - flMid ), 0.05f, 0.99f );
+						flSoftEnd = clamp( flMid + flResScale * ( flSoftEnd - flMid ), 0.05f, 0.99f );
 					}
 				
 
 					if ( bScaleOutline )
 					{
 						// shrink the soft part of the outline, enlarging hard part
-						float flMidS = 0.5 * ( flOutlineStart1 + flOutlineStart0 );
-						flOutlineStart1 = clamp( flMidS + flResScale * ( flOutlineStart1 - flMidS ), 0.05, 0.99 );
-						float flMidE = 0.5 * ( flOutlineEnd1 + flOutlineEnd0 );
-						flOutlineEnd1 = clamp( flMidE + flResScale * ( flOutlineEnd1 - flMidE ), 0.05, 0.99 );
+						float flMidS = 0.5f * ( flOutlineStart1 + flOutlineStart0 );
+						flOutlineStart1 = clamp( flMidS + flResScale * ( flOutlineStart1 - flMidS ), 0.05f, 0.99f );
+						float flMidE = 0.5f * ( flOutlineEnd1 + flOutlineEnd0 );
+						flOutlineEnd1 = clamp( flMidE + flResScale * ( flOutlineEnd1 - flMidE ), 0.05f, 0.99f );
 					}
 					
 				}
@@ -1403,10 +1403,10 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 			DynamicCmdsOut.SetDepthFeatheringPixelShaderConstant( 13, GetFloatParam( info.m_nDepthBlendScale, params, 50.0f ) );
 		}
 
-		float fPixelFogType = pShaderAPI->GetPixelFogCombo() == 1 ? 1 : 0;
-		float fWriteDepthToAlpha = bWriteDepthToAlpha && IsPC() ? 1 : 0;
-		float fWriteWaterFogToDestAlpha = (pShaderAPI->GetPixelFogCombo() == 1 && bWriteWaterFogToAlpha) ? 1 : 0;
-		float fVertexAlpha = bHasVertexAlpha ? 1 : 0;
+		float fPixelFogType = pShaderAPI->GetPixelFogCombo() == 1 ? 1.f : 0.f;
+		float fWriteDepthToAlpha = bWriteDepthToAlpha && IsPC() ? 1.f : 0.f;
+		float fWriteWaterFogToDestAlpha = (pShaderAPI->GetPixelFogCombo() == 1 && bWriteWaterFogToAlpha) ? 1.f : 0.f;
+		float fVertexAlpha = bHasVertexAlpha ? 1.f : 0.f;
 
 		// Controls for lerp-style paths through shader code (bump and non-bump have use different register)
 		float vShaderControls[4] = { fPixelFogType, fWriteDepthToAlpha, fWriteWaterFogToDestAlpha, fVertexAlpha	 };

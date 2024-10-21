@@ -85,7 +85,7 @@ void CTEBeamSpline::Test( const Vector& current_origin, const QAngle& current_an
 	for ( int i = 0; i < m_nPoints; i++ )
 	{
 		m_vecPoints.Set( i, m_vecStart );
-		VectorMA( m_vecStart, 128/m_nPoints, right, m_vecStart );
+		VectorMA( m_vecStart, 128.0f/m_nPoints, right, m_vecStart );
 		VectorMA( m_vecStart, 30.0f/m_nPoints, forward, m_vecStart );
 	}
 

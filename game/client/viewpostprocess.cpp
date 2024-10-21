@@ -1107,7 +1107,7 @@ static void SetToneMapScale(IMatRenderContext *pRenderContext, float newvalue, f
 		int sample_pt = ssize( s_MovingAverageToneMapScale ) / 2;
 		for( int i = 0;i < ssize( s_MovingAverageToneMapScale );i ++ )
 		{
-			float weight = abs( i - sample_pt ) * ( 1.0 / ( ssize( s_MovingAverageToneMapScale ) / 2 ));
+			float weight = abs( i - sample_pt ) * ( 1.0f / ( ssize( s_MovingAverageToneMapScale ) / 2 ));
 			sumweights += weight;
 			avg += weight * s_MovingAverageToneMapScale[i];
 		}
@@ -2440,9 +2440,9 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 				//				Warning("avg_lum=%f\n",g_HDR_HistogramSystem.GetTargetTonemapScalar());
 				if ( mat_dynamic_tonemapping.GetInt() )
 				{
-					float avg_lum = MAX( 0.0001, g_HDR_HistogramSystem.GetTargetTonemapScalar() );
+					float avg_lum = MAX( 0.0001f, g_HDR_HistogramSystem.GetTargetTonemapScalar() );
 					float scalevalue = MAX( flAutoExposureMin,
-										 MIN( flAutoExposureMax, 0.18 / avg_lum ));
+										 MIN( flAutoExposureMax, 0.18f / avg_lum ));
 					pRenderContext->SetGoalToneMappingScale( scalevalue );
 					mat_hdr_tonemapscale.SetValue( scalevalue );
 				}
@@ -2493,9 +2493,9 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 				g_HDR_HistogramSystem.DisplayHistogram();
 			if ( mat_dynamic_tonemapping.GetInt() )
 			{
-				float avg_lum = MAX( 0.0001, g_HDR_HistogramSystem.GetTargetTonemapScalar() );
+				float avg_lum = MAX( 0.0001f, g_HDR_HistogramSystem.GetTargetTonemapScalar() );
 				float scalevalue = MAX( flAutoExposureMin,
-									 MIN( flAutoExposureMax, 0.023 / avg_lum ));
+									 MIN( flAutoExposureMax, 0.023f / avg_lum ));
 				SetToneMapScale( pRenderContext, scalevalue, flAutoExposureMin, flAutoExposureMax );
 			}
 			pRenderContext->SetRenderTarget( NULL );
