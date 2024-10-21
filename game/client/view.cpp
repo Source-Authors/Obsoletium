@@ -1014,7 +1014,7 @@ float ScaleFOVByWidthRatio( float fovDegrees, float ratio )
 //-----------------------------------------------------------------------------
 void CViewRender::SetUpOverView()
 {
-	static int oldCRC = 0;
+	static float oldCRC = 0;
 
     CViewSetup &viewEye = GetView ( STEREO_EYE_MONO );
 
@@ -1036,8 +1036,8 @@ void CViewRender::SetUpOverView()
 	viewEye.angles = QAngle( 90, 90, 0 );
 
 	// simple movement detector, show position if moved
-	int newCRC = viewEye.origin.x + viewEye.origin.y + viewEye.origin.z;
-	if ( newCRC != oldCRC )
+	float newCRC = viewEye.origin.x + viewEye.origin.y + viewEye.origin.z;
+	if ( !AlmostEqual( newCRC, oldCRC ) )
 	{
 		Msg( "Overview: scale %.2f, pos_x %.0f, pos_y %.0f\n", cl_leveloverview.GetFloat(),
 			viewEye.origin.x, viewEye.origin.y );
