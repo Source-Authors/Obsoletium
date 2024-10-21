@@ -766,9 +766,10 @@ CThreadLocalBase::CThreadLocalBase()
 {
 #ifdef _WIN32
 	m_index = TlsAlloc();
-	AssertMsg( m_index != 0xFFFFFFFF, "Bad thread local" );
-	if ( m_index == 0xFFFFFFFF )
-		Error( "Out of thread local storage!\n" );
+	AssertMsg( m_index != TLS_OUT_OF_INDEXES, "Bad thread local" );
+	if ( m_index == TLS_OUT_OF_INDEXES )
+		Error( "Out of thread local storage: %s!\n",
+			std::system_category().message(::GetLastError()).c_str() );
 #elif defined(POSIX)
 	if ( pthread_key_create( &m_index, NULL ) != 0 )
 		Error( "Out of thread local storage!\n" );
@@ -780,9 +781,9 @@ CThreadLocalBase::CThreadLocalBase()
 CThreadLocalBase::~CThreadLocalBase()
 {
 #ifdef _WIN32
-	if ( m_index != 0xFFFFFFFF )
+	if ( m_index != TLS_OUT_OF_INDEXES )
 		TlsFree( m_index );
-	m_index = 0xFFFFFFFF;
+	m_index = TLS_OUT_OF_INDEXES;
 #elif defined(POSIX)
 	pthread_key_delete( m_index );
 #endif
@@ -793,7 +794,7 @@ CThreadLocalBase::~CThreadLocalBase()
 void * CThreadLocalBase::Get() const
 {
 #ifdef _WIN32
-	if ( m_index != 0xFFFFFFFF )
+	if ( m_index != TLS_OUT_OF_INDEXES )
 		return TlsGetValue( m_index );
 	AssertMsg( 0, "Bad thread local" );
 	return NULL;
@@ -808,8 +809,8 @@ void * CThreadLocalBase::Get() const
 void CThreadLocalBase::Set( void *value )
 {
 #ifdef _WIN32
-	if (m_index != 0xFFFFFFFF)
-		TlsSetValue(m_index, value);
+	if ( m_index != TLS_OUT_OF_INDEXES )
+		TlsSetValue( m_index, value );
 	else
 		AssertMsg( 0, "Bad thread local" );
 #elif defined(POSIX)
