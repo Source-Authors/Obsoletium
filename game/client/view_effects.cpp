@@ -169,10 +169,10 @@ void __MsgFunc_Fade( bf_read &msg )
 	fade.duration = msg.ReadShort(); // fade lasts this long
 	fade.holdTime = msg.ReadShort(); // fade lasts this long
 	fade.fadeFlags = msg.ReadShort(); // fade type (in / out)
-	fade.r = msg.ReadByte(); // fade red
-	fade.g = msg.ReadByte(); // fade green
-	fade.b = msg.ReadByte(); // fade blue
-	fade.a = msg.ReadByte(); // fade blue
+	fade.r = static_cast<byte>(msg.ReadByte()); // fade red
+	fade.g = static_cast<byte>(msg.ReadByte()); // fade green
+	fade.b = static_cast<byte>(msg.ReadByte()); // fade blue
+	fade.a = static_cast<byte>(msg.ReadByte()); // fade blue
 
 	g_ViewEffects.Fade( fade );
 }
@@ -274,7 +274,7 @@ void CViewEffects::CalcShake( void )
 				pShake->offset[i] = random->RandomFloat( -pShake->amplitude, pShake->amplitude );
 			}
 
-			pShake->angle = random->RandomFloat( -pShake->amplitude*0.25, pShake->amplitude*0.25 );
+			pShake->angle = random->RandomFloat( -pShake->amplitude*0.25f, pShake->amplitude*0.25f );
 		}
 
 		// Ramp down amplitude over duration (fraction goes from 1 to 0 linearly with slope 1/duration)
@@ -628,10 +628,10 @@ void CViewEffects::GetFadeParams( byte *r, byte *g, byte *b, byte *a, bool *blen
 
 	FadeCalculate();
 
-	*r = m_FadeColorRGBA[0];
-	*g = m_FadeColorRGBA[1];
-	*b = m_FadeColorRGBA[2];
-	*a = m_FadeColorRGBA[3];
+	*r = static_cast<byte>(m_FadeColorRGBA[0]);
+	*g = static_cast<byte>(m_FadeColorRGBA[1]);
+	*b = static_cast<byte>(m_FadeColorRGBA[2]);
+	*a = static_cast<byte>(m_FadeColorRGBA[3]);
 	*blend = m_bModulate;
 }
 
