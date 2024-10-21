@@ -82,7 +82,8 @@ CON_COMMAND_F( viewanim_addkeyframe, "", FCVAR_CHEAT )
 		int iFlags = 0;
 		if (args.ArgC() > 1)
 		{
-			iFlags = strtof( args[2], nullptr );
+			// dimhotepus: strtof -> atoi.
+			iFlags = atoi( args[2] );
 		}
 
 		g_pTestAnimation->AddKeyFrame( new CViewAngleKeyFrame( vecTarget, flDelay, iFlags ) );
