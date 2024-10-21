@@ -264,7 +264,7 @@ public:
 
 	void Flush()
 	{
-		for ( int i = m_Entries.FirstInorder(); i != m_Entries.InvalidIndex(); i = m_Entries.NextInorder( i ) )
+		for ( auto i = m_Entries.FirstInorder(); i != m_Entries.InvalidIndex(); i = m_Entries.NextInorder( i ) )
 		{
 			delete m_Entries[i];
 		}
@@ -275,7 +275,7 @@ public:
 	{
 		Entry_t lookup( viewSetup );
 
-		int i = m_Entries.Find( &lookup );
+		auto i = m_Entries.Find( &lookup );
 
 		if ( i != m_Entries.InvalidIndex() )
 		{
@@ -5070,12 +5070,13 @@ void CFreezeFrameView::Draw( void )
 		// Overlay screen fade on entire screen
 		IMaterial* pMaterial = m_TranslucentSingleColor;
 
-		int iFadeAlpha = FREEZECAM_SNAPSHOT_FADE_SPEED * ( g_flFreezeFlash - gpGlobals->curtime );
+		// dimhotepus: int -> float
+		float flFadeAlpha = FREEZECAM_SNAPSHOT_FADE_SPEED * ( g_flFreezeFlash - gpGlobals->curtime );
 		
-		iFadeAlpha = MIN( iFadeAlpha, 255 );
-		iFadeAlpha = MAX( 0, iFadeAlpha );
+		flFadeAlpha = MIN( flFadeAlpha, 255.f );
+		flFadeAlpha = MAX( 0.f, flFadeAlpha );
 		
-		pMaterial->AlphaModulate( iFadeAlpha * ( 1.0f / 255.0f ) );
+		pMaterial->AlphaModulate( flFadeAlpha * ( 1.0f / 255.0f ) );
 		pMaterial->ColorModulate( 1.0f,	1.0f, 1.0f );
 		pMaterial->SetMaterialVarFlag( MATERIAL_VAR_IGNOREZ, true );
 
