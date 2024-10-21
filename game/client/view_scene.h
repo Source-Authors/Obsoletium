@@ -95,10 +95,10 @@ inline void UpdateScreenEffectTexture( int textureIndex, int x, int y, int w, in
 		// nonpow2 rendertargets aren't supported), so lets figure it out here.
 		float scaleX = ( float )nDestWidth / ( float )nSrcWidth;
 		float scaleY = ( float )nDestHeight / ( float )nSrcHeight;
-		destRect.x = srcRect.x * scaleX;
-		destRect.y = srcRect.y * scaleY;
-		destRect.width = srcRect.width * scaleX;
-		destRect.height = srcRect.height * scaleY;
+		destRect.x = static_cast<int>(srcRect.x * scaleX);
+		destRect.y = static_cast<int>(srcRect.y * scaleY);
+		destRect.width = static_cast<int>(srcRect.width * scaleX);
+		destRect.height = static_cast<int>(srcRect.height * scaleY);
 		destRect.x = clamp( destRect.x, 0, nDestWidth );
 		destRect.y = clamp( destRect.y, 0, nDestHeight );
 		destRect.width = clamp( destRect.width, 0, nDestWidth - destRect.x );
