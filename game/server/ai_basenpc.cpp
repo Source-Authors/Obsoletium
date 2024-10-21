@@ -2838,7 +2838,7 @@ void CAI_BaseNPC::PerformMovement()
 	AI_PROFILE_SCOPE(CAI_BaseNPC_PerformMovement);
 	g_AIMoveTimer.Start();
 
-	float flInterval = ( m_flTimeLastMovement != FLT_MAX ) ? gpGlobals->curtime - m_flTimeLastMovement : 0.1;
+	float flInterval = ( m_flTimeLastMovement != FLT_MAX ) ? gpGlobals->curtime - m_flTimeLastMovement : 0.1f;
 
 	m_pNavigator->Move( ROUND_TO_TICKS( flInterval ) );
 	m_flTimeLastMovement = gpGlobals->curtime;
@@ -9544,7 +9544,7 @@ void CAI_BaseNPC::CollectShotStats( const Vector &vecShootOrigin, const Vector &
 			manipulator.SetShootDir( testDir );
 		}
 
-		float flHitPercent = ((float)iHits / (float)iterations) * 100.0;
+		float flHitPercent = ((float)iHits / (float)iterations) * 100.0f;
 		m_LastShootAccuracy = flHitPercent;
 		//DevMsg("Shots:%d   Hits:%d   Percentage:%.1f\n", iterations, iHits, flHitPercent);
 	}
@@ -9642,7 +9642,7 @@ Vector CAI_BaseNPC::GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pT
 	if ( pEnemyInfo )
 	{
 		float timeToFocus = ai_spread_cone_focus_time.GetFloat();
-		if ( timeToFocus > 0.0 )
+		if ( timeToFocus > 0.0f )
 		{
 			float timeSinceValidEnemy = gpGlobals->curtime - pEnemyInfo->timeValidEnemy;
 			if ( timeSinceValidEnemy < 0 )
@@ -9650,11 +9650,11 @@ Vector CAI_BaseNPC::GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pT
 			if ( timeSinceValidEnemy < timeToFocus )
 			{
 				float coneMultiplier = ai_spread_defocused_cone_multiplier.GetFloat();
-				if ( coneMultiplier > 1.0 )
+				if ( coneMultiplier > 1.0f )
 				{
-					float scale = 1.0 - timeSinceValidEnemy / timeToFocus;
-					Assert( scale >= 0.0 && scale <= 1.0 );
-					float multiplier = ( (coneMultiplier - 1.0) * scale ) + 1.0;
+					float scale = 1.0f - timeSinceValidEnemy / timeToFocus;
+					Assert( scale >= 0.0f && scale <= 1.0f );
+					float multiplier = ( (coneMultiplier - 1.0f) * scale ) + 1.0f;
 					baseResult *= multiplier;
 				}
 			}

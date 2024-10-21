@@ -328,7 +328,7 @@ void CBaseBudgetPanel::PerformLayout()
 		m_TimeLabels[i]->GetContentSize( labelWidth, labelHeight );
 		x = maxLabelWidth + ( i * m_ConfigData.m_flTimeLabelInterval ) / fRange * ( totalWidth - maxLabelWidth );
 		
-		m_TimeLabels[i]->SetPos( x - ( labelWidth * 0.5 ), totalHeight - labelHeight );
+		m_TimeLabels[i]->SetPos( x - ( labelWidth * 0.5f ), totalHeight - labelHeight );
 		m_TimeLabels[i]->SetSize( labelWidth, labelHeight );
 		m_TimeLabels[i]->SetContentAlignment( vgui::Label::a_east );
 	}

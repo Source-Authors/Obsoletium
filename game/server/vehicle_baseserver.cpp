@@ -571,7 +571,7 @@ bool CBaseServerVehicle::CheckExitPoint( float yaw, int distance, Vector *pEndPo
   	trace_t tr;
   	UTIL_TraceHull( vecStart, *pEndPoint, VEC_HULL_MIN, VEC_HULL_MAX, MASK_PLAYERSOLID, m_pVehicle, COLLISION_GROUP_NONE, &tr );
 
-	if ( tr.fraction < 1.0 )
+	if ( tr.fraction < 1.0f )
 		return false;
   
   	return true;
@@ -1340,7 +1340,7 @@ int CBaseServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAll
 		
 		if ( g_debug_vehicleexit.GetBool() )
 		{
-			NDebugOverlay::SweptBox( vecStart, vecEnd, VEC_HULL_MIN, Vector( VEC_HULL_MAX.x, VEC_HULL_MAX.y, VEC_HULL_MIN.y ), vec3_angle, 255, 255, 255, 8.0f, 20.0f );
+			NDebugOverlay::SweptBox( vecStart, vecEnd, VEC_HULL_MIN, Vector( VEC_HULL_MAX.x, VEC_HULL_MAX.y, VEC_HULL_MIN.y ), vec3_angle, 255, 255, 255, 8, 20.0f );
 		}
 		
 		if ( tr.fraction < 1.0f )
@@ -1353,14 +1353,14 @@ int CBaseServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAll
 			{
 				if ( g_debug_vehicleexit.GetBool() )
 				{
-					NDebugOverlay::Box( tr.endpos, VEC_HULL_MIN, VEC_HULL_MAX, 255, 0, 0, 8.0f, 20.0f );
+					NDebugOverlay::Box( tr.endpos, VEC_HULL_MIN, VEC_HULL_MAX, 255, 0, 0, 8, 20.0f );
 				}
 				continue;
 			}
 
 			if ( g_debug_vehicleexit.GetBool() )
 			{
-				NDebugOverlay::Box( tr.endpos, VEC_HULL_MIN, VEC_HULL_MAX, 0, 255, 0, 8.0f, 20.0f );
+				NDebugOverlay::Box( tr.endpos, VEC_HULL_MIN, VEC_HULL_MAX, 0, 255, 0, 8, 20.0f );
 			}
 		}
 		else if ( tr.allsolid || ( ( tr.fraction == 1.0 ) && !GetDrivableVehicle()->AllowMidairExit( pPlayer, nRole ) ) )

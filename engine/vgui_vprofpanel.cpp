@@ -1134,7 +1134,7 @@ void CVProfPanel::OnCommand( const char *pCommand )
 	}
 	else if ( !Q_stricmp( pCommand, "GotoButton" ) )
 	{
-		int shouldReset = VProfPlayback_SeekToPercent( (float)m_pPlaybackScroll->GetValue() / 1000.0 );
+		int shouldReset = VProfPlayback_SeekToPercent( (float)m_pPlaybackScroll->GetValue() / 1000.0f );
 		if ( shouldReset == 2 )
 		{
 			Reset();

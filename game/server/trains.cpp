@@ -2078,7 +2078,7 @@ void CFuncTrackTrain::UpdateOrientationAtPathTracks( CPathTrack *pPrev, CPathTra
 	}
 	else
 	{
-		m_ppath->LookAhead( nextFront, IsDirForward() ? 100 : -100, 0, &pNextNode );
+		m_ppath->LookAhead( nextFront, IsDirForward() ? 100.f : -100.f, 0, &pNextNode );
 	}
 	nextFront.z += m_height;
 

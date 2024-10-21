@@ -203,14 +203,13 @@ static void Noise( float *noise, int divs, float scale )
 
 static void SineNoise( float *noise, int divs )
 {
-	int i;
-	float freq;
-	float step = M_PI / (float)divs;
+	float step = M_PI_F / (float)divs;
+	float freq = 0;
 
-	freq = 0;
-	for ( i = 0; i < divs; i++ )
+	for ( int i = 0; i < divs; i++ )
 	{
 		noise[i] = sin( freq );
+
 		freq += step;
 	}
 }
@@ -1894,7 +1893,7 @@ void CViewRenderBeams::DrawLaser( Beam_t *pbeam, int frame, int rendermode, floa
 	else
 	{
 		// Fade the beam if the player's not looking at the source
-		float flFade = pow( flDot, 10 );
+		float flFade = powf( flDot, 10 );
 
 		// Fade the beam based on the player's proximity to the beam
 		Vector localDir = CurrentViewOrigin() - pbeam->attachment[0];
@@ -1993,9 +1992,9 @@ void CViewRenderBeams::DrawBeam( Beam_t *pbeam )
 		VectorCopy( srcColor, color );
 	}
 
-	VectorScale( color, (1/255.0), color );
+	VectorScale( color, (1/255.0f), color );
 	VectorCopy( color, srcColor );
-	VectorScale( color, ((float)pbeam->brightness / 255.0), color );
+	VectorScale( color, ((float)pbeam->brightness / 255.0f), color );
 	color[3] = 1.f;
 
 	switch( pbeam->type )
