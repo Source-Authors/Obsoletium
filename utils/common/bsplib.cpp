@@ -964,12 +964,12 @@ GameLumpId_t CGameLump::GetGameLumpId( GameLumpHandle_t handle )
 	return m_GameLumps[handle].m_Id;
 }
 
-int	CGameLump::GetGameLumpFlags( GameLumpHandle_t handle )
+unsigned short CGameLump::GetGameLumpFlags( GameLumpHandle_t handle )
 {
 	return m_GameLumps[handle].m_Flags;
 }
 
-int	CGameLump::GetGameLumpVersion( GameLumpHandle_t handle )
+unsigned short CGameLump::GetGameLumpVersion( GameLumpHandle_t handle )
 {
 	return m_GameLumps[handle].m_Version;
 }
@@ -1015,7 +1015,7 @@ GameLumpHandle_t	CGameLump::InvalidGameLump()
 // Game lump creation/destruction method
 //-----------------------------------------------------------------------------
 
-GameLumpHandle_t	CGameLump::CreateGameLump( GameLumpId_t id, int size, int flags, int version )
+GameLumpHandle_t	CGameLump::CreateGameLump( GameLumpId_t id, int size, unsigned short flags, unsigned short version )
 {
 	Assert( GetGameLumpHandle(id) == InvalidGameLump() );
 	GameLumpHandle_t handle = m_GameLumps.AddToTail();
@@ -1057,7 +1057,7 @@ void CGameLump::ComputeGameLumpSizeAndCount( int& size, int& clumpCount )
 }
 
 
-void CGameLump::SwapGameLump( GameLumpId_t id, int version, byte *dest, byte *src, int length )
+void CGameLump::SwapGameLump( GameLumpId_t id, unsigned short version, byte *dest, byte *src, int length )
 {
 	int count = 0;
 	switch( id )
@@ -1122,7 +1122,7 @@ void CGameLump::SwapGameLump( GameLumpId_t id, int version, byte *dest, byte *sr
 		{
 			if ( version != 6 )
 			{
-				Error( "Unknown Static Prop Lump version %d didn't get swapped!\n", version );
+				Error( "Unknown Static Prop Lump version %hu didn't get swapped!\n", version );
 			}
 
 			StaticPropLump_t lump;
@@ -1425,7 +1425,8 @@ static void LoadOcclusionLump()
 	
 	CUtlBuffer buf( (byte *)g_pBSPHeader + ofs, length, CUtlBuffer::READ_ONLY );
 	buf.ActivateByteSwapping( g_bSwapOnLoad );
-	switch ( g_pBSPHeader->lumps[LUMP_OCCLUSION].version )
+	int version = g_pBSPHeader->lumps[LUMP_OCCLUSION].version;
+	switch ( version )
 	{
 	case 2:
 		UnserializeOcclusionLumpV2( buf );
@@ -1435,7 +1436,7 @@ static void LoadOcclusionLump()
 		break;
 
 	default:
-		Error("Unknown occlusion lump version!\n");
+		Error("Unknown occlusion lump version %d!\n", version);
 		break;
 	}
 }
@@ -1503,12 +1504,12 @@ void DecompressVis (byte *in, byte *decompressed)
 	
 		c = in[1];
 		if (!c)
-			Error ("DecompressVis: 0 repeat");
+			Error("Vis decompression: 0 repeat.\n");
 		in += 2;
 		if ((out - decompressed) + c > row)
 		{
 			c = row - (out - decompressed);
-			Warning( "warning: Vis decompression overrun\n" );
+			Warning( "Vis decompression row %d overrun!\n", row );
 		}
 		while (c)
 		{
@@ -1565,7 +1566,7 @@ END_BYTESWAP_DATADESC()
 static void SwapPhyscollideLump( byte *pDestBase, byte *pSrcBase, unsigned int &count )
 {
 	IPhysicsCollision *physcollision = NULL;
-	CSysModule *pPhysicsModule = g_pFullFileSystem->LoadModule( "vphysics.dll" );
+	CSysModule *pPhysicsModule = g_pFullFileSystem->LoadModule( "vphysics" DLL_EXT_STRING );
 	if ( pPhysicsModule )
 	{
 		CreateInterfaceFnT<IPhysicsCollision> physicsFactory = Sys_GetFactory<IPhysicsCollision>( pPhysicsModule );
@@ -1577,7 +1578,8 @@ static void SwapPhyscollideLump( byte *pDestBase, byte *pSrcBase, unsigned int &
 
 	if ( !physcollision )
 	{
-		Warning("!!! WARNING: Can't swap the physcollide lump!\n" );
+		Warning("VPhysics missed '%s' interface. Can't swap the physcollide lump!\n",
+			VPHYSICS_COLLISION_INTERFACE_VERSION );
 		return;
 	}
 
@@ -1846,12 +1848,13 @@ void ValidateLump( int lump, int length, int size, int forceVersion )
 {
 	if ( length % size )
 	{
-		Error( "ValidateLump: odd size for lump %d", lump );
+		Error( "ValidateLump: odd size %d for lump %d.\n", size, lump );
 	}
 
-	if ( forceVersion >= 0 && forceVersion != g_pBSPHeader->lumps[lump].version )
+	int version = g_pBSPHeader->lumps[lump].version;
+	if ( forceVersion >= 0 && forceVersion != version )
 	{
-		Error( "ValidateLump: old version for lump %d in map!", lump );
+		Error( "ValidateLump: old version %d for lump %d in map!\n", version, lump );
 	}
 }
 
@@ -2003,9 +2006,7 @@ int CopyVariableLump( int lump, void **dest, int forceVersion = -1 )
 //-----------------------------------------------------------------------------
 void Lumps_Parse( void )
 {
-	int i;
-
-	for ( i = 0; i < HEADER_LUMPS; i++ )
+	for ( int i = 0; i < HEADER_LUMPS; i++ )
 	{
 		if ( !g_Lumps.bLumpParsed[i] && g_pBSPHeader->lumps[i].filelen )
 		{
@@ -2017,9 +2018,7 @@ void Lumps_Parse( void )
 
 void Lumps_Write( void )
 {
-	int i;
-
-	for ( i = 0; i < HEADER_LUMPS; i++ )
+	for ( int i = 0; i < HEADER_LUMPS; i++ )
 	{
 		if ( g_Lumps.size[i] )
 		{
@@ -2039,8 +2038,8 @@ int LoadLeafs( void )
 #if defined( BSP_USE_LESS_MEMORY )
 	dleafs = (dleaf_t*)malloc( g_pBSPHeader->lumps[LUMP_LEAFS].filelen );
 #endif
-
-	switch ( LumpVersion( LUMP_LEAFS ) )
+	int version = LumpVersion( LUMP_LEAFS );
+	switch ( version )
 	{
 	case 0:
 		{
@@ -2049,7 +2048,7 @@ int LoadLeafs( void )
 			int size = sizeof( dleaf_version_0_t );
 			if ( length % size )
 			{
-				Error( "odd size for LUMP_LEAFS\n" );
+				Error( "Odd size %d for LUMP_LEAFS!\n", size );
 			}
 			int count = length / size;
 
@@ -2087,7 +2086,7 @@ int LoadLeafs( void )
 
 	default:
 		Assert( 0 );
-		Error( "Unknown LUMP_LEAFS version\n" );
+		Error( "Unknown LUMP_LEAFS version %d.\n", version );
 		return 0;
 	}
 }
@@ -2178,11 +2177,12 @@ void ValidateHeader( const char *filename, const dheader_t *pHeader )
 {
 	if ( pHeader->ident != IDBSPHEADER )
 	{
-		Error ("%s is not a IBSP file", filename);
+		Error ("%s is not a BSP (0x%x) file but 0x%x one", filename, IDBSPHEADER, pHeader->ident);
 	}
 	if ( pHeader->version < MINBSPVERSION || pHeader->version > BSPVERSION )
 	{
-		Error ("%s is version %i, not %i", filename, pHeader->version, BSPVERSION);
+		Error ("%s is BSP version %d, expected %d..%d",
+			filename, pHeader->version, MINBSPVERSION, BSPVERSION);
 	}
 }
 
@@ -2299,17 +2299,6 @@ void LoadBSPFile( const char *filename )
 
 	CopyLump( FIELD_SHORT, LUMP_LEAFMINDISTTOWATER, g_LeafMinDistToWater );
 
-	/*
-	int crap;
-	for( crap = 0; crap < g_nBSPStringTable; crap++ )
-	{
-		Msg( "stringtable %d", ( int )crap );
-		Msg( " %d:",  ( int )g_BSPStringTable[crap] );
-		puts( &g_BSPStringData[g_BSPStringTable[crap]] );
-		puts( "\n" );
-	}
-	*/
-		
 	// Load PAK file lump into appropriate data structure
 	byte *pakbuffer = NULL;
 	int paksize = CopyVariableLump<byte>( FIELD_CHARACTER, LUMP_PAKFILE, ( void ** )&pakbuffer );
@@ -2493,11 +2482,10 @@ void ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName )
 	int paksize = CopyVariableLump<byte>( FIELD_CHARACTER, LUMP_PAKFILE, ( void ** )&pakbuffer );
 	if ( paksize > 0 )
 	{
-		FILE *fp;
-		fp = fopen( pZipFileName, "wb" );
+		FILE *fp = fopen( pZipFileName, "wb" );
 		if( !fp )
 		{
-			fprintf( stderr, "can't open %s\n", pZipFileName );
+			fprintf( stderr, "Can't open %s\n", pZipFileName );
 			return;
 		}
 
@@ -2505,8 +2493,8 @@ void ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName )
 		fclose( fp );
 	}
 	else
-	{		
-		fprintf( stderr, "zip file is zero length!\n" );
+	{
+		fprintf( stderr, "Zip file is zero length!\n" );
 	}
 }
 
@@ -2637,7 +2625,7 @@ void WriteBSPFile( const char *filename, char * )
 {		
 	if ( texinfo.Count() > MAX_MAP_TEXINFO )
 	{
-		Error( "Map has too many texinfos (has %zd, can have at most %d)\n", texinfo.Count(), MAX_MAP_TEXINFO );
+		Error( "Map has too many texinfos (has %zd, can have at most %d).\n", texinfo.Count(), MAX_MAP_TEXINFO );
 		return;
 	}
 
@@ -2779,7 +2767,7 @@ void WriteLumpToFile( char *filename, int lump )
 	FileHandle_t lumpfile = g_pFileSystem->Open(lumppre, "wb");
 	if ( !lumpfile )
 	{
-		Error ("Error opening %s! (Check for write enable)\n",filename);
+		Error ("Error opening %s! (Check for write enable).\n",filename);
 		return;
 	}
 
@@ -2812,7 +2800,7 @@ void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer,
 	FileHandle_t lumpfile = g_pFileSystem->Open(lumppre, "wb");
 	if ( !lumpfile )
 	{
-		Error ("Error opening %s! (Check for write enable)\n",filename);
+		Error ("Error opening %s! (Check for write enable).\n",filename);
 		return;
 	}
 
@@ -2989,12 +2977,10 @@ entity_t	entities[MAX_MAP_ENTITIES];
 
 void StripTrailing (char *e)
 {
-	char	*s;
-
-	s = e + strlen(e)-1;
+	char	*s = e + strlen(e)-1;
 	while (s >= e && *s <= 32)
 	{
-		*s = 0;
+		*s = '\0';
 		s--;
 	}
 }
@@ -3012,12 +2998,12 @@ epair_t *ParseEpair (void)
 	memset (e, 0, sizeof(epair_t));
 	
 	if (strlen(token) >= MAX_KEY-1)
-		Error ("ParseEpar: token too long");
+		Error ("ParseEpar: token key too long (%zu > %u)", strlen(token), MAX_KEY);
 	e->key = copystring(token);
 
 	GetToken (false);
 	if (strlen(token) >= MAX_VALUE-1)
-		Error ("ParseEpar: token too long");
+		Error ("ParseEpar: token value too long (%zu > %u)", strlen(token), MAX_VALUE);
 	e->value = copystring(token);
 
 	// strip trailing spaces
@@ -3045,7 +3031,7 @@ qboolean	ParseEntity (void)
 		Error ("ParseEntity: { not found");
 	
 	if (num_entities == MAX_MAP_ENTITIES)
-		Error ("num_entities == MAX_MAP_ENTITIES");
+		Error ("num_entities == MAX_MAP_ENTITIES (%d)", MAX_MAP_ENTITIES);
 
 	mapent = &entities[num_entities];
 	num_entities++;
@@ -3750,15 +3736,13 @@ CUtlVector<clusterlist_t> g_ClusterLeaves;
 
 void BuildClusterTable( void )
 {
-	int i, j;
-	int leafCount;
 	int	leafList[MAX_MAP_LEAFS];
 
 	g_ClusterLeaves.SetCount( dvis->numclusters );
-	for ( i = 0; i < dvis->numclusters; i++ )
+	for ( int i = 0; i < dvis->numclusters; i++ )
 	{
-		leafCount = 0;
-		for ( j = 0; j < numleafs; j++ )
+		int leafCount = 0;
+		for ( int j = 0; j < numleafs; j++ )
 		{
 			if ( dleafs[j].cluster == i )
 			{
@@ -3818,7 +3802,7 @@ static bool CRC_MapFile(CRC32_t *crcvalue, const char *pszFileName)
 				g_pFileSystem->Close( fp );
 				return false;
 			}
-		}	
+		}
 	}
 	
 	g_pFileSystem->Close( fp );
@@ -3831,28 +3815,25 @@ void SetHDRMode( bool bHDR )
 	g_bHDR = bHDR;
 	if ( bHDR )
 	{
-		pdlightdata = &dlightdataHDR;		
+		pdlightdata = &dlightdataHDR;
 		g_pLeafAmbientLighting = &g_LeafAmbientLightingHDR;
 		g_pLeafAmbientIndex = &g_LeafAmbientIndexHDR;
 		pNumworldlights = &numworldlightsHDR;
 		dworldlights = dworldlightsHDR;
-#ifdef VRAD
-		extern void VRadDetailProps_SetHDRMode( bool bHDR );
-		VRadDetailProps_SetHDRMode( bHDR );
-#endif
 	}
 	else
 	{
-		pdlightdata = &dlightdataLDR;		
+		pdlightdata = &dlightdataLDR;
 		g_pLeafAmbientLighting = &g_LeafAmbientLightingLDR;
 		g_pLeafAmbientIndex = &g_LeafAmbientIndexLDR;
 		pNumworldlights = &numworldlightsLDR;
 		dworldlights = dworldlightsLDR;
-#ifdef VRAD
-		extern void VRadDetailProps_SetHDRMode( bool bHDR );
-		VRadDetailProps_SetHDRMode( bHDR );
-#endif
 	}
+	
+#ifdef VRAD
+	extern void VRadDetailProps_SetHDRMode( bool bHDR );
+	VRadDetailProps_SetHDRMode( bHDR );
+#endif
 }
 
 bool SwapVHV( void *pDestBase, void *pSrcBase )
@@ -4351,7 +4332,7 @@ void BuildStaticPropNameTable()
 	GameLumpHandle_t hGameLump = g_GameLumps.GetGameLumpHandle( GAMELUMP_STATIC_PROPS );
 	if ( hGameLump != g_GameLumps.InvalidGameLump() )
 	{
-		int nVersion = g_GameLumps.GetGameLumpVersion( hGameLump );
+		unsigned short nVersion = g_GameLumps.GetGameLumpVersion( hGameLump );
 		if ( nVersion < 4 )
 		{
 			// old unsupported version
@@ -4360,7 +4341,7 @@ void BuildStaticPropNameTable()
 
 		if ( nVersion != 4 && nVersion != 5 && nVersion != 6 )
 		{
-			Error( "Unknown Static Prop Lump version %d!\n", nVersion );
+			Error( "Unknown Static Prop Lump version %hu!\n", nVersion );
 		}
 
 		byte *pGameLumpData = (byte *)g_GameLumps.GetGameLump( hGameLump );
@@ -4495,18 +4476,20 @@ bool CompressGameLump( dheader_t *pInBSPHeader, dheader_t *pOutBSPHeader, CUtlBu
 				byte *pCompressedLump = ((byte *)pInBSPHeader) + pInGameLump[i].fileofs;
 				if ( CLZMA::IsCompressed( pCompressedLump ) )
 				{
-					inputBuffer.EnsureCapacity( CLZMA::GetActualSize( pCompressedLump ) );
+					unsigned int actualSize = CLZMA::GetActualSize( pCompressedLump );
+					inputBuffer.EnsureCapacity( actualSize );
 					unsigned int outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
 					inputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, outSize );
-					if ( outSize != CLZMA::GetActualSize( pCompressedLump ) )
+					if ( outSize != actualSize )
 					{
-						Warning( "Decompressed size differs from header, BSP may be corrupt\n" );
+						Warning( "Decompressed size %u differs from header %u one, BSP may be corrupt.\n",
+							outSize, actualSize );
 					}
 				}
 				else
 				{
 					Assert( CLZMA::IsCompressed( pCompressedLump ) );
-					Warning( "Unsupported BSP: Unrecognized compressed game lump\n" );
+					Warning( "Unsupported BSP: Unrecognized compressed game lump.\n" );
 				}
 
 			}
@@ -4571,7 +4554,7 @@ bool RepackBSPCallback_LZMA( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer )
 	if ( pCompressedOutput )
 	{
 		outputBuffer.Put( pCompressedOutput, compressedSize );
-		DevMsg( "Compressed bsp lump %u -> %u bytes\n", originalSize, compressedSize );
+		DevMsg( "Compressed bsp lump %u -> %u bytes.\n", originalSize, compressedSize );
 		free( pCompressedOutput );
 		return true;
 	}
@@ -4585,7 +4568,8 @@ bool RepackBSP( CUtlBuffer &inputBufferIn, CUtlBuffer &outputBuffer, CompressFun
 	dheader_t *pInBSPHeader = inputBufferIn.Base<dheader_t>();
 	if ( pInBSPHeader->ident != IDBSPHEADER )
 	{
-		Warning( "RepackBSP given invalid input data\n" );
+		Warning( "RepackBSP given invalid BSP header identifier. Expect 0x%x, got 0x%x.\n",
+			IDBSPHEADER, pInBSPHeader->ident );
 		return false;
 	}
 
@@ -4631,20 +4615,22 @@ bool RepackBSP( CUtlBuffer &inputBufferIn, CUtlBuffer &outputBuffer, CompressFun
 			if ( pSortedLump->pLump->uncompressedSize )
 			{
 				byte *pCompressedLump = ((byte *)pInBSPHeader) + pSortedLump->pLump->fileofs;
-				if ( CLZMA::IsCompressed( pCompressedLump ) && static_cast<unsigned>(pSortedLump->pLump->uncompressedSize) == CLZMA::GetActualSize( pCompressedLump ) )
+				unsigned int headerSize = static_cast<unsigned>(pSortedLump->pLump->uncompressedSize);
+				if ( CLZMA::IsCompressed( pCompressedLump ) && headerSize == CLZMA::GetActualSize( pCompressedLump ) )
 				{
 					inputBuffer.EnsureCapacity( CLZMA::GetActualSize( pCompressedLump ) );
 					unsigned int outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
 					inputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, outSize );
-					if ( outSize != static_cast<unsigned>(pSortedLump->pLump->uncompressedSize) )
+					if ( outSize != headerSize )
 					{
-						Warning( "Decompressed size differs from header, BSP may be corrupt\n" );
+						Warning( "Decompressed size %u differs from header %u one, BSP may be corrupt.\n",
+							outSize, headerSize );
 					}
 				}
 				else
 				{
 					Assert( CLZMA::IsCompressed( pCompressedLump ) &&
-					        static_cast<unsigned>(pSortedLump->pLump->uncompressedSize) == CLZMA::GetActualSize( pCompressedLump ) );
+					        headerSize == CLZMA::GetActualSize( pCompressedLump ) );
 					Warning( "Unsupported BSP: Unrecognized compressed lump\n" );
 				}
 			}

@@ -236,11 +236,11 @@ public:
 	//-----------------------------------------------------------------------------
 	GameLumpHandle_t	GetGameLumpHandle( GameLumpId_t id );
 	GameLumpId_t		GetGameLumpId( GameLumpHandle_t handle );
-	int					GetGameLumpFlags( GameLumpHandle_t handle );
-	int					GetGameLumpVersion( GameLumpHandle_t handle );
+	unsigned short		GetGameLumpFlags( GameLumpHandle_t handle );
+	unsigned short		GetGameLumpVersion( GameLumpHandle_t handle );
 	void				ComputeGameLumpSizeAndCount( int& size, int& clumpCount );
 	void				ParseGameLump( dheader_t* pHeader );
-	void				SwapGameLump( GameLumpId_t id, int version, byte *dest, byte *src, int size );
+	void				SwapGameLump( GameLumpId_t id, unsigned short version, byte *dest, byte *src, int size );
 
 
 	//-----------------------------------------------------------------------------
@@ -261,7 +261,7 @@ public:
 	//-----------------------------------------------------------------------------
 	// Game lump creation/destruction method
 	//-----------------------------------------------------------------------------
-	GameLumpHandle_t	CreateGameLump( GameLumpId_t id, int size, int flags, int version );
+	GameLumpHandle_t	CreateGameLump( GameLumpId_t id, int size, unsigned short flags, unsigned short version );
 	void				DestroyGameLump( GameLumpHandle_t handle );
 	void				DestroyAllGameLumps();
 
