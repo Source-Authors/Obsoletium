@@ -27,7 +27,7 @@ struct CBSPPack final : public IBSPPack
 
 void CBSPPack::LoadBSPFile( IFileSystem *pFileSystem, char *filename )
 {
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
+	MathLib_Init( 2.2f, 2.2f, 0.0f, 2 );
 	
 	// This is shady, but the engine is the only client here and we want the same search paths it has.
 	g_pFileSystem = g_pFullFileSystem = pFileSystem;
