@@ -154,7 +154,7 @@ public:
 	bool IsOn() { return !IsEffectActive( EF_NODRAW ); }
 
 	inline float Frames( void ) { return m_flMaxFrame; }
-	inline void SetTransparency( int rendermode, byte r, byte g, byte b, byte a, int fx )
+	inline void SetTransparency( int rendermode, byte r, byte g, byte b, byte a, byte fx )
 	{
 		SetRenderMode( (RenderMode_t)rendermode );
 		SetColor( r, g, b );
