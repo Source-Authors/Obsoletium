@@ -13,9 +13,9 @@ $Project "actbusy"
 	"tools\actbusy\actbusy.vpc" [$WINDOWS]
 }
 
-$Project "AdminServer"
+$Project "adminserver"
 {
-	"Tracker\AdminServer\AdminServer.vpc" [$WINDOWS]
+	"tracker\AdminServer\adminserver.vpc" [$WINDOWS]
 }
 
 $Project "appframework"
@@ -285,7 +285,7 @@ $Project "gamestats_reader"
 	"utils\gamestats_reader\gamestats_reader.vpc" [$WINDOWS]
 }
 
-$Project "GameUI"
+$Project "gameUI"
 {
 	"gameui\GameUI.vpc" [$WINDOWS||$POSIX]
 }

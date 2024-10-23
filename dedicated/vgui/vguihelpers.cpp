@@ -81,17 +81,17 @@ int StartVGUI(CreateInterfaceFn dedicatedFactory) {
 
   // load the module
 #ifdef PLATFORM_64BITS
-  g_pFullFileSystem->GetLocalCopy("bin/x64/AdminServer.dll");
+  g_pFullFileSystem->GetLocalCopy("bin/x64/adminserver" DLL_EXT_STRING);
 #else
-  g_pFullFileSystem->GetLocalCopy("bin/AdminServer.dll");
+  g_pFullFileSystem->GetLocalCopy("bin/adminserver" DLL_EXT_STRING);
 #endif
 
-  g_hAdminServerModule = g_pFullFileSystem->LoadModule("AdminServer");
+  g_hAdminServerModule = g_pFullFileSystem->LoadModule("adminserver");
   Assert(g_hAdminServerModule);
 
   if (!g_hAdminServerModule) {
     vgui::ivgui()->DPrintf2(
-        "Admin Error: module version (AdminServer.dll, %s) invalid, not "
+        "Admin Error: module version (adminserver" DLL_EXT_STRING ", %s) invalid, not "
         "loading\n",
         IMANAGESERVER_INTERFACE_VERSION);
   } else {
@@ -107,7 +107,7 @@ int StartVGUI(CreateInterfaceFn dedicatedFactory) {
 
     if (!g_pAdminServer || !g_pAdminVGuiModule) {
       vgui::ivgui()->DPrintf2(
-          "Admin Error: module version (AdminServer.dll, %s) invalid, not "
+          "Admin Error: module version (adminserver" DLL_EXT_STRING ", %s) invalid, not "
           "loading\n",
           IMANAGESERVER_INTERFACE_VERSION);
     }

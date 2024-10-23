@@ -14,11 +14,7 @@
 #include "winlite.h"
 #endif
 #include "appframework/ilaunchermgr.h"
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/EditablePanel.h>
 #include <matsys_controls/matsyscontrols.h>
-#include <vgui/Cursor.h>
-#include <vgui_controls/PHandle.h>
 #include "keys.h"
 #include "console.h"
 #include "gl_matsysiface.h"
@@ -31,21 +27,15 @@
 #include "igame.h"
 #include "con_nprint.h"
 #include "vgui_DebugSystemPanel.h"
-#include "tier0/vprof.h"
 #include "cl_demoactionmanager.h"
 #include "enginebugreporter.h"
 #include "engineperftools.h"
 #include "icolorcorrectiontools.h"
-#include "tier0/icommandline.h"
 #include "client.h"
 #include "server.h"
 #include "sys.h" // Sys_GetRegKeyValue()
 #include "vgui_drawtreepanel.h"
 #include "vgui_vprofpanel.h"
-#include "vgui/VGUI.h"
-#include "vgui/IInput.h"
-#include <vgui/IInputInternal.h>
-#include "vgui_controls/AnimationController.h"
 #include "vgui_vprofgraphpanel.h"
 #include "vgui_texturebudgetpanel.h"
 #include "vgui_budgetpanel.h"
@@ -53,6 +43,10 @@
 #include "sourcevr/isourcevirtualreality.h"
 #include "cl_pluginhelpers.h"
 #include "cl_steamauth.h"
+
+#include "tier0/icommandline.h"
+#include "tier0/vprof.h"
+#include "tier1/KeyValues.h"
 
 // interface to gameui dll
 #include <GameUI/IGameUI.h>
@@ -69,30 +63,31 @@
 
 // vgui2 interface
 // note that GameUI project uses ..\public\vgui and ..\public\vgui_controls, not ..\utils\vgui\include
-#include <vgui/VGUI.h>
-#include <vgui/Cursor.h>
-#include <KeyValues.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IPanel.h>
-#include <vgui/IScheme.h>
-#include <vgui/IVGui.h>
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui/VGUI.h"
+#include "vgui/Cursor.h"
+#include "vgui/ILocalize.h"
+#include "vgui/IPanel.h"
+#include "vgui/IScheme.h"
+#include "vgui/IVGui.h"
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
+#include "vgui/IInput.h"
+#include "vgui/IInputInternal.h"
+#include "vgui/Cursor.h"
 
-#include <vgui_controls/MenuButton.h>
-#include <vgui_controls/Menu.h>
-#include <vgui_controls/PHandle.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/MenuButton.h"
+#include "vgui_controls/Menu.h"
+#include "vgui_controls/PHandle.h"
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/AnimationController.h"
 
 #include "IVguiModule.h"
 #include "vgui_baseui_interface.h"
 #include "vgui_DebugSystemPanel.h"
 #include "toolframework/itoolframework.h"
 #include "filesystem/IQueuedLoader.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 #include "vgui_askconnectpanel.h"
 
@@ -122,7 +117,7 @@ IGameConsole *staticGameConsole = NULL;
 // cache some of the state we pass through to matsystemsurface, for visibility
 bool s_bWindowsInputEnabled = true;
 
-ConVar r_drawvgui( "r_drawvgui", "1", FCVAR_CHEAT, "Enable the rendering of vgui panels" );
+ConVar r_drawvgui( "r_drawvgui", "1", FCVAR_CHEAT, "Enable the rendering of vgui panels", true, 0, true, 1 );
 ConVar gameui_xbox( "gameui_xbox", "0", 0 );
 
 void Con_CreateConsolePanel( vgui::Panel *parent );
@@ -209,20 +204,6 @@ public:
 		SetMouseInputEnabled( state );
 		SetKeyBoardInputEnabled( state );
 	}
-
-/*	virtual vgui::VPANEL IsWithinTraverse(int x, int y, bool traversePopups)
-	{
-		if ( !m_bCanFocus )
-			return NULL;
-
-		vgui::VPANEL retval = BaseClass::IsWithinTraverse( x, y, traversePopups );
-		if ( retval == GetVPanel() )
-			return NULL;
-		return retval;
-	}*/
-
-//private:
-//	bool		m_bCanFocus;
 };
 
 
@@ -278,19 +259,19 @@ public:
 	~CEngineVGui();
 
 	// Methods of IEngineVGui
-	virtual vgui::VPANEL GetPanel( VGuiPanel_t type );
+	vgui::VPANEL GetPanel( VGuiPanel_t type ) override;
 
 	// Methods of IEngineVGuiInternal
-	virtual void Init();
-	virtual void Connect();
-	virtual void Shutdown();
-	virtual bool SetVGUIDirectories();
-	virtual bool IsInitialized() const;
-	virtual bool Key_Event( const InputEvent_t &event );
-	virtual void UpdateButtonState( const InputEvent_t &event );
-	virtual void BackwardCompatibility_Paint();
-	virtual void Paint( PaintMode_t mode );
-	virtual void PostInit();
+	void Init() override;
+	void Connect() override;
+	void Shutdown() override;
+	bool SetVGUIDirectories() override;
+	bool IsInitialized() const override;
+	bool Key_Event( const InputEvent_t &event ) override;
+	void UpdateButtonState( const InputEvent_t &event ) override;
+	void BackwardCompatibility_Paint() override;
+	void Paint( PaintMode_t mode ) override;
+	void PostInit() override;
 
 	CreateInterfaceFn GetGameUIFactory()
 	{
@@ -479,12 +460,12 @@ public:
 		{
 			// not enabled
 			return;
-		}	
+		}
 
 		int snappedProgress = progress * 15;
 
 		// Need excessive updates on the 360 to keep the XBox slider inny bar active
-		if ( !IsX360() && ( snappedProgress <= m_SnappedProgress ) )
+		if ( snappedProgress <= m_SnappedProgress )
 		{
 			// prevent excessive updates
 			return;
@@ -527,6 +508,8 @@ CEngineVGui::CEngineVGui()
 
 #ifdef VPROF_ENABLED
 	m_pVProfPanel = NULL;
+	m_pBudgetPanel = NULL;
+	m_pTextureBudgetPanel = NULL;
 #endif
 
 	m_bShowProgressDialog = false;
@@ -563,7 +546,7 @@ void CEngineVGui::Init()
 {
 	COM_TimestampedLog( "Loading gameui.dll" );
 
-	// load the GameUI dll
+	// load the GameUI module
 	constexpr char szDllName[]{"gameui"};
 	m_hStaticGameUIModule = g_pFileSystem->LoadModule(szDllName, "EXECUTABLE_PATH", true); // LoadModule() does a GetLocalCopy() call
 	m_GameUIFactory = Sys_GetFactory(m_hStaticGameUIModule);
@@ -576,23 +559,20 @@ void CEngineVGui::Init()
 	staticGameUIFuncs = (IGameUI *)m_GameUIFactory(GAMEUI_INTERFACE_VERSION, NULL);
 	if (!staticGameUIFuncs )
 	{
-		Error( "Could not get IGameUI interface %s from %s\n", GAMEUI_INTERFACE_VERSION, szDllName );
+		Error( "Could not get IGameUI interface %s from %s.\n", GAMEUI_INTERFACE_VERSION, szDllName );
 	}
 
-	if ( IsPC() )
+	staticGameConsole = (IGameConsole *)m_GameUIFactory(GAMECONSOLE_INTERFACE_VERSION, NULL);
+	if ( !staticGameConsole )
 	{
-		staticGameConsole = (IGameConsole *)m_GameUIFactory(GAMECONSOLE_INTERFACE_VERSION, NULL);
-		if ( !staticGameConsole )
-		{
-			Sys_Error( "Could not get IGameConsole interface %s from %s\n", GAMECONSOLE_INTERFACE_VERSION, szDllName );
-		}
+		Sys_Error( "Could not get IGameConsole interface %s from %s.\n", GAMECONSOLE_INTERFACE_VERSION, szDllName );
 	}
 
 	vgui::VGui_InitMatSysInterfacesList( "BaseUI", &g_AppSystemFactory, 1 );
 
 	// Get our langauge string
 	char lang[ 64 ];
-	lang[0] = 0;
+	lang[0] = '\0';
 	engineClient->GetUILanguage( lang, sizeof( lang ) );
 	if ( lang[0] )
 		vgui::system()->SetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", lang );
@@ -608,20 +588,8 @@ void CEngineVGui::Init()
 	const char *pStr = "Resource/SourceScheme.res";
 	if ( !vgui::scheme()->LoadSchemeFromFile( pStr, "Tracker" ))
 	{
-		Sys_Error( "Error loading file %s\n", pStr );
+		Sys_Error( "Error loading file %s.\n", pStr );
 		return;
-	}
-
-	if ( IsX360() )
-	{
-		CCommand ccommand;
-		if ( CL_ShouldLoadBackgroundLevel( ccommand ) )
-		{
-			// Must be before the game ui base panel starts up
-			// This is a hint to avoid the menu pop due to the impending background map
-			// that the game ui is not aware of until 1 frame later.
-			staticGameUIFuncs->SetProgressOnStart();
-		}
 	}
 
 	COM_TimestampedLog( "vgui::ivgui()->Start()" );
@@ -646,7 +614,7 @@ void CEngineVGui::Init()
 	//		staticGameUIPanel ( GameUI stuff ) ( zpos == 100 )
 	//		staticDebugSystemPanel ( Engine debug stuff ) zpos == 125 )
 
-	staticPanel = new CStaticPanel( NULL, "staticPanel" );	
+	staticPanel = new CStaticPanel( NULL, "staticPanel" );
 	staticPanel->SetBounds( 0, 0, videomode->GetModeUIWidth(), videomode->GetModeUIHeight() );
 	staticPanel->SetPaintBorderEnabled(false);
 	staticPanel->SetPaintBackgroundEnabled(false);
@@ -712,14 +680,7 @@ void CEngineVGui::Init()
 	staticGameDLLPanel->SetCursor( vgui::dc_none );
 	staticGameDLLPanel->SetZPos( 135 );
 
-	if ( CommandLine()->CheckParm( "-tools" ) != NULL )
-	{
-		staticGameDLLPanel->SetVisible( true );
-	}
-	else
-	{
-		staticGameDLLPanel->SetVisible( false );
-	}
+	staticGameDLLPanel->SetVisible( CommandLine()->CheckParm( "-tools" ) != NULL );
 
 	if ( IsPC() )
 	{
@@ -794,7 +755,7 @@ void CEngineVGui::Init()
 	// load mod-specific localization file for kb_act.lst, user.scr, settings.scr, etc.
 	char szFileName[MAX_PATH];
 	Q_snprintf( szFileName, sizeof( szFileName ) - 1, "resource/%s_%%language%%.txt", GetCurrentMod() );
-	szFileName[ sizeof( szFileName ) - 1 ] = '\0';
+	szFileName[ std::size( szFileName ) - 1 ] = '\0';
 	g_pVGuiLocalize->AddFile( szFileName );
 
 	// setup console
@@ -802,12 +763,6 @@ void CEngineVGui::Init()
 	{
 		staticGameConsole->Initialize();
 		staticGameConsole->SetParent(staticGameUIPanel->GetVPanel());
-	}
-
-	if ( IsX360() )
-	{
-		// provide an interface for loader to send progress notifications
-		g_pQueuedLoader->InstallProgress( &s_LoaderProgress ); 
 	}
 
 	// show the game UI
@@ -829,9 +784,6 @@ void CEngineVGui::Init()
 void CEngineVGui::PostInit()
 {
 	staticGameUIFuncs->PostInit();
-#if defined( _X360 )
-	g_pMatSystemSurface->ClearTemporaryFontCache();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -849,9 +801,6 @@ void CEngineVGui::Connect()
 //-----------------------------------------------------------------------------
 void CEngineVGui::CreateVProfPanels( vgui::Panel *pParent )
 {
-	if ( IsX360() )
-		return;
-
 #ifdef VPROF_ENABLED
 	m_pVProfPanel = new CVProfPanel( pParent, "VProfPanel" );
 	m_pBudgetPanel = new CBudgetPanelEngine( pParent, "BudgetPanel" );
@@ -862,9 +811,6 @@ void CEngineVGui::CreateVProfPanels( vgui::Panel *pParent )
 
 void CEngineVGui::DestroyVProfPanels( )
 {
-	if ( IsX360() )
-		return;
-
 #ifdef VPROF_ENABLED
 	if ( m_pVProfPanel )
 	{
@@ -1002,11 +948,7 @@ void CEngineVGui::SetEngineVisible( bool state )
 //-----------------------------------------------------------------------------
 bool CEngineVGui::ShouldPause()
 {
-	if ( IsPC() )
-	{
-		return bugreporter->ShouldPause() || perftools->ShouldPause();
-	}
-	return false;
+	return bugreporter->ShouldPause() || perftools->ShouldPause();
 }
 
 //-----------------------------------------------------------------------------
@@ -1103,9 +1045,6 @@ bool CEngineVGui::HideGameUI()
 //-----------------------------------------------------------------------------
 void CEngineVGui::HideConsole()
 {
-	if ( IsX360() )
-		return;
-
 	if ( staticGameConsole )
 	{
 		staticGameConsole->Hide();
@@ -1117,9 +1056,6 @@ void CEngineVGui::HideConsole()
 //-----------------------------------------------------------------------------
 void CEngineVGui::ShowConsole()
 {
-	if ( IsX360() )
-		return;
-
 	ActivateGameUI();
 
 	if ( staticGameConsole )
@@ -1133,15 +1069,7 @@ void CEngineVGui::ShowConsole()
 //-----------------------------------------------------------------------------
 bool CEngineVGui::IsConsoleVisible()
 {
-	if ( IsPC() )
-	{
-		return IsGameUIVisible() && staticGameConsole && staticGameConsole->IsConsoleVisible();
-	}
-	else
-	{
-		// xbox has no drop down console
-		return false;
-	}
+	return IsGameUIVisible() && staticGameConsole && staticGameConsole->IsConsoleVisible();
 }
 
 //-----------------------------------------------------------------------------
@@ -1258,12 +1186,6 @@ void CEngineVGui::OnLevelLoadingStarted()
 		}
 	}
 	
-	if ( IsX360() )
-	{
-		// TCR requirement, always!!!
-		m_bShowProgressDialog = true;
-	}
-
 	// we've starting loading a level/connecting to a server
 	staticGameUIFuncs->OnLevelLoadingStarted( m_bShowProgressDialog );
 
@@ -1522,7 +1444,7 @@ void CEngineVGui::UpdateButtonState( const InputEvent_t &event )
 	m_pInputInternal->UpdateButtonState( event );
 }
 
-		
+
 //-----------------------------------------------------------------------------
 // Purpose: Returns 1 if the key event is handled, 0 if the engine should handle it
 //-----------------------------------------------------------------------------
@@ -1531,7 +1453,7 @@ bool CEngineVGui::Key_Event( const InputEvent_t &event )
 	bool bDown = event.m_nType != IE_ButtonReleased;
 	ButtonCode_t code = (ButtonCode_t)event.m_nData;
 
-	if ( IsPC() && IsShiftKeyDown() )
+	if ( IsShiftKeyDown() )
 	{
 		switch( code )
 		{
@@ -1553,40 +1475,31 @@ bool CEngineVGui::Key_Event( const InputEvent_t &event )
 
 #if defined( _WIN32 )
 	// Ignore alt tilde, since the Japanese IME uses this to toggle itself on/off
-	if ( IsPC() && code == KEY_BACKQUOTE && ( IsAltKeyDown() || IsCtrlKeyDown() ) )
+	if ( code == KEY_BACKQUOTE && ( IsAltKeyDown() || IsCtrlKeyDown() ) )
 		return true;
 #endif
-			   
+
 	// ESCAPE toggles game ui
 	if ( bDown && ( code == KEY_ESCAPE || code == KEY_XBUTTON_START || code == STEAMCONTROLLER_START) && !g_ClientDLL->HandleUiToggle() )
 	{
-		if ( IsPC() )
+		if ( IsGameUIVisible() )
 		{
-			if ( IsGameUIVisible()  )
+			// Don't allow hiding of the game ui if there's no level
+			const char *pLevelName = engineClient->GetLevelName();
+			if ( pLevelName && pLevelName[0] )
 			{
-				// Don't allow hiding of the game ui if there's no level
-				const char *pLevelName = engineClient->GetLevelName();
-				if ( pLevelName && pLevelName[0] )
+				Cbuf_AddText( "gameui_hide" );
+				if ( IsDebugSystemVisible() )
 				{
-					Cbuf_AddText( "gameui_hide" );
-					if ( IsDebugSystemVisible() )
-					{
-						Cbuf_AddText( "debugsystemui 0" );
-					}
+					Cbuf_AddText( "debugsystemui 0" );
 				}
 			}
-			else
-			{
-				Cbuf_AddText( "gameui_activate" );
-			}
-			return true;
 		}
-		if ( IsX360() && !IsGameUIVisible() )
+		else
 		{
-			// 360 UI does not toggle, engine does "show", but UI needs to handle "hide"
 			Cbuf_AddText( "gameui_activate" );
-			return true;
 		}
+		return true;
 	}
 
 	if ( g_pMatSystemSurface && g_pMatSystemSurface->HandleInputEvent( event ) )
@@ -1594,7 +1507,7 @@ bool CEngineVGui::Key_Event( const InputEvent_t &event )
 		// always let the engine handle the console keys
 		// FIXME: Do a lookup of the key bound to toggleconsole
 		// want to cache it off so the lookup happens only when keys are bound?
-		if ( IsPC() && ( code == KEY_BACKQUOTE ) )
+		if ( code == KEY_BACKQUOTE )
 			return false;
 		return true;
 	}
@@ -2308,14 +2221,12 @@ bool CEngineVGui::ValidateStorageDevice(int *pStorageDeviceValidated)
 //-----------------------------------------------------------------------------
 void DumpPanels_r( vgui::VPANEL panel, int level )
 {
-	int i;
-
 	vgui::IPanel *ipanel = vgui::ipanel();
-
 	const char *pName = ipanel->GetName( panel );
 
-	char indentBuff[32];
-	for (i=0; i<level; i++)
+	int i;
+	char indentBuff[64];
+	for ( i = 0; i < level; i++ )
 	{
 		indentBuff[i] = '.';
 	}
@@ -2324,7 +2235,7 @@ void DumpPanels_r( vgui::VPANEL panel, int level )
 	ConMsg( "%s%s\n", indentBuff, pName[0] ? pName : "???" );
 
 	int childcount = ipanel->GetChildCount( panel );
-	for ( i = 0; i < childcount; i++ )
+	for ( int i = 0; i < childcount; i++ )
 	{
 		vgui::VPANEL child = ipanel->GetChild( panel, i );
 		DumpPanels_r( child, level+1 );
@@ -2337,24 +2248,3 @@ void DumpPanels_f()
 	DumpPanels_r( embedded, 0 );
 }
 ConCommand DumpPanels("dump_panels", DumpPanels_f, "Dump Panel Tree" );
-
-#if defined( _X360 )
-//-----------------------------------------------------------------------------
-// Purpose: For testing message dialogs 
-//-----------------------------------------------------------------------------
-#include "vgui_controls/MessageDialog.h"
-CON_COMMAND( dlg_normal, "Display a sample message dialog" )
-{
-	EngineVGui()->ShowMessageDialog( MD_STANDARD_SAMPLE );
-}
-
-CON_COMMAND( dlg_warning, "Display a sample warning message dialog" )
-{
-	EngineVGui()->ShowMessageDialog( MD_WARNING_SAMPLE );
-}
-
-CON_COMMAND( dlg_error, "Display a sample error message dialog" )
-{
-	EngineVGui()->ShowMessageDialog( MD_ERROR_SAMPLE );
-}
-#endif
