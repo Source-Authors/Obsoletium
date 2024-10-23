@@ -221,7 +221,7 @@ static void ComputeBeamPerpendicular( const Vector &vecBeamDelta, Vector *pPerp 
 //			fadescale - 
 //-----------------------------------------------------------------------------
 void DrawSegs( int noise_divisions, float *prgNoise, const model_t* spritemodel,
-				float frame, int rendermode, const Vector& source, const Vector& delta, 
+				int frame, int rendermode, const Vector& source, const Vector& delta, 
 				float startWidth, float endWidth, float scale, float freq, float speed, int segments,
 				int flags, float* color, float fadeLength, float flHDRColorScale )
 {
@@ -475,7 +475,7 @@ void CalcSegOrigin( Vector *vecOut, int iPoint, int noise_divisions, float *prgN
 //			fadescale - 
 //-----------------------------------------------------------------------------
 void DrawTeslaSegs( int noise_divisions, float *prgNoise, const model_t* spritemodel,
-				float frame, int rendermode, const Vector&  source, const Vector&  delta, 
+				int frame, int rendermode, const Vector&  source, const Vector&  delta, 
 				float startWidth, float endWidth, float scale, float freq, float speed, int segments,
 				int flags, float* color, float fadeLength, float flHDRColorScale )
 {
@@ -656,7 +656,7 @@ void DrawTeslaSegs( int noise_divisions, float *prgNoise, const model_t* spritem
 
 void DrawSplineSegs( int noise_divisions, float *prgNoise, 
 				const model_t* beammodel, const model_t* halomodel, float flHaloScale,
-				float frame, int rendermode, int numAttachments, Vector* attachment, 
+				int frame, int rendermode, int numAttachments, Vector* attachment, 
 				float startWidth, float endWidth, float scale, float freq, float speed, int segments,
 				int flags, float* color, float fadeLength, float flHDRColorScale )
 {
@@ -976,7 +976,7 @@ void DrawSplineSegs( int noise_divisions, float *prgNoise,
 //			scale - 
 //			*color - 
 //-----------------------------------------------------------------------------
-void BeamDrawHalo( const model_t* spritemodel, float frame, int rendermode, 
+void BeamDrawHalo( const model_t* spritemodel, int frame, int rendermode, 
 				  const Vector& source, float scale, float* color, float flHDRColorScale )
 {
 	CEngineSprite *pSprite = Draw_SetSpriteTexture( spritemodel, frame, rendermode );
@@ -1003,7 +1003,7 @@ void BeamDrawHalo( const model_t* spritemodel, float frame, int rendermode,
 //			*color - 
 //-----------------------------------------------------------------------------
 void DrawDisk( int noise_divisions, float *prgNoise, const model_t* spritemodel, 
-			  float frame, int rendermode, const Vector&  source, const Vector& delta, 
+			  int frame, int rendermode, const Vector&  source, const Vector& delta, 
 			  float width, float scale, float freq, float speed, int segments, float* color, float flHDRColorScale )
 {
 	int				i;
@@ -1101,7 +1101,7 @@ void DrawDisk( int noise_divisions, float *prgNoise, const model_t* spritemodel,
 //			*color - 
 //-----------------------------------------------------------------------------
 void DrawCylinder( int noise_divisions, float *prgNoise, const model_t* spritemodel,
-				  float frame, int rendermode, const Vector&  source, const Vector& delta, 
+				  int frame, int rendermode, const Vector&  source, const Vector& delta, 
 				  float width, float scale, float freq, float speed, int segments, 
 				  float* color, float flHDRColorScale )
 {
@@ -1187,7 +1187,7 @@ void DrawCylinder( int noise_divisions, float *prgNoise, const model_t* spritemo
 //			(*pfnNoise - 
 //-----------------------------------------------------------------------------
 void DrawRing( int noise_divisions, float *prgNoise, void (*pfnNoise)( float *noise, int divs, float scale ), 
-			  const model_t* spritemodel, float frame, int rendermode,
+			  const model_t* spritemodel, int frame, int rendermode,
 			  const Vector& source, const Vector& delta, float width, 
 			  float amplitude, float freq, float speed, int segments, float *color, float flHDRColorScale )
 {
