@@ -59,7 +59,7 @@ inline void Float4ToColor32( color32 &out, float colorIn[4] )
 	out.a = colorIn[3] * 255;
 }
 
-inline void Color32Init( color32 &out, int r, int g, int b, int a )
+inline void Color32Init( color32 &out, byte r, byte g, byte b, byte a )
 {
 	out.r = r;
 	out.g = g;

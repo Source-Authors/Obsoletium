@@ -459,7 +459,7 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 	sParticle->m_uchColor[2]	= 255;
 	sParticle->m_uchStartAlpha	= 255;
 	sParticle->m_uchEndAlpha	= 255;
-	sParticle->m_uchStartSize	= nMagnitude * random->RandomInt( 4, 8 );
+	sParticle->m_uchStartSize	= static_cast<byte>(nMagnitude * random->RandomInt( 4, 8 ));
 	sParticle->m_uchEndSize		= 0;
 	sParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 	sParticle->m_flRollDelta	= 0.0f;
@@ -474,15 +474,16 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 	
 	sParticle->m_vecVelocity.Init();
 
-	int	fColor = random->RandomInt( 32, 64 );
+	byte fColor = static_cast<byte>(random->RandomInt( 32, 64 ));
 	sParticle->m_uchColor[0]	= fColor;
 	sParticle->m_uchColor[1]	= fColor;
 	sParticle->m_uchColor[2]	= fColor;
 	sParticle->m_uchStartAlpha	= fColor;
 	sParticle->m_uchEndAlpha	= 0;
-	sParticle->m_uchStartSize	= nMagnitude * random->RandomInt( 32, 64 );
+	sParticle->m_uchStartSize	= static_cast<byte>(nMagnitude * random->RandomInt( 32, 64 ));
 	sParticle->m_uchEndSize		= 0;
-	sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	// dimhotepus: RandomInt -> RandomFloat,
+	sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 	sParticle->m_flRollDelta	= random->RandomFloat( -1.0f, 1.0f );
 
 	//
@@ -512,10 +513,10 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 	sParticle->m_uchColor[0]	= 255;
 	sParticle->m_uchColor[1]	= 255;
 	sParticle->m_uchColor[2]	= 200;
-	sParticle->m_uchStartAlpha	= random->RandomInt( 16, 32 );
+	sParticle->m_uchStartAlpha	= static_cast<byte>(random->RandomInt( 16, 32 ));
 	sParticle->m_uchEndAlpha	= 0;
-	sParticle->m_uchStartSize	= random->RandomInt( 4, 8 );
-	sParticle->m_uchEndSize		= sParticle->m_uchStartSize*4;
+	sParticle->m_uchStartSize	= static_cast<byte>(random->RandomInt( 4, 8 ));
+	sParticle->m_uchEndSize		= static_cast<byte>(sParticle->m_uchStartSize*4);
 	sParticle->m_flRoll			= random->RandomInt( 0, 360 );
 	sParticle->m_flRollDelta	= random->RandomFloat( -2.0f, 2.0f );
 
@@ -703,9 +704,11 @@ void FX_MetalSpark( const Vector &position, const Vector &direction, const Vecto
 	data.SetNormal( surfaceNormal );
 	data.SetAlpha( 1.0f, 0.0f );
 	data.SetLifeTime( 0.1f );
-	data.SetYaw( random->RandomInt( 0, 360 ) );
+	// dimhotepus: RandomInt -> RandomFloat,
+	data.SetYaw( random->RandomFloat( 0, 360 ) );
 	
-	int scale = random->RandomInt( 24, 28 );
+	// dimhotepus: RandomInt -> RandomFloat,
+	float scale = random->RandomFloat( 24, 28 );
 	data.SetScale( scale, 0 );
 
 	FX_AddQuad( data );
@@ -866,7 +869,8 @@ void FX_EnergySplash( const Vector &pos, const Vector &normal, int nFlags )
 				1.0f,
 				0.0f,
 				0.4f,
-				random->RandomInt( 0, 360 ), 
+				// dimhotepus: RandomInt -> RandomFloat,
+				random->RandomFloat( 0, 360 ), 
 				0,
 				Vector( 1.0f, 1.0f, 1.0f ), 
 				0.25f, 
@@ -882,7 +886,8 @@ void FX_EnergySplash( const Vector &pos, const Vector &normal, int nFlags )
 				1.0f,
 				0.0f,
 				0.4f,
-				random->RandomInt( 0, 360 ), 
+				// dimhotepus: RandomInt -> RandomFloat,
+				random->RandomFloat( 0, 360 ), 
 				0,
 				Vector( 1.0f, 1.0f, 1.0f ), 
 				0.5f, 
@@ -917,15 +922,16 @@ void FX_EnergySplash( const Vector &pos, const Vector &normal, int nFlags )
 
 		sParticle->m_vecVelocity = Vector( Helper_RandomFloat( -4.0f, 4.0f ), Helper_RandomFloat( -4.0f, 4.0f ), Helper_RandomFloat( 16.0f, 64.0f ) );
 		
-		sParticle->m_uchStartSize	= random->RandomInt( 2, 4 );
+		sParticle->m_uchStartSize	= static_cast<byte>(random->RandomInt( 2, 4 ));
 
 		sParticle->m_flDieTime = random->RandomFloat( 0.4f, 0.6f );
 		
 		sParticle->m_flLifetime		= 0.0f;
 
-		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+		// dimhotepus: Helper_RandomInt -> Helper_RandomFloat,
+		sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 
-		float alpha = 255;
+		constexpr byte alpha = 255;
 
 		sParticle->m_flRollDelta	= Helper_RandomFloat( -4.0f, 4.0f );
 		sParticle->m_uchColor[0]	= alpha;
@@ -1026,9 +1032,9 @@ void FX_MicroExplosion( Vector &position, Vector &normal )
 		sParticle->m_uchColor[0]	= 255;
 		sParticle->m_uchColor[1]	= 255;
 		sParticle->m_uchColor[2]	= 255;
-		sParticle->m_uchStartAlpha	= random->RandomInt( 128, 255 );
+		sParticle->m_uchStartAlpha	= static_cast<byte>(random->RandomInt( 128, 255 ));
 		sParticle->m_uchEndAlpha	= 0;
-		sParticle->m_uchStartSize	= random->RandomInt( 12, 16 );
+		sParticle->m_uchStartSize	= static_cast<byte>(random->RandomInt( 12, 16 ));
 		sParticle->m_uchEndSize		= sParticle->m_uchStartSize;
 		sParticle->m_flRoll			= random->RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
@@ -1148,15 +1154,15 @@ void FX_Explosion( Vector& origin, Vector& normal, char materialType )
 			dir[0] = normal[0] + random->RandomFloat( -EXPLOSION_FLECK_ANGULAR_SPRAY, EXPLOSION_FLECK_ANGULAR_SPRAY );
 			dir[1] = normal[1] + random->RandomFloat( -EXPLOSION_FLECK_ANGULAR_SPRAY, EXPLOSION_FLECK_ANGULAR_SPRAY );
 			dir[2] = normal[2] + random->RandomFloat( -EXPLOSION_FLECK_ANGULAR_SPRAY, EXPLOSION_FLECK_ANGULAR_SPRAY );
-			pParticle->m_uchSize		= random->RandomInt( 2, 6 );
+			pParticle->m_uchSize		= static_cast<byte>(random->RandomInt( 2, 6 ));
 			pParticle->m_vecVelocity	= dir * ( random->RandomFloat( EXPLOSION_FLECK_MIN_SPEED, EXPLOSION_FLECK_MAX_SPEED ) * ( 7 - pParticle->m_uchSize ) );
 			pParticle->m_flRoll		= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( 0, 360 );
 
 			float colorRamp = random->RandomFloat( 0.75f, 1.5f );
-			pParticle->m_uchColor[0] = MIN( 1.0f, r*colorRamp )*255.0f;
-			pParticle->m_uchColor[1] = MIN( 1.0f, g*colorRamp )*255.0f;
-			pParticle->m_uchColor[2] = MIN( 1.0f, b*colorRamp )*255.0f;
+			pParticle->m_uchColor[0] = static_cast<byte>(MIN( 1.0f, r*colorRamp )*255.0f);
+			pParticle->m_uchColor[1] = static_cast<byte>(MIN( 1.0f, g*colorRamp )*255.0f);
+			pParticle->m_uchColor[2] = static_cast<byte>(MIN( 1.0f, b*colorRamp )*255.0f);
 		}
 	}
 
@@ -1177,9 +1183,9 @@ void FX_Explosion( Vector& origin, Vector& normal, char materialType )
 		pSphereParticle->m_vecVelocity		= Vector(0,0,0);
 
 		float colorRamp = random->RandomFloat( 0.75f, 1.5f );
-		pSphereParticle->m_uchColor[0] = MIN( 1.0f, r*colorRamp )*255.0f;
-		pSphereParticle->m_uchColor[1] = MIN( 1.0f, g*colorRamp )*255.0f;
-		pSphereParticle->m_uchColor[2] = MIN( 1.0f, b*colorRamp )*255.0f;
+		pSphereParticle->m_uchColor[0] = static_cast<byte>(MIN( 1.0f, r*colorRamp )*255.0f);
+		pSphereParticle->m_uchColor[1] = static_cast<byte>(MIN( 1.0f, g*colorRamp )*255.0f);
+		pSphereParticle->m_uchColor[2] = static_cast<byte>(MIN( 1.0f, b*colorRamp )*255.0f);
 	}
 
 	// Throw some smoke balls out around the normal
@@ -1200,15 +1206,15 @@ void FX_Explosion( Vector& origin, Vector& normal, char materialType )
 			pParticle->m_uchStartSize	= 16;
 			pParticle->m_uchEndSize		= 64;
 
-			float flAngle = ((float)i * M_PI * 2) / numBalls;
+			float flAngle = (i * M_PI_F * 2) / numBalls;
 			float x = cos( flAngle );
 			float y = sin( flAngle );
 			pParticle->m_vecVelocity = (vecRight*x + vecUp*y) * 1024.0;
 
 			float colorRamp = random->RandomFloat( 0.75f, 1.5f );
-			pParticle->m_uchColor[0] = MIN( 1.0f, r*colorRamp )*255.0f;
-			pParticle->m_uchColor[1] = MIN( 1.0f, g*colorRamp )*255.0f;
-			pParticle->m_uchColor[2] = MIN( 1.0f, b*colorRamp )*255.0f;
+			pParticle->m_uchColor[0] = static_cast<byte>(MIN( 1.0f, r*colorRamp )*255.0f);
+			pParticle->m_uchColor[1] = static_cast<byte>(MIN( 1.0f, g*colorRamp )*255.0f);
+			pParticle->m_uchColor[2] = static_cast<byte>(MIN( 1.0f, b*colorRamp )*255.0f);
 		}
 	}
 
@@ -1235,9 +1241,9 @@ void FX_Explosion( Vector& origin, Vector& normal, char materialType )
 		pParticle->m_flRollDelta	= random->RandomFloat( -1, 1 );
 
 		float colorRamp = random->RandomFloat( 0.5f, 1.25f );
-		pParticle->m_uchColor[0] = MIN( 1.0f, r*colorRamp )*255.0f;
-		pParticle->m_uchColor[1] = MIN( 1.0f, g*colorRamp )*255.0f;
-		pParticle->m_uchColor[2] = MIN( 1.0f, b*colorRamp )*255.0f;
+		pParticle->m_uchColor[0] = static_cast<byte>(MIN( 1.0f, r*colorRamp )*255.0f);
+		pParticle->m_uchColor[1] = static_cast<byte>(MIN( 1.0f, g*colorRamp )*255.0f);
+		pParticle->m_uchColor[2] = static_cast<byte>(MIN( 1.0f, b*colorRamp )*255.0f);
 	}
 }
 
@@ -1270,20 +1276,20 @@ void FX_ConcussiveExplosion( Vector &origin, Vector &normal )
 
 		pParticle->m_flLifetime		= 0.0f;
 		pParticle->m_flDieTime		= random->RandomFloat( 0.2f, 0.4f );
-		pParticle->m_uchStartSize	= random->RandomInt( 4, 8 );
-		pParticle->m_uchEndSize		= random->RandomInt( 32, 64 );
+		pParticle->m_uchStartSize	= static_cast<byte>(random->RandomInt( 4, 8 ));
+		pParticle->m_uchEndSize		= static_cast<byte>(random->RandomInt( 32, 64 ));
 		
 		dir[0] = random->RandomFloat( -1.0f, 1.0f );
 		dir[1] = random->RandomFloat( -1.0f, 1.0f );
 		dir[2] = random->RandomFloat( -1.0f, 1.0f );
 		
 		pParticle->m_vecVelocity	= dir * random->RandomFloat( 64.0f, 128.0f );
-		pParticle->m_uchStartAlpha	= random->RandomInt( 64, 128 );
+		pParticle->m_uchStartAlpha	= static_cast<byte>(random->RandomInt( 64, 128 ));
 		pParticle->m_uchEndAlpha	= 0;
 		pParticle->m_flRoll			= random->RandomFloat( 180, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -4, 4 );
 
-		int colorRamp = random->RandomFloat( 235, 255 );
+		byte colorRamp = static_cast<byte>(random->RandomInt( 235, 255 ));
 		pParticle->m_uchColor[0] = colorRamp;
 		pParticle->m_uchColor[1] = colorRamp;
 		pParticle->m_uchColor[2] = colorRamp;
@@ -1298,8 +1304,8 @@ void FX_ConcussiveExplosion( Vector &origin, Vector &normal )
 
 		pParticle->m_flLifetime	= 0.0f;
 		pParticle->m_flDieTime	= random->RandomFloat( 1.0f, 2.0f );
-		pParticle->m_uchStartSize	= random->RandomInt( 32, 64 );
-		pParticle->m_uchEndSize		= random->RandomInt( 100, 128 );
+		pParticle->m_uchStartSize	= static_cast<byte>(random->RandomInt( 32, 64 ));
+		pParticle->m_uchEndSize		= static_cast<byte>(random->RandomInt( 100, 128 ));
 
 		dir[0] = normal[0] + random->RandomFloat( -0.8f, 0.8f );
 		dir[1] = normal[1] + random->RandomFloat( -0.8f, 0.8f );
@@ -1307,12 +1313,12 @@ void FX_ConcussiveExplosion( Vector &origin, Vector &normal )
 
 		pParticle->m_vecVelocity = dir * random->RandomFloat( 16.0f, 32.0f );
 
-		pParticle->m_uchStartAlpha	= random->RandomInt( 32, 64 );
+		pParticle->m_uchStartAlpha	= static_cast<byte>(random->RandomInt( 32, 64 ));
 		pParticle->m_uchEndAlpha	= 0;
 		pParticle->m_flRoll			= random->RandomFloat( 180, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -1, 1 );
 
-		int colorRamp = random->RandomInt( 235, 255 );
+		byte colorRamp = static_cast<byte>(random->RandomInt( 235, 255 ));
 		pParticle->m_uchColor[0] = colorRamp;
 		pParticle->m_uchColor[1] = colorRamp;
 		pParticle->m_uchColor[2] = colorRamp;

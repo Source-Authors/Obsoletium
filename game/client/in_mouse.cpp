@@ -559,8 +559,8 @@ void CInput::ApplyMouse( QAngle& viewangles, CUserCmd *cmd, float mouse_x, float
 
 	// Finally, add mouse state to usercmd.
 	// NOTE:  Does rounding to int cause any issues?  ywb 1/17/04
-	cmd->mousedx = (int)mouse_x;
-	cmd->mousedy = (int)mouse_y;
+	cmd->mousedx = (short)mouse_x;
+	cmd->mousedy = (short)mouse_y;
 }
 
 //-----------------------------------------------------------------------------

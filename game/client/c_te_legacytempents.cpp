@@ -3116,7 +3116,7 @@ void CTempEnts::MuzzleFlash_357_Player( ClientEntityHandle_t hEntity, int attach
 		pParticle->m_uchStartAlpha	= 255;
 		pParticle->m_uchEndAlpha	= 255;
 
-		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (8-(i))/6) * flScale );
+		pParticle->m_uchStartSize	= static_cast<byte>( (random->RandomFloat( 6.0f, 8.0f ) * (8-(i))/6) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
 		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
@@ -3167,15 +3167,15 @@ void CTempEnts::MuzzleFlash_Pistol_Player( ClientEntityHandle_t hEntity, int att
 		pParticle->m_vecVelocity = forward * random->RandomFloat( 48.0f, 64.0f );
 		pParticle->m_vecVelocity[2] += random->RandomFloat( 4.0f, 16.0f );
 
-		int color = random->RandomInt( 200, 255 );
+		byte color = static_cast<byte>(random->RandomInt( 200, 255 ));
 		pParticle->m_uchColor[0]	= color;
 		pParticle->m_uchColor[1]	= color;
 		pParticle->m_uchColor[2]	= color;
 
-		pParticle->m_uchStartAlpha	= random->RandomInt( 64, 128 );
+		pParticle->m_uchStartAlpha	= static_cast<byte>(random->RandomInt( 64, 128 ));
 		pParticle->m_uchEndAlpha	= 0;
 
-		pParticle->m_uchStartSize	= random->RandomInt( 2, 4 );
+		pParticle->m_uchStartSize	= static_cast<byte>(random->RandomInt( 2, 4 ));
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize * 4;
 		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= random->RandomFloat( -0.1f, 0.1f );
@@ -3200,12 +3200,12 @@ void CTempEnts::MuzzleFlash_Pistol_Player( ClientEntityHandle_t hEntity, int att
 
 		pParticle->m_uchColor[0]	= 255;
 		pParticle->m_uchColor[1]	= 255;
-		pParticle->m_uchColor[2]	= 200+random->RandomInt(0,55);
+		pParticle->m_uchColor[2]	= static_cast<byte>(200+random->RandomInt(0,55));
 
 		pParticle->m_uchStartAlpha	= 255;
 		pParticle->m_uchEndAlpha	= 255;
 
-		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (8-(i))/6) * flScale );
+		pParticle->m_uchStartSize	= static_cast<byte>( (random->RandomFloat( 6.0f, 8.0f ) * (8-(i))/6) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
 		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
 		pParticle->m_flRollDelta	= 0.0f;
@@ -3262,7 +3262,8 @@ void CTempEnts::RocketFlare( const Vector& pos )
 	pTemp->m_nRenderFX = kRenderFxNoDissipation;
 	pTemp->tempent_renderamt = 255;
 	pTemp->m_flFrameRate = 1.0;
-	pTemp->m_flFrame = random->RandomInt( 0, nframeCount - 1);
+	// dimhotepus: RandomInt -> RandomFloat.
+	pTemp->m_flFrame = random->RandomFloat( 0, nframeCount - 1);
 	pTemp->m_flSpriteScale = 1.0;
 	pTemp->SetAbsOrigin( pos );
 	pTemp->die = gpGlobals->curtime + 0.01f;
