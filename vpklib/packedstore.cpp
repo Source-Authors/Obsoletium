@@ -934,7 +934,7 @@ bool CPackedStoreReadCache::CheckMd5Result( CachedVPKRead_t &cachedVPKRead )
 int CPackedStoreReadCache::FindBufferToUse()
 {
 	int idxLRU = 0;
-	int idxToRemove = m_treeCachedVPKRead.InvalidIndex();
+	auto idxToRemove = m_treeCachedVPKRead.InvalidIndex();
 	uint32 uTimeLowest = (uint32)~0; // MAXINT
 	// find the oldest item, reuse its buffer
 	for ( int i = 0; i < m_cItemsInCache; i++ )
@@ -945,7 +945,7 @@ int CPackedStoreReadCache::FindBufferToUse()
 			idxToRemove = m_rgCurrentCacheIndex[i];
 			idxLRU = i;
 		}
-		int idxCurrent = m_rgCurrentCacheIndex[i];
+		auto idxCurrent = m_rgCurrentCacheIndex[i];
 		// while we are here check if the MD5 is done
 		if ( m_treeCachedVPKRead[idxCurrent].m_hMD5RequestHandle )
 		{
@@ -983,7 +983,7 @@ bool CPackedStoreReadCache::BCanSatisfyFromReadCacheInternal( uint8 *pOutData, C
 	CachedVPKRead_t key;
 	key.m_nPackFileNumber = handle.m_nFileNumber;
 	key.m_nFileFraction = nDesiredPos & k_nCacheBufferMask;
-	int idxTrackedVPKFile = m_treeCachedVPKRead.Find( key );
+	auto idxTrackedVPKFile = m_treeCachedVPKRead.Find( key );
 	if ( idxTrackedVPKFile == m_treeCachedVPKRead.InvalidIndex() || m_treeCachedVPKRead[idxTrackedVPKFile].m_pubBuffer == NULL )
 	{
 		m_rwlock.UnlockRead();
@@ -1018,7 +1018,7 @@ bool CPackedStoreReadCache::BCanSatisfyFromReadCacheInternal( uint8 *pOutData, C
 		{
 			// Need to kick out the LRU.
 			idxLRU = FindBufferToUse();
-			int idxToRemove = m_rgCurrentCacheIndex[idxLRU];
+			auto idxToRemove = m_rgCurrentCacheIndex[idxLRU];
 			Assert( m_treeCachedVPKRead[idxToRemove].m_idxLRU == idxLRU );
 			Assert( m_treeCachedVPKRead[idxToRemove].m_pubBuffer != NULL );
 

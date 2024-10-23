@@ -261,7 +261,7 @@ public:
 
 	// current items in the cache
 	int m_cItemsInCache;
-	int m_rgCurrentCacheIndex[k_nCacheBuffersToKeep];
+	unsigned short m_rgCurrentCacheIndex[k_nCacheBuffersToKeep];
 	CInterlockedUInt m_rgLastUsedTime[k_nCacheBuffersToKeep];
 
 	CPackedStore *m_pPackedStore;
