@@ -350,7 +350,7 @@ char *CMsgBuffer::ReadString (void)
 			break;
 		string[l] = c;
 		l++;
-	} while ( l < static_cast<int>(sizeof(string))-1 );
+	} while ( l < ssize(string)-1 );
 	
 	string[ l ] = 0;
 	
@@ -413,7 +413,7 @@ void *CMsgBuffer::GetSpace( int length )
 // Input  : *m_rgData - 
 //			length - 
 //-----------------------------------------------------------------------------
-void CMsgBuffer::Write(const void *m_rgData, int length)
+void CMsgBuffer::Write(const void *data, int length)
 {
-	memcpy( GetSpace(length), m_rgData, length );         
+	memcpy( GetSpace(length), data, length );
 }
