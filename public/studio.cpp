@@ -1594,8 +1594,6 @@ void CStudioHdr::RunFlexRules( const float *src, float *dest )
 //-----------------------------------------------------------------------------
 //	CODE PERTAINING TO ACTIVITY->SEQUENCE MAPPING SUBCLASS
 //-----------------------------------------------------------------------------
-#define iabs(i) (( (i) >= 0 ) ? (i) : -(i) )
-
 CUtlSymbolTable g_ActivityModifiersTable;
 
 extern void SetActivityForSequence( CStudioHdr *pstudiohdr, int i );
@@ -1643,14 +1641,14 @@ void CStudioHdr::CActivityToSequenceMapping::Initialize( CStudioHdr * __restrict
 			bFoundOne = true;
 
 			// look up if we already have an entry. First we need to make a speculative one --
-			HashValueType entry(seqdesc.activity, 0, 1, iabs(seqdesc.actweight));
+			HashValueType entry(seqdesc.activity, 0, 1, abs(seqdesc.actweight));
 			UtlHashHandle_t handle = m_ActToSeqHash.Find(entry);
 			if ( m_ActToSeqHash.IsValidHandle(handle) )
 			{	
 				// we already have an entry and must update it by incrementing count
 				HashValueType * __restrict toUpdate = &m_ActToSeqHash.Element(handle);
 				toUpdate->count += 1;
-				toUpdate->totalWeight += iabs(seqdesc.actweight);
+				toUpdate->totalWeight += abs(seqdesc.actweight);
 				if ( !HushAsserts() )
 				{
 					AssertMsg( toUpdate->totalWeight > 0, "toUpdate->totalWeight: %d", toUpdate->totalWeight );
@@ -1736,7 +1734,7 @@ void CStudioHdr::CActivityToSequenceMapping::Initialize( CStudioHdr * __restrict
 			// You might be tempted to collapse this pointer math into a single pointer --
 			// don't! the tuple list is marked __restrict above.
 			(tupleList + element.startingIdx + tupleOffset)->seqnum = i; // store sequence number
-			(tupleList + element.startingIdx + tupleOffset)->weight = iabs(seqdesc.actweight);
+			(tupleList + element.startingIdx + tupleOffset)->weight = abs(seqdesc.actweight);
 
 			// We can't have weights of 0
 			// Assert( (tupleList + element.startingIdx + tupleOffset)->weight > 0 );
