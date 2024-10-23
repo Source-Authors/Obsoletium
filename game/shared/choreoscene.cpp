@@ -3797,7 +3797,7 @@ void CChoreoScene::SaveToBinaryBuffer( CUtlBuffer& buf, unsigned int nTextVersio
 
 	intp c = eventList.Count();
 	Assert( c <= 255 );
-	buf.PutUnsignedChar( c );
+	buf.PutUnsignedChar( static_cast<unsigned char>(c) );
 	for ( i = 0; i < c; ++i )
 	{
 		CChoreoEvent *e = eventList[ i ];
@@ -3817,7 +3817,7 @@ void CChoreoScene::SaveToBinaryBuffer( CUtlBuffer& buf, unsigned int nTextVersio
 
 	c = actorList.Count();
 	Assert( c <= 255 );
-	buf.PutUnsignedChar( c );
+	buf.PutUnsignedChar( static_cast<unsigned char>(c) );
 	for ( i = 0; i < c; ++i )
 	{
 		CChoreoActor *a = actorList[ i ];

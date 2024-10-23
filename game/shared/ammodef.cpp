@@ -57,9 +57,10 @@ int	CAmmoDef::PlrDamage(int nAmmoIndex)
 
 	if ( m_AmmoType[nAmmoIndex].pPlrDmg == USE_CVAR )
 	{
-		if ( m_AmmoType[nAmmoIndex].pPlrDmgCVar )
+		const ConVar *dmgVar = m_AmmoType[nAmmoIndex].pPlrDmgCVar;
+		if ( dmgVar )
 		{
-			return m_AmmoType[nAmmoIndex].pPlrDmgCVar->GetFloat();
+			return dmgVar->GetInt();
 		}
 
 		return 0;
@@ -82,9 +83,10 @@ int	CAmmoDef::NPCDamage(int nAmmoIndex)
 
 	if ( m_AmmoType[nAmmoIndex].pNPCDmg == USE_CVAR )
 	{
-		if ( m_AmmoType[nAmmoIndex].pNPCDmgCVar )
+		const ConVar *dmgVar = m_AmmoType[nAmmoIndex].pNPCDmgCVar;
+		if ( dmgVar )
 		{
-			return m_AmmoType[nAmmoIndex].pNPCDmgCVar->GetFloat();
+			return dmgVar->GetInt();
 		}
 
 		return 0;
@@ -107,8 +109,9 @@ int	CAmmoDef::MaxCarry(int nAmmoIndex)
 
 	if ( m_AmmoType[nAmmoIndex].pMaxCarry == USE_CVAR )
 	{
-		if ( m_AmmoType[nAmmoIndex].pMaxCarryCVar )
-			return m_AmmoType[nAmmoIndex].pMaxCarryCVar->GetFloat();
+		const ConVar* carryVar = m_AmmoType[nAmmoIndex].pMaxCarryCVar;
+		if ( carryVar )
+			return carryVar->GetInt();
 
 		return 0;
 	}

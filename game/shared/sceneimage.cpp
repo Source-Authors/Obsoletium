@@ -96,7 +96,7 @@ public:
 	// Returns a valid id into the string table
 	short FindOrAddString( const char *pString ) override
 	{
-		int stringId = m_StringMap.Find( pString );
+		UtlSymId_t stringId = m_StringMap.Find( pString );
 		if ( stringId != m_StringMap.InvalidIndex() )
 		{
 			// found in pool
@@ -109,7 +109,7 @@ public:
 		m_nOffset += strlen( pString ) + 1;
 
 		stringId = m_StringMap.Find( pString );
-		Assert( stringId >= 0 && stringId <= 32767 );
+		Assert( stringId >= 0 && stringId <= SHRT_MAX );
 
 		return stringId;
 	}

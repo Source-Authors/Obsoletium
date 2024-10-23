@@ -1180,7 +1180,6 @@ void CBaseEntity::UpdateWaterState()
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 // Purpose: Check if entity is in the water and applies any current to velocity
 // and sets appropriate water flags
@@ -2030,7 +2029,7 @@ private:
 		ThinkSync item;
 		item.thinktime = thinktime;
 
-		int idx = m_Thinkers.Find( item );
+		auto idx = m_Thinkers.Find( item );
 		if ( idx == m_Thinkers.InvalidIndex() )
 		{
 			idx = m_Thinkers.Insert( item );
@@ -2046,7 +2045,7 @@ private:
 
 		Msg( "-----------------\nThink report frame %i\n", gpGlobals->tickcount );
 
-		for ( int i = m_Thinkers.FirstInorder(); 
+		for ( auto i = m_Thinkers.FirstInorder(); 
 			i != m_Thinkers.InvalidIndex(); 
 			i = m_Thinkers.NextInorder( i ) )
 		{

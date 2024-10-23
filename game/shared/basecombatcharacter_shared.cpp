@@ -291,10 +291,10 @@ void CCombatCharVisCache::FrameUpdatePreEntityThink()
 	if ( m_VisCache.Count() < 256 )
 		return;
 
-	int nMaxIndex = m_VisCache.MaxElement() - 1;
+	unsigned short nMaxIndex = m_VisCache.MaxElement() - 1;
 	for ( int i = 0; i < 8; ++i )
 	{
-		int n = RandomInt( 0, nMaxIndex );
+		unsigned short n = static_cast<unsigned short>(RandomInt( 0, nMaxIndex ));
 		if ( !m_VisCache.IsValidIndex( n ) )
 			continue;
 
@@ -325,7 +325,7 @@ int CCombatCharVisCache::LookupVisibility( const CBaseCombatCharacter *pChar1, C
 		cacheEntry.m_hEntity2 = pChar1;
 	}
 
-	int iCache = m_VisCache.Find( cacheEntry );
+	auto iCache = m_VisCache.Find( cacheEntry );
 	if ( iCache == m_VisCache.InvalidIndex() )
 	{
 		if ( m_VisCache.Count() == m_VisCache.InvalidIndex() )
@@ -335,7 +335,7 @@ int CCombatCharVisCache::LookupVisibility( const CBaseCombatCharacter *pChar1, C
 		m_VisCache[iCache].m_flTime = gpGlobals->curtime - 2.0f * VIS_CACHE_ENTRY_LIFE;
 	}
 
-	return ( pChar1 < pChar2 ) ? iCache : - iCache - 1;
+	return ( pChar1 < pChar2 ) ? iCache : -(int)iCache - 1;
 }
 
 VisCacheResult_t CCombatCharVisCache::HasVisibility( int iCache ) const

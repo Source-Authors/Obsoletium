@@ -98,8 +98,8 @@ public:
 	void SetEndWidth( float endWidth );
 	void SetFadeLength( float fadeLength );
 	void SetNoise( float amplitude );
-	void SetColor( int r, int g, int b );
-	void SetBrightness( int brightness );
+	void SetColor( byte r, byte g, byte b );
+	void SetBrightness( byte brightness );
 	void SetFrame( float frame );
 	void SetScrollRate( int speed );
 	void SetFireTime( float flFireTime );
@@ -336,12 +336,12 @@ inline void CBeam::SetNoise( float amplitude )
 	m_fAmplitude = amplitude; 
 }
 
-inline void CBeam::SetColor( int r, int g, int b )		
+inline void CBeam::SetColor( byte r, byte g, byte b )		
 { 
 	SetRenderColor( r, g, b, GetRenderColor().a );
 }
 
-inline void CBeam::SetBrightness( int brightness )		
+inline void CBeam::SetBrightness( byte brightness )		
 { 
 	SetRenderColorA( brightness ); 
 }
