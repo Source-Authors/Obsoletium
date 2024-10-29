@@ -441,7 +441,7 @@ void CPlayerLogoProxy::OnLogoBindInternal( int playerindex )
 	logo.crc = (unsigned int)info.customFiles[0];
 	logo.texture = NULL;
 
-	int lookup = m_Logos.Find( logo );
+	unsigned short lookup = m_Logos.Find( logo );
 	if ( lookup == m_Logos.InvalidIndex() )
 	{
 		char crcfilename[ 512 ];
