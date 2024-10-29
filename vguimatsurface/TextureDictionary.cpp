@@ -143,7 +143,8 @@ public:
 	CMatSystemTexture	*GetTexture( int id );
 
 private:
-	CUtlLinkedList< CMatSystemTexture, unsigned short >	m_Textures;
+	// dimhotepus: unsigned short -> int as callers use int.
+	CUtlLinkedList< CMatSystemTexture, int >	m_Textures;
 };
 
 static CTextureDictionary s_TextureDictionary;
@@ -161,17 +162,9 @@ public:
 		m_nWidth  = nWidth;
 		m_nHeight = nHeight;
 
-		if ( IsPC() )
-		{
-			intp size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
-			m_pTextureBits = new unsigned char[size];
-			memset( m_pTextureBits, 0, size );
-		}
-		else
-		{
-			// will be allocated as needed
-			m_pTextureBits = NULL;
-		}
+		intp size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
+		m_pTextureBits = new unsigned char[size];
+		memset( m_pTextureBits, 0, size );
 	}
 
 	virtual ~CFontTextureRegen( void )
@@ -182,17 +175,8 @@ public:
 	void UpdateBackingBits( Rect_t &subRect, const unsigned char *pBits, Rect_t &uploadRect, ImageFormat format )
 	{
 		intp size = ImageLoader::GetMemRequired( m_nWidth, m_nHeight, 1, m_nFormat, false );
-		if ( IsPC() )
-		{
-			if ( !m_pTextureBits )
-				return;
-		}
-		else
-		{
-			Assert( !m_pTextureBits );
-			m_pTextureBits = new unsigned char[size];
-			memset( m_pTextureBits, 0, size );
-		}
+		if ( !m_pTextureBits )
+			return;
 
 		// Copy subrect into backing bits storage
 		// source data is expected to be in same format as backing bits
@@ -781,7 +765,7 @@ void CTextureDictionary::DestroyTexture( int id )
 	if (id != INVALID_TEXTURE_ID)
 	{
 		Assert( id != m_Textures.InvalidIndex() );
-		m_Textures.Remove( (unsigned short)id );
+		m_Textures.Remove( id );
 	}
 }
 
