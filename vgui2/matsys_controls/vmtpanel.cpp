@@ -109,59 +109,60 @@ void CVMTPanel::PerformLayout()
 	BaseClass::PerformLayout();
 	return;
 
+	// dimhotepus: Comment unused code.
 	// Get the current size, see if it's big enough to view the entire thing
-	int iWidth, iHeight;
-	GetSize( iWidth, iHeight );
+	//int iWidth, iHeight;
+	//GetSize( iWidth, iHeight );
 
-	// In the case of stretching, just stretch to the size and blow off
-	// the scrollbars. Same holds true if there's no material
-	if (!m_bUseActualSize || !m_pMaterial)
-	{
-		m_iViewableWidth = iWidth;
-		m_iViewableHeight = iHeight;
-		m_pHorizontalBar->SetVisible(false);
-		m_pVerticalBar->SetVisible(false);
-		return;
-	}
+	//// In the case of stretching, just stretch to the size and blow off
+	//// the scrollbars. Same holds true if there's no material
+	//if (!m_bUseActualSize || !m_pMaterial)
+	//{
+	//	m_iViewableWidth = iWidth;
+	//	m_iViewableHeight = iHeight;
+	//	m_pHorizontalBar->SetVisible(false);
+	//	m_pVerticalBar->SetVisible(false);
+	//	return;
+	//}
 
-	// Check the size of the material...
-	int iMaterialWidth = m_pMaterial->GetMappingWidth();
-	int iMaterialHeight = m_pMaterial->GetMappingHeight();
+	//// Check the size of the material...
+	//int iMaterialWidth = m_pMaterial->GetMappingWidth();
+	//int iMaterialHeight = m_pMaterial->GetMappingHeight();
 
-	// Check if the scroll bars are visible
-	bool bHorizScrollVisible = (iMaterialWidth > iWidth);
-	bool bVertScrollVisible = (iMaterialHeight > iHeight);
+	//// Check if the scroll bars are visible
+	//bool bHorizScrollVisible = (iMaterialWidth > iWidth);
+	//bool bVertScrollVisible = (iMaterialHeight > iHeight);
 
-	m_pHorizontalBar->SetVisible(bHorizScrollVisible);
-	m_pVerticalBar->SetVisible(bVertScrollVisible);
+	//m_pHorizontalBar->SetVisible(bHorizScrollVisible);
+	//m_pVerticalBar->SetVisible(bVertScrollVisible);
 
-	// Shrink the bars if both are visible
-	m_iViewableWidth = bVertScrollVisible ? iWidth - SCROLLBAR_SIZE - WINDOW_BORDER_WIDTH : iWidth; 
-	m_iViewableHeight = bHorizScrollVisible ? iHeight - SCROLLBAR_SIZE - WINDOW_BORDER_WIDTH : iHeight; 
+	//// Shrink the bars if both are visible
+	//m_iViewableWidth = bVertScrollVisible ? iWidth - SCROLLBAR_SIZE - WINDOW_BORDER_WIDTH : iWidth; 
+	//m_iViewableHeight = bHorizScrollVisible ? iHeight - SCROLLBAR_SIZE - WINDOW_BORDER_WIDTH : iHeight; 
 
-	// Set the position of the horizontal bar...
-	if (bHorizScrollVisible)
-	{
-		m_pHorizontalBar->SetPos(0, iHeight - SCROLLBAR_SIZE);
-		m_pHorizontalBar->SetSize( m_iViewableWidth, SCROLLBAR_SIZE );
+	//// Set the position of the horizontal bar...
+	//if (bHorizScrollVisible)
+	//{
+	//	m_pHorizontalBar->SetPos(0, iHeight - SCROLLBAR_SIZE);
+	//	m_pHorizontalBar->SetSize( m_iViewableWidth, SCROLLBAR_SIZE );
 
-		m_pHorizontalBar->SetRangeWindow( m_iViewableWidth );
-		m_pHorizontalBar->SetRange( 0, iMaterialWidth );	
+	//	m_pHorizontalBar->SetRangeWindow( m_iViewableWidth );
+	//	m_pHorizontalBar->SetRange( 0, iMaterialWidth );	
 
-		// FIXME: Change scroll amount based on how much is not visible?
-		m_pHorizontalBar->SetButtonPressedScrollValue( 5 );
-	}
+	//	// FIXME: Change scroll amount based on how much is not visible?
+	//	m_pHorizontalBar->SetButtonPressedScrollValue( 5 );
+	//}
 
-	// Set the position of the vertical bar...
-	if (bVertScrollVisible)
-	{
-		m_pVerticalBar->SetPos(iWidth - SCROLLBAR_SIZE, 0);
-		m_pVerticalBar->SetSize(SCROLLBAR_SIZE, m_iViewableHeight);
+	//// Set the position of the vertical bar...
+	//if (bVertScrollVisible)
+	//{
+	//	m_pVerticalBar->SetPos(iWidth - SCROLLBAR_SIZE, 0);
+	//	m_pVerticalBar->SetSize(SCROLLBAR_SIZE, m_iViewableHeight);
 
-		m_pVerticalBar->SetRangeWindow( m_iViewableHeight );
-		m_pVerticalBar->SetRange( 0, iMaterialHeight);	
-		m_pVerticalBar->SetButtonPressedScrollValue( 5 );
-	}
+	//	m_pVerticalBar->SetRangeWindow( m_iViewableHeight );
+	//	m_pVerticalBar->SetRange( 0, iMaterialHeight);	
+	//	m_pVerticalBar->SetButtonPressedScrollValue( 5 );
+	//}
 }
 
 
