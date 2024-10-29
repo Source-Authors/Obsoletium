@@ -1300,7 +1300,7 @@ void CParticleMgr::RemoveEffect( CParticleEffectBinding *pEffect )
 	// Take it out of the leaf system.
 	ClientLeafSystem()->RemoveRenderable( pEffect->m_hRenderHandle );
 
-	int listIndex = pEffect->m_ListIndex;
+	auto listIndex = pEffect->m_ListIndex;
 	if ( pEffect->m_pSim )
 	{
 		pEffect->m_pSim->NotifyRemove();
@@ -1354,11 +1354,10 @@ void CParticleMgr::RemoveAllNewEffects()
 void CParticleMgr::RemoveAllEffects()
 {
 	unsigned short iNext;
-	for ( unsigned short i{m_Effects.Head()}; i != m_Effects.InvalidIndex(); i = iNext )
+	for ( auto i = m_Effects.Head(); i != m_Effects.InvalidIndex(); i = iNext )
 	{
 		iNext = m_Effects.Next( i );
 		RemoveEffect( m_Effects[i] );
-
 	}
 
 	RemoveAllNewEffects();
@@ -1945,8 +1944,8 @@ void CParticleMgr::UpdateAllEffects( float flTimeDelta )
 	m_bUpdatingEffects = false;
 
 	// Remove any effects that were flagged to be removed.
-	int iNext;
-	for ( int i=m_Effects.Head(); i != m_Effects.InvalidIndex(); i=iNext )
+	unsigned short iNext;
+	for ( auto i=m_Effects.Head(); i != m_Effects.InvalidIndex(); i=iNext )
 	{
 		iNext = m_Effects.Next( i );
 		CParticleEffectBinding *pEffect = m_Effects[i];
@@ -1995,7 +1994,7 @@ PMaterialHandle CParticleMgr::GetPMaterial( const char *pMaterialName )
 		return NULL;
 	}
 
-	int hMat = m_SubTextures.Find( pMaterialName );
+	auto hMat = m_SubTextures.Find( pMaterialName );
 	if ( hMat == m_SubTextures.InvalidIndex() )
 	{
 		IMaterial *pIMaterial = m_pMaterialSystem->FindMaterial( pMaterialName, TEXTURE_GROUP_PARTICLE );
