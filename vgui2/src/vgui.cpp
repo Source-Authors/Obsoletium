@@ -650,7 +650,6 @@ void CVGui::PanelDeleted(VPanel *focus)
 //-----------------------------------------------------------------------------
 CVGui::Tick_t* CVGui::CreateNewTick( VPANEL panel, int intervalMilliseconds )
 {
-	Tick_t *t;
 	// See if it's already in list
 	int count = m_TickSignalVec.Count();
 	for (int i = 0; i < count; i++ )
@@ -669,7 +668,7 @@ CVGui::Tick_t* CVGui::CreateNewTick( VPANEL panel, int intervalMilliseconds )
 	}
 
 	// Add to list
-	t = new Tick_t;
+	Tick_t *t = new Tick_t;
 
 	t->panel = (VPanel *)panel;
 	t->interval = intervalMilliseconds;
@@ -775,7 +774,8 @@ bool CVGui::DispatchMessages()
 		{
 			// get the first message
 			MessageItem_t *messageItem = NULL;
-			int messageIndex = 0;
+			// dimhotepus: int -> ushort as it is queue index.
+			ushort messageIndex = 0;
 
 			// use the secondary queue until it empties. empty it after each message in the
 			// primary queue. this makes primary messages completely resolve 
