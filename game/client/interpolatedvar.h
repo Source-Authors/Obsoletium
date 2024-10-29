@@ -154,7 +154,7 @@ abstract_class IInterpolatedVar
 public:
 	virtual		 ~IInterpolatedVar() {}
 
-	virtual void Setup( void *pValue, int type ) = 0;
+	virtual void Setup( void *pValue, byte type ) = 0;
 	virtual void SetInterpolationAmount( float seconds ) = 0;
 	
 	// Returns true if the new value is different from the prior most recent value.
@@ -445,7 +445,7 @@ public:
 	// IInterpolatedVar overrides.
 public:
 	
-	virtual void Setup( void *pValue, int type );
+	virtual void Setup( void *pValue, byte type );
 	virtual void SetInterpolationAmount( float seconds );
 	virtual void NoteLastNetworkedValue();
 	virtual bool NoteChanged( float changetime, bool bUpdateLastNetworkedValue );
@@ -598,7 +598,7 @@ inline CInterpolatedVarArrayBase<Type, IS_ARRAY>::~CInterpolatedVarArrayBase()
 }
 
 template< typename Type, bool IS_ARRAY >
-inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::Setup( void *pValue, int type )
+inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::Setup( void *pValue, byte type )
 {
 	m_pValue = ( Type * )pValue;
 	m_fType = type;
