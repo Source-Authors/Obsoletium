@@ -167,7 +167,7 @@ void BitmapImage::DoPaint( int x, int y, int wide, int tall, float yaw, float fl
 		Vector2D center( x + (wide * 0.5f), y + (tall * 0.5f) );
 
 		// Choose a basis...
-		float yawRadians = -yaw * M_PI / 180.0f;
+		float yawRadians = DEG2RAD(-yaw);
 		Vector2D axis[2];
 		axis[0].x = cos(yawRadians);
 		axis[0].y = sin(yawRadians);

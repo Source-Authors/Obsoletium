@@ -129,7 +129,10 @@ inline void DrawScreenEffectMaterial( IMaterial *pMaterial, int x, int y, int w,
 	CMatRenderContextPtr pRenderContext( materials );
 
 	pRenderContext->DrawScreenSpaceRectangle( pMaterial, x, y, w, h,
-		actualRect.x, actualRect.y, actualRect.x+actualRect.width-1, actualRect.y+actualRect.height-1, 
+		static_cast<float>(actualRect.x),
+		static_cast<float>(actualRect.y),
+		static_cast<float>(actualRect.x+actualRect.width-1),
+		static_cast<float>(actualRect.y+actualRect.height-1),
 		pTexture->GetActualWidth(), pTexture->GetActualHeight() );
 }
 
