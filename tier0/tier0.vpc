@@ -17,14 +17,14 @@ $Configuration
 	{
 		$PreprocessorDefinitions		"$BASE;TIER0_DLL_EXPORT"
 		$Create/UsePrecompiledHeader	"Use Precompiled Header (/Yu)"
-		$Create/UsePCHThroughFile		"pch_tier0.h"
+		$Create/UsePCHThroughFile		"stdafx.h"
 		$PrecompiledHeaderFile			"$(IntDir)/tier0.pch"
-		$EnableC++Exceptions				"Yes (/EHsc)"
+		$EnableC++Exceptions			"Yes (/EHsc)"
 	}
 	
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE Advapi32.lib ws2_32.lib"						[$WINDOWS]
+		$AdditionalDependencies			"$BASE Advapi32.lib gdi32.lib ws2_32.lib"						[$WINDOWS]
 
 		// pc publishes the import library directly
 		$ImportLibrary					"$LIBPUBLIC\$(TargetName).lib"				[$WINDOWS]
@@ -74,6 +74,7 @@ $Project "tier0"
 {
 	$Folder	"Source Files"
 	{
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.cpp"
 		$File	"assert_dialog.cpp"
 		$File	"assert_dialog.rc"		[$WINDOWS]
 		$File	"commandline.cpp"
@@ -144,6 +145,7 @@ $Project "tier0"
 
 	$folder	"Header Files"
 	{
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"$SRCDIR\public\tier0\commonmacros.h"
 		$File	"$SRCDIR\public\tier0\cpumonitoring.h"
@@ -165,7 +167,7 @@ $Project "tier0"
 		$File	"$SRCDIR\public\tier0\minidump.h"
 		$File	"$SRCDIR\public\tier0\P4PerformanceCounters.h"
 		$File	"$SRCDIR\public\tier0\P5P6PerformanceCounters.h"
-		$File	"pch_tier0.h"
+		$File	"stdafx.h"
 		$File	"$SRCDIR\public\tier0\platform.h"
 		$File	"$SRCDIR\public\tier0\PMELib.h"
 		$File	"$SRCDIR\public\tier0\progressbar.h"

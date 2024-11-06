@@ -5,7 +5,7 @@
 // Uncomment the following line to require the prescence of a hardware key.
 //#define REQUIRE_HARDWARE_KEY
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 
 #include "tier0/platform.h"
 #include "tier0/vcrmode.h"

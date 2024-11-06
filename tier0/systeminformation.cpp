@@ -1,6 +1,6 @@
 // opyright Valve Corporation, All rights reserved.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 #include "tier0/systeminformation.h"
 
 #ifdef IS_WINDOWS_PC

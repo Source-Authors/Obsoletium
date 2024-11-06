@@ -18,7 +18,7 @@
 // work. The threads are started on demand and are never terminated, in order to simplify
 // the code.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 #include "tier0/cpumonitoring.h"
 
 #ifdef PLATFORM_WINDOWS_PC

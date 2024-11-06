@@ -2,7 +2,7 @@
 //
 // Memory allocation!
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 #include "tier0/mem.h"
 #include "tier0/dbg.h"
 #include "tier0/minidump.h"

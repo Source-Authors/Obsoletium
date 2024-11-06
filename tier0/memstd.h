@@ -3,7 +3,7 @@
 // NOTE! This should never be called directly from leaf code
 // Just use new,delete,malloc,free etc. They will call into this eventually
 //-----------------------------------------------------------------------------
-#include "pch_tier0.h"
+#include "stdafx.h"
 
 #if defined(_WIN32)
 #if !defined(_X360)

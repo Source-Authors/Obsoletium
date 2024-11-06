@@ -2,7 +2,7 @@
 //
 // Purpose: Real-Time Hierarchical Profiling
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 
 #include "tier0/memalloc.h"
 #include "tier0/valve_off.h"

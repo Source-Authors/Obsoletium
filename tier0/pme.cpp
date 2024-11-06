@@ -1,6 +1,6 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 
 #include "tier0/platform.h"
 #include "tier0/vprof.h"

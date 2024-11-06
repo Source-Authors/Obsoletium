@@ -1,6 +1,6 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 #include "mem_helpers.h"
 
 #include <cstdint>

@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+﻿//Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
 
@@ -18,7 +18,7 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
+#pragma code_page(65001)  // Unicode (UTF-8)
 #endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
@@ -55,7 +55,7 @@ END
 IDD_ASSERT_DIALOG DIALOG DISCARDABLE  0, 0, 268, 158
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Assert"
-FONT 8, "MS Sans Serif"
+FONT 8, "Segoe UI"
 BEGIN
     LTEXT           "File:",IDC_NOID,7,7,23,9
     LTEXT           "c:/hl2/src/blah.cpp",IDC_FILENAME_CONTROL,36,7,217,8
@@ -68,14 +68,14 @@ BEGIN
     PUSHBUTTON      "&Ignore This Assert",IDC_IGNORE_THIS,7,66,98,14
     EDITTEXT        IDC_IGNORE_NUMTIMES,110,66,24,14,ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "time(s).",IDC_NOID,138,68,23,8
+    LTEXT           "time(s).",IDC_NOID,138,68,28,8
     PUSHBUTTON      "Always Ignore &This Assert",IDC_IGNORE_ALWAYS,7,84,98,
                     14
     PUSHBUTTON      "Ignore &Nearby Asserts",IDC_IGNORE_NEARBY,7,102,98,14
-    LTEXT           "within",IDC_NOID,109,105,19,8
-    EDITTEXT        IDC_IGNORE_NUMLINES,131,102,40,14,ES_AUTOHSCROLL | 
+    LTEXT           "within",IDC_NOID,110,105,21,8
+    EDITTEXT        IDC_IGNORE_NUMLINES,136,102,40,14,ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "lines.",IDC_NOID,175,105,17,8
+    LTEXT           "lines.",IDC_NOID,180,105,17,10
     PUSHBUTTON      "Ignore Asserts in This &File",IDC_IGNORE_FILE,7,120,98,
                     14
     PUSHBUTTON      "Ignore &All Asserts",IDC_IGNORE_ALL,7,137,98,14

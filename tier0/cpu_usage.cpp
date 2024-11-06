@@ -8,7 +8,7 @@
 // On win32 you need to call this once in a while.  Every few seconds.
 // First call returns zero.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 
 #include "tier0/platform.h"
 

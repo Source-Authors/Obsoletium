@@ -3,7 +3,7 @@
 // Attaches a console for I/O to a Win32 GUI application in a
 // reasonably smart fashion.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 
 #if defined( _WIN32 )
 

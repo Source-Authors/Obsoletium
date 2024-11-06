@@ -1,6 +1,6 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 
 #include <thread>
 
@@ -419,7 +419,7 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 			const size_t descriptionSize = (wcharsNeeded + 1) * sizeof(wchar_t);
 			wchar_t *description = static_cast<wchar_t*>( stackalloc( descriptionSize ) );
 
-			[[maybe_unused]] const size_t wcharsConverted = mbstowcs( description, pszName, INT_MAX );
+			[[maybe_unused]] const size_t wcharsConverted = mbstowcs( description, pszName, descriptionSize );
 			Assert( wcharsNeeded == wcharsConverted );
 			description[descriptionSize / sizeof(wchar_t) - 1] = L'\0';
 

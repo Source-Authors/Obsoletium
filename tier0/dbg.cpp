@@ -1,6 +1,6 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 #include "tier0/minidump.h"
 
 #if defined( _WIN32 ) && !defined( _X360 )

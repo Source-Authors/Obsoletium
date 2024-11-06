@@ -2,7 +2,7 @@
 //
 // Memory allocation!
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 

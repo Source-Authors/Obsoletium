@@ -2,7 +2,7 @@
 //
 // Thread management routines.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 
 #include "tier0/valve_off.h"
 

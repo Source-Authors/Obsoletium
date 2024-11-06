@@ -2,7 +2,7 @@
 //
 // Shared library loading and symbol lookup.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 #include "tier0/dynfunction.h"
 
 #if defined(WIN32)

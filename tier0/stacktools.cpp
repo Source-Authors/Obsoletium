@@ -1,6 +1,6 @@
 // Copyright 1996-2005, Valve Corporation, All rights reserved.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 #include "tier0/stacktools.h"
 #include "tier0/threadtools.h"
 #include "tier0/icommandline.h"

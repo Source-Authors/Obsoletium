@@ -1,11 +1,12 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 
 #include "tier0/valve_off.h"
 
 #if defined( _WIN32 )
 #include "winlite.h"
+#include "windows/dpi_wnd_behavior.h"
 
 // dimhotepus: Launcher icon id.
 #include "../launcher_main/resource.h"
@@ -161,7 +162,7 @@ static bool AreAssertsEnabledInFileLine( const tchar *pFilename, int iLine )
 }
 
 
-CAssertDisable* CreateNewAssertDisable( const tchar *pFilename )
+static CAssertDisable* CreateNewAssertDisable( const tchar *pFilename )
 {
 	CAssertDisable *pDisable = new CAssertDisable;
 	pDisable->m_pNext = g_pAssertDisables;
@@ -178,13 +179,13 @@ CAssertDisable* CreateNewAssertDisable( const tchar *pFilename )
 }
 
 
-void IgnoreAssertsInCurrentFile()
+static void IgnoreAssertsInCurrentFile()
 {
 	CreateNewAssertDisable( g_Info.m_pFilename );
 }
 
 
-CAssertDisable* IgnoreAssertsNearby( int nRange )
+static CAssertDisable* IgnoreAssertsNearby( int nRange )
 {
 	CAssertDisable *pDisable = CreateNewAssertDisable( g_Info.m_pFilename );
 	pDisable->m_LineMin = g_Info.m_iLine - nRange;
@@ -192,13 +193,14 @@ CAssertDisable* IgnoreAssertsNearby( int nRange )
 	return pDisable;
 }
 
+#if defined( _WIN32 )
+se::windows::ui::CDpiWindowBehavior g_dpi_window_behavior;
 
-#if ( defined( _WIN32 ) && !defined( _X360 ) )
-INT_PTR CALLBACK AssertDialogProc(
-  HWND hDlg,  // handle to dialog box
-  UINT uMsg,     // message
-  WPARAM wParam, // first message parameter
-  [[maybe_unused]] LPARAM lParam  // second message parameter
+static INT_PTR CALLBACK AssertDialogProc(
+  HWND hDlg,                      // handle to dialog box
+  UINT uMsg,                      // message
+  WPARAM wParam,                  // first message parameter
+  LPARAM lParam                   // second message parameter
 )
 {
 	switch( uMsg )
@@ -216,6 +218,10 @@ INT_PTR CALLBACK AssertDialogProc(
 			SetDlgItemInt( hDlg, IDC_IGNORE_NUMLINES, g_iLastLineRange, false );
 			SetDlgItemInt( hDlg, IDC_IGNORE_NUMTIMES, g_nLastIgnoreNumTimes, false );
 
+			// dimhotepus: Honor per monitor V2 DPI.
+			// It is DialogBoxParam (uses CreateWindowEx), so need scaling.
+			g_dpi_window_behavior.OnCreateWindow(hDlg);
+
 			// dimhotepus: Add launcher icon for Assert dialog.
 			HANDLE hExeIcon = LoadImageW( GetModuleHandleW( nullptr ), MAKEINTRESOURCEW( SRC_IDI_APP_MAIN ), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE );
 			SendMessage( hDlg, WM_SETICON, ICON_BIG, (LPARAM)hExeIcon );
@@ -231,7 +237,7 @@ INT_PTR CALLBACK AssertDialogProc(
 				((rcDesktop.bottom-rcDesktop.top) - (rcDlg.bottom-rcDlg.top)) / 2,
 				0,
 				0,
-				SWP_NOSIZE );
+				SWP_NOSIZE | SWP_NOACTIVATE );
 		}
 		return TRUE;
 
@@ -307,9 +313,21 @@ INT_PTR CALLBACK AssertDialogProc(
 					return TRUE;
 				}
 			}
-					
+
+			return TRUE;
 		}
-		return TRUE;
+
+		case WM_DPICHANGED:
+		{
+			return !g_dpi_window_behavior.OnWindowDpiChanged(wParam, lParam)
+				? TRUE : FALSE;
+		}
+
+		case WM_DESTROY:
+		{
+			g_dpi_window_behavior.OnDestroyWindow();
+			return TRUE;
+		}
 	}
 
 	return FALSE;

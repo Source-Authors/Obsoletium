@@ -170,12 +170,12 @@ public:
 	void Push( T *pNode )
 	{
 		Assert( sizeof(T) >= sizeof(TSLNodeBase_t) );
-		CTSListBase::Push( (TSLNodeBase_t *)pNode );
+		CTSListBase::Push( pNode );
 	}
 
 	T *Pop()
 	{
-		return (T *)CTSListBase::Pop();
+		return static_cast<T *>(CTSListBase::Pop());
 	}
 };
 
@@ -203,7 +203,7 @@ public:
 	{
 		while ( true )
 		{
-			TSPoolNode_t *pNode = (TSPoolNode_t *)CTSListBase::Pop();
+			auto *pNode = static_cast<TSPoolNode_t *>(CTSListBase::Pop());
 			if ( !pNode )
 				break;
 
@@ -213,16 +213,16 @@ public:
 
 	void PutObject( T *pInfo )
 	{
-		unsigned char *pElem = (unsigned char *)pInfo;
+		auto *pElem = reinterpret_cast<unsigned char *>(pInfo);
 		pElem -= offsetof(TSPoolNode_t, elem);
-		TSPoolNode_t *pNode = (TSPoolNode_t *)pElem;
+		auto *pNode = reinterpret_cast<TSPoolNode_t *>(pElem);
 
 		CTSListBase::Push( pNode );
 	}
 
 	T *GetObject()
 	{
-		TSPoolNode_t *pNode = (TSPoolNode_t *)CTSListBase::Pop();
+		auto *pNode = static_cast<TSPoolNode_t *>(CTSListBase::Pop());
 		if ( !pNode )
 		{
 			pNode = new TSPoolNode_t;
@@ -273,12 +273,12 @@ public:
 
 	Node_t *Push( Node_t *pNode )
 	{
-		return (Node_t *)CTSListBase::Push( pNode );
+		return static_cast<Node_t *>(CTSListBase::Push( pNode ));
 	}
 
 	Node_t *Pop()
 	{
-		return (Node_t *)CTSListBase::Pop();
+		return static_cast<Node_t *>(CTSListBase::Pop());
 	}
 
 	void PushItem( const T &init )
@@ -299,7 +299,7 @@ public:
 
 	Node_t *Detach()
 	{
-		return (Node_t *)CTSListBase::Detach();
+		return static_cast<Node_t *>(CTSListBase::Detach());
 	}
 };
 
@@ -326,14 +326,14 @@ public:
 		Node_t *pCurrent = Detach();
 		while ( pCurrent )
 		{
-			Node_t *pNext = (Node_t *)pCurrent->Next;
+			auto *pNext = static_cast<Node_t *>(pCurrent->Next);
 			delete pCurrent;
 			pCurrent = pNext;
 		}
-		pCurrent = (Node_t *)m_FreeList.Detach();
+		pCurrent = static_cast<Node_t *>(m_FreeList.Detach());
 		while ( pCurrent )
 		{
-			Node_t *pNext = (Node_t *)pCurrent->Next;
+			auto *pNext = static_cast<Node_t *>(pCurrent->Next);
 			delete pCurrent;
 			pCurrent = pNext;
 		}
@@ -344,7 +344,7 @@ public:
 		Node_t *pCurrent = Detach();
 		while ( pCurrent )
 		{
-			Node_t *pNext = (Node_t *)pCurrent->Next;
+			auto *pNext = static_cast<Node_t *>(pCurrent->Next);
 			m_FreeList.Push( pCurrent );
 			pCurrent = pNext;
 		}
@@ -352,17 +352,17 @@ public:
 
 	Node_t *Push( Node_t *pNode )
 	{
-		return (Node_t *)CTSListBase::Push( pNode );
+		return static_cast<Node_t *>(CTSListBase::Push( pNode ));
 	}
 
 	Node_t *Pop()
 	{
-		return (Node_t *)CTSListBase::Pop();
+		return static_cast<Node_t *>(CTSListBase::Pop());
 	}
 
 	void PushItem( const T &init )
 	{
-		Node_t *pNode = (Node_t *)m_FreeList.Pop();
+		auto *pNode = static_cast<Node_t *>(m_FreeList.Pop());
 		if ( !pNode )
 		{
 			pNode = new Node_t;
@@ -384,7 +384,7 @@ public:
 
 	Node_t *Detach()
 	{
-		return (Node_t *)CTSListBase::Detach();
+		return static_cast<Node_t *>(CTSListBase::Detach());
 	}
 
 	void FreeNode( Node_t *pNode )
@@ -493,7 +493,7 @@ public:
 			delete pNode;
 		}
 
-		while ( ( pNode = (Node_t *)m_FreeNodes.Pop() ) != NULL )
+		while ( ( pNode = reinterpret_cast<Node_t *>(m_FreeNodes.Pop()) ) != nullptr )
 		{
 			delete pNode;
 		}
@@ -618,9 +618,9 @@ public:
 	{
 		// dimhtepus: x64 support.
 #ifdef PLATFORM_64BITS
-		Node_t * TSQUEUE_BAD_NODE_LINK = (Node_t *)(void*)0xdeadbeefdeadbeef;
+		Node_t * TSQUEUE_BAD_NODE_LINK = static_cast<Node_t *>(reinterpret_cast<void *>(static_cast<size_t>(0xdeadbeefdeadbeef)));
 #else
-		Node_t * TSQUEUE_BAD_NODE_LINK = (Node_t *)(void*)0xdeadbeef;
+		Node_t * TSQUEUE_BAD_NODE_LINK = static_cast<Node_t *>(reinterpret_cast<void *>(static_cast<size_t>(0xdeadbeef)));
 #endif
 		NodeLink_t * volatile		pHead = &m_Head;
 		NodeLink_t * volatile		pTail = &m_Tail;
@@ -692,12 +692,12 @@ public:
 
 	void FreeNode( Node_t *pNode )
 	{
-		m_FreeNodes.Push( (TSLNodeBase_t *)pNode );
+		m_FreeNodes.Push( reinterpret_cast<Node_t *>(pNode) );
 	}
 
 	void PushItem( const T &init )
 	{
-		Node_t *pNode = (Node_t *)m_FreeNodes.Pop();
+		auto *pNode = reinterpret_cast<Node_t *>(m_FreeNodes.Pop());
 		if ( pNode )
 		{
 			pNode->elem = init;
@@ -716,7 +716,7 @@ public:
 			return false;
 
 		*pResult = pNode->elem;
-		m_FreeNodes.Push( (TSLNodeBase_t *)pNode );
+		m_FreeNodes.Push( reinterpret_cast<TSLNodeBase_t *>(pNode) );
 		return true;
 	}
 
@@ -729,7 +729,7 @@ private:
 	// just need a unique signifier
 	Node_t *End() { return &m_end; }
 
-	Node_t *InterlockedCompareExchangeNode( Node_t * volatile *ppNode, Node_t *value, Node_t *comperand )
+	[[nodiscard]] static Node_t *InterlockedCompareExchangeNode( Node_t * volatile *ppNode, Node_t *value, Node_t *comperand )
 	{
 		return (Node_t *)::ThreadInterlockedCompareExchangePointer( (void * volatile *)ppNode, value, comperand );
 	}

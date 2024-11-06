@@ -4,7 +4,7 @@
 // This allows easy insertion of Generic Event markers into ETW/xperf tracing
 // which then aids in analyzing the traces and finding performance problems.
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 #include "tier0/etwprof.h"
 
 #ifdef	ETW_MARKS_ENABLED
