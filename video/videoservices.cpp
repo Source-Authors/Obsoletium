@@ -1158,8 +1158,8 @@ bool CVideoCommonServices::CalculateVideoDimensions( int videoWidth, int videoHe
 				}
 				else	// can scale variably..
 				{
-					float Xfactor = ( displayWidth / curWidth );
-					float Yfactor = ( displayHeight / curHeight );
+					float Xfactor = ( static_cast<float>(displayWidth) / curWidth );
+					float Yfactor = ( static_cast<float>(displayHeight) / curHeight );
 					float scale = MIN( Xfactor, Yfactor );
 					
 					curWidth = (int)  ( curWidth * scale + 0.35f );
