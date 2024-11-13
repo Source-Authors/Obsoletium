@@ -1572,20 +1572,6 @@ FORCEINLINE fltx4 XM_CALLCONV FindHighestSIMD3( DirectX::FXMVECTOR a )
 // ------------------------------------
 
 
-#if 0				/* pc does not have these ops */
-// splat all components of a vector to a signed immediate int number.
-FORCEINLINE fltx4 IntSetImmediateSIMD(int to)
-{
-	//CHRISG: SSE2 has this, but not SSE1. What to do?
-	fltx4 retval;
-	SubInt( retval, 0 ) = to;
-	SubInt( retval, 1 ) = to;
-	SubInt( retval, 2 ) = to;
-	SubInt( retval, 3 ) = to;
-	return retval;
-}
-#endif
-
 #ifdef _XM_SSE_INTRINSICS_
 
 // Load 4 aligned words into a SIMD register
