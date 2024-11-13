@@ -26,9 +26,10 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-static ConVar cl_showfps( "cl_showfps", "0", FCVAR_ALLOWED_IN_COMPETITIVE, "Draw fps meter at top of screen (1 = fps, 2 = smooth fps)" );
-static ConVar cl_showpos( "cl_showpos", "0", 0, "Draw current position at top of screen" );
-static ConVar cl_showbattery( "cl_showbattery", "0", 0, "Draw current battery level at top of screen when on battery power" );
+// dimhotepus: Restrict cl_show* as boolean vars.
+static ConVar cl_showfps( "cl_showfps", "0", FCVAR_ALLOWED_IN_COMPETITIVE, "Draw fps meter at top of screen (1 = fps, 2 = smooth fps)", true, 0, true, 2 );
+static ConVar cl_showpos( "cl_showpos", "0", 0, "Draw current position at top of screen", true, 0, true, 1 );
+static ConVar cl_showbattery( "cl_showbattery", "0", 0, "Draw current battery level at top of screen when on battery power", true, 0, true, 1 );
 
 extern bool g_bDisplayParticlePerformance;
 int GetParticlePerformance();
