@@ -364,7 +364,7 @@ void Beam_t::ComputeBounds( )
 			// FIXME: This isn't quite right for the cylinder
 
 			// Here, delta[2] is the radius
-			int radius = delta[2];
+			float radius = delta[2];
 			m_Mins.Init( -radius, -radius, -radius );
 			m_Maxs.Init( radius, radius, radius );
 		}
@@ -373,7 +373,7 @@ void Beam_t::ComputeBounds( )
 	case TE_BEAMRING:
 	case TE_BEAMRINGPOINT:
 		{
-			int radius = delta.Length() * 0.5f;
+			float radius = delta.Length() * 0.5f;
 			m_Mins.Init( -radius, -radius, -radius );
 			m_Maxs.Init( radius, radius, radius );
 		}
