@@ -14,6 +14,7 @@
 
 #include "tier1/interface.h"
 #include "appframework/IAppSystem.h"
+#include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 #include "mathlib/vector4d.h"
 #include "vcollide.h"
