@@ -1018,8 +1018,9 @@ void CViewRender::SetUpOverView()
 
 	float aspect = (float)viewEye.width/(float)viewEye.height;
 
-	int size_y = 1024.0f * cl_leveloverview.GetFloat(); // scale factor, 1024 = OVERVIEW_MAP_SIZE
-	int	size_x = size_y * aspect;	// standard screen aspect 
+	// dimhotepus: int -> float.
+	float size_y = 1024.0f * cl_leveloverview.GetFloat(); // scale factor, 1024 = OVERVIEW_MAP_SIZE
+	float size_x = size_y * aspect;	// standard screen aspect 
 
 	viewEye.origin.x -= size_x / 2;
 	viewEye.origin.y += size_y / 2;
