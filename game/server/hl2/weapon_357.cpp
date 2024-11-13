@@ -79,7 +79,7 @@ void CWeapon357::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChara
 				for ( int i = 0; i < 6; i++ )
 				{
 					data.m_vOrigin = pOwner->WorldSpaceCenter() + RandomVector( -4, 4 );
-					data.m_vAngles = QAngle( 90, random->RandomInt( 0, 360 ), 0 );
+					data.m_vAngles = QAngle( 90, random->RandomFloat( 0, 360 ), 0 );
 					data.m_nEntIndex = entindex();
 
 					DispatchEffect( "ShellEject", data );

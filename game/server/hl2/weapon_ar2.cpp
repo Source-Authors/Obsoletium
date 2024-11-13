@@ -246,13 +246,13 @@ void CWeaponAR2::DelayedAttack( void )
 	//Disorient the player
 	QAngle angles = pOwner->GetLocalAngles();
 
-	angles.x += random->RandomInt( -4, 4 );
-	angles.y += random->RandomInt( -4, 4 );
+	angles.x += random->RandomFloat( -4, 4 );
+	angles.y += random->RandomFloat( -4, 4 );
 	angles.z = 0;
 
 	pOwner->SnapEyeAngles( angles );
 	
-	pOwner->ViewPunch( QAngle( random->RandomInt( -12, -8 ), random->RandomInt( 1, 2 ), 0 ) );
+	pOwner->ViewPunch( QAngle( random->RandomFloat( -12, -8 ), random->RandomFloat( 1, 2 ), 0 ) );
 
 	// Decrease ammo
 	pOwner->RemoveAmmo( 1, m_iSecondaryAmmoType );

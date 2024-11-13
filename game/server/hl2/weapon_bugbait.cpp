@@ -278,7 +278,7 @@ void CWeaponBugBait::ThrowGrenade( CBasePlayer *pPlayer )
 	pPlayer->GetVelocity( &vThrowVel, NULL );
 	vThrowVel += vForward * 1000;
 
-	CGrenadeBugBait *pGrenade = BugBaitGrenade_Create( vThrowPos, vec3_angle, vThrowVel, QAngle(600,random->RandomInt(-1200,1200),0), pPlayer );
+	CGrenadeBugBait *pGrenade = BugBaitGrenade_Create( vThrowPos, vec3_angle, vThrowVel, QAngle(600,random->RandomFloat(-1200,1200),0), pPlayer );
 
 	if ( pGrenade != NULL )
 	{

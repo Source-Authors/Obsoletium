@@ -1717,7 +1717,7 @@ void CWeaponPhysCannon::PrimaryFireEffect( void )
 	if ( pOwner == NULL )
 		return;
 
-	pOwner->ViewPunch( QAngle(-6, random->RandomInt(-2,2) ,0) );
+	pOwner->ViewPunch( QAngle(-6, random->RandomFloat(-2,2) ,0) );
 	
 	color32 white = { 245, 245, 255, 32 };
 	UTIL_ScreenFade( pOwner, white, 0.1f, 0.0f, FFADE_IN );
@@ -4138,12 +4138,12 @@ void CWeaponPhysCannon::DoMegaEffectLaunch( Vector *pos )
 			pBeam->PointEntInit( endpos, vm );
 			pBeam->SetEndAttachment( 1 );
 			pBeam->SetWidth( 2 );
-			pBeam->SetEndWidth( random->RandomInt( 1, 2 ) );
+			pBeam->SetEndWidth( random->RandomFloat( 1, 2 ) );
 			pBeam->SetBrightness( 255 );
 			pBeam->SetColor( 255, 255, 255 );
 			pBeam->LiveForTime( 0.1f );
 			pBeam->RelinkBeam();
-			pBeam->SetNoise( random->RandomInt( 8, 12 ) );
+			pBeam->SetNoise( random->RandomFloat( 8, 12 ) );
 		}
 	}
 	
