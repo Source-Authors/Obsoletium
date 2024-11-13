@@ -429,7 +429,7 @@ void CPoseDebuggerImpl::StartBlending( IClientNetworkable *pEntity, const CStudi
 		m_mapModelOld.Swap( m_mapModel );
 
 		// Zero out the text on the old map
-		for ( int k = m_mapModelOld.FirstInorder();
+		for ( auto k = m_mapModelOld.FirstInorder();
 			  k != m_mapModelOld.InvalidIndex();
 			  k = m_mapModelOld.NextInorder( k ) )
 		{
