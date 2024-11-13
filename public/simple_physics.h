@@ -53,7 +53,7 @@ public:
 
 				CSimplePhysics();
 	
-	void		Init( float flTimeStep );
+	void		Init( double flTimeStep );
 	
 	void		Simulate( 
 		CNode *pNodes, 
@@ -73,8 +73,8 @@ private:
 	double		m_flPredictedTime;	// (GetCurTime()-m_flTimeStep) <= m_flPredictedTime <= GetCurTime()
 	int			m_iCurTimeStep;
 	
-	float		m_flTimeStep;
-	float		m_flTimeStepMul;	// dt*dt*0.5
+	double		m_flTimeStep;
+	double		m_flTimeStepMul;	// dt*dt*0.5
 };
 
  

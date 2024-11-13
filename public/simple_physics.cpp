@@ -14,16 +14,16 @@
 
 CSimplePhysics::CSimplePhysics()
 {
-	Init( 1.0f / 30.0f ); // default is 30 steps per second
+	Init( 1.0 / 30.0 ); // default is 30 steps per second
 }
 
 
-void CSimplePhysics::Init( float flTimeStep )
+void CSimplePhysics::Init( double flTimeStep )
 {
 	m_flPredictedTime = 0;
 	m_iCurTimeStep = 0;
 	m_flTimeStep = flTimeStep;
-	m_flTimeStepMul = m_flTimeStep*m_flTimeStep*0.5f;
+	m_flTimeStepMul = m_flTimeStep*m_flTimeStep*0.5;
 }
 
 
@@ -61,12 +61,10 @@ void CSimplePhysics::Simulate(
 	m_iCurTimeStep = newTimeStep;
 
 	// Setup predicted positions.
-	float flInterpolant = (m_flPredictedTime - (GetCurTime() - m_flTimeStep)) / m_flTimeStep;
+	double flInterpolant = (m_flPredictedTime - (GetCurTime() - m_flTimeStep)) / m_flTimeStep;
 	for( int iNode=0; iNode < nNodes; iNode++ )
 	{
 		CSimplePhysics::CNode *pNode = &pNodes[iNode];
 		VectorLerp( pNode->m_vPrevPos, pNode->m_vPos, flInterpolant, pNode->m_vPredicted );
 	}
 }
-
-
