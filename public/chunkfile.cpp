@@ -175,7 +175,6 @@ CChunkFile::CChunkFile(void)
 	}
 
 	m_nHandlerStackDepth = 0;
-	m_DefaultChunkHandler = 0;
 }
 
 
@@ -542,6 +541,9 @@ ChunkFileResult_t CChunkFile::ReadNext(char *szName, char *szValue, int nValueSi
 						return ChunkFile_StringTooLong;
 					}
 				}
+
+				// dimhotepus: Add missed break.
+				break;
 			}
 
 			case OPERATOR:
