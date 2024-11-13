@@ -63,7 +63,7 @@ public:
 																	// if you want to get the position or dimensions of the child  
 																	// controls. This will set them.
 
-	void				SetRowUnderline(int row, bool enabled, int offset, int r, int g, int b, int a);	// sets underline color for a particular row
+	void				SetRowUnderline(int row, bool enabled, int offset, short r, short g, short b, short a);	// sets underline color for a particular row
 
 	// returns the true if found, false otherwise
 	bool					GetCellAtPoint(int worldX, int worldY, int &row, int &col);

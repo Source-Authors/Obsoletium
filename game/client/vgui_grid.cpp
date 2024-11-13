@@ -324,7 +324,7 @@ void CGrid::PaintBackground()
 //-----------------------------------------------------------------------------
 // Purpose: sets underline color for a particular row
 //-----------------------------------------------------------------------------
-void CGrid::SetRowUnderline(int row, bool enabled, int offset, int r, int g, int b, int a)
+void CGrid::SetRowUnderline(int row, bool enabled, int offset, short r, short g, short b, short a)
 {
 	CGridEntry *cell = GridEntry(0, row);
 	cell->m_bUnderline = enabled;
