@@ -1276,16 +1276,13 @@ void XM_CALLCONV SetScaleMatrix( float x, float y, float z, matrix3x4_t &dst )
 //-----------------------------------------------------------------------------
 void XM_CALLCONV MatrixBuildRotationAboutAxis( const Vector &vAxisOfRot, float angleDegrees, matrix3x4_t &dst )
 {
-	float radians;
 	float axisXSquared;
 	float axisYSquared;
 	float axisZSquared;
-	float fSin;
-	float fCos;
 
-	radians = angleDegrees * ( M_PI_F / 180.0f );
-	fSin = sin( radians );
-	fCos = cos( radians );
+	float fSin, fCos;
+	float radians = DEG2RAD(angleDegrees);
+	DirectX::XMScalarSinCos(&fSin, &fCos, radians);
 
 	axisXSquared = vAxisOfRot[0] * vAxisOfRot[0];
 	axisYSquared = vAxisOfRot[1] * vAxisOfRot[1];

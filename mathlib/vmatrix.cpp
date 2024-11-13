@@ -123,13 +123,10 @@ VMatrix SetupMatrixAxisRot(const Vector &vAxis, vec_t fDegrees)
 	vec_t s, c, t;
 	vec_t tx, ty, tz;
 	vec_t sx, sy, sz;
-	vec_t fRadians;
 
+	vec_t fRadians = DEG2RAD(fDegrees);
+	DirectX::XMScalarSinCos(&s, &c, fRadians);
 
-	fRadians = fDegrees * (M_PI_F / 180.0f);
-	
-	s = (vec_t)sin(fRadians);
-	c = (vec_t)cos(fRadians);
 	t = 1.0f - c;
 
 	tx = t * vAxis.x;	ty = t * vAxis.y;	tz = t * vAxis.z;
