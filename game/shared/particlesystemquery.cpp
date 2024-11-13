@@ -213,7 +213,7 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 	if ( pMoveParent )
 	{
 		float flRandMax = flBBoxScale;
-		float flRandMin = 1.0 - flBBoxScale;
+		float flRandMin = 1.0f - flBBoxScale;
 		Vector vecBasePos;
 		pParticles->GetControlPointAtTime( nControlPointNumber, pParticles->m_flCurTime, &vecBasePos );
 
