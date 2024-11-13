@@ -82,7 +82,7 @@ public:
 	class CCommand_Point : public CBaseCommand
 	{
 	public:
-						CCommand_Point() : CBaseCommand( COMMAND_POINT ) {}
+						CCommand_Point() : CBaseCommand( COMMAND_POINT ), m_flPointSize{-1} {}
 
 		virtual void	Read( CFileRead *pFile );
 		virtual void	Write( IFileSystem* pFileSystem, FileHandle_t fp );
@@ -127,7 +127,7 @@ public:
 	class CCommand_RenderState : public CBaseCommand
 	{
 	public:
-						CCommand_RenderState() : CBaseCommand( COMMAND_RENDERSTATE ) {}
+						CCommand_RenderState() : CBaseCommand( COMMAND_RENDERSTATE ), m_State{0}, m_Val{0} {}
 
 		virtual void	Read( CFileRead *pFile );
 		virtual void	Write( IFileSystem* pFileSystem, FileHandle_t fp );

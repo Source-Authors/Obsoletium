@@ -515,15 +515,18 @@ void CScratchPad3D::DrawPolygonsForPixels(
 		vTopRight = vTopLeft + vTopXInc;
 		vBottomRight = vBottomLeft + vBottomXInc;
 
-		SPRGBA *pSrc = &pData[ y * (pitchInBytes/sizeof(SPRGBA)) ];
+		// dimhotepus: Do not derefence nullptr pData
+		SPRGBA *pSrc = pData ? &pData[ y * (pitchInBytes/sizeof(SPRGBA)) ] : nullptr;
 		for( int x=0; x < width; x++ )
 		{
-			if ( pData )
+			if ( pSrc )
+			{
 				DrawPolygon( CSPVertList( vPolyBox, 4, Vector(pSrc->r/255.1f, pSrc->g/255.1f, pSrc->b/255.1f) ) );
+				++pSrc;
+			}
 			else
 				DrawPolygon( CSPVertList( vPolyBox, 4, Vector(1,1,1) ) );
 			
-			++pSrc;
 			vTopLeft += vTopXInc;
 			vTopRight += vTopXInc;
 			vBottomLeft += vBottomXInc;

@@ -33,6 +33,7 @@ class CSPColor
 public:
 	CSPColor()
 	{
+		m_vColor.Init();
 		m_flAlpha = 1;
 	}
 	CSPColor( const Vector &vColor, float flAlpha=1 )
