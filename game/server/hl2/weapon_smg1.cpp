@@ -396,7 +396,8 @@ void CWeaponSMG1::SecondaryAttack( void )
 //-----------------------------------------------------------------------------
 int CWeaponSMG1::WeaponRangeAttack2Condition( float flDot, float flDist )
 {
-	CAI_BaseNPC *npcOwner = GetOwner()->MyNPCPointer();
+	// dimhotepus: Comment unused.
+	// CAI_BaseNPC *npcOwner = GetOwner()->MyNPCPointer();
 
 	return COND_NONE;
 
@@ -408,90 +409,91 @@ int CWeaponSMG1::WeaponRangeAttack2Condition( float flDot, float flDist )
 		return m_lastGrenadeCondition;
 */
 
-	// -----------------------
-	// If moving, don't check.
-	// -----------------------
-	if ( npcOwner->IsMoving())
-		return COND_NONE;
+	// dimhotepus: Comment unused.
+	//// -----------------------
+	//// If moving, don't check.
+	//// -----------------------
+	//if ( npcOwner->IsMoving())
+	//	return COND_NONE;
 
-	CBaseEntity *pEnemy = npcOwner->GetEnemy();
+	//CBaseEntity *pEnemy = npcOwner->GetEnemy();
 
-	if (!pEnemy)
-		return COND_NONE;
+	//if (!pEnemy)
+	//	return COND_NONE;
 
-	Vector vecEnemyLKP = npcOwner->GetEnemyLKP();
-	if ( !( pEnemy->GetFlags() & FL_ONGROUND ) && pEnemy->GetWaterLevel() == 0 && vecEnemyLKP.z > (GetAbsOrigin().z + WorldAlignMaxs().z) )
-	{
-		//!!!BUGBUG - we should make this check movetype and make sure it isn't FLY? Players who jump a lot are unlikely to 
-		// be grenaded.
-		// don't throw grenades at anything that isn't on the ground!
-		return COND_NONE;
-	}
-	
-	// --------------------------------------
-	//  Get target vector
-	// --------------------------------------
-	Vector vecTarget;
-	if (random->RandomInt(0,1))
-	{
-		// magically know where they are
-		vecTarget = pEnemy->WorldSpaceCenter();
-	}
-	else
-	{
-		// toss it to where you last saw them
-		vecTarget = vecEnemyLKP;
-	}
-	// vecTarget = m_vecEnemyLKP + (pEnemy->BodyTarget( GetLocalOrigin() ) - pEnemy->GetLocalOrigin());
-	// estimate position
-	// vecTarget = vecTarget + pEnemy->m_vecVelocity * 2;
+	//Vector vecEnemyLKP = npcOwner->GetEnemyLKP();
+	//if ( !( pEnemy->GetFlags() & FL_ONGROUND ) && pEnemy->GetWaterLevel() == 0 && vecEnemyLKP.z > (GetAbsOrigin().z + WorldAlignMaxs().z) )
+	//{
+	//	//!!!BUGBUG - we should make this check movetype and make sure it isn't FLY? Players who jump a lot are unlikely to 
+	//	// be grenaded.
+	//	// don't throw grenades at anything that isn't on the ground!
+	//	return COND_NONE;
+	//}
+	//
+	//// --------------------------------------
+	////  Get target vector
+	//// --------------------------------------
+	//Vector vecTarget;
+	//if (random->RandomInt(0,1))
+	//{
+	//	// magically know where they are
+	//	vecTarget = pEnemy->WorldSpaceCenter();
+	//}
+	//else
+	//{
+	//	// toss it to where you last saw them
+	//	vecTarget = vecEnemyLKP;
+	//}
+	//// vecTarget = m_vecEnemyLKP + (pEnemy->BodyTarget( GetLocalOrigin() ) - pEnemy->GetLocalOrigin());
+	//// estimate position
+	//// vecTarget = vecTarget + pEnemy->m_vecVelocity * 2;
 
 
-	if ( ( vecTarget - npcOwner->GetLocalOrigin() ).Length2D() <= COMBINE_MIN_GRENADE_CLEAR_DIST )
-	{
-		// crap, I don't want to blow myself up
-		m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.
-		return (COND_NONE);
-	}
+	//if ( ( vecTarget - npcOwner->GetLocalOrigin() ).Length2D() <= COMBINE_MIN_GRENADE_CLEAR_DIST )
+	//{
+	//	// crap, I don't want to blow myself up
+	//	m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.
+	//	return (COND_NONE);
+	//}
 
-	// ---------------------------------------------------------------------
-	// Are any friendlies near the intended grenade impact area?
-	// ---------------------------------------------------------------------
-	CBaseEntity *pTarget = NULL;
+	//// ---------------------------------------------------------------------
+	//// Are any friendlies near the intended grenade impact area?
+	//// ---------------------------------------------------------------------
+	//CBaseEntity *pTarget = NULL;
 
-	while ( ( pTarget = gEntList.FindEntityInSphere( pTarget, vecTarget, COMBINE_MIN_GRENADE_CLEAR_DIST ) ) != NULL )
-	{
-		//Check to see if the default relationship is hatred, and if so intensify that
-		if ( npcOwner->IRelationType( pTarget ) == D_LI )
-		{
-			// crap, I might blow my own guy up. Don't throw a grenade and don't check again for a while.
-			m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.
-			return (COND_WEAPON_BLOCKED_BY_FRIEND);
-		}
-	}
+	//while ( ( pTarget = gEntList.FindEntityInSphere( pTarget, vecTarget, COMBINE_MIN_GRENADE_CLEAR_DIST ) ) != NULL )
+	//{
+	//	//Check to see if the default relationship is hatred, and if so intensify that
+	//	if ( npcOwner->IRelationType( pTarget ) == D_LI )
+	//	{
+	//		// crap, I might blow my own guy up. Don't throw a grenade and don't check again for a while.
+	//		m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.
+	//		return (COND_WEAPON_BLOCKED_BY_FRIEND);
+	//	}
+	//}
 
-	// ---------------------------------------------------------------------
-	// Check that throw is legal and clear
-	// ---------------------------------------------------------------------
-	// FIXME: speed is based on difficulty...
+	//// ---------------------------------------------------------------------
+	//// Check that throw is legal and clear
+	//// ---------------------------------------------------------------------
+	//// FIXME: speed is based on difficulty...
 
-	Vector vecToss = VecCheckThrow( this, npcOwner->GetLocalOrigin() + Vector(0,0,60), vecTarget, 600.0, 0.5 );
-	if ( vecToss != vec3_origin )
-	{
-		m_vecTossVelocity = vecToss;
+	//Vector vecToss = VecCheckThrow( this, npcOwner->GetLocalOrigin() + Vector(0,0,60), vecTarget, 600.0, 0.5 );
+	//if ( vecToss != vec3_origin )
+	//{
+	//	m_vecTossVelocity = vecToss;
 
-		// don't check again for a while.
-		// JAY: HL1 keeps checking - test?
-		//m_flNextGrenadeCheck = gpGlobals->curtime;
-		m_flNextGrenadeCheck = gpGlobals->curtime + 0.3f; // 1/3 second.
-		return COND_CAN_RANGE_ATTACK2;
-	}
-	else
-	{
-		// don't check again for a while.
-		m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.
-		return COND_WEAPON_SIGHT_OCCLUDED;
-	}
+	//	// don't check again for a while.
+	//	// JAY: HL1 keeps checking - test?
+	//	//m_flNextGrenadeCheck = gpGlobals->curtime;
+	//	m_flNextGrenadeCheck = gpGlobals->curtime + 0.3f; // 1/3 second.
+	//	return COND_CAN_RANGE_ATTACK2;
+	//}
+	//else
+	//{
+	//	// don't check again for a while.
+	//	m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.
+	//	return COND_WEAPON_SIGHT_OCCLUDED;
+	//}
 }
 
 //-----------------------------------------------------------------------------
