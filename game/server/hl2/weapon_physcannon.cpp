@@ -149,10 +149,6 @@ public:
 			// See if it's a grabbable physics prop
 			if ( FClassnameIs( pEntity, "prop_physics" ) )
 			{
-				CPhysicsProp *pPhysProp = dynamic_cast<CPhysicsProp *>(pEntity);
-				if ( pPhysProp != NULL )
-					return pPhysProp->CanBePickedUpByPhyscannon();
-
 				// Somehow had a classname that didn't match the class!
 				Assert(0);
 			}
@@ -315,7 +311,7 @@ static QAngle AlignAngles( const QAngle &angles, float cosineAlignAngle )
 		{
 			if ( fabs(vec[i]) > cosineAlignAngle )
 			{
-				vec[i] = SIGN(vec[i]);
+				vec[i] = Sign(vec[i]);
 				vec[(i+1)%3] = 0;
 				vec[(i+2)%3] = 0;
 				MatrixSetColumn( vec, j, alignMatrix );
