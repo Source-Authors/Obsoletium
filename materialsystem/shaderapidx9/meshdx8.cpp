@@ -4189,7 +4189,7 @@ template<size_t vertsSize>
 static int ClipTriangleAgainstPlane( DirectX::XMFLOAT3* (&ppVert)[vertsSize], int nVertexCount,
 			DirectX::XMFLOAT3** ppOutVert, int normalInd, float val, bool nearClip = false )
 {
-	Assert( vertsSize <= (size_t)nVertexCount );
+	Assert( vertsSize >= (size_t)nVertexCount );
 
 	// Ye Olde Sutherland-Hodgman clipping algorithm
 	int numOutVerts = 0;
