@@ -14,6 +14,7 @@
 
 #include <dxgi.h>
 #include "com_ptr.h"
+#include "windows/scoped_com.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -29,10 +30,10 @@ size_t GetVidMemBytes( unsigned nAdapter )
 	if ( nBeenAdapter != UINT_MAX ) return nBytes;
 
 	nBeenAdapter = nAdapter;
-	
-	// Initialize COM
-	HRESULT hr{CoInitializeEx( nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY )};
-	if ( FAILED(hr) )
+
+	se::common::windows::ScopedCom scoped_com{
+		static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY)};
+	if ( FAILED(scoped_com.errc()) )
 	{
 		Warning( "Unable to get GPU VRAM size: COM initialization failure.\n" );
 		return 0;
@@ -40,7 +41,7 @@ size_t GetVidMemBytes( unsigned nAdapter )
 
 	// Windows 7+.
 	se::win::com::com_ptr<IDXGIFactory1> pDXGIFactory;
-	hr = CreateDXGIFactory1( IID_PPV_ARGS(&pDXGIFactory) );
+	HRESULT hr = CreateDXGIFactory1( IID_PPV_ARGS(&pDXGIFactory) );
 	if ( FAILED( hr ) )
 	{
 		Warning( "Failed to create the DXGI Factory #1!\n" );
@@ -64,9 +65,6 @@ size_t GetVidMemBytes( unsigned nAdapter )
 	}
 
 	nBytes = SUCCEEDED(hr) ? desc.DedicatedVideoMemory : 0;
-
-	// Cleanup
-	CoUninitialize();
 
 	return nBytes;
 }
