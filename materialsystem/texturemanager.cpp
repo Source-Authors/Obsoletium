@@ -1426,7 +1426,7 @@ CTextureManager::CTextureManager( void )
 , m_nAsyncReadThread( 0xFFFFFFFF )
 {
 	m_iNextTexID = 0;
-  m_nFlags = 0;
+	m_nFlags = 0;
 	m_pErrorTexture = NULL;
 	m_pBlackTexture = NULL;
 	m_pWhiteTexture = NULL;

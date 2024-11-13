@@ -1217,8 +1217,8 @@ void CTexture::ApplyRenderTargetSizeMode( int &width, int &height, ImageFormat f
 		case RT_SIZE_DEFAULT:
 		{
 			// Assume that the input is pow2.
-			Assert( ( width & ( width - 1 ) ) == 0 );
-			Assert( ( height & ( height - 1 ) ) == 0 );
+			Assert( IsPowerOfTwo ( width ) );
+			Assert( IsPowerOfTwo ( height ) );
 			int fbWidth, fbHeight;
 			MaterialSystem()->GetRenderTargetFrameBufferDimensions( fbWidth, fbHeight );
 			while( width > fbWidth )
