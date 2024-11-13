@@ -3,6 +3,9 @@
 // Microsoft Developer Studio generated include file.
 // Used by FileSystemOpenDialog.rc
 //
+
+#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "File System Open Dialog"
+
 #define IDS_NO_RELATIVE_PATH            1
 #define IDD_FILESYSTEM_OPENDIALOG       327
 #define IDB_LABEL_MDL                   328

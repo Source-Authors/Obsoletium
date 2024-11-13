@@ -6,6 +6,9 @@
 
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro LIBJPEGSRCDIR	"$SRCDIR\thirdparty\libjpeg-turbo"
+$Macro LIBJPEGSRC2DIR	"$LIBJPEGSRCDIR\out"
+$Macro LIBJPEGOUTDIR	"$LIBJPEGSRCDIR\out\Release"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -15,24 +18,27 @@ $Configuration
 	{
 		// Deprecated MBCS MFC libraries for VS 2013 (nafxcw.lib and nafxcwd.lib) can be downloaded from http://go.microsoft.com/?linkid=9832071
 		$PreprocessorDefinitions			"$BASE;NO_WARN_MBCS_MFC_DEPRECATION"
-		$AdditionalIncludeDirectories		"$BASE,..\common;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out"
-		$PreprocessorDefinitions			"$BASE;;WINVER=0x502"
+		$AdditionalIncludeDirectories		"$BASE,..\common;$LIBJPEGSRCDIR;$LIBJPEGSRC2DIR"
 		$Create/UsePrecompiledHeader		"Use Precompiled Header (/Yu)"
 		$PrecompiledHeaderFile				"Debug/FileSystemOpenDialog.pch"
 		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
 }
 
-$Project "FileSystemOpenDialog"
+$Project "filesystemopendialog"
 {
 	$Folder	"Source Files"
 	{
-		$File	"$SRCDIR\public\tier0\afxmem_override.cpp"
 		$File	"FileDialogApp.cpp"
 		$File	"FileDialogApp.h"
 		$File	"FileSystemOpenDlg.cpp"
 		$File	"FileSystemOpenDlg.h"
+		$File	"$SRCDIR\common\windows\base_dlg.h"
+		$File	"$SRCDIR\common\windows\base_dlg.cpp"
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.h"
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.cpp"
 		$File	"$SRCDIR\common\IFileSystemOpenDialog.h"
+		$File	"$SRCDIR\public\tier0\afxmem_override.cpp"
 		-$File	"$SRCDIR\public\tier0\memoverride.cpp"
 		$File	"$SRCDIR\public\tier0\memoverride.cpp"
 		{
@@ -71,6 +77,6 @@ $Project "FileSystemOpenDialog"
 
 	$Folder "Link Libraries"
 	{
-		$Lib	"$LIBCOMMON/jpeg-static"
+		$Libexternal	"$LIBJPEGOUTDIR/jpeg-static"
 	}
 }

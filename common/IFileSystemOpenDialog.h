@@ -1,16 +1,9 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-//=============================================================================//
 
 #ifndef IFILESYSTEMOPENDIALOG_H
 #define IFILESYSTEMOPENDIALOG_H
-#ifdef _WIN32
-#pragma once
-#endif
-
-
 
 #define FILESYSTEMOPENDIALOG_VERSION	"FileSystemOpenDlg003"
 
@@ -31,7 +24,7 @@ public:
 	virtual void AddFileMask( const char *pMask ) = 0;
 	virtual void SetInitialDir( const char *pDir, const char *pPathID = NULL ) = 0;
 	virtual void SetFilterMdlAndJpgFiles( bool bFilter ) = 0;
-	virtual void GetFilename( char *pOut, int outLen ) const = 0;	// Get the filename they chose.
+	virtual void GetFilename( INOUT_Z_CAP(outLen) char *pOut, int outLen ) const = 0;	// Get the filename they chose.
 
 	// Call this to make the dialog itself. Returns true if they clicked OK and false 
 	// if they canceled it.

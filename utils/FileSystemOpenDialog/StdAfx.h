@@ -21,6 +21,21 @@
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
+// Strict types mode.
+#ifndef STRICT
+#define STRICT
+#endif
+
+// Disable unused things to speedup compile.
+#define NOMINMAX
+#define NOWINRES
+#define NOSERVICE
+#define NOMCX
+#define NOIME
+
+// Access to Windows 10 features.
+#define _WIN32_WINNT 0x0A00
+
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 

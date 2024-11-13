@@ -24,6 +24,7 @@ static char THIS_FILE[] = __FILE__;
 
 CFileInfo::CFileInfo()
 {
+	m_bIsDir = false;
 	m_pBitmap = NULL;
 }
 
@@ -124,7 +125,7 @@ CBitmapCache g_BitmapCache;
 // CFileSystemOpenDlg dialog
 
 CFileSystemOpenDlg::CFileSystemOpenDlg(CreateInterfaceFn factory, CWnd* pParent )
-	: CDialog(CFileSystemOpenDlg::IDD, pParent)
+	: CBaseDlg(CFileSystemOpenDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CFileSystemOpenDlg)
 	//}}AFX_DATA_INIT
@@ -134,12 +135,16 @@ CFileSystemOpenDlg::CFileSystemOpenDlg(CreateInterfaceFn factory, CWnd* pParent 
 		Error( "Unable to connect to %s!\n", FILESYSTEM_INTERFACE_VERSION );
 	}
 
+	m_iLabel_Folder = -1;
+	m_iLabel_Mdl = -1;
+	m_iLabel_File = -1;
+
 	m_bFilterMdlAndJpgFiles = false;
 }
 
 void CFileSystemOpenDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	CBaseDlg::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CFileSystemOpenDlg)
 	DDX_Control(pDX, IDC_FILENAME_LABEL, m_FilenameLabel);
 	DDX_Control(pDX, IDC_FILENAME, m_FilenameControl);
@@ -149,7 +154,7 @@ void CFileSystemOpenDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CFileSystemOpenDlg, CDialog)
+BEGIN_MESSAGE_MAP(CFileSystemOpenDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CFileSystemOpenDlg)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
@@ -204,7 +209,7 @@ void CFileSystemOpenDlg::OnOK()
 		// No file or directory here.
 		CString str;
 		str.FormatMessage( "File %1!s! doesn't exist.", (const char*)fullFilename );
-		AfxMessageBox( str, MB_OK );
+		AfxMessageBox( str, MB_OK | MB_ICONEXCLAMATION );
 	}
 }
 
@@ -225,7 +230,7 @@ CString CFileSystemOpenDlg::GetFilename() const
 
 BOOL CFileSystemOpenDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	CBaseDlg::OnInitDialog();
 	
 	// Setup our anchor list.
 	AddAnchor( IDC_FILE_LIST, 2, 2 );
@@ -666,7 +671,7 @@ void CFileSystemOpenDlg::PopulateListControl()
 		m_FileList.InsertItem( &item );
 	}
 
-	m_FileList.SortItems( FileListSortCallback, (DWORD)this );
+	m_FileList.SortItems( FileListSortCallback, (DWORD_PTR)this );
 }
 
 void CFileSystemOpenDlg::AddFileMask( const char *pMask )
@@ -677,12 +682,12 @@ void CFileSystemOpenDlg::AddFileMask( const char *pMask )
 
 BOOL CFileSystemOpenDlg::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext) 
 {
-	return CDialog::Create(IDD, pParentWnd);
+	return CBaseDlg::Create(IDD, pParentWnd);
 }
 
 int CFileSystemOpenDlg::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
-	if (CDialog::OnCreate(lpCreateStruct) == -1)
+	if (CBaseDlg::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	return 0;
@@ -740,7 +745,7 @@ void CFileSystemOpenDlg::AddAnchor( int iDlgItem, int iSide, int iParentSide )
 
 void CFileSystemOpenDlg::OnSize(UINT nType, int cx, int cy) 
 {
-	CDialog::OnSize(nType, cx, cy);
+	CBaseDlg::OnSize(nType, cx, cy);
 	
 	for ( int i=0; i < m_Anchors.Count(); i++ )
 		ProcessAnchor( &m_Anchors[i] );	
@@ -799,7 +804,7 @@ void CFileSystemOpenDlg::OnItemchangedFileList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
 
-	DWORD iItem = m_FileList.GetItemData( pNMListView->iItem );
+	DWORD iItem = static_cast<DWORD>(m_FileList.GetItemData( pNMListView->iItem ));
 	if ( iItem < (DWORD)m_FileInfos.Count() )
 	{
 		CFileInfo *pInfo = &m_FileInfos[iItem];
@@ -838,7 +843,9 @@ class CFileSystemOpenDialogWrapper : public IFileSystemOpenDialog
 public:
 	CFileSystemOpenDialogWrapper()
 	{
-		m_pDialog = 0;
+		m_pDialog = nullptr;
+		m_hParentWnd = nullptr;
+		m_RelativeFilename[0] = '\0';
 		m_bLastModalWasWindowsDialog = false;
 	}
 
@@ -960,6 +967,7 @@ public:
 			OFN_ENABLESIZING,					// flags
 			filters,
 			CWnd::FromHandle( m_hParentWnd ) );
+		dlg.m_ofn.lpstrTitle = "Open File";
 
 		while ( dlg.DoModal() == IDOK )
 		{
@@ -978,7 +986,7 @@ public:
 			}
 			else
 			{
-				AfxMessageBox( IDS_NO_RELATIVE_PATH );
+				AfxMessageBox( IDS_NO_RELATIVE_PATH, MB_ICONINFORMATION );
 			}
 		}
 

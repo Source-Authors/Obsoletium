@@ -1,10 +1,7 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
 //
-// $NoKeywords: $
-//
-//=============================================================================//
+
 #if !defined(AFX_FILESYSTEMOPENDLG_H__01CFDE04_321F_4F1E_94ED_933B2B32C193__INCLUDED_)
 #define AFX_FILESYSTEMOPENDLG_H__01CFDE04_321F_4F1E_94ED_933B2B32C193__INCLUDED_
 
@@ -14,7 +11,8 @@
 // FileSystemOpenDlg.h : header file
 //
 
-#include "utlvector.h"
+#include "windows/base_dlg.h"
+#include "tier1/utlvector.h"
 #include "resource.h"
 #include "filesystem.h"
 
@@ -41,8 +39,7 @@ public:
 	CBitmap *m_pBitmap;
 };
 
-
-class CFileSystemOpenDlg : public CDialog
+class CFileSystemOpenDlg : public CBaseDlg
 {
 friend class CFileSystemOpenDialogWrapper;
 
