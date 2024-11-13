@@ -267,8 +267,8 @@ void CSprite::ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pV
 	if ( m_bWorldSpaceScale == false )
 	{
 		// Find the height and width of the source of the sprite
-		float width = modelinfo->GetModelSpriteWidth( GetModel() );
-		float height = modelinfo->GetModelSpriteHeight( GetModel() );
+		int width = modelinfo->GetModelSpriteWidth( GetModel() );
+		int height = modelinfo->GetModelSpriteHeight( GetModel() );
 		flScale *= MAX( width, height );
 	}
 
@@ -667,7 +667,7 @@ void CSprite::GetRenderBounds( Vector &vecMins, Vector &vecMaxs )
 		CEngineSprite *psprite = (CEngineSprite *) modelinfo->GetModelExtraData( GetModel() );
 		if ( psprite )
 		{
-			float flSize = MAX( psprite->GetWidth(), psprite->GetHeight() );
+			int flSize = MAX( psprite->GetWidth(), psprite->GetHeight() );
 			flScale *= flSize;
 		}
 	}
@@ -787,7 +787,7 @@ int CSprite::DrawModel( int flags )
 	if ( m_bWorldSpaceScale )
 	{
 		CEngineSprite *psprite = ( CEngineSprite * )modelinfo->GetModelExtraData( GetModel() );
-		float flMinSize = MIN( psprite->GetWidth(), psprite->GetHeight() );
+		int flMinSize = MIN( psprite->GetWidth(), psprite->GetHeight() );
 		renderscale /= flMinSize;
 	}
 
