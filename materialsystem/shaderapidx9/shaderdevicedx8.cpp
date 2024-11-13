@@ -1279,12 +1279,8 @@ unsigned CShaderDeviceMgrDx8::GetModeCount( unsigned nAdapter ) const
 	LOCK_SHADERAPI();
 	Assert( m_pD3D && (nAdapter < GetAdapterCount() ) );
 
-#if !defined( _X360 )
 	// fixme - what format should I use here?
 	return m_pD3D->GetAdapterModeCount( nAdapter, D3DFMT_X8R8G8B8 );
-#else
-	return 1; // Only one mode, which is the current mode set in the 360 dashboard.  Going to fill it in with exactly what the 360 is set to.
-#endif
 }
 
 
@@ -1299,27 +1295,17 @@ void CShaderDeviceMgrDx8::GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAda
 	Assert( m_pD3D && (nAdapter < GetAdapterCount() ) );
 	Assert( nMode < GetModeCount( nAdapter ) );
 
-#if !defined( _X360 )
-	HRESULT hr;
 	D3DDISPLAYMODE d3dInfo;
 
 	// fixme - what format should I use here?
-	hr = D3D()->EnumAdapterModes( nAdapter, D3DFMT_X8R8G8B8, nMode, &d3dInfo );
+	HRESULT hr = D3D()->EnumAdapterModes( nAdapter, D3DFMT_X8R8G8B8, nMode, &d3dInfo );
 	Assert( !FAILED(hr) );
 
-	pInfo->m_nWidth       = d3dInfo.Width;
-	pInfo->m_nHeight      = d3dInfo.Height;
+	pInfo->m_nWidth      = d3dInfo.Width;
+	pInfo->m_nHeight     = d3dInfo.Height;
 	pInfo->m_Format      = ImageLoader::D3DFormatToImageFormat( d3dInfo.Format );
 	pInfo->m_nRefreshRateNumerator = d3dInfo.RefreshRate;
 	pInfo->m_nRefreshRateDenominator = 1;
-#else
-	pInfo->m_Format = ImageLoader::D3DFormatToImageFormat( D3DFMT_X8R8G8B8 );
-	pInfo->m_nRefreshRateNumerator = 60;
-	pInfo->m_nRefreshRateDenominator = 1;
-
-	pInfo->m_nWidth = GetSystemMetrics( SM_CXSCREEN );
-	pInfo->m_nHeight = GetSystemMetrics( SM_CYSCREEN );
-#endif
 }
 
 
