@@ -233,17 +233,15 @@ struct SoundInfo_t
 				// bias results so that we only incur the precision loss on relatively large skipaheads
 				fDelay += SOUND_DELAY_OFFSET;
 
-				// Convert to msecs
-				int iDelay = fDelay * 1000.0f;
+				// Convert to ms
+				float msDelay = clamp( fDelay * 1000.f, -10.f * MAX_SOUND_DELAY_MSEC, 1.f * MAX_SOUND_DELAY_MSEC );
 
-				iDelay = clamp( iDelay, (int)(-10 * MAX_SOUND_DELAY_MSEC), (int)(MAX_SOUND_DELAY_MSEC) );
-
-				if ( iDelay < 0 )
+				if ( msDelay < 0.f )
 				{
-					iDelay /=10;	
+					msDelay /= 10.f;
 				}
 				
-				buffer.WriteSBitLong( iDelay , MAX_SOUND_DELAY_MSEC_ENCODE_BITS );
+				buffer.WriteSBitLong( static_cast<int>(msDelay), MAX_SOUND_DELAY_MSEC_ENCODE_BITS );
 			}
 
 			// don't transmit sounds with high precision
