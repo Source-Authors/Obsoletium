@@ -264,7 +264,7 @@ bool C_PhysPropClientside::Initialize()
 	}
 
 	// We want touch calls when we hit the world
-	unsigned int flags = VPhysicsGetObject()->GetCallbackFlags();
+	unsigned short flags = VPhysicsGetObject()->GetCallbackFlags();
 	VPhysicsGetObject()->SetCallbackFlags( flags | CALLBACK_GLOBAL_TOUCH_STATIC );
 
 	if ( m_spawnflags & SF_PHYSPROP_MOTIONDISABLED )
