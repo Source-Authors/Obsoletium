@@ -16,9 +16,8 @@
 //-----------------------------------------------------------------------------
 GDclass::GDclass(void)
 {
-	m_nVariables = 0;
+	Parent = nullptr;
 	m_bBase = false;
-	m_bSolid = false;
 	m_bBase = false;
 	m_bSolid = false;
 	m_bModel = false;
@@ -27,24 +26,28 @@ GDclass::GDclass(void)
 	m_bPoint = false;
 	m_bNPC = false;
 	m_bFilter = false;
-
 	m_bHalfGridSnap = false;
 
 	m_bGotSize = false;
 	m_bGotColor = false;
+	
+	m_szName[0] = '\0';
+	m_pszDescription = NULL;
 
 	m_rgbColor.r = 220;
 	m_rgbColor.g = 30;
 	m_rgbColor.b = 220;
 	m_rgbColor.a = 0;
 
-	m_pszDescription = NULL;
+	m_nVariables = 0;
 
 	for (int i = 0; i < 3; i++)
 	{
 		m_bmins[i] = -8;
 		m_bmaxs[i] = 8;
 	}
+
+	memset( m_VariableMap, 0, sizeof(m_VariableMap) );
 }
 
 
@@ -547,7 +550,7 @@ bool GDclass::ParseColor(TokenReader &tr)
 	{
 		return(false);
 	}
-	BYTE r = atoi(szToken);
+	unsigned char r = static_cast<unsigned char>(strtoul(szToken, nullptr, 10));
 
 	//
 	// Green.
@@ -556,7 +559,7 @@ bool GDclass::ParseColor(TokenReader &tr)
 	{
 		return(false);
 	}
-	BYTE g = atoi(szToken);
+	unsigned char g = static_cast<unsigned char>(strtoul(szToken, nullptr, 10));
 
 	//
 	// Blue.
@@ -565,7 +568,7 @@ bool GDclass::ParseColor(TokenReader &tr)
 	{
 		return(false);
 	}
-	BYTE b = atoi(szToken);
+	unsigned char b = static_cast<unsigned char>(strtoul(szToken, nullptr, 10));
 
 	m_rgbColor.r = r;
 	m_rgbColor.g = g;

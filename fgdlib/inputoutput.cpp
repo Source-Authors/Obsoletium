@@ -12,11 +12,11 @@
 #include <tier0/memdbgon.h>
 
 
-typedef struct
+struct TypeMap_t
 {
 	InputOutputType_t eType;	// The enumeration of this type.
 	char *pszName;				// The name of this type.
-} TypeMap_t;
+};
 
 
 char *CClassInputOutputBase::g_pszEmpty = "";
@@ -44,6 +44,7 @@ static TypeMap_t TypeMap[] =
 //-----------------------------------------------------------------------------
 CClassInputOutputBase::CClassInputOutputBase(void)
 {
+	m_szName[0] = '\0';
 	m_eType = iotInvalid;
 	m_pszDescription = NULL;
 }
@@ -56,6 +57,8 @@ CClassInputOutputBase::CClassInputOutputBase(void)
 //-----------------------------------------------------------------------------
 CClassInputOutputBase::CClassInputOutputBase(const char *pszName, InputOutputType_t eType)
 {
+	m_szName[0] = '\0';
+	m_eType = eType;
 	m_pszDescription = NULL;
 }
 

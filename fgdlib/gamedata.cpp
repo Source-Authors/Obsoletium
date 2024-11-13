@@ -2,21 +2,23 @@
 //
 //=============================================================================
 
-#include <windows.h>
-#include <tier0/dbg.h>
-#include <io.h>
-#include <WorldSize.h>
 #include "fgdlib/GameData.h"
+
+#include <io.h>
+
+#include "WorldSize.h"
 #include "fgdlib/HelperInfo.h"
-#include "KeyValues.h"
 #include "filesystem_tools.h"
+#include "tier0/dbg.h"
 #include "tier1/strtools.h"
-#include "utlmap.h"
+#include "tier1/utlmap.h"
+#include "tier1/KeyValues.h"
+
+#include "winlite.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#pragma warning(disable:4244)
 
 
 const int MAX_ERRORS = 5;
@@ -140,7 +142,7 @@ static bool DoGetToken(TokenReader &tr, char **ppszStore, int nSize, trtoken_t t
 //			error - 
 // Output : 
 //-----------------------------------------------------------------------------
-bool GDError(TokenReader &tr, const char *error, ...)
+bool GDError(TokenReader &tr, PRINTF_FORMAT_STRING const char *error, ...)
 {
 	char szBuf[128];
 	va_list vl;
@@ -242,6 +244,10 @@ GameData::GameData(void)
 {
 	m_nMaxMapCoord = 8192;
 	m_nMinMapCoord = -8192;
+	m_InstanceOrigin.Init();
+	m_InstanceAngle.Init();
+	memset(&m_InstanceMat, 0, sizeof(m_InstanceMat));
+	memset(m_InstancePrefix, 0, sizeof(m_InstancePrefix));
 	m_InstanceClass = NULL;
 }
 
@@ -638,7 +644,7 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 	}
 
 	GDIV_TYPE	KVType = KVVar->GetType();
-	int			KVRemapIndex = RemapOperation.Find( KVType );
+	auto			KVRemapIndex = RemapOperation.Find( KVType );
 	if ( KVRemapIndex == RemapOperation.InvalidIndex() )
 	{
 		return false;
@@ -659,7 +665,10 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 			{
 				Vector	inPoint( 0.0f, 0.0f, 0.0f ), outPoint;
 
-				sscanf ( pszInValue, "%f %f %f", &inPoint.x, &inPoint.y, &inPoint.z );
+				if ( sscanf ( pszInValue, "%f %f %f", &inPoint.x, &inPoint.y, &inPoint.z ) != 3 )
+				{
+					Warning( "'%s' is not a vector3.\n", pszInValue );
+				}
 				VectorTransform( inPoint, m_InstanceMat, outPoint );
 				sprintf( pszOutValue, "%g %g %g", outPoint.x, outPoint.y, outPoint.z );
 			}
@@ -671,7 +680,10 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 				QAngle		inAngles( 0.0f, 0.0f, 0.0f ), outAngles;
 				matrix3x4_t angToWorld, localMatrix;
 
-				sscanf ( pszInValue, "%f %f %f", &inAngles.x, &inAngles.y, &inAngles.z );
+				if ( sscanf ( pszInValue, "%f %f %f", &inAngles.x, &inAngles.y, &inAngles.z ) != 3 )
+				{
+					Warning( "'%s' is not a qangle.\n", pszInValue );
+				}
 
 				AngleMatrix( inAngles, angToWorld );
 				MatrixMultiply( m_InstanceMat, angToWorld, localMatrix );
@@ -687,7 +699,10 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 				QAngle		inAngles( 0.0f, 0.0f, 0.0f ), outAngles;
 				matrix3x4_t angToWorld, localMatrix;
 
-				sscanf ( pszInValue, "%f", &inAngles.x );	// just the pitch
+				if ( sscanf ( pszInValue, "%f", &inAngles.x ) != 1 )	// just the pitch
+				{
+					Warning( "'%s' is not a angle pitch value.\n", pszInValue );
+				}
 				inAngles.x = -inAngles.x;
 
 				AngleMatrix( inAngles, angToWorld );

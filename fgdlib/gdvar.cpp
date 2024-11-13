@@ -65,12 +65,16 @@ char *GDinputvariable::m_pszEmpty = "";
 //-----------------------------------------------------------------------------
 GDinputvariable::GDinputvariable(void)
 {
-	m_szDefault[0] = 0;
+	m_szName[0] = '\0';
+	m_szLongName[0] = '\0';
+	m_pszDescription = NULL;
+	m_eType = ivBadType;
 	m_nDefault = 0;
-	m_szValue[0] = 0;
+	m_szDefault[0] = '\0';
+	m_nValue = 0;
+	m_szValue[0] = '\0';
 	m_bReportable = FALSE;
 	m_bReadOnly = false;
-	m_pszDescription = NULL;
 }
 
 
@@ -443,7 +447,11 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 
 			// store bitflag value
 			GDGetToken(tr, szToken, sizeof(szToken), INTEGER);
-			sscanf( szToken, "%lu", &ivi.iValue );
+			// dimhotepus: Expect bitflag to be present.
+			if ( sscanf( szToken, "%lu", &ivi.iValue ) != 1 )
+			{
+				return FALSE;
+			}
 
 			// colon..
 			if (!GDSkipToken(tr, OPERATOR, ":"))

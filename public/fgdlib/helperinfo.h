@@ -56,8 +56,8 @@ inline CHelperInfo::CHelperInfo(void)
 //-----------------------------------------------------------------------------
 inline CHelperInfo::~CHelperInfo(void)
 {
-	int nCount = m_Parameters.Count();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = m_Parameters.Count();
+	for (intp i = 0; i < nCount; i++)
 	{
 		char *pszParam = m_Parameters.Element(i);
 		Assert(pszParam != NULL);
@@ -80,7 +80,7 @@ inline bool CHelperInfo::AddParameter(const char *pszParameter)
 {
 	if ((pszParameter != NULL) && (pszParameter[0] != '\0'))
 	{
-		int nLen = strlen(pszParameter);
+		size_t nLen = strlen(pszParameter);
 		
 		if (nLen > 0)
 		{

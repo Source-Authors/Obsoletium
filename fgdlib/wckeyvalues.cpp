@@ -92,13 +92,13 @@ void WCKVBase_Vector::InsertKeyValue( const MDkeyvalue &kv )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void WCKVBase_Dict::RemoveKeyAt(int nIndex)
+void WCKVBase_Dict::RemoveKeyAt(unsigned short nIndex)
 {
 	m_KeyValues.RemoveAt(nIndex);
 }
 
 
-int WCKVBase_Dict::FindByKeyName( const char *pKeyName ) const
+unsigned short WCKVBase_Dict::FindByKeyName( const char *pKeyName ) const
 {
 	return m_KeyValues.Find( pKeyName );
 }
@@ -139,7 +139,7 @@ WCKeyValuesT<Base>::~WCKeyValuesT(void)
 template<class Base>
 const char *WCKeyValuesT<Base>::GetValue(const char *pszKey, int *piIndex) const
 {
-	int i = FindByKeyName( pszKey );
+	auto i = FindByKeyName( pszKey );
 	if ( i == GetInvalidIndex() )
 	{
 		return NULL;
@@ -191,7 +191,7 @@ void StripEdgeWhiteSpace(char *psz)
 		psz++;
 	}
 
-	int iLen = strlen(psz) - 1;
+	ptrdiff_t iLen = V_strlen(psz) - 1;
 	
 	if ( iLen >= 0 )
 	{
@@ -233,7 +233,7 @@ void WCKeyValuesT<Base>::SetValue(const char *pszKey, const char *pszValue)
 	StripEdgeWhiteSpace(szTmpKey);
 	StripEdgeWhiteSpace(szTmpValue);
 
-	int i = FindByKeyName( szTmpKey );
+	auto i = FindByKeyName( szTmpKey );
 	if ( i == GetInvalidIndex() )
 	{
 		if ( pszValue )

@@ -21,6 +21,7 @@
 #include "TokenReader.h"
 #include "GDVar.h"
 #include "InputOutput.h"
+#include "Color.h"
 #include "mathlib/vector.h"
 
 class CHelperInfo;
@@ -80,14 +81,14 @@ class GDclass
 		// Interface to class attributes:
 		//
 		inline bool IsClass(const char *pszClass);
-		inline bool IsSolidClass(void) { return(m_bSolid); }
-		inline bool IsBaseClass(void) { return(m_bBase); }
-		inline bool IsMoveClass(void) { return(m_bMove); }
-		inline bool IsKeyFrameClass(void) { return(m_bKeyFrame); }
-		inline bool IsPointClass(void) { return(m_bPoint); }
-		inline bool IsNPCClass(void) { return(m_bNPC); }
-		inline bool IsFilterClass(void) { return(m_bFilter); }
-		inline bool IsNodeClass(void);
+		inline bool IsSolidClass(void) const { return(m_bSolid); }
+		inline bool IsBaseClass(void) const { return(m_bBase); }
+		inline bool IsMoveClass(void) const { return(m_bMove); }
+		inline bool IsKeyFrameClass(void) const { return(m_bKeyFrame); }
+		inline bool IsPointClass(void) const { return(m_bPoint); }
+		inline bool IsNPCClass(void) const { return(m_bNPC); }
+		inline bool IsFilterClass(void) const { return(m_bFilter); }
+		inline bool IsNodeClass(void) const;
 		static inline bool IsNodeClass(const char *pszClassName);
 
 		inline bool ShouldSnapToHalfGrid() { return m_bHalfGridSnap; }
@@ -100,19 +101,19 @@ class GDclass
 		inline void SetMoveClass(bool bMove) { m_bMove = bMove; }
 		inline void SetKeyFrameClass(bool bKeyFrame) { m_bKeyFrame = bKeyFrame; }
 
-		inline const Vector &GetMins(void) { return(m_bmins); }
-		inline const Vector &GetMaxs(void) { return(m_bmaxs); }
+		inline const Vector &GetMins(void) const { return(m_bmins); }
+		inline const Vector &GetMaxs(void) const { return(m_bmaxs); }
 		
 		BOOL GetBoundBox(Vector& pfMins, Vector& pfMaxs);
 		bool HasBoundBox() const { return m_bGotSize; }
 
-		inline color32 GetColor(void);
+		inline color32 GetColor(void) const;
 
 		//
 		// Interface to helper information:
 		//
 		inline void AddHelper(CHelperInfo *pHelper);
-		inline int GetHelperCount(void) { return(m_Helpers.Count()); }
+		inline int GetHelperCount(void) const { return(m_Helpers.Count()); }
 		CHelperInfo *GetHelper(int nIndex);
 
 	protected:
@@ -165,7 +166,7 @@ class GDclass
 		//	[0] = base number from Bases, or -1 if not in a base.
 		//	[1] = index into base's variables
 		//
-		signed short m_VariableMap[GD_MAX_VARIABLES][2];
+		int m_VariableMap[GD_MAX_VARIABLES][2];
 
 		Vector m_bmins;		// 3D minima of object (pointclass).
 		Vector m_bmaxs;		// 3D maxima of object (pointclass).
@@ -205,7 +206,7 @@ inline void GDclass::AddHelper(CHelperInfo *pHelper)
 //-----------------------------------------------------------------------------
 // Purpose: Returns the render color of this entity class.
 //-----------------------------------------------------------------------------
-color32 GDclass::GetColor(void)
+color32 GDclass::GetColor(void) const
 {
 	return m_rgbColor;
 }
@@ -251,7 +252,7 @@ bool GDclass::IsNodeClass(const char *pszClassName)
 //
 // HACK: if this is necessary, we should have a new @NodeClass FGD specifier (or something)
 //-----------------------------------------------------------------------------
-bool GDclass::IsNodeClass(void)
+bool GDclass::IsNodeClass(void) const
 {
 	return(IsNodeClass(m_szName));
 }

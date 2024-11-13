@@ -12,10 +12,7 @@
 #include <tier0/dbg.h>
 #include <utlvector.h>
 #include <utldict.h>
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
 
 
 #define KEYVALUE_MAX_KEY_LENGTH			80
@@ -138,12 +135,12 @@ public:
 
 	// Iteration helpers. Note that there is no GetCount() because you can't iterate
 	// these by incrementing a counter.
-	inline int GetFirst() const			{ return m_KeyValues.First(); }
-	inline int GetNext( int i ) const	{ return m_KeyValues.Next( i ); }
-	static inline int GetInvalidIndex()	{ return CUtlDict<MDkeyvalue,unsigned short>::InvalidIndex(); }
+	inline unsigned short GetFirst() const			{ return m_KeyValues.First(); }
+	inline unsigned short GetNext( unsigned short i ) const	{ return m_KeyValues.Next( i ); }
+	static inline unsigned short GetInvalidIndex()	{ return CUtlDict<MDkeyvalue,unsigned short>::InvalidIndex(); }
 
-	int FindByKeyName( const char *pKeyName ) const; // Returns the same value as GetInvalidIndex if not found.
-	void RemoveKeyAt(int nIndex);
+	unsigned short FindByKeyName( const char *pKeyName ) const; // Returns the same value as GetInvalidIndex if not found.
+	void RemoveKeyAt(unsigned short nIndex);
 
 protected:
 	void InsertKeyValue( const MDkeyvalue &kv );
@@ -168,10 +165,10 @@ public:
 	void SetValue(const char *pszKey, const char *pszValue);
 	void SetValue(const char *pszKey, int iValue);
 
-	const char *GetKey(int nIndex) const;
-	MDkeyvalue &GetKeyValue(int nIndex);
-	const MDkeyvalue& GetKeyValue(int nIndex) const;
-	const char *GetValue(int nIndex) const;
+	const char *GetKey(unsigned short nIndex) const;
+	MDkeyvalue &GetKeyValue(unsigned short nIndex);
+	const MDkeyvalue& GetKeyValue(unsigned short nIndex) const;
+	const char *GetValue(unsigned short nIndex) const;
 	const char *GetValue(const char *pszKey, int *piIndex = NULL) const;
 };
 
@@ -186,7 +183,7 @@ typedef WCKeyValuesT<WCKVBase_Vector> WCKeyValuesVector;
 // Input  : nIndex - 
 //-----------------------------------------------------------------------------
 template<class Base>
-inline const char *WCKeyValuesT<Base>::GetKey(int nIndex) const
+inline const char *WCKeyValuesT<Base>::GetKey(unsigned short nIndex) const
 {
 	return(m_KeyValues.Element(nIndex).szKey);
 }
@@ -198,7 +195,7 @@ inline const char *WCKeyValuesT<Base>::GetKey(int nIndex) const
 // Output : MDKeyValue
 //-----------------------------------------------------------------------------
 template<class Base>
-inline MDkeyvalue &WCKeyValuesT<Base>::GetKeyValue(int nIndex)
+inline MDkeyvalue &WCKeyValuesT<Base>::GetKeyValue(unsigned short nIndex)
 {
 	return(m_KeyValues.Element(nIndex));
 }
@@ -210,7 +207,7 @@ inline MDkeyvalue &WCKeyValuesT<Base>::GetKeyValue(int nIndex)
 // Output : MDkeyvalue
 //-----------------------------------------------------------------------------
 template<class Base>
-inline const MDkeyvalue& WCKeyValuesT<Base>::GetKeyValue(int nIndex) const
+inline const MDkeyvalue& WCKeyValuesT<Base>::GetKeyValue(unsigned short nIndex) const
 {
 	return(m_KeyValues.Element(nIndex));
 }
@@ -221,7 +218,7 @@ inline const MDkeyvalue& WCKeyValuesT<Base>::GetKeyValue(int nIndex) const
 // Input  : nIndex - 
 //-----------------------------------------------------------------------------
 template<class Base>
-inline const char *WCKeyValuesT<Base>::GetValue(int nIndex) const
+inline const char *WCKeyValuesT<Base>::GetValue(unsigned short nIndex) const
 {
 	return(m_KeyValues.Element(nIndex).szValue);
 }
