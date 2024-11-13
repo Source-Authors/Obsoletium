@@ -56,6 +56,8 @@
 CChunkHandlerMap::CChunkHandlerMap(void)
 {
 	m_pHandlers = NULL;
+	m_pfnErrorHandler = NULL;
+	m_pErrorData = NULL;
 }
 
 
@@ -161,8 +163,17 @@ ChunkHandler_t CChunkHandlerMap::GetHandler(const char *pszChunkName, void **ppD
 CChunkFile::CChunkFile(void)
 {
 	m_hFile = NULL;
-	m_nCurrentDepth = 0;
+	m_szErrorToken[0] = '\0';
 	m_szIndent[0] = '\0';
+	m_nCurrentDepth = 0;
+	m_DefaultChunkHandler = NULL;
+	m_pDefaultChunkHandlerData = NULL;
+
+	for (auto &h : m_HandlerStack)
+	{
+		h = nullptr;
+	}
+
 	m_nHandlerStackDepth = 0;
 	m_DefaultChunkHandler = 0;
 }

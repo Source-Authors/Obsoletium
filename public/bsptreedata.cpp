@@ -120,7 +120,7 @@ void DestroyBSPTreeData( IBSPTreeData* pTreeData )
 // constructor, destructor
 //-----------------------------------------------------------------------------
 
-CBSPTreeData::CBSPTreeData()
+CBSPTreeData::CBSPTreeData() : m_pBSPTree{nullptr}
 {
 }
 

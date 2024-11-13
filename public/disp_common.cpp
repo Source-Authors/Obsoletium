@@ -444,7 +444,7 @@ bool DoesPointHaveAnyNeighbors(
 CDispSubEdgeIterator::CDispSubEdgeIterator()
 {
 	m_pNeighbor = 0;
-	m_FreeDim = m_Index.x = m_Inc.x = m_End = 0;	// Setup so Next returns false.
+	m_FreeDim = m_Index.x = m_Inc.x = m_NBIndex.x = m_NBInc.x = m_End = 0;	// Setup so Next returns false.
 }
 
 

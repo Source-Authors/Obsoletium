@@ -597,7 +597,7 @@ bool CDispCollTree::AABBTree_Ray( const Ray_t &ray, const Vector &vecInvDelta, R
 
 void CDispCollTree::AABBTree_TreeTrisRayBarycentricTest( const Ray_t &ray, const Vector &vecInvDelta, int iNode, RayDispOutput_t &output, CDispCollTri **pImpactTri )
 {
-	rayleaflist_t list;
+	rayleaflist_t list = {};
 	// NOTE: This part is loop invariant - should be hoisted up as far as possible
 	list.invDelta.DuplicateVector(vecInvDelta);
 	list.rayStart.DuplicateVector(ray.m_Start);
@@ -683,7 +683,7 @@ bool CDispCollTree::AABBTree_Ray( const Ray_t &ray, const Vector &vecInvDelta, C
 //-----------------------------------------------------------------------------
 void CDispCollTree::AABBTree_TreeTrisRayTest( const Ray_t &ray, const Vector &vecInvDelta, int iNode, CBaseTrace *pTrace, bool bSide, CDispCollTri **pImpactTri )
 {
-	rayleaflist_t list;
+	rayleaflist_t list = {};
 	// NOTE: This part is loop invariant - should be hoisted up as far as possible
 	list.invDelta.DuplicateVector(vecInvDelta);
 	list.rayStart.DuplicateVector(ray.m_Start);
@@ -903,7 +903,7 @@ bool CDispCollTree::AABBTree_SweepAABB( const Ray_t &ray, const Vector &vecInvDe
 	// Save fraction.
 	float flFrac = pTrace->fraction;
 	
-	rayleaflist_t list;
+	rayleaflist_t list = {};
 	// NOTE: This part is loop invariant - should be hoisted up as far as possible
 	list.invDelta.DuplicateVector(vecInvDelta);
 	list.rayStart.DuplicateVector(ray.m_Start);
@@ -1420,6 +1420,8 @@ CDispCollTree::CDispCollTree()
 #ifdef ENGINE_DLL
 	m_hCache = INVALID_MEMHANDLE;
 #endif
+
+	m_nSize = 0;
 }
 
 //-----------------------------------------------------------------------------

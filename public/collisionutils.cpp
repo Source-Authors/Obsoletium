@@ -1588,7 +1588,7 @@ bool IntersectRayWithOBB( const Ray_t &ray, const matrix3x4_t &matOBBToWorld,
 		// the ray extents with the plane normal
 		// For the OBB planes, do it in world space; 
 		// and use the direction of the OBB (the ith column of matOBBToWorld) in world space vs extents
-		pPlaneNormal[i].Init( );
+		pPlaneNormal[i] = Vector(0, 0, 0);
 		pPlaneNormal[i][i] = 1.0f;
 
 		float flExtentDotNormal = 
