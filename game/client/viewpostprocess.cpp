@@ -1019,18 +1019,18 @@ void CLuminanceHistogramSystem::DisplayHistogram( void )
 		float flAutoExposureMax;
 		GetExposureRange( &flAutoExposureMin, &flAutoExposureMax );
 
-		float flBarWidth = 600.0f;
-		float flBarStart = dest_width - flBarWidth - 10.0f;
+		constexpr int nBarWidth = 600;
+		const int nBarStart = dest_width - nBarWidth - 10;
 
-		pRenderContext->Viewport( flBarStart, 4 + HISTOGRAM_BAR_SIZE - 4 + 75, flBarWidth, 4 );
+		pRenderContext->Viewport( nBarStart, 4 + HISTOGRAM_BAR_SIZE - 4 + 75, nBarWidth, 4 );
 		pRenderContext->ClearColor3ub( 200, 200, 200 );
 		pRenderContext->ClearBuffers( true, true );
 
-		pRenderContext->Viewport( flBarStart, 4 + HISTOGRAM_BAR_SIZE - 4 + 75 + 1, flBarWidth, 2 );
+		pRenderContext->Viewport( nBarStart, 4 + HISTOGRAM_BAR_SIZE - 4 + 75 + 1, nBarWidth, 2 );
 		pRenderContext->ClearColor3ub( 0, 0, 0 );
 		pRenderContext->ClearBuffers( true, true );
 
-		pRenderContext->Viewport( flBarStart + ( flBarWidth * ( ( pRenderContext->GetToneMappingScaleLinear().x - flAutoExposureMin ) / ( flAutoExposureMax - flAutoExposureMin ) ) ),
+		pRenderContext->Viewport( nBarStart + ( nBarWidth * ( ( pRenderContext->GetToneMappingScaleLinear().x - flAutoExposureMin ) / ( flAutoExposureMax - flAutoExposureMin ) ) ),
 								  4 + HISTOGRAM_BAR_SIZE - 4 + 75 - 6, 4, 16 );
 		pRenderContext->ClearColor3ub( 255, 0, 0 );
 		pRenderContext->ClearBuffers( true, true );
@@ -1236,8 +1236,8 @@ void CEnginePostMaterialProxy::SetupEnginePostMaterialAA( bool bPerformSoftwareA
 		// NOTE: this order matches pixel shader constants in Engine_Post_ps2x.fxc
 		s_vBloomAAValues[0]  = flAAStrength;
 		s_vBloomAAValues[1]  = 1.0f - mat_software_aa_blur_one_pixel_lines.GetFloat();
-		s_vBloomAAValues[2]  = mat_software_aa_quality.GetInt();
-		s_vBloomAAValues[3]  = mat_software_aa_debug.GetInt();
+		s_vBloomAAValues[2]  = mat_software_aa_quality.GetFloat();
+		s_vBloomAAValues[3]  = mat_software_aa_debug.GetFloat();
 		s_vBloomAAValues2[0] = mat_software_aa_edge_threshold.GetFloat();
 		s_vBloomAAValues2[1] = mat_software_aa_tap_offset.GetFloat();
 		//s_vBloomAAValues2[2] = unused;
