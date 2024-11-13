@@ -2207,8 +2207,7 @@ int GetNodeNeighborNodeFromNeighborSurf( int power, int index, int direction, in
 }
 
 
-
-// Turn the optimizer back on
+// dimhotepus: Reenable optimizer.
 // #pragma optimize( "", on )
 
 //-----------------------------------------------------------------------------
