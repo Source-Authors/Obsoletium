@@ -1665,8 +1665,11 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 	rec.signature = PKID( 5, 6 );
 	rec.numberOfThisDisk = 0;
 	rec.numberOfTheDiskWithStartOfCentralDirectory = 0;
-	rec.nCentralDirectoryEntries_ThisDisk = realNumFiles;
-	rec.nCentralDirectoryEntries_Total = realNumFiles;
+
+	Assert(realNumFiles <= USHRT_MAX);
+
+	rec.nCentralDirectoryEntries_ThisDisk = static_cast<unsigned short>(realNumFiles);
+	rec.nCentralDirectoryEntries_Total = static_cast<unsigned short>(realNumFiles);
 	rec.centralDirectorySize = centralDirEnd - centralDirStart;
 	rec.startOfCentralDirOffset = centralDirStart;
 
