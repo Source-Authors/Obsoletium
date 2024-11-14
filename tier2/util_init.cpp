@@ -20,18 +20,18 @@ static void PrintFReportHandler(char const *job_name, int total_units_to_do, int
 	if ( Q_strncmp( LastJobName, job_name, sizeof( LastJobName ) ) )
 	{
 		if ( work_in_progress )
-			printf("..done\n");
+			Msg("..done\n");
 		Q_strncpy( LastJobName, job_name, sizeof( LastJobName ) );
 	}
  	if ( (total_units_to_do > 0 ) && (total_units_to_do >= n_units_completed) )
 	{
 		int percent_done=(100*n_units_completed)/total_units_to_do;
-		printf("\r%s : %d%%",LastJobName, percent_done );
+		Msg("\r%s : %d%%",LastJobName, percent_done );
 		work_in_progress = true;
 	}
 	else
 	{
-		printf("%s\n",LastJobName);
+		Msg("%s\n",LastJobName);
 		work_in_progress = false;
 	}
 }
