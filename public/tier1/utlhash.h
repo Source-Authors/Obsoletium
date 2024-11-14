@@ -198,8 +198,8 @@ inline UtlHashHandle_t CUtlHash<Data, C, K>::BuildHandle( intp ndxBucket, intp n
 	Assert( ( ndxBucket >= 0 ) && ( ndxBucket <= UINT_MAX ) );
 	Assert( ( ndxKeyData >= 0 ) && ( ndxKeyData <= UINT_MAX ) );
 #else
-	Assert( ( ndxBucket >= 0 ) && ( ndxBucket < USHRT_MAX ) );
-	Assert( ( ndxKeyData >= 0 ) && ( ndxKeyData < USHRT_MAX ) );
+	Assert( ( ndxBucket >= 0 ) && ( ndxBucket <= USHRT_MAX ) );
+	Assert( ( ndxKeyData >= 0 ) && ( ndxKeyData <= USHRT_MAX ) );
 #endif
 
 	UtlHashHandle_t handle = ndxKeyData;
