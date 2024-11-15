@@ -590,7 +590,7 @@ bool CRConServer::HandleFailedRconAuth( const netadr_t & adr )
 	// check if the user should be banned based on total failed attempts
 	if ( failedRcon->badPasswordCount > sv_rcon_maxfailures.GetInt() )
 	{
-		ConMsg( "Banning %s for rcon hacking attempts\n", failedRcon->adr.ToString( true ) );
+		ConMsg( "Banning %s for overflowing total rcon authentication attempts\n", failedRcon->adr.ToString( true ) );
 		Cbuf_AddText( va( "addip %i %s\n", sv_rcon_banpenalty.GetInt(), failedRcon->adr.ToString( true ) ) );
 		Cbuf_Execute();
 		return true;
@@ -607,7 +607,7 @@ bool CRConServer::HandleFailedRconAuth( const netadr_t & adr )
 	}
 	if ( recentFailures > sv_rcon_minfailures.GetInt() )
 	{
-		ConMsg( "Banning %s for rcon hacking attempts\n", failedRcon->adr.ToString( true ) );
+		ConMsg( "Banning %s for overflowing recent rcon authentication attempts\n", failedRcon->adr.ToString( true ) );
 		Cbuf_AddText( va( "addip %i %s\n", sv_rcon_banpenalty.GetInt(), failedRcon->adr.ToString( true ) ) );
 		Cbuf_Execute();
 		return true;

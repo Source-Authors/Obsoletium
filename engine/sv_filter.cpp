@@ -7,8 +7,9 @@
 
 
 #include "server_pch.h"
-#include "vfilter.h" // Renamed to avoid conflict with Microsoft's filter.h
 #include "sv_filter.h"
+
+#include "vfilter.h" // Renamed to avoid conflict with Microsoft's filter.h
 #include "sv_steamauth.h"
 #include "GameEventManager.h"
 #include "proto_oob.h"
@@ -20,7 +21,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-static ConVar sv_filterban( "sv_filterban", "1", 0, "Set packet filtering by IP mode" );
+// dimhotepus: Restrict values to 0...1.
+static ConVar sv_filterban( "sv_filterban", "1", 0, "Set packet filtering by IP mode", true, 0, true, 1 );
 
 CUtlVector< ipfilter_t > g_IPFilters;
 CUtlVector< userfilter_t > g_UserFilters;
@@ -51,12 +53,12 @@ bool Filter_ShouldDiscard( const netadr_t& adr )
 		return false;
 	}
 
-	bool bNegativeFilter = sv_filterban.GetInt() == 1;
+	const bool bNegativeFilter = sv_filterban.GetInt() == 1;
 
 	unsigned in = *(unsigned *)&adr.ip[0];
 
 	// Handle timeouts 
-	for ( int i = g_IPFilters.Count() - 1 ; i >= 0 ; i--)
+	for ( intp i = g_IPFilters.Count() - 1 ; i >= 0 ; i--)
 	{
 		if ( ( g_IPFilters[i].compare != 0xffffffff) &&
 			 ( g_IPFilters[i].banEndTime != 0.0f ) &&
@@ -82,13 +84,13 @@ bool Filter_ShouldDiscard( const netadr_t& adr )
 //			*f - 
 // Output : bool Filter_ConvertString
 //-----------------------------------------------------------------------------
-bool Filter_ConvertString( const char *s, ipfilter_t *f )
+static bool Filter_ConvertString( const char *s, ipfilter_t *f )
 {
-	char	num[128];
-	int		i, j;
+	char	num[16];
 	alignas(unsigned) byte	b[4];
 	alignas(unsigned) byte	m[4];
 	
+	int i;
 	for (i=0 ; i<4 ; i++)
 	{
 		b[i] = 0;
@@ -99,22 +101,37 @@ bool Filter_ConvertString( const char *s, ipfilter_t *f )
 	{
 		if (*s < '0' || *s > '9')
 		{
-			ConMsg("Bad filter address: %s\n", s);
+			ConMsg("Bad filter address: %s.\n", s);
 			return false;
 		}
 		
-		j = 0;
-		while (*s >= '0' && *s <= '9')
+		int j = 0;
+		while (j < ssize(num) && *s >= '0' && *s <= '9')
 		{
 			num[j++] = *s++;
 		}
-		num[j] = 0;
+
+		if (j == ssize(num))
+		{
+			ConMsg("Bad filter address: %s.\n", s);
+			return false;
+		}
+
+		num[j] = '\0';
+
 		b[i] = atoi(num);
 		if (b[i] != 0)
 			m[i] = 255;
 
 		if (!*s)
 			break;
+
+		if (s[0] != '.')
+		{
+			ConMsg("Bad filter address, expect ddd.ddd.ddd.ddd\n");
+			return false;
+		}
+
 		s++;
 	}
 	
@@ -129,8 +146,6 @@ bool Filter_ConvertString( const char *s, ipfilter_t *f )
 //-----------------------------------------------------------------------------
 static void Filter_Add_f( const CCommand& args )
 {
-	intp		i = 0;
-	float		banTime;
 	bool		bKick = true;
 	bool		bFound = false;
 	char		szDuration[256];
@@ -138,12 +153,21 @@ static void Filter_Add_f( const CCommand& args )
 
 	if ( !Q_stricmp( args[0], "banip" ) )
 	{
-		ConMsg( "Note: should use \"addip\" instead of \"banip\".\n" );
+		ConWarning( "Please use \"addip\" instead of \"banip\".\n" );
 	}
 
 	if ( args.ArgC() != 3 )
 	{
-		ConMsg( "Usage:  addip < minutes > < ipaddress >\nUse 0 minutes for permanent\n" );
+		ConMsg( "Usage: addip <minutes> <ipaddress>\nUse 0 minutes for permanent.\n" );
+		return;
+	}
+
+	// dimhotepus: atof -> strtof
+	char *end = nullptr;
+	float banTime = strtof( args[1], &end );
+	if ( !Q_isempty(end) )
+	{
+		ConMsg( "Usage: addip <minutes> <ipaddress>\nUse 0 minutes for permanent.\n" );
 		return;
 	}
 
@@ -151,9 +175,11 @@ static void Filter_Add_f( const CCommand& args )
 	if ( !Filter_ConvertString( args[2], &f ) )
 		return;
 
+	intp i;
 	for (i=0 ; i<g_IPFilters.Count(); i++)
 	{
-		if ( g_IPFilters[i].compare == 0xffffffff || ( g_IPFilters[i].compare == f.compare && g_IPFilters[i].mask == f.mask ) )
+		if ( g_IPFilters[i].compare == 0xffffffff ||
+			( g_IPFilters[i].compare == f.compare && g_IPFilters[i].mask == f.mask ) )
 			break;		// free spot
 	}
 	
@@ -161,7 +187,7 @@ static void Filter_Add_f( const CCommand& args )
 	{
 		if (g_IPFilters.Count() == MAX_IPFILTERS)
 		{
-			ConMsg( "addip:  IP filter list is full\n" );
+			ConMsg( "addip: IP filter list is full (max %zd).\n", MAX_IPFILTERS );
 			return;
 		}
 
@@ -172,15 +198,13 @@ static void Filter_Add_f( const CCommand& args )
 		// updating in-place, so don't kick people
 		bKick = false;
 	}
-	// dimhotepus: atof -> strtof
-	banTime = strtof( args[1], nullptr );
+	
 	if (banTime < 0.01f)
 	{
 		banTime = 0.0f;
 	}
-	
-	g_IPFilters[i].banTime = banTime;
 
+	g_IPFilters[i].banTime = banTime;
 	// Time to unban.
 	g_IPFilters[i].banEndTime = ( banTime != 0.0F ) ? ( realtime + 60.0F * banTime ) : 0.0F;
 
@@ -210,19 +234,17 @@ static void Filter_Add_f( const CCommand& args )
 	}
 
 	// Build a duration string for the ban
-	if ( banTime == 0.0 )
+	if ( banTime == 0.0f )
 	{
-		Q_snprintf( szDuration, sizeof( szDuration ), "permanently" );
+		V_sprintf_safe( szDuration, "permanently" );
 	}
 	else
 	{
-		Q_snprintf( szDuration, sizeof( szDuration ), "for %.2f minutes", banTime );
+		V_sprintf_safe( szDuration, "for %.2f minutes", banTime );
 	}
 	
 	// fire the event
-
 	IGameEvent *event = g_GameEventManager.CreateEvent( "server_addban" );
-
 	if ( event )
 	{
 		if ( bFound && client )
@@ -255,7 +277,7 @@ static void Filter_Add_f( const CCommand& args )
 
 // IP Address filtering ConCommands
 static ConCommand addip( "addip", Filter_Add_f, "Add an IP address to the ban list." );
-static ConCommand banip( "banip", Filter_Add_f, "Add an IP address to the ban list." );
+static ConCommand banip( "banip", Filter_Add_f, "Add an IP address to the ban list (obsolete, use addip)." );
 
 
 //-----------------------------------------------------------------------------
@@ -263,80 +285,76 @@ static ConCommand banip( "banip", Filter_Add_f, "Add an IP address to the ban li
 //-----------------------------------------------------------------------------
 CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 {
-	ipfilter_t	f;
-	int			i;
-
 	if ( args.ArgC() < 1 )
 	{
-		ConMsg( "Usage:  removeip < slot | ipaddress >\n" );
+		ConMsg( "Usage: removeip <slot | ipaddress>\n" );
 		return;
 	}
 
 	// if no "." in the string we'll assume it's a slot number
-	if ( !Q_strstr( args[1], "." ) )
+	if ( !V_strstr( args[1], "." ) )
 	{
-		int slot = Q_atoi( args[1] );
-		if ( slot > 0 && slot <= g_IPFilters.Count() )
+		int slot = V_atoi( args[1] );
+		if ( slot <= 0 || slot > g_IPFilters.Count() )
 		{
-			byte b[4];
-			char szIP[32];
-
-			// array access is zero based
-			slot--;
-
-			memcpy( b, &g_IPFilters[slot].compare, sizeof(b) );
-			Q_snprintf( szIP, sizeof( szIP ), "%3i.%3i.%3i.%3i", b[0], b[1], b[2], b[3] );
-
-			g_IPFilters.Remove( slot );
-
-			// Tell server operator
-			ConMsg( "removeip:  filter removed for %s, IP %s\n", args[1], szIP );
-
-			// send an event
-			IGameEvent *event = g_GameEventManager.CreateEvent( "server_removeban" );
-			if ( event )
-			{
-				event->SetString( "networkid", "" );
-				event->SetString( "ip", szIP );
-				event->SetString( "by", ( cmd_source == src_command ) ? "Console" : host_client->m_Name );
-
-				g_GameEventManager.FireEvent( event );
-			}
+			ConMsg( "removeip: Invalid slot %i\n", slot );
+			return;
 		}
-		else
+
+		// array access is zero based
+		byte b[4];
+		memcpy( b, &g_IPFilters[--slot].compare, sizeof(b) );
+
+		g_IPFilters.Remove( slot );
+		
+		char szIP[32];
+		V_sprintf_safe( szIP, "%i.%i.%i.%i", b[0], b[1], b[2], b[3] );
+		// Tell server operator
+		ConMsg( "removeip: Filter removed for %s, IP %s\n", args[1], szIP );
+
+		// send an event
+		IGameEvent *event = g_GameEventManager.CreateEvent( "server_removeban" );
+		if ( event )
 		{
-			ConMsg( "removeip:  invalid slot %i\n", slot );
+			event->SetString( "networkid", "" );
+			event->SetString( "ip", szIP );
+			event->SetString( "by", ( cmd_source == src_command ) ? "Console" : host_client->m_Name );
+
+			g_GameEventManager.FireEvent( event );
 		}
 
 		return;
 	}
 
+	ipfilter_t	f;
 	if ( !Filter_ConvertString( args[1], &f ) )
 		return;
 
-	for ( i = 0 ; i < g_IPFilters.Count() ; i++ )
+	for ( intp i = 0 ; i < g_IPFilters.Count() ; i++ )
 	{
 		if ( ( g_IPFilters[i].mask == f.mask ) &&
 			 ( g_IPFilters[i].compare == f.compare ) )
 		{
 			g_IPFilters.Remove(i);
-			ConMsg( "removeip:  filter removed for %s\n", args[1] );
+
+			ConMsg( "removeip: filter removed for %s\n", args[1] );
 
 			// send an event
 			IGameEvent *event = g_GameEventManager.CreateEvent( "server_removeban" );
-
 			if ( event )
 			{
 				event->SetString( "networkid", "" );
 				event->SetString( "ip", args[1] );
 				event->SetString( "by", ( cmd_source == src_command ) ? "Console" : host_client->m_Name );
+
 				g_GameEventManager.FireEvent( event );
 			}
 
 			return;
 		}
 	}
-	ConMsg( "removeip:  couldn't find %s\n", args[1] );
+
+	ConMsg( "removeip: Couldn't find %s\n", args[1] );
 }
 
 
@@ -345,10 +363,7 @@ CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 //-----------------------------------------------------------------------------
 CON_COMMAND( listip, "List IP addresses on the ban list." )
 {
-	int		i;
-	byte	b[4];
-	int		count = g_IPFilters.Count();
-
+	const intp count = g_IPFilters.Count();
 	if ( !count )
 	{
 		ConMsg( "IP filter list: empty\n" );
@@ -356,27 +371,21 @@ CON_COMMAND( listip, "List IP addresses on the ban list." )
 	}
 	else
 	{
-		if ( count == 1 )
-		{
-			ConMsg( "IP filter list: %i entry\n", count );
-		}
-		else
-		{
-			ConMsg( "IP filter list: %i entries\n", count );
-		}
+		ConMsg( "IP filter list: %zd entr%s\n", count, count == 1 ? "y" : "ies" );
 	}
-
-	for ( i = 0 ; i < count ; i++ )
+	
+	byte b[4];
+	for ( intp i = 0 ; i < count ; i++ )
 	{
 		memcpy( b, &g_IPFilters[i].compare, sizeof(b) );
 
 		if ( g_IPFilters[i].banTime != 0.0f )
 		{
-			ConMsg( "%i %3i.%3i.%3i.%3i : %.3f min\n", i+1, b[0], b[1], b[2], b[3], g_IPFilters[i].banTime );
+			ConMsg( "%i %i.%i.%i.%i: %.3f min\n", i+1, b[0], b[1], b[2], b[3], g_IPFilters[i].banTime );
 		}
 		else
 		{
-			ConMsg( "%i %3i.%3i.%3i.%3i : permanent\n", i+1, b[0], b[1], b[2], b[3] );
+			ConMsg( "%i %i.%i.%i.%i: permanent\n", i+1, b[0], b[1], b[2], b[3] );
 		}
 	}
 }
@@ -387,26 +396,24 @@ CON_COMMAND( listip, "List IP addresses on the ban list." )
 CON_COMMAND( writeip, "Save the ban list to " BANNED_IP_FILENAME "." )
 {
 	char	name[MAX_OSPATH];
-	byte	b[4];
-
-	Q_strncpy( name, CONFIG_DIR BANNED_IP_FILENAME, sizeof( name ) );
+	V_strcpy_safe( name, CONFIG_DIR BANNED_IP_FILENAME );
 
 	ConMsg( "Writing %s.\n", name );
 
 	FileHandle_t f = g_pFileSystem->Open(name, "wb");
 	if ( !f )
 	{
-		ConMsg( "Couldn't open %s\n", name );
+		ConMsg( "Couldn't open %s.\n", name );
 		return;
 	}
 	
+	byte b[4];
 	for ( const auto &ipf : g_IPFilters )
 	{
 		memcpy( b, &ipf.compare, sizeof(b) );
 
 		// Only store out the permanent bad guys from this server.
 		float banTime = ipf.banTime;
-		
 		if ( banTime != 0.0f )
 		{
 			continue;
@@ -425,14 +432,13 @@ CON_COMMAND( writeip, "Save the ban list to " BANNED_IP_FILENAME "." )
 //-----------------------------------------------------------------------------
 bool Filter_IsUserBanned( const USERID_t& userid )
 {
-#ifndef _XBOX
 	if ( sv_filterban.GetInt() == 0 )
 		return false;
 
 	bool bNegativeFilter = sv_filterban.GetInt() == 1;
 	
 	// Handle timeouts 
-	for ( int i =g_UserFilters.Count() - 1 ; i >= 0 ; i-- )
+	for ( intp i = g_UserFilters.Count() - 1 ; i >= 0 ; i-- )
 	{
 		// Time out old filters
 		if ( ( g_UserFilters[i].banEndTime != 0.0f ) &&
@@ -450,9 +456,6 @@ bool Filter_IsUserBanned( const USERID_t& userid )
 	}
 
 	return !bNegativeFilter;
-#else
-	return false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -463,10 +466,9 @@ USERID_t *Filter_StringToUserID( const char *str )
 	static USERID_t id;
 	Q_memset( &id, 0, sizeof( id ) );
 
-	if ( str && str[ 0 ] )
+	if ( str && !Q_isempty(str) )
 	{
-		char szTemp[128];
-		if ( !Q_strnicmp( str, STEAM_PREFIX, ssize( STEAM_PREFIX ) - 1 ) )
+		if ( char szTemp[128]; !Q_strnicmp( str, STEAM_PREFIX, ssize( STEAM_PREFIX ) - 1 ) )
 		{
 			Q_strncpy( szTemp, str + ssize( STEAM_PREFIX ) - 1, sizeof( szTemp ) - 1 );
 			id.idtype = IDTYPE_STEAM;
@@ -479,10 +481,10 @@ USERID_t *Filter_StringToUserID( const char *str )
 			{
 				// allow settings from old style steam2 format
 				TSteamGlobalUserID steam2ID;
-
 				steam2ID.m_SteamInstanceID = (SteamInstanceID_t)atoi( args[ 0 ] );
 				steam2ID.m_SteamLocalUserID.Split.High32bits = (int)atoi( args[ 2 ] );
 				steam2ID.m_SteamLocalUserID.Split.Low32bits = (int)atoi( args[ 4 ] );
+
 				EUniverse eUniverse = k_EUniversePublic;
 				if ( Steam3Server().GetGSSteamID().IsValid() )
 					eUniverse = Steam3Server().GetGSSteamID().GetEUniverse();
@@ -490,6 +492,7 @@ USERID_t *Filter_StringToUserID( const char *str )
 				else if ( Steam3Client().SteamUser() )
 					eUniverse = Steam3Client().SteamUser()->GetSteamID().GetEUniverse();
 #endif
+
 				id.steamid.SetFromSteam2( &steam2ID, eUniverse );
 			}
 		}
@@ -499,8 +502,8 @@ USERID_t *Filter_StringToUserID( const char *str )
 			if ( id.steamid.IsValid() )
 				id.idtype = IDTYPE_STEAM;
 		}
-
 	}
+
 	return &id;
 }
 
@@ -510,26 +513,21 @@ USERID_t *Filter_StringToUserID( const char *str )
 //-----------------------------------------------------------------------------
 CON_COMMAND( writeid, "Writes a list of permanently-banned user IDs to " BANNED_USER_FILENAME "." )
 {
-	FileHandle_t f;
 	char name[MAX_OSPATH];
-	int i;
-	float banTime;
-
-	Q_strncpy( name, CONFIG_DIR BANNED_USER_FILENAME, sizeof( name ) );
+	V_sprintf_safe( name, CONFIG_DIR BANNED_USER_FILENAME );
 
 	ConMsg( "Writing %s.\n", name );
 
-	f = g_pFileSystem->Open ( name, "wb" );
+	FileHandle_t f = g_pFileSystem->Open ( name, "wb" );
 	if ( !f )
 	{
-		ConMsg( "Couldn't open %s\n", name );
+		ConMsg( "Couldn't open %s.\n", name );
 		return;
 	}
 	
-	for ( i = 0 ; i < g_UserFilters.Count() ; i++ )
+	for ( intp i = 0 ; i < g_UserFilters.Count() ; i++ )
 	{
-		banTime = g_UserFilters[i].banTime;
-
+		float banTime = g_UserFilters[i].banTime;
 		if ( banTime != 0.0f )
 		{
 			continue;
@@ -547,37 +545,33 @@ CON_COMMAND( writeid, "Writes a list of permanently-banned user IDs to " BANNED_
 //-----------------------------------------------------------------------------
 CON_COMMAND( removeid, "Remove a user ID from the ban list." )
 {
-	int			i = 0;
-	const char	*pszArg1 = NULL;
-	char		szSearchString[64];
-
 	if ( args.ArgC() != 2 && args.ArgC() != 6 )
 	{
-		ConMsg( "Usage:  removeid < slot | uniqueid >\n" );
+		ConMsg( "Usage: removeid <slot | uniqueid>\n" );
 		return;
 	}
 
 	// get the first argument
-	pszArg1 = args[1];
+	const char *pszArg1 = args[1];
 
 	// don't need the # if they're using it
 	if ( !Q_strncmp( pszArg1, "#", 1 ) )
 	{
-		ConMsg( "Usage:  removeid < userid | uniqueid >\n" );
-		ConMsg( "No # necessary\n" );
+		ConMsg( "Usage: removeid <userid | uniqueid>\n" );
+		ConMsg( "No # necessary.\n" );
 		return;
 	}
 
-	// if the first letter is a character then
-	// we're searching for a uniqueid ( e.g. STEAM_ )
+	// if the first letter is a character then we're searching for a uniqueid ( e.g. STEAM_ )
 	if ( *pszArg1 < '0' || *pszArg1 > '9' || V_atoi64( pszArg1 ) > ( (uint32)~0 ) )
 	{
 		bool bValid = false;
 
+		char szSearchString[64];
 		// SteamID ( need to reassemble it )
-		if ( !Q_strnicmp( pszArg1, STEAM_PREFIX, Q_strlen( STEAM_PREFIX ) ) && Q_strstr( args[2], ":" ) )
+		if ( !Q_strnicmp( pszArg1, STEAM_PREFIX, ssize( STEAM_PREFIX ) - 1 ) && Q_strstr( args[2], ":" ) )
 		{
-			Q_snprintf( szSearchString, sizeof( szSearchString ), "%s:%s:%s", pszArg1, args[3], args[5] );
+			V_sprintf_safe( szSearchString, "%s:%s:%s", pszArg1, args[3], args[5] );
 			
 			USERID_t *id = Filter_StringToUserID( szSearchString );
 			if ( id )
@@ -589,82 +583,76 @@ CON_COMMAND( removeid, "Remove a user ID from the ban list." )
 		}
 		else
 		{
-			CSteamID cSteamIDCheck;
-			const char *pchUUID = args.ArgS();
-			if ( pchUUID )
+			if ( const char *pchUUID = args.ArgS(); pchUUID )
 			{
+				CSteamID cSteamIDCheck;
 				cSteamIDCheck.SetFromString( pchUUID, k_EUniversePublic );
+
 				bValid = cSteamIDCheck.IsValid();
 				if ( bValid )
 					V_sprintf_safe( szSearchString, "%s", cSteamIDCheck.Render() );
 			}
 		}
+
 		// some other ID (e.g. "UNKNOWN", "STEAM_ID_PENDING", "STEAM_ID_LAN")
 		// NOTE: assumed to be one argument
 		if ( !bValid )
 		{
-			ConMsg( "removeid:  invalid ban ID \"%s\"\n", pszArg1 );
+			ConMsg( "removeid: Invalid ban ID \"%s\"\n", pszArg1 );
 			return;
 		}
 
-		for ( i = 0 ; i < g_UserFilters.Count() ; i++ )
+		for ( intp i = 0 ; i < g_UserFilters.Count() ; i++ )
 		{
 			if ( Q_stricmp( GetUserIDString( g_UserFilters[i].userid ), szSearchString ) )
 				continue;
 
 			g_UserFilters.Remove( i );
-			ConMsg( "removeid:  filter removed for %s\n", szSearchString );
+			ConMsg( "removeid: Filter removed for %s\n", szSearchString );
 
 			// send an event
 			IGameEvent *event = g_GameEventManager.CreateEvent( "server_removeban" );
-
 			if ( event )
 			{
 				event->SetString( "networkid", szSearchString );
 				event->SetString( "ip", "" );
 				event->SetString( "by", ( cmd_source == src_command ) ? "Console" : host_client->m_Name );
+
 				g_GameEventManager.FireEvent( event );
 			}
 
 			return;
 		}
 		
-		ConMsg( "removeid:  couldn't find %s\n", szSearchString );
+		ConMsg( "removeid: Couldn't find %s\n", szSearchString );
+		return;
 	}
+
 	// this is a userid
-	else
+	int slot = Q_atoi( pszArg1 );
+	if ( slot <= 0 || slot > g_UserFilters.Count() )
 	{
-		int slot = Q_atoi( pszArg1 );
-		if ( slot > 0 && slot <= g_UserFilters.Count() )
-		{
-			USERID_t id;
+		ConMsg( "removeid: Invalid slot %i\n", slot );
+		return;
+	}
 
-			// array access is zero based
-			slot--;
+	// array access is zero based
+	// Copy off slot
+	USERID_t id = g_UserFilters[--slot].userid;
+	g_UserFilters.Remove( slot );
 
-			// Copy off slot
-			id = g_UserFilters[slot].userid;
+	// Tell server operator
+	ConMsg( "removeid: Filter removed for %s, ID %s\n", pszArg1, GetUserIDString( id ) );
 
-			g_UserFilters.Remove( slot );
+	// send an event
+	IGameEvent *event = g_GameEventManager.CreateEvent( "server_removeban" );
+	if ( event )
+	{
+		event->SetString( "networkid", GetUserIDString( id ) );
+		event->SetString( "ip", "" );
+		event->SetString( "by", ( cmd_source == src_command ) ? "Console" : host_client->m_Name );
 
-			// Tell server operator
-			ConMsg( "removeid:  filter removed for %s, ID %s\n", pszArg1, GetUserIDString( id ) );
-
-			// send an event
-			IGameEvent *event = g_GameEventManager.CreateEvent( "server_removeban" );
-
-			if ( event )
-			{
-				event->SetString( "networkid", GetUserIDString( id ) );
-				event->SetString( "ip", "" );
-				event->SetString( "by", ( cmd_source == src_command ) ? "Console" : host_client->m_Name );
-				g_GameEventManager.FireEvent( event );
-			}
-		}
-		else
-		{
-			ConMsg( "removeid:  invalid slot %i\n", slot );
-		}
+		g_GameEventManager.FireEvent( event );
 	}
 }
 
@@ -673,35 +661,26 @@ CON_COMMAND( removeid, "Remove a user ID from the ban list." )
 //-----------------------------------------------------------------------------
 CON_COMMAND( listid, "Lists banned users." )
 {
-	int i;
-	int count = g_UserFilters.Count();
-
+	const intp count = g_UserFilters.Count();
 	if ( !count )
 	{
 		ConMsg( "ID filter list: empty\n" );
 		return;
 	}
-	else
-	{
-		if ( count == 1 )
-		{
-			ConMsg( "ID filter list: %i entry\n", count );
-		}
-		else
-		{
-			ConMsg( "ID filter list: %i entries\n", count );
-		}
-	}
 
-	for ( i = 0 ; i < count ; i++ )
+	ConMsg( "ID filter list: %i entr%s\n", count, count == 1 ? "y" : "ies" );
+
+	for ( intp i = 0 ; i < count ; i++ )
 	{
-		if ( g_UserFilters[i].banTime != 0.0 )
+		const char *uid = GetUserIDString( g_UserFilters[i].userid );
+
+		if ( g_UserFilters[i].banTime != 0.0f )
 		{
-			ConMsg( "%i %s : %.3f min\n", i+1, GetUserIDString( g_UserFilters[i].userid ), g_UserFilters[i].banTime );
+			ConMsg( "%i %s: %.3f min\n", i+1, uid, g_UserFilters[i].banTime );
 		}
 		else
 		{
-			ConMsg( "%i %s : permanent\n", i+1, GetUserIDString( g_UserFilters[i].userid ) );
+			ConMsg( "%i %s: permanent\n", i+1, uid );
 		}
 	}
 }
@@ -711,84 +690,82 @@ CON_COMMAND( listid, "Lists banned users." )
 //-----------------------------------------------------------------------------
 CON_COMMAND( banid, "Add a user ID to the ban list." )
 {
-#ifndef _XBOX
-	intp		i;
-	float		banTime;
-	USERID_t	localId;
-	USERID_t *	id = NULL;
-	int			iSearchIndex = -1;
-	char		szDuration[256];
-	char		szSearchString[64];
-	szSearchString[0] = '\0';
-	bool		bKick = false;
-	bool		bPlaying = false;
-	const char	*pszArg2 = NULL;
-	CGameClient *client = NULL;
-
 	if ( Steam3Server().BLanOnly() )
 	{
-		ConMsg( "Can't ban users on a LAN\n" );
+		ConMsg( "Can't ban users on a LAN.\n" );
 		return;
 	}
 
 	if ( args.ArgC() < 3 || args.ArgC() > 8 )
 	{
-		ConMsg( "Usage:  banid < minutes > < userid | uniqueid > { kick }\n" );
-		ConMsg( "Use 0 minutes for permanent\n");
+		ConMsg( "Usage: banid <minutes> <userid | uniqueid> {kick}\n" );
+		ConMsg( "Use 0 minutes for permanent.\n");
 		return;
 	}
 
-	banTime = Q_atof( args[1] );
-	if ( banTime < 0.01 )
+	char *end = nullptr;
+	float banTime = strtof( args[1], &end );
+	if ( !Q_isempty(end) )
 	{
-		banTime = 0.0;
+		ConMsg( "Usage: banid <minutes> <userid | uniqueid> {kick}\n" );
+		return;
+	}
+
+	if ( banTime < 0.01f )
+	{
+		banTime = 0.0f;
 	}
 
 	// get the first argument
-	pszArg2 = args[2];
-
+	const char *pszArg2 = args[2];
 	// don't need the # if they're using it
 	if ( !Q_strncmp( pszArg2, "#", 1 ) )
 	{
-		ConMsg( "Usage:  banid < minutes > < userid | uniqueid > { kick }\n" );
-		ConMsg( "No # necessary\n");
+		ConMsg( "Usage: banid <minutes> <userid | uniqueid> {kick}\n" );
+		ConMsg( "No # necessary.\n");
 		return;
 	}
 
-	bKick = ( args.ArgC() >= 3 && Q_strcasecmp( args[ args.ArgC() - 1 ], "kick" ) == 0 );
-
-
+	const bool bKick = args.ArgC() >= 3 && Q_strcasecmp( args[ args.ArgC() - 1 ], "kick" ) == 0;
+	
+	char szSearchString[64];
+	szSearchString[0] = '\0';
+	int	iSearchIndex = -1;
 	// if the first letter is a character then
 	// we're searching for a uniqueid ( e.g. STEAM_ )
 	if ( *pszArg2 < '0' || *pszArg2 > '9' || V_atoi64( pszArg2 ) > ((uint32)~0) )
 	{
 		bool bValid = false;
+
 		iSearchIndex = -1;
 
 		// SteamID (need to reassemble it)
 		if ( !Q_strnicmp( pszArg2, STEAM_PREFIX, ssize( STEAM_PREFIX ) - 1 ) && Q_strstr( args[3], ":" ) )
 		{
-			Q_snprintf( szSearchString, sizeof( szSearchString ), "%s:%s:%s", pszArg2, args[4], args[6] );
+			V_sprintf_safe( szSearchString, "%s:%s:%s", pszArg2, args[4], args[6] );
+
 			bValid = true;
 		}
 		else
 		{
 			CSteamID cSteamIDCheck;
 			const char *pchArgs = args.ArgS();
-			const char *pchUUID = strchr( pchArgs, ' ' );
-			if ( pchUUID )
+
+			if ( const char *pchUUID = strchr( pchArgs, ' ' ); pchUUID )
 			{
 				cSteamIDCheck.SetFromString( pchUUID + 1, k_EUniversePublic );
+
 				bValid = cSteamIDCheck.IsValid();
 				if ( bValid )
 					V_sprintf_safe( szSearchString, "%s", cSteamIDCheck.Render() );
 			}
 		}
+
 		// some other ID (e.g. "UNKNOWN", "STEAM_ID_PENDING", "STEAM_ID_LAN")
 		// NOTE: assumed to be one argument
 		if ( !bValid )
 		{
-			ConMsg( "Can't ban users with ID \"%s\"\n", pszArg2 );
+			ConMsg( "Can't ban users with ID \"%s\".\n", pszArg2 );
 			return;
 		}
 	}
@@ -797,12 +774,16 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 		// see if it is a userid
 		iSearchIndex = Q_atoi( pszArg2 );
 	}
-
+	
+	intp i;
+	bool bPlaying = false;
+	USERID_t localId;
+	USERID_t *id = nullptr;
+	CGameClient *client = nullptr;
 	// find this client (if they're currently in the server)
 	for ( i = 0; i < sv.GetClientCount(); i++ )
 	{
 		client = sv.Client(i);
-
 		if ( !client || !client->IsActive() || !client->IsConnected() || !client->IsSpawned() )
 		{
 			continue;
@@ -825,9 +806,9 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 				break;
 			}
 		}
-		// searching by UniqueID
-		else	
+		else
 		{
+			// searching by UniqueID
 			if ( Q_stricmp( client->GetNetworkIDString(), szSearchString ) == 0 ) 
 			{
 				// found!
@@ -842,7 +823,7 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 	// if we were searching by userid and we didn't find the person, we're done
 	if ( iSearchIndex != -1 && !id )
 	{
-		ConMsg( "banid:  couldn't find userid %d\n", iSearchIndex );
+		ConMsg( "banid: Couldn't find userid %d.\n", iSearchIndex );
 		return;
 	}
 
@@ -850,21 +831,13 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 	{
 		// we're searching by SteamID and we haven't found them actively playing
 		id = Filter_StringToUserID( szSearchString );
-
 		if ( !id )
 		{
-			ConMsg( "banid:  Couldn't resolve uniqueid \"%s\".\n", szSearchString );
-			ConMsg( "Usage:  banid < minutes > < userid | uniqueid > { kick }\n" );
-			ConMsg( "Use 0 minutes for permanent\n");
+			ConMsg( "banid: Couldn't resolve uniqueid \"%s\".\n", szSearchString );
+			ConMsg( "Usage: banid <minutes> <userid | uniqueid> {kick}\n" );
+			ConMsg( "Use 0 minutes for permanent.\n");
 			return;
 		}
-	}
-
-	if ( !id )
-	{
-		// Should never occur!!!
-		ConMsg( "SV_BanId_f:  id == NULL\n" );
-		return;
 	}
 
 	// See if it's in the list already
@@ -875,38 +848,36 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 			break;
 	}
 
-	// 
 	// Adding a new one
-	if ( i >= g_UserFilters.Count() )
+	if ( i == g_UserFilters.Count() )
 	{
 		// See if we have space for it
 		if ( g_UserFilters.Count() >= MAX_USERFILTERS )
 		{
-			ConMsg( "banid:  user filter list is full\n" );
+			ConMsg( "banid: User filter list is full (max %zd).\n", MAX_USERFILTERS );
 			return;
 		}
-		userfilter_t nullUser;
-		memset( &nullUser, 0, sizeof(nullUser) );
-		i = g_UserFilters.AddToTail( nullUser );
+
+		i = g_UserFilters.AddToTail( userfilter_t{} );
 	}
 
 	g_UserFilters[i].banTime = banTime;
 	g_UserFilters[i].banEndTime = ( banTime != 0.0F ) ? ( realtime + 60.0F * banTime ) : 0.0F;
 	g_UserFilters[i].userid = *id;
-
+	
+	char szDuration[64];
 	// Build a duration string for the ban
-	if ( banTime == 0.0 )
+	if ( banTime == 0.0f )
 	{
-		Q_snprintf( szDuration, sizeof( szDuration ), "permanently" );
+		V_sprintf_safe( szDuration, "permanently" );
 	}
 	else
 	{
-		Q_snprintf( szDuration, sizeof( szDuration ), "for %.2f minutes", banTime );
+		V_sprintf_safe( szDuration, "for %.2f minutes", banTime );
 	}
 
 	// fire the event
 	IGameEvent *event = g_GameEventManager.CreateEvent( "server_addban" );
-
 	if ( event )
 	{
 		if ( bPlaying )
@@ -935,7 +906,6 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 		client->ClientPrintf ( "You have been kicked and banned %s by the server.\n", szDuration );
 		client->Disconnect( "Kicked and banned" );
 	}
-#endif
 }
 
 

@@ -82,7 +82,7 @@ public:
 public:	// members are public to avoid to much changes
 
 	netadrtype_t	type;
-	unsigned char	ip[4];
+	alignas(unsigned) unsigned char	ip[4];
 	unsigned short	port;
 } netadr_t;
 
