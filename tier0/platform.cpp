@@ -420,7 +420,6 @@ bool Is64BitOS()
 // DEPRECATED. Still here to support binary back compatability of tier0.dll
 //
 // -------------------------------------------------------------------------------------------------- //
-#ifndef _X360
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
 typedef void (*Plat_AllocErrorFn)( unsigned long size );
@@ -432,86 +431,56 @@ void Plat_DefaultAllocErrorFn( [[maybe_unused]] unsigned long size )
 Plat_AllocErrorFn g_AllocError = Plat_DefaultAllocErrorFn;
 #endif
 
-#ifndef _X360
-CRITICAL_SECTION g_AllocCS;
-class CAllocCSInit
-{
-public:
-	CAllocCSInit()
-	{
-		InitializeCriticalSection( &g_AllocCS );
-	}
-} g_AllocCSInit;
-#endif
-
-#ifndef _X360
 PLATFORM_INTERFACE void* Plat_Alloc( unsigned long size )
 {
-	EnterCriticalSection( &g_AllocCS );
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
-		void *pRet = g_pMemAlloc->Alloc( size );
+	void *pRet = g_pMemAlloc->Alloc( size );
 #else
-		void *pRet = malloc( size );
+	void *pRet = malloc( size );
 #endif
-	LeaveCriticalSection( &g_AllocCS );
+
 	if ( pRet )
 	{
 		return pRet;
 	}
-	else
-	{
-#if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
-		g_AllocError( size );
-#endif
-		return 0;
-	}
-}
-#endif
 
-#ifndef _X360
+#if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
+	g_AllocError( size );
+#endif
+	return 0;
+}
+
 PLATFORM_INTERFACE void* Plat_Realloc( void *ptr, unsigned long size )
 {
-	EnterCriticalSection( &g_AllocCS );
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
-		void *pRet = g_pMemAlloc->Realloc( ptr, size );
+	void *pRet = g_pMemAlloc->Realloc( ptr, size );
 #else
-		void *pRet = realloc( ptr, size );
+	void *pRet = realloc( ptr, size );
 #endif
-	LeaveCriticalSection( &g_AllocCS );
+
 	if ( pRet )
 	{
 		return pRet;
 	}
-	else
-	{
-#if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
-		g_AllocError( size );
-#endif
-		return 0;
-	}
-}
-#endif
 
-#ifndef _X360
+#if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
+	g_AllocError( size );
+#endif
+	return 0;
+}
+
 PLATFORM_INTERFACE void Plat_Free( void *ptr )
 {
-	EnterCriticalSection( &g_AllocCS );
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
-		g_pMemAlloc->Free( ptr );
+	g_pMemAlloc->Free( ptr );
 #else
-		free( ptr );
+	free( ptr );
 #endif
-	LeaveCriticalSection( &g_AllocCS );
 }
-#endif
 
-#ifndef _X360
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 PLATFORM_INTERFACE void Plat_SetAllocErrorFn( Plat_AllocErrorFn fn )
 {
 	g_AllocError = fn;
 }
-#endif
-#endif
-
 #endif
