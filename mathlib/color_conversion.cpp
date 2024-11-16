@@ -495,14 +495,18 @@ void XM_CALLCONV VectorToColorRGBExp32( const Vector& vin, ColorRGBExp32 &c )
 		std::memcpy( &scalar, &fbits, sizeof(scalar) );
 	}
 
-	// Above 255 would be right out.
-	Assert(vin.x * scalar <= 255.0f && 
-		   vin.y * scalar <= 255.0f && 
-		   vin.z * scalar <= 255.0f);
+	float r = vin.x * scalar;
+	float g = vin.y * scalar;
+	float b = vin.z * scalar;
 
-	c.r = static_cast<byte>( vin.x * scalar );
-	c.g = static_cast<byte>( vin.y * scalar );
-	c.b = static_cast<byte>( vin.z * scalar );
+	// Above 255 would be right out.
+	AssertMsg( r <= 255.0f && g <= 255.0f && b <= 255.0f,
+		"(R = %.2f, G = %.2f, B = %.2f): component > 255.\n",
+		r, g, b );
+
+	c.r = static_cast<byte>( r );
+	c.g = static_cast<byte>( g );
+	c.b = static_cast<byte>( b );
 
 	c.exponent = ( signed char )exponent;
 }
