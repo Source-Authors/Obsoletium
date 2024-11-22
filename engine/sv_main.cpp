@@ -1788,7 +1788,9 @@ void CGameServer::CopyTempEntities( CFrameSnapshot* pSnapshot )
 //   are running many instances anyway. It's off in Dota and CSGO dedicated servers.
 //
 // Bruce also had a patch to disable this in //ValveGames/staging/game/tf/cfg/unencrypted/print_instance_config.py
-static ConVar sv_parallel_sendsnapshot( "sv_parallel_sendsnapshot", "0" );
+//
+// NOTE: The crash should be fixed.
+static ConVar sv_parallel_sendsnapshot( "sv_parallel_sendsnapshot", "1" );
 
 static void SV_ParallelSendSnapshot( CGameClient *& pClient )
 {

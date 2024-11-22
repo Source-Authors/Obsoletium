@@ -166,6 +166,7 @@ public:
 private:
 	void	DeleteFrameSnapshot( CFrameSnapshot* pSnapshot );
 
+	CThreadFastMutex									m_FrameSnapshotsWriteMutex;
 	CUtlLinkedList<CFrameSnapshot*, unsigned short>		m_FrameSnapshots;
 	CClassMemoryPool< PackedEntity >					m_PackedEntitiesPool;
 
