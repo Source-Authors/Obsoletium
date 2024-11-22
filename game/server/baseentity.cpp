@@ -278,6 +278,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt		(SENDINFO(m_CollisionGroup), 5, SPROP_UNSIGNED),
 	SendPropFloat	(SENDINFO(m_flElasticity), 0, SPROP_COORD),
 	SendPropFloat	(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED ),
+	SendPropFloat	(SENDINFO(m_flGravity), 0),
 	SendPropEHandle (SENDINFO(m_hOwnerEntity)),
 	SendPropEHandle (SENDINFO(m_hEffectEntity)),
 	SendPropEHandle (SENDINFO_NAME(m_hMoveParent, moveparent)),
@@ -1831,6 +1832,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 	DEFINE_FIELD( m_MoveType, FIELD_CHARACTER ),
 	DEFINE_FIELD( m_MoveCollide, FIELD_CHARACTER ),
+	DEFINE_FIELD( m_flGravity, FIELD_FLOAT ),
 	DEFINE_FIELD( m_hOwnerEntity, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_CollisionGroup, FIELD_INTEGER ),
 	DEFINE_PHYSPTR( m_pPhysicsObject),
