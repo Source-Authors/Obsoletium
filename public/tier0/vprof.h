@@ -545,7 +545,7 @@ protected:
 	tchar *m_CounterNames[MAXCOUNTERS];
 	int m_NumCounters;
 
-	unsigned m_TargetThreadId;
+	ThreadId_t m_TargetThreadId;
 
 	StreamOut_t				m_pOutputStream;
 };
