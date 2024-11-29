@@ -315,7 +315,7 @@ void CBanPanel::ChangeBanTimeByID(const char *id, const char *newtime)
 
 	// send down the command
 	char cmd[512];
-	_snprintf(cmd, sizeof(cmd) -1, "%s %s %s\n", IsIPAddress(id) ? "addip" : "banid", newtime, id);
+	V_sprintf_safe(cmd, "%s %s %s\n", IsIPAddress(id) ? "addip" : "banid", newtime, id);
 	RemoteServer().SendCommand(cmd);
 	if (IsIPAddress(id))
 	{

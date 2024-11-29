@@ -351,7 +351,7 @@ void CPlayerPanel::AddBanByID(const char *id, const char *newtime)
 
 	// send down the ban command
 	char cmd[512];
-	_snprintf(cmd, sizeof(cmd) -1, "%s %s %s\n", banCmd, newtime, id);
+	V_sprintf_safe(cmd, "%s %s %s\n", banCmd, newtime, id);
 	RemoteServer().SendCommand(cmd);
 
 	// force the file to update
