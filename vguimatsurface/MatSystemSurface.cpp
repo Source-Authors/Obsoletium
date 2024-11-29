@@ -1825,7 +1825,17 @@ bool CMatSystemSurface::AddCustomFontFile( const char *fontName, const char *fon
 	bool bFound = g_pFullFileSystem->GetLocalPath( fontFileName, fullPath, sizeof( fullPath ) );
 	if ( !bFound )
 	{
-		Warning( "Couldn't find custom font file '%s' for font '%s'\n", fontFileName, fontName ? fontName : "" );
+		char output[512];
+		V_snprintf( output,	ssize(output), "Couldn't find custom font file '%s'", fontFileName );
+		if ( fontName )
+		{
+			V_strcat_safe( output, " for font '" );
+			V_strcat_safe( output, fontName );
+			V_strcat_safe( output, "'" );
+		}
+		V_strcat_safe( output, "\n" );
+
+		Warning(output);
 		return false;
 	}
 
