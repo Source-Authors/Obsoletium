@@ -2077,7 +2077,7 @@ KeyValues::types_t KeyValues::GetDataType(const char *keyName)
 {
 	KeyValues *dat = FindKey(keyName, false);
 	if (dat)
-		return (types_t)dat->m_iDataType;
+		return dat->m_iDataType;
 
 	return TYPE_NONE;
 }

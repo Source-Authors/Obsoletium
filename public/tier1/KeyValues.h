@@ -236,7 +236,7 @@ public:
 	void Clear( void );
 
 	// Data type
-	enum types_t
+	enum types_t : char
 	{
 		TYPE_NONE = 0,
 		TYPE_STRING,
@@ -332,7 +332,7 @@ private:
 		unsigned char m_Color[4];
 	};
 	
-	char	   m_iDataType;
+	types_t	   m_iDataType;
 	char	   m_bHasEscapeSequences; // true, if while parsing this KeyValue, Escape Sequences are used (default false)
 	char	   m_bEvaluateConditionals; // true, if while parsing this KeyValue, conditionals blocks are evaluated (default true)
 	char	   unused[1];
