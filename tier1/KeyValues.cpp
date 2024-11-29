@@ -1441,7 +1441,7 @@ float KeyValues::GetFloat( const char *keyName, float defaultValue )
 			AssertMsg( false, "impl me" );
 			return 0.0;
 #endif
-			case TYPE_FLOAT:
+		case TYPE_FLOAT:
 			return dat->m_flValue;
 		case TYPE_INT:
 			return (float)dat->m_iValue;
@@ -2227,6 +2227,37 @@ void KeyValues::RecursiveMergeKeyValues( KeyValues *baseKV )
 	}
 }
 
+static int s_nSteamDeckCached = -1;
+
+// dimhotepus: Try add basic SteamDeck support.
+static bool IsSteamDeck()
+{
+	if (s_nSteamDeckCached == -1)
+	{
+		if ( CommandLine()->CheckParm( "-nogamepadui" ) != 0 )
+		{
+			s_nSteamDeckCached = 0;
+		}
+		else
+		{
+			if ( CommandLine()->CheckParm( "-gamepadui" ) != 0 )
+			{
+				s_nSteamDeckCached = 1;
+			}
+			else
+			{
+				char *deck = getenv("SteamDeck");
+
+				if ( deck == 0 || *deck == 0 )
+					s_nSteamDeckCached = 0;
+				else
+					s_nSteamDeckCached = atoi(deck) != 0;
+			}
+		}
+	}
+	return s_nSteamDeckCached;
+}
+
 //-----------------------------------------------------------------------------
 // Returns whether a keyvalues conditional evaluates to true or false
 // Needs more flexibility with conditionals, checking convars would be nice.
@@ -2260,6 +2291,10 @@ bool EvaluateConditional( const char *str )
 
 	if ( Q_stristr( str, "$POSIX" ) )
 		return IsPosix() ^ bNot;
+
+	// dimhotepus: Basic SteamDeck support.
+	if ( Q_stristr(str, "$DECK" ) )
+		return IsSteamDeck() ^ bNot;
 	
 	return false;
 }
