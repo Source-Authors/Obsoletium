@@ -47,8 +47,8 @@ public:
 	void			Pop( void );
 
 	// Writing functions
-	void			WriteByte(int c);
-	void			WriteShort(int c);
+	void			WriteByte(unsigned char c);
+	void			WriteShort(short c);
 	void			WriteLong(int c);
 	void			WriteFloat(float f);
 	void			WriteString(const char *s);

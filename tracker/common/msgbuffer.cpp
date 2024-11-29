@@ -140,10 +140,9 @@ netadr_t &CMsgBuffer::GetNetAddress()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CMsgBuffer::WriteByte( int c )
+void CMsgBuffer::WriteByte( unsigned char c )
 {
-	unsigned char    *buf;
-	buf = (unsigned char *)GetSpace( 1 );
+	unsigned char    *buf = (unsigned char *)GetSpace( 1 );
 	buf[0] = c;
 }
 
@@ -151,7 +150,7 @@ void CMsgBuffer::WriteByte( int c )
 // Purpose: 
 // Input  : c - 
 //-----------------------------------------------------------------------------
-void CMsgBuffer::WriteShort ( int c )
+void CMsgBuffer::WriteShort ( short c )
 {
 	unsigned char    *buf;
 	buf = (unsigned char *)GetSpace( 2 );
@@ -340,19 +339,18 @@ int CMsgBuffer::ReadBuf( int iSize, void *pbuf )
 char *CMsgBuffer::ReadString (void)
 {
 	static char     string[ NET_MAXMESSAGE ];
-	int             l,c;
 	
-	l = 0;
+	intp l = 0;
 	do
 	{
-		c = (char)ReadByte();
+		char c = (char)ReadByte();
 		if ( c == -1 || c == 0 )
 			break;
 		string[l] = c;
 		l++;
 	} while ( l < ssize(string)-1 );
 	
-	string[ l ] = 0;
+	string[ l ] = '\0';
 	
 	return string;
 }
