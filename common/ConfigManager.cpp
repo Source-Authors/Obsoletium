@@ -4,19 +4,23 @@
 //
 //=============================================================================//
 
-#include <windows.h>
-#include "interface.h"
-#include "tier0/icommandline.h"
-#include "filesystem_tools.h"
-#include "KeyValues.h"
-#include "tier1/utlbuffer.h"
+#include "ConfigManager.h"
+
 #include <io.h>
 #include <fcntl.h>
 #include <sys/types.h> 
 #include <sys/stat.h> 
-#include <stdio.h>
-#include "ConfigManager.h"
+#include <cstdio>
+
+#include "interface.h"
+#include "tier0/icommandline.h"
+#include "filesystem_tools.h"
+#include "tier1/KeyValues.h"
+#include "tier1/utlbuffer.h"
 #include "SourceAppInfo.h"
+
+#include "winlite.h"
+
 // dimhotepus: Optional steam.
 #ifndef NO_STEAM
 #include "steam/steam_api.h"
