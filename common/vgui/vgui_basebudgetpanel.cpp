@@ -340,7 +340,7 @@ void CBaseBudgetPanel::PerformLayout()
 	{
 		int labelWidth, labelHeight;
 		m_HistoryLabels[i]->GetContentSize( labelWidth, labelHeight );
-		y = (fRange != 0) ? budgetHistoryHeight * m_ConfigData.m_HistoryLabelValues[i] / ( float )fRange : 0.0f;
+		y = (fRange != 0) ? budgetHistoryHeight * m_ConfigData.m_HistoryLabelValues[i] / fRange : 0.0f;
 		int top = ( int )( budgetHistoryHeight - y - 1 - labelHeight * 0.5f );
 		m_HistoryLabels[i]->SetPos( totalWidth - maxFPSLabelWidth, top );
 		m_HistoryLabels[i]->SetSize( labelWidth, labelHeight );

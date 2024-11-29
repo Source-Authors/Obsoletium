@@ -143,7 +143,7 @@ void CBudgetBarGraphPanel::DrawTimeLines( void )
 		}
 		
 		float flTemp = ( config.m_flBarGraphRange != 0.0f ) ? ( flValueInterval / config.m_flBarGraphRange ) : flValueInterval;
-		left = -0.5f + panelWidth * ( float )( i * flTemp );
+		left = -0.5f + panelWidth * ( i * flTemp );
 		right = left + 1;
 
 		vgui::surface()->DrawSetColor( 0, 0, 0, alpha );
@@ -225,7 +225,7 @@ void CBudgetBarGraphPanel::DrawAverages()
 			int offset = ( nSampleOffset - j + BUDGET_HISTORY_COUNT ) % BUDGET_HISTORY_COUNT;
 			sum += pBudgetGroupTimes[i * nSamplesPerGroup + offset];
 		}
-		sum *= ( 1.0f / numSamples );
+		sum *= ( 1.0 / numSamples );
 		float percent = m_pBudgetPanel->GetBudgetGroupPercent( sum );
 		DrawTickAtIndex( i, percent, red, green, blue, alpha );
 	}

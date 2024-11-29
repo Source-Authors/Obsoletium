@@ -74,8 +74,7 @@ void CBudgetHistoryPanel::Paint()
 	float ooRangeMaxMinusMin = 1.0f / ( m_fRangeMax - m_fRangeMin );
 	for( j = 0; j < m_nGroups; j++ )
 	{
-		int i;
-		for( i = startID; i < endID; i++ )
+		for( int i = startID; i < endID; i++ )
 		{
 			int sampleOffset = i % m_nSamplesPerGroup;
 			int left = i - startID + xOffset;
