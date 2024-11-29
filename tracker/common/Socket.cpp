@@ -60,7 +60,7 @@ private:
 
 private:
 	// Critical section used for synchronizing access to socket list
-	CRITICAL_SECTION		cs;
+	CThreadMutex			cs;
 	// List of sockets we are listening on
 	threadsocket_t			*m_pSocketList;
 	// Thread handle
@@ -190,8 +190,6 @@ CSocketThread::CSocketThread( void )
 
 	m_pSocketList = NULL;
 
-	InitializeCriticalSection( &cs );
-
 	m_hShutdown	= CreateEvent( NULL, TRUE, FALSE, NULL );
 	Assert( m_hShutdown );
 
@@ -223,8 +221,6 @@ CSocketThread::~CSocketThread( void )
 	}
 
 	CloseHandle( m_hShutdown );
-
-	DeleteCriticalSection( &cs );
 }
 	
 //-----------------------------------------------------------------------------
@@ -415,7 +411,7 @@ void CSocketThread::RemoveSocketFromThread( CSocket *socket )
 //-----------------------------------------------------------------------------
 void CSocketThread::Lock( void )
 {
-	VCRHook_EnterCriticalSection( &cs );
+	cs.Lock();
 }
 
 //-----------------------------------------------------------------------------
@@ -423,7 +419,7 @@ void CSocketThread::Lock( void )
 //-----------------------------------------------------------------------------
 void CSocketThread::Unlock( void )
 {
-	LeaveCriticalSection( &cs );
+	cs.Unlock();
 }
 
 //-----------------------------------------------------------------------------
