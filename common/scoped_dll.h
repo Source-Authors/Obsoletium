@@ -55,7 +55,8 @@ class ScopedDll {
   ScopedDll(const char *dll_path, unsigned int load_flags) noexcept
 #ifdef _WIN32
       : dll_{::LoadLibraryExA(dll_path, nullptr, load_flags)},
-        rc_{dll_ ? 0 : static_cast<int>(GetLastError()), std::system_category()}
+        rc_{dll_ ? 0 : static_cast<int>(::GetLastError()),
+            std::system_category()}
 #else
       : dll_{::dlopen(dll_path, load_flags)},
         rc_{dll_ ? 0 : EINVAL}
@@ -87,7 +88,7 @@ class ScopedDll {
     if (dll_) {
 #ifdef _WIN32
       // Force exit when unload failure.
-      if (!FreeLibrary(dll_)) exit(1);
+      if (!::FreeLibrary(dll_)) exit(static_cast<int>(::GetLastError()));
 #else
       // Force exit when unload failure.
       if (::dlclose(dll_)) {
@@ -110,7 +111,7 @@ class ScopedDll {
 #endif
 
     if (f == nullptr) {
-      return {nullptr, std::error_code{static_cast<int>(GetLastError()),
+      return {nullptr, std::error_code{static_cast<int>(::GetLastError()),
                                        std::system_category()}};
     }
 
