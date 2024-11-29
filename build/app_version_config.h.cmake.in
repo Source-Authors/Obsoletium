@@ -24,9 +24,9 @@
   SRC_STRINGIFY(SRC_APP_VER_FILE_VERSION_INFO)
 
 // App file description.
-#ifndef SRC_PRODUCT_FILE_DESCRIPTION_STRING
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "@SRC_CURRENT_TARGET_DESCRIPTION@"
-#endif
+// #ifndef SRC_PRODUCT_FILE_DESCRIPTION_STRING
+// #define SRC_PRODUCT_FILE_DESCRIPTION_STRING "@SRC_CURRENT_TARGET_DESCRIPTION@"
+// #endif
 
 #ifdef _WIN32
 // App file internal name.  Should be the original filename, without
