@@ -2235,9 +2235,9 @@ void DumpPanels_r( vgui::VPANEL panel, int level )
 	ConMsg( "%s%s\n", indentBuff, pName[0] ? pName : "???" );
 
 	int childcount = ipanel->GetChildCount( panel );
-	for ( int i = 0; i < childcount; i++ )
+	for ( int j = 0; j < childcount; j++ )
 	{
-		vgui::VPANEL child = ipanel->GetChild( panel, i );
+		vgui::VPANEL child = ipanel->GetChild( panel, j );
 		DumpPanels_r( child, level+1 );
 	}
 }
