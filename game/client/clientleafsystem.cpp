@@ -1365,7 +1365,6 @@ bool CClientLeafSystem::ShouldDrawDetailObjectsInLeaf( int leaf, int frameNumber
 			 ( ( leafInfo.m_DetailPropCount != 0 ) || ( leafInfo.m_pSubSystemData[CLSUBSYSTEM_DETAILOBJECTS] ) ) );
 }
 
-
 //-----------------------------------------------------------------------------
 // Compute which leaf the translucent renderables should render in
 //-----------------------------------------------------------------------------
@@ -1374,9 +1373,18 @@ void CClientLeafSystem::ComputeTranslucentRenderLeaf( int count, const LeafIndex
 	ASSERT_NO_REENTRY();
 	VPROF_BUDGET( "CClientLeafSystem::ComputeTranslucentRenderLeaf", "ComputeTranslucentRenderLeaf"  );
 
-	#define LeafToMarker( leaf ) reinterpret_cast<RenderableInfo_t *>(static_cast<size_t>( (leaf) << 1 ) | 1)
-	#define IsLeafMarker( p ) (bool)((reinterpret_cast<size_t>(p)) & 1)
-	#define MarkerToLeaf( p ) (int)((reinterpret_cast<size_t>(p)) >> 1)
+	const auto LeafToMarker = []( LeafIndex_t leaf ) {
+	  Assert( leaf <= std::numeric_limits<LeafIndex_t>::max() >> 1 );
+	  return reinterpret_cast<RenderableInfo_t *>(static_cast<size_t>(leaf << 1) | 1);
+	};
+
+	const auto IsLeafMarker = []( RenderableInfo_t *p ) {
+	  return static_cast<bool>(reinterpret_cast<size_t>(p) & 1);
+	};
+
+	const auto MarkerToLeaf = []( RenderableInfo_t *p ) {
+	  return static_cast<LeafIndex_t>(reinterpret_cast<size_t>(p) >> 1);
+	};
 
 	// For better sorting, we're gonna choose the leaf that is closest to the camera.
 	// The leaf list passed in here is sorted front to back
