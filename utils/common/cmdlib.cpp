@@ -164,22 +164,38 @@ void Error(char const *pMsg, ...) {
 
 #else
 
-CRITICAL_SECTION g_SpewCS;
-bool g_bSpewCSInitted = false;
+CThreadMutex g_SpewMutex;
+
 bool g_bSuppressPrintfOutput = false;
 
-SpewRetval_t CmdLib_SpewOutputFunc(SpewType_t type, char const *pMsg) {
-  // Hopefully two threads won't call this simultaneously right at the start!
-  if (!g_bSpewCSInitted) {
-    (void)InitializeCriticalSectionAndSpinCount(&g_SpewCS, 2000);
-    g_bSpewCSInitted = true;
+template <size_t out_size>
+static const char *PrefixMessageGroup(
+    _Out_z_bytecapcount_(out_size) char (&out)[out_size], const char *group,
+    const char *message) {
+  const char *out_group{GetSpewOutputGroup()};
+
+  out_group = out_group && out_group[0] ? out_group : group;
+
+  const size_t length{strlen(message)};
+  if (length > 1 && message[length - 1] == '\n') {
+    Q_snprintf(out, std::size(out), "[%s] %s", out_group, message);
+  } else {
+    Q_snprintf(out, std::size(out), "%s", message);
   }
+
+  return out;
+}
+
+SpewRetval_t CmdLib_SpewOutputFunc(SpewType_t type, char const *pMsg) {
+  char message[4096];
+  PrefixMessageGroup(message, "cmdlib", pMsg);
 
   WORD old;
   SpewRetval_t retVal;
 
-  EnterCriticalSection(&g_SpewCS);
   {
+    AUTO_LOCK(g_SpewMutex);
+
     if ((type == SPEW_MESSAGE) || (type == SPEW_LOG)) {
       Color c = *GetSpewOutputColor();
       if (c.r() != 255 || c.g() != 255 || c.b() != 255) {
@@ -227,27 +243,26 @@ SpewRetval_t CmdLib_SpewOutputFunc(SpewType_t type, char const *pMsg) {
     }
 
     if (!g_bSuppressPrintfOutput || type == SPEW_ERROR)
-      fprintf(stderr, "%s", pMsg);
+      fprintf(stderr, "%s", message);
 
-    OutputDebugString(pMsg);
+    Plat_DebugString(message);
 
     if (type == SPEW_ERROR) {
       fprintf(stderr, "\n");
-      OutputDebugString("\n");
+      Plat_DebugString("\n");
     }
 
     if (g_pLogFile) {
-      CmdLib_FPrintf(g_pLogFile, "%s", pMsg);
+      CmdLib_FPrintf(g_pLogFile, "%s", message);
       g_pFileSystem->Flush(g_pLogFile);
     }
 
     // Dispatch to other spew hooks.
     FOR_EACH_LL(g_ExtraSpewHooks, i)
-    g_ExtraSpewHooks[i](pMsg);
+    g_ExtraSpewHooks[i](message);
 
     RestoreConsoleTextColor(old);
   }
-  LeaveCriticalSection(&g_SpewCS);
 
   if (type == SPEW_ERROR) CmdLib_Exit(1);
 
