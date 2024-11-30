@@ -392,7 +392,9 @@ bool CMoveHelperServer::PlayerFallingDamage( void )
 		if ( g_pGameRules->FlPlayerFallDeathDoesScreenFade( m_pHostPlayer ) )
 		{
 			color32 black = {0, 0, 0, 255};
-			UTIL_ScreenFade( m_pHostPlayer, black, 0, 9999, FFADE_OUT | FFADE_STAYOUT );
+			// dimhotepus: 0 fade time is too fast, use 0.3s for better visual.
+			// dimhotepus: 9999 fade time caused overflow. Reduce to a lowest allowed (63 seconds) value.
+			UTIL_ScreenFade( m_pHostPlayer, black, 0.3f, 63, FFADE_OUT | FFADE_STAYOUT );
 		}
 		return(false);
 	}
