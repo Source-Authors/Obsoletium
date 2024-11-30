@@ -72,7 +72,6 @@ $Project "gameui"
 		$File	"PanelListPanel.cpp"
 		$File	"RunGameEngine.cpp"
 		$File	"$SRCDIR\common\GameUI\scriptobject.cpp"
-		$File	"$SRCDIR\Tracker\common\Socket.cpp" [!$POSIX]
 		$File	"Sys_Utils.cpp"
 		$File	"TextEntryBox.cpp"
 		$File	"TGAImagePanel.cpp"
