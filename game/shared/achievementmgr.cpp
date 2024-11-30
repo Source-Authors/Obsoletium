@@ -1368,7 +1368,7 @@ void CAchievementMgr::PrintAchievementStatus()
 	{
 		CBaseAchievement *pAchievement = m_mapAchievement[i];
 
-		Msg( "%42s ", pAchievement->GetName() );	
+		Msg( "[achiev] %42s ", pAchievement->GetName() );
 
 		CFailableAchievement *pFailableAchievement = dynamic_cast<CFailableAchievement *>( pAchievement );
 		if ( pAchievement->IsAchieved() )
@@ -1382,7 +1382,7 @@ void CAchievementMgr::PrintAchievementStatus()
 		else 
 		{
 			char szBuf[255];
-			Q_snprintf( szBuf, ARRAYSIZE( szBuf ), "(%d/%d)%s", pAchievement->GetCount(), pAchievement->GetGoal(),
+			V_sprintf_safe( szBuf, "(%d/%d)%s", pAchievement->GetCount(), pAchievement->GetGoal(),
 				pAchievement->IsActive() ? "" : " (inactive)" );
 			Msg( "%-20s", szBuf );
 		}
