@@ -13,7 +13,7 @@
 
 * Use `git clone --recurse-submodules`
 * Run `create_<GAME_NAME>_dev_<ARCH>.bat` from `Developer Command Prompt` (Use x64 version for x64 CPU arch). See directory tree for supported games.
-* Open `hl2_<ARCH>.sln`.
+* Open `<GAME_NAME>_<ARCH>.sln`.
 * Build.
 
 
