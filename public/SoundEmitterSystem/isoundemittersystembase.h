@@ -107,7 +107,19 @@ struct sound_interval_t
 
 	interval_t &ToInterval( interval_t &dest ) const	{ dest.start = start; dest.range = range; return dest; }
 	void FromInterval( const interval_t &from )			{ start = from.start; range = from.range; }
-	float Random() const								{ return RandomFloat( start, start + range ); }
+	// dimhotepus: Integral or floating point return type based on T.
+	auto Random() const								
+	{
+		// dimhotepus: Correct Random* call based on type.
+		if constexpr (std::is_integral_v<T>)
+		{
+			return static_cast<T>(RandomInt( start, start + range ));
+		}
+		else
+		{
+			return RandomFloat( start, start + range );
+		}
+	}
 };
 
 
