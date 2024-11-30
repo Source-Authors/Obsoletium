@@ -232,7 +232,7 @@ public:
 	};
 protected:
 	// Client-only dynamic model indices are iterators into this struct (only populated by CModelInfoClient subclass)
-	CUtlStableHashtable< model_t*, empty_t, ModelFileHandleHash, ModelFileHandleEq, int16, FileNameHandle_t > m_ClientDynamicModels;
+	CUtlStableHashtable< model_t*, empty_t, ModelFileHandleHash, ModelFileHandleEq, int32, FileNameHandle_t > m_ClientDynamicModels;
 };
 
 int CModelInfo::GetModelIndex( const char *name ) const

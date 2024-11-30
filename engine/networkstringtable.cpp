@@ -193,7 +193,7 @@ public:
 	}
 
 private:
-	CUtlStableHashtable< CUtlConstString, CNetworkStringTableItem, CaselessStringHashFunctor, UTLConstStringCaselessStringEqualFunctor<char> > m_Lookup;
+	CUtlStableHashtable< CUtlConstString, CNetworkStringTableItem, CaselessStringHashFunctor, UTLConstStringCaselessStringEqualFunctor<char>, int32 > m_Lookup;
 };
 
 //-----------------------------------------------------------------------------
