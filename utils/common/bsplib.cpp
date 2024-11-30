@@ -3180,47 +3180,54 @@ int		IntForKeyWithDefault(entity_t *ent, char *key, int nDefault )
 	return atol(k);
 }
 
-// dimhotepus: Unused.
-//void 	GetVectorForKey (entity_t *ent, char *key, Vector& vec)
-//{
-//
-//	char *k = ValueForKey (ent, key);
-//// scanf into doubles, then assign, so it is vec_t size independent
-//	double	v1, v2, v3;
-//	v1 = v2 = v3 = 0;
-//	sscanf (k, "%lf %lf %lf", &v1, &v2, &v3);
-//	vec[0] = v1;
-//	vec[1] = v2;
-//	vec[2] = v3;
-//}
+void 	GetVectorForKey (entity_t *ent, char *key, Vector& vec)
+{
+	const char *k = ValueForKey (ent, key);
+// scanf into doubles, then assign, so it is vec_t size independent
+	double	v1, v2, v3;
+	v1 = v2 = v3 = 0;
+	if ( !Q_isempty( k ) && sscanf (k, "%lf %lf %lf", &v1, &v2, &v3) != 3 )
+	{
+		Warning( "Key '%s' has value '%s' which is not a vector3.\n", key, k );
+	}
 
-// dimhotepus: Unused.
-//void 	GetVector2DForKey (entity_t *ent, char *key, Vector2D& vec)
-//{
-//	double	v1, v2;
-//
-//	char *k = ValueForKey (ent, key);
-//// scanf into doubles, then assign, so it is vec_t size independent
-//	v1 = v2 = 0;
-//	sscanf (k, "%lf %lf", &v1, &v2);
-//	vec[0] = v1;
-//	vec[1] = v2;
-//}
+	vec[0] = v1;
+	vec[1] = v2;
+	vec[2] = v3;
+}
 
-// dimhotepus: Unused.
-//void 	GetAnglesForKey (entity_t *ent, char *key, QAngle& angle)
-//{
-//	char	*k;
-//	double	v1, v2, v3;
-//
-//	k = ValueForKey (ent, key);
-//// scanf into doubles, then assign, so it is vec_t size independent
-//	v1 = v2 = v3 = 0;
-//	sscanf (k, "%lf %lf %lf", &v1, &v2, &v3);
-//	angle[0] = v1;
-//	angle[1] = v2;
-//	angle[2] = v3;
-//}
+void 	GetVector2DForKey (entity_t *ent, char *key, Vector2D& vec)
+{
+	double	v1, v2;
+
+	const char *k = ValueForKey (ent, key);
+// scanf into doubles, then assign, so it is vec_t size independent
+	v1 = v2 = 0;
+	if ( sscanf (k, "%lf %lf", &v1, &v2) != 2 )
+	{
+		Warning( "key '%s' has value '%s' which is not a vector2.\n", key, k );
+	}
+
+	vec[0] = v1;
+	vec[1] = v2;
+}
+
+void 	GetAnglesForKey (entity_t *ent, char *key, QAngle& angle)
+{
+	double	v1, v2, v3;
+
+	const char *k = ValueForKey (ent, key);
+// scanf into doubles, then assign, so it is vec_t size independent
+	v1 = v2 = v3 = 0;
+	if ( sscanf (k, "%lf %lf %lf", &v1, &v2, &v3) != 3 )
+	{
+		Warning( "key '%s' has value '%s' which is not a qangle.\n", key, k );
+	}
+
+	angle[0] = v1;
+	angle[1] = v2;
+	angle[2] = v3;
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
