@@ -432,8 +432,8 @@ void CLeaderboardDialog::UpdateLeaderboard( int iNewRank )
 	}
  	else if ( iNewActiveItemIndex >= m_Menu.GetBaseRowIndex() + nVisibleItems )
  	{
-		int nHiddenItems = NUM_ROWS_PER_QUERY - nVisibleItems;
-		int iTopRank = iNewRank + nHiddenItems;
+		int nHiddenItems2 = NUM_ROWS_PER_QUERY - nVisibleItems;
+		int iTopRank = iNewRank + nHiddenItems2;
 		if ( iTopRank > m_iMaxRank )
 		{
 			iTopRank = m_iMaxRank;
