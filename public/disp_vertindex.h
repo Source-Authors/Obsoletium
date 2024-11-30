@@ -54,7 +54,13 @@ inline CVertIndex BuildOffsetVertIndex(
 	CVertIndex const &offset,
 	int mul )
 {
-	return CVertIndex( nodeIndex.x + offset.x * mul, nodeIndex.y + offset.y * mul );
+	const int x = nodeIndex.x + offset.x * mul;
+	const int y = nodeIndex.y + offset.y * mul;
+
+	Assert(x >= SHRT_MIN && x <= SHRT_MAX);
+	Assert(y >= SHRT_MIN && y <= SHRT_MAX);
+
+	return CVertIndex( static_cast<short>(x), static_cast<short>(y) );
 }
 
 
