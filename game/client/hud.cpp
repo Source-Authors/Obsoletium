@@ -524,7 +524,8 @@ void CHud::LevelInit( void )
 
 	// Unhide all render groups
 	size_t iCount = m_RenderGroups.Count();
-	for ( size_t i = 0; i < iCount; i++ )
+	Assert( iCount <= std::numeric_limits<unsigned short>::max() );
+	for ( unsigned short i = 0; i < static_cast<unsigned short>(iCount); i++ )
 	{
 		CHudRenderGroup *group = m_RenderGroups[ i ];
 		group->bHidden = false;
