@@ -22,5 +22,6 @@ $Configuration
 	$Linker
 	{
 		$SubSystem		"Console (/SUBSYSTEM:CONSOLE)"
+		$EnableLargeAddresses		"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)" [$WIN32]
 	}
 }
