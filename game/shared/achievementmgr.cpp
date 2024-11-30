@@ -1140,7 +1140,7 @@ bool CalcPlayersOnFriendsList( int iMinFriends )
 	if ( !g_PR )
 		return false;
 
-	Assert( g_pGameRules->IsMultiplayer() );
+	Assert( g_pGameRules && g_pGameRules->IsMultiplayer() );
 
 	// Do a cheap rejection: check teammate count first to see if we even need to bother checking w/Steam
 	// Subtract 1 for the local player.
@@ -1149,28 +1149,14 @@ bool CalcPlayersOnFriendsList( int iMinFriends )
 
 	// determine local player team
 	int iLocalPlayerIndex =  GetLocalPlayerIndex();
-	uint64 XPlayerUid = 0;
 
-	if ( IsPC() )
-	{
 #ifndef NO_STEAM
-		if ( !steamapicontext->SteamFriends() || !steamapicontext->SteamUtils() || !g_pGameRules->IsMultiplayer() )
-#endif
-			return false;
-
-	}
-	else if ( IsX360() )
-	{
-		if ( !matchmaking )
-			return false;
-
-		XPlayerUid = XBX_GetPrimaryUserId();
-	}
-	else
-	{
-		// other platforms...?
+	if ( !steamapicontext->SteamFriends() || !steamapicontext->SteamUtils() || !g_pGameRules->IsMultiplayer() )
 		return false;
-	}
+#else
+	return false;
+#endif
+
 	// Loop through the players
 	int iTotalFriends = 0;
 	for( int iPlayerIndex = 1 ; iPlayerIndex <= MAX_PLAYERS; iPlayerIndex++ )
@@ -1178,37 +1164,24 @@ bool CalcPlayersOnFriendsList( int iMinFriends )
 		// find all players who are on the local player's team
 		if( ( iPlayerIndex != iLocalPlayerIndex ) && ( g_PR->IsConnected( iPlayerIndex ) ) )
 		{
-			if ( IsPC() )
-			{
-				player_info_t pi;
-				if ( !engine->GetPlayerInfo( iPlayerIndex, &pi ) )
-					continue;
-				if ( !pi.friendsID )
-					continue;
+			player_info_t pi;
+			if ( !engine->GetPlayerInfo( iPlayerIndex, &pi ) )
+				continue;
+			if ( !pi.friendsID )
+				continue;
+
 #ifndef NO_STEAM
-				// check and see if they're on the local player's friends list
-				CSteamID steamID( pi.friendsID, 1, GetUniverse(), k_EAccountTypeIndividual );
-				if ( !steamapicontext->SteamFriends()->HasFriend( steamID, /*k_EFriendFlagImmediate*/ 0x04 ) )
-					continue;
+			// check and see if they're on the local player's friends list
+			CSteamID steamID( pi.friendsID, 1, GetUniverse(), k_EAccountTypeIndividual );
+			if ( !steamapicontext->SteamFriends()->HasFriend( steamID, /*k_EFriendFlagImmediate*/ 0x04 ) )
+				continue;
 #endif
-			}
-			else if ( IsX360() )
-			{
-				uint64 XUid[1];
-				XUid[0] = matchmaking->PlayerIdToXuid( iPlayerIndex );
-				BOOL bFriend;
-#ifdef _X360
-				XUserAreUsersFriends( XPlayerUid, XUid, 1, &bFriend, NULL );
-#endif // _X360
-				if ( !bFriend )
-					continue;
-			}
 
 			iTotalFriends++;
 		}
 	}
 
-	return (iTotalFriends >= iMinFriends);
+	return iTotalFriends >= iMinFriends;
 }
 
 //-----------------------------------------------------------------------------
@@ -1218,59 +1191,49 @@ bool CalcPlayersOnFriendsList( int iMinFriends )
 //-----------------------------------------------------------------------------
 bool CalcHasNumClanPlayers( int iClanTeammates )
 {
-	Assert( g_pGameRules->IsMultiplayer() );
+	Assert( g_pGameRules && g_pGameRules->IsMultiplayer() );
 
-	if ( IsPC() )
+	// Do a cheap rejection: check teammate count first to see if we even need to bother checking w/Steam
+	// Subtract 1 for the local player.
+	if ( CalcPlayerCount()-1 < iClanTeammates )
+		return false;
+
+	// dimhotepus: No Steam.
+#ifdef NO_STEAM
+	return false;
+#else
+	if ( !steamapicontext->SteamFriends() || !steamapicontext->SteamUtils() || !g_pGameRules->IsMultiplayer() )
+		return false;
+#endif
+
+	// determine local player team
+	int iLocalPlayerIndex =  GetLocalPlayerIndex();
+
+	for ( int iClan = 0; iClan < steamapicontext->SteamFriends()->GetClanCount(); iClan++ )
 	{
-#ifndef _X360
-		// Do a cheap rejection: check teammate count first to see if we even need to bother checking w/Steam
-		// Subtract 1 for the local player.
-		if ( CalcPlayerCount()-1 < iClanTeammates )
-			return false;
-
-		if ( !steamapicontext->SteamFriends() || !steamapicontext->SteamUtils() || !g_pGameRules->IsMultiplayer() )
-			return false;
-
-		// determine local player team
-		int iLocalPlayerIndex =  GetLocalPlayerIndex();
-
-		for ( int iClan = 0; iClan < steamapicontext->SteamFriends()->GetClanCount(); iClan++ )
+		int iClanMembersOnTeam = 0;
+		CSteamID clanID = steamapicontext->SteamFriends()->GetClanByIndex( iClan );
+		// enumerate all players
+		for( int iPlayerIndex = 1 ; iPlayerIndex <= MAX_PLAYERS; iPlayerIndex++ )
 		{
-			int iClanMembersOnTeam = 0;
-			CSteamID clanID = steamapicontext->SteamFriends()->GetClanByIndex( iClan );
-			// enumerate all players
-			for( int iPlayerIndex = 1 ; iPlayerIndex <= MAX_PLAYERS; iPlayerIndex++ )
+			if( ( iPlayerIndex != iLocalPlayerIndex ) && ( g_PR->IsConnected( iPlayerIndex ) ) )
 			{
-				if( ( iPlayerIndex != iLocalPlayerIndex ) && ( g_PR->IsConnected( iPlayerIndex ) ) )
-				{
-					player_info_t pi;
-					if ( engine->GetPlayerInfo( iPlayerIndex, &pi ) && ( pi.friendsID ) )
-					{	
-						// check and see if they're on the local player's friends list
-						CSteamID steamID( pi.friendsID, 1, GetUniverse(), k_EAccountTypeIndividual );
-						if ( steamapicontext->SteamFriends()->IsUserInSource( steamID, clanID ) )
-						{
-							iClanMembersOnTeam++;
-							if ( iClanMembersOnTeam == iClanTeammates )
-								return true;
-						}
+				player_info_t pi;
+				if ( engine->GetPlayerInfo( iPlayerIndex, &pi ) && ( pi.friendsID ) )
+				{	
+					// check and see if they're on the local player's friends list
+					CSteamID steamID( pi.friendsID, 1, GetUniverse(), k_EAccountTypeIndividual );
+					if ( steamapicontext->SteamFriends()->IsUserInSource( steamID, clanID ) )
+					{
+						iClanMembersOnTeam++;
+						if ( iClanMembersOnTeam == iClanTeammates )
+							return true;
 					}
 				}
 			}
 		}
-#endif
-		return false;
 	}
-	else if ( IsX360() )
-	{
-		// TODO: implement for 360
-		return false;
-	}
-	else 
-	{
-		// other platforms...?
-		return false;
-	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -2023,11 +1986,18 @@ CON_COMMAND_F( achievement_test_friend_count, "Counts the # of teammates on loca
 	CAchievementMgr *pAchievementMgr = dynamic_cast<CAchievementMgr *>( engine->GetAchievementMgr() );
 	if ( !pAchievementMgr )
 		return;
+
 	if ( 2 != args.ArgC() )
 	{
 		Msg( "Usage: achievement_test_friend_count <min # of teammates>\n" );
 		return;
 	}
+	
+#ifdef NO_STEAM
+	Warning( "Can't count # of friends in the game. No Steam support in this build.\n" );
+	return;
+#endif
+
 	int iMinFriends = atoi( args[1] );
 	bool bRet = CalcPlayersOnFriendsList( iMinFriends );
 	Msg( "You %s have at least %d friends in the game.\n", bRet ? "do" : "do not", iMinFriends );
@@ -2044,6 +2014,12 @@ CON_COMMAND_F( achievement_test_clan_count, "Determines if specified # of teamma
 		Msg( "Usage: achievement_test_clan_count <# of clan teammates>\n" );
 		return;
 	}
+
+#ifdef NO_STEAM
+	Warning( "Can't check # of players who you're in a Steam group with. No Steam support in this build.\n" );
+	return;
+#endif
+
 	int iClanPlayers = atoi( args[1] );
 	bool bRet = CalcHasNumClanPlayers( iClanPlayers );
 	Msg( "There %s %d players who you're in a Steam group with.\n", bRet ? "are" : "are not", iClanPlayers );

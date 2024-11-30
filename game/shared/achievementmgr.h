@@ -106,7 +106,7 @@ public:
 		return false;
 #endif
 	}
-	float GetTimeLastUpload() { return m_flTimeLastSaved; }			// time we last uploaded to Steam
+	double GetTimeLastUpload() const { return m_flTimeLastSaved; }			// time we last uploaded to Steam
 
 	bool WereCheatsEverOn( void ) { return m_bCheatsEverOn; }
 
@@ -148,7 +148,7 @@ private:
 	bool  m_bSteamDataDirty;			// do we have changes to upload to Steamworks?
 	bool  m_bGlobalStateLoaded;			// have we loaded global state
 	bool  m_bCheatsEverOn;				// have cheats ever been turned on in this level
-	float m_flTimeLastSaved;			// last time we uploaded to Steam
+	double m_flTimeLastSaved;			// last time we uploaded to Steam
 
     //=============================================================================
     // HPE_BEGIN
