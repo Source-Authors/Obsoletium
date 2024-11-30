@@ -164,20 +164,22 @@ void CHudSuitPower::Paint()
 		}
 	}
 
-	// draw the suit power bar
-	surface()->DrawSetColor( m_AuxPowerColor );
-	int xpos = m_flBarInsetX, ypos = m_flBarInsetY;
-	for (int i = 0; i < enabledChunks; i++)
 	{
-		surface()->DrawFilledRect( xpos, ypos, xpos + m_flBarChunkWidth, ypos + m_flBarHeight );
-		xpos += (m_flBarChunkWidth + m_flBarChunkGap);
-	}
-	// draw the exhausted portion of the bar.
-	surface()->DrawSetColor( Color( m_AuxPowerColor[0], m_AuxPowerColor[1], m_AuxPowerColor[2], m_iAuxPowerDisabledAlpha ) );
-	for (int i = enabledChunks; i < chunkCount; i++)
-	{
-		surface()->DrawFilledRect( xpos, ypos, xpos + m_flBarChunkWidth, ypos + m_flBarHeight );
-		xpos += (m_flBarChunkWidth + m_flBarChunkGap);
+		// draw the suit power bar
+		surface()->DrawSetColor( m_AuxPowerColor );
+		int xpos = m_flBarInsetX, ypos = m_flBarInsetY;
+		for (int i = 0; i < enabledChunks; i++)
+		{
+			surface()->DrawFilledRect( xpos, ypos, xpos + m_flBarChunkWidth, ypos + m_flBarHeight );
+			xpos += (m_flBarChunkWidth + m_flBarChunkGap);
+		}
+		// draw the exhausted portion of the bar.
+		surface()->DrawSetColor( Color( m_AuxPowerColor[0], m_AuxPowerColor[1], m_AuxPowerColor[2], m_iAuxPowerDisabledAlpha ) );
+		for (int i = enabledChunks; i < chunkCount; i++)
+		{
+			surface()->DrawFilledRect( xpos, ypos, xpos + m_flBarChunkWidth, ypos + m_flBarHeight );
+			xpos += (m_flBarChunkWidth + m_flBarChunkGap);
+		}
 	}
 
 	// draw our name

@@ -312,7 +312,7 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 	sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 	sParticle->m_flRollDelta	= 0.0f;
 
-	int alpha = 128;
+	constexpr int alpha = 128;
 
 	sParticle->m_uchColor[0]	= alpha;
 	sParticle->m_uchColor[1]	= alpha;
@@ -341,12 +341,12 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		int alpha = 100;
+		constexpr int alpha1 = 100;
 
-		sParticle->m_uchColor[0]	= alpha;
-		sParticle->m_uchColor[1]	= alpha;
-		sParticle->m_uchColor[2]	= alpha;
-		sParticle->m_uchStartAlpha	= alpha;
+		sParticle->m_uchColor[0]	= alpha1;
+		sParticle->m_uchColor[1]	= alpha1;
+		sParticle->m_uchColor[2]	= alpha1;
+		sParticle->m_uchStartAlpha	= alpha1;
 		sParticle->m_uchEndAlpha	= 0;
 
 		if ( i < 1 )
@@ -404,12 +404,12 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		unsigned char alpha = 255;
+		constexpr unsigned char alpha2 = 255;
 
-		sParticle->m_uchColor[0]	= alpha;
-		sParticle->m_uchColor[1]	= alpha;
-		sParticle->m_uchColor[2]	= alpha;
-		sParticle->m_uchStartAlpha	= alpha;
+		sParticle->m_uchColor[0]	= alpha2;
+		sParticle->m_uchColor[1]	= alpha2;
+		sParticle->m_uchColor[2]	= alpha2;
+		sParticle->m_uchStartAlpha	= alpha2;
 		sParticle->m_uchEndAlpha	= 0;
 
 		sParticle->m_uchStartSize	= 1;

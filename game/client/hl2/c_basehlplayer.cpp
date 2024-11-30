@@ -446,7 +446,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 			else
 			{
 				// try moving directly away from the object
-				Vector vTestPosition = GetAbsOrigin() - dirToObject * radius * 2;
+				vTestPosition = GetAbsOrigin() - dirToObject * radius * 2;
 				if ( TestMove( vTestPosition, size.z * 2, radius * 2, obj->GetAbsOrigin(), vMoveDir ) )
 				{
 					fwd = currentdir.Dot( -dirToObject );
