@@ -1016,7 +1016,7 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, float ene
 // Input  : idx - 
 // Output : static void
 //-----------------------------------------------------------------------------
-static HSOUNDSCRIPTHANDLE PrecachePhysicsSoundByStringIndex( int idx )
+static HSOUNDSCRIPTHANDLE PrecachePhysicsSoundByStringIndex( unsigned short idx )
 {
 	// Only precache if a value was set in the script file...
 	if ( idx != 0 )
