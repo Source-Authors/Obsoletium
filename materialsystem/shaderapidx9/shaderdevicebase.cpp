@@ -158,7 +158,7 @@ bool CShaderDeviceMgrBase::Connect( CreateInterfaceFn factory )
 	}
 
 	// NOTE! : Overbright is 1.0 so that Hammer will work properly with the white bumped and unbumped lightmaps.
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT );
 	return true;
 }
 

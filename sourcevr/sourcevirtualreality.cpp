@@ -136,7 +136,7 @@ InitReturnVal_t	CSourceVirtualReality::Init()
 	if ( nRetVal != INIT_OK )
 		return nRetVal;
 
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT );
 
 	// if our tracker expects to use the texture base distortion shader,
 	// make the procedural textures for that shader now

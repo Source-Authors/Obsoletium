@@ -10,6 +10,8 @@
 #include "cmdlib.h"
 #include "zip_utils.h"
 
+#include "materialsystem/imaterialsystem.h"
+
 struct CBSPPack final : public IBSPPack 
 {
 	void LoadBSPFile( IFileSystem *pFileSystem, char *filename ) override;
@@ -27,7 +29,7 @@ struct CBSPPack final : public IBSPPack
 
 void CBSPPack::LoadBSPFile( IFileSystem *pFileSystem, char *filename )
 {
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2 );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT );
 	
 	// This is shady, but the engine is the only client here and we want the same search paths it has.
 	g_pFileSystem = g_pFullFileSystem = pFileSystem;

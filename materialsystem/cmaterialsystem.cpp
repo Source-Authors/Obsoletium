@@ -632,7 +632,7 @@ InitReturnVal_t CMaterialSystem::Init()
 	if ( nRetVal != INIT_OK )
 		return nRetVal;
 
-	MathLib_Init( 2.2f, 2.2f, 0.0f, OVERBRIGHT );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT );
 
 	if ( !g_pShaderDeviceMgr->SetAdapter( m_nAdapter, m_nAdapterFlags ) )
 	{
@@ -1152,29 +1152,17 @@ bool CMaterialSystem::SetMode( void* hwnd, const MaterialSystem_Config_t &config
 	// will be reloaded via the reaquireresources call. Same goes for procedural materials
 	if ( !bPreviouslyUsingGraphics )
 	{
-		if ( IsPC() )
+		TextureManager()->RestoreRenderTargets();
+		TextureManager()->RestoreNonRenderTargetTextures();
+		if ( MaterialSystem()->CanUseEditorMaterials() )
 		{
-			TextureManager()->RestoreRenderTargets();
-			TextureManager()->RestoreNonRenderTargetTextures();
-			if ( MaterialSystem()->CanUseEditorMaterials() )
-			{
-				// We are in Hammer.  Allocate these here since we aren't going to allocate
-				// lightmaps.
-				// HACK!
-				// NOTE! : Overbright is 1.0 so that Hammer will work properly with the white bumped and unbumped lightmaps.
-				MathLib_Init( 2.2f, 2.2f, 0.0f, OVERBRIGHT );
-			}
-
-			AllocateStandardTextures();
-			TextureManager()->WarmTextureCache();
+			// We are in Hammer.  Allocate these here since we aren't going to allocate
+			// lightmaps.
+			MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT );
 		}
 
-		if ( IsX360() )
-		{
-			// shaderapi was not viable at init time, it is now
-			TextureManager()->ReloadTextures();
-			AllocateStandardTextures();
-		}
+		AllocateStandardTextures();
+		TextureManager()->WarmTextureCache();
 	}
 
 	g_pShaderDevice->SetHardwareGammaRamp( config.m_fMonitorGamma, config.m_fGammaTVRangeMin, config.m_fGammaTVRangeMax, 

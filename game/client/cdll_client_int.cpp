@@ -860,7 +860,7 @@ ISourceVirtualReality *g_pSourceVR = NULL;
 int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physicsFactory, CGlobalVarsBase *pGlobals )
 {
 	InitCRTMemDebug();
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT );
 
 
 #ifdef SIXENSE

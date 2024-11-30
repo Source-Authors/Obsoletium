@@ -124,7 +124,7 @@ void *CStudioRenderContext::QueryInterface( const char *pInterfaceName )
 //-----------------------------------------------------------------------------
 InitReturnVal_t CStudioRenderContext::Init()
 {
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT );
 
 	InitReturnVal_t nRetVal = BaseClass::Init();
 	if ( nRetVal != INIT_OK )

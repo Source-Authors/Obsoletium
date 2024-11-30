@@ -11,6 +11,8 @@
 #include "tier0/platform.h"
 #include "mathlib/mathlib.h"
 
+#include "materialsystem/imaterialsystem.h"
+
 #ifdef _WIN32
 #include "winlite.h"
 #endif
@@ -28,7 +30,7 @@ void ivu_string_print_function(const char *message) { Msg("%s", message); }
 BOOL WINAPI DllMain(HINSTANCE, DWORD call_reason, LPVOID) {
   if (call_reason == DLL_PROCESS_ATTACH) {
     // ivp_set_message_print_function( ivu_string_print_function );
-    MathLib_Init(2.2f, 2.2f, 0.0f, 2, false, false, false, false);
+    MathLib_Init(GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false);
   }
   return TRUE;
 }
@@ -40,6 +42,6 @@ void __attribute__((constructor)) vphysics_init();
 
 void vphysics_init() {
   // ivp_set_message_print_function( ivu_string_print_function );
-  MathLib_Init(2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false);
+  MathLib_Init(GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false);
 }
 #endif

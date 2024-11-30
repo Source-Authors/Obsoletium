@@ -639,7 +639,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 
 	g_pSharedChangeInfo = engine->GetSharedEdictChangeInfo();
 	
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT );
 
 	// save these in case other system inits need them
 	factorylist_t factories;

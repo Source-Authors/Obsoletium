@@ -12,6 +12,8 @@
 #include "cmd.h" // Cmd_*
 #include "console.h"  // ConMsg
 
+#include "materialsystem/imaterialsystem.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -20,10 +22,7 @@ static bool s_bAllowSSE2 = true;
 
 void InitMathlib()
 {
-	MathLib_Init( 2.2f, // v_gamma.GetFloat()
-		2.2f, // v_texgamma.GetFloat()
-		0.0f /*v_brightness.GetFloat() */, 
-		2.0f /*mat_overbright.GetInt() */, s_bAllow3DNow, true, s_bAllowSSE2, true );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, s_bAllow3DNow, true, s_bAllowSSE2, true );
 }
 
 /*

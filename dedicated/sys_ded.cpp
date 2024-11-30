@@ -19,9 +19,9 @@
 #include "vgui/vguihelpers.h"
 #include "appframework/AppFramework.h"
 #include "filesystem_init.h"
-#include "dedicated.h"
 #include "vstdlib/cvar.h"
 #include "inputsystem/iinputsystem.h"
+#include "materialsystem/imaterialsystem.h"
 
 #include "app_version_config.h"
 #include "../dedicated_main/resource.h"
@@ -452,7 +452,7 @@ int BootMain(int argc, char **argv, bool is_console_mode, ISystem *system) {
   BuildCmdLine(argc, argv);
 #endif
 
-  MathLib_Init(2.2f, 2.2f, 0.0f, 1);
+  MathLib_Init(GAMMA, TEXGAMMA, 0.0f, 1);
 
   ICommandLine *command_line{CommandLine()};
   // Store off command line for argument searching.

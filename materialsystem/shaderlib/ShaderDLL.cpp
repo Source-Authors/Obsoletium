@@ -95,7 +95,7 @@ EXPOSE_INTERFACE_FN( (InstantiateInterfaceFn)GetShaderDLLInternal, IShaderDLLInt
 //-----------------------------------------------------------------------------
 CShaderDLL::CShaderDLL()
 {
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT );
 }
 
 
