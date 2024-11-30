@@ -18,7 +18,6 @@
 #include "colorformatdx8.h"
 #include "materialsystem/IShader.h"
 #include "shaderapidx8.h"
-#include "shaderapidx8_global.h"
 #include "imeshdx8.h"
 #include "materialsystem/materialsystem_config.h"
 #include "vertexshaderdx8.h"
@@ -58,12 +57,6 @@ static double s_rdtsc_to_ms;
 #ifndef _X360
 #include "wmi.h"
 #endif
-
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_win32stubs.h"
-#endif
-
 
 //#define DX8_COMPATABILITY_MODE
 
@@ -3244,47 +3237,3 @@ IIndexBuffer *CShaderDeviceDx8::GetDynamicIndexBuffer( MaterialIndexFormat_t fmt
 	LOCK_SHADERAPI();
 	return MeshMgr()->GetDynamicIndexBuffer( fmt, bBuffered );
 }
-
-#ifdef _X360
-void CShaderDeviceDx8::SpewVideoInfo360( const CCommand &args )
-{
-	XVIDEO_MODE videoMode;
-	XGetVideoMode( &videoMode );
-
-	Warning( "back buffer size: %dx%d\n", m_PresentParameters.BackBufferWidth, m_PresentParameters.BackBufferHeight );
-	Warning( "display resolution: %dx%d %s\n", videoMode.dwDisplayWidth, videoMode.dwDisplayHeight, videoMode.fIsInterlaced ? "interlaced" : "progressive" );
-	Warning( "refresh rate: %f\n", videoMode.RefreshRate );
-	Warning( "aspect: %s\n", videoMode.fIsWideScreen ? "16x9 (widescreen)" : "4x3 (normal)" );
-	Warning( "%s\n", videoMode.fIsHiDef ? "hidef" : "lodef" );
-	switch( videoMode.VideoStandard )
-	{
-	case XC_VIDEO_STANDARD_NTSC_M:
-		Warning( "video standard: NTSC_M\n" );
-		break;
-	case XC_VIDEO_STANDARD_NTSC_J:
-		Warning( "video standard: NTSC_J\n" );
-		break;
-	case XC_VIDEO_STANDARD_PAL_I:
-		Warning( "video standard: PAL_I\n" );
-		break;
-	default:
-		Warning( "error: UNKNOWN VIDEO STANDARD!\n" );
-		Assert( 0 );
-		break;
-	}
-	ConVarRef fps_max( "fps_max" );
-	Warning( "fps_max: %f\n", fps_max.GetFloat() );
-	switch( m_PresentParameters.MultiSampleType )
-	{
-	case D3DMULTISAMPLE_NONE:
-		Warning( "multisample type: D3DMULTISAMPLE_NONE\n" );
-		break;
-	case D3DMULTISAMPLE_2_SAMPLES:
-		Warning( "multisample type: D3DMULTISAMPLE_2_SAMPLES\n" );
-		break;
-	case D3DMULTISAMPLE_4_SAMPLES:
-		Warning( "multisample type: D3DMULTISAMPLE_4_SAMPLES\n" );
-		break;
-	}
-}
-#endif
