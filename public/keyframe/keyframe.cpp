@@ -251,6 +251,8 @@ void CPositionInterpolator_CatmullRom::InterpolatePosition( float time, Vector &
 class CRopeDelegate : public CSimplePhysics::IHelper
 {
 public:
+	CRopeDelegate() { m_CurEndPoints[0] = vec3_invalid; m_CurEndPoints[1] = vec3_invalid; }
+
 	virtual void	GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel );
 	virtual void	ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes );
 
