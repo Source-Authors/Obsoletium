@@ -114,7 +114,7 @@ abstract_class IEntityFactory
 public:
 	virtual IServerNetworkable *Create( const char *pClassName ) = 0;
 	virtual void Destroy( IServerNetworkable *pNetworkable ) = 0;
-	virtual size_t GetEntitySize() = 0;
+	virtual size_t GetEntitySize() const = 0;
 };
 
 template <class T>
@@ -126,13 +126,13 @@ public:
 		EntityFactoryDictionary()->InstallFactory( this, pClassName );
 	}
 
-	IServerNetworkable *Create( const char *pClassName )
+	IServerNetworkable *Create( const char *pClassName ) override
 	{
-		T* pEnt = _CreateEntityTemplate((T*)NULL, pClassName);
+		T* pEnt = _CreateEntityTemplate((T*)nullptr, pClassName);
 		return pEnt->NetworkProp();
 	}
 
-	void Destroy( IServerNetworkable *pNetworkable )
+	void Destroy( IServerNetworkable *pNetworkable ) override
 	{
 		if ( pNetworkable )
 		{
@@ -140,7 +140,7 @@ public:
 		}
 	}
 
-	virtual size_t GetEntitySize()
+	size_t GetEntitySize() const override
 	{
 		return sizeof(T);
 	}

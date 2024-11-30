@@ -205,7 +205,7 @@ void CEntityFactoryDictionary::ReportEntitySizes()
 {
 	for ( auto i = m_Factories.First(); i != m_Factories.InvalidIndex(); i = m_Factories.Next( i ) )
 	{
-		Msg( " %s: %llu", m_Factories.GetElementName( i ), (uint64)(m_Factories[i]->GetEntitySize()) );
+		Msg( " %32s: %zu\n", m_Factories.GetElementName( i ), m_Factories[i]->GetEntitySize() );
 	}
 }
 
