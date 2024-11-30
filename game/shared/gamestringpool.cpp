@@ -52,19 +52,18 @@ public:
 		CUtlVector<const char*> strings( (intp)0, m_Strings.Count() );
 		for (UtlHashHandle_t i = m_Strings.FirstHandle(); i != m_Strings.InvalidHandle(); i = m_Strings.NextHandle(i))
 		{
-			strings.AddToTail( strings[i] );
+			// dimhotepus: strings[i] -> m_Strings[i].
+			strings.AddToTail( m_Strings[i] );
 		}
-		struct _Local {
-			static int __cdecl F(const char * const *a, const char * const *b) { return strcmp(*a, *b); }
-		};
-		strings.Sort( _Local::F );
+		const auto F = [](const char * const *a, const char * const *b) { return strcmp(*a, *b); };
+		strings.Sort( F );
 		
-		for ( int i = 0; i < strings.Count(); ++i )
+		for ( intp i = 0; i < strings.Count(); ++i )
 		{
-			DevMsg( "  %d (0x%p) : %s\n", i, strings[i], strings[i] );
+			DevMsg( "  %zd (0x%p): %s\n", i, strings[i], strings[i] );
 		}
 		DevMsg( "\n" );
-		DevMsg( "Size:  %d items\n", strings.Count() );
+		DevMsg( "Size:  %zd items\n", strings.Count() );
 	}
 
 	const char *Find(const char *string)
