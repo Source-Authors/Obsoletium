@@ -814,7 +814,7 @@ void CVoteController::VoteControllerThink( void )
 	if ( m_VoteCallers.Count() >= MAX_VOTER_HISTORY )
 	{
 		// Remove older entries
-		for ( int iIdx = m_VoteCallers.FirstInorder(); iIdx != m_VoteCallers.InvalidIndex(); iIdx = m_VoteCallers.NextInorder( iIdx ) )
+		for ( auto iIdx = m_VoteCallers.FirstInorder(); iIdx != m_VoteCallers.InvalidIndex(); iIdx = m_VoteCallers.NextInorder( iIdx ) )
 		{
 			if ( m_VoteCallers[ iIdx ] - gpGlobals->curtime <= 0 )
 			{
