@@ -100,7 +100,7 @@ TimeModifier_t g_TimeModifiers[] =
 
 int Motion_GetNumberOfTimeModifiers( void )
 {
-	return ssize(g_TimeModifiers);
+	return static_cast<int>(ssize(g_TimeModifiers));
 }
 
 bool Motion_GetTimeModifierDetails( int timeInterpNum, const char **outName )
@@ -411,7 +411,7 @@ PositionInterpolatorCreateFn g_PositionInterpolatorCreateFns[] =
 
 int Motion_GetNumberOfPositionInterpolators( void )
 {
-	return ssize(g_PositionInterpolatorCreateFns);
+	return static_cast<int>(ssize(g_PositionInterpolatorCreateFns));
 }
 
 
@@ -455,7 +455,7 @@ RotationInterpolator_t g_RotationInterpolators[] =
 
 int Motion_GetNumberOfRotationInterpolators( void )
 {
-	return ssize(g_RotationInterpolators);
+	return static_cast<int>(ssize(g_RotationInterpolators));
 }
 
 bool Motion_GetRotationInterpolatorDetails( int rotInterpNum, const char **outName, int *outMinKeyReq, int *outMaxKeyReq )
