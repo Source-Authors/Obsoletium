@@ -600,7 +600,7 @@ public:
 	
 	BITBUF_INLINE int	ReadChar() { return (char)ReadUBitLong(8); }
 	BITBUF_INLINE int	ReadByte() { return ReadUBitLong(8); }
-	BITBUF_INLINE int	ReadShort() { return (short)ReadUBitLong(16); }
+	BITBUF_INLINE short	ReadShort() { return (short)ReadUBitLong(16); }
 	BITBUF_INLINE int	ReadWord() { return ReadUBitLong(16); }
 	BITBUF_INLINE long ReadLong() { return ReadUBitLong(32); }
 	int64			ReadLongLong();
