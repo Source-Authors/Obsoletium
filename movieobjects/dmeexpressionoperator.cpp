@@ -24,7 +24,8 @@
 bool ParseLiteral( const char *&expr, float &value )
 {
 	const char *startExpr = expr;
-	value = ( float )strtod( startExpr, const_cast< char** >( &expr ) );
+	// dimhotepus: strtod -> strtof.
+	value = strtof( startExpr, const_cast< char** >( &expr ) );
 	return ( startExpr != expr );
 }
 
