@@ -110,7 +110,9 @@ bool KVPacker::WriteAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 		case KeyValues::TYPE_WSTRING:
 			{
 				size_t nLength = dat->GetWString() ? wcslen( dat->GetWString() ) : 0;
-				buffer.PutShort( nLength );
+				// dimhotepus: Ensure short strings.
+				Assert( nLength <= SHRT_MAX );
+				buffer.PutShort( static_cast<short>(nLength) );
 				for( size_t k = 0; k < nLength; ++ k )
 				{
 					buffer.PutShort( ( unsigned short ) dat->GetWString()[k] );
