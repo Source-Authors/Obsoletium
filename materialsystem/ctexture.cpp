@@ -3996,8 +3996,7 @@ void CTexture::SwapContents( ITexture *pOther )
 	if( (pOther == NULL) || (pOther == this) )
 		return;
 
-	ICallQueue *pCallQueue = materials->GetRenderContext()->GetCallQueue();
-	if ( pCallQueue )
+	if ( ICallQueue *pCallQueue = materials->GetRenderContext()->GetCallQueue(); pCallQueue )
 	{
 		pCallQueue->QueueCall( this, &CTexture::SwapContents, pOther );
 		return;

@@ -3382,8 +3382,7 @@ void CModelRender::ProtectColorDataIfQueued( DataCacheHandle_t hColorMesh )
 	if ( hColorMesh != DC_INVALID_HANDLE)
 	{
 		CMatRenderContextPtr pRenderContext( materials );
-		ICallQueue *pCallQueue = pRenderContext->GetCallQueue();
-		if ( pCallQueue )
+		if ( ICallQueue *pCallQueue = pRenderContext->GetCallQueue(); pCallQueue )
 		{
 			if ( CacheLock( hColorMesh ) ) // CacheCreate above will call functions that won't take place until later. If color mesh isn't used right away, it could get dumped
 			{

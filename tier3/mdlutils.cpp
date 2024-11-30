@@ -144,7 +144,7 @@ void CMDL::UnreferenceMDL()
 	{
 		// XXX need to figure out where it is safe to flush the queue during map change to not crash
 #if 0
-		if ( ICallQueue *pCallQueue = materials->GetRenderContext()->GetCallQueue() )
+		if ( ICallQueue *pCallQueue = materials->GetRenderContext()->GetCallQueue(); pCallQueue )
 		{
 			// Parallel rendering: don't unlock model data until end of rendering
 			pCallQueue->QueueCall( g_pMDLCache, &IMDLCache::UnlockStudioHdr, m_MDLHandle );

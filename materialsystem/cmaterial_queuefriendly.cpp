@@ -18,14 +18,14 @@
 
 #define QUEUE_MATERIAL_CALL( FuncName, ... )														\
 	{																								\
-		ICallQueue *pCallQueue = materials->GetRenderContext()->GetCallQueue();						\
-		if ( !pCallQueue )																			\
+		if ( ICallQueue *pCallQueue = materials->GetRenderContext()->GetCallQueue(); pCallQueue )	\
 		{																							\
-			m_pRealTimeVersion->FuncName( __VA_ARGS__ );											\
+			pCallQueue->																			\
+				QueueCall( m_pRealTimeVersion, &IMaterialInternal::FuncName, ##__VA_ARGS__ );		\
 		}																							\
 		else																						\
 		{																							\
-			pCallQueue->QueueCall( m_pRealTimeVersion, &IMaterialInternal::FuncName, ##__VA_ARGS__ );	\
+			m_pRealTimeVersion->FuncName(__VA_ARGS__);												\
 		}																							\
 	}
 

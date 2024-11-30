@@ -17,7 +17,6 @@
 #include "recording.h"
 #include "shaderapi/ishaderapi.h"
 #include "filesystem.h"
-#include "locald3dtypes.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/callqueue.h"
 #include "tier0/vprof.h"
@@ -391,10 +390,8 @@ void DestroyD3DTexture( IDirect3DBaseTexture* pD3DTex )
 		VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, -nMemUsed );
 #endif
 
-#if !defined( _X360 )
 		CMatRenderContextPtr pRenderContext( materials );
-		ICallQueue *pCallQueue;
-		if ( ( pCallQueue = pRenderContext->GetCallQueue() ) != NULL )
+		if ( ICallQueue *pCallQueue = pRenderContext->GetCallQueue(); pCallQueue )
 		{
 			pCallQueue->QueueCall( ReleaseD3DTexture, pD3DTex );
 		}
@@ -402,9 +399,7 @@ void DestroyD3DTexture( IDirect3DBaseTexture* pD3DTex )
 		{
 			ReleaseD3DTexture( pD3DTex );
 		}
-#else
-		g_TextureHeap.FreeTexture( pD3DTex );
-#endif
+
 		--s_TextureCount;
 	}
 }

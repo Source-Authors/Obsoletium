@@ -2145,8 +2145,7 @@ void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, b
 
 	if ( r_queued_post_processing.GetInt() )
 	{
-		ICallQueue *pCallQueue = pRenderContext->GetCallQueue();
-		if ( pCallQueue )
+		if ( ICallQueue *pCallQueue = pRenderContext->GetCallQueue(); pCallQueue )
 		{
 			pCallQueue->QueueCall( DoEnginePostProcessing, x, y, w, h, bFlashlightIsOn, bPostVGui );
 			return;

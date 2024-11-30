@@ -1823,8 +1823,8 @@ private:
 static void DoMatSysQueueMark( IMaterialSystem *pMaterialSystem, const char *psz )
 {
 	CMatRenderContextPtr pRenderContext( pMaterialSystem );
-	if ( pRenderContext->GetCallQueue() ) 
-		pRenderContext->GetCallQueue()->QueueCall( Plat_DebugString, CUtlEnvelope<const char *>( psz ) );
+	if ( ICallQueue *pCallQueue = pRenderContext->GetCallQueue(); pCallQueue ) 
+		pCallQueue->QueueCall( Plat_DebugString, CUtlEnvelope<const char *>( psz ) );
 }
 
 #define MatSysQueueMark( pMaterialSystem, ...) DoMatSysQueueMark( pMaterialSystem, CFmtStr( __VA_ARGS__ ) )

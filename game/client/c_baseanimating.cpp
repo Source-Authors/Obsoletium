@@ -977,7 +977,7 @@ void C_BaseAnimating::UnlockStudioHdr()
 
 #if 0
 		// XXX need to figure out where to flush the queue on map change to not crash
-		if ( ICallQueue *pCallQueue = materials->GetRenderContext()->GetCallQueue() )
+		if ( ICallQueue *pCallQueue = materials->GetRenderContext()->GetCallQueue(); pCallQueue )
 		{
 			// Parallel rendering: don't unlock model data until end of rendering
 			if ( pStudioHdr->GetVirtualModel() )
