@@ -1879,7 +1879,7 @@ void CMaterialSystem::WriteConfigurationInfoToConVars( bool bOverwriteCommandLin
 		}
 		if (! bLegalVar )
 		{
-			Msg(" Bad convar found in dxsupport - %s\n", pConfigName );
+			Warning("Not supported convar found in %s - %s %.2f\n", SUPPORT_CFG_FILE, pConfigName, pKey->GetFloat() );
 			continue;
 		}
 

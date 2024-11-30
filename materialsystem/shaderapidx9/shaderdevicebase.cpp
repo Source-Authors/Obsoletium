@@ -67,30 +67,6 @@ static void InitShaderAPICVars( )
 	}
 }
 
-
-
-//-----------------------------------------------------------------------------
-// Read dx support levels
-//-----------------------------------------------------------------------------
-#if defined( DX_TO_GL_ABSTRACTION )
-	#if defined( OSX )
-		// OSX
-		#define SUPPORT_CFG_FILE "dxsupport_mac.cfg"
-		// TODO: make this different for Mac?
-		#define SUPPORT_CFG_OVERRIDE_FILE "dxsupport_override.cfg"
-	#else
-		// Linux/Win GL
-		#define SUPPORT_CFG_FILE "dxsupport_linux.cfg"
-		// TODO: make this different for Linux?
-		#define SUPPORT_CFG_OVERRIDE_FILE "dxsupport_override.cfg"
-	#endif
-#else
-	// D3D
-	#define SUPPORT_CFG_FILE "dxsupport.cfg"
-	#define SUPPORT_CFG_OVERRIDE_FILE "dxsupport_override.cfg"
-#endif
-
-
 //-----------------------------------------------------------------------------
 // constructor, destructor
 //-----------------------------------------------------------------------------
