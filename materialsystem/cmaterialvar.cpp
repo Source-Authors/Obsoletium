@@ -1568,7 +1568,8 @@ void CMaterialVar::SetValueAutodetectType( const char *val )
 	const char* pSEnd = val + len ; // pos where token ends
 
 	int ival = strtol( val, &pIEnd, 10 );
-	float fval = (float)strtod( val, &pFEnd );
+	// dimhotepus: strtod -> strtof.
+	float fval = strtof( val, &pFEnd );
 
 	if ( ( pFEnd > pIEnd ) && ( pFEnd == pSEnd ) )
 	{
