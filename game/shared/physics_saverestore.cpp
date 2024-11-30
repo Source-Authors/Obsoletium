@@ -596,7 +596,7 @@ public:
 	
 	string_t GetModelName( IPhysicsObject *pObject )
 	{
-		int i = m_PhysObjectModels.Find( pObject );
+		auto i = m_PhysObjectModels.Find( pObject );
 		if ( i == m_PhysObjectModels.InvalidIndex() )
 			return NULL_STRING;
 		return AllocPooledString( modelinfo->GetModelName( modelinfo->GetModel( m_PhysObjectModels[i] ) ) );
@@ -606,7 +606,7 @@ public:
 	
 	BBox_t * GetBBox( IPhysicsObject *pObject )
 	{
-		int i = m_PhysObjectCustomModels.Find( pObject );
+		auto i = m_PhysObjectCustomModels.Find( pObject );
 		if ( i == m_PhysObjectCustomModels.InvalidIndex() )
 			return NULL;
 		i = m_PhysCollideBBoxModels.Find( m_PhysObjectCustomModels[i] );
