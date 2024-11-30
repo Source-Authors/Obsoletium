@@ -39,7 +39,7 @@ public:
 		data[m_stackDepth++] = elem;
 		if( m_stackDepth > m_maxNumElements )
 		{
-			printf( "ArrayStack overflow\n" );
+			Warning( "ArrayStack overflow\n" );
 			assert( 0 );
 		}
 	}
@@ -48,7 +48,7 @@ public:
 	{
 		if( m_stackDepth == 0 )
 		{
-			printf( "ArrayStack underflow\n" );
+			Warning( "ArrayStack underflow\n" );
 			assert( 0 );
 		}
 		return data[--m_stackDepth];
