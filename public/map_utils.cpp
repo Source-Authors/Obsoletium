@@ -31,8 +31,8 @@ void SetupLightNormalFromProps( const QAngle &angles, float angle, float pitch, 
 		}
 		
 		output[2] = 0;
-		output[0] = (float)cos (angle/180*M_PI);
-		output[1] = (float)sin (angle/180*M_PI);
+
+		DirectX::XMScalarSinCos(&output[1], &output[0], DEG2RAD(angle));
 	}
 	
 	if ( !pitch )
@@ -41,8 +41,11 @@ void SetupLightNormalFromProps( const QAngle &angles, float angle, float pitch, 
 		pitch = angles[PITCH];
 	}
 	
-	output[2] = (float)sin(pitch/180*M_PI);
-	output[0] *= (float)cos(pitch/180*M_PI);
-	output[1] *= (float)cos(pitch/180*M_PI);
+	float fSin, fCos;
+	DirectX::XMScalarSinCos(&fSin, &fCos, DEG2RAD(pitch));
+
+	output[0] *= fCos;
+	output[1] *= fCos;
+	output[2] = fSin;
 }
 
