@@ -1779,7 +1779,7 @@ public:
 	// OLD VERSION! Use the struct version
 	void FireBullets( int cShots, const Vector &vecSrc, const Vector &vecDirShooting, 
 		const Vector &vecSpread, float flDistance, int iAmmoType, int iTracerFreq = 4, 
-		int firingEntID = -1, int attachmentID = -1, int iDamage = 0, 
+		int firingEntID = -1, int attachmentID = -1, float iDamage = 0, 
 		CBaseEntity *pAttacker = NULL, bool bFirstShotAccurate = false );
 
 	virtual	bool		ShouldMoveAndShoot( void );
@@ -2140,7 +2140,7 @@ inline bool CAI_BaseNPC::IsActivityStarted(void)
 inline void CAI_BaseNPC::FireBullets( int cShots, const Vector &vecSrc, 
 	const Vector &vecDirShooting, const Vector &vecSpread, float flDistance, 
 	int iAmmoType, int iTracerFreq, int firingEntID, int attachmentID,
-	int iDamage, CBaseEntity *pAttacker, bool bFirstShotAccurate )
+	float iDamage, CBaseEntity *pAttacker, bool bFirstShotAccurate )
 {
 	FireBulletsInfo_t info;
 	info.m_iShots = cShots;
