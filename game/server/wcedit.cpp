@@ -357,13 +357,13 @@ void NWCEdit::DestroyAINode( CBasePlayer *pPlayer )
 				{
 					int nWCSrcID = g_pAINetworkManager->GetEditOps()->m_pNodeIndexTable[nSrcID];
 					int nWCDstID = g_pAINetworkManager->GetEditOps()->m_pNodeIndexTable[nDstID];
-					int	status	 = Editor_DeleteNodeLink(nWCSrcID, nWCDstID);
+					int	deleteStatus = Editor_DeleteNodeLink(nWCSrcID, nWCDstID);
 
-					if (status == Editor_BadCommand)
+					if (deleteStatus == Editor_BadCommand)
 					{
 						Msg( "Worldcraft failed on node link deletion...\n" );
 					}
-				}				
+				}
 			}
 		}
 	}
