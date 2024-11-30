@@ -76,12 +76,12 @@ void LoadCmdLineFromFile( int &argc, char **&argv, const char *keyname, const ch
 {
 	sFoundConfigArgs = false;
 
-	assert( g_pFileSystem );
+	Assert( g_pFileSystem );
 	if( !g_pFileSystem )
 		return;
 
 	// Load the cfg file, and find the keyname
-	KeyValues *kv = new KeyValues( "CommandLine" );
+	auto kv = KeyValues::AutoDelete( "CommandLine" );
 
 	char filename[512];
 	Q_snprintf( filename, sizeof( filename ), "%s/cfg/commandline.cfg", gamedir );
@@ -98,8 +98,6 @@ void LoadCmdLineFromFile( int &argc, char **&argv, const char *keyname, const ch
 			AddArguments( argc, argv, str );
 		}
 	}
-
-	kv->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
