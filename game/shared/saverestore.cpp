@@ -1634,10 +1634,10 @@ int CRestore::ReadFields( const char *pname, void *pBaseData, datamap_t *pRootMa
 {
 	static int lastName = -1;
 	Verify( ReadShort() == sizeof(int) );			// First entry should be an int
-	int symName = m_pData->FindCreateSymbol(pname);
+	unsigned short symName = m_pData->FindCreateSymbol(pname);
 
 	// Check the struct name
-	int curSym = ReadShort();
+	unsigned short curSym = ReadShort();
 	if ( curSym != symName )			// Field Set marker
 	{
 		const char *pLastName = m_pData->StringFromSymbol( lastName );
@@ -1653,12 +1653,11 @@ int CRestore::ReadFields( const char *pname, void *pBaseData, datamap_t *pRootMa
 	EmptyFields( pBaseData, pFields, fieldCount );
 	
 	// Skip over the struct name
-	int i;
 	int nFieldsSaved = ReadInt();						// Read field count
 	int searchCookie = 0;								// Make searches faster, most data is read/written in the same order
 	SaveRestoreRecordHeader_t header;
 
-	for ( i = 0; i < nFieldsSaved; i++ )
+	for ( int i = 0; i < nFieldsSaved; i++ )
 	{
 		ReadHeader( &header );
 
