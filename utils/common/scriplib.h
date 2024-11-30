@@ -14,6 +14,8 @@
 #pragma once
 #endif
 
+#include "tier0/basetypes.h"
+
 
 enum ScriptPathMode_t
 {

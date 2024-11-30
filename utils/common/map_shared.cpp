@@ -7,6 +7,7 @@
 
 #include "map_shared.h"
 #include "bsplib.h"
+#include "bspflags.h"
 #include "cmdlib.h"
 
 

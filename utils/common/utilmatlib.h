@@ -14,12 +14,14 @@
 #pragma once
 #endif
 
+#include "tier1/interface.h"
+
 #define MATERIAL_NOT_FOUND NULL
 	
 class IMaterialSystem;
 extern IMaterialSystem *g_pMaterialSystem;
 
-typedef void *MaterialSystemMaterial_t;
+using MaterialSystemMaterial_t = void *;
 
 #define UTILMATLIB_NEEDS_BUMPED_LIGHTMAPS 0
 #define UTILMATLIB_NEEDS_LIGHTMAP 1

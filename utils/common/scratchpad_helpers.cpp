@@ -7,6 +7,7 @@
 #include "scratchpad_helpers.h"
 #include "bspfile.h"
 #include "bsplib.h"
+#include "bspflags.h"
 
 
 void ScratchPad_DrawWinding( 
