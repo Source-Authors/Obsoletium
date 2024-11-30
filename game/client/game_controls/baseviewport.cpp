@@ -124,11 +124,10 @@ bool Helper_LoadFile( IBaseFileSystem *pFileSystem, const char *pFilename, CUtlV
 //-----------------------------------------------------------------------------
 bool CBaseViewport::LoadHudAnimations( void )
 {
-	const char *HUDANIMATION_MANIFEST_FILE = "scripts/hudanimations_manifest.txt";
-	KeyValues *manifest = new KeyValues( HUDANIMATION_MANIFEST_FILE );
+	const char HUDANIMATION_MANIFEST_FILE[] = "scripts/hudanimations_manifest.txt";
+	auto manifest = KeyValues::AutoDelete( HUDANIMATION_MANIFEST_FILE );
 	if ( manifest->LoadFromFile( g_pFullFileSystem, HUDANIMATION_MANIFEST_FILE, "GAME" ) == false )
 	{
-		manifest->deleteThis();
 		return false;
 	}
 
@@ -150,7 +149,6 @@ bool CBaseViewport::LoadHudAnimations( void )
 		}
 	}
 
-	manifest->deleteThis();
 	return true;
 }
 
