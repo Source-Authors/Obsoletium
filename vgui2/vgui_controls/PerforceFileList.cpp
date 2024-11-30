@@ -453,8 +453,8 @@ void PerforceFileList::Refresh()
 	*/
 
 	// NOTE: Reducing the # of perforce calls is important for performance
-	/*int nCount = m_Directories.GetNumStrings();
-	for ( int i = 0; i < nCount; ++i )
+	/*unsigned short nCount = m_Directories.GetNumStrings();
+	for ( unsigned short i = 0; i < nCount; ++i )
 	{
 		const char *pDirectory = m_Directories.String(i);
 		DirectoryInfo_t *pInfo = &m_Directories[i];*/

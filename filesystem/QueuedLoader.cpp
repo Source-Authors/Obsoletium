@@ -1525,7 +1525,7 @@ void CQueuedLoader::ParseResourceList( CUtlBuffer &resourceList )
 
 	// add any additional resources
 	// duplicates don't need to be culled, loaders are supposed to handle resources that already exist
-	for ( intp i = 0; i < m_AdditionalResources.GetNumStrings(); i++ )
+	for ( unsigned short i = 0; i < m_AdditionalResources.GetNumStrings(); i++ )
 	{
 		if ( g_QueuedLoader.GetSpewDetail() )
 		{

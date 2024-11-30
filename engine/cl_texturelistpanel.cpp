@@ -1224,11 +1224,11 @@ void CRenderTextureEditor::SetDispInfo( KeyValues *kv, int iHint )
 	}
 	else
 	{
-		int c = arrMaterials.GetNumStrings();
-		bufText.Printf( "  %d material%s:", c, ( c%10 == 1 && c != 11 ) ? "" : "s" );
+		unsigned short c = arrMaterials.GetNumStrings();
+		bufText.Printf( "  %hu material%s:", c, ( c%10 == 1 && c != 11 ) ? "" : "s" );
 	}
 
-	for ( intp k = 0; k < arrMaterials.GetNumStrings(); ++ k )
+	for ( unsigned short k = 0; k < arrMaterials.GetNumStrings(); ++ k )
 	{
 		bufText.Printf( "\n%s", arrMaterials.String( k ) );
 	}
@@ -1257,7 +1257,7 @@ void CRenderTextureEditor::SetDispInfo( KeyValues *kv, int iHint )
 
 		m_lstMaterials.RemoveAll();
 		m_lstMaterials.EnsureCapacity( arrMaterialsFullNames.GetNumStrings() );
-		for ( intp k = 0; k < arrMaterialsFullNames.GetNumStrings(); ++ k )
+		for ( unsigned short k = 0; k < arrMaterialsFullNames.GetNumStrings(); ++ k )
 		{
 			m_lstMaterials.AddToTail( CUtlSymbol( arrMaterialsFullNames.String( k ) ) );
 		}

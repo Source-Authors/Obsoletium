@@ -4718,7 +4718,7 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 
 	if ( !stricmp( szCmd, "reset" ) )
 	{
-		for ( int k = 0; k < s_OverrideMap.GetNumStrings(); ++ k )
+		for ( unsigned short k = 0; k < s_OverrideMap.GetNumStrings(); ++ k )
 		{
 			char const *szTx = s_OverrideMap.String( k );
 			s_OverrideMap[ k ] = OverrideInfo(); // Reset the override info
@@ -4741,7 +4741,7 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 		if ( !p4 )
 			g_p4factory->SetDummyMode( true );
 
-		for ( int k = 0; k < s_OverrideMap.GetNumStrings(); ++ k )
+		for ( unsigned short k = 0; k < s_OverrideMap.GetNumStrings(); ++ k )
 		{
 			char const *szTx = s_OverrideMap.String( k );
 			OverrideInfo oi = s_OverrideMap[ k ];

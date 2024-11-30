@@ -125,7 +125,7 @@ public:
 		return true;
 	}
 
-	int GetNumStrings()
+	unsigned short GetNumStrings()
 	{
 		return m_StringMap.GetNumStrings();
 	}
@@ -145,7 +145,7 @@ public:
 		buffer.EnsureCapacity( m_nOffset );
 
 		size_t currentOffset = 0;
-		for ( intp i = 0; i < m_StringMap.GetNumStrings(); i++ )
+		for ( unsigned short i = 0; i < m_StringMap.GetNumStrings(); i++ )
 		{
 			offsets.AddToTail( currentOffset );
 
@@ -166,7 +166,7 @@ public:
 
 	void DumpPool()
 	{
-		for ( intp i = 0; i < m_StringMap.GetNumStrings(); i++ )
+		for ( unsigned short i = 0; i < m_StringMap.GetNumStrings(); i++ )
 		{
 			const char *pString = m_StringMap.String( i );
 			Msg( "%s\n", pString );

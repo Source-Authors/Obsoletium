@@ -141,17 +141,15 @@ void CCompiledKeyValuesWriter::WriteFiles( CUtlBuffer &buf )
 
 void CCompiledKeyValuesWriter::WriteStringTable( CUtlBuffer& buf )
 {
-	int i;
-	CUtlVector< int >	offsets;
-
 	CUtlBuffer stringBuffer;
 
+	CUtlVector< int >	offsets;
 	offsets.AddToTail( stringBuffer.TellPut() );
 
 	stringBuffer.PutString( "" );
 	// save all the rest
-	int c = m_StringTable.GetNumStrings();
-	for ( i = 1; i < c; i++)
+	unsigned short c = m_StringTable.GetNumStrings();
+	for ( unsigned short i = 1; i < c; i++)
 	{
 		offsets.AddToTail( stringBuffer.TellPut() );
 		stringBuffer.PutString( m_StringTable.String( i ) );
@@ -290,10 +288,10 @@ KeyValues *CCompiledKeyValuesReader::CreateFromData( const FileInfo_t& info )
 	}
 }
 
-bool CCompiledKeyValuesReader::CreateInPlaceFromData( KeyValues& head, const FileInfo_t& info )
+bool CCompiledKeyValuesReader::CreateInPlaceFromData( KeyValues& head, const FileInfo_t& fileInfo )
 {
-	int first = info.nFirstIndex;
-	int num = info.nCount;
+	int first = fileInfo.nFirstIndex;
+	int num = fileInfo.nCount;
 
 	KeyValues *root = NULL;
 	KeyValues *tail = NULL;

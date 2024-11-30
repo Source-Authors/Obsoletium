@@ -797,7 +797,7 @@ CON_COMMAND( hammer_update_safe_entities, "Updates entities in the map that can 
 
 	if ( ignoredNames.GetNumStrings() > 0 )
 	{
-		Msg( "Ignoring %d specified targetnames.\n", ignoredNames.GetNumStrings() );
+		Msg( "Ignoring %hu specified targetnames.\n", ignoredNames.GetNumStrings() );
 	}
 
 

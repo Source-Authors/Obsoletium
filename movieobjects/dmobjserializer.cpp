@@ -53,8 +53,8 @@ void CFaceSetData::Clear()
 //-----------------------------------------------------------------------------
 void CFaceSetData::AddToMesh( CDmeMesh *pMesh )
 {
-	const int nFaceSets( m_faceSetIndices.GetNumStrings() );
-	for ( int i( 0 ); i < nFaceSets; ++i )
+	const unsigned short nFaceSets( m_faceSetIndices.GetNumStrings() );
+	for ( unsigned short i( 0 ); i < nFaceSets; ++i )
 	{
 		const char *pName( m_faceSetIndices.String( i ) );
 		CUtlVector< int > &faceSetIndices( m_faceSetIndices[ pName ] );
@@ -1412,7 +1412,7 @@ void CDmObjSerializer::ComputeDeltaStateComputationList( CUtlVector< CUtlVector<
 //-----------------------------------------------------------------------------
 void CDmObjSerializer::ComputeDependentUsage( CUtlVector< CUtlVector< int > > &deltaUsage )
 {
-	const int nDeltas = m_deltas.GetNumStrings();
+	const unsigned short nDeltas = m_deltas.GetNumStrings();
 	compList.EnsureCount( nDeltas );
 
 	CUtlVector< CUtlVector< int > > deltaStateUsage;

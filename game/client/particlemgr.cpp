@@ -2304,8 +2304,8 @@ void CParticleMgr::StatsAccumulateActiveParticleSystems()
 	}
 
 	// Now accumulate/max then into the multi-frame stats.
-	int nCount = SingleFrameHistogram.GetNumStrings();
-	for ( int i = 0; i < nCount; ++i )
+	unsigned short nCount = SingleFrameHistogram.GetNumStrings();
+	for ( unsigned short i = 0; i < nCount; ++i )
 	{
 		ParticleInfo_t *pSingleInfo = &(SingleFrameHistogram[i]);
 		const char *pName = SingleFrameHistogram.String(i);
@@ -2339,11 +2339,11 @@ void CParticleMgr::StatsSpewResults()
 {
 #ifdef STAGING_ONLY
 #ifdef TF_CLIENT_DLL
-	int nCount = ProfilingHistogram.GetNumStrings();
+	unsigned short nCount = ProfilingHistogram.GetNumStrings();
 
 	Msg( "Active particle systems. Numbers are averages over %d frames. Max num particles %d.\n", Profiling_nFrames, Profiling_nMaxParticles );
 	Msg( "Name\t\t\t\t\t\tSystems\t\tActive\t\tDrawn\tAv Children\t\tMaximums per frame\t\t\tMax draw dist\n" );
-	for ( int i = 0; i < nCount; ++i )
+	for ( unsigned short i = 0; i < nCount; ++i )
 	{
 		ParticleInfo_t *pParticleInfo = &(ProfilingHistogram[i]);
 		if ( pParticleInfo->m_nTotalActiveParticles > 0 )

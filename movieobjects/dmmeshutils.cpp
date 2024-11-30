@@ -2531,7 +2531,7 @@ bool CDmMeshUtils::CreateDeltasFromPresets(
 
 	CUtlVector< CDmePresetGroup * > presetGroups;
 
-	for ( int i = 0; i < presetExpressionMap.GetNumStrings(); ++i )
+	for ( unsigned short i = 0; i < presetExpressionMap.GetNumStrings(); ++i )
 	{
 		const char *pPresetFilename = presetExpressionMap.String( i );
 
@@ -2554,7 +2554,7 @@ bool CDmMeshUtils::CreateDeltasFromPresets(
 		PurgeUnreferencedDeltas( pMesh, presetMap, pPurgeAllButThese, pComboOp );
 	}
 
-	for ( int i = 0; i < presetMap.GetNumStrings(); ++i )
+	for ( unsigned short i = 0; i < presetMap.GetNumStrings(); ++i )
 	{
 		const char *pPresetName = presetMap[ i ]->GetName();
 		const int nControlIndex = pComboOp->FindControlIndex( pPresetName );
@@ -2593,7 +2593,7 @@ bool CDmMeshUtils::CreateDeltasFromPresets(
 	pComboOp->UsingLaggedData( bSavedUsingLagged );
 	pComboOp->SetToDefault();
 
-	for ( int i = 0; i < presetExpressionMap.GetNumStrings(); ++i )
+	for ( unsigned short i = 0; i < presetExpressionMap.GetNumStrings(); ++i )
 	{
 		const CUtlString &expressionFile = presetExpressionMap[ i ];
 		if ( expressionFile.IsEmpty() )
@@ -2602,9 +2602,8 @@ bool CDmMeshUtils::CreateDeltasFromPresets(
 		CreateExpressionFile( expressionFile.Get(), pPurgeAllButThese, pComboOp, presetGroups[ i ] );
 	}
 
-	for ( int i = 0; i < presetGroups.Count(); ++i )
+	for ( auto *pPresetGroup : presetGroups )
 	{
-		CDmePresetGroup *pPresetGroup = presetGroups[ i ];
 		if ( !pPresetGroup )
 			continue;
 
@@ -3326,7 +3325,7 @@ void CDmMeshUtils::PurgeUnreferencedDeltas( CDmeMesh *pMesh, CUtlStringMap< CDme
 	} while( bDeleted );
 
 	// Rename any that can be renamed... which should be all of them
-	for ( int i = 0; i < presetMap.GetNumStrings(); ++i )
+	for ( unsigned short i = 0; i < presetMap.GetNumStrings(); ++i )
 	{
 		const char *pPresetName = presetMap.String( i );
 		CDmePreset *pPreset = presetMap[ i ];
