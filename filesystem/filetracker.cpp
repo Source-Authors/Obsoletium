@@ -531,13 +531,13 @@ void CFileTracker2::NoteFileUnloaded( const char *pFilename, const char *pPathID
 	TrackedFile_t trackedfile;
 	trackedfile.RebuildFileName( m_stringPool, pFilename, pPathID, 0 );
 
-	int idxFile = m_treeAllOpenedFiles.Find( trackedfile );
+	auto idxFile = m_treeAllOpenedFiles.Find( trackedfile );
 	if ( idxFile >= 0 )
 	{
 		// Clear state
-		TrackedFile_t &trackedfile = m_treeAllOpenedFiles[ idxFile ];
-		trackedfile.m_iLoadedSearchPathStoreId = 0;
-		trackedfile.m_bIgnoredForPureServer = false;
+		TrackedFile_t &indexFile = m_treeAllOpenedFiles[ idxFile ];
+		indexFile.m_iLoadedSearchPathStoreId = 0;
+		indexFile.m_bIgnoredForPureServer = false;
 	}
 #endif
 }

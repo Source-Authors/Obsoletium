@@ -3394,9 +3394,10 @@ void CBaseFileSystem::CacheAllVPKFileHashes( bool bCacheAllVPKHashes, bool bReca
 		if ( bCacheAllVPKHashes )
 		{
 			Msg( "Loaded %zd VPK file hashes from %s for pure server operation.\n", vecChunkHash.Count(), pVPK->FullPathName() );
-			FOR_EACH_VEC( vecChunkHash, i )
+			FOR_EACH_VEC( vecChunkHash, j )
 			{
-				m_FileTracker2.AddFileHashForVPKFile( vecChunkHash[i].m_nPackFileNumber, vecChunkHash[i].m_nFileFraction, vecChunkHash[i].m_cbChunkLen, vecChunkHash[i].m_md5contents, fhandle );
+				ChunkHashFraction_t &f = vecChunkHash[j];
+				m_FileTracker2.AddFileHashForVPKFile( f.m_nPackFileNumber, f.m_nFileFraction, f.m_cbChunkLen, f.m_md5contents, fhandle );
 			}
 		}
 		else
