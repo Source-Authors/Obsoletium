@@ -8,6 +8,7 @@
 #endif
 
 #include <ctime>
+#include "tier0/threadtools.h"
 #include "tier0/vcrmode.h"
 #include "tier0/dbg.h"
 
@@ -69,38 +70,25 @@ inline void Wrap_EnterCriticalSection( CRITICAL_SECTION *pSection )
 // Threadsafe debugging file output.
 // ------------------------------------------------------------------------------------------ //
 FILE *g_pDebugFile = 0;
-CRITICAL_SECTION g_DebugFileCS;
-
-class CCSInit
-{
-public:
-	CCSInit()
-	{
-		InitializeCriticalSection( &g_DebugFileCS );
-	}
-	~CCSInit()
-	{
-		DeleteCriticalSection( &g_DebugFileCS );
-	}
-} g_DebugFileCS222;
+CThreadMutex g_DebugFileMutex;
 
 void VCR_Debug( const char *pMsg, ... )
 {
 	va_list marker;
 	va_start( marker, pMsg );
 
-	EnterCriticalSection( &g_DebugFileCS );
-
-	if ( !g_pDebugFile )
-		g_pDebugFile = fopen( "vcrdebug.txt", "wt" );
-
-	if ( g_pDebugFile )
 	{
-		vfprintf( g_pDebugFile, pMsg, marker );
-		fflush( g_pDebugFile );
-	}
+		AUTO_LOCK(g_DebugFileMutex);
+		
+		if ( !g_pDebugFile )
+			g_pDebugFile = fopen( "vcrdebug.txt", "wt" );
 
-	LeaveCriticalSection( &g_DebugFileCS );
+		if ( g_pDebugFile )
+		{
+			vfprintf( g_pDebugFile, pMsg, marker );
+			fflush( g_pDebugFile );
+		}
+	}
 	
 	va_end( marker );
 }
@@ -208,7 +196,7 @@ class CVCRThreadSafeInitter
 public:
 	CVCRThreadSafeInitter()
 	{
-		InitializeCriticalSection( &g_VCRCriticalSection );
+		(void)InitializeCriticalSectionAndSpinCount( &g_VCRCriticalSection, 4000 );
 	}
 	~CVCRThreadSafeInitter()
 	{
