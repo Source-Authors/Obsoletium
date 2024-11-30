@@ -7075,7 +7075,7 @@ void CShaderAPIDx8::DeleteD3DTexture( ShaderAPITextureHandle_t hTexture )
 
 		if ( texture.GetDepthStencilSurface() )
 		{
-			int nRetVal = texture.GetDepthStencilSurface()->Release();
+			ULONG nRetVal = texture.GetDepthStencilSurface()->Release();
 			Assert( nRetVal == 0 );
 			texture.GetDepthStencilSurface() = 0;
 			numDeallocated = 1;

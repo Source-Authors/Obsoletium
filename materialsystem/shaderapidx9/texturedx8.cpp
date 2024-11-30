@@ -369,7 +369,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 //-----------------------------------------------------------------------------
 void ReleaseD3DTexture( IDirect3DBaseTexture* pD3DTex )
 {
-	int ref = pD3DTex->Release();
+	ULONG ref = pD3DTex->Release();
 	Assert( ref == 0 );
 }
 
