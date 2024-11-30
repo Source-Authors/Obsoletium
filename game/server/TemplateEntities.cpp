@@ -300,6 +300,19 @@ void Templates_ReconnectIOForGroup( CPointTemplate *pGroup )
 	GroupTemplates.Purge();
 }
 
+static constexpr int Pow(int v, unsigned p)
+{
+  if (p == 0) return 1;
+
+  int r = v;
+  while (--p > 0)
+  {
+	  r *= v;
+  }
+
+  return r;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Someone's about to start instancing a new group of entities.
 //			Generate a unique identifier for this group.
@@ -308,8 +321,11 @@ void Templates_StartUniqueInstance( void )
 {
 	g_iCurrentTemplateInstance++;
 
+	constexpr int factor = ssize(ENTITYIO_FIXUP_STRING) - 2;
+
 	// Make sure there's enough room to fit it into the string
-	int iMax = pow(10.0f, ssize(ENTITYIO_FIXUP_STRING) - 2);	// -1 for the &
+	// int iMax = pow(10, factor);	// -1 for the &
+	constexpr int iMax = Pow(10, factor);
 	if ( g_iCurrentTemplateInstance >= iMax )
 	{
 		// We won't hit this.
