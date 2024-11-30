@@ -22,7 +22,7 @@
 
 static ButtonCode_t ControllerButtonToButtonCode( SDL_GamepadButton button );
 static AnalogCode_t ControllerAxisToAnalogCode( SDL_GamepadAxis axis );
-static SDL_bool SDLCALL JoystickSDLWatcher(void *userInfo, SDL_Event *event);
+static bool SDLCALL JoystickSDLWatcher(void *userInfo, SDL_Event *event);
 
 ConVar joy_axisbutton_threshold( "joy_axisbutton_threshold", "0.3", FCVAR_ARCHIVE, "Analog axis range before a button press is registered." );
 ConVar joy_axis_deadzone( "joy_axis_deadzone", "0.2", FCVAR_ARCHIVE, "Dead zone near the zero point to not report movement." );
@@ -116,7 +116,7 @@ void joy_gamecontroller_config_changed_f( IConVar *var, const char *pOldValue, f
 //-----------------------------------------------------------------------------
 // Handle the events coming from the GameController SDL subsystem.
 //-----------------------------------------------------------------------------
-SDL_bool SDLCALL JoystickSDLWatcher( void *userInfo, SDL_Event *event )
+bool SDLCALL JoystickSDLWatcher( void *userInfo, SDL_Event *event )
 {
 	CInputSystem *pInputSystem = (CInputSystem *)userInfo;
 	Assert(pInputSystem != NULL);
@@ -350,7 +350,7 @@ void CInputSystem::JoystickHotplugAdded( unsigned joystickId )
 	info.m_pDevice = controller;
 	info.m_pHaptic = haptic;
 	info.m_nDeviceId = SDL_GetJoystickID(SDL_GetGamepadJoystick(controller));
-	info.m_nButtonCount = SDL_GAMEPAD_BUTTON_MAX;
+	info.m_nButtonCount = SDL_GAMEPAD_BUTTON_COUNT;
 	info.m_bRumbleEnabled = false;
 
 	SetJoyXControllerFound(true);
