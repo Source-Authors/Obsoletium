@@ -60,7 +60,7 @@ public:
 	void SetVector3D( const Vector &val ) { vecVal[0] = val[0]; vecVal[1] = val[1]; vecVal[2] = val[2]; fieldType = FIELD_VECTOR; }
 	void SetPositionVector3D( const Vector &val ) { vecVal[0] = val[0]; vecVal[1] = val[1]; vecVal[2] = val[2]; fieldType = FIELD_POSITION_VECTOR; }
 	void SetColor32( color32 val ) { rgbaVal = val; fieldType = FIELD_COLOR32; }
-	void SetColor32( int r, int g, int b, int a ) { rgbaVal.r = r; rgbaVal.g = g; rgbaVal.b = b; rgbaVal.a = a; fieldType = FIELD_COLOR32; }
+	void SetColor32( byte r, byte g, byte b, byte a ) { rgbaVal.r = r; rgbaVal.g = g; rgbaVal.b = b; rgbaVal.a = a; fieldType = FIELD_COLOR32; }
 	void Set( fieldtype_t ftype, void *data );
 	void SetOther( void *data );
 	bool Convert( fieldtype_t newType );
