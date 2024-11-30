@@ -74,40 +74,41 @@ void CAI_BasePhysicsFlyingBot::TurnHeadToTarget(float flInterval, const Vector &
 
 	m_fHeadYaw = desYaw;
 
-	return;
+	// dimhotepus: Comment unreachable code.
+	//return;
 
-	// If I've flipped completely around, reverse angles
-	float fYawDiff = m_fHeadYaw - desYaw;
-	if (fYawDiff > 180)
-	{
-		m_fHeadYaw -= 360;
-	}
-	else if (fYawDiff < -180)
-	{
-		m_fHeadYaw += 360;
-	}
+	//// If I've flipped completely around, reverse angles
+	//float fYawDiff = m_fHeadYaw - desYaw;
+	//if (fYawDiff > 180)
+	//{
+	//	m_fHeadYaw -= 360;
+	//}
+	//else if (fYawDiff < -180)
+	//{
+	//	m_fHeadYaw += 360;
+	//}
 
-	// RIGHT NOW, this affects every flying bot. This rate should be member data that individuals
-	// can manipulate. THIS change for MANHACKS E3 2003 (sjb)
-	float iRate = 0.8;
+	//// RIGHT NOW, this affects every flying bot. This rate should be member data that individuals
+	//// can manipulate. THIS change for MANHACKS E3 2003 (sjb)
+	//float iRate = 0.8;
 
-	// Make frame rate independent
-	float timeToUse = flInterval;
-	while (timeToUse > 0)
-	{
-		m_fHeadYaw	   = (iRate * m_fHeadYaw) + (1-iRate)*desYaw;
-		timeToUse -= 0.1;
-	}
+	//// Make frame rate independent
+	//float timeToUse = flInterval;
+	//while (timeToUse > 0)
+	//{
+	//	m_fHeadYaw	   = (iRate * m_fHeadYaw) + (1-iRate)*desYaw;
+	//	timeToUse -= 0.1;
+	//}
 
-	while( m_fHeadYaw > 360 )  
-	{
-		m_fHeadYaw -= 360.0f;
-	}
+	//while( m_fHeadYaw > 360 )  
+	//{
+	//	m_fHeadYaw -= 360.0f;
+	//}
 
-	while( m_fHeadYaw < 0 )
-	{
-		m_fHeadYaw += 360.f;
-	}
+	//while( m_fHeadYaw < 0 )
+	//{
+	//	m_fHeadYaw += 360.f;
+	//}
 
 	// SetBoneController( 0, m_fHeadYaw );
 }
