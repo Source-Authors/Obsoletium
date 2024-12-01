@@ -429,7 +429,7 @@ void CHLTVDirector::StartFixedCameraShot(int iCamera, int iTarget)
 		shot->SetInt("theta", aViewAngle.x );
 		shot->SetInt("phi", aViewAngle.y );
 		shot->SetInt("target", iTarget );
-		shot->SetFloat("fov", RandomFloat(50,110) );
+		shot->SetFloat("fov", RandomFloat(50,MAX_FOV) );
 	
 		// send spectators the HLTV director command as a game event
 		m_pHLTVServer->BroadcastEvent( shot );

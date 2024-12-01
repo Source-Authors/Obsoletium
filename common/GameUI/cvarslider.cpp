@@ -77,8 +77,9 @@ void CCvarSlider::SetupSlider( float minValue, float maxValue, const char *cvarn
 	char szMin[ 32 ];
 	char szMax[ 32 ];
 
-	Q_snprintf( szMin, sizeof( szMin ), "%.2f", minValue );
-	Q_snprintf( szMax, sizeof( szMax ), "%.2f", maxValue );
+	// dimhotepus: Show floats without decimal part as is.
+	Q_snprintf( szMin, sizeof( szMin ), std::truncf(minValue) == minValue ? "%.0f" : "%.2f", minValue );
+	Q_snprintf( szMax, sizeof( szMax ), std::truncf(maxValue) == maxValue ? "%.0f" : "%.2f", maxValue );
 
 	SetTickCaptions( szMin, szMax );
 
@@ -162,10 +163,10 @@ void CCvarSlider::SetMinMaxValues( float minValue, float maxValue, bool bSetTick
 	{
 		char szMin[ 32 ];
 		char szMax[ 32 ];
-
-		Q_snprintf( szMin, sizeof( szMin ), "%.2f", minValue );
-		Q_snprintf( szMax, sizeof( szMax ), "%.2f", maxValue );
-
+		
+		// dimhotepus: Show floats without decimal part as is.
+		Q_snprintf( szMin, sizeof( szMin ), std::truncf(minValue) == minValue ? "%.0f" : "%.2f", minValue );
+		Q_snprintf( szMax, sizeof( szMax ), std::truncf(maxValue) == maxValue ? "%.0f" : "%.2f", maxValue );
 
 		SetTickCaptions( szMin, szMax );
 	}

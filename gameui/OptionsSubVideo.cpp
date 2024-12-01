@@ -449,7 +449,18 @@ public:
 			{
 				pFOV->SetVisible( false );
 			}
+
+			pFOV = FindChildByName( "FOVValueLabel" );
+			if ( pFOV )
+			{
+				pFOV->SetVisible( false );
+			}
 		}
+
+		m_pFOVSlider = static_cast<CCvarSlider *>(FindChildByName( "FOVSlider" ));
+		m_pFOVValueLabel = static_cast<vgui::Label *>(FindChildByName( "FOVValueLabel" ));
+
+		UpdateFOVLabel();
 		
 		MarkDefaultSettingsAsRecommended();
 
@@ -537,10 +548,28 @@ public:
 		}
 	}
 
+	MESSAGE_FUNC_PTR( OnControlModified, "ControlModified", panel )
+	{
+		// the HasBeenModified() check is so that if the value is outside of the range of the
+		// slider, it won't use the slider to determine the display value but leave the
+		// real value that we determined in the constructor
+		if (panel == m_pFOVSlider && m_pFOVSlider->HasBeenModified())
+		{
+			UpdateFOVLabel();
+		}
+	}
+
 	MESSAGE_FUNC( OK_Confirmed, "OK_Confirmed" )
 	{
 		m_bUseChanges = true;
 		Close();
+	}
+
+	void UpdateFOVLabel()
+	{
+		char buf[16];
+		Q_snprintf(buf, sizeof( buf ), "%.0f", m_pFOVSlider->GetSliderValue());
+		m_pFOVValueLabel->SetText(buf);
 	}
 
 	void MarkDefaultSettingsAsRecommended()
@@ -774,11 +803,12 @@ public:
 
 		ApplyChangesToConVar( "mat_motion_blur_enabled", m_pMotionBlur->GetActiveItem() );
 		
-		CCvarSlider *pFOV = (CCvarSlider *)FindChildByName( "FOVSlider" );
-		if ( pFOV ) 
+		if ( m_pFOVSlider )
 		{
-			pFOV->ApplyChanges();
+			m_pFOVSlider->ApplyChanges();
 		}
+		
+		m_pFOVSlider->ApplyChanges();
 	}
 
 	virtual void OnResetData()
@@ -882,6 +912,8 @@ public:
 
 		m_pVSync->ActivateItem( mat_vsync.GetInt() );
 
+		m_pFOVSlider->Reset();
+
 		int iMC = mat_queue_mode.GetInt();
 
 		// We (Rick!) have now switched -2 to mean enabled. So this comment has been rendered obsolete:
@@ -979,6 +1011,8 @@ private:
 	bool m_bUseChanges;
 	vgui::ComboBox *m_pModelDetail, *m_pTextureDetail, *m_pAntialiasingMode, *m_pFilteringMode;
 	vgui::ComboBox *m_pShadowDetail, *m_pHDR, *m_pWaterDetail, *m_pVSync, *m_pMulticore, *m_pShaderDetail;
+	CCvarSlider *m_pFOVSlider;
+	vgui::Label *m_pFOVValueLabel;
 	vgui::ComboBox *m_pColorCorrection;
 	vgui::ComboBox *m_pMotionBlur;
 	vgui::ComboBox *m_pDXLevel;
