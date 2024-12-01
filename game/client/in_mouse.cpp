@@ -81,8 +81,8 @@ extern ConVar cam_idealpitch;
 extern ConVar thirdperson_platformer;
 
 static ConVar m_filter( "m_filter","0", FCVAR_ARCHIVE, "Mouse filtering (set this to 1 to average the mouse over 2 frames)." );
-// dimhotepus: max 100000 -> 1000 as in CS:GO 
-ConVar sensitivity( "sensitivity","3", FCVAR_ARCHIVE, "Mouse sensitivity.", true, 0.0001f, true, 1000 );
+// dimhotepus: max 100000 -> 6.0 as in original version. 
+ConVar sensitivity( "sensitivity","3", FCVAR_ARCHIVE, "Mouse sensitivity.", true, 0.1f, true, 6.0f );
 
 // dimhotepus: Limit min / max as in CS:GO.
 static ConVar m_side( "m_side","0.8", FCVAR_ARCHIVE, "Mouse side factor.", true, 0.0001f, true, 1000 );
