@@ -47,7 +47,9 @@ private:
 	MESSAGE_FUNC( LaunchBenchmark, "LaunchBenchmark" );
 	MESSAGE_FUNC( OpenGammaDialog, "OpenGammaDialog" );
 
-   
+	void		SetCurrentHUDAspectRatio();
+	void		ApplyHUDAspectRatio();
+
 	void		PrepareResolutionList();
 
 	bool		BUseHDContent();
@@ -60,6 +62,7 @@ private:
 	vgui::ComboBox		*m_pMode;
 	vgui::ComboBox		*m_pWindowed;
 	vgui::ComboBox		*m_pAspectRatio;
+	vgui::ComboBox		*m_pHUDAspectRatio;
 	vgui::ComboBox		*m_pVRMode;
 	vgui::Button		*m_pGammaButton;
 	vgui::Button		*m_pAdvanced;

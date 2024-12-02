@@ -102,8 +102,8 @@ int GetScreenAspectMode( int width, int height )
 	float aspectRatio = (float)width / (float)height;
 
 	// just find the closest ratio
-	float closestAspectRatioDist = 99999.0f;
-	int closestAnamorphic = 0;
+	float closestAspectRatioDist = std::numeric_limits<float>::max();
+	int closestAnamorphic = -1;
 	for ( const auto &ram : g_RatioToAspectModes )
 	{
 		float dist = fabsf( ram.aspectRatio - aspectRatio );
@@ -1059,7 +1059,8 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	m_pGammaButton = new Button( this, "GammaButton", "#GameUI_AdjustGamma" );
 	m_pGammaButton->SetCommand(new KeyValues("OpenGammaDialog"));
 	m_pMode = new ComboBox(this, "Resolution", 8, false);
-	m_pAspectRatio = new ComboBox( this, "AspectRatio", 6, false );
+	m_pAspectRatio = new ComboBox( this, "AspectRatio", 3, false );
+	m_pHUDAspectRatio = new ComboBox( this, "HudAspectRatio", 4, false );
 	m_pVRMode = new ComboBox( this, "VRMode", 2, false );
 	m_pAdvanced = new Button( this, "AdvancedButton", "#GameUI_AdvancedEllipsis" );
 	m_pAdvanced->SetCommand(new KeyValues("OpenAdvanced"));
@@ -1069,43 +1070,37 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	m_pThirdPartyCredits->SetCommand(new KeyValues("OpenThirdPartyVideoCreditsDialog"));
 	m_pHDContent = new CheckButton( this, "HDContentButton", "#GameUI_HDContent" );
 
-	char pszAspectName[3][64];
-	const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectNormal");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName[0], 32);
-	unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectWide16x9");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName[1], 32);
-	unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectWide16x10");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName[2], 32);
-
-	int iNormalItemID = m_pAspectRatio->AddItem( pszAspectName[0], NULL );
-	int i16x9ItemID = m_pAspectRatio->AddItem( pszAspectName[1], NULL );
-	int i16x10ItemID = m_pAspectRatio->AddItem( pszAspectName[2], NULL );
+	const int iAspectNormalItemID = m_pAspectRatio->AddItem( "#GameUI_AspectNormal", NULL );
+	const int iAspect16x9ItemID = m_pAspectRatio->AddItem( "#GameUI_AspectWide16x9", NULL );
+	const int iAspect16x10ItemID = m_pAspectRatio->AddItem( "#GameUI_AspectWide16x10", NULL );
 
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 
-	int iAspectMode = GetScreenAspectMode( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height );
+	const int iAspectMode = GetScreenAspectMode( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height );
 	switch ( iAspectMode )
 	{
 	default:
 	case 0:
-		m_pAspectRatio->ActivateItem( iNormalItemID );
+		m_pAspectRatio->ActivateItem( iAspectNormalItemID );
 		break;
 	case 1:
-		m_pAspectRatio->ActivateItem( i16x9ItemID );
+		m_pAspectRatio->ActivateItem( iAspect16x9ItemID );
 		break;
 	case 2:
-		m_pAspectRatio->ActivateItem( i16x10ItemID );
+		m_pAspectRatio->ActivateItem( iAspect16x10ItemID );
 		break;
 	}
 
-	char pszVRModeName[2][64];
-	unicodeText = g_pVGuiLocalize->Find("#GameUI_Disabled");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszVRModeName[0], 32);
-	unicodeText = g_pVGuiLocalize->Find("#GameUI_Enabled");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszVRModeName[1], 32);
+	// dimhotepus: Where did they get Unlocked string?
+	m_pHUDAspectRatio->AddItem( "#GameUI_Achievement_Unlocked", NULL );
+	m_pHUDAspectRatio->AddItem( "#GameUI_AspectNormal", NULL );
+	m_pHUDAspectRatio->AddItem( "#GameUI_AspectWide16x9", NULL );
+	m_pHUDAspectRatio->AddItem( "#GameUI_AspectWide16x10", NULL );
 
-	m_pVRMode->AddItem( pszVRModeName[0], NULL );
-	m_pVRMode->AddItem( pszVRModeName[1], NULL );
+	SetCurrentHUDAspectRatio();
+
+	m_pVRMode->AddItem( "#GameUI_Disabled", NULL );
+	m_pVRMode->AddItem( "#GameUI_Enabled", NULL );
 
 	// Multimonitor under Direct3D requires you to destroy and recreate the device, 
 	// which is an operation we don't support as it currently stands. The user can 
@@ -1184,6 +1179,68 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Sets current HUD aspect ratio
+//-----------------------------------------------------------------------------
+void COptionsSubVideo::SetCurrentHUDAspectRatio()
+{
+	ConVarRef hud_aspect("hud_aspect");
+	Assert(hud_aspect.IsValid());
+
+	constexpr float hudScaleFactor = 1000.f;
+	const int iHUDAspectMode = GetScreenAspectMode( hud_aspect.GetFloat() * hudScaleFactor,
+		hud_aspect.GetFloat() ? hudScaleFactor : 0 );
+	switch ( iHUDAspectMode )
+	{
+	default:
+	case -1:
+		m_pHUDAspectRatio->ActivateItem(0);
+		break;
+	case 0:
+		// 4:3
+		m_pHUDAspectRatio->ActivateItem(1);
+		break;
+	case 1:
+		// 16:9
+		m_pHUDAspectRatio->ActivateItem(2);
+		break;
+	case 2:
+		// 16:10
+		m_pHUDAspectRatio->ActivateItem(3);
+		break;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Applies HUD aspect ratio to convar
+//-----------------------------------------------------------------------------
+void COptionsSubVideo::ApplyHUDAspectRatio()
+{
+	ConVarRef hud_aspect("hud_aspect");
+	Assert( hud_aspect.IsValid() );
+
+	const int iHUDAspectRatioItem = m_pHUDAspectRatio->GetActiveItem();
+	switch (iHUDAspectRatioItem)
+	{
+	default:
+	case 0:
+		hud_aspect.SetValue(0);
+		break;
+	case 1:
+		// 4:3
+		hud_aspect.SetValue(4.f / 3.f);
+		break;
+	case 2:
+		// 16:9
+		hud_aspect.SetValue(16.f / 9.f);
+		break;
+	case 3:
+		// 16:10
+		hud_aspect.SetValue(16.f / 10.f);
+		break;
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Generates resolution list
 //-----------------------------------------------------------------------------
 void COptionsSubVideo::PrepareResolutionList()
@@ -1198,6 +1255,8 @@ void COptionsSubVideo::PrepareResolutionList()
 	m_pMode->DeleteAllItems();
 	m_pAspectRatio->SetItemEnabled(1, false);
 	m_pAspectRatio->SetItemEnabled(2, false);
+	m_pHUDAspectRatio->SetItemEnabled(2, false);
+	m_pHUDAspectRatio->SetItemEnabled(3, false);
 
 	// get full video mode list
 	vmode_t *plist = NULL;
@@ -1265,6 +1324,7 @@ void COptionsSubVideo::PrepareResolutionList()
 		if ( iAspectMode > 0 )
 		{
 			m_pAspectRatio->SetItemEnabled( iAspectMode, true );
+			m_pHUDAspectRatio->SetItemEnabled( iAspectMode + 1, true );
 			bFoundWidescreen = true;
 		}
 
@@ -1287,6 +1347,8 @@ void COptionsSubVideo::PrepareResolutionList()
 
 	// disable ratio selection if we can't display widescreen.
 	m_pAspectRatio->SetEnabled( bFoundWidescreen );
+	// Do not disable HUD ratio selectio when no widescreen as we still have unlocked and normal 4:3 modes.
+	// m_pHUDAspectRatio->SetEnabled( bFoundWidescreen );
 
 	m_nSelectedMode = selectedItemID;
 
@@ -1417,12 +1479,13 @@ void COptionsSubVideo::OnResetData()
 
 	m_pHDContent->SetSelected( BUseHDContent() );
 
-    SetCurrentResolutionComboItem();
+	SetCurrentResolutionComboItem();
 
 	bool bVREnabled = config.m_nVRModeAdapter != UINT_MAX;
 	m_pVRMode->ActivateItem( bVREnabled ? 1 : 0 );
 	EnableOrDisableWindowedForVR();
 
+	SetCurrentHUDAspectRatio();
 }
 
 //-----------------------------------------------------------------------------
@@ -1537,6 +1600,7 @@ void COptionsSubVideo::OnApplyChanges()
 		windowed = bVRMode;
 	}
 
+	ApplyHUDAspectRatio();
 
 	// make sure there is a change
 	if ( config.m_VideoMode.m_Width != width
@@ -1601,7 +1665,6 @@ void COptionsSubVideo::OnApplyChanges()
 
 	// apply changes
 	engine->ClientCmd_Unrestricted( "mat_savechanges\n" );
-
 }
 
 //-----------------------------------------------------------------------------
