@@ -52,10 +52,19 @@ struct RatioToAspectMode_t
 };
 RatioToAspectMode_t g_RatioToAspectModes[] =
 {
-	{	0,		4.0f / 3.0f },
-	{	1,		16.0f / 9.0f },
-	{	2,		16.0f / 10.0f },
-	{	2,		1.0f },
+	// Surface 3:2
+	{	0,		3.0f / 2.0f },
+	// Normal 4:3
+	{	1,		4.0f / 3.0f },
+	// Widescreen 16:9
+	{	2,		16.0f / 9.0f },
+	// Widescreen 16:10
+	{	3,		16.0f / 10.0f },
+	// Widescreen 21:9
+	{	4,		21.0f / 9.0f },
+	// Widescreen 32:9
+	{	5,		32.0f / 9.0f },
+	{	3,		1.0f },
 };
 
 struct AAMode_t
@@ -1059,8 +1068,8 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	m_pGammaButton = new Button( this, "GammaButton", "#GameUI_AdjustGamma" );
 	m_pGammaButton->SetCommand(new KeyValues("OpenGammaDialog"));
 	m_pMode = new ComboBox(this, "Resolution", 8, false);
-	m_pAspectRatio = new ComboBox( this, "AspectRatio", 3, false );
-	m_pHUDAspectRatio = new ComboBox( this, "HudAspectRatio", 4, false );
+	m_pAspectRatio = new ComboBox( this, "AspectRatio", 6, false );
+	m_pHUDAspectRatio = new ComboBox( this, "HudAspectRatio", 7, false );
 	m_pVRMode = new ComboBox( this, "VRMode", 2, false );
 	m_pAdvanced = new Button( this, "AdvancedButton", "#GameUI_AdvancedEllipsis" );
 	m_pAdvanced->SetCommand(new KeyValues("OpenAdvanced"));
@@ -1070,28 +1079,98 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	m_pThirdPartyCredits->SetCommand(new KeyValues("OpenThirdPartyVideoCreditsDialog"));
 	m_pHDContent = new CheckButton( this, "HDContentButton", "#GameUI_HDContent" );
 
-	const int iAspectNormalItemID = m_pAspectRatio->AddItem( "#GameUI_AspectNormal", NULL );
-	const int iAspect16x9ItemID = m_pAspectRatio->AddItem( "#GameUI_AspectWide16x9", NULL );
-	const int iAspect16x10ItemID = m_pAspectRatio->AddItem( "#GameUI_AspectWide16x10", NULL );
+	char pszAspectName[64];
+
+	{
+		const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectNormal");
+		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+		
+		char *digit = strchr(pszAspectName, '3');
+		if (digit) *digit = '2';
+
+		digit = strchr(pszAspectName, '4');
+		if (digit) *digit = '3';
+	}
+	
+	// dimhotepus: Where did they get Unlocked string?
+	m_pHUDAspectRatio->AddItem( "#GameUI_Achievement_Unlocked", NULL );
+
+	// 3:2
+	m_pAspectRatio->AddItem( pszAspectName, NULL );
+	m_pHUDAspectRatio->AddItem( pszAspectName, NULL );
+	// 4:3
+	m_pAspectRatio->AddItem( "#GameUI_AspectNormal", NULL );
+	m_pHUDAspectRatio->AddItem( "#GameUI_AspectNormal", NULL );
+	// 16:9
+	m_pAspectRatio->AddItem( "#GameUI_AspectWide16x9", NULL );
+	m_pHUDAspectRatio->AddItem( "#GameUI_AspectWide16x9", NULL );
+	// 16:10
+	m_pAspectRatio->AddItem( "#GameUI_AspectWide16x10", NULL );
+	m_pHUDAspectRatio->AddItem( "#GameUI_AspectWide16x10", NULL );
+
+	{
+		const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectWide16x9");
+		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+
+		char *digit = strchr(pszAspectName, '1');
+		if (digit) *digit = '2';
+	
+		digit = strchr(pszAspectName, '6');
+		if (digit) *digit = '1';
+	}
+
+	// 21:9
+	m_pAspectRatio->AddItem( pszAspectName, NULL );
+	m_pHUDAspectRatio->AddItem( pszAspectName, NULL );
+
+	{
+		const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectWide16x9");
+		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+
+		char *digit = strchr(pszAspectName, '1');
+		if (digit) *digit = '3';
+	
+		digit = strchr(pszAspectName, '6');
+		if (digit) *digit = '2';
+	}
+	
+	// 32:9
+	m_pAspectRatio->AddItem( pszAspectName, NULL );
+	m_pHUDAspectRatio->AddItem( pszAspectName, NULL );
 
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 
 	const int iAspectMode = GetScreenAspectMode( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height );
 	switch ( iAspectMode )
 	{
-	default:
 	case 0:
-		m_pAspectRatio->ActivateItem( iAspectNormalItemID );
+		// 3:2
+		m_pAspectRatio->ActivateItem( 0 );
 		break;
+	default:
 	case 1:
-		m_pAspectRatio->ActivateItem( iAspect16x9ItemID );
+		// 4:3
+		m_pAspectRatio->ActivateItem( 1 );
 		break;
 	case 2:
-		m_pAspectRatio->ActivateItem( iAspect16x10ItemID );
+		// 16:9
+		m_pAspectRatio->ActivateItem( 2 );
+		break;
+	case 3:
+		// 16:10
+		m_pAspectRatio->ActivateItem( 3 );
+		break;
+	case 4:
+		// 21:9
+		m_pAspectRatio->ActivateItem( 4 );
+		break;
+	case 5:
+		// 32:9
+		m_pAspectRatio->ActivateItem( 5 );
 		break;
 	}
 
-	// dimhotepus: Where did they get Unlocked string?
+	SetCurrentHUDAspectRatio();
 	m_pHUDAspectRatio->AddItem( "#GameUI_Achievement_Unlocked", NULL );
 	m_pHUDAspectRatio->AddItem( "#GameUI_AspectNormal", NULL );
 	m_pHUDAspectRatio->AddItem( "#GameUI_AspectWide16x9", NULL );
@@ -1193,19 +1272,32 @@ void COptionsSubVideo::SetCurrentHUDAspectRatio()
 	{
 	default:
 	case -1:
+		// Unlocked
 		m_pHUDAspectRatio->ActivateItem(0);
 		break;
 	case 0:
-		// 4:3
+		// 3:2
 		m_pHUDAspectRatio->ActivateItem(1);
 		break;
 	case 1:
-		// 16:9
+		// 4:3
 		m_pHUDAspectRatio->ActivateItem(2);
 		break;
 	case 2:
-		// 16:10
+		// 16:9
 		m_pHUDAspectRatio->ActivateItem(3);
+		break;
+	case 3:
+		// 16:10
+		m_pHUDAspectRatio->ActivateItem(4);
+		break;
+	case 4:
+		// 21:9
+		m_pHUDAspectRatio->ActivateItem(5);
+		break;
+	case 5:
+		// 32:9
+		m_pHUDAspectRatio->ActivateItem(6);
 		break;
 	}
 }
@@ -1223,19 +1315,32 @@ void COptionsSubVideo::ApplyHUDAspectRatio()
 	{
 	default:
 	case 0:
+		// Unlocked
 		hud_aspect.SetValue(0);
 		break;
 	case 1:
+		// 3:2
+		hud_aspect.SetValue(3.f / 2.f);
+		break;
+	case 2:
 		// 4:3
 		hud_aspect.SetValue(4.f / 3.f);
 		break;
-	case 2:
+	case 3:
 		// 16:9
 		hud_aspect.SetValue(16.f / 9.f);
 		break;
-	case 3:
+	case 4:
 		// 16:10
 		hud_aspect.SetValue(16.f / 10.f);
+		break;
+	case 5:
+		// 21:9
+		hud_aspect.SetValue(21.f / 9.f);
+		break;
+	case 6:
+		// 32:9
+		hud_aspect.SetValue(32.f / 9.f);
 		break;
 	}
 }
@@ -1253,10 +1358,26 @@ void COptionsSubVideo::PrepareResolutionList()
 
 	// Clean up before filling the info again.
 	m_pMode->DeleteAllItems();
-	m_pAspectRatio->SetItemEnabled(1, false);
+	// 3:2
+	m_pAspectRatio->SetItemEnabled(0, false);
+	// 16:9
 	m_pAspectRatio->SetItemEnabled(2, false);
-	m_pHUDAspectRatio->SetItemEnabled(2, false);
+	// 16:10
+	m_pAspectRatio->SetItemEnabled(3, false);
+	// 21:9
+	m_pAspectRatio->SetItemEnabled(4, false);
+	// 32:9
+	m_pAspectRatio->SetItemEnabled(5, false);
+	// 3:2
+	m_pHUDAspectRatio->SetItemEnabled(1, false);
+	// 16:9
 	m_pHUDAspectRatio->SetItemEnabled(3, false);
+	// 16:10
+	m_pHUDAspectRatio->SetItemEnabled(4, false);
+	// 21:9
+	m_pHUDAspectRatio->SetItemEnabled(5, false);
+	// 32:9
+	m_pHUDAspectRatio->SetItemEnabled(6, false);
 
 	// get full video mode list
 	vmode_t *plist = NULL;
