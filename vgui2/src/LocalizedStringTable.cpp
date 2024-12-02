@@ -489,7 +489,13 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 						bool bAccepted = true;
 						ucs2 conditional[ MAX_LOCALIZED_CHARS ];
 						ucs2 *tempData = ReadUnicodeToken(data, conditional, MAX_LOCALIZED_CHARS, bQuoted);
-						if ( !bQuoted && conditional[0] == L'[' && conditional[1] == L'$' ) // wcsstr( conditional, L"[$" ) )
+						const size_t conditional_length = wcslen(conditional);
+						// dimhotepus: Add $!<cond> support as required.
+						if ( !bQuoted &&
+							 conditional_length > 2 &&
+							 conditional[0] == L'[' &&
+							 (conditional[1] == L'$' ||
+								 (conditional_length > 3 && conditional[1] == L'!' && conditional[2] == L'$') ) ) // wcsstr( conditional, L"[$" ) )
 						{
 							// Evaluate the conditional tag
 							char cond[MAX_LOCALIZED_CHARS];
