@@ -1193,6 +1193,12 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	{
 		m_pWindowed->AddItem( "#GameUI_Fullscreen", NULL );
 		m_pWindowed->AddItem( "#GameUI_Windowed", NULL );
+
+		const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_Windowed");
+		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+		V_strcat_safe(pszAspectName, " (No Border)");
+
+		m_pWindowed->AddItem( pszAspectName, NULL );
 	}
 	else
 	{
@@ -1211,6 +1217,12 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 		}
 
 		m_pWindowed->AddItem( "#GameUI_Windowed", NULL );
+
+		const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_Windowed");
+		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+		V_strcat_safe(pszAspectName, " (No Border)");
+
+		m_pWindowed->AddItem( pszAspectName, NULL );
 	}
 
 #else
@@ -1218,6 +1230,12 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 
 	m_pWindowed->AddItem( "#GameUI_Fullscreen", NULL );
 	m_pWindowed->AddItem( "#GameUI_Windowed", NULL );
+
+	const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_Windowed");
+	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+	V_strcat_safe(pszAspectName, " (No Border)");
+
+	m_pWindowed->AddItem( pszAspectName, NULL );
 #endif
 
 	LoadControlSettings("Resource\\OptionsSubVideo.res");
@@ -1387,12 +1405,13 @@ void COptionsSubVideo::PrepareResolutionList()
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 
 	// Windowed is the last item in the combobox.
-	bool bWindowed = ( m_pWindowed->GetActiveItem() >= ( m_pWindowed->GetItemCount() - 1 ) );
+	bool bWindowed = ( m_pWindowed->GetActiveItem() == ( m_pWindowed->GetItemCount() - 2 ) ) ? true : false;
+	bool bBorderless = ( m_pWindowed->GetActiveItem() == ( m_pWindowed->GetItemCount() - 1 ) ) ? true : false;
 	int desktopWidth, desktopHeight;
 	gameuifuncs->GetDesktopResolution( desktopWidth, desktopHeight );
 
 #if defined( USE_SDL )
-	bool bFullScreenWithMultipleDisplays = ( !bWindowed && ( SDL_GetNumVideoDisplays() > 1 ) );
+	bool bFullScreenWithMultipleDisplays = ( !bWindowed && !bBorderless && ( SDL_GetNumVideoDisplays() > 1 ) );
 	if ( bFullScreenWithMultipleDisplays )
 	{
 		SDL_Rect rect;
@@ -1413,7 +1432,7 @@ void COptionsSubVideo::PrepareResolutionList()
 	//	fake things out so the native fullscreen resolution is selected. Stuck this in
 	//	because I assume most people will go fullscreen at native resolution, and it's sometimes
 	//	difficult to find the native resolution with all the aspect ratio options.
-	bool bNewFullscreenDisplay = ( !bWindowed && ( getSDLDisplayIndexFullscreen() != m_pWindowed->GetActiveItem() ) );
+	bool bNewFullscreenDisplay = ( !bWindowed && !bBorderless && ( getSDLDisplayIndexFullscreen() != m_pWindowed->GetActiveItem() ) );
 	if ( bNewFullscreenDisplay )
 	{
 		currentWidth = desktopWidth;
@@ -1428,7 +1447,7 @@ void COptionsSubVideo::PrepareResolutionList()
 	{
 #if !defined( USE_SDL )
 		// don't show modes bigger than the desktop for windowed mode
-		if ( bWindowed )
+		if ( bWindowed || bBorderless )
 #endif
 		{
 			if ( plist->width > desktopWidth || plist->height > desktopHeight )
@@ -1575,7 +1594,12 @@ void COptionsSubVideo::OnResetData()
 
 	if ( config.Windowed() )
 	{
-		// Last item in the combobox is Windowed.
+		// Last before one item in the combobox is Windowed.
+		ItemIndex = ( m_pWindowed->GetItemCount() - 2 );
+	}
+	else if ( config.Borderless() )
+	{
+		// Last before one item in the combobox is window borderless.
 		ItemIndex = ( m_pWindowed->GetItemCount() - 1 );
 	}
 	else
@@ -1592,11 +1616,22 @@ void COptionsSubVideo::OnResetData()
 
     m_pWindowed->ActivateItem( ItemIndex );
 #else
-    m_pWindowed->ActivateItem( config.Windowed() ? 1 : 0 );
+	if (config.Windowed())
+	{
+		m_pWindowed->ActivateItem( 1 );
+	}
+	else if (config.Borderless())
+	{
+		m_pWindowed->ActivateItem( 2 );
+	}
+	else
+	{
+		m_pWindowed->ActivateItem( 0 );
+	}
 #endif
 
 	// reset gamma control
-	m_pGammaButton->SetEnabled( !config.Windowed() );
+	m_pGammaButton->SetEnabled( !config.Windowed() && !config.Borderless() );
 
 	m_pHDContent->SetSelected( BUseHDContent() );
 
@@ -1706,7 +1741,8 @@ void COptionsSubVideo::OnApplyChanges()
 
 	// windowed
 	bool bConfigChanged = false;
-	bool windowed = ( m_pWindowed->GetActiveItem() == ( m_pWindowed->GetItemCount() - 1 ) ) ? true : false;
+	bool windowed = ( m_pWindowed->GetActiveItem() == ( m_pWindowed->GetItemCount() - 2 ) ) ? true : false;
+	bool borderless = ( m_pWindowed->GetActiveItem() == ( m_pWindowed->GetItemCount() - 1 ) ) ? true : false;
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 
 	bool bVRMode = m_pVRMode->GetActiveItem() != 0;
@@ -1726,7 +1762,8 @@ void COptionsSubVideo::OnApplyChanges()
 	// make sure there is a change
 	if ( config.m_VideoMode.m_Width != width
 		|| config.m_VideoMode.m_Height != height
-		|| config.Windowed() != windowed )
+		|| config.Windowed() != windowed
+		|| config.Borderless() != borderless )
 	{
 		bConfigChanged = true;
 	}
@@ -1768,7 +1805,7 @@ void COptionsSubVideo::OnApplyChanges()
 	{
 		// set mode
 		char szCmd[ 256 ];
-		Q_snprintf( szCmd, sizeof( szCmd ), "mat_setvideomode %i %i %i\n", width, height, windowed ? 1 : 0 );
+		Q_snprintf( szCmd, sizeof( szCmd ), "mat_setvideomode %i %i %i %i\n", width, height, windowed ? 1 : 0, borderless ? 1 : 0 );
 		engine->ClientCmd_Unrestricted( szCmd );
 	}
 
@@ -1798,7 +1835,7 @@ void COptionsSubVideo::PerformLayout()
 	if ( m_pGammaButton )
 	{
 		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
-		m_pGammaButton->SetEnabled( !config.Windowed() );
+		m_pGammaButton->SetEnabled( !config.Windowed() && !config.Borderless() );
 	}
 }
 

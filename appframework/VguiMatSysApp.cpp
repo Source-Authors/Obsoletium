@@ -268,14 +268,8 @@ void* CVguiMatSysApp::GetAppWindow()
 bool CVguiMatSysApp::SetVideoMode( )
 {
 	MaterialSystem_Config_t config;
-	if ( CommandLine()->CheckParm( "-fullscreen" ) )
-	{
-		config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, false );
-	}
-	else
-	{
-		config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, true );
-	}
+	config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, !CommandLine()->CheckParm( "-fullscreen" ) );
+	config.SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, !!CommandLine()->CheckParm( "-noborder" ) );
 
 	if ( CommandLine()->CheckParm( "-resizing" ) )
 	{

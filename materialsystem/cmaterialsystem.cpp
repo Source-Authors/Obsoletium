@@ -1038,11 +1038,11 @@ static void ConvertModeStruct( ShaderDeviceInfo_t *pMode, const MaterialSystem_C
 	pMode->m_nWindowedSizeLimitWidth = (int)config.m_WindowedSizeLimitWidth;	
 	pMode->m_nWindowedSizeLimitHeight = (int)config.m_WindowedSizeLimitHeight;
 
-	pMode->m_bWindowed = config.Windowed();
-	pMode->m_bResizing = config.Resizing();			
+	pMode->m_bWindowed = config.Windowed() || config.Borderless();
+	pMode->m_bResizing = config.Resizing();
 	pMode->m_bUseStencil = config.Stencil();
-	pMode->m_bLimitWindowedSize = config.LimitWindowedSize();	
-	pMode->m_bWaitForVSync = config.WaitForVSync();	
+	pMode->m_bLimitWindowedSize = config.LimitWindowedSize();
+	pMode->m_bWaitForVSync = config.WaitForVSync();
 	pMode->m_bScaleToOutputResolution = config.ScaleToOutputResolution();
 	pMode->m_bUsingMultipleWindows = config.UsingMultipleWindows();
 }
@@ -1171,6 +1171,7 @@ bool CMaterialSystem::SetMode( void* hwnd, const MaterialSystem_Config_t &config
 	// Copy over that state which isn't stored currently in convars
 	g_config.m_VideoMode = config.m_VideoMode;
 	g_config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, config.Windowed() );
+	g_config.SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, config.Borderless() );
 	g_config.SetFlag( MATSYS_VIDCFG_FLAGS_STENCIL, config.Stencil() );
 	g_config.SetFlag( MATSYS_VIDCFG_FLAGS_VR_MODE, config.VRMode() );
 	WriteConfigIntoConVars( config );
@@ -2271,6 +2272,7 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		config.m_nAASamples != g_config.m_nAASamples ||
 		config.m_nAAQuality != g_config.m_nAAQuality ||
 		config.Windowed() != g_config.Windowed() ||
+		config.Borderless() != g_config.Borderless() ||
 		config.Stencil() != g_config.Stencil() )
 	{
 		if( mat_debugalttab.GetBool() )
@@ -2283,21 +2285,13 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle wait for vsync
 	// In GL, we just check this and it's just a function call--no need for device shenanigans.
 #if !defined( DX_TO_GL_ABSTRACTION )
-	if ( (IsX360() || !config.Windowed()) && (config.WaitForVSync() != g_config.WaitForVSync()) )
+	if ( (!config.Windowed() && !config.Borderless()) && (config.WaitForVSync() != g_config.WaitForVSync()) )
 	{
-#		if ( !defined( _X360 ) )
+		if ( mat_debugalttab.GetBool() )
 		{
-			if ( mat_debugalttab.GetBool() )
-			{
-				Warning( "mat_debugalttab: video mode changed due to toggle of wait for vsync\n" );
-			}
-			bVideoModeChange = true;
+			Warning( "mat_debugalttab: video mode changed due to toggle of wait for vsync\n" );
 		}
-#		else
-		{
-			g_pShaderAPI->EnableVSync_360( config.WaitForVSync() );
-		}
-#		endif
+		bVideoModeChange = true;
 	}
 #endif
 

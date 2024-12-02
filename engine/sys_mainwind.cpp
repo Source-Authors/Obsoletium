@@ -911,7 +911,7 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 #ifndef SWDS
 		case IMN_PRIVATE:
-			if ( !videomode->IsWindowedMode() )
+			if ( !videomode->IsWindowedMode() && !videomode->IsBorderlessMode() )
 				return 0;
 			break;
 #endif
@@ -1037,7 +1037,7 @@ bool CGame::CreateGameWindow( void )
 	// Give it a frame if we want a border
 	if ( videomode->IsWindowedMode() )
 	{
-		if( !CommandLine()->FindParm( "-noborder" ) )
+		if ( !videomode->IsBorderlessMode() )
 		{
 			style |= WS_OVERLAPPEDWINDOW;
 			style &= ~WS_THICKFRAME;
@@ -1326,6 +1326,29 @@ class ScopedMilesAudioDevice
   void *m_miles_sound_device;
 };
 
+#ifdef _WIN32
+class ScopedShowCursor
+{
+ public:
+  ScopedShowCursor(bool is_shown) noexcept : m_is_shown{is_shown}
+  {
+	  ::ShowCursor(is_shown ? TRUE : FALSE);
+  }
+  ~ScopedShowCursor() noexcept
+  {
+	  ::ShowCursor(m_is_shown ? FALSE : TRUE);
+  }
+
+  ScopedShowCursor(ScopedShowCursor &) = delete;
+  ScopedShowCursor& operator=(ScopedShowCursor &) = delete;
+  ScopedShowCursor(ScopedShowCursor &&) = delete;
+  ScopedShowCursor& operator=(ScopedShowCursor &&) = delete;
+
+ private:
+  const bool m_is_shown;
+};
+#endif
+
 void CGame::PlayStartupVideos( void )
 {
 	if ( Plat_IsInBenchmarkMode() )
@@ -1335,9 +1358,10 @@ void CGame::PlayStartupVideos( void )
 	
 	// Wait for the mode to change and stabilized
 	// FIXME: There's really no way to know when this is completed, so we have to guess a time that will mostly be correct
-	if ( videomode->IsWindowedMode() == false )
+	if ( videomode->IsWindowedMode() == false && videomode->IsBorderlessMode() == false )
 	{
-		Sys_Sleep( 1000 );
+		// dimhotepus: Reduce mode stabilization time to 300ms as CRTs are rarely used anymore.
+		Sys_Sleep( 300 );
 	}
 
 	bool bEndGame = CommandLine()->CheckParm( "-endgamevid" );
@@ -1408,7 +1432,7 @@ void CGame::PlayStartupVideos( void )
   #if defined( USE_SDL )
 	g_pLauncherMgr->SetMouseVisible( false );
   #elif defined( WIN32 )
-	::ShowCursor( FALSE );
+	const ScopedShowCursor scoped_show_cursor{false};
   #endif
 
 #if defined( LINUX )
@@ -1437,8 +1461,6 @@ void CGame::PlayStartupVideos( void )
 	// show cursor again
   #if defined( USE_SDL )
 	g_pLauncherMgr->SetMouseVisible( true );
-  #elif defined( WIN32 )
-	::ShowCursor( TRUE );
   #endif
 
 	// call free on the buffer since the buffer was malloc'd in COM_LoadFile
@@ -1484,7 +1506,7 @@ void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 #endif
 
 	VideoResult_t status = 	g_pVideo->PlayVideoFileFullScreen( filename, "GAME", GetMainWindowPlatformSpecificHandle (),
-	                                                           m_width, m_height, m_iDesktopWidth, m_iDesktopHeight, videomode->IsWindowedMode(),
+	                                                           m_width, m_height, m_iDesktopWidth, m_iDesktopHeight, videomode->IsWindowedMode() || videomode->IsBorderlessMode(),
 	                                                           forcedMinTime, VideoPlaybackFlags::DEFAULT_FULLSCREEN_OPTIONS | VideoPlaybackFlags::FILL_WINDOW );
 
 	// Everything ok?

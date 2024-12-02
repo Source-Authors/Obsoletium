@@ -36,13 +36,13 @@ public:
 	virtual void			DrawStartupGraphic() = 0;
 
 	// Creates the game window, plays the startup movie, starts up the material system
-	virtual bool			CreateGameWindow( int nWidth, int nHeight, bool bWindowed ) = 0;
+	virtual bool			CreateGameWindow( int nWidth, int nHeight, bool bWindowed, bool bBorderless ) = 0;
 
 	// Sets the game window in editor mode
 	virtual void			SetGameWindow( void *hWnd ) = 0;
 
 	// Sets the video mode, and re-sizes the window
-	virtual bool			SetMode( int nWidth, int nHeight, bool bWindowed ) = 0;
+	virtual bool			SetMode( int nWidth, int nHeight, bool bWindowed, bool bBorderless ) = 0;
 
 	// Returns the fullscreen modes for the adapter the game was started on
 	virtual int				GetModeCount( void ) = 0;
@@ -96,6 +96,8 @@ public:
 	virtual bool			TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality ) = 0;
 
 	virtual void			ReadScreenPixels( int x, int y, int w, int h, void *pBuffer, ImageFormat format ) = 0;
+
+	virtual bool			IsBorderlessMode() const = 0;
 };
 
 //-----------------------------------------------------------------------------

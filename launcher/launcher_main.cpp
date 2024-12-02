@@ -243,6 +243,8 @@ void RemoveParametersOverrides(ICommandLine *command_line) {
   command_line->RemoveParm("-startwindowed");
   command_line->RemoveParm("-windowed");
   command_line->RemoveParm("-window");
+  // dimhotepus: Remove borderless override.
+  command_line->RemoveParm("-noborder");
   command_line->RemoveParm("-full");
   command_line->RemoveParm("-fullscreen");
   command_line->RemoveParm("-dxlevel");

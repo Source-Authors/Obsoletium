@@ -1670,9 +1670,12 @@ bool CEngineAPI::ModInit( const char *pModName, const char *pGameDir )
 	bool bWindowed = g_pMaterialSystemConfig->Windowed() ||
 		// at init time we never want to start up full screen
 		g_pMaterialSystemConfig->m_nVRModeAdapter != UINT_MAX;
+	bool bBorderless = g_pMaterialSystemConfig->Borderless() ||
+		// at init time we never want to start up full screen
+		g_pMaterialSystemConfig->m_nVRModeAdapter != UINT_MAX;
 
 	return videomode &&
-		   videomode->CreateGameWindow( width, height, bWindowed );
+		   videomode->CreateGameWindow( width, height, bWindowed, bBorderless );
 }
 
 void CEngineAPI::ModShutdown()

@@ -36,6 +36,7 @@ enum MaterialSystem_Config_Flags_t
 	MATSYS_VIDCFG_FLAGS_USING_MULTIPLE_WINDOWS      = ( 1 << 15 ),
 	MATSYS_VIDCFG_FLAGS_DISABLE_PHONG               = ( 1 << 16 ),
 	MATSYS_VIDCFG_FLAGS_VR_MODE						= ( 1 << 17 ),
+	MATSYS_VIDCFG_FLAGS_BORDERLESS					= ( 1 << 18 ),
 };
 
 struct MaterialSystemHardwareIdentifier_t
@@ -48,6 +49,7 @@ struct MaterialSystemHardwareIdentifier_t
 struct MaterialSystem_Config_t
 {
 	bool Windowed() const { return ( m_Flags & MATSYS_VIDCFG_FLAGS_WINDOWED ) != 0; }
+	bool Borderless() const { return ( m_Flags & MATSYS_VIDCFG_FLAGS_BORDERLESS ) != 0; }
 	bool Resizing() const { return ( m_Flags & MATSYS_VIDCFG_FLAGS_RESIZING ) != 0; }
 #ifdef CSS_PERF_TEST
 	bool WaitForVSync() const { return false; }//( m_Flags & MATSYS_VIDCFG_FLAGS_NO_WAIT_FOR_VSYNC ) == 0; }
@@ -167,6 +169,7 @@ struct MaterialSystem_Config_t
 		SetFlag( MATSYS_VIDCFG_FLAGS_USING_MULTIPLE_WINDOWS, false );
 		SetFlag( MATSYS_VIDCFG_FLAGS_DISABLE_PHONG, false );
 		SetFlag( MATSYS_VIDCFG_FLAGS_VR_MODE, false );
+		SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, false );
 
 		m_VideoMode.m_Width = BASE_WIDTH;
 		m_VideoMode.m_Height = BASE_HEIGHT;

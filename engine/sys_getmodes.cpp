@@ -107,7 +107,7 @@ public:
     void        DrawNullBackground( void *hdc, int w, int h ) override;
     void        InvalidateWindow() override;
     void        DrawStartupGraphic() override;
-    bool        CreateGameWindow( int nWidth, int nHeight, bool bWindowed ) override;
+    bool        CreateGameWindow( int nWidth, int nHeight, bool bWindowed, bool bBorderless ) override;
     int         GetModeWidth( void ) const override;
     int         GetModeHeight( void ) const override;
 	int			GetModeStereoWidth() const override;
@@ -125,8 +125,8 @@ public:
 protected:
     bool                GetInitialized( ) const;
     void                SetInitialized( bool init );
-    void                AdjustWindow( int nWidth, int nHeight, int nBPP, bool bWindowed );
-    void                ResetCurrentModeForNewResolution( int width, int height, bool bWindowed );
+    void                AdjustWindow( int nWidth, int nHeight, int nBPP, bool bWindowed, bool bBorderless );
+    void                ResetCurrentModeForNewResolution( int width, int height, bool bWindowed, bool bBorderless );
     int                 GetModeBPP( ) const { return 32; }
     void                DrawStartupVideo();
     void                ComputeStartupGraphicName( char *pBuf, int nBufLen );
@@ -145,6 +145,8 @@ protected:
     // Inline accessors
     vmode_t&            DefaultVideoMode();
     vmode_t&            RequestedWindowVideoMode();
+
+    bool                IsBorderlessMode() const;
 
 private:
     // Purpose: Loads the startup graphic
@@ -202,6 +204,7 @@ protected:
 	int					m_nRenderHeight;
 #endif
     bool                m_bWindowed;
+    bool                m_bBorderless;
     bool                m_bSetModeOnce;
 	bool				m_bVROverride;
 
@@ -228,6 +231,10 @@ inline vmode_t& CVideoMode_Common::RequestedWindowVideoMode()
     return m_nCustomModeList[ - VIDEO_MODE_REQUESTED_WINDOW_SIZE - 1 ];
 }
 
+bool CVideoMode_Common::IsBorderlessMode() const
+{
+    return m_bBorderless;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -251,6 +258,7 @@ CVideoMode_Common::CVideoMode_Common( void )
     m_pBackgroundTexture   = NULL;
     m_pLoadingTexture      = NULL;
     m_bWindowed            = false;
+    m_bBorderless          = false;
     m_nModeWidth           = 1024;
     m_nModeHeight          = 768;
 	m_bVROverride = false;
@@ -489,14 +497,15 @@ int CVideoMode_Common::FindVideoMode( int nDesiredWidth, int nDesiredHeight, boo
 //-----------------------------------------------------------------------------
 // Choose the actual video mode based on the available modes
 //-----------------------------------------------------------------------------
-void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeight, bool bWindowed )
+void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeight, bool bWindowed, bool bBorderless )
 {
     // Fill in vid structure for the mode
-    int nGameMode = FindVideoMode( nWidth, nHeight, bWindowed );
+    int nGameMode = FindVideoMode( nWidth, nHeight, bWindowed || bBorderless );
     vmode_t *pMode = GetMode( nGameMode );
 
 	// default to non-VR values
 	m_bWindowed = bWindowed;
+    m_bBorderless = bBorderless;
 	m_nModeWidth = pMode->width;
 	m_nModeHeight = pMode->height;
 	m_nUIWidth = pMode->width;
@@ -545,7 +554,7 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 #endif
 		}
 	}
-	else if( (unsigned)materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter == materials->GetCurrentAdapter() )
+	else if( materials->GetCurrentConfigForVideoCard().m_nVRModeAdapter == materials->GetCurrentAdapter() )
 	{
 		// if we aren't in VR mode but we do have a VR mode adapter set, we must not be full
 		// screen because that would show up on the HMD
@@ -557,7 +566,7 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 //-----------------------------------------------------------------------------
 // Creates the game window, plays the startup movie
 //-----------------------------------------------------------------------------
-bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, bool bWindowed )
+bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, bool bWindowed, bool bBorderless )
 {
     COM_TimestampedLog( "CVideoMode_Common::Init  CreateGameWindow" );
 
@@ -599,7 +608,7 @@ bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, bool bWindowe
     {
         // Fill in vid structure for the mode.
         // Note: ModeWidth/Height may *not* match requested nWidth/nHeight
-        ResetCurrentModeForNewResolution( nWidth, nHeight, bWindowed );
+        ResetCurrentModeForNewResolution( nWidth, nHeight, bWindowed, bBorderless );
 
 		COM_TimestampedLog( "CreateGameWindow - Start" );
         // When running in stand-alone mode, create your own window 
@@ -608,11 +617,11 @@ bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, bool bWindowe
 		COM_TimestampedLog( "CreateGameWindow - Finish" );
 
         // Re-size and re-center the window
-        AdjustWindow( GetModeWidth(), GetModeHeight(), GetModeBPP(), IsWindowedMode() );
+        AdjustWindow( GetModeWidth(), GetModeHeight(), GetModeBPP(), IsWindowedMode(), IsBorderlessMode() );
 
 		COM_TimestampedLog( "SetMode - Start" );
         // Set the mode and let the materialsystem take over
-        if ( !SetMode( GetModeWidth(), GetModeHeight(), IsWindowedMode() ) )
+        if ( !SetMode( GetModeWidth(), GetModeHeight(), IsWindowedMode(), IsBorderlessMode() ) )
             return false;
 
 #if defined( USE_SDL ) && 0
@@ -1310,7 +1319,7 @@ int CVideoMode_Common::GetRefreshRateForMode( const vmode_t *pMode )
 // Input  : *mode - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bWindowed )
+void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bWindowed, bool bBorderless )
 {
 	if ( g_bTextMode )
 		return;
@@ -1333,7 +1342,7 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 	{
 		// Give it a frame (pretty much WS_OVERLAPPEDWINDOW except for we do not modify the
 		// flags corresponding to resizing-frame and maximize-box)
-		if( !CommandLine()->FindParm( "-noborder" ) && !m_bVROverride )
+		if( !bBorderless && !m_bVROverride )
 		{
 			style |= WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 		}
@@ -1396,7 +1405,7 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 	if( bWindowed )
 	{
 		SDL_Window* win = (SDL_Window*)g_pLauncherMgr->GetWindowRef();
-		if ( m_bVROverride || CommandLine()->FindParm( "-noborder" ) )
+		if ( m_bVROverride || bBorderless )
 			SDL_SetWindowBordered( win, SDL_FALSE );
 		else
 			SDL_SetWindowBordered( win, SDL_TRUE );
@@ -1529,40 +1538,29 @@ void CVideoMode_Common::CenterEngineWindow( int width, int height)
 	game->SetWindowXY( CenterX, CenterY );
 	g_pLauncherMgr->MoveWindow( CenterX, CenterY );
 #else
-    void *hWndCenter = game->GetMainWindow();
+    HWND hWndCenter = static_cast<HWND>(game->GetMainWindow());
 
-    if ( IsPC() )
+    // In windowed mode go through game->GetDesktopInfo because system metrics change
+    // when going fullscreen vs windowed.
+    // Use system metrics for fullscreen or when game didn't have a chance to initialize.
+    int cxScreen = 0, cyScreen = 0, refreshRate = 0;
+
+    if ( m_bBorderless || ( !( WS_EX_TOPMOST & ::GetWindowLong( hWndCenter, GWL_EXSTYLE ) ) && m_bWindowed ) )
     {
-        // In windowed mode go through game->GetDesktopInfo because system metrics change
-        // when going fullscreen vs windowed.
-        // Use system metrics for fullscreen or when game didn't have a chance to initialize.
-
-        int cxScreen = 0, cyScreen = 0, refreshRate = 0;
-
-        if ( !( WS_EX_TOPMOST & ::GetWindowLong( (HWND)hWndCenter, GWL_EXSTYLE ) ) && m_bWindowed )
-        {
-            game->GetDesktopInfo( cxScreen, cyScreen, refreshRate );
-        }
-        
-        if ( !cxScreen || !cyScreen )
-        {
-            cxScreen = GetSystemMetrics(SM_CXSCREEN);
-            cyScreen = GetSystemMetrics(SM_CYSCREEN);
-        }
-
-        // Compute top-left corner offset
-        CenterX = (cxScreen - width) / 2;
-        CenterY = (cyScreen - height) / 2;
-        CenterX = (CenterX < 0) ? 0: CenterX;
-        CenterY = (CenterY < 0) ? 0: CenterY;
-    }
-    else
-    {
-        CenterX = 0;
-        CenterY = 0;
+        game->GetDesktopInfo( cxScreen, cyScreen, refreshRate );
     }
 
-	if( m_bVROverride )
+    if (!cxScreen || !cyScreen)
+    {
+        cxScreen = GetSystemMetrics(SM_CXSCREEN);
+        cyScreen = GetSystemMetrics(SM_CYSCREEN);
+    }
+
+    // Compute top-left corner offset
+    CenterX = std::max(0, (cxScreen - width) / 2);
+    CenterY = std::max(0, (cyScreen - height) / 2);
+
+	if ( m_bVROverride )
 	{
 		CenterX = m_nVROverrideX;
 		CenterY = m_nVROverrideY;
@@ -1574,7 +1572,7 @@ void CVideoMode_Common::CenterEngineWindow( int width, int height)
 
     game->SetWindowXY( CenterX, CenterY );
 
-    SetWindowPos ( (HWND)hWndCenter, NULL, CenterX, CenterY, 0, 0,
+    SetWindowPos( hWndCenter, NULL, CenterX, CenterY, 0, 0,
                   SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_DRAWFRAME);
 #endif
 
@@ -2150,7 +2148,7 @@ public:
     virtual bool        Init( );
     virtual void        Shutdown( void );
     virtual void        SetGameWindow( void *hWnd );
-    virtual bool        SetMode( int nWidth, int nHeight, bool bWindowed );
+    virtual bool        SetMode( int nWidth, int nHeight, bool bWindowed, bool bBorderless );
     virtual void        ReleaseVideo( void );
     virtual void        RestoreVideo( void );
     virtual void        AdjustForModeChange( void );
@@ -2289,10 +2287,10 @@ void CVideoMode_MaterialSystem::Shutdown()
 //-----------------------------------------------------------------------------
 // Sets the video mode
 //-----------------------------------------------------------------------------
-bool CVideoMode_MaterialSystem::SetMode( int nWidth, int nHeight, bool bWindowed )
+bool CVideoMode_MaterialSystem::SetMode( int nWidth, int nHeight, bool bWindowed, bool bBorderless )
 {
     // Necessary for mode selection to work
-    int nFoundMode = FindVideoMode( nWidth, nHeight, bWindowed );
+    int nFoundMode = FindVideoMode( nWidth, nHeight, bWindowed || bBorderless );
     vmode_t *pMode = GetMode( nFoundMode );
 
     // update current video state
@@ -2313,15 +2311,16 @@ bool CVideoMode_MaterialSystem::SetMode( int nWidth, int nHeight, bool bWindowed
 #else
     config.m_VideoMode.m_RefreshRate = GetRefreshRateForMode( pMode );
 #endif
-    
+
     config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, bWindowed );
+	config.SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, bBorderless );
 
     // FIXME: This is trash. We have to do *different* things depending on how we're setting the mode!
     if ( !m_bSetModeOnce )
     {
 		//Debugger();
 		
-        if ( !materials->SetMode( (void*)game->GetMainDeviceWindow(), config ) )
+        if ( !materials->SetMode( game->GetMainDeviceWindow(), config ) )
             return false;
 
         m_bSetModeOnce = true;
@@ -2352,12 +2351,13 @@ void CVideoMode_MaterialSystem::AdjustForModeChange( void )
     int nNewWidth = g_pMaterialSystemConfig->m_VideoMode.m_Width;
     int nNewHeight = g_pMaterialSystemConfig->m_VideoMode.m_Height;
     bool bWindowed = g_pMaterialSystemConfig->Windowed();
+    bool bBorderless = g_pMaterialSystemConfig->Borderless();
 
     // reset the window size
     CMatRenderContextPtr pRenderContext( materials );
 
-    ResetCurrentModeForNewResolution( nNewWidth, nNewHeight, bWindowed );
-    AdjustWindow( GetModeWidth(), GetModeHeight(), GetModeBPP(), IsWindowedMode() );
+    ResetCurrentModeForNewResolution( nNewWidth, nNewHeight, bWindowed, bBorderless );
+    AdjustWindow( GetModeWidth(), GetModeHeight(), GetModeBPP(), IsWindowedMode(), IsBorderlessMode() );
     MarkClientViewRectDirty();
     pRenderContext->Viewport( 0, 0, GetModeStereoWidth(), GetModeStereoHeight() );
 
@@ -2401,7 +2401,7 @@ void CVideoMode_MaterialSystem::SetGameWindow( void *hWnd )
 //-----------------------------------------------------------------------------
 void CVideoMode_MaterialSystem::ReleaseVideo( void )
 {
-    if ( IsWindowedMode() )
+    if ( IsWindowedMode() || IsBorderlessMode() )
         return;
 
     ReleaseFullScreen();
@@ -2413,7 +2413,7 @@ void CVideoMode_MaterialSystem::ReleaseVideo( void )
 //-----------------------------------------------------------------------------
 void CVideoMode_MaterialSystem::RestoreVideo( void )
 {
-    if ( IsWindowedMode() )
+    if ( IsWindowedMode() || IsBorderlessMode() )
         return;
 
 #if defined( USE_SDL )
@@ -2421,7 +2421,7 @@ void CVideoMode_MaterialSystem::RestoreVideo( void )
 #else
 	ShowWindow( (HWND)game->GetMainWindow(), SW_SHOWNORMAL );
 #endif
-    AdjustWindow( GetModeWidth(), GetModeHeight(), GetModeBPP(), IsWindowedMode() );
+    AdjustWindow( GetModeWidth(), GetModeHeight(), GetModeBPP(), IsWindowedMode(), IsBorderlessMode() );
 }
 
 
@@ -2430,7 +2430,7 @@ void CVideoMode_MaterialSystem::RestoreVideo( void )
 //-----------------------------------------------------------------------------
 void CVideoMode_MaterialSystem::ReleaseFullScreen( void )
 {
-    if ( IsWindowedMode() )
+    if ( IsWindowedMode() || IsBorderlessMode() )
         return;
 
 #if !defined( USE_SDL )
@@ -2451,7 +2451,7 @@ void CVideoMode_MaterialSystem::ReleaseFullScreen( void )
 //-----------------------------------------------------------------------------
 void CVideoMode_MaterialSystem::ChangeDisplaySettingsToFullscreen( int nWidth, int nHeight, int nBPP )
 {
-    if ( IsWindowedMode() )
+    if ( IsWindowedMode() || IsBorderlessMode() )
         return;
 
 #if defined( WIN32 ) && !defined( USE_SDL )
