@@ -133,7 +133,7 @@ static int AddStaticPropDictLump( char const* pModelName )
 	StaticPropDictLump_t dictLump;
 	strncpy( dictLump.m_Name, pModelName, DETAIL_NAME_LENGTH );
 
-	for (int i = s_StaticPropDictLump.Size(); --i >= 0; )
+	for (int i = s_StaticPropDictLump.Count(); --i >= 0; )
 	{
 		if (!memcmp(&s_StaticPropDictLump[i], &dictLump, sizeof(dictLump) ))
 			return i;
@@ -183,8 +183,8 @@ bool LoadStudioModel( char const* pModelName, char const* pEntityType, CUtlBuffe
 	}
 
 	// ensure reset
-	pHdr->pVertexBase = NULL;
-	pHdr->pIndexBase  = NULL;
+	pHdr->SetVertexBase(nullptr);
+	pHdr->SetIndexBase(nullptr);
 
 	return true;
 }
@@ -235,7 +235,7 @@ CPhysCollide* ComputeConvexHull( studiohdr_t* pStudioHdr )
 
 	// Convert an array of convex elements to a compiled collision model
 	// (this deletes the convex elements)
-	return s_pPhysCollision->ConvertConvexToCollide( convexHulls.Base(), convexHulls.Size() );
+	return s_pPhysCollision->ConvertConvexToCollide( convexHulls.Base(), convexHulls.Count() );
 }
 
 
@@ -522,7 +522,7 @@ static void AddStaticPropToLump( StaticPropBuild_t const& build )
 	propLump.m_nLightmapResolutionY = build.m_LightmapResolutionY;
 
 	// Add the leaves to the leaf lump
-	for (int j = 0; j < leafList.Size(); ++j)
+	for (int j = 0; j < leafList.Count(); ++j)
 	{
 		StaticPropLeafLump_t insert;
 		insert.m_Leaf = leafList[j];
@@ -542,22 +542,22 @@ static void SetLumpData( )
 	if (handle != g_GameLumps.InvalidGameLump())
 		g_GameLumps.DestroyGameLump(handle);
 
-	int dictsize = s_StaticPropDictLump.Size() * sizeof(StaticPropDictLump_t);
-	int objsize = s_StaticPropLump.Size() * sizeof(StaticPropLump_t);
-	int leafsize = s_StaticPropLeafLump.Size() * sizeof(StaticPropLeafLump_t);
+	int dictsize = s_StaticPropDictLump.Count() * sizeof(StaticPropDictLump_t);
+	int objsize = s_StaticPropLump.Count() * sizeof(StaticPropLump_t);
+	int leafsize = s_StaticPropLeafLump.Count() * sizeof(StaticPropLeafLump_t);
 	int size = dictsize + objsize + leafsize + 3 * sizeof(int);
 
 	handle = g_GameLumps.CreateGameLump( GAMELUMP_STATIC_PROPS, size, 0, GAMELUMP_STATIC_PROPS_VERSION );
 
 	// Serialize the data
 	CUtlBuffer buf( g_GameLumps.GetGameLump(handle), size );
-	buf.PutInt( s_StaticPropDictLump.Size() );
+	buf.PutInt( s_StaticPropDictLump.Count() );
 	if (dictsize)
 		buf.Put( s_StaticPropDictLump.Base(), dictsize );
-	buf.PutInt( s_StaticPropLeafLump.Size() );
+	buf.PutInt( s_StaticPropLeafLump.Count() );
 	if (leafsize)
 		buf.Put( s_StaticPropLeafLump.Base(), leafsize );
-	buf.PutInt( s_StaticPropLump.Size() );
+	buf.PutInt( s_StaticPropLump.Count() );
 	if (objsize)
 		buf.Put( s_StaticPropLump.Base(), objsize );
 }
@@ -581,7 +581,7 @@ void EmitStaticProps()
 	int i;
 	for ( i = 0; i < num_entities; ++i)
 	{
-		char* pEntity = ValueForKey(&entities[i], "classname");
+		const char* pEntity = ValueForKey(&entities[i], "classname");
 		if (!Q_strcmp(pEntity, "info_lighting"))
 		{
 			s_LightingInfo.AddToTail(i);
@@ -591,7 +591,7 @@ void EmitStaticProps()
 	// Emit specifically specified static props
 	for ( i = 0; i < num_entities; ++i)
 	{
-		char* pEntity = ValueForKey(&entities[i], "classname");
+		const char* pEntity = ValueForKey(&entities[i], "classname");
 		if (!strcmp(pEntity, "static_prop") || !strcmp(pEntity, "prop_static"))
 		{
 			StaticPropBuild_t build;
@@ -692,10 +692,10 @@ static void FreeCurrentModelVertexes()
 {
 	Assert( g_pActiveStudioHdr );
 
-	if ( g_pActiveStudioHdr->pVertexBase )
+	if ( g_pActiveStudioHdr->GetVertexBase() )
 	{
-		free( g_pActiveStudioHdr->pVertexBase );
-		g_pActiveStudioHdr->pVertexBase = NULL;
+		free( g_pActiveStudioHdr->GetVertexBase() );
+		g_pActiveStudioHdr->SetVertexBase(nullptr);
 	}
 }
 
@@ -708,9 +708,9 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 	Assert( pModelData == NULL );
 	Assert( g_pActiveStudioHdr );
 
-	if ( g_pActiveStudioHdr->pVertexBase )
+	if ( g_pActiveStudioHdr->GetVertexBase() )
 	{
-		return (vertexFileHeader_t *)g_pActiveStudioHdr->pVertexBase;
+		return (vertexFileHeader_t *)g_pActiveStudioHdr->GetVertexBase();
 	}
 
 	// mandatory callback to make requested data resident
@@ -736,6 +736,11 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 	}
 
 	pVvdHdr = (vertexFileHeader_t *)malloc(size);
+	if (!pVvdHdr)
+	{
+		Error("Error Vertex File %s allocation failure\n", fileName);
+	}
+
 	g_pFileSystem->Read( pVvdHdr, size, fileHandle );
 	g_pFileSystem->Close( fileHandle );
 
@@ -753,7 +758,7 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 		Error("Error Vertex File %s checksum %d should be %d\n", fileName, pVvdHdr->checksum, g_pActiveStudioHdr->checksum);
 	}
 
-	g_pActiveStudioHdr->pVertexBase = (void*)pVvdHdr;
+	g_pActiveStudioHdr->SetVertexBase(pVvdHdr);
 	return pVvdHdr;
 }
 

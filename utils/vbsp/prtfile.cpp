@@ -8,6 +8,8 @@
 
 #include "vbsp.h"
 #include "collisionutils.h"
+#include "bspflags.h"
+
 /*
 ==============================================================================
 
@@ -324,12 +326,12 @@ void WritePortalFile (tree_t *tree)
 {
 	char	filename[1024];
 	node_t *headnode;
-	int start = Plat_FloatTime();
+	double start = Plat_FloatTime();
 
 	qprintf ("--- WritePortalFile ---\n");
 
 	sprintf (filename, "%s.prt", source);
-	Msg ("writing %s...", filename);
+	Msg ("writing %s...\n", filename);
 
 	headnode = tree->headnode;
 
@@ -369,6 +371,6 @@ void WritePortalFile (tree_t *tree)
 	clusterleaf = 1;
 	SaveClusters_r (headnode);
 
-	Msg("done (%d)\n", (int)(Plat_FloatTime() - start) );
+	Msg("done (%.2fs)\n", Plat_FloatTime() - start );
 }
 
