@@ -7,7 +7,6 @@
 //=============================================================================//
 // vis.c
 
-#include <windows.h>
 #include "vis.h"
 #include "threads.h"
 #include "stdlib.h"
@@ -22,7 +21,9 @@
 #include "tools_minidump.h"
 #include "loadcmdline.h"
 #include "byteswap.h"
+#include "bspflags.h"
 
+#include "winlite.h"
 
 int			g_numportals;
 int			portalclusters;
@@ -78,16 +79,15 @@ NewWinding
 */
 winding_t *NewWinding (int points)
 {
-	winding_t	*w;
-	int			size;
-	
 	if (points > MAX_POINTS_ON_WINDING)
 		Error ("NewWinding: %i points, max %d", points, MAX_POINTS_ON_WINDING);
-	
-	size = (int)(&((winding_t *)0)->points[points]);
-	w = (winding_t*)malloc (size);
-	memset (w, 0, size);
-	
+
+	// dimhotepus: Use offsetof instead of hand-written magic
+	constexpr size_t pointsOffset = offsetof(winding_t, points);
+	const size_t windingSize = pointsOffset + sizeof(Vector) * points;
+
+	winding_t *w = (winding_t *)calloc(1, windingSize);
+
 	return w;
 }
 
@@ -402,12 +402,6 @@ LoadPortals
 */
 void LoadPortals (char *name)
 {
-	int			i, j;
-	portal_t	*p;
-	leaf_t		*l;
-	char		magic[80];
-	int			numpoints;
-	winding_t	*w;
 	int			leafnums[2];
 	plane_t		plane;
 
@@ -454,9 +448,13 @@ void LoadPortals (char *name)
 
 	if ( !f )
 		Error ("LoadPortals: couldn't read %s\n",name);
-
+	
+	char magic[80];
 	if (fscanf (f,"%79s\n%i\n%i\n",magic, &portalclusters, &g_numportals) != 3)
 		Error ("LoadPortals %s: failed to read header", name);
+	// dimhotepus: Ensure zero termination.
+	magic[std::size(magic) - 1] = '\0';
+
 	if (stricmp(magic,PORTALFILE))
 		Error ("LoadPortals %s: not a portal file", name);
 
@@ -475,12 +473,9 @@ void LoadPortals (char *name)
 	portalbytes = ((g_numportals*2+63)&~63)>>3;
 	portallongs = portalbytes/sizeof(long);
 
-// each file portal is split into two memory portals
-	portals = (portal_t*)malloc(2*g_numportals*sizeof(portal_t));
-	memset (portals, 0, 2*g_numportals*sizeof(portal_t));
-	
-	leafs = (leaf_t*)malloc(portalclusters*sizeof(leaf_t));
-	memset (leafs, 0, portalclusters*sizeof(leaf_t));
+	// each file portal is split into two memory portals
+	portals = (portal_t*)calloc(2*g_numportals, sizeof(portal_t));
+	leafs = (leaf_t*)calloc(portalclusters, sizeof(leaf_t));
 
 	originalvismapsize = portalclusters*leafbytes;
 	uncompressedvis = (byte*)malloc(originalvismapsize);
@@ -490,31 +485,34 @@ void LoadPortals (char *name)
 	vismap_p = (byte *)&dvis->bitofs[portalclusters];
 
 	vismap_end = vismap + MAX_MAP_VISIBILITY;
-		
+
+	int i;
+	portal_t *p;
+	int numpoints;
 	for (i=0, p=portals ; i<g_numportals ; i++)
 	{
 		if (fscanf (f, "%i %i %i ", &numpoints, &leafnums[0], &leafnums[1])
 			!= 3)
 			Error ("LoadPortals: reading portal %i", i);
+
 		if (numpoints > MAX_POINTS_ON_WINDING)
 			Error ("LoadPortals: portal %i has too many points", i);
-		if ( (unsigned)leafnums[0] > portalclusters
-		|| (unsigned)leafnums[1] > portalclusters)
+
+		if ( (unsigned)leafnums[0] > portalclusters || (unsigned)leafnums[1] > portalclusters)
 			Error ("LoadPortals: reading portal %i", i);
 		
-		w = p->winding = NewWinding (numpoints);
+		winding_t *w = p->winding = NewWinding (numpoints);
 		w->original = true;
 		w->numpoints = numpoints;
 		
-		for (j=0 ; j<numpoints ; j++)
+		for (int j=0 ; j<numpoints ; j++)
 		{
 			double	v[3];
 			int		k;
 
 			// scanf into double, then assign to vec_t
 			// so we don't care what size vec_t is
-			if (fscanf (f, "(%lf %lf %lf ) "
-			, &v[0], &v[1], &v[2]) != 3)
+			if (fscanf (f, "(%lf %lf %lf ) ", &v[0], &v[1], &v[2]) != 3)
 				Error ("LoadPortals: reading portal %i", i);
 			for (k=0 ; k<3 ; k++)
 				w->points[j][k] = v[k];
@@ -525,7 +523,7 @@ void LoadPortals (char *name)
 		PlaneFromWinding (w, &plane);
 
 	// create forward portal
-		l = &leafs[leafnums[0]];
+		leaf_t *l = &leafs[leafnums[0]];
 		l->portals.AddToTail(p);
 		
 		p->winding = w;
@@ -541,7 +539,7 @@ void LoadPortals (char *name)
 		
 		p->winding = NewWinding(w->numpoints);
 		p->winding->numpoints = w->numpoints;
-		for (j=0 ; j<w->numpoints ; j++)
+		for (int j=0 ; j<w->numpoints ; j++)
 		{
 			VectorCopy (w->points[w->numpoints-1-j], p->winding->points[j]);
 		}
@@ -567,41 +565,48 @@ by ORing together all the PVS visible from a leaf
 */
 void CalcPAS (void)
 {
-	int		i, j, k, l, index;
-	int		bitbyte;
-	long	*dest, *src;
-	byte	*scan;
-	int		count;
 	byte	uncompressed[MAX_MAP_LEAFS/8];
 	byte	compressed[MAX_MAP_LEAFS/8];
+	
+	long *dest, *src;
 
 	Msg ("Building PAS...\n");
 
-	count = 0;
-	for (i=0 ; i<portalclusters ; i++)
+	int count = 0;
+	for (int i=0 ; i<portalclusters ; i++)
 	{
-		scan = uncompressedvis + i*leafbytes;
+		byte *scan = uncompressedvis + i*leafbytes;
+
+		// dimhotepus: Add size check to catch usage issues.
+		Assert(leafbytes <= ssize(uncompressed));
 		memcpy (uncompressed, scan, leafbytes);
-		for (j=0 ; j<leafbytes ; j++)
+
+		// dimhotepus: Add size check to catch usage issues.
+		Assert(leaflongs * sizeof(long) <= ssize(uncompressed));
+		for (int j=0 ; j<leafbytes ; j++)
 		{
-			bitbyte = scan[j];
+			int bitbyte = scan[j];
 			if (!bitbyte)
 				continue;
-			for (k=0 ; k<8 ; k++)
+
+			for (int k=0 ; k<8 ; k++)
 			{
 				if (! (bitbyte & (1<<k)) )
 					continue;
+
 				// OR this pvs row into the phs
-				index = ((j<<3)+k);
+				int index = ((j<<3)+k);
 				if (index >= portalclusters)
-					Error ("Bad bit in PVS");	// pad bits should be 0
+					Error ("Bad bit %d (>= %d) in PVS", index, portalclusters);	// pad bits should be 0
+
 				src = (long *)(uncompressedvis + index*leafbytes);
 				dest = (long *)uncompressed;
-				for (l=0 ; l<leaflongs ; l++)
+
+				for (int l=0 ; l<leaflongs ; l++)
 					((long *)uncompressed)[l] |= src[l];
 			}
 		}
-		for (j=0 ; j<portalclusters ; j++)
+		for (int j=0 ; j<portalclusters ; j++)
 		{
 			if ( CheckBit( uncompressed, j ) )
 			{
@@ -612,7 +617,7 @@ void CalcPAS (void)
 	//
 	// compress the bit string
 	//
-		j = CompressVis (uncompressed, compressed);
+		int j = CompressVis (uncompressed, compressed);
 
 		dest = (long *)vismap_p;
 		vismap_p += j;
@@ -622,7 +627,7 @@ void CalcPAS (void)
 
 		dvis->bitofs[i][DVIS_PAS] = (byte *)dest-vismap;
 
-		memcpy (dest, compressed, j);	
+		memcpy (dest, compressed, j);
 	}
 
 	Msg ("Average clusters audible: %i\n", count/portalclusters);
@@ -884,7 +889,7 @@ float DetermineVisRadius( )
 	// Check the max vis range to determine the vis radius
 	for (int i = 0; i < num_entities; ++i)
 	{
-		char* pEntity = ValueForKey(&entities[i], "classname");
+		const char* pEntity = ValueForKey(&entities[i], "classname");
 		if (!stricmp(pEntity, "env_fog_controller"))
 		{
 			flRadius = FloatForKey (&entities[i], "farz");
@@ -913,17 +918,31 @@ int ParseCommandLine( int argc, char **argv )
 	{
 		if (!Q_stricmp(argv[i],"-threads"))
 		{
-			numthreads = atoi (argv[i+1]);
-			i++;
+			if ( ++i < argc )
+			{
+				numthreads = atoi (argv[i]);
+				if ( numthreads <= 0 )
+				{
+					Error("Expected positive value after '-threads'.\n" );
+					return -1;
+				}
+
+				Msg( "--threads: %d\n", numthreads );
+			}
+			else
+			{
+				Error("Expected a value after '-threads'.\n" );
+				return -1;
+			}
 		}
 		else if (!Q_stricmp(argv[i], "-fast"))
 		{
-			Msg ("fastvis = true\n");
+			Msg ("--fast-vis: true\n");
 			fastvis = true;
 		}
 		else if (!Q_stricmp(argv[i], "-v") || !Q_stricmp(argv[i], "-verbose"))
 		{
-			Msg ("verbose = true\n");
+			Msg ("--verbose: true\n");
 			verbose = true;
 		}
 		else if( !Q_stricmp( argv[i], "-radius_override" ) )
@@ -931,7 +950,7 @@ int ParseCommandLine( int argc, char **argv )
 			g_bUseRadius = true;
 			g_VisRadius = atof( argv[i+1] );
 			i++;
-			Msg( "Vis Radius = %4.2f\n", g_VisRadius );
+			Msg( "--radius-override: %4.2f\n", g_VisRadius );
 			g_VisRadius = g_VisRadius * g_VisRadius;   // so distance check can be squared
 		}
 		else if( !Q_stricmp( argv[i], "-trace" ) )
@@ -940,25 +959,31 @@ int ParseCommandLine( int argc, char **argv )
 			i++;
 			g_TraceClusterStop = atoi( argv[i+1] );
 			i++;
-			Msg( "Tracing vis from cluster %d to %d\n", g_TraceClusterStart, g_TraceClusterStop );
+			Msg( "--trace: Tracing vis from cluster %d to %d\n", g_TraceClusterStart, g_TraceClusterStop );
 		}
 		else if (!Q_stricmp (argv[i],"-nosort"))
 		{
-			Msg ("nosort = true\n");
+			Msg ("--no-sort: true\n");
 			nosort = true;
 		}
 		else if (!Q_stricmp (argv[i],"-tmpin"))
+		{
+			Msg ("--tmpin: Read from /tmp\n");
 			strcpy (inbase, "/tmp");
+		}
 		else if( !Q_stricmp( argv[i], "-low" ) )
 		{
+			Msg( "--low: Run worker threads with low priority\n" );
 			g_bLowPriority = true;
 		}
 		else if ( !Q_stricmp( argv[i], "-FullMinidumps" ) )
 		{
-			EnableFullMinidumps( true );
+			Msg( "--full-minidumps: true\n" );
+			se::utils::common::EnableFullMinidumps( true );
 		}
 		else if ( !Q_stricmp( argv[i], CMDLINEOPTION_NOVCONFIG ) )
 		{
+			Msg( "--no-vconfig: true\n" );
 		}
 		else if ( !Q_stricmp( argv[i], "-vproject" ) || !Q_stricmp( argv[i], "-game" ) )
 		{
@@ -966,6 +991,7 @@ int ParseCommandLine( int argc, char **argv )
 		}
 		else if ( !Q_stricmp( argv[i], "-allowdebug" ) || !Q_stricmp( argv[i], "-steam" ) )
 		{
+			Msg( "--allow-debug or --steam: true\n" );
 			// nothing to do here, but don't bail on this option
 		}
 		// NOTE: the -mpi checks must come last here because they allow the previous argument 
@@ -975,6 +1001,8 @@ int ParseCommandLine( int argc, char **argv )
 		{
 			if ( stricmp( argv[i], "-mpi" ) == 0 )
 				g_bUseMPI = true;
+
+			Msg("--mpi: %s MPI", g_bUseMPI ? "Enable" : "Disable" );
 		
 			// Any other args that start with -mpi are ok too.
 			if ( i == argc - 1 )
@@ -982,7 +1010,7 @@ int ParseCommandLine( int argc, char **argv )
 		}
 		else if (argv[i][0] == '-')
 		{
-			Warning("VBSP: Unknown option \"%s\"\n\n", argv[i]);
+			Warning("Unknown option \"%s\".\n\n", argv[i]);
 			i = 100000;	// force it to print the usage
 			break;
 		}
@@ -1034,8 +1062,6 @@ void PrintUsage( int argc, char **argv )
 		"  -tmpout         : Make portals come from \\tmp\\<mapname>.\n"
 		"  -trace <start cluster> <end cluster> : Writes a linefile that traces the vis from one cluster to another for debugging map vis.\n"
 		"  -FullMinidumps  : Write large minidumps on crash.\n"
-		"  -x360		   : Generate Xbox360 version of vsp\n"
-		"  -nox360		   : Disable generation Xbox360 version of vsp (default)\n"
 		"\n"
 #if 1 // Disabled for the initial SDK release with VMPI so we can get feedback from selected users.
 		);
@@ -1049,7 +1075,7 @@ void PrintUsage( int argc, char **argv )
 	{
 		if ( V_stricmp( argv[i], "-mpi_ListParams" ) == 0 )
 		{
-			Warning( "VMPI-specific options:\n\n" );
+			Warning( "--mpi-list-params: VMPI-specific options:\n\n" );
 
 			bool bIsSDKMode = VMPI_IsSDKMode();
 			for ( int i=k_eVMPICmdLineParam_FirstParam+1; i < k_eVMPICmdLineParam_LastParam; i++ )
@@ -1070,18 +1096,17 @@ void PrintUsage( int argc, char **argv )
 
 int RunVVis( int argc, char **argv )
 {
-	char	portalfile[1024];
-	char		source[1024];
-	char		mapFile[1024];
-	double		start, end;
-
-
+#ifdef PLATFORM_64BITS
+	Msg( "Valve Software - vvis.exe [64 bit] (%s)\n", __DATE__ );
+#else
 	Msg( "Valve Software - vvis.exe (%s)\n", __DATE__ );
+#endif
+
+	char	portalfile[MAX_FILEPATH];
+	char		source[MAX_FILEPATH];
+	char		mapFile[MAX_FILEPATH];
 
 	verbose = false;
-
-	LoadCmdLineFromFile( argc, argv, source, "vvis" );
-	int i = ParseCommandLine( argc, argv );
 
 	CmdLib_InitFileSystem( argv[ argc - 1 ] );
 
@@ -1093,13 +1118,17 @@ int RunVVis( int argc, char **argv )
 	//             information. We then ExpandPath() it (see VMPI comment above), and tack on .bsp for the file access
 	//             parts.
 	V_FileBase( argv[ argc - 1 ], mapFile, sizeof( mapFile ) );
-	V_strncpy( mapFile, ExpandPath( mapFile ), sizeof( mapFile ) );
-	V_strncat( mapFile, ".bsp", sizeof( mapFile ) );
+	V_strcpy_safe( mapFile, ExpandPath( mapFile ) );
+	V_strcat_safe( mapFile, ".bsp" );
 
 	// Source is just the mapfile without an extension at this point...
-	V_strncpy( source, mapFile, sizeof( mapFile ) );
+	V_strcpy_safe( source, mapFile );
 	V_StripExtension( source, source, sizeof( source ) );
 
+	// dimhotepus: Reorder to apply command line from file, too.
+	LoadCmdLineFromFile( argc, argv, source, "vvis" );
+
+	int i = ParseCommandLine( argc, argv );
 	if (i != argc - 1)
 	{
 		PrintUsage( argc, argv );
@@ -1107,24 +1136,24 @@ int RunVVis( int argc, char **argv )
 		CmdLib_Exit( 1 );
 	}
 
-	start = Plat_FloatTime();
+	double start = Plat_FloatTime();
 
 
 	if (!g_bUseMPI)
 	{
 		// Setup the logfile.
-		char logFile[512];
-		_snprintf( logFile, sizeof(logFile), "%s.log", source );
+		char logFile[MAX_FILEPATH];
+		V_sprintf_safe( logFile, "%s.log", source );
 		SetSpewFunctionLogFile( logFile );
 	}
 
 	// Run in the background?
-	if( g_bLowPriority )
+	if (g_bLowPriority)
 	{
 		SetLowPriority();
 	}
 
-	ThreadSetDefault ();
+	ThreadSetDefault();
 
 	Msg ("reading %s\n", mapFile);
 	LoadBSPFile (mapFile);
@@ -1150,14 +1179,14 @@ int RunVVis( int argc, char **argv )
 
 	if ( inbase[0] == 0 )
 	{
-		strcpy( portalfile, source );
+		V_strcpy_safe( portalfile, source );
 	}
 	else
 	{
-		sprintf ( portalfile, "%s%s", inbase, argv[i] );
+		V_sprintf_safe ( portalfile, "%s%s", inbase, argv[i] );
 		Q_StripExtension( portalfile, portalfile, sizeof( portalfile ) );
 	}
-	strcat (portalfile, ".prt");
+	V_strcat_safe (portalfile, ".prt");
 
 	Msg ("reading %s\n", portalfile);
 	LoadPortals (portalfile);
@@ -1183,62 +1212,67 @@ int RunVVis( int argc, char **argv )
 	}
 	else
 	{
-		if ( g_TraceClusterStart < 0 || g_TraceClusterStart >= portalclusters || g_TraceClusterStop < 0 || g_TraceClusterStop >= portalclusters )
+		if ( g_TraceClusterStart < 0 ||
+			g_TraceClusterStart >= portalclusters ||
+			g_TraceClusterStop < 0 ||
+			g_TraceClusterStop >= portalclusters )
 		{
 			Error("Invalid cluster trace: %d to %d, valid range is 0 to %d\n", g_TraceClusterStart, g_TraceClusterStop, portalclusters-1 );
 		}
+
 		if ( g_bUseMPI )
 		{
 			Warning("Can't compile trace in MPI mode\n");
 		}
+
 		CalcVisTrace ();
 		WritePortalTrace(source);
 	}
 
-	end = Plat_FloatTime();
+	double end = Plat_FloatTime();
 
-	char str[512];
+	char str[64];
 	GetHourMinuteSecondsString( (int)( end - start ), str, sizeof( str ) );
 	Msg( "%s elapsed\n", str );
 
 	ReleasePakFileLumps();
 	DeleteCmdLine( argc, argv );
 	CmdLib_Cleanup();
+	// dimhotepus: Explicitly close spew and free memory.
+	SpewDeactivate();
 	return 0;
 }
 
 
-/*
-===========
-main
-===========
-*/
 int main (int argc, char **argv)
 {
 	CommandLine()->CreateCmdLine( argc, argv );
 
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 1.0f, false, false, false, false );
+	MathLib_Init( 2.2f, 2.2f, 0.0f, 1, false, false, false, false );
+
 	InstallAllocationFunctions();
 	InstallSpewFunction();
+	SpewActivate( "developer", 1 );
 
 	VVIS_SetupMPI( argc, argv );
 
 	// Install an exception handler.
 	if ( g_bUseMPI && !g_bMPIMaster )
-		SetupToolsMinidumpHandler( VMPI_ExceptionFilter );
-	else
-		SetupDefaultToolsMinidumpHandler();
+	{
+		const se::utils::common::ScopedMinidumpHandler minidump{VMPI_ExceptionFilter};
+		return RunVVis( argc, argv );
+	}
 
+	const se::utils::common::ScopedDefaultMinidumpHandler minidump;
 	return RunVVis( argc, argv );
 }
 
 
 // When VVIS is used as a DLL (makes debugging vmpi vvis a lot easier), this is used to
 // get it going.
-class CVVisDLL : public ILaunchableDLL
+struct CVVisDLL : ILaunchableDLL
 {
-public:
-	virtual int main( int argc, char **argv )
+	int main( int argc, char **argv ) override
 	{
 		return ::main( argc, argv );
 	}
