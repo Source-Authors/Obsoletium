@@ -137,7 +137,7 @@ void CreateMaterialPatch( const char *pOriginalMaterialName, const char *pNewMat
 	}
 	
 	// Write patched .vmt into a memory buffer
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	kv->RecursiveSaveToFile( buf, 0 );
 
 	// Add to pak file for this .bsp
@@ -399,7 +399,7 @@ void WriteMaterialKeyValuesToPak( const char *pMaterialName, KeyValues *kv )
 	Q_snprintf( pFullMaterialName, 512, "materials/%s.vmt", pMaterialName );
 
 	// Write patched .vmt into a memory buffer
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	kv->RecursiveSaveToFile( buf, 0 );
 
 	// Add to pak file for this .bsp

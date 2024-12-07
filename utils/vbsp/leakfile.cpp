@@ -72,6 +72,8 @@ void LeakFile (tree_t *tree)
 			}
 		}
 		node = nextnode;
+		Assert(node);
+		Assert(nextportal);
 		WindingCenter (nextportal->winding, mid);
 		fprintf (linefile, "%f %f %f\n", mid[0], mid[1], mid[2]);
 		count++;

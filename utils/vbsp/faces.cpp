@@ -793,12 +793,10 @@ face_t	*AllocFace (void)
 {
 	static int s_FaceId = 0;
 
-	face_t	*f;
+	face_t	*f = (face_t*)calloc(1, sizeof(*f));
+	if (!f) return nullptr;
 
-	f = (face_t*)malloc(sizeof(*f));
-	memset (f, 0, sizeof(*f));
-	f->id = s_FaceId;
-	++s_FaceId;
+	f->id = s_FaceId++;
 
 	c_faces++;
 
@@ -807,10 +805,9 @@ face_t	*AllocFace (void)
 
 face_t *NewFaceFromFace (face_t *f)
 {
-	face_t	*newf;
-
-	newf = AllocFace ();
+	face_t	*newf = AllocFace ();
 	*newf = *f;
+
 	newf->merged = NULL;
 	newf->split[0] = newf->split[1] = NULL;
 	newf->w = NULL;
@@ -848,7 +845,7 @@ void GetEdge2_InitOptimizedList()
 
 void IntSort( CUtlVector<int> &theList )
 {
-	for( int i=0; i < theList.Size()-1; i++ )
+	for( int i=0; i < theList.Count()-1; i++ )
 	{
 		if( theList[i] > theList[i+1] )
 		{
@@ -902,7 +899,7 @@ int GetEdge2 (int v1, int v2,  face_t *f)
 	{
 		// Check all edges connected to v1.
 		CUtlVector<int> &theList = g_VertEdgeList[v1];
-		for( int i=0; i < theList.Size(); i++ )
+		for( int i=0; i < theList.Count(); i++ )
 		{
 			int iEdge = theList[i];
 			edge = &dedges[iEdge];
@@ -979,7 +976,8 @@ winding_t *TryMergeWinding (winding_t *f1, winding_t *f2, Vector& planenormal)
 			break;
 	}
 	
-	if (i == f1->numpoints)
+	// dimhotepus: f1->numpoints == 0 for static analyzer.
+	if (f1->numpoints == 0 || i == f1->numpoints)
 		return NULL;			// no matching edges
 
 	//
@@ -1504,8 +1502,8 @@ int AddWindingToPrimverts( const winding_t *w, unsigned short *pIndices, int ver
 }
 
 
-
-#pragma optimize( "g", off )
+// dimhotepus: Reenable optimizer.
+// #pragma optimize( "g", off )
 #define USE_TRISTRIPS
 
 // UNDONE: Should split this function into subdivide and primitive building parts
@@ -1678,7 +1676,7 @@ static void SubdivideFaceBySubdivSize( face_t *f, float subdivsize )
 
 	delete [] windings;
 	// We've already updated the verts and have a trilist. . let's strip it!
-	if( !triListIndices.Size() )
+	if( !triListIndices.Count() )
 	{
 		return;
 	}
@@ -1686,7 +1684,7 @@ static void SubdivideFaceBySubdivSize( face_t *f, float subdivsize )
 #ifdef USE_TRISTRIPS
 	int numTristripIndices;
 	WORD *pStripIndices = NULL;
-	Stripify( triListIndices.Size() / 3, triListIndices.Base(), &numTristripIndices, 
+	Stripify( triListIndices.Count() / 3, triListIndices.Base(), &numTristripIndices, 
 		&pStripIndices );
 	Assert( pStripIndices );
 
@@ -1788,7 +1786,8 @@ void SplitSubdividedFaces( face_t *pLeafFaceList, node_t *headnode )
 	SplitSubdividedFaces_Node_r( headnode );
 }
 
-#pragma optimize( "", on )
+// dimhotepus: Reenable optimizer.
+// #pragma optimize( "", on )
 
 /*
 ============
