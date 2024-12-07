@@ -100,7 +100,9 @@ CFrameSnapshot*	CFrameSnapshotManager::CreateEmptySnapshot( int tickcount, int m
 		entry++;
 	}
 
+	m_FrameSnapshotsWriteMutex.Lock();
 	snap->m_ListIndex = m_FrameSnapshots.AddToTail( snap );
+	m_FrameSnapshotsWriteMutex.Unlock();
 	return snap;
 }
 
@@ -190,7 +192,9 @@ void CFrameSnapshotManager::DeleteFrameSnapshot( CFrameSnapshot* pSnapshot )
 		}
 	}
 
+	m_FrameSnapshotsWriteMutex.Lock();
 	m_FrameSnapshots.Remove( pSnapshot->m_ListIndex );
+	m_FrameSnapshotsWriteMutex.Unlock();
 	delete pSnapshot;
 }
 
