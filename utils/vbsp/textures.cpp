@@ -14,6 +14,7 @@
 #include "tier1/strtools.h"
 #include "materialpatch.h"
 #include "KeyValues.h"
+#include "bspflags.h"
 
 void LoadSurfaceProperties( void );
 
@@ -610,9 +611,8 @@ int TexinfoForBrushTexture (plane_t *plane, brush_texture_t *bt, const Vector& o
 			{ sinv = -1 ; cosv = 0; }
 		else
 		{	
-			ang = bt->rotate / 180 * M_PI;
-			sinv = sin(ang);
-			cosv = cos(ang);
+			ang = DEG2RAD( bt->rotate );
+			DirectX::XMScalarSinCos(&sinv, &cosv, ang);
 		}
 
 		if (vecs[0][0])
@@ -695,11 +695,13 @@ void LoadSurfacePropFile( const char *pMaterialFilename )
 		return;
 	}
 
-	int len = g_pFileSystem->Size( fp );
+	const unsigned len = g_pFileSystem->Size( fp );
 
-	char *pText = new char[len];
+	char *pText = new char[len + 1];
 	g_pFileSystem->Read( pText, len, fp );
 	g_pFileSystem->Close( fp );
+	// dimhotepus: Ensure null termination.
+	pText[len] = '\0';
 
 	physprops->ParseSurfaceData( pMaterialFilename, pText );
 
