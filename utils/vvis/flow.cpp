@@ -109,10 +109,6 @@ ChopWinding
 ==============
 */
 
-#ifdef _WIN32
-#pragma warning (disable:4701)
-#endif
-
 winding_t	*ChopWinding (winding_t *in, pstack_t *stack, plane_t *split)
 {
 	vec_t	dists[128];
@@ -213,10 +209,6 @@ winding_t	*ChopWinding (winding_t *in, pstack_t *stack, plane_t *split)
 	
 	return neww;
 }
-
-#ifdef _WIN32
-#pragma warning (default:4701)
-#endif
 
 /*
 ==============
@@ -722,14 +714,9 @@ void BasePortalVis (int iThread, int portalnum)
 	//
 	// allocate memory for bitwise vis solutions for this portal
 	//
-	p->portalfront = (byte*)malloc (portalbytes);
-	memset (p->portalfront, 0, portalbytes);
-
-	p->portalflood = (byte*)malloc (portalbytes);
-	memset (p->portalflood, 0, portalbytes);
-	
-	p->portalvis = (byte*)malloc (portalbytes);
-	memset (p->portalvis, 0, portalbytes);
+	p->portalfront = (byte*)calloc (portalbytes, sizeof(byte));
+	p->portalflood = (byte*)calloc (portalbytes, sizeof(byte));
+	p->portalvis = (byte*)calloc (portalbytes, sizeof(byte));
 	
 	//
 	// test the given portal against all of the portals in the map
