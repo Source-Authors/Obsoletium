@@ -181,7 +181,11 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 					pSpriteData = pIter->GetString( "spritesize", 0 );
 					if (pSpriteData)
 					{
-						sscanf( pSpriteData, "%f %f %f %f", &x, &y, &flWidth, &flHeight );
+						// dimhotepus: Ensure sprite data is correct.
+						if ( sscanf( pSpriteData, "%f %f %f %f", &x, &y, &flWidth, &flHeight ) != 4 )
+						{
+							Error( "spritesize '%s' missed 4 dimensions.\n", pSpriteData );
+						}
 
 						float ox = flWidth * x;
 						float oy = flHeight * y;

@@ -15,11 +15,13 @@
 #include "materialsub.h"
 #include "fgdlib/fgdlib.h"
 #include "manifest.h"
+#include "bspflags.h"
 
 #ifdef VSVMFIO
 #include "VmfImport.h"
 #endif // VSVMFIO
 
+#include "tier0/memdbgon.h"
 
 // undefine to make plane finding use linear sort
 #define	USE_HASHING
