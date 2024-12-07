@@ -6,7 +6,12 @@
 //
 //=============================================================================//
 #include "incremental.h"
+
 #include "lightmap.h"
+#include "filesystem.h"
+#include "vrad.h"
+
+#include "winlite.h"
 
 
 
@@ -185,7 +190,8 @@ bool CIncremental::PrepareForLighting()
 		//if(bTest)
 		//	CompareLights( &dl->light, &pClosest->m_Light );
 
-		if( iUnmatched == unmatched.InvalidIndex() )
+		// dimhotepus: Check dl is not nullptr.
+		if( iUnmatched == unmatched.InvalidIndex() && dl )
 			pPrev = &dl->next;
 	}
 
@@ -311,9 +317,9 @@ void CIncremental::AddLightToFace(
 	{
 		bool bNew;
 		
-		EnterCriticalSection( &pLight->m_CS );
+		EnterCriticalSection( pLight->m_pCS );
 			pFace = pLight->FindOrCreateLightFace( iFace, lmSize, &bNew );
-		LeaveCriticalSection( &pLight->m_CS );
+		LeaveCriticalSection( pLight->m_pCS );
 
 		pLight->m_pCachedFaces[iThread] = pFace;
 
@@ -373,10 +379,6 @@ void DecompressLightData( CUtlBuffer *pIn, CUtlVector<CLightValue> *pOut )
 	}
 }
 
-#ifdef _WIN32
-#pragma warning (disable:4701)
-#endif
-
 void CompressLightData( 
 	CLightValue const *pValues, 
 	int nValues, 
@@ -415,10 +417,6 @@ void CompressLightData(
 		EncodeCharOrShort( pBuf, flLastValue );
 	}
 }
-
-#ifdef _WIN32
-#pragma warning (default:4701)
-#endif
 
 void MultiplyValues( CUtlVector<CLightValue> &values, float scale )
 {
@@ -460,10 +458,10 @@ void CIncremental::FinishFace(
 		if( pFace->m_CompressedData.TellPut() == 0 )
 		{
 			// No contribution.. delete this face from the light.
-			EnterCriticalSection( &pLight->m_CS );
+			EnterCriticalSection( pLight->m_pCS );
 				pLight->m_LightFaces.Remove( pFace->m_LightFacesIndex );
 				delete pFace;
-			LeaveCriticalSection( &pLight->m_CS );
+			LeaveCriticalSection( pLight->m_pCS );
 		}
 		else
 		{
@@ -719,14 +717,17 @@ void CIncremental::LinkLightsToFaces( CUtlVector<CFaceLightList> &faceLights )
 CIncLight::CIncLight()
 {
 	memset( m_pCachedFaces, 0, sizeof(m_pCachedFaces) );
-	InitializeCriticalSection( &m_CS );
+	m_pCS = new CRITICAL_SECTION;
+	(void)::InitializeCriticalSectionAndSpinCount(m_pCS, 4000);
+	m_flMaxIntensity = 0;
 }
 
 
 CIncLight::~CIncLight()
 {
 	m_LightFaces.PurgeAndDeleteElements();
-	DeleteCriticalSection( &m_CS );
+	DeleteCriticalSection( m_pCS );
+	delete m_pCS;
 }
 
 
@@ -737,7 +738,7 @@ CLightFace* CIncLight::FindOrCreateLightFace( int iFace, int lmSize, bool *bNew 
 
 
 	// Look for it.
-	for( int i=m_LightFaces.Head(); i != m_LightFaces.InvalidIndex(); i=m_LightFaces.Next(i) )
+	for( auto i=m_LightFaces.Head(); i != m_LightFaces.InvalidIndex(); i=m_LightFaces.Next(i) )
 	{
 		CLightFace *pFace = m_LightFaces[i];
 
