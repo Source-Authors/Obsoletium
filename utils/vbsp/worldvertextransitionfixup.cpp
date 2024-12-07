@@ -17,21 +17,6 @@ struct entitySideList_t
 	int brushSideCount;
 };
 
-static bool SideIsNotDispAndHasDispMaterial( int iSide )
-{
-	side_t *pSide = &g_MainMap->brushsides[iSide];
-
-	// If it's a displacement, then it's fine to have a displacement-only material.
-	if ( pSide->pMapDisp )
-	{
-		return false;
-	}
-
-	pSide->texinfo;	
-
-	return true;
-}
-
 static void BackSlashToForwardSlash( char *pname )
 {
 	while ( *pname ) {
