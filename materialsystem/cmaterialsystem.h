@@ -574,7 +574,7 @@ public:
 	MaterialLock_t							Lock();
 	void									Unlock( MaterialLock_t );
 	CMatCallQueue *							GetRenderCallQueue();
-	uint									GetRenderThreadId() const { return m_nRenderThreadID; }
+	ThreadId_t								GetRenderThreadId() const { return m_nRenderThreadID; }
 	void									UnbindMaterial( IMaterial *pMaterial );
 
 	IMaterialProxy							*DetermineProxyReplacements( IMaterial *pMaterial, KeyValues *pFallbackKeyValues );
@@ -700,7 +700,7 @@ private:
 
 	const char *							m_pForcedTextureLoadPathID;
 	FileCacheHandle_t						m_hAsyncLoadFileCache;
-	uint									m_nRenderThreadID;
+	ThreadId_t								m_nRenderThreadID;
 	bool									m_bAllocatingRenderTargets;
 	bool									m_bInStubMode;
 	bool									m_bGeneratedConfig;
@@ -708,7 +708,7 @@ private:
 	bool									m_bForcedSingleThreaded;
 	bool									m_bAllowQueuedRendering;
 	std::atomic_bool						m_bThreadHasOwnership;
-	uint									m_ThreadOwnershipID;
+	ThreadId_t								m_ThreadOwnershipID;
 
 	//---------------------------------
 

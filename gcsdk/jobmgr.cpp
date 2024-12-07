@@ -1265,7 +1265,7 @@ int CJobMgr::CountJobs() const
 //-----------------------------------------------------------------------------
 void CJobMgr::CheckThreadID()
 {
-	uint unCurrentThread = ThreadGetCurrentId();
+	ThreadId_t unCurrentThread = ThreadGetCurrentId();
 
 	if ( m_unFrameFuncThreadID == 0 )
 	{

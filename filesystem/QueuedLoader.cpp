@@ -99,7 +99,7 @@ struct FileJob_t
 	int						m_SubmitTag;
 	int						m_nActualBytesRead;
 	LoaderError_t			m_LoaderError;
-	unsigned int			m_ThreadId;
+	ThreadId_t				m_ThreadId;
 
 	unsigned int			m_bFinished : 1;
 	unsigned int			m_bFreeTargetAfterIO : 1;

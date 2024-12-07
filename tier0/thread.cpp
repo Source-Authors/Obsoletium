@@ -15,7 +15,7 @@
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
 
-unsigned long Plat_GetCurrentThreadID()
+ThreadId_t Plat_GetCurrentThreadID()
 {
 	return ThreadGetCurrentId();
 }

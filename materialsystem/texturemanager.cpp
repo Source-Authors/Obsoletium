@@ -748,8 +748,8 @@ protected:
 	friend class AsyncReader;
 	AsyncReader* m_pAsyncReader;
 
-	uint m_nAsyncLoadThread;
-	uint m_nAsyncReadThread;
+	ThreadId_t m_nAsyncLoadThread;
+	ThreadId_t m_nAsyncReadThread;
 
 	int m_iSuspendTextureStreaming;
 };
@@ -1097,7 +1097,7 @@ private:
 
 		s_TextureManager.m_nAsyncLoadThread = ThreadGetCurrentId();
 		( ( AsyncLoader* )_this )->ThreadLoader_Main();
-		s_TextureManager.m_nAsyncLoadThread = 0xFFFFFFFF;
+		s_TextureManager.m_nAsyncLoadThread = -1;
 		return 0;
 	}
 
@@ -1397,7 +1397,7 @@ private:
 
 		s_TextureManager.m_nAsyncReadThread = ThreadGetCurrentId();
 		( ( AsyncReader* ) _this )->ThreadReader_Main();
-		s_TextureManager.m_nAsyncReadThread = 0xFFFFFFFF;
+		s_TextureManager.m_nAsyncReadThread = -1;
 		return 0;
 	}
 
@@ -1422,8 +1422,8 @@ CTextureManager::CTextureManager( void )
 , m_TextureExcludes( true )
 , m_PendingAsyncLoads( true ) 
 , m_textureStreamingRequests( DefLessFunc( ITextureInternal* ) )
-, m_nAsyncLoadThread( 0xFFFFFFFF )
-, m_nAsyncReadThread( 0xFFFFFFFF )
+, m_nAsyncLoadThread( -1 )
+, m_nAsyncReadThread( -1 )
 {
 	m_iNextTexID = 0;
 	m_nFlags = 0;
