@@ -7,6 +7,8 @@
 //=============================================================================//
 #include "vbsp.h"
 
+#include "bspflags.h"
+
 extern	int	c_nodes;
 
 void RemovePortalFromNode (portal_t *portal, node_t *l);

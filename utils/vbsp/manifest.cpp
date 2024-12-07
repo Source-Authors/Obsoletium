@@ -1,9 +1,10 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
+
+#include "manifest.h"
+
 #include "vbsp.h"
 #include "map_shared.h"
 #include "fgdlib/fgdlib.h"
-#include "manifest.h"
-#include "windows.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: default constructor
@@ -347,6 +348,12 @@ bool CManifest::LoadSubMaps( CMapFile *pMapFile, const char *pszFileName )
 	return true;
 }
 
+#ifdef _WIN32
+// Instead of including Windows.h
+extern "C" __declspec(dllimport) int __stdcall GetUserNameA(const char *lpBuffer,
+														    unsigned long *nSize);
+#endif
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -356,10 +363,10 @@ bool CManifest::LoadSubMaps( CMapFile *pMapFile, const char *pszFileName )
 bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 {
 	char		UserName[ MAX_PATH ], FileName[ MAX_PATH ], UserPrefsFileName[ MAX_PATH ];
-	DWORD		UserNameSize;
+	unsigned long		UserNameSize;
 
 	UserNameSize = sizeof( UserName );
-	if ( GetUserName( UserName, &UserNameSize ) == 0 )
+	if ( GetUserNameA( UserName, &UserNameSize ) == 0 )
 	{
 		strcpy( UserPrefsFileName, "default" );
 	}

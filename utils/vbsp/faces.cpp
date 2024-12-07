@@ -10,9 +10,9 @@
 #include "vbsp.h"
 #include "utlvector.h"
 #include "utilmatlib.h"
-#include <float.h>
 #include "mstristrip.h"
 #include "tier1/strtools.h"
+#include "bspflags.h"
 #include "materialpatch.h"
 /*
 

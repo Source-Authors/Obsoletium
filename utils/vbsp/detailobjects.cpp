@@ -6,13 +6,13 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <windows.h>
 #include "vbsp.h"
 #include "bsplib.h"
-#include "KeyValues.h"
-#include "utlsymbol.h"
-#include "utlvector.h"
-#include <io.h>
+#include "tier1/KeyValues.h"
+#include "tier1/utlsymbol.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utllinkedlist.h"
 #include "bspfile.h"
 #include "utilmatlib.h"
 #include "gamebspfile.h"
@@ -22,10 +22,7 @@
 #include "vstdlib/random.h"
 #include "builddisp.h"
 #include "disp_vbsp.h"
-#include "UtlBuffer.h"
 #include "CollisionUtils.h"
-#include <float.h>
-#include "UtlLinkedList.h"
 #include "byteswap.h"
 #include "writebsp.h"
 

@@ -15,6 +15,7 @@
 #include "pacifier.h"
 #include "disp_ivp.h"
 #include "builddisp.h"
+#include "bspflags.h"
 #include "mathlib/vector.h"
 
 // map displacement info -- runs parallel to the dispinfos struct
