@@ -22,6 +22,7 @@
 #include "mathlib/quantize.h"
 #include "bitmap/imageformat.h"
 #include "coordsize.h"
+#include "bspflags.h"
 
 enum
 {
@@ -57,8 +58,8 @@ private:
 	CUtlVector<int>	m_NormalGrid[NUM_SUBDIVS][NUM_SUBDIVS][NUM_SUBDIVS];
 };
 
-
-int g_iCurFace;
+// dimhotepus: Make atomic.
+std::atomic_int g_iCurFace;
 edgeshare_t	edgeshare[MAX_MAP_EDGES];
 
 Vector	face_centroids[MAX_MAP_EDGES];
@@ -90,13 +91,13 @@ int CNormalList::FindOrAddNormal( Vector const &vNormal )
 	for( int iDim=0; iDim < 3; iDim++ )
 	{
 		gi[iDim] = (int)( ((vNormal[iDim] + 1.0f) * 0.5f) * NUM_SUBDIVS - 0.000001f );
-		gi[iDim] = min( gi[iDim], NUM_SUBDIVS );
+		gi[iDim] = min( gi[iDim], (int)NUM_SUBDIVS );
 		gi[iDim] = max( gi[iDim], 0 );
 	}
 
 	// Look for a matching vector in there.
 	CUtlVector<int> *pGridElement = &m_NormalGrid[gi[0]][gi[1]][gi[2]];
-	for( int i=0; i < pGridElement->Size(); i++ )
+	for( int i=0; i < pGridElement->Count(); i++ )
 	{
 		int iNormal = pGridElement->Element(i);
 
@@ -107,13 +108,13 @@ int CNormalList::FindOrAddNormal( Vector const &vNormal )
 	}
 
 	// Ok, add a new one.
-	pGridElement->AddToTail( m_Normals.Size() );
+	pGridElement->AddToTail( m_Normals.Count() );
 	return m_Normals.AddToTail( vNormal );
 }
 
 // FIXME: HACK until the plane normals are made more happy
 void GetBumpNormals( const float* sVect, const float* tVect, const Vector& flatNormal, 
-					 const Vector& phongNormal, Vector bumpNormals[NUM_BUMP_VECTS] )
+					 const Vector& phongNormal, Vector (&bumpNormals)[NUM_BUMP_VECTS] )
 {
 	Vector stmp( sVect[0], sVect[1], sVect[2] );
 	Vector ttmp( tVect[0], tVect[1], tVect[2] );
@@ -309,6 +310,8 @@ void PairEdges (void)
             // copy over neighbor list
             fn->numneighbors = numneighbors;
             fn->neighbor = ( int* )calloc( numneighbors, sizeof( fn->neighbor[0] ) );
+            if (!fn->neighbor) Error("Memory allocation failure in neighbors");
+
             for (m = 0; m < numneighbors; m++)
             {
                 fn->neighbor[m] = tmpneighbor[m];
@@ -362,14 +365,14 @@ void SaveVertexNormals( void )
 		}
 	}
 
-	if( normalList.m_Normals.Size() > MAX_MAP_VERTNORMALS )
+	if( normalList.m_Normals.Count() > MAX_MAP_VERTNORMALS )
 	{
 		Error( "g_numvertnormals > MAX_MAP_VERTNORMALS" );
 	}
 
 	// Copy the list of unique vert normals into g_vertnormals.
-	g_numvertnormals = normalList.m_Normals.Size();
-	memcpy( g_vertnormals, normalList.m_Normals.Base(), sizeof(g_vertnormals[0]) * normalList.m_Normals.Size() );
+	g_numvertnormals = normalList.m_Normals.Count();
+	memcpy( g_vertnormals, normalList.m_Normals.Base(), sizeof(g_vertnormals[0]) * normalList.m_Normals.Count() );
 }
 
 /*
@@ -526,48 +529,47 @@ void DumpFaces( lightinfo_t *pLightInfo, int ndxFace )
 	faceneighbor_t *fn = &faceneighbor[ndxFace];
 	Vector &centroid = face_centroids[ndxFace];
 
-	// disable threading (not a multi-threadable function!)
-	ThreadLock();
-	
-	if( !out )
 	{
-		// open the file
-		out = g_pFileSystem->Open( "face.txt", "w" );
+		// disable threading (not a multi-threadable function!)
+		ScopedThreadsLock lock;
+	
 		if( !out )
-			return;
-	}
+		{
+			// open the file
+			out = g_pFileSystem->Open( "face.txt", "w" );
+			if( !out )
+				return;
+		}
 	
-	//
-	// write out face
-	//
-	for( int ndxEdge = 0; ndxEdge < pLightInfo->face->numedges; ndxEdge++ )
-	{
-//		int edge = dsurfedges[pLightInfo->face->firstedge+ndxEdge];
+		//
+		// write out face
+		//
+		for( int ndxEdge = 0; ndxEdge < pLightInfo->face->numedges; ndxEdge++ )
+		{
+	//		int edge = dsurfedges[pLightInfo->face->firstedge+ndxEdge];
 
-		Vector p1, p2;
-		VectorAdd( dvertexes[EdgeVertex( pLightInfo->face, ndxEdge )].point, pLightInfo->modelorg, p1 );
-		VectorAdd( dvertexes[EdgeVertex( pLightInfo->face, ndxEdge+1 )].point, pLightInfo->modelorg, p2 );
+			Vector p1, p2;
+			VectorAdd( dvertexes[EdgeVertex( pLightInfo->face, ndxEdge )].point, pLightInfo->modelorg, p1 );
+			VectorAdd( dvertexes[EdgeVertex( pLightInfo->face, ndxEdge+1 )].point, pLightInfo->modelorg, p2 );
 		
-		Vector &n1 = fn->normal[ndxEdge];
-		Vector &n2 = fn->normal[(ndxEdge+1)%pLightInfo->face->numedges];
+			Vector &n1 = fn->normal[ndxEdge];
+			Vector &n2 = fn->normal[(ndxEdge+1)%pLightInfo->face->numedges];
 		
-		CmdLib_FPrintf( out, "3\n");
+			CmdLib_FPrintf( out, "3\n");
 		
-		CmdLib_FPrintf(out, "%f %f %f %f %f %f\n", p1[0], p1[1], p1[2], n1[0] * 0.5 + 0.5, n1[1] * 0.5 + 0.5, n1[2] * 0.5 + 0.5 );
+			CmdLib_FPrintf(out, "%f %f %f %f %f %f\n", p1[0], p1[1], p1[2], n1[0] * 0.5 + 0.5, n1[1] * 0.5 + 0.5, n1[2] * 0.5 + 0.5 );
 		
-		CmdLib_FPrintf(out, "%f %f %f %f %f %f\n", p2[0], p2[1], p2[2], n2[0] * 0.5 + 0.5, n2[1] * 0.5 + 0.5, n2[2] * 0.5 + 0.5 );
+			CmdLib_FPrintf(out, "%f %f %f %f %f %f\n", p2[0], p2[1], p2[2], n2[0] * 0.5 + 0.5, n2[1] * 0.5 + 0.5, n2[2] * 0.5 + 0.5 );
 		
-		CmdLib_FPrintf(out, "%f %f %f %f %f %f\n", centroid[0] + pLightInfo->modelorg[0], 
-					   centroid[1] + pLightInfo->modelorg[1], 
-					   centroid[2] + pLightInfo->modelorg[2], 
-					   fn->facenormal[0] * 0.5 + 0.5, 
-					   fn->facenormal[1] * 0.5 + 0.5, 
-					   fn->facenormal[2] * 0.5 + 0.5 );
+			CmdLib_FPrintf(out, "%f %f %f %f %f %f\n", centroid[0] + pLightInfo->modelorg[0], 
+						   centroid[1] + pLightInfo->modelorg[1], 
+						   centroid[2] + pLightInfo->modelorg[2], 
+						   fn->facenormal[0] * 0.5 + 0.5, 
+						   fn->facenormal[1] * 0.5 + 0.5, 
+						   fn->facenormal[2] * 0.5 + 0.5 );
 		
+		}
 	}
-	
-	// enable threading
-	ThreadUnlock();
 }
 
 
@@ -938,10 +940,10 @@ int				numdlights;
   FindTargetEntity
   ==================
 */
-entity_t *FindTargetEntity (char *target)
+entity_t *FindTargetEntity (const char *target)
 {
 	int		i;
-	char	*n;
+	const char	*n;
 
 	for (i=0 ; i<num_entities ; i++)
 	{
@@ -970,6 +972,8 @@ directlight_t *AllocDLight( Vector& origin, bool bAddToList )
 	directlight_t *dl;
 
 	dl = ( directlight_t* )calloc(1, sizeof(directlight_t));
+	if (!dl) return nullptr;
+
 	dl->index = numdlights++;
 
 	VectorCopy( origin, dl->light.origin );
@@ -1046,14 +1050,14 @@ void MergeDLightVis( directlight_t *dl, int cluster )
 */
 int LightForKey (entity_t *ent, char *key, Vector& intensity )
 {
-	char *pLight;
+	const char *pLight;
 
 	pLight = ValueForKey( ent, key );
 
 	return LightForString( pLight, intensity );
 }
 
-int LightForString( char *pLight, Vector& intensity )
+int LightForString( const char *pLight, Vector& intensity )
 {
 	double r, g, b, scaler;
 	int argCnt;
@@ -1109,7 +1113,7 @@ int LightForString( char *pLight, Vector& intensity )
 			break;
 
 		default:
-			printf("unknown light specifier type - %s\n",pLight);
+			Warning("Unknown light specifier type - %s\n.",pLight);
 			return false;
 	}
 	// scale up source lights by scaling factor
@@ -1124,7 +1128,7 @@ int LightForString( char *pLight, Vector& intensity )
 static void ParseLightGeneric( entity_t *e, directlight_t *dl )
 {
 	entity_t		*e2;
-	char	        *target;
+	const char	        *target;
 	Vector	        dest;
 
 	dl->light.style = (int)FloatForKey (e, "style");
@@ -1485,7 +1489,7 @@ static void ParseLightEnvironment( entity_t* e, directlight_t* dl )
 	{
 		g_SunAngularExtent=atof(angle_str);
 		g_SunAngularExtent=sin((M_PI/180.0)*g_SunAngularExtent);
-		printf("sun extent from map=%f\n",g_SunAngularExtent);
+		qprintf("sun extent from map=%f\n",g_SunAngularExtent);
 	}
 	if ( !gSkyLight )
 	{
@@ -1544,7 +1548,7 @@ void CreateDirectLights (void)
 	CPatch	        *p = NULL;
 	directlight_t	*dl = NULL;
 	entity_t	    *e = NULL;
-	char	        *name;
+	const char	    *name;
 	Vector	        dest;
 
 	numdlights = 0;
@@ -1752,11 +1756,11 @@ void GatherSampleAmbientSkySSE( SSE_sampleLightOutput_t &out, directlight_t *dl,
 	bool force_fast = ( nLFlags & GATHERLFLAGS_FORCE_FAST ) != 0;
 
 	fltx4 sumdot = Four_Zeros;
-	fltx4 ambient_intensity[NUM_BUMP_VECTS+1];
-	fltx4 possibleHitCount[NUM_BUMP_VECTS+1];
+	fltx4 ambient_intensity[NUM_BUMP_VECTS+1] = {};
+	fltx4 possibleHitCount[NUM_BUMP_VECTS+1] = {};
 	fltx4 dots[NUM_BUMP_VECTS+1];
 
-	for ( int i = 0; i < normalCount; i++ )
+	for ( int i = 0; i < NUM_BUMP_VECTS+1; i++ )
 	{
 		ambient_intensity[i] = Four_Zeros;
 		possibleHitCount[i] = Four_Zeros;
@@ -2345,7 +2349,7 @@ void BuildPatchLights( int facenum );
 
 void DumpSamples( int ndxFace, facelight_t *pFaceLight )
 {
-	ThreadLock();
+	ScopedThreadsLock lock;
 
 	dface_t *pFace = &g_pFaces[ndxFace];
 	if( pFace )
@@ -2374,8 +2378,6 @@ void DumpSamples( int ndxFace, facelight_t *pFaceLight )
 			}
 		}
 	}
-
-	ThreadUnlock();
 }
 
 
@@ -2641,7 +2643,8 @@ static void ResampleLightAt4Points( SSE_SampleInfo_t& info, int lightStyleIndex,
 bool PointsInWinding ( FourVectors const & point, winding_t *w, int &invalidBits )
 {
 	FourVectors edge, toPt, cross, testCross, p0, p1;
-	fltx4 invalidMask;
+	// dimhotepus: Initialize invalid mask.
+	fltx4 invalidMask = Four_Zeros;
 
 	//
 	// get the first normal to test
@@ -3068,19 +3071,17 @@ void BuildFacelights (int iThread, int facenum)
 	Vector spot;
 	Vector v[4], n[4];
 
-	if( g_bInterrupt )
+	if( g_bInterrupt.load(std::memory_order::memory_order_relaxed) )
 		return;
 
 	// FIXME: Is there a better way to do this? Like, in RunThreadsOn, for instance?
 	// Don't pay this cost unless we have to; this is super perf-critical code.
 	if (g_pIncremental)
 	{
-		// Both threads will be accessing this so it needs to be protected or else thread A
+		// Both threads will be accessing this so it needs to be protected/atomic or else thread A
 		// will load it in and thread B will increment it but its increment will be
 		// overwritten by thread A when thread A writes it back.
-		ThreadLock();
-		++g_iCurFace;
-		ThreadUnlock();
+		g_iCurFace.fetch_add(1, std::memory_order::memory_order_relaxed);
 	}
 
 	// some surfaces don't need lightmaps
@@ -3258,7 +3259,7 @@ void BuildPatchLights( int facenum )
 			{ 
 				float scale;
 				Vector v;
-				scale = 1.0 / patch->samplearea;
+				scale = 1.0f / patch->samplearea;
 
 				VectorScale( patch->samplelight, scale, v );
 				VectorAdd( patch->totallight.light[0], v, patch->totallight.light[0] );
@@ -3431,7 +3432,7 @@ static void ColorClampBumped( Vector& color1, Vector& color2, Vector& color3 )
 	// HACK!  Clean this up, and add some else statements
 #define CONDITION(a,b,c) do { if( maxs[a] >= maxs[b] && maxs[b] >= maxs[c] ) { order[0] = a; order[1] = b; order[2] = c; } } while( 0 )
 	
-	int order[3];
+	int order[3] = {};
 	CONDITION(0,1,2);
 	CONDITION(0,2,1);
 	CONDITION(1,0,2);

@@ -13,6 +13,7 @@
 #include "coordsize.h"
 #include "vstdlib/random.h"
 #include "bsptreedata.h"
+#include "bspflags.h"
 #include "messbuf.h"
 #include "vmpi.h"
 #include "vmpi_distribute_work.h"
@@ -148,7 +149,7 @@ void ComputeAmbientFromSphericalSamples( int iThread, const Vector &vStart, Vect
 
 		// Now that we've got a ray, see what surface we've hit
 		Vector lightStyleColors[MAX_LIGHTSTYLES];
-		lightStyleColors[0].Init();	// We only care about light style 0 here.
+		lightStyleColors[0] = Vector{0, 0, 0};	// We only care about light style 0 here.
 		CalcRayAmbientLighting( iThread, vStart, vEnd, tanTheta, lightStyleColors );
 	
 		radcolor[i] = lightStyleColors[0];
@@ -463,7 +464,7 @@ float AABBDistance( const Vector &mins0, const Vector &maxs0, const Vector &mins
 class CLeafList : public ISpatialLeafEnumerator
 {
 public:
-	virtual bool EnumerateLeaf( int leaf, int context )
+	virtual bool EnumerateLeaf( int leaf, intp context )
 	{
 		m_list.AddToTail(leaf);
 		return true;
@@ -570,7 +571,7 @@ static void ThreadComputeLeafAmbient( int iThread, void *pUserData )
 	CUtlVector<ambientsample_t> list;
 	while (1)
 	{
-		int leafID = GetThreadWork ();
+		int leafID = GetThreadWork();
 		if (leafID == -1)
 			break;
 		list.RemoveAll();
@@ -654,7 +655,7 @@ void ComputePerLeafAmbientLighting()
 	}
 
 	// now write out the data
-	Msg("Writing leaf ambient...");
+	Msg("Writing leaf ambient...\n");
 	g_pLeafAmbientIndex->RemoveAll();
 	g_pLeafAmbientLighting->RemoveAll();
 	g_pLeafAmbientIndex->SetCount( numleafs );
