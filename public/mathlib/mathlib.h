@@ -1065,10 +1065,10 @@ inline float XM_CALLCONV TexLightToLinear( int c, int exponent )
 }
 
 
-// convert texture to linear 0..1 value
-int XM_CALLCONV LinearToTexture( float f );
+// converts linear 0..1 value to texture (0..255)
+byte XM_CALLCONV LinearToTexture( float f );
 // converts 0..1 linear value to screen gamma (0..255)
-int XM_CALLCONV LinearToScreenGamma( float f );
+byte XM_CALLCONV LinearToScreenGamma( float f );
 float XM_CALLCONV TextureToLinear( int c );
 
 // compressed color format 

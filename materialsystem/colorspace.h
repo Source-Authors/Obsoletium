@@ -30,9 +30,6 @@ namespace ColorSpace
 	// convert texture to linear 0..1 value
 	float TextureToLinear( int c );
 
-	// convert texture to linear 0..1 value
-	int LinearToTexture( float f );
-
 	float TexLightToLinear( int c, int exponent );
 
 	// assume 0..4 range
@@ -44,9 +41,6 @@ namespace ColorSpace
 		unsigned char *ret, unsigned char *retBump1,
 		unsigned char *retBump2, unsigned char *retBump3 );
 	
-	// converts 0..1 linear value to screen gamma (0..255)
-	int LinearToScreenGamma( float f );
-
 	FORCEINLINE void LinearToLightmap( unsigned char *pDstRGB, const float *pSrcRGB )
 	{
 		Vector tmpVect;

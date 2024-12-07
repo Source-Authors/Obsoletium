@@ -24,8 +24,8 @@
 static byte		texgammatable[256];	// palette is sent through this to convert to screen gamma
 
 static float	texturetolinear[256];	// texture (0..255) to linear (0..1)
-static int		lineartotexture[1024];	// linear (0..1) to texture (0..255)
-static int		lineartoscreen[1024];	// linear (0..1) to gamma corrected vertex light (0..255)
+static byte		lineartotexture[1024];	// linear (0..1) to texture (0..255)
+static byte		lineartoscreen[1024];	// linear (0..1) to gamma corrected vertex light (0..255)
 
 // build a lightmap texture to combine with surface texture, adjust for src*dst+dst*src, ramp reprogramming, etc
 float			lineartovertex[4096];	// linear (0..4) to screen corrected vertex space (0..1?)
@@ -168,7 +168,7 @@ void XM_CALLCONV BuildGammaTable( float gamma, float texGamma, float brightness,
 
 		// convert linear space to desired gamma space
 		int inf = static_cast<int>( 255 * pow ( f, g ) );
-		lineartoscreen[i] = max( min( inf, 255 ), 0 );
+		lineartoscreen[i] = static_cast<byte>( max( min( inf, 255 ), 0 ));
 	}
 
 	for (i=0 ; i<256 ; i++)
@@ -186,7 +186,7 @@ void XM_CALLCONV BuildGammaTable( float gamma, float texGamma, float brightness,
 	for (i=0 ; i<1024 ; i++)
 	{
 		// convert from linear space (0..1) to nonlinear texture space (0..255)
-		lineartotexture[i] = static_cast<int>( pow( i / 1023.0f, 1.0f / texGamma ) * 255 );
+		lineartotexture[i] = static_cast<byte>( pow( i / 1023.0f, 1.0f / texGamma ) * 255 );
 	}
 
 	{
@@ -377,8 +377,8 @@ float XM_CALLCONV TextureToLinear( int c )
 	return texturetolinear[c];
 }
 
-// convert texture to linear 0..1 value
-int XM_CALLCONV LinearToTexture( float f )
+// converts linear 0..1 value to texture (0..255)
+byte XM_CALLCONV LinearToTexture( float f )
 {
 	Assert( s_bMathlibInitialized );
 	int i = max( min( static_cast<int>( f * 1023 ), 1023 ), 0 );	// assume 0..1 range
@@ -387,7 +387,7 @@ int XM_CALLCONV LinearToTexture( float f )
 
 
 // converts 0..1 linear value to screen gamma (0..255)
-int XM_CALLCONV LinearToScreenGamma( float f )
+byte XM_CALLCONV LinearToScreenGamma( float f )
 {
 	Assert( s_bMathlibInitialized );
 	int i = max( min( static_cast<int>( f * 1023 ), 1023 ), 0 );	// assume 0..1 range

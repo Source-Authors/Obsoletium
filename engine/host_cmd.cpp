@@ -331,11 +331,11 @@ void Host_LightCrosshair (void)
 	VectorMA( MainViewOrigin(), COORD_EXTENT * 1.74f, MainViewForward(), endPoint );
 	
 	R_LightVec( MainViewOrigin(), endPoint, true, lightmapColor );
-	int r = LinearToTexture( lightmapColor.x );
-	int g = LinearToTexture( lightmapColor.y );
-	int b = LinearToTexture( lightmapColor.z );
+	byte r = LinearToTexture( lightmapColor.x );
+	byte g = LinearToTexture( lightmapColor.y );
+	byte b = LinearToTexture( lightmapColor.z );
 
-	ConMsg( "Luxel Value: %d %d %d\n", r, g, b );
+	ConMsg( "Luxel Value: R %hhu; G %hhu; B %hhu\n", r, g, b );
 }
 #endif
 
