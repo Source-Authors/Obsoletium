@@ -3319,13 +3319,13 @@ int CModelLoader::GetCount( void )
 
 model_t *CModelLoader::GetModelForIndex( int i )
 {
-	if ( i < 0 || (unsigned)i >= m_Models.Count() )
+	Assert( m_Models.IsValidIndex( i ) );
+
+	if ( i < 0 || (size_t)i >= m_Models.Count() )
 	{
-		Assert( !m_Models.IsValidIndex( i ) );
 		return NULL;
 	}
 
-	Assert( m_Models.IsValidIndex( i ) );
 	return m_Models[i].modelpointer;
 }
 
