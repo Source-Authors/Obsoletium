@@ -15,6 +15,7 @@
 #include "utilmatlib.h"
 #include "utldict.h"
 #include "map.h"
+#include "bspflags.h"
 
 int		c_nofaces;
 int		c_facenodes;
@@ -982,7 +983,6 @@ SetLightStyles
 void SetLightStyles (void)
 {
 	int		stylenum;
-	char	*t;
 	entity_t	*e;
 	int		i, j;
 	char	value[10];
@@ -997,7 +997,7 @@ void SetLightStyles (void)
 	{
 		e = &entities[i];
 
-		t = ValueForKey (e, "classname");
+		const char *t = ValueForKey (e, "classname");
 		if (Q_strncasecmp (t, "light", 5))
 			continue;
 
@@ -1021,7 +1021,7 @@ void SetLightStyles (void)
 			stylenum++;
 		}
 		sprintf (value, "%i", 32 + j);
-		char *pCurrentStyle = ValueForKey( e, "style" );
+		const char *pCurrentStyle = ValueForKey( e, "style" );
 		// the designer has set a default lightstyle as well as making the light switchable
 		if ( pCurrentStyle )
 		{
@@ -1095,8 +1095,11 @@ void EmitBrushes (void)
 						break;
 				if (i == b->numsides)
 				{
+					// dimhotepus: Ensure has brushes.
+					if (numbrushsides < 1)
+						Error ("numbrushsides < 1");
 					if (numbrushsides >= MAX_MAP_BRUSHSIDES)
-						Error ("MAX_MAP_BRUSHSIDES");
+						Error ("numbrushsides >= MAX_MAP_BRUSHSIDES");
 
 					dbrushsides[numbrushsides].planenum = planenum;
 					dbrushsides[numbrushsides].texinfo =
@@ -1389,13 +1392,24 @@ int PointLeafnum ( dmodel_t* pModel, const Vector& p )
 
 
 //-----------------------------------------------------------------------------
-// Adds a noew to the bounding box
+// Adds a node to the bounding box
 //-----------------------------------------------------------------------------
 static void AddNodeToBounds(int node, CUtlVector<int>& skipAreas, Vector& mins, Vector& maxs)
 {
+	static int prevNode = INT_MIN;
+
 	// not a leaf
 	if (node >= 0)
 	{
+		// dimhotepus: Prevent stack overflow due to infinite recursion for empty maps.
+		if (prevNode == node)
+		{
+			Warning("Overflow bounds by node %d, skipping the rest.\n", node);
+			return;
+		}
+
+		prevNode = node;
+
 		AddNodeToBounds( dnodes[node].children[0], skipAreas, mins, maxs );
 		AddNodeToBounds( dnodes[node].children[1], skipAreas, mins, maxs );
 	}
@@ -1537,7 +1551,7 @@ void ComputeBoundsNoSkybox( )
 	// Add the bounds to the worldspawn data
 	for (int i = 0; i < num_entities; ++i)
 	{
-		char* pEntity = ValueForKey(&entities[i], "classname");
+		const char* pEntity = ValueForKey(&entities[i], "classname");
 		if (!strcmp(pEntity, "worldspawn"))
 		{
 			char	string[32];
