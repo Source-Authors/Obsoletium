@@ -3378,7 +3378,7 @@ model_t *CModelLoader::FindModel( const char *pName )
 	// handles are insensitive to case and slashes
 	FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( pName );
 
-	int i = m_Models.Find( fnHandle );
+	auto i = m_Models.Find( fnHandle );
 	if ( i == m_Models.InvalidIndex() )
 	{
 		pModel = (model_t *)m_ModelPool.Alloc();
