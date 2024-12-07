@@ -345,7 +345,7 @@ void BuildVisRow (int patchnum, byte *pvs, int head, transfer_t *transfers, CTra
 			}
 		}
 
-		int dispCount = g_ClusterDispFaces[j].dispFaces.Size();
+		int dispCount = g_ClusterDispFaces[j].dispFaces.Count();
 		for( int ndxDisp = 0; ndxDisp < dispCount; ndxDisp++ )
 		{
 			int ndxFace = g_ClusterDispFaces[j].dispFaces[ndxDisp];

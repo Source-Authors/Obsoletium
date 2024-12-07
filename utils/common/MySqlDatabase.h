@@ -11,12 +11,14 @@
 #pragma once
 #endif
 
-#include <windows.h>
 #include "ISQLDBReplyTarget.h"
-#include "utlvector.h"
-#include "UtlLinkedList.h"
+#include "tier1/utlvector.h"
+#include "tier1/utllinkedlist.h"
 
 class ISQLDBCommand;
+
+typedef struct _RTL_CRITICAL_SECTION RTL_CRITICAL_SECTION;
+typedef RTL_CRITICAL_SECTION CRITICAL_SECTION;
 
 //-----------------------------------------------------------------------------
 // Purpose: Generic MySQL accessing database
@@ -51,10 +53,10 @@ private:
 
 	// threading data
 	bool m_bRunThread;
-	CRITICAL_SECTION m_csThread;
-	CRITICAL_SECTION m_csInQueue;
-	CRITICAL_SECTION m_csOutQueue;
-	CRITICAL_SECTION m_csDBAccess;
+	CRITICAL_SECTION *m_pcsThread;
+	CRITICAL_SECTION *m_pcsInQueue;
+	CRITICAL_SECTION *m_pcsOutQueue;
+	CRITICAL_SECTION *m_pcsDBAccess;
 
 	// wait event
 	HANDLE m_hEvent;

@@ -13,12 +13,6 @@
 // Copyright (c) 1999-2000 Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
 
-// identifier was truncated to '255' characters in the debug information
-#pragma warning(disable: 4786)
-// conversion from 'double' to 'float'
-#pragma warning(disable: 4244)
-#pragma warning(disable: 4530)
-
 #include <stdio.h>
 #include <stdarg.h>
 #include <algorithm>

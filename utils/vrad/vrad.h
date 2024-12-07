@@ -16,7 +16,7 @@
 #pragma once
 
 
-#include "commonmacros.h"
+#include "tier0/commonmacros.h"
 #include "worldsize.h"
 #include "cmdlib.h"
 #include "mathlib/mathlib.h"
@@ -25,24 +25,16 @@
 #include "threads.h"
 #include "builddisp.h"
 #include "VRAD_DispColl.h"
-#include "UtlMemory.h"
-#include "UtlHash.h"
-#include "utlvector.h"
 #include "iincremental.h"
 #include "raytrace.h"
-
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include "tier1/utlmemory.h"
+#include "tier1/utlhash.h"
+#include "tier1/utlvector.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#pragma warning(disable: 4142 4028)
 #include <io.h>
-#pragma warning(default: 4142 4028)
-
 #include <fcntl.h>
 #include <direct.h>
 #include <ctype.h>
@@ -95,8 +87,8 @@ struct directlight_t
 	{
 		m_flEndFadeDistance = -1.0;							// end<start indicates not set
 		m_flStartFadeDistance= 0.0;
-		m_flCapDist = 1.0e22;
-
+		m_flCapDist = 1.0e22f;
+		m_IncrementalID = 0;
 	}
 };
 
@@ -279,7 +271,7 @@ extern float		maxchop;
 extern FileHandle_t	pFileSamples[4][4];
 extern qboolean		g_bLowPriority;
 extern qboolean		do_fast;
-extern bool			g_bInterrupt;		// Was used with background lighting in WC. Tells VRAD to stop lighting.
+extern std::atomic_bool	g_bInterrupt;		// Was used with background lighting in WC. Tells VRAD to stop lighting.
 extern IIncremental *g_pIncremental;	// null if not doing incremental lighting
 extern bool			g_bDumpPropLightmaps;
 
@@ -397,7 +389,7 @@ void AddBrushesForRayTrace ( void );
 void BaseLightForFace( dface_t *f, Vector& light, float *parea, Vector& reflectivity );
 void CreateDirectLights (void);
 void GetPhongNormal( int facenum, Vector const& spot, Vector& phongnormal );
-int LightForString( char *pLight, Vector& intensity );
+int LightForString( const char *pLight, Vector& intensity );
 void MakeTransfer( int ndxPatch1, int ndxPatch2, transfer_t *all_transfers );
 void MakeScales( int ndxPatch, transfer_t *all_transfers );
 

@@ -28,7 +28,7 @@ void pw(winding_t *w)
 {
 	int		i;
 	for (i=0 ; i<w->numpoints ; i++)
-		printf ("(%5.1f, %5.1f, %5.1f)\n",w->p[i][0], w->p[i][1],w->p[i][2]);
+		qprintf ("(%5.1f, %5.1f, %5.1f)\n",w->p[i][0], w->p[i][1],w->p[i][2]);
 }
 
 winding_t *winding_pool[MAX_POINTS_ON_WINDING+4];
@@ -40,8 +40,6 @@ AllocWinding
 */
 winding_t *AllocWinding (int points)
 {
-	winding_t	*w;
-
 	if (numthreads == 1)
 	{
 		c_winding_allocs++;
@@ -50,18 +48,30 @@ winding_t *AllocWinding (int points)
 		if (c_active_windings > c_peak_windings)
 			c_peak_windings = c_active_windings;
 	}
-	ThreadLock();
-	if (winding_pool[points])
+	
+	winding_t	*w;
 	{
-		w = winding_pool[points];
-		winding_pool[points] = w->next;
+		bool need_new = true;
+
+		{
+			ScopedThreadsLock lock;
+			// Assign from pool to w.
+			if ((w = winding_pool[points]))
+			{
+				winding_pool[points] = w->next;
+
+				need_new = false;
+			}
+		}
+
+		if (need_new)
+		{
+			w = (winding_t *)malloc( sizeof(*w) );
+			if (!w) return nullptr;
+
+			w->p = (Vector *)calloc( points, sizeof(Vector) );
+		}
 	}
-	else
-	{
-		w = (winding_t *)malloc(sizeof(*w));
-		w->p = (Vector *)calloc( points, sizeof(Vector) );
-	}
-	ThreadUnlock();
 	w->numpoints = 0; // None are occupied yet even though allocated.
 	w->maxpoints = points;
 	w->next = NULL;
@@ -73,11 +83,10 @@ void FreeWinding (winding_t *w)
 	if (w->numpoints == 0xdeaddead)
 		Error ("FreeWinding: freed a freed winding");
 	
-	ThreadLock();
+	ScopedThreadsLock lock;
 	w->numpoints = 0xdeaddead; // flag as freed
 	w->next = winding_pool[w->maxpoints];
 	winding_pool[w->maxpoints] = w;
-	ThreadUnlock();
 }
 
 /*
@@ -323,12 +332,10 @@ CopyWinding
 */
 winding_t *CopyWinding (winding_t *w)
 {
-	int			size;
-	winding_t	*c;
-
-	c = AllocWinding (w->numpoints);
+	winding_t	*c = AllocWinding (w->numpoints);
 	c->numpoints = w->numpoints;
-	size = w->numpoints*sizeof(w->p[0]);
+
+	size_t size = w->numpoints*sizeof(w->p[0]);
 	memcpy (c->p, w->p, size);
 	return c;
 }
@@ -353,8 +360,9 @@ winding_t *ReverseWinding (winding_t *w)
 }
 
 
+// dimhotepus: Reenable optimizer.
 // BUGBUG: Hunt this down - it's causing CSG errors
-#pragma optimize("g", off)
+// #pragma optimize("g", off)
 /*
 =============
 ClipWindingEpsilon
@@ -373,6 +381,8 @@ void ClipWindingEpsilon (winding_t *in, const Vector &normal, vec_t dist,
 	winding_t	*f, *b;
 	int		maxpts;
 	
+	dists[0] = 0;
+	sides[0] = SIDE_ON;
 	counts[0] = counts[1] = counts[2] = 0;
 
 // determine sides for each point
@@ -465,7 +475,9 @@ void ClipWindingEpsilon (winding_t *in, const Vector &normal, vec_t dist,
 	if (f->numpoints > MAX_POINTS_ON_WINDING || b->numpoints > MAX_POINTS_ON_WINDING)
 		Error ("ClipWinding: MAX_POINTS_ON_WINDING");
 }
-#pragma optimize("", on)
+
+// dimhotepus: Reenable optimizer.
+// #pragma optimize("", on)
 
 
 // NOTE: This is identical to ClipWindingEpsilon, but it does a pre/post translation to improve precision
@@ -521,6 +533,8 @@ void ClassifyWindingEpsilon( winding_t *in, const Vector &normal, vec_t dist,
 	winding_t	*f, *b;
 	int		maxpts;
 	
+	dists[0] = 0;
+	sides[0] = SIDE_ON;
 	counts[0] = counts[1] = counts[2] = 0;
 
 // determine sides for each point
@@ -638,6 +652,9 @@ void ChopWindingInPlace (winding_t **inout, const Vector &normal, vec_t dist, ve
 	int		maxpts;
 
 	in = *inout;
+
+	dists[0] = 0;
+	sides[0] = SIDE_ON;
 	counts[0] = counts[1] = counts[2] = 0;
 // determine sides for each point
 	for (i=0 ; i<in->numpoints ; i++)

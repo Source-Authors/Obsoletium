@@ -165,8 +165,8 @@ void Rasterizer::Build()
 		return;
 
 	// Clamp to 0..1
-	fMinX = max(0, fMinX);
-	fMinY = max(0, fMinY);
+	fMinX = max(0.0f, fMinX);
+	fMinY = max(0.0f, fMinY);
 	fMaxX = min(1.0f, fMaxX);
 	fMaxY = min(1.0f, fMaxY);
 
@@ -182,8 +182,8 @@ void Rasterizer::Build()
 	// Clamp to valid texture (integer) locations
 	iMinX = max(0, iMinX);
 	iMinY = max(0, iMinY);
-	iMaxX = min(iMaxX, mResX - 1);
-	iMaxY = min(iMaxY, mResY - 1);
+	iMaxX = min(iMaxX, (int)mResX - 1);
+	iMaxY = min(iMaxY, (int)mResY - 1);
 
 	// Set the size to be as expected. 
 	// TODO: Pass this in from outside to minimize allocations
@@ -393,18 +393,6 @@ static bool LoadFile( char const* pFileName, CUtlBuffer& buf )
 	return g_pFullFileSystem->ReadFile( pFileName, NULL, buf );
 }
 
-
-//-----------------------------------------------------------------------------
-// Constructs the file name from the model name
-//-----------------------------------------------------------------------------
-static char const* ConstructFileName( char const* pModelName )
-{
-	static char buf[1024];
-	sprintf( buf, "%s%s", gamedir, pModelName );
-	return buf;
-}
-
-
 //-----------------------------------------------------------------------------
 // Computes a convex hull from a studio mesh
 //-----------------------------------------------------------------------------
@@ -451,7 +439,7 @@ CPhysCollide* ComputeConvexHull( studiohdr_t* pStudioHdr )
 
 	// Convert an array of convex elements to a compiled collision model
 	// (this deletes the convex elements)
-	return s_pPhysCollision->ConvertConvexToCollide( convexHulls.Base(), convexHulls.Size() );
+	return s_pPhysCollision->ConvertConvexToCollide( convexHulls.Base(), convexHulls.Count() );
 }
 
 
@@ -495,8 +483,8 @@ bool LoadStudioModel( char const* pModelName, CUtlBuffer& buf )
 	}
 
 	// ensure reset
-	pHdr->pVertexBase = NULL;
-	pHdr->pIndexBase  = NULL;
+	pHdr->SetVertexBase(nullptr);
+	pHdr->SetIndexBase(nullptr);
 
 	return true;
 }
@@ -609,21 +597,6 @@ void DumpCollideToGlView( vcollide_t *pCollide, const char *pFilename )
 }
 
 
-static bool PointInTriangle( const Vector2D &p, const Vector2D &v0, const Vector2D &v1, const Vector2D &v2 )
-{
-	float coords[3];
-	GetBarycentricCoords2D( v0, v1, v2, p, coords );
-	for ( int i = 0; i < 3; i++ )
-	{
-		if ( coords[i] < 0.0f || coords[i] > 1.0f )
-			return false;
-	}
-	float sum = coords[0] + coords[1] + coords[2];
-	if ( sum > 1.0f )
-		return false;
-	return true;
-}
-
 bool LoadFileIntoBuffer( CUtlBuffer &buf, const char *pFilename )
 {
 	FileHandle_t fileHandle = g_pFileSystem->Open( pFilename, "rb" );
@@ -696,7 +669,7 @@ public:
 		else
 		{
 			KeyValues *pVMT = new KeyValues("vmt");
-			CUtlBuffer buf(0,0,CUtlBuffer::TEXT_BUFFER);
+			CUtlBuffer buf((intp)0,0,CUtlBuffer::TEXT_BUFFER);
 			LoadFileIntoBuffer( buf, pMaterialName );
 			if ( pVMT->LoadFromBuffer( pMaterialName, buf ) )
 			{
@@ -897,8 +870,8 @@ float ComputeCoverageFromTexture( float b0, float b1, float b2, int32 hitID )
 void CleanModelName( const char *pModelName, char *pOutput, int outLen )
 {
 	// strip off leading models/ if it exists
-	const char *pModelDir = "models/";
-	int modelLen = Q_strlen(pModelDir);
+	const char pModelDir[] = "models/";
+	constexpr intp modelLen = ssize(pModelDir) - 1;
 
 	if ( !Q_strnicmp(pModelName, pModelDir, modelLen ) )
 	{
@@ -910,7 +883,7 @@ void CleanModelName( const char *pModelName, char *pOutput, int outLen )
 	char *dot = strchr(pOutput,'.');
 	if ( dot )
 	{
-		*dot = 0;
+		*dot = '\0';
 	}
 
 }
@@ -918,7 +891,7 @@ void CleanModelName( const char *pModelName, char *pOutput, int outLen )
 
 void ForceTextureShadowsOnModel( const char *pModelName )
 {
-	char buf[1024];
+	char buf[MAX_FILEPATH];
 	CleanModelName( pModelName, buf, sizeof(buf) );
 	if ( !g_ForcedTextureShadowsModels.Find(buf).IsValid())
 	{
@@ -1105,15 +1078,12 @@ void CVradStaticPropMgr::Shutdown()
 {
 
 	// Remove all static prop model data
-	for (int i = m_StaticPropDict.Size(); --i >= 0; )
+	for (int i = m_StaticPropDict.Count(); --i >= 0; )
 	{
 		studiohdr_t *pStudioHdr = m_StaticPropDict[i].m_pStudioHdr;
 		if ( pStudioHdr )
 		{
-			if ( pStudioHdr->pVertexBase )
-			{
-				free( pStudioHdr->pVertexBase );
-			}
+			free( pStudioHdr->GetVertexBase() );
 			free( pStudioHdr );
 		}
 	}
@@ -1996,7 +1966,7 @@ void CVradStaticPropMgr::AddPolysForRayTrace( void )
 							{
 								// all tris expected to be discrete tri lists
 								// must fixme if stripping ever occurs
-								printf( "unexpected strips found\n" );
+								Warning( "unexpected strips found\n" );
 								Assert( 0 );
 								return;
 							}
@@ -2153,7 +2123,7 @@ void CVradStaticPropMgr::BuildTriList( CStaticProp &prop )
 						{
 							// all tris expected to be discrete tri lists
 							// must fixme if stripping ever occurs
-							printf( "unexpected strips found\n" );
+							Warning( "unexpected strips found\n" );
 							Assert( 0 );
 							return;
 						}
@@ -2169,9 +2139,9 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void *pModelData )
 	studiohdr_t *pActiveStudioHdr = static_cast<studiohdr_t *>(pModelData);
 	Assert( pActiveStudioHdr );
 
-	if ( pActiveStudioHdr->pVertexBase )
+	if ( pActiveStudioHdr->GetVertexBase() )
 	{
-		return (vertexFileHeader_t *)pActiveStudioHdr->pVertexBase;
+		return (vertexFileHeader_t *)pActiveStudioHdr->GetVertexBase();
 	}
 
 	// mandatory callback to make requested data resident
@@ -2198,6 +2168,11 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void *pModelData )
 	}
 
 	vertexFileHeader_t *pVvdHdr = (vertexFileHeader_t *)malloc( vvdSize );
+	if ( !pVvdHdr )
+	{
+		Error("Error Vertex File %s memory allocation failure.\n", fileName);
+	}
+
 	g_pFileSystem->Read( pVvdHdr, vvdSize, fileHandle );
 	g_pFileSystem->Close( fileHandle );
 
@@ -2230,7 +2205,7 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void *pModelData )
 	free( pVvdHdr );
 	pVvdHdr = pNewVvdHdr;
 
-	pActiveStudioHdr->pVertexBase = (void*)pVvdHdr;
+	pActiveStudioHdr->SetVertexBase(pVvdHdr);
 	return pVvdHdr;
 }
 
@@ -2455,8 +2430,8 @@ static int GetTexelCount(unsigned int _resX, unsigned int _resY, bool _mipmaps)
 	while (_resX > 1 || _resY > 1) 
 	{
 		retVal += _resX * _resY;
-		_resX = max(1, _resX >> 1);
-		_resY = max(1, _resY >> 1);
+		_resX = max(1U, _resX >> 1);
+		_resY = max(1U, _resY >> 1);
 	}
 
 	// Add in the 1x1 mipmap level, which wasn't hit above. This could be done in the initializer of 

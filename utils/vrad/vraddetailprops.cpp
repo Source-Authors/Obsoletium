@@ -361,7 +361,7 @@ public:
 	CLightSurface(int iThread) : m_pSurface(0), m_HitFrac(1.0f), m_bHasLuxel(false), m_iThread(iThread) {}
 
 	// call back with a node and a context
-	bool EnumerateNode( int node, Ray_t const& ray, float f, int context )
+	bool EnumerateNode( int node, Ray_t const& ray, float f, intp context )
 	{
 		dface_t* pSkySurface = 0;
 
@@ -410,7 +410,7 @@ public:
 	}
 
 	// call back with a leaf and a context
-	virtual bool EnumerateLeaf( int leaf, Ray_t const& ray, float start, float end, int context )
+	virtual bool EnumerateLeaf( int leaf, Ray_t const& ray, float start, float end, intp context )
 	{
 		bool hit = false;
 		dleaf_t* pLeaf = &dleafs[leaf];
@@ -814,7 +814,7 @@ static void ComputeLighting( DetailObjectLump_t& prop, int iThread )
 		{
 			if (!hasLightstyles)
 			{
-				prop.m_LightStyles = s_pDetailPropLightStyleLump->Size();
+				prop.m_LightStyles = s_pDetailPropLightStyleLump->Count();
 				hasLightstyles = true;
 			}
 
@@ -914,14 +914,14 @@ static void WriteDetailLightingLump( int lumpID, int lumpVersion, CUtlVector<Det
 	GameLumpHandle_t handle = g_GameLumps.GetGameLumpHandle(lumpID);
 	if (handle != g_GameLumps.InvalidGameLump())
 		g_GameLumps.DestroyGameLump(handle);
-	int lightsize = lumpData.Size() * sizeof(DetailPropLightstylesLump_t);
+	int lightsize = lumpData.Count() * sizeof(DetailPropLightstylesLump_t);
 	int lumpsize = lightsize + sizeof(int);
 
 	handle = g_GameLumps.CreateGameLump( lumpID, lumpsize, 0, lumpVersion );
 
 	// Serialize the data
 	CUtlBuffer buf( g_GameLumps.GetGameLump(handle), lumpsize );
-	buf.PutInt( lumpData.Size() );
+	buf.PutInt( lumpData.Count() );
 	if (lightsize)
 		buf.Put( lumpData.Base(), lightsize );
 }
@@ -954,7 +954,7 @@ void UnserializeDetailPropLighting( int lumpID, int lumpVersion, CUtlVector<Deta
 		return;
 	}
 	lumpData.SetCount( count );
-	int lightsize = lumpData.Size() * sizeof(DetailPropLightstylesLump_t);
+	int lightsize = lumpData.Count() * sizeof(DetailPropLightstylesLump_t);
 	buf.Get( lumpData.Base(), lightsize );
 }
 

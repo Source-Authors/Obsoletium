@@ -10,6 +10,7 @@
 #include "DispColl_Common.h"
 #include "radial.h"
 #include "CollisionUtils.h"
+#include "bspflags.h"
 #include "tier0\dbg.h"
 
 #define SAMPLE_BBOX_SLOP		5.0f
@@ -390,7 +391,7 @@ float CVRADDispColl::CreateParentPatches( void )
 	// Get the number of displacement subdivisions.
 	int nInterval = GetWidth();
 
-	Vector vecPoints[4];
+	Vector vecPoints[4] = {};
 	vecPoints[0].Init( m_aVerts[0].x, m_aVerts[0].y, m_aVerts[0].z );
 	vecPoints[1].Init( m_aVerts[(nInterval*(nInterval-1))].x, m_aVerts[(nInterval*(nInterval-1))].y, m_aVerts[(nInterval*(nInterval-1))].z );
 	vecPoints[2].Init( m_aVerts[((nInterval*nInterval)-1)].x, m_aVerts[((nInterval*nInterval)-1)].y, m_aVerts[((nInterval*nInterval)-1)].z );
@@ -1066,7 +1067,7 @@ void CVRADDispColl::AddPolysForRayTrace( void )
 	if ( !( m_nContents & MASK_OPAQUE ) )
 		return;
 
-	for ( int ndxTri = 0; ndxTri < m_aTris.Size(); ndxTri++ )
+	for ( int ndxTri = 0; ndxTri < m_aTris.Count(); ndxTri++ )
 	{
 		CDispCollTri *tri = m_aTris.Base() + ndxTri;
 		int v[3];

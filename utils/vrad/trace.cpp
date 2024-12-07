@@ -151,7 +151,7 @@ public:
 void TestLine( const FourVectors& start, const FourVectors& stop,
                fltx4 *pFractionVisible, int static_prop_index_to_ignore )
 {
-	FourRays myrays;
+	FourRays myrays = {};
 	myrays.origin = start;
 	myrays.direction = stop;
 	myrays.direction -= myrays.origin;
@@ -352,7 +352,7 @@ void DM_ClipBoxToBrush( CToolTrace *trace, const Vector& mins, const Vector& max
 void TestLine_DoesHitSky( FourVectors const& start, FourVectors const& stop,
 	fltx4 *pFractionVisible, bool canRecurse, int static_prop_to_skip, bool bDoDebug )
 {
-	FourRays myrays;
+	FourRays myrays = {};
 	myrays.origin = start;
 	myrays.direction = stop;
 	myrays.direction -= myrays.origin;
@@ -603,7 +603,7 @@ void AddBrushesForRayTrace( void )
 	CUtlVector<int> brushList;
 	GetBrushes_r ( dmodels[0].headnode, brushList );
 
-	for ( int i = 0; i < brushList.Size(); i++ )
+	for ( int i = 0; i < brushList.Count(); i++ )
 	{
 		dbrush_t *brush = &dbrushes[brushList[i]];
 		AddBrushToRaytraceEnvironment ( brush, identity );
