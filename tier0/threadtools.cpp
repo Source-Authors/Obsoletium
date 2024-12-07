@@ -200,12 +200,12 @@ void ThreadSleep(unsigned nMilliseconds)
 //-----------------------------------------------------------------------------
 
 #ifndef ThreadGetCurrentId
-uint ThreadGetCurrentId()
+ThreadId_t ThreadGetCurrentId()
 {
 #ifdef _WIN32
 	return GetCurrentThreadId();
 #elif defined(POSIX)
-	return (uint)pthread_self();
+	return (ThreadId_t)pthread_self();
 #endif
 }
 #endif
@@ -325,7 +325,7 @@ void ThreadSetAffinity( ThreadHandle_t hThread, ptrdiff_t nAffinityMask )
 
 //-----------------------------------------------------------------------------
 
-uint InitMainThread()
+ThreadId_t InitMainThread()
 {
 #ifndef LINUX
 	// Skip doing the setname on Linux for the main thread. Here is why...
@@ -349,11 +349,11 @@ uint InitMainThread()
 #ifdef _WIN32
 	return ThreadGetCurrentId();
 #elif defined(POSIX)
-	return (uint)pthread_self();
+	return (ThreadId_t)pthread_self();
 #endif
 }
 
-uint g_ThreadMainThreadID = InitMainThread();
+ThreadId_t g_ThreadMainThreadID = InitMainThread();
 
 bool ThreadInMainThread()
 {
@@ -435,7 +435,7 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 
 	if ( s_pthread_setname_np_func )
 	{
-		if ( id == (uint32)-1 )
+		if ( id == (ThreadId_t)-1 )
 			id = pthread_self();
 
 		/* 
@@ -1284,9 +1284,9 @@ bool CThreadMutex::TryLock()
 
 #if defined( _WIN32 )
 #ifdef THREAD_MUTEX_TRACING_ENABLED
-	uint thisThreadID = ThreadGetCurrentId();
+	ThreadId_t thisThreadID = ThreadGetCurrentId();
 	if ( m_bTrace && m_currentOwnerID && ( m_currentOwnerID != thisThreadID ) )
-		Msg( "Thread %u about to try-wait for lock %p owned by %u\n", ThreadGetCurrentId(), (CRITICAL_SECTION *)&m_CriticalSection, m_currentOwnerID );
+		Msg( "Thread %lu about to try-wait for lock %p owned by %lu\n", ThreadGetCurrentId(), (CRITICAL_SECTION *)&m_CriticalSection, m_currentOwnerID );
 #endif
 	if ( DynTryEnterCriticalSection != NULL )
 	{
@@ -1298,7 +1298,7 @@ bool CThreadMutex::TryLock()
 				// we now own it for the first time.  Set owner information
 				m_currentOwnerID = thisThreadID;
 				if ( m_bTrace )
-					Msg( "Thread %u now owns lock 0x%p\n", m_currentOwnerID, (CRITICAL_SECTION *)&m_CriticalSection );
+					Msg( "Thread %lu now owns lock 0x%p\n", m_currentOwnerID, (CRITICAL_SECTION *)&m_CriticalSection );
 			}
 			m_lockCount++;
 #endif
@@ -1324,7 +1324,7 @@ bool CThreadMutex::TryLock()
 
 #define THREAD_SPIN (8*1024)
 
-void CThreadFastMutex::Lock( const uint32 threadId, unsigned nSpinSleepTime ) 
+void CThreadFastMutex::Lock( const ThreadId_t threadId, unsigned nSpinSleepTime ) 
 {
 	int i;
 	if ( nSpinSleepTime != TT_INFINITE )
@@ -1459,7 +1459,7 @@ void CThreadRWLock::UnlockWrite()
 //
 //-----------------------------------------------------------------------------
 
-void CThreadSpinRWLock::SpinLockForWrite( const uint32 threadId )
+void CThreadSpinRWLock::SpinLockForWrite( const ThreadId_t threadId )
 {
 	int i;
 
@@ -1500,16 +1500,12 @@ void CThreadSpinRWLock::LockForRead()
 	int i;
 
 	// In order to grab a read lock, the number of readers must not change and no thread can own the write lock
-	LockInfo_t oldValue;
-	LockInfo_t newValue;
-
-	oldValue.m_nReaders = m_lockInfo.m_nReaders;
-	oldValue.m_writerId = 0;
-	newValue.m_nReaders = oldValue.m_nReaders + 1;
-	newValue.m_writerId = 0;
+	LockInfo_t oldValue{0, m_lockInfo.m_nReaders};
+	LockInfo_t newValue{0, oldValue.m_nReaders + 1};
 
 	if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
 		return;
+
 	ThreadPause();
 	oldValue.m_nReaders = m_lockInfo.m_nReaders;
 	newValue.m_nReaders = oldValue.m_nReaders + 1;
@@ -1672,7 +1668,7 @@ const char *CThread::GetName()
 #ifdef _WIN32
 		_snprintf( m_szName, sizeof(m_szName) - 1, "Thread(%p/%p)", this, m_hThread );
 #elif defined(POSIX)
-		_snprintf( m_szName, sizeof(m_szName) - 1, "Thread(0x%x/0x%x)", (uint)this, (uint)m_threadId );
+		_snprintf( m_szName, sizeof(m_szName) - 1, "Thread(%p/0x%x)", this, (uint)m_threadId );
 #endif
 		m_szName[sizeof(m_szName) - 1] = 0;
 	}
@@ -1907,7 +1903,7 @@ bool CThread::SetPriority(int priority)
 
 void CThread::SuspendCooperative()
 {
-	if ( ThreadGetCurrentId() == (ThreadId_t)m_threadId )
+	if ( ThreadGetCurrentId() == m_threadId )
 	{
 		m_SuspendEventSignal.Set();
 		m_nSuspendCount = 1;

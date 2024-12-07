@@ -109,7 +109,7 @@ PLATFORM_INTERFACE bool ReleaseThreadHandle( ThreadHandle_t );
 //-----------------------------------------------------------------------------
 
 PLATFORM_INTERFACE void ThreadSleep(unsigned duration = 0);
-PLATFORM_INTERFACE uint ThreadGetCurrentId();
+PLATFORM_INTERFACE ThreadId_t ThreadGetCurrentId();
 PLATFORM_INTERFACE ThreadHandle_t ThreadGetCurrentHandle();
 PLATFORM_INTERFACE int ThreadGetPriority( ThreadHandle_t hThread = nullptr );
 PLATFORM_INTERFACE bool ThreadSetPriority( ThreadHandle_t hThread, int priority );
@@ -733,7 +733,7 @@ private:
 
 #ifdef THREAD_MUTEX_TRACING_SUPPORTED
 	// Debugging (always here to allow mixed debug/release builds w/o changing size)
-	uint	m_currentOwnerID;
+	ThreadId_t	m_currentOwnerID;
 	uint16	m_lockCount;
 	bool	m_bTrace;
 #endif
@@ -761,7 +761,7 @@ public:
 	}
 
 private:
-	FORCEINLINE bool TryLockInline( const uint32 threadId )
+	FORCEINLINE bool TryLockInline( const ThreadId_t threadId )
 	{
 		if ( threadId != m_ownerID.GetRaw() && !m_ownerID.AssignIf( 0, threadId ) )
 			return false;
@@ -771,7 +771,7 @@ private:
 		return true;
 	}
 
-	bool TryLock( const uint32 threadId )
+	bool TryLock( const ThreadId_t threadId )
 	{
 		return TryLockInline( threadId );
 	}
@@ -779,9 +779,9 @@ private:
 	// dimhotepus: This one is for old vphysics dll to work. 
 	PLATFORM_CLASS void Lock( const uint32 threadId, unsigned nSpinSleepTime ) volatile
 	{
-		const_cast<CThreadFastMutex *>(this)->Lock(threadId, nSpinSleepTime);
+		const_cast<CThreadFastMutex *>(this)->Lock( (ThreadId_t)threadId, nSpinSleepTime);
 	}
-	PLATFORM_CLASS void Lock( const uint32 threadId, unsigned nSpinSleepTime );
+	PLATFORM_CLASS void Lock( const ThreadId_t threadId, unsigned nSpinSleepTime );
 
 public:
 	bool TryLock()
@@ -801,7 +801,7 @@ public:
 #endif
 	void Lock( unsigned int nSpinSleepTime = 0 )
 	{
-		const uint32 threadId = ThreadGetCurrentId();
+		const ThreadId_t threadId = ThreadGetCurrentId();
 
 		if ( !TryLockInline( threadId ) )
 		{
@@ -1257,13 +1257,13 @@ public:
 private:
 	struct LockInfo_t
 		{
-			uint32	m_writerId;
+			ThreadId_t	m_writerId;
 			int		m_nReaders;
 		};
 
 	bool AssignIf( const LockInfo_t &newValue, const LockInfo_t &comperand );
-	bool TryLockForWrite( const uint32 threadId );
-	void SpinLockForWrite( const uint32 threadId );
+	bool TryLockForWrite( const ThreadId_t threadId );
+	void SpinLockForWrite( const ThreadId_t threadId );
 
 	volatile LockInfo_t m_lockInfo;
 
@@ -1652,9 +1652,9 @@ extern "C"
 inline void CThreadMutex::Lock()
 {
 #ifdef THREAD_MUTEX_TRACING_ENABLED
-		uint thisThreadID = ThreadGetCurrentId();
+		ThreadId_t thisThreadID = ThreadGetCurrentId();
 		if ( m_bTrace && m_currentOwnerID && ( m_currentOwnerID != thisThreadID ) )
-		Msg( "Thread %u about to wait for lock %p owned by %u\n", ThreadGetCurrentId(), (CRITICAL_SECTION *)&m_CriticalSection, m_currentOwnerID );
+		Msg( "Thread %lu about to wait for lock %p owned by %lu\n", ThreadGetCurrentId(), (CRITICAL_SECTION *)&m_CriticalSection, m_currentOwnerID );
 	#endif
 
 	VCRHook_EnterCriticalSection((CRITICAL_SECTION *)&m_CriticalSection);
@@ -1665,7 +1665,7 @@ inline void CThreadMutex::Lock()
 			// we now own it for the first time.  Set owner information
 			m_currentOwnerID = thisThreadID;
 			if ( m_bTrace )
-			Msg( "Thread %u now owns lock %p\n", m_currentOwnerID, (CRITICAL_SECTION *)&m_CriticalSection );
+			Msg( "Thread %lu now owns lock %p\n", m_currentOwnerID, (CRITICAL_SECTION *)&m_CriticalSection );
 		}
 		m_lockCount++;
 	#endif
@@ -1681,7 +1681,7 @@ inline void CThreadMutex::Unlock()
 		if (m_lockCount == 0)
 		{
 			if ( m_bTrace )
-			Msg( "Thread %u releasing lock %p\n", m_currentOwnerID, (CRITICAL_SECTION *)&m_CriticalSection );
+			Msg( "Thread %lu releasing lock %p\n", m_currentOwnerID, (CRITICAL_SECTION *)&m_CriticalSection );
 			m_currentOwnerID = 0;
 		}
 	#endif
@@ -1695,7 +1695,7 @@ inline bool CThreadMutex::AssertOwnedByCurrentThread() const
 #ifdef THREAD_MUTEX_TRACING_ENABLED
 	if (ThreadGetCurrentId() == m_currentOwnerID)
 		return true;
-	AssertMsg3( 0, "Expected thread %u as owner of lock %p, but %u owns", ThreadGetCurrentId(), (const CRITICAL_SECTION *)&m_CriticalSection, m_currentOwnerID );
+	AssertMsg3( 0, "Expected thread %lu as owner of lock %p, but %lu owns", ThreadGetCurrentId(), (const CRITICAL_SECTION *)&m_CriticalSection, m_currentOwnerID );
 	return false;
 #else
 	return true;
@@ -1807,7 +1807,7 @@ inline bool CThreadSpinRWLock::AssignIf( const LockInfo_t &newValue, const LockI
 	return ThreadInterlockedAssignIf64( (volatile int64 *)&m_lockInfo, *((const int64 *)&newValue), *((const int64 *)&comperand) );
 }
 
-inline bool CThreadSpinRWLock::TryLockForWrite( const uint32 threadId )
+inline bool CThreadSpinRWLock::TryLockForWrite( const ThreadId_t threadId )
 {
 	// In order to grab a write lock, there can be no readers and no owners of the write lock
 	if ( m_lockInfo.m_nReaders > 0 || ( m_lockInfo.m_writerId && m_lockInfo.m_writerId != threadId ) )
@@ -1860,7 +1860,7 @@ inline bool CThreadSpinRWLock::TryLockForRead()
 
 inline void CThreadSpinRWLock::LockForWrite()
 {
-	const uint32 threadId = ThreadGetCurrentId();
+	const ThreadId_t threadId = ThreadGetCurrentId();
 
 	++m_nWriters;
 

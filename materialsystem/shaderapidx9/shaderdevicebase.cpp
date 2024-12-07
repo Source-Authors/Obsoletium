@@ -902,7 +902,7 @@ void CShaderDeviceBase::SetCurrentThreadAsOwner()
 
 void CShaderDeviceBase::RemoveThreadOwner()
 {
-	m_dwThreadId = 0xFFFFFFFF;
+	m_dwThreadId = -1;
 }
 
 bool CShaderDeviceBase::ThreadOwnsDevice()

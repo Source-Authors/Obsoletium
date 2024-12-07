@@ -349,7 +349,7 @@ void CMaterialSystem::CleanUpErrorMaterial()
 //-----------------------------------------------------------------------------
 CMaterialSystem::CMaterialSystem()
 {
-	m_nRenderThreadID = 0xFFFFFFFF;
+	m_nRenderThreadID = -1;
 	m_hAsyncLoadFileCache = NULL;
 	m_ShaderHInst = NULL;
 	m_ShaderAPIFactory = NULL;
@@ -3364,7 +3364,7 @@ void CMaterialSystem::ThreadExecuteQueuedContext( CMatQueuedRenderContext *pCont
 	m_pRenderContext.Set( &m_HardwareRenderContext );
 	pContext->EndQueue( true );
 	m_pRenderContext.Set( pSavedRenderContext );
-	m_nRenderThreadID = 0xFFFFFFFF; 
+	m_nRenderThreadID = -1; 
 }
 
 IThreadPool *CMaterialSystem::CreateMatQueueThreadPool()

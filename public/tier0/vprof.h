@@ -400,8 +400,8 @@ public:
 	void Start();
 	void Stop();
 
-	void SetTargetThreadId( unsigned id ) { m_TargetThreadId = id; }
-	unsigned GetTargetThreadId() const { return m_TargetThreadId; }
+	void SetTargetThreadId( ThreadId_t id ) { m_TargetThreadId = id; }
+	ThreadId_t GetTargetThreadId() const { return m_TargetThreadId; }
 	bool InTargetThread() const { return ( m_TargetThreadId == ThreadGetCurrentId() ); }
 
 	void EnterScope( const tchar *pszName, int detailLevel, const tchar *pBudgetGroupName, bool bAssertAccounted );
@@ -545,7 +545,7 @@ protected:
 	tchar *m_CounterNames[MAXCOUNTERS];
 	int m_NumCounters;
 
-	unsigned m_TargetThreadId;
+	ThreadId_t m_TargetThreadId;
 
 	StreamOut_t				m_pOutputStream;
 };

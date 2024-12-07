@@ -125,7 +125,7 @@ static bool HaveExactMap( const char *pszMapName )
 static void FinishAsyncSave()
 {
 	LOCAL_THREAD_LOCK();
-	SaveMsg( "FinishAsyncSave() (%d/%d)\n", ThreadInMainThread(), ThreadGetCurrentId() );
+	SaveMsg( "FinishAsyncSave() (%d/%lu)\n", ThreadInMainThread(), ThreadGetCurrentId() );
 	if ( g_AsyncSaveCallQueue.Count() )
 	{
 		g_AsyncSaveCallQueue.CallQueued();
@@ -628,7 +628,7 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 		Sys_Sleep( clamp( save_asyncdelay.GetInt(), 0, 3000 ) );
 	}
 
-	SaveMsg( "Start save... (%d/%d)\n", ThreadInMainThread(), ThreadGetCurrentId() );
+	SaveMsg( "Start save... (%d/%lu)\n", ThreadInMainThread(), ThreadGetCurrentId() );
 	VPROF_BUDGET( "SaveGameSlot", "Save" );
 	char			hlPath[256], name[256], *pTokenData;
 	int				tag, i, tokenSize;
