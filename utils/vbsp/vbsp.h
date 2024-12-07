@@ -20,10 +20,6 @@
 #include "utilmatlib.h"
 #include "ChunkFile.h"
 
-#ifdef WIN32
-#pragma warning( disable: 4706 )
-#endif
-
 class CUtlBuffer;
 
 #define	MAX_BRUSH_SIDES	128
@@ -367,7 +363,7 @@ extern	bool		g_bAllowDetailCracks;
 extern	bool		g_bNoVirtualMesh;
 extern	char		outbase[32];
 
-extern	char	source[1024];
+extern	char	source[512];
 extern char		mapbase[ 64 ];
 extern CUtlVector<int> g_SkyAreas;
 
