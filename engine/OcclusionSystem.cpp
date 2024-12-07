@@ -946,7 +946,7 @@ private:
 
 private:
 	// Used to sort surfaces by screen area
-	static Surface_t *s_pSortSurfaces;
+	static thread_local Surface_t *s_pSortSurfaces;
 
 	// List of all edges
 	EdgeList_t m_Edges;
@@ -1242,7 +1242,7 @@ void CEdgeList::AddEdge( Vector **ppEdgeVertices, int nSurfID )
 //-----------------------------------------------------------------------------
 // Used to sort the surfaces
 //-----------------------------------------------------------------------------
-CEdgeList::Surface_t *CEdgeList::s_pSortSurfaces = NULL;
+thread_local CEdgeList::Surface_t *CEdgeList::s_pSortSurfaces = NULL;
 int __cdecl CEdgeList::SurfCompare( const void *elem1, const void *elem2 )
 {
 	int nSurfID1 = *(int*)elem1;
