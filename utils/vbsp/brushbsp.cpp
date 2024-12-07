@@ -7,6 +7,7 @@
 //=============================================================================//
 
 #include "vbsp.h"
+#include "bspflags.h"
 
 
 int		c_nodes;
@@ -294,10 +295,9 @@ AllocTree
 */
 tree_t *AllocTree (void)
 {
-	tree_t	*tree;
+	tree_t	*tree = (tree_t*)calloc(1, sizeof(*tree));
+	if (!tree) Error("Tree allocation failure.\n");
 
-	tree = (tree_t*)malloc(sizeof(*tree));
-	memset (tree, 0, sizeof(*tree));
 	ClearBounds (tree->mins, tree->maxs);
 
 	return tree;
@@ -312,14 +312,11 @@ node_t *AllocNode (void)
 {
 	static int s_NodeCount = 0;
 
-	node_t	*node;
+	node_t	*node = (node_t*)calloc(1, sizeof(*node));
+	if (!node) Error("Node allocation failure.\n");
 
-	node = (node_t*)malloc(sizeof(*node));
-	memset (node, 0, sizeof(*node));
-	node->id = s_NodeCount;
+	node->id = s_NodeCount++;
 	node->diskId = -1;
-
-	s_NodeCount++;
 
 	return node;
 }
@@ -334,12 +331,13 @@ bspbrush_t *AllocBrush (int numsides)
 {
 	static int s_BrushId = 0;
 
-	bspbrush_t	*bb;
-	int			c;
+	// dimhotepus: Use offsetof instead of handwritten magic.
+	constexpr size_t sidesOffset = offsetof(bspbrush_t, sides);
+	const size_t brushSize = sidesOffset + numsides * sizeof(side_t);
 
-	c = (int)&(((bspbrush_t *)0)->sides[numsides]);
-	bb = (bspbrush_t*)malloc(c);
-	memset (bb, 0, c);
+	bspbrush_t	*bb = (bspbrush_t*)calloc(1, brushSize);
+	if (!bb) Error("BSP brush allocation failure.\n");
+
 	bb->id = s_BrushId++;
 	if (numthreads == 1)
 		c_active_brushes++;
@@ -390,16 +388,14 @@ Duplicates the brush, the sides, and the windings
 */
 bspbrush_t *CopyBrush (bspbrush_t *brush)
 {
-	bspbrush_t *newbrush;
-	int			size;
-	int			i;
-	
-	size = (int)&(((bspbrush_t *)0)->sides[brush->numsides]);
+	bspbrush_t *newbrush = AllocBrush (brush->numsides);
+	// dimhotepus: Use offsetof instead of handwritten magic.
+	constexpr size_t sidesOffset = offsetof(bspbrush_t, sides);
+	const size_t brushSize = sidesOffset + brush->numsides * sizeof(side_t);
 
-	newbrush = AllocBrush (brush->numsides);
-	memcpy (newbrush, brush, size);
+	memcpy (newbrush, brush, brushSize);
 
-	for (i=0 ; i<brush->numsides ; i++)
+	for (int i=0 ; i<brush->numsides ; i++)
 	{
 		if (brush->sides[i].winding)
 			newbrush->sides[i].winding = CopyWinding (brush->sides[i].winding);
@@ -1074,12 +1070,12 @@ void SplitBrush( bspbrush_t *brush, int planenum, bspbrush_t **front, bspbrush_t
 		}
 	}
 
-	if (d_front < 0.1) // PLANESIDE_EPSILON)
+	if (d_front < 0.1f) // PLANESIDE_EPSILON)
 	{	// only on back
 		*back = CopyBrush (brush);
 		return;
 	}
-	if (d_back > -0.1) // PLANESIDE_EPSILON)
+	if (d_back > -0.1f) // PLANESIDE_EPSILON)
 	{	// only on front
 		*front = CopyBrush (brush);
 		return;
@@ -1238,9 +1234,8 @@ void SplitBrush( bspbrush_t *brush, int planenum, bspbrush_t **front, bspbrush_t
 
 {
 	vec_t	v1;
-	int		i;
 
-	for (i=0 ; i<2 ; i++)
+	for (int i=0 ; i<2 ; i++)
 	{
 		v1 = BrushVolume (b[i]);
 		if (v1 < 1.0)
