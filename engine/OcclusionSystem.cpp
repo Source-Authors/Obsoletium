@@ -939,7 +939,7 @@ private:
 	class EdgeLess
 	{
 	public:
-        bool Less( const unsigned short& src1, const unsigned short& src2, void *pCtx );
+        bool Less( const intp& src1, const intp& src2, void *pCtx );
 	};
 
 	static int __cdecl SurfCompare( const void *elem1, const void *elem2 );
@@ -950,8 +950,8 @@ private:
 
 	// List of all edges
 	EdgeList_t m_Edges;
-	CUtlSortVector<unsigned short, EdgeLess > m_OrigSortIndices;
-	CUtlVector<unsigned short> m_SortIndices;
+	CUtlSortVector<intp, EdgeLess> m_OrigSortIndices;
+	CUtlVector<intp> m_SortIndices;
 	Edge_t m_StartTerminal;
 	Edge_t m_EndTerminal;
 
@@ -982,7 +982,7 @@ private:
 //-----------------------------------------------------------------------------
 // Used to sort the edge list
 //-----------------------------------------------------------------------------
-bool CEdgeList::EdgeLess::Less( const unsigned short& src1, const unsigned short& src2, void *pCtx )
+bool CEdgeList::EdgeLess::Less( const intp& src1, const intp& src2, void *pCtx )
 {
 	EdgeList_t *pEdgeList = (EdgeList_t*)pCtx;
 
@@ -1266,7 +1266,7 @@ void CEdgeList::CullSmallOccluders()
 {	 
 	// Cull out all surfaces with too small of a screen area...
 	// Sort the surfaces by screen area, in descending order
-	int nSurfCount = m_Surfaces.Count();
+	intp nSurfCount = m_Surfaces.Count();
 	s_pSortSurfaces = m_Surfaces.Base();
 	qsort( m_SurfaceSort.Base(), nSurfCount, sizeof(int), SurfCompare );
 
@@ -1283,7 +1283,7 @@ void CEdgeList::CullSmallOccluders()
 	bool *bUseSurface = (bool*)stackalloc( nSurfCount * sizeof(bool) );
 	memset( bUseSurface, 0, nSurfCount * sizeof(bool) );
 	
-	int i;
+	intp i;
 	for ( i = 0; i < nSurfCount; ++i )
 	{
 		int nSurfID = m_SurfaceSort[i];
@@ -1294,12 +1294,12 @@ void CEdgeList::CullSmallOccluders()
 
 	MEM_ALLOC_CREDIT();
 
-	int nEdgeCount = m_OrigSortIndices.Count();
+	intp nEdgeCount = m_OrigSortIndices.Count();
 	m_SortIndices.RemoveAll();
 	m_SortIndices.EnsureCapacity( nEdgeCount );
 	for( i = 0; i < nEdgeCount; ++i )
 	{
-		int nEdgeIndex = m_OrigSortIndices[i];
+		intp nEdgeIndex = m_OrigSortIndices[i];
 		if ( bUseSurface[ m_Edges[ nEdgeIndex ].m_nSurfID ] )
 		{
 			m_SortIndices.AddToTail( nEdgeIndex ); 
