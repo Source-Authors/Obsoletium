@@ -65,10 +65,10 @@ void CFrameSnapshotManager::LevelChanged()
 
 CFrameSnapshot*	CFrameSnapshotManager::NextSnapshot( const CFrameSnapshot *pSnapshot )
 {
-	if ( !pSnapshot || ((unsigned short)pSnapshot->m_ListIndex == m_FrameSnapshots.InvalidIndex()) )
+	if ( !pSnapshot || (pSnapshot->m_ListIndex == m_FrameSnapshots.InvalidIndex()) )
 		return NULL;
 
-	int next = m_FrameSnapshots.Next(pSnapshot->m_ListIndex);
+	auto next = m_FrameSnapshots.Next(pSnapshot->m_ListIndex);
 
 	if ( next == m_FrameSnapshots.InvalidIndex() )
 		return NULL;
