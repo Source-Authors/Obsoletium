@@ -18,9 +18,6 @@
 //-----------------------------------------------------------------------------
 class CCommand;
 
-
-#define MAX_BUFFER_SIZE 2048
-
 //-----------------------------------------------------------------------------
 // Purpose: Holds benchmark data & state
 //-----------------------------------------------------------------------------
@@ -29,7 +26,7 @@ class CBenchmarkResults
 public:
 	CBenchmarkResults();
 
-	bool IsBenchmarkRunning();
+	bool IsBenchmarkRunning() const;
 	void StartBenchmark( const CCommand &args );
 	void StopBenchmark();
 	void SetResultsFilename( const char *pFilename );
@@ -39,7 +36,7 @@ private:
 	bool m_bIsTestRunning;
 	char m_szFilename[256];
 
-	float m_flStartTime;
+	double m_flStartTime;
 	int m_iStartFrame;
 };
 

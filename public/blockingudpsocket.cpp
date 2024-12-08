@@ -130,20 +130,15 @@ unsigned int CBlockingUDPSocket::ReceiveSocketMessage( sockaddr_in *packet_from,
 bool CBlockingUDPSocket::SendSocketMessage( const sockaddr_in & rRecipient, const unsigned char *buf, size_t bufsize )
 {
 	// Send data
-	int bytesSent = sendto
-		(
+	const auto bytesSent = sendto
+	(
 		m_Socket, 
 		(const char *)buf, 
 		(int)bufsize, 
 		0, 
 		reinterpret_cast< const sockaddr * >( &rRecipient ), 
 		sizeof( rRecipient ) 
-		);
+	);
 
-	if ( SOCKET_ERROR == bytesSent )
-	{
-		return false;
-	}
-
-	return true;
+	return SOCKET_ERROR != bytesSent;
 }
