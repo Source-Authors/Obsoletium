@@ -1240,7 +1240,7 @@ int CMapFile::SideIDToIndex( int brushSideID )
 //-----------------------------------------------------------------------------
 void ConvertSideList( entity_t *mapent, char *key )
 {
-	char *pszSideList = ValueForKey( mapent, key );
+	const char *pszSideList = ValueForKey( mapent, key );
 
 	if (pszSideList)
 	{
@@ -1288,10 +1288,12 @@ void ConvertSideList( entity_t *mapent, char *key )
 ChunkFileResult_t HandleNoDynamicShadowsEnt( entity_t *pMapEnt )
 {
 	// Get the list of the sides.
-	char *pSideList = ValueForKey( pMapEnt, "sides" );
+	const char *pSideList = ValueForKey( pMapEnt, "sides" );
+	// dimhotepus: Create a copy as strtok accepts non-const
+	char *sideList = copystring( pSideList );
 
 	// Parse the side list.
-	char *pScan = strtok( pSideList, " " );
+	char *pScan = strtok( sideList, " " );
 	if( pScan )
 	{
 		do
@@ -1304,6 +1306,8 @@ ChunkFileResult_t HandleNoDynamicShadowsEnt( entity_t *pMapEnt )
 			}
 		} while( ( pScan = strtok( NULL, " " ) ) );
 	}
+
+	free(sideList);
 	
 	// Clear out this entity.
 	pMapEnt->epairs = NULL;
@@ -2017,10 +2021,10 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	// automatically done in this processing.
 	for ( int i = 0; i < num_entities; i++ )
 	{
-		char *pEntity = ValueForKey( &entities[ i ], "classname" );
+		const char *pEntity = ValueForKey( &entities[ i ], "classname" );
 		if ( !strcmp( pEntity, "func_instance" ) )
 		{
-			char *pInstanceFile = ValueForKey( &entities[ i ], "file" );
+			const char *pInstanceFile = ValueForKey( &entities[ i ], "file" );
 			if ( pInstanceFile[ 0 ] )
 			{
 				char	InstancePath[ MAX_PATH ];
@@ -2335,8 +2339,8 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 	entity_t				*WorldspawnEnt = NULL;
 	GameData::TNameFixup	FixupStyle;
 
-	char *pTargetName = ValueForKey( pInstanceEntity, "targetname" );
-	char *pName = ValueForKey( pInstanceEntity, "name" );
+	const char *pTargetName = ValueForKey( pInstanceEntity, "targetname" );
+	const char *pName = ValueForKey( pInstanceEntity, "name" );
 	if ( pTargetName[ 0 ] )
 	{
 		sprintf( NameFixup, "%s", pTargetName );
@@ -2352,7 +2356,7 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 
 	for( int i = 0; i < num_entities; i++ )
 	{
-		char *pID = ValueForKey( &entities[ i ], "hammerid" );
+		const char *pID = ValueForKey( &entities[ i ], "hammerid" );
 		if ( pID[ 0 ] )
 		{
 			int value = atoi( pID );
@@ -2372,7 +2376,7 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 		entity_t *entity = &entities[ num_entities + i ];
 		entity->firstbrush += ( nummapbrushes - Instance->nummapbrushes );
 
-		char *pID = ValueForKey( entity, "hammerid" );
+		const char *pID = ValueForKey( entity, "hammerid" );
 		if ( pID[ 0 ] )
 		{
 			int value = atoi( pID );
@@ -2382,7 +2386,7 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 			SetKeyValue( entity, "hammerid", temp );
 		}
 
-		char *pEntity = ValueForKey( entity, "classname" );
+		const char *pEntity = ValueForKey( entity, "classname" );
 		if ( strcmpi( pEntity, "worldspawn" ) == 0 )
 		{
 			WorldspawnEnt = entity;
@@ -2408,7 +2412,7 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 				for( int i = 0; i < EntClass->GetVariableCount(); i++ )
 				{
 					GDinputvariable *EntVar = EntClass->GetVariableAt( i );
-					char *pValue = ValueForKey( entity, ( char * )EntVar->GetName() );
+					const char *pValue = ValueForKey( entity, ( char * )EntVar->GetName() );
 					if ( GD.RemapKeyValue( EntVar->GetName(), pValue, temp, FixupStyle ) )
 					{
 #ifdef MERGE_INSTANCE_DEBUG_INFO
@@ -2496,9 +2500,13 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 
 	num_entities += Instance->num_entities;
 
-	MoveBrushesToWorldGeneral( WorldspawnEnt );
-	WorldspawnEnt->numbrushes = 0;
-	WorldspawnEnt->epairs = NULL;
+	// dimhotepus: Ensure no null dereference.
+	if ( WorldspawnEnt )
+	{
+		MoveBrushesToWorldGeneral( WorldspawnEnt );
+		WorldspawnEnt->numbrushes = 0;
+		WorldspawnEnt->epairs = NULL;
+	}
 }
 
 
@@ -2770,7 +2778,8 @@ ChunkFileResult_t CMapFile::LoadSideCallback(CChunkFile *pFile, LoadSide_t *pSid
         
 				// save the td off in case there is an origin brush and we
 				// have to recalculate the texinfo
-				if (nummapbrushsides == MAX_MAP_BRUSHSIDES)
+				// dimhotepus: Notify if map brush sides overflow.
+				if (nummapbrushsides >= MAX_MAP_BRUSHSIDES)
 					g_MapError.ReportError ("MAX_MAP_BRUSHSIDES");
 				side_brushtextures[nummapbrushsides] = pSideInfo->td;
 				nummapbrushsides++;
