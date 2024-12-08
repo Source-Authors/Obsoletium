@@ -2399,10 +2399,8 @@ void CSaveRestore::ClearRestoredIndexTranslationTables()
 //-----------------------------------------------------------------------------
 int EntryInTable( CSaveRestoreData *pSaveData, const char *pMapName, int index )
 {
-	int i;
-
 	index++;
-	for ( i = index; i < pSaveData->levelInfo.connectionCount; i++ )
+	for ( int i = index; i < pSaveData->levelInfo.connectionCount; i++ )
 	{
 		if ( !stricmp( pSaveData->levelInfo.levelList[i].mapName, pMapName ) )
 			return i;
@@ -2444,22 +2442,26 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 {
 	FinishAsyncSave();
 
-	CSaveRestoreData currentLevelData, *pSaveData;
-	int				i, test, flags, index, movedCount = 0;
-	SAVE_HEADER		header;
-	Vector			landmarkOrigin;
-
+	CSaveRestoreData currentLevelData;
 	memset( &currentLevelData, 0, sizeof(CSaveRestoreData) );
+
+	int				test, flags, index, movedCount = 0;
+	SAVE_HEADER		header;
+
 	g_ServerGlobalVariables.pSaveData = &currentLevelData;
 	// Build the adjacent map list
 	serverGameDLL->BuildAdjacentMapList();
+
 	bool foundprevious = false;
 
-	for ( i = 0; i < currentLevelData.levelInfo.connectionCount; i++ )
+	for ( int i = 0; i < currentLevelData.levelInfo.connectionCount; i++ )
 	{
+		const auto &levelList = currentLevelData.levelInfo.levelList;
+		const char *mapName = levelList[i].mapName;
+
 		// make sure the previous level is in the connection list so we can
 		// bring over the player.
-		if ( !strcmpi( currentLevelData.levelInfo.levelList[i].mapName, pOldLevel ) )
+		if ( !strcmpi( mapName, pOldLevel ) )
 		{
 			foundprevious = true;
 		}
@@ -2467,29 +2469,31 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 		for ( test = 0; test < i; test++ )
 		{
 			// Only do maps once
-			if ( !stricmp( currentLevelData.levelInfo.levelList[i].mapName, currentLevelData.levelInfo.levelList[test].mapName ) )
+			if ( !stricmp( mapName, levelList[test].mapName ) )
 				break;
 		}
 		// Map was already in the list
 		if ( test < i )
 			continue;
 
-//		ConMsg("Merging entities from %s ( at %s )\n", currentLevelData.levelInfo.levelList[i].mapName, currentLevelData.levelInfo.levelList[i].landmarkName );
-		pSaveData = LoadSaveData( GetSaveGameMapName( currentLevelData.levelInfo.levelList[i].mapName ) );
-
+//		ConMsg("Merging entities from %s ( at %s )\n", mapName, levelList[i].landmarkName );
+		CSaveRestoreData *pSaveData = LoadSaveData( GetSaveGameMapName( mapName ) );
 		if ( pSaveData )
 		{
 			serverGameDLL->ReadRestoreHeaders( pSaveData );
 
 			ParseSaveTables( pSaveData, &header, 0 );
-			EntityPatchRead( pSaveData, currentLevelData.levelInfo.levelList[i].mapName );
+			EntityPatchRead( pSaveData, mapName );
 			pSaveData->levelInfo.time = sv.GetTime();// - header.time;
 			pSaveData->levelInfo.fUseLandmark = true;
 			flags = 0;
+
+			Vector landmarkOrigin;
 			LandmarkOrigin( &currentLevelData, landmarkOrigin, pLandmarkName );
 			LandmarkOrigin( pSaveData, pSaveData->levelInfo.vecLandmarkOffset, pLandmarkName );
+
 			VectorSubtract( landmarkOrigin, pSaveData->levelInfo.vecLandmarkOffset, pSaveData->levelInfo.vecLandmarkOffset );
-			if ( !stricmp( currentLevelData.levelInfo.levelList[i].mapName, pOldLevel ) )
+			if ( !stricmp( mapName, pOldLevel ) )
 				flags |= FENTTABLE_PLAYER;
 
 			index = -1;
@@ -2506,17 +2510,18 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 
 			// If ents were moved, rewrite entity table to save file
 			if ( movedCount )
-				EntityPatchWrite( pSaveData, GetSaveGameMapName( currentLevelData.levelInfo.levelList[i].mapName ) );
+				EntityPatchWrite( pSaveData, GetSaveGameMapName( mapName ) );
 
-			BuildRestoredIndexTranslationTable( currentLevelData.levelInfo.levelList[i].mapName, pSaveData, true );
+			BuildRestoredIndexTranslationTable( mapName, pSaveData, true );
 
 			Finish( pSaveData );
 		}
 	}
+
 	g_ServerGlobalVariables.pSaveData = NULL;
+
 	if ( !foundprevious )
 	{
-		// Host_Error( "Level transition ERROR\nCan't find connection to %s from %s\n", pOldLevel, sv.GetMapName() );
 		Warning( "Level transition ERROR\nCan't find connection to %s from %s\n", pOldLevel, sv.GetMapName() );
 		Cbuf_AddText( "disconnect\n" );
 	}
