@@ -49,7 +49,7 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory,
 
 // Sleep time when not focus. Set to 0 to not sleep even if app doesn't have focus.
 // dimhotepus: Reduce default no focus sleep time from 50 to 25 milliseconds.
-ConVar engine_no_focus_sleep( "engine_no_focus_sleep", "25", FCVAR_ARCHIVE, "How much time in milliseconds to sleep", true, 0, true, INT_MAX );
+ConVar engine_no_focus_sleep( "engine_no_focus_sleep", "25", FCVAR_ARCHIVE, "How much time in milliseconds to sleep", true, 0, true, 1000.f );
 
 #define DEFAULT_FPS_MAX	300
 #define DEFAULT_FPS_MAX_S "300"
