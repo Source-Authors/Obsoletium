@@ -56,7 +56,7 @@ void CMaterialDict::Shutdown( )
 //-----------------------------------------------------------------------------
 void CMaterialDict::AddMaterialToMaterialList( IMaterialInternal *pMaterial )
 {
-	Assert( ThreadInMainThread() );
+	AUTO_LOCK(m_MaterialDictMutex);
 	MaterialLookup_t lookup;
 	lookup.m_pMaterial = pMaterial;
 	lookup.m_Name = pMaterial->GetName();
@@ -67,7 +67,7 @@ void CMaterialDict::AddMaterialToMaterialList( IMaterialInternal *pMaterial )
 
 void CMaterialDict::RemoveMaterialFromMaterialList( IMaterialInternal *pMaterial )
 {
-	Assert( ThreadInMainThread() );
+	AUTO_LOCK(m_MaterialDictMutex);
 	// Gotta iterate over this manually; name-based lookup is bogus if there are two
 	// materials with the same name, which can happen for procedural materials
 	// First remove all the subrect materials, because they'll point at their material pages.
@@ -131,13 +131,13 @@ void CMaterialDict::RemoveMaterialSubRect( IMaterialInternal *pMaterial )
 
 void CMaterialDict::RemoveMaterialFromMaterialList( MaterialHandle_t h )
 {
-	Assert( ThreadInMainThread() );
+	AUTO_LOCK(m_MaterialDictMutex);
 	m_MaterialDict.RemoveAt( h );
 }
 
 void CMaterialDict::RemoveAllMaterialsFromMaterialList()
 {
-	Assert( ThreadInMainThread() );
+	AUTO_LOCK(m_MaterialDictMutex);
 	m_MaterialDict.RemoveAll();
 }
 
@@ -146,8 +146,8 @@ void CMaterialDict::RemoveAllMaterials()
 	Assert( ThreadInMainThread() );
 
 	// First remove all the subrect materials, because they'll point at their material pages.
-	MaterialHandle_t i, iNext;
-	for (i = FirstMaterial(); i != InvalidMaterial(); i = iNext )
+	MaterialHandle_t iNext;
+	for (auto i = FirstMaterial(); i != InvalidMaterial(); i = iNext )
 	{
 		iNext = NextMaterial(i);
 		IMaterialInternal *pMaterial = GetMaterialInternal( i );
@@ -159,7 +159,7 @@ void CMaterialDict::RemoveAllMaterials()
 	}
 
 	// Now get rid of the rest of the materials, including the pages.
-	for (i = FirstMaterial(); i != InvalidMaterial(); i = NextMaterial(i) )
+	for (auto i = FirstMaterial(); i != InvalidMaterial(); i = NextMaterial(i) )
 	{
 		IMaterialInternal::DestroyMaterial( GetMaterialInternal( i ) );
 	}
