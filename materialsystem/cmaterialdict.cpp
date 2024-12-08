@@ -23,7 +23,6 @@
 bool CMaterialDict::MaterialLessFunc( const MaterialLookup_t& src1, 
 										   const MaterialLookup_t& src2 )
 {
-	Assert( ThreadInMainThread() );
 	// Always sort manually-created materials to the front
 	if ( src1.m_bManuallyCreated != src2.m_bManuallyCreated )
 		return src1.m_bManuallyCreated;
@@ -37,7 +36,6 @@ bool CMaterialDict::MaterialLessFunc( const MaterialLookup_t& src1,
 bool CMaterialDict::MissingMaterialLessFunc( const MissingMaterial_t& src1, 
 											const MissingMaterial_t& src2 )
 {
-	Assert( ThreadInMainThread() );
 	return src1.m_Name < src2.m_Name;
 }
 
