@@ -1137,9 +1137,8 @@ bool CHL2GameMovement::CanAccelerate()
 	}
 #endif
 
-	BaseClass::CanAccelerate();
-
-	return true;
+	// dimhotepus: Correct acceleration check, ensure base class applied.
+	return BaseClass::CanAccelerate();
 }
 
 
