@@ -11,11 +11,12 @@
 #endif
 
 #include "datamap.h"
-#include "checksum_crc.h"
+#include "tier0/commonmacros.h"
+#include "tier1/checksum_crc.h"
 
 #define MAX_BLOCK_BITS	13
 
-#define MAX_BLOCK_SIZE (1<<MAX_BLOCK_BITS )
+#define MAX_BLOCK_SIZE (1<<MAX_BLOCK_BITS)
 
 #define COMPILED_CAPTION_FILEID			MAKEID( 'V', 'C', 'C', 'D' )
 #define COMPILED_CAPTION_VERSION		1
@@ -42,10 +43,10 @@ struct CaptionLookup_t
 
 	void SetHash( char const *string )
 	{
-		int len = Q_strlen( string );
-		char *tempstr = (char *)_alloca( len + 1 );
-		Q_strncpy( tempstr, string, len + 1 );
-		Q_strlower( tempstr );
+		intp len = V_strlen( string );
+		char *tempstr = static_cast<char *>(_alloca( len + 1 ));
+		V_strncpy( tempstr, string, len + 1 );
+		V_strlower( tempstr );
 		CRC32_t temp;
 		CRC32_Init( &temp );
 		CRC32_ProcessBuffer( &temp, tempstr, len );

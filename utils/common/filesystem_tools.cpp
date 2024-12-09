@@ -13,11 +13,11 @@
 #include <unistd.h>
 #endif
 
-#include <cstdio>
 #include <sys/stat.h>
+
+#include "tier1/KeyValues.h"
 #include "tier1/strtools.h"
 #include "tier0/icommandline.h"
-#include "KeyValues.h"
 #include "tier2/tier2.h"
 
 #ifdef MPI

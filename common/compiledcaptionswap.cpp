@@ -5,11 +5,14 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "utlbuffer.h"
-#include "byteswap.h"
-#include "filesystem.h"
-#include "tier2/fileutils.h"
 #include "captioncompiler.h"
+
+#include "tier1/utlbuffer.h"
+#include "tier1/byteswap.h"
+
+#include "tier2/fileutils.h"
+
+#include "filesystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -38,8 +41,7 @@ bool SwapClosecaptionFile( void *pData )
 	CByteswap swap;
 	swap.ActivateByteSwapping( true );
 
-	CompiledCaptionHeader_t *pHdr = (CompiledCaptionHeader_t*)pData;
-
+	auto *pHdr = static_cast<CompiledCaptionHeader_t*>(pData);
 	if ( pHdr->magic != COMPILED_CAPTION_FILEID || pHdr->version != COMPILED_CAPTION_VERSION )
 	{
 		// bad data
@@ -47,12 +49,12 @@ bool SwapClosecaptionFile( void *pData )
 	}
 
 	// lookup headers
-	pData = (byte*)pData + sizeof(CompiledCaptionHeader_t);
+	pData = static_cast<byte*>(pData) + sizeof(CompiledCaptionHeader_t);
 	swap.SwapFieldsToTargetEndian( (CaptionLookup_t*)pData, pHdr->directorysize );
 
 	// unicode data
 	pData = (byte*)pHdr + pHdr->dataoffset;
-	swap.SwapBufferToTargetEndian( (wchar_t*)pData, (wchar_t*)pData, pHdr->numblocks * pHdr->blocksize / sizeof(wchar_t) );
+	swap.SwapBufferToTargetEndian( static_cast<wchar_t*>(pData), static_cast<wchar_t*>(pData), pHdr->numblocks * pHdr->blocksize / sizeof(wchar_t) );
 
 	// post-swap file header
 	swap.SwapFieldsToTargetEndian( pHdr );
