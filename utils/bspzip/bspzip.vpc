@@ -21,9 +21,21 @@ $Configuration
 	{
 		$EnableLargeAddresses				"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)"
 	}
+
+	$ManifestTool
+	{
+		// Input And Output
+		$AdditionalManifestFiles			"$BASE;$SRCDIR\build\win\manifests\dpi-aware.manifest;$SRCDIR\build\win\manifests\ultra-high-scroll-resolution.manifest;$SRCDIR\build\win\manifests\utf-8-code-page.manifest;$SRCDIR\out\manifests\enable-visual-styles.manifest" [!$SOURCESDK]
+	}
+
+	$Resources
+	{
+		// General
+		$PreprocessorDefinitions			"$BASE;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTEhammer\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTEhammer.exe\$QUOTE"
+	}
 }
 
-$Project "Bspzip"
+$Project "bspzip"
 {
 	$Folder	"Source Files"
 	{

@@ -2485,7 +2485,7 @@ void ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName )
 		FILE *fp = fopen( pZipFileName, "wb" );
 		if( !fp )
 		{
-			fprintf( stderr, "Can't open %s\n", pZipFileName );
+			fprintf( stderr, "Can't open BSP '%s'.\n", pZipFileName );
 			return;
 		}
 
@@ -2494,7 +2494,7 @@ void ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName )
 	}
 	else
 	{
-		fprintf( stderr, "Zip file is zero length!\n" );
+		fprintf( stderr, "'%s' zip file is zero length!\n", pBSPFileName );
 	}
 }
 
@@ -3817,9 +3817,9 @@ static bool CRC_MapFile(CRC32_t *crcvalue, const char *pszFileName)
 }
 
 
-void SetHDRMode( bool bHDR )
+bool SetHDRMode( bool bHDR )
 {
-	g_bHDR = bHDR;
+	bool bOldHDR = std::exchange(g_bHDR, bHDR);
 	if ( bHDR )
 	{
 		pdlightdata = &dlightdataHDR;
@@ -3841,6 +3841,8 @@ void SetHDRMode( bool bHDR )
 	extern void VRadDetailProps_SetHDRMode( bool bHDR );
 	VRadDetailProps_SetHDRMode( bHDR );
 #endif
+
+	return bOldHDR;
 }
 
 bool SwapVHV( void *pDestBase, void *pSrcBase )

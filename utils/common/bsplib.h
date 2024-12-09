@@ -387,7 +387,22 @@ extern CUtlVector<clusterlist_t> g_ClusterLeaves;
 // Call this to build the mapping from cluster to leaves
 void BuildClusterTable( );
 
-void SetHDRMode( bool bHDR );
+bool SetHDRMode( bool bHDR );
+
+class ScopedHDRMode
+{
+ public:
+  explicit ScopedHDRMode(bool isHDR) noexcept : m_wasHDR{SetHDRMode(isHDR)} {}
+  ~ScopedHDRMode() noexcept { SetHDRMode(m_wasHDR); }
+
+  ScopedHDRMode(ScopedHDRMode &&) = delete;
+  ScopedHDRMode& operator=(ScopedHDRMode &&) = delete;
+  ScopedHDRMode(ScopedHDRMode &) = delete;
+  ScopedHDRMode &operator=(ScopedHDRMode &) = delete;
+
+ private:
+  const bool m_wasHDR;
+};
 
 // ----------------------------------------------------------------------------- //
 // Helper accessors for the various structures.
