@@ -3202,11 +3202,11 @@ void CAI_BaseNPC::UpdateEfficiency( bool bInPVS )
 		{
 			CSound *pCurrentSound = CSoundEnt::SoundPointerForIndex( iSound );
 
-			float hearingSensitivity = HearingSensitivity();
-			Vector vEarPosition = EarPosition();
-
 			if ( pCurrentSound && (SOUND_DANGER & pCurrentSound->SoundType()) )
 			{
+				float hearingSensitivity = HearingSensitivity();
+				Vector vEarPosition = EarPosition();
+
 				float flHearDistanceSq = pCurrentSound->Volume() * hearingSensitivity;
 				flHearDistanceSq *= flHearDistanceSq;
 				if ( pCurrentSound->GetSoundOrigin().DistToSqr( vEarPosition ) <= flHearDistanceSq )
@@ -3219,6 +3219,11 @@ void CAI_BaseNPC::UpdateEfficiency( bool bInPVS )
 			if ( pCurrentSound )
 			{
 				iSound = pCurrentSound->NextSound();
+			}
+			else
+			{
+				// dimhotepus: Break if no current sound.
+				break;
 			}
 		}
 	}
