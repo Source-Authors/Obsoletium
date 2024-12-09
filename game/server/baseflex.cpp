@@ -2154,8 +2154,9 @@ void CBaseFlex::DoBodyLean( void )
 		{
 			m_vecPrevVelocity = vecDelta;
 			float decay =  ExponentialDecay( 0.5, 0.1, dt );
-			m_vecShift = m_vecLean * decay;
-			m_vecLean = m_vecShift * decay;
+			// dimhotepus: Ensure correct shifting and leaning are applied to bodies.
+			m_vecShift = m_vecShift * decay;
+			m_vecLean = m_vecLean * decay;
  		}
 
 		m_vecPrevOrigin = vecOrigin;
