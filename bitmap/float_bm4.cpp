@@ -25,7 +25,6 @@
 // In order to handle intersections with wrapped copies, we repeat the bitmap triangles this many
 // times
 constexpr int NREPS_TILE{1};
-extern int n_intersection_calculations;
 
 
 
