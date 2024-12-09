@@ -1712,6 +1712,12 @@ void CHL2_Player::CommanderMode()
 //-----------------------------------------------------------------------------
 void CHL2_Player::CheatImpulseCommands( int iImpulse )
 {
+	// dimhotepus: Cheats can be applied only in cheat mode.
+	if ( !sv_cheats->GetBool() )
+	{
+		return;
+	}
+
 	switch( iImpulse )
 	{
 	case 50:
