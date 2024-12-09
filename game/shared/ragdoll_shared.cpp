@@ -882,15 +882,15 @@ void CRagdollLRURetirement::Update( float frametime ) // EPISODIC VERSION
 	
 		for ( i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next )
 		{
-			CBaseAnimating *pRagdoll = m_LRU[i].Get();
-
 			next = m_LRU.Next(i);
-			IPhysicsObject *pObject = pRagdoll->VPhysicsGetObject();
-			if ( pRagdoll && (pRagdoll->GetEffectEntity() || ( pObject && !pObject->IsAsleep()) ) )
-				continue;
-
+			
+			CBaseAnimating *pRagdoll = m_LRU[i].Get();
 			if ( pRagdoll )
 			{
+				IPhysicsObject *pObject = pRagdoll->VPhysicsGetObject();
+				if ( pRagdoll->GetEffectEntity() || ( pObject && !pObject->IsAsleep()) )
+					continue;
+
 				// float distToPlayer = (pPlayer->GetAbsOrigin() - pRagdoll->GetAbsOrigin()).LengthSqr();
 				float distToPlayer = (PlayerOrigin - pRagdoll->GetAbsOrigin()).LengthSqr();
 
