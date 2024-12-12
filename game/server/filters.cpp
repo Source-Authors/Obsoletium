@@ -372,7 +372,8 @@ protected:
 
 	bool PassesDamageFilterImpl(const CTakeDamageInfo &info)
 	{
-	 	return info.GetDamageType() == m_iDamageType;
+		// dimhotepus: Fix damage type filter to check all bits of damage are set.
+	 	return (info.GetDamageType() & m_iDamageType) == m_iDamageType;
 	}
 
 	int m_iDamageType;
