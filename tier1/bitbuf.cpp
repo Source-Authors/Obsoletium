@@ -729,6 +729,7 @@ void bf_write::WriteLongLong(int64 val)
 {
 	uint32 *pLongs = (uint32*)&val;
 
+	// dimhotepus: Fix writing int64 bits in LP64 model.
 	// Insert the two DWORDS according to network endian
 	const short endianIndex = 0x0100;
 	byte *idx = (byte*)&endianIndex;
@@ -876,24 +877,23 @@ void bf_read::ReadBits(void *pOutData, int nBits)
 		nBitsLeft -= 8;
 	}
 
-	// X360TBD: Can't read dwords in ReadBits because they'll get swapped
-	if ( IsPC() )
+	// dimhotepus: Fix reading int32 bits in LP64 model.
+	constexpr int kBitsInInt32{CHAR_BIT * sizeof(uint32)};
+
+	// read dwords
+	while ( nBitsLeft >= kBitsInInt32 )
 	{
-		// read dwords
-		while ( nBitsLeft >= 32 )
-		{
-			*((unsigned long*)pOut) = ReadUBitLong(32);
-			pOut += sizeof(unsigned long);
-			nBitsLeft -= 32;
-		}
+		*((uint32*)pOut) = ReadUBitLong(kBitsInInt32);
+		pOut += sizeof(uint32);
+		nBitsLeft -= kBitsInInt32;
 	}
 
 	// read remaining bytes
-	while ( nBitsLeft >= 8 )
+	while ( nBitsLeft >= CHAR_BIT )
 	{
-		*pOut = ReadUBitLong(8);
+		*pOut = ReadUBitLong(CHAR_BIT);
 		++pOut;
-		nBitsLeft -= 8;
+		nBitsLeft -= CHAR_BIT;
 	}
 	
 	// read remaining bits
@@ -1329,7 +1329,8 @@ int64 bf_read::ReadLongLong()
 {
 	int64 retval;
 	uint32 *pLongs = (uint32*)&retval;
-
+	
+	// dimhotepus: Fix reading int64 bits in LP64 model.
 	// Read the two DWORDs according to network endian
 	const short endianIndex = 0x0100;
 	byte *idx = (byte*)&endianIndex;
