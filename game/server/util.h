@@ -539,7 +539,7 @@ int SENTENCEG_PickRndSz(const char *szrootname);
 int SENTENCEG_GetIndex(const char *szrootname);
 int SENTENCEG_Lookup(const char *sample);
 
-char TEXTURETYPE_Find( trace_t *ptr );
+unsigned short TEXTURETYPE_Find(trace_t *ptr);
 
 void UTIL_EmitSoundSuit(edict_t *entity, const char *sample);
 int  UTIL_EmitGroupIDSuit(edict_t *entity, int isentenceg);

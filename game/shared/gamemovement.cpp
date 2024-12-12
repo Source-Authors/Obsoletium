@@ -825,7 +825,7 @@ void CGameMovement::PlantFootprint( surfacedata_t *psurface )
 			UTIL_TraceLine( hipOrigin, hipOrigin + Vector(0, 0, -COORD_EXTENT * 1.74), 
 							MASK_SOLID_BRUSHONLY, edict(), COLLISION_GROUP_NONE, &tr);
 
-			unsigned char mType = TEXTURETYPE_Find( &tr );
+			unsigned short mType = TEXTURETYPE_Find( &tr );
 
 			// Splat a decal
 			CPVSFilter filter( tr.endpos );

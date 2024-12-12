@@ -1518,7 +1518,7 @@ int UTIL_EmitGroupnameSuit(edict_t *entity, const char *groupname)
 // texture name to a material type.  Play footstep sound based
 // on material type.
 
-char TEXTURETYPE_Find( trace_t *ptr )
+unsigned short TEXTURETYPE_Find( trace_t *ptr )
 {
 	const surfacedata_t *psurfaceData = physprops->GetSurfaceData( ptr->surface.surfaceProps );
 
