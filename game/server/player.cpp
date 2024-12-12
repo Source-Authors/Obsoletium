@@ -3519,7 +3519,9 @@ bool CBasePlayer::IsUserCmdDataValid( CUserCmd *pCmd )
 	const int nMinDelta = Max( 0, gpGlobals->tickcount - nCmdMaxTickDelta );
 	const int nMaxDelta = gpGlobals->tickcount + nCmdMaxTickDelta;
 
-	bool bValid = ( pCmd->tick_count >= nMinDelta && pCmd->tick_count < nMaxDelta ) &&
+	// dimhotepus: Threaded engine tick count validation is not working.
+	// dimhotepus: It causes player to ignore move commands.
+	bool bValid = ( IsEngineThreaded() || ( pCmd->tick_count >= nMinDelta && pCmd->tick_count < nMaxDelta ) ) &&
 				  // Prevent clients from sending invalid view angles to try to get leaf server code to crash
 				  ( pCmd->viewangles.IsValid() && IsEntityQAngleReasonable( pCmd->viewangles ) ) &&
 				  // Movement ranges
