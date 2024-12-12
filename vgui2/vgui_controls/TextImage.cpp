@@ -914,7 +914,7 @@ void TextImage::RecalculateCenterWrapIndents()
 		else if (ch == '\n')
 		{
 			intp iIdx = m_LineXIndent.AddToTail();
-			m_LineXIndent[iIdx] = (_drawWidth - iCurLineW) * 0.5f;
+			m_LineXIndent[iIdx] = (_drawWidth - iCurLineW) / 2;
 
 			iCurLineW = 0;
 			continue;
@@ -941,7 +941,7 @@ void TextImage::RecalculateCenterWrapIndents()
 			if (wsz == m_LineBreaks[currentLineBreak])
 			{
 				intp iIdx = m_LineXIndent.AddToTail();
-				m_LineXIndent[iIdx] = (_drawWidth - iCurLineW) * 0.5f;
+				m_LineXIndent[iIdx] = (_drawWidth - iCurLineW) / 2;
 
 				iCurLineW = 0;
 				currentLineBreak++;
