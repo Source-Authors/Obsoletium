@@ -138,7 +138,7 @@ static void CopyPending(int len, uint8 const *rawbytes,uint8 * &outbuf, uint8 co
   {
     if (limit-outbuf < len+1)
       Fail("diff buffer overrun");
-    *(outbuf++)=len;
+    *(outbuf++)=static_cast<uint8>(len);
     memcpy(outbuf,rawbytes,len);
     outbuf+=len;
   }
@@ -270,7 +270,7 @@ int FindDiffsForLargeFiles(uint8 const *NewBlock, uint8 const *OldBlock,
         {
           if (nremaining<2)
             Fail("diff buff needs increase");
-          *(outbuf++)=128+longest;
+          *(outbuf++)=128+static_cast<uint8>(longest);
           *(outbuf++)=(match_of&255);
         }
         else
@@ -279,7 +279,7 @@ int FindDiffsForLargeFiles(uint8 const *NewBlock, uint8 const *OldBlock,
           if (nremaining<4)
             Fail("diff buff needs increase");
           *(outbuf++)=0x80;          
-          *(outbuf++)=longest;
+          *(outbuf++)=static_cast<uint8>(longest);
           *(outbuf++)=(match_of & 255);
           *(outbuf++)=((match_of>>8) & 255);
         }
@@ -400,7 +400,7 @@ int FindDiffs(uint8 const *NewBlock, uint8 const *OldBlock,
         {
           if (nremaining<2)
             Fail("diff buff needs increase");
-          *(outbuf++)=128+longest;
+          *(outbuf++)=128+static_cast<uint8>(longest);
           *(outbuf++)=(match_of&255);
         }
         else
@@ -409,7 +409,7 @@ int FindDiffs(uint8 const *NewBlock, uint8 const *OldBlock,
           if (nremaining<4)
             Fail("diff buff needs increase");
           *(outbuf++)=0x80;
-          *(outbuf++)=longest;
+          *(outbuf++)=static_cast<uint8>(longest);
           *(outbuf++)=(match_of & 255);
           *(outbuf++)=((match_of>>8) & 255);
         }
@@ -509,7 +509,7 @@ int FindDiffsLowMemory(uint8 const *NewBlock, uint8 const *OldBlock,
         {
           if (nremaining<2)
             Fail("diff buff needs increase");
-          *(outbuf++)=128+longest;
+          *(outbuf++)=128+static_cast<uint8>(longest);
           *(outbuf++)=(match_of&255);
         }
         else
@@ -518,7 +518,7 @@ int FindDiffsLowMemory(uint8 const *NewBlock, uint8 const *OldBlock,
           if (nremaining<4)
             Fail("diff buff needs increase");
           *(outbuf++)=0x80;
-          *(outbuf++)=longest;
+          *(outbuf++)=static_cast<uint8>(longest);
           *(outbuf++)=(match_of & 255);
           *(outbuf++)=((match_of>>8) & 255);
         }
