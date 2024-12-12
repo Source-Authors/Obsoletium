@@ -909,10 +909,9 @@ template <class T>
 void	CUtlCachedFileData<T>::CheckDiskInfo( bool forcerebuild, long cacheFileTime )
 {
 	char fn[ 512 ];
-	unsigned short i;
 	if ( forcerebuild )
 	{
-		for ( i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
+		for ( auto i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
 		{
 			ElementType_t& element = m_Elements[ i ];
 			g_pFullFileSystem->String( element.handle, fn, sizeof( fn ) );
@@ -922,7 +921,7 @@ void	CUtlCachedFileData<T>::CheckDiskInfo( bool forcerebuild, long cacheFileTime
 	}
 
 	CUtlSortVector<CSortedCacheFile, CSortedCacheFile> list;
-	for ( i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
+	for ( auto i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
 	{
 		ElementType_t& element = m_Elements[ i ];
 		CSortedCacheFile insert;
@@ -960,7 +959,7 @@ void	CUtlCachedFileData<T>::CheckDiskInfo( bool forcerebuild, long cacheFileTime
 			bCheck = (pathTime > cacheFileTime) ? true : false;
 		}
 
-		for ( i = listStart; i < listEnd; i++ )
+		for ( auto i = listStart; i < listEnd; i++ )
 		{
 			ElementType_t& element = m_Elements[ list[i].index ];
 
