@@ -24,14 +24,14 @@
 #pragma intrinsic(_BitScanReverse)
 #pragma intrinsic(_BitScanForward)
 
-inline unsigned int CountLeadingZeros(unsigned int x)
+[[nodiscard]] static inline unsigned int CountLeadingZeros(unsigned int x)
 {
 	unsigned long firstBit;
 	if ( _BitScanReverse(&firstBit,x) )
 		return 31 - firstBit;
 	return 32;
 }
-inline unsigned int CountTrailingZeros(unsigned int elem)
+[[nodiscard]] static inline unsigned int CountTrailingZeros(unsigned int elem)
 {
 	unsigned long out;
 	if ( _BitScanForward(&out, elem) )
@@ -44,9 +44,9 @@ inline unsigned int CountTrailingZeros(unsigned int elem)
 #endif
 
 
-static std::atomic<BitBufErrorHandler> g_BitBufErrorHandler = 0;
+static std::atomic<BitBufErrorHandler> g_BitBufErrorHandler{nullptr};
 
-static constexpr inline int BitForBitnum(int bitnum)
+[[nodiscard]] static constexpr inline int BitForBitnum(int bitnum)
 {
 	return GetBitForBitnum(bitnum);
 }
