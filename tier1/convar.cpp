@@ -1349,11 +1349,13 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 
 		if ( bMin )
 		{
-			ConMsg( " min. %f", fMin );
+			// dimhotepus: Drop trailing zeros.
+			ConMsg( " min. %g", fMin );
 		}
 		if ( bMax )
 		{
-			ConMsg( " max. %f", fMax );
+			// dimhotepus: Drop trailing zeros.
+			ConMsg( " max. %g", fMax );
 		}
 
 		ConMsg( "\n" );
