@@ -727,13 +727,13 @@ void bf_write::WriteLong(long val)
 
 void bf_write::WriteLongLong(int64 val)
 {
-	uint *pLongs = (uint*)&val;
+	uint32 *pLongs = (uint32*)&val;
 
 	// Insert the two DWORDS according to network endian
 	const short endianIndex = 0x0100;
 	byte *idx = (byte*)&endianIndex;
-	WriteUBitLong(pLongs[*idx++], sizeof(long) << 3);
-	WriteUBitLong(pLongs[*idx], sizeof(long) << 3);
+	WriteUBitLong(pLongs[*idx++], sizeof(uint32) << 3);
+	WriteUBitLong(pLongs[*idx], sizeof(uint32) << 3);
 }
 
 void bf_write::WriteFloat(float val)
@@ -1328,13 +1328,13 @@ void bf_read::ReadBitAngles( QAngle& fa )
 int64 bf_read::ReadLongLong()
 {
 	int64 retval;
-	uint *pLongs = (uint*)&retval;
+	uint32 *pLongs = (uint32*)&retval;
 
 	// Read the two DWORDs according to network endian
 	const short endianIndex = 0x0100;
 	byte *idx = (byte*)&endianIndex;
-	pLongs[*idx++] = ReadUBitLong(sizeof(long) << 3);
-	pLongs[*idx] = ReadUBitLong(sizeof(long) << 3);
+	pLongs[*idx++] = ReadUBitLong(sizeof(uint32) << 3);
+	pLongs[*idx] = ReadUBitLong(sizeof(uint32) << 3);
 
 	return retval;
 }
