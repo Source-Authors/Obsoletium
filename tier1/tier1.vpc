@@ -27,7 +27,6 @@ $Project "tier1"
 	$Folder	"Source Files"
 	{
 		$File	"bitbuf.cpp"
-		$File	"newbitbuf.cpp"
 		$File	"byteswap.cpp"
 		$File	"characterset.cpp"
 		$File	"checksum_crc.cpp"
