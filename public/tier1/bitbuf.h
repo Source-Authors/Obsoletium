@@ -162,7 +162,7 @@ public:
 	void			SetAssertOnOverflow( bool bAssert );
 
 	// This can be set to assign a name that gets output if the buffer overflows.
-	const char*		GetDebugName();
+	const char*		GetDebugName() const;
 	void			SetDebugName( const char *pDebugName );
 
 

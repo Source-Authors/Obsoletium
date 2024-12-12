@@ -171,7 +171,7 @@ void bf_write::SetAssertOnOverflow( bool bAssert )
 }
 
 
-const char* bf_write::GetDebugName()
+const char* bf_write::GetDebugName() const
 {
 	return m_pDebugName;
 }
