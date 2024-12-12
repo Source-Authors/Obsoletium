@@ -3275,7 +3275,7 @@ void CShaderManager::SetVertexShader( VertexShader_t shader )
 #else
 	if ( vshLookup.m_Flags & SHADER_FAILED_LOAD )
 	{
-		Assert( 0 );
+		AssertMsg( false, "Can't load vertex shader '%s'.\n", m_ShaderSymbolTable.String( vshLookup.m_Name ) );
 		return;
 	}
 #ifdef _DEBUG
@@ -3374,7 +3374,7 @@ void CShaderManager::SetPixelShader( PixelShader_t shader )
 #else
 	if ( pshLookup.m_Flags & SHADER_FAILED_LOAD )
 	{
-		Assert( 0 );
+		AssertMsg( false, "Can't load pixel shader '%s'.\n", m_ShaderSymbolTable.String( pshLookup.m_Name ) );
 		return;
 	}
 #ifdef _DEBUG
