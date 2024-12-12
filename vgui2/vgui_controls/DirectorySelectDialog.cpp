@@ -363,8 +363,10 @@ void DirectorySelectDialog::BuildDirTree()
 	// clear current tree
 	m_pDirTree->RemoveAll();
 
+	// dimhotepus: Do not leak KevValues.
+	auto kv = KeyValues::AutoDelete(new KeyValues("root", "Text", m_szCurrentDrive));
 	// add in a root
-	int rootIndex = m_pDirTree->AddItem(new KeyValues("root", "Text", m_szCurrentDrive), -1);
+	int rootIndex = m_pDirTree->AddItem(kv, -1);
 
 	// build first level of the tree
 	ExpandTreeNode(m_szCurrentDrive, rootIndex);
