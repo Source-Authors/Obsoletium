@@ -13,10 +13,7 @@
 #include "tier1/strtools.h"
 #include "bitvec.h"
 
-// FIXME: Can't use this until we get multithreaded allocations in tier0 working for tools
-// This is used by VVIS and fails to link
-// NOTE: This must be the last file included!!!
-//#include "tier0/memdbgon.h"
+#include <atomic>
 
 #ifdef _X360
 // mandatory ... wary of above comment and isolating, tier0 is built as MT though
@@ -50,23 +47,24 @@ inline unsigned int CountTrailingZeros(unsigned int elem)
 #endif
 
 
-static BitBufErrorHandler g_BitBufErrorHandler = 0;
+static std::atomic<BitBufErrorHandler> g_BitBufErrorHandler = 0;
 
-constexpr inline int BitForBitnum(int bitnum)
+static constexpr inline int BitForBitnum(int bitnum)
 {
 	return GetBitForBitnum(bitnum);
 }
 
 void InternalBitBufErrorHandler( BitBufErrorType errorType, const char *pDebugName )
 {
-	if ( g_BitBufErrorHandler )
-		g_BitBufErrorHandler( errorType, pDebugName );
+	const auto copy = g_BitBufErrorHandler.load(std::memory_order::memory_order_relaxed);
+	if ( copy )
+		copy( errorType, pDebugName );
 }
 
 
-void SetBitBufErrorHandler( BitBufErrorHandler fn )
+BitBufErrorHandler SetBitBufErrorHandler( BitBufErrorHandler fn )
 {
-	g_BitBufErrorHandler = fn;
+  return g_BitBufErrorHandler.exchange(fn);
 }
 
 

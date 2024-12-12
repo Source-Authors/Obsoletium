@@ -64,7 +64,7 @@ using BitBufErrorHandler = void (*)(BitBufErrorType errorType, const char *pDebu
 
 
 // Use this to install the error handler. Call with NULL to uninstall your error handler.
-void SetBitBufErrorHandler( BitBufErrorHandler fn );
+BitBufErrorHandler SetBitBufErrorHandler( BitBufErrorHandler fn );
 
 
 //-----------------------------------------------------------------------------
