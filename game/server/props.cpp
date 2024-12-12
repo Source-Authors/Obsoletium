@@ -2812,7 +2812,7 @@ void CPhysicsProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 //-----------------------------------------------------------------------------
 bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
 {
-  KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
+	KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
 	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
 		KeyValues *pkvPropData = modelKeyValues->FindKey( "physgun_interactions" );
