@@ -746,7 +746,9 @@ inline int bf_read::ReadOneBit()
 
 inline float bf_read::ReadBitFloat()
 {
-	union { uint32 u; float f; } c = { ReadUBitLong(32) };
+	static_assert(alignof(uint32) == alignof(float));
+	static_assert(sizeof(uint32) == sizeof(float));
+	union { uint32 u; float f; } c = { ReadUBitLong(CHAR_BIT * sizeof(float)) };
 	return c.f;
 }
 
