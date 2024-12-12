@@ -4181,23 +4181,17 @@ bool CBaseFileSystem::FixUpPath( const char *pFileName, char *pFixedUpFileName, 
 	}
 	else 
 	{
-		//  Get the BASE_PATH, skip past  - if necessary, and lowercase the rest
-		//  Not just yet...
-
-
-		int iBaseLength = 0;
-		char pBaseDir[MAX_PATH];
-
 		//  Need to get "BASE_PATH" from the filesystem paths, and then check this name against it.
-		//
-		iBaseLength = GetSearchPath( "BASE_PATH", true, pBaseDir, sizeof( pBaseDir ) );
-		if ( iBaseLength )
+		if ( m_iBaseLength < 3 ) // If It's below 3 it's most likely empty. So we try again. (GetSearchPath never returns 0?)
+			m_iBaseLength = GetSearchPath( "BASE_PATH", true, m_pBaseDir, sizeof( m_pBaseDir ) );
+
+		if ( m_iBaseLength > 3 )
 		{
 			//  If the first part of the pFixedUpFilename is pBaseDir
 			//  then lowercase the part after that.
-			if ( *pBaseDir && (iBaseLength+1 < V_strlen( pFixedUpFileName ) ) && (0 != V_strncmp( pBaseDir, pFixedUpFileName, iBaseLength ) )  )
+			if ( *m_pBaseDir && (m_iBaseLength+1 < V_strlen( pFixedUpFileName ) ) && (0 != V_strncmp( m_pBaseDir, pFixedUpFileName, m_iBaseLength ) )  )
 			{
-				V_strlower( &pFixedUpFileName[iBaseLength-1] );
+				V_strlower( &pFixedUpFileName[m_iBaseLength-1] );
 			}
 		}
 	    
