@@ -464,13 +464,11 @@ BITBUF_INLINE void bf_write::WriteUBitVar( unsigned int data )
 // write raw IEEE float bits in little endian form
 BITBUF_INLINE void bf_write::WriteBitFloat(float val)
 {
-	long intVal;
+	static_assert(sizeof(int32) == sizeof(float));
+	static_assert(alignof(int32) == alignof(float));
 
-	Assert(sizeof(long) == sizeof(float));
-	Assert(sizeof(float) == 4);
-
-	intVal = *((long*)&val);
-	WriteUBitLong( intVal, 32 );
+	int32 intVal = *((int32*)&val);
+	WriteUBitLong( intVal, CHAR_BIT * sizeof(int32) );
 }
 
 //-----------------------------------------------------------------------------
