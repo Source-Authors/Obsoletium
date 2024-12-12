@@ -717,37 +717,10 @@ inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == a
 //-------------------------------------
 // Fast swaps
 //-------------------------------------
+// dimhotepus: Use C instead of ASM as it fallback to intrinsic.
 
-#if defined( _MSC_VER ) && !defined( PLATFORM_WINDOWS_PC64 )
-
-	template <typename T>
-	inline T WordSwap( T w )
-	{
-	   __asm
-	   {
-		  mov ax, w
-		  xchg al, ah
-	   }
-	}
-
-	template <typename T>
-	inline T DWordSwap( T dw )
-	{
-	   __asm
-	   {
-		  mov eax, dw
-		  bswap eax
-	   }
-	}
-
-#else
-
-	#define WordSwap  WordSwapC
-	#define DWordSwap DWordSwapC
-
-#endif
-
-// No ASM implementation for this yet
+#define WordSwap  WordSwapC
+#define DWordSwap DWordSwapC
 #define QWordSwap QWordSwapC
 
 //-------------------------------------
