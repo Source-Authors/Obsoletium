@@ -454,7 +454,7 @@ bool bf_write::WriteBits(const void *pInData, int nBits)
 		nBitsLeft -= 8;
 	}
 	
-	if ( IsPC() && (nBitsLeft >= 32) && (m_iCurBit & 7) == 0 )
+	if ( (nBitsLeft >= 32) && (m_iCurBit & 7) == 0 )
 	{
 		// current bit is byte aligned, do block copy
 		int numbytes = nBitsLeft >> 3; 
@@ -466,8 +466,7 @@ bool bf_write::WriteBits(const void *pInData, int nBits)
 		m_iCurBit += numbits;
 	}
 
-	// X360TBD: Can't write dwords in WriteBits because they'll get swapped
-	if ( IsPC() && nBitsLeft >= 32 )
+	if ( nBitsLeft >= 32 )
 	{
 		unsigned long iBitsRight = (m_iCurBit & 31);
 		unsigned long iBitsLeft = 32 - iBitsRight;
