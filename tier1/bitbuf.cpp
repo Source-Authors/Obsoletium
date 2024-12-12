@@ -1342,8 +1342,8 @@ int64 bf_read::ReadLongLong()
 float bf_read::ReadFloat()
 {
 	float ret;
-	Assert( sizeof(ret) == 4 );
-	ReadBits(&ret, 32);
+	static_assert( sizeof(ret) == 4 );
+	ReadBits(&ret, CHAR_BIT * sizeof(float));
 
 	// Swap the float, since ReadBits reads raw data
 	LittleFloat( &ret, &ret );
