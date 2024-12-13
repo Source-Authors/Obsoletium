@@ -2491,29 +2491,30 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 	lookup.m_hShaderFileCache = fileCacheIndex;
 
 	// fetch from cache
-	ShaderFileCache_t *pFileCache = &m_ShaderFileCache[fileCacheIndex];
-	ShaderHeader_t *pHeader = &pFileCache->m_Header;
+	ShaderFileCache_t &pFileCache = m_ShaderFileCache[fileCacheIndex];
+	ShaderHeader_t &pHeader = pFileCache.m_Header;
 
 	FileHandle_t hFile = FILESYSTEM_INVALID_HANDLE;
-	if ( pFileCache->IsValid() )
+	if ( pFileCache.IsValid() )
 	{
+		const char *shaderFileName = m_ShaderSymbolTable.String( pFileCache.m_Filename );
 		// using cached header, just open file, no read of header needed
-		hFile = OpenFileAndLoadHeader( m_ShaderSymbolTable.String( pFileCache->m_Filename ), NULL );
+		hFile = OpenFileAndLoadHeader( shaderFileName, NULL );
 		if ( hFile == FILESYSTEM_INVALID_HANDLE )
 		{
 			// shouldn't happen
-			Assert( 0 );
+			AssertMsg( false, "Couldn't load shader '%s'.\n", shaderFileName );
 			return false;
 		}
 	}
 	else
 	{
-		V_memset( pHeader, 0, sizeof( ShaderHeader_t ) );
+		V_memset( &pHeader, 0, sizeof( ShaderHeader_t ) );
 
 		// try the vsh/psh dir first
 		char filename[MAX_PATH];
 		V_sprintf_safe( filename, "shaders\\%s\\%s" SHADER_FNAME_EXTENSION, bVertexShader ? "vsh" : "psh", pName );
-		hFile = OpenFileAndLoadHeader( filename, pHeader );
+		hFile = OpenFileAndLoadHeader( filename, &pHeader );
 		if ( hFile == FILESYSTEM_INVALID_HANDLE )
 		{
 #ifdef DYNAMIC_SHADER_COMPILE
@@ -2521,47 +2522,49 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 			return LoadAndCreateShaders_Dynamic( lookup, bVertexShader );
 #else
 			// next, try the fxc dir
-			Q_snprintf( filename, MAX_PATH, "shaders\\fxc\\%s" SHADER_FNAME_EXTENSION, pName );
-			hFile = OpenFileAndLoadHeader( filename, pHeader );
+			V_sprintf_safe( filename, "shaders\\fxc\\%s" SHADER_FNAME_EXTENSION, pName );
+			hFile = OpenFileAndLoadHeader( filename, &pHeader );
 			if ( hFile == FILESYSTEM_INVALID_HANDLE )
 			{
 				lookup.m_Flags |= SHADER_FAILED_LOAD;
-				Warning( "Couldn't load %s shader %s\n", bVertexShader ? "vertex" : "pixel", pName );
+				Warning( "Couldn't load %s shader %s.\n", bVertexShader ? "vertex" : "pixel", pName );
 				return false;
 			}
 #endif
 		}
 
-		lookup.m_Flags = pHeader->m_nFlags;
+		lookup.m_Flags = pHeader.m_nFlags;
 
-		pFileCache->m_Name = lookup.m_Name;
-		pFileCache->m_Filename = m_ShaderSymbolTable.AddString( filename );
-		pFileCache->m_bVertexShader = bVertexShader;
+		pFileCache.m_Name = lookup.m_Name;
+		pFileCache.m_Filename = m_ShaderSymbolTable.AddString( filename );
+		pFileCache.m_bVertexShader = bVertexShader;
 
-		if ( pFileCache->IsOldVersion() )
+		if ( pFileCache.IsOldVersion() )
 		{ 
-			int referenceComboSize = ((ShaderHeader_t_v4 *)pHeader)->m_nDiffReferenceSize;
+			int referenceComboSize = ((ShaderHeader_t_v4 &)pHeader).m_nDiffReferenceSize;
 			if ( referenceComboSize )
 			{
 				// cache the reference combo
-				pFileCache->m_ReferenceCombo.EnsureCapacity( referenceComboSize );
-				g_pFullFileSystem->Read( pFileCache->m_ReferenceCombo.Base(), referenceComboSize, hFile );
+				pFileCache.m_ReferenceCombo.EnsureCapacity( referenceComboSize );
+				g_pFullFileSystem->Read( pFileCache.m_ReferenceCombo.Base(), referenceComboSize, hFile );
 			}
 		}
 		else
 		{
 			// cache the dictionary
-			pFileCache->m_StaticComboRecords.EnsureCount( pHeader->m_nNumStaticCombos );
-			g_pFullFileSystem->Read( pFileCache->m_StaticComboRecords.Base(), pHeader->m_nNumStaticCombos * sizeof( StaticComboRecord_t ), hFile );
-			if ( pFileCache->IsVersion6() )
+			pFileCache.m_StaticComboRecords.EnsureCount( pHeader.m_nNumStaticCombos );
+			g_pFullFileSystem->Read( pFileCache.m_StaticComboRecords.Base(),
+				pHeader.m_nNumStaticCombos * sizeof( StaticComboRecord_t ), hFile );
+			if ( pFileCache.IsVersion6() )
 			{
 				// read static combo alias records
 				int nNumDups;
 				g_pFullFileSystem->Read( &nNumDups, sizeof( nNumDups ), hFile );
 				if ( nNumDups )
 				{
-					pFileCache->m_StaticComboDupRecords.EnsureCount( nNumDups );
-					g_pFullFileSystem->Read( pFileCache->m_StaticComboDupRecords.Base(), nNumDups * sizeof( StaticComboAliasRecord_t ), hFile );
+					pFileCache.m_StaticComboDupRecords.EnsureCount( nNumDups );
+					g_pFullFileSystem->Read( pFileCache.m_StaticComboDupRecords.Base(),
+						nNumDups * sizeof( StaticComboAliasRecord_t ), hFile );
 				}
 			}
 
@@ -2569,14 +2572,14 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 	}
 
 	// FIXME: should make lookup and ShaderStaticCombos_t are pool allocated.
-	int i;
-	lookup.m_ShaderStaticCombos.m_nCount = pHeader->m_nDynamicCombos;
-	lookup.m_ShaderStaticCombos.m_pHardwareShaders = new HardwareShader_t[pHeader->m_nDynamicCombos];
+	lookup.m_ShaderStaticCombos.m_nCount = pHeader.m_nDynamicCombos;
+	lookup.m_ShaderStaticCombos.m_pHardwareShaders = new HardwareShader_t[pHeader.m_nDynamicCombos];
 	if ( m_bCreateShadersOnDemand )
 	{
-		lookup.m_ShaderStaticCombos.m_pCreationData = new ShaderStaticCombos_t::ShaderCreationData_t[pHeader->m_nDynamicCombos];
+		lookup.m_ShaderStaticCombos.m_pCreationData =
+			new ShaderStaticCombos_t::ShaderCreationData_t[pHeader.m_nDynamicCombos];
 	}
-	for ( i = 0; i < pHeader->m_nDynamicCombos; i++ )
+	for ( int i = 0; i < pHeader.m_nDynamicCombos; i++ )
 	{
 		lookup.m_ShaderStaticCombos.m_pHardwareShaders[i] = INVALID_HARDWARE_SHADER;
 	}
@@ -2584,18 +2587,18 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 	int nStartingOffset = 0;
 	int nEndingOffset = 0;
 
-	if ( pFileCache->IsOldVersion() )
+	if ( pFileCache.IsOldVersion() )
 	{
-		int nDictionaryOffset = sizeof( ShaderHeader_t ) + ((ShaderHeader_t_v4 *)pHeader)->m_nDiffReferenceSize;
+		int nDictionaryOffset = sizeof( ShaderHeader_t ) + ((ShaderHeader_t_v4 &)pHeader).m_nDiffReferenceSize;
 
 		// read in shader's dynamic combos directory
-		lookup.m_pComboDictionary = new ShaderDictionaryEntry_t[pHeader->m_nDynamicCombos];
+		lookup.m_pComboDictionary = new ShaderDictionaryEntry_t[pHeader.m_nDynamicCombos];
 		g_pFullFileSystem->Seek( hFile, nDictionaryOffset + lookup.m_nStaticIndex * sizeof( ShaderDictionaryEntry_t ), FILESYSTEM_SEEK_HEAD );
-		g_pFullFileSystem->Read( lookup.m_pComboDictionary, pHeader->m_nDynamicCombos * sizeof( ShaderDictionaryEntry_t ), hFile );
+		g_pFullFileSystem->Read( lookup.m_pComboDictionary, pHeader.m_nDynamicCombos * sizeof( ShaderDictionaryEntry_t ), hFile );
 
 		// want single read of all this shader's dynamic combos into a target buffer
 		// shaders are written sequentially, determine starting offset and length
-		for ( i = 0; i < pHeader->m_nDynamicCombos; i++ )
+		for ( int i = 0; i < pHeader.m_nDynamicCombos; i++ )
 		{
 			if ( lookup.m_pComboDictionary[i].m_Offset == -1 )
 			{
@@ -2615,43 +2618,45 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 		if ( !nStartingOffset )
 		{
 			g_pFullFileSystem->Close( hFile );
-			Warning( "Shader '%s' - All dynamic combos skipped. This is bad!\n", m_ShaderSymbolTable.String( pFileCache->m_Filename ) );
+			Warning( "Shader '%s' - All dynamic combos skipped. This is bad!\n",
+				m_ShaderSymbolTable.String( pFileCache.m_Filename ) );
 			return false;
 		}
 	}
 	else
 	{
-		int nStaticComboIdx = pFileCache->FindCombo( lookup.m_nStaticIndex / pFileCache->m_Header.m_nDynamicCombos );
+		int nStaticComboIdx = pFileCache.FindCombo( lookup.m_nStaticIndex / pFileCache.m_Header.m_nDynamicCombos );
 		if ( nStaticComboIdx == -1 )
 		{
 			g_pFullFileSystem->Close( hFile );
 			lookup.m_Flags |= SHADER_FAILED_LOAD;
-			Warning( "Shader '%s' - Couldn't load combo %d of shader (dyn=%d)\n", m_ShaderSymbolTable.String( pFileCache->m_Filename ), lookup.m_nStaticIndex, pFileCache->m_Header.m_nDynamicCombos );
+			Warning( "Shader '%s' - Couldn't load combo %d of shader (dyn=%d).\n",
+				m_ShaderSymbolTable.String( pFileCache.m_Filename ), lookup.m_nStaticIndex, pFileCache.m_Header.m_nDynamicCombos );
 			return false;
 		}
 
-		nStartingOffset = pFileCache->m_StaticComboRecords[nStaticComboIdx].m_nFileOffset;
-		nEndingOffset = pFileCache->m_StaticComboRecords[nStaticComboIdx+1].m_nFileOffset;
+		nStartingOffset = pFileCache.m_StaticComboRecords[nStaticComboIdx].m_nFileOffset;
+		nEndingOffset = pFileCache.m_StaticComboRecords[nStaticComboIdx+1].m_nFileOffset;
 	}
 
 	// align offsets for unbuffered optimal i/o - fastest i/o possible
 	unsigned nOffsetAlign, nSizeAlign, nBufferAlign;
 	g_pFullFileSystem->GetOptimalIOConstraints( hFile, &nOffsetAlign, &nSizeAlign, &nBufferAlign );
-	unsigned int nAlignedOffset = AlignValue( ( nStartingOffset - nOffsetAlign ) + 1, nOffsetAlign );
-	unsigned int nAlignedBytesToRead = AlignValue( nEndingOffset - nAlignedOffset, nSizeAlign );
+	unsigned nAlignedOffset = AlignValue( ( nStartingOffset - nOffsetAlign ) + 1, nOffsetAlign );
+	unsigned nAlignedBytesToRead = AlignValue( nEndingOffset - nAlignedOffset, nSizeAlign );
 
 	// used for adjusting provided buffer to actual data
 	lookup.m_nDataOffset = nStartingOffset - nAlignedOffset;
 
 	bool bOK = true;
 	{
-		//printf("\n CShaderManager::LoadAndCreateShaders - reading %d bytes from file offset %d", nAlignedBytesToRead, nAlignedOffset);
 		// single optimal read of all dynamic combos into monolithic buffer
-		uint8 *pOptimalBuffer = (uint8 *)g_pFullFileSystem->AllocOptimalReadBuffer( hFile, nAlignedBytesToRead, nAlignedOffset );
+		uint8 *pOptimalBuffer = (uint8 *)
+			g_pFullFileSystem->AllocOptimalReadBuffer( hFile, nAlignedBytesToRead, nAlignedOffset );
 		g_pFullFileSystem->Seek( hFile, nAlignedOffset, FILESYSTEM_SEEK_HEAD );
 		g_pFullFileSystem->Read( pOptimalBuffer, nAlignedBytesToRead, hFile );
 
-		if ( pFileCache->IsOldVersion() )
+		if ( pFileCache.IsOldVersion() )
 		{
 			bOK = CreateDynamicCombos_Ver4( &lookup, pOptimalBuffer );
 		}
@@ -2673,189 +2678,6 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 	return bOK;
 }
 
-
-//----------------------------------------------------------------------------------old code
-
-#if 0
-
-	// Set this convar internally to build or add to the shader cache file
-	// We really only expect this to work on DX_TO_GL_ABSTRACTION
-	ConVar mat_cacheshaders( "mat_cacheshaders", "0", FCVAR_DEVELOPMENTONLY );
-
-	#define SHADER_CACHE_FILE "shader_cache.cfg"
-	#define PROGRAM_CACHE_FILE "program_cache.cfg"
-
-	static void WriteToShaderCache( const char *pShaderName, const int nIndex )
-	{
-#ifndef DX_TO_GL_ABSTRACTION
-			return;
-#endif
-
-		KeyValues *pShaderCache = new KeyValues( "shadercache" );
-				// we don't load anything, it starts empty..  pShaderCache->LoadFromFile( g_pFullFileSystem, SHADER_CACHE_FILE, "MOD" );
-
-		if ( !pShaderCache )
-		{
-			Warning( "Could not write to shader cache file!\n" );
-			return;
-		}
-
-		// Subkey for specific shader
-		KeyValues *pShaderKey = pShaderCache->FindKey( pShaderName, true );
-		Assert( pShaderKey );
-
-		bool bFound = false;
-		int nKeys = 0;
-		char szIndex[8];
-		FOR_EACH_VALUE( pShaderKey, pValues )
-		{
-			if ( pValues->GetInt() == nIndex )
-			{
-				bFound = true;
-			}
-			nKeys++;
-		}
-
-		if ( !bFound )
-		{
-			V_to_chars( szIndex, nKeys );
-			pShaderKey->SetInt( szIndex, nIndex );
-		}
-
-		pShaderCache->SaveToFile( g_pFullFileSystem, SHADER_CACHE_FILE, "MOD" );
-		pShaderCache->deleteThis();
-	}
-
-void CShaderManager::WarmShaderCache()
-	{
-#ifndef DX_TO_GL_ABSTRACTION
-			return;
-#endif
-
-		// Don't access the cache if we're building it!
-		if ( mat_cacheshaders.GetBool() )
-			return;
-
-		// Don't warm the cache if we're just going to monkey with the shaders anyway
-	#ifdef DYNAMIC_SHADER_COMPILE
-		return;
-	#endif
-
-		double st = Sys_FloatTime();
-
-
-		//
-		// First we warm SHADERS  ===============================================
-		//
-
-		KeyValues *pShaderCache = new KeyValues( "shadercache" );
-		pShaderCache->LoadFromFile( g_pFullFileSystem, SHADER_CACHE_FILE, "MOD" );
-
-		if ( !pShaderCache )
-		{
-			Warning( "Could not find shader cache file!\n" );
-			return;
-		}
-
-		// Run through each shader in the cache
-		FOR_EACH_SUBKEY( pShaderCache, pShaderKey )
-		{
-			const char *pShaderName = pShaderKey->GetName();
-			bool bVertexShader = Q_stristr( pShaderName, "_vs20" ) || Q_stristr( pShaderName, "_vs30" );
-
-			FOR_EACH_VALUE( pShaderKey, pValue )
-			{
-				char	temp[1024];
-				int		staticIndex = pValue->GetInt();
-				
-				if ( bVertexShader )
-				{
-					V_snprintf( temp, sizeof(temp), "vs-file %s vs-index %d", pShaderName, staticIndex );
-					CreateVertexShader( pShaderName, staticIndex, temp );
-				}
-				else
-				{
-					V_snprintf( temp, sizeof(temp), "ps-file %s ps-index %d", pShaderName, staticIndex );
-					CreatePixelShader( pShaderName, staticIndex, temp );
-				}
-			}
-		}
-
-		pShaderCache->deleteThis();
-
-
-		//
-		// Next, we warm PROGRAMS (which are pairs of shaders)  =================
-		//
-
-		KeyValues *pProgramCache = new KeyValues( "programcache" );
-		pProgramCache->LoadFromFile( g_pFullFileSystem, PROGRAM_CACHE_FILE, "MOD" );
-
-		if ( !pProgramCache )
-		{
-			Warning( "Could not find program cache file!\n" );
-			return;
-		}
-
-		// Run through each program in the cache
-		FOR_EACH_SUBKEY( pProgramCache, pProgramKey )
-		{
-			KeyValues *pValue = pProgramKey->GetFirstValue();
-			const char *pVertexShaderName = pValue->GetString();
-			pValue = pValue->GetNextValue();
-			const char *pPixelShaderName = pValue->GetString();
-			pValue = pValue->GetNextValue();
-			int nVertexShaderStaticIndex = pValue->GetInt();
-			pValue = pValue->GetNextValue();
-			int nPixelShaderStaticIndex = pValue->GetInt();
-			pValue = pValue->GetNextValue();
-			int nVertexShaderDynamicIndex = pValue->GetInt();
-			pValue = pValue->GetNextValue();
-			int nPixelShaderDynamicIndex = pValue->GetInt();
-
-			ShaderLookup_t vshLookup;
-			vshLookup.m_Name = m_ShaderSymbolTable.AddString( pVertexShaderName ); // TODO: use String() here and catch this odd case
-			vshLookup.m_nStaticIndex = nVertexShaderStaticIndex;
-			VertexShader_t vertexShader = m_VertexShaderDict.Find( vshLookup );
-
-			ShaderLookup_t pshLookup;
-			pshLookup.m_Name = m_ShaderSymbolTable.AddString( pPixelShaderName );
-			pshLookup.m_nStaticIndex = nPixelShaderStaticIndex;
-			PixelShader_t pixelShader = m_PixelShaderDict.Find( pshLookup );
-
-			// If we found both shaders, do the link!
-			if ( ( vertexShader != m_VertexShaderDict.InvalidIndex() ) && ( pixelShader != m_PixelShaderDict.InvalidIndex() ) )
-			{
-	#ifdef DX_TO_GL_ABSTRACTION
-				//HardwareShader_t hardwareVertexShader = vshLookup.m_ShaderStaticCombos.m_pHardwareShaders[nVertexShaderDynamicIndex];
-				//HardwareShader_t hardwarePixelShader = pshLookup.m_ShaderStaticCombos.m_pHardwareShaders[nPixelShaderDynamicIndex];
-
-				HardwareShader_t hardwareVertexShader = m_VertexShaderDict[vertexShader].m_ShaderStaticCombos.m_pHardwareShaders[nVertexShaderDynamicIndex];
-				HardwareShader_t hardwarePixelShader = m_PixelShaderDict[pixelShader].m_ShaderStaticCombos.m_pHardwareShaders[nPixelShaderDynamicIndex];
-
-				if ( ( hardwareVertexShader != INVALID_HARDWARE_SHADER ) && ( hardwarePixelShader != INVALID_HARDWARE_SHADER ) )
-				{
-					if ( S_OK != Dx9Device()->LinkShaderPair( (IDirect3DVertexShader9 *)hardwareVertexShader, (IDirect3DPixelShader9 *)hardwarePixelShader ) )
-					{
-						Warning( "Could not link OpenGL shaders: %s (%d, %d) : %s (%d, %d)\n", pVertexShaderName, nVertexShaderStaticIndex, nVertexShaderDynamicIndex, pPixelShaderName, nPixelShaderStaticIndex, nPixelShaderDynamicIndex );
-					}
-				}
-	#endif
-			}
-			else
-			{
-				Warning( "Invalid shader linkage: %s (%d, %d) : %s (%d, %d)\n", pVertexShaderName, nVertexShaderStaticIndex, nVertexShaderDynamicIndex, pPixelShaderName, nPixelShaderStaticIndex, nPixelShaderDynamicIndex );
-			}
-		}
-
-		pProgramCache->deleteThis();
-
-		float elapsed = ( float )( Sys_FloatTime() - st ) * 1000.0;
-		DevMsg( "WarmShaderCache took %.3f msec\n", elapsed );
-	}
-
-#endif
-//----------------------------------------------------------------------------------old code
 
 #ifdef DX_TO_GL_ABSTRACTION
 // if shaders are changed in a way that requires the client-side cache to be invalidated,
