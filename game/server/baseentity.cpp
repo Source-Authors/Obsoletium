@@ -2976,6 +2976,34 @@ bool CBaseEntity::PassesDamageFilter( const CTakeDamageInfo &info )
 	return true;
 }
 
+// Original Source match impl.
+static auto badmatch = []( unsigned char cName, unsigned char cQuery )
+{
+	// simple ascii case conversion
+	if ( cName == cQuery ) return true;
+
+	if ( cName - 'A' <= (unsigned char)'Z' - 'A' && cName - 'A' + 'a' == cQuery )
+		return true;
+	else if ( cName - 'a' <= (unsigned char)'z' - 'a' && cName - 'a' + 'A' == cQuery )
+		return true;
+
+	return false;
+};
+
+// Fixed Source match impl.
+static auto goodmatch = []( unsigned char cName, unsigned char cQuery )
+{
+	// simple ascii case conversion
+	if ( cName == cQuery ) return true;
+
+	if ( (unsigned char)(cName - 'A') <= (unsigned char)('Z' - 'A') && (unsigned char)(cName - 'A' + 'a') == cQuery )
+		return true;
+	else if ( (unsigned char)(cName - 'a') <= (unsigned char)('z' - 'a') && (unsigned char)(cName - 'a' + 'A') == cQuery )
+		return true;
+ 
+	return false;
+};
+
 FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 {
 	if ( nameToMatch == NULL_STRING )
@@ -2991,15 +3019,18 @@ FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 	{
 		unsigned char cName = *pszNameToMatch;
 		unsigned char cQuery = *pszQuery;
-		// simple ascii case conversion
-		if ( cName == cQuery )
-			;
-		else if ( cName - 'A' <= (unsigned char)'Z' - 'A' && cName - 'A' + 'a' == cQuery )
-			;
-		else if ( cName - 'a' <= (unsigned char)'z' - 'a' && cName - 'a' + 'A' == cQuery )
-			;
-		else
+
+		bool good = goodmatch( cName, cQuery );
+
+		// dimhotepus: Detect cases when name matching is different. Inspect them.
+		AssertMsg( !(good ^ badmatch(cName, cQuery)),
+			"Behavior change. %s and %s names matching diffs from original.\n",
+			pszQuery, pszNameToMatch );
+		if ( !good )
+		{
 			break;
+		}
+
 		++pszNameToMatch;
 		++pszQuery;
 	}
