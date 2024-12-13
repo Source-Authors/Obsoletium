@@ -913,6 +913,7 @@ C_SporeExplosion::C_SporeExplosion( void )
 	m_flStartSize			= 32;
 	m_flEndSize				= 64;
 	m_flSpawnRadius			= 32;
+	m_hMaterial				= NULL;
 	m_pSporeEffect			= NULL;
 
 	m_teParticleSpawn.Init( 32 );
@@ -950,7 +951,11 @@ void C_SporeExplosion::OnDataChanged( DataUpdateType_t updateType )
 		m_teParticleSpawn.Init( m_flSpawnRate );
 	}
 
-	m_pSporeEffect->SetDontRemove( m_bDontRemove );
+	// dimhotepus: Spore effect may not be created.
+	if ( m_pSporeEffect.IsValid() )
+	{
+		m_pSporeEffect->SetDontRemove( m_bDontRemove );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -981,6 +986,12 @@ void C_SporeExplosion::Start( CParticleMgr *pParticleMgr, IPrototypeArgAccess *p
 //-----------------------------------------------------------------------------
 void C_SporeExplosion::AddParticles( void )
 {
+	// dimhotepus: If spore effect not created or destroyed, nothing to emit.
+	if ( !m_pSporeEffect.IsValid() )
+	{
+		return;
+	}
+
 	//Spores
 	Vector	offset;
 	Vector	dir;
