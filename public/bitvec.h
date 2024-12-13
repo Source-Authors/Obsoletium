@@ -46,18 +46,10 @@ inline int FirstBitInWord( unsigned int elem, int offset )
 #if _WIN32
 	if ( !elem )
 		return -1;
-#if defined( _X360 )
-	// this implements CountTrailingZeros() / BitScanForward()
-	unsigned int mask = elem-1;
-	unsigned int comp = ~elem;
-	elem = mask & comp;
-	return (32 - _CountLeadingZeros(elem)) + offset;
-#else
+
 	unsigned long out;
 	_BitScanForward(&out, elem);
 	return out + offset;
-#endif
-
 #else
 	static unsigned firstBitLUT[256] = 
 	{
