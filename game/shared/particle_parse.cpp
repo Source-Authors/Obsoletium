@@ -170,17 +170,17 @@ void ParseParticleEffectsMap( const char *pMapName, bool bLoadSheets, IFileList 
 	MEM_ALLOC_CREDIT();
 
 	CUtlVector<CUtlString> files;
-	char szMapManifestFilename[MAX_PATH];
 
+	char szMapManifestFilename[MAX_PATH];
 	szMapManifestFilename[0] = NULL;
 
 	if ( pMapName && *pMapName )
 	{
-		V_snprintf( szMapManifestFilename, sizeof( szMapManifestFilename ), "maps/%s_particles.txt", pMapName );
+		V_sprintf_safe( szMapManifestFilename, "maps/%s_particles.txt", pMapName );
 	}
 
 	// Open the manifest file, and read the particles specified inside it
-	KeyValues *manifest = new KeyValues( szMapManifestFilename );
+	auto manifest = KeyValues::AutoDelete( szMapManifestFilename );
 	if ( manifest->LoadFromFile( filesystem, szMapManifestFilename, "GAME" ) )
 	{
 		DevMsg( "Successfully loaded particle effects manifest '%s' for map '%s'\n", szMapManifestFilename, pMapName );
