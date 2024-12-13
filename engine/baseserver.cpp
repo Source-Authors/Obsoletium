@@ -97,56 +97,55 @@ static void ServerTagsCleanUp( void )
 {
 	CUtlVector<char*> TagList;
 	ConVarRef sv_tags( "sv_tags" );
-	if ( sv_tags.IsValid() )
+	if ( !sv_tags.IsValid() ) return;
+
+	char tmptags[MAX_TAG_STRING_LENGTH];
+	tmptags[0] = '\0';
+
+	V_SplitString( sv_tags.GetString(), ",", TagList );
+
+	// make a pass on the tags to eliminate preceding whitespace and empty tags
+	for ( intp i = 0; i < TagList.Count(); i++ )
 	{
-		int i;
-		char tmptags[MAX_TAG_STRING_LENGTH];
-		tmptags[0] = '\0';
-
-		V_SplitString( sv_tags.GetString(), ",", TagList );
-
-		// make a pass on the tags to eliminate preceding whitespace and empty tags
-		for ( i = 0; i < TagList.Count(); i++ )
+		if ( i > 0 )
 		{
-			if ( i > 0 )
-			{
-				Q_strncat( tmptags, ",", MAX_TAG_STRING_LENGTH );
-			}
-
-			char *pChar = TagList[i];
-			while ( *pChar && *pChar == ' ' )
-			{
-				pChar++;
-			}
-
-			// make sure we don't have an empty string (all spaces or ,,)
-			if ( *pChar )
-			{
-				Q_strncat( tmptags, pChar, MAX_TAG_STRING_LENGTH );
-			}
+			V_strcat_safe( tmptags, "," );
 		}
 
-		// reset our lists and sort the tags
-		TagList.PurgeAndDeleteElementsArray();
-		V_SplitString( tmptags, ",", TagList );
-		TagList.Sort( SortServerTags );
-		tmptags[0] = '\0';
-
-		// create our new, sorted list of tags
-		for ( i = 0; i < TagList.Count(); i++ )
+		char *pChar = TagList[i];
+		while ( *pChar && *pChar == ' ' )
 		{
-			if ( i > 0 )
-			{
-				Q_strncat( tmptags, ",", MAX_TAG_STRING_LENGTH );
-			}
-
-			Q_strncat( tmptags, TagList[i], MAX_TAG_STRING_LENGTH );
+			pChar++;
 		}
 
-		// set our convar and purge our list
-		sv_tags.SetValue( tmptags );
-		TagList.PurgeAndDeleteElementsArray();
+		// make sure we don't have an empty string (all spaces or ,,)
+		if ( *pChar )
+		{
+			V_strcat_safe( tmptags, pChar );
+		}
 	}
+
+	// reset our lists and sort the tags
+	TagList.PurgeAndDeleteElementsArray();
+
+	V_SplitString( tmptags, ",", TagList );
+	TagList.Sort( SortServerTags );
+	tmptags[0] = '\0';
+
+	// create our new, sorted list of tags
+	for ( intp i = 0; i < TagList.Count(); i++ )
+	{
+		if ( i > 0 )
+		{
+			V_strcat_safe( tmptags, "," );
+		}
+
+		V_strcat_safe( tmptags, TagList[i] );
+	}
+
+	// set our convar and purge our list
+	sv_tags.SetValue( tmptags );
+	TagList.PurgeAndDeleteElementsArray();
 }
 
 static void SvTagsChangeCallback( IConVar *pConVar, const char *pOldValue, float flOldValue )
@@ -2397,7 +2396,7 @@ void CBaseServer::RecalculateTags( void )
 	// Games without this interface will have no tagged cvars besides "increased_maxplayers"
 	if ( serverGameTags )
 	{
-		KeyValues *pKV = new KeyValues( "GameTags" );
+		auto pKV = KeyValues::AutoDelete( "GameTags" );
 
 		serverGameTags->GetTaggedConVarList( pKV );
 
@@ -2421,8 +2420,6 @@ void CBaseServer::RecalculateTags( void )
 
 			p = p->GetNextKey();
 		}
-
-		pKV->deleteThis();
 	}
 
 	// Check maxplayers
@@ -2466,10 +2463,10 @@ void CBaseServer::AddTag( const char *pszTag )
 {
 	CUtlVector<char*> TagList;
 	V_SplitString( sv_tags.GetString(), ",", TagList );
-	for ( int i = 0; i < TagList.Count(); i++ )
+	for ( const char *tag : TagList )
 	{
 		// Already in the tag list?
-		if ( !Q_stricmp(TagList[i],pszTag) )
+		if ( !Q_stricmp(tag,pszTag) )
 			return;
 	}
 	TagList.PurgeAndDeleteElementsArray();
@@ -2477,9 +2474,9 @@ void CBaseServer::AddTag( const char *pszTag )
 	// Append it
 	char tmptags[MAX_TAG_STRING_LENGTH];
 	tmptags[0] = '\0';
-	Q_strncpy( tmptags, pszTag, MAX_TAG_STRING_LENGTH );
-	Q_strncat( tmptags, ",", MAX_TAG_STRING_LENGTH );
-	Q_strncat( tmptags, sv_tags.GetString(), MAX_TAG_STRING_LENGTH );
+	V_strcpy_safe( tmptags, pszTag );
+	V_strcat_safe( tmptags, "," );
+	V_strcat_safe( tmptags, sv_tags.GetString() );
 	sv_tags.SetValue( tmptags );
 }
 
@@ -2494,17 +2491,18 @@ void CBaseServer::RemoveTag( const char *pszTag )
 
 	char tmptags[MAX_TAG_STRING_LENGTH];
 	tmptags[0] = '\0';
+	
+	bool bFoundIt = false;
 
 	CUtlVector<char*> TagList;
-	bool bFoundIt = false;
 	V_SplitString( sv_tags.GetString(), ",", TagList );
-	for ( int i = 0; i < TagList.Count(); i++ )
+	for ( const char *tag : TagList )
 	{
 		// Keep any tags other than the specified one
-		if ( Q_stricmp(TagList[i],pszTag) )
+		if ( Q_stricmp(tag,pszTag) )
 		{
-			Q_strncat( tmptags, TagList[i], MAX_TAG_STRING_LENGTH );
-			Q_strncat( tmptags, ",", MAX_TAG_STRING_LENGTH );
+			V_strcat_safe( tmptags, tag );
+			V_strcat_safe( tmptags, "," );
 		}
 		else
 		{
