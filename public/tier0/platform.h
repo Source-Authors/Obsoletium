@@ -807,12 +807,12 @@ inline void SwapFloat( float *pOut, const float *pIn )		{ SafeSwapFloat( pOut, p
 
 #endif
 
-FORCEINLINE unsigned long LoadLittleDWord( const unsigned long *base, size_t dwordIndex )
+FORCEINLINE unsigned int LoadLittleDWord( const unsigned int *base, size_t dwordIndex )
 	{
 		return LittleDWord( base[dwordIndex] );
 	}
 
-FORCEINLINE void StoreLittleDWord( unsigned long *base, size_t dwordIndex, unsigned long dword )
+FORCEINLINE void StoreLittleDWord( unsigned int *base, size_t dwordIndex, unsigned int dword )
 	{
 		base[dwordIndex] = LittleDWord(dword);
 	}
