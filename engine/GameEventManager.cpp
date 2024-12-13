@@ -221,7 +221,7 @@ bool CGameEventManager::ParseEventList(SVC_GameEventList *msg)
 		int id = msg->m_DataIn.ReadUBitLong( MAX_EVENT_BITS );
 		char name[MAX_EVENT_NAME_LENGTH];
 		msg->m_DataIn.ReadString( name, sizeof(name) );
-        		
+
 		CGameEventDescriptor *descriptor = GetEventDescriptor( name );
 
 		if ( !descriptor )
@@ -317,7 +317,7 @@ IGameEvent *CGameEventManager::CreateEvent( const char *name, bool bForce )
 	}
 
 	// create & return the new event 
-	return new CGameEvent ( descriptor );
+	return CreateEvent( descriptor );
 }
 
 bool CGameEventManager::FireEvent( IGameEvent *event, bool bServerOnly )
@@ -751,9 +751,17 @@ bool CGameEventManager::RegisterEvent( KeyValues * event)
 		intp index = m_GameEvents.AddToTail();
 		descriptor =  &m_GameEvents.Element(index);
 
-		AssertMsg2( V_strlen( event->GetName() ) <= MAX_EVENT_NAME_LENGTH, "Event named '%s' exceeds maximum name length %d", event->GetName(), MAX_EVENT_NAME_LENGTH );
+		// dimhotepus: Check for event name overflow correctly.
+		const bool overflow = V_strlen( event->GetName() ) >= ssize(descriptor->name);
+		if (overflow)
+		{
+			AssertMsg2( false, "Event named '%s' exceeds maximum name length %zd.\n",
+				event->GetName(), ssize(descriptor->name) );
+			Warning("Event named '%s' exceeds maximum name length %zd.\n",
+				event->GetName(), ssize(descriptor->name) );
+		}
 
-		Q_strncpy( descriptor->name, event->GetName(), MAX_EVENT_NAME_LENGTH );	
+		V_strcpy_safe( descriptor->name, event->GetName() );
 	}
 	else
 	{
