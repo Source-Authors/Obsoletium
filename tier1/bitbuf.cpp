@@ -1120,7 +1120,7 @@ float bf_read::ReadBitCoordMP( bool bIntegral, bool bLowPrecision )
 		return 0.f;
 	}
 	
-	static const float mul_table[4] =
+	static constexpr float mul_table[4] =
 	{
 		1.f/(1<<COORD_FRACTIONAL_BITS),
 		-1.f/(1<<COORD_FRACTIONAL_BITS),
@@ -1130,7 +1130,7 @@ float bf_read::ReadBitCoordMP( bool bIntegral, bool bLowPrecision )
 	//equivalent to: float multiply = mul_table[ ((flags & SIGN) ? 1 : 0) + bLowPrecision*2 ];
 	float multiply = *(float*)((uintptr_t)&mul_table[0] + (flags & 4) + bLowPrecision*8);
 
-	static const unsigned char numbits_table[8] =
+	static constexpr unsigned char numbits_table[8] =
 	{
 		COORD_FRACTIONAL_BITS,
 		COORD_FRACTIONAL_BITS,
@@ -1190,7 +1190,7 @@ unsigned int bf_read::ReadBitCoordBits (void)
 	if ( flags == 0 )
 		return 0;
 
-	static const int numbits_table[3] =
+	static constexpr int numbits_table[3] =
 	{
 		COORD_INTEGER_BITS + 1,
 		COORD_FRACTIONAL_BITS + 1,
@@ -1222,7 +1222,7 @@ unsigned int bf_read::ReadBitCoordMPBits( bool bIntegral, bool bLowPrecision )
 	}
 	else
 	{
-		static const unsigned char numbits_table[8] =
+		static constexpr unsigned char numbits_table[8] =
 		{
 			1 + COORD_FRACTIONAL_BITS,
 			1 + COORD_FRACTIONAL_BITS,
