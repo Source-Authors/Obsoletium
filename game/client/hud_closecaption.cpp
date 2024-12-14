@@ -637,7 +637,7 @@ public:
 
 		CUtlRBTree< AsyncCaption_t::BlockInfo_t, unsigned short >& requested = m_Db[ fileIndex ].m_RequestedBlocks;
 
-		int idx = requested.Find( search );
+		auto idx = requested.Find( search );
 		if ( idx == requested.InvalidIndex() )
 		{
 			entry = false;
@@ -668,7 +668,7 @@ public:
 
 		CUtlRBTree< AsyncCaption_t::BlockInfo_t, unsigned short >& requested = m_Db[ dbFileIndex ].m_RequestedBlocks;
 
-		int idx = FindOrAddBlock( dbFileIndex, blockNum );
+		auto idx = FindOrAddBlock( dbFileIndex, blockNum );
 		if ( idx == requested.InvalidIndex() )
 		{
 			Assert( 0 );
@@ -731,7 +731,7 @@ public:
 	// Purpose: Touch the cache or load the scene into the cache for the first time
 	// Input  : *filename - 
 	//-----------------------------------------------------------------------------
-	int FindOrAddBlock( int dbFileIndex, int blockNum )
+	unsigned short FindOrAddBlock( int dbFileIndex, int blockNum )
 	{
 		const char *dbname = m_Db[ dbFileIndex ].m_DataBaseFile.String();
 
@@ -741,7 +741,7 @@ public:
 		search.blocknum = blockNum;
 		search.fileindex = dbFileIndex;
 
-		int idx = requested.Find( search );
+		auto idx = requested.Find( search );
 		if ( idx != requested.InvalidIndex() )
 		{
 			// Move it to head of LRU
@@ -2253,17 +2253,16 @@ private:
 
 void CHudCloseCaption::ProcessAsyncWork()
 {
-	int i;
-	for( i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex(); i = m_AsyncWork.Next( i ) )
+	for( auto i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex(); i = m_AsyncWork.Next( i ) )
 	{
 		// check for data arrival
 		CAsyncCaption *item = m_AsyncWork[ i ];
 		item->ProcessAsyncWork( this, m_AsyncCaptions );
 	}
 	// Now operate on any new data which arrived
-	for( i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex();  )
+	for( auto i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex();  )
 	{
-		int n = m_AsyncWork.Next( i );
+		auto n = m_AsyncWork.Next( i );
 
 		CAsyncCaption *item = m_AsyncWork[ i ];
 		wchar_t stream[ MAX_CAPTION_CHARACTERS ];
@@ -2299,7 +2298,7 @@ void CHudCloseCaption::ProcessAsyncWork()
 
 void CHudCloseCaption::ClearAsyncWork()
 {
-	for ( int i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex(); i = m_AsyncWork.Next( i ) )
+	for ( auto i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex(); i = m_AsyncWork.Next( i ) )
 	{
         CAsyncCaption *item = m_AsyncWork[ i ];
 		delete item;
