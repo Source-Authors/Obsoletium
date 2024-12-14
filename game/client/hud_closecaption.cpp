@@ -42,8 +42,8 @@ static ConVar cc_smallfontlength( "cc_smallfontlength", "300", 0, "If text strea
 
 #define	MAX_CAPTION_CHARACTERS		4096
 
-#define CAPTION_PAN_FADE_TIME		0.5			// The time it takes for a line to fade while panning over a large entry
-#define CAPTION_PAN_SLIDE_TIME		0.5			// The time it takes for a line to slide on while panning over a large entry
+#define CAPTION_PAN_FADE_TIME		0.5f			// The time it takes for a line to fade while panning over a large entry
+#define CAPTION_PAN_SLIDE_TIME		0.5f			// The time it takes for a line to slide on while panning over a large entry
 
 
 // A work unit is a pre-processed chunk of CC text to display
