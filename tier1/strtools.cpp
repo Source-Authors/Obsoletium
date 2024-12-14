@@ -2661,7 +2661,7 @@ void V_wcstostr( const wchar_t *pWString, int nInSize, OUT_Z_CAP(nOutSizeInChars
 // backslashification
 //--------------------------------------------------------------------------------
 
-static char s_BackSlashMap[]="\tt\nn\rr\"\"\\\\";
+static constexpr char s_BackSlashMap[]="\tt\nn\rr\"\"\\\\";
 
 char *V_AddBackSlashesToSpecialChars( char const *pSrc )
 {
@@ -2704,7 +2704,7 @@ char *V_AddBackSlashesToSpecialChars( char const *pSrc )
 //-----------------------------------------------------------------------------
 // Purpose: Helper for converting a numeric value to a hex digit, value should be 0-15.
 //-----------------------------------------------------------------------------
-char cIntToHexDigit( int nValue )
+static constexpr char cIntToHexDigit( int nValue )
 {
 	Assert( nValue >= 0 && nValue <= 15 );
 	return "0123456789ABCDEF"[ nValue & 15 ];
@@ -2714,7 +2714,7 @@ char cIntToHexDigit( int nValue )
 // Purpose: Helper for converting a hex char value to numeric, return -1 if the char
 //          is not a valid hex digit.
 //-----------------------------------------------------------------------------
-int iHexCharToInt( char cValue )
+static constexpr int iHexCharToInt( char cValue )
 {
 	int32 iValue = cValue;
 	if ( (uint32)( iValue - '0' ) < 10 )
@@ -3021,7 +3021,7 @@ bool BGetLocalFormattedTime( time_t timeVal, char *pchTime, int cubTime )
 // Prints out a memory dump where stuff that's ascii is human readable, etc.
 void V_LogMultiline( bool input, char const *label, const char *data, size_t len, CUtlString &output )
 {
-	static const char HEX[] = "0123456789abcdef";
+	constexpr char HEX[] = "0123456789abcdef";
 	const char * direction = (input ? " << " : " >> ");
 	const size_t LINE_SIZE = 24;
 	char hex_line[LINE_SIZE * 9 / 4 + 2], asc_line[LINE_SIZE + 1];
@@ -3174,7 +3174,7 @@ struct HtmlEntity_t
 	ptrdiff_t nEntityLength;
 };
 
-const static HtmlEntity_t g_BasicHTMLEntities[] = {
+constexpr static HtmlEntity_t g_BasicHTMLEntities[] = {
 		{ '"', "&quot;", 6 },
 		{ '\'', "&#039;", 6 },
 		{ '<', "&lt;", 4 },
@@ -3183,7 +3183,7 @@ const static HtmlEntity_t g_BasicHTMLEntities[] = {
 		{ 0, NULL, 0 } // sentinel for end of array
 };
 
-const static HtmlEntity_t g_WhitespaceEntities[] = {
+constexpr static HtmlEntity_t g_WhitespaceEntities[] = {
 		{ ' ', "&nbsp;", 6 },
 		{ '\n', "<br>", 4 },
 		{ 0, NULL, 0 } // sentinel for end of array
@@ -3465,7 +3465,7 @@ bool V_HtmlEntityDecodeToUTF8( OUT_Z_CAP( nDestSize ) char *pDest, const ptrdiff
 	return true;
 }
 
-static const char *g_pszSimpleBBCodeReplacements[] = {
+static constexpr char * const g_pszSimpleBBCodeReplacements[] = {
 	"[b]", "<b>",
 	"[/b]", "</b>",
 	"[i]", "<i>",
@@ -3860,8 +3860,8 @@ bool V_ExtractDomainFromURL( const char *pchURL, OUT_Z_CAP( cchDomain ) char *pc
 {
 	pchDomain[ 0 ] = 0;
 
-	static const char *k_pchSteamOpenUrl = "steam://openurl/";
-	static const char *k_pchSteamOpenUrlExt = "steam://openurl_external/";
+	constexpr char k_pchSteamOpenUrl[] = "steam://openurl/";
+	constexpr char k_pchSteamOpenUrlExt[] = "steam://openurl_external/";
 
 	const char *pchOpenUrlSuffix = StringAfterPrefix( pchURL, k_pchSteamOpenUrl );
 	if ( pchOpenUrlSuffix == NULL )
