@@ -1318,7 +1318,7 @@ int64 bf_read::ReadLongLong()
 	// dimhotepus: Fix reading int64 bits in LP64 model.
 	// Read the two DWORDs according to network endian
 	const short endianIndex = 0x0100;
-	byte *idx = (byte*)&endianIndex;
+	const byte *idx = (const byte*)&endianIndex;
 	pLongs[*idx++] = ReadUBitLong(sizeof(uint32) * CHAR_BIT);
 	pLongs[*idx] = ReadUBitLong(sizeof(uint32) * CHAR_BIT);
 
