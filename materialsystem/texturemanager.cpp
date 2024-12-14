@@ -1097,7 +1097,7 @@ private:
 
 		s_TextureManager.m_nAsyncLoadThread = ThreadGetCurrentId();
 		( ( AsyncLoader* )_this )->ThreadLoader_Main();
-		s_TextureManager.m_nAsyncLoadThread = -1;
+		s_TextureManager.m_nAsyncLoadThread = std::numeric_limits<ThreadId_t>::max();
 		return 0;
 	}
 
@@ -1397,7 +1397,7 @@ private:
 
 		s_TextureManager.m_nAsyncReadThread = ThreadGetCurrentId();
 		( ( AsyncReader* ) _this )->ThreadReader_Main();
-		s_TextureManager.m_nAsyncReadThread = -1;
+		s_TextureManager.m_nAsyncReadThread = std::numeric_limits<ThreadId_t>::max();
 		return 0;
 	}
 
