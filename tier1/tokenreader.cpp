@@ -246,7 +246,7 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 		return TOKENEOF;
 	}
 
-	char ch = get();
+	int ch = get();
 
 	//
 	// Look for all the valid operators.
@@ -271,7 +271,7 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 		case '}':
 		case '\\':
 		{
-			pszStore[0] = ch;
+			pszStore[0] = static_cast<char>(ch);
 			pszStore[1] = 0;
 			return OPERATOR;
 		}
@@ -294,7 +294,7 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 		{
 			if ( (pszStore - pStart + 1) < nSize )
 			{
-				*pszStore = ch;
+				*pszStore = static_cast<char>(ch);
 				pszStore++;
 			}
 
@@ -316,7 +316,7 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 		//
 		// Put back the non-numeric character for the next call.
 		//
-		putback(ch);
+		putback(static_cast<char>(ch));
 		*pszStore = '\0';
 		return INTEGER;
 	}
@@ -329,7 +329,7 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 	{
 		if ( (pszStore - pStart + 1) < nSize )
 		{
-			*pszStore = ch;
+			*pszStore = static_cast<char>(ch);
 			pszStore++;
 		}
 
@@ -339,7 +339,7 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 	//
 	// Put back the non-identifier character for the next call.
 	//
-	putback(ch);
+	putback(static_cast<char>(ch));
 	*pszStore = '\0';
 	return IDENT;
 }
@@ -436,7 +436,7 @@ bool TokenReader::SkipWhiteSpace(void)
 
 	while (true)
 	{
-		char ch = get();
+		int ch = get();
 
 		if ((ch == ' ') || (ch == '\t') || (ch == '\r') || (ch == 0))
 		{
@@ -476,7 +476,7 @@ bool TokenReader::SkipWhiteSpace(void)
 			//
 			// It is a worthy character. Put it back.
 			//
-			putback(ch);
+			putback(static_cast<char>(ch));
 			return(bCombineStrings);
 		}
 	}
