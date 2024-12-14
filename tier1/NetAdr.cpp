@@ -306,18 +306,14 @@ bool netadr_t::SetFromString( const char *pch, bool bUseDNS )
 			|| n5 < 0 || n5 > 65535
 		)
 			return false;
-		SetIP( n1, n2, n3, n4 );
-		SetPort( ( uint16 ) n5 );
+		// dimhotepus: Safe to cast as checked above.
+		SetIP( static_cast<uint8>(n1), static_cast<uint8>(n2), static_cast<uint8>(n3), static_cast<uint8>(n4) );
+		SetPort( static_cast<uint16>(n5) );
 		return true;
 	}
 
 	if ( bUseDNS )
 	{
-// X360TBD:
-	// dgoodenough - since this is skipped on X360, seems reasonable to skip as well on PS3
-	// PS3_BUILDFIX
-	// FIXME - Leap of faith, this works without asserting on X360, so I assume it will on PS3
-#if !defined( _X360 ) && !defined( _PS3 )
 		// Null out the colon if there is one
 		char *pchColon = strchr( address, ':' );
 		if ( pchColon )
@@ -335,13 +331,19 @@ bool netadr_t::SetFromString( const char *pch, bool bUseDNS )
 		// Set Port to whatever was specified after the colon
 		if ( pchColon )
 		{
-			SetPort( V_atoi( ++pchColon ) );
+			const int parsedPort = V_atoi( ++pchColon );
+			// dimhotepus: Check port is valid.
+			if (parsedPort >= static_cast<int>(std::numeric_limits<unsigned short>::min()) &&
+				parsedPort <= static_cast<int>(std::numeric_limits<unsigned short>::max()))
+			{
+				SetPort( static_cast<unsigned short>(parsedPort) );
+			}
+			else
+			{
+				return false;
+			}
 		}
 		return true;
-#else
-		Assert( 0 );
-		return false;
-#endif
 	}
 
 	return false;
