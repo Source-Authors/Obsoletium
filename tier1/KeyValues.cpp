@@ -1603,11 +1603,17 @@ Color KeyValues::GetColor( const char *keyName )
 		}
 		else if ( dat->m_iDataType == TYPE_FLOAT )
 		{
-			color[0] = dat->m_flValue;
+			// dimhotepus: Check value is in color range.
+			Assert(dat->m_flValue >= std::numeric_limits<byte>::min() &&
+				dat->m_flValue <= std::numeric_limits<byte>::max());
+			color[0] = static_cast<byte>( dat->m_flValue );
 		}
 		else if ( dat->m_iDataType == TYPE_INT )
 		{
-			color[0] = dat->m_iValue;
+			// dimhotepus: Check value is in color range.
+			Assert(dat->m_iValue >= std::numeric_limits<byte>::min() &&
+				dat->m_iValue <= std::numeric_limits<byte>::max());
+			color[0] = static_cast<byte>( dat->m_iValue );
 		}
 		else if ( dat->m_iDataType == TYPE_STRING )
 		{
@@ -3005,9 +3011,10 @@ void KeyValues::UnpackIntoStructure( KeyValuesUnpackStructure const *pUnpackTabl
 				if (find_it)
 				{
 					Color c=GetColor( pUnpackTable->m_pKeyName );
-					dest_v->x = c.r();
-					dest_v->y = c.g();
-					dest_v->z = c.b();
+					// dimhotepus: Safe to cast as RGB are bytes.
+					dest_v->x = static_cast<vec_t>(c.r());
+					dest_v->y = static_cast<vec_t>(c.g());
+					dest_v->z = static_cast<vec_t>(c.b());
 				}
 				else
 				{
