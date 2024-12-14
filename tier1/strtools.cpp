@@ -97,7 +97,6 @@ static int FastToLower( char c )
 void _V_memset (const char*, int, void *dest, int fill, ptrdiff_t count)
 {
 	Assert( count >= 0 );
-	AssertValidWritePtr( dest, count );
 
 	memset(dest,fill,count);
 }
@@ -105,8 +104,6 @@ void _V_memset (const char*, int, void *dest, int fill, ptrdiff_t count)
 void _V_memcpy (const char*, int, void *dest, const void *src, ptrdiff_t count)
 {
 	Assert( count >= 0 );
-	AssertValidReadPtr( src, count );
-	AssertValidWritePtr( dest, count );
 
 	memcpy( dest, src, count );
 }
@@ -114,8 +111,6 @@ void _V_memcpy (const char*, int, void *dest, const void *src, ptrdiff_t count)
 void _V_memmove(const char*, int, void *dest, const void *src, ptrdiff_t count)
 {
 	Assert( count >= 0 );
-	AssertValidReadPtr( src, count );
-	AssertValidWritePtr( dest, count );
 
 	memmove( dest, src, count );
 }
@@ -123,15 +118,12 @@ void _V_memmove(const char*, int, void *dest, const void *src, ptrdiff_t count)
 int _V_memcmp (const char*, int, const void *m1, const void *m2, ptrdiff_t count)
 {
 	Assert( count >= 0 );
-	AssertValidReadPtr( m1, count );
-	AssertValidReadPtr( m2, count );
 
 	return memcmp( m1, m2, count );
 }
 
 ptrdiff_t _V_strlen(const char*, int, const char *str)
 {
-	AssertValidStringPtr(str);
 	return strlen( str );
 }
 
