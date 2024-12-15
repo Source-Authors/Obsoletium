@@ -205,7 +205,7 @@ char *V_strupr( char *start )
 		if ( (unsigned char)(*str - 'a') <= ('z' - 'a') )
 			*str -= 'a' - 'A';
 		else if ( (unsigned char)*str >= 0x80 ) // non-ascii, fall back to CRT
-			*str = toupper( *str );
+			*str = static_cast<unsigned char>(toupper( *str ));
 		str++;
 	}
 	return start;
@@ -219,7 +219,7 @@ char *V_strlower( char *start )
 		if ( (unsigned char)(*str - 'A') <= ('Z' - 'A') )
 			*str += 'a' - 'A';
 		else if ( (unsigned char)*str >= 0x80 ) // non-ascii, fall back to CRT
-			*str = tolower( *str );
+			*str = static_cast<unsigned char>(tolower( *str ));
 		str++;
 	}
 	return start;
