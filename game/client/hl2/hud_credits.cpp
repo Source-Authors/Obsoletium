@@ -502,7 +502,8 @@ void CHudCredits::DrawIntroCreditsName( void )
 			 continue;
 	
 		vgui::HScheme scheme = vgui::scheme()->GetScheme( "ClientScheme" );
-		vgui::HFont m_hTFont = vgui::scheme()->GetIScheme(scheme)->GetFont( credit.szFontName );
+		// dimhotepus: High-resolution displays - fix intro credits font is too small.
+		vgui::HFont m_hTFont = vgui::scheme()->GetIScheme(scheme)->GetFont( credit.szFontName, true );
 
 		float localTime = gpGlobals->curtime - credit.flTimeStart;
 
@@ -657,7 +658,8 @@ void CHudCredits::PrepareIntroCredits( void )
 		++i;
 
 		vgui::HScheme scheme = vgui::scheme()->GetScheme( "ClientScheme" );
-		vgui::HFont m_hTFont = vgui::scheme()->GetIScheme(scheme)->GetFont( credit.szFontName );
+		// dimhotepus: High-resolution displays - fix intro credits font is too small.
+		vgui::HFont m_hTFont = vgui::scheme()->GetIScheme(scheme)->GetFont( credit.szFontName, true );
 
 		credit.flYPos = m_flY + ( iSlot * surface()->GetFontTall ( m_hTFont ) );
 		credit.flXPos = m_flX;
